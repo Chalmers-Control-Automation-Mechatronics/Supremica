@@ -96,6 +96,8 @@ public class ProjectBuildFromXml
 	private final static String actionStr = "Action";
 	private final static String controlsStr = "Controls";
 	private final static String controlStr = "Control";
+	private final static String timersStr = "Timers";
+	private final static String timerStr = "Timer";
 	private final static String commandStr = "Command";
 	private final static String conditionStr = "Condition";
 	private final static String interfacesStr = "Interfaces";
@@ -120,6 +122,7 @@ public class ProjectBuildFromXml
 	private Action currAction = null;
 	private Control currControl = null;
 	private Signals currSignals = null;
+	private Timers currTimers = null;
 	private InputProtocol inputProtocol = InputProtocol.UnknownProtocol;
 	private File thisFile = null;
 
@@ -328,6 +331,14 @@ public class ProjectBuildFromXml
 		else if (controlStr.equals(name))
 		{
 			doControl(attributes);
+		}
+		else if (timersStr.equals(name))
+		{
+			doTimers(attributes);
+		}
+		else if (timerStr.equals(name))
+		{
+			doTimer(attributes);
 		}
 		else if (commandStr.equals(name))
 		{
@@ -803,6 +814,58 @@ public class ProjectBuildFromXml
 		currControl = new Control(label, invert);
 
 		currControls.addControl(currControl);
+	}
+
+	public final void doTimers(Attributes attributes)
+		throws SAXException
+	{
+		if (currProject == null)
+		{
+			throwException("Project section is missing");
+		}
+		currTimers = currProject.getTimers();
+	}
+
+	public final void doTimer(Attributes attributes)
+		throws SAXException
+	{
+		if (currTimers == null)
+		{
+			throwException("Timers section is missing");
+		}
+
+		String name = attributes.getValue("name");
+		if (name == null)
+		{
+			throwException("name attribute is missing");
+		}
+
+		String startEvent = attributes.getValue("startEvent");
+		if (startEvent == null)
+		{
+			throwException("startEvent attribute is missing");
+		}
+
+		String timeoutEvent = attributes.getValue("timeoutEvent");
+		if (timeoutEvent == null)
+		{
+			throwException("timeoutEvent attribute is missing");
+		}
+
+		String delayStr = attributes.getValue("delay");
+		if (delayStr == null)
+		{
+			throwException("delay attribute is missing");
+		}
+		int delay = Integer.parseInt(delayStr);
+
+		if (currTimers.hasTimer(name))
+		{
+			throwException("Multiple timers of " + name);
+		}
+		EventTimer currTimer = new EventTimer(name, startEvent, timeoutEvent, delay);
+
+		currTimers.addTimer(currTimer);
 	}
 
 	public final void doCommand(Attributes attributes)

@@ -67,6 +67,7 @@ public class Project
 	private Controls theControls = null;
 	private Signals theInputSignals = null;
 	private Signals theOutputSignals = null;
+	private Timers theTimers = null;
 	private URL animationURL = null;
 
 	public Project()
@@ -75,6 +76,7 @@ public class Project
 		theControls = new Controls();
 		theInputSignals = new Signals();
 		theOutputSignals = new Signals();
+		theTimers = new Timers();
 	}
 
 	public Project(String name)
@@ -91,6 +93,7 @@ public class Project
 		theControls = new Controls(otherProject.theControls);
 		theInputSignals = new Signals(otherProject.theInputSignals);
 		theOutputSignals = new Signals(otherProject.theOutputSignals);
+		theTimers = new Timers(otherProject.theTimers);
 		setName(otherProject.getName());
 	}
 
@@ -122,6 +125,16 @@ public class Project
 	public Iterator outputSignalsIterator()
 	{
 		return theOutputSignals.iterator();
+	}
+
+	public Timers getTimers()
+	{
+		return theTimers;
+	}
+
+	public Iterator timersIterator()
+	{
+		return theTimers.iterator();
 	}
 
 	public boolean hasAnimation()
@@ -171,6 +184,7 @@ public class Project
 		addOutputSignals(otherProject.getOutputSignals());
 		addActions(otherProject.getActions());
 		addControls(otherProject.getControls());
+		addTimers(otherProject.getTimers());
 		setAnimationURL(otherProject.getAnimationURL());
 	}
 
@@ -214,6 +228,16 @@ public class Project
 		notifyListeners(AutomataListeners.MODE_ACTIONS_OR_CONTROLS_CHANGED, null);
 	}
 
+	private void addTimers(Timers otherTimers)
+	{
+		if (theTimers == null)
+		{
+			theTimers = new Timers();
+		}
+		theTimers.addTimers(otherTimers);
+		notifyListeners(AutomataListeners.MODE_ACTIONS_OR_CONTROLS_CHANGED, null);
+	}
+
 	public void clearActions()
 	{
 		if (theActions != null)
@@ -232,11 +256,21 @@ public class Project
 		}
 	}
 
+	public void clearTimers()
+	{
+		if (theTimers != null)
+		{
+			theTimers.clear();
+			notifyListeners(AutomataListeners.MODE_ACTIONS_OR_CONTROLS_CHANGED, null);
+		}
+	}
+
 	public void clear()
 	{
 		super.clear();
 		theActions.clear();
 		theControls.clear();
+		theTimers.clear();
 	}
 
 	public boolean equalProject(Project other)

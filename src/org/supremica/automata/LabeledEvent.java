@@ -58,6 +58,7 @@ public class LabeledEvent
 	private String id = "";
 	// The label is what shows in the dot-figures, this is the global identifier of an event, appearing in the alphabet
 	private String label = "";
+
 	private boolean controllable = true;
 	private boolean prioritized = true;
 	private boolean immediate = false;

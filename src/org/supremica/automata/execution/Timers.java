@@ -47,57 +47,90 @@
  *
  * Supremica is owned and represented by KA.
  */
-package org.supremica.util;
+package org.supremica.automata.execution;
 
-import java.util.Date;
+import java.util.*;
 
-public class ActionTimer
+public class Timers
 {
-	private Date startDate = null;
-	private Date stopDate = null;
+	private HashSet theTimers = null;
+	private HashMap labelToTimerMap = null;
 
-	public ActionTimer()
-	{	}
-
-	/**
-	 * Starts the timer.
-	 */
-	public void start()
+	public Timers()
 	{
-		stopDate = null;
-		startDate = new Date();
+		theTimers = new HashSet();
+		labelToTimerMap = new HashMap();
 	}
 
-
-	/**
-	 * Stops the timer.
-	 */
-	public void stop()
+	public Timers(Timers otherTimers)
 	{
-		stopDate = new Date();
+		theTimers = new HashSet((int) (otherTimers.size() * 1.5));
+		labelToTimerMap = new HashMap((int) (otherTimers.size() * 1.5));
+
+		for (Iterator actIt = otherTimers.iterator(); actIt.hasNext(); )
+		{
+			EventTimer currTimer = (EventTimer) actIt.next();
+			EventTimer newTimer = new EventTimer(currTimer);
+
+			addTimer(newTimer);
+		}
 	}
 
-	/**
-	 * Returns the elapsed time in milliseconds between last start and last stop call.
-	 * If stop is not called before this method then the time since last call
-	 * to start is returned */
-	public long elapsedTime()
-		throws IllegalStateException
+	public void addTimers(Timers otherTimers)
 	{
-		if (startDate == null)
+		for (Iterator actIt = otherTimers.iterator(); actIt.hasNext(); )
 		{
-			throw new IllegalStateException("startDate is negative");
+			EventTimer currTimer = (EventTimer) actIt.next();
+			EventTimer newTimer = new EventTimer(currTimer);
+
+			addTimer(newTimer);
 		}
-		if (stopDate == null)
+	}
+
+	public boolean addTimer(EventTimer theTimer)
+	{
+		if (theTimer == null)
 		{
-			return (new Date()).getTime() - startDate.getTime();
+			return false;
 		}
-		return stopDate.getTime() - startDate.getTime();
+		if (labelToTimerMap.containsKey(theTimer.getName()))
+		{
+			return false;
+		}
+		theTimers.add(theTimer);
+		labelToTimerMap.put(theTimer.getName(), theTimer);
+		return true;
+	}
+
+	public void removeTimer(EventTimer theTimer)
+	{
+		theTimers.remove(theTimer);
+		labelToTimerMap.remove(theTimer.getName());
+	}
+
+	public boolean hasTimer(String label)
+	{
+		return labelToTimerMap.containsKey(label);
+	}
+
+	public EventTimer getTimer(String label)
+	{
+		return (EventTimer) labelToTimerMap.get(label);
+	}
+
+	public Iterator iterator()
+	{
+		return theTimers.iterator();
+	}
+
+	public int size()
+	{
+		return theTimers.size();
 	}
 
 	public void clear()
 	{
-		startDate = null;
-		stopDate = null;
+		theTimers.clear();
+		labelToTimerMap.clear();
 	}
 }
