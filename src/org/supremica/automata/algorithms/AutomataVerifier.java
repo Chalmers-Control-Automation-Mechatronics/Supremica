@@ -261,7 +261,12 @@ public class AutomataVerifier
 			}
 			else if (verificationOptions.getVerificationType() == VerificationType.LanguageInclusion)
 			{
-				if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Monolithic)
+
+			    if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.BDD)
+				{
+					return BDDLanguageInclusionVerification();
+				}
+			    else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Monolithic)
 				{
 					// Language inclusion is performed as a controllability verification!
 					return monolithicControllabilityVerification();
@@ -1202,6 +1207,24 @@ public class AutomataVerifier
 		 */
 	}
 
+
+  
+	/**
+	 * Answers YES/NO to the language inclusion problem
+	 *
+	 *@see  BDDAutomata, AutomataBDDVerifier
+	 */
+    private boolean BDDLanguageInclusionVerification()
+	throws Exception 
+    {
+	Automata unselected = ActionMan.getGui().getUnselectedAutomata();
+	AutomataBDDVerifier abf = new AutomataBDDVerifier(theAutomata, unselected);
+	boolean ret = abf.passLanguageInclusion();
+	abf.cleanup();
+	return ret;
+
+    }
+  
 	/**
 	 * Answers YES/NO to the controllability problem
 	 *
@@ -1209,6 +1232,7 @@ public class AutomataVerifier
 	 *@see  BDDAutomata, AutomataBDDVerifier
 	 */
     private boolean BDDControllabilityVerification()
+	throws Exception 
     {
 	AutomataBDDVerifier abf = new AutomataBDDVerifier(theAutomata);
 	boolean ret = abf.isControllable();
@@ -1223,6 +1247,7 @@ public class AutomataVerifier
 	 *@see  BDDAutomata, AutomataBDDVerifier
 	 */
     private boolean BDDNonBlockingVerification()
+	throws Exception
     {
 	AutomataBDDVerifier abf = new AutomataBDDVerifier(theAutomata);
 	boolean ret = abf.isNonBlocking();

@@ -5,6 +5,8 @@ package org.supremica.automata.algorithms;
 import org.supremica.automata.*;
 import org.supremica.util.BDD.*;
 
+import java.util.*;
+
 /**
  * AutomataBDDVerifier, for verification with BDDs
  *
@@ -12,8 +14,8 @@ import org.supremica.util.BDD.*;
 
 public class AutomataBDDVerifier {
     private  org.supremica.automata.Automata theAutomata;
-    private BDDAutomata ba;
-    private Supervisor sup;
+    private BDDAutomata ba = null;
+    private Supervisor sup = null;
 
     /**
      * creates a verification object
@@ -21,12 +23,50 @@ public class AutomataBDDVerifier {
      * <b>DONT FORGET TO CALL cleanup() AFTERWARDS!!!</b>
      * @see cleanup()
      */
-    public AutomataBDDVerifier(org.supremica.automata.Automata theAutomata) {
+    public AutomataBDDVerifier(org.supremica.automata.Automata theAutomata) 
+	throws Exception
+    {
 	this.theAutomata = theAutomata;
 
-	Builder bu = new Builder(theAutomata);
-	ba = bu.getBDDAutomata();
-	sup = new Supervisor(ba, ba.getAutomataVector());
+	try {
+	    Builder bu = new Builder(theAutomata);
+	    ba = bu.getBDDAutomata();	
+	    // sup = new Supervisor(ba, ba.getAutomataVector());
+	    sup = SupervisorFactory.createSupervisor(ba, ba.getAutomataVector());
+	} catch(Exception pass) {
+	    cleanup();
+	    throw pass;
+	}
+	
+    }
+
+    /**
+     * creates a verification object for LANGUAGE INCLUSION test.
+     * depeding one the type of algorithm used, this call might take a while
+     * <b>DONT FORGET TO CALL cleanup() AFTERWARDS!!!</b>
+     * @see cleanup()
+     */
+    public AutomataBDDVerifier(org.supremica.automata.Automata selected,
+			       org.supremica.automata.Automata unselected) 
+	throws Exception
+    {
+	theAutomata = new org.supremica.automata.Automata();
+	theAutomata.addAutomata(selected);
+	theAutomata.addAutomata(unselected);
+
+	try {
+	    Builder bu = new Builder(theAutomata);
+	    ba = bu.getBDDAutomata();	
+	    BDDAutomaton [] all = ba.getAutomataVector();
+
+	    Group g2 = new Group(ba, all, new AutomatonMembership(selected), "Selected");
+	    Group g1 = new Group(ba, all, new AutomatonMembership(unselected), "Unselected");
+
+	    sup = SupervisorFactory.createSupervisor(ba, g1, g2);
+	} catch(Exception pass) {
+	    cleanup();
+	    throw pass;
+	}
 	
     }
 
@@ -36,13 +76,13 @@ public class AutomataBDDVerifier {
      *
      */ 
     public void cleanup() {
-	sup.cleanup();
-	ba.cleanup();
+	if(sup != null) sup.cleanup();
+	if(ba != null) ba.cleanup();
     }
 
-    // ------------------------------------------
+
     /**
-     * Monolithic BDD liveness check
+     *  BDD liveness check
      *
      * @return TRUE if the system is non-blocking
      */
@@ -77,7 +117,7 @@ public class AutomataBDDVerifier {
     }
 
     /**
-     * Monolithic BDD controllability check
+     * BDD controllability check
      *
      * @return TRUE if the system is controllable
      */
@@ -100,6 +140,48 @@ public class AutomataBDDVerifier {
 
 	return is_controllable;
 
+    }
+
+   /**
+     * Language inclusion  check
+     *
+     * @return TRUE if the system a1 in a1
+     */
+    public boolean passLanguageInclusion() {
+	
+	int states = sup.computeReachableLanguageDifference();
+	boolean ret = (states == ba.getZero());
+
+	if(!ret && Options.trace_on) 
+	    sup.trace_set("Language Inclusion counterexample", states, 1);            
+	
+	ba.recursiveDeref(states);
+	return ret;
+
+    }
+
+    /**
+     * Accepts a BDDAutomaton ba if it has the same name as one
+     * of the Supremica Automata in theAutomata
+     */
+    class AutomatonMembership implements GroupMembership {
+	private org.supremica.automata.Automata theAutomata;
+	AutomatonMembership(org.supremica.automata.Automata a) {
+	    theAutomata = a;
+	}
+	public boolean shouldInclude(BDDAutomaton a) {
+	    String name = a.getName();
+
+	    Iterator autIt = theAutomata.iterator();	    
+	    while (autIt.hasNext())
+		{
+		    org.supremica.automata.Automaton supa = (org.supremica.automata.Automaton) autIt.next();
+		    if(name.equals(supa.getName()))
+			return true;
+		}
+	    return false;
+	}
+	
     }
 
 }

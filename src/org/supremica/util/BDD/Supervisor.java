@@ -117,46 +117,80 @@ public class Supervisor
 
 		return bdd_uncontrollables;
 	}
-
+    
 	private void computeUncontrollables()
 	{
 		timer.reset();
 
-		int t_sp = spec.getT();
-		int t_p = plant.getT();
-		int cubep_sp = spec.getCubep();
-		int cubep_p = plant.getCubep();
 		int sigma_u = manager.and( plant.getSigmaU(), spec.getSigmaU()); // WAS manager.getSigmaU();
-		int sigma_cube = manager.getEventCube();
-		int tmp10 = manager.exists(t_sp, cubep_sp);
-		int tmp1 = manager.not(tmp10);
 
-		manager.recursiveDeref(tmp10);
-
-		int tmp2 = manager.and(tmp1, sigma_u);
-
-		manager.recursiveDeref(tmp1);
-
-		/*
-		 * // WAS: The exists() here is extremly slow (why??)
-		 * int tmp3  = manager.exists(t_p, cubep_p );
-		 * int tmp4  = manager.relProd(tmp3, tmp2, sigma_cube);
-		 * manager.recursiveDeref(tmp3);   manager.recursiveDeref(tmp2);
-		 */
-
-		// CHANGED TO: maybe delaying exists() will help a bit?
-		int cube2 = manager.and(sigma_cube, cubep_p);
-		int tmp4 = manager.relProd(t_p, tmp2, cube2);
-
-		manager.recursiveDeref(tmp2);
-		manager.recursiveDeref(cube2);
-		manager.recursiveDeref(sigma_u);
-
+		bdd_uncontrollables = computeLanguageDifference(sigma_u);
 		has_uncontrollables = true;
-		bdd_uncontrollables = tmp4;
+
+		manager.recursiveDeref(sigma_u);
 
 		timer.report("Uncontrollable states found");
 	}
+
+
+    protected int computeLanguageDifference(int considred_events) 
+    {
+	int t_sp = spec.getT();
+	int t_p = plant.getT();
+	int cubep_sp = spec.getCubep();
+	int cubep_p = plant.getCubep();
+	int sigma_cube = manager.getEventCube();
+	int tmp10 = manager.exists(t_sp, cubep_sp);
+	int tmp1 = manager.not(tmp10);
+	
+	manager.recursiveDeref(tmp10);
+	
+	int tmp2 = manager.and(tmp1, considred_events);	
+	manager.recursiveDeref(tmp1);
+	int cube2 = manager.and(sigma_cube, cubep_p);
+	int tmp4 = manager.relProd(t_p, tmp2, cube2);
+	
+	manager.recursiveDeref(tmp2);
+	manager.recursiveDeref(cube2);	
+	return tmp4;
+	
+    }
+
+    /**
+     * We use the same base as our controllability routine to check if Plant includes Spec
+     * <b>important note</b>: the plant and spec need not to be the actual plant and spec!
+     * we only use this conevntion to reuse the controllability code!!
+     */ 
+    private int getLanguageDifference() 
+    {
+	timer.reset();		
+	int ret = computeLanguageDifference(plant.getSigma());
+	timer.report("Uncontrollable states found");
+	return ret;
+    }
+
+
+    /**
+     * <b>Reachable</b> counterexamples to the language inclusions check
+     *
+     *
+     */
+
+    public int computeReachableLanguageDifference() {
+	int ld = getLanguageDifference();
+	if(ld == manager.getZero()) {
+	    // nothing there, so we dont need the intersection with reachables 
+	    // to get the reachable difference
+	    return ld;
+	}
+	
+	int r = getReachables();
+	int intersection = manager.and(ld,r);
+	manager.recursiveDeref(ld);
+	return intersection;
+    }
+
+
 
 	// --------------------------------------------------------------------------------------------
 

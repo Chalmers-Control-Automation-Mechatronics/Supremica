@@ -7,9 +7,23 @@ public class Group
 	private BDDAutomaton[] members;
 	private BDDAutomata manager;
 	private String name;
-	private int bdd_i, bdd_cube, bdd_cubep, bdd_sigma_u, bdd_t, bdd_m, bdd_tu;
+	private int bdd_i, bdd_cube, bdd_cubep, bdd_sigma, bdd_sigma_u, bdd_t, bdd_m, bdd_tu;
 	private boolean has_t, has_tu;
 
+
+    public Group(BDDAutomata manager, BDDAutomaton [] automata, String name) 
+    {
+	this(manager, automata, null, name);
+	
+    }
+    public Group(BDDAutomata manager, BDDAutomaton [] automata, GroupMembership member, String name) 
+    {
+	this(manager, automata.length, name);
+	
+	for(int i = 0; i < automata.length; i++)
+	    if(member == null || member.shouldInclude(automata[i]))
+		add(automata[i]);
+    }
 	public Group(BDDAutomata manager, int max_capacity, String name)
 	{
 		this.manager = manager;
@@ -17,25 +31,24 @@ public class Group
 		capacity = max_capacity;
 		size = 0;
 		members = new BDDAutomaton[capacity];
-		bdd_i = manager.getOne();
 
+		bdd_i = manager.getOne();
 		manager.ref(bdd_i);
 
 		bdd_m = manager.getOne();
-
 		manager.ref(bdd_m);
 
 		bdd_cube = manager.getOne();
-
 		manager.ref(bdd_cube);
 
 		bdd_cubep = manager.getOne();
-
 		manager.ref(bdd_cubep);
 
 		bdd_sigma_u = manager.getZero();
-
 		manager.ref(bdd_sigma_u);
+
+		bdd_sigma = manager.getZero();
+		manager.ref(bdd_sigma);
 
 		// no pre-calculations are valid
 		has_t = false;
@@ -50,6 +63,7 @@ public class Group
 		manager.recursiveDeref(bdd_cube);
 		manager.recursiveDeref(bdd_cubep);
 		manager.recursiveDeref(bdd_sigma_u);
+		manager.recursiveDeref(bdd_sigma);
 	}
 
 	public void add(BDDAutomaton a)
@@ -64,6 +78,7 @@ public class Group
 		bdd_m = manager.andTo(bdd_m, a.getM());
 		bdd_cube = manager.andTo(bdd_cube, a.getCube());
 		bdd_cubep = manager.andTo(bdd_cubep, a.getCubep());
+		bdd_sigma   = manager.orTo(bdd_sigma, a.getSigma());
 		bdd_sigma_u = manager.orTo(bdd_sigma_u, a.getSigmaU());
 
 		reset();
@@ -115,6 +130,11 @@ public class Group
 	public int getM()
 	{
 		return bdd_m;
+	}
+
+	public int getSigma()
+	{
+		return bdd_sigma;
 	}
 
 	public int getSigmaU()
