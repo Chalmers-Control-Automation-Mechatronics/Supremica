@@ -27,11 +27,11 @@ class FindStatesTableModel extends AbstractTableModel
 	private PatternCompiler comp = null;
 	private String[] columnNames = { "Automaton", "Type", "Regular Expression" };
 	private Object[][] cells = null;
-	
+
 	private static final int AUTOMATON_COL = 0;
 	private static final int TYPE_COL = AUTOMATON_COL + 1;
 	private static final int REGEXP_COL = TYPE_COL + 1;
-		
+
 	public FindStatesTableModel(Automata a, PatternCompiler c)
 	{
 		final int size = a.size();
@@ -42,20 +42,23 @@ class FindStatesTableModel extends AbstractTableModel
 			cells[it][TYPE_COL] = a.getAutomatonAt(it).getType().toString();
 			cells[it][REGEXP_COL] = ".*";
 		}
-		
+
 		comp = c;
 		patterns = new Pattern[size];
-		try // I know compile _cannot_ throw here, but Java requires me to catch thsi exception
+		try // I know compile _cannot_ throw here, but Java requires me to catch this exception
 		{
 			Pattern any_string = comp.compile(".*");
 			for(int i = 0; i < patterns.length; ++i)
+			{
 				patterns[i] = any_string;
+			}
 		}
 		catch(MalformedPatternException excp)
 		{
+			System.err.println("This should never happend");
 		}
 	}
-	
+
 	public String getColumnName(int col)
 	{
 		return columnNames[col];
@@ -119,7 +122,7 @@ class RegexpPopupMenu extends PopupMenu
 	public RegexpPopupMenu()
 	{
 	}
-	
+
 }
 //-----------------------------------
 class FindStatesTable extends JTable
@@ -134,12 +137,12 @@ class FindStatesTable extends JTable
 	class localMouseAdapter extends MouseAdapter
 	{
 		private RegexpPopupMenu regexp_popup;
-		
+
 		public localMouseAdapter()
 		{
 			regexp_popup = new RegexpPopupMenu();
 		}
-		
+
         public void mouseClicked(MouseEvent e)
         {
         	TableColumnModel columnModel = getColumnModel();
@@ -157,7 +160,7 @@ class FindStatesTable extends JTable
         	}
         }
 	}
-	
+
 	//** Wrap the FindStatesTableModel inside a sort filter
 	static TableSorter makeTableModel(Automata a)
 	{
@@ -170,19 +173,19 @@ class FindStatesTable extends JTable
 		//** If TableSorter had a proper constructor we could have done
 		//** super(new TableSorter(new FindStatesTableModel(a)));
 		super(makeTableModel(a));
-		
+
 		((TableSorter)getModel()).addMouseListenerToHeaderInTable(this);
-		
+
 		// addMouseListener(new localMouseAdapter());
- 
+
 	}
-	
+
 	public FindStatesTable getTable()
 	{
 		return this;
 	}
-	
-	public Pattern[] getRegexpPatterns() 
+
+	public Pattern[] getRegexpPatterns()
 	{
 		return ((FindStatesTableModel)((TableSorter)getModel()).getModel()).getRegexpPatterns();
 	}
@@ -197,10 +200,10 @@ class FindStatesFrame extends JFrame /* CenteredFrame */
 	Automata getAutomata() { return automata; }
 	Pattern[] getRegexpPatterns() { return table.getRegexpPatterns(); }
 	void Debug(String s) { thisCategory.debug(s); }
-	
+
 	class FindButton extends JButton
 	{
-	 	
+
 		public FindButton()
 		{
 			super("Find");
@@ -214,7 +217,7 @@ class FindStatesFrame extends JFrame /* CenteredFrame */
 					}
 				});
 		}
-		
+
 		void action(ActionEvent e)
 		{
 			/* build the pattern
@@ -245,7 +248,7 @@ class FindStatesFrame extends JFrame /* CenteredFrame */
 				ss.search(new Perl5Matcher(), patterns);
 				Debug("Show composite states");
 				showCompositeStates(ss);
-				
+
 			}
 			catch(Exception excp)
 			{
@@ -258,17 +261,17 @@ class FindStatesFrame extends JFrame /* CenteredFrame */
 			for(Iterator it1 = ss.iterator(); it1.hasNext(); )
 			{
 				System.out.print("<");
-				
+
 				for(SearchStates.StateIterator it2 = ss.getStateIterator((int[])it1.next()); it2.hasNext(); it2.inc())
 				{
 					System.out.print(it2.getState().getName() + ",");
 				}
-				
+
 				System.out.println(">");
 			}
 		}
 	}
-	
+
 	class QuitButton extends JButton
 	{
 		public QuitButton()
@@ -284,30 +287,30 @@ class FindStatesFrame extends JFrame /* CenteredFrame */
 					}
 				});
 		}
-		
+
 		void action(ActionEvent e)
 		{
 			Debug("QuitButton disposing");
 			dispose();
 		}
 	}
-	
+
 	private JButton findButton;
 	private JButton quitButton;
-	
+
 	public FindStatesFrame(Automata a)
 	{
 		// super(400, 300); // for CenteredFrame inheritance
 		Utility.setupFrame(this, 400, 300);
 		setTitle("Find States");
-		
+
 		automata = a;
 		table = new FindStatesTable(a);
-		
+
 		JPanel panel = new JPanel();
 		panel.add(new FindButton());
 		panel.add(new QuitButton());
-		
+
 		Container contentPane = getContentPane();
 		contentPane.add(new WhitePane(table), "Center");
 		contentPane.add(panel, "South");
@@ -318,16 +321,16 @@ public class FindStates
 {
 	private Automata automata;
 	private JFrame frame;
-	
-	public FindStates(Automata a) 
-	{ 
-		automata = a; 
+
+	public FindStates(Automata a)
+	{
+		automata = a;
 		frame = new FindStatesFrame(a);
-	}	
-	
+	}
+
 	public void execute()
 	{
 		frame.show();
 	}
-	
+
 }
