@@ -39,6 +39,7 @@
 *	first time. 
 *	You should also run everytime one of jar files below
 *	has been updated.
+*
 -->
 
 <target name="initialize" depends="clean">
