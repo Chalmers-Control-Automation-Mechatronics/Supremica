@@ -1,6 +1,7 @@
 package org.supremica.util.BDD;
 
 import java.util.*;
+import org.supremica.util.BDD.heuristics.*;
 
 
 /**
@@ -20,6 +21,8 @@ public class  DelayedStarSmoothSupervisor extends DelayedSmoothSupervisor {
 	Cluster [] cluster_stack;
 	int cluster_tos; // top of stach
 
+	DelayedInsertationHeuristic dih;
+
     public DelayedStarSmoothSupervisor(BDDAutomata manager, Group p, Group sp) {
 		super(manager,p,sp);
 		delaystar_init();
@@ -32,10 +35,11 @@ public class  DelayedStarSmoothSupervisor extends DelayedSmoothSupervisor {
 
 	private void delaystar_init() {
 		cluster_stack = new Cluster[disj_size];
+		dih = DelayedInsertationHeuristicFactory.create(cluster_stack, disj_size);
 	}
 
 	public String toString() {
-		return "delayed* smothing";
+		return "delayed* smothing/" + Options.DSSI_HEURISTIC_NAMES[Options.dssi_heuristics];
 	}
 
 
@@ -50,11 +54,14 @@ public class  DelayedStarSmoothSupervisor extends DelayedSmoothSupervisor {
 
 	// compute the forward image
 	protected int delay_forward(GrowFrame gf, Cluster c, int r) {
-		cluster_stack[ cluster_tos++] = c;
+
 		MonotonicPartition delay_partition= new MonotonicPartition(manager, plant.getSize() + spec.getSize());
+
+		cluster_stack[ cluster_tos++] = c;
+		dih.init(cluster_tos);
+
 		for(int i = 0; i < cluster_tos; i++) {
-			int index = cluster_tos - i -1;
-			delay_partition.add( cluster_stack[index].twave);
+			delay_partition.add( dih.next().twave );
 			r = delay_partition.forward(gf, r);
 		}
 		if(gf != null)    gf.mark("Released* " + c.toString());
@@ -63,11 +70,13 @@ public class  DelayedStarSmoothSupervisor extends DelayedSmoothSupervisor {
 	}
 
 	protected int delay_backward(GrowFrame gf, Cluster c, int r) {
-		cluster_stack[ cluster_tos++] = c;
 		MonotonicPartition delay_partition= new MonotonicPartition(manager, plant.getSize() + spec.getSize());
+
+		cluster_stack[ cluster_tos++] = c;
+		dih.init(cluster_tos);
+
 		for(int i = 0; i < cluster_tos; i++) {
-			int index = cluster_tos - i -1;
-			delay_partition.add( cluster_stack[index].twave);
+			delay_partition.add( dih.next().twave );
 			r = delay_partition.backward(gf, r);
 		}
 		if(gf != null)    gf.mark("Released* " + c.toString());

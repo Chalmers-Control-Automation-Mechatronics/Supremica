@@ -683,7 +683,7 @@ class BDDPanel
     private JCheckBox alterPCG, debugOn,  traceOn, ucOptimistic, nbOptimistic;
     private JCheckBox localSaturation, encodingFill, sizeWatch, profileOn;
     private JComboBox showGrow, algorithmFamily, countAlgorithm, orderingAlgorithm;
-    private JComboBox inclusionAlgorithm, asHeuristics, esHeuristics;
+    private JComboBox inclusionAlgorithm, asHeuristics, esHeuristics, dssiHeuristics;
     private JTextField maxPartitionSize;
 
 	private JButton bProofFile;
@@ -802,9 +802,18 @@ class BDDPanel
 
 	for(int i = 0; i < Options.AS_HEURISTIC_NAMES.length; i++)
 		asHeuristics.addItem(Options.AS_HEURISTIC_NAMES[i]);
-
-
 	asHeuristics.setSelectedIndex(Options.as_heuristics);
+
+
+
+	JPanel pDelayed= new JPanel(new FlowLayout(FlowLayout.RIGHT) );
+	p.add(pDelayed);
+	pDelayed.add( new JLabel("Delayed* insertation heuristic"));
+	pDelayed.add( dssiHeuristics = new JComboBox());
+
+	for(int i = 0; i < Options.DSSI_HEURISTIC_NAMES.length; i++)
+		dssiHeuristics.addItem(Options.DSSI_HEURISTIC_NAMES[i]);
+	dssiHeuristics.setSelectedIndex(Options.dssi_heuristics);
 
 
 
@@ -863,6 +872,7 @@ class BDDPanel
 	asHeuristics.setMaximumRowCount(20);
 	esHeuristics.setMaximumRowCount(20);
 	showGrow.setMaximumRowCount(20);
+	dssiHeuristics.setMaximumRowCount(20);
 
     }
 
@@ -882,6 +892,7 @@ class BDDPanel
 	Options.inclsuion_algorithm = inclusionAlgorithm.getSelectedIndex();
 	Options.as_heuristics = asHeuristics.getSelectedIndex();
 	Options.es_heuristics = esHeuristics.getSelectedIndex();
+	Options.dssi_heuristics = dssiHeuristics.getSelectedIndex();
 	Options.show_grow        = showGrow.getSelectedIndex();
 	Options.user_alters_PCG  = alterPCG.isSelected();
 	// Options.uc_optimistic    = ucOptimistic.isSelected();

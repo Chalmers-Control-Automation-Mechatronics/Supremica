@@ -102,6 +102,21 @@ public class Options
 	;
 
 
+
+	/* insertation heuristic for Delayed* smoothing algorithm */
+	public static final String [] DSSI_HEURISTIC_NAMES =  {
+		"Random", "Stack", "FIFO", "Smallest BDD", "Largest BDD"
+	};
+	public static final int
+		DSSI_RANDOM = 0,
+		DSSI_STACK = 1,
+		DSSI_FIFO = 2,
+		DSSI_SMALLEST_BDD = 3,
+		DSSI_LARGEST_BDD = 4
+		;
+
+
+
 	/** BDD grow graf */
 	public static final int
 		SHOW_GROW_NONE = 0,
@@ -148,6 +163,7 @@ public class Options
     // heurisitcs
 	public static int as_heuristics  = AS_HEURISTIC_HYBRID;
 	public static int es_heuristics  = ES_HEURISTIC_LEAST_FOLLOWERS;
+	public static int dssi_heuristics = DSSI_RANDOM;
 	public static int ordering_algorithm = ORDERING_ALGO_NEW_TSP;
 
 

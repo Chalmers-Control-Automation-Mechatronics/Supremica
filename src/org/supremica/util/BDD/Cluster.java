@@ -80,6 +80,8 @@ public class Cluster {
 	}
 
 
+
+
 	// ------------------------------------------------
 	/** DEBUG
 	public void check(String place)
@@ -104,6 +106,12 @@ public class Cluster {
 		return cubep;
 	}
 
+
+	/** number of nodes in T~ */
+	public int getBDDSize()
+	{
+		return manager.nodeCount(twave);
+	}
 	// ------------------------------------------------
 
 	public String toString()
