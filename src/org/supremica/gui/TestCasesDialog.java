@@ -538,7 +538,7 @@ class ExampleTab
 		addTab("Counters", null, new CountersPanel(), "Independent Counters");
 		addTab("Random automata", null, new RandomPanel(), "Random automata");
 		addTab("Pigeon-Hole", null, new PigeonHolePanel(), "Pigeon-Hole");
-		addTab("Snachez-BM", null, new SanchezPanel(), "Snachez-BM");
+		addTab("Sanchez-BM", null, new SanchezPanel(), "Sanchez-BM");
 
 		addTab("Warehouse", null, new WarehousePanel(), "Warehouse");
 		//addTab("Allocation Batch", null, new AllocationBatchPanel(), "Serialized Allocation Batch");

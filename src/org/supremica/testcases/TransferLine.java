@@ -17,9 +17,12 @@ import org.supremica.automata.*;
 public class TransferLine extends Automata {
 	private Project project;
 	private LabeledEvent [] events_vector;
+	private boolean sanchez_models;
 
-	public TransferLine(int cells, int cap1, int cap2)
+	public TransferLine(int cells, int cap1, int cap2, boolean sanchez_models)
 	{
+		this.sanchez_models = sanchez_models;
+
 		project =  new Project();
 
 		// create those shared events between the cells:
@@ -50,9 +53,6 @@ public class TransferLine extends Automata {
 
 	private void createCell(int i, int cap1, int cap2)
 	{
-
-		Automaton b1 = new Automaton("B1_" + (i + 1));
-		Automaton b2 = new Automaton("B2_" + (i + 1));
 		Automaton m1 = new Automaton("M1_" + (i + 1));
 		Automaton m2 = new Automaton("M2_" + (i + 1));
 		Automaton tu = new Automaton("TU_" + (i + 1));
@@ -75,35 +75,46 @@ public class TransferLine extends Automata {
 		e8.setControllable(false);
 
 
-
-
 		// M1:
 		createMachine(m1, e1, e2);
 
 		// M2:
 		createMachine(m2, e3, e4);
 
-		// B1:
-		createBuffer(b1, cap1, e2, e3, e8);
+		if(sanchez_models) {
+			// B1 & B2
+			Automaton b12 = new Automaton("B_" + (i + 1));
+			b12.setType(AutomatonType.Specification);
+			createBuffer2(b12, cap1, e2,e3,e4,e5, e8);
+			project.addAutomaton(b12);
 
-		// B2:
-		createBuffer(b2, cap2, e4, e5, null);
+		} else {
+			// B1 & B2
+			Automaton b1 = new Automaton("B1_" + (i + 1));
+			b1.setType(AutomatonType.Specification);
+			createBuffer(b1, cap1, e2, e3, e8);
+			project.addAutomaton(b1);
+
+			Automaton b2 = new Automaton("B2_" + (i + 1));
+			b2.setType(AutomatonType.Specification);
+			createBuffer(b2, cap2, e4, e5, null);
+			project.addAutomaton(b2);
+
+		}
 
 		// TU:
 		createTU(tu, e5, e6, e8);
 
 
 
-		b1.setType(AutomatonType.Specification);
-		b2.setType(AutomatonType.Specification);
 		m1.setType(AutomatonType.Plant);
 		m2.setType(AutomatonType.Plant);
 		tu.setType(AutomatonType.Plant);
 
 		project.addAutomaton(m1);
-		project.addAutomaton(b1);
+
 		project.addAutomaton(m2);
-		project.addAutomaton(b2);
+
 		project.addAutomaton(tu);
 	}
 
@@ -150,6 +161,41 @@ public class TransferLine extends Automata {
 			if(c != null) buf.addArc(new Arc(last,next, c));
 			last = next;
 		}
+	}
+
+	// create B1 x B2, as done in Sanchezs benchmarks!
+	private void createBuffer2(Automaton b12, int cap, LabeledEvent e2, LabeledEvent e3,LabeledEvent e4, LabeledEvent e5, LabeledEvent e7) {
+		State ss[] = new State[4];
+		for(int i = 0; i < 4; i++) {
+			ss[i] = new State("" + i);
+			if(i == 0) ss[i].setInitial(true);
+			ss[i].setAccepting(true);
+			b12.addState(ss[i]);
+		}
+
+
+		Alphabet sigma = b12.getAlphabet();
+		sigma.addEvent(e2);
+		sigma.addEvent(e3);
+		sigma.addEvent(e4);
+		sigma.addEvent(e5);
+		sigma.addEvent(e7);
+
+		b12.addArc(new Arc(ss[0], ss[2], e2) );
+		b12.addArc(new Arc(ss[0], ss[2], e7) );
+		b12.addArc(new Arc(ss[0], ss[1], e4) );
+
+		b12.addArc(new Arc(ss[1], ss[3], e2) );
+		b12.addArc(new Arc(ss[1], ss[3], e7) );
+		b12.addArc(new Arc(ss[1], ss[0], e5) );
+
+		b12.addArc(new Arc(ss[2], ss[0], e3) );
+		b12.addArc(new Arc(ss[2], ss[3], e4) );
+
+
+		b12.addArc(new Arc(ss[3], ss[1], e3) );
+		b12.addArc(new Arc(ss[3], ss[2], e5) );
+
 	}
 
 
