@@ -8,16 +8,16 @@ import java.awt.event.KeyEvent;
 import org.supremica.gui.ide.ModuleContainer;
 import org.supremica.gui.ide.IDE;
 
-public class EditorAddNodeAction
+public class EditorAddSimpleComponentAction
 	extends IDEAction
 {
-	public EditorAddNodeAction(IDEActionInterface ide)
+	public EditorAddSimpleComponentAction(IDEActionInterface ide)
 	{
 		super(ide);
 
-		putValue(Action.NAME, "Add Node");
-		putValue(Action.SHORT_DESCRIPTION, "Add Node");
-		putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/waters/node16.gif")));
+		putValue(Action.NAME, "Add Simple Component...");
+		putValue(Action.SHORT_DESCRIPTION, "Add Simple Component");
+//		putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/waters/edge16.gif")));
 	}
 
 	public void actionPerformed(ActionEvent e)
@@ -27,8 +27,6 @@ public class EditorAddNodeAction
 
 	public void doAction()
 	{
-		ide.setEditorMode(this);
-
-//		System.err.println("Add Node is not implemented yet!");
+		System.err.println("Add Simple Component is not implemented yet!");
 	}
 }

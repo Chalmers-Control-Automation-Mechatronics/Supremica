@@ -41,7 +41,7 @@ public class IDE
 	private BorderLayout contentLayout;
 
 	private IDEMenuBar menuBar;
-	private JToolBar ideToolBar;
+	private IDEToolBar ideToolBar;
 	private JToolBar currToolBar = null;
 
 	private ModuleContainers moduleContainers;
@@ -71,7 +71,8 @@ public class IDE
     	menuBar = new IDEMenuBar(this);
     	setJMenuBar(menuBar);
 
-
+		setToolBar(createToolBar());
+/*
     	ideToolBar = new IDEToolBar(this);
 
 		// Set standard actions
@@ -80,6 +81,7 @@ public class IDE
 		ideToolBar.add(getActions().saveAction);
 
     	setToolBar(ideToolBar);
+*/
 
 		tabPanel = new JTabbedPane();
 		tabPanel.addChangeListener(this);
@@ -207,6 +209,20 @@ public class IDE
     	currToolBar = toolBar;
 	}
 
+	private IDEToolBar createToolBar()
+	{
+    	ideToolBar = new IDEToolBar(this);
+
+		// Set standard actions
+		ideToolBar.add(getActions().newAction);
+		ideToolBar.add(getActions().openAction);
+		ideToolBar.add(getActions().saveAction);
+
+		getActiveModuleContainer().getAnalyzerPanel().addToolBarEntries(ideToolBar);
+		getActiveModuleContainer().getEditorPanel().addToolBarEntries(ideToolBar);
+		return ideToolBar;
+	}
+
 	// Overridden so we can exit when window is closed
 	protected void processWindowEvent(WindowEvent e)
 	{
@@ -223,12 +239,12 @@ public class IDE
 		Component currTab = tabPanel.getSelectedComponent();
 		if (currTab == getActiveModuleContainer().getAnalyzerPanel())
 		{
-			setToolBar(getActiveModuleContainer().getAnalyzerPanel().getToolBar(ideToolBar));
+//			setToolBar(getActiveModuleContainer().getAnalyzerPanel().getToolBar(ideToolBar));
 			getActiveModuleContainer().updateAutomata();
 			getActiveModuleContainer().getEditorPanel().disablePanel();
 			getActiveModuleContainer().getAnalyzerPanel().enablePanel();
 		}
-		if (currTab == getActiveModuleContainer().getEditorPanel())
+//		if (currTab == getActiveModuleContainer().getEditorPanel())
 		{
 			setToolBar(getActiveModuleContainer().getEditorPanel().getToolBar(ideToolBar));
 			getActiveModuleContainer().getEditorPanel().enablePanel();

@@ -8,16 +8,17 @@ import java.awt.event.KeyEvent;
 import org.supremica.gui.ide.ModuleContainer;
 import org.supremica.gui.ide.IDE;
 
-public class EditorAddNodeAction
+public class EditorCopyAction
 	extends IDEAction
 {
-	public EditorAddNodeAction(IDEActionInterface ide)
+
+	public EditorCopyAction(IDEActionInterface ide)
 	{
 		super(ide);
 
-		putValue(Action.NAME, "Add Node");
-		putValue(Action.SHORT_DESCRIPTION, "Add Node");
-		putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/waters/node16.gif")));
+		putValue(Action.NAME, "Copy");
+		putValue(Action.SHORT_DESCRIPTION, "Copy");
+		putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Copy16.gif")));
 	}
 
 	public void actionPerformed(ActionEvent e)
@@ -27,8 +28,6 @@ public class EditorAddNodeAction
 
 	public void doAction()
 	{
-		ide.setEditorMode(this);
-
-//		System.err.println("Add Node is not implemented yet!");
+		System.err.println("Copy is not implemented yet!");
 	}
 }

@@ -55,9 +55,12 @@ public class AnalyzerPanel
 
 	public void disablePanel()
 	{
+		getActions().enableAnalyzerActions(false);
 	}
 
 	public void enablePanel()
 	{
+		getActions().enableAnalyzerActions(true);
 	}
+
 }

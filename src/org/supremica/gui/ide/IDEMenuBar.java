@@ -49,6 +49,30 @@ public class IDEMenuBar
 
 
 		//
+		// Edit
+		//
+
+		JMenu menuEdit = new JMenu("Edit");
+		menuEdit.setMnemonic(KeyEvent.VK_E);
+		add(menuEdit);
+
+		menuEdit.add(new JMenuItem(ide.getActions().editorCopyAction));
+
+		//
+		// Module
+		//
+
+		JMenu menuModule = new JMenu("Editor");
+		menuModule.setMnemonic(KeyEvent.VK_M);
+		add(menuModule);
+
+		menuModule.add(new JMenuItem(ide.getActions().editorAddSimpleComponentAction));
+		menuModule.add(new JMenuItem(ide.getActions().editorAddForeachComponentAction));
+		menuModule.add(new JMenuItem(ide.getActions().editorAddInstanceAction));
+		menuModule.add(new JMenuItem(ide.getActions().editorAddBindingAction));
+
+
+		//
 		// Configure
 		//
 
@@ -57,15 +81,17 @@ public class IDEMenuBar
 
 		menuConfigure.add(new JMenuItem(ide.getActions().editorOptionsAction));
 
+
+
 		//
-		// Module
+		// Modules
 		//
 
-		JMenu menuModule = new JMenu("Modules");
-		menuModule.setMnemonic(KeyEvent.VK_M);
-		add(menuModule);
+		JMenu menuModules = new JMenu("Modules");
+//		menuModules.setMnemonic(KeyEvent.VK_M);
+		add(menuModules);
 
-		menuModule.addMenuListener
+		menuModules.addMenuListener
 		(
 			new MenuListener()
 			{
