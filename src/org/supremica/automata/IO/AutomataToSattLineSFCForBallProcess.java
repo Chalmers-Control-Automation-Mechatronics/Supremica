@@ -166,7 +166,14 @@ public class AutomataToSattLineSFCForBallProcess
 		{
 			LabeledEvent event = theArc.getEvent(); // theAutomaton.getEvent(theArc.getEventId());
 
-			pw.println("SEQTRANSITION " + theAutomaton.getName().replace('.', '_') + "_Tr" + transitionCounter++ + theHelper.getTransitionConditionPrefix() + event.getLabel() + theHelper.getTransitionConditionSuffix());
+			if (event.getLabel().equals("timer"))
+			{
+				pw.println("SEQTRANSITION " + theAutomaton.getName().replace('.', '_') + "_Tr" + transitionCounter++ + theHelper.getTransitionConditionPrefix() + theAutomaton.getName().replace('.', '_') + "__" + theArc.getFromState().getId() + ".T > 1000" + theHelper.getTransitionConditionSuffix());
+			}
+			else
+			{
+				pw.println("SEQTRANSITION " + theAutomaton.getName().replace('.', '_') + "_Tr" + transitionCounter++ + theHelper.getTransitionConditionPrefix() + event.getLabel() + theHelper.getTransitionConditionSuffix());
+			}
 		}
 		catch (Exception ex)
 		{

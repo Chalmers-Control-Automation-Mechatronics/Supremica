@@ -204,10 +204,13 @@ public class SattLineHelper
 	{
 		return " = ";
 	}
+
+/*	Might as well use both SeqControl and SeqTimer. Note that SeqControl is default in
+	ControlBuilder but not in SattLine.
 	public String getSequenceControlString()
 	{
 		return "";
-	}
+	}*/
 
 	public String getIdentifierLengthErrorMessage()
 	{

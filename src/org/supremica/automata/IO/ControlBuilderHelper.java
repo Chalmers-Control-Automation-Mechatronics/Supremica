@@ -202,7 +202,7 @@ public class ControlBuilderHelper
 
 	public String getSequenceControlString()
 	{
-		return "  (SeqControl)";
+		return "  (SeqControl,SeqTimer)";
 	}
 
 	public String getIdentifierLengthErrorMessage()
