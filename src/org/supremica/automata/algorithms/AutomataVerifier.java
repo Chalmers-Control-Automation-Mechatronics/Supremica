@@ -329,6 +329,25 @@ public class AutomataVerifier
 			{
 				if (verboseMode)
 					thisCategory.info("Attempt number " + attempt + ".");
+
+				if (similarAutomata.length == selectedAutomata.size() - automataIndices.length)
+				{	// Already added all similar automata
+					int[] moreSimilarAutomata = findSimilarAutomata(theAutomata, selectedAutomata);
+					int[] newSimilarAutomata = new int[similarAutomata.length + moreSimilarAutomata.length];
+					if (moreSimilarAutomata != null)
+					{
+						if (verboseMode)
+							thisCategory.info("All similar automata are already added, trying to add some more...");
+						System.arraycopy(similarAutomata, 0, newSimilarAutomata, 0, similarAutomata.length);
+						System.arraycopy(moreSimilarAutomata, 0, newSimilarAutomata, similarAutomata.length, moreSimilarAutomata.length);
+						similarAutomata = newSimilarAutomata;
+					}
+					else
+					{
+						if (verboseMode)
+							thisCategory.info("All similar automata are already added, no chance for controllability.");
+					}
+				}
 				
 				if (similarAutomata != null)
 				{	// Add the similar automata  in hope of removing uncontrollable
@@ -354,7 +373,6 @@ public class AutomataVerifier
 							// Print info on amount of states examined
 							// synchHelper.displayInfo(); // This is done always in AutomataVerificationWorker
 						}
-						System.out.println("Crash!");
 						return false;
 					}
 				}
@@ -403,7 +421,7 @@ public class AutomataVerifier
 		int amountOfAutomata = theAutomata.size();
 		int amountOfUnselected = amountOfAutomata - amountOfSelected;
 		// Are there any automata to find in the first place?
-		if (amountOfAutomata == 0)
+		if (amountOfUnselected == 0)
 			return null;
 
   		// Compute the union alphabet of the automata in selectedAutomata
@@ -430,14 +448,15 @@ public class AutomataVerifier
 			if (arraySortValue[count] > 0)
 			{
 				for (int i = 0; i < amountOfSelected; i++)
-				{
 					if (currAutomaton == (Automaton) selectedAutomata.get(i))
 						found = true;
-				}
+
 				if (!found)
 					tempArray[count++] = currAutomaton.getIndex();
+
 				if (count == amountOfUnselected)
 					break;
+
 				found = false;
 			}
 		}
@@ -513,16 +532,11 @@ public class AutomataVerifier
 		String addedAutomata = "";
 		int start = selectedAutomata.size() - automataIndices.length;
 
-		if (start == similarAutomata.length)
-		{   // Already added all similar automata
-			if (verboseMode)
-				thisCategory.info("All similar automata are already added, there is no hope for prooving controllability...");
-			return;
-		}
-		else if (start > 0)
+		if (start > 0)
 		{   // Been here before, already added some automata
 			for (int i = 0; i < start; i++)
 				addedAutomata = addedAutomata + " " + theAutomata.getAutomatonAt(similarAutomata[i]).getName();
+
 			// Increase the limit each time
 			stateAmountLimit = stateAmountLimit * 5;
 		}
@@ -617,7 +631,8 @@ public class AutomataVerifier
 				}
 			}
 		}
-		stateAmountLimit = (stateAmount/1000)*1000;
+		if (stateAmount > stateAmountLimit)
+			stateAmountLimit = (stateAmount/1000)*1000;
 	}
 
 	/*
@@ -708,11 +723,25 @@ public class AutomataVerifier
 		synchHelper.setCoExecute(true);
 		synchHelper.setCoExecuter(onlineSynchronizer);
 		synchHelper.setExhaustiveSearch(true);
-		// synchHelper.setRememberUncontrollable(true);
-		AutomataSynchronizerExecuter executer = new AutomataSynchronizerExecuter(synchHelper);
-		executer.selectAllAutomata();
-		executer.start();
-		executer.join();
+		synchHelper.setRememberUncontrollable(true);
+
+		// Initialize the synchronizationExecuters
+		for (int i = 0; i < nbrOfExecuters; i++)
+		{
+			AutomataSynchronizerExecuter currSynchronizationExecuter =
+				new AutomataSynchronizerExecuter(synchHelper);
+			synchronizationExecuters.add(currSynchronizationExecuter);
+		}
+
+		// Start all the synchronization executers and wait for completion
+		for (int i = 0; i < nbrOfExecuters; i++)
+		{
+			AutomataSynchronizerExecuter currExec =
+				(AutomataSynchronizerExecuter)synchronizationExecuters.get(i);
+			currExec.selectAllAutomata();
+			currExec.start();
+		}
+		((AutomataSynchronizerExecuter)synchronizationExecuters.get(0)).join();
 
 		return !synchHelper.getAutomataIsControllable();
 	}

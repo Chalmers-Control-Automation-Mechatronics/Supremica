@@ -231,11 +231,11 @@ public final class AutomataSynchronizerHelper
 				if (fromStateList.size() > 0)
 				{
 					while (!(Arrays.equals((int[]) fromStateList.getLast(),(int[]) stateTrace.getLast())))
-					{
 						stateTrace.removeLast();
-					}
+					
 					if (stateTrace.size() == 0)
-						thisCategory.error("Error, error, error...");
+						thisCategory.error("Error when recording trace.");
+					
 					fromStateList.removeLast();
 					stateTrace.addLast(statesToProcess.getLast());
 				}
