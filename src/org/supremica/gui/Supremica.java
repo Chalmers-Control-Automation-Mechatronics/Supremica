@@ -773,7 +773,7 @@ public class Supremica
 				repaint();
 			}
 		});
-		
+
 		menuHandler.addSeparator(); //----------------------------------------------
 
 
@@ -1185,8 +1185,20 @@ public class Supremica
 			return;
 		}
 
-		Iterator autIt = selectedAutomata.iterator();
-		while (autIt.hasNext())
+		StringBuffer infoStr = new StringBuffer();
+
+		infoStr.append("Number of selected automata: " + selectedAutomata.size());
+
+		double potentialNumberOfStates = 1.0;
+		for (Iterator autIt = selectedAutomata.iterator(); autIt.hasNext();)
+		{
+			Automaton currAutomaton = (Automaton)autIt.next();
+			potentialNumberOfStates = potentialNumberOfStates * currAutomaton.nbrOfStates();
+		}
+		infoStr.append("\n\tNumber of potential states: " + potentialNumberOfStates);
+		thisCategory.info(infoStr.toString());
+
+		for (Iterator autIt = selectedAutomata.iterator(); autIt.hasNext();)
 		{
 			Automaton currAutomaton = (Automaton)autIt.next();
 			StringBuffer statusStr = new StringBuffer();
@@ -2222,9 +2234,9 @@ public class Supremica
 		{
 			thisCategory.error(excp.toString());
 		}
-			
+
 	}
-	
+
 	// Automaton.Copy action performed
 	public void automataCopy_actionPerformed(ActionEvent e)
 	{
