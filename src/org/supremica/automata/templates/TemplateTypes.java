@@ -58,6 +58,7 @@ public class TemplateTypes
 	public static final TemplateTypes CCSBookExample = new TemplateTypes("CCS-Book Examples");
 	public static final TemplateTypes CCSBookExercise = new TemplateTypes("CCS-Book Exercises");
 	public static final TemplateTypes CCSCourseAssignment = new TemplateTypes("CCS-Course Assignments");
+	public static final TemplateTypes CCSCourseAssignmentSolutions = new TemplateTypes("CCS-Course Assignment Solutions");
 	public static final TemplateTypes OtherExample = new TemplateTypes("Other Examples");
 	public static final TemplateTypes StandardComponent = new TemplateTypes("Standard Components");
 	private String description;

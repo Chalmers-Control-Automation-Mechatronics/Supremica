@@ -58,6 +58,7 @@ public class ExampleTemplates
 	private final TemplateGroup CCSBookExamples = new TemplateGroup(TemplateTypes.CCSBookExample);
 	private final TemplateGroup CCSBookExercises = new TemplateGroup(TemplateTypes.CCSBookExercise);
 	private final TemplateGroup CCSCourseAssignments = new TemplateGroup(TemplateTypes.CCSCourseAssignment);
+	private final TemplateGroup CCSCourseAssignmentSolutions = new TemplateGroup(TemplateTypes.CCSCourseAssignmentSolutions);
 	private final TemplateGroup OtherExamples = new TemplateGroup(TemplateTypes.OtherExample);
 	private final TemplateGroup StandardComponents = new TemplateGroup(TemplateTypes.StandardComponent);
 	private static final String extraPrefix = "/includeInJarFile";
@@ -73,6 +74,7 @@ public class ExampleTemplates
 		initializeCCSBookExamples();
 		initializeCCSBookExercises();
 		initializeCCSCourseAssignments();
+		initializeCCSCourseAssignmentSolutions();
 		initializeOtherExamples();
 		initializeStandardComponents();
 	}
@@ -105,6 +107,18 @@ public class ExampleTemplates
 		thisGroup.addItem(new TemplateItem("FMS line", prefix + "FMSLine.xml"));
 		thisGroup.addItem(new TemplateItem("Production system", prefix + "ProdSysStudent.xml"));
 		thisGroup.addItem(new TemplateItem("Communication channel", prefix + "CommunicationChannel.xml"));
+	}
+
+	private void initializeCCSCourseAssignmentSolutions()
+	{
+		TemplateGroup thisGroup = CCSCourseAssignmentSolutions;
+
+		allGroups.add(thisGroup);
+
+		String prefix = extraPrefix + "/CCSCourseAssignments/solutions/";
+		thisGroup.addItem(new TemplateItem("FMS without feedback", prefix + "FMSLine.xml"));
+		thisGroup.addItem(new TemplateItem("FMS with feedback", prefix + "FMSLoop.xml"));
+		thisGroup.addItem(new TemplateItem("Communication channel Specification", prefix + "comm_spec.xml"));
 	}
 
 	private void initializeOtherExamples()
