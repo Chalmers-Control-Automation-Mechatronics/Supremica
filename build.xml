@@ -168,7 +168,7 @@
 *	Reuses existing class files, but recompiles those
 *	source files that have changed.
 -->
-<target name="compile" depends="compile_supremica,compile_jgrafchart">
+<target name="compile" depends="compile_supremica,compile_tests_supremica,compile_jgrafchart">
 	<javac
 		srcdir="${src}"
 		destdir="${build}"
