@@ -61,15 +61,14 @@ import org.supremica.automata.IO.*;
 import org.supremica.gui.texteditor.TextFrame;
 import java.awt.geom.Rectangle2D;
 
-public class DotViewer
+public abstract class DotViewer
 	extends JFrame
-	implements DotViewerInterface
+	implements DotBuilderObserver
 {
 	private static final long serialVersionUID = 1L;
 	private static Logger logger = LoggerFactory.createLogger(DotViewer.class);
 	private Graph theGraph;
-	private PrintWriter toDotWriter;
-	private InputStream fromDotStream;
+
 	private JScrollPane currScrollPanel = null;
 	private GrappaPanel viewerPanel;
 	private BorderLayout layout = new BorderLayout();
@@ -87,7 +86,6 @@ public class DotViewer
 	private final static double SCALE_RESET = 1.0, SCALE_CHANGE = 1.5,
 								MAX_SCALE = 64.0, MIN_SCALE = 1.0 / 64;
 	private double scaleFactor = SCALE_RESET;
-	private Process dotProcess;
 	private DotBuilder builder;
 	private String objectName = "";
 	private GraphicsToClipboard toClipboard = null;
@@ -119,8 +117,9 @@ public class DotViewer
 		updateNeeded = true;
 	}
 
-	public void initialize() {}
+//	public void initialize() {}
 
+/*
 	public void run()
 	{
 		setVisible(true);
@@ -135,6 +134,7 @@ public class DotViewer
 			logger.debug(ex.getStackTrace());
 		}
 	}
+*/
 
 	public void updated(Object o)
 	{
@@ -279,15 +279,6 @@ public class DotViewer
 			}
 		});
 
-		/* see below
-		menuFileImport.addActionListener(new ActionListener()
-		{
-				public void actionPerformed(ActionEvent e)
-				{
-						fileImport_actionPerformed(e);
-				}
-		});
-		*/
 		menuFileClose.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -298,8 +289,6 @@ public class DotViewer
 				//dispose();
 			}
 		});
-
-
 
 		leftToRightCheckBox.addActionListener(new ActionListener()
 		{
@@ -463,9 +452,10 @@ public class DotViewer
 	public void build()
 		throws Exception
 	{
-		builder = new DotBuilder(this);
+		DotBuilder builder = DotBuilder.getDotBuilder(this, getSerializer());
+		//builder = new DotBuilder(this);
 
-		builder.start();
+		//builder.start();
 	}
 
 	public void updated(Object update, Object original)
@@ -513,97 +503,6 @@ public class DotViewer
 		}
 	}
 
-	public void internalBuild()
-//		throws Exception
-	{
-		AutomataSerializer serializer = getSerializer();
-
-		try
-		{
-			initializeStreams("");
-		}
-		catch (Exception ex)
-		{
-			toDotWriter.close();
-			logger.debug(ex.getStackTrace());
-			return;
-			//throw ex;
-		}
-
-		// Send the file to dot
-		try
-		{
-			serializer.serialize(toDotWriter);
-		}
-		catch (Exception ex)
-		{
-			logger.error("Exception while serializing ", ex);
-			logger.debug(ex.getStackTrace());
-
-			return;
-		}
-		finally
-		{
-			toDotWriter.close();
-		}
-
-		parseResponse(fromDotStream);
-	}
-
-	private void parseResponse(InputStream inputStream)
-//		throws Exception
-	{
-
-		// Parse the response from dot
-		Parser parser = new Parser(inputStream);
-
-		try
-		{
-			parser.parse();
-		}
-		catch (Exception ex)
-		{
-			logger.error("Exception while parsing dot file", ex);
-			logger.debug(ex.getStackTrace());
-			return;
-//			throw ex;
-		}
-		finally
-		{
-			try
-			{
-				inputStream.close();
-			}
-			catch (IOException ex)
-			{
-				logger.error("Exception while closing input stream", ex);
-				logger.debug(ex.getStackTrace());
-				return;
-			}
-		}
-
-		try
-		{
-			theGraph = parser.getGraph();
-		}
-		catch (Exception ex)
-		{
-			logger.error("Exception while getting dot graph", ex);
-			logger.debug(ex.getStackTrace());
-			return;
-//			throw ex;
-		}
-	}
-
-	public void stopProcess()
-	{
-		if (dotProcess != null)
-		{
-			dotProcess.destroy();
-
-			updateNeeded = true;
-		}
-	}
 
 	public void terminateProcesses()
 	{
@@ -672,27 +571,6 @@ public class DotViewer
 		toClipboard.copyToClipboard();
 	}
 
-	private void initializeStreams(String arguments)
-		throws Exception
-	{
-		try
-		{
-			dotProcess = Runtime.getRuntime().exec(SupremicaProperties.getDotExecuteCommand() + " " + arguments);
-		}
-		catch (IOException ex)
-		{
-			logger.error("Cannot run dot. Make sure dot is in the path.");
-			logger.debug(ex.getStackTrace());
-
-			throw ex;
-		}
-
-		OutputStream pOut = dotProcess.getOutputStream();
-		BufferedOutputStream pBuffOut = new BufferedOutputStream(pOut);
-
-		toDotWriter = new PrintWriter(pBuffOut);
-		fromDotStream = dotProcess.getInputStream();
-	}
 
 	public void zoomin_actionPerformed(ActionEvent e)
 	{
@@ -759,7 +637,6 @@ public class DotViewer
 
 			pane.add(checkbox);
 
-			// int style = styleFromMessageType(JOptionPane.INFORMATION_MESSAGE);
 			dialog = pane.createDialog(comp, "Export");
 		}
 
@@ -836,12 +713,19 @@ public class DotViewer
 		}
 	}
 
-	// MF Why isn't this one purely abstract?
-	public AutomataSerializer getSerializer()
+	public void setGraph(Graph theGraph)
 	{
-		return null;
+		this.theGraph = theGraph;
+		draw();
 	}
 
+	public abstract AutomataSerializer getSerializer();
+
+	// ToDo
+	public void fileExport_actionPerformed(ActionEvent e)
+	{}
+
+/*
 	public void fileExport_actionPerformed(ActionEvent e)
 	{
 		ExportDialog dlg = new ExportDialog(this);
@@ -943,88 +827,5 @@ public class DotViewer
 			}
 		}
 	}
-
-	/* I wanted a way to load manually altered dot-files and to then export them
-	 * This is not the way to do it.
-	public void fileImport_actionPerformed(ActionEvent e)
-	{
-			// Open an inputstream to the file and have it parsed as an ordinary dot response
-			try
-			{
-					FileInputStream fistream = new FileInputStream("D:\\Temp\\User1.dot");
-					parseResponse(fistream);
-			}
-			catch(FileNotFoundException excp)
-			{
-					logger.error("File not found");
-			}
-			catch(Exception excp)
-			{
-					logger.error("Exception parsing the file");
-					logger.debug(excp.getStackTrace());
-			}
-			draw();
-	}
-	*/
-
-
-
-}
-
-/*
-public class Builder
-	extends Thread
-{
-	private DotViewer theViewer = null;
-	private final static int BUILD = 1;
-	private final static int DRAW = 2;
-	private int mode = BUILD;
-	private static Logger logger = LoggerFactory.createLogger(Builder.class);
-
-	public Builder(DotViewer theViewer)
-	{
-		this.theViewer = theViewer;
-
-		setPriority(Thread.MIN_PRIORITY);
-	}
-
-	public void run()
-	{
-		if (mode == BUILD)
-		{
-			theViewer.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
-			try
-			{
-				theViewer.internalBuild();
-			}
-			catch (Exception ex)
-			{
-				logger.error("Cannot display object.");
-				logger.debug(ex.getStackTrace());
-				theViewer.setCursor(java.awt.Cursor.getDefaultCursor());
-
-				return;
-			}
-
-			mode = DRAW;
-
-			java.awt.EventQueue.invokeLater(this);
-		}
-		else if (mode == DRAW)
-		{
-			// theViewer.setCursor(java.awt.Cursor.WAIT_CURSOR);
-			theViewer.draw();
-			theViewer.setCursor(java.awt.Cursor.getDefaultCursor());
-		}
-	}
-
-	public void stopProcess()
-	{
-		if (theViewer != null)
-		{
-			theViewer.stopProcess();
-			theViewer.setCursor(java.awt.Cursor.getDefaultCursor());
-		}
-	}
-}
 */
+}
