@@ -13,12 +13,12 @@ import java.util.*;
 import org.supremica.automata.*;
 import org.supremica.log.*;
 
-public class FactoryExecutorDEMO
+public class FactoryExecutorDEMO extends JFrame
 {
 	public static int threadSleepInterval=200;
 	boolean type;
 	static PlantDEMO shoePlant;
-	static int shoeNr=1, sNr=0;
+	static int shoeNr=1, sNr=0, supervisorType=0;
 	static Gui gui;
 	static EditorAPI e;
 	static ArrayList shoes = new ArrayList();
@@ -71,9 +71,14 @@ public class FactoryExecutorDEMO
 	
 					SyncBuilder syncPlant = new SyncBuilder(gui, shoePlant.getPlant());
 					
-				//Syncronize or Synthesize
-					syncPlant.synchronizePlants("theSupervisor");
-					//syncPlant.synthesizePlants("theSupervisor");
+					ImageIcon icon = new ImageIcon(Supremica.class.getResource("/shoefactory/blshoe.gif"));			
+					String[] options = {"Synthesized", "Synchronized"};
+					supervisorType = JOptionPane.showOptionDialog(this, "Since this is a DEMO you may choose the type of supervisor.", "Choose supervisor", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, icon, options, "Synthesized");
+
+					if(supervisorType==1)
+						syncPlant.synchronizePlants("theSupervisor");
+					else
+						syncPlant.synthesizePlants("theSupervisor");
 			
 					//-----DEMO - reduce available slots--------
 					for(int i=0;i<9;i++)
@@ -143,10 +148,11 @@ public class FactoryExecutorDEMO
 				remove_Aut(6+shoes.size());
 
 				SyncBuilder syncPlant = new SyncBuilder(gui, shoePlant.getPlant());
-				
-			//Syncronize or Synthesize
-				syncPlant.synchronizePlants("theSupervisor");
-				//syncPlant.synthesizePlants("theSupervisor");
+	
+				if(supervisorType==1)
+						syncPlant.synchronizePlants("theSupervisor");
+				else
+					syncPlant.synthesizePlants("theSupervisor");
 					
 				shoeNr++;
 	
