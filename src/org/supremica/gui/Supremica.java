@@ -649,12 +649,12 @@ public class Supremica
 		/*
 		JMenuItem controllabilityCheckItem = new JMenuItem("Controllability check");
 		menuHandler.add(controllabilityCheckItem, 2);
-		*/		
+		*/
 
 		/*
 		JMenuItem fastControllabilityCheckItem = new JMenuItem("Fast controllability check");
 		menuHandler.add(fastControllabilityCheckItem, 2);
-		*/		
+		*/
 
 		/*
 		JMenuItem pairwiseCheckItem = new JMenuItem("Pairwise controllability check");
@@ -1020,7 +1020,10 @@ public class Supremica
 			});
 	}
 
-	public Collection getSelectedAutomata()
+	/**
+	 * This is a deprecated method, use getSelectedAutomata instead.
+	 */
+	public Collection getSelectedAutomataAsCollection()
 	{
 		int[] selectedRowIndicies = theAutomatonTable.getSelectedRows();
 		LinkedList selectedAutomata = new LinkedList();
@@ -1033,6 +1036,29 @@ public class Supremica
 				int orgIndex = theTableSorter.getOriginalRowIndex(currIndex);
 				Automaton currAutomaton = theAutomatonContainer.getAutomatonAt(orgIndex);
 				selectedAutomata.add(currAutomaton);
+			}
+			catch (Exception ex)
+			{
+				thisCategory.error("Trying to get an automaton that does not exist. Index: " + i);
+			}
+		}
+
+		return selectedAutomata;
+	}
+
+	public Automata getSelectedAutomata()
+	{
+		int[] selectedRowIndicies = theAutomatonTable.getSelectedRows();
+		Automata selectedAutomata = new Automata();
+
+		for (int i = 0; i < selectedRowIndicies.length; i++)
+		{
+			try
+			{
+				int currIndex = selectedRowIndicies[i];
+				int orgIndex = theTableSorter.getOriginalRowIndex(currIndex);
+				Automaton currAutomaton = theAutomatonContainer.getAutomatonAt(orgIndex);
+				selectedAutomata.addAutomaton(currAutomaton);
 			}
 			catch (Exception ex)
 			{
@@ -1141,7 +1167,7 @@ public class Supremica
     public void automatonStatus_actionPerformed(ActionEvent e)
     {
 		thisCategory.info("Number of automata: " + theAutomatonContainer.getSize());
-		Collection selectedAutomata = getSelectedAutomata();
+		Collection selectedAutomata = getSelectedAutomataAsCollection();
 		if (selectedAutomata.size() < 1)
 		{
 			return;
@@ -1169,7 +1195,7 @@ public class Supremica
     // Automaton.View action performed
     public void automatonView_actionPerformed(ActionEvent e)
     {
-		Collection selectedAutomata = getSelectedAutomata();
+		Collection selectedAutomata = getSelectedAutomataAsCollection();
 		if (selectedAutomata.size() < 1)
 		{
 			JOptionPane.showMessageDialog(this, "At least one automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
@@ -1220,7 +1246,7 @@ public class Supremica
 	// Automaton.Explore action performed
     public void automatonExplore_actionPerformed(ActionEvent e)
     {
-		Collection selectedAutomata = getSelectedAutomata();
+		Collection selectedAutomata = getSelectedAutomataAsCollection();
 		if (selectedAutomata.size() < 1)
 		{
 			JOptionPane.showMessageDialog(this, "At least one automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
@@ -1303,7 +1329,7 @@ public class Supremica
 	// Automaton.Alphabet action performed
 	public void automatonAlphabet_actionPerformed(ActionEvent e)
 	{
-		Collection selectedAutomata = getSelectedAutomata();
+		Collection selectedAutomata = getSelectedAutomataAsCollection();
 		if (selectedAutomata.size() < 1)
 		{
 			JOptionPane.showMessageDialog(this, "At least one automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
@@ -1330,7 +1356,7 @@ public class Supremica
 	// Threaded version
 	public void automataSynchronize_actionPerformed(ActionEvent e)
 	{
-		Collection selectedAutomata = getSelectedAutomata();
+		Collection selectedAutomata = getSelectedAutomataAsCollection();
 
  		if (selectedAutomata.size() < 2)
  		{
@@ -1402,7 +1428,7 @@ public class Supremica
 		if (!verificationOptions.getDialogOK())
 			return;
 
-		Collection selectedAutomata = getSelectedAutomata();
+		Collection selectedAutomata = getSelectedAutomataAsCollection();
 
  		if (selectedAutomata.size() < 1)
  		{
@@ -1461,7 +1487,7 @@ public class Supremica
 	// Automaton.Synchronize action performed
 	public void automataSynchronize_actionPerformed(ActionEvent e)
 	{
-		Collection selectedAutomata = getSelectedAutomata();
+		Collection selectedAutomata = getSelectedAutomataAsCollection();
 
  		if (selectedAutomata.size() < 2)
  		{
@@ -1535,7 +1561,7 @@ public class Supremica
 	{
 		Date startDate = new Date();
 
-		Collection selectedAutomata = getSelectedAutomata();
+		Collection selectedAutomata = getSelectedAutomataAsCollection();
 		boolean isControllable = true;
 
  		if (selectedAutomata.size() < 2)
@@ -1587,15 +1613,15 @@ public class Supremica
 			JOptionPane.showMessageDialog(this, "The automata is not controllable!", "Bad news", JOptionPane.INFORMATION_MESSAGE);
 		}
 	 }
-	
-	
+
+
 	/**
 	 * @deprecated use AutomataVerifier instead.
 	 */
 	public void automataFastControllabilityCheck_actionPerformed(ActionEvent e)
 	{
 		Date startDate = new Date();
-		Collection selectedAutomata = getSelectedAutomata();
+		Collection selectedAutomata = getSelectedAutomataAsCollection();
 		boolean isControllable = true;
 
  		if (selectedAutomata.size() < 2)
@@ -1652,7 +1678,7 @@ public class Supremica
 	// Automaton.PairwiseCheck action performed
 	public void automataPairwiseCheck_actionPerformed(ActionEvent e)
 	{
-		Collection selectedAutomata = getSelectedAutomata();
+		Collection selectedAutomata = getSelectedAutomataAsCollection();
 		boolean existsPlant = false;
 		boolean existsSupervisor = false;
 
@@ -1714,8 +1740,8 @@ public class Supremica
 	public void languageInclusionCheck_actionPerformed(ActionEvent e)
 	{
 		Date startDate = new Date();
-		// LinkedList selectedAutomata = (LinkedList) getSelectedAutomata();
-		Collection selectedAutomata = getSelectedAutomata();
+		// LinkedList selectedAutomata = (LinkedList) getSelectedAutomataAsCollection();
+		Collection selectedAutomata = getSelectedAutomataAsCollection();
 		boolean isIncluded = false;
 
 		// Select at least one automaton
@@ -1797,7 +1823,7 @@ public class Supremica
 			return;
 
 		Date startDate = new Date();
-		Collection selectedAutomata = getSelectedAutomata();
+		Collection selectedAutomata = getSelectedAutomataAsCollection();
 		if (selectedAutomata.size() < 1)
 		{
 			JOptionPane.showMessageDialog(this, "At least one automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
@@ -1891,7 +1917,7 @@ public class Supremica
 	// Automaton.Purge action performed
 	public void automataPurge_actionPerformed(ActionEvent e)
 	{
-		Collection selectedAutomata = getSelectedAutomata();
+		Collection selectedAutomata = getSelectedAutomataAsCollection();
 		if (selectedAutomata.size() < 1)
 		{
 			JOptionPane.showMessageDialog(this, "At least one automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
@@ -1917,7 +1943,7 @@ public class Supremica
 	// Automaton.AllAccepting action performed
 	public void automataAllAccepting_actionPerformed(ActionEvent e)
 	{
-		Collection selectedAutomata = getSelectedAutomata();
+		Collection selectedAutomata = getSelectedAutomataAsCollection();
 		if (selectedAutomata.size() < 1)
 		{
 			JOptionPane.showMessageDialog(this, "At least one automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
@@ -1943,7 +1969,7 @@ public class Supremica
 	// Automaton.Complement action performed
 	public void automataComplement_actionPerformed(ActionEvent e)
 	{
-		Collection selectedAutomata = getSelectedAutomata();
+		Collection selectedAutomata = getSelectedAutomataAsCollection();
 		if (selectedAutomata.size() < 1)
 		{
 			JOptionPane.showMessageDialog(this, "At least one automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
@@ -1978,7 +2004,7 @@ public class Supremica
 	// Automaton.Extend action performed
 	public void automataExtend_actionPerformed(ActionEvent e)
 	{
-		Collection selectedAutomata = getSelectedAutomata();
+		Collection selectedAutomata = getSelectedAutomataAsCollection();
 		if (selectedAutomata.size() < 1)
 		{
 			JOptionPane.showMessageDialog(this, "At least one automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
@@ -2016,7 +2042,7 @@ public class Supremica
 	// Automaton.RemovePass action performed
 	public void automataRemovePass_actionPerformed(ActionEvent e)
 	{
-		Collection selectedAutomata = getSelectedAutomata();
+		Collection selectedAutomata = getSelectedAutomataAsCollection();
 		if (selectedAutomata.size() < 1)
 		{
 			JOptionPane.showMessageDialog(this, "At least one automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
@@ -2041,7 +2067,7 @@ public class Supremica
 	// Automata.AddSelfLoopArcs action performed
 	public void automataAddSelfLoopArcs_actionPerformed(ActionEvent e)
 	{
-		Collection selectedAutomata = getSelectedAutomata();
+		Collection selectedAutomata = getSelectedAutomataAsCollection();
 		if (selectedAutomata.size() < 1)
 		{
 			JOptionPane.showMessageDialog(this, "At least one automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
@@ -2066,7 +2092,7 @@ public class Supremica
 	// Automata.RemoveSelfLoopArcs action performed
 	public void automataRemoveSelfLoopArcs_actionPerformed(ActionEvent e)
 	{
-		Collection selectedAutomata = getSelectedAutomata();
+		Collection selectedAutomata = getSelectedAutomataAsCollection();
 		if (selectedAutomata.size() < 1)
 		{
 			JOptionPane.showMessageDialog(this, "At least one automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
@@ -2091,7 +2117,7 @@ public class Supremica
 	// Automata.AlphabetNormalize action performed
 	public void normalizeAlphabet_actionPerformed(ActionEvent e)
 	{
-		Collection selectedAutomata = getSelectedAutomata();
+		Collection selectedAutomata = getSelectedAutomataAsCollection();
 		if (selectedAutomata.size() < 1)
 		{
 			JOptionPane.showMessageDialog(this, "At least one automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
@@ -2119,7 +2145,7 @@ public class Supremica
 	// Automaton.Minimization action performed
 	public void automatonMinimize_actionPerformed(ActionEvent e)
 	{
-		Collection selectedAutomata = getSelectedAutomata();
+		Collection selectedAutomata = getSelectedAutomataAsCollection();
 		if (selectedAutomata.size() < 1)
 		{
 			JOptionPane.showMessageDialog(this, "At least one automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
@@ -2154,7 +2180,7 @@ public class Supremica
      // Automata.AlphabetAnalyzer action performed
      public void alphabetAnalyzer_actionPerformed(ActionEvent e)
      {
-		Collection selectedAutomata = getSelectedAutomata();
+		Collection selectedAutomata = getSelectedAutomataAsCollection();
 		if (selectedAutomata.size() >= 2)
 		{
 			Iterator autIt = selectedAutomata.iterator();
@@ -2186,7 +2212,7 @@ public class Supremica
 	// Automaton.Copy action performed
 	public void automataCopy_actionPerformed(ActionEvent e)
 	{
-		Collection selectedAutomata = getSelectedAutomata();
+		Collection selectedAutomata = getSelectedAutomataAsCollection();
 		if (selectedAutomata.size() < 1)
 		{
 			JOptionPane.showMessageDialog(this, "At least one automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
@@ -2216,7 +2242,7 @@ public class Supremica
 	// Automaton.Delete action performed
 	public void automataDelete_actionPerformed()
 	{
-		Collection selectedAutomata = getSelectedAutomata();
+		Collection selectedAutomata = getSelectedAutomataAsCollection();
 		if (selectedAutomata.size() < 1)
 		{
 			JOptionPane.showMessageDialog(this, "At least one automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
@@ -2256,7 +2282,7 @@ public class Supremica
 	// Automaton.Rename action performed
 	public void automataRename_actionPerformed()
 	{
-		Collection selectedAutomata = getSelectedAutomata();
+		Collection selectedAutomata = getSelectedAutomataAsCollection();
 		if (selectedAutomata.size() < 1)
 		{
 			JOptionPane.showMessageDialog(this, "At least one automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
@@ -2369,7 +2395,7 @@ public class Supremica
 	// Automaton.Export action performed
 	public void automataExport()
 	{
-		Collection selectedAutomata = getSelectedAutomata();
+		Collection selectedAutomata = getSelectedAutomataAsCollection();
 		if (selectedAutomata.size() < 1)
 		{
 			JOptionPane.showMessageDialog(this, "At least one automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
@@ -2530,7 +2556,7 @@ public class Supremica
 
 		while (!finished)
 		{
-			newName = (String) JOptionPane.showInputDialog(this, msg, "Enter a new name", 
+			newName = (String) JOptionPane.showInputDialog(this, msg, "Enter a new name",
 														   JOptionPane.QUESTION_MESSAGE,
 														   null, null, nameSuggestion);
 			if (newName == null)

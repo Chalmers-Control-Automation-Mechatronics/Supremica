@@ -30,6 +30,15 @@ Supremica is following.
 	> setenv CVS_RSH ssh  (for tcsh)
 	After this you can checkout the sources, change ka to your username.
 	> cvs -d ka@linus.s2.chalmers.se:/users/s2/cvs checkout Supremica
+	
+	If you have licensed version of JGo and/or JGo Layout then
+	copy the licensed jar files to
+	Supremica\lib\licensed
+	The two files should be named JGo.jar and JGoLayout.jar, respectively.
+	Note, if you do not have licensed versions of JGo then the trial version
+	will be used. The trial JGo files are in the CVS, but not the licensed 
+	files. This implies that you have to manually update the licensed files.
+	
 
 2. Compiling
 	The first time you compile after a checkout you should write:

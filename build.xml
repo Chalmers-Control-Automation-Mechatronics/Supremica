@@ -158,7 +158,8 @@
 	<copy file="${templates}/Supremica" todir="${dist}"/>	
 	<chmod file="${dist}/Supremica" perm="555"/>	
 	<copy file="${templates}/Supremica.cmd" todir="${dist}"/>	
-	<chmod file="${dist}/Supremica.cmd" perm="444"/>		
+	<chmod file="${dist}/Supremica.cmd" perm="444"/>
+	
 </target>
 
 <!-- Rebuild:

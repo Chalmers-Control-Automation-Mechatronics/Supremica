@@ -100,14 +100,14 @@ public class AutomataVerificationWorker
 		Date startDate;
 		Date endDate;
 		final AutomataVerifier automataVerifier;
-		
+
 		// Cancel dialog initialization...
 		ArrayList threadsToStop = new ArrayList();
 		threadsToStop.add(this);
-		
+
 		cancelDialog = new CancelDialog(workbench, threadsToStop, eventQueue);
 		cancelDialog.updateHeader("Verifying...");
-		
+
 		if (verificationOptions.getVerificationType() == 0)
 		{   // Controllability verification...
 			boolean isControllable;
@@ -124,7 +124,7 @@ public class AutomataVerificationWorker
 				automataVerifier = new AutomataVerifier(theAutomata, synchronizationOptions, verificationOptions);
  				eventQueue.invokeLater(new Runnable()
 					{   public void run()
-						{ 
+						{
 							automataVerifier.getHelper().setCancelDialog(cancelDialog);
 						}
 					});
@@ -138,7 +138,7 @@ public class AutomataVerificationWorker
 				thisCategory.error(e.getMessage());
 				return;
 			}
-			
+
 			startDate = new Date();
 			try
 			{
@@ -195,13 +195,13 @@ public class AutomataVerificationWorker
 		else if (verificationOptions.getVerificationType() == 2)
 		{	// Language inclusion
 			boolean isIncluded;
-			
-			Collection selectedAutomata = workbench.getSelectedAutomata();
+
+			Collection selectedAutomata = workbench.getSelectedAutomataAsCollection();
 			Automata automataA = new Automata();
 			Automata automataB = new Automata();
 			Automaton currAutomaton;
 			String currAutomatonName;
-			
+
 			// The automata must have an initial state
 			// Put selected automata in automataB and unselected in automataA
 			for (int i = 0; i < theAutomatonContainer.getSize(); i++)
@@ -228,7 +228,7 @@ public class AutomataVerificationWorker
 				else
 					automataA.addAutomaton(new Automaton(currAutomaton));
 			}
-			
+
 			if (automataA.size() < 1 || automataB.size() < 1)
 			{
 				thisCategory.error("At least one automaton must be unselected.");
@@ -269,7 +269,7 @@ public class AutomataVerificationWorker
 					thisCategory.error("Error when calculating union alphabet. " + e);
 					return;
 				}
-			}			
+			}
 
 			// Change events in the automata in automataB to uncontrollable if they
 			// are included in the union alphabet found above, mark the automata as
@@ -290,11 +290,11 @@ public class AutomataVerificationWorker
 						currEvent.setControllable(true);
 				}
 			}
-			
+
 			// After the above preparations, the language inclusion check
 			// can be performed as a controllability check...
 			automataA.addAutomata(automataB);
-			
+
 			try
 			{
 				automataVerifier = new AutomataVerifier(automataA, synchronizationOptions, verificationOptions);
@@ -313,7 +313,7 @@ public class AutomataVerificationWorker
 				thisCategory.error(e.getMessage());
 				return;
 			}
-			
+
 			startDate = new Date();
 			try
 			{
@@ -345,7 +345,7 @@ public class AutomataVerificationWorker
 				return;
 			}
 			endDate = new Date();
-			
+
 			// Present result...
 			if (!stopRequested)
 			{
@@ -365,7 +365,7 @@ public class AutomataVerificationWorker
 			thisCategory.error("Unavailable option chosen.");
 			return;
 		}
-		
+
 		// Present result...
 		automataVerifier.getHelper().displayInfo();
 		if (!stopRequested)
