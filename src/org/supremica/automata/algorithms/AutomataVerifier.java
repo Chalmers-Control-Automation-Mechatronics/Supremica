@@ -183,7 +183,23 @@ public class AutomataVerifier
 
 			if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
 			{
-				return "Modular nonblocking option not yet implemented.";
+				return "The modular nonblocking algorithm \n" + "is not fully implemented!";
+			}
+		}
+
+		// Check Language Inclusion
+		if (verificationOptions.getVerificationType() == VerificationType.Controllability)
+		{
+			if (theAutomata.size() < 1)
+			{
+				return "At least one automata must be selected";
+			}
+			if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
+			{
+				if (!theAutomata.isAllEventsPrioritized())
+				{
+					return "All event must be prioritized in the modular algorithm";
+				}
 			}
 		}
 
@@ -241,6 +257,7 @@ public class AutomataVerifier
 				{
 					// This algorithm is under implementation!!
 					return modularNonBlockingVerification();
+
 					// This algorithm only verifies pairwise nonblocking!!!
 					// return pairwiseNonblockingVerification();
 				}
@@ -476,7 +493,7 @@ public class AutomataVerifier
 
 			// Sort automata in order of similar alphabets
 			int[] similarAutomata = findSimilarAutomata(theAutomata, selectedAutomata);
-
+			
 			if (similarAutomata == null)
 			{
 				// There are no similar automata, this module must be uncontrollable
@@ -1181,16 +1198,21 @@ public class AutomataVerifier
 		}
 	
 		// Preparations for the global nonblocking verification...
-		ExecutionDialog executionDialog = synchHelper.getExecutionDialog(); 
-		executionDialog.setMode(ExecutionDialogMode.verifyingNonblocking);
-		executionDialog.initProgressBar(0,theAutomata.size());
+	    ExecutionDialog executionDialog = synchHelper.getExecutionDialog(); 
+		if (executionDialog != null) // The executionDialog might not have been initilized yet! FIXA!
+		{
+			executionDialog.initProgressBar(0, theAutomata.size());
+			executionDialog.setMode(ExecutionDialogMode.verifyingNonblocking);
+		}
 		// We use a copy of theAutomata instead from this point on. This is to spare us the 
 		// effort of changing all events to uncontrollable over and over and lets us use the 
 		// same helper all the time, EXCEPT for AutomataIndexForm.typeIsPlantTable which we 
 		// have to reinitialize between the language inclusion checks!!
 	    theAutomata = new Automata(theAutomata, false); 
 		synchHelper = new AutomataSynchronizerHelper(theAutomata, synchronizationOptions);
-		// Make all events in all automata in theAutomata uncontrollable!
+		// Make all events in all automata in theAutomata uncontrollable! (All 
+		// events in plants skould be uncontrollable and the controllability of 
+		// the events in the supervisors doesn't matter!)
 		Iterator eventIterator;
 		Iterator automatonIterator = theAutomata.iterator();
 		while (automatonIterator.hasNext())
@@ -1210,12 +1232,15 @@ public class AutomataVerifier
 		Automata currAutomata = new Automata();
 		while (autIt.hasNext())
 		{
-			currAutomaton = new Automaton((Automaton) autIt.next());
-			logger.info("Examining the automaton " + currAutomaton.getName() + ".");
-			executionDialog.setValue(theAutomata.getAutomatonIndex(currAutomaton));
+			currAutomaton = (Automaton) autIt.next();
+			if (executionDialog != null)
+			{
+				executionDialog.setProgress(theAutomata.getAutomatonIndex(currAutomaton));
+			}
 		    currAutomata.addAutomaton(currAutomaton);
-			// Perform the language inclusion check!
-			allIncluded = allIncluded && languageInclusionVerification(currAutomata, theAutomata);
+			// Perform the behavioural inclusion check!
+			logger.info("Examining the automaton " + currAutomaton.getName() + ".");
+			allIncluded = allIncluded && behaviouralInclusionVerification(currAutomata, theAutomata);
 			currAutomata.removeAutomaton(currAutomaton); // Examine one automaton at a time...
 			if (!allIncluded)
 			{
@@ -1226,51 +1251,32 @@ public class AutomataVerifier
 	}
 
 	/**
-	 * Verifies language inclusion of the language of AutomataA in AutomataB. 
-	 * I.e. is AutomataA included in AutomataB?
+	 * Verifies behavioural inclusion of the language of automataA in automataB. 
+	 * I.e. is the behaviour of automataA included in automataB?
+	 * It IS ok for automataB to contain automata in automataA, but not the other way around!
+	 * This method presupposes that all events are uncontrollable!
 	 */
-	private boolean languageInclusionVerification(Automata automataA, Automata automataB)
+	private boolean behaviouralInclusionVerification(Automata automataA, Automata automataB)
 		throws Exception
 	{
-		// Compute the union alphabet of the events in automataA, mark all
-		// events in automataA as uncontrollable and the automata as plants
-		Alphabet unionAlphabet;
-		Iterator eventIterator;
+		// Change the automata in automataB to specifications
 		Automaton currAutomaton;
-		Iterator automatonIterator = automataA.iterator();
-		while (automatonIterator.hasNext())
-		{
-			currAutomaton = (Automaton) automatonIterator.next();
-			currAutomaton.setType(AutomatonType.Plant);
-			// eventIterator = currAutomaton.eventIterator();
-			// while (eventIterator.hasNext())
-			// {
-			// 	((LabeledEvent) eventIterator.next()).setControllable(false);
-			// }
-		}
- 		unionAlphabet = AlphabetHelpers.getUnionAlphabet(automataA);
-
-		// Change events in the automata in automataB to uncontrollable if they
-		// are included in the union alphabet found above, mark the automata as
-		// specifications
-		LabeledEvent currEvent;
-		automatonIterator = automataB.iterator();
+		Iterator automatonIterator = automataB.iterator();
 		while (automatonIterator.hasNext())
 		{
 			currAutomaton = (Automaton) automatonIterator.next();
 			currAutomaton.setType(AutomatonType.Supervisor);
-			// eventIterator = currAutomaton.eventIterator();
-			// while (eventIterator.hasNext())
-			// {
-			// 	currEvent = (LabeledEvent) eventIteratorB.next();
-			//	if (unionAlphabet.containsEventWithLabel(currEvent.getLabel()))
-			//		currEvent.setControllable(false);
-			//	else
-			//		currEvent.setControllable(true);
-			// }
 		}
-		
-		// And update the typeIsPlantTable in the AutomataIndexForm in the synchHelper!
+
+		// Change the automata in automataA to plants
+		automatonIterator = automataA.iterator();
+		while (automatonIterator.hasNext())
+		{
+			currAutomaton = (Automaton) automatonIterator.next();
+			currAutomaton.setType(AutomatonType.Plant);
+		}
+ 		
+		// Update the typeIsPlantTable in the AutomataIndexForm in the synchHelper!
 		synchHelper.getAutomataIndexForm().generateAutomataIndices(theAutomata);
 		
 		// After the above preparations, the language inclusion check

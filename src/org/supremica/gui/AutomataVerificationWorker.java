@@ -130,32 +130,7 @@ public class AutomataVerificationWorker
 			}
 		});
 		
-		// Crap! LanguageInclusion is somewhat special since we have to use another theAutomata so this won't work!
-		/*
-		  // Initialize the AutomataVerifier
-		  try
-		  {
-		  automataVerifier = new AutomataVerifier(theAutomata, synchronizationOptions, verificationOptions);
-		  eventQueue.invokeLater(new Runnable()
-		  {
-		  public void run()
-		  {
-		  automataVerifier.getHelper().setExecutionDialog(executionDialog);
-		  }
-		  });
-		  threadsToStop.add(automataVerifier);
-		  }
-		  catch (Exception ex)
-		  {
-		  requestStop();
-		  JOptionPane.showMessageDialog(workbench.getFrame(), ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-		  logger.error(ex.getMessage());
-		  logger.debug(ex.getStackTrace());
-		  return;
-		  }
-		*/
-
-		// Examine the chosen options
+		// Examine the validity of the chosen options
 		String errorMessage = AutomataVerifier.validOptions(theAutomata, verificationOptions);
 		if (errorMessage != null)
 		{
@@ -164,429 +139,34 @@ public class AutomataVerificationWorker
 			return;
 		}
 		
+		// Perform verification according to the VerificationType.
 		if (verificationOptions.getVerificationType() == VerificationType.Controllability)
 		{
 			// Controllability verification...
 			successMessage = "The system is controllable!";
 			failureMessage = "The system is NOT controllable!";
-			
-			// Initialize the AutomataVerifier
-			try
-			{
-				automataVerifier = new AutomataVerifier(theAutomata, synchronizationOptions, verificationOptions);
-				eventQueue.invokeLater(new Runnable()
-				{
-					public void run()
-					{
-						automataVerifier.getHelper().setExecutionDialog(executionDialog);
-					}
-				});
-				threadsToStop.add(automataVerifier);
-			}
-			catch (Exception ex) 
-			{
-				requestStop();
-				JOptionPane.showMessageDialog(workbench.getFrame(), ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-				logger.error(ex.getMessage());
-				logger.debug(ex.getStackTrace());
-				return;
-			}
-			
-			/* 
-			   if (theAutomata.size() < 2)
-			   {
-			   JOptionPane.showMessageDialog(workbench.getFrame(), "At least two automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
-			   requestStop();
-			   
-			   return;
-			   }
-			*/
-
-			/*
-			  startDate = new Date();
-			  
-			  verificationSuccess = automataVerifier.verify();
-			*/
-
-			/*
-			  try
-			  {
-			  if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
-			  {
-			  // Modular...
-			  verificationSuccess = automataVerifier.verify();
-			  }
-			  else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Monolithic)
-			  {
-			  // Monolithic...
-			  verificationSuccess = automataVerifier.verify();
-			  }
-			  else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.IDD)
-			  {
-			  // IDD...
-			  requestStop();
-			  logger.error("IDD option not yet implemented...");
-			  return;
-			  }
-			  else
-			  {
-			  // Error...
-			  requestStop();
-			  logger.error("Unavailable controllability option chosen.");
-			  return;
-			  }
-			  }
-			  catch (Exception ex)
-			  {
-			  requestStop();
-			  logger.error("Error in AutomataVerificationWorker when verifying controllability. " + ex);
-			  logger.debug(ex.getStackTrace());
-			  return;
-			  }
-			*/
-
-			/*
-			  endDate = new Date();
-			*/
-
-			/*
-			  // Present result...
-			  if (!stopRequested)
-			  {
-			  if (verificationSuccess)
-			  {
-			  JOptionPane.showMessageDialog(workbench.getFrame(), "The system is controllable!", "Good news", JOptionPane.INFORMATION_MESSAGE);
-			  }
-			  else
-			  {
-			  JOptionPane.showMessageDialog(workbench.getFrame(), "The system is NOT controllable!", "Bad news", JOptionPane.INFORMATION_MESSAGE);
-			  }
-			  }
-			*/
 		}
 		else if (verificationOptions.getVerificationType() == VerificationType.Nonblocking)
 		{
 			// Non-blocking verification...
 			successMessage = "The system is non-blocking!";
 			failureMessage = "The system is blocking!";
-			
-			/*
-			  if (theAutomata.size() < 1)
-			  {
-			  JOptionPane.showMessageDialog(workbench.getFrame(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
-			  requestStop();
-			  return;
-			  }
-			*/
-			
-			try
-			{
-				automataVerifier = new AutomataVerifier(theAutomata, synchronizationOptions, verificationOptions);
-				
-				eventQueue.invokeLater(new Runnable()
-				{
-					public void run()
-					{
-						automataVerifier.getHelper().setExecutionDialog(executionDialog);
-					}
-				});
-				
-				// automataVerifier.getHelper().setExecutionDialog(executionDialog);
-				threadsToStop.add(automataVerifier);
-			}
-			catch (Exception ex)
-			{
-				requestStop();
-				JOptionPane.showMessageDialog(workbench.getFrame(), ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-				logger.error(ex.getMessage());
-				logger.debug(ex.getStackTrace());
-				return;
-			}
-			
-			/*
-			  startDate = new Date();
-			  
-			  verificationSuccess = automataVerifier.verify();
-			*/			
-
-			/*
-			  try
-			  {
-			  if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
-			  {
-			  // Modular...
-			  // requestStop();
-			  // logger.error("Modular nonblocking option not yet implemented... try the monolithic algorithm instead!");
-			  // return;				
-			  
-			  JOptionPane.showMessageDialog(workbench.getFrame(), "This algorithm is intentionally designed \n not to give you the answer you want.", "Mind you!", JOptionPane.INFORMATION_MESSAGE);
-			  verificationSuccess = automataVerifier.verify();					
-			  }
-			  else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Monolithic)
-			  {
-			  // Monolithic...
-			  verificationSuccess = automataVerifier.verify();
-			  }
-			  else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.IDD)
-			  {
-			  // IDD...
-			  requestStop();
-			  logger.error("Sorry. Nonblocking IDD verifictaion not yet implemented...");
-			  return;
-			  }
-			  else
-			  {
-			  // Error...
-			  requestStop();
-			  logger.error("Unavailable nonblocking option chosen.");
-			  return;
-			  }
-			  }
-			  catch (Exception ex)
-			  {
-			  requestStop();
-			  logger.error("Error in AutomataVerificationWorker when verifying non-blocking. " + ex);
-			  logger.debug(ex.getStackTrace());
-			  return;
-			  }
-			*/
-
-			/*
-			  endDate = new Date();
-			*/
-			
-			/*
-			  // Present result...
-			  if (!stopRequested)
-			  {
-			  if (verificationSuccess)
-			  {
-			  JOptionPane.showMessageDialog(workbench.getFrame(), "The system is non-blocking!", "Good news", JOptionPane.INFORMATION_MESSAGE);
-			  }
-			  else
-			  {
-			  JOptionPane.showMessageDialog(workbench.getFrame(), "The system is blocking!", "Bad news", JOptionPane.INFORMATION_MESSAGE);
-			  }
-			}
-			*/
 		}
 		else if (verificationOptions.getVerificationType() == VerificationType.LanguageInclusion)
 		{
 			// Language inclusion
-			successMessage = "The language of the unselected automata is included in the language of the selected automata.";
-			failureMessage = "The language of the unselected automata is NOT included in the language of the selected automata.";
+			successMessage = "The language of the unselected automata is \n" +
+				             "included in the language of the selected automata.";
+			failureMessage = "The language of the unselected automata is \n" +
+				             "NOT included in the language of the selected automata.";
 			
-			Collection selectedAutomata = workbench.getSelectedAutomataAsCollection();
-			Automata automataA = new Automata();
-			Automata automataB = new Automata();
-			Automaton currAutomaton;
-			String currAutomatonName;
-
-			// The automata must have an initial state
-			// Put selected automata in automataB and unselected in automataA
-			for (int i = 0; i < theVisualProjectContainer.getActiveProject().getNbrOfAutomata(); i++)
-			{
-				try
-				{
-					currAutomaton = theVisualProjectContainer.getActiveProject().getAutomatonAt(i);
-				}
-				catch (Exception ex)
-				{
-					requestStop();
-					logger.error("Exception in VisualProjectContainer. " + ex);
-					logger.debug(ex.getStackTrace());
-					return;
-				}
-
-				currAutomatonName = currAutomaton.getName();
-
-				if (currAutomaton.getInitialState() == null)
-				{
-					requestStop();
-					JOptionPane.showMessageDialog(workbench.getFrame(), "The automaton " + currAutomatonName + " does not have an initial state!", "Alert", JOptionPane.ERROR_MESSAGE);
-
-					return;
-				}
-
-				if (selectedAutomata.contains(currAutomaton))
-				{
-					automataB.addAutomaton(new Automaton(currAutomaton));
-				}
-				else
-				{
-					automataA.addAutomaton(new Automaton(currAutomaton));
-				}
-			}
-
-			if ((automataA.size() < 1) || (automataB.size() < 1))
-			{
-				logger.error("At least one automaton must be unselected.");
-				requestStop();
-				return;
-			}
-
-			// Compute the union alphabet of the events in automataA, mark all
-			// events in automataA as uncontrollable and the automata as plants
-			EventsSet theAlphabets = new EventsSet();
-			Alphabet unionAlphabet;
-			Iterator automatonIteratorA = automataA.iterator();
-			Iterator eventIteratorA;
-			Iterator eventIteratorB;
-
-			while (automatonIteratorA.hasNext())
-			{
-				currAutomaton = (Automaton) automatonIteratorA.next();
-
-				Alphabet currAlphabet = currAutomaton.getAlphabet();
-
-				theAlphabets.add(currAlphabet);
-				currAutomaton.setType(AutomatonType.Plant);
-
-				eventIteratorA = currAutomaton.eventIterator();
-
-				while (eventIteratorA.hasNext())
-				{
-					((org.supremica.automata.LabeledEvent) eventIteratorA.next()).setControllable(false);
-				}
-			}
-
-			if (theAlphabets.size() == 1)
-			{
-				unionAlphabet = (Alphabet) theAlphabets.get(0);
-			}
-			else
-			{
-				try
-				{
-					unionAlphabet = AlphabetHelpers.getUnionAlphabet(theAlphabets); // , "");
-				}
-				catch (Exception ex)
-				{
-					requestStop();
-					logger.error("Error when calculating union alphabet. " + ex);
-					logger.debug(ex.getStackTrace());
-					return;
-				}
-			}
-
-			// Change events in the automata in automataB to uncontrollable if they
-			// are included in the union alphabet found above, mark the automata as
-			// specifications
-			Iterator automatonIteratorB = automataB.iterator();
-			org.supremica.automata.LabeledEvent currEvent;
-
-			while (automatonIteratorB.hasNext())
-			{
-				currAutomaton = (Automaton) automatonIteratorB.next();
-
-				currAutomaton.setType(AutomatonType.Supervisor);
-
-				eventIteratorB = currAutomaton.eventIterator();
-
-				while (eventIteratorB.hasNext())
-				{
-					currEvent = (org.supremica.automata.LabeledEvent) eventIteratorB.next();
-
-					if (unionAlphabet.containsEventWithLabel(currEvent.getLabel()))
-					{
-						currEvent.setControllable(false);
-					}
-					else
-					{
-						currEvent.setControllable(true);
-					}
-				}
-			}
-
-			// After the above preparations, the language inclusion check
-			// can be performed as a controllability check...
-			automataA.addAutomata(automataB);
-			
-			try
-			{
-				automataVerifier = new AutomataVerifier(automataA, synchronizationOptions, verificationOptions);
-				
-				eventQueue.invokeLater(new Runnable()
-				{
-					public void run()
-					{
-						automataVerifier.getHelper().setExecutionDialog(executionDialog);
-					}
-				});
-				
-				// automataVerifier.getHelper().setExecutionDialog(executionDialog);
-				threadsToStop.add(automataVerifier);
-			}
-			catch (Exception ex)
-			{
-				requestStop();
-				JOptionPane.showMessageDialog(workbench.getFrame(), ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-				logger.error(ex.getMessage());
-				logger.debug(ex.getStackTrace());
-				return;
-			}
-
-			/*
-			  startDate = new Date();
-			  
-			  verificationSuccess = automataVerifier.verify();
-			*/
-
-			/*
-			  try
-			  {
-			  if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
-			  {
-			  // Modular...
-			  verificationSuccess = automataVerifier.verify();
-			  }
-			  else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Monolithic)
-			  {
-			  // Monolithic...
-			  verificationSuccess = automataVerifier.verify();
-			  }
-			  else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.IDD)
-			  {
-			  // IDD...
-			  requestStop();
-			  logger.error("Language Inclusion IDD option not yet implemented...");
-			  return;
-			  }
-			  else
-			  {
-			  // Error...
-			  requestStop();
-			  logger.error("Language Inclusion, unavailable option chosen.");
-			  return;
-			  }
-			  }
-			  catch (Exception ex)
-			  {
-			  requestStop();
-			  logger.error("Error in AutomataVerificationWorker when verifying language inclusion. ", ex);
-			  logger.debug(ex.getStackTrace());
-			  return;
-			  }
-			*/
-			
-			/*
-			  endDate = new Date();
-			*/
-
-			/*
-			  // Present result...
-			  if (!stopRequested)
-			  {
-			  if (verificationSuccess)
-			  {
-			  JOptionPane.showMessageDialog(workbench.getFrame(), "The language of the unselected automata is included in the language of the selected automata.", "Good news", JOptionPane.INFORMATION_MESSAGE);
-			  }
-			  else
-			  {
-			  JOptionPane.showMessageDialog(workbench.getFrame(), "The language of the unselected automata is NOT included in the language of the selected automata.", "Bad news", JOptionPane.INFORMATION_MESSAGE);
-			  }
-			  }
-			*/
+			prepareAutomataForLanguageInclusion();
+			JOptionPane.showMessageDialog(workbench.getFrame(), 
+										  "Note that the language inclusion check is guaranteed to \n" +
+										  "work only when the alphabets of the respective automata \n" +
+										  "sets are equal. Also know that this is prefix-closed \n" +
+										  "language verification only.", "Important information!", 
+										  JOptionPane.INFORMATION_MESSAGE);
 		}
 		else
 		{
@@ -596,11 +176,40 @@ public class AutomataVerificationWorker
 			return;
 		}
 
+		// Did some initialization go wrong?
+		if (stopRequested)
+		{
+			return;
+		}
+		
+		// Initialize the AutomataVerifier
+		try
+		{
+			automataVerifier = new AutomataVerifier(theAutomata, synchronizationOptions, verificationOptions);
+			eventQueue.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						automataVerifier.getHelper().setExecutionDialog(executionDialog);
+					}
+				});
+			threadsToStop.add(automataVerifier);
+		}
+		catch (Exception ex) 
+		{
+			requestStop();
+			JOptionPane.showMessageDialog(workbench.getFrame(), ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+			logger.error(ex.getMessage());
+			logger.debug(ex.getStackTrace());
+			return;
+		}
+
+		// Solve the problem!
 		startDate = new Date();
 		verificationSuccess = automataVerifier.verify();		
 		endDate = new Date();
 
-		// Present result...
+		// Present the result
 		if (!stopRequested)
 		{
 			if (verificationSuccess)
@@ -622,6 +231,133 @@ public class AutomataVerificationWorker
 		
 		// We're finished! Stop everything!
 		requestStop();
+	}
+
+	private void prepareAutomataForLanguageInclusion()
+	{
+		// We have to go through some, quite lengthy, preparations
+		// before we can perform the language inclusion...
+		Collection selectedAutomata = workbench.getSelectedAutomataAsCollection();
+		Automata automataA = new Automata();
+		Automata automataB = new Automata();
+		Automaton currAutomaton;
+		String currAutomatonName;
+		
+		// The automata must have an initial state
+		// Put selected automata in automataB and unselected in automataA
+		for (int i = 0; i < theVisualProjectContainer.getActiveProject().getNbrOfAutomata(); i++)
+		{
+			try
+			{
+				currAutomaton = theVisualProjectContainer.getActiveProject().getAutomatonAt(i);
+			}
+			catch (Exception ex)
+			{
+				requestStop();
+				logger.error("Exception in VisualProjectContainer. " + ex);
+				logger.debug(ex.getStackTrace());
+				return;
+			}
+			
+			currAutomatonName = currAutomaton.getName();
+			
+			if (currAutomaton.getInitialState() == null)
+			{
+				requestStop();
+				JOptionPane.showMessageDialog(workbench.getFrame(), "The automaton " + currAutomatonName + " does not have an initial state!", "Alert", JOptionPane.ERROR_MESSAGE);
+				
+				return;
+			}
+			
+			if (selectedAutomata.contains(currAutomaton))
+			{
+				automataB.addAutomaton(new Automaton(currAutomaton));
+			}
+			else
+			{
+				automataA.addAutomaton(new Automaton(currAutomaton));
+			}
+		}
+		
+		if ((automataA.size() < 1) || (automataB.size() < 1))
+		{
+			logger.error("At least one automaton must be unselected.");
+			requestStop();
+			return;
+		}
+		
+		// Compute the union alphabet of the events in automataA, mark all
+		// events in automataA as uncontrollable and the automata as plants
+		EventsSet theAlphabets = new EventsSet();
+		Alphabet unionAlphabet;
+		Iterator automatonIteratorA = automataA.iterator();
+		Iterator eventIteratorA;
+		Iterator eventIteratorB;
+		
+		while (automatonIteratorA.hasNext())
+		{
+			currAutomaton = (Automaton) automatonIteratorA.next();
+			Alphabet currAlphabet = currAutomaton.getAlphabet();			
+			theAlphabets.add(currAlphabet);
+			currAutomaton.setType(AutomatonType.Plant);
+			
+			eventIteratorA = currAutomaton.eventIterator();
+			while (eventIteratorA.hasNext())
+			{
+				((org.supremica.automata.LabeledEvent) eventIteratorA.next()).setControllable(false);
+			}
+		}
+		
+		if (theAlphabets.size() == 1)
+		{
+			unionAlphabet = (Alphabet) theAlphabets.get(0);
+		}
+		else
+		{
+			try
+			{
+				unionAlphabet = AlphabetHelpers.getUnionAlphabet(theAlphabets); // , "");
+			}
+			catch (Exception ex)
+			{
+				requestStop();
+				logger.error("Error when calculating union alphabet. " + ex);
+				logger.debug(ex.getStackTrace());
+				return;
+			}
+		}
+		
+		// Change events in the automata in automataB to uncontrollable if they
+		// are included in the union alphabet found above, mark the automata as
+		// specifications
+		Iterator automatonIteratorB = automataB.iterator();
+		org.supremica.automata.LabeledEvent currEvent;
+		
+		while (automatonIteratorB.hasNext())
+		{
+			currAutomaton = (Automaton) automatonIteratorB.next();
+			currAutomaton.setType(AutomatonType.Supervisor);
+			
+			eventIteratorB = currAutomaton.eventIterator();			
+			while (eventIteratorB.hasNext())
+			{
+				currEvent = (org.supremica.automata.LabeledEvent) eventIteratorB.next();
+				
+				if (unionAlphabet.containsEventWithLabel(currEvent.getLabel()))
+				{
+					currEvent.setControllable(false);
+				}
+				else
+				{
+					currEvent.setControllable(true);
+				}
+			}
+		}
+		
+		// After the above preparations, the language inclusion check
+		// can be performed as a controllability check...
+		automataA.addAutomata(automataB);
+		theAutomata = automataA;
 	}
 
 	/**

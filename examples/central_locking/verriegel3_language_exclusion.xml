@@ -1,19 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Automata name="Untitled">
-<Automaton name="mvr.HT" type="Plant">
-	<Events>
-		<Event id="MVR_an.TUER" label="MVR_an.HT"/>
-		<Event id="MVR_aus.TUER" label="MVR_aus.HT"/>
-	</Events>
-	<States>
-		<State id="IDLE" initial="true" accepting="true" cost="0"/>
-		<State id="RUN" cost="0"/>
-	</States>
-	<Transitions>
-		<Transition source="IDLE" dest="RUN" event="MVR_an.TUER"/>
-		<Transition source="RUN" dest="IDLE" event="MVR_aus.TUER"/>
-	</Transitions>
-</Automaton>
 <Automaton name="sicherheit_er" type="Undefined">
 	<Events>
 		<Event id="CS" label="CS" controllable="false"/>
@@ -39,6 +25,20 @@
 		<Transition source="IN" dest="RQ" event="ER_HK"/>
 		<Transition source="IN" dest="RQ" event="ER_FS"/>
 		<Transition source="IN" dest="RQ" event="CS"/>
+	</Transitions>
+</Automaton>
+<Automaton name="mvr.HT" type="Plant">
+	<Events>
+		<Event id="MVR_an.TUER" label="MVR_an.HT"/>
+		<Event id="MVR_aus.TUER" label="MVR_aus.HT"/>
+	</Events>
+	<States>
+		<State id="IDLE" initial="true" accepting="true" cost="0"/>
+		<State id="RUN" cost="0"/>
+	</States>
+	<Transitions>
+		<Transition source="IDLE" dest="RUN" event="MVR_an.TUER"/>
+		<Transition source="RUN" dest="IDLE" event="MVR_aus.TUER"/>
 	</Transitions>
 </Automaton>
 <Automaton name="noreset.WSP" type="Specification">

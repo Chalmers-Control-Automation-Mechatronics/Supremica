@@ -188,7 +188,6 @@ public class ExecutionDialog
 	 */
 	public void initProgressBar(int min, int max)
 	{
-
 		// progressMin = min;
 		// progressMax = max;
 		progressBar.setMinimum(min);
@@ -227,7 +226,6 @@ public class ExecutionDialog
 
 	public void run()
 	{
-
 		// Update labels
 		if (newMode)
 		{
@@ -281,6 +279,13 @@ public class ExecutionDialog
 
 				currCenterPanel = infoPanel;
 			}
+			else if (currentMode == ExecutionDialogMode.verifyingNonblocking)
+			{
+				operationLabel.setText(currentMode.getId());    // "Verifying nonblocking...");
+				contentPanel.add(progressPanel, BorderLayout.CENTER);
+				
+				currCenterPanel = infoPanel;
+			}
 			else if (currentMode == ExecutionDialogMode.hide)
 			{
 
@@ -302,11 +307,8 @@ public class ExecutionDialog
 
 		// Update labels
 		boolean showValues = currentMode.showValue();
-
-		// = ((currentMode == ExecutionDialogMode.synchronizing) || (currentMode == ExecutionDialogMode.verifying) || (currentMode == ExecutionDialogMode.synthesizing));
 		boolean showProgress = currentMode.showProgress();
 
-		// = ((currentMode == ExecutionDialogMode.buildingStates) || (currentMode == ExecutionDialogMode.buildingTransitions));
 		if (showValues)
 		{
 			infoValue.setText(String.valueOf(value));
