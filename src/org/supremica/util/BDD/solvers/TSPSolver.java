@@ -5,7 +5,11 @@ import org.supremica.util.BDD.*;
 
 import java.util.*;
 
-/** TSP ordering */
+/**
+ * TSP ordering: solve a TSP problem by a 2-step lookahead greedy algo.
+ * note thet the weights are DYNAMIC, so this is not really TSP.
+ * besides, the starting point DOES matter here :(
+ */
 public class TSPSolver extends Solver {
 
 	public TSPSolver(Node [] org_ ) {  super(org_); }
@@ -13,6 +17,7 @@ public class TSPSolver extends Solver {
 	private double cost(int from, int to, int distance) {
 		// this is VERY non-theoretical :)
 		return Math.pow(org[from].wlocal[to], Math.log(1 + Math.abs(distance)));
+		// return org[from].wlocal[to] * Math.abs(distance); // <-- not that powerful
 	}
 	public void solve() {
 		int [] tour = TSP_tour();

@@ -28,15 +28,16 @@ public class SiftTCPSolver extends TSPSolver {
 
 		double best = eval();
 		improvments = 0;
-
 		for(int j = 0; j < size * 5; j++) {
 			int r = (int)(Math.random() * size);
-			int dir = (Math.random() >= 0.5) ? 1 : -1;
-			int to = (r + dir);
+			// int dir = (Math.random() >= 0.5) ? 3 : -3;
+			int dir = 1 + (int)(Math.random() * (size -1) );
+			int to = r + dir;
+
 
 			// wrap around, not very clever, huh?
-			if(to < 0) to += size;
-			if(to >= size) to -= size;
+			while(to < 0) to += size;
+			while(to >= size) to -= size;
 
 			Node tmp = work[r]; work[r] = work[to]; work[to] = tmp;
 
