@@ -64,6 +64,7 @@ import java.awt.geom.Rectangle2D;
 public class DotViewer
 	extends JFrame
 {
+	private static final long serialVersionUID = 1L;
 	private static Logger logger = LoggerFactory.createLogger(DotViewer.class);
 	private Graph theGraph;
 	private PrintWriter toDotWriter;
@@ -980,7 +981,7 @@ class Builder
 	{
 		if (mode == BUILD)
 		{
-			theViewer.setCursor(java.awt.Cursor.WAIT_CURSOR);
+			theViewer.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
 			try
 			{
 				theViewer.internalBuild();
@@ -989,7 +990,7 @@ class Builder
 			{
 				logger.error("Cannot display object.");
 				logger.debug(ex.getStackTrace());
-				theViewer.setCursor(java.awt.Cursor.DEFAULT_CURSOR);
+				theViewer.setCursor(java.awt.Cursor.getDefaultCursor());
 
 				return;
 			}
@@ -1002,7 +1003,7 @@ class Builder
 		{
 			// theViewer.setCursor(java.awt.Cursor.WAIT_CURSOR);
 			theViewer.draw();
-			theViewer.setCursor(java.awt.Cursor.DEFAULT_CURSOR);
+			theViewer.setCursor(java.awt.Cursor.getDefaultCursor());
 		}
 	}
 
@@ -1011,7 +1012,7 @@ class Builder
 		if (theViewer != null)
 		{
 			theViewer.stopProcess();
-			theViewer.setCursor(java.awt.Cursor.DEFAULT_CURSOR);
+			theViewer.setCursor(java.awt.Cursor.getDefaultCursor());
 		}
 	}
 }
