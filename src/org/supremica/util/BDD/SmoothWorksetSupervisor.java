@@ -1,0 +1,154 @@
+
+
+package org.supremica.util.BDD;
+
+import java.util.*;
+
+/**
+ * monotonicly increased smoothed reachability based on conjunctive transition relations
+ * the difference to SmoothSupervisor.java is that SmoothWorksetSupervisor.java picks
+ * new automatoa/clusters based on the workset algorithm (see Workset.java and
+ * WorksetSupervisor.init_worksets() for example).
+ *
+ * However, SmoothSupervisor.java uses the current BDD ordering which is often better but
+ * in some weird cases that I haven't figured it out yet...
+ */
+
+public class SmoothWorksetSupervisor extends WorksetSupervisor {
+
+    public SmoothWorksetSupervisor(BDDAutomata manager, Group p, Group sp) {
+		super(manager,p,sp);
+    }
+
+    public SmoothWorksetSupervisor(BDDAutomata manager, BDDAutomaton [] as) {
+		super(manager,as);
+    }
+
+
+    // ------------------------------------------------------------------------
+    protected void computeReachables() {
+		// statistic stuffs
+		GrowFrame gf = null;
+		if(Options.show_grow)
+			gf = new GrowFrame("Forward reachability (smoothed+workset)");
+
+		timer.reset();
+		MonotonicPartition dp = new MonotonicPartition(manager, plant.getSize() + spec.getSize());
+
+		SizeWatch.setOwner("SmoothWorksetSupervisor.computeReachables");
+		int cube    = manager.getStateCube();
+		int i_all = manager.and(plant.getI(), spec.getI());
+
+		int r_all_p, r_all = i_all;
+		manager.ref(i_all); //gets derefed by orTo and finally a deref
+
+
+		// 0/1 smoothing
+		int size = dop.getSize();
+		Cluster [] clusters = dop.getClusters();
+
+		Workset workset = createWorkset();
+
+		for(int a = 0; a < size; a++) {
+			int p = workset.pickOneExcelsuive();
+			dp.add(clusters[p].twave);
+
+			int  r_all_pp, front_s, front_sp;
+
+
+			do {
+				r_all_pp = r_all;
+				int front = dp.image(r_all);
+				r_all = manager.orTo(r_all, front);
+				manager.deref(front);
+				if(gf != null)    gf.add( manager.nodeCount( r_all));
+			} while(r_all != r_all_pp);
+
+			workset.advance(p, true);
+
+		}
+
+
+		// cleanup
+		manager.deref(i_all);
+
+		has_reachables = true;
+		bdd_reachables = r_all;
+		SizeWatch.report(r_all, "Qr");
+		dp.cleanup();
+		timer.report("Forward reachables found (smoothed+workset)");
+		// SizeWatch.report(r_all, "R");
+    }
+    // -------------------------------------------------------------------------------
+
+    protected void computeCoReachables() {
+	GrowFrame gf = null;;
+	if(Options.show_grow) gf = new GrowFrame("backward reachability (smoothed+workset)");
+
+	timer.reset();
+	MonotonicPartition dp = new MonotonicPartition(manager, plant.getSize() + spec.getSize());
+
+	SizeWatch.setOwner("SmoothWorksetSupervisor.computeCoReachables");
+
+	int cube    = manager.getStatepCube();
+	int permute1 = manager.getPermuteS2Sp();
+	int permute2 = manager.getPermuteSp2S();
+
+
+	int m_all = GroupHelper.getM(manager, spec, plant);
+
+	// gets derefed in first orTo ??
+	int r_all_p, r_all = manager.replace(m_all, permute1);
+	manager.deref(m_all);
+
+
+	if(Options.local_saturation) {
+	    // TODO: compute saturated m_all (r_all right now)
+	}
+
+	SizeWatch.report(r_all, "Qm");
+
+	// 0/1 smoothing
+	int size = dop.getSize();
+	Cluster [] clusters = dop.getClusters();
+
+	Workset workset = createWorkset();
+
+
+	for(int a = 0; a < size; a++) {
+	    int p = workset.pickOneExcelsuive();
+	    dp.add(clusters[p].twave);
+
+	    int r_all_org, r_all_pp, front_s, front_sp;
+
+		r_all_org = r_all;
+
+	    do {
+			r_all_pp = r_all;
+			int front = dp.preImage(r_all);
+			r_all = manager.orTo(r_all, front);
+			manager.deref(front);
+			if(gf != null)    gf.add( manager.nodeCount( r_all));
+	    } while(r_all != r_all_pp);
+
+	    workset.advance(p, true);
+	}
+
+	int ret = manager.replace(r_all, permute2);
+
+	// cleanup:
+	manager.deref(r_all);
+
+
+	has_coreachables = true;
+	bdd_coreachables = ret;
+
+	SizeWatch.report(bdd_coreachables, "Qco");
+	timer.report("Co-reachables found (smoothed+workset)");
+	if(gf != null) gf.stopTimer();
+	dp.cleanup();
+	// SizeWatch.report(bdd_coreachables,"Coreachables");
+
+    }
+
+}
