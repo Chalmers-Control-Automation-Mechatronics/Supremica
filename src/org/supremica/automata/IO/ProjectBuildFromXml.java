@@ -288,6 +288,9 @@ public class ProjectBuildFromXml
 		}
 		else if (automatonStr.equals(name))
 		{
+			// Reset the id maps when parsing a new automaton
+			idEventMap = new HashMap();
+			idStateMap = new HashMap();
 			doAutomaton(attributes);
 		}
 		else if (projectStr.equals(name))
@@ -404,6 +407,7 @@ public class ProjectBuildFromXml
 
 		currAutomaton.setType(currType);
 
+		// Automaton comment
 		String comment = attributes.getValue("comment");
 		if ((comment != null) && !comment.equals(""))
 		{
@@ -605,7 +609,7 @@ public class ProjectBuildFromXml
 		// Get the event corresponding to this id
 		if (!idEventMap.containsKey(eventId))
 		{
-			throwException("event id \"" + eventId + "\" is not a valid event id.");
+			throwException("event id '" + eventId + "' is not a valid event id.");
 		}
 		LabeledEvent event = (LabeledEvent)idEventMap.get(eventId);
 		// Create and add the arc

@@ -54,7 +54,7 @@ public class EditCommentDialog
 
 		// Add the stuff to the dialog
 		Container pane = getContentPane();
-		pane.setLayout(new BorderLayout(10, 10));	
+		pane.setLayout(new BorderLayout(10, 10));
 		pane.add(labelPane, BorderLayout.NORTH);
 		pane.add(textPane, BorderLayout.CENTER);
 		pane.add(buttonPane, BorderLayout.SOUTH);

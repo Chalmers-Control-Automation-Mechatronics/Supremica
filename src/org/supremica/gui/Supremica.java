@@ -664,7 +664,7 @@ public class Supremica
 
 	public String getNewProjectComment()
 	{
-		String msg = "Enter new project comment";
+		// String msg = "Enter new project comment";
 		boolean finished = false;
 		String oldComment = getActiveProject().getComment();
 		String newComment = "";
