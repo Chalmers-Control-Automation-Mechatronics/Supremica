@@ -1713,6 +1713,16 @@ public class ActionMan
 
 			return;
 		}
+		if (selectedAutomata.hasSelfLoop())
+		{
+			JOptionPane.showMessageDialog(gui.getComponent(), "Self-loops are not supported in SFC. The ST and IL mode can handle self-loops!", "Not supported", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		if (!selectedAutomata.isAllEventsPrioritized())
+		{
+			JOptionPane.showMessageDialog(gui.getComponent(), "All events must prioritized in this mode. The ST and IL mode can handle non-prioritized events!", "Not supported", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
 
 		JFileChooser fileExporter = FileDialogs.getSFileExporter();
 
@@ -1775,7 +1785,16 @@ public class ActionMan
 
 			return;
 		}
-
+		if (selectedAutomata.hasSelfLoop())
+		{
+			JOptionPane.showMessageDialog(gui.getComponent(), "Self-loops are not supported in SFC. The ST and IL mode can handle self-loops!", "Not supported", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		if (!selectedAutomata.isAllEventsPrioritized())
+		{
+			JOptionPane.showMessageDialog(gui.getComponent(), "All events must prioritized in this mode. The ST and IL mode can handle non-prioritized events!", "Not supported", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
 		JFileChooser fileExporter = FileDialogs.getPRJFileExporter();
 
 		if (fileExporter.showSaveDialog(gui.getComponent()) == JFileChooser.APPROVE_OPTION)
