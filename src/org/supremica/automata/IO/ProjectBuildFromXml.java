@@ -600,7 +600,7 @@ public class ProjectBuildFromXml
 		currState.setAccepting(accepting);
 		currState.setForbidden(forbidden);
 		currState.setCost(cost);
-
+		
 		// Associate the id with the state
 		idStateMap.put(id, currState);
 		currAutomaton.addState(currState);

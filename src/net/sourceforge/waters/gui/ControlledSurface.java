@@ -22,7 +22,7 @@ public class ControlledSurface
 {
 	private ControlledSurface S;
 	private EditorToolbar T;
-	private EditorOptions Options;
+	private EditorOptions options;
 	private EditorNode sNode = null;
 	private int lastLineIndex = 0;
 	private int lastX = 0;
@@ -43,7 +43,7 @@ public class ControlledSurface
 
 	public void setOptionsVisible(boolean v)
 	{
-		Options.setVisible(v);
+		options.setVisible(v);
 	}
 
 	public boolean getNodesSnap()
@@ -406,6 +406,7 @@ public class ControlledSurface
 					dx += gridSize;
 				}
 				
+				// Which one is closer?
 				if (e.getX() - dx > (dx + gridSize) - e.getX())
 				{
 					dx += gridSize;
@@ -416,12 +417,13 @@ public class ControlledSurface
 					dy += gridSize;
 				}
 				
+				// Which one is closer?
 				if (e.getY() - dy > (dy + gridSize) - e.getY())
 				{
 					dy += gridSize;
 				}
 				
-				// So the real delta values are...
+				// So the actual delta values are...
 				dx -= lastX;
 				dy -= lastY;
 			}
@@ -476,25 +478,10 @@ public class ControlledSurface
 			// Multiple selection?
 			if (T.getPlace() == EditorToolbar.SELECT)
 			{
-				// Drag all selected objects
-
-				/*
-				// Select on drag?
-				if (selectOnDrag)
-				{
-					// Where were we pointing just now?
-					EditorObject o = getObjectAtPosition(e.getX() - dx, e.getY() - dy);
-					if (o != null)
-					{
-						select(o);
-					}
-
-					selectOnDrag = false;
-				}
-				*/
-				
-				// Don't unselect!
+				// Don't unselect! We're dragging!
 				toBeDeselected.clear();
+
+				// Drag all selected objects
 
 				// No move?
 				if ((dx == 0) && (dy == 0))
@@ -502,7 +489,7 @@ public class ControlledSurface
 					return;
 				}
 
-				/*
+				/* // Code for preventing nodes from ending up in the same place (but we allow that now)
 				  for (int i = 0; i < nodes.size(); i++)
 				  {
 				  if (((EditorNode) nodes.get(i)).getPosition().distance(dx, dy) < selectedNode.getWidth() && ((EditorNode) nodes.get(i)) != selectedNode)
@@ -994,6 +981,7 @@ public class ControlledSurface
 							posX += gridSize;
 						}  
 						
+						// Which one is closer?
 						if (e.getX() - posX > (posX + gridSize) - e.getX())
 						{
 							posX += gridSize;
@@ -1004,6 +992,7 @@ public class ControlledSurface
 							posY += gridSize;
 						}
 						
+						// Which one is closer?
 						if (e.getY() - posY > (posY + gridSize) - e.getY())
 						{
 							posY += gridSize;
@@ -1015,7 +1004,7 @@ public class ControlledSurface
 						posY = e.getY();
 					}
 					
-					// Is there alreaposY a node present?
+					// Is there already a node present?
 					if ((getObjectAtPosition(posX, posY) == null) || (getObjectAtPosition(posX, posY).getType() != EditorObject.NODE))
 					{
 						// Find a unique name!
@@ -1080,9 +1069,10 @@ public class ControlledSurface
 			// Double click
 			else if (e.getClickCount() == 2)
 			{
-				// Change name
 				if (T.getPlace() == EditorToolbar.SELECT)
 				{
+					// Change names on double click!
+
 					/* What's this?
 					   if (selectedNode != null)
 					   {
@@ -1144,7 +1134,7 @@ public class ControlledSurface
 
 	public void createOptions(EditorWindowInterface root)
 	{
-		Options = new EditorOptions(root);
+		options = new EditorOptions(root);
 	}
 
 	/*

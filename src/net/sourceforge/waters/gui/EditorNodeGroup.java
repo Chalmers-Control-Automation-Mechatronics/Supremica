@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorNodeGroup
 //###########################################################################
-//# $Id: EditorNodeGroup.java,v 1.7 2005-03-04 11:52:45 flordal Exp $
+//# $Id: EditorNodeGroup.java,v 1.8 2005-03-08 11:35:14 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -107,14 +107,13 @@ public class EditorNodeGroup
 		setCorners();
 	}
 
-	//public void moveGroup(int x, int y)
+	//public void moveGroupTo(int x, int y)
 	public void moveGroup(int dx, int dy)
 	{
-		/*
-		int dx = x - (int) bounds.getMinX();
-		int dy = y - (int) bounds.getMinY();
-		*/
+		//int dx = x - (int) bounds.getX();
+		//int dy = y - (int) bounds.getY();
 
+		// Move points
 		for (int i = 0; i < points.size(); i++)
 		{
 			Point2D.Double p = (Point2D.Double) points.get(i);
@@ -123,7 +122,7 @@ public class EditorNodeGroup
 			((EditorEdge) edges.get(i)).updateControlPoint(p.getX() - dx, p.getY() - dy, true);
 		}
 
-		//bounds.setRect(x, y, bounds.getWidth(), bounds.getHeight());
+		// Move rect
 		bounds.setRect(bounds.getX() + dx, bounds.getY() + dy, bounds.getWidth(), bounds.getHeight());
 		setCorners();
 	}

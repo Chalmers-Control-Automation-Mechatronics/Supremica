@@ -98,7 +98,6 @@ public class AutomatonToDot
 		this.writeEventLabels = withLabel;
 	}
 
-
 	public void setWithCircles(boolean withCircles)
 	{
 		this.withCircles = withCircles;
@@ -159,7 +158,7 @@ public class AutomatonToDot
 	public void serialize(PrintWriter pw)
 		throws Exception
 	{
-		aut.normalizeStateIdentities();
+		//aut.normalizeStateIdentities();
 		
 		/*
 		EnumerateStates en = new EnumerateStates(aut, "q");
