@@ -599,7 +599,7 @@ public class Configit extends JFrame
 											ctrl_mngr.getValueName(0, ctrl_mngr.getSelectedValue(0)), ctrl_mngr.getValueName(4, ctrl_mngr.getSelectedValue(4)),
 											ctrl_mngr.getValueName(5, ctrl_mngr.getSelectedValue(5)));
 
-					FactoryExecutor fe = new FactoryExecutor(cc.getConfig(), gui);
+					//FactoryExecutor fe = new FactoryExecutor(cc.getConfig(), gui);
 					ctrl_mngr.resetConf();
 					Res_Sellist();
 					reset();
@@ -612,7 +612,7 @@ public class Configit extends JFrame
 		if(e.getSource() == JQ)
 		{
 			ConfigConverter cc = new ConfigConverter("red","40","Adult","Male","typeA","Hiking");
-			FactoryExecutor fe = new FactoryExecutor(cc.getConfig(), gui);
+			//FactoryExecutor fe = new FactoryExecutor(cc.getConfig(), gui);
 		}
 
 		if(e.getSource() == lGend1)
