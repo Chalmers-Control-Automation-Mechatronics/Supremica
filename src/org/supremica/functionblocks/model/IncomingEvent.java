@@ -60,18 +60,18 @@ import java.util.*;
 >
 */
 
-public class Event
+public class IncomingEvent
 {
 	String name;
 	String type = null;
 	String comment = null;
 	List withs = new LinkedList(); // Put the variable name here
 
-	private Event()
+	private IncomingEvent()
 	{
 	}
 
-	public Event(String name)
+	public IncomingEvent(String name)
 	{
 		this.name = name;
 	}
