@@ -141,9 +141,7 @@ public class AutomatonToDot
 			return;
 		}
 
-		Iterator states = aut.stateIterator();
-
-		while (states.hasNext())
+		for (Iterator states = aut.stateIterator(); states.hasNext(); )
 		{
 			State state = (State) states.next();
 
@@ -192,9 +190,7 @@ public class AutomatonToDot
 
 		Alphabet theAlphabet = aut.getAlphabet();
 
-		states = aut.stateIterator();
-
-		while (states.hasNext())
+		for (Iterator states = aut.stateIterator(); states.hasNext(); )
 		{
 			State sourceState = (State) states.next();
 

@@ -54,18 +54,12 @@ import java.io.*;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.parsers.SAXParser;
 import org.xml.sax.*;
-import org.supremica.automata.Alphabet;
-import org.supremica.automata.Arc;
-import org.supremica.automata.Automata;
-import org.supremica.automata.Automaton;
-import org.supremica.automata.AutomatonType;
-import org.supremica.automata.State;
-import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.*;
 
 public class ProjectBuildFromXml
 	extends AutomataBuildFromXml
 {
-/*	private final static String projectStr = "Project";
+	private final static String projectStr = "SupremicaProject";
 	private final static String layoutStr = "Layout";
 	private final static String executionStr = "Execution";
 	private final static String actionsStr = "Actions";
@@ -382,5 +376,4 @@ public class ProjectBuildFromXml
 			throw new SAXException("Unsupported file format.");
 		}
 	}
-*/
 }
