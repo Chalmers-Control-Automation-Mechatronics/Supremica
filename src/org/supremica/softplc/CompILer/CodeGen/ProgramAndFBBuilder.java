@@ -767,7 +767,11 @@ public abstract class ProgramAndFBBuilder
 		 * first we must duplicate stack value to be able to keep
 		 * IL's result register value
 		 */
-		if (var.getType() == TypeConstant.T_BOOL)
+		if (var.getType() == TypeConstant.T_BOOL ||
+		    (var instanceof IECSymbolicVariable && 
+		     var.getType() == TypeConstant.T_DERIVED &&
+		     ((IECSymbolicVariable)var).getFieldSelectorType() 
+		     == TypeConstant.T_BOOL))
 		    {
 			ilRun.append(InstructionConstants.DUP);
 			emitNOT();

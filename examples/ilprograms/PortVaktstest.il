@@ -31,37 +31,66 @@ PROGRAM PortVaktstest
 	VAR
 		(*Insignaler*)
 		Start 		 AT %IX24 : BOOL;
-		KulaPortvakt AT %IX0  : BOOL;
-		MatlyftNere  AT %IX1  : BOOL;
-		KulaMatlyft  AT %IX2  : BOOL;
+		KulaPortvakt 	AT %IX0  : BOOL;
+		MatlyftNere  	AT %IX1  : BOOL;
+		KulaMatlyft  	AT %IX2  : BOOL;
+		MatlyftUppe	AT %IX3  : BOOL;
+		KulaMatstation	AT %IX4  : BOOL;
+		StorKula	AT %IX5  : BOOL;
+		LitenKula	AT %IX6  : BOOL;
+		HissNere	AT %IX7  : BOOL;
+		KulaHiss	AT %IX10 : BOOL;
+		HissVan1	AT %IX11 : BOOL;
+		KulaVan1	AT %IX12 : BOOL;		
+		PlockaVan1	AT %IX13 : BOOL;
+		HissVan2	AT %IX14 : BOOL;
+		KulaVan2	AT %IX15 : BOOL;
+		PlockaVan2	AT %IX16 : BOOL;
 		(*Utsignaler*)
-		InPortvakt   AT %QX0  : BOOL;
-		UrPortvakt   AT %QX1  : BOOL;
-		Matlyft      AT %QX2  : BOOL;
+		InPortvakt   	AT %QX0  : BOOL;
+		UrPortvakt   	AT %QX1  : BOOL;
+		UppMatlyft      AT %QX2  : BOOL;
+		UrMatning	AT %QX3  : BOOL;
+		Mat		AT %QX4  : BOOL;
+		UppHissVan1	AT %QX5  : BOOL;
+		UppHissVan2	AT %QX6  : BOOL;
+		UtVan1		AT %QX7  : BOOL;
+		LyftVan1	AT %QX10 : BOOL;
+		UtVan2		AT %QX11 : BOOL;
+		LyftVan2	AT %QX12 : BOOL;
 	END_VAR
 	VAR
-		delay2, delay5 : TON;
-		
+		IsStorKula  : BOOL;
+		MatningKlar, UrMatningKlar : BOOL := FALSE;
+		PaborjaMatning : BOOL := FALSE;
+		NyMatningSkallUtforas : BOOL;
+
+		delay2, delay4, delay5, delay6,delay66: TON;
+		delay8, delay88,delay10 : TON;
+		tmpb   : BOOL;
+		tmpd   : DINT;		
 		Init  : BOOL := TRUE;
 	END_VAR
 (*init*)
 	LD Init
 	JMPCN end_init
-		LD DINT#1000 (*Time of delay*)
-		ST delay2.tonPT
+		CAL PRINTLN("Initialising......!!")
+		LD DINT#300 
+		ST delay8.tonPT
+		ST delay88.tonPT
+		LD DINT#300
+		ST delay2.tonPT (*Stäng InPortvakt*)
+		LD DINT#1000
+		ST delay4.tonPT
 		ST delay5.tonPT
-
+		ST delay6.tonPT
+		ST delay66.tonPT (*PaborjaMatn-fördröjning*)
+		ST delay10.tonPT (*Hiss*)
 		LD FALSE
 		ST Init
 end_init:
 
-(*Print start*)
-CAL PRINTLN("Start =", Start)
-CAL PRINTLN("Urportvakt=", UrPortvakt)
-	LD FALSE
-	ST %QX1
-
-
+(*start*)
 (*	if !(Start || (KulaPortvakt || UrPortvakt))
 		Släpp in kula
 	fi
@@ -77,26 +106,36 @@ CAL PRINTLN("Urportvakt=", UrPortvakt)
 END1 :
 
 (*
-	if (KulaPortvakt)
+	if (KulaPortvakt && InPortvakt)
 		Stäng InPortvakt
 	fi
 *)
 
 		LD KulaPortvakt
+		AND InPortvakt
 		JMPCN END2
 			LD  TRUE
 			ST  delay2.tonIN
 			CAL delay2
 			LD  delay2.tonQ
 			STN InPortvakt
+			STN tmpb
+			CAL PRINTLN(tmpb)
+			JMPCN e2
+				LD FALSE
+				ST delay2.tonIN
+				CAL delay2
+			e2:
+
 END2 :
 
 (*
-	if (KulaPortvakt && MätlyftNere && !KulaMätlyft)
+	if (KulaPortvakt && !InPortvakt && MätlyftNere && !KulaMätlyft)
 		Släpp ut kula ur portvakt
 	fi
 *)
 		LD KulaPortvakt
+		ANDN InPortvakt
 		AND MatlyftNere
 		ANDN KulaMatlyft
 		JMPCN END3
@@ -105,31 +144,191 @@ END2 :
 END3 :
 
 (*
-	if (!KulaPortvakt)
+	if (!KulaPortvakt && UrPortvakt)
 		Stäng UrPortvakt
 	fi
 *)
 
-		LD KulaPortvakt
-		JMPC END4
-			LD FALSE
-			ST UrPortvakt
+		LD UrPortvakt
+		ANDN KulaPortvakt
+		JMPCN END4
+			LD TRUE
+			ST  delay4.tonIN
+			CAL delay4
+			LD  delay4.tonQ		
+			STN UrPortvakt
+			STN delay4.tonIN
+			CAL delay4
 END4 :
-
 (*
 	bonus
-	if (KulaMätlyft && MätlyftNere)
-
+	if (KulaMätlyft && MätlyftNere && !UrMatning &&!Mat && !UppMatlyft)
+		Skicka upp mätlyften
+	fi
 *)
 
 	LD KulaMatlyft
 	AND MatlyftNere
+	ANDN UrMatning (*försäkring*)
+	ANDN Mat
+	ANDN UppMatlyft
 	JMPCN END5
 		LD TRUE
+		ST NyMatningSkallUtforas
 		ST delay5.tonIN
 		CAL delay5
 		LD delay5.tonQ
-		ST Matlyft
+		ST UppMatlyft
+		STN delay5.tonIN
+		CAL delay5
 END5:
 
+(*	if (MätlyftUppe && KulaMatstation && HissNere && !MatningKlar)
+		Sätt Mät
+	fi
+*)
+	LD  MatlyftUppe
+	AND KulaMatstation
+	AND HissNere
+	ANDN MatningKlar
+	JMPCN END6
+		(*Vänta tills bollen stabiliserats innan Mat sätts*)
+		LD TRUE   
+		ST delay6.tonIN
+		CAL delay6
+		LD delay6.tonQ
+		ST Mat
+		(*Vänta tills Mat gått ner innan Matning påbörjas*)
+		ST delay66.tonIN
+		CAL delay66
+		LD delay66.tonQ
+		ST PaborjaMatning
+			
+END6:
+
+(*	if (MätlyftUppe && KulaMatstation && HissNere && Mat && !MatningKlar
+		&& !KulaHiss)
+		Läs av mätare
+		Stäng av Mät
+		Sätt mät klar
+	fi
+*)
+	LD  MatlyftUppe
+	AND KulaMatstation
+	AND HissNere
+	ANDN MatningKlar
+	AND Mat	
+	AND PaborjaMatning
+	ANDN KulaHiss
+	JMPCN END7
+		LD StorKula
+		CAL PRINT("Läser av=", StorKula)
+		CAL PRINTLN("")
+		ST IsStorKula
+		
+		(*lägg till lite bättre logik*)
+		LD FALSE
+		ST Mat (*släpp upp mätaren*)
+		ST PaborjaMatning
+		ST delay6.tonIN (*återställ delayen när Mat satts till true*)
+		ST delay66.tonIN (*återställ delayen*)			
+		ST NyMatningSkallUtforas
+		LD TRUE
+		ST MatningKlar
+END7:
+
+(* 	if (MatningKlar && HissNere && !KulaHiss)
+		Vänta lite
+		Sätt UrMätning
+		Vänta lite till
+		Sätt MatningKlar = false
+*)
+	LD MatningKlar
+	AND HissNere
+	ANDN KulaHiss
+	JMPCN END8
+		LD TRUE
+		ST delay8.tonIN
+		CAL delay8
+		LD delay8.tonQ
+		ST UrMatning
+		ST delay88.tonIN
+		CAL delay88
+		LD delay88.tonQ
+		STN MatningKlar
+END8:
+(*	if (MatlyftUppe && !KulaMatstation &&
+		!NyMatningSkallUtforas)
+		dra tillbaka UrMätlyft
+		skicka ner matlyften
+*)
+
+	LD MatlyftUppe
+	ANDN KulaMatstation
+	ANDN NyMatningSkallUtforas
+	JMPCN END9
+		LD FALSE
+		ST NyMatningSkallUtforas
+		ST UrMatning
+		ST UppMatlyft
+		(*ST UrMatningKlar*)
+		ST delay8.tonIN
+		ST delay88.tonIN
+		CAL delay8
+		CAL delay88
+END9:
+
+(*	if (HissNere && KulaHiss && !UtVan1 && !UtVan2)
+		Kör upp hiss
+
+*)
+	LD HissNere
+	AND KulaHiss
+	ANDN UtVan1
+	ANDN UtVan2
+	JMPCN END10
+		LD TRUE
+		ST delay10.tonIN
+		CAL delay10
+		LD delay10
+		JMPCN END10 (*Vänta innan hissen körs upp*)
+		ST UppHissVan1
+		LD IsStorKula
+		JMPCN litenH
+			(*Stor kula*)		
+			LD TRUE
+			ST UppHissVan2
+			JMP END10
+	litenH:
+		LD FALSE
+		ST delay10.tonIN
+		CAL delay10
+END10:
+
+(*	if (IsStorKula && HissVan2 && !KulaVan2)
+		Skicka ner hiss
+*)
+	LD IsStorKula
+	AND HissVan2
+	ANDN KulaVan2
+	JMPCN END11
+		LD FALSE
+		ST UppHissVan1
+		ST UppHissVan2
+END11:
+(*	if (!IsStorKula && HissVan1 && !KulaVan1)
+		Skicka ner hiss
+*)
+	LD HissVan1
+	ANDN IsStorKula
+	ANDN KulaVan1
+	JMPCN END12
+		LD FALSE
+		ST UppHissVan1
+		ST UppHissVan2
+END12:
+
+
+
 END_PROGRAM
+
