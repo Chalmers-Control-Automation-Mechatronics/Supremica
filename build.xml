@@ -91,7 +91,7 @@
 </target>
 
 
-<target name="initialize" depends="clean">
+<target name="initialize" depends="clean,generate_JAXB">
  	<mkdir dir="${build}"/>
 	<delete includeEmptyDirs="true" >
 		<fileset dir="${build}" />
@@ -210,6 +210,24 @@
 			</patternset>
 		</fileset>
 	</delete>		
+
+	<mkdir dir="${src}/net/sourceforge/waters/xsd"/>
+	<delete>
+		<fileset dir="${src}/net/sourceforge/waters/xsd">
+			<patternset id="cleanjaxbfiles">
+				<include name="**"/>
+			</patternset>
+		</fileset>
+	</delete>	
+
+	<mkdir dir="${src}/org/w3"/>
+	<delete>
+		<fileset dir="${src}/org/w3">
+			<patternset id="cleanjaxbw3files">
+				<include name="**"/>
+			</patternset>
+		</fileset>
+	</delete>	
 
 	<mkdir dir="${doc}/api"/>	
 	<delete dir="${doc}/api"/>
