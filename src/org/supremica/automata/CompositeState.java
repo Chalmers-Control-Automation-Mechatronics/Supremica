@@ -77,9 +77,9 @@ public class CompositeState
 		super(state);
 	}
 
-	public CompositeState(String id)
+	public CompositeState(String name)
 	{
-		super(id);
+		super(name);
 	}
 
 	public CompositeState(int[] indices, Automata compositeAutomata)
@@ -87,9 +87,9 @@ public class CompositeState
 		this("non_def", indices, compositeAutomata);
 	}
 
-	public CompositeState(String id, int[] indices, Automata compositeAutomata)
+	public CompositeState(String name, int[] indices, Automata compositeAutomata)
 	{
-		this(id);
+		this(name);
 
 		//setOwnerAutomaton(ownerAutomaton);
 		initialize(indices, compositeAutomata);

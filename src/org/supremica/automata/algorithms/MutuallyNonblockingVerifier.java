@@ -488,10 +488,9 @@ public class MutuallyNonblockingVerifier
 				// Some statistics
 				logger.fatal("states: " + currSynchAutomaton.nbrOfStates() + " forb: " + currSynchAutomaton.nbrOfForbiddenStates() + " mutnotforb: " + currSynchAutomaton.nbrOfMutuallyAcceptingNotForbiddenStates() + " mut: " + currSynchAutomaton.nbrOfMutuallyAcceptingStates());
 
-				// Have we had enough of this mma..mmammm..mmmammmm...mmmadness?
+				// Have we had enough of this?
 				if (currSynchAutomaton.nbrOfStates() > 2000)
 				{
-
 					// Switch to BDD verification?
 					// useBDDAlgorithm = true;
 					logger.error("Gave up because of state explosion!");
@@ -1304,7 +1303,8 @@ public class MutuallyNonblockingVerifier
 		{
 			State currState = stateIt.nextState();
 
-			currState.setName(count++ + "_");
+			assert(false); // The names are used below to identify composed names... see **** 
+			//currState.setName(count++ + "_");
 		}
 	}
 
@@ -1327,7 +1327,7 @@ public class MutuallyNonblockingVerifier
 			if (!currState.isMutuallyAccepting())
 			{
 				String stateName = currState.getName();
-				String projectedStateName = stateName.substring(0, stateName.indexOf('_') + 1);
+				String projectedStateName = stateName.substring(0, stateName.indexOf('_') + 1); // Here! ****
 				State realState = currAutomaton.getStateWithName(projectedStateName);
 
 				realState.setMutuallyAccepting(false);

@@ -257,7 +257,7 @@ public class Automaton
 			}
 			else
 			{
-				logger.error("Error in Automata.java. Automaton with empty name and comment detected!");
+				logger.error("Error in Automaton.java. Automaton with empty name and comment detected!");
 			}
 
 			return "";
@@ -1351,6 +1351,7 @@ public class Automaton
 	 * dot does not handle dots in the statename.
 	 * This method resets all state identities to valid names
 	 */
+	/*
 	public void normalizeStateIdentities()
 	{
 		setStateIndicies();
@@ -1359,11 +1360,12 @@ public class Automaton
 		{
 			State currState = stateIt.nextState();
 
-			currState.setName("q_" + currState.getIndex());
+			currState.setName("q" + currState.getIndex());
 		}
 
 		remapStateIndices();
 	}
+	*/
 
 	public void setIndicies()
 	{

@@ -72,7 +72,7 @@ import org.supremica.external.shoefactory.Configurator.*;
 import org.supremica.log.*;
 import org.supremica.automata.IO.*;
 import org.supremica.util.ActionTimer;
-import org.supremica.automata.algorithms.RobotStudioLink;
+//import org.supremica.automata.algorithms.RobotStudioLink;
 import org.supremica.gui.useractions.*;
 import org.supremica.gui.texteditor.TextFrame;
 import org.swixml.SwingEngine;
@@ -2844,6 +2844,7 @@ public class ActionMan
 		thread.start();
 	}
 
+	/*
 	public static void robotStudioOpenStation(Gui gui)
 	{
 		new FileImporter(FileDialogs.getRobotStudioStationFileImporter(), gui)    // anonymous class
@@ -2913,23 +2914,6 @@ public class ActionMan
 		thread.start();
 	}
 
-/*
-		public static void robotStudioLink(Gui gui)
-		{
-				new FileImporter(FileDialogs.getRobotStudioStationFileImporter(), gui)    // anonymous class
-				{
-						void openFile(Gui g, File f)
-						{
-								String stationName;
-								stationName = f.getAbsolutePath();
-
-								// Start thread
-								RobotStudioLink robotStudioLink = new RobotStudioLink(g, stationName);
-								robotStudioLink.start();
-						}
-				};
-		}
-*/
 	public static void robotStudioExecuteRobot(Gui gui)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
@@ -2953,6 +2937,7 @@ public class ActionMan
 	{
 		RobotStudioLink.test(gui);
 	}
+	*/
 
 	// CoordinationABB of robots in Robot Studio
 	public static void createPathsInRS(Gui gui)

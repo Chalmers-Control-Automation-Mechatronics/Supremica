@@ -942,7 +942,6 @@ public class CreateXml
 	{
 		try
 		{
-
 			// the number of robots is known
 			int nbrOfRobots = station.getMechanisms().getCount();
 
@@ -1004,6 +1003,7 @@ public class CreateXml
 					IPath movingPath = robot.getPaths().item(var(movingPathName));
 
 					// execute the sub-path
+					
 					org.supremica.automata.algorithms.RobotStudioLink.moveRobotAlongPath(robot, movingPath);
 					Thread.sleep(3500);    // it should wait for a response from RobotStudio:see Hugo's code RobotStudioLink
 				}

@@ -18,6 +18,17 @@ public class EnumerateStates
 	StringBuffer prefix = null;
 	int prefixlen = 0;
 
+	/**
+	 * Creates enumerator for the supplied automaton.
+	 */
+	public EnumerateStates(Automaton automaton, String prefix)
+	{
+		this(new Automata(automaton), prefix);
+	}
+
+	/**
+	 * Creates enumerator for the supplied automata.
+	 */
 	public EnumerateStates(Automata automata, String prefix)
 	{
 		this.automata = automata;
@@ -25,6 +36,9 @@ public class EnumerateStates
 		this.prefixlen = prefix.length();
 	}
 
+	/**
+	 * Makes sure the enumeration is made.
+	 */
 	public void execute()
 	{
 		Iterator autit = automata.iterator();
@@ -35,6 +49,9 @@ public class EnumerateStates
 		}
 	}
 
+	/**
+	 * Enumerates the states in automaton.
+	 */
 	private void enumerate(Automaton automaton)
 	{
 		automaton.beginTransaction();

@@ -89,7 +89,7 @@ import org.supremica.gui.animators.scenebeans.AnimationItem;
 import org.supremica.gui.animators.scenebeans.AnimationGroup;
 import org.supremica.util.BrowserControl;
 import org.supremica.util.SupremicaMenuItem;
-import org.supremica.automata.algorithms.RobotStudioLink;
+//import org.supremica.automata.algorithms.RobotStudioLink;
 
 public class MainMenuBar
     extends JMenuBar
@@ -960,6 +960,7 @@ public class MainMenuBar
 		});
 	}
 
+	/*
 	// Tools.RobotStudio
 	// This is Hugo's old implementation
 	if (SupremicaProperties.showRobotstudioLink())
@@ -970,20 +971,6 @@ public class MainMenuBar
 
 	    menuRobotStudioLink.setText("RobotStudio");
 	    menuTools.add(menuRobotStudioLink);
-
-	    /*
-	    // RobotStudioExtractAutomata
-	    JMenuItem robLink = new JMenuItem();
-	    robLink.setText("Extract Automata From Station...");
-	    menuRobotStudioLink.add(robLink);
-	    robLink.addActionListener(new ActionListener()
-	    {
-	    public void actionPerformed(ActionEvent e)
-	    {
-	    ActionMan.robotStudioLink(ActionMan.getGui());
-	    }
-	    });
-	    */
 
 	    // RobotStudioOpenStation
 	    JMenuItem robOpen = new JMenuItem();
@@ -1089,7 +1076,9 @@ public class MainMenuBar
 		    }
 		});
 	}
+	*/
 
+	/*
 	// Tools.CoordinationABB
 	// This is Domenico's implementation, the result from his master's thesis
 	if (SupremicaProperties.showCoordinationABB())
@@ -1205,6 +1194,7 @@ public class MainMenuBar
 		    }
 		});
 	}
+	*/
 
 	// Tools.Evolution
 	if (SupremicaProperties.showGeneticAlgorithms())

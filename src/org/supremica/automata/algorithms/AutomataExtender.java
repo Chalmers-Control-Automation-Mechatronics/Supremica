@@ -159,20 +159,17 @@ public class AutomataExtender
 
 			for (int i = 0; i < nbrOfStateCopies; i++)
 			{
-				State newState = new State(orgState);
-
-				assert(false); // Fiddling with id is not recommended!
-				//newState.setId(orgState.getId() + "_" + i);
-
 				StringBuffer labelExt = new StringBuffer("");
-
 				for (int j = 0; j < i; j++)
 				{
 					// labelExt.append("'");
 					labelExt.append("p");
 				}
+ 
+				State newState = new State(orgState.getName() + labelExt.toString(), orgState);
 
-				newState.setName(orgState.getName() + labelExt.toString());
+				assert(false); // Fiddling with id is not recommended!
+				//newState.setId(orgState.getId() + "_" + i);
 
 				// Assume that we have seen zero unobservable event
 				// when we start the system

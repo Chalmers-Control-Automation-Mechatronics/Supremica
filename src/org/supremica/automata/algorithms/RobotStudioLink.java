@@ -600,10 +600,10 @@ End Sub
 		Alphabet alphabet = automaton.getAlphabet();
 
 		// Initial state
-		State state = automaton.createAndAddUniqueState(null);
-
-		state.setName("Home");
+		State state = new State("Home");
+		state.setInitial(true);
 		state.setAccepting(true);
+		automaton.addState(state);
 
 		if (targetTimes != null)
 		{
@@ -664,10 +664,10 @@ End Sub
 			}
 			else
 			{    // Wait state
-				state = automaton.createAndAddUniqueState(null);
+				state = new State("Wait" + i);
+				automaton.addState(state);
 
 				state.setCost(0);
-				state.setName("Wait" + i);
 			}
 
 			automaton.addArc(new Arc(prevState, state, stopEvent));
@@ -887,15 +887,14 @@ End Sub
 			automaton.setType(AutomatonType.Specification);
 
 			// Add two states, Free and Booked
-			State state = automaton.createAndAddUniqueState(null);
-
-			state.setName("Free");
+			State state = new State("Free");
+			automaton.addState(state);
 			state.setAccepting(true);
 			automaton.setInitialState(state);
 
-			state = automaton.createAndAddUniqueState(null);
+			state = new State("Booked");
+			automaton.addState(state);
 
-			state.setName("Booked");
 			mutexAutomata.addAutomaton(automaton);
 			gui.addAutomaton(automaton);
 		}

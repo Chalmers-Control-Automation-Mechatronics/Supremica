@@ -124,11 +124,21 @@ public class State
 	 */
 	public State(State otherState)
 	{
-		this(otherState.name, otherState.id);
+		this(otherState.name, otherState);
+	}
+
+	/**
+	 * This copy constructor does only copy the states attributes.
+	 * The incoming and outgoing arcs are not copied.
+	 *
+	 * @param name the name of the new state
+	 * @param  otherState Description of the Parameter
+	 */
+	public State(String name, State otherState)
+	{
+		this(name, otherState.id);
 
 		index = otherState.index;
-		id = otherState.id;
-		name = otherState.name;
 		initial = otherState.initial;
 		accepting = otherState.accepting;
 		mutuallyAccepting = otherState.mutuallyAccepting;

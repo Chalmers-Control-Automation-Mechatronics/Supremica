@@ -600,7 +600,7 @@ public class RobotStudioInterface
 				/*
 				for (Iterator posIt = richPath.iterator(); posIt.hasNext();)
 				{
-					logger.info((RichPosition) posIt.next());
+				    logger.info((RichPosition) posIt.next());
 				}
 				*/
 
@@ -719,7 +719,7 @@ public class RobotStudioInterface
 					assert(to.getName().equals(lastPos.getName()));
 					State firstState = new State(firstPos.getName() + secondPos.getName());
 					rob.addState(firstState);
-					State lastState =  rob.getStateWithName(from.getName() + to.getName());
+					State lastState = rob.getStateWithName(from.getName() + to.getName());
 					lastState.setName(secondLastPos.getName() + lastPos.getName());
 
 					// Set cost for first state, must be int, so it now is the number of milliseconds

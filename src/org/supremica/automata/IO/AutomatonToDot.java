@@ -56,6 +56,7 @@ import org.supremica.automata.ArcSet;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.State;
 import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.algorithms.EnumerateStates;
 
 public class AutomatonToDot
 	implements AutomataSerializer
@@ -164,7 +165,9 @@ public class AutomatonToDot
 	public void serialize(PrintWriter pw)
 		throws Exception
 	{
-		aut.normalizeStateIdentities();
+		//aut.normalizeStateIdentities();
+		EnumerateStates en = new EnumerateStates(aut, "q");
+		en.execute();
 
 		Vector initialStates = new Vector();
 		final String initPrefix = "__init_";
