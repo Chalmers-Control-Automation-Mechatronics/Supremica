@@ -444,10 +444,10 @@
 
 		<!-- AGV 1 -->
 		<Action label="u11">
-			<Command command="agv1.reset"/>
+			<Command command="agv1.go"/>
 		</Action>
 		<Action label="e10">
-			<Command command="agv1.go"/>
+			<Command command="agv1.reset"/>
 		</Action>
 		<Action label="c1">
 			<Command command="agv1.go"/>
@@ -527,7 +527,7 @@
 		</Action>
 		
 		<!-- AGV 4 -->
-		<Action label="c9">
+		<Action label="c7">
 			<Command command="agv4.reset"/>
 		</Action>
 		<Action label="u40">
@@ -672,7 +672,7 @@
 		</Control>
 		
 		<!-- AGV 4 -->
-		<Control label="c9">
+		<Control label="c7">
 			<Condition condition="agv4.end"/>
 		</Control>
 		<Control label="u40">

@@ -4,44 +4,44 @@
 
 	<behaviour id="agv1.go" algorithm="Track" event="agv1.end">
 		<param name="pointCount" value="11" />
-		
-		<param name="point" index="0" value="(126,24)" />
+
+		<param name="point" index="0" value="(101,41)" />
 		<param name="duration" index="0" value="1" />
 
-		<param name="point" index="1" value="(101,24)" />
+		<param name="point" index="1" value="(101,84)" />
 		<param name="duration" index="1" value="1" />
 		<param name="event" index="1" value="agv1.end" />
-
-		<param name="point" index="2" value="(101,41)" />
-		<param name="duration" index="2" value="1" />
-
-		<param name="point" index="3" value="(101,84)" />
-		<param name="duration" index="3" value="1" />
-		<param name="event" index="3" value="agv1.end" />
 		
-		<param name="point" index="4" value="(107,84)" />
+		<param name="point" index="2" value="(107,84)" />
+		<param name="duration" index="2" value="1" />
+		<param name="event" index="2" value="agv1.end" />
+		
+		<param name="point" index="3" value="(169,84)" />
+		<param name="duration" index="3" value="1" />		
+
+		<param name="point" index="4" value="(327,84)" />
 		<param name="duration" index="4" value="1" />
 		<param name="event" index="4" value="agv1.end" />
-		
-		<param name="point" index="5" value="(169,84)" />
-		<param name="duration" index="5" value="1" />		
 
-		<param name="point" index="6" value="(327,84)" />
+		<param name="point" index="5" value="(327,69)" />
+		<param name="duration" index="5" value="1" />
+
+		<param name="point" index="6" value="(327,24)" />
 		<param name="duration" index="6" value="1" />
 		<param name="event" index="6" value="agv1.end" />
 
-		<param name="point" index="7" value="(327,69)" />
+		<param name="point" index="7" value="(169,24)" />		
 		<param name="duration" index="7" value="1" />
+		<param name="event" index="7" value="agv1.end" />
 
-		<param name="point" index="8" value="(327,24)" />
+		<param name="point" index="8" value="(126,24)" />
 		<param name="duration" index="8" value="1" />
-		<param name="event" index="8" value="agv1.end" />
 
-		<param name="point" index="9" value="(195,24)" />		
+		<param name="point" index="9" value="(101,24)" />
 		<param name="duration" index="9" value="1" />
 		<param name="event" index="9" value="agv1.end" />
-
-		<param name="point" index="10" value="(126,24)" />		
+		
+		<param name="point" index="10" value="(101,41)" />		
 	</behaviour>
 
 	<behaviour id="agv2.go" algorithm="Track" event="agv2.end">
@@ -344,8 +344,8 @@
 
 	<draw>
 		<transform type = "translate">
-			<param name ="x" value ="126"/>
-			<param name ="y" value ="24"/>
+			<param name ="x" value ="101"/>
+			<param name ="y" value ="41"/>
 			<animate param = "translation" behaviour = "agv1.go"/>
 			<paste object = "agv1_primitive" /> 
 		</transform>	
@@ -356,7 +356,7 @@
 			<paste object = "agv2_primitive" /> 
 		</transform>	
 		<transform type = "translate">
-			<param name ="x" value ="296"/>
+			<param name ="x" value ="272"/>
 			<param name ="y" value ="406"/>
 			<animate param = "translation" behaviour = "agv3.go"/>
 			<paste object = "agv3_primitive" /> 
