@@ -674,6 +674,7 @@ class SoftPLCPanel
 
 
 
+/** BDD specific stuff, what a f**king mess! */
 class BDDPanel
     extends JPanel
     implements ActionListener
@@ -681,7 +682,7 @@ class BDDPanel
     private PreferencesDialog theDialog = null;
     private JCheckBox showGrow, alterPCG, debugOn,  traceOn, ucOptimistic, nbOptimistic;
     private JCheckBox localSaturation, encodingFill, sizeWatch, profileOn;
-    private JComboBox algorithmFamily, countAlgorithm, orderingAlgorithm, inclusionAlgorithm;
+    private JComboBox algorithmFamily, countAlgorithm, orderingAlgorithm, inclusionAlgorithm, asHeuristics;
 	private JButton bProofFile;
 
     public BDDPanel(PreferencesDialog theDialog)
@@ -778,6 +779,20 @@ class BDDPanel
 	algorithmFamily.addItem("Smoothed: Partitioned   (P1)");
 	algorithmFamily.setSelectedIndex(Options.algo_family);
 
+
+	JPanel pHeuristics = new JPanel(new FlowLayout(FlowLayout.RIGHT) );
+	p.add(pHeuristics);
+	pHeuristics.add( new JLabel("Automaton selection heuristic"));
+	pHeuristics.add( asHeuristics = new JComboBox());
+
+	asHeuristics.addItem("Random");
+	asHeuristics.addItem("BDD/Stack");
+	asHeuristics.addItem("BDD/FIFO");
+	asHeuristics.addItem("Most common uc-events");
+	asHeuristics.addItem("Most common uc-arcs");
+	asHeuristics.setSelectedIndex(Options.as_heuristics);
+
+
 	p.add( new JSeparator() );
 
 	pLabel= new JPanel(new FlowLayout(FlowLayout.LEFT) );
@@ -811,7 +826,8 @@ class BDDPanel
 	Options.algo_family      = algorithmFamily.getSelectedIndex();
 	Options.count_algo       = countAlgorithm.getSelectedIndex();
 	Options.ordering_algorithm  = orderingAlgorithm.getSelectedIndex();
-	 Options.inclsuion_algorithm = inclusionAlgorithm.getSelectedIndex();
+	Options.inclsuion_algorithm = inclusionAlgorithm.getSelectedIndex();
+		Options.as_heuristics = asHeuristics.getSelectedIndex();
 
 	Options.show_grow        = showGrow.isSelected();
 	Options.user_alters_PCG  = alterPCG.isSelected();

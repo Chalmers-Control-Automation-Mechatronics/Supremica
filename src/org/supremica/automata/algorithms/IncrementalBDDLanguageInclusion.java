@@ -152,7 +152,8 @@ public class IncrementalBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 
 				// ok, we now it might exists. we can proov that it _does_ exists if
 				// we can show that is reachable using local events only!!
-				else if(try_local_reachability(sup, next, bdd_theta)) {
+				// no idea doing this if we have added all automaton that can be added :(
+				else if(ac.moreToGo() && try_local_reachability(sup, next, bdd_theta)) {
 					cleanup_bdds();
 					return false;
 				}
@@ -272,7 +273,8 @@ public class IncrementalBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 				}
 				// ok, we now it might exists. we can proov that it _does_ exists if
 				// we can show that is reachable using local events only!!
-				else if(try_local_reachability(sup, next, bdd_theta)) {
+				// no idea doing this if we have added all automaton that can be added :(
+				else if(ac.moreToGo() && try_local_reachability(sup, next, bdd_theta)) {
 					cleanup_bdds();
 					return false;
 				}

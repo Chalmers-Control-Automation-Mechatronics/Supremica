@@ -40,6 +40,14 @@ public class Options
 	ORDERING_ALGO_NEW_TSP = 2;
 
 
+	/** Automaton selection heuristics */
+	public static final int
+		AS_HEURISTIC_RANDOM = 0,
+		AS_HEURISTIC_STACK = 1,
+		AS_HEURISTIC_FIFO = 2,
+		AS_HEURISTIC_MOST_COMMON_UC_EVENTS = 3,
+		AS_HEURISTIC_MOST_COMMON_UC_ARCS = 4;
+
     // constants
     public static final int LINE_WIDTH = 55;    // # of chars per line?, screen width
     private static final int DEFAULT_MAX_PARTITION_SIZE = 3000; // max nodes/partition
@@ -65,6 +73,7 @@ public class Options
     public static int count_algo  = COUNT_TREE;
     public static int max_partition_size = DEFAULT_MAX_PARTITION_SIZE;
     public static int inclsuion_algorithm = INCLUSION_ALGO_MODULAR;
+	public static int as_heuristics  = AS_HEURISTIC_MOST_COMMON_UC_ARCS;
 
     // out own out stream, might be changed to point to a file
     public static PrintStream out = System.out;

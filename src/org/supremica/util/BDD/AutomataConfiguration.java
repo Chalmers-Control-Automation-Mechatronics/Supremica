@@ -2,6 +2,8 @@
 package org.supremica.util.BDD;
 
 import java.util.*;
+import org.supremica.util.BDD.heuristics.*;
+
 
 
 /**
@@ -31,8 +33,10 @@ public class AutomataConfiguration {
 	private double [] queue_costs; /* cost of elements in the queue */
 	private int queue_size;
 	private boolean queue_sorted; /* if the elemnts in the queue are sorted  (see costs) */
+	private int my_index, max_size;
 
-	private int my_index;
+	// and the quese selection herustic:
+	private AutomatonSelectionHeuristic heuristic;
 
 
 	/**
@@ -83,6 +87,8 @@ public class AutomataConfiguration {
 		this.work_queue = new int[count];
 		this.queue_costs = new double[count];
 		resetQueue();
+
+		heuristic = AutomatonSelectionHeuristicFactory.createInstance(all, work_queue, queue_costs);
 	}
 
 	private int getIndex(BDDAutomaton a)
@@ -121,9 +127,12 @@ public class AutomataConfiguration {
 		if(!include_both) {
 			// this will make us to ignore the automata in G1:
 			for(int i = 0; i < size_all; i++) selection[i] = type[i];
+
+			max_size = size_all - IndexedSet.cardinality( selection) + 1;
 		} else {
 			// everythings is clean. both g1 and g2 are avialable
 			IndexedSet.empty(selection);
+			max_size = size_all;
 		}
 		selection[my_index] = true;
 
@@ -171,7 +180,7 @@ public class AutomataConfiguration {
 		{
 			if(!override || addIfInteractWithMe(current_events) == 0)
 			{
-				Options.out.println("No more automata to add");
+				// Options.out.println("No more automata to add");
 				return null;
 			}
 		}
@@ -257,6 +266,17 @@ public class AutomataConfiguration {
 
 	// -- [ helper ] --------------------------------------------------------
 
+
+	/**
+	 * returns false if we can guarantee that there are not more automata to be added.
+	 * a positive answer does not mean that we _will_ have an automaton to added however,
+	 * since it might be no automaton with the needed dependency left.
+	 */
+	public boolean moreToGo() {
+		return ! ((selected == max_size) && queue_size == 0);
+	}
+
+
 	/** make queue empty */
 	private void resetQueue() {
 		queue_size = 0;
@@ -299,36 +319,8 @@ public class AutomataConfiguration {
 
 	private void sort_queue() {
 
-		// ------------------------ first compute the weights
-		// **********************************************************
-		// ********************* THE ORDERING HERUSITIC STARTS HERE
-		int max = 0;
-		for(int i = 0; i < queue_size; i++) {
-			BDDAutomaton automaton = all[ work_queue[i] ];
-			int tmp        = automaton.arcOverlapCount( workset_events );
-			int total_arcs =automaton.getNumArcs();
+		heuristic.choose(queue_size, workset_events);
 
-			if(total_arcs == 0) // no arcs???
-				queue_costs[i] = 0;
-			else
-				queue_costs[i] =  ((double) tmp) / ((double) total_arcs);
-		}
-
-		// dont like divide by zero!
-		double maxd = max < 1 ? 1.0 : (double) max;
-
-		// invert
-		for(int i = 0; i < queue_size; i++) {
-			queue_costs[i] /= maxd;
-		}
-
-
-		// ************************** END OF ORDERING HERUSITIC
-		// **********************************************************
-
-		// ------------------------ now sort the queue
-
-		QuickSort.sort(work_queue, queue_costs, queue_size, false);
 
 
 /*

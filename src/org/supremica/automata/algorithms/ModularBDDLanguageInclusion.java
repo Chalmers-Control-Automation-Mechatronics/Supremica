@@ -40,6 +40,7 @@ public class ModularBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 	}
 
 	private void init2() {
+
 		if(Options.debug_on) {
 			Options.out.println("*** Modular language containment test considreing " +
 				IndexedSet.cardinality(considred_events) + " events." );
@@ -114,7 +115,8 @@ public class ModularBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 				}
 
 				// proof reachability by local events and thus reachability globally:
-				if(try_local_reachability(sup, next, bdd_bad)) {
+				// no idea doing this if we have added all automaton that can be added :(
+				if(ac.moreToGo()  && try_local_reachability(sup, next, bdd_bad)) {
 					cleanup_bdds();
 					return false;
 				}
@@ -124,11 +126,11 @@ public class ModularBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 			//      ok while they are not! this is due to or "dirty trick" in the function
 			// Supervisor.computeLanguageDifference(...) :
 			// tmp2 = manager.andTo(tmp2, plant.getSigma());
-
 			// anyway, it seems that we can do without it...
 
-/*
+			// XXX: On Second Thought, I am not sure if above is correct
 
+/*
 				// *** see if some events are proved to be unrachable and can be removed
 				if(event_included(bdd_bad, workset_events, changes) > 0) {
 
