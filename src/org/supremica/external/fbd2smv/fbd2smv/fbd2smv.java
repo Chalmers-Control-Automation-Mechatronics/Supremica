@@ -24,6 +24,21 @@ public class fbd2smv
 
 	isagrafReader igReader = new isagrafReader(fbdProjectPath);
 	fbdProj                = igReader.getFbdProject();
+
+
+	/* <test> */
+  	  LinkedList indices = fbdProj.getOutputVariableIndicesByVariableName("E_Go");
+	  System.out.println("indices.size()=" + indices.size());
+	
+	  for(int i=0; i < indices.size(); i++)
+	      {
+		  String[] str = (String[])indices.get(i);
+		  System.out.println(str[0] + " " + str[1]);
+	      }
+	
+	/* </test> */
+
+
 		
 	LinkedList programs    = fbdProj.getPrograms();
 	LinkedList varBooleans = fbdProj.dictionaryGetBooleans();

@@ -122,6 +122,70 @@ public class fbdProject
     }
 
 
+    public LinkedList getOutputVariableIndicesByVariableName(String name)
+    {
+	LinkedList indices = new LinkedList();
+	Program program;
+
+	for (int i=0; i<programs.size(); i++)
+	{
+	    program = (Program)programs.get(i);
+	    HashMap variables = program.getVariablesByIndex();
+	    
+	    for (Iterator varIt = variables.keySet().iterator(); varIt.hasNext(); )
+	    {
+		String currIndex = (String)varIt.next();
+
+		if (isOutputVariable(currIndex))
+	        {
+		    VAR currVar = (VAR)variables.get(currIndex);
+
+		    if (name.equals(currVar.getName()))
+			{
+			    String[] str    = new String[2];
+			    str[0] = program.getName();
+			    str[1] = currVar.getIndex();
+			    
+			    indices.add(str);
+			}
+		}
+
+	    }
+	}
+
+	return indices;
+    }
+    
+
+    /*
+    public LinkedList getOutputVariables()
+    {
+	LinkedList outputVariables = new LinkedList();
+	Program program;
+
+	for (int i=0; i<programs.size(); i++)
+	{
+	    program = (Program)programs.get(i);
+	    HashMap variables = program.getVariablesByIndex();
+	    
+	    for (Iterator varIt = variables.keySet().iterator(); varIt.hasNext(); )
+	    {
+		String currIndex = (String)varIt.next();
+
+		if (isOutputVariable(currIndex))
+	        {
+		    VAR currVar = (VAR)variables.get(currIndex);
+		    outputVariables.add(currVar);
+		}
+
+	    }
+	}
+
+	
+    }
+    */
+
+
     /*
     public boolean isOutputVariable(int ix)
     {
