@@ -434,7 +434,7 @@ public final class AutomataSynchronizerHelper
 
 	public void setDeadlocked(int[] state, boolean deadlocked)
 	{
-		logger.debug(AutomataIndexFormHelper.dumpState(state));
+		logger.debug(AutomataIndexFormHelper.dumpVerboseState(state, theAutomataIndexForm));
 		int currStatus = state[state.length - 1];
 
 		if (deadlocked)

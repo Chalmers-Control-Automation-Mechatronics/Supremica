@@ -97,6 +97,8 @@ public final class AutomataIndexForm
 	// <automaton, event> -> <state[]>
 	private int[][][] enableEventsTable;
 
+	private Automata theAutomata = null;
+
 
 	private static Logger logger = LoggerFactory.createLogger(AutomataIndexForm.class);
 
@@ -113,6 +115,8 @@ public final class AutomataIndexForm
 		Alphabet unionAlphabet = theAutomata.setIndicies();
 		theAutomaton.getAlphabet().union(unionAlphabet);
 		//theAutomaton.setIndicies();
+
+		this.theAutomata = theAutomata;
 
 		generateAutomataIndices(theAutomata);
 
@@ -589,6 +593,16 @@ public final class AutomataIndexForm
 	public int[][][] getEnableEventsTable()
 	{
 		return enableEventsTable;
+	}
+
+	public Automaton getAutomaton(int index)
+	{
+		return theAutomata.getAutomatonAt(index);
+	}
+
+	public State getState(int automatonIndex, int stateIndex)
+	{
+		return stateTable[automatonIndex][stateIndex];
 	}
 
 	private int[] generateCopy1DIntArray(int[] oldArray)

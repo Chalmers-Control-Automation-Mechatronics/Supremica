@@ -248,6 +248,30 @@ public final class AutomataIndexFormHelper
 		return sb.toString();
 	}
 
+	/**
+	 * Automaton index: 1 name:"aut1", State: index:2 name:"q2"
+	 */
+	public static String dumpVerboseState(int[] state, AutomataIndexForm theForm)
+	{
+		StringBuffer sb = new StringBuffer("[\n");
+
+		State[][] stateTable = theForm.getStateTable();
+
+		for (int i = 0; i < state.length - 1; i++)
+		{
+			Automaton currAutomaton = theForm.getAutomaton(i);
+			State currState = theForm.getState(i, state[i]);
+
+			sb.append("Automaton index:" + i + " name: \"" + currAutomaton.getName() + "\", State: index:" + state[i] + " name:\"" + currState.getName() + "\"\n");
+		}
+
+		sb.append("Status: " + state[state.length - 1] + "\n");
+
+		sb.append("]");
+
+		return sb.toString();
+	}
+
 	public static void main(String[] args)
 	{
 		String orgString = "[10]";
