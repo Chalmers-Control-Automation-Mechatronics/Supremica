@@ -393,6 +393,9 @@ public class Supremica
 		theAutomatonTable.clearSelection();
 	}
 
+
+	public void selectAutomaton(Automaton a) {
+	}
 	/**
 	 * Selects the automata indicated by selectionIndices
 	 */
@@ -496,7 +499,6 @@ public class Supremica
 				int currIndex = selectedRowIndices[i];
 				int orgIndex = theTableSorter.getOriginalRowIndex(currIndex);
 				Automaton currAutomaton = getActiveProject().getAutomatonAt(orgIndex);
-
 				selectedAutomata.addAutomaton(currAutomaton);
 			}
 			catch (Exception ex)

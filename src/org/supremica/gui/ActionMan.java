@@ -3801,6 +3801,108 @@ public class ActionMan
 		org.supremica.util.BDD.test.DeveloperTest.DoCoReachability(gui.getSelectedAutomata());
 	}
 
+	// ------------------------------------------------------------------
+
+	/**
+	 * Mark (select) automata in the dependency group of the selected automata.
+	 *
+	 * ok, this should go in the automata.algorithms package, but we can move it later
+	 */
+	public static void markDependencySet() {
+		Automata selected = gui.getSelectedAutomata();
+		Automata unselected = gui.getUnselectedAutomata();
+		Vector toSelect = new Vector();
+
+		try
+		{
+			Alphabet  selectedAlphabet = AlphabetHelpers.getUnionAlphabet(selected, false, false);
+			for (AutomatonIterator it = unselected.iterator(); it.hasNext(); )
+			{
+				Automaton a = it.nextAutomaton();
+
+				Alphabet alfa = a.getAlphabet();
+				if(alfa.overlap(selectedAlphabet))
+				{
+					toSelect.add(a);
+				}
+			}
+
+			int [] sel = new int[ toSelect.size() ];
+			int i = 0;
+			for (Enumeration e = toSelect.elements() ; e.hasMoreElements() ; i++)
+			{
+				Automaton a = (Automaton) e.nextElement();
+				sel[i] = gui.getVisualProjectContainer().getActiveProject().getAutomatonIndex(a);
+			}
+			gui.selectAutomata(sel);
+
+		}
+		catch (Exception ex)
+		{
+			logger.error(ex);
+		}
+	}
+
+	/**
+	 * select the maximal component the current selection is a part of
+	 * (the current selection must be connected!)
+	 *
+	 * this should too go in the automata.algorithms package :(
+	 */
+	public static void markMaximalComponent() {
+		Automata selected = gui.getSelectedAutomata();
+		Automata unselected = gui.getUnselectedAutomata();
+		Vector toSelect = new Vector();
+
+		try
+		{
+
+
+			boolean done;
+			do
+			{
+				done = true;
+				Alphabet  selectedAlphabet = AlphabetHelpers.getUnionAlphabet(selected, false, false);
+
+				for (AutomatonIterator it = unselected.iterator(); it.hasNext(); )
+				{
+					Automaton a = it.nextAutomaton();
+
+					Alphabet alfa = a.getAlphabet();
+					if(alfa.overlap(selectedAlphabet))
+					{
+						toSelect.add(a);
+						selected.addAutomaton(a);
+						done = false;
+					}
+				}
+
+				for (Enumeration e = toSelect.elements() ; e.hasMoreElements() ;)
+				{
+					Automaton a = (Automaton) e.nextElement();
+					unselected.removeAutomaton(a);
+				}
+
+			}
+			while(! done);
+
+			int [] sel = new int[ toSelect.size() ];
+			int i = 0;
+			for (Enumeration e = toSelect.elements() ; e.hasMoreElements() ; i++)
+			{
+				Automaton a = (Automaton) e.nextElement();
+				sel[i] = gui.getVisualProjectContainer().getActiveProject().getAutomatonIndex(a);
+
+			}
+			gui.selectAutomata(sel);
+
+		}
+		catch (Exception ex)
+		{
+			logger.error(ex);
+		}
+	}
+
 }
 
 // ActionMan

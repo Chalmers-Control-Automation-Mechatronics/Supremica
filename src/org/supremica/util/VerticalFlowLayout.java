@@ -4,8 +4,8 @@
 
 /*===========================================================================
  $Workfile:   VerticalFlowLayout.java  $
- $Revision: 1.1 $
- $Date: 2003-10-17 15:17:49 $
+ $Revision: 1.2 $
+ $Date: 2004-03-31 12:20:52 $
 
  (C) Unpublished Copyright of Novell, Inc.  All Rights Reserved.
 

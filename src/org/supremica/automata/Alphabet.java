@@ -296,6 +296,30 @@ public class Alphabet
 		}
 	}
 
+
+  /**
+	 * returns true if the two alphabets overlap, that is, they have at least one common event
+	 *
+	 *@param  other The other alphabet
+	 */
+	public boolean overlap(Alphabet other)
+	{
+		ArrayList removeList = new ArrayList();
+
+		for (Iterator alphIt = this.iterator(); alphIt.hasNext(); )
+		{
+			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
+
+			if(other.containsEventWithLabel(currEvent.getLabel()))
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+
 	/**
 	 * Computes and returns "A intersection B"
 	 */
@@ -388,7 +412,7 @@ public class Alphabet
 		{
 			subAlphabet.addEvent(evIt.nextEvent());
 		}
-		
+
 		return subAlphabet;
 	}
 

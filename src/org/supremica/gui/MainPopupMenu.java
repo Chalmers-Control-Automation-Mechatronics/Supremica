@@ -304,7 +304,12 @@ class MainPopupMenu
 
 
 
-
+			JMenuItem mMd, mMmc;
+			expMenu.addSeparator();
+			expMenu.add(mMd = new JMenuItem("Mark dependency set"));
+			expMenu.add(mMmc= new JMenuItem("Mark maximal component"));
+			mMd .addActionListener(new ActionListener(){public void actionPerformed(ActionEvent e) { ActionMan.markDependencySet(); } } );
+			mMmc.addActionListener(new ActionListener(){public void actionPerformed(ActionEvent e) { ActionMan.markMaximalComponent(); } } );
 
 			// BDD crap, sorry for the compressed lines... /Arash
 			JMenuItem miR, miCR;
