@@ -78,7 +78,7 @@ public class AutomataToSattLineSFC
 		canonical = false;
 	}
 
-	public void serialize(PrintWriter pw)
+	public void serialize_s(PrintWriter pw)
 	{
 		pw.println("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
 		pw.print("<Automata");
@@ -171,6 +171,21 @@ public class AutomataToSattLineSFC
 		throws IOException
 	{
 		serialize(new PrintWriter(new FileWriter(fileName)));
+	}
+
+	public void serialize_g(PrintWriter pw)
+	{
+
+	}
+
+	public void serialize_p(PrintWriter pw)
+	{
+
+	}
+
+	public void serialize_l(PrintWriter pw)
+	{
+
 	}
 
 	private String normalize(String s)

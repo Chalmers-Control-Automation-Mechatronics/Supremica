@@ -542,6 +542,20 @@ public class Supremica
 						//toolsAutomataEditor();
 					}
 				});
+
+			JMenuItem menuToolsCodeGenerationSattLineSFC = new JMenuItem();
+			menuToolsCodeGenerationSattLineSFC.setText("SattLine SFC...");
+			menuToolsCodeGenerationSattLineSFC.setEnabled(false);
+
+			menuToolsCodeGeneration.add(menuToolsCodeGenerationSattLineSFC);
+
+			menuToolsCodeGenerationSattLineSFC.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						//toolsAutomataEditor();
+					}
+				});
 		}
 
 
