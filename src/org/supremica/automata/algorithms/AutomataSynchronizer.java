@@ -105,10 +105,10 @@ public class AutomataSynchronizer
 			initialState[currAutomaton.getIndex()] = currInitialState.getIndex();
 
 			comment.append(currAutomaton.getName());
-			comment.append("||");
+			comment.append(syncOptions.getAutomatonNameSeparator());
 		}
 
-		comment.delete(comment.length() - 2, comment.length());
+		comment.delete(comment.length() - syncOptions.getAutomatonNameSeparator().length(), comment.length());
 		synchHelper.addState(initialState);
 		synchHelper.addComment(comment.toString());
 
