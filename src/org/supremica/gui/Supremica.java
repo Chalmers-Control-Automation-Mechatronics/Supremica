@@ -1190,6 +1190,8 @@ public class Supremica
 
 	public void tableChanged(TableModelEvent e)
 	{
+
+		// logger.debug("Supremica.tableChanged");
 		theAutomatonTable.revalidate();
 	}
 
@@ -1321,6 +1323,8 @@ public class Supremica
 
 		try
 		{    // throws Exception if the automaton already exists
+
+			// logger.debug("Supremica.addAutomaton");
 			getActiveProject().addAutomaton(currAutomaton);
 		}
 		catch (Exception excp)

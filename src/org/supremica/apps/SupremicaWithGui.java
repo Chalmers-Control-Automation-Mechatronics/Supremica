@@ -60,7 +60,7 @@ public class SupremicaWithGui
 {
 	static
 	{
-		SupremicaProperties.setLogToConsole(true);
+		SupremicaProperties.setLogToConsole(false);
 		SupremicaProperties.setLogToGUI(true);
 	}
 

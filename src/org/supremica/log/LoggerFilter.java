@@ -59,7 +59,7 @@ public class LoggerFilter
 {
 	private boolean allowInfos = true;
 	private boolean allowWarns = true;
-	private boolean allowDebugs = true;
+	private boolean allowDebugs = false;
 	private boolean allowFatals = true;
 	private boolean allowErrors = true;
 

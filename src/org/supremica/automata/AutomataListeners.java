@@ -50,10 +50,12 @@
 package org.supremica.automata;
 
 import java.util.*;
+import org.supremica.log.*;
 
 public class AutomataListeners
 	extends Listeners
 {
+	private static Logger logger = LoggerFactory.createLogger(AutomataListeners.class);
 	public static final int MODE_AUTOMATON_ADDED = 1;
 	public static final int MODE_AUTOMATON_REMOVED = 2;
 	public static final int MODE_AUTOMATON_RENAMED = 3;
@@ -65,6 +67,8 @@ public class AutomataListeners
 
 	public void notifyListeners(int mode, Automaton a)
 	{
+
+		// logger.debug("AutomataListeners.notifyListeners Start");
 		if (batchUpdate)
 		{
 			updateNeeded = true;
@@ -73,9 +77,9 @@ public class AutomataListeners
 		{
 			if (listeners != null)
 			{
-				Iterator listenerIt = listeners.iterator();
 
-				while (listenerIt.hasNext())
+				// logger.debug("AutomataListeners.notifyListeners notifying");
+				for (Iterator listenerIt = listeners.iterator(); listenerIt.hasNext(); )
 				{
 					AutomataListener currListener = (AutomataListener) listenerIt.next();
 

@@ -70,9 +70,9 @@ import org.supremica.automata.LabeledEvent;
  */
 public final class AutomataSynchronizerHelper
 {
+	private static Logger logger = LoggerFactory.createLogger(AutomataSynchronizerHelper.class);
 	private AutomataIndexForm theAutomataIndexForm;
 	private IntArrayHashTable theStates;
-	private static Logger logger = LoggerFactory.createLogger(AutomataSynchronizerHelper.class);
 	private IntArrayList statesToProcess;
 	private int nbrOfStatesToProcess = 0;
 	private int totalNbrOfStates = 0;

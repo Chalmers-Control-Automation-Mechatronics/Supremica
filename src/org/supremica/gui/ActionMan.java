@@ -68,6 +68,7 @@ import org.supremica.gui.editor.*;
 import org.supremica.gui.help.*;
 import org.supremica.automata.*;
 import org.supremica.gui.animators.scenebeans.*;
+import org.supremica.log.*;
 
 // -- MF -- Abstract class to save on duplicate code
 // -- From this class is instantiated anonymous classes that implement the openFile properly
@@ -100,6 +101,7 @@ abstract class FileImporter
 // --------------------
 public class ActionMan
 {
+	private static Logger logger = LoggerFactory.createLogger(ActionMan.class);
 	private static final int    // instead of using constants later below :)
 		FORMAT_UNKNOWN = -1, FORMAT_XML = 1, FORMAT_DOT = 2, FORMAT_DSX = 3, FORMAT_RCP = 4;
 
@@ -133,6 +135,8 @@ public class ActionMan
 	// File.NewFromTemplate action performed
 	public static void fileNewFromTemplate(Gui gui, TemplateItem item)
 	{
+
+		// logger.debug("ActionMan.fileNewFromTemplate Start");
 		Automata newAutomata;
 
 		try
@@ -140,6 +144,8 @@ public class ActionMan
 			newAutomata = item.createInstance(new VisualProjectFactory());
 
 			gui.addAutomata(newAutomata);
+
+			// logger.debug("ActionMan.fileNewFromTemplate");
 		}
 		catch (Exception ex)
 		{

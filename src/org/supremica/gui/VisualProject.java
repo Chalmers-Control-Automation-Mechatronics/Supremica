@@ -78,11 +78,22 @@ public class VisualProject
 	private FullTableModel fullTableModel = new FullTableModel();
 	private File projectFile = null;
 
-	public VisualProject() {}
+	public VisualProject()
+	{
+		initialize();
+	}
 
 	public VisualProject(String name)
 	{
 		super(name);
+
+		initialize();
+	}
+
+	private void initialize()
+	{
+		addListener(lightTableModel);
+		addListener(fullTableModel);
 	}
 
 	public void setSelectedAutomata(Automata theAutomata)
@@ -224,30 +235,30 @@ public class VisualProject
 		return null;
 
 		/*
-						else
-						{
-								Automaton currAutomaton = getAutomaton(automatonName);
-
-								if (currAutomaton != null)
-								{
-										try
+										else
 										{
-												AutomatonDocument document = new AutomatonDocument(this, currAutomaton);
+														Automaton currAutomaton = getAutomaton(automatonName);
 
-												theAutomatonDocumentContainer.put(automaton, document);
+														if (currAutomaton != null)
+														{
+																		try
+																		{
+																						AutomatonDocument document = new AutomatonDocument(this, currAutomaton);
 
-												return document;
+																						theAutomatonDocumentContainer.put(automaton, document);
+
+																						return document;
+																		}
+																		catch (Exception ex)
+																		{
+																						throw new Exception("Error while viewing: " + automaton);
+																		}
+														}
+														else
+														{
+																		throw new Exception(automaton + " does not exist in VisualProjectContainer");
+														}
 										}
-										catch (Exception ex)
-										{
-												throw new Exception("Error while viewing: " + automaton);
-										}
-								}
-								else
-								{
-										throw new Exception(automaton + " does not exist in VisualProjectContainer");
-								}
-						}
 		*/
 	}
 
@@ -345,7 +356,7 @@ public class VisualProject
 	}
 
 	private class LightTableModel
-		implements TableModel
+		implements TableModel, AutomataListener
 	{
 		private LinkedList listeners = new LinkedList();
 
@@ -417,6 +428,8 @@ public class VisualProject
 
 		public void updateListeners()
 		{
+
+			// logger.debug("LightTableModel.updateListeners");
 			Iterator theIt = listeners.iterator();
 			TableModelEvent event = new TableModelEvent(this, 0, getNbrOfAutomata() - 1);
 
@@ -427,10 +440,30 @@ public class VisualProject
 				theListener.tableChanged(event);
 			}
 		}
+
+		public void automatonAdded(Automata automata, Automaton automaton)
+		{
+			updateListeners();
+		}
+
+		public void automatonRemoved(Automata automata, Automaton automaton)
+		{
+			updateListeners();
+		}
+
+		public void automatonRenamed(Automata automata, Automaton automaton)
+		{
+			updateListeners();
+		}
+
+		public void updated(Object theObject)
+		{
+			updateListeners();
+		}
 	}
 
 	private class FullTableModel
-		implements TableModel
+		implements TableModel, AutomataListener
 	{
 		private LinkedList listeners = new LinkedList();
 
@@ -549,6 +582,8 @@ public class VisualProject
 
 		public void updateListeners()
 		{
+
+			// logger.debug("LightTableModel.updateListeners");
 			Iterator theIt = listeners.iterator();
 			TableModelEvent event = new TableModelEvent(this, 0, getNbrOfAutomata() - 1);
 
@@ -558,6 +593,26 @@ public class VisualProject
 
 				theListener.tableChanged(event);
 			}
+		}
+
+		public void automatonAdded(Automata automata, Automaton automaton)
+		{
+			updateListeners();
+		}
+
+		public void automatonRemoved(Automata automata, Automaton automaton)
+		{
+			updateListeners();
+		}
+
+		public void automatonRenamed(Automata automata, Automaton automaton)
+		{
+			updateListeners();
+		}
+
+		public void updated(Object theObject)
+		{
+			updateListeners();
 		}
 	}
 }

@@ -76,9 +76,7 @@ public class Automata
 	{
 		this();
 
-		Iterator automataIterator = oldAutomata.iterator();
-
-		while (automataIterator.hasNext())
+		for (Iterator automataIterator = oldAutomata.iterator(); automataIterator.hasNext(); )
 		{
 			addAutomaton(new Automaton((Automaton) automataIterator.next()));
 		}
@@ -89,16 +87,15 @@ public class Automata
 		theAutomata.add(aut);
 		nameMap.put(aut.getName(), aut);
 		notifyListeners(AutomataListeners.MODE_AUTOMATON_ADDED, aut);
-		logger.debug("Automata.addAutomaton: " + aut.getName());
+
+		// logger.debug("Automata.addAutomaton: " + aut.getName());
 	}
 
 	public void addAutomata(Automata automata)
 	{
-		Iterator automataIterator = automata.iterator();
-
-		while (automataIterator.hasNext())
+		for (Iterator autIt = automata.iterator(); autIt.hasNext(); )
 		{
-			addAutomaton((Automaton) automataIterator.next());
+			addAutomaton((Automaton) autIt.next());
 		}
 	}
 
@@ -244,6 +241,13 @@ public class Automata
 		return listeners;
 	}
 
+	public void addListener(AutomataListener listener)
+	{
+		AutomataListeners listeners = getListeners();
+
+		listeners.addListener(listener);
+	}
+
 	public long checksum()
 	{    // Ad-hoc checksum algorithm
 		long checksum = 53562951413L;
@@ -268,8 +272,12 @@ public class Automata
 
 	private void notifyListeners(int mode, Automaton a)
 	{
+
+		// logger.debug("Automata.notifyListeners Start");
 		if (listeners != null)
 		{
+
+			// logger.debug("Automata.notifyListeners");
 			listeners.notifyListeners(mode, a);
 		}
 	}
