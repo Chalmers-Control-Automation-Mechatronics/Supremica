@@ -1,0 +1,127 @@
+/*
+ * SFSP -- Supremica Finite State Processes
+ * SFSP is based on Finite State Processes (FSP) as defined
+ * in "Concurrency : state models & Java programs" by Jeff Magee and Jeff Kramer, Wiley 1999.
+ */
+
+PARSER_BEGIN(sfsp)
+
+import java.io.*;
+
+public class sfsp
+{
+
+	public static void main(String args[])
+	{
+		try
+		{
+			sfsp t = new sfsp(new BufferedReader(new FileReader(new File(args[0]))));
+			try 
+			{
+				SimpleNode n = t.Start();
+				n.dump("");
+			} 
+			catch (Exception e) 
+			{
+				System.out.println("Oops.");
+				System.out.println(e.getMessage());
+				e.printStackTrace();
+			}
+		}
+		catch (Throwable e) 
+		{
+			System.out.println("Unable to parse input " + e);
+		}
+	}
+}
+
+
+PARSER_END(sfsp)
+
+
+SKIP :
+{
+ " "
+| "\t"
+//|"\n"
+| "\r"
+}
+
+
+SimpleNode Start() :
+{}
+{
+  BProcessDef()
+  <EOF>
+  { return jjtThis; }
+}
+
+
+
+TOKEN: /* EOL */
+{
+	< EOL: "\n" >
+}
+
+
+/*
+ * Basic FSP
+ */
+
+void BProcessDef() :
+{}
+{
+	BProcessBody() (AlphabetExtension())? (Relabel())? (Hiding())? "."
+}
+
+void BProcessBody() :
+{}
+{
+	(ProcessIdent() "=" BLocalProcess())
+	| (BProcessBody() "," ProcessIdent() "=" BLocalProcess())
+}
+
+void BLocalProcess() :
+{}
+{
+	("STOP")
+	| ("ERROR")
+	| (ProcessIdent())
+	| ("(" BChoice() ")")
+}
+
+void BChoice() :
+{}
+{
+	(ActionLabel() "=" BLocalProcess())
+	| (BChoice "|" ActionLabel() "=" BLocalProcess())
+}
+
+void BCompositeDef() :
+{}
+{
+	"||" ProcessIdent() "=" BCompositeBody() (Priority())? (Hiding())? "."
+}
+
+void BCompositeBody() :
+{}
+{
+	(ProcessIdent() (Relabel())?)
+	| ("(" BParallelComposition() ")" (Relabel())?)
+}
+
+void BParallelComposition() :
+{}
+{
+	(BCompositeBody())
+	| (
+	ParallelComposition() "||" BCompositeBody())
+}
+
+
+
+
+
+
+
+
