@@ -138,10 +138,9 @@ class AutomataSelector
 	{
 		if (eventToAutomataMap.get(currEvent) != null)
 		{
-			/*
 			partialSet.addAutomata(eventToAutomataMap.get(currEvent));
-			*/
 
+			/*
 			Iterator plantIterator = eventToAutomataMap.get(currEvent).iterator();
 			while (plantIterator.hasNext())
 			{
@@ -154,24 +153,6 @@ class AutomataSelector
 					partialSet.addAutomaton(currPlantAutomaton);
 					logger.debug("AutomataSelector::Added plant " + currPlantAutomaton.getName());
 					
-					// closedSet stuff removed
-				}
-			}
-			
-			/*
-			Iterator plantIterator = ((Set) eventToAutomataMap.get(currEvent)).iterator();
-
-			while (plantIterator.hasNext())
-			{
-				Automaton currPlantAutomaton = (Automaton) plantIterator.next();
-
-				// This check is performed in eventToAutomataMap
-				// if (currPlantAutomaton.getType() == AutomatonType.Plant)
-				if (!partialSet.containsAutomaton(currPlantAutomaton))
-				{
-					partialSet.addAutomaton(currPlantAutomaton);
-					logger.debug("AutomataSelector::Added plant " + currPlantAutomaton.getName());
-
 					// closedSet stuff removed
 				}
 			}

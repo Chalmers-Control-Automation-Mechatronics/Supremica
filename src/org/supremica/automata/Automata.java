@@ -133,6 +133,12 @@ public class Automata
 
 	public void addAutomaton(Automaton aut)
 	{
+		if (containsAutomaton(aut.getName()))
+		{
+			// Already here!
+			return;
+		}
+
 		theAutomata.add(aut);
 		nameMap.put(aut.getName(), aut);
 		aut.addListener(this);

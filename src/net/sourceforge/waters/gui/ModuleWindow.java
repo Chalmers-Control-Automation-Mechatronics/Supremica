@@ -3,7 +3,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   ModuleWindow
 //###########################################################################
-//# $Id: ModuleWindow.java,v 1.2 2005-02-17 02:59:28 flordal Exp $
+//# $Id: ModuleWindow.java,v 1.3 2005-02-17 03:01:19 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -38,7 +38,7 @@ import org.supremica.automata.Project;
  */
 public class ModuleWindow extends JFrame implements ActionListener, FocusListener {
     private ModuleProxy module = null;
-    private JFileChooser fileChooser = new JFileChooser(".");
+	private JFileChooser fileChooser = new JFileChooser(".");
     private JFileChooser fileSaveChooser = new JFileChooser(".");
     private JMenuItem FileNewMenu;
     private JMenuItem FileOpenMenu;
@@ -73,17 +73,17 @@ public class ModuleWindow extends JFrame implements ActionListener, FocusListene
     public ModuleWindow(String title) {
         this.setTitle(title);
         JFrame.setDefaultLookAndFeelDecorated(true);
-	this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
+		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
        	module = new ModuleProxy("Unnamed Module", null);
-
-	debugPane = createDebugPane();
-
+		
+		debugPane = createDebugPane();
+		
         constructWindow();
-
-	pack();
-	setVisible(true);
-	setLocationRelativeTo(null);
+		
+		pack();
+		setLocationRelativeTo(null);
+		setVisible(true);
     }
 
     /** Load a Waters module into the module viewer.
