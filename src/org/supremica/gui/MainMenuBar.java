@@ -320,6 +320,24 @@ public class MainMenuBar
 				}
 			});
 
+
+
+			if (SupremicaProperties.generalUseRobotCoordination())
+			{
+				// File.Import.RobotCoordination
+				JMenuItem menuFileImportRobotCoordination = new JMenuItem();
+
+				menuFileImportRobotCoordination.setText("From Robot Coordinator...");
+				menuFileImport.add(menuFileImportRobotCoordination);
+				menuFileImportRobotCoordination.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						ActionMan.fileImportRobotCoordination(ActionMan.getGui());
+					}
+				});
+			}
+
 			separatorNeeded = true;
 		}
 

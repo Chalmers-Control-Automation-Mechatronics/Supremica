@@ -132,10 +132,10 @@ public class SimulatorEventList
 //							int[] newState = eventsList.getStateAt(index);
 //							if (!eventsList.executeEvent(currEvent))
 //							{
-//								logger.warn("Failed to execute event: " + currEvent.getLabel());	
+//								logger.warn("Failed to execute event: " + currEvent.getLabel());
 //							}
 //							else
-//							{							
+//							{
 //								executeEvent(currEvent, newState);
 //							}
 						}
@@ -147,7 +147,7 @@ public class SimulatorEventList
 
 	public boolean clickable()
 	{
-		return true;
+		return !eventsList.isLocked();
 	}
 
 	public void setShowStateId(boolean showStateId)
@@ -178,29 +178,29 @@ public class SimulatorEventList
 //	{
 //		stateViewer.executeEvent(event);
 //	}
-	
+
 	private void executeEvent(LabeledEvent currEvent)
 	{
-		theExecuter.executeEvent(currEvent);		
+		theExecuter.executeEvent(currEvent);
 	}
-	
+
 	public SimulatorEventListModel getEventListModel()
 	{
-		return eventsList;	
+		return eventsList;
 	}
 
 	public void contentsChanged(ListDataEvent e)
 	{
-		update();		
+		update();
 	}
-	
+
 	public void intervalAdded(ListDataEvent e)
 	{
-		contentsChanged(e);	
+		contentsChanged(e);
 	}
 
 	public void intervalRemoved(ListDataEvent e)
 	{
-		contentsChanged(e);		
-	}  	
+		contentsChanged(e);
+	}
 }

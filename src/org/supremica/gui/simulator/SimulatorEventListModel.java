@@ -89,6 +89,7 @@ public class SimulatorEventListModel
 	private AutomataSynchronizerHelper helper;
 //	private AnimationSignals theSignals;
 	private SimulatorExecuter theExecuter;
+	protected boolean isLocked = false;
 
 	public SimulatorEventListModel(SimulatorExecuter theExecuter, AutomataSynchronizerHelper helper, Project theProject)
 	{
@@ -101,7 +102,7 @@ public class SimulatorEventListModel
 //		this.theSignals = theSignals;
 		this.theExecuter = theExecuter;
 		events = new int[helper.getNbrOfEvents() + 1];
-		theExecuter.registerSignalObserver(this);
+//		theExecuter.registerSignalObserver(this);
 //		theSignals.registerInterest(this);
 	}
 
@@ -119,6 +120,8 @@ public class SimulatorEventListModel
 
 	public void update()
 	{
+		enterLock();
+
 		//logger.info("SimulatorEventListModel.update");
 		AutomataOnlineSynchronizer onlineSynchronizer = helper.getCoExecuter();
 		int[] extEvents = onlineSynchronizer.getOutgoingEvents(theExecuter.getCurrentState());
@@ -177,10 +180,46 @@ public class SimulatorEventListModel
 		{
 			eventAmount++;
 		}
-	
-		//logger.error("Before fireContentsChanged");
+
+		logger.error("Before fireContentsChanged");
 		fireContentsChanged(this, 0, eventAmount - 1);
-		//logger.error("After fireContentsChanged");
+		logger.error("After fireContentsChanged");
+
+		exitLock();
+
+	}
+
+	public synchronized void enterLock()
+	{
+		try
+		{
+			while (isLocked)
+			{
+				wait();
+			}
+			setLock(true);
+		}
+		catch (InterruptedException e)
+		{
+			logger.error("enterLock interrupted");
+		}
+	}
+
+	public synchronized void exitLock()
+	{
+		setLock(false);
+		notifyAll();
+	}
+
+
+	public synchronized boolean isLocked()
+	{
+		return isLocked;
+	}
+
+	private synchronized void setLock(boolean doLock)
+	{
+		this.isLocked = doLock;
 	}
 
 	public int getSize()
@@ -240,16 +279,16 @@ public class SimulatorEventListModel
 //
 //		return onlineSynchronizer.doTransition(events[index]);
 //	}
-//	
+//
 //	public synchronized boolean executeEvent(LabeledEvent theEvent)
 //	{
-//		theExecuter.executeEvent(theEvent);	
-//		return true;	
+//		theExecuter.executeEvent(theEvent);
+//		return true;
 //	}
 
 	public void signalUpdated()
 	{
-		update();		
+		update();
 	}
 }
 

@@ -71,6 +71,8 @@ import org.supremica.gui.automataExplorer.AutomataExplorer;
 import org.supremica.gui.recipeEditor.RecipeEditor;
 import org.supremica.gui.cellEditor.CellEditor;
 import org.supremica.gui.simulator.SimulatorExecuter;
+import org.supremica.external.robotCoordination.AutomataBuilder;
+
 import org.supremica.log.*;
 import org.supremica.automata.IO.*;
 import org.supremica.util.ActionTimer;
@@ -1915,6 +1917,19 @@ public class ActionMan
 		};
 	}
 
+	public static void fileImportRobotCoordination(Gui gui)
+	{
+		new FileImporter(FileDialogs.getXMLFileImporter(), gui)    // anonymous class
+		{
+			void openFile(Gui g, File f)
+			{
+				importRobotCoordinationFile(g, f);
+			}
+		};
+	}
+
+
+
 	// Aldebaran format, a simple format for specifying des
 	public static void fileImportAut(Gui gui)
 	{
@@ -2166,6 +2181,28 @@ public class ActionMan
 		try
 		{
 			AutomataBuildFromVALID builder = new AutomataBuildFromVALID(new VisualProjectFactory());
+			Automata currAutomata = builder.build(file);
+			int nbrOfAddedAutomata = gui.addAutomata(currAutomata);
+
+			gui.info("Successfully imported " + nbrOfAddedAutomata + " automata.");
+		}
+		catch (Exception ex)
+		{
+			logger.error("Error while importing " + file.getAbsolutePath(), ex);
+			logger.debug(ex.getStackTrace());
+			return;
+		}
+	}
+
+	public static void importRobotCoordinationFile(Gui gui, File file)
+	{
+
+		// logger.info("Importing " + file.getAbsolutePath() + " ...");
+		gui.info("Importing " + file.getAbsolutePath() + " ...");
+
+		try
+		{
+			AutomataBuilder builder = new AutomataBuilder(new VisualProjectFactory());
 			Automata currAutomata = builder.build(file);
 			int nbrOfAddedAutomata = gui.addAutomata(currAutomata);
 

@@ -86,6 +86,8 @@ public final class SupremicaProperties
 	private static final String GENERAL_LOOKANDFEEL = "generalLookAndFeel";
 	//private static final String GENERAL_INCLUDE_ANIMATIONS = "generalIncludeAnimations";
 	private static final String GENERAL_USE_RCP = "generalUseRcp";
+	private static final String GENERAL_USE_ROBOTCOORDINATION = "generalUseRobotCoordination";
+
 
 	// Logging options
 	private static final String LOG_TO_CONSOLE = "logToConsole";
@@ -185,6 +187,8 @@ public final class SupremicaProperties
 		setProperty(GENERAL_LOOKANDFEEL, "System", true);
 		//setProperty(GENERAL_INCLUDE_ANIMATIONS, "false", true);
 		setProperty(GENERAL_USE_RCP, "false", true);
+		setProperty(GENERAL_USE_RCP, "false", true);
+		setProperty(GENERAL_USE_ROBOTCOORDINATION, "false", true);
 		setProperty(INCLUDE_EDITOR, "false", true);
 		setProperty(INCLUDE_BOUNDED_UNCON_TOOLS, "false", true);
 		setProperty(VERBOSE_MODE, "false", true);
@@ -338,6 +342,16 @@ public final class SupremicaProperties
 	public static void setGeneralUseRCP(boolean allow)
 	{
 		wp.setProperty(GENERAL_USE_RCP, toString(allow));
+	}
+
+	public static boolean generalUseRobotCoordination()
+	{
+		return toBoolean(wp.getProperty(GENERAL_USE_ROBOTCOORDINATION));
+	}
+
+	public static void setGeneralUseRobotCoordination(boolean allow)
+	{
+		wp.setProperty(GENERAL_USE_ROBOTCOORDINATION, toString(allow));
 	}
 
 	public static boolean fileAllowImport()

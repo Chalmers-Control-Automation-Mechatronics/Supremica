@@ -76,7 +76,7 @@ public class ExampleTemplates
 		initializeCCSBookExamples();
 		initializeCCSBookExercises();
 		initializeCCSCourseAssignments();
-		initializeCCSCourseAssignmentSolutions();
+		//initializeCCSCourseAssignmentSolutions();
 		initializeOtherExamples();
 		initializeAIPExamples();
 		initializeOperatorSupervisorExamples();

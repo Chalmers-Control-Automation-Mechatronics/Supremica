@@ -291,7 +291,13 @@ public class SimulatorExecuter
 		return theAnimationSignals.isTrue(theCondition.getLabel());
 	}
 
-	public synchronized boolean executeEvent(LabeledEvent event)
+/*
+	protected void updateSignals()
+	{
+		theAnimationSignals.updateSignals();
+	}
+*/
+	public boolean executeEvent(LabeledEvent event)
 	{
 
 		String label = event.getLabel();
@@ -350,7 +356,7 @@ public class SimulatorExecuter
 
 	public void update()
 	{
-		theAnimationSignals.notifyObservers();
+//		theAnimationSignals.notifyObservers();
 	}
 }
 

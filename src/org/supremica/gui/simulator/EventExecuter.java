@@ -69,8 +69,12 @@ class EventExecuter
 
 	private synchronized void tryExecuteEvent()
 	{
+		updateSignals();
+
 		if (executeUncontrollableEvents)
 		{
+			eventModel.enterLock();
+
 			int nbrOfEvents = eventModel.getSize();
 			for (int i = 0; i < nbrOfEvents; i++)
 			{
@@ -82,13 +86,21 @@ class EventExecuter
 					{
 						logger.warn("Failed to execute event: " + currEvent.getLabel());
 					}
+					eventModel.exitLock();
 					return;
 				}
 			}
 
+			eventModel.exitLock();
+
 		}
+
+		updateSignals();
+
 		if (executeControllableEvents)
 		{
+			eventModel.enterLock();
+
 			int nbrOfEvents = eventModel.getSize();
 			for (int i = 0; i < nbrOfEvents; i++)
 			{
@@ -100,9 +112,12 @@ class EventExecuter
 					{
 						logger.warn("Failed to execute event: " + currEvent.getLabel());
 					}
+					eventModel.exitLock();
 					return;
 				}
 			}
+
+			eventModel.exitLock();
 		}
 	}
 
@@ -121,6 +136,12 @@ class EventExecuter
 	public void intervalRemoved(ListDataEvent e)
 	{
 		contentsChanged(e);
+	}
+
+	protected void updateSignals()
+	{
+		eventModel.update();
+		//theExecuter.updateSignals();
 	}
 }
 

@@ -30,7 +30,7 @@ class AnimationSignals
 
 	public void registerInterest(SignalObserver observer)
 	{
-		observers.add(observer);
+//		observers.add(observer);
 	}
 
 	public synchronized void animationEvent(AnimationEvent ev)
@@ -49,10 +49,10 @@ class AnimationSignals
 			theSignals.put(currEvent, Boolean.TRUE);
 		}
 		//logger.error("Calling notifyObservers");
-		notifyObservers();
+		//notifyObservers();
 		//logger.error("Finished Calling notifyObservers");
 	}
-
+/*
 	public void notifyObservers()
 	{
 		for (Iterator obsIt = observers.iterator(); obsIt.hasNext();)
@@ -61,8 +61,8 @@ class AnimationSignals
 			currObserver.signalUpdated();
 		}
 	}
-
-	public boolean isTrue(String theSignal)
+*/
+	public synchronized boolean isTrue(String theSignal)
 	{
 		Boolean currValue = (Boolean)theSignals.get(theSignal);
 
@@ -73,4 +73,11 @@ class AnimationSignals
 		}
 		return currValue == Boolean.TRUE;
 	}
+
+/*
+	public void updateSignals()
+	{
+
+	}
+*/
 }
