@@ -69,4 +69,19 @@ public class Control
 	{
 		return condition;
 	}
+
+	public boolean equals(Object other)
+	{
+		if (!(other instanceof Control))
+		{
+			return false;
+		}
+		Control otherControl = (Control)other;
+		return label.equals(otherControl.label) && condition.equals(otherControl.condition);
+	}
+
+	public int hashCode()
+	{
+		return label.hashCode() + condition.hashCode();
+	}
 }

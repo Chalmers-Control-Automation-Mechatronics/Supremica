@@ -52,6 +52,7 @@ package org.supremica.automata;
 import java.util.*;
 import org.supremica.gui.*;
 import org.supremica.log.*;
+import org.supremica.automata.execution.*;
 
 /**
  * A set of Automata with common actions and an AutomatonContainer.

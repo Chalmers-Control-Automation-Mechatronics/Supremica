@@ -49,6 +49,8 @@
  */
 package org.supremica.automata.execution;
 
+import java.util.*;
+
 public class Controls
 {
 	private Set theControls = null;
@@ -63,16 +65,18 @@ public class Controls
 	public void addControl(Control theControl)
 	{
 		theControls.add(theControl);
+		labelToControlMap.put(theControl.getLabel(), theControl);
 	}
 
 	public void removeControl(Control theControl)
 	{
-
+		theControls.remove(theControl);
+		labelToControlMap.remove(theControl.getLabel());
 	}
 
 	public boolean hasControl(String label)
 	{
-		return labelToControlMap.contains(label);
+		return labelToControlMap.containsKey(label);
 	}
 
 	public Control getControl(String label)
@@ -82,6 +86,11 @@ public class Controls
 
 	public Iterator iterator()
 	{
-		return labelToControlMap.values().iterator();
+		return theControls.iterator();
+	}
+
+	public int size()
+	{
+		return theControls.size();
 	}
 }

@@ -49,39 +49,48 @@
  */
 package org.supremica.automata.execution;
 
-public class Action
+import java.util.*;
+
+public class Actions
 {
-	private String label = null;
-	private String command = null;
+	private Set theActions = null;
+	private Map labelToActionMap = null;
 
-	public Action(String label, String command)
+	public Actions()
 	{
-		this.label = label;
-		this.command = command;
+		theActions = new HashSet();
+		labelToActionMap = new HashMap();
 	}
 
-	public String getLabel()
+	public void addAction(Action theAction)
 	{
-		return label;
+		theActions.add(theActions);
+		labelToActionMap.put(theAction.getLabel(), theAction);
 	}
 
-	public String getCommand()
+	public void removeAction(Action theAction)
 	{
-		return command;
+		theActions.remove(theAction);
+		labelToActionMap.remove(theAction.getLabel());
 	}
 
-	public boolean equals(Object other)
+	public boolean hasAction(String label)
 	{
-		if (!(other instanceof Action))
-		{
-			return false;
-		}
-		Action otherAction = (Action)other;
-		return label.equals(otherAction.label) && command.equals(otherAction.command);
+		return labelToActionMap.containsKey(label);
 	}
 
-	public int hashCode()
+	public Action getAction(String label)
 	{
-		return label.hashCode() + command.hashCode();
+		return (Action)labelToActionMap.get(label);
+	}
+
+	public Iterator iterator()
+	{
+		return theActions.iterator();
+	}
+
+	public int size()
+	{
+		return theActions.size();
 	}
 }
