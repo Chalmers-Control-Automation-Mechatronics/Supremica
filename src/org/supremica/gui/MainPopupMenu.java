@@ -41,23 +41,15 @@ class MainPopupMenu
 		exploreItem.setToolTipText("Explore states one by one interactively");
 		menuHandler.add(exploreItem, 1);
 
-		JMenuItem hierarchyItem = new JMenuItem("View modular structure");
-		hierarchyItem.setToolTipText("Display graphically the connections between different modules");
-		menuHandler.add(hierarchyItem, 1);
-
-		JMenuItem alphabetItem = new JMenuItem("View alphabet");
-		alphabetItem.setToolTipText("Display information about the alphabets of the selected automata");
-		menuHandler.add(alphabetItem, 1);
-
-		JMenuItem statesItem = new JMenuItem("View states");
-		statesItem.setToolTipText("Display information about the states of the selected automata");
-		menuHandler.add(statesItem, 1);
-
+		JMenu viewMenu = new JMenu("View");
+		menuHandler.add(viewMenu, 1);
+		
 		if (SupremicaProperties.useDot())
 		{
 			JMenuItem viewItem = new JMenuItem("View automaton");
 			viewItem.setToolTipText("Display graphical representation of the selected automata");
-			menuHandler.add(viewItem, 1);
+			//menuHandler.add(viewItem, 1);
+			viewMenu.add(viewItem);
 
 			viewItem.addActionListener(new ActionListener()
 			{
@@ -68,6 +60,21 @@ class MainPopupMenu
 				}
 			});
 		}
+
+		JMenuItem hierarchyItem = new JMenuItem("View modular structure");
+		hierarchyItem.setToolTipText("Display graphically the connections between different modules");
+		//menuHandler.add(hierarchyItem, 1);
+		viewMenu.add(hierarchyItem);
+
+		JMenuItem alphabetItem = new JMenuItem("View alphabet");
+		alphabetItem.setToolTipText("Display information about the alphabets of the selected automata");
+		//menuHandler.add(alphabetItem, 1);
+		viewMenu.add(alphabetItem);
+
+		JMenuItem statesItem = new JMenuItem("View states");
+		statesItem.setToolTipText("Display information about the states of the selected automata");
+		//menuHandler.add(statesItem, 1);
+		viewMenu.add(statesItem);
 
 		menuHandler.addSeparator();
 
@@ -290,7 +297,6 @@ class MainPopupMenu
 		if (SupremicaProperties.includeExperimentalAlgorithms())
 		{
 			JMenu expMenu = new JMenu("Experimental algorithms");
-
 			menuHandler.add(expMenu, 1);
 
 			// Strictly EXPERIMENTAL

@@ -83,8 +83,8 @@ public class AutomataExplorer
 	{
 		this.theAutomata = theAutomata;
 
-		// Generate options from defaule
-		SynchronizationOptions syncOptions = SynchronizationOptions.getDefaultSynchronizationOptions();
+		// Get current options
+		SynchronizationOptions syncOptions = new SynchronizationOptions();
 		syncOptions.setBuildAutomaton(false);
 		syncOptions.setRequireConsistentControllability(false);
 

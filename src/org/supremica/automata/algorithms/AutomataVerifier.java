@@ -286,7 +286,7 @@ public class AutomataVerifier
 
 					// This algorithm is under implementation!!
 					return modularNonblockingVerification();
-
+					//return compositionalNonblockingVerification();
 					// This algorithm only verifies pairwise nonblocking!!!
 					// return pairwiseNonblockingVerification();
 				}
@@ -1264,7 +1264,7 @@ public class AutomataVerifier
 		Automata unselected = ActionMan.getGui().getUnselectedAutomata();
 
 		// we already know the answer: L(P) = \Sigma^*
-		if (unselected.nbrOfAutomata() < 1)
+		if (unselected.size() < 1)
 		{
 			return true;
 		}
@@ -1781,10 +1781,101 @@ public class AutomataVerifier
 	{
 		// Make a copy that we can fiddle with
 		//Automata theAutomata = new Automata(theAutomata); 
+
+		while (theAutomata.size() >= 2)
+		{
+			// Get any automaton
+			Automaton autA = theAutomata.getFirstAutomaton();
+			Alphabet alphaA = autA.getAlphabet();
+			
+			// Find the pair (in which autA is a part) with the highest 
+			// "unique to total" (number of events) ratio
+			double bestRatio = 0;
+			Automaton bestAutB = null;
+			Alphabet hideThese = null;
+			for (int i=1; i<theAutomata.size(); i++)
+			{
+				Automaton autB = theAutomata.getAutomatonAt(i);
+				Alphabet alphaB = autB.getAlphabet();
+				
+				// If there is no common events, try next automaton
+				int nbrOfCommonEvents = alphaA.nbrOfCommonEvents(alphaB);
+				if (nbrOfCommonEvents == 0)
+				{
+					continue;
+				}
+				
+				// Calculate the alphabet of unique events
+				Alphabet uniqueEvents = Alphabet.union(alphaA, alphaB);
+				for (int j=1; j<theAutomata.size(); j++)
+				{
+					// Skip self
+					if (i == j)
+					{
+						continue;
+					}
+					
+					// Remove the events that are present in C, they are not unique to A and B.
+					Automaton autC = theAutomata.getAutomatonAt(j);
+					Alphabet alphaC = autC.getAlphabet();
+					uniqueEvents.minus(alphaC);
+					
+					// Early termination
+					if (uniqueEvents.size() == 0)
+					{
+						break;
+					}
+				}
+				
+				// Find ratio
+				int nbrOfUniqueEvents = uniqueEvents.size();
+				int unionAlphabetSize = alphaA.size() + alphaB.size() - nbrOfCommonEvents;
+				double thisRatio = nbrOfUniqueEvents/unionAlphabetSize;
+				
+				// Improvement?
+				if (thisRatio > bestRatio)
+				{
+					bestAutB = autB;
+					bestRatio = thisRatio;
+					hideThese = uniqueEvents;
+				}
+			}
+			
+			if (bestRatio > 0)
+			{
+				Automata automata = new Automata();
+				automata.addAutomaton(autA);
+				automata.addAutomaton(bestAutB);
+				
+				Automaton min = composeAndMinimize(automata, hideThese);
+				theAutomata.removeAutomata(automata);
+				theAutomata.addAutomaton(min);
+			}
+			else
+			{
+				logger.info("No pair found based on " + autA + ". Need to try triples?");
+				break;
+			}
+
+			try
+			{
+				Thread.sleep(2000);
+			}
+			catch (Exception apa)
+			{
+
+			}
+		}
 		
-		//composeAndMinimize(automata, hideThese);
-		
-		return false;
+		// How did it go?
+		if (theAutomata.size() == 1)
+		{
+			return verifyNonblocking(theAutomata.getFirstAutomaton());
+		}
+		else
+		{
+			return false;
+		}
 	}
 
 	private Automaton composeAndMinimize(Automata automata, Alphabet hideThese)

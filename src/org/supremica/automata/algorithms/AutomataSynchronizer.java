@@ -215,12 +215,8 @@ public class AutomataSynchronizer
 	public static Automaton synchronizeAutomata(Automata theAutomata)
 		throws Exception
 	{
-		SynchronizationOptions syncOptions;
-
-		syncOptions = SynchronizationOptions.getDefaultSynchronizationOptions();
-
+		SynchronizationOptions syncOptions = SynchronizationOptions.getDefaultSynchronizationOptions();
 		AutomataSynchronizer synchronizer = new AutomataSynchronizer(theAutomata, syncOptions);
-
 		synchronizer.execute();
 
 		return synchronizer.getAutomaton();

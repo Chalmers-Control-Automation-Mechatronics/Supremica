@@ -110,8 +110,7 @@ public class AutomatonMinimizer
 		for (Iterator it = theAutomaton.safeStateIterator(); it.hasNext(); )
 		{
 			State state = (State) it.next();
-			
-			if (state.getCost() == State.MAX_COST)
+			if ((state.getCost() == State.MAX_COST) && !state.isForbidden())
 			{
 				theAutomaton.removeState(state);
 			}
@@ -173,7 +172,7 @@ public class AutomatonMinimizer
 		catch (Exception ex)
 		{
 			logger.debug(ex.getStackTrace());
-
+			
 			throw ex;
 		}
 
@@ -220,7 +219,7 @@ public class AutomatonMinimizer
 		{
 			State currState = stateIt.nextState();
 			
-			if (currState.isForbidden())
+			if (currState.isForbidden() && !options.getIgnoreMarking())
 			{
 				currState.setStateSet(forbiddenStates);
 				forbiddenStates.add(currState);

@@ -64,7 +64,7 @@ public final class SynthesizerOptions
 	private boolean rememberDisabledEvents;
 
 	/**
-	 * The default options, based on earlier user preferences.
+	 * The current options, based on earlier user preferences.
 	 */
 	public SynthesizerOptions()
 	{
@@ -202,6 +202,6 @@ public final class SynthesizerOptions
 	 */
 	public static SynthesizerOptions getDefaultSynthesizerOptions()
 	{
-		return new SynthesizerOptions();
+		return new SynthesizerOptions(SynthesisType.Both, SynthesisAlgorithm.Modular, true, true, true, true, true);
 	}
 }

@@ -59,12 +59,24 @@ public final class MinimizationOptions
 	private boolean keepOriginal;
 	private boolean ignoreMarking;
 
+	/**
+	 * This constructor returns the options previously chosen by the user as per the state SupremicaProperties.
+	 */
 	public MinimizationOptions()
 	{
-		this(SupremicaProperties.minimizationMinimizationType(), SupremicaProperties.minimizationAlsoTransitions(), SupremicaProperties.minimizationKeepOriginal(), SupremicaProperties.minimizationIgnoreMarking());
+		this(SupremicaProperties.minimizationMinimizationType(), 
+			 SupremicaProperties.minimizationAlsoTransitions(), 
+			 SupremicaProperties.minimizationKeepOriginal(), 
+			 SupremicaProperties.minimizationIgnoreMarking());
 	}
 
-	public MinimizationOptions(EquivalenceRelation equivalenceRelation, boolean alsoTransitions, boolean keepOriginal, boolean ignoreMarking)
+	/**
+	 * This constructor lets you choose exactly what options you want. This is not recommended and is
+	 * therefore private. It is better to first use the "getDefault..."-methods and then 
+	 * modify the options you want (perhaps all of them).
+	 */
+	private MinimizationOptions(EquivalenceRelation equivalenceRelation, boolean alsoTransitions, 
+							   boolean keepOriginal, boolean ignoreMarking)
 	{
 		this.equivalenceRelation = equivalenceRelation;
 		this.alsoTransitions = alsoTransitions;
@@ -134,11 +146,10 @@ public final class MinimizationOptions
 	}
 
 	/**
-	 * Returns the default options for verification. This is the same as
-	 * in the default constructor in this class.
+	 * Returns the default options for minimization - this is with respect to observation equivalence.
 	 */
 	public static MinimizationOptions getDefaultMinimizationOptions()
 	{
-		return new MinimizationOptions();
+		return new MinimizationOptions(EquivalenceRelation.ObservationEquivalence, true, true, false);
 	}
 }

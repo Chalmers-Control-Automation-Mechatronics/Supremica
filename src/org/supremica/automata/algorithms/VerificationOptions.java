@@ -63,7 +63,7 @@ public final class VerificationOptions
 	private int nbrOfAttempts;
 
 	/**
-	 * The default options, based on earlier user preferences.
+	 * The current options, based on earlier user preferences.
 	 */
 	public VerificationOptions()
 	{
@@ -189,6 +189,8 @@ public final class VerificationOptions
 		VerificationOptions options = new VerificationOptions();
 		options.setVerificationType(VerificationType.Controllability);
 		options.setAlgorithmType(VerificationAlgorithm.Modular);
+		options.setOneEventAtATime(false);
+		options.setSkipUncontrollabilityCheck(false);
 		return options;
 	}
 
@@ -197,9 +199,8 @@ public final class VerificationOptions
 	 */
 	public static VerificationOptions getDefaultLanguageInclusionOptions()
 	{
-		VerificationOptions options = new VerificationOptions();
+		VerificationOptions options = getDefaultControllabilityOptions();
 		options.setVerificationType(VerificationType.LanguageInclusion);
-		options.setAlgorithmType(VerificationAlgorithm.Modular);
 		return options;
 	}
 }

@@ -70,17 +70,18 @@ public final class SynchronizationOptions
 	private boolean dialogOK = false;
 
 	/**
-	 * The default options, based on earlier user preferences.
+	 * The current options, based on earlier user preferences.
 	 */
 	public SynchronizationOptions()
 		throws IllegalArgumentException
 	{
 		this(SupremicaProperties.syncNbrOfExecuters(), SynchronizationType.Prioritized, SupremicaProperties.syncInitialHashtableSize(), SupremicaProperties.syncExpandHashtable(), SupremicaProperties.syncForbidUncontrollableStates(), SupremicaProperties.syncExpandForbiddenStates(), 
-			 false,    // expandEventsUsingPriority
-			 true,    // buildAutomaton
-			 SupremicaProperties.verboseMode(), true,    // requireConsistentControllability
-			 true,    // requireConsistentImmediate
-			 false);    // rememberDisabledEvents
+			 false,                                   // expandEventsUsingPriority
+			 true,                                    // buildAutomaton
+			 SupremicaProperties.verboseMode(),       // Should always be decided by user! Doesn't belong here?
+			 true,                                    // requireConsistentControllability
+			 true,                                    // requireConsistentImmediate
+			 false);                                  // rememberDisabledEvents
 	}
 
 	/**
@@ -154,6 +155,11 @@ public final class SynchronizationOptions
 	public boolean expandHashtable()
 	{
 		return expandHashtable;
+	}
+
+	public void setExpandHashtable(boolean set)
+	{
+		expandHashtable = set;
 	}
 
 	public boolean forbidUncontrollableStates()
@@ -265,16 +271,24 @@ public final class SynchronizationOptions
 	 */
 	public static SynchronizationOptions getDefaultSynchronizationOptions()
 	{
+		SynchronizationOptions options = new SynchronizationOptions();
+		options.setSynchronizationType(SynchronizationType.Prioritized);
+		options.setForbidUncontrollableStates(true);  // This is controversial!
+		options.setExpandForbiddenStates(true);
+		options.setExpandHashtable(true);
 		return new SynchronizationOptions();
 	}
 
 	/**
-	 * Returns the default options for verification.
+	 * Returns the default options for verification. For example, when performing verification, we do 
+	 * not want to build the full automaton model. The abstract indexForm representation is enough. 
+	 * That is why buildAutomaton is set to be false.
 	 */
 	public static SynchronizationOptions getDefaultVerificationOptions()
 	{
-		SynchronizationOptions options = new SynchronizationOptions();
-		options.setBuildAutomaton(false);
+		SynchronizationOptions options = getDefaultSynchronizationOptions();
+		options.setBuildAutomaton(false);        // We don't want to see the stuff, anyway...
+		options.setExpandForbiddenStates(false); // Don't need to do that, then...
 		return options;
 	}
 
@@ -283,8 +297,9 @@ public final class SynchronizationOptions
 	 */
 	public static SynchronizationOptions getDefaultSynthesisOptions()
 	{
-		SynchronizationOptions options = new SynchronizationOptions();
+		SynchronizationOptions options = getDefaultSynchronizationOptions();
 		options.setForbidUncontrollableStates(true);
+		options.setExpandForbiddenStates(false); // Don't need to do that if we're not using it anyway...
 		return options;
 	}
 }

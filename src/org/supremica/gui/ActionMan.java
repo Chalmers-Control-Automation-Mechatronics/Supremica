@@ -1382,7 +1382,7 @@ public class ActionMan
 			return;
 		}
 
-		// Get the default options
+		// Get the current options
 		SynchronizationOptions synchronizationOptions;
 
 		try
@@ -1422,10 +1422,9 @@ public class ActionMan
 			return;
 		}
 
-		// Get the default options and allow the user to change them...
-		SynthesizerOptions synthesizerOptions = SynthesizerOptions.getDefaultSynthesizerOptions();
+		// Get the current options and allow the user to change them...
+		SynthesizerOptions synthesizerOptions = new SynthesizerOptions();
 		SynthesizerDialog synthesizerDialog = new SynthesizerDialog(gui.getFrame(), selectedAutomata.size(), synthesizerOptions);
-
 		synthesizerDialog.show();
 
 		if (!synthesizerOptions.getDialogOK())
@@ -1434,19 +1433,18 @@ public class ActionMan
 		}
 
 		ActionTimer timer = null;
-
+		
+		// One or more automata selected?
 		if (selectedAutomata.size() > 1)
 		{
-			SynchronizationOptions syncOptions;
-			syncOptions = SynchronizationOptions.getDefaultSynthesisOptions();
-
+			SynchronizationOptions syncOptions = SynchronizationOptions.getDefaultSynthesisOptions();
+			
 			try
 			{
-				AutomataSynthesizer synthesizer = new AutomataSynthesizer(gui, selectedAutomata, syncOptions, synthesizerOptions);
-
+				AutomataSynthesizer synthesizer = new AutomataSynthesizer(gui, selectedAutomata, syncOptions, 
+																		  synthesizerOptions);
 				synthesizer.execute();
-
-				// elapsedTime = synthesizer.elapsedTime();
+				
 				timer = synthesizer.getTimer();
 			}
 			catch (Exception ex)
@@ -1464,9 +1462,9 @@ public class ActionMan
 				// ARASH: this is IDIOTIC! why didnt we prepare for more than one monolithc algorithm???
 				// (this is a dirty fix, should use a factory instead)
 				AutomatonSynthesizer synthesizer = (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.MonolithicSingleFixpoint)
-												   ? new AutomatonSynthesizerSingleFixpoint(theAutomaton, synthesizerOptions)
-												   : new AutomatonSynthesizer(theAutomaton, synthesizerOptions);
-
+					? new AutomatonSynthesizerSingleFixpoint(theAutomaton, synthesizerOptions)
+					: new AutomatonSynthesizer(theAutomaton, synthesizerOptions);
+				
 				// AutomatonSynthesizer synthesizer = new AutomatonSynthesizer(theAutomaton,synthesizerOptions);
 				synthesizer.synthesize();
 			}
@@ -1475,37 +1473,6 @@ public class ActionMan
 				logger.error("Exception in AutomatonSynthesizer. Automaton: " + theAutomaton.getName(), ex);
 				logger.debug(ex.getStackTrace());
 			}
-
-			/*
-			Iterator autIt = selectedAutomata.iterator();
-
-			while (autIt.hasNext())
-			{
-					Automaton currAutomaton = (Automaton) autIt.next();
-					AutomatonSynthesizer synthesizer;
-
-					try
-					{
-							synthesizer = new AutomatonSynthesizer(currAutomaton, synthesizerOptions);
-					}
-					catch (Exception ex)
-					{
-							JOptionPane.showMessageDialog(gui.getComponent(), ex.toString(), "Alert", JOptionPane.ERROR_MESSAGE);
-							logger.debug(ex.getStackTrace());
-							return;
-					}
-
-					try
-					{
-							synthesizer.synthesize();
-					}
-					catch (Exception ex)
-					{
-							logger.error("Exception in AutomatonSynthesizer. Automaton: " + currAutomaton.getName(), ex);
-							logger.debug(ex.getStackTrace());
-					}
-			}
-			*/
 		}
 
 		if (timer != null)
@@ -1525,7 +1492,7 @@ public class ActionMan
 			return;
 		}
 
-		// Get the default options and allow the user to change them...
+		// Get the current options and allow the user to change them...
 		VerificationOptions verificationOptions = new VerificationOptions();
 		VerificationDialog verificationDialog = new VerificationDialog(gui.getFrame(), verificationOptions);
 		verificationDialog.show();
@@ -1764,7 +1731,7 @@ public class ActionMan
 			return;
 		}
 
-		// Get the default options and allow the user to change them...
+		// Get the current options and allow the user to change them...
 		MinimizationOptions options = new MinimizationOptions();
 		MinimizationDialog dialog = new MinimizationDialog(gui.getFrame(), options);
 		dialog.show();
@@ -2697,7 +2664,6 @@ public class ActionMan
 
 		try
 		{
-
 			// Synchronize the automata using default options (prediction will
 			// probably be a problem if there are non-prioritized events)
 			syncOptions = new SynchronizationOptions();

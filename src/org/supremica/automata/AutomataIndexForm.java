@@ -55,31 +55,31 @@ import org.supremica.log.*;
 public final class AutomataIndexForm
 {
 
-	// <automaton,event> -> <true|false>
+	// <automaton, event> -> <true|false>
 	private boolean[][] alphabetEventsTable;
 
-	// <automaton,event> -> <true|false>
+	// <automaton, event> -> <true|false>
 	private boolean[][] prioritizedEventsTable;
 
-	// <automaton,state> -> <event[]>
+	// <automaton, state> -> <event[]>
 	private int[][][] outgoingEventsTable;
 
-	// <automaton,state> -> <event[]>
+	// <automaton, state> -> <event[]>
 	private int[][][] incomingEventsTable;
 
-	// <automaton,state,event> -> <state>
+	// <automaton, state, event> -> <state>
 	private int[][][] nextStateTable;
 
-	// <automaton,state,event> -> <state[]>
+	// <automaton, state, event> -> <state[]>
 	private int[][][][] nextStatesTable;
 
 	// <automaton, state, event> -> <state[]>
 	private int[][][][] prevStatesTable;
 
-	// <automaton,state> -> <State>
+	// <automaton, state> -> <State>
 	private State[][] stateTable;
 
-	// <automaton,state> -> <status>
+	// <automaton, state> -> <status>
 	private int[][] stateStatusTable;
 
 	// <event> -> <true|false>
