@@ -331,11 +331,11 @@ public class RouteController
 			}
 		}
 
-		System.out.println("MatlyftLevel     : " + matlyftLevel);
-		System.out.println("HissLevel        : " + hissLevel);
-		System.out.println("ArmLevel         : " + armLevel);
-		System.out.println("ArmAngle         : " + armAngle);
-		System.out.println("");
+		//		System.out.println("MatlyftLevel     : " + matlyftLevel);
+		//System.out.println("HissLevel        : " + hissLevel);
+		//System.out.println("ArmLevel         : " + armLevel);
+		//System.out.println("ArmAngle         : " + armAngle);
+		//System.out.println("");
 
 		// -----------------------------------
 

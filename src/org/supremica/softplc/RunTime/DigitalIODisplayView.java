@@ -123,14 +123,15 @@ public class DigitalIODisplayView
 
 		for (i = 0; i < nr_Of_Signals_In; i++)
 		{
-			System.out.println(i);
-
-			cbSignalsIn[i] = new JCheckBox();
-
-			cbSignalsIn[i].setText(inputDescriptions[i]);
-			cbSignalsIn[i].setBackground(Color.white);
-			cbSignalsIn[i].setEnabled(false);
-			signalPanelIn.add(cbSignalsIn[i], null);
+		    //Varför?? Finns det någon mening eller ska det bort?
+		    System.out.println(i);
+		    
+		    cbSignalsIn[i] = new JCheckBox();
+		    
+		    cbSignalsIn[i].setText(inputDescriptions[i]);
+		    cbSignalsIn[i].setBackground(Color.white);
+		    cbSignalsIn[i].setEnabled(false);
+		    signalPanelIn.add(cbSignalsIn[i], null);
 		}
 
 		for (i = 0; i < nr_Of_Signals_Out; i++)
@@ -147,6 +148,7 @@ public class DigitalIODisplayView
 		signalPanelScroller.setAlignmentX(LEFT_ALIGNMENT);
 		descriptions.setAlignmentX(LEFT_ALIGNMENT);
 		descIn.setFont(new Font("Arial", Font.PLAIN, 18));
+		descIn.setSize(160,20);
 		descUt.setFont(new Font("Arial", Font.PLAIN, 18));
 		descriptions.add(descIn);
 		descriptions.add(descUt);
@@ -184,7 +186,7 @@ public class DigitalIODisplayView
 		jMenuBar1.add(jMenuFile);
 		jMenuBar1.add(jMenuHelp);
 		this.getContentPane().setBackground(Color.white);
-		this.setSize(new Dimension(110, 600));
+		this.setSize(new Dimension(320, 630));
 		this.setTitle("Display");
 		this.setJMenuBar(jMenuBar1);
 	}

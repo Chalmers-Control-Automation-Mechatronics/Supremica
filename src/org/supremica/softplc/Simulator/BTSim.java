@@ -96,29 +96,29 @@ public class BTSim
 	{
 		String[] temp = new String[nrOfSignalsIn];
 
-		temp[0] = new String("KulaPortvakt"); //Names the signals in use
-		temp[1] = new String("MätlyftNere");
-		temp[2] = new String("KulaMätlyft");
-		temp[3] = new String("MätLyftUppe");
-		temp[4] = new String("KulaMätstation");
-		temp[5] = new String("StorKula");
-		temp[6] = new String("LitenKula");
-		temp[7] = new String("HissNere");
-		temp[8] = new String("KulaHiss");
-		temp[9] = new String("HissVån1");
-		temp[10] = new String("KulaVån1");
-		temp[11] = new String("PlockaVån1");
-		temp[12] = new String("HissVån2");
-		temp[13] = new String("KulaVån2");
-		temp[14] = new String("PlockaVån2");
-		temp[15] = new String("ArmHemma");
-		temp[16] = new String("ArmVån1");
-		temp[17] = new String("ArmVån2");
-		temp[18] = new String("KulaFast");
-		temp[19] = new String("Autostart");
-		temp[20] = new String("ManuellStart");
-		temp[21] = new String("Nödstopp");
-		temp[22] = new String("LarmKvittering");
+		temp[0] = new String("0 - KulaPortvakt"); //Names the signals in use
+		temp[1] = new String("1 - MätlyftNere");
+		temp[2] = new String("2 - KulaMätlyft");
+		temp[3] = new String("3 - MätLyftUppe");
+		temp[4] = new String("4 - KulaMätstation");
+		temp[5] = new String("5 - StorKula");
+		temp[6] = new String("6 - LitenKula");
+		temp[7] = new String("7 - HissNere");
+		temp[8] = new String("10 - KulaHiss");
+		temp[9] = new String("11 - HissVån1");
+		temp[10] = new String("12 - KulaVån1");
+		temp[11] = new String("13 - PlockaVån1");
+		temp[12] = new String("14 - HissVån2");
+		temp[13] = new String("15 - KulaVån2");
+		temp[14] = new String("16 - PlockaVån2");
+		temp[15] = new String("17 - ArmHemma");
+		temp[16] = new String("20 - ArmVån1");
+		temp[17] = new String("21 - ArmVån2");
+		temp[18] = new String("22 - KulaFast");
+		temp[19] = new String("23 - Autostart");
+		temp[20] = new String("24 - ManuellStart");
+		temp[21] = new String("25 - Nödstopp");
+		temp[22] = new String("26 - LarmKvittering");
 
 		for (int i = 23; i < nrOfSignalsOut; i++) //names the signals NOT in use
 			{
@@ -133,22 +133,22 @@ public class BTSim
 	{
 		String[] temp = new String[nrOfSignalsOut];
 
-		temp[0] = new String("InPortvakt"); //Names the signals in use
-		temp[1] = new String("UrPortvakt");
-		temp[2] = new String("UppMätlyft");
-		temp[3] = new String("UrMätning");
-		temp[4] = new String("Mät");
-		temp[5] = new String("UppHissVån1");
-		temp[6] = new String("UppHissVån2");
-		temp[7] = new String("UtVån1");
-		temp[8] = new String("LyftVån1");
-		temp[9] = new String("UtVån2");
-		temp[10] = new String("LyftVån2");
-		temp[11] = new String("UppArmVån1");
-		temp[12] = new String("UppArmVån2");
-		temp[13] = new String("VridArmHöger");
-		temp[14] = new String("Sug");
-		temp[15] = new String("TändLampa");
+		temp[0] = new String("0 - InPortvakt"); //Names the signals in use
+		temp[1] = new String("1 - UrPortvakt");
+		temp[2] = new String("2 - UppMätlyft");
+		temp[3] = new String("3 - UrMätning");
+		temp[4] = new String("4 - Mät");
+		temp[5] = new String("5 - UppHissVån1");
+		temp[6] = new String("6 - UppHissVån2");
+		temp[7] = new String("7 - UtVån1");
+		temp[8] = new String("10 - LyftVån1");
+		temp[9] = new String("11 - UtVån2");
+		temp[10] = new String("12 - LyftVån2");
+		temp[11] = new String("13 - UppArmVån1");
+		temp[12] = new String("14 - UppArmVån2");
+		temp[13] = new String("15 - VridArmHöger");
+		temp[14] = new String("16 - Sug");
+		temp[15] = new String("17 - TändLampa");
 
 		for (int i = 16; i < nrOfSignalsOut; i++) //Nubmers the signals NOT in use
 		{
