@@ -1,4 +1,3 @@
-
 /*
  *  Supremica Software License Agreement
  *
@@ -68,7 +67,7 @@ public class AutomataHierarchyViewer
 		this.theAutomata = theAutomata;
 
 		//super.setObjectName("Hierarchy " + theAutomata);
-		super.setObjectName("Hierarchy");
+		super.setObjectName("Modular structure");
 		theAutomata.getListeners().addListener(this);
 	}
 

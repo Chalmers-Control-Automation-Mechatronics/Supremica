@@ -41,7 +41,7 @@ class MainPopupMenu
 
 		menuHandler.add(exploreItem, 1);
 
-		JMenuItem hierarchyItem = new JMenuItem("View hierarchy");
+		JMenuItem hierarchyItem = new JMenuItem("View modular structure");
 
 		menuHandler.add(hierarchyItem, 1);
 
@@ -84,12 +84,10 @@ class MainPopupMenu
 		menuHandler.addSeparator();
 
 		JMenuItem workbench = new SupremicaMenuItem(new WorkbenchAction());
-
 		menuHandler.add(workbench, 1);
 		menuHandler.addSeparator();
 
 		JMenuItem purgeItem = new JMenuItem("Purge");
-
 		menuHandler.add(purgeItem, 1);
 
 		// These are the "standard" algorithms
@@ -98,19 +96,15 @@ class MainPopupMenu
 		// JMenu standardalgos = JMenu("Standard Algorithms");
 		// menuHandler.add(standardalgos, 0);
 		JMenuItem minimizeItem = new JMenuItem("Minimize");
-
 		menuHandler.add(minimizeItem, 1);
 
 		JMenuItem allAcceptingItem = new JMenuItem("Set all states as accepting");
-
 		menuHandler.add(allAcceptingItem, 1);
 
 		JMenuItem stateEnumerator = new JMenuItem(ActionMan.stateEnumerator);
-
 		menuHandler.add(stateEnumerator, 1);
 
 		JMenuItem complementItem = new JMenuItem("Automaton complement");
-
 		complementItem.setToolTipText("Generate an automaton with complementary marked language");
 		menuHandler.add(complementItem, 1);
 

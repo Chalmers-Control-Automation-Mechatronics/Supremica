@@ -643,7 +643,6 @@ public class Automata
 	 */
 	public boolean isEventNamesSafe()
 	{
-
 		// Get the union alphabet, ignoring consistency for now
 		Alphabet unionAlphabet = null;
 
@@ -660,11 +659,68 @@ public class Automata
 	}
 
 	/**
+	 * Returns true if the system is really several systems, i.e. can be divided into sets of
+	 * automata that have disjoint alphabets.
+	 */
+	public boolean isSeveralSystems()
+	{
+		Automata autA = new Automata(this.getFirstAutomaton());
+		Alphabet unionAlpha = autA.getUnionAlphabet();
+		boolean change = true;
+
+		while (change)
+		{
+			change = false;
+			AutomatonIterator autIt = this.iterator();
+			autIt.nextAutomaton(); // The first is already taken care of
+			
+			// Loop and compare alphabets
+			while(autIt.hasNext())
+			{
+				Automaton theAut = autIt.nextAutomaton();
+				if (autA.containsAutomaton(theAut))
+				{
+					continue;
+				}
+				Alphabet alpha = theAut.getAlphabet();
+				
+				// Compare the alphabets!
+				Alphabet diff = Alphabet.minus(alpha, unionAlpha);			
+				if (diff.size() == alpha.size())
+				{   // Disjoint (so far)
+					
+				}
+				else if (diff.size() > 0)
+				{   // Not disjoint, new events in unionAlpha!
+					autA.addAutomaton(theAut);
+					unionAlpha = autA.getUnionAlphabet();
+					change = true;
+				}
+				else
+				{   // Not disjoint, no change!
+					autA.addAutomaton(theAut);
+				}
+			}		
+		}
+		
+		// What's the result?
+		if (unionAlpha.size() < this.getUnionAlphabet().size())
+		{
+			if (autA.size() > 1)
+				logger.warn("Some of the selected automata share no event with the other selected automata. For example, the automata " + autA + " are disconnected from the rest.");
+			else
+				logger.warn("Some of the selected automata share no event with the other selected automata. For example, the automaton " + autA + " is disconnected from the rest.");
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
 	 * Returns true if the controllability is consistent through all the automata.
 	 */
 	public boolean isEventControllabilityConsistent()
 	{
-
 		// Get the union alphabet, ignoring consistency for now
 		Alphabet unionAlphabet = null;
 
@@ -1227,9 +1283,12 @@ public class Automata
 	 */
 	public boolean sanityCheck(Gui gui, int minSize, boolean mustHaveInitial, boolean mustHaveValidType, boolean mustBeControllabilityConsistent)
 	{
-
 		// Warns if there are events with equal (lowercase) names.
 		isEventNamesSafe();
+
+		// Warns if the system has dsjoint modules (the system can be divided into at least two sets 
+		// of modules whose union alphabets are disjoint)
+		isSeveralSystems();
 
 		// Examines controllability consitency
 		if (mustBeControllabilityConsistent &&!isEventControllabilityConsistent())

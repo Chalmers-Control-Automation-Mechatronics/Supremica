@@ -1,4 +1,3 @@
-
 /*
  *  Supremica Software License Agreement
  *
@@ -158,7 +157,7 @@ public class AutomataToHierarchyToDot
 	public void serialize(PrintWriter pw)
 		throws Exception
 	{
-		pw.println("graph hierarchy {");
+		pw.println("graph structure {");
 
 		// pw.println("\tcenter = true;");
 		// Left to right or top to bottom?

@@ -669,7 +669,6 @@
 		<from address="ka@s2.chalmers.se"/>
 		<to address="ka@s2.chalmers.se"/>
 		<message>The daily build has completed</message>
-
 	</mail>
 </target>
 

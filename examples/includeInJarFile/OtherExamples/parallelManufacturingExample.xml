@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Automata name="Parallel Manufacturing Example" comment="This example was found in Ryan James Leducs PhD-thesis 'Hierarchical Interface-based Supervisory Control'. The system is controllable and non-blocking.">
+<Automata name="Parallel Manufacturing Example" comment="This example was found in Ryan James Leduc's PhD-thesis 'Hierarchical Interface-based Supervisory Control'. The system is controllable and nonblocking.">
 <!-- PLANTS FOR THE HIGH LEVEL -->
 <Automaton name="HighLevel-PackagingSystem" type="Plant">
 	<Events>
