@@ -231,8 +231,6 @@ public class VariableChecker implements SimpleNodeVisitor {
 
 
 
-		System.out.println("***** visitVariable: " + n.getName());
-
 		if (!n.isDirectVariable()) {
 
 			/*
@@ -405,7 +403,6 @@ public class VariableChecker implements SimpleNodeVisitor {
     }
 
     public Object visitIL_SIMPLE_OPERATION(ASTil_simple_operation n,Object o) {
-		System.out.println("*** visitIL_SIMPLE_OPERATION");
 
         Node[] children = n.getChildren();
 		if (children != null) {
