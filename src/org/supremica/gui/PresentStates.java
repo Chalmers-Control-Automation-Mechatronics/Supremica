@@ -95,7 +95,11 @@ class PresentStatesTableModel
 	{
 		return ss.getState(col, row).getName();
 	}
-
+	// None of the cells are editable (DefaultTableMode return true! AbstractTableModel does not!!) 
+	public boolean isCellEditable(int rowIndex, int columnIndex) 
+	{
+		return false;
+	}
 }
 
 class PresentStatesTable

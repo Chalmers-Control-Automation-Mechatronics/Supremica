@@ -36,4 +36,10 @@ public class Utility
 	{
 		pane.getViewport().setBackground(Color.white);
 	}
+	
+	static JButton setDefaultButton(JFrame frame, JButton b)
+	{
+		frame.getRootPane().setDefaultButton(b);
+		return b;
+	}
 }

@@ -168,7 +168,7 @@ class MainPopupMenu
 			}
 		});
 
-		// ** MF Find States **
+		//-- MF Find States --
 		JMenuItem findStatesItem = new JMenuItem("Find States...");
 
 		menuHandler.add(findStatesItem, 1);
@@ -182,8 +182,23 @@ class MainPopupMenu
 				getGui().repaint();
 			}
 		});
-		menuHandler.addSeparator();
+		
+		//-- MF Route --
+		JMenuItem routeItem = new JMenuItem("Route...");
+		
+		menuHandler.add(routeItem, 1);
+		routeItem.addActionListener(new ActionListener()
+		{
 
+			// anonymous class (is this a good thing?)
+			public void actionPerformed(ActionEvent e)
+			{
+				ActionMan.routeAction(getGui());
+				getGui().repaint();
+			}
+		});
+
+		menuHandler.addSeparator();
 		// ----------------------------------------------
 		JMenuItem copyItem = new JMenuItem("Copy");
 

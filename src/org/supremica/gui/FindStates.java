@@ -55,18 +55,22 @@
 // Implements the FindStates dialog with regexps
 package org.supremica.gui;
 
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.table.*;
-import org.supremica.log.*;
+import javax.swing.event.*;
+
 import org.apache.oro.text.regex.*;
+
+import org.supremica.log.*;
 import org.supremica.automata.algorithms.*;
 import org.supremica.util.*;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
+import org.supremica.automata.AutomataListener;
 // ----------------------------------------------------------------------------------
 // compiler type should be adjustable, but as for now, we only support a single type
 class CompilerFactory
@@ -81,65 +85,58 @@ class CompilerFactory
 // It takes a compiler to be able to verify the correctness
 // of the patterns on-line
 class FindStatesTableModel
-	extends AbstractTableModel
+	extends AbstractTableModel 
+	implements AutomataListener // could usefully inherit from AutomataTableModel or something like that
 {
 	private static Logger logger = LoggerFactory.createLogger(FindStatesTableModel.class);
-	private Pattern[] patterns = null;
+	// private Pattern[] patterns = null;
 	private PatternCompiler comp = null;
 	private String[] columnNames = { "Automaton", "Type", "Regular Expression" };
-	private Object[][] cells = null;
-	private final static int AUTOMATON_COL = 0;
-	private final static int TYPE_COL = AUTOMATON_COL + 1;
-	private final static int REGEXP_COL = TYPE_COL + 1;
+	// private Object[][] cells = null;
+	private Automata automata;
+	private HashMap hashmap = new HashMap();
+	
+	public final static int AUTOMATON_COL = 0;
+	public final static int TYPE_COL = AUTOMATON_COL + 1;
+	public final static int REGEXP_COL = TYPE_COL + 1;
 
 	public FindStatesTableModel(Automata a, PatternCompiler c)
 	{
-		final int size = a.size();
+/*		final int size = a.size();
 
 		cells = new Object[size][REGEXP_COL + 1];
 
-		for (int it = 0; it < size; ++it)
+		for (int i = 0; i < size; ++i)
 		{
-			cells[it][AUTOMATON_COL] = a.getAutomatonAt(it).getName();
-			cells[it][TYPE_COL] = a.getAutomatonAt(it).getType().toString();
-			cells[it][REGEXP_COL] = ".*";
-			
-			/*-------------- just testin'
-			Automaton automaton = a.getAutomatonAt(it);
-			logger.debug(automaton.getName());
-			int num_states = automaton.nbrOfStates();
-			for(int i = 0; i < num_states; ++i)
-			{
-				String name = automaton.getStateNameWithIndex(i);
-				if(name == null)
-				{
-					logger.debug("Fishy...");
-				}
-				else
-				{
-					logger.debug(name);
-				}
-			}
-			*///----------------- test
+			cells[i][AUTOMATON_COL] = a.getAutomatonAt(i).getName();
+			cells[i][TYPE_COL] = a.getAutomatonAt(i).getType().toString();
+			cells[i][REGEXP_COL] = ".*";
 		}
-
-		comp = c;
-		patterns = new Pattern[size];
-
+*/
+		this.automata = a;
+		this.comp = c;
+		// this.patterns = new Pattern[a.size()];
+		
+		automata.addListener(this);
+		
 		try
-		{
+		{	// I know compile _cannot_ throw here, but Java requires me to catch this exception
 
-			// I know compile _cannot_ throw here, but Java requires me to catch this exception
-			Pattern any_string = comp.compile(".*");
+			for(Iterator it = a.iterator(); it.hasNext(); )
+			{
+				hashmap.put(it.next(), comp.compile(".*"));
+			}
+			
+/*			Pattern any_string = comp.compile(".*");
 
 			for (int i = 0; i < patterns.length; ++i)
 			{
 				patterns[i] = any_string;
-			}
+			}*/
 		}
 		catch (MalformedPatternException excp)
 		{
-			System.err.println("This should never happend");
+			System.err.println("This should never happen!");
 		}
 	}
 
@@ -147,12 +144,12 @@ class FindStatesTableModel
 	{
 		return columnNames[col];
 	}
-
+/*
 	public Class getColumnClass(int col)
 	{
 		return cells[0][col].getClass();
 	}
-
+*/
 	public int getColumnCount()
 	{
 		return columnNames.length;
@@ -160,23 +157,34 @@ class FindStatesTableModel
 
 	public int getRowCount()
 	{
-		return cells.length;
+		// return cells.length;
+		return automata.getNbrOfAutomata();
 	}
 
 	public Object getValueAt(int row, int col)
 	{
-		return cells[row][col];
+		Automaton automaton = automata.getAutomatonAt(row);
+		switch(col)
+		{
+			case AUTOMATON_COL: return automaton.getName();
+			case TYPE_COL: return automaton.getType();
+			case REGEXP_COL: return ((Pattern)hashmap.get(automaton)).getPattern();
+		}
+		return null;
+		// return cells[row][col];
 	}
 
 	public void setValueAt(Object obj, int row, int col)
 	{
-		cells[row][col] = obj;
+		// cells[row][col] = obj;
 
 		if (isRegexpColumn(col))
 		{
 			try
 			{
-				patterns[row] = comp.compile((String) obj);
+				Automaton automaton = automata.getAutomatonAt(row);
+				// patterns[row] = comp.compile((String) obj);
+				hashmap.put(automaton, comp.compile((String) obj));
 			}
 			catch (MalformedPatternException excp)
 			{
@@ -188,9 +196,10 @@ class FindStatesTableModel
 
 	public boolean isCellEditable(int row, int col)
 	{
-		return col == REGEXP_COL;
-
 		// the one and only editable column
+		// return col == REGEXP_COL;
+		// Dec'01 no (directly) editable column
+		return false;
 	}
 
 	public boolean isRegexpColumn(int col)
@@ -200,26 +209,72 @@ class FindStatesTableModel
 
 	public Pattern[] getRegexpPatterns()
 	{
+		Pattern[] patterns = new Pattern[automata.size()];
+		for(int i = 0; i < automata.size(); ++i)
+		{
+			patterns[i] = (Pattern)hashmap.get(automata.getAutomatonAt(i));
+		}
 		return patterns;
+	}
+	
+	// implementation of AutomataListener interface
+	private void updateListeners()
+	{
+		TableModelEvent event = new TableModelEvent(this, 0, automata.getNbrOfAutomata() - 1);
+		fireTableChanged(event);
+	}
+
+	public void automatonAdded(Automata automata, Automaton automaton)
+	{
+		updateListeners();
+	}
+
+	public void automatonRemoved(Automata automata, Automaton automaton)
+	{
+		// need to remove its pattern
+		hashmap.remove(automaton);
+		updateListeners();
+	}
+
+	public void automatonRenamed(Automata automata, Automaton automaton)
+	{
+		updateListeners();
+	}
+
+	public void updated(Object theObject)
+	{
+		updateListeners();
 	}
 }
 
 // -----------------------------------
 class FindStatesTable
-	extends JTable
+	extends JTable 
 {
+	private static Logger logger = LoggerFactory.createLogger(FindStatesTable.class);
 
+	private Automata automata;
+	private JFrame frame;
+	
 	// local utility functions
 	private TableSorter getTableSorterModel()
 	{
 		return (TableSorter) getModel();
 	}
-
 	private FindStatesTableModel getStatesTableModel()
 	{
 		return (FindStatesTableModel) getTableSorterModel().getModel();
 	}
-
+	private Automaton getAutomaton(int row)
+	{
+		String name = (String) getModel().getValueAt(row, FindStatesTableModel.AUTOMATON_COL);
+		return automata.getAutomaton(name);
+	}
+	private void deleteAutomaton(int row)
+	{
+		automata.removeAutomaton(getAutomaton(row));
+		
+	}	
 	private void doRepaint()
 	{
 		repaint();
@@ -230,41 +285,58 @@ class FindStatesTable
 		return this;
 	}
 
-	// ** Inner class, needs access to the model
+	// Inner class, needs access to the model
 	class RegexpPopupMenu
 		extends JPopupMenu
 	{
 		int row;
-		int col;
 
-		public RegexpPopupMenu(int r, int c)
+		public RegexpPopupMenu(int r)
 		{
 			super("RegexpPopup");
 
-			row = r;
-			col = c;
+			this.row = r;
 
 			JMenuItem edit_item = add("Edit");
-
+			this.add(new JSeparator());
+			JMenuItem delete_item = add("Delete");
+			JMenuItem quit_item = add("Cancel");
+			
 			edit_item.addActionListener(new ActionListener()
 			{
-
-				// anonymous class
-				public void actionPerformed(ActionEvent e)
+				public void actionPerformed(ActionEvent e) // anonymous class
 				{
-					String str = (String) getModel().getValueAt(row, col);
-					RegexpDialog regexp_dialog = new RegexpDialog(null, str);
+					String str = (String) getModel().getValueAt(row, FindStatesTableModel.REGEXP_COL);
+					RegexpDialog regexp_dialog = new RegexpDialog(null, getAutomaton(row), str);
 
 					if (regexp_dialog.isOk())
 					{
-						getModel().setValueAt(regexp_dialog.getText(), row, col);
+						getModel().setValueAt(regexp_dialog.getText(), row, FindStatesTableModel.REGEXP_COL);
 					}
 
 					doRepaint();
-
-					// for resolving ambiguity
 				}
 			});
+			
+			delete_item.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e) // anonymous class
+				{
+					Automaton automaton = getAutomaton(row);
+					logger.debug("Removing " + automaton.getName());
+					automata.removeAutomaton(automaton);
+					doRepaint();
+				}
+			});
+			
+			quit_item.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e) // anonymous class
+				{
+					frame.dispose();
+				}
+			});
+
 		}
 	}
 
@@ -278,15 +350,18 @@ class FindStatesTable
 		return sorter;
 	}
 
-	public FindStatesTable(Automata a)
+	public FindStatesTable(Automata a, JFrame frame)
 	{
-
-		// ** If TableSorter had a proper constructor we could have done
-		// ** super(new TableSorter(new FindStatesTableModel(a)));
 		super(makeTableModel(a));
-
+		
+		this.automata = a;
+		this.frame = frame;
+		
 		getTableSorterModel().addMouseListenerToHeaderInTable(this);
-
+		getStatesTableModel().addTableModelListener(this);
+		
+		setSelectionMode(ListSelectionModel.SINGLE_SELECTION);// no use allowing multirow selection here (is there?)
+		
 		// Note! This code is duplicated (almost) from Supremica.java
 		addMouseListener(new MouseAdapter()
 		{
@@ -324,14 +399,14 @@ class FindStatesTable
 						setRowSelectionInterval(row, row);
 					}
 
-					// 
-					if (getStatesTableModel().isRegexpColumn(col))
+					// Dec'01, only edit through the dialog and through click in any column
+					//if (getStatesTableModel().isRegexpColumn(col))
 					{
-						RegexpPopupMenu regexp_popup = new RegexpPopupMenu(row, col);
+						RegexpPopupMenu regexp_popup = new RegexpPopupMenu(row);
 
 						regexp_popup.show(e.getComponent(), e.getX(), e.getY());
 					}
-					else
+//					else
 					{
 						// in table but not in the regexp column - show main menu
 						// Supremica.menuHandler.getDisabledPopupMenu(getThisTable()).show(e.getComponent(), e.getX(), e.getY());
@@ -351,22 +426,6 @@ class FindStatesTable
 
 // ------------------------------------------
 
-/*
- * abstract class FindStatesPanel
- *       extends JPanel
- * {
- *       public String title;
- *       public String tip;
- *
- *       FindStatesPanel(String title, String tip)
- *       {
- *               this.title = title;
- *               this.tip = tip;
- *       }
- *
- *       public abstract Matcher getMatcher();
- * }
- */
 interface FindStatesTab
 {
 	public String getTitle();
@@ -559,13 +618,6 @@ class FindStatesFrame
 		return table.getRegexpPatterns();
 	}
 
-	private JButton setDefaultButton(JButton b)
-	{
-		getRootPane().setDefaultButton(b);
-
-		return b;
-	}
-
 	private void doRepaint()
 	{
 		repaint();
@@ -576,14 +628,6 @@ class FindStatesFrame
 		return (FindStatesTab) tabbedPane.getSelectedComponent();
 	}
 
-	/*
-					private void showCompositeStates(SearchStates ss)
-					{
-									PresentStates present_states = new PresentStates(ss, getAutomata());
-
-									present_states.execute();
-					}
-	*/
 	class FindButton
 		extends JButton
 	{
@@ -632,112 +676,6 @@ class FindStatesFrame
 		}
 	}
 
-	// ****************** Testing only ********** copied straight (almost) from the Monitor project
-	class Task
-		extends MonitorableThread
-	{
-		private int p;
-		private int i = 0;
-		private boolean mode = false;    // false is "no progressbar"
-		private /* volatile */ boolean requestStop = false;
-
-		public void run()
-		{
-			try
-			{
-				while ((i < 100) &&!requestStop)
-				{
-					sleep(750);
-
-					i += (int) (Math.random() * 20);
-				}
-
-				mode = !mode;
-
-				while ((p < 100) &&!requestStop)
-				{
-					p += (int) (Math.random() * 20);
-
-					sleep(500);
-				}
-			}
-			catch (InterruptedException iexcp)
-			{
-				return;
-			}
-		}
-
-		public int getProgress()
-		{
-			System.out.println("Task::getProgress - " + getActivity());
-
-			if (mode)
-			{
-				return p;
-			}
-			else
-			{
-				return 1;    // no progress
-			}
-		}
-
-		public String getActivity()
-		{
-			if (mode)
-			{
-				return ("Building transitions: " + p + "% complete");
-			}
-			else
-			{
-				return ("Synchronizing: " + i + " number of states");
-			}
-		}
-
-		public void stopTask()
-		{
-			requestStop = true;
-		}
-
-		public boolean wasStopped()
-		{
-			return requestStop;
-		}
-
-		public ExecutionDialogMode getMode()    // ** Changed but not used **
-		{
-			return null;
-		}
-	}
-
-	// ****** Still more testing stuff
-	class PresentResult
-		extends Presenter
-	{
-		JFrame frame;
-
-		public PresentResult(JFrame frame, MonitorableThread task)
-		{
-			super(task);
-
-			this.frame = frame;
-		}
-
-		public void taskFinished()
-		{
-
-			// System.err.println(task.getName() + " - final value was: " + task.getProgress());
-			JOptionPane.showMessageDialog(frame, task.getName() + " - final value was: " + task.getProgress(), "Task finished", JOptionPane.INFORMATION_MESSAGE);
-		}
-
-		public void taskStopped()
-		{
-
-			// System.err.println(task.getName() + " was stopped");
-			JOptionPane.showMessageDialog(frame, task.getName() + " cancelled by user", "Task cancelled", JOptionPane.WARNING_MESSAGE);
-		}
-	}
-
-	// ****************************************************
 	private void goAhead()
 	{
 		try
@@ -747,32 +685,15 @@ class FindStatesFrame
 			if (matcher != null)
 			{
 
-				/*
-				// Start the task
-				Task task = new Task(); // SearchStates ss = new SearchStates(getAutomata(), matcher);
-				task.start();
-
-				// Start the monitor
-				Monitor monitor = new Monitor("Message...", "Note", task);
-				monitor.startMonitor(this, 0, 1000);
-
-				// Start the presenter (waits for the task)
-				PresentResult present = new PresentResult(this, task);
-				present.start();
-
-				*/
 				SearchStates ss = new SearchStates(getAutomata(), matcher);
-
 				ss.start();    // Start the synchronization thread
 
 				Monitor monitor = new Monitor("Finding states...", "", ss);
-
 				monitor.startMonitor(this, 0, 1000);
 
 				PresentStates present_states = new PresentStates(this, ss, getAutomata());
-
 				present_states.start();
-				/*  */
+
 			}
 
 			// else do nothing
@@ -788,14 +709,12 @@ class FindStatesFrame
 
 	public FindStatesFrame(Gui gui)
 	{
-
-		// super(400, 300); // for CenteredFrame inheritance
 		Utility.setupFrame(this, 500, 300);
 		setTitle("Find States");
 
 		this.gui = gui;
 		this.automata = gui.getSelectedAutomata();
-		this.table = new FindStatesTable(automata);
+		this.table = new FindStatesTable(automata, this);
 
 		FixedFormPanel fixedformPanel = new FixedFormPanel(table);
 		FreeFormPanel freeformPanel = new FreeFormPanel();
@@ -807,13 +726,13 @@ class FindStatesFrame
 
 		JPanel buttonPanel = new JPanel();
 
-		buttonPanel.add(find_button = setDefaultButton(new FindButton()));
+		buttonPanel.add(find_button = Utility.setDefaultButton(this, new FindButton()));
 		buttonPanel.add(quit_button = new CancelButton());
 
 		Container contentPane = getContentPane();
 
-		contentPane.add(tabbedPane, "Center");
-		contentPane.add(buttonPanel, "South");
+		contentPane.add(tabbedPane, BorderLayout.CENTER);
+		contentPane.add(buttonPanel, BorderLayout.SOUTH);
 	}
 }
 

@@ -1594,7 +1594,7 @@ public class ActionMan
 		gui.selectAll();
 	}
 
-	// 
+	// Find States... action selected
 	public static void findStates_action(Gui gui)
 	{
 		FindStates find_states = new FindStates(gui);
@@ -1611,6 +1611,22 @@ public class ActionMan
 		}
 	}
 
+	// Route... action selected
+	public static void routeAction(Gui gui)
+	{
+		RouterGui router_gui = new RouterGui(gui);
+
+		try
+		{
+			router_gui.execute();
+		}
+		catch (Exception ex)
+		{
+			gui.error(ex.toString());
+		}
+		
+	}
+	
 	// Delete All - this really implements Close Project
 	public static void automataDeleteAll_actionPerformed(Gui gui)
 	{

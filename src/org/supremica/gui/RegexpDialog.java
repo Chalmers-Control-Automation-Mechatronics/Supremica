@@ -9,7 +9,10 @@ package org.supremica.gui;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import java.util.*;
 
+import org.supremica.automata.State;
+import org.supremica.automata.Automaton;
 // 
 public class RegexpDialog
 	extends JDialog    /* implements ActionListener */
@@ -61,26 +64,67 @@ public class RegexpDialog
 		}
 	}
 
+	class StatesMenuItem
+		extends JMenuItem
+		implements ActionListener
+	{
+		public StatesMenuItem(String s)
+		{
+			super(s);
+			addActionListener(this);
+		}
+		public void actionPerformed(ActionEvent event)
+		{
+			String text = ((JMenuItem)event.getSource()).getText();
+			replaceSelection(text);
+			doRepaint();
+		}
+	}
+	
 	class RegexpMenuBar
 		extends JMenuBar
 	{
-		public RegexpMenuBar()
+		private JMenu makeExpressionMenu()
 		{
 			JMenu menu = new JMenu("Expressions");
-
 			menu.add(new RegexpMenuItem("any string", ".*"));
 			menu.add(new RegexpMenuItem("any uppercase", "[A-Z]"));
 			menu.add(new RegexpMenuItem("any lowercase", "[a-z]"));
 			menu.add(new RegexpMenuItem("any alphabetic", "[a-zA-Z]"));
 			menu.add(new RegexpMenuItem("any digit", "[0-9]"));
-			this.add(menu);
-
+			return menu;
+		}
+		private JMenu makeStatesMenu(Automaton a)
+		{
+			JMenu menu = new JMenu("States");
+			for(Iterator it = a.stateIterator(); it.hasNext(); )
+			{
+				menu.add(new StatesMenuItem(((State)it.next()).getName()));
+			}
+			return menu;
+		}
+		private JMenu makeHelpMenu()
+		{
 			JMenu help = new JMenu("Help");
-
 			help.add(new JMenuItem("Help Topics"));
 			help.add(new JSeparator());
 			help.add(new JMenuItem("About..."));
-			this.add(help);
+			return help;
+		}
+		
+		public RegexpMenuBar()
+		{
+			this.add(makeExpressionMenu());
+			this.add(makeHelpMenu());
+
+		}
+		public RegexpMenuBar(Automaton automaton)
+		{
+			this.add(makeExpressionMenu());
+			this.add(makeStatesMenu(automaton));
+			this.add(makeHelpMenu());
+
+			
 		}
 	}
 
@@ -131,31 +175,26 @@ public class RegexpDialog
 		}
 	}
 
-	// * Pop up this dialog with the textfield set to str
-	public RegexpDialog(JFrame parent, String str)
+	private void setup(String txt)
 	{
-		super(parent, "Enter regular expression", true);    // modal
-
 		JPanel p1 = new JPanel();
-
 		p1.add(new JLabel("Regexp:"));
-		p1.add(reg_exp = new JTextField(str, 30));
+		p1.add(reg_exp = new JTextField(txt, 30));
 
 		JPanel p2 = new JPanel();
-
 		p2.add(setDefaultButton(new OkButton()));
 		p2.add(new CancelButton());
 
 		Container content_pane = getContentPane();
+		content_pane.add(BorderLayout.CENTER, p1);
+		content_pane.add(BorderLayout.SOUTH, p2);
 
-		content_pane.add("Center", p1);
-		content_pane.add("South", p2);
-		setJMenuBar(new RegexpMenuBar());
-
-		// System.err.println(getMinimumSize()); // java.awt.Dimension[width=137,height=68]
+	}
+	
+	private void goAhead(String txt)
+	{
 		pack();
 
-		// System.err.println(getMinimumSize()); // java.awt.Dimension[width=145,height=95]
 		Dimension dim = getMinimumSize();
 
 		setLocation(Utility.getPosForCenter(dim));
@@ -165,10 +204,28 @@ public class RegexpDialog
 
 		if (ok)
 		{
-			str = reg_exp.getText();
+			txt = reg_exp.getText();
 		}
 	}
+	// Pop up this dialog with the textfield set to txt
+	public RegexpDialog(JFrame parent, String txt)
+	{
+		super(parent, "Enter regular expression", true);    // modal
 
+		setup(txt);
+		setJMenuBar(new RegexpMenuBar());
+		goAhead(txt);
+	}
+
+	public RegexpDialog(JFrame parent, Automaton a, String txt)
+	{
+		super(parent, "Enter regular expression for " + a.getName(), true); // modal
+		
+		setup(txt);
+		setJMenuBar(new RegexpMenuBar(a));
+		goAhead(txt);
+	}
+	
 	public boolean isOk()
 	{
 		return ok;
