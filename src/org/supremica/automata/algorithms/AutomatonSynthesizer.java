@@ -50,6 +50,7 @@
 package org.supremica.automata.algorithms;
 
 import org.supremica.log.*;
+import org.supremica.util.ActionTimer;
 import java.util.*;
 import org.supremica.automata.Arc;
 import org.supremica.automata.Alphabet;
@@ -75,6 +76,7 @@ public class AutomatonSynthesizer
 	private boolean rememberDisabledEvents = false;
 	private Alphabet disabledEvents;
 	private final static boolean debugMode = false;
+	private final ActionTimer theTimer = new ActionTimer();
 
 	public AutomatonSynthesizer(Automaton theAutomaton, SynthesizerOptions synthesizerOptions)
 		throws Exception
@@ -87,6 +89,14 @@ public class AutomatonSynthesizer
 		this.theAutomaton = theAutomaton;
 		this.synthesizerOptions = synthesizerOptions;
 	}
+	/**
+	 * Return the time required to run this algorithm. It is only valid to
+	 * call this method after the return of the execute method.
+	 */
+	public long elapsedTime()
+	{
+		return theTimer.elapsedTime();
+	}
 
 	// Synthesize a monolithic supervisor
 	public boolean synthesize()
@@ -95,6 +105,8 @@ public class AutomatonSynthesizer
 		logger.debug("AutomatonSynthesizer::synthesize()");
 
 		theAutomaton.beginTransaction();
+
+		theTimer.start();
 
 		SynthesisType synthesisType = synthesizerOptions.getSynthesisType();
 
@@ -123,8 +135,11 @@ public class AutomatonSynthesizer
 			purge();
 		}
 
+		theTimer.stop();
+
 		theAutomaton.invalidate();
 		theAutomaton.endTransaction();
+
 		return didSomething;
 	}
 

@@ -1172,12 +1172,12 @@ public class ActionMan
 
 		synthesizerDialog.show();
 
+		long elapsedTime = -1;
+
 		if (!synthesizerOptions.getDialogOK())
 		{
 			return;
 		}
-
-		Date startDate = new Date();
 
 		if (selectedAutomata.size() > 1)
 		{
@@ -1256,6 +1256,8 @@ public class ActionMan
 				AutomataSynthesizer synthesizer = new AutomataSynthesizer(gui, currAutomata, syncOptions, synthesizerOptions);
 
 				synthesizer.execute();
+
+				elapsedTime = synthesizer.elapsedTime();
 			}
 			catch (Exception ex)
 			{
@@ -1286,6 +1288,7 @@ public class ActionMan
 				try
 				{
 					synthesizer.synthesize();
+					elapsedTime = synthesizer.elapsedTime();
 				}
 				catch (Exception ex)
 				{
@@ -1295,9 +1298,10 @@ public class ActionMan
 			}
 		}
 
-		Date endDate = new Date();
-
-		gui.info("Execution completed after " + (endDate.getTime() - startDate.getTime()) / 1000.0 + " seconds.");
+		if (elapsedTime >= 0)
+		{
+			gui.info("Execution completed after " + (elapsedTime) / 1000.0 + " seconds.");
+		}
 	}
 
 	// Automaton.Verify action performed

@@ -52,6 +52,8 @@ package org.supremica.automata.algorithms;
 
 import java.util.*;
 import org.supremica.util.IntArrayHashTable;
+import org.supremica.util.ActionTimer;
+
 import java.io.PrintWriter;
 
 import org.supremica.log.*;
@@ -209,6 +211,7 @@ public class AutomataSynthesizer
 	private SynthesizerOptions synthesizerOptions;
 	private int[] initialState;
 	private VisualProjectContainer theVisualProjectContainer;
+	private ActionTimer theTimer = new ActionTimer();
 	private Gui gui;
 
 	// For the optimization...
@@ -308,6 +311,15 @@ public class AutomataSynthesizer
 		}
 	}
 
+	/**
+	 * Return the time required to run this algorithm. It is only valid to
+	 * call this method after the return of the execute method.
+	 */
+	public long elapsedTime()
+	{
+		return theTimer.elapsedTime();
+	}
+
 	// Synthesizes supervisors
 	public void execute()
 		throws Exception
@@ -316,15 +328,20 @@ public class AutomataSynthesizer
 
 		if(synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.Monolithic)
 		{
+			theTimer.start();
 			// monolithic case, just whack the entire stuff into the monolithic algo
 			//Boolean didSomething = new Boolean(false);
 			MonolithicReturnValue retval = doMonolithic(theAutomata); // we always do something, at least we synch
 			// if purge, that's already been done
+			theTimer.stop();
+
 			gui.addAutomaton(retval.automaton); // let the user choose the name
 
 		}
 		else if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.Modular) // modular case
 		{
+			theTimer.start();
+
 			Automata modSupervisors = new Automata(); // collects the calculated supervisors
 
 //			AutomataSelector selector = new AutomataSelector(theAutomata, synthesizerOptions.getMaximallyPermissive());
@@ -382,6 +399,9 @@ public class AutomataSynthesizer
 			{
 				optimize(theAutomata, modSupervisors);
 			}
+
+			theTimer.stop();
+
 			if(modSupervisors.size() > 0)
 			{
 				gui.addAutomata(modSupervisors);

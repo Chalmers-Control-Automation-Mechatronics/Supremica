@@ -49,17 +49,17 @@
  */
 package org.supremica.util;
 
-import java.util.Calendar;
+import java.util.Date;
 
 public class ActionTimer
 {
-	private final Calendar theCalendar;
-	private long startTime = -1;
-	private long stopTime = -1;
+	//private final Calendar theCalendar;
+	private Date startDate = null;
+	private Date stopDate = null;
 
 	public ActionTimer()
 	{
-		theCalendar = Calendar.getInstance();
+		//theCalendar = Calendar.getInstance();
 	}
 
 	/**
@@ -67,8 +67,8 @@ public class ActionTimer
 	 */
 	public void start()
 	{
-		stopTime = -1;
-		startTime = theCalendar.getTimeInMillis();
+		stopDate = null;
+		startDate = new Date();
 	}
 
 
@@ -77,7 +77,7 @@ public class ActionTimer
 	 */
 	public void stop()
 	{
-		stopTime = theCalendar.getTimeInMillis();
+		stopDate = new Date();
 	}
 
 	/**
@@ -87,20 +87,20 @@ public class ActionTimer
 	public long elapsedTime()
 		throws IllegalStateException
 	{
-		if (startTime < 0)
+		if (startDate == null)
 		{
-			throw new IllegalStateException("startTime is negative");
+			throw new IllegalStateException("startDate is negative");
 		}
-		if (stopTime < 0)
+		if (stopDate == null)
 		{
-			return theCalendar.getTimeInMillis() - startTime;
+			return (new Date()).getTime() - startDate.getTime();
 		}
-		return stopTime - startTime;
+		return stopDate.getTime() - startDate.getTime();
 	}
 
 	public void clear()
 	{
-		startTime = -1;
-		stopTime = -1;
+		startDate = null;
+		stopDate = null;
 	}
 }
