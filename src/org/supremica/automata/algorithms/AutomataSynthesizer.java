@@ -81,7 +81,7 @@ public class AutomataSynthesizer
 	private Automata newAutomata = new Automata();
 	private boolean maximallyPermissive;
 
-    public AutomataSynthesizer(/* Supremica workbench */Gui workbench, Automata theAutomata, SynchronizationOptions synchronizationOptions, SynthesizerOptions synthesizerOptions)
+    public AutomataSynthesizer(Gui workbench, Automata theAutomata, SynchronizationOptions synchronizationOptions, SynthesizerOptions synthesizerOptions)
 		throws IllegalArgumentException
 	{
 		Automaton currAutomaton;
@@ -226,8 +226,10 @@ public class AutomataSynthesizer
 							theAutomaton.setType(AutomatonType.Supervisor);
 							theAutomaton.setAlphabet(unionAlphabet(selectedAutomata));
 
-							AutomatonSynthesizer synthesizer = new AutomatonSynthesizer(theAutomaton);
+							AutomatonSynthesizer synthesizer = new AutomatonSynthesizer(workbench, theAutomaton, synthesizerOptions);
+							synthesizer.synthesize();
 
+/*
 							if (synthesizerOptions.getSynthesisType() == SynthesisType.Controllable)
 							{
 								synthesizer.synthesizeControllable();
@@ -254,6 +256,7 @@ public class AutomataSynthesizer
 								AutomatonPurge automatonPurge = new AutomatonPurge(theAutomaton);
 								automatonPurge.execute();
 							}
+*/
 							newAutomata.addAutomaton(theAutomaton);
 						}
 						catch (Exception ex)
@@ -338,7 +341,7 @@ public class AutomataSynthesizer
 			return;
 		}
 
-		if (!synthesizerOptions.getPurge())
+		if (!synthesizerOptions.doPurge())
 		{   // The automata aren't purged but they must be for the optimization to work...
 			Iterator autIt = newAutomata.iterator();
 			while (autIt.hasNext())

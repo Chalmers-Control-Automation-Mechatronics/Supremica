@@ -579,7 +579,7 @@ public class ActionMan
 			}
 
 			AutomataSynthesizer synthesizer = new AutomataSynthesizer(gui, currAutomata, syncOptions, synthesizerOptions);
-			try											//!! was 'this' here^^^^^^^^^^^^, now expects a Gui
+			try
 			{
 				synthesizer.execute();
 			}
@@ -595,38 +595,22 @@ public class ActionMan
 			while (autIt.hasNext())
 			{
 				Automaton currAutomaton = (Automaton)autIt.next();
+				AutomatonSynthesizer synthesizer;
 				try
 				{
-					AutomatonSynthesizer synthesizer = new AutomatonSynthesizer(currAutomaton);
-					if (synthesizerOptions.getSynthesisType() == SynthesisType.Controllable)
-					{
-						synthesizer.synthesizeControllable();
-					}
-					else if (synthesizerOptions.getSynthesisType() == SynthesisType.Nonblocking)
-					{
-						JOptionPane.showMessageDialog(gui.getComponent(),
-													  "Option not implemented.",
-													  "Alert",
-													  JOptionPane.ERROR_MESSAGE);
-						return;
-					}
-					else if (synthesizerOptions.getSynthesisType() == SynthesisType.Both)
-					{
-						synthesizer.synthesize();
-					}
-					else
-					{
-						JOptionPane.showMessageDialog(gui.getComponent(),
-													  "Unavailable option chosen.",
-													  "Alert",
-													  JOptionPane.ERROR_MESSAGE);
-						return;
-					}
-					if (synthesizerOptions.getPurge())
-					{
-						AutomatonPurge automatonPurge = new AutomatonPurge(currAutomaton);
-						automatonPurge.execute();
-					}
+					synthesizer = new AutomatonSynthesizer(gui, currAutomaton, synthesizerOptions);
+				}
+				catch (Exception e)
+				{
+					JOptionPane.showMessageDialog(gui.getComponent(),
+												  e.toString(),
+												  "Alert",
+												  JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				try
+				{
+					synthesizer.synthesize();
 				}
 				catch (Exception ex)
 				{

@@ -89,7 +89,7 @@ class SD_StandardPanel extends SynthesizerPanel
 	{
 		synthesisTypeBox.setSelectedItem(synthesizerOptions.getSynthesisType());
 		algorithmTypeBox.setSelectedItem(synthesizerOptions.getAlgorithmType());
-		purgeBox.setSelected(synthesizerOptions.getPurge());
+		purgeBox.setSelected(synthesizerOptions.doPurge());
 		optimizeBox.setSelected(synthesizerOptions.getOptimize());
 	}
 	public void regain(SynthesizerOptions synthesizerOptions)

@@ -117,7 +117,7 @@ public final class SynthesizerOptions
 		WorkbenchProperties.setSynthesisPurge(bool);
 	}
 
-	public boolean getPurge()
+	public boolean doPurge()
 	{
 		return purge;
 	}

@@ -50,29 +50,68 @@
 package org.supremica.automata.algorithms;
 
 import org.supremica.automata.*;
+import org.supremica.gui.*;
 import java.util.*;
-//-- MF -- Lots of duplicate code here, should be cleaned up!
+
+/**
+ * A monolithic synthesizer that can handle non-blocking and controllability problems.
+ */
 public class AutomatonSynthesizer
 {
 	private Automaton theAutomaton;
 	private LinkedList acceptingStates = new LinkedList();
+	private Gui workbench;
+	private SynthesizerOptions synthesizerOptions;
 	private static final boolean debugMode = false;
 
-	public AutomatonSynthesizer(Automaton theAutomaton)
+	public AutomatonSynthesizer(Gui workbench, Automaton theAutomaton, SynthesizerOptions synthesizerOptions)
+		throws Exception
 	{
+		if (synthesizerOptions.getSynthesisType() == SynthesisType.Unknown)
+		{
+			throw new Exception ("Invalid synthesis type: " + SynthesisType.Unknown.toString());
+		}
+		this.workbench = workbench;
 		this.theAutomaton = theAutomaton;
+		this.synthesizerOptions = synthesizerOptions;
 	}
 
+	// Synthesize a monolithic supervisor
 	public void synthesize()
+		throws Exception
+	{
+		theAutomaton.beginTransaction();
+
+		SynthesisType synthesisType = synthesizerOptions.getSynthesisType();
+		if (synthesisType == SynthesisType.Controllable)
+		{
+			synthesizeControllable();
+		}
+		else if (synthesisType == SynthesisType.Nonblocking)
+		{
+			synthesizeNonblocking();
+		}
+		else if (synthesisType == SynthesisType.Both)
+		{
+			synthesizeControllableNonblocking();
+		}
+
+		if (synthesizerOptions.doPurge())
+		{
+			purge();
+		}
+
+		theAutomaton.invalidate();
+		theAutomaton.endTransaction();
+	}
+
+	// Synthesize a controllable and nonblocking supervisor
+	private void synthesizeControllableNonblocking()
 		throws Exception
 	{
 		boolean newUnsafeStates;
 
-		System.err.println("AutomatonSynthesizer");
-
 		LinkedList stateList = new LinkedList();
-
-		theAutomaton.beginTransaction();
 
 		Iterator stateIt = theAutomaton.stateIterator();
 		while (stateIt.hasNext())
@@ -120,19 +159,15 @@ public class AutomatonSynthesizer
 			}
 		}
 		theAutomaton.setType(AutomatonType.Supervisor);
-
-		theAutomaton.invalidate();
-		theAutomaton.endTransaction();
 	}
 
-	public void synthesizeControllable()
+	// Synthesize a controllable supervisor
+	private void synthesizeControllable()
 		throws Exception
 	{
 		boolean newUnsafeStates;
 
 		LinkedList stateList = new LinkedList();
-
-		theAutomaton.beginTransaction();
 
 		Iterator stateIt = theAutomaton.stateIterator();
 		while (stateIt.hasNext())
@@ -184,15 +219,11 @@ public class AutomatonSynthesizer
 		}
 		theAutomaton.setType(AutomatonType.Supervisor);
 
-		theAutomaton.invalidate();
-		theAutomaton.endTransaction();
 	}
 
-//-- MF -- My try for doing only nonblocking (even more duplicate code!!)
-	public void synthesizeNonblocking()
+	private void synthesizeNonblocking()
 		throws Exception
 	{
-		theAutomaton.beginTransaction();
 		boolean newUnsafeStates;
 
 		LinkedList stateList = new LinkedList();
@@ -222,13 +253,11 @@ public class AutomatonSynthesizer
 			}
 		}
 
-
 		theAutomaton.setType(AutomatonType.Supervisor);
-
-		theAutomaton.invalidate();
-		theAutomaton.endTransaction();
 	}
-//-------------------------------------
+
+
+
 	private LinkedList doCoreachable()
 		throws Exception
 	{
@@ -322,7 +351,7 @@ public class AutomatonSynthesizer
 		return newUnsafeStates;
 	}
 
-	public void doReachable()
+	private void doReachable()
 	{
 		if (debugMode) System.err.println("doReachable");
 		theAutomaton.clearVisitedStates();
@@ -369,7 +398,7 @@ public class AutomatonSynthesizer
 		}
 	}
 
-	public void purge()
+	private void purge()
 	{
 		LinkedList stateList = new LinkedList();
 
