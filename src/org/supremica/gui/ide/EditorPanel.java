@@ -71,9 +71,6 @@ class EditorPanel
 		splitPanelHorizontal.setDividerLocation(0.2);
 		splitPanelHorizontal.setResizeWeight(0.0);
 
-		// add(splitPanelHorizontal, BorderLayout.CENTER);
-
-
 		final GridBagLayout gridbag = new GridBagLayout();
 		final GridBagConstraints constraints = new GridBagConstraints();
 
@@ -100,12 +97,9 @@ class EditorPanel
 
 	public void setActiveComponentEditorPanel(JPanel newPanel)
 	{
-//		System.err.println("setActiveComponentEditorPanel");
-
 		Component oldPanel = splitPanelHorizontal.getRightComponent();
 		if (oldPanel != newPanel)
 		{
-//			System.err.println("Switching panel");
 			Dimension oldSize = emptyComponentEditorPanel.getSize();
 
 			if (oldPanel != null)
@@ -123,7 +117,6 @@ class EditorPanel
 			{
 				newPanel.setPreferredSize(oldSize);
 				splitPanelHorizontal.setRightComponent(newPanel);
-//				System.err.println("setRightPanel");
 			}
 		}
 

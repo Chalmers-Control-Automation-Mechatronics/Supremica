@@ -54,6 +54,7 @@ import java.util.*;
 import org.supremica.log.*;
 import org.supremica.util.SupremicaIterator;
 import org.supremica.properties.SupremicaProperties;
+import net.sourceforge.waters.model.des.AutomatonProxy;
 
 public class Automaton
 	implements ArcListener
@@ -94,6 +95,8 @@ public class Automaton
 	private Automata masterAutomata = null;
 	private Automata slaveAutomata = null;
 	private AutomatonListeners listeners = null;
+
+	private AutomatonProxy correspondingAutomatonProxy = null;
 
 	/**
 	 * Creates an empty automaton.
@@ -336,7 +339,7 @@ public class Automaton
 	 * sure that the state is set to be initial BEFORE adding it with this method.
 	 *
 	 * @return 1 if the state is already in the automaton, otherwise returns 0.
-	 */ 
+	 */
 	public int addState(State state)
 		throws IllegalArgumentException
 	{
@@ -1939,7 +1942,7 @@ public class Automaton
 			newState.setIndex(two.getIndex());
 		}
 		*/
-		
+
 		// Return the new state
 		return newState;
 	}
@@ -2182,6 +2185,21 @@ public class Automaton
 		}
 
 		return true;
+	}
+
+	public void setCorrespondingAutomatonProxy(AutomatonProxy correspondingAutomatonProxy)
+	{
+		this.correspondingAutomatonProxy = correspondingAutomatonProxy;
+	}
+
+	public boolean hasCorrespondingAutomatonProxy()
+	{
+		return correspondingAutomatonProxy != null;
+	}
+
+	public AutomatonProxy getCorrespondingAutomatonProxy()
+	{
+		return correspondingAutomatonProxy;
 	}
 
 	public long checksum()

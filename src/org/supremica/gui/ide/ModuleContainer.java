@@ -5,7 +5,9 @@ import java.awt.Component;
 import javax.swing.JFrame;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
-
+import org.supremica.automata.IO.ProjectBuildFromWaters;
+import org.supremica.gui.VisualProject;
+import org.supremica.automata.Project;
 
 public class ModuleContainer
 {
@@ -16,6 +18,7 @@ public class ModuleContainer
 	private AnalyzerPanel analyzerPanel = null;
 	private SimulatorPanel simulatorPanel = null;
 	private Component selectedComponent = null;
+	private VisualProject theVisualProject = new VisualProject();
 	private Map componentToPanelMap = new HashMap();
 
 	public ModuleContainer(IDE ide, ModuleProxy module)
@@ -91,7 +94,20 @@ public class ModuleContainer
 		return ide.getFrame();
 	}
 
+	public VisualProject getVisualProject()
+	{
+		return theVisualProject;
+	}
 
+	public void updateAutomata()
+	{
+		System.err.println("updateAutomata");
+		ModuleProxy currModule = getModuleProxy();
+		ProjectBuildFromWaters builder = new ProjectBuildFromWaters();
+		Project supremicaProject = builder.build(currModule);
+		theVisualProject.clear();
+		theVisualProject.addAutomata(supremicaProject);
+	}
 
 
 }

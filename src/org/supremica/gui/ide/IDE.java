@@ -2,7 +2,10 @@
 package org.supremica.gui.ide;
 
 import javax.swing.*;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ChangeEvent;
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.event.WindowEvent;
 import java.util.*;
 import org.supremica.gui.Utility;
@@ -12,6 +15,7 @@ import org.supremica.automata.IO.FileFormats;
 
 public class IDE
     extends JFrame
+    implements ChangeListener
 {
 	private final static InterfaceManager interfaceManager = InterfaceManager.getInstance();
 
@@ -54,6 +58,7 @@ public class IDE
     	contentPanel.add(toolBar, BorderLayout.NORTH);
 
 		tabPanel = new JTabbedPane();
+		tabPanel.addChangeListener(this);
 //		tabPanel.setLayout(new BorderLayout());
 
 		ModuleContainer currModuleContainer = moduleContainers.getActiveModuleContainer();
@@ -166,6 +171,14 @@ public class IDE
 		}
 	}
 
+	public void stateChanged(ChangeEvent e)
+	{
+		Component currTab = tabPanel.getSelectedComponent();
+		if (currTab == getActiveModuleContainer().getAnalyzerPanel())
+		{
+			getActiveModuleContainer().updateAutomata();
+		}
+	}
 
 	public static void main(String args[])
 	{

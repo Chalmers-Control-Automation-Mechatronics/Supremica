@@ -95,11 +95,17 @@ public class ProjectBuildFromWaters
 			logger.error("Exception - Failed to compile: " + ex.getMessage());
 		}
 
+		if (des == null)
+		{
+			return currProject;
+		}
+
 		Collection theWatersAutomata = des.getAutomata();
 		for (Iterator autIt = theWatersAutomata.iterator(); autIt.hasNext(); )
 		{
 			AutomatonProxy currWatersAutomaton = (AutomatonProxy)autIt.next();
 			Automaton currSupremicaAutomaton = new Automaton();
+			currSupremicaAutomaton.setCorrespondingAutomatonProxy(currWatersAutomaton);
 			currSupremicaAutomaton.setName(currWatersAutomaton.getName());
 
 			//System.err.println("Automaton: " + currWatersAutomaton.getName());
