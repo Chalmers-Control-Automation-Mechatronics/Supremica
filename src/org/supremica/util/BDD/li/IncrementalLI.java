@@ -190,7 +190,22 @@ public class IncrementalLI extends BaseLI {
 					return false;
 				}
 
+			} else if(last_locals > 0) {
+				// maybe the initial state is among them, no need for any local transitions then?
+				int tmp = ba.and(bdd_initial, bdd_theta);
+				if(tmp != ba.getZero() ) {
+					int tmp2 = ba.and(tmp, bdd_local_events_plant);
+					boolean enabled = tmp2 != ba.getOne();
+					ba.deref(tmp2);
+					if(enabled) {
+						ba.deref(tmp);
+						if(Options.debug_on)  Options.out.println("*** IncrLC:The initial state is in Theta and P-enabled");
+						return false;
+					}
+				}
+				ba.deref(tmp);
 			}
+
 
 		}
 

@@ -75,83 +75,70 @@ public class ConjSupervisor
     {
 		int cubep_sp = spec.getCubep();
 		int cubep_p = plant.getCubep();
-		int tmp;
+		int tmp, work;
 
 		SizeWatch.setOwner("ConjSupervisor.computeLanguageDifference");
 
 
+		// get Spec part of half transitions
+		BDDAutomaton[] sps = spec.getMembers();
+		int spsize = spec.getSize();
+		work = manager.ref( manager.getOne() );
+		for(int i = 0; i < spsize; i++) {
+			 tmp = manager.exists(sps[i].getTpri(), cubep_sp);
+			work = manager.andTo(work, tmp);
+			manager.deref(tmp);
+		}
+		int spec_part = manager.not(work);
+		manager.deref(work);
+		SizeWatch.report(spec_part, "~Eq'sp. Tsp");
 
 
-		int work;
 
-
-		int t_sp = spec.getT();
-
-		SizeWatch.report(t_sp, "Tsp");
-
-		tmp = manager.exists(t_sp, cubep_sp);
-		work = manager.not(tmp);
-		manager.deref(tmp);
-		SizeWatch.report(work, "~Eq'sp. Tsp");
-
-
+		/*
+		// get Plant part of half transitions (type 1, not very BDD friendly)
 		BDDAutomaton[] ps = plant.getMembers();
 		int psize = plant.getSize();
+		int plant_part = manager.ref( manager.getOne() );
 		for(int i = 0; i < psize; i++) {
 			tmp = manager.exists(ps[i].getTpri(), cubep_p);
-			work = manager.andTo(work, tmp);
+			plant_part = manager.andTo(plant_part, tmp);
+			manager.deref(tmp);
+		}
+
+		SizeWatch.report(plant_part, "Eq'p. Tp");
+
+		work = manager.and(plant_part, spec_part);
+		manager.deref(plant_part);
+		manager.deref(spec_part);
+
+		work = manager.andTo(work, plant.getSigma()); // this is a _DIRTY_ trick to remove added self-loops (false)contribution!
+		work = manager.andTo(work, considred_events);
+		*/
+
+
+
+		// get Plant part of half transitions (type 2)
+		BDDAutomaton[] ps = plant.getMembers();
+		int psize = plant.getSize();
+		work = manager.and(spec_part, plant.getSigma()); // this is a _DIRTY_ trick to remove added self-loops (false)contribution!
+		manager.deref(spec_part);
+		work = manager.andTo(work, considred_events);
+		for(int i = 0; i < psize; i++) {
+			tmp = manager.exists(ps[i].getTpri(), cubep_p);
+			work= manager.andTo(work, tmp);
 			manager.deref(tmp);
 		}
 
 
-		/*
-		// THIS IS PROBABLY WORSE THAN THE MONOLITHIC VERSION (is it?)
-		int work2 = manager.getOne();
-		manager.ref(work2);
 
-		BDDAutomaton [] all  = gh.getSortedList();
-		boolean [] isPlant   = gh.getSortedType();
-		int size = all.length;
-
-		// XXX: maybe its more efficient to AND against considred_events after the loop??
-		for(int i = 0; i < size; i++) {
-			// Options.out.println("Adding " + all[i].getName() + (isPlant[i] ? " plant" : " spec"));
-			// manager.printSet(work);
-			if(isPlant[i]) {
-				int tmp = manager.relProd(all[i].getTpri(), considred_events, cubep_p);
-				work = manager.andTo(work, tmp);
-				manager.deref(tmp);
-			} else {
-				int tmp = manager.exists(all[i].getTpri(), cubep_sp);
-				work2 = manager.andTo(work2, tmp);
-				manager.deref(tmp);
-			}
-		}
-
-
-		// not delta_sp and stuff
-		int tmp2 = manager.not(work2);
-		manager.deref(work2);
-		int tmp3 = manager.and(tmp2, considred_events);
-		manager.deref(tmp2);
-		work = manager.andTo(work, tmp3);
-		manager.deref(tmp3);
-		*/
-
-
-		// restrict it to the considred events...
-		work = manager.and(work, considred_events);
-
-
-		// this is a _DIRTY_ trick to remove added self-loops (false)contribution!
-		// this is needed when doing modular computation, i.e. when plant + spec < all automata
-		work = manager.andTo(work, plant.getSigma());
-
+		SizeWatch.report(work, "(Eq'p. Tp) AND (~Eq'sp. Tsp)");
 
 		if(remove_events) {
 			tmp = manager.exists(work, e_cube);
 			manager.deref(work);
 			work = tmp;
+			SizeWatch.report(work, "Ee. [(Eq'p. Tp) AND (~Eq'sp. Tsp)]");
 		}
 
 		SizeWatch.report(work, "(Language diff)");

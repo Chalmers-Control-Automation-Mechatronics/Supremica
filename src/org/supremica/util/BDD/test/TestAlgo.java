@@ -30,13 +30,14 @@ public class TestAlgo {
 		"../examples/includeInJarFile/OtherExamples/circularTable.xml",
 		"../examples/includeInJarFile/OtherExamples/flexibleManufacturingSystem.xml",
 		"../examples/benchmark/simple1.xml",
+		"../examples/includeInJarFile/OtherExamples/aip/System4_system4.xml",
 		"../examples/c3.xml"
 
 		};
-	private final double reachables[] = { 25731072, 18, 199, 2274519862886400.0, 10000000, -1};
-	private final double coreachables[] = { 343692864, 20, 432, 2274519862886400.0, 10000000, -1};
-	private final boolean controllable[] = { false, false, false, true, true, true};
-	private final boolean nonblocking[] = { true, true, false, false, true, true /* dont know */};
+	private final double reachables[] = { 25731072, 18, 199, 2274519862886400.0, 10000000, 1.101504E7, -1};
+	private final double coreachables[] = { 343692864, 20, 432, 2274519862886400.0, 10000000, -1, -1};
+	private final boolean controllable[] = { false, false, false, true, true, false, true};
+	private final boolean nonblocking[] = { true, true, false, false, true, true /* dont know */, true /* dont know */};
 
 
 	// ----------------------------------------------------------------------------------
@@ -61,10 +62,17 @@ public class TestAlgo {
 		supervisor = verifier.getSupervisor();
 	}
 
+	private boolean monolithic_ok(double reachables) {
+		if(reachables == -1 || reachables > 5000000) return false;
+		return automata2.getSize() < 15;
+	}
 	// ----------------------------------------------------------------------------------
 
-	private void testC(boolean result) {
-		if(Options.inclsuion_algorithm != Options.INCLUSION_ALGO_MONOLITHIC) return; // not monolithic!
+	private void testC(boolean result, double reachables) {
+		// WHAT IS THIS?
+		// if(Options.inclsuion_algorithm != Options.INCLUSION_ALGO_MONOLITHIC) return; // not monolithic!
+
+		if(!monolithic_ok(reachables) ) return; // system to large??
 
 		System.out.print("C ");
 		boolean is_controllable = verifier.isControllable();
@@ -184,10 +192,11 @@ public class TestAlgo {
 
 			load(TEST_FILES[i]);
 
-			testC(controllable[i]);
+
 			testR(reachables[i]);
 			testCR(coreachables[i]);
 			testNB(reachables[i], coreachables[i], nonblocking[i]);
+			testC(controllable[i],  reachables[i]);
 			verifier.cleanup(); // cleans up both supervisor and automata2
 
 			// what a waste of resources, we will do all BDD pre-calcs again :(
@@ -238,3 +247,7 @@ public class TestAlgo {
 		}
 	}
 }
+
+/*
+$log$
+*/

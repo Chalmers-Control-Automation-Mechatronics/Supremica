@@ -341,7 +341,8 @@ public class Supervisor
 		if(ld == manager.getZero()) {
 			// nothing there, so we dont need the intersection with reachables
 			// to get the reachable difference
-			Options.out.println("Language diff is empty!");
+			if(Options.debug_on)
+				Options.out.println("Language diff is empty (no need for reachability test)!");
 			return ld;
 		}
 
