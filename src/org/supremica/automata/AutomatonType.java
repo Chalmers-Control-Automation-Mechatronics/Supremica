@@ -67,8 +67,8 @@ public class AutomatonType
 		if (add)
 		{
 			collection.add(this);
-			this.identifier = identifier;
 		}
+		this.identifier = identifier;
 	}
 
 	public static Iterator iterator()
