@@ -3,6 +3,7 @@ package org.supremica.gui.animators.scenebeans;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
+import javax.swing.*;
 import java.io.*;
 import java.util.Iterator;
 import java.util.TreeSet;
@@ -28,8 +29,8 @@ public class Animator
 	public Animator(String detail)
 		throws Exception
 	{
-		setFrameIcon(Supremica.cornerIcon);
-		setTitle("Supremica Animator - " + detail);
+		super("Supremica Animator - " + detail);
+		setIconImage(Supremica.cornerImage);
 		setLayout(new GridBagLayout());
 
 		GridBagConstraints pos = new GridBagConstraints();
