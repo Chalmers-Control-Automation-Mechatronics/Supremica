@@ -178,7 +178,7 @@ public class AutomatonToDot
 			if (state.isInitial())
 			{
 				initialStates.addElement(state);
-				pw.println("\t{node [shape = plaintext] \"" + initPrefix + state.getId() + "\"};");
+				pw.println("\t{node [shape = plaintext, style=invis] \"" + initPrefix + state.getId() + "\"};");
 			}
 
 			if (state.isAccepting() && !state.isForbidden())
@@ -203,9 +203,9 @@ public class AutomatonToDot
 		{
 			String stateId = ((State) initialStates.elementAt(i)).getId();
 
-			pw.println("\t\"" + initPrefix + stateId + "\" [label = \"\"]; ");
-			pw.println("\t\"" + initPrefix + stateId + "\" [height = \"0\"]; ");
-			pw.println("\t\"" + initPrefix + stateId + "\" [width = \"0\"]; ");
+			// pw.println("\t\"" + initPrefix + stateId + "\" [label = \"\"]; ");
+			// pw.println("\t\"" + initPrefix + stateId + "\" [height = \"0\"]; ");
+			// pw.println("\t\"" + initPrefix + stateId + "\" [width = \"0\"]; ");
 			pw.println("\t\"" + initPrefix + stateId + "\" -> \"" + stateId + "\";");
 		}
 

@@ -164,7 +164,7 @@ class DefaultExpander
 
 			}
 		}
-		// Note the time array is of specs-size specs, but the state array is of system size (confusing? yes!)
+		// Note the time array is of specs-size, but the state array is of system size (confusing? yes!)
 		nxtstate.setCost(state.getCost() + state.getTimeArray()[direction]);
 		// nxtstate.setTime(direction, aut.getStateWithIndex(nxtstate.getStateArray()[direction]).getCost());
 		nxtstate.setTime(direction, aut.getStateWithIndex(nxtstate.getStateArray()[aut.getIndex()]).getCost());

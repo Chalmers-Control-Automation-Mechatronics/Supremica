@@ -55,7 +55,7 @@ public class SimpleEstimator
 		try
 		{
 			ModifiedAstar mastar = new ModifiedAstar(tmp);	// gets default estimate (zero estimate);
-			Element elem = mastar.walk3();
+			Element elem = mastar.walk();
 			int cost = elem.getCost();
 			clone = null; // will this help any?
 			return cost;

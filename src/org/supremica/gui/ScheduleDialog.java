@@ -258,7 +258,7 @@ public class ScheduleDialog
 		try
 		{
 			ModifiedAstar mastar = new ModifiedAstar(automata, weights.getCalculator(estimates.getEstimator(automata)));
-			Element elem = mastar.walk3();
+			Element elem = mastar.walk();
 			if(elem == null)
 			{
 				throw new RuntimeException("no marked state found");

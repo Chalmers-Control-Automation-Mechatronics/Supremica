@@ -51,11 +51,6 @@ public class ModifiedAstar
 	private int debugNum = 0;	// keeps track of the num of iterations until open is empty (is this the same as the number of states?)
 	private ActionTimer timer = new ActionTimer();
 
-	// This is only needed for init() and walk1()
-	//private AutomataOnlineSynchronizer onlineSynchronizer = null;
-	private AutomataSynchronizerExecuter onlineSynchronizer = null;
-	private int[] indexmap;
-
 	public static class Info
 	{
 		private Element elem;
@@ -85,8 +80,8 @@ public class ModifiedAstar
 		this.reopener = reopener;
 		this.open = new Structure(manipulator);
 		this.closed = new Structure(manipulator);
-		this.specAutomata = new Automata(); // is filled in by initx()
-		initx();
+		this.specAutomata = new Automata(); // is filled in by init()
+		init();
 	}
 
 	public ModifiedAstar(Automata theAutomata, Calculator calculator, Manipulator manipulator, Expander expander)
@@ -114,45 +109,6 @@ public class ModifiedAstar
 	}
 
 	private void init()
-		throws Exception
-	{
-		automata.setIndicies();
-
-		this.indexmap = new int[automata.size()];
-
-		// Build the initial state
-		int[] initialState = AutomataIndexFormHelper.createState(automata.size());
-		int index = 0;
-		for(Iterator autIt = automata.iterator(); autIt.hasNext(); )
-		{
-			Automaton automaton = (Automaton) autIt.next();
-			State currInitialState = automaton.getInitialState();
-			initialState[automaton.getIndex()] = currInitialState.getIndex();
-			automaton.remapStateIndices();		// Rebuild the maps to have the indices match up - why the f***??
-			if(automaton.getType() == AutomatonType.Specification)
-			{
-				specAutomata.addAutomaton(automaton);
-				indexmap[automaton.getIndex()] = index++;	// count only the specs
-			}
-		}
-
-		SynchronizationOptions syncOptions = new SynchronizationOptions(SupremicaProperties.syncNbrOfExecuters(), SynchronizationType.Prioritized, SupremicaProperties.syncInitialHashtableSize(), SupremicaProperties.syncExpandHashtable(), SupremicaProperties.syncForbidUncontrollableStates(), SupremicaProperties.syncExpandForbiddenStates(), false, false, false, SupremicaProperties.verboseMode(), false, true);
-		AutomataSynchronizerHelper helper = new AutomataSynchronizerHelper(automata, syncOptions);
-		//this.onlineSynchronizer = new AutomataOnlineSynchronizer(helper);
-		this.onlineSynchronizer = new AutomataSynchronizerExecuter(helper);
-
-		onlineSynchronizer.initialize();
-		onlineSynchronizer.setCurrState(initialState);
-		helper.setCoExecuter(onlineSynchronizer);
-
-		// Put the initial state on open
-		Element ini = new ElementObject(initialState, specAutomata.size());
-		open.add(ini);
-
-		logger.debug("Initial state: " + ini.toString());
-	}
-	// using the expander
-	private void initx()
 	{
 		automata.setIndicies();
 
@@ -181,154 +137,8 @@ public class ModifiedAstar
 		return true;
 	}
 
-	// This one walks the system like:
+	// We walk the system like:
 	//
-	//	foreach spec automaton Ai
-	//		foreach event e enbled in the local state of Ai
-	//			if e is globally enabled
-	//				move in direction Ai
-	//			end if
-	//		end foreach
-	//	end foreach
-
-	// Potentially, there can be a lot of locally enabled events that are not globally enabled.
-	private Element walk1()
-		throws Exception
-	{
-		// When we get here, initx() has already run, we need to undo what's been done, that is, clear open
-		open.clear();
-		init();
-
-		timer.start();
-
-		while(!open.isEmpty())
-		{
-			// Here we should intelligently select the state to manipulate
-			// Intelligently means lowest bound, this is taken care of by Structure itself
-			Capsule state = new Capsule(open.first());
-			debugNum++;
-
-			/* System.out.println("\n(" + debugNum + ") Glob State: " + state.toString());*/
-
-			if(isMarked(state))
-			{
-				timer.stop();
-				logger.debug(state.toString() + " is marked. Number of states searched: " + debugNum + " Elapsed time: " + getElapsedTime());
-				return state; // we've reached the goal, are done
-			}
-
-			// From this state, move in all directions one step
-			// First we need to find the events enabled in automaton i
-			for(Iterator autIt = specAutomata.iterator(); autIt.hasNext(); )
-			{
-				int[] currState = state.getStateArray();
-				onlineSynchronizer.setCurrState(currState);	// we operate from this state
-				Automaton currAutomaton = (Automaton) autIt.next();
-				logger.debug("Expanding automaton: " + currAutomaton.getName());
-
-				// We only look through specAutomata
-				// if(currAutomaton.isSpecification())	// only do this for specs, plants/resources are not "directions"
-				{
-					int stateIndex = state.getStateArray()[currAutomaton.getIndex()];
-					// Now we need to find the state with this index in currAutomaton
-					State s = currAutomaton.getStateWithIndex(stateIndex);
-
-					/* System.out.println("Part State: " + currAutomaton.getName() + "[" + stateIndex + ":" + s.getIndex() + "]::" + s.toString());
-					*/
-					// Now, let us iterate over all events (locally) enabled in this state
-					EventIterator evit = currAutomaton.outgoingEventsIterator(s);
-					while(evit.hasNext())
-					{
-						LabeledEvent event = evit.nextEvent();
-
-						/* System.out.print("Event: " + currAutomaton.getName() + "::" + event.toString()); */
-
-						if(onlineSynchronizer.isEnabled(event))	// if the event is globally enabled
-						{
-							/* System.out.println(" is globally enabled"); */
-
-							// Move in direction Ai
-							Element nextState = new ElementObject(onlineSynchronizer.doTransition(currState, event), specAutomata.size());
-							move(state, nextState, currAutomaton);
-
-							// attach ptr back to n
-							nextState.setParent(state);
-
-							// If we've not already seen it (same logical state)...
-							boolean onopen = open.contains(nextState);
-							boolean onclosed = closed.contains(nextState);
-							if(!onopen && !onclosed)
-							{
-								// ...calc the estimate
-								nextState.setBound(calculator.calculate(nextState)); // nextState.getCost() + estimator.h(nextState));
-								// ...put it on the list
-								open.add(nextState);
-							}
-							else // already on open or closed
-							{
-								// direct ptr along path yielding the lowest g(n')
-								if(nextState.getParent() != state)
-								{
-									// needed ptr adjustment
-									nextState.setParent(state);
-
-									if(onclosed)	// reopen
-									{
-										reopener.reopen(nextState, open, closed);
-									}
-								}
-							}
-						}
-
-						/* System.out.println();*/
-					}
-				}
-			}
-			// done with this state, remove it from open
-			open.remove(state);
- 			// and put it on closed
-			closed.add(state);
-			// Note! Must be done in that order, adding alters the stored iterators
-			// If you add before removing the iterators wont be pointing right
-			/* System.out.println("Open: " + open.toString()); */
-		}
-		timer.stop();
-		return null;
-	}
-
-
-	// This one walks the system like:
-	//
-	//	foreach globally enabled event e
-	//		foreach spec automaton Ai
-	//			if e belongs to Ai.alpha
-	//				move in direction Ai
-	//				break foreach
-	//			end if
-	//		end foreach
-	//	end foreach
-	private void walk2()
-	{
-		int debugNum = 1;
-
-		while(!open.isEmpty())
-		{
-			Element state = new Capsule(open.first());
-
-			/* System.out.println("\n(" + debugNum++ + ") Glob State: " + state.toString());*/
-
-			// foreach event enabled in this state
-			int[] events = onlineSynchronizer.getOutgoingEvents(state.getStateArray());
-			for(int i = 0; i < events.length; ++i)
-			{
-				// What do we do now?
-			}
-		}
-	}
-
-	// Here's the one that uses the expander element, just to see how it works out
-	// This is the way it should work (isnt it?)
-	// 
 	// 	while open is not empty
 	//	{
 	//		intelligently pick an element e from open
@@ -351,7 +161,7 @@ public class ModifiedAstar
 	//		remove e from open
 	//		put e on closed
 	//	}
-	public Element walk3()
+	public Element walk()
 	{
 		timer.start();
 
@@ -366,6 +176,7 @@ public class ModifiedAstar
 			{
 				timer.stop();
 				logger.debug(state.toString() + " is marked. Number of states searched: " + debugNum + " Elapsed time: " + getElapsedTime());
+				logger.debug(trace(state));
 				return state; // we've reached the goal, are done
 			}
 
@@ -379,9 +190,9 @@ public class ModifiedAstar
 				boolean onopen = open.contains(nextState);
 				boolean onclosed = closed.contains(nextState);
 				
-				/* begin debug */
+				// begin debug *****
 				logger.debug(nextState.toString() + " is " + (onopen ? "already" : "not") + " on open, and is " + (onclosed ? "already" : "not") + " on closed");
-				/* end debug */
+				// end debug ******
 				
 				if(!onopen && !onclosed)
 				{
@@ -414,32 +225,11 @@ public class ModifiedAstar
 			// If you add before removing the iterators wont be pointing right
 
 		}
-		logger.debug("opne list is empty");
+		logger.debug("open list is empty");
 		timer.stop();
 		return null;	// never reached a (globally) marked state!!
 	}
 
-	// Take a step in the direction of aut
-	// g and Tv are updated as (see p.47)
-	private void move(Element state, Element nxtstate, Automaton aut)
-	{
-		int direction = indexmap[aut.getIndex()]; // specAutomata.getAutomatonIndex(aut); // aut.getIndex();
-		for(Iterator autit = specAutomata.iterator(); autit.hasNext(); )
-		{
-			Automaton automaton = (Automaton)autit.next();
-			int autidx = indexmap[automaton.getIndex()]; // specAutomata.getAutomatonIndex(automaton); // automaton.getIndex();
-			if(autidx != direction)
-			{
-				/* System.out.println("autidx :" + autidx + " direction: " + direction + " Tv.length: " + nxtstate.getTimeArray().length + ", " + state.getTimeArray().length);
-				*/
-				nxtstate.getTimeArray()[autidx] = Math.max(0, state.getTimeArray()[autidx] - state.getTimeArray()[direction]);
-				/* System.out.println("Tv[" + autidx + "] = max(0, " + state.getTimeArray()[autidx] + " - " + state.getTimeArray()[direction] + ")");
-				*/
-			}
-		}
-		nxtstate.setCost(state.getCost() + state.getTimeArray()[direction]);
-		nxtstate.setTime(direction, aut.getStateWithIndex(nxtstate.getStateArray()[direction]).getCost());
-	}
 	// Generate the trace for this element
 	// Note, it's written backwards (should we bother?)
 	private String trace(Element elem)
@@ -485,7 +275,7 @@ public class ModifiedAstar
 				break;
 			}
 		}
-		// automatinIndex indexes an automaton, find the transition from fromStateIndex to toStateIndex
+		// automatonIndex indexes an automaton, find the transition from fromStateIndex to toStateIndex
 		Automaton automaton = automata.getAutomatonAt(automatonIndex);
 		State from = automaton.getStateWithIndex(fromStateIndex);
 		State to = automaton.getStateWithIndex(toStateIndex);
@@ -499,11 +289,9 @@ public class ModifiedAstar
 		}
 		return null;
 	}
+	
 	public Automaton getAutomaton(Element elem)
 	{
-		// String theTrace = trace(elem);
-		// logger.info(theTrace);
-
 		Automaton automaton = new Automaton();
 		automaton.setComment("Schedule");
 
@@ -544,6 +332,10 @@ public class ModifiedAstar
 		return new Info(elem, debugNum, getElapsedTime());
 	}
 	
+	/*** The following is for simple debug only
+	 * It didn't save us from a number of bugs...
+	 ***/
+
 	// Read in problems of the format
 	//	<num machines>
 	//	<num products>
