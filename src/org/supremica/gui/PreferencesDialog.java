@@ -564,7 +564,7 @@ class SoftPLCPanel
 {
 	private PreferencesDialog theDialog = null;
 	private JCheckBox useXmlRpc = null;
-        JTextField cykelTime = new JTextField("");
+        JTextField cycleTime = new JTextField("");
         private JList ioInterfaceList = new JList();
         private Vector ioInterface = new Vector();
 
@@ -587,7 +587,7 @@ class SoftPLCPanel
         contentPane.setLayout(gridBagLayout1);
         ioInterfaceList.setVisibleRowCount(2);
 
-        jLabel1.setText("Default cykel time (ms)");
+        jLabel1.setText("Default cycle time (ms)");
         jLabel2.setText("Available IO-interfaces");
         jButton1.setText("Remove");
         jToggleButton1.setText("Add");
@@ -599,7 +599,7 @@ class SoftPLCPanel
             ,GridBagConstraints.EAST, GridBagConstraints.BOTH, new Insets(0, 80, 60, 20), 60, 0));
         contentPane.add(jLabel1,               new GridBagConstraints(0, 0, 2, 1, 0.0, 0.0
             ,GridBagConstraints.SOUTH, GridBagConstraints.NONE, new Insets(10, 81, 3, 40), 199, 0));
-        contentPane.add(cykelTime,                                       new GridBagConstraints(0, 1, 2, 1, 0.0, 0.0
+        contentPane.add(cycleTime,                                       new GridBagConstraints(0, 1, 2, 1, 0.0, 0.0
             ,GridBagConstraints.SOUTHWEST, GridBagConstraints.NONE, new Insets(8, 82, 23, 0), 181, 0));
         contentPane.add(jButton1,                                     new GridBagConstraints(1, 4, 1, 1, 0.4, 0.0
             ,GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(2, 0, 74, 8), 5, 0));
@@ -614,11 +614,11 @@ class SoftPLCPanel
 		//
 
 
-// 		Jlabel cykelTimeLabel = new JLabel("Default cykel time (ms)");
-// 		propertiesBox.add(cykelTimeLabel);
+// 		Jlabel cycleTimeLabel = new JLabel("Default cycle time (ms)");
+// 		propertiesBox.add(cycleTimeLabel);
 
-// 		cykelTime = new JTextField();
-// 		propertiesBox.add(cykelTime);
+// 		cycleTime = new JTextField();
+// 		propertiesBox.add(cycleTime);
 		
 // 		ioInterface.add("BTSim");
 // 		ioInterface.add("AdlinkPCI7432");
@@ -632,15 +632,15 @@ class SoftPLCPanel
 	{
 		SupremicaProperties.setXmlRpcActive(useXmlRpc.isSelected());
 
-		//int cykelTime = theDialog.getInt("XML-RPC Port", cykelTime.getText(), 1);
-		int cykelTime = 10;
+		//int cycleTime = theDialog.getInt("XML-RPC Port", cycleTime.getText(), 1);
+		int cycleTime = 10;
 
-		if (cykelTime == Integer.MIN_VALUE)
+		if (cycleTime == Integer.MIN_VALUE)
 		{
 			return false;
 		}
 
-		SupremicaProperties.setXmlRpcPort(cykelTime);
+		SupremicaProperties.setXmlRpcPort(cycleTime);
 
 		return true;
 	}
@@ -648,6 +648,6 @@ class SoftPLCPanel
 	public void update()
 	{
 		useXmlRpc.setSelected(SupremicaProperties.isXmlRpcActive());
-		cykelTime.setText(Integer.toString(SupremicaProperties.getXmlRpcPort()));
+		cycleTime.setText(Integer.toString(SupremicaProperties.getXmlRpcPort()));
 	}
 }
