@@ -78,7 +78,7 @@ public class VerificationDialog
 		this.verificationOptions = verificationOptions;
 		dialog.setTitle("Verification options");
 		dialog.setSize(new Dimension(400, 300));
-		dialog.setResizable(false);
+		// dialog.setResizable(false);
 		Container contentPane = dialog.getContentPane();
 
 		JPanel standardPanel = new JPanel();

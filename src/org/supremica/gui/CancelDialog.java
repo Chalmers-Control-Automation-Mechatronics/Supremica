@@ -83,15 +83,23 @@ public class CancelDialog
 
 	private boolean stopRequested = false;
 
+	private EventQueue eventQueue;
+
+	public CancelDialog(Supremica workbench, ArrayList executers)
+	{
+		this(workbench, executers, null);
+	}
+
 	/**
 	 * Creates (modal?) dialog box for canceling the threads in the supplied ArrayList
 	 */
-	public CancelDialog(Supremica workbench, ArrayList executers)
+	public CancelDialog(Supremica workbench, ArrayList executers, EventQueue eventQueue)
 	{
 		super(workbench);
 
 		this.workbench = workbench;
 		this.executers = executers;
+		this.eventQueue = eventQueue;
 
 		setTitle("Stop execution");
 		setSize(new Dimension(250, 120));
@@ -136,7 +144,14 @@ public class CancelDialog
 		// headerLabel.setVerticalAlignment(SwingConstants.BOTTOM);
 		// headerLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		// counterLabel = new JLabel();
-		makeCounter();
+		progressBar = null;
+		counterLabel = new JLabel();
+		JLabel stateLabel = new JLabel("States examined:");
+		counterPanel.removeAll();
+		counterPanel.add(stateLabel);
+		counterPanel.add(counterLabel);
+		//makeCounter();
+		
 		// counterLabel.setVerticalAlignment(SwingConstants.TOP);
 		// counterLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		headerPanel.add(headerLabel, "South");
@@ -150,57 +165,102 @@ public class CancelDialog
 
 	public void makeCounter()
 	{
-		progressBar = null;
-		counterLabel = new JLabel();
-		JLabel stateLabel = new JLabel("States examined:");
-		counterPanel.removeAll();
-		counterPanel.add(stateLabel);
-		counterPanel.add(counterLabel);
+		eventQueue.invokeLater(new Runnable()
+			{   public void run()
+				{
+					progressBar = null;
+					counterLabel = new JLabel();
+					JLabel stateLabel = new JLabel("States examined:");
+					counterPanel.removeAll();
+					counterPanel.add(stateLabel);
+					counterPanel.add(counterLabel);
+				}
+			});
+		/*
+		  progressBar = null;
+		  counterLabel = new JLabel();
+		  JLabel stateLabel = new JLabel("States examined:");
+		  counterPanel.removeAll();
+		  counterPanel.add(stateLabel);
+		  counterPanel.add(counterLabel);
+		*/
 	}
 
-	public void makeProgressBar(int min, int max)
+	public void makeProgressBar(int minValue, int maxValue)
 	{
-		counterLabel = null;
-		progressBar = new JProgressBar(min, max);
-		counterPanel.removeAll();
-		counterPanel.add(progressBar);
+		final int min = minValue;
+		final int max = maxValue;
+		eventQueue.invokeLater(new Runnable()
+			{   public void run()
+				{
+					counterLabel = null;
+					progressBar = new JProgressBar(min, max);
+					counterPanel.removeAll();
+					counterPanel.add(progressBar);
+				}
+			});
+		/*
+		  counterLabel = null;
+		  progressBar = new JProgressBar(min, max);
+		  counterPanel.removeAll();
+		  counterPanel.add(progressBar);
+		*/
 	}
 
 	public void updateCounter(int value)
 	{
 		if (progressBar == null)
 		{
-			try
+			// try
 			{
-				counterLabel.setText(String.valueOf(value));
+				final int counterValue = value;
+				eventQueue.invokeLater(new Runnable()
+					{   public void run()
+						{   counterLabel.setText(String.valueOf(counterValue));
+						}
+					});
+				//counterLabel.setText(String.valueOf(value));
 			}
-			catch (Exception e)
+			// catch (Exception e)
 			{
-				System.out.println("Error when updating counter.");
+				// System.out.println("Error when updating counter.");
 			}
 		}
 		else if (counterLabel == null)
 		{
-			try
+			// try
 			{
-				progressBar.setValue(value);
+				final int counterValue = value;
+				eventQueue.invokeLater(new Runnable()
+					{   public void run()
+						{   progressBar.setValue(counterValue);
+						}
+					});
+				// progressBar.setValue(value);
 			}
-			catch (Exception e)
+			// catch (Exception e)
 			{
-				System.out.println("Error when updating progress bar.");
+				// System.out.println("Error when updating progress bar.");
 			}
 		}
 	}
 
-	public void updateHeader(String message)
+	public void updateHeader(String headerMessage)
 	{
-		try
+		// try
+		final String message = headerMessage;
 		{
-			headerLabel.setText(message);
+			eventQueue.invokeLater(new Runnable()
+				{   public void run()
+					{
+						headerLabel.setText(message);
+					}
+				});
+			// headerLabel.setText(message);
 		}
-		catch (Exception e)
+		// catch (Exception e)
 		{
-			System.out.println("Error when updating header.");
+			// System.out.println("Error when updating header.");
 		}
 	}
 
@@ -218,7 +278,12 @@ public class CancelDialog
 		{
 			executers = null; // Helping the garbage collector...
 			// workbench = null; // Helping the garbage collector...
-			setVisible(false);
+			eventQueue.invokeLater(new Runnable()
+				{   public void run()
+					{   setVisible(false);
+					}
+				});
+			// setVisible(false);
 		}
 	}
 
@@ -234,7 +299,12 @@ public class CancelDialog
 			}
 			executers = null; // Helping the garbage collector...
 			// workbench = null; // Helping the garbage collector...
-			setVisible(false);
+			eventQueue.invokeLater(new Runnable()
+				{   public void run()
+					{   setVisible(false);
+					}
+				});
+			// setVisible(false);
 		}
 		else
  		{

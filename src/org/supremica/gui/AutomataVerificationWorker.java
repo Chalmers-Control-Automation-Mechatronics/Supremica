@@ -79,6 +79,8 @@ public class AutomataVerificationWorker
 	private CancelDialog cancelDialog;
 	private boolean stopRequested = false;
 
+	private EventQueue eventQueue = new EventQueue();
+
 	public AutomataVerificationWorker(Supremica workbench,
 									  Automata theAutomata,
 									  SynchronizationOptions synchronizationOptions,
@@ -97,12 +99,13 @@ public class AutomataVerificationWorker
 	{
 		Date startDate;
 		Date endDate;
-		AutomataVerifier automataVerifier = null;
+		final AutomataVerifier automataVerifier;
 		
 		// Cancel dialog initialization...
 		ArrayList threadsToStop = new ArrayList();
 		threadsToStop.add(this);
-		cancelDialog = new CancelDialog(workbench, threadsToStop);
+		
+		cancelDialog = new CancelDialog(workbench, threadsToStop, eventQueue);
 		cancelDialog.updateHeader("Verifying...");
 		
 		if (verificationOptions.getVerificationType() == 0)
@@ -119,7 +122,13 @@ public class AutomataVerificationWorker
 			try
 			{
 				automataVerifier = new AutomataVerifier(theAutomata, synchronizationOptions, verificationOptions);
-				automataVerifier.getHelper().setCancelDialog(cancelDialog);
+ 				eventQueue.invokeLater(new Runnable()
+					{   public void run()
+						{ 
+							automataVerifier.getHelper().setCancelDialog(cancelDialog);
+						}
+					});
+				// automataVerifier.getHelper().setCancelDialog(cancelDialog);
 				threadsToStop.add(automataVerifier);
 			}
 			catch (Exception e)
@@ -257,7 +266,7 @@ public class AutomataVerificationWorker
 				catch (Exception e)
 				{
 					requestStop();
-					thisCategory.error("Error when calculation union alphabet. " + e);
+					thisCategory.error("Error when calculating union alphabet. " + e);
 					return;
 				}
 			}			
@@ -289,7 +298,12 @@ public class AutomataVerificationWorker
 			try
 			{
 				automataVerifier = new AutomataVerifier(automataA, synchronizationOptions, verificationOptions);
-				automataVerifier.getHelper().setCancelDialog(cancelDialog);
+				eventQueue.invokeLater(new Runnable()
+					{   public void run()
+						{ automataVerifier.getHelper().setCancelDialog(cancelDialog);
+						}
+					});
+				// automataVerifier.getHelper().setCancelDialog(cancelDialog);
 				threadsToStop.add(automataVerifier);
 			}
 			catch (Exception e)
@@ -370,7 +384,12 @@ public class AutomataVerificationWorker
 	public void requestStop()
 	{
 		if (cancelDialog != null)
-			cancelDialog.destroy();
+			eventQueue.invokeLater(new Runnable()
+				{   public void run()
+					{ cancelDialog.destroy();
+					}
+				});
+		// cancelDialog.destroy();
 		stopRequested = true;
 	}
 }

@@ -112,6 +112,7 @@ public class AutomataSynchronizerWorker
 
 			ArrayList threadsToStop = new ArrayList();
 			threadsToStop.add(theSynchronizer);
+			threadsToStop.add(this);
 			CancelDialog cancelDialog = new CancelDialog(workbench, threadsToStop);
 			theSynchronizer.getHelper().setCancelDialog(cancelDialog);
 			cancelDialog.updateHeader("Synchronizing...");
@@ -136,7 +137,7 @@ public class AutomataSynchronizerWorker
 				}
 				catch (Exception ex)
 				{
-					thisCategory.error("Exception in AutomatonSynchronizer while getting the automaton");
+					thisCategory.error("Exception in AutomatonSynchronizer while getting the automaton" + ex);
 					return;
 				}
 			}
@@ -148,8 +149,6 @@ public class AutomataSynchronizerWorker
 				mode = MODE_UPDATE;
 				java.awt.EventQueue.invokeLater(this);
 
-				cancelDialog.destroy();
-
 				Date endDate = new Date();
 				thisCategory.info("Execution completed after " + (endDate.getTime()-startDate.getTime())/1000.0 + " seconds.");
 			}
@@ -159,6 +158,7 @@ public class AutomataSynchronizerWorker
 				thisCategory.info("Execution stopped after " + (endDate.getTime()-startDate.getTime())/1000.0 + " seconds!");
 			}
 
+			cancelDialog.destroy();
 		}
 		else if (mode == MODE_UPDATE)
 		{

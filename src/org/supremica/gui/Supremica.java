@@ -649,11 +649,11 @@ public class Supremica
 		/*
 		JMenuItem controllabilityCheckItem = new JMenuItem("Controllability check");
 		menuHandler.add(controllabilityCheckItem, 2);
+		*/		
 
 		JMenuItem fastControllabilityCheckItem = new JMenuItem("Fast controllability check");
 		menuHandler.add(fastControllabilityCheckItem, 2);
-		*/
-
+		
 		/*
 		JMenuItem pairwiseCheckItem = new JMenuItem("Pairwise controllability check");
 		menuHandler.add(pairwiseCheckItem, 2);
@@ -846,6 +846,7 @@ public class Supremica
 					repaint();
 				}
 			});
+		*/
 
 		fastControllabilityCheckItem.addActionListener(new ActionListener()
 			{
@@ -855,8 +856,7 @@ public class Supremica
 					repaint();
 				}
 			});
-		*/
-
+		
 		/*
 		pairwiseCheckItem.addActionListener(new ActionListener()
 			{
@@ -2612,7 +2612,7 @@ public class Supremica
 				Automaton currAutomaton = (Automaton)autIt.next();
 				boolean add = true;
 
-				// Force the user the enter a new name if the name is ""
+				// Force the user to enter a new name if the name is ""
 				// Note that a null name is not allowed by AutomataBuildFromXml
 				if (currAutomaton.getName().equals(""))
 				{

@@ -78,7 +78,7 @@ public class SynthesizerDialog
 		this.synthesizerOptions = synthesizerOptions;
 		dialog.setTitle("Synthesizer options");
 		dialog.setSize(new Dimension(400, 300));
-		dialog.setResizable(false);
+		// dialog.setResizable(false);
 		Container contentPane = dialog.getContentPane();
 
 		JPanel standardPanel = new JPanel();
