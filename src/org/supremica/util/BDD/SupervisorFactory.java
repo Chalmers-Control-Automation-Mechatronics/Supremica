@@ -10,18 +10,19 @@ package org.supremica.util.BDD;
 public class SupervisorFactory {
 
     // -----------------------------------------------------------------------------------
-    public static Supervisor createSupervisor(BDDAutomata manager, BDDAutomaton[] automata) 
+    public static Supervisor createSupervisor(BDDAutomata manager, BDDAutomaton[] automata)
 	throws Exception
     {
 	switch(Options.algo_family) {
-	case Options.ALGO_MONOLITHIC: return new Supervisor(manager, automata);	    
+	case Options.ALGO_MONOLITHIC: return new Supervisor(manager, automata);
 	case Options.ALGO_CONJUNCTIVE: return new ConjSupervisor(manager,automata);
 	case Options.ALGO_DISJUNCTIVE: return new DisjSupervisor(manager,automata);
-	case Options.ALGO_SMOOTHED: return new SmoothSupervisor(manager,automata);
+	case Options.ALGO_SMOOTHED_MONO: return new SmoothSupervisor(manager,automata);
+	case Options.ALGO_SMOOTHED_PATH: return new PathSmoothSupervisor(manager,automata);
 	}
 
 	// the type is not supported:
-	throw new Exception("Current algorithm family not implemented");	
+	throw new Exception("Current algorithm family not implemented");
     }
 
     // ----------------------------------------------------------------------------------
@@ -30,12 +31,13 @@ public class SupervisorFactory {
     {
 	switch(Options.algo_family) {
 	case Options.ALGO_MONOLITHIC: return new Supervisor(manager, plant,spec);
-	case Options.ALGO_CONJUNCTIVE: return new ConjSupervisor(manager,plant, spec);   
+	case Options.ALGO_CONJUNCTIVE: return new ConjSupervisor(manager,plant, spec);
  	case Options.ALGO_DISJUNCTIVE: return new DisjSupervisor(manager,plant, spec);
-	case Options.ALGO_SMOOTHED: return new SmoothSupervisor(manager,plant, spec);
+	case Options.ALGO_SMOOTHED_MONO: return new SmoothSupervisor(manager,plant, spec);
+	case Options.ALGO_SMOOTHED_PATH: return new PathSmoothSupervisor(manager,plant, spec);
 	}
 
 	// the type is not supported:
-	throw new Exception("Current algorithm family not implemented");	
+	throw new Exception("Current algorithm family not implemented");
     }
 }

@@ -82,7 +82,7 @@ public class GrowFrame
 		int size_x = vars.getSize();
 		StringBuffer sb = new StringBuffer();
 
-		sb.append("x=[0:" + size_x + "];\n");
+		sb.append("x=[1:" + size_x + "];\n");
 		sb.append("\n");
 		sb.append("y=[");
 

@@ -1,5 +1,7 @@
 package org.supremica.util.BDD;
 
+import java.util.*;
+
 public class Util
 {
 	private static int free_memory;    // free memory in MB
@@ -21,12 +23,12 @@ public class Util
 		double d = 10000 * (size + 1);
 		int nodes = (int) Math.max(Math.min(d, MAX_NODES), MIN_NODES);
 
-		BDDAssert.debug("suggsted " + nodes + " nodes for " + 
+		BDDAssert.debug("suggsted " + nodes + " nodes for " +
 				size + " variables.");
 
 		return nodes;
 	}
-    
+
 	public static int log2ceil(int num)
 	{
 		if (num <= 1)
@@ -86,7 +88,34 @@ public class Util
 	}
 
 
-    /** 
+
+	/**
+     * write to stderr and wait until user presses ENTER
+     *
+     */
+
+
+	public static void notify(String msg) {
+		System.err.println(msg);
+		System.err.flush();
+		try {
+			while( System.in.read() != '\n') ;
+		} catch(Exception exxx) { }
+	}
+
+    /**
+     * append_to := append_to + append_from<br>
+     * duplicates are NOT ignored :(
+     *
+     */
+
+	public static void append(Vector append_to, Vector append_from) {
+		for (Enumeration e = append_from.elements(); e.hasMoreElements(); )
+			append_to.addElement( e.nextElement() );
+	}
+
+
+    /**
      * Actually SHOW the BDD as an EPS file<br>
      * requires: AT&T dot, ghostview.<br>
      * works only on UNIX :)

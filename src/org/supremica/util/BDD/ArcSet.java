@@ -27,7 +27,7 @@ public class ArcSet
 		return false;
 	}
 
-  
+
 	public void add(String event, String s1, String s2)
 	    throws BDDException
 	{
@@ -35,6 +35,7 @@ public class ArcSet
 		BDDAssert.bddAssert(!in(event, s1, s2), "Duplicate arc: " + s1 + " -" + event + "-> " + s2);
 
 		Arc arc = new Arc();
+
 
 		arc.event = event;
 		arc.state1 = s1;
@@ -80,13 +81,15 @@ public class ArcSet
 		return arcs[index];
 	}
 
-    
-	public void saturate(String from, String to, Event e1, EventSet es) 
+
+
+	/* TODO: all saturate code should use the new next/prev and incoming/outgoing stuff in Set and Arc */
+	public void saturate(String from, String to, Event e1, EventSet es)
 	{
 	    BDDAssert.internalCheck(!closed, "[ArcSet.saturate]BAD FUNCTION CALL!");
 
 
-	   
+
 	    for (Enumeration e = elements(); e.hasMoreElements(); ) {
 		Arc arc = (Arc) e.nextElement();
 
@@ -95,23 +98,42 @@ public class ArcSet
 		    Event e2 = es.getEventByName(arc.event);
 		    if(e2.c == e1.c /* && e2.p == e1.p */) {
 			if(!in(e2.name_id, arc.state1, to)) {
-			    			    
+
 			    Arc new_arc = new Arc();
-			    
+
 			    new_arc.event  = e2.name_id;
 			    new_arc.state1 = arc.state1;
 			    new_arc.state2 = to;
 			    new_arc.id     = count++;
-			    new_arc.e_code = new_arc.s1_code = new_arc.s2_code;
-			    
-			    addElement(new_arc); 
+			    new_arc.e_code = new_arc.s1_code = new_arc.s2_code = -1; // not initialized yet :(
+
+			    addElement(new_arc);
 			}
 		    }
 		}
 	    }
 	}
 
-	
+
+
+	private void registerArc(StateSet ss, Arc a, Event event)
+		throws BDDException
+	{
+		a.o_from  = ss.getByName(a.state1);
+		BDDAssert.bddAssert(a.o_from != null, "from-state not found:" + a.state1);
+
+		a.o_to    = ss.getByName(a.state2);
+		BDDAssert.bddAssert(a.o_to != null, "to-state not found:" + a.state2);
+
+		a.o_event = event;
+
+		a.s1_code = a.o_from.id;
+		a.s2_code = a.o_to.id;
+
+		a.o_from.outgoing.addElement( a); // State -> ARC
+		a.o_to.incoming.addElement( a);   // ARC --> State
+		a.o_from.next.addElement(a.o_to); // State -- (ARC) --> State
+	}
 
 	public void close(StateSet ss, EventSet es)
 	    throws BDDException
@@ -126,20 +148,26 @@ public class ArcSet
 			Event event = es.getEventByName(ev.event);
 
 			BDDAssert.bddAssert(event != null, "event not found:" + ev.event);
-
 			ev.e_code = event.id;
-			ev.s1_code = ss.getIdByName(ev.state1);
-			ev.s2_code = ss.getIdByName(ev.state2);
-
 			BDDAssert.bddAssert(ev.e_code != Automaton.FAILED, "event not found:" + ev.event);
-			BDDAssert.bddAssert(ev.s1_code != Automaton.FAILED, "from-state not found:" + ev.state1);
-			BDDAssert.bddAssert(ev.s2_code != Automaton.FAILED, "to-state not found:" + ev.state2);
+
+			registerArc(ss,ev, event);
+			arcs[ev.id] = ev;
 
 			// mark that this event has been used one time in a transition
 			event.use++;
 
-			arcs[ev.id] = ev;
 		}
+
+
+
+		/* build the next/prev arc vectors for each arc */
+	    for (Enumeration e = elements(); e.hasMoreElements(); ) {
+			Arc arc = (Arc) e.nextElement();
+			Util.append( arc.next, arc.o_to.outgoing);
+			Util.append( arc.prev, arc.o_from.incoming);
+		}
+
 
 		closed = true;
 	}

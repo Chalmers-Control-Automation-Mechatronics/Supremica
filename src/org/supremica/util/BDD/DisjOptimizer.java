@@ -9,54 +9,66 @@ import java.util.*;
 
 
 public class DisjOptimizer {
+
     private GroupHelper gh;
     private BDDAutomata manager;
     private int max_size, size;
     private int [] twave, twave2;
+	private Cluster [] clusters;
 
     public DisjOptimizer(BDDAutomata manager, GroupHelper gh) {
 	this.gh = gh;
 	this.manager = manager;
 
 	max_size = size = gh.getSize();
-	
+
 	twave = new int[size];
 	twave2 = new int[size];
+	clusters = new Cluster[size];
 
 	int [] tmp = gh.getTwave();
+	int [] cube = gh.getCube();
+	int [] cubep = gh.getCubep();
+	BDDAutomaton [] automata = gh.getSortedList();
+
 	for(int i = 0; i < size; i++) {
-	    twave[i] = tmp[i];
+		clusters[i] = new Cluster(manager, twave[i] = tmp[i], cube[i], cubep[i]);
+		clusters[i].members.addElement( automata[i] );
 	    manager.ref(twave[i]);
 	}
 
 	optimize();
     }
 
-    public void cleanup() {	
+    public void cleanup() {
 	for(int i = 0; i < size; i++) {
 	    manager.deref(twave[i]);
-	}	
+	    clusters[i].cleanup();
+	}
     }
 
-    public int getSize() {
-	return size;
+    public int getSize()
+    {
+		return size;
     }
-    public int [] getTwave() {
-	return twave;
-    }
+
+    public Cluster [] getClusters()
+    {
+		return clusters;
+	}
     // ----------------------------------------------------
     /*
     void optimize() {
     // BDD size optimization: DOES NOT WORK
-	
+
 	// TODO: we only need to look at those that are dependent!
-	
+
 	int current = 0;
 	for(int i = 0; i < size; i++) {
-	    
-	    for(int j = i+1; j < size; j++) {		
+
+	    for(int j = i+1; j < size; j++) {
 		int l = twave[i]; // lower bound
-		int u = twave[j]; // upper bound		
+		int u = twave[j]; // upper bound
 		int notu = manager.not(u);
 		int c = manager.or(notu, l); // c = l + ~u
 
@@ -88,11 +100,11 @@ public class DisjOptimizer {
 			Util.showBDD(manager,add,"add"+i);
 			return;
 		    }
-		    
+
 		    int both = manager.or(u,l);
 		    int more = manager.or(both,f);
 		    if(more != both) {
-			System.out.println("f is more than u");			
+			System.out.println("f is more than u");
 			int notboth = manager.not(both);
 			int extra = manager.and(f, both);
 			manager.printSet(extra);
@@ -101,12 +113,12 @@ public class DisjOptimizer {
 			manager.show_transitions(extra);
 			return;
 		    }
-		    		    
+
 		    manager.deref(less);
 		    manager.deref(more);
 		    // END OF DEBUG CODE
 		}
-		
+
 
 		manager.deref(f);
 	    }
@@ -123,7 +135,7 @@ public class DisjOptimizer {
 
 
 	twave2[current] = twave[0];
-	
+
 	for(int i = 1; i < size; i++) {
 	    if(manager.nodeCount(twave[i]) > max_nodes) {
 		current ++;
@@ -141,8 +153,8 @@ public class DisjOptimizer {
 		    current++;
 		    twave2[current] = twave[i];
 		}
-	    }	    
-	}    
+	    }
+	}
 
 
 	current ++;

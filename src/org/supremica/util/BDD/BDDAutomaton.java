@@ -30,7 +30,7 @@ public class BDDAutomaton
 	private int permute_s2sp, permute_sp2s;
 
 	public BDDAutomaton(BDDAutomata manager, Automaton a, int index)
-	{	    
+	{
 		this.manager   = manager;
 		this.automaton = a;
 		this.index     = index;
@@ -69,19 +69,15 @@ public class BDDAutomaton
 
 		// precalculate STATE -> BDD map
 		bdd_m = manager.getZero();
-
 		manager.ref(bdd_m);
 
 		bdd_f = manager.getZero();
-
 		manager.ref(bdd_f);
 
 		bdd_care_s = manager.getZero();
-
 		manager.ref(bdd_care_s);
 
 		bdd_care_sp = manager.getZero();
-
 		manager.ref(bdd_care_sp);
 
 		for (int i = 0; i < num_states; i++)
@@ -103,9 +99,53 @@ public class BDDAutomaton
 				bdd_f = manager.orTo(bdd_f, bdd_sp);
 			}
 
-			bdd_care_s = manager.orTo(bdd_care_s, bdd_s);
-			bdd_care_sp = manager.orTo(bdd_care_sp, bdd_sp);
+			/* to count states correctly, we use only one encoding state -> the care set != entire S */
+			// if(!Options.fill_statevars) {
+				bdd_care_s = manager.orTo(bdd_care_s, bdd_s);
+				bdd_care_sp = manager.orTo(bdd_care_sp, bdd_sp);
+			//}
 		}
+
+
+		/* use the entire encoding space by having duplicate encodings per state*/
+		if(Options.fill_statevars)
+		{
+			int capacity = 1 << num_bits;
+			int unused = capacity - num_states;
+
+			/* find out which encodings are free */
+
+			boolean [] code_used= new boolean[capacity];
+
+			for(int i = 0; i < capacity; i++)
+				code_used[i] = false;
+
+			for (int i = 0; i < num_states; i++)
+				code_used[states[i].code] = true;
+
+
+			/* append the unused encoding to some states, untill every code is used */
+			for(int i = 0; i < unused; i++)
+			{
+
+				int state = i; /* the state to which we add an encoding */
+
+				/* find the next unused code */
+				int j = 0;
+				for(; code_used[j]; j++) ;
+				int code = j;
+				code_used[j] = true;
+
+				/* get the BDD for it */
+				int bdd_more_s  = Util.getNumber(manager, var_s, code);
+				int bdd_more_sp = Util.getNumber(manager, var_sp, code);
+
+				/* append it to some state */
+				states[state].bdd_s  = manager.orTo(states[state].bdd_s , bdd_more_s );
+				states[state].bdd_sp = manager.orTo(states[state].bdd_sp, bdd_more_sp);
+			}
+		}
+
 
 		// get dont-care states, i.e. states allocated but not used in this state-vector
 		bdd_dontcare_s = manager.not(bdd_care_s);
@@ -165,8 +205,10 @@ public class BDDAutomaton
 	public void cleanup()
 	{
 		check("Cleanup");
+
 		manager.deletePair(permute_s2sp);
 		manager.deletePair(permute_sp2s);
+
 		if(dependency != null) {
 		    dependency.cleanup();
 		    dependency = null;
@@ -293,7 +335,7 @@ public class BDDAutomaton
 	{
 		return automaton.getName();
 	}
-    public int getIndex() 
+    public int getIndex()
     {
 	return index;
     }

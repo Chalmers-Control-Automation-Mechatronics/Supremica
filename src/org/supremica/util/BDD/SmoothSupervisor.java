@@ -2,26 +2,18 @@
 
 package org.supremica.util.BDD;
 
-// NOTICE: maybe we should ignore the first round (initial states) ???
-
-
-// Smoothed reachability based on conjunctive transition relations
-//
-// the way the BDD peek jumps up and down just before fixpoint
-// is probably due to a bug in the PCG routines that give a very
-// non-optimal "shortest path"...
-
-
 import java.util.*;
+
+/** monotonicly increased smoothed reachability based on conjunctive transition relations */
 
 public class SmoothSupervisor extends DisjSupervisor {
 
     public SmoothSupervisor(BDDAutomata manager, Group p, Group sp) {
-	super(manager,p,sp);
+		super(manager,p,sp);
     }
-    
+
     public SmoothSupervisor(BDDAutomata manager, BDDAutomaton [] as) {
-	super(manager,as);
+		super(manager,as);
     }
 
 
@@ -31,11 +23,12 @@ public class SmoothSupervisor extends DisjSupervisor {
 	GrowFrame gf = null;
 	if(Options.show_grow)
 	    gf = new GrowFrame("Forward reachability (smoothed)");
-      
+
 	timer.reset();
-	DisjPartition dp = new DisjPartition(manager, plant.getSize() + spec.getSize());
+	MonotonicPartition dp = new MonotonicPartition(manager, plant.getSize() + spec.getSize());
+
 	SizeWatch.setOwner("SmoothSupervisor.computeReachables");
-	int cube    = manager.getStateCube();	
+	int cube    = manager.getStateCube();
 	int i_all = manager.and(plant.getI(), spec.getI());
 
 	/*
@@ -46,11 +39,11 @@ public class SmoothSupervisor extends DisjSupervisor {
 	    int i_first = i_all;
 	    i_all = manager.getZero(); manager.ref(i_all);
 	    BDDAutomaton [] as = gh.getSortedList();
-	    for(int i = 0; i < gh.getSize(); i++) {	    
+	    for(int i = 0; i < gh.getSize(); i++) {
 		DependencySet ds = as[i].getDependencySet();
 		int i2 = ds.getReachables( ds.getI());
-		int i_others = manager.exists(i_first, ds.getCube());		
-		i2 = manager.andTo(i2, i_others);				
+		int i_others = manager.exists(i_first, ds.getCube());
+		i2 = manager.andTo(i2, i_others);
 		manager.deref(i_others);
 		i_all = manager.orTo(i_all, i2);
 		manager.deref(i2);
@@ -58,32 +51,35 @@ public class SmoothSupervisor extends DisjSupervisor {
 	    manager.deref(i_first);
 	} // End of computing saturated I
 	*/
-	
+
 	int r_all_p, r_all = i_all;
 	manager.ref(i_all); //gets derefed by orTo and finally a deref
 
 
 	// 0/1 smoothing
-	boolean [] remaining = new boolean[disj_size];
-	for(int i = 0; i < disj_size; i++) 
-	    remaining[i] = true; 
+	int size = dop.getSize();
+	Cluster [] clusters = dop.getClusters();
+
+	boolean [] remaining = new boolean[size];
+	for(int i = 0; i < size; i++)
+	    remaining[i] = true;
 
 
-	for(int a = 0; a < disj_size; a++) {
-	    if(remaining[a]) {	    
+	for(int a = 0; a < size; a++) {
+	    if(remaining[a]) {
 		remaining[a] = false;
-		dp.add(twave[a]);		
+		dp.add(clusters[a].twave);
 	    }
 	    int r_all_pp, front_s, front_sp;
 
 	    do {
-		r_all_pp = r_all;		
+		r_all_pp = r_all;
 		int front = dp.image(r_all);
 		r_all = manager.orTo(r_all, front);
 		manager.deref(front);
 		if(gf != null)    gf.add( manager.nodeCount( r_all));
 
-	    } while(r_all != r_all_pp);	    
+	    } while(r_all != r_all_pp);
 	}
 
 
@@ -95,6 +91,7 @@ public class SmoothSupervisor extends DisjSupervisor {
 	has_reachables = true;
 	bdd_reachables = r_all;
 	SizeWatch.report(r_all, "Qr");
+	dp.cleanup();
 	timer.report("Forward reachables found (smoothed)");
 	// SizeWatch.report(r_all, "R");
     }
@@ -105,7 +102,8 @@ public class SmoothSupervisor extends DisjSupervisor {
 	if(Options.show_grow) gf = new GrowFrame("backward reachability (smoothed)");
 
 	timer.reset();
-	DisjPartition dp = new DisjPartition(manager, plant.getSize() + spec.getSize());
+	MonotonicPartition dp = new MonotonicPartition(manager, plant.getSize() + spec.getSize());
+
 	SizeWatch.setOwner("SmoothSupervisor.computeCoReachables");
 
 	int cube    = manager.getStatepCube();
@@ -121,34 +119,36 @@ public class SmoothSupervisor extends DisjSupervisor {
 
 
 	if(Options.local_saturation) {
-	    // TODO: compute saturated m_all (r_all right now) 
+	    // TODO: compute saturated m_all (r_all right now)
 	}
 
-	SizeWatch.report(r_all, "Qm"); 
+	SizeWatch.report(r_all, "Qm");
 
 	// 0/1 smoothing
-	boolean [] remaining = new boolean[disj_size];
-	for(int i = 0; i < disj_size; i++) 
-	    remaining[i] = true; 
+	int size = dop.getSize();
+	Cluster [] clusters = dop.getClusters();
+	boolean [] remaining = new boolean[size];
+	for(int i = 0; i < size; i++)
+	    remaining[i] = true;
 
 
 
 
-	for(int a = 0; a < disj_size; a++) {
-	    if(remaining[a]) {	    
+	for(int a = 0; a < size; a++) {
+	    if(remaining[a]) {
 		remaining[a] = false;
-		dp.add(twave[a]);
+		dp.add(clusters[a].twave);
 	    }
 	    int r_all_pp, front_s, front_sp;
 
 	    do {
-		r_all_pp = r_all;		
+		r_all_pp = r_all;
 		int front = dp.preImage(r_all);
 		r_all = manager.orTo(r_all, front);
 		manager.deref(front);
 		if(gf != null)    gf.add( manager.nodeCount( r_all));
 
-	    } while(r_all != r_all_pp);	    
+	    } while(r_all != r_all_pp);
 	}
 
 
@@ -164,6 +164,7 @@ public class SmoothSupervisor extends DisjSupervisor {
 	SizeWatch.report(bdd_coreachables, "Qco");
 	timer.report("Co-reachables found (smoothed)");
 	if(gf != null) gf.stopTimer();
+	dp.cleanup();
 	// SizeWatch.report(bdd_coreachables,"Coreachables");
 
     }

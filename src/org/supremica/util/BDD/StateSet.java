@@ -27,7 +27,8 @@ public class StateSet
 		return false;
 	}
 
-	public int getIdByName(String name)
+
+	public State getByName(String name)
 	    throws BDDException
 	{
 		BDDAssert.bddAssert(!closed, "[StateSet.getIdByName]BAD FUNCTION CALL!");
@@ -38,12 +39,21 @@ public class StateSet
 
 			if (s.name_id.equals(name))
 			{
-				return s.id;
+				return s;
 			}
 		}
 
-		return Automaton.FAILED;
+		return null;
 	}
+
+
+	public int getIdByName(String name)
+	    throws BDDException
+	{
+		State s = getByName(name);
+		return ( s  != null) ? s.id : Automaton.FAILED;
+	}
+
 
 	public void add(String name, String id, boolean i, boolean m, boolean x)
 	    throws BDDException

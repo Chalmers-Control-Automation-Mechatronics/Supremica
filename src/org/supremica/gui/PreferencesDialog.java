@@ -108,10 +108,10 @@ public class PreferencesDialog
 
 		theControllerPanel = new PreferencesControllerPanel(this);
 
-		contentPane.add(theControllerPanel, BorderLayout.SOUTH);		
+		contentPane.add(theControllerPanel, BorderLayout.SOUTH);
 		// setSize(400, 350);
 		pack();
-		
+
 
 
 		// Center the window
@@ -129,7 +129,7 @@ public class PreferencesDialog
 		}
 
 		setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
-		
+
 
 		addWindowListener(new WindowAdapter()
 		{
@@ -398,7 +398,7 @@ class LayoutPanel
 		SupremicaProperties.setDotUseColors(dotUseColors.isSelected());
 		SupremicaProperties.setDotUseMultipleLabels(dotUseMultipleLabels.isSelected());
 		SupremicaProperties.setDotExecuteCommand(dotCommand.getText());
-		
+
 		int maxNbrOfStates = theDialog.getInt("Max number of states without warning", dotMaxNbrOfStates.getText(), 0);
 
 		if (maxNbrOfStates == Integer.MIN_VALUE)
@@ -660,9 +660,9 @@ class BDDPanel
 {
     private PreferencesDialog theDialog = null;
     private JCheckBox showGrow, alterPCG, debugOn,  traceOn, ucOptimistic, nbOptimistic;
-    private JCheckBox localSaturation;
+    private JCheckBox localSaturation, encodingFill;
     private JComboBox algorithmFamily, countAlgorithm, orderingAlgorithm;
-    
+
     public BDDPanel(PreferencesDialog theDialog)
     {
 
@@ -673,22 +673,24 @@ class BDDPanel
 	add(pWest, BorderLayout.WEST);
 
 	pWest.add( showGrow = new JCheckBox("Show BDD growth", Options.show_grow) );
-	pWest.add( alterPCG = new JCheckBox("User is allowed to alter PCG orders", 
-					     Options.user_alters_PCG) );       
+	pWest.add( alterPCG = new JCheckBox("User is allowed to alter PCG orders",
+					     Options.user_alters_PCG) );
 	pWest.add( traceOn = new JCheckBox("Dump execution trace ", Options.trace_on) );
 	pWest.add( debugOn = new JCheckBox("Verbose", Options.debug_on) );
 	pWest.add( localSaturation = new JCheckBox("Locally saturate", Options.local_saturation) );
-	pWest.add( ucOptimistic = new JCheckBox("Optimisitc on controllability", Options.uc_optimistic));
-	pWest.add( nbOptimistic = new JCheckBox("Optimisitc on liveness", Options.nb_optimistic));
+	// pWest.add( ucOptimistic = new JCheckBox("Optimisitc on controllability", Options.uc_optimistic));
+	// pWest.add( nbOptimistic = new JCheckBox("Optimisitc on liveness", Options.nb_optimistic));
 
-       
+	pWest.add( encodingFill = new JCheckBox("Full encoding of S", Options.fill_statevars) );
+
+
 	Box p = new Box(BoxLayout.Y_AXIS);
 	add(p, BorderLayout.EAST);
 
 
 	JPanel pOrdering = new JPanel();
 	p.add(pOrdering);
-	
+
 	pOrdering.add( new JLabel("Automata (not BDD) ordering"));
 	pOrdering.add( orderingAlgorithm = new JComboBox());
 
@@ -699,31 +701,32 @@ class BDDPanel
 
 
 	JPanel pFamily = new JPanel();
-	p.add(pFamily);	
+	p.add(pFamily);
 	pFamily.add( new JLabel("Favour algorithm family"));
 	pFamily.add( algorithmFamily = new JComboBox());
 
 	algorithmFamily.addItem("Monolithic");
 	algorithmFamily.addItem("Conjunctive");
 	algorithmFamily.addItem("Disjunctive");
-	algorithmFamily.addItem("Smoothed");
+	algorithmFamily.addItem("Smoothed: Monotonic ");
+	algorithmFamily.addItem("Smoothed: Path");
 	algorithmFamily.setSelectedIndex(Options.algo_family);
 
 
 	JPanel pCount = new JPanel();
 	p.add(pCount);
-	
+
 	pCount.add( new JLabel("State-counting algorithm"));
 	pCount.add(countAlgorithm = new JComboBox());
 
 	countAlgorithm.addItem("No counting");
 	countAlgorithm.addItem("Tree SAT");
 	countAlgorithm.addItem("Exact");
-	
+
 	countAlgorithm.setSelectedIndex( Options.count_algo);
-       
+
     }
-    
+
     public boolean doApply()
     {
 	Options.algo_family      = algorithmFamily.getSelectedIndex();
@@ -732,16 +735,16 @@ class BDDPanel
 
 	Options.show_grow        = showGrow.isSelected();
 	Options.user_alters_PCG  = alterPCG.isSelected();
-	Options.uc_optimistic    = ucOptimistic.isSelected();
-	Options.nb_optimistic    = nbOptimistic.isSelected();
+	// Options.uc_optimistic    = ucOptimistic.isSelected();
+	// Options.nb_optimistic    = nbOptimistic.isSelected();
 	Options.trace_on         = traceOn.isSelected();
 	Options.debug_on         = debugOn.isSelected();
 	Options.local_saturation = localSaturation.isSelected();
+	Options.fill_statevars   = encodingFill.isSelected();
 
-
-	SupremicaProperties.updateBDDOptions(true);		
+	SupremicaProperties.updateBDDOptions(true);
 	return true;
-	
+
     }
 
     public void update()

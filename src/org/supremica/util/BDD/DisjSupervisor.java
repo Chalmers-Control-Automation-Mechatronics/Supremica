@@ -5,7 +5,6 @@ package org.supremica.util.BDD;
 import java.util.*;
 
 public class DisjSupervisor extends ConjSupervisor {
-    protected int [] twave;
     protected DisjOptimizer dop;
     protected DisjPartition disj_partition;
     protected int disj_size;
@@ -25,34 +24,27 @@ public class DisjSupervisor extends ConjSupervisor {
 
     /** C++-style Destructor to cleanup unused BDD trees*/
     public void cleanup() {
-	if(disj_partition != null) {
-	    disj_partition.cleanup();
-	    disj_partition = null;
-	}
-	dop.cleanup();
-	super.cleanup();
+		if(disj_partition != null) {
+			disj_partition.cleanup();
+			disj_partition = null;
+		}
+		dop.cleanup();
+		super.cleanup();
     }
     // --------------------------------------------------------
     private void init_disj() {
-	disj_partition = null; // not needed yet
-	dop = new DisjOptimizer(manager, gh);
-	twave = dop.getTwave();
-	disj_size  = dop.getSize();
+		disj_partition = null; // not needed yet
+		dop = new DisjOptimizer(manager, gh);
+		disj_size  = dop.getSize();
     }
     protected DisjPartition getDisjPartition() {
-	if(disj_partition == null) computeDisjPartition();
-	return disj_partition;
+		if(disj_partition == null) computeDisjPartition();
+		return disj_partition;
     }
     private void computeDisjPartition() {
-	int size = dop.getSize();
-	int []twave = dop.getTwave();
-	disj_partition = new DisjPartition(manager, size);
-	for(int i = 0; i < size; i++) 
-	    disj_partition.add( twave[i]);
-
-	disj_partition.report(); // show some states	
+		disj_partition = new DisjPartition(manager, dop);
     }
-    
+
     // --------------------------------------------------------
     protected void computeReachables() {
 	// statistic stuffs
@@ -70,7 +62,8 @@ public class DisjSupervisor extends ConjSupervisor {
 	int r_all_p, r_all = i_all, front = i_all;
 	manager.ref(i_all); //gets derefed by orTo and finally a deref
 	manager.ref(front); // get derefed
-		
+
+
 	do {
 	    r_all_p = r_all;
 
@@ -82,6 +75,7 @@ public class DisjSupervisor extends ConjSupervisor {
 	    if(gf != null)    gf.add( manager.nodeCount( r_all));
 	} while(r_all_p != r_all);
 
+
 	manager.deref(front);
 	manager.deref(i_all);
 
@@ -91,8 +85,9 @@ public class DisjSupervisor extends ConjSupervisor {
 	SizeWatch.report(bdd_reachables, "Qr");
 	timer.report("Forward reachables found (disjunctive)");
 	// SizeWatch.report(r_all, "R");
+
     }
-    
+
     protected void computeCoReachables() {
 	GrowFrame gf = null;;
 	if(Options.show_grow) gf = new GrowFrame("backward reachability (disjuncted)");
@@ -122,10 +117,10 @@ public class DisjSupervisor extends ConjSupervisor {
 	    int new_front = dp.preImage(front);
 	    r_all = manager.orTo(r_all, new_front);
 	    manager.deref(front);
-	    front = new_front;	    
-	    if(gf != null)    gf.add( manager.nodeCount( r_all));	    
+	    front = new_front;
+	    if(gf != null)    gf.add( manager.nodeCount( r_all));
 	} while(r_all != r_all_p);
-    	
+
 	// move the result from S' to S:
 	int ret = manager.replace(r_all, permute2);
 
@@ -142,5 +137,6 @@ public class DisjSupervisor extends ConjSupervisor {
 	if(gf != null) gf.stopTimer();
 	// SizeWatch.report(bdd_coreachables,"Coreachables");
     }
- 
+
+
 }

@@ -5,12 +5,12 @@ import java.util.*;
 
 /**
  * This class re-creates the automaton-list by merging two groups and using
- * the oroginal ordering (according to BDDAutomaton.index) 
+ * the original ordering (according to BDDAutomaton.index)
  * (last Automata first, to allow bottom-up construction)
  */
 
 public class GroupHelper {
-    
+
     private int size;
     private int [] tpri, cube, cubep, twave;
     private Vector all;
@@ -24,8 +24,8 @@ public class GroupHelper {
     public GroupHelper(Group g1, Group g2) {
 
 	// We actually need a priority vector, but who cares (N is small anyway) :)
-	all = new Vector(g1.getSize() + g2.getSize());	
-	
+	all = new Vector(g1.getSize() + g2.getSize());
+
 	BDDAutomaton [] tmp = g1.getMembers();
 	for(int i = 0; i < g1.getSize(); i++) all.addElement( tmp[i]);
 
@@ -34,16 +34,16 @@ public class GroupHelper {
 
 	sort();
     }
-	
+
     public GroupHelper(BDDAutomaton [] a) {
 
 	// We actually need a priority vector, but who cares (N is small anyway) :)
-	all = new Vector(a.length);		
+	all = new Vector(a.length);
 	for(int i = 0; i < a.length; i++) all.addElement( a[i]);
 
 	sort();
     }
-	
+
     private void sort() {
 	size  = all.size();
 	tpri  = new int[size];
@@ -64,23 +64,23 @@ public class GroupHelper {
     }
 
     // --------------------------------------------------------------------------
-    public int getSize() 
+    public int getSize()
     {
 	return size;
     }
-    public int [] getTpri() 
-    { 
-	return tpri; 
+    public int [] getTpri()
+    {
+	return tpri;
     }
 
-    public int [] getCube() 
-    { 
-	return cube; 
+    public int [] getCube()
+    {
+	return cube;
     }
 
-    public int [] getCubep() 
-    { 
-	return cubep; 
+    public int [] getCubep()
+    {
+	return cubep;
     }
 
 
@@ -95,15 +95,15 @@ public class GroupHelper {
     public int [] getTwave() {
 	if(twave == null) {
 	    twave = new int[size];
-	    for(int i = 0; i < size; i++) 
-		twave[i] = sorted_list[i].getDependencySet().getTwave();	 
+	    for(int i = 0; i < size; i++)
+		twave[i] = sorted_list[i].getDependencySet().getTwave();
 	}
 	return twave;
     }
     // ---------------------------------------------------------------------------
     // a PriorityQueue, my kingdom for a PriorityQueue...
     private BDDAutomaton popLargest() {
-	Enumeration e = all.elements();	
+	Enumeration e = all.elements();
 	BDDAutomaton s = (BDDAutomaton) e.nextElement();
 
 	while(e.hasMoreElements()) {

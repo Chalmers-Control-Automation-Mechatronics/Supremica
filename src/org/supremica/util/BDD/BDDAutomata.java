@@ -39,7 +39,7 @@ public class BDDAutomata
 		SizeWatch.setManager(this);
 
 		// some funny thing with CUDD ...
-		BDDAssert.internalCheck((not(getZero()) == getOne()) && (not(getOne()) == getZero()), 
+		BDDAssert.internalCheck((not(getZero()) == getOne()) && (not(getOne()) == getZero()),
 					"[INTERNAL] either  ~1 != 0  or  ~0 != 1");
 
 		Timer timer = new Timer();
@@ -60,7 +60,7 @@ public class BDDAutomata
 
 		while (e.hasMoreElements())
 		{
-			automata[i] = new BDDAutomaton(this, (Automaton) e.nextElement(), i);			
+			automata[i] = new BDDAutomaton(this, (Automaton) e.nextElement(), i);
 			size_states += automata[i].getNumStateBits();
 			i++;
 
@@ -428,20 +428,20 @@ public class BDDAutomata
 	System.out.println(name + " " + count_states(bdd));
     }
 
-    public long count_states(int bdd) 
+    public long count_states(int bdd)
 	{
 
 	    switch(Options.count_algo) {
 	    case Options.COUNT_NONE:
 		return 0;
-		
-	    case Options.COUNT_TREE:		
+
+	    case Options.COUNT_TREE:
 		// the easy way
 		int new_bdd = removeDontCareS(bdd);
 		double states = satCount(new_bdd);
 		if(states != -1)
 		    states /= Math.pow(2, size_states + size_events);
-		deref(new_bdd);		
+		deref(new_bdd);
 		return (long) states;
 	    case Options.COUNT_EXACT:
 		// the hard/boring/slow way :(
@@ -451,7 +451,7 @@ public class BDDAutomata
 
 		return c.get();
 	    }
-	    return 0; // just in case :)		
+	    return 0; // just in case :)
 	}
 
 	private void count_transitions_rec0(Counter c, int bdd, int level)

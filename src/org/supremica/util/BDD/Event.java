@@ -2,7 +2,7 @@ package org.supremica.util.BDD;
 
 public class Event
 {
-	Event()
+	public Event()
 	{
 		owners = use = 0;
 	}
