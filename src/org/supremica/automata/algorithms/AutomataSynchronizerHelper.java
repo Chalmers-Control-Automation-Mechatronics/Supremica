@@ -203,6 +203,11 @@ public final class AutomataSynchronizerHelper
 		return theAutomaton;
 	}
 
+	public Alphabet getUnionAlphabet()
+	{
+		return theAutomaton.getAlphabet();
+	}
+
 	public Automata getAutomata()
 	{
 		return theAutomata;

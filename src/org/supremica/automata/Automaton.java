@@ -50,10 +50,13 @@
 package org.supremica.automata;
 
 import java.util.*;
+import org.supremica.log.*;
 
 public class Automaton
 	implements ArcListener
 {
+	private static Logger logger = LoggerFactory.createLogger(Automaton.class);
+
 	private Alphabet alphabet;
 	private String name;
 	private String comment;
@@ -344,9 +347,65 @@ public class Automaton
 		return alphabet.getEventWithId(eventId);
 	}
 
+	public LabeledEvent getEvent(Arc theArc)
+		throws Exception
+	{
+		return getEvent(theArc.getEventId());
+	}
+
+	public String getLabel(Arc theArc)
+		throws Exception
+	{
+		LabeledEvent theEvent = getEvent(theArc);
+		return theEvent.getLabel();
+	}
+
+	/**
+	 * Use isInAlphabet instead
+	 * @deprecated
+	 */
 	public boolean containsEventWithLabel(String eventLabel)
 	{
+		return hasEventInAlphabet(eventLabel);
+	}
+
+	public boolean hasEventInAlphabet(String eventLabel)
+	{
 		return alphabet.containsEventWithLabel(eventLabel);
+	}
+
+	/**
+	 * Returns an iterator to all states in this automaton
+	 * that has an event with eventLabel as an outoing event.
+	 */
+	public Iterator statesThatEnableEventIterator(String eventLabel)
+	{
+		StateIterator stateIt = new StateIterator(eventLabel, true);
+		return stateIt;
+	}
+
+	/**
+	 * Returns true if the event with label eventLabel is prioritized in this
+	 * automaton. If the event is not included in this automaton or is not
+	 * prioritized then it returns false.
+	 */
+	public boolean isEventPrioritized(String eventLabel)
+	{
+		if (!containsEventWithLabel(eventLabel))
+		{
+			return false;
+		}
+		LabeledEvent thisEvent = null;
+		try
+		{
+			thisEvent = getEventWithLabel(eventLabel);
+		}
+		catch (Exception ex)
+		{
+			logger.error("Automaton.isEventPrioritzed: Error in getEventWithLabel");
+			return false;
+		}
+		return thisEvent.isPrioritized();
 	}
 
 	public LabeledEvent getEventWithLabel(String eventLabel)
@@ -354,6 +413,7 @@ public class Automaton
 	{
 		return alphabet.getEventWithLabel(eventLabel);
 	}
+
 
 	public int nbrOfStates()
 	{
@@ -446,6 +506,18 @@ public class Automaton
 	public Iterator safeArcIterator()
 	{
 		return (new ArcSet(theArcs)).iterator();
+	}
+
+	public Iterator outgoingEventsIterator(State theState)
+	{
+		Iterator arcIt = theState.outgoingArcsIterator();
+		return new EventIterator(arcIt);
+	}
+
+	public Iterator incomingEventsIterator(State theState)
+	{
+		Iterator arcIt = theState.incomingArcsIterator();
+		return new EventIterator(arcIt);
 	}
 
 	/**
@@ -931,5 +1003,108 @@ public class Automaton
 				System.err.println("st == null");
 		else
 				System.err.println("st != null");
+	}
+
+	class EventIterator
+		implements Iterator
+	{
+		private Iterator arcIt;
+
+		public EventIterator(Iterator arcIt)
+		{
+			this.arcIt = arcIt;
+		}
+
+		public boolean hasNext()
+		{
+			return arcIt.hasNext();
+		}
+
+		public Object next()
+		{
+			Arc nextArc = (Arc)arcIt.next();
+			String eventId = nextArc.getEventId();
+			LabeledEvent nextEvent = null;
+			try
+			{
+				nextEvent = getEvent(eventId);
+			}
+			catch (Exception ex)
+			{
+				logger.error("Automaton::EventIterator.next: Error in getEvent");
+			}
+			return nextEvent;
+		}
+
+		public void remove()
+		{
+			throw new UnsupportedOperationException();
+		}
+	}
+
+	class StateIterator
+		implements Iterator
+	{
+		private Iterator arcIt;
+		private State currState = null;
+		private String eventLabel;
+		private boolean outgoing;
+
+		public StateIterator(String eventLabel, boolean outgoing)
+		{
+			this.eventLabel = eventLabel;
+			this.outgoing = outgoing;
+			arcIt = theArcs.iterator();
+			currState = null;
+			findNext();
+		}
+
+		public boolean hasNext()
+		{
+			return currState != null;
+		}
+
+		public Object next()
+		{
+			State returnState = currState;
+			findNext();
+			return returnState;
+		}
+
+		public void remove()
+		{
+			throw new UnsupportedOperationException();
+		}
+
+		private void findNext()
+		{
+			while (arcIt.hasNext())
+			{
+				Arc currArc = (Arc)arcIt.next();
+				String currLabel = null;
+				try
+				{
+					currLabel = getLabel(currArc);
+				}
+				catch (Exception ex)
+				{
+					logger.error("Automaton::StateIterator.findNext: Error in getLabel");
+				}
+				if (eventLabel.equals(currLabel))
+				{
+					if (outgoing)
+					{
+						currState = currArc.getToState();
+						return;
+					}
+					else
+					{
+						currState = currArc.getFromState();
+						return;
+					}
+				}
+			}
+			currState = null;
+		}
 	}
 }

@@ -55,48 +55,49 @@ import org.supremica.log.*;
 
 public final class AutomataIndexForm
 {
+	// <automaton,event> -> <true|false>
 	private boolean[][] alphabetEventsTable;
 
 	// <automaton,event> -> <true|false>
 	private boolean[][] prioritizedEventsTable;
 
-	// <automaton,event> -> <true|false>
+	// <automaton,state> -> <event[]>
 	private int[][][] outgoingEventsTable;
 
 	// <automaton,state> -> <event[]>
 	private int[][][] incomingEventsTable;
 
-	// <automaton,state> -> <event[]>
+	// <automaton,state,event> -> <state>
 	private int[][][] nextStateTable;
 
-	// <automaton,state,event> -> <state>
+	// <automaton, state, event> -> <state[]>
 	private int[][][][] prevStatesTable;
 
-	// <automaton, state, event> -> <state[]>
+	// <automaton,state> -> <State>
 	private State[][] stateTable;
 
-	// <automaton,state> -> <State>
+	// <automaton,state> -> <status>
 	private int[][] stateStatusTable;
 
-	// <automaton,state> -> <status>
+	// <event> -> <true|false>
 	private boolean[] controllableEventsTable;
 
 	// <event> -> <true|false>
 	private boolean[] immediateEventsTable;
 
-	// <event> -> <true|false>
+	// <automaton> -> <isPlant>
 	private boolean[] typeIsPlantTable;
 
-	// <automaton> -> <isPlant>
+	// <event> -> <priority>
 	private int[] eventPriority;
 
-	// <event> -> <priority>
+	// <automaton> -> <nbr_of_states>
 	private int[] automataSize;
 
-	// <automaton> -> <nbr_of_states>
+	// <automaton, event> -> <state[]>
 	private int[][][] enableEventsTable;
 
-	// <automaton, event> -> <state[]>
+
 	private static Logger logger = LoggerFactory.createLogger(AutomataIndexForm.class);
 
 	/**
