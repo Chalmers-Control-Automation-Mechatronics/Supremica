@@ -420,25 +420,34 @@ public class BDDAutomata
 
 	// ------------------------------------------------------------------------------
 	public void count_states(String name, int bdd)
+    {
+	System.out.println(name + " " + count_states(bdd));
+    }
+
+    public long count_states(int bdd) 
 	{
 
-		/*
-		 * // the easy way
-		 * int new_bdd = removeDontCareS(bdd);
-		 * double states = satCount(new_bdd);
-		 * if(states != -1)
-		 *   states /= Math.pow(2, size_states + size_events);
-		 *   recursiveDeref(new_bdd);
-		 */
-
+	    switch(Options.count_algo) {
+	    case Options.COUNT_NONE:
+		return 0;
+		
+	    case Options.COUNT_TREE:		
+		// the easy way
+		int new_bdd = removeDontCareS(bdd);
+		double states = satCount(new_bdd);
+		if(states != -1)
+		    states /= Math.pow(2, size_states + size_events);
+		recursiveDeref(new_bdd);		
+		return (long) states;
+	    case Options.COUNT_EXACT:
 		// the hard/boring/slow way :(
 		Counter c = new Counter();
 
 		count_transitions_rec0(c, bdd, 0);
 
-		long states = c.get();
-
-		System.out.println(name + " " + states);
+		return c.get();
+	    }
+	    return 0; // just in case :)		
 	}
 
 	private void count_transitions_rec0(Counter c, int bdd, int level)

@@ -14,6 +14,8 @@ public class Supervisor
 	protected int bdd_uncontrollables, bdd_reachables,
 	    bdd_reachable_uncontrollables, bdd_coreachables;
 
+
+
 	public Supervisor(BDDAutomata manager, Group plant, Group spec)
 	{
 		this.manager = manager;
@@ -55,6 +57,7 @@ public class Supervisor
 		}
 
 		has_uncontrollables = has_reachables = has_reachable_uncontrollables = has_coreachables = false;
+
 	}
 
 	public void cleanup()
@@ -269,6 +272,8 @@ public class Supervisor
 		manager.recursiveDeref(i_all);
 		manager.recursiveDeref(t_all);
 
+
+
 		has_reachables = true;
 		bdd_reachables = r_all;
 
@@ -401,6 +406,7 @@ public class Supervisor
 
 		manager.recursiveDeref(r_all);
 
+		
 		has_coreachables = true;
 		bdd_coreachables = ret;
 
