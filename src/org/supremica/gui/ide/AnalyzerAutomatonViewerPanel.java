@@ -24,6 +24,7 @@ class AnalyzerAutomatonViewerPanel
 		this.moduleContainer = moduleContainer;
 		this.name = name;
 		this.theAutomaton = theAutomaton;
+		build();
 	}
 
 	public String getName()
@@ -31,12 +32,11 @@ class AnalyzerAutomatonViewerPanel
 		return name;
 	}
 
-	public void build()
-		throws Exception
+	private void build()
 	{
 		builder = DotBuilder.getDotBuilder(this, new AutomatonToDot(theAutomaton));
 
-		builder.start();
+		//builder.start();
 	}
 
 	public void setGraph(Graph theGraph)
@@ -44,7 +44,9 @@ class AnalyzerAutomatonViewerPanel
 		GrappaPanel viewerPanel = new GrappaPanel(theGraph);
 		viewerPanel.setScaleToFit(false);
 		getViewport().add(viewerPanel);
+		validate();
 		revalidate();
+		repaint();
 	}
 
 }
