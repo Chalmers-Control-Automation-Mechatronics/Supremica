@@ -62,7 +62,6 @@ class Sticks
 
 		for (int player = 0; player < players; ++player)
 		{
-
 			// Note, we assume _at_least_ 5 sticks here!
 			State s0 = sticks[0];
 			State s1 = sticks[0 + 1];
@@ -128,16 +127,19 @@ class Players
 
 		setType(AutomatonType.Plant);
 
-		players = new State[num];    // one state for each player
-		players[0] = new State(PlayerEvents.getPlayerId(0));    // first player is special (initial and accepting)
-
+		// One state for each player
+		// First player is special (initial and accepting)
+		// All other states except for the one immediately after the first player
+		// has made a move should be marked (player 1 must not take the last stick)!
+		players = new State[num];
+		players[0] = new State(PlayerEvents.getPlayerId(0));
 		players[0].setInitial(true);
 		players[0].setAccepting(true);
 		addState(players[0]);
 
 		Alphabet alpha = getAlphabet();
 
-		for (int i = 0; i < num - 1; ++i)    // for each player excpet the last one, add arcs to the next guy
+		for (int i = 0; i < num - 1; ++i)    // for each player except the last one, add arcs to the next guy
 		{
 			PlayerEvents pe = new PlayerEvents(i);
 
@@ -145,11 +147,17 @@ class Players
 			alpha.addEvent(pe.a2);
 			alpha.addEvent(pe.a3);
 
-			State from = players[i];    // from this guy...
-
+			// From this guy...
+			State from = players[i];
+			// ...to this one
 			players[i + 1] = new State(PlayerEvents.getPlayerId(i + 1));
+			State to = players[i + 1];
 
-			State to = players[i + 1];    // ...to this one
+			// All but one state should be accepting!
+			if (i != 0)
+			{
+				to.setAccepting(true);
+			}
 
 			addState(to);
 

@@ -19,50 +19,50 @@ import org.supremica.external.robotCoordinationABB.*;
 public class RobotStudioInterface
 {
     private static Logger logger = LoggerFactory.createLogger(RobotStudioInterface.class);
-    
+
     // Initialize jacoZoom
     static
     {
     	com.inzoom.comjni.Dll.runRoyaltyFree(643622874);
     }
-    
+
     // Constants
-    
+
     /** The name of the IPart containing the mutex zones. */
     private final static String ZONEPART_NAME = "MutexZones";
-    
+
     private final static String ZONEENTITY_BASENAME = "MutexZone";
     private final static String FREESTATE_NAME = "Free";
     private final static String BOOKEDSTATE_NAME = "Booked";
-    
+
     /** The suffix of the Part containing the spans. */
     private final static String SPAN_SUFFIX = "_Span";
     private final static String SPANS_SUFFIX = SPAN_SUFFIX + "s";
-    
+
     /** The name of the module containing the paths */
     private final static String PATHSMODULE_NAME = "Paths";
-    
+
     /** Automata constants */
     private final static String STARTSTATE_NAME = "start";
     private final static String FINISHSTATE_NAME = "finish";
     private final static String FINISHEVENT_NAME = "fin";
-    
+
     /** Via point suffix */
     private final static String VIAPOINT_SUFFIX = "vp";
-    
+
     /** Colours */
     private static Variant RS_WHITE;
     private static Variant RS_RED;
     private static Variant RS_GREEN;
     private static Variant RS_BLUE;
-    
+
     /** The RobotStudio application. */
     private static Application app = null;
-    
+
     // Domenico stuff
     private static int nbrOfTimesCollision = 1;
     private static LinkedList[] robotCosts;
-    
+
     // Implementation of the RobotCell interface for use against RobotStudio.
     public static class RSRobotCell
 		implements RobotCell, DAppEvents
@@ -70,14 +70,14 @@ public class RobotStudioInterface
 		/** The active RopbotStudio station. */
 		private static Station station = null;
 		private Part zones;
-		
+
 		/** Generated automata */
 		private Automata robotAutomata = new Automata();
 		private Automata zoneAutomata = new Automata();
-		
+
 		// Running number of added zones
 		private int zoneNbr = 1;
-		
+
 		public RSRobotCell(File file)
 		{
 			try
@@ -86,17 +86,17 @@ public class RobotStudioInterface
 				openStation(file);
 				station.setBackgroundColor(RS_WHITE);
 				station.setFloorVisible(false);
-				
+
 				// Array of LinkedLists, later containing PathWithCost objects
 				robotCosts = new LinkedList[getMechanismsWithRole(RsKinematicRole.rsKinematicRoleRobot).size()];
-				
+
 				for (int i = 0;
 					 i < getMechanismsWithRole(RsKinematicRole.rsKinematicRoleRobot).size();
 					 i++)
 				{
 					robotCosts[i] = new LinkedList();
 				}
-				
+
 				try
 				{
 					// Already got a zones part?
@@ -115,7 +115,7 @@ public class RobotStudioInterface
 				e.printStackTrace();
 			}
 		}
-		
+
 		/**
 		 * Initializes RobotStudio
 		 */
@@ -131,21 +131,21 @@ public class RobotStudioInterface
 			else
 			{
 				logger.info("Starting RobotStudio...");
-				
+
 				app = new Application();
 				app.addDAppEventsListener(this);
 				app.setVisible(true);    // It's nice to see what is happening
-				
+
 				logger.info("RobotStudio started.");
 			}
-			
+
 			// Some declarations
 			RS_WHITE = new Variant(new SafeArray(new int[]{ 255, 255, 255 }), false);
 			RS_RED = new Variant(new SafeArray(new int[]{ 255, 0, 0 }), false);
 			RS_GREEN = new Variant(new SafeArray(new int[]{ 0, 255, 0 }), false);
 			RS_BLUE = new Variant(new SafeArray(new int[]{ 0, 0, 255 }), false);
 		}
-		
+
 		/**
 		 * Returns true if an application is already running, false otherwise.
 		 * if quit() worked as it should, we could simply check if (app == null).
@@ -169,11 +169,11 @@ public class RobotStudioInterface
 				return false;
 			}
 		}
-		
+
 		/////////////////////////////////
 		// RobotCell INTERFACE METHODS //
 		/////////////////////////////////
-			
+
 		/**
 		 * Opens station in the RobotStudio environment
 		 */
@@ -183,12 +183,12 @@ public class RobotStudioInterface
 			String stationName = file.getAbsolutePath();
 			IStation iStation = app.getWorkspace().openStation(stationName, var(true), var(false));
 			station = Station.getStationFromUnknown(iStation);
-			
+
 			// Build robot automata
 			LinkedList robots = getRobots();
 			robotAutomata = buildRobotAutomata(robots);
 		}
-		
+
 		/**
 		 * Examine if there is an open station.
 		 */
@@ -207,7 +207,7 @@ public class RobotStudioInterface
 				return false;
 			}
 		}
-		
+
 		/**
 		 * Returns a linked list of Robot objects.
 		 */
@@ -622,10 +622,10 @@ public class RobotStudioInterface
 					// Detect error...
 					if (inZone != null && outZone != null)
 					{
-						logger.fatal("Exiting and entering zone at the same time detected? " + 
+						logger.fatal("Exiting and entering zone at the same time detected? " +
 									 "This is impossible, tell Hugo!");
 					}
-					
+
 					// Modify zone automaton
 					if (inZone != null || outZone != null)
 					{
@@ -664,12 +664,12 @@ public class RobotStudioInterface
 						zone.addArc(arc);
 					}
 				}
-				
+
 				// Modify Robot Automaton
 				// Forward direction
 				{
 					Automaton rob = robotAutomata.getAutomaton(robot.getName());
-					RichPosition firstPos = (RichPosition) richPath.get(0);				
+					RichPosition firstPos = (RichPosition) richPath.get(0);
 					Position secondPos = (Position) richPath.get(1);
 					Position secondLastPos = (Position) richPath.get(richPath.size()-2);
 					Position lastPos = (Position) richPath.get(richPath.size()-1);
@@ -707,21 +707,21 @@ public class RobotStudioInterface
 					}
 					LabeledEvent oldEvent = rob.getAlphabet().getEvent(from.getName() + to.getName());
 					rob.getAlphabet().removeEvent(oldEvent);
-				
+
 					// Add sequence
 					State currState = firstState;
 					for (int i=1; i<richPath.size()-1; i++)
 					{
 						RichPosition currPos = (RichPosition) richPath.get(i);
 						RichPosition nextPos = (RichPosition) richPath.get(i+1);
-					
+
 						// Add new arc and stuff
 						State nextState;
 						if (i == richPath.size()-2)
 						{
 							nextState = lastState;
 						}
-						else	
+						else
 						{
 							nextState = new State(currPos.getName() + nextPos.getName());
 							rob.addState(nextState);
@@ -733,13 +733,13 @@ public class RobotStudioInterface
 
 						// Set cost, must be int, so it now is the number of milliseconds
 						nextState.setCost((int) (1000*(nextPos.getTime() - currPos.getTime())));
-					
+
 						currState = nextState;
 					}
 				}
 				// Backwards direction (lines with // in the end have been changed)
 				{
-					Automaton rob = robotAutomata.getAutomaton(robot.getName());     
+					Automaton rob = robotAutomata.getAutomaton(robot.getName());
 					Position lastPos = (Position) richPath.get(0);				     //
 					Position secondLastPos = (Position) richPath.get(1);             //
 					RichPosition secondPos = (RichPosition) richPath.get(richPath.size()-2); //
@@ -773,21 +773,21 @@ public class RobotStudioInterface
 					}
 					LabeledEvent oldEvent = rob.getAlphabet().getEvent(to.getName() + from.getName()); //
 					rob.getAlphabet().removeEvent(oldEvent);
-				
+
 					// Add sequence
 					State currState = firstState;
 					for (int i=richPath.size()-2; i>0; i--) //
 					{
 						RichPosition currPos = (RichPosition) richPath.get(i);
 						RichPosition nextPos = (RichPosition) richPath.get(i-1); //
-					
+
 						// Add new arc and stuff
 						State nextState;
 						if (i == 1) //
 						{
 							nextState = lastState;
 						}
-						else	
+						else
 						{
 							nextState = new State(currPos.getName() + nextPos.getName());
 							rob.addState(nextState);
@@ -799,7 +799,7 @@ public class RobotStudioInterface
 
 						// Set cost, must be int, so it now is the number of milliseconds
 						nextState.setCost((int) (1000*(currPos.getTime() - nextPos.getTime()))); //
-					
+
 						currState = nextState;
 					}
 				}
@@ -1109,18 +1109,18 @@ public class RobotStudioInterface
 				try
 				{
 					double motionTime = controller.getMotionTime();
-				
+
 					if (!leavingTarget)
 					{
 						// Log
 						logger.debug("Target reached at time " + (float) motionTime + ".");
-					
+
 						// Set the cost
 						Double realCost = new Double((motionTime - previousTime) * 1000);    // [ms]
-					
+
 						pathcosts.insertCost(new Integer(realCost.intValue()));
 						robotCosts[getRobotIndex(mechanism.getName())].add(pathcosts);
-					
+
 						// Remember
 						posList.add(new RichPosition("FINISH", motionTime, null, null));
 					}
@@ -1129,17 +1129,17 @@ public class RobotStudioInterface
 						// Remember
 						posList.add(new RichPosition("START", motionTime, null, null));
 					}
-				
+
 					leavingTarget = !leavingTarget;
 				}
 				catch (Exception ex)
 				{
 					logger.error("Error in event targetReached. " + ex);
 				}
-			
+
 				return 0;
 			}
-		
+
 			public synchronized int collisionStart(RsObject collidingObject)
 			{
 				try
@@ -1147,9 +1147,9 @@ public class RobotStudioInterface
 					// basic information
 					String objectName = collidingObject.getName();
 					double time = controller.getMotionTime();
-				
+
 					// Don't care about the spans!!
-				
+
 					/*
 					   Nä... så här är det ju inte, de slutar på "_X" också... där X är int
 					   if (objectName.endsWith(SPAN_SUFFIX))
@@ -1157,29 +1157,29 @@ public class RobotStudioInterface
 					       return 0;
 					   }
 					*/
-				
+
 					// Did this happen at a positive valued time?
 					if (time < 0)
 					{
 						logger.error("Collision at negative time detected with " + objectName + ".");
-					
+
 						return 0;
 					}
-				
+
 					// Wasn't this a zone?
 					int indexZone = getZoneIndex(objectName);
 					if (indexZone <= 0)
 					{
 						logger.warn("It appears that " + mechanism.getName() + " has collided with '" + objectName + "'.");
-					
+
 						return 0;
-					
+
 						//throw new SupremicaException("Collision with object in station detected!");
 					}
-				
+
 					// Have we collided with this fellow before?
 					Collider data = getColliderWithName(objectsColliding, objectName);
-				
+
 					// Only for new collisions
 					if (data == null)
 					{
@@ -1191,7 +1191,7 @@ public class RobotStudioInterface
 						Double realCost = new Double((time - previousTime) * 1000);
 						pathcosts.insertCost(new Integer(realCost.intValue()));
 						previousTime = time;
-					
+
 						// Create a target here!
 						//String viaPointName = "In" + indexZone + "_";
 						//viaPointName = viaPointName + path.getName() + nbrOfTimesCollision;
@@ -1200,17 +1200,17 @@ public class RobotStudioInterface
 						int robotIndex = getRobotIndex(mechanism.getName());
 						String viaPointName = mechanism.getName().substring(5) + VIAPOINT_SUFFIX + nbrOfTimesCollision;
 						ITarget viaTarget = createTargetAtTCP(viaPointName);
-					
+
 						// Insert the new target in the path
 						ITargetRef viaTargetRef = path.insert(viaTarget);
 						viaTargetRef.setMotionType(1);
-					
+
 						nbrOfTimesCollision++;
-					
+
 						// Remember
 						posList.add(new RichPosition(viaPointName, time, objectName, null));
 					}
-				
+
 					// Count the "ins"
 					data.setCount(data.getCount() + 1);
 				}
@@ -1219,10 +1219,10 @@ public class RobotStudioInterface
 					logger.error("Error in collisionStart. " + e);
 					e.printStackTrace(System.err);
 				}
-			
+
 				return 0;
 			}
-		
+
 			public synchronized int collisionEnd(RsObject collidingObject)
 			{
 				try
@@ -1230,21 +1230,21 @@ public class RobotStudioInterface
 					// basic information
 					String objectName = collidingObject.getName();
 					double time = controller.getMotionTime();
-				
+
 					// Wasn't this a zone?
 					int indexZone = getZoneIndex(objectName);
-				
+
 					if (indexZone <= 0)
 					{
 						return 0;
 					}
-				
+
 					Collider data = getColliderWithName(objectsColliding, objectName);
-				
+
 					if (data == null)
 					{
 						logger.error("Collision ended mysteriously (without starting).");
-					
+
 						return 0;
 					}
 
@@ -1468,9 +1468,9 @@ public class RobotStudioInterface
 			String name;
 			/** The time it took to get here */
 			double timeToPos;
-			/** The name of eventual zone just about to be entered */
+			/** The name of the zone (if any) just about to be entered */
 			String enterZone = null;
-			/** The name of eventual zone just left */
+			/** The name of the zone (if any) just left */
 			String leaveZone = null;
 
 			RichPosition(String name, double timeToPos, String enterZone, String leaveZone)
@@ -1705,8 +1705,8 @@ public class RobotStudioInterface
 			// Start virtual controller
 			controller = mechanism.startABBS4Controller(true);
 
-			// We don't have to wait here! In RS2.0 it was necessary, but in RS3.0,
-			// the above call won't return until the controller has started!
+			// We don't have to wait here? In RS2.0 it was necessary, but in RS3.0,
+			// the above call won't return until the controller has started?
 			// YES IT WILL! Better wait at least a second... ¤#&#@¤#%#!
 			Thread.sleep(1500);
 
@@ -2195,11 +2195,11 @@ public class RobotStudioInterface
 		////////////////////////////////
 		// Position interface methods //
 		////////////////////////////////
-	
+
 		public String getName()
 		{
 			try
-			{	
+			{
 				// Return the name (remove the last two characters ":1" since they are ugly)
 				return target.getName().substring(0, target.getName().length() - 2);
 			}
@@ -2207,11 +2207,11 @@ public class RobotStudioInterface
 			{
 				System.err.println("Robot has no name? " + ex);
 			}
-	    
+
 			return "";
 		}
     }
-    
+
     /**
      * A listener for determining when a simulation is finished.
      */
@@ -2220,26 +2220,26 @@ public class RobotStudioInterface
     {
 		// Boolean for keeping track on when a simulation is running... not 100%!
 		boolean simulationRunning = true;
-	
+
 		// Events generated by RobotStudio.ISimulation
 		public synchronized void stop()
 		{
 			simulationRunning = false;
-	    
+
 			logger.debug("Simulation finished.");
-	    
+
 			notify();
 		}
-	
+
 		public void tick(double time)
 		{
 			//System.out.println("Simtick: " + time);
 		}
-	
+
 		////////////////////////////
 		// Junk constructed by me //
 		////////////////////////////
-	
+
 		/**
 		 * This method is designed to return when the current simulation has stopped.
 		 */
@@ -2252,7 +2252,7 @@ public class RobotStudioInterface
 				{
 					wait();
 				}
-		
+
 				// Make sure the simulation is really over before we return
 				//Thread.sleep(2500);
 			}
@@ -2261,11 +2261,11 @@ public class RobotStudioInterface
 				//System.out.println("Interrupted! " + ex);
 				logger.error("Interrupted! " + ex);
 			}
-	    
+
 			return;
 		}
     }
-    
+
     /**
      * Typecast i into Variant, for convenience! (Variant is something like
      * VB:s counterpart of java's Object.)
@@ -2275,7 +2275,7 @@ public class RobotStudioInterface
     {
 		return new Variant(i);
     }
-    
+
     /**
      * Typecast i into Variant, for convenience! (Variant is something like
      * VB:s counterpart of java's Object.)
@@ -2285,7 +2285,7 @@ public class RobotStudioInterface
     {
 		return new Variant(i);
     }
-    
+
     /**
      * Typecast i into Variant, for convenience! (Variant is something like
      * VB:s counterpart of java's Object.)
