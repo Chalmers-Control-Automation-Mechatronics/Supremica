@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.10 2005-03-03 09:42:02 flordal Exp $
+//# $Id: EditorSurface.java,v 1.11 2005-03-03 12:52:54 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -25,6 +25,9 @@ import net.sourceforge.waters.model.module.*;
 import net.sourceforge.waters.model.expr.*;
 import net.sourceforge.waters.xsd.module.AnchorPosition;
 
+// Printing
+import java.awt.print.Printable;
+
 /**
  * <p>A component which allows for the display of module data.</p>
  *
@@ -36,6 +39,7 @@ import net.sourceforge.waters.xsd.module.AnchorPosition;
  */
 public class EditorSurface
 	extends JComponent
+	implements Printable
 {
 	protected boolean showGrid = true;
 	protected EditorWindowInterface root;
@@ -56,7 +60,7 @@ public class EditorSurface
 	protected boolean dragSelect = false;
 	protected EditorShade shade;
 	protected GraphProxy graph;
-
+	
 	public int getGridSize()
 	{
 		return gridSize;
@@ -110,11 +114,27 @@ public class EditorSurface
 		}
 	}
 
+	protected void printComponent(Graphics g)
+	{
+		paintComponent(g, true);
+	}
+
 	protected void paintComponent(Graphics g)
 	{
-		minimizeSize();
-		paintGrid(g);
+		paintComponent(g, false);
+	}
 
+	private void paintComponent(Graphics g, boolean printing)
+	{
+		minimizeSize();
+
+		// Only paint the grid if we're not printing!
+		if (!printing)
+		{
+			paintGrid(g);
+		}
+
+		// Don't do anything if there is nothing to do!
 		if (nodes == null)
 		{
 			return;
@@ -175,7 +195,7 @@ public class EditorSurface
 				for (int k = 0; k < groups.size(); k++)
 				{
 					EditorNodeGroup n3 = (EditorNodeGroup) groups.get(k);
-
+					
 					if (n3.getBounds().contains(n2.getPosition()))
 					{
 						notImmediate = true;
@@ -226,7 +246,7 @@ public class EditorSurface
 		}
 
 		for (int i = 0; i < lines.size(); i++)
-		{
+		{ 
 			int[] l = (int[]) lines.get(i);
 
 			g.setColor(Color.BLACK);
@@ -237,6 +257,10 @@ public class EditorSurface
 		{
 			showDragSelect(g);
 		}
+
+		Rectangle rect = getDrawnArea();
+		g.setColor(Color.PINK);
+		g.drawRect((int) rect.getX(), (int) rect.getY(), (int) rect.getWidth(), (int) rect.getHeight());
 	}
 
 	public static boolean isSimpleComponentProxy(Object o)
@@ -616,7 +640,7 @@ public class EditorSurface
 				return (EditorEdge) edges.get(i);
 			}
 		}
-
+		
 		for (int i = 0; i < nodeGroups.size(); i++)
 		{
 			if (((EditorNodeGroup) nodeGroups.get(i)).wasClicked(ex, ey))
@@ -724,7 +748,7 @@ public class EditorSurface
 		{
 			EditorNode ng = (EditorNode) nodes.get(i);
 			
-			if (r.getBounds().contains(ng.getPosition()))
+			if (r.getBounds().contains(ng.getRectangularOutline()))
 			{
 				selection.add(ng);
 			}
@@ -776,7 +800,7 @@ public class EditorSurface
 		}
 	}
 
-	public void deselectAll()
+ 	public void deselectAll()
 	{
 		for (int i = 0; i < nodes.size(); i++)
 		{
@@ -909,7 +933,7 @@ public class EditorSurface
 					{
 						EditorNode n = (EditorNode) nodes.get(i);
 
-						if (n.getEllipse().intersects(r))
+						if (n.getEllipsicalOutline().intersects(r))
 						{
 							found = false;
 
@@ -952,14 +976,13 @@ public class EditorSurface
 
 			for (int i = 0; (i < size) && (i * size < noGeometry.size()); i++)
 			{
-				for (int j = 0;
-						(j < size) && (i * size + j < noGeometry.size()); j++)
+				for (int j = 0; (j < size) && (i * size + j < noGeometry.size()); j++)
 				{
 					if (noGeometry.get(i * size + j) instanceof SimpleNodeProxy)
 					{
 						SimpleNodeProxy np = (SimpleNodeProxy) noGeometry.get(i * size + j);
 						Point2D.Double p = new Point2D.Double(x + (j * gridSize * 4) + EditorNode.WIDTH / 2, y + (i * gridSize * 4) + EditorNode.WIDTH / 2);
-
+						
 						np.setPointGeometry(new PointGeometryProxy(p));
 						addNode(np);
 					}
@@ -967,7 +990,6 @@ public class EditorSurface
 			}
 
 			java.util.List edges = graph.getEdges();
-
 			for (int j = 0; j < edges.size(); j++)
 			{
 				EdgeProxy e = (EdgeProxy) edges.get(j);
@@ -1041,36 +1063,78 @@ public class EditorSurface
 	 */
 	public void minimizeSize()
 	{
-		int largestX = 500;
-		int largestY = 500;
+		Rectangle drawnArea = getDrawnArea();
+
+		int width = (int) drawnArea.getWidth();
+		int height = (int) drawnArea.getHeight();
+
+		if (width < 500)
+		{
+			width = 500;
+		}
+
+		if (height < 500)
+		{
+			height = 500;
+		}
+
+		setPreferredSize(new Dimension(width + gridSize * 10, height + gridSize * 10));
+	}
+
+	public Rectangle getDrawnArea()
+	{
+		double minX = Double.MAX_VALUE;
+		double maxX = 0;
+		double minY = Double.MAX_VALUE;
+		double maxY = 0;
 
 		for (int i = 0; i < nodes.size(); i++)
 		{
-			if (((EditorNode) nodes.get(i)).getX() > largestX)
+			if (((EditorNode) nodes.get(i)).getX() + EditorNode.RADIUS > maxX)
 			{
-				largestX = ((EditorNode) nodes.get(i)).getX();
+				maxX = ((EditorNode) nodes.get(i)).getX() + EditorNode.RADIUS;
 			}
 
-			if (((EditorNode) nodes.get(i)).getY() > largestY)
+			if (((EditorNode) nodes.get(i)).getX() - EditorNode.RADIUS < minX)
 			{
-				largestY = ((EditorNode) nodes.get(i)).getY();
+				minX = ((EditorNode) nodes.get(i)).getX() - EditorNode.RADIUS;
+			}
+
+			if (((EditorNode) nodes.get(i)).getY() + EditorNode.RADIUS > maxY)
+			{
+				maxY = ((EditorNode) nodes.get(i)).getY() + EditorNode.RADIUS;
+			}
+
+			if (((EditorNode) nodes.get(i)).getY() - EditorNode.RADIUS < minY)
+			{
+				minY = ((EditorNode) nodes.get(i)).getY() - EditorNode.RADIUS; 
 			}
 		}
 
 		for (int i = 0; i < edges.size(); i++)
 		{
-			if (((EditorEdge) edges.get(i)).getTPointX() > largestX)
+			if (((EditorEdge) edges.get(i)).getTPointX() > maxX)
 			{
-				largestX = ((EditorEdge) edges.get(i)).getX();
+				maxX = ((EditorEdge) edges.get(i)).getTPointX();
 			}
 
-			if (((EditorEdge) edges.get(i)).getTPointY() > largestY)
+			if (((EditorEdge) edges.get(i)).getTPointX() < minX)
 			{
-				largestY = ((EditorEdge) edges.get(i)).getY();
+				minX = ((EditorEdge) edges.get(i)).getTPointX();
+			}
+
+			if (((EditorEdge) edges.get(i)).getTPointY() > maxY)
+			{
+				maxY = ((EditorEdge) edges.get(i)).getTPointY();
+			}
+
+			if (((EditorEdge) edges.get(i)).getTPointY() < minY)
+			{
+				minY = ((EditorEdge) edges.get(i)).getTPointY();
 			}
 		}
 
-		setPreferredSize(new Dimension(largestX + gridSize * 10, largestY + gridSize * 10));
+		return new Rectangle((int) minX, (int) minY, (int) (maxX-minX),(int) (maxY-minY));
 	}
 
 	public boolean nodeGroupIsColliding(EditorNodeGroup ng)
@@ -1126,5 +1190,37 @@ public class EditorSurface
 		shades.add(new EditorShade("Default", 255, 255, 255));
 
 		shade = (EditorShade) shades.get(0);
+	}
+
+	/**
+	 * Implementation of the Printable interface.
+	 */
+	public int print(Graphics g, PageFormat pageFormat, int page) 
+	{  
+		final double INCH = 72;
+		
+		int i;
+        Graphics2D g2d;
+		
+        // Validate the page number, we only print the first page
+        if (page == 0) 
+		{
+			g2d = (Graphics2D) g;
+
+			// Translate the origin to be (0,0)
+			g2d.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
+
+			// This is the place to do rescaling if the figure won't fit on the page!
+			//g2d.scale(0.5, 0.5);
+
+			// Get the current figure
+			print(g);
+						
+			return (PAGE_EXISTS);
+        }
+        else
+		{
+			return (NO_SUCH_PAGE);
+		}
 	}
 }

@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorLabel
 //###########################################################################
-//# $Id: EditorLabel.java,v 1.8 2005-02-22 21:53:14 flordal Exp $
+//# $Id: EditorLabel.java,v 1.9 2005-03-03 12:52:54 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -118,7 +118,7 @@ public class EditorLabel
 			return;
 		}
 
-		if ((text.getText().length() == 0) &&!editing)
+		if ((text.getText().length() == 0) && !editing)
 		{
 			text.setText(backup);
 		}

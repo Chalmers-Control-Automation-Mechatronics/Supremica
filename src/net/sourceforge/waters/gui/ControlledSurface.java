@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.12 2005-03-03 09:42:02 flordal Exp $
+//# $Id: ControlledSurface.java,v 1.13 2005-03-03 12:52:54 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -349,6 +349,11 @@ public class ControlledSurface
 					EditorEdgePopupMenu popup = new EditorEdgePopupMenu(this, object);
 					popup.show(this, e.getX(), e.getY());
 				}
+			}
+			else
+			{
+				EditorSurfacePopupMenu popup = new EditorSurfacePopupMenu(this, selectedObjects);
+				popup.show(this, e.getX(), e.getY());
 			}
 		}
 	}	

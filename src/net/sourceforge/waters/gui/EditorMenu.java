@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorMenu
 //###########################################################################
-//# $Id: EditorMenu.java,v 1.6 2005-02-22 04:12:36 knut Exp $
+//# $Id: EditorMenu.java,v 1.7 2005-03-03 12:52:54 flordal Exp $
 //###########################################################################
 
 
@@ -14,6 +14,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
+
+// Printing
+import java.awt.print.*;
 
 /**
  * <p>The EditorWindow menu.</p>
@@ -28,6 +31,7 @@ public class EditorMenu
 	implements ActionListener
 {
 	public final JMenuItem FileNewMenu;
+	public final JMenuItem PrintMenu;
 	public final JMenuItem FileExitMenu;
 	public final JMenuItem mToolsCreateEvent;
 	public final JMenuItem ToolsOptionsMenu;
@@ -61,8 +65,10 @@ public class EditorMenu
 		menu.add(menuItem);
 
 		menuItem = new JMenuItem("Print...", KeyEvent.VK_P);
-		menuItem.setEnabled(false);
-		menuItem.setToolTipText("Not implemented yet");
+		menuItem.addActionListener(this);
+		PrintMenu = menuItem;
+		//menuItem.setEnabled(false);
+		//menuItem.setToolTipText("Not implemented yet");
 		menu.add(menuItem);
 		menu.addSeparator();
 
@@ -80,7 +86,7 @@ public class EditorMenu
 		menuItem.setToolTipText("Not implemented yet");
 		menu.add(menuItem);
 		menu.addSeparator();
-
+		
 		menuItem = new JMenuItem("Copy");
 		menuItem.setEnabled(false);
 		menuItem.setToolTipText("Not implemented yet");
@@ -164,6 +170,36 @@ public class EditorMenu
 		if (e.getSource() == FileExitMenu)
 		{
 //			root.dispose();
+		}
+
+		if (e.getSource() == PrintMenu)
+		{
+			ControlledSurface surface = root.getControlledSurface();
+
+			System.err.println(surface.getDrawnArea());
+			
+			PrinterJob printJob = PrinterJob.getPrinterJob();
+			if (printJob.getPrintService() == null)
+			{
+				System.err.println("No default printer set.");
+				return;
+			}
+
+			printJob.setPrintable((EditorSurface) surface);
+
+			// Show printing dialog
+			if (printJob.printDialog()) 
+			{
+				try 
+				{
+					// Print!
+					printJob.print();
+				} 
+				catch (Exception ex) 
+				{
+					System.err.println(ex.getStackTrace());
+				}
+			}
 		}
 
 		if (e.getSource() == editDeleteMenu)

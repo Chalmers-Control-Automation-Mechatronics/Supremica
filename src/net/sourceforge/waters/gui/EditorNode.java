@@ -1,11 +1,3 @@
-
-//###########################################################################
-//# PROJECT: Waters
-//# PACKAGE: waters.gui
-//# CLASS:   EditorNode
-//###########################################################################
-//# $Id: EditorNode.java,v 1.5 2005-02-22 21:53:14 flordal Exp $
-//###########################################################################
 package net.sourceforge.waters.gui;
 
 import java.awt.*;
@@ -34,6 +26,7 @@ public class EditorNode
 	protected Point2D.Double position;
 	private SimpleNodeProxy proxy;
 	public static int WIDTH = 12;
+	public static int RADIUS = WIDTH/2;
 	private EditorPropGroup propGroup;
 
 	public EditorNode(int x, int y, EditorShade s, SimpleNodeProxy np, EditorSurface e)
@@ -116,12 +109,12 @@ public class EditorNode
 
 	public void setX(int newxposition)
 	{
-		position.setLocation(newxposition, position.getY());
+		position.setLocation(newxposition, getY());
 	}
 
 	public void setY(int newyposition)
 	{
-		position.setLocation(position.getX(), newyposition);
+		position.setLocation(getX(), newyposition);
 	}
 
 	public int getX()
@@ -141,7 +134,7 @@ public class EditorNode
 
 	public boolean wasClicked(int Cxposition, int Cyposition)
 	{
-		return (((position.getX() - WIDTH / 2) <= Cxposition) && (Cxposition <= (position.getX() + WIDTH / 2)) && ((position.getY() - WIDTH / 2) <= Cyposition) && (Cyposition <= (position.getY() + WIDTH / 2)));
+		return (((getX() - RADIUS) <= Cxposition) && (Cxposition <= (getX() + RADIUS)) && ((getY() - RADIUS) <= Cyposition) && (Cyposition <= (getY() + RADIUS)));
 	}
 
 	public void setShade(EditorShade s)
@@ -201,7 +194,7 @@ public class EditorNode
 
 	public int radius()
 	{
-		return (int) WIDTH / 2;
+		return (int) RADIUS;
 	}
 
 	public int getWidth()
@@ -209,9 +202,20 @@ public class EditorNode
 		return WIDTH;
 	}
 
-	public Ellipse2D.Double getEllipse()
+	/**
+	 * Returns an ellipse that outlines the node.
+	 */
+	public Ellipse2D.Double getEllipsicalOutline()
 	{
-		return (new Ellipse2D.Double(position.getX() - WIDTH / 2, position.getY() - WIDTH / 2, WIDTH, WIDTH));
+		return new Ellipse2D.Double(getX() - RADIUS, getY() - RADIUS, WIDTH, WIDTH);
+	}
+
+	/**
+	 * Returns a rectangle that outlines the node.
+	 */
+	public Rectangle2D.Double getRectangularOutline()
+	{
+		return new Rectangle2D.Double(getX() - RADIUS, getY() - RADIUS, WIDTH, WIDTH);
 	}
 
 	public void drawObject(Graphics g, java.util.List EventDeclList)
@@ -228,92 +232,52 @@ public class EditorNode
 		{
 			propGroup.setVisible(false);
 		}
-
-		double angle = 0;
-		Rectangle2D.Double r = new Rectangle2D.Double();
-		Arc2D.Double a = new Arc2D.Double();
-
-		g2d.drawOval((int) position.getX() - (WIDTH / 2), (int) position.getY() - (WIDTH / 2), WIDTH, WIDTH);
-
-		if (proxy.isInitial())
+		
+		// Draw the inside of the node
+		if (colours.size() == 0)
 		{
-			/*
-			if (!getSelected())
+			// There is no marking!
+			// Draw the background white!
+			g2d.setColor(Color.WHITE);
+			g2d.fillOval(getX() - RADIUS, getY() - RADIUS, WIDTH+1, WIDTH+1);
+		}
+		else if (colours.size() <= 4)
+		{
+			Arc2D.Double a = new Arc2D.Double();
+			double startAngle = 0;
+			double deltaAngle = (double) (360/colours.size());
+			while (i.hasNext())
 			{
-				if (!getHighlighted())
-				{
-					g2d.setColor(EditorColor.DEFAULTCOLOR);
-				}
-				else
-				{
-					g2d.setColor(EditorColor.HIGHLIGHTCOLOR);
-				}
-			}
-			*/
-
-			g2d.fillOval((int) position.getX() - (WIDTH / 2), (int) position.getY() - (WIDTH / 2), WIDTH + 1, WIDTH + 1);
-
-			if (!i.hasNext())
-			{
-				g2d.setColor(new Color(shade.getRGB()));
-				g2d.fillOval((int) position.getX() - (WIDTH / 2) + 2, (int) position.getY() - (WIDTH / 2) + 2, WIDTH - 3, WIDTH - 3);
-			}
-
-			if (colours.size() <= 4)
-			{
-				while (i.hasNext())
-				{
-					a.setArcByCenter(position.getX(), position.getY(), radius() - 2, angle, 360 / (double) colours.size(), Arc2D.PIE);
-
-					angle += 360 / (double) colours.size();
-
-					g2d.setColor((Color) i.next());
-					g2d.fill(a);
-					g2d.draw(a);
-				}
-			}
-			else
-			{
-				g2d.setColor(EditorColor.DEFAULTMARKINGCOLOR);
-				g2d.fillOval((int) position.getX() - (WIDTH / 2) + 2, (int) position.getY() - (WIDTH / 2) + 2, WIDTH - 2, WIDTH - 2);
-
-				g2d.setColor(getColor());
+				// There are markings but they are fewer than 5! 
+				// Draw nice colored pies!!
+				a.setArcByCenter(getX(), getY(), RADIUS+1, startAngle, deltaAngle, Arc2D.PIE);
+				startAngle += deltaAngle;
 				
-				g2d.drawLine((int) position.getX(), (int) position.getY() - (WIDTH / 2), (int) position.getX(), (int) position.getY() + (WIDTH / 2));
-				g2d.drawLine((int) position.getX() - (WIDTH / 2), (int) position.getY(), (int) position.getX() + (WIDTH / 2), (int) position.getY());
+				g2d.setColor((Color) i.next());
+				g2d.fill(a);
+				//g2d.draw(a);
 			}
 		}
 		else
 		{
-			if (!i.hasNext())
-			{
-				g2d.setColor(new Color(shade.getRGB()));
-				g2d.fillOval((int) position.getX() - (WIDTH / 2) + 1, (int) position.getY() - (WIDTH / 2) + 1, WIDTH - 1, WIDTH - 1);
-			}
+			// More than four markings! Use the default marking color and draw a cross on top!
+			g2d.setColor(EditorColor.DEFAULTMARKINGCOLOR);
+			g2d.fillOval(getX() - RADIUS, getY() - RADIUS, WIDTH+1, WIDTH+1);
+			
+			//g2d.setColor(EditorColor.DEFAULTCOLOR);
+			g2d.setColor(Color.WHITE);
+			g2d.drawLine(getX(), getY() - RADIUS, getX(), getY() + RADIUS);
+			g2d.drawLine(getX() - RADIUS, getY(), getX() + RADIUS, getY());
+		}		
 
-			if (colours.size() <= 4)
-			{
-				while (i.hasNext())
-				{
-					a.setArcByCenter(position.getX(), position.getY(), radius() - 1, angle, 360 / (double) colours.size(), Arc2D.PIE);
-
-					angle += 360 / (double) colours.size();
-
-					g2d.setColor((Color) i.next());
-					g2d.fill(a);
-					g2d.draw(a);
-				}
-			}
-			else
-			{
-				g2d.setColor(EditorColor.DEFAULTMARKINGCOLOR);
-				g2d.fillOval((int) position.getX() - (WIDTH / 2) + 1, (int) position.getY() - (WIDTH / 2) + 1, WIDTH - 1, WIDTH - 1);
-
-				g2d.setColor(getColor());
-
-				g2d.drawLine((int) position.getX(), (int) position.getY() - (WIDTH / 2), (int) position.getX(), (int) position.getY() + (WIDTH / 2));
-				g2d.drawLine((int) position.getX() - (WIDTH / 2), (int) position.getY(), (int) position.getX() + (WIDTH / 2), (int) position.getY());
-			}
+		// Draw the border of the node
+		g2d.setColor(getColor());
+		g2d.drawOval(getX() - RADIUS - 1, getY() - RADIUS - 1, WIDTH + 2, WIDTH + 2);
+		if (isInitial())
+		{
+			// Draw it thicker!
+			g2d.drawOval(getX() - RADIUS, getY() - RADIUS, WIDTH, WIDTH);
+			//g2d.drawOval(getX() - RADIUS + 1, getY() - RADIUS + 1, WIDTH - 2, WIDTH - 2);			
 		}
 	}
 }
