@@ -88,7 +88,7 @@ public class Options
 		DISJ_OPTIMIZER_ALPHABET_SIZE = 5,
 		DISJ_OPTIMIZER_TWAVE_SIZE = 6
 		;
-	public static int disj_optimizer_algo = DISJ_OPTIMIZER_STATE_VECTOR_SIZE;
+	public static int disj_optimizer_algo = DISJ_OPTIMIZER_NONE;
 
 
 	/** (PN) transition optimization algorithm */
@@ -217,7 +217,7 @@ public class Options
 							ES_MOST_SHARED_EVENTS = 9,
 							ES_ADAPTIVE = 10;
 
-	public static int es_heuristics = ES_HEURISTIC_MOST_MEMBERS;
+	public static int es_heuristics = ES_ADAPTIVE;
 
 	/** BDD grow graph */
 	public static final String SHOW_GROW_NAMES[] = {

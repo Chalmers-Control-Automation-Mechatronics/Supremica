@@ -90,23 +90,6 @@ public class PetriNetSupervisor
 		pet = TransitionOptimizer.optimize(pet, manager, all);
 		size = pet.length; // may have changed!
 
-		// DEBUG:
-		/*
-		for(int j = 0; j < all.length; j++) {
-			Options.out.println("\nAutomata " + all[j].getName() );
-			boolean [] flow = all[j].getEventFlow(true);
-			Options.out.print(" event flow -> ");
-			for(int i = 0; i < flow.length; i++) if(flow[i]) Options.out.print(" " + i);
-			Options.out.println();
-
-			flow = all[j].getEventFlow(false);
-			Options.out.print(" event flow -> ");
-			for(int i = 0; i < flow.length; i++) if(flow[i]) Options.out.print(" " + i);
-			Options.out.println();
-		}
-		for(int i = 0; i < size; i++) pet[i].dump();
-		*/
-
 
 
 
@@ -457,6 +440,11 @@ public class PetriNetSupervisor
 		GrowFrame gf = BDDGrow.getGrowFrame(manager, "Forward reachability" + type());
 		int r_all_p, r_all = i_all;
 
+		if(Options.profile_on) {
+			Options.out.println("PN_forward  Level-1 dep: " + getLevel1Dependency(true));
+		}
+
+
 		manager.ref(r_all);
 		limit.reset();
 
@@ -515,6 +503,11 @@ public class PetriNetSupervisor
 		GrowFrame gf = BDDGrow.getGrowFrame(manager, "Backward reachability" + type());
 		int r_all_p, r_all = manager.replace(q_m, perm_s2sp);
 
+
+		if(Options.profile_on) {
+			Options.out.println("PN_backward Level-1 dep: " + getLevel1Dependency(false));
+		}
+
 		manager.ref(r_all);
 		limit.reset();
 
@@ -555,5 +548,12 @@ public class PetriNetSupervisor
 		stop_search();
 
 		return ret;
+	}
+	// -----------------------------------------------
+
+	public DependencyData getLevel1Dependency(boolean go_forward) {
+		DependencyData dd = new DependencyData();
+		dd.fromPerEventTransitions(pet, size, go_forward);
+		return dd;
 	}
 }

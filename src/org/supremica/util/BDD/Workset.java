@@ -36,6 +36,7 @@ public class Workset
 	 * dependency matrix:  n = dependent[automata][0] is the number of dependent automata.
    * dependent[automata][1] .. dependent[automata][n] are the dependent automata.
    * @see WorksetSupervisor
+   * @see #getLevel1Dependency
 	 */
 	 private int[][] dependent;
 
@@ -481,5 +482,15 @@ public class Workset
 	public boolean empty()
 	{
 		return workset_count <= 0;
+	}
+	// --------------------------------------------------------------------------------------------------------
+	/**
+	 * compute the level-1 dependency set data for this workset
+	 *
+	 */
+	public DependencyData getLevel1Dependency(boolean go_forward) {
+		DependencyData dd = new DependencyData();
+		dd.fromClusters(clusters, size);
+		return dd;
 	}
 }

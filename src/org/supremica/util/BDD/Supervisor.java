@@ -1346,4 +1346,15 @@ public class Supervisor
 
 		return r_not_s_go;
 	}
+
+	// -----------------------------------------------------------------
+	/**
+	 * compute the level-1 dependency set data for this model (only available if disjunctive)
+	 */
+	public DependencyData  getLevel1Dependency(boolean go_forward) {
+		DependencyData dd = new DependencyData ();
+		dd.setNeutral();
+		return dd;
+	}
 }
+

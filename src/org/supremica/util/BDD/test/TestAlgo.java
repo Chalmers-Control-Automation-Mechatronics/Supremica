@@ -216,6 +216,7 @@ public class TestAlgo
 		}
 		catch(Exception exx)
 		{
+			exx.printStackTrace();
 			error("[testSupNBC] something bad happened: " + exx);
 		}
 
@@ -767,6 +768,9 @@ public class TestAlgo
 
 /*
  $Log: not supported by cvs2svn $
+ Revision 1.31  2004/11/25 16:04:52  vahidi
+ fixed hugos "fixes" where the HeperData was not created for BDD operations.
+
  Revision 1.30  2004/11/12 19:51:57  flordal
  *** empty log message ***
 

@@ -90,6 +90,13 @@ public class DisjOptimizer
 
 		Timer timer = new Timer("DisjOptimizer");
 
+
+
+		if(Options.profile_on) {
+			DependencyData dd = getLevel1Dependency(true);
+			Options.out.println("Level-1 dep before optimization: " + dd.toString() );
+		}
+
 		// this is the re-ordered copy we will use:
 		Cluster [] copy = new Cluster [size];
 
@@ -175,6 +182,17 @@ public class DisjOptimizer
 		timer.report("Optimization of disjunctive partitions finished");
 	}
 
+
+
+// -----------------------------------------------------------------
+	/**
+	 * compute the level-1 dependency set data for this model
+	 */
+	public DependencyData getLevel1Dependency(boolean go_forward) {
+		DependencyData dd = new DependencyData();
+		dd.fromClusters(clusters, size);
+		return dd;
+	}
 }
 
 

@@ -144,6 +144,10 @@ public class WorksetSupervisor
 		Workset workset = getWorkset(false);
 		int r_all_p, r_all = manager.ref(bdd_i);
 
+		if(Options.profile_on) {
+			Options.out.println("Disj_forward  Level-1 dep: " + getLevel1Dependency(true));
+		}
+
 		// initial burst mode
 		if (Options.burst_mode)
 		{
@@ -239,6 +243,10 @@ public class WorksetSupervisor
 
 		Workset workset = getWorkset(false);
 		int r_all_p, r_all = manager.replace(m_all, perm_s2sp);
+
+		if(Options.profile_on) {
+			Options.out.println("Disj_backward Level-1 dep: " + getLevel1Dependency(false));
+		}
 
 		// initial burst mode:
 		if (Options.burst_mode)
@@ -439,4 +447,15 @@ public class WorksetSupervisor
 		return ret;
 	}
 
+// -----------------------------------------------------------------
+	/**
+	 * compute the level-1 dependency set data for this model (only available if disjunctive)
+	 */
+	public DependencyData getLevel1Dependency(boolean go_forward) {
+		if(workset == null) {
+			return super.getLevel1Dependency(go_forward);
+		} else {
+			return workset.getLevel1Dependency(go_forward);
+		}
+	}
 }

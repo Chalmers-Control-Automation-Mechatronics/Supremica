@@ -197,4 +197,14 @@ public void check(String place){
 
 		return q_kplus1;
 	}
+
+	// -----------------------------------------------------------------
+	/**
+	 * compute the level-1 dependency set data for this model
+	 */
+	public DependencyData getLevel1Dependency(boolean go_forward) {
+		DependencyData dd = new DependencyData ();
+		dd.fromClusters(clusters, curr);
+		return dd;
+	}
 }

@@ -287,6 +287,13 @@ public class TransitionOptimizer {
 			return org;
 		}
 
+		if(Options.profile_on) {
+			DependencyData dd = new DependencyData();
+			dd.fromPerEventTransitions(org, org.length, true);
+			Options.out.println("Unoptimized PN_forward  Level-1 dep: " + dd);
+			dd.fromPerEventTransitions(org, org.length, false);
+			Options.out.println("Unoptimized PN_backward Level-1 dep: " + dd);
+		}
 
 		try {
 			// optimize it and free the original
