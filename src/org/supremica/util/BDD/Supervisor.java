@@ -13,6 +13,7 @@ public class Supervisor
 	protected Group spec;
 	protected BDDAutomata manager;
 	protected Timer timer;
+	protected Limiter limit;
 	protected boolean has_uncontrollables, has_reachables,
 	    has_reachable_uncontrollables, has_coreachables;
 	protected int bdd_uncontrollables, bdd_reachables,
@@ -56,6 +57,7 @@ public class Supervisor
 
 	private void init()
 	{
+		limit = Limiter.createNew();
 		timer = new Timer("Supervisor");
 		fso = new FrontierSetOptimizer(manager);
 
@@ -113,6 +115,12 @@ public class Supervisor
 	}
 
 	// ------------------------------------------------------------------------------
+
+	public boolean wasStopped()
+	{
+		return limit.wasStopped();
+	}
+
 	public BDDAutomata getManager()
 	{
 		return manager;
@@ -438,6 +446,7 @@ public class Supervisor
 
 		SizeWatch.report(t_all, "T");
 
+		limit.reset();
 		do
 		{
 			r_all_p = r_all;
@@ -454,7 +463,7 @@ public class Supervisor
 			{
 				gf.add( r_all );
 			}
-		} while (r_all_p != r_all);
+		} while (r_all_p != r_all && !limit.stopped());
 
 		manager.deref(front);
 
@@ -562,6 +571,8 @@ public class Supervisor
 		int front = manager.ref(r_all);
 
 		// manager.ref(r_all);
+
+		limit.reset();
 		do
 		{
 			r_all_p = r_all;
@@ -582,7 +593,7 @@ public class Supervisor
 				gf.add( r_all );
 			}
 		}
-		while (r_all_p != r_all);
+		while (r_all_p != r_all && !limit.stopped() );
 
 		manager.deref(front);
 		manager.deref(t_all);
@@ -638,6 +649,7 @@ public class Supervisor
 	SizeWatch.report(set, "set");
 
 
+	limit.reset();
 	do {
 	    r_all_p = r_all;
 
@@ -668,7 +680,7 @@ public class Supervisor
 		    gf.add( r_all );
 		}
 	}
-	while (r_all_p != r_all);
+	while (r_all_p != r_all && !limit.stopped());
 
 
 	// clean up

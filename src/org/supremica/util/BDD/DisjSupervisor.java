@@ -77,6 +77,7 @@ public class DisjSupervisor extends ConjSupervisor {
 
 		// NOTE: we cant use FrontierSetOptimizer here [ DisjPartition.image() used frontier sets]
 
+		limit.reset();
 		do {
 			r_all_p = r_all;
 
@@ -88,7 +89,7 @@ public class DisjSupervisor extends ConjSupervisor {
 
 
 			if(gf != null)    gf.add( r_all);
-		} while(r_all_p != r_all);
+		} while(r_all_p != r_all && !limit.stopped());
 
 
 		manager.deref(front);
@@ -135,7 +136,7 @@ public class DisjSupervisor extends ConjSupervisor {
 
 
 		// NOTE: we cant use FrontierSetOptimizer here [ DisjPartition.preImage() used frontier sets]
-
+		limit.reset();
 		do {
 
 			r_all_p = r_all;
@@ -146,7 +147,7 @@ public class DisjSupervisor extends ConjSupervisor {
 			front = tmp;
 
 			if(gf != null)    gf.add( r_all);
-		} while(r_all != r_all_p);
+		} while(r_all != r_all_p && !limit.stopped());
 
 		// move the result from S' to S:
 		int ret = manager.replace(r_all, perm_sp2s);

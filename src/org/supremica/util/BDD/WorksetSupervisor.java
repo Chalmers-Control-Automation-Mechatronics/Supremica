@@ -155,7 +155,8 @@ public class WorksetSupervisor extends DisjSupervisor
 		}
 
 
-		while(!workset.empty()) {
+		limit.reset();
+		while(!workset.empty() && !limit.stopped()) {
 			int p = workset.pickOne();
 			int r_all_org = r_all;
 
@@ -225,7 +226,8 @@ public class WorksetSupervisor extends DisjSupervisor
 			}
 
 
-		while(!workset.empty()) {
+		limit.reset();
+		while(!workset.empty() && !limit.stopped()) {
 			int p = workset.pickOne();
 			int r_all_org = r_all;
 			do {

@@ -131,17 +131,16 @@ public class SmoothSupervisor extends DisjSupervisor {
 			remaining[i] = true;
 
 
-
+		limit.reset();
 		// for(int a = 0; a < size; a++) {
 		for(int a = size-1; a >= 0; a--) {
 			if(remaining[a]) {
 				remaining[a] = false;
 				dp.add(clusters[a].twave);
 				if(gf != null) gf.mark( clusters[a].toString() );
-
 				r_all = delay_forward(gf, clusters[a], r_all); // do the 'delay' thing...
 			}
-			r_all = dp.forward(gf, r_all);
+			r_all = dp.forward(gf, limit, r_all);
 		}
 
 
@@ -194,7 +193,7 @@ public class SmoothSupervisor extends DisjSupervisor {
 
 
 
-
+		limit.reset();
 		for(int a = 0; a < size; a++) {
 			if(remaining[a]) {
 				remaining[a] = false;
@@ -202,7 +201,7 @@ public class SmoothSupervisor extends DisjSupervisor {
 				if(gf != null) gf.mark( clusters[a].toString() );
 				r_all = delay_backward(gf, clusters[a], r_all); // do the 'delay' thing...
 			}
-			r_all = dp.backward(gf, r_all);
+			r_all = dp.backward(gf, limit, r_all);
 		}
 
 

@@ -61,7 +61,7 @@ public class  DelayedStarSmoothSupervisor extends DelayedSmoothSupervisor {
 
 		for(int i = 0; i < cluster_tos; i++) {
 			delay_partition.add( dih.next().twave );
-			r = delay_partition.forward(gf, r);
+			r = delay_partition.forward(gf, limit, r);
 		}
 		if(gf != null)    gf.mark("Released* " + c.toString());
 		delay_partition.cleanup();
@@ -76,7 +76,7 @@ public class  DelayedStarSmoothSupervisor extends DelayedSmoothSupervisor {
 
 		for(int i = 0; i < cluster_tos; i++) {
 			delay_partition.add( dih.next().twave );
-			r = delay_partition.backward(gf, r);
+			r = delay_partition.backward(gf, limit, r);
 		}
 		if(gf != null)    gf.mark("Released* " + c.toString());
 		delay_partition.cleanup();

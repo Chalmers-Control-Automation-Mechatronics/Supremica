@@ -1,4 +1,5 @@
 
+// FIXME: this algorithm cannot be interrupted
 
 
 package org.supremica.util.BDD;

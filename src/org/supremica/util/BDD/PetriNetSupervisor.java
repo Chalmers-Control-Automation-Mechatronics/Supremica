@@ -241,7 +241,8 @@ public class PetriNetSupervisor
 		int r_all_p, r_all = i_all;
 		manager.ref(r_all);
 
-		for(;;) {
+		limit.reset();
+		while(!limit.stopped()) {
 			r_all_p = r_all;
 
 			int i = pick_one_event(true /* forward direction */);
@@ -287,7 +288,8 @@ public class PetriNetSupervisor
 		int r_all_p, r_all = manager.replace(q_m, perm_s2sp);
 		manager.ref(r_all);
 
-		for(;;) {
+		limit.reset();
+		while(!limit.stopped()) {
 			r_all_p = r_all;
 
 			int i = pick_one_event(false /* backward direction */);

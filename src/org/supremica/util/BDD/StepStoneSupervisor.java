@@ -38,7 +38,8 @@ public class StepStoneSupervisor extends WorksetSupervisor {
 
 		int r_all = manager.ref(bdd_i);
 
-		while(!workset.empty()) {
+		limit.reset();
+		while(!workset.empty() && !limit.stopped()) {
 			int p = workset.pickOne();
 			int r_all_old = r_all;
 
@@ -78,7 +79,8 @@ public class StepStoneSupervisor extends WorksetSupervisor {
 
 		int r_all = manager.replace(m_all, perm_s2sp);
 
-		while(!workset.empty()) {
+		limit.reset();
+		while(!workset.empty() && !limit.stopped()) {
 			int p = workset.pickOne();
 			int r_all_old = r_all;
 

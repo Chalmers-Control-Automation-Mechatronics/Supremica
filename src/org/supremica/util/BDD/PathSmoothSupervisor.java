@@ -37,6 +37,7 @@ public class PathSmoothSupervisor extends DisjSupervisor
 		int i_all   = manager.and(plant.getI(), spec.getI());
 		int r_all_p, r_all = i_all;
 
+		limit.reset();
 		do {
 			do {
 				r_all_p = r_all;
@@ -46,8 +47,8 @@ public class PathSmoothSupervisor extends DisjSupervisor
 				manager.deref( tmp );
 
 				if(gf != null)    gf.add( r_all );
-			} while(r_all_p != r_all);
-		} while(psp.step());
+			} while(r_all_p != r_all && ! limit.stopped());
+		} while(psp.step() && !limit.stopped());
 
 
 		// cleanup
@@ -78,6 +79,7 @@ public class PathSmoothSupervisor extends DisjSupervisor
 		SizeWatch.report(r_all, "Qm");
 
 
+		limit.reset();
 		do {
 			do {
 				r_all_p = r_all;
@@ -86,8 +88,8 @@ public class PathSmoothSupervisor extends DisjSupervisor
 				manager.deref(tmp);
 
 				if(gf != null)    gf.add( r_all );
-			} while(r_all_p != r_all);
-		} while(psp.step());
+			} while(r_all_p != r_all && !limit.stopped());
+		} while(psp.step() && !limit.stopped());
 
 		has_coreachables = true;
 		bdd_coreachables = manager.replace(r_all, perm_sp2s);

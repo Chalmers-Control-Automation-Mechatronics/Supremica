@@ -119,6 +119,7 @@ public class SimplePartitionSupervisor extends ConjSupervisor {
 
 
 		i = j = 0;
+		limit.reset();
 		do {
 			r_all_p = r_all;
 
@@ -138,7 +139,7 @@ public class SimplePartitionSupervisor extends ConjSupervisor {
 
 			if(gf != null)    gf.add( r_all );
 
-		} while( i < size);
+		} while( i < size && !limit.stopped());
 
 
 		if(gf != null) gf.stopTimer();

@@ -223,6 +223,7 @@ public class ConjSupervisor
 		manager.ref(i_all);    // gets derefed by orTo and finally a recursiveDeref
 		manager.ref(front); // gets derefed
 
+		limit.reset();
 		do {
 			r_all_p = r_all;
 
@@ -236,7 +237,7 @@ public class ConjSupervisor
 
 			if (gf != null)
 			gf.add(r_all);
-		} while (r_all_p != r_all);
+		} while (r_all_p != r_all && !limit.stopped());
 
 		manager.deref(front);
 
@@ -268,6 +269,7 @@ public class ConjSupervisor
 
 		SizeWatch.report(r_all, "Qm");
 
+		limit.reset();
 		do
 		{
 			r_all_p = r_all;
@@ -283,7 +285,7 @@ public class ConjSupervisor
 				gf.add(r_all);
 			}
 		}
-		while (r_all_p != r_all);
+		while (r_all_p != r_all && !limit.stopped());
 
 		manager.deref(front);
 

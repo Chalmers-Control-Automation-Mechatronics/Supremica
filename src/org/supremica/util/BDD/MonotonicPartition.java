@@ -109,7 +109,7 @@ public class MonotonicPartition {
 
 	 /** forward rechable fixedpoint */
 	 // XXX: can be much faster by moving out the permutations!
-	public int forward(GrowFrame gf, int q_k) {
+	public int forward(GrowFrame gf, Limiter limit, int q_k) {
 		int q_k_minus1;
 		do {
 			q_k_minus1 = q_k;
@@ -117,7 +117,7 @@ public class MonotonicPartition {
 			q_k = manager.orTo(q_k_minus1, front);
 			manager.deref(front);
 			if(gf != null)    gf.add( q_k );
-		} while(q_k_minus1 != q_k);
+		} while(q_k_minus1 != q_k && !limit.stopped());
 
 
 		return q_k;
@@ -126,7 +126,7 @@ public class MonotonicPartition {
 
 	 /** backward rechable fixedpoint */
 	 // XXX: can be much faster by moving out the permutations!
-	public int backward(GrowFrame gf, int q_k) {
+	public int backward(GrowFrame gf, Limiter limit, int q_k) {
 		int q_k_minus1;
 		do {
 			q_k_minus1 = q_k;
@@ -134,7 +134,7 @@ public class MonotonicPartition {
 			q_k = manager.orTo(q_k_minus1, front);
 			manager.deref(front);
 			if(gf != null)    gf.add( q_k );
-		} while(q_k_minus1 != q_k);
+		} while(q_k_minus1 != q_k && !limit.stopped());
 
 
 		return q_k;

@@ -45,8 +45,8 @@ public class SmoothWorksetSupervisor extends WorksetSupervisor {
 		Cluster [] clusters = dop.getClusters();
 
 
-
-		for(int a = 0; a < size; a++) {
+		limit.reset();
+		for(int a = 0; a < size && !limit.wasStopped(); a++) {
 			int p = workset.pickOneExcelsuive();
 			dp.add(clusters[p].twave);
 			if(gf != null) gf.mark( clusters[p].toString() );
@@ -60,7 +60,7 @@ public class SmoothWorksetSupervisor extends WorksetSupervisor {
 				r_all = manager.orTo(r_all, front);
 				manager.deref(front);
 				if(gf != null)    gf.add( r_all);
-			} while(r_all != r_all_pp);
+			} while(r_all != r_all_pp && !limit.stopped());
 
 			workset.advance(p, true);
 
@@ -107,7 +107,8 @@ public class SmoothWorksetSupervisor extends WorksetSupervisor {
 	Cluster [] clusters = dop.getClusters();
 
 
-	for(int a = 0; a < size; a++) {
+	limit.reset();
+	for(int a = 0; a < size && !limit.stopped(); a++) {
 	    int p = workset.pickOneExcelsuive();
 	    dp.add(clusters[p].twave);
 	    if(gf != null) gf.mark( clusters[p].toString() );
@@ -117,12 +118,12 @@ public class SmoothWorksetSupervisor extends WorksetSupervisor {
 		r_all_org = r_all;
 
 	    do {
-			r_all_pp = r_all;
-			int front = dp.preImage(r_all);
-			r_all = manager.orTo(r_all, front);
-			manager.deref(front);
-			if(gf != null)    gf.add( r_all );
-	    } while(r_all != r_all_pp);
+				r_all_pp = r_all;
+				int front = dp.preImage(r_all);
+				r_all = manager.orTo(r_all, front);
+				manager.deref(front);
+				if(gf != null)    gf.add( r_all );
+	    } while(r_all != r_all_pp && !limit.stopped());
 
 	    workset.advance(p, true);
 	}

@@ -235,7 +235,10 @@ public class Options
     // --- [ constants ] -------------------------------------------------
     public static final int LINE_WIDTH = 55;    // # of chars per line?, screen width
     private static final int DEFAULT_MAX_PARTITION_SIZE = 3000; // max nodes/partition
-	public static int max_partition_size = DEFAULT_MAX_PARTITION_SIZE;
+		public static int max_partition_size = DEFAULT_MAX_PARTITION_SIZE;
+
+		/** number of seconds an algorithm is allowed to run before it is aborted, -1 means DISABLED */
+		public static int algo_time_limit = -1;
 
 
     // --- [ options ] -------------------------------------------------
@@ -255,8 +258,8 @@ public class Options
     public static boolean burst_mode = false; /** initial burst mode: to do some initial work before the reachability algo realy starts */
 
 
-
     // out own out stream, might be changed to point to a file
     public static PrintStream out = System.out;
+
 
 }

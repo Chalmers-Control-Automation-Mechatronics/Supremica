@@ -51,6 +51,7 @@ public class PartitionSmoothSupervisor extends DisjSupervisor {
 
 
 		i = j = 0;
+		limit.reset();
 		do {
 			// Util.notify("i = " + i + ", j = " + j + ", n = " + size);
 			r_all_p = r_all;
@@ -72,7 +73,7 @@ public class PartitionSmoothSupervisor extends DisjSupervisor {
 
 			if(gf != null)    gf.add( r_all );
 
-		} while( i < size);
+		} while( i < size && !limit.stopped());
 
 
 		has_reachables = true;
@@ -109,6 +110,7 @@ public class PartitionSmoothSupervisor extends DisjSupervisor {
 
 
 		i = j = 0;
+		limit.reset();
 		do {
 			r_all_p = r_all;
 
@@ -128,7 +130,7 @@ public class PartitionSmoothSupervisor extends DisjSupervisor {
 
 			if(gf != null)    gf.add( r_all );
 
-		} while( i < size);
+		} while( i < size && !limit.stopped());
 
 		// move the result from S' to S:
 		int ret = manager.replace(r_all, perm_sp2s);
