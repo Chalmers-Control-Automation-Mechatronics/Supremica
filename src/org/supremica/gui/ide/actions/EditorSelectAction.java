@@ -29,6 +29,7 @@ public class EditorSelectAction
 
 	public void doAction()
 	{
-		System.err.println("Select is not implemented yet!");
+		ide.setEditorMode(this);
+		//System.err.println("Select is not implemented yet!");
 	}
 }

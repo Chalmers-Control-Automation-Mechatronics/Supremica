@@ -1,6 +1,8 @@
 package org.supremica.gui.ide;
 
 import javax.swing.*;
+import java.awt.Dimension;
+
 import org.supremica.gui.WhiteScrollPane;
 import org.supremica.gui.DotBuilder;
 import org.supremica.gui.DotBuilderObserver;
@@ -18,6 +20,7 @@ class AnalyzerAutomatonViewerPanel
 	private String name;
 	private DotBuilder builder;
 	private Automaton theAutomaton;
+	private GrappaPanel viewerPanel = null;
 
 	AnalyzerAutomatonViewerPanel(ModuleContainer moduleContainer, String name, Automaton theAutomaton)
 	{
@@ -34,6 +37,24 @@ class AnalyzerAutomatonViewerPanel
 		return name;
 	}
 
+	public void setPreferredSize(Dimension dimension)
+	{
+		super.setPreferredSize(dimension);
+		if (viewerPanel != null)
+		{
+			viewerPanel.setPreferredSize(dimension);
+		}
+	}
+
+	public void setMinimumSize(Dimension dimension)
+	{
+		super.setMinimumSize(dimension);
+		if (viewerPanel != null)
+		{
+			viewerPanel.setMinimumSize(dimension);
+		}
+	}
+
 	private void build()
 	{
 		builder = DotBuilder.getDotBuilder(this, new AutomatonToDot(theAutomaton));
@@ -43,9 +64,13 @@ class AnalyzerAutomatonViewerPanel
 
 	public void setGraph(Graph theGraph)
 	{
-		GrappaPanel viewerPanel = new GrappaPanel(theGraph);
+		viewerPanel = new GrappaPanel(theGraph);
 		viewerPanel.setScaleToFit(false);
+		viewerPanel.setPreferredSize(getPreferredSize());
+		viewerPanel.setMinimumSize(getMinimumSize());
 		getViewport().add(viewerPanel);
+		getViewport().setPreferredSize(getPreferredSize());
+		getViewport().setMinimumSize(getMinimumSize());
 		validate();
 	}
 

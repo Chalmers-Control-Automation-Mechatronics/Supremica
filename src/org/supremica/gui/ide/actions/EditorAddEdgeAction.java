@@ -29,6 +29,8 @@ public class EditorAddEdgeAction
 
 	public void doAction()
 	{
-		System.err.println("Add Edge is not implemented yet!");
+		ide.setEditorMode(this);
+
+//		System.err.println("Add Edge is not implemented yet!");
 	}
 }

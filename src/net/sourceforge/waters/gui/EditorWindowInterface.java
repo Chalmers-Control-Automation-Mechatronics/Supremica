@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorWindow
 //###########################################################################
-//# $Id: EditorWindowInterface.java,v 1.1 2005-02-22 04:12:36 knut Exp $
+//# $Id: EditorWindowInterface.java,v 1.2 2005-03-03 13:32:55 knut Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -34,4 +34,5 @@ public interface EditorWindowInterface
 
 	public void repaint();
 
+	void copyAsWMFToClipboard();
 }

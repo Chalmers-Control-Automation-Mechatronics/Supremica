@@ -61,16 +61,16 @@ public class ComponentEditorPanel
 		constraints.anchor = GridBagConstraints.NORTH;
 
 		setLayout(gridbag);
-		gridbag.setConstraints(toolbar, constraints);
-		add(toolbar);
+		//gridbag.setConstraints(toolbar, constraints);
+		//add(toolbar);
 
 		final JScrollPane scrollsurface = new JScrollPane(surface);
 		final JScrollPane scrollevents = new JScrollPane(events);
 		final JViewport viewevents = scrollevents.getViewport();
 		final JSplitPane split = new JSplitPane
-			(JSplitPane.HORIZONTAL_SPLIT, scrollsurface, scrollevents);
+			(JSplitPane.HORIZONTAL_SPLIT, scrollevents, scrollsurface);
 		viewevents.setBackground(Color.WHITE);
-		split.setResizeWeight(1.0);
+		split.setResizeWeight(0.0);
 		split.setDividerLocation(500);
 
 		constraints.weightx = 1.0;

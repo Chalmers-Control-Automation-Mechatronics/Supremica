@@ -95,6 +95,7 @@ public class VisualProject
 	private HashMap theAlphabetViewerContainer = new HashMap();
 	private LightTableModel lightTableModel = new LightTableModel();
 	private FullTableModel fullTableModel = new FullTableModel();
+	private AnalyzerTableModel analyzerTableModel = new AnalyzerTableModel();
 	private File projectFile = null;
 
 	public VisualProject()
@@ -113,6 +114,8 @@ public class VisualProject
 	{
 		addListener(lightTableModel);
 		addListener(fullTableModel);
+		addListener(analyzerTableModel);
+
 	}
 
 	public void clear()
@@ -332,8 +335,8 @@ public class VisualProject
 		{
 			throw new SupremicaException(automatonName + " does not exist in VisualProjectContainer");
 		}
-		
-		if (existsAutomatonViewer(automaton)) 
+
+		if (existsAutomatonViewer(automaton))
 		{
 			// Check with the user that its ok to display the automaton
 			if (showAutomatonViewer(automaton))
@@ -345,10 +348,10 @@ public class VisualProject
 
 				return viewer;
 			}
-			else 
+			else
 			{
 				// The user didn't like what was presented to her
-				return null; 
+				return null;
 			}
 		}
 		else if(maker != null)
@@ -374,7 +377,7 @@ public class VisualProject
 			return null; // null here means "no viewer exists and you didn't want me to construct a new one"
 		}
 	}
-	
+
 	// This is what it should really be like, one task - one function...
 	public boolean showAutomatonViewer(Automaton automaton)
 	{
@@ -389,33 +392,33 @@ public class VisualProject
 			if(response == JOptionPane.NO_OPTION)
 			{
 				return false; // user chose to "Abort"
-			}	
+			}
 		}
-		
+
 		return true;
 	}
-	
+
 	// When will any of these throw an exception?? When automaton == null, but else...?
 	public boolean existsAutomatonViewer(Automaton automaton)
 		throws Exception
 	{
 		return theAutomatonViewerContainer.containsKey(automaton.getName());
 	}
-	
+
 	public AutomatonViewer returnAutomatonViewer(Automaton automaton)
 		throws Exception
 	{
 		return (AutomatonViewer) theAutomatonViewerContainer.get(automaton.getName());
 	}
-	
+
 	public AutomatonViewer createAutomatonViewer(Automaton automaton, AutomatonViewerFactory maker)
 		throws Exception
 	{
 		AutomatonViewer viewer = maker.createAutomatonViewer(automaton);
 		theAutomatonViewerContainer.put(automaton.getName(), viewer);
-		return viewer;	
+		return viewer;
 	}
-	
+
 	public JInternalFrame getAutomatonFrame(String automatonName)
 		throws Exception
 	{
@@ -753,6 +756,11 @@ public class VisualProject
 		return fullTableModel;
 	}
 
+	public TableModel getAnalyzerTableModel()
+	{
+		return analyzerTableModel;
+	}
+
 	public class LightTableModel
 		extends AbstractTableModel
 		implements AutomataListener
@@ -945,6 +953,149 @@ public class VisualProject
 				return true;
 			}
 
+			return false;
+		}
+
+		public void setValueAt(Object aValue, int rowIndex, int columnIndex) {}
+
+		public void updateListeners()
+		{
+			fireTableDataChanged();
+		}
+
+		public void automatonAdded(Automata automata, Automaton automaton)
+		{
+			updateListeners();
+		}
+
+		public void automatonRemoved(Automata automata, Automaton automaton)
+		{
+			updateListeners();
+		}
+
+		public void automatonRenamed(Automata automata, Automaton automaton)
+		{
+			updateListeners();
+		}
+
+		public void actionsOrControlsChanged(Automata automata)
+		{    // Do nothing
+		}
+
+		public void updated(Object theObject)
+		{
+			updateListeners();
+		}
+	}
+
+
+	public class AnalyzerTableModel
+		extends AbstractTableModel
+		implements AutomataListener
+	{
+		public AnalyzerTableModel() {}
+
+		public int getColumnCount()
+		{
+			return 5;
+		}
+
+		public String getColumnName(int columnIndex)
+		{
+			if (columnIndex == 0)
+			{
+				return "Name";
+			}
+
+			if (columnIndex == 1)
+			{
+				return "Type";
+			}
+
+			if (columnIndex == 2)
+			{
+				return "|Q|";
+			}
+
+			if (columnIndex == 3)
+			{
+				return "|E|";
+			}
+
+			if (columnIndex == 4)
+			{
+				return "|T|";
+			}
+
+			return "Unknown";
+		}
+
+		public Class getColumnClass(int column)
+		{
+			if (column == 0)
+			{
+				return String.class;
+			}
+
+			if (column == 1)
+			{
+				return String.class;
+			}
+
+			if ((column == 2) || (column == 3) || (column == 4))
+			{
+				return Integer.class;
+			}
+
+			return String.class;
+		}
+
+		public int getRowCount()
+		{
+			return nbrOfAutomata();
+		}
+
+		public int getSize()
+		{
+			return getRowCount();
+		}
+
+		public Object getValueAt(int rowIndex, int columnIndex)
+		{
+			Automaton theAutomaton = getAutomatonAt(rowIndex);
+
+			if (columnIndex == 0)
+			{
+				return theAutomaton.getName();
+			}
+
+			if (columnIndex == 1)
+			{
+				AutomatonType currType = theAutomaton.getType();
+
+				return currType.toString();
+			}
+
+			if (columnIndex == 2)
+			{
+				return new Integer(theAutomaton.nbrOfStates());
+			}
+
+			if (columnIndex == 3)
+			{
+				return new Integer(theAutomaton.nbrOfEvents());
+			}
+
+			if (columnIndex == 4)
+			{
+				return new Integer(theAutomaton.nbrOfTransitions());
+			}
+
+			return "Unknown";
+		}
+
+		public boolean isCellEditable(int rowIndex, int columnIndex)
+		{
 			return false;
 		}
 

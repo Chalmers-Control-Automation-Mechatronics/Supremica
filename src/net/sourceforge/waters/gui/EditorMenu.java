@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorMenu
 //###########################################################################
-//# $Id: EditorMenu.java,v 1.7 2005-03-03 12:52:54 flordal Exp $
+//# $Id: EditorMenu.java,v 1.8 2005-03-03 13:32:55 knut Exp $
 //###########################################################################
 
 
@@ -92,11 +92,11 @@ public class EditorMenu
 		menuItem.setToolTipText("Not implemented yet");
 		menu.add(menuItem);
 
-/*
+
 		menuItem = new JMenuItem("Copy as WMF");
 		menu.add(menuItem);
 		menuItem.addActionListener(this);
-*/
+
 		editCopyAsWMFMenu = menuItem;
 
 		menuItem = new JMenuItem("Cut");
@@ -216,11 +216,11 @@ public class EditorMenu
 		{
 			root.getControlledSurface().setOptionsVisible(true);
 		}
-/*
+
 		if (e.getSource() == editCopyAsWMFMenu)
 		{
 			root.copyAsWMFToClipboard();
 		}
-*/
+
 	}
 }

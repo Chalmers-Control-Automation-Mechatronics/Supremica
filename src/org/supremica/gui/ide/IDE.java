@@ -1,6 +1,7 @@
 
 package org.supremica.gui.ide;
 
+import org.supremica.gui.ide.actions.IDEAction;
 import javax.swing.*;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
@@ -225,6 +226,11 @@ public class IDE
 		}
 		validate();
 		repaint();
+	}
+
+	public void setEditorMode(IDEAction theAction)
+	{
+
 	}
 
 	public static void main(String args[])

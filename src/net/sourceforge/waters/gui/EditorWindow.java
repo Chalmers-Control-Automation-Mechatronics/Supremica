@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorWindow
 //###########################################################################
-//# $Id: EditorWindow.java,v 1.9 2005-02-22 21:24:31 robi Exp $
+//# $Id: EditorWindow.java,v 1.10 2005-03-03 13:32:55 knut Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -145,7 +145,7 @@ public class EditorWindow
 		return events;
 	}
 
-	void copyAsWMFToClipboard()
+	public void copyAsWMFToClipboard()
 	{
 		if (toClipboard == null)
 		{
@@ -167,7 +167,7 @@ public class EditorWindow
 		//height += (int)0.1*height;
 		Graphics theGraphics = toClipboard.getGraphics(surface.getWidth(), surface.getHeight());
 
-		surface.paint(theGraphics);
+		surface.print(theGraphics);
 		toClipboard.copyToClipboard();
 	}
 }

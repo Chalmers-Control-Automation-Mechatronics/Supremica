@@ -29,6 +29,7 @@ public class EditorAddNodeGroupAction
 
 	public void doAction()
 	{
-		System.err.println("Add Node Group is not implemented yet!");
+		ide.setEditorMode(this);
+//		System.err.println("Add Node Group is not implemented yet!");
 	}
 }

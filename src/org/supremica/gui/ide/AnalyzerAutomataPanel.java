@@ -34,19 +34,22 @@ class AnalyzerAutomataPanel
 	private String name;
 	private JTable theAutomatonTable;
 	private TableSorter theTableSorter;
-	private TableModel fullTableModel;
-//	private MainPopupMenu mainPopupMenu = new MainPopupMenu(this);
+	private TableModel analyzerTableModel;
+	private AnalyzerPopupMenu analyzerPopupMenu;
 
 	public static int TABLE_IDENTITY_COLUMN = 0;
 	public static int TABLE_TYPE_COLUMN = 1;
 	public static int TABLE_STATES_COLUMN = 2;
 	public static int TABLE_EVENTS_COLUMN = 3;
+	public static int TABLE_TRANSITIONS_COLUMN = 4;
 
 	AnalyzerAutomataPanel(AnalyzerPanel analyzerPanel, ModuleContainer moduleContainer, String name)
 	{
 		this.analyzerPanel = analyzerPanel;
 		this.moduleContainer = moduleContainer;
 		this.name = name;
+		analyzerPopupMenu = new AnalyzerPopupMenu(moduleContainer.getFrame());
+
 		setPreferredSize(IDEDimensions.leftAnalyzerPreferredSize);
 		setMinimumSize(IDEDimensions.leftAnalyzerMinimumSize);
 		initialize();
@@ -60,8 +63,8 @@ class AnalyzerAutomataPanel
 
 	private void initialize()
 	{
-		fullTableModel = getActiveProject().getFullTableModel();
-		theTableSorter = new TableSorter(fullTableModel);
+		analyzerTableModel = getActiveProject().getAnalyzerTableModel();
+		theTableSorter = new TableSorter(analyzerTableModel);
 		theAutomatonTable = new JTable(theTableSorter);
 
 		theAutomatonTable.getTableHeader().setReorderingAllowed(false);
@@ -70,7 +73,7 @@ class AnalyzerAutomataPanel
 
 		theTableSorter.addMouseListenerToHeaderInTable(theAutomatonTable);
 
-		fullTableModel.addTableModelListener(this);
+		analyzerTableModel.addTableModelListener(this);
 		theAutomatonTable.addKeyListener(new KeyAdapter()
 		{
 			public void keyPressed(KeyEvent e)
@@ -89,7 +92,7 @@ class AnalyzerAutomataPanel
 
 		// Set the preferred column width of the automaton table
 		int tableWidth = theAutomatonTable.getWidth();
-		int tableWidthEntity = tableWidth / 12;
+		int tableWidthEntity = tableWidth / 11;
 		TableColumnModel theTableColumnModel = theAutomatonTable.getColumnModel();
 
 		for (int i = 0; i < theAutomatonTable.getColumnCount(); i++)
@@ -106,7 +109,7 @@ class AnalyzerAutomataPanel
 			}
 			else
 			{
-				currColumn.setPreferredWidth(tableWidthEntity * 2);
+				currColumn.setPreferredWidth(tableWidthEntity * 1);
 			}
 		}
 
@@ -145,8 +148,6 @@ class AnalyzerAutomataPanel
 								catch (Exception ex)
 								{
 									logger.error("Exception in AutomatonViewer. Automaton: " + currAutomaton, ex);
-									logger.debug(ex.getStackTrace());
-
 									return;
 								}
 							}
@@ -200,8 +201,8 @@ class AnalyzerAutomataPanel
 						theAutomatonTable.setRowSelectionInterval(currRow, currRow);
 					}
 
-					// ToDo
-					//mainPopupMenu.show(theAutomatonTable.getSelectedRowCount(), e.getComponent(), e.getX(), e.getY());
+
+					analyzerPopupMenu.show(theAutomatonTable.getSelectedRowCount(), e.getComponent(), e.getX(), e.getY());
 				}
 			}
 		});

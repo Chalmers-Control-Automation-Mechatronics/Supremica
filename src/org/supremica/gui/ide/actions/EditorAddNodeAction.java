@@ -29,6 +29,8 @@ public class EditorAddNodeAction
 
 	public void doAction()
 	{
+		ide.setEditorMode(this);
+
 		System.err.println("Add Node is not implemented yet!");
 	}
 }
