@@ -150,12 +150,12 @@
 		<Events>
 			<Event id="em.measure.start" label="em.measure.start" controllable="true" prioritized="true" />
 			<Event id="em.measure.finished" label="em.measure.finished" controllable="false" prioritized="true" />
-			<Event id="measure.go_out" label="measure.go_out" controllable="true" prioritized="true" />
+			<Event id="em.measure.go_out" label="em.measure.go_out" controllable="true" prioritized="true" />
 			<Event id="em.timer.measure.start" label="em.timer.measure.start" controllable="true" prioritized="true" />
 			<Event id="em.timer.measure.timeout" label="em.timer.measure.timeout" controllable="false" prioritized="true" />
 			<Event id="em.small_ball" label="em.small_ball" controllable="false" prioritized="true" />
 			<Event id="em.large_ball" label="em.large_ball" controllable="false" prioritized="true" />
-			<Event id="measure.go_in" label="measure.go_in" controllable="true" prioritized="true" />
+			<Event id="em.measure.go_in" label="em.measure.go_in" controllable="true" prioritized="true" />
 			<Event id="em.measure.allocate_station" label="em.measure.allocate_station" controllable="true" prioritized="true" />
 			<Event id="em.measure.release_station" label="em.measure.release_station" controllable="true" prioritized="true" />
 		</Events>
@@ -174,12 +174,12 @@
 		<Transitions>
 			<Transition event="em.measure.start" source="q_0" dest="q_0_1" />
 			<Transition event="em.measure.allocate_station" source="q_0_1" dest="q_0_2" />
-			<Transition event="measure.go_out" source="q_0_2" dest="q_1" />
+			<Transition event="em.measure.go_out" source="q_0_2" dest="q_1" />
 			<Transition event="em.timer.measure.start" source="q_1" dest="q_2" />
 			<Transition event="em.timer.measure.timeout" source="q_2" dest="q_3" />
 			<Transition event="em.small_ball" source="q_3" dest="q_4" />
 			<Transition event="em.large_ball" source="q_3" dest="q_4" />
-			<Transition event="measure.go_in" source="q_4" dest="q_5" />
+			<Transition event="em.measure.go_in" source="q_4" dest="q_5" />
 			<Transition event="em.measure.release_station" source="q_5" dest="q_6" />
 			<Transition event="em.measure.finished" source="q_6" dest="q_0" />			
 		</Transitions>
