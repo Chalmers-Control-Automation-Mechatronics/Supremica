@@ -3,7 +3,7 @@
 //# PACKAGE: waters.model.expr
 //# CLASS:   ParseException
 //###########################################################################
-//# $Id: ParseException.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: ParseException.java,v 1.2 2005-02-17 19:41:43 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.expr;
@@ -83,6 +83,24 @@ public class ParseException extends WatersException
   public int getPosition()
   {
     return mPosition;
+  }
+
+
+  //#########################################################################
+  //# Rethrowing
+  /**
+   * Convert this exception to a {@link java.text.ParseException}.
+   * @return A {@link java.text.ParseException} with the same error message
+   *         and position as this exception, which has this exception as
+   *         its cause.
+   */
+  public java.text.ParseException getJavaException()
+  {
+    final String msg = getMessage();
+    final java.text.ParseException rethrown =
+      new java.text.ParseException(msg, mPosition);
+    rethrown.initCause(this);
+    return rethrown;
   }
 
 
