@@ -16,7 +16,9 @@ import java.lang.Exception;
 import java.util.HashSet;
 import java.util.Iterator;
 import org.apache.oro.text.regex.*;
-import org.supremica.util.*;
+
+import org.supremica.util.IntArrayList;
+import org.supremica.util.IntArrayVector;
 import org.supremica.automata.Automata;
 import org.supremica.automata.State;
 import org.supremica.gui.MonitorableThread;
@@ -28,12 +30,17 @@ public class SearchStates
 // implements Monitorable    // Stoppable
 {
 	private AutomataSynchronizer syncher = null;
-	private IntArrayList list = null;
+	private IntArrayVector container = null;
 	private Matcher matcher = null;
 	protected /* volatile */ boolean stopRequested = false;
 	protected boolean mode = false;    // false means sychronization mode, true is matching mode
 	protected int progress = 1;
 
+	private IntArrayVector makeContainer()
+	{
+		return new IntArrayVector();
+	}
+	
 	public SearchStates(Automata automata, Matcher m)
 		throws Exception
 	{
@@ -42,7 +49,7 @@ public class SearchStates
 		// !!Throws exception if automata is empty or has only one automaton!!
 		this.syncher = new AutomataSynchronizer(automata, new SynchronizationOptions());
 		this.matcher = m;
-		this.list = new IntArrayList();    // Must create the list, in case the thread is stopped
+		this.container = makeContainer();    // Must create the container, in case the thread is stopped
 	}
 
 	protected void synchronize()
@@ -75,7 +82,7 @@ public class SearchStates
 				// ...and this is SearchStates::getStateIterator, returns SearchStates::StateIterator
 				if (matcher.matches(getStateIterator(composite_state)))
 				{
-					list.add(composite_state);
+					container.add(composite_state);
 				}
 
 				progress = (int) ((++num_processed * 100) / num_total);
@@ -83,7 +90,7 @@ public class SearchStates
 
 			if (stopRequested)
 			{
-				list = new IntArrayList();    // thread stopped - clear the list
+				container = makeContainer();    // thread stopped - clear the container
 			}
 		}
 	}
@@ -133,15 +140,21 @@ public class SearchStates
 
 	public int numberFound()
 	{
-		return list.size();
+		return container.size();
 	}
 
 	// To iterate over the matched states
 	public Iterator iterator()
 	{
-		return list.iterator();
+		return container.iterator();
 	}
-
+	// Given index for an automaton and a composite state, return that state
+	public State getState(int automaton, int index)
+	{
+		State[][] states = syncher.getHelper().getIndexFormStateTable(); // shoudl be cached?
+		int[] composite = container.getElement(index);
+		return states[automaton][composite[automaton]];
+	}
 	// iterates over the partial states
 	public class StateIterator
 	{

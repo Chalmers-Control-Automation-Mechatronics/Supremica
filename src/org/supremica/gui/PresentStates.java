@@ -3,32 +3,59 @@
 // * (Various ways of?) Presents the found states for the user
 package org.supremica.gui;
 
+import java.util.Vector;
 import java.util.Iterator;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.table.*;
 import org.supremica.log.*;
+import org.supremica.util.IntArrayVector;
 import org.supremica.automata.Automata;
+import org.supremica.automata.Automaton;
 import org.supremica.automata.algorithms.SearchStates;
 import org.supremica.gui.Presenter;
 
 class PresentStatesTableModel
-	extends AbstractTableModel
+	extends DefaultTableModel // AbstractTableModel
 {
-	String[] heading = null;
-	String[][] body = null;
-
+	// private String[] heading = null;
+	// private String[][] body = null;
+	private IntArrayVector states;
+//	private Automata automata;
+	private SearchStates ss;
+	private final int rows;
+	private final int cols;
+	
+	private static Vector formColumnNameVector(Automata a)
+	{
+		Vector v = new Vector();
+		
+		for (int i = 0; i < a.size(); ++i)
+		{
+			v.add( a.getAutomatonAt(i).getName());
+		}
+		return v;
+	}
 	public PresentStatesTableModel(SearchStates ss, Automata a)
 	{
-		heading = new String[a.size()];
+		super(formColumnNameVector(a), ss.numberFound());
+		
+//		this.automata = a;
+		this.ss = ss;		
+		this.rows = ss.numberFound();
+		this.cols = a.size();
+		
+/*		heading = new String[cols];
 
-		for (int i = 0; i < a.size(); ++i)
+		for (int i = 0; i < cols; ++i)
 		{
 			heading[i] = a.getAutomatonAt(i).getName();
 		}
+*/
+/* Instead of doing this, we dynamically create what is necessary in getValueAt()
 
-		body = new String[ss.numberFound()][a.size()];
+		body = new String[rows][cols];
 
 		int row = 0;
 
@@ -41,27 +68,34 @@ class PresentStatesTableModel
 				body[row][col++] = it2.getState().getName();
 			}
 		}
+*/
 	}
-
+/*
 	public int getRowCount()
 	{
-		return body.length;
+		return rows; // body.length;
 	}
 
 	public int getColumnCount()
 	{
-		return heading.length;
+		return cols; // heading.length;
 	}
 
 	public String getColumnName(int col)
 	{
 		return heading[col];
 	}
-
 	public Object getValueAt(int row, int col)
 	{
 		return body[row][col];
+		
+	}*/
+	// col indexes an automaton, row a state
+	public Object getValueAt(int row, int col)
+	{
+		return ss.getState(col, row).getName();
 	}
+
 }
 
 class PresentStatesTable

@@ -96,6 +96,8 @@ public final class AutomataSynchronizerExecuter
 	private boolean controllableState;
 	private final static int IMMEDIATE_NOT_AVAILABLE = -1;
 	private int immediateEvent = IMMEDIATE_NOT_AVAILABLE;
+	
+	private int numberOfAddedStates = 0;
 
 	/** Options determining how the synchronization should be performed. */
 	private final SynchronizationOptions syncOptions;
@@ -659,6 +661,14 @@ public final class AutomataSynchronizerExecuter
 					try
 					{
 						helper.addState(currState, nextState, currEventIndex);
+						if(numberOfAddedStates++ % 10000 == 0)
+						{
+							for (int j = 0; j < 10; j++)
+							{
+								yield();
+							}
+						}
+
 					}
 					catch (Exception e)
 					{

@@ -66,7 +66,7 @@ import org.apache.oro.text.regex.*;
 import org.supremica.automata.algorithms.*;
 import org.supremica.util.*;
 import org.supremica.automata.Automata;
-
+import org.supremica.automata.Automaton;
 // ----------------------------------------------------------------------------------
 // compiler type should be adjustable, but as for now, we only support a single type
 class CompilerFactory
@@ -103,6 +103,24 @@ class FindStatesTableModel
 			cells[it][AUTOMATON_COL] = a.getAutomatonAt(it).getName();
 			cells[it][TYPE_COL] = a.getAutomatonAt(it).getType().toString();
 			cells[it][REGEXP_COL] = ".*";
+			
+			/*-------------- just testin'
+			Automaton automaton = a.getAutomatonAt(it);
+			logger.debug(automaton.getName());
+			int num_states = automaton.nbrOfStates();
+			for(int i = 0; i < num_states; ++i)
+			{
+				String name = automaton.getStateNameWithIndex(i);
+				if(name == null)
+				{
+					logger.debug("Fishy...");
+				}
+				else
+				{
+					logger.debug(name);
+				}
+			}
+			*///----------------- test
 		}
 
 		comp = c;
@@ -315,7 +333,6 @@ class FindStatesTable
 					}
 					else
 					{
-
 						// in table but not in the regexp column - show main menu
 						// Supremica.menuHandler.getDisabledPopupMenu(getThisTable()).show(e.getComponent(), e.getX(), e.getY());
 						// getMainPopupMenu().show(getThisTable().getSelectedRowCount(), e.getComponent(), e.getX(), e.getY());
@@ -442,13 +459,6 @@ class FreeFormPanel
 		p1.add(new JLabel("State Separator: "));
 		p1.add(sep_str = new JTextField(".", 20));
 		add("Center", p1);
-
-		/*
-		 *               JPanel p2 = new JPanel();
-		 *               p2.add(new JLabel("State Separator: "));
-		 *               p2.add(sep_str = new JTextField(".", 20));
-		 *               add("South", p2);
-		 */
 	}
 
 	public String getTitle()
@@ -501,11 +511,6 @@ class FixedFormPanel
 
 	FixedFormPanel(FindStatesTable t)
 	{
-
-		// this.table = table;
-		// JScrollPane scroll_pane = new WhitePane(table);
-		// scroll_pane.setPreferredSize(new Dimension(500, 300)); // does not help - still no scrolling
-		// add(scroll_pane, "Center");
 		super(t);
 
 		this.table = t;
