@@ -73,7 +73,7 @@ public interface Gui
 	Collection getSelectedAutomataAsCollection();
 
 	Automata getSelectedAutomata();
-	Automata getUnSelectedAutomata();
+	Automata getUnselectedAutomata();
 
 	Project getSelectedProject();
 

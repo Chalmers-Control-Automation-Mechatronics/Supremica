@@ -508,7 +508,7 @@ public class Supremica
 		return selectedAutomata;
 	}
 
-	public Automata getUnSelectedAutomata()
+	public Automata getUnselectedAutomata()
 	{
 		invertSelection();
 		Automata unSelectedAutomata = getSelectedAutomata();

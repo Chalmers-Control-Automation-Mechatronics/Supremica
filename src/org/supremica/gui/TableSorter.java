@@ -1,4 +1,3 @@
-
 /*
  * Supremica Software License Agreement
  *
@@ -260,11 +259,11 @@ public class TableSorter
 	public void reallocateIndexes()
 	{
 		int rowCount = model.getRowCount();
-
+		
 		// Set up a new array of indexes with the right number of elements
 		// for the new data model.
 		indexes = new int[rowCount];
-
+		
 		// Initialise with the identity mapping.
 		for (int row = 0; row < rowCount; row++)
 		{
@@ -274,8 +273,8 @@ public class TableSorter
 
 	public void tableChanged(TableModelEvent e)
 	{
-
 		// System.out.println("Sorter: tableChanged");
+		// reallocateIndexes();
 		reallocateIndexes();
 		super.tableChanged(e);
 	}
@@ -440,7 +439,6 @@ public class TableSorter
 
 				if ((e.getClickCount() == 1) && (column != -1))
 				{
-
 					// System.out.println("Sorting ...");
 					int shiftPressed = e.getModifiers() & InputEvent.SHIFT_MASK;
 					boolean ascending = (shiftPressed == 0);

@@ -435,7 +435,8 @@ public class ActionMan
 		}
 	}
 
-	// ** Delete - remove from the container, clear the selection, mark the project as dirty but do not close the project
+	// ** Delete - remove from the container, clear the selection,
+	// mark the project as dirty but do not close the project
 	public static void automataDelete_actionPerformed(Gui gui)
 	{
 		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
