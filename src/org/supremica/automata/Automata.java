@@ -66,6 +66,7 @@ public class Automata
  	private String name = null;
 	private AutomataListeners listeners = null;
 	private String owner = "Supremica";
+	private String hash = null;
 
 	public Automata()
 	{
@@ -111,6 +112,36 @@ public class Automata
 		aut.setName(newName);
 		nameMap.put(aut.getName(), aut);
 		notifyListeners(AutomataListeners.MODE_AUTOMATON_RENAMED, aut);
+	}
+
+	public void setOwner(String owner)
+	{
+		this.owner = owner;
+	}
+	
+	public String getOwner()
+	{
+		return owner;
+	}
+
+	public void setHash(String hash)
+	{
+		this.hash = hash;
+	}
+
+	public String getHash()
+	{
+		return hash;
+	}
+
+	public String computeHash()
+	{
+		long checksum = checksum();
+		long ownerhash = owner.hashCode();
+		long extrahash = 0x314C;
+		long totalhash = checksum*ownerhash*extrahash;
+		String newHash = Long.toHexString(totalhash);
+		return newHash;	
 	}
 
 	public Alphabet createUnionAlphabet()

@@ -107,6 +107,8 @@ public class Supremica
 	private ContentHelp help = null;
 	private CSH.DisplayHelpFromSource helpDisplayer = null;
 
+	private FileSecurity fileSecurity = new FileSecurity();
+
 	public static int TABLE_IDENTITY_COLUMN = 0;
 	public static int TABLE_TYPE_COLUMN = 1;
 	public static int TABLE_STATES_COLUMN = 2;
@@ -220,6 +222,11 @@ public class Supremica
 	private JFrame getCurrentFrame()
 	{
 		return this;
+	}
+
+	public FileSecurity getFileSecurity()
+	{
+		return fileSecurity;
 	}
 
 	// Component initialization
@@ -441,6 +448,22 @@ public class Supremica
 				}
 			});
 
+		if (WorkbenchProperties.generalUseSecurity())
+		{	
+			menuFile.addSeparator();
+
+			// File.Login
+			JMenuItem menuFileLogin = new JMenuItem();
+			menuFileLogin.setText("Login");
+			menuFile.add(menuFileLogin);
+			menuFileLogin.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						ActionMan.fileLogin(getGui());
+					}
+				});	
+		}
 
 		menuFile.addSeparator();
 

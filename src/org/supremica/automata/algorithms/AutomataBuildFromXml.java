@@ -77,6 +77,8 @@ public class AutomataBuildFromXml
 	private static final String controllableStr = "controllable";
 	private static final String prioritizedStr = "prioritized";
 	private static final String immediateStr = "immediate";
+	private static final String owner = "owner";
+	private static final String hash = "hash";
 
 	private static AutomataBuildFromXml builder = null;
 	private Automata currAutomata = null;
@@ -236,6 +238,18 @@ public class AutomataBuildFromXml
 			currAutomata.setName(name);
 		}
 
+		String owner = attributes.getValue("owner");
+		if (name != null)
+		{
+			currAutomata.setOwner(owner);
+		}
+
+		String hash = attributes.getValue("hash");
+		if (hash != null)
+		{
+			currAutomata.setHash(hash);
+		}
+	
 		int majorVersion = 0;
 		String majorStringVersion = attributes.getValue("major");
 		if (majorStringVersion != null)

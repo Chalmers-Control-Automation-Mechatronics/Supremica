@@ -44,6 +44,47 @@ public class ActionMan
 		return theIntValue;
 	}
 
+     // File.Login action performed
+     public static void fileLogin(Gui gui)
+     {
+ 		FileSecurity fileSecurity = gui.getFileSecurity();
+		if (fileSecurity.hasCurrentUser())
+		{
+			JOptionPane.showMessageDialog(gui.getComponent(), "You are only allowed to log in once. You are logged in as: " + fileSecurity.getCurrentUser(), "Already logged in", JOptionPane.ERROR_MESSAGE);
+			return;
+
+		}	
+
+		boolean finished = false;
+		String newName = null;
+
+		while (!finished)
+		{
+			newName = JOptionPane.showInputDialog(gui.getComponent(), "Enter your username");
+			if ((newName == null) || newName.equals(""))
+			{
+				JOptionPane.showMessageDialog(gui.getComponent(), "An empty name is not allowed", "alert", JOptionPane.ERROR_MESSAGE);
+			}
+			else if (fileSecurity.isSuperUser(newName))
+			{
+				if (fileSecurity.allowSuperUserLogin())
+				{
+					finished = true;
+				}
+				else
+				{
+					JOptionPane.showMessageDialog(gui.getComponent(), "You are not allowed to login as " + newName, "alert", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+			else
+			{
+				finished = true;
+			}
+		}
+		fileSecurity.setCurrentUser(newName);
+	}
+
+
      // Automata.AlphabetAnalyzer action performed
      public static void alphabetAnalyzer_actionPerformed(Gui gui)
      {
@@ -1039,6 +1080,17 @@ public class ActionMan
 			return;
 		}
 
+		if (WorkbenchProperties.generalUseSecurity())
+		{
+			FileSecurity fileSecurity = gui.getFileSecurity();
+			if (!fileSecurity.allowOpening(currAutomata))
+			{
+				JOptionPane.showMessageDialog(gui.getComponent(), "You are not allowed to open this file", "alert", JOptionPane.ERROR_MESSAGE);
+
+				return;
+			}
+		}
+
 		int nbrOfAutomataBeforeOpening = gui.getAutomatonContainer().getSize();
 
 		try
@@ -1184,6 +1236,18 @@ public class ActionMan
 			{
 				try
 				{
+					FileSecurity fileSecurity = gui.getFileSecurity();
+					if (WorkbenchProperties.generalUseSecurity())
+					{
+						if (!fileSecurity.hasCurrentUser())
+						{
+							JOptionPane.showMessageDialog(gui.getComponent(), "You must be logged in to save!", "Alert", JOptionPane.ERROR_MESSAGE);
+							return;
+						}
+						currAutomata.setOwner(fileSecurity.getCurrentUser());
+						currAutomata.setHash(currAutomata.computeHash());
+					}
+
 					AutomataToXml exporter = new AutomataToXml(currAutomata);
 					exporter.serialize(currFile.getAbsolutePath());
 				}
@@ -1198,6 +1262,15 @@ public class ActionMan
 	// File.SaveAs action performed
 	public static void fileSaveAs(Gui gui)
 	{
+		FileSecurity fileSecurity = gui.getFileSecurity();
+		if (WorkbenchProperties.generalUseSecurity())
+		{
+			if (!fileSecurity.hasCurrentUser())
+			{
+				JOptionPane.showMessageDialog(gui.getComponent(), "You must be logged in to save!", "Alert", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+		}
 		JFileChooser fileSaveAs = FileDialogs.getXMLFileSaveAs();
 
 		String projectName = gui.getAutomatonContainer().getProjectName();

@@ -35,5 +35,7 @@ public interface Gui
 	public AutomatonContainer getAutomatonContainer();
 	public Collection getSelectedAutomataAsCollection();
 	public Automata getSelectedAutomata();
+
+	public FileSecurity getFileSecurity();
 }
 	

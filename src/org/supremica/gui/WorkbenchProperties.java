@@ -73,6 +73,8 @@ public final class WorkbenchProperties
 	private static final String INCLUDE_EDITOR = "includeEditor";
 	private static final String INCLUDE_BOUNDED_UNCON_TOOLS = "includeBoundedUnconTools";
 	private static final String VERBOSE_MODE = "verboseMode";
+	private static final String ALLOW_SUPERUSER_LOGIN = "allowSuperUserLogin";
+
 	// SynchronizationOptions
 	private static final String SYNC_FORBID_UNCON_STATES = "syncForbidUncontrollableStates";
 	private static final String SYNC_EXPAND_FORBIDDEN_STATES = "syncExpandUncontrollableStates";
@@ -115,6 +117,7 @@ public final class WorkbenchProperties
 		setProperty(INCLUDE_EDITOR, "true");
 		setProperty(INCLUDE_BOUNDED_UNCON_TOOLS, "false");
 		setProperty(VERBOSE_MODE, "false");
+		setProperty(ALLOW_SUPERUSER_LOGIN, "true");
 		setProperty(SYNC_FORBID_UNCON_STATES, "true");
 		setProperty(SYNC_EXPAND_FORBIDDEN_STATES, "true");
 		setProperty(SYNC_INITIAL_HASHTABLE_SIZE, Integer.toString((1 << 14) - 1));
@@ -291,6 +294,11 @@ public final class WorkbenchProperties
 	public static void setVerboseMode(boolean mode)
 	{
 		wp.setProperty(VERBOSE_MODE, toString(mode));
+	}
+
+	public static boolean allowSuperUserLogin()
+	{
+		return toBoolean(wp.getProperty(ALLOW_SUPERUSER_LOGIN));
 	}
 
 	// Synchronization...
