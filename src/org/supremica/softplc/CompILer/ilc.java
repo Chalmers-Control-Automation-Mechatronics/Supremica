@@ -40,15 +40,21 @@ public class ilc
 		// XXX
 		//n.dump("");
 		
-		new VariableChecker(n);
+		VariableChecker v = new VariableChecker(n);
+		
 		//XXX new VaribleChecker(n,logger);
 		//System.out.println("VarChecker färdig");
 		// XXX
 		//n.dump("");
+
 		
-		JavaBytecodeGenerator jb = new JavaBytecodeGenerator(n, outDir, logger, debug);
-		//XXXnew JavaBytecodeGenerator(n, null/*output directory*/, logger);
-		File temp = jb.getTempFile();
+		if (v.check()) {
+		    JavaBytecodeGenerator jb = new JavaBytecodeGenerator(n, outDir, logger, debug);
+		    //XXXnew JavaBytecodeGenerator(n, null/*output directory*/, logger);
+		    File temp = jb.getTempFile();
+		} else {
+		    System.err.println("VariableChecker failed");
+		}
 	    }
 	    catch (Exception e)
 		{

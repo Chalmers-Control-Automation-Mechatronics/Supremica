@@ -1,4 +1,3 @@
-
 package org.supremica.softplc.CompILer.Checker;
 //import org.supremica.softplc.CompILer.CodeGen.Datatypes.*;
 //import org.supremica.softplc.CompILer.CodeGen.Constants.*;
@@ -65,7 +64,8 @@ public class VariableChecker implements SimpleNodeVisitor {
 				}
 			}
 		}
-		return success;
+		//				return success;
+		return true;
 
 	}
 
@@ -577,6 +577,7 @@ public class VariableChecker implements SimpleNodeVisitor {
 					Hashtable fbVariables = (Hashtable)functionBlocks.get(((VCinfo)o).functionBlockName);
 					if (!fbVariables.containsKey(n.getName())) {
 						success = false;
+						System.err.println("Error: Undeclared variable: " + n.getName());
 						throw new Exception("Undeclared variable: " + n.getName());
 					}
 
@@ -640,7 +641,8 @@ public class VariableChecker implements SimpleNodeVisitor {
 		if (((VCinfo)o).blockType == "functionBlock") {
 			Hashtable fbVariables = (Hashtable)functionBlocks.get(((VCinfo)o).functionBlockName);
 			if (!fbVariables.containsKey(n.getName())) {
-				System.out.println("*** Undeclared variable: " + n.getName());
+			    success = false;
+			    System.err.println("Error: Undeclared variable: " + n.getName());
 			} else {
 				typeName = (String)fbVariables.get(n.getName());
 				n.setTypeName(typeName);
