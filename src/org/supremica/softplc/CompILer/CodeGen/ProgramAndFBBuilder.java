@@ -10,8 +10,8 @@ import de.fub.bytecode.Constants;
 
 /**
  * This class handles java bytecode generation. It handles all parts common
- * to IL programs (@see ProgramBuilder) and function blocks 
- * (@see FunctionBlockBuilder). 
+ * to IL programs ({@link ProgramBuilder}) and function blocks 
+ * ({@link FunctionBlockBuilder}). 
  * @author Anders Röding
  * @author Andreas Herner
  */
@@ -2482,24 +2482,14 @@ public abstract class ProgramAndFBBuilder
 	ilRun.append(fac.createInvoke(fbTypeName, "run", Type.VOID, Type.NO_ARGS, Constants.INVOKEVIRTUAL));
     }
 
-    /*
-      Intended to handle fb calls with parameters, but it was decided that the checker should handle this.
-      public void emitIL_FB_CALL_SetInputs() {}
-
-      public void emitIL_FB_CALL_SetOutputs() {}
-    */
-
     /**
      * hack för att få print att fungera på ett enkelt sätt
      * This method is deprecated
      */ 
-    public void emitIL_FB_CALL(IlCallOperator op, String fb_name, Object[] args)
+    public void emitIL_FB_CALL(IlCallOperator op, String fb_name,Object[] args)
     {
 	fb_name = fb_name.toLowerCase();
 
-	// vi kan inte ha lowercase senare eftersom vi ska anropa java-metoder
-	// --kan vi visst eftersom vi använder CALL_JAVA då istället för CAL
-	/* check conditions */
 	BranchInstruction callCondition = new IFEQ(null);    // dummy init
 
 	if (op == IlCallOperator.CAL) {}
@@ -2523,7 +2513,7 @@ public abstract class ProgramAndFBBuilder
 		ilRun.append(callCondition);
 	    }
 
-	/* make call */
+	// make call
 	if (fb_name.equals("print") || fb_name.equals("println"))
 	    {
 		emitPRINT(args, fb_name);
@@ -2533,7 +2523,7 @@ public abstract class ProgramAndFBBuilder
 		//XXX jovisst,,,,error("Calls to function blocks not yet " + "implemented");
 	    }
 
-	/* set conditional target */
+	// set conditional target
 	if ((op == IlCallOperator.CALC) || (op == IlCallOperator.CALCN))
 	    {
 		InstructionHandle end_call = ilRun.append(InstructionConstants.NOP);

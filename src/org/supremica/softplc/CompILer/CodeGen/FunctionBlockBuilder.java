@@ -9,9 +9,9 @@ import de.fub.bytecode.Constants;
 import java.io.File;
 
 /**
- * The class FunctionBlockBuilder is used to generate code parts that
- * are specific to Function Blocks and not common with Programs. The
- * common parts of code are instead generated in @see ProgramAndFBBuilder.
+ * The class FunctionBlockBuilder is used to generate java bytecode parts that
+ * are specific to IL function blocks and not common with IL programs. The
+ * common parts of code are instead generated in {@link ProgramAndFBBuilder}
  * @author Anders Röding
  */
 public class FunctionBlockBuilder
@@ -22,13 +22,7 @@ public class FunctionBlockBuilder
      */
     private static String[] interfaces = {"org.supremica.softplc.CompILer.CodeGen.IEC_Interfaces.IEC_FunctionBlock" };
 
-    /*
-     * BCEL objects used to create bytecode for the runArgs method
-     *     that only function blocks has
-     */
-    //XXX InstructionList ilRunArgs = new InstructionList();
-    //XXXMethodGen mgRunArgs;
-
+	//XXX skall denna finns
     public File getTempFile() {return null;};
 
     /**Constructor ProgramBuilder constructs a new frame for
@@ -57,11 +51,6 @@ public class FunctionBlockBuilder
 	/* create the run method of the IL program */
 	mgRun = new MethodGen(Constants.ACC_PUBLIC, Type.VOID, Type.NO_ARGS,
 			      null, "run", className, ilRun, constPoolGen);
-	/* create the runArgs method of the IL program */
-	/* XXXmgRunArgs = new MethodGen(Constants.ACC_PUBLIC, Type.VOID,
-				  Type.NO_ARGS, null, "runArgs", className,
-				  ilRunArgs, constPoolGen);
-	*/
 	/* create MethodGen for constructor method */
 	mgInit = new MethodGen(Constants.ACC_PUBLIC, Type.VOID,
 			       Type.NO_ARGS, new String[]{}, "<init>",
@@ -72,18 +61,6 @@ public class FunctionBlockBuilder
 	ilInit.append(fac.createInvoke("java.lang.Object", "<init>",
 				       Type.VOID, Type.NO_ARGS,
 				       Constants.INVOKESPECIAL));
-    }
-
-    /**
-     * should be called when the IL function block generation is finished.
-     * This method will then dump the generated code to a class file.
-     */
-    public void dumpCode()
-    {
-	//XXXilRunArgs.append(InstructionConstants.RETURN);
-	//XXXmgRunArgs.setMaxStack();
-	//XXXclassGen.addMethod(mgRunArgs.getMethod());
-	super.dumpCode();
     }
 
     /*

@@ -10,7 +10,21 @@ import java.util.*;
 import java.io.File;
 
 /**
- * generates java bytecode from a IEC 6-1131 Instruction List syntax tree
+ * This class is the main component for generating java bytecode from an 
+ * IEC 6-1131 Instruction List syntax tree.
+ * Different instances of {@link org.supremica.softplc.CompILer.CodeGen.Builder} is
+ * used by JavaBytecodeGenerator to generate the actual bytecode.
+ * 
+ * Some kinds of nodes in the syntax tree will not visited by because the tree is 
+ * supposed to have passed a checker like
+ * {@link org.supremica.softplc.CompILer.Checker.VariableChecker}. Therefore 
+ * some nodes are not meaningful while actually generating code.
+ *
+ * Abbreviations used later on in the documentation of this class
+ * <pre>
+ * POU - Program Organization Unit (eg. program, function block etc. as defined by IEC 6-1131)
+ * TOS - Top Of Stack, refers to the top of the stack in Java bytecode.
+ * </pre>
  * @author Anders Röding
  */
 
@@ -31,13 +45,11 @@ public class JavaBytecodeGenerator
      * -DINT
      * -WSTRING?
      * -REAL
-     */
-
-    /*
-     * Abbreviation explanations
-     *
-     * POU - Program Organization Unit (eg. program, function block etc.)
-     * TOS - Top Of Stack, top of stack value in java bytecode.
+	 *
+	 * Resultatet från instruktionslistan i en IL expression operator måste vara
+	 * av typen BOOL. (Funkar troligen även för DINT eftersom boolean betraktas
+	 * som en int i java)
+	 * 
      */
 
     /**
@@ -159,8 +171,14 @@ public class JavaBytecodeGenerator
 	    }
     }
 
-    //XXX skall troligen tas bort när vi är färdiga
-    //XXX eller ge "hårdare" felmeddelande dvs. kör inte vidare efter detta
+    /**
+     * handles IL parts that are probably not properly dealt with. If you use an IL
+	 * language construct that are not supported and you in some way get around the
+	 * checker you will end up here.
+     * @param n a SimpleNode (any syntax tree node)
+	 * @param o an argument (in most cases not used in JavaBytecodeGenerator)
+     * @return nothing
+	 */
     public Object visitStandard(SimpleNode n, Object o)
     {
 	debug(n.toString());
@@ -171,7 +189,9 @@ public class JavaBytecodeGenerator
     /**
      * handles all that happens when visiting the node n while traversing the syntax tree.
      * @param n an ASTsimple_instr_list node
-     */
+	 * @param o an argument (in most cases not used in JavaBytecodeGenerator)
+     * @return nothing
+	 */
     public Object visitSIMPLE_INSTR_LIST(ASTsimple_instr_list n, Object o)
     {
 	debug(n.toString());
@@ -184,8 +204,10 @@ public class JavaBytecodeGenerator
 
     /**
      * handles all that happens when visiting the node n while traversing the syntax tree.
-     * @param n an AST XXXnode
-     * @param o an argument (in most cases not used in JavaBytecodeGenerator) */
+     * @param n an ASTil_simple_instruction node
+     * @param o an argument (in most cases not used in JavaBytecodeGenerator) 
+	 * @return nothing
+	 */
     public Object visitIL_SIMPLE_INSTRUCTION(ASTil_simple_instruction n, Object o)
     {
 	debug(n.toString());
@@ -203,8 +225,10 @@ public class JavaBytecodeGenerator
 
     /**
      * handles all that happens when visiting the node n while traversing the syntax tree.
-     * @param n an AST XXXnode
-     * @param o an argument (in most cases not used in JavaBytecodeGenerator) */
+     * @param n an ASTil_simple_operation node
+     * @param o an argument (in most cases not used in JavaBytecodeGenerator) 
+	 * @return nothing
+	 */
     public Object visitIL_SIMPLE_OPERATION(ASTil_simple_operation n, Object o)
     {
 	debug(n.toString());
@@ -223,8 +247,10 @@ public class JavaBytecodeGenerator
 
     /**
      * handles all that happens when visiting the node n while traversing the syntax tree.
-     * @param n an AST XXXnode
-     * @param o an argument (in most cases not used in JavaBytecodeGenerator) */
+     * @param n an ASTil_expression node
+     * @param o an argument (in most cases not used in JavaBytecodeGenerator) 
+	 * @return nothing
+	 */
     public Object visitIL_EXPRESSION(ASTil_expression n, Object o)
     {
 	debug(n.toString());
@@ -236,15 +262,12 @@ public class JavaBytecodeGenerator
 	    {
 		error("IL_EXPRESSION missing operand(s)");
 		return null;
-		// what should happen when a il_expression doesn't have
-		// any operands at all, typeChecker?? can it really happen //XXX
 	    }
 	else if (children.length == 1)
 	    {
 		try
 		    {
 			ASTsimple_instr_list simInstrList = (ASTsimple_instr_list)children[0];
-			/* open new IL scope, size should be set by typeChecker */
 			builder.emitStackSpace(1);
 			simInstrList.visit(this, null);
 		    }
@@ -256,7 +279,7 @@ public class JavaBytecodeGenerator
 		    }
 	    }
 	else
-	    {
+	    { /* children.length == 2*/
 		Object arg = ((SimpleNode) children[0]).visit(this, null);
 
 		builder.emitLoad(arg);    // opens new IL scope and loads arg
@@ -265,15 +288,17 @@ public class JavaBytecodeGenerator
 
 	builder.emitIL_EXPRESSION(operator, TypeConstant.T_BOOL, null);
 
-	//XXX typen för argumentet till expr_operator måste läggas in i
-	//XXX ASTn av typcheckaren ist. för att sättas till T_BOOL
+	//The type of the argument to an expr_operator must be set by the checker
+	//XXX in the node, not set to TypeConstants.T_BOOL
 	return null;
     }
 
     /**
      * handles all that happens when visiting the node n while traversing the syntax tree.
-     * @param n an AST XXXnode
-     * @param o an argument (in most cases not used in JavaBytecodeGenerator) */
+     * @param n an ASTil_jump_operation node
+     * @param o an argument (in most cases not used in JavaBytecodeGenerator) 
+	 * @return nothing
+	 */
     public Object visitIL_JUMP_OPERATION(ASTil_jump_operation n, Object o)
     {
 	debug(n.toString());
@@ -289,8 +314,9 @@ public class JavaBytecodeGenerator
 
     /**
      * handles all that happens when visiting the node n while traversing the syntax tree.
-     * @param n an AST XXXnode
-     * @param o an argument (in most cases not used in JavaBytecodeGenerator) */
+     * @param n an ASTil_jump_operator node
+     * @param o an argument (in most cases not used in JavaBytecodeGenerator) 
+	 * @return a jump operator*/
     public Object visitIL_JUMP_OPERATOR(ASTil_jump_operator n, Object o)
     {
 	debug(n.toString());
@@ -312,8 +338,10 @@ public class JavaBytecodeGenerator
 
     /**
      * handles all that happens when visiting the node n while traversing the syntax tree.
-     * @param n an AST XXXnode
-     * @param o an argument (in most cases not used in JavaBytecodeGenerator) */
+     * @param n an ASTnumeric_literal node
+     * @param o an argument (in most cases not used in JavaBytecodeGenerator) 
+	 * @return a numeric literal
+	 */
     public Object visitNUMERIC_LITERAL(ASTnumeric_literal n, Object o)
     {
 	debug(n.toString());
@@ -330,8 +358,9 @@ public class JavaBytecodeGenerator
 
     /**
      * handles all that happens when visiting the node n while traversing the syntax tree.
-     * @param n an AST XXXnode
-     * @param o an argument (in most cases not used in JavaBytecodeGenerator) */
+     * @param n an ASTboolean_literal node
+     * @param o an argument (in most cases not used in JavaBytecodeGenerator) 
+	 * @return a boolean literal*/
     public Object visitBOOLEAN_LITERAL(ASTboolean_literal n, Object o)
     {
 	debug(n.toString());
@@ -340,38 +369,30 @@ public class JavaBytecodeGenerator
 
     /**
      * handles all that happens when visiting the node n while traversing the syntax tree.
-     * @param n an AST XXXnode
-     * @param o an argument (in most cases not used in JavaBytecodeGenerator) */
+     * @param n an ASTvariable node
+     * @param o an argument (in most cases not used in JavaBytecodeGenerator) 
+	 * @return a variable
+	 */
     public Object visitVARIABLE(ASTvariable n, Object o)
     {
 	debug(n.toString());
 
 	if (n.isDirectVariable())
 	    {
-		return new IECDirectVariable(n.getName());    // , TypeConstant.T_BOOL);
+		return new IECDirectVariable(n.getName());
 	    }
 	else if (n.getType() == TypeConstant.T_DERIVED)
 	    {
 	        if (n.getFieldSelector() != null) {
+				/*n is referring to a field in a derived variable*/
 		    return new IECSymbolicVariable(n.getName(), n.getType(), n.getTypeName(), 
 						   n.getFieldSelector(), n.getFieldSelectorType(), n.getFieldSelectorTypeName());
-		}
-		else {
-		    return new IECSymbolicVariable(n.getName(), n.getType(), n.getTypeName(), 
-						   null, null, null);
-		}
-		/*
-		if (n.isFunctionBlock())
-		    {
-			return new IECSymbolicVariable(n.getName(), n.getType(), n.getTypeName(), 
-						       n.getFieldSelector(), n.getFieldSelectorType());
-		    }
-		else
-		    {
-			error("Function blocks are the only derived " + "datatypes allowed");
-			return null;
-		    }
-		*/
+			}
+			else {
+				/*n is referring to the derived variable itself*/
+				return new IECSymbolicVariable(n.getName(), n.getType(), n.getTypeName(), 
+											   null, null, null);
+			}
 	    }
 	else
 	    {
@@ -381,8 +402,10 @@ public class JavaBytecodeGenerator
 
     /**
      * handles all that happens when visiting the node n while traversing the syntax tree.
-     * @param n an AST XXXnode
-     * @param o an argument (in most cases not used in JavaBytecodeGenerator) */
+     * @param n an ASTvariable_name node
+     * @param o an argument (in most cases not used in JavaBytecodeGenerator) 
+	 * @return variable name
+	 */
     public Object visitVARIABLE_NAME(ASTvariable_name n, Object o)
     {
 	debug(n.toString());
@@ -391,57 +414,62 @@ public class JavaBytecodeGenerator
 
     /**
      * handles all that happens when visiting the node n while traversing the syntax tree.
-     * @param n an AST XXXnode
-     * @param o an argument (in most cases not used in JavaBytecodeGenerator) */
+     * @param n an ASTfield_selector node
+     * @param o an argument (in most cases not used in JavaBytecodeGenerator)
+	 * @return nothing
+	 */
     public Object visitFIELD_SELECTOR(ASTfield_selector n, Object o)
     {
 	debug(n.toString());
 	//error("Found fieldselector"); 
-	/*should never happen in CodeGenerator only in
-	checker ??*/
-
+	/*should never happen in CodeGenerator only in the checker*/
 	return null;
     }
 
     /**
      * handles all that happens when visiting the node n while traversing the syntax tree.
-     * @param n an AST XXXnode
-     * @param o an argument (in most cases not used in JavaBytecodeGenerator) */
+     * @param n an ASTelementary_type_name node
+     * @param o an argument (in most cases not used in JavaBytecodeGenerator)
+	 * @return a type constant
+	 */
     public Object visitELEMENTARY_TYPE_NAME(ASTelementary_type_name n, Object o)
     {
-	debug(n.toString());
-
-	return HelpMethods.parseTypeConstants(n.getName());
+		debug(n.toString());
+		return HelpMethods.parseTypeConstants(n.getName());
     }
 
     /**
      * handles all that happens when visiting the node n while traversing the syntax tree.
-     * @param n an AST XXXnode
-     * @param o an argument (in most cases not used in JavaBytecodeGenerator) */
+     * @param n an ASTsimple_type_name node
+     * @param o an argument (in most cases not used in JavaBytecodeGenerator)
+	 * @return object describing the simple type name
+	 */
     public Object visitSIMPLE_TYPE_NAME(ASTsimple_type_name n, Object o)
     {
 	debug(n.toString());
 
 	if (!declaredDataTypes.contains(n.getName()))
 	    {
-		/* we have found a function block initialisation */
+			/* we have found a function block initialisation */
 		return new TypeFUNCTION_BLOCK(n.getName());
 	    }
 
-	System.err.println("Found simple_type_name," + n.getName() + " that was " 
-			   + "not a function block type. Not implemented.");
+	error("Found simple_type_name," + n.getName() + " that was " 
+		  + "not a function block type. This is not implemented.");
 
 	return null;    
 	/*
 	 * if declaredDataType. Should be changed when
-	 *             derived data types are implemented
+	 * other derived data types than function blocks are implemented
 	 */
     }
 
     /**
      * handles all that happens when visiting the node n while traversing the syntax tree.
-     * @param n an AST XXXnode
-     * @param o an argument (in most cases not used in JavaBytecodeGenerator) */
+     * @param n an ASTprogram_type_name node
+     * @param o an argument (in most cases not used in JavaBytecodeGenerator)
+	 * @return program name
+	 */
     public Object visitPROGRAM_TYPE_NAME(ASTprogram_type_name n, Object o)
     {
 	debug(n.toString());
@@ -450,8 +478,10 @@ public class JavaBytecodeGenerator
 
     /**
      * handles all that happens when visiting the node n while traversing the syntax tree.
-     * @param n an AST XXXnode
-     * @param o an argument (in most cases not used in JavaBytecodeGenerator) */
+     * @param n an ASTderived_function_block_name node
+     * @param o an argument (in most cases not used in JavaBytecodeGenerator) 
+	 * @return derived function block name
+	 */
     public Object visitDERIVED_FUNCTION_BLOCK_NAME(ASTderived_function_block_name n, Object o)
     {
 	debug(n.toString());
@@ -461,8 +491,10 @@ public class JavaBytecodeGenerator
 
     /**
      * handles all that happens when visiting the node n while traversing the syntax tree.
-     * @param n an AST XXXnode
-     * @param o an argument (in most cases not used in JavaBytecodeGenerator) */
+     * @param n an ASTfb_name node
+     * @param o an argument (in most cases not used in JavaBytecodeGenerator)
+	 * @return function block name
+	 */
     public Object visitFB_NAME(ASTfb_name n, Object o)
     {
 	debug(n.toString());
@@ -472,8 +504,10 @@ public class JavaBytecodeGenerator
 
     /**
      * handles all that happens when visiting the node n while traversing the syntax tree.
-     * @param n an AST XXXnode
-     * @param o an argument (in most cases not used in JavaBytecodeGenerator) */
+     * @param n an ASTfunction_block_body node
+     * @param o an argument (in most cases not used in JavaBytecodeGenerator)
+	 * @return nothing
+	 */
     public Object visitFUNCTION_BLOCK_BODY(ASTfunction_block_body n, Object o)
     {
 	debug(n.toString());
@@ -488,8 +522,10 @@ public class JavaBytecodeGenerator
 
     /**
      * handles all that happens when visiting the node n while traversing the syntax tree.
-     * @param n an AST XXXnode
-     * @param o an argument (in most cases not used in JavaBytecodeGenerator) */
+     * @param n an ASTprogram_declaration node
+     * @param o an argument (in most cases not used in JavaBytecodeGenerator)
+	 * @return nothing
+	 */
     public Object visitPROGRAM_DECLARATION(ASTprogram_declaration n, Object o)
     {
 	debug(n.toString());
@@ -511,8 +547,10 @@ public class JavaBytecodeGenerator
 
     /**
      * handles all that happens when visiting the node n while traversing the syntax tree.
-     * @param n an AST XXXnode
-     * @param o an argument (in most cases not used in JavaBytecodeGenerator) */
+     * @param n an ASTfunction_block_declaration node
+     * @param o an argument (in most cases not used in JavaBytecodeGenerator)
+	 * @return nothing
+	 */
     public Object visitFUNCTION_BLOCK_DECLARATION(ASTfunction_block_declaration n, Object o)
     {
 	debug(n.toString());
@@ -534,8 +572,10 @@ public class JavaBytecodeGenerator
 
     /**
      * handles all that happens when visiting the node n while traversing the syntax tree.
-     * @param n an AST XXXnode
-     * @param o an argument (in most cases not used in JavaBytecodeGenerator) */
+     * @param n an ASTjava_block_declaration node
+     * @param o an argument (in most cases not used in JavaBytecodeGenerator)
+	 * @return nothing
+	 */
     public Object visitJAVA_BLOCK_DECLARATION(ASTjava_block_declaration n, Object o)
     {
 	debug(n.toString());
@@ -547,8 +587,10 @@ public class JavaBytecodeGenerator
 
     /**
      * handles all that happens when visiting the node n while traversing the syntax tree.
-     * @param n an AST XXXnode
-     * @param o an argument (in most cases not used in JavaBytecodeGenerator) */
+     * @param n an ASTother_var_declarations node
+     * @param o an argument (in most cases not used in JavaBytecodeGenerator)
+	 * @return nothing
+	 */
     public Object visitOTHER_VAR_DECLARATIONS(ASTother_var_declarations n, Object o)
     {
 	debug(n.toString());
@@ -562,8 +604,10 @@ public class JavaBytecodeGenerator
 
     /**
      * handles all that happens when visiting the node n while traversing the syntax tree.
-     * @param n an AST XXXnode
-     * @param o an argument (in most cases not used in JavaBytecodeGenerator) */
+     * @param n an ASTvar_declarations node
+     * @param o an argument (in most cases not used in JavaBytecodeGenerator)
+	 * @return nothing
+	 */
     public Object visitVAR_DECLARATIONS(ASTvar_declarations n, Object o)
     {
 	debug(n.toString());
@@ -577,8 +621,10 @@ public class JavaBytecodeGenerator
 
     /**
      * handles all that happens when visiting the node n while traversing the syntax tree.
-     * @param n an AST XXXnode
-     * @param o an argument (in most cases not used in JavaBytecodeGenerator) */
+     * @param n an ASTvar_init_decl node
+     * @param o an argument (in most cases not used in JavaBytecodeGenerator)
+	 * @return nothing
+	 */
     public Object visitVAR_INIT_DECL(ASTvar_init_decl n, Object o)
     {
 	debug(n.toString());
@@ -599,8 +645,10 @@ public class JavaBytecodeGenerator
 
     /**
      * handles all that happens when visiting the node n while traversing the syntax tree.
-     * @param n an AST XXXnode
-     * @param o an argument (in most cases not used in JavaBytecodeGenerator) */
+     * @param n an ASTlocated_var_declarations node
+     * @param o an argument (in most cases not used in JavaBytecodeGenerator)
+	 * @return nothing
+	 */
     public Object visitLOCATED_VAR_DECLARATIONS(ASTlocated_var_declarations n, Object o)
     {
 	debug(n.toString());
@@ -614,8 +662,10 @@ public class JavaBytecodeGenerator
 
     /**
      * handles all that happens when visiting the node n while traversing the syntax tree.
-     * @param n an AST XXXnode
-     * @param o an argument (in most cases not used in JavaBytecodeGenerator) */
+     * @param n an ASTlocated_var_decl node
+     * @param o an argument (in most cases not used in JavaBytecodeGenerator)
+	 * @return nothing
+	 */
     public Object visitLOCATED_VAR_DECL(ASTlocated_var_decl n, Object o)
     {
 	debug(n.toString());
@@ -635,7 +685,7 @@ public class JavaBytecodeGenerator
 	if (type instanceof TypeConstant)
 	    {
 
-		// this is a type check, should be in a checker instead
+		// This is a type check, should be in a checker instead.
 		// but left here as a precaution
 		if (!((TypeConstant) type == TypeConstant.T_BOOL))
 		    {
@@ -667,8 +717,11 @@ public class JavaBytecodeGenerator
 
     /**
      * handles all that happens when visiting the node n while traversing the syntax tree.
-     * @param n an AST XXXnode
-     * @param o an argument (in most cases not used in JavaBytecodeGenerator) */
+     * @param n an ASTlocated_var_spec_init node
+     * @param o an argument (in most cases not used in JavaBytecodeGenerator)
+	 * @return type constant or object describing initial value.
+	 *          See also returns for {@link #visitSIMPLE_SPEC_INIT}.
+	 */
     public Object visitLOCATED_VAR_SPEC_INIT(ASTlocated_var_spec_init n, Object o)
     {
 	debug(n.toString());
@@ -690,8 +743,10 @@ public class JavaBytecodeGenerator
 
     /**
      * handles all that happens when visiting the node n while traversing the syntax tree.
-     * @param n an AST XXXnode
-     * @param o an argument (in most cases not used in JavaBytecodeGenerator) */
+     * @param n an ASTlocation node
+     * @param o an argument (in most cases not used in JavaBytecodeGenerator) 
+	 * @return a direct variable
+	 */
     public Object visitLOCATION(ASTlocation n, Object o)
     {
 	debug(n.toString());
@@ -704,8 +759,10 @@ public class JavaBytecodeGenerator
 
     /**
      * handles all that happens when visiting the node n while traversing the syntax tree.
-     * @param n an AST XXXnode
-     * @param o an argument (in most cases not used in JavaBytecodeGenerator) */
+     * @param n an ASTio_var_declarations node
+     * @param o an argument (in most cases not used in JavaBytecodeGenerator)
+	 * @return nothing
+	 */
     public Object visitIO_VAR_DECLARATIONS(ASTio_var_declarations n, Object o)
     {
 	debug(n.toString());
@@ -717,9 +774,9 @@ public class JavaBytecodeGenerator
 		child.visit(this, null);
 	    }
 	else
-	    {    /*child instanceof ASTinput_declaration*/
-
-		/* child instanceof ASToutput_declarations*/
+	    {    
+			/*child instanceof ASTinput_declaration or
+			  child instanceof ASToutput_declarations*/
 		error("Only var_in_out is implemented, not var_in " + "or var_out");
 	    }
 
@@ -728,8 +785,10 @@ public class JavaBytecodeGenerator
 
     /**
      * handles all that happens when visiting the node n while traversing the syntax tree.
-     * @param n an AST XXXnode
-     * @param o an argument (in most cases not used in JavaBytecodeGenerator) */
+     * @param n an ASTinput_output_declarations node
+     * @param o an argument (in most cases not used in JavaBytecodeGenerator)
+	 * @return nothing
+	 */
     public Object visitINPUT_OUTPUT_DECLARATIONS(ASTinput_output_declarations n, Object o)
     {
 	debug(n.toString());
@@ -743,29 +802,33 @@ public class JavaBytecodeGenerator
 
     /**
      * handles all that happens when visiting the node n while traversing the syntax tree.
-     * @param n an AST XXXnode
-     * @param o an argument (in most cases not used in JavaBytecodeGenerator) */
+     * @param n an ASTvar_declaration node
+     * @param o an argument (in most cases not used in JavaBytecodeGenerator)
+	 * @return nothing
+	 */
     public Object visitVAR_DECLARATION(ASTvar_declaration n, Object o)
     {
 	debug(n.toString());
 
 	Node child = (n.getChildren())[0];    /* always one child*/
 
-	if (child instanceof ASTfb_name_decl)
-	    {
-		/*error("ASTfb_name_decl found!!!! This is a wonder " + "please keep your program and send it to the " + "constructor");*/ //XXX
-	    }
-
 	((SimpleNode) child).visit(this, null);
 
 	return null;
     }
 
-    /* XXX vad skall vi göra här */
+
+
+
+    /* XXX vad skall vi göra här 2002-05-05
+	   ändra även return kommentaren
+	 */
     /**
      * handles all that happens when visiting the node n while traversing the syntax tree.
-     * @param n an AST XXXnode
-     * @param o an argument (in most cases not used in JavaBytecodeGenerator) */
+     * @param n an ASTtemp_var_decl node
+     * @param o an argument (in most cases not used in JavaBytecodeGenerator)
+	 * @return nothing
+	 */
     public Object visitTEMP_VAR_DECL(ASTtemp_var_decl n, Object o)
     {
 	debug(n.toString());
@@ -774,14 +837,14 @@ public class JavaBytecodeGenerator
 	return null;
     }
 
-
-
     /* General specification and variable declaration */
 
     /**
      * handles all that happens when visiting the node n while traversing the syntax tree.
-     * @param n an AST XXXnode
-     * @param o an argument (in most cases not used in JavaBytecodeGenerator) */
+     * @param n an ASTvar1_init_decl node
+     * @param o an argument (in most cases not used in JavaBytecodeGenerator)
+	 * @return nothing
+	 */
     public Object visitVAR1_INIT_DECL(ASTvar1_init_decl n, Object o)
     {
 	debug(n.toString());
@@ -799,12 +862,9 @@ public class JavaBytecodeGenerator
 		for (int i = 0; i < varNames.length; i++)
 		    {
 			builder.emitVarField(varNames[i], type, false /* global IECvariable? */, false /* IO_VAR */);
-
 			// XXX global and Io should be set by using info about the variable decl.
 		    }
 	    }
-
-	// else if (type instanceof DERIVED){ // XXX to be implemented
 	else
 	    {
 		error("In var1_init_decl: this alternative not " + 
@@ -816,8 +876,10 @@ public class JavaBytecodeGenerator
 
     /**
      * handles all that happens when visiting the node n while traversing the syntax tree.
-     * @param n an AST XXXnode
-     * @param o an argument (in most cases not used in JavaBytecodeGenerator) */
+     * @param n an ASTvar1_declaration node
+     * @param o an argument (in most cases not used in JavaBytecodeGenerator)
+	 * @return nothing
+	 */
     public Object visitVAR1_DECLARATION(ASTvar1_declaration n, Object o)
     {
 	debug(n.toString());
@@ -837,8 +899,6 @@ public class JavaBytecodeGenerator
 			// XXX global and Io should be set by using info about the variable decl.
 		    }
 	    }
-
-	// else if (type instanceof DERIVED){  //XXX to be implemented
 	else
 	    {
 		error("in var1__declaration: this alternative not " + 
@@ -850,19 +910,23 @@ public class JavaBytecodeGenerator
 
     /**
      * handles all that happens when visiting the node n while traversing the syntax tree.
-     * @param n an AST XXXnode
-     * @param o an argument (in most cases not used in JavaBytecodeGenerator) */
+     * @param n an ASTvar1_list node
+     * @param o an argument (in most cases not used in JavaBytecodeGenerator)
+	 * @return array of names (String[])
+	 */
     public Object visitVAR1_LIST(ASTvar1_list n, Object o)
     {
 	debug(n.toString());
 
-	return n.getNames();    // String[]
+	return n.getNames(); // of type String[]
     }
 
     /**
      * handles all that happens when visiting the node n while traversing the syntax tree.
-     * @param n an AST XXXnode
-     * @param o an argument (in most cases not used in JavaBytecodeGenerator) */
+     * @param n an ASTsimple_spec_init node
+     * @param o an argument (in most cases not used in JavaBytecodeGenerator) 
+	 * @return type constant or object describing an intial value
+	 */
     public Object visitSIMPLE_SPEC_INIT(ASTsimple_spec_init n, Object o)
     {
 	debug(n.toString());
@@ -872,7 +936,7 @@ public class JavaBytecodeGenerator
 
 	if (type instanceof TypeConstant)
 	    {
-		/* type anything but Function_Block and Derived */
+		/* type anything but derived*/
 		try
 		    {
 			TypeANY init = (TypeANY) ((SimpleNode) children[1]).visit(this, null);
@@ -894,11 +958,11 @@ public class JavaBytecodeGenerator
 	    }
 	else if (type instanceof TypeFUNCTION_BLOCK)
 	    {
-		return type;
+			return type;
 	    }
 	else
 	    {
-		error("in simple_spec_init: this alternative " + "not yet implemented");
+			error("in simple_spec_init: this alternative " + "not yet implemented");
 	    }
 
 	return null;
@@ -906,8 +970,10 @@ public class JavaBytecodeGenerator
 
     /**
      * handles all that happens when visiting the node n while traversing the syntax tree.
-     * @param n an AST XXXnode
-     * @param o an argument (in most cases not used in JavaBytecodeGenerator) */
+     * @param n an ASTsimple_specification node
+     * @param o an argument (in most cases not used in JavaBytecodeGenerator)
+	 * @return either return value from {@link #visitSIMPLE_TYPE_NAME} or {@link #visitELEMENTARY_TYPE_NAME}
+	 */
     public Object visitSIMPLE_SPECIFICATION(ASTsimple_specification n, Object o)
     {
 	debug(n.toString());
@@ -923,8 +989,11 @@ public class JavaBytecodeGenerator
 
     /**
      * handles all that happens when visiting the node n while traversing the syntax tree.
-     * @param n an AST XXXnode
-     * @param o an argument (in most cases not used in JavaBytecodeGenerator) */
+     * @param n an ASTlabel node
+     * @param o an argument (in most cases not used in JavaBytecodeGenerator)
+	 * @return if visited via il_jump_operation (i.e. the label is used as a 
+	 *         jump target) a label name; else nothing
+	 */
     public Object visitLABEL(ASTlabel n, Object o)
     {
 	debug(n.toString());
@@ -937,27 +1006,31 @@ public class JavaBytecodeGenerator
 	    }
 	else
 	    {
-		builder.emitLABEL(n.getName());
+			builder.emitLABEL(n.getName());
 
-		return null;
+			return null;
 	    }
     }
 
     /**
      * handles all that happens when visiting the node n while traversing the syntax tree.
-     * @param n an AST XXXnode
-     * @param o an argument (in most cases not used in JavaBytecodeGenerator) */
+     * @param n an ASTcharacter_string node
+     * @param o an argument (in most cases not used in JavaBytecodeGenerator)
+	 * @return a character string constant
+	 */
     public Object visitCHARACTER_STRING(ASTcharacter_string n, Object o)
     {
-	debug(n.toString());
-
-	return new TypeWSTRING(n.getName());
+		debug(n.toString());
+		
+		return new TypeWSTRING(n.getName());
     }
 
     /**
      * handles all that happens when visiting the node n while traversing the syntax tree.
-     * @param n an AST XXXnode
-     * @param o an argument (in most cases not used in JavaBytecodeGenerator) */
+     * @param n an ASTil_fb_call node
+     * @param o an argument (in most cases not used in JavaBytecodeGenerator)
+	 * @return nothing
+	 */
     public Object visitIL_FB_CALL(ASTil_fb_call n, Object o)
     {
 	debug(n.toString());
@@ -971,6 +1044,9 @@ public class JavaBytecodeGenerator
 
 	if (children.length == 3 /* is there any arguments */)
 	    {
+			error("The Checker has not done its job properly. Wrong number of " +
+				  "arguments to IL_FB_CALL");//XXX
+			/*gammalt hack för print. skall tas bort XXX
 		if (children[2] instanceof ASTil_operand_list)
 		    {
 
@@ -994,7 +1070,7 @@ public class JavaBytecodeGenerator
 			// end: hack för print
 		    }
 		else
-		    {    /* children[2] instanceof ASTil_param_list */
+		    {    // children[2] instanceof ASTil_param_list
 			BranchInstruction callCondition = builder.emitIL_FB_CALL_Start(op);    // check callCondition
 
 			// builder.emitIL_FB_CALL_SetInputs()
@@ -1003,6 +1079,7 @@ public class JavaBytecodeGenerator
 			// builder.emitIL_FB_CALL_SetOutputs()
 			builder.emitIL_FB_CALL_End(callCondition);
 		    }
+			*/
 	    }
 	else
 	    {    // no arguments
@@ -1018,8 +1095,11 @@ public class JavaBytecodeGenerator
 
     /**
      * handles all that happens when visiting the node n while traversing the syntax tree.
-     * @param n an AST XXXnode
-     * @param o an argument (in most cases not used in JavaBytecodeGenerator) */
+     * @param n an ASTil_call_operator node
+     * @param o an argument (in most cases not used in JavaBytecodeGenerator)
+	 * @return an IL call operator 
+	 *         {@link org.supremica.softplc.CompILer.CodeGen.Constants.IlCallOperator}
+	 */
     public Object visitIL_CALL_OPERATOR(ASTil_call_operator n, Object o)
     {
 	debug(n.toString());
@@ -1056,8 +1136,10 @@ public class JavaBytecodeGenerator
 
     /**
      * handles all that happens when visiting the node n while traversing the syntax tree.
-     * @param n an AST XXXnode
-     * @param o an argument (in most cases not used in JavaBytecodeGenerator) */
+     * @param n an ASTil_operand_list node
+     * @param o an argument (in most cases not used in JavaBytecodeGenerator)
+	 * @return the children of n
+	 */
     public Object visitIL_OPERAND_LIST(ASTil_operand_list n, Object o)
     {
 	debug(n.toString());
@@ -1067,8 +1149,10 @@ public class JavaBytecodeGenerator
 
     /**
      * handles all that happens when visiting the node n while traversing the syntax tree.
-     * @param n an AST XXXnode
-     * @param o an argument (in most cases not used in JavaBytecodeGenerator) */
+     * @param n an ASTmulti_element node
+     * @param o an argument (in most cases not used in JavaBytecodeGenerator)
+	 * @return nothing
+	 */
     public Object visitMULTI_ELEMENT_VARIABLE(ASTmulti_element_variable n, Object o)
     {
 	debug(n.toString());
@@ -1077,8 +1161,10 @@ public class JavaBytecodeGenerator
 
     /**
      * handles all that happens when visiting the node n while traversing the syntax tree.
-     * @param n an AST XXXnode
-     * @param o an argument (in most cases not used in JavaBytecodeGenerator) */
+     * @param n an ASTrecord_variable node
+     * @param o an argument (in most cases not used in JavaBytecodeGenerator)
+	 * @return nothing
+	 */
     public Object visitRECORD_VARIABLE(ASTrecord_variable n, Object o)
     {
 	debug(n.toString());
@@ -1087,8 +1173,10 @@ public class JavaBytecodeGenerator
 
     /**
      * handles all that happens when visiting the node n while traversing the syntax tree.
-     * @param n an AST XXXnode
-     * @param o an argument (in most cases not used in JavaBytecodeGenerator) */
+     * @param n an ASTstructured_variable node
+     * @param o an argument (in most cases not used in JavaBytecodeGenerator)
+	 * @return nothing
+	 */
     public Object visitSTRUCTURED_VARIABLE(ASTstructured_variable n, Object o)
     {
 	debug(n.toString());
@@ -1098,8 +1186,10 @@ public class JavaBytecodeGenerator
 
     /**
      * handles all that happens when visiting the node n while traversing the syntax tree.
-     * @param n an AST XXXnode
-     * @param o an argument (in most cases not used in JavaBytecodeGenerator) */
+     * @param n an ASTil_param_list node
+     * @param o an argument (in most cases not used in JavaBytecodeGenerator)
+	 * @return nothing
+	 */
     public Object visitIL_PARAM_LIST(ASTil_param_list n, Object o)
     {
 	debug(n.toString());

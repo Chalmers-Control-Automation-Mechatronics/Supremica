@@ -23,7 +23,7 @@ public class Shell
     public static DigitalIODriver driver;
 
     /** execute once every [interval] ms */
-    public static short interval = 30;
+    public static short interval = 40;
 
     Class[] constructorArgumentTypes = { boolean[].class, boolean[].class };
     Constructor classConstructor;
