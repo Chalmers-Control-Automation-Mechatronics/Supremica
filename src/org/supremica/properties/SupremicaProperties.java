@@ -210,7 +210,7 @@ public final class SupremicaProperties
 		//setProperty(ANIMATOR_IN_USE, "false", true);
 		setProperty(INCLUDE_ANIMATOR, "false", true);
 		setProperty(SOFTPLC_CYCLE_TIME, "40", true);
-		setProperty(SHOW_GENETIC_ALGORITHMS, "false", false);
+		setProperty(SHOW_GENETIC_ALGORITHMS, "true", false);
 		setProperty(SHOW_ROBOTSTUDIO_LINK, "true", false);
 		setProperty(USE_ACTIVEX_BRIDGE, "true", false);
 

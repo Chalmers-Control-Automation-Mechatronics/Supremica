@@ -274,7 +274,6 @@ public class TableSorter
 	public void tableChanged(TableModelEvent e)
 	{
 		// System.out.println("Sorter: tableChanged");
-		// reallocateIndexes();
 		reallocateIndexes();
 		super.tableChanged(e);
 	}

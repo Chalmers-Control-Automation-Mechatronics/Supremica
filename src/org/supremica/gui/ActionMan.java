@@ -482,7 +482,11 @@ public class ActionMan
 		gui.clearSelection();
 	}
 
-	// Moves selected automata one step up in the list
+	/**
+	 * Moves selected automata one step up or down in the list
+	 *
+	 * @param directionIsUp Boolean deciding the direction of the move, true->up false->down.
+	 */
 	public static void automataMove_actionPerformed(Gui gui, boolean directionIsUp)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
@@ -677,7 +681,6 @@ public class ActionMan
 	// it is now (ARASH)
 	public static void automataExport(Gui gui)
 	{
-
 		// this one comes back in the next function. we need to have duplicates otherwise we would
 		// ask for the type and first then complain if nonthing is selected
 		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();

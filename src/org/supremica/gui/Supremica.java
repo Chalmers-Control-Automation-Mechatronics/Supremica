@@ -715,7 +715,6 @@ public class Supremica
 
 	public void tableChanged(TableModelEvent e)
 	{
-
 		// logger.debug("Supremica.tableChanged");
 		theAutomatonTable.revalidate();
 	}

@@ -213,7 +213,7 @@ public class GeneticAlgorithms
 
 	public static int calculateSynchronizationSize(Automata automata, SynchronizationOptions syncOptions)
 	{
-		// If there's only one automata, there's no need to synchronize
+		// If there's only one automaton, there's no need to synchronize
 		if ((automata.size() == 1) || automata.getAutomatonAt(0) == automata.getAutomatonAt(1))
 		{
 			return automata.getAutomatonAt(0).nbrOfStates();
@@ -247,7 +247,7 @@ public class GeneticAlgorithms
 	}
 
 	/**
-	 * This is not finished... the idéa is to predict what happens when we
+	 * This is not finished... the idea is to predict what happens when we
 	 * synchronize several automata together, adding one at a time.
 	 *
 	 * First we need to predict all the data in the synchronizaed automaton
@@ -301,9 +301,105 @@ public class GeneticAlgorithms
 	}
 	*/
 
+	private static class PredictionFunction 
+	{
+        private static double [] r = new double[16];
+		
+        public static double f(double [] in)
+		{
+			for(int i = 0; i < 16; i++) r[i] = in[i];
+			
+			r[11] = Math.cos(in[9]);
+			r[15] = 0.546875;
+			r[9] = Math.pow( r[9], r[2]);
+			r[0] = Math.max( r[0], r[13]);
+			r[3] = r[3] - r[15];
+			r[0] = Math.min( r[0], r[4]);
+			r[9] = r[9] * in[3];
+			r[13] = Math.max( r[13], r[1]);
+			r[2] = Math.pow( r[2], r[0]);
+			r[2] = r[2] + in[2];
+			if(r[1]>in[0])          if(in[7] != 0) r[2] = r[2] / in[7];
+			r[9] = Math.pow( r[9], r[2]);
+			if(r[9]>in[6])          r[13] = r[13] * in[12];
+			r[12] = r[12] + in[11];
+			r[0] = Math.max( r[0], r[1]);
+			r[12] = r[12] - r[11];
+			r[12] = r[12] * in[14];
+			r[0] = Math.max( r[0], r[13]);
+			if(r[3] > 0) r[1] = Math.log( r[3]);
+			r[0] = Math.max( r[0], r[13]);
+			if(r[3] > 0) r[1] = Math.log( r[3]);
+			r[9] = r[9] + in[4];
+			r[9] = r[9] - r[12];
+			r[4] = r[4] - in[11];
+			r[13] = Math.max( r[13], r[1]);
+			r[9] = r[9] * in[3];
+			r[0] = Math.max( r[0], r[13]);
+			r[9] = r[9] - r[12];
+			if(r[3] > 0) r[9] = Math.log( r[3]);
+			r[6] = Math.sqrt( Math.abs( r[0]));
+			if(r[6] != 0) r[9] = r[9] / r[6];
+			r[13] = -0.0625;
+			if(in[3] != 0) r[9] = r[9] / in[3];
+			r[9] = r[9] * in[3];
+			r[12] = Math.cos(in[7]);
+			r[13] = Math.abs( r[1]);
+			if(r[9] > 0) r[13] = Math.log( r[9]);
+			r[0] = Math.max( r[0], r[13]);
+			if(r[3] > 0) r[1] = Math.log( r[3]);
+			r[7] = Math.sqrt( Math.abs( r[0]));
+			r[4] = r[4] - in[11];
+			r[13] = Math.exp( r[12]);
+			r[12] = Math.cos(in[7]);
+			r[13] = Math.abs( r[1]);
+			r[13] = Math.abs( r[1]);
+			r[7] = Math.min( r[7], in[3]);
+			r[13] = Math.max( r[13], r[7]);
+			if(r[4]>in[5])          if(r[0]>in[3])          r[13] = Math.max( r[13], r[1]);
+			r[7] = Math.min( r[7], in[3]);
+			r[13] = Math.max( r[13], r[7]);
+			if(r[4]>in[5])          r[7] = r[7] + in[12];
+			r[13] = Math.max( r[13], r[1]);
+			r[7] = Math.max( r[7], in[9]);
+			r[0] = Math.min( r[0], r[4]);
+			r[13] = r[13] - r[7];
+			if(r[7]>in[10])         r[13] = r[13] - r[7];
+			r[13] = r[13] - in[10];
+			r[12] = Math.max( r[12], in[9]);
+			r[0] = r[0] - in[11];
+			r[13] = r[13] * in[12];
+			r[0] = Math.max( r[0], r[13]);
+			r[0] = Math.max( r[0], r[13]);
+			r[12] = r[12] + in[11];
+			r[0] = Math.max( r[0], r[1]);
+			r[13] = Math.abs( in[15]);
+			r[0] = Math.max( r[0], r[13]);
+			r[11] = Math.sqrt( Math.abs( r[13]));
+			r[0] = Math.max( r[0], r[13]);
+			r[0] = Math.max( r[0], r[13]);
+			r[1] = Math.cos(r[11]);
+			r[0] = Math.max( r[0], r[13]);
+			r[13] = Math.max( r[13], r[0]);
+			r[0] = -0.3125;
+			r[0] = Math.max( r[0], r[13]);
+			r[1] = r[1] - in[5];
+			r[1] = Math.max( r[1], r[12]);
+			r[13] = Math.sin(in[9]);
+			r[0] = Math.max( r[0], r[13]);
+			r[13] = Math.max( r[13], r[1]);
+			r[0] = Math.max( r[0], r[13]);
+			r[0] = Math.max( r[0], r[13]);
+			r[0] = r[0] + r[0];
+			
+			return r[0];
+        } // 88 instructions, fitness: 0.08753301196436607		
+	}
+	
 	/**
 	 * This is an automatically generated class
 	 */
+	/*
 	private static class PredictionFunction
 	{
 		private static double[] r = new double[GA_DATA_SIZE];
@@ -411,4 +507,5 @@ public class GeneticAlgorithms
 			return r[0];
         } // 95 instructions, fitness: 4.731034756672716
 	}
+	*/
 }
