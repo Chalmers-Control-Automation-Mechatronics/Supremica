@@ -133,17 +133,21 @@ public final class AutomataSynchronizerExecuter
 	 */
 	private final SynchronizationType syncType;
 
-	// For AutomataFastControllabilityCheck...
+	/**
+	 * Determines if uncontrollable states should be stored in potentiallyUncontrollableStates
+	 * for later analysis.
+	 */
+	private boolean rememberUncontrollable = false;
+
 	private int problemPlant = Integer.MAX_VALUE;
 	private int problemEvent = Integer.MAX_VALUE;
 	private StateMemorizer potentiallyUncontrollableStates;
 	private int[] eventPriority;
 	private boolean expandEventsUsingPriority;
-	private boolean rememberUncontrollable = false;
 	private boolean exhaustiveSearch = false;
 	private boolean coExecute = false;
 	private AutomataOnlineSynchronizer coExecuter = null;
-
+	
 	/** For "one event at a time"-execution. */
 	private int currUncontrollableEvent = -1;
 
@@ -222,7 +226,7 @@ public final class AutomataSynchronizerExecuter
 	/**
 	 * Selects the automata with the indices in automataIndices for synchronization
 	 *
-	 *@param automataIndices Array of int with the indexes of the automata to be selected.
+	 *@param automataIndices Array of int with the indices of the automata to be selected.
 	 *@exception  Exception Throws exception if exhaustiva search is used.
 	 */
 	public void selectAutomata(int[] automataIndices)

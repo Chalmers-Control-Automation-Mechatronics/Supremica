@@ -132,4 +132,22 @@ public class TestAutomataVerifier
 		}
 	}
 
+	public void testModularLanguageInclusion()
+	{
+		try
+		{
+			ProjectBuildFromXml builder = new ProjectBuildFromXml();
+			Project theProject = builder.build(TestFiles.getFile(TestFiles.Verriegel3Language));
+			SynchronizationOptions synchronizationOptions = new SynchronizationOptions();
+			VerificationOptions verificationOptions = new VerificationOptions();
+			verificationOptions.setVerificationType(VerificationType.LanguageInclusion);
+			AutomataVerifier theVerifier = new AutomataVerifier(theProject, synchronizationOptions, verificationOptions);
+			assertTrue(theVerifier.verify());
+		}
+		catch (Exception ex)
+		{
+			ex.printStackTrace();
+			assertTrue(false);
+		}		
+	}
 }

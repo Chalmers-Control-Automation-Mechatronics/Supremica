@@ -149,7 +149,6 @@ public class AutomataVerifier
 
 	public static String validOptions(Automata theAutomata, VerificationOptions verificationOptions)
 	{
-
 		if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.IDD)
 		{
 			return "The IDD Algorithm is not fully implemented yet";
@@ -1221,7 +1220,33 @@ public class AutomataVerifier
 
 		selectedAutomata.add(AutomatonA);
 		selectedAutomata.add(AutomatonB);
-		
+	
+		try
+		{	
+			AutomataSynk = synchronizeAutomata(selectedAutomata);
+		}
+		catch (Exception ex)
+		{
+			logger.error("Error when synchronizing automata: " + ex.toString());
+			logger.debug(ex.getStackTrace());
+			throw ex;	
+		}
+	
+		return moduleIsNonblocking(AutomataSynk);
+	}
+
+	/**
+	 * Performs synchronous composition on the automata represented by selectedAutomata
+	 *
+	 * @param selectedAutomata The Automata to be synchronized
+	 * @return The automaton that constitutes the synchronization of the automata 
+	 * represented by the ArrayList.
+	 */
+	private Automaton synchronizeAutomata(ArrayList selectedAutomata)
+		throws Exception
+	{
+		Automaton AutomataSynk;
+
 		// Clear the hash-table in the helper and set some variables in the synchronization helper
 		synchHelper.clear();
 		// synchHelper.setRememberUncontrollable(true);
@@ -1229,7 +1254,7 @@ public class AutomataVerifier
 		
 		if (stopRequested)
 		{
-			return false;
+			return null;
 		}
 		
 		// Initialize the synchronizationExecuters
@@ -1273,9 +1298,10 @@ public class AutomataVerifier
 			logger.debug(ex.getStackTrace());
 			throw ex;
 		}
-		
-		return moduleIsNonblocking(AutomataSynk);
+
+		return AutomataSynk;
 	}
+
 
 	/**
 	 * Examines non-blocking monolithically, by examining all reachable states.
@@ -1328,7 +1354,6 @@ public class AutomataVerifier
 
 		while (stateIterator.hasNext())
 		{
-			//System.out.println("Blocking state: " + ((State) stateIterator.next()).getName());
 			logger.info("Blocking state: " + ((State) stateIterator.next()).getName());
 		}
 		
