@@ -6,7 +6,7 @@ package org.supremica.util.BDD;
 public class MonotonicPartition {
 
     private int max_size, curr;
-    private int [] delta;
+    private int [] delta, permutation;
     private JBDD manager;
     private int cube, cubep, s2sp,sp2s;
 
@@ -21,6 +21,8 @@ public class MonotonicPartition {
 	this.sp2s     = manager.getPermuteSp2S();
 
 	this.delta = new int[max_size];
+	this.permutation = new int[max_size];
+	for(int i = 0; i < max_size; i++) permutation [i] = i;
     }
 
     public void cleanup() {
@@ -33,8 +35,13 @@ public class MonotonicPartition {
     public int getS2Sp() { return s2sp; }
     public int getSp2s() { return sp2s; }
     // --------------------------------------------------
+    /**
+     * my simple/idiotic/stupid insertation algo
+     *
+     * worst-case of this greedy algo gives 2 times the optimal solution.
+     * (and optimal is NP-complete). There is a proof somewhere in Cormens book ...
+     */
     public void add(int delta_k) {
-	// simple/idiotic/stupid insertation
 	for(int i = 0; i < curr; i++) {
 	    int tmp = manager.or( delta[i], delta_k);
 	    if( manager.nodeCount(tmp) < Options.max_partition_size) {
@@ -63,11 +70,17 @@ public class MonotonicPartition {
 
     // --------------------------------------------------
 
-    /** 1-step forward rechables */
+    /**
+     * 1-step forward rechables.
+     * We use the permutation table to change the order of clusters each time
+     */
     public int image(int q_k) {
+		Util.permutate(permutation, curr);
+
 	int front = manager.getZero(); manager.ref(front);
 	for(int i = 0; i < curr; i++) {
-	    int tmp = manager.relProd(delta[i], q_k, cube);
+		int a = permutation [i];
+	    int tmp = manager.relProd(delta[a], q_k, cube);
 	    front = manager.orTo(front, tmp);
 	    manager.deref(tmp);
 	}
@@ -80,11 +93,16 @@ public class MonotonicPartition {
     /** 1-step backward reachables.<br>
      * Note: q_k must be in S' _not_ in S'!<br>
      * the returned BDD is also in S'
+     *
+     * We use the permutation table to change the order of clusters each time
      */
     public int preImage(int q_k) {
+		Util.permutate(permutation, curr);
+
 	int front = manager.getZero(); manager.ref(front);
 	for(int i = 0; i < curr; i++) {
-	    int tmp = manager.relProd(delta[i], q_k, cubep);
+		int a = permutation [i];
+	    int tmp = manager.relProd(delta[a], q_k, cubep);
 	    front = manager.orTo(front, tmp);
 	    manager.deref(tmp);
 	}

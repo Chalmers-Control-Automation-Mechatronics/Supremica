@@ -33,6 +33,25 @@ public class Workset
 			for(int i = 0; i < size; i++) remaining[i] = true;
 	}
 
+	public String getHeuristicName() {
+		switch(Options.es_heuristics) {
+			case Options.ES_HEURISTIC_RANDOM:
+				return "random";
+			case Options.ES_HEURISTIC_MOST_PENDING:
+				return "most pending";
+			case Options.ES_HEURISTIC_LEAST_PENDING:
+				return "least pending";
+			case Options.ES_HEURISTIC_MOST_MEMBERS:
+			case Options.ES_HEURISTIC_MOST_FOLLOWERS:
+				return "most followers";
+			case Options.ES_HEURISTIC_LEAST_MEMBERS:
+			case Options.ES_HEURISTIC_LEAST_FOLLOWERS:
+				return "least followers";
+			default:
+				return "(unknown??)";
+		}
+	}
+
 	/**
 	 * choose the next automaton
 	 *

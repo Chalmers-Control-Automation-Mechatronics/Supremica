@@ -40,6 +40,16 @@ class BDDNodeGrow extends GrowFrame {
 		this.manager = manager;
 	}
 	public void add(int bdd) { super.add( manager.nodeCount( bdd) ); }
+	public void stopTimer() {
+		super.stopTimer();
+		// compute graph cost: \Sum_i (y_i) ^2
+		double cost = 0;
+		int max = vars.getMax();
+		for(int i = 0; i < max; i++) cost += (vars.get(i)) << 1;
+		String tmp = status.getText();
+		status.setText(tmp + "; total cost: " + cost);
+		title = title + "; total cost: " + cost;
+	}
 }
 
 

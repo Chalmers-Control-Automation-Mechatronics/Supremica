@@ -98,7 +98,7 @@ public class Options
     // constants
     public static final int LINE_WIDTH = 55;    // # of chars per line?, screen width
     private static final int DEFAULT_MAX_PARTITION_SIZE = 3000; // max nodes/partition
-	public static final int max_partition_size = DEFAULT_MAX_PARTITION_SIZE;
+	public static int max_partition_size = DEFAULT_MAX_PARTITION_SIZE;
 
 
     // options

@@ -684,6 +684,8 @@ class BDDPanel
     private JCheckBox localSaturation, encodingFill, sizeWatch, profileOn;
     private JComboBox showGrow, algorithmFamily, countAlgorithm, orderingAlgorithm;
     private JComboBox inclusionAlgorithm, asHeuristics, esHeuristics;
+    private JTextField maxPartitionSize;
+
 	private JButton bProofFile;
 
     public BDDPanel(PreferencesDialog theDialog)
@@ -693,12 +695,12 @@ class BDDPanel
 		JLabel tmp;
 
 
-	JPanel pWest  = new JPanel( new GridLayout(12,1));
+	JPanel pWest  = new JPanel( new GridLayout(14,1));
 	add(pWest, BorderLayout.WEST);
 
 
 
-	pWest.add( tmp = new JLabel("User interaction:", SwingConstants.LEFT));
+	pWest.add( tmp = new JLabel("User interaction and reports:", SwingConstants.LEFT));
 	tmp.setForeground(Color.blue);
 
 
@@ -715,6 +717,13 @@ class BDDPanel
 	pWest.add( tmp = new JLabel("Computation options:"));
 	tmp.setForeground(Color.blue);
 
+
+	JPanel pPartitionSize = new JPanel(new FlowLayout(FlowLayout.LEFT) );
+	pWest.add(pPartitionSize);
+	pPartitionSize.add( new JLabel("Max BDD nodes/cluster"));
+	pPartitionSize.add( maxPartitionSize = new JTextField("" + Options.max_partition_size, 10));
+
+
 	pWest.add( localSaturation = new JCheckBox("Locally saturate", Options.local_saturation) );
 
 	// pWest.add( ucOptimistic = new JCheckBox("Optimisitc on controllability", Options.uc_optimistic));
@@ -722,7 +731,8 @@ class BDDPanel
 
 	pWest.add( encodingFill = new JCheckBox("Full encoding of S", Options.fill_statevars) );
 
-
+		localSaturation.setEnabled(false);
+		encodingFill.setEnabled(false);
 
 
 
@@ -827,7 +837,7 @@ class BDDPanel
 
 	JPanel pGrow = new JPanel(new FlowLayout(FlowLayout.RIGHT) );
 	p.add(pGrow);
-	pGrow.add( new Label("BDD graphs"));
+	pGrow.add( new JLabel("BDD graphs"));
 	pGrow.add( showGrow = new JComboBox());
 	showGrow.addItem("None");
 	showGrow.addItem("Node count");
@@ -849,7 +859,6 @@ class BDDPanel
 	countAlgorithm.addItem("Exact");
 	countAlgorithm.setSelectedIndex(Options.count_algo);
 
-
 	JPanel pProof = new JPanel(new FlowLayout(FlowLayout.LEFT) );
 	p.add(pProof);
 
@@ -861,13 +870,20 @@ class BDDPanel
 
     public boolean doApply()
     {
+
+	int maxsize = PreferencesDialog.getInt("Max cluster size", maxPartitionSize.getText(), 0);
+	if (maxsize == Integer.MIN_VALUE)
+	{
+		return false;
+	}
+
+	Options.max_partition_size =  maxsize;
 	Options.algo_family      = algorithmFamily.getSelectedIndex();
 	Options.count_algo       = countAlgorithm.getSelectedIndex();
 	Options.ordering_algorithm  = orderingAlgorithm.getSelectedIndex();
 	Options.inclsuion_algorithm = inclusionAlgorithm.getSelectedIndex();
 	Options.as_heuristics = asHeuristics.getSelectedIndex();
 	Options.es_heuristics = esHeuristics.getSelectedIndex();
-
 	Options.show_grow        = showGrow.getSelectedIndex();
 	Options.user_alters_PCG  = alterPCG.isSelected();
 	// Options.uc_optimistic    = ucOptimistic.isSelected();

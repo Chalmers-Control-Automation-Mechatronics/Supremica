@@ -371,5 +371,4 @@ public class AutomataConfiguration {
 		bf.append("};");
 		return bf.toString();
 	}
-
 };

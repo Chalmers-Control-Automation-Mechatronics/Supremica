@@ -27,8 +27,10 @@ public class SmoothWorksetSupervisor extends WorksetSupervisor {
 
     // ------------------------------------------------------------------------
     protected void computeReachables() {
+		Workset workset = getWorkset(true);
+
 		// statistic stuffs
-		GrowFrame gf = BDDGrow.getGrowFrame(manager, "Forward reachability (smoothed+workset)");
+		GrowFrame gf = BDDGrow.getGrowFrame(manager, "Forward reachability (smoothed+workset)/" + workset.getHeuristicName());
 
 		timer.reset();
 		MonotonicPartition dp = new MonotonicPartition(manager, plant.getSize() + spec.getSize());
@@ -45,7 +47,7 @@ public class SmoothWorksetSupervisor extends WorksetSupervisor {
 		int size = dop.getSize();
 		Cluster [] clusters = dop.getClusters();
 
-		Workset workset = getWorkset(true);
+
 
 		for(int a = 0; a < size; a++) {
 			int p = workset.pickOneExcelsuive();
@@ -83,7 +85,9 @@ public class SmoothWorksetSupervisor extends WorksetSupervisor {
     // -------------------------------------------------------------------------------
 
     protected void computeCoReachables() {
-	GrowFrame gf = BDDGrow.getGrowFrame(manager, "backward reachability (smoothed+workset)");
+		Workset workset = getWorkset(true);
+
+	GrowFrame gf = BDDGrow.getGrowFrame(manager, "backward reachability (smoothed+workset)/" + workset.getHeuristicName());
 
 	timer.reset();
 	MonotonicPartition dp = new MonotonicPartition(manager, plant.getSize() + spec.getSize());
@@ -111,8 +115,6 @@ public class SmoothWorksetSupervisor extends WorksetSupervisor {
 	// 0/1 smoothing
 	int size = dop.getSize();
 	Cluster [] clusters = dop.getClusters();
-
-	Workset workset = getWorkset(true);
 
 
 	for(int a = 0; a < size; a++) {

@@ -9,16 +9,16 @@ public class GrowFrame
 {
 	private final static long SHOW_THRESHOLD = 1000; /** how long to wait before next graph is drawn */
 
-	private IntArray vars;
+	protected IntArray vars;
 	private GrowCanvas canvas;
 	private long start_time, end_time, last_time;
 	private Button bQuit, bDump, bReturn;
-	private Label status;
+	protected Label status;
 	private TextArea ta;
 	private boolean showGraph;
 	private boolean stopped;
 	private Marker marker_root, marker_last;
-	private String title;
+	protected String title;
 
 	protected GrowFrame(String txt)
 	{
