@@ -42,6 +42,7 @@ public class SplashWindow
         {
                 this.setSize(new Dimension(300, 170));
                 this.setLayout(new BorderLayout());
-                this.add(new Label("Supremica"), BorderLayout.CENTER);
+                ImageIcon imageIcon = new ImageIcon(Supremica.class.getResource("/splash_v1.gif"))
+                this.add(imageIcon.getImage(), BorderLayout.CENTER);
         }
 }
