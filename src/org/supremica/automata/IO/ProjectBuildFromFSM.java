@@ -364,6 +364,7 @@ public class ProjectBuildFromFSM
 				}
 				else if (currParserState == STATE_READ_ADDITIONAL_EVENTS)
 				{
+					System.err.println("State_read_additional_events: currLine: :" +currLine + ": currToken :"+ currToken + ":");
 					if (currToken.equalsIgnoreCase("EVENTS"))
 					{ // Do nothing
 
