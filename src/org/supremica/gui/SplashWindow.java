@@ -6,18 +6,20 @@ import javax.swing.*;
 public class SplashWindow
         extends java.awt.Window
 {
+        private static ImageIcon splashIcon = new ImageIcon(Supremica.class.getResource("/splash_v1.gif"));
+
         public SplashWindow()
         {
                 super(new Frame());
 
-                try
-                {
-                        init();
-                }
-                catch (Exception e)
-                {
-                        e.printStackTrace();
-                }
+                int height = splashIcon.getHeight();
+                int width = splashIcon.getWidth();
+
+                this.setSize(new Dimension(width, height));
+
+                BorderLayout layout = new BorderLayout();
+                this.setLayout(layout);
+                this.add(new JLabel(imageIcon), BorderLayout.CENTER);
 
                 /*
                 * Center splash window on screen
@@ -36,15 +38,5 @@ public class SplashWindow
                 }
                 setLocation((screenSize.width  - splashWindowSize.width)  / 2,
                         (screenSize.height - splashWindowSize.height) / 2);
-        }
-
-        private void init()
-                throws Exception
-        {
-                this.setSize(new Dimension(300, 170));
-                BorderLayout layout = new BorderLayout();
-                this.setLayout(layout);
-                ImageIcon imageIcon = new ImageIcon(Supremica.class.getResource("/splash_v1.gif"));
-                this.add(new JLabel(imageIcon), BorderLayout.CENTER);
         }
 }
