@@ -1470,13 +1470,7 @@ void function_block_declaration() :
 	function_block_body() "END_FUNCTION_BLOCK"
 }
 
-/*
- * Tillägg för JAVA_BLOCK 2002-04-15 av Anders
- * java_block_declaration är endast till för att typdeklarara
- * function blocks som är skrivna direkt i java ist. för i IL.
- * Därför används exakt samma byggstenar i java_block_declaration
- * som i
- */
+/* addition to normal grammar (se above) */
 void java_block_declaration() :
 {}
 {
@@ -1484,12 +1478,6 @@ void java_block_declaration() :
 		io_var_declarations()
 	"END_JAVA_BLOCK"
 }
-
-/*
- * Slut JAVA_BLOCK-tillägg
- */
-
-
 
 void other_var_declarations() :
 {}
