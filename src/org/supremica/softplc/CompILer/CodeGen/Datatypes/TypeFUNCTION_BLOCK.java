@@ -14,7 +14,7 @@ public class TypeFUNCTION_BLOCK
 	 *  @return the type constant*/
 	public TypeConstant getType()
 	{
-		return TypeConstant.T_FUNCTION_BLOCK;
+		return null; //TypeConstant.T_FUNCTION_BLOCK;
 	}
 
 	// Methods and stuff concerning internal representation
@@ -23,6 +23,7 @@ public class TypeFUNCTION_BLOCK
 
 	public TypeFUNCTION_BLOCK(String n)
 	{
+		System.err.println("Using deprecated class TypeFUNCTION_BLOCK");
 		this.name = n;
 	}
 
