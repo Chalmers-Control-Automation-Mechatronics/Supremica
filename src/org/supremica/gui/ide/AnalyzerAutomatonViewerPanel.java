@@ -45,8 +45,6 @@ class AnalyzerAutomatonViewerPanel
 		viewerPanel.setScaleToFit(false);
 		getViewport().add(viewerPanel);
 		validate();
-		revalidate();
-		repaint();
 	}
 
 }
