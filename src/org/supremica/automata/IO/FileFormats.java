@@ -76,6 +76,7 @@ public class FileFormats
 	public static final FileFormats ST = new FileFormats(false, true, "ST", ".st", "IEC-1131 Structured Text files (*.st)");
 	public static final FileFormats IL = new FileFormats(false, true, "IL", ".il", "IEC-1131 Instruction List files (*.il)");
 	public static final FileFormats NQC = new FileFormats(false, true, "NQC", ".nqc", "Mindstorm NQC files (*.nqc)");
+	public static final FileFormats CLASS = new FileFormats(true, true, "CLASS", ".class", "Java Bytecode files (*.class)");
 	public static final FileFormats Directory = new FileFormats(false, false, "Directory", "", "Directory");
 
 	private String identifier;
