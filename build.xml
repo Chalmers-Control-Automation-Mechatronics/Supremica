@@ -22,7 +22,7 @@
 
 <!--
 *	If you for some reason prefer javac instead of jikes,
-*	just change "jikes" to "modern" on the next line.
+*	just change "jikes" to "classic" on the next line.
 -->
 <property name="build.compiler" value="jikes"/>
 
@@ -66,6 +66,7 @@
 	<unjar src="${lib}/junit.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/log4j-core.jar" dest="${lib}/${unjared}"/>
 	<unjar src="${lib}/log4j.jar" dest="${lib}/${unjared}"/>
+	<unjar src="${lib}/jakarta-oro.jar" dest="${lib}/${unjared}"/>
 	
 	<mkdir dir="${lib}/${unjared}/META-INF"/>
 	<delete includeEmptyDirs="true">
@@ -129,6 +130,7 @@
 		destdir="${build}"
 		classpath="${lib}/${unjared}"
 		includeJavaRuntime="yes"
+		deprecation="false"
 		excludes="
 			${my_basedir}/sattline/**,
 			${my_basedir}/supervisor/**"	
