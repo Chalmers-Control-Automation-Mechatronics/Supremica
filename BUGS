@@ -7,4 +7,6 @@ doesn't stop the other executors!
 * The extra state for complement automata has a fix name. If an automaton
 already has a state with that name, bad things happen.
 
+* AutomataExplorer does not show correct set of incoming events.
+
 

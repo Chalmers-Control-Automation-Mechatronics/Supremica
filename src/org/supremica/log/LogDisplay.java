@@ -463,7 +463,7 @@ public class LogDisplay
 			add(clearItem);
 			addSeparator();
 
-			JMenu logProperties = new JMenu("Log Properties");
+			JMenu logProperties = new JMenu("Log Configuration");
 
 			add(logProperties);
 
