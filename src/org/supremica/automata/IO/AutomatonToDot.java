@@ -143,12 +143,6 @@ public class AutomatonToDot
 	{
 		if (useArcColors)
 		{
-/*
-			if (is_prop)
-			{
-				return ", color = blue";
-			}
-*/
 			if (is_ctrl)
 			{
 				return ", color = green3";

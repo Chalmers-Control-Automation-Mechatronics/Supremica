@@ -49,12 +49,7 @@ Supremica is following.
 	will be used. The trial JGo files are in the CVS, but not the licensed 
 	files. This implies that you have to manually update the licensed files.
 
-2. Create a build.properties file
-
-	Copy build.properties.sample (in the Supremica root directory)
-	to build.properties. Update the paths inside the file.
-
-3. Compiling
+2. Compiling
 
 	To compile Supremica you need to have Ant and Jikes installed
 	See the links at the bottom of the page.
@@ -95,7 +90,7 @@ Supremica is following.
 		compile_supremica, build_supremica, rebuild_supremica,
 		compile_jgrafchart, build_jgrafchart, rebuild_jgrafchart.
 	
-4. Run
+3. Run
 	Three alternatives:
 	
 	i. Enter Supremica/dist, write:
@@ -119,15 +114,15 @@ Supremica is following.
 	be able to double-click on Supremica/dist/Supremica.jar
 	in the Explorer.
 
-5. Update
+4. Update
 	Enter the Supremica directory, write:
 	> cvs update -d -P
 
-6. Commit changes
+5. Commit changes
  	Enter the Supremica directory, write:
 	> cvs commit
 
-7. Add a new file into cvs
+6. Add a new file into cvs
 	Enter the directory where the file resides, write:
 	cvs add filename.java
 
@@ -145,12 +140,13 @@ Generating JAXB files
 Some Java files for parsing and representing XML files are automatically generated. 
 Normally you do not need to generate them since a compiled version of them are
 included in the waters_jaxb.jar file. In case you changed the xml schema then
-you need to generate new java files. This is done by executing the follwoing command.
+you need to generate new java files. This is done by executing the following command
+in the waters directory
 
-	> ant generate_JAXB
+	> ant gen
 
 This command will also compile the generated files and generate a new jar file that
-will be commited when you run cvs commit. To be able to run generate_JAXB you need
+will be commited when you run cvs commit. To be able to run gen you need
 to have installed JAXB, see link below.
 
 Testing

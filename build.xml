@@ -80,23 +80,6 @@
 	</delete>
 </target>
 
-<target name="generate_JAXB" depends="clean,init,generate_JAXB_internal,rebuild,jar_jaxb" description="Generate JAXB classes.">
-</target>
-
-<target name="generate_JAXB_internal">
-	<taskdef name="xjc" classname="com.sun.tools.xjc.XJCTask">
-		<classpath>
-			<pathelement path="${jwsdp.classpath}"/>
-		</classpath>
-	</taskdef>
-	<xjc target="${src}" extension="true" removeOldOutput="yes">
-		<schema dir="${xsd}" includes="waters-des.xsd waters-module.xsd"/>
-		<produces dir="${src}/net/sourceforge/waters/xsd/"
-			includes="base/* base/impl/* des/* des/impl/* module/* module/impl/*"/>
-	</xjc>
-</target>
-
-
 <target name="initialize" depends="clean">
  	<mkdir dir="${build}"/>
 	<delete includeEmptyDirs="true" >
@@ -298,8 +281,7 @@
 			${jgrafchart_basedir}/**,
 			${supremica_basedir}/external/comInterfaces/**,
 			${supremica_basedir}/sattline/**,
-			${supremica_basedir}/supervisor/**,	
-			${supremica_basedir}/util/compactStateSet/**"	
+			${supremica_basedir}/supervisor/**"	
 		source="1.4"
 	/>
 </target>

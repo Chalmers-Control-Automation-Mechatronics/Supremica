@@ -34,7 +34,7 @@ public class IDE
     public IDE()
     {
 		Utility.setupFrame(this, 900, 700);
-		setTitle(ideName);
+		setTitle(getName());
 		moduleContainers = new ModuleContainers(this);
 		ModuleContainer defaultModule = createNewModuleContainer();
 		moduleContainers.add(defaultModule);
@@ -134,7 +134,7 @@ public class IDE
 		}
 	}
 
-	public String getIDEName()
+	public String getName()
 	{
 		return ideName;
 	}

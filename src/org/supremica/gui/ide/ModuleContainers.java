@@ -50,7 +50,7 @@ public class ModuleContainers
 		{
 			activeModuleContainer = moduleContainer;
 		}
-		ide.setTitle(ide.getIDEName() + " [" + moduleContainer.getName() + "]");
+		ide.setTitle(ide.getName() + " [" + moduleContainer.getName() + "]");
 	}
 
 	public ModuleContainer getActiveModuleContainer()
