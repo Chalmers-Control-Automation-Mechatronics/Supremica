@@ -1,0 +1,143 @@
+//###########################################################################
+//# PROJECT: Waters
+//# PACKAGE: net.sourceforge.waters.build.jniglue
+//# CLASS:   FieldGlue
+//###########################################################################
+//# $Id: FieldGlue.java,v 1.1 2005-02-18 01:30:10 robi Exp $
+//###########################################################################
+
+package net.sourceforge.waters.build.jniglue;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.Map;
+import java.util.Set;
+
+
+class FieldGlue implements Comparable, WritableGlue {
+
+  //#########################################################################
+  //# Constructors
+  FieldGlue(final TypeGlue type, final String name)
+  {
+    mType = type;
+    mFieldName = name;
+    mTypeSignature = null;
+  }
+
+
+  //#########################################################################
+  //# equals() and hashCode()
+  public boolean equals(final Object partner)
+  {
+    if (partner != null && getClass() == partner.getClass()) {
+      final FieldGlue field = (FieldGlue) partner;
+      return mFieldName.equals(field.mFieldName);
+    } else {
+      return false;
+    }
+  }
+
+  public int hashCode()
+  {
+    return mFieldName.hashCode();
+  }
+
+
+  //#########################################################################
+  //# Interface java.lang.Comparable
+  public int compareTo(final Object partner)
+  {
+    final FieldGlue field = (FieldGlue) partner;
+    return mFieldName.compareTo(field.mFieldName);
+  }
+
+
+  //#########################################################################
+  //# Simple Access
+  TypeGlue getType()
+  {
+    return mType;
+  }
+
+  String getFieldName()
+  {
+    return mFieldName;
+  }
+
+  Class getJavaType()
+  {
+    return mType.getJavaClass();
+  }
+
+
+  //#########################################################################
+  //# Type Verification
+  void verify(final Class javaclass, final ErrorReporter reporter)
+  {
+    try {
+      final Field field = javaclass.getField(mFieldName);
+      final Class fieldtype = field.getType();
+      final Class gluetype = getJavaType();
+      if (gluetype != null && gluetype != fieldtype) {
+	reporter.reportError
+	  ("Field " + mFieldName + " in class " + javaclass.getName() +
+	   " is not of type " + gluetype.getName() + "!");
+      } else if (field.getModifiers() !=
+		 (Modifier.PUBLIC | Modifier.STATIC | Modifier.FINAL)) {
+	reporter.reportError
+	  ("Field " + mFieldName + " in class " + javaclass.getName() +
+	   " is not static final!");
+      }
+    } catch (final NoSuchFieldException exception) {
+      reporter.reportError
+	("Can't find field " + mFieldName + " in class " +
+	 javaclass.getName() + "!");
+    }
+  }
+
+
+  //#########################################################################
+  //# Calculating Type Signatures
+  void collectSignatures(final Set names, final Map signatures)
+  {
+    if (mTypeSignature != null) {
+      throw new IllegalStateException("Second call to collectSignatures()!");
+    }
+
+    final StringBuffer buffer = new StringBuffer();
+    mType.appendTypeSignature(buffer);
+    final String signame = buffer.toString();
+    final TypeSignature foundsig = (TypeSignature) signatures.get(signame);
+    if (foundsig == null) {
+      mTypeSignature = new TypeSignature(signame);
+      signatures.put(signame, mTypeSignature);
+    } else {
+      mTypeSignature = foundsig;
+    }
+
+    names.add(mFieldName);
+  }
+
+
+  //#########################################################################
+  //# interface net.sourceforge.waters.build.jniglue.WritableGlue
+  public void registerProcessors(final TemplateContext context)
+  {
+    final ProcessorVariable nameproc =
+      new DefaultProcessorVariable(mFieldName);
+    context.registerProcessorVariable("FIELDNAME", nameproc);
+    mType.registerProcessors(context);
+    if (mTypeSignature != null) {
+      mTypeSignature.registerProcessors(context);
+    }
+  }
+
+
+  //#########################################################################
+  //# Data Members
+  private final TypeGlue mType;
+  private final String mFieldName;
+  private TypeSignature mTypeSignature;
+
+}

@@ -1,0 +1,43 @@
+# -*- Makefile -*-
+#############################################################################
+#
+# Makefile for libwaters.so
+#
+#############################################################################
+
+#############################################################################
+# Main Rules
+
+# compile the main file
+
+all::			$(LIB)
+
+test::			$(TESTAPP)
+
+
+$(LIB):			$(OBJ)
+			@mkdir -p $(LIBDIR)
+			$(CXX) -shared -o $@ $^
+
+$(TESTAPP):		$(LIB) $(TESTOBJ)
+			@mkdir -p $(BINDIR)
+			$(CXX) -o $@ -L$(LIBDIR) -l$(PROJECT) $(TESTOBJ)
+
+
+#############################################################################
+# General Rules
+
+$(OBJDIR)/%.o:		$(SRCDIR)/%.cpp
+			@mkdir -p `dirname $@`
+			$(CXX) -c $(CFLAGS) $(INCDIRS) -o $@ $<
+
+
+#############################################################################
+# Dependencies
+
+$(DEP):			$(CPP) $(HPP) Makefile
+			$(CXX) -MM $(INCDIRS) $(CPP) | \
+	sed -e "/:/s|^.*: *$(SRCDIR)/\(.*\)/[^/]*\.cpp|$(OBJDIR)/\1/\0|" > $@
+
+-include $(DEP)
+
