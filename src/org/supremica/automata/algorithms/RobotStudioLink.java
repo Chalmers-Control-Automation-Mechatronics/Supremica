@@ -53,9 +53,8 @@ package org.supremica.automata.algorithms;
   java -classpath .;c:\programs\supremica\build;c:\programs\supremica\lib/unjared RobotStudioLink
 */
 
-// Domenico
 import org.supremica.external.robotCoordinationABB.CreateXml;
-// Domenico
+
 
 import org.supremica.external.comInterfaces.robotstudio_2_1.RobotStudio.*;
 import org.supremica.external.comInterfaces.robotstudio_2_1.RobotStudio.enum.RsKinematicRole;
@@ -95,10 +94,6 @@ public class RobotStudioLink
 	private static String stationName;
 	/** The Supremica gui. */
 	private static Gui gui;
-
-	// Domenico
-	private static int nbrOfTimesCollision = 0;
-	// Domenico
 
 	// Constants
 	/** The name of the IPart containing the mutex zones. */
@@ -355,9 +350,6 @@ End Sub
 				SimulationListener simulationListener = new SimulationListener();
 				sim.addDSimulationEventsListener(simulationListener);
 				// Start a thread running the simulation in RobotStudio
-				// Domenico
-				nbrOfTimesCollision = 1;
-				// Domenico
 				simulation.start();
 
 				// Wait for the simulation to stop
@@ -405,7 +397,7 @@ End Sub
 	}
 
 
-	//D: so far the following method is never used
+	//So far the following method is never used
 	public static void NEWextractAutomata()
 	{
 		try
@@ -692,7 +684,9 @@ End Sub
 			}
 
 			// Create automata for each entity in the IPart called mutexPartName
-			createMutexAutomata();    // domenico
+
+			createMutexAutomata();
+
 		}
 		catch (Exception ex)
 		{
@@ -728,16 +722,16 @@ End Sub
 				activeStation = app.getActiveStation();
 				activeStation.getParts().item(var(mutexPartName));
 
-				// Domenico
+				/* Domenico
 				try
 				{
-				CreateXml.createXmlStation(activeStation);
+					CreateXml.createXmlStation(activeStation);
 				}
 				catch (Exception u)
 				{
-					logger.error("Error with xmlst");
+					logger.error("Error building the xml file for the coordinated station");
 				}
-				// Domenico
+				// Domenico*/
 			}
 			catch (ComJniException ex)
 			{
@@ -796,7 +790,9 @@ End Sub
 			*/
 
 			// Create automata for each entity in the IPart called mutexPartName
-			createMutexAutomata();                                     //Domenico
+
+			createMutexAutomata();
+
 		}
 		catch (Exception ex)
 		{
@@ -860,6 +856,7 @@ End Sub
 		newBox.setVisible(true);
 	}
 
+
 	/**
 	 * Generates a 3D object (IEntity) representing the span of robot.
 	 */
@@ -884,6 +881,7 @@ End Sub
 		controller.shutDown();
 		Thread.sleep(2500);
 		logger.info("Controller shut down");
+
 	}
 
 
@@ -1034,6 +1032,7 @@ End Sub
 		// Wait for controller start
 		//mechanismListener.waitForControllerStart();
 		//D H: Is there a bug in RS2.1? the event afterControllerStarted doesn´t seem firing
+		Thread.sleep(2500);
 
 		mech.remove_MechanismEventsListener(mechanismListener);
 
@@ -1479,11 +1478,7 @@ End Sub
 				{
 					data.setStartTime(controller.getMotionTime());
 					logger.info("Start of collision with " + objectName + " at time " + (float) data.startTime);
-					//createTargetAtTCP(controller.getMechanism().getName() + "Enter" + objectName);
-
-					// Domenico
-					createTargetAtTCP("In" + /*objectName + */ "_" + nbrOfTimesCollision);
-					// Domenico
+					createTargetAtTCP(controller.getMechanism().getName() + "Enter" + objectName);
 
 				}
 				data.setCount(data.getCount()+1);
@@ -1515,12 +1510,7 @@ End Sub
 				{
 					data.setEndTime(controller.getMotionTime());
 					logger.info("End of collision with " + objectName + " at time " + (float) data.endTime);
-					//createTargetAtTCP(controller.getMechanism().getName() + "Exit" + objectName);
-
-					// Domenico
-					createTargetAtTCP("Out" + /*objectName + */ "_" + nbrOfTimesCollision);
-					nbrOfTimesCollision++;
-					// Domenico
+					createTargetAtTCP(controller.getMechanism().getName() + "Exit" + objectName);
 				}
 			}
 			catch (Exception whatever)
@@ -1740,7 +1730,7 @@ End Sub
 				}
 
 				// Make sure the simulation is really over before we return
-				Thread.sleep(1500);
+				Thread.sleep(2500);
 			}
 			catch (Exception ex)
 			{
@@ -1765,7 +1755,7 @@ End Sub
 		private static double cylinderRadius = 0.06; // [m]
 		private static double stepSize = boxSize*3/4; // [m]
 		// The margin that should be added to the approximations
-		private static double margin = 0.01; // [m]
+		private static double margin = 0.10; // [m]
 
 		private Transform oldTransform;
 
@@ -1873,17 +1863,29 @@ End Sub
 			IPart upperArm = robot.getLinks().item(var("Link4")).getParts().item(var(1));
 			activeStation.setUCS(upperArm);
 			ITransform cylinderTransform = ruu.wCSToUCS(upperArm.getTransform());
-			cylinderTransform.setZ(cylinderTransform.getZ()+1.195);
-			cylinderTransform.setRy(cylinderTransform.getRy()+Math.PI/2);
+			cylinderTransform.setZ(cylinderTransform.getZ()+1.195-margin);
+			cylinderTransform.setRy(cylinderTransform.getRy()+Math.PI/2-margin);
 			cylinderTransform = ruu.uCSToWCS(cylinderTransform);
 
 			// Create cylinder around the arm
-			spanPart.createSolidCylinder(cylinderTransform,cylinderRadius,cylinderLength);
+			spanPart.createSolidCylinder(cylinderTransform,cylinderRadius+margin,cylinderLength+2*margin);
 
 			// Create box around the tooltip
 			spanPart.createSolidBox(boxTransform,boxSize+2*margin,boxSize+2*margin,boxSize+2*margin);
 		}
 	}
+
+	// used by CreateXml
+	public static void configureCreateXml()
+	{
+		if (app == null || activeStation == null)
+		{
+			logger.error("No connection to RobotStudio.");
+			return;
+		}
+		CreateXml.configureStation(activeStation);
+	}
+
 }
 
 

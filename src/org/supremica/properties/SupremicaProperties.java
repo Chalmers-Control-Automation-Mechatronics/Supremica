@@ -87,6 +87,8 @@ public final class SupremicaProperties
 	//private static final String GENERAL_INCLUDE_ANIMATIONS = "generalIncludeAnimations";
 	private static final String GENERAL_USE_RCP = "generalUseRcp";
 	private static final String GENERAL_USE_ROBOTCOORDINATION = "generalUseRobotCoordination";
+	private static final String GENERAL_USE_ROBOTCOORDINATION_ABB = "generalUseRobotCoordinationABB";
+
 
 
 	// Logging options
@@ -157,6 +159,9 @@ public final class SupremicaProperties
 	private static final String SHOW_GENETIC_ALGORITHMS = "showGeneticAlgorithms";
 	private static final String SHOW_ROBOTSTUDIO_LINK = "showRobotstudioLink";
 
+	// Coordination ABB
+	private static final String SHOW_COORDINATION_ABB = "showCoordinationABB";
+
 	// ActiveXBridge
 	private static final String USE_ACTIVEX_BRIDGE = "useActiveXBridge";
 
@@ -198,6 +203,7 @@ public final class SupremicaProperties
 		setProperty(GENERAL_USE_RCP, "false", true);
 		setProperty(GENERAL_USE_RCP, "false", true);
 		setProperty(GENERAL_USE_ROBOTCOORDINATION, "false", true);
+		setProperty(GENERAL_USE_ROBOTCOORDINATION_ABB, "true", true);
 		setProperty(INCLUDE_EDITOR, "false", true);
 		setProperty(INCLUDE_SHOE_FACTORY, "false", true);
 		setProperty(INCLUDE_BOUNDED_UNCON_TOOLS, "false", true);
@@ -229,6 +235,7 @@ public final class SupremicaProperties
 		setProperty(SHOW_GENETIC_ALGORITHMS, "true", false);
 		setProperty(SHOW_ROBOTSTUDIO_LINK, "true", false);
 		setProperty(USE_ACTIVEX_BRIDGE, "true", false);
+		setProperty(SHOW_COORDINATION_ABB, "true", false);
 
 		softplcInterfaces.add(new org.supremica.gui.SoftplcInterface("org.supremica.softplc.Simulator.BTSim"));
 
@@ -368,6 +375,16 @@ public final class SupremicaProperties
 	public static void setGeneralUseRobotCoordination(boolean allow)
 	{
 		wp.setProperty(GENERAL_USE_ROBOTCOORDINATION, toString(allow));
+	}
+
+	public static boolean generalUseRobotCoordinationABB()
+	{
+		return toBoolean(wp.getProperty(GENERAL_USE_ROBOTCOORDINATION_ABB));
+	}
+
+	public static void setGeneralUseRobotCoordinationABB(boolean allow)
+	{
+		wp.setProperty(GENERAL_USE_ROBOTCOORDINATION_ABB, toString(allow));
 	}
 
 	public static boolean fileAllowImport()
@@ -901,6 +918,11 @@ public final class SupremicaProperties
 	public static boolean useActiveXBridge()
 	{
 		return toBoolean(wp.getProperty(USE_ACTIVEX_BRIDGE));
+	}
+
+	public static boolean showCoordinationABB()
+	{
+		return toBoolean(wp.getProperty(SHOW_COORDINATION_ABB));
 	}
 
 	private static String toString(boolean b)

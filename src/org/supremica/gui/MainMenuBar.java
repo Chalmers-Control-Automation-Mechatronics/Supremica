@@ -336,8 +336,11 @@ public class MainMenuBar
 						ActionMan.fileImportRobotCoordination(ActionMan.getGui());
 					}
 				});
+			}
 
-				// Domenico
+			if (SupremicaProperties.generalUseRobotCoordinationABB())
+			{
+				// File.Import.RobotCoordinationABB
 				JMenuItem menuFileImportRobotCoordinationABB = new JMenuItem();
 
 				menuFileImportRobotCoordinationABB.setText("From Robot Coordinator ABB...");
@@ -349,8 +352,6 @@ public class MainMenuBar
 						ActionMan.fileImportRobotCoordinationABB(ActionMan.getGui());
 					}
 				});
-				// Domenico
-
 			}
 
 			separatorNeeded = true;
@@ -1038,6 +1039,85 @@ public class MainMenuBar
 					}
 				});
 		}
+
+		// Tools.CoordinationABB
+		if(SupremicaProperties.showCoordinationABB())
+		{
+			menuTools.add(new JSeparator());
+
+			JMenu menuCoordinationABB = new JMenu();
+			menuCoordinationABB.setText("CoordinationABB");
+			menuTools.add(menuCoordinationABB);
+
+			// OpenRobotStudioStation
+			JMenuItem stationOpen = new JMenuItem();
+			stationOpen.setText("Open Robot Studio Station...");
+			menuCoordinationABB.add(stationOpen);
+			stationOpen.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						ActionMan.robotStudioOpenStation(ActionMan.getGui());
+					}
+				});
+
+			// CreatePaths
+			JMenuItem createPaths = new JMenuItem();
+			createPaths.setText("Create paths in Robot Studio");
+			menuCoordinationABB.add(createPaths);
+			createPaths.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						ActionMan.createPathsInRS(ActionMan.getGui());
+					}
+				});
+			// CreateSpans
+			JMenuItem createSpans = new JMenuItem();
+			createSpans.setText("Simulations to create Spans");
+			menuCoordinationABB.add(createSpans);
+			createSpans.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					ActionMan.createSpansInRS(ActionMan.getGui());
+				}
+			});
+			// CreateMutexZones
+			JMenuItem createMutexZones = new JMenuItem();
+			createMutexZones.setText("Intersect Spans -> Mutex Zones");
+			menuCoordinationABB.add(createMutexZones);
+			createMutexZones.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					ActionMan.createMutexZonesInRS(ActionMan.getGui());
+				}
+			});
+			// AddViaPoints
+			JMenuItem addViaPoints = new JMenuItem();
+			addViaPoints.setText("Simulations to add via-points");
+			menuCoordinationABB.add(addViaPoints);
+			addViaPoints.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					ActionMan.addViaPointsInRS(ActionMan.getGui());
+				}
+			});
+			// BuildXmlFile
+			JMenuItem buildXmlFile = new JMenuItem();
+			buildXmlFile.setText("Build xml file");
+			menuCoordinationABB.add(buildXmlFile);
+			buildXmlFile.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					ActionMan.buildXmlFile(ActionMan.getGui());
+				}
+			});
+		}
+
 
 		// Tools.Evolution
 		if (SupremicaProperties.showGeneticAlgorithms())

@@ -72,6 +72,7 @@ import org.supremica.gui.recipeEditor.RecipeEditor;
 import org.supremica.gui.cellEditor.CellEditor;
 import org.supremica.gui.simulator.SimulatorExecuter;
 import org.supremica.external.robotCoordination.AutomataBuilder;
+import org.supremica.external.robotCoordinationABB.*;
 import org.supremica.external.shoefactory.plantBuilder.*;
 import org.supremica.external.shoefactory.Animator.*;
 import org.supremica.external.shoefactory.Configurator.*;
@@ -84,7 +85,7 @@ import org.supremica.automata.algorithms.RobotStudioLink;
 import org.supremica.gui.useractions.*;
 import org.supremica.gui.texteditor.TextFrame;
 
-import org.supremica.external.robotCoordinationABB.*;
+
 
 // -- MF -- Abstract class to save on duplicate code
 // -- From this class is instantiated anonymous classes that implement the openFile properly
@@ -1949,7 +1950,7 @@ public class ActionMan
 		};
 	}
 
-    // Domenico
+    // File.Import.FromRobotCoordinationABB (format representing RobotStudio station)
     public static void fileImportRobotCoordinationABB(Gui gui)
 		{
 			new FileImporter(FileDialogs.getXMLFileImporter(), gui)    // anonymous class
@@ -1960,7 +1961,6 @@ public class ActionMan
 				}
 			};
 	}
-    // Domenico
 
 	// Aldebaran format, a simple format for specifying des
 	public static void fileImportAut(Gui gui)
@@ -2248,7 +2248,7 @@ public class ActionMan
 		}
 	}
 
-	// Domenico
+	// File.Import.FromRobotCoordinationABB
 	public static void importRobotCoordinationFileABB(Gui gui, File file)
 		{
 
@@ -2266,7 +2266,6 @@ public class ActionMan
 				return;
 			}
 	}
-	// Domenico
 
 	// Automata.AlphabetNormalize action performed
 	public static void normalizeAlphabet_actionPerformed(Gui gui)
@@ -2584,6 +2583,64 @@ public class ActionMan
 	public static void robotStudioTest(Gui gui)
 	{
 		RobotStudioLink.test(gui);
+	}
+
+	// Coordination of robots in Robot Studio
+	public static void createPathsInRS(Gui gui)
+	{
+		Thread thread = new Thread(new Runnable()
+		{
+			public void run()
+			{
+				RobotStudioLink.configureCreateXml();
+				CreateXml.createPathsInRS();
+			}
+		});
+		thread.start();
+	}
+
+	public static void createSpansInRS(Gui gui)
+	{
+		Thread thread = new Thread(new Runnable()
+		{
+			public void run()
+			{
+				RobotStudioLink.configureCreateXml();
+				CreateXml.createSpansInRS();
+			}
+		});
+		thread.start();
+	}
+
+	public static void createMutexZonesInRS(Gui gui)
+	{
+		Thread thread = new Thread(new Runnable()
+		{
+			public void run()
+			{
+				RobotStudioLink.configureCreateXml();
+				CreateXml.createMutexZonesInRS();
+			}
+		});
+		thread.start();
+	}
+
+	public static void addViaPointsInRS(Gui gui)
+	{
+		Thread thread = new Thread(new Runnable()
+		{
+			public void run()
+			{
+				RobotStudioLink.configureCreateXml();
+				CreateXml.addViaPointsInRS();
+			}
+		});
+		thread.start();
+	}
+
+	public static void buildXmlFile(Gui gui)
+	{
+		CreateXml.buildXmlFile();
 	}
 
 	// TestCases... - open the test cases dialog, and add the result to the current set of automata	public static void testCases(Gui gui)
@@ -3364,7 +3421,7 @@ public class ActionMan
 				// Is this Automaton's type AutomatonType.Undefined?
 				if(currAutomaton.getType() == AutomatonType.Undefined)
 				{
-					String message = "The automaton " + currAutomaton.getName() + 
+					String message = "The automaton " + currAutomaton.getName() +
 						" is of 'Undefined' type.\n" +
 						"Skip this automaton or Cancel the whole operation?";
 					Object[] options = { "Skip", "Cancel" };
@@ -3396,7 +3453,7 @@ public class ActionMan
 				size = "two automata";
 			else
 				size = minSize + " automata";
-			JOptionPane.showMessageDialog(gui.getFrame(), "At least " + 
+			JOptionPane.showMessageDialog(gui.getFrame(), "At least " +
 										  size + " must be selected!",
 										  "Alert", JOptionPane.ERROR_MESSAGE);
 			// This is inSaNe!
