@@ -65,7 +65,7 @@ public class ProjectToSP
 	private boolean includeLayout = true;
 	private boolean includeExecution = true;
 	private final static int majorFileVersion = 0;
-	private final static int minorFileVersion = 9;
+	private final static int minorFileVersion = 10;
 
 	public ProjectToSP(Project project)
 	{
@@ -214,7 +214,7 @@ public class ProjectToSP
 			pw.println("\t</Transitions>");
 
 			// Print layout
-			if (includeLayout)
+			if (includeLayout && aut.hasLayout())
 			{
 				pw.println("\t<Layout>");
 

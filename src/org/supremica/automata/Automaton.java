@@ -66,6 +66,8 @@ public class Automaton
 	private AutomatonType type = AutomatonType.Undefined;
 	private int uniqueStateIndex = 0;
 	private boolean hasLayout = false;
+	private int width = -1;
+	private int height = -1;
 	private AutomatonListeners listeners = null;
 
 	public Automaton()
@@ -471,6 +473,44 @@ public class Automaton
 	public void setHasLayout(boolean hasLayout)
 	{
 		this.hasLayout = hasLayout;
+	}
+
+	public int getWidth()
+	{
+		return width;
+	}
+
+	public void setWidth(int width)
+	{
+		this.width = width;
+	}
+
+
+	public int getHeight()
+	{
+		return height;
+	}
+
+	public void setHeight(int height)
+	{
+		this.height = height;
+	}
+
+	public boolean validLayout()
+	{
+		if (width < 0 || height < 0)
+		{
+			return false;
+		}
+		for (Iterator stateIt = stateIterator(); stateIt.hasNext(); )
+		{
+			State currState = (State)stateIt.next();
+			if (!currState.validLayout())
+			{
+				return false;
+			}
+		}
+		return true;
 	}
 
 	public long checksum()

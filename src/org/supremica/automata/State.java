@@ -261,6 +261,15 @@ public class State
 		return y;
 	}
 
+	public boolean validLayout()
+	{
+		if (x < 0 || y < 0)
+		{
+			return false;
+		}
+		return true;
+	}
+
 	public Point getLocation()
 	{
 		return new Point(x, y);
