@@ -498,7 +498,7 @@ class EventListModel
 		boolean terminateFont = false;
 		if (nextStateAssociated(currArc))
 		{
-			responseString.append("<html><font color=RED>");
+			responseString.append("<html><font color=BLUE>");
 			terminateFont = true;
 		}
 
@@ -692,7 +692,7 @@ class ExplorerController
 		JButton findButton = new JButton(findImg);
 		findButton.setToolTipText("Search for a state");
 		JButton routeButton = new JButton(routeImg);
-		routeButton.setToolTipText("Find shortest path from the initial state to this state and mark the corresponding events in red.");
+		routeButton.setToolTipText("Find shortest path from the initial state to this state and mark the corresponding events in blue.");
 
 		redoBox.add(Box.createHorizontalGlue());
 		redoBox.add(Box.createHorizontalGlue());
