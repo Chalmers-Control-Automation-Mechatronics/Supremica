@@ -217,18 +217,17 @@ public class AutomataVerificationWorker
 		}
 
 		// Are further preparations needed?
+		// This can't be done earlier, since the helper must be initialized!
 	    if (verificationOptions.getVerificationType() == VerificationType.LanguageInclusion)
 		{
 			// Treat the unselected automata as plants (and the rest as supervisors, implicitly)
 			automataVerifier.prepareForLanguageInclusion(workbench.getUnselectedAutomata());
 		}
 
-		// Solve the problem!
-		// startDate = new Date();
+		// Solve the problem (and measure the time to)!
 		ActionTimer timer = new ActionTimer();
 		timer.start();
 		verificationSuccess = automataVerifier.verify();
-		// endDate = new Date();
 		timer.stop();
 
 		// Present the result

@@ -245,9 +245,9 @@ public class AutomataVerifier
 					return modularControllabilityVerification();
 				}
 				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.BDD)
-				    {
+			    {
 					return BDDControllabilityVerification();
-				    }
+			    }
 				else
 				{
 					throw new UnsupportedOperationException("The selected algorithm is not implemented");
@@ -261,9 +261,9 @@ public class AutomataVerifier
 					return monolithicNonblockingVerification();
 				}
 				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.BDD)
-				    {
+			    {
 					return BDDNonBlockingVerification();
-				    }
+			    }
 				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
 				{
 					// This algorithm is under implementation!!
@@ -1264,13 +1264,12 @@ public class AutomataVerifier
     private boolean BDDLanguageInclusionVerification()
 	throws Exception
     {
-	Automata unselected = ActionMan.getGui().getUnselectedAutomata();
-	AutomataBDDVerifier abf = new AutomataBDDVerifier(theAutomata, unselected, synchHelper.getHelperData() );
-	boolean ret = abf.passLanguageInclusion();
-
-	abf.cleanup();
-	return ret;
-
+		Automata unselected = ActionMan.getGui().getUnselectedAutomata();
+		AutomataBDDVerifier abf = new AutomataBDDVerifier(theAutomata, unselected, synchHelper.getHelperData() );
+		boolean ret = abf.passLanguageInclusion();
+		
+		abf.cleanup();
+		return ret;		
     }
 
 	/**
@@ -1609,6 +1608,7 @@ public class AutomataVerifier
 	}
 	*/
 
+	/*
 	/**
 	 * THIS DOES NOT WORK! IT'S JUST A TEST! Examines non-blocking modularily
 	 * by examining pairwise non-blocking between all automata.
@@ -1617,7 +1617,7 @@ public class AutomataVerifier
 	 *@return True if non-blocking, false if blocking
 	 *@exception  Exception Description of the Exception
 	 *@see  AutomataSynchronizerExecuter
-	 */
+	 *
 	private boolean pairwiseNonblockingVerification()
 		throws Exception
 	{
@@ -1668,7 +1668,7 @@ public class AutomataVerifier
 	 *
 	 * @param AutomatonA The first automata in the pair.
 	 * @param AutomatonB The second automata in the pair.
-	 */
+	 *
 	private boolean automatonPairIsNonblocking(Automaton AutomatonA, Automaton AutomatonB)
 		throws Exception
 	{
@@ -1701,7 +1701,7 @@ public class AutomataVerifier
 	 * @param selectedAutomata The Automata to be synchronized, ArrayList of Automaton objects
 	 * @return The automaton that constitutes the synchronization of the automata
 	 * represented by selectedAutomata.
-	 */
+	 *
 	private Automaton synchronizeAutomata(ArrayList selectedAutomata)
 		throws Exception
 	{
@@ -1764,7 +1764,6 @@ public class AutomataVerifier
 			currExec.selectAllAutomata();
 			currExec.start();
 		}
-
 		((AutomataSynchronizerExecuter) synchronizationExecuters.get(0)).join();
 		AutomataSynchronizerExecuter currExec = (AutomataSynchronizerExecuter) synchronizationExecuters.get(0);
 
@@ -1789,6 +1788,7 @@ public class AutomataVerifier
 
 		return AutomataSynk;
 	}
+	*/
 
 	/**
 	 * Examines non-blocking monolithically, by examining all reachable states.
