@@ -1,5 +1,8 @@
 package org.supremica.util.BDD;
 
+
+import java.util.*;
+
 /**
  * Disjunctive transition relation
  * NO CLUSTRING exists yet, so these algorithms may be SLOWER than the
@@ -353,4 +356,114 @@ public class ConjSupervisor
 			gf.stopTimer();
 		}
 	}
+
+	// -------------------------------------------------------------------
+/**
+	 * get POSSIBLE counterexamples for a language containment test.
+	 * this is equal to Thetha_uc(considred_events)(P,Sp) or Q_uc(considred_events)(P,Sp)
+	 * if remove_events is true.
+	 *
+	 *
+	 * <p>Note1: this is hardcoded to full-sync (like many others)
+	 *
+	 *
+	 * <p>Note2: if the returned BDD does not match with that of Supervisor.possibleLanguageContainmentCounterexample()
+	 * it has to do with the dont-cares. This operators usually returns significantly smaller BDDs [implicit care-set optimization ??]
+	 *
+	 *
+	 * @see Supervisor.possibleLanguageContainmentCounterexample
+	 */
+	protected int possibleLanguageContainmentCounterexample(int considred_events, boolean remove_events)
+	{
+
+		int ret = manager.ref( manager.getZero() ); // answer bdd
+
+		// why waste time???
+		if(considred_events == manager.getZero()  || plant.isEmpty() || spec.isEmpty() )
+		{
+			if(Options.debug_on)
+			{
+				Options.out.println("Bypassing ConjSupervisor.possibleLanguageContainmentCounterexample()");
+			}
+
+			return ret;
+		}
+
+
+
+
+
+		Event [] events = manager.getEvents();
+		int cube = manager.and( manager.getStatepCube(), manager.getEventCube());
+
+		for(int i = 0; i < events.length; i++)
+		{
+
+			// see if the event is something that we care about:
+			int tmp = manager.and( events[i].bdd, considred_events);
+			boolean do_care =  (tmp != manager.getZero());
+			manager.deref(tmp);
+
+			if(do_care)
+			{
+
+				// what plans/specs are affected by this event?
+				Collection plant_care = plant.getUsers(events[i]);
+				Collection spec_care = spec.getUsers(events[i]);
+				if(! plant_care.isEmpty() &&  !spec_care.isEmpty())
+				{
+
+					// get (E.q', sigma : \delta_conj(q,sigma)=q')
+					int q_uc_plant = manager.ref (manager.getOne() );
+					for(Iterator it = plant_care.iterator(); it.hasNext(); )
+					{
+						BDDAutomaton aut = (BDDAutomaton ) it.next();
+						tmp = manager.relProd(aut.getT(), events[i].bdd, cube);
+						q_uc_plant = manager.andTo(q_uc_plant, tmp);
+						manager.deref(tmp);
+					}
+
+					// dito for spec
+					int q_uc_spec = manager.ref (manager.getOne() );
+					for(Iterator it = spec_care.iterator(); it.hasNext(); )
+					{
+						BDDAutomaton aut = (BDDAutomaton ) it.next();
+						tmp = manager.relProd(aut.getT(), events[i].bdd, cube);
+						q_uc_spec = manager.andTo(q_uc_spec, tmp);
+						manager.deref(tmp);
+					}
+
+
+					int not_q_uc_spec = manager.not(q_uc_spec);
+					manager.deref(q_uc_spec);
+
+
+					tmp = manager.and(not_q_uc_spec, q_uc_plant);
+					manager.deref(not_q_uc_spec);
+					manager.deref(q_uc_plant);
+
+
+					// put back the removed events
+					if(!remove_events)
+					{
+						tmp = manager.andTo(tmp,  events[i].bdd);
+					}
+
+					// save it:
+					ret = manager.orTo(ret, tmp);
+					manager.deref(tmp);
+
+				}
+			}
+		}
+
+
+
+		SizeWatch.setOwner("ConjSupervisor.possibleLanguageContainmentCounterexample");
+		SizeWatch.report(ret, "(language diff)");
+
+		manager.deref(cube);
+		return ret;
+	}
+
 }

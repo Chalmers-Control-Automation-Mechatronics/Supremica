@@ -240,7 +240,7 @@ public class Supervisor
 
 		int sigma_u = manager.and(plant.getSigmaU(), spec.getSigmaU());    // WAS manager.getSigmaU();
 
-		bdd_uncontrollables = computeLanguageDifference(sigma_u, true);
+		bdd_uncontrollables = possibleLanguageContainmentCounterexample(sigma_u, true);
 		has_uncontrollables = true;
 
 		SizeWatch.setOwner("Supervisor.computeUncontrollables");
@@ -251,19 +251,18 @@ public class Supervisor
 	}
 
 	/**
-	 * compute language difference of plant and spec considreing only the given events.
-	 * returns a BDD as a counter example. retunrs < states> if remove_events is trues
-	 * otherwise returns <states, events> instead...
-	 *
+	 * get POSSIBLE counterexamples for a language containment test.
+	 * this is equal to Thetha_uc(considred_events)(P,Sp) or Q_uc(considred_events)(P,Sp)
+	 * if remove_events is true.
 	 */
-	protected int computeLanguageDifference(int considred_events, boolean remove_events)
+	protected int possibleLanguageContainmentCounterexample(int considred_events, boolean remove_events)
 	{
 		int t_sp = spec.getT();
 		int t_p = plant.getT();
 		int cubep_sp = spec.getCubep();
 		int cubep_p = plant.getCubep();
 
-		SizeWatch.setOwner("Supervisor.computeLanguageDifference");
+		SizeWatch.setOwner("Supervisor.possibleLanguageContainmentCounterexample");
 		SizeWatch.report(t_sp, "Tsp");
 		SizeWatch.report(t_p, "Tp");
 
@@ -293,8 +292,6 @@ public class Supervisor
 			tmp4 = manager.relProd(t_p, tmp2, cubep_p);
 		}
 
-		// DEBUG:
-		// manager.printSet(tmp4);
 		manager.deref(tmp2);
 		SizeWatch.report(tmp4, "(Language diff)");
 
@@ -310,7 +307,7 @@ public class Supervisor
 	{
 		timer.reset();
 
-		int ret = computeLanguageDifference(plant.getSigma(), true);
+		int ret = possibleLanguageContainmentCounterexample(plant.getSigma(), true);
 
 		timer.report("Uncontrollable states found");
 
@@ -352,7 +349,7 @@ public class Supervisor
 	 */
 	public int computeReachableLanguageDifference(int event_care)
 	{
-		int ld = computeLanguageDifference(event_care, false);
+		int ld = possibleLanguageContainmentCounterexample(event_care, false);
 
 		if (ld == manager.getZero())
 		{
@@ -745,7 +742,10 @@ public class Supervisor
 		return ret;
 	}
 
-	// -----------------------------------------------------------------------
+
+	// -- [ trace functions ] ---------------------------------------------------------------------
+
+
 	public void trace_set(String what, int bdd, int max)
 	{
 		if (bdd == manager.getZero())
@@ -933,9 +933,120 @@ public class Supervisor
 		return false;    // to not found
 	}
 
-	// --------------------------------------------------------------
-	// TODO: se the note on getBR2()
-	public int getBR1(int marked, int forbidden)
+
+
+
+
+
+	// ---- [ SAFE STATE SUPERVISOR SYNTHESIS ] --------------------------------------------------------------------
+
+	public int getSafeStates(boolean nb, boolean c)
+	{
+		if (nb && c)
+		{
+			return getSafeStatesNBC();
+		}
+
+		if (nb)
+		{
+			return getSafeStatesNB();
+		}
+
+		if (c)
+		{
+			return getSafeStatesC();
+		}
+
+		return manager.ref(manager.getOne());    // what the hell are we doing??
+	}
+
+	/** return Q[supNB] */
+	public int getSafeStatesNB()
+	{
+		/*
+		// XXX: what the hell was this??
+		int forbidden = manager.ref(manager.getZero());
+		int marked = GroupHelper.getM(manager, spec, plant);
+		int ret = restrictedBackward(marked, forbidden);
+
+		manager.deref(marked);
+		manager.deref(forbidden);
+
+		return ret;
+		*/
+		return getCoReachables();
+	}
+
+	/** return Q[supC] */
+
+	public int getSafeStatesC()
+	{
+
+		// XXX:
+		// this is really wiered, must be re-written. isnt it cheaper to just skip the reachability
+		// i.e. return backward_u( possibly-uncontrollables) instead??
+
+		// note: dont try getUncontrollableStates(), we would need to compute reachables to get the border anyway :(
+		return getReachableUncontrollables();
+	}
+
+	/** return Q[supNBC] */
+	public int getSafeStatesNBC()
+	{
+
+		// note: dont use timer here (get reseted by getReachable)
+		GrowFrame gf = BDDGrow.getGrowFrame(manager, "Safe states: nodeCount(X)");
+		int xp, x = getUncontrollableStates();
+		int marked = GroupHelper.getM(manager, spec, plant);
+
+		manager.ref(x);
+
+		do
+		{
+			xp = x;
+
+			int qp_k = restrictedBackward(marked, x);
+			int not_qp_k = manager.not(qp_k);
+			manager.deref(qp_k);
+
+			int qpp_k = uncontrollableBackward(not_qp_k);
+			x = manager.orTo(x, qpp_k);
+			manager.deref(qpp_k);
+
+			if (gf != null)
+			{
+				gf.add(x);
+			}
+		}
+		while (x != xp);
+
+		manager.deref(marked);
+
+		int not_x = manager.not(x);
+		manager.deref(x);
+
+
+
+		if (gf != null)
+		{
+			gf.stopTimer();
+		}
+
+		return not_x;
+	}
+
+
+
+
+	// -----[ synthesis helper functions ]--------------------------------------------------------
+	/**
+	 * restricted backward search:
+	 * go back from <tt>marked</tt> without ever visiting a <tt>fobidden</tt> state.
+	 *
+	 * used in safe-state supervisor synthesis
+	 */
+
+	public int restrictedBackward(int marked, int forbidden)
 	{
 
 		// note: dont use timer here (get reseted in getSafeStates)
@@ -944,6 +1055,7 @@ public class Supervisor
 		// again, we remove events as soon as possible
 		int t_all = manager.relProd(plant.getT(), spec.getT(), e_cube);
 		int r_all_p, r_all = manager.replace(marked, perm_s2sp);
+
 
 		do
 		{
@@ -954,7 +1066,6 @@ public class Supervisor
 			tmp = manager.andTo(tmp, good);    // remove bad stuffs
 
 			int tmp2 = manager.replace(tmp, perm_s2sp);
-
 			manager.deref(tmp);
 
 			r_all = manager.orTo(r_all, tmp2);
@@ -973,43 +1084,54 @@ public class Supervisor
 		return ret;
 	}
 
+
 	// -------------------------------------------------------------------------
-	// TODO: did we really get rid of events here??
-	public int getBR2(int forbidden)
+	/**
+	 * uncontrollable backward:
+	 *
+	 * go backwards from the <tt>forbidden</tt> states using only uncontrollable transitions.
+	 *
+	 *
+	 * used in the safe-state supervisor synthesis algorithm.
+	 */
+
+	public int uncontrollableBackward(int forbidden)
 	{
 
-		// note: dont use timer here (get reseted in getSafeStates)
-		int t_all = manager.and(plant.getTu(), spec.getTu());
-		int i_all = manager.and(plant.getI(), spec.getI());
-		int cube = manager.and(sp_cube, e_cube);
+		int delta_all = manager.and(plant.getT(), spec.getT()); // t-top ??
+		int t_u = manager.relProd(delta_all, manager.getSigmaU(), e_cube);
+		manager.deref(delta_all);
+
+
 		int r_all_p, r_all = manager.replace(forbidden, perm_s2sp);
+		int front = manager.ref(r_all); // see (1)
 
 		do
 		{
 			r_all_p = r_all;
 
-			int tmp = manager.relProd(t_all, r_all, cube);
+			int tmp = manager.relProd(t_u, front, sp_cube);
 			int tmp2 = manager.replace(tmp, perm_s2sp);
 
 			manager.deref(tmp);
+			manager.deref(front);
 
 			r_all = manager.orTo(r_all, tmp2);
+			front = fso.choose(r_all, tmp2);    // Takes care of tmp2!
+		} while (r_all_p != r_all);
 
-			manager.deref(tmp2);
-		}
-		while (r_all_p != r_all);
+		manager.deref(front); // (1) deref the work copy of front
+		manager.deref(t_u);
 
-		manager.deref(t_all);
-		manager.deref(cube);
 
 		int ret = manager.replace(r_all, perm_sp2s);
-
 		manager.deref(r_all);
-
 		return ret;
 	}
 
-	// --------------------------------------------------------------------------------
+
+	// --[ safe state=> automata coinversion, EVRY INEFFICIENT. DO NOT USE] ---------------------------------------------------
+
 	// this is used to generate the supervisor??
 	public int getUnsafeTransitions(int safe_states)
 	{
@@ -1086,102 +1208,9 @@ public class Supervisor
 		return results;
 	}
 
-	// --------------------------------------------------------------------------------
-	public int getSafeStates(boolean nb, boolean c)
-	{
-		if (nb && c)
-		{
-			return getSafeStatesNBC();
-		}
 
-		if (nb)
-		{
-			return getSafeStatesNB();
-		}
 
-		if (c)
-		{
-			return getSafeStatesC();
-		}
-
-		return manager.ref(manager.getOne());    // what the hell are we doing??
-	}
-
-	/** return Q[supNB] */
-	public int getSafeStatesNB()
-	{
-		int forbidden = manager.ref(manager.getZero());
-		int marked = GroupHelper.getM(manager, spec, plant);
-		int ret = getBR1(marked, forbidden);
-
-		manager.deref(marked);
-		manager.deref(forbidden);
-
-		return ret;
-	}
-
-	/** return Q[supC] */
-	public int getSafeStatesC()
-	{
-
-		// XXX: dont try getUncontrollableStates(), we would need to conpute reachables to get the border anyway :(
-		return getReachableUncontrollables();
-	}
-
-	/** return Q[supNBC] */
-	public int getSafeStatesNBC()
-	{
-
-		// note: dont use timer here (get reseted by getReachable)
-		GrowFrame gf = BDDGrow.getGrowFrame(manager, "Safe states: nodeCount(X)");
-		int xp, x = getReachableUncontrollables();
-		int marked = GroupHelper.getM(manager, spec, plant);
-
-		manager.ref(x);
-
-		do
-		{
-			xp = x;
-
-			int qp_k = getBR1(marked, x);
-			int not_qp_k = manager.not(qp_k);
-
-			manager.deref(qp_k);
-
-			int qpp_k = getBR2(not_qp_k);
-
-			x = manager.orTo(x, qpp_k);
-
-			manager.deref(qpp_k);
-
-			if (gf != null)
-			{
-				gf.add(x);
-			}
-		}
-		while (x != xp);
-
-		manager.deref(marked);
-
-		int not_x = manager.not(x);
-
-		manager.deref(x);
-
-		// return not_x;
-		// note: the only reason we get the reachable portion of it is to count it correctly!
-		int not_x_reachable = manager.and(not_x, getReachables());
-
-		manager.deref(not_x);
-
-		if (gf != null)
-		{
-			gf.stopTimer();
-		}
-
-		return not_x_reachable;
-	}
-
-	// ---------------------------------------------------------------------------------
+	// -------[ old deadlock test code, DO NOT USE ] ----------------------------------------------------------------
 	public int getDeadlocks()
 	{
 		timer.reset();

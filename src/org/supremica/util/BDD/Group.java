@@ -1,5 +1,8 @@
 package org.supremica.util.BDD;
 
+
+import java.util.*;
+
 // NEW CUDD: FIXED
 public class Group
 {
@@ -166,7 +169,10 @@ public class Group
 		}
 	}
 
-	/** ---------------------------------------------------------------- */
+	/* ---------------------------------------------------------------- */
+	/**
+	 * Is this automaton a member of this group?
+	 */
 	public boolean isMember(BDDAutomaton a)
 	{
 		for (int i = 0; i < size; i++)
@@ -180,11 +186,14 @@ public class Group
 		return false;
 	}
 
+
+	/** is this group empty ? */
 	public boolean isEmpty()
 	{
 		return size == 0;
 	}
 
+	/** number of automaton in this group */
 	public int getSize()
 	{
 		return size;
@@ -242,6 +251,26 @@ public class Group
 		}
 
 		return ret;
+	}
+
+	/**
+	 * return the set of automata that use this event in their alphabet
+	 *
+	 */
+	public Collection getUsers(Event e)
+	{
+		LinkedList ret = new LinkedList();
+
+		for (int i = 0; i < size; i++)
+		{
+			if(members[i].eventUsed(e))
+			{
+				ret.add(members[i]);
+			}
+		}
+
+		return ret;
+
 	}
 
 	// --------------------------------------------------------------------------

@@ -1,5 +1,6 @@
 package org.supremica.util.BDD;
 
+
 public class DisjSupervisor
 	extends ConjSupervisor
 {
@@ -210,4 +211,5 @@ public class DisjSupervisor
 
 		// SizeWatch.report(bdd_coreachables,"Coreachables");
 	}
+
 }
