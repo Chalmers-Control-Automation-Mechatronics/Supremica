@@ -31,6 +31,7 @@ class StateComparator
 public class StateSet
 {
 	private TreeSet theSet = null;
+	private State singleStateRepresentation = null;
 
 	// Private constructor for cloning
 	private StateSet(TreeSet setimpl)
@@ -90,27 +91,32 @@ public class StateSet
 	// Make me the union of myself and s2
 	public void union(StateSet s2)
 	{
+		modified();
 		theSet.addAll(s2.theSet);
 	}
 
 	// Make me the intersection of myself and s2
 	public void intersect(StateSet s2)
 	{
+		modified();
 		theSet.retainAll(s2.theSet);
 	}
 
 	public boolean add(State state)
 	{
+		modified();
 		return theSet.add(state);
 	}
 
 	public boolean add(Collection collection)
 	{
+		modified();
 		return theSet.addAll(collection);
 	}
 
 	public void clear()
 	{
+		modified();
 		theSet.clear();
 	}
 
@@ -154,6 +160,7 @@ public class StateSet
 
 	public boolean remove(State state)
 	{
+		modified();
 		return theSet.remove(state);
 	}
 
@@ -227,7 +234,7 @@ public class StateSet
 	}
 
 	/**
-	 *      @return an arbitrary, not yet iterated element. Note, assumes that at least one exists
+	 * @return an arbitrary, not yet iterated element. Note, assumes that at least one exists
 	 */
 	public State get()
 	{
@@ -235,11 +242,26 @@ public class StateSet
 	}
 
 	/**
-	 *      Creates a new state named as the composition of the states in this set
-	 *  Should use the globally defined state separator (and thus, this method
-	 *      should not even be here)
+	 * Returns a single state representation of this StateSet. Either by constructing a new one
+	 * or by returning a previously constructed one.
 	 */
-	public State createNewState()
+	public State getSingleStateRepresentation()
+	{
+		if (singleStateRepresentation == null)
+		{
+			singleStateRepresentation = createSingleStateRepresentation();
+		}
+		return singleStateRepresentation;
+	}
+
+	/**
+	 * Creates a new state named as the composition of the states in this set
+	 * Should use the globally defined state separator 
+	 *
+	 * The "initial" attribute should be set in the automaton that this state 
+	 * should be long to, not here!
+	 */
+	public State createSingleStateRepresentation()
 	{
 		// boolean i = false;   // initial?
 		boolean d = false;    // desired?
@@ -251,31 +273,24 @@ public class StateSet
 		{
 			State state = (State) stateit.next();
 
+			// Add to new name
 			buf.append(state.getName());
- 			buf.append(SupremicaProperties.getStateSeparator());
+			if (stateit.hasNext())
+			{
+				buf.append(SupremicaProperties.getStateSeparator());
+			}
 
 			// i |= state.isInitial();
 			d |= state.isAccepting();
 			x |= state.isForbidden();
 		}
 
-		// Truncate last separator
-		buf.setLength(buf.length() - SupremicaProperties.getStateSeparator().length());    
-
-		// logger.info("StateSet::createNewState -- " + buf.toString());
+		// Create new state
 		State newstate = new State(buf.toString());
-
 		// if(i) newstate.setInitial(true);
-		if (d)
-		{
-			newstate.setAccepting(true);
-		}
-
-		if (x)
-		{
-			newstate.setForbidden(true);
-		}
-
+		if (d) newstate.setAccepting(true);
+		if (x) newstate.setForbidden(true);
+		
 		return newstate;
 	}
 
@@ -292,5 +307,67 @@ public class StateSet
 
 			currState.setStateSet(this);
 		}
+	}
+
+	// Returns true if at least one state in this equivalence class is marked as 'initial'
+	public boolean hasInitialState()
+	{
+		Iterator stateIt = iterator();
+
+		while (stateIt.hasNext())
+		{
+			State currState = (State) stateIt.next();
+
+			if (currState.isInitial())
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	// Returns true if at least one state in this equivalence class is marked as 'accepting'
+	public boolean hasAcceptingState()
+	{
+		Iterator stateIt = iterator();
+
+		while (stateIt.hasNext())
+		{
+			State currState = (State) stateIt.next();
+
+			if (currState.isAccepting())
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	// Returns true if at least one state in this equivalence class is marked as 'forbidden'
+	public boolean hasForbiddenState()
+	{
+		Iterator stateIt = iterator();
+
+		while (stateIt.hasNext())
+		{
+			State currState = (State) stateIt.next();
+
+			if (currState.isForbidden())
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * When this StateSet is modified, it will have a new singleStateRepresentation.
+	 */
+	private void modified()
+	{
+		singleStateRepresentation = null;
 	}
 }

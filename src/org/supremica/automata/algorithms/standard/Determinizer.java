@@ -135,7 +135,7 @@ public class Determinizer
 		add(initset);  
 
 		// Create initial state
-		State init = initset.createNewState();
+		State init = initset.getSingleStateRepresentation();
 		newAutomaton.addState(init);
 		newAutomaton.setInitialState(init);
 
@@ -143,7 +143,7 @@ public class Determinizer
 		while (!openStateSets.isEmpty())
 		{
 			StateSet Q1 = openStateSets.get();    // This is vanNoords T
-			State T = newAutomaton.addStateChecked(Q1.createNewState());
+			State T = newAutomaton.addStateChecked(Q1.getSingleStateRepresentation());
 
 			// for each event not to be disregarded, calc the closure, create the arc
 			/* Alphabet */
@@ -186,7 +186,7 @@ public class Determinizer
 
 						add(Q2c);
 
-						State U = newAutomaton.addStateChecked(Q2c.createNewState());
+						State U = newAutomaton.addStateChecked(Q2c.getSingleStateRepresentation());
 
 						newAutomaton.addArc(new Arc(T, U, e));
 					}

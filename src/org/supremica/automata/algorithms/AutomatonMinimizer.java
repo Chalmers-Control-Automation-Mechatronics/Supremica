@@ -58,6 +58,7 @@ import org.supremica.gui.ActionMan;
 import java.awt.Toolkit;
 
 // Factory object for generating the correct class according to prefs
+/*
 class EqClassFactory
 {
 	static EquivalenceClass getEqClass()
@@ -70,6 +71,7 @@ class EqClassFactory
 		return new EqClass(eqc);
 	}
 }
+*/
 
 public class AutomatonMinimizer
 	implements Stoppable
@@ -268,9 +270,9 @@ public class AutomatonMinimizer
 		EquivalenceClasses equivClasses = new EquivalenceClasses();
 
 		// Divide the state space into three initial equivalence classes, based on markings
-		EquivalenceClass acceptingStates = EqClassFactory.getEqClass();
-		EquivalenceClass forbiddenStates = EqClassFactory.getEqClass();
-		EquivalenceClass rejectingStates = EqClassFactory.getEqClass();
+		EquivalenceClass acceptingStates = new EquivalenceClass(); //EqClassFactory.getEqClass();
+		EquivalenceClass forbiddenStates = new EquivalenceClass(); //EqClassFactory.getEqClass();
+		EquivalenceClass rejectingStates = new EquivalenceClass(); //EqClassFactory.getEqClass();
 
 		// Examine each state for which class it fits into
 		StateIterator stateIt = aut.stateIterator();
@@ -333,7 +335,13 @@ public class AutomatonMinimizer
 		while (equivClassIt.hasNext())
 		{
 			EquivalenceClass currEquivClass = (EquivalenceClass) equivClassIt.next();
-			State currState = currEquivClass.getState(newAutomaton);
+			//State currState = currEquivClass.getState(newAutomaton);
+			State currState = currEquivClass.getSingleStateRepresentation();
+			newAutomaton.addState(currState);
+			if (currEquivClass.hasInitialState())
+			{
+				newAutomaton.setInitialState(currState);
+			}
 		}
 
 		// Build all transitions
@@ -346,7 +354,8 @@ public class AutomatonMinimizer
 			}
 
 			EquivalenceClass currEquivClass = (EquivalenceClass) equivClassIt.next();
-			State fromState = currEquivClass.getState(newAutomaton);
+			//State fromState = currEquivClass.getState(newAutomaton);
+			State fromState = currEquivClass.getSingleStateRepresentation();
 			Iterator outgoingArcsIt = currEquivClass.outgoingArcsIterator();
 
 			while (outgoingArcsIt.hasNext())
@@ -356,7 +365,8 @@ public class AutomatonMinimizer
 				LabeledEvent currEvent = currArc.getEvent();
 				State oldToState = currArc.getToState();
 				EquivalenceClass nextEquivalenceClass = (EquivalenceClass) oldToState.getStateSet();
-				State toState = nextEquivalenceClass.getState(newAutomaton);
+				//State toState = nextEquivalenceClass.getState(newAutomaton);
+				State toState = nextEquivalenceClass.getSingleStateRepresentation();
 
 				Arc newArc = new Arc(fromState, toState, currEvent);
 
@@ -379,7 +389,7 @@ public class AutomatonMinimizer
 
 	/**
 	 * Splits the equivalence classes with respect to language equivalence, based
-	 * on this, an automaton with a minimal number of state can be generated from
+	 * on this, an automaton with a minimal number of states can be generated from
 	 * the equivalence classes!
 	 */
 	private void doLanguageEquivalenceMinimization(EquivalenceClasses equivClasses)
@@ -390,12 +400,12 @@ public class AutomatonMinimizer
 		{
 			refined = false;
 
+			// Split all current equivClasses
 			Iterator classIt = equivClasses.safeIterator();
-
 			while (classIt.hasNext())
 			{
 				EquivalenceClass currClass = (EquivalenceClass) classIt.next();
-
+				
 				refined = doLanguageEquivalenceMinimization(equivClasses, currClass) || refined;
 			}
 		}
@@ -1132,150 +1142,19 @@ class EquivalenceClasses
 	*/
 }
 
-// at the moment, this is only for being able to use get/setStateClaa
-// will StateSet do most of the job correctly?
-
-// I've extended StateSet with most of these methods, but I didn't have the guts for and neither did I feel
-// for changing the above to use StateSet (and StateSets) instead...  /hguo
 class EquivalenceClass
 	extends StateSet
 {
-	// private LinkedList states = new LinkedList();
-	protected State newState = null;
-	private EquivalenceClass nextClass = null;
-
-	public EquivalenceClass() {}
-
-	public EquivalenceClass(EquivalenceClass nextClass)
+	public EquivalenceClass() 
 	{
-		this.nextClass = nextClass;
-	}
-
-	public EquivalenceClass getNextClass()
-	{
-		return nextClass;
-	}
-
-	public void update()
-	{
-		Iterator stateIt = /* states. */ iterator();
-
-		while (stateIt.hasNext())
-		{
-			State currState = (State) stateIt.next();
-
-			currState.setStateSet(this);    // setEquivalenceClass(this);
-		}
-	}
-
-/*      public boolean add(State state)
-		{
-				return states.add(state);
-		}
-
-		public boolean remove(State state)
-		{
-				return states.remove(state);
-		}
-
-		public boolean addAll(Collection c)
-		{
-				return states.addAll(c);
-		}
-
-		public Iterator iterator()
-		{
-				return states.iterator();
-		}
-*/
-
-	// Returns true if one state in this equivalence class is marked as 'initial'
-	public boolean isInitial()
-	{
-		Iterator stateIt = /* states. */ iterator();
-
-		while (stateIt.hasNext())
-		{
-			State currState = (State) stateIt.next();
-
-			if (currState.isInitial())
-			{
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	// With regard to accepting, all states have the same designation
-	// Thus, we need only check the first state
-	public boolean isAccepting()
-	{
-		State currState = get();    // (State) states.getFirst();
-
-		if (currState.isAccepting())
-		{
-			return true;
-		}
-
-		return false;
-	}
-
-	// With regard to forbidden, all states have the same designation
-	// Thus, we need only check the first state
-	public boolean isForbidden()
-	{
-		State currState = get();    // (State) states.getFirst();
-
-		if (currState.isForbidden())
-		{
-			return true;
-		}
-
-		return false;
 	}
 
 	/**
-	 * Set the state that corresponds to this equivalence class.
-	 * This is used while building the minimized automaton.
-	 *
-	 *@param  state The new state value
-	 */
-	private void setState(State state)
-	{
-		newState = state;
-	}
-
-	public State getState(Automaton theAutomaton)
-	{
-		if (newState == null)
-		{
-			createNewState(theAutomaton, "q");
-		}
-
-		return newState;
-	}
-
-	// Creates and adds a uniquely named state
-	protected void createNewState(Automaton theAutomaton, String prefix)
-	{
-		newState = theAutomaton.createAndAddUniqueState(prefix);
-
-		if (isInitial())
-		{
-			theAutomaton.setInitialState(newState);
-		}
-
-		if (isForbidden())
-		{
-			newState.setForbidden(true);
-		}
-		else if (isAccepting())
-		{
-			newState.setAccepting(true);
-		}
-	}
-
+	 * Note that this method only returns an iterator to SOME of the outgoing arc
+	 * frm the underlying StateSet. This is OK, though, since all states in the
+	 * equivalence class should have the same outgoing transitions, otherwise 
+	 * they are not equivalent! (Maybe that should be examined to be safe...)
+	 */ 
 	public Iterator outgoingArcsIterator()
 	{
 		State currState = get();    // (State) states.getFirst();
@@ -1287,72 +1166,75 @@ class EquivalenceClass
 	/**
 	 * Split the equivalence class according to what can be reached on this event
 	 * Return all new equivalence classes in the holder
-	 * If the holder contains only one entry, all reached states have the same eq class(?)
-	 */
+	 * If the holder contains only one entry, all reached states have the same eq class (at this point)
+	 */	
 	public EquivalenceClassHolder split(LabeledEvent e)
 	{
-		// System.err.println("Splitting " + e.getLabel());
-		EquivalenceClassHolder newEquivalenceClassHolder = new EquivalenceClassHolder();
-
-		// Build a list of equivalance classes that e transfers to from each of the states in this eq-class
-		// Note, for each state there is only one successor state for this event (determinism)
-		Iterator stateIt = iterator();
-
-		while (stateIt.hasNext())
+		boolean oldversion = true;
+		if (oldversion)
 		{
-			State currState = (State) stateIt.next();
-			State nextState = currState.nextState(e);
-			EquivalenceClass nextEquivalenceClass = null;
-
-			if (nextState != null)
+			// System.err.println("Splitting " + e.getLabel());
+			EquivalenceClassHolder newEquivalenceClassHolder = new EquivalenceClassHolder();
+			
+			// Build a list of equivalance classes that e transfers to from each of the states in this eq-class
+			// Note, for each state there is only one successor state for this event (determinism) 
+			Iterator stateIt = iterator();
+			while (stateIt.hasNext())
 			{
-				nextEquivalenceClass = (EquivalenceClass) nextState.getStateSet();    // getEquivalenceClass();
-			}
-
-			newEquivalenceClassHolder.addState(currState, nextEquivalenceClass);
-		}
-
-		return newEquivalenceClassHolder;
-	}
-
-/*
-		public void clear()
-		{
-				states.clear();
-		}
-
-		public int size()
-		{
-				return states.size();
-		}
-
-		public String toString()
-		{
-				StringBuffer sb = new StringBuffer();
-
-				sb.append("[");
-
-				Iterator stateIt = states.iterator();
-
-				while (stateIt.hasNext())
+				State currState = (State) stateIt.next();
+				State nextState = currState.nextState(e);
+				EquivalenceClass nextEquivalenceClass = null;
+				if (nextState != null)
 				{
-						State currState = (State) stateIt.next();
-
-						sb.append(" " + currState.getId());
+					nextEquivalenceClass = (EquivalenceClass) nextState.getStateSet();    // getEquivalenceClass();
 				}
-
-				sb.append("]");
-
-				return sb.toString();
-		}*/
+				newEquivalenceClassHolder.addState(currState, nextEquivalenceClass);
+			}
+			
+			return newEquivalenceClassHolder;
+		}
+		else
+		{
+			// System.err.println("Splitting " + e.getLabel());
+			EquivalenceClassHolder newEquivalenceClassHolder = new EquivalenceClassHolder();
+			
+			// Build a list of equivalence classes that e transfers to from each of the states in this eq-class
+			// Note, for each state there is only one successor state for this event (determinism) 
+			// NOOOOOOOOOOOOOOOOO! NOT DETERMINISTIC!!
+			Iterator stateIt = iterator();
+			while (stateIt.hasNext())
+			{
+				State currState = (State) stateIt.next();
+				StateSet nextStates = currState.nextStateSet(e);
+				if (nextStates.size() == 0)
+				{
+					/*
+					  EquivalenceClass nextEquivalenceClass = (EquivalenceClass) nextState.getStateSet();
+					  newEquivalenceClassHolder.addState(currState, nextEquivalenceClass);
+					*/
+					newEquivalenceClassHolder.addState(currState, null);
+				}
+				System.err.println("nextStates " + nextStates.size());
+				for (StateIterator nextIt = nextStates.iterator(); nextIt.hasNext(); )
+				{
+					State nextState = nextIt.nextState();
+					EquivalenceClass nextEquivalenceClass = (EquivalenceClass) nextState.getStateSet(); 
+					newEquivalenceClassHolder.addState(currState, nextEquivalenceClass);
+				}
+			}
+			
+			return newEquivalenceClassHolder;
+		}
+	}
 }
 
 /**
  * Fabians play-around version of EquivalencClass
- * This class generates itself the state that it corresponds to
+ * This class itself generates the state that it corresponds to
  * It sets the state-name as the concatenation of the original state names
  * This has the effect that it keeps the same name for singleton equivalence classes
  */
+/*
 class EqClass
 	extends EquivalenceClass
 {
@@ -1386,19 +1268,11 @@ class EqClass
 
 		return newState;
 	}
-
-	// Add a state to this equivalence class
-	// Should the eq-class also add itself to the state?
-	public boolean add(State state)
-	{
-		// System.out.println("EqClass(" + name +")::addState(" + state.getName() + ")");
-		return super.add(state);
-	}
 }
+*/
 
 /**
  * Temporary help object for storing new equivalence classes.
- *
  *
  *@author  ka
  *@created  November 28, 2001
@@ -1411,7 +1285,7 @@ class EquivalenceClassHolder
 		// If the next equivalence class does not exist create it
 		if (!containsKey(nextClass))
 		{
-			EquivalenceClass newEquivClass = EqClassFactory.getEqClass(nextClass);
+			EquivalenceClass newEquivClass = new EquivalenceClass(); //EqClassFactory.getEqClass(nextClass);
 
 			put(nextClass, newEquivClass);
 		}

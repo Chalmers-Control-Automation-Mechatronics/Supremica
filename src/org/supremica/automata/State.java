@@ -533,6 +533,7 @@ public class State
 	 */
 	public boolean containsOutgoingArc(Arc arc)
 	{
+		// Had to do this ugly iteration since the equals()-method won't work properly
 		for (Iterator arcIt = outgoingArcs.iterator(); arcIt.hasNext(); )
 		{
 			if (arc.equals((Arc) arcIt.next()))
@@ -549,6 +550,7 @@ public class State
 	 */
 	public boolean containsIncomingArc(Arc arc)
 	{
+		// Had to do this ugly iteration since the equals()-method won't work properly
 		for (Iterator arcIt = incomingArcs.iterator(); arcIt.hasNext(); )
 		{
 			if (arc.equals((Arc) arcIt.next()))
@@ -754,14 +756,11 @@ public class State
 	 * Follow the event e and return the next state.
 	 * If e is not active then return null.
 	 *
-	 *@param  e Description of the Parameter
-	 *@return  Description of the Return Value
+	 *@param  event The event
 	 */
 	public State nextState(LabeledEvent event)
 	{
 		Iterator outgoingArcsIt = outgoingArcs.iterator();
-
-		// String eventId = e.getId();
 		while (outgoingArcsIt.hasNext())
 		{
 			Arc currArc = (Arc) outgoingArcsIt.next();
@@ -774,6 +773,26 @@ public class State
 		}
 
 		return null;
+	}
+
+	/**
+	 * Follow the event "event" and return the set of states that may be reached
+	 */
+	public StateSet nextStateSet(LabeledEvent event)
+	{
+		StateSet states = new StateSet();
+
+		Iterator outgoingArcsIt = outgoingArcs.iterator();
+		while (outgoingArcsIt.hasNext())
+		{
+			Arc currArc = (Arc) outgoingArcsIt.next();
+			if (currArc.getEvent().equals(event))
+			{
+				states.add(currArc.getToState());
+			}
+		}
+
+		return states;
 	}
 
 	/**

@@ -79,7 +79,6 @@ public class RobotStudioLink
 //extends Thread
 implements Runnable, DAppEvents
 {
-
 	// Initialize jacoZoom
 	static
 	{
