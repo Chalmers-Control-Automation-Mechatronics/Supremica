@@ -13,8 +13,9 @@ public class GroupHelper {
 
     private int size;
     private int [] tpri, cube, cubep, twave;
-    private Vector all;
     private BDDAutomaton [] sorted_list;
+    private BinaryHeap bh;
+
 
     /**
      * create a ordred automata list from two groups
@@ -23,37 +24,33 @@ public class GroupHelper {
 
     public GroupHelper(Group g1, Group g2) {
 
-		// We actually need a priority vector, but who cares (N is small anyway) :)
-		all = new Vector(g1.getSize() + g2.getSize());
+		bh = new BinaryHeap();
 
 		BDDAutomaton [] tmp = g1.getMembers();
-		for(int i = 0; i < g1.getSize(); i++) all.addElement( tmp[i]);
+		for(int i = 0; i < g1.getSize(); i++) bh.insert( tmp[i]);
 
 		tmp = g2.getMembers();
-		for(int i = 0; i < g2.getSize(); i++) all.addElement( tmp[i]);
-
+		for(int i = 0; i < g2.getSize(); i++) bh.insert( tmp[i]);
 		sort();
     }
 
     public GroupHelper(BDDAutomaton [] a) {
-
-		// We actually need a priority vector, but who cares (N is small anyway) :)
-		all = new Vector(a.length);
-		for(int i = 0; i < a.length; i++) all.addElement( a[i]);
-
+		bh = new BinaryHeap();
+		for(int i = 0; i < a.length; i++) bh.insert( a[i]);
 		sort();
     }
 
     private void sort() {
-		size  = all.size();
+		size  = bh.size();
 		tpri  = new int[size];
 		cube  = new int[size];
 		cubep = new int[size];
 
 		sorted_list = new BDDAutomaton[size];
 
-		for(int i = 0; i < size; i++) {
-			BDDAutomaton a = popLargest();
+
+		for(int i = size -1; i >= 0; i--){ // largest first!
+			BDDAutomaton a = (BDDAutomaton) bh.deleteMin().object();
 			sorted_list[i] = a;
 			tpri[i]  = a.getTpri();
 			cube[i]  = a.getCube();
@@ -100,21 +97,8 @@ public class GroupHelper {
 		}
 		return twave;
     }
+
     // ---------------------------------------------------------------------------
-    // a PriorityQueue, my kingdom for a PriorityQueue...
-    private BDDAutomaton popLargest() {
-		Enumeration e = all.elements();
-		BDDAutomaton s = (BDDAutomaton) e.nextElement();
-
-		while(e.hasMoreElements()) {
-			BDDAutomaton c = (BDDAutomaton) e.nextElement();
-			if(c.getIndex() > s.getIndex())
-			s = c;
-		}
-
-		all.removeElement(s);
-		return s;
-    }
 
 
     /** the code to compute Q_M is moved here.<br>

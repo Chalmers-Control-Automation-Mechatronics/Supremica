@@ -131,6 +131,7 @@ public class WorksetSupervisor extends DisjSupervisor
 		has_reachables = true;
 		bdd_reachables = r_all;
 
+		if(gf != null) gf.stopTimer();
 		SizeWatch.report(bdd_reachables, "Qr");
 		timer.report("Forward reachables found (workset smoothed)");
 	}
@@ -186,6 +187,7 @@ public class WorksetSupervisor extends DisjSupervisor
 		has_coreachables = true;
 		bdd_coreachables = ret;
 
+		if(gf != null) gf.stopTimer();
 		SizeWatch.report(bdd_reachables, "Qr");
 		timer.report("Backward reachables found (workset smoothed)");
 	}

@@ -71,6 +71,7 @@ public class PartitionSmoothSupervisor extends DisjSupervisor {
 		has_reachables = true;
 		bdd_reachables = r_all;
 
+		if(gf != null) gf.stopTimer();
 		SizeWatch.report(bdd_reachables, "Qr");
 		timer.report("Forward reachables found (PartitionSmooth)");
 
@@ -131,9 +132,8 @@ public class PartitionSmoothSupervisor extends DisjSupervisor {
 		has_coreachables = true;
 		bdd_coreachables = ret;
 
+		if(gf != null) gf.stopTimer();
 		SizeWatch.report(bdd_reachables, "Qco");
 		timer.report("Co-reachables found (PartitionSmooth)");
-
-		if(gf != null) gf.stopTimer();
     }
 }

@@ -38,11 +38,17 @@ public class IntArray
 		return size;
 	}
 
+
 	public int get(int index)
 	{
 		return ((index >= 0) && (index < size))
 			   ? array[index]
 			   : 0;
+	}
+
+	public int [] getAll()
+	{
+		return array;
 	}
 
 	public int getMin()
@@ -54,6 +60,12 @@ public class IntArray
 	{
 		return max;
 	}
+
+	public void clear()
+	{
+		size = 0;
+	}
+
 
 	private void resize()
 	{
@@ -68,9 +80,16 @@ public class IntArray
 
 			int[] tmp = new int[capacity];
 
-			for (int i = 0; i < size; i++)
+			if(size > 200)	// native method call is to slow for small values due to call overhead!
 			{
-				tmp[i] = array[i];
+				System.arraycopy(array, 0, tmp, 0, size);
+			}
+			else
+			{
+				for (int i = 0; i < size; i++)
+				{
+					tmp[i] = array[i];
+				}
 			}
 
 			array = tmp;

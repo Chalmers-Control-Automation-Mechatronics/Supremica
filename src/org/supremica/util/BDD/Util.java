@@ -203,4 +203,19 @@ public class Util
 	    exx.printStackTrace();
 	}
     }
+
+    public static String showHugeNumber(double n) {
+		int mul = 0;
+
+		if(n < 1000) return "" + ((int)n);
+
+		while( n > 1000) {
+			n /= 1000;
+			mul ++;
+		}
+
+		// three decimals would do
+		n = ((double)((int)(n * 1000))) / 1000.0;
+		return "" + n + " E+" + (mul * 3);
+	}
 }

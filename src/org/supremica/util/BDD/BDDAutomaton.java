@@ -5,6 +5,7 @@ import java.io.*;
 import java.util.*;
 
 public class BDDAutomaton
+	implements WeightedObject
 {
 	private BDDAutomata manager;
 	private Automaton automaton;
@@ -528,4 +529,9 @@ public class BDDAutomaton
 
 		BDDAssert.internalCheck(manager.checkPackage(), name + ": checkPackage() failed");
 	}
+
+
+	// ---[ WeightedObject stuff ]-----------------------------------------------------
+	public Object object() { return this; }
+	public double weight() { return getIndex(); }
 }

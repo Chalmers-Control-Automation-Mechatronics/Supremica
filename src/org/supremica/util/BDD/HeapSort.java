@@ -27,9 +27,11 @@ public class HeapSort {
 		curr--;
 		for( tmp = array[hole];  2 * hole  < curr; hole = child) {
 			child = 2 * hole + 1;
-			if(child != curr && array[child].less ( array[child + 1] ) )
+			// if(child != curr && array[child].less ( array[child + 1] ) )
+			if(child != curr && array[child].weight() < array[child + 1].weight() )
 				child ++;
-			if(tmp.less( array[child]) )
+			// if(tmp.less( array[child]) )
+			if(tmp.weight() <  array[child].weight() )
 				array[hole] = array[child];
 			else
 				break;
@@ -40,6 +42,7 @@ public class HeapSort {
 
 // --[ testbench ]-----------------------------------------------
 
+/*
 	public static void main(String [] args) {
 		WeightedObject [] x = new WeightedObject[10];
 
@@ -57,4 +60,6 @@ public class HeapSort {
 		}
 	}
 
+
+*/
 }

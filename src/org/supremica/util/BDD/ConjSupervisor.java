@@ -148,6 +148,7 @@ public class ConjSupervisor
 		has_reachables = true;
 		bdd_reachables = r_all;
 
+		if(gf != null) gf.stopTimer();
 		SizeWatch.report(bdd_reachables, "Qr");
 		timer.report("[Conjunctive] forward reachables found");
     }

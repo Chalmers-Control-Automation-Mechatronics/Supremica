@@ -57,6 +57,7 @@ public class KeepSmoothSupervisor extends DisjSupervisor
 		has_reachables = true;
 		bdd_reachables = r_all;
 
+		if(gf != null) gf.stopTimer();
 		SizeWatch.report(bdd_reachables, "Qr");
 		timer.report("Forward reachables found (keep smoothed)");
 	}
@@ -99,9 +100,10 @@ public class KeepSmoothSupervisor extends DisjSupervisor
 		manager.deref(r_all);
 
 
+		if(gf != null) gf.stopTimer();
 		SizeWatch.report(bdd_coreachables, "Qco");
 		timer.report("Co-reachables found (keep smoothed)");
-		if(gf != null) gf.stopTimer();
+
 
     }
 

@@ -60,6 +60,7 @@ public class PathSmoothSupervisor extends DisjSupervisor
 		has_reachables = true;
 		bdd_reachables = r_all;
 
+		if(gf != null) gf.stopTimer();
 		SizeWatch.report(bdd_reachables, "Qr");
 		timer.report("Forward reachables found (path smoothed)");
 	}
@@ -102,9 +103,8 @@ public class PathSmoothSupervisor extends DisjSupervisor
 		// cleanup:
 		psp.cleanup();
 
+		if(gf != null) gf.stopTimer();
 		SizeWatch.report(bdd_coreachables, "Qco");
 		timer.report("Co-reachables found (path smoothed)");
-		if(gf != null) gf.stopTimer();
-
     }
 }

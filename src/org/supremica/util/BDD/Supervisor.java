@@ -294,11 +294,13 @@ public class Supervisor
 		manager.deref(t_all);
 
 
-		SizeWatch.report(r_all, "R");
+
 
 		has_reachables = true;
 		bdd_reachables = r_all;
 
+		SizeWatch.report(r_all, "R");
+		if(gf != null) gf.stopTimer();
 		timer.report("Forward reachables found");
 
 
@@ -440,13 +442,13 @@ public class Supervisor
 		bdd_coreachables = ret;
 
 
-		SizeWatch.report(bdd_coreachables, "Qco");
-		timer.report("Co-reachables found");
-
 		if (gf != null)
 		{
 			gf.stopTimer();
 		}
+		SizeWatch.report(bdd_coreachables, "Qco");
+		timer.report("Co-reachables found");
+
 	}
 
     // ------------------------------------------------------------------------
@@ -520,7 +522,6 @@ public class Supervisor
 	}
 	while (r_all_p != r_all);
 
-	timer.report("Forward reachablility with constraint [none found]");
 
 	// clean up
 	manager.deref(i_all);
@@ -530,6 +531,8 @@ public class Supervisor
 	has_reachables = true;
 	bdd_reachables = r_all;
 
+	if(gf != null) gf.stopTimer();
+	timer.report("Forward reachablility with constraint [none found]");
 	SizeWatch.report(bdd_reachables, "Qr");
 
 

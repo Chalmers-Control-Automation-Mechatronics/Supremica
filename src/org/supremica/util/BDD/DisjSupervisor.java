@@ -84,6 +84,7 @@ public class DisjSupervisor extends ConjSupervisor {
 		has_reachables = true;
 		bdd_reachables = r_all;
 
+		if(gf != null) gf.stopTimer();
 		SizeWatch.report(bdd_reachables, "Qr");
 		timer.report("Forward reachables found (disjunctive)");
 		// SizeWatch.report(r_all, "R");

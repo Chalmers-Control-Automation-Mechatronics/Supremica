@@ -74,10 +74,12 @@ public class SmoothWorksetSupervisor extends WorksetSupervisor {
 
 		has_reachables = true;
 		bdd_reachables = r_all;
+
+		if(gf != null) gf.stopTimer();
 		SizeWatch.report(r_all, "Qr");
-		dp.cleanup();
 		timer.report("Forward reachables found (smoothed+workset)");
 		// SizeWatch.report(r_all, "R");
+		dp.cleanup();
     }
     // -------------------------------------------------------------------------------
 
@@ -143,9 +145,9 @@ public class SmoothWorksetSupervisor extends WorksetSupervisor {
 	has_coreachables = true;
 	bdd_coreachables = ret;
 
+	if(gf != null) gf.stopTimer();
 	SizeWatch.report(bdd_coreachables, "Qco");
 	timer.report("Co-reachables found (smoothed+workset)");
-	if(gf != null) gf.stopTimer();
 	dp.cleanup();
 	// SizeWatch.report(bdd_coreachables,"Coreachables");
 
