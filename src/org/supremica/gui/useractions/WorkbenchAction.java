@@ -45,6 +45,11 @@ public class WorkbenchAction
 	public void execute(VisualProject theProject, Automata theAutomata)
 		throws Exception
 	{
+		if (!theAutomata.sanityCheck(ActionMan.getGui(), 1, true, true, true))
+		{
+			return;
+		}
+
 		new Workbench(theProject, theAutomata).show();
 	}
 }

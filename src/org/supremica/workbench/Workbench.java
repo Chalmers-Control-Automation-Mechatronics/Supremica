@@ -661,14 +661,16 @@ public class Workbench
 		this.project = project;
 		this.automata = automata;
 
+		// The sanity check is made earlier (in WorkbenchAction)
+		/*
 		if (automata.sanityCheck(null, 1, true, true, true) == false)
 		{
-
 			// dispose(); // cannot dispose itself! What then?
 			logger.error("Sanity check not passed, see log window");
 
 			throw new SupremicaException("Sanity check not passed, see log window");
 		}
+		*/
 	}
 
 	void close()

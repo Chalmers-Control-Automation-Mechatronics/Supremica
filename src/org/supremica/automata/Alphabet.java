@@ -443,10 +443,9 @@ public class Alphabet
 					sbuf.append(", ");
 				}
 			}
-
-			sbuf.append("}");
 		}
 
+		sbuf.append("}");
 		return sbuf.toString();
 	}
 

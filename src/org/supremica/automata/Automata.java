@@ -707,9 +707,9 @@ public class Automata
 		if (unionAlpha.size() < this.getUnionAlphabet().size())
 		{
 			if (autA.size() > 1)
-				logger.warn("Some of the selected automata share no event with the other selected automata. For example, the automata " + autA + " are disconnected from the rest.");
+				logger.warn("Some of the selected automata share no events with the other selected automata. For example, the automata " + autA + " are disconnected from the rest.");
 			else
-				logger.warn("Some of the selected automata share no event with the other selected automata. For example, the automaton " + autA + " is disconnected from the rest.");
+				logger.warn("Some of the selected automata share no events with the other selected automata. For example, the automaton " + autA.getFirstAutomaton() + " is disconnected from the rest.");
 			return true;
 		}
 
@@ -1202,7 +1202,7 @@ public class Automata
 
 	public String toString()
 	{
-		StringBuffer sbuf = new StringBuffer();
+		StringBuffer sbuf = new StringBuffer("{");
 
 		if (size() > 0)
 		{
@@ -1216,6 +1216,7 @@ public class Automata
 			sbuf.delete(sbuf.length() - 2, sbuf.length());
 		}
 
+		sbuf.append("}");
 		return sbuf.toString();
 	}
 
