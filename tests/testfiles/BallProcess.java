@@ -223,7 +223,7 @@ public class BallProcess {
 			timerThread.start();
 		}
 		public boolean hasTimedOut() {
-			return !timerThread.isAlive();
+			return timerThread == null || !timerThread.isAlive();
 		}
 	}
 

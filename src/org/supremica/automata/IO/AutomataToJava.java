@@ -195,7 +195,7 @@ public class AutomataToJava
 		pw.println("\t\t\ttimerThread.start();");
 		pw.println("\t\t}");
 		pw.println("\t\tpublic boolean hasTimedOut() {");
-		pw.println("\t\t\treturn !timerThread.isAlive();");
+		pw.println("\t\t\treturn timerThread == null || !timerThread.isAlive();");
 		pw.println("\t\t}");
 		pw.println("\t}");
 	}
