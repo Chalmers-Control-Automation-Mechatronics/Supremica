@@ -96,7 +96,7 @@ public class ProjectBuildFromWaters
 		}
 		catch (Exception ex)
 		{
-			logger.error("Exception - Failed to compile: " + ex.getMessage());
+			logger.error("Exception - Failed to compile: " + ex.getMessage(), ex);
 		}
 
 		if (des == null)

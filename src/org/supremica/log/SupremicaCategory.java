@@ -51,6 +51,8 @@ package org.supremica.log;
 
 import org.apache.log4j.*;
 import org.supremica.properties.SupremicaProperties;
+import java.io.StringWriter;
+import java.io.PrintWriter;
 
 public final class SupremicaCategory
 	implements Logger
@@ -91,7 +93,7 @@ public final class SupremicaCategory
 	public void error(Object message, Throwable t)
 	{
 		category.error(message + "\n" + t.toString());
-		category.debug(t.getStackTrace());
+		category.debug(getStackTraceAsString(t));
 	}
 
 	public void error(Throwable t)
@@ -200,4 +202,14 @@ public final class SupremicaCategory
 			}
 		}
 	}
+
+	private String getStackTraceAsString(Throwable t)
+	{
+		StringWriter stringWriter = new StringWriter();
+		PrintWriter printWriter = new PrintWriter(stringWriter);
+		t.printStackTrace(printWriter);
+		StringBuffer error = stringWriter.getBuffer();
+		return error.toString();
+	}
+
 }

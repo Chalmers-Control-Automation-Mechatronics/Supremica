@@ -82,13 +82,13 @@ class MainPanel
 			if (newComponent == null)
 			{
 //				emptyRightPanel.setPreferredScrollableViewportSize(oldSize);
-				emptyRightPanel.setPreferredSize(oldSize);
+//				emptyRightPanel.setPreferredSize(oldSize);
 				splitPanelHorizontal.setRightComponent(emptyRightPanel);
 			}
 			else
 			{
 //				newComponent.setPreferredScrollableViewportSize(oldSize);
-				newComponent.setPreferredSize(oldSize);
+//				newComponent.setPreferredSize(oldSize);
 				splitPanelHorizontal.setRightComponent(newComponent);
 			}
 		}

@@ -26,7 +26,7 @@ public class IDEDimensions
 	public static Dimension rightAnalyzerPreferredSize = new Dimension(600, 650);
 	public static Dimension rightAnalyzerMinimumSize = new Dimension(50, 50);
 
-	public static Dimension rightEmptyPreferredSize = new Dimension(600, 650);
+	public static Dimension rightEmptyPreferredSize = new Dimension(400, 650);
 	public static Dimension rightEmptyMinimumSize = new Dimension(50, 50);
 
 	private IDEDimensions()

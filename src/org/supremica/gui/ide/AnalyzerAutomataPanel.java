@@ -50,6 +50,7 @@ class AnalyzerAutomataPanel
 		setPreferredSize(IDEDimensions.leftAnalyzerPreferredSize);
 		setMinimumSize(IDEDimensions.leftAnalyzerMinimumSize);
 		initialize();
+		validate();
 	}
 
 	public String getName()
