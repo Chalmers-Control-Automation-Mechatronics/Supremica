@@ -1334,13 +1334,35 @@ public abstract class ProgramAndFBBuilder
 		{
 			TypeConstant t = ((IECConstant) arg).getType();
 
-			if (t == TypeConstant.T_DINT)
+			if (t == TypeConstant.T_BOOL)
 			{
-				ilRun.append(new PUSH(constPoolGen, ((TypeDINT) arg).getValue()));
+			        ilRun.append(new PUSH(constPoolGen, ((TypeBOOL) arg).getValue()));
 				ilRun.append(InstructionConstants.ISUB);
 
-				// preperation for comparison by
-				// subtracting values on the stack
+				InstructionHandle if_true;
+				BranchInstruction ifeq = new IFEQ(null);
+
+				ilRun.append(ifeq);    // if condition is true, jump to if_true
+				ilRun.append(new PUSH(constPoolGen, false));
+
+				InstructionHandle end;
+				BranchInstruction jmp = new GOTO(null);
+
+				ilRun.append(jmp);    // always jump to end
+
+				if_true = ilRun.append(new PUSH(constPoolGen, true));
+				end = ilRun.append(InstructionConstants.NOP);
+
+				ifeq.setTarget(if_true);
+				jmp.setTarget(end);
+			}
+
+			else if (t == TypeConstant.T_DINT)
+			{
+				// preperation for comparison by subtracting values on the stack
+			        ilRun.append(new PUSH(constPoolGen, ((TypeDINT) arg).getValue()));
+				ilRun.append(InstructionConstants.ISUB);
+
 				InstructionHandle if_true;
 				BranchInstruction ifeq = new IFEQ(null);
 
@@ -1731,7 +1753,30 @@ public abstract class ProgramAndFBBuilder
 		{
 			TypeConstant t = ((IECConstant) arg).getType();
 
-			if (t == TypeConstant.T_DINT)
+			if (t == TypeConstant.T_BOOL)
+			{
+			        ilRun.append(new PUSH(constPoolGen, ((TypeBOOL) arg).getValue()));
+				ilRun.append(InstructionConstants.ISUB);
+
+				InstructionHandle if_true;
+				BranchInstruction ifne = new IFNE(null);
+
+				ilRun.append(ifne);    // if condition is true, jump to if_true
+				ilRun.append(new PUSH(constPoolGen, false));
+
+				InstructionHandle end;
+				BranchInstruction jmp = new GOTO(null);
+
+				ilRun.append(jmp);    // always jump to end
+
+				if_true = ilRun.append(new PUSH(constPoolGen, true));
+				end = ilRun.append(InstructionConstants.NOP);
+
+				ifne.setTarget(if_true);
+				jmp.setTarget(end);
+			}
+			
+			else if (t == TypeConstant.T_DINT)
 			{
 				ilRun.append(new PUSH(constPoolGen, ((TypeDINT) arg).getValue()));
 				ilRun.append(InstructionConstants.ISUB);    // preperation for comparison by
