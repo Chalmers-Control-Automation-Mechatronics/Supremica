@@ -73,7 +73,14 @@ public final class StateBlock
 
 	public int add(int[] theState)
 	{
+//		System.err.println("add: " + size + " " + compressedStateLength);
+
+		if (size >= nbrOfStates)
+		{
+			return -1;
+		}
 		int[] compressedState = compressor.compress(theState);
+
 		System.arraycopy(compressedState, 0, theArray, size * compressedStateLength, compressedStateLength);
 		return size++;
 	}
@@ -88,6 +95,29 @@ public final class StateBlock
 	public int size()
 	{
 		return size;
+	}
+
+	public static int[] createCopy(int[] theState)
+	{
+		int[] copy = new int[theState.length];
+		System.arraycopy(theState, 0, copy, 0, theState.length);
+		return copy;
+	}
+
+	public String toString()
+	{
+		StringBuffer sb = new StringBuffer();
+		sb.append("[");
+		for (int i = 0; i < theArray.length; i++)
+		{
+			sb.append(theArray[i]);
+			if (i < theArray.length-1)
+			{
+				sb.append(" ");
+			}
+		}
+		sb.append("]");
+		return sb.toString();
 	}
 
 }

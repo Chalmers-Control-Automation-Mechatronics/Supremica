@@ -53,11 +53,11 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import org.supremica.testhelpers.*;
 
-public class TestStateCompressor
+public class TestStateBlock
 	extends TestCase
 {
 
-	public TestStateCompressor(String name)
+	public TestStateBlock(String name)
 	{
 		super(name);
 	}
@@ -84,20 +84,105 @@ public class TestStateCompressor
 	 */
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite(TestStateCompressor.class);
+		TestSuite suite = new TestSuite(TestStateBlock.class);
 		return suite;
 	}
 
 
-	public void testDefaultStateCompressor()
+	public void testStateBlock()
 	{
-		DefaultStateCompressor compressor = new DefaultStateCompressor(2);
-		assertTrue(compressor.getDecompressedStateLength() == 2);
-		assertTrue(compressor.getCompressedStateLength() == 2);
-		int[] testState = {0, 1};
-		assertTrue(compressor.compress(testState) == testState);
-		assertTrue(compressor.decompress(testState) == testState);
+		int stateLength = 2;
+		int nbrOfStates = 4;
+		StateCompressor compressor = new DefaultStateCompressor(stateLength);
+		StateBlock block = new StateBlock(compressor, nbrOfStates);
+		int[] currState = new int[stateLength];
+		int[] pos0State = new int[stateLength];
+		int[] pos1State = new int[stateLength];
+		int[] posLastState = new int[stateLength];
 
+		for (int i = 0; i < nbrOfStates; i++)
+		{
+			//System.err.println("Building state: " + i);
+			for (int j = 0; j < stateLength; j++)
+			{
+				currState[j] = i+j;
+			}
+			if (i == 0)
+			{
+				System.arraycopy(currState, 0, pos0State, 0, pos0State.length);
+			}
+			else if (i == 1)
+			{
+				System.arraycopy(currState, 0, pos1State, 0, pos1State.length);
+			}
+			else if (i == nbrOfStates - 1)
+			{
+				System.arraycopy(currState, 0, posLastState, 0, posLastState.length);
+			}
+			assertTrue(block.add(currState) == i);
+
+			//System.err.println(block.toString());
+		}
+		assertTrue(block.add(currState) == -1);
+
+		int[] pos0StateCopy = new int[stateLength];
+		int[] pos1StateCopy = new int[stateLength];
+		int[] posLastStateCopy = new int[stateLength];
+
+//		System.err.println("0: ");
+//		print(pos0State);
+
+		block.get(0, pos0StateCopy);
+
+//		print(pos0StateCopy);
+//		System.err.println(isEqual(pos0State, pos0StateCopy));
+		assertTrue(isEqual(pos0State, pos0StateCopy));
+
+//		System.err.println("1:");
+
+		block.get(1, pos1StateCopy);
+		assertTrue(isEqual(pos1State, pos1StateCopy));
+
+
+//		System.err.println("Last:");
+
+		block.get(nbrOfStates - 1, posLastStateCopy);
+		assertTrue(isEqual(posLastState, posLastStateCopy));
+	}
+
+	boolean isEqual(int[] first, int[] second)
+	{
+		if (first == null || second == null)
+		{
+			return false;
+		}
+		if (first.length != second.length)
+		{
+			return false;
+		}
+		for (int i = 0; i < first.length; i++)
+		{
+			if (first[i] != second[i])
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	void print(int[] first)
+	{
+		if (first == null)
+		{
+			System.err.println("null");
+		}
+
+		System.err.print("[");
+		for (int i = 0; i < first.length; i++)
+		{
+			System.err.print(first[i] + " ");
+		}
+		System.err.print("]");
 	}
 
 }

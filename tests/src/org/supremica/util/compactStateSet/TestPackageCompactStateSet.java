@@ -71,6 +71,7 @@ public class TestPackageCompactStateSet
 	{
 		TestSuite suite = new TestSuite();
 		suite.addTest(TestStateCompressor.suite());
+		suite.addTest(TestStateBlock.suite());
 		suite.addTest(TestStateBlocks.suite());
 		suite.addTest(TestCompactStateSet.suite());
 		return suite;

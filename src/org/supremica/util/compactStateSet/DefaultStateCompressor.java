@@ -57,10 +57,10 @@ public class DefaultStateCompressor
 	private int compressedStateLength;
 	private int decompressedStateLength;
 
-	public DefaultStateCompressor(int decompressedStateLength, int compressedStateLength)
+	public DefaultStateCompressor(int stateLength)
 	{
-		this.compressedStateLength = compressedStateLength;
-		this.decompressedStateLength = decompressedStateLength;
+		this.compressedStateLength = stateLength;
+		this.decompressedStateLength = stateLength;
 	}
 
 	public int[] compress(int[] source)
