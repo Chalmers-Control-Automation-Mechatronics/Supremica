@@ -50,6 +50,7 @@
 package org.supremica.functionblocks.management;
 
 import java.io.*;
+import java.util.*;
 
 /**
  * @author Cengic
@@ -58,10 +59,28 @@ public class BasicFBTypeDeclaration
 	extends FBTypeDeclaration
 {
 
+	private List internalVariableDeclarations = new LinkedList();
+	private ECCDeclaration eccDeclaration;
+	private List algorithmDeclarations = new LinkedList();
 
 	public BasicFBTypeDeclaration(String name) 
 	{
 		super(name);
+	}
+
+	public void addInternalVariable(InternalVariableDeclaration variable)
+	{
+			internalVariableDeclarations.add(variable);
+	}
+
+	public void setECCDeclaration(ECCDeclaration ecc)
+	{
+		eccDeclaration = ecc;
+	}
+	
+	public void addAlgorithDeclaration(AlgorithmDeclaration algorithm)
+	{
+		algorithmDeclarations.add(algorithm);
 	}
 
 	public void toTextualRepresentation(PrintWriter pw)

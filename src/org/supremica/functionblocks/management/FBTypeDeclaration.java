@@ -49,6 +49,8 @@
 
 package org.supremica.functionblocks.management;
 
+import java.util.*;
+
 /**
  * @author Cengic
  */
@@ -56,8 +58,34 @@ public class FBTypeDeclaration
 	extends LibraryElement
 {
 	
+	private List eventInputDeclarations = new LinkedList();
+	private List eventOutputDeclarations = new LinkedList();
+	private List inputVariableDeclarations = new LinkedList();
+	private List outputVariableDeclarations = new LinkedList();
+	
 	public FBTypeDeclaration(String name)
 	{
 		super(name);
 	}
+
+	public void addEventInputDeclaration(EventInputDeclaration event)
+	{
+		eventInputDeclarations.add(event);
+	}
+	
+	public void addEventOutputDeclaration(EventOutputDeclaration event)
+	{
+		eventOutputDeclarations.add(event);
+	}
+
+	public void addInputVariableDeclaration(InputVariableDeclaration variable)
+	{
+		inputVariableDeclarations.add(variable);
+	}
+
+	public void addOutputVariableDeclaration(OutputVariableDeclaration variable)
+	{
+		outputVariableDeclarations.add(variable);
+	}
+
 }
