@@ -53,7 +53,6 @@ import org.supremica.log.*;
 import org.supremica.automata.*;
 import org.swixml.*;
 import java.util.*;
-import java.awt.Component;
 
 public class ProjectBuildFromSwingEngine
 {
