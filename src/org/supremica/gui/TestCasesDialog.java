@@ -16,6 +16,7 @@ import org.supremica.testcases.Counters;
 import org.supremica.testcases.RandomAutomata;
 import org.supremica.testcases.TransferLine;
 import org.supremica.testcases.PigeonHole;
+import org.supremica.testcases.SanchezTestCase;
 import org.supremica.testcases.warehouse.Warehouse;
 import org.supremica.testcases.warehouse.SelectEventsWindow;
 
@@ -445,7 +446,7 @@ class TransferLinePanel
 		int cap2 = int_cap2.get();
 		if(cap1 < 1 || cap2 < 1) throw new Exception("Buffer capacity must be at least 1");
 
-		TransferLine tl = new TransferLine(int_cells.get(), cap1, cap2);
+		TransferLine tl = new TransferLine(int_cells.get(), cap1, cap2, false);
 		return tl.getProject();
 	}
 }
@@ -489,6 +490,41 @@ class PigeonHolePanel
 
 
 
+class SanchezPanel
+	extends JPanel
+	implements TestCase
+{
+	IntegerField int_blocks = null;
+	JComboBox choice = null;
+	final String [] choice_items =  {"#1: Async prod",  "#2: synch prod", "#3: supC"};
+	public SanchezPanel()
+	{
+
+		JPanel panel  = new JPanel( new GridLayout(3,2));
+		add(panel, BorderLayout.NORTH);
+
+		panel.add(new JLabel("Ref: \"A Comparision of Synthesis",  SwingConstants.RIGHT) );
+		panel.add(new JLabel(" Tools For...\", A. Sanchez et. al.", SwingConstants.LEFT ));
+
+		panel.add(new JLabel("Number of blocks: "));
+		panel.add(int_blocks = new IntegerField("5", 3));
+		panel.add(new JLabel("Benchmark: "));
+		panel.add(choice = new JComboBox(choice_items));
+
+	}
+
+	public Project doIt()
+		throws Exception
+	{
+		int p = int_blocks.get();
+		int type = choice.getSelectedIndex();
+
+		SanchezTestCase stc = new SanchezTestCase(p,type);
+		return stc.getProject();
+	}
+}
+
+
 class ExampleTab
 	extends JTabbedPane
 {
@@ -502,6 +538,8 @@ class ExampleTab
 		addTab("Counters", null, new CountersPanel(), "Independent Counters");
 		addTab("Random automata", null, new RandomPanel(), "Random automata");
 		addTab("Pigeon-Hole", null, new PigeonHolePanel(), "Pigeon-Hole");
+		addTab("Snachez-BM", null, new SanchezPanel(), "Snachez-BM");
+
 		addTab("Warehouse", null, new WarehousePanel(), "Warehouse");
 		//addTab("Allocation Batch", null, new AllocationBatchPanel(), "Serialized Allocation Batch");
 	}
