@@ -1,0 +1,5 @@
+invoked = invoked + 1;
+DO = DI + 1;
+System.out.println("TestAlgorithm.execute(): invoked: " + invoked + " times.");
+System.out.println("TestAlgorithm.execute(): DO: " + DO + ".");
+	

@@ -93,7 +93,7 @@ public class Resource extends NamedObject
 		fbType.getECC().addTransition("INIT", "STATE", "OCCURRED");
 		fbType.getECC().addTransition("STATE", "INIT", "TRUE");
 		// create algorithm
-		fbType.getECC().getState("STATE").addAction(new JavaTextAlgorithm("TestJavaTextAlgorithm.java"), "DONE");
+		fbType.getECC().getState("STATE").addAction(new JavaTextAlgorithm("TestJavaTextAlgorithm.jscript"), "DONE");
 		
 		// FB application fragment
 		addApplicationFragment("AppFrag");
