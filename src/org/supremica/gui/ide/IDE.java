@@ -8,6 +8,7 @@ import java.util.*;
 import org.supremica.gui.Utility;
 import org.supremica.gui.InterfaceManager;
 import org.supremica.gui.ide.actions.Actions;
+import org.supremica.automata.IO.FileFormats;
 
 public class IDE
     extends JFrame
@@ -142,6 +143,11 @@ public class IDE
 	public ModuleContainer createNewModuleContainer()
 	{
 		return moduleContainers.createNewModuleContainer();
+	}
+
+	public JFrame getFrame()
+	{
+		return this;
 	}
 
 	// Overridden so we can exit when window is closed

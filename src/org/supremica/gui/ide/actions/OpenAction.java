@@ -3,9 +3,19 @@ package org.supremica.gui.ide.actions;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import net.sourceforge.waters.model.module.ModuleMarshaller;
+import net.sourceforge.waters.model.base.ModelException;
+import net.sourceforge.waters.model.module.ModuleProxy;
+import net.sourceforge.waters.model.base.ProxyMarshaller;
 
+import javax.xml.bind.JAXBException;
+import java.io.File;
+import org.supremica.automata.IO.FileFormats;
+import org.supremica.gui.FileDialogs;
+import org.supremica.gui.ide.*;
 
 import org.supremica.gui.ide.IDE;
 
@@ -33,15 +43,38 @@ public class OpenAction
 
 	public void doAction()
 	{
-/*
-		new FileImporter(FileDialogs.getImportFileChooser(FileFormats.WDES), ide)    // anonymous class
+
+		new FileImporter(FileDialogs.getImportFileChooser(FileFormats.WMOD), ide)    // anonymous class
 		{
 			void openFile(IDE ide, File f)
 			{
-				importUMDESFile(ide, f);
+				ModuleProxy module = null;
+				try
+				{
+					final ProxyMarshaller marshaller = new ModuleMarshaller();
+
+					module = (ModuleProxy) marshaller.unmarshal(f);
+				}
+				catch (final JAXBException exception)
+				{
+
+					// Something bad happened
+					JOptionPane.showMessageDialog(ide, "Error loading module file! (JAXBException)");
+					// logEntry("JAXBException - Failed to load: " + wmodf);
+
+					//exception.printStackTrace(System.err);
+				}
+				catch (final ModelException exception)
+				{
+					JOptionPane.showMessageDialog(ide, "Error loading module file! (ModelException)");
+					// logEntry("ModelException - Failed to load: " + wmodf);
+				}
+
+				ModuleContainer moduleContainer = new ModuleContainer(ide, module);
+				ide.add(moduleContainer);
+				ide.setActive(moduleContainer);
 			}
 		};
-*/
-		System.err.println("Open Action selected - not implemented");
+
 	}
 }

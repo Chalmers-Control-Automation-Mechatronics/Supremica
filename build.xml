@@ -707,32 +707,41 @@
 		use="true"
 		private="true"
 		windowtitle="Supremica API"
-		doctitle="Supremica"
-		
-		bottom="Copyright &#169; 2001, 2002, 2003 Supremica and Knut Akesson. All Rights Reserved.">
+		link="http://java.sun.com/j2se/1.4/docs/api"				
+		bottom="Copyright &#169; 2001 - 2005 Supremica and Knut Åkesson. All Rights Reserved.">
+		<doctitle><![CDATA[<h1>Supremica API Documentation</h1>]]></doctitle>
 	</javadoc>
 </target>
 <!--	THIS ONE WAS PREVIOUSLY INCLUDED ABOVE...  -->
 <!--	overview="${templates}/Overview.html"      -->
 
-<!--
-<target name="doc_jgrafchart">
-	<javadoc
-		sourcepath="${src}"
-		destdir="${doc}/api"
-		packagenames="${jgrafchart_basepackage}.*"
-		classpath="${lib}/${unjared}"
-		author="true"
-		version="true"
-		use="true"
-		private="true"
-		windowtitle="JGrafChart API"
-		doctitle="JGrafChart"
-		
-		bottom="Copyright &#169; 2001 Karl-Erik Arzen. All Rights Reserved.">
+
+<target name="doc_waters"
+	description="Generate Javadoc documentation.">
+	<mkdir dir="${javadoc}"/>
+	<javadoc destdir="${javadoc}">
+		<packageset dir="${src}">
+			<include name="net/sourceforge/waters/xsd/**/*"/>
+			<exclude name="net/sourceforge/waters/xsd/*/impl/**"/>
+		</packageset>
+		<packageset dir="${supremica.src}">
+			<include name="net/sourceforge/waters/**/*"/>
+			<exclude name="net/sourceforge/waters/gui/**"/>
+		</packageset>
+		<doctitle><![CDATA[<h1>Waters API Documentation</h1>]]></doctitle>
+		<link href="${java14.api.url}"
+			offline="true" packagelistLoc="${docsrc}/offline/j2sdk1.4.2"/>
+		<link href="${jaxme.api.url}"
+			offline="true" packagelistLoc="${docsrc}/offline/jaxme"/>
+		<link href="${junit.api.url}"
+			offline="true" packagelistLoc="${docsrc}/offline/junit"/>
+		<classpath>
+			<path refid="external-classpath"/>
+			pathelement location="${junit.jar}"/>
+		</classpath>
 	</javadoc>
 </target>
--->
+
 
 <target name="run">
 	<java classname="${supremica_basepackage}.apps.Supremica" fork="yes">
