@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Automata>
+ <Automaton name="V1" type="Plant">
+  <Events>
+   <Event id="v11" label="v11" controllable="true" prioritized="true" />
+   <Event id="v10" label="v10" controllable="true" prioritized="true" />
+   <Event id="in" label="in" controllable="false" prioritized="true" />
+  </Events>
+  <States>
+   <State id="closed" initial="true" accepting="true" x="86" y="155" />
+   <State id="opened" accepting="true" x="342" y="155" />
+  </States>
+  <Transitions>
+   <Transition event="v11" source="closed" dest="opened" x="226" y="93" />
+   <Transition event="v10" source="opened" dest="closed" x="219" y="241" />
+   <Transition event="in" source="opened" dest="opened" x="400" y="93" />
+  </Transitions>
+ </Automaton>
+ <Automaton name="V2" type="Plant">
+  <Events>
+   <Event id="v21" label="v21" controllable="true" prioritized="true" />
+   <Event id="v20" label="v20" controllable="true" prioritized="true" />
+   <Event id="out" label="out" controllable="false" prioritized="true" />
+  </Events>
+  <States>
+   <State id="closed" initial="true" accepting="true" x="86" y="155" />
+   <State id="opened" accepting="true" x="342" y="155" />
+  </States>
+  <Transitions>
+   <Transition event="v21" source="closed" dest="opened" x="226" y="93" />
+   <Transition event="v20" source="opened" dest="closed" x="219" y="241" />
+   <Transition event="out" source="opened" dest="opened" x="400" y="93" />
+  </Transitions>
+ </Automaton>
+ <Automaton name="Tank" type="Plant">
+  <Events>
+   <Event id="in" label="in" controllable="false" prioritized="true" />
+   <Event id="out" label="out" controllable="false" prioritized="true" />
+  </Events>
+  <States>
+   <State id="empty" initial="true" accepting="true" x="86" y="88" />
+   <State id="half" accepting="true" x="278" y="88" />
+   <State id="full" accepting="true" x="470" y="88" />
+  </States>
+  <Transitions>
+   <Transition event="in" source="empty" dest="half" x="190" y="47" />
+   <Transition event="in" source="half" dest="full" x="378" y="44" />
+   <Transition event="out" source="full" dest="half" x="370" y="142" />
+   <Transition event="out" source="half" dest="empty" x="186" y="144" />
+  </Transitions>
+ </Automaton>
+ <Automaton name="E" type="Plant">
+  <Events>
+   <Event id="e1" label="e1" controllable="true" prioritized="true" />
+   <Event id="t1" label="t1" controllable="false" prioritized="true" />
+   <Event id="t0" label="t0" controllable="false" prioritized="true" />
+   <Event id="e0" label="e0" controllable="true" prioritized="true" />
+  </Events>
+  <States>
+   <State id="off" initial="true" accepting="true" x="86" y="155" />
+   <State id="on" accepting="true" x="342" y="152" />
+  </States>
+  <Transitions>
+   <Transition event="e1" source="off" dest="on" x="180" y="70" />
+   <Transition event="t1" source="on" dest="on" x="373" y="87" />
+   <Transition event="t0" source="off" dest="off" x="44" y="252" />
+   <Transition event="e0" source="on" dest="off" x="195" y="239" />
+  </Transitions>
+ </Automaton>
+ <Automaton name="T" type="Plant">
+  <Events>
+   <Event id="t1" label="t1" controllable="false" prioritized="true" />
+   <Event id="t0" label="t0" controllable="false" prioritized="true" />
+  </Events>
+  <States>
+   <State id="lo" initial="true" accepting="true" x="75" y="152" />
+   <State id="hi" accepting="true" x="328" y="152" />
+  </States>
+  <Transitions>
+   <Transition event="t1" source="lo" dest="hi" x="226" y="93" />
+   <Transition event="t0" source="hi" dest="lo" x="219" y="241" />
+  </Transitions>
+ </Automaton>
+ <Automaton name="FillDrain" type="Specification">
+  <Events>
+   <Event id="in" label="in" controllable="false" prioritized="true" />
+   <Event id="v10" label="v10" controllable="true" prioritized="true" />
+   <Event id="v21" label="v21" controllable="true" prioritized="true" />
+   <Event id="out" label="out" controllable="false" prioritized="true" />
+   <Event id="v20" label="v20" controllable="true" prioritized="true" />
+  </Events>
+  <States>
+   <State id="p0" initial="true" accepting="true" x="150" y="155" />
+   <State id="p1" x="278" y="155" />
+   <State id="p2" x="406" y="152" />
+   <State id="p3" x="534" y="155" />
+   <State id="p4" x="406" y="283" />
+   <State id="p5" x="278" y="411" />
+   <State id="p6" x="214" y="283" />
+  </States>
+  <Transitions>
+   <Transition event="in" source="p0" dest="p1" x="214" y="151" />
+   <Transition event="in" source="p1" dest="p2" x="347" y="156" />
+   <Transition event="v10" source="p2" dest="p3" x="475" y="156" />
+   <Transition event="v21" source="p3" dest="p4" x="475" y="222" />
+   <Transition event="out" source="p4" dest="p5" x="347" y="350" />
+   <Transition event="out" source="p5" dest="p6" x="251" y="350" />
+   <Transition event="v20" source="p6" dest="p0" x="187" y="222" />
+  </Transitions>
+ </Automaton>
+ <Automaton name="Heat" type="Specification">
+  <Events>
+   <Event id="e1" label="e1" controllable="true" prioritized="true" />
+   <Event id="t1" label="t1" controllable="false" prioritized="true" />
+   <Event id="e0" label="e0" controllable="true" prioritized="true" />
+   <Event id="v21" label="v21" controllable="true" prioritized="true" />
+   <Event id="v20" label="v20" controllable="true" prioritized="true" />
+  </Events>
+  <States>
+   <State id="p0" initial="true" accepting="true" x="86" y="155" />
+   <State id="p1" x="214" y="155" />
+   <State id="p2" x="342" y="155" />
+   <State id="p3" x="470" y="155" />
+   <State id="p4" x="278" y="347" />
+  </States>
+  <Transitions>
+   <Transition event="e1" source="p0" dest="p1" x="155" y="158" />
+   <Transition event="t1" source="p1" dest="p2" x="283" y="158" />
+   <Transition event="e0" source="p2" dest="p3" x="411" y="158" />
+   <Transition event="v21" source="p3" dest="p4" x="379" y="254" />
+   <Transition event="v20" source="p4" dest="p0" x="187" y="254" />
+  </Transitions>
+ </Automaton>
+ <Automaton name="inBefore_e1" type="Specification">
+  <Events>
+   <Event id="in" label="in" controllable="false" prioritized="true" />
+   <Event id="e1" label="e1" controllable="true" prioritized="true" />
+   <Event id="v20" label="v20" controllable="true" prioritized="true" />
+  </Events>
+  <States>
+   <State id="p0" initial="true" accepting="true" x="86" y="155" />
+   <State id="p1" accepting="true" x="278" y="155" />
+  </States>
+  <Transitions>
+   <Transition event="in" source="p0" dest="p1" x="128" y="105" />
+   <Transition event="e1" source="p1" dest="p1" x="223" y="98" />
+   <Transition event="v20" source="p1" dest="p0" x="151" y="196" />
+   <Transition event="in" source="p1" dest="p1" x="307" y="94" />
+  </Transitions>
+ </Automaton>
+</Automata>
