@@ -24,20 +24,19 @@ public class MainToolBar
 	private static final SaveAction saveAction = new SaveAction();
 	private static final SaveAsAction saveAsAction = new SaveAsAction();
 	private static final EditAction editAction = new EditAction(supremica);
-	// private static final HelpAction helpAction = new HelpAction();
+	private static final Insets theInsets = new Insets(0, 0, 0, 0);
 
 	public MainToolBar(Supremica supremica)
 	{
 		this.supremica = supremica;
 
 		initToolBar();
+
 		setRollover(true);
 	}
 
-	public void initToolBar()
+	private void initToolBar()
 	{
-		Insets tmpInsets = new Insets(0, 0, 0, 0);
-
 		if (SupremicaProperties.fileAllowOpen())
 		{
 			add(openAction);
@@ -58,5 +57,15 @@ public class MainToolBar
 		}
 
 		add(ActionMan.helpAction);
+	}
+
+	/**
+	 * Set the button margin
+	 */
+	public JButton add(Action theAction)
+	{
+		JButton theButton = super.add(theAction);
+		theButton.setMargin(theInsets);
+		return theButton;
 	}
 }
