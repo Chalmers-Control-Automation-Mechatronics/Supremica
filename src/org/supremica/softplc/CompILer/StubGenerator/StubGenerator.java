@@ -51,7 +51,7 @@ public class StubGenerator
 					}
 					else if (currFieldType == Float.TYPE)
 					{
-						pw.println("\t\t" + currFieldName + " : FLOAT;");
+						pw.println("\t\t" + currFieldName + " : REAL;");
 					}
 				}
 				else
@@ -61,7 +61,7 @@ public class StubGenerator
 			}
 		}
 		pw.println("\tEND_VAR");
-		pw.println("END:");
+		//pw.println("END:");
 		pw.println("END_FUNCTION_BLOCK");
 	}
 
