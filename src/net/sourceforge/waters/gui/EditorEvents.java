@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorEvents
 //###########################################################################
-//# $Id: EditorEvents.java,v 1.6 2005-02-22 04:12:36 knut Exp $
+//# $Id: EditorEvents.java,v 1.7 2005-02-22 18:28:46 robi Exp $
 //###########################################################################
 
 
@@ -53,17 +53,14 @@ public class EditorEvents
 	//#######################################################################
 	//# Constructors
 	public EditorEvents(final ModuleProxy module,
-				 final SimpleComponentProxy comp,
-				 final EditorWindowInterface root)
+						final SimpleComponentProxy comp)
 	{
-		this(module, comp.getGraph(), root);
+		this(module, comp.getGraph());
 	}
 
 	public EditorEvents(final ModuleProxy module,
-				 final GraphProxy graph,
-				 final EditorWindowInterface root)
+						final GraphProxy graph)
 	{
-		mRoot = root;
 		mModel = new EventTableModel(graph, module);
 
 		final Dimension ispacing = new Dimension(0, 0);
@@ -276,7 +273,7 @@ public class EditorEvents
 
 	//#######################################################################
 	//# Local Class IdentifierEditor
-	private class IdentifierEditor
+	private static class IdentifierEditor
 		extends DefaultCellEditor
 	{
 
@@ -284,8 +281,7 @@ public class EditorEvents
 		//# Constructors
 		private IdentifierEditor()
 		{
-			super(new SimpleExpressionCell(mRoot.getFrame(),
-										   SimpleExpressionProxy.TYPE_NAME));
+			super(new SimpleExpressionCell(SimpleExpressionProxy.TYPE_NAME));
 		}
 
 
@@ -364,7 +360,6 @@ public class EditorEvents
 
 	//#######################################################################
 	//# Data Members
-	private final EditorWindowInterface mRoot;
 	private final EventTableModel mModel;
 	private final Dimension mPreferredSize;
 

@@ -49,7 +49,7 @@ public class ComponentEditorPanel
 		surface.setPreferredSize(new Dimension(500, 500));
 		surface.setMinimumSize(new Dimension(100, 100));
 
-		events = new EditorEvents(module, element, this);
+		events = new EditorEvents(module, element);
 		menu = new EditorMenu(surface, this);
 
 		// final Container panel = getContentPane();

@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorWindow
 //###########################################################################
-//# $Id: EditorWindow.java,v 1.7 2005-02-22 04:12:36 knut Exp $
+//# $Id: EditorWindow.java,v 1.8 2005-02-22 18:28:46 robi Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -47,7 +47,7 @@ public class EditorWindow
 		surface.setPreferredSize(new Dimension(500, 500));
 		surface.setMinimumSize(new Dimension(0, 0));
 
-		events = new EditorEvents(module, element, this);
+		events = new EditorEvents(module, element);
 		menu = new EditorMenu(surface, this);
 
 		final Container panel = getContentPane();

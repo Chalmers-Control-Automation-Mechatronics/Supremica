@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EventListCell
 //###########################################################################
-//# $Id: SimpleExpressionCell.java,v 1.5 2005-02-21 19:18:35 robi Exp $
+//# $Id: SimpleExpressionCell.java,v 1.6 2005-02-22 18:28:46 robi Exp $
 //###########################################################################
 
 
@@ -40,30 +40,27 @@ public class SimpleExpressionCell
 
 	//#######################################################################
 	//# Constructors
-	public SimpleExpressionCell(final Frame root)
+	public SimpleExpressionCell()
 	{
-		this(root, SimpleExpressionProxy.TYPE_ANY);
+		this(SimpleExpressionProxy.TYPE_ANY);
 	}
 
 
-	public SimpleExpressionCell(final Frame root, final int mask)
+	public SimpleExpressionCell(final int mask)
 	{
-		this(root, null, mask);
+		this(null, mask);
 	}
 
 
-	public SimpleExpressionCell(final Frame root,
-								final SimpleExpressionProxy expr)
+	public SimpleExpressionCell(final SimpleExpressionProxy expr)
 	{
-		this(root, expr, SimpleExpressionProxy.TYPE_ANY);
+		this(expr, SimpleExpressionProxy.TYPE_ANY);
 	}
 
 
-	public SimpleExpressionCell(final Frame root,
-								final SimpleExpressionProxy expr,
+	public SimpleExpressionCell(final SimpleExpressionProxy expr,
 								final int mask)
 	{
-		mRoot = root;
 		mTypeMask = mask;
 		mParser = new ExpressionParser();
 		mFilter = new SimpleExpressionFilter();
@@ -195,8 +192,9 @@ public class SimpleExpressionCell
 					if (text.length() == 0) {
 						return false;
 					}
+					final Frame root = (Frame) getTopLevelAncestor();
 					final boolean revert =
-						ErrorWindow.askRevert(mRoot, exception, text);
+						ErrorWindow.askRevert(root, exception, text);
 					if (revert) {
 						textfield.revert();
 					} else {
@@ -319,7 +317,6 @@ public class SimpleExpressionCell
 
 	//#######################################################################
 	//# Data Members
-	private final Frame mRoot;
 	private final int mTypeMask;
 	private final ExpressionParser mParser;
 	private final DocumentFilter mFilter;
