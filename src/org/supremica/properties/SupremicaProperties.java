@@ -121,6 +121,9 @@ public final class SupremicaProperties
 	private static final String SYNTHESIS_MAXIMALLY_PERMISSIVE = "synthesisMaximallyPermissive";
 	private static final String GENERAL_USE_SECURITY = "GeneralUseSecurity";
 
+	// Animator Options
+	private static final String ANIMATOR_IN_USE = "animatorInUse";
+
 	private Set forbidExternalModification = new HashSet();
 
 	private static final SupremicaProperties wp = new SupremicaProperties();
@@ -174,6 +177,7 @@ public final class SupremicaProperties
 		setProperty(SYNTHESIS_OPTIMIZE, "false", true);
 		setProperty(SYNTHESIS_MAXIMALLY_PERMISSIVE, "true", true);
 		setProperty(GENERAL_USE_SECURITY, "false", false);
+		setProperty(ANIMATOR_IN_USE, "false", true);
 	}
 
 
@@ -702,6 +706,16 @@ public final class SupremicaProperties
 	public static void setUseSecurity(boolean useSecurity)
 	{
 		wp.setProperty(GENERAL_USE_SECURITY, toString(useSecurity));
+	}
+
+	public static boolean animatorInUse()
+	{
+		return toBoolean(wp.getProperty(ANIMATOR_IN_USE));
+	}
+
+	public static void setAnimatorInUse(boolean useAnimator)
+	{
+		wp.setProperty(ANIMATOR_IN_USE, toString(useAnimator));
 	}
 
 	private static String toString(boolean b)

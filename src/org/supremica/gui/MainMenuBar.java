@@ -20,7 +20,7 @@
 	Should be replaced with this
 		JMenuItem menuFileNew = new JMenuItem(ActionMan.fileNewAction);
 		menuFile.add(menuFileNew);
-		
+
 	where fileNewAction is a static AbstractAction descendant
 */
 package org.supremica.gui;
@@ -48,7 +48,7 @@ public class MainMenuBar
 	private Supremica supremica;
  	private ContentHelp help = null;
 	private CSH.DisplayHelpFromSource helpDisplayer = null;
-	
+
 	public MainMenuBar(Supremica supremica) // should get rid of supremica here
 	{
 		this.supremica = supremica;
@@ -57,7 +57,7 @@ public class MainMenuBar
 
 		initMenubar();
 	}
-	
+
 	private void initMenubar()	// This is copied (almost) straight from Supremica.java
 	{
 		class NewFromTemplateHandler
@@ -479,44 +479,47 @@ public class MainMenuBar
 			}
 		});
 
-		// Project.Animator
-		JMenuItem menuProjectAnimator = new JMenuItem();
-
-		menuProjectAnimator.setText("Animator...");
-		menuProject.add(menuProjectAnimator);
-		menuProjectAnimator.addActionListener(new ActionListener()
+		if (SupremicaProperties.animatorInUse())
 		{
-			public void actionPerformed(ActionEvent e)
+			// Project.Animator
+			JMenuItem menuProjectAnimator = new JMenuItem();
+
+			menuProjectAnimator.setText("Animator...");
+			menuProject.add(menuProjectAnimator);
+			menuProjectAnimator.addActionListener(new ActionListener()
 			{
-				ActionMan.animator_actionPerformed(ActionMan.getGui());
-			}
-		});
+				public void actionPerformed(ActionEvent e)
+				{
+					ActionMan.animator_actionPerformed(ActionMan.getGui());
+				}
+			});
 
-		// Project.Simulator
-		JMenuItem menuProjectSimulator = new JMenuItem();
+			// Project.Simulator
+			JMenuItem menuProjectSimulator = new JMenuItem();
 
-		menuProjectSimulator.setText("Simulator...");
-		menuProject.add(menuProjectSimulator);
-		menuProjectSimulator.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
+			menuProjectSimulator.setText("Simulator...");
+			menuProject.add(menuProjectSimulator);
+			menuProjectSimulator.addActionListener(new ActionListener()
 			{
-				ActionMan.simulator_actionPerformed(ActionMan.getGui());
-			}
-		});
+				public void actionPerformed(ActionEvent e)
+				{
+					ActionMan.simulator_actionPerformed(ActionMan.getGui());
+				}
+			});
 
-		// Project.Clear
-		JMenuItem menuProjectSimulatorClear = new JMenuItem();
+			// Project.Clear
+			JMenuItem menuProjectSimulatorClear = new JMenuItem();
 
-		menuProjectSimulatorClear.setText("Clear simulation data");
-		menuProject.add(menuProjectSimulatorClear);
-		menuProjectSimulatorClear.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
+			menuProjectSimulatorClear.setText("Clear simulation data");
+			menuProject.add(menuProjectSimulatorClear);
+			menuProjectSimulatorClear.addActionListener(new ActionListener()
 			{
-				ActionMan.simulatorClear_actionPerformed(ActionMan.getGui());
-			}
-		});
+				public void actionPerformed(ActionEvent e)
+				{
+					ActionMan.simulatorClear_actionPerformed(ActionMan.getGui());
+				}
+			});
+		}
 
 		// Tools
 		JMenu menuTools = new JMenu();
@@ -758,7 +761,7 @@ public class MainMenuBar
 		*/
 		JMenuItem menuHelpTopics = new SupremicaMenuItem(ActionMan.helpAction);
 		menuHelp.add(menuHelpTopics);
-		
+
 		menuHelp.addSeparator();
 
 		// Help.About
