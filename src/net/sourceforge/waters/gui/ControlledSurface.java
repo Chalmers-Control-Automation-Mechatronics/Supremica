@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.8 2005-02-22 04:12:36 knut Exp $
+//# $Id: ControlledSurface.java,v 1.9 2005-02-22 07:54:28 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -369,6 +369,9 @@ public class ControlledSurface
 
 	public void mouseDragged(MouseEvent e)
 	{
+		// A drag is a move
+		//mouseMoved(e);
+
 		//if (e.getButton() == MouseEvent.BUTTON1) // Why not?
 		{
 			hasDragged = true;
@@ -600,76 +603,74 @@ public class ControlledSurface
 			{
 				// Single selection!
 
-				/*
-				  if (T.getPlace() == EditorToolbar.EDGE)
-				  {
-				  if ((o != null) && (o.getType() == EditorObject.EDGE))
-				  {
-				  EditorEdge edge = (EditorEdge) o;
-
-				  if (edge.getDragC())
-				  {
-				  edge.setTPoint(e.getX(), e.getY());
-				  }
-				  else if (edge.getDragT())
-				  {
-				  edge.setTarget(e.getX(), e.getY());
-				  }
-				  else if (edge.getDragS())
-				  {
-				  System.out.println("DragS :" + edge.getDragS());
-				  edge.setSource(e.getX(), e.getY());
-				  }
-
-				  repaint();
-
-				  return;
-				  }
-				  }
-				*/
-
 				// Edge drawing...
 				if (T.getPlace() == EditorToolbar.EDGE)
 				{
-					// If a node or nodegroup is selected, we're drawing an edge!
-					if ((nodeIsSelected() || nodeGroupIsSelected()))
+					// There should only be one object here, or maybe two, 
+					// a node and it's label or an edge and it's labelgroup...
+					// Let's make it an iterator anyway!
+					for (Iterator it = selectedObjects.iterator(); it.hasNext(); )
 					{
-						for (Iterator it = selectedObjects.iterator(); it.hasNext(); )
+						// Which object is it?
+						EditorObject object = (EditorObject) it.next();
+
+						// If an edge is selected, you can drag!
+						if (object.getType() == EditorObject.EDGE)
 						{
-							EditorObject object = (EditorObject) it.next();
-							if (object.getType() == EditorObject.NODE)
+							assert(selectedObjects.size() <= 2);
+
+							EditorEdge edge = (EditorEdge) object;
+							
+							if (edge.getDragC())
 							{
-								EditorNode node = (EditorNode) object;
-
-								int[] dat = {node.getX(), node.getY(), e.getX(), e.getY()};
-
-								// Draw line!
-								if ((lines != null) && (lines.size() > 0))
-								{
-									lines.set(0, dat);
-								}
-								else
-								{
-									lines.add(dat);
-								}
+								edge.setTPoint(e.getX(), e.getY());
 							}
-							else if (object.getType() == EditorObject.NODEGROUP)
+							else if (edge.getDragT())
 							{
-								EditorNodeGroup nodeGroup = (EditorNodeGroup) object;
+								edge.setTarget(e.getX(), e.getY());
+							}
+							else if (edge.getDragS())
+							{
+								edge.setSource(e.getX(), e.getY());
+							}
+						}
+						
+						if (object.getType() == EditorObject.NODE)
+						{
+							assert(selectedObjects.size() <= 2);
 
-								// Find point on the border of the group from where the line is drawn...
-								Point2D.Double p = nodeGroup.setOnBounds(nodeGroup.getX() + xoff, nodeGroup.getY() + yoff);
-								int[] dat = { (int) p.getX(), (int) p.getY(), e.getX(), e.getY() };
+							EditorNode node = (EditorNode) object;
+							
+							int[] dat = {node.getX(), node.getY(), e.getX(), e.getY()};
+							
+							// Draw line!
+							if ((lines != null) && (lines.size() > 0))
+							{
+								lines.set(0, dat);
+							}
+							else
+							{
+								lines.add(dat);
+							}
+						}
+						else if (object.getType() == EditorObject.NODEGROUP)
+						{
+							assert(selectedObjects.size() == 1);
 
-								// Draw line!
-								if ((lines != null) && (lines.size() > 0))
-								{
-									lines.set(0, dat);
-								}
-								else
-								{
-									lines.add(dat);
-								}
+							EditorNodeGroup nodeGroup = (EditorNodeGroup) object;
+							
+							// Find point on the border of the group from where the line is drawn...
+							Point2D.Double p = nodeGroup.setOnBounds(nodeGroup.getX() + xoff, nodeGroup.getY() + yoff);
+							int[] dat = { (int) p.getX(), (int) p.getY(), e.getX(), e.getY() };
+							
+							// Draw line!
+							if ((lines != null) && (lines.size() > 0))
+							{
+								lines.set(0, dat);
+							}
+							else
+							{
+								lines.add(dat);
 							}
 						}
 					}
@@ -762,9 +763,11 @@ public class ControlledSurface
 					deselect(n1);
 
 					// This is the targetpoint
-					EditorNode n2 = (EditorNode) getObjectAtPosition(e.getX(), e.getY());
-					if (n2 != null)
+					EditorObject o2 = getObjectAtPosition(e.getX(), e.getY());
+					if ((o2 != null) && (o2.getType() == EditorObject.NODE))
 					{
+						EditorNode n2 = (EditorNode) o2;
+
 						// Add edge
 						if (n1.getType() == EditorObject.NODE)
 						{
@@ -812,15 +815,14 @@ public class ControlledSurface
 				}
 			}
 
-			/*
-			// Redraw edge
-			if (edgeIsSelected() && (selectedObjects.size() == 1))
+			// Redefine edge if it has been changed
+			if ((T.getPlace() == EditorToolbar.EDGE) || (T.getPlace() == EditorToolbar.SELECT))
 			{
-				EditorEdge edge = (EditorEdge) selectedObjects.remove(0);
-
-				if ((T.getPlace() == EditorToolbar.EDGE) || (T.getPlace() == EditorToolbar.SELECT))
+				if (edgeIsSelected() && (selectedObjects.size() <= 2))
 				{
-					EditorObject n = getObjectAtPosition(e.getX(), e.getY());
+					EditorEdge edge = (EditorEdge) selectedObjects.remove(0);
+
+					EditorObject n = getNodeOrNodeGroupAtPosition(e.getX(), e.getY());
 
 					if (n != null)
 					{
@@ -837,8 +839,6 @@ public class ControlledSurface
 						}
 						else if (n.getType() == EditorObject.NODEGROUP)
 						{
-							System.out.println("is a nodeGroup when mouse released" + edge.getDragS());
-
 							if (edge.getDragS())
 							{
 								edge.setStartNode(n, e.getX(), e.getY());
@@ -852,7 +852,6 @@ public class ControlledSurface
 					edge.setTPoint(edge.getTPointX(), edge.getTPointY());
 				}
 			}
-			*/
 
 			lines.clear();
 

@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.7 2005-02-22 04:12:36 knut Exp $
+//# $Id: EditorSurface.java,v 1.8 2005-02-22 07:54:28 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -120,20 +120,6 @@ public class EditorSurface
 			return;
 		}
 
-		for (int i = 0; i < edges.size(); i++)
-		{
-			EditorEdge n = (EditorEdge) edges.get(i);
-
-			n.drawObject(g);
-		}
-
-		for (int i = 0; i < nodes.size(); i++)
-		{
-			EditorNode n = (EditorNode) nodes.get(i);
-
-			n.drawObject(g, root.getEventDeclList());
-		}
-
 		for (int i = 0; i < nodeGroups.size(); i++)
 		{
 			EditorNodeGroup n = (EditorNodeGroup) nodeGroups.get(i);
@@ -209,6 +195,20 @@ public class EditorSurface
 
 			children.addAll(groups);
 			n.setChildNodes(children, (JComponent) this);
+		}
+
+		for (int i = 0; i < edges.size(); i++)
+		{
+			EditorEdge n = (EditorEdge) edges.get(i);
+
+			n.drawObject(g);
+		}
+
+		for (int i = 0; i < nodes.size(); i++)
+		{
+			EditorNode n = (EditorNode) nodes.get(i);
+
+			n.drawObject(g, root.getEventDeclList());
 		}
 
 		for (int i = 0; i < labels.size(); i++)
@@ -571,9 +571,9 @@ public class EditorSurface
 		g2d.fill(new Rectangle(m_xoffset, m_yoffset, event_x - m_xoffset, event_y - m_yoffset));
 	}
 
-	public EditorObject getObjectAtPosition(int ex, int ey)
+	// When you're dragging an edge, you only want nodes or nodegroups...
+	public EditorObject getNodeOrNodeGroupAtPosition(int ex, int ey)
 	{
-		// Order of precedence: Nodes, Edges, Labels
 		for (int i = 0; i < nodes.size(); i++)
 		{
 			if (((EditorNode) nodes.get(i)).wasClicked(ex, ey))
@@ -590,11 +590,34 @@ public class EditorSurface
 			}
 		}
 
+		return null;
+	}
+
+	public EditorObject getObjectAtPosition(int ex, int ey)
+	{
+		// Order of precedence: Nodes, Edges, Labels
+		for (int i = 0; i < nodes.size(); i++)
+		{
+			if (((EditorNode) nodes.get(i)).wasClicked(ex, ey))
+			{
+				return (EditorNode) nodes.get(i);
+			}
+		}
+
+		// But edges before nodegroups, because they are hiding the edges otherwise...
 		for (int i = 0; i < edges.size(); i++)
 		{
 			if (((EditorEdge) edges.get(i)).wasClicked(ex, ey))
 			{
 				return (EditorEdge) edges.get(i);
+			}
+		}
+
+		for (int i = 0; i < nodeGroups.size(); i++)
+		{
+			if (((EditorNodeGroup) nodeGroups.get(i)).wasClicked(ex, ey))
+			{
+				return (EditorNodeGroup) nodeGroups.get(i);
 			}
 		}
 

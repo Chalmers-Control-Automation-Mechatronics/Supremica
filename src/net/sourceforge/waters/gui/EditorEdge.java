@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorEdge
 //###########################################################################
-//# $Id: EditorEdge.java,v 1.5 2005-02-22 03:05:08 flordal Exp $
+//# $Id: EditorEdge.java,v 1.6 2005-02-22 07:54:28 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -250,8 +250,6 @@ public class EditorEdge
 		}
 		else
 		{
-			System.out.println("is a nodegroup in setStartNode");
-
 			EditorNodeGroup s = (EditorNodeGroup) startNode;
 
 			start = s.getPosition(x, y, this);
