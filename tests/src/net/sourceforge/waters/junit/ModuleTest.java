@@ -3,7 +3,7 @@
 //# PACKAGE: waters.junit
 //# CLASS:   ModuleTest
 //###########################################################################
-//# $Id: ModuleTest.java,v 1.1 2005-02-21 02:51:15 knut Exp $
+//# $Id: ModuleTest.java,v 1.2 2005-02-21 03:14:14 robi Exp $
 //###########################################################################
 
 
@@ -164,8 +164,8 @@ public class ModuleTest
   { 
     super.setUp();
     mMarshaller = new ModuleMarshaller();
-    mInputDirectory = new File("examples", "handwritten");
-    mOutputDirectory = new File("logs", "module");
+    mInputDirectory = new File(getInputRoot(), "handwritten");
+    mOutputDirectory = new File(getOutputRoot(), "module");
   }
 
   protected void tearDown()

@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.junit
 //# CLASS:   AlgorithmsTest
 //###########################################################################
-//# $Id: AnalysisTest.java,v 1.1 2005-02-21 02:51:15 knut Exp $
+//# $Id: AnalysisTest.java,v 1.2 2005-02-21 03:14:14 robi Exp $
 //###########################################################################
 
 
@@ -12,7 +12,6 @@ package net.sourceforge.waters.junit;
 import java.io.File;
 import java.io.IOException;
 import javax.xml.bind.JAXBException;
-import junit.framework.TestCase;
 
 import net.sourceforge.waters.model.analysis.ProductDESCopier;
 import net.sourceforge.waters.model.analysis.ProductDESResult;
@@ -26,7 +25,7 @@ import net.sourceforge.waters.model.module.ModuleMarshaller;
 import net.sourceforge.waters.model.module.ModuleProxy;
 
 
-public class AnalysisTest extends TestCase
+public class AnalysisTest extends WatersTestCase
 {
 
   //#########################################################################
@@ -76,8 +75,8 @@ public class AnalysisTest extends TestCase
     mDocumentManager = new DocumentManager();
     mDocumentManager.register(mModuleMarshaller);
     mDocumentManager.register(mDESMarshaller);
-    mInputDirectory = new File("examples", "handwritten");
-    mOutputDirectory = new File("logs", "analysis");
+    mInputDirectory = new File(getInputRoot(), "handwritten");
+    mOutputDirectory = new File(getOutputRoot(), "analysis");
   }
 
   protected void tearDown()

@@ -3,7 +3,7 @@
 //# PACKAGE: waters.junit
 //# CLASS:   JAXBTestCase
 //###########################################################################
-//# $Id: JAXBTestCase.java,v 1.1 2005-02-21 02:51:15 knut Exp $
+//# $Id: JAXBTestCase.java,v 1.2 2005-02-21 03:14:14 robi Exp $
 //###########################################################################
 
 
@@ -13,7 +13,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import javax.xml.bind.JAXBException;
-import junit.framework.TestCase;
 
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.ElementProxy;
@@ -23,7 +22,7 @@ import net.sourceforge.waters.model.base.ProxyMarshaller;
 
 
 abstract class JAXBTestCase
-  extends TestCase
+  extends WatersTestCase
 {
 
   //#########################################################################

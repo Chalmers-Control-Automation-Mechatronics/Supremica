@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.junit
 //# CLASS:   MazeTest
 //###########################################################################
-//# $Id: MazeTest.java,v 1.1 2005-02-21 02:51:15 knut Exp $
+//# $Id: MazeTest.java,v 1.2 2005-02-21 03:14:14 robi Exp $
 //###########################################################################
 
 
@@ -12,7 +12,6 @@ package net.sourceforge.waters.junit;
 import java.io.File;
 import java.io.IOException;
 import javax.xml.bind.JAXBException;
-import junit.framework.TestCase;
 
 import net.sourceforge.waters.model.base.DocumentManager;
 import net.sourceforge.waters.model.base.ProxyMarshaller;
@@ -25,7 +24,7 @@ import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.samples.maze.MazeCompiler;
 
 
-public class MazeTest extends TestCase
+public class MazeTest extends WatersTestCase
 {
 
   //#########################################################################
@@ -109,8 +108,8 @@ public class MazeTest extends TestCase
     mDocumentManager = new DocumentManager();
     mDocumentManager.register(mModuleMarshaller);
     mDocumentManager.register(mDESMarshaller);
-    mInputDirectory = new File("examples", "maze");
-    mOutputDirectory = new File("logs", "maze");
+    mInputDirectory = new File(getInputRoot(), "maze");
+    mOutputDirectory = new File(getOutputRoot(), "maze");
     mMazeCompiler = new MazeCompiler
       (mInputDirectory, mOutputDirectory, true, mModuleMarshaller);
   }
