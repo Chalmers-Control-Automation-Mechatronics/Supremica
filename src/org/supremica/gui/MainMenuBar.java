@@ -423,7 +423,7 @@ public class MainMenuBar
 
 		// Project.document db
 		JMenuItem menuProjectDocumentDB = new JMenuItem();
-		menuProjectDocumentDB.setText("Document Databse...");
+		menuProjectDocumentDB.setText("Document Database...");
 		menuProject.add(menuProjectDocumentDB);
 		menuProjectDocumentDB.addActionListener(new ActionListener()
 		{
