@@ -25,17 +25,25 @@ FUNCTION_BLOCK TON
 	ST tonET
 	LD odt.tonQ
 	ST tonQ
+(*
+	CAL PRINT("tid =", tonET)
+	CAL PRINTLN("") 
+*)
 END_FUNCTION_BLOCK
 PROGRAM TONtest
 	VAR
 		t : TON;
 		b : BOOL;
+		tid : DINT;
 	END_VAR
 	LD DINT#3000
 	ST t.tonPT
 	LD TRUE
 	ST t.tonIN
+	CAL t
 	LD t.tonQ
 	ST b
-	CAL PRINTLN("b= ",b)
+	LD t.tonET
+	ST tid
+	CAL PRINTLN("b= ",b,tid)
 END_PROGRAM

@@ -1,11 +1,11 @@
 import java.util.Timer;
 import java.util.TimerTask;
+import org.supremica.softplc.CompILer.CodeGen.IEC_Interfaces.IEC_FunctionBlock;
 
-
-public class OnDelayTimer implements org.supremica.softplc.CompILer.CodeGen.IEC_Interfaces.IEC_FunctionBlock {
+public class OnDelayTimer implements IEC_FunctionBlock {
 	Timer timer = new Timer();
 	private long zeroTime;
-	private boolean prevIN;
+	private boolean prevIN = false;
 
 	public boolean tonIN;
 	public int tonPT;

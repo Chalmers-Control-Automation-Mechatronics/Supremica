@@ -9,8 +9,10 @@ public class JavablocksRunner {
 			System.out.println(i +" "+ain[i] +" "+ aout[i]);
 		}
 		*/
-		for(;;)
+		for(;;) {
+		    //System.out.print("loop");
 		    prog.run();
+		}
 		/*
 		for (int i = 0; i<ain.length;i++){
 			System.out.println(i +" "+ain[i] +" "+ aout[i]);

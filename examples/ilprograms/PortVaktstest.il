@@ -1,26 +1,31 @@
-FUNCTION_BLOCK Delayer
-	VAR_IN_OUT
-		LOOPS : DINT;
-		L : DINT;
-	END_VAR
-		LD DINT#0
-		ST L
-	LOOP :  LD L
-		EQ LOOPS
-		CAL PRINT("L",L)
-		JMPC ENDING
-		CAL PRINT("HEJ")
-		LD DINT#1
-		ADD L
-		ST L
-		JMP LOOP
-ENDING:
-END_FUNCTION_BLOCK	
-JAVA_BLOCK JDelayer
-	VAR_IN_OUT
-		LOOPS : DINT;
-	END_VAR
+JAVA_BLOCK OnDelayTimer
+        VAR_IN_OUT
+                tonIN : BOOL;
+                tonPT : DINT;
+                tonET : DINT;
+                tonQ  : BOOL;
+        END_VAR
 END_JAVA_BLOCK
+FUNCTION_BLOCK TON
+        VAR_IN_OUT
+                tonIN : BOOL;
+                tonPT : DINT;
+                tonET : DINT;
+                tonQ  : BOOL;
+        END_VAR
+        VAR
+                odt : OnDelayTimer;
+        END_VAR
+        LD tonIN
+        ST odt.tonIN
+        LD tonPT
+        ST odt.tonPT
+        CAL_JAVA odt
+        LD odt.tonET
+        ST tonET
+        LD odt.tonQ
+        ST tonQ
+END_FUNCTION_BLOCK
 
 PROGRAM PortVaktstest
 	VAR
@@ -35,12 +40,20 @@ PROGRAM PortVaktstest
 		Matlyft      AT %QX2  : BOOL;
 	END_VAR
 	VAR
-		Lcnt : DINT;
-		tmp  : BOOL;
+		delay2, delay5 : TON;
+		
+		Init  : BOOL := TRUE;
 	END_VAR
-	VAR
-		delay : JDelayer;
-	END_VAR
+(*init*)
+	LD Init
+	JMPCN end_init
+		LD DINT#1000 (*Time of delay*)
+		ST delay2.tonPT
+		ST delay5.tonPT
+
+		LD FALSE
+		ST Init
+end_init:
 
 (*Print start*)
 CAL PRINTLN("Start =", Start)
@@ -57,10 +70,6 @@ CAL PRINTLN("Urportvakt=", UrPortvakt)
 		OR(KulaPortvakt
 		   OR UrPortvakt
 		)
-		ST tmp
-		CAL PRINTLN("TMP=",tmp)
-		CAL PRINTLN("KulaPvakt=",KulaPortvakt)
-		CAL PRINTLN("UrPortvakt=",UrPortvakt)
 		JMPC END1
 			
 			LD TRUE
@@ -75,8 +84,11 @@ END1 :
 
 		LD KulaPortvakt
 		JMPCN END2
-			LD FALSE
-			ST InPortvakt
+			LD  TRUE
+			ST  delay2.tonIN
+			CAL delay2
+			LD  delay2.tonQ
+			STN InPortvakt
 END2 :
 
 (*
@@ -113,25 +125,11 @@ END4 :
 	LD KulaMatlyft
 	AND MatlyftNere
 	JMPCN END5
-
-	LD DINT#20000
-	ST delay.LOOPS
-
-(*
-		LD DINT#0
-		ST Lcnt
-	LOOP :  LD Lcnt
-		EQ DINT#4000
-		JMPC ENDING
-		LD DINT#1
-		ADD Lcnt
-		ST Lcnt
-		JMP LOOP
-	ENDING:
-*)
-	CAL delay	
-	LD TRUE
-	ST Matlyft
+		LD TRUE
+		ST delay5.tonIN
+		CAL delay5
+		LD delay5.tonQ
+		ST Matlyft
 END5:
 
 END_PROGRAM
