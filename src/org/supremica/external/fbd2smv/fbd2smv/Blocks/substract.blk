@@ -1,4 +1,4 @@
-module substract(In1, In2, Out1, compute)
+module substract(In1, In2, compute)
 {
 	input compute: boolean;	
 	input In1, In2: -32..32;

@@ -1,4 +1,4 @@
-module limit(Min, In1, Max, Out1, compute)
+module limit(Min, In1, Max, compute)
 {
 	input compute: boolean;	
 	input Min, In1, Max: -32..32;

@@ -1,4 +1,4 @@
-module boonet(In1, Out1, compute)
+module boonet(In1, compute)
 {
 	input In1, compute: boolean;
 	output Out1: boolean;

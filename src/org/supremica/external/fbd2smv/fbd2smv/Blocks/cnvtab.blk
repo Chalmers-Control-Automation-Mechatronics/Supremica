@@ -1,4 +1,4 @@
-module cnvtab(In1, Tab, Out1, compute)
+module cnvtab(In1, Tab, compute)
 {
 	input In1, Tab : -32..32;
 	input compute: boolean;

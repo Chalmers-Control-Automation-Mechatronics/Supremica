@@ -1,4 +1,4 @@
-module errsela(In1, AltIn, ErrSe, compute)
+module errsela(In1, AltIn, compute)
 {
 	input In1, AltIn : -32..32;
 	input compute: boolean;

@@ -1,4 +1,4 @@
-module selb(sel_i, In1, In2, Out1, compute)
+module selb(sel_i, In1, In2, compute)
 {
 	input sel_i, In1, In2, compute: boolean;
 	output Out1: boolean;

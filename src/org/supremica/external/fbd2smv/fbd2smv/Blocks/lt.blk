@@ -1,5 +1,5 @@
 -- lt: Lower Than (<)
-module lt(In1, In2, Q, compute)
+module lt(In1, In2, compute)
 {
 	input In1, In2: -32..32; 
 	input compute: boolean;
