@@ -54,8 +54,26 @@ public class SupervisorFactory {
 	case Options.ALGO_SMOOTHED_PART: return new PartitionSmoothSupervisor(manager,plant, spec);
 
 	}
-
 	// the type is not supported:
-	throw new Exception("Current BDD algorithm family not implemented");
+		throw new Exception("Current BDD algorithm family not implemented");
     }
+
+
+	/**
+	 * get a non-disjunctive algorithm, choose one based on the size of the system
+	 */
+   public static Supervisor createNonDisjSupervisor(BDDAutomata manager, Group plant, Group spec)
+   	throws Exception
+   {
+		int s1 = plant.getSize();
+		int s2 = spec.getSize();
+
+		if(s1 > Options.MAX_MONOLITHIC_GROUP_SIZE || s1 > Options.MAX_MONOLITHIC_GROUP_SIZE
+			|| (s1 + s2) > Options.MAX_MONOLITHIC_TOTAL_SIZE) {
+			return new ConjSupervisor(manager,plant, spec);
+		} else {
+			return new Supervisor(manager, plant,spec);
+		}
+	}
 }
+

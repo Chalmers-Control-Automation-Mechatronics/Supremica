@@ -3,12 +3,14 @@ package org.supremica.automata.algorithms;
 
 
 // TODO:
-// for some reason i cant understand, incremental algo is much slower than the modular one.
-// there are two possible reasons (that i can think of)
-//  1. event_included() is too expensive
-//  2. when we remove the "solved" events, this confuses the herusitics for some reason
+// even if 		ac.plantIncludesAllConsidredEvents()   retunrs FALSE,
+// we can prove uncontrollability of the events by local strings (if we only consider strings
+// that end with events in current \Sigma^P_u).
+// maybe we should try that once in a while? or when number of local events exceeds some threshold?
 
-
+// TODO:
+// local-rechanles are not re-used in the LI test, only used for C test
+//    (doesn't really matter)
 
 import org.supremica.automata.*;
 import org.supremica.util.BDD.*;
@@ -17,6 +19,18 @@ import java.util.*;
 
 /**
  * IncrementalBDDLanguageInclusion, for incremental modular verification with BDDs
+ *
+ *
+ * IMPORTANT:
+ *  this algorithm may NOT give the same counterexample as the modular one.
+ *  in fact, it might declare a uc-state as OK. here is the reason:
+ *  we add Sp and Plant as the same type, this means that a Sp can remove a valid path.
+ *  this means that two Sp's are in conflict, but more IMPORTANT is that if that second SP
+ *  is uncontrollable at that position, we will find out LATER, thus it will giv us ANOTHER
+ *  counter example
+ *
+ *   (I have no idea if this is correct and can be proved, that said, it seems that the
+ *    algorithm works...)
  *
  */
 
@@ -30,6 +44,7 @@ public class IncrementalBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 	// added some stuff that really should be local. but its good for the common code...
 	private int bdd_events = -1;
 	private int bdd_theta  = -1;
+	private int bdd_initial_states  = -1;
 	private Supervisor sup = null;
 
 
@@ -127,19 +142,27 @@ public class IncrementalBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 			if(next == null)
 				break;
 
+			int bdd_theta_delta = ba.relProd(next.getTpri(), bdd_events, bdd_cube_sp);
+			bdd_theta = ba.andTo(bdd_theta, bdd_theta_delta);
+
+			if(! ac.plantIncludesAllConsidredEvents() ) {
+				// must do this manually, because we bypass try_local_reachability()
+				register_automaton_addition(next);
+				continue;
+			}
+
+
 			if(Options.debug_on) {
 				Options.out.println("\n -----------------------------------------------------------\n");
 				Options.out.println("Check L(" + work1.toString() + ") subseteq L(" + work2.toString()  + ") ?");
 			}
 
-			int bdd_theta_delta = ba.relProd(next.getTpri(), bdd_events, bdd_cube_sp);
-			bdd_theta = ba.andTo(bdd_theta, bdd_theta_delta);
-
 
 			try {
 				if(sup != null)  sup.cleanup(); // delete the last one
 
-				sup = SupervisorFactory.createSupervisor(ba, work2, work1);
+				// sup = SupervisorFactory.createSupervisor(ba, work2, work1);
+				sup = SupervisorFactory.createNonDisjSupervisor(ba, work2, work1);
 				int r = sup.getReachables();
 
 				bdd_theta= ba.andTo(bdd_theta, r); // see how much of uc was reachable
@@ -247,20 +270,31 @@ public class IncrementalBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 
 		sup = null;
 
+		bdd_initial_states  = k.getI();
+		ba.ref(bdd_initial_states);
+
 		for(;;) {
 			num_syncs_done++; // statistic stuffs
 
 			BDDAutomaton next = ac.addone(work1, work2, true);
 			if(next == null) break;
 
+			int bdd_theta_delta = ba.relProd(next.getTpri(), bdd_events, bdd_cube_sp);
+			bdd_theta = ba.andTo(bdd_theta, bdd_theta_delta);
+			bdd_initial_states = ba.andTo(bdd_initial_states, next.getI() );
+
+
+
+			if(! ac.plantIncludesAllConsidredEvents() ) {
+				// must do this manually, because we bypass try_local_reachability()
+				register_automaton_addition(next);
+				continue;
+			}
+
 			if(Options.debug_on) {
 				Options.out.println("\n -----------------------------------------------------------\n");
 				Options.out.println("Check C(" + work2.toString() + ", " + work1.toString()  + ") ?");
 			}
-
-
-			int bdd_theta_delta = ba.relProd(next.getTpri(), bdd_events, bdd_cube_sp);
-			bdd_theta = ba.andTo(bdd_theta, bdd_theta_delta);
 
 
 			try {
@@ -270,8 +304,10 @@ public class IncrementalBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 				}
 
 
-				sup = SupervisorFactory.createSupervisor(ba, work2, work1);
-				int r = sup.getReachables();
+				// sup = SupervisorFactory.createSupervisor(ba, work2, work1);
+				sup = SupervisorFactory.createNonDisjSupervisor(ba, work2, work1);
+
+				int r = sup.getReachables(bdd_initial_states);
 
 				bdd_theta= ba.andTo(bdd_theta, r); // see how much of uc was reachable
 				boolean ret = (bdd_theta == ba.getZero());
@@ -279,7 +315,7 @@ public class IncrementalBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 				if(ret) {
 					// show that all and nc-arcs where unreachable
 					if(Options.debug_on)
-						ba.getEventManager().dumpSubset("*** Removed events", workset_events);
+						ba.getEventManager().dumpSubset("*** Removed events (all)", workset_events);
 
 					// clean up before returning
 					cleanup_bdds();
@@ -291,12 +327,36 @@ public class IncrementalBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 				else if(ac.moreToGo()) {
 					// those damn self-loops!!
 					int bdd_theta_relevant = ba.and(bdd_theta, work2.getSigma() );
+
+
+					// (1) This is how it would look without re-using the local-reachables as the
+					// next initial state
+/*
 					if(try_local_reachability(sup, next, bdd_theta_relevant)) {
 						ba.deref(bdd_theta_relevant);
 						cleanup_bdds();
 						return false;
 					}
+*/
+
+					// (2) This is how it would looks like when we _do_ re-use local-rechables...
+					int locals = try_and_remember_local_reachability(sup, next, bdd_theta_relevant, bdd_initial_states);
+
+					if(locals == ba.getZero() ) {
+						ba.deref(bdd_theta_relevant);
+						cleanup_bdds();
+						return false;
+					} else if(locals == bdd_initial_states) {
+						// no new local events where found...
+					} else {
+						// new local events found and new local-reachable states computed:
+						ba.deref(bdd_initial_states);
+						bdd_initial_states = locals;
+					}
+
 					ba.deref(bdd_theta_relevant);
+
+
 				}
 
 				// *** see if some events are proved to be unrachable and can be removed
@@ -311,6 +371,7 @@ public class IncrementalBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 					ba.deref(bdd_events);
 					bdd_events = ba.getAlphabetSubsetAsBDD(workset_events);
 				}
+
 
 			} catch(Exception exx) {
 				exx.printStackTrace();
@@ -339,14 +400,22 @@ public class IncrementalBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 	// ----- [ all common code goes here ] -------------------------------------------------------
 
 	private void cleanup_bdds() {
+
 		if(bdd_theta != -1) {
 			ba.deref(bdd_theta);
 			bdd_theta = -1;
 		}
+
 		if(bdd_events != -1) {
 			ba.deref(bdd_events);
 			bdd_events = -1;
 		}
+
+		if(bdd_initial_states != -1) {
+			ba.deref(bdd_initial_states);
+			bdd_initial_states = -1;
+		}
+
 		if(sup != null) {
 			sup.cleanup();	// do the delayed cleanup!
 			sup = null;

@@ -23,6 +23,7 @@ public class AutomataConfiguration {
 	private boolean include_both; /* both g1 and g2 are choosen */
 	private int size1, size2, size_all, selected;
 	private int [] local_index; /* index for the automata in G1 or G2, whereever it belongs */
+	private int [] workset_events_to_be_used_in_plant; //  >= 0 if the events has been used in the plant or we dont care about that events
 
 	private BDDAutomaton[] all;
 	private BDDAutomaton automaton;
@@ -60,7 +61,7 @@ public class AutomataConfiguration {
 		this.all = new BDDAutomaton[size_all];
 		this.include_both = include_both;
 		this.automaton = null;
-		this.current_events = null; // to be allocated
+		this.current_events = null; // to be allocated, see reset()
 
 		// insert g1
 		tmp = g1.getMembers();
@@ -120,7 +121,9 @@ public class AutomataConfiguration {
 		if(current_events == null) {
 			current_events = new boolean[event_care.length];
 			tmp_events = new boolean[event_care.length];
+			workset_events_to_be_used_in_plant = new int[event_care.length];
 		}
+
 
 
 		// make selection[] valid...
@@ -146,6 +149,10 @@ public class AutomataConfiguration {
 				Options.out.println("No need to check " + automaton.getName() + ", no relevant events here...");
 			return false;
 		}
+
+		// copy the events that should but have not been used in the plants yet:
+		for(int i = 0; i < workset_events.length; i++)
+			workset_events_to_be_used_in_plant[i] = workset_events[i] ? 1 : 0;
 
 		addIfInteractWithMe(current_events);
 		return true;
@@ -192,7 +199,10 @@ public class AutomataConfiguration {
 
 		// check if it was from g1 or g2
 		if(type[pop])	l1.add( all[pop]);
-		else			l2.add( all[pop]);
+		else {
+			l2.add( all[pop]);
+			all[pop].removeEventUsage(workset_events_to_be_used_in_plant);
+		}
 
 		return all[pop];
 
@@ -234,6 +244,7 @@ public class AutomataConfiguration {
 	{
 
 		// get new care set:
+		IndexedSet.copy(event_careset, tmp_events);
 		for(int i = 0; i < size_all; i++)
 		{
 			if(selection[i])
@@ -243,7 +254,7 @@ public class AutomataConfiguration {
 				// all[i].addEventCareSet(tmp_events, false /* all events*/ );
 				// IndexedSet.add(event_careset, tmp_events);
 
-				all[i].addEventCareSet(event_careset, false /* all events*/ );
+				all[i].addEventCareSet(tmp_events, event_careset, false /* all events*/ );
 			}
 		}
 
@@ -267,6 +278,19 @@ public class AutomataConfiguration {
 	// -- [ helper ] --------------------------------------------------------
 
 
+	/**
+	 * Returns true if the plants toghether include all the considred (uncontrollable for C, all otherwise).
+	 * If this is not true, an uncontrollable ARC might be due to a self-loop in the Plants!!
+	 * (the real arc not added yet, all other plants are those that just 'agree' by using self-loops)
+	 */
+	public boolean plantIncludesAllConsidredEvents() {
+		int len = workset_events_to_be_used_in_plant.length;
+		for(int i = 0; i < len; i++)
+			if(workset_events_to_be_used_in_plant[i] > 0)
+			return false;
+
+		return true;
+	}
 	/**
 	 * returns false if we can guarantee that there are not more automata to be added.
 	 * a positive answer does not mean that we _will_ have an automaton to added however,

@@ -87,6 +87,23 @@ public class ConjPartition {
 		return tmp2;
     }
 
+    /**
+     * 1-step forward rechables.
+     * Consider only events in the mask.
+     * TODO: this is a good place to deploy operator scheduling (to add mask before or after conjunction)
+     **/
+    public int image(int q_k, int event_mask) {
+		int front = q_k; manager.ref(front);
+
+		for(int i = 0; i < curr; i++)
+			front = manager.andTo(front, delta[i]);
+
+		int tmp = manager.relProd(front, event_mask, cube_se);
+		manager.deref(front);
+		int tmp2 = manager.replace(tmp, sp2s);
+		manager.deref(tmp);
+		return tmp2;
+    }
 
     /** 1-step backward reachables.<br>
      * Note: q_k must be in S' _not_ in S'!<br>

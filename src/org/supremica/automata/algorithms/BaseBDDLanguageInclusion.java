@@ -188,11 +188,6 @@ public abstract class BaseBDDLanguageInclusion {
 		boolean save_show_grow = Options.show_grow;
 		Options.show_grow = false;
 
-		int save_algo = Options.algo_family;
-		Options.algo_family = Options.ALGO_MONOLITHIC; // good for smaller tests!
-
-
-
 
 		BDDAutomaton[] l1 = L1.getMembers();
 		int count = L1.getSize();
@@ -228,7 +223,6 @@ public abstract class BaseBDDLanguageInclusion {
 
 		// change back what we disabled:
 		Options.show_grow = save_show_grow;
-		Options.algo_family = save_algo;
 
 		return result;
 	}
@@ -382,6 +376,60 @@ public abstract class BaseBDDLanguageInclusion {
 		}
 		return false; // no new local events, no need to compute ??
 	}
+
+
+	/**
+	 * same as try_local_reachability(), but uses the previous local reachables and stores
+	 * the current ones.
+	 *
+	 * returns bdd-ZERO if to indicate that we have reached a uc_state (and thus no need to care about
+	 * local reachables) or the new local-reachables as a BDD
+	 *
+	 */
+	protected int try_and_remember_local_reachability(Supervisor sup, BDDAutomaton at,
+		int bdd_uc, int initial_states)
+		{
+
+		int local_events_current = register_automaton_addition(at);
+
+		if(local_events_current > local_events_found ) {
+
+			if(Options.debug_on) {
+				Options.out.println("   LL " + (local_events_current - local_events_found) +
+				" new local events found.");
+				ba.getEventManager().dumpSubset("   LL Local events", local_events);
+			}
+			local_events_found  = local_events_current;
+
+			// now check if that state is still reachable given only those events:
+			int local_r = sup.getReachables(local_events);
+			int tmp_bdd = ba.and(bdd_uc, local_r);
+			boolean not_exist = (tmp_bdd == ba.getZero());
+
+
+
+			if(not_exist) {
+				// ok, nothing to worry about, we will carry one. just clean up the mess
+				if(Options.debug_on)
+					Options.out.println("Could not prove reachability using local events, continuing...");
+				ba.deref(tmp_bdd);
+				return local_r;
+			} else {
+				// we have proved that the a bad state was reachable using LOCAL EVENTS!
+				// no need to proceed, we now we are screwed ;(
+				if(Options.debug_on)
+					Options.out.println("A 'bad' state was proved to be reachable by _local events_. we are done!");
+
+				if(Options.trace_on) show_trace(sup, tmp_bdd);
+
+				ba.deref(tmp_bdd);
+				ba.deref(local_r); // throw this one, we wont need it anymore
+				return ba.getZero();
+			}
+		}
+		return initial_states; // no new local events, no need to compute ??
+	}
+
 
 	// ---------------------------------------------------------------------------------------
 

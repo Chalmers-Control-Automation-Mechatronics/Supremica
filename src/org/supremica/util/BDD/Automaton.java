@@ -236,13 +236,13 @@ public class Automaton
 
 	// ---------------------------------------------------------------
 
-    public void addEventCareSet(boolean [] events, boolean uncontrollable_events_only)
+    public void addEventCareSet(boolean [] events, boolean [] result, boolean uncontrollable_events_only)
     {
 		// eventSet.addEventCareSet(events, uncontrollable_events_only);
 		boolean [] es = getEventCareSet(uncontrollable_events_only);
 		int size= es.length;
 		for(int i = 0; i < size; i++)
-			events[i] |= es[i];
+			result[i] = events[i] | es[i];
 	}
 
 	public boolean [] getEventCareSet(boolean uncontrollable_events_only)

@@ -4,6 +4,16 @@ import java.io.*;
 
 public class Options
 {
+
+	/**
+	 * The number of automata in a group or total before we switch from the
+	 * monolithic supervisor -- see SupervisorFactory.createNonDisjSupervisor()
+	 */
+	public static final int
+		MAX_MONOLITHIC_GROUP_SIZE = 12,
+		MAX_MONOLITHIC_TOTAL_SIZE = 18
+		;
+
     /** search algorithm */
     public static final int
 	ALGO_MONOLITHIC = 0,

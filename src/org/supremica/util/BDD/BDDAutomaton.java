@@ -405,9 +405,9 @@ public class BDDAutomaton
 		return automaton.getEventUsageCount();
 	}
 
-	public void addEventCareSet(boolean [] events, boolean uncontrollable_events_only)
+	public void addEventCareSet(boolean [] events, boolean [] result, boolean uncontrollable_events_only)
 	{
-		automaton.addEventCareSet(events, uncontrollable_events_only);
+		automaton.addEventCareSet(events, result, uncontrollable_events_only);
 	}
 
 	public boolean [] getEventCareSet(boolean uncontrollable_events_only)

@@ -45,10 +45,10 @@ public class DisjSupervisor extends ConjSupervisor {
 		disj_partition = new DisjPartition(manager, dop);
     }
 
-    // --------------------------------------------------------
-    protected void computeReachables() {
 
 
+
+    protected int internal_computeReachablesDisj(int i_all) {
 		// statistic stuffs
 		GrowFrame gf = null;
 		if(Options.show_grow)
@@ -57,10 +57,6 @@ public class DisjSupervisor extends ConjSupervisor {
 		timer.reset();
 		DisjPartition dp = getDisjPartition();
 		SizeWatch.setOwner("DisjSupervisor.computeReachables");
-
-
-		int i_all   = manager.and(plant.getI(), spec.getI());
-
 		int r_all_p, r_all = i_all, front = i_all;
 		manager.ref(i_all); //gets derefed by orTo and finally a deref
 		manager.ref(front); // get derefed
@@ -79,17 +75,28 @@ public class DisjSupervisor extends ConjSupervisor {
 
 
 		manager.deref(front);
-		manager.deref(i_all);
 
-		has_reachables = true;
-		bdd_reachables = r_all;
 
 		if(gf != null) gf.stopTimer();
 		SizeWatch.report(bdd_reachables, "Qr");
 		timer.report("Forward reachables found (disjunctive)");
 		// SizeWatch.report(r_all, "R");
+		return r_all;
+	}
+
+
+    // --------------------------------------------------------
+    protected void computeReachables() {
+
+		int i_all = manager.and(plant.getI(), spec.getI());
+		int ret = internal_computeReachablesDisj(i_all);
+		manager.deref(i_all);
+
+		has_reachables = true;
+		bdd_reachables = ret;
     }
 
+	// -------------------------------
     protected void computeCoReachables() {
 
 		GrowFrame gf = null;

@@ -109,9 +109,56 @@ public class ConjSupervisor
     }
     */
 
+	// ------------------------------------------------------------------------
+
+
+	/**
+	 * do a FORWARD reachability search.
+	 * start from the given (set of) initial state(s)
+	 */
+	public int getReachables(int initial_states) {
+		return internal_computeReachablesConj(initial_states, -1);
+	}
+
+	/**
+	 * do a FORWARD reachability search, use only these events;
+	 * start from the initial state
+	 */
+	public int getReachables(boolean [] events) {
+		int i_all = manager.and(plant.getI(), spec.getI());
+		int ret = getReachables(events, i_all);
+		manager.deref(i_all);
+		return ret;
+	}
+
+
+	/**
+	 * do a FORWARD reachability search, use only these events;
+	 * start from the given initial state(s)
+	 */
+	public int getReachables(boolean [] events, int intial_states) {
+		int event_mask = manager.getAlphabetSubsetAsBDD(events);
+		int x = internal_computeReachablesConj(intial_states, event_mask);
+		manager.deref(event_mask);
+		return x;
+	}
 
     protected void computeReachables()
     {
+		int i_all = manager.and(plant.getI(), spec.getI());
+		int ret = internal_computeReachablesConj(i_all, -1);
+		manager.deref(i_all);
+		has_reachables = true;
+		bdd_reachables = ret;
+	}
+
+	/**
+	 * compute reachable states using disjunctive-partioning.
+	 * start from initial state(s) i_all
+	 * consider only events in event_mask (-1 means consider all)
+	 */
+	private int internal_computeReachablesConj(int i_all, int event_mask)
+	{
 
 		// Note: we remove events from t_all, it is needed for forward reachability
 		GrowFrame gf = null;
@@ -124,7 +171,6 @@ public class ConjSupervisor
 		ConjPartition cp = getConjPartition();
 		SizeWatch.setOwner("ConjSupervisor.computeReachables");
 
-		int i_all = manager.and(plant.getI(), spec.getI());
 		int r_all_p, r_all = i_all, front = i_all;
 		manager.ref(i_all);    // gets derefed by orTo and finally a recursiveDeref
 		manager.ref(front); // gets derefed
@@ -132,7 +178,10 @@ public class ConjSupervisor
 		do {
 			r_all_p = r_all;
 
-			int tmp2 = cp.image(front);
+			int tmp2;
+			if(event_mask == -1)	tmp2 = cp.image(front);
+			else					tmp2 = cp.image(front, event_mask);
+
 			r_all = manager.orTo(r_all, tmp2);
 			manager.deref(front);
 			front = tmp2;
@@ -141,20 +190,18 @@ public class ConjSupervisor
 			gf.add(manager.nodeCount(r_all));
 		} while (r_all_p != r_all);
 
-
-		manager.deref(i_all);
 		manager.deref(front);
 
-		has_reachables = true;
-		bdd_reachables = r_all;
+
 
 		if(gf != null) gf.stopTimer();
 		SizeWatch.report(bdd_reachables, "Qr");
 		timer.report("[Conjunctive] forward reachables found");
+		return r_all;
     }
 
 
-
+	// -------------------------------------------------------------------------------------
     protected void computeCoReachables()
 	{
 		GrowFrame gf = null;;

@@ -93,6 +93,13 @@ public class ModularBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 			BDDAutomaton next = ac.addone(work1, work2, true);
 			if(next == null) break;
 
+
+			if(! ac.plantIncludesAllConsidredEvents() ) {
+				// must do this manually, because we bypass try_local_reachability()
+				register_automaton_addition(next);
+				continue;
+			}
+
 			if(Options.debug_on) {
 				Options.out.println("\n -----------------------------------------------------------\n");
 				Options.out.println("Check C(" + work2.toString() + ", " + work1.toString()  + ") ?");
@@ -105,7 +112,8 @@ public class ModularBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 					sup.cleanup();
 					sup = null;
 				}
-				sup = SupervisorFactory.createSupervisor(ba, work2, work1);
+				// sup = SupervisorFactory.createSupervisor(ba, work2, work1);
+				sup = SupervisorFactory.createNonDisjSupervisor(ba, work2, work1);
 
 				bdd_bad = sup.computeReachableLanguageDifference(bdd_events);
 				boolean ret = (bdd_bad == ba.getZero());

@@ -296,19 +296,47 @@ public class Supervisor
 
 	// --------------------------------------------------------------------------------------------
 
-	/** do a reachability search, use only these events; */
+	/**
+	 * do a FORWARD reachability search.
+	 * start from the given (set of) initial state(s)
+	 */
+	public int getReachables(int initial_states) {
+		int t_all = manager.relProd(plant.getT(), spec.getT(), manager.getEventCube());
+		int x = internal_computeReachables(t_all, initial_states);
+		manager.deref(t_all);
+		return x;
+	}
+
+	/**
+	 * do a FORWARD reachability search, use only these events;
+	 * start from the initial state
+	 */
 	public int getReachables(boolean [] events) {
+		int i_all = manager.and(plant.getI(), spec.getI());
+		int ret = getReachables(events, i_all);
+		manager.deref(i_all);
+		return ret;
+	}
+
+	/**
+	 * do a FORWARD reachability search, use only these events;
+	 * start from the given initial state(s)
+	 */
+	public int getReachables(boolean [] events, int intial_states) {
 		int event_mask = manager.getAlphabetSubsetAsBDD(events);
 		int tmp = manager.and(plant.getT(), event_mask);
 		int t_all = manager.relProd(tmp, spec.getT(), manager.getEventCube());
 		manager.deref(tmp);
 		manager.deref(event_mask);
-		int x = internal_computeReachables(t_all);
+		int x = internal_computeReachables(t_all, intial_states);
 		manager.deref(t_all);
 		return x;
 	}
 
-	/** do a reachability search, use all events ; */
+	/**
+	 * do a reachability search, use all events ;
+	 * start from the initial state
+	 */
 	public int getReachables()
 	{    // get reachables from I
 		if (!has_reachables)
@@ -322,13 +350,19 @@ public class Supervisor
 	protected void computeReachables()
 	{
 		int t_all = manager.relProd(plant.getT(), spec.getT(), manager.getEventCube());
-		bdd_reachables = internal_computeReachables(t_all);
+		int i_all = manager.and(plant.getI(), spec.getI());
+		bdd_reachables = internal_computeReachables(t_all, i_all);
 		has_reachables = true;
+		manager.deref(i_all);
 		manager.deref(t_all);
 	}
 
-	/** do a reachability search, using the given transition relation */
-	protected int internal_computeReachables(int t_all) {
+	/**
+	 * do a reachability search,
+	 * use the given transition relation.
+	 * use the given initial state(s)
+	 */
+	protected int internal_computeReachables(int t_all, int i_all) {
 	// Note: we remove events from t_all, it is needed for forward reachability
 		GrowFrame gf = null;
 
@@ -343,7 +377,7 @@ public class Supervisor
 		int cube = manager.getStateCube();
 		int permute = manager.getPermuteSp2S();
 
-		int i_all = manager.and(plant.getI(), spec.getI());
+		// int i_all = manager.and(plant.getI(), spec.getI());
 		int r_all_p, r_all = i_all;
 
 		manager.ref(i_all);    // gets derefed by orTo and finally a recursiveDeref
@@ -370,7 +404,7 @@ public class Supervisor
 		}
 		while (r_all_p != r_all);
 
-		manager.deref(i_all);
+		// manager.deref(i_all);
 
 		SizeWatch.report(r_all, "R");
 		if(gf != null) gf.stopTimer();

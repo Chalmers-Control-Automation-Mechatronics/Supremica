@@ -209,7 +209,7 @@ public class Group
 		for(int i = 0; i < es; i++) ret[i] = false;
 
 		for (int i = 0; i < size; i++)
-			members[i].addEventCareSet(ret, uncontrollable_events_only);
+			members[i].addEventCareSet(ret, ret, uncontrollable_events_only);
 
 		return ret;
 	}
