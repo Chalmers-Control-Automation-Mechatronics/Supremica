@@ -555,6 +555,38 @@ public class TestAlgo
 
 
 
+		// test the transition optimization:
+		System.out.println("\n***** Testing transition optimization, using AGV");
+		oldalgo = Options.algo_family;
+		oldopt = Options.transition_optimizer_algo;
+
+		Options.algo_family = Options.ALGO_PETRINET;
+		System.out.println("Reachability family: " + Options.REACH_ALGO_NAMES[Options.algo_family]);
+
+		for(int k = 0; k < Options.TRANSITION_OPTIMIZER_NAMES.length; k++)
+		{
+			Options.transition_optimizer_algo = k;
+			announce("  optimizer " + Options.TRANSITION_OPTIMIZER_NAMES[k] );
+
+			load(TEST_FILES[agv]);
+			testR(reachables[agv]);
+			testCR(coreachables[agv]);
+
+			if (k == oldopt)
+			{
+				System.out.print(" (DEFAULT) ");
+			}
+
+			verifier.cleanup();
+			System.out.println();
+
+		}
+		Options.algo_family = oldalgo;
+		Options.transition_optimizer_algo = oldopt;
+
+
+
+
 
 		// We also test the H1/H2 heuristics. note that we dont test performance here
 		System.out.println("\n***** Testing H1 and H2 heuristics, using AGV");
@@ -703,6 +735,9 @@ public class TestAlgo
 
 /*
  $Log: not supported by cvs2svn $
+ Revision 1.24  2004/10/19 11:29:35  vahidi
+ *** empty log message ***
+
  Revision 1.23  2004/10/13 13:25:42  vahidi
  *** empty log message ***
 

@@ -81,7 +81,7 @@ public class TransitionOptimizer {
 		// 2. update each system with these new names
 		for(int i = 0; i < k; i++)
 		{
-			optimized[i].renameEvent(perm, k);
+			optimized[i].renameEvent(perm, k, i);
 		}
 
 		/*

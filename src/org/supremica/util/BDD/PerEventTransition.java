@@ -259,6 +259,10 @@ public class PerEventTransition
 			}
 		}
 
+		// remove myself
+		next_event[event] = prev_event[event] = 0;
+
+		// count it!
 		next_events = ec - Util.countEQ(next_event, 0);
 		prev_events = ec - Util.countEQ(prev_event, 0);
 	}
@@ -431,7 +435,7 @@ public class PerEventTransition
 	 * this must be called after a join
 	 */
 
-	/* package */ void renameEvent(int [] perm, int new_size)
+	/* package */ void renameEvent(int [] perm, int new_size, int my_id)
 	{
 		int []tmp1 = new int[new_size];
 		int []tmp2 = new int[new_size];
@@ -451,6 +455,13 @@ public class PerEventTransition
 
 		next_event = tmp1;
 		prev_event = tmp2;
+
+		// remove myself
+		next_event[my_id] = prev_event[my_id] = 0;
+
+		// recount it (is this really needed? maybe when it removes itself and is join of two dependent transitions??)
+		next_events = new_size - Util.countEQ(next_event, 0);
+		prev_events = new_size - Util.countEQ(prev_event, 0);
 
 		// XXX: do not touch the event_list! that the original and must be kept intact!
 	}
