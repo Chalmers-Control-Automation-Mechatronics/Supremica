@@ -63,6 +63,8 @@ public class Supremica
 
 	public static void main(String[] args)
 	{
-		SupremicaWithGui.startSupremica(args);
+		SupremicaProperties.loadProperties(args);
+		//SupremicaWithGui.startSupremica(args);
+		SupremicaWithGui.startSupremica();
 	}
 }

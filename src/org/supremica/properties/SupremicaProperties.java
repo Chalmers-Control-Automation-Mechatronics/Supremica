@@ -120,8 +120,8 @@ public final class SupremicaProperties
 
 	private SupremicaProperties()
 	{
-		setProperty(FILE_OPEN_PATH, "../examples/", true);
-		setProperty(FILE_SAVE_PATH, ".", true);
+		setProperty(FILE_OPEN_PATH, System.getProperty("user.home"), true);
+		setProperty(FILE_SAVE_PATH, System.getProperty("user.home"), true);
 		setProperty(FILE_ALLOW_OPEN, "true", true);
 		setProperty(FILE_ALLOW_SAVE, "true", true);
 		setProperty(FILE_ALLOW_IMPORT, "true", true);
@@ -654,5 +654,32 @@ public final class SupremicaProperties
 	private static int toInt(String s)
 	{
 		return Integer.parseInt(s);
+	}
+
+
+	/**
+	 * Looks for "-p propertyFile", and load it it exists.
+	 */
+	public static void loadProperties(String[] args)
+	{
+		for (int i = 0; i < args.length; i++)
+		{
+			if (args[i].equals("-p") || args[i].equals("--properties"))
+			{
+				if (i + 1 < args.length)
+				{
+					String fileName = args[i + 1];
+					File propFile = new File(fileName);
+					try
+					{
+						setProperties(propFile);
+					}
+					catch (Exception e)
+					{
+						System.err.println("Error reading properties file: " + propFile.getAbsolutePath());
+					}
+				}
+			}
+		}
 	}
 }

@@ -67,6 +67,7 @@ public class SupremicaStudent
 	{
 		if (args != null)
 		{
+			SupremicaProperties.loadProperties(args);
 			SupremicaWithGui.startSupremica(args);
 		}
 	}
