@@ -227,7 +227,7 @@ public final class AutomataSynchronizerExecuter
 		// FIXA!
 		if (exhaustiveSearch)
 		{
-			throw new Exception("Exhaustive search used wrong way!");
+			throw new Exception("Exhaustive search used in the wrong way!");
 		}
 	}
 
@@ -244,7 +244,7 @@ public final class AutomataSynchronizerExecuter
 
 		if (exhaustiveSearch)
 		{
-			throw new Exception("Exhaustive search used wrong way!");
+			throw new Exception("Exhaustive search used in the wrong way!");
 		}
 	}
 
@@ -355,7 +355,7 @@ public final class AutomataSynchronizerExecuter
 						{
 							//... this event should not be executed
 							thisEventOk = false;
-
+							
 							// For controllability we need to know whether the event was disabled by a plant or a spec
 							if (typeIsPlantTable[currAutIndex])
 							{
@@ -455,7 +455,7 @@ public final class AutomataSynchronizerExecuter
 				}
 			}
 
-			if (!thisEventOk && canExecuteInPlant && thisPlantEventOk &&!controllableEventsTable[currEventIndex])
+			if (!thisEventOk && canExecuteInPlant && thisPlantEventOk && !controllableEventsTable[currEventIndex])
 			{
 
 				// Uncontrollable state found
@@ -612,7 +612,6 @@ public final class AutomataSynchronizerExecuter
 				if (forbidUncontrollableStates)
 				{
 					helper.setForbidden(currState, true);
-
 				}
 			}
 
@@ -625,7 +624,6 @@ public final class AutomataSynchronizerExecuter
 				// Handle all events
 				while (currEventIndex != Integer.MAX_VALUE)
 				{
-
 					// Generate an array that contains the indicies of each state
 					System.arraycopy(currState, 0, nextState, 0, currState.length);
 

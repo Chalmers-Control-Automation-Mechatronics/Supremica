@@ -189,7 +189,7 @@ public final class AutomataSynchronizerHelper
 	public void clear()
 	{
 		theStates.clear();
-
+		
 		automataIsControllable = true;
 		coExecute = false;
 		coExecuter = null;
@@ -242,20 +242,9 @@ public final class AutomataSynchronizerHelper
 		return helperData;
 	}
 
-	/**
-	 * Add a state to the queue of states waiting for being processed.
-	 * This is only called by the addInitialState and addState methods.
-	 *
-	 *@param  state The feature to be added to the StateToProcess attribute
-	 */
-	public void addStateToProcess(int[] state)
+	public int getNbrOfStatesToProcess()
 	{
-		synchronized (addingToStatesToProcessLock)
-		{
-			statesToProcess.addLast(state);
-
-			nbrOfStatesToProcess++;
-		}
+		return nbrOfStatesToProcess;
 	}
 
 	/**
@@ -321,6 +310,56 @@ public final class AutomataSynchronizerHelper
 		}
 	}
 
+	public void addComment(String comment)
+	{
+		theAutomaton.setComment(comment);
+	}
+
+	public void setExecutionDialog(ExecutionDialog executionDialog)
+	{
+		this.executionDialog = executionDialog;
+	}
+
+	public ExecutionDialog getExecutionDialog()
+	{
+		return executionDialog;
+	}
+
+	/**
+	 * If the toState does not exist then make a copy of this state
+	 * and add it to the set of states and to the set of states waiting for processing.
+	 * If it exists then find it.
+	 * Insert the arc.
+	 *
+	 *@param fromState The feature to be added to the State attribute
+	 *@param toState The feature to be added to the State attribute
+	 *@param eventIndex The feature to be added to the State attribute
+	 *@exception  Exception Description of the Exception
+	 */
+	public void addState(int[] fromState, int[] toState, int eventIndex)
+		throws Exception
+	{
+		if (rememberTrace)
+		{
+			fromStateList.addLast(fromState);
+		}
+
+		if (true)  // What? /Hguo.
+		{
+			int prevStateIndex = theStates.getIndex(fromState);
+			if (prevStateIndex >= 0)
+			{
+				AutomataIndexFormHelper.setPrevStateIndex(toState, prevStateIndex);
+			}
+			else
+			{
+				AutomataIndexFormHelper.setPrevStateIndex(toState, AutomataIndexFormHelper.STATE_NO_PREVSTATE);
+			}
+		}
+
+		addState(toState);
+	}
+
 	// Add this state to theStates
 	public void addState(int[] state)
 		throws Exception
@@ -364,54 +403,20 @@ public final class AutomataSynchronizerHelper
 		}
 	}
 
-	public void addComment(String comment)
-	{
-		theAutomaton.setComment(comment);
-	}
-
-	public void setExecutionDialog(ExecutionDialog executionDialog)
-	{
-		this.executionDialog = executionDialog;
-	}
-
-	public ExecutionDialog getExecutionDialog()
-	{
-		return executionDialog;
-	}
-
 	/**
-	 * If the toState does not exist then make a copy of this state
-	 * and add it to the set of states and to the set of states waiting for processing.
-	 * If it exists then find it.
-	 * Insert the arc.
+	 * Add a state to the queue of states waiting for being processed.
+	 * This is only called by the addInitialState and addState methods.
 	 *
-	 *@param  fromState The feature to be added to the State attribute
-	 *@param  toState The feature to be added to the State attribute
-	 *@param  eventIndex The feature to be added to the State attribute
-	 *@exception  Exception Description of the Exception
+	 *@param  state The feature to be added to the StateToProcess attribute
 	 */
-	public void addState(int[] fromState, int[] toState, int eventIndex)
-		throws Exception
+	public void addStateToProcess(int[] state)
 	{
-		if (rememberTrace)
+		synchronized (addingToStatesToProcessLock)
 		{
-			fromStateList.addLast(fromState);
-		}
+			statesToProcess.addLast(state);
 
-		if (true)
-		{
-			int prevStateIndex = theStates.getIndex(fromState);
-			if (prevStateIndex >= 0)
-			{
-				AutomataIndexFormHelper.setPrevStateIndex(toState, prevStateIndex);
-			}
-			else
-			{
-				AutomataIndexFormHelper.setPrevStateIndex(toState, AutomataIndexFormHelper.STATE_NO_PREVSTATE);
-			}
+			nbrOfStatesToProcess++;
 		}
-
-		addState(toState);
 	}
 
 	public void addStatus(int[] state)

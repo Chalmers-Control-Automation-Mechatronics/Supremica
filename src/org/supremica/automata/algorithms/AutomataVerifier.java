@@ -282,7 +282,7 @@ public class AutomataVerifier
 	/**
 	 * Performs modular controllablity verification on theAutomata..
 	 *
-	 *@return  true if controllable, false if not or false if don't know.
+	 *@return  true if controllable, false if not or false (with error message) if don't know.
 	 *@exception  Exception Description of the Exception
 	 *@see  AutomataVerificationWorker
 	 */
@@ -414,6 +414,7 @@ public class AutomataVerifier
 		synchHelper.clear();
 		synchHelper.setRememberUncontrollable(true);
 		synchHelper.addState(initialState);
+		// logger.info("nbrOfStatesToProcess: " + synchHelper.getNbrOfStatesToProcess());
 
 		if (stopRequested)
 		{
@@ -1384,7 +1385,7 @@ public class AutomataVerifier
 
 		// The automata have indexes corresponding to theAutomata, we ignore
 		// this by using the variable "index".
-		int index=0;
+		int index = 0;
 		while (autIt.hasNext())
 		{
 			currAutomaton = (Automaton) autIt.next();
