@@ -196,6 +196,68 @@ public class Events
 		throw new Exception("No event with index '" + index + "' exists");
 	}
 
+	public int nbrOfEvents()
+	{
+		return size();
+	}
+
+	public int nbrOfControllableEvents()
+	{
+		int nbrOfFoundEvents = 0;
+		for (Iterator evIt = iterator(); evIt.hasNext(); )
+		{
+			LabeledEvent currEvent = (LabeledEvent)evIt.next();
+			if (currEvent.isControllable())
+			{
+				nbrOfFoundEvents++;
+			}
+		}
+		return nbrOfFoundEvents;
+	}
+
+	public int nbrOfPrioritizedEvents()
+	{
+		int nbrOfFoundEvents = 0;
+		for (Iterator evIt = iterator(); evIt.hasNext(); )
+		{
+			LabeledEvent currEvent = (LabeledEvent)evIt.next();
+			if (currEvent.isPrioritized())
+			{
+				nbrOfFoundEvents++;
+			}
+		}
+		return nbrOfFoundEvents;
+	}
+
+	public int nbrOfImmediateEvents()
+	{
+		int nbrOfFoundEvents = 0;
+		for (Iterator evIt = iterator(); evIt.hasNext(); )
+		{
+			LabeledEvent currEvent = (LabeledEvent)evIt.next();
+			if (currEvent.isImmediate())
+			{
+				nbrOfFoundEvents++;
+			}
+		}
+		return nbrOfFoundEvents;
+	}
+
+	public int nbrOfEpsilonEvents()
+	{
+		int nbrOfFoundEvents = 0;
+		for (Iterator evIt = iterator(); evIt.hasNext(); )
+		{
+			LabeledEvent currEvent = (LabeledEvent)evIt.next();
+			if (currEvent.isEpsilon())
+			{
+				nbrOfFoundEvents++;
+			}
+		}
+		return nbrOfFoundEvents;
+	}
+
+
 	/**
 	 * True, if the event is in the set already, false otherwise.
 	 *

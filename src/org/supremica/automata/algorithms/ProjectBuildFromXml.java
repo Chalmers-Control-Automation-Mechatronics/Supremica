@@ -119,6 +119,11 @@ public class ProjectBuildFromXml
 	private Map idStateMap = new HashMap();
 	private Map idEventMap = new HashMap();
 
+	public ProjectBuildFromXml()
+	{
+		this.theProjectFactory = new DefaultProjectFactory();
+	}
+
 	public ProjectBuildFromXml(ProjectFactory theProjectFactory)
 	{
 		this.theProjectFactory = theProjectFactory;
@@ -415,7 +420,7 @@ public class ProjectBuildFromXml
 
 		// Associate the id with the event
 		idEventMap.put(id, currEvent);
-		
+
 		try
 		{
 			currAlphabet.addEvent(currEvent);
@@ -480,10 +485,10 @@ public class ProjectBuildFromXml
 		currState.setInitial(initial);
 		currState.setAccepting(accepting);
 		currState.setForbidden(forbidden);
-		
+
 		// Associate the id with the state
 		idStateMap.put(id, currState);
-		
+
 		currAutomaton.addState(currState);
 	}
 

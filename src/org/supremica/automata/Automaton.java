@@ -62,7 +62,7 @@ public class Automaton
 	private String comment;
 	// private List theStates = new LinkedList();
 	private StateSet theStates = new StateSet();
-	
+
 	private int index = -1;
 	private Map idStateMap;	// Want fast lookup on both id and index (but not name?)
 	private Map indexStateMap;
@@ -71,7 +71,7 @@ public class Automaton
 	private boolean isDisabled = false;
 	private AutomatonType type = AutomatonType.Undefined;
 	private int uniqueStateIndex = 0;
-	
+
 	// Graphical stuff
 	private boolean hasLayout = false;
 	private int width = -1;
@@ -140,10 +140,10 @@ public class Automaton
 					Arc orgArc = (Arc) outgoingArcs.next();
 					State orgDestState = orgArc.getToState();
 					State newDestState = getStateWithId(orgDestState.getId());
-					
+
 					LabeledEvent currEvent = newAlphabet.getEventWithId(orgArc.getEventId());
 					// LabeledEvent currEvent = orgAlphabet.getEventWithId(orgArc.getEventId());
-					
+
 					Arc newArc = new Arc(newSourceState, newDestState, currEvent);
 					// Arc newArc = new Arc(newSourceState, newDestState, currEvent.getId());
 
@@ -199,10 +199,18 @@ public class Automaton
 
 	public String getName()
 	{
+		if (name == null)
+		{
+			return "";
+		}
 		return name;
 	}
 	public String getComment()
 	{
+		if (comment == null)
+		{
+			return "";
+		}
 		return comment;
 	}
 	public void setComment(String comment)
@@ -250,7 +258,7 @@ public class Automaton
 		addState(state);
 		return state;
 	}
-	
+
 	public void removeState(State state)
 	{
 		if (state == initialState)
@@ -274,27 +282,27 @@ public class Automaton
 	{
 		return initialState;
 	}
-	
+
 	// This is a fixx, for now - see bug report
 	public void setInitialState(State state)
 	{
 		State oldinit = getInitialState();
-		
+
 		State newinit = getState(state);
 		if(newinit == null)
 		{
 			throw new RuntimeException("No such state. id = " + state.getId());
 		}
-		
+
 		newinit.setInitial(true);
 		initialState = newinit;
-		
+
 		if(oldinit != null)
 		{
 			oldinit.setInitial(false);
 		}
 	}
-	
+
 	/**
 	 * Returns a uniquely named (and id'ed) state.
 	 * Passing null or empty prefix sets prefix to 'q'
@@ -318,7 +326,7 @@ public class Automaton
 		}
 		return new State(name.toString());
 	}
-	
+
 	/**
 	 * Returns a uniquely named (and id'ed) state.
 	 * Add it to the state set
@@ -420,7 +428,7 @@ public class Automaton
 	{
 		return theStates;
 	}
-	
+
 	public State getState(State state)
 	{
 		return (State) idStateMap.get(state.getId());
@@ -466,7 +474,7 @@ public class Automaton
 		return (((State) (indexStateMap.get(new Integer(index)))).getName());
 	}
 	// end index stuff
-	
+
 	public LabeledEvent getEvent(String eventId)
 		throws Exception
 	{
@@ -987,6 +995,93 @@ public class Automaton
 				return false;
 			}
 		}
+		return true;
+	}
+
+	public int nbrOfControllableEvents()
+	{
+		return alphabet.nbrOfControllableEvents();
+	}
+
+	public int nbrOfPrioritizedEvents()
+	{
+		return alphabet.nbrOfPrioritizedEvents();
+	}
+
+	public int nbrOfImmediateEvents()
+	{
+		return alphabet.nbrOfImmediateEvents();
+	}
+
+	public int nbrOfEpsilonEvents()
+	{
+		return alphabet.nbrOfEpsilonEvents();
+	}
+
+	/**
+	 * Returns true if there are no obvious differences between this
+	 * automaton and the other. Note, that this method only compares the
+	 * number of states and transitions, etc. This method does guarantee
+	 * that the two automata generates the same language.
+	 */
+	public boolean equalAutomaton(Automaton other)
+	{
+		if (getType() != other.getType())
+		{
+			//System.err.println("equalAutomaton::non equal type");
+			return false;
+		}
+		if (!getName().equals(other.getName()))
+		{
+			//System.err.println("equalAutomaton::non equal name");
+			return false;
+		}
+		if (!getComment().equals(other.getComment()))
+		{
+			//System.err.println("equalAutomaton::non equal comment");
+			return false;
+		}
+		if (hasAcceptingState() != other.hasAcceptingState())
+		{
+			//System.err.println("equalAutomaton::non equal accepting state");
+			return false;
+		}
+		if (hasSelfLoop() != other.hasSelfLoop())
+		{
+			//System.err.println("equalAutomaton::non equal has self loop");
+			return false;
+		}
+		if (isDeterministic() != other.isDeterministic())
+		{
+			//System.err.println("equalAutomaton::non equal is deterministic");
+			return false;
+		}
+		if (isAllEventsPrioritized() != other.isAllEventsPrioritized())
+		{
+			//System.err.println("equalAutomaton::non equal is all events prioritized");
+			return false;
+		}
+		if (nbrOfAcceptingStates() != other.nbrOfAcceptingStates())
+		{
+			//System.err.println("equalAutomaton::non equal name nbr of accepting states");
+			return false;
+		}
+		if (nbrOfForbiddenStates() != other.nbrOfForbiddenStates())
+		{
+			//System.err.println("equalAutomaton::non equal nbr of forbidden states");
+			return false;
+		}
+		if (nbrOfAcceptingAndForbiddenStates() != other.nbrOfAcceptingAndForbiddenStates())
+		{
+			//System.err.println("equalAutomaton::non equal name nbr of accepting and forbidden states");
+			return false;
+		}
+		if (!alphabet.equalAlphabet(other.alphabet))
+		{
+			//System.err.println("equalAutomaton::non equal alphabet");
+			return false;
+		}
+
 		return true;
 	}
 

@@ -139,6 +139,7 @@ public class Project
 		this.inputProtocol = theProtocol;
 	}
 */
+
 	public void addActions(Actions otherActions)
 	{
 		if (theActions == null)
@@ -182,5 +183,15 @@ public class Project
 		super.clear();
 		theActions.clear();
 		theControls.clear();
+	}
+
+	public boolean equalProject(Project other)
+	{
+		if (!equalAutomata(other))
+		{
+			return false;
+		}
+		// Add more checks here
+		return true;
 	}
 }

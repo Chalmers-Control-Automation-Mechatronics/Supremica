@@ -53,25 +53,71 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-public class TestPackageAutomata
+import org.supremica.testhelpers.*;
+import org.supremica.automata.*;
+import org.supremica.automata.algorithms.*;
+import java.io.*;
+
+public class TestProjectToSP
 	extends TestCase
 {
+	private static final String tempFilePrefix = "SupremicaDummyFile";
+	private static final String tempFileSuffix = "xml";
 
-	public TestPackageAutomata(String name)
+	public TestProjectToSP(String name)
 	{
 		super(name);
 	}
 
 	/**
+	 * Sets up the test fixture.
+	 * Called before every test case method.
+	 */
+	protected void setUp()
+	{
+	}
+
+	/**
+	 * Tears down the test fixture.
+	 * Called after every test case method.
+	 */
+	protected void tearDown()
+	{
+	}
+
+	/**
 	 * Assembles and returns a test suite
-	 * containing all known tests.
+	 * for all the test methods of this test case.
 	 */
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite();
-		suite.addTest(TestAutomaton.suite());
-		suite.addTest(TestAutomataToXml.suite());
-		suite.addTest(TestProjectToSP.suite());
+		TestSuite suite = new TestSuite(TestInterClassFileIO.class);
 		return suite;
 	}
+
+	public void testReadWriteRead()
+	{
+		try
+		{
+			File testFileAgv = TestFiles.getFile(TestFiles.AGV);
+			ProjectBuildFromXml originalBuilder = new ProjectBuildFromXml();
+			Project theOriginalProject = originalBuilder.build(testFileAgv);
+			assertTrue(theOriginalProject.nbrOfAutomata() > 0);
+			File tempFile = File.createTempFile(tempFilePrefix, tempFileSuffix);
+			ProjectToSP exporter = new ProjectToSP(theOriginalProject);
+			exporter.serialize(tempFile);
+			ProjectBuildFromXml secondBuilder = new ProjectBuildFromXml();
+			Project theSecondProject = secondBuilder.build(tempFile);
+			tempFile.delete();
+			assertTrue(theOriginalProject != null);
+			assertTrue(theSecondProject != null);
+			assertTrue(theOriginalProject.equalProject(theSecondProject));
+		}
+		catch (Exception ex)
+		{
+			ex.printStackTrace();
+			assertTrue(false);
+		}
+	}
+
 }

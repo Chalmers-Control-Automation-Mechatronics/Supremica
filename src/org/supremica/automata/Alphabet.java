@@ -124,7 +124,7 @@ public class Alphabet
 	{
 		return containsEventWithId(event.getId());
 	}
-	
+
 	/**
 	 * Returns an event with a given id. An exception is thrown if the event
 	 * does not exists.
@@ -284,6 +284,36 @@ public class Alphabet
 	public Iterator eventIterator()
 	{
 		return idMap.values().iterator();
+	}
+
+	public boolean equalAlphabet(Alphabet other)
+	{
+		if (nbrOfEvents() != other.nbrOfEvents())
+		{
+			//System.err.println("equalAlphabet::non equal nbr of events");
+			return false;
+		}
+		if (nbrOfControllableEvents() != other.nbrOfControllableEvents())
+		{
+			//System.err.println("equalAlphabet::non equal nbr of controllable events");
+			return false;
+		}
+		if (nbrOfPrioritizedEvents() != other.nbrOfPrioritizedEvents())
+		{
+			//System.err.println("equalAlphabet::non equal nbr of prioritized events");
+			return false;
+		}
+		if (nbrOfImmediateEvents() != other.nbrOfImmediateEvents())
+		{
+			//System.err.println("equalAlphabet::non equal nbr of immediate events");
+			return false;
+		}
+		if (nbrOfEpsilonEvents() != other.nbrOfEpsilonEvents())
+		{
+			//System.err.println("equalAlphabet::non equal nbr of epsilon events");
+			return false;
+		}
+		return true;
 	}
 
 	/**

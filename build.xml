@@ -197,7 +197,7 @@
 *	Reuses existing class files, but recompiles those
 *	source files that have changed.
 -->
-<target name="compile_supremica_tests">
+<target name="compile_tests_supremica">
 	<javac
 		srcdir="${testssrc}"
 		destdir="${testsbuild}"
@@ -252,21 +252,21 @@
 *	A standard compilation followed by packaging
 *	all files into a jar file. 
 -->
-<target name="build_supremica" depends="compile_supremica,compile_supremica_tests,jar_supremica,startfiles_supremica">
+<target name="build_supremica" depends="compile_supremica,compile_tests_supremica,jar_supremica,startfiles_supremica">
 </target>
 
 <!-- Build:
 *	A standard compilation followed by packaging
 *	all files into a jar file. 
 -->
-<target name="build_supremica_student" depends="compile_supremica,compile_supremica_tests,jar_supremica_student,startfiles_supremica_student">
+<target name="build_supremica_student" depends="compile_supremica,compile_tests_supremica,jar_supremica_student,startfiles_supremica_student">
 </target>
 
 <!-- Build:
 *	A standard compilation followed by packaging
 *	all files into a jar file. 
 -->
-<target name="build_supremica_teacher" depends="compile_supremica,compile_supremica_tests,jar_supremica_teacher,startfiles_supremica_teacher">
+<target name="build_supremica_teacher" depends="compile_supremica,compile_tests_supremica,jar_supremica_teacher,startfiles_supremica_teacher">
 </target>
 
 <!-- Rebuild:
@@ -411,7 +411,10 @@
 <target name="doc" depends="doc_supremica,doc_jgrafchart">
 </target>
 
-<target name="run_supremica_tests" depends="compile_supremica,compile_supremica_tests">
+<target name="run_tests" depends="run_tests_supremica">
+</target>
+
+<target name="run_tests_supremica" depends="compile_supremica,compile_tests_supremica">
 	<java fork="yes" classname="junit.textui.TestRunner"
 		taskname="junit" failonerror="true">
 		<arg value="org.supremica.TestPackageSupremica"/>

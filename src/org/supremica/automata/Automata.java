@@ -347,9 +347,17 @@ public class Automata
 		return theAutomata.size();
 	}
 
-	public int getNbrOfAutomata()
+	public int nbrOfAutomata()
 	{
 		return size();
+	}
+
+	/**
+	 * Use nbrOfAutomata instead.
+	 */
+	public int getNbrOfAutomata()
+	{
+		return nbrOfAutomata();
 	}
 
 	public boolean containsAutomaton(String name)
@@ -396,8 +404,54 @@ public class Automata
 		return -1;
 	}
 
+	/**
+	 * Compares two automata objects for equality. This test is supposed
+	 * to a quick test, therefor we do not check for language equality
+	 * in this automaton. Note, that the automata must be in the same order
+	 * for this method to return true.
+	 */
+	public boolean equalAutomata(Automata other)
+	{
+		if (nbrOfAutomata() != other.nbrOfAutomata())
+		{
+			return false;
+		}
+		if (!getName().equals(other.getName()))
+		{
+			return false;
+		}
+		for (Iterator thisAutIt = iterator(), otherAutIt = other.iterator(); thisAutIt.hasNext() || otherAutIt.hasNext(); )
+		{
+			//System.err.println("automata i");
+			if (!thisAutIt.hasNext())
+			{
+				//System.err.println("automata i this");
+				return false;
+			}
+			if (!otherAutIt.hasNext())
+			{
+				//System.err.println("automata i other");
+				return false;
+			}
+			Automaton thisAutomaton = (Automaton)thisAutIt.next();
+			Automaton otherAutomaton = (Automaton)otherAutIt.next();
+			if (!thisAutomaton.equalAutomaton(otherAutomaton))
+			{
+				//System.err.println("unequal automaton");
+				return false;
+			}
+		}
+
+		//System.err.println("equal automaton");
+		return true;
+	}
+
 	public String getName()
 	{
+		if (name == null)
+		{
+			return "";
+		}
 		return name;
 	}
 
