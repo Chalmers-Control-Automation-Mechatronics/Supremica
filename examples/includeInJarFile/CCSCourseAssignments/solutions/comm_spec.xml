@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Automata name="Single Visual Project"  major="0"  minor="9" >
+<Automaton name="com_spec" type="Specification">
+	<Events>
+		<Event id="getframe" label="getframe"/>
+		<Event id="passtohost" label="passtohost"/>
+	</Events>
+	<States>
+		<State id="q_0" initial="true" accepting="true"/>
+		<State id="q_1"/>
+	</States>
+	<Transitions>
+		<Transition source="q_0" dest="q_1" event="getframe"/>
+		<Transition source="q_1" dest="q_0" event="passtohost"/>
+	</Transitions>
+</Automaton>
+</Automata>
