@@ -121,12 +121,14 @@ the controllers there may be as many views as needed for the
 automation object.
 
 Configuration registry is a function block implementing the
-configuration database and interface to it. This
-function block holds all relevant attributes for the
-automation object and provides an interface for accessing
-and changing them. Configuration registry is used by models,
-controllers and the views for storing and retrieving the
-configuration data.
+configuration database and interface to it. This function
+block holds all relevant attributes and configuration
+variables for the automation object and provides an
+interface for accessing and changing them. Configuration
+registry is used by models, controllers and the views for
+storing and retrieving the configuration data. For example,
+controllers will use this function block to access their
+regulator parameters and other configurable parameters.
 
 %* Service is a set of views that support some relevant task
 %  for the connected controller  
@@ -193,10 +195,9 @@ be done in the Supremica. The architecture for the
 automation objects will be concurrently implemented with the
 development tools and functions. In this section
 implementation considerations are discussed and the
-development work flow is presented using some mockup
-screenshots.
+development work flow is presented.
 
-%% implementation of automation objects
+%% format of automation objects
 %%   archive of XML files
 %%   models, views, controllers and registry are declared in
 %%   some kind of MetaInformation.xml 
@@ -204,16 +205,96 @@ An automation object is distributed as compressed archive of
 XML-files. The archive contains XML definitions of models,
 views, controllers, registry and a file containing the meta
 information for the automation object. In the meta
-information file all information about the automation object
+information file all the automation object attributes
 (ie name, creator, version), all of the possible
-configuration attributes, service definitions and interface
-explanations are stored.
+configuration variables, service definitions and interface
+explanations are stored. In other words everything needed
+for successful reusage in the development, configuration and
+execution of the automation object. 
 
-%% libraries 
+%% repositories
 %%   non-hierarchical pool of automation objects
-%%   libraries  may be Internet repositories
+%%   may be share using the internet
 %%   searching and sorting by multiple attributes/keys
 %%   searching and sorting by services
+It is envisioned that after the initial acceptance period
+significant amount of automation objects are developed.
+These are stored in the repositories for easy acess. The
+repositories are non-hierarchical pools of automation
+objects, probably implemented using database technology.
+These repositories are prefferably shared over the internet.
+The most important feature of the repositories is the
+ability for extensinve search and sorting by multiple
+attributes defined in the registry as well as the defined
+services.
 
 %% development tool is the control system
-%% how will it work (mockups)
+%% how will it work?
+The Supremica tool provides the user interface for the
+development and the deployment of the automation object
+applications. The implementation that supports the user
+interface consists of two cooperating parts. The development
+environment for the automation objects and the run-time
+environment for the function blocks. 
+
+The DE provides the tools and functions for the repository
+handlig and automation object development. The user is able
+to choose among the available automation objects from the
+repository and include them in the application. While
+working with the objects the user can activate different
+services or bring up specific views and exchange the models
+and controllers. User can also connect the views of the
+different objects in the application. Working in this way
+the user can build and tune the application to it's liking.
+
+All the time during the development process the run-time
+environment is active and taking commands from the
+development environment to add function block types, add
+instances and connections to composite function block types,
+to add instances and connections to the application, to
+configure the resources, to start and stop the execution of
+the application and so, thus creating the application in the
+run-time environment as it is developed. These commands are
+all at the function block level. It is the development
+environment that transforms the automation object operations
+into the function blocks running in the run-time environment
+and thus making all of the automation objects alive
+throughout the development.
+
+While the user have one of the simulation models activated
+the run-time is executing the code that simulates the
+behaviour of the hardware that the object is supposed to
+control. Switching to the model that talks to the process
+interface issues a command to exchange the function blocks
+in the run-time and results in the control of hardware
+instead of the simulation of the control. This gives user
+the freedom to incrementally develop large systems. 
+
+For example, consider a production plant that is connected
+to the network of control computers. Engineers responsible
+for each part can develop, tune and test their part on any
+computer on the network. As each one switches to the model
+that communcates with the hardware the plant becomes more
+and more functional until it is fully operational.
+
+To accomplish this the development environment uses the
+database technology to hold the application data that is
+shared. While working on the application the engineers can
+acess this data from any computer on the network. The
+application data includes the distribution configuration
+governing which automation objects are run by which
+computers on the network. By issuing the commands to the
+run-time environment of the computer running the automation
+object that is currently worked on, the development
+environment allows the user to work on the whole application
+from any computer on the network. This means that if
+something goes wrong or software/equipment needs upgrading
+anyone that can acess the application data can, from any
+computer on the network, switch the model of the automation
+object in question to simulation model so that the parts of
+the plant that don't need the resource being upgraded in the
+production can continue to function, resolv the problem or
+perform the upgrade and finally switch back. This feature
+can also be used for active monitoring, tuning and control
+of the system by a human operator given that the views
+implementing the human machine interface are developed.
