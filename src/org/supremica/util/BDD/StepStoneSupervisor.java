@@ -54,7 +54,7 @@ public class StepStoneSupervisor
 			r_all = manager.orTo(r_all, tmp2);
 
 			manager.deref(tmp2);
-			workset.exclusive_advance(p, (r_all != r_all_old));
+			workset.nonfixpoint_advance(p, (r_all != r_all_old));
 
 			if (gf != null)
 			{
@@ -99,7 +99,7 @@ public class StepStoneSupervisor
 			r_all = manager.orTo(r_all, tmp2);
 
 			manager.deref(tmp2);
-			workset.exclusive_advance(p, (r_all != r_all_old));
+			workset.nonfixpoint_advance(p, (r_all != r_all_old));
 
 			if (gf != null)
 			{
@@ -122,4 +122,111 @@ public class StepStoneSupervisor
 
 		return ret;
 	}
+
+
+	// --- [ safe state supervisory stuff ] -----------------------------------------
+	// XXX: this fails when doing supNBC on AGV!!
+	protected int restrictedBackward(int marked, int forbidden)
+	{
+
+		// statistic stuffs
+		GrowFrame gf = BDDGrow.getGrowFrame(manager, "restrictedBackward " + type());
+		SizeWatch.setOwner("StepStoneSupervisor.restrictedBackward");
+		timer.reset();
+
+		Workset workset = getWorkset(false);
+		int r_all = manager.replace(marked, perm_s2sp);
+		int r_permitted = manager.not(forbidden);
+
+		while (!workset.empty())
+		{
+			int p = workset.pickOne();
+
+			int tmp = manager.relProd(clusters[p].getTwave(), r_all, sp_cube);
+			tmp = manager.andTo(tmp, r_permitted);
+			int tmp2 = manager.replace(tmp, perm_s2sp);
+			manager.deref(tmp);
+
+
+			int r_all_old = r_all;
+			r_all = manager.orTo(r_all, tmp2);
+			workset.nonfixpoint_advance(p, r_all != r_all_old);
+
+			manager.deref(tmp2);
+
+
+			if (gf != null)
+			{
+				gf.add(r_all);
+			}
+		}
+
+		int ret = manager.replace(r_all, perm_sp2s);
+
+		manager.deref(r_all);
+		manager.deref(r_permitted);
+
+		if (gf != null)
+		{
+			gf.stopTimer();
+		}
+
+		SizeWatch.report(ret, "Qrestricted_backward");
+		timer.report("restrictedBackward (StepStone)");
+		workset.done();
+
+		return ret;
+	}
+
+
+	// -------------------------------------------------------
+
+	// XXX: maybe this also fails, but just not on the AGV model???
+	protected int uncontrollableBackward(int states)
+	{
+		GrowFrame gf = BDDGrow.getGrowFrame(manager, "uncontrollableBackward " + type());
+
+		timer.reset();
+		SizeWatch.setOwner("StepStoneSupervisor.uncontrollableBackward");
+
+		Workset workset = getWorkset(false);
+		int r_all_p, r_all = manager.replace(states, perm_s2sp);
+
+
+
+		while (!workset.empty())
+		{
+			int p = workset.pickOne();
+
+
+			int tmp = manager.relProd(clusters[p].getTwaveUncontrollable(), r_all, sp_cube);
+			int tmp2 = manager.replace(tmp, perm_s2sp);
+			manager.deref(tmp);
+
+			int r_all_old = r_all;
+			r_all = manager.orTo(r_all, tmp2);
+			workset.nonfixpoint_advance(p, (r_all != r_all_old));
+			manager.deref(tmp2);
+
+			if (gf != null)
+			{
+				gf.add(r_all);
+			}
+		}
+
+		int ret = manager.replace(r_all, perm_sp2s);
+		manager.deref(r_all);
+
+		if (gf != null)
+		{
+			gf.stopTimer();
+		}
+
+		SizeWatch.report(ret, "Quncontrollable_backward");
+		timer.report("uncontrollableBackward (StepStone)");
+		workset.done();
+
+		return ret;
+	}
+
 }

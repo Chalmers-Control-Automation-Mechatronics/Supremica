@@ -293,7 +293,7 @@ class JBDD
 	See Clarke papper "10^20and beyond..." for more info.
 	Note: the returned result is already referenced.<br>
 	@param bdd_left a BDD
-	@param bdd_rght a BDD
+	@param bdd_right a BDD
 	@param quant_cube the variables to be quantified.
 	@return E quant_cube. bdd_left AND bdd_right
 	*/

@@ -10,10 +10,8 @@ import org.supremica.automata.algorithms.*;
  * "test" the result of algorithms against a set of pre-solved problems
  * We are in the "dist" directory during these tests.
  *
- *
- * XXX: the sumpNBC tests are not very accurate (there are simply many correct answers,
- * and we dont know which one we will get). what we really should
  */
+
 public class TestAlgo
 {
 
@@ -42,8 +40,7 @@ public class TestAlgo
 		5702550, 25731072, 18, 199, 2274519862886400.0, 10000000,1.101504E7, -1 };
 	private static final double coreachables[] = {  6,
 			5702550, 343692864, 20, 432, 2274519862886400.0,10000000, -1, -1 };
-	private static final double supstates[] = { 3 /* [1] */,
-		-1, -1, 8 /* [1] */ , 151, -1, 10000000, -1, -1 };
+
 
 	private static final boolean controllable[] = { false,
 		true, false, false, false, true, true, true, true };
@@ -51,11 +48,17 @@ public class TestAlgo
 		true, true, true, false, false, true, true /* [2]*/, true /* [2] */
 	};
 
-	/*
-	NOTES:
-	 [1] not equal to supremicas answer, contains safe states that are not reachable under supervision and we have no algo to compute these today
-	 [2] we dont know the answer, or dont care to compute it as it takes to loooong time for this test
-	*/
+	// these are the classes that have their own sup algos (we replaced conjunctive with
+	// disjunctive since the former is soooo slow on simple reachability search :(  )
+	private static final int [] SUP_ALGOS = {
+		Options.ALGO_MONOLITHIC, Options.ALGO_DISJUNCTIVE,
+		Options.ALGO_DISJUNCTIVE_WORKSET,
+		Options.ALGO_DISJUNCTIVE_STEPSTONE
+	};
+
+// which models should we test for sup synthesis??
+	private static final boolean testsup[] = { true, false, true, true, true, false, false, false, false };
+
 
 	// ----------------------------------------------------------------------------------
 	private int fail, pass;
@@ -112,29 +115,62 @@ public class TestAlgo
 	 * _under supervision_.
 	 *
 	 */
-	private void testSupNBC(double states)
+	private void testSupNBC(String name)
 	{
-		// no synthesis data available
-		if(states < 0)
+		int save_algo_family = Options.algo_family;    // save the default crap
+
+		// DEBUG:
+		Options.profile_on = Options.debug_on = true;
+
+
+		try {
+			automata1 = builder.build(new File(name));
+
+			double got_1 = -1, got_2 = -1;
+
+			for(int i = 0; i < SUP_ALGOS.length; i++) {
+				Options.algo_family = SUP_ALGOS[i];
+				verifier = new AutomataBDDVerifier(automata1, null);
+				automata2 = verifier.getBDDAutomata();
+				supervisor = verifier.getSupervisor();
+
+				System.out.print("   " + Options.REACH_ALGO_NAMES[Options.algo_family] + "...");
+				int safe_states = supervisor.getSafeStates(true, true);
+				int reachables = supervisor.getReachables();
+				int reachable_safe = automata2.and(reachables, safe_states);
+
+				double found = automata2.count_states(safe_states);
+				double found_reachable = automata2.count_states(reachable_safe);
+
+				if(i == 0) {
+					got_1 = found;
+					got_2 = found_reachable;
+					System.out.println(" (recorded)");
+				} else {
+					if(got_1 != found)
+					{
+						error("[testSupNBC] got " + found + " safe states, expected " + got_1);
+					}
+					else if(got_2 != found_reachable)
+					{
+						error("[testSupNBC] got " + found_reachable + " reachable safe states, expected " + got_2);
+					}
+					else
+					{
+						pass++;
+						System.out.println();
+					}
+				}
+
+				verifier.cleanup();
+			}
+		}
+		catch(Exception exx)
 		{
-			return;
+			error("[testSupNBC] something bad happened: " + exx);
 		}
 
-		System.out.print("supNBC ");
-
-		int safe_states = supervisor.getSafeStates(true, true);
-		int reachables = supervisor.getReachables();
-		int reachable_safe = automata2.and(reachables, safe_states);
-		double found = automata2.count_states(reachable_safe);
-
-
-		if (found != states)
-		{
-			error("[supNBC] supervisor has " + found + " states, expected " + states);
-			return;
-		}
-
-		pass++;
+		Options.algo_family = save_algo_family;
 	}
 
 	// ----------------------------------------------------------------------------------
@@ -327,7 +363,6 @@ public class TestAlgo
 		throws Exception
 	{
 		fail = pass = 0;
-
 		int len = TEST_FILES.length;
 
 		for (int k = 0; k < 4; k++)
@@ -414,8 +449,9 @@ public class TestAlgo
 			Options.ordering_algorithm = save_ordering;
 		}
 
-		System.out.println("\n***** Testing DES/SCT algorithms");
 
+
+		System.out.println("\n***** Testing DES/SCT algorithms");
 		for (int i = 0; i < len; i++)
 		{
 			announce(TEST_FILES[i]);
@@ -424,7 +460,6 @@ public class TestAlgo
 			testCR(coreachables[i]);
 			testNB(reachables[i], coreachables[i], nonblocking[i]);
 			testC(controllable[i], reachables[i]);
-			testSupNBC(supstates[i]);
 			verifier.cleanup();    // cleans up both supervisor and automata2
 
 			// what a waste of resources, we will do all BDD pre-calcs again :(
@@ -432,6 +467,18 @@ public class TestAlgo
 			modularC(controllable[i]);
 			System.out.println();
 		}
+
+		System.out.println("\n***** Testing SCT/synthesis algorithms");
+		for (int i = 0; i < len; i++)
+		{
+			if(testsup[i]) {
+				System.out.println("Loading " + TEST_FILES[i] + "...");
+				testSupNBC(TEST_FILES[i]);
+			}
+		}
+
+
+
 
 		if (fail == 0)
 		{
@@ -486,6 +533,13 @@ public class TestAlgo
 
 /*
  $Log: not supported by cvs2svn $
+ Revision 1.15  2004/06/29 14:57:14  vahidi
+
+ Added workset support for the supNBC algo ==> faster synthesis.
+
+ + some minor bug fixes
+ + supNBC added to the testcases (not working very good though)
+
  Revision 1.14  2004/06/11 21:12:52  knut
  After running JIndent
 

@@ -394,9 +394,19 @@ public class Workset
 	 * if changed is new, then something has changed and we should consider the
 	 * affect of this by adding automata that are directly connected with our automaton
 	 */
-	public void exclusive_advance(int automaton, boolean changed)
+	public void nonfixpoint_advance(int automaton, boolean changed)
 	{
-		internal_advance(automaton, changed, true);
+		if(changed)
+		{
+			record_change(automaton);
+		}
+		else
+		{
+			workset[automaton] = 0;
+			workset_count--;
+		}
+
+		ndas.advance(automaton, changed);
 	}
 
 	/**
@@ -406,42 +416,46 @@ public class Workset
 	 */
 	public void advance(int automaton, boolean changed)
 	{
-		internal_advance(automaton, changed, false);
-	}
-
-	public void internal_advance(int automaton, boolean changed, boolean exclusive)
-	{
-		if (!changed ||!exclusive)
+		workset[automaton] = 0;
+		workset_count--;
+		if(changed)
 		{
-			workset[automaton] = 0;
-
-			workset_count--;
-
-			ndas.advance(automaton, changed);
+			record_change(automaton);
 		}
 
-		if (changed)
+		ndas.advance(automaton, changed);
+	}
+
+
+	// a change in "automaton" was seen, track the consequences by adding the dependent automata to the workset
+	private void record_change(int automaton)
+	{
+		int count = dependent[automaton][0];
+
+		// for(int i = 1 ; i <= count; i++) workset[  dependent[automaton][i] ] ++;
+		// workset_count += count;
+		for (int i = 1; i <= count; i++)
 		{
-			int count = dependent[automaton][0];
+			int a = dependent[automaton][i];
 
-			// for(int i = 1 ; i <= count; i++) workset[  dependent[automaton][i] ] ++;
-			// workset_count += count;
-			for (int i = 1; i <= count; i++)
+			if (workset[a] == 0)
 			{
-				int a = dependent[automaton][i];
-
-				if (workset[a] == 0)
-				{
-					workset_count++;
-				}
-
-				workset[a]++;
+				workset_count++;
 			}
+
+			workset[a]++;
 		}
 	}
 
 	public boolean empty()
 	{
 		return workset_count <= 0;
+
+		/*
+		for(int i = 0; i < size; i++) {
+			if(workset[i] > 0) return false;
+		}
+		return true;
+		*/
 	}
 }
