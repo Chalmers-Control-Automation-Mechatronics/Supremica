@@ -24,188 +24,230 @@ public class BallTrackView
  */
 {
 
-	/**Background image*/
-	private final String imageFile = "backgroundtext.gif";
-    private Image bgImage = Toolkit.getDefaultToolkit().getImage(BallTrackView.class.getResource("/labprocess/" + imageFile));
+    /**Background image*/
+    private final String imageFileWithText    = "backgroundtext.gif";
+    private final String imageFileWithoutText = "background.gif";
+    private boolean imageWithText = true; //Because bgImage will contain this image from the beginning
+    private Image bgImage = Toolkit.getDefaultToolkit().getImage(BallTrackView.class.getResource("/labprocess/" + imageFileWithText));
 
-	/**Maximum number of balls allowed*/
-	final int maxNrOfBalls = 20;
+    /**Maximum number of balls allowed*/
+    final int maxNrOfBalls = 20;
+    
+    /**size of window*/
+    private int size;
+    
+    /**This BallTrackView must be aware of a RouteController
+     * to be able to add balls*/
+    private RouteController rController;
+    
+    // private int nrOfBalls = 0;
+    private java.util.List balls;    // keep track of the balls
+    public JButton insSmallBall, insLargeBall, delBall, changeImage;
+    public JPanel panel = new JPanel();
+    public JPanel south = new JPanel();
+    public Canvas canvas = new Canvas();
+        
+    /**Constructor BallTrackView initialises a view for a ball track
+     * @param framesize the heigth of the window
+     */
+    public BallTrackView(int framesize, RouteController rcont)
+    {
+	rController = rcont;
+	size = framesize;
+	
+	setSize(size, size + 45);
+	setTitle("Ball Track Simulator");
+	setVisible(true);
+	
+	Container contentPane = getContentPane();
+	contentPane.setLayout(null);
 
-	/**size of window*/
-	private int size;
+	panel.setLayout(new BorderLayout());
+	panel.setBackground(Color.white);
+	panel.setSize(size, size + 30);
 
-	/**This BallTrackView must be aware of a RouteController
-	 * to be able to add balls*/
-	private RouteController rController;
+	south.setLayout(new FlowLayout());
+	south.setBackground(Color.white);
+	
+	canvas.setSize(500,458);
+	canvas.setVisible(true);
+	panel.add(canvas,BorderLayout.NORTH);
+	
+	insSmallBall = new JButton("Add Small Ball");
+	insSmallBall.setFont(new Font("Times", Font.BOLD, 10));
+	//insSmallBall.setBackground(Color.white);
+	south.add(insSmallBall);
+	
+	insLargeBall = new JButton("Add Large Ball");
+	insLargeBall.setFont(new Font("Times", Font.BOLD, 10));
+	//insLargeBall.setBackground(Color.white);
+	south.add(insLargeBall);
+	
+	delBall = new JButton("Remove Ball");
+	delBall.setFont(new Font("Times", Font.BOLD, 10));
+	//delBall.setBackground(Color.white);
+	south.add(delBall);
+	
+	changeImage = new JButton("Change Image");
+	changeImage.setFont(new Font("Times", Font.BOLD, 10));
+	south.add(changeImage);
 
-	// private int nrOfBalls = 0;
-	private java.util.List balls;    // keep track of the balls
-	public JButton insSmallBall, insLargeBall, delBall, changeImage;
-	public CheckboxGroup cbg = new CheckboxGroup();
+	south.setVisible(true);
+	panel.setVisible(true);
+	panel.add(south,BorderLayout.SOUTH);
 
-	/**Constructor BallTrackView initialises a view for a ball track
-	 * @param framesize the heigth of the window
-	 */
-	public BallTrackView(int framesize, RouteController rcont)
+	contentPane.add(panel);
+	contentPane.setVisible(true);
+
+	/*	Insets insets = panel.getInsets();
+	
+	insSmallBall.setBounds(0 + insets.left, 458 + insets.top, 120, 40);
+	insLargeBall.setBounds(120 + insets.left, 458 + insets.top, 120, 40);
+	delBall.setBounds(240 + insets.left, 458 + insets.top, 120, 40);
+	changeImage.setBounds(360 + insets.left, 458 + insets.top, 120, 40);
+	*/
+	insSmallBall.addMouseListener(new java.awt.event.MouseAdapter()
 	{
-		rController = rcont;
-		size = framesize;
+	    public void mouseClicked(MouseEvent e)
+	    {
+		insSmallBall_mouseClicked(e);
+	    }
+	});
+	insLargeBall.addMouseListener(new java.awt.event.MouseAdapter()
+	{
+	    public void mouseClicked(MouseEvent e)
+	    {
+		insLargeBall_mouseClicked(e);
+	    }
+	});
+	delBall.addMouseListener(new java.awt.event.MouseAdapter()
+	{
+	    public void mouseClicked(MouseEvent e)
+	    {
+		delBall_mouseClicked(e);
+	    }
+	});
+	changeImage.addMouseListener(new java.awt.event.MouseAdapter()
+	{
+	    public void mouseClicked(MouseEvent e)
+	    {
+		changeImage_mouseClicked(e);
+	    }
+        });
+    }
+    
+    void insSmallBall_mouseClicked(MouseEvent e)
+    {
+	rController.addSmallBall();
+    }
+    
+    void insLargeBall_mouseClicked(MouseEvent e)
+    {
+	rController.addLargeBall();
+    }
 
-		setSize(size, size + 30);
-		setTitle("Ball Track Simulator");
-		setVisible(true);
-
-		Container contentPane = getContentPane();
-
-		contentPane.setLayout(null);
-		//contentPane.setLayout(new BorderLayout());
-
-		insSmallBall = new JButton("Add Small Ball");
-		insSmallBall.setFont(new Font("Times", Font.BOLD, 10));
-		//insSmallBall.setBackground(Color.white);
-		contentPane.add(insSmallBall);
-
-		insLargeBall = new JButton("Add Large Ball");
-		insLargeBall.setFont(new Font("Times", Font.BOLD, 10));
-		//insLargeBall.setBackground(Color.white);
-		contentPane.add(insLargeBall);
-
-		delBall = new JButton("Remove Ball");
-		delBall.setFont(new Font("Times", Font.BOLD, 10));
-		//delBall.setBackground(Color.white);
-		contentPane.add(delBall);
-
-		changeImage = new JButton("Change Image");
-		changeImage.setFont(new Font("Times", Font.BOLD, 10));
-		contentPane.add(changeImage);
-
-		Insets insets = contentPane.getInsets();
-
-		insSmallBall.setBounds(0 + insets.left, 365 + insets.top, 120, 40);
-		insLargeBall.setBounds(120 + insets.left, 365 + insets.top, 120, 40);
-		delBall.setBounds(0 + insets.left, 405 + insets.top, 120, 40);
-		changeImage.setBounds(120 + insets.left, 405 + insets.top, 120, 40);
-
-		insSmallBall.addMouseListener(new java.awt.event.MouseAdapter()
-		{
-			public void mouseClicked(MouseEvent e)
-			{
-				insSmallBall_mouseClicked(e);
-			}
-		});
-		insLargeBall.addMouseListener(new java.awt.event.MouseAdapter()
-		{
-			public void mouseClicked(MouseEvent e)
-			{
-				insLargeBall_mouseClicked(e);
-			}
-		});
-		delBall.addMouseListener(new java.awt.event.MouseAdapter()
-		{
-			public void mouseClicked(MouseEvent e)
-			{
-				delBall_mouseClicked(e);
-			}
-		});
+    void delBall_mouseClicked(MouseEvent e)
+    {
+	rController.delBall();
+    }
+    
+    void changeImage_mouseClicked(MouseEvent e)
+    {
+	if (imageWithText)
+	{
+	    bgImage = Toolkit.getDefaultToolkit().getImage(BallTrackView.class.getResource("/labprocess/" + imageFileWithoutText));
+	    imageWithText = false;
 	}
-
-	void insSmallBall_mouseClicked(MouseEvent e)
+	else if (!imageWithText)
 	{
-		rController.addSmallBall();
+	    bgImage = Toolkit.getDefaultToolkit().getImage(BallTrackView.class.getResource("/labprocess/" + imageFileWithText));
+	    imageWithText = true;
 	}
-
-	void insLargeBall_mouseClicked(MouseEvent e)
+    }
+    /**collisionAvoidanceHandle makes sure that no ball run over another
+     */
+    private void collisionAvoidanceHandle()
+    {
+	boolean colliding;
+	
+	for (Iterator i = balls.iterator(); i.hasNext(); )
 	{
-		rController.addLargeBall();
-	}
-
-	void delBall_mouseClicked(MouseEvent e)
-	{
-		rController.delBall();
-	}
-
-	/**collisionAvoidanceHandle makes sure that no ball run over another
-	 */
-	private void collisionAvoidanceHandle()
-	{
-		boolean colliding;
-
-		for (Iterator i = balls.iterator(); i.hasNext(); )
+	    Ball b = (Ball) i.next();
+		
+	    colliding = false;
+	    
+	    for (Iterator j = balls.iterator(); j.hasNext(); )
+	    {
+		Ball c = (Ball) j.next();
+			
+		if (!b.equals(c))
 		{
-			Ball b = (Ball) i.next();
-
-			colliding = false;
-
-			for (Iterator j = balls.iterator(); j.hasNext(); )
-			{
-				Ball c = (Ball) j.next();
-
-				if (!b.equals(c))
-				{
-					if (b.collisionRisk(c))
-					{
-						colliding = true;
-					}
-				}
-			}
-
-			b.allowMove(!colliding);
+		    if (b.collisionRisk(c))
+		    {
+			colliding = true;
+		    }
 		}
-	}
+	    }
 
-	/**update changes the standard update used in repaint()
-	 * to avoid blinking
-	 * @param g the graphics pen
-	 */
-	public void update(Graphics g)
+	    b.allowMove(!colliding);
+	}
+    }
+
+    /**update changes the standard update used in repaint()
+     * to avoid blinking
+     * @param g the graphics pen
+     */
+    public void update(Graphics g)
+    {
+	paint(g);
+    }
+
+    /**Paint paints all balls and the background
+     * @param g the graphics pen
+     */
+    public void paint(Graphics gr)
+    {
+	Image im = createImage(500, 458);
+	Graphics g = im.getGraphics();
+	
+	// get the balls to be painted
+	balls = rController.getAllBalls();
+
+	// make sure no balls collide
+	collisionAvoidanceHandle();
+	
+	// paint background image
+	g.drawImage(bgImage, 0, 0, this);
+	
+	// paint the animated lifts
+	g.setColor(Color.gray);
+	paintPortVakt(g);
+	paintMatLyft(g);
+	paintUrMatning(g);
+	paintHiss(g);
+	paintUrVan1(g);
+	paintUrVan2(g);
+	paintLyftVan1(g);
+	paintLyftVan2(g);
+	paintArm(g);
+
+	// paint the balls
+	for (Iterator i = balls.iterator(); i.hasNext(); )
 	{
-		paint(g);
+	    Ball b = (Ball) i.next();
+		
+	    b.paint(g);
 	}
 
-	/**Paint paints all balls and the background
-	 * @param g the graphics pen
-	 */
-	public void paint(Graphics gr)
-	{
-		Image im = createImage(500, 458);
-		Graphics g = im.getGraphics();
+	Graphics gN = canvas.getGraphics();
 
-		// get the balls to be painted
-		balls = rController.getAllBalls();
-
-		// make sure no balls collide
-		collisionAvoidanceHandle();
-
-		// paint background image
-		g.drawImage(bgImage, 0, 15, this);
-
-		// paint the animated lifts
-  		g.setColor(Color.gray);
-  		paintPortVakt(g);
-		paintMatLyft(g);
-		paintUrMatning(g);
-		paintHiss(g);
-		paintUrVan1(g);
-		paintUrVan2(g);
-		paintLyftVan1(g);
-		paintLyftVan2(g);
-		paintArm(g);
-
-		// paint the balls
-		for (Iterator i = balls.iterator(); i.hasNext(); )
-		{
-			Ball b = (Ball) i.next();
-
-			b.paint(g);
-		}
-
-		gr.drawImage(im, 0, 0, this);
-
-		//insSmallBall.repaint();
-		//insLargeBall.repaint();
-		//delBall.repaint();
-		//changeImage.repaint();
-	}
+	gN.drawImage(im, 0, 0, this);
+	
+	insSmallBall.repaint();
+	insLargeBall.repaint();
+	delBall.repaint();
+	changeImage.repaint();
+    }
 
 
 	/************************************************
