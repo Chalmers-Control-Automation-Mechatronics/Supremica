@@ -378,4 +378,13 @@ public class Project
 		// Add more checks here
 		return true;
 	}
+
+	public boolean hasExecutionParameters() {
+		return hasAnimation()
+				|| getTimers().size() > 0
+				|| getInputSignals().size() > 0
+				|| getOutputSignals().size() > 0
+				|| getActions().size() > 0
+				|| getControls().size() > 0;
+	}
 }
