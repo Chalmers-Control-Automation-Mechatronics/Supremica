@@ -11,7 +11,8 @@ public class DotBuilder
 {
 	private static Logger logger = LoggerFactory.createLogger(DotBuilder.class);
 
-	private DotBuilderObserver theObserver = null;
+	private DotBuilderGraphObserver theGraphObserver = null;
+	private DotBuilderStreamObserver theStreamObserver = null;
 	private AutomataSerializer theSerializer = null;
 	private final static int BUILD = 1;
 	private final static int DRAW = 2;
@@ -22,18 +23,19 @@ public class DotBuilder
 	private String dotArguments;
 	Graph theGraph = null;
 
-	private DotBuilder(DotBuilderObserver theObserver, AutomataSerializer theSerializer, String dotArguments)
+	private DotBuilder(DotBuilderStreamObserver theStreamObserver, DotBuilderGraphObserver theGraphObserver, AutomataSerializer theSerializer, String dotArguments)
 	{
-		this.theObserver = theObserver;
+		this.theStreamObserver = theStreamObserver;
+		this.theGraphObserver = theGraphObserver;
 		this.theSerializer = theSerializer;
 		this.dotArguments = dotArguments;
 
 		setPriority(Thread.MIN_PRIORITY);
 	}
 
-	public static DotBuilder getDotBuilder(DotBuilderObserver theObserver, AutomataSerializer theSerializer, String dotArguments)
+	public static DotBuilder getDotBuilder(DotBuilderStreamObserver theStreamObserver, DotBuilderGraphObserver theGraphObserver, AutomataSerializer theSerializer, String dotArguments)
 	{
-		DotBuilder dotBuilder = new DotBuilder(theObserver, theSerializer, dotArguments);
+		DotBuilder dotBuilder = new DotBuilder(theStreamObserver, theGraphObserver, theSerializer, dotArguments);
 		dotBuilder.start();
 		return dotBuilder;
 	}
@@ -58,12 +60,18 @@ public class DotBuilder
 
 			mode = DRAW;
 
-			java.awt.EventQueue.invokeLater(this);
+			if (theGraphObserver != null)
+			{
+				java.awt.EventQueue.invokeLater(this);
+			}
 		}
 		else if (mode == DRAW)
 		{
 			// theObserver.setCursor(java.awt.Cursor.WAIT_CURSOR);
-			theObserver.setGraph(theGraph);
+			if (theGraphObserver != null)
+			{
+				theGraphObserver.setGraph(theGraph);
+			}
 			//theObserver.setCursor(java.awt.Cursor.getDefaultCursor());
 		}
 	}
@@ -112,12 +120,18 @@ public class DotBuilder
 			toDotWriter.close();
 		}
 
-		parseResponse(fromDotStream);
+		if (theStreamObserver != null)
+		{
+			theStreamObserver.setInputStream(fromDotStream);
+		}
+		if (theGraphObserver != null)
+		{
+			parseResponse(fromDotStream);
+		}
 	}
 
 	private void parseResponse(InputStream inputStream)
 	{
-
 		// Parse the response from dot
 		Parser parser = new Parser(inputStream);
 

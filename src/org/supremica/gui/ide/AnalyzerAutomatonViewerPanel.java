@@ -5,7 +5,7 @@ import java.io.InputStream;
 
 import org.supremica.gui.WhiteScrollPane;
 import org.supremica.gui.DotBuilder;
-import org.supremica.gui.DotBuilderObserver;
+import org.supremica.gui.DotBuilderGraphObserver;
 import org.supremica.automata.IO.AutomatonToDot;
 import org.supremica.automata.Automaton;
 
@@ -14,7 +14,7 @@ import att.grappa.GrappaPanel;
 
 class AnalyzerAutomatonViewerPanel
 	extends WhiteScrollPane
-	implements DotBuilderObserver
+	implements DotBuilderGraphObserver
 {
 	private static final long serialVersionUID = 1L;
 
@@ -59,7 +59,7 @@ class AnalyzerAutomatonViewerPanel
 
 	private void build()
 	{
-		builder = DotBuilder.getDotBuilder(this, new AutomatonToDot(theAutomaton), "");
+		builder = DotBuilder.getDotBuilder(null, this, new AutomatonToDot(theAutomaton), "");
 
 		//builder.start();
 	}
@@ -74,10 +74,6 @@ class AnalyzerAutomatonViewerPanel
 		getViewport().setPreferredSize(getPreferredSize());
 		getViewport().setMinimumSize(getMinimumSize());
 		validate();
-	}
-
-	public void setInputStream(InputStream inputStream)
-	{
 	}
 
 }

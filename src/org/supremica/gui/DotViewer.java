@@ -63,7 +63,7 @@ import java.awt.geom.Rectangle2D;
 
 public abstract class DotViewer
 	extends JFrame
-	implements DotBuilderObserver
+	implements DotBuilderGraphObserver
 {
 	private static final long serialVersionUID = 1L;
 	private static Logger logger = LoggerFactory.createLogger(DotViewer.class);
@@ -453,7 +453,7 @@ public abstract class DotViewer
 	public void build()
 		throws Exception
 	{
-		DotBuilder builder = DotBuilder.getDotBuilder(this, getSerializer(), "");
+		DotBuilder builder = DotBuilder.getDotBuilder(null, this, getSerializer(), "");
 		//builder = new DotBuilder(this);
 
 		//builder.start();
@@ -606,11 +606,6 @@ public abstract class DotViewer
 		draw();
 	}
 
-	public void setInputStream(InputStream theInputStream)
-	{
-		// Do nothing
-	}
-
 	public abstract AutomataSerializer getSerializer();
 
 	public void fileExport_actionPerformed(ActionEvent e)
@@ -630,7 +625,7 @@ public abstract class DotViewer
 		{
 			AutomataSerializer serializer = getSerializer();
 
-			DotBuilder.getDotBuilder(new DotDebugViewer(), serializer, dlg.getDotArgument());
+			DotBuilder.getDotBuilder(new DotDebugViewer(), null, serializer, dlg.getDotArgument());
 			return;
 		}
 		else
@@ -653,7 +648,8 @@ public abstract class DotViewer
 						{
 							AutomataSerializer serializer = getSerializer();
 
-							DotBuilder.getDotBuilder(new DotFileViewer(currFile), serializer, dlg.getDotArgument());
+							DotBuilder.getDotBuilder(new DotFileViewer(currFile), null, serializer, dlg.getDotArgument());
+
 
 						}
 						catch (Exception ex)
@@ -671,16 +667,12 @@ public abstract class DotViewer
 
 
 	class DotDebugViewer
-		implements DotBuilderObserver
+		implements DotBuilderStreamObserver
 	{
 
 		public DotDebugViewer()
 		{
 
-		}
-
-		public void setGraph(Graph theGraph)
-		{
 		}
 
 		public void setInputStream(InputStream theInputStream)
@@ -718,18 +710,13 @@ public abstract class DotViewer
 	}
 
 	class DotFileViewer
-		implements DotBuilderObserver
+		implements DotBuilderStreamObserver
 	{
 		File theFile;
 
 		public DotFileViewer(File theFile)
 		{
 			this.theFile = theFile;
-		}
-
-
-		public void setGraph(Graph theGraph)
-		{
 		}
 
 		public void setInputStream(InputStream theInputStream)
