@@ -1268,8 +1268,7 @@ public abstract class ProgramAndFBBuilder
 				ilRun.append(jmp);    // always jump to end_mod
 
 				mod_0 = ilRun.append(InstructionConstants.POP);
-
-				ilRun.append(new PUSH(constPoolGen, true));
+				ilRun.append(InstructionConstants.ICONST_0);
 
 				end_mod = ilRun.append(InstructionConstants.NOP);
 
@@ -1308,8 +1307,7 @@ public abstract class ProgramAndFBBuilder
 				ilRun.append(jmp);    // always jump to end_mod
 
 				mod_0 = ilRun.append(InstructionConstants.POP);
-
-				ilRun.append(new PUSH(constPoolGen, true));
+				ilRun.append(InstructionConstants.ICONST_0);
 
 				end_mod = ilRun.append(InstructionConstants.NOP);
 
