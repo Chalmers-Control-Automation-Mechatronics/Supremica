@@ -390,7 +390,6 @@ public final class SupremicaProperties
 		wp.setProperty(ALLOW_SUPERUSER_LOGIN, toString(mode));
 	}
 
-
 	public static boolean logToConsole()
 	{
 		return toBoolean(wp.getProperty(LOG_TO_CONSOLE));

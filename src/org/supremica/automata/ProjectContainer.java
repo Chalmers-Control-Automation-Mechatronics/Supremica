@@ -71,6 +71,7 @@ public class ProjectContainer
 	public void addProject(Project theProject, boolean setActive)
 	{
 		theProjects.add(theProject);
+
 		if (setActive)
 		{
 			currentProject = theProject;
@@ -80,6 +81,7 @@ public class ProjectContainer
 	public void removeProject(Project theProject)
 	{
 		theProjects.remove(theProject);
+
 		if (currentProject == theProject)
 		{
 			currentProject = null;
@@ -121,9 +123,8 @@ public class ProjectContainer
 		return theProjects.iterator();
 	}
 
-
 	public String getUniqueProjectName()
-	{ // Implement this
+	{    // Implement this
 		return "Untitled";
 	}
 }

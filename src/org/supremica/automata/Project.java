@@ -76,7 +76,6 @@ public class Project
 		this.name = name;
 	}
 
-
 	public Project(Project otherProject)
 	{
 		super(otherProject);
@@ -129,9 +128,5 @@ public class Project
 	}
 
 	// What is this supposed to do!!?
-	public void close()
-	{
-
-	}
-
+	public void close() {}
 }

@@ -53,6 +53,7 @@ import org.supremica.properties.SupremicaProperties;
 
 public class SupremicaTeacher
 {
+
 	// Same as SupremicaStudent but with setAllowSuperUserLogin to true
 	static
 	{
