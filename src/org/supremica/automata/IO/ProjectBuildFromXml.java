@@ -1,4 +1,3 @@
-
 /*
  *  Supremica Software License Agreement
  *
@@ -60,7 +59,6 @@ import org.xml.sax.helpers.DefaultHandler;
 import org.supremica.automata.*;
 import org.supremica.automata.execution.*;
 import org.supremica.log.*;
-
 
 public class ProjectBuildFromXml
 	extends DefaultHandler
@@ -395,7 +393,6 @@ public class ProjectBuildFromXml
 			currType = AutomatonType.toType(type);
 		}
 		currAutomaton.setType(currType);
-
 
 		String comment = attributes.getValue("comment");
 

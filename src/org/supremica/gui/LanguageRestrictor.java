@@ -404,7 +404,6 @@ class LanguageRestrictorDialog
 	private void moveEvents()
 	{
 		TreePath[] paths = sourceEvents.getSelectionPaths();
-		
 		if(paths != null) // gotta have something selected
 		{
 			for(int i = 0; i < paths.length; ++i)
@@ -421,7 +420,7 @@ class LanguageRestrictorDialog
 		}
 	}
 	
-	// Remove the selected events from restrictEvents to sourceEvents
+	// Remove the selected events from restrictEvents (not from sourceEvents, of course)
 	private void removeEvents()
 	{
 		TreePath[] paths = restrictEvents.getSelectionPaths();
@@ -621,8 +620,8 @@ public class LanguageRestrictor
 	{
 		// Get the selected automata
 		Automata automata = ActionMan.getGui().getSelectedAutomata();
-		// Throw up the dialog, let the user select the alphabet
 
+		// Throw up the dialog, let the user select the alphabet
 		LanguageRestrictorDialog dlg = new LanguageRestrictorDialog(automata);
 	}
 }

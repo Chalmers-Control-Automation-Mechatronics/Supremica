@@ -88,8 +88,6 @@ public final class SupremicaProperties
 	private static final String GENERAL_USE_ROBOTCOORDINATION = "generalUseRobotCoordination";
 	private static final String GENERAL_USE_ROBOTCOORDINATION_ABB = "generalUseRobotCoordinationABB";
 
-
-
 	// Logging options
 	private static final String LOG_TO_CONSOLE = "logToConsole";
 	private static final String LOG_TO_GUI = "logToGUI";
@@ -137,12 +135,9 @@ public final class SupremicaProperties
     private static final String BDD_UC_OPTIMISTIC = "bddUCOptimistic";
     private static final String BDD_NB_OPTIMISTIC = "bddNBOptimistic";
 
-
 	// Simulation stuff
 	private static final String SIMULATION_IS_EXTERNAL = "simulationIsExternal";
 	private static final String SIMULATION_CYCLE_TIME = "simulationCycleTime";
-
-
 
 	// Animator Options
 	private static final String INCLUDE_ANIMATOR = "includeAnimator";
@@ -234,7 +229,7 @@ public final class SupremicaProperties
 		setProperty(GENERAL_USE_SECURITY, "false", false);
 		setProperty(INCLUDE_ANIMATOR, "false", true);
 		setProperty(SOFTPLC_CYCLE_TIME, "40", true);
-		setProperty(SHOW_GENETIC_ALGORITHMS, "true", false);
+		setProperty(SHOW_GENETIC_ALGORITHMS, "false", false);
 		setProperty(SHOW_ROBOTSTUDIO_LINK, "true", false);
 		setProperty(USE_ACTIVEX_BRIDGE, "true", false);
 		setProperty(SHOW_COORDINATION_ABB, "true", false);
@@ -258,7 +253,6 @@ public final class SupremicaProperties
 
 
 	}
-
 
 	public static final void setProperties(File aFile)
 		throws Exception

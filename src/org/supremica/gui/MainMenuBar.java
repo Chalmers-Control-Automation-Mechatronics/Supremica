@@ -1166,7 +1166,6 @@ public class MainMenuBar
 
 		}
 
-
 		// Tools.Evolution
 		if (SupremicaProperties.showGeneticAlgorithms())
 		{

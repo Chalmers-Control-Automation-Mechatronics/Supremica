@@ -1,4 +1,3 @@
-
 /*
  * Supremica Software License Agreement
  *
@@ -157,8 +156,6 @@ public final class VerificationOptions
 	{
 		return skipUncontrollabilityCheck;
 	}
-
-
 
 	/**
 	 * Returns the default options for verification. This is the same as 
