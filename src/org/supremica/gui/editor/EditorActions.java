@@ -67,7 +67,7 @@ public class EditorActions
 	private AppAction fileSaveAction = null;
 	private AppAction fileSaveAsAction = null;
 	private AppAction filePrintAction = null;
-	private AppAction fileExitAction = null;
+	private AppAction fileCloseAction = null;
 
 	private AppAction editCutAction = null;
 	private AppAction editCopyAction = null;
@@ -101,7 +101,7 @@ public class EditorActions
 				public boolean canAct()
 				{
 					return true;
-				}	
+				}
 			};
 		}
 		return fileAddAction;
@@ -117,16 +117,16 @@ public class EditorActions
 				{
 					theEditor.fileOpen();
 				}
-				
+
 				public boolean canAct()
 				{
 					return true;
-				}	
+				}
 			};
 		}
 		return fileOpenAction;
 	}
-	
+
 	public AppAction getFileSaveAction()
 	{
 		if (fileSaveAction == null)
@@ -137,15 +137,15 @@ public class EditorActions
 				{
 					theEditor.fileSave();
 				}
-				
+
 				public boolean canAct()
 				{
 					return true;
-				}	
+				}
 			};
 		}
 		return fileSaveAction;
-	}	
+	}
 
 	public AppAction getFileSaveAsAction()
 	{
@@ -160,7 +160,7 @@ public class EditorActions
 				public boolean canAct()
 				{
 					return true;
-				}	
+				}
 			};
 		}
 		return fileSaveAsAction;
@@ -176,34 +176,34 @@ public class EditorActions
 				{
 					theEditor.filePrint();
 				}
-				
+
 				public boolean canAct()
 				{
 					return true;
-				}	
+				}
 			};
 		}
 		return filePrintAction;
 	}
 
-	public AppAction getFileExitAction()
+	public AppAction getFileCloseAction()
 	{
-		if (fileExitAction == null)
+		if (fileCloseAction == null)
 		{
-			fileExitAction = new AppAction("Exit", theEditor)
+			fileCloseAction = new AppAction("Close", theEditor)
 			{
 				public void actionPerformed(ActionEvent e)
 				{
-					theEditor.fileExit();
+					theEditor.fileClose();
 				}
-				
+
 				public boolean canAct()
 				{
 					return true;
-				}	
+				}
 			};
 		}
-		return fileExitAction;
+		return fileCloseAction;
 	}
 }
 

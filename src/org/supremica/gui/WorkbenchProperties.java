@@ -68,8 +68,7 @@ import org.supremica.automata.algorithms.SynthesisAlgorithm;
 public final class WorkbenchProperties
 	extends Properties
 {
-	private static final String FILE_OPEN_PATH = "fileOpenPath";
-	private static final String FILE_SAVE_PATH = "fileSavePath";
+
 	private static final String XML_RPC_ACTIVE = "xmlRpcActive";
 	private static final String XML_RPC_PORT = "xmlRpcPort";
 	private static final String DOT_USE = "dotUse";
@@ -87,20 +86,29 @@ public final class WorkbenchProperties
 	private static final String SUPERUSER_IDENTITY = "superuserIdentity";
 	private static final String ALLOW_SUPERUSER_LOGIN = "allowSuperUserLogin";
 
-	// SynchronizationOptions
+	// File Options
+	private static final String FILE_OPEN_PATH = "fileOpenPath";
+	private static final String FILE_SAVE_PATH = "fileSavePath";
+	private static final String FILE_ALLOW_OPEN = "FileAllowOpen";
+	private static final String FILE_ALLOW_SAVE = "FileAllowSave";
+	private static final String FILE_ALLOW_IMPORT = "FileAllowImport";
+	private static final String FILE_ALLOW_EXPORT = "FileAllowExport";
+	private static final String FILE_ALLOW_QUIT = "FileAllowQuit";
+
+	// Synchronization Options
 	private static final String SYNC_FORBID_UNCON_STATES = "syncForbidUncontrollableStates";
 	private static final String SYNC_EXPAND_FORBIDDEN_STATES = "syncExpandUncontrollableStates";
 	private static final String SYNC_INITIAL_HASHTABLE_SIZE = "syncInitialHashtableSize";
 	private static final String SYNC_EXPAND_HASHTABLE = "syncExpandHashtable";
 	private static final String SYNC_NBR_OF_EXECUTERS = "synchNbrOfExecuters";
-	// VerificationOptions
+	// Verification Options
 	private static final String VERIFY_VERIFICATION_TYPE = "verifyVerificationType";
 	private static final String VERIFY_ALGORITHM_TYPE = "verifyAlgorithmType";
 	private static final String VERIFY_EXCLUSION_STATE_LIMIT = "verifyExclusionStateLimit";
 	private static final String VERIFY_REACHABILITY_STATE_LIMIT = "verifyReachabilityStateLimit";
 	private static final String VERIFY_ONE_EVENT_AT_A_TIME = "verifyOneEventAtATime";
 	private static final String VERIFY_SKIP_UNCONTROLLABILITY_CHECK = "skipUncontrollabilityCheck";
-	// SynthesizerOptions
+	// Synthesizer Options
 	private static final String SYNTHESIS_SYNTHESIS_TYPE = "synthesisSynthesisType";
 	private static final String SYNTHESIS_ALGORITHM_TYPE = "synthesisAlgorithmType";
 	private static final String SYNTHESIS_PURGE = "synthesisPurge";
@@ -115,6 +123,12 @@ public final class WorkbenchProperties
 	{
 		setProperty(FILE_OPEN_PATH, "../examples/");
 		setProperty(FILE_SAVE_PATH, ".");
+		setProperty(FILE_ALLOW_OPEN, "true");
+		setProperty(FILE_ALLOW_SAVE, "true");
+		setProperty(FILE_ALLOW_IMPORT, "true");
+		setProperty(FILE_ALLOW_EXPORT, "true");
+		setProperty(FILE_ALLOW_QUIT, "true");
+
 		setProperty(XML_RPC_ACTIVE, "true");
 		setProperty(XML_RPC_PORT, "9112");
 		setProperty(DOT_USE, "true");
@@ -153,6 +167,7 @@ public final class WorkbenchProperties
 	public static void load(String fileName)
 		throws IOException
 	{
+		// System.err.println("PropertiesLoad");
 		FileInputStream fileStream = new FileInputStream(fileName);
 		wp.load(fileStream);
 	}
@@ -177,6 +192,56 @@ public final class WorkbenchProperties
 	public static void setFileSavePath(String path)
 	{
 		wp.setProperty(FILE_SAVE_PATH, path);
+	}
+
+	public static boolean fileAllowOpen()
+	{
+		return toBoolean(wp.getProperty(FILE_ALLOW_OPEN));
+	}
+
+	public static void setFileAllowOpen(boolean allow)
+	{
+		wp.setProperty(FILE_ALLOW_OPEN, toString(allow));
+	}
+
+	public static boolean fileAllowSave()
+	{
+		return toBoolean(wp.getProperty(FILE_ALLOW_SAVE));
+	}
+
+	public static void setFileAllowSave(boolean allow)
+	{
+		wp.setProperty(FILE_ALLOW_SAVE, toString(allow));
+	}
+
+	public static boolean fileAllowImport()
+	{
+		return toBoolean(wp.getProperty(FILE_ALLOW_IMPORT));
+	}
+
+	public static void setFileAllowImport(boolean allow)
+	{
+		wp.setProperty(FILE_ALLOW_IMPORT, toString(allow));
+	}
+
+	public static boolean fileAllowExport()
+	{
+		return toBoolean(wp.getProperty(FILE_ALLOW_EXPORT));
+	}
+
+	public static void setFileAllowExport(boolean allow)
+	{
+		wp.setProperty(FILE_ALLOW_EXPORT, toString(allow));
+	}
+
+	public static boolean fileAllowQuit()
+	{
+		return toBoolean(wp.getProperty(FILE_ALLOW_QUIT));
+	}
+
+	public static void setFileAllowQuit(boolean allow)
+	{
+		wp.setProperty(FILE_ALLOW_QUIT, toString(allow));
 	}
 
 	public static boolean isXmlRpcActive()

@@ -84,8 +84,11 @@ public class PreferencesDialog
 		theCommunicationPanel = new CommunicationPanel(this);
 		theTabbedPanel.add("Communication", theCommunicationPanel);
 
-		theFilePanel = new FilePanel(this);
-		theTabbedPanel.add("File", theFilePanel);
+		if (WorkbenchProperties.fileAllowOpen() || WorkbenchProperties.fileAllowSave())
+		{
+			theFilePanel = new FilePanel(this);
+			theTabbedPanel.add("File", theFilePanel);
+		}
 
 		theControllerPanel = new PreferencesControllerPanel(this);
 		contentPane.add(theControllerPanel, BorderLayout.SOUTH);
@@ -140,7 +143,10 @@ public class PreferencesDialog
 
 	private void getAttributes()
 	{
-		theFilePanel.update();
+		if (theFilePanel != null)
+		{
+			theFilePanel.update();
+		}
 		theCommunicationPanel.update();
 		theLayoutPanel.update();
 		theSynchronizationPanel.update();
@@ -148,9 +154,12 @@ public class PreferencesDialog
 
 	private boolean setAttributes()
 	{
-		if (!theFilePanel.doApply())
+		if (theFilePanel != null)
 		{
-			return false;
+			if (!theFilePanel.doApply())
+			{
+				return false;
+			}
 		}
 		if (!theCommunicationPanel.doApply())
 		{

@@ -21,15 +21,17 @@ public interface Gui
 	public void error(String msg, Throwable t);
 	public void info(String msg);
 	public void debug(String msg);
-		
+
 	public void repaint();
 	public String getNewAutomatonName(String str, String def); // who uses this one?
 	public void clearSelection();
 	public void selectAll();
-	
+
+	public void close();
+
 	public int addAutomata(Automata a) throws Exception; // returns number added
 	public boolean addAutomaton(Automaton a); // returns true if added
-	
+
 	public Component getComponent(); 	// Do we need this one?
 	public JFrame getFrame(); // this should be the main frame
 	public AutomatonContainer getAutomatonContainer();
@@ -38,4 +40,4 @@ public interface Gui
 
 	public FileSecurity getFileSecurity();
 }
-	
+

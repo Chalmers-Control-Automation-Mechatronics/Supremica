@@ -18,10 +18,10 @@ import org.supremica.gui.help.*;
 class MainPopupMenu extends JPopupMenu
 {
 	private MenuHandler menuHandler = null;
-	
+
 	// local utilities
 	private Gui getGui() { return (Gui)getInvoker(); }
-	
+
 	// except for access, these are copied straight from gui.Supremica
 	private void initPopups()
 	{
@@ -191,8 +191,19 @@ class MainPopupMenu extends JPopupMenu
 		// JMenuItem saveAsItem = new JMenuItem("Save As...");
 		// menuHandler.add(saveAsItem, 1);
 
-		JMenuItem exportItem = new JMenuItem("Export...");
-		menuHandler.add(exportItem, 1);
+		if (WorkbenchProperties.fileAllowExport())
+		{
+			JMenuItem exportItem = new JMenuItem("Export...");
+			menuHandler.add(exportItem, 1);
+			exportItem.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						ActionMan.automataExport(getGui());
+						getGui().repaint();
+					}
+				});
+		}
 
 		selectAllItem.addActionListener(new ActionListener()
 			{
@@ -329,14 +340,7 @@ class MainPopupMenu extends JPopupMenu
 			});
 
 
-		exportItem.addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent e)
-				{
-					ActionMan.automataExport(getGui());
-					getGui().repaint();
-				}
-			});
+
 
 // Here is revelaed that this one knows that the interface is built around a table. Not good!
 // It should popup when ordered so by the gui, not de ide for itself when to
@@ -384,7 +388,7 @@ class MainPopupMenu extends JPopupMenu
 		JPopupMenu regionPopup = menuHandler.getDisabledPopupMenu(num_selected);
 		regionPopup.show(c, x, y);
 	}
-	
+
 	public MainPopupMenu(Gui gui)
 	{
 		setInvoker(gui.getFrame());
@@ -392,4 +396,4 @@ class MainPopupMenu extends JPopupMenu
 		initPopups();
 	}
 }
-	
+

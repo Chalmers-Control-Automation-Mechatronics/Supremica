@@ -47,42 +47,34 @@
  * Supremica is owned and represented by KA.
  */
 
-package org.supremica.gui.help;
+package org.supremica.automata.templates;
 
-import javax.help.*;
-import java.net.URL;
-import org.supremica.gui.Supremica;
+import java.util.*;
+import org.supremica.automata.*;
 
-public class ContentHelp
+public class TemplateGroup
 {
-	private HelpBroker helpBroker = null;
+	private List items = new LinkedList();
+	private TemplateTypes type;
 
-	public ContentHelp()
+	public TemplateGroup(TemplateTypes type)
 	{
-		String helpsetName = "help/ccs.hs";
-		HelpSet hs = null;
-		try
-		{
-			ClassLoader cl = Supremica.class.getClassLoader();
-			URL hsURL = HelpSet.findHelpSet(cl, helpsetName);
-			hs = new HelpSet(null, hsURL);
-		}
-		catch (Exception e)
-		{
-			System.err.println("HelpSet "+ helpsetName + " not found");
-			return;
-		}
-
-		helpBroker = hs.createHelpBroker();
-		if (helpBroker == null)
-		{
-			System.err.println("HelpBroker is null");
-		}
+		this.type = type;
+		items.add(this);
 	}
 
-	public HelpBroker getStandardHelpBroker()
+	public void addItem(String description, String url)
 	{
-		return helpBroker;
+		items.add(description);
 	}
 
+	public Iterator iterator()
+	{
+		return items.iterator();
+	}
+
+	public Automata createInstance(String description)
+	{
+		return null;
+	}
 }

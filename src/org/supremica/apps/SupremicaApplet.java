@@ -51,47 +51,60 @@ package org.supremica.apps;
 
 import java.io.*;
 import java.awt.*;
+import javax.swing.*;
 
 import org.apache.log4j.*;
 import org.supremica.gui.*;
 
-// import org.jgrafchart.*;
-
-public class Supremica
+public class SupremicaApplet
+	extends JApplet
 {
 	private static Category thisCategory = LogDisplay.createCategory(org.supremica.gui.Supremica.class.getName());
-	private static org.supremica.gui.Supremica workbench;
-	private static SplashWindow splash;
+	private org.supremica.gui.Supremica workbench;
+	private SplashWindow splash;
 
-	private Supremica()
+	public SupremicaApplet()
 	{
 	}
 
-	private static void doSplash()
+	private void doSplash()
 	{
 		splash = new SplashWindow();
 		splash.setVisible(true);
 	}
 
-	public static void startSupremica()
+	private void setProperties()
 	{
-		doSplash();
-		workbench = new org.supremica.gui.Supremica();
-		init();
-	}
-	public static void startSupremica(String arg)
-	{
-//		if (args.length >= 1)
-//		{
-//			workbench.openAutomataXMLFile(new File(args[0]));
-//		}
-		doSplash();
-		workbench = new org.supremica.gui.Supremica(arg);
-		init();
+		WorkbenchProperties.setFileAllowOpen(false);
+		WorkbenchProperties.setFileAllowSave(false);
+		WorkbenchProperties.setFileAllowImport(false);
+		WorkbenchProperties.setFileAllowExport(false);
+		WorkbenchProperties.setFileAllowQuit(false);
+		WorkbenchProperties.setFileAllowExport(false);
+		WorkbenchProperties.setXmlRpcActive(false);
+		WorkbenchProperties.setUseDot(false);
 	}
 
-	public static void init()
+	public void init()
 	{
+		setProperties();
+
+		setSize(200, 100);
+		setBackground(Color.gray);
+
+		Panel topPanel = new Panel();
+		topPanel.setLayout(new BorderLayout());
+		getContentPane().add(topPanel);
+
+		Label labelHello = new Label("Starting Supremica...");
+		topPanel.add(labelHello, BorderLayout.NORTH);
+
+		doSplash();
+
+		if (workbench == null)
+		{
+			workbench = new org.supremica.gui.Supremica();
+		}
 
 		boolean packFrame = false;
 		// Validate frames that have preset sizes
@@ -117,43 +130,18 @@ public class Supremica
 		}
 		workbench.setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
 		workbench.initialize();
-       	splash.setVisible(false);
+		splash.setVisible(false);
 		workbench.setVisible(true);
 
 		PreLoader preLoader = PreLoader.getPreLoader();
 	}
 
-/*
-	public static void startJGrafChart()
+	public void destroy()
 	{
-    	Basic2GC app = new Basic2GC();
-    	app.updateActions();
-	}
-*/
-
-	// Main method
-	public static void main(String[] args)
-	{
-
-		if (args.length > 0)
-		{
-			if (args[0].equalsIgnoreCase("Supremica"))
+			if (workbench != null)
 			{
-				startSupremica();
+				workbench.destroy();
 			}
-//			else if (args[0].equalsIgnoreCase("JGrafChart"))
-//			{
-//				startJGrafChart();
-//			}
-			else
-			{
-				startSupremica(args[0]);
-			}
-		}
-		else
-		{
-			startSupremica();
-		}
-
 	}
+
 }

@@ -47,42 +47,104 @@
  * Supremica is owned and represented by KA.
  */
 
-package org.supremica.gui.help;
+package org.supremica.automata.templates;
 
-import javax.help.*;
-import java.net.URL;
-import org.supremica.gui.Supremica;
+import java.util.*;
 
-public class ContentHelp
+public class TemplateProperties
 {
-	private HelpBroker helpBroker = null;
+	private String stateNamePrefix = null;
+	private String stateNameSuffix = null;
+	private String labelPrefix = null;
+	private String labelSuffix = null;
+	private String stateNameRegExp = null;
+	private String labelRegExp = null;
 
-	public ContentHelp()
+	public TemplateProperties()
 	{
-		String helpsetName = "help/ccs.hs";
-		HelpSet hs = null;
-		try
-		{
-			ClassLoader cl = Supremica.class.getClassLoader();
-			URL hsURL = HelpSet.findHelpSet(cl, helpsetName);
-			hs = new HelpSet(null, hsURL);
-		}
-		catch (Exception e)
-		{
-			System.err.println("HelpSet "+ helpsetName + " not found");
-			return;
-		}
-
-		helpBroker = hs.createHelpBroker();
-		if (helpBroker == null)
-		{
-			System.err.println("HelpBroker is null");
-		}
 	}
 
-	public HelpBroker getStandardHelpBroker()
+	public void setStateNamePrefix(String prefix)
 	{
-		return helpBroker;
+		this.stateNamePrefix = prefix;
 	}
 
+	public void setStateNameSuffix(String suffix)
+	{
+		this.stateNameSuffix = suffix;
+	}
+
+	public void setLabelPrefix(String prefix)
+	{
+		this.labelPrefix = prefix;
+	}
+
+	public void setLabelSuffix(String suffix)
+	{
+		this.labelSuffix = suffix;
+	}
+
+	public void setStateNameRegExp(String regExp)
+	{
+		this.stateNameRegExp = regExp;
+	}
+
+	public void setLabelRegExp(String regExp)
+	{
+		this.labelRegExp = regExp;
+	}
+
+	public boolean matchesStateName(String stateName)
+	{
+		return true;
+	}
+
+	public boolean matchesLabel(String label)
+	{
+		return true;
+	}
+
+	public String getNewStateName(String stateName)
+	{
+		if (!matchesStateName(stateName))
+		{
+			return stateName;
+		}
+
+		StringBuffer sb = new StringBuffer();
+		if (stateNamePrefix != null && !stateNamePrefix.equals(""))
+		{
+			sb.append(stateNamePrefix);
+		}
+
+		sb.append(stateName);
+
+		if (stateNameSuffix != null && !stateNameSuffix.equals(""))
+		{
+			sb.append(stateNameSuffix);
+		}
+		return sb.toString();
+	}
+
+	public String getNewLabel(String label)
+	{
+		if (!matchesLabel(label))
+		{
+			return label;
+		}
+
+		StringBuffer sb = new StringBuffer();
+		if (labelPrefix != null && !labelPrefix.equals(""))
+		{
+			sb.append(labelPrefix);
+		}
+
+		sb.append(label);
+
+		if (labelSuffix != null && !labelSuffix.equals(""))
+		{
+			sb.append(labelSuffix);
+		}
+		return sb.toString();
+	}
 }

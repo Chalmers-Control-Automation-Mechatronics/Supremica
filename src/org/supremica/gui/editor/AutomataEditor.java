@@ -175,8 +175,8 @@ public class AutomataEditor
 
     filemenu.addSeparator();
 
-	// Exit
-	item = filemenu.add(theActions.getFileExitAction());
+	// Close
+	item = filemenu.add(theActions.getFileCloseAction());
     item.setMnemonic('x');
 
     mainMenuBar.add(filemenu);
@@ -325,6 +325,9 @@ public class AutomataEditor
 
 	public void initToolbar()
 	{
+		Insets tmpInsets = new Insets(0, 0, 0, 0);
+		boolean separatorNeeded = false;
+
 		JButton addButton = new JButton();
 		addButton.setToolTipText("Add");
 		ImageIcon add16Img = new ImageIcon(Supremica.class.getResource(
@@ -337,46 +340,68 @@ public class AutomataEditor
 					fileAdd();
 				}
 			});
+		addButton.setMargin(tmpInsets);
+		toolBar.add(addButton, "WEST");
+		separatorNeeded = true;
 
-
-		JButton openButton = new JButton();
-		openButton.setToolTipText("Open");
-		ImageIcon open16Img = new ImageIcon(Supremica.class.getResource(
-			"/toolbarButtonGraphics/general/Open16.gif"));
-		openButton.setIcon(open16Img);
-		openButton.addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent e)
+		if (WorkbenchProperties.fileAllowOpen())
+		{
+			JButton openButton = new JButton();
+			openButton.setToolTipText("Open");
+			ImageIcon open16Img = new ImageIcon(Supremica.class.getResource(
+				"/toolbarButtonGraphics/general/Open16.gif"));
+			openButton.setIcon(open16Img);
+			openButton.addActionListener(new ActionListener()
 				{
-					fileOpen();
-				}
-			});
+					public void actionPerformed(ActionEvent e)
+					{
+						fileOpen();
+					}
+				});
+			openButton.setMargin(tmpInsets);
+			toolBar.add(openButton, "WEST");
+			separatorNeeded = true;
+		}
 
-		JButton saveButton = new JButton();
-		saveButton.setToolTipText("Save");
-		ImageIcon save16Img = new ImageIcon(Supremica.class.getResource(
-			"/toolbarButtonGraphics/general/Save16.gif"));
-		saveButton.setIcon(save16Img);
-		saveButton.addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent e)
+		if (WorkbenchProperties.fileAllowSave())
+		{
+			JButton saveButton = new JButton();
+			saveButton.setToolTipText("Save");
+			ImageIcon save16Img = new ImageIcon(Supremica.class.getResource(
+				"/toolbarButtonGraphics/general/Save16.gif"));
+			saveButton.setIcon(save16Img);
+			saveButton.addActionListener(new ActionListener()
 				{
-					fileSave();
-				}
-			});
+					public void actionPerformed(ActionEvent e)
+					{
+						fileSave();
+					}
+				});
 
-		JButton saveAsButton = new JButton();
-		saveAsButton.setToolTipText("Save As");
-		ImageIcon saveAs16Img = new ImageIcon(Supremica.class.getResource(
-			"/toolbarButtonGraphics/general/SaveAs16.gif"));
-		saveAsButton.setIcon(saveAs16Img);
-		saveAsButton.addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent e)
+			JButton saveAsButton = new JButton();
+			saveAsButton.setToolTipText("Save As");
+			ImageIcon saveAs16Img = new ImageIcon(Supremica.class.getResource(
+				"/toolbarButtonGraphics/general/SaveAs16.gif"));
+			saveAsButton.setIcon(saveAs16Img);
+			saveAsButton.addActionListener(new ActionListener()
 				{
-					fileSaveAs();
-				}
-			});
+					public void actionPerformed(ActionEvent e)
+					{
+						fileSaveAs();
+					}
+				});
+			saveButton.setMargin(tmpInsets);
+			saveAsButton.setMargin(tmpInsets);
+			toolBar.add(saveButton, "WEST");
+			toolBar.add(saveAsButton, "WEST");
+			separatorNeeded = true;
+		}
+
+		if (separatorNeeded)
+		{
+			toolBar.addSeparator();
+			separatorNeeded = true;
+		}
 
 		JButton printButton = new JButton();
 		printButton.setToolTipText("Print");
@@ -515,13 +540,7 @@ public class AutomataEditor
 		helpButton.setIcon(help16Img);
 		//helpButton.addActionListener(helpDisplayer);
 
-		// Set margins
-		Insets tmpInsets = new Insets(0, 0, 0, 0);
 
-		addButton.setMargin(tmpInsets);
-		openButton.setMargin(tmpInsets);
-		saveButton.setMargin(tmpInsets);
-		saveAsButton.setMargin(tmpInsets);
 		printButton.setMargin(tmpInsets);
 		cutButton.setMargin(tmpInsets);
 		copyButton.setMargin(tmpInsets);
@@ -535,12 +554,6 @@ public class AutomataEditor
 		helpButton.setMargin(tmpInsets);
 
 		// Add buttons to toolbar
-		toolBar.add(addButton, "WEST");
-		toolBar.add(openButton, "WEST");
-		toolBar.add(saveButton, "WEST");
-		toolBar.add(saveAsButton, "WEST");
-
-		toolBar.addSeparator();
 
 		toolBar.add(printButton, "WEST");
 
@@ -965,7 +978,7 @@ public class AutomataEditor
 		}
 	}
 
-	public void fileExit()
+	public void fileClose()
 	{
 		this.show(false);
 	}

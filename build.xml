@@ -274,6 +274,8 @@
 	<chmod file="${dist}/Supremica" perm="755"/>	
 	<copy file="${templates}/Supremica.cmd" todir="${dist}"/>	
 	<chmod file="${dist}/Supremica.cmd" perm="644"/>
+	<copy file="${templates}/SupremicaApplet.html" todir="${dist}"/>	
+	<chmod file="${dist}/SupremicaApplet.html" perm="644"/>	
 </target>
 
 <target name="startfiles_jgrafchart">

@@ -271,7 +271,7 @@ public class Supremica
 
 										 );
 
- 		typeEditor = new TypeCellEditor(theAutomatonTable, theTableSorter, theAutomatonContainer);
+		typeEditor = new TypeCellEditor(theAutomatonTable, theTableSorter, theAutomatonContainer);
 
 		helpDisplayer = new CSH.DisplayHelpFromSource(help.getStandardHelpBroker());
 
@@ -289,6 +289,8 @@ public class Supremica
 
 	public void initMenubar()
 	{
+		boolean separatorNeeded = false;
+
 		setJMenuBar(menuBar);
 
 		// File
@@ -296,162 +298,218 @@ public class Supremica
 		menuFile.setText("File");
 		menuFile.setMnemonic(KeyEvent.VK_F);
 		menuBar.add(menuFile);
-
-		// File.Open
-		JMenuItem menuFileOpen = new JMenuItem();
-		menuFileOpen.setText("Open...");
-		menuFile.add(menuFileOpen);
-		menuFileOpen.addActionListener(new ActionListener()
+/*
+		// File.New
+		JMenuItem menuFileNew = new JMenuItem();
+		menuFileNew.setText("New...");
+		menuFile.add(menuFileNew);
+		menuFileNew.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
 				{
-					// fileOpen(this, getCurrentFrame());
-					ActionMan.fileOpen(getGui());
+					ActionMan.fileNew(getGui());
 				}
 			});
 
-		// File.Save
-		JMenuItem menuFileSave = new JMenuItem();
-		menuFileSave.setText("Save");
-		menuFileSave.setMnemonic(KeyEvent.VK_S);
-		menuFile.add(menuFileSave);
-		menuFileSave.addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent e)
+		// File.NewFromTemplate
+		JMenu menuFileNewFromTemplate = new JMenu();
+		menuFileNewFromTemplate.setText("New From Template");
+		menuFile.add(menuFileNewFromTemplate);
+
+		// File.NewFromTemplateStandardComponents
+		JMenu menuFileNewFromTemplateStandardComponents = new JMenu();
+		menuFileNewFromTemplateStandardComponents.setText("Standard Components");
+		menuFileNewFromTemplate.add(menuFileNewFromStandardComponents);
+
+		// File.NewFromTemplateBookExamples
+		JMenu menuFileNewFromTemplateBookExamples = new JMenu();
+		menuFileNewFromTemplateBookExamples.setText("CCS Book Examples");
+		menuFileNewFromTemplate.add(menuFileNewFromTemplateBookExamples);
+
+		// File.NewFromTemplateOtherExamples
+		JMenu menuFileNewFromTemplateOtherExamples = new JMenu();
+		menuFileNewFromTemplateOtherExamples.setText("Other Examples");
+		menuFileNewFromTemplate.add(menuFileNewFromTemplateOtherExamples);
+*/
+
+		if (WorkbenchProperties.fileAllowOpen())
+		{
+			// File.Open
+			JMenuItem menuFileOpen = new JMenuItem();
+			menuFileOpen.setText("Open...");
+			menuFile.add(menuFileOpen);
+			menuFileOpen.addActionListener(new ActionListener()
 				{
-					ActionMan.fileSave(getGui());
-				}
-			});
+					public void actionPerformed(ActionEvent e)
+					{
+						ActionMan.fileOpen(getGui());
+					}
+				});
+			separatorNeeded = true;
+		}
 
-		// File.SaveAs
-		JMenuItem menuFileSaveAs = new JMenuItem();
-		menuFileSaveAs.setText("Save As...");
-		menuFile.add(menuFileSaveAs);
-		menuFileSaveAs.addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent e)
+		if (WorkbenchProperties.fileAllowSave())
+		{
+			// File.Save
+			JMenuItem menuFileSave = new JMenuItem();
+			menuFileSave.setText("Save");
+			menuFileSave.setMnemonic(KeyEvent.VK_S);
+			menuFile.add(menuFileSave);
+			menuFileSave.addActionListener(new ActionListener()
 				{
-					ActionMan.fileSaveAs(getGui());
-				}
-			});
+					public void actionPerformed(ActionEvent e)
+					{
+						ActionMan.fileSave(getGui());
+					}
+				});
 
-		menuFile.addSeparator();
-
-		// File.Import
-		JMenu menuFileImport = new JMenu();
-		menuFileImport.setText("Import");
-		menuFile.add(menuFileImport);
-
-		// File.Import.Desco
-		JMenuItem menuFileImportDesco = new JMenuItem();
-		menuFileImportDesco.setText("From Desco...");
-		menuFileImport.add(menuFileImportDesco);
-		menuFileImportDesco.addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent e)
+			// File.SaveAs
+			JMenuItem menuFileSaveAs = new JMenuItem();
+			menuFileSaveAs.setText("Save As...");
+			menuFile.add(menuFileSaveAs);
+			menuFileSaveAs.addActionListener(new ActionListener()
 				{
-					ActionMan.fileImportDesco(getGui());
-				}
-			});
+					public void actionPerformed(ActionEvent e)
+					{
+						ActionMan.fileSaveAs(getGui());
+					}
+				});
+			separatorNeeded = true;
+		}
 
-		// File.Import.TCT
-		JMenuItem menuFileImportTCT = new JMenuItem();
-		menuFileImportTCT.setText("From TCT...");
-		menuFileImport.add(menuFileImportTCT);
-		menuFileImportTCT.setEnabled(false);
-		menuFileImportTCT.addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent e)
+		if (separatorNeeded)
+		{
+			menuFile.addSeparator();
+			separatorNeeded = false;
+		}
+
+		if (WorkbenchProperties.fileAllowImport())
+		{
+			// File.Import
+			JMenu menuFileImport = new JMenu();
+			menuFileImport.setText("Import");
+			menuFile.add(menuFileImport);
+
+			// File.Import.Desco
+			JMenuItem menuFileImportDesco = new JMenuItem();
+			menuFileImportDesco.setText("From Desco...");
+			menuFileImport.add(menuFileImportDesco);
+			menuFileImportDesco.addActionListener(new ActionListener()
 				{
-					//ActionMan.fileImportTCT(getGui());
-				}
-			});
+					public void actionPerformed(ActionEvent e)
+					{
+						ActionMan.fileImportDesco(getGui());
+					}
+				});
 
-		// File.Import.UMDES
-		JMenuItem menuFileImportUMDES = new JMenuItem();
-		menuFileImportUMDES.setText("From UMDES...");
-		menuFileImport.add(menuFileImportUMDES);
-		menuFileImportUMDES.setEnabled(false);
-		menuFileImportUMDES.addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent e)
+			// File.Import.TCT
+			JMenuItem menuFileImportTCT = new JMenuItem();
+			menuFileImportTCT.setText("From TCT...");
+			menuFileImport.add(menuFileImportTCT);
+			menuFileImportTCT.setEnabled(false);
+			menuFileImportTCT.addActionListener(new ActionListener()
 				{
-					//ActionMan.fileImportUMDES(this);
-				}
-			});
+					public void actionPerformed(ActionEvent e)
+					{
+						//ActionMan.fileImportTCT(getGui());
+					}
+				});
 
-		// File.Import.Valid
-		JMenuItem menuFileImportValid = new JMenuItem();
-		menuFileImportValid.setText("From Valid...");
-		menuFileImport.add(menuFileImportValid);
-		menuFileImportValid.addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent e)
+			// File.Import.UMDES
+			JMenuItem menuFileImportUMDES = new JMenuItem();
+			menuFileImportUMDES.setText("From UMDES...");
+			menuFileImport.add(menuFileImportUMDES);
+			menuFileImportUMDES.setEnabled(false);
+			menuFileImportUMDES.addActionListener(new ActionListener()
 				{
-					ActionMan.fileImportValid(getGui());
-				}
-			});
+					public void actionPerformed(ActionEvent e)
+					{
+						//ActionMan.fileImportUMDES(this);
+					}
+				});
 
-		// File.Export
-		JMenu menuFileExport = new JMenu();
-		menuFileExport.setText("Export");
-		menuFile.add(menuFileExport);
-
-		// File.Export.Desco
-		JMenuItem menuFileExportDesco = new JMenuItem();
-		menuFileExportDesco.setText("To Desco...");
-		menuFileExport.add(menuFileExportDesco);
-		menuFileExportDesco.addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent e)
+			// File.Import.Valid
+			JMenuItem menuFileImportValid = new JMenuItem();
+			menuFileImportValid.setText("From Valid...");
+			menuFileImport.add(menuFileImportValid);
+			menuFileImportValid.addActionListener(new ActionListener()
 				{
-					ActionMan.fileExportDesco(getGui());
-				}
-			});
+					public void actionPerformed(ActionEvent e)
+					{
+						ActionMan.fileImportValid(getGui());
+					}
+				});
+			separatorNeeded = true;
+		}
 
-		// File.Export.TCT
-		JMenuItem menuFileExportTCT = new JMenuItem();
-		menuFileExportTCT.setText("To TCT...");
-		menuFileExport.add(menuFileExportTCT);
-		menuFileExportTCT.setEnabled(false);
-		menuFileExportTCT.addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent e)
-				{
-					//ActionMan.fileExportTCT(getGui());
-				}
-			});
+		if (WorkbenchProperties.fileAllowExport())
+		{
+			// File.Export
+			JMenu menuFileExport = new JMenu();
+			menuFileExport.setText("Export");
+			menuFile.add(menuFileExport);
 
-		// File.Export.UMDES
-		JMenuItem menuFileExportUMDES = new JMenuItem();
-		menuFileExportUMDES.setText("To UMDES...");
-		menuFileExport.add(menuFileExportUMDES);
-		menuFileExportUMDES.setEnabled(false);
-		menuFileExportUMDES.addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent e)
+			// File.Export.Desco
+			JMenuItem menuFileExportDesco = new JMenuItem();
+			menuFileExportDesco.setText("To Desco...");
+			menuFileExport.add(menuFileExportDesco);
+			menuFileExportDesco.addActionListener(new ActionListener()
 				{
-					//ActionMan.fileExportUMDES(getGui());
-				}
-			});
+					public void actionPerformed(ActionEvent e)
+					{
+						ActionMan.fileExportDesco(getGui());
+					}
+				});
 
-		// File.Export.Valid
-		JMenuItem menuFileExportValid = new JMenuItem();
-		menuFileExportValid.setText("To Valid...");
-		menuFileExport.add(menuFileExportValid);
-		menuFileExportUMDES.setEnabled(false);
-		menuFileExportValid.addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent e)
+			// File.Export.TCT
+			JMenuItem menuFileExportTCT = new JMenuItem();
+			menuFileExportTCT.setText("To TCT...");
+			menuFileExport.add(menuFileExportTCT);
+			menuFileExportTCT.setEnabled(false);
+			menuFileExportTCT.addActionListener(new ActionListener()
 				{
-					ActionMan.fileExportValid(getGui());
-				}
-			});
+					public void actionPerformed(ActionEvent e)
+					{
+						//ActionMan.fileExportTCT(getGui());
+					}
+				});
+
+			// File.Export.UMDES
+			JMenuItem menuFileExportUMDES = new JMenuItem();
+			menuFileExportUMDES.setText("To UMDES...");
+			menuFileExport.add(menuFileExportUMDES);
+			menuFileExportUMDES.setEnabled(false);
+			menuFileExportUMDES.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						//ActionMan.fileExportUMDES(getGui());
+					}
+				});
+
+			// File.Export.Valid
+			JMenuItem menuFileExportValid = new JMenuItem();
+			menuFileExportValid.setText("To Valid...");
+			menuFileExport.add(menuFileExportValid);
+			menuFileExportUMDES.setEnabled(false);
+			menuFileExportValid.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						ActionMan.fileExportValid(getGui());
+					}
+				});
+			separatorNeeded = true;
+		}
+
+		if (separatorNeeded)
+		{
+			menuFile.addSeparator();
+			separatorNeeded = false;
+		}
 
 		if (WorkbenchProperties.generalUseSecurity())
-		{	
-			menuFile.addSeparator();
-
+		{
 			// File.Login
 			JMenuItem menuFileLogin = new JMenuItem();
 			menuFileLogin.setText("Login");
@@ -462,22 +520,44 @@ public class Supremica
 					{
 						ActionMan.fileLogin(getGui());
 					}
-				});	
+				});
+			separatorNeeded = true;
 		}
 
-		menuFile.addSeparator();
+		if (separatorNeeded)
+		{
+			menuFile.addSeparator();
+			separatorNeeded = false;
+		}
 
-		// File.Exit
-		JMenuItem menuFileExit = new JMenuItem();
-		menuFileExit.setText("Exit");
-		menuFile.add(menuFileExit);
-		menuFileExit.addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent e)
+		if (WorkbenchProperties.fileAllowQuit())
+		{
+			// File.Exit
+			JMenuItem menuFileExit = new JMenuItem();
+			menuFileExit.setText("Exit");
+			menuFile.add(menuFileExit);
+			menuFileExit.addActionListener(new ActionListener()
 				{
-					ActionMan.fileExit(getGui());
-				}
-			});
+					public void actionPerformed(ActionEvent e)
+					{
+						ActionMan.fileExit(getGui());
+					}
+				});
+		}
+		else
+		{
+			// File.Close
+			JMenuItem menuFileExit = new JMenuItem();
+			menuFileExit.setText("Close");
+			menuFile.add(menuFileExit);
+			menuFileExit.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						ActionMan.fileClose(getGui());
+					}
+				});
+		}
 
 		// Project
 		JMenu menuProject = new JMenu();
@@ -503,23 +583,24 @@ public class Supremica
 		menuTools.setMnemonic(KeyEvent.VK_T);
 		menuBar.add(menuTools);
 
+		// Tools.TestCases
 		JMenuItem test_cases = new JMenuItem();
-		test_cases.setText("Test Cases ...");
+		test_cases.setText("Test Cases...");
 		menuTools.add(test_cases);
 		test_cases.addActionListener(new ActionListener()
 			{
-					public void actionPerformed(ActionEvent e)
+				public void actionPerformed(ActionEvent e)
+				{
+					try
 					{
-						try
-						{
-							ActionMan.testCases(getGui());
-						}
-						catch(Exception excp)
-						{
-							// what the f*** do we do?
-						}
+						ActionMan.testCases(getGui());
 					}
-				});
+					catch(Exception excp)
+					{
+						// what the f*** do we do?
+					}
+				}
+			});
 
 		// Tools.AutomataEditor
 		if (WorkbenchProperties.includeEditor())
@@ -527,7 +608,7 @@ public class Supremica
 			menuTools.add(new JSeparator());
 
 			JMenuItem menuToolsAutomataEditor = new JMenuItem();
-			menuToolsAutomataEditor.setText("Editor");
+			menuToolsAutomataEditor.setText("Editor...");
 			menuTools.add(menuToolsAutomataEditor);
 
 			menuToolsAutomataEditor.addActionListener(new ActionListener()
@@ -634,47 +715,60 @@ public class Supremica
 
 	public void initToolbar()
 	{
-		// toolBar.setLayout(new BorderLayout());
+		Insets tmpInsets = new Insets(0, 0, 0, 0);
 
-		// Create buttons
-		JButton openButton = new JButton();
-		openButton.setToolTipText("Open");
-		ImageIcon open16Img = new ImageIcon(Supremica.class.getResource(
-			"/toolbarButtonGraphics/general/Open16.gif"));
-		openButton.setIcon(open16Img);
-		openButton.addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent e)
+		if (WorkbenchProperties.fileAllowOpen())
+		{
+			// Create buttons
+			JButton openButton = new JButton();
+			openButton.setToolTipText("Open");
+			ImageIcon open16Img = new ImageIcon(Supremica.class.getResource(
+				"/toolbarButtonGraphics/general/Open16.gif"));
+			openButton.setIcon(open16Img);
+			openButton.addActionListener(new ActionListener()
 				{
-					ActionMan.fileOpen(getGui());
-				}
-			});
+					public void actionPerformed(ActionEvent e)
+					{
+						ActionMan.fileOpen(getGui());
+					}
+				});
+			openButton.setMargin(tmpInsets);
+			toolBar.add(openButton, "WEST");
+		}
 
-		JButton saveButton = new JButton();
-		saveButton.setToolTipText("Save");
-		ImageIcon save16Img = new ImageIcon(Supremica.class.getResource(
-			"/toolbarButtonGraphics/general/Save16.gif"));
-		saveButton.setIcon(save16Img);
-		saveButton.addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent e)
+		if (WorkbenchProperties.fileAllowSave())
+		{
+			JButton saveButton = new JButton();
+			saveButton.setToolTipText("Save");
+			ImageIcon save16Img = new ImageIcon(Supremica.class.getResource(
+				"/toolbarButtonGraphics/general/Save16.gif"));
+			saveButton.setIcon(save16Img);
+			saveButton.addActionListener(new ActionListener()
 				{
-					ActionMan.fileSave(getGui());
-				}
-			});
+					public void actionPerformed(ActionEvent e)
+					{
+						ActionMan.fileSave(getGui());
+					}
+				});
 
-		JButton saveAsButton = new JButton();
-		saveAsButton.setToolTipText("Save As");
-		ImageIcon saveAs16Img = new ImageIcon(Supremica.class.getResource(
-			"/toolbarButtonGraphics/general/SaveAs16.gif"));
-		saveAsButton.setIcon(saveAs16Img);
-		saveAsButton.addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent e)
+			JButton saveAsButton = new JButton();
+			saveAsButton.setToolTipText("Save As");
+			ImageIcon saveAs16Img = new ImageIcon(Supremica.class.getResource(
+				"/toolbarButtonGraphics/general/SaveAs16.gif"));
+			saveAsButton.setIcon(saveAs16Img);
+			saveAsButton.addActionListener(new ActionListener()
 				{
-					ActionMan.fileSaveAs(getGui());
-				}
-			});
+					public void actionPerformed(ActionEvent e)
+					{
+						ActionMan.fileSaveAs(getGui());
+					}
+				});
+			saveButton.setMargin(tmpInsets);
+			saveAsButton.setMargin(tmpInsets);
+			toolBar.add(saveButton, "WEST");
+			toolBar.add(saveAsButton, "WEST");
+			toolBar.addSeparator();
+		}
 
 		JButton editButton = new JButton();
 		editButton.setToolTipText("Edit");
@@ -688,6 +782,9 @@ public class Supremica
 					toolsAutomataEditor();
 				}
 			});
+		editButton.setMargin(tmpInsets);
+		toolBar.add(editButton, "WEST");
+		toolBar.addSeparator();
 
 		JButton helpButton = new JButton();
 		helpButton.setToolTipText("Help");
@@ -695,22 +792,7 @@ public class Supremica
 			"/toolbarButtonGraphics/general/Help16.gif"));
 		helpButton.setIcon(help16Img);
 		helpButton.addActionListener(helpDisplayer);
-
-		// Set margins
-		Insets tmpInsets = new Insets(0, 0, 0, 0);
-		openButton.setMargin(tmpInsets);
-		saveButton.setMargin(tmpInsets);
-		saveAsButton.setMargin(tmpInsets);
-		editButton.setMargin(tmpInsets);
 		helpButton.setMargin(tmpInsets);
-
-		// Add buttons to toolbar
-		toolBar.add(openButton, "WEST");
-		toolBar.add(saveButton, "WEST");
-		toolBar.add(saveAsButton, "WEST");
-		toolBar.addSeparator();
-		toolBar.add(editButton, "WEST");
-		toolBar.addSeparator();
 		toolBar.add(helpButton, "EAST");
 	}
 	//** MF ** Implementation of Gui stuff
@@ -947,12 +1029,12 @@ public class Supremica
 		}
 
 		int nbrOfAutomataBeforeOpening = theAutomatonContainer.getSize();
-		
+
 		try
 		{
 			int nbrOfAddedAutomata = addAutomata(currAutomata);
 			thisCategory.info("Successfully opened and added " + nbrOfAddedAutomata + " automata.");
-		}	
+		}
 		catch(Exception excp)
 		{
 			thisCategory.error("Error adding automata " + file.getAbsolutePath() + " " + excp.getMessage());
@@ -1080,7 +1162,7 @@ public class Supremica
 			{
 				// Must have a way to say, "cancel all"?
 			}
-		}	
+		}
 		return nbrOfAddedAutomata;
 	}
 	// We need a single entry to add automata to the gui
@@ -1118,7 +1200,7 @@ public class Supremica
 				currAutomaton.setName(autName);
 			}
 		}
-		
+
 		try
 		{
 			theAutomatonContainer.add(currAutomaton); // throws Exception if the automaton already exists
@@ -1128,6 +1210,17 @@ public class Supremica
 			thisCategory.error("Error while adding: " + excp.getMessage());
 		}
 		return true;
+	}
+
+	public void close()
+	{
+		setVisible(false);
+		dispose();
+	}
+
+	public void destroy()
+	{
+		close();
 	}
 }
 
