@@ -2807,8 +2807,8 @@ public class ActionMan
 		}
 		int[] syncAutomata = {0,1};
 		SyncBuilder syncPlant = new SyncBuilder(gui, newProject, syncAutomata);
-		syncPlant.synchronizePlants("Synchronized");
-		syncPlant.synthesizePlants("Synthesized");
+		//syncPlant.synchronizePlants("Synchronized");
+	//	syncPlant.synthesizePlants("Synthesized");
 	}
 
 	//shoeFactory - SFC

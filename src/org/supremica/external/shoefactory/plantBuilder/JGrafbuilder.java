@@ -7,12 +7,6 @@ import java.awt.event.*;
 import java.io.*;
 import com.nwoods.jgo.*;
 import org.jgrafchart.*;
-/*import org.jgrafchart.GCTransition;
-import org.jgrafchart.DigitalIn;
-import org.jgrafchart.DigitalOut;
-import org.jgrafchart.DigitalOut0;
-import org.jgrafchart.DigitalOut1;
-import org.jgrafchart.AppAction;*/
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;

@@ -85,11 +85,11 @@ public class Plant
 			createTable(i,1);
 		}
 
-		add_shoe(2);
+		/*add_shoe(2);
 		add_shoe(3);
 		add_shoe(4);
 		add_shoe(5);
-		add_shoe(6);
+		add_shoe(6);*/
 	}
 
 	public void createTable(int table_id,int table_type)
