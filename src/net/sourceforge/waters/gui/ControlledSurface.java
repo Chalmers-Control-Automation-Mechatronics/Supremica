@@ -465,7 +465,7 @@ public class ControlledSurface
 				if (selectOnDrag)
 				{
 					// Where are we pointing right now?
-					EditorObject o = getObjectAtPosition(e.getX(), e.getY());
+					EditorObject o = getObjectAtPosition(e.getX() - dx, e.getY() - dy);
 					if (o != null)
 					{
 						select(o);

@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorNodeGroup
 //###########################################################################
-//# $Id: EditorNodeGroup.java,v 1.6 2005-03-03 05:36:29 flordal Exp $
+//# $Id: EditorNodeGroup.java,v 1.7 2005-03-04 11:52:45 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -348,8 +348,20 @@ public class EditorNodeGroup
 			}
 		}
 
-		//g2d.draw(bounds);
+		/*
+		// Draw shadow
+		if (isHighlighted())
+		{
+			g2d.setStroke(SHADOWSTROKE);
+			g2d.setColor(getShadowColor());
+			g2d.drawRoundRect((int) bounds.getX(), (int) bounds.getY(), (int) bounds.getWidth(), (int) bounds.getHeight(), CORNERDIAMETER, CORNERDIAMETER);
+			g2d.setColor(getColor());
+			g2d.setStroke(BASICSTROKE);
+		}
+		*/
+
+		g2d.setStroke(DOUBLESTROKE);
 		g2d.drawRoundRect((int) bounds.getX(), (int) bounds.getY(), (int) bounds.getWidth(), (int) bounds.getHeight(), CORNERDIAMETER, CORNERDIAMETER);
-		g2d.drawRoundRect((int) bounds.getX()-1, (int) bounds.getY()-1, (int) bounds.getWidth()+2, (int) bounds.getHeight()+2, CORNERDIAMETER+2, CORNERDIAMETER+2);
+		g2d.setStroke(BASICSTROKE);
 	}
 }

@@ -8,21 +8,25 @@ import java.awt.Color;
  */
 class EditorColor
 {
-	public static Color HIGHLIGHTCOLOR = Color.CYAN; 
-
-	public static Color SELECTCOLOR = Color.BLUE; 
-
-	//public static Color DRAGSELECTCOLOR = Color.PINK; 
 	public static Color DRAGSELECTCOLOR = new Color(0,0,255,36); 
 
 	public static Color DEFAULTMARKINGCOLOR = Color.GRAY; 
 
 	public static Color ERRORCOLOR = Color.RED; 
-	//public static Color ERRORCOLOR_NODE = ERRORCOLOR.brighter(); // Doesn't work?
 	public static Color ERRORCOLOR_NODE = new Color(255,0,0,128); 
+	public static Color ERRORSHADOWCOLOR = new Color(255,0,0,36); 
+
+	public static Color SELECTCOLOR = Color.BLUE; 
+	public static Color SELECTSHADOWCOLOR = new Color(0,0,255,36); 
+
+	public static Color HIGHLIGHTCOLOR = Color.CYAN; 
+	public static Color HIGHLIGHTSHADOWCOLOR = new Color(0,255,255,36); 
 
 	public static Color DEFAULTCOLOR = Color.BLACK; 
 	public static Color DEFAULTCOLOR_NODEGROUP = Color.lightGray; 
+	public static Color DEFAULTSHADOWCOLOR = new Color(0,0,0,36); 
+
+	public static Color INVISIBLE = new Color(0,0,0,0);
 }
 
 

@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorLabel
 //###########################################################################
-//# $Id: EditorLabel.java,v 1.9 2005-03-03 12:52:54 flordal Exp $
+//# $Id: EditorLabel.java,v 1.10 2005-03-04 11:52:45 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -34,6 +34,7 @@ public class EditorLabel
 {
 	private JTextField text;
 	private JLabel label;
+	//private JLabel labelShadow;
 	private String backup = "";
 	private Rectangle boundingRect = new Rectangle();
 	private boolean editing = false;
@@ -54,6 +55,7 @@ public class EditorLabel
 	public void removeFromSurface(EditorSurface e)
 	{
 		e.remove(text);
+		//e.remove(labelShadow);
 		e.remove(label);
 	}
 
@@ -84,6 +86,7 @@ public class EditorLabel
 
 		text.setVisible(edit);
 		label.setVisible(!edit);
+		//labelShadow.setVisible(!edit);
 	}
 
 	public boolean getEditing()
@@ -133,6 +136,16 @@ public class EditorLabel
 		}
 
 		label.setForeground(getColor());
+		/*
+		if (isHighlighted())
+		{
+			labelShadow.setForeground(getShadowColor());
+		}
+		else
+		{
+			labelShadow.setForeground(EditorColor.INVISIBLE);
+		}
+		*/
 
 		int xposition = parent.getX() + (int) geometry.getOffset().getX();
 		int yposition = parent.getY() + (int) geometry.getOffset().getY();
@@ -142,7 +155,27 @@ public class EditorLabel
 		label.setText(text.getText());
 		label.setFont(text.getFont());
 		label.setSize(label.getPreferredSize());
+		/*
+		labelShadow.setLocation(label.getX(), label.getY());
+		labelShadow.setText(text.getText());
+		labelShadow.setFont(text.getFont().deriveFont(Font.BOLD));
+		labelShadow.setSize(label.getPreferredSize());
+		*/
 		boundingRect.setRect(xposition - 1, yposition - 14, text.getWidth(), text.getHeight());
+
+		/*
+		// Draw shadow?
+		if (isHighlighted())
+		{
+			Graphics2D g2d = (Graphics2D) g;
+			//g2d.setStroke(SHADOWSTROKE); 
+			g2d.setColor(getShadowColor());				
+			g2d.fillRect((int) boundingRect.getX(), (int) boundingRect.getY(), 
+						 (int) boundingRect.getWidth(), (int) boundingRect.getHeight());			
+			g2d.setColor(getColor());
+			g2d.setStroke(BASICSTROKE);
+		}
+		*/
 	}
 
 	public boolean wasClicked(int ex, int ey)
@@ -206,14 +239,18 @@ public class EditorLabel
 		}
 
 		label = new JLabel(text.getText());
+		//labelShadow = new JLabel(text.getText());
 
 		text.setOpaque(false);
 		label.setOpaque(false);
+		//labelShadow.setOpaque(false);
 		text.setBorder(new EmptyBorder(text.getBorder().getBorderInsets(text)));
 		label.setBorder(new EmptyBorder(text.getBorder().getBorderInsets(text)));
+		//labelShadow.setBorder(new EmptyBorder(text.getBorder().getBorderInsets(text)));
 		text.setVisible(false);
 		text.setForeground(EditorColor.DEFAULTCOLOR);
 		e.add(text);
+		//e.add(labelShadow);
 		e.add(label);
 
 		parent = par;

@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorEdge
 //###########################################################################
-//# $Id: EditorEdge.java,v 1.13 2005-03-04 04:03:55 flordal Exp $
+//# $Id: EditorEdge.java,v 1.14 2005-03-04 11:52:45 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -88,7 +88,7 @@ public class EditorEdge
 		// Create new geometry if there is none
 		if (proxy.getGeometry() == null)
 		{
-			if (startNode != endNode)
+			if (!isSelfLoop())
 			{
 				straight = true;
 				tPoint = new Point2D.Double((start.getX() + endNode.getX()) / 2, (start.getY() + endNode.getY()) / 2);
@@ -302,7 +302,7 @@ public class EditorEdge
 
 			setTPoint(dx + endNode.getX(), dy + endNode.getY());
 		}
-		else if (startNode == endNode)
+		else if (isSelfLoop())
 		{
 			setTPoint(start.getX() + 30, start.getY() + 30);
 		}
@@ -320,7 +320,7 @@ public class EditorEdge
 	{
 		endNode = newendNode;
 
-		if (startNode == endNode)
+		if (isSelfLoop())
 		{
 			setTPoint(start.getX() + 30, start.getY() + 30);
 		}
@@ -429,14 +429,14 @@ public class EditorEdge
 		return (int) getTPointY();
 	}
 
-	/* 
+	/**
 	 * Set the screen coordinates of the turning point of the edge.
 	 */
 	public void setTPoint(double x, double y)
 	{
-		if (startNode == endNode)
+		if (isSelfLoop())
 		{
-			straight = false;
+			straight = false; 
 			
 			tPoint.setLocation(x, y);
 		}
@@ -471,7 +471,7 @@ public class EditorEdge
 	 */
 	public void updateControlPoint(double ox, double oy, boolean startN)
 	{
-		if (startNode == endNode)
+		if (isSelfLoop())
 		{
 			tPoint.setLocation(tPoint.getX() + (endNode.getX() - (int) ox) / 2, tPoint.getY() + (endNode.getY() - (int) oy) / 2);
 
@@ -510,9 +510,16 @@ public class EditorEdge
 
 		// If ox and oy are 0, this becomes 0...
 		double divide = Math.pow(ox, 2) + Math.pow(oy, 2);
-		if (divide == 0)
+		if (Math.abs(divide) < Double.MIN_VALUE)
 		{
-			divide += Double.MIN_VALUE;
+			if (divide >= 0)
+			{
+				divide = 2*Double.MIN_VALUE;
+			}
+			else
+			{
+				divide = -2*Double.MIN_VALUE;
+			}
 		}
 
 		// ... which is not good here!
@@ -568,7 +575,7 @@ public class EditorEdge
 		}
 	}
 
-	private ArrayList createTear()
+	protected ArrayList createTear()
 	{
 		double dist = (double) Math.sqrt((getCPointX() - start.getX()) * (getCPointX() - start.getX()) + (getCPointY() - start.getY()) * (getCPointY() - start.getY())) * tearRatio;
 		double r = dist / 2;
@@ -654,29 +661,39 @@ public class EditorEdge
 			return true;
 		}
 
-		if (startNode == endNode)
+		if (isSelfLoop())
 		{
 			return (onCircle(Cxposition, Cyposition));
 		}
 
 		//return (Math.abs(Cxposition-controlPoint.getX()) < 5 && Math.abs(Cyposition-controlPoint.getY()) < 5);
-		QuadCurve2D.Double q;
+
 		int n = 0;
+
+		// The straight line between start and end
 		Line2D.Double l = new Line2D.Double(start.getX(), start.getY(), endNode.getX(), endNode.getY());
 
-		q = new QuadCurve2D.Double(start.getX(), start.getY(), getCPointX(), getCPointY(), endNode.getX(), endNode.getY());
+  		// The curve that is this edge
+		QuadCurve2D.Double q = getCurve();
 
 		if (straight)
 		{
 			return (l.intersects(Cxposition - 2, Cyposition - 2, 4, 4));
 		}
-
-		if (l.intersects(Cxposition - 2, Cyposition - 2, 4, 4))
+		else if (l.intersects(Cxposition - 2, Cyposition - 2, 4, 4))
 		{
 			return false;
 		}
+		else
+		{
+			return ((q.intersects(Cxposition - 2, Cyposition - 2, 4, 4)) && 
+					(!q.contains(Cxposition - 2, Cyposition - 2, 4, 4)));
+		}
+	}
 
-		return ((q.intersects(Cxposition - 2, Cyposition - 2, 4, 4)) && (!q.contains(Cxposition - 2, Cyposition - 2, 4, 4)));
+	public boolean isSelfLoop()
+	{
+		return startNode == endNode;
 	}
 
 	private void drawArrow(double x1, double y1, double x2, double y2, int posX, int posY, boolean loop, Graphics2D g2d)
@@ -767,6 +784,13 @@ public class EditorEdge
 		return proxy;
 	}
 	
+	public QuadCurve2D.Double getCurve()
+	{
+		return new QuadCurve2D.Double(start.getX(), start.getY(), 
+ 									  getCPointX(), getCPointY(), 
+									  endNode.getX(), endNode.getY());
+	}
+	
 	public void drawObject(Graphics g)
 	{
 		Graphics2D g2d = (Graphics2D) g;
@@ -779,12 +803,12 @@ public class EditorEdge
 			int x1 = (int) source.getCenterX();
 			int y1 = (int) source.getCenterY();
 			int x2 = (int) target.getCenterX();
-			int y2 = (int) target.getCenterY();
+			int y2 = (int) target.getCenterY(); 
 			
 			g2d.drawLine(x1, y1, x2, y2);
 			drawArrow(x1, y1, x2, y2, (x1 + x2) / 2, (y1 + y2) / 2, false, g2d);
 		}
-		else if (startNode == endNode)
+		else if (isSelfLoop())
 		{
 			ArrayList a = createTear();
 			
@@ -798,20 +822,20 @@ public class EditorEdge
 		}
 		else
 		{
-			//controlPointX = ((start.getX() + endNode.getX())/2);
-			//controlPointY = ((start.getY() + endNode.getY())/2);
 			/*
-			System.err.println("---------------");
-			System.err.println("" + start.getX());
-			System.err.println("" + start.getY());
-			System.err.println("" + getCPointX());
-			System.err.println("" + getCPointY());
-			System.err.println("" + endNode.getX());
-			System.err.println("" + endNode.getY());
+			// Draw shadow
+			if (isHighlighted())
+			{
+				g2d.setStroke(SHADOWSTROKE);
+				g2d.setColor(getShadowColor());				
+				g2d.draw(getCurve()); 
+				g2d.setColor(getColor());
+				g2d.setStroke(BASICSTROKE);
+			}
 			*/
-			g2d.draw(new QuadCurve2D.Double(start.getX(), start.getY(), 
-											getCPointX(), getCPointY(), 
-											endNode.getX(), endNode.getY()));
+
+			// Draw curve
+			g2d.draw(getCurve());
 
 			if (startNode.getType() == NODE)
 			{

@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorObject
 //###########################################################################
-//# $Id: EditorObject.java,v 1.6 2005-03-03 05:36:29 flordal Exp $
+//# $Id: EditorObject.java,v 1.7 2005-03-04 11:52:45 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -31,6 +31,11 @@ public class EditorObject
 	private boolean selected = false;
 	private boolean highlighted = false;
 	private boolean error = false;
+
+	// Different pens for drawing
+	public final Stroke BASICSTROKE = new BasicStroke();
+	public final Stroke DOUBLESTROKE = new BasicStroke(2); 	
+	public final Stroke SHADOWSTROKE = new BasicStroke(5); 	
 
 	public void drawObject(Graphics g)
 	{
@@ -111,6 +116,29 @@ public class EditorObject
 			return EditorColor.DEFAULTCOLOR;
 		}
 	}		
+
+	public Color getShadowColor()
+	{
+		//return EditorColor.INVISIBLE;
+
+		// In order of importance
+		if (isError())
+		{
+			return EditorColor.ERRORSHADOWCOLOR;
+		}
+		else if (isSelected())
+		{
+			return EditorColor.SELECTSHADOWCOLOR;
+		}
+		else if (isHighlighted())
+		{
+			return EditorColor.HIGHLIGHTSHADOWCOLOR;
+		}
+		else
+		{
+			return EditorColor.DEFAULTSHADOWCOLOR;
+		}
+	}
 
 	public EditorObject()
 	{

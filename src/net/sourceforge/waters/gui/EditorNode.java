@@ -233,6 +233,18 @@ public class EditorNode
 			propGroup.setVisible(false);
 		}
 		
+		/*
+		// Draw shadow?
+		if (isHighlighted())
+		{
+			g2d.setStroke(SHADOWSTROKE); 
+			g2d.setColor(getShadowColor());				
+			g2d.drawOval(getX() - RADIUS, getY() - RADIUS, WIDTH, WIDTH);			
+			g2d.setColor(getColor());
+			g2d.setStroke(BASICSTROKE);
+		}
+		*/
+
 		// Draw the inside of the node
 		if (colours.size() == 0)
 		{
@@ -272,11 +284,12 @@ public class EditorNode
 
 		// Draw the border of the node
 		g2d.setColor(getColor());
-		g2d.drawOval(getX() - RADIUS, getY() - RADIUS, WIDTH, WIDTH);
 		if (isInitial())
 		{
 			// Draw it thicker!
-			g2d.drawOval(getX() - RADIUS + 1, getY() - RADIUS + 1, WIDTH - 2, WIDTH - 2);			
+			g2d.setStroke(DOUBLESTROKE);
 		}
+		g2d.drawOval(getX() - RADIUS, getY() - RADIUS, WIDTH, WIDTH);			
+		g2d.setStroke(BASICSTROKE);
 	}
 }

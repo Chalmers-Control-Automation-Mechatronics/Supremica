@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.14 2005-03-04 03:52:47 flordal Exp $
+//# $Id: EditorSurface.java,v 1.15 2005-03-04 11:52:45 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -219,9 +219,25 @@ public class EditorSurface
 
 		for (int i = 0; i < edges.size(); i++)
 		{
-			EditorEdge n = (EditorEdge) edges.get(i);
+			EditorEdge edge = (EditorEdge) edges.get(i);
 
-			n.drawObject(g);
+			edge.drawObject(g);
+
+			/*
+			QuadCurve2D.Double curve = edge.getCurve();
+			//PathIterator it = curve.getPathIterator(new AffineTransform());
+			FlatteningPathIterator it = new FlatteningPathIterator (curve.getPathIterator(new AffineTransform()), 2, 100);
+			while (!it.isDone())
+			{
+				double[] segment = new double[6];
+				int type = it.currentSegment(segment);
+				
+				g.setColor(Color.ORANGE);
+				g.drawOval((int) segment[0]-1, (int) segment[1]-1, 3, 3);
+				
+				it.next();
+			}
+			*/
 		}
 
 		for (int i = 0; i < nodes.size(); i++)
@@ -257,7 +273,7 @@ public class EditorSurface
 		{
 			showDragSelect(g);
 		}
-
+		
 		/*
 		Rectangle rect = getDrawnAreaBounds();
 		g.setColor(Color.PINK);
@@ -1065,10 +1081,10 @@ public class EditorSurface
 	 */
 	public void minimizeSize()
 	{
-		Rectangle drawnArea = getDrawnAreaBounds();
+		Rectangle area = getDrawnAreaBounds();
 
-		int width = (int) drawnArea.getWidth();
-		int height = (int) drawnArea.getHeight();
+		int width = (int) area.getWidth();
+		int height = (int) area.getHeight();
 
 		if (width < 500)
 		{
@@ -1103,7 +1119,7 @@ public class EditorSurface
 		for (int i = 0; i < nodes.size(); i++)
 		{
 			x = ((EditorNode) nodes.get(i)).getX();
-			mod = EditorNode.RADIUS + 3 + SPACING;
+			mod = EditorNode.RADIUS + 2 + SPACING;
 			if (x + mod > maxX)
 			{
 				maxX = x + mod;
@@ -1161,8 +1177,11 @@ public class EditorSurface
 		// Edges...
 		for (int i = 0; i < edges.size(); i++)
 		{
-			x = ((EditorEdge) edges.get(i)).getTPointX();
-			mod = 0 + SPACING;
+			EditorEdge edge = (EditorEdge) edges.get(i);
+
+			// The bounds of the arrow
+			x = edge.getTPointX();
+			mod = 4 + SPACING;
 			if (x + mod > maxX)
 			{
 				maxX = x + mod;
@@ -1173,7 +1192,7 @@ public class EditorSurface
 				minX = x - mod;
 			}
 
-			y = ((EditorEdge) edges.get(i)).getTPointY();
+			y = edge.getTPointY();
 			if (y + mod > maxY)
 			{
 				maxY = y + mod;
@@ -1182,6 +1201,77 @@ public class EditorSurface
 			if (y - mod < minY)
 			{
 				minY = y - mod;
+			}
+
+			// The bounds of the curve
+			if (edge.isSelfLoop())
+			{
+				ArrayList loop = edge.createTear();
+				Arc2D.Double arc = (Arc2D.Double) loop.get(0);
+
+				Rectangle bound = arc.getBounds();
+				x = bound.getX();
+				mod = bound.getWidth() + SPACING;
+				if (x + mod > maxX)
+				{
+					maxX = x + mod;
+				}
+				
+				mod = 2 + SPACING;
+				if (x - mod < minX)
+				{
+					minX = x - mod;
+				}
+				
+				y = bound.getY();
+				mod = bound.getHeight() + SPACING;
+				if (y + mod > maxY)
+				{
+					maxY = y + mod;
+				}
+				
+				mod = 2 + SPACING;
+				if (y - mod < minY)
+				{
+					minY = y - mod;
+				}
+			}
+			else
+			{
+				QuadCurve2D.Double curve = edge.getCurve();
+				FlatteningPathIterator it = 
+					new FlatteningPathIterator(curve.getPathIterator(new AffineTransform()), 2.0, 25);
+				while (!it.isDone())
+				{
+					double[] segment = new double[6];
+					int type = it.currentSegment(segment);
+					
+					// Only care about the first point, it's not such a big deal, anyway?
+					x = segment[0];
+					mod = 2 + SPACING;
+					if (x + mod > maxX)
+					{
+						maxX = x + mod;
+					}
+					
+					if (x - mod < minX)
+					{
+						minX = x - mod;
+					}
+					
+					y = segment[1];
+					if (y + mod > maxY)
+					{
+						maxY = y + mod;
+					}
+					
+					if (y - mod < minY)
+					{
+						minY = y - mod;
+					}
+					
+					it.next();
+				}
 			}
 		}
 
@@ -1366,7 +1456,16 @@ public class EditorSurface
 
 			// Put the current figure into the Graphics object!
 			print(g);
-			 
+
+			/*
+			// Bounding box
+			int llx = (int) (area.getX());
+			int lly = (int) (area.getY() + area.getHeight());
+			int urx = (int) (area.getX() + area.getWidth());
+			int ury = (int) (area.getY());
+			System.err.println("%%BoundingBox: " + llx + " " + lly + " " + urx + " " + ury);
+			*/
+
 			// OK to print!
 			return (PAGE_EXISTS);
         }
