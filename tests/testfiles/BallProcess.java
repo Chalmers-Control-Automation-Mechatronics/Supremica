@@ -197,34 +197,33 @@ import org.supremica.softplc.RunTime.DigitalIODriver;
  *   Timer 6: "es.timer.before_deput"
  *   Timer 7: "es.timer.before_up"
  */
-public class BallProcess
-{
+public class BallProcess {
 	/**
 	 * Class Timer is a simple countdown timer.
 	 * Start the timer like this:
 	 * <code>myTimer.start()</code>
 	 * It has timed out if:
-	 * <code>myTimer.isAlive()</code>
-	 * returns false.
+	 * <code>myTimer.hasTimedOut()</code>
+	 * returns true.
 	 */
-	static class Timer extends Thread
-	{
+	static class Timer {
 		int delay;
-
-		public Timer(int delay) // In ms
-		{
+		Thread timerThread;
+		public Timer(int delay) { // In ms
 			this.delay = delay;
 		}
-
-		public void run()
-		{
-			try
-			{
-				sleep(delay);
-			}
-			catch (InterruptedException e)
-			{
-			}
+		public void start() {
+			timerThread = new Thread(new Runnable() {
+				public void run() {
+					try {
+						Thread.sleep(Timer.this.delay);
+					} catch (InterruptedException e) {}
+				}
+			});
+			timerThread.start();
+		}
+		public boolean hasTimedOut() {
+			return !timerThread.isAlive();
 		}
 	}
 
@@ -382,8 +381,7 @@ public class BallProcess
 	/**
 	 * Constructor
 	 */
-	BallProcess()
-	{
+	BallProcess() {
 		/*
 		 * DigitalIODriverFactory is a class that
 		 * should be implemented by the user (you).
@@ -404,10 +402,8 @@ public class BallProcess
 	 * @return <code>true</code> if the event is enabled.
 	 *         <code>false</code> otherwise.
 	 */
-	boolean eventIsEnabledInCurrentState(int eventIndex)
-	{
-		switch (eventIndex)
-		{
+	boolean eventIsEnabledInCurrentState(int eventIndex) {
+		switch (eventIndex) {
 		case 0: // Event "arm.allocate_lower_buffer"
 			return (currentState[9] == 0)
 					&& (false /* Automaton 17 */);
@@ -683,16 +679,14 @@ public class BallProcess
 	 * @return <code>true</code> if the event is enabled.
 	 *         <code>false</code> otherwise.
 	 */
-	boolean eventIsEnabledByInputVariables(int eventIndex)
-	{
+	boolean eventIsEnabledByInputVariables(int eventIndex) {
 		/*
 		 * All external conditions are true by default.
 		 * Example:
 		 * case 8: // Event "product_arrival"
 		 *   return inputVariables[5];  // Sensor on port 5
 		 */
-		switch (eventIndex)
-		{
+		switch (eventIndex) {
 		case 8: // Event "button.automatic.pressed"
 			return !inputVariables[23];
 		case 9: // Event "button.automatic.released"
@@ -742,32 +736,30 @@ public class BallProcess
 	 * @return <code>true</code> if the event is enabled.
 	 *         <code>false</code> otherwise.
 	 */
-	boolean eventIsEnabledByTimers(int eventIndex)
-	{
+	boolean eventIsEnabledByTimers(int eventIndex) {
 		/*
 		 * All timer conditions are true by default.
 		 * Example:
 		 * case 5: // Event "mytimer_timeout"
-		 *   return !timers[2].isAlive();  // Timer "mytimer"
+		 *   return timers[2].hasTimedOut();  // Timer "mytimer"
 		 */
-		switch (eventIndex)
-		{
+		switch (eventIndex) {
 		case 40: // Event "em.timer.before_ballcheck.timeout"
-			return !timers[0].isAlive(); // Timer "em.timer.before_ballcheck"
+			return timers[0].hasTimedOut(); // Timer "em.timer.before_ballcheck"
 		case 42: // Event "em.timer.before_put.timeout"
-			return !timers[1].isAlive(); // Timer "em.timer.before_put"
+			return timers[1].hasTimedOut(); // Timer "em.timer.before_put"
 		case 44: // Event "em.timer.before_up.timeout"
-			return !timers[2].isAlive(); // Timer "em.timer.before_up"
+			return timers[2].hasTimedOut(); // Timer "em.timer.before_up"
 		case 46: // Event "em.timer.measure.timeout"
-			return !timers[3].isAlive(); // Timer "em.timer.measure"
+			return timers[3].hasTimedOut(); // Timer "em.timer.measure"
 		case 48: // Event "em.timer.putting.timeout"
-			return !timers[4].isAlive(); // Timer "em.timer.putting"
+			return timers[4].hasTimedOut(); // Timer "em.timer.putting"
 		case 70: // Event "es.timer.before_ballcheck.timeout"
-			return !timers[5].isAlive(); // Timer "es.timer.before_ballcheck"
+			return timers[5].hasTimedOut(); // Timer "es.timer.before_ballcheck"
 		case 72: // Event "es.timer.before_deput.timeout"
-			return !timers[6].isAlive(); // Timer "es.timer.before_deput"
+			return timers[6].hasTimedOut(); // Timer "es.timer.before_deput"
 		case 74: // Event "es.timer.before_up.timeout"
-			return !timers[7].isAlive(); // Timer "es.timer.before_up"
+			return timers[7].hasTimedOut(); // Timer "es.timer.before_up"
 		default:
 			return true;
 		}
@@ -777,10 +769,8 @@ public class BallProcess
 	 * Updates the states of the automata
 	 * @param eventIndex The executed event
 	 */
-	void updateCurrentState(int eventIndex)
-	{
-		switch (eventIndex)
-		{
+	void updateCurrentState(int eventIndex) {
+		switch (eventIndex) {
 		case NO_EVENT_IS_SELECTED: // If no event was enabled
 			break;
 		case 0: // Event "arm.allocate_lower_buffer"
@@ -1662,8 +1652,7 @@ public class BallProcess
 	 * Sets output variables according to the executed event
 	 * @param eventIndex The executed event
 	 */
-	void updateOutputVariables(int eventIndex)
-	{
+	void updateOutputVariables(int eventIndex) {
 		/*
 		 * No output variables are changed by default.
 		 * Example:
@@ -1671,8 +1660,7 @@ public class BallProcess
 		 *   outputVariables[7] = true;
 		 *   break;
 		 */
-		switch (eventIndex)
-		{
+		switch (eventIndex) {
 		case 16: // Event "em.go_down"
 			outputVariables[2] = false; // Output "UppMatlyft"
 			break;
@@ -1736,8 +1724,7 @@ public class BallProcess
 	 * Start timers.
 	 * @param eventIndex The executed event
 	 */
-	void startTimers(int eventIndex)
-	{
+	void startTimers(int eventIndex) {
 		/*
 		 * No timers are started by default.
 		 * Example:
@@ -1745,8 +1732,7 @@ public class BallProcess
 		 *   timers[2].start();  // Timer "mytimer"
 		 *   break;
 		 */
-		switch (eventIndex)
-		{
+		switch (eventIndex) {
 		case 39: // Event "em.timer.before_ballcheck.start"
 			timers[0].start(); // Timer "em.timer.before_ballcheck"
 			break;
@@ -1779,8 +1765,7 @@ public class BallProcess
 	/**
 	 * Executes the program.
 	 */
-	void execute()
-	{
+	void execute() {
 		// The index of the event that is selected to be executed
 		int eventToBeExecuted = NO_EVENT_IS_SELECTED;
 		
@@ -1792,10 +1777,8 @@ public class BallProcess
 		long timeToSleep;
 		
 		// Main scancycle
-		while (true)
-		{
-			try
-			{
+		while (true) {
+			try {
 				eventToBeExecuted = NO_EVENT_IS_SELECTED;
 
 				// Read the input signal values into the input variables
@@ -1832,9 +1815,7 @@ public class BallProcess
 				// For debugging
 				//if (eventToBeExecuted != NO_EVENT_IS_SELECTED)
 				//	System.out.println(EVENT_LABELS[eventToBeExecuted]);
-			}
-			catch (Exception e)
-			{
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 
@@ -1844,20 +1825,16 @@ public class BallProcess
 			 * the real scan cycle time. 
 			 */
 			timeToSleep = PREFERRED_SCAN_CYCLE_TIME - (System.currentTimeMillis() - timeOfLastScan); 
-			if (timeToSleep > 0)
-			{
-				try
-				{
+			if (timeToSleep > 0) {
+				try {
 					Thread.sleep(timeToSleep);
-				}
-				catch(InterruptedException e){}
+				} catch(InterruptedException e){}
 			}
 			timeOfLastScan = System.currentTimeMillis();
 		}
 	}
 
-	public static void main(String[] args)
-	{
+	public static void main(String[] args) {
 		BallProcess instance = new BallProcess();
 		instance.execute();
 	}

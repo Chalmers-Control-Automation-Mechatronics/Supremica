@@ -52,34 +52,33 @@ import org.supremica.softplc.RunTime.DigitalIODriver;
  * Timer indices and the corresponding label
  *   No timers
  */
-public class CatAndMouse
-{
+public class CatAndMouse {
 	/**
 	 * Class Timer is a simple countdown timer.
 	 * Start the timer like this:
 	 * <code>myTimer.start()</code>
 	 * It has timed out if:
-	 * <code>myTimer.isAlive()</code>
-	 * returns false.
+	 * <code>myTimer.hasTimedOut()</code>
+	 * returns true.
 	 */
-	static class Timer extends Thread
-	{
+	static class Timer {
 		int delay;
-
-		public Timer(int delay) // In ms
-		{
+		Thread timerThread;
+		public Timer(int delay) { // In ms
 			this.delay = delay;
 		}
-
-		public void run()
-		{
-			try
-			{
-				sleep(delay);
-			}
-			catch (InterruptedException e)
-			{
-			}
+		public void start() {
+			timerThread = new Thread(new Runnable() {
+				public void run() {
+					try {
+						Thread.sleep(Timer.this.delay);
+					} catch (InterruptedException e) {}
+				}
+			});
+			timerThread.start();
+		}
+		public boolean hasTimedOut() {
+			return !timerThread.isAlive();
 		}
 	}
 
@@ -149,8 +148,7 @@ public class CatAndMouse
 	/**
 	 * Constructor
 	 */
-	CatAndMouse()
-	{
+	CatAndMouse() {
 		/*
 		 * DigitalIODriverFactory is a class that
 		 * should be implemented by the user (you).
@@ -171,10 +169,8 @@ public class CatAndMouse
 	 * @return <code>true</code> if the event is enabled.
 	 *         <code>false</code> otherwise.
 	 */
-	boolean eventIsEnabledInCurrentState(int eventIndex)
-	{
-		switch (eventIndex)
-		{
+	boolean eventIsEnabledInCurrentState(int eventIndex) {
+		switch (eventIndex) {
 		case 0: // Event "c1"
 			return (currentState[0] == 0)
 					&& (currentState[2] == 0)
@@ -244,16 +240,14 @@ public class CatAndMouse
 	 * @return <code>true</code> if the event is enabled.
 	 *         <code>false</code> otherwise.
 	 */
-	boolean eventIsEnabledByInputVariables(int eventIndex)
-	{
+	boolean eventIsEnabledByInputVariables(int eventIndex) {
 		/*
 		 * All external conditions are true by default.
 		 * Example:
 		 * case 8: // Event "product_arrival"
 		 *   return inputVariables[5];  // Sensor on port 5
 		 */
-		switch (eventIndex)
-		{
+		switch (eventIndex) {
 		default:
 			return true;
 		}
@@ -265,16 +259,14 @@ public class CatAndMouse
 	 * @return <code>true</code> if the event is enabled.
 	 *         <code>false</code> otherwise.
 	 */
-	boolean eventIsEnabledByTimers(int eventIndex)
-	{
+	boolean eventIsEnabledByTimers(int eventIndex) {
 		/*
 		 * All timer conditions are true by default.
 		 * Example:
 		 * case 5: // Event "mytimer_timeout"
-		 *   return !timers[2].isAlive();  // Timer "mytimer"
+		 *   return timers[2].hasTimedOut();  // Timer "mytimer"
 		 */
-		switch (eventIndex)
-		{
+		switch (eventIndex) {
 		default:
 			return true;
 		}
@@ -284,10 +276,8 @@ public class CatAndMouse
 	 * Updates the states of the automata
 	 * @param eventIndex The executed event
 	 */
-	void updateCurrentState(int eventIndex)
-	{
-		switch (eventIndex)
-		{
+	void updateCurrentState(int eventIndex) {
+		switch (eventIndex) {
 		case NO_EVENT_IS_SELECTED: // If no event was enabled
 			break;
 		case 0: // Event "c1"
@@ -495,8 +485,7 @@ public class CatAndMouse
 	 * Sets output variables according to the executed event
 	 * @param eventIndex The executed event
 	 */
-	void updateOutputVariables(int eventIndex)
-	{
+	void updateOutputVariables(int eventIndex) {
 		/*
 		 * No output variables are changed by default.
 		 * Example:
@@ -504,8 +493,7 @@ public class CatAndMouse
 		 *   outputVariables[7] = true;
 		 *   break;
 		 */
-		switch (eventIndex)
-		{
+		switch (eventIndex) {
 		default: // Do nothing
 			break;
 		}
@@ -515,8 +503,7 @@ public class CatAndMouse
 	 * Start timers.
 	 * @param eventIndex The executed event
 	 */
-	void startTimers(int eventIndex)
-	{
+	void startTimers(int eventIndex) {
 		/*
 		 * No timers are started by default.
 		 * Example:
@@ -524,8 +511,7 @@ public class CatAndMouse
 		 *   timers[2].start();  // Timer "mytimer"
 		 *   break;
 		 */
-		switch (eventIndex)
-		{
+		switch (eventIndex) {
 		default: // Do nothing
 			break;
 		}
@@ -534,8 +520,7 @@ public class CatAndMouse
 	/**
 	 * Executes the program.
 	 */
-	void execute()
-	{
+	void execute() {
 		// The index of the event that is selected to be executed
 		int eventToBeExecuted = NO_EVENT_IS_SELECTED;
 		
@@ -547,10 +532,8 @@ public class CatAndMouse
 		long timeToSleep;
 		
 		// Main scancycle
-		while (true)
-		{
-			try
-			{
+		while (true) {
+			try {
 				eventToBeExecuted = NO_EVENT_IS_SELECTED;
 
 				// Read the input signal values into the input variables
@@ -587,9 +570,7 @@ public class CatAndMouse
 				// For debugging
 				//if (eventToBeExecuted != NO_EVENT_IS_SELECTED)
 				//	System.out.println(EVENT_LABELS[eventToBeExecuted]);
-			}
-			catch (Exception e)
-			{
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 
@@ -599,20 +580,16 @@ public class CatAndMouse
 			 * the real scan cycle time. 
 			 */
 			timeToSleep = PREFERRED_SCAN_CYCLE_TIME - (System.currentTimeMillis() - timeOfLastScan); 
-			if (timeToSleep > 0)
-			{
-				try
-				{
+			if (timeToSleep > 0) {
+				try {
 					Thread.sleep(timeToSleep);
-				}
-				catch(InterruptedException e){}
+				} catch(InterruptedException e){}
 			}
 			timeOfLastScan = System.currentTimeMillis();
 		}
 	}
 
-	public static void main(String[] args)
-	{
+	public static void main(String[] args) {
 		CatAndMouse instance = new CatAndMouse();
 		instance.execute();
 	}

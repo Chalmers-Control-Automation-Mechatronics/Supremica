@@ -57,6 +57,7 @@ import org.supremica.automata.*;
 import org.supremica.automata.algorithms.SynchronizationType;
 import org.supremica.automata.algorithms.AutomataSynchronizerHelper;
 import org.supremica.automata.execution.*;
+
 /**
  * @author torda
  *
@@ -164,9 +165,9 @@ public class AutomataToJava
 
 	void printClassHeader(PrintWriter pw)
 	{
-		pw.println("public class " + this.classname);
-		pw.println("{");
+		pw.println("public class " + this.classname + " {");
 	}
+	
 	void printTimerSubclass(PrintWriter pw)
 	{
 		pw.println("\t/**");
@@ -174,27 +175,27 @@ public class AutomataToJava
 		pw.println("\t * Start the timer like this:");
 		pw.println("\t * <code>myTimer.start()</code>");
 		pw.println("\t * It has timed out if:");
-		pw.println("\t * <code>myTimer.isAlive()</code>");
-		pw.println("\t * returns false.");
+		pw.println("\t * <code>myTimer.hasTimedOut()</code>");
+		pw.println("\t * returns true.");
 		pw.println("\t */");
-		pw.println("\tstatic class Timer extends Thread");
-		pw.println("\t{");
+		pw.println("\tstatic class Timer {");
 		pw.println("\t\tint delay;");
-		pw.println();
-		pw.println("\t\tpublic Timer(int delay) // In ms");
-		pw.println("\t\t{");
+		pw.println("\t\tThread timerThread;");
+		pw.println("\t\tpublic Timer(int delay) { // In ms");
 		pw.println("\t\t\tthis.delay = delay;");
 		pw.println("\t\t}");
-		pw.println();
-		pw.println("\t\tpublic void run()");
-		pw.println("\t\t{");
-		pw.println("\t\t\ttry");
-		pw.println("\t\t\t{");
-		pw.println("\t\t\t\tsleep(delay);");
-		pw.println("\t\t\t}");
-		pw.println("\t\t\tcatch (InterruptedException e)");
-		pw.println("\t\t\t{");
-		pw.println("\t\t\t}");
+		pw.println("\t\tpublic void start() {");
+		pw.println("\t\t\ttimerThread = new Thread(new Runnable() {");
+		pw.println("\t\t\t\tpublic void run() {");
+		pw.println("\t\t\t\t\ttry {");
+		pw.println("\t\t\t\t\t\tThread.sleep(Timer.this.delay);");
+		pw.println("\t\t\t\t\t} catch (InterruptedException e) {}");
+		pw.println("\t\t\t\t}");
+		pw.println("\t\t\t});");
+		pw.println("\t\t\ttimerThread.start();");
+		pw.println("\t\t}");
+		pw.println("\t\tpublic boolean hasTimedOut() {");
+		pw.println("\t\t\treturn !timerThread.isAlive();");
 		pw.println("\t\t}");
 		pw.println("\t}");
 	}
@@ -205,8 +206,7 @@ public class AutomataToJava
 		pw.println("\n\t/**");
 		pw.println("\t * Constructor");
 		pw.println("\t */");
-		pw.println("\t" + classname + "()");
-		pw.println("\t{");
+		pw.println("\t" + classname + "() {");
 		pw.println("\t\t/*");
 		pw.println("\t\t * DigitalIODriverFactory is a class that");
 		pw.println("\t\t * should be implemented by the user (you).");
@@ -254,8 +254,7 @@ public class AutomataToJava
 	private void printMainFunction(PrintWriter pw)
 	{
 		pw.println();
-		pw.println("\tpublic static void main(String[] args)");
-		pw.println("\t{");
+		pw.println("\tpublic static void main(String[] args) {");
 		pw.println("\t\t" + classname + " instance = new " + classname + "();");
 		pw.println("\t\tinstance.execute();");
 		pw.println("\t}");
@@ -270,8 +269,7 @@ public class AutomataToJava
 		pw.println("\t/**");
 		pw.println("\t * Executes the program.");
 		pw.println("\t */");
-		pw.println("\tvoid execute()");
-		pw.println("\t{");
+		pw.println("\tvoid execute() {");
 		pw.println("\t\t// The index of the event that is selected to be executed");
 		pw.println("\t\tint eventToBeExecuted = NO_EVENT_IS_SELECTED;");
 		pw.println("\t\t");
@@ -283,10 +281,8 @@ public class AutomataToJava
 		pw.println("\t\tlong timeToSleep;");
 		pw.println("\t\t");
 		pw.println("\t\t// Main scancycle");
-		pw.println("\t\twhile (true)");
-		pw.println("\t\t{");
-		pw.println("\t\t\ttry");
-		pw.println("\t\t\t{");
+		pw.println("\t\twhile (true) {");
+		pw.println("\t\t\ttry {");
 		pw.println("\t\t\t\teventToBeExecuted = NO_EVENT_IS_SELECTED;");
 		pw.println();
 		pw.println("\t\t\t\t// Read the input signal values into the input variables");
@@ -323,9 +319,7 @@ public class AutomataToJava
 		pw.println("\t\t\t\t// For debugging");
 		pw.println("\t\t\t\t//if (eventToBeExecuted != NO_EVENT_IS_SELECTED)");
 		pw.println("\t\t\t\t//\tSystem.out.println(EVENT_LABELS[eventToBeExecuted]);");
-		pw.println("\t\t\t}");
-		pw.println("\t\t\tcatch (Exception e)");
-		pw.println("\t\t\t{");
+		pw.println("\t\t\t} catch (Exception e) {");
 		pw.println("\t\t\t\te.printStackTrace();");
 		pw.println("\t\t\t}");
 		pw.println();
@@ -335,13 +329,10 @@ public class AutomataToJava
 		pw.println("\t\t\t * the real scan cycle time. ");
 		pw.println("\t\t\t */");
 		pw.println("\t\t\ttimeToSleep = PREFERRED_SCAN_CYCLE_TIME - (System.currentTimeMillis() - timeOfLastScan); ");
-		pw.println("\t\t\tif (timeToSleep > 0)");
-		pw.println("\t\t\t{");
-		pw.println("\t\t\t\ttry");
-		pw.println("\t\t\t\t{");
+		pw.println("\t\t\tif (timeToSleep > 0) {");
+		pw.println("\t\t\t\ttry {");
 		pw.println("\t\t\t\t\tThread.sleep(timeToSleep);");
-		pw.println("\t\t\t\t}");
-		pw.println("\t\t\t\tcatch(InterruptedException e){}");
+		pw.println("\t\t\t\t} catch(InterruptedException e){}");
 		pw.println("\t\t\t}");
 		pw.println("\t\t\ttimeOfLastScan = System.currentTimeMillis();");
 		pw.println("\t\t}");
@@ -359,8 +350,7 @@ public class AutomataToJava
 		pw.println("\t * Sets output variables according to the executed event");
 		pw.println("\t * @param eventIndex The executed event");
 		pw.println("\t */");
-		pw.println("\tvoid updateOutputVariables(int eventIndex)");
-		pw.println("\t{");
+		pw.println("\tvoid updateOutputVariables(int eventIndex) {");
 		pw.println("\t\t/*");
 		pw.println("\t\t * No output variables are changed by default.");
 		pw.println("\t\t * Example:");
@@ -368,8 +358,7 @@ public class AutomataToJava
 		pw.println("\t\t *   outputVariables[7] = true;");
 		pw.println("\t\t *   break;");
 		pw.println("\t\t */");
-		pw.println("\t\tswitch (eventIndex)");
-		pw.println("\t\t{");
+		pw.println("\t\tswitch (eventIndex) {");
 		LabeledEvent event;
 		Action action;
 		Command command;
@@ -407,10 +396,8 @@ public class AutomataToJava
 		pw.println("\t * Updates the states of the automata");
 		pw.println("\t * @param eventIndex The executed event");
 		pw.println("\t */");
-		pw.println("\tvoid updateCurrentState(int eventIndex)");
-		pw.println("\t{");
-		pw.println("\t\tswitch (eventIndex)");
-		pw.println("\t\t{");
+		pw.println("\tvoid updateCurrentState(int eventIndex) {");
+		pw.println("\t\tswitch (eventIndex) {");
 		pw.println("\t\tcase NO_EVENT_IS_SELECTED: // If no event was enabled");
 		pw.println("\t\t\tbreak;");
 		LabeledEvent event;
@@ -479,8 +466,7 @@ public class AutomataToJava
 		pw.println("\t * Start timers.");
 		pw.println("\t * @param eventIndex The executed event");
 		pw.println("\t */");
-		pw.println("\tvoid startTimers(int eventIndex)");
-		pw.println("\t{");
+		pw.println("\tvoid startTimers(int eventIndex) {");
 		pw.println("\t\t/*");
 		pw.println("\t\t * No timers are started by default.");
 		pw.println("\t\t * Example:");
@@ -488,8 +474,7 @@ public class AutomataToJava
 		pw.println("\t\t *   timers[2].start();  // Timer \"mytimer\"");
 		pw.println("\t\t *   break;");
 		pw.println("\t\t */");
-		pw.println("\t\tswitch (eventIndex)");
-		pw.println("\t\t{");
+		pw.println("\t\tswitch (eventIndex) {");
 		LabeledEvent event;
 		EventTimer timer;
 		boolean firstTimer = true;
@@ -527,16 +512,14 @@ public class AutomataToJava
 		pw.println("\t * @return <code>true</code> if the event is enabled.");
 		pw.println("\t *         <code>false</code> otherwise.");
 		pw.println("\t */");
-		pw.println("\tboolean eventIsEnabledByInputVariables(int eventIndex)");
-		pw.println("\t{");
+		pw.println("\tboolean eventIsEnabledByInputVariables(int eventIndex) {");
 		pw.println("\t\t/*");
 		pw.println("\t\t * All external conditions are true by default.");
 		pw.println("\t\t * Example:");
 		pw.println("\t\t * case 8: // Event \"product_arrival\"");
 		pw.println("\t\t *   return inputVariables[5];  // Sensor on port 5");
 		pw.println("\t\t */");
-		pw.println("\t\tswitch (eventIndex)");
-		pw.println("\t\t{");
+		pw.println("\t\tswitch (eventIndex) {");
 		LabeledEvent event;
 		Control control;
 		Condition condition;
@@ -586,16 +569,14 @@ public class AutomataToJava
 		pw.println("\t * @return <code>true</code> if the event is enabled.");
 	    pw.println("\t *         <code>false</code> otherwise.");
 		pw.println("\t */");
-		pw.println("\tboolean eventIsEnabledByTimers(int eventIndex)");
-		pw.println("\t{");
+		pw.println("\tboolean eventIsEnabledByTimers(int eventIndex) {");
 		pw.println("\t\t/*");
 		pw.println("\t\t * All timer conditions are true by default.");
 		pw.println("\t\t * Example:");
 		pw.println("\t\t * case 5: // Event \"mytimer_timeout\"");
-		pw.println("\t\t *   return !timers[2].isAlive();  // Timer \"mytimer\"");
+		pw.println("\t\t *   return timers[2].hasTimedOut();  // Timer \"mytimer\"");
 		pw.println("\t\t */");
-		pw.println("\t\tswitch (eventIndex)");
-		pw.println("\t\t{");
+		pw.println("\t\tswitch (eventIndex) {");
 		LabeledEvent event;
 		EventTimer timer;
 		boolean firstTimer = true;
@@ -606,7 +587,7 @@ public class AutomataToJava
 			if (timer != null)
 			{
 				pw.println("\t\tcase " + event.getSynchIndex() + ": // Event \"" + event.getLabel() + "\"");
-				pw.println("\t\t\treturn !timers[" + timer.getSynchIndex() + "].isAlive(); // Timer \"" + timer.getName() + "\"");
+				pw.println("\t\t\treturn timers[" + timer.getSynchIndex() + "].hasTimedOut(); // Timer \"" + timer.getName() + "\"");
 			}		
 		}
 		pw.println("\t\tdefault:");
@@ -628,10 +609,8 @@ public class AutomataToJava
 		pw.println("\t * @return <code>true</code> if the event is enabled.");
 	    pw.println("\t *         <code>false</code> otherwise.");
 		pw.println("\t */");
-		pw.println("\tboolean eventIsEnabledInCurrentState(int eventIndex)");
-		pw.println("\t{");
-		pw.println("\t\tswitch (eventIndex)");
-		pw.println("\t\t{");
+		pw.println("\tboolean eventIsEnabledInCurrentState(int eventIndex) {");
+		pw.println("\t\tswitch (eventIndex) {");
 		LabeledEvent event;
 		Automaton automaton;
 		Alphabet alphabet;
