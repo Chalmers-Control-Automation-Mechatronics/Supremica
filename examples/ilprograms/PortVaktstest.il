@@ -99,7 +99,6 @@ PROGRAM PortVaktstest
 (*init*)
 	LD Init
 	JMPCN end_init
-		CAL WPrintln("Initialising......!!")
 		LD DINT#300 
 		ST delay8.tonPT
 		ST delay88.tonPT
@@ -461,20 +460,6 @@ END14:
 		ingenvan2:
 		CAL delay21(tonIN := FALSE)
 END15:
-
-CAL WPrint ("Sug        = ")
-CAL BPrintln (Sug)
-CAL WPrint ("Armhemma   = ")
-CAL BPrintln (ArmHemma)
-CAL WPrint ("KulaFast   = ")
-CAL BPrintln (KulaFast)
-CAL WPrint ("PlockaVan1 = ")
-CAL BPrintln (PlockaVan1)
-CAL WPrint ("PlockaVan2 = ")
-CAL BPrintln (PlockaVan2)
-
-
-
 
 
 (*	if (ArmVan1 && PlockaVan1 && !KulaFast)
