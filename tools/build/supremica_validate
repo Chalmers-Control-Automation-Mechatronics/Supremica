@@ -1,0 +1,24 @@
+#!/bin/sh
+
+# Send suggestions for improvements to ka@s2.chalmers.se
+
+SUPREMICA_CHECKOUT_DIR=/tmp/$USER\_$RANDOM
+
+SUPREMICA_BEFORE_DIR=$PWD
+
+mkdir $SUPREMICA_CHECKOUT_DIR
+cd $SUPREMICA_CHECKOUT_DIR
+
+cvs checkout Supremica
+
+cd Supremica
+
+ant initialize
+ant rebuild
+ant run_tests
+
+cd /tmp
+rm -rf $SUPREMICA_CHECKOUT_DIR
+
+cd $SUPREMICA_BEFORE_DIR
+

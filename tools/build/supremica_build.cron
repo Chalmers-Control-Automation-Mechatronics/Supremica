@@ -1,0 +1,6 @@
+#!/bin/bash
+/usr/local/bin/supremica_automated_build >& /tmp/supremica_buildlog
+
+exit 0
+
+
