@@ -1,147 +1,242 @@
-
-
 package org.supremica.util.BDD;
 
 import java.util.*;
 import java.io.*;
 
-public class StateSet 
-    extends Vector
+public class StateSet
+	extends Vector
 {
-    int count = 0;
-    boolean closed = false;
+	int count = 0;
+	boolean closed = false;
 
-    // ------------------------------------------------ stuffs used BEFORE closing!
-    private boolean in(String name) {
-	for(Enumeration e = elements(); e.hasMoreElements(); ) {
-	    State s = (State) e.nextElement();
-	    if(s.name.equals(name)){
-		System.out.println("Found state " + s.name + "/" + s.name_id + " " + s.id + "/" + s.code);
-		return true;
-	    }
-	}
-	return false;
-    }
+	// ------------------------------------------------ stuffs used BEFORE closing!
+	private boolean in(String name)
+	{
+		for (Enumeration e = elements(); e.hasMoreElements(); )
+		{
+			State s = (State) e.nextElement();
 
-    public int getIdByName(String name) {
-	Assert.assert(!closed, "[StateSet.getIdByName]BAD FUNCTION CALL!");
-	for(Enumeration e = elements(); e.hasMoreElements(); ) {
-	    State s = (State) e.nextElement();
-	    if(s.name_id.equals(name)) 
-		return s.id;	    
-	}
-	return Automaton.FAILED;
-    }
-    public void add(String name, String id, boolean i, boolean m, boolean x) {
+			if (s.name.equals(name))
+			{
+				System.out.println("Found state " + s.name + "/" + s.name_id + " " + s.id + "/" + s.code);
 
-	Assert.assert(!closed, "[StateSet.add] BAD FUNCTION CALL!");	
-	// Assert.assert(!in(name), "Duplicate state: " + name);
-	if(in(name)) {
-	    System.out.println("Duplicate state: " + name + "/" + id + " " + (count+1));	    
-	    int c = 0;
-	    for(Enumeration e = elements(); e.hasMoreElements(); ) {
-		State s = (State) e.nextElement();
-		System.out.println("state " + (c++) + " " + s.name + "/" + s.name_id + " " + s.id + "/" + s.code);
-	    }	    
+				return true;
+			}
+		}
 
-	    System.exit(20);
+		return false;
 	}
 
-	State state= new State();
-	state.name = name;
-	state.name_id = id;
-	state.i = i;
-	state.m = m;
-	state.f = x;
-	state.id = count++;
-	state.code = state.id;
-	addElement(state);
-	
-	// if(count == 1) System.out.println();
-	// System.out.print("\r " + count + "   ");
-    }
+	public int getIdByName(String name)
+	{
+		BDDAssert.bddAssert(!closed, "[StateSet.getIdByName]BAD FUNCTION CALL!");
 
-    
-    // -------------------------------------------- AFTER CLOSING
-    private State [] states;
-    public int getSize() { return count; }
-    public State [] getStateVector() {
-	Assert.assert(closed, "[StateSet.getStateVector] BAD FUNCTION CALL!");
-	return states;
-    }
-    public State getState(int index) { 
-	Assert.assert( index >= 0 && index < count, "BAD state-index");
-	return states[index];
-    }
-    void close() {
-	Assert.assert(!closed, "[StateSet.close] BAD FUNCTION CALL!");	
+		for (Enumeration e = elements(); e.hasMoreElements(); )
+		{
+			State s = (State) e.nextElement();
 
-	states = new State[count];
-	for(Enumeration e = elements(); e.hasMoreElements(); ) {
-	    State ss = (State) e.nextElement();
-	    states[ss.id] = ss;
+			if (s.name_id.equals(name))
+			{
+				return s.id;
+			}
+		}
+
+		return Automaton.FAILED;
 	}
 
-	removeAllElements();
-	closed = true;
-    }
+	public void add(String name, String id, boolean i, boolean m, boolean x)
+	{
+		BDDAssert.bddAssert(!closed, "[StateSet.add] BAD FUNCTION CALL!");
 
+		// BDDAssert.bddAssert(!in(name), "Duplicate state: " + name);
+		if (in(name))
+		{
+			System.out.println("Duplicate state: " + name + "/" + id + " " + (count + 1));
 
-    public void dump(PrintStream ps) {
-	int m, i_, f;
-	m = i_ = f = 0;
+			int c = 0;
 
-	ps.print("States = { ");
-	for(int i = 0; i < count; i++) {
-	    if(i != 0) ps.print(", ");
-	    ps.print(states[i].name);
+			for (Enumeration e = elements(); e.hasMoreElements(); )
+			{
+				State s = (State) e.nextElement();
 
-	    if(states[i].i) i_++;
-	    if(states[i].m) m++;
-	    if(states[i].f) f++;
-	}
-	ps.println(" };");
+				System.out.println("state " + (c++) + " " + s.name + "/" + s.name_id + " " + s.id + "/" + s.code);
+			}
 
-	// print the initial state(s)
+			System.exit(20);
+		}
 
-	if(i_ > 0) {
-	    ps.print("States_i = { ");
-	    boolean first = true;
-	    for(int i = 0; i < count; i++) 
-		if(states[i].i) {
-		    if(!first) ps.print(", ");
-		    else       first = false;
-		    ps.print(states[i].name);	 
-	    }
-	    ps.println(" };"); 
-	}
+		State state = new State();
 
-	// print marked states:
-	if(m > 1) {
-	    ps.print("States_m = { ");
-	    boolean first = true;
-	    for(int i = 0; i < count; i++)
-		if(states[i].m) {
-		    if(!first) ps.print(", ");
-		    else       first = false;
-		    ps.print(states[i].name);	 
-	    }
-	    ps.println(" };"); 
+		state.name = name;
+		state.name_id = id;
+		state.i = i;
+		state.m = m;
+		state.f = x;
+		state.id = count++;
+		state.code = state.id;
+
+		addElement(state);
+
+		// if(count == 1) System.out.println();
+		// System.out.print("\r " + count + "   ");
 	}
 
-	// print forbidden states:
-	if(f > 1) {
-	    ps.print("States_x = { ");
-	    boolean first = true;
-	    for(int i = 0; i < count; i++) 
-		if(states[i].f) {		
-		if(!first) ps.print(", ");
-		else       first = false;
-		ps.print(states[i].name);	 
-	    }
-	    ps.println(" };"); 
+	// -------------------------------------------- AFTER CLOSING
+	private State[] states;
+
+	public int getSize()
+	{
+		return count;
 	}
 
-	ps.println();
-    }
+	public State[] getStateVector()
+	{
+		BDDAssert.bddAssert(closed, "[StateSet.getStateVector] BAD FUNCTION CALL!");
+
+		return states;
+	}
+
+	public State getState(int index)
+	{
+		BDDAssert.bddAssert((index >= 0) && (index < count), "BAD state-index");
+
+		return states[index];
+	}
+
+	void close()
+	{
+		BDDAssert.bddAssert(!closed, "[StateSet.close] BAD FUNCTION CALL!");
+
+		states = new State[count];
+
+		for (Enumeration e = elements(); e.hasMoreElements(); )
+		{
+			State ss = (State) e.nextElement();
+
+			states[ss.id] = ss;
+		}
+
+		removeAllElements();
+
+		closed = true;
+	}
+
+	public void dump(PrintStream ps)
+	{
+		int m, i_, f;
+
+		m = i_ = f = 0;
+
+		ps.print("States = { ");
+
+		for (int i = 0; i < count; i++)
+		{
+			if (i != 0)
+			{
+				ps.print(", ");
+			}
+
+			ps.print(states[i].name);
+
+			if (states[i].i)
+			{
+				i_++;
+			}
+
+			if (states[i].m)
+			{
+				m++;
+			}
+
+			if (states[i].f)
+			{
+				f++;
+			}
+		}
+
+		ps.println(" };");
+
+		// print the initial state(s)
+		if (i_ > 0)
+		{
+			ps.print("States_i = { ");
+
+			boolean first = true;
+
+			for (int i = 0; i < count; i++)
+			{
+				if (states[i].i)
+				{
+					if (!first)
+					{
+						ps.print(", ");
+					}
+					else
+					{
+						first = false;
+					}
+
+					ps.print(states[i].name);
+				}
+			}
+
+			ps.println(" };");
+		}
+
+		// print marked states:
+		if (m > 1)
+		{
+			ps.print("States_m = { ");
+
+			boolean first = true;
+
+			for (int i = 0; i < count; i++)
+			{
+				if (states[i].m)
+				{
+					if (!first)
+					{
+						ps.print(", ");
+					}
+					else
+					{
+						first = false;
+					}
+
+					ps.print(states[i].name);
+				}
+			}
+
+			ps.println(" };");
+		}
+
+		// print forbidden states:
+		if (f > 1)
+		{
+			ps.print("States_x = { ");
+
+			boolean first = true;
+
+			for (int i = 0; i < count; i++)
+			{
+				if (states[i].f)
+				{
+					if (!first)
+					{
+						ps.print(", ");
+					}
+					else
+					{
+						first = false;
+					}
+
+					ps.print(states[i].name);
+				}
+			}
+
+			ps.println(" };");
+		}
+
+		ps.println();
+	}
 }
