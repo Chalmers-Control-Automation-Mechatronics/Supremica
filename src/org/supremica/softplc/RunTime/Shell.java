@@ -14,22 +14,18 @@ import java.io.File;
 public class Shell
 {
     public Timer timer;
-    //    public IEC_Program il_program;
     public static String ioclass = new String();
     public static String ilclass = new String();
     public boolean[] inSignals;
     public boolean[] outSignals;
-    public static short nr_Of_Signals_In;
-    public static short nr_Of_Signals_Out;
+    static short nr_Of_Signals_In;
+    static short nr_Of_Signals_Out;
     public static DigitalIODriver driver;
 
     /** execute once every [interval] ms */
-    public static short interval = 40;
+    static short interval = 40;
 
-    Class[] constructorArgumentTypes = { boolean[].class, boolean[].class };
     Constructor classConstructor;
-    Object[] constructorArgs = { inSignals, outSignals };
-    Class ILClass;
 
     public Shell(String io, String path, String name)
     {
@@ -72,6 +68,9 @@ public class Shell
 
     public void ILShell(String path, String name)
     {
+        Class ILClass;
+        Class[] constructorArgumentTypes = { boolean[].class, boolean[].class };
+
 	try
 	    {
                 org.supremica.util.FileClassLoader loader = new org.supremica.util.FileClassLoader(path);
