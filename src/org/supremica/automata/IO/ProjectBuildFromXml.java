@@ -59,11 +59,14 @@ import org.xml.sax.*;
 import org.xml.sax.helpers.DefaultHandler;
 import org.supremica.automata.*;
 import org.supremica.automata.execution.*;
+import org.supremica.log.*;
 
 
 public class ProjectBuildFromXml
 	extends DefaultHandler
 {
+	private static Logger logger = LoggerFactory.createLogger(ProjectBuildFromXml.class);
+
 	private final static String automataStr = "Automata";
 	private final static String automatonStr = "Automaton";
 	private final static String eventsStr = "Events";
@@ -231,6 +234,7 @@ public class ProjectBuildFromXml
 		}
 		catch (SAXException ex)
 		{
+			logger.error(ex.getMessage());
 			throw new Exception(ex.getMessage());
 		}
 
@@ -252,6 +256,7 @@ public class ProjectBuildFromXml
 		}
 		catch (SAXException ex)
 		{
+			logger.error(ex.getMessage());
 			throw new Exception(ex.getMessage());
 		}
 
