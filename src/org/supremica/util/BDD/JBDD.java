@@ -53,14 +53,19 @@ package org.supremica.util.BDD;
 class JBDD {
     static
     {
-        if (Options.use_cudd)
-            {
-                System.loadLibrary("cudd");
-            }
-	else
-	    {
-		System.loadLibrary("buddy");
+	String lib = (Options.use_cudd) ? "cudd" : "buddy";
+	try {
+	    System.loadLibrary(lib);
+	} catch(UnsatisfiedLinkError ule) {
+	    System.err.println("DLL " + lib + " not in the path, trying current directory");
+	    try {
+		System.load(System.getProperty("user.dir")+ java.io.File.separator + System.mapLibraryName(lib) );
+	    } catch(UnsatisfiedLinkError ule2) {
+		System.err.println("Unable to load the DLL: " + ule2);
+		System.err.println("If you are using linux, this may be a GCC 3.x vs GCC 2.x issue :(");
+		throw ule2;
 	    }
+	}
     }
 
 

@@ -535,10 +535,8 @@ public class BDDAutomata
 		return (long) states;
 	    case Options.COUNT_EXACT:
 		// the hard/boring/slow way :(
-		Counter c = new Counter();
-
+		Counter c = new Counter();		
 		count_transitions_rec0(c, bdd, 0);
-
 		return c.get();
 	    }
 	    return 0; // just in case :)

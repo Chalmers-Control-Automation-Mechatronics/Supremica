@@ -214,7 +214,7 @@ public class GrowFrame
 		public void force_repaint() {
 			if(!showGraph) return;
 
-			Graphics g = getGraphics();
+			Graphics g = this.getGraphics();
 			if(g!= null)
 			{
 				g.clearRect(0,0, this.getWidth(), this.getHeight() );
