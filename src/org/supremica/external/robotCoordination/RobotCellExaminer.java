@@ -35,25 +35,24 @@ public class RobotCellExaminer
 	public RobotCellExaminer(Frame owner)
 	{
 		super(owner, "Robot cell examiner", false);
-
 		this.owner = owner;
-		contentPane = (JPanel) getContentPane();
 
+		contentPane = (JPanel) getContentPane();
 		contentPane.setLayout(new FlowLayout());
 
 		JButton openButton = new JButton("Open cell");
-
 		openButton.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
+				// Let the user choose a file
 				JFileChooser fileOpener = FileDialogs.getRobotCellFileImporter();
-
 				if (fileOpener.showOpenDialog(null) == JFileChooser.APPROVE_OPTION)
 				{
 					File file = fileOpener.getSelectedFile();
 					String cellName = file.getAbsolutePath();
 
+					// Choose simulator based on file type...
 					if (cellName.endsWith(".stn"))
 					{
 						openCell(file, RobotSimulatorType.RobotStudio);
@@ -175,7 +174,7 @@ public class RobotCellExaminer
 	 */
 	private void generateSpans()
 	{
-		if (cell == null)
+		if (cell == null || !cell.isOpen())
 		{
 			logger.error("No cell opened.");
 			return;
@@ -225,7 +224,7 @@ public class RobotCellExaminer
 	 */
 	private void intersectSpans()
 	{
-		if (cell == null)
+		if (cell == null || !cell.isOpen())
 		{
 			logger.error("No cell opened.");
 			return;
@@ -282,7 +281,7 @@ public class RobotCellExaminer
 	 */
 	private void examineCollisions()
 	{
-		if (cell == null)
+		if (cell == null || !cell.isOpen())
 		{
 			logger.error("No cell opened.");
 			return;

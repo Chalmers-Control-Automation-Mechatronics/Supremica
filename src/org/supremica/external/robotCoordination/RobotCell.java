@@ -12,6 +12,11 @@ public interface RobotCell
 		throws Exception;
 
 	/**
+	 * Returns true if a cell is open, false otherwise.
+	 */
+	public boolean isOpen();
+
+	/**
 	 * Returns linked list of Robot objects.
 	 */
 	public LinkedList getRobots()

@@ -148,9 +148,9 @@ public class ExampleTemplates
 
 		String prefix = extraPrefix + "/CCSCourseAssignments/";
 
-		thisGroup.addItem(new TemplateItem("FMS line", prefix + "FMSLine.xml"));
-		thisGroup.addItem(new TemplateItem("Production system", prefix + "ProdSysStudent.xml"));
-		thisGroup.addItem(new TemplateItem("Communication channel", prefix + "CommunicationChannel.xml"));
+		thisGroup.addItem(new TemplateItem("FMS Line", prefix + "FMSLine.xml"));
+		thisGroup.addItem(new TemplateItem("Production System", prefix + "ProdSysStudent.xml"));
+		thisGroup.addItem(new TemplateItem("Communication Channel", prefix + "CommunicationChannel.xml"));
 	}
 
 	private void initializeCCSCourseAssignmentSolutions()
@@ -161,9 +161,9 @@ public class ExampleTemplates
 
 		String prefix = extraPrefix + "/CCSCourseAssignments/solutions/";
 
-		thisGroup.addItem(new TemplateItem("FMS without feedback", prefix + "FMSLine.xml"));
-		thisGroup.addItem(new TemplateItem("FMS with feedback", prefix + "FMSLoop.xml"));
-		thisGroup.addItem(new TemplateItem("Communication channel Specification", prefix + "comm_spec.xml"));
+		thisGroup.addItem(new TemplateItem("FMS Without Feedback", prefix + "FMSLine.xml"));
+		thisGroup.addItem(new TemplateItem("FMS With Feedback", prefix + "FMSLoop.xml"));
+		thisGroup.addItem(new TemplateItem("Communication Channel Specification", prefix + "comm_spec.xml"));
 	}
 
 	private void initializeOtherExamples()
@@ -176,7 +176,7 @@ public class ExampleTemplates
 
 		thisGroup.addItem(new TemplateItem("Ball Process", prefix + "ballProcess.xml"));
 		thisGroup.addItem(new TemplateItem("Ball Process - Gatekeeper", prefix + "ballProcessGatekeeper.xml"));
-		thisGroup.addItem(new TemplateItem("Telecommunications Network", prefix + "telecommunicationsNetwork.xml"));
+		thisGroup.addItem(new TemplateItem("Telecommunications Network (incomplete)", prefix + "telecommunicationsNetwork.xml"));
 		thisGroup.addItem(new TemplateItem("Automatic Car Park Gate", prefix + "AutomaticCarParkGate.xml"));
 		thisGroup.addItem(new TemplateItem("Bisimulation Equivalence Execise", prefix + "Bisimulation.xml"));
 	}
@@ -259,9 +259,9 @@ public class ExampleTemplates
 		//String prefix = extraPrefix + "/ManufacturingExamples/";
 		String prefix = extraPrefix + "/OtherExamples/";
 
-		thisGroup.addItem(new TemplateItem("Flexible manufacturing system", prefix + "flexibleManufacturingSystem.xml"));
-		thisGroup.addItem(new TemplateItem("Robot assembly cell", prefix + "robotAssemblyCell.xml"));
-		thisGroup.addItem(new TemplateItem("Flexible manufacuring cell", prefix + "flexibleManufacturingCell.xml"));
+		thisGroup.addItem(new TemplateItem("Flexible Manufacturing System (incomplete)", prefix + "flexibleManufacturingSystem.xml"));
+		thisGroup.addItem(new TemplateItem("Robot Assembly Cell", prefix + "robotAssemblyCell.xml"));
+		thisGroup.addItem(new TemplateItem("Flexible Manufacuring Cell", prefix + "flexibleManufacturingCell.xml"));
 		thisGroup.addItem(new TemplateItem("Automated Guided Vehicles", prefix + "agv.xml"));
 		//thisGroup.addItem(new TemplateItem("Automated Guided Vehicle, immediate events", prefix + "agvImmediate.xml"));
 		thisGroup.addItem(new TemplateItem("Circular Table", prefix + "circularTable.xml"));
@@ -273,7 +273,7 @@ public class ExampleTemplates
 		thisGroup.addItem(new TemplateItem("Machine Buffer Machine", prefix + "machineBufferMachine.xml"));
 		thisGroup.addItem(new TemplateItem("Tank Process", prefix + "tankProcess.xml"));
 	}
-	
+
 	private void initializeGames()
 	{
 		TemplateGroup thisGroup = Games;

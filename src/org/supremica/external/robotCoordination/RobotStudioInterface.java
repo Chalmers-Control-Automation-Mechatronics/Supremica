@@ -123,7 +123,7 @@ public class RobotStudioInterface
 			throws Exception
 		{
 			// Create an instance of RobotStudio.Application.
-			if (app != null)
+			if (applicationIsRunning())
 			{
 				logger.info("RobotStudio already started.");
 				app.setVisible(true);    // It's nice to see what is happening
@@ -133,9 +133,9 @@ public class RobotStudioInterface
 				logger.info("Starting RobotStudio...");
 
 				app = new Application();
-
 				app.addDAppEventsListener(this);
 				app.setVisible(true);    // It's nice to see what is happening
+
 				logger.info("RobotStudio started.");
 			}
 
@@ -146,7 +146,33 @@ public class RobotStudioInterface
 			RS_BLUE = new Variant(new SafeArray(new int[]{ 0, 0, 255 }), false);
 		}
 
+		/**
+		 * Returns true if an application is already running, false otherwise.
+		 * if quit() worked as it should, we could simply check if (app == null).
+		 *
+		 * @see quit()
+		 */
+		private boolean applicationIsRunning()
+		{
+			// Try if it is possible to get any info from app, if not, either app
+			// is null or not running!
+			try
+			{
+				// Try a simple method, if there is no exception,
+				// there is!
+				app.getVisible();
+				return true;
+			}
+			catch (Exception ex)
+			{
+				// Something is wrong!
+				return false;
+			}
+		}
+
+	    /////////////////////////////////
 		// RobotCell INTERFACE METHODS //
+		/////////////////////////////////
 
 		/**
 		 * Opens station in the RobotStudio environment
@@ -161,6 +187,25 @@ public class RobotStudioInterface
 			// Build robot automata
 			LinkedList robots = getRobots();
 			robotAutomata = buildRobotAutomata(robots);
+		}
+
+		/**
+		 * Examine if there is an open station.
+	 	 */
+		public boolean isOpen()
+		{
+			try
+			{
+				// See if there is an active station, if there is no exception,
+				// there is!
+				app.getActiveStation();
+				return true;
+			}
+			catch (Exception ex)
+			{
+				// Something is wrong!
+				return false;
+			}
 		}
 
 		/**
@@ -550,7 +595,7 @@ public class RobotStudioInterface
 					logger.fatal((RichPosition) posIt.next());
 				}
 
-				// The richPath should be used to generate the automata?
+				// The richPath should be used to generate the automata!
 				// Modify zone automata
 				for (int i=0; i< richPath.size(); i++)
 				{
@@ -712,7 +757,9 @@ public class RobotStudioInterface
 			}
 		}
 
-		// DAppEvents interface methods
+		//////////////////////////////////
+		// DAppEvents interface methods //
+		//////////////////////////////////
 
 		public void selectionChanged()
 		{
@@ -1712,7 +1759,6 @@ public class RobotStudioInterface
 			// Implementation of _MechanismEventsAdapter methods
 			public int beforeControllerStarted()
 			{
-
 				// This method works fine... but is quite useless here? Post some info...
 				try
 				{
@@ -1836,7 +1882,8 @@ public class RobotStudioInterface
 					IEntity unionEntity;
 
 					if (spanEntities.getCount() >= 2)
-					{    // At least two spanEntities
+					{
+						// At least two spanEntities
 						unionEntity = spanEntities.item(var(2));
 						IPart oldPart = null;
 						boolean shutup = false;
@@ -1872,7 +1919,8 @@ public class RobotStudioInterface
 						}
 					}
 					else
-					{    // Only one spanEntity
+					{
+						// Only one spanEntity
 						unionEntity = spanEntities.item(var(1));
 					}
 
@@ -1983,7 +2031,24 @@ public class RobotStudioInterface
 			}
 		}
 
-		// Target interface methods
+		// Other method
+		public String toString()
+		{
+			return "'" + getName() + "'";
+		}
+
+		/**
+		 * Returns the RobotStudio target.
+		 */
+		public Target getRobotStudioTarget()
+		{
+			return target;
+		}
+
+		////////////////////////////////
+		// Position interface methods //
+		////////////////////////////////
+
 		public String getName()
 		{
 			try
@@ -1998,20 +2063,6 @@ public class RobotStudioInterface
 			}
 
 			return "";
-		}
-
-		// Other method
-		public String toString()
-		{
-			return "'" + getName() + "'";
-		}
-
-		/**
-		 * Returns the RobotStudio target.
-		 */
-		public Target getRobotStudioTarget()
-		{
-			return target;
 		}
 	}
 
@@ -2029,11 +2080,7 @@ public class RobotStudioInterface
 		{
 			simulationRunning = false;
 
-			try
-			{
-				logger.debug("Simulation finished.");
-			}
-			catch (Exception whatever) {}
+			logger.debug("Simulation finished.");
 
 			notify();
 		}
@@ -2043,7 +2090,13 @@ public class RobotStudioInterface
 			//System.out.println("Simtick: " + time);
 		}
 
-		// Junk constructed by me
+		////////////////////////////
+		// Junk constructed by me //
+		////////////////////////////
+
+		/**
+		 * This method is designed to return when the current simulation has stopped.
+		 */
 		public synchronized void waitForSimulationStop()
 		{
 			try
@@ -2069,7 +2122,7 @@ public class RobotStudioInterface
 
 	/**
 	 * Typecast i into Variant, for convenience! (Variant is something like
-	 * VB:s variant of the java Object.)
+	 * VB:s counterpart of java's Object.)
 	 */
 	private static Variant var(int i)
 		throws Exception
@@ -2077,12 +2130,20 @@ public class RobotStudioInterface
 		return new Variant(i);
 	}
 
+	/**
+	 * Typecast i into Variant, for convenience! (Variant is something like
+	 * VB:s counterpart of java's Object.)
+	 */
 	private static Variant var(boolean i)
 		throws Exception
 	{
 		return new Variant(i);
 	}
 
+	/**
+	 * Typecast i into Variant, for convenience! (Variant is something like
+	 * VB:s counterpart of java's Object.)
+	 */
 	private static Variant var(String i)
 		throws Exception
 	{
