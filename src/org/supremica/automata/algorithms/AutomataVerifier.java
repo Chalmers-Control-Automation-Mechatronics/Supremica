@@ -79,9 +79,14 @@ public class AutomataVerifier
 	private StateMemorizer potentiallyUncontrollableStates;
 	private int[] initialState;
 
+	// Used by findUncontrollableStates
+    private AutomataSynchronizerHelper uncontrollabilityCheckHelper;
+    private ArrayList uncontrollabilityCheckExecuters = new ArrayList();
+
 	// Used in excludeUncontrollableStates
 	private int stateAmountLimit;
-	private int stateAmount = 1;
+	private int stateAmount;
+	private int attempt;
 
 	/** Determines if more detailed information on the progress of things should be displayed.
 	 * @see SynchronizationOptions */
@@ -110,7 +115,7 @@ public class AutomataVerifier
 		this.synchronizationOptions = synchronizationOptions;
 		nbrOfExecuters = synchronizationOptions.getNbrOfExecuters();
 		verboseMode = synchronizationOptions.verboseMode();
-		stateAmountLimit = verificationOptions.getStateLimit();
+		// stateAmountLimit = verificationOptions.getStateLimit(); // Done later...
 		oneEventAtATime = verificationOptions.getOneEventAtATime();
 
 		synchHelper = new AutomataSynchronizerHelper(theAutomata, synchronizationOptions);
@@ -352,7 +357,8 @@ public class AutomataVerifier
 			if (verboseMode)
 				thisCategory.info("There are " + similarAutomata.length + " automata with similar alphabets...");
 			
-			for (int attempt = 1; attempt <= 5; attempt++)
+			stateAmount = 1;
+			for (attempt = 1; attempt <= 5; attempt++)
 			{   // Make five attempts on prooving controllability and uncontrollability
 				if (verboseMode)
 					thisCategory.info("Attempt number " + attempt + ".");
@@ -408,9 +414,9 @@ public class AutomataVerifier
 						{   // Uncontrollable state found! 
 							if (verboseMode)
 							{	// Print the uncontrollable state(s)...
-								synchHelper.printUncontrollableStates();
+								uncontrollabilityCheckHelper.printUncontrollableStates();
 								// Print event trace reaching uncontrollable state
-								synchHelper.displayTrace();
+								uncontrollabilityCheckHelper.displayTrace();
 								// Print info on amount of states examined
 								// synchHelper.displayInfo(); // This is done always in AutomataVerificationWorker
 							}
@@ -579,18 +585,19 @@ public class AutomataVerifier
 		String addedAutomata = "";
 		int start = selectedAutomata.size() - automataIndices.length;
 
-		if (start > 0)
+		if (attempt == 1)
+		{   // First attempt
+			stateAmountLimit = verificationOptions.getStateLimit();
+			for (int i = 0; i < automataIndices.length; i++)
+				stateAmount = stateAmount * theAutomata.getAutomatonAt(automataIndices[i]).nbrOfStates();
+		}
+		else
 		{   // Been here before, already added some automata
 			for (int i = 0; i < start; i++)
 				addedAutomata = addedAutomata + " " + theAutomata.getAutomatonAt(similarAutomata[i]).getName();
 
 			// Increase the limit each time
 			stateAmountLimit = stateAmountLimit * 5;
-		}
-		else
-		{   // First attempt
-			for (int i = 0; i < automataIndices.length; i++)
-				stateAmount = stateAmount * theAutomata.getAutomatonAt(automataIndices[i]).nbrOfStates();
 		}
 
 		if (verboseMode)
@@ -602,7 +609,6 @@ public class AutomataVerifier
 		{	// Add automaton
 			selectedAutomata.add(theAutomata.getAutomatonAt(similarAutomata[i]));
 			addedAutomata = addedAutomata + " " + theAutomata.getAutomatonAt(similarAutomata[i]).getName();
-			// stateAmount = (int) (stateAmount * theAutomata.getAutomatonAt(similarAutomata[i]).nbrOfStates() / (1+arraySortValue[i])/(arraySortValue[0]));  // INGE BRA... SVÅRT ATT MOTIVERA LOGISKT... FIXA!
 			stateAmount = stateAmount * theAutomata.getAutomatonAt(similarAutomata[i]).nbrOfStates();
 			if ((stateAmount > stateAmountLimit) || (i == similarAutomata.length-1))
 			{   // Synchronize...
@@ -683,7 +689,9 @@ public class AutomataVerifier
 		}
 
 		if (stateAmount > stateAmountLimit)
+		{   // Make sure the limit and the real amount is not too different in magnitude.
 			stateAmountLimit = (stateAmount/1000)*1000;
+		}
 	}
 
 	/**
@@ -696,14 +704,61 @@ public class AutomataVerifier
 	private boolean findUncontrollableStates(int[] automataIndices)
 		throws Exception
 	{
+		if (uncontrollabilityCheckHelper == null)
+		{
+			AutomataOnlineSynchronizer onlineSynchronizer = new AutomataOnlineSynchronizer(synchHelper);
+			onlineSynchronizer.selectAutomata(automataIndices);
+			onlineSynchronizer.initialize();
+
+			uncontrollabilityCheckHelper = new AutomataSynchronizerHelper(synchHelper);
+			if (verboseMode)
+			{	// It's important that setRememberTrace occurs before addState!
+				uncontrollabilityCheckHelper.setRememberTrace(true);
+			}
+			uncontrollabilityCheckHelper.addState(initialState);
+			uncontrollabilityCheckHelper.setCoExecute(true);
+			uncontrollabilityCheckHelper.setCoExecuter(onlineSynchronizer);
+			uncontrollabilityCheckHelper.setExhaustiveSearch(true);
+			uncontrollabilityCheckHelper.setRememberUncontrollable(true);		
+		}
+		
+		// Stop after having found a suitable amount of new states
+		uncontrollabilityCheckHelper.stopExecutionAfter(250*attempt);
+
+		// Initialize the synchronizationExecuters
+		synchronizationExecuters.clear();
+		for (int i = 0; i < nbrOfExecuters; i++)
+		{
+			AutomataSynchronizerExecuter currSynchronizationExecuter =
+				new AutomataSynchronizerExecuter(uncontrollabilityCheckHelper);
+			synchronizationExecuters.add(currSynchronizationExecuter);
+		}
+
+		// Start all the synchronization executers and wait for completion
+		for (int i = 0; i < nbrOfExecuters; i++)
+		{
+			AutomataSynchronizerExecuter currExec =
+				(AutomataSynchronizerExecuter)synchronizationExecuters.get(i);
+			currExec.selectAllAutomata();
+			// The next line... /nbrOfExecuters is because the stopCount is counted in all executers simultaneously....
+			// currExec.stopAfter((int) (2000/nbrOfExecuters)); 
+			// currExec.stopAfter((int) (1000*java.lang.Math.pow(10, attempt)/nbrOfExecuters)); 
+			currExec.start();
+		}
+		((AutomataSynchronizerExecuter)synchronizationExecuters.get(0)).join();
+
+		return !uncontrollabilityCheckHelper.getAutomataIsControllable();
+
+		/* // This is the whole method as it was before...
 		synchHelper.clear();
 		AutomataOnlineSynchronizer onlineSynchronizer = new AutomataOnlineSynchronizer(synchHelper);
 		onlineSynchronizer.selectAutomata(automataIndices);
 		onlineSynchronizer.initialize();
 
-		// It's important that setRememberTrace occurs before addState...
 		if (verboseMode)
+		{	// It's important that setRememberTrace occurs before addState!
 			synchHelper.setRememberTrace(true);
+		}
 		synchHelper.addState(initialState);
 		synchHelper.setCoExecute(true);
 		synchHelper.setCoExecuter(onlineSynchronizer);
@@ -730,6 +785,7 @@ public class AutomataVerifier
 		((AutomataSynchronizerExecuter)synchronizationExecuters.get(0)).join();
 
 		return !synchHelper.getAutomataIsControllable();
+		*/
 	}
 
 	/**

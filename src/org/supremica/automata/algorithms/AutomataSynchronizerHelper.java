@@ -80,12 +80,12 @@ public final class AutomataSynchronizerHelper
 
 	private boolean automataIsControllable = true;
 
-	private int nbrOfAddedStates = 0;
-	private int nbrOfCheckedStates = 0;
+	/** Keeps information common to helpers. */
+	private HelperData helperData;
 
 	private SynchronizationOptions syncOptions = null;
 
-	// Used by AutomataFastControllabillityCheck
+	// Used by AutomataSynchronizerExecuter
 	private StateMemorizer stateMemorizer = new StateMemorizer();
 	private boolean rememberUncontrollable = false;
 	private boolean expandEventsUsingPriority = false;
@@ -107,6 +107,9 @@ public final class AutomataSynchronizerHelper
 	// Verbose mode
 	private boolean verboseMode;
 
+	// Stop execution after amount of state
+	private int stopExecutionLimit = -1;
+
  	public AutomataSynchronizerHelper(Automata theAutomata, SynchronizationOptions syncOptions)
  		throws Exception
     {
@@ -122,6 +125,7 @@ public final class AutomataSynchronizerHelper
 		this.theAutomata = theAutomata;
 		this.syncOptions = syncOptions;
 		verboseMode = syncOptions.verboseMode();
+		helperData = new HelperData();
 
 		statesToProcess  = new IntArrayList();
 		nbrOfStatesToProcess = 0;
@@ -129,34 +133,8 @@ public final class AutomataSynchronizerHelper
        	theStates = new IntArrayHashTable(syncOptions.getInitialHashtableSize(), syncOptions.expandHashtable());
   		theAutomaton = new Automaton();
 
-		/*
-  		// Compute the new alphabet
-		EventsSet theAlphabets = new EventsSet();
-		Iterator autIt = theAutomata.iterator();
-		while (autIt.hasNext())
-		{
-			Automaton currAutomaton = (Automaton)autIt.next();
-			Alphabet currAlphabet = currAutomaton.getAlphabet();
-			theAlphabets.add(currAlphabet);
-		}
-		*/
-
 		Alphabet theAlphabet = theAutomata.createUnionAlphabet();
 		theAutomaton.setAlphabet(theAlphabet);
-
-		/*
-		try
-  		{
-			Alphabet theAlphabet = AlphabetHelpers.getUnionAlphabet(theAlphabets, "a");
-			theAutomaton.setAlphabet(theAlphabet);
-		}
-  		catch (Exception e)
-    	{
-			System.err.println("Error while generating union alphabet: " + e);
- 			thisCategory.error("Error while generating union alphabet: " + e);
-        	throw e;
-     	}
-		*/
 
   		try
   		{
@@ -168,6 +146,27 @@ public final class AutomataSynchronizerHelper
 			throw e;
 		}
     }
+
+	/**
+	 * Constructs new helper but keeps the same AutomataIndexForm-, Automata-, HelperData and Automaton-Objects.
+	 * @see AutomataVerificationOptions#findUncontrollableStates(int[])
+	 */
+ 	public AutomataSynchronizerHelper(AutomataSynchronizerHelper orgHelper)
+ 		throws Exception
+    {
+		theAutomata = orgHelper.getAutomata();
+		theAutomaton = orgHelper.getAutomaton();
+		theAutomataIndexForm = orgHelper.getAutomataIndexForm();
+		syncOptions = orgHelper.getSynchronizationOptions();
+		verboseMode = syncOptions.verboseMode();
+		helperData = orgHelper.getHelperData();
+		executionDialog = orgHelper.getExecutionDialog();
+
+		statesToProcess  = new IntArrayList();
+		nbrOfStatesToProcess = 0;
+
+       	theStates = new IntArrayHashTable(syncOptions.getInitialHashtableSize(), syncOptions.expandHashtable());
+	}
 
 	public void clear()
 	{
@@ -202,6 +201,11 @@ public final class AutomataSynchronizerHelper
 		return theAutomataIndexForm;
     }
 
+	public HelperData getHelperData()
+	{
+		return helperData;
+	}
+	
     /**
      * Add a state to the queue of states waiting for being processed.
      * This is only called by the addInitialState and addState methods.
@@ -216,21 +220,28 @@ public final class AutomataSynchronizerHelper
     }
 
     /**
-     * @return A state if there are more states to process, null otherwise.
+     * @return a state if there are more states to process, null otherwise.
      */
     public int[] getStateToProcess()
     {
 		synchronized (gettingFromStatesToProcessLock)
         {
-	        if (nbrOfStatesToProcess == 0)
+			if (nbrOfStatesToProcess == 0 || stopExecutionLimit == 0)
 			{
 	        	return null;
 			}
+			
+			if (stopExecutionLimit > 0)
+			{
+				stopExecutionLimit--;
+			}
+				
 			nbrOfStatesToProcess--;
+
 			if (rememberTrace)
 			{
 				if (fromStateList.size() > 0)
-				{   //
+				{  
 					while (!(Arrays.equals(fromStateList.getLast(), stateTrace.getLast())))
 					{
 						stateTrace.removeLast();
@@ -279,10 +290,12 @@ public final class AutomataSynchronizerHelper
 			}
             addStatus(newState);
         	addStateToProcess(newState);
-			++nbrOfAddedStates;
+
+			// helperData.incrNbrOfAddedStates();
+			helperData.nbrOfAddedStates++;
 
 			/*
-			if (verboseMode && nbrOfAddedStates % 10000 == 0)
+			if (verboseMode && helperData.getNbrOfAddedStates() % 10000 == 0)
 					thisCategory.debug(nbrOfAddedStates + " new states found so far.");
 			*/
         }
@@ -294,15 +307,20 @@ public final class AutomataSynchronizerHelper
 			}
 		}
 
-  		if (++nbrOfCheckedStates % 2000 == 0)
+		// helperData.incrNbrOfCheckedStates();
+		helperData.nbrOfCheckedStates++;
+		
+		// if (helperData.getNbrOfCheckedStates() % 2000 == 0)
+		if (helperData.nbrOfCheckedStates % 2000 == 0)
 		{
 			if (executionDialog != null)
 			{
-				executionDialog.setValue(nbrOfCheckedStates);
+				// executionDialog.setValue(helperData.getNbrOfCheckedStates());
+				executionDialog.setValue(helperData.nbrOfCheckedStates);
 			}
 
 			/*
-			if (verboseMode && nbrOfCheckedStates % 10000 == 0)
+			if (verboseMode && helperData.getNbrOfCheckedStates() % 10000 == 0)
 					thisCategory.debug(nbrOfCheckedStates + " states checked so far.");
 			*/
 		}
@@ -484,8 +502,10 @@ public final class AutomataSynchronizerHelper
 	 */
 	public void displayInfo()
 	{
-		thisCategory.info("During the execution, " + nbrOfCheckedStates + " states were examined.");
-		thisCategory.info("During the execution, " + nbrOfAddedStates + " new states were found.");
+		// thisCategory.info("During the execution, " + helperData.getNbrOfCheckedStates() + " states were examined.");
+		// thisCategory.info("During the execution, " + helperData.getNbrOfAddedStates() + " new states were found.");
+		thisCategory.info("During the execution, " + helperData.nbrOfCheckedStates + " states were examined.");
+		thisCategory.info("During the execution, " + helperData.nbrOfAddedStates + " new states were found.");
 	}
 
 	/**
@@ -728,6 +748,43 @@ public final class AutomataSynchronizerHelper
      	}
 	}
 	*/
+
+	public void stopExecutionAfter(int stopExecutionLimit)
+	{
+		this.stopExecutionLimit = stopExecutionLimit;
+	}
+
+	private class HelperData
+	{
+		// private int nbrOfAddedStates = 0;
+		// private int nbrOfCheckedStates = 0;
+		public int nbrOfAddedStates = 0;
+		public int nbrOfCheckedStates = 0;
+		
+		public HelperData()
+		{
+		}
+
+		public void incrNbrOfAddedStates()
+		{
+			nbrOfAddedStates++;
+		}
+
+		public int getNbrOfAddedStates()
+		{
+			return nbrOfAddedStates;
+		}
+
+		public void incrNbrOfCheckedStates()
+		{
+		    nbrOfCheckedStates++;
+		}
+		
+		public int getNbrOfCheckedStates()
+		{
+			return nbrOfCheckedStates;
+		}
+	}
 }
 
 

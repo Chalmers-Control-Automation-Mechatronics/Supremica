@@ -454,7 +454,7 @@ public final class AutomataSynchronizerExecuter
 				//  */
 				// Here, the insertionIndex sets the maximium amount of states that are examined...
 				// insertionIndex = 2;
-				insertionIndex = 20;
+				insertionIndex = currEnabledEvents.length-1;
 			}
 			else
 			{   // There are transitions in the suspect automaton...
