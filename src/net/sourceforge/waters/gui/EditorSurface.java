@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.20 2005-03-16 08:15:25 flordal Exp $
+//# $Id: EditorSurface.java,v 1.21 2005-03-17 01:52:05 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -1405,6 +1405,16 @@ public class EditorSurface
 			}
 		}
 
+		for (int i = 0; i < nodes.size(); i++)
+		{
+			EditorNode n2 = (EditorNode) nodes.get(i);
+
+			if ((n != n2) && Math.sqrt(Math.pow(n.getX()-n2.getX(), 2) + Math.pow(n.getY()-n2.getY(), 2)) < EditorNode.RADIUS*2+2)
+			{
+				return true;
+			}
+		}
+
 		return false;
 	}
 
@@ -1489,7 +1499,7 @@ public class EditorSurface
 			print(g);
 
 			/*
-			// Bounding box
+			// Bounding box (but it's wrong)
 			int llx = (int) (area.getX());
 			int lly = (int) (area.getY() + area.getHeight());
 			int urx = (int) (area.getX() + area.getWidth());
