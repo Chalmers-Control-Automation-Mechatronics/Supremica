@@ -190,7 +190,7 @@ public class ProjectBuildFromFSM
 			while (tokenizer.hasMoreTokens())
 			{
 				String currToken = tokenizer.nextToken();
-				System.err.println("umdes: \"" + currToken + "\"");
+				//System.err.println("umdes: \"" + currToken + "\"");
 
 				if (currParserState == STATE_READ_NUMBER_OF_STATES)
 				{
@@ -364,10 +364,10 @@ public class ProjectBuildFromFSM
 				}
 				else if (currParserState == STATE_READ_ADDITIONAL_EVENTS)
 				{
-					System.err.println("State_read_additional_events: currLine: :" +currLine + ": currToken :"+ currToken + ":");
+					//System.err.println("State_read_additional_events: currLine: :" +currLine + ": currToken :"+ currToken + ":");
 					if (currToken.equalsIgnoreCase("EVENTS"))
 					{ // Do nothing
-						System.err.println("Read EVENTS - do nothing");
+						//System.err.println("Read EVENTS - do nothing");
 					}
 					else
 					{
@@ -377,7 +377,7 @@ public class ProjectBuildFromFSM
 							System.err.println("Alphabet alredy contains: " + currEvent);
 							logger.warn(currEvent + " is already defined");
 						}
-						System.err.println("extra events - read: " + currEvent);
+						//System.err.println("extra events - read: " + currEvent);
 
 						boolean currEventControllable = true;
 						boolean currEventObservable = true;
@@ -385,7 +385,7 @@ public class ProjectBuildFromFSM
 						while (tokenizer.hasMoreTokens())
 						{
 							String optionalParameter = tokenizer.nextToken();
-							System.err.println("extra events - more tokens: " + optionalParameter);
+							//System.err.println("extra events - more tokens: " + optionalParameter);
 							if (optionalParameter.equalsIgnoreCase("c"))
 							{
 								currEventControllable = true;
