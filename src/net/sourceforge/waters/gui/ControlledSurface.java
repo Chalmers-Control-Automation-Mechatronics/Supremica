@@ -1,11 +1,4 @@
 
-//###########################################################################
-//# PROJECT: Waters
-//# PACKAGE: waters.gui
-//# CLASS:   ControlledSurface
-//###########################################################################
-//# $Id: ControlledSurface.java,v 1.13 2005-03-03 12:52:54 flordal Exp $
-//###########################################################################
 package net.sourceforge.waters.gui;
 
 import java.lang.*;
@@ -366,7 +359,7 @@ public class ControlledSurface
 	public void mouseDragged(MouseEvent e)
 	{
 		// A drag is a move
-		//mouseMoved(e);
+		//mouseMoved(e); 
 
 		//if (e.getButton() == MouseEvent.BUTTON1) // Why not?
 		{
@@ -684,7 +677,7 @@ public class ControlledSurface
 							
 							// Find point on the border of the group from where the line is drawn...
 							Point2D.Double p = nodeGroup.setOnBounds(nodeGroup.getX() + xoff, nodeGroup.getY() + yoff);
-							int[] dat = { (int) p.getX(), (int) p.getY(), e.getX(), e.getY() };
+							int[] dat = {(int) p.getX(), (int) p.getY(), e.getX(), e.getY()};
 							
 							// Draw line!
 							if ((lines != null) && (lines.size() > 0))
@@ -936,7 +929,7 @@ public class ControlledSurface
 
 			// Highlight children
 			LinkedList children = getChildren(highlightedObject);
-			while (children.size() != 0)
+			while (children.size() != 0)  
 			{
 				((EditorObject) children.remove(0)).setHighlighted(true);
 			}
@@ -971,7 +964,7 @@ public class ControlledSurface
 					while (dx + gridSize < e.getX())
 					{
 						dx += gridSize;
-					}
+					}  
 
 					if (e.getX() - dx > (dx + gridSize) - e.getX())
 					{
@@ -1017,7 +1010,7 @@ public class ControlledSurface
 					}
 					addNode("s" + i, dx, dy);
 
-					examineCollisions();
+					examineCollisions();  
 
 					//addLabel(getLastNode(), "", 0, break20);
 					repaint();

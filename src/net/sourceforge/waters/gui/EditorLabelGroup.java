@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorLabelGroup
 //###########################################################################
-//# $Id: EditorLabelGroup.java,v 1.6 2005-03-03 05:36:29 flordal Exp $
+//# $Id: EditorLabelGroup.java,v 1.7 2005-03-03 23:29:33 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -272,6 +272,16 @@ public class EditorLabelGroup
 	public int getY()
 	{
 		return panel.getY();
+	}
+
+	public int getWidth()
+	{
+		return panel.getWidth();
+	}
+
+	public int getHeight()
+	{
+		return panel.getHeight();
 	}
 
 	public EditorLabelGroup(EditorEdge par, EditorSurface e)

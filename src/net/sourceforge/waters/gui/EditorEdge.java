@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorEdge
 //###########################################################################
-//# $Id: EditorEdge.java,v 1.10 2005-03-03 09:42:02 flordal Exp $
+//# $Id: EditorEdge.java,v 1.11 2005-03-03 23:29:33 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -415,7 +415,6 @@ public class EditorEdge
 	 */
 	public double getTPointY()
 	{
-		/*
 		if (center.isEmpty() && (dragS || dragT))
 		{
 			return (source.getCenterY() + target.getCenterY()) / 2;
@@ -424,9 +423,8 @@ public class EditorEdge
 		{
 			return tPoint.getY();
 		}
-		*/
 
-		return tPoint.getY();
+		//return tPoint.getY();
 	}
 
 	/** 

@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.12 2005-03-03 21:49:14 flordal Exp $
+//# $Id: EditorSurface.java,v 1.13 2005-03-03 23:29:33 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -259,10 +259,10 @@ public class EditorSurface
 		}
 
 		/*
-		  Rectangle rect = getDrawnArea();
-		  g.setColor(Color.PINK);
-		  g.drawRect((int) rect.getX(), (int) rect.getY(), (int) rect.getWidth(), (int) rect.getHeight());
-		*/ 
+		Rectangle rect = getDrawnAreaBounds();
+		g.setColor(Color.PINK);
+		g.drawRect((int) rect.getX(), (int) rect.getY(), (int) rect.getWidth(), (int) rect.getHeight());
+		*/
 	}
 
 	public static boolean isSimpleComponentProxy(Object o)
@@ -938,7 +938,7 @@ public class EditorSurface
 						if (n.getEllipsicalOutline().intersects(r))
 						{
 							found = false;
-
+							
 							break;
 						}
 					}
@@ -1065,7 +1065,7 @@ public class EditorSurface
 	 */
 	public void minimizeSize()
 	{
-		Rectangle drawnArea = getDrawnArea();
+		Rectangle drawnArea = getDrawnAreaBounds();
 
 		int width = (int) drawnArea.getWidth();
 		int height = (int) drawnArea.getHeight();
@@ -1083,56 +1083,165 @@ public class EditorSurface
 		setPreferredSize(new Dimension(width + gridSize * 10, height + gridSize * 10));
 	}
 
-	public Rectangle getDrawnArea()
+	public Rectangle getDrawnAreaBounds()
 	{
+		// How much space between actual bounds and used bounds?
+		int SPACING = 0;
+
+		// The extreme values
 		double minX = Double.MAX_VALUE;
 		double maxX = 0;
 		double minY = Double.MAX_VALUE;
 		double maxY = 0;
 
+		// Local measures
+		double x;
+		double y;
+		double mod;
+		
+		// Nodes...
 		for (int i = 0; i < nodes.size(); i++)
 		{
-			if (((EditorNode) nodes.get(i)).getX() + EditorNode.RADIUS > maxX)
+			x = ((EditorNode) nodes.get(i)).getX();
+			mod = EditorNode.RADIUS + 3 + SPACING;
+			if (x + mod > maxX)
 			{
-				maxX = ((EditorNode) nodes.get(i)).getX() + EditorNode.RADIUS;
+				maxX = x + mod;
 			}
 
-			if (((EditorNode) nodes.get(i)).getX() - EditorNode.RADIUS < minX)
+			if (x - mod < minX)
 			{
-				minX = ((EditorNode) nodes.get(i)).getX() - EditorNode.RADIUS;
+				minX = x - mod;
 			}
 
-			if (((EditorNode) nodes.get(i)).getY() + EditorNode.RADIUS > maxY)
+			y = ((EditorNode) nodes.get(i)).getY();
+			if (y + mod > maxY)
 			{
-				maxY = ((EditorNode) nodes.get(i)).getY() + EditorNode.RADIUS;
+				maxY = y + mod;
 			}
 
-			if (((EditorNode) nodes.get(i)).getY() - EditorNode.RADIUS < minY)
+			if (y - mod < minY)
 			{
-				minY = ((EditorNode) nodes.get(i)).getY() - EditorNode.RADIUS; 
+				minY = y - mod;
 			}
 		}
 
+		// Nodegroups...
+		for (int i = 0; i < nodeGroups.size(); i++)
+		{
+			EditorNodeGroup ng = (EditorNodeGroup) nodeGroups.get(i);
+			Rectangle2D.Double bound = ng.getBounds();
+			x = bound.getX();
+			mod = bound.getWidth() + 2 + SPACING;
+			if (x + mod > maxX)
+			{
+				maxX = x + mod;
+			}
+
+			mod = 2 + SPACING;
+			if (x - mod < minX)
+			{
+				minX = x - mod;
+			}
+
+			y = bound.getY();
+			mod = bound.getHeight() + 2 + SPACING;
+			if (y + mod > maxY)
+			{
+				maxY = y + mod;
+			}
+
+			mod = 2 + SPACING;
+			if (y - mod < minY)
+			{
+				minY = y - mod;
+			}
+		}
+
+		// Edges...
 		for (int i = 0; i < edges.size(); i++)
 		{
-			if (((EditorEdge) edges.get(i)).getTPointX() > maxX)
+			x = ((EditorEdge) edges.get(i)).getTPointX();
+			mod = 0 + SPACING;
+			if (x + mod > maxX)
 			{
-				maxX = ((EditorEdge) edges.get(i)).getTPointX();
+				maxX = x + mod;
 			}
 
-			if (((EditorEdge) edges.get(i)).getTPointX() < minX)
+			if (x - mod < minX)
 			{
-				minX = ((EditorEdge) edges.get(i)).getTPointX();
+				minX = x - mod;
 			}
 
-			if (((EditorEdge) edges.get(i)).getTPointY() > maxY)
+			y = ((EditorEdge) edges.get(i)).getTPointY();
+			if (y + mod > maxY)
 			{
-				maxY = ((EditorEdge) edges.get(i)).getTPointY();
+				maxY = y + mod;
 			}
 
-			if (((EditorEdge) edges.get(i)).getTPointY() < minY)
+			if (y - mod < minY)
 			{
-				minY = ((EditorEdge) edges.get(i)).getTPointY();
+				minY = y - mod;
+			}
+		}
+
+		// Node labels...
+		for (int i = 0; i < labels.size(); i++)
+		{
+			EditorLabel label = ((EditorLabel) labels.get(i));
+			x = label.getX();
+			mod = label.getWidth()/2 - 2 + SPACING;
+			if (x + mod > maxX)
+			{
+				maxX = x + mod;
+			}
+
+			if (x - mod < minX)
+			{
+				minX = x - mod;
+			}
+
+			y = label.getY();
+			mod = label.getHeight()/2 - 2 + SPACING;
+			if (y + mod > maxY)
+			{
+				maxY = y + mod;
+			}
+
+			if (y - mod < minY)
+			{
+				minY = y - mod;
+			}
+		}
+
+		// Edge labels...
+		for (int i = 0; i < events.size(); i++)
+		{
+			EditorLabelGroup labelGroup = ((EditorLabelGroup) events.get(i));
+			x = labelGroup.getX(); // This is not the center!
+			mod = labelGroup.getWidth() + SPACING;
+			if (x + mod > maxX)
+			{
+				maxX = x + mod;
+			}
+
+			mod = SPACING;
+			if (x - mod < minX)
+			{
+				minX = x - mod;
+			}
+
+			y = labelGroup.getY(); // This is not the center!
+			mod = labelGroup.getHeight() + SPACING;
+			if (y + mod > maxY)
+			{
+				maxY = y + mod;
+			}
+
+			mod = SPACING;
+			if (y - mod < minY)
+			{
+				minY = y - mod;
 			}
 		}
 
@@ -1211,29 +1320,53 @@ public class EditorSurface
 			// Translate the origin to be (0,0) at the margin
 			g2d.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
 
+			/*
+			// Print page margin
+			{
+				Line2D.Double line = new Line2D.Double ();
+				int i;
+				g2d.setColor(Color.ORANGE);
+				// Print the vertical lines
+				line.setLine (0, 0, 0, pageFormat.getHeight());
+				g2d.draw (line);
+				line.setLine (pageFormat.getImageableWidth(), 0, pageFormat.getImageableWidth(), pageFormat.getImageableHeight());
+				g2d.draw (line);
+				
+				//--- Print the horizontal lines
+				line.setLine (0, 0, pageFormat.getImageableWidth(), 0);
+				g2d.draw (line);
+				line.setLine (0, pageFormat.getImageableHeight(), pageFormat.getImageableWidth(), pageFormat.getImageableHeight());
+				g2d.draw (line);
+			}
+			*/
+
+			// Get the bounds of the actual drawing
+			Rectangle area = getDrawnAreaBounds();
+ 
 			// This is the place to do rescaling if the figure won't fit on the page!
-			// The below is quick and dirty... getDrawnArea() is not correct for example.
-			Rectangle area = getDrawnArea();
-			double scaleX = pageFormat.getImageableWidth() / (area.getWidth() + 2*INCH);
-			double scaleY = pageFormat.getImageableHeight() / (area.getHeight() + 2*INCH);
+			double scaleX = pageFormat.getImageableWidth() / (area.getWidth());
+			double scaleY = pageFormat.getImageableHeight() / (area.getHeight());
 			double scale;
-			//System.err.println("x: " + scaleX + " y: " + scaleY);			
 			if (scaleX < scaleY)
 			{
 				scale = scaleX;
 			}
 			else
 			{
-				scale = scaleY;
+				scale = scaleY;  
 			}
 			if (scale < 1)
 			{
+				System.err.println("Rescaling figure to fit page. Scale: " + scale);
 				g2d.scale(scale, scale);
-			}
+			}   
+
+			// Put drawing at (0, 0)
+			g2d.translate(-area.getX(), -area.getY());
 
 			// Put the current figure into the Graphics object!
 			print(g);
-						
+			 
 			// OK to print!
 			return (PAGE_EXISTS);
         }
