@@ -160,7 +160,8 @@ public class AutomataVerificationWorker
 			failureMessage = "The language of the unselected automata is \n" +
 				             "NOT included in the language of the selected automata.";
 			
-			prepareAutomataForLanguageInclusion();
+			//prepareAutomataForLanguageInclusion();			
+			theAutomata = workbench.getVisualProjectContainer().getActiveProject();
 			JOptionPane.showMessageDialog(workbench.getFrame(), 
 										  "Note that the language inclusion check is guaranteed to \n" +
 										  "work only when the alphabets of the respective automata \n" +
@@ -229,16 +230,99 @@ public class AutomataVerificationWorker
 			logger.info("Execution stopped after " + (endDate.getTime()-startDate.getTime())/1000.0 + " seconds.");
 		}
 		
-		// We're finished! Bail out! Kill the ExecutionDialog!
+		// We're finished! Bail out! Make sure to kill the ExecutionDialog!
 		if (executionDialog != null)
 		{
 			executionDialog.setMode(ExecutionDialogMode.hide);
 		}
 	}
 
-	private void prepareAutomataForLanguageInclusion()
+	private void prepareAutomataForLanguageInclusion(AutomataSynchronizerHelper synchHelper)
 	{
-		// We have to go through some, quite lengthy, preparations
+		synchHelper.considerAllEventsUncontrollable();
+
+		/*
+		// We have to go through some - quite lengthy - preparations
+		// before we can perform the language inclusion...
+		Automata automataA = new Automata(workbench.getSelectedAutomata());
+		Automata automataB = new Automata(workbench.getUnselectedAutomata());
+		if (!automataA.hasInitialState() || automataB.hasInitialState())
+		{
+			JOptionPane.showMessageDialog(workbench.getFrame(), "Some automaton lacks an initial state!", "Alert", JOptionPane.ERROR_MESSAGE);
+			return;
+		}	
+		
+		EventsSet theAlphabets = new EventsSet();
+		Alphabet unionAlphabet;
+		Iterator automatonIterator = automataA.iterator();
+		while (automatonIteratorA.hasNext())
+		{
+			currAutomaton = (Automaton) automatonIteratorA.next();
+			Alphabet currAlphabet = currAutomaton.getAlphabet();			
+			theAlphabets.add(currAlphabet);
+			currAutomaton.setType(AutomatonType.Plant);
+			
+			eventIteratorA = currAutomaton.eventIterator();
+			while (eventIteratorA.hasNext())
+			{
+				((org.supremica.automata.LabeledEvent) eventIteratorA.next()).setControllable(false);
+			}
+		}
+		
+		if (theAlphabets.size() == 1)
+		{
+			unionAlphabet = (Alphabet) theAlphabets.get(0);
+		}
+		else
+		{
+			try
+			{
+				unionAlphabet = AlphabetHelpers.getUnionAlphabet(theAlphabets); // , "");
+			}
+			catch (Exception ex)
+			{
+				requestStop();
+				logger.error("Error when calculating union alphabet. " + ex);
+				logger.debug(ex.getStackTrace());
+				return;
+			}
+		}
+		
+		// Change events in the automata in automataB to uncontrollable if they
+		// are included in the union alphabet found above, mark the automata as
+		// specifications
+		Iterator automatonIteratorB = automataB.iterator();
+		org.supremica.automata.LabeledEvent currEvent;
+		
+		while (automatonIteratorB.hasNext())
+		{
+			currAutomaton = (Automaton) automatonIteratorB.next();
+			currAutomaton.setType(AutomatonType.Supervisor);
+			
+			eventIteratorB = currAutomaton.eventIterator();			
+			while (eventIteratorB.hasNext())
+			{
+				currEvent = (org.supremica.automata.LabeledEvent) eventIteratorB.next();
+				
+				if (unionAlphabet.containsEventWithLabel(currEvent.getLabel()))
+				{
+					currEvent.setControllable(false);
+				}
+				else
+				{
+					currEvent.setControllable(true);
+				}
+			}
+		}
+		
+		// After the above preparations, the language inclusion check
+		// can be performed as a controllability check...
+		automataA.addAutomata(automataB);
+		theAutomata = automataA;
+		*/
+
+		// /*
+		// We have to go through some - quite lengthy - preparations
 		// before we can perform the language inclusion...
 		Collection selectedAutomata = workbench.getSelectedAutomataAsCollection();
 		Automata automataA = new Automata();
@@ -361,6 +445,7 @@ public class AutomataVerificationWorker
 		// can be performed as a controllability check...
 		automataA.addAutomata(automataB);
 		theAutomata = automataA;
+		// */
 	}
 
 	/**

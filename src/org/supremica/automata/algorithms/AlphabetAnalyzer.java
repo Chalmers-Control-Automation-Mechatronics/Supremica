@@ -77,33 +77,19 @@ public class AlphabetAnalyzer
 	public void execute()
 	{
 		buildEventToAutomataMap();
-	}
 
-	/**
-	 * Builds the eventToAutomataMap to map uncontrollable events to plants.
-	 *
-	 *@return  HashMap mapping uncontrollable Event-object to Set of plant-type Automaton-objects.
-	 */
-	public HashMap getUncontrollableEventToPlantMap()
-		throws Exception
-	{
-		try
-		{
-			buildUncontrollableEventToPlantMap();
-		}
-		catch (Exception e)
-		{
-			logger.error("Error in AlphabetAnalyzer. " + e);
-			logger.debug(e.getStackTrace());
-			throw e;
-		}
-
-		return eventToAutomataMap;
+		checkAllPairs();
+		printUnsynchronizedEvents();		
 	}
 
 	private void buildEventToAutomataMap()
 	{
-		Iterator automataIt = theAutomata.iterator();
+		buildEventToAutomataMap(theAutomata);
+	}	
+
+	private void buildEventToAutomataMap(Automata anAutomata)
+	{
+		Iterator automataIt = anAutomata.iterator();
 
 		while (automataIt.hasNext())
 		{
@@ -118,9 +104,42 @@ public class AlphabetAnalyzer
 				insertEvent(currEvent, currAutomaton);
 			}
 		}
+	}
 
-		checkAllPairs();
-		printUnsynchronizedEvents();
+	/**
+	 * Builds the eventToAutomataMap to map the events in anAutomata to the automata in anAutomata
+	 *
+	 *@return HashMap mapping Event-object to Set of Automaton-objects.
+	 */
+	public HashMap getEventToAutomataMap(Automata anAutomata)
+	{
+		buildEventToAutomataMap(anAutomata);
+		return eventToAutomataMap;
+	}
+
+	/**
+	 * Builds the eventToAutomataMap to map uncontrollable events to plants.
+	 *
+	 *@return HashMap mapping uncontrollable Event-object to Set of plant-type Automaton-objects.
+	 */
+	public HashMap getUncontrollableEventToPlantMap()
+		 throws Exception
+	{
+		///* There will be no exceptions
+  		  try
+		  {
+		      buildUncontrollableEventToPlantMap();
+		  }
+		  catch (Exception e)
+		  {
+			  logger.error("Error in AlphabetAnalyzer. " + e);
+			  logger.debug(e.getStackTrace());
+			  throw e;
+		  }
+		  //*/
+		
+		  //buildUncontrollableEventToPlantMap();
+		return eventToAutomataMap;
 	}
 
 	private void buildUncontrollableEventToPlantMap()

@@ -69,7 +69,6 @@ public class AutomataListeners
 
 	public void notifyListeners(int mode, Automaton a)
 	{
-
 		// logger.debug("AutomataListeners.notifyListeners Start");
 		if (batchUpdate)
 		{
@@ -79,7 +78,6 @@ public class AutomataListeners
 		{
 			if (listeners != null)
 			{
-
 				// logger.debug("AutomataListeners.notifyListeners notifying");
 				for (Iterator listenerIt = listeners.iterator(); listenerIt.hasNext(); )
 				{

@@ -827,47 +827,17 @@ public final class AutomataSynchronizerHelper
 
 	public boolean isAllAutomataPlants()
 	{
-		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
-		{
-			Automaton currAutomaton = (Automaton) autIt.next();
-
-			if (currAutomaton.getType() != AutomatonType.Plant)
-			{
-				return false;
-		}
-		}
-
-		return true;
+		return theAutomata.isAllAutomataPlants();
 	}
 
 	public boolean isAllAutomataSupervisors()
 	{
-		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
-		{
-			Automaton currAutomaton = (Automaton) autIt.next();
-
-			if (currAutomaton.getType() != AutomatonType.Supervisor)
-			{
-				return false;
-			}
-		}
-
-		return true;
+		return theAutomata.isAllAutomataSupervisors();
 	}
 
 	public boolean isAllAutomataSpecifications()
 	{
-		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
-		{
-			Automaton currAutomaton = (Automaton) autIt.next();
-
-			if (currAutomaton.getType() != AutomatonType.Specification)
-			{
-				return false;
-			}
-		}
-
-		return true;
+		return theAutomata.isAllAutomataSpecifications();
 	}
 
 	public void selectAutomata(int[] automataIndices)
@@ -923,6 +893,15 @@ public final class AutomataSynchronizerHelper
 	public void stopExecutionAfter(int stopExecutionLimit)
 	{
 		this.stopExecutionLimit = stopExecutionLimit;
+	}
+
+	public void considerAllEventsUncontrollable()
+	{
+		boolean[] controllableEventsTable = theAutomataIndexForm.getControllableEventsTable();
+		for (int i=0;i<controllableEventsTable.length;i++)
+		{
+			controllableEventsTable[i] = false;
+		}
 	}
 
 	public class HelperData

@@ -460,14 +460,14 @@ public class Supremica
 	 */
 	public Collection getSelectedAutomataAsCollection()
 	{
-		int[] selectedRowIndicies = theAutomatonTable.getSelectedRows();
+		int[] selectedRowIndices = theAutomatonTable.getSelectedRows();
 		LinkedList selectedAutomata = new LinkedList();
 
-		for (int i = 0; i < selectedRowIndicies.length; i++)
+		for (int i = 0; i < selectedRowIndices.length; i++)
 		{
 			try
 			{
-				int currIndex = selectedRowIndicies[i];
+				int currIndex = selectedRowIndices[i];
 				int orgIndex = theTableSorter.getOriginalRowIndex(currIndex);
 				Automaton currAutomaton = getActiveProject().getAutomatonAt(orgIndex);
 
@@ -485,14 +485,14 @@ public class Supremica
 
 	public Automata getSelectedAutomata()
 	{
-		int[] selectedRowIndicies = theAutomatonTable.getSelectedRows();
+		int[] selectedRowIndices = theAutomatonTable.getSelectedRows();
 		Automata selectedAutomata = new Automata();
 
-		for (int i = 0; i < selectedRowIndicies.length; i++)
+		for (int i = 0; i < selectedRowIndices.length; i++)
 		{
 			try
 			{
-				int currIndex = selectedRowIndicies[i];
+				int currIndex = selectedRowIndices[i];
 				int orgIndex = theTableSorter.getOriginalRowIndex(currIndex);
 				Automaton currAutomaton = getActiveProject().getAutomatonAt(orgIndex);
 
@@ -510,23 +510,55 @@ public class Supremica
 
 	public Automata getUnselectedAutomata()
 	{
-		invertSelection();
-		Automata unSelectedAutomata = getSelectedAutomata();
-		invertSelection();
-		return unSelectedAutomata;
+		/* Simple... but flickery!
+		   invertSelection();
+		   Automata unSelectedAutomata = getSelectedAutomata();
+		   invertSelection();
+		   return unSelectedAutomata;
+		*/
+		
+		int[] selectedRowIndices = theAutomatonTable.getSelectedRows();
+		Automata unselectedAutomata = new Automata();
+		int j = 0;
+		
+		for (int i = 0; i < theAutomatonTable.getRowCount(); i++)
+		{
+			if ((j >= selectedRowIndices.length) || (i != selectedRowIndices[j]))
+			{
+				try
+				{
+					int currIndex = i;
+					int orgIndex = theTableSorter.getOriginalRowIndex(currIndex);
+					Automaton currAutomaton = getActiveProject().getAutomatonAt(orgIndex);
+					
+					unselectedAutomata.addAutomaton(currAutomaton);
+				}
+				catch (Exception ex)
+				{
+					logger.error("Trying to get an automaton that does not exist. Index: " + i);
+					logger.debug(ex.getStackTrace());
+				}
+			}
+			else
+			{
+				j++;
+			}
+		}
+
+		return unselectedAutomata;
 	}
 
-	// Same as getSelected automata but include execution information
+	// Same as getSelectedAutomata but include execution information
 	public Project getSelectedProject()
 	{
-		int[] selectedRowIndicies = theAutomatonTable.getSelectedRows();
+		int[] selectedRowIndices = theAutomatonTable.getSelectedRows();
 		Project selectedProject = new Project();
 
-		for (int i = 0; i < selectedRowIndicies.length; i++)
+		for (int i = 0; i < selectedRowIndices.length; i++)
 		{
 			try
 			{
-				int currIndex = selectedRowIndicies[i];
+				int currIndex = selectedRowIndices[i];
 				int orgIndex = theTableSorter.getOriginalRowIndex(currIndex);
 				Automaton currAutomaton = getActiveProject().getAutomatonAt(orgIndex);
 

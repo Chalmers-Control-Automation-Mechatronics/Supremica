@@ -194,6 +194,21 @@ public final class AutomataIndexForm
 		}
 	}
 
+	/**
+	 * Defines the typeIsPlantTable to "point to" the automata in anAutomata
+	 * in spite of what these automata (or the other automata in theAutomata, 
+	 * for that matter) really are!!
+	 */
+	public void defineTypeIsPlantTable(Automata anAutomata)
+	{
+		for (int i=0,j=0; i<theAutomata.size(); i++)
+		{
+			typeIsPlantTable[i] = (j < anAutomata.size()) && (i == anAutomata.getAutomatonAt(j).getIndex());
+			if (typeIsPlantTable[i])
+				j++;
+		}
+	}
+
 	void generateEventIndices(Automata theAutomata, Automaton theAutomaton)
 		throws Exception
 	{

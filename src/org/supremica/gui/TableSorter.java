@@ -268,9 +268,9 @@ public class TableSorter
 		for (int row = 0; row < rowCount; row++)
 		{
 			indexes[row] = row;
-		}
+		}		
 	}
-
+	
 	public void tableChanged(TableModelEvent e)
 	{
 		// System.out.println("Sorter: tableChanged");

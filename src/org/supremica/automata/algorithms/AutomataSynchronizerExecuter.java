@@ -166,10 +166,20 @@ public final class AutomataSynchronizerExecuter
 	{
 		setPriority(Thread.MIN_PRIORITY);
 
+		// Helper parameters
 		helper = synchronizerHelper;
-		indexForm = helper.getAutomataIndexForm();
 		nbrOfAutomata = helper.getAutomata().size();
 		nbrOfEvents = helper.getAutomaton().getAlphabet().size();
+		potentiallyUncontrollableStates = helper.getStateMemorizer();
+		exhaustiveSearch = helper.getExhaustiveSearch();
+		rememberUncontrollable = helper.getRememberUncontrollable();
+		expandEventsUsingPriority = helper.getExpandEventsUsingPriority();
+		coExecute = helper.getCoExecute();
+		coExecuter = helper.getCoExecuter();
+		executerRendezvous = helper.getExecuterRendezvous();
+
+		// Indexform parameters
+		indexForm = helper.getAutomataIndexForm();
 		nextStateTable = indexForm.getNextStateTable();
 		outgoingEventsTable = indexForm.getOutgoingEventsTable();
 		prioritizedEventsTable = indexForm.getPrioritizedEventsTable();
@@ -177,33 +187,25 @@ public final class AutomataSynchronizerExecuter
 		typeIsPlantTable = indexForm.getTypeIsPlantTable();
 		controllableEventsTable = indexForm.getControllableEventsTable();
 		immediateEventsTable = indexForm.getImmediateEventsTable();
-		potentiallyUncontrollableStates = helper.getStateMemorizer();
-		exhaustiveSearch = helper.getExhaustiveSearch();
-		rememberUncontrollable = helper.getRememberUncontrollable();
-		expandEventsUsingPriority = helper.getExpandEventsUsingPriority();
-		coExecute = helper.getCoExecute();
-		coExecuter = helper.getCoExecuter();
 
-		if (expandEventsUsingPriority)
-		{
-			eventPriority = helper.getEventPriority();
-			exhaustiveSearch = true;
-			rememberUncontrollable = true;
-		}
-
+		// Syncoptions parameters
 		syncOptions = synchronizerHelper.getSynchronizationOptions();
 		syncType = syncOptions.getSynchronizationType();
 		forbidUncontrollableStates = syncOptions.forbidUncontrollableStates();
 		expandForbiddenStates = syncOptions.expandForbiddenStates();
 		verboseMode = syncOptions.verboseMode();
 
+		// Overrides
+		if (expandEventsUsingPriority)
+		{
+			eventPriority = helper.getEventPriority();
+			exhaustiveSearch = true;       // Why force this?
+			rememberUncontrollable = true; // Why force this?
+		}
 		if (rememberUncontrollable)
 		{
-			expandForbiddenStates = false;
+			expandForbiddenStates = false; // Why force this?
 		}
-
-		executerRendezvous = synchronizerHelper.getExecuterRendezvous();
-
 	}
 
 	/**
@@ -457,7 +459,6 @@ public final class AutomataSynchronizerExecuter
 
 			if (!thisEventOk && canExecuteInPlant && thisPlantEventOk && !controllableEventsTable[currEventIndex])
 			{
-
 				// Uncontrollable state found
 				controllableState = false;
 

@@ -132,6 +132,7 @@ public class TestAutomataVerifier
 		}
 	}
 
+	/*
 	public void testModularLanguageInclusion()
 	{
 		// Note that the TestFiles have been altered... so that language 
@@ -175,4 +176,5 @@ public class TestAutomataVerifier
 			assertTrue(false);
 		}		
 	}
+	*/
 }

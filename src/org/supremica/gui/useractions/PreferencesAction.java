@@ -17,7 +17,7 @@ public class PreferencesAction
 	public PreferencesAction()
 	{
 		super("Preferences...", new ImageIcon(Supremica.class.getResource("/toolbarButtonGraphics/general/Preferences16.gif")));
-		putValue(SHORT_DESCRIPTION, "Edit Supremica preferences");
+		putValue(SHORT_DESCRIPTION, "Edit preferences");
 	}
 
 	public void actionPerformed(ActionEvent e)

@@ -209,6 +209,13 @@ public class Automata
 		return theAutomata.iterator();
 	}
 
+	/**
+	 * Iterates backwars through the automata... necessary 
+	 * in the automataMove_actionPerformed in ActionMan when
+	 * moving down
+	 *
+	 *@see ActionMan
+	 */
 	public Iterator backwardsIterator()
 	{
 		ArrayList backwardList = new ArrayList();
@@ -312,7 +319,7 @@ public class Automata
 	}
 
 	/**
-	 * Returns true if all automata have initial states
+	 * Returns true if all automata are deterministic
 	 */
 	public boolean isDeterministic()
 	{
@@ -377,6 +384,60 @@ public class Automata
 				return false;
 			}
 		}
+		return true;
+	}
+
+	/**
+	 * True if all automata are plants
+	 */
+	public boolean isAllAutomataPlants()
+	{
+		for (Iterator autIt = iterator(); autIt.hasNext(); )
+		{
+			Automaton currAutomaton = (Automaton) autIt.next();
+			
+			if (currAutomaton.getType() != AutomatonType.Plant)
+			{
+				return false;
+			}
+		}
+		
+		return true;
+	}
+
+	/**
+	 * True if all automata are supervisors
+	 */
+	public boolean isAllAutomataSupervisors()
+	{
+		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
+		{
+			Automaton currAutomaton = (Automaton) autIt.next();
+
+			if (currAutomaton.getType() != AutomatonType.Supervisor)
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * True if all automata are specifications
+	 */
+	public boolean isAllAutomataSpecifications()
+	{
+		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
+		{
+			Automaton currAutomaton = (Automaton) autIt.next();
+
+			if (currAutomaton.getType() != AutomatonType.Specification)
+			{
+				return false;
+			}
+		}
+
 		return true;
 	}
 

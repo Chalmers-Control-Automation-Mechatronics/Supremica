@@ -187,11 +187,15 @@ public class AutomataVerifier
 		}
 
 		// Check Language Inclusion
-		if (verificationOptions.getVerificationType() == VerificationType.Controllability)
+		if (verificationOptions.getVerificationType() == VerificationType.LanguageInclusion)
 		{
 			if (theAutomata.size() < 1)
 			{
-				return "At least one automata must be selected";
+				return "At least one automaton must be selected";
+			}
+			if (ActionMan.getGui().getUnselectedAutomata().size() < 1)
+			{
+				return "At least one automaton must be unselected";
 			}
 			if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
 			{
@@ -288,11 +292,124 @@ public class AutomataVerifier
 	private boolean modularControllabilityVerification()
 		throws Exception
 	{
-		potentiallyUncontrollableStates = synchHelper.getStateMemorizer();
-
 		AlphabetAnalyzer alphabetAnalyzer = new AlphabetAnalyzer(theAutomata);
-		uncontrollableEventToPlantMap = alphabetAnalyzer.getUncontrollableEventToPlantMap();
+		if (!(verificationOptions.getVerificationType() == VerificationType.LanguageInclusion))
+		{   // Standard case, map uncontrollable events to plants
+			uncontrollableEventToPlantMap = alphabetAnalyzer.getUncontrollableEventToPlantMap();
+		}
+		else
+		{   // Language inclusion, all events should be considered uncontrollable and
+			// this changes the uncontrollableEventToPlantMap.
+			synchHelper.considerAllEventsUncontrollable();
+			Automata plantAutomata = ActionMan.getGui().getUnselectedAutomata();
+			synchHelper.getAutomataIndexForm().defineTypeIsPlantTable(plantAutomata);
+			uncontrollableEventToPlantMap = alphabetAnalyzer.getEventToAutomataMap(plantAutomata);
+		}
 
+		potentiallyUncontrollableStates = synchHelper.getStateMemorizer();
+		LabeledEvent currEvent;
+		Automaton currPlantAutomaton;
+		Automaton currSupervisorAutomaton;
+		ArrayList selectedAutomata = new ArrayList();
+		Iterator eventIterator;
+		Iterator plantIterator;
+		boolean allModulesControllable = true;
+		Iterator supervisorIterator = theAutomata.iterator();
+		boolean[] typeIsPlantTable = synchHelper.getAutomataIndexForm().getTypeIsPlantTable();
+		boolean[] controllableEventsTable = synchHelper.getAutomataIndexForm().getControllableEventsTable();
+
+		loop:
+		while (supervisorIterator.hasNext())
+		{
+			// Iterate over supervisors/specifications
+			currSupervisorAutomaton = (Automaton) supervisorIterator.next();
+
+			// if ((currSupervisorAutomaton.getType() == AutomatonType.Supervisor) || (currSupervisorAutomaton.getType() == AutomatonType.Specification))
+			if (!typeIsPlantTable[currSupervisorAutomaton.getIndex()])
+			{
+				//logger.info("Supervisor: " + currSupervisorAutomaton.getName());
+				// Examine uncontrollable events in currSupervisorAutomaton 
+				// and select plants containing these events
+				selectedAutomata.add(currSupervisorAutomaton);
+				eventIterator = currSupervisorAutomaton.eventIterator();
+				while (eventIterator.hasNext())
+				{
+					currEvent = (LabeledEvent) eventIterator.next();
+					//if (!currEvent.isControllable())
+					if (!controllableEventsTable[currEvent.getSynchIndex()])
+					{
+						if (uncontrollableEventToPlantMap.get(currEvent) != null)
+						{
+							plantIterator = ((Set) uncontrollableEventToPlantMap.get(currEvent)).iterator();
+							while (plantIterator.hasNext())
+							{
+								currPlantAutomaton = (Automaton) plantIterator.next();
+								if (!selectedAutomata.contains(currPlantAutomaton))
+								{
+									//logger.info("Plant: " + currPlantAutomaton.getName());
+									selectedAutomata.add(currPlantAutomaton);
+								}
+							}
+
+							if (oneEventAtATime)
+							{
+								if (stopRequested)
+								{
+									return false;
+								}
+
+								if (selectedAutomata.size() > 1)
+								{
+									// Check module
+									allModulesControllable = allModulesControllable && moduleIsControllable(selectedAutomata);
+
+									// Stop if uncontrollable
+									if (!allModulesControllable)
+									{
+										if (verboseMode)
+										{
+											logger.info("Uncontrollable state found.");
+										}
+										break loop;
+									}
+									
+									// Clean selectedAutomata
+									while (selectedAutomata.size() > 1)
+									{
+										selectedAutomata.remove(1);
+									}
+								}
+							}
+						}
+					}
+				}
+
+				if (!oneEventAtATime)
+				{
+					if (stopRequested)
+					{
+						return false;
+					}
+
+					if (selectedAutomata.size() > 1)
+					{
+						// Check module
+						allModulesControllable = allModulesControllable && moduleIsControllable(selectedAutomata);
+
+						// Stop if uncontrollable
+						if (!allModulesControllable)
+						{
+							break loop;
+						}
+					}
+				}
+
+				selectedAutomata.clear();
+			}
+		}
+
+		/*
+		potentiallyUncontrollableStates = synchHelper.getStateMemorizer();
 		LabeledEvent currEvent;
 		Automaton currPlantAutomaton;
 		Automaton currSupervisorAutomaton;
@@ -387,6 +504,7 @@ public class AutomataVerifier
 				selectedAutomata.clear();
 			}
 		}
+		*/
 
 		// loop finished.
 		if (failure)
@@ -400,7 +518,7 @@ public class AutomataVerifier
 	/**
 	 * Performs modular controllablity verification on one module using AutomataSynchronizerExecuter.
 	 *
-	 *@param  selectedAutomata Description of the Parameter
+	 *@param  selectedAutomata the automata that should be verified
 	 *@return  true if controllable, false if not or false if don't know.
 	 *@exception  Exception Description of the Exception
 	 *@see  AutomataSynchronizerExecuter
@@ -1193,7 +1311,7 @@ public class AutomataVerifier
 		// We use a copy of theAutomata instead from this point on. This is to spare us the 
 		// effort of changing all events to uncontrollable over and over and lets us use the 
 		// same helper all the time, EXCEPT for AutomataIndexForm.typeIsPlantTable which we 
-		// have to reinitialize between the language inclusion checks!!
+		// have to reinitialize between the language inclusion checks!! 
 	    theAutomata = new Automata(theAutomata, false); 
 		synchHelper = new AutomataSynchronizerHelper(theAutomata, synchronizationOptions);
 		// Make all events in all automata in theAutomata as uncontrollable! (All 

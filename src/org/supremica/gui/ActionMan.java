@@ -439,7 +439,7 @@ public class ActionMan
 	// mark the project as dirty but do not close the project
 	public static void automataDelete_actionPerformed(Gui gui)
 	{
-		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
+		Automata selectedAutomata = gui.getSelectedAutomata();
 
 		if (selectedAutomata.size() < 1)
 		{
