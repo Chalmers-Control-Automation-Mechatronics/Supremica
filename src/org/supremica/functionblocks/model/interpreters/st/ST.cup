@@ -3,10 +3,7 @@
 package org.supremica.functionblocks.model.interpreters.st;
 
 import java_cup.runtime.*;
-
-/* Preliminaries to set up and use the scanner.  
-init with {: scanner.init();              :};
-scan with {: return scanner.next_token(); :};*/
+import java.lang.*;
 
 /* Terminals (tokens returned by the scanner). */
 terminal            OR,XOR,AND;
@@ -15,83 +12,82 @@ terminal            LESS,LESSEQ,MORE,MOREEQ;
 terminal            PLUS,MINUS;
 terminal	    TIMES,DIV,MOD;
 terminal	    POWER;
+terminal	    UMINUS;  	
 terminal            NOT; 
 terminal            LPAREN, RPAREN;
-terminal 	    STRING;
-terminal 	    NUMBER;
-terminal	    BOOL;
-terminal            IDENT;
+terminal String	    STRING;
+terminal Integer    INT;
+terminal Float      FLOAT;
+terminal Boolean    BOOL;
+terminal String     IDENT;
 
 /* Non terminals */
-non terminal     expression, expressionp;
-non terminal     xor_expression, xor_expressionp;
-non terminal     and_expression, and_expressionp;
-non terminal     comparison, comparisonp;
-non terminal     equ_expression, equ_expressionp;
-non terminal     add_expression, add_expressionp;
-non terminal     term, termp;
-non terminal     power_expression, power_expressionp;
-non terminal     unary_expression;
-non terminal     primary_expression;
-non terminal     constant, variable;
-non terminal     empty;
+non terminal Expression		expression;
+non terminal OrExpression	or_expression;
+non terminal XorExpression	xor_expression;
+non terminal AndExpression	and_expression;
+non terminal Comparison		comparison;
+non terminal AddExpression	add_expression;
+non terminal Term		term;
+non terminal PowerExpression	power_expression;
+non terminal UnaryExpression	unary_expression;
+non terminal PrimaryExpression	primary_expression;
 
 /* Precedences */
-//precedence left PLUS, MINUS;
-//precedence left TIMES, DIVIDE, MOD;
-//precedence left UMINUS;
+precedence left  OR;
+precedence left  XOR;
+precedence left  AND;
+precedence left  NOT;
+precedence nonassoc EQ,NEQ,LESS,LESSEQ,MORE,MOREEQ;
+precedence left  PLUS,  MINUS;
+precedence left  TIMES, DIV, MOD;
+precedence left  POWER;
+precedence left  UMINUS;
 
 
 /* The grammar */
 
 start with expression;
 
-expression ::= xor_expression expressionp;
-expressionp ::= OR xor_expression expressionp | empty;
+expression ::= or_expression:a			 		{: RESULT = new Expression(a); :};
 
-xor_expression ::= and_expression xor_expressionp;
-xor_expressionp ::= XOR and_expression xor_expressionp | empty;
+or_expression ::= or_expression:a OR or_expression:b 		{: RESULT = new BinaryOrExpression(a,b); :}
+                | xor_expression:a 		 		{: RESULT = new UnaryOrExpression(a); :};
 
-and_expression ::= comparison and_expressionp;
-and_expressionp ::= AND comparison and_expressionp | empty;
+xor_expression ::= xor_expression:a XOR xor_expression:b	{: RESULT = new BinaryXorExpression(a,b); :}
+                 | and_expression:a 				{: RESULT = new UnaryXorExpression(a); :};
 
-comparison ::= equ_expression comparisonp;
-comparisonp ::= EQ equ_expression comparisonp 
-	      | NEQ equ_expression comparisonp	
-	      | empty;
+and_expression ::= and_expression:a AND and_expression:b	{: RESULT = new BinaryAndExpression(a,b); :}
+                 | comparison:a 				{: RESULT = new UnaryAndExpression(a); :};
 
-equ_expression ::= add_expression equ_expressionp;
-equ_expressionp ::=  LESS   add_expression equ_expressionp 
-		  |  LESSEQ add_expression equ_expressionp 
-		  |  MORE   add_expression equ_expressionp 
-		  |  MOREEQ add_expression equ_expressionp 
-	          |  empty;
+comparison ::= add_expression:a EQ     add_expression:b		{: RESULT = new Eq(a,b); :}
+	     | add_expression:a NEQ    add_expression:b		{: RESULT = new Neq(a,b); :}
+	     | add_expression:a LESS   add_expression:b 	{: RESULT = new Less(a,b); :}
+	     | add_expression:a LESSEQ add_expression:b 	{: RESULT = new LessEq(a,b); :}
+	     | add_expression:a MORE   add_expression:b 	{: RESULT = new More(a,b); :}
+	     | add_expression:a MOREEQ add_expression:b 	{: RESULT = new MoreEq(a,b); :}
+	     | add_expression:a					{: RESULT = new UnaryComparison(a); :};
 
-add_expression ::= term add_expressionp;
-add_expressionp ::= PLUS term add_expressionp
- 		  | MINUS term add_expressionp 
-	      	  | empty;
+add_expression ::= add_expression:a PLUS  add_expression:b	{: RESULT = new Plus(a,b); :}
+ 		 | add_expression:a MINUS add_expression:b	{: RESULT = new Minus(a,b); :}
+ 		 | term:a					{: RESULT = new UnaryAddExpression(a); :};
 
-term ::= power_expression termp;
-termp ::= TIMES power_expression termp 
-	| DIV power_expression termp
-	| MOD power_expression termp  
-	| empty;
+term ::= term:a TIMES term:b 					{: RESULT = new Times(a,b); :}
+       | term:a DIV   term:b 					{: RESULT = new Div(a,b); :}
+       | term:a MOD   term:b 					{: RESULT = new Mod(a,b); :}
+       | power_expression:a					{: RESULT = new UnaryTerm(a); :};
 
-power_expression ::= unary_expression power_expressionp;
-power_expressionp ::= POWER unary_expression power_expressionp 
-	            | empty;
+power_expression ::= power_expression:a POWER power_expression:b {: RESULT = new BinaryPowerExpression(a,b); :}
+		   | unary_expression:a				{: RESULT = new  UnaryPowerExpression(a); :};
 
-unary_expression ::= primary_expression
-		   | MINUS primary_expression
-		   | NOT primary_expression;
+unary_expression ::= primary_expression:a			{: RESULT = new UnaryPrimaryExpression(a); :}
+		   | LPAREN expression:a RPAREN			{: RESULT = new UnaryExpressionExpression(a); :}
+		   | MINUS primary_expression:a			{: RESULT = new UnaryMinus(a); :} %prec UMINUS
+		   | NOT   primary_expression:a			{: RESULT = new UnaryNot(a); :} %prec NOT;
 
-primary_expression ::= constant 
-                     | variable 
-		     | LPAREN expression RPAREN;
 
-constant ::= STRING | NUMBER | BOOL;
-
-variable ::= IDENT;
-
-empty ::=;
+primary_expression ::= IDENT:a					{: RESULT = new PrimaryIdent(a); :}
+		     | STRING:a 				{: RESULT = new PrimaryString(a); :}
+		     | INT:a					{: RESULT = new PrimaryInt(a); :}
+	  	     | FLOAT:a 					{: RESULT = new PrimaryFloat(a); :}
+	  	     | BOOL:a					{: RESULT = new PrimaryBool(a); :};

@@ -53,21 +53,23 @@ package org.supremica.functionblocks.model;
 
 import java.lang.Exception;
 import java.io.StringReader;
+import java.io.FileReader;
 import java.io.Reader;
 import java_cup.runtime.Scanner;
 import java_cup.runtime.Symbol;
-import org.supremica.functionblocks.model.interpreters.st.Lexer;
-import org.supremica.functionblocks.model.interpreters.st.Parser;
+import org.supremica.functionblocks.model.interpreters.st.*;
 
 
 public class ECCondition
 {
 	private String condition = null;
-	private StringReader reader = null;
+	private StringReader stringReader = null;
 	private Lexer lexer = null;
 	private Parser parser = null;
-	
-	private ECCondition(){}
+
+	private Expression abstractSyntax = null;
+
+	private ECCondition() {}
 
 	public ECCondition(String cond)
 	{
@@ -76,21 +78,30 @@ public class ECCondition
 
 	public void setCondition(String cond)
 	{
+	
 		condition = cond;
 
-		reader = new StringReader(condition);
+		stringReader = new StringReader(condition);
 		
-		lexer = new Lexer((Reader) reader);
+		lexer = new Lexer((Reader) stringReader);
 
 		parser = new Parser((Scanner) lexer);
 
+		try 
+		{ 
+			abstractSyntax = (Expression) parser.parse().value; 
+		} 
+		catch(Exception e) 
+		{
+			
+		}
+		
+		new Print(System.out).prExpression(abstractSyntax,0);
 
 	}
 
 	public boolean evaluate(Variables vars)
 	{
-
-		try {parser.parse();} catch(Exception e) {}
 		return true;
 	}
 	

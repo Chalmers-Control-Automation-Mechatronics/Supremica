@@ -79,6 +79,7 @@ public class Resource
 	fbInstance = fbType.createInstance("DummyFBInstance");
 	fbInstance.addEventInputQueue(new EventQueue());
 	fbInstance.queueEvent("DummyEventInput");
+	new ECCondition("TRUE OR var5 OR var4 AND 8= var2 +var3 XOR (7.12 = 7.0 + var1)");
     }
 
     void handleConfigurationRequests()
