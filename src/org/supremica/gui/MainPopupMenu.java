@@ -87,25 +87,21 @@ class MainPopupMenu
 		// menuHandler.add(standardalgos, 0);
 			
 		JMenuItem minimizeItem = new JMenuItem("Minimize");
-
 		menuHandler.add(minimizeItem, 1);
 
 		JMenuItem allAcceptingItem = new JMenuItem("Set all states as accepting");
-
 		menuHandler.add(allAcceptingItem, 1);
 
-		JMenuItem complementItem = new JMenuItem("Automaton complement");
+		JMenuItem stateEnumerator = new JMenuItem(ActionMan.stateEnumerator);
+		menuHandler.add(stateEnumerator, 1);
 
+		JMenuItem complementItem = new JMenuItem("Automaton complement");
 		menuHandler.add(complementItem, 1);
 		
 		JMenuItem languageRestrictor = new JMenuItem(ActionMan.languageRestrictor);
 		menuHandler.add(languageRestrictor, 1);
-
-		JMenuItem stateEnumerator = new JMenuItem(ActionMan.stateEnumerator);
-		menuHandler.add(stateEnumerator, 1);
 		
 		JMenuItem interfaceItem = new JMenuItem("Interface Properties...");
-
 		//menuHandler.add(interfaceItem, 1);
 
 		menuHandler.addSeparator();

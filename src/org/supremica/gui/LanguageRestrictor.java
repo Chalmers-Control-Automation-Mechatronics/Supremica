@@ -37,13 +37,14 @@ class EventNodeRenderer
     {
         super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
         
-        /*
+        /**/
         SupremicaTreeNode eventnode = (SupremicaTreeNode)value;
         if(!eventnode.isEnabled())
         {
-        	setIcon(getDisabledIcon()); // getDisabledIcxon is from JLabel
+        	// setIcon(getDisabledIcon()); // getDisabledIcxon is from JLabel
+        	setEnabled(false);
         }
-		*/
+		/**/
         return this;
     }
 }
@@ -51,6 +52,11 @@ class EventNodeRenderer
 // Need the following: selecting any child ov an EventSubTree, selects the entire subtree
 // A disabled EventSubTree should not be selectable
 // 
+class EventSelectionModel
+	extends DefaultTreeSelectionModel
+{
+}
+
 class ViewerPanel
 	extends JPanel
 {
@@ -77,6 +83,7 @@ class EventsViewerPanel	// compare AlphabetsViewerPanel
 	private void init()
 	{
 		theTree.setCellRenderer(new EventNodeRenderer());
+		theTree.setSelectionModel(new EventSelectionModel());
 		setLayout(new BorderLayout());
 		setPreferredSize(new Dimension(200, 400));
 		add(scrollPanel, BorderLayout.CENTER);		
@@ -167,7 +174,7 @@ class EventsViewerPanel	// compare AlphabetsViewerPanel
 			EventSubTree node = (EventSubTree)enum.nextElement();
 			node.setEnabled(true);
         }
-        revalidate();
+        repaint();
 	}
 	
 	// Go through the tree and make hide those nodes that are not in all automata
@@ -185,7 +192,7 @@ class EventsViewerPanel	// compare AlphabetsViewerPanel
 				node.setEnabled(false);
 			}
         }
-        revalidate();
+        repaint();
 	}
 	
 	public TreePath[] getSelectionPaths()
@@ -358,12 +365,6 @@ class LanguageRestrictorDialog
 				}
 			});
 		}
-		/*  For some reason, this is not the way to do it
-		public void actionPerformed(ActionEvent event)
-		{
-			shutWindow();
-		}
-		*/
 	}
 	
 	private class MoveButton
@@ -502,8 +503,8 @@ class LanguageRestrictorDialog
 		viewMenu.add(viewMenuIntersection);
 
 		// For the moment, until we get the rendering etc fixed
-		viewMenuUnion.setEnabled(false);
-		viewMenuIntersection.setEnabled(false);
+		// viewMenuUnion.setEnabled(false);
+		// viewMenuIntersection.setEnabled(false);
 		
 		// Restrict
 		JMenu restrictMenu = new JMenu("Restrict");
