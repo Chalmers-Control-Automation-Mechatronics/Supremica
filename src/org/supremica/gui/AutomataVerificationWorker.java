@@ -112,8 +112,6 @@ public class AutomataVerificationWorker
 	public void run()
 	{
 		final AutomataVerifier automataVerifier;
-		Date startDate;
-		Date endDate;
 
 		boolean verificationSuccess;
 		String successMessage;
@@ -157,7 +155,7 @@ public class AutomataVerificationWorker
 		{
 			// Non-blocking verification...
 			successMessage = "The system is mutually non-blocking!";
-			failureMessage = "The system might be mutually blocking!";
+			failureMessage = "The system might be mutually blocking.";
 		}
 		else if (verificationOptions.getVerificationType() == VerificationType.LanguageInclusion)
 		{
@@ -170,6 +168,7 @@ public class AutomataVerificationWorker
 			// In language inclusion, not only the currently selected automata are used!
 			theAutomata = workbench.getVisualProjectContainer().getActiveProject();
 
+			/*
 			// Reservation!!
 			JOptionPane.showMessageDialog(workbench.getFrame(),
 										  "Note that the language inclusion check is guaranteed to \n" +
@@ -177,6 +176,7 @@ public class AutomataVerificationWorker
 										  "sets are equal. Also know that this is prefix-closed \n" +
 										  "language verification only.", "Important information!",
 										  JOptionPane.INFORMATION_MESSAGE);
+			*/
 		}
 		else
 		{
@@ -210,14 +210,15 @@ public class AutomataVerificationWorker
 		catch (Exception ex)
 		{
 			requestStop();
-			JOptionPane.showMessageDialog(workbench.getFrame(), ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(workbench.getFrame(), ex.getMessage(), "Error", 
+										  JOptionPane.ERROR_MESSAGE);
 			logger.error(ex.getMessage());
 			logger.debug(ex.getStackTrace());
 			return;
 		}
 
 		// Are further preparations needed?
-		// This can't be done earlier, since the helper must be initialized!
+		// This can't be done earlier, since the helper must be initialized! Ugly.
 	    if (verificationOptions.getVerificationType() == VerificationType.LanguageInclusion)
 		{
 			// Treat the unselected automata as plants (and the rest as supervisors, implicitly)
@@ -235,20 +236,20 @@ public class AutomataVerificationWorker
 		{
 			if (verificationSuccess)
 			{
-				JOptionPane.showMessageDialog(workbench.getFrame(), successMessage, "Good news", JOptionPane.INFORMATION_MESSAGE);
+				JOptionPane.showMessageDialog(workbench.getFrame(), successMessage, "Good news", 
+											  JOptionPane.INFORMATION_MESSAGE);
 			}
 			else
 			{
-				JOptionPane.showMessageDialog(workbench.getFrame(), failureMessage, "Bad news", JOptionPane.INFORMATION_MESSAGE);
+				JOptionPane.showMessageDialog(workbench.getFrame(), failureMessage, "Bad news", 
+											  JOptionPane.INFORMATION_MESSAGE);
 			}
 			automataVerifier.getHelper().displayInfo();
-			// logger.info("Execution completed after " + (endDate.getTime()-startDate.getTime())/1000.0 + " seconds.");
 			logger.info("Execution completed after " + timer.toString());
 		}
 		else
 		{
 			automataVerifier.getHelper().displayInfo();
-			// logger.info("Execution stopped after " + (endDate.getTime()-startDate.getTime())/1000.0 + " seconds.");
 			logger.info("Execution stopped after " + timer.toString());
 		}
 

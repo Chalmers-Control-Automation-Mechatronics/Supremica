@@ -1,4 +1,3 @@
-
 /*
  * Supremica Software License Agreement
  *
@@ -59,7 +58,6 @@ import javax.swing.*;
 interface VerificationPanel
 {
 	void update(VerificationOptions v);
-
 	void regain(VerificationOptions v);
 }
 
@@ -70,34 +68,38 @@ class VerificationDialogStandardPanel
 {
 	private JComboBox verificationTypeBox;
 	private AlgorithmSelector algorithmSelector;
-	private JTextArea nbNote;
+	private JTextArea note;
 	//private JTextArea note;// = new JTextArea("Bananas...");
 
-	//final String[] verificationData = { "Controllability",	// keep them in this order, for God's sake! 
-	//									"Non-blocking",         // No! God has nothing to do with programming!! 
-	//									"Language inclusion" }; // Programming is fate-driven!
-
+	//final String[] verificationData = { "Controllability",  // keep them in this order, for God's sake! 
+	//									"Non-blocking",       // No! God has nothing to do with programming!! 
+	//									"Language inclusion"};// Programming is fate-driven!
 
 	static class AlgorithmSelector
 		extends JComboBox
 	{
-		//final static int MONOLITHIC = 0;
-		//final static int MODULAR = 1;
-		//final static int IDD = 2;
-		//final static String[] algorithmData = { "Monolithic",  "Modular"};
-
 		public AlgorithmSelector()
 		{
 			super(VerificationAlgorithm.toArray());
 		}
-		// Martin: Can you fix this? /Knut
 		public void forceMonolithic()
 		{
-			//removeItemAt(MODULAR);
+			allowAll();
+			removeItem(VerificationAlgorithm.Modular);
+		}
+		public void forceModular()
+		{
+			allowAll();
+			removeItem(VerificationAlgorithm.Monolithic);
 		}
 		public void allowAll()
 		{
-			//addItem(algorithmData[MODULAR]);
+			removeAllItems();
+			Object[] alternatives = VerificationAlgorithm.toArray();
+			for (int i=0; i<alternatives.length; i++)
+			{
+				addItem(alternatives[i]);
+			}
 		}
 	}
 
@@ -108,11 +110,10 @@ class VerificationDialogStandardPanel
 
 		algorithmSelector = new AlgorithmSelector();
 
-		nbNote = new JTextArea("Note:\n" +
-								"Currently, modular non-blocking\n" +
-								"verification is not supported");
-		//nbNote.setBackground(new Color(0,0,0,0)); // transparent
-		nbNote.setBackground(this.getBackground());
+		note = new JTextArea("Note:\n" +
+							 "Currently, modular non-blocking\n" +
+							 "verification is not supported");
+		note.setBackground(this.getBackground());
 
 		Box standardBox = Box.createVerticalBox();
 		standardBox.add(verificationTypeBox);
@@ -126,13 +127,9 @@ class VerificationDialogStandardPanel
 		this.add(choicePanel);
 		JPanel notePanel = new JPanel();
 		notePanel.setLayout(new FlowLayout());
-		notePanel.add(nbNote);
-		this.add(notePanel);
-
-		// OLD TRIES
-		//this.setLayout(new FlowLayout());// this.setLayout(new BorderLayout());
-		//this.add(standardBox);//, BorderLayout.CENTER);
-		//this.add(nbNote);//, BorderLayout.SOUTH);
+		notePanel.add(note);
+		note.setVisible(false);
+		this.add(notePanel);		
 	}
 
 	public void update(VerificationOptions verificationOptions)
@@ -149,19 +146,41 @@ class VerificationDialogStandardPanel
 
 	public void actionPerformed(ActionEvent e)
 	{
-		if((verificationTypeBox.getSelectedItem()) == VerificationType.Nonblocking) // non-blocking
+		if((verificationTypeBox.getSelectedItem()) == VerificationType.Nonblocking)
 		{
 			// force the monolithic algorithm
 			algorithmSelector.forceMonolithic();
-			nbNote.setVisible(true);
+			note.setText("Note:\n" +
+						 "Currently, modular non-blocking\n" +
+						 "verification is not supported.");
+			note.setVisible(true);
 		}
-		else // either controllability or language inclusion selected
+		else if((verificationTypeBox.getSelectedItem()) == VerificationType.MutuallyNonblocking)
+		{
+			// force the modular algorithm
+			algorithmSelector.forceModular();
+			note.setText("Note:\n" +
+						 "Mutual nonblocking is inherently modular\n" +
+						 "and hence there is no monolithic algoritm.");
+			note.setVisible(true);
+		}
+		else if ((verificationTypeBox.getSelectedItem()) == VerificationType.LanguageInclusion)
 		{
 			algorithmSelector.allowAll();
-			nbNote.setVisible(false);
+			note.setText("Note:\n" +
+						 "This verifies whether the language of the selected\n" + 
+						 "automata is included in the inverse projection of\n" +
+						 "the language of the unselected automata.\n" +
+						 "  The alphabet of the selected automata must\n" + 
+						 "include the alphabet of the unselected automata.\n");
+			note.setVisible(true);
+		}
+		else // Something else is selected
+		{
+			algorithmSelector.allowAll();
+			note.setVisible(false);
 		}
 	}
-
 }
 
 class VerificationDialogAdvancedPanel

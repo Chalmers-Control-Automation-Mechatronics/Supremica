@@ -67,7 +67,6 @@ public class SearchStates
 		}
 		catch (Exception excp)
 		{
-
 			// How to work this (exception in a worker thread)??
 			logger.debug(excp.getStackTrace());
 			return;
@@ -134,7 +133,6 @@ public class SearchStates
 
 	public void stopTask()
 	{
-
 		// System.out.println("Stop requested");
 		stopRequested = true;
 
@@ -190,14 +188,13 @@ public class SearchStates
 			// the last element of composite is not used
 			// return index < composite.length - 1;
 
-			// did Knut change this to not use the las two elements??
+			// did Knut change this to not use the last two elements??
 			return index < composite.length - 2;
 			// Yes! He f***ing did. Where else did this break code???
 		}
 
 		public State getState()
 		{
-
 			// get the current state of the current automaton
 			logger.debug("getState index: " + index);
 			logger.debug("getState composite.length: " + composite.length);
@@ -207,7 +204,6 @@ public class SearchStates
 
 		public void inc()
 		{
-
 			// move to the next automaton
 			++index;
 		}

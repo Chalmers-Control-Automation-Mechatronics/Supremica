@@ -70,6 +70,45 @@ public final class SynchronizationOptions
 	private boolean requireConsistentImmediate;
 	private boolean dialogOK = false;
 
+	/*
+	public static final int DEFAULT_SYNCHRONIZATION = 0;
+	public static final int DEFAULT_SYNTHESIS = 0;
+	public static final int DEFAULT_VERIFICATION = 1;
+
+	public SynchronizationOptions getDefaultOptions(int type)
+	{
+		if (type == DEFAULT_SYNCHRONIZATION)
+			return new SynchronizationOptions();
+		else if (type == DEFAULT_SYNTHESIS)
+			return new SynchronizationOptions(SupremicaProperties.syncNbrOfExecuters(),
+											  SynchronizationType.Prioritized,
+											  SupremicaProperties.syncInitialHashtableSize(),
+											  SupremicaProperties.syncExpandHashtable(),
+											  true, // This is the only difference from default!
+											  SupremicaProperties.syncExpandForbiddenStates(),
+											  false,
+											  false,
+											  true,
+											  SupremicaProperties.verboseMode(),
+											  true,
+											  true);
+		else if (type == DEFAULT_VERIFICATION)
+			return new SynchronizationOptions(SupremicaProperties.syncNbrOfExecuters(),
+											  SynchronizationType.Prioritized,
+											  SupremicaProperties.syncInitialHashtableSize(),
+											  SupremicaProperties.syncExpandHashtable(),
+											  SupremicaProperties.syncForbidUncontrollableStates(),
+											  SupremicaProperties.syncExpandForbiddenStates(),
+											  false, 
+											  false, 
+											  false, // This is the only difference from default!
+											  SupremicaProperties.verboseMode(),
+											  true, 
+											  true);
+		
+	}
+	*/
+
 	public SynchronizationOptions()
 		throws IllegalArgumentException
 	{

@@ -85,7 +85,7 @@ class MainPopupMenu
 		menuHandler.add(purgeItem, 1);
 
 		// These are the "standard" algorithms
-		// Submenu stuff won't work here, the menuHandler consept has painted us into a corner
+		// Submenu stuff won't work here, the menuHandler concept has painted us into a corner
 		// ** This has to be reworked ** Use the Action concept instead **
 		// JMenu standardalgos = JMenu("Standard Algorithms");
 		// menuHandler.add(standardalgos, 0);
@@ -100,6 +100,7 @@ class MainPopupMenu
 		menuHandler.add(stateEnumerator, 1);
 
 		JMenuItem complementItem = new JMenuItem("Automaton complement");
+		complementItem.setToolTipText("Generate an automaton with complementary marked language");
 		menuHandler.add(complementItem, 1);
 		
 		// Do this...

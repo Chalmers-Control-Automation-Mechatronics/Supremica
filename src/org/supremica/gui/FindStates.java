@@ -1,4 +1,3 @@
-
 /*
  * Supremica Software License Agreement
  *
@@ -109,7 +108,6 @@ class FindStatesTableModel
 
 	public FindStatesTableModel(Automata a)
 	{
-
 		this.automata = a;
 		//this.comp = c;
 		// this.patterns = new Pattern[a.size()];
@@ -118,7 +116,6 @@ class FindStatesTableModel
 
 		try
 		{	// I know compile _cannot_ throw here, but Java requires me to catch this exception
-
 			for(Iterator it = a.iterator(); it.hasNext(); )
 			{
 				Automaton currAutomaton = (Automaton)it.next();
@@ -1004,7 +1001,6 @@ class FindStatesFrame
 
 		void action(ActionEvent e)
 		{
-
 			// debug("CancelButton disposing");
 			dispose();
 		}
@@ -1018,7 +1014,6 @@ class FindStatesFrame
 
 			if (matcher != null)
 			{
-
 				SearchStates ss;
 				try
 				{
@@ -1035,16 +1030,13 @@ class FindStatesFrame
 				Monitor monitor = new Monitor("Finding states...", "", ss);
 				monitor.startMonitor(this, 0, 1000);
 
-				PresentStates present_states = new PresentStates(this, ss, getAutomata(), theVisualProject);
+				PresentStates present_states = new PresentStates(this, ss, getAutomata(), 
+																 theVisualProject);
 				present_states.start();
-
 			}
-
-			// else do nothing
 		}
 		catch (Exception ex)
 		{
-
 			// Let it silently die, how the f*** do get these excp specs to work?
 			debug("FindButton - " + ex);
 			logger.debug(ex.getStackTrace());

@@ -1163,7 +1163,8 @@ public class ActionMan
 	// ** Synchronize - Threaded version
 	public static void automataSynchronize_actionPerformed(Gui gui)
 	{
-		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
+		// Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
+		Automata selectedAutomata = gui.getSelectedAutomata();
 
 		if (selectedAutomata.size() < 2)
 		{
@@ -1172,8 +1173,8 @@ public class ActionMan
 			return;
 		}
 
+		// Get the default options
 		SynchronizationOptions synchronizationOptions;
-
 		try
 		{
 			synchronizationOptions = new SynchronizationOptions();
@@ -1185,10 +1186,9 @@ public class ActionMan
 			return;
 		}
 
+		// Start a dialog to allow the user changing the options
 		SynchronizationDialog synchronizationDialog = new SynchronizationDialog(gui.getFrame(), synchronizationOptions);
-
 		synchronizationDialog.show();
-
 		if (!synchronizationOptions.getDialogOK())
 		{
 			return;
@@ -1210,25 +1210,24 @@ public class ActionMan
 			}
 		} */
 
-		Automata currAutomata = new Automata();
-		Iterator autIt = selectedAutomata.iterator();
 
+		// Do a sanity check, does all automata have initial states?
+		// There is a method for this, Automata.hasInitialState(), but 
+		// it doesn't tell what automaton breaks the test...
+		Iterator autIt = selectedAutomata.iterator();
 		while (autIt.hasNext())
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
 			String currAutomatonName = currAutomaton.getName();
-
 			if (currAutomaton.getInitialState() == null)
 			{
 				JOptionPane.showMessageDialog(gui.getComponent(), "The automaton " + currAutomatonName + " does not have an initial state!", "Alert", JOptionPane.ERROR_MESSAGE);
-
 				return;
 			}
-
-			currAutomata.addAutomaton(currAutomaton);
 		}
 
-		AutomataSynchronizerWorker worker = new AutomataSynchronizerWorker(gui, currAutomata, "" /* newAutomatonName */, synchronizationOptions);
+		// Start worker thread - perform the task.
+		AutomataSynchronizerWorker worker = new AutomataSynchronizerWorker(gui, selectedAutomata, "" /* newAutomatonName */, synchronizationOptions);
 	}
 
 	// ** Synthesize
@@ -1258,9 +1257,7 @@ public class ActionMan
 
 		if (selectedAutomata.size() > 1)
 		{
-
 			SynchronizationOptions syncOptions;
-
 			try
 			{
 				syncOptions = new SynchronizationOptions(SupremicaProperties.syncNbrOfExecuters(),
@@ -2370,7 +2367,7 @@ public class ActionMan
 
 		try
 		{
-			// Synchronize the automata using default options (this will
+			// Synchronize the automata using default options (prediction will
 			// probably be a problem if there are non-prioritized events)
 			syncOptions = new SynchronizationOptions();
 			outFile = new FileWriter("SynchTable.txt", append);

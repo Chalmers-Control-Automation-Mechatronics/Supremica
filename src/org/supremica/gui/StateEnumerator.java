@@ -22,8 +22,7 @@ public class StateEnumerator
 	public StateEnumerator()
 	{
 		putValue(NAME, "Enumerate States");
-		putValue(SHORT_DESCRIPTION, "Rename states with q0, q1, etc");
-		
+		putValue(SHORT_DESCRIPTION, "Rename states with q0, q1, etc");		
 	}
 	
 	public void actionPerformed(ActionEvent event)

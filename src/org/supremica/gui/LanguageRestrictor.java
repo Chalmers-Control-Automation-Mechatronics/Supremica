@@ -615,8 +615,7 @@ public class LanguageRestrictor
 	public LanguageRestrictor()
 	{
 		putValue(NAME, "Language Restriction");
-		putValue(SHORT_DESCRIPTION, "Restrict the language to a subset of the alphabet");
-		
+		putValue(SHORT_DESCRIPTION, "Restrict the language to a subset of the alphabet");		
 	}
 	
 	public void actionPerformed(ActionEvent event)

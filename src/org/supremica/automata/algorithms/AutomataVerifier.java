@@ -340,7 +340,7 @@ public class AutomataVerifier
 		uncontrollableEventToPlantMap = alphabetAnalyzer.getEventToAutomataMap(inclusionAutomata);
 
 		// This last one is not really good... we'd like to do this only once! Perhaps
-		// a switch in the synchronizeroptions or verificationsptions instead? FIXA!!
+		// a switch in the synchronizeroptions or verificationoptions instead? FIXA!!
 		synchHelper.considerAllEventsUncontrollable();
 	}
 
@@ -436,7 +436,8 @@ public class AutomataVerifier
 								if (selectedAutomata.size() > 1)
 								{
 									// Check module
-									allModulesControllable = allModulesControllable && moduleIsControllable(selectedAutomata);
+									allModulesControllable = allModulesControllable && 
+										moduleIsControllable(selectedAutomata);
 
 									// Stop if uncontrollable
 									if (!allModulesControllable)
@@ -469,7 +470,8 @@ public class AutomataVerifier
 					if (selectedAutomata.size() > 1)
 					{
 						// Check module
-						allModulesControllable = allModulesControllable && moduleIsControllable(selectedAutomata);
+						allModulesControllable = allModulesControllable && 
+							moduleIsControllable(selectedAutomata);
 
 						// Stop if uncontrollable
 						if (!allModulesControllable)
@@ -651,6 +653,7 @@ public class AutomataVerifier
 			}
 		}
 
+		// Was the result uncontrollable?
 		if (!synchHelper.getAutomataIsControllable())
 		{
 			// Try to add some more automata
@@ -669,7 +672,6 @@ public class AutomataVerifier
 
 			// Sort automata in order of similar alphabets
 			int[] similarAutomata = findSimilarAutomata(theAutomata, selectedAutomata);
-
 			if (similarAutomata == null)
 			{
 				// There are no similar automata, this module must be uncontrollable
@@ -694,9 +696,9 @@ public class AutomataVerifier
 
 			stateAmount = 1;
 
+			// Make five attempts on prooving controllability and uncontrollability and then give up
 			for (attempt = 1; attempt <= 5; attempt++)
 			{
-				// Make five attempts on prooving controllability and uncontrollability
 				if (verboseMode)
 				{
 					logger.info("Attempt number " + attempt + ".");
@@ -724,7 +726,8 @@ public class AutomataVerifier
 					{
 						if (verboseMode)
 						{
-							logger.info("All similar automata are already added, no chance for controllability.");
+							logger.info("All similar automata are already added, " + 
+										"no chance for controllability.");
 
 							// Print the uncontrollable state(s)...
 							synchHelper.printUncontrollableStates();
@@ -757,25 +760,18 @@ public class AutomataVerifier
 
 					if (!verificationOptions.getSkipUncontrollabilityCheck())
 					{
-
 						// Try to prove remaining states in the stateMemorizer as beeing uncontrollable
 						if (findUncontrollableStates(automataIndices))
 						{
-
 							// Uncontrollable state found!
 							if (verboseMode)
 							{
-
 								// Print the uncontrollable state(s)...
 								uncontrollabilityCheckHelper.printUncontrollableStates();
 
 								// Print event trace reaching uncontrollable state
 								uncontrollabilityCheckHelper.displayTrace();
-
-								// Print info on amount of states examined
-								// synchHelper.displayInfo(); // This is done always in AutomataVerificationWorker
 							}
-
 							return false;
 						}
 					}
@@ -796,7 +792,6 @@ public class AutomataVerifier
 
 			if (potentiallyUncontrollableStates.size(automataIndices) > 0)
 			{
-
 				// There are still some uncontrollable states that we're not sure as of being either
 				// controllable or uncontrollable. We now have no idea what so ever on the
 				// controllability so... we chicken out and give up.
@@ -934,8 +929,9 @@ public class AutomataVerifier
 	}
 
 	/**
-	 * Compares two alphabets for determining how similar they are in some sense. All events in rightAlphabet are
-	 * examined if they are unique to rightAlphabet or appear in leftAlphabet too.
+	 * Compares two alphabets for determining how similar they are in some sense. 
+	 * All events in rightAlphabet are examined if they are unique to rightAlphabet 
+	 * or appear in leftAlphabet too.
 	 *
 	 *@param  leftAlphabet the alphabet to compare.
 	 *@param  rightAlphabet the alphabet to compare to.
@@ -944,9 +940,8 @@ public class AutomataVerifier
 	private double compareAlphabets(Alphabet leftAlphabet, Alphabet rightAlphabet)
 	{
 		//
-		//
 		// USE Alphabet.nbrOfCommonEvents INSTEAD!!!!
-		//
+		// Naaaah... not the same thing, but this method should be in Alphabet.java
 		//
 
 		int amountOfCommon = 0;
@@ -970,7 +965,6 @@ public class AutomataVerifier
 
 		if (amountOfCommon < 1)
 		{
-			// Perhaps <= 1? Only one event won't do much good?
 			return 0;
 		}
 
@@ -1796,7 +1790,7 @@ public class AutomataVerifier
 	 *
 	 *@return True if non-blocking, false if blocking
 	 *@exception  Exception Description of the Exception
-	 *@see  AutomataSynchronizerExecuter
+	 *@see AutomataSynchronizerExecuter
 	 */
 	private boolean moduleIsNonblocking(Automaton theAutomaton)
 		throws Exception
