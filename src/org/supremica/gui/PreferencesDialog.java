@@ -661,32 +661,47 @@ class BDDPanel
     private PreferencesDialog theDialog = null;
     private JCheckBox showGrow, alterPCG, debugOn,  traceOn, ucOptimistic, nbOptimistic;
     private JCheckBox localSaturation;
-    private JComboBox algorithmFamily, countAlgorithm;
+    private JComboBox algorithmFamily, countAlgorithm, orderingAlgorithm;
     
     public BDDPanel(PreferencesDialog theDialog)
     {
 	// super(new BorderLayout(20,20));
 	// Panel p = new Panel(new GridLayout(5,1));
 	// add(p, BorderLayout.SOUTH);
-	
-	Box p = new Box(BoxLayout.Y_AXIS);
-	add(p, BorderLayout.CENTER);
-
 
 	this.theDialog = theDialog;
 
-	p.add( showGrow = new JCheckBox("Show BDD growth", Options.show_grow) );
-	p.add( alterPCG = new JCheckBox("User is allowed to alter PCG orders", Options.user_alters_PCG) );
-	p.add( traceOn = new JCheckBox("Dump execution trace ", Options.trace_on) );
-	p.add( debugOn = new JCheckBox("Verbose", Options.debug_on) );
-	p.add( localSaturation = new JCheckBox("Locally saturate", Options.local_saturation) );
-	p.add( ucOptimistic = new JCheckBox("Optimisitc on controllability", Options.uc_optimistic));
-	p.add( nbOptimistic = new JCheckBox("Optimisitc on liveness", Options.nb_optimistic));
 
+	JPanel pWest  = new JPanel( new GridLayout(8,2));
+	add(pWest, BorderLayout.WEST);
+
+	pWest.add( showGrow = new JCheckBox("Show BDD growth", Options.show_grow) );
+	pWest.add( alterPCG = new JCheckBox("User is allowed to alter PCG orders", 
+					     Options.user_alters_PCG) );       
+	pWest.add( traceOn = new JCheckBox("Dump execution trace ", Options.trace_on) );
+	pWest.add( debugOn = new JCheckBox("Verbose", Options.debug_on) );
+	pWest.add( localSaturation = new JCheckBox("Locally saturate", Options.local_saturation) );
+	pWest.add( ucOptimistic = new JCheckBox("Optimisitc on controllability", Options.uc_optimistic));
+	pWest.add( nbOptimistic = new JCheckBox("Optimisitc on liveness", Options.nb_optimistic));
+
+       
+	Box p = new Box(BoxLayout.Y_AXIS);
+	add(p, BorderLayout.CENTER);
+
+	JPanel pOrdering = new JPanel();
+	p.add(pOrdering);
 	
-	JPanel pFamily = new JPanel( /* new FlowLayout(FlowLayout.CENTER) */);
-	p.add(pFamily);
-	
+	pOrdering.add( new JLabel("Automata (not BDD) ordering"));
+	pOrdering.add( orderingAlgorithm = new JComboBox());
+
+	orderingAlgorithm.addItem("PCG search");
+	orderingAlgorithm.addItem("Random (!)");
+	orderingAlgorithm.addItem("modified TSP");
+	orderingAlgorithm.setSelectedIndex( Options.ordering_algorithm);
+
+
+	JPanel pFamily = new JPanel();
+	p.add(pFamily);	
 	pFamily.add( new JLabel("Favour algorithm family"));
 	pFamily.add( algorithmFamily = new JComboBox());
 
@@ -697,7 +712,7 @@ class BDDPanel
 	algorithmFamily.setSelectedIndex(Options.algo_family);
 
 
-	JPanel pCount = new JPanel( /* new FlowLayout(FlowLayout.CENTER) */);
+	JPanel pCount = new JPanel();
 	p.add(pCount);
 	
 	pCount.add( new JLabel("State-counting algorithm"));
@@ -708,12 +723,15 @@ class BDDPanel
 	countAlgorithm.addItem("Exact");
 	
 	countAlgorithm.setSelectedIndex( Options.count_algo);
+       
     }
     
     public boolean doApply()
     {
 	Options.algo_family      = algorithmFamily.getSelectedIndex();
 	Options.count_algo       = countAlgorithm.getSelectedIndex();
+	Options.ordering_algorithm  = orderingAlgorithm.getSelectedIndex();
+
 	Options.show_grow        = showGrow.isSelected();
 	Options.user_alters_PCG  = alterPCG.isSelected();
 	Options.uc_optimistic    = ucOptimistic.isSelected();
@@ -721,6 +739,7 @@ class BDDPanel
 	Options.trace_on         = traceOn.isSelected();
 	Options.debug_on         = debugOn.isSelected();
 	Options.local_saturation = localSaturation.isSelected();
+
 
 	SupremicaProperties.updateBDDOptions(true);		
 	return true;
