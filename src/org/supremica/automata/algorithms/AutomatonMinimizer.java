@@ -1,4 +1,3 @@
-
 /*
  *  Supremica Software License Agreement
  *
@@ -419,9 +418,10 @@ class EquivalenceClasses
 	}
 }
 
+// at the moment, this is only for being able to use get/setStateClaa
+// will StateSet do most of the job correctly?
 class EquivalenceClass
-	extends StateSet 	// at the moment, this is only for being able to use get/setStateClaa
-						// will StateSet do most of the job correctly?
+	extends StateSet 	
 {
 	// private LinkedList states = new LinkedList();
 	protected State newState = null;

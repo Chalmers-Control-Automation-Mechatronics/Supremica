@@ -20,7 +20,7 @@ public class PigeonHole {
 		this.holes = holes;
 
 		project = new Project();
-		if(first)
+		// if(first)
 			project.setComment("The Pigeon-Hole Principle (PHP): having n pigeons in m holes, if m < n, " +
 				"then there is at least one hole that contains more than one pigeon. " +
 				"Note that similar situations often arise in reality, for example in a batch system with large buffers. " +
@@ -32,7 +32,7 @@ public class PigeonHole {
 				"To see why this problem is so hard, refer to 'The Intractability of Resolution' by A. Haken. "
 				);
 
-		first = false;
+		// first = false;
 
 		// create events:
 		iEvents = new LabeledEvent[ pigeons * holes ];
@@ -42,8 +42,8 @@ public class PigeonHole {
 		{
 			for (int j = 0; j < holes; j++) 
 			{
-				iEvents[ i + j * pigeons] = new LabeledEvent("I:" + (i+1) + ":" + (j + 1) );
-				lEvents[ i + j * pigeons] = new LabeledEvent("L:" + (i+1) + ":" + (j + 1) );
+				iEvents[ i + j * pigeons] = new LabeledEvent("In:P" + (i+1) + ":H" + (j + 1) );
+				lEvents[ i + j * pigeons] = new LabeledEvent("Out:P" + (i+1) + ":H" + (j + 1) );
 			}
 		}
 
@@ -63,7 +63,7 @@ public class PigeonHole {
 
 			for(int j = 0; j < holes; j++)
 			{
-				State s = new State("P" + (i + 1) + ":" + (j + 1));
+				State s = new State("P" + (i + 1) + ":H" + (j + 1));
 				s.setAccepting(true);
 				p.addState( s);
 				p.addArc(new Arc(s, si, leaveEvent(i, j)));

@@ -166,8 +166,6 @@ public class AutomataToHierarchyToDot
 			pw.println("\trankdir = LR;");
 		}
 
-		pw.println("\tnode [color = black];");
-
 		// Circles?
 		if (withCircles)
 		{

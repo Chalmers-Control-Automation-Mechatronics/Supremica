@@ -16,3 +16,7 @@ något. Man vill ha kvar sin egen sortering så länge man inte ber om nå't annat.
 
 * Man måste ju kunna välja full synkron eller prioriterad synkron för
 prioriterade system! Fixafixa!
+
+* Vore det inte käckt att kunna välja att markeringen efter synkning är "unionen" av markeringarna hos delsystemen? $L^{A||B}_m = L^A_m \cup L^B_m$ (lika alfabeten.
+
+* Wouldn't it be nice if we used the TODO-file more regularly or else removed it completely?

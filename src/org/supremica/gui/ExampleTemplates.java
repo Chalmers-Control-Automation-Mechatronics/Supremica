@@ -58,9 +58,10 @@ public class ExampleTemplates
 	private final TemplateGroup CCSBookExercises = new TemplateGroup(TemplateTypes.CCSBookExercise);
 	private final TemplateGroup CCSCourseAssignments = new TemplateGroup(TemplateTypes.CCSCourseAssignment);
 	private final TemplateGroup CCSCourseAssignmentSolutions = new TemplateGroup(TemplateTypes.CCSCourseAssignmentSolutions);
-	private final TemplateGroup OtherExamples = new TemplateGroup(TemplateTypes.OtherExample);
 	private final TemplateGroup AIPExamples = new TemplateGroup(TemplateTypes.AIPExample);
+	private final TemplateGroup CentralLockExamples = new TemplateGroup(TemplateTypes.CentralLockExample);
 	private final TemplateGroup OperatorSupervisorExamples = new TemplateGroup(TemplateTypes.OperatorSupervisorExample);
+	private final TemplateGroup OtherExamples = new TemplateGroup(TemplateTypes.OtherExample);
 	//private final TemplateGroup StandardComponents = new TemplateGroup(TemplateTypes.StandardComponent);
 	private static final String extraPrefix = "/includeInJarFile";
 	private List allGroups = new LinkedList();
@@ -76,9 +77,10 @@ public class ExampleTemplates
 		initializeCCSBookExercises();
 		initializeCCSCourseAssignments();
 		//initializeCCSCourseAssignmentSolutions();
-		initializeOtherExamples();
+		initializeCentralLockExamples();
 		initializeAIPExamples();
 		initializeOperatorSupervisorExamples();
+		initializeOtherExamples();
 		//initializeStandardComponents();
 	}
 
@@ -154,7 +156,7 @@ public class ExampleTemplates
 
 		String prefix = extraPrefix + "/OtherExamples/";
 
-		thisGroup.addItem(new TemplateItem("Central locking system - 3 doors", prefix + "centralLocking3Doors.xml"));
+		//thisGroup.addItem(new TemplateItem("Central locking system - 3 doors", prefix + "centralLocking3Doors.xml"));
 		thisGroup.addItem(new TemplateItem("Flexible manufacturing system", prefix + "flexibleManufacturingSystem.xml"));
 		thisGroup.addItem(new TemplateItem("Robot assembly cell", prefix + "robotAssemblyCell.xml"));
 		thisGroup.addItem(new TemplateItem("Flexible manufacuring cell", prefix + "flexibleManufacturingCell.xml"));
@@ -192,6 +194,24 @@ public class ExampleTemplates
 		thisGroup.addItem(new TemplateItem("AIP System 6 - System 6", prefix + "aip/System6_system6.xml"));
 		thisGroup.addItem(new TemplateItem("AIP System 7 - System 7", prefix + "aip/System7_system7.xml"));
 		thisGroup.addItem(new TemplateItem("AIP System 7 - Top TU 4", prefix + "aip/System7_Top_TU4.xml"));
+	}
+
+	private void initializeCentralLockExamples()
+	{
+		TemplateGroup thisGroup = CentralLockExamples;
+		allGroups.add(thisGroup);
+
+		String prefix = extraPrefix + "/OtherExamples/";
+
+		thisGroup.addItem(new TemplateItem("Central Lock - 3 Doors", prefix + "centralLock/verriegel3.xml"));
+		thisGroup.addItem(new TemplateItem("Central Lock - 3 Doors - Uncontrollable", prefix + "centralLock/verriegel3_uncontrollable.xml"));
+		thisGroup.addItem(new TemplateItem("Central Lock - 3 Doors - Language Inclusion", prefix + "centralLock/verriegel3_language_inclusion.xml"));
+		thisGroup.addItem(new TemplateItem("Central Lock - 3 Doors - Language Exclusion", prefix + "centralLock/verriegel3_language_exclusion.xml"));
+		thisGroup.addItem(new TemplateItem("Central Lock - 3 Doors - Synchronized Plants", prefix + "centralLock/verriegel3_joint.xml"));
+		thisGroup.addItem(new TemplateItem("Central Lock - 3 Doors - Synchronized Plants Uncontrollable", prefix + "centralLock/verriegel3_joint_uncontrollable.xml"));
+		thisGroup.addItem(new TemplateItem("Central Lock - 4 Doors", prefix + "centralLock/verriegel4.xml"));
+		thisGroup.addItem(new TemplateItem("Central Lock - 4 Doors - Language Inclusion", prefix + "centralLock/verriegel4_language_inclusion.xml"));
+		thisGroup.addItem(new TemplateItem("Central Lock - 4 Doors - Language Exclusion", prefix + "centralLock/verriegel4_language_exclusion.xml"));
 	}
 
 	private void initializeOperatorSupervisorExamples()

@@ -187,7 +187,6 @@ public final class AutomataSynchronizerExecuter
 		coExecuter = helper.getCoExecuter();
 		executerRendezvous = helper.getExecuterRendezvous();
 
-
 		// Indexform parameters
 		indexForm = helper.getAutomataIndexForm();
 		nextStateTable = indexForm.getNextStateTable();

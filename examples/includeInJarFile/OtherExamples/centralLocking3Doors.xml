@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Automata name="Central Lock 3 Doors" comment="This is a model of a central lock in a BMW. The automata are imported from VALID but originally appeared as a result of the KorSys project. The systems is both controllable and non-blocking.">
+<Automata name="Central Lock 3 Doors" comment="This is a model of a central lock in a BMW. The automata are imported from VALID but originally appeared as a result of the KorSys project. The system is both controllable and nonblocking. If the automaton 'noreset.WSP' is removed, the system is blocking. Variants of this system with other types of verification can be found in 'Supremica\examples\central_locking'.">
 <Automaton name="mvr.HT" type="Plant">
 	<Events>
 		<Event id="MVR_an.TUER" label="MVR_an.HT"/>
