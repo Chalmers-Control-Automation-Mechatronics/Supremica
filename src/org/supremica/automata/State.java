@@ -746,7 +746,6 @@ public class State
 		accumulatedCost = prevState.getAccumulatedCost() + prevState.getCost(); 
 	}
 
-		
 	/**
 	 *	Returns an exact copy of this State. 
 	 */
