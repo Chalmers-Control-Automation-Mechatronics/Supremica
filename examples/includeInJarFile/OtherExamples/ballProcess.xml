@@ -89,14 +89,14 @@
 			<Event id="em.elevator.release_station" label="em.elevator.release_station" controllable="true" prioritized="true" />	
 			<Event id="em.go_up" label="em.go_up" controllable="true" prioritized="true" />
 			<Event id="em.is_up" label="em.is_up" controllable="false" prioritized="true" />
-			<Event id="em.timer.measure.start" label="em.timer.measure.start" controllable="true" prioritized="true" />
-			<Event id="em.timer.measure.timeout" label="em.timer.measure.timeout" controllable="false" prioritized="true" />
+			<Event id="em.timer.before_ballcheck.start" label="em.timer.before_ballcheck.start" controllable="true" prioritized="true" />
+			<Event id="em.timer.before_ballcheck.timeout" label="em.timer.before_ballcheck.timeout" controllable="false" prioritized="true" />
 			<Event id="em.measure.has_ball" label="em.measure.has_ball" controllable="false" prioritized="true" />
+			<Event id="em.measure.has_no_ball" label="em.measure.has_no_ball" controllable="false" prioritized="true" />
 			<Event id="em.request_measure" label="em.request_measure" controllable="true" prioritized="true" />
 			<Event id="em.request_putter" label="em.request_putter" controllable="true" prioritized="true" />			
 			<Event id="em.ball_out_of_measure_station" label="em.ball_out_of_measure_station" controllable="false" prioritized="true" />
 			<Event id="em.go_down" label="em.go_down" controllable="true" prioritized="true" />
-			<Event id="em.measure.has_no_ball" label="em.measure.has_no_ball" controllable="false" prioritized="true" />
 		</Events>
 		<States>
 			<State id="q_0" initial="true" accepting="true" />
@@ -116,7 +116,6 @@
 			<State id="q_12_1" />
 			<State id="q_12" />
 			<State id="q_13" />
-			<State id="q_14" />			
 		</States>
 		<Transitions>
 			<Transition event="em.start" source="q_0" dest="q_0_1" />		
@@ -127,17 +126,16 @@
 			<Transition event="em.go_up" source="q_3" dest="q_4" />
 			<Transition event="em.is_up" source="q_4" dest="q_5_1" />
 			<Transition event="em.elevator.release_station" source="q_5_1" dest="q_5" />						
-			<Transition event="em.timer.measure.start" source="q_5" dest="q_6" />
-			<Transition event="em.timer.measure.timeout" source="q_6" dest="q_7" />
+			<Transition event="em.timer.before_ballcheck.start" source="q_5" dest="q_6" />
+			<Transition event="em.timer.before_ballcheck.timeout" source="q_6" dest="q_7" />
 			<Transition event="em.measure.has_ball" source="q_7" dest="q_8" />
+			<Transition event="em.measure.has_no_ball" source="q_7" dest="q_12" />			
 			<Transition event="em.request_measure" source="q_8" dest="q_9" />
 			<Transition event="em.request_putter" source="q_9" dest="q_11" />
 			<Transition event="em.ball_out_of_measure_station" source="q_11" dest="q_12_1" />
 			<Transition event="em.elevator.allocate_station" source="q_12_1" dest="q_12" />						
 			<Transition event="em.go_down" source="q_12" dest="q_13" />
-			<Transition event="em.elevator.release_station" source="q_14" dest="q_0" />			
-			<Transition event="em.elevator.release_station" source="q_5_1" dest="q_5" />									
-			<Transition event="em.measure.has_no_ball" source="q_7" dest="q_12" />
+			<Transition event="em.elevator.release_station" source="q_13" dest="q_0" />			
 		</Transitions>
 	</Automaton>
 
@@ -149,17 +147,20 @@
 		<Events>
 			<Event id="em.is_down" label="em.is_down" controllable="false" prioritized="true" />
 			<Event id="gk.release_ball" label="gk.release_ball" controllable="true" prioritized="true" />
+			<Event id="em.start" label="em.start" controllable="true" prioritized="true" />			
 			<Event id="em.is_up" label="em.is_up" controllable="false" prioritized="true" />
 		</Events>
 		<States>
 			<State id="q_0" initial="true" accepting="true" />
 			<State id="q_1" />
 			<State id="q_2" />
+			<State id="q_3" />
 		</States>
 		<Transitions>
 			<Transition event="em.is_down" source="q_0" dest="q_1" />
 			<Transition event="gk.release_ball" source="q_1" dest="q_2" />
-			<Transition event="em.is_up" source="q_2" dest="q_0" />
+			<Transition event="em.start" source="q_2" dest="q_3" />
+			<Transition event="em.is_up" source="q_3" dest="q_0" />
 		</Transitions>
 	</Automaton>	
 
@@ -268,7 +269,7 @@
 			<Event id="e5" label="gk.in.is_out" />
 			<Event id="e6" label="gk.out.is_in" />
 			<Event id="e7" label="gk.out.is_out" />
-			<!-- <Event id="e8" label="button.automatic.pressed" /> -->
+			<Event id="e8" label="button.automatic.pressed" />
 		</Events>
 		<States>
 			<State id="q_0" name="dummy" initial="true" accepting="true" />
@@ -280,7 +281,7 @@
 	<!-- -->
 	<!-- Extended plants -->
 	<!-- -->
-<!--
+
 	<Automaton name="Extended Plant: GK and EM" type="Plant">
 		<Events>
 			<Event id="gk.release_ball" label="gk.release_ball" controllable="true" prioritized="true" />
