@@ -96,7 +96,7 @@ public class AboutBox
 			e.printStackTrace();
 		}
 
-		// imageControl1.setIcon(imageIcon);
+		imageControl1.setIcon(imageIcon);
 		pack();
 	}
 
@@ -104,7 +104,7 @@ public class AboutBox
 		throws Exception
 	{
 
-		// imageIcon = new ImageIcon(getClass().getResource("/splash.gif"));
+		imageIcon = new ImageIcon(getClass().getResource("/icons/Supremica.gif"));
 		this.setTitle("About");
 		setResizable(false);
 		panel1.setLayout(borderLayout1);
