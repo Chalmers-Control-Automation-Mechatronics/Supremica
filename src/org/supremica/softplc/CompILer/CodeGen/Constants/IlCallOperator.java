@@ -6,7 +6,10 @@
 package org.supremica.softplc.CompILer.CodeGen.Constants;
 
 import java.util.*;
-
+/**
+ * constants representing the different IL call operators
+ * @author Anders Röding
+ */
 public class IlCallOperator
 {
 	private static List theInstructions = new ArrayList();

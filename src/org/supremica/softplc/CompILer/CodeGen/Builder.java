@@ -5,10 +5,9 @@ import org.supremica.softplc.CompILer.CodeGen.Constants.*;
 import de.fub.bytecode.generic.*;
 
 /**
- * Interface describing an entity for generating java byte code from different IL (IEC 6-1131)
- * statements.
+ * Interface describing an entity for generating java byte code from 
+ * different IL (IEC 6-1131) statements.
  * 
- *
  * @author Anders Röding
  */
 public interface Builder
@@ -59,14 +58,14 @@ public interface Builder
 	/**
 	 * the middle part of generating code for an IL function block call.
 	 *
-	 * @see #emitIL_FB_CALL_start
+	 * @see {@link #emitIL_FB_CALL_start}
 	 */
 	void emitIL_FB_CALL_Run(String fbName, String fbTypeName);
 
 	/**
 	 * the last part of generating code for an IL function block call.
 	 * 
-	 * @see #emitIL_FB_CALL_start
+	 * @see {@link #emitIL_FB_CALL_start}
 	 */
 	void emitIL_FB_CALL_End(BranchInstruction callCondition);
 

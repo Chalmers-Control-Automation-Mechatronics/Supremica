@@ -1119,21 +1119,6 @@ public class JavaBytecodeGenerator
 	return op;
     }
 
-    /*XXX    public Object visitIL_CALL_JAVA_OPERATOR(ASTil_call_java_operator n, Object o)
-    {
-	debug(n.toString());
-	//XXX
-	// IlCallOperator op = IlCallOperator.CAL; //dummy init
-	// try {op = IlCallOperator.getOperator(n.getName());}
-	// catch (IllegalOperatorException e) {
-	// System.err.println("Illegal call operator: " +n.getName());
-	// return null;
-	// }
-	return null;    // op;
-    }
-    */
-
-
     /**
      * handles all that happens when visiting the node n while traversing the syntax tree.
      * @param n an ASTil_operand_list node

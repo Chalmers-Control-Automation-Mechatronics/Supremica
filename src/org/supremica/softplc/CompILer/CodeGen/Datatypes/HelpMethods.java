@@ -1,13 +1,19 @@
+package org.supremica.softplc.CompILer.CodeGen.Datatypes;
+import java.util.*;
 
 /**HelpMethods provides users of this package for IEC 6-1131-3 dataypes
  * with general methods, e.g. parsing
+ * @see "Chapter 2.3 Datatypes in Programming industrial control
+ *       systems using IEC 1131-3 by R. W. Lewis. ISBN: 0 85296 827 2"
+ * @author Anders Röding
+ * @author Thomas Isaksson
  */
-package org.supremica.softplc.CompILer.CodeGen.Datatypes;
-
-import java.util.*;
-
 public class HelpMethods
 {
+	/** parses a string and returns a TypeBOOL object
+	 * @param s string to parse
+	 * @return boolean value wrapped into a TypeBOOL
+	 */
 	public static TypeBOOL parseBOOL(String s)
 	{
 		StringTokenizer tokens = new StringTokenizer(s, "#", false);
@@ -39,6 +45,10 @@ public class HelpMethods
 		}
 	}
 
+	/** parses a type constant like "BOOL" etc.
+	 * @param s string to parse
+	 * @return a type constant
+	 */
 	public static TypeConstant parseTypeConstants(String s)
 	{
 		if (s.equals("BOOL"))
@@ -133,6 +143,10 @@ public class HelpMethods
 		return null;
 	}
 
+	/** parses a numeric value
+	 * @param s string to parse
+	 * @return an object representing the parsed value
+	 */
 	public static TypeANY_NUM parseANY_NUM(String s)
 	{
 		StringTokenizer tokens = new StringTokenizer(s, "#", false);

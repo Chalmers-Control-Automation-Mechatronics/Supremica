@@ -8,7 +8,7 @@ package org.supremica.softplc.CompILer.CodeGen.IEC_Interfaces;
  */
 public interface IEC_FunctionBlock
 {
-	/**run is used for il CAL operations of this kind ie.
+	/**run is used for il CAL operations of (at least) three kinds:
 	 *   var
 	 *      neg : fb;
 	 *      a,b : BOOL;
@@ -18,8 +18,7 @@ public interface IEC_FunctionBlock
 	 *   CAL neg
 	 *   LD neg.outputvariable1
 	 *   ST a
-
-	 * and of this kind
+	 *
 	 *   var
 	 *      neg : fb;
 	 *      a,b : BOOL;
@@ -27,6 +26,15 @@ public interface IEC_FunctionBlock
 	 *   LD TRUE
 	 *   ST a
 	 *   CAL neg(inputvariable1 := a, outputvariable2 => b)
+	 *
+	 *
+	 *   var
+	 *      neg : fb;
+	 *      a,b : BOOL;
+	 *   end_var
+	 *   LD TRUE
+	 *   ST a
+	 *   CAL neg(a, b)
 	 */
 	void run();
 }
