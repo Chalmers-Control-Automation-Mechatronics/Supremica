@@ -81,22 +81,53 @@ public class BDDAutomata
 
 		// lets change the state encoding now:
 		Encoding enc = EncodingFactory.getEncoder();
-
+		size_states = 0;
 		for (Enumeration e = v.elements(); e.hasMoreElements(); )
 		{
 			Automaton automaton = (Automaton) e.nextElement();
 
 			enc.encode(automaton);
+			size_states += automaton.getStateVectorSize();
 		}
 
-		// first we create all automata  ...
+
+
+		// first, we create all the variables
+		int[] tmp1 = new int[size_states];	// S
+		int[] tmp2 = new int[size_states];	// S'
+		int[] tmp3 = new int[size_states];	// S''
+
+		if(Options.interleaved_variables)
+		{
+			for (int i = 0; i < size_states; i++)
+			{
+				tmp1[i] = createBDD();
+				tmp2[i] = createBDD();
+				tmp3[i] = createBDD();
+			}
+		}
+		else
+		{
+			for (int i = 0; i < size_states; i++)	tmp1[i] = createBDD();
+			for (int i = 0; i < size_states; i++)	tmp2[i] = createBDD();
+			for (int i = 0; i < size_states; i++)	tmp3[i] = createBDD();
+		}
+
+		// and create global S->S' and S'->S permutations
+		permute_s2sp = createPair(tmp1, tmp2);
+		permute_sp2s = createPair(tmp2, tmp1);
+		permute_spp2sp = createPair(tmp3, tmp2);
+		permute_sp2spp = createPair(tmp2, tmp3);
+
+		// then we create all automata  ...
 		int i = 0;
 
 		size_states = 0;
 
 		for (Enumeration e = v.elements(); e.hasMoreElements(); )
 		{
-			automata[i] = new BDDAutomaton(this, (Automaton) e.nextElement(), i);
+			// automata[i] = new BDDAutomaton(this, (Automaton) e.nextElement(), i);
+			automata[i] = new BDDAutomaton(this, (Automaton) e.nextElement(), i, tmp1, tmp2, tmp3, size_states);
 			size_states += automata[i].getNumStateBits();
 
 			i++;
@@ -221,26 +252,7 @@ public class BDDAutomata
 		bdd_events = or(bdd_events_c, bdd_events_u);
 		has_events = true;
 
-		// ---------------------------------------- create global S->S' and S'->S permutations
-		int[] tmp1 = new int[size_states];
-		int[] tmp2 = new int[size_states];
-		int[] tmp3 = new int[size_states];
 
-		for (int i = 0; i < size_states; i++)
-		{
-			tmp1[i] = getBDD(i * 3);    // S[i]
-			tmp2[i] = getBDD(i * 3 + 1);    // S´[i]
-			tmp3[i] = getBDD(i * 3 + 2);    // S´'[i]
-		}
-
-		permute_s2sp = createPair(tmp1, tmp2);
-		permute_sp2s = createPair(tmp2, tmp1);
-		permute_spp2sp = createPair(tmp3, tmp2);
-		permute_sp2spp = createPair(tmp2, tmp3);
-
-		// Options.out.println("cube_s   -> " + internal_refcount(cube_s));
-		// Options.out.println("cube_s'  -> " + internal_refcount(cube_sp));
-		// Options.out.println("cube_s'' -> " + internal_refcount(cube_spp));
 		size_all = 3 * size_states + size_events;
 	}
 

@@ -34,7 +34,7 @@ public class BDDAutomaton
 
 	/** used by other algos */
 
-	public BDDAutomaton(BDDAutomata manager, Automaton a, int index)
+	public BDDAutomaton(BDDAutomata manager, Automaton a, int index, int [] bdd1, int [] bdd2, int [] bdd3, int offset)
 	{
 		this.manager = manager;
 		this.automaton = a;
@@ -47,23 +47,28 @@ public class BDDAutomaton
 		var_s = new int[num_bits];
 		var_sp = new int[num_bits];
 		var_spp = new int[num_bits];
-		bdd_keep = manager.getOne();
 
-		manager.ref(bdd_keep);
 
+		// copy the variables from the state vectors
 		for (int i = 0; i < num_bits; i++)
 		{
-			var_s[i] = manager.createBDD();
-			var_sp[i] = manager.createBDD();
-			var_spp[i] = manager.createBDD();
+			var_s[i] = bdd1[i + offset];
+			var_sp[i] = bdd2[i + offset];
+			var_spp[i] = bdd3[i + offset];
+		}
 
+
+		// get the "keep" constraint for this automaton
+		bdd_keep = manager.ref( manager.getOne() );
+		for (int i = 0; i < num_bits; i++)
+		{
 			int equal = manager.biimp(var_s[i], var_sp[i]);
-
 			bdd_keep = manager.andTo(bdd_keep, equal);
+			manager.deref(equal);
 		}
 
 		index_first_bdd = manager.internal_index(var_s[0]);
-		index_last_bdd = manager.internal_index(var_spp[num_bits - 1]);
+		index_last_bdd = manager.internal_index(var_spp[num_bits - 1]); // this also holds for the seperated order
 	}
 
 	/**
@@ -75,6 +80,7 @@ public class BDDAutomaton
 		cube_s = manager.makeSet(var_s, num_bits);
 		cube_sp = manager.makeSet(var_sp, num_bits);
 		cube_spp = manager.makeSet(var_spp, num_bits);
+
 
 		// precalculate STATE -> BDD map
 		bdd_m = manager.getZero();

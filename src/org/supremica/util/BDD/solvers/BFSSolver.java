@@ -5,9 +5,17 @@ import org.supremica.util.BDD.*;
 /**
  * breadth first ordering
  *
- * XXX: we must test if traversing the nodes w.r.t weights  order really helps?
  *
+ *
+ *
+ * <p>
+ * ok, we saw some problems in this ordering.
+ * it works bad when the model is too complex. the reachable-set bdd becomes too large.
+ * on the other hand, it works great when it comes to smaller or less complex system,
+ * SPECIALLY the type of subsystems we see in a modular or incremental computation.
  */
+
+// XXX: we must test if traversing the nodes w.r.t weights  order really helps?
 public class BFSSolver
 	extends Solver
 {
@@ -105,6 +113,11 @@ public class BFSSolver
 
 			if (cost < best_cost)
 			{
+
+				// XXX: this is the correct version
+				// best_cost = cost;
+
+				// XXX: this is the version that we will use
 				best_cost = 0;
 
 				for (int i = 0; i < size; i++)

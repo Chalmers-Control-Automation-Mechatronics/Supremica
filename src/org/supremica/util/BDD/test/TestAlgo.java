@@ -82,11 +82,11 @@ public class TestAlgo
 	};
 
 	// ----------------------------------------------------------------------------------
-	private static int find_AGV()
+	private static int find(String file)
 	{
 		for(int i = 0; i < TEST_FILES.length; i++)
 		{
-			if(TEST_FILES[i].indexOf("agv.xml") != -1)
+			if(TEST_FILES[i].indexOf(file) != -1)
 			{
 				return i;
 			}
@@ -133,6 +133,7 @@ public class TestAlgo
 		System.err.println("Reachability family: " + Options.REACH_ALGO_NAMES[Options.algo_family]);
 		System.err.println("Encoding algo: " + Options.ENCODING_NAMES[Options.encoding_algorithm]);
 		System.err.println("Ordering algo: " + Options.ORDERING_ALGORITHM_NAMES[Options.ordering_algorithm]);
+		if(!Options.interleaved_variables)	System.err.println("Using SEPARATED ordering!");
 		System.err.println();
 		System.exit(20);    // comment out to allow ALL tests to run before stopped
 
@@ -399,7 +400,8 @@ public class TestAlgo
 		fail = pass = 0;
 
 		// we will use AGV in this experiment
-		int agv = find_AGV();
+		int agv = find("agv.xml");
+		int catmouse = find("catmouse.xml");
 
 
 		for (int k = 0; k < 4; k++)
@@ -483,6 +485,33 @@ public class TestAlgo
 
 			Options.ordering_algorithm = save_ordering;
 		}
+
+
+
+		// test the interleaved/separated ordering
+		System.out.println("\n***** Testing interleaved & separated ordering, using catmouse");
+		boolean save_int = Options.interleaved_variables;
+
+		for(int i = 0; i < 2; i++) {
+			Options.interleaved_variables = (i == 0);
+			load(TEST_FILES[catmouse]);
+			adjust(Options.interleaved_variables ? "interleaved" : "separated", 40);
+
+			testR(reachables[catmouse]);
+			testCR(coreachables[catmouse]);
+
+			verifier.cleanup();
+
+			if (Options.interleaved_variables == save_int)
+			{
+				System.out.print("   (DEFAULT) ");
+			}
+			System.out.println();
+
+		}
+
+		Options.interleaved_variables = save_int;
+
 
 
 
@@ -650,6 +679,9 @@ public class TestAlgo
 
 /*
  $Log: not supported by cvs2svn $
+ Revision 1.21  2004/08/20 14:48:42  vahidi
+ the ordering algorithms now use quick-sort if needed.
+
  Revision 1.20  2004/08/10 15:20:23  vahidi
  Finally rewrote DisjOptimizer and added optimization to some search functions
  (not yet workset)

@@ -13,6 +13,7 @@ public abstract class Solver
 {
 	protected int size;
 	protected Node[] org, solved;
+
 	private double [] internal_weight; /** for internal sorting */
 	private Node [] internal_object; /** for internal sorting */
 
@@ -26,6 +27,15 @@ public abstract class Solver
 		this.internal_weight = new double[size];
 
 		solve();
+
+		if(Options.profile_on)
+		{
+			int [] order = new int[size];
+			for(int i = 0; i < order.length; i++) order[i] = solved[i].index;
+
+			double cost = totalCost(order);
+			Options.out.println("--> [Solver] ordering cost = " + cost);
+		}
 	}
 
 	public Node[] getShortestPath()
@@ -42,6 +52,8 @@ public abstract class Solver
 		return Math.pow(org[from].wlocal[to], Math.log(1 + Math.abs(distance)));
 
 		// return org[from].wlocal[to] * Math.abs(distance); // <-- not that powerful
+
+		// return Math.pow( org[from].wlocal[to] * Math.abs(distance), 1.5);
 	}
 
 	protected double totalCost(int[] order)

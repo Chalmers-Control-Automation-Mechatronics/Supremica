@@ -1000,7 +1000,7 @@ class BDDPanel2
 					  orderingAlgorithm, encodingAlgorithm;
 	private JCheckBox cReorderDynamic, cReorderBuild, cReorderGroup;
 	private JCheckBox localSaturation, encodingFill,  cReorderGroupFree;
-	private JCheckBox burstMode;
+	private JCheckBox burstMode, cInterleavedVariables;
 	private JTextField extraLibDir;
 
 	public BDDPanel2(PreferencesDialog theDialog)
@@ -1013,13 +1013,14 @@ class BDDPanel2
 		add(pLeft, BorderLayout.WEST);
 
 		// TOP LEFT
-		JPanel pTopLeft = new JPanel(new GridLayout(5, 1));
+		JPanel pTopLeft = new JPanel(new GridLayout(6, 1));
 
 		pLeft.add(pTopLeft, BorderLayout.NORTH);
 
-		BDDPanel1.addCaption(pTopLeft, "Automata to BDD conversion");
+		BDDPanel1.addCaption(pTopLeft, "Static variable ordering");
 		orderingAlgorithm = BDDPanel1.addCombo(pTopLeft,"Automaton ordering", Options.ORDERING_ALGORITHM_NAMES, Options.ordering_algorithm);
 		encodingAlgorithm = BDDPanel1.addCombo(pTopLeft,"State encoding", Options.ENCODING_NAMES, Options.encoding_algorithm);
+		pTopLeft.add(cInterleavedVariables = new JCheckBox("Interleaved ordering (separated otherwise, SLOW!)", Options.interleaved_variables));
 
 
 		BDDPanel1.addCaption(pTopLeft, "Dynamic variable ordering (NOT recommended)");
@@ -1076,6 +1077,7 @@ class BDDPanel2
 		Options.extraLibPath = extraLibDir.getText();
 		Options.reorder_algo = cbReordering.getSelectedIndex();
 		Options.reorder_dyanmic = cReorderDynamic.isSelected();
+		Options.interleaved_variables = cInterleavedVariables.isSelected();
 		Options.reorder_after_build = cReorderBuild.isSelected();
 		Options.reorder_with_groups = cReorderGroup.isSelected();
 		Options.reorder_within_group = cReorderGroupFree.isSelected();

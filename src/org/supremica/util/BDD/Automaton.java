@@ -98,6 +98,7 @@ public class Automaton
 		}
 	}
 
+
 	// ------------------------------------------------------------
 
 	/** returns the supremica-automata this object was built from */
@@ -373,9 +374,21 @@ public class Automaton
 		{
 			if ((e1s[i] != null) && (e2s[i] != null))
 			{
+
 				if ((e1s[i].use > 0) && (e2s[i].use > 0))
 				{
 					ret += (e1s[i].use + e2s[i].use);
+				}
+					else
+				{
+					/*
+					// We can do it this way, but it will hurt the variable ordering:
+					// the event is in the alphabet but not used. what do we do now
+					int use = Math.max( e1s[i].use, e2s[i].use);
+					if(use > 0) use *= 2; // one of them has it
+					else use = this.getStatesSize() + other.getStatesSize(); // none of them has it :)
+					ret += use;
+					*/
 				}
 			}
 		}

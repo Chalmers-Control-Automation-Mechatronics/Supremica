@@ -152,7 +152,6 @@ public class OrderingSolver
 		case Options.AO_HEURISTIC_TSP_SIFT :
 			sol = new SiftTCPSolver(nods);
 			break;
-
 		default :
 			System.err.println("[INTERNAL] unknown ordering-solver!");
 		}
