@@ -4,7 +4,14 @@ package org.supremica.util.BDD;
  * This is the set of all transitions for a single event, that is, if the event is 'my_event'
  * T(q, q') = { <q,q'> |  delta(q, myevent) = q' }
  *
+ * <p>
+ * note that unlike the dependency sets and the workset algorithm, we keep the disjunctive transition and
+ * its "keep" separated. "keep" is realized by the modified S->S' permutation
+ *
+ * <p>
+ * we can also join two such objects, and then it represents more than a single transitions
  */
+
 public class PerEventTransition
 {
 	private BDDAutomata manager;
@@ -71,22 +78,19 @@ public class PerEventTransition
 
 
 				// get flow for this automata
-				boolean[] f1 = all[i].getEventFlow(true);
-				boolean[] f2 = all[i].getEventFlow(false);
+				int [][] flow = all[i].getEventFlowMatrix();
 
-
-				for (int j = 0; j < ec; j++)
-				{
-					if (f1[j])
+				for(int j = 0; j < event_list.length; j++) {
+					for (int k = 0; k < ec; k++)
 					{
-						next_event[j]++;
-					}
-
-					if (f2[j])
-					{
-						prev_event[j]++;
+						int event = event_list[j];
+						if(event != i) {
+							next_event[k] += flow[event][k];
+							prev_event[k] += flow[k][event];
+						}
 					}
 				}
+
 
 
 				// see if one is moving but the other one is not:
@@ -204,22 +208,13 @@ public class PerEventTransition
 				// update T
 				tmp = manager.andTo(tmp, all[j].getTpri());
 
-				// get flow
-				boolean[] f1 = all[j].getEventFlow(true);
-				boolean[] f2 = all[j].getEventFlow(false);
-
+				int [][] flow = all[j].getEventFlowMatrix();
 				for (int i = 0; i < ec; i++)
 				{
-					if (f1[i])
-					{
-						next_event[i]++;
-					}
-
-					if (f2[i])
-					{
-						prev_event[i]++;
-					}
+					next_event[i] += flow[event][i];
+					prev_event[i] += flow[i][event];
 				}
+
 			}
 			else
 			{
@@ -265,6 +260,7 @@ public class PerEventTransition
 		// count it!
 		next_events = ec - Util.countEQ(next_event, 0);
 		prev_events = ec - Util.countEQ(prev_event, 0);
+
 	}
 
 	public void cleanup()
@@ -476,6 +472,49 @@ public class PerEventTransition
 		{
 			perm[ event_list[i] ] = my_id;
 		}
+	}
+
+	// -----------------------------------------------------------------------------------
+	/**
+	 * estimate the cost of joining these two transition systems
+	 *
+	 * <p>
+	 * how we do it is not well-defined yet.
+	 * for now, we just focus on the size of the automata-cover
+	 *
+	 */
+	public static double estimateJoinCost(PerEventTransition p1, PerEventTransition p2)
+	{
+		double ret = 0.0;
+
+		int size = p1.automata_cover.length;
+		for(int i = 0; i <  size; i++)
+		{
+			if( p1.automata_cover[i] || p2.automata_cover[i]) ret += 1.0;
+		}
+
+
+		// this finds out the ADDITIONs to the cover
+		ret = 2 * ret - (p1.members + p2.members);
+
+		return ret;
+	}
+
+	/**
+	 * estimate the cost of ADDING p2 when p1 already exists.
+	 * <p> this is a bit different from estimateJoinCost()
+	 * sometimes, a cover is subset of another cover and then adding it wont cost anything (in theory)
+	 */
+	public static double estimateaddCost(PerEventTransition have, PerEventTransition add)
+	{
+		double ret = 0.0;
+
+		for(int i = 0; i < have.automata_cover.length; i++)
+		{
+			if( !have.automata_cover[i] && add.automata_cover[i]) ret += 1.0;
+		}
+
+		return ret;
 	}
 
 	// ------------------------------------------------------------------------------------

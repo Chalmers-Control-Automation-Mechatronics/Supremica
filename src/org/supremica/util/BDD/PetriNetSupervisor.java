@@ -86,6 +86,26 @@ public class PetriNetSupervisor
 		pet = TransitionOptimizer.optimize(pet, all);
 		size = pet.length; // may have changed!
 
+		// DEBUG:
+		/*
+		for(int j = 0; j < all.length; j++) {
+			Options.out.println("\nAutomata " + all[j].getName() );
+			boolean [] flow = all[j].getEventFlow(true);
+			Options.out.print(" event flow -> ");
+			for(int i = 0; i < flow.length; i++) if(flow[i]) Options.out.print(" " + i);
+			Options.out.println();
+
+			flow = all[j].getEventFlow(false);
+			Options.out.print(" event flow -> ");
+			for(int i = 0; i < flow.length; i++) if(flow[i]) Options.out.print(" " + i);
+			Options.out.println();
+		}
+		for(int i = 0; i < size; i++) pet[i].dump();
+		*/
+
+
+
+
 		workset = new int[size];
 		queue = new int[size];    // use by the heuristics
 		ndas = new NDAS_Choice(size); // use by the heuristics
