@@ -34,34 +34,38 @@ public class BallTrackView
 
     /**Maximum number of balls allowed*/
     final int maxNrOfBalls = 20;
-    
+
     /**size of window*/
     private int size;
-    
+
     /**This BallTrackView must be aware of a RouteController
      * to be able to add balls*/
     private RouteController rController;
-    
+
     // private int nrOfBalls = 0;
     private java.util.List balls;    // keep track of the balls
     public JButton insSmallBall, insLargeBall, delBall, changeImage, manuellStart, autoStart, nodStop, larmKvitt, exit;
     public JPanel south       = new JPanel();    //panel to collect the button panels
     public JPanel simButtons  = new JPanel();   //panel for buttons used to simulate the BallTrack
-    public JPanel realButtons = new JPanel();  //panel for buttons simulating real life actions 
+    public JPanel realButtons = new JPanel();  //panel for buttons simulating real life actions
     public Canvas canvas      = new Canvas(); //Canvas used to paint simualtor images
-        
+
+	private JMenuBar menuBar;
+
     /**Constructor BallTrackView initialises a view for a ball track
      * @param framesize the heigth of the window
      */
     public BallTrackView(int framesize, RouteController rcont)
     {
+		menuBar = new JMenuBar();
+	    initMenubar();
 	rController = rcont;
 	size = framesize;
-	
+
 	setSize(size, size + 45);
-	setTitle("Ball Track Simulator");
+	setTitle("Ballprocess Simulator");
 	setVisible(true);
-	
+
 	Container contentPane = getContentPane();
 	contentPane.setLayout(new BorderLayout());
 	contentPane.setBackground(Color.white);
@@ -82,7 +86,7 @@ public class BallTrackView
 
 	bildsLaddningKontroll.addImage(bgImage, 0);
 	bildsLaddningKontroll.addImage(bgImageTemp, 1);
-	
+
 	try
             {
                 bildsLaddningKontroll.waitForAll();
@@ -93,48 +97,48 @@ public class BallTrackView
             }
 
 	//Button to insert a BALL with small radius
-	insSmallBall = new JButton("Add Small Ball");
+	insSmallBall = new JButton("Add small ball");
 	insSmallBall.setFont(new Font("Times", Font.BOLD, 10));
 	realButtons.add(insSmallBall);
 
 	//Button to insert a BALL with large radius
-	insLargeBall = new JButton("Add Large Ball");
+	insLargeBall = new JButton("Add large ball");
 	insLargeBall.setFont(new Font("Times", Font.BOLD, 10));
 	realButtons.add(insLargeBall);
-	
+
 	//Button to delete the first ball in Leg 1
-	delBall = new JButton("Remove Ball");
+	delBall = new JButton("Remove ball");
 	delBall.setFont(new Font("Times", Font.BOLD, 10));
 	realButtons.add(delBall);
-	
+
 	//Button to change the backgroud image. With or Without text
-	changeImage = new JButton("Change Image");
+	changeImage = new JButton("Switch image");
 	changeImage.setFont(new Font("Times", Font.BOLD, 10));
 	realButtons.add(changeImage);
 
 	//Button to start the simulation manually
-	manuellStart = new JButton("ManuellStart");
+	manuellStart = new JButton("Manual start");
 	manuellStart.setFont(new Font("Times", Font.BOLD, 10));
 	simButtons.add(manuellStart);
 
 	//Button to start the simulation automatically
-	autoStart = new JButton("AutoStart");
+	autoStart = new JButton("Auto start");
 	autoStart.setFont(new Font("Times", Font.BOLD, 10));
 	simButtons.add(autoStart);
 
 	//Button to stop the simulation quickly
-	nodStop = new JButton("NödStop");
+	nodStop = new JButton("Emergency stop");
 	nodStop.setFont(new Font("Times", Font.BOLD, 10));
 	simButtons.add(nodStop);
 
 	//Button to turn of the alarm
-	larmKvitt = new JButton("LarmKvittering");
+	larmKvitt = new JButton("Alarm acknowledgment");
 	larmKvitt.setFont(new Font("Times", Font.BOLD, 10));
 	simButtons.add(larmKvitt);
 
 	//Button to exit the simulation
-	exit = new JButton("Exit Program");
-	exit.setFont(new Font("Times", Font.BOLD, 12));
+	//exit = new JButton("Exit simulation");
+	//exit.setFont(new Font("Times", Font.BOLD, 12));
 
 	simButtons.setVisible(true);
 	realButtons.setVisible(true);
@@ -232,14 +236,16 @@ public class BallTrackView
 		exit_mouseClicked(e);
 	    }
         });
+
+
 	pack();//Paint the components (buttons) the first time
     }
-    
+
     void insSmallBall_mouseClicked(MouseEvent e)
     {
 	rController.addSmallBall();
     }
-    
+
     void insLargeBall_mouseClicked(MouseEvent e)
     {
 	rController.addLargeBall();
@@ -249,7 +255,7 @@ public class BallTrackView
     {
 	rController.delBall();
     }
-    
+
     void changeImage_mouseClicked(MouseEvent e)
     {
 	if (imageWithText)
@@ -286,17 +292,17 @@ public class BallTrackView
 
     void nodStop_mousePressed(MouseEvent e)
     {
-	
+
     }
 
     void nodStop_mouseReleased(MouseEvent e)
     {
-	
+
     }
 
     void larmKvitt_mousePressed(MouseEvent e)
     {
-	
+
     }
 
     void larmKvitt_mouseReleased(MouseEvent e)
@@ -304,10 +310,41 @@ public class BallTrackView
 
     }
 
-    void exit_mouseClicked(MouseEvent e)
+	private void initMenubar()
+	{
+		setJMenuBar(menuBar);
+
+		// File
+		JMenu menuFile = new JMenu();
+
+		menuFile.setText("File");
+		menuFile.setMnemonic(KeyEvent.VK_F);
+
+		// File.Close
+		JMenuItem menuFileClose = new JMenuItem();
+
+		menuFileClose.setText("Close");
+		menuFile.add(menuFileClose);
+		menuBar.add(menuFile);
+		menuFileClose.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				close();
+			}
+		});
+	}
+
+    public void exit_mouseClicked(MouseEvent e)
     {
-	System.exit(0);
-    }
+		close();
+	}
+
+    public void close()
+    {
+		setVisible(false);
+		dispose();
+	}
 
     /**getBgImageStatus returns the status for the bgImage
      */
@@ -322,17 +359,17 @@ public class BallTrackView
     private void collisionAvoidanceHandle()
     {
 	boolean colliding;
-	
+
 	for (Iterator i = balls.iterator(); i.hasNext(); )
 	{
 	    Ball b = (Ball) i.next();
-		
+
 	    colliding = false;
-	    
+
 	    for (Iterator j = balls.iterator(); j.hasNext(); )
 	    {
 		Ball c = (Ball) j.next();
-			
+
 		if (!b.equals(c))
 		{
 		    if (b.collisionRisk(c))
@@ -362,16 +399,16 @@ public class BallTrackView
     {
 	    Image im = createImage(500, 458);
 	    Graphics g = im.getGraphics();
-	    
+
 	    // get the balls to be painted
 	    balls = rController.getAllBalls();
-	    
+
 	    // make sure no balls collide
 	    collisionAvoidanceHandle();
-	    
+
 	    // paint background image
 	    g.drawImage(bgImage, 0, 0, this);
-	    
+
 	    // paint the animated lifts
 	    g.setColor(Color.gray);
 	    paintPortVakt(g);
@@ -383,18 +420,18 @@ public class BallTrackView
 	    paintLyftVan1(g);
 	    paintLyftVan2(g);
 	    paintArm(g);
-	    
+
 	    // paint the balls
 	    for (Iterator i = balls.iterator(); i.hasNext(); )
 	    {
 		Ball b = (Ball) i.next();
 		b.paint(g);
 	    }
-	    
+
 	    //paint the simulator buffer to the canvas
 	    Graphics gN = canvas.getGraphics();
 	    gN.drawImage(im, 0, 0, this);
-	    
+
 	    //paint the buttons and the background of the buttons
 	    south.repaint();
     }
