@@ -62,7 +62,7 @@ import org.supremica.automata.LabeledEvent;
  * A monolithic synthesizer that can handle non-blocking and controllability problems.
  *
  *@author  ka
- *@created  November 28, 2001
+ *@created  November 28, 2000
  */
 public class AutomatonSynthesizer
 {
@@ -92,13 +92,13 @@ public class AutomatonSynthesizer
 		throws Exception
 	{
 		logger.debug("AutomatonSynthesizer::synthesize()");
-		
+
 		theAutomaton.beginTransaction();
 
 		SynthesisType synthesisType = synthesizerOptions.getSynthesisType();
-		
+
 		boolean didSomething = false; // records whether we actually did anything
-		
+
 		if (synthesisType == SynthesisType.Controllable)
 		{
 			didSomething = synthesizeControllable();
@@ -128,6 +128,8 @@ public class AutomatonSynthesizer
 	{
 		LinkedList stateList = new LinkedList();
 		Iterator stateIt = theAutomaton.stateIterator();
+
+		logger.debug("AutomatonSynthesizer::synthesizeControllableNonblocking");
 
 		while (stateIt.hasNext())
 		{
@@ -192,6 +194,8 @@ public class AutomatonSynthesizer
 	private boolean synthesizeControllable()
 		throws Exception
 	{
+		logger.debug("AutomatonSynthesizer::synthesizeControllable");
+
 		// boolean newUnsafeStates;
 		LinkedList stateList = new LinkedList();
 		Iterator stateIt = theAutomaton.stateIterator();
@@ -257,6 +261,8 @@ public class AutomatonSynthesizer
 	private boolean synthesizeNonblocking()
 		throws Exception
 	{
+		logger.debug("AutomatonSynthesizer::synthesizeNonblocking");
+
 		boolean newUnsafeStates;
 		LinkedList stateList = new LinkedList();
 
@@ -290,17 +296,14 @@ public class AutomatonSynthesizer
 		}
 
 		theAutomaton.setType(AutomatonType.Supervisor);
-		
+
 		return didSomething;
 	}
 
 	private LinkedList doCoreachable()
 		throws Exception
 	{
-		if (debugMode)
-		{
-			System.err.println("doCoreachable");
-		}
+		logger.debug("AutomatonSynthesizer::doCoreachable");
 
 		theAutomaton.clearVisitedStates();
 
@@ -308,10 +311,7 @@ public class AutomatonSynthesizer
 		// Mark the state as visited
 		LinkedList stateStack = new LinkedList(acceptingStates);
 
-		if (debugMode)
-		{
-			System.err.println(stateStack.size() + " nbr of accepting states");
-		}
+		logger.debug(stateStack.size() + " nbr of accepting states");
 
 		// Do propagate coreachability
 		while (stateStack.size() > 0)
@@ -459,7 +459,7 @@ public class AutomatonSynthesizer
 				}
 			}
 		}
-		
+
 		Iterator stateIt = theAutomaton.stateIterator();
 
 		while (stateIt.hasNext())
@@ -471,7 +471,7 @@ public class AutomatonSynthesizer
 				currState.setCost(State.MAX_COST);
 			}
 		}
-		
+
 	}
 
 	private void purge()

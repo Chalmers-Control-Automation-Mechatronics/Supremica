@@ -143,7 +143,7 @@ public final class SupremicaProperties
 		setProperty(DOT_AUTOMATIC_UPDATE, "true", true);
 		setProperty(GENERAL_REDIRECT_STDOUT, "true", true);
 		setProperty(GENERAL_REDIRECT_STDERR, "true", true);
-		setProperty(GENERAL_LOOKANDFEEL, "javax.swing.plaf.metal.MetalLookAndFeel", true);
+		setProperty(GENERAL_LOOKANDFEEL, "System", true);
 		setProperty(INCLUDE_EDITOR, "true", true);
 		setProperty(INCLUDE_BOUNDED_UNCON_TOOLS, "false", true);
 		setProperty(VERBOSE_MODE, "false", true);
