@@ -45,26 +45,32 @@ public class RouteController
 		new Movement(new int[]{ 48, 310 }, new int[]{ 98, 314 }, 25)
 	};
 
-	public int getParts(int leg)
-	{
-		return movements[leg].parts;
-	}
-
-	public int getHori(int leg)
+    public int getParts(int leg)
     {
-		return (movements[leg].endPos[0] - movements[leg].startPos[0]);
-	}
+	return movements[leg].parts;
+    }
+    
+    public int getHori(int leg)
+    {
+	return (movements[leg].endPos[0] - movements[leg].startPos[0]);
+    }
 
-	public int getVert(int leg)
-	{
-		return (movements[leg].endPos[1] - movements[leg].startPos[1]);
-	}
+    public int getVert(int leg)
+    {
+	return (movements[leg].endPos[1] - movements[leg].startPos[1]);
+    }
 
-	// inputs to simulator [18] -- 2 signals are not used ([8],[9])
-	private boolean[] inSignals = new boolean[18];
+    // inputs to simulator [18] -- 2 signals are not used ([8],[9])
+    private boolean[] inSignals = new boolean[18];
+    
+    // outputs from simulator [27] -- 4 signals are not used ([8],[9],[18],[19])
+    private boolean[] outSignals = new boolean[27];
 
-	// outputs from simulator [27] -- 4 signals are not used ([8],[9],[18],[19])
-	private boolean[] outSignals = new boolean[27];
+    //used when buttons are pressed on the simulator (manual start, auto start etc) 
+    public void setOutSignals(int signal, boolean value)
+    {
+	outSignals[signal] = value;
+    }
 
 	// keeps track of which balls are in each leg
 	private List[] legBallList = new List[nrOfLegs];

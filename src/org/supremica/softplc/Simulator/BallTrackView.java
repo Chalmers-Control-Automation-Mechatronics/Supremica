@@ -42,7 +42,7 @@ public class BallTrackView
     
     // private int nrOfBalls = 0;
     private java.util.List balls;    // keep track of the balls
-    public JButton insSmallBall, insLargeBall, delBall, changeImage;
+    public JButton insSmallBall, insLargeBall, delBall, changeImage, manuellStart;
     public JPanel panel = new JPanel();
     public JPanel south = new JPanel();
     public Canvas canvas = new Canvas();
@@ -55,23 +55,24 @@ public class BallTrackView
 	rController = rcont;
 	size = framesize;
 	
-	setSize(size, size + 45);
+	setSize(size + 100, size + 45);
 	setTitle("Ball Track Simulator");
 	setVisible(true);
 	
 	Container contentPane = getContentPane();
-	contentPane.setLayout(null);
+	contentPane.setLayout(new BorderLayout());
+	contentPane.setBackground(Color.white);
 
-	panel.setLayout(new BorderLayout());
-	panel.setBackground(Color.white);
-	panel.setSize(size, size + 30);
+	//panel.setLayout(new BorderLayout());
+	//panel.setBackground(Color.white);
+	//panel.setSize(size, size + 30);
 
 	south.setLayout(new FlowLayout());
 	south.setBackground(Color.white);
 	
 	canvas.setSize(500,458);
 	canvas.setVisible(true);
-	panel.add(canvas,BorderLayout.NORTH);
+	contentPane.add(canvas,BorderLayout.NORTH);
 	
 	insSmallBall = new JButton("Add Small Ball");
 	insSmallBall.setFont(new Font("Times", Font.BOLD, 10));
@@ -92,20 +93,17 @@ public class BallTrackView
 	changeImage.setFont(new Font("Times", Font.BOLD, 10));
 	south.add(changeImage);
 
+	manuellStart = new JButton("Manuell Start");
+	manuellStart.setFont(new Font("Times", Font.BOLD, 10));
+	south.add(manuellStart);
+
 	south.setVisible(true);
-	panel.setVisible(true);
-	panel.add(south,BorderLayout.SOUTH);
+	//panel.setVisible(true);
+	contentPane.add(south,BorderLayout.SOUTH);
 
-	contentPane.add(panel);
+	//contentPane.add(panel);
 	contentPane.setVisible(true);
-
-	/*	Insets insets = panel.getInsets();
 	
-	insSmallBall.setBounds(0 + insets.left, 458 + insets.top, 120, 40);
-	insLargeBall.setBounds(120 + insets.left, 458 + insets.top, 120, 40);
-	delBall.setBounds(240 + insets.left, 458 + insets.top, 120, 40);
-	changeImage.setBounds(360 + insets.left, 458 + insets.top, 120, 40);
-	*/
 	insSmallBall.addMouseListener(new java.awt.event.MouseAdapter()
 	{
 	    public void mouseClicked(MouseEvent e)
@@ -134,6 +132,19 @@ public class BallTrackView
 		changeImage_mouseClicked(e);
 	    }
         });
+	manuellStart.addMouseListener(new java.awt.event.MouseAdapter()
+	{
+	    public void mousePressed(MouseEvent e)
+	    {
+		manuellStart_mousePressed(e);
+	    }
+	    public void mouseReleased(MouseEvent e)
+	    {
+		manuellStart_mouseReleased(e);
+	    }
+
+        });
+	pack();//Paint the components (buttons) the first time
     }
     
     void insSmallBall_mouseClicked(MouseEvent e)
@@ -164,6 +175,17 @@ public class BallTrackView
 	    imageWithText = true;
 	}
     }
+
+    void manuellStart_mousePressed(MouseEvent e)
+    {
+	rController.setOutSignals(24, false);
+    }
+
+    void manuellStart_mouseReleased(MouseEvent e)
+    {
+	rController.setOutSignals(24, true);
+    }
+
     /**collisionAvoidanceHandle makes sure that no ball run over another
      */
     private void collisionAvoidanceHandle()
@@ -239,14 +261,18 @@ public class BallTrackView
 	    b.paint(g);
 	}
 
+	//paint the simulator buffer to the canvas
 	Graphics gN = canvas.getGraphics();
-
 	gN.drawImage(im, 0, 0, this);
 	
+	//paint the buttons and the background of the buttons
 	insSmallBall.repaint();
 	insLargeBall.repaint();
 	delBall.repaint();
 	changeImage.repaint();
+	manuellStart.repaint();
+	south.repaint();
+
     }
 
 
