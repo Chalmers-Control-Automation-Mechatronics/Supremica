@@ -2565,7 +2565,7 @@ public class ActionMan
 	        JFileChooser outputDir = new JFileChooser();
 		outputDir.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 
-		if (outputDir.showOpenDialog(gui.getComponent()) == JFileChooser.APPROVE_OPTION)
+		if (outputDir.showSaveDialog(gui.getComponent()) == JFileChooser.APPROVE_OPTION)
 		{
 			File currFile = outputDir.getSelectedFile();
 			
