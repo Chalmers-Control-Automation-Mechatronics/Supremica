@@ -1,6 +1,22 @@
 #/bin/sh
 
+
+if [ -n "$SUPREMICADEV_PATH" ]
+then
+	echo ""
+else
+	SUPREMICADEV_PATH="../.." 
+fi
+
+if [ -z "$2" ]
+then
+	COMPILE_DIR="."
+else
+	COMPILE_DIR="$2"
+fi
+
 #SUPREMICADEV_PATH skall innehålla sökvägen till Supremica-katalogen
-export LD_LIBRARY_PATH=${SUPREMICADEV_PATH}/examples/ilprograms
+export LD_LIBRARY_PATH=${SUPREMICADEV_PATH}/examples/ilprograms:/usr/lib
 java -cp .:${SUPREMICADEV_PATH}/build:${SUPREMICADEV_PATH}/lib/unjared org.supremica.softplc.RunTime.Shell -IO org.supremica.softplc.Drivers.AdlinkPCI7432 -IL $*
+
 

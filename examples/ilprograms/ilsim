@@ -1,5 +1,20 @@
 #/bin/sh
 
+if [ -n "$SUPREMICADEV_PATH" ]
+then
+	echo ""
+else
+	SUPREMICADEV_PATH="../.." 
+fi
+
+if [ -z "$2" ]
+then
+	COMPILE_DIR="."
+else
+	COMPILE_DIR="$2"
+fi
+
 #SUPREMICADEV_PATH skall innehålla sökvägen till Supremica-katalogen
 java -cp .:${SUPREMICADEV_PATH}/build:${SUPREMICADEV_PATH}/lib/unjared:${SUPREMICADEV_PATH}/images:${CLASSPATH} org.supremica.softplc.RunTime.Shell -IO org.supremica.softplc.Simulator.BTSim -IL $*
+
 

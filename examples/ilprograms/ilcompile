@@ -1,3 +1,17 @@
 #/bin/sh
 
-java -cp .:${SUPREMICADEV_PATH}/build:${SUPREMICADEV_PATH}/lib/unjared org.supremica.softplc.CompILer.ilc $*
+if [ -n "$SUPREMICADEV_PATH" ]
+then
+	echo ""
+else
+	SUPREMICADEV_PATH="../.." 
+fi
+
+if [ -z "$2" ]
+then
+	COMPILE_DIR="."
+else
+	COMPILE_DIR="$2"
+fi
+
+java -cp .:${SUPREMICADEV_PATH}/build:${SUPREMICADEV_PATH}/lib/unjared org.supremica.softplc.CompILer.ilc $1 $COMPILE_DIR
