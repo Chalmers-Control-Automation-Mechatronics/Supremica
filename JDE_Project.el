@@ -1,0 +1,10 @@
+(jde-project-file-version "1.0")
+(jde-set-variables
+ '(jde-project-name "default")
+ '(jde-ant-enable-find t)
+ '(jde-enable-abbrev-mode nil)
+ '(jde-global-classpath (quote ("/slave/home/cengic/devel/workspace/Supremica/build")))
+ '(jde-ant-read-target t)
+ '(jde-complete-function (quote jde-complete-menu))
+ '(jde-build-function (quote (jde-ant-build)))
+ '(jde-gen-k&r nil))
