@@ -169,7 +169,7 @@ public class Options
 							ES_HEURISTIC_MOST_MEMBERS = 8,
 							ES_HEURISTIC_LEAST_MEMBERS = 9;
 	;
-	public static int es_heuristics = ES_HEURISTIC_LEAST_FOLLOWERS;
+	public static int es_heuristics = ES_HEURISTIC_MOST_FOLLOWERS;
 
 	/** BDD grow graph */
 	public static final String SHOW_GROW_NAMES[] = { "None", "Node count",
@@ -217,7 +217,7 @@ public class Options
 	public static final int ENCODING_DEFAULT = 0, ENCODING_RANDOM = 1,
 							ENCODING_DFS_I = 2, ENCODING_DFS_M = 3,
 							ENCODING_BFS_I = 4, ENCODING_BFS_M = 5;
-	public static int encoding_algorithm = ENCODING_BFS_I;
+	public static int encoding_algorithm = ENCODING_BFS_M;
 
 	// --- [ constants ] -------------------------------------------------
 	public static final int LINE_WIDTH = 55;    // # of chars per line?, screen width

@@ -1087,9 +1087,12 @@ public class Supervisor
 		// note: dont use timer here (get reseted in getSafeStates)
 		int good = manager.not(forbidden);
 
+
+		marked = manager.and(marked, good);
+		int r_all_p, r_all = manager.replace(marked, perm_s2sp);
+
 		// again, we remove events as soon as possible
 		int t_all = manager.relProd(plant.getT(), spec.getT(), e_cube);
-		int r_all_p, r_all = manager.replace(marked, perm_s2sp);
 
 		do
 		{
@@ -1107,6 +1110,7 @@ public class Supervisor
 		}
 		while (r_all_p != r_all);
 
+		manager.deref(marked);
 		manager.deref(t_all);
 		manager.deref(good);
 

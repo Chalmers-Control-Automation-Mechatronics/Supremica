@@ -331,8 +331,10 @@ public class WorksetSupervisor
 		SizeWatch.setOwner("WorksetSupervisor.restrictedBackward");
 
 		Workset workset = getWorkset(false);
-		int r_all_p, r_all = manager.replace(marked, perm_s2sp);
 		int r_permitted = manager.not(forbidden);
+		marked = manager.and(marked, r_permitted);
+		int r_all_p, r_all = manager.replace(marked, perm_s2sp);
+
 
 		while (!workset.empty())
 		{
@@ -365,6 +367,7 @@ public class WorksetSupervisor
 
 		int ret = manager.replace(r_all, perm_sp2s);
 
+		manager.deref(marked);
 		manager.deref(r_all);
 		manager.deref(r_permitted);
 
