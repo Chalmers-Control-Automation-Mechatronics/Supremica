@@ -71,7 +71,7 @@ public final class IntArrayList
 
     public IntArrayList()
     {
-		this(128);
+		this(5*1024);
     }
 
     public IntArrayList(int blockSize)
