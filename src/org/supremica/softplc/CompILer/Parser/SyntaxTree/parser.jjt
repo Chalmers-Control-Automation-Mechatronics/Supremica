@@ -1888,7 +1888,7 @@ void il_fb_call() :
  * programmed in java.
  */
 
-    ( il_call_operator() | il_call_java_operator() )
+    il_call_operator() //| il_call_java_operator() )
         fb_name()
         ("("
          (
@@ -2078,26 +2078,27 @@ TOKEN:
 }
 
 
-void il_call_java_operator() :
+//void il_call_java_operator() :
 /* Added in addition to the normal grammar to handle
  * calls to function blocks programmed in java.
  */
+/*
 {
-	Token t;
+Token t;
 }
 {
-	t = <il_call_java_op>
-	{jjtThis.setName(t.image);}
+    t = <il_call_java_op>
+    {jjtThis.setName(t.image);}
 }
+*/
 
-
-TOKEN:
+//TOKEN:
 /* Added in addition to the normal grammar to handle
  * calls to function blocks programmed in java.
  */
-{
-	<il_call_java_op: "CAL_JAVA" >
-}
+//{
+//	<il_call_java_op: "CAL_JAVA" >
+//}
 
 
 
