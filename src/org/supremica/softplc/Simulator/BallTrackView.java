@@ -26,7 +26,7 @@ public class BallTrackView
 
 	/**Background image*/
 	private final String imageFile = "backgroundtext.gif";
-	private Image bgImage = Toolkit.getDefaultToolkit().getImage(imageFile);
+    private Image bgImage = Toolkit.getDefaultToolkit().getImage(BallTrackView.class.getResource("/labprocess/" + imageFile));
 
 	/**Maximum number of balls allowed*/
 	final int maxNrOfBalls = 20;
