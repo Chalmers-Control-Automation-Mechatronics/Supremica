@@ -54,4 +54,5 @@ import java.util.*;
 public class EventsSet
 	extends ArrayList
 {
+	private static final long serialVersionUID = 1L;
 }

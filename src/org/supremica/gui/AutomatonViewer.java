@@ -59,6 +59,7 @@ public class AutomatonViewer
 	extends DotViewer
 	implements AutomatonListener
 {
+	private static final long serialVersionUID = 1L;
 	private Automaton theAutomaton;
 
 	protected AutomatonViewer(Automaton theAutomaton) // protected, use VisualProject::getAutomatonViewer instead

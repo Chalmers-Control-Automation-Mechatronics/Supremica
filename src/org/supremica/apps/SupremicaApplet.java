@@ -58,6 +58,7 @@ import org.supremica.properties.SupremicaProperties;
 public class SupremicaApplet
 	extends JApplet
 {
+	private static final long serialVersionUID = 1L;
 	private static Logger logger = LoggerFactory.createLogger(org.supremica.gui.Supremica.class);
 	private org.supremica.gui.Supremica workbench;
 	private SplashWindow splash;

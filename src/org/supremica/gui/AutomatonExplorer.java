@@ -71,6 +71,7 @@ public class AutomatonExplorer
 	extends JFrame
 	implements AutomatonListener
 {
+	private static final long serialVersionUID = 1L;
 	private static Logger logger = LoggerFactory.createLogger(AutomatonExplorer.class);
 	private Automaton theAutomaton;
 	private BorderLayout layout = new BorderLayout();
@@ -223,6 +224,7 @@ public class AutomatonExplorer
 class StateViewer
 	extends JPanel
 {
+	private static final long serialVersionUID = 1L;
 	private static Logger logger = LoggerFactory.createLogger(StateViewer.class);
 	private Automaton theAutomaton;
 	private State currState;
@@ -374,6 +376,7 @@ class StateViewer
 class EventList
 	extends JPanel
 {
+	private static final long serialVersionUID = 1L;
 	private boolean forward;
 	private boolean showStateId = false;
 	private Automaton theAutomaton;
@@ -459,6 +462,7 @@ class EventList
 class EventListModel
 	extends AbstractListModel
 {
+	private static final long serialVersionUID = 1L;
 	private static Logger logger = LoggerFactory.createLogger(EventListModel.class);
 	private State currState;
 	private ArrayList currArcs = new ArrayList();
@@ -623,6 +627,7 @@ class EventListModel
 class StateDisplayer
 	extends JPanel
 {
+	private static final long serialVersionUID = 1L;
 	private StateViewer stateViewer;
 	private Automaton theAutomaton;
 	private JCheckBox isInitialBox = new JCheckBox("initial");
@@ -749,6 +754,7 @@ class StateDisplayer
 class ExplorerController
 	extends JPanel
 {
+	private static final long serialVersionUID = 1L;
 	private static Logger logger = LoggerFactory.createLogger(ExplorerController.class);
 	private StateViewer stateViewer;
 	private Automaton theAutomaton;
