@@ -47,21 +47,21 @@ public class BDDAutomata
 		deref(check1);
 
 		Timer timer = new Timer();
-
-		original_automata = a;
-
+		this.original_automata = a;
 		Vector v = a.getAutomata();
 
-		components = v.size();
-		automata = new BDDAutomaton[components];
+		this.components = v.size();
+		this.automata = new BDDAutomaton[components];
+
+		// Dynamic reordering stuff:
+		reorder_setMethod( Options.reorder_algo);
+		if(Options.reorder_dyanmic) reorder_enableDyanamic(true);
+
 
 		// first we create all automata  ...
 		int i = 0;
-
 		size_states = 0;
-
 		Enumeration e = v.elements();
-
 		while (e.hasMoreElements())
 		{
 			automata[i] = new BDDAutomaton(this, (Automaton) e.nextElement(), i);
@@ -105,6 +105,17 @@ public class BDDAutomata
 			bdd_total_cubepp = andTo(bdd_total_cubepp, automata[i].getCubepp());
 
 			// check("Createdautomaton " + automata[i].getName() );
+			if(Options.reorderEnabled() && Options.reorder_with_groups) {
+				reorder_createVariableGroup(automata[i].getTopBDD(), automata[i].getBottomBDD(),
+					Options.reorder_within_group);
+			}
+		}
+
+
+
+		// see if we must reorder after build:
+		if(Options.reorderEnabled() && Options.reorder_after_build) {
+			reorder_now();
 		}
 
 		timer.report("BDD automata created");
@@ -138,6 +149,14 @@ public class BDDAutomata
 		for (int i = 0; i < size_events; i++)
 		{
 			events[i] = createBDD();
+		}
+
+
+		// if we have dynamic reordering:
+		if(Options.reorderEnabled() && Options.reorder_with_groups) {
+			int index1 = internal_index( events[0] );
+			int index2 = internal_index( events[size_events-1] );
+			reorder_createVariableGroup(index1, index2, Options.reorder_within_group);
 		}
 
 		bdd_events_u = getZero();

@@ -15,6 +15,25 @@ public class Options
 		;
 
 
+
+	/** Variable re-ordering method. NOTE: must use the same order as the constants in JBDD !!*/
+	public static final String [] REORDER_ALGO_NAMES =  {
+		"None",  "Win2", "Win3", "Sift", "Random"
+	};
+	/** check if dynamic variable ordering is enabled anywhere */
+	public static final boolean reorderEnabled() {
+		return (reorder_algo != JBDD.REORDER_NONE) && (reorder_dyanmic || reorder_after_build);
+	}
+	public static int reorder_algo = JBDD.REORDER_SIFT;
+	public static boolean reorder_dyanmic = false;  /** enable on the fly reordering */
+	public static boolean reorder_after_build = false; /** reorder once after the automata is built */
+	public static boolean reorder_with_groups = false; /** set each automata to a variable group */
+	public static boolean reorder_within_group = false; /** allow ordering inside the group ?  */
+
+
+
+
+
 	/** REACHABILITY search algorithms */
 	public static final String [] REACH_ALGO_NAMES =  {
 		"monotonic", "Conjunctive", "LatticeWalk", "Disjunctive",
@@ -37,31 +56,41 @@ public class Options
 	ALGO_SMOOTHED_PATH = 9,
 	ALGO_SMOOTHED_KEEP = 10,
 	ALGO_SMOOTHED_PART = 11,
-	ALGO_PETRINET = 12
-	;
+	ALGO_PETRINET = 12;
+	public static int algo_family = ALGO_DISJUNCTIVE_WORKSET; /** reachability algorithm */
+
 
 
 	/** language controllability/inclusion algorithms */
+	public static final String [] INCLUSION_ALGORITHM_NAMES = {
+		"Monolithic      ","Modular","Incremental"};
 	public static final int
 		INCLUSION_ALGO_MONOLITHIC = 0,
 		INCLUSION_ALGO_MODULAR = 1,
-		INCLUSION_ALGO_INCREMENTAL = 2
-		;
+		INCLUSION_ALGO_INCREMENTAL = 2;
+    public static int inclsuion_algorithm = INCLUSION_ALGO_INCREMENTAL;	/** C/LI algorithm */
+
 
 
     /** state counting algorithm */
+    public static final String [] COUNT_ALGO_NAMES = {
+		"No counting         ","Tree SAT", "Exact (slow!)" };
     public static final int
-	COUNT_NONE = 0,
-	COUNT_TREE = 1,
-	COUNT_EXACT = 2;
+		COUNT_NONE = 0,
+		COUNT_TREE = 1,
+		COUNT_EXACT = 2;
+	public static int count_algo  = COUNT_TREE; /** state counting, nothing important ... */
+
 
 
     /** Automaton ordering algorithm */
+    public static final String [] ORDERING_ALGORITHM_NAMES = {
+		"PCG search           ", "Random (!)",  "modified TSP" };
     public static final int
-	ORDERING_ALGO_OLD_PCG = 0,
-	ORDERING_ALGO_RANDOM  = 1,
-	ORDERING_ALGO_NEW_TSP = 2;
-
+		ORDERING_ALGO_OLD_PCG = 0,
+		ORDERING_ALGO_RANDOM  = 1,
+		ORDERING_ALGO_NEW_TSP = 2;
+	public static int ordering_algorithm = ORDERING_ALGO_NEW_TSP;
 
 
 	/** Automaton selection heuristics  */
@@ -81,8 +110,8 @@ public class Options
 		AS_HEURISTIC_MOST_COMMON_EVENTS = 6,
 		AS_HEURISTIC_MOST_COMMON_ARCS = 7,
 		AS_HEURISTIC_MOST_LOCAL = 8,
-		AS_HEURISTIC_HYBRID = 9
-		;
+		AS_HEURISTIC_HYBRID = 9;
+	public static int as_heuristics  = AS_HEURISTIC_HYBRID;
 
 
 
@@ -98,12 +127,29 @@ public class Options
 		ES_HEURISTIC_MOST_FOLLOWERS = 3,
 		ES_HEURISTIC_LEAST_FOLLOWERS = 4,
 		ES_HEURISTIC_MOST_MEMBERS = 5,
-		ES_HEURISTIC_LEAST_MEMBERS = 6
-	;
+		ES_HEURISTIC_LEAST_MEMBERS = 6;
+	public static int es_heuristics  = ES_HEURISTIC_LEAST_FOLLOWERS;
 
 
+	/** BDD grow graph */
+	public static final String SHOW_GROW_NAMES [] = {
+		"None", "Node count","logNode (log scale)   ","Node delta",
+		"SAT count","logSAT",
+		"SAT delta", "Nodes & logSAT"
+		};
+	public static final int
+		SHOW_GROW_NONE = 0,
+		SHOW_GROW_NODES = 1,
+		SHOW_GROW_NODES_LOG = 2,
+		SHOW_GROW_NODES_DIFF = 3,
+		SHOW_GROW_SATCOUNT = 4,
+		SHOW_GROW_SATCOUNT_LOG = 5,
+		SHOW_GROW_SATCOUNT_DIFF = 6,
+		SHOW_GROW_NODES_AND_SATCOUNT_LOG = 7;
+	public static int show_grow = SHOW_GROW_NONE; /** type of the BDD graph shown by GrowFrame */
 
-	/* insertation heuristic for Delayed* smoothing algorithm */
+
+	/** insertation heuristic for Delayed* smoothing algorithm */
 	public static final String [] DSSI_HEURISTIC_NAMES =  {
 		"Random", "Stack", "FIFO", "Smallest BDD", "Largest BDD"
 	};
@@ -112,32 +158,19 @@ public class Options
 		DSSI_STACK = 1,
 		DSSI_FIFO = 2,
 		DSSI_SMALLEST_BDD = 3,
-		DSSI_LARGEST_BDD = 4
-		;
+		DSSI_LARGEST_BDD = 4;
+	public static int dssi_heuristics = DSSI_STACK;
 
 
 
-	/** BDD grow graf */
-	public static final int
-		SHOW_GROW_NONE = 0,
 
-		SHOW_GROW_NODES = 1,
-		SHOW_GROW_NODES_LOG = 2,
-		SHOW_GROW_NODES_DIFF = 3,
-
-		SHOW_GROW_SATCOUNT = 4,
-		SHOW_GROW_SATCOUNT_LOG = 5,
-		SHOW_GROW_SATCOUNT_DIFF = 6,
-
-		SHOW_GROW_NODES_AND_SATCOUNT_LOG = 7;
-
-    // constants
+    // --- [ constants ] -------------------------------------------------
     public static final int LINE_WIDTH = 55;    // # of chars per line?, screen width
     private static final int DEFAULT_MAX_PARTITION_SIZE = 3000; // max nodes/partition
 	public static int max_partition_size = DEFAULT_MAX_PARTITION_SIZE;
 
 
-    // options
+    // --- [ options ] -------------------------------------------------
 	public static boolean developer_mode = true;
     public static final boolean use_cudd = false;
     public static boolean fill_statevars = false;
@@ -152,19 +185,6 @@ public class Options
     public static boolean uc_optimistic = true;
     public static boolean nb_optimistic = true;
 
-	public static int show_grow = SHOW_GROW_NONE; /** type of the BDD graph shown by GrowFrame */
-
-
-    // algorithms
-    public static int inclsuion_algorithm = INCLUSION_ALGO_INCREMENTAL;	/** C/LI algorithm */
-    public static int algo_family = ALGO_DISJUNCTIVE_WORKSET; /** reachability algorithm */
-    public static int count_algo  = COUNT_TREE; /** state counting, nothing important ... */
-
-    // heurisitcs
-	public static int as_heuristics  = AS_HEURISTIC_HYBRID;
-	public static int es_heuristics  = ES_HEURISTIC_LEAST_FOLLOWERS;
-	public static int dssi_heuristics = DSSI_RANDOM;
-	public static int ordering_algorithm = ORDERING_ALGO_NEW_TSP;
 
 
     // out own out stream, might be changed to point to a file

@@ -13,7 +13,7 @@ import org.supremica.util.BDD.heuristics.*;
  *
  * XXX:
  * current implementation uses a stack to do this, which is not a very good approximation.
- * we need heuristics such as does in ES_* and AS_* for better reults
+ * we need heuristics like those in ES_* and AS_* for better reults
  */
 
 public class  DelayedStarSmoothSupervisor extends DelayedSmoothSupervisor {

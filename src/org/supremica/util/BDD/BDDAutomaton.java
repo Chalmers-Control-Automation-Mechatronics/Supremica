@@ -27,6 +27,7 @@ public class BDDAutomaton
 	private int bdd_keep;
 	private int bdd_care_s, bdd_dontcare_s;
 	private int bdd_care_sp, bdd_dontcare_sp;
+	private int index_first_bdd, index_last_bdd;
 
 	public BDDAutomaton(BDDAutomata manager, Automaton a, int index)
 	{
@@ -55,6 +56,9 @@ public class BDDAutomaton
 
 			bdd_keep = manager.andTo(bdd_keep, equal);
 		}
+
+		index_first_bdd = manager.internal_index( var_s[0] );
+		index_last_bdd  = manager.internal_index( var_spp[ num_bits - 1] );
 	}
 
 	/**
@@ -377,6 +381,15 @@ public class BDDAutomaton
 
 	public void setMembership(int m) {
 		membership = m;
+	}
+
+	/** get the first bdd variable [for default order], i.e. the one with lowest index */
+	public int getTopBDD() {
+		return index_first_bdd;
+	}
+	/** get the last bdd variable [for default order] i.e. the one with highest index */
+	public int getBottomBDD() {
+		return index_last_bdd;
 	}
 	// --------------------------------------------------------
 

@@ -217,7 +217,7 @@ public class GrowFrame
 			Graphics g = getGraphics();
 			if(g!= null)
 			{
-				g.clearRect(0,0, getWidth(), getHeight() );
+				g.clearRect(0,0, this.getWidth(), this.getHeight() );
 				paint(g);
 			}
 
