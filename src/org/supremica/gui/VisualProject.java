@@ -413,6 +413,8 @@ public class VisualProject
 	public AlphabetViewer getAlphabetViewer(String automaton)
 		throws Exception
 	{
+		logger.debug("VisualProject::getAlphabetViewer(" + automaton + ")");
+		
 		if (theAlphabetViewerContainer.containsKey(automaton))
 		{
 			AlphabetViewer viewer = (AlphabetViewer) theAlphabetViewerContainer.get(automaton);

@@ -79,14 +79,7 @@ public class LoggerFactory
 
 		if (logToConsole)
 		{
-			if (consoleAppender == null)
-			{
-				consoleAppender = new ConsoleAppender(layout);
-
-				consoleAppender.addFilter(filter);
-			}
-
-			thisCategory.addAppender(consoleAppender);
+			thisCategory.addAppender(getConsoleAppender());
 		}
 
 		if (logToGui)
@@ -97,6 +90,23 @@ public class LoggerFactory
 		SupremicaCategory supremicaCategory = new SupremicaCategory(thisCategory);
 
 		return supremicaCategory;
+	}
+	
+	synchronized static ConsoleAppender getConsoleAppender()
+	{
+		if (consoleAppender == null)
+		{
+			consoleAppender = new ConsoleAppender(layout);
+
+			consoleAppender.addFilter(filter);
+		}
+		return consoleAppender;
+	
+	}
+	
+	synchronized static boolean hasConsoleAppender()
+	{
+		return consoleAppender != null;
 	}
 
 	public synchronized static void updateLoggers()

@@ -62,18 +62,21 @@ public class Automaton
 	private String comment;
 	private List theStates;
 	private int index = -1;
-	private Map idStateMap;
+	private Map idStateMap;	// Want fast lookup on both id and index (but not name?)
 	private Map indexStateMap;
 	private ArcSet theArcs;
 	private State initialState;
 	private boolean isDisabled = false;
 	private AutomatonType type = AutomatonType.Undefined;
 	private int uniqueStateIndex = 0;
+	
+	// Graphical stuff
 	private boolean hasLayout = false;
 	private int width = -1;
 	private int height = -1;
 
 	// master and slave automata are only valid if this automaton is an interface
+	// Shouldn't then Interface inherit from Automata?
 	private Automata masterAutomata = null;
 	private Automata slaveAutomata = null;
 
@@ -230,6 +233,20 @@ public class Automaton
 		notifyListeners(AutomatonListeners.MODE_STATE_ADDED, state);
 	}
 
+	// If a state with this id (and/or name?) already exists, return the existing state
+	// Else, add this state and return it
+	public State addStateChecked(State state)
+	{
+		State existing = (State)idStateMap.get(state.getId());
+		if(existing != null)
+		{
+			return existing;
+		}
+		// else, add it as usual
+		addState(state);
+		return state;
+	}
+	
 	public void removeState(State state)
 	{
 		if (state == initialState)
@@ -253,13 +270,33 @@ public class Automaton
 	{
 		return initialState;
 	}
-
+	
+	// This is a fixx, for now - see bug report
+	public void setInitialState(State state)
+	{
+		State oldinit = getInitialState();
+		
+		State newinit = getState(state);
+		if(newinit == null)
+		{
+			throw new RuntimeException("No such state. id = " + state.getId());
+		}
+		
+		newinit.setInitial(true);
+		initialState = newinit;
+		
+		if(oldinit != null)
+		{
+			oldinit.setInitial(false);
+		}
+	}
+	
 	/**
 	 * Returns a uniquely named (and id'ed) state.
-	 * Add it to the state set
 	 * Passing null or empty prefix sets prefix to 'q'
+	 * The new state is not added to the state set
 	 */
-	public State createAndAddUniqueState(String prefix)
+	public State createUniqueState(String prefix)
 	{
 		StringBuffer name = null;
 		if(prefix == null || prefix.equals(""))
@@ -275,10 +312,19 @@ public class Automaton
 		{
 			name.append(uniqueStateIndex++);
 		}
-		State newState = new State(name.toString());
-		addState(newState);
-
-		return newState;
+		return new State(name.toString());
+	}
+	
+	/**
+	 * Returns a uniquely named (and id'ed) state.
+	 * Add it to the state set
+	 * Passing null or empty prefix sets prefix to 'q'
+	 */
+	public State createAndAddUniqueState(String prefix)
+	{
+		State newstate = createUniqueState(prefix);
+		addState(newstate);
+		return newstate;
 	}
 	/**
 	 * Returns true if it finds one accepting state, else returns false
@@ -550,7 +596,7 @@ public class Automaton
 		return nbrOfAcceptingAndForbiddenStates;
 	}
 
-	public Iterator stateIterator()
+	public Iterator stateIterator()	// Should be 'getStateIterator'?
 	{
 		return theStates.iterator();
 	}
@@ -1127,8 +1173,8 @@ public class Automaton
 		{
 			this.eventLabel = eventLabel;
 			this.outgoing = outgoing;
-			arcIt = theArcs.iterator();
-			currState = null;
+			this.arcIt = theArcs.iterator();
+			this.currState = null;
 			findNext();
 		}
 

@@ -50,16 +50,15 @@
 package org.supremica.automata;
 
 import java.util.*;
-import org.supremica.gui.*;
 import org.supremica.log.*;
 
 /**
- * Similar to Events, but with allows for the fast lookup of an event based on the id.
+ * Similar to Events, but allows for the fast lookup of an event based on the id.
  *
  * Important note:
  * If an event label is changed after it is inserted in
  * an Events object, then rehash must be called otherwise
- * the strange errors will arise.
+ * strange errors will arise.
  *
  *@author  ka
  *@created  November 28, 2001
@@ -121,6 +120,11 @@ public class Alphabet
 		return idMap.containsKey(id);
 	}
 
+	public boolean contains(LabeledEvent event)
+	{
+		return containsEventWithId(event.getId());
+	}
+	
 	/**
 	 * Returns an event with a given id. An exception is thrown if the event
 	 * does not exists.
@@ -144,7 +148,7 @@ public class Alphabet
 
 	/**
 	 * Add an event to the alphabet. Check with containsEventWithId to make
-	 * sure that an event with the id already exists.
+	 * sure that an event with the id not already exists.
 	 * If trying to add an event with an id that already exists, an exception is thrown.
 	 *
 	 *@param  event The feature to be added to the Event attribute
@@ -164,6 +168,20 @@ public class Alphabet
 		}
 	}
 
+	public void addEvent(LabeledEvent event, boolean b)
+	{
+		try
+		{
+			addEvent(event);
+		}
+		catch(Exception excp)
+		{
+			if(b == true)
+			{
+				throw new RuntimeException(excp);
+			}
+		}
+	}
 	/**
 	 * Computes A \ B (difference) where A is this alphabet and B is other
 	 *

@@ -107,6 +107,11 @@ public class ActionMan
 	private static final int    // instead of using constants later below :)
 		FORMAT_UNKNOWN = -1, FORMAT_XML = 1, FORMAT_DOT = 2, FORMAT_DSX = 3, FORMAT_RCP = 4, FORMAT_SP = 5;
 
+	// Ugly fixx here. We need a good way to globally get at the selected automata, the current project etc
+	// gui here is filled in by 
+	public static Gui gui = null;
+	public static LanguageRestrictor languageRestrictor = new LanguageRestrictor();
+	
 	private static int getIntegerInDialogWindow(String text, Component parent)
 	{
 		boolean finished = false;
@@ -956,10 +961,18 @@ public class ActionMan
 
 			try
 			{
-				syncOptions = new SynchronizationOptions(SupremicaProperties.syncNbrOfExecuters(), SynchronizationType.Prioritized, SupremicaProperties.syncInitialHashtableSize(), SupremicaProperties.syncExpandHashtable(), true,
-
-				// SupremicaProperties.syncForbidUncontrollableStates(),
-				SupremicaProperties.syncExpandForbiddenStates(), false, false, true, SupremicaProperties.verboseMode(), true, true);
+				syncOptions = new SynchronizationOptions(SupremicaProperties.syncNbrOfExecuters(), 
+														SynchronizationType.Prioritized, 
+														SupremicaProperties.syncInitialHashtableSize(), 
+														SupremicaProperties.syncExpandHashtable(), 
+														true,
+														SupremicaProperties.syncExpandForbiddenStates(), 
+														false, 
+														false, 
+														true, 
+														SupremicaProperties.verboseMode(), 
+														true, 
+														true);
 			}
 			catch (Exception ex)
 			{
@@ -976,13 +989,41 @@ public class ActionMan
 				Automaton currAutomaton = (Automaton) autIt.next();
 				String currAutomatonName = currAutomaton.getName();
 
+				// No initial state -- remove from synthesis (or cancel entirely)
 				if (currAutomaton.getInitialState() == null)
 				{
-					JOptionPane.showMessageDialog(gui.getComponent(), "The automaton " + currAutomatonName + " does not have an initial state!", "Alert", JOptionPane.ERROR_MESSAGE);
+					int cont = JOptionPane.showConfirmDialog(gui.getComponent(), 
+												"The automaton " + currAutomatonName + " does not have an initial state.\nSkip it or cancel...", 
+												"Alert", 
+												JOptionPane.OK_CANCEL_OPTION,
+												JOptionPane.WARNING_MESSAGE);
 
-					return;
+					if(cont == JOptionPane.OK_OPTION)
+					{
+						continue; // skip currAutomaton from the synthesis
+					}
+					else // JOptionPane.CANCEL_OPTION
+					{
+						return;	// cancel entirely
+					}
 				}
-
+				// Undefined type -- remove from synthesis (or cancel entirely)
+				if(currAutomaton.getType() == AutomatonType.Undefined)
+				{
+					int cont = JOptionPane.showConfirmDialog(gui.getComponent(), 
+														"The automaton " + currAutomatonName + " is of 'Undefined' type.\nSkip it or cancel...",
+														"Alert",
+														JOptionPane.OK_CANCEL_OPTION,
+														JOptionPane.WARNING_MESSAGE);
+					if(cont == JOptionPane.OK_OPTION)
+					{
+						continue; // skip currAutomaton from the synthesis
+					}
+					else // JOptionPane.CANCEL_OPTION
+					{
+						return;	// cancel entirely
+					}
+				}
 				currAutomata.addAutomaton(currAutomaton);
 			}
 
@@ -1096,7 +1137,9 @@ public class ActionMan
 	// Automaton.Alphabet action performed
 	public static void automatonAlphabet_actionPerformed(Gui gui)
 	{
-		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
+		logger.debug("ActionMan::automatonAlphabet_actionPerformed(gui)");
+		
+		Automata selectedAutomata = gui.getSelectedAutomata();
 
 		if (selectedAutomata.size() < 1)
 		{
@@ -1105,6 +1148,8 @@ public class ActionMan
 			return;
 		}
 
+	/* I don't understand all this, and I don't see the meaning (and there are no comments to explain)
+	
 		Iterator autIt = selectedAutomata.iterator();
 
 		while (autIt.hasNext())
@@ -1122,6 +1167,19 @@ public class ActionMan
 				// logger.error("Exception in AlphabetViewer. Automaton: " + currAutomaton.getName());
 				gui.error("Exception in AlphabetViewer. Automaton: " + currAutomaton.getName());
 			}
+		}
+	*/
+		// Why not simpy instantiate an AlphabetViewer with the given automata object??
+		try
+		{
+			AlphabetViewer alphabetviewer = new AlphabetViewer(selectedAutomata);
+			alphabetviewer.setVisible(true);
+		}
+		catch(Exception excp)
+		{
+			logger.error("Exception in AlphabetViewer");
+			logger.error(excp);
+			return;
 		}
 	}
 
@@ -1308,8 +1366,9 @@ public class ActionMan
 			catch (Exception ex)
 			{
 
-				// logger.error("Exception in AutomatonMinimize. Automaton: " + currAutomaton.getName());
-				gui.error("Exception in AutomatonMinimize. Automaton: " + currAutomaton.getName());
+				logger.error("Exception in AutomatonMinimize. Automaton: " + currAutomaton.getName());
+				// ex.printStackTrace();
+				// gui.error("Exception in AutomatonMinimize. Automaton: " + currAutomaton.getName());
 			}
 		}
 	}

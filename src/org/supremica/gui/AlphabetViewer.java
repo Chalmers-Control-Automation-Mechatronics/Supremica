@@ -55,8 +55,13 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.tree.*;
 import java.util.*;
+import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 
+// I changed AlphabetViewer to accept Automata objects and to show the alphabets 
+// of all selected Automaton in the same window. That's probably what you want if 
+// you select more than one and request Alphabet viewing. Previously, one 
+// AlphabetViewer was opened for each automaton.
 public class AlphabetViewer
 	extends JFrame
 {
@@ -64,15 +69,28 @@ public class AlphabetViewer
 	private JMenuBar menuBar = new JMenuBar();
 	private AlphabetViewerPanel alphabetPanel;
 
-	public AlphabetViewer(Automaton theAutomaton)
+	public AlphabetViewer(Automaton automaton)
 		throws Exception
 	{
-		alphabetPanel = new AlphabetViewerPanel(theAutomaton);
+		Automata automata = new Automata();
+		automata.addAutomaton(automaton);
+		init(automata);
+	}
+	
+	public AlphabetViewer(Automata theAutomata)
+		throws Exception
+	{
+		init(theAutomata);
+	}
+	private void init(Automata theAutomata)
+		throws Exception
+	{
+		this.alphabetPanel = new AlphabetViewerPanel(theAutomata);
 		contentPane = (JPanel) getContentPane();
 
 		// contentPane.setLayout(new BorderLayout());
 		// contentPane.add(toolBar, BorderLayout.NORTH);
-		setTitle("Alphabet Viewer: " + theAutomaton.getName());
+		setTitle("Alphabet Viewer"); // : " + theAutomaton.getName());
 		setSize(200, 500);
 		addWindowListener(new WindowAdapter()
 		{
@@ -109,16 +127,12 @@ public class AlphabetViewer
 
 		// File
 		JMenu menuFile = new JMenu();
-
 		menuFile.setText("File");
 		menuFile.setMnemonic(KeyEvent.VK_F);
 
 		// File.Close
 		JMenuItem menuFileClose = new JMenuItem();
-
 		menuFileClose.setText("Close");
-		menuFile.add(menuFileClose);
-		menuBar.add(menuFile);
 		menuFileClose.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -127,6 +141,38 @@ public class AlphabetViewer
 				//dispose();
 			}
 		});
+		
+		menuFile.add(menuFileClose);
+		menuBar.add(menuFile);
+		
+		// View
+		JMenu viewMenu = new JMenu("View");
+		viewMenu.setMnemonic(KeyEvent.VK_V);
+		
+		// View.Union (default, therefore initially checked)
+		JRadioButtonMenuItem viewMenuUnion = new JRadioButtonMenuItem("Union", true);
+		viewMenuUnion.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+			}
+		});
+		
+		// View.Intersection
+		JRadioButtonMenuItem viewMenuIntersection = new JRadioButtonMenuItem("Intersection");
+		viewMenuIntersection.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+			}
+		});
+		ButtonGroup buttongroup = new ButtonGroup();
+		buttongroup.add(viewMenuUnion);
+		buttongroup.add(viewMenuIntersection);
+		
+		viewMenu.add(viewMenuUnion);
+		viewMenu.add(viewMenuIntersection);
+		menuBar.add(viewMenu);
 	}
 
 	public void initialize() {}

@@ -115,4 +115,15 @@ public final class SupremicaCategory
 	{
 		return category.isDebugEnabled();
 	}
+	
+	public void setLogToConsole(boolean log)
+	{
+		if (log)
+		{
+			if (!LoggerFactory.hasConsoleAppender())
+			{
+				category.addAppender(LoggerFactory.getConsoleAppender());
+			}
+		}
+	}
 }

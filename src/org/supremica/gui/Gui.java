@@ -44,13 +44,13 @@ public interface Gui
 	public int addAutomata(Automata a)
 		throws Exception;
 
+	// returns number added
 	public int addProject(Project p)
 		throws Exception;
 
-	// returns number added
+	// returns true if added
 	public boolean addAutomaton(Automaton a);
 
-	// returns true if added
 	public Component getComponent();
 
 	public void addActions(Actions theActions);

@@ -53,7 +53,7 @@ import java.util.*;
 
 public class Arc
 {
-	private String eventId;
+	private String eventId;	// why not event here??
 	private State fromState;
 	private State toState;
 	private ArcListeners listeners = null;
@@ -81,14 +81,20 @@ public class Arc
 		{
 			throw new IllegalArgumentException("State to must be non null");
 		}
-		fromState = from;
-		toState = to;
+		this.fromState = from;
+		this.toState = to;
 		this.eventId = eventId;
 
 		from.addOutgoingArc(this);
 		to.addIncomingArc(this);
 	}
 
+	public Arc(State from, State to, LabeledEvent event)
+		throws IllegalArgumentException
+	{
+		this(from, to, event.getId());
+	}
+	
 	public String getEventId()
 	{
 		return eventId;

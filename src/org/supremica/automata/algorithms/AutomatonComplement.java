@@ -68,8 +68,7 @@ public class AutomatonComplement
 	public Automaton execute()
 	{
 		Alphabet alphabet = theAutomaton.getAlphabet();
-		State newState = null;
-		boolean complemented = false;
+		State dumpState = null;
 		Iterator stateIterator = theAutomaton.safeStateIterator();
 
 		while (stateIterator.hasNext())
@@ -87,6 +86,7 @@ public class AutomatonComplement
 			}
 
 			// Add arcs for all events that are not currently outgoing from the current state.
+			// Those arcs reach the dump state
 			Iterator eventIterator = alphabet.iterator();
 
 			while (eventIterator.hasNext())
@@ -107,26 +107,25 @@ public class AutomatonComplement
 
 				if (!found)
 				{
-					complemented = true;
-					if (newState == null)
+					if (dumpState == null)
 					{
-						newState = theAutomaton.createAndAddUniqueState("dump");
+						dumpState = theAutomaton.createAndAddUniqueState("dump");
 					}
-					theAutomaton.addArc(new Arc(currState, newState, currEvent.getId()));
+					theAutomaton.addArc(new Arc(currState, dumpState, currEvent.getId()));
 				}
 			}
 		}
 
 		// If complementation has been done, add the state, mark it as accepting and add self loops to the dump state...
-		if(complemented)
+		if(dumpState != null)
 		{
-			newState.setAccepting(true);
+			dumpState.setAccepting(true);
 
 			Iterator eventIterator = alphabet.iterator();
 
 			while (eventIterator.hasNext())
 			{
-				theAutomaton.addArc(new Arc(newState, newState, ((LabeledEvent) eventIterator.next()).getId()));
+				theAutomaton.addArc(new Arc(dumpState, dumpState, ((LabeledEvent) eventIterator.next()).getId()));
 			}
 		}
 

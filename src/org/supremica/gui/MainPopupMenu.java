@@ -80,6 +80,12 @@ class MainPopupMenu
 
 		menuHandler.add(purgeItem, 1);
 
+		// These are the "standard" algorithms
+		// Submenu stuff won't work here, the menuHandler consept has painted us into a corner
+		// ** This has to be reworked ** Use the Action concept instead **
+		// JMenu standardalgos = JMenu("Standard Algorithms");
+		// menuHandler.add(standardalgos, 0);
+			
 		JMenuItem minimizeItem = new JMenuItem("Minimize");
 
 		menuHandler.add(minimizeItem, 1);
@@ -91,6 +97,9 @@ class MainPopupMenu
 		JMenuItem complementItem = new JMenuItem("Automaton complement");
 
 		menuHandler.add(complementItem, 1);
+		
+		JMenuItem languageRestrictor = new JMenuItem(ActionMan.languageRestrictor);
+		menuHandler.add(languageRestrictor, 1);
 
 		JMenuItem interfaceItem = new JMenuItem("Interface Properties...");
 
@@ -367,7 +376,10 @@ class MainPopupMenu
 	public MainPopupMenu(Gui gui)
 	{
 		setInvoker(gui.getFrame());
-
+		
+		// Ugly fixx, temporary
+		ActionMan.gui = gui;
+		
 		menuHandler = new MenuHandler();
 
 		initPopups();

@@ -72,4 +72,6 @@ public interface Logger
 	public void info(Object message, Throwable t);
 
 	public boolean isDebugEnabled();
+	
+	public void setLogToConsole(boolean log);
 }

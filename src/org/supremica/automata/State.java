@@ -75,7 +75,8 @@ public class State
 	private int cost = UNDEF_COST;
 	private boolean visited = false;
 	private State assocState = null;
-	private Object equivClass = null;
+	// private Object equivClass = null;
+	private StateSet stateClass = null;	//
 	private int x = UNDEF_POS;
 	private int y = UNDEF_POS;
 	private int radius = 9;
@@ -124,7 +125,8 @@ public class State
 		first = otherState.first;
 		last = otherState.last;
 		cost = otherState.cost;
-		equivClass = otherState.equivClass;
+		// equivClass = otherState.equivClass;
+		stateClass = otherState.stateClass;
 		visited = otherState.visited;
 		x = otherState.x;
 		y = otherState.y;
@@ -441,14 +443,15 @@ public class State
 		return cost;
 	}
 
-	public void setEquivalenceClass(Object equivClass)
+	public void setStateClass(StateSet stateClass) // setEquivalenceClass(Object equivClass)
 	{
-		this.equivClass = equivClass;
+		// this.equivClass = equivClass;
+		this.stateClass = stateClass;
 	}
 
-	public Object getEquivalenceClass()
+	public StateSet getStateClass() // Object getEquivalenceClass()
 	{
-		return equivClass;
+		return stateClass; // equivClass;
 	}
 
 	public void setVisited(boolean visited)
