@@ -196,7 +196,6 @@ public class AutomataBDDVerifier
 	public boolean isControllable()
 	{
 		int Q_u = sup.getSomeReachableUncontrollables();
-
 		// int Q_u = sup.getReachableUncontrollables();
 		// hd.setNumberOfForbiddenStates(ba.count_states(Q_u));
 		boolean is_controllable = ba.getZero() == Q_u;

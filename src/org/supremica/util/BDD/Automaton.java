@@ -174,6 +174,28 @@ public class Automaton
 		// alphabet.dumpSubset("  UC events for " + getName(), care_set_uc);
 	}
 
+
+	// ------------------------------------------------------------
+	/**
+	 * retruns true if this single automaton is controllable.
+	 * that is, no forbidden states are conncted via an uncontrollable event.
+	 *
+	 * Do not call before the model is "closed" !!
+	 */
+
+	 public boolean isControllable()
+	 {
+		 Arc [] arcs = arcSet.getArcVector();
+		 for(int i = 0; i < arcs.length; i++)
+		 {
+			 if(arcs[i].o_to.isForbidden() && !arcs[i].o_event.isControllable() )
+			 {
+				 return true;
+			 }
+		 }
+
+		 return false;
+	 }
 	// ------------------------------------------------------------
 
 	/** maps event -> number of times that event was used in a transition */

@@ -283,7 +283,7 @@ public class Supervisor
 		{
 			int cube2 = manager.and(e_cube, cubep_p);
 
-			tmp4 = manager.relProd(t_p, tmp2, cubep_p);
+			tmp4 = manager.relProd(t_p, tmp2, cube2);
 
 			manager.deref(cube2);
 		}
@@ -961,7 +961,7 @@ public class Supervisor
 	}
 
 	/** return Q[supNB] */
-	public int getSafeStatesNB()
+	private int getSafeStatesNB()
 	{
 		/*
 		// XXX: what the hell was this??
@@ -979,7 +979,7 @@ public class Supervisor
 
 	/** return Q[supC] */
 
-	public int getSafeStatesC()
+	private int getSafeStatesC()
 	{
 
 		// XXX:
@@ -991,19 +991,30 @@ public class Supervisor
 	}
 
 	/** return Q[supNBC] */
-	public int getSafeStatesNBC()
+	private int getSafeStatesNBC()
 	{
 
 		// note: dont use timer here (get reseted by getReachable)
 		GrowFrame gf = BDDGrow.getGrowFrame(manager, "Safe states: nodeCount(X)");
-		int xp, x = getUncontrollableStates();
+
+		Timer timer = new Timer("SafeStatesNBC");
+		int xp, x = manager.ref( getUncontrollableStates() );
+		timer.report("Uncontrollable by syncronization found", true);
+
 		int marked = GroupHelper.getM(manager, spec, plant);
 
-		manager.ref(x);
 
+
+		int implicitly_forbidden = manager.computeF();
+		x = manager.orTo(x, implicitly_forbidden);
+		manager.deref(implicitly_forbidden);
+
+
+		int itr = 0;
 		do
 		{
 			xp = x;
+			itr++;
 
 			int qp_k = restrictedBackward(marked, x);
 			int not_qp_k = manager.not(qp_k);
@@ -1026,12 +1037,12 @@ public class Supervisor
 		manager.deref(x);
 
 
-
 		if (gf != null)
 		{
 			gf.stopTimer();
 		}
 
+		timer.report("Safe states computed with " + itr + " iterations", true);
 		return not_x;
 	}
 
@@ -1046,7 +1057,7 @@ public class Supervisor
 	 * used in safe-state supervisor synthesis
 	 */
 
-	public int restrictedBackward(int marked, int forbidden)
+	protected int restrictedBackward(int marked, int forbidden)
 	{
 
 		// note: dont use timer here (get reseted in getSafeStates)
@@ -1056,13 +1067,11 @@ public class Supervisor
 		int t_all = manager.relProd(plant.getT(), spec.getT(), e_cube);
 		int r_all_p, r_all = manager.replace(marked, perm_s2sp);
 
-
 		do
 		{
 			r_all_p = r_all;
 
 			int tmp = manager.relProd(t_all, r_all, sp_cube);
-
 			tmp = manager.andTo(tmp, good);    // remove bad stuffs
 
 			int tmp2 = manager.replace(tmp, perm_s2sp);
@@ -1095,7 +1104,7 @@ public class Supervisor
 	 * used in the safe-state supervisor synthesis algorithm.
 	 */
 
-	public int uncontrollableBackward(int forbidden)
+	protected int uncontrollableBackward(int forbidden)
 	{
 
 		int delta_all = manager.and(plant.getT(), spec.getT()); // t-top ??

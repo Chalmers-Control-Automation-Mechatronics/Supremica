@@ -114,7 +114,7 @@ public class BDDAutomaton
 
 			if (states[i].f)
 			{
-				bdd_f = manager.orTo(bdd_f, states[i].bdd_sp);
+				bdd_f = manager.orTo(bdd_f, states[i].bdd_s);
 			}
 
 			/* to count states correctly, we use only one encoding state -> the care set != entire S */
@@ -589,6 +589,15 @@ public class BDDAutomaton
 		// BDDAssert.debug("BDD_T_PRI"); manager.printSet(bdd_t_pri);
 	}
 
+	// -------------------------------------------------------------------
+	/**
+	 * retruns true if this single automaton is controllable.
+	 * that is, no forbidden states are conncted via an uncontrollable event
+	 */
+	public boolean isControllable()
+	{
+		return automaton.isControllable();
+	}
 	// -------------------------------------------------------------------
 	private void dumpBDD(PrintStream ps, String name, int bdd, int vars)
 	{

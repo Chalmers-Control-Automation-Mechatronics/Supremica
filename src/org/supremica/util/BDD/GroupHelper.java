@@ -11,7 +11,7 @@ package org.supremica.util.BDD;
 public class GroupHelper
 {
 	private int size;
-	private int[] tpri, cube, cubep, twave;
+	private int[] tpri, cube, cubep, twave, twaveu;
 	private boolean[] type;
 	private BDDAutomaton[] sorted_list;
 	private BinaryHeap bh;
@@ -93,6 +93,7 @@ public class GroupHelper
 		}
 
 		twave = null;    // NOT computed unless needed!
+		twaveu = null;
 	}
 
 	// --------------------------------------------------------------------------
@@ -129,7 +130,7 @@ public class GroupHelper
 
 	/** get ~T (disjunctive T). <br>
 	 * This will probably trigger a long sequence of computation first time.<br>
-	 * (internal: you dont need to cleanup after this function, its done elsewhere)
+	 * (internal: you dont need to cleanup after this function, its done DependencySet for each automaton)
 	 */
 	public int[] getTwave()
 	{
@@ -144,6 +145,25 @@ public class GroupHelper
 		}
 
 		return twave;
+	}
+
+	/**
+	 * return the uncontrollable subset of Twave
+	 * @see #getTwave
+	 */
+	public int[] getTwaveUncontrollable()
+	{
+		if (twaveu == null)
+		{
+			twaveu = new int[size];
+
+			for (int i = 0; i < size; i++)
+			{
+				twaveu[i] = sorted_list[i].getDependencySet().getTwaveUncontrollable();
+			}
+		}
+
+		return twaveu;
 	}
 
 	// ---------------------------------------------------------------------------

@@ -5,27 +5,18 @@ import java.util.*;
 public class Cluster
 {
 	public Vector members;    /* list of BDDAutomaton */
-	public int twave, cube, cubep;
+	public int twave, twaveu, cube, cubep;
 	private BDDAutomata manager;
 
 	// DEBUG private BDDRefCheck refcheck;
-	public Cluster(BDDAutomata manager, int t, int c, int cp)
+	public Cluster(BDDAutomata manager, int t, int tu, int c, int cp)
 	{
 		this.manager = manager;
-		members = new Vector();
-		this.twave = t;
-		this.cube = c;
-		this.cubep = cp;
-
-		manager.ref(this.twave);
-		manager.ref(this.cube);
-		manager.ref(this.cubep);
-
-		// DEBUG:
-		// refcheck = new BDDRefCheck(manager, "A Cluster");
-		// refcheck.add(this.twave);
-		// refcheck.add(this.cube);
-		// refcheck.add(this.cubep);
+		this.members = new Vector();
+		this.twave   = manager.ref( t );
+		this.twaveu  = manager.ref( tu );
+		this.cube    = manager.ref( c );
+		this.cubep   = manager.ref( cp);
 	}
 
 	public void cleanup()
@@ -34,6 +25,7 @@ public class Cluster
 		// DEBUG
 		// check("cleanup");
 		manager.deref(twave);
+		manager.deref(twaveu);
 		manager.deref(cube);
 		manager.deref(cubep);
 	}
@@ -41,10 +33,8 @@ public class Cluster
 	/** deep copy of a Cluster (with BDD refs and everything) */
 	public Cluster copy()
 	{
-		Cluster ret = new Cluster(manager, twave, cube, cubep);
-
+		Cluster ret = new Cluster(manager, twave, twaveu, cube, cubep);
 		Util.append(ret.members, this.members);
-
 		return ret;
 	}
 
@@ -58,6 +48,7 @@ public class Cluster
 		cube = manager.andTo(cube, with.cube);
 		cubep = manager.andTo(cubep, with.cubep);
 		twave = manager.orTo(twave, with.twave);
+		twaveu = manager.orTo(twaveu, with.twaveu);
 	}
 
 	public boolean interact(Cluster c)
@@ -94,6 +85,10 @@ public class Cluster
 		return twave;
 	}
 
+	public int getTwaveUncontrollable()
+	{
+		return twaveu;
+	}
 	public int getCube()
 	{
 		return cube;

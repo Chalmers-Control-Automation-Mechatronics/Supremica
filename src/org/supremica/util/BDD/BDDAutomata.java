@@ -257,6 +257,21 @@ public class BDDAutomata
 	}
 
 	// -------------------------------------------------------------------------------------
+	/**
+	 * compute and return the set of globally forbidden (but not always reachable!) states.
+	 *
+	 * the returned bdd is ref-counted and must be deref-counted by the user
+	 */
+	public int computeF()
+	{
+		int x = ref( getZero() );
+		for(int i = 0; i < automata.length; i++)
+		{
+			x = orTo(x, automata[i].getF() );
+		}
+		return x;
+	}
+	// -------------------------------------------------------------------------------------
 	public BDDAutomaton[] getAutomataVector()
 	{
 		return automata;

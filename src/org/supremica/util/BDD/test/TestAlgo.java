@@ -9,18 +9,25 @@ import org.supremica.automata.algorithms.*;
 /**
  * "test" the result of algorithms against a set of pre-solved problems
  * We are in the "dist" directory during these tests.
+ *
+ *
+ * XXX: the sumpNBC tests are not very accurate (there are simply many correct answers,
+ * and we dont know which one we will get). what we really should
  */
 public class TestAlgo
 {
 
 	/**
 	 * It works like this:
-	 * controllablility tests is always done.
-	 * reachability test only if size != -1
-	 * co-reachability test only if size != -1
+	 * controllablility tests are always done.
+	 * reachability test only if reachables != -1
+	 * co-reachability test only if coreachables != -1
 	 * non-blocking test only if can do reachability and co-reachability
+	 * supNBC only if supstates != -1
 	 */
-	private static final String[] TEST_FILES = { "../examples/includeInJarFile/OtherExamples/parallelManufacturingExample.xml",
+	private static final String[] TEST_FILES = {
+												"../examples/SynthesizerTest.xml",
+												"../examples/includeInJarFile/OtherExamples/parallelManufacturingExample.xml",
 												 "../examples/includeInJarFile/OtherExamples/agv.xml",
 												 "../examples/includeInJarFile/OtherExamples/catmouse.xml",
 												 "../examples/includeInJarFile/OtherExamples/circularTable.xml",
@@ -31,18 +38,24 @@ public class TestAlgo
 
 	// XXX:         these number probably haev double-floating-point  overflows, so if we count them in some other way we might not
 	//        get exactly the same number for the big ones!
-	private static final double reachables[] = { 5702550, 25731072, 18, 199,
-												 2274519862886400.0, 10000000,
-												 1.101504E7, -1 };
-	private static final double coreachables[] = { 5702550, 343692864, 20,
-												   432, 2274519862886400.0,
-												   10000000, -1, -1 };
-	private static final boolean controllable[] = { true, false, false, false,
-													true, true, true, true };
-	private static final boolean nonblocking[] =
-	{
-		true, true, true, false, false, true, true /* dont know */, true /* dont know */
+	private static final double reachables[] = { 10,
+		5702550, 25731072, 18, 199, 2274519862886400.0, 10000000,1.101504E7, -1 };
+	private static final double coreachables[] = {  6,
+			5702550, 343692864, 20, 432, 2274519862886400.0,10000000, -1, -1 };
+	private static final double supstates[] = { 3 /* [1] */,
+		-1, -1, 8 /* [1] */ , 151, -1, 10000000, -1, -1 };
+
+	private static final boolean controllable[] = { false,
+		true, false, false, false, true, true, true, true };
+	private static final boolean nonblocking[] = { false,
+		true, true, true, false, false, true, true /* [2]*/, true /* [2] */
 	};
+
+	/*
+	NOTES:
+	 [1] not equal to supremicas answer, contains safe states that are not reachable under supervision and we have no algo to compute these today
+	 [2] we dont know the answer, or dont care to compute it as it takes to loooong time for this test
+	*/
 
 	// ----------------------------------------------------------------------------------
 	private int fail, pass;
@@ -90,9 +103,49 @@ public class TestAlgo
 		fail++;
 	}
 
+	// ----------------------------------------------------------------
+	/**
+	 * count the number of states in the safe state supervisor.
+	 * the problem we face here is that these states are not all reachable so we cant just compare the
+	 * results with supremicas traditional algorithms. we can compute the intersaction fo safe states and
+	 * the reachable states, but that doesnt remove states that are both safe and reachable  buth unreachable
+	 * _under supervision_.
+	 *
+	 */
+	private void testSupNBC(double states)
+	{
+		// no synthesis data available
+		if(states < 0)
+		{
+			return;
+		}
+
+		System.out.print("supNBC ");
+
+		int safe_states = supervisor.getSafeStates(true, true);
+		int reachables = supervisor.getReachables();
+		int reachable_safe = automata2.and(reachables, safe_states);
+		double found = automata2.count_states(reachable_safe);
+
+
+		if (found != states)
+		{
+			error("[supNBC] supervisor has " + found + " states, expected " + states);
+			return;
+		}
+
+		pass++;
+	}
+
 	// ----------------------------------------------------------------------------------
 	private void testC(boolean result, double reachables)
 	{
+
+		// dont know if this is correct, but we skip controllability for less than two automata
+		if( automata2.getSize()  < 2)
+		{
+			return ;
+		}
 
 		// WHAT IS THIS?
 		// if(Options.inclsuion_algorithm != Options.INCLUSION_ALGO_MONOLITHIC) return; // not monolithic!
@@ -184,6 +237,13 @@ public class TestAlgo
 	private void incrementalC(boolean result)
 		throws Exception
 	{
+
+		// dont know if this is correct, but we skip controllability for less than two automata
+		if( automata2.getSize()  < 2)
+		{
+			return ;
+		}
+
 		System.out.print("incrC ");
 
 		// IncrementalBDDLanguageInclusion ili = new IncrementalBDDLanguageInclusion(automata1, null);
@@ -206,6 +266,13 @@ public class TestAlgo
 	private void modularC(boolean result)
 		throws Exception
 	{
+
+		// dont know if this is correct, but we skip controllability for less than two automata
+		if( automata2.getSize()  < 2)
+		{
+			return ;
+		}
+
 		System.out.print("modC ");
 
 		ModularLI mli = new ModularLI(automata1, null);
@@ -239,14 +306,20 @@ public class TestAlgo
 
 	private void announce(String nam)
 	{
-		int n = nam.lastIndexOf('/');
 
+		int n = nam.lastIndexOf('/');
 		if (n > 0)
 		{
 			nam = nam.substring(n + 1);
 		}
 
-		adjust(nam + ":", 40);
+		n = nam.lastIndexOf('.');
+		if(n > 0)
+		{
+			nam = nam.substring(0, n);
+		}
+
+		adjust(nam + ":", 35);
 	}
 
 	// ------------------------------------------------------------------------------------
@@ -257,7 +330,7 @@ public class TestAlgo
 
 		int len = TEST_FILES.length;
 
-		for (int k = 0; k < 3; k++)
+		for (int k = 0; k < 4; k++)
 		{
 			System.out.println("\nTarget #" + k + " is " + TEST_FILES[k]);
 
@@ -351,6 +424,7 @@ public class TestAlgo
 			testCR(coreachables[i]);
 			testNB(reachables[i], coreachables[i], nonblocking[i]);
 			testC(controllable[i], reachables[i]);
+			testSupNBC(supstates[i]);
 			verifier.cleanup();    // cleans up both supervisor and automata2
 
 			// what a waste of resources, we will do all BDD pre-calcs again :(
@@ -384,7 +458,6 @@ public class TestAlgo
 			PrintStream ps = new PrintStream(fos);
 
 			Options.out = ps;
-			Options.debug_on = true;
 		}
 		catch (IOException exx)
 		{
@@ -392,6 +465,7 @@ public class TestAlgo
 		}
 
 		// remeber, there is no GUI:
+		Options.debug_on = false;
 		Options.size_watch = false;
 		Options.user_alters_PCG = false;
 		Options.show_grow = Options.SHOW_GROW_NONE;
@@ -412,6 +486,9 @@ public class TestAlgo
 
 /*
  $Log: not supported by cvs2svn $
+ Revision 1.14  2004/06/11 21:12:52  knut
+ After running JIndent
+
  Revision 1.13  2004/05/21 15:28:08  vahidi
 
  major  bugfix patch:

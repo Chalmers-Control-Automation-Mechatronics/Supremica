@@ -235,7 +235,7 @@ public class WorksetSupervisor
 		GrowFrame gf = BDDGrow.getGrowFrame(manager, "Backward reachability" + type());
 
 		timer.reset();
-		SizeWatch.setOwner("WorksetSupervisor.computeReachables");
+		SizeWatch.setOwner("WorksetSupervisor.computeCoReachables");
 
 		Workset workset = getWorkset(false);
 		int r_all_p, r_all = manager.replace(m_all, perm_s2sp);
@@ -311,10 +311,129 @@ public class WorksetSupervisor
 			gf.stopTimer();
 		}
 
-		SizeWatch.report(bdd_reachables, "Qr");
+		SizeWatch.report(ret, "Qr");
 		timer.report("Backward reachables found (workset)");
 		workset.done();
 
 		return ret;
 	}
+
+
+	// --- [ safe state supervisory stuff ] -----------------------------------------
+
+	protected int restrictedBackward(int marked, int forbidden)
+	{
+
+		// statistic stuffs
+		GrowFrame gf = BDDGrow.getGrowFrame(manager, "restrictedBackward " + type());
+
+		timer.reset();
+		SizeWatch.setOwner("WorksetSupervisor.restrictedBackward");
+
+		Workset workset = getWorkset(false);
+		int r_all_p, r_all = manager.replace(marked, perm_s2sp);
+		int r_permitted = manager.not(forbidden);
+
+		while (!workset.empty())
+		{
+			int p = workset.pickOne();
+			int r_all_org = r_all;
+
+			do
+			{
+				r_all_p = r_all;
+
+				int tmp = manager.relProd(clusters[p].getTwave(), r_all, sp_cube);
+
+				tmp = manager.andTo(tmp, r_permitted);
+				int tmp2 = manager.replace(tmp, perm_s2sp);
+				manager.deref(tmp);
+
+				r_all = manager.orTo(r_all, tmp2);
+
+				manager.deref(tmp2);
+
+				if (gf != null)
+				{
+					gf.add(r_all);
+				}
+			}
+			while (r_all_p != r_all);
+
+			workset.advance(p, r_all != r_all_org);
+		}
+
+		int ret = manager.replace(r_all, perm_sp2s);
+
+		manager.deref(r_all);
+		manager.deref(r_permitted);
+
+		if (gf != null)
+		{
+			gf.stopTimer();
+		}
+
+		SizeWatch.report(ret, "Qrestricted_backward");
+		timer.report("restrictedBackward (workset)");
+		workset.done();
+
+		return ret;
+	}
+
+
+	// -------------------------------------------------------
+
+	protected int uncontrollableBackward(int states)
+	{
+		GrowFrame gf = BDDGrow.getGrowFrame(manager, "uncontrollableBackward " + type());
+
+		timer.reset();
+		SizeWatch.setOwner("WorksetSupervisor.uncontrollableBackward");
+
+		Workset workset = getWorkset(false);
+		int r_all_p, r_all = manager.replace(states, perm_s2sp);
+
+		while (!workset.empty())
+		{
+			int p = workset.pickOne();
+			int r_all_org = r_all;
+
+			do
+			{
+				r_all_p = r_all;
+
+				int tmp = manager.relProd(clusters[p].getTwaveUncontrollable(), r_all, sp_cube);
+
+				int tmp2 = manager.replace(tmp, perm_s2sp);
+				manager.deref(tmp);
+
+				r_all = manager.orTo(r_all, tmp2);
+
+				manager.deref(tmp2);
+
+				if (gf != null)
+				{
+					gf.add(r_all);
+				}
+			}
+			while (r_all_p != r_all);
+
+			workset.advance(p, r_all != r_all_org);
+		}
+
+		int ret = manager.replace(r_all, perm_sp2s);
+		manager.deref(r_all);
+
+		if (gf != null)
+		{
+			gf.stopTimer();
+		}
+
+		SizeWatch.report(ret, "Quncontrollable_backward");
+		timer.report("uncontrollableBackward (workset)");
+		workset.done();
+
+		return ret;
+	}
+
 }

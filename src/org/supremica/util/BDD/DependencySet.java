@@ -2,6 +2,9 @@ package org.supremica.util.BDD;
 
 import java.io.*;
 
+// XXX: dependency set computation is a little bit inefficient.
+// it would be nicer if we could use the same dependency matrix for this and automata ordering.
+
 public class DependencySet
 {
 	private BDDAutomata manager;
@@ -9,7 +12,7 @@ public class DependencySet
 	private BDDAutomaton me;
 	private boolean[] map_dependency;
 	private int bdd_keep_depend, bdd_keep_others, bdd_t_wave,
-				bdd_t_wave_isolated;
+				bdd_t_wave_isolated, bdd_t_wave_u;
 	private int bdd_i, bdd_cube, bdd_cube_others;
 
 	public DependencySet(BDDAutomata manager, BDDAutomaton me)
@@ -134,12 +137,16 @@ public class DependencySet
 		bdd_t_wave_isolated = manager.exists(tmp3, manager.getEventCube());    // XXX: why dones this one includes event-variables ??
 		bdd_t_wave = manager.relProd(tmp3, bdd_keep_others, manager.getEventCube());
 
+		// now, get the uncontrollable subset of t_wave:
+		tmp3 = manager.andTo(tmp3, manager.getSigmaU() );
+		bdd_t_wave_u = manager.relProd(tmp3, bdd_keep_others, manager.getEventCube());
+
 		manager.deref(tmp3);
 		manager.deref(event_mask);
 		SizeWatch.report(bdd_t_wave, "Twave");
+		SizeWatch.report(bdd_t_wave_u, "Twave_u");
 	}
 
-	// -----------------------------------------------------------------
 	// ------------------------------------------------------------------
 	public void cleanup()
 	{
@@ -147,6 +154,7 @@ public class DependencySet
 		manager.deref(bdd_keep_depend);
 		manager.deref(bdd_t_wave_isolated);
 		manager.deref(bdd_t_wave);
+		manager.deref(bdd_t_wave_u);
 		manager.deref(bdd_i);
 		manager.deref(bdd_cube_others);
 	}
@@ -172,6 +180,11 @@ public class DependencySet
 		return bdd_t_wave;
 	}
 
+	public int getTwaveUncontrollable()
+	{
+		return bdd_t_wave_u;
+	}
+
 	public int getTwaveIsolated()
 	{
 		return bdd_t_wave_isolated;
@@ -182,20 +195,6 @@ public class DependencySet
 		return bdd_i;
 	}
 
-	// -----------------------------------------------------------------
-
-	/* NOT TESTED  (to be used in workset-amoothing ? )
-	public int addDependency(int [] vector) {
-				int count = 0;
-				for(int i = 0; i < all.length; i++) {
-				if(all[i] != me) {
-								vector[i]++;
-								count++;
-						}
-				}
-				return count;
-		}
-		*/
 
 	// -----------------------------------------------------------------
 	public int getReachables(int start)

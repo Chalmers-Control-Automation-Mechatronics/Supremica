@@ -1,14 +1,19 @@
 package org.supremica.util.BDD;
 
 /**
- * This class optimize the number and BDD size of disjunctive transition relations
+ * This class optimize the number and BDD size of disjunctive transition relations.
+ *
+ * The idea is to join/splitt disjunctive transition relations to make things easier
+ * for the BDD engine, but we havent figured out how to do that yet :(
+ *
  */
+
 public class DisjOptimizer
 {
 	private GroupHelper gh;
 	private BDDAutomata manager;
 	private int max_size, size;
-	private int[] twave, twave2;
+	private int[] twave, twave_u;
 	private Cluster[] clusters;
 
 	// DEBUG public BDDRefCheck refcheck;
@@ -18,10 +23,11 @@ public class DisjOptimizer
 		this.manager = manager;
 		max_size = size = gh.getSize();
 		twave = new int[size];
-		twave2 = new int[size];
+		twave_u = new int[size];
 		clusters = new Cluster[size];
 
 		int[] tmp = gh.getTwave();
+		int[] tmp2 = gh.getTwaveUncontrollable();
 		int[] cube = gh.getCube();
 		int[] cubep = gh.getCubep();
 		BDDAutomaton[] automata = gh.getSortedList();
@@ -31,25 +37,18 @@ public class DisjOptimizer
 		{
 
 			// make this copy our own
-			twave[i] = tmp[i];
+			twave[i] = manager.ref( tmp[i] );
+			twave_u[i] = manager.ref( tmp2[i] );
 
-			manager.ref(twave[i]);
 
 			// THIS solves many problmes (why?)
 			// manager.ref( cube[i] );
-			clusters[i] = new Cluster(manager, twave[i], cube[i], cubep[i]);
-
+			clusters[i] = new Cluster(manager, twave[i], twave_u[i], cube[i], cubep[i]);
 			clusters[i].members.addElement(automata[i]);
 
-			// DEBUG:
-			// refcheck.add( twave[i]);
-			// refcheck.add( cube[i]);
-			// refcheck.add( cubep[i]);
 		}
 
 		optimize();
-
-		// DEBUG check("After optimize");
 	}
 
 	public void cleanup()
@@ -59,6 +58,7 @@ public class DisjOptimizer
 		for (int i = 0; i < size; i++)
 		{
 			manager.deref(twave[i]);
+			manager.deref(twave_u[i]);
 			clusters[i].cleanup();
 		}
 	}
