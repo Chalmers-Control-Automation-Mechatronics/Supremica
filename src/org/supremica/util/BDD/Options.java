@@ -46,7 +46,7 @@ public class Options
     public static boolean show_grow = true;
     public static boolean trace_on = false;
     public static boolean local_saturation = false;
-    public static boolean bdd_modular = false;
+    public static boolean bdd_modular = true;
     public static boolean uc_optimistic = true;
     public static boolean nb_optimistic = true;
 
