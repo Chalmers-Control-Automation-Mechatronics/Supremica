@@ -66,7 +66,7 @@ import java.util.EmptyStackException;
 import java.util.Hashtable;
 import java.util.Stack;
 import java.util.Vector;
-import org.xml.sax.Attributes;
+import org.xml.sax.AttributeList;
 import org.xml.sax.SAXException;
 
 /**
@@ -76,7 +76,7 @@ import org.xml.sax.SAXException;
  * work better for you.
  *
  * @author <a href="mailto:hannes@apache.org">Hannes Wallnoefer</a>
- * @version $Id: XmlRpcClient.java,v 1.2 2004-04-26 13:01:43 torda Exp $
+ * @version $Id: XmlRpcClient.java,v 1.3 2004-05-26 15:16:13 vahidi Exp $
  */
 public class XmlRpcClient implements XmlRpcHandler
 {
@@ -504,7 +504,7 @@ public class XmlRpcClient implements XmlRpcHandler
         /**
          * Overrides method in XmlRpc to handle fault repsonses.
          */
-        public void startElement(String name, Attributes atts)
+        public void startElement(String name, AttributeList atts)
                 throws SAXException
         {
             if ("fault".equals(name))

@@ -51,7 +51,7 @@ public class Limiter {
 
 	public void reset() {
 		has_stopped = false;
-		global_stop = false; // XXX: affects parallell processes!
+		global_stop = false; // XXX: RACE CONDITION, affects parallell processes!
 		if(maxtime < 0) end_time = -1; // disabled
 		else end_time = maxtime + System.currentTimeMillis();
 	}

@@ -61,8 +61,8 @@ import java.io.InputStream;
 import java.util.Hashtable;
 import java.util.Stack;
 import java.util.Vector;
-import org.xml.sax.Attributes;
-import org.xml.sax.helpers.DefaultHandler;
+import org.xml.sax.AttributeList;
+import org.xml.sax.HandlerBase;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
@@ -88,9 +88,12 @@ import javax.xml.parsers.*;
  * @author <a href="mailto:hannes@apache.org">Hannes Wallnoefer</a>
  * @author <a href="mailto:dlr@finemaltcoding.com">Daniel Rall</a>
  * @author <a href="mailto:andrew@kungfoocoder.org">Andrew Evers</a>
- * @version $Id: XmlRpc.java,v 1.3 2004-04-26 13:01:44 torda Exp $
+ * @version $Id: XmlRpc.java,v 1.4 2004-05-26 15:16:13 vahidi Exp $
  */
-public abstract class XmlRpc extends DefaultHandler
+
+
+// ajabaja tord, inte ändra kod du inte är insatt i bara för att få tyst på jikes:
+public abstract class XmlRpc extends HandlerBase
 {
     /**
      * The version string used in HTTP communication.
@@ -553,7 +556,7 @@ public abstract class XmlRpc extends DefaultHandler
     /**
      * Method called by SAX driver.
      */
-    public void startElement(String name, Attributes atts)
+    public void startElement(String name, AttributeList atts)
             throws SAXException
     {
         if (debug)

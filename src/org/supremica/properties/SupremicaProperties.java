@@ -154,6 +154,7 @@ public final class SupremicaProperties
 	private static final String BDD_ALTER_PCG = "bddAlterPCG";
 	private static final String BDD_TRACE_ON  = "bddTraceOn";
 	private static final String BDD_DEBUG_ON  = "bddDebugOn";
+	private static final String BDD_PROFILE_ON  = "bddProfileOn";
 	private static final String BDD_ALGORITHM = "bddAlgorithm";
 	private static final String BDD_COUNT_ALGO= "bddCountAlgorithm";
 	private static final String BDD_LOCAL_SATURATION = "bddLocalSaturation";
@@ -1167,6 +1168,7 @@ public final class SupremicaProperties
 			setOption(BDD_SHOW_GROW , Options.show_grow);
 			setOption(BDD_ALTER_PCG , Options.user_alters_PCG);
 			setOption(BDD_DEBUG_ON , Options.debug_on);
+			setOption(BDD_PROFILE_ON , Options.profile_on);
 			setOption(BDD_UC_OPTIMISTIC , Options.uc_optimistic);
 			setOption(BDD_NB_OPTIMISTIC , Options.nb_optimistic);
 			setOption(BDD_LOCAL_SATURATION , Options.local_saturation);
@@ -1194,6 +1196,7 @@ public final class SupremicaProperties
 			Options.nb_optimistic 			= optionAsBoolean(BDD_NB_OPTIMISTIC , Options.nb_optimistic);
 			Options.local_saturation 		= optionAsBoolean(BDD_LOCAL_SATURATION , Options.local_saturation);
 			Options.trace_on 						= optionAsBoolean(BDD_TRACE_ON , Options.trace_on);
+			Options.profile_on          = optionAsBoolean(BDD_PROFILE_ON , Options.profile_on);
 			Options.count_algo 					= optionAsInt(BDD_COUNT_ALGO , Options.count_algo);
 			Options.inclsuion_algorithm = optionAsInt(BDD_LI_ALGO , Options.inclsuion_algorithm);
 			Options.ordering_algorithm 	= optionAsInt(BDD_ORDER_ALGO , Options.ordering_algorithm);
@@ -1205,6 +1208,7 @@ public final class SupremicaProperties
 			Options.max_partition_size 	= optionAsInt(BDD_PARTITION_MAX , Options.max_partition_size);
 			Options.encoding_algorithm 	= optionAsInt(BDD_ENCODING_ALGO , Options.encoding_algorithm);
 			Options.extraLibPath 				= optionAsString(BDD_LIB_PATH , Options.extraLibPath);
+
 
 		}
 	}

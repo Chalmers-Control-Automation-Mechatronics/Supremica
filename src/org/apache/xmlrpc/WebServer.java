@@ -330,18 +330,21 @@ public class WebServer implements Runnable
     {
         // webserver.setParanoid (true);
         // webserver.acceptClient ("192.168.*.*");
-        addHandler("string", "Welcome to XML-RPC!");
-        addHandler("math", Math.class);
+        // addHandler("string", "Welcome to XML-RPC!");
+        // addHandler("math", Math.class);
         // addHandler("auth", new AuthDemo());
         // addHandler("$default", new Echo());
         // XmlRpcClients can be used as Proxies in XmlRpcServers which is a
         // cool feature for applets.
-        String url = "http://www.mailtothefuture.com:80/RPC2";
-        addHandler("mttf", new XmlRpcClient(url));
-        SystemHandler systemHandler = new SystemHandler();
+        // String url = "http://www.mailtothefuture.com:80/RPC2";
+        // addHandler("mttf", new XmlRpcClient(url));
+
+        SystemHandler systemHandler = new SystemHandler(xmlrpc);
+        addHandler("system", systemHandler);
+
         if (xmlrpc.getHandlerMapping() != null)
         	systemHandler.addDefaultSystemHandlers();
-        addHandler("system", systemHandler);
+
     }
 
     /**

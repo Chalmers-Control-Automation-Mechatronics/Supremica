@@ -336,7 +336,7 @@ class CommunicationPanel
 	extends JPanel
 {
 	private PreferencesDialog theDialog = null;
-	private JCheckBox useXmlRpc = null;
+	private JCheckBox useXmlRpc = null, debugXmlRpc = null;;
 	private JTextField xmlRpcPort, xmlRpcFilter;
 	private JTextField docdbHost, docdbPort, docdbUser, docdbDoc;
 
@@ -350,7 +350,7 @@ class CommunicationPanel
 		JLabel tmp;
 
 
-		JPanel panel  = new JPanel( new GridLayout(5,1) );
+		JPanel panel  = new JPanel( new GridLayout(6,1) );
 		add(panel, BorderLayout.WEST);
 
 		panel.add( tmp = new JLabel("XML-RPC", SwingConstants.LEFT)  );
@@ -364,6 +364,15 @@ class CommunicationPanel
 		panel.add(useXmlRpc = new JCheckBox("Run XML-RPC server") );
 		xmlRpcPort = add(panel, "Use port number ", 10);
 		xmlRpcFilter = add(panel, "Server IP filter ", 10);
+
+		debugXmlRpc = new JCheckBox("Debug XML-RPC communication");
+
+
+		if(SupremicaProperties.includeExperimentalAlgorithms() )  // debugging XML-RPC is good to only developers
+		{
+			panel.add(debugXmlRpc );
+		}
+
 
 
 		panel  = new JPanel( new GridLayout(5,1) );
@@ -409,6 +418,8 @@ class CommunicationPanel
 		SupremicaProperties.setXmlRpcPort(port);
 		SupremicaProperties.setXmlRpcFilter(xmlRpcFilter.getText());
 		SupremicaProperties.setXmlRpcActive(useXmlRpc.isSelected());
+		SupremicaProperties.setXmlRpcDebug(debugXmlRpc.isSelected());
+
 
 
 		SupremicaProperties.setDocDBHost(docdbHost.getText());
@@ -423,8 +434,12 @@ class CommunicationPanel
 	public void update()
 	{
 		useXmlRpc.setSelected(SupremicaProperties.isXmlRpcActive());
+		debugXmlRpc.setSelected(SupremicaProperties.isXmlRpcDebugging());
+
 		xmlRpcPort.setText(Integer.toString(SupremicaProperties.getXmlRpcPort()));
 		xmlRpcFilter.setText(SupremicaProperties.getXmlRpcFilter() );
+
+
 
 		docdbPort.setText("" + SupremicaProperties.getDocDBPort() );
 		docdbHost.setText(SupremicaProperties.getDocDBHost() );
