@@ -1,16 +1,24 @@
+% -*- TeX-master:"main" -*-
+
 \chapter{Automation Objects}
 \label{automationobjects}
-
 %% Intro
 With the function blocks the main technological problem of
 distributed automation has been solved. A general framework
 for development and deployment of distributed automation
-systems has been developed. What is still needed is a way of
-encapsulating function blocks together with the data about
-their properties and, more importantly, their functionality
-in a way that will enable diminishing the time to market
-and facilitate effective rapid object oriented development
-of automation systems.
+systems has been established. What is still needed is a way
+of encapsulating function blocks together with the data
+about their properties and, more importantly, about their
+functionality in a way that will enable diminishing of the
+time-to-market and facilitate effective rapid object
+oriented development of automation systems. In this chapter
+the concept of automation objects is presented as far as the
+research has come. There are still plenty of details to be
+worked out but this chapter should clarify the role and the
+benefits of using the automation objects in the development
+of the industrial, as well as other, automated control
+systems.
+
 
 \section{Background}
 %% Background. Why automation objects? What do we want to do?
@@ -21,12 +29,12 @@ afore mentioned goal.
 %%     effective reuse of software
 Object oriented system development as presented in the
 IEC~61499 standard is ideal for the purpose that it is
-designed for but not enough for achieving \emph{effective
-  software reuse} in automation systems development.
+designed for but not enough for achieving effective software
+reuse in automation systems development.
 
 %%     effective decentralization of software development 
-Effective software reuse facilitates \textit{effective
-  decentralization of software development}. If anyone could
+Effective software reuse facilitates effective
+decentralization of software development. If anyone could
 use the software that somebody else developed without
 wasting time on resolving the difficulties that arise from
 poorly documented interfaces, or resorting to
@@ -36,22 +44,20 @@ their part of the automation system software.
 
 %%     easier integration and deployment of software
 Leveraging effective software reuse and decentralized
-software development \textit{makes integration and
-  deployment much easier}. System integrator's task is
-hereby reduced to picking the right software objects from
-the library and connecting them for the specific
-application.
+software development makes integration and deployment much
+easier. System integrator's task is hereby reduced to
+picking the right software objects from the library and
+connecting them for the specific application.
 
 %%     development of libraries
 Using the encapsulation of software objects with well
 specified information about their usage makes it possible to
-\textit{build libraries} of elements that can easily be
-shared over the Internet since everything that is needed for
-the usage of the elements comes with the elements
-themselves. This is unlike the Java system where the objects
-are distributed in binary only format and the interface
-documentation has to be downloaded or reviewed on-line prior
-to usage.
+build libraries of elements that can easily be shared over
+the Internet since everything that is needed for the usage
+of the elements comes with the elements themselves. This is
+unlike the Java system where the objects are distributed in
+binary only format and the interface documentation has to be
+downloaded or reviewed on-line prior to usage.
 
 %%     all of these result in rapid development of
 %%     automation systems
@@ -59,12 +65,6 @@ The arguments presented are enough to support the idea that
 the software objects encapsulated with the information about
 their usage will increase the speed of the development of
 the automation systems.
-
-%After a specification and a formal definition of the
-%encapsulation the benefits beyond the ones discussed above
-%will be presented followed by the presentation about the
-%implementation issues and the support in Supremica that is
-%planned for such data objects.
 
 
 
@@ -75,24 +75,30 @@ of software objects are needed, preliminary called
 are still very much a research subject the following is the
 specification of the objects so far.
 
-%Automation Object:
-%* consists of models, controllers, views and
+%* AO consists of models, controllers, views and
 %  configuration registry
-Automation objects consists of models, views, controllers
-and configuration registry implemented using IEC-61499
-function blocks and their inteerfaces. Models are
-interchangable simulation models with varaying level of
-abstraction. One model might be used for the simulation on a
-high level of abstraction, typicaly behavioural model, and
-another for the simulation on a lower level. This is then
-used to implement dynamic zooming during the simulation. One
-of the models will implement the communication with the
-controlled equpiment thus allowing effortless switching
-between simulation and acutal control. This will enable
-gradual verification and on-line tuning of the big
-automation systems by allowing the simulation of the system
-components that are being configured or tuned while running
-the components that are already configured.
+Automation objects consists of models, controllers, views
+and configuration registry implemented using IEC~61499
+function blocks and their interfaces, see
+figure~\ref{fig:AO}. Models are interchangeable simulation
+models with varying level of abstraction. One model might
+be used for the simulation on a high level of abstraction,
+typically behavioral model, and another for the simulation
+on a lower level. This is then used to implement dynamic
+zooming during the simulation. One of the models will
+implement the communication with the controlled equipment
+thus allowing effortless switching between simulation and
+actual control. This will enable gradual verification and
+on-line tuning of the big automation systems by allowing the
+simulation of the system components that are being
+configured or tuned while running the components that are
+already configured.
+\begin{figure}[!ht]
+  \centering
+  \includegraphics{images/automationobjects/AO}
+  \caption{The architecture of the automation object.}
+  \label{fig:AO}
+\end{figure}
 
 Controllers are function blocks that control the model. The
 best examples of controllers are regulators as PI- or
@@ -100,36 +106,108 @@ PID-regulator. On the higher level of the automation system
 these can be configurable implementations of different
 automation algorithms. This allows interchange of different
 controlling strategies for easy verification with simulation
-and the equipment.
+and the equipment. The automation object can have as many
+controllers as it is needed but only one controller may be
+active at any time.
 
 Views are the function blocks allowing user interaction with
-the automation object. These implement all the alowable ways
+the automation object. These implement all the allowable ways
 of interaction with the automation object. At the lower
 levels of the automation system they will typically provide
-different event and data interfaces depending on the user's
-needs while at the higher leve they will implement full
-graphical user interfaces for the operators.
+various interfaces to the object depending on the user's
+needs while at the higher levels they will implement the
+full graphical user interfaces for the operators. As with
+the controllers there may be as many views as needed for the
+automation object.
 
-%* service is a set of views that support some relevant task
+Configuration registry is a function block implementing the
+configuration database and interface to it. This
+function block holds all relevant attributes for the
+automation object and provides an interface for accessing
+and changing them. Configuration registry is used by models,
+controllers and the views for storing and retrieving the
+configuration data.
+
+%* Service is a set of views that support some relevant task
 %  for the connected controller  
-%* is extensible with user defined services
+For every automation object a number of services may be
+defined. A number of views that are needed for a certain
+task during the development of the control system are
+specified in the definition of the service thus the service
+operates on a certain controller. The service can than be
+invoked during the development and ease the task that it is
+designed for. One service may only include views that
+operate on the same controller since only one controller is
+active at any time. Several services that operate on the
+same controller may be activated at the same time. On the
+other hand, services that operate on different controllers
+are mutually exclusive. During the development of the
+control system at the highest level of abstraction user of
+the automation objects is interacting only with services.
+For example, think of a company that is producing conveyor
+belts. The company buys motors and produces the belts. With
+the motor comes the automation object for it from the motor
+manufacturer. When the motor and the belt are assembled the
+tuning service of the motor's automation object can be
+invoked and the motor parameters can be tuned for the
+conveyor belt. The company also develops an accompanying
+automation object for the conveyor belt that encapsulates
+the automation object for the motor and provides a service
+for the tuning of the conveyor belt when it is installed in
+some manufacturing process.
+
 %* supports replacement of services defined within the
 %  object by user defined services
+%* is extensible with user defined services
 %* supports extension of services
-%* supports distribution of services and model among
-%  different computing resources
-%* has a single topology involving model and services
-%* has an access protection mechanism
+All services defined in an automation object are replaceable
+with user defined services. In case a user is not satisfied
+with how a service works she can develop new views and
+define a new service that will replace the service defined
+in the automation object. The user can also customize
+existing services by adding views to or replacing views in
+the defined services. It is also possible to define new
+services for the automation object by combining existing
+views in different groups, adding new views or both.
 
+%* supports distribution of services, controller and model among
+%  different computing resources
+Since the automation objects are built using IEC~61499
+function blocks the model, controller and services are
+distributable among different computing resources. Using
+this property tuning of the conveyor belt in the earlier
+example may be done from any computer on the company's
+network.
+
+%* has an access protection mechanism
+Last but not the least, automation objects have a
+protection mechanism that will hide the implementation of
+the models, views and controllers from the users of the
+automation objects.
 
 
 \section{Implementation and Support in Supremica}
 % Support in Supremica
+First implementation of the automation object concepts will
+be done in the Supremica. The architecture for the
+automation objects will be concurrently implemented with the
+development tools and functions. In this section
+implementation considerations are discussed and the
+development work flow is presented using some mockup
+screenshots.
 
 %% implementation of automation objects
 %%   archive of XML files
 %%   models, views, controllers and registry are declared in
 %%   some kind of MetaInformation.xml 
+An automation object is distributed as compressed archive of
+XML-files. The archive contains XML definitions of models,
+views, controllers, registry and a file containing the meta
+information for the automation object. In the meta
+information file all information about the automation object
+(ie name, creator, version), all of the possible
+configuration attributes, service definitions and interface
+explanations are stored.
 
 %% libraries 
 %%   non-hierarchical pool of automation objects
@@ -137,9 +215,5 @@ graphical user interfaces for the operators.
 %%   searching and sorting by multiple attributes/keys
 %%   searching and sorting by services
 
-% Example of usage in Supremica. Three scenarios with the
-% lab equipment (kulbanan).
-% 1. Student does everything.
-% 2. Library is provided and the logic is done by the student.
-% 3. Library is proviede and the logic is synthesised by the
-%    Supremica.
+%% development tool is the control system
+%% how will it work (mockups)
