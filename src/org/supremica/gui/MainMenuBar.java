@@ -90,7 +90,7 @@ import org.supremica.gui.animators.scenebeans.AnimationItem;
 import org.supremica.gui.animators.scenebeans.AnimationGroup;
 import org.supremica.util.BrowserControl;
 import org.supremica.util.SupremicaMenuItem;
-
+import org.supremica.automata.algorithms.GeneticAlgorithms;
 
 public class MainMenuBar
 	extends JMenuBar
@@ -571,9 +571,7 @@ public class MainMenuBar
 		}
 
 		// Evolution
-		// boolean showGA = true;
-		boolean showGA = false;
-		if (showGA)
+		if (GeneticAlgorithms.useGeneticAlgorithms())
 		{
 			JMenu menuEvoComp = new JMenu();
 			
@@ -591,7 +589,26 @@ public class MainMenuBar
 					{
 						try
 						{
-							ActionMan.evoCompSynchTable(ActionMan.getGui());
+							ActionMan.evoCompSynchTable(ActionMan.getGui(), false);
+						}
+						catch (Exception excp)
+						{
+							// what the f*** do we do?
+						}
+					}
+				});
+			
+			// EvoComp.PredictSize
+			JMenuItem predictSize = new JMenuItem();
+			predictSize.setText("Predict Synchronization Size");
+			menuEvoComp.add(predictSize);
+			predictSize.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						try
+						{
+							ActionMan.evoCompPredictSize(ActionMan.getGui());
 						}
 						catch (Exception excp)
 						{
@@ -812,7 +829,7 @@ public class MainMenuBar
 		// Tools.RunSimulation
 		JMenuItem run_simulation = new JMenuItem();
 
-		run_simulation.setText("Run simulation...");
+		run_simulation.setText("Run Simulation...");
 		menuTools.add(run_simulation);
 		run_simulation.addActionListener(new ActionListener()
 		{

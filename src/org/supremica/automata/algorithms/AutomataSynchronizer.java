@@ -116,7 +116,6 @@ public class AutomataSynchronizer
 		for (int i = 0; i < synchronizationExecuters.size(); i++)
 		{
 			AutomataSynchronizerExecuter currExec = (AutomataSynchronizerExecuter) synchronizationExecuters.get(i);
-
 			currExec.start();
 		}
 
@@ -168,7 +167,7 @@ public class AutomataSynchronizer
 		return synchHelper;
 	}
 
-	/* GAAAH! The garbage collection is too slow... and this won't make it faster...
+	/* GAAAH! The garbage collection is too slow... and this won't make it faster... /Hugo.
 	public void clear()
 	{
 		synchHelper = null;

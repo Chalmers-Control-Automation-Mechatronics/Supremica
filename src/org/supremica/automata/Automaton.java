@@ -1,4 +1,3 @@
-
 /*
  *  Supremica Software License Agreement
  *
@@ -765,7 +764,7 @@ public class Automaton
 		return new StateIterator((new StateSet(theStates)).iterator());
 	}
 
-	public Iterator arcIterator()
+	public ArcIterator arcIterator()
 	{
 		return theArcs.iterator();
 	}

@@ -2289,104 +2289,98 @@ public class ActionMan
 	 * This is a part of a project in a course in Evolutionary Computation, FFR105 (2002) at 
 	 * Chalmers University of Technology. 
 	 *
+	 * To use this you have to set a boolean in GeneticAlgorithms.java.
+	 *
 	 * Writes 8 columns of data and a correct value on each line of an output file
 	 *
 	 * @author Hugo Flordal, hugo@s2.chalmers.se
 	 */
-	public static void evoCompSynchTable(Gui gui)
+	public static void evoCompSynchTable(Gui gui, boolean append)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
 		
 		Automaton automatonA;
 		Automaton automatonB;
-		Automaton synchAutomaton;
 		FileWriter outFile = null;
 
-		Iterator automataAIterator = selectedAutomata.iterator();
-		Iterator automataBIterator;
-		Automata theTwoAutomata = new Automata();
-
+		// Reuse syncOptions
 		SynchronizationOptions syncOptions;
-		AutomataSynchronizer theSynchronizer;
 
-		int[] data = new int[8];
-		int correctValue = 0;
+		double[] data;// = new double[8+1];
 
 		try
 		{
 			// Synchronize the automata using default options (this will 
 			// probably be a problem if there are non-prioritized events)
 			syncOptions = new SynchronizationOptions();
-			outFile = new FileWriter("SynchTable.txt", false);
+			outFile = new FileWriter("SynchTable.txt", append);
 
-			while (automataAIterator.hasNext())
+			int dataAmount = 500;
+			for (int i=0; i<dataAmount; i++)
 			{
-				automatonA = (Automaton) automataAIterator.next();
-				theTwoAutomata.clear();
-				theTwoAutomata.addAutomaton(automatonA);
-				
-				automataBIterator = selectedAutomata.iterator();				
-				while (automataBIterator.hasNext())
-				{
-					automatonB = (Automaton) automataBIterator.next();
+				// Find two random automata
+				automatonA = selectedAutomata.getAutomatonAt((int) (Math.random()*selectedAutomata.size()));
+				automatonB = selectedAutomata.getAutomatonAt((int) (Math.random()*selectedAutomata.size()));
+				//System.out.println(automatonA.getName() + automatonB.getName());
 
-					if (automatonA != automatonB)
-						// Just add it
-						theTwoAutomata.addAutomaton(automatonB);
-					else
-						// Got to make a copy...
-						theTwoAutomata.addAutomaton(new Automaton(automatonB));
-					
-					theSynchronizer = new AutomataSynchronizer(theTwoAutomata, syncOptions);
-					theSynchronizer.execute();
-					
-					// Number of states in automataA
-					data[0] = automatonA.nbrOfStates();
-					// Number of events in automataA
-					data[1] = automatonA.nbrOfEvents();
-					// Number of transitions in automataA
-					data[2] = automatonA.nbrOfTransitions();
-					
-					// Number of states in automataB
-					data[3] = automatonB.nbrOfStates();
-					// Number of events in automataB
-					data[4] = automatonB.nbrOfEvents();
-					// Number of transitions in automataB
-					data[5] = automatonB.nbrOfTransitions();
-					
-					// Number of common events between the automata
-					data[6] = automatonA.getAlphabet().nbrOfCommonEvents(automatonB.getAlphabet());
-					
-					// Worst case synchronization size
-					data[7] = data[0] * data[3];
-					
-					// OTHER CONCEIVABLE DATA THAT MIGHT BE OF INTEREST
-					// * Amount of selfloops
-					// * Number of prioritized events (overkill)
-					// * AutomatonType
-					// * Maximum depth of automata
-					
-					// The correct value, the number of states in the synchronization
-					correctValue = theSynchronizer.getNumberOfStates();
-					
+				data = GeneticAlgorithms.extractData(automatonA, automatonB);
+				Automata theTwoAutomata = new Automata();
+				theTwoAutomata.addAutomaton(automatonA);
+				theTwoAutomata.addAutomaton(automatonB);
+				double correctValue = (double) GeneticAlgorithms.calculateSynchronizationSize(theTwoAutomata, syncOptions);
+
+				if ((i>dataAmount/4) && (data[0]*data[1] == correctValue))
+				{
+					// Too much data of this kind otherwise...
+					i--;
+				}
+				else
+				{
 					// Writes data[0]..data[7] and correctValue to the file
-					for (int i=0;i<data.length;i++)
+					for (int j=0;j<data.length;j++)
 					{
-						outFile.write(data[i] + "\t");
+						outFile.write(data[j] + "\t");
 					}
-					outFile.write(correctValue + " " + automatonA.getName() + " " + automatonB.getName() + "\n");
-					theTwoAutomata.removeAutomaton(automatonB);
+					outFile.write(correctValue + "\t");
+					outFile.write(automatonA.getName() + " " + automatonB.getName() + "\n");
 					outFile.flush();
 				}
-				theTwoAutomata.removeAutomaton(automatonA);
-			}
-			
+			}							
 			outFile.close();			
 		}
 		catch (Exception ex)
 		{
 			JOptionPane.showMessageDialog(gui.getComponent(), "Error in ActionMan.evoCompSynchTable(): " + ex.getMessage(), "Alert", JOptionPane.ERROR_MESSAGE);
 			return;
+		}
+	}
+
+	public static void evoCompPredictSize(Gui gui)
+	{
+		Automata selectedAutomata = gui.getSelectedAutomata();
+
+		double predictedSize = GeneticAlgorithms.predictSynchronizationSize(selectedAutomata);
+		
+		if (predictedSize > 0.0)
+		{
+			double[] data;
+			if (selectedAutomata.size() == 2)
+			    data = GeneticAlgorithms.extractData(selectedAutomata.getAutomatonAt(0), selectedAutomata.getAutomatonAt(1));
+			else if (selectedAutomata.size() == 1)
+				data = GeneticAlgorithms.extractData(selectedAutomata.getAutomatonAt(0), selectedAutomata.getAutomatonAt(0));
+			else
+				return;
+			int realSize = GeneticAlgorithms.calculateSynchronizationSize(selectedAutomata);
+			int worstSize = (int) (data[0]*data[1]);
+			JOptionPane.showMessageDialog(gui.getComponent(), "The synchronization is predicted to have " 
+										  + (float) predictedSize + " states. \nSynchronization actually " + 
+										  "gives exactly " + realSize + " states (worst case " + worstSize +
+										  ").", "Prediction", JOptionPane.INFORMATION_MESSAGE);
+		}
+		else
+		{
+			JOptionPane.showMessageDialog(gui.getComponent(), "The prediction failed. (Predicted size: " + predictedSize + ")", "Prediction",
+										  JOptionPane.ERROR_MESSAGE);
 		}
 	}
 

@@ -259,11 +259,12 @@ public class Alphabet
 		return result;
 	}
 
+	/* WHO THE FUNK WROTE THIS METHOD?  /Hguo.
 	/**
 	 * Computes A intersection B, where A is this alphabet and B is other
 	 *
 	 *@param  other The other alphabet
-	 */
+	 /
 	public void intersect(Alphabet other)
 	{
 		for (Iterator alphIt = other.iterator(); alphIt.hasNext(); )
@@ -277,17 +278,39 @@ public class Alphabet
 					removeEvent(currEvent.getLabel());
 				}
 				catch (Exception ex)
-				{    // This should be impossible
+				{   // This should be impossible
 					logger.error("Alphabet.intersect. Trying to remove a non-existing event. " + ex);
 					logger.debug(ex.getStackTrace());
 				}
 			}
 		}
 	}
-	public static Alphabet intersect(Alphabet op1, Alphabet op2)
+	*/
+	
+	/**
+	 * Computes and returns "A intersection B"
+	 */
+	public static Alphabet intersect(Alphabet a1, Alphabet a2)
 	{
-		Alphabet result = new Alphabet(op1);
-		result.intersect(op2);
+		Alphabet result = new Alphabet();
+		
+		for (Iterator alphIt = a2.iterator(); alphIt.hasNext(); )
+		{
+			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
+			if(a1.containsEventWithLabel(currEvent.getLabel()))
+			{
+				LabeledEvent newEvent = new LabeledEvent(currEvent);
+				try
+				{
+					result.addEvent(newEvent, false);
+				}
+				catch (Exception ex)
+				{    // This should be impossible
+					logger.error("Alphabet.intersect. Trying to add an existing event. " + ex);
+					logger.debug(ex.getStackTrace());
+				}
+			}			
+		}
 		return result;
 	}
 
@@ -319,7 +342,6 @@ public class Alphabet
 			}
 		}
 	}
-
 	static public Alphabet union(Alphabet op1, Alphabet op2)
 	{
 		Alphabet result = new Alphabet(op1);
@@ -524,6 +546,7 @@ public class Alphabet
 		}
 	}
 
+	/*
 	public int nbrOfCommonEvents(Alphabet otherAlphabet)
 	{
 		int nbrOfCommon = 0;
@@ -542,6 +565,7 @@ public class Alphabet
 
 		return nbrOfCommon;
 	}
+	*/
 
 	// Must be called after an event label or id is modified
 	public void rehash()
