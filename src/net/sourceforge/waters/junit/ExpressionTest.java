@@ -3,7 +3,7 @@
 //# PACKAGE: waters.junit
 //# CLASS:   ExpressionTest
 //###########################################################################
-//# $Id: ExpressionTest.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: ExpressionTest.java,v 1.2 2005-02-17 19:34:19 robi Exp $
 //###########################################################################
 
 
@@ -157,6 +157,16 @@ public class ExpressionTest extends TestCase
   {
     testExpression("event [1][1+1]", mExpr_event_1_1plus1,
 		   SimpleExpressionProxy.TYPE_NAME);
+  }
+
+  public void testMultiInvoke()
+    throws ParseException
+  {
+    testExpression("1", mExpr_1, SimpleExpressionProxy.TYPE_INT);
+    testExpression("1", mExpr_1, SimpleExpressionProxy.TYPE_INT);
+    testExpression("1", mExpr_1, SimpleExpressionProxy.TYPE_INT);
+    testExpression("1", mExpr_1, SimpleExpressionProxy.TYPE_INT);
+    testExpression("1", mExpr_1, SimpleExpressionProxy.TYPE_INT);
   }
 
 

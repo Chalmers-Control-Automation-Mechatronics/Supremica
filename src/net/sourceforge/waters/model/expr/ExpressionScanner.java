@@ -3,7 +3,7 @@
 //# PACKAGE: waters.model.expr
 //# CLASS:   ExpressionScanner
 //###########################################################################
-//# $Id: ExpressionScanner.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: ExpressionScanner.java,v 1.2 2005-02-17 19:33:42 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.expr;
@@ -37,11 +37,8 @@ public class ExpressionScanner {
 
   ExpressionScanner(final Reader reader)
   {
-    mInputStream = reader;
     mTokenText = new StringBuffer();
-    mNextToken = null;
-    mPutbackCharacter = -2;
-    mPosition = -1;
+    setInputStream(reader);
   }
     
 
@@ -50,6 +47,9 @@ public class ExpressionScanner {
   void setInputStream(final Reader reader)
   {
     mInputStream = reader;
+    mNextToken = null;
+    mPutbackCharacter = -2;
+    mPosition = -1;
   }
 
 
