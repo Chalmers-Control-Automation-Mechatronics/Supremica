@@ -25,10 +25,12 @@ public class BallTrackView
 {
 
     /**Background image*/
+    MediaTracker bildsLaddningKontroll = new MediaTracker(this);
     private final String imageFileWithText    = "backgroundtext.gif";
     private final String imageFileWithoutText = "background.gif";
     private boolean imageWithText = true; //Because bgImage will contain this image from the beginning
     private Image bgImage = Toolkit.getDefaultToolkit().getImage(BallTrackView.class.getResource("/labprocess/" + imageFileWithText));
+    private Image bgImageTemp = Toolkit.getDefaultToolkit().getImage(BallTrackView.class.getResource("/labprocess/" + imageFileWithoutText));
 
     /**Maximum number of balls allowed*/
     final int maxNrOfBalls = 20;
@@ -42,10 +44,11 @@ public class BallTrackView
     
     // private int nrOfBalls = 0;
     private java.util.List balls;    // keep track of the balls
-    public JButton insSmallBall, insLargeBall, delBall, changeImage, manuellStart;
-    public JPanel panel = new JPanel();
-    public JPanel south = new JPanel();
-    public Canvas canvas = new Canvas();
+    public JButton insSmallBall, insLargeBall, delBall, changeImage, manuellStart, autoStart, nodStop, larmKvitt, exit;
+    public JPanel south       = new JPanel();    //panel to collect the button panels
+    public JPanel simButtons  = new JPanel();   //panel for buttons used to simulate the BallTrack
+    public JPanel realButtons = new JPanel();  //panel for buttons simulating real life actions 
+    public Canvas canvas      = new Canvas(); //Canvas used to paint simualtor images
         
     /**Constructor BallTrackView initialises a view for a ball track
      * @param framesize the heigth of the window
@@ -55,7 +58,7 @@ public class BallTrackView
 	rController = rcont;
 	size = framesize;
 	
-	setSize(size + 100, size + 45);
+	setSize(size, size + 45);
 	setTitle("Ball Track Simulator");
 	setVisible(true);
 	
@@ -63,47 +66,89 @@ public class BallTrackView
 	contentPane.setLayout(new BorderLayout());
 	contentPane.setBackground(Color.white);
 
-	//panel.setLayout(new BorderLayout());
-	//panel.setBackground(Color.white);
-	//panel.setSize(size, size + 30);
-
-	south.setLayout(new FlowLayout());
+	south.setLayout(new BorderLayout());
 	south.setBackground(Color.white);
-	
+
+	simButtons.setLayout(new FlowLayout());
+	simButtons.setBackground(Color.white);
+
+	realButtons.setLayout(new FlowLayout());
+	realButtons.setBackground(Color.white);
+
 	canvas.setSize(500,458);
+	canvas.setBackground(Color.white);
 	canvas.setVisible(true);
 	contentPane.add(canvas,BorderLayout.NORTH);
+
+	bildsLaddningKontroll.addImage(bgImage, 0);
+	bildsLaddningKontroll.addImage(bgImageTemp, 1);
 	
+	try
+            {
+                bildsLaddningKontroll.waitForAll();
+            }
+        catch(Exception e)
+            {
+                System.exit(-1);
+            }
+
+	//Button to insert a BALL with small radius
 	insSmallBall = new JButton("Add Small Ball");
 	insSmallBall.setFont(new Font("Times", Font.BOLD, 10));
-	//insSmallBall.setBackground(Color.white);
-	south.add(insSmallBall);
-	
+	realButtons.add(insSmallBall);
+
+	//Button to insert a BALL with large radius
 	insLargeBall = new JButton("Add Large Ball");
 	insLargeBall.setFont(new Font("Times", Font.BOLD, 10));
-	//insLargeBall.setBackground(Color.white);
-	south.add(insLargeBall);
+	realButtons.add(insLargeBall);
 	
+	//Button to delete the first ball in Leg 1
 	delBall = new JButton("Remove Ball");
 	delBall.setFont(new Font("Times", Font.BOLD, 10));
-	//delBall.setBackground(Color.white);
-	south.add(delBall);
+	realButtons.add(delBall);
 	
+	//Button to change the backgroud image. With or Without text
 	changeImage = new JButton("Change Image");
 	changeImage.setFont(new Font("Times", Font.BOLD, 10));
-	south.add(changeImage);
+	realButtons.add(changeImage);
 
-	manuellStart = new JButton("Manuell Start");
+	//Button to start the simulation manually
+	manuellStart = new JButton("ManuellStart");
 	manuellStart.setFont(new Font("Times", Font.BOLD, 10));
-	south.add(manuellStart);
+	simButtons.add(manuellStart);
 
+	//Button to start the simulation automatically
+	autoStart = new JButton("AutoStart");
+	autoStart.setFont(new Font("Times", Font.BOLD, 10));
+	simButtons.add(autoStart);
+
+	//Button to stop the simulation quickly
+	nodStop = new JButton("NödStop");
+	nodStop.setFont(new Font("Times", Font.BOLD, 10));
+	simButtons.add(nodStop);
+
+	//Button to turn of the alarm
+	larmKvitt = new JButton("LarmKvittering");
+	larmKvitt.setFont(new Font("Times", Font.BOLD, 10));
+	simButtons.add(larmKvitt);
+
+	//Button to exit the simulation
+	exit = new JButton("Exit Program");
+	exit.setFont(new Font("Times", Font.BOLD, 12));
+
+	simButtons.setVisible(true);
+	realButtons.setVisible(true);
+
+	south.add(simButtons, BorderLayout.NORTH);
+	south.add(realButtons, BorderLayout.CENTER);
+	south.add(exit, BorderLayout.SOUTH);
 	south.setVisible(true);
-	//panel.setVisible(true);
-	contentPane.add(south,BorderLayout.SOUTH);
 
-	//contentPane.add(panel);
+	contentPane.add(canvas,BorderLayout.NORTH);
+	contentPane.add(south,BorderLayout.SOUTH);
 	contentPane.setVisible(true);
-	
+
+	//Add mouseListener to the buttons
 	insSmallBall.addMouseListener(new java.awt.event.MouseAdapter()
 	{
 	    public void mouseClicked(MouseEvent e)
@@ -143,6 +188,49 @@ public class BallTrackView
 		manuellStart_mouseReleased(e);
 	    }
 
+        });
+	autoStart.addMouseListener(new java.awt.event.MouseAdapter()
+	{
+	    public void mousePressed(MouseEvent e)
+	    {
+		autoStart_mousePressed(e);
+	    }
+	    public void mouseReleased(MouseEvent e)
+	    {
+		autoStart_mouseReleased(e);
+	    }
+
+        });
+	nodStop.addMouseListener(new java.awt.event.MouseAdapter()
+	{
+	    public void mousePressed(MouseEvent e)
+	    {
+		nodStop_mousePressed(e);
+	    }
+	    public void mouseReleased(MouseEvent e)
+	    {
+		nodStop_mouseReleased(e);
+	    }
+
+        });
+	larmKvitt.addMouseListener(new java.awt.event.MouseAdapter()
+	{
+	    public void mousePressed(MouseEvent e)
+	    {
+		larmKvitt_mousePressed(e);
+	    }
+	    public void mouseReleased(MouseEvent e)
+	    {
+		larmKvitt_mouseReleased(e);
+	    }
+
+        });
+	exit.addMouseListener(new java.awt.event.MouseAdapter()
+	{
+	    public void mouseClicked(MouseEvent e)
+	    {
+		exit_mouseClicked(e);
+	    }
         });
 	pack();//Paint the components (buttons) the first time
     }
@@ -185,6 +273,42 @@ public class BallTrackView
     {
 	rController.setOutSignals(24, true);
     }
+
+    void autoStart_mousePressed(MouseEvent e)
+    {
+	rController.setOutSignals(23, false);
+    }
+
+    void autoStart_mouseReleased(MouseEvent e)
+    {
+	rController.setOutSignals(23, true);
+    }
+
+    void nodStop_mousePressed(MouseEvent e)
+    {
+	
+    }
+
+    void nodStop_mouseReleased(MouseEvent e)
+    {
+	
+    }
+
+    void larmKvitt_mousePressed(MouseEvent e)
+    {
+	
+    }
+
+    void larmKvitt_mouseReleased(MouseEvent e)
+    {
+
+    }
+
+    void exit_mouseClicked(MouseEvent e)
+    {
+	System.exit(0);
+    }
+
 
     /**collisionAvoidanceHandle makes sure that no ball run over another
      */
@@ -266,11 +390,6 @@ public class BallTrackView
 	gN.drawImage(im, 0, 0, this);
 	
 	//paint the buttons and the background of the buttons
-	insSmallBall.repaint();
-	insLargeBall.repaint();
-	delBall.repaint();
-	changeImage.repaint();
-	manuellStart.repaint();
 	south.repaint();
 
     }

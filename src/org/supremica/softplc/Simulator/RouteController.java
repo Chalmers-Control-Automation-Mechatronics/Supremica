@@ -322,7 +322,7 @@ public class RouteController
 	    }
 	else if (armLevel == armVertLength)
 	    {
-		if (inSignals[15] && armAngle == armHoriLength)//more signals
+		if (inSignals[15] && armAngle == armHoriLength) 
 		    {
 				//null, nothing has to be done
 		    }
@@ -336,13 +336,6 @@ public class RouteController
 			armAngle = armAngle - 2;
 			}
 	    }
-	
-	//System.out.println("MatlyftLevel     : " + matlyftLevel);
-	//System.out.println("HissLevel        : " + hissLevel);
-	//System.out.println("ArmLevel         : " + armLevel);
-	//System.out.println("ArmAngle         : " + armAngle);
-	//System.out.println("");
-	//System.out.println("Manuell Start: " + outSignals[24]);
 	
 	// leg 13
 	if (!legBallList[13].isEmpty())
@@ -391,9 +384,8 @@ public class RouteController
 		{
 		    Exception e = new Exception("Ball dropped (11)");
 		    System.err.println(e);
-		    JOptionPane.showMessageDialog(null,"Ball dropped (11)");
+		    JOptionPane.showMessageDialog(null,"Ball dropped (11), Program Will be ended");
 		    System.exit(-1);
-		    //throw new Exception("Ball dropped (11)");
 		}
 	    }
 	    
@@ -439,12 +431,10 @@ public class RouteController
 	    {
 		Exception e = new Exception("Error in handling of UtVån1 UtVån2 (5)");
 		System.err.println(e);
-		JOptionPane.showMessageDialog(null,"Error in handling of UtVån1 UtVån2 (5)");
+		JOptionPane.showMessageDialog(null,"Error in handling of UtVån1 UtVån2 (5), Program Will be ended");
 		System.exit(-1);
-		//throw new Exception("Error in handling of UtVån1 UtVån2 (5)");
 	    }
 
-	    //System.out.println("I leg 5");
 	    Ball b = (Ball) legBallList[5].get(0);
 	    int  x = movements[4].startPos[0];
 	    int  y = movements[4].startPos[1] - hissLevel;
@@ -470,13 +460,12 @@ public class RouteController
 	    if (hissLevel < hissVan1Length)
 	    {
 	        //hissen nära UtVån1 när UtVån satt
-		if (inSignals[7] && (inSignals[5] && hissLevel > (hissVan1Length - 7)))
+		if ( inSignals[7] && inSignals[5] && (hissLevel > (hissVan1Length - 7)) )
 		    {
 			Exception e = new Exception("Error in handling of UtVån1 (4)");
 			System.err.println(e);
-			JOptionPane.showMessageDialog(null,"Error in handling of UtVån1 (4)");
+			JOptionPane.showMessageDialog(null,"Error in handling of UtVån1 (4), Program Will be ended");
 			System.exit(-1);
-			//throw new Exception("Error in handling of UtVån1 (4)");
 		    }
 	    }
 	    //Elevator on first Level
@@ -489,13 +478,14 @@ public class RouteController
 	    else if (hissLevel < hissLength)
 	    {
 		//UtVån 1 eller Hissen på väg upp, nära UtVån2 samt att UtVån2 satt
-		if (inSignals[7] || ((inSignals[5] && inSignals[6]) && inSignals[11] && (hissLevel == (hissLength-7))) && hissLevel != hissLength)
+		if ( inSignals[7] || 
+		     ( inSignals[5] && inSignals[6] && inSignals[11] && 
+		       (hissLevel == (hissLength-8)) ) )
 		{
-		    Exception e = new Exception("Error in handling of UtVån1 UtVån2 (5)");
+		    Exception e = new Exception("Error in handling of UtVån1 or UtVån2 (5)");
 		    System.err.println(e);
-		    JOptionPane.showMessageDialog(null,"Error in handling of UtVån1 UtVån2 (5)");
+		    JOptionPane.showMessageDialog(null,"Error in handling of UtVån1 or UtVån2 (5)Program Will be ended");
 		    System.exit(-1);
-		    //throw new Exception("Error in handling of UtVån1 UtVån2 (5)");
 		}
 	    }
 	    //Elevator in second Level
@@ -527,13 +517,14 @@ public class RouteController
 	    Ball b = (Ball) legBallList[2].get(0);
 	    
 	    //The ball will hit the urMatning bar
-	    if (matlyftLevel == (movements[2].parts - 2) && inSignals[2] && inSignals[3])
+	    if ( (matlyftLevel == (movements[2].parts - 2) && inSignals[2] && inSignals[3]) ||
+		 //The ball will hit the measureHead
+		 (matlyftLevel == (movements[2].parts - 2) && inSignals[2] && inSignals[4]) )
 	    {
-		Exception e = new Exception("Error in handling of UrMätning (2)");
+		Exception e = new Exception("Error in handling top of matLyft (2)");
 		System.err.println(e);
-		JOptionPane.showMessageDialog(null,"Error in handling of UrMätning (2), program will be ended!");
+		JOptionPane.showMessageDialog(null,"Error in handling top of matLyft (2), program will be ended!");
 		System.exit(-1);
-		//throw new Exception("Error in handling of UrMätning (2)");
 	    }
 	    else if (matlyftLevel == movements[2].parts && inSignals[3] && move_2_3())
 	    {
@@ -722,7 +713,6 @@ public class RouteController
 	    System.err.println(e);
 	    JOptionPane.showMessageDialog(null,"Elevator not down (3-4)");
 	    System.exit(-1);
-	    //throw new Exception("Elevator not down (3-4)");
 	}
 
 	return false;
@@ -755,10 +745,6 @@ public class RouteController
 
     private boolean move_6_8()
 	throws Exception
-
-// Vad händer om armen är i rätt läge och har en
-// kula fastsugen och man försöker knuffa upp en
-// till?
     {
 	// ArmVån1 && Sug && LyftVån1
 	if (outSignals[20] && inSignals[16] && inSignals[10])
@@ -769,7 +755,6 @@ public class RouteController
 		System.err.println(e);
 		JOptionPane.showMessageDialog(null,"Never two balls in the arm (6)");
 		System.exit(-1);
-		//throw new Exception("Never two balls in the arm (6)");
 	    }
 
 	    legBallList[9].add(((LinkedList) legBallList[6]).removeFirst());
@@ -792,7 +777,6 @@ public class RouteController
 		System.err.println(e);
 		JOptionPane.showMessageDialog(null,"Never two balls in the arm (7)");
 		System.exit(-1);
-		//throw new Exception("Never two balls in the arm (7)");
 	    }
 
 	    legBallList[9].add(((LinkedList) legBallList[7]).removeFirst());
@@ -825,38 +809,38 @@ public class RouteController
 
     private void setOutSignals()
     {
-	outSignals[0] = !legBallList[0].isEmpty();         // KulaPortvakt
-	outSignals[1] = matlyftLevel == 0;                // MätlyftNere
-	if (!legBallList[1].isEmpty() && outSignals[1])  // KulaMätlyft
+	outSignals[0] = !legBallList[0].isEmpty();                       // KulaPortvakt
+	outSignals[1] = matlyftLevel == 0;                              // MätlyftNere
+	if (!legBallList[1].isEmpty() && outSignals[1])                // KulaMätlyft
 	    outSignals[2] =	((Ball) ((LinkedList) legBallList[1]).getFirst()).finishedLeg();
 	else
 	    outSignals[2] =	(outSignals[1] && !legBallList[2].isEmpty());
-	outSignals[3] = matlyftLevel == movements[2].parts;            // MätlyftUppe
-	outSignals[4] = outSignals[3] &&!legBallList[2].isEmpty();    // KulaMätstation
-	outSignals[5] = inSignals[4] && outSignals[4] && ((Ball) (((LinkedList) legBallList[2]).getFirst())).getRadius() == Ball.BIG_BALL;    // StorKula
+	outSignals[3] = matlyftLevel == movements[2].parts;        // MätlyftUppe
+	outSignals[4] = outSignals[3] &&!legBallList[2].isEmpty();// KulaMätstation
+	outSignals[5] = inSignals[4] && outSignals[4] && ((Ball) (((LinkedList) legBallList[2]).getFirst())).getRadius() == Ball.BIG_BALL;     // StorKula
 	outSignals[6] = inSignals[4] && outSignals[4] && ((Ball) (((LinkedList) legBallList[2]).getFirst())).getRadius() == Ball.SMALL_BALL; // LitenKula
-	outSignals[7] = hissLevel == 0;                    // HissNere
-	outSignals[8] = false;  //Not Used
-	outSignals[9] = false; //Not Used
+	outSignals[7] = hissLevel == 0;                      // HissNere
+	outSignals[8] = false;                              //Not Used
+	outSignals[9] = false;                             //Not Used
 	if (!legBallList[3].isEmpty() && outSignals[7])   // KulaHiss
 	    outSignals[10] = ((Ball) ((LinkedList) legBallList[3]).getFirst()).finishedLeg();
 	else
 	    outSignals[10] = (outSignals[7] && !legBallList[4].isEmpty());
-	outSignals[11] = hissLevel == hissVan1Length;                // HissVån1
-	outSignals[12] = outSignals[11] &&!legBallList[4].isEmpty();// KulaVån1
-	outSignals[13] = !legBallList[6].isEmpty() && ((Ball) ((LinkedList) legBallList[6]).getFirst()).finishedLeg();   // PlockaVån1
+	outSignals[11] = hissLevel == hissVan1Length;                     // HissVån1
+	outSignals[12] = outSignals[11] &&!legBallList[4].isEmpty();     // KulaVån1
+	outSignals[13] = !legBallList[6].isEmpty() && ((Ball) ((LinkedList) legBallList[6]).getFirst()).finishedLeg();       // PlockaVån1
 	outSignals[14] = hissLevel == hissLength;                     // HissVån2
 	outSignals[15] = outSignals[14] &&!legBallList[4].isEmpty(); // KulaVån2
-	outSignals[16] = !legBallList[7].isEmpty() && ((Ball) ((LinkedList) legBallList[7]).getFirst()).finishedLeg();// PlockaVån2
-	outSignals[17] = (armLevel == 0) && (armAngle == 0);       // ArmHemma
-	outSignals[18] = false;
-	outSignals[19] = false;
-	outSignals[20] = (armLevel == armVertVan1Length) && (armAngle == armHoriLength);    // ArmVån1
-	outSignals[21] = (armLevel == armVertLength) && (armAngle == armHoriLength);      // ArmVån2
-	outSignals[22] = inSignals[16] &&!(legBallList[9].isEmpty()); // KulaFast
-	//outSignals[23] = true;                                       // AutoStart, inverterad
-	//outSignals[24] = true;                                      // ManuellStart, inverterad
-	outSignals[25] = false;                                    // NödStopp
-	outSignals[26] = false;                                   // LarmKvittering
+	outSignals[16] = !legBallList[7].isEmpty() && ((Ball) ((LinkedList) legBallList[7]).getFirst()).finishedLeg();  // PlockaVån2
+	outSignals[17] = (armLevel == 0) && (armAngle == 0);      // ArmHemma
+	outSignals[18] = false;                                  //Not Used
+	outSignals[19] = false;                                 //Not Used
+	outSignals[20] = (armLevel == armVertVan1Length) && (armAngle == armHoriLength); // ArmVån1
+	outSignals[21] = (armLevel == armVertLength) && (armAngle == armHoriLength);    // ArmVån2
+	outSignals[22] = inSignals[16] &&!(legBallList[9].isEmpty());                  // KulaFast
+	   //outSignals[23] = true;                         // AutoStart, inverterad, sätts av BallTrackView
+	  //outSignals[24] = true;                         // ManuellStart, inverterad, sätts av BallTrackView
+	 //outSignals[25] = false;                        // NödStopp, sätts av BallTrackView
+	//outSignals[26] = false;                        // LarmKvittering, sätts av BallTrackView
     }
 }
