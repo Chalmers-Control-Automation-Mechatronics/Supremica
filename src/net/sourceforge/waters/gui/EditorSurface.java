@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.15 2005-03-04 11:52:45 flordal Exp $
+//# $Id: EditorSurface.java,v 1.16 2005-03-08 02:51:18 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -1077,7 +1077,7 @@ public class EditorSurface
 	}
 
 	/**
-	 * This should reduce the size of the controlled surface to the minimum required
+	 * This should adjust the size of the controlled surface to the minimum required
 	 */
 	public void minimizeSize()
 	{
@@ -1101,7 +1101,7 @@ public class EditorSurface
 
 	public Rectangle getDrawnAreaBounds()
 	{
-		// How much space between actual bounds and used bounds?
+		// How much spacing should there be
 		int SPACING = 0;
 
 		// The extreme values

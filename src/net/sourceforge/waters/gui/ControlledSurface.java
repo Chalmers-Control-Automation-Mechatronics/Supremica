@@ -279,7 +279,7 @@ public class ControlledSurface
 					deselectAll();
 				}
 				
-				// If object is selected prepare to unselect (don't unselect if dragging!)
+				// If object is selected prepare to unselect (don't unselect if dragging, though!)
 				if (selectedObjects.contains(o))
 				{
 					toBeDeselected.add(o);
@@ -312,13 +312,12 @@ public class ControlledSurface
 				xoff = e.getX() - ((EditorLabel) o).getX();
 				yoff = e.getY() - ((EditorLabel) o).getY();
 			}
-			/*
 			else if (o.getType() == EditorObject.NODEGROUP)
 			{
+				// We need this offset to place new edges
 				xoff = e.getX() - ((EditorNodeGroup) o).getX();
 				yoff = e.getY() - ((EditorNodeGroup) o).getY();
 			}
-			*/
 		}
 		else if (e.getButton() == MouseEvent.BUTTON2)
 		{
@@ -399,8 +398,8 @@ public class ControlledSurface
 			if ((nodeIsSelected() || nodeGroupIsSelected()) && nodesSnap)
 				//if (nodesSnap)
 			{
-				lastX = (lastX/gridSize) * gridSize;
-				lastY = (lastY/gridSize) * gridSize;
+				lastX = lastX/gridSize * gridSize;
+				lastY = lastY/gridSize * gridSize;
 				
 				while (dx + gridSize < e.getX())
 				{
@@ -774,8 +773,6 @@ public class ControlledSurface
 		{
 			select((EditorObject) toBeSelected.remove(0));
 		}
-
-		// Make the temporary selection definite
 		while (toBeDeselected.size() > 0)
 		{
 			deselect((EditorObject) toBeDeselected.remove(0));
@@ -880,7 +877,7 @@ public class ControlledSurface
 			{
 				if (edgeIsSelected() && (selectedObjects.size() <= 2))
 				{
-					EditorObject obj = (EditorObject) selectedObjects.remove(0);
+					EditorObject obj = (EditorObject) selectedObjects.get(0);
 					EditorEdge edge;
 					if (obj.getType() == EditorObject.EDGE)
 					{
@@ -888,7 +885,7 @@ public class ControlledSurface
 					}
 					else
 					{
-						edge = (EditorEdge) selectedObjects.remove(0);
+						edge = (EditorEdge) selectedObjects.get(1);
 					}
 
 					EditorObject n = getNodeOrNodeGroupAtPosition(e.getX(), e.getY());
@@ -983,158 +980,166 @@ public class ControlledSurface
 
 		if (e.getButton() == MouseEvent.BUTTON1)
 		{
-			if ((e.getClickCount() == 1) && (T.getPlace() == EditorToolbar.NODE))
-			{
-				int dx = 0;
-				int dy = 0;
-
-				if (nodesSnap)
+			if (e.getClickCount() == 1)
+			{				
+				if (T.getPlace() == EditorToolbar.NODE)
 				{
-					while (dx + gridSize < e.getX())
+					int posX = 0;
+					int posY = 0;
+					
+					if (nodesSnap)
 					{
-						dx += gridSize;
-					}  
-
-					if (e.getX() - dx > (dx + gridSize) - e.getX())
-					{
-						dx += gridSize;
-					}
-
-					while (dy + gridSize < e.getY())
-					{
-						dy += gridSize;
-					}
-
-					if (e.getY() - dy > (dy + gridSize) - e.getY())
-					{
-						dy += gridSize;
-					}
-				}
-				else
-				{
-					dx = e.getX();
-					dy = e.getY();
-				}
-
-				// Is there already a node present?
-				if ((getObjectAtPosition(dx, dy) == null) || (getObjectAtPosition(dx, dy).getType() != EditorObject.NODE))
-				{
-					// Find a unique name!
-					int i;
-					for (i=0; i<=nodes.size(); i++)
-					{
-						boolean found = false;
-						for (int j=0; j<nodes.size(); j++)
+						while (posX + gridSize < e.getX())
 						{
-							if (((EditorNode) nodes.get(j)).getName().equals("s" + i))
+							posX += gridSize;
+						}  
+						
+						if (e.getX() - posX > (posX + gridSize) - e.getX())
+						{
+							posX += gridSize;
+						}
+						
+						while (posY + gridSize < e.getY())
+						{
+							posY += gridSize;
+						}
+						
+						if (e.getY() - posY > (posY + gridSize) - e.getY())
+						{
+							posY += gridSize;
+						}
+					}
+					else
+					{
+						posX = e.getX();
+						posY = e.getY();
+					}
+					
+					// Is there alreaposY a node present?
+					if ((getObjectAtPosition(posX, posY) == null) || (getObjectAtPosition(posX, posY).getType() != EditorObject.NODE))
+					{
+						// Find a unique name!
+						int i;
+						for (i=0; i<=nodes.size(); i++)
+						{
+							boolean found = false;
+							for (int j=0; j<nodes.size(); j++)
 							{
-								found = true;
+								if (((EditorNode) nodes.get(j)).getName().equals("s" + i))
+								{
+									found = true;
+									break;
+								}
+							}
+							if (!found)
+							{
 								break;
 							}
 						}
-						if (!found)
-						{
-							break;
-						}
-					}
-					addNode("s" + i, dx, dy);
-
-					examineCollisions();  
-
-					//addLabel(getLastNode(), "", 0, break20);
-					repaint();
-
-					//SimpleNodeProxy np = new SimpleNodeProxy("s" + nodes.size());
-					//PointGeometryProxy gp = new PointGeometryProxy(dx,dy);
-					//np.setPointGeometry(gp);
-					//graph.getNodes().add(np);
-				}
-			}
-
-			if ((e.getClickCount() == 1) && (T.getPlace() == EditorToolbar.EDGE))
-			{
-				EditorObject o = getObjectAtPosition(e.getX(), e.getY());
-
-				if (o == null)
-				{
-					deselectAll();
-
-					return;
-				}
-			}
-
-			// Set clicked node to initial
-			if ((e.getClickCount() == 1) && (T.getPlace() == EditorToolbar.INITIAL))
-			{
-				EditorNode n = (EditorNode) getObjectAtPosition(e.getX(), e.getY());
-
-				if (n == null)
-				{
-					return;
-				}
-
-				unsetAllInitial();
- 				n.setInitial(true);
-				repaint();
-			}
-
-			/*
-			if ((e.getClickCount() == 2) && (T.getPlace() == EditorToolbar.SELECT))
-			{
-				if (selectedNode != null)
-				{
-					if (selectedNode.getPropGroup().wasClicked(e.getX(), e.getY()) && selectedNode.getPropGroup().getVisible())
-					{
-						EditorPropGroup p = selectedNode.getPropGroup();
-
-						p.setSelectedLabel(e.getX(), e.getY());
-						repaint();
+						addNode("s" + i, posX, posY);
+						
+						examineCollisions();  
+						
+						//addLabel(getLastNode(), "", 0, break20);
+						
+						//SimpleNodeProxy np = new SimpleNodeProxy("s" + nodes.size());
+						//PointGeometryProxy gp = new PointGeometryProxy(posX,posY);
+						//np.setPointGeometry(gp);
+						//graph.getNodes().add(np);
 					}
 				}
-
-				EditorObject o = getObjectAtPosition(e.getX(), e.getY());
-
-				if ((o != null) && (o.getType() == EditorObject.LABEL))
+				/** Nonsense?
+				else if (T.getPlace() == EditorToolbar.EDGE)
 				{
-					EditorLabel l = (EditorLabel) o;
-
-					if (l == null)
+				    EditorObject o = getObjectAtPosition(e.getX(), e.getY());
+				
+					if (o == null)
 					{
+					    deselectAll();
+
 						return;
 					}
-
-					l.setEditing(true);
-					repaint();
 				}
+				*/
 
-				if ((o != null) && (o.getType() == EditorObject.LABELGROUP))
+				// Set clicked node to initial
+				if (T.getPlace() == EditorToolbar.INITIAL)
 				{
-					EditorLabelGroup l = (EditorLabelGroup) o;
-
-					if (l == null)
-					{
-						return;
-					}
-
-					l.setSelectedLabel(e.getX(), e.getY());
-					repaint();
-				}
-
-				if ((o != null) && (o.getType() == EditorObject.NODE))
-				{
-					EditorNode n = (EditorNode) o;
-
+					EditorNode n = (EditorNode) getObjectAtPosition(e.getX(), e.getY());
+					
 					if (n == null)
 					{
 						return;
 					}
-
-					n.getPropGroup().setVisible(true);
-					repaint();
+					
+					unsetAllInitial();
+					n.setInitial(true);
 				}
 			}
-			*/
+				
+			// Double click
+			else if (e.getClickCount() == 2)
+			{
+				// Change name
+				if (T.getPlace() == EditorToolbar.SELECT)
+				{
+					/* What's this?
+					   if (selectedNode != null)
+					   {
+					   if (selectedNode.getPropGroup().wasClicked(e.getX(), e.getY()) && selectedNode.getPropGroup().getVisible())
+					   {
+					   EditorPropGroup p = selectedNode.getPropGroup();
+					   
+					   p.setSelectedLabel(e.getX(), e.getY());
+					   repaint();
+					   }
+					   }
+					*/
+				
+					EditorObject o = getObjectAtPosition(e.getX(), e.getY());
+					
+					if (o != null)
+					{
+						if (o.getType() == EditorObject.LABEL)
+						{
+							EditorLabel l = (EditorLabel) o;
+							
+							if (l == null)
+							{
+								return;
+							}
+							
+							l.setEditing(true);
+						}
+						else if (o.getType() == EditorObject.LABELGROUP)
+						{
+							EditorLabelGroup l = (EditorLabelGroup) o;
+							
+							if (l == null)
+							{
+								return;
+							}
+							
+							l.setSelectedLabel(e.getX(), e.getY());
+						}
+						else if (o.getType() == EditorObject.NODE)
+						{
+							EditorNode n = (EditorNode) o;
+							
+							if (n == null)
+							{
+								return;
+							}
+							
+							n.getPropGroup().setVisible(true);
+						}
+					}
+				}
+			}
 		}
+		
+		// Repaint is done when you release the mouse button? (But that's before the click?)
+		repaint();
 	}
 
 	public void createOptions(EditorWindowInterface root)

@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorEdge
 //###########################################################################
-//# $Id: EditorEdge.java,v 1.14 2005-03-04 11:52:45 flordal Exp $
+//# $Id: EditorEdge.java,v 1.15 2005-03-08 02:51:18 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -550,6 +550,15 @@ public class EditorEdge
 
 	private boolean onLine(double x, double y)
 	{
+		// If were "behind" a node, were not on the line...
+		if (((start.getX() < x) && (endNode.getX() < x)) || 
+			((start.getY() < y) && (endNode.getY() < y)) || 
+			((start.getX() > x) && (endNode.getX() > x)) || 
+			((start.getY() > y) && (endNode.getY() > y)))
+		{
+			return false;
+		}
+
 		Rectangle2D.Double r = new Rectangle2D.Double((double) start.getX(), (double) start.getY(), (double) (endNode.getX() - start.getX()), (double) (endNode.getY() - start.getY()));
 
 		if (r.contains(x, y))
