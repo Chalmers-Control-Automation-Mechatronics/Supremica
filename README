@@ -82,6 +82,11 @@ Supremica is following.
 	Enter the directory where the file resides, write:
 	cvs add filename.java
 
+Warning: Never save anything in the following directories:
+	build
+	dist
+	doc
+Since these directories are occasionally deleted by Ant.
 
 More information
 ----------------
@@ -97,4 +102,5 @@ http://java.sun.com/
 
 IBM Java JDK
 http://www.ibm.com/java
+
 

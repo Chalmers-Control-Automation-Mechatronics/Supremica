@@ -42,6 +42,6 @@ public class SplashWindow
         {
                 this.setSize(new Dimension(300, 170));
                 this.setLayout(new BorderLayout());
-                this.add(new JLabel("Supremica"), BorderLayout.CENTER);
+                this.add(new Label("Supremica"), BorderLayout.CENTER);
         }
 }
