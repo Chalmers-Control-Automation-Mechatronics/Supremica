@@ -66,6 +66,8 @@ public final class SupremicaProperties
 {
 	private static final String XML_RPC_ACTIVE = "xmlRpcActive";
 	private static final String XML_RPC_PORT = "xmlRpcPort";
+	private static final String XML_RPC_FILTER = "xmlRpcFilter";
+	private static final String XML_RPC_DEBUG = "xmlRpcDebug";
 	private static final String DOT_USE = "dotUse";
 	private static final String DOT_EXECUTE_COMMAND = "dotExecuteCommand";
 	private static final String DOT_MAX_NBR_OF_STATES = "dotMaxNbrOfStatesWithoutWarning";
@@ -189,7 +191,9 @@ public final class SupremicaProperties
 		setProperty(FILE_ALLOW_EXPORT, "true", true);
 		setProperty(FILE_ALLOW_QUIT, "true", true);
 		setProperty(XML_RPC_ACTIVE, "false", true);
+		setProperty(XML_RPC_DEBUG, "false", true);
 		setProperty(XML_RPC_PORT, "9112", true);
+		setProperty(XML_RPC_FILTER, "127.0.0.1", true);
 		setProperty(DOT_USE, "true", true);
 		setProperty(DOT_EXECUTE_COMMAND, "dot", true);
 		setProperty(DOT_MAX_NBR_OF_STATES, "40", true);
@@ -423,6 +427,7 @@ public final class SupremicaProperties
 		wp.setProperty(FILE_ALLOW_QUIT, toString(allow));
 	}
 
+	// -----------------------------------------
 	public static boolean isXmlRpcActive()
 	{
 		return toBoolean(wp.getProperty(XML_RPC_ACTIVE));
@@ -442,6 +447,28 @@ public final class SupremicaProperties
 	{
 		wp.setProperty(XML_RPC_PORT, toString(port));
 	}
+
+	public static String getXmlRpcFilter()
+	{
+		return wp.getProperty(XML_RPC_FILTER);
+	}
+
+	public static void setXmlRpcFilter(String filter)
+	{
+		wp.setProperty(XML_RPC_FILTER, filter);
+	}
+
+	public static boolean isXmlRpcDebugging()
+	{
+		return toBoolean(wp.getProperty(XML_RPC_DEBUG));
+	}
+
+	public static void setXmlRpcDebug(boolean on)
+	{
+		wp.setProperty(XML_RPC_DEBUG, toString(on));
+	}
+
+	// -----------------------------------------
 
 	public static boolean generalRedirectStdout()
 	{

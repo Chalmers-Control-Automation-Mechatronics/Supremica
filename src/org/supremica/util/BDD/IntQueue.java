@@ -3,7 +3,7 @@ package org.supremica.util.BDD;
 
 
 /**
- * A ring queue opf integers
+ * A ring queue of integers
  *
  */
 public class IntQueue {

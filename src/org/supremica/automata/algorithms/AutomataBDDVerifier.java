@@ -43,7 +43,8 @@ public class AutomataBDDVerifier {
     /**
      * creates a verification object, uses only the given (subset of )Alphabet
      *
-     * depeding one the type of algorithm used, this call might take a while
+     * depeding one the family of the reachability algorithm used, this call might take a while
+     *
      * <b>DONT FORGET TO CALL cleanup() AFTERWARDS!!!</b>
      * @see cleanup()
      */
@@ -112,7 +113,7 @@ public class AutomataBDDVerifier {
 
 
 	// ------------------------------------------------------------------------------------
-	/** allow access to some stuff we really shouldnt access :) */
+	/* allows access to some stuff we really shouldnt access :) */
 	public Supervisor  getSupervisor() { return sup; }
 	public BDDAutomata  getBDDAutomata() { return ba; }
 	public org.supremica.automata.Automata  getAutomata() { return theAutomata; }
@@ -141,7 +142,7 @@ public class AutomataBDDVerifier {
 		if(hd != null)
 		{
 			hd.setNumberOfDeadlockedStates((long)ba.count_states(not_c));
-			hd. setNumberOfCheckedStates((long)ba.count_states(intersection));
+			hd.setNumberOfCheckedStates((long)ba.count_states(intersection));
 		}
 
 		if(intersection != ba.getZero()) {
@@ -187,7 +188,7 @@ public class AutomataBDDVerifier {
    /**
      * Language inclusion  check
      *
-     * @return TRUE if the system a1 in a1
+     * @return TRUE if the system a1 in a2 ?
      */
     public boolean passLanguageInclusion() {
 

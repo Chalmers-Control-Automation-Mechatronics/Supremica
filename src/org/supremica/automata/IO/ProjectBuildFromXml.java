@@ -178,7 +178,8 @@ public class ProjectBuildFromXml
 		return build(file.toURL());
 	}
 
-	private Project build(InputStream is)
+	// changed to public by Arash, we need to load from streams in XML-RPC interface!
+	public Project build(InputStream is)
 		throws Exception
 	{
 		return build(is, false);
@@ -487,7 +488,7 @@ public class ProjectBuildFromXml
 		currEvent.setOperator(operator);
 		currEvent.setImmediate(immediate);
 		currEvent.setEpsilon(epsilon);
-                                                     
+
 		// Associate the id with the event
 		idEventMap.put(id, currEvent);
 

@@ -7,7 +7,10 @@ import java.io.*;
 import javax.swing.JFileChooser;
 
 /**
- * AutomataBDDSynthesizer, for synthesis with BDDs
+ * AutomataBDDSynthesizer, for synthesis with BDDs.
+ *
+ * 1. the execute() part was a proof-of-concept thingy, and IT SHOULD NOT BE USED ANYMORE!!
+ * 2. use the interface to OnlineBDDSupervisor [i.e. extractOnlineSupervisor() ] for realtime execution instead :)
  *
  */
 

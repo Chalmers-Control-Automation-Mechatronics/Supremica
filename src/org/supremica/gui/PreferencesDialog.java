@@ -330,27 +330,48 @@ class CommunicationPanel
 	private PreferencesDialog theDialog = null;
 	private JCheckBox useXmlRpc = null;
 	private JTextField xmlRpcPort = null;
+	private JTextField xmlRpcFilter = null;
 
 	public CommunicationPanel(PreferencesDialog theDialog)
 	{
+		// super( new BorderLayout());
 		this.theDialog = theDialog;
+
+		JPanel ptmp;
+		JLabel tmp;
+
+
+		JPanel panel  = new JPanel( new GridLayout(5,1) );
+		add(panel, BorderLayout.WEST);
+
+
+		panel.add( tmp = new JLabel("XML-RPC", SwingConstants.LEFT)  );
+		tmp.setForeground(Color.blue);
+
+
+		panel.add( tmp = new JLabel("(must restart to take effect)", SwingConstants.CENTER)  );
+
 
 		Box propertiesBox = new Box(BoxLayout.Y_AXIS);
 		add(propertiesBox, BorderLayout.CENTER);
 
-		useXmlRpc = new JCheckBox("Run XML-RPC server");
-		propertiesBox.add(useXmlRpc);
 
-		JLabel xmlRpcPortLabel = new JLabel("Use port number");
-		propertiesBox.add(xmlRpcPortLabel);
+		panel.add(useXmlRpc = new JCheckBox("Run XML-RPC server") );
 
-		xmlRpcPort = new JTextField();
-		propertiesBox.add(xmlRpcPort);
+
+		panel.add( ptmp = new JPanel(new FlowLayout( FlowLayout.RIGHT) ) );
+		ptmp.add( new JLabel("Use port number ") );
+		ptmp.add( xmlRpcPort = new JTextField(10) );
+
+
+
+		panel.add( ptmp = new JPanel(new FlowLayout( FlowLayout.RIGHT) ) );
+		ptmp.add( new JLabel("Server IP filter ") );
+		ptmp.add( xmlRpcFilter = new JTextField(10) );
 	}
 
 	public boolean doApply()
 	{
-		SupremicaProperties.setXmlRpcActive(useXmlRpc.isSelected());
 
 		int port = PreferencesDialog.getInt("XML-RPC Port", xmlRpcPort.getText(), 1);
 
@@ -361,6 +382,10 @@ class CommunicationPanel
 
 		SupremicaProperties.setXmlRpcPort(port);
 
+		SupremicaProperties.setXmlRpcFilter(xmlRpcFilter.getText());
+
+		SupremicaProperties.setXmlRpcActive(useXmlRpc.isSelected());
+
 		return true;
 	}
 
@@ -368,6 +393,7 @@ class CommunicationPanel
 	{
 		useXmlRpc.setSelected(SupremicaProperties.isXmlRpcActive());
 		xmlRpcPort.setText(Integer.toString(SupremicaProperties.getXmlRpcPort()));
+		xmlRpcFilter.setText(SupremicaProperties.getXmlRpcFilter() );
 	}
 }
 
@@ -995,7 +1021,7 @@ class BDDPanel2
 
 	private void onSetProofFile() {
 
-		// AWT is mych better than Swing
+		// AWT is much better than Swing
 		FileDialog fd = new FileDialog(theDialog.getOwnerFrame(), "Choose a proof file", FileDialog.SAVE);
 		fd.show();
 		if(fd.getFile() != null) {
