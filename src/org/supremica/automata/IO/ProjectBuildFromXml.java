@@ -105,6 +105,10 @@ public class ProjectBuildFromXml
 	private final static String slavesStr = "Slaves";
 	private final static String slaveStr = "Slave";
 	private final static String animationStr = "Animation";
+	private final static String expressionStr = "Expression";
+	private final static String orStr = "Or";
+	private final static String andStr = "And";
+	private final static String notStr = "Not";
 
 	private ProjectFactory theProjectFactory = null;
 	private Project currProject = null;

@@ -1,4 +1,3 @@
-
 /*
  * Supremica Software License Agreement
  *
@@ -50,16 +49,19 @@
 package org.supremica.automata.execution;
 
 import java.util.*;
+import org.supremica.automata.execution.expressions.*;
 
 public class Control
 {
 	private String label = null;
 	private List conditions = null;
+	private Expression expr = null;
 
 	public Control(String label)
 	{
 		this.label = label;
 		conditions = new LinkedList();
+		expr = new ConstVariable(falseb);
 	}
 
 	public Control(String label, String condition)
@@ -72,6 +74,7 @@ public class Control
 	{
 		this(otherControl.label);
 		conditions = new LinkedList(otherControl.conditions);
+		expr = new Expression();
 	}
 
 	public String getLabel()
