@@ -16,6 +16,7 @@ class AutomataViewerPanel
 	extends JPanel
 // implements AutomatonListener
 {
+	private static final long serialVersionUID = 1L;
 	private static Logger logger = LoggerFactory.createLogger(AutomataViewerPanel.class);
 	private Automata automata;
 	private JTree theTree = new JTree();
@@ -67,6 +68,7 @@ class AutomataViewerPanel
 public class AutomataViewer
 	extends JFrame
 {
+	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JMenuBar menuBar = new JMenuBar();
 	private AutomataViewerPanel viewerPanel;
