@@ -56,6 +56,8 @@ public class BooleanVariable extends Variable
 	
 	private boolean value;
 
+
+
 	public void setValue(boolean v)
 	{
 		value = v;
@@ -64,6 +66,7 @@ public class BooleanVariable extends Variable
 	public boolean getValue()
 	{
 		return value;
+		
 	}
     
 }

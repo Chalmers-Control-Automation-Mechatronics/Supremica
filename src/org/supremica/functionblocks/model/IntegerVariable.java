@@ -56,12 +56,12 @@ public class IntegerVariable extends Variable
 	
 	private int value;
 
-	public void setVar(int i)
+	public void setValue(int i)
 	{
 		value = i;
 	}
 
-	public int getVar()
+	public int getValue()
 	{
 		return value;
 	}

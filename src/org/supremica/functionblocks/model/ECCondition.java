@@ -89,12 +89,8 @@ public class ECCondition
 
 	public boolean evaluate(Variables vars)
 	{
-		
-		try{
-			System.out.println("ECCondition.evaluate(): parser returned symbol:" + parser.parse().toString());
-		} 
-		catch(Exception e)
-		{}
+
+		try {parser.parse();} catch(Exception e) {}
 		return true;
 	}
 	

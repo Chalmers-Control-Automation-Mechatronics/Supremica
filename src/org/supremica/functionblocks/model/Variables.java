@@ -57,7 +57,31 @@ public class Variables
 {
 	
 	private Map variables = new HashMap();
-	
 
+
+	public Variable getVariable(String)
+	{
+		return (Variable) variables.get(name);
+	}
+
+	public BooleanVariable getBooleanVariable(String name)
+	{
+		return (BooleanVariable) variables.get(name);
+	}
+
+	public IntegerVariable getIntegerVariable(String name)
+	{
+		return (IntegerVariable) variables.get(name);
+	}
+
+	public void addVariable(String name, Variable value)
+	{
+		variables.put(name,value);
+	}
+
+	public Iterator iterator()
+	{
+		return variables.keySet().iterator();
+	}
 
 }
