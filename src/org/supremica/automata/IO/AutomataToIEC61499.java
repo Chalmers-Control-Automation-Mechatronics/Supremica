@@ -610,11 +610,11 @@ public class AutomataToIEC61499
 		LabeledEvent currEvent = (LabeledEvent) alphIt.next();
 		if (alphIt.hasNext())
 		{
-		    pw.println("\t\tEI_" + tmpAut.getName() + "_" + currEvent.getLabel()+ ",");
+		    pw.println("\t\tEI_" + tmpAut.getName() + currEvent.getLabel()+ ",");
 		} 
 		else 
 		{
-		    pw.println("\t\tEI_" + tmpAut.getName() + "_" + currEvent.getLabel()+ ";");
+		    pw.println("\t\tEI_" + tmpAut.getName() + currEvent.getLabel()+ ";");
 		}
 	    }
 	}
@@ -633,11 +633,11 @@ public class AutomataToIEC61499
 		LabeledEvent currEvent = (LabeledEvent) alphIt.next();
 		if (alphIt.hasNext())
 		{
-		    pw.println("\t\tEO_" + tmpAut.getName() + "_" + currEvent.getLabel()+ ",");
+		    pw.println("\t\tEO_" + tmpAut.getName() + currEvent.getLabel()+ ",");
 		} 
 		else 
 		{
-		    pw.println("\t\tEO_" + tmpAut.getName() + "_" + currEvent.getLabel()+ ";");
+		    pw.println("\t\tEO_" + tmpAut.getName() + currEvent.getLabel()+ ";");
 		}
 	    }
 	}
@@ -652,10 +652,10 @@ public class AutomataToIEC61499
 	    for (Iterator alphIt = tmpAut.getAlphabet().iterator(); alphIt.hasNext();)
 	    {
 		LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-		pw.print("\tEI_" + tmpAut.getName() + "_" + currEvent.getLabel() + " : BOOL;"); 
+		pw.print("\tEI_" + tmpAut.getName() + currEvent.getLabel() + " : BOOL;"); 
 		if (comments)
 		{
-		    pw.print("\t(* " + tmpAut.getName() + "_" + currEvent.getLabel() + " *)");
+		    pw.print("\t(* " + tmpAut.getName() + currEvent.getLabel() + " *)");
 		}
 		pw.print("\n");
 	    }
@@ -671,10 +671,10 @@ public class AutomataToIEC61499
 	    for (Iterator alphIt = tmpAut.getAlphabet().iterator(); alphIt.hasNext();)
 	    {
 		LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-		pw.print("\tEO_" + tmpAut.getName() + "_" + currEvent.getLabel() + " : BOOL;");
+		pw.print("\tEO_" + tmpAut.getName() + currEvent.getLabel() + " : BOOL;");
 		if (comments)
 		{
-		    pw.print("\t(* " + tmpAut.getName() + "_" + currEvent.getLabel() + " *)");
+		    pw.print("\t(* " + tmpAut.getName() + currEvent.getLabel() + " *)");
 		}
 		pw.print("\n");
 	    }
@@ -709,17 +709,16 @@ public class AutomataToIEC61499
 	    for (Iterator alphIt = curAut.getAlphabet().iterator(); alphIt.hasNext(); )
 	    {
 		LabeledEvent curEv = (LabeledEvent) alphIt.next();
-		pw.print("\tEO_" + curAut.getName() + "_" + curEv.getLabel() + " := ");
+		pw.print("\tEO_" + curAut.getName() + curEv.getLabel() + " := ");
 		for (Iterator innerAutIt = theProject.iterator(); innerAutIt.hasNext();)
 		{
 		    Automaton tmpAut = (Automaton) innerAutIt.next();
 		    for (Iterator innerAlphIt = tmpAut.getAlphabet().iterator(); innerAlphIt.hasNext();)
 		    {
 			LabeledEvent tmpEv = (LabeledEvent) innerAlphIt.next();
-			System.out.println("Labels: tmpEv = " + tmpEv.getLabel() + "; curEv = " + curEv.getLabel() + ";");
 			if(tmpEv.getLabel().equals(curEv.getLabel()))
 			{
-			    pw.print("EI_" + tmpAut.getName() + "_" + tmpEv.getLabel() + " AND ");
+			    pw.print("EI_" + tmpAut.getName() + tmpEv.getLabel() + " AND ");
 			}
 		    }		    
 		}
@@ -729,7 +728,5 @@ public class AutomataToIEC61499
 	pw.println("END_ALGORITHM");
 
 	pw.println("END_FUNCTION_BLOCK");
-	
-	
     }
 }
