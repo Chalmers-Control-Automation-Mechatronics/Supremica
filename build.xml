@@ -32,6 +32,7 @@
 *	You should also run everytime one of jar files below
 *	has been updated.
 -->
+
 <target name="initialize" depends="clean">
  	<mkdir dir="${build}"/>
 	<delete includeEmptyDirs="true" >
@@ -67,6 +68,12 @@
 	<unjar src="${lib}/log4j-core.jar" dest="${lib}/${unjared}"/>
 	<unjar src="${lib}/log4j.jar" dest="${lib}/${unjared}"/>
 	<unjar src="${lib}/jakarta-oro.jar" dest="${lib}/${unjared}"/>
+
+ 	<mkdir dir="${lib}/licensed"/>
+ 	<touch file="${lib}/licensed/JGo.jar"/>	
+ 	<touch file="${lib}/licensed/JGoLayout.jar"/>	 	
+	<unjar src="${lib}/licensed/JGo.jar" dest="${lib}/${unjared}"/>	
+	<unjar src="${lib}/licensed/JGoLayout.jar" dest="${lib}/${unjared}"/>
 	
 	<mkdir dir="${lib}/${unjared}/META-INF"/>
 	<delete includeEmptyDirs="true">
