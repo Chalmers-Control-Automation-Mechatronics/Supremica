@@ -253,10 +253,10 @@ public class Automaton
 	{
 		return initialState;
 	}
-	
+
 	/**
 	 * Returns a uniquely named (and id'ed) state.
-	 * Does not add it to the state set
+	 * Add it to the state set
 	 * Passing null or empty prefix sets prefix to 'q'
 	 */
 	public State createUniqueState(String prefix)
@@ -272,13 +272,15 @@ public class Automaton
 		}
 
 		Random rand = new Random();
-		
+
 		while(containsStateWithId(name.toString()))
 		{
 			name.append(rand.nextInt(10));
 		}
-		
-		return new State(name.toString());
+		State newState = new State(name.toString());
+		addState(newState);
+
+		return newState;
 	}
 	/**
 	 * Returns true if it finds one accepting state, else returns false

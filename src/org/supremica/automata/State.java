@@ -426,6 +426,11 @@ public class State
 		return outgoingArcSets.size();
 	}
 
+	public boolean isDeadlock()
+	{
+		return outgoingArcs.size() == 0;
+	}
+
 	public void setCost(int cost)
 	{
 		this.cost = cost;

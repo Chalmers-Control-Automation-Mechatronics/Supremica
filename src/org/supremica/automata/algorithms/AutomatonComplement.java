@@ -116,7 +116,6 @@ public class AutomatonComplement
 		// If complementation has been done, add the state, mark it as accepting and add self loops to the dump state...
 		if(complemented)
 		{
-			theAutomaton.addState(newState);
 			newState.setAccepting(true);
 
 			Iterator eventIterator = alphabet.iterator();

@@ -111,9 +111,9 @@ public class AutomatonDocument
 
 	public StateNode newStateNode(Point p)
 	{
-		State newState = new State(theAutomaton.getUniqueStateId());
+		State newState = theAutomaton.createUniqueState(null);
 
-		theAutomaton.addState(newState);
+		//theAutomaton.addState(newState);
 		newState.setXY((int) p.getX(), (int) p.getY());
 
 		return newStateNode(newState);
