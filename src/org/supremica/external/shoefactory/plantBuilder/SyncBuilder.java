@@ -48,7 +48,37 @@
 */
 package org.supremica.external.shoefactory.plantBuilder;
 
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+import javax.swing.event.*;
+import javax.swing.table.*;
+import java.util.*;
+import java.io.*;
+import org.supremica.*;
+import org.supremica.properties.SupremicaProperties;
+import org.supremica.automata.templates.*;
 import org.supremica.automata.algorithms.*;
+import org.supremica.comm.xmlrpc.*;
+import org.supremica.gui.editor.*;
+import org.supremica.gui.help.*;
+import org.supremica.automata.*;
+import org.supremica.gui.animators.scenebeans.*;
+import org.supremica.gui.automataExplorer.AutomataExplorer;
+import org.supremica.gui.recipeEditor.RecipeEditor;
+import org.supremica.gui.cellEditor.CellEditor;
+import org.supremica.gui.simulator.SimulatorExecuter;
+import org.supremica.external.robotCoordination.AutomataBuilder;
+import org.supremica.external.shoefactory.plantBuilder.*;
+import org.supremica.external.shoefactory.Animator.*;
+
+import org.supremica.log.*;
+import org.supremica.automata.IO.*;
+import org.supremica.util.ActionTimer;
+import org.supremica.automata.algorithms.RobotStudioLink;
+
+import org.supremica.gui.useractions.*;
+import org.supremica.gui.texteditor.TextFrame;
 
 import org.supremica.automata.*;
 import org.supremica.gui.*;
@@ -63,31 +93,31 @@ public class SyncBuilder
 	private AutomataSynchronizer theSynchronizer = null;
 	private Gui gui;
 
-public SyncBuilder(Gui g, Project thePlant, int[] selectAut)
+public SyncBuilder(Gui g, Project thePlant)
 {
-gui = g;
-synchronizationOptions = new SynchronizationOptions();
-synthesizerOptions = new SynthesizerOptions();
-synthesizerOptions.setPurge(true);
-gui.selectAutomata(selectAut);
-selectedAutomata = gui.getSelectedAutomata();
+	gui = g;
+	synchronizationOptions = new SynchronizationOptions();
+	synthesizerOptions = new SynthesizerOptions();
+	synthesizerOptions.setPurge(true);
+	gui.selectAll();
+	selectedAutomata = gui.getSelectedAutomata();
 }
 
 
 
 public void synchronizePlants(String name)
 {
-try
-{
-theSynchronizer = new AutomataSynchronizer(selectedAutomata, synchronizationOptions);
-theSynchronizer.execute();
-theAutomaton = theSynchronizer.getAutomaton();
-}
-catch (Exception ex)
-{
-}
-theAutomaton.setName(name);
-gui.addAutomaton(theAutomaton);
+	try
+	{
+	theSynchronizer = new AutomataSynchronizer(selectedAutomata, synchronizationOptions);
+	theSynchronizer.execute();
+	theAutomaton = theSynchronizer.getAutomaton();
+	}
+	catch (Exception ex)
+	{
+	}
+	theAutomaton.setName(name);
+	gui.addAutomaton(theAutomaton);
 }
 
 
@@ -95,33 +125,28 @@ gui.addAutomaton(theAutomaton);
 
 public void synthesizePlants(String name)
 {
-try
-{
-theSynchronizer = new AutomataSynchronizer(selectedAutomata, synchronizationOptions);
-theSynchronizer.execute();
-theAutomaton = theSynchronizer.getAutomaton();
-}
-catch (Exception ex)
-{}
+	try
+	{
+	theSynchronizer = new AutomataSynchronizer(selectedAutomata, synchronizationOptions);
+	theSynchronizer.execute();
+	theAutomaton = theSynchronizer.getAutomaton();
+	}
+	catch (Exception ex)
+	{}
 
-try
-{
-	synthes = new AutomatonSynthesizer(theAutomaton, synthesizerOptions);
-	//synthesizer = new AutomataSynthesizer(gui, selectedAutomata, synchronizationOptions, synthesizerOptions);
-   // synthesizer.execute();
-	boolean s = synthes.synthesize();
+	try
+	{
+		synthes = new AutomatonSynthesizer(theAutomaton, synthesizerOptions);
+		boolean s = synthes.synthesize();
 
 
-}
-
-catch (Exception ex)
-{
-}
-theAutomaton.setComment(name);
-//theAutomaton = synthesizer.getAutomaton();
-
-//gui.addAutomaton( theAutomaton);
-theAutomaton.setName(name);
-gui.addAutomaton(theAutomaton);
-}
+	}
+	
+	catch (Exception ex)
+	{
+	}
+	theAutomaton.setComment(name);
+	theAutomaton.setName(name);
+	gui.addAutomaton(theAutomaton);
+	}
 }

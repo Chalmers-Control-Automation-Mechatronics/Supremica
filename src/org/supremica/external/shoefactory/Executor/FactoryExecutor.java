@@ -10,22 +10,28 @@ import javax.swing.*;
 import java.io.*;
 import java.net.URL;
 import java.util.*;
-import  org.supremica.automata.*;
+import org.supremica.automata.*;
 import org.supremica.log.*;
-
-
 
 public class FactoryExecutor
 {
+	public static int threadSleepInterval=100;
 	boolean[] stationV;
 	static Plant shoePlant;
-	static int shoeNr=1;
+	static int shoeNr=1, firstIndex=0, sNr=0;
 	static Gui gui;
 	static EditorAPI e;
-	static ArrayList shoes = new ArrayList ();
-	static int[] syncAutomata = {45,44,43,42,41,40,39,38,37,36,35,34,33,32,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0};
+	static ArrayList shoes = new ArrayList();
+	static ArrayList shoeNumbers = new ArrayList();
+	GCDocument top;
+	GCDocument  jgSupervisor;
+//jgsup static för linj
+	public FactoryExecutor()
+	{
 
-	public FactoryExecutor(boolean [] sv, Gui g)
+	}
+
+	public void start(boolean [] sv, Gui g)
 	{
 		stationV = sv;
 		gui = g;
@@ -40,24 +46,30 @@ public class FactoryExecutor
 				e.removePaletteAction();
 
 				URL url = Supremica.class.getResource("/shoefactory/ShoeFactory.xml");
-				//GCDocument top = e.openWorkspace(url.getPath());
+				//top = e.openWorkspace(url.getPath());
 
-				GCDocument jgSupervisor = e.newWorkspace();
+				jgSupervisor = e.newWorkspace();
 				JgrafSupervisor js = new JgrafSupervisor(jgSupervisor,shoeNr);
 
 				shoePlant = new Plant();
 				gui.addProject(shoePlant.getPlant());
-				
+
 				Specification shoeSpec = new Specification(shoeNr,sv);
 				gui.addProject(shoeSpec.getSpec());
 
-				//SyncBuilder syncPlant = new SyncBuilder(gui, shoePlant.getPlant(), syncAutomata);
+				//SyncBuilder syncPlant = new SyncBuilder(gui, shoePlant.getPlant());
 				//syncPlant.synthesizePlants("theSupervisor");
 
 				GCDocument newShoe = e.newWorkspace();
 				Shoe s = new Shoe(newShoe, stationV, shoeNr);
-				shoes.add(shoeNr-1,s);
-/*
+				shoes.add(newShoe);
+				shoeNumbers.add(new Integer(shoeNr));
+				
+				newShoe.setSpeed(threadSleepInterval);
+				top.setSpeed(threadSleepInterval);
+				jgSupervisor.setSpeed(threadSleepInterval);
+				
+
 				boolean OK = e.compileWorkspace(top);
 				if(OK)
 				{
@@ -75,35 +87,49 @@ public class FactoryExecutor
 				{
 					//e.startWorkspace(newShoe);
 				}
-*/
+				
 				shoeNr++;
 			}
 			else
 			{
+				pauseSFC(20000);
+				e.stopWorkspace(jgSupervisor);
+				
 				shoePlant.add_shoe(shoeNr,true);
 				Specification shoeSpec = new Specification(shoeNr,sv);
 				gui.addProject(shoeSpec.getSpec());
 
 				GCDocument newShoe = e.newWorkspace();
 				Shoe s = new Shoe(newShoe, stationV, shoeNr);
-				shoes.add(shoeNr-1,newShoe);
+				shoes.add(newShoe);
+				shoeNumbers.add(new Integer(shoeNr));
 				
+				shoes.trimToSize();
+				shoeNumbers.trimToSize();
 				
-				/*remove_Aut(44+shoeNr);				
-							
-				
-				syncAutomata = addSyncAutomata(syncAutomata,shoeNr+44);
-				SyncBuilder syncPlant = new SyncBuilder(gui, shoePlant.getPlant(), syncAutomata);
-				syncPlant.synthesizePlants("theSupervisor");
-				*/
+				remove_Aut(44+shoes.size());
+
+				//SyncBuilder syncPlant = new SyncBuilder(gui, shoePlant.getPlant());
+				//syncPlant.synthesizePlants("theSupervisor");
+					
 				shoeNr++;
-/*
-				boolean OK = e.compileWorkspace(newShoe);
+	
+				boolean OK = e.compileWorkspace(jgSupervisor);
 				if(OK)
 				{
-					//e.startWorkspace(newShoe);
+					e.startWorkspace(jgSupervisor);
 				}
-*/
+				
+				pauseSFC(threadSleepInterval);
+
+
+				OK = e.compileWorkspace(newShoe);
+				if(OK)
+				{
+					e.startWorkspace(newShoe);
+				}
+
+
 			}
 		}
 		catch(Exception ex)
@@ -111,32 +137,53 @@ public class FactoryExecutor
 			System.out.println("Error"+shoeNr);
 		}
 	}
+	
+	public static boolean saveValues(int fI, int s)
+	{
+		firstIndex = fI;
+		sNr = s;
+		return true;
+	}
+
+	
+	public static int getSValue()
+	{
+		return sNr;
+	}
+	
+	public static int getFiValue()
+	{
+		return firstIndex;
+	}
 
 	public static boolean deleteShoe (int nr)
 	{
-		GCDocument temp = (GCDocument) shoes.get(nr-1);
+		Integer i = new Integer(nr);
+		GCDocument temp = (GCDocument) shoes.get(shoeNumbers.indexOf(i));
 		e.stopWorkspace(temp);
 		//e.deleteWorkspace(temp);
 		shoePlant.remove_shoe(nr);
-		return true;
-	}
+		remove_Aut(45+shoeNumbers.indexOf(i));
+		
+		System.out.println("Shoe "+nr+" is manufactured and ready.");
+		
+		shoes.remove(shoeNumbers.indexOf(i));
+		shoeNumbers.remove(shoeNumbers.indexOf(i));
+		
+		shoes.trimToSize();
+		shoeNumbers.trimToSize();
 	
-	public static int[] addSyncAutomata(int[] aut, int nr)
-	{
-		int[] newSync = new int[aut.length+1];
-		System.arraycopy(aut,0,newSync,1,aut.length);
-		newSync[0]=nr;	
-		return newSync;
+		return true;
 	}
 
 	public static void remove_Aut(int nr)
 	{
-		int [] sel ={nr};
+		int[] sel ={nr};
 		gui.selectAutomata(sel);
 		Automata selectedAutomata = gui.getSelectedAutomata();
 		Iterator autIt = selectedAutomata.iterator();
-			while (autIt.hasNext())
-			{
+		while (autIt.hasNext())
+		{
 			Automaton currAutomaton = (Automaton) autIt.next();
 			String currAutomatonName = currAutomaton.getName();
 
@@ -145,11 +192,50 @@ public class FactoryExecutor
 				gui.getVisualProjectContainer().getActiveProject().removeAutomaton(currAutomatonName);
 			}
 			catch (Exception ex)
-				{
-			
-				}	
+			{
+
 			}
+		}
+	}
 
-	}	
+	//A really ugly way of pausing Jgrafchart by setting the Thread sleep to a very large number
+	public void pauseSFC(int time)
+	{
+		for(int nr=1; nr<=shoes.size(); nr++)
+		{
+			GCDocument temp = (GCDocument)shoes.get(nr-1);
+			temp.setSpeed(time);
+		}
 
+		top.setSpeed(time);
+		jgSupervisor.setSpeed(time);
+	}
+	
+/*	public static boolean chngspeed(int ms)
+		{	
+			jgSupervisor.setSpeed(ms);
+			return true;
+		}			
+	
+*/	
+	
+	
+	
+	
+	public static int getShoeIndex(int currIndex)
+	{
+		Integer i=new Integer(0);
+
+		if(currIndex==0)
+		{
+			return i.parseInt(shoeNumbers.get(0).toString());
+		}	
+		else if(shoeNumbers.indexOf(new Integer(currIndex)) < shoeNumbers.size()-1)	
+		{
+			return i.parseInt( shoeNumbers.get(shoeNumbers.indexOf(new Integer(currIndex))+1).toString() ) ;	
+		}
+		
+		else
+			return -1;
+	}
 }

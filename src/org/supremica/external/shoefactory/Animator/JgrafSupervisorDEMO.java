@@ -1,393 +1,310 @@
 package org.supremica.external.shoefactory.Animator;
 
+import java.awt.datatransfer.*;
 import java.awt.*;
+import java.awt.event.*;
+import java.awt.geom.*;
+import java.awt.print.*;
+import javax.swing.*;
+import javax.swing.border.*;
 import grafchart.sfc.*;
+import org.supremica.automata.*;
+import org.supremica.gui.*;
+import java.util.*;
+import org.supremica.external.jgrafchart.*;
 
 public class JgrafSupervisorDEMO
 {
-	private int yPos=0, stepID=0;
-	private boolean[] stationVisit;
-	GCDocument jgSupervisor;
-	private static String[] alphabet = {"put_T0L","put_T0R","get_T0L","get_T0R","put_T1","get_T1","put_T1_S0","get_T1_S0","put_T2","get_T2","put_T2_S1","get_T2_S1"};
-
-	public JgrafSupervisorDEMO(GCDocument doc)
+	private int yPos=0, stepID=0, shoeNr;
+	private static String[] putEventsA = {"put_T0L","put_T0R"};
+	private static String[] putEventsB = {"put_T1","put_T2"};
+	private static String[] putEventsC = {"put_T1_S0","put_T2_S1"};
+	private static String[] getEventsA = {"get_T0L","get_T0R"};
+	private static String[] getEventsB = {"get_T1","get_T2"};
+	private static String[] getEventsC = {"get_T1_S0","get_T2_S1"};
+	
+	private String actionString = "S getRot=\"Shoe\"+index+\".nrOfRot\";\nS currTable = \"Shoe\"+index+\".currentTable\";\nS gotoString = \"Shoe\"+index+\".ShoeControl.moveFromTable\"+currTable^+\".goto\";\n";
+	private String conditionString = "";
+	
+	public JgrafSupervisorDEMO(GCDocument doc, int nr)
 	{
-		jgSupervisor = doc;
+		GCDocument jgSupervisor = doc;
 		jgSupervisor.setWorkspaceName("JgrafSupervisor");
-		jgSupervisor.setFrameRectangle(new Rectangle(0,0,800,800));
-
-		BooleanVariable[] bv = new BooleanVariable[alphabet.length];
-		BooleanVariable ena = jgSupervisor.createBooleanVariable(300,50,"enabled","0");
-		BooleanVariable suc = jgSupervisor.createBooleanVariable(400,50,"success","0");
-		StringVariable sup = jgSupervisor.createStringVariable(500,50,"supervisor","theSupervisor");
-		StringVariable curT = jgSupervisor.createStringVariable(600,50,"currTable","");
-		StringVariable curS1 = jgSupervisor.createStringVariable(900,50,"currStation","");
-		StringVariable curE = jgSupervisor.createStringVariable(700,50,"currEvent","");
-		StringVariable curS2 = jgSupervisor.createStringVariable(1000,50,"currStation2","");
-		IntegerVariable nrO = jgSupervisor.createIntegerVariable(300,150,"nrOfShoes","0");
-		IntegerVariable sho = jgSupervisor.createIntegerVariable(400,150,"index","1");
-		StringVariable getR = jgSupervisor.createStringVariable(500,150,"getRot","");
-		StringVariable stepS = jgSupervisor.createStringVariable(700,150,"stepString","");
-		IntegerVariable pi = jgSupervisor.createIntegerVariable(800,150,"pointerInt","0");
-
-		for(int i=0; i<alphabet.length; i++)
-		{
-			bv[i] = jgSupervisor.createBooleanVariable(100+100*i,250,alphabet[i],"0");
-		}
+		jgSupervisor.setFrameRectangle(new Rectangle(0,0,800,400));
 
 		WorkspaceObject wo = jgSupervisor.createWorkspaceObject(100,50,"Supervisor");
 		GCDocument supervisor = wo.getSubWorkspace();
-
+		
+		BooleanVariable[] bv1 = new BooleanVariable[putEventsA.length+putEventsB.length+putEventsC.length+getEventsA.length+getEventsB.length+getEventsC.length];
+		
+		BooleanVariable suc = jgSupervisor.createBooleanVariable(300,50,"success","0");
+		StringVariable sup = jgSupervisor.createStringVariable(400,50,"supervisor","theSupervisor");
+		StringVariable curS = jgSupervisor.createStringVariable(500,50,"currStation","");
+		StringVariable gotS = jgSupervisor.createStringVariable(600,50,"gotoString","");
+		IntegerVariable nrO = jgSupervisor.createIntegerVariable(700,50,"nrOfShoes","0");
+		IntegerVariable sho = jgSupervisor.createIntegerVariable(800,50,"index","0");
+		StringVariable curE = jgSupervisor.createStringVariable(900,50,"currEvent","");
+		StringVariable getR = jgSupervisor.createStringVariable(300,150,"getRot","");
+		StringVariable stepS = jgSupervisor.createStringVariable(400,150,"stepString","");
+		StringVariable curT = jgSupervisor.createStringVariable(500,150,"currTable","");
+		StringVariable agvS = jgSupervisor.createStringVariable(600,150,"agvString","");
+		BooleanVariable turn = jgSupervisor.createBooleanVariable(700,150,"turn","0");
+		IntegerVariable fir = jgSupervisor.createIntegerVariable(800,150,"firstIndex","0");
+		
 		// Create Grafcet
-		GCStepInitial initialStep = supervisor.createInitialStep(100,yPos,"Start","S success = applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"initializeSupervisor\",\"boolean\",\"string\",supervisor) ;");
+		GCStepInitial initialStep = supervisor.createInitialStep(100,yPos,"Start","S nrOfShoes = applyStaticMethod(\"org.supremica.external.shoefactory.Executor.FactoryExecutorDEMO\",\"getSValue\",\"int\");\nS success = applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"initializeSupervisor\",\"boolean\",\"string\",supervisor);");
 		yPos+=100;
-		GCTransition trAA = supervisor.createTransition(100,yPos,"nrOfShoes>0 & success");
+		GCTransition trA = supervisor.createTransition(100,yPos,"nrOfShoes>0 & success");
 		yPos+=50;
-		GCStep sA = supervisor.createStep(100,yPos,"sA",";");
+		GCStep sA = supervisor.createStep(100,yPos,"sA","S index=applyStaticMethod(\"org.supremica.external.shoefactory.Executor.FactoryExecutorDEMO\",\"getShoeIndex\",\"int\",\"int\",0);\nS turn=1 ;\nX turn=0;");
 		yPos+=100;
-		GCTransition tr = supervisor.createTransition(100,yPos,"1");
+		GCTransition trB = supervisor.createTransition(100,yPos,"1");
 		yPos+=50;
-
-		supervisor.connect(initialStep,trAA);
-		supervisor.connect(trAA,sA);
-		supervisor.connect(sA,tr);
-
-		//*********
-		GCStep s0A = supervisor.createStep(100,yPos,"Step"+stepID,"S currEvent=\"Shoe_\"+index+\"put_T0L\";\nS enabled = applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"isEventEnabled\",\"boolean\",\"string\",supervisor,\"string\",currEvent);\nS stepString = \"Shoe\"+index+\".activeSteps.onStep11\";\nS enabled = enabled & !Shoefactory.tables.table0.fullSlot.get(Shoefactory.tables.table0.rot) & stepString^;");
-		GCTransition trNotEnA = supervisor.createTransition(100,yPos+100,"!enabled");
-		stepID++;
-		GCTransition trEn1A = supervisor.createTransition(300,yPos+100,"enabled");
-		GCStep s1A = supervisor.createStep(300,yPos+150,"Step"+stepID,"S success = applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"executeEvent\",\"boolean\",\"string\",supervisor,\"string\",currEvent);\nN put_T0L;");
-		GCTransition trEn2A = supervisor.createTransition(300,yPos+250,"Step"+stepID+".T>1");
-		stepID++;
-		GCStep s2A = supervisor.createStep(100,yPos+300,"Step"+stepID,"S index = index+1;");
-		GCTransition trA = supervisor.createTransition(100,yPos+400,"index>nrOfShoes");
-		GCTransition trBackA = supervisor.createTransition(300,yPos+400,"index<=nrOfShoes");
-		stepID++;
-		GCStep s3A = supervisor.createStep(100,yPos+450,"Step"+stepID,"S index = 1;");
-		GCTransition tr2A = supervisor.createTransition(100,yPos+550,"1");
-		stepID++;
-		supervisor.connect(tr,s0A);
-		supervisor.connect(s0A,trNotEnA);
-		supervisor.connect(s0A,trEn1A);
-		supervisor.connect(trEn1A,s1A);
-		supervisor.connect(s1A,trEn2A);
-		supervisor.connect(trNotEnA,s2A);
-		supervisor.connect(trEn2A,s2A);
-		supervisor.connect(s2A,trBackA);
-		supervisor.connect(s2A,trA);
-		supervisor.connect(trBackA,s0A);
-		supervisor.connect(trA,s3A);
-		supervisor.connect(s3A,tr2A);
-		yPos+=600;
-
-		GCStep s0B = supervisor.createStep(100,yPos,"Step"+stepID,"S currEvent=\"Shoe_\"+index+\"put_T0R\";\nS enabled = applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"isEventEnabled\",\"boolean\",\"string\",supervisor,\"string\",currEvent);\nS stepString = \"Shoe\"+index+\".activeSteps.onStep6\";\nS enabled = enabled & !Shoefactory.tables.table0.fullSlot.get(applyStaticMethod(\"org.supremica.external.shoefactory.Animator.ShoeDEMO\",\"getRota\",\"int\",\"int\",Shoefactory.tables.table0.rot)) & stepString^;");
-		GCTransition trNotEnB = supervisor.createTransition(100,yPos+100,"!enabled");
-		stepID++;
-		GCTransition trEn1B = supervisor.createTransition(300,yPos+100,"enabled");
-		GCStep s1B = supervisor.createStep(300,yPos+150,"Step"+stepID,"S success = applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"executeEvent\",\"boolean\",\"string\",supervisor,\"string\",currEvent);\nN put_T0R;");
-		GCTransition trEn2B = supervisor.createTransition(300,yPos+250,"Step"+stepID+".T>1");
-		stepID++;
-		GCStep s2B = supervisor.createStep(100,yPos+300,"Step"+stepID,"S index = index+1;");
-		GCTransition trB = supervisor.createTransition(100,yPos+400,"index>nrOfShoes");
-		GCTransition trBackB = supervisor.createTransition(300,yPos+400,"index<=nrOfShoes");
-		stepID++;
-		GCStep s3B = supervisor.createStep(100,yPos+450,"Step"+stepID,"S index = 1;");
-		GCTransition tr2B = supervisor.createTransition(100,yPos+550,"1");
-		stepID++;
-		supervisor.connect(tr2A,s0B);
-		supervisor.connect(s0B,trNotEnB);
-		supervisor.connect(s0B,trEn1B);
-		supervisor.connect(trEn1B,s1B);
-		supervisor.connect(s1B,trEn2B);
-		supervisor.connect(trNotEnB,s2B);
-		supervisor.connect(trEn2B,s2B);
-		supervisor.connect(s2B,trBackB);
-		supervisor.connect(s2B,trB);
-		supervisor.connect(trBackB,s0B);
-		supervisor.connect(trB,s3B);
-		supervisor.connect(s3B,tr2B);
-		yPos+=600;
-
-		GCStep s0C = supervisor.createStep(100,yPos,"Step"+stepID,"S currEvent=\"Shoe_\"+index+\"put_T1\";\nS enabled = applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"isEventEnabled\",\"boolean\",\"string\",supervisor,\"string\",currEvent);\nS stepString = \"Shoe\"+index+\".activeSteps.onStep5\";\nS enabled = enabled & !Shoefactory.tables.table1.fullSlot.get(Shoefactory.tables.table1.rot) & stepString^;");
-		GCTransition trNotEnC = supervisor.createTransition(100,yPos+100,"!enabled");
-		stepID++;
-		GCTransition trEn1C = supervisor.createTransition(300,yPos+100,"enabled");
-		GCStep s1C = supervisor.createStep(300,yPos+150,"Step"+stepID,"S success = applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"executeEvent\",\"boolean\",\"string\",supervisor,\"string\",currEvent);\nN put_T1;");
-		GCTransition trEn2C = supervisor.createTransition(300,yPos+250,"Step"+stepID+".T>1");
-		stepID++;
-		GCStep s2C = supervisor.createStep(100,yPos+300,"Step"+stepID,"S index = index+1;");
-		GCTransition trC = supervisor.createTransition(100,yPos+400,"index>nrOfShoes");
-		GCTransition trBackC = supervisor.createTransition(300,yPos+400,"index<=nrOfShoes");
-		stepID++;
-		GCStep s3C = supervisor.createStep(100,yPos+450,"Step"+stepID,"S index = 1;");
-		GCTransition tr2C = supervisor.createTransition(100,yPos+550,"1");
-		stepID++;
-		supervisor.connect(tr2B,s0C);
-		supervisor.connect(s0C,trNotEnC);
-		supervisor.connect(s0C,trEn1C);
-		supervisor.connect(trEn1C,s1C);
-		supervisor.connect(s1C,trEn2C);
-		supervisor.connect(trNotEnC,s2C);
-		supervisor.connect(trEn2C,s2C);
-		supervisor.connect(s2C,trBackC);
-		supervisor.connect(s2C,trC);
-		supervisor.connect(trBackC,s0C);
-		supervisor.connect(trC,s3C);
-		supervisor.connect(s3C,tr2C);
-		yPos+=600;
-
-		GCStep s0D = supervisor.createStep(100,yPos,"Step"+stepID,"S currEvent=\"Shoe_\"+index+\"put_T2\";\nS enabled = applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"isEventEnabled\",\"boolean\",\"string\",supervisor,\"string\",currEvent);\nS stepString = \"Shoe\"+index+\".activeSteps.onStep4\";\nS enabled = enabled & !Shoefactory.tables.table2.fullSlot.get(Shoefactory.tables.table2.rot) & stepString^;");
-		GCTransition trNotEnD = supervisor.createTransition(100,yPos+100,"!enabled");
-		stepID++;
-		GCTransition trEn1D = supervisor.createTransition(300,yPos+100,"enabled");
-		GCStep s1D = supervisor.createStep(300,yPos+150,"Step"+stepID,"S success = applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"executeEvent\",\"boolean\",\"string\",supervisor,\"string\",currEvent);\nN put_T2;");
-		GCTransition trEn2D = supervisor.createTransition(300,yPos+250,"Step"+stepID+".T>1");
-		stepID++;
-		GCStep s2D = supervisor.createStep(100,yPos+300,"Step"+stepID,"S index = index+1;");
-		GCTransition trD = supervisor.createTransition(100,yPos+400,"index>nrOfShoes");
-		GCTransition trBackD = supervisor.createTransition(300,yPos+400,"index<=nrOfShoes");
-		stepID++;
-		GCStep s3D = supervisor.createStep(100,yPos+450,"Step"+stepID,"S index = 1;");
-		GCTransition tr2D = supervisor.createTransition(100,yPos+550,"1");
-		stepID++;
-		supervisor.connect(tr2C,s0D);
-		supervisor.connect(s0D,trNotEnD);
-		supervisor.connect(s0D,trEn1D);
-		supervisor.connect(trEn1D,s1D);
-		supervisor.connect(s1D,trEn2D);
-		supervisor.connect(trNotEnD,s2D);
-		supervisor.connect(trEn2D,s2D);
-		supervisor.connect(s2D,trBackD);
-		supervisor.connect(s2D,trD);
-		supervisor.connect(trBackD,s0D);
-		supervisor.connect(trD,s3D);
-		supervisor.connect(s3D,tr2D);
-		yPos+=600;
-
-		GCStep s0E = supervisor.createStep(100,yPos,"Step"+stepID,"S currEvent=\"Shoe_\"+index+\"get_T0L\";\nS getRot=\"Shoe\"+index+\".nrOfRot\";\nS enabled=applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"isEventEnabled\",\"boolean\",\"string\",supervisor,\"string\",currEvent);\nS currStation=\"Shoe\"+index+\".station0\";\nS currStation2=\"Shoe\"+index+\".station1\";\nS stepString = \"Shoe\"+index+\".activeSteps.onStep8\";\nS enabled = enabled & applyStaticMethod(\"java.lang.Math\",\"abs\",\"int\",\"int\",getRot^-Shoefactory.tables.table0.rot)==0 & stepString^ & !currStation^ & !currStation2^;");
-		GCTransition trNotEnE = supervisor.createTransition(100,yPos+100,"!enabled");
-		stepID++;
-		GCTransition trEn1E = supervisor.createTransition(300,yPos+100,"enabled");
-		GCStep s1E = supervisor.createStep(300,yPos+150,"Step"+stepID,"S success = applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"executeEvent\",\"boolean\",\"string\",supervisor,\"string\",currEvent);\nN get_T0L;");
-		GCTransition trEn2E = supervisor.createTransition(300,yPos+250,"Step"+stepID+".T>1");
-		stepID++;
-		GCStep s2E = supervisor.createStep(100,yPos+300,"Step"+stepID,"S index = index+1;");
-		GCTransition trE = supervisor.createTransition(100,yPos+400,"index>nrOfShoes");
-		GCTransition trBackE = supervisor.createTransition(300,yPos+400,"index<=nrOfShoes");
-		stepID++;
-		GCStep s3E = supervisor.createStep(100,yPos+450,"Step"+stepID,"S index = 1;");
-		GCTransition tr2E = supervisor.createTransition(100,yPos+550,"1");
-		stepID++;
-		supervisor.connect(tr2D,s0E);
-		supervisor.connect(s0E,trNotEnE);
-		supervisor.connect(s0E,trEn1E);
-		supervisor.connect(trEn1E,s1E);
-		supervisor.connect(s1E,trEn2E);
-		supervisor.connect(trNotEnE,s2E);
-		supervisor.connect(trEn2E,s2E);
-		supervisor.connect(s2E,trBackE);
-		supervisor.connect(s2E,trE);
-		supervisor.connect(trBackE,s0E);
-		supervisor.connect(trE,s3E);
-		supervisor.connect(s3E,tr2E);
-		yPos+=600;
-
-		GCStep s0F = supervisor.createStep(100,yPos,"Step"+stepID,"S currEvent=\"Shoe_\"+index+\"get_T0R\";\nS getRot=\"Shoe\"+index+\".nrOfRot\";\nS enabled=applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"isEventEnabled\",\"boolean\",\"string\",supervisor,\"string\",currEvent);\nS stepString = \"Shoe\"+index+\".activeSteps.onStep10\";\nS enabled = enabled & applyStaticMethod(\"java.lang.Math\",\"abs\",\"int\",\"int\",getRot^-Shoefactory.tables.table0.rot)==6 & stepString^;");
-		GCTransition trNotEnF = supervisor.createTransition(100,yPos+100,"!enabled");
-		stepID++;
-		GCTransition trEn1F = supervisor.createTransition(300,yPos+100,"enabled");
-		GCStep s1F = supervisor.createStep(300,yPos+150,"Step"+stepID,"S success = applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"executeEvent\",\"boolean\",\"string\",supervisor,\"string\",currEvent);\nN get_T0R;");
-		GCTransition trEn2F = supervisor.createTransition(300,yPos+250,"Step"+stepID+".T>1");
-		stepID++;
-		GCStep s2F = supervisor.createStep(100,yPos+300,"Step"+stepID,"S index = index+1;");
-		GCTransition trF = supervisor.createTransition(100,yPos+400,"index>nrOfShoes");
-		GCTransition trBackF = supervisor.createTransition(300,yPos+400,"index<=nrOfShoes");
-		stepID++;
-		GCStep s3F = supervisor.createStep(100,yPos+450,"Step"+stepID,"S index = 1;");
-		GCTransition tr2F = supervisor.createTransition(100,yPos+550,"1");
-		stepID++;
-		supervisor.connect(tr2E,s0F);
-		supervisor.connect(s0F,trNotEnF);
-		supervisor.connect(s0F,trEn1F);
-		supervisor.connect(trEn1F,s1F);
-		supervisor.connect(s1F,trEn2F);
-		supervisor.connect(trNotEnF,s2F);
-		supervisor.connect(trEn2F,s2F);
-		supervisor.connect(s2F,trBackF);
-		supervisor.connect(s2F,trF);
-		supervisor.connect(trBackF,s0F);
-		supervisor.connect(trF,s3F);
-		supervisor.connect(s3F,tr2F);
-		yPos+=600;
-
-		GCStep s0G = supervisor.createStep(100,yPos,"Step"+stepID,"S currEvent=\"Shoe_\"+index+\"get_T1\";\nS getRot=\"Shoe\"+index+\".nrOfRot\";\nS enabled=applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"isEventEnabled\",\"boolean\",\"string\",supervisor,\"string\",currEvent);\nS stepString = \"Shoe\"+index+\".activeSteps.onStep10\";\nS enabled = enabled & applyStaticMethod(\"java.lang.Math\",\"abs\",\"int\",\"int\",getRot^-Shoefactory.tables.table1.rot)==0 & stepString^;");
-		GCTransition trNotEnG = supervisor.createTransition(100,yPos+100,"!enabled");
-		stepID++;
-		GCTransition trEn1G = supervisor.createTransition(300,yPos+100,"enabled");
-		GCStep s1G = supervisor.createStep(300,yPos+150,"Step"+stepID,"S success = applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"executeEvent\",\"boolean\",\"string\",supervisor,\"string\",currEvent);\nN get_T1;");
-		GCTransition trEn2G = supervisor.createTransition(300,yPos+250,"Step"+stepID+".T>1");
-		stepID++;
-		GCStep s2G = supervisor.createStep(100,yPos+300,"Step"+stepID,"S index = index+1;");
-		GCTransition trG = supervisor.createTransition(100,yPos+400,"index>nrOfShoes");
-		GCTransition trBackG = supervisor.createTransition(300,yPos+400,"index<=nrOfShoes");
-		stepID++;
-		GCStep s3G = supervisor.createStep(100,yPos+450,"Step"+stepID,"S index = 1;");
-		GCTransition tr2G = supervisor.createTransition(100,yPos+550,"1");
-		stepID++;
-		supervisor.connect(tr2F,s0G);
-		supervisor.connect(s0G,trNotEnG);
-		supervisor.connect(s0G,trEn1G);
-		supervisor.connect(trEn1G,s1G);
-		supervisor.connect(s1G,trEn2G);
-		supervisor.connect(trNotEnG,s2G);
-		supervisor.connect(trEn2G,s2G);
-		supervisor.connect(s2G,trBackG);
-		supervisor.connect(s2G,trG);
-		supervisor.connect(trBackG,s0G);
-		supervisor.connect(trG,s3G);
-		supervisor.connect(s3G,tr2G);
-		yPos+=600;
-
-		GCStep s0H = supervisor.createStep(100,yPos,"Step"+stepID,"S currEvent=\"Shoe_\"+index+\"get_T2\";\nS getRot=\"Shoe\"+index+\".nrOfRot\";\nS enabled=applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"isEventEnabled\",\"boolean\",\"string\",supervisor,\"string\",currEvent);\nS stepString = \"Shoe\"+index+\".activeSteps.onStep10\";\nS enabled = enabled & applyStaticMethod(\"java.lang.Math\",\"abs\",\"int\",\"int\",getRot^-Shoefactory.tables.table2.rot)==0 & stepString^;");
-		GCTransition trNotEnH = supervisor.createTransition(100,yPos+100,"!enabled");
-		stepID++;
-		GCTransition trEn1H = supervisor.createTransition(300,yPos+100,"enabled");
-		GCStep s1H = supervisor.createStep(300,yPos+150,"Step"+stepID,"S success = applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"executeEvent\",\"boolean\",\"string\",supervisor,\"string\",currEvent);\nN get_T2;");
-		GCTransition trEn2H = supervisor.createTransition(300,yPos+250,"Step"+stepID+".T>1");
-		stepID++;
-		GCStep s2H = supervisor.createStep(100,yPos+300,"Step"+stepID,"S index = index+1;");
-		GCTransition trH = supervisor.createTransition(100,yPos+400,"index>nrOfShoes");
-		GCTransition trBackH = supervisor.createTransition(300,yPos+400,"index<=nrOfShoes");
-		stepID++;
-		GCStep s3H = supervisor.createStep(100,yPos+450,"Step"+stepID,"S index = 1;");
-		GCTransition tr2H = supervisor.createTransition(100,yPos+550,"1");
-		stepID++;
-		supervisor.connect(tr2G,s0H);
-		supervisor.connect(s0H,trNotEnH);
-		supervisor.connect(s0H,trEn1H);
-		supervisor.connect(trEn1H,s1H);
-		supervisor.connect(s1H,trEn2H);
-		supervisor.connect(trNotEnH,s2H);
-		supervisor.connect(trEn2H,s2H);
-		supervisor.connect(s2H,trBackH);
-		supervisor.connect(s2H,trH);
-		supervisor.connect(trBackH,s0H);
-		supervisor.connect(trH,s3H);
-		supervisor.connect(s3H,tr2H);
-		yPos+=600;
-
-		GCStep s0I = supervisor.createStep(100,yPos,"Step"+stepID,"S currEvent=\"Shoe_\"+index+\"put_T1_S0\";\nS getRot=\"Shoe\"+index+\".nrOfRot\";\nS pointerInt=applyStaticMethod(\"org.supremica.external.shoefactory.Animator.ShoeDEMO\",\"getIndex\",\"int\",\"int\",Shoefactory.tables.table1.rot,\"int\",15);\nS enabled = applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"isEventEnabled\",\"boolean\",\"string\",supervisor,\"string\",currEvent);\nS stepString = \"Shoe\"+index+\".activeSteps.onStep1\";\nS enabled = enabled & !Shoefactory.tables.table1.fullSlot.get(pointerInt^) & stepString^;");
-		GCTransition trNotEnI = supervisor.createTransition(100,yPos+100,"!enabled");
-		stepID++;
-		GCTransition trEn1I = supervisor.createTransition(300,yPos+100,"enabled");
-		GCStep s1I = supervisor.createStep(300,yPos+150,"Step"+stepID,"S success = applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"executeEvent\",\"boolean\",\"string\",supervisor,\"string\",currEvent);\nN put_T1_S0;");
-		GCTransition trEn2I = supervisor.createTransition(300,yPos+250,"Step"+stepID+".T>1");
-		stepID++;
-		GCStep s2I = supervisor.createStep(100,yPos+300,"Step"+stepID,"S index = index+1;");
-		GCTransition trI = supervisor.createTransition(100,yPos+400,"index>nrOfShoes");
-		GCTransition trBackI = supervisor.createTransition(300,yPos+400,"index<=nrOfShoes");
-		stepID++;
-		GCStep s3I = supervisor.createStep(100,yPos+450,"Step"+stepID,"S index = 1;");
-		GCTransition tr2I = supervisor.createTransition(100,yPos+550,"1");
-		stepID++;
-		supervisor.connect(tr2H,s0I);
-		supervisor.connect(s0I,trNotEnI);
-		supervisor.connect(s0I,trEn1I);
-		supervisor.connect(trEn1I,s1I);
-		supervisor.connect(s1I,trEn2I);
-		supervisor.connect(trNotEnI,s2I);
-		supervisor.connect(trEn2I,s2I);
-		supervisor.connect(s2I,trBackI);
-		supervisor.connect(s2I,trI);
-		supervisor.connect(trBackI,s0I);
-		supervisor.connect(trI,s3I);
-		supervisor.connect(s3I,tr2I);
-		yPos+=600;
-
-		GCStep s0J = supervisor.createStep(100,yPos,"Step"+stepID,"S currEvent=\"Shoe_\"+index+\"get_T1_S0\";\nS getRot=\"Shoe\"+index+\".nrOfRot\";\nS currStation=\"Shoe\"+index+\".station0\";\nS enabled = applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"isEventEnabled\",\"boolean\",\"string\",supervisor,\"string\",currEvent);\nS stepString = \"Shoe\"+index+\".activeSteps.onStep0\";\nS enabled = enabled & applyStaticMethod(\"java.lang.Math\",\"abs\",\"int\",\"int\",getRot^-Shoefactory.tables.table1.rot)==15 & stepString^ & currStation^;");
-		GCTransition trNotEnJ = supervisor.createTransition(100,yPos+100,"!enabled");
-		stepID++;
-		GCTransition trEn1J = supervisor.createTransition(300,yPos+100,"enabled");
-		GCStep s1J = supervisor.createStep(300,yPos+150,"Step"+stepID,"S success = applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"executeEvent\",\"boolean\",\"string\",supervisor,\"string\",currEvent);\nN get_T1_S0;");
-		GCTransition trEn2J = supervisor.createTransition(300,yPos+250,"Step"+stepID+".T>1");
-		stepID++;
-		GCStep s2J = supervisor.createStep(100,yPos+300,"Step"+stepID,"S index = index+1;");
-		GCTransition trJ = supervisor.createTransition(100,yPos+400,"index>nrOfShoes");
-		GCTransition trBackJ = supervisor.createTransition(300,yPos+400,"index<=nrOfShoes");
-		stepID++;
-		GCStep s3J = supervisor.createStep(100,yPos+450,"Step"+stepID,"S index = 1;");
-		GCTransition tr2J = supervisor.createTransition(100,yPos+550,"1");
-		stepID++;
-		supervisor.connect(tr2I,s0J);
-		supervisor.connect(s0J,trNotEnJ);
-		supervisor.connect(s0J,trEn1J);
-		supervisor.connect(trEn1J,s1J);
-		supervisor.connect(s1J,trEn2J);
-		supervisor.connect(trNotEnJ,s2J);
-		supervisor.connect(trEn2J,s2J);
-		supervisor.connect(s2J,trBackJ);
-		supervisor.connect(s2J,trJ);
-		supervisor.connect(trBackJ,s0J);
-		supervisor.connect(trJ,s3J);
-		supervisor.connect(s3J,tr2J);
-		yPos+=600;
-
-		GCStep s0K = supervisor.createStep(100,yPos,"Step"+stepID,"S currEvent=\"Shoe_\"+index+\"put_T2_S1\";\nS getRot=\"Shoe\"+index+\".nrOfRot\";\nS pointerInt=applyStaticMethod(\"org.supremica.external.shoefactory.Animator.ShoeDEMO\",\"getIndex\",\"int\",\"int\",Shoefactory.tables.table2.rot,\"int\",8);\nS enabled = applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"isEventEnabled\",\"boolean\",\"string\",supervisor,\"string\",currEvent);\nS stepString = \"Shoe\"+index+\".activeSteps.onStep3\";\nS enabled = enabled & !Shoefactory.tables.table2.fullSlot.get(pointerInt^) & stepString^;");
-		GCTransition trNotEnK = supervisor.createTransition(100,yPos+100,"!enabled");
-		stepID++;
-		GCTransition trEn1K = supervisor.createTransition(300,yPos+100,"enabled");
-		GCStep s1K = supervisor.createStep(300,yPos+150,"Step"+stepID,"S success = applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"executeEvent\",\"boolean\",\"string\",supervisor,\"string\",currEvent);\nN put_T2_S1;");
-		GCTransition trEn2K = supervisor.createTransition(300,yPos+250,"Step"+stepID+".T>1");
-		stepID++;
-		GCStep s2K = supervisor.createStep(100,yPos+300,"Step"+stepID,"S index = index+1;");
-		GCTransition trK = supervisor.createTransition(100,yPos+400,"index>nrOfShoes");
-		GCTransition trBackK = supervisor.createTransition(300,yPos+400,"index<=nrOfShoes");
-		stepID++;
-		GCStep s3K = supervisor.createStep(100,yPos+450,"Step"+stepID,"S index = 1;");
-		GCTransition tr2K = supervisor.createTransition(100,yPos+550,"1");
-		stepID++;
-		supervisor.connect(tr2J,s0K);
-		supervisor.connect(s0K,trNotEnK);
-		supervisor.connect(s0K,trEn1K);
-		supervisor.connect(trEn1K,s1K);
-		supervisor.connect(s1K,trEn2K);
-		supervisor.connect(trNotEnK,s2K);
-		supervisor.connect(trEn2K,s2K);
-		supervisor.connect(s2K,trBackK);
-		supervisor.connect(s2K,trK);
-		supervisor.connect(trBackK,s0K);
-		supervisor.connect(trK,s3K);
-		supervisor.connect(s3K,tr2K);
-		yPos+=600;
-
-		GCStep s0L = supervisor.createStep(100,yPos,"Step"+stepID,"S currEvent=\"Shoe_\"+index+\"get_T2_S1\";\nS getRot=\"Shoe\"+index+\".nrOfRot\";\nS currStation=\"Shoe\"+index+\".station1\";\nS enabled = applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"isEventEnabled\",\"boolean\",\"string\",supervisor,\"string\",currEvent);\nS stepString = \"Shoe\"+index+\".activeSteps.onStep2\";\nS enabled = enabled & applyStaticMethod(\"java.lang.Math\",\"abs\",\"int\",\"int\",getRot^-Shoefactory.tables.table2.rot)==8 & stepString^ & currStation^;");
-		GCTransition trNotEnL = supervisor.createTransition(100,yPos+100,"!enabled");
-		stepID++;
-		GCTransition trEn1L = supervisor.createTransition(300,yPos+100,"enabled");
-		GCStep s1L = supervisor.createStep(300,yPos+150,"Step"+stepID,"S success = applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"executeEvent\",\"boolean\",\"string\",supervisor,\"string\",currEvent);\nN get_T2_S1;");
-		GCTransition trEn2L = supervisor.createTransition(300,yPos+250,"Step"+stepID+".T>1");
-		stepID++;
-		GCStep s2L = supervisor.createStep(100,yPos+300,"Step"+stepID,"S index = index+1;");
-		GCTransition trL = supervisor.createTransition(100,yPos+400,"index>nrOfShoes");
-		GCTransition trBackL = supervisor.createTransition(300,yPos+400,"index<=nrOfShoes");
-		stepID++;
-		GCStep s3L = supervisor.createStep(100,yPos+450,"Step"+stepID,"S index = 1;");
-		GCTransition tr2L = supervisor.createTransition(100,yPos+550,"1");
-		stepID++;
-		supervisor.connect(tr2K,s0L);
-		supervisor.connect(s0L,trNotEnL);
-		supervisor.connect(s0L,trEn1L);
-		supervisor.connect(trEn1L,s1L);
-		supervisor.connect(s1L,trEn2L);
-		supervisor.connect(trNotEnL,s2L);
-		supervisor.connect(trEn2L,s2L);
-		supervisor.connect(s2L,trBackL);
-		supervisor.connect(s2L,trL);
-		supervisor.connect(trBackL,s0L);
-		supervisor.connect(trL,s3L);
-		supervisor.connect(s3L,tr2L);
-
-		supervisor.connect(tr2L,sA);
+		GCStep sB = supervisor.createStep(100,yPos,"sB",";");
+		yPos+=100;
+		GCTransition trC = supervisor.createTransition(100,yPos+30,"");
+		
+		GCStep sC = supervisor.createStep(100,yPos+200,"sC","S index=applyStaticMethod(\"org.supremica.external.shoefactory.Executor.FactoryExecutorDEMO\",\"getShoeIndex\",\"int\",\"int\",index);\nS success = applyStaticMethod(\"org.supremica.external.shoefactory.Executor.FactoryExecutorDEMO\",\"saveValues\",\"boolean\",\"int\",nrOfShoes);");
+		GCTransition trDa = supervisor.createTransition(100,yPos+300,"index>0 & index<=nrOfShoes");
+		GCTransition trDb = supervisor.createTransition(300,yPos+300,"index<0 & (nrOfShoes-firstIndex)>0");
+		
+		for(int i=1; i<putEventsA.length+1; i++)
+		{
+			GCTransition tr = checkTablePutEvents(supervisor,sB,i-1);
+			bv1[i-1] = jgSupervisor.createBooleanVariable(100*i,250,putEventsA[i-1],"0");
+			supervisor.connect(tr,sC);
+		}
+		
+		for(int i=1; i<putEventsB.length+1; i++)
+		{
+			GCTransition tr = checkTableWithStationPutEvents(supervisor,sB,i-1);
+			bv1[putEventsA.length] = jgSupervisor.createBooleanVariable(100*i,350,putEventsB[i-1],"0");
+			supervisor.connect(tr,sC);
+		}
+		
+		for(int i=1; i<putEventsC.length+1; i++)
+		{
+			GCTransition tr = checkStationPutEvents(supervisor,sB,i-1);
+			bv1[putEventsA.length+putEventsB.length] = jgSupervisor.createBooleanVariable(100*i,450,putEventsC[i-1],"0");
+			supervisor.connect(tr,sC);
+		}
+		
+		for(int i=1; i<getEventsA.length+1; i++)
+		{
+			GCTransition tr = checkTableGetEvents(supervisor,sB,i-1);
+			bv1[putEventsA.length+putEventsB.length+putEventsC.length] = jgSupervisor.createBooleanVariable(100*i,550,getEventsA[i-1],"0");
+			supervisor.connect(tr,sC);
+		}
+		
+		for(int i=1; i<getEventsB.length+1; i++)
+		{
+			GCTransition tr = checkTableWithStationGetEvents(supervisor,sB,i-1);
+			bv1[putEventsA.length+putEventsB.length+putEventsC.length+getEventsA.length] = jgSupervisor.createBooleanVariable(100*i,650,getEventsB[i-1],"0");
+			supervisor.connect(tr,sC);
+		}
+		
+		for(int i=1; i<getEventsC.length+1; i++)
+		{
+			GCTransition tr = checkStationGetEvents(supervisor,sB,i-1);
+			bv1[putEventsA.length+putEventsB.length+putEventsC.length+getEventsA.length+getEventsB.length] = jgSupervisor.createBooleanVariable(100*i,750,getEventsC[i-1],"0");
+			supervisor.connect(tr,sC);
+		}
+		trC.setConditionText("!("+conditionString+"0)");
+		sB.setActionText(actionString);
+		
+		supervisor.connect(initialStep,trA);
+		supervisor.connect(trA,sA);
+		supervisor.connect(sA,trB);
+		supervisor.connect(trB,sB);
+		supervisor.connect(sB,trC);
+		supervisor.connect(trC,sC);
+		supervisor.connect(sC,trDa);
+		supervisor.connect(sC,trDb);
+		supervisor.connect(trDa,sB);
+		supervisor.connect(trDb,sA);
 	}
+	
+	public GCTransition checkTablePutEvents(GCDocument supervisor, GCStep in, int index)
+	{
+		int xPos=300+100*(index);
+		conditionString = conditionString+putEventsA[index]+" | ";
+		
+		if(index==0)
+			actionString = actionString+"S stepString = \"Shoe\"+index+\".ShoeControl.Wait_table0.x\";\nS "+putEventsA[index]+" = applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"isEventEnabled\",\"boolean\",\"string\",supervisor,\"string\",\"Shoe_\"+index+\""+putEventsA[index]+"\") & !ShoefactoryDEMO.tables.table0.fullSlot.get(getRot^) & stepString^;\n";
+		else if(index==1)
+			actionString = actionString+"S stepString = \"Shoe\"+index+\".ShoeControl.moveFromTable\"+currTable^+\".S_toTable0_end.x\";\nS "+putEventsA[index]+" = applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"isEventEnabled\",\"boolean\",\"string\",supervisor,\"string\",\"Shoe_\"+index+\""+putEventsA[index]+"\") & !ShoefactoryDEMO.tables.table0.fullSlot.get(getRot^) & stepString^;\n";	
+		else
+			actionString = actionString+"S stepString = \"Shoe\"+index+\".ShoeControl.moveFromTable\"+currTable^+\".Wait_table"+index/2+".x\";\nS "+putEventsA[index]+" = applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"isEventEnabled\",\"boolean\",\"string\",supervisor,\"string\",\"Shoe_\"+index+\""+putEventsA[index]+"\") & !ShoefactoryDEMO.tables.table"+index/2+".fullSlot.get(getRot^) & stepString^;\n";	
+				
+		GCTransition trEn1 = supervisor.createTransition(xPos,yPos,putEventsA[index]);
+		GCStep s1 = supervisor.createStep(xPos,yPos+50,"Step"+stepID,";");
+		if(index==0)
+			s1.setActionText("S success = applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"executeEvent\",\"boolean\",\"string\",supervisor,\"string\",\"Shoe_\"+index+\""+putEventsA[index]+"\");\nS success = applyStaticMethod(\"org.supremica.external.shoefactory.Animator.JgrafSupervisorDEMO\",\"moveInitial\",\"boolean\",\"string\",\"Table0\",\"string\",\"Shoe_\"+index+\""+putEventsA[index]+"\");\nS success = applyStaticMethod(\"org.supremica.external.shoefactory.Animator.JgrafSupervisorDEMO\",\"moveInitial\",\"boolean\",\"string\",\"shoeSpec\"+index,\"string\",\"Shoe_\"+index+\""+putEventsA[index]+"\");\nS currEvent = \"Shoe\"+index+\".Events."+putEventsA[index]+"\";\nS currEvent^=1;");
+		else if(index==1)
+			s1.setActionText("S success = applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"executeEvent\",\"boolean\",\"string\",supervisor,\"string\",\"Shoe_\"+index+\""+putEventsA[index]+"\");\nS success = applyStaticMethod(\"org.supremica.external.shoefactory.Animator.JgrafSupervisorDEMO\",\"moveInitial\",\"boolean\",\"string\",\"Table0\",\"string\",\"Shoe_\"+index+\""+putEventsA[index]+"\");\nS success = applyStaticMethod(\"org.supremica.external.shoefactory.Animator.JgrafSupervisorDEMO\",\"moveInitial\",\"boolean\",\"string\",\"IO_1\",\"string\",\"Shoe_\"+index+\""+putEventsA[index]+"\");\nS success = applyStaticMethod(\"org.supremica.external.shoefactory.Animator.JgrafSupervisorDEMO\",\"moveInitial\",\"boolean\",\"string\",\"shoeSpec\"+index,\"string\",\"Shoe_\"+index+\""+putEventsA[index]+"\");\nS currEvent = \"Shoe\"+index+\".Events."+putEventsA[index]+"\";\nS currEvent^=1;");
+		else
+			s1.setActionText("S success = applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"executeEvent\",\"boolean\",\"string\",supervisor,\"string\",\"Shoe_\"+index+\""+putEventsA[index]+"\");\nS success = applyStaticMethod(\"org.supremica.external.shoefactory.Animator.JgrafSupervisorDEMO\",\"moveInitial\",\"boolean\",\"string\",\"Table"+index/2 +"\",\"string\",\"Shoe_\"+index+\""+putEventsA[index]+"\");\nS success = applyStaticMethod(\"org.supremica.external.shoefactory.Animator.JgrafSupervisorDEMO\",\"moveInitial\",\"boolean\",\"string\",\"IO_"+(index/2+index%2)+"\",\"string\",\"Shoe_\"+index+\""+putEventsA[index]+"\");\nS success = applyStaticMethod(\"org.supremica.external.shoefactory.Animator.JgrafSupervisorDEMO\",\"moveInitial\",\"boolean\",\"string\",\"shoeSpec\"+index,\"string\",\"Shoe_\"+index+\""+putEventsA[index]+"\");\nS currEvent = \"Shoe\"+index+\".Events."+putEventsA[index]+"\";\nS currEvent^=1;");
+			
+	
+		GCTransition trEn2 = supervisor.createTransition(xPos,yPos+150,"Step"+stepID+".T>1");
+		stepID++;
+		supervisor.connect(in,trEn1);
+		supervisor.connect(trEn1,s1);
+		supervisor.connect(s1,trEn2);
+		
+		return trEn2;
+	}
+	
+	public GCTransition checkTableWithStationPutEvents(GCDocument supervisor, GCStep in, int index)
+	{
+		int tNr=index+1, xPos=300+100*(index+putEventsA.length);
+		conditionString = conditionString+putEventsB[index]+" | ";
+		
+	    actionString = actionString+"S stepString = \"Shoe\"+index+\".ShoeControl.moveFromTable\"+currTable^+\".S_toTable"+tNr+"_end.x\";\nS "+putEventsB[index]+" = applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"isEventEnabled\",\"boolean\",\"string\",supervisor,\"string\",\"Shoe_\"+index+\""+putEventsB[index]+"\") & !ShoefactoryDEMO.tables.table"+tNr+".fullSlot.get(getRot^) & stepString^;\n";
+
+		GCTransition trEn1 = supervisor.createTransition(xPos,yPos,putEventsB[index]);
+		GCStep s1 = supervisor.createStep(xPos,yPos+50,"Step"+stepID,"S success = applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"executeEvent\",\"boolean\",\"string\",supervisor,\"string\",\"Shoe_\"+index+\""+putEventsB[index]+"\");\nS success = applyStaticMethod(\"org.supremica.external.shoefactory.Animator.JgrafSupervisorDEMO\",\"moveInitial\",\"boolean\",\"string\",\"Table"+tNr+"\",\"string\",\"Shoe_\"+index+\""+putEventsB[index]+"\");\nS success = applyStaticMethod(\"org.supremica.external.shoefactory.Animator.JgrafSupervisorDEMO\",\"moveInitial\",\"boolean\",\"string\",\"IO_1\",\"string\",\"Shoe_\"+index+\""+putEventsB[index]+"\");\nS success = applyStaticMethod(\"org.supremica.external.shoefactory.Animator.JgrafSupervisorDEMO\",\"moveInitial\",\"boolean\",\"string\",\"shoeSpec\"+index,\"string\",\"Shoe_\"+index+\""+putEventsB[index]+"\");\nS currEvent = \"Shoe\"+index+\".Events."+putEventsB[index]+"\";\nS currEvent^=1;");
+		
+		GCTransition trEn2 = supervisor.createTransition(xPos,yPos+150,"Step"+stepID+".T>1");
+		stepID++;
+		
+		supervisor.connect(in,trEn1);
+		supervisor.connect(trEn1,s1);
+		supervisor.connect(s1,trEn2);
+		
+		return trEn2;
+	}
+	
+	public GCTransition checkStationPutEvents(GCDocument supervisor, GCStep in, int index)
+	{
+		int tNr=index+1, xPos=300+100*(index+putEventsA.length+putEventsB.length);
+		conditionString = conditionString+putEventsC[index]+" | ";
+		actionString = actionString+"S stepString = \"Shoe\"+index+\".ShoeControl.onTable"+tNr+".Station"+index+".x\";\nS "+putEventsC[index]+" = applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"isEventEnabled\",\"boolean\",\"string\",supervisor,\"string\",\"Shoe_\"+index+\""+putEventsC[index]+"\") & !ShoefactoryDEMO.tables.table"+tNr+".fullSlot.get(applyStaticMethod(\"org.supremica.external.shoefactory.Animator.Shoe\",\"getIndex\",\"int\",\"int\",getRot^,\"int\","+ShoeDEMO.getStationRot(index)+")) & stepString^;\n";
+
+		GCTransition trEn1 = supervisor.createTransition(xPos,yPos,putEventsC[index]);
+		GCStep s1 = supervisor.createStep(xPos,yPos+50,"Step"+stepID,"S success = applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"executeEvent\",\"boolean\",\"string\",supervisor,\"string\",\"Shoe_\"+index+\""+putEventsC[index]+"\");\nS success = applyStaticMethod(\"org.supremica.external.shoefactory.Animator.JgrafSupervisorDEMO\",\"moveInitial\",\"boolean\",\"string\",\"Station_"+tNr+"_"+index+"\",\"string\",\"Shoe_\"+index+\""+putEventsC[index]+"\");\nS success = applyStaticMethod(\"org.supremica.external.shoefactory.Animator.JgrafSupervisorDEMO\",\"moveInitial\",\"boolean\",\"string\",\"Table"+tNr +"\",\"string\",\"Shoe_\"+index+\""+putEventsC[index]+"\");\nS success = applyStaticMethod(\"org.supremica.external.shoefactory.Animator.JgrafSupervisorDEMO\",\"moveInitial\",\"boolean\",\"string\",\"shoeSpec\"+index,\"string\",\"Shoe_\"+index+\""+putEventsC[index]+"\");\nS currEvent = \"Shoe\"+index+\".Events."+putEventsC[index]+"\";\nS currEvent^=1;");
+		GCTransition trEn2 = supervisor.createTransition(xPos,yPos+150,"Step"+stepID+".T>1");
+		stepID++;
+		
+		supervisor.connect(in,trEn1);
+		supervisor.connect(trEn1,s1);
+		supervisor.connect(s1,trEn2);
+		
+		return trEn2;
+	}
+	
+	public GCTransition checkTableGetEvents(GCDocument supervisor, GCStep in, int index)
+	{
+		int xPos=300+100*(index+putEventsA.length+putEventsB.length+putEventsC.length);
+		conditionString = conditionString+getEventsA[index]+" | ";
+		
+
+		if(index==0)
+			actionString = actionString+"S currStation=\"Shoe\"+index+\".station23\";\nS stepString = \"Shoe\"+index+\".ShoeControl.S0.x\";\nS "+getEventsA[index]+" = applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"isEventEnabled\",\"boolean\",\"string\",supervisor,\"string\",\"Shoe_\"+index+\""+getEventsA[index]+"\") & applyStaticMethod(\"java.lang.Math\",\"abs\",\"int\",\"int\",getRot^-ShoefactoryDEMO.tables.table0.rot)==0 & !currStation^ & stepString^;\n";
+		else
+			actionString = actionString+"S agvString = applyStaticMethod(\"org.supremica.external.shoefactory.Animator.JgrafSupervisorDEMO\",\"checkAgv\",\"string\",\"string\",\"Shoe_\"+index+\""+getEventsA[index]+"\",\"int\",gotoString^);\nS stepString = \"Shoe\"+index+\".ShoeControl.moveFromTable0.S0.x\";\nS "+getEventsA[index]+" = applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"isEventEnabled\",\"boolean\",\"string\",supervisor,\"string\",\"Shoe_\"+index+\""+getEventsA[index]+"\") & applyStaticMethod(\"java.lang.Math\",\"abs\",\"int\",\"int\",getRot^-ShoefactoryDEMO.tables.table0.rot)==6 & !agvString^ & stepString^;\n";
+
+																																																																																																								
+		GCTransition trEn1 = supervisor.createTransition(xPos,yPos,getEventsA[index]);
+		GCStep s1 = supervisor.createStep(xPos,yPos+50,"Step"+stepID,";");
+
+		if(index==0)
+			s1.setActionText("S success = applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"executeEvent\",\"boolean\",\"string\",supervisor,\"string\",\"Shoe_\"+index+\""+getEventsA[index]+"\");\nS success = applyStaticMethod(\"org.supremica.external.shoefactory.Animator.JgrafSupervisorDEMO\",\"moveInitial\",\"boolean\",\"string\",\"Table0\",\"string\",\"Shoe_\"+index+\""+getEventsA[index]+"\");\nS success = applyStaticMethod(\"org.supremica.external.shoefactory.Animator.JgrafSupervisorDEMO\",\"moveInitial\",\"boolean\",\"string\",\"shoeSpec\"+index,\"string\",\"Shoe_\"+index+\""+getEventsA[index]+"\");\nS firstIndex = firstIndex+1;\nS currEvent = \"Shoe\"+index+\".Events."+getEventsA[index]+"\";\nS currEvent^=1;");
+
+		else
+			s1.setActionText("S success = applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"executeEvent\",\"boolean\",\"string\",supervisor,\"string\",\"Shoe_\"+index+\""+getEventsA[index]+"\");\nS success = applyStaticMethod(\"org.supremica.external.shoefactory.Animator.JgrafSupervisorDEMO\",\"moveInitial\",\"boolean\",\"string\",\"Table0\",\"string\",\"Shoe_\"+index+\""+getEventsA[index]+"\");\nS success = applyStaticMethod(\"org.supremica.external.shoefactory.Animator.JgrafSupervisorDEMO\",\"moveInitial\",\"boolean\",\"string\",\"IO_1\",\"string\",\"Shoe_\"+index+\""+getEventsA[index]+"\");\nS success = applyStaticMethod(\"org.supremica.external.shoefactory.Animator.JgrafSupervisorDEMO\",\"moveInitial\",\"boolean\",\"string\",\"shoeSpec\"+index,\"string\",\"Shoe_\"+index+\""+getEventsA[index]+"\");\nS currEvent = \"Shoe\"+index+\".Events."+getEventsA[index]+"\";\nS currEvent^=1;");
+	
+		GCTransition trEn2 = supervisor.createTransition(xPos,yPos+150,"Step"+stepID+".T>1");
+		stepID++;
+		supervisor.connect(in,trEn1);
+		supervisor.connect(trEn1,s1);
+		supervisor.connect(s1,trEn2);
+		
+		return trEn2;
+	}
+	
+	public GCTransition checkTableWithStationGetEvents(GCDocument supervisor, GCStep in, int index)
+	{
+		int tNr=index+1, xPos=300+100*(index+putEventsA.length+putEventsB.length+putEventsC.length+getEventsA.length);
+		conditionString = conditionString+getEventsB[index]+" | ";
+		actionString = actionString+"S agvString = applyStaticMethod(\"org.supremica.external.shoefactory.Animator.JgrafSupervisorDEMO\",\"checkAgv\",\"string\",\"string\",\"Shoe_\"+index+\""+getEventsB[index]+"\",\"int\",gotoString^);\nS stepString = \"Shoe\"+index+\".ShoeControl.moveFromTable"+tNr+".S0.x\";\nS "+getEventsB[index]+" = applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"isEventEnabled\",\"boolean\",\"string\",supervisor,\"string\",\"Shoe_\"+index+\""+getEventsB[index]+"\") & applyStaticMethod(\"java.lang.Math\",\"abs\",\"int\",\"int\",getRot^-ShoefactoryDEMO.tables.table"+tNr+".rot)==0 & !agvString^ & stepString^;\n";
+
+		GCTransition trEn1 = supervisor.createTransition(xPos,yPos,getEventsB[index]);
+		GCStep s1 = supervisor.createStep(xPos,yPos+50,"Step"+stepID,"S success = applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"executeEvent\",\"boolean\",\"string\",supervisor,\"string\",\"Shoe_\"+index+\""+getEventsB[index]+"\");\nS success = applyStaticMethod(\"org.supremica.external.shoefactory.Animator.JgrafSupervisorDEMO\",\"moveInitial\",\"boolean\",\"string\",\"shoeSpec\"+index,\"string\",\"Shoe_\"+index+\""+getEventsB[index]+"\");\nS success = applyStaticMethod(\"org.supremica.external.shoefactory.Animator.JgrafSupervisorDEMO\",\"moveInitial\",\"boolean\",\"string\",\"Table"+tNr+"\",\"string\",\"Shoe_\"+index+\""+getEventsB[index]+"\");\nS success = applyStaticMethod(\"org.supremica.external.shoefactory.Animator.JgrafSupervisorDEMO\",\"moveInitial\",\"boolean\",\"string\",\"IO_1\",\"string\",\"Shoe_\"+index+\""+getEventsB[index]+"\");\nS currEvent = \"Shoe\"+index+\".Events."+getEventsB[index]+"\";\nS currEvent^=1;");
+		
+		GCTransition trEn2 = supervisor.createTransition(xPos,yPos+150,"Step"+stepID+".T>1");
+		stepID++;
+		supervisor.connect(in,trEn1);
+		supervisor.connect(trEn1,s1);
+		supervisor.connect(s1,trEn2);
+		
+		return trEn2;
+	}
+	
+	public GCTransition checkStationGetEvents(GCDocument supervisor, GCStep in, int index)
+	{
+		int tNr=index+1, xPos=300+100*(index+putEventsA.length+putEventsB.length+putEventsC.length+getEventsA.length+getEventsB.length);;
+		conditionString = conditionString+getEventsC[index]+" | ";
+		actionString = actionString+"S currStation=\"Shoe\"+index+\".station"+index+"\";\nS stepString = \"Shoe\"+index+\".ShoeControl.onTable"+tNr+".S0.x\";\nS "+getEventsC[index]+" = applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"isEventEnabled\",\"boolean\",\"string\",supervisor,\"string\",\"Shoe_\"+index+\""+getEventsC[index]+"\") & applyStaticMethod(\"java.lang.Math\",\"abs\",\"int\",\"int\",getRot^-ShoefactoryDEMO.tables.table"+tNr+".rot)=="+ShoeDEMO.getStationRot(index)+" & currStation^ & stepString^;\n";
+
+		GCTransition trEn1 = supervisor.createTransition(xPos,yPos,getEventsC[index]);
+		GCStep s1 = supervisor.createStep(xPos,yPos+50,"Step"+stepID,"S success = applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"executeEvent\",\"boolean\",\"string\",supervisor,\"string\",\"Shoe_\"+index+\""+getEventsC[index]+"\");\nS success = applyStaticMethod(\"org.supremica.external.shoefactory.Animator.JgrafSupervisorDEMO\",\"moveInitial\",\"boolean\",\"string\",\"Station_"+tNr+"_"+index+"\",\"string\",\"Shoe_\"+index+\""+getEventsC[index]+"\");\nS success = applyStaticMethod(\"org.supremica.external.shoefactory.Animator.JgrafSupervisorDEMO\",\"moveInitial\",\"boolean\",\"string\",\"Table"+tNr+"\",\"string\",\"Shoe_\"+index+\""+getEventsC[index]+"\");\nS success = applyStaticMethod(\"org.supremica.external.shoefactory.Animator.JgrafSupervisorDEMO\",\"moveInitial\",\"boolean\",\"string\",\"shoeSpec\"+index,\"string\",\"Shoe_\"+index+\""+getEventsC[index]+"\");\nS currEvent = \"Shoe\"+index+\".Events."+getEventsC[index]+"\";\nS currEvent^=1;");
+		GCTransition trEn2 = supervisor.createTransition(xPos,yPos+150,"Step"+stepID+".T>1");
+		stepID++;
+		supervisor.connect(in,trEn1);
+		supervisor.connect(trEn1,s1);
+		supervisor.connect(s1,trEn2);
+		
+		return trEn2;
+	}
+	
+	public static boolean moveInitial(String supervisor, String event)
+	{
+		Gui theGui = ActionMan.getGui();
+		VisualProjectContainer container = theGui.getVisualProjectContainer();
+		Project activeProject = container.getActiveProject();
+		Automaton currAutomaton = activeProject.getAutomaton(supervisor);
+		State currState = currAutomaton.getInitialState();
+
+		if(currState.isEnabled(event))
+		{
+			State nextState = currState.nextState(event);
+			currState.setInitial(false);
+			currState.setAccepting(false);
+			nextState.setInitial(true);
+			nextState.setAccepting(true);
+			currAutomaton.setInitialState(nextState);
+			return true;	
+		}
+		else 
+		{
+			return false;
+		}
+	}
+	
+	//Gives the correct String to the supervisor when it checks an agv
+	public static String checkAgv(String event, int gotoTable)
+	{
+		if(event.endsWith("R"))
+		{
+			if(gotoTable==1)
+				return "ShoefactoryDEMO.agvs.agv0.busyA";
+			else
+				return "ShoefactoryDEMO.agvs.agv0.busyB";
+		}
+		else if(event.endsWith("1"))
+		{
+			if(gotoTable==0)
+				return "ShoefactoryDEMO.agvs.agv0.busyA";
+			else
+				return "ShoefactoryDEMO.agvs.agv0.busyC";
+		}
+		else
+		{
+			if(gotoTable==0)
+				return "ShoefactoryDEMO.agvs.agv0.busyB";
+			else
+				return "ShoefactoryDEMO.agvs.agv0.busyC";
+		}
+	}	
 }

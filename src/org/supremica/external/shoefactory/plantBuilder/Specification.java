@@ -81,7 +81,7 @@ public class Specification
 		shoeNr = nr;
 
 	
-		Automaton currShoe = new Automaton("Shoe"+nr+" spec");
+		Automaton currShoe = new Automaton("shoeSpec"+nr);
 	  	currShoe.setType(AutomatonType.Specification);
 	   	currAlphabet = currShoe.getAlphabet();
 
@@ -756,8 +756,10 @@ public class Specification
 				State s0ret15=currShoe.createAndAddUniqueState("q");
 				
 				Arc bla1 = new Arc( s0ret13,stat20, gt10s20);
-				Arc bla2 = new Arc( stat20,s0ret15,pt10s20);
-				Arc ag6 = new Arc( s0ret15,s0ret14,getL10Event);
+				//Arc bla2 = new Arc( stat20,s0ret15,pt10s20);
+				Arc bla2 = new Arc( stat20,s0ret13,pt10s20);
+				//Arc ag6 = new Arc( s0ret15,s0ret14,getL10Event);
+				Arc ag6 = new Arc( s0ret13,s0ret14,getL10Event);
 			}
 			
 			else

@@ -2,10 +2,16 @@ package org.supremica.external.shoefactory.Configurator;
 
 public class ConfigConverter
 {
-	private boolean[] stationVisit = new boolean[24];
 
-	public ConfigConverter(String c, String s, String gt, String g, String st, String m)
+	public ConfigConverter()
 	{
+
+	}
+
+	public boolean[] getConfig(String c, String s, String gt, String g, String st, String m)
+	{
+		boolean[] stationVisit = new boolean[24];
+			
         if(c.compareTo("red")==0)
         {
 			stationVisit[14]=true;
@@ -73,7 +79,6 @@ public class ConfigConverter
 			stationVisit[1]=true;
 			stationVisit[7]=true;
 			stationVisit[10]=true;
-
 		}
 		else if(s.compareTo("42")==0)
 		{
@@ -151,10 +156,7 @@ public class ConfigConverter
 		}
 
 		stationVisit[23]=true;
-	}
 
-	public boolean[] getConfig()
-	{
 		return stationVisit;
 	}
 }

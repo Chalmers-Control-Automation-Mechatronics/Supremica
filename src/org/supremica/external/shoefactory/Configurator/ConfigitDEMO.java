@@ -52,11 +52,17 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.*;
-
+import javax.swing.ImageIcon.*;
 import java.net.URL;
+import java.net.MalformedURLException;
+import javax.xml.parsers.SAXParserFactory;
+import javax.xml.parsers.SAXParser;
+import org.xml.sax.*;
+import org.xml.sax.helpers.DefaultHandler;
 import java.io.*;
 import com.configit_software.ctrlmngr.*;
-
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import org.supremica.gui.*;
 import org.supremica.log.*;
 import org.supremica.external.shoefactory.Executor.*;
@@ -98,7 +104,9 @@ public class ConfigitDEMO extends JFrame
    	JButton JB = new JButton ("Cancel");
 	JButton JR = new JButton ("Reset");
 	JButton JC = new JButton ("Place order");
-	JButton JP = new JButton ("Start production");
+	//-----------------------------------------
+	JButton JQ = new JButton ("Quick pick");
+	//-----------------------------------------
 
 	ButtonGroup lGend = new ButtonGroup();
 	ButtonGroup lGT = new ButtonGroup();
@@ -124,6 +132,9 @@ public class ConfigitDEMO extends JFrame
 
    	ImageIcon icon1 = new ImageIcon(Supremica.class.getResource("/shoefactory/blshoe.gif"));
    	ImageIcon icon2 = new ImageIcon(Supremica.class.getResource("/shoefactory/pnkshoe.gif"));
+   	
+   	FactoryExecutorDEMO fe = new FactoryExecutorDEMO();
+   	ConfigConverter cc = new ConfigConverter();
 
 	public ConfigitDEMO (Gui g)
 	{
@@ -248,7 +259,7 @@ public class ConfigitDEMO extends JFrame
 		buttonPanel.add(JR, FlowLayout.LEFT);
 		buttonPanel.add(JB, FlowLayout.CENTER);
 		buttonPanel.add(JC, FlowLayout.CENTER);
-		buttonPanel.add(JP, FlowLayout.RIGHT);
+		buttonPanel.add(JQ, FlowLayout.RIGHT);
 
 		lGend1.addActionListener(this);
 		lGend2.addActionListener(this);
@@ -262,7 +273,7 @@ public class ConfigitDEMO extends JFrame
 		JB.addActionListener(this);
 		JR.addActionListener(this);
 		JC.addActionListener(this);
-		JP.addActionListener(this);
+		JQ.addActionListener(this);
 
 		pack();
     }
@@ -588,12 +599,11 @@ public class ConfigitDEMO extends JFrame
 				if(selection == JOptionPane.OK_OPTION)
 				{
 					ctrl_mngr.completeConf();
-					/*ConfigConverter cc = new ConfigConverter(ctrl_mngr.getValueName(3, ctrl_mngr.getSelectedValue(3)),
+
+					fe.start(cc.getConfig(ctrl_mngr.getValueName(3, ctrl_mngr.getSelectedValue(3)),
 											ctrl_mngr.getValueName(1, ctrl_mngr.getSelectedValue(1)), ctrl_mngr.getValueName(2, ctrl_mngr.getSelectedValue(2)),
 											ctrl_mngr.getValueName(0, ctrl_mngr.getSelectedValue(0)), ctrl_mngr.getValueName(4, ctrl_mngr.getSelectedValue(4)),
-											ctrl_mngr.getValueName(5, ctrl_mngr.getSelectedValue(5)));*/
-					//FactoryExecutor fe = new FactoryExecutor(cc.getConfig(), gui);
-					total++;
+											ctrl_mngr.getValueName(5, ctrl_mngr.getSelectedValue(5))), gui);
 					ctrl_mngr.resetConf();
 					Res_Sellist();
 					reset();
@@ -602,13 +612,12 @@ public class ConfigitDEMO extends JFrame
 				}
 			}
 		}
-
-		if(e.getSource() == JP)
+		
+		if(e.getSource() == JQ)
 		{
-			boolean[] t1={true,true,true};
-			FactoryExecutorDEMO fe = new FactoryExecutorDEMO(t1, gui);
+			fe.start(cc.getConfig("red","40","Adult","Male","typeA","Hiking"), gui);
 		}
-
+		
 		if(e.getSource() == lGend1)
 		{
 			assign(0,0);

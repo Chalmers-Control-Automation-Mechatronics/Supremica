@@ -53,21 +53,15 @@ import org.supremica.automata.*;
 public class SpecificationDEMO
 {
 	protected Project theSpec = null;
-	//private Automaton station =null;
 	private Alphabet currAlphabet;
 	private int shoeNr,typ;
-
-//	private boolean[] createdEvents = new boolean[13];
-
 
 	public SpecificationDEMO(int nr, boolean type)
 	{
 		theSpec = new Project();
 		shoeNr = nr;
 
-
-
-		Automaton currShoe = new Automaton("Shoe"+shoeNr+" spec");
+		Automaton currShoe = new Automaton("shoeSpec"+nr);
 	  	currShoe.setType(AutomatonType.Specification);
 	   	currAlphabet = currShoe.getAlphabet();
 
@@ -158,10 +152,7 @@ public class SpecificationDEMO
 			Arc putArc10 = new Arc(s10,sInitial, getT0L);
 
 		}
-
-
 			theSpec.addAutomaton(currShoe);
-
 		}
 
 		public Project getSpec()

@@ -3029,10 +3029,6 @@ public class ActionMan
 		{
 			logger.error("shoeFactoryBuildPlant: " + ex.getMessage());
 		}
-		int[] syncAutomata = {0,1,2,3};
-		SyncBuilder syncPlant = new SyncBuilder(gui, newProject, syncAutomata);
-		//syncPlant.synchronizePlants("Synchronized");
-		syncPlant.synthesizePlants("theSupervisor");
 	}
 
 	//shoeFactory - build SFC

@@ -52,11 +52,17 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.*;
+import javax.swing.ImageIcon.*;
 import java.net.URL;
-
+import java.net.MalformedURLException;
+import javax.xml.parsers.SAXParserFactory;
+import javax.xml.parsers.SAXParser;
+import org.xml.sax.*;
+import org.xml.sax.helpers.DefaultHandler;
 import java.io.*;
 import com.configit_software.ctrlmngr.*;
-
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import org.supremica.gui.*;
 import org.supremica.log.*;
 import org.supremica.external.shoefactory.Executor.*;
@@ -70,7 +76,7 @@ public class Configit extends JFrame
 	Container c;
 	Gui gui;
 	private boolean resetok = true;
-		
+
     private String [] Gender = {"Male" ,"Female"};
 	private String [] GeneralType = {"Children", "Adult" };
    	private String [] Size;
@@ -124,6 +130,9 @@ public class Configit extends JFrame
 
    	ImageIcon icon1 = new ImageIcon(Supremica.class.getResource("/shoefactory/blshoe.gif"));
    	ImageIcon icon2 = new ImageIcon(Supremica.class.getResource("/shoefactory/pnkshoe.gif"));
+
+   	FactoryExecutor fe = new FactoryExecutor();
+   	ConfigConverter cc = new ConfigConverter();
 
 	public Configit (Gui g)
 	{
@@ -467,7 +476,7 @@ public class Configit extends JFrame
 				lSize.addItem("");
 				lSize.setSelectedItem("");
 			}
-			
+
 			ifSelected = false;
 			for(int i=0; i<ctrl_mngr.getDomainSize(5); i++)
 			{
@@ -562,7 +571,7 @@ public class Configit extends JFrame
       	if(e.getSource() == JB){
 			dispose();
 		}
-		
+
 		if(e.getSource() == JR)
 		{
 			ctrl_mngr.resetConf();
@@ -588,12 +597,11 @@ public class Configit extends JFrame
 				if(selection == JOptionPane.OK_OPTION)
 				{
 					ctrl_mngr.completeConf();
-					ConfigConverter cc = new ConfigConverter(ctrl_mngr.getValueName(3, ctrl_mngr.getSelectedValue(3)),
+
+					fe.start(cc.getConfig(ctrl_mngr.getValueName(3, ctrl_mngr.getSelectedValue(3)),
 											ctrl_mngr.getValueName(1, ctrl_mngr.getSelectedValue(1)), ctrl_mngr.getValueName(2, ctrl_mngr.getSelectedValue(2)),
 											ctrl_mngr.getValueName(0, ctrl_mngr.getSelectedValue(0)), ctrl_mngr.getValueName(4, ctrl_mngr.getSelectedValue(4)),
-											ctrl_mngr.getValueName(5, ctrl_mngr.getSelectedValue(5)));
-
-					FactoryExecutor fe = new FactoryExecutor(cc.getConfig(), gui);
+											ctrl_mngr.getValueName(5, ctrl_mngr.getSelectedValue(5))), gui);
 					ctrl_mngr.resetConf();
 					Res_Sellist();
 					reset();
@@ -602,11 +610,10 @@ public class Configit extends JFrame
 				}
 			}
 		}
-		
+
 		if(e.getSource() == JQ)
 		{
-			ConfigConverter cc = new ConfigConverter("red","40","Adult","Male","typeA","Hiking");
-			FactoryExecutor fe = new FactoryExecutor(cc.getConfig(), gui);
+			fe.start(cc.getConfig("red","40","Adult","Male","typeA","Hiking"), gui);
 		}
 
 		if(e.getSource() == lGend1)
