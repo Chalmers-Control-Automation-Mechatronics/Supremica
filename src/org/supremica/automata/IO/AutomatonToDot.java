@@ -159,9 +159,12 @@ public class AutomatonToDot
 	public void serialize(PrintWriter pw)
 		throws Exception
 	{
-		//aut.normalizeStateIdentities();
+		aut.normalizeStateIdentities();
+		
+		/*
 		EnumerateStates en = new EnumerateStates(aut, "q");
 		en.execute();
+		*/
 
 		Vector initialStates = new Vector();
 		final String initPrefix = "__init_";
