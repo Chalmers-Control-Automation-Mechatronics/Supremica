@@ -50,7 +50,7 @@
 package org.supremica.apps;
 
 import java.util.*;
-import helma.xmlrpc.*;
+import org.apache.xmlrpc.*;
 import org.supremica.properties.SupremicaProperties;
 
 public class SupremicaClient

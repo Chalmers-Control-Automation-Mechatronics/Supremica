@@ -275,6 +275,72 @@ public final class SupremicaProperties
 	}
 
 
+	// --------------------------------------------------------------
+
+
+	// ALL OF THIS IS COMING FROM THE JAVA SDK CODE (Properties.java)
+	private static char toHex(int nibble) {
+		return hexDigit[(nibble & 0xF)];
+	}
+
+	/** A table of hex digits */
+	private static final char[] hexDigit = {
+		'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'
+	};
+
+
+	private static final String keyValueSeparators = "=: \t\r\n\f";
+
+	private static final String strictKeyValueSeparators = "=:";
+
+	private static final String specialSaveChars = "=: \t\r\n\f#!";
+
+	private static final String whiteSpaceChars = " \t\r\n\f";
+
+	private static String convert(String theString, boolean escapeSpace) {
+		int len = theString.length();
+		StringBuffer outBuffer = new StringBuffer(len*2);
+
+		for(int x=0; x<len; x++) {
+			char aChar = theString.charAt(x);
+			switch(aChar) {
+		case ' ':
+			if (x == 0 || escapeSpace)
+			outBuffer.append('\\');
+
+			outBuffer.append(' ');
+			break;
+				case '\\':outBuffer.append('\\'); outBuffer.append('\\');
+						  break;
+				case '\t':outBuffer.append('\\'); outBuffer.append('t');
+						  break;
+				case '\n':outBuffer.append('\\'); outBuffer.append('n');
+						  break;
+				case '\r':outBuffer.append('\\'); outBuffer.append('r');
+						  break;
+				case '\f':outBuffer.append('\\'); outBuffer.append('f');
+						  break;
+				default:
+					if ((aChar < 0x0020) || (aChar > 0x007e)) {
+						outBuffer.append('\\');
+						outBuffer.append('u');
+						outBuffer.append(toHex((aChar >> 12) & 0xF));
+						outBuffer.append(toHex((aChar >>  8) & 0xF));
+						outBuffer.append(toHex((aChar >>  4) & 0xF));
+						outBuffer.append(toHex( aChar        & 0xF));
+					} else {
+						if (specialSaveChars.indexOf(aChar) != -1)
+							outBuffer.append('\\');
+						outBuffer.append(aChar);
+					}
+			}
+		}
+		return outBuffer.toString();
+	}
+
+
+
+
 	/**
 	 * save the property list to the configuration file.
 	 *
@@ -283,11 +349,27 @@ public final class SupremicaProperties
 	public static final void savePropperties(String name)
 		throws IOException
 	{
-
+		// CODE STOLEN FROM THE OTIGINAL Properties.java FILE FROM JDK :(
 		OutputStream os = new FileOutputStream(name);
-		wp.store(os, "# Supremica configuration file");
+		BufferedWriter awriter = new BufferedWriter(new OutputStreamWriter(os, "8859_1"));
+
+		awriter.write("# Supremica configuration file");
+		awriter.newLine();
+		awriter.write("#" + new Date().toString());
+		awriter.newLine();
+		for (Enumeration e = wp.keys(); e.hasMoreElements();)
+		{
+			String key = (String)e.nextElement();
+			if(!wp.allowExternalModification(key)) continue; 	// <---- NOTE!
+			key = convert(key, true);
+			String val = convert((String)wp.get(key), false);
+			awriter.write(key + "=" + val);
+			awriter.newLine();
+		}
+        awriter.flush();
 		os.close();
 	}
+
 
 
 	public static final void savePropperties()
