@@ -201,6 +201,7 @@ public class Automata
 	 * If you want the synchronization indicies to be valid then you have to call setSynchronizationIndicies
 	 * before calling this method.
 	 */
+	/*
 	private Alphabet getUnionAlphabet()
 		throws Exception
 	{
@@ -212,6 +213,7 @@ public class Automata
 	{
 		return AlphabetHelpers.getUnionAlphabet(this, requireConsistentControllability, requireConsistentImmediate);
 	}
+	*/
 
 	public Iterator iterator()
 	{
@@ -355,6 +357,7 @@ public class Automata
 	/**
 	 * Use nbrOfAutomata instead.
 	 */
+
 	public int getNbrOfAutomata()
 	{
 		return nbrOfAutomata();
@@ -375,6 +378,27 @@ public class Automata
 		return thisAutomaton == otherAutomaton;
 	}
 
+	public Alphabet setIndicies()
+	{
+		Alphabet theAlphabet;
+		try
+		{
+			theAlphabet = AlphabetHelpers.getUnionAlphabet(this, false, false);
+		}
+		catch (Exception ex)
+		{
+			throw new RuntimeException(ex);
+		}
+		theAlphabet.setIndicies();
+		int i = 0;
+		for (Iterator autIt = iterator(); autIt.hasNext();)
+		{
+			Automaton currAutomaton = (Automaton)autIt.next();
+			currAutomaton.setIndicies(i++, theAlphabet);
+		}
+		return theAlphabet;
+
+	}
 
 	public Automaton getAutomaton(String name)
 	{

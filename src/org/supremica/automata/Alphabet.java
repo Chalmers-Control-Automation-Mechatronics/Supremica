@@ -156,6 +156,7 @@ public class Alphabet
 		}
 	}
 
+
 	/**
 	 * Given an event, returns an "equal" event from this alphabet
 	 * The def of "equal" is an internal matter.
@@ -167,6 +168,7 @@ public class Alphabet
 		return getEventWithId(event.getId());
 	}
 
+
 	/**
 	 * Add an event to the alphabet. Check with containsEventWithId to make
 	 * sure that an event with the id not already exists.
@@ -176,7 +178,6 @@ public class Alphabet
 	 *@exception  Exception Description of the Exception
 	 */
 	public void addEvent(LabeledEvent event)
-		throws Exception
 	{
 		addEvent(event, true);
 	}
@@ -254,7 +255,7 @@ public class Alphabet
 	static public Alphabet minus(Alphabet op1, Alphabet op2)
 	{
 		Alphabet result = new Alphabet(op1);
-		result. minus(op2);
+		result.minus(op2);
 		return result;
 	}
 
@@ -326,6 +327,31 @@ public class Alphabet
 		return result;
 	}
 
+	public void setIndicies()
+	{
+		int i = 0;
+		for (EventIterator evIt = iterator(); evIt.hasNext();)
+		{
+			LabeledEvent currEvent = evIt.nextEvent();
+			currEvent.setSynchIndex(i++);
+		}
+	}
+
+	public void setIndicies(Alphabet otherAlphabet)
+		throws IllegalArgumentException
+	{
+		for (EventIterator evIt = iterator(); evIt.hasNext();)
+		{
+			LabeledEvent currEvent = evIt.nextEvent();
+			LabeledEvent otherEvent = otherAlphabet.getEventWithLabel(currEvent.getLabel());
+			if (otherEvent == null)
+			{
+				throw new IllegalArgumentException("otherAlphabet must contains all events in this alphabet");
+			}
+			currEvent.setSynchIndex(otherEvent.getSynchIndex());
+		}
+	}
+
 	public boolean isAllEventsPrioritized()
 	{
 		for (Iterator evIt = eventIterator(); evIt.hasNext(); )
@@ -382,8 +408,12 @@ public class Alphabet
 	 *@param  event Description of the Parameter
 	 */
 	public void removeEvent(LabeledEvent event)
-		throws Exception
+		throws IllegalArgumentException
 	{
+		if (!includes(event))
+		{
+			throw new IllegalArgumentException("The event is not included in this alphabet");
+		}
 		idMap.remove(event.getId());
 		super.removeEvent(event);
 	}
@@ -394,8 +424,12 @@ public class Alphabet
 	 *@param  event Description of the Parameter
 	 */
 	public void removeEvent(String label)
-		throws Exception
+		throws IllegalArgumentException
 	{
+		if (!containsEventWithLabel(label))
+		{
+			throw new IllegalArgumentException("The event is not included in this alphabet");
+		}
 		LabeledEvent currEvent = getEventWithLabel(label);
 
 		idMap.remove(currEvent.getId());
@@ -440,6 +474,12 @@ public class Alphabet
 			return false;
 		}
 		return true;
+	}
+
+	public void clear()
+	{
+		super.clear();
+		rehash();
 	}
 
 	/**
