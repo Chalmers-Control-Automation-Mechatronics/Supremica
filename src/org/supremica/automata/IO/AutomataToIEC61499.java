@@ -187,7 +187,7 @@ public class AutomataToIEC61499
 		for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext();)
 		{
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-			pw.println("\tEO_" + currEvent.getSynchIndex() + " : BOOL;\t(* " + currEvent.getLabel() + " *)");
+			pw.println("\tEO_" + currEvent.getSynchIndex() + " : BOOL;"); //\t(* " + currEvent.getLabel() + " *)");
 		}
 		pw.println("END_VAR");		
 	
@@ -212,7 +212,8 @@ public class AutomataToIEC61499
 				State currState = (State) stateIt.next();
 				int currStateIndex = currState.getSynchIndex();
 
-				theHelper.printBooleanVariableDeclaration(pw, "Q_" + currAutomatonIndex + "_" + currStateIndex, currState.getName() + " in " + currAutomaton.getName(),1);
+				//theHelper.printBooleanVariableDeclaration(pw, "Q_" + currAutomatonIndex + "_" + currStateIndex, currState.getName() + " in " + currAutomaton.getName(),1);
+				pw.println("\tQ_" + currAutomatonIndex + "_" + currStateIndex + " : BOOL;");
 			}
 		}
 				
