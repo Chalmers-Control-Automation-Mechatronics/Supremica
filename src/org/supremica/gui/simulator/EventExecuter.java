@@ -26,6 +26,7 @@ class EventExecuter
 		this.sleepTime = sleepTime;	
 		this.theExecuter = executer;
 		this.eventModel = eventModel;
+		eventModel.addListDataListener(this);
 	}	
 	
 	public void run()
@@ -63,7 +64,7 @@ class EventExecuter
 		doRun = false;		
 	}
 	
-	public void tryExecuteEvent()
+	public synchronized void tryExecuteEvent()
 	{
 		if (executeUncontrollableEvents)
 		{

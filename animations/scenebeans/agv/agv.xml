@@ -825,6 +825,10 @@
 	</event>
 
 	<!-- WS 2 Commands -->
+	<command name="ws2.go">
+		<announce event = "~ws2.end"/>
+		<start behaviour="ws2.go"/>
+	</command>
 	<command name="ws2.addpart">
 		<announce event = "~ws2.end"/>
 		<set object="ws2_primitive_switch" param="current" value="0" />
@@ -842,6 +846,10 @@
 	</event>
 
 	<!-- WS 3 Commands -->
+	<command name="ws3.go">
+		<announce event = "~ws3.end"/>
+		<start behaviour="ws3.go"/>
+	</command>
 	<command name="ws3.addpart">
 		<announce event = "~ws3.end"/>
 		<set object="ws3_primitive_switch" param="current" value="0" />
