@@ -15,7 +15,7 @@ public class EditorPanel
 	private EditorEventsPanel eventsPanel;
 	private EditorAliasesPanel aliasesPanel;
 	private EditorComponentsPanel componentsPanel;
-	private EditorButtonGroup editorButtonGroup;
+	private ButtonGroup editorButtonGroup;
 
 	public EditorPanel(ModuleContainer moduleContainer, String name)
 	{
@@ -62,7 +62,7 @@ public class EditorPanel
 
 	public void addToolBarEntries(IDEToolBar toolBar)
 	{
-		editorButtonGroup = new EditorButtonGroup();
+		editorButtonGroup = new ButtonGroup();
 		toolBar.addSeparator();
 		(toolBar.add(getActions().editorSelectAction, editorButtonGroup)).setSelected(true);
 		toolBar.add(getActions().editorAddNodeAction, editorButtonGroup);

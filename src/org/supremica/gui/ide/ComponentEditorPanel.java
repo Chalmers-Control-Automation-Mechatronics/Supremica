@@ -132,7 +132,7 @@ public class ComponentEditorPanel
 		return events;
 	}
 
-	void copyAsWMFToClipboard()
+	public void copyAsWMFToClipboard()
 	{
 		if (toClipboard == null)
 		{
