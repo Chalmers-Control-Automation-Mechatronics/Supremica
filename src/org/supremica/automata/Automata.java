@@ -641,7 +641,7 @@ public class Automata
 	 * Returns true if there are no events with alphabetically equal names, i.e.
 	 * lowercase equal.
 	 */
-	public boolean isEventNameConsistent()
+	public boolean isEventNamesSafe()
 	{
 
 		// Get the union alphabet, ignoring consistency for now
@@ -656,7 +656,7 @@ public class Automata
 			logger.error(ex);
 		}
 
-		return !unionAlphabet.hasEqualLowercaseEventNames();
+		return !unionAlphabet.hasEqualEventNamesIgnoringCase();
 	}
 
 	/**
@@ -1229,7 +1229,7 @@ public class Automata
 	{
 
 		// Warns if there are events with equal (lowercase) names.
-		isEventNameConsistent();
+		isEventNamesSafe();
 
 		// Examines controllability consitency
 		if (mustBeControllabilityConsistent &&!isEventControllabilityConsistent())

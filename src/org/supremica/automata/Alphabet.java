@@ -909,9 +909,9 @@ public class Alphabet
 	}
 
 	/**
-	 * Returns true if the alphabet has alphabetically (lowecase) equal event names.
+	 * Returns true if the alphabet has alphabetically (ignoring case) equal event names.
 	 */
-	public boolean hasEqualLowercaseEventNames()
+	public boolean hasEqualEventNamesIgnoringCase()
 	{
 
 		// Make copy to make iterating easier...
@@ -935,8 +935,8 @@ public class Alphabet
 			{
 				LabeledEvent eventB = eventIt.nextEvent();
 
-				// Compare lowercase names
-				if (eventA.getLabel().toLowerCase().equals(eventB.getLabel().toLowerCase()))
+				// Compare names ignoring case
+				if (eventA.getLabel().equalsIgnoreCase(eventB.getLabel()))
 				{
 					logger.warn("The events " + eventA + " and " + eventB + " have dangerously " + "similar names.");
 
