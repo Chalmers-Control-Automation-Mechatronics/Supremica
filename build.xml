@@ -43,7 +43,7 @@
 *	just change "jikes" to "modern" on the next line.
 -->
 <property name="build.compiler" value="jikes"/>
-<!-- Enables emacs warning warning and error mesages. This is equals to calling jikes +E -->
+<!-- Enables emacs warning and error mesages. This is equals to calling jikes +E -->
 <!-- Put this in TextPad to get clickable error messages
 	Expression = ^[ \t]+\[javac\] \([A-Z]:[^:]+\):\([0-9]+\):\([0-9]+\):\([0-9]+\):
 	File Register = 1

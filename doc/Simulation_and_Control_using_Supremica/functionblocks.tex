@@ -5,25 +5,27 @@
 {This chapter is with minor revisions copied from chapter 2 in \cite{j:des:2002}.}
 \end{bf}
 
-New technologies and standards are emerging that are set to have a
-dramatic effect on the design and implementation of industrial
-control systems. A new standard IEC-61131-3~\cite{iec:1131:1993} was
-introduced in 1995 to standardize the representation of control
-designs so as to enable cross-vendor integration. The standard
-offered significant advantages over earlier vendor proprietary
+New technologies and standards are emerging that are set to
+have a dramatic effect on the design and implementation of
+industrial control systems. A new standard
+IEC-61131-3~\cite{iec:1131:1993} was introduced in 1995 to
+standardize the representation of control designs so as to
+enable cross-vendor integration. The standard offered
+significant advantages over earlier vendor proprietary
 control design representations~\cite{l:pro:1995}.
 \begin{itemize}
-\item It encouraged well-structured procedural
-programs that allowed the development of different functional
-elements into separate procedures or program units.
-\item It provided standardized languages and methods of program execution
-so that wide range of technological problems can be programmed as
-vendor-independent software elements.
-\item It provided support for various languages like structured
-text, function block diagrams, ladder diagrams, instruction list
-and sequential function charts.
-\item The standard enforced strong data typing and supported user defined
-data structures.
+\item It encouraged well-structured procedural programs that
+  allowed the development of different functional elements
+  into separate procedures or program units.
+\item It provided standardized languages and methods of
+  program execution so that wide range of technological
+  problems can be programmed as vendor-independent software
+  elements.
+\item It provided support for various languages like
+  structured text, function block diagrams, ladder diagrams,
+  instruction list and sequential function charts.
+\item The standard enforced strong data typing and supported
+  user defined data structures.
 \end{itemize}
 
 The standard however was based on a scanning mechanism where the
@@ -351,124 +353,126 @@ the scheduling function must be able to detect the arrival of
 input events at a faster rate than the rate at which they can be
 handled by the block.
 
-\section{FBEditor}
-Function Block Development Kit (FBDK) ~\cite{c:fun:2002} is a
-software toolkit that enables users to build and test data types,
-function block types, resource types, device types and system
-configurations according to the IEC 61499 standard. FBEditor is a
-part of the FBDK toolkit that provides a development and runtime
-environment for applications based on the IEC 61499 standard.
-Figure \ref{f:FBEditor} shows the editor being used to load a
-function block used for controlling a motor.
 
-%
-%\singlespace
-\begin{figure}
-\begin{center}
-\epsfig{file=images/functionblocks/FBEditor.eps, scale=.6}
-\caption[FBEditor]{FBEditor{\protect ~\cite{c:fun:2002}}}
-\label{f:FBEditor}
-\end{center}
-\end{figure}
-%\doublespace
-%
+% \section{FBEditor}
+% Function Block Development Kit (FBDK) ~\cite{c:fun:2002} is a
+% software toolkit that enables users to build and test data types,
+% function block types, resource types, device types and system
+% configurations according to the IEC 61499 standard. FBEditor is a
+% part of the FBDK toolkit that provides a development and runtime
+% environment for applications based on the IEC 61499 standard.
+% Figure \ref{f:FBEditor} shows the editor being used to load a
+% function block used for controlling a motor.
 
-FBEditor enables the users to edit the block definitions through
-both a text editor and through a graphical user interface. New
-data types, basic function blocks, composite function blocks,
-execution control charts and other higher level entities may be
-created through the editor. The attributes of the blocks (data and
-events) may also be examined through a graphical user interface.
-The function blocks can be examined at the device level as shown
-in Figure \ref{f:Editor-Devices} or at the level of individual
-attributes like the connections, as shown in figure
-\ref{f:Editor-Mapping}.
+% %
+% %\singlespace
+% \begin{figure}
+% \begin{center}
+% \epsfig{file=images/functionblocks/FBEditor.eps, scale=.6}
+% \caption[FBEditor]{FBEditor{\protect ~\cite{c:fun:2002}}}
+% \label{f:FBEditor}
+% \end{center}
+% \end{figure}
+% %\doublespace
+% %
 
-The editor supports the languages supported by the standard
-(Structured text, execution control chart etc.). It uses XML as
-the exchange format to ensure portability across various domains.
-Figure \ref{f:Editor-Versions} shows how the editor can also be
-used to manage meta properties like versions, owner entities,
-authors etc.
+% FBEditor enables the users to edit the block definitions through
+% both a text editor and through a graphical user interface. New
+% data types, basic function blocks, composite function blocks,
+% execution control charts and other higher level entities may be
+% created through the editor. The attributes of the blocks (data and
+% events) may also be examined through a graphical user interface.
+% The function blocks can be examined at the device level as shown
+% in Figure \ref{f:Editor-Devices} or at the level of individual
+% attributes like the connections, as shown in figure
+% \ref{f:Editor-Mapping}.
 
-%
-%\singlespace
-\begin{figure}
-\begin{center}
-\epsfig{file=images/functionblocks/Editor-Devices.eps, scale=.6} \caption[FBEditor
-- Editing system devices]{FBEditor - Editing system
-devices{\protect ~\cite{c:fun:2002}}} \label{f:Editor-Devices}
-\end{center}
-\end{figure}
-%\doublespace
-%
+% The editor supports the languages supported by the standard
+% (Structured text, execution control chart etc.). It uses XML as
+% the exchange format to ensure portability across various domains.
+% Figure \ref{f:Editor-Versions} shows how the editor can also be
+% used to manage meta properties like versions, owner entities,
+% authors etc.
 
-%
-%\singlespace
-\begin{figure}
-\begin{center}
-\epsfig{file=images/functionblocks/Editor-Mapping.eps, scale=.6} \caption[FBEditor
-- Editing device connections]{FBEditor - Editing device
-connections{\protect ~\cite{c:fun:2002}}} \label{f:Editor-Mapping}
-\end{center}
-\end{figure}
-%\doublespace
-%
+% %
+% %\singlespace
+% \begin{figure}
+% \begin{center}
+% \epsfig{file=images/functionblocks/Editor-Devices.eps, scale=.6} \caption[FBEditor
+% - Editing system devices]{FBEditor - Editing system
+% devices{\protect ~\cite{c:fun:2002}}} \label{f:Editor-Devices}
+% \end{center}
+% \end{figure}
+% %\doublespace
+% %
 
-%
-%\singlespace
-\begin{figure}
-\begin{center}
-\epsfig{file=images/functionblocks/Editor-Versions.eps, scale=.6}
-\caption[FBEditor - Editing meta properties]{FBEditor - Editing
-meta properties{\protect ~\cite{c:fun:2002}}}
-\label{f:Editor-Versions}
-\end{center}
-\end{figure}
-%\doublespace
-%
-FBEditor has a navigation pane that allows the user to choose the
-display on the worksheet area, including the external interface;
-the Execution Control Chart (ECC) for basic function block type;
-service primitive sequences for service interface function block
-types; and function block networks for composite function block
-types, device and resource types and instances, and system
-configurations. The worksheet / viewport area contains the
-function block diagram for the currently selected instance.
-Different components of the diagram can be dragged around for
-better readability.
+% %
+% %\singlespace
+% \begin{figure}
+% \begin{center}
+% \epsfig{file=images/functionblocks/Editor-Mapping.eps, scale=.6} \caption[FBEditor
+% - Editing device connections]{FBEditor - Editing device
+% connections{\protect ~\cite{c:fun:2002}}} \label{f:Editor-Mapping}
+% \end{center}
+% \end{figure}
+% %\doublespace
+% %
 
-
-FBEditor has been developed in Java language. Hence in order to
-run simulations on applications written using the editor, one
-needs to generate the Java classes that correspond to the source
-files for the function blocks written in structured text (for
-instance). The editor has a code generation mechanism through
-which it parses through the source files and generates a Java
-class corresponding to each block.
+% %
+% %\singlespace
+% \begin{figure}
+% \begin{center}
+% \epsfig{file=images/functionblocks/Editor-Versions.eps, scale=.6}
+% \caption[FBEditor - Editing meta properties]{FBEditor - Editing
+% meta properties{\protect ~\cite{c:fun:2002}}}
+% \label{f:Editor-Versions}
+% \end{center}
+% \end{figure}
+% %\doublespace
+% %
+% FBEditor has a navigation pane that allows the user to choose the
+% display on the worksheet area, including the external interface;
+% the Execution Control Chart (ECC) for basic function block type;
+% service primitive sequences for service interface function block
+% types; and function block networks for composite function block
+% types, device and resource types and instances, and system
+% configurations. The worksheet / viewport area contains the
+% function block diagram for the currently selected instance.
+% Different components of the diagram can be dragged around for
+% better readability.
 
 
-On occurrence of certain input events, the user needs to specify
-the algorithms that should be scheduled to be executed and the
-output events that should signal the completion of algorithms.
-This may be done either by editing the generated Java files or by
-enclosing the algorithm inside especially marked tags in the
-source files. The files are then compiled and simulations can be
-run from within the editor environment. Figure
-\ref{f:Editor-Transitions} shows the assignment of output events
-on the transitions through the editing of the execution control
-chart.
+% FBEditor has been developed in Java language. Hence in order to
+% run simulations on applications written using the editor, one
+% needs to generate the Java classes that correspond to the source
+% files for the function blocks written in structured text (for
+% instance). The editor has a code generation mechanism through
+% which it parses through the source files and generates a Java
+% class corresponding to each block.
 
-%
-%\singlespace
-\begin{figure}
-\begin{center}
-\epsfig{file=images/functionblocks/Editor-Transitions.eps, scale=.6}
-\caption[FBEditor Editing the execution control chart]{FBEditor
-Editing the execution control chart{\protect ~\cite{c:fun:2002}}}
-\label{f:Editor-Transitions}
-\end{center}
-\end{figure}
+
+% On occurrence of certain input events, the user needs to specify
+% the algorithms that should be scheduled to be executed and the
+% output events that should signal the completion of algorithms.
+% This may be done either by editing the generated Java files or by
+% enclosing the algorithm inside especially marked tags in the
+% source files. The files are then compiled and simulations can be
+% run from within the editor environment. Figure
+% \ref{f:Editor-Transitions} shows the assignment of output events
+% on the transitions through the editing of the execution control
+% chart.
+
+% %
+% %\singlespace
+% \begin{figure}
+% \begin{center}
+% \epsfig{file=images/functionblocks/Editor-Transitions.eps, scale=.6}
+% \caption[FBEditor Editing the execution control chart]{FBEditor
+% Editing the execution control chart{\protect ~\cite{c:fun:2002}}}
+% \label{f:Editor-Transitions}
+% \end{center}
+% \end{figure}
+
 %\doublespace
 %
 

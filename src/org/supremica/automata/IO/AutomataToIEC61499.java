@@ -52,30 +52,24 @@ import java.io.*;
 import java.util.*;
 import java.text.DateFormat;
 
-
 import org.supremica.log.*;
 import org.supremica.automata.*;
 import org.supremica.util.SupremicaException;
 import org.supremica.automata.algorithms.SynchronizationType;
 
-/**
- * @author cengic
- *
- * This class generates an IEC 61499 function block implementing 
- * the automata in the current project.
+//TODO: Make state variables int
+
+/** This class generates an IEC-61499 function block 
+ * implementing the automata in the current project.
  *  
- * An important notice is that the event in the IEC-61499 is not the 
- * same as the automaton event, that is why the
- * implementation of the interface is done this way
+ * <p>Note that the event in the IEC-61499 is not the 
+ * same as an automaton event. That is why the
+ * implementation of the interface is done this way. KA 
+ * and I are planing several different interfaces so this 
+ * is only the first one.
  * 
- * KA and I are planing several different interfaces so this is only the first one.
- * 
- */
-
-// TODO: Make state variables int
-// TODO: Make comments optional
-
-
+ * @author Goran Cengic
+ */ 
 public class AutomataToIEC61499
 
 {
@@ -85,48 +79,54 @@ public class AutomataToIEC61499
 	private IEC61131Helper theHelper;
 	private Alphabet allEvents;
 	private SynchronizationType syncType = SynchronizationType.Prioritized;
+	private boolean comments = false;	
 	
+	public void commentsOn()
+	{
+		comments = true;
+	}
 	
+	public void commentsOff()
+	{
+		comments = false;
+	}
 	
 	// Constructor
 	public AutomataToIEC61499(Project theProject)
 	{
 		this.theProject = theProject;
 		this.theHelper = IEC61131Helper.getInstance();
-		this.initialize();
-	}
-
-	
-	
-	private void initialize()
-	{
-		allEvents = theProject.setIndicies();
+		allEvents = this.theProject.setIndicies();
+		commentsOn();
 	}
 
 
-
-	// Makes the beginning of the function block type declaration
+	/** Makes the beginning of the function block type declaration. */
 	private void printBeginProgram(PrintWriter pw)
 	{
 
-		//pw.println("(* This file was automatically generated from Supremica *)");
-		//pw.println("(* Supremica version: " + org.supremica.Version.version() + "*)");
-		//pw.println("(* Time of generation: + DateFormat.getDateTimeInstance().format(new Date()) +" *)");
-				
-		pw.println("FUNCTION_BLOCK AUTOGEN_AUTOMATA_FUNCTION_BLOCK"); // + "\t" + "(* " + "Supremica version: " + org.supremica.Version.version() + "\t" + "Time of generation: " + DateFormat.getDateTimeInstance().format(new Date()) + " *)");
+		if (comments)
+		{
+			pw.println("(* This file was automatically generated from Supremica *)");
+			pw.println("(* Supremica version: " + org.supremica.Version.version() + "*)");
+			pw.println("(* Time of generation: " + DateFormat.getDateTimeInstance().format(new Date()) + " *)");
+		}
+		
+		pw.println("FUNCTION_BLOCK AUTOGEN_AUTOMATA_FUNCTION_BLOCK");
 
 	}
 
 
 
 
-	// Makes the fb_interface_list production rule of the standard
+	/** Makes the fb_interface_list production rule of the standard. */
 	private void printInterfaceList(PrintWriter pw) 
 	{
 
 
 		// The event_input_list. This is the same for all FBs of automata.
-		// For now the input events are RESET and OCURED.
+		// For now the input events are INIT, RESET and OCURED.
+		// INIT event does the initialization
 		// RESET event makes all of the automata go to their initial state.
 		// OCCURRED event signals a new automaton event to the automata and is thus coupled 
 		// to the input variables that represent the automaton events.
@@ -149,6 +149,7 @@ public class AutomataToIEC61499
 		pw.println("END_EVENT");
 		
 
+
 		// The event_output_list. This is the same for all FBs of automata also.
 		// For now the only output event is DONE and it is coupled with the output variables that
 		// represent the state of the automata after the transition upon receving a automaton event.
@@ -169,6 +170,7 @@ public class AutomataToIEC61499
 		pw.println("END_EVENT");
 		
 		
+		
 		// The input_variable_list. Input variables represent the automaton events and are of the
 		// bool type. Only one should be TRUE when the OCCURRED event happens but if several are TRUE
 		// all of the transitions will take place. The user have to make shure that this is possible!
@@ -176,7 +178,12 @@ public class AutomataToIEC61499
 		for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext();)
 		{
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-			pw.println("\tEI_" + currEvent.getSynchIndex() + " : BOOL;"); //\t(* " + currEvent.getLabel() + " *)");
+			pw.print("\tEI_" + currEvent.getSynchIndex() + " : BOOL;"); 
+			if (comments)
+			{
+				pw.print("\t(* " + currEvent.getLabel() + " *)");
+			}
+			pw.print("\n");
 		}
 		pw.println("END_VAR");
 
@@ -187,7 +194,12 @@ public class AutomataToIEC61499
 		for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext();)
 		{
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-			pw.println("\tEO_" + currEvent.getSynchIndex() + " : BOOL;"); //\t(* " + currEvent.getLabel() + " *)");
+			pw.print("\tEO_" + currEvent.getSynchIndex() + " : BOOL;");
+			if (comments)
+			{
+				pw.print("\t(* " + currEvent.getLabel() + " *)");
+			}
+			pw.print("\n");
 		}
 		pw.println("END_VAR");		
 	
@@ -196,8 +208,8 @@ public class AutomataToIEC61499
 
 
 
-	// Makes the fb_internal_variable_list production rule of the standard
-	private void printInternalVariableList(PrintWriter pw) 
+	/** Makes the fb_internal_variable_list production rule of the standard. */
+ 	private void printInternalVariableList(PrintWriter pw) 
 	{
 		pw.println("VAR");
 		
@@ -212,8 +224,12 @@ public class AutomataToIEC61499
 				State currState = (State) stateIt.next();
 				int currStateIndex = currState.getSynchIndex();
 
-				//theHelper.printBooleanVariableDeclaration(pw, "Q_" + currAutomatonIndex + "_" + currStateIndex, currState.getName() + " in " + currAutomaton.getName(),1);
-				pw.println("\tQ_" + currAutomatonIndex + "_" + currStateIndex + " : BOOL;");
+				pw.print("\tQ_" + currAutomatonIndex + "_" + currStateIndex + " : BOOL;");
+				if (comments)
+				{
+					pw.print(" (* " + currState.getName() + " in " + currAutomaton.getName() + " *)");
+				}
+				pw.print("\n");
 			}
 		}
 				
@@ -223,7 +239,7 @@ public class AutomataToIEC61499
 
 
 
-	// Makes the fb_ecc_declaration
+	/** Makes the fb_ecc_declaration production rule of the standard. */
 	private void printEccDeclaration(PrintWriter pw) 
 	{
 		
@@ -254,7 +270,7 @@ public class AutomataToIEC61499
 
 
 
-	// Makes the fb_algorithm_declaration
+	/** Makes the fb_algorithm_declaration production rule of the standard. */
 	private void printAlgorithmDeclarations(PrintWriter pw) 
 		throws Exception
 	{
@@ -271,6 +287,13 @@ public class AutomataToIEC61499
 		// makes automata enter the initial state.
 		pw.println("ALGORITHM RESET IN ST :");
 
+		if (comments)
+		{
+			pw.println("\t(* Reset all automata to initial state *)");
+			pw.println();
+			pw.println("\t(* First set all states to FALSE *)");
+		}
+		
 		// Set all state variables to FALSE
 		for (Iterator autIt = theProject.iterator(); autIt.hasNext(); )
 		{
@@ -284,6 +307,13 @@ public class AutomataToIEC61499
 
 				pw.println("\tQ_" + currAutomatonIndex + "_" + currStateIndex + " := FALSE;");
 			}
+		}
+
+
+		if (comments)
+		{
+			pw.println();
+			pw.println("\t(* Then set the initial states to TRUE *)");
 		}
 
 		// Then set the initital states to TRUE
@@ -307,11 +337,14 @@ public class AutomataToIEC61499
 
 
 		
-		// TRANSITION algorithm makes the transition corresponding to the automaton event that occurred.
+		// TRANSITION algorithm makes the transition corresponding to the automaton events that came with the 
+		// OCCURED.
 		pw.println("ALGORITHM TRANSITION IN ST :");
 						
-		// pw.println("\n\t(* Change state in the automata *)");
-		//pw.println("\t(* It is in general not safe to have more than one event set to true at this point *)");
+		if (comments)
+		{
+			pw.println("\t(* Change state in the automata *)");
+		}
 
 		// Iterate over all events and make transitions for the enabled events
 		for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext();)
@@ -319,7 +352,11 @@ public class AutomataToIEC61499
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
 			int currEventIndex = currEvent.getSynchIndex();
 
-			//pw.println("\n\t(* Transition for event \"" + currEvent.getLabel() + "\" *)");
+			if (comments)
+			{
+				pw.println();
+				pw.println("\t(* Transitions for event \"" + currEvent.getLabel() + "\" *)");
+			}
 
 			boolean previousCondition = false;
 
@@ -341,7 +378,10 @@ public class AutomataToIEC61499
 						throw new SupremicaException("AutomataToIEC61499.printAlgorithmDeclarations: " + "Could not find " + currEvent.getLabel() + " in automaton " + currAutomaton.getName());
 					}
 
-					//pw.println("\n\t\t(* Transitions in " + currAutomaton.getName() + " *)");
+					if (comments)
+					{
+						pw.println("\t\t(* Transitions in " + currAutomaton.getName() + " *)");
+					}
 
 					boolean previousState = false;
 
@@ -378,7 +418,10 @@ public class AutomataToIEC61499
 						}
 						else
 						{
-							//pw.println("\t\t(* Q_" + currAutomatonIndex + "_" + currStateIndex + "  has EI_" + currEventIndex + " as self loop, no transition *)");
+							if (comments)
+							{
+								pw.println("\t\t(* Q_" + currAutomatonIndex + "_" + currStateIndex + "  has EI_" + currEventIndex + " as self loop, no transition *)");
+							}
 						}
 					}
 
@@ -400,8 +443,6 @@ public class AutomataToIEC61499
 		// the transition.
 		pw.println("ALGORITHM COMP_ENABLED IN ST :");
 
-		//pw.println("\n\t(* Compute the enabled events *)");
-
 		// Iterate over all events and compute which events that are enabled
 		for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext(); )
 		{
@@ -410,7 +451,11 @@ public class AutomataToIEC61499
 				LabeledEvent currEvent = (LabeledEvent) alphIt.next();
 				int currEventIndex = currEvent.getSynchIndex();
 
-				//pw.println("\n\t(* Enable condition for event \"" + currEvent.getLabel() + "\" *)");
+				if (comments)
+				{
+					pw.println();
+					pw.println("\t(* Enable condition for event \"" + currEvent.getLabel() + "\" *)");
+				}
 
 				boolean previousCondition = false;
 
@@ -489,7 +534,7 @@ public class AutomataToIEC61499
 
 
 
-	// Makes the end of the function block type declaration
+	/** Makes the end of the function block type declaration */
 	private void printEndProgram(PrintWriter pw)
 	{
 
@@ -500,7 +545,7 @@ public class AutomataToIEC61499
 
 
 
-	// Put together function block type declaration
+	/** Makes the basic function block type declaration. */
 	public void printSource(PrintWriter pw)
 	{
 
@@ -518,7 +563,7 @@ public class AutomataToIEC61499
 		}
 		printEndProgram(pw);
 	
-//		printSignalVariables(pw);   -- not used yet, we'll have to see how to handle this.
+		//printSignalVariables(pw);   -- not used yet, we'll have to see how to handle this.
 
 	}
 
