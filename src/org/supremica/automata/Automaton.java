@@ -271,7 +271,7 @@ public class Automaton
 		}
 		return false;
 	}
-	
+
 	/**
 	 * When adding an arc, both the two states associated with the
 	 * arc _must_ already be contained in the automaton, otherwise the
@@ -602,6 +602,8 @@ public class Automaton
 
 		LabelTrace theTrace = new LabelTrace();
 
+		// Remove the associated state from all states that
+		// is not on the way between fromState and toState.
 		State thisState = toState;
 		thisState.setVisited(true);
 		State prevState = thisState.getAssociatedState();
@@ -654,6 +656,11 @@ public class Automaton
 		}
 	}
 
+	/**
+	 * In computeShortestPath the assciatedStates are backwards. I.e. they
+	 * point from the to states towards the initial state. After the computation
+	 * we want the arcs in the opposite direction.
+	 */
 	private void reverseAssociatedState(State toState)
 	{
 		clearVisitedStates();
