@@ -238,7 +238,7 @@ public class Server
 				return escape( response.toString() );
 		}
 
-		public void addAutomaton(String name, String automatonXmlEncoding)
+		public int addAutomaton(String name, String automatonXmlEncoding)
 			throws XmlRpcException
 		{
 			// System.out.println("name = " + name);
@@ -265,10 +265,11 @@ public class Server
 			currAutomaton.setName( name);
 			container.getActiveProject().addAutomaton(currAutomaton);
 
+			return 0; // ignore this
 		}
 
 
-		public void addAutomata(String automataXmlEncoding)
+		public int addAutomata(String automataXmlEncoding)
 				throws XmlRpcException
 		{
 			StringBufferInputStream sbis = new StringBufferInputStream(automataXmlEncoding);
@@ -299,10 +300,11 @@ public class Server
 				}
 			}
 
+			return 0; // ignore this
 		}
 
 
-		public void removeAutomata(Vector automataIdentities)
+		public int removeAutomata(Vector automataIdentities)
 				throws XmlRpcException
 		{
 				for (int i = 0; i < automataIdentities.size(); i++)
@@ -319,13 +321,17 @@ public class Server
 								throw new XmlRpcException(0, currName + " does not exist.");
 						}
 				}
+
+				return 0; // ignore this
 		}
 
+		/*
 		public void synchronizeAutomata(Vector automataIdentitites, String newautomatonIdentitity)
 				throws XmlRpcException {}
 
 		public void minimizeAutomaton(String automatonIdentity, String newIdentity)
 				throws XmlRpcException {}
+		*/
 
 
 
