@@ -16,7 +16,7 @@ Specification of XML Schema etc can be found at http://www.w3.org/XML/Schema
 			<xs:enumeration value="Specification" />
 			<xs:enumeration value="Supervisor" />
 			<xs:enumeration value="Interface" />
-			 <!-- Undefined is deprecated, use Specification instead -->
+			<!-- Undefined is deprecated, use Specification instead -->
 			<xs:enumeration value="Undefined" />
 		</xs:restriction>
 	</xs:simpleType>
@@ -105,11 +105,11 @@ Includes timers and signals.
 	<xs:complexType name="Execution">
 		<xs:sequence>
 			<xs:element name="Timers" type="Timers" minOccurs="0" />
-			<xs:element name="InputSignals" type="Signals"  minOccurs="0" />
+			<xs:element name="InputSignals" type="Signals" minOccurs="0" />
 			<xs:element name="OutputSignals" type="Signals" minOccurs="0" />
 			<xs:element name="Actions" type="Actions" minOccurs="0" />
 			<xs:element name="Controls" type="Controls" minOccurs="0" />
-			<xs:element name="Animation" type="Animation" minOccurs="0"/>
+			<xs:element name="Animation" type="Animation" minOccurs="0" />
 		</xs:sequence>
 	</xs:complexType>
 	<xs:annotation>
@@ -223,8 +223,65 @@ This is the root element type.
 	</xs:annotation>
 	<xs:complexType name="SupremicaProject">
 		<xs:sequence>
-			<xs:element ref="Automaton" minOccurs="0" maxOccurs="unbounded" />
-			<xs:element ref="Execution" minOccurs="0" />
+			<xs:element name="Automaton" type="Automaton" minOccurs="0" maxOccurs="unbounded">
+				<!-- Attribute id must exist and be unique for all events within an automaton -->
+				<xs:key name="EventId">
+					<xs:selector xpath="Events/Event" />
+					<xs:field xpath="attribute::id" />
+				</xs:key>
+				<!-- Attribute label must be unique for all events within an automaton -->
+				<xs:unique name="EventLabel">
+					<xs:selector xpath="Events/Event" />
+					<xs:field xpath="attribute::label" />
+				</xs:unique>
+				<!-- Attribute id must exist and be unique for all states within an automaton -->
+				<xs:key name="StateId">
+					<xs:selector xpath="States/State" />
+					<xs:field xpath="attribute::id" />
+				</xs:key>
+				<!-- Attribute event must refer an existing event id -->
+				<xs:keyref name="TransitionEventId" refer="EventId">
+					<xs:selector xpath="Transitions/Transition" />
+					<xs:field xpath="attribute::event" />
+				</xs:keyref>
+				<!-- Attribute source must refer to an existing state id -->
+				<xs:keyref name="TransitionSourceStateId" refer="StateId">
+					<xs:selector xpath="Transitions/Transition" />
+					<xs:field xpath="attribute::source" />
+				</xs:keyref>
+				<!-- Attribute dest must refer to an existing state id -->
+				<xs:keyref name="TransitionDestStateId" refer="StateId">
+					<xs:selector xpath="Transitions/Transition" />
+					<xs:field xpath="attribute::dest" />
+				</xs:keyref>
+			</xs:element>
+			<xs:element name="Execution" type="Execution" minOccurs="0">
+				<!-- Attribute name must exist and be unique for all timers -->
+				<xs:key name="TimerName">
+					<xs:selector xpath="Timers/Timer" />
+					<xs:field xpath="attribute::name" />
+				</xs:key>
+				<!-- Attribute label must exist and be unique for all input signals -->
+				<xs:key name="InputSignalLabel">
+					<xs:selector xpath="InputSignals/Signal" />
+					<xs:field xpath="attribute::label" />
+				</xs:key>
+				<!-- Attribute port must exist and be unique for all input signals -->
+				<xs:key name="InputSignalPort">
+					<xs:selector xpath="InputSignals/Signal" />
+					<xs:field xpath="attribute::port" />
+				</xs:key>
+				<!-- Attribute label must exist and be unique for all output signals -->
+				<xs:key name="OutputSignalLabel">
+					<xs:selector xpath="OutputSignals/Signal" />
+					<xs:field xpath="attribute::label" />
+				</xs:key>
+				<!-- Attribute port must exist and be unique for all output signals -->
+				<xs:key name="OutputSignalPort">
+					<xs:selector xpath="OutputSignals/Signal" />
+					<xs:field xpath="attribute::port" />
+				</xs:key>
+			</xs:element>
 		</xs:sequence>
 		<xs:attribute name="name" type="xs:string" />
 		<xs:attribute name="comment" type="xs:string" />
@@ -237,66 +294,6 @@ This is the root element type.
 			</xs:simpleType>
 		</xs:attribute>
 	</xs:complexType>
-	<!-- Predefined elements -->
-	<xs:element name="Automaton" type="Automaton">
-		<!-- Attribute id must exist and be unique for all events within an automaton -->
-		<xs:key name="EventId">
-			<xs:selector xpath="Events/Event" />
-			<xs:field xpath="attribute::id" />
-		</xs:key>
-		<!-- Attribute label must be unique for all events within an automaton -->
-		<xs:unique name="EventLabel">
-			<xs:selector xpath="Events/Event" />
-			<xs:field xpath="attribute::label" />
-		</xs:unique>
-		<!-- Attribute id must exist and be unique for all states within an automaton -->
-		<xs:key name="StateId">
-			<xs:selector xpath="States/State" />
-			<xs:field xpath="attribute::id" />
-		</xs:key>
-		<!-- Attribute event must refer an existing event id -->
-		<xs:keyref name="TransitionEventId" refer="EventId">
-			<xs:selector xpath="Transitions/Transition" />
-			<xs:field xpath="attribute::event" />
-		</xs:keyref>
-		<!-- Attribute source must refer to an existing state id -->
-		<xs:keyref name="TransitionSourceStateId" refer="StateId">
-			<xs:selector xpath="Transitions/Transition" />
-			<xs:field xpath="attribute::source" />
-		</xs:keyref>
-		<!-- Attribute dest must refer to an existing state id -->
-		<xs:keyref name="TransitionDestStateId" refer="StateId">
-			<xs:selector xpath="Transitions/Transition" />
-			<xs:field xpath="attribute::dest" />
-		</xs:keyref>
-	</xs:element>
-	<xs:element name="Execution" type="Execution">
-		<!-- Attribute name must exist and be unique for all timers -->
-		<xs:key name="TimerName">
-			<xs:selector xpath="Timers/Timer" />
-			<xs:field xpath="attribute::name" />
-		</xs:key>
-		<!-- Attribute label must exist and be unique for all input signals -->
-		<xs:key name="InputSignalLabel">
-			<xs:selector xpath="InputSignals/Signal" />
-			<xs:field xpath="attribute::label" />
-		</xs:key>
-		<!-- Attribute port must exist and be unique for all input signals -->
-		<xs:key name="InputSignalPort">
-			<xs:selector xpath="InputSignals/Signal" />
-			<xs:field xpath="attribute::port" />
-		</xs:key>
-		<!-- Attribute label must exist and be unique for all output signals -->
-		<xs:key name="OutputSignalLabel">
-			<xs:selector xpath="OutputSignals/Signal" />
-			<xs:field xpath="attribute::label" />
-		</xs:key>
-		<!-- Attribute port must exist and be unique for all output signals -->
-		<xs:key name="OutputSignalPort">
-			<xs:selector xpath="OutputSignals/Signal" />
-			<xs:field xpath="attribute::port" />
-		</xs:key>
-	</xs:element>
 	<xs:annotation>
 		<xs:documentation>
 Root element:
