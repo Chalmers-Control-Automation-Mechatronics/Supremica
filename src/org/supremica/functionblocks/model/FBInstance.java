@@ -54,5 +54,8 @@ package org.supremica.functionblocks.model;
  */
 public class FBInstance extends FBType
 {
-
+    public FBInstance(String name)
+    {
+        super(name);
+    }
 }
