@@ -58,6 +58,10 @@ import java.io.PrintWriter;
 import org.supremica.gui.*;
 import org.apache.log4j.*;
 
+/**
+ * @deprecated No longer used! Use AutomataVerificationWorker instead!
+ * @see AutomataVerificationWorker
+ */
 public class LanguageInclusionCheck
 {
 	private static Category thisCategory = LogDisplay.createCategory(LanguageInclusionCheck.class.getName());

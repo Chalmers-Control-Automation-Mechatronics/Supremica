@@ -551,6 +551,7 @@ public final class AutomataSynchronizerExecuter
 	 */
 	public void requestStop()
 	{
+		System.out.println("Executer requested to stop.");
 		stopRequested = true;
 	}
 

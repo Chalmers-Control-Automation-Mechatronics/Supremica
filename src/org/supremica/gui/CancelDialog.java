@@ -313,7 +313,7 @@ public class CancelDialog
 		}
 		else
  		{
-			System.out.println("What the hell was that? That was kinda' gross.");
+			System.out.println("Error in CancelDialog, unknown event occurred.");
 		}
 		dispose();
 	}

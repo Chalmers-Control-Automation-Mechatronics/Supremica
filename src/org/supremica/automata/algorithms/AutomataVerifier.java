@@ -164,6 +164,7 @@ public class AutomataVerifier
 	 */
  	public void requestStop()
 	{
+		System.out.println("Verifier requested to stop.");
 		stopRequested = true;
 		for (int i = 0; i < synchronizationExecuters.size(); i++)
 			((AutomataSynchronizerExecuter) synchronizationExecuters.get(i)).requestStop();
@@ -215,6 +216,9 @@ public class AutomataVerifier
 
 							if (oneEventAtATime)
 							{
+								if (stopRequested)
+									return false;
+								
 								if (selectedAutomata.size() > 1)
 								{	// Check module
 									allModulesControllable = allModulesControllable && checkModule(selectedAutomata);
@@ -234,6 +238,9 @@ public class AutomataVerifier
 
 				if (!oneEventAtATime)
 				{
+					if (stopRequested)
+						return false;
+					
 					if (selectedAutomata.size() > 1)
 					{	// Check module
 						allModulesControllable = allModulesControllable && checkModule(selectedAutomata);
@@ -243,10 +250,7 @@ public class AutomataVerifier
 							break loop;
 					}
 				}
-				
-				if (stopRequested)
-					return false;
-				
+								
 				selectedAutomata.clear();
 			}
 		}
@@ -272,6 +276,9 @@ public class AutomataVerifier
 		synchHelper.clear();
 		synchHelper.setRememberUncontrollable(true);
 		synchHelper.addState(initialState);
+		
+		if (stopRequested)
+			return false;
 		
 		// Initialize the synchronizationExecuters
 		synchronizationExecuters.clear();
@@ -416,7 +423,6 @@ public class AutomataVerifier
 					synchHelper.printUncontrollableStates(automataIndices);
 				}
 
-				// requestStop();
 				failure = true;
 				return false;
 			}
@@ -534,13 +540,14 @@ public class AutomataVerifier
 		if (amountOfCommon < 1) // Perhaps <= 1? Only one event won't do much good?
 			return 0;
 		if (amountOfUnique > 0)
-			return (double)amountOfCommon/(double)amountOfUnique;
+			// return (double)amountOfCommon; // Another way of doing it...
+			return (double)amountOfCommon/(double)amountOfUnique; 
 		else
 			return Double.MAX_VALUE;
 	}
 
 	/**
-	 * Excudes potentially uncontrollable states from potentiallyUncontrollableStates by synchronizing the
+	 * Excludes potentially uncontrollable states from potentiallyUncontrollableStates by synchronizing the
 	 * automata in the current composition with automata with similar alphabets.
 	 * @param similarAutomata integer array with indices of automata with similar alphabets (from similarAutomata()).
 	 * @param selectedAutomata ArrayList of the Automaton-objects currently selected (the ones in the current "composition" plus perhaps some of the similar automata from earlier rins of this method).
@@ -583,6 +590,9 @@ public class AutomataVerifier
 				// synchHelper.clear(); // This is done while analyzing the result se *** below
 				synchHelper.addState(initialState);
 				
+				if (stopRequested)
+					return;
+
 				// Initialize the synchronizationExecuters
 				synchronizationExecuters.clear();
 				for (int j = 0; j < nbrOfExecuters; j++)
