@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorEdge
 //###########################################################################
-//# $Id: EditorEdge.java,v 1.7 2005-02-22 21:53:14 flordal Exp $
+//# $Id: EditorEdge.java,v 1.8 2005-02-22 22:28:57 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -54,24 +54,24 @@ public class EditorEdge
 		startNode = iStartNode;
 		endNode = iEndNode;
 		proxy = e;
-
+		
 		if (startNode.getType() == NODE)
 		{
 			EditorNode s = (EditorNode) startNode;
-
+			
 			proxy.setSource((NodeProxy) s.getProxy());
-
+			
 			start = s.getPosition();
 		}
 		else
 		{
 			EditorNodeGroup s = (EditorNodeGroup) startNode;
-
+			
 			proxy.setSource((NodeProxy) s.getProxy());
-
+			
 			start = s.getPosition(x, y, this);
 		}
-
+		
 		proxy.setTarget((NodeProxy) iEndNode.getProxy());
 		proxy.setStartPoint(new PointGeometryProxy(start));
 		proxy.setEndPoint(new PointGeometryProxy(endNode.getPosition()));
@@ -375,6 +375,7 @@ public class EditorEdge
 	 */
 	public double getTPointX()
 	{
+		/*
 		if (center.isEmpty() && (dragS || dragT))
 		{
 			return (source.getCenterX() + target.getCenterX()) / 2;
@@ -383,6 +384,9 @@ public class EditorEdge
 		{
 			return tPoint.getX();
 		}
+		*/
+
+		return tPoint.getX();
 	}
 
 	/** 
@@ -391,6 +395,7 @@ public class EditorEdge
 	 */
 	public double getTPointY()
 	{
+		/*
 		if (center.isEmpty() && (dragS || dragT))
 		{
 			return (source.getCenterY() + target.getCenterY()) / 2;
@@ -399,6 +404,9 @@ public class EditorEdge
 		{
 			return tPoint.getY();
 		}
+		*/ 
+
+		return tPoint.getY();
 	}
 
 	/** 
@@ -720,7 +728,7 @@ public class EditorEdge
 				s.getY() + endNode.getWidth()/2 + 2* WIDTH);
 			}
 			else{
-				i.setFrameFromCenter(s.getX(), s.getY() - endNode.getWidth()/2-WIDTH, s.getX() + WIDTH, s.getY() - endNode.getWidth()/2);
+				i.setFrameFromCenter(s.getX(), s.getY() - endNode.getWidth()/2-WIDTH, s.getX() + WIDTH, s.getY() - endNode.getWidth()/r);
 				}*/
 			e.setLocation(e.getX() + .000000001, e.getY());
 		}
@@ -735,7 +743,7 @@ public class EditorEdge
 		}
 
 		double y = m * x;
-
+		
 		x += s.getX();
 		y += s.getY();
 
@@ -748,28 +756,28 @@ public class EditorEdge
 	{
 		return proxy;
 	}
-
+	
 	public void drawObject(Graphics g)
 	{
 		Graphics2D g2d = (Graphics2D) g;
-
+		
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g2d.setColor(getColor());
-
+		
 		if (source.isEmpty() && (dragT || dragS))
 		{
 			int x1 = (int) source.getCenterX();
 			int x2 = (int) target.getCenterX();
 			int y1 = (int) source.getCenterY();
 			int y2 = (int) target.getCenterY();
-
+			
 			g2d.drawLine(x1, y1, x2, y2);
 			drawArrow(x1, y1, x2, y2, (x1 + x2) / 2, (y1 + y2) / 2, false, g2d);
 		}
 		else if (startNode == endNode)
 		{
 			ArrayList a = createTear();
-
+			
 			g2d.draw((Arc2D.Double) a.get(0));
 			g2d.draw((Line2D.Double) a.get(1));
 			g2d.draw((Line2D.Double) a.get(2));
@@ -780,7 +788,7 @@ public class EditorEdge
 			//controlPointX = ((start.getX() + endNode.getX())/2);
 			//controlPointY = ((start.getY() + endNode.getY())/2);
 			g2d.draw(new QuadCurve2D.Double(start.getX(), start.getY(), getCPointX(), getCPointY(), endNode.getX(), endNode.getY()));
-
+			
 			if (startNode.getType() == NODE)
 			{
 				findIntersection(source, new Point2D.Double(start.getX(), start.getY()), new Point2D.Double((double) getCPointX(), (double) getCPointY()));
@@ -789,11 +797,11 @@ public class EditorEdge
 			{
 				source.setFrameFromCenter(start.getX(), start.getY(), start.getX() + WIDTHD, start.getY() + WIDTHD);
 			}
-
+			
 			findIntersection(target, new Point2D.Double(endNode.getX(), endNode.getY()), new Point2D.Double((double) getCPointX(), (double) getCPointY()));
 			drawArrow(start.getX(), start.getY(), endNode.getX(), endNode.getY(), (int) getTPointX(), (int) getTPointY(), false, g2d);
 		}
-
+		
 		if (isSelected())
 		{
 			g2d.draw(source);
