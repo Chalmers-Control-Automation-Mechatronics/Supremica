@@ -339,7 +339,7 @@ class MainPopupMenu extends JPopupMenu
 			});
 
 // Here is revelaed that this one knows that the interface is built around a table. Not good!
-// It should popup when ordered so by the gui, not decide for itself when to
+// It should popup when ordered so by the gui, not de ide for itself when to
 // It should have no notion of rows/cols, these thinsg it should get from the gui
 /***
 		theAutomatonTable.addMouseListener(new MouseAdapter()
