@@ -656,13 +656,11 @@
 <!-- Don't use this. This is used by the automated builder at supremica.s2.chalmers.se to
      send dialy build results. This target will only work for the automated build script --> 
 <target name="mail_buildlog">
-	<mail mailhost="mail.medic.chalmers.se" mailport="25" subject="Supremica Build">
+	<mail mailhost="mail.medic.chalmers.se" mailport="25" subject="Supremica Build" files="/tmp/supremica_buildlog">
 		<from address="ka@s2.chalmers.se"/>
 		<to address="ka@s2.chalmers.se"/>
 		<message>The ${buildname} daily build has completed</message>
-		<fileset dir="dist">
-			<includes name="/tmp/supremica_buildlog"/>
-		</fileset>
+
 	</mail>
 </target>
 
