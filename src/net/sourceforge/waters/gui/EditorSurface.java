@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.5 2005-02-21 10:22:09 flordal Exp $
+//# $Id: EditorSurface.java,v 1.6 2005-02-22 00:35:13 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -416,6 +416,36 @@ public class EditorSurface
 		if (labels.size() > 0)
 		{
 			return (EditorLabel) labels.get(labels.size() - 1);
+		}
+
+		return null;
+	}
+	
+	public EditorLabel getLabel(EditorNode n)
+	{
+		for (int i = 0; i < labels.size(); i++)
+		{
+			EditorLabel e = (EditorLabel) labels.get(i);
+			
+			if (e.getParent() == (EditorObject) n)
+			{
+				return e;
+			}
+		}
+
+		return null;
+	}
+
+	public EditorLabelGroup getLabelGroup(EditorEdge e)
+	{
+		for (int i = 0; i < events.size(); i++)
+		{
+			EditorLabelGroup g = (EditorLabelGroup) events.get(i);
+
+			if (g.getParent() == (EditorObject) e)
+			{
+				return g;
+			}
 		}
 
 		return null;

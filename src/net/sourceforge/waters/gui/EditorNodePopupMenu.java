@@ -21,6 +21,7 @@ class EditorNodePopupMenu
 	private JMenuItem deleteItem;
 	//private JCheckBox initialBox;
 	private JMenuItem initialItem;	
+	private JMenuItem recallItem;	
 
 	public EditorNodePopupMenu(EditorSurface parent, EditorNode node)
 	{
@@ -58,6 +59,25 @@ class EditorNodePopupMenu
 		item.addActionListener(this);
 		this.add(item);
 		initialItem = item;
+
+		// Disable "initial" is node already is initial
+		if (node.isInitial())
+		{
+			initialItem.setEnabled(false);
+			initialItem.setToolTipText("State is already initial");
+		}
+
+		item = new JMenuItem("Recall label");
+		item.addActionListener(this);
+		this.add(item);
+		recallItem = item;
+
+		// Disable "recall" if label is in right position
+		if ((parent.getLabel(node).getOffsetX() == EditorLabel.DEFAULTOFFSETX) && (parent.getLabel(node).getOffsetY() == EditorLabel.DEFAULTOFFSETY))
+		{
+			recallItem.setEnabled(false);
+			recallItem.setToolTipText("Label is already in default position");
+		}
 	}
 
 	public void actionPerformed(ActionEvent e) 
@@ -89,6 +109,11 @@ class EditorNodePopupMenu
 				parent.unsetAllInitial();
 				node.getProxy().setInitial(true);
 			}
+		}
+
+		if (e.getSource() == recallItem)
+		{
+			parent.getLabel(node).setOffset(EditorLabel.DEFAULTOFFSETX, EditorLabel.DEFAULTOFFSETY);
 		}
 
 		parent.repaint();

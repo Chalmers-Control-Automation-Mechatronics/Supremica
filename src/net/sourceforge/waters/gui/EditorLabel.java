@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorLabel
 //###########################################################################
-//# $Id: EditorLabel.java,v 1.5 2005-02-21 21:33:30 flordal Exp $
+//# $Id: EditorLabel.java,v 1.6 2005-02-22 00:35:13 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -39,6 +39,9 @@ public class EditorLabel
 	private boolean editing = false;
 	private EditorNode parent = null;
 	private LabelGeometryProxy geometry;
+
+	public static final int DEFAULTOFFSETX = 0;
+	public static final int DEFAULTOFFSETY = 20;
 
 	/** 
 	 * Get the object which this label is attached to
@@ -207,7 +210,7 @@ public class EditorLabel
 
 		if (par.getProxy().getLabelGeometry() == null)
 		{
-			geometry = new LabelGeometryProxy(0, 20);
+			geometry = new LabelGeometryProxy(DEFAULTOFFSETX, DEFAULTOFFSETX);
 
 			par.getProxy().setLabelGeometry(geometry);
 		}
