@@ -3,6 +3,7 @@ package org.supremica.softplc.CompILer.CodeGen;
 import org.supremica.softplc.CompILer.CodeGen.Datatypes.*;
 import org.supremica.softplc.CompILer.CodeGen.Constants.*;
 import de.fub.bytecode.generic.*;
+import java.io.File;
 
 public interface Builder
 {
@@ -16,6 +17,8 @@ public interface Builder
 
 	void dumpCode();
 
+        public File getTempFile();
+
 	void emitVarField(String varName, Object type, boolean global, boolean inputOutputVar);
 
 	void emitDirectInit(IECDirectVariable v, TypeBOOL i);
@@ -25,7 +28,7 @@ public interface Builder
 	void emitIL_FB_CALL_End(BranchInstruction callCondition);
 
 	void emitIL_FB_CALL_Run(String fbName, String fbTypeName);
-
+    
 	void emitIL_FB_CALL_SetInputs();
 
 	void emitIL_FB_CALL_SetOutputs();

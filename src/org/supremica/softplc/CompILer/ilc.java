@@ -29,7 +29,8 @@ public class ilc
 
 				n.dump("");
 
-				new JavaBytecodeGenerator(n, null);
+				JavaBytecodeGenerator jb = new JavaBytecodeGenerator(n, null);
+				File temp = jb.getTempFile();
 			}
 			catch (Exception e)
 			{

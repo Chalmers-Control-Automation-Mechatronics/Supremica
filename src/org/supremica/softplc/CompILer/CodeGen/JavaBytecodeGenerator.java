@@ -6,6 +6,7 @@ import org.supremica.softplc.CompILer.Parser.*;
 import org.supremica.softplc.CompILer.Parser.SyntaxTree.*;
 import de.fub.bytecode.generic.*;
 import java.util.*;
+import java.io.File;
 
 public class JavaBytecodeGenerator
 	implements CodeGenerator, SimpleNodeVisitor
@@ -46,6 +47,8 @@ public class JavaBytecodeGenerator
 	 * all detected errors are corrected
 	 */
 	boolean errorsPresentInPOU;
+
+        private File temp;
 
 	public JavaBytecodeGenerator(SimpleNode abstractSyntaxTreeRoot, String outputDir /* not used */)
 	{
@@ -364,6 +367,7 @@ public class JavaBytecodeGenerator
 
 		// errorsPresentInPOU
 		builder.dumpCode();
+		temp = builder.getTempFile();
 
 		return null;
 	}
@@ -844,5 +848,9 @@ public class JavaBytecodeGenerator
 		System.out.println("   " + n.toString());
 
 		return null;
+	}
+
+        public File getTempFile() {
+	        return temp;
 	}
 }

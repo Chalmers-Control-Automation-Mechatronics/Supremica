@@ -1,4 +1,4 @@
 #/bin/sh
 
-java -cp .:/home/d99andro/Supremica/build:/home/d99andro/Supremica/lib/unjared org.supremica.softplc.CompILer.ilc $*
+java -cp .:/home/d99hamp/Supremica/build:/home/d99hamp/Supremica/lib/unjared org.supremica.softplc.CompILer.ilc $*
 

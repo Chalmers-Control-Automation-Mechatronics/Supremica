@@ -6,6 +6,7 @@ import org.supremica.softplc.CompILer.CodeGen.Constants.*;
 import org.supremica.softplc.CompILer.CodeGen.Datatypes.*;
 import de.fub.bytecode.generic.*;
 import de.fub.bytecode.Constants;
+import java.io.File;
 
 public class ProgramBuilder
     extends ProgramAndFBBuilder
@@ -14,6 +15,7 @@ public class ProgramBuilder
     /* references to the direct variable fields */
     String directOutput = "directOutput";
     String directInput = "directInput";
+    private File temp;
 
     /**Constructor ProgramBuilder constructs a new frame for
      * IL program generation
@@ -23,7 +25,13 @@ public class ProgramBuilder
     {
 	implementedInterfaces = programInterfaces;
 	className = programName;
-	classFileName = className.concat(".class");
+
+	try {
+	    temp = File.createTempFile("ilc", ".class");
+	    classFileName = temp.getCanonicalPath();
+	    //temp.deleteOnExit();
+	}
+	catch (Exception e) { System.err.println(e); }
 
 	// create the new program class
 	classGen = new ClassGen(className, "java.lang.Object", "<generated>", 
@@ -69,6 +77,10 @@ public class ProgramBuilder
 	ilInit.append(fac.createFieldAccess(className, directOutput, 
 					    new ArrayType(Type.BOOLEAN, 1), 
 					    Constants.PUTFIELD));
+    }
+
+    public File getTempFile() {
+	return temp;
     }
 
     public void emitDirectInit(IECDirectVariable v, TypeBOOL i)
