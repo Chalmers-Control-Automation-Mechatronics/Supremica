@@ -660,11 +660,10 @@ public class Automaton
 	public int nbrOfForbiddenStates()
 	{
 		int nbrOfForbiddenStates = 0;
-		Iterator stateIt = stateIterator();
 
-		while (stateIt.hasNext())
+		for  (StateIterator stateIt = stateIterator(); stateIt.hasNext(); )
 		{
-			State currState = (State) stateIt.next();
+			State currState = stateIt.nextState();
 
 			if (currState.isForbidden())
 			{
@@ -678,11 +677,10 @@ public class Automaton
 	public int nbrOfAcceptingAndForbiddenStates()
 	{
 		int nbrOfAcceptingAndForbiddenStates = 0;
-		Iterator stateIt = stateIterator();
 
-		while (stateIt.hasNext())
+		for  (StateIterator stateIt = stateIterator(); stateIt.hasNext(); )
 		{
-			State currState = (State) stateIt.next();
+			State currState = stateIt.nextState();
 
 			if (currState.isAccepting() && currState.isForbidden())
 			{
@@ -717,13 +715,13 @@ public class Automaton
 		return (new ArcSet(theArcs)).iterator();
 	}
 
-	public Iterator outgoingEventsIterator(State theState)
+	public EventIterator outgoingEventsIterator(State theState)
 	{
 		Iterator arcIt = theState.outgoingArcsIterator();
 		return new InternalEventIterator(arcIt);
 	}
 
-	public Iterator incomingEventsIterator(State theState)
+	public EventIterator incomingEventsIterator(State theState)
 	{
 		Iterator arcIt = theState.incomingArcsIterator();
 		return new InternalEventIterator(arcIt);
@@ -1174,9 +1172,9 @@ public class Automaton
 		// Ad-hoc checksum algorithm
 		long checksum = 0;
 
-		for (Iterator sIt = stateIterator(); sIt.hasNext(); )
+		for (StateIterator sIt = stateIterator(); sIt.hasNext(); )
 		{
-			State currState = (State) sIt.next();
+			State currState = sIt.nextState();
 			int part1 = 1;
 			int part2 = 2;
 			String id = currState.getId();
@@ -1318,12 +1316,13 @@ public class Automaton
 	}
 
 	class InternalEventIterator
-		implements Iterator
+		extends EventIterator
 	{
-		private Iterator arcIt;
+		private final Iterator arcIt;
 
 		public InternalEventIterator(Iterator arcIt)
 		{
+			super(null);
 			this.arcIt = arcIt;
 		}
 
@@ -1358,7 +1357,7 @@ public class Automaton
 	class InternalStateIterator
 		extends StateIterator
 	{
-		private Iterator arcIt;
+		private final Iterator arcIt;
 		private State currState = null;
 		private String eventLabel;
 		private boolean outgoing;
