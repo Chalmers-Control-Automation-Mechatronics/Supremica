@@ -68,6 +68,7 @@ import org.supremica.util.BDD.Options;
 public final class SupremicaProperties
 	extends Properties
 {
+	private static final long serialVersionUID = 1L;
 	/** the last property file used, so we write back changes to the correct config file */
 	private static String lastPropertyFile = null;
 	private static final String DOC_DB_SERVER_NAME = "docdbHost";
@@ -129,6 +130,7 @@ public final class SupremicaProperties
 	private static final String SYNC_INITIAL_HASHTABLE_SIZE = "syncInitialHashtableSize";
 	private static final String SYNC_EXPAND_HASHTABLE = "syncExpandHashtable";
 	private static final String SYNC_NBR_OF_EXECUTERS = "synchNbrOfExecuters";
+	private static final String SYNC_AUTOMATON_NAME_SEPARATOR = "synchAutomatonNameSeparator";
 
 	// Verification Options
 	private static final String VERIFY_VERIFICATION_TYPE = "verifyVerificationType";
@@ -288,6 +290,7 @@ public final class SupremicaProperties
 		setProperty(SYNC_INITIAL_HASHTABLE_SIZE, Integer.toString((1 << 14) - 1), true);
 		setProperty(SYNC_EXPAND_HASHTABLE, "true", true);
 		setProperty(SYNC_NBR_OF_EXECUTERS, "1", true);
+		setProperty(SYNC_AUTOMATON_NAME_SEPARATOR, "||", true);
 		// Verification
 		setProperty(VERIFY_VERIFICATION_TYPE, VerificationType.Controllability.toString(), true);
 		setProperty(VERIFY_ALGORITHM_TYPE, VerificationAlgorithm.Modular.toString(), true);
@@ -1113,6 +1116,16 @@ public final class SupremicaProperties
 	public static void setSyncNbrOfExecuters(int nbrOfExecuters)
 	{
 		wp.setProperty(SYNC_NBR_OF_EXECUTERS, toString(nbrOfExecuters));
+	}
+
+	public static String syncAutomatonNameSeparator()
+	{
+		return wp.getProperty(SYNC_AUTOMATON_NAME_SEPARATOR);
+	}
+
+	public static void setSyncAutomatonNameSeparator(String automatonNameSeparator)
+	{
+		wp.setProperty(SYNC_AUTOMATON_NAME_SEPARATOR, automatonNameSeparator);
 	}
 
 	// Verification...
