@@ -232,6 +232,7 @@ public class Determinizer
 		newAutomaton.addState(init);
 		newAutomaton.setInitialState(init);
 
+
 		while(!openStateSets.isEmpty())
 		{
 			StateSet Q1 = openStateSets.get(); // This is vanNoords T

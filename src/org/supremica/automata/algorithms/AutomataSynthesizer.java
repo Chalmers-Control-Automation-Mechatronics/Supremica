@@ -534,10 +534,10 @@ public class AutomataSynthesizer
 
 
 	// se the real impelemntation below
-	private MonolithicReturnValue doMonolithic(Automata automatat)
+	private MonolithicReturnValue doMonolithic(Automata automata)
 		throws Exception
 	{
-		return doMonolithic(automatat, false); // <-- NOT single fixpoint as default for now (under development)
+		return doMonolithic(automata, false); // <-- NOT single fixpoint as default for now (under development)
 	}
 
 	// This is the engine, synchronizes the given automata, and calcs the forbidden states
@@ -609,15 +609,25 @@ public class AutomataSynthesizer
 			}
 		}
 
+		// Remember old setting
 		boolean orgRememberDisabledEvents = synchronizationOptions.rememberDisabledEvents();
-		synchronizationOptions.rememberDisabledEvents(true);
+		// We must keep track of all events that we have disabled
+		// This is used when checking for observability
+		if (synthesizerOptions.getSynthesisType() == SynthesisType.Observable)
+		{
+			synchronizationOptions.rememberDisabledEvents(true);
+		}
 
 		AutomataSynchronizer syncher = new AutomataSynchronizer(automata, synchronizationOptions);
 		syncher.execute(); // should be able to interrupt this one, just not now...
 		retval.automaton = syncher.getAutomaton();
 		retval.didSomething |= syncher.getHelper().getAutomataIsControllable();
 
-		synchronizationOptions.rememberDisabledEvents(true);
+		if (synthesizerOptions.getSynthesisType() == SynthesisType.Observable)
+		{
+			// Reset the synchronization type
+			synchronizationOptions.rememberDisabledEvents(true);
+		}
 
 		// We need to synthesize even if the result above is controllable
 		// Nonblocking may ruin controllability
@@ -630,6 +640,7 @@ public class AutomataSynthesizer
 
 		retval.didSomething |= synthesizer.synthesize(); // should also be able to interrupt this one....
 		retval.disabledEvents = synthesizer.getDisabledEvents();
+		retval.automaton = synthesizer.getAutomaton();
 
 		return retval;
 	}

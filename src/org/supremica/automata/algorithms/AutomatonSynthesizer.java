@@ -52,15 +52,7 @@ package org.supremica.automata.algorithms;
 import org.supremica.log.*;
 import org.supremica.util.ActionTimer;
 import java.util.*;
-import org.supremica.automata.Arc;
-import org.supremica.automata.Alphabet;
-import org.supremica.automata.Automaton;
-import org.supremica.automata.AutomatonType;
-import org.supremica.automata.Events;
-import org.supremica.automata.State;
-import org.supremica.automata.StateIterator;
-import org.supremica.automata.EventIterator;
-import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.*;
 import org.supremica.automata.algorithms.standard.ObserverBuilder;
 
 /**
@@ -80,6 +72,7 @@ public class AutomatonSynthesizer
 	protected Alphabet disabledEvents;
 	protected final static boolean debugMode = false;
 	protected final ActionTimer theTimer = new ActionTimer();
+	protected boolean forcedPurge = false;
 
 	public AutomatonSynthesizer(Automaton theAutomaton, SynthesizerOptions synthesizerOptions)
 		throws Exception
@@ -99,6 +92,11 @@ public class AutomatonSynthesizer
 	public long elapsedTime()
 	{
 		return theTimer.elapsedTime();
+	}
+	
+	public Automaton getAutomaton()
+	{
+		return theAutomaton;
 	}
 
 	// Synthesize a monolithic supervisor
@@ -137,7 +135,7 @@ public class AutomatonSynthesizer
 			computeDisabledEvents();
 		}
 
-		if (synthesizerOptions.doPurge())
+		if (synthesizerOptions.doPurge() || forcedPurge)
 		{
 			purge();
 		}
@@ -171,25 +169,44 @@ public class AutomatonSynthesizer
 	protected boolean synthesizeControllableNonblockingObservable()
 		throws Exception
 	{
-		boolean didSomething = false;
-		boolean unobservable = true;
+		forcedPurge = true;
 		
-
+		boolean didSomething = false;
+		boolean observable = false;
 
 		int observerIteration = 1; 		
-		while (unobservable)
+		while (!observable)
 		{
 			boolean changed = synthesizeControllableNonblocking();
 			didSomething = didSomething || changed;
 			ObserverBuilder observerBuilder = new ObserverBuilder(theAutomaton, true);							
-			unobservable = !observerBuilder.isObservable();
+			observerBuilder.execute();
+			observable = observerBuilder.isObservable();
 			Automaton currObserver = observerBuilder.getNewAutomaton();
 			currObserver.setAllStatesAsAccepting(true);
+			currObserver.setName("Observer");
 			
-			logger.debug("Observer in iteration " + observerIteration + " is " + (unobservable ? "unobservable" : "observable"));
+			logger.info("Number of states in observer: " + currObserver.nbrOfStates() + " nbr forb states: " + currObserver.nbrOfForbiddenStates());
+			
+			Automata observerAndSupervisor = new Automata();
+			observerAndSupervisor.addAutomaton(currObserver);
+			observerAndSupervisor.addAutomaton(theAutomaton);
+			// observerAndSupervisor.setIndicies();
+			SynchronizationOptions observerSynchOptions = new SynchronizationOptions();
+			observerSynchOptions.setSynchronizationType(SynchronizationType.Full);
+			
+			AutomataSynchronizer observerSynchronizer = new AutomataSynchronizer(observerAndSupervisor, observerSynchOptions);
+			observerSynchronizer.execute();
+			Automaton newSystem = observerSynchronizer.getAutomaton();
+			logger.info("Number of states in observer||sup: " + newSystem.nbrOfStates() + " nbr forb states: " + newSystem.nbrOfForbiddenStates());
+			
+			
+			theAutomaton = newSystem;
+			 
+			logger.debug("Observer in iteration " + observerIteration + " is " + (observable ? "observable" : "unobservable"));
 			observerIteration++;
 		}
-		return didSomething;
+		return true;
 	}
 
 	// Synthesize a controllable and nonblocking supervisor
