@@ -5,7 +5,7 @@ package org.supremica.softplc.Simulator;
  * @version 1.0
  */
 public class BTSim
-	implements DigitalIODriver
+	implements org.supremica.softplc.RunTime.DigitalIODriver
 {
 	private short nrOfSignalsIn = 32;
 	private short nrOfSignalsOut = 32;
