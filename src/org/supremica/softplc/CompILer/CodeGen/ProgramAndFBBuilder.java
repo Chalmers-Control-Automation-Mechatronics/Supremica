@@ -7,6 +7,9 @@ import org.supremica.softplc.CompILer.CodeGen.Datatypes.*;
 import de.fub.bytecode.generic.*;
 import de.fub.bytecode.Constants;
 
+/**The class ProgramAndFBBuilder handles all common parts of code generation
+ * for its sub classes.
+ */
 public abstract class ProgramAndFBBuilder
 	implements Builder
 {
@@ -15,11 +18,13 @@ public abstract class ProgramAndFBBuilder
 	String className;
 	String classFileName;
 	String[] implementedInterfaces;
+
 	/* name of owner field for use with external variables */
 
-	// Vad skall man ha denna till undrar Anders, som inte vet
-	// varför han har skapat den.
-	// String owner = "owner";
+	// XXX Vad skall man ha denna till undrar Anders, som inte vet
+	// XXX varför han har skapat den.
+	// XXX String owner = "owner";
+
 	/* jumpController keeps track of all jumps contained in a POU */
 	JumpController jumpController = new JumpController();
 	/* BCEL objects used to create bytecode */
@@ -31,7 +36,7 @@ public abstract class ProgramAndFBBuilder
 	InstructionList ilInit = new InstructionList();
 	InstructionFactory fac;
 
-	/**dumpCode should be called when the IL Program generation is finished.
+	/**dumpCode should be called when the IL POU generation is finished.
 	 * This method will then dump the generated code to a class file.
 	 */
 	public void dumpCode()
@@ -71,7 +76,8 @@ public abstract class ProgramAndFBBuilder
 	 * @param inputOutputVar decide whether this variable should be
 	 *                       accessible from owner POU (e.g. Program)
 	 */
-	public void emitVarField(String varName, Object type, boolean global, boolean inputOutputVar)
+	public void emitVarField(String varName, Object type, boolean global,
+							 boolean inputOutputVar)
 	{
 		if (type instanceof TypeConstant)
 		{
@@ -79,16 +85,18 @@ public abstract class ProgramAndFBBuilder
 		}
 		else if (type instanceof TypeANY_ELEMENTARY)
 		{
-			emitVarField(varName, (TypeANY_ELEMENTARY) type, global, inputOutputVar);
+			emitVarField(varName, (TypeANY_ELEMENTARY) type, global,
+						 inputOutputVar);
 		}
 		else if (type instanceof TypeFUNCTION_BLOCK)
 		{
-			emitVarField(varName, (TypeFUNCTION_BLOCK) type, global, inputOutputVar);
+			emitVarField(varName, (TypeFUNCTION_BLOCK) type, global,
+						 inputOutputVar);
 		}
 		else
 		{
-			System.err.println("Variables of this kind " + type.toString() + "is not implemented.");
-
+			System.err.println("Variables of this kind " + type.toString() +
+							   "is not implemented.");
 			errorsPresent = true;
 		}
 	}
@@ -102,47 +110,46 @@ public abstract class ProgramAndFBBuilder
 	 * @param inputOutputVar decide whether this variable should be
 	 *                       accessible from owner POU (e.g. Program)
 	 */
-	public void emitVarField(String varName, TypeConstant type, boolean global, boolean inputOutputVar)
+	public void emitVarField(String varName, TypeConstant type,
+							 boolean global, boolean inputOutputVar)
 	{
 		int accessFlags = Constants.ACC_PRIVATE;
-
 		if (global || inputOutputVar)
 		{
 			accessFlags = Constants.ACC_PUBLIC;
 		}
-
 		if (type == TypeConstant.T_BOOL)
 		{
-			FieldGen var = new FieldGen(accessFlags, Type.BOOLEAN, varName, constPoolGen);
-
+			FieldGen var = new FieldGen(accessFlags, Type.BOOLEAN, varName,
+										constPoolGen);
 			classGen.addField(var.getField());
-			constPoolGen.addFieldref(className, varName, "Z");
+			constPoolGen.addFieldref(className, varName,"Z"/*bcode basetype*/);
 		}
 		else if (type == TypeConstant.T_DINT)
 		{
-			FieldGen var = new FieldGen(accessFlags, Type.INT, varName, constPoolGen);
-
+			FieldGen var = new FieldGen(accessFlags, Type.INT, varName,
+										constPoolGen);
 			classGen.addField(var.getField());
-			constPoolGen.addFieldref(className, varName, "I" /* bcode basetype */);
+			constPoolGen.addFieldref(className, varName,"I"/*bcode basetype*/);
 		}
 		else if (type == TypeConstant.T_REAL)
 		{
-			FieldGen var = new FieldGen(accessFlags, Type.FLOAT, varName, constPoolGen);
-
+			FieldGen var = new FieldGen(accessFlags, Type.FLOAT, varName,
+										constPoolGen);
 			classGen.addField(var.getField());
-			constPoolGen.addFieldref(className, varName, "F" /* bcode basetype */);
+			constPoolGen.addFieldref(className, varName,"F"/*bcode basetype*/);
 		}
 		else if (type == TypeConstant.T_WSTRING)
 		{
-			FieldGen var = new FieldGen(accessFlags, Type.STRING, varName, constPoolGen);
-
+			FieldGen var = new FieldGen(accessFlags, Type.STRING, varName,
+										constPoolGen);
 			classGen.addField(var.getField());
 			constPoolGen.addFieldref(className, varName, "Ljava/lang/String;");
 		}
 		else
 		{
-			System.err.println("Variables of this type not yet implemented: " + type);
-
+			System.err.println("Variables of this type not yet implemented: "
+							   + type);
 			errorsPresent = true;
 		}
 	}
@@ -156,26 +163,26 @@ public abstract class ProgramAndFBBuilder
 	 * @param inputOutputVar decide whether this variable should be
 	 *                       accessible from owner POU (e.g. Program)
 	 */
-	public void emitVarField(String varName, TypeANY_ELEMENTARY type, boolean global, boolean inputOutputVar)
+	public void emitVarField(String varName, TypeANY_ELEMENTARY type,
+							 boolean global, boolean inputOutputVar)
 	{
 		TypeConstant t = type.getType();
-
-		if ((t == TypeConstant.T_BOOL) || (t == TypeConstant.T_DINT) || (t == TypeConstant.T_REAL) || (t == TypeConstant.T_WSTRING))
+		if ((t == TypeConstant.T_BOOL) || (t == TypeConstant.T_DINT) ||
+			(t == TypeConstant.T_REAL) || (t == TypeConstant.T_WSTRING))
 		{
 			/* create a field */
 			emitVarField(varName, type.getType(), global, inputOutputVar);
-
 			/* initialise the variable */
-			IECSymbolicVariable var = new IECSymbolicVariable(varName, type.getType());
-
+			IECSymbolicVariable var = new IECSymbolicVariable(varName,
+															  type.getType());
 			ilInit.append(emitLoadG(type));
 			ilInit.append(emitStoreVariable(var));
 		}
 		else
 		{
-			System.err.println("Initialised variables of type " + type.getType() + " not implemented.");
+			System.err.println("Initialised variables of type " +
+							   type.getType() + " not implemented.");
 			System.err.println("Try manual initialisation.");
-
 			errorsPresent = true;
 		}
 	}
@@ -189,28 +196,28 @@ public abstract class ProgramAndFBBuilder
 	 * @param inputOutputVar decide whether this variable should be
 	 *                       accessible from owner POU (e.g. Program)
 	 */
-	public void emitVarField(String varName, TypeFUNCTION_BLOCK type, boolean global, boolean inputOutputVar)
+	public void emitVarField(String varName, TypeFUNCTION_BLOCK type,
+							 boolean global, boolean inputOutputVar)
 	{
-
 		// create a field
 		int accessFlags = Constants.ACC_PRIVATE;
-
 		if (global || inputOutputVar)
 		{
 			accessFlags = Constants.ACC_PUBLIC;
 		}
-
 		ObjectType fbType = new ObjectType(type.getName());
-		FieldGen var = new FieldGen(accessFlags, fbType, varName, constPoolGen);
+		FieldGen var = new FieldGen(accessFlags, fbType, varName,constPoolGen);
 
 		classGen.addField(var.getField());
-		constPoolGen.addFieldref(className, varName, "L" + type.getName() + ";");
-		/* create a new instance and make the field refer to the new instance */
+		constPoolGen.addFieldref(className, varName, "L" + type.getName()+";");
+		/* create a new instance and make the field refer to the new instance*/
 		ilInit.append(InstructionConstants.THIS);
 		ilInit.append(fac.createNew(fbType));
 		ilInit.append(InstructionConstants.DUP);
-		ilInit.append(fac.createInvoke(type.getName(), "<init>", Type.VOID, Type.NO_ARGS, Constants.INVOKESPECIAL));
-		ilInit.append(fac.createFieldAccess(className, varName, fbType, Constants.PUTFIELD));
+		ilInit.append(fac.createInvoke(type.getName(), "<init>", Type.VOID,
+									   Type.NO_ARGS, Constants.INVOKESPECIAL));
+		ilInit.append(fac.createFieldAccess(className, varName, fbType,
+											Constants.PUTFIELD));
 	}
 
 	/**emitDirectInit is used to set init values to direct output variables
@@ -243,7 +250,6 @@ public abstract class ProgramAndFBBuilder
 	 */
 	InstructionList emitLoadVariable(IECSymbolicVariable var)
 	{
-		/* If TypeConstant == Derived then we should perhaps load a reference? */
 		InstructionList il = new InstructionList();
 		TypeConstant type = var.getType();
 		String varName = var.getName();
@@ -251,72 +257,100 @@ public abstract class ProgramAndFBBuilder
 		if (type == TypeConstant.T_BOOL)
 		{
 			il.append(InstructionConstants.THIS);
-			il.append(fac.createFieldAccess(className, varName, Type.BOOLEAN, Constants.GETFIELD));
+			il.append(fac.createFieldAccess(className, varName, Type.BOOLEAN,
+											Constants.GETFIELD));
 		}
 		else if (type == TypeConstant.T_DINT)
 		{
 			il.append(InstructionConstants.THIS);
-			il.append(fac.createFieldAccess(className, varName, Type.INT, Constants.GETFIELD));
+			il.append(fac.createFieldAccess(className, varName, Type.INT,
+											Constants.GETFIELD));
 		}
 		else if (type == TypeConstant.T_REAL)
 		{
 			il.append(InstructionConstants.THIS);
-			il.append(fac.createFieldAccess(className, varName, Type.FLOAT, Constants.GETFIELD));
+			il.append(fac.createFieldAccess(className, varName, Type.FLOAT,
+											Constants.GETFIELD));
 		}
 		else if (type == TypeConstant.T_WSTRING)
 		{
 			il.append(InstructionConstants.THIS);
-			il.append(fac.createFieldAccess(className, varName, Type.STRING, Constants.GETFIELD));
+			il.append(fac.createFieldAccess(className, varName, Type.STRING,
+											Constants.GETFIELD));
 		}
-		else if (type == TypeConstant.T_DERIVED /* including function blocks */)
+		else if (type == TypeConstant.T_DERIVED /*including function blocks */)
 		{
 			if (var.getFieldSelector() != null)
-			{    /* a variable in the derived variable */
+			{    /* we have got a variable in a derived variable */
 
-				// first get reference to function block object
+				/* first get reference to the derived variable object*/
 				il.append(InstructionConstants.THIS);
-				il.append(fac.createFieldAccess(className, varName, new ObjectType(var.getTypeName()), Constants.GETFIELD));
-
-				// then load value
+				il.append(fac.createFieldAccess
+						  (className, varName,
+						   new ObjectType(var.getTypeName()),
+						   Constants.GETFIELD));
+				/* then load value */
 				type = var.getFieldSelectorType();
 
 				// int och real och string måste vara med
 				if (type == TypeConstant.T_BOOL)
 				{
-					il.append(fac.createFieldAccess( /* fb type name */var.getTypeName(), var.getFieldSelector(), Type.BOOLEAN
-					/* var.getFieldSelectorType() */
-					, Constants.GETFIELD));
+					il.append(fac.createFieldAccess
+							  (/*fb type name*/var.getTypeName(),
+							   var.getFieldSelector(), Type.BOOLEAN
+							   , Constants.GETFIELD));
+				}
+				else if (type == TypeConstant.T_DINT)
+				{
+					il.append(fac.createFieldAccess
+							  (/*fb type name*/var.getTypeName(),
+							   var.getFieldSelector(), Type.INT
+							   , Constants.GETFIELD));
+				}
+				else if (type == TypeConstant.T_REAL)
+				{
+					il.append(fac.createFieldAccess
+							  (/*fb type name*/var.getTypeName(),
+							   var.getFieldSelector(), Type.FLOAT
+							   , Constants.GETFIELD));
+				}
+				else if (type == TypeConstant.T_WSTRING)
+				{
+					il.append(fac.createFieldAccess
+							  (/*fb type name*/var.getTypeName(),
+							   var.getFieldSelector(), Type.STRING
+							   , Constants.GETFIELD));
 				}
 				else
 				{
-					/* fb vars only of type bool */
-					System.err.println("IO variables in function blocks can " + "only be of type BOOL, other types " + "should soon be implemented.");
-
+					System.err.println("IO variables in function blocks can "
+									   + "not be of type " + type);
 					errorsPresent = true;
 				}
 			}
 			else
-			{    /* the derived variable itself */
-				System.err.println("**********");
-
+			{    /* the derived variable itself should be loaded*/
+				// XXX should implement this
+				System.err.println("Only loading of elements in " +
+								   "derived variables are implemented " +
+								   "so far.");
 				errorsPresent = true;
 			}
 		}
 		else
 		{
-			System.err.println("Loading symbolic variables of type " + type + " not yet implemented");
-
+			System.err.println("Loading symbolic variables of type " + type +
+							   " not yet implemented");
 			errorsPresent = true;
 		}
-
 		return il;
 	}
 
 	/**emitLoadVariable pushes the value of a specified variable
 	 * on the stack without manipulating
 	 * previous stack values
-		 * This method also applies to AT-defined variables since these
-		 * already should have been changed into DirectVariables by a Checker.
+	 * This method also applies to AT-defined variables since these
+	 * already should have been changed into DirectVariables by a Checker.
 	 * @param var direct variable to load
 	 */
 	abstract InstructionList emitLoadVariable(IECDirectVariable var);
@@ -351,66 +385,97 @@ public abstract class ProgramAndFBBuilder
 		{
 			il.append(InstructionConstants.THIS);
 			il.append(InstructionConstants.SWAP);
-			il.append(fac.createFieldAccess(className, varName, Type.BOOLEAN, Constants.PUTFIELD));
+			il.append(fac.createFieldAccess(className, varName, Type.BOOLEAN,
+											Constants.PUTFIELD));
 		}
 		else if (type == TypeConstant.T_DINT)
 		{
 			il.append(InstructionConstants.THIS);
 			il.append(InstructionConstants.SWAP);
-			il.append(fac.createFieldAccess(className, varName, Type.INT, Constants.PUTFIELD));
+			il.append(fac.createFieldAccess(className, varName, Type.INT,
+											Constants.PUTFIELD));
 		}
 		else if (type == TypeConstant.T_REAL)
 		{
 			il.append(InstructionConstants.THIS);
 			il.append(InstructionConstants.SWAP);
-			il.append(fac.createFieldAccess(className, varName, Type.FLOAT, Constants.PUTFIELD));
+			il.append(fac.createFieldAccess(className, varName, Type.FLOAT,
+											Constants.PUTFIELD));
 		}
 		else if (type == TypeConstant.T_WSTRING)
 		{
 			il.append(InstructionConstants.THIS);
 			il.append(InstructionConstants.SWAP);
-			il.append(fac.createFieldAccess(className, varName, Type.STRING, Constants.PUTFIELD));
+			il.append(fac.createFieldAccess(className, varName, Type.STRING,
+											Constants.PUTFIELD));
 		}
-		else if (type == TypeConstant.T_DERIVED /* including function blocks */)
+		else if (type == TypeConstant.T_DERIVED /*including function blocks*/)
 		{
-			if (var.getFieldSelector() != null /* reference to a variable in the derived variable */)
-			{
-
-				// first get reference to function block object
+			if (var.getFieldSelector() != null)
+			{	/* reference to a variable in the derived variable */
+				/* first get reference to derived variable object */
 				il.append(InstructionConstants.THIS);
-				il.append(fac.createFieldAccess(className, varName, new ObjectType(var.getTypeName()), Constants.GETFIELD));
-
-				// then store value
+				il.append(fac.createFieldAccess
+						  (className, varName,
+						   new ObjectType(var.getTypeName()),
+						   Constants.GETFIELD));
+				/* then store value*/
 				type = var.getFieldSelectorType();
 
-				// int och real och string måste vara med
 				if (type == TypeConstant.T_BOOL)
 				{
 					il.append(InstructionConstants.SWAP);
-					il.append(fac.createFieldAccess( /* fb type name */var.getTypeName(), var.getFieldSelector(), Type.BOOLEAN, Constants.PUTFIELD));
+					il.append(fac.createFieldAccess
+							  (/*fb type name*/var.getTypeName(),
+							   var.getFieldSelector(), Type.BOOLEAN,
+							   Constants.PUTFIELD));
+				}
+				else if (type == TypeConstant.T_DINT)
+				{
+					il.append(InstructionConstants.SWAP);
+					il.append(fac.createFieldAccess
+							  (/*fb type name*/var.getTypeName(),
+							   var.getFieldSelector(), Type.INT,
+							   Constants.PUTFIELD));
+				}
+				else if (type == TypeConstant.T_REAL)
+				{
+					il.append(InstructionConstants.SWAP);
+					il.append(fac.createFieldAccess
+							  (/*fb type name*/var.getTypeName(),
+							   var.getFieldSelector(), Type.FLOAT,
+							   Constants.PUTFIELD));
+				}
+				else if (type == TypeConstant.T_WSTRING)
+				{
+					il.append(InstructionConstants.SWAP);
+					il.append(fac.createFieldAccess
+							  (/*fb type name*/var.getTypeName(),
+							   var.getFieldSelector(), Type.STRING,
+							   Constants.PUTFIELD));
 				}
 				else
 				{
-					/* fb vars only of type bool */
-					System.err.println("IO variables in function blocks can " + "only be of type BOOL, other types " + "should soon be implemented.");
-
+					System.err.println("IO variables in function blocks can "+
+									   "not have type " + type);
 					errorsPresent = true;
 				}
 			}
 			else
 			{    /* the derived variable itself */
-				System.err.println("**********");
-
+				// XXX should implement this
+				System.err.println("Only loading of elements in " +
+								   "derived variables are implemented " +
+								   "so far.");
 				errorsPresent = true;
 			}
 		}
 		else
 		{
-			System.err.println("Storing variables of type " + type + " not yet implemented");
-
+			System.err.println("Storing variables of type " + type +
+							   " not yet implemented");
 			errorsPresent = true;
 		}
-
 		return il;
 	}
 
@@ -428,10 +493,7 @@ public abstract class ProgramAndFBBuilder
 	 */
 	public void emitIL_SIMPLE_OPERATION(String operator, Object arg)
 	{
-
-		// throws IllegalOperatorException {
 		IlSimpleOperator op = IlSimpleOperator.ADD;
-
 		try
 		{
 			op = IlSimpleOperator.getOperator(operator);
@@ -439,21 +501,20 @@ public abstract class ProgramAndFBBuilder
 		catch (IllegalOperatorException e)
 		{
 			System.err.println("Illegal operator: " + operator);
-
 			errorsPresent = true;
 		}
-
 		if (op == IlSimpleOperator.LD)
 		{
 			emitLD(arg);
-
-			// else if (op == IlSimpleOperator.LDN)
+		}
+		else if (op == IlSimpleOperator.LDN)
+		{
+			emitLDN(arg);
 		}
 		else if (op == IlSimpleOperator.ST)
 		{
 			emitST(arg);
 		}
-
 		// else if (op == IlSimpleOperator.STN )
 		// else if (op == IlSimpleOperator.NOT )
 		else if (op == IlSimpleOperator.S)
@@ -464,7 +525,6 @@ public abstract class ProgramAndFBBuilder
 		{
 			emitR(arg);
 		}
-
 		// else if (op == IlSimpleOperator.S1  )
 		// else if (op == IlSimpleOperator.R1  )
 		// else if (op == IlSimpleOperator.CLK )
@@ -480,16 +540,14 @@ public abstract class ProgramAndFBBuilder
 		else if (op == IlSimpleOperator.OR)
 		{
 			emitOR(arg);
-
-			// else if (op == IlSimpleOperator.XOR )
 		}
+		// else if (op == IlSimpleOperator.XOR )
 		else if (op == IlSimpleOperator.ANDN)
 		{
 			emitANDN(arg);
-
-			// else if (op == IlSimpleOperator.ORN )
-			// else if (op == IlSimpleOperator.XORN)
 		}
+		// else if (op == IlSimpleOperator.ORN )
+		// else if (op == IlSimpleOperator.XORN)
 		else if (op == IlSimpleOperator.ADD)
 		{
 			emitADD(arg);
@@ -536,22 +594,24 @@ public abstract class ProgramAndFBBuilder
 		}
 	}
 
-	/**emitStackSpace is used when opening a new scope in IL
+     /**emitStackSpace is used when opening a new scope in IL
 	 * @param size nr of spaces on JVM-stack to reserve
 	 */
 	public void emitStackSpace(int size)
 	{
 		if (size == 1)
 		{
-			ilRun.append(InstructionConstants.ICONST_0);    // reserves one space
+			ilRun.append(InstructionConstants.ICONST_0);/*reserves one space*/
 		}
 		else if (size == 2)
 		{
-			ilRun.append(new PUSH(constPoolGen, (long) 0));    // reserves two spaces
+			/*reserves two spaces*/
+			ilRun.append(new PUSH(constPoolGen,(long)0));
 		}
 		else
 		{
 			System.err.println("param size (emitStackSpace) must be 1 or 2");
+			//XXX ge fel här??
 		}
 	}
 
@@ -567,27 +627,30 @@ public abstract class ProgramAndFBBuilder
 		if (arg instanceof IECConstant)
 		{
 			TypeConstant t = ((IECConstant) arg).getType();
-
 			if (t == TypeConstant.T_DINT)
 			{
-				il.append(new PUSH(constPoolGen, (int) ((TypeDINT) arg).getValue()));
+				il.append(new PUSH(constPoolGen,
+								   (int) ((TypeDINT) arg).getValue()));
 			}
 			else if (t == TypeConstant.T_REAL)
 			{
-				il.append(new PUSH(constPoolGen, (float) ((TypeREAL) arg).getValue()));
+				il.append(new PUSH(constPoolGen,
+								   (float) ((TypeREAL) arg).getValue()));
 			}
 			else if (t == TypeConstant.T_BOOL)
 			{
-				il.append(new PUSH(constPoolGen, (boolean) ((TypeBOOL) arg).getValue()));
+				il.append(new PUSH(constPoolGen,
+								   (boolean) ((TypeBOOL) arg).getValue()));
 			}
 			else if (t == TypeConstant.T_WSTRING)
 			{
-				il.append(new PUSH(constPoolGen, (String) ((TypeWSTRING) arg).getValue()));
+				il.append(new PUSH(constPoolGen,
+								   (String) ((TypeWSTRING) arg).getValue()));
 			}
 			else
 			{
-				System.err.println("Loading of " + arg.toString() + " not yet " + "implemented.");
-
+				System.err.println("Loading of " + arg.toString() +
+								   " not yet " + "implemented.");
 				errorsPresent = true;
 			}
 		}
@@ -597,35 +660,62 @@ public abstract class ProgramAndFBBuilder
 		}
 		else
 		{
-			System.err.println("Loading of " + arg.toString() + " not yet " + "implemented.");
-
+			System.err.println("Loading of " + arg + " not yet implemented.");
 			errorsPresent = true;
 		}
-
 		return il;
 	}
 
-	/**emitLoad pushes a value on the stack without manipulating
-	 * previous values
-	 * @param arg the value to push
-	 */
-	public void emitLoad(Object arg)
-	{
+    /**emitLoad pushes a value on the stack without manipulating
+    * previous values
+    * @param arg the value to push
+    */
+    public void emitLoad(Object arg)
+    {
 		ilRun.append(emitLoadG(arg));
 	}
 
-	/**emitLD replaces the top of stack value (simulating IL's LD-instruction
-	 * behaviour
+     /**emitLD replaces the top of stack value (simulating IL's LD-instruction
+	 * behaviour)
 	 * @param arg the value to push
 	 */
 	private void emitLD(Object arg)
 	{
-		ilRun.append(InstructionConstants.POP);    // if singel word value
-
-		// ilRun.append(InstructionConstants.POP2); //if double word value
-		// information om hur saker skall tas bort måste ligga i
-		// il_simple_operation noden
+		ilRun.append(InstructionConstants.POP);
 		emitLoad(arg);
+	}
+
+	/**emitLDN replaces the top of stack value (simulating IL's LDN-instruction
+	 * behaviour)
+	 * @param arg the value to push
+	 */
+	private void emitLDN(Object arg)
+	{
+		if ((arg instanceof IECConstant &&
+			 ((IECConstant)arg).getType() == TypeConstant.T_BOOL) ||
+			(arg instanceof IECVariable &&
+			 ((IECVariable)arg).getType() == TypeConstant.T_BOOL))
+		{
+			ilRun.append(InstructionConstants.POP);
+			emitLoad(arg);
+			/* negate value */
+			InstructionHandle end_ldn, iffalse;
+			BranchInstruction ifeq = new IFEQ(null);
+			BranchInstruction jmp = new GOTO(null);
+			ilRun.append(ifeq);    //if stack == false jump
+			ilRun.append(new PUSH(constPoolGen, false));
+			ilRun.append(jmp);
+			iffalse = ilRun.append(new PUSH(constPoolGen, true)
+			end_ldn = ilRun.append(InstructionConstants.NOP);
+			ifeq.setTarget(iffalse);
+			jmp.setTarget(end_ldn);
+		}
+		else
+		{
+			System.err.println("LDN can only be used on the BOOL datatype." +
+							   "Not on " + arg);
+			errorsPresent = true;
+		}
 	}
 
 	/**emitST stores the top of stack value (IL's result register) in a
@@ -636,31 +726,36 @@ public abstract class ProgramAndFBBuilder
 	{    // ej färdig
 		if (arg instanceof IECConstant)
 		{
-			System.err.println("Fatal error: Operator ST cannot " + "store in constant");
+			System.err.println("Fatal error: Operator ST cannot " +
+							   "store in constant");
 		}
 		else if (arg instanceof IECVariable)
 		{
 			IECVariable var = (IECVariable) arg;
-
 			/*
 			 * first we must duplicate stack value to be able to keep
 			 * IL's result register value
 			 */
-			if ((var.getType() == TypeConstant.T_BOOL) || (var.getType() == TypeConstant.T_DINT) || (var.getType() == TypeConstant.T_REAL) || (var.getType() == TypeConstant.T_DERIVED) || (var.getType() == TypeConstant.T_WSTRING))
+			if ((var.getType() == TypeConstant.T_BOOL) ||
+				(var.getType() == TypeConstant.T_DINT) ||
+				(var.getType() == TypeConstant.T_REAL) ||
+				(var.getType() == TypeConstant.T_DERIVED) ||
+				(var.getType() == TypeConstant.T_WSTRING))
 			{
 				ilRun.append(InstructionConstants.DUP);
 				ilRun.append(emitStoreVariable(var));
 			}
 			else
 			{
-				System.err.println("Store for " + var.getType() + " not yet implemented");
-
+				System.err.println("Store for " + var.getType() +
+								   " not yet implemented");
 				errorsPresent = true;
 			}
 		}
 		else
 		{
 			System.err.println("Can't store in anything else than a variable");
+			errorsPresent = true;
 		}
 	}
 
@@ -671,35 +766,30 @@ public abstract class ProgramAndFBBuilder
 	{
 		if (arg instanceof IECConstant)
 		{
-			System.err.println("Fatal error: Operator S cannot " + "store in constant");
+			System.err.println("Fatal error: Operator S cannot " +
+							   "store in constant");
 		}
 		else if (arg instanceof IECVariable)
 		{
 			IECVariable var = (IECVariable) arg;
-
 			if (var.getType() == TypeConstant.T_BOOL)
 			{
 				BranchInstruction ifne = new IFEQ(null);
 				InstructionHandle skipStore;
-
 				ilRun.append(InstructionConstants.DUP);
-
-				/*
+				/* XXX
 				 * need to check that IL's result reg has type BOOL,
-				 *  (should be done in TypeChecker) 
+				 *  (should be done in TypeChecker)
 				 */
 				ilRun.append(ifne);
 				ilRun.append(new PUSH(constPoolGen, true));
 				ilRun.append(emitStoreVariable(var));
-
 				skipStore = ilRun.append(InstructionConstants.NOP);
-
 				ifne.setTarget(skipStore);
 			}
 			else
 			{
 				System.err.println("Operator S can only be used on BOOL");
-
 				errorsPresent = true;
 			}
 		}
@@ -716,35 +806,30 @@ public abstract class ProgramAndFBBuilder
 	{
 		if (arg instanceof IECConstant)
 		{
-			System.err.println("Fatal error: Operator R cannot " + "store in constant");
+			System.err.println("Fatal error: Operator R cannot " +
+							   "store in constant");
 		}
 		else if (arg instanceof IECVariable)
 		{
 			IECVariable var = (IECVariable) arg;
-
 			if (var.getType() == TypeConstant.T_BOOL)
 			{
 				BranchInstruction ifne = new IFEQ(null);
 				InstructionHandle skipStore;
-
 				ilRun.append(InstructionConstants.DUP);
-
-				/*
+				/* XXX
 				 * need to check that IL's result reg has type BOOL,
-				 *  (should be done in TypeChecker) 
+				 *  (should be done in TypeChecker)
 				 */
 				ilRun.append(ifne);
 				ilRun.append(new PUSH(constPoolGen, false));
 				ilRun.append(emitStoreVariable(var));
-
 				skipStore = ilRun.append(InstructionConstants.NOP);
-
 				ifne.setTarget(skipStore);
 			}
 			else
 			{
 				System.err.println("Operator S can only be used on BOOL");
-
 				errorsPresent = true;
 			}
 		}
@@ -754,7 +839,8 @@ public abstract class ProgramAndFBBuilder
 		}
 	}
 
-	/**emitADD add the argument with stack value and put the result on the stack
+	/**emitADD add the argument with stack value and put the result
+	 * on the stack
 	 * @param arg an IL BOOL-variable
 	 */
 	private void emitADD(Object arg)
@@ -762,32 +848,33 @@ public abstract class ProgramAndFBBuilder
 		if (arg instanceof IECConstant)
 		{
 			TypeConstant t = ((IECConstant) arg).getType();
-
 			if (t == TypeConstant.T_DINT)
 			{
-				ilRun.append(new PUSH(constPoolGen, ((TypeDINT) arg).getValue()));
+				ilRun.append(new PUSH(constPoolGen,
+									  ((TypeDINT) arg).getValue()));
 				ilRun.append(InstructionConstants.IADD);
 			}
 			else if (t == TypeConstant.T_REAL)
 			{
-				ilRun.append(new PUSH(constPoolGen, ((TypeREAL) arg).getValue()));
+				ilRun.append(new PUSH(constPoolGen,
+									  ((TypeREAL) arg).getValue()));
 				ilRun.append(InstructionConstants.FADD);
 			}
 			else
 			{
-				System.err.println("Not yet implemented");
+				System.err.println("ADD not yet implemented for " + t);
+				errorsPresent = true;
 			}
 		}
 		else if (arg instanceof IECVariable)
 		{
 			IECVariable var = (IECVariable) arg;
 			TypeConstant t = var.getType();
-
-			if ((var instanceof IECSymbolicVariable) && (t == TypeConstant.T_FUNCTION_BLOCK))
+			if ((var instanceof IECSymbolicVariable) &&
+				(t == TypeConstant.T_FUNCTION_BLOCK))
 			{
 				t = ((IECSymbolicVariable) var).getFieldSelectorType();
 			}
-
 			if (t == TypeConstant.T_DINT)
 			{
 				ilRun.append(emitLoadVariable(var));
@@ -800,12 +887,13 @@ public abstract class ProgramAndFBBuilder
 			}
 			else
 			{
-				System.err.println("Not yet implemented");
+				System.err.println("ADD not yet implemented for "+ t);
+				errorsPresent = true;
 			}
 		}
 		else
 		{
-			System.err.println("Not yet implemented");
+			System.err.println("Not yet implemented for "+ arg);
 		}
 	}
 
@@ -822,12 +910,12 @@ public abstract class ProgramAndFBBuilder
 					ilRun.append(InstructionConstants.POP);
 					ilRun.append(InstructionConstants.ICONST_0);
 				}
-
-				// else  result
+				/* else keep result register value */
 			}
 			else
 			{
-				System.err.println("Illegal type or not yet " + "implemented (emitAND)");
+				System.err.println("Illegal type or not yet " +
+								   "implemented (AND " + arg + ")");
 			}
 		}
 		else if (arg instanceof IECVariable)
@@ -835,11 +923,11 @@ public abstract class ProgramAndFBBuilder
 			IECVariable var = (IECVariable) arg;
 			TypeConstant t = var.getType();
 
-			if ((var instanceof IECSymbolicVariable) && (t == TypeConstant.T_FUNCTION_BLOCK))
+			if ((var instanceof IECSymbolicVariable) &&
+				(t == TypeConstant.T_FUNCTION_BLOCK))
 			{
 				t = ((IECSymbolicVariable) var).getFieldSelectorType();
 			}
-
 			if (t == TypeConstant.T_BOOL)
 			{
 				ilRun.append(emitLoadVariable(var));
@@ -858,12 +946,13 @@ public abstract class ProgramAndFBBuilder
 			}
 			else
 			{
-				System.err.println("Illegal type or not yet implemented " + "(emitAND)");
+				System.err.println("Illegal type or not yet implemented " +
+								   "(AND " + arg + ")");
 			}
 		}
 		else
 		{
-			System.err.println("Not yet implemented");
+			System.err.println("AND not yet implemented for" + arg);
 		}
 	}
 
@@ -885,7 +974,8 @@ public abstract class ProgramAndFBBuilder
 			}
 			else
 			{
-				System.err.println("Illegal type or not yet " + "implemented (emitANDN)");
+				System.err.println("Illegal type or not yet " +
+								   "implemented (ANDN " + t +")");
 			}
 		}
 		else if (arg instanceof IECVariable)
@@ -893,7 +983,8 @@ public abstract class ProgramAndFBBuilder
 			IECVariable var = (IECVariable) arg;
 			TypeConstant t = var.getType();
 
-			if ((var instanceof IECSymbolicVariable) && (t == TypeConstant.T_FUNCTION_BLOCK))
+			if ((var instanceof IECSymbolicVariable) &&
+				(t == TypeConstant.T_FUNCTION_BLOCK))
 			{
 				t = ((IECSymbolicVariable) var).getFieldSelectorType();
 			}
@@ -916,14 +1007,17 @@ public abstract class ProgramAndFBBuilder
 			}
 			else
 			{
-				System.err.println("Illegal type or not yet implemented " + "(emitANDN)");
+				System.err.println("Illegal type or not yet implemented " +
+								   "(emitANDN "+ t +")");
 			}
 		}
 		else
 		{
-			System.err.println("Not yet implemented (in ANDN)");
+			System.err.println("ANDN not yet implemented for "+ arg);
 		}
 	}
+
+	//XXX Hit har Anders gått igenom formatering + lite kommentarer 2002-04-12
 
 	private void emitOR(Object arg)
 	{
