@@ -714,5 +714,283 @@ ST TVAR
 	CAL Bp(output := RV1)
 	CAL WSp(output := " ")
 	CAL Bpln(output := RV2)
+
+(*pre: FVAR = FALSE, TVAR = FALSE*)
+(*XOR-operatorn, operand: variabel*)
+	CAL WSpln(output:="Test av XOR operatorn")
+	(*T-T*)	
+	LD FALSE
+	ST RV1
+	LD TRUE
+	ST RV2 (*end init*)
+	LD TRUE
+
+
+	XOR TVAR
+	ST  RV1
+	ST  RV2
+
+	CAL WSp(output := "?? false == ")
+	CAL Bp(output := RV1)
+	CAL WSp(output := " ")
+	CAL Bpln(output := RV2)
+	
+	(*T-F*)
+	LD FALSE
+	ST RV1
+	LD TRUE
+	ST RV2 (*end init*)
+	LD TRUE
+
+	XOR FVAR	
+	ST  RV1
+	ST  RV2
+
+	CAL WSp(output := "?? true  == ")
+	CAL Bp(output := RV1)
+	CAL WSp(output := " ")
+	CAL Bpln(output := RV2)
+
+	(*F-T*)
+	LD FALSE
+	ST RV1
+	LD TRUE
+	ST RV2 (*end init*)
+	LD FALSE
+
+	XOR TVAR
+	ST  RV1
+	ST  RV2
+
+	CAL WSp(output := "?? true  == ")
+	CAL Bp(output := RV1)
+	CAL WSp(output := " ")
+	CAL Bpln(output := RV2)
+
+	(*F-F*)
+	LD FALSE
+	ST RV1
+	LD TRUE
+	ST RV2 (*end init*)
+	LD FALSE
+
+	XOR FVAR
+	ST  RV1
+	ST  RV2
+
+	CAL WSp(output := "?? false == ")
+	CAL Bp(output := RV1)
+	CAL WSp(output := " ")
+	CAL Bpln(output := RV2)
+
+(*pre: FVAR = FALSE, TVAR = FALSE*)
+(*XOR-operatorn, operand: konstant*)
+	CAL WSpln(output:="Test av XOR operatorn")
+	(*T-T*)	
+	LD FALSE
+	ST RV1
+	LD TRUE
+	ST RV2 (*end init*)
+	LD TRUE
+
+	XOR TRUE
+	ST  RV1
+	ST  RV2
+
+	CAL WSp(output := "?? false == ")
+	CAL Bp(output := RV1)
+	CAL WSp(output := " ")
+	CAL Bpln(output := RV2)
+	
+	(*T-F*)
+	LD FALSE
+	ST RV1
+	LD TRUE
+	ST RV2 (*end init*)
+	LD TRUE
+
+	XOR FALSE
+	ST  RV1
+	ST  RV2
+
+	CAL WSp(output := "?? true  == ")
+	CAL Bp(output := RV1)
+	CAL WSp(output := " ")
+	CAL Bpln(output := RV2)
+
+	(*F-T*)
+	LD FALSE
+	ST RV1
+	LD TRUE
+	ST RV2 (*end init*)
+	LD FALSE
+
+	XOR TRUE
+	ST  RV1
+	ST  RV2
+
+	CAL WSp(output := "?? true  == ")
+	CAL Bp(output := RV1)
+	CAL WSp(output := " ")
+	CAL Bpln(output := RV2)
+
+	(*F-F*)
+	LD FALSE
+	ST RV1
+	LD TRUE
+	ST RV2 (*end init*)
+	LD FALSE
+
+	XOR FALSE
+	ST  RV1
+	ST  RV2
+
+	CAL WSp(output := "?? false == ")
+	CAL Bp(output := RV1)
+	CAL WSp(output := " ")
+	CAL Bpln(output := RV2)
+
+(*pre: FVAR = FALSE, TVAR = FALSE*)
+(*XORN-operatorn, operand: variabel*)
+	CAL WSpln(output:="Test av XORN operatorn")
+	(*T-T*)	
+	LD FALSE
+	ST RV1
+	LD TRUE
+	ST RV2 (*end init*)
+	LD TRUE
+
+
+	XORN TVAR
+	ST  RV1
+	ST  RV2
+
+	CAL WSp(output := "?? true  == ")
+	CAL Bp(output := RV1)
+	CAL WSp(output := " ")
+	CAL Bpln(output := RV2)
+	
+	(*T-F*)
+	LD FALSE
+	ST RV1
+	LD TRUE
+	ST RV2 (*end init*)
+	LD TRUE
+
+	XORN FVAR	
+	ST  RV1
+	ST  RV2
+
+	CAL WSp(output := "?? false == ")
+	CAL Bp(output := RV1)
+	CAL WSp(output := " ")
+	CAL Bpln(output := RV2)
+
+	(*F-T*)
+	LD FALSE
+	ST RV1
+	LD TRUE
+	ST RV2 (*end init*)
+	LD FALSE
+
+	XORN TVAR
+	ST  RV1
+	ST  RV2
+
+	CAL WSp(output := "?? false == ")
+	CAL Bp(output := RV1)
+	CAL WSp(output := " ")
+	CAL Bpln(output := RV2)
+
+	(*F-F*)
+	LD FALSE
+	ST RV1
+	LD TRUE
+	ST RV2 (*end init*)
+	LD FALSE
+
+	XORN FVAR
+	ST  RV1
+	ST  RV2
+
+	CAL WSp(output := "?? true  == ")
+	CAL Bp(output := RV1)
+	CAL WSp(output := " ")
+	CAL Bpln(output := RV2)
+
+(*pre: FVAR = FALSE, TVAR = FALSE*)
+(*XORN-operatorn, operand: konstant*)
+	CAL WSpln(output:="Test av XORN operatorn")
+	(*T-T*)	
+	LD FALSE
+	ST RV1
+	LD TRUE
+	ST RV2 (*end init*)
+	LD TRUE
+
+	XORN TRUE
+	ST  RV1
+	ST  RV2
+
+	CAL WSp(output := "?? true  == ")
+	CAL Bp(output := RV1)
+	CAL WSp(output := " ")
+	CAL Bpln(output := RV2)
+	
+	(*T-F*)
+	LD FALSE
+	ST RV1
+	LD TRUE
+	ST RV2 (*end init*)
+	LD TRUE
+
+	XORN FALSE
+	ST  RV1
+	ST  RV2
+
+	CAL WSp(output := "?? false == ")
+	CAL Bp(output := RV1)
+	CAL WSp(output := " ")
+	CAL Bpln(output := RV2)
+
+	(*F-T*)
+	LD FALSE
+	ST RV1
+	LD TRUE
+	ST RV2 (*end init*)
+	LD FALSE
+
+	XORN TRUE
+	ST  RV1
+	ST  RV2
+
+	CAL WSp(output := "?? false == ")
+	CAL Bp(output := RV1)
+	CAL WSp(output := " ")
+	CAL Bpln(output := RV2)
+
+	(*F-F*)
+	LD FALSE
+	ST RV1
+	LD TRUE
+	ST RV2 (*end init*)
+	LD FALSE
+
+	XORN FALSE
+	ST  RV1
+	ST  RV2
+
+	CAL WSp(output := "?? true  == ")
+	CAL Bp(output := RV1)
+	CAL WSp(output := " ")
+	CAL Bpln(output := RV2)
+
 	
 END_PROGRAM
+
+
+
+
+
+
+

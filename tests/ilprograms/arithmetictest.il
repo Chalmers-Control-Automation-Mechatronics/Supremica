@@ -50,7 +50,8 @@ FUNCTION_BLOCK Asserter
 	END_VAR
 	LD result
 	JMPC noerror
-		CAL WPrint("Error: assertion not true! : ")
+		CAL WPrint(output := "fdsf")
+		(*CAL WPrint("Error: assertion not true! : ")*)
 		(*CAL WPrintln(msg)*)
 noerror:
 END_FUNCTION_BLOCK

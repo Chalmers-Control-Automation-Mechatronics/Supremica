@@ -592,110 +592,119 @@ public abstract class ProgramAndFBBuilder
      */
     public void emitIL_SIMPLE_OPERATION(String operator, Object arg)
     {
-	IlSimpleOperator op = IlSimpleOperator.ADD;
-	try
-	    {
-		op = IlSimpleOperator.getOperator(operator);
-	    }
-	catch (IllegalOperatorException e)
-	    {
-		error("Illegal operator: " + operator);
-	    }
-	if (op == IlSimpleOperator.LD)
-	    {
-		emitLD(arg);
-	    }
-	else if (op == IlSimpleOperator.LDN)
-	    {
-		emitLDN(arg);
-	    }
-	else if (op == IlSimpleOperator.ST)
-	    {
-		emitST(arg);
-	    }
-	else if (op == IlSimpleOperator.STN )
-	    {
-		emitSTN(arg);
-	    }
-	// else if (op == IlSimpleOperator.NOT )
-	else if (op == IlSimpleOperator.S)
-	    {
-		emitS(arg);
-	    }
-	else if (op == IlSimpleOperator.R)
-	    {
-		emitR(arg);
-	    }
-	// else if (op == IlSimpleOperator.S1  )
-	// else if (op == IlSimpleOperator.R1  )
-	// else if (op == IlSimpleOperator.CLK )
-	// else if (op == IlSimpleOperator.CU  )
-	// else if (op == IlSimpleOperator.CD  )
-	// else if (op == IlSimpleOperator.PV  )
-	// else if (op == IlSimpleOperator.IN  )
-	// else if (op == IlSimpleOperator.PT  )
-	else if (op == IlSimpleOperator.AND)
-	    {
-		emitAND(arg);
-	    }
-	else if (op == IlSimpleOperator.OR)
-	    {
-		emitOR(arg);
-	    }
-	//XXX else if (op == IlSimpleOperator.XOR )
-	else if (op == IlSimpleOperator.ANDN)
-	    {
-		emitANDN(arg);
-	    }
-	else if (op == IlSimpleOperator.ORN )
+		try
 		{
-			emitORN(arg);
+			IlSimpleOperator op = IlSimpleOperator.getOperator(operator);
+			if (op == IlSimpleOperator.LD)
+				{
+					emitLD(arg);
+				}
+			else if (op == IlSimpleOperator.LDN)
+				{
+					emitLDN(arg);
+				}
+			else if (op == IlSimpleOperator.ST)
+				{
+					emitST(arg);
+				}
+			else if (op == IlSimpleOperator.STN )
+				{
+					emitSTN(arg);
+				}
+			// else if (op == IlSimpleOperator.NOT )
+			else if (op == IlSimpleOperator.S)
+				{
+					emitS(arg);
+				}
+			else if (op == IlSimpleOperator.R)
+				{
+					emitR(arg);
+				}
+			// else if (op == IlSimpleOperator.S1  )
+			// else if (op == IlSimpleOperator.R1  )
+			// else if (op == IlSimpleOperator.CLK )
+			// else if (op == IlSimpleOperator.CU  )
+			// else if (op == IlSimpleOperator.CD  )
+			// else if (op == IlSimpleOperator.PV  )
+			// else if (op == IlSimpleOperator.IN  )
+			// else if (op == IlSimpleOperator.PT  )
+			else if (op == IlSimpleOperator.AND)
+				{
+					emitAND(arg);
+				}
+			else if (op == IlSimpleOperator.OR)
+				{
+					emitOR(arg);
+				}
+			else if (op == IlSimpleOperator.XOR )
+				{
+					emitXOR(arg);
+				}
+			else if (op == IlSimpleOperator.ANDN)
+				{
+					emitANDN(arg);
+				}
+			else if (op == IlSimpleOperator.ORN )
+				{
+					emitORN(arg);
+				}
+			else if (op == IlSimpleOperator.XORN)
+				{
+					emitXORN(arg);
+				}
+			else if (op == IlSimpleOperator.ADD)
+				{
+					emitADD(arg);
+				}
+			else if (op == IlSimpleOperator.SUB)
+				{
+					emitSUB(arg);
+				}
+			else if (op == IlSimpleOperator.MUL)
+				{
+					emitMUL(arg);
+				}
+			else if (op == IlSimpleOperator.DIV)
+				{
+					emitDIV(arg);
+				}
+			else if (op == IlSimpleOperator.MOD)
+				{
+					emitMOD(arg);
+				}
+			else if (op == IlSimpleOperator.GT)
+				{
+					emitGT(arg);
+				}
+			else if (op == IlSimpleOperator.GE)
+				{
+					emitGE(arg);
+				}
+			else if (op == IlSimpleOperator.EQ)
+				{
+					emitEQ(arg);
+				}
+			else if (op == IlSimpleOperator.LT)
+				{
+					emitLT(arg);
+				}
+			else if (op == IlSimpleOperator.LE)
+				{
+					emitLE(arg);
+				}
+			else if (op == IlSimpleOperator.NE)
+				{
+					emitNE(arg);
+				}
+			else 
+				{
+					error("Operator "+op+" not implemented");
+				}
 		}
-	//XXX else if (op == IlSimpleOperator.XORN)
-	else if (op == IlSimpleOperator.ADD)
-	    {
-		emitADD(arg);
-	    }
-	else if (op == IlSimpleOperator.SUB)
-	    {
-		emitSUB(arg);
-	    }
-	else if (op == IlSimpleOperator.MUL)
-	    {
-		emitMUL(arg);
-	    }
-	else if (op == IlSimpleOperator.DIV)
-	    {
-		emitDIV(arg);
-	    }
-	else if (op == IlSimpleOperator.MOD)
-	    {
-		emitMOD(arg);
-	    }
-	else if (op == IlSimpleOperator.GT)
-	    {
-		emitGT(arg);
-	    }
-	else if (op == IlSimpleOperator.GE)
-	    {
-		emitGE(arg);
-	    }
-	else if (op == IlSimpleOperator.EQ)
-	    {
-		emitEQ(arg);
-	    }
-	else if (op == IlSimpleOperator.LT)
-	    {
-		emitLT(arg);
-	    }
-	else if (op == IlSimpleOperator.LE)
-	    {
-		emitLE(arg);
-	    }
-	else if (op == IlSimpleOperator.NE)
-	    {
-		emitNE(arg);
-	    }
+		catch (IllegalOperatorException e)
+			{
+				error("Illegal operator: " + operator);
+			}
     }
 
     /**
@@ -1236,6 +1245,65 @@ public abstract class ProgramAndFBBuilder
 		error("Not yet implemented");
 	    }
     }
+    /**
+     * emitXOR makes a logical XOR between TOS value and the argument.
+     * @param arg an IL BOOL
+     */
+    private void emitXOR(Object arg)
+    {
+	if (arg instanceof IECConstant)
+	    {
+		TypeConstant t = ((IECConstant) arg).getType();
+
+		if (t == TypeConstant.T_BOOL)
+		    {
+			if (((TypeBOOL) arg).getValue())
+			    {    // result XOR TRUE -> not result
+					emitNOT();
+			    }
+
+			// else  result register value, result XOR FALSE -> RESULT
+		    }
+		else
+		    {
+			error("Illegal type or not yet " + "implemented (emitXOR)");
+		    }
+	    }
+	else if (arg instanceof IECVariable)
+	    {
+		IECVariable var = (IECVariable) arg;
+		TypeConstant t = var.getType();
+
+		if ((var instanceof IECSymbolicVariable) && 
+			(t == TypeConstant.T_DERIVED) &&
+			(((IECSymbolicVariable)var).getFieldSelectorType() != null))
+		    {
+			t = ((IECSymbolicVariable) var).getFieldSelectorType();
+		    }
+
+		if (t == TypeConstant.T_BOOL)
+		    {
+			ilRun.append(emitLoadVariable(var));
+
+			InstructionHandle end_xor;
+			BranchInstruction ifeq = new IFEQ(null);
+
+			ilRun.append(ifeq);    // stack = false
+			emitNOT();
+			end_xor = ilRun.append(InstructionConstants.NOP);
+
+			ifeq.setTarget(end_xor);
+		    }
+		else
+		    {
+			error("Illegal type or not yet " + "implemented (emitXOR)");
+		    }
+	    }
+	else
+	    {
+		error("Not yet implemented");
+	    }
+    }
 
     /**
      * emitORN makes a logical ORN between TOS value and the inverted argument.
@@ -1291,6 +1359,71 @@ public abstract class ProgramAndFBBuilder
 		else
 		    {
 			error("Illegal type or not yet " + "implemented (emitOR)");
+		    }
+	    }
+	else
+	    {
+		error("Not yet implemented");
+	    }
+    }
+
+    /**
+     * emitXORN makes a logical XORN between TOS value and the argument.
+     * @param arg an IL BOOL
+     */
+
+	/*T xn T = T
+	T xn F   F
+    F xn T   F
+    F xn F   T*/
+    private void emitXORN(Object arg)
+    {
+	if (arg instanceof IECConstant)
+	    {
+		TypeConstant t = ((IECConstant) arg).getType();
+
+		if (t == TypeConstant.T_BOOL)
+		    {
+			if (!((TypeBOOL) arg).getValue())
+			    {    // result XORN TRUE -> not result
+					emitNOT();
+			    }
+
+			// else  result register value, result XORN TRUE -> RESULT
+		    }
+		else
+		    {
+			error("Illegal type or not yet " + "implemented (emitXORN)");
+		    }
+	    }
+	else if (arg instanceof IECVariable)
+	    {
+		IECVariable var = (IECVariable) arg;
+		TypeConstant t = var.getType();
+
+		if ((var instanceof IECSymbolicVariable) && 
+			(t == TypeConstant.T_DERIVED) &&
+			(((IECSymbolicVariable)var).getFieldSelectorType() != null))
+		    {
+			t = ((IECSymbolicVariable) var).getFieldSelectorType();
+		    }
+
+		if (t == TypeConstant.T_BOOL)
+		    {
+			ilRun.append(emitLoadVariable(var));
+
+			InstructionHandle end_xorn;
+			BranchInstruction ifne = new IFNE(null);
+
+			ilRun.append(ifne);    // stack = true
+			emitNOT();
+			end_xorn = ilRun.append(InstructionConstants.NOP);
+
+			ifne.setTarget(end_xorn);
+		    }
+		else
+		    {
+			error("Illegal type or not yet " + "implemented (emitXORN)");
 		    }
 	    }
 	else
@@ -2174,65 +2307,63 @@ public abstract class ProgramAndFBBuilder
      */
     public void emitIL_EXPRESSION(String operator, TypeConstant t, Object arg)
     {
-	IlExprOperator op = IlExprOperator.ADD;
-
 	try
 	    {
-		op = IlExprOperator.getOperator(operator);
+		IlExprOperator op = IlExprOperator.getOperator(operator);
+		if (op == IlExprOperator.AND)
+			{    // Logical AND
+				emitExprAND(t, arg);
+			}
+		else if (op == IlExprOperator.OR)
+			{    // Logical OR
+				emitExprOR(t, arg);
+			}
+
+		// else if (op == IlExprOperator.XOR) { //Logical Exclusive OR
+		else if (op == IlExprOperator.ANDN)
+			{    // Logical e1 AND NOT e2
+				emitExprANDN(t, arg);
+			}
+
+		// else if (op == IlExprOperator.ORN) { //Logical e1 OR NOT e2
+		// else if (op == IlExprOperator.XORN) { //Logical e1 XOR NOT e2
+		// if (op == IlExprOperator.ADD) { //Addition
+		// emitExprADD(t,arg); //se nedan
+		// }
+		// else if (op == IlExprOperator.SUB){         //Subtraction
+		// emitExprSUB(t,arg);
+		// }
+		// else if (op == IlExprOperator.MUL) {        //Multiplication
+		// emitExprMUL(t,arg);
+		// }
+		// else if (op == IlExprOperator.DIV) {  //Division
+		// if (t == TypeConstant.DINT){
+		// ilRun.append(InstructionConstants.IDIV);}
+		// }
+		// Modulus
+		// else if (op == IlExprOperator.MOD) {
+		// if (t == TypeConstant.DINT){           //il's MOD != java's REM
+		// ilRun.append(InstructionConstants.IREM);} //Kolla upp matematiken
+		// }
+		// else if (op == IlExprOperator.GT) {
+		// else if (op == IlExprOperator.GE) {
+		// else if (op == IlExprOperator.EQ) {
+		// else if (op == IlExprOperator.LT) {
+		// else if (op == IlExprOperator.LE) {
+		// else if (op == IlExprOperator.NE) {
+		else
+			{
+				error("Not implemented: "+ operator+", operand of type: " + t);
+			}
+
 	    }
 	catch (IllegalOperatorException e)
 	    {
 		error("Illegal operator: " + operator);
 	    }
 
-	if (op == IlExprOperator.AND)
-	    {    // Logical AND
-		emitExprAND(t, arg);
-	    }
-	else if (op == IlExprOperator.OR)
-	    {    // Logical OR
-		emitExprOR(t, arg);
-	    }
-
-	// else if (op == IlExprOperator.XOR) { //Logical Exclusive OR
-	else if (op == IlExprOperator.ANDN)
-	    {    // Logical e1 AND NOT e2
-		emitExprANDN(t, arg);
-	    }
-
-	// else if (op == IlExprOperator.ORN) { //Logical e1 OR NOT e2
-	// else if (op == IlExprOperator.XORN) { //Logical e1 XOR NOT e2
-	// if (op == IlExprOperator.ADD) { //Addition
-	// emitExprADD(t,arg); //se nedan
-	// }
-	// else if (op == IlExprOperator.SUB){         //Subtraction
-	// emitExprSUB(t,arg);
-	// }
-	// else if (op == IlExprOperator.MUL) {        //Multiplication
-	// emitExprMUL(t,arg);
-	// }
-	// else if (op == IlExprOperator.DIV) {  //Division
-	// if (t == TypeConstant.DINT){
-	// ilRun.append(InstructionConstants.IDIV);}
-	// }
-	// Modulus
-	// else if (op == IlExprOperator.MOD) {
-	// if (t == TypeConstant.DINT){           //il's MOD != java's REM
-	// ilRun.append(InstructionConstants.IREM);} //Kolla upp matematiken
-	// }
-	// else if (op == IlExprOperator.GT) {
-	// else if (op == IlExprOperator.GE) {
-	// else if (op == IlExprOperator.EQ) {
-	// else if (op == IlExprOperator.LT) {
-	// else if (op == IlExprOperator.LE) {
-	// else if (op == IlExprOperator.NE) {
-	else
-	    {
-		error("Not implemented: " + operator + ", operand of type: " + t);
-	    }
     }
 
-    // private void emitExprAdd(TypeConstant t, Object arg){
     /**
      * emitExprAND does a logical AND between TOS value and the 
      * next to TOS value
