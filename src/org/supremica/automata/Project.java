@@ -50,6 +50,7 @@
 package org.supremica.automata;
 
 import java.util.*;
+import java.net.URL;
 import org.supremica.log.*;
 import org.supremica.automata.execution.*;
 
@@ -64,7 +65,7 @@ public class Project
 	private static Logger logger = LoggerFactory.createLogger(Project.class);
 	private Actions theActions = null;
 	private Controls theControls = null;
-	private String animationPath = null;
+	private URL animationURL = null;
 
 	public Project()
 	{
@@ -100,6 +101,8 @@ public class Project
 
 	public boolean hasAnimation()
 	{
+		return animationURL != null;
+		/*
 		if (animationPath == null)
 		{
 			return false;
@@ -109,21 +112,33 @@ public class Project
 			return false;
 		}
 		return true;
+		*/
 	}
 
-	public String getAnimationPath()
+	public URL getAnimationURL()
 	{
-		return animationPath;
+		return animationURL;
 	}
 
 	/**
 	 * Set an absolute path
 	 **/
-	public void setAnimationPath(String path)
+	public void setAnimationURL(URL url)
 	{
-		animationPath = path;
+		animationURL = url;
 	}
 
+/*
+	public InputProtocol getInputProtocol()
+	{
+		return inputProtocol;
+	}
+
+	public void setInputProtocol(InputProtocol theProtocol)
+	{
+		this.inputProtocol = theProtocol;
+	}
+*/
 	public void addActions(Actions otherActions)
 	{
 		if (theActions == null)

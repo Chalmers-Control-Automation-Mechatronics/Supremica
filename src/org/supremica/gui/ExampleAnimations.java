@@ -50,6 +50,7 @@
 package org.supremica.gui;
 
 import java.util.*;
+import java.net.URL;
 import org.supremica.gui.animators.*;
 import org.supremica.gui.animators.scenebeans.*;
 
@@ -75,16 +76,16 @@ public class ExampleAnimations
 		AnimationGroup thisGroup = MageeKramerExamples;
 
 		allGroups.add(thisGroup);
-		thisGroup.addItem(new AnimationItem("Bridge", prefix + "bridge.xml"));
-		thisGroup.addItem(new AnimationItem("Channel", prefix + "channel.xml"));
-		thisGroup.addItem(new AnimationItem("Dining philosophers", prefix + "diners.xml"));
-		thisGroup.addItem(new AnimationItem("Flexible Manufacturing Cell", prefix + "fmc.xml"));
-		thisGroup.addItem(new AnimationItem("Helicopter", prefix + "copter_track.xml"));
-		thisGroup.addItem(new AnimationItem("Lottery", prefix + "lottery.xml"));
-		thisGroup.addItem(new AnimationItem("Maze", prefix + "maze.xml"));
-		thisGroup.addItem(new AnimationItem("Puzzle", prefix + "puzzle.xml"));
-		thisGroup.addItem(new AnimationItem("Tic Tac Toe", prefix + "tictactoe.xml"));
-		thisGroup.addItem(new AnimationItem("Window", prefix + "window.xml"));
+		thisGroup.addItem(new AnimationItem("Bridge", ExampleAnimations.class.getResource(prefix + "bridge.xml")));
+		thisGroup.addItem(new AnimationItem("Channel", ExampleAnimations.class.getResource(prefix + "channel.xml")));
+		thisGroup.addItem(new AnimationItem("Dining philosophers", ExampleAnimations.class.getResource(prefix + "diners.xml")));
+		thisGroup.addItem(new AnimationItem("Flexible Manufacturing Cell", ExampleAnimations.class.getResource(prefix + "fmc.xml")));
+		thisGroup.addItem(new AnimationItem("Helicopter", ExampleAnimations.class.getResource(prefix + "copter_track.xml")));
+		thisGroup.addItem(new AnimationItem("Lottery", ExampleAnimations.class.getResource(prefix + "lottery.xml")));
+		thisGroup.addItem(new AnimationItem("Maze", ExampleAnimations.class.getResource(prefix + "maze.xml")));
+		thisGroup.addItem(new AnimationItem("Puzzle", ExampleAnimations.class.getResource(prefix + "puzzle.xml")));
+		thisGroup.addItem(new AnimationItem("Tic Tac Toe", ExampleAnimations.class.getResource(prefix + "tictactoe.xml")));
+		thisGroup.addItem(new AnimationItem("Window", ExampleAnimations.class.getResource(prefix + "window.xml")));
 	}
 
 	public synchronized static ExampleAnimations getInstance()

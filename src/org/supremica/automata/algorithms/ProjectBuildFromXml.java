@@ -52,6 +52,7 @@ package org.supremica.automata.algorithms;
 import java.util.*;
 import java.io.*;
 import java.net.URL;
+import java.net.MalformedURLException;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.parsers.SAXParser;
 import org.xml.sax.*;
@@ -111,6 +112,8 @@ public class ProjectBuildFromXml
 	private Actions currActions = null;
 	private Action currAction = null;
 	private Control currControl = null;
+	private InputProtocol inputProtocol = InputProtocol.UnknownProtocol;
+	private File thisFile = null;
 
 	public ProjectBuildFromXml(ProjectFactory theProjectFactory)
 	{
@@ -120,6 +123,26 @@ public class ProjectBuildFromXml
 	public Project build(URL url)
 		throws Exception
 	{
+		String protocol = url.getProtocol();
+
+		if (protocol.equals("file"))
+		{
+			inputProtocol = InputProtocol.FileProtocol;
+			String fileName = url.getFile();
+			thisFile = new File(fileName);
+
+		}
+		else if (protocol.equals("jar"))
+		{
+			inputProtocol = InputProtocol.JarProtocol;
+		}
+		else
+		{
+			inputProtocol = InputProtocol.UnknownProtocol;
+			System.err.println("Unknown protocol: " + protocol);
+			return null;
+		}
+
 		InputStream stream = url.openStream();
 		return build(stream);
 	}
@@ -127,7 +150,7 @@ public class ProjectBuildFromXml
 	public Project build(File file)
 		throws Exception
 	{
-		return build(file, false);
+		return build(file.toURL());
 	}
 
 	private Project build(InputStream is)
@@ -740,6 +763,47 @@ public class ProjectBuildFromXml
 			throwException("path attribute is missing");
 		}
 
-		currProject.setAnimationPath(path);
+		URL url = null;
+		try
+		{
+			url = new URL(path);
+		}
+		catch (MalformedURLException ex)
+		{ // This was not an url
+			url = null;
+		}
+
+		try
+		{
+			if (url == null && inputProtocol == InputProtocol.FileProtocol)
+			{
+				File theAnimFile = new File(path);
+				if (theAnimFile.isAbsolute())
+				{
+					url = theAnimFile.toURL();
+				}
+				else
+				{ // Make it absolute
+					if (thisFile != null)
+					{
+						File newAnimFile = new File(thisFile.getParentFile(), path);
+						url = newAnimFile.toURL();
+					}
+					else
+					{ // What to do
+					}
+				}
+
+			}
+			else if (url == null && inputProtocol == InputProtocol.JarProtocol)
+			{
+				url = ProjectBuildFromXml.class.getResource(path);
+			}
+		}
+		catch (MalformedURLException ex)
+		{ // This was not an url
+			url = null;
+		}
+		currProject.setAnimationURL(url);
 	}
 }

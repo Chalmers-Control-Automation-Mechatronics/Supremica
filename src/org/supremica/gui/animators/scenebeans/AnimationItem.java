@@ -50,7 +50,7 @@
 package org.supremica.gui.animators.scenebeans;
 
 import java.util.*;
-import java.net.*;
+import java.net.URL;
 import java.io.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -70,12 +70,12 @@ import uk.ac.ic.doc.scenebeans.input.*;
 public class AnimationItem
 {
 	private String description;
-	private String path;
+	private URL url;
 
-	public AnimationItem(String description, String path)
+	public AnimationItem(String description, URL url)
 	{
 		this.description = description;
-		this.path = path;
+		this.url = url;
 	}
 
 	public String getDescription()
@@ -83,29 +83,30 @@ public class AnimationItem
 		return description;
 	}
 
-	public String getPath()
+	public URL getURL()
 	{
-		return path;
+		return url;
 	}
 
 	public Animator createInstance()
 		throws Exception
 	{
-		return AnimationItem.createInstance(path);
+		return AnimationItem.createInstance(url);
 	}
 
-	public static Animator createInstance(String path)
+	public static Animator createInstance(URL url)
 		throws Exception
 	{
 		try
 		{
-			final Animator view = new Animator(" Path: " + path);
+			final Animator view = new Animator(" Path: " + url.toString());
+			/*
 			URL url = AnimationItem.class.getResource(path);
 
 			if (url == null)
 			{ // The class loader could not find the file
 
-			}
+			}*/
 
 			XMLAnimationParser parser = new XMLAnimationParser(url, view._canvas);
 

@@ -107,9 +107,9 @@ public class SimulatorExecuter
 		theAnimator = theProject.getAnimator();
 		if (theAnimator == null)
 		{
-			String msg = "Could not open animator: " + theProject.getAnimationPath();
+			String msg = "Could not open animator: " + theProject.getAnimationURL();
 			logger.error(msg);
-			throw new Exception("Could not open animator: " + theProject.getAnimationPath());
+			throw new Exception("Could not open animator: " + theProject.getAnimationURL());
 		}
 
 		theAnimation = theAnimator.getAnimation();

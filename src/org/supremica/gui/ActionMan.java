@@ -101,7 +101,7 @@ abstract class FileImporter
 }
 
 // --------------------
-public class ActionMan 
+public class ActionMan
 {
 	private static Logger logger = LoggerFactory.createLogger(ActionMan.class);
 	private static final int    // instead of using constants later below :)
@@ -112,12 +112,12 @@ public class ActionMan
 	public static Gui gui = null;
 	public static LanguageRestrictor languageRestrictor = new LanguageRestrictor();
 	public static StateEnumerator stateEnumerator = new StateEnumerator();
-	
-	public static Gui getGui() 
+
+	public static Gui getGui()
 	{
 		return gui;
 	}
-	
+
 	private static int getIntegerInDialogWindow(String text, Component parent)
 	{
 		boolean finished = false;
@@ -682,7 +682,7 @@ public class ActionMan
 							Project newProject = new Project();
 							newProject.addActions(selectedProject.getActions());
 							newProject.addControls(selectedProject.getControls());
-							newProject.setAnimationPath(selectedProject.getAnimationPath());
+							newProject.setAnimationURL(selectedProject.getAnimationURL());
 
 							ProjectToSP exporter = new ProjectToSP(newProject);
 

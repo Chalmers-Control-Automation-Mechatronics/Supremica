@@ -327,7 +327,7 @@ public class ProjectToSP
 
 			if (project.hasAnimation())
 			{
-				pw.println("\t<Animation path=\"" + normalize(project.getAnimationPath()) + "\"/>");
+				pw.println("\t<Animation path=\"" + normalize(project.getAnimationURL().toString()) + "\"/>");
 			}
 
 			pw.println("</Execution>");

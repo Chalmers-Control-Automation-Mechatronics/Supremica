@@ -50,7 +50,7 @@
 package org.supremica.automata.templates;
 
 import java.util.*;
-import java.net.*;
+import java.net.URL;
 import java.io.*;
 import org.supremica.automata.algorithms.*;
 import org.supremica.automata.*;

@@ -414,7 +414,7 @@ public class VisualProject
 		throws Exception
 	{
 		logger.debug("VisualProject::getAlphabetViewer(" + automaton + ")");
-		
+
 		if (theAlphabetViewerContainer.containsKey(automaton))
 		{
 			AlphabetViewer viewer = (AlphabetViewer) theAlphabetViewerContainer.get(automaton);
@@ -472,7 +472,7 @@ public class VisualProject
 		}
 		if (theAnimator == null)
 		{
-			theAnimator = AnimationItem.createInstance(getAnimationPath());
+			theAnimator = AnimationItem.createInstance(getAnimationURL());
 		}
 		theAnimator.setVisible(true);
 		return theAnimator;

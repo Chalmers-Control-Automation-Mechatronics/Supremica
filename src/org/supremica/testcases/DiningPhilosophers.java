@@ -479,7 +479,7 @@ public class DiningPhilosophers
 
 		if (animation)
 		{
-			project.setAnimationPath("/scenebeans/mageekramer/xml/diners.xml");
+			project.setAnimationURL(DiningPhilosophers.class.getResource("/scenebeans/mageekramer/xml/diners.xml"));
 		}
 	}
 

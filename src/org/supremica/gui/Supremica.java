@@ -56,6 +56,7 @@ import javax.swing.event.*;
 import javax.swing.table.*;
 import java.util.*;
 import java.io.*;
+import java.net.URL;
 import org.supremica.log.*;
 import javax.help.*;
 import org.supremica.*;
@@ -1288,7 +1289,7 @@ public class Supremica
 		{
 			selectedProject.addActions(activeProject.getActions());
 			selectedProject.addControls(activeProject.getControls());
-			selectedProject.setAnimationPath(activeProject.getAnimationPath());
+			selectedProject.setAnimationURL(activeProject.getAnimationURL());
 		}
 		return selectedProject;
 	}
@@ -1516,10 +1517,10 @@ public class Supremica
 		currProject.addControls(theControls);
 	}
 
-	public void setAnimationPath(String animationPath)
+	public void setAnimationURL(URL animationURL)
 	{
 		Project currProject = getActiveProject();
-		currProject.setAnimationPath(animationPath);
+		currProject.setAnimationURL(animationURL);
 	}
 
 	public int addAutomata(Automata currAutomata)
@@ -1561,11 +1562,13 @@ public class Supremica
 		{
 			addActions(theProject.getActions());
 			addControls(theProject.getControls());
+			setAnimationURL(theProject.getAnimationURL());
+			/*
 			String animPath = theProject.getAnimationPath();
 			if (animPath != null && !animPath.equals(""))
 			{
 				setAnimationPath(animPath);
-			}
+			}*/
 		}
 
 		return nbrOfAddedAutomata;
