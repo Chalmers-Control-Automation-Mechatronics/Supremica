@@ -92,6 +92,8 @@ public class AutomataSynchronizerWorker
 	{
 		if (mode == MODE_SYNC)
 		{
+			Date startDate = new Date();
+
 			AutomataSynchronizer theSynchronizer;
 			try
 			{
@@ -104,9 +106,19 @@ public class AutomataSynchronizerWorker
 				return;
 			}
 
+			ArrayList threadsToStop = new ArrayList();
+			threadsToStop.add(theSynchronizer);
+			CancelDialog cancelDialog = new CancelDialog(workbench, threadsToStop);
+			theSynchronizer.getHelper().setCancelDialog(cancelDialog);
+
+			// cancelDialog.makeProgressBar(0,97000);
+			// cancelDialog.makeCounter();
+			
 			try
 			{
+				cancelDialog.updateHeader("Synchronizing...");
 				theSynchronizer.execute();
+				System.out.println("Synchronization complete...");
 			}
 			catch (Exception ex)
 			{
@@ -115,16 +127,32 @@ public class AutomataSynchronizerWorker
 			}
 			try
 			{
+				cancelDialog.updateHeader("Building automaton...");
 				theAutomaton = theSynchronizer.getAutomaton();
+				System.out.println("Automaton build complete...");
 			}
 			catch (Exception ex)
 			{
 				thisCategory.error("Exception in AutomatonSynchronizer while getting the automaton");
 				return;
 			}
-			theAutomaton.setName(newAutomatonName);
-			mode = MODE_UPDATE;
-			java.awt.EventQueue.invokeLater(this);
+
+			// if (!theAutomaton.isDisabled())
+			if (theAutomaton != null)
+			{
+				theAutomaton.setName(newAutomatonName);
+				mode = MODE_UPDATE;
+				java.awt.EventQueue.invokeLater(this);
+				cancelDialog.destroy();
+				Date endDate = new Date();
+				thisCategory.info("Execution completed after " + (endDate.getTime()-startDate.getTime())/1000.0 + " seconds.");	
+			}
+			else
+			{
+				Date endDate = new Date();
+				thisCategory.info("Execution stopped after " + (endDate.getTime()-startDate.getTime())/1000.0 + " seconds!");
+			}
+
 		}
 		else if (mode == MODE_UPDATE)
 		{

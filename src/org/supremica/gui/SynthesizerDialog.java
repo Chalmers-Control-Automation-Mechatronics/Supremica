@@ -78,33 +78,12 @@ public class SynthesizerDialog
 		this.synthesizerOptions = synthesizerOptions;
 		dialog.setTitle("Synthesizer options");
 		dialog.setSize(new Dimension(300, 200));
+		dialog.setResizable(false);
 		Container contentPane = dialog.getContentPane();
-		
-		/*
-		JPanel panel = new JPanel();
-		String[] synthesisData = {"controllable", "non-blocking", "both"};
-		JComboBox synthesisTypeBox = new JComboBox(synthesisData);
-		String[] algorithmData = {"modular", "monolithic", "IDD"};
-		JComboBox algorithmTypeBox = new JComboBox(algorithmData);
-		JCheckBox purgeBox = new JCheckBox("Purge result");
-		JCheckBox optimizeBox = new JCheckBox("Optimize result");
-		panel.setLayout(new GridLayout(2, 2));
-		panel.add(synthesisTypeBox);
-		panel.add(purgeBox);
-		panel.add(algorithmTypeBox);
-		panel.add(optimizeBox);
-
-		contentPane.add("Center", standardPanel);
-		contentPane.add("South", buttonPanel);
-		*/
 
 		JPanel standardPanel = new JPanel();
 		JPanel advancedPanel = new JPanel();
         
-		//Border padding = BorderFactory.createEmptyBorder(20,20,5,20);
-		//standardPanel.setBorder(padding);
-		//advancedPanel.setBorder(padding);
- 
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.addTab("Synthesis options", null, 
                           standardPanel,
@@ -114,23 +93,22 @@ public class SynthesizerDialog
                           "Sick options");
 		
 		// standardPanel
-		JPanel rightPanel = new JPanel();
-		JPanel leftPanel = new JPanel();
+		JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		String[] synthesisData = {"controllable", "non-blocking", "both"};
 		synthesisTypeBox = new JComboBox(synthesisData);
 		String[] algorithmData = {"modular", "monolithic", "IDD"};
 		algorithmTypeBox = new JComboBox(algorithmData);
 		purgeBox = new JCheckBox("Purge result", true);
 		optimizeBox = new JCheckBox("Optimize result", true);
-		rightPanel.add(synthesisTypeBox);
-		rightPanel.add(algorithmTypeBox);
-		leftPanel.add(purgeBox);
-		leftPanel.add(optimizeBox);
+		leftPanel.add(synthesisTypeBox);
+		leftPanel.add(algorithmTypeBox);
+		rightPanel.add(purgeBox);
+		rightPanel.add(optimizeBox);
 
-		// standardPanel.add(rightPanel, BorderLayout.EAST);
-		// standardPanel.add(leftPanel, BorderLayout.WEST);
-		standardPanel.add("East", rightPanel);
-		standardPanel.add("West", leftPanel);
+		standardPanel.setLayout(new GridLayout(1,2));
+		standardPanel.add(leftPanel);
+		standardPanel.add(rightPanel);
 		
 		// advancedPanel
 		// null...

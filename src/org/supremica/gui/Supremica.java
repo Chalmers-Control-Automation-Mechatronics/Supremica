@@ -1351,7 +1351,8 @@ public class Supremica
 				WorkbenchProperties.syncExpandForbiddenStates(),
 				false,
 				false,
-				true
+				true,
+				WorkbenchProperties.verboseMode()
 			);
 		}
 		catch (Exception ex)
@@ -1717,7 +1718,8 @@ public class Supremica
 					WorkbenchProperties.syncExpandForbiddenStates(),
 					false,
 					false,
-					true
+					true,
+					WorkbenchProperties.verboseMode()
 					);
 			}
 			catch (Exception ex)
@@ -1762,11 +1764,11 @@ public class Supremica
 				try
 				{
 					AutomatonSynthesizer synthesizer = new AutomatonSynthesizer(currAutomaton);
-					if (synthesizerOptions.getSynthesisType() == 0)
+					if (synthesizerOptions.getSynthesisType() == 0)      // Controllable
 						synthesizer.synthesizeControllable();
-					else if (synthesizerOptions.getSynthesisType() == 1)
+					else if (synthesizerOptions.getSynthesisType() == 1) // Non-blocking
 						thisCategory.error("Option not implemented...");
-					else if (synthesizerOptions.getSynthesisType() == 2)
+					else if (synthesizerOptions.getSynthesisType() == 2) // Both
 						synthesizer.synthesize();
 					else
 						thisCategory.error("Unavailable option chosen.");

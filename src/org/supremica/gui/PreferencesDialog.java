@@ -396,6 +396,7 @@ class SynchronizationPanel
 	private JCheckBox forbidUncontrollableStates = null;
 	private JCheckBox expandForbiddenStates = null;
 	private JCheckBox expandHashtable = null;
+	private JCheckBox verboseMode = null;
 	private JTextField hashtableSize = null;
 	private JTextField nbrOfExecuters = null;
 
@@ -418,6 +419,10 @@ class SynchronizationPanel
 		expandHashtable =
 			new JCheckBox("Expand hashtable");
 		propertiesBox.add(expandHashtable);
+
+		verboseMode =
+			new JCheckBox("Verbose mode");
+		propertiesBox.add(verboseMode);
 
 		JLabel hashtableSizeLabel =
 			new JLabel("Initial size of the hashtable");
@@ -442,6 +447,8 @@ class SynchronizationPanel
 			expandForbiddenStates.isSelected());
 		WorkbenchProperties.setSyncExpandHashtable(
 			expandHashtable.isSelected());
+		WorkbenchProperties.setVerboseMode(
+			verboseMode.isSelected());
 
 		int size = theDialog.getInt("Hashtable size", hashtableSize.getText(), 100);
 		if (size == Integer.MIN_VALUE)
@@ -468,6 +475,8 @@ class SynchronizationPanel
 			WorkbenchProperties.syncExpandForbiddenStates());
 		expandHashtable.setSelected(
 			WorkbenchProperties.syncExpandHashtable());
+		verboseMode.setSelected(
+			WorkbenchProperties.verboseMode());
 		hashtableSize.setText(
 			Integer.toString(WorkbenchProperties.syncInitialHashtableSize()));
 		nbrOfExecuters.setText(

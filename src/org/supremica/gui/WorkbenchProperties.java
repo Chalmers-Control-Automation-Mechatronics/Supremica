@@ -74,6 +74,7 @@ public final class WorkbenchProperties
 	private static final String SYNC_EXPAND_FORBIDDEN_STATES = "syncExpandUncontrollableStates";
 	private static final String SYNC_INITIAL_HASHTABLE_SIZE = "syncInitialHashtableSize";
 	private static final String SYNC_EXPAND_HASHTABLE = "syncExpandHashtable";
+	private static final String VERBOSE_MODE = "verboseMode";
 	private static final String SYNC_NBR_OF_EXECUTERS = "synchNbrOfExecuters";
 
 	private static final WorkbenchProperties wp = new WorkbenchProperties();
@@ -99,6 +100,7 @@ public final class WorkbenchProperties
 		setProperty(SYNC_EXPAND_FORBIDDEN_STATES, "true");
 		setProperty(SYNC_INITIAL_HASHTABLE_SIZE, Integer.toString((1 << 14) - 1));
 		setProperty(SYNC_EXPAND_HASHTABLE, "true");
+		setProperty(VERBOSE_MODE, "false");
 		setProperty(SYNC_NBR_OF_EXECUTERS, "1");
 	}
 
@@ -289,6 +291,16 @@ public final class WorkbenchProperties
 	public static void setSyncExpandHashtable(boolean expand)
 	{
 		wp.setProperty(SYNC_EXPAND_HASHTABLE, toString(expand));
+	}
+
+	public static boolean verboseMode()
+	{
+		return toBoolean(wp.getProperty(VERBOSE_MODE));
+	}
+
+	public static void setVerboseMode(boolean mode)
+	{
+		wp.setProperty(VERBOSE_MODE, toString(mode));
 	}
 
 	public static int syncNbrOfExecuters()

@@ -87,7 +87,8 @@ public class AutomataExplorer
 			WorkbenchProperties.syncExpandForbiddenStates(),
 			false,
 			false,
-			false);
+			false,
+			WorkbenchProperties.verboseMode());
 
 		helper = new AutomataSynchronizerHelper(theAutomata, syncOptions);
 
