@@ -1,6 +1,7 @@
 package org.supremica.util;
 
 import java.io.IOException;
+import org.supremica.log.*;
 
 /**
 * A simple, static class to display a URL in the system browser.
@@ -23,6 +24,8 @@ import java.io.IOException;
 */
 public class BrowserControl
 {
+	private static Logger logger = LoggerFactory.createLogger(BrowserControl.class);
+
     /**
      * Display a file in the system browser.  If you want to display a
      * file, you must include the absolute path name.
@@ -66,17 +69,17 @@ public class BrowserControl
                 }
                 catch(InterruptedException x)
                 {
-                    System.err.println("Error bringing up browser, cmd='" +
+                    logger.error("Error bringing up browser, cmd='" +
                                        cmd + "'");
-                    System.err.println("Caught: " + x);
+                    logger.error("Caught: " + x);
                 }
             }
         }
         catch(IOException x)
         {
             // couldn't exec browser
-            System.err.println("Could not invoke browser, command=" + cmd);
-            System.err.println("Caught: " + x);
+            logger.error("Could not invoke browser, command=" + cmd);
+            logger.error("Caught: " + x);
         }
     }
     /**
