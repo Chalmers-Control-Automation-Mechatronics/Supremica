@@ -204,6 +204,7 @@ public class LSFReader
 	char c = varName.charAt(0);       
 	String elementType = null;
 
+
 	if (Character.isLetter(c))
 	    {
 		elementType = "variable";
@@ -211,6 +212,15 @@ public class LSFReader
 	else
 	    {
 		elementType = "constant";
+	    }
+
+	if (varName.length() > 1)
+	    {
+		System.out.println(varName.substring(0, 2));
+		if ((varName.substring(0, 2)).equals("t#"))
+		    {
+			elementType = "constant";
+		    }
 	    }
 	
 

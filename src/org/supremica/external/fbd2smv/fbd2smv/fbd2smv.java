@@ -101,6 +101,11 @@ public class fbd2smv
 		    { 
 			((BOX)boxes.get(i)).setName("div");
 		    }
+		else if (boxName.equals("TON"))
+		    { 
+			((BOX)boxes.get(i)).setName("ton");
+		    }
+
 	    }
     }
 
@@ -154,6 +159,11 @@ public class fbd2smv
 		    { 
 			((BOX)boxes.get(boxKey)).setName("div");
 		    }
+		else if (boxName.equals("TON"))
+		    { 
+			((BOX)boxes.get(boxKey)).setName("ton");
+		    }
+
 	    }
     }
 
@@ -212,6 +222,11 @@ public class fbd2smv
 			    { 
 				fbdElement.setElementName("div");
 			    }
+			else if (boxName.equals("TON"))
+			    { 
+				fbdElement.setElementName("ton");
+			    }
+
 		    }
 	    }
     }
@@ -513,7 +528,19 @@ public class fbd2smv
 					else
 					    {
 
-						String formalArgName = ((Block)smvBlocks.get(((BOX)theFBDObject.getElement()).getName())).getOutputArgumentName(sourceOutputNumber);
+						System.out.println("### " + ((Block)smvBlocks.get("ton")).getOutputArgumentName(1));
+
+						System.out.println("*** BoxName: " + ((BOX)theFBDObject.getElement()).getName() + " ***");
+						System.out.println("*** sourceOutputNumber: " + sourceOutputNumber + " ***");
+
+
+
+						//						String formalArgName = ((Block)smvBlocks.get(((BOX)theFBDObject.getElement()).getName())).getOutputArgumentName(sourceOutputNumber);
+String formalArgName = ((Block)smvBlocks.get(((BOX)theFBDObject.getElement()).getName())).getOutputArgumentName(sourceOutputNumber);
+
+
+						System.out.println("formalArgName: " + formalArgName);
+
 						buff.append(program.getName() + "_" + ((Block)smvBlocks.get(((BOX)theFBDObject.getElement()).getName())).getName() + "_" + sourceIndex + "." + formalArgName + ";");
 			
 					    }

@@ -22,6 +22,12 @@ public class BLKReader
 	for (int i=0; i<blkFiles.size(); i++)
 	    {
 		Block block = parse(path + blkFiles.get(i)); 
+
+		if ((blkFiles.get(i)).equals("ton.blk"))
+		    {
+		       
+			System.out.println("@@@ " + block.getName() + ": " + block.getOutputArgumentName(1));
+		    }
 		blocks.put(block.getName(), block);
 	    }
 
@@ -55,6 +61,9 @@ public class BLKReader
 		    } 
 		else if ((input.trim()).startsWith("output"))
 		    {
+
+			System.out.println(input);
+			
 			StringTokenizer tokenizer = new StringTokenizer((input.substring(input.indexOf("output")+7, input.indexOf(":"))), ",");
 			String type = (input.substring(input.indexOf(":")+1, input.indexOf(";"))).trim();
 						
@@ -63,6 +72,7 @@ public class BLKReader
 				String currToken = (tokenizer.nextToken()).trim();
 
 				outputArguments.add(new Argument(currToken, type));
+				System.out.println("%%% size: " + outputArguments.size());
 			    }
 		    } 
 		else if ((input.trim()).startsWith("module"))
