@@ -133,14 +133,14 @@ public class ASTvariable
 
 	public Object visit(SimpleNodeVisitor v, Object o)
 	{
-		try
-		{
+	    //	try
+	    //	{
 			return v.visitVARIABLE(this, o);
-		}
-		catch (Exception e)
-		{
-			System.err.println("Caught Exception: " + e.getMessage());
-			return null;
-		}
+			//	}
+			//		catch (Exception e)
+			//	{
+			//		System.err.println("Caught Exception: " + e.getMessage());
+			//return null;
+			//	}
 	}
 }
