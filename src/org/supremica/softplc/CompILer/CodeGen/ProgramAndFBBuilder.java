@@ -403,12 +403,12 @@ public abstract class ProgramAndFBBuilder
 					   , Constants.GETFIELD));
 			    }
 			else if (type == TypeConstant.T_DERIVED)
-			    { //XXX den här måste kontrolleras
-				il.append(fac.createFieldAccess
-					  (/*fb type name*/var.getTypeName(),
-					   var.getFieldSelector(), new ObjectType(var.getFieldSelectorTypeName())
-					   , Constants.GETFIELD));
-				warn("Not tested. loading derived types from derived types"); //XXX stämmer det
+			    {
+					il.append(fac.createFieldAccess
+							  (/*fb type name*/var.getTypeName(),
+							   var.getFieldSelector(), 
+							   new ObjectType(var.getFieldSelectorTypeName()),
+							   Constants.GETFIELD));
 			    }
 			else
 			    {
@@ -421,9 +421,6 @@ public abstract class ProgramAndFBBuilder
 			il.append(fac.createFieldAccess(className, varName,
 							new ObjectType(var.getTypeName()),
 							Constants.GETFIELD));
-
-			// XXX don't forget to test this
-			warn("Not properly tested so far. Loading of derived variables."); //XXX
 		    }
 	    }
 	else
@@ -549,9 +546,9 @@ public abstract class ProgramAndFBBuilder
 				il.append(InstructionConstants.SWAP);
 				il.append(fac.createFieldAccess
 					  (/*fb type name*/var.getTypeName(),
-					   var.getFieldSelector(), new ObjectType(var.getFieldSelectorTypeName()),
+					   var.getFieldSelector(), 
+					   new ObjectType(var.getFieldSelectorTypeName()),
 					   Constants.PUTFIELD));
-				warn("Not tested. Stording derived type into another derived type"); //XXX stämmer det
 			    }
 			else
 			    {
@@ -566,7 +563,6 @@ public abstract class ProgramAndFBBuilder
 			il.append(fac.createFieldAccess(className, varName,
 							new ObjectType(var.getTypeName()),
 							Constants.PUTFIELD));
-			warn("Not properly tested. Store of derived type variables."); //XXX
 		    }
 	    }
 	else
@@ -938,9 +934,10 @@ public abstract class ProgramAndFBBuilder
 			BranchInstruction ifne = new IFEQ(null);
 			InstructionHandle skipStore;
 			ilRun.append(InstructionConstants.DUP);
-			/* XXX
+			/*
 			 * need to check that IL's result reg has type BOOL,
-			 *  (should be done in TypeChecker)
+			 * (should be done in TypeChecker, but not done as
+			 * far as known by now, 16th May 2002)
 			 */
 			ilRun.append(ifne);
 			ilRun.append(new PUSH(constPoolGen, true));
