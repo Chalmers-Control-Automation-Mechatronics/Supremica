@@ -3364,7 +3364,8 @@ public class ActionMan
 				// Is this Automaton's type AutomatonType.Undefined?
 				if(currAutomaton.getType() == AutomatonType.Undefined)
 				{
-					String message = "The automaton " + currAutomaton.getName() + " is of 'Undefined' type.\n" +
+					String message = "The automaton " + currAutomaton.getName() + 
+						" is of 'Undefined' type.\n" +
 						"Skip this automaton or Cancel the whole operation?";
 					Object[] options = { "Skip", "Cancel" };
 					int cont = JOptionPane.showOptionDialog(gui.getComponent(), message, "Alert", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[1]);
@@ -3395,7 +3396,8 @@ public class ActionMan
 				size = "two automata";
 			else
 				size = minSize + " automata";
-			JOptionPane.showMessageDialog(gui.getFrame(), "At least " + size + " must be selected!",
+			JOptionPane.showMessageDialog(gui.getFrame(), "At least " + 
+										  size + " must be selected!",
 										  "Alert", JOptionPane.ERROR_MESSAGE);
 			// This is inSaNe!
 			return false;

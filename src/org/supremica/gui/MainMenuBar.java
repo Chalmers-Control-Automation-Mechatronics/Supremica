@@ -984,7 +984,7 @@ public class MainMenuBar
 				});
 			// RobotStudioCreateMutexZones
 			JMenuItem robSpanMutex = new JMenuItem();
-			robSpanMutex.setText("Create MutexZones From Span");
+			robSpanMutex.setText("Create Mutex Zones From Span");
 			menuRobotStudioLink.add(robSpanMutex);
 			robSpanMutex.addActionListener(new ActionListener()
 				{

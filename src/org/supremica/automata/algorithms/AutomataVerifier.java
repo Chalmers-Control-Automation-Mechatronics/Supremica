@@ -358,7 +358,7 @@ public class AutomataVerifier
 	}
 
 	/**
-	 * Performs modular controllablity verification on theAutomata..
+	 * Performs modular controllability verification on theAutomata..
 	 *
 	 *@return  true if controllable, false if not or false (with error message) if don't know.
 	 *@exception  Exception Description of the Exception
@@ -475,11 +475,16 @@ public class AutomataVerifier
 						// Stop if uncontrollable
 						if (!allModulesControllable)
 						{
+							if (verboseMode)
+							{
+								logger.info("Uncontrollable state found.");
+							}
 							break loop;
 						}
 					}
 				}
 
+				// Clean selectedAutomata
 				selectedAutomata.clear();
 			}
 		}
@@ -585,7 +590,10 @@ public class AutomataVerifier
 		// loop finished.
 		if (failure)
 		{
-			logger.error("Supremica's modular verification algorithm can't solve this problem. Try the monolithic algorithm instead. There are " + potentiallyUncontrollableStates.size() + " states that perhaps makes this system uncontrollable.");
+			logger.error("Supremica's modular verification algorithm can't solve this\n" +
+						 "problem. Try the monolithic algorithm instead. There are " + 
+						 potentiallyUncontrollableStates.size() + "\n" + 
+						 "states that perhaps makes this system uncontrollable.");
 		}
 
 		return allModulesControllable;
@@ -656,7 +664,6 @@ public class AutomataVerifier
 			// Try to add some more automata
 			// Make array with indices of selected automata to remember which were originally selected
 			int[] automataIndices = new int[selectedAutomata.size()];
-
 			for (int i = 0; i < selectedAutomata.size(); i++)
 			{
 				automataIndices[i] = ((Automaton) selectedAutomata.get(i)).getIndex();
@@ -669,7 +676,7 @@ public class AutomataVerifier
 							 " states that might be uncontrollable...");
 			}
 
-			// Sort automata in order of similar alphabets
+			// Set a sorted array of indexes of automata with similar alphabets
 			int[] similarAutomata = findSimilarAutomata(theAutomata, selectedAutomata);
 			if (similarAutomata == null)
 			{
@@ -688,10 +695,11 @@ public class AutomataVerifier
 				logger.info("There are " + similarAutomata.length + " automata with similar alphabets...");
 			}
 
-			// Make five attempts on prooving controllability and 
-			// uncontrollability and then give up
+			// Make nbrOfAttempts attempts on prooving controllability and 
+			// uncontrollability alternatingly and then give up
+			int nbrOfAttempts = 5;
 			stateAmount = 1;
-			for (attempt = 1; attempt <= 5; attempt++)
+			for (attempt = 1; attempt <= nbrOfAttempts; attempt++)
 			{
 				if (verboseMode)
 				{
@@ -750,13 +758,13 @@ public class AutomataVerifier
 
 				if (potentiallyUncontrollableStates.size(automataIndices) > 0)
 				{
-					if (verboseMode)
-					{
-						logger.info("Couldn't prove controllability, trying to prove uncontrollability...");
-					}
-
 					if (!verificationOptions.getSkipUncontrollabilityCheck())
 					{
+						if (verboseMode)
+						{
+							logger.info("Couldn't prove controllability, trying to prove uncontrollability...");
+						}
+						
 						// Try to prove remaining states in the stateMemorizer as beeing uncontrollable
 						if (findUncontrollableStates(automataIndices))
 						{
@@ -817,10 +825,9 @@ public class AutomataVerifier
 	/**
 	 * Finds similar automata and sorts these automata in a smart way...
 	 *
-	 *@param  selectedAutomata the collection automata in the current "composition".
+	 *@param  selectedAutomata the selected automata in the current "composition".
 	 *@param  theAutomata reference to the global variable with the same name... eh...
-	 *@return  Description of the Return Value
-	 *@exception  Exception Description of the Exception
+	 *@return an int array with indexes of interesting automata in order of interesting interest.
 	 *@see  #compareAlphabets(org.supremica.automata.Alphabet, org.supremica.automata.Alphabet)
 	 *@see  #excludeUncontrollableStates(int[], java.util.ArrayList, int[])
 	 */
@@ -838,7 +845,7 @@ public class AutomataVerifier
 		}
 
 		// Compute the union alphabet of the automata in selectedAutomata
-		Alphabet unionAlphabet;
+		Alphabet synchAlphabet;
 		Automaton currAutomaton;
 		EventsSet theAlphabets = new EventsSet();
 
@@ -851,7 +858,7 @@ public class AutomataVerifier
 			theAlphabets.add(currAlphabet);
 		}
 
-		unionAlphabet = AlphabetHelpers.getUnionAlphabet(theAlphabets); // , "");
+		synchAlphabet = AlphabetHelpers.getUnionAlphabet(theAlphabets); // , "");
 
 		int[] tempArray = new int[amountOfUnselected];
 		double[] arraySortValue = new double[amountOfUnselected];
@@ -862,7 +869,7 @@ public class AutomataVerifier
 		while (automataIterator.hasNext())
 		{
 			currAutomaton = (Automaton) automataIterator.next();
-			arraySortValue[count] = compareAlphabets(currAutomaton.getAlphabet(), unionAlphabet);
+			arraySortValue[count] = compareAlphabets(currAutomaton.getAlphabet(), synchAlphabet);
 
 			if (arraySortValue[count] > 0)
 			{
@@ -899,7 +906,6 @@ public class AutomataVerifier
 		double tempDouble = 0;
 		int tempInt = 0;
 		int changes = 1;
-
 		while (changes > 0)
 		{
 			changes = 0;
@@ -919,7 +925,6 @@ public class AutomataVerifier
 				}
 			}
 		}
-
 		System.arraycopy(tempArray, 0, outArray, 0, count);
 
 		return outArray;
@@ -983,7 +988,6 @@ public class AutomataVerifier
 	 *@param  similarAutomata integer array with indices of automata with similar alphabets (from similarAutomata()).
 	 *@param  selectedAutomata ArrayList of the Automaton-objects currently selected (the ones in the current "composition" plus perhaps some of the similar automata from earlier rins of this method).
 	 *@param  automataIndices integer array with indices of automata in the current "composition".
-	 *@exception  Exception Description of the Exception
 	 *@see  #findSimilarAutomata(org.supremica.automata.Automata, java.util.ArrayList)
 	 */
 	private void excludeUncontrollableStates(int[] similarAutomata, ArrayList selectedAutomata, int[] automataIndices)
@@ -994,7 +998,6 @@ public class AutomataVerifier
 
 		if (attempt == 1)
 		{
-
 			// First attempt
 			stateAmountLimit = verificationOptions.getExclusionStateLimit();
 
@@ -1005,7 +1008,6 @@ public class AutomataVerifier
 		}
 		else
 		{
-
 			// Been here before, already added some automata
 			for (int i = 0; i < start; i++)
 			{
@@ -1025,7 +1027,6 @@ public class AutomataVerifier
 
 		for (int i = start; i < similarAutomata.length; i++)
 		{
-
 			// Add automaton
 			selectedAutomata.add(theAutomata.getAutomatonAt(similarAutomata[i]));
 
@@ -1034,7 +1035,6 @@ public class AutomataVerifier
 
 			if ((stateAmount > stateAmountLimit) || (i == similarAutomata.length - 1))
 			{
-
 				// Synchronize...
 				// synchHelper.clear(); // This is done while analyzing the result se *** below
 				synchHelper.addState(initialState);
@@ -1082,9 +1082,9 @@ public class AutomataVerifier
 					{
 						potentiallyUncontrollableStates.find(automataIndices, currStateTable[j]);
 
+						// Instead of using clear()... se *** above
 						currStateTable[j] = null;
 
-						// Instead of using clear()... se *** above
 						stateCount++;
 					}
 				}
@@ -1104,30 +1104,25 @@ public class AutomataVerifier
 				// Print result
 				int statesLeft = potentiallyUncontrollableStates.size(automataIndices);
 
+				if (verboseMode)
+				{
+					String message = "";
+					switch(statesLeft) {
+					case 0:
+						message = "No uncontrollable states ";
+						break;
+					case 1:
+						message = "Still one state ";
+						break;
+					default:
+						message = "Still " + statesLeft + " states ";
+					}
+					logger.info(message + "left after adding" + addedAutomata + ", this subsystem is controllable.");
+				}
+				
 				if (statesLeft == 0)
-				{
-					if (verboseMode)
-					{
-						logger.info("No uncontrollable states left after adding" + addedAutomata + ", this subsystem is controllable.");
-					}
-
 					return;
-				}
-				else if (statesLeft == 1)
-				{
-					if (verboseMode)
-					{
-						logger.info("Still one state left after adding" + addedAutomata + ".");
-					}
-				}
-				else
-				{
-					if (verboseMode)
-					{
-						logger.info("Still " + statesLeft + " states left after adding" + addedAutomata + ".");
-					}
-				}
-
+				
 				if (stateAmount > stateAmountLimit)
 				{
 
@@ -1139,7 +1134,6 @@ public class AutomataVerifier
 
 		if (stateAmount > stateAmountLimit)
 		{
-
 			// Make sure the limit and the real amount is not too different in magnitude.
 			stateAmountLimit = (stateAmount / 1000) * 1000;
 		}

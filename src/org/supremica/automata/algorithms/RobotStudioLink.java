@@ -692,7 +692,7 @@ End Sub
 			}
 
 			// Create automata for each entity in the IPart called mutexPartName
-			//createMutexAutomata();    // domenico
+			createMutexAutomata();    // domenico
 		}
 		catch (Exception ex)
 		{
@@ -753,9 +753,9 @@ End Sub
 
 			// CRASHES HERE IF ZONES ALREADY CREATED! FIXA!
 			// Create three boxes (IEntity:s), members of the IPart mutexPartName
-			// createBox(-0.25, 0.125, 0.75, 0, 0, 0, 0.5, 0.5, 0.5, "MutexZoneA");
-			// createBox(-0.25, -0.625, 0.75, 0, 0, 0, 0.5, 0.5, 0.5, "MutexZoneB");
-			// createBox(-0.125, -0.125, 0.875, 0, 0, 0, 0.25, 0.25, 0.25, "MutexZoneC");
+			createBox(-0.25, 0.125, 0.75, 0, 0, 0, 0.5, 0.5, 0.5, "MutexZoneA");
+			createBox(-0.25, -0.625, 0.75, 0, 0, 0, 0.5, 0.5, 0.5, "MutexZoneB");
+			createBox(-0.125, -0.125, 0.875, 0, 0, 0, 0.25, 0.25, 0.25, "MutexZoneC");
 			// 3 equal boxes
 			//createBox(-0.1875, 0.1875, 0.75, 0, 0, 0, 0.375, 0.375, 0.375, "MutexZoneA");
 			//createBox(-0.1875, -0.5625, 0.75, 0, 0, 0, 0.375, 0.375, 0.375, "MutexZoneB");
@@ -796,7 +796,7 @@ End Sub
 			*/
 
 			// Create automata for each entity in the IPart called mutexPartName
-			//createMutexAutomata();                                     //Domenico
+			createMutexAutomata();                                     //Domenico
 		}
 		catch (Exception ex)
 		{
