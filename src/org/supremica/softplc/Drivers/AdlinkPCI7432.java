@@ -29,6 +29,8 @@ public class AdlinkPCI7432
 	private static final boolean[] defaultOutputs = new boolean[nrOfDigitalOutputs];
 	private static final short nrOfSignalsIn = 32;
 	private static final short nrOfSignalsOut = 32;
+        
+        private boolean[] outputs = null;
 
 	public AdlinkPCI7432()
 		throws Exception
@@ -103,7 +105,7 @@ public class AdlinkPCI7432
 		}
 
 		int value = toInt(outputs, invertOutputs);
-
+		this.outputs = outputs;
 		//		System.err.println("Wrote: " + value);
 		AdlinkPCI7432.WritePort(card, (short) 0, value);
 	}
@@ -229,6 +231,11 @@ public class AdlinkPCI7432
 		getSignalArray(inputs);
 		System.out.println(AdlinkPCI7432.toString(inputs));
 	}
+	public void printOutputs()
+		throws Exception
+	{
+		System.out.println(AdlinkPCI7432.toString(outputs));
+	}
 
 	public static void main(String[] args)
 		throws Exception
@@ -240,6 +247,7 @@ public class AdlinkPCI7432
 		System.out.println("s 1: for setting output 1");
 		System.out.println("r 2: for resetting output 2");
 		System.out.println("d: for displaying inputs");
+		System.out.println("o: for displaying outputs");
 		System.out.println("q: for quitting");
 
 		boolean cont = true;
@@ -270,6 +278,10 @@ public class AdlinkPCI7432
 			else if (operation == 'd')
 			{
 				driver.printInputs();
+			}
+			else if (operation == 'o')
+			{
+				driver.printOutputs();
 			}
 			else if (operation == 'q')
 			{
