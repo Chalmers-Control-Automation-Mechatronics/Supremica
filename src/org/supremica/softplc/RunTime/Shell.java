@@ -172,7 +172,7 @@ public class Shell
     public static void main(String args[])
     {
 	process_args(args);
-	new Shell(ioclass, ilclass, "");
+	new Shell(ioclass, ".", ilclass);
 
 	/*
 	 *  case 1:

@@ -4,7 +4,7 @@ if [ -n "$SUPREMICADEV_PATH" ]
 then
 	echo ""
 else
-	SUPREMICADEV_PATH="../.." 
+	SUPREMICADEV_PATH="../.."
 fi
 
 if [ -z "$2" ]
