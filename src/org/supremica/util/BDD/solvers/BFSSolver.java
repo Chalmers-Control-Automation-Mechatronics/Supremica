@@ -87,12 +87,19 @@ public class BFSSolver
 				}
 			}
 
-			// see if we screwed ...
-			if (verify_order_integrity(tmp))
-			{
 
-				// WHAT DO WE DO NOW???
+			// extra integrity test
+			if(Options.test_integrity)
+			{
+				// see if we screwed ...
+				if (verify_order_integrity(tmp))
+				{
+
+					// WHAT DO WE DO NOW???
+				}
 			}
+
+
 
 			double cost = totalCost(tmp);
 

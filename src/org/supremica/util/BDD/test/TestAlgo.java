@@ -395,6 +395,7 @@ public class TestAlgo
 	public void runTests()
 		throws Exception
 	{
+		Options.test_integrity = true; // enable extra runtime tests!
 		fail = pass = 0;
 
 		// we will use AGV in this experiment
@@ -649,6 +650,10 @@ public class TestAlgo
 
 /*
  $Log: not supported by cvs2svn $
+ Revision 1.20  2004/08/10 15:20:23  vahidi
+ Finally rewrote DisjOptimizer and added optimization to some search functions
+ (not yet workset)
+
  Revision 1.19  2004/08/03 12:23:24  vahidi
  The testbed now also tests the H1 and H2 heuristics with workset and monotonic-workset
 

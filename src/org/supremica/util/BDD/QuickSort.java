@@ -7,6 +7,26 @@ package org.supremica.util.BDD;
 public class QuickSort
 {
 
+	// ----[ bubble-sort, when quick-sort is an overkill ]---------------------------------------------
+
+	/** bubble sort for list of Objects */
+	public static void bubble_sort(double [] weights, Object [] data, int len) {
+		for (int i = len; --i >= 0; ) {
+		boolean flipped = false;
+			for (int j = 0; j<i; j++) {
+				if( weights[j+1] < weights[j]) {
+					// SWAP
+					Object tmp1 = data[j]; data[j] = data[j+1]; data[j+1] = tmp1;
+					double tmp2 = weights[j]; weights[j] = weights[j+1]; weights[j+1] = tmp2;
+					flipped = true;
+				}
+			}
+			if (!flipped)
+				return;
+		}
+	}
+
+
 	// ----[ quicksort for WeightedObject ]-----------------------------------------------
 
 	/** helper function to quicksort (quicksort partition) */
@@ -147,10 +167,20 @@ public class QuickSort
 	 */
 	public static void sort(Object[] array, double[] cost, int size, boolean reverse)
 	{
+
+
 		oarray_ = array;
 		cost_ = cost;
 
-		oquicksort_(0, size - 1);
+		if(size >= Options.MIN_QUICKSORT_THRESHOLD)
+		{
+			oquicksort_(0, size - 1);
+		}
+		else
+		{
+			bubble_sort(cost, array, size);
+		}
+
 
 		if (reverse)
 		{

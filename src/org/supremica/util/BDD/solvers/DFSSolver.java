@@ -52,7 +52,7 @@ public class DFSSolver
 			}
 
 			// sort element 'start' to 'tos'-1
-			sort(stack, start, tos, curr);
+			sort(stack, start, tos-1, curr);
 		}
 
 		// fix those with no ordering:

@@ -254,6 +254,7 @@ public class Options
 	// --- [ constants ] -------------------------------------------------
 	public static final int LINE_WIDTH = 55;    // # of chars per line?, screen width
 	private static final int DEFAULT_MAX_PARTITION_SIZE = 3000;    // max nodes/partition
+	public static final int MIN_QUICKSORT_THRESHOLD = 8; // when to start using quick sort
 	public static int max_partition_size = DEFAULT_MAX_PARTITION_SIZE;
 
 	/** number of seconds an algorithm is allowed to run before it is aborted, -1 means DISABLED */
@@ -274,6 +275,8 @@ public class Options
 	public static boolean uc_optimistic = true;
 	public static boolean nb_optimistic = true;
 	public static boolean burst_mode = false;
+	public static boolean test_integrity = false; /** enables some internal test routines that are usually turned off to save time */
+
 
 
 	/** initial burst mode: to do some initial work before the reachability algo realy starts */

@@ -1,5 +1,7 @@
 package org.supremica.util.BDD.solvers;
 
+import org.supremica.util.BDD.*;
+
 /**
  * Ordering solver base class.
  *
@@ -11,12 +13,17 @@ public abstract class Solver
 {
 	protected int size;
 	protected Node[] org, solved;
+	private double [] internal_weight; /** for internal sorting */
+	private Node [] internal_object; /** for internal sorting */
 
 	public Solver(Node[] org_)
 	{
 		this.org = org_;
 		this.size = org_.length;
-		solved = new Node[size];
+		this.solved = new Node[size];
+
+		this.internal_object = new Node[size];
+		this.internal_weight = new double[size];
 
 		solve();
 	}
@@ -111,9 +118,20 @@ public abstract class Solver
 	/**
 	 * just sort so the automaton with largest dependency gets places on top of stack and
 	 * therefor traversed first :)
+	 *
+	 * <p> side-effect: org[].extra3 changed
 	 */
 	protected final void sort(int[] data, int start, int end, int parent)
 	{
+
+		// only one element, nothing to do
+		if(start == end)
+		{
+			return;
+		}
+
+		/*
+		// The old version:
 		for (int i = start; i < end; i++)
 		{
 			int min = i;
@@ -130,6 +148,32 @@ public abstract class Solver
 
 			data[min] = data[i];
 			data[i] = tmp;
+		}
+		*/
+
+
+		// 1. first make an (object, weight) pair so we can send it to quick-sort
+		int count = 0;
+		for(int i = start; i <= end; i++)
+		{
+			internal_weight[count]  = org[data[i]].wlocal[parent];
+			internal_object[count]  = org[data[i]];
+			internal_object[count].extra3 = data[i];
+			count++;
+		}
+
+		// 2. disturb the order for better sorting (TODO)
+
+
+		// 3. sort...
+		QuickSort.sort(internal_object, internal_weight,count, true);
+
+		// 4. ... and write back
+		for(int i = 0; i < count; i++)
+		{
+			int value = internal_object[i].extra3;
+			int index = i + start;
+			data[index] =  value;
 		}
 	}
 }
