@@ -306,7 +306,7 @@ public class TestAlgo
 
 		System.out.print("NB ");
 
-		boolean nb = verifier.isNonblocking();
+		boolean nb = verifier.isNonBlocking();
 
 		if (nb != result)
 		{
@@ -767,6 +767,10 @@ public class TestAlgo
 
 /*
  $Log: not supported by cvs2svn $
+ Revision 1.28  2004/10/29 07:49:57  vahidi
+
+ (mostly bug fixes)
+
  Revision 1.27  2004/10/28 16:44:31  flordal
  *** empty log message ***
 
