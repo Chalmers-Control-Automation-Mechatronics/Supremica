@@ -72,8 +72,6 @@ import org.supremica.automata.algorithms.SynchronizationType;
  * 
  */
 
-// TODO: Get rid of the internal variables
-// TODO: Make the generated function behave according to agreement
 // TODO: Make state variables int
 // TODO: Make comments optional
 
@@ -115,16 +113,7 @@ public class AutomataToIEC61499
 		//pw.println("(* Supremica version: " + org.supremica.Version.version() + "*)");
 		//pw.println("(* Time of generation: + DateFormat.getDateTimeInstance().format(new Date()) +" *)");
 				
-		pw.println("FUNCTION_BLOCK AUTOGEN_AUTOMATA_FUNCTION_BLOCK"
-					+ "\t"
-					+ "(* " 
-					+ "Supremica version: " 
-					+ org.supremica.Version.version()
-					+ "\t"
-					+ "Time of generation: " 
-					+ DateFormat.getDateTimeInstance().format(new Date()) 
-					+ " *)"
-					);
+		pw.println("FUNCTION_BLOCK AUTOGEN_AUTOMATA_FUNCTION_BLOCK"); // + "\t" + "(* " + "Supremica version: " + org.supremica.Version.version() + "\t" + "Time of generation: " + DateFormat.getDateTimeInstance().format(new Date()) + " *)");
 
 	}
 
@@ -181,12 +170,13 @@ public class AutomataToIEC61499
 		
 		
 		// The input_variable_list. Input variables represent the automaton events and are of the
-		// bool type. Only one can be true when the OCCURRED event happens.
+		// bool type. Only one should be TRUE when the OCCURRED event happens but if several are TRUE
+		// all of the transitions will take place. The user have to make shure that this is possible!
 		pw.println("VAR_INPUT");		
 		for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext();)
 		{
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-			pw.println("\tEI_" + currEvent.getSynchIndex() + " : BOOL;\t(* " + currEvent.getLabel() + " *)");
+			pw.println("\tEI_" + currEvent.getSynchIndex() + " : BOOL;"); //\t(* " + currEvent.getLabel() + " *)");
 		}
 		pw.println("END_VAR");
 
@@ -210,17 +200,6 @@ public class AutomataToIEC61499
 	private void printInternalVariableList(PrintWriter pw) 
 	{
 		pw.println("VAR");
-
-		// Not needed acctually
-		// Internal event variables
-		//for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext();) 
-		//{
-		//	LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-		//	pw.println("\te_" + currEvent.getSynchIndex() + " : BOOL;");
-		//}
-
-		// Not needed any more
-		//pw.println(	"\tenabledEvent : BOOL;" + "(* True if an event is enabled, false otherwise *)");
 		
 		// State variables
 		for (Iterator autIt = theProject.iterator(); autIt.hasNext(); )
@@ -236,10 +215,7 @@ public class AutomataToIEC61499
 				theHelper.printBooleanVariableDeclaration(pw, "Q_" + currAutomatonIndex + "_" + currStateIndex, currState.getName() + " in " + currAutomaton.getName(),1);
 			}
 		}
-		
-		// Not needed since we have to do an INIT befor accepting the OCCURRED
-		//theHelper.printBooleanVariableDeclaration(pw, "initialized", "Set the inital state the first scan cycle",1);
-		
+				
 		pw.println("END_VAR");
 	}
 
@@ -252,7 +228,6 @@ public class AutomataToIEC61499
 		
 		// Execution Control Chart (ECC) is the same for all function blocks of this type		
 		
-		
 		// States of the ECC
 		pw.println("EC_STATES");
 		pw.println("\tSTART;");
@@ -261,7 +236,6 @@ public class AutomataToIEC61499
 		pw.println("\tTRANSITION : TRANSITION;");
 		pw.println("\tCOMP_ENABLED : COMP_ENABLED -> DONE;");
 		pw.println("END_STATES");
-	
 	
 		// Transitions of the ECC
 		pw.println("EC_TRANSITIONS");
@@ -273,7 +247,6 @@ public class AutomataToIEC61499
 		pw.println("\tCOMP_ENABLED TO START := 1;");
 		pw.println("\tTRANSITION TO COMP_ENABLED := 1;");
 		pw.println("END_TRANSITIONS");
-	
 	
 	}
 
@@ -296,12 +269,6 @@ public class AutomataToIEC61499
 		// RESET algorithm resets the automata in the function block. In other words it
 		// makes automata enter the initial state.
 		pw.println("ALGORITHM RESET IN ST :");
-		// Not needed anymore
-		//pw.println("\tinitialized := FALSE;");
-		// theAutomataToIEC1131.printInitializationStructureAsST(pw);
-		//pw.println("\n\t(* Set the initial state *)");
-		//pw.println("\tIF (NOT initialized)");
-		//pw.println("\tTHEN");
 
 		// Set all state variables to FALSE
 		for (Iterator autIt = theProject.iterator(); autIt.hasNext(); )
@@ -334,9 +301,6 @@ public class AutomataToIEC61499
 
 			pw.println("\tQ_" + currAutomaton.getSynchIndex() + "_" + currAutomaton.getInitialState().getSynchIndex() + " := TRUE;");
 		}
-
-		//pw.println("\t\tinitialized := TRUE;");
-		//pw.println("\tEND_IF;");
 		
 		pw.println("END_ALGORITHM");
 
@@ -344,108 +308,9 @@ public class AutomataToIEC61499
 		
 		// TRANSITION algorithm makes the transition corresponding to the automaton event that occurred.
 		pw.println("ALGORITHM TRANSITION IN ST :");
-		
-		// input variables to internal variables
-		//for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext();)
-		//{
-		//	LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-		//	pw.println("\te_" + currEvent.getSynchIndex() + " := " + "\tEI_" + currEvent.getSynchIndex() + ";");
-		//}
-		// Not needed anymore
-		
-		
-		// Already done by COMP_ENABLED algorithm, just use the output variables
-		
-		//	theAutomataToIEC1131.printComputeEnabledEventsAsST(pw);
-		//pw.println("\n\tenabledEvent = FALSE;");
-		//pw.println("\n\t(* Compute the enabled events *)");
-	
-//		// Iterate over all events and compute which events that are enabled
-//		for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext(); )
-//		{
-//			while (alphIt.hasNext())
-//			{
-//				LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-//				int currEventIndex = currEvent.getSynchIndex();
-//
-//				pw.println("\n\t(* Enable condition for event \"" + currEvent.getLabel() + "\" *)");
-//
-//				boolean previousCondition = false;
-//
-//				pw.print("\te_" + currEventIndex + " := ");
-//
-//				for (Iterator autIt = theProject.iterator(); autIt.hasNext(); )
-//				{
-//					Automaton currAutomaton = (Automaton) autIt.next();
-//					Alphabet currAlphabet = currAutomaton.getAlphabet();
-//					int currAutomatonIndex = currAutomaton.getSynchIndex();
-//
-//					if (syncType == SynchronizationType.Prioritized)
-//					{    // All automata that has this event as prioritized must be able to execute it
-//						if (currAlphabet.containsEqualEvent(currEvent) && currAlphabet.isPrioritized(currEvent))
-//						{    // Find all states that enables this event
-//
-//							// Use OR between states in the same automaton.
-//							// Use AND between states in different automata.
-//							if (previousCondition)
-//							{
-//								pw.print(" AND ");
-//							}
-//							else
-//							{
-//								previousCondition = true;
-//							}
-//
-//							boolean previousState = false;
-//
-//							pw.print("(");
-//
-//							for (Iterator stateIt = currAutomaton.statesThatEnableEventIterator(currEvent.getLabel());
-//									stateIt.hasNext(); )
-//							{
-//								State currState = (State) stateIt.next();
-//								int currStateIndex = currState.getSynchIndex();
-//
-//								if (previousState)
-//								{
-//									pw.print(" OR ");
-//								}
-//								else
-//								{
-//									previousState = true;
-//								}
-//
-//								pw.print("q_" + currAutomatonIndex + "_" + currStateIndex);
-//							}
-//
-//							if (!previousState)
-//							{
-//								pw.print(" FALSE ");
-//							}
-//
-//							pw.print(")");
-//						}
-//					}
-//					else
-//					{
-//						String errMessage = "Unsupported SynchronizationType";
-//
-//						logger.error(errMessage);
-//
-//						throw new IllegalStateException(errMessage);
-//					}
-//				}
-//
-//				pw.println(";");
-//			}
-//		}
-
-		//	theAutomataToIEC1131.printComputeSingleEnabledEventAsST(pw);
-		// Not needed.
-
-		//	theAutomataToIEC1131.printChangeStateTransitionsAsST(pw); 
-		pw.println("\n\t(* Change state in the automata *)");
-		pw.println("\t(* It is in general not safe to have more than one event set to true at this point *)");
+						
+		// pw.println("\n\t(* Change state in the automata *)");
+		//pw.println("\t(* It is in general not safe to have more than one event set to true at this point *)");
 
 		// Iterate over all events and make transitions for the enabled events
 		for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext();)
@@ -453,7 +318,7 @@ public class AutomataToIEC61499
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
 			int currEventIndex = currEvent.getSynchIndex();
 
-			pw.println("\n\t(* Transition for event \"" + currEvent.getLabel() + "\" *)");
+			//pw.println("\n\t(* Transition for event \"" + currEvent.getLabel() + "\" *)");
 
 			boolean previousCondition = false;
 
@@ -475,7 +340,7 @@ public class AutomataToIEC61499
 						throw new SupremicaException("AutomataToIEC61499.printAlgorithmDeclarations: " + "Could not find " + currEvent.getLabel() + " in automaton " + currAutomaton.getName());
 					}
 
-					pw.println("\n\t\t(* Transitions in " + currAutomaton.getName() + " *)");
+					//pw.println("\n\t\t(* Transitions in " + currAutomaton.getName() + " *)");
 
 					boolean previousState = false;
 
@@ -512,7 +377,7 @@ public class AutomataToIEC61499
 						}
 						else
 						{
-							pw.println("\t\t(* Q_" + currAutomatonIndex + "_" + currStateIndex + "  has EI_" + currEventIndex + " as self loop, no transition *)");
+							//pw.println("\t\t(* Q_" + currAutomatonIndex + "_" + currStateIndex + "  has EI_" + currEventIndex + " as self loop, no transition *)");
 						}
 					}
 
@@ -533,9 +398,8 @@ public class AutomataToIEC61499
 		// COMP_ENABLED algorithm computes the enabled automata events in the states of automat after
 		// the transition.
 		pw.println("ALGORITHM COMP_ENABLED IN ST :");
-		//theAutomataToIEC1131.printComputeEnabledEventsAsST(pw);
-		//pw.println("\n\tenabledEvent = FALSE;");
-		pw.println("\n\t(* Compute the enabled events *)");
+
+		//pw.println("\n\t(* Compute the enabled events *)");
 
 		// Iterate over all events and compute which events that are enabled
 		for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext(); )
@@ -545,7 +409,7 @@ public class AutomataToIEC61499
 				LabeledEvent currEvent = (LabeledEvent) alphIt.next();
 				int currEventIndex = currEvent.getSynchIndex();
 
-				pw.println("\n\t(* Enable condition for event \"" + currEvent.getLabel() + "\" *)");
+				//pw.println("\n\t(* Enable condition for event \"" + currEvent.getLabel() + "\" *)");
 
 				boolean previousCondition = false;
 
@@ -617,16 +481,6 @@ public class AutomataToIEC61499
 			}
 		}
 
-
-		// Not needed anymore
-		// internal variables to output variables
-		//pw.println();
-		//for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext();)
-		//{
-		//	LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-		//	pw.println("\tEO_" + currEvent.getSynchIndex() + " := " + "\te_" + currEvent.getSynchIndex() + ";");
-		//}
-		//pw.println();
 		pw.println("END_ALGORITHM");
 
 	}
