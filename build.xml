@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
 
-<project name="Supremica and JGrafChart" default="rebuild" basedir=".">
+<project name="Supremica" default="rebuild" basedir=".">
 
 <property name="src" value="src"/>
 <property name="testssrc" value="tests/src"/>
@@ -105,6 +105,14 @@
 	<unjar src="${lib}/jgl3.1.0.jar" dest="${lib}/${unjared}"/>
 	<unjar src="${lib}/izmcomjni.jar" dest="${lib}/${unjared}"/>
 	<unjar src="${lib}/ctrlmngr.jar" dest="${lib}/${unjared}"/>	
+	<unjar src="${lib}/CCOM.jar" dest="${lib}/${unjared}"/>	
+	<unjar src="${lib}/jacorb.jar" dest="${lib}/${unjared}"/>	
+	<unjar src="${lib}/jutils.jar" dest="${lib}/${unjared}"/>	
+	<unjar src="${lib}/xalan.jar" dest="${lib}/${unjared}"/>	
+	<unjar src="${lib}/xmlBlaster.jar" dest="${lib}/${unjared}"/>	
+	<unjar src="${lib}/xtdash.jar" dest="${lib}/${unjared}"/>	
+	<unjar src="${lib}/jgrafchart.jar" dest="${lib}/${unjared}"/>	
+	
 	<unjar src="${lib}/interfaceRobotStudio2_1.jar" dest="${lib}/${unjared}"/>	
 
 	<mkdir dir="${lib}/licensed"/>
@@ -174,7 +182,7 @@
 *	Reuses existing class files, but recompiles those
 *	source files that have changed.
 -->
-<target name="compile" depends="compile_supremica,compile_tests_supremica,compile_jgrafchart">
+<target name="compile" depends="compile_supremica,compile_tests_supremica">
 	<javac
 		srcdir="${src}"
 		destdir="${build}"
@@ -234,6 +242,7 @@
 *	Reuses existing class files, but recompiles those
 *	source files that have changed.
 -->
+<!-- 
 <target name="compile_jgrafchart">
 	<javac
 		srcdir="${src}"
@@ -249,6 +258,7 @@
 	/>
 
 </target>
+-->
 
 <!-- Compile Runtime
 *	Reuses existing class files, but recompiles those
@@ -271,7 +281,7 @@
 *	A standard compilation followed by packaging
 *	all files into a jar file. 
 -->
-<target name="build" depends="compile,jar,startfiles_supremica,startfiles_jgrafchart">
+<target name="build" depends="compile,jar,startfiles_supremica">
 </target>
 
 <!-- Rebuild:
@@ -332,22 +342,28 @@
 *	A standard compilation followed by packaging
 *	all files into a jar file. 
 -->
+<!--
 <target name="build_jgrafchart" depends="compile_jgrafchart,jar_jgrafchart,startfiles_jgrafchart">
 </target>
+-->
 
 <!-- Rebuild:
 *	Deletes all existing class files, recompiles all files,
 *	and packages all files into a jar file that can
 *	be executed without any other dependencies. 
 -->
+<!--
 <target name="rebuild_jgrafchart" depends="clean,version,build_jgrafchart,jar_supremica_lib">
 </target>
+-->
 
+<!--
 <target name="jar_jgrafchart">
 	<jar jarfile="${dist}/Supremica.jar" manifest="${templates}/JGRAFCHART_MANIFEST.MF"> 
 		<fileset dir="${build}"/>
 	</jar>
 </target>
+-->
 
 <target name="jar_supremica_lib">
 	<jar jarfile="${dist}/SupremicaLib.jar"> 
@@ -454,14 +470,16 @@
 	<chmod file="${dist}/SupremicaTeacher.cmd" perm="644"/>
 </target>
 
+<!--
 <target name="startfiles_jgrafchart">
 	<copy file="${templates}/JGrafChart" todir="${dist}"/>	
 	<chmod file="${dist}/JGrafChart" perm="755"/>	
 	<copy file="${templates}/JGrafChart.cmd" todir="${dist}"/>	
 	<chmod file="${dist}/JGrafChart.cmd" perm="644"/>
 </target>
+-->
 
-<target name="doc" depends="doc_supremica,doc_jgrafchart">
+<target name="doc" depends="doc_supremica">
 </target>
 
 <target name="run_tests" depends="run_tests_supremica">
@@ -498,6 +516,7 @@
 	</javadoc>
 </target>
 
+<!--
 <target name="doc_jgrafchart">
 	<javadoc
 		sourcepath="${src}"
@@ -514,6 +533,7 @@
 		bottom="Copyright &#169; 2001 Karl-Erik Arzen. All Rights Reserved.">
 	</javadoc>
 </target>
+-->
 
 <target name="run">
 	<java classname="${supremica_basepackage}.apps.Supremica" fork="yes">
