@@ -49,76 +49,15 @@
 /*
  * @author cengic
  */
-package org.supremica.functionblocks.model;
+package org.supremica.functionblocks.model.interpreters.st.abstractsyntax;
 
-import java.lang.Exception;
-import java.io.StringReader;
-import java.io.FileReader;
-import java.io.Reader;
-import java_cup.runtime.Scanner;
-import java_cup.runtime.Symbol;
-import org.supremica.functionblocks.model.interpreters.st.*;
-import org.supremica.functionblocks.model.interpreters.st.abstractsyntax.Expression;
-
-
-public class ECCondition
+public class BinaryPowerExpression extends PowerExpression
 {
+
+	public PowerExpression a,b;
 	
-	private String condition = "";
-
-	private Expression abstractSyntax = null;
-
-	private ECCondition() {}
-
-	public ECCondition(String condition)
-	{
-		
-		System.out.println("ECCondition: New instance: " + condition);
-		set(condition);
-	}
-
-	public void set(String cond)
-	{
+	private BinaryPowerExpression() {}
 	
-		condition = cond;
-		
-		StringReader stringReader = new StringReader(condition);
-		
-		Lexer lexer = new Lexer((Reader) stringReader);
+	public BinaryPowerExpression(PowerExpression aa, PowerExpression bb) {a=aa;b=bb;}
 
-		Parser parser = new Parser((Scanner) lexer);
-
-		try 
-		{
-			System.out.println("ECCondition: Parsing...");
-			abstractSyntax = (Expression) parser.parse().value;
-		} 
-		catch(Exception e) 
-		{
-			
-		}
-
-	}
-
-	public String get()
-	{
-		return condition;
-	}
-
-	public Object evaluate(Variables vars)
-	{
-		
-		System.out.println("ECCondition: evaluate()");
-		try 
-		{ 
-			return (new Evaluator(vars)).evalExpression(abstractSyntax);
-		} 
-		catch(Exception e) 
-		{
-			System.out.println(e.toString());
-			System.exit(0);
-		}
-		return null;
-	}
-	
 }

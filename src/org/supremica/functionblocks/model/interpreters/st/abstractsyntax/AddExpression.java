@@ -49,76 +49,10 @@
 /*
  * @author cengic
  */
-package org.supremica.functionblocks.model;
-
-import java.lang.Exception;
-import java.io.StringReader;
-import java.io.FileReader;
-import java.io.Reader;
-import java_cup.runtime.Scanner;
-import java_cup.runtime.Symbol;
-import org.supremica.functionblocks.model.interpreters.st.*;
-import org.supremica.functionblocks.model.interpreters.st.abstractsyntax.Expression;
+package org.supremica.functionblocks.model.interpreters.st.abstractsyntax;
 
 
-public class ECCondition
+public abstract class AddExpression
 {
-	
-	private String condition = "";
-
-	private Expression abstractSyntax = null;
-
-	private ECCondition() {}
-
-	public ECCondition(String condition)
-	{
-		
-		System.out.println("ECCondition: New instance: " + condition);
-		set(condition);
-	}
-
-	public void set(String cond)
-	{
-	
-		condition = cond;
-		
-		StringReader stringReader = new StringReader(condition);
-		
-		Lexer lexer = new Lexer((Reader) stringReader);
-
-		Parser parser = new Parser((Scanner) lexer);
-
-		try 
-		{
-			System.out.println("ECCondition: Parsing...");
-			abstractSyntax = (Expression) parser.parse().value;
-		} 
-		catch(Exception e) 
-		{
-			
-		}
-
-	}
-
-	public String get()
-	{
-		return condition;
-	}
-
-	public Object evaluate(Variables vars)
-	{
-		
-		System.out.println("ECCondition: evaluate()");
-		try 
-		{ 
-			return (new Evaluator(vars)).evalExpression(abstractSyntax);
-		} 
-		catch(Exception e) 
-		{
-			System.out.println(e.toString());
-			System.exit(0);
-		}
-		return null;
-	}
 	
 }

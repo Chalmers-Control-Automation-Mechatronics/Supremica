@@ -50,6 +50,7 @@
  * @author cengic
  */
 package org.supremica.functionblocks.model.interpreters.st;
+import org.supremica.functionblocks.model.interpreters.st.abstractsyntax.*;
 
 import org.supremica.functionblocks.model.Variables;
 import org.supremica.functionblocks.model.Variable;

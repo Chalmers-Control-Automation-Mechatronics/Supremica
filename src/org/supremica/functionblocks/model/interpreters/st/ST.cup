@@ -2,6 +2,7 @@
 
 package org.supremica.functionblocks.model.interpreters.st;
 
+import org.supremica.functionblocks.model.interpreters.st.abstractsyntax.*;
 import java_cup.runtime.*;
 import java.lang.*;
 
