@@ -47,12 +47,15 @@
  * Supremica is owned and represented by KA.
  */
 
+/*
+ * Created on Dec 16, 2004
+ */
 package org.supremica.functionblocks.model;
 
 /**
- * @author Cengic
+ * @author cengic
  */
-public class NamedObject extends ManagedObject
+public class ServiceFBInstance
 {
 
 }

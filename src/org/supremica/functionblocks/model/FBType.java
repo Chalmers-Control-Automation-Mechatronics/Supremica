@@ -62,7 +62,7 @@ public abstract class FBType extends NamedObject
     FBNetwork fbNetwork = null;
     String service = null;
 
-    private FBType()
+    public FBType()
     {
     }
 

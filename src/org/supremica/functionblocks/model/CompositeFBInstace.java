@@ -47,87 +47,15 @@
  * Supremica is owned and represented by KA.
  */
 
+/*
+ * Created on Dec 16, 2004
+ */
 package org.supremica.functionblocks.model;
 
-import java.util.*;
-/*
-<!ELEMENT FBNetwork (FB*,EventConnections?,DataConnections?,AdapterConnections?)>
-<!ELEMENT FB EMPTY>
-<!ATTLIST FB
- Name CDATA #REQUIRED
- Type CDATA #REQUIRED
- Comment CDATA #IMPLIED
-  x CDATA #IMPLIED
-  y CDATA #IMPLIED
->
-
-*/
-
-public class FBNetwork
+/**
+ * @author cengic
+ */
+public class CompositeFBInstace
 {
-	List FB = new LinkedList();
-	EventConnections eventConnections = null;
-	DataConnections dataConnections = null;
-	AdapterConnections adapterConnections = null;
 
-	String name;
-	String type;
-	String comment;
-	float x;
-	float y;
-
-	private FBNetwork()
-	{
-	}
-
-	public FBNetwork(String name, String type)
-	{
-		this.name = name;
-		this.type = type;
-	}
-
-	public boolean hasEventConnections()
-	{
-		return eventConnections != null;
-	}
-
-	public EventConnections getEventConnections()
-	{
-		return eventConnections;
-	}
-
-	public void setEventConnections(EventConnections theConnections)
-	{
-		this.eventConnections = theConnections;
-	}
-
-	public boolean hasDataConnections()
-	{
-		return dataConnections != null;
-	}
-
-	public DataConnections getDataConnections()
-	{
-		return dataConnections;
-	}
-
-	public void setDataConnections(DataConnections theConnections)
-	{
-		this.dataConnections = theConnections;
-	}
-
-	public boolean hasAdapterConnections()
-	{
-		return adapterConnections != null;
-	}
-
-	public AdapterConnections getAdapterConnections()
-	{
-		return adapterConnections;
-	}
-
-	public void setAdapterConnections(AdapterConnections theConnections)
-	{
-		this.adapterConnections = theConnections;
-	}
 }

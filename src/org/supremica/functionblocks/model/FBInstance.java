@@ -52,10 +52,9 @@ package org.supremica.functionblocks.model;
 /**
  * @author Cengic
  */
-public class FBInstance extends FBType
+public abstract class FBInstance extends NamedObject
 {
     public FBInstance(String name)
     {
-        super(name);
     }
 }

@@ -55,7 +55,7 @@ package org.supremica.functionblocks.model;
 /**
  * @author cengic
  */
-public abstract class EventType
+public abstract class EventType extends NamedObject
 {
 
 }
