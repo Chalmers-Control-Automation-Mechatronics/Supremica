@@ -65,7 +65,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import org.supremica.gui.*;
 import org.supremica.log.*;
-import org.supremica.external.shoefactory.Executor.*;
+// import org.supremica.external.shoefactory.Executor.*;
 
 public class Configit extends JFrame
 	implements ActionListener
