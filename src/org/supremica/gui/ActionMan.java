@@ -504,11 +504,13 @@ public class ActionMan
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
 
+/* What the f*** is this doing here? Someone thought something...
+
 		if (!selectedAutomata.sanityCheck(gui, 1))
 		{
 			return;
 		}
-
+*/
 		/*
 		Automata selectedAutomata = gui.getSelectedAutomata();
 
