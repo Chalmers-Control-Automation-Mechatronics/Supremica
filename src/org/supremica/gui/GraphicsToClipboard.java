@@ -113,7 +113,6 @@ public class GraphicsToClipboard
 
 		temp.deleteOnExit();
 
-		//save the WMF to an OutputStream with a placeable WMF header
 		FileOutputStream out = null;
 		try
 		{
@@ -127,14 +126,8 @@ public class GraphicsToClipboard
 
 		try
 		{
-			if (false)
-			{
-				wmf.writePlaceableWMF(out, 0, 0, width, height, Toolkit.getDefaultToolkit().getScreenResolution());
-			}
-			else
-			{
-				wmf.writeWMF(out);
-			}
+			wmf.writeWMF(out);
+			//wmf.writePlaceableWMF(out, 0, 0, width, height, Toolkit.getDefaultToolkit().getScreenResolution());
 		}
 		catch (IOException ex)
 		{
@@ -152,8 +145,55 @@ public class GraphicsToClipboard
 			return;
 		}
 
-		clipboardCopy.copyWithPixelSize(temp.getAbsolutePath(), width, height, false);
+		int result = clipboardCopy.copyWithPixelSize(temp.getAbsolutePath(), width, height, false);
+		if (result != 0)
+		{
+			logger.error("Error when copying to clipboard, error code: " + result);
+		}
 		temp.delete();
+
+		copyToFile();
+	}
+
+
+	public void copyToFile()
+	{
+		File temp = new File("c:/temp/SupremicaWMF.wmf");
+
+		temp.deleteOnExit();
+
+		//save the WMF to an OutputStream with a placeable WMF header
+		FileOutputStream out = null;
+		try
+		{
+			out = new FileOutputStream(temp.getAbsolutePath());
+		}
+		catch (FileNotFoundException ex)
+		{
+			logger.error(ex);
+			return;
+		}
+
+		try
+		{
+			wmf.writePlaceableWMF(out, 0, 0, width, height, Toolkit.getDefaultToolkit().getScreenResolution());
+		}
+		catch (IOException ex)
+		{
+			logger.error(ex);
+			return;
+		}
+
+		try
+		{
+			out.close();
+		}
+		catch (IOException ex)
+		{
+			logger.error(ex);
+			return;
+		}
+
 	}
 
 

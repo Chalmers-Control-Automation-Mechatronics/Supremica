@@ -620,7 +620,7 @@ public class DotViewer
 			toClipboard = GraphicsToClipboard.getInstance();
 		}
 
-		Rectangle2D bb = theGraph.getBoundingBox();
+		Rectangle2D bb = theGraph.resetBoundingBox();
 
 		double minX = bb.getMinX();
 		double maxX = bb.getMaxX();
@@ -630,8 +630,13 @@ public class DotViewer
 		logger.debug("minX: " + minX + " maxX: " + maxX + " minY: " + minY + " maxY: " + maxY);
 
 		//create a WMF object
-		int width = (int)(maxX - minX) + 20;
-		int height = (int)(maxY - minY) + 20;
+		int width = (int)(maxX - minX) + 1;
+		int height = (int)(maxY - minY) + 1;
+
+		// Copy a larger area, approx 10 percent, there seems to be
+		// a problem with the size of wmf-data
+		width += (int)0.1*width;
+		height += (int)0.1*height;
 
 		Graphics theGraphics = toClipboard.getGraphics(width, height);
 		viewerPanel.paint(theGraphics);
