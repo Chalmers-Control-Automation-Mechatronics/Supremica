@@ -54,7 +54,9 @@ import java.util.*;
 public class LabeledEvent
 	implements Comparable
 {
+	// The id is the local identifier of an event, should be different from any other id:s in the same automaton
 	private String id = "";
+	// The label is what shows in the dot-figures, this is the global identifier of an event, appearing in the alphabet
 	private String label = "";
 	private boolean controllable = true;
 	private boolean prioritized = true;
@@ -173,16 +175,18 @@ public class LabeledEvent
 	public boolean equals(Object obj)
 	{
 		return equals((LabeledEvent)obj);
-//		throw new RuntimeException("LabeledEvent::equals(Object), not expected to be called!");
+		// throw new RuntimeException("LabeledEvent::equals(Object), not expected to be called!");
 		
 		// System.err.println("equalsObject");
 		// return this.label.equals(((LabeledEvent) obj).label);
 	}
+
 	// NOTE -- this one's experimental, while migrating to the real problem domain
 	// The Java people have messed it all up with inheriting equals(Object)
 	public boolean equals(LabeledEvent event)
 	{
-		return getId().equals(event.getId());
+		// return getId().equals(event.getId());
+		return getLabel().equals(event.getLabel());
 	}
 	
 	public boolean equals(String label)
