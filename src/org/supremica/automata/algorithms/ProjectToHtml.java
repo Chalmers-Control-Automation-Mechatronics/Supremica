@@ -62,6 +62,10 @@ public class ProjectToHtml
 	private Project project;
 	private File directory;
 	private boolean overwrite;
+	private int maxNbrOfStatesInPng;
+	private Process dotProcess;
+	private PrintWriter toDotWriter;
+	private InputStream fromDotStream;
 
 	public ProjectToHtml(Project project, File directory)
 	{
@@ -73,6 +77,8 @@ public class ProjectToHtml
 		{
 			logger.error("ProjectToHtml: You must export to a directory");
 		}
+
+		maxNbrOfStatesInPng = SupremicaProperties.getDotMaxNbrOfStatesWithoutWarning();
 	}
 
 	public void serialize()
@@ -160,6 +166,13 @@ public class ProjectToHtml
 			pw.println("<li> <a href=\"event" + event.getSynchIndex() + ".html\">" + normalize(event.getLabel()) + "</a></li>");
 		}
 		pw.println("</ul>");
+		boolean pngCreated = createPngFile(theAutomaton);
+		if (pngCreated)
+		{
+			pw.println("<center>");
+			pw.println("<img src=\"automaton" + theAutomaton.getSynchIndex() + ".png\"</img>");
+			pw.println("</center>");
+		}
 		printHtmlEnd(pw);
 	}
 
@@ -196,6 +209,74 @@ public class ProjectToHtml
 		pw.println("</html>");
 		pw.flush();
 		pw.close();
+	}
+
+
+	private boolean createPngFile(Automaton theAutomaton)
+		throws Exception
+	{
+		if (theAutomaton.nbrOfStates() > maxNbrOfStatesInPng)
+		{
+			return false;
+		}
+		File currFile = getFile("automaton" + theAutomaton.getSynchIndex() + ".png");
+
+		if (currFile != null)
+		{
+			if (!currFile.isDirectory())
+			{
+				try
+				{
+					AutomatonToDot exporter = new AutomatonToDot(theAutomaton);
+					exporter.setUseColors(true);
+
+					try
+					{
+						dotProcess = Runtime.getRuntime().exec(SupremicaProperties.getDotExecuteCommand() + " -Tpng");
+					}
+					catch (IOException ex)
+					{
+						logger.error("Cannot run dot. Make sure dot is in the path.");
+
+						throw ex;
+					}
+
+					OutputStream pOut = dotProcess.getOutputStream();
+					BufferedOutputStream pBuffOut = new BufferedOutputStream(pOut);
+
+					toDotWriter = new PrintWriter(pBuffOut);
+					fromDotStream = dotProcess.getInputStream();
+
+					// Send the file to dot
+					exporter.serialize(toDotWriter);
+					toDotWriter.close();
+
+					// Send the response to a file
+					FileOutputStream fw = new FileOutputStream(currFile);
+					BufferedOutputStream buffOutStream = new BufferedOutputStream(fw);
+					BufferedInputStream buffInStream = new BufferedInputStream(fromDotStream);
+					int currChar = buffInStream.read();
+
+					while (currChar != -1)
+					{
+						buffOutStream.write(currChar);
+
+						currChar = buffInStream.read();
+					}
+
+					buffInStream.close();
+					buffOutStream.close();
+				}
+				catch (Exception ex)
+				{
+					logger.error("Error while exporting " + currFile.getAbsolutePath() + "\n", ex);
+
+					return false;
+				}
+			}
+		}
+		return true;
+
 	}
 
 	/**
