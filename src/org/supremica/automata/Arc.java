@@ -143,7 +143,6 @@ public class Arc
 
 	public void reverse()
 	{
-
 		// swap the states
 		State tmpState = getToState();
 

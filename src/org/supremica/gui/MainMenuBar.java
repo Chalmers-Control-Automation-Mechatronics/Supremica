@@ -260,13 +260,11 @@ public class MainMenuBar
 
 			// File.Import
 			JMenu menuFileImport = new JMenu();
-
 			menuFileImport.setText("Import");
 			menuFile.add(menuFileImport);
 
 			// File.Import.UMDES
 			JMenuItem menuFileImportUMDES = new JMenuItem();
-
 			menuFileImportUMDES.setText("From UMDES...");
 			menuFileImport.add(menuFileImportUMDES);
 			menuFileImportUMDES.addActionListener(new ActionListener()
@@ -279,7 +277,6 @@ public class MainMenuBar
 
 			// File.Import.Valid
 			JMenuItem menuFileImportValid = new JMenuItem();
-
 			menuFileImportValid.setText("From Valid...");
 			menuFileImport.add(menuFileImportValid);
 			menuFileImportValid.addActionListener(new ActionListener()
@@ -289,7 +286,19 @@ public class MainMenuBar
 					ActionMan.fileImportValid(ActionMan.getGui());
 				}
 			});
-	
+
+			// File.Import.HYB
+			JMenuItem menuFileImportHYB = new JMenuItem();
+			menuFileImportHYB.setText("From HYB...");
+			menuFileImport.add(menuFileImportHYB);
+			menuFileImportHYB.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					ActionMan.fileImportHYB(ActionMan.getGui());
+				}
+			});
+
 			// /* WHAT'S THE DIFFERENCE BETWEEN THESE TWO? THERE IS NO DOCUMENTATION!!! AAAAARGH!!
 			if (SupremicaProperties.generalUseRobotCoordination() || true)
 			{

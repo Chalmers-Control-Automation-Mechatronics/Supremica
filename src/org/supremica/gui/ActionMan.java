@@ -2143,7 +2143,7 @@ public class ActionMan
 			 *
 			 *	if (maxNbrOfStates < currAutomaton.nbrOfStates())
 			 *	{
-			 *	
+			 *
 			 *	// Why isn't this in AutomatonViewer??
 			 *	// Every user of AutomatonViewer has to manage this for himself!?
 			 *	String msg = currAutomaton + " has " + currAutomaton.nbrOfStates() + " states. It is not recommended to display an automaton with more than " + maxNbrOfStates + " states. Do you want to abort viewing?";
@@ -2159,7 +2159,7 @@ public class ActionMan
 			 *	}
 			 *	}
 			 */
-			
+
 			try
 			{
 				AutomatonViewer viewer = gui.getVisualProjectContainer().getActiveProject().getAutomatonViewer(currAutomaton.getName());
@@ -2263,6 +2263,17 @@ public class ActionMan
 			void openFile(Gui g, File f)
 			{
 				importValidFile(g, f);
+			}
+		};
+	}
+
+	public static void fileImportHYB(Gui gui)
+	{
+		new FileImporter(FileDialogs.getHYBFileImporter(), gui)    // anonymous class
+		{
+			void openFile(Gui g, File f)
+			{
+				importHYBFile(g, f);
 			}
 		};
 	}
@@ -2453,7 +2464,7 @@ public class ActionMan
 
 			return;
 		}
-		
+
 		// Get the current project
 		Project currProject = gui.getVisualProjectContainer().getActiveProject();
 
@@ -2592,6 +2603,27 @@ public class ActionMan
 		}
 	}
 
+	public static void importHYBFile(Gui gui, File file)
+	{
+		gui.info("Importing " + file.getAbsolutePath() + " ...");
+
+		try
+		{
+			ProjectBuildFromHYB builder = new ProjectBuildFromHYB(new VisualProjectFactory());
+			Automata currAutomata = builder.build(file.toURL());
+			int nbrOfAddedAutomata = gui.addAutomata(currAutomata);
+
+			gui.info("Successfully imported " + nbrOfAddedAutomata + " automata.");
+		}
+		catch (Exception ex)
+		{
+			logger.error("Error while importing " + file.getAbsolutePath(), ex);
+			logger.debug(ex.getStackTrace());
+
+			return;
+		}
+	}
+
 	public static void importUMDESFile(Gui gui, File file)
 	{
 		gui.info("Importing " + file.getAbsolutePath() + " ...");
@@ -2606,7 +2638,7 @@ public class ActionMan
 		}
 		catch (Exception ex)
 		{
-			logger.error("Error while importing " + file.getAbsolutePath(), ex);
+			logger.error("Error while importing " + file.getAbsolutePath() + " ", ex);
 			logger.debug(ex.getStackTrace());
 
 			return;

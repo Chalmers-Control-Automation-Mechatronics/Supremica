@@ -65,6 +65,7 @@ public class FileDialogs
 	private FileFilter vprjFilter = null;
 	private FileFilter vmodFilter = null;
 	private FileFilter dgrfFilter = null;
+	private FileFilter hybFilter = null;
 	private FileFilter dsxFilter = null;
 	private FileFilter dotFilter = null;
 	private FileFilter epsFilter = null;
@@ -171,6 +172,17 @@ public class FileDialogs
 		fileImporter.addChoosableFileFilter(fd.getDGRFFilter());
 		fileImporter.addChoosableFileFilter(fd.getVMODFilter());
 		fileImporter.setFileFilter(fd.getVPRJFilter());
+
+		return fileImporter;
+	}
+
+	public static JFileChooser getHYBFileImporter()
+	{
+		JFileChooser fileImporter = fd.getFileImporter();
+
+		fileImporter.resetChoosableFileFilters();
+		fileImporter.addChoosableFileFilter(fd.getHYBFilter());
+		fileImporter.setFileFilter(fd.getHYBFilter());
 
 		return fileImporter;
 	}
@@ -457,6 +469,16 @@ public class FileDialogs
 		}
 
 		return dgrfFilter;
+	}
+
+	private FileFilter getHYBFilter()
+	{
+		if (hybFilter == null)
+		{
+			hybFilter = makeFileFilter(".hyb", "Balemi HYB file (*.hyb)");
+		}
+
+		return hybFilter;
 	}
 
 	private FileFilter getDSXFilter()
