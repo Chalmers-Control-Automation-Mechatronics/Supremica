@@ -20,6 +20,8 @@ public class BDDGrow
 		switch (Options.show_grow)
 		{
 
+		case Options.SHOW_SIMPLE_NODES:
+			return new BDDSimpleGrow(manager, title);
 		case Options.SHOW_GROW_NODES :
 			return new BDDNodeGrow(manager, title);
 

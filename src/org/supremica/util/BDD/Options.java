@@ -192,20 +192,21 @@ public class Options
 	public static int es_heuristics = ES_HEURISTIC_MOST_MEMBERS;
 
 	/** BDD grow graph */
-	public static final String SHOW_GROW_NAMES[] = { "None", "Node count",
+	public static final String SHOW_GROW_NAMES[] = {
+														"None", "Simple statistics", "Node count",
 													 "logNode (log scale)   ",
 													 "Node delta",
 													 "SAT count", "logSAT",
 													 "SAT delta",
 													 "Nodes & logSAT",
 													 "Nodes & SAT delta" };
-	public static final int SHOW_GROW_NONE = 0, SHOW_GROW_NODES = 1,
-							SHOW_GROW_NODES_LOG = 2, SHOW_GROW_NODES_DIFF = 3,
-							SHOW_GROW_SATCOUNT = 4,
-							SHOW_GROW_SATCOUNT_LOG = 5,
-							SHOW_GROW_SATCOUNT_DIFF = 6,
-							SHOW_GROW_NODES_AND_SATCOUNT_LOG = 7,
-							SHOW_GROW_NODES_AND_SATCOUNT_DIFF = 8;
+	public static final int SHOW_GROW_NONE = 0, SHOW_SIMPLE_NODES = 1, SHOW_GROW_NODES = 2,
+							SHOW_GROW_NODES_LOG = 3, SHOW_GROW_NODES_DIFF = 4,
+							SHOW_GROW_SATCOUNT = 5,
+							SHOW_GROW_SATCOUNT_LOG = 6,
+							SHOW_GROW_SATCOUNT_DIFF = 7,
+							SHOW_GROW_NODES_AND_SATCOUNT_LOG = 8,
+							SHOW_GROW_NODES_AND_SATCOUNT_DIFF = 9;
 	public static int show_grow = SHOW_GROW_NONE;
 
 	/** type of the BDD graph shown by GrowFrame */

@@ -17,19 +17,32 @@ public class GrowFrame
 	private Button bQuit, bDump, bReturn, bAbort;
 	protected Label status;
 	private TextArea ta;
-	private boolean showGraph;
+	private boolean showGraph, graphic;
 	private boolean stopped;
 	private Marker marker_root, marker_last;
 	protected String title;
-	protected int min_value, max_value, last_value;
+	protected int min_value, max_value, last_value, count;
 
+
+	// ---------------------------------------------------------------
+
+	/** graphic version */
 	protected GrowFrame(String txt)
+	{
+		this(txt, true);
+	}
+
+		/** graphic version or simple version */
+	protected GrowFrame(String txt, boolean graphic)
 	{
 		super(txt);
 
-		title = txt;
+		this.title = txt;
+		this.graphic = graphic;
+
+
 		this.showGraph = true;
-		this.vars = new IntArray();
+
 
 		Panel pNorth = new Panel(new FlowLayout(FlowLayout.LEFT));
 
@@ -38,22 +51,31 @@ public class GrowFrame
 		bQuit.addActionListener(this);
 		pNorth.add(bAbort = new Button("Abort"));
 		bAbort.addActionListener(this);
-		bAbort.setBackground(Color.red);
-		pNorth.add(bDump = new Button("Values"));
-		bDump.addActionListener(this);
-		pNorth.add(bReturn = new Button("Graph"));
-		bReturn.addActionListener(this);
-		bReturn.setVisible(false);
+
+		if(graphic) {
+			this.vars = new IntArray();
+			this.canvas = new GrowCanvas();
+			add(canvas, BorderLayout.CENTER);
+
+			bAbort.setBackground(Color.red);
+			pNorth.add(bDump = new Button("Values"));
+			bDump.addActionListener(this);
+			pNorth.add(bReturn = new Button("Graph"));
+			bReturn.addActionListener(this);
+			bReturn.setVisible(false);
+		} else {
+			vars = null;
+			canvas = null;
+		}
+
 
 		this.max_value = Integer.MIN_VALUE;
 		this.min_value = Integer.MAX_VALUE;
 		this.last_value = 0;
+		this.count = 0;
 
 		add(status = new Label(), BorderLayout.SOUTH);
 
-		canvas = new GrowCanvas();
-
-		add(canvas, BorderLayout.CENTER);
 		add(ta = new TextArea(25, 80), BorderLayout.WEST);
 		ta.setVisible(false);
 
@@ -92,7 +114,13 @@ public class GrowFrame
 	{
 		end_time = System.currentTimeMillis();
 
-		vars.add(last_value = value);
+		// remeber it
+		count++;
+		last_value = value;
+
+
+		// put it in the vector, if any
+		if(vars != null) vars.add(value);
 
 		if (last_value > max_value)
 		{
@@ -110,8 +138,9 @@ public class GrowFrame
 			return;
 		}
 
-		last_time = end_time;
 
+		// otherwise...
+		last_time = end_time;
 		update_screen();
 	}
 
@@ -137,7 +166,12 @@ public class GrowFrame
 			status.setText("Time " + t + " [ms]");
 		}
 
-		canvas.force_repaint();
+		update_canvas();
+
+	}
+
+	protected void update_canvas() {
+		if(graphic) canvas.force_repaint();
 	}
 
 	// -------------------------------------------------------------
@@ -158,7 +192,8 @@ public class GrowFrame
 
 	public int iterations()
 	{
-		return vars.getSize();
+
+		return count;
 	}
 
 	public long totalTime()
@@ -174,6 +209,7 @@ public class GrowFrame
 	public void save(String filename)
 		throws IOException
 	{
+
 		FileWriter fw = new FileWriter(filename);
 		String text = getText();
 
@@ -185,9 +221,11 @@ public class GrowFrame
 	// -------------------------------------------------------------
 	private void onDump()
 	{
-		String text = getText();
+		if(!graphic) return; // only available when graph data available
 
+		String text = getText();
 		ta.setText(text);
+
 		canvas.setVisible(false);
 		ta.setVisible(true);
 		bDump.setVisible(false);
@@ -197,6 +235,8 @@ public class GrowFrame
 
 	private String getText()
 	{
+		if(!graphic) return   "ERROR: this funcion is only available when graph data is available";
+
 		int size_x = vars.getSize();
 		StringBuffer sb = new StringBuffer();
 
@@ -247,6 +287,8 @@ public class GrowFrame
 
 	private void onReturn()
 	{
+		if(!graphic) return; // only available when graph data available
+
 		ta.setVisible(false);
 		canvas.setVisible(true);
 		bReturn.setVisible(false);
@@ -287,6 +329,8 @@ public class GrowFrame
 	/** inster a marker at the current position */
 	public void mark(String txt)
 	{
+		if(!graphic) return; // only available when graph data available
+
 		Marker m = new Marker(txt);
 
 		if (marker_root == null)
