@@ -21,9 +21,9 @@ import java.awt.*;
  * everything should work just fine...
  *
  *
- * 1) this code will compute a BDD supervisor and create an online object from it:
+ * 1) this code will compute a BDD supNBC and create an online object from it:
  *
- * AutomataBDDSynthesizer bddSynthesizer = new AutomataBDDSynthesizer(theAutomata);
+ * AutomataBDDSynthesizer bddSynthesizer = new AutomataBDDSynthesizer(theAutomata, true, true);
  * OnlineBDDSupervisor ob = bddSynthesizer.extractOnlineSupervisor();
  * bddSynthesizer.cleanup();
  *

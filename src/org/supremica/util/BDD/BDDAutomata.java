@@ -954,7 +954,7 @@ public class BDDAutomata
 		int u = sup.getReachableUncontrollables();    // gc();
 		int d = sup.getDeadlocks();    // gc();
 		int c = sup.getCoReachables();    // gc();
-		int safe = sup.getSafeStates();    // gc();
+		int safe = sup.getSafeStates(true, true);    // gc();
 
 		// DEBUG:
 		// Options.out.print("Deadlocks: ");     show_states(d);

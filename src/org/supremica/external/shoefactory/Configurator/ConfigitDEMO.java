@@ -132,7 +132,7 @@ public class ConfigitDEMO extends JFrame
 
    	ImageIcon icon1 = new ImageIcon(Supremica.class.getResource("/shoefactory/blshoe.gif"));
    	ImageIcon icon2 = new ImageIcon(Supremica.class.getResource("/shoefactory/pnkshoe.gif"));
-   	
+
    	FactoryExecutorDEMO fe = new FactoryExecutorDEMO();
    	ConfigConverter cc = new ConfigConverter();
 
@@ -612,12 +612,12 @@ public class ConfigitDEMO extends JFrame
 				}
 			}
 		}
-		
+
 		if(e.getSource() == JQ)
 		{
 			fe.start(cc.getConfig("red","40","Adult","Male","typeA","Hiking"), gui);
 		}
-		
+
 		if(e.getSource() == lGend1)
 		{
 			assign(0,0);

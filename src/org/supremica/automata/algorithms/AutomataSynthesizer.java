@@ -243,17 +243,16 @@ public class AutomataSynthesizer
 		// evil BDD code inserted here by Arash
 		if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.BDD)
 		{
-
-			if(synthesizerOptions.getSynthesisType() !=  SynthesisType.Both)
-			{
-				throw new IllegalArgumentException("BDD algorithms currently only support supNBC synthesis.");
+			SynthesisType typ = synthesizerOptions.getSynthesisType();
+			if(typ !=  SynthesisType.Both && typ !=  SynthesisType.Controllable && typ !=  SynthesisType.Nonblocking) {
+				throw new IllegalArgumentException("BDD algorithms currently only support supNB+C synthesis.");
 			}
 			// now, Do BDD Specific initialization here and skip the other stuff
 			return;
 		}
-
 		// initialization stuff that do need extra computation and thus ignored when
 		// doing BDD computation...
+
 
 		Automaton currAutomaton;
 		State currInitialState;
@@ -466,8 +465,12 @@ public class AutomataSynthesizer
 		}
 		else if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.BDD) // more BDD Stuff
 		{
+			SynthesisType typ = synthesizerOptions.getSynthesisType();
+			boolean do_c = (typ ==  SynthesisType.Both) | (typ ==  SynthesisType.Controllable);
+			boolean do_nb = (typ ==  SynthesisType.Both) | (typ ==  SynthesisType.Nonblocking);
+
 			theTimer.start();
-			AutomataBDDSynthesizer bddSynthesizer = new AutomataBDDSynthesizer(theAutomata);
+			AutomataBDDSynthesizer bddSynthesizer = new AutomataBDDSynthesizer(theAutomata, do_nb, do_c);
 			bddSynthesizer.execute();
 			bddSynthesizer.cleanup();
 			theTimer.stop();

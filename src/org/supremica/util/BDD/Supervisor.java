@@ -907,25 +907,24 @@ public class Supervisor
 
 	// --------------------------------------------------------------------------------
 	// this is used to generate the supervisor??
-	public int getUnsafeTransitions()
+	public int getUnsafeTransitions(int safe_states)
 	{
 
 		// unsafe_transitions = { (q,sigma,q') |
 		//            \delta(q,sigma) = ´q´ \land q \in good_states \land q' \in bad_states }
 
-		int good_states = getSafeStates();
+		// int good_states = getSafeStates();
 
-		int bad_states = manager.not(good_states);
+		int bad_states = manager.not(safe_states);
 		int bad_statesp = manager.replace(bad_states, perm_s2sp);
 
 		manager.deref(bad_states);
 
 		int t_all = manager.and(plant.getT(), spec.getT());
 
-		int tmp = manager.and(t_all, good_states);
+		int tmp = manager.and(t_all, safe_states);
 		tmp = manager.andTo(tmp, bad_statesp);
 		manager.deref(t_all);
-		manager.deref(good_states);
 		manager.deref(bad_statesp);
 
 		// tmp: Q x E -> Q, but we only need the first part, ie: tmp2: Q x E ??
@@ -936,9 +935,9 @@ public class Supervisor
 	}
 
 	/** get the list of unsafe transitions */
-	public Vector getUnsafeTransitionList()
+	public Vector getUnsafeTransitionList(int safe_states)
 	{
-		int unsafe = getUnsafeTransitions();
+		int unsafe = getUnsafeTransitions(safe_states);
 		Event[] events = manager.getEvents();
 		int events_size = events.length;
 
@@ -952,13 +951,16 @@ public class Supervisor
 			results.add(dp);
 			manager.deref(states_event);
 		}
+		manager.deref(unsafe);
 		return results;
 	}
+
+
 	/** get the _tree_ of unsafe states */
-	public Vector getUnsafeTransitionTree()
+	public Vector getUnsafeTransitionTree(int safe_states)
 	{
 		// TODO: do we need to remove E x Q' with relProd, or can we remove Q' before the loop??
-		int unsafe = getUnsafeTransitions();
+		int unsafe = getUnsafeTransitions(safe_states);
 		int cube = manager.and(e_cube, sp_cube );
 		Event[] events = manager.getEvents();
 		int events_size = events.length;
@@ -978,17 +980,43 @@ public class Supervisor
 		}
 
 		manager.deref(cube);
+		manager.deref(unsafe);
 
 		return results;
 	}
 	// --------------------------------------------------------------------------------
-	public int getSafeStates()
+	public int getSafeStates(boolean nb, boolean c) {
+		if(nb && c) return getSafeStatesNBC();
+		if(nb) return getSafeStatesNB();
+		if(c) return getSafeStatesC();
+
+		return manager.ref( manager.getOne() ); // what the hell are we doing??
+	}
+
+	/** return Q[supNB] */
+	public int getSafeStatesNB() {
+		int forbidden = manager.ref( manager.getZero() );
+		int marked = GroupHelper.getM(manager,spec, plant);
+		int ret = getBR1(marked, forbidden);
+
+		manager.deref(marked);
+		manager.deref(forbidden);
+
+		return ret;
+	}
+
+	/** return Q[supC] */
+	public int getSafeStatesC() {
+		// XXX: dont try getUncontrollableStates(), we would need to conpute reachables to get the border anyway :(
+		return getReachableUncontrollables();
+	}
+
+	/** return Q[supNBC] */
+	public int getSafeStatesNBC()
 	{
 
 		// note: dont use timer here (get reseted by getReachable)
-		// TEMPORARY OFF:
-		// GrowFrame gf = BDDGrow.getGrowFrame(manager, "Safe states: nodeCount(X)");
-		GrowFrame gf = null;
+		GrowFrame gf = BDDGrow.getGrowFrame(manager, "Safe states: nodeCount(X)");
 
 		int xp, x = getReachableUncontrollables();
 		int marked = GroupHelper.getM(manager,spec, plant);
@@ -1016,6 +1044,7 @@ public class Supervisor
 		}
 		while (x != xp);
 
+		manager.deref(marked);
 		int not_x = manager.not(x);
 
 		manager.deref(x);
