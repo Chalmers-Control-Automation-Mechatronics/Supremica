@@ -118,6 +118,7 @@ public class ExampleTemplates
 		String prefix = extraPrefix + "/CCSBookExercises/";
 
 		thisGroup.addItem(new TemplateItem("2.1 - PIN Code Reader", prefix + "Ex2_1.xml"));
+		thisGroup.addItem(new TemplateItem("2.2 - Kanban", prefix + "Ex2_2.xml"));
 		thisGroup.addItem(new TemplateItem("2.6 - Man, Wolf, Goat, Cabbage", prefix + "Ex2_6.xml"));
 		thisGroup.addItem(new TemplateItem("4.1 - Man, Wolf, Goat, Cabbage Revisited", prefix + "Ex4_1.xml"));
 		thisGroup.addItem(new TemplateItem("4.2 - AGV System", prefix + "Ex4_2.xml"));
