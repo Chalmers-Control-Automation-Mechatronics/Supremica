@@ -1,4 +1,3 @@
-
 /*
  * Supremica Software License Agreement
  *
@@ -336,6 +335,16 @@ public class FileDialogs
 		stationFileImporter.setFileFilter(fd.getSTNFilter());
 
 		return stationFileImporter;
+	}
+
+	public static JFileChooser getRobotCellFileImporter()
+	{
+		JFileChooser cellFileImporter = fd.getFileImporter();
+
+		cellFileImporter.resetChoosableFileFilters();
+		cellFileImporter.setFileFilter(fd.getSTNFilter()); // RobotStudio
+
+		return cellFileImporter;
 	}
 
 	private JFileChooser getFileImporter()

@@ -629,19 +629,19 @@ public class MainMenuBar
 		{
 			menuTools.add(new JSeparator());
 
-			
-			
+
+
 			JMenu menuToolsJGrafchart = new JMenu();
-			menuToolsJGrafchart.setText("JGrafchart...");
+			menuToolsJGrafchart.setText("JGrafchart");
 			menuTools.add(menuToolsJGrafchart);
-			
+
 			JMenuItem menuToolsOpenJGrafchart = new SupremicaMenuItem(ActionMan.openJGrafchartAction);
 			menuToolsJGrafchart.add(menuToolsOpenJGrafchart);
 
 			JMenuItem menuToolsUpdateFromJGrafchart = new SupremicaMenuItem(ActionMan.updateFromJGrafchartAction);
-			menuToolsJGrafchart.add(menuToolsUpdateFromJGrafchart);			
-			
-/*			
+			menuToolsJGrafchart.add(menuToolsUpdateFromJGrafchart);
+
+/*
 			JMenuItem menuOpenEditor= new JMenuItem("Open Editor");
 
 			menuOpenEditor.addActionListener(new ActionListener()
@@ -659,8 +659,8 @@ public class MainMenuBar
 						{
 							ActionMan.updateFromJGrafchart(ActionMan.getGui());
 						}
-					});			
-			
+					});
+
 			menuToolsJGrafchart.add(menuUpdateFromJGrafchart);
 	*/
 		}
@@ -804,7 +804,7 @@ public class MainMenuBar
 				ActionMan.AutomataToJavaBytecode(ActionMan.getGui());
 			}
 		});
-		
+
 		JMenuItem menuToolsCodeGenerationJava = new JMenuItem();
 
 		menuToolsCodeGenerationJava.setText("Java...");
@@ -907,6 +907,22 @@ public class MainMenuBar
 			}
 		});
 */
+
+		// Tools.RobotCellExaminer
+		if (false)
+		{
+			menuTools.add(new JSeparator());
+			JMenuItem robotCellExamine = new JMenuItem();
+			robotCellExamine.setText("Robot Coordination...");
+			menuTools.add(robotCellExamine);
+			robotCellExamine.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					ActionMan.showRobotCellExaminer(ActionMan.getGui());
+				}
+			});
+		}
 
 		// Tools.RobotStudio
 		if (SupremicaProperties.showRobotstudioLink() && SupremicaProperties.useActiveXBridge())

@@ -84,7 +84,7 @@ import org.supremica.gui.animators.scenebeans.*;
 //import org.supremica.gui.animators.tsim.*;
 import org.supremica.gui.automataExplorer.AutomataExplorer;
 import org.supremica.gui.simulator.SimulatorExecuter;
-import org.supremica.external.robotCoordination.AutomataBuilder;
+import org.supremica.external.robotCoordination.*;
 import org.supremica.external.robotCoordinationABB.*;
 import org.supremica.external.shoefactory.plantBuilder.*;
 import org.supremica.external.shoefactory.Configurator.*;
@@ -2412,7 +2412,6 @@ public class ActionMan
 
 	public static void importValidFile(Gui gui, File file)
 	{
-
 		// logger.info("Importing " + file.getAbsolutePath() + " ...");
 		gui.info("Importing " + file.getAbsolutePath() + " ...");
 
@@ -2454,7 +2453,6 @@ public class ActionMan
 
 	public static void importRobotCoordinationFile(Gui gui, File file)
 	{
-
 		// logger.info("Importing " + file.getAbsolutePath() + " ...");
 		gui.info("Importing " + file.getAbsolutePath() + " ...");
 
@@ -2477,7 +2475,6 @@ public class ActionMan
 	// File.Import.FromRobotCoordinationABB
 	public static void importRobotCoordinationFileABB(Gui gui, File file)
 		{
-
 			// logger.info("Importing " + file.getAbsolutePath() + " ...");
 			gui.info("Importing " + file.getAbsolutePath() + " ...");
 
@@ -2729,6 +2726,25 @@ public class ActionMan
 		//trainSimulator.exec();
 	}
 	*/
+
+	static RobotCellExaminer theRobotCellExaminer = null;
+	public static void showRobotCellExaminer(Gui gui)
+	{
+		Thread thread = new Thread(new Runnable()
+		{
+			public void run()
+			{
+				if (theRobotCellExaminer == null)
+					theRobotCellExaminer = new RobotCellExaminer(ActionMan.getGui().getFrame());
+				theRobotCellExaminer.setVisible(true);
+				/*
+				RobotCellExaminer examiner = new RobotCellExaminer(ActionMan.getGui().getFrame());
+				examiner.setVisible(true);
+				*/
+			}
+		});
+		thread.start();
+	}
 
 	public static void robotStudioOpenStation(Gui gui)
 	{

@@ -608,7 +608,7 @@ End Sub
 	}
 
 	/**
-	 * Finds and returns the main procedure of a mechanisms program.
+	 * Finds and returns the main procedure of a mechanism's program.
 	 */
 	private static IABBS4Procedure getMainProcedure(IMechanism mechanism)
 		throws Exception
@@ -1362,11 +1362,11 @@ End Sub
 	}
 
 	/**
-	 * Keeps trach of the controller status, is it started or shut down?
+	 * Keeps track of the controller status, is it started or shut down?
 	 * The _MechanismEventsAdapter lacks information about the current mechanism
 	 * and its controller but this information is supplied in this class...
 	 */
-	private static class ControllerListener extends _MechanismEventsAdapter
+	public static class ControllerListener extends _MechanismEventsAdapter
 	{
 		private boolean controllerRunning = false;  // Used in the wait-methods
 
@@ -1763,7 +1763,7 @@ End Sub
 				if (ex.ErrorCode == HResult.E_FAIL)
 				{   // No such item, construct one!
 					part = activeStation.getParts().add();
-					part.setName(mutexPartName);
+					part.setName(name);
 				}
 				else
 				{  //Something is really wrong
@@ -1808,7 +1808,7 @@ End Sub
 
 			// Add part for the span to the station
 			spanPart = addPart(robot.getName() + "_Span");
-			spanPart.setVisible(true); // Why?
+			spanPart.setVisible(true); // Why? For fun!
 
 			tool0 = robot.getToolFrames().item(var("tool0"));
 			//robot.setActiveToolFrame(tool0);
@@ -1910,7 +1910,7 @@ End Sub
 			cylinderTransform.setRy(cylinderTransform.getRy()+Math.PI/2);
 			cylinderTransform = ruu.uCSToWCS(cylinderTransform);
 
-			// Create cylinder around the arm
+			// Create cylinder around the upper arm
 			spanPart.createSolidCylinder(cylinderTransform,cylinderRadius+margin,cylinderLength+2*margin);
 
 			// Create box around the tooltip

@@ -206,7 +206,7 @@ public class CreateXml
 			for(ListIterator it = robotCosts[i-1].listIterator(); it.hasNext();)
 			{
 				PathWithCosts thispath = (PathWithCosts) it.next();
-				LinkedList costs = thispath.takeCosts();
+				LinkedList costs = thispath.getCosts();
 				IPath thisPath = robotMechanism.getPaths().item(var(thispath.getName()));
 				Element path = new Element(pathName);
 				String nameOfPath = thisPath.getName();
@@ -683,8 +683,8 @@ public class CreateXml
 	}
 
     /**
-     * For each path try to calculate the points in which each robot intersects a mutex zone (that is an entity
-     * in the part named "MutexZones").
+     * For each path try to calculate the points in which each robot intersects a mutex zone
+     * (that is an entity in the part named "MutexZones").
 	 * Each new point found is added to the corresponding path.
 	 */
 	public static void addViaPointsInRS()
@@ -703,7 +703,6 @@ public class CreateXml
 					logger.info("Starting VC for " + robot.getName() + "...");
 					IABBS4Controller controller = org.supremica.automata.algorithms.RobotStudioLink.startController(robot);
 					logger.info("VC started.");
-
 
 					//IABBS4Module module = controller.getModules().item(var("Paths"));   // pathsModule is not allowed as a name
 					IABBS4Module module = controller.getModules().item(var("Paths"));
@@ -1393,7 +1392,7 @@ public class CreateXml
 			public SpanGenerator(IMechanism3 robot, String procName, IPart spansPart)
 				throws Exception
 			{
-				station = robot.getParent();;
+				station = robot.getParent();
 				this.robot = robot;
 				this.procName = procName;
 				this.spansPart = spansPart;
@@ -1603,7 +1602,9 @@ public class CreateXml
 		}
 	}
 
-	private static class PathWithCosts
+	///
+	//private static class PathWithCosts
+	public static class PathWithCosts
 	{
 		String pathName;
 		LinkedList costsInPath;
@@ -1612,7 +1613,9 @@ public class CreateXml
 		{
 		}
 
-		PathWithCosts(String name)
+		///
+		//PathWithCosts(String name)
+		public PathWithCosts(String name)
 		{
 			pathName = new String(name);
 			costsInPath = new LinkedList();
@@ -1623,7 +1626,7 @@ public class CreateXml
 			costsInPath.add(new String(costFromSimulation.toString()));
 		}
 
-		public synchronized LinkedList takeCosts()
+		public synchronized LinkedList getCosts()
 		{
 			return costsInPath;
 		}
@@ -1631,11 +1634,15 @@ public class CreateXml
 		{
 			return pathName;
 		}
-		public void printCosts()
+		public String toString()
 		{
-			logger.info("Costs for path " + pathName);
+			//logger.info("Costs for path " + pathName);
+			//for(ListIterator it = costsInPath.listIterator(); it.hasNext();)
+			//	logger.info((String) it.next());
+			String string = "Costs for path " + pathName;
 			for(ListIterator it = costsInPath.listIterator(); it.hasNext();)
-				logger.info((String) it.next());
+				string = string + ((String) it.next());
+			return string;
 		}
 	}
 

@@ -1,4 +1,3 @@
-
 /*
  *  Supremica Software License Agreement
  *
@@ -89,7 +88,6 @@ public class AutomataBuildFromVALID
 
 		try
 		{
-
 			// Find SAXparser using JAXP, validation optional
 			docBuilder = new SAXBuilder(validate);
 

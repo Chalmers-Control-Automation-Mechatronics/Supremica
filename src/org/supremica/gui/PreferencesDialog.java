@@ -65,7 +65,8 @@ public class PreferencesDialog
 	private FilePanel theFilePanel = null;
 	private CommunicationPanel theCommunicationPanel = null;
 	private SimulationPanel  theSimulationPanel = null;
-    /* yes, it has package access! */BDDPanel1 theBDDPanel1 = null;
+ 	private RobotCoordinationPanel  theRobotCoordinationPanel = null;
+   /* yes, it has package access! */BDDPanel1 theBDDPanel1 = null;
     private BDDPanel2 theBDDPanel2 = null;
 	private LayoutPanel theLayoutPanel = null;
 	private SynchronizationPropertiesPanel theSynchronizationPanel = null;
@@ -108,6 +109,9 @@ public class PreferencesDialog
 		theSimulationPanel = new SimulationPanel(this);
 		theTabbedPanel.add("Simulation", theSimulationPanel);
 
+		theRobotCoordinationPanel = new RobotCoordinationPanel(this);
+		theTabbedPanel.add("Robot coordination", theRobotCoordinationPanel);
+
 		if (SupremicaProperties.fileAllowOpen() || SupremicaProperties.fileAllowSave())
 		{
 			theFilePanel = new FilePanel(this);
@@ -137,7 +141,6 @@ public class PreferencesDialog
 
 		setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
 
-
 		addWindowListener(new WindowAdapter()
 		{
 			public void windowClosing(WindowEvent e)
@@ -145,7 +148,6 @@ public class PreferencesDialog
 				doCancel();
 			}
 		});
-
 	}
 
 	public Frame getOwnerFrame()
@@ -160,10 +162,8 @@ public class PreferencesDialog
 
 	public void doApply()
 	{
-
 		if (setAttributes())
 		{
-
 			try {
 				SupremicaProperties.savePropperties(); // write back the changes to the config file too!!
 			} catch(IOException exx) {
@@ -202,7 +202,6 @@ public class PreferencesDialog
 
 	private boolean setAttributes()
 	{
-
 	    if (theBDDPanel1 != null)
 		{
 			if (!theBDDPanel1.doApply())
@@ -247,12 +246,10 @@ public class PreferencesDialog
 			return false;
 		}
 
-
        	if (!theSimulationPanel.doApply())
 		{
 			return false;
 		}
-
 
 		return true;
 	}
@@ -340,7 +337,6 @@ class CommunicationPanel
 	private JTextField xmlRpcPort, xmlRpcFilter;
 	private JTextField docdbHost, docdbPort, docdbUser, docdbDoc;
 
-
 	public CommunicationPanel(PreferencesDialog theDialog)
 	{
 		// super( new BorderLayout());
@@ -372,8 +368,6 @@ class CommunicationPanel
 		{
 			panel.add(debugXmlRpc );
 		}
-
-
 
 		panel  = new JPanel( new GridLayout(5,1) );
 		add(panel, BorderLayout.EAST);
@@ -413,20 +407,16 @@ class CommunicationPanel
 			return false;
 		}
 
-
-
 		SupremicaProperties.setXmlRpcPort(port);
 		SupremicaProperties.setXmlRpcFilter(xmlRpcFilter.getText());
 		SupremicaProperties.setXmlRpcActive(useXmlRpc.isSelected());
 		SupremicaProperties.setXmlRpcDebug(debugXmlRpc.isSelected());
 
 
-
 		SupremicaProperties.setDocDBHost(docdbHost.getText());
 		SupremicaProperties.setDocDBPort(port2);
 		SupremicaProperties.setDocDBUsername(docdbUser.getText());
 		SupremicaProperties.setDocDBDocument(docdbDoc.getText());
-
 
 		return true;
 	}
@@ -820,8 +810,6 @@ class BDDPanel1
 		insert( frontierStrategy, Options.FRONTIER_STRATEGY_NAMES, Options.frontier_strategy);
 
 
-
-
 		JPanel pInclusion = new JPanel( new FlowLayout(FlowLayout.RIGHT) );
 		p.add(pInclusion);
 		pInclusion.add( new JLabel("Language containment algorithm"));
@@ -839,10 +827,6 @@ class BDDPanel1
 		pHeuristics.add( new JLabel("Automaton selection heuristic"));
 		pHeuristics.add( asHeuristics = new JComboBox());
 		insert(asHeuristics, Options.AS_HEURISTIC_NAMES, Options.as_heuristics);
-
-
-
-
 
 
 		JPanel pDelayed= new JPanel(new FlowLayout(FlowLayout.RIGHT) );
@@ -903,12 +887,6 @@ class BDDPanel1
     }
 }
 
-
-
-
-
-
-
 /** more BDD specific stuff, still a mess! */
 class BDDPanel2
     extends JPanel
@@ -951,8 +929,6 @@ class BDDPanel2
 		pTopLeft.add(pEncoding);
 
 
-
-
 		pTopLeft.add( tmp = new JLabel("Dynamic variable ordering (NOT recommended)", SwingConstants.LEFT)  );
 		tmp.setForeground(Color.blue);
 
@@ -962,7 +938,6 @@ class BDDPanel2
 		insert(cbReordering, Options.REORDER_ALGO_NAMES, Options.reorder_algo);
 		pTopLeft.add( ptmp);
 
-
 		// CENTER LEFT
 		JPanel pLeftLeft  = new JPanel( new GridLayout(4,1));
 		pLeft.add(pLeftLeft, BorderLayout.CENTER);
@@ -971,9 +946,6 @@ class BDDPanel2
 		pLeftLeft.add( cReorderBuild = new JCheckBox("Reorder after build", Options.reorder_after_build ) );
 		pLeftLeft.add( cReorderGroup = new JCheckBox("Don't reorder between automata", Options.reorder_with_groups ) );
 		pLeftLeft.add( cReorderGroupFree = new JCheckBox("Don't reorder inside automata", Options.reorder_within_group ) );
-
-
-
 
 		// -------------------------------- RIGHT
 		JPanel pRight  = new JPanel( new BorderLayout() );
@@ -986,8 +958,6 @@ class BDDPanel2
 
 		pTopRight.add( tmp = new JLabel("Misc. options:"));
 		tmp.setForeground(Color.blue);
-
-
 
 		JPanel pCount = new JPanel(new FlowLayout(FlowLayout.RIGHT) );
 		pTopRight.add(pCount);
@@ -1006,8 +976,6 @@ class BDDPanel2
 		pExtraLib.add( new JLabel("Additinal DLL path"));
 		pExtraLib.add( extraLibDir = new JTextField("" + Options.extraLibPath, 15));
 		pTopRight.add(pExtraLib);
-
-
 
 		// BOTTOM RIGHT
 		JPanel pBottomRight = new JPanel( new GridLayout(3,1) );
@@ -1092,11 +1060,6 @@ class BDDPanel2
 	}
 };
 
-
-
-
-
-
 class SimulationPanel
     extends JPanel
 {
@@ -1115,7 +1078,7 @@ class SimulationPanel
 		add(propertiesBox, BorderLayout.CENTER);
 
 
-		propertiesBox.add( new JLabel("Note: event source should be changed BEFORE any simulations are started."));
+		propertiesBox.add(new JLabel("Note: event source should be changed BEFORE any simulations are started."));
 
 		propertiesBox.add(useExternal = new JCheckBox("Use external event source"));
 		JPanel jp = new JPanel();
@@ -1144,8 +1107,39 @@ class SimulationPanel
     public void update()
     {
 		useExternal.setSelected( SupremicaProperties.getSimulationIsExternal() );
-		cycleTime.setText( "" + SupremicaProperties.getSimulationCycleTime() );
+		cycleTime.setText("" + SupremicaProperties.getSimulationCycleTime() );
 
     }
 }
 
+class RobotCoordinationPanel
+    extends JPanel
+{
+    private PreferencesDialog theDialog = null;
+    private JCheckBox showRobotCoordination;
+    private JTextField cycleTime;
+
+    public RobotCoordinationPanel(PreferencesDialog theDialog)
+    {
+		this.theDialog = theDialog;
+		JPanel contentPane = new JPanel();
+
+		Box propertiesBox = new Box(BoxLayout.Y_AXIS);
+		add(propertiesBox, BorderLayout.CENTER);
+
+		propertiesBox.add(showRobotCoordination = new JCheckBox("Show robot coordination tools"));
+    }
+
+    public boolean doApply()
+    {
+		SupremicaProperties.setGeneralUseRobotCoordination(showRobotCoordination.isSelected());
+		SupremicaProperties.setShowRobotstudioLink(showRobotCoordination.isSelected());
+		SupremicaProperties.setShowCoordinationABB(showRobotCoordination.isSelected());
+		return true;
+    }
+
+    public void update()
+    {
+		showRobotCoordination.setSelected(SupremicaProperties.generalUseRobotCoordination());
+    }
+}

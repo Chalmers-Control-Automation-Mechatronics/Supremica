@@ -284,10 +284,10 @@ public final class SupremicaProperties
 		setProperty(GENERAL_USE_SECURITY, "false", false);
 		setProperty(INCLUDE_ANIMATOR, "false", true);
 		setProperty(SOFTPLC_CYCLE_TIME, "40", true);
-		setProperty(SHOW_GENETIC_ALGORITHMS, "false", false);
-		setProperty(SHOW_ROBOTSTUDIO_LINK, "false", false);
-		setProperty(USE_ACTIVEX_BRIDGE, "false", false);
-		setProperty(SHOW_COORDINATION_ABB, "false", false);
+		setProperty(SHOW_GENETIC_ALGORITHMS, "false", true);
+		setProperty(SHOW_ROBOTSTUDIO_LINK, "false", true);
+		setProperty(USE_ACTIVEX_BRIDGE, "false", true);
+		setProperty(SHOW_COORDINATION_ABB, "false", true);
 
 		softplcInterfaces.add(new org.supremica.gui.SoftplcInterface("org.supremica.softplc.Simulator.BTSim"));
 		// Simulation stuff
@@ -446,9 +446,6 @@ public final class SupremicaProperties
 			System.err.println("Could not write to configuration file, unknown file name.");
 		}
 	}
-
-
-
 
 	public static final void setProperties(File aFile)
 		throws Exception
@@ -1213,9 +1210,6 @@ public final class SupremicaProperties
 		}
 	}
 
-
-	// --------------------------------------------------------------------------------------
-
 	public static boolean showGeneticAlgorithms()
 	{
 		return toBoolean(wp.getProperty(SHOW_GENETIC_ALGORITHMS));
@@ -1226,6 +1220,11 @@ public final class SupremicaProperties
 		return toBoolean(wp.getProperty(SHOW_ROBOTSTUDIO_LINK));
 	}
 
+	public static void setShowRobotstudioLink(boolean show)
+	{
+		wp.setProperty(SHOW_ROBOTSTUDIO_LINK, toString(show));
+	}
+
 	public static boolean useActiveXBridge()
 	{
 		return toBoolean(wp.getProperty(USE_ACTIVEX_BRIDGE));
@@ -1234,6 +1233,11 @@ public final class SupremicaProperties
 	public static boolean showCoordinationABB()
 	{
 		return toBoolean(wp.getProperty(SHOW_COORDINATION_ABB));
+	}
+
+	public static void setShowCoordinationABB(boolean show)
+	{
+		wp.setProperty(SHOW_COORDINATION_ABB, toString(show));
 	}
 
 	private static String toString(boolean b)
@@ -1270,7 +1274,6 @@ public final class SupremicaProperties
 	 */
 	public static void loadProperties(String[] args)
 	{
-
 		// do we  want developer stuff by default
 		boolean enabled_developer_mode = true;
 
