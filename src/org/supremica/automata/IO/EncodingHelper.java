@@ -47,80 +47,85 @@
  *
  *  Supremica is owned and represented by KA.
  */
-package org.supremica.automata;
+package org.supremica.automata.IO;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import java.io.*;
+import org.supremica.log.*;
 
-public class TestStateSet
-	extends TestCase
+public class EncodingHelper
 {
+	private static Logger logger = LoggerFactory.createLogger(EncodingHelper.class);
 
-	public TestStateSet(String name)
-	{
-		super(name);
-	}
-
-	/**
-	 * Sets up the test fixture.
-	 * Called before every test case method.
-	 */
-	protected void setUp()
+	private EncodingHelper()
 	{
 	}
 
-	/**
-	 * Tears down the test fixture.
-	 * Called after every test case method.
-	 */
-	protected void tearDown()
+	public static String normalize(String input)
 	{
+		String s = input;
+		/*
+		try
+		{
+			s = new String(input.getBytes(), "UTF-8");
+			logger.info("org: " + input + " new: " + s);
+		}
+		catch (UnsupportedEncodingException ex)
+		{
+			logger.error("UTF-8 is an unsupported encoding");
+			throw new RuntimeException("UTF-8 is an unsupported encoding");
+		}
+		return s.toString();
+		*/
+
+		StringBuffer str = new StringBuffer();
+		int len = (s != null)
+				  ? s.length()
+				  : 0;
+
+		for (int i = 0; i < len; i++)
+		{
+			char ch = s.charAt(i);
+
+			switch (ch)
+			{
+
+			case '<' :
+			{
+				str.append("&lt;");
+
+				break;
+			}
+			case '>' :
+			{
+				str.append("&gt;");
+
+				break;
+			}
+			case '&' :
+			{
+				str.append("&amp;");
+
+				break;
+			}
+			case '"' :
+			{
+				str.append("&quot;");
+
+				break;
+			}
+			case '\r' :
+			case '\n' :
+			{
+				// else, default append char
+			}
+			default :
+			{
+				str.append(ch);
+			}
+			}
+		}
+
+		return str.toString();
+
 	}
-
-	/**
-	 * Assembles and returns a test suite
-	 * for all the test methods of this test case.
-	 */
-	public static Test suite()
-	{
-		TestSuite suite = new TestSuite(TestStateSet.class);
-		return suite;
-	}
-
-	public void testStateSets()
-	{
-		State q0 = new State("q0"); // id and name, set to the same
-		State q1 = new State("q1");
-		State q2 = new State("q2");
-		State q3 = new State("q3");
-
-		StateSet oneset = new StateSet();
-		assertTrue(oneset.size() == 0);
-		oneset.add(q0);
-		assertTrue(oneset.size() == 1);
-		oneset.add(q1);
-		assertTrue(oneset.size() == 2);
-		// oneset.add(q2);
-		// oneset.add(q3);
-		oneset.add(q1);
-		assertTrue(oneset.size() == 2); // should not add existing
-
-		StateSet twoset = new StateSet();
-		assertTrue(twoset.size() == 0);
-		twoset.add(q0);
-		assertTrue(twoset.size() == 1);
-		twoset.add(q1);
-		assertTrue(twoset.size() == 2);
-		// twoset.add(q2);
-		// twoset.add(q3);
-		twoset.add(new State(q0));
-		assertTrue(twoset.size() == 2); // should not add existing
-
-		assertTrue(oneset == oneset);
-		assertTrue(oneset.equals(oneset));
-		assertTrue(!(oneset == twoset));
-		assertTrue(oneset.equals(twoset));
-	}
-
 }

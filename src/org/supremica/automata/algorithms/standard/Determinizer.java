@@ -560,7 +560,7 @@ public class Determinizer
 		detm.execute();
 		detm.cleanUpDebug();
 
-		org.supremica.automata.algorithms.AutomatonToDsx todsx = new org.supremica.automata.algorithms.AutomatonToDsx(detm.getNewAutomaton());
+		org.supremica.automata.IO.AutomatonToDsx todsx = new org.supremica.automata.IO.AutomatonToDsx(detm.getNewAutomaton());
 		try
 		{
 			todsx.serialize(new java.io.PrintWriter(System.out));

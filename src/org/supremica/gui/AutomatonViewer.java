@@ -62,6 +62,7 @@ import org.supremica.automata.Arc;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.AutomatonListener;
 import org.supremica.automata.State;
+import org.supremica.automata.IO.*;
 
 public class AutomatonViewer
 	extends JFrame

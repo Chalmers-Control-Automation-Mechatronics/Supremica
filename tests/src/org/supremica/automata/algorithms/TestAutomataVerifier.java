@@ -49,6 +49,8 @@
  */
 package org.supremica.automata.algorithms;
 
+import java.io.*;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -56,7 +58,7 @@ import junit.framework.TestSuite;
 import org.supremica.testhelpers.*;
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.*;
-import java.io.*;
+import org.supremica.automata.IO.*;
 
 public class TestAutomataVerifier
 	extends TestCase

@@ -57,12 +57,13 @@ public class FileFormats
 	private static List inputs = new LinkedList();
 	private static List outputs = new LinkedList();
 
-	public static final FileFormats RCP = new FileFormats(false, true, "RCP", ".rcp", "RCP files (*.rcp)");
+	// Both input and output
 	public static final FileFormats XML = new FileFormats(true, true, "XML", ".xml", "XML files (*.xml)");
 	public static final FileFormats SP = new FileFormats(true, true, "SP", ".sp", "Supremica Project files (*.sp)");
-	public static final FileFormats VPRJ = new FileFormats(true, false, "VPRJ", ".vprj", "Valid Project files (*.vprj)");
-	public static final FileFormats VMOD = new FileFormats(true, false, "VMOD", ".vmod", "Valid Module files (*.vmod)");
-	public static final FileFormats DGRF = new FileFormats(true, false, "DGRF", ".dgrf", "Valid Graph files (*.dgrf)");
+	public static final FileFormats CLASS = new FileFormats(true, true, "CLASS", ".class", "Java Bytecode files (*.class)");
+
+	// Output only
+	public static final FileFormats RCP = new FileFormats(false, true, "RCP", ".rcp", "RCP files (*.rcp)");
 	public static final FileFormats DSX = new FileFormats(false, true, "DSX", ".dsx", "Desco files (*.dsx)");
 	public static final FileFormats DOT = new FileFormats(false, true, "DOT", ".dot", "Graphviz files (*.dot)");
 	public static final FileFormats EPS = new FileFormats(false, true, "EPS", ".eps", "Encapsulated Postscript (*.eps)");
@@ -76,7 +77,13 @@ public class FileFormats
 	public static final FileFormats ST = new FileFormats(false, true, "ST", ".st", "IEC-1131 Structured Text files (*.st)");
 	public static final FileFormats IL = new FileFormats(false, true, "IL", ".il", "IEC-1131 Instruction List files (*.il)");
 	public static final FileFormats NQC = new FileFormats(false, true, "NQC", ".nqc", "Mindstorm NQC files (*.nqc)");
-	public static final FileFormats CLASS = new FileFormats(true, true, "CLASS", ".class", "Java Bytecode files (*.class)");
+
+	// Input only
+	public static final FileFormats VPRJ = new FileFormats(true, false, "VPRJ", ".vprj", "Valid Project files (*.vprj)");
+	public static final FileFormats VMOD = new FileFormats(true, false, "VMOD", ".vmod", "Valid Module files (*.vmod)");
+	public static final FileFormats DGRF = new FileFormats(true, false, "DGRF", ".dgrf", "Valid Graph files (*.dgrf)");
+
+	// Neither input nor output
 	public static final FileFormats Directory = new FileFormats(false, false, "Directory", "", "Directory");
 
 	private String identifier;

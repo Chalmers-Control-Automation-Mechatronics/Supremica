@@ -106,11 +106,6 @@ public class Arc
 		return toState;
 	}
 
-	public LabeledEvent getEvent()
-	{
-		return event;
-	}
-
 	public String getLabel()
 	{
 		return event.getLabel();
@@ -119,6 +114,19 @@ public class Arc
 	public State getFromState()
 	{
 		return fromState;
+	}
+
+	public LabeledEvent getEvent()
+	{
+		return event;
+	}
+
+	public void reverse()
+	{
+		// swap the states
+		State tmpState = getToState();
+		toState = getFromState();
+		fromState = tmpState;
 	}
 
 	/**

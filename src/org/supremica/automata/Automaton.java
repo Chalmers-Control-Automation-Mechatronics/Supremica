@@ -500,6 +500,13 @@ public class Automaton
 		return (State) idStateMap.get(state.getId());
 	}
 
+	// Given thsi state, which belongs to this stateset, return a unique id-string
+	public String getUniqueStateId(State state)
+	{
+		// prereq: state is in theStates:
+		return state.getId(); // at the moment do the simplest thing
+	}
+	
 	/**
 	 * True if a state with the name exists, otherwise false.
 	 */
@@ -1185,9 +1192,14 @@ public class Automaton
 	 * automaton and the other. Note, that this method only compares the
 	 * number of states and transitions, etc. This method does guarantee
 	 * that the two automata generates the same language.
+	 *
+	 * That should really be "does NOT guarantee", right?
+	 * Shouldn't there really be a CompareAutomata class?
+	 * This class should have methods like areIsomorphic() and languageEqual()
 	 */
 	public boolean equalAutomaton(Automaton other)
 	{
+		// Should type, name, comment really be considered?
 		if (getType() != other.getType())
 		{
 			//System.err.println("equalAutomaton::non equal type");
@@ -1203,6 +1215,8 @@ public class Automaton
 			//System.err.println("equalAutomaton::non equal comment");
 			return false;
 		}
+		
+		// The following stuff seems useful to consider
 		if (hasAcceptingState() != other.hasAcceptingState())
 		{
 			//System.err.println("equalAutomaton::non equal accepting state");

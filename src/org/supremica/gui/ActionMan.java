@@ -71,7 +71,7 @@ import org.supremica.gui.animators.scenebeans.*;
 import org.supremica.gui.automataExplorer.AutomataExplorer;
 import org.supremica.gui.simulator.SimulatorExecuter;
 import org.supremica.log.*;
-import org.supremica.automata.IO.FileFormats;
+import org.supremica.automata.IO.*;
 
 import org.supremica.gui.useractions.*;
 import org.supremica.gui.texteditor.TextFrame;

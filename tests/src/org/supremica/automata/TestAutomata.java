@@ -49,14 +49,16 @@
  */
 package org.supremica.automata;
 
+import java.io.*;
+import java.util.*;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import org.supremica.testhelpers.*;
 import org.supremica.automata.algorithms.*;
-import java.io.*;
-import java.util.*;
+import org.supremica.automata.IO.*;
 
 public class TestAutomata
 	extends TestCase

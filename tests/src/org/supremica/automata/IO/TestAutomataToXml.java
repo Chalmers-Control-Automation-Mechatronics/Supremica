@@ -47,17 +47,25 @@
  *
  *  Supremica is owned and represented by KA.
  */
-package org.supremica.automata;
+package org.supremica.automata.IO;
+
+import java.io.*;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-public class TestStateSet
+import org.supremica.testhelpers.*;
+import org.supremica.automata.*;
+import org.supremica.automata.IO.*;
+
+public class TestAutomataToXml
 	extends TestCase
 {
+	private static final String tempFilePrefix = "SupremicaDummyFile";
+	private static final String tempFileSuffix = "xml";
 
-	public TestStateSet(String name)
+	public TestAutomataToXml(String name)
 	{
 		super(name);
 	}
@@ -84,43 +92,33 @@ public class TestStateSet
 	 */
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite(TestStateSet.class);
+		TestSuite suite = new TestSuite(TestAutomataToXml.class);
 		return suite;
 	}
 
-	public void testStateSets()
+	public void testReadWriteRead()
 	{
-		State q0 = new State("q0"); // id and name, set to the same
-		State q1 = new State("q1");
-		State q2 = new State("q2");
-		State q3 = new State("q3");
-
-		StateSet oneset = new StateSet();
-		assertTrue(oneset.size() == 0);
-		oneset.add(q0);
-		assertTrue(oneset.size() == 1);
-		oneset.add(q1);
-		assertTrue(oneset.size() == 2);
-		// oneset.add(q2);
-		// oneset.add(q3);
-		oneset.add(q1);
-		assertTrue(oneset.size() == 2); // should not add existing
-
-		StateSet twoset = new StateSet();
-		assertTrue(twoset.size() == 0);
-		twoset.add(q0);
-		assertTrue(twoset.size() == 1);
-		twoset.add(q1);
-		assertTrue(twoset.size() == 2);
-		// twoset.add(q2);
-		// twoset.add(q3);
-		twoset.add(new State(q0));
-		assertTrue(twoset.size() == 2); // should not add existing
-
-		assertTrue(oneset == oneset);
-		assertTrue(oneset.equals(oneset));
-		assertTrue(!(oneset == twoset));
-		assertTrue(oneset.equals(twoset));
+		try
+		{
+			File testFileAgv = TestFiles.getFile(TestFiles.AGV);
+			ProjectBuildFromXml originalBuilder = new ProjectBuildFromXml();
+			Project theOriginalProject = originalBuilder.build(testFileAgv);
+			assertTrue(theOriginalProject.nbrOfAutomata() > 0);
+			File tempFile = File.createTempFile(tempFilePrefix, tempFileSuffix);
+			AutomataToXml exporter = new AutomataToXml(theOriginalProject);
+			exporter.serialize(tempFile);
+			ProjectBuildFromXml secondBuilder = new ProjectBuildFromXml();
+			Project theSecondProject = secondBuilder.build(tempFile);
+			tempFile.delete();
+			assertTrue(theOriginalProject != null);
+			assertTrue(theSecondProject != null);
+			assertTrue(theOriginalProject.equalProject(theSecondProject));
+		}
+		catch (Exception ex)
+		{
+			ex.printStackTrace();
+			assertTrue(false);
+		}
 	}
 
 }

@@ -47,80 +47,31 @@
  *
  *  Supremica is owned and represented by KA.
  */
-package org.supremica.automata;
+package org.supremica.automata.IO;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-public class TestStateSet
+public class TestPackageIO
 	extends TestCase
 {
 
-	public TestStateSet(String name)
+	public TestPackageIO(String name)
 	{
 		super(name);
 	}
 
 	/**
-	 * Sets up the test fixture.
-	 * Called before every test case method.
-	 */
-	protected void setUp()
-	{
-	}
-
-	/**
-	 * Tears down the test fixture.
-	 * Called after every test case method.
-	 */
-	protected void tearDown()
-	{
-	}
-
-	/**
 	 * Assembles and returns a test suite
-	 * for all the test methods of this test case.
+	 * containing all known tests.
 	 */
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite(TestStateSet.class);
+		TestSuite suite = new TestSuite();
+		suite.addTest(TestProjectBuildFromXml.suite());
+		suite.addTest(TestAutomataToXml.suite());
+		suite.addTest(TestProjectToSP.suite());
 		return suite;
 	}
-
-	public void testStateSets()
-	{
-		State q0 = new State("q0"); // id and name, set to the same
-		State q1 = new State("q1");
-		State q2 = new State("q2");
-		State q3 = new State("q3");
-
-		StateSet oneset = new StateSet();
-		assertTrue(oneset.size() == 0);
-		oneset.add(q0);
-		assertTrue(oneset.size() == 1);
-		oneset.add(q1);
-		assertTrue(oneset.size() == 2);
-		// oneset.add(q2);
-		// oneset.add(q3);
-		oneset.add(q1);
-		assertTrue(oneset.size() == 2); // should not add existing
-
-		StateSet twoset = new StateSet();
-		assertTrue(twoset.size() == 0);
-		twoset.add(q0);
-		assertTrue(twoset.size() == 1);
-		twoset.add(q1);
-		assertTrue(twoset.size() == 2);
-		// twoset.add(q2);
-		// twoset.add(q3);
-		twoset.add(new State(q0));
-		assertTrue(twoset.size() == 2); // should not add existing
-
-		assertTrue(oneset == oneset);
-		assertTrue(oneset.equals(oneset));
-		assertTrue(!(oneset == twoset));
-		assertTrue(oneset.equals(twoset));
-	}
-
 }

@@ -57,8 +57,9 @@ import javax.swing.table.*;
 import java.util.*;
 import java.io.*;
 import java.net.URL;
-import org.supremica.log.*;
+import java.beans.*;
 import javax.help.*;
+import org.supremica.log.*;
 import org.supremica.*;
 import org.supremica.automata.algorithms.*;
 import org.supremica.automata.templates.*;
@@ -73,7 +74,7 @@ import org.supremica.util.*;
 import org.supremica.automata.execution.Controls;
 import org.supremica.automata.execution.Actions;
 import org.supremica.gui.animators.scenebeans.*;
-import java.beans.*;
+import org.supremica.automata.IO.*;
 
 public class Supremica
 	extends JFrame

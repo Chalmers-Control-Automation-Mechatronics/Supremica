@@ -340,7 +340,7 @@ public class AutomatonMinimizer
 		try
 		{
 			Automaton minauto = minimizer.getMinimizedAutomaton();
-			AutomatonToDsx todsx = new AutomatonToDsx(minauto);
+			org.supremica.automata.IO.AutomatonToDsx todsx = new org.supremica.automata.IO.AutomatonToDsx(minauto);
 			todsx.serialize(new java.io.PrintWriter(System.out));
 		}
 		catch(Exception excp)

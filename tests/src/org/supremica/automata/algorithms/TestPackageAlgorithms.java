@@ -69,13 +69,13 @@ public class TestPackageAlgorithms
 	public static Test suite()
 	{
 		TestSuite suite = new TestSuite();
-		suite.addTest(TestProjectBuildFromXml.suite());
+		// suite.addTest(TestProjectBuildFromXml.suite());
 		suite.addTest(TestAutomataSynchronizer.suite());
 		suite.addTest(TestAutomatonSynthesizer.suite());
 		suite.addTest(TestAutomataSynthesizer.suite());
 		suite.addTest(TestAutomataVerifier.suite());
-		suite.addTest(TestAutomataToXml.suite());
-		suite.addTest(TestProjectToSP.suite());
+		// suite.addTest(TestAutomataToXml.suite());
+		// suite.addTest(TestProjectToSP.suite());
 		return suite;
 	}
 }
