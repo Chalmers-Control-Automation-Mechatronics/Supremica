@@ -93,13 +93,38 @@ public class ActionAndControlViewerPanel
 	public void build()
 		throws Exception
 	{
-		DefaultMutableTreeNode root = new DefaultMutableTreeNode("Exceution");
+		DefaultMutableTreeNode root = new DefaultMutableTreeNode("Execution");
+
+		DefaultMutableTreeNode inputSignalsNode = new DefaultMutableTreeNode("InputSignals");
+		root.add(inputSignalsNode);
+
+		DefaultMutableTreeNode outputSignalsNode = new DefaultMutableTreeNode("OutputSignals");
+		root.add(outputSignalsNode);
 
 		DefaultMutableTreeNode actionsNode = new DefaultMutableTreeNode("Actions");
 		root.add(actionsNode);
 
 		DefaultMutableTreeNode controlsNode = new DefaultMutableTreeNode("Controls");
 		root.add(controlsNode);
+
+
+		for (Iterator theIt = theProject.inputSignalsIterator(); theIt.hasNext();)
+		{
+			Signal currSignal = (Signal)theIt.next();
+			DefaultMutableTreeNode currSignalNode = new DefaultMutableTreeNode(currSignal.getLabel());
+			inputSignalsNode.add(currSignalNode);
+			DefaultMutableTreeNode currPortNode = new DefaultMutableTreeNode(new Integer(currSignal.getPort()));
+			currSignalNode.add(currPortNode);
+		}
+
+		for (Iterator theIt = theProject.outputSignalsIterator(); theIt.hasNext();)
+		{
+			Signal currSignal = (Signal)theIt.next();
+			DefaultMutableTreeNode currSignalNode = new DefaultMutableTreeNode(currSignal.getLabel());
+			outputSignalsNode.add(currSignalNode);
+			DefaultMutableTreeNode currPortNode = new DefaultMutableTreeNode(new Integer(currSignal.getPort()));
+			currSignalNode.add(currPortNode);
+		}
 
 		Actions currActions = theProject.getActions();
 		if (currActions != null)

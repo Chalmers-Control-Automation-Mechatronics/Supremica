@@ -1,0 +1,180 @@
+<?xml version="1.0"?>
+
+<animation width="360" height="435">
+
+	<behaviour id="truckX" algorithm="constantSpeedMove" event="truckX.end">
+		<param name="from" value = "103" />
+		<param name="speed" value="0.02" />
+	</behaviour>
+
+	<behaviour id="truckY" algorithm="constantSpeedMove" event="truckY.end">
+		<param name="from" value = "403" />
+		<param name="speed" value="0.02"/>
+	</behaviour>
+
+	<behaviour id="agvX" algorithm="constantSpeedMove" event="agvX.end">
+		<param name="from" value = "307" />
+		<param name="speed" value="0.02"/>
+	</behaviour>
+
+	<behaviour id="agvY" algorithm="constantSpeedMove" event="agvY.end">
+		<param name="from" value = "103" />
+		<param name="speed" value="0.02"/>
+	</behaviour>
+	
+
+	<define id="truck_primitive">
+		<primitive type = "sprite">
+			<param name = "src" value = "image/truck.gif"/>
+			<param name = "hotspot" value = "(16,23)"/>
+		</primitive>
+	</define>
+
+
+	<define id="agv_primitive">
+		<primitive type = "sprite">
+			<param name = "src" value = "image/agv.gif"/>
+			<param name = "hotspot" value = "(16,23)"/>
+		</primitive>
+	</define>
+
+	<define id="background_primitive">
+		<primitive type = "sprite">
+			<param name = "src" value ="image/plant.gif"/>
+			<param name="hotspot" value="(0,0)"/>
+		</primitive>
+	</define>
+
+
+	<draw>
+		<transform type = "translate">
+			<animate param = "x" behaviour = "agvX"/>
+			<animate param = "y" behaviour = "agvY"/>
+			<param name = "x" value = "307"/>
+			<param name = "y" value = "103"/>
+			<paste object = "agv_primitive" /> 
+		</transform>
+		<transform type = "translate">
+			<animate param = "x" behaviour = "truckX"/>
+			<animate param = "y" behaviour = "truckY"/>
+			<param name = "x" value = "103"/>
+			<param name = "y" value = "403"/>
+			<paste object = "truck_primitive" /> 
+		</transform>
+		<paste object="background_primitive"/>
+	</draw>
+	
+	<!-- The commands -->
+
+	<forall var = "i" values = "0">
+		<command name="agv.goX.${i}">
+			<announce event = "~agvX.end"/>
+			<reset behaviour="agvX"/>
+			<set object="agvX" param="to" value="23"/>
+			<start behaviour="agvX"/>
+		</command>
+	</forall>
+
+	<forall var = "i" values = "1 2 3 4">
+		<command name="agv.goX.${i}">
+			<announce event = "~agvX.end"/>
+			<reset behaviour="agvX"/>
+			<set object="agvX" param="to" value="40+68*${i}"/>
+			<start behaviour="agvX"/>
+		</command>
+	</forall>
+
+	<forall var = "i" values = "0 1 2">
+		<command name="agv.goY.${i}">
+			<announce event = "~agvY.end"/>
+			<reset behaviour="agvY"/>
+			<set object="agvY" param="to" value="45+68*${i}"/>
+			<start behaviour="agvY"/>
+		</command>
+	</forall>
+
+
+	<forall var = "i" values = "3">
+		<command name="agv.goY.${i}">
+			<announce event = "~agvY.end"/>
+			<reset behaviour="agvY"/>
+			<set object="agvY" param="to" value="23+68*${i}"/>
+			<start behaviour="agvY"/>
+		</command>
+	</forall>
+	
+	<forall var = "i" values = "4 5 6">
+		<command name="agv.goY.${i}">
+			<announce event = "~agvY.end"/>
+			<reset behaviour="agvY"/>
+			<set object="agvY" param="to" value="5+68*${i}"/>
+			<start behaviour="agvY"/>
+		</command>
+	</forall>	
+
+	<event object="agvX" event="agvX.end">
+		<announce event="agvX.end"/>
+		<stop behaviour = "agvX"/>
+	</event>
+
+	<event object="agvY" event="agvY.end">
+		<announce event="agvY.end"/>
+		<stop behaviour = "agvY"/>
+	</event>
+
+	<forall var = "i" values = "0">
+		<command name="truck.goX.${i}">
+			<announce event = "~truckX.end"/>
+			<reset behaviour="truckX"/>
+			<set object="truckX" param="to" value="25"/>
+			<start behaviour="truckX"/>
+		</command>
+	</forall>
+
+	<forall var = "i" values = "1 2 3 4">
+		<command name="truck.goX.${i}">
+			<announce event = "~truckX.end"/>
+			<reset behaviour="truckX"/>
+			<set object="truckX" param="to" value="40+68*${i}"/>
+			<start behaviour="truckX"/>
+		</command>
+	</forall>
+
+	<forall var = "i" values = "0 1 2">
+		<command name="truck.goY.${i}">
+			<announce event = "~truckY.end"/>
+			<reset behaviour="truckY"/>
+			<set object="truckY" param="to" value="35+68*${i}"/>
+			<start behaviour="truckY"/>
+		</command>
+	</forall>
+
+	<forall var = "i" values = "3">
+		<command name="truck.goY.${i}">
+			<announce event = "~truckY.end"/>
+			<reset behaviour="truckY"/>
+			<set object="truckY" param="to" value="13+68*${i}"/>
+			<start behaviour="truckY"/>
+		</command>
+	</forall>
+	
+	<forall var = "i" values = "4 5 6">
+		<command name="truck.goY.${i}">
+			<announce event = "~truckY.end"/>
+			<reset behaviour="truckY"/>
+			<set object="truckY" param="to" value="-5+68*${i}"/>
+			<start behaviour="truckY"/>
+		</command>
+	</forall>	
+
+	<event object="truckX" event="truckX.end">
+		<announce event="truckX.end"/>
+		<stop behaviour = "truckX"/>
+	</event>
+
+	<event object="truckY" event="truckY.end">
+		<announce event="truckY.end"/>
+		<stop behaviour = "truckY"/>
+	</event>
+
+</animation>

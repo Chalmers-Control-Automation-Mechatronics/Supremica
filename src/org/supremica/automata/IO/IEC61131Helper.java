@@ -111,6 +111,28 @@ public class IEC61131Helper
 		pw.println();
 	}
 
+	// Start AT %IX24 : BOOL;
+	public void printBooleanInputVariableDeclaration(PrintWriter pw, String variableName, int port, String comment)
+	{
+		pw.print("\t\t" + variableName + " AT %IX" + port + " : BOOL; ");
+		if (comment != null)
+		{
+			pw.print("(* " + comment + " *)");
+		}
+		pw.println();
+	}
+
+	// InPortvakt AT %QX0  : BOOL;
+	public void printBooleanOutputVariableDeclaration(PrintWriter pw, String variableName, int port, String comment)
+	{
+		pw.print("\t\t" + variableName + " AT %QX" + port +  " : BOOL; ");
+		if (comment != null)
+		{
+			pw.print("(* " + comment + " *)");
+		}
+		pw.println();
+	}
+
 	public void printEndVariables(PrintWriter pw)
 	{
 		pw.println("\tEND_VAR\n");

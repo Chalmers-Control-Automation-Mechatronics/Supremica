@@ -64,7 +64,16 @@ public class Signals
 		for (Iterator signalIt = other.iterator(); signalIt.hasNext();)
 		{
 			Signal currSignal = (Signal)signalIt.next();
+			addSignal(new Signal(currSignal));
+		}
+	}
 
+	public void addSignals(Signals other)
+	{
+		for (Iterator signalIt = other.iterator(); signalIt.hasNext();)
+		{
+			Signal currSignal = (Signal)signalIt.next();
+			addSignal(new Signal(currSignal));
 		}
 	}
 

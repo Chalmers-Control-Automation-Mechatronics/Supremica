@@ -433,6 +433,6 @@
 			<Condition condition="head.end"/>
 		</Control>
 	</Controls>
-	<Animation path="operator_supervisor_animation.xml"/>
+	<Animation path="/scenebeans/warehouse/warehouse.xml"/>
 </Execution>
 </Automata>

@@ -62,11 +62,11 @@ public class AutomataToControlBuilderST
 	private AutomataToIEC1131 theExporter = null;
 	private ControlBuilderHelper theHelper = null;
 
-	public AutomataToControlBuilderST(Automata theAutomata)
+	public AutomataToControlBuilderST(Project theProject)
 		throws Exception
 	{
 		theHelper = (ControlBuilderHelper)ControlBuilderHelper.getInstance();
-		theExporter = new AutomataToIEC1131(theAutomata, theHelper);
+		theExporter = new AutomataToIEC1131(theProject, theHelper);
 	}
 
 	public void serializeApp(File theFile, String filename)

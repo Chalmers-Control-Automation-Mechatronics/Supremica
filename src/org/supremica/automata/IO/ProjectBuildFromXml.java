@@ -115,6 +115,7 @@ public class ProjectBuildFromXml
 	private Actions currActions = null;
 	private Action currAction = null;
 	private Control currControl = null;
+	private Signals currSignals = null;
 	private InputProtocol inputProtocol = InputProtocol.UnknownProtocol;
 	private File thisFile = null;
 
@@ -296,7 +297,6 @@ public class ProjectBuildFromXml
 		{
 			doExecution(attributes);
 		}
-/*
 		else if (inputSignalsStr.equals(name))
 		{
 			doInputSignals(attributes);
@@ -309,7 +309,6 @@ public class ProjectBuildFromXml
 		{
 			doSignal(attributes);
 		}
-*/
 		else if (actionsStr.equals(name))
 		{
 			doActions(attributes);
@@ -683,6 +682,45 @@ public class ProjectBuildFromXml
 	public final void doExecution(Attributes attributes)
 		throws SAXException
 	{
+	}
+
+	public final void doInputSignals(Attributes attributes)
+		throws SAXException
+	{
+		currSignals = currProject.getInputSignals();
+	}
+
+	public final void doOutputSignals(Attributes attributes)
+		throws SAXException
+	{
+		currSignals = currProject.getOutputSignals();
+	}
+
+	public final void doSignal(Attributes attributes)
+		throws SAXException
+	{
+		String label = attributes.getValue("label");
+
+		if (label == null)
+		{
+			throwException("label attribute is missing");
+		}
+		if (currSignals.hasSignal(label))
+		{
+			throwException("Multiple signals of " + label);
+		}
+
+		String portStr = attributes.getValue("port");
+		if (portStr == null)
+		{
+			throwException("port attribute is missing");
+		}
+		int port = Integer.parseInt(portStr);
+
+		Signal newSignal = new BinarySignal(label, port);
+
+		//System.err.println("Signal added:" + label);
+		currSignals.addSignal(newSignal);
 	}
 
 	public final void doActions(Attributes attributes)

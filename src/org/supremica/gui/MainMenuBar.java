@@ -611,7 +611,7 @@ public class MainMenuBar
 			public void actionPerformed(ActionEvent e)
 			{
 
-				ActionMan.AutomataTo1131IL(ActionMan.getGui());
+				ActionMan.ProjectTo1131IL(ActionMan.getGui());
 			}
 		});
 
@@ -623,7 +623,7 @@ public class MainMenuBar
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				ActionMan.AutomataTo1131ST(ActionMan.getGui());
+				ActionMan.ProjectTo1131ST(ActionMan.getGui());
 			}
 		});
 
@@ -636,7 +636,7 @@ public class MainMenuBar
 			public void actionPerformed(ActionEvent e)
 			{
 
-				ActionMan.AutomataToControlBuilderIL(ActionMan.getGui());
+				ActionMan.ProjectToControlBuilderIL(ActionMan.getGui());
 			}
 		});
 
@@ -649,7 +649,7 @@ public class MainMenuBar
 			public void actionPerformed(ActionEvent e)
 			{
 
-				ActionMan.AutomataToControlBuilderST(ActionMan.getGui());
+				ActionMan.ProjectToControlBuilderST(ActionMan.getGui());
 			}
 		});
 

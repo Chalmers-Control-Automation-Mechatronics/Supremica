@@ -109,9 +109,19 @@ public class Project
 		return theInputSignals;
 	}
 
+	public Iterator inputSignalsIterator()
+	{
+		return theInputSignals.iterator();
+	}
+
 	public Signals getOutputSignals()
 	{
 		return theOutputSignals;
+	}
+
+	public Iterator outputSignalsIterator()
+	{
+		return theOutputSignals.iterator();
 	}
 
 	public boolean hasAnimation()
@@ -157,11 +167,32 @@ public class Project
 
 	public void addAttributes(Project otherProject)
 	{
+		addInputSignals(otherProject.getInputSignals());
+		addOutputSignals(otherProject.getOutputSignals());
 		addActions(otherProject.getActions());
 		addControls(otherProject.getControls());
 		setAnimationURL(otherProject.getAnimationURL());
 	}
 
+	private void addInputSignals(Signals otherSignals)
+	{
+		if (theInputSignals == null)
+		{
+			theInputSignals = new Signals();
+		}
+		theInputSignals.addSignals(otherSignals);
+		notifyListeners(AutomataListeners.MODE_ACTIONS_OR_CONTROLS_CHANGED, null);
+	}
+
+	private void addOutputSignals(Signals otherSignals)
+	{
+		if (theOutputSignals == null)
+		{
+			theOutputSignals = new Signals();
+		}
+		theOutputSignals.addSignals(otherSignals);
+		notifyListeners(AutomataListeners.MODE_ACTIONS_OR_CONTROLS_CHANGED, null);
+	}
 
 	private void addActions(Actions otherActions)
 	{

@@ -2305,11 +2305,11 @@ public class ActionMan
 
 
 	// Generate ABB Control Builder IL
-	public static void AutomataToControlBuilderIL(Gui gui)
+	public static void ProjectToControlBuilderIL(Gui gui)
 	{
-		Automata selectedAutomata = gui.getSelectedAutomata();
+		Project selectedProject = gui.getSelectedProject();
 
-		if (selectedAutomata.size() < 1)
+		if (selectedProject.size() < 1)
 		{
 			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
 
@@ -2341,7 +2341,7 @@ public class ActionMan
 					File prjFile = new File(prefixName + ".prj");
 					try
 					{
-						AutomataToControlBuilderIL exporter = new AutomataToControlBuilderIL(selectedAutomata);
+						AutomataToControlBuilderIL exporter = new AutomataToControlBuilderIL(selectedProject);
 
 						exporter.serializeApp(appFile, filename);
 						exporter.serializePrj(prjFile, filename);
@@ -2359,11 +2359,11 @@ public class ActionMan
 	}
 
 	// Generate ABB Control Builder ST
-	public static void AutomataToControlBuilderST(Gui gui)
+	public static void ProjectToControlBuilderST(Gui gui)
 	{
-		Automata selectedAutomata = gui.getSelectedAutomata();
+		Project selectedProject = gui.getSelectedProject();
 
-		if (selectedAutomata.size() < 1)
+		if (selectedProject.size() < 1)
 		{
 			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
 
@@ -2395,7 +2395,7 @@ public class ActionMan
 					File prjFile = new File(prefixName + ".prj");
 					try
 					{
-						AutomataToControlBuilderST exporter = new AutomataToControlBuilderST(selectedAutomata);
+						AutomataToControlBuilderST exporter = new AutomataToControlBuilderST(selectedProject);
 						exporter.serializeApp(appFile, filename);
 						exporter.serializePrj(prjFile, filename);
 					}
@@ -2458,11 +2458,12 @@ public class ActionMan
 	}
 
 	// Generate 1131 Structured Text
-	public static void AutomataTo1131ST(Gui gui)
+	public static void ProjectTo1131ST(Gui gui)
 	{
-		Automata selectedAutomata = gui.getSelectedAutomata();
+		// Automata selectedProject = gui.getselectedProject();
+		Project selectedProject = gui.getSelectedProject();
 
-		if (selectedAutomata.size() < 1)
+		if (selectedProject.size() < 1)
 		{
 			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
 
@@ -2482,7 +2483,7 @@ public class ActionMan
 					try
 					{
 
-						AutomataToIEC1131 exporter = new AutomataToIEC1131(selectedAutomata);
+						AutomataToIEC1131 exporter = new AutomataToIEC1131(selectedProject);
 
 						PrintWriter theWriter = new PrintWriter(new FileWriter(currFile));
 
@@ -2504,11 +2505,12 @@ public class ActionMan
 	}
 
 	// Generate 1131 Instruction List
-	public static void AutomataTo1131IL(Gui gui)
+	public static void ProjectTo1131IL(Gui gui)
 	{
-		Automata selectedAutomata = gui.getSelectedAutomata();
+		//Automata selectedProject = gui.getselectedProject();
+		Project selectedProject = gui.getSelectedProject();
 
-		if (selectedAutomata.size() < 1)
+		if (selectedProject.size() < 1)
 		{
 			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
 
@@ -2529,7 +2531,7 @@ public class ActionMan
 
 					try
 					{
-						AutomataToIEC1131 exporter = new AutomataToIEC1131(selectedAutomata);
+						AutomataToIEC1131 exporter = new AutomataToIEC1131(selectedProject);
 
 						PrintWriter theWriter = new PrintWriter(new FileWriter(currFile));
 
@@ -2553,40 +2555,40 @@ public class ActionMan
 	// Generate Java Bytecode
 	public static void AutomataToJavaBytecode(Gui gui)
 	{
-		Automata selectedAutomata = gui.getSelectedAutomata();
+		Project selectedProject = gui.getSelectedProject();
 
-		if (selectedAutomata.size() < 1)
+		if (selectedProject.size() < 1)
 		{
 			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
 
 			return;
 		}
 
-	        JFileChooser outputDir = new JFileChooser();
+			JFileChooser outputDir = new JFileChooser();
 		outputDir.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 
 		if (outputDir.showSaveDialog(gui.getComponent()) == JFileChooser.APPROVE_OPTION)
 		{
 			File currFile = outputDir.getSelectedFile();
-			
+
 			if (currFile != null)
 			{
-			    if (currFile.isDirectory())
+				if (currFile.isDirectory())
 				{
-				    try
+					try
 					{
-					    File tmpFile  = File.createTempFile("softplc", ".il");
-					    tmpFile.deleteOnExit();
-					    AutomataToIEC1131 exporter = new AutomataToIEC1131(selectedAutomata);
-					    PrintWriter theWriter = new PrintWriter(new FileWriter(tmpFile));
-					    
-					    exporter.serializeInstructionList(theWriter);
-					    
-					    theWriter.close();
-					    
-					    new org.supremica.softplc.CompILer.ilc(tmpFile.getAbsolutePath(), currFile.getAbsolutePath());
+						File tmpFile  = File.createTempFile("softplc", ".il");
+						tmpFile.deleteOnExit();
+						AutomataToIEC1131 exporter = new AutomataToIEC1131(selectedProject);
+						PrintWriter theWriter = new PrintWriter(new FileWriter(tmpFile));
+
+						exporter.serializeInstructionList(theWriter);
+
+						theWriter.close();
+
+						new org.supremica.softplc.CompILer.ilc(tmpFile.getAbsolutePath(), currFile.getAbsolutePath());
 					}
-				    catch (Exception ex)
+					catch (Exception ex)
 					{
 						logger.error("Exception while generating Java Bytecode to file " + currFile.getAbsolutePath());
 						logger.debug(ex.getStackTrace());
@@ -2598,37 +2600,37 @@ public class ActionMan
 		}
 	}
 
-        // Run simulation
-        public static void RunSimulation(Gui gui)
+	// Run simulation
+	public static void RunSimulation(Gui gui)
 	{
-	    Automata selectedAutomata = gui.getSelectedAutomata();
-	    
-	    if (selectedAutomata.size() < 1)
+		Project selectedProject = gui.getSelectedProject();
+
+		if (selectedProject.size() < 1)
 		{
-		    JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
-		    
-		    return;
+			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+
+			return;
 		}
-	    
+
 	    try
 		{
-		    File tmpFile  = File.createTempFile("softplc", ".il");
-		    tmpFile.deleteOnExit();
-		    AutomataToIEC1131 exporter = new AutomataToIEC1131(selectedAutomata);
-		    PrintWriter theWriter = new PrintWriter(new FileWriter(tmpFile));
-		    
-		    exporter.serializeInstructionList(theWriter);
-		    theWriter.close();
-		    
-		    new org.supremica.softplc.CompILer.ilc(tmpFile.getAbsolutePath(), "/tmp");
+			File tmpFile  = File.createTempFile("softplc", ".il");
+			tmpFile.deleteOnExit();
+			AutomataToIEC1131 exporter = new AutomataToIEC1131(selectedProject);
+			PrintWriter theWriter = new PrintWriter(new FileWriter(tmpFile));
+
+			exporter.serializeInstructionList(theWriter);
+			theWriter.close();
+
+			new org.supremica.softplc.CompILer.ilc(tmpFile.getAbsolutePath(), "/tmp");
 		}
-	    catch (Exception ex)
+		catch (Exception ex)
 		{
-		    logger.error("Exception while generating Java Bytecode to file");
-		    logger.debug(ex.getStackTrace());
-		    return;
+			logger.error("Exception while generating Java Bytecode to file");
+			logger.debug(ex.getStackTrace());
+			return;
 		}
-	    logger.info("Java Bytecode file successfully generated");
+		logger.info("Java Bytecode file successfully generated");
 	}
 }
 
