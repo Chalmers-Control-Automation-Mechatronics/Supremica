@@ -8,7 +8,7 @@ class EditorPanel
 	extends JPanel
 {
 	private ModuleContainer moduleContainer;
-	private String title;
+	private String name;
 	private JTabbedPane tabPanel;
 	private EditorParametersPanel parametersPanel;
 	private EditorEventsPanel eventsPanel;
@@ -16,24 +16,24 @@ class EditorPanel
 	private EditorComponentsPanel componentsPanel;
 	private JSplitPane splitPanelHorizontal;
 
-	EditorPanel(ModuleContainer moduleContainer, String title)
+	EditorPanel(ModuleContainer moduleContainer, String name)
 	{
 		this.moduleContainer = moduleContainer;
-		this.title = title;
+		this.name = name;
 
 		tabPanel = new JTabbedPane(JTabbedPane.BOTTOM);
 
 		aliasesPanel = new EditorAliasesPanel(moduleContainer, "Aliases");
-		tabPanel.add(aliasesPanel.getTitle(), aliasesPanel);
+		tabPanel.add(aliasesPanel);
 
 		componentsPanel = new EditorComponentsPanel(moduleContainer, "Components");
-		tabPanel.add(componentsPanel.getTitle(), componentsPanel);
+		tabPanel.add(componentsPanel);
 
 		eventsPanel = new EditorEventsPanel(moduleContainer, "Events");
-		tabPanel.add(eventsPanel.getTitle(), eventsPanel);
+		tabPanel.add(eventsPanel);
 
 		parametersPanel = new EditorParametersPanel(moduleContainer, "Parameters");
-		tabPanel.add(parametersPanel.getTitle(), parametersPanel);
+		tabPanel.add(parametersPanel);
 
 		tabPanel.setSelectedComponent(componentsPanel);
 
@@ -45,9 +45,9 @@ class EditorPanel
 		add(splitPanelHorizontal, BorderLayout.CENTER);
 	}
 
-	public String getTitle()
+	public String getName()
 	{
-		return title;
+		return name;
 	}
 
 }

@@ -33,6 +33,15 @@ public class OpenAction
 
 	public void doAction()
 	{
+/*
+		new FileImporter(FileDialogs.getImportFileChooser(FileFormats.WDES), ide)    // anonymous class
+		{
+			void openFile(IDE ide, File f)
+			{
+				importUMDESFile(ide, f);
+			}
+		};
+*/
 		System.err.println("Open Action selected - not implemented");
 	}
 }

@@ -7,17 +7,17 @@ class EditorParametersPanel
 	extends WhiteScrollPane
 {
 	private ModuleContainer moduleContainer;
-	private String title;
+	private String name;
 
-	EditorParametersPanel(ModuleContainer moduleContainer, String title)
+	EditorParametersPanel(ModuleContainer moduleContainer, String name)
 	{
 		this.moduleContainer = moduleContainer;
-		this.title = title;
+		this.name = name;
 	}
 
-	public String getTitle()
+	public String getName()
 	{
-		return title;
+		return name;
 	}
 
 }

@@ -7,17 +7,17 @@ class SimulatorPanel
 	extends WhiteScrollPane
 {
 	private ModuleContainer moduleContainer;
-	private String title;
+	private String name;
 
-	SimulatorPanel(ModuleContainer moduleContainer, String title)
+	SimulatorPanel(ModuleContainer moduleContainer, String name)
 	{
 		this.moduleContainer = moduleContainer;
-		this.title = title;
+		this.name = name;
 	}
 
-	public String getTitle()
+	public String getName()
 	{
-		return title;
+		return name;
 	}
 
 }

@@ -6,19 +6,19 @@ import org.supremica.gui.WhiteScrollPane;
 class EditorEventsPanel
 	extends WhiteScrollPane
 {
-	private String title;
+	private String name;
 	private ModuleContainer moduleContainer;
 
-	EditorEventsPanel(ModuleContainer moduleContainer, String title)
+	EditorEventsPanel(ModuleContainer moduleContainer, String name)
 	{
 		this.moduleContainer = moduleContainer;
-		this.title = title;
+		this.name = name;
 	}
 
-	public String getTitle()
+	public String getName()
 	{
-		System.err.println("getTitle: " + title);
-		return title;
+		//System.err.println("getTitle: " + title);
+		return name;
 	}
 
 }
