@@ -72,6 +72,8 @@ public class IDE
 
 		contentPanel.add(splitPanelVertical, BorderLayout.CENTER);
 
+		pack();
+
 
     }
 
@@ -95,7 +97,7 @@ public class IDE
 	public String getNewModuleName(String prefix)
 	{
 		String nameSuggestion = prefix + newModuleCounter++;
-		while (getModule(nameSuggestion) != null)
+		while (getModuleProxy(nameSuggestion) != null)
 		{
 			nameSuggestion = prefix + newModuleCounter++;
 		}
@@ -103,7 +105,7 @@ public class IDE
 
 	}
 
-	public ModuleProxy getModule(String name)
+	public ModuleProxy getModuleProxy(String name)
 	{
 		for(Iterator modIt = modules.iterator(); modIt.hasNext(); )
 		{
@@ -129,7 +131,7 @@ public class IDE
 
 	public void setActiveModule(ModuleProxy module)
 	{
-		if (getActiveModule() != module)
+		if (getActiveModuleProxy() != module)
 		{
 			remove(module);
 			add(module);
@@ -137,9 +139,14 @@ public class IDE
 		setTitle(ideName + " [" + module.getName() + "]");
 	}
 
-	public ModuleProxy getActiveModule()
+	public ModuleProxy getActiveModuleProxy()
 	{
 		return (ModuleProxy)modules.getFirst();
+	}
+
+	public Iterator getModuleIterator()
+	{
+		return modules.iterator();
 	}
 
 	public static void main(String args[])

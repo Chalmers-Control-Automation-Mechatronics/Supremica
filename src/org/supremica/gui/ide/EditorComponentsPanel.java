@@ -8,10 +8,12 @@ class EditorComponentsPanel
 {
 	private IDE ide;
 	private String title;
+	private ModuleContainer moduleContainer;
 
-	EditorComponentsPanel(IDE ide, String title)
+	EditorComponentsPanel(IDE ide, ModuleContainer moduleContainer, String title)
 	{
 		this.ide = ide;
+		this.moduleContainer = moduleContainer;
 		this.title = title;
 	}
 

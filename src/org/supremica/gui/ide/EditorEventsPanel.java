@@ -8,10 +8,12 @@ class EditorEventsPanel
 {
 	private IDE ide;
 	private String title;
+	private ModuleContainer moduleContainer;
 
-	EditorEventsPanel(IDE ide, String title)
+	EditorEventsPanel(IDE ide, ModuleContainer moduleContainer, String title)
 	{
 		this.ide = ide;
+		this.moduleContainer = moduleContainer;
 		this.title = title;
 	}
 
