@@ -5,8 +5,11 @@
 // named as "restr(automaton)"
 
 // Note, this is the first command to implement the Swing.Action interface
-// Makes thinsg so much simpler!
+// Makes things so much simpler!
 
+// TODO:
+// Need a TreeSelectionListener that selects the event and all its children
+// when it or one of its children is selected (or only allow level 1 nodes to be selected
 package org.supremica.gui;
 
 import java.util.*;
@@ -176,7 +179,7 @@ class EventsViewerPanel	// compare AlphabetsViewerPanel
 			EventSubTree node = (EventSubTree)enum.nextElement();
 			
 			// If the number of children is not the same as the number of automata plus the number in EventSubTree
-			// Then it has to be disabled/hidden
+			// Then it has to be disabled/hidden/unselectable
 			if(node.getChildCount()-EventSubTree.numChildren() != automata.size())
 			{
 				node.setEnabled(false);
@@ -225,8 +228,9 @@ class RestrictEventsViewerPanel
 {
 	private JTree tree = null;
 	private JScrollPane scrollpane = null;
-	private Automaton automaton = new Automaton("Restrict Events");
 	private AlphabetViewerSubTree root = null;
+	boolean erase = true;
+	private Automaton automaton = new Automaton("Erase These Events");
 	
 	public RestrictEventsViewerPanel()
 	{
@@ -278,6 +282,27 @@ class RestrictEventsViewerPanel
 		revalidate();
 	}
 
+	public void eraseThese()
+	{
+		automaton.setName("Erase These Events");
+		root.setUserObject("Erase These Events");
+		erase = true;
+		tree.repaint();
+	}
+	
+	public void keepThese()
+	{
+		automaton.setName("Keep These Events");
+		root.setUserObject("Keep These Events");
+		erase = false;
+		tree.repaint();
+	}
+
+	public boolean toErase()
+	{
+		return erase;
+	}
+	
 	public TreePath[] getSelectionPaths()
 	{
 		return tree.getSelectionPaths();
@@ -307,7 +332,7 @@ class LanguageRestrictorDialog
 		public OkButton()
 		{
 			super("Ok");
-			setToolTipText("Do teh restriction");
+			setToolTipText("Do the restriction");
 			addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
@@ -387,7 +412,7 @@ class LanguageRestrictorDialog
 			for(int i = 0; i < paths.length; ++i)
 			{
 				TreePath path = paths[i];
-				// The second element is the one we're interested in. Get its event object
+				// The second element is the one we're interested in - component 0, the root, can never be selected.
 				SupremicaTreeNode node = (SupremicaTreeNode)path.getPathComponent(1);
 				LabeledEvent event = (LabeledEvent)node.getUserObject();
 				
@@ -408,7 +433,7 @@ class LanguageRestrictorDialog
 			for(int i = 0; i < paths.length; ++i)
 			{
 				TreePath path = paths[i];
-				// The second element is the one we're interested in
+				// The second element is the one we're interested in - component 0, the root, can never be selected
 				SupremicaTreeNode node = (SupremicaTreeNode)path.getPathComponent(1);
 				LabeledEvent event = (LabeledEvent)node.getUserObject();
 				restrictEvents.remove(event);
@@ -480,9 +505,44 @@ class LanguageRestrictorDialog
 		viewMenuUnion.setEnabled(false);
 		viewMenuIntersection.setEnabled(false);
 		
+		// Restrict
+		JMenu restrictMenu = new JMenu("Restrict");
+		restrictMenu.setMnemonic(KeyEvent.VK_R);
+		
+		// Restrict.Erase These Events (default, therefore initially checked)
+		JRadioButtonMenuItem restrictMenuErase = new JRadioButtonMenuItem("Erase These Events", true);
+		restrictMenuErase.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				restrictEvents.eraseThese();
+			}
+		});
+		
+		// Restrict.Keep These Events
+		JRadioButtonMenuItem restrictMenuKeep = new JRadioButtonMenuItem("Keep These Events");
+		restrictMenuKeep.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				restrictEvents.keepThese();
+			}
+		});
+		ButtonGroup restrgroup = new ButtonGroup();
+		restrgroup.add(restrictMenuErase);
+		restrgroup.add(restrictMenuKeep);
+		
+		restrictMenu.add(restrictMenuErase);
+		restrictMenu.add(restrictMenuKeep);
+
+		// For the moment, until we get the Alphabet impl fixed
+		restrictMenuErase.setEnabled(false);
+		restrictMenuKeep.setEnabled(false);
+		
 		JMenuBar menuBar = new JMenuBar();		
 		menuBar.add(menuFile);
 		menuBar.add(viewMenu);
+		menuBar.add(restrictMenu);
 		setJMenuBar(menuBar);
 	}
 	
@@ -525,6 +585,12 @@ class LanguageRestrictorDialog
 		logger.debug("LanguageRestriction::doRestrict()");
 		// Get the restriction alphabet
 		Alphabet alpha = restrictEvents.getAlphabet();
+		
+		if(!restrictEvents.toErase()) // if these are to be kept, the others should be erased
+		{
+			// Create an alphabet that is the union of 
+		}
+		
 		Automata newautomata = new Automata();
 		
 		Iterator autit = automata.iterator();

@@ -1,4 +1,4 @@
-/**************** StateSet.java *********************/
+/********************** StateSet.java *************************/
 // Implementation of a useful state set. 
 // Note that a Set implmentation considers two elements e1 and e2 equal
 // if e1.equals(e2) == true; Surely this also means that e2.equals(e1)
@@ -6,27 +6,43 @@
 // For State, equals(Object obj) compares id's, so in practice
 // StateSet is only well-defined for states of the same automaton.
 
+// StateSet gurantees an ordering defined by the names of the states
+
 package org.supremica.automata;
 
 import java.util.*;
 import org.supremica.automata.State;
 
+class StateComparator
+	implements Comparator
+{
+	int compare(State s1, State s2)
+	{
+		return s1.getName().compareTo(s2.getName());
+	}
+	
+	public int compare(Object o1, Object o2)
+	{
+		return compare((State)o1, (State)o2);
+	}
+	
+}
 
 public class StateSet
 //	extends AbstractSet
 {
-	private HashSet theSet = null;
-
+	private TreeSet theSet = null;
+	
 	// Private constructor for cloning
-	private StateSet(HashSet hashset)
+	private StateSet(TreeSet setimpl)
 	{
-		this.theSet = new HashSet(hashset);
+		this.theSet = new TreeSet(setimpl);
 	}
 	
 	// Create an empty set
 	public StateSet()
 	{
-		theSet = new HashSet();
+		theSet = new TreeSet(new StateComparator());
 	}
 
 	// Shallow copy (should it be deep?)
@@ -58,14 +74,6 @@ public class StateSet
 	// Make me the intersection of myself and s2
 	public void intersect(StateSet s2)
 	{
-		/* Iterate over self and remove all that're not in s2
-		Iterator it = iterator();
-		while(it.hasNext())
-		{
-			State state = (State)it.next();
-			if(!s2.contains(state))
-				remove(state);
-		}*/
 		theSet.retainAll(s2.theSet);
 	}
 
@@ -82,7 +90,7 @@ public class StateSet
 	// Shallow copy (is that what we mean by clone, really?)
 	public Object clone()
 	{
-		return new StateSet(((HashSet)theSet.clone()));
+		return new StateSet(((TreeSet)theSet.clone()));
 	}
 
 	public boolean contains(State state)
@@ -159,7 +167,7 @@ public class StateSet
 	// Should use the globally defined state separator (and thus, this method should not even be here)
 	public State createNewState()
 	{
-		boolean i = false;	// initial?
+		// boolean i = false;	// initial?
 		boolean d = false;	// desired?
 		boolean x = false;	// forbidden?
 		
@@ -172,7 +180,7 @@ public class StateSet
 			buf.append(state.getName());
 			buf.append(".");	// STATE_SEPARATOR -- should be globally user definable
 			
-			i |= state.isInitial();
+			// i |= state.isInitial();
 			d |= state.isAccepting();
 			x |= state.isForbidden();
 		}
@@ -181,7 +189,7 @@ public class StateSet
 		System.out.println("StateSet::createNewState -- " + buf.toString());
 		State newstate = new State(buf.toString());
 		
-		if(i) newstate.setInitial(true);
+		// if(i) newstate.setInitial(true);
 		if(d) newstate.setAccepting(true);
 		if(x) newstate.setForbidden(true);
 		

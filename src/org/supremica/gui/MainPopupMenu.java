@@ -101,6 +101,9 @@ class MainPopupMenu
 		JMenuItem languageRestrictor = new JMenuItem(ActionMan.languageRestrictor);
 		menuHandler.add(languageRestrictor, 1);
 
+		JMenuItem stateEnumerator = new JMenuItem(ActionMan.stateEnumerator);
+		menuHandler.add(stateEnumerator, 1);
+		
 		JMenuItem interfaceItem = new JMenuItem("Interface Properties...");
 
 		//menuHandler.add(interfaceItem, 1);

@@ -23,6 +23,7 @@ import org.supremica.automata.Arc;
 class SetOfStateSets
 {
 	private HashSet theSet = null;
+	
 	// Private constructor for cloning
 	private SetOfStateSets(HashSet hashset)
 	{
@@ -172,12 +173,13 @@ public class Determinizer
 	/*	if(enter)
 			++tabs;
 		
-		printTabs();	
+		printTabs();
 		System.out.println(str);
 
 		if(!enter)
 			--tabs;
 	*/
+		logger.debug(str);
 	}
 	// end debug stuff
 	
@@ -224,9 +226,12 @@ public class Determinizer
 		
 		and that's how it goes */
 		
-		State init = automaton.getInitialState();
-		add(epsilonClosure(init));
-
+		StateSet initset = epsilonClosure(automaton.getInitialState()); // This should be the one and only initial state!
+		add(initset);
+		State init = initset.createNewState();
+		newAutomaton.addState(init);
+		newAutomaton.setInitialState(init);
+		
 		while(!openStateSets.isEmpty())
 		{
 			StateSet Q1 = openStateSets.get(); // This is vanNoords T
@@ -395,9 +400,9 @@ public class Determinizer
 		
 		if(state.getStateClass() != null) // if already calculated and cached, return it
 		{
-			StateSet closure = state.getStateClass();
+			StateSet closure = (StateSet)state.getStateClass();
 			debugPrint("(eCS) return cached closure" + closure.toString() + ")", false);
-			return state.getStateClass();
+			return (StateSet)state.getStateClass();
 		}
 		
 		StateSet closure = new StateSet();
@@ -415,7 +420,7 @@ public class Determinizer
 		{
 			do
 			{	prevsize = nextsize;
-				tempset = epsilonTransition(tempset);
+				tempset = epsilonTransition(tempset); // call eTSS
 				closure.union(tempset);
 				nextsize = closure.size();
 
@@ -455,7 +460,7 @@ public class Determinizer
 		debugPrint("(eTS) epsilonTransition(" + state.getName() + ")", true);
 
 		StateSet stateset = new StateSet();
-		/* Arc */ Iterator it = state.outgoingArcsIterator();	// should be safeOutgoingArcsIterator()?
+		/* Arc */ Iterator it = state.outgoingArcsIterator();
 		while(it.hasNext())
 		{
 			try
@@ -471,6 +476,7 @@ public class Determinizer
 			// perform correctly, else the automaton is broken and we are lost anyway.
 			catch(Exception excp)
 			{
+				excp.printStackTrace();
 				throw new RuntimeException(excp);
 			}
 		}
@@ -499,14 +505,14 @@ public class Determinizer
 			State state = (State)stateit.next();
 			// System.out.print(state.getName());
 			
-			StateSet stateset = state.getStateClass();
+			StateSet stateset = (StateSet)state.getStateClass();
 			if(stateset != null)
 			{
-				// System.out.println(": " + stateset.toString());
+				System.out.println(": " + stateset.toString());
 			}
 			else
 			{
-				// System.out.println(": <null state class>");
+				System.out.println(": <null state class>");
 			} 
 			state.setStateClass(null);
 		}

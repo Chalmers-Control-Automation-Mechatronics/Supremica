@@ -101,7 +101,7 @@ abstract class FileImporter
 }
 
 // --------------------
-public class ActionMan
+public class ActionMan 
 {
 	private static Logger logger = LoggerFactory.createLogger(ActionMan.class);
 	private static final int    // instead of using constants later below :)
@@ -111,7 +111,13 @@ public class ActionMan
 	// gui here is filled in by
 	public static Gui gui = null;
 	public static LanguageRestrictor languageRestrictor = new LanguageRestrictor();
-
+	public static StateEnumerator stateEnumerator = new StateEnumerator();
+	
+	public static Gui getGui() 
+	{
+		return gui;
+	}
+	
 	private static int getIntegerInDialogWindow(String text, Component parent)
 	{
 		boolean finished = false;
