@@ -55,6 +55,7 @@ public class SynthesisAlgorithm
 {
 	private static Collection types = new LinkedList();
 	public static final SynthesisAlgorithm Monolithic = new SynthesisAlgorithm("Monolithic");
+	public static final SynthesisAlgorithm MonolithicSingleFixpoint = new SynthesisAlgorithm("Monolithic (single fixpoint)");
 	public static final SynthesisAlgorithm Modular = new SynthesisAlgorithm("Modular");
 	public static final SynthesisAlgorithm IDD = new SynthesisAlgorithm("IDD", false);
 	public static final SynthesisAlgorithm Unknown = new SynthesisAlgorithm("Unknown", false);
@@ -92,6 +93,11 @@ public class SynthesisAlgorithm
 			return Monolithic;
 		}
 
+		if (algorithm.equals(MonolithicSingleFixpoint.toString()))
+		{
+			return MonolithicSingleFixpoint;
+		}
+
 		if (algorithm.equals(Modular.toString()))
 		{
 			return Modular;
@@ -108,5 +114,12 @@ public class SynthesisAlgorithm
 	public static Object[] toArray()
 	{
 		return types.toArray();
+	}
+
+	public static Object [] toArray_oneAutomaton() {
+		Object [] ret = new Object[2];
+		ret[0] = Monolithic;
+		ret[1] = MonolithicSingleFixpoint;
+		return ret;
 	}
 }

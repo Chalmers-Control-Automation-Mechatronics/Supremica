@@ -4,7 +4,16 @@ package org.supremica.util.BDD;
 
 import java.util.*;
 
-/** monotonicly increased smoothed reachability based on conjunctive transition relations */
+
+/**
+ * monotonicly increased smoothed reachability based on conjunctive transition relations
+ *
+ * see also SmoothWorksetSupervisor.java which uses the same algorithm but picks new
+ * automata/clusters by using the workset algorithm...
+ *
+ * This one is better (time & space) in general, but does really bad in some special
+ * cases (shoefactory comes to my mind...).
+ */
 
 public class SmoothSupervisor extends DisjSupervisor {
 
@@ -67,8 +76,9 @@ public class SmoothSupervisor extends DisjSupervisor {
 
 	for(int a = 0; a < size; a++) {
 	    if(remaining[a]) {
-		remaining[a] = false;
-		dp.add(clusters[a].twave);
+			remaining[a] = false;
+			dp.add(clusters[a].twave);
+			System.out.println("Forward-Adding: " + clusters[a].toString() ); // DEBUG
 	    }
 	    int r_all_pp, front_s, front_sp;
 
@@ -136,8 +146,9 @@ public class SmoothSupervisor extends DisjSupervisor {
 
 	for(int a = 0; a < size; a++) {
 	    if(remaining[a]) {
-		remaining[a] = false;
-		dp.add(clusters[a].twave);
+			remaining[a] = false;
+			dp.add(clusters[a].twave);
+			System.out.println("Backward-Adding: " + clusters[a].toString() ); // DEBUG
 	    }
 	    int r_all_pp, front_s, front_sp;
 

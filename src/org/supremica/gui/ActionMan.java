@@ -1338,8 +1338,16 @@ public class ActionMan
 
 			try
 			{
-				AutomatonSynthesizer synthesizer = new AutomatonSynthesizer(theAutomaton,
-																			synthesizerOptions);
+
+				// ARASH: this is IDIOTIC! why didnt we prepare for more than one monolithc algorithm???
+				// (this is a dirty fix, should use a factory instead)
+				AutomatonSynthesizer synthesizer =
+				 	synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.MonolithicSingleFixpoint ?
+					new AutomatonSynthesizerSingleFixpoint(theAutomaton, synthesizerOptions) :
+					new AutomatonSynthesizer(theAutomaton, synthesizerOptions);
+
+				// AutomatonSynthesizer synthesizer = new AutomatonSynthesizer(theAutomaton,synthesizerOptions);
+
 				synthesizer.synthesize();
 			}
 			catch (Exception ex)

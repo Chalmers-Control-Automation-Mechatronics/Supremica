@@ -68,15 +68,15 @@ import org.supremica.automata.LabeledEvent;
  */
 public class AutomatonSynthesizer
 {
-	private static Logger logger = LoggerFactory.createLogger(AutomatonSynthesizer.class);
+	protected static Logger logger = LoggerFactory.createLogger(AutomatonSynthesizer.class);
 
-	private Automaton theAutomaton;
-	private LinkedList acceptingStates = new LinkedList();
-	private SynthesizerOptions synthesizerOptions;
-	private boolean rememberDisabledEvents = false;
-	private Alphabet disabledEvents;
-	private final static boolean debugMode = false;
-	private final ActionTimer theTimer = new ActionTimer();
+	protected Automaton theAutomaton;
+	protected LinkedList acceptingStates = new LinkedList();
+	protected SynthesizerOptions synthesizerOptions;
+	protected boolean rememberDisabledEvents = false;
+	protected Alphabet disabledEvents;
+	protected final static boolean debugMode = false;
+	protected final ActionTimer theTimer = new ActionTimer();
 
 	public AutomatonSynthesizer(Automaton theAutomaton, SynthesizerOptions synthesizerOptions)
 		throws Exception
@@ -143,7 +143,7 @@ public class AutomatonSynthesizer
 		return didSomething;
 	}
 
-	private void initializeAcceptingStates()
+	protected void initializeAcceptingStates()
 	{
 		Iterator stateIt = theAutomaton.stateIterator();
 
@@ -161,7 +161,7 @@ public class AutomatonSynthesizer
 	}
 
 	// Synthesize a controllable and nonblocking supervisor
-	private boolean synthesizeControllableNonblocking()
+	protected boolean synthesizeControllableNonblocking()
 		throws Exception
 	{
 		LinkedList stateList = new LinkedList();
@@ -223,7 +223,7 @@ public class AutomatonSynthesizer
 	}
 
 	// Synthesize a controllable supervisor
-	private boolean synthesizeControllable()
+	protected boolean synthesizeControllable()
 		throws Exception
 	{
 		logger.debug("AutomatonSynthesizer::synthesizeControllable");
@@ -271,7 +271,7 @@ public class AutomatonSynthesizer
 		return didSomething;
 	}
 
-	private boolean synthesizeNonblocking()
+	protected boolean synthesizeNonblocking()
 		throws Exception
 	{
 		logger.debug("AutomatonSynthesizer::synthesizeNonblocking");
@@ -310,7 +310,7 @@ public class AutomatonSynthesizer
 		return didSomething;
 	}
 
-	private LinkedList doCoreachable()
+	protected LinkedList doCoreachable()
 		throws Exception
 	{
 		logger.debug("AutomatonSynthesizer::doCoreachable");
@@ -369,7 +369,7 @@ public class AutomatonSynthesizer
 		return stateStack; // return the set of non-coreachable states
 	}
 
-	private boolean doControllable(LinkedList stateStack) // returns true if uncontrollable states found
+	protected boolean doControllable(LinkedList stateStack) // returns true if uncontrollable states found
 		throws Exception
 	{
 		logger.debug("AutomatonSynthesizer::doControllable");
@@ -415,7 +415,7 @@ public class AutomatonSynthesizer
 		return newUnsafeStates;
 	}
 
-	private void doReachable()
+	protected void doReachable()
 	{
 		logger.debug("AutomatonSynthesizer::doReachable");
 
@@ -482,7 +482,7 @@ public class AutomatonSynthesizer
 		return disabledEvents;
 	}
 
-	private void computeDisabledEvents()
+	protected void computeDisabledEvents()
 	{
 		disabledEvents = new Alphabet();
 
@@ -515,7 +515,7 @@ public class AutomatonSynthesizer
 		}
 	}
 
-	private void purge()
+	protected void purge()
 	{
 		List stateList = new LinkedList();
 

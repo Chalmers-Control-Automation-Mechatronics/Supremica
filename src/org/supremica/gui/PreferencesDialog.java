@@ -723,6 +723,7 @@ class BDDPanel
 	algorithmFamily.addItem("Disjunctive: Simple");
 	algorithmFamily.addItem("Disjunctive: Workset");
 	algorithmFamily.addItem("Smoothed: Monotonic");
+	algorithmFamily.addItem("Smoothed: Monotonic+Workset");
 	algorithmFamily.addItem("Smoothed: Path          (V1)");
 	algorithmFamily.addItem("Smoothed: Keep          (V2)");
 	algorithmFamily.addItem("Smoothed: Partitioned   (P1)");

@@ -86,9 +86,9 @@ public class DisjPartition {
 
     // -------------------------------------------------
     public void report() {
-	SizeWatch.setOwner("DisjPartition");
-	for(int i = 0; i < curr; i++)
-	    SizeWatch.report(clusters[i].twave, "Cluster " + (i + 1));
+		SizeWatch.setOwner("DisjPartition");
+		for(int i = 0; i < curr; i++)
+		    SizeWatch.report(clusters[i].twave, "Cluster " + (i + 1));
     }
 
     // --------------------------------------------------

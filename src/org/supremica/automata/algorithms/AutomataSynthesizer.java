@@ -299,8 +299,14 @@ public class AutomataSynthesizer
 		{
 			return false; // Not implemented (yet)
 		}
-		else if (algorithm == SynthesisAlgorithm.Modular)
+		else if (algorithm == SynthesisAlgorithm.MonolithicSingleFixpoint)
 		{
+			return true;
+		}
+
+		else if (algorithm == SynthesisAlgorithm.Monolithic)
+		{
+			// same as monolithic. in fact, anything but the NBC uses the monolithic code :)
 			return true;
 		}
 		else if (algorithm == SynthesisAlgorithm.Monolithic)
@@ -333,12 +339,22 @@ public class AutomataSynthesizer
 	{
 		//Automata newAutomata = new Automata();
 
-		if(synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.Monolithic)
+
+		if(synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.MonolithicSingleFixpoint)
+		{
+			theTimer.start();
+			MonolithicReturnValue retval = doMonolithic(theAutomata, true);
+			theTimer.stop();
+			retval.automaton.setComment("sup(" + retval.automaton.getComment() + ")");
+			gui.addAutomaton(retval.automaton); // let the user choose the name
+
+		}
+		else if(synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.Monolithic)
 		{
 			theTimer.start();
 			// monolithic case, just whack the entire stuff into the monolithic algo
 			//Boolean didSomething = new Boolean(false);
-			MonolithicReturnValue retval = doMonolithic(theAutomata); // we always do something, at least we synch
+			MonolithicReturnValue retval = doMonolithic(theAutomata, false); // we always do something, at least we synch
 			// if purge, that's already been done
 			theTimer.stop();
 
@@ -485,10 +501,18 @@ public class AutomataSynthesizer
 		return disabledEvents;
 	}
 
+
+	// se the real impelemntation below
+	private MonolithicReturnValue doMonolithic(Automata automatat)
+		throws Exception
+	{
+		return doMonolithic(automatat, false); // <-- NOT single fixpoint as default for now (under development)
+	}
+
 	// This is the engine, synchronizes the given automata, and calcs the forbidden states
 	// Returns true if states have been forbidden
 	// anAutomaton is an out-parameter, the synched result
-	private MonolithicReturnValue doMonolithic(Automata automata)
+	private MonolithicReturnValue doMonolithic(Automata automata, boolean singleFixpoint)
 		throws Exception // simply throws everything upwards
 	{
 		logger.debug("AutomataSynthesizer::doMonolithic");
@@ -504,7 +528,12 @@ public class AutomataSynthesizer
 		// We need to synthesize even if the result above is controllable
 		// Nonblocking may ruin controllability
 
-		AutomatonSynthesizer synthesizer = new AutomatonSynthesizer(retval.automaton, synthesizerOptions);
+
+		// ARASH: choose between tripple and the single fixpoint algorithms:
+		AutomatonSynthesizer synthesizer = singleFixpoint ?
+			new AutomatonSynthesizerSingleFixpoint(retval.automaton, synthesizerOptions) :
+			new AutomatonSynthesizer(retval.automaton, synthesizerOptions);
+
 		retval.didSomething |= synthesizer.synthesize(); // should also be able to interrupt this one....
 		retval.disabledEvents = synthesizer.getDisabledEvents();
 

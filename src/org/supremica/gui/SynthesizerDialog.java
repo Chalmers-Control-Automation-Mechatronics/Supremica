@@ -93,14 +93,18 @@ class SynthesizerDialogStandardPanel
 		}
 		public static AlgorithmSelector create(int num)
 		{
+
 			if(num == 1)
 			{
-				return new AlgorithmSelector(SynthesisAlgorithm.Monolithic);
+				// return new AlgorithmSelector(SynthesisAlgorithm.Monolithic);
+				return new AlgorithmSelector(SynthesisAlgorithm.toArray_oneAutomaton() );
 			}
 			else
 			{
 				return new AlgorithmSelector(SynthesisAlgorithm.toArray());
 			}
+
+
 		}
 
 	}
@@ -207,6 +211,11 @@ class SynthesizerDialogStandardPanel
 	public void actionPerformed(ActionEvent e)
 	{
 		if(algorithmTypeBox.getAlgorithm() == SynthesisAlgorithm.Monolithic)
+		{
+			optimizeBox.setEnabled(false);
+			nbNote.setVisible(false);
+		}
+		if(algorithmTypeBox.getAlgorithm() == SynthesisAlgorithm.MonolithicSingleFixpoint)
 		{
 			optimizeBox.setEnabled(false);
 			nbNote.setVisible(false);

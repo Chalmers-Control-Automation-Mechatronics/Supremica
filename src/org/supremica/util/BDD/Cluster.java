@@ -76,4 +76,20 @@ public class Cluster {
 		return cubep;
 	}
 
+
+	public String toString()
+	{
+		StringBuffer buf = new StringBuffer();
+		buf.append("(");
+		for (Enumeration e = members.elements(); e.hasMoreElements(); )
+		{
+			BDDAutomaton a1 = (BDDAutomaton) e.nextElement();
+			buf.append(a1.getName());
+			buf.append(" ");
+		}
+		buf.append(")");
+		return buf.toString();
+	}
+
+
 };

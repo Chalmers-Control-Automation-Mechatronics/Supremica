@@ -83,6 +83,9 @@ public class State
 	private int radius = 9;
 	private boolean selected = false;
 
+	/** ARASH: this is used to speed up set operations in the AutomatonSynthesizerSingleFixpoint algorithm */
+	public int sethelper;
+
 	// private StateNode stateNode = null;
 	private LinkedList incomingArcs = new LinkedList();
 	private LinkedList outgoingArcs = new LinkedList();

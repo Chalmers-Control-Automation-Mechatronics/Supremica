@@ -22,6 +22,8 @@ public class SupervisorFactory {
 	case Options.ALGO_DISJUNCTIVE_WORKSET: return new WorksetSupervisor(manager,automata);
 
 	case Options.ALGO_SMOOTHED_MONO: return new SmoothSupervisor(manager,automata);
+	case Options.ALGO_SMOOTHED_MONO_WORKSET: return new SmoothWorksetSupervisor(manager,automata);
+
 	case Options.ALGO_SMOOTHED_PATH: return new PathSmoothSupervisor(manager,automata);
 	case Options.ALGO_SMOOTHED_KEEP: return new KeepSmoothSupervisor(manager,automata);
 	case Options.ALGO_SMOOTHED_PART: return new PartitionSmoothSupervisor(manager,automata);
@@ -45,6 +47,8 @@ public class SupervisorFactory {
  	case Options.ALGO_DISJUNCTIVE_WORKSET: return new WorksetSupervisor(manager,plant, spec);
 
 	case Options.ALGO_SMOOTHED_MONO: return new SmoothSupervisor(manager,plant, spec);
+	case Options.ALGO_SMOOTHED_MONO_WORKSET: return new SmoothWorksetSupervisor(manager,plant, spec);
+
 	case Options.ALGO_SMOOTHED_PATH: return new PathSmoothSupervisor(manager,plant, spec);
 	case Options.ALGO_SMOOTHED_KEEP: return new KeepSmoothSupervisor(manager,plant, spec);
 	case Options.ALGO_SMOOTHED_PART: return new PartitionSmoothSupervisor(manager,plant, spec);

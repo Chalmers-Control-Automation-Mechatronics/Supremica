@@ -82,40 +82,11 @@ public class WorksetSupervisor extends DisjSupervisor
 	}
 
 
-
-	/** choose the next automaton (to be re-written) */
-	private int pick_one(int [] list) {
-		/*
-		// first best
-		for(int i = 0; i < list.length; i++) {
-			if(list[i] > 0) return i;
-		}
-		return -1;
-		*/
-
-		/*
-		// the largest one (most affected so far)
-		int max = 0, maxdex = -1;
-		for(int i = 0; i < list.length; i++) {
-			if(max < list[i]) {
-				maxdex = i;
-				max = list[i];
-			}
-		}
-		return maxdex;
-		*/
-
-		// the smallest one (least affected so far)
-		int min = 0xFFFF, mindex = -1;
-		for(int i = 0; i < list.length; i++) {
-			if(min >  list[i] && list[i] > 0) {
-				mindex = i;
-				min = list[i];
-			}
-		}
-		return mindex;
+	/** workset to start from: all automata are enabled */
+	protected Workset createWorkset()
+	{
+		return new Workset(size, dependent);
 	}
-
 
 
     protected void computeReachables() {
@@ -129,9 +100,8 @@ public class WorksetSupervisor extends DisjSupervisor
 
 		SizeWatch.setOwner("WorksetSupervisor.computeReachables");
 
-		int [] workset = new int[size];
-		for(int j = 0; j < size; j++) workset[j] = 1;
-		int workset_count = size; // sum of workset_i
+
+		Workset workset = createWorkset();
 
 		int cube = manager.getStateCube();
 		int permute = manager.getPermuteSp2S();
@@ -139,10 +109,10 @@ public class WorksetSupervisor extends DisjSupervisor
 		int r_all_p, r_all = i_all;
 
 
-		while(workset_count > 0) {
-			int p = pick_one(workset);
+		while(!workset.empty()) {
+			int p = workset.pickOne();
 			int r_all_org = r_all;
-			System.out.println("-->" + p);
+			// System.out.println("-->" + p);
 			do {
 				r_all_p = r_all;
 				int tmp = manager.relProd(clusters[p].getTwave() , r_all, cube);
@@ -154,14 +124,7 @@ public class WorksetSupervisor extends DisjSupervisor
 				if (gf != null)	gf.add(manager.nodeCount(r_all));
 			} while(r_all_p != r_all);
 
-			workset_count -= workset[p];
-			workset[p] = 0;
-
-			if(r_all != r_all_org) {
-				int count = dependent[p][0];
-				for(int i = 0 ; i < count; i++) workset[  dependent[p][i + 1] ] ++;
-				workset_count += count;
-			}
+			workset.advance(p, r_all != r_all_org);
 		}
 
 		manager.deref(i_all);
@@ -186,9 +149,7 @@ public class WorksetSupervisor extends DisjSupervisor
 		SizeWatch.setOwner("WorksetSupervisor.computeReachables");
 
 
-		int [] workset = new int[size];
-		for(int j = 0; j < size; j++) workset[j] = 1;
-		int workset_count = size; // sum of workset_i
+		Workset workset = createWorkset();
 
 		int cube = manager.getStatepCube();
 		int permute1 = manager.getPermuteS2Sp();
@@ -200,8 +161,8 @@ public class WorksetSupervisor extends DisjSupervisor
 
 
 
-		while(workset_count > 0) {
-			int p = pick_one(workset);
+		while(!workset.empty()) {
+			int p = workset.pickOne();
 			int r_all_org = r_all;
 			do {
 				r_all_p = r_all;
@@ -214,14 +175,8 @@ public class WorksetSupervisor extends DisjSupervisor
 				if (gf != null)	gf.add(manager.nodeCount(r_all));
 			} while(r_all_p != r_all);
 
-			workset_count -= workset[p];
-			workset[p] = 0;
 
-			if(r_all != r_all_org) {
-				int count = dependent[p][0];
-				for(int i = 0 ; i < count; i++) workset[  dependent[p][i + 1] ] ++;
-				workset_count += count;
-			}
+			workset.advance(p, r_all != r_all_org);
 		}
 
 

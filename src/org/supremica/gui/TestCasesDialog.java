@@ -18,7 +18,7 @@ import org.supremica.testcases.StickPickingGame;
 import org.supremica.testcases.AllocationBatch;
 import org.supremica.testcases.Counters;
 import org.supremica.testcases.RandomAutomata;
-
+import org.supremica.testcases.TransferLine;
 
 // should perform integer validation - see Horstmann
 class IntegerField
@@ -321,7 +321,7 @@ class RandomPanel
 		panel.add(new JLabel("Number of Events: "));
 		panel.add(int_events = new IntegerField("8", 3));
 
-		panel.add(new JLabel("Transition density: "));
+		panel.add(new JLabel("Deterministic transition-density: "));
 		panel.add(dbl_dens = new DoubleField("0.3", 6));
 
 	}
@@ -334,6 +334,53 @@ class RandomPanel
 	}
 }
 
+
+
+
+
+
+
+class TransferLinePanel
+	extends JPanel
+	implements TestCase
+{
+	IntegerField int_cap1 = null;
+	IntegerField int_cap2 = null;
+	IntegerField int_cells = null;
+
+
+	public TransferLinePanel()
+	{
+
+		JPanel panel  = new JPanel( new GridLayout(3,2));
+		add(panel, BorderLayout.CENTER);
+
+		panel.add(new JLabel("Number of cells: "));
+		panel.add(int_cells = new IntegerField("3", 5));
+
+		panel.add(new JLabel("Buffer 1 capacity: "));
+		panel.add(int_cap1 = new IntegerField("3", 5));
+
+		panel.add(new JLabel("Buffer 2 capacity: "));
+		panel.add(int_cap2 = new IntegerField("3", 5));
+
+
+	}
+
+	public Project doIt()
+		throws Exception
+	{
+		int cap1 = int_cap1.get();
+		int cap2 = int_cap2.get();
+		if(cap1 < 1 || cap2 < 1) throw new Exception("Buffer capacity must be at least 1");
+
+		TransferLine tl = new TransferLine(int_cells.get(), cap1, cap2);
+		return tl.getProject();
+	}
+}
+
+
+
 class ExampleTab
 	extends JTabbedPane
 {
@@ -343,6 +390,7 @@ class ExampleTab
 		addTab("Philos", null, new PhilosPanel(), "Dininig Philosophers");
 		addTab("Bricks", null, new BricksPanel(), "n-by-m bricks game");
 		addTab("Sticks Game", null, new StickGamePanel(), "Stick picking game");
+		addTab("Transfer Line", null, new TransferLinePanel(), "Transfer Line");
 		addTab("Counters", null, new CountersPanel(), "Independent Counters");
 		addTab("Random automata", null, new RandomPanel(), "Random automata");
 		//addTab("Allocation Batch", null, new AllocationBatchPanel(), "Serialized Allocation Batch");
@@ -475,3 +523,6 @@ public class TestCasesDialog
 		setLocation(point);
 	}
 }
+
+
+
