@@ -55,6 +55,7 @@ public class AutomataBDDVerifier {
 	int intersection = ba.and(r, not_c);
 
 
+	
 	// DEBUG
 	// System.out.println("Reachables:" );
 	// ba.show_states(r);
