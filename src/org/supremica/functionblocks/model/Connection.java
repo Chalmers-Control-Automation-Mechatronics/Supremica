@@ -52,25 +52,25 @@ package org.supremica.functionblocks.model;
 public class Connection
 {
 	
-	private FBInstance toFBInstance;
-	private String input;
+	private FBInstance fbInstance;
+	private String signalName;
 
 	private Connection() {}
 
-	public Connection(FBInstance fb, String i)
+	public Connection(FBInstance fb, String s)
 	{
-		toFBInstance = fb;
-		input = i;
+		fbInstance = fb;
+		signalName = s;
 	}
 
-	public FBInstance getToFBInstance()
+	public FBInstance getFBInstance()
 	{
-		return toFBInstance;
+		return fbInstance;
 	}
 
-	public String getInput()
+	public String getSignalName()
 	{
-		return input;
+		return signalName;
 	}
 
 }

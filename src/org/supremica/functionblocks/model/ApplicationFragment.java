@@ -80,10 +80,16 @@ public class ApplicationFragment
 		return (FBInstance) fbInstances.get(name);
 	}
 
-	public void addFBConnection(String fromInstance,String fromOutput, String toInstance, String toInput)
+	public void addEventConnection(String fromInstance,String fromOutput, String toInstance, String toInput)
 	{
 		Connection newConn = new Connection(getFBInstance(toInstance), toInput);
 		getFBInstance(fromInstance).addEventOutputConnection(fromOutput, newConn);
+	}
+
+	public void addDataConnection(String fromInstance,String fromOutput, String toInstance, String toInput)
+	{
+		Connection newConn = new Connection(getFBInstance(fromInstance), fromOutput);
+		getFBInstance(toInstance).addDataInputConnection(toInput, newConn);
 	}
 
 }

@@ -59,7 +59,7 @@ class AlgorithmExecutingThread extends Thread
 {
 	
 	private Scheduler scheduler = null;
-	
+
 	private AlgorithmExecutingThread() {}
 	
 	public AlgorithmExecutingThread(Scheduler s)

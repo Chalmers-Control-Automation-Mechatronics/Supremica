@@ -49,9 +49,17 @@
 
 package org.supremica.functionblocks.model;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Iterator;
+
 public class Event
 {
 	private String name;
+
+	private List withData = new LinkedList();
+
+	private Event() {}
 
 	public Event(String n)
 	{
@@ -61,6 +69,16 @@ public class Event
 	public String getName()
 	{
 		return name;
+	}
+
+	public void addWithData(String dataVarName)
+	{
+		withData.add(dataVarName);
+	}
+
+	public Iterator withIterator()
+	{
+		return withData.iterator();
 	}
 
 }

@@ -51,7 +51,8 @@ public class BasicFBInstance extends FBInstance
 	private Resource resource;
 	private BasicFBType fbType;
 
-	private Map inputEvents = new HashMap();
+	// maps event names to event classes representing them
+	private Map events;
 
 	private EventQueue eventInputQueue = new EventQueue();
 
@@ -71,9 +72,9 @@ public class BasicFBInstance extends FBInstance
 	
 	public BasicFBInstance(String n, Resource r, BasicFBType t)
 	{
-		this.name = n;
-		fbType = t;
+		name = n;
 		resource = r;
+		fbType = t;
 		currentECState = fbType.getECC().getInitialState();
 	}
 
@@ -87,9 +88,9 @@ public class BasicFBInstance extends FBInstance
 		variables.addVariable(name,var);
 	}
 
-	public void addInputEvent(String name, Event ev)
+	public void setEvents(Map i)
 	{
-		inputEvents.put(name,ev);
+		events = i;
 	}
 	
 	public void addEventOutputConnection(String output, Connection cnt)
@@ -97,9 +98,19 @@ public class BasicFBInstance extends FBInstance
 		eventOutputConnections.put(output,cnt);
 	}
     
-	public void addDataInputConnection()
+	public void addDataInputConnection(String input, Connection cnt)
 	{	
+		dataInputConnections.put(input, cnt);
+	}
 
+	public Variable getDataOutput(String name)
+	{
+		if (!((Variable) variables.getVariable(name)).getType().equals("DataOutput"))
+		{
+			System.out.println("BasicFBInstance: no such DataOutput " + name);
+			System.exit(0);
+		}
+		return (Variable) variables.getVariable(name);
 	}
 
 	public void queueEvent(String eventInput)
@@ -108,7 +119,7 @@ public class BasicFBInstance extends FBInstance
 		if(variables.getVariable(eventInput) != null)
 			if(variables.getVariable(eventInput).getType().equals("EventInput"))
 			{
-				eventInputQueue.add((Event) inputEvents.get(eventInput));
+				eventInputQueue.add((Event) events.get(eventInput));
 				resource.getScheduler().scheduleFBInstance(this);
 			}
 			else
@@ -136,11 +147,21 @@ public class BasicFBInstance extends FBInstance
 		if(currentEvent != null)
 		{
 			handlingEvent = true;
-			getDataVariables(currentEvent);
-			// reset all other InputEvent vars to false
-			
+
+			// set all InputEvents to false
+			for (Iterator iter = variables.iterator();iter.hasNext();)
+			{
+				String curName = (String) iter.next();
+				if (((Variable) variables.getVariable(curName)).getType().equals("EventInput"))
+				{
+					((BooleanVariable) variables.getVariable(curName)).setValue(false);
+				}
+			}
+
 			// set the var corrensponding to the input event to TRUE 
 			((BooleanVariable) variables.getVariable(currentEvent.getName())).setValue(true);
+			getDataVariables(currentEvent);
+
 			// and execute the ecc
 			ECState newECState = updateECC();
 			if (newECState != currentECState)
@@ -166,6 +187,33 @@ public class BasicFBInstance extends FBInstance
 	private void getDataVariables(Event event)
 	{
 		// get the data variables associated with this event and put the in variables attribute
+		for (Iterator iter = event.withIterator();iter.hasNext();)
+		{
+			String curName = (String) iter.next();
+			Connection curConnection  = (Connection) dataInputConnections.get(curName);
+			Variable outputVar = curConnection.getFBInstance().getDataOutput(curConnection.getSignalName());
+			if(outputVar instanceof IntegerVariable)
+			{
+				((IntegerVariable) variables.getVariable(curName)).setValue(((IntegerVariable) outputVar).getValue().intValue());
+			}
+			else if(outputVar instanceof IntegerVariable)
+			{
+				((IntegerVariable) variables.getVariable(curName)).setValue(((IntegerVariable) outputVar).getValue().intValue());
+			}
+			else if(outputVar instanceof IntegerVariable)
+			{
+				((IntegerVariable) variables.getVariable(curName)).setValue(((IntegerVariable) outputVar).getValue().intValue());
+			}
+			else if(outputVar instanceof IntegerVariable)
+			{
+				((IntegerVariable) variables.getVariable(curName)).setValue(((IntegerVariable) outputVar).getValue().intValue());
+			}
+			else if(outputVar instanceof IntegerVariable)
+			{
+				((IntegerVariable) variables.getVariable(curName)).setValue(((IntegerVariable) outputVar).getValue().intValue());
+			}
+			
+		}
 	}
 	
 
@@ -232,8 +280,8 @@ public class BasicFBInstance extends FBInstance
 		if (currentECAction.getOutput() != null)
 		{
 			Connection outputConnection = (Connection) eventOutputConnections.get(currentECAction.getOutput());
-			FBInstance toInstance = outputConnection.getToFBInstance();
-			toInstance.queueEvent(outputConnection.getInput());
+			FBInstance toInstance = outputConnection.getFBInstance();
+			toInstance.queueEvent(outputConnection.getSignalName());
 		}
 		actionsLeft = actionsLeft - 1;
 	}

@@ -59,6 +59,9 @@ public abstract class FBInstance extends NamedObject
 	
 	public abstract void queueEvent(String eventInput);
 
-	public abstract void addEventOutputConnection(String output, Connection cnt);
+	public abstract void addEventOutputConnection(String eventOutput, Connection cnt);
+	public abstract void addDataInputConnection(String dataInput, Connection cnt);
+
+	public abstract Variable getDataOutput(String name);
 
 }

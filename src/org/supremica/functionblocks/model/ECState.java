@@ -56,7 +56,7 @@ import java.util.*;
 
 public class ECState extends NamedObject
 {
-
+	
 	private List ecActions = new LinkedList();
     
 	ECState(String name)

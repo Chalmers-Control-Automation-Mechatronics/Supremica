@@ -64,6 +64,8 @@ public class BasicFBType extends FBType
 	// needed to update all the instances when the type def is updated
 	private Map instances = new HashMap();
 
+	private Map events = new HashMap();
+
 	private Variables variables = new Variables();
 
 
@@ -83,20 +85,10 @@ public class BasicFBType extends FBType
 	public FBInstance createInstance(String name)
 	{
 		System.out.println("BasicFBType.createInstace(" + name + ")");
-		BasicFBInstance newInstance = new BasicFBInstance(name,resource,this);
+		BasicFBInstance newInstance = new BasicFBInstance(name,resource,this);	
+		
+		newInstance.setEvents(events);
 
-		// construct Events for all EventInputs
-		for(Iterator iter = variables.iterator();iter.hasNext();)
-		{
-			String curName = (String) iter.next();
-			Variable curVar = (Variable) variables.getVariable(curName);
-			if(curVar.getType().equals("EventInput"))
-			{
-				newInstance.addInputEvent(curName,new Event(curName));
-			}
-		}
-
-		//System.out.println("BasicFBType.createInstace(" + name + "): cloning variables");
 		newInstance.setVariables((Variables) variables.clone());
 
 		return newInstance;
@@ -111,7 +103,17 @@ public class BasicFBType extends FBType
 	public void addVariable(String name, Variable var)
 	{
 		variables.addVariable(name,var);
+		// check for input event and add to events
+		if (var.getType().equals("EventInput") || var.getType().equals("EventOutput"))
+		{
+			events.put(name,new Event(name));
+		}
 		// update instances
+	}
+
+	public void addDataAssociation(String event, String dataVar)
+	{
+		((Event) events.get(event)).addWithData(dataVar);
 	}
 	
 }

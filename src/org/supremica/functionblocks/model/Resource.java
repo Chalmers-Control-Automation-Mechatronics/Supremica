@@ -49,6 +49,8 @@
 package org.supremica.functionblocks.model;
 
 import java.util.*;
+import java.io.Reader;
+import java.io.FileReader;
 
 /**
  * @author Cengic
@@ -78,15 +80,21 @@ public class Resource extends NamedObject
 		// only one event input and output for now
 		fbType.addVariable("OCCURRED", new BooleanVariable("EventInput",false));
 		fbType.addVariable("DONE", new BooleanVariable("EventOutput",false));
+		fbType.addVariable("DI", new IntegerVariable("DataInput",0));
+		fbType.addVariable("DO", new IntegerVariable("DataOutput",0));
 		fbType.addVariable("invoked", new IntegerVariable("Local",0));
+
+		fbType.addDataAssociation("OCCURRED","DI");
+		fbType.addDataAssociation("DONE","DO");
 
 		// Build ECC 
 		fbType.getECC().addInitialState("INIT");
 		fbType.getECC().addState("STATE");
 		fbType.getECC().addTransition("INIT", "STATE", "OCCURRED");
 		fbType.getECC().addTransition("STATE", "INIT", "TRUE");
-		fbType.getECC().getState("STATE").addAction(new TestAlgorithm(), "DONE");
-
+		// create algorithm
+		fbType.getECC().getState("STATE").addAction(new JavaTextAlgorithm("TestJavaTextAlgorithm.java"), "DONE");
+		
 		// FB application fragment
 		addApplicationFragment("AppFrag");
 		ApplicationFragment appFrag =  getApplicationFragment("AppFrag");
@@ -96,8 +104,12 @@ public class Resource extends NamedObject
 		appFrag.addFBInstance("inst2","P1");
 
 		// connections
-		appFrag.addFBConnection("inst1","DONE","inst2","OCCURRED");
-		appFrag.addFBConnection("inst2","DONE","inst1","OCCURRED");
+		appFrag.addEventConnection("inst1","DONE","inst2","OCCURRED");
+		appFrag.addEventConnection("inst2","DONE","inst1","OCCURRED");
+
+		appFrag.addDataConnection("inst1","DO","inst2","DI");
+		appFrag.addDataConnection("inst2","DO","inst1","DI");
+
 
 		// kick off 
 		appFrag.getFBInstance("inst1").queueEvent("OCCURRED");
