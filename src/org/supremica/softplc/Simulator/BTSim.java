@@ -37,13 +37,13 @@ public class BTSim
     public synchronized void setSignalArray(boolean[] values)
 	throws Exception
     {
-	boolean[] temp = new boolean[values.length];
+	/*boolean[] temp = new boolean[values.length];
 	temp = values;
 	for (int i=8;i<15;i++)
 	{
 	    values[i] = false;
-	    values[i+3] = temp[i];
-	}
+	    values[i+2] = temp[i];
+	    }*/
 	
 	// när skall vi ge exception???
 	System.arraycopy(values, 0, inSignals, 0, inSignals.length);
@@ -55,18 +55,19 @@ public class BTSim
     public void getSignalArray(boolean[] values)
 	throws Exception
     {
-	boolean[] temp = new boolean[values.length];
+	/*boolean[] temp = new boolean[values.length];
 	temp = values;
 	for (int i=8;i<15;i++)
 	{
 	    values[i] = false;
-	    values[i+3] = temp[i];
+	    values[i+2] = temp[i];
 	}
 	for (int j=18;j<24;j++)
 	{
 	    values[j] = false;
-	    values[j+3] = temp[j];
-	}
+	    values[j+2] = temp[j];
+	    }*/
+
 	// när skall vi ge exception???
 	System.arraycopy(outSignals, 0, values, 0, outSignals.length);
     }
@@ -80,18 +81,19 @@ public class BTSim
      */
     public synchronized void setOutSignals(boolean[] values)
     {
-	//boolean[] temp = new boolean[values.length];
-	//temp = values;
-	/*for (int i=8;i<15;i++)
-	  {
-	  values[i] = false;
-	  values[i+2] = temp[i];
-	  }
-	  for (int j=18;j<27;j++)
-	  {
-	  values[j] = false;
-	  values[j+3] = temp[j];
-	  }*/
+	/*boolean[] temp = new boolean[values.length];
+	temp = values;
+	for (int i=8;i<15;i++)
+	{
+	values[i] = false;
+	values[i+2] = temp[i];
+	}
+	for (int j=18;j<25;j++)
+	{
+	values[j] = false;
+	values[j+2] = temp[j];
+	}*/
+
 	System.arraycopy(values, 0, outSignals, 0, outSignals.length);
     }
     

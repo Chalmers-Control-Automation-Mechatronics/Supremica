@@ -475,7 +475,7 @@ public class BallTrackView
 		shortLength = 10;	 //length of the bar when signal is not set
 		longLength  = 19;	//length of the bar when signal is set
 
-		if (rController.getInSignal(9))
+		if (rController.getInSignal(11))
 			g.fillRect(upperX,upperY,
 						longLength,width);
 		else
@@ -491,7 +491,7 @@ public class BallTrackView
 		shortLength = 6;	 //length of the bar when signal is not set
 		longLength  = 12;	//length of the bar when signal is set
 
-		if (rController.getInSignal(8))
+		if (rController.getInSignal(10))
 			g.fillRect( upperX, (lowerY - longLength),
 						width, longLength);
 		else
@@ -507,7 +507,7 @@ public class BallTrackView
 		shortLength = 6;
 		longLength  = 12;
 
-		if (rController.getInSignal(10))
+		if (rController.getInSignal(12))
 			g.fillRect(upperX, (lowerY - longLength),
 					   width, longLength);
 		else
