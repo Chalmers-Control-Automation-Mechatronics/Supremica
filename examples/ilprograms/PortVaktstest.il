@@ -103,6 +103,7 @@ PROGRAM PortVaktstest
 		LD DINT#300 
 		ST delay8.tonPT
 		ST delay88.tonPT
+		ST delay21.tonPT
 		LD DINT#300
 		ST delay2.tonPT (*Stäng InPortvakt*)
 		LD DINT#1000
@@ -545,6 +546,8 @@ END19:
 				ST VridArmHoger
 				ST UppArmVan1
 				ST UppArmVan2
+				ST delay21.tonIN
+				CAL delay21
 		e20:
 END20:
 
