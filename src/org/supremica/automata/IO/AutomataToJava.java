@@ -710,7 +710,7 @@ public class AutomataToJava
 		pw.println("\t * The enabled event that comes first in this array is executed.");
 		pw.println("\t * The uncontrollable events has the highest priority");
 		pw.println("\t */");
-		pw.print("\tstatic final int[] EVENT_PRIORITY_QUEUE = new int[]{");
+		pw.print("\tstatic final int[] EVENT_PRIORITY_QUEUE = {");
 		boolean firstEventPrinted = false;
 		for (Iterator alphIt = allEvents.uncontrollableEventIterator(); alphIt.hasNext();)
 		{
@@ -731,7 +731,7 @@ public class AutomataToJava
 		pw.println("\t/**");
 		pw.println("\t * A map from event index to event label. Is not used by default.");
 		pw.println("\t */");
-		pw.print("\tstatic final String[] EVENT_LABELS = new String[]{");
+		pw.print("\tstatic final String[] EVENT_LABELS = {");
 		firstEventPrinted = false;
 		for (int i = 0; i < allEvents.nbrOfEvents(); ++i)
 		{
@@ -767,7 +767,7 @@ public class AutomataToJava
 		pw.println("\t */");
 		pw.println("\tDigitalIODriver digitalIODriver;");
 		pw.println();
-		pw.print("\tfinal Timer[] timers = new Timer[]{");
+		pw.print("\tfinal Timer[] timers = {");
 		boolean firstTimerPrinted = false;
 		for (Iterator it = theProject.timerIterator(); it.hasNext();)
 		{

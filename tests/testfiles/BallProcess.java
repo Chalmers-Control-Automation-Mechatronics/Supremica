@@ -244,12 +244,12 @@ public class BallProcess
 	 * The enabled event that comes first in this array is executed.
 	 * The uncontrollable events has the highest priority
 	 */
-	static final int[] EVENT_PRIORITY_QUEUE = new int[]{8, 9, 10, 11, 12, 18, 19, 20, 21, 23, 26, 27, 31, 38, 40, 42, 44, 46, 48, 51, 52, 58, 60, 63, 64, 70, 72, 74, 79, 81, 0, 1, 2, 3, 4, 5, 6, 7, 13, 14, 15, 16, 17, 22, 24, 25, 28, 29, 30, 32, 33, 34, 35, 36, 37, 39, 41, 43, 45, 47, 49, 50, 53, 54, 55, 56, 57, 59, 61, 62, 65, 66, 67, 68, 69, 71, 73, 75, 76, 77, 78, 80, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94};
+	static final int[] EVENT_PRIORITY_QUEUE = {8, 9, 10, 11, 12, 18, 19, 20, 21, 23, 26, 27, 31, 38, 40, 42, 44, 46, 48, 51, 52, 58, 60, 63, 64, 70, 72, 74, 79, 81, 0, 1, 2, 3, 4, 5, 6, 7, 13, 14, 15, 16, 17, 22, 24, 25, 28, 29, 30, 32, 33, 34, 35, 36, 37, 39, 41, 43, 45, 47, 49, 50, 53, 54, 55, 56, 57, 59, 61, 62, 65, 66, 67, 68, 69, 71, 73, 75, 76, 77, 78, 80, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94};
 
 	/**
 	 * A map from event index to event label. Is not used by default.
 	 */
-	static final String[] EVENT_LABELS = new String[]{"arm.allocate_lower_buffer",
+	static final String[] EVENT_LABELS = {"arm.allocate_lower_buffer",
 			"arm.allocate_upper_buffer",
 			"arm.lower_lower_buffer",
 			"arm.lower_upper_buffer",
@@ -370,7 +370,7 @@ public class BallProcess
 	 */
 	DigitalIODriver digitalIODriver;
 
-	final Timer[] timers = new Timer[]{new Timer(1000),
+	final Timer[] timers = {new Timer(1000),
 			new Timer(1000),
 			new Timer(1000),
 			new Timer(1000),

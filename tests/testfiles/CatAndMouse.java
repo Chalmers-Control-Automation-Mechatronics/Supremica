@@ -99,12 +99,12 @@ public class CatAndMouse
 	 * The enabled event that comes first in this array is executed.
 	 * The uncontrollable events has the highest priority
 	 */
-	static final int[] EVENT_PRIORITY_QUEUE = new int[]{6, 7, 0, 1, 2, 3, 4, 5, 8, 9, 10, 11, 12, 13};
+	static final int[] EVENT_PRIORITY_QUEUE = {6, 7, 0, 1, 2, 3, 4, 5, 8, 9, 10, 11, 12, 13};
 
 	/**
 	 * A map from event index to event label. Is not used by default.
 	 */
-	static final String[] EVENT_LABELS = new String[]{"c1",
+	static final String[] EVENT_LABELS = {"c1",
 			"c2",
 			"c3",
 			"c4",
@@ -144,7 +144,7 @@ public class CatAndMouse
 	 */
 	DigitalIODriver digitalIODriver;
 
-	final Timer[] timers = new Timer[]{};
+	final Timer[] timers = {};
 
 	/**
 	 * Constructor
