@@ -200,6 +200,8 @@ public class DotViewer
 
 			menuEditCopy.setText("Copy");
 			menuEditCopy.setMnemonic(KeyEvent.VK_C);
+			menuEditCopy.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, ActionEvent.CTRL_MASK));
+
 			menuEdit.add(menuEditCopy);
 
 			menuEditCopy.addActionListener(new ActionListener()
