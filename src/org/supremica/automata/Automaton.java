@@ -1437,6 +1437,34 @@ public class Automaton
 			}
 		}
 	}
+	
+	public void setAllStatesAsAccepting()
+	{
+		setAllStatesAsAccepting(false);
+	}
+	
+	public void setAllStatesAsAccepting(boolean keepForbidden)
+	{
+		beginTransaction();
+		for (StateIterator stateIt = stateIterator(); stateIt.hasNext();)
+		{
+			State currState = stateIt.nextState();
+			if (keepForbidden)
+			{
+				if (!currState.isForbidden())
+				{	
+					currState.setAccepting(true);
+				}
+			}
+			else
+			{
+				currState.setAccepting(true);
+				currState.setForbidden(false);	
+			}
+		}
+		invalidate();
+		endTransaction();		
+	}	
 
 	/**
 	 * Returns a event on a arc that starts in fromState and ends in toState.
@@ -1559,9 +1587,9 @@ public class Automaton
 		return alphabet.nbrOfEpsilonEvents();
 	}
 
-	public int nbrOfObservableEvents()
+	public int nbrOfUnobservableEvents()
 	{
-		return alphabet.nbrOfObservableEvents();
+		return alphabet.nbrOfUnobservableEvents();
 	}
 
 	/**

@@ -56,9 +56,12 @@ import org.supremica.automata.Arc;
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.AutomatonType;
+import org.supremica.automata.Events;
 import org.supremica.automata.State;
 import org.supremica.automata.StateIterator;
+import org.supremica.automata.EventIterator;
 import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.algorithms.standard.ObserverBuilder;
 
 /**
  * A monolithic synthesizer that can handle non-blocking and controllability problems.
@@ -124,6 +127,10 @@ public class AutomatonSynthesizer
 		{
 			didSomething = synthesizeControllableNonblocking();
 		}
+		else if (synthesisType == SynthesisType.Observable)
+		{
+			didSomething = synthesizeControllableNonblockingObservable();
+		}
 
 		if (synthesizerOptions.doRememberDisabledEvents())
 		{
@@ -160,16 +167,40 @@ public class AutomatonSynthesizer
 		}
 	}
 
+	// Synthesize a controllable, nonblocking and observable supervisor
+	protected boolean synthesizeControllableNonblockingObservable()
+		throws Exception
+	{
+		boolean didSomething = false;
+		boolean unobservable = true;
+		
+
+
+		int observerIteration = 1; 		
+		while (unobservable)
+		{
+			boolean changed = synthesizeControllableNonblocking();
+			didSomething = didSomething || changed;
+			ObserverBuilder observerBuilder = new ObserverBuilder(theAutomaton, true);							
+			unobservable = !observerBuilder.isObservable();
+			Automaton currObserver = observerBuilder.getNewAutomaton();
+			currObserver.setAllStatesAsAccepting(true);
+			
+			logger.debug("Observer in iteration " + observerIteration + " is " + (unobservable ? "unobservable" : "observable"));
+			observerIteration++;
+		}
+		return didSomething;
+	}
+
 	// Synthesize a controllable and nonblocking supervisor
 	protected boolean synthesizeControllableNonblocking()
 		throws Exception
 	{
 		LinkedList stateList = new LinkedList();
-		Iterator stateIt = theAutomaton.stateIterator();
 
 		logger.debug("AutomatonSynthesizer::synthesizeControllableNonblocking");
 
-		while (stateIt.hasNext())
+		for (Iterator stateIt = theAutomaton.stateIterator(); stateIt.hasNext(); )
 		{
 			State currState = (State) stateIt.next();
 
@@ -205,9 +236,8 @@ public class AutomatonSynthesizer
 
 		// Forbid the states with MAX_COST set
 		boolean didSomething = false;
-		stateIt = theAutomaton.stateIterator();
-
-		while (stateIt.hasNext())
+		
+		for (StateIterator stateIt = theAutomaton.stateIterator(); stateIt.hasNext(); )
 		{
 			State currState = (State) stateIt.next();
 

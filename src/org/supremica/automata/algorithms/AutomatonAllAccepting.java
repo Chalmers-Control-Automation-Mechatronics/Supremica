@@ -63,18 +63,6 @@ public class AutomatonAllAccepting
 
 	public void execute()
 	{
-		theAutomaton.beginTransaction();
-
-		Iterator stateIt = theAutomaton.stateIterator();
-
-		while (stateIt.hasNext())
-		{
-			State currState = (State) stateIt.next();
-
-			currState.setAccepting(true);
-		}
-
-		theAutomaton.invalidate();
-		theAutomaton.endTransaction();
+		theAutomaton.setAllStatesAsAccepting();
 	}
 }

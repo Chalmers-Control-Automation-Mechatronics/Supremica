@@ -30,7 +30,12 @@ public class ObserverBuilder
 		determinizer.resolveControlInconsistencies(true);
 		determinizer.execute();
 		boolean inconsistent = determinizer.isControlInconsistent();
-		logger.debug(orgAutomatonName + " is control inconsistent: " + inconsistent);
+		logger.info(orgAutomatonName + " is control inconsistent: " + inconsistent);
+	}
+	
+	public boolean isObservable()
+	{
+		return !determinizer.isControlInconsistent();
 	}
 
 	public Automaton getNewAutomaton()

@@ -66,6 +66,7 @@ public final class SynchronizationOptions
 	private boolean verboseMode;
 	private boolean requireConsistentControllability;
 	private boolean requireConsistentImmediate;
+	private boolean rememberDisabledEvents;
 	private boolean dialogOK = false;
 
 	public SynchronizationOptions()
@@ -82,10 +83,11 @@ public final class SynchronizationOptions
 			true, 	// buildAutomaton
 			SupremicaProperties.verboseMode(),
 			true, 	// requireConsistentControllability
-			true);	// requireConsistentImmediate
+			true,
+			false);	// requireConsistentImmediate
 	}
 
-	public SynchronizationOptions(int nbrOfExecuters, SynchronizationType syncType, int initialHashtableSize, boolean expandHashtable, boolean forbidUnconStates, boolean expandForbiddenStates, boolean terminateIfUnconState, boolean expandEventsUsingPriority, boolean buildAutomaton, boolean verboseMode, boolean requireConsistentControllability, boolean requireConsistentImmediate)
+	public SynchronizationOptions(int nbrOfExecuters, SynchronizationType syncType, int initialHashtableSize, boolean expandHashtable, boolean forbidUnconStates, boolean expandForbiddenStates, boolean terminateIfUnconState, boolean expandEventsUsingPriority, boolean buildAutomaton, boolean verboseMode, boolean requireConsistentControllability, boolean requireConsistentImmediate, boolean rememberDisabledEvents)
 		throws IllegalArgumentException
 	{
 		if (syncType == null)
@@ -115,6 +117,7 @@ public final class SynchronizationOptions
 		this.verboseMode = verboseMode;
 		this.requireConsistentControllability = requireConsistentControllability;
 		this.requireConsistentImmediate = requireConsistentImmediate;
+		this.rememberDisabledEvents = rememberDisabledEvents;
 	}
 
 	public void setDialogOK(boolean bool)
@@ -212,6 +215,16 @@ public final class SynchronizationOptions
 		requireConsistentImmediate = require;
 	}
 
+	public boolean rememberDisabledEvents()
+	{
+		return rememberDisabledEvents;
+	}
+
+	public void rememberDisabledEvents(boolean remember)
+	{
+		rememberDisabledEvents = remember;
+	}
+
 	/**
 	 Build an Automaton after synchronization.
 	*/
@@ -270,7 +283,8 @@ public final class SynchronizationOptions
 										  false, // This is the only difference from default!
 										  SupremicaProperties.verboseMode(),
 										  true, 
-										  true);
+										  true,
+										  false);
 	}
 
 	/**
@@ -289,6 +303,7 @@ public final class SynchronizationOptions
 										  true,
 										  SupremicaProperties.verboseMode(),
 										  true,
-										  true);
+										  true,
+										  false);
 	}
 }

@@ -590,7 +590,7 @@ public class Determinizer
 		if(!enter)
 			--tabs;
 	*/
-		logger.debug(str);
+		//logger.debug(str);
 	}
 	// end debug stuff
 }

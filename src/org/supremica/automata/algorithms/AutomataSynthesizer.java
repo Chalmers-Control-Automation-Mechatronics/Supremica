@@ -55,13 +55,17 @@ import org.supremica.util.ActionTimer;
 import org.supremica.log.*;
 import org.supremica.gui.Gui;
 import org.supremica.automata.Alphabet;
+import org.supremica.automata.AlphabetHelpers;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.gui.VisualProjectContainer;
 import org.supremica.automata.AutomatonType;
 import org.supremica.automata.State;
+import org.supremica.automata.Events;
 import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.EventIterator;
 import org.supremica.automata.AutomataIndexFormHelper;
+import org.supremica.automata.algorithms.SynthesisType;
 
 // AutomatSelector a set of specs/sups/plants,
 // For each spec/sup it returns that automaton together with the plants with which it shares uc-events
@@ -547,10 +551,73 @@ public class AutomataSynthesizer
 		MonolithicReturnValue retval = new MonolithicReturnValue();
 		retval.didSomething = false;
 
+		// If we synthesize a nonblocking, controllable and observable
+		// supervisor a supremal supervisor is only guaranteed
+		// to exist if all controllable events are observable.
+		// If this is not the case then we can treat all
+		// unobservable events as uncontrollable. This will
+		// guarantee the existence of a supremal supervisor.
+		// How ever this will not necessarily be the maximally
+		// permissive supervisor. See Introduction to Discrete Event
+		// Systems, Cassandras, Lafortune for a discussion about this
+		// problem. 
+		if (synthesizerOptions.getSynthesisType() == SynthesisType.Observable)
+		{
+			Alphabet unionAlphabet = AlphabetHelpers.getUnionAlphabet(automata);
+
+			Events problemEvents = new Events();
+			for (EventIterator evIt = unionAlphabet.iterator(); evIt.hasNext(); )
+			{
+				LabeledEvent currEvent = evIt.nextEvent();
+				if (currEvent.isControllable() && !currEvent.isObservable())
+				{
+					problemEvents.addEvent(currEvent);
+				}
+			}
+		
+			if (problemEvents.size() > 0)
+			{
+				Automata newAutomata = new Automata(automata); // Make copy sine we will change controllability
+				
+				// Iterate over all the automata and change
+				// controllability of the problem events
+				for (Iterator autIt = newAutomata.iterator(); autIt.hasNext();)
+				{
+					Automaton currAutomaton = (Automaton)autIt.next();
+					Alphabet currAlphabet = currAutomaton.getAlphabet();
+					// Iterator over the problem events
+					for (EventIterator evIt = problemEvents.iterator(); evIt.hasNext(); )
+					{
+						LabeledEvent currEvent = evIt.nextEvent();
+						if (currAlphabet.containsEventWithLabel(currEvent.getLabel()))
+						{
+							LabeledEvent currAutomatonEvent = currAlphabet.getEventWithLabel(currEvent.getLabel());
+							currAutomatonEvent.setControllable(false);
+						}
+					}
+				}
+				
+				StringBuffer sb = new StringBuffer();
+				for (EventIterator evIt = problemEvents.iterator(); evIt.hasNext(); )
+				{
+					LabeledEvent currEvent = evIt.nextEvent();
+					sb.append(currEvent.getLabel() + " ");
+				}
+				logger.warn(sb.toString() + "are controllable but not observable. This imply that a supremal supervisor may not exist. To guarantee existence of such a supervisor the events will be treated us uncontrollable from the supervisors point of view. However the supervisor does not have to be maximally permissive.");
+				
+				automata = newAutomata;
+			}
+		}
+
+		boolean orgRememberDisabledEvents = synchronizationOptions.rememberDisabledEvents();
+		synchronizationOptions.rememberDisabledEvents(true);
+
 		AutomataSynchronizer syncher = new AutomataSynchronizer(automata, synchronizationOptions);
 		syncher.execute(); // should be able to interrupt this one, just not now...
 		retval.automaton = syncher.getAutomaton();
 		retval.didSomething |= syncher.getHelper().getAutomataIsControllable();
+
+		synchronizationOptions.rememberDisabledEvents(true);
 
 		// We need to synthesize even if the result above is controllable
 		// Nonblocking may ruin controllability

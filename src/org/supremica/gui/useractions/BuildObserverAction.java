@@ -69,7 +69,7 @@ public class BuildObserverAction
 	{
 		// automaton.beginTransaction();
 		boolean doit = false;
-		doit = automaton.nbrOfObservableEvents() < automaton.nbrOfEvents();
+		doit = automaton.nbrOfUnobservableEvents() > 0;
 		
 		if(doit)
 		{

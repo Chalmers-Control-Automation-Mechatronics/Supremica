@@ -112,6 +112,7 @@ public class EventHelpers
 		boolean controllable = tmpEvent.isControllable();
 		boolean prioritized = tmpEvent.isPrioritized();
 		boolean operator = tmpEvent.isOperator();
+		boolean observable = tmpEvent.isObservable();
 		boolean immediate = tmpEvent.isImmediate();
 
 		while (eventIt.hasNext())
@@ -144,6 +145,14 @@ public class EventHelpers
 				throw new Exception(errorMsg);
 			}
 
+
+			if (observable != tmpEvent.isObservable())
+			{
+				String errorMsg = "Observability of an event must be the same in all automata. Observability of " + label + " is not consistent.";
+
+				throw new Exception(errorMsg);
+			}
+
 			prioritized = prioritized || tmpEvent.isPrioritized();
 		}
 
@@ -156,6 +165,7 @@ public class EventHelpers
 		theEvent.setPrioritized(prioritized);
 		theEvent.setImmediate(immediate);
 		theEvent.setOperator(operator);
+		theEvent.setObservable(observable);
 
 		return theEvent;
 	}

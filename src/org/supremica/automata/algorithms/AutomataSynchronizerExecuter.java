@@ -94,6 +94,7 @@ public final class AutomataSynchronizerExecuter
 	private int[] currPlantAutomata;
 	private int[] nextState;
 	private int[] currEnabledEvents;
+	private int[] currDisabledEvents;
 	private boolean controllableState;
 	private final static int IMMEDIATE_NOT_AVAILABLE = -1;
 	private int immediateEvent = IMMEDIATE_NOT_AVAILABLE;
@@ -123,6 +124,14 @@ public final class AutomataSynchronizerExecuter
 	 *@see  SynchronizationOptions
 	 */
 	private boolean verboseMode;
+
+	/**
+	 * If true then an arc for all disabled events to a forbidden state is added.
+	 * This is used when synthesizing supervisors with partial observability.
+	 *
+	 *@see  SynchronizationOptions
+	 */
+	private boolean rememberDisabledEvents;
 
 	/**
 	 * Determines synchronization type.
@@ -177,6 +186,7 @@ public final class AutomataSynchronizerExecuter
 		coExecuter = helper.getCoExecuter();
 		executerRendezvous = helper.getExecuterRendezvous();
 
+
 		// Indexform parameters
 		indexForm = helper.getAutomataIndexForm();
 		nextStateTable = indexForm.getNextStateTable();
@@ -193,6 +203,7 @@ public final class AutomataSynchronizerExecuter
 		forbidUncontrollableStates = syncOptions.forbidUncontrollableStates();
 		expandForbiddenStates = syncOptions.expandForbiddenStates();
 		verboseMode = syncOptions.verboseMode();
+		rememberDisabledEvents = syncOptions.rememberDisabledEvents();
 
 		// Overrides
 		if (expandEventsUsingPriority)
@@ -275,6 +286,8 @@ public final class AutomataSynchronizerExecuter
 
 		// +1 status field (always end with Integer.MAX_VALUE)
 		currEnabledEvents = new int[nbrOfEvents + 1];
+		// +1 status field (always end with Integer.MAX_VALUE)
+		currDisabledEvents = new int[nbrOfEvents + 1];
 	}
 
 	/**
@@ -318,6 +331,7 @@ public final class AutomataSynchronizerExecuter
 
 		// Compute all events that are enabled in the current state
 		int nbrOfEnabledEvents = 0;
+		int nbrOfDisabledEvents = 0;
 		boolean thisEventOk;
 		boolean thisPlantEventOk;
 		boolean canExecuteInPlant;
@@ -452,6 +466,14 @@ public final class AutomataSynchronizerExecuter
 					currEnabledEvents[nbrOfEnabledEvents++] = currEventIndex;
 				}
 			}
+			else
+			{ // Keep track of the disabled events
+				// This is used when synthesizing supervisors with partial observability
+				if (canExecuteInPlant)
+				{
+					currDisabledEvents[nbrOfDisabledEvents++] = currEventIndex;
+				}
+			}
 
 			if (!thisEventOk && canExecuteInPlant && thisPlantEventOk && !controllableEventsTable[currEventIndex])
 			{
@@ -475,6 +497,7 @@ public final class AutomataSynchronizerExecuter
 
 		// Always add Integer.MAX_VALUE as the last element
 		currEnabledEvents[nbrOfEnabledEvents++] = Integer.MAX_VALUE;
+		currDisabledEvents[nbrOfDisabledEvents++] = Integer.MAX_VALUE;
 
 		if (expandEventsUsingPriority)
 		{
@@ -752,6 +775,14 @@ public final class AutomataSynchronizerExecuter
 			int[][] currStateTable = helper.getStateTable();
 			int stateNumber = 0;
 			ExecutionDialog executionDialog = helper.getExecutionDialog();
+			
+			State rememberDisabledEventsState = null;
+			
+			if (rememberDisabledEvents)
+			{
+				rememberDisabledEventsState = theAutomaton.createAndAddUniqueState("qf");
+				rememberDisabledEventsState.setForbidden(true);
+			}
 
 			if (executionDialog != null)
 			{
@@ -894,6 +925,23 @@ public final class AutomataSynchronizerExecuter
 
 						currEventIndex = currEnabledEvents[++i];
 					}
+					
+					
+					if (rememberDisabledEvents)
+					{
+						i = 0;
+						int currDisabledEventIndex = currDisabledEvents[i];
+						// Handle all events
+						while (currDisabledEventIndex != Integer.MAX_VALUE)
+						{
+							LabeledEvent theEvent = theAlphabet.getEventWithIndex(currDisabledEventIndex);							
+							Arc newArc = new Arc(thisState, rememberDisabledEventsState, theEvent);
+
+							theAutomaton.addArc(newArc);
+	
+							currDisabledEventIndex = currDisabledEvents[++i];							
+						}	
+					}			
 				}
 			}
 

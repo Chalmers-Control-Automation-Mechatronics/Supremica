@@ -269,13 +269,17 @@ public class Events
 		return nbrOfFoundEvents;
 	}
 
-	public int nbrOfObservableEvents()
+	/**
+	 * Returns the number of unobservable events, epsilon events
+	 * are assumed to be unobservable
+	 */
+	public int nbrOfUnobservableEvents()
 	{
 		int nbrOfFoundEvents = 0;
 		for (EventIterator evIt = iterator(); evIt.hasNext(); )
 		{
 			LabeledEvent currEvent = evIt.nextEvent();
-			if (currEvent.isObservable())
+			if (!currEvent.isObservable() || currEvent.isEpsilon())
 			{
 				nbrOfFoundEvents++;
 			}

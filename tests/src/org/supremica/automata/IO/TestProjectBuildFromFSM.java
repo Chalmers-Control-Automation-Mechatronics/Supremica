@@ -131,7 +131,7 @@ public class TestProjectBuildFromFSM
 				assertTrue(currAutomaton.nbrOfAcceptingAndForbiddenStates() == 0);
 				assertTrue(currAutomaton.nbrOfControllableEvents() == 4);
 				assertTrue(currAutomaton.nbrOfPrioritizedEvents() == 5);
-				assertTrue(currAutomaton.nbrOfObservableEvents() == 5);
+				assertTrue(currAutomaton.nbrOfUnobservableEvents() == 0);
 				assertTrue(currAutomaton.nbrOfImmediateEvents() == 0);
 				assertTrue(currAutomaton.nbrOfEpsilonEvents() == 0);
 				assertTrue(currAlphabet.nbrOfEvents() == 5);
@@ -233,7 +233,7 @@ public class TestProjectBuildFromFSM
 				assertTrue(currAutomaton.nbrOfAcceptingAndForbiddenStates() == 0);
 				assertTrue(currAutomaton.nbrOfControllableEvents() == 3);
 				assertTrue(currAutomaton.nbrOfPrioritizedEvents() == 5);
-				assertTrue(currAutomaton.nbrOfObservableEvents() == 3);
+				assertTrue(currAutomaton.nbrOfUnobservableEvents() == 2);
 				assertTrue(currAutomaton.nbrOfImmediateEvents() == 0);
 				assertTrue(currAutomaton.nbrOfEpsilonEvents() == 0);
 				assertTrue(currAlphabet.nbrOfEvents() == 5);

@@ -68,6 +68,7 @@ class SynchronizationDialogStandardPanel
 	private JCheckBox expandForbiddenStatesBox;
 	private JCheckBox terminateIfUnconStateBox;
 	private JCheckBox buildAutomatonBox;
+	private JCheckBox rememberDisabledEventsBox;
 
 	public SynchronizationDialogStandardPanel()
 	{
@@ -76,11 +77,13 @@ class SynchronizationDialogStandardPanel
 		forbidUnconStatesBox = new JCheckBox("Mark uncontrollable states as forbidden");
 		expandForbiddenStatesBox = new JCheckBox("Expand forbidden states");
 		terminateIfUnconStateBox = new JCheckBox("Terminate if forbidden states");
+		rememberDisabledEventsBox = new JCheckBox("Add disabled events to a forbidden state");
 		buildAutomatonBox = new JCheckBox("Build a full automaton model");
 
 		standardBox.add(forbidUnconStatesBox);
 		standardBox.add(expandForbiddenStatesBox);
 		standardBox.add(terminateIfUnconStateBox);
+		standardBox.add(rememberDisabledEventsBox);
 		standardBox.add(buildAutomatonBox);
 		this.add(standardBox);
 	}
@@ -90,6 +93,7 @@ class SynchronizationDialogStandardPanel
 		forbidUnconStatesBox.setSelected(synchronizationOptions.forbidUncontrollableStates());
 		expandForbiddenStatesBox.setSelected(synchronizationOptions.expandForbiddenStates());
 		terminateIfUnconStateBox.setSelected(synchronizationOptions.terminateIfUncontrollableState());
+		rememberDisabledEventsBox.setSelected(synchronizationOptions.rememberDisabledEvents());
 		buildAutomatonBox.setSelected(synchronizationOptions.buildAutomaton());
 	}
 
@@ -98,6 +102,7 @@ class SynchronizationDialogStandardPanel
 		synchronizationOptions.setForbidUncontrollableStates(forbidUnconStatesBox.isSelected());
 		synchronizationOptions.setExpandForbiddenStates(expandForbiddenStatesBox.isSelected());
 		synchronizationOptions.setTerminateIfUncontrollableState(terminateIfUnconStateBox.isSelected());
+		synchronizationOptions.rememberDisabledEvents(rememberDisabledEventsBox.isSelected());
 		synchronizationOptions.setBuildAutomaton(buildAutomatonBox.isSelected());
 	}
 }

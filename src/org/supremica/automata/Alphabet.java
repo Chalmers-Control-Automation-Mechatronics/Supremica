@@ -515,7 +515,7 @@ public class Alphabet
 			//System.err.println("equalAlphabet::non equal nbr of prioritized events");
 			return false;
 		}
-		if (nbrOfObservableEvents() != other.nbrOfObservableEvents())
+		if (nbrOfUnobservableEvents() != other.nbrOfUnobservableEvents())
 		{
 			return false;
 		}
