@@ -587,7 +587,7 @@ public class AutomatonSynthesizer
 					{
 						try
 						{
-							if (!disabledEvents.containsEventWithLabel(currEvent.getLabel()))
+							if (!disabledEvents.contains(currEvent.getLabel()))
 							{
 								disabledEvents.addEvent(currEvent);
 							}

@@ -53,7 +53,7 @@ public class LabeledEvent
 {
 	// The id is the local identifier of an event, should be
 	// different from any other id:s in the same automaton
-	private String id = "";
+	// private String id = "";
 	// The label is what shows in the dot-figures, this is the
 	// global identifier of an event, appearing in the alphabet
 	private String label = "";
@@ -82,18 +82,20 @@ public class LabeledEvent
 
 		// ** MF ** if I instantiate with only a label, I (probably) want the id to be the same (not?)
 		// ** MF ** adding this cannot break any code, can it?
-		this.id = label;
+//		this.id = label;
 	}
 
+/*
 	public LabeledEvent(String label, String id)
 	{
 		setLabel(label);
 		setId(id);
 	}
+*/
 
 	public LabeledEvent(LabeledEvent e)
 	{
-		id = e.id;
+//		id = e.id;
 		label = e.label;
 		controllable = e.controllable;
 		prioritized = e.prioritized;
@@ -123,6 +125,7 @@ public class LabeledEvent
 	 */
 
 	// get/setId are now _only_ used by Alphabet
+/*
 	String getId() // default access, accessible within package, not outside (poor java mans friend declaration)
 	{
 		return id;
@@ -132,6 +135,7 @@ public class LabeledEvent
 	{
 		this.id = id;
 	}
+*/
 
 	public String getLabel()
 	{
@@ -242,6 +246,7 @@ public class LabeledEvent
 		return this.label.equals(ev.label); // should also check priority & controllability?
 	}
 
+/*
 	private boolean equalId(Object obj)
 	{
 		return this.id.equals(((LabeledEvent) obj).id);
@@ -251,6 +256,7 @@ public class LabeledEvent
 	{
 		return this.id.equals(id);
 	}
+*/
 
 	public int hashCode()
 	{

@@ -479,7 +479,8 @@ public class ProjectBuildFromXml
 			label = id;
 		}
 
-		LabeledEvent currEvent = new LabeledEvent(label, id);
+		// LabeledEvent currEvent = new LabeledEvent(label, id);
+		LabeledEvent currEvent = new LabeledEvent(label);
 //		currEvent.setId(id);
 //		currEvent.setLabel(label);
 		currEvent.setControllable(controllable);

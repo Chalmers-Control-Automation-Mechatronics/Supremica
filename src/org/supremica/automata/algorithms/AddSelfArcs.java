@@ -82,7 +82,7 @@ public class AddSelfArcs
 		{
 			try
 			{
-				passEvent = theAlphabet.getEventWithLabel("pass");
+				passEvent = theAlphabet.getEvent("pass");
 			}
 			catch (Exception ex) {}
 
@@ -302,7 +302,7 @@ public class AddSelfArcs
 			Arc currArc = (Arc) arcIt.next();
 			// String currEventId = currArc.getEventId();
 			LabeledEvent currEvent = currArc.getEvent();
-			
+
 			if ((passEvent == null) || !passEvent.equals(currEvent))
 			{
 				// LabeledEvent currEvent = currArc.getEvent(); // currAlphabet.getEventWithId(currEventId);
@@ -340,14 +340,14 @@ public class AddSelfArcs
 			theAutomaton.addArc(currArc);
 		}
 	}
-	
+
 	private static boolean containsPassEvent(State theState, Alphabet currAlpha, LabeledEvent passEvent)
 	{
 		if (passEvent == null)
 		{
 			return false;
 		}
-		
+
 		Iterator arcIt = theState.outgoingArcsIterator();
 		while (arcIt.hasNext())
 		{

@@ -79,7 +79,7 @@ public class AlphabetHelpers
 	{
 		return getUnionAlphabet(alphas, /* "", */ true, true);
 	}
-	
+
 	private static Alphabet getUnionAlphabet(EventsSet alphabets, String idPrefix)
 		throws IllegalArgumentException, Exception
 	{
@@ -106,7 +106,7 @@ public class AlphabetHelpers
 		}
 
 		EventsSet eventsSet = new EventsSet();
-		Events unionEvents = EventsHelpers.union(alphabets);
+		Alphabet unionEvents = AlphabetHelpers.union(alphabets);
 		Alphabet newAlphabet = new Alphabet();
 
 		// Iterate over all events - check consistency and add one for each label
@@ -124,20 +124,61 @@ public class AlphabetHelpers
 			{
 				Alphabet currAlphabet = (Alphabet) alphabetIt.next();
 
-				if (currAlphabet.containsEventWithLabel(currEvent.getLabel()))
+				if (currAlphabet.contains(currEvent.getLabel()))
 				{
-					eventsSet.add(currAlphabet.getEventWithLabel(currEvent.getLabel()));
+					eventsSet.add(currAlphabet.getEvent(currEvent.getLabel()));
 				}
 			}
 
 			LabeledEvent newEvent = EventHelpers.createEvent(eventsSet, requireConsistentControllability, requireConsistentImmediate);
-			
+
 			// If we get here, the events are consistent (or consistency is not to be checked)
-			
+
 			// newEvent.setId(newAlphabet.getUniqueId(idPrefix));
-			newAlphabet.addEvent(newEvent, false);
+			newAlphabet.addEvent(newEvent);
 		}
 
 		return newAlphabet;
+	}
+
+	/**
+	 * Computes the union of all events in eventsSet.
+	 * No manipulation of the events.
+	 *
+	 *@param  eventsSet Description of the Parameter
+	 *@return  Description of the Return Value
+	 *@exception  IllegalArgumentException Description of the Exception
+	 *@exception  Exception Description of the Exception
+	 */
+	private static Alphabet union(EventsSet eventsSet)
+		throws IllegalArgumentException, Exception
+	{
+		if (eventsSet.size() >= 1)
+		{
+			// this was >= 2 but why could we not have union over 1 or even 0 number of elements??
+			// Build the new set of events
+			Iterator eventsSetIt = eventsSet.iterator();
+			Collection currEvents = ((Alphabet) eventsSetIt.next()).values();
+			TreeSet tmpEvents = new TreeSet(currEvents);
+
+			while (eventsSetIt.hasNext())
+			{
+				tmpEvents.addAll((Collection) ((Alphabet) eventsSetIt.next()).values());
+			}
+
+			// Add all events to an Events object
+			Iterator eventIt = tmpEvents.iterator();
+			Alphabet theEvents = new Alphabet();
+
+			while (eventIt.hasNext())
+			{
+				theEvents.addEvent((LabeledEvent) eventIt.next());
+			}
+
+			return theEvents;
+		}
+
+		// at least 1 (not two ::MF) arguments are necessary
+		throw new IllegalArgumentException("Not enough elements of events");
 	}
 }

@@ -437,9 +437,9 @@ public class AutomataToNQC
 				Alphabet currAlphabet = currAutomaton.getAlphabet();
 				int currAutomatonIndex = currAutomaton.getSynchIndex();
 
-				if (currAlphabet.containsEventWithLabel(currEvent.getLabel()))
+				if (currAlphabet.contains(currEvent.getLabel()))
 				{
-					LabeledEvent currAutomatonEvent = currAutomaton.getEventWithLabel(currEvent.getLabel());
+					LabeledEvent currAutomatonEvent = currAutomaton.getEvent(currEvent.getLabel());
 					if (currAutomatonEvent == null)
 					{
 						throw new Exception("AutomataToIEC1131.printChangeTransitionsAsST: " + "Could not find " + currEvent.getLabel() + " in automaton " + currAutomaton.getName());

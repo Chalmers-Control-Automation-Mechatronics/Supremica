@@ -63,7 +63,7 @@ public class AutomataBuildFromVALID
 	private Project currAutomata = null;
 	private SAXBuilder docBuilder;
 	private String filePath;
-	
+
 	private int autonum = 0;
 
 	// mappings between id and state/event
@@ -301,7 +301,7 @@ public class AutomataBuildFromVALID
 						// Change name on the label in the automaton
 						// currAutomata.getAutomaton(newAutomatonName).getEventWithLabel(oldEventName).setLabel(new String(newEventName));
 						Automaton currAutomaton = currAutomata.getAutomaton(newAutomatonName);
-						LabeledEvent currEvent = currAutomaton.getEventWithLabel(oldEventName);
+						LabeledEvent currEvent = currAutomaton.getEvent(oldEventName);
 						Alphabet currAlphabet = currAutomaton.getAlphabet();
 
 						currAlphabet.removeEvent(currEvent);

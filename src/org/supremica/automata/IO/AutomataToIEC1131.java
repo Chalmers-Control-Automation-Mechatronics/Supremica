@@ -519,13 +519,13 @@ public class AutomataToIEC1131
 			theHelper.printILComment(pw, "Condition for timer " + currTimer.getName());
 
 			String currTimeoutLabel = currTimer.getTimeoutEvent();
-			if (!allEvents.containsEventWithLabel(currTimeoutLabel))
+			if (!allEvents.contains(currTimeoutLabel))
 			{
 				String errMessage = "Could not find event: " + currTimeoutLabel;
 				logger.error(errMessage);
 				throw new IllegalStateException(errMessage);
 			}
-			LabeledEvent currEvent = allEvents.getEventWithLabel(currTimeoutLabel);
+			LabeledEvent currEvent = allEvents.getEvent(currTimeoutLabel);
 			int currEventIndex = currEvent.getSynchIndex();
 
 			theHelper.printILComment(pw, "Timeout event is \"" + currEvent.getLabel() + "\"");
@@ -557,13 +557,13 @@ public class AutomataToIEC1131
 			theHelper.printILComment(pw, "Start timer " + currTimer.getName());
 
 			String currTimeoutLabel = currTimer.getStartEvent();
-			if (!allEvents.containsEventWithLabel(currTimeoutLabel))
+			if (!allEvents.contains(currTimeoutLabel))
 			{
 				String errMessage = "Could not find event: " + currTimeoutLabel;
 				logger.error(errMessage);
 				throw new IllegalStateException(errMessage);
 			}
-			LabeledEvent currEvent = allEvents.getEventWithLabel(currTimeoutLabel);
+			LabeledEvent currEvent = allEvents.getEvent(currTimeoutLabel);
 			int currEventIndex = currEvent.getSynchIndex();
 
 			theHelper.printILComment(pw, "Start event is \"" + currEvent.getLabel() + "\"");
@@ -682,9 +682,9 @@ public class AutomataToIEC1131
 					Alphabet theAlphabet = currAutomaton.getAlphabet();
 					int currAutomatonIndex = currAutomaton.getSynchIndex();
 
-					if (theAlphabet.containsEventWithLabel(currEvent.getLabel()))
+					if (theAlphabet.contains(currEvent.getLabel()))
 					{
-						LabeledEvent currAutomatonEvent = currAutomaton.getEventWithLabel(currEvent.getLabel());
+						LabeledEvent currAutomatonEvent = currAutomaton.getEvent(currEvent.getLabel());
 						if (currAutomatonEvent == null)
 						{
 							throw new Exception("AutomataToIEC1131.printChangeTransitionsAsST: " + "Could not find " + currEvent.getLabel() + " in automaton " + currAutomaton.getName());
@@ -781,9 +781,9 @@ public class AutomataToIEC1131
 
 					int currAutomatonIndex = currAutomaton.getSynchIndex();
 
-					if (currAlphabet.containsEventWithLabel(currEvent.getLabel()))
+					if (currAlphabet.contains(currEvent.getLabel()))
 					{
-						LabeledEvent currAutomatonEvent = currAutomaton.getEventWithLabel(currEvent.getLabel());
+						LabeledEvent currAutomatonEvent = currAutomaton.getEvent(currEvent.getLabel());
 						if (currAutomatonEvent == null)
 						{
 							throw new IllegalStateException("AutomataToIEC1131.printChangeTransitionsAsIL: " + "Could not find " + currEvent.getLabel() + " in automaton " + currAutomaton.getName());

@@ -263,11 +263,11 @@ public final class AutomataIndexForm
 			{
 				Alphabet currAutAlphabet = theAutomata.getAutomatonAt(i).getAlphabet();
 
-				if (currAutAlphabet.containsEventWithLabel(currLabel))
+				if (currAutAlphabet.contains(currLabel))
 				{
 					alphabetEventsTable[i][currEventSynchIndex] = true;
 
-					LabeledEvent currAutEvent = currAutAlphabet.getEventWithLabel(currLabel);
+					LabeledEvent currAutEvent = currAutAlphabet.getEvent(currLabel);
 
 					prioritizedEventsTable[i][currEventSynchIndex] = currAutEvent.isPrioritized();
 				}
@@ -397,7 +397,7 @@ public final class AutomataIndexForm
 					// Get the event from the automaton
 					// String eventId = currArc.getEventId();
 					LabeledEvent currEvent = currArc.getEvent(); // currAlphabet.getEventWithId(eventId);
-					LabeledEvent theEvent = theAlphabet.getEventWithLabel(currEvent.getLabel());
+					LabeledEvent theEvent = theAlphabet.getEvent(currEvent.getLabel());
 					int currEventIndex = theEvent.getSynchIndex();
 
 					sortedArcs.add(new Integer(currEventIndex));
@@ -418,7 +418,7 @@ public final class AutomataIndexForm
 					}
 
 					enableEventsTable[currAutomatonIndex][currEventIndex][i] = currStateIndex;
-					try 
+					try
 					{
 						enableEventsTable[currAutomatonIndex][currEventIndex][i + 1] = Integer.MAX_VALUE;
 					}
@@ -511,7 +511,7 @@ public final class AutomataIndexForm
 					// Get the event from the automaton
 					// String eventId = currArc.getEventId();
 					LabeledEvent currEvent = currArc.getEvent(); // currAlphabet.getEventWithId(eventId);
-					LabeledEvent theEvent = theAlphabet.getEventWithLabel(currEvent.getLabel());
+					LabeledEvent theEvent = theAlphabet.getEvent(currEvent.getLabel());
 					int currEventIndex = theEvent.getSynchIndex();
 
 					sortedArcs.add(new Integer(currEventIndex));

@@ -131,7 +131,7 @@ public class TestAlphabet
 
 		Alphabet alph4 = new Alphabet(alph1);
 		{
-			LabeledEvent e2 = alph4.getEventWithLabel("e2");
+			LabeledEvent e2 = alph4.getEvent("e2");
 			alph4.removeEvent(e2);
 			assertTrue(alph4.size() == 2);
 			alph2.minus(alph4);

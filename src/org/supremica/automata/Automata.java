@@ -192,7 +192,7 @@ public class Automata
 	public void moveAutomaton(Automaton aut, int destinationIndex)
 	{
 		int originIndex = theAutomata.indexOf(aut);
-		
+
 		if (originIndex > destinationIndex)
 			for (int i = originIndex; i > destinationIndex; i--)
 				moveAutomaton(aut, true);
@@ -582,21 +582,21 @@ public class Automata
 		{
 			logger.error(ex);
 		}
-		
+
 		// Iterate over the alphabet and examine all automata
 		for (EventIterator evIt = unionAlphabet.iterator(); evIt.hasNext();)
 		{
 			LabeledEvent currEvent = evIt.nextEvent();
-			
+
 			// Examine each automata
 			for (AutomatonIterator autIt = iterator(); autIt.hasNext();)
 			{
 				Alphabet currAlpha = autIt.nextAutomaton().getAlphabet();
-				
-				if (currAlpha.containsEventWithLabel(currEvent.getLabel()))
+
+				if (currAlpha.contains(currEvent.getLabel()))
 				{
-					if (currEvent.isControllable() != 
-						currAlpha.getEventWithLabel(currEvent.getLabel()).isControllable())
+					if (currEvent.isControllable() !=
+						currAlpha.getEvent(currEvent.getLabel()).isControllable())
 					{
 						logger.error("The event " + currEvent + " is not controllability consistent.");
 						return false;
@@ -1199,7 +1199,7 @@ public class Automata
 					}
 					else
 					{
-						logger.error("The automaton " + currAutomaton + 
+						logger.error("The automaton " + currAutomaton +
 									 " is of type 'Undefined'. Please specify a type.");
 					}
 

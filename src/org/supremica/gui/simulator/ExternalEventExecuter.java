@@ -58,7 +58,7 @@ class ExternalEventExecuter extends EventExecuter
 
 		for (Iterator alphIt = theAlphabet.iterator(); alphIt.hasNext(); )
 		{
-			LabeledEvent currEvent = theAlphabet.getEventWithLabel( ((LabeledEvent) alphIt.next()).getLabel());
+			LabeledEvent currEvent = theAlphabet.getEvent( ((LabeledEvent) alphIt.next()).getLabel());
 			events[i] = new EventWrapper(i,currEvent);
 			events[i].external = native_register_event(i, currEvent.getLabel());
 			events_map.put(currEvent, events[i]);

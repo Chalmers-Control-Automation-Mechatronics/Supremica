@@ -162,7 +162,7 @@ public class AutomataToSattLineSFCForBallProcess
 			Automaton aut = (Automaton) autIt.next();
 			Alphabet theAlphabet = aut.getAlphabet();
 
-			if (theAlphabet.containsEventWithLabel(theEvent.getLabel()))
+			if (theAlphabet.contains(theEvent.getLabel()))
 			{
 
 				// The event exists in this automaton
@@ -316,7 +316,7 @@ public class AutomataToSattLineSFCForBallProcess
 			Automaton aut = (Automaton) autIt.next();
 			Alphabet theAlphabet = aut.getAlphabet();
 
-			if (theAlphabet.containsEventWithLabel(theEvent.getLabel()))
+			if (theAlphabet.contains(theEvent.getLabel()))
 			{
 
 				// The event exists in this automaton

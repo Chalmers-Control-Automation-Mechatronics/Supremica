@@ -86,7 +86,7 @@ public class AutomataToJava
 	private SynchronizationType syncType = SynchronizationType.Prioritized;
 	private Alphabet allEvents;
 	private String classname;
-	
+
 	public AutomataToJava(Automata theAutomata, String classname)
 	{
 		this.theAutomata = theAutomata;
@@ -107,7 +107,7 @@ public class AutomataToJava
 		pw.println(" *");
 		pw.println(" * The following automata are synchronized.");
 		pw.println(" * The number is the index used in this file");
-		pw.println(" * to identify the automata."); 
+		pw.println(" * to identify the automata.");
 		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext();)
 		{
 			Automaton currAutomaton = (Automaton)autIt.next();
@@ -145,7 +145,7 @@ public class AutomataToJava
 		throws GenerationException
 	{
 		initialize();
-		
+
 		printFileHeader(pw);
 		printClassHeader(pw);
 		printConstants(pw);
@@ -298,9 +298,9 @@ public class AutomataToJava
 			{
 				automaton = (Automaton)autIt.next();
 				alphabet = automaton.getAlphabet();
-				if (alphabet.containsEventWithLabel(event))
+				if (alphabet.contains(event))
 				{
-					LabeledEvent automatonEvent = automaton.getEventWithLabel(event.getLabel());
+					LabeledEvent automatonEvent = automaton.getEvent(event.getLabel());
 					if (automatonEvent == null)
 						throw new GenerationException("Could not find " + event.getLabel() + " in automaton " + automaton.getName());
 					pw.println("\n\t\t\t// Transitions in \"" + automaton.getName() + "\"");
@@ -333,7 +333,7 @@ public class AutomataToJava
 				}
 			}
 			pw.println("\t\t\tbreak;");
-			
+
 		}
 		pw.println("\t\tdefault:");
 		pw.println("\t\t\t// Should never get here");
@@ -352,7 +352,7 @@ public class AutomataToJava
 		pw.println("\t * Checks if the event is enabled by external");
 		pw.println("\t * conditions such as input signal values.");
 		pw.println("\t * @param eventIndex");
-		pw.println("\t * @return <code>true</code> if the event is enabled."); 
+		pw.println("\t * @return <code>true</code> if the event is enabled.");
 		pw.println("\t *         <code>false</code> otherwise.");
 		pw.println("\t */");
 		pw.println("\tstatic boolean eventIsExternallyEnabled(int eventIndex)");

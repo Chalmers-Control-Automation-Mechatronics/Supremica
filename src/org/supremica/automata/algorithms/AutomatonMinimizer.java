@@ -326,10 +326,10 @@ public class AutomatonMinimizer
 		State q4 = new State("q4"); automaton.addState(q4);
 		State q5 = new State("q5"); automaton.addState(q5);
 
-		LabeledEvent a = new LabeledEvent("a"); automaton.getAlphabet().addEvent(a, false);
-		LabeledEvent b = new LabeledEvent("b"); automaton.getAlphabet().addEvent(b, false);
-		LabeledEvent c = new LabeledEvent("c"); automaton.getAlphabet().addEvent(c, false);
-		LabeledEvent d = new LabeledEvent("d"); automaton.getAlphabet().addEvent(d, false);
+		LabeledEvent a = new LabeledEvent("a"); automaton.getAlphabet().addEvent(a);
+		LabeledEvent b = new LabeledEvent("b"); automaton.getAlphabet().addEvent(b);
+		LabeledEvent c = new LabeledEvent("c"); automaton.getAlphabet().addEvent(c);
+		LabeledEvent d = new LabeledEvent("d"); automaton.getAlphabet().addEvent(d);
 
 		automaton.addArc(new Arc(q0, q1, a));
 		automaton.addArc(new Arc(q1, q1, a));

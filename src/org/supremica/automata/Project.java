@@ -313,7 +313,7 @@ public class Project
 		{
 			Action currAction = (Action)theIt.next();
 			String currLabel = currAction.getLabel();
-			if (!theAlphabet.containsEventWithLabel(currLabel))
+			if (!theAlphabet.contains(currLabel))
 			{
 				valid = false;
 				logger.error("The action " + currLabel + " is not a valid event");
@@ -333,7 +333,7 @@ public class Project
 		{
 			Control currControl = (Control)theIt.next();
 			String currLabel = currControl.getLabel();
-			if (!theAlphabet.containsEventWithLabel(currLabel))
+			if (!theAlphabet.contains(currLabel))
 			{
 				valid = false;
 				logger.error("The control " + currLabel + " is not a valid event");
@@ -353,13 +353,13 @@ public class Project
 		{
 			EventTimer currTimer = (EventTimer)theIt.next();
 			String currStartEvent = currTimer.getStartEvent();
-			if (!theAlphabet.containsEventWithLabel(currStartEvent))
+			if (!theAlphabet.contains(currStartEvent))
 			{
 				valid = false;
 				logger.error("The start event, " + currStartEvent + ", in timer " + currTimer.getName() + " is not a valid event");
 			}
 			String currTimeoutEvent = currTimer.getTimeoutEvent();
-			if (!theAlphabet.containsEventWithLabel(currTimeoutEvent))
+			if (!theAlphabet.contains(currTimeoutEvent))
 			{
 				valid = false;
 				logger.error("The timeout event, " + currStartEvent + ", in timer " + currTimer.getName() + " is not a valid event");

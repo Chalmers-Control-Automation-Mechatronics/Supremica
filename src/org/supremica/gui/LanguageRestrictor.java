@@ -261,7 +261,7 @@ class RestrictEventsViewerPanel
 		try
 		{
 			// Alphabet alpha = automaton.getAlphabet();
-			if(!alpha.containsEventWithLabel(event.getLabel()))
+			if(!alpha.contains(event.getLabel()))
 			{
 				alpha.addEvent(event);
 			}

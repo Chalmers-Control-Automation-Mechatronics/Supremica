@@ -26,9 +26,9 @@ class AlphaEpsilonTester
 			return events.contains(event);
 		}
 		*/
-		return notin^events.containsEventWithLabel(event);
+		return notin^events.contains(event);
 	}
-	
+
 	public String showWhatYouGot()
 	{
 		if (notin)

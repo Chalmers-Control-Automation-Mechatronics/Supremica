@@ -154,7 +154,7 @@ public class Determinizer
 					{
 						if (checkControlInconsistencies)
 						{
-							Events inconsistentEvents = automaton.getControlInconsistentEvents(Q2c);
+							Alphabet inconsistentEvents = automaton.getControlInconsistentEvents(Q2c);
 							if (inconsistentEvents.size() > 0)
 							{
 								logger.debug("In states " + Q2c.toString() + " the following events are inconsistent " + inconsistentEvents.toString());
@@ -163,7 +163,7 @@ public class Determinizer
 						}
 						if (resolveControlInconsistencies)
 						{
-							Events inconsistentEvents = automaton.resolveControlInconsistencies(Q2c);
+							Alphabet inconsistentEvents = automaton.resolveControlInconsistencies(Q2c);
 							if (inconsistentEvents.size() > 0)
 							{
 								logger.debug("In states " + Q2c.toString() + " the following events are inconsistent (resolved) " + inconsistentEvents.toString());
@@ -443,14 +443,14 @@ public class Determinizer
 		State q4 = new State("q4"); automaton.addState(q4);
 		State q5 = new State("q5"); automaton.addState(q5); q5.setAccepting(true);
 
-		LabeledEvent a = new LabeledEvent("a"); automaton.getAlphabet().addEvent(a, false);
-		LabeledEvent b = new LabeledEvent("b"); automaton.getAlphabet().addEvent(b, false); b.setEpsilon(true);
-		LabeledEvent c = new LabeledEvent("c"); automaton.getAlphabet().addEvent(c, false); c.setEpsilon(true);
-		LabeledEvent d = new LabeledEvent("d"); automaton.getAlphabet().addEvent(d, false);
+		LabeledEvent a = new LabeledEvent("a"); automaton.getAlphabet().addEvent(a);
+		LabeledEvent b = new LabeledEvent("b"); automaton.getAlphabet().addEvent(b); b.setEpsilon(true);
+		LabeledEvent c = new LabeledEvent("c"); automaton.getAlphabet().addEvent(c); c.setEpsilon(true);
+		LabeledEvent d = new LabeledEvent("d"); automaton.getAlphabet().addEvent(d);
 
 		Alphabet epsilons = new Alphabet();
-		epsilons.addEvent(b, false);
-		epsilons.addEvent(c, false);
+		epsilons.addEvent(b);
+		epsilons.addEvent(c);
 
 		automaton.addArc(new Arc(q0, q1, a));
 		automaton.addArc(new Arc(q0, q1, b));

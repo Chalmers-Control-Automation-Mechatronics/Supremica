@@ -47,20 +47,20 @@ public class ModifiedAstar
 		private Element elem;
 		private int dbgNum;
 		private long time;
-		
+
 		Info(Element elem, int dbgnum, long time)
 		{
 			this.elem = elem;
 			this.dbgNum = dbgnum;
 			this.time = time;
 		}
-		
+
 		public String toString()
 		{
 			return new String(elem.toString() + "States searched: " + dbgNum + " in time: " + time);
 		}
 	}
-	
+
 	public ModifiedAstar(Automata theAutomata, Calculator calculator, Manipulator manipulator, Expander expander, Reopener reopener)
 		throws Exception
 	{
@@ -179,15 +179,15 @@ public class ModifiedAstar
 
 				// If we've not already seen it (same logical state)...
 				boolean onopen = open.contains(nextState);
-				
+
 				// Man kan nog lägga till if(!onopen) else onclosed = false
-				// Det kanske är lite snabbare 
+				// Det kanske är lite snabbare
 				boolean onclosed = closed.contains(nextState);
-				
+
 				// begin debug *****
 				logger.debug(nextState.toString() + " is " + (onopen ? "already" : "not") + " on open, and is " + (onclosed ? "already" : "not") + " on closed");
 				// end debug ******
-				
+
 				if(!onopen && !onclosed)
 				{
 					// ...calc the estimate
@@ -283,7 +283,7 @@ public class ModifiedAstar
 		}
 		return null;
 	}
-	
+
 	public Automaton getAutomaton(Element elem)
 	{
 		Automaton automaton = new Automaton();
@@ -305,7 +305,7 @@ public class ModifiedAstar
 			{
 				throw new RuntimeException("No such event!");
 			}
-			automaton.getAlphabet().addEvent(event, false);
+			automaton.getAlphabet().addEvent(event);
 			automaton.addArc(new Arc(prevState, state, event));
 
 			state = prevState;
@@ -320,12 +320,12 @@ public class ModifiedAstar
 	{
 		return timer.elapsedTime();
 	}
-	
+
 	public Info getInfo(Element elem)
 	{
 		return new Info(elem, debugNum, getElapsedTime());
 	}
-	
+
 	/*** The following is for simple debug only
 	 * It didn't save us from a number of bugs...
 	 ***/

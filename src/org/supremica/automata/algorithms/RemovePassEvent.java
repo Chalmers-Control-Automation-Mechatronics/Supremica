@@ -118,9 +118,9 @@ public class RemovePassEvent
 			}
 		}
 
-		if (theAlphabet.containsEventWithLabel("pass"))
+		if (theAlphabet.contains("pass"))
 		{
-			LabeledEvent passEvent = theAlphabet.getEventWithLabel("pass");
+			LabeledEvent passEvent = theAlphabet.getEvent("pass");
 
 			theAlphabet.removeEvent(passEvent);
 		}

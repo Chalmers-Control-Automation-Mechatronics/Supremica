@@ -266,7 +266,7 @@ public class AutomataBuilder
 		List allocationZones = currMovement.getPreMoveAllocationZones();
 		String allocString = computeLabel("a_" + sourceSpot.getName(), allocationZones);
 		LabeledEvent allocationEvent = new LabeledEvent(allocString);
-		currAlphabet.addEvent(allocationEvent, false);
+		currAlphabet.addEvent(allocationEvent);
 		Arc allocationArc = new Arc(sourceState, allocationSpotState, allocationEvent);
 		currAutomaton.addArc(allocationArc);
 
@@ -279,7 +279,7 @@ public class AutomataBuilder
 		List deallocationZones = currMovement.getPostMoveDeallocationZones();
 		String deallocString = computeLabel("d_" + destSpot.getName(), deallocationZones);
 		LabeledEvent deallocationEvent = new LabeledEvent(deallocString);
-		currAlphabet.addEvent(deallocationEvent, false);
+		currAlphabet.addEvent(deallocationEvent);
 		Arc deallocationArc = new Arc(allocationSpotState, deallocationSpotState, deallocationEvent);
 		currAutomaton.addArc(deallocationArc);
 

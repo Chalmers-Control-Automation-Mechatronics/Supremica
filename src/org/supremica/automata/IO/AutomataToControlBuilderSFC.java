@@ -285,7 +285,7 @@ public class AutomataToControlBuilderSFC
 		{
 			LabeledEvent theEvent = (LabeledEvent) alphaIt.next();
 
-			if (testAlphabet.containsEventWithLabel(theEvent.getLabel()))
+			if (testAlphabet.contains(theEvent.getLabel()))
 			{
 
 				// Step 3. Compute ExtendedConflict(event)
@@ -336,7 +336,7 @@ public class AutomataToControlBuilderSFC
 			{
 				LabeledEvent confEvent = (LabeledEvent) alphaIt.next();
 
-				if (theExtConfAlphabet.containsEventWithLabel(confEvent.getLabel()) &&!testAlphabet.containsEventWithLabel(confEvent.getLabel()))
+				if (theExtConfAlphabet.contains(confEvent.getLabel()) &&!testAlphabet.contains(confEvent.getLabel()))
 				{
 
 					// Step 3. Let C = C + Conflict(e), D = D + {e}.
@@ -398,7 +398,7 @@ public class AutomataToControlBuilderSFC
 
 			logger.debug(aut.getName().replace('.', '_'));
 
-			if (theAlphabet.containsEventWithLabel(theEvent.getLabel()))
+			if (theAlphabet.contains(theEvent.getLabel()))
 			{
 				logger.debug("The event " + theEvent.getLabel() + " exsits in the automaton " + aut.getName().replace('.', '_'));
 
@@ -578,7 +578,7 @@ public class AutomataToControlBuilderSFC
 			Automaton aut = (Automaton) autIt.next();
 			Alphabet theAlphabet = aut.getAlphabet();
 
-			if (theAlphabet.containsEventWithLabel(theEvent.getLabel()))
+			if (theAlphabet.contains(theEvent.getLabel()))
 			{
 
 				// The event exists in this automaton
@@ -695,7 +695,7 @@ public class AutomataToControlBuilderSFC
 			Automaton aut = (Automaton) autIt.next();
 			Alphabet theAlphabet = aut.getAlphabet();
 
-			if (theAlphabet.containsEventWithLabel(theEvent.getLabel()))
+			if (theAlphabet.contains(theEvent.getLabel()))
 			{
 
 				// The event exists in this automaton

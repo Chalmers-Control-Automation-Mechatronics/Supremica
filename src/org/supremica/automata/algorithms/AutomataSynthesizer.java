@@ -104,7 +104,7 @@ public class AutomataSynthesizer
 			throw new IllegalArgumentException("The automata are not consistent in " +
 											   "the controllability of some event.");
 		}
-		if ((synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.Modular) && 
+		if ((synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.Modular) &&
 			!theAutomata.isAllEventsPrioritized())
 		{
 			throw new IllegalArgumentException("All events are not prioritized!");
@@ -114,10 +114,10 @@ public class AutomataSynthesizer
 		if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.BDD)
 		{
 			SynthesisType typ = synthesizerOptions.getSynthesisType();
-			if(typ !=  SynthesisType.Both && typ !=  SynthesisType.Controllable && 
-			   typ !=  SynthesisType.Nonblocking) 
+			if(typ !=  SynthesisType.Both && typ !=  SynthesisType.Controllable &&
+			   typ !=  SynthesisType.Nonblocking)
 			{
-				throw new IllegalArgumentException("BDD algorithms currently only " + 
+				throw new IllegalArgumentException("BDD algorithms currently only " +
 												   "support supNB+C synthesis.");
 			}
 			// now, Do BDD Specific initialization here and skip the other stuff
@@ -334,12 +334,12 @@ public class AutomataSynthesizer
 		{
 			// In the non incremental approach, immediately add all plants that are related
 			// by uncontrollable events. Otherwise this is done incrementally below
-			if (synthesizerOptions.getMaximallyPermissive() && 
+			if (synthesizerOptions.getMaximallyPermissive() &&
 				!synthesizerOptions.getMaximallyPermissiveIncremental())
 			{
 				int previousSize = 0;
 				Alphabet uncontrollableEvents = automata.getUnionAlphabet().getUncontrollableAlphabet();
-				
+
 				// Loop until no new uncontrollable events are found
 				while (uncontrollableEvents.size() > previousSize)
 				{
@@ -357,8 +357,8 @@ public class AutomataSynthesizer
 				// retval.automaton.setComment("sup(" + retval.automaton.getComment() + ")");
 
 				Alphabet disabledEvents = checkMaximallyPermissive(automata, retval.disabledEvents);
-				// Do we care about max perm? 
-				if(synthesizerOptions.getMaximallyPermissive()) 
+				// Do we care about max perm?
+				if(synthesizerOptions.getMaximallyPermissive())
 				{
 					while(disabledEvents.size() > 0) // ...then do so until we're known to be maximally permissive...
 					{
@@ -473,7 +473,7 @@ public class AutomataSynthesizer
 		{
 			Alphabet unionAlphabet = AlphabetHelpers.getUnionAlphabet(automata);
 
-			Events problemEvents = new Events();
+			Alphabet problemEvents = new Alphabet();
 			for (EventIterator evIt = unionAlphabet.iterator(); evIt.hasNext(); )
 			{
 				LabeledEvent currEvent = evIt.nextEvent();
@@ -497,9 +497,9 @@ public class AutomataSynthesizer
 					for (EventIterator evIt = problemEvents.iterator(); evIt.hasNext(); )
 					{
 						LabeledEvent currEvent = evIt.nextEvent();
-						if (currAlphabet.containsEventWithLabel(currEvent.getLabel()))
+						if (currAlphabet.contains(currEvent.getLabel()))
 						{
-							LabeledEvent currAutomatonEvent = currAlphabet.getEventWithLabel(currEvent.getLabel());
+							LabeledEvent currAutomatonEvent = currAlphabet.getEvent(currEvent.getLabel());
 							currAutomatonEvent.setControllable(false);
 						}
 					}

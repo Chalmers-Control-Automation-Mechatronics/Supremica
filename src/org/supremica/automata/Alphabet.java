@@ -61,168 +61,453 @@ import org.supremica.log.*;
  *
  *@author  ka
  *@created  November 28, 2001
- *@see  org.supremica.automata.Events
  *@see  org.supremica.automata.AlphabetHelpers
  */
 public class Alphabet
-	extends Events
 {
 	private static Logger logger = LoggerFactory.createLogger(Alphabet.class);
 
-	private HashMap idMap;
 	private int idIndex = 0;
 	private Listeners listeners = null;
-
-	public class IdExistsException
-		extends Exception
-	{
-		public IdExistsException(String str)
-		{
-			super(str);
-		}
-	}
+	private TreeMap theEvents = null;
 
 	public Alphabet()
 	{
-		idMap = new HashMap();
+		theEvents = new TreeMap();
+
 	}
 
 	public Alphabet(Alphabet orgAlphabet)
 	{
-		super(orgAlphabet);
+		this();
+		for (Iterator it = orgAlphabet.iterator(); it.hasNext(); )
+		{
+			LabeledEvent newEvent = new LabeledEvent((LabeledEvent) it.next());
 
-		idMap = new HashMap();
+			theEvents.put(newEvent.getLabel(), newEvent);
+		}
+
 		idIndex = orgAlphabet.idIndex;
 
-		// theEvents = new TreeMap(orgAlphabet.theEvents);
-		// setEvents(orgAlphabet.getEvents());
 		rehash();
 	}
 
 	/**
-	 * Returns a new unique (for this object) id.
+	 * Return the number of events.
 	 *
-	 *@param  prefix Description of the Parameter
-	 *@return  The uniqueId value
+	 *@return number of events
 	 */
-	private String getUniqueId(String prefix)
+	public int size()
 	{
-		String newId = null;
-
-		do
-		{
-			newId = prefix + new Integer(idIndex++);
-		}
-		while (containsEventWithId(newId));
-
-		return newId;
+		return theEvents.size();
 	}
 
 	/**
-	 * True, if an event with this id is already in the alphabet, false otherwise.
+	 * Return the number of events.
 	 *
-	 *@param  id Description of the Parameter
-	 *@return  Description of the Return Value
+	 *@return number of events
 	 */
-	private boolean containsEventWithId(String id)
+	public int nbrOfEvents()
 	{
-		return idMap.containsKey(id);
+		return size();
 	}
 
-	public boolean contains(LabeledEvent event)
+	public void setEvents(TreeMap oldEvents)
 	{
-		return containsEventWithId(event.getId());
+		theEvents = new TreeMap(oldEvents);
+	}
+
+	public Map getEvents()
+	{
+		return theEvents;
 	}
 
 	/**
-	 * Returns an event with a given id. An exception is thrown if the event
-	 * does not exists.
+	 * Return an iterator to the events.
 	 *
-	 *@param  id Description of the Parameter
-	 *@return  The eventWithId value
-	 *@exception  Exception Description of the Exception
+	 *@return  An iterator
 	 */
-	private LabeledEvent getEventWithId(String id)
-		throws Exception
+	public EventIterator iterator()
 	{
-		if (containsEventWithId(id))
+		return new EventIterator(theEvents.values().iterator());
+	}
+
+	/**
+	 * Return an iterator to the controllable events.
+	 *
+	 *@return  An iterator
+	 */
+	public EventIterator controllableEventIterator()
+	{
+		return new EventIterator(new ControllableEventIterator(theEvents.values().iterator(), true));
+	}
+
+	/**
+	 * Return an iterator to the uncontrollable events.
+	 *
+	 *@return  An iterator
+	 */
+	public EventIterator uncontrollableEventIterator()
+	{
+		return new EventIterator(new ControllableEventIterator(theEvents.values().iterator(), false));
+	}
+
+	/**
+	 * Add an event.
+	 */
+	public void addEvent(LabeledEvent ev)
+		throws IllegalArgumentException
+	{
+		if (ev == null)
 		{
-			return (LabeledEvent) idMap.get(id);
+			throw new IllegalArgumentException("addEvent: event mist be non-null");
 		}
-		else
+		if (ev.getLabel() == null)
 		{
-			throw new Exception("Alphabet.getEventWithId: No event with id \"" + id + "\" exists");
+			throw new IllegalArgumentException("addEvent: event label mist be non-null");
 		}
+		if (theEvents.containsKey(ev.getLabel()))
+		{
+			throw new IllegalArgumentException("getEvent: event is already in the alphabet ");
+		}
+		theEvents.put(ev.getLabel(), ev);
 	}
 
 	/**
 	 * Given an event, returns an "equal" event from this alphabet
 	 * The def of "equal" is an internal matter.
 	 * Use this method instead of fiddling with event ids in user code
+	 * Return null if the event does not exist
 	 */
-	public LabeledEvent getEvent(LabeledEvent event)
-		throws Exception
+	public LabeledEvent getEvent(LabeledEvent ev)
+		throws IllegalArgumentException
 	{
-		return getEventWithId(event.getId());
+		if (ev == null)
+		{
+			throw new IllegalArgumentException("getEvent: event mist be non-null");
+		}
+		if (ev.getLabel() == null)
+		{
+			throw new IllegalArgumentException("getEvent: event label mist be non-null");
+		}
+		return (LabeledEvent)theEvents.get(ev.getLabel());
+	}
+
+
+	/**
+	 * Adds all events in another Events to this Events.
+	 * Makes sure they are not already included!
+	 */
+	public void addEvents(Alphabet otherEvents)
+	{
+		for (EventIterator eventIt = otherEvents.iterator(); eventIt.hasNext(); )
+		{
+			LabeledEvent currEvent = eventIt.nextEvent();
+			if (!contains(currEvent))
+			{
+				addEvent(currEvent);
+			}
+		}
+	}
+
+	public void removeEvent(LabeledEvent ev)
+		throws IllegalArgumentException
+	{
+		if (!includes(ev))
+		{
+			throw new IllegalArgumentException("The event is not included in this alphabet");
+		}
+		removeEvent(ev.getLabel());
+	}
+
+	public void removeEvent(String label)
+		throws IllegalArgumentException
+	{
+		if (!contains(label))
+		{
+			throw new IllegalArgumentException("The event is not included in this alphabet");
+		}
+		theEvents.remove(label);
 	}
 
 	/**
-	 * Add an event to the alphabet. Check with containsEventWithId to make
-	 * sure that an event with the id not already exists.
-	 * If trying to add an event with an id that already exists, an exception is thrown.
+	 * True, if there exists an event with the same label, false otherwise.
 	 *
-	 *@param  event The feature to be added to the Event attribute
+	 *@param  event The event with an interesting label
+	 */
+	public boolean contains(LabeledEvent event)
+		throws IllegalArgumentException
+	{
+		return contains(event.getLabel());
+	}
+
+	/**
+	 * True, if it exists an event with the label, false otherwise.
+	 *
+	 *@param  label The label of interest
+	 */
+	public boolean contains(String label)
+		throws IllegalArgumentException
+	{
+		if (label == null)
+		{
+			throw new IllegalArgumentException("Event label must be non-null");
+		}
+		return theEvents.containsKey(label);
+	}
+
+	/**
+	 * Return the event with the given label.
+	 * Throw an exception if it does not exist.
+	 *
+	 *@param  label Description of the Parameter
+	 *@return  The eventWithLabel value
 	 *@exception  Exception Description of the Exception
 	 */
-	public void addEvent(LabeledEvent event)
+	public LabeledEvent getEvent(String label)
+		throws IllegalArgumentException
 	{
-		addEvent(event, true);
+		if (label == null)
+		{
+			throw new IllegalArgumentException("Event label must be non-null");
+		}
+		return (LabeledEvent) theEvents.get(label);
+	}
+
+	public LabeledEvent getEventWithIndex(int index)
+		throws IllegalArgumentException
+	{
+		Iterator eventIt = iterator();
+
+		while (eventIt.hasNext())
+		{
+			LabeledEvent currEvent = (LabeledEvent) eventIt.next();
+
+			if (currEvent.getSynchIndex() == index)
+			{
+				return currEvent;
+			}
+		}
+
+		throw new IllegalArgumentException("No event with index '" + index + "' exists");
+	}
+
+
+	public int nbrOfControllableEvents()
+	{
+		int nbrOfFoundEvents = 0;
+		for (EventIterator evIt = iterator(); evIt.hasNext(); )
+		{
+			LabeledEvent currEvent = evIt.nextEvent();
+			if (currEvent.isControllable())
+			{
+				nbrOfFoundEvents++;
+			}
+		}
+		return nbrOfFoundEvents;
+	}
+
+	public int nbrOfUncontrollableEvents()
+	{
+		int nbrOfFoundEvents = 0;
+		for (EventIterator evIt = iterator(); evIt.hasNext(); )
+		{
+			LabeledEvent currEvent = evIt.nextEvent();
+			if (!currEvent.isControllable())
+			{
+				nbrOfFoundEvents++;
+			}
+		}
+		return nbrOfFoundEvents;
 	}
 
 	/**
-	 * Add an event to the alphabet. If an event with the same id already exists
-	 * and doThrow is true, then throw an exception, else generate a unique id
-	 * and really add it. Note, may throw an event, even for doThrow == false, if
-	 * Events::addEvent throws or if idMap::put throws. However, doThrow == false
-	 * means that no event will be thrown because of same id
+	 * Returns the number of unobservable events, epsilon events
+	 * are assumed to be unobservable
 	 */
-	public void addEvent(LabeledEvent event, boolean doThrow)
+	public int nbrOfUnobservableEvents()
 	{
-		if (!containsEventWithId(event.getId()))
+		int nbrOfFoundEvents = 0;
+		for (EventIterator evIt = iterator(); evIt.hasNext(); )
 		{
-			try
+			LabeledEvent currEvent = evIt.nextEvent();
+			if (!currEvent.isObservable() || currEvent.isEpsilon())
 			{
-				super.addEvent(event);
-				idMap.put(event.getId(), event);
+				nbrOfFoundEvents++;
 			}
-			catch(Exception ex)
+		}
+		return nbrOfFoundEvents;
+	}
+
+	public int nbrOfPrioritizedEvents()
+	{
+		int nbrOfFoundEvents = 0;
+		for (EventIterator evIt = iterator(); evIt.hasNext(); )
+		{
+			LabeledEvent currEvent = evIt.nextEvent();
+			if (currEvent.isPrioritized())
 			{
-				throw new RuntimeException(ex);
+				nbrOfFoundEvents++;
 			}
-			return;
+		}
+		return nbrOfFoundEvents;
+	}
+
+	public int nbrOfImmediateEvents()
+	{
+		int nbrOfFoundEvents = 0;
+		for (EventIterator evIt = iterator(); evIt.hasNext(); )
+		{
+			LabeledEvent currEvent = evIt.nextEvent();
+			if (currEvent.isImmediate())
+			{
+				nbrOfFoundEvents++;
+			}
+		}
+		return nbrOfFoundEvents;
+	}
+
+	public int nbrOfEpsilonEvents()
+	{
+		int nbrOfFoundEvents = 0;
+		for (EventIterator evIt = iterator(); evIt.hasNext(); )
+		{
+			LabeledEvent currEvent = evIt.nextEvent();
+			if (currEvent.isEpsilon())
+			{
+				nbrOfFoundEvents++;
+			}
+		}
+		return nbrOfFoundEvents;
+	}
+
+
+	/**
+	 * True, if the event is in the set already, false otherwise.
+	 *
+	 *@param  theEvent Description of the Parameter
+	 *@return  Description of the Return Value
+	 */
+	public boolean includes(LabeledEvent theEvent)
+	{
+		return theEvents.containsValue(theEvent);
+	}
+
+	public String toDebugString()
+	{
+		StringBuffer tmpBuf = new StringBuffer(theEvents.toString());
+
+		return tmpBuf.toString();
+	}
+
+	public String toString()
+	{
+		StringBuffer sbuf = new StringBuffer("{");
+
+		if (size() > 0)
+		{
+			for(EventIterator it = iterator(); it.hasNext(); )
+			{
+				LabeledEvent event = it.nextEvent();
+				sbuf.append(event);
+				if (it.hasNext())
+				{
+					sbuf.append(", ");
+				}
+			}
+			sbuf.append("}");
 		}
 
-		// Here containsEventWithId(event.getId()) == true
+		return sbuf.toString();
+	}
 
-		if(doThrow == true)
+
+	/**
+	 * Returns collection of the events..
+	 *
+	 *@return  Description of the Return Value
+	 */
+	public Collection values()
+	{
+		return theEvents.values();
+	}
+
+
+	/** Must be called after an event label is modified. */
+	public void rehash()
+	{
+		TreeMap newEvents = new TreeMap();
+
+		// theEvents = new TreeMap(orgEvents.theEvents);
+		// Deep copy
+		for (Iterator it = iterator(); it.hasNext(); )
 		{
-			throw new RuntimeException("Alphabet.addEvent: An event with id \"" +
-									   event.getId() + "\" already exists");
+			LabeledEvent currEvent = (LabeledEvent) it.next();
+
+			newEvents.put(currEvent.getLabel(), currEvent);
 		}
-		else // doThrow == false => construct unique id, and add for real
+
+		theEvents.clear();
+
+		theEvents = newEvents;
+	}
+
+	class ControllableEventIterator
+		implements Iterator
+	{
+		private final Iterator theIterator;
+		private final boolean controllableEvents;
+		private Object nextEvent = null;
+
+
+		public ControllableEventIterator(Iterator theIterator, boolean controllableEvents)
 		{
-			event.setId(getUniqueId("x"));
-			try
+			this.theIterator = theIterator;
+			this.controllableEvents = controllableEvents;
+			findNextEvent();
+		}
+
+		public boolean hasNext()
+		{
+			return nextEvent != null;
+		}
+
+		public Object next()
+			throws NoSuchElementException
+		{
+			if (nextEvent != null)
 			{
-				super.addEvent(event);
-				idMap.put(event.getId(), event);
+				Object oldEvent = nextEvent;
+				findNextEvent();
+				return oldEvent;
 			}
-			catch(Exception ex) // cannot throw Exception, since then an exception spec is necessary
+			else
 			{
-				throw new RuntimeException(ex);
+				throw new NoSuchElementException();
 			}
+		}
+
+		public void remove()
+			throws UnsupportedOperationException, IllegalStateException
+		{
+			throw new UnsupportedOperationException();
+		}
+
+		private void findNextEvent()
+		{
+			while (theIterator.hasNext())
+			{
+				LabeledEvent currEvent = (LabeledEvent)theIterator.next();
+				if (currEvent.isControllable() == controllableEvents)
+				{
+					nextEvent = currEvent;
+					return;
+				}
+			}
+			nextEvent = null;
 		}
 	}
+
 
 	/**
 	 * Computes A \ B (difference) where A is this alphabet and B is other
@@ -235,7 +520,7 @@ public class Alphabet
 		{
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
 
-			if (containsEventWithLabel(currEvent.getLabel()))
+			if (contains(currEvent.getLabel()))
 			{
 				try
 				{
@@ -269,7 +554,7 @@ public class Alphabet
 		{
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
 
-			if(!other.containsEventWithLabel(currEvent.getLabel()))
+			if(!other.contains(currEvent.getLabel()))
 			{
 				removeList.add(currEvent);
 				//removeList.add(currEvent.getLabel());
@@ -310,7 +595,7 @@ public class Alphabet
 		{
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
 
-			if(other.containsEventWithLabel(currEvent.getLabel()))
+			if(other.contains(currEvent.getLabel()))
 			{
 				return true;
 			}
@@ -328,29 +613,6 @@ public class Alphabet
 		Alphabet result = new Alphabet(a1);
 		result.intersect(a2);
 		return result;
-
-		/*
-		Alphabet result = new Alphabet();
-
-		for (Iterator alphIt = a2.iterator(); alphIt.hasNext(); )
-		{
-			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-			if(a1.containsEventWithLabel(currEvent.getLabel()))
-			{
-				LabeledEvent newEvent = new LabeledEvent(currEvent);
-				try
-				{
-					result.addEvent(newEvent);
-				}
-				catch (Exception ex)
-				{   // This should be impossible
-					logger.error("Alphabet.intersect. Trying to add an existing event. " + ex);
-					logger.debug(ex.getStackTrace());
-				}
-			}
-		}
-		return result;
-		*/
 	}
 
 	/**
@@ -364,14 +626,14 @@ public class Alphabet
 		{
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
 
-			if (!containsEventWithLabel(currEvent.getLabel()))
+			if (!contains(currEvent.getLabel()))
 			{
 				LabeledEvent newEvent = new LabeledEvent(currEvent);
 				// newEvent.setId(getUniqueId("e"));
 
 				try
 				{
-					addEvent(newEvent, false);
+					addEvent(newEvent);
 				}
 				catch (Exception ex)
 				{    // This should be impossible
@@ -432,7 +694,7 @@ public class Alphabet
 		for (EventIterator evIt = iterator(); evIt.hasNext();)
 		{
 			LabeledEvent currEvent = evIt.nextEvent();
-			LabeledEvent otherEvent = otherAlphabet.getEventWithLabel(currEvent.getLabel());
+			LabeledEvent otherEvent = otherAlphabet.getEvent(currEvent.getLabel());
 			if (otherEvent == null)
 			{
 				throw new IllegalArgumentException("otherAlphabet must contains all events in this alphabet");
@@ -474,7 +736,7 @@ public class Alphabet
 	 */
 	public boolean containsEqualEvent(LabeledEvent otherEvent)
 	{
-		return containsEventWithLabel(otherEvent.getLabel());
+		return contains(otherEvent.getLabel());
 	}
 
 	/**
@@ -487,7 +749,7 @@ public class Alphabet
 		{
 			throw new IllegalArgumentException();
 		}
-		LabeledEvent thisEvent = getEventWithLabel(otherEvent.getLabel());
+		LabeledEvent thisEvent = getEvent(otherEvent.getLabel());
 		return thisEvent.isPrioritized();
 	}
 
@@ -501,55 +763,10 @@ public class Alphabet
 		{
 			throw new IllegalArgumentException();
 		}
-		LabeledEvent thisEvent = getEventWithLabel(otherEvent.getLabel());
+		LabeledEvent thisEvent = getEvent(otherEvent.getLabel());
 		return thisEvent.isControllable();
 	}
 
-	/**
-	 * Remove event from alphabet.
-	 *
-	 *@param  event Description of the Parameter
-	 */
-	public void removeEvent(LabeledEvent event)
-		throws IllegalArgumentException
-	{
-		if (!includes(event))
-		{
-			throw new IllegalArgumentException("The event is not included in this alphabet");
-		}
-		idMap.remove(event.getId());
-		super.removeEvent(event);
-	}
-
-	/**
-	 * Remove event from alphabet.
-	 *
-	 *@param  event Description of the Parameter
-	 */
-	public void removeEvent(String label)
-		throws IllegalArgumentException
-	{
-		if (!containsEventWithLabel(label))
-		{
-			throw new IllegalArgumentException("The event is not included in this alphabet");
-		}
-		LabeledEvent currEvent = getEventWithLabel(label);
-
-		idMap.remove(currEvent.getId());
-		super.removeEvent(label);
-	}
-
-	/**
-	 * Do not use this, use iterator instead.
-	 *
-	 *@return  Description of the Return Value
-	 */
-	 /*
-	public EventIterator eventIterator()
-	{
-		return new EventIterator(idMap.values().iterator());
-	}
-	*/
 
 	public boolean equalAlphabet(Alphabet other)
 	{
@@ -587,34 +804,8 @@ public class Alphabet
 
 	public void clear()
 	{
-		super.clear();
+		theEvents.clear();
 		rehash();
-	}
-
-	/**
-	 * Produce a string suitable for debugging
-	 *
-	 *@return  Description of the Return Value
-	 */
-	public String toString()
-	{
-		/*
-		  StringBuffer tmpBuf = new StringBuffer("Alphabet:\n   idMap: " + idMap + '\n');
-
-		  tmpBuf.append(super.toString());
-
-		  return tmpBuf.toString();
-		*/
-		StringBuffer buf = new StringBuffer("{");
-		for(Iterator it = iterator(); it.hasNext(); )
-		{
-			LabeledEvent ev = (LabeledEvent)it.next();
-			buf.append(ev);
-			if (it.hasNext())
-				buf.append(", ");
-		}
-		buf.append("}");
-		return buf.toString();
 	}
 
 	public Listeners getListeners()
@@ -646,7 +837,7 @@ public class Alphabet
 		{
 			currEvent = eventIterator.nextEvent();
 
-			if (otherAlphabet.containsEventWithLabel(currEvent.getLabel()))
+			if (otherAlphabet.contains(currEvent.getLabel()))
 			{
 				nbrOfCommon++;
 			}
@@ -655,35 +846,18 @@ public class Alphabet
 		return nbrOfCommon;
 	}
 
-	// Must be called after an event label or id is modified
-	public void rehash()
-	{
-		super.rehash();
-
-		LabeledEvent event;
-		Iterator eventIt = iterator();
-
-		idMap.clear();
-
-		while (eventIt.hasNext())
-		{
-			event = (LabeledEvent) eventIt.next();
-			idMap.put(event.getId(), event);
-		}
-	}
-
 	public static void main(String[] args)
 	{
 		Alphabet sigma1 = new Alphabet();
-		sigma1.addEvent(new LabeledEvent("e1", "id1"), true);
-		sigma1.addEvent(new LabeledEvent("e2", "id2"), true);
+		sigma1.addEvent(new LabeledEvent("e1"));
+		sigma1.addEvent(new LabeledEvent("e2"));
 
 		Alphabet sigma2 = new Alphabet();
-		sigma2.addEvent(new LabeledEvent("e2", "id2"), true);
-		sigma2.addEvent(new LabeledEvent("e3", "id3"), true);
+		sigma2.addEvent(new LabeledEvent("e2"));
+		sigma2.addEvent(new LabeledEvent("e3"));
 
 		sigma1.union(sigma2);
-		System.out.println("sigma1 + sigma2 = " + sigma1.toString()); // no event with id == "id3" exists in sigma1
+		System.out.println("sigma1 + sigma2 = " + sigma1.toString());
 
 	}
 

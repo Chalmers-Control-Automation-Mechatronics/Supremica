@@ -66,7 +66,7 @@ class Resource
 	{
 		return y;
 	}
-	
+
 	public void addNextAGVResource(Resource currResource)
 	{
 		u1NextResources.add(currResource);
@@ -76,11 +76,11 @@ class Resource
 	{
 		u2NextResources.add(currResource);
 	}
-	
+
 	public Automaton getAutomaton()
 	{
 		buildTransitions();
-		return theAutomaton;	
+		return theAutomaton;
 	}
 
 	private void buildTransitions()
@@ -111,7 +111,7 @@ class Resource
 
 		{
 			// Add agv allocation event
-			LabeledEvent agvAllocationEvent = agvAlphabet.getEventWithLabel("agv" + getIdentity());
+			LabeledEvent agvAllocationEvent = agvAlphabet.getEvent("agv" + getIdentity());
 			LabeledEvent thisAGVAllocationEvent = new LabeledEvent(agvAllocationEvent);
 			thisAlphabet.addEvent(thisAGVAllocationEvent);
 			Arc agvAllocationArc = new Arc(orgInitialState, usedByAGV, thisAGVAllocationEvent);
@@ -121,7 +121,7 @@ class Resource
 			}
 			catch (Exception ex)
 			{
-				logger.error("Could not add arc." +ex);	
+				logger.error("Could not add arc." +ex);
 			}
 		}
 		{
@@ -130,7 +130,7 @@ class Resource
 			{
 				Resource nextResource = (Resource)nextResIt.next();
 				String nextIdentity = nextResource.getIdentity();
-				LabeledEvent agvDeallocationEvent = agvAlphabet.getEventWithLabel("agv" + nextIdentity);
+				LabeledEvent agvDeallocationEvent = agvAlphabet.getEvent("agv" + nextIdentity);
 				LabeledEvent thisAGVDeallocationEvent = new LabeledEvent(agvDeallocationEvent);
 				thisAGVDeallocationEvent.setPrioritized(false);
 				thisAlphabet.addEvent(thisAGVDeallocationEvent);
@@ -141,15 +141,15 @@ class Resource
 				}
 				catch (Exception ex)
 				{
-					logger.error("Could not add arc." +ex);	
+					logger.error("Could not add arc." +ex);
 				}
 			}
 		}
 
-		{	
+		{
 			// Add truck allocation event
 			String truckAllocationString = "truck" + getIdentity();
-			LabeledEvent truckAllocationEvent = truckAlphabet.getEventWithLabel(truckAllocationString);
+			LabeledEvent truckAllocationEvent = truckAlphabet.getEvent(truckAllocationString);
 			if (truckAllocationEvent == null)
 			{
 				logger.debug("Could not find event " + truckAllocationString);
@@ -165,7 +165,7 @@ class Resource
 				}
 				catch (Exception ex)
 				{
-					logger.error("Could not add arc." +ex);	
+					logger.error("Could not add arc." +ex);
 				}
 			}
 		}
@@ -175,7 +175,7 @@ class Resource
 			{
 				Resource nextResource = (Resource)nextResIt.next();
 				String nextIdentity = nextResource.getIdentity();
-				LabeledEvent truckDeallocationEvent = truckAlphabet.getEventWithLabel("truck" + nextIdentity);
+				LabeledEvent truckDeallocationEvent = truckAlphabet.getEvent("truck" + nextIdentity);
 				LabeledEvent thisTruckDeallocationEvent = new LabeledEvent(truckDeallocationEvent);
 				thisTruckDeallocationEvent.setPrioritized(false);
 				thisAlphabet.addEvent(thisTruckDeallocationEvent);
@@ -186,7 +186,7 @@ class Resource
 				}
 				catch (Exception ex)
 				{
-					logger.error("Could not add arc." +ex);	
+					logger.error("Could not add arc." +ex);
 				}
 			}
 		}
@@ -216,7 +216,7 @@ class User
 		currTransition.add(fromResource);
 		currTransition.add(toResources);
 		transitions.addLast(currTransition);
-		
+
 		if (identity.equalsIgnoreCase("agv"))
 		{
 			for (int i = 0; i < toResources.length; i++)
@@ -235,7 +235,7 @@ class User
 		{
 			System.err.println("Unknown type");
 		}
-		
+
 	}
 
 
@@ -317,7 +317,7 @@ class User
 			{
 				Resource destResource = destResources[i];
 				State destState = (State)resourceMap.get(destResource);
-				LabeledEvent currEvent = theAlphabet.getEventWithLabel(identity + destResource.getIdentity());
+				LabeledEvent currEvent = theAlphabet.getEvent(identity + destResource.getIdentity());
 				if (currEvent == null)
 				{
 					System.err.println("currEvent is null");
@@ -350,7 +350,7 @@ public class Warehouse
 {
 	private static Logger logger = LoggerFactory.createLogger(Warehouse.class);
 
-	protected Project theProject= null;	
+	protected Project theProject= null;
 	protected int k = 3;
 	protected int l = 1;
 	protected Automaton agvAutomaton = null;
@@ -381,17 +381,17 @@ public class Warehouse
 
 	Resource r41 = null;
 	Resource r42 = null;
-	
+
 	public Warehouse()
 	{
 		this(3, 1);
 	}
-		
+
 	public Warehouse(int k, int l)
 	{
 		this.k = k;
 		this.l = l;
-		theProject = new Project("Warehouse");	
+		theProject = new Project("Warehouse");
 		User u1 = new User("agv", true, theProject);
 		User u2 = new User("truck", false, theProject);
 		r11 = new Resource(this, 1, 0, true, u1, u2);
@@ -479,39 +479,39 @@ public class Warehouse
 		theProject.addAutomaton(truckAutomaton);
 
 	}
-	
+
 	public void setK(int k)
 	{
 		this.k = k;
 	}
-	
+
 	public int getK()
 	{
 		return k;
 	}
-	
+
 	public void setL(int l)
 	{
 		this.l = l;
 	}
-	
+
 	public int getL()
 	{
 		return l;
 	}
-	
+
 	public Alphabet getAGVAlphabet()
 	{
 		// return new Alphabet();
 		return agvAutomaton.getAlphabet();
 	}
-	
+
 	public Alphabet getTruckAlphabet()
 	{
 		// return new Alphabet();
 		return truckAutomaton.getAlphabet();
 	}
-	
+
 	protected void buildProject()
 	{
 		theProject.addAutomaton(r11.getAutomaton());
@@ -537,10 +537,10 @@ public class Warehouse
 		theProject.addAutomaton(r31.getAutomaton());
 		theProject.addAutomaton(r32.getAutomaton());
 		theProject.addAutomaton(r33.getAutomaton());
-		
+
 		theProject.addAutomaton(r41.getAutomaton());
 		theProject.addAutomaton(r42.getAutomaton());
-				
+
 		ComputerHumanExtender extender = new ComputerHumanExtender(theProject, k);
 
 		try
@@ -554,7 +554,7 @@ public class Warehouse
 		{
 			logger.error("Error in ComputerHumanExtender");
 			logger.debug(ex.getStackTrace());
-		}		
+		}
 	}
 
 	public Project getProject()
@@ -563,6 +563,6 @@ public class Warehouse
 		buildProject();
 		//System.err.println(theProject.nbrOfAutomata());
 		//System.err.println("Warehouse getProject");
-		return theProject;	
+		return theProject;
 	}
 }

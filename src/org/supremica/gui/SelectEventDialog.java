@@ -217,7 +217,7 @@ class CreateEventPanel
 				Alphabet alph = getAlphabet();
 				String currLabel = labelField.getText();
 
-				if (alph.containsEventWithLabel(currLabel))
+				if (alph.contains(currLabel))
 				{
 					JOptionPane.showMessageDialog(null, "Existing event", "An event " + currLabel + "does already exists", JOptionPane.ERROR_MESSAGE);
 				}

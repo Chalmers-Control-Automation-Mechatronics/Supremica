@@ -100,7 +100,7 @@ public class AutomataExtender
 		//Alphabet orgAlphabet = orgAut.getAlphabet();
 		Alphabet newAlphabet = new Alphabet(orgAut.getAlphabet());
 		// String passEventId = orgAlphabet.getUniqueId(newAut.getName());
-		LabeledEvent passEvent = new LabeledEvent("pass", "3.1415926");
+		LabeledEvent passEvent = new LabeledEvent("pass");
 		// newAlphabet.addEvent(passEvent);
 
 		if (mode == MODE_REMOVE_UNCON_TOP_EVENTS)
@@ -129,7 +129,7 @@ public class AutomataExtender
 
 				if (!currEvent.isControllable())
 				{
-					LabeledEvent newEvent = new LabeledEvent(currEvent.getLabel(), currEvent.getLabel() + "_c");
+					LabeledEvent newEvent = new LabeledEvent(currEvent.getLabel() + "_c");
 					newEvent.setPrioritized(currEvent.isPrioritized());
 					newEvent.setControllable(true);
 					newEvents.add(newEvent);

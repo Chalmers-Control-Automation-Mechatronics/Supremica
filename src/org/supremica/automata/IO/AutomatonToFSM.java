@@ -119,7 +119,7 @@ public class AutomatonToFSM
 		 	LabeledEvent currEvent = currArc.getEvent();
 		 	String label = currEvent.getLabel();
 		 	pw.println(label + "\t" + targetState.getName() + "\t" + (currEvent.isControllable() ? "c" : "uc") + "\t" + (currEvent.isObservable() ? "o" : "uo") );
-			if (eventsNotOnTransitions.containsEventWithLabel(label))
+			if (eventsNotOnTransitions.contains(label))
 			{
 				eventsNotOnTransitions.removeEvent(label);
 			}

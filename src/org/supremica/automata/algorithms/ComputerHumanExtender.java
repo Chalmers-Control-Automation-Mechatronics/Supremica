@@ -155,7 +155,7 @@ public class ComputerHumanExtender
 		Alphabet newAutAlphabet = newAutomaton.getAlphabet();
 		newAutAlphabet.addEvents(controllableEvents);
 		newAutAlphabet.addEvents(operatorEvents);
-		LabeledEvent passEvent = new LabeledEvent("pass", "3.1415926");
+		LabeledEvent passEvent = new LabeledEvent("pass");
 		newAutAlphabet.addEvent(passEvent);
 
 		State initialState = newAutomaton.createUniqueState("qi");

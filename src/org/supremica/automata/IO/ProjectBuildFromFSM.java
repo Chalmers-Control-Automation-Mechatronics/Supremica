@@ -372,7 +372,7 @@ public class ProjectBuildFromFSM
 					else
 					{
 						String currEvent = currToken;
-						if (currAlphabet.containsEventWithLabel(currEvent))
+						if (currAlphabet.contains(currEvent))
 						{
 							System.err.println("Alphabet alredy contains: " + currEvent);
 							logger.warn(currEvent + " is already defined");

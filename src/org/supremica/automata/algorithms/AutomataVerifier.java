@@ -898,7 +898,7 @@ public class AutomataVerifier
 		{
 			currEvent = (LabeledEvent) eventIterator.next();
 
-			if (leftAlphabet.containsEventWithLabel(currEvent.getLabel()))
+			if (leftAlphabet.contains(currEvent.getLabel()))
 			{
 				amountOfCommon++;
 			}

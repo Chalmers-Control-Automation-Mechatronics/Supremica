@@ -32,14 +32,14 @@ import org.supremica.gui.Utility;
 import org.supremica.gui.ActionMan;
 
 // To be able to show disabled tree nodes, we need a custom renderer
-class EventNodeRenderer 
-	extends DefaultTreeCellRenderer 
+class EventNodeRenderer
+	extends DefaultTreeCellRenderer
 {
     public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded,
-                        							boolean leaf, int row, boolean hasFocus) 
+                        							boolean leaf, int row, boolean hasFocus)
     {
         super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
-        
+
         /**/
         SupremicaTreeNode eventnode = (SupremicaTreeNode)value;
         if(!eventnode.isEnabled())
@@ -54,7 +54,7 @@ class EventNodeRenderer
 // TODO:
 // Need the following: selecting any child ov an EventSubTree, selects the entire subtree
 // A disabled EventSubTree should not be selectable
-// 
+//
 class EventSelectionModel
 	extends DefaultTreeSelectionModel
 {
@@ -74,7 +74,7 @@ class EventsViewerPanel	// compare AlphabetsViewerPanel
 	private JTree theTree = new JTree();
 	private SupremicaTreeNode root = new SupremicaTreeNode();
 	private JScrollPane scrollPanel = new JScrollPane(theTree);
-	Alphabet alphabet = null; 
+	Alphabet alphabet = null;
 
 	EventsViewerPanel(Alphabet alphabet)
 	{
@@ -82,14 +82,14 @@ class EventsViewerPanel	// compare AlphabetsViewerPanel
 		build(false);
 		init();
 	}
-	
+
 	private void init()
 	{
 		theTree.setCellRenderer(new SupremicaTreeCellRenderer()); // EventNodeRenderer());
 		theTree.setSelectionModel(new EventSelectionModel());
 		setLayout(new BorderLayout());
 		setPreferredSize(new Dimension(200, 400));
-		add(scrollPanel, BorderLayout.CENTER);		
+		add(scrollPanel, BorderLayout.CENTER);
 	}
 	// In this panel, the EventSubTrees are at level 1 (root is at 0) with the AlphabetViewerSubTrees at level 2
 	// The AlphabetViewerSubTrees are only there to show what automata the event belongs to
@@ -101,11 +101,11 @@ class EventsViewerPanel	// compare AlphabetsViewerPanel
 		// So, we have to create over and oper again -- bummer.
 		// EventTreeCache eventTreeCache = new EventTreeCache();
 		// AutomatonTreeCache automatonTreeCache = new AutomatonTreeCache();
-		
+
 		// This cache is only for storing whether we have already seen the event or not
 		HashSet eventTreeCache = new HashSet();
-	
-		
+
+
 		for(Iterator eventit = alphabet.iterator(); eventit.hasNext();)
 		{
 			LabeledEvent event = (LabeledEvent)eventit.next();
@@ -116,12 +116,12 @@ class EventsViewerPanel	// compare AlphabetsViewerPanel
 				root.add(eventsubtree);
 			}
 		}
-/*		
+/*
 		Iterator autit = automata.iterator();
 		while(autit.hasNext())
 		{
 			Automaton aut = (Automaton)autit.next();
-			
+
 			// Iterate over the events, for each event not already encountered, calc its subtree
 			// Then add as children all the automata containing this event
 			Iterator eventit = aut.getAlphabet().iterator();
@@ -133,7 +133,7 @@ class EventsViewerPanel	// compare AlphabetsViewerPanel
 					EventSubTree eventsubtree = new EventSubTree(event);
 					eventTreeCache.add(event);
 					root.add(eventsubtree);
-			
+
 					// Now, look for automata containing this event
 					Iterator autoit = automata.iterator();
 					while(autoit.hasNext())
@@ -149,7 +149,7 @@ class EventsViewerPanel	// compare AlphabetsViewerPanel
 				}
 			}
 		}
-*/		
+*/
 		DefaultTreeModel treeModel = new DefaultTreeModel(root);
 		theTree.setModel(treeModel);
 		theTree.setRootVisible(showroot);
@@ -157,7 +157,7 @@ class EventsViewerPanel	// compare AlphabetsViewerPanel
 
 		revalidate();
 	}
-	
+
 	// Rebuild after having events added
 	public void rebuild()
 	{
@@ -173,13 +173,13 @@ class EventsViewerPanel	// compare AlphabetsViewerPanel
 			excp.printStackTrace();
 		}
 	}
-	
+
 
 	// Go through the tree and unhide all nodes
 	public void showUnion()
 	{
 		// for all the (immediate) children of the root, make them visible
-		for (Enumeration enum = root.children(); enum.hasMoreElements(); ) 
+		for (Enumeration enum = root.children(); enum.hasMoreElements(); )
 		{
 			EventSubTree node = (EventSubTree)enum.nextElement();
 			node.setEnabled(true);
@@ -187,15 +187,15 @@ class EventsViewerPanel	// compare AlphabetsViewerPanel
         repaint();
 	}
 
-/*	
+/*
 	// Go through the tree and make hide those nodes that are not in all automata
 	public void showIntersection()
 	{
 		// for all the (immediate) children of the root, make them visible
-		for (Enumeration enum = root.children(); enum.hasMoreElements(); ) 
+		for (Enumeration enum = root.children(); enum.hasMoreElements(); )
 		{
 			EventSubTree node = (EventSubTree)enum.nextElement();
-			
+
 			// If the number of children is not the same as the number of automata plus the number in EventSubTree
 			// Then it has to be disabled/hidden/unselectable
 			if(node.getChildCount() - node.numDirectLeafs() != automata.size())
@@ -205,12 +205,12 @@ class EventsViewerPanel	// compare AlphabetsViewerPanel
         }
         repaint();
 	}
-*/	
+*/
 	public TreePath[] getSelectionPaths()
 	{
 		return theTree.getSelectionPaths();
 	}
-	
+
 	/* These are the caches used during tree building
 	class EventTreeCache
 		extends HashMap		// HashMap<LabeledEvent, EventSubTree>
@@ -223,7 +223,7 @@ class EventsViewerPanel	// compare AlphabetsViewerPanel
 		{
 			return (EventSubTree)put(key, value);
 		}
-		
+
 	}
 	class AutomatonTreeCache
 		extends HashMap	// HashMap<Automaton, AlphabetViewerSubTree>
@@ -238,11 +238,11 @@ class EventsViewerPanel	// compare AlphabetsViewerPanel
 		}
 	}
 	*/
-	
+
 }
 
 /**
- * THIS IS ALMOST A COPY OF THE LanguageRestrictor.java!!!!!! 
+ * THIS IS ALMOST A COPY OF THE LanguageRestrictor.java!!!!!!
  */
 class RestrictEventsViewerPanel
 	extends JPanel
@@ -255,7 +255,7 @@ class RestrictEventsViewerPanel
 
 	// private Automaton automaton = new Automaton("Select These Events");
 	private Alphabet alpha = new Alphabet();
-	
+
 	public RestrictEventsViewerPanel()
 	{
 		this.root = new AlphabetSubTree(alpha);
@@ -265,7 +265,7 @@ class RestrictEventsViewerPanel
 
 		setLayout(new BorderLayout());
 		setPreferredSize(new Dimension(200, 400));
-		add(scrollpane, BorderLayout.CENTER);		
+		add(scrollpane, BorderLayout.CENTER);
 		tree.setCellRenderer(new SupremicaTreeCellRenderer());
 	}
 
@@ -275,7 +275,7 @@ class RestrictEventsViewerPanel
 		try
 		{
 			// Alphabet alpha = automaton.getAlphabet();
-			if(!alpha.containsEventWithLabel(event.getLabel()))
+			if(!alpha.contains(event.getLabel()))
 			{
 				alpha.addEvent(event);
 			}
@@ -297,9 +297,9 @@ class RestrictEventsViewerPanel
 		{
 			excp.printStackTrace();
 		}
-		
+
 	}
-	
+
 	// If the alphabet has changed, you have to rebuild
 	public void rebuild()
 	{
@@ -319,7 +319,7 @@ class RestrictEventsViewerPanel
 		erase = true;
 		tree.repaint();
 	}
-	
+
 	public void keepThese()
 	{
 		// automaton.setName("Do Not Select These Events");
@@ -332,12 +332,12 @@ class RestrictEventsViewerPanel
 	{
 		return erase;
 	}
-	
+
 	public TreePath[] getSelectionPaths()
 	{
 		return tree.getSelectionPaths();
 	}
-	
+
 	public Alphabet getAlphabet()
 	{
 		// return automaton.getAlphabet();
@@ -355,10 +355,10 @@ class SelectOperatorEventsDialog
 	private EventsViewerPanel sourceEvents;
 	private RestrictEventsViewerPanel restrictEvents;
 	private boolean selectOperatorEvents = false;
-	private boolean selectUnobservableEvents = false;	
-	
+	private boolean selectUnobservableEvents = false;
+
 	private void shutWindow() { setVisible(false); dispose(); }
-	
+
 	private class OkButton
 		extends JButton
 	{
@@ -376,7 +376,7 @@ class SelectOperatorEventsDialog
 			});
 		}
 	}
-	
+
 	private class CancelButton
 		extends JButton
 	{
@@ -393,7 +393,7 @@ class SelectOperatorEventsDialog
 			});
 		}
 	}
-	
+
 	private class MoveButton
 		extends JButton
 	{
@@ -411,7 +411,7 @@ class SelectOperatorEventsDialog
 			});
 		}
 	}
-	
+
 	private class RemoveButton
 		extends JButton
 	{
@@ -429,7 +429,7 @@ class SelectOperatorEventsDialog
 			});
 		}
 	}
-	
+
 	// Move the selected events from sourceEvents to restrictEvents
 	private void moveEvents()
 	{
@@ -442,19 +442,19 @@ class SelectOperatorEventsDialog
 				// The second element is the one we're interested in - component 0, the root, can never be selected.
 				SupremicaTreeNode node = (SupremicaTreeNode)path.getPathComponent(1);
 				LabeledEvent event = (LabeledEvent)node.getUserObject();
-				
+
 				restrictEvents.add(event);
 			}
-			
+
 			restrictEvents.rebuild();
 		}
 	}
-	
+
 	// Remove the selected events from restrictEvents (not from sourceEvents, of course)
 	private void removeEvents()
 	{
 		TreePath[] paths = restrictEvents.getSelectionPaths();
-		
+
 		if(paths != null) // gotta have something selected
 		{
 			for(int i = 0; i < paths.length; ++i)
@@ -465,12 +465,12 @@ class SelectOperatorEventsDialog
 				LabeledEvent event = (LabeledEvent)node.getUserObject();
 				restrictEvents.remove(event);
 			}
-			
+
 			restrictEvents.rebuild();
-		}		
+		}
 	}
-	
-/*	
+
+/*
 	// Return the the restrictEvents
 	public Alphabet getRestrictionAlphabet()
 	{
@@ -483,7 +483,7 @@ class SelectOperatorEventsDialog
 	{
 		return restrictEvents.getAlphabet();
 	}
-	
+
 	// Almost identical to AlphabetViewer menubar
 	private void initMenubar()
 	{
@@ -503,13 +503,13 @@ class SelectOperatorEventsDialog
 				//dispose();
 			}
 		});
-		
+
 		menuFile.add(menuFileClose);
-		
+
 		// View
 		JMenu viewMenu = new JMenu("View");
 		viewMenu.setMnemonic(KeyEvent.VK_V);
-		
+
 		// View.Union (default, therefore initially checked)
 		JRadioButtonMenuItem viewMenuUnion = new JRadioButtonMenuItem("Union", true);
 		viewMenuUnion.addActionListener(new ActionListener()
@@ -519,8 +519,8 @@ class SelectOperatorEventsDialog
 				sourceEvents.showUnion();
 			}
 		});
-	
-/*		
+
+/*
 		// View.Intersection
 		JRadioButtonMenuItem viewMenuIntersection = new JRadioButtonMenuItem("Intersection");
 		viewMenuIntersection.addActionListener(new ActionListener()
@@ -534,19 +534,19 @@ class SelectOperatorEventsDialog
 		ButtonGroup buttongroup = new ButtonGroup();
 		buttongroup.add(viewMenuUnion);
 //		buttongroup.add(viewMenuIntersection);
-		
+
 		viewMenu.add(viewMenuUnion);
 //		viewMenu.add(viewMenuIntersection);
 
 		// For the moment, until we get the rendering etc fixed
 		// viewMenuUnion.setEnabled(false);
 		// viewMenuIntersection.setEnabled(false);
-		
-/*		
+
+/*
 		// Restrict
 		JMenu restrictMenu = new JMenu("Select");
 		restrictMenu.setMnemonic(KeyEvent.VK_R);
-		
+
 		// Restrict.Erase These Events (default, therefore initially checked)
 		JRadioButtonMenuItem restrictMenuErase = new JRadioButtonMenuItem("Select These Events", true);
 		restrictMenuErase.addActionListener(new ActionListener()
@@ -556,7 +556,7 @@ class SelectOperatorEventsDialog
 				restrictEvents.eraseThese();
 			}
 		});
-		
+
 		// Restrict.Keep These Events
 		JRadioButtonMenuItem restrictMenuKeep = new JRadioButtonMenuItem("Keep These Events");
 		restrictMenuKeep.addActionListener(new ActionListener()
@@ -571,23 +571,23 @@ class SelectOperatorEventsDialog
 				ButtonGroup restrgroup = new ButtonGroup();
 		restrgroup.add(restrictMenuErase);
 		restrgroup.add(restrictMenuKeep);
-		
+
 		restrictMenu.add(restrictMenuErase);
 		restrictMenu.add(restrictMenuKeep);
 		restrictMenuErase.setEnabled(true);
 		restrictMenuKeep.setEnabled(true);
-*/		
-		JMenuBar menuBar = new JMenuBar();		
+*/
+		JMenuBar menuBar = new JMenuBar();
 		menuBar.add(menuFile);
 //		menuBar.add(viewMenu);
 //		menuBar.add(restrictMenu);
 		setJMenuBar(menuBar);
 	}
-	
+
 	public SelectOperatorEventsDialog(Alphabet alphabet, String name, boolean selectOperatorEvents)
 	{
 		super(name);
-		
+
 		if (selectOperatorEvents)
 		{
 			this.selectOperatorEvents = true;
@@ -596,57 +596,57 @@ class SelectOperatorEventsDialog
 		else
 		{
 			this.selectOperatorEvents = false;
-			this.selectUnobservableEvents = true;			
+			this.selectUnobservableEvents = true;
 		}
-		
+
 		this.alphabet = alphabet;
 		this.sourceEvents = new EventsViewerPanel(alphabet);
 		this.restrictEvents = new RestrictEventsViewerPanel();
-		
+
 		initMenubar();
-		
+
 		JPanel okcancelpanel = new JPanel(); // default is flowlayout
 		okcancelpanel.add(new OkButton());
 		okcancelpanel.add(new CancelButton());
-		
+
 		JPanel movebuttonpanel = new JPanel(new BorderLayout());
 		movebuttonpanel.add(new MoveButton(), BorderLayout.NORTH);
 		movebuttonpanel.add(new RemoveButton(), BorderLayout.SOUTH);
-		
+
 		JPanel buttonpanel = new JPanel(new BorderLayout());
 		buttonpanel.add(movebuttonpanel, BorderLayout.CENTER);
 		buttonpanel.add(okcancelpanel, BorderLayout.SOUTH);
-		
+
 		JPanel panel = new JPanel(new BorderLayout());
 		panel.add(sourceEvents, BorderLayout.WEST);
 		panel.add(restrictEvents, BorderLayout.EAST);
 		panel.add(buttonpanel, BorderLayout.CENTER);
-		
+
 		getContentPane().add(panel);
 
 		Utility.setupFrame(this, 600, 600);
 		pack();
 		show();
 	}
-	
+
 	private void doRestrict()
 	{
 		// Get the restriction alphabet
 		Alphabet operatorEvents = restrictEvents.getAlphabet();
-		
+
 		if (selectOperatorEvents)
 		{
 			for (EventIterator evIt = alphabet.iterator(); evIt.hasNext(); )
 			{
 				LabeledEvent currEvent = evIt.nextEvent();
-				
-				if (operatorEvents.containsEventWithLabel(currEvent.getLabel()))
+
+				if (operatorEvents.contains(currEvent.getLabel()))
 				{
 					currEvent.setOperator(true);
 				}
 				else
 				{
-					currEvent.setOperator(false);					
+					currEvent.setOperator(false);
 				}
 			}
 		}
@@ -655,24 +655,24 @@ class SelectOperatorEventsDialog
 			for (EventIterator evIt = alphabet.iterator(); evIt.hasNext(); )
 			{
 				LabeledEvent currEvent = evIt.nextEvent();
-				
-				if (operatorEvents.containsEventWithLabel(currEvent.getLabel()))
+
+				if (operatorEvents.contains(currEvent.getLabel()))
 				{
 					currEvent.setObservable(false);
 				}
 				else
 				{
-					currEvent.setObservable(true);					
+					currEvent.setObservable(true);
 				}
-			}		
-		
+			}
+
 		}
 /*
 		// Get the restriction alphabet
 		Alphabet alpha = restrictEvents.getAlphabet();
-		
+
 		Automata newautomata = new Automata();
-		
+
 		Iterator autit = automata.iterator();
 		while(autit.hasNext())
 		{
@@ -683,7 +683,7 @@ class SelectOperatorEventsDialog
 			newautomaton.setComment(automaton.getName() + "\\" + alpha.toString());
 			newautomata.addAutomaton(newautomaton);
 		}
-		
+
 		try
 		{
 			ActionMan.gui.addAutomata(newautomata);
@@ -709,12 +709,12 @@ public class SelectEventsWindow
 	public SelectEventsWindow(Alphabet theAlphabet, String name, String description, boolean selectOperator)
 	{
 		putValue(NAME, name);
-		putValue(SHORT_DESCRIPTION, description);		
+		putValue(SHORT_DESCRIPTION, description);
 		this.theAlphabet = theAlphabet;
 		this.name = name;
 		this.selectOperator = selectOperator;
 	}
-	
+
 	public void actionPerformed(ActionEvent event)
 	{
 		// Get the selected automata
@@ -727,9 +727,9 @@ public class SelectEventsWindow
 		}
 		dlg.show();
 	}
-	
+
 	public Alphabet getSelectedEvents()
 	{
-			return dlg.getSelectedEvents();	
+			return dlg.getSelectedEvents();
 	}
 }

@@ -67,7 +67,7 @@ public class Automaton
 	/**
 	 * A temporary name, used as a suggestion for a name to the gui when
 	 * adding a new automaton, so that the gui can avoid giving two automata
-	 * the same name. 
+	 * the same name.
 	 */
 	private String comment;
 
@@ -145,12 +145,12 @@ public class Automaton
 				for (ArcIterator outgoingArcs = orgSourceState.safeOutgoingArcsIterator(); outgoingArcs.hasNext(); )
 				{
 					Arc orgArc = outgoingArcs.nextArc();
-					
+
 					State orgDestState = orgArc.getToState();
 					State newDestState = getStateWithId(orgDestState.getId());
-					
+
 					LabeledEvent currEvent = alphabet.getEvent(orgArc.getEvent());
-					
+
 					Arc newArc = new Arc(newSourceState, newDestState, currEvent);
 					addArc(newArc);
 				}
@@ -334,9 +334,9 @@ public class Automaton
 	 * an forbidden state.
 	 * The states in stateset must be contained in the current automaton.
 	 */
-	public Events getControlInconsistentEvents(StateSet stateset)
+	public Alphabet getControlInconsistentEvents(StateSet stateset)
 	{
-		Events explicitlyForbiddenEvents = new Events();
+		Alphabet explicitlyForbiddenEvents = new Alphabet();
 
 		// We start by computing the set of explicitly
 		// forbidden events
@@ -370,7 +370,7 @@ public class Automaton
 		// all explicitly allowed events and check
 		// that those are not in the list of explicitly
 		// forbidden events
-		Events controlInconsistentEvents = new Events();
+		Alphabet controlInconsistentEvents = new Alphabet();
 		for (StateIterator stateIt = stateset.iterator(); stateIt.hasNext(); )
 		{
 			State currState = stateIt.nextState();
@@ -405,9 +405,9 @@ public class Automaton
 	 * to a forbidden state if that events is involved
 	 * in a control inconsistency. See getControlInconsistentEvents.
 	 */
-	public Events resolveControlInconsistencies(StateSet stateset)
+	public Alphabet resolveControlInconsistencies(StateSet stateset)
 	{
-		Events explicitlyForbiddenEvents = new Events();
+		Alphabet explicitlyForbiddenEvents = new Alphabet();
 		Map eventToStateMap = new HashMap();
 
 		// We start by computing the set of explicitly
@@ -443,7 +443,7 @@ public class Automaton
 		// all explicitly allowed events and check
 		// that those are not in the list of explicitly
 		// forbidden events
-		Events controlInconsistentEvents = new Events();
+		Alphabet controlInconsistentEvents = new Alphabet();
 		for (StateIterator stateIt = stateset.iterator(); stateIt.hasNext(); )
 		{
 			State currState = stateIt.nextState();
@@ -846,9 +846,9 @@ public class Automaton
 		{
 			throw new IllegalArgumentException("EventLabel must be non-null");
 		}
-		if (alphabet.containsEventWithLabel(eventLabel))
+		if (alphabet.contains(eventLabel))
 		{
-			LabeledEvent thisEvent = alphabet.getEventWithLabel(eventLabel);
+			LabeledEvent thisEvent = alphabet.getEvent(eventLabel);
 			return thisEvent.isPrioritized();
 		}
 		else
@@ -857,10 +857,10 @@ public class Automaton
 		}
 	}
 
-	public LabeledEvent getEventWithLabel(String eventLabel)
+	public LabeledEvent getEvent(String eventLabel)
 		throws IllegalArgumentException
 	{
-		return alphabet.getEventWithLabel(eventLabel);
+		return alphabet.getEvent(eventLabel);
 	}
 
 	public int nbrOfStates()
@@ -1432,7 +1432,7 @@ public class Automaton
 	 * Backwards extend accepting and mutually accepting states along transitions with safeEvents.
 	 * some kind of "coreachability along a subset of the alphabet".
 	 */
-	public void extendMutuallyAccepting(Events safeEvents)
+	public void extendMutuallyAccepting(Alphabet safeEvents)
 	{
 		beginTransaction();
 		boolean changes = true;
@@ -1454,7 +1454,7 @@ public class Automaton
 					{
 						Arc currArc = arcIt.nextArc();
 						LabeledEvent arcEvent = currArc.getEvent();
-						if (safeEvents.containsEventWithLabel(arcEvent.getLabel()))
+						if (safeEvents.contains(arcEvent.getLabel()))
 						{
 							State fromState = currArc.getFromState();
 							if (!fromState.isMutuallyAccepting())
