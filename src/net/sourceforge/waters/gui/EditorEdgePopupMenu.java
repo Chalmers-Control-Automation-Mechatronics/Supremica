@@ -17,10 +17,8 @@ class EditorEdgePopupMenu
 	private EditorEdge edge;
 	private EditorSurface parent;
 
-	private JMenuItem renameItem;
 	private JMenuItem deleteItem;
-	//private JCheckBox initialBox;
-	private JMenuItem initialItem;	
+	private JMenuItem recallItem;	
 
 	public EditorEdgePopupMenu(EditorSurface parent, EditorEdge edge)
 	{
@@ -41,6 +39,18 @@ class EditorEdgePopupMenu
 		item.addActionListener(this);
 		this.add(item);
 		deleteItem = item;
+
+		item = new JMenuItem("Recall label");
+		item.addActionListener(this);
+		this.add(item);
+		recallItem = item;
+
+		// Disable "recall" if label is in right position (or maybe instead if it is close enough?)
+		if ((parent.getLabelGroup(edge).getOffsetX() == EditorLabelGroup.DEFAULTOFFSETX) && (parent.getLabelGroup(edge).getOffsetY() == EditorLabelGroup.DEFAULTOFFSETY))
+		{
+			recallItem.setEnabled(false);
+			recallItem.setToolTipText("Label is already in default position");
+		}
 	}
 
 	public void actionPerformed(ActionEvent e) 
@@ -49,6 +59,11 @@ class EditorEdgePopupMenu
 		{
 			parent.delEdge(edge);
 			this.hide();
+		}
+
+		if (e.getSource() == recallItem)
+		{
+			parent.getLabelGroup(edge).setOffset(EditorLabelGroup.DEFAULTOFFSETX, EditorLabelGroup.DEFAULTOFFSETY);
 		}
 
 		parent.repaint();

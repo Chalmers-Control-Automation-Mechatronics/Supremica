@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.8 2005-02-22 07:54:28 flordal Exp $
+//# $Id: EditorSurface.java,v 1.9 2005-03-03 05:36:29 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -49,10 +49,10 @@ public class EditorSurface
 	protected ArrayList lines;
 	protected ArrayList shades;
 	protected ArrayList events;
-	protected int m_xoffset;
-	protected int m_yoffset;
-	protected int event_x;
-	protected int event_y;
+	protected int dragStartX;
+	protected int dragStartY;
+	protected int dragNowX;
+	protected int dragNowY;
 	protected boolean dragSelect = false;
 	protected EditorShade shade;
 	protected GraphProxy graph;
@@ -235,7 +235,7 @@ public class EditorSurface
 
 		if (dragSelect)
 		{
-			showDragSelect();
+			showDragSelect(g);
 		}
 	}
 
@@ -477,6 +477,7 @@ public class EditorSurface
 
 		nodes.remove(n);
 		graph.getNodes().remove(n.getProxy());
+		examineCollisions();
 		repaint();
 	}
 
@@ -494,6 +495,7 @@ public class EditorSurface
 
 		nodeGroups.remove(n);
 		graph.getNodes().remove(n.getProxy());
+		examineCollisions();
 		repaint();
 	}
 
@@ -563,12 +565,14 @@ public class EditorSurface
 		repaint();
 	}
 
-	public void showDragSelect()
+	public void showDragSelect(Graphics g)
 	{
-		Graphics2D g2d = (Graphics2D) this.getGraphics();
+		//Graphics2D g2d = (Graphics2D) this.getGraphics();
+		Graphics2D g2d = (Graphics2D) g;
 
-		g2d.setColor(new Color(0.0f, 1.0f, 0.0f, 1.0f));
-		g2d.fill(new Rectangle(m_xoffset, m_yoffset, event_x - m_xoffset, event_y - m_yoffset));
+		g2d.setColor(EditorColor.DRAGSELECTCOLOR);
+		g2d.fill(getDragRectangle());
+		//g2d.fill(new Rectangle(dragStartX, dragStartY, dragNowX - dragStartX, dragNowY - dragStartY));
 	}
 
 	// When you're dragging an edge, you only want nodes or nodegroups...
@@ -638,6 +642,127 @@ public class EditorSurface
 		}
 
 		return null;
+	}
+
+	/**
+	 * Returns a list of all children of an object.
+	 */
+	public LinkedList getChildren(EditorObject o)
+	{
+		LinkedList children = new LinkedList();
+
+		for (int i = 0; i < labels.size(); i++)
+		{
+			if (((EditorLabel) labels.get(i)).getParent() == o)
+			{
+				children.add((EditorLabel) labels.get(i));
+			}
+		}
+
+		for (int i = 0; i < events.size(); i++)
+		{
+			if (((EditorLabelGroup) events.get(i)).getParent() == o)
+			{
+				children.add((EditorLabelGroup) events.get(i));
+			}
+		}
+		
+		return children;
+	}
+
+	public Rectangle getDragRectangle()
+	{
+		int x;
+		int y;
+		int w;
+		int h;
+		if (dragStartX > dragNowX)
+		{
+			x = dragNowX;
+			w = dragStartX - dragNowX;
+		}
+		else
+		{
+			x = dragStartX;
+			w = dragNowX - dragStartX;
+		}
+		
+		if (dragStartY > dragNowY)
+		{
+			y = dragNowY;
+			h = dragStartY - dragNowY;
+		}
+		else
+		{
+			y = dragStartY;
+			h = dragNowY - dragStartY;
+		}
+		
+		return new Rectangle(x,y,w,h);
+	}
+
+	/**
+	 * Returns a list of all objects within a rectangle (to be selected).
+	 */
+	public LinkedList getDragSelection()
+	{
+		Rectangle r = getDragRectangle();
+
+		LinkedList selection = new LinkedList();
+
+		for (int i = 0; i < nodeGroups.size(); i++)
+		{
+			EditorNodeGroup n = (EditorNodeGroup) nodeGroups.get(i);
+
+			if (r.getBounds().contains(n.getBounds()))
+			{
+				selection.add(n);
+			}
+		}
+
+		for (int i = 0; i < nodes.size(); i++)
+		{
+			EditorNode n = (EditorNode) nodes.get(i);
+			
+			if (r.getBounds().contains(n.getPosition()))
+			{
+				selection.add(n);
+			}
+		}
+		
+		return selection;
+	}
+
+	/**
+	 * Sets the error status of nodes and nodegroups. If a nodegroup is placed on top of
+	 * a node, they are both set as being erroneous.
+	 */
+	public void examineCollisions()
+	{
+		for (Iterator it = nodes.iterator(); it.hasNext(); )
+		{
+			EditorNode node = (EditorNode) it.next();
+			node.setError(nodeIsColliding(node));
+			
+			// Set error on children as well
+			LinkedList children = getChildren(node);
+			while (children.size() != 0)
+			{
+				((EditorObject) children.remove(0)).setError(node.isError());
+			}
+		}
+		for (Iterator it = nodeGroups.iterator(); it.hasNext(); )
+		{
+			EditorNodeGroup nodeGroup = (EditorNodeGroup) it.next();
+			nodeGroup.setError(nodeGroupIsColliding(nodeGroup));
+
+			// Set error on children as well
+			LinkedList children = getChildren(nodeGroup);
+			while (children.size() != 0)
+			{
+				((EditorObject) children.remove(0)).setError(nodeGroup.isError());
+			}
+		}
 	}
 
 	public void deselectAll()
@@ -937,8 +1062,9 @@ public class EditorSurface
 		setPreferredSize(new Dimension(largestX + gridSize * 10, largestY + gridSize * 10));
 	}
 
-	public boolean intersectsRectangle(Rectangle2D.Double r)
+	public boolean nodeGroupIsColliding(EditorNodeGroup ng)
 	{
+		Rectangle2D.Double r = ng.getBounds();
 		Rectangle2D.Double e = new Rectangle2D.Double();
 
 		for (int i = 0; i < nodes.size(); i++)
@@ -946,6 +1072,25 @@ public class EditorSurface
 			EditorNode n = (EditorNode) nodes.get(i);
 
 			e.setFrameFromCenter(n.getX(), n.getY(), n.getX() + n.radius(), n.getY() + n.radius());
+
+			if (r.intersects(e) &&!r.contains(e))
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	public boolean nodeIsColliding(EditorNode n)
+	{
+		Rectangle2D.Double e = new Rectangle2D.Double();
+		e.setFrameFromCenter(n.getX(), n.getY(), n.getX() + n.radius(), n.getY() + n.radius());
+
+		for (int i = 0; i < nodeGroups.size(); i++)
+		{
+			EditorNodeGroup ng = (EditorNodeGroup) nodeGroups.get(i);
+			Rectangle2D.Double r = ng.getBounds();
 
 			if (r.intersects(e) &&!r.contains(e))
 			{

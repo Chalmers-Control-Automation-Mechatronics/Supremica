@@ -202,7 +202,6 @@ public class Supremica
 
 			public void mousePressed(MouseEvent e)
 			{
-
 				// This is needed for the Linux platform
 				// where isPopupTrigger is true only on mousePressed.
 				maybeShowPopup(e);
@@ -210,7 +209,6 @@ public class Supremica
 
 			public void mouseReleased(MouseEvent e)
 			{
-
 				// This is for triggering the popup on Windows platforms
 				maybeShowPopup(e);
 			}

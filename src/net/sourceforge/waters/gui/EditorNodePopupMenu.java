@@ -19,7 +19,6 @@ class EditorNodePopupMenu
 
 	private JMenuItem renameItem;
 	private JMenuItem deleteItem;
-	//private JCheckBox initialBox;
 	private JMenuItem initialItem;	
 	private JMenuItem recallItem;	
 

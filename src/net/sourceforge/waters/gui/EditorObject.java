@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorObject
 //###########################################################################
-//# $Id: EditorObject.java,v 1.5 2005-02-22 21:53:14 flordal Exp $
+//# $Id: EditorObject.java,v 1.6 2005-03-03 05:36:29 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -87,6 +87,10 @@ public class EditorObject
 		// In order of importance
 		if (isError())
 		{
+			if (getType() == NODE)
+			{
+				return EditorColor.ERRORCOLOR_NODE;
+			}
 			return EditorColor.ERRORCOLOR;
 		}
 		else if (isSelected())
@@ -97,17 +101,16 @@ public class EditorObject
 		{
 			return EditorColor.HIGHLIGHTCOLOR;
 		}
-
-		// Defaults
-		if (getType() == NODEGROUP)
-		{
-			return EditorColor.NODEGROUPCOLOR;
-		}
 		else
 		{
+			// Defaults
+			if (getType() == NODEGROUP)
+			{
+				return EditorColor.DEFAULTCOLOR_NODEGROUP;
+			}
 			return EditorColor.DEFAULTCOLOR;
 		}
-	}
+	}		
 
 	public EditorObject()
 	{

@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.10 2005-02-22 21:53:14 flordal Exp $
+//# $Id: ControlledSurface.java,v 1.11 2005-03-03 05:36:29 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -36,13 +36,15 @@ public class ControlledSurface
 	private int lastY = 0;
 	private int xoff = 0;
 	private int yoff = 0;
-	private boolean controlPointsMove = false;
+	private boolean controlPointsMove = true;
 	private boolean nodesSnap = true;
 
 	private boolean selectOnDrag = false;
 	private boolean hasDragged = false;
 
 	private LinkedList selectedObjects = new LinkedList();
+	private LinkedList toBeSelected = new LinkedList();
+
 	private EditorObject highlightedObject = null;
 
 	public void setOptionsVisible(boolean v)
@@ -118,25 +120,11 @@ public class ControlledSurface
 		{
 			selectedObjects.add(o);
 			o.setSelected(true);
-			selectAllWithParent(o);
-		}
-	}
 
-	private void selectAllWithParent(EditorObject o)
-	{
-		for (int i = 0; i < labels.size(); i++)
-		{
-			if (((EditorLabel) labels.get(i)).getParent() == o)
+			LinkedList children = getChildren(o);
+			while (children.size() != 0)
 			{
-				select((EditorLabel) labels.get(i));
-			}
-		}
-
-		for (int i = 0; i < events.size(); i++)
-		{
-			if (((EditorLabelGroup) events.get(i)).getParent() == o)
-			{
-				select((EditorLabelGroup) events.get(i));
+				((EditorObject) children.remove(0)).setSelected(true);
 			}
 		}
 	}
@@ -148,25 +136,6 @@ public class ControlledSurface
 			selectedObjects.remove(o);
 			o.setSelected(false);
 			//deselectAllWithParent(o);
-		}
-	}
-
-	private void deselectAllWithParent(EditorObject o)
-	{
-		for (int i = 0; i < labels.size(); i++)
-		{
-			if (((EditorLabel) labels.get(i)).getParent() == o)
-			{
-				deselect((EditorLabel) labels.get(i));
-			}
-		}
-
-		for (int i = 0; i < events.size(); i++)
-		{
-			if (((EditorLabelGroup) events.get(i)).getParent() == o)
-			{
-				deselect((EditorLabelGroup) events.get(i));
-			}
 		}
 	}
 
@@ -236,6 +205,9 @@ public class ControlledSurface
 
    	public void mousePressed(MouseEvent e)
 	{
+		// This is for triggering the popup 
+		maybeShowPopup(e);
+
 		if (e.getButton() == MouseEvent.BUTTON1)
 		{
 			lastX = e.getX();
@@ -256,8 +228,10 @@ public class ControlledSurface
 				if (T.getPlace() == EditorToolbar.SELECT)
 				{
 					// Start of drag-select?
-					m_xoffset = e.getX();
-					m_yoffset = e.getY();
+					dragStartX = e.getX();
+					dragStartY = e.getY();
+					dragNowX = dragStartX;
+					dragNowY = dragStartY;
 					dragSelect = true;
 				}
 
@@ -320,17 +294,29 @@ public class ControlledSurface
 				xoff = e.getX() - ((EditorLabel) o).getX();
 				yoff = e.getY() - ((EditorLabel) o).getY();
 			}
+			/*
 			else if (o.getType() == EditorObject.NODEGROUP)
 			{
 				xoff = e.getX() - ((EditorNodeGroup) o).getX();
 				yoff = e.getY() - ((EditorNodeGroup) o).getY();
 			}
+			*/
 		}
 		else if (e.getButton() == MouseEvent.BUTTON2)
 		{
 			System.out.println("Button 2!");
 		}
 		else if (e.getButton() == MouseEvent.BUTTON3)
+		{
+
+		}
+
+		repaint();
+	}
+
+	private void maybeShowPopup(MouseEvent e)
+	{
+		if (e.isPopupTrigger())
 		{
 			EditorObject o = getObjectAtPosition(e.getX(), e.getY());
 			if (!(o == null))
@@ -358,10 +344,8 @@ public class ControlledSurface
 				}
 			}
 		}
-
-		repaint();
-	}
-
+	}	
+	
 	public boolean isFocusable()
 	{
 		return true;
@@ -385,17 +369,84 @@ public class ControlledSurface
 				return;
 			}
 
+			// Find the distances that the mouse has dragged (for moving and stuff)
+			int dx = 0;
+			int dy = 0;
+			// Are we using snap?
+			if ((nodeIsSelected() || nodeGroupIsSelected()) && nodesSnap)
+				//if (nodesSnap)
+			{
+				lastX = (lastX/gridSize) * gridSize;
+				lastY = (lastY/gridSize) * gridSize;
+				
+				while (dx + gridSize < e.getX())
+				{
+					dx += gridSize;
+				}
+				
+				if (e.getX() - dx > (dx + gridSize) - e.getX())
+				{
+					dx += gridSize;
+				}
+				
+				while (dy + gridSize < e.getY())
+				{
+					dy += gridSize;
+				}
+				
+				if (e.getY() - dy > (dy + gridSize) - e.getY())
+				{
+					dy += gridSize;
+				}
+				
+				// So the real delta values are...
+				dx -= lastX;
+				dy -= lastY;
+			}
+			else
+			{
+				dx = e.getX() - lastX;
+				dy = e.getY() - lastY;
+			}
+			// Update position
+			lastX += dx;
+			lastY += dy;
+
 			// DragSelect!
 			if (dragSelect)
 			{
 				/* Drag-select */
-				event_x = e.getX();
-				event_y = e.getY();
+				dragNowX = e.getX();
+				dragNowY = e.getY();
 
-				paintImmediately(m_xoffset, m_yoffset, event_x, event_y);
+				toBeSelected = getDragSelection();
 
-				// Add or remove things that come in selection...
-				// notImplemented();
+				// Select all that should be selected...
+				super.deselectAll();
+				// These have been selected previously and should still be selected
+				for (int i=0; i<selectedObjects.size(); i++)
+				{
+					EditorObject o = (EditorObject) selectedObjects.get(i);
+					o.setSelected(true);
+					LinkedList children = getChildren(o);
+					while (children.size() != 0)
+					{
+						((EditorObject) children.remove(0)).setSelected(true);
+					}
+				}
+				// These are in the current drag selection!
+				for (int i=0; i<toBeSelected.size(); i++)
+				{
+					EditorObject o = (EditorObject) toBeSelected.get(i);
+					o.setSelected(true);
+					LinkedList children = getChildren(o);
+					while (children.size() != 0)
+					{
+						((EditorObject) children.remove(0)).setSelected(true);
+					}
+				}
+
+				repaint();
 
 				return;
 			}
@@ -417,51 +468,6 @@ public class ControlledSurface
 
 					selectOnDrag = false;
 				}
-
-				// The distances that we should move everything...
-				int dx = 0;
-				int dy = 0;
-
-				// Are we using snap?
-				if ((nodeIsSelected() || nodeGroupIsSelected()) && nodesSnap)
-					//if (nodesSnap)
-				{
-					lastX = (lastX/gridSize) * gridSize;
-					lastY = (lastY/gridSize) * gridSize;
-
-					while (dx + gridSize < e.getX())
-					{
-						dx += gridSize;
-					}
-
-					if (e.getX() - dx > (dx + gridSize) - e.getX())
-					{
-						dx += gridSize;
-					}
-
-					while (dy + gridSize < e.getY())
-					{
-						dy += gridSize;
-					}
-
-					if (e.getY() - dy > (dy + gridSize) - e.getY())
-					{
-						dy += gridSize;
-					}
-
-					// So the real delta values are...
-					dx -= lastX;
-					dy -= lastY;
-				}
-				else
-				{
-					dx = e.getX() - lastX;
-					dy = e.getY() - lastY;
-				}
-
-				// Update position
-				lastX += dx;
-				lastY += dy;
 
 				// No move?
 				if ((dx == 0) && (dy == 0))
@@ -527,7 +533,6 @@ public class ControlledSurface
 					// Is it a nodegroup?
 					else if (object.getType() == EditorObject.NODEGROUP)
 					{
-
 						EditorNodeGroup nodeGroup = (EditorNodeGroup) object;
 
 						//Rectangle2D.Double b = new Rectangle2D.Double();
@@ -546,6 +551,7 @@ public class ControlledSurface
 						}
 						else
 						{
+							/*
 							if (nodesSnap)
 							{
 								nodeGroup.moveGroup(Math.round((e.getX() - xoff) / gridSize) * gridSize, Math.round((e.getY() - yoff) / gridSize) * gridSize);
@@ -554,6 +560,8 @@ public class ControlledSurface
 							{
 								nodeGroup.moveGroup(e.getX() - xoff, e.getY() - yoff);
 							}
+							*/
+							nodeGroup.moveGroup(dx, dy);
 						}
 
 						/* // Prevent nodegroups from moving onto nodes?
@@ -562,7 +570,6 @@ public class ControlledSurface
 						   nodeGroup.setBounds(b);
 						   }
 						*/
-						nodeGroup.setError(intersectsRectangle(nodeGroup.getBounds()));
 
 						/*
 						EditorNodeGroup nodeGroup = (EditorNodeGroup) object;
@@ -570,7 +577,7 @@ public class ControlledSurface
 						*/
 					}
 					// Is it an edge?
-					else if ((object.getType() == EditorObject.EDGE) && !controlPointsMove)
+					else if ((object.getType() == EditorObject.EDGE) && (!controlPointsMove || !(nodeIsSelected() || nodeGroupIsSelected())))
 					{
 						EditorEdge edge = (EditorEdge) object;
 						edge.setTPoint(edge.getTPointX() + dx, edge.getTPointY() + dy);
@@ -600,13 +607,15 @@ public class ControlledSurface
 						}
 					}
 				}
+
+				examineCollisions();
 			}
 			else
 			{
-				// Single selection!
+				// Single selection! (Multiple selection is only allowed in SELECT-mode.)
 
 				// Edge drawing...
-				if (T.getPlace() == EditorToolbar.EDGE)
+				if (T.getPlace() == EditorToolbar.EDGE )
 				{
 					// There should only be one object here, or maybe two, 
 					// a node and it's label or an edge and it's labelgroup...
@@ -699,6 +708,7 @@ public class ControlledSurface
 					}
 					else
 					{
+						/*
 						if (nodesSnap)
 						{
 							nodeGroup.moveGroup(Math.round((e.getX() - xoff) / gridSize) * gridSize, Math.round((e.getY() - yoff) / gridSize) * gridSize);
@@ -707,6 +717,8 @@ public class ControlledSurface
 						{
 							nodeGroup.moveGroup(e.getX() - xoff, e.getY() - yoff);
 						}
+						*/
+						nodeGroup.moveGroup(dx, dy);
 					}
 					
 					/* // Prevent nodegroups from moving onto nodes?
@@ -715,7 +727,8 @@ public class ControlledSurface
 						nodeGroup.setBounds(b);
 					}
 					*/
-					nodeGroup.setError(intersectsRectangle(nodeGroup.getBounds()));
+					
+					examineCollisions();
 				}
 			}
 		}
@@ -725,6 +738,15 @@ public class ControlledSurface
 
 	public void mouseReleased(MouseEvent e)
 	{
+		// This is for triggering the popup 
+		maybeShowPopup(e);
+
+		// Make the temporary selection definite
+		while (toBeSelected.size() > 0)
+		{
+			select((EditorObject) toBeSelected.remove(0));
+		}
+
 		if (e.getButton() == MouseEvent.BUTTON1)
 		{
 			if (root.getBuffer() != null)
@@ -824,7 +846,16 @@ public class ControlledSurface
 			{
 				if (edgeIsSelected() && (selectedObjects.size() <= 2))
 				{
-					EditorEdge edge = (EditorEdge) selectedObjects.remove(0);
+					EditorObject obj = (EditorObject) selectedObjects.remove(0);
+					EditorEdge edge;
+					if (obj.getType() == EditorObject.EDGE)
+					{
+						edge = (EditorEdge) obj;
+					}
+					else
+					{
+						edge = (EditorEdge) selectedObjects.remove(0);
+					}
 
 					EditorObject n = getNodeOrNodeGroupAtPosition(e.getX(), e.getY());
 
@@ -875,7 +906,14 @@ public class ControlledSurface
 		if ((highlightedObject != null) && !highlightedObject.equals(o))
 		{
 			highlightedObject.setHighlighted(false);
-			highlightedAllWithParent(highlightedObject, false);
+
+			// Don't highlight children
+			LinkedList children = getChildren(highlightedObject);
+			while (children.size() != 0)
+			{
+				((EditorObject) children.remove(0)).setHighlighted(false);
+			}
+
 			highlightedObject = null;
 		}
 
@@ -883,35 +921,16 @@ public class ControlledSurface
 		{
 			o.setHighlighted(true);
 			highlightedObject = o;
-			highlightedAllWithParent(highlightedObject, true);
+
+			// Highlight children
+			LinkedList children = getChildren(highlightedObject);
+			while (children.size() != 0)
+			{
+				((EditorObject) children.remove(0)).setHighlighted(true);
+			}
 		}
 
 		repaint();
-	}
-
-	/**
-	 * Changes the highlight status of all EditorObject:s with o as parent.
-	 *
-	 * @param o the parent of which all children should be highlighed.
-	 * @param highlight if true, makes highlighted, otherwise removes highlight
-	 */
-	private void highlightedAllWithParent(EditorObject o, boolean highlight)
-	{
-		for (int i = 0; i < labels.size(); i++)
-		{
-			if (((EditorLabel) labels.get(i)).getParent() == o)
-			{
-				((EditorLabel) labels.get(i)).setHighlighted(highlight);
-			}
-		}
-
-		for (int i = 0; i < events.size(); i++)
-		{
-			if (((EditorLabelGroup) events.get(i)).getParent() == o)
-			{
-				((EditorLabelGroup) events.get(i)).setHighlighted(highlight);
-			}
-		}
 	}
 
 	public void mouseEntered(MouseEvent e)
@@ -985,6 +1004,8 @@ public class ControlledSurface
 						}
 					}
 					addNode("s" + i, dx, dy);
+
+					examineCollisions();
 
 					//addLabel(getLastNode(), "", 0, break20);
 					repaint();

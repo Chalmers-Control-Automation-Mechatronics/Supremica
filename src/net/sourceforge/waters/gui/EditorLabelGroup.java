@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorLabelGroup
 //###########################################################################
-//# $Id: EditorLabelGroup.java,v 1.5 2005-02-22 21:53:14 flordal Exp $
+//# $Id: EditorLabelGroup.java,v 1.6 2005-03-03 05:36:29 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -38,6 +38,9 @@ public class EditorLabelGroup
 	private final EditorEdge parent;
 	private final ArrayList events;
 	private LabelBlockProxy proxy;
+
+	public static final int DEFAULTOFFSETX = 0;
+	public static final int DEFAULTOFFSETY = 10;
 
 	public void removeFromSurface(EditorSurface e)
 	{
@@ -284,7 +287,7 @@ public class EditorLabelGroup
 
 		if (proxy.getGeometry() == null)
 		{
-			proxy.setGeometry(new LabelGeometryProxy(0, 10, AnchorPosition.NW));
+			proxy.setGeometry(new LabelGeometryProxy(DEFAULTOFFSETX, DEFAULTOFFSETY, AnchorPosition.NW));
 		}
 
 		verticalA = TOP;
