@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="E_F_DIV" Comment="Event-Driven Frequency Divider" >
+  <Identification Standard="61499-2" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2004-04-23" />
+  <CompilerInfo header="package fb.rt.events;" >
+    <Compiler Language="Java" Vendor="Sun" Product="JDK" Version="1.06" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="EI" Comment="Input Event" >
+        <With Var="N" />
+      </Event>
+      <Event Name="R" Comment="Reset Divider" >
+        <With Var="N" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="EO" Comment="Output Event at frequency 1/N of EI" >
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="N" Type="UINT" InitialValue="1" Comment="Divisor (should be >0)" />
+    </InputVars>
+  </InterfaceList>
+  <FBNetwork >
+    <FB Name="CTR" Type="E_CTU" x="268.42105" y="10.526316" />
+    <FB Name="GATE" Type="E_PERMIT" x="594.7368" y="10.526316" />
+    <EventConnections>
+      <Connection Source="R" Destination="CTR.R" dx1="200.0" />
+      <Connection Source="EI" Destination="CTR.CU" dx1="194.73685" />
+      <Connection Source="CTR.CUO" Destination="GATE.EI" dx1="52.631577" />
+      <Connection Source="GATE.EO" Destination="CTR.R" dx1="26.315788" dx2="42.105263" dy="710.5263" />
+      <Connection Source="GATE.EO" Destination="EO" dx1="978.9474" />
+    </EventConnections>
+    <DataConnections>
+      <Connection Source="N" Destination="CTR.PV" dx1="205.26315" />
+      <Connection Source="CTR.Q" Destination="GATE.PERMIT" dx1="26.315788" />
+    </DataConnections>
+  </FBNetwork>
+</FBType>

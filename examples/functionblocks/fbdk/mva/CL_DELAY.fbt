@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="CL_DELAY" Comment="Clocked delayed propagation of an event-Cancellable, Locally Clocked" >
+  <Identification Standard="61499-2" ApplicationDomain="Simulation" Function="Delay" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2004-09-23" />
+  <CompilerInfo header="package fb.rt.mva; import fb.rt.net.*;" >
+    <Compiler Language="Java" Vendor="Sun" Product="JDK" Version="1.4.2" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="INIT" Comment="Initialization Request" >
+        <With Var="CLK_ID" />
+      </Event>
+      <Event Name="START" Comment="Begin Delay" >
+        <With Var="N" />
+      </Event>
+      <Event Name="STOP" Comment="Cancel Delay" >
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="INITO" Comment="Initialization Confirm" >
+      </Event>
+      <Event Name="EO" Comment="Delayed Event" >
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="CLK_ID" Type="WSTRING" InitialValue="&#34;SIM_CLK&#34;" Comment="Simulation Clock Channel ID" />
+      <VarDeclaration Name="N" Type="UINT" Comment="Delay Time in Clock Cycles" />
+    </InputVars>
+  </InterfaceList>
+  <FBNetwork >
+    <FB Name="DLY" Type="C_DELAY" x="1077.7777" y="11.111111" />
+    <FB Name="CLK" Type="SUBL_0" x="272.2222" y="11.111111" />
+    <EventConnections>
+      <Connection Source="START" Destination="DLY.START" dx1="927.7778" />
+      <Connection Source="DLY.EO" Destination="EO" dx1="1488.8888" />
+      <Connection Source="INIT" Destination="CLK.INIT" dx1="166.66666" />
+      <Connection Source="CLK.IND" Destination="DLY.CLK" dx1="77.77777" />
+      <Connection Source="STOP" Destination="DLY.STOP" dx1="944.4444" />
+      <Connection Source="CLK.INITO" Destination="INITO" dx1="711.1111" />
+    </EventConnections>
+    <DataConnections>
+      <Connection Source="N" Destination="DLY.N" dx1="1005.55554" />
+      <Connection Source="CLK_ID" Destination="CLK.ID" dx1="122.22221" />
+    </DataConnections>
+  </FBNetwork>
+</FBType>

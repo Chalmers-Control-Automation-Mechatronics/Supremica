@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="XSLIDE_MDLL" Comment="Transfer Slide Model with  Locally Coupled Data+Clock" >
+  <Identification Standard="61499-1" Classification="Model" ApplicationDomain="Simulation" Function="Bidirectional Motion" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2004-10-18" Remarks="Made LOADER an LDU_MDL." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2004-09-27" />
+  <CompilerInfo header="package fb.rt.mach; import fb.rt.mva.*; import fb.rt.net.*; " classdef="public class XSLIDE_MDLL extends FBMVCD" >
+    <Compiler Language="Java" Vendor="Sun" Product="JDK" Version="1.4.2" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="INIT" Comment="Initialize" >
+        <With Var="ACT_ID" />
+        <With Var="CLK_ID" />
+        <With Var="UI_ID" />
+        <With Var="SENSE_ID" />
+        <With Var="VF" />
+        <With Var="VR" />
+        <With Var="REND_ID" />
+        <With Var="VCF" />
+        <With Var="VCR" />
+        <With Var="LOAD_ID" />
+      </Event>
+      <Event Name="UNLD" Comment="Unload Workpiece" >
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="INITO" >
+        <With Var="HOME" />
+        <With Var="END" />
+        <With Var="PRESENT" />
+      </Event>
+      <Event Name="IND" Comment="Sensor Changed" >
+        <With Var="HOME" />
+        <With Var="END" />
+        <With Var="PRESENT" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="CLK_ID" Type="WSTRING" InitialValue="&#34;SIM_CLK&#34;" Comment="Simulation clock channel ID" />
+      <VarDeclaration Name="UI_ID" Type="WSTRING" Comment="User input channel ID from View" />
+      <VarDeclaration Name="REND_ID" Type="WSTRING" Comment="Local Channel ID for Rendering Data" />
+      <VarDeclaration Name="SENSE_ID" Type="WSTRING" Comment="Sensor data channel ID to Controller" />
+      <VarDeclaration Name="ACT_ID" Type="WSTRING" Comment="Actuator data channel ID from Controller" />
+      <VarDeclaration Name="LOAD_ID" Type="WSTRING" Comment="Workpiece loading data channel ID from Model" />
+      <VarDeclaration Name="VF" Type="UINT" Comment="Forward speed in % Full Scale per CLK event" />
+      <VarDeclaration Name="VR" Type="UINT" Comment="Reverse speed in %FS per CLK event" />
+      <VarDeclaration Name="VCF" Type="UINT" InitialValue="25" Comment="Clamp Forward speed in % Full Scale per CLK event" />
+      <VarDeclaration Name="VCR" Type="UINT" InitialValue="25" Comment="Clamp Reverse speed in %FS per CLK event" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="HOME" Type="BOOL" InitialValue="1" Comment="HOME position limit switch with hysteresis" />
+      <VarDeclaration Name="END" Type="BOOL" Comment="END position limit switch with hysteresis" />
+      <VarDeclaration Name="PRESENT" Type="BOOL" Comment="Workpiece Present" />
+    </OutputVars>
+  </InterfaceList>
+  <FBNetwork >
+    <FB Name="MECH2" Type="MECH2_MDL" x="266.66666" y="922.22217" />
+    <FB Name="UI" Type="SUBL_1" x="994.4444" y="11.111111" />
+    <FB Name="CLK" Type="SUBL_0" x="288.8889" y="11.111111" />
+    <FB Name="ACT" Type="SUBL_3" x="1666.6666" y="11.111111" />
+    <FB Name="SENSE" Type="PUBL_5" x="3544.4443" y="11.111111" />
+    <FB Name="REND" Type="PUBL_4" x="2577.7776" y="11.111111" />
+    <FB Name="LOADER" Type="E_LDU" x="2677.7776" y="2627.7776" />
+    <FB Name="CLAMP" Type="SOL_MDL" x="999.99994" y="1772.2222" />
+    <FB Name="LOADSUB" Type="SUBL_3" Comment="Subscriber for Load Channel" x="3938.8887" y="1461.1111" />
+    <EventConnections>
+      <Connection Source="CLK.IND" Destination="MECH2.CLK" dx1="33.333332" dx2="33.333332" dy="444.44443" />
+      <Connection Source="INIT" Destination="CLK.INIT" dx1="183.33333" />
+      <Connection Source="MECH2.INDS" Destination="SENSE.REQ" dx1="2683.3333" />
+      <Connection Source="LOADER.LD" Destination="REND.REQ" dx1="233.33333" dx2="366.66666" dy="-916.6666" />
+      <Connection Source="MECH2.INDP" Destination="REND.REQ" dx1="1533.3333" />
+      <Connection Source="UNLD" Destination="LOADER.UNLD" dx1="2550.0" />
+      <Connection Source="LOADER.LD" Destination="SENSE.REQ" dx1="294.44443" />
+      <Connection Source="SENSE.CNF" Destination="IND" dx1="3949.9998" />
+      <Connection Source="CLAMP.INDR" Destination="REND.REQ" dx1="811.1111" dx2="27.777777" dy="1533.3333" />
+      <Connection Source="CLAMP.INDS" Destination="SENSE.REQ" dx1="1961.1111" dx2="55.555553" dy="-705.55554" />
+      <Connection Source="CLK.IND" Destination="CLAMP.CLK" dx1="311.11108" />
+      <Connection Source="CLK.INITO" Destination="UI.INIT" dx1="38.888885" />
+      <Connection Source="UI.INITO" Destination="ACT.INIT" dx1="44.444443" />
+      <Connection Source="ACT.INITO" Destination="REND.INIT" dx1="72.22222" />
+      <Connection Source="REND.INITO" Destination="SENSE.INIT" dx1="72.22222" />
+      <Connection Source="SENSE.INITO" Destination="LOADSUB.INIT" dx1="33.333332" />
+      <Connection Source="LOADSUB.INITO" Destination="INITO" dx1="4377.778" />
+      <Connection Source="LOADSUB.IND" Destination="LOADER.LD1" dx1="194.44444" dx2="277.77777" dy="1955.5554" />
+    </EventConnections>
+    <DataConnections>
+      <Connection Source="UI.RD_1" Destination="MECH2.FAULT" dx1="55.555553" dx2="222.22221" dy="172.22221" />
+      <Connection Source="CLK_ID" Destination="CLK.ID" dx1="138.88889" />
+      <Connection Source="UI_ID" Destination="UI.ID" dx1="872.22217" />
+      <Connection Source="ACT_ID" Destination="ACT.ID" dx1="1516.6666" />
+      <Connection Source="ACT.RD_1" Destination="MECH2.FWD" dx1="111.11111" dx2="188.88889" dy="2294.4443" />
+      <Connection Source="ACT.RD_2" Destination="MECH2.REV" dx1="77.77777" dx2="150.0" dy="2144.4443" />
+      <Connection Source="MECH2.HOME" Destination="SENSE.SD_1" dx1="2733.3333" />
+      <Connection Source="MECH2.END" Destination="SENSE.SD_2" dx1="2766.6665" />
+      <Connection Source="SENSE_ID" Destination="SENSE.ID" dx1="3355.5554" />
+      <Connection Source="VF" Destination="MECH2.VF" dx1="177.77777" />
+      <Connection Source="VR" Destination="MECH2.VR" dx1="177.77777" />
+      <Connection Source="MECH2.POS" Destination="REND.SD_1" dx1="1744.4443" />
+      <Connection Source="MECH2.HOME" Destination="HOME" dx1="777.7778" />
+      <Connection Source="MECH2.END" Destination="END" dx1="750.0" />
+      <Connection Source="LOADER.STYLE" Destination="REND.SD_2" dx1="77.77777" dx2="122.22221" dy="-1988.8888" />
+      <Connection Source="LOADER.WKPC" Destination="REND.SD_3" dx1="105.55555" dx2="88.888885" dy="-2144.4443" />
+      <Connection Source="LOADER.PRESENT" Destination="SENSE.SD_3" dx1="155.55554" dx2="38.888885" dy="222.22221" />
+      <Connection Source="LOADER.PRESENT" Destination="PRESENT" dx1="3249.9998" />
+      <Connection Source="REND_ID" Destination="REND.ID" dx1="2405.5554" />
+      <Connection Source="CLAMP.POS" Destination="REND.SD_4" dx1="1144.4445" dx2="33.333332" dy="1311.1111" />
+      <Connection Source="UI.RD_1" Destination="CLAMP.FAULT" dx1="55.555553" dx2="44.444443" dy="172.22221" />
+      <Connection Source="CLAMP.HOME" Destination="SENSE.SD_4" dx1="2061.111" dx2="94.44444" dy="1238.8888" />
+      <Connection Source="CLAMP.END" Destination="SENSE.SD_5" dx1="2094.4443" dx2="88.888885" dy="1122.2222" />
+      <Connection Source="VCF" Destination="CLAMP.VF" dx1="894.4444" />
+      <Connection Source="VCR" Destination="CLAMP.VR" dx1="894.4444" />
+      <Connection Source="ACT.RD_3" Destination="CLAMP.FWD" dx1="44.444443" dx2="205.55554" dy="1988.8888" />
+      <Connection Source="LOADSUB.RD_2" Destination="LOADER.S1" dx1="138.88889" dx2="222.22221" dy="1455.5555" />
+      <Connection Source="LOADSUB.RD_3" Destination="LOADER.W1" dx1="105.55555" dx2="105.55555" dy="1283.3333" />
+      <Connection Source="VSTYLE#EMPTY" Destination="LOADER.S0" dx1="2394.4443" />
+      <Connection Source="LOAD_ID" Destination="LOADSUB.ID" dx1="3766.6665" />
+    </DataConnections>
+  </FBNetwork>
+</FBType>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="MECHC_VIEW" Comment="View of a Linear Mechanism with Clamping" >
+  <Identification Standard="61499-1" Classification="View" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.2" Author="JHC" Date="2004-10-07" Remarks="Added CNV input." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2004-09-27" Remarks="Moved CLAMP after WKPC for consistency with MECH_VIEW." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2002-05-21" Remarks="Copied/Modified from MECH_VIEW." />
+  <CompilerInfo header="package fb.rt.mva;" classdef="public class MECHC_VIEW extends MECH_VIEW" >
+    <Compiler Language="Java" Vendor="Sun" Product="JDK" Version="1.4.2" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="INIT" Comment="Initialize" >
+        <With Var="BKGD" />
+        <With Var="LEN" />
+        <With Var="DIA" />
+        <With Var="DIR" />
+        <With Var="CNV" />
+      </Event>
+      <Event Name="REQ" Comment="Update the display" >
+        <With Var="POS" />
+        <With Var="CLAMP" />
+        <With Var="STYLE" />
+        <With Var="WKPC" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="INITO" Comment="Initialized" >
+      </Event>
+      <Event Name="CNF" Comment="Display Updated" >
+      </Event>
+      <Event Name="IND" Comment="Change in FAULT status" >
+        <With Var="FAULT" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="POS" Type="UINT" Comment="Mechanism displacement,%" />
+      <VarDeclaration Name="STYLE" Type="VSTYLE" InitialValue="RING" Comment="View style" />
+      <VarDeclaration Name="WKPC" Type="COLOR" InitialValue="blue" Comment="Foreground Color" />
+      <VarDeclaration Name="CLAMP" Type="UINT" Comment="Clamp or gate position,%" />
+      <VarDeclaration Name="CNV" Type="BOOL" Comment="0=Paint workpiece with clamp,1=Paint as conveyor with gate at end." />
+      <VarDeclaration Name="BKGD" Type="COLOR" InitialValue="blue" Comment="Background Color" />
+      <VarDeclaration Name="LEN" Type="UINT" Comment="Length in Diameters" />
+      <VarDeclaration Name="DIA" Type="UINT" Comment="Diameter" />
+      <VarDeclaration Name="DIR" Type="UINT" Comment="Orientation:0=L/R,1=T/B,2=R/L,3=B/T" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="FAULT" Type="BOOL" Comment="0=Normal,1=Fault" />
+    </OutputVars>
+  </InterfaceList>
+</FBType>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE DataType SYSTEM "../DataType.dtd" >
+<DataType xmlns="http://www.holobloc.com/xml/DataType" Name="ANALOG_16_INPUT_CONFIGURATION" >
+  <Identification Standard="61131-3" Type="Data Type" Description="Table 12, #5" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2001-03-02" Remarks="Tested new Java generation." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2000-11-09" />
+  <CompilerInfo header="package fb.rt.ita;" >
+    <Compiler Language="Java" Vendor="IBM" Product="VisualAge" Version="3.0" />
+  </CompilerInfo>
+  <ASN1Tag Class="PRIVATE" Number="17" />
+  <StructuredType >
+    <VarDeclaration Name="SIGNAL_TYPE" Type="ANALOG_SIGNAL_TYPE" />
+    <VarDeclaration Name="FILTER" Type="FILTER_PARAMETER" />
+    <VarDeclaration Name="CHANNEL" Type="ANALOG_CHANNEL_CONFIGURATION" ArraySize="16" />
+  </StructuredType>
+</DataType>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="FACEPLATE" Comment="Controller Faceplate" >
+  <Identification Standard="61499-1" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.6" Author="JHC" Date="2004-09-08" Remarks="Changed CNF to IND." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.5" Author="JHC" Date="2004-09-03" Remarks="Changed CNF to IND." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.4" Author="JHC" Date="2004-09-03" Remarks="Changed I/O to UINT; added BKGD,COLORS." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.3" Author="JHC" Date="2002-04-25" Remarks="Added W, H inputs" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.2" Author="JHC" Date="2000-06-20" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2000-04-29" Remarks="SIFB implementation" />
+  <CompilerInfo header="package fb.rt.project; import fb.rt.swing.*; import java.awt.*;" >
+    <Compiler Language="Java" Vendor="Sun" Product="JDK" Version="1.4.2" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="INIT" >
+        <With Var="LABEL" />
+        <With Var="W" />
+        <With Var="H" />
+        <With Var="SPI" />
+        <With Var="PV" />
+        <With Var="XOUT" />
+        <With Var="BKGD" />
+        <With Var="COLORS" />
+      </Event>
+      <Event Name="REQ" >
+        <With Var="PV" />
+        <With Var="XOUT" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="INITO" >
+        <With Var="SP" />
+        <With Var="AUTO" />
+      </Event>
+      <Event Name="IND" Comment="Change in AUTO or SP value" >
+        <With Var="AUTO" />
+        <With Var="SP" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="LABEL" Type="WSTRING" InitialValue="&#34;   CONTROL FACEPLATE   &#34;" />
+      <VarDeclaration Name="BKGD" Type="COLOR" InitialValue="COLOR#lightGray" Comment="Background color for bars" />
+      <VarDeclaration Name="COLORS" Type="COLOR" ArraySize="3" InitialValue="[yellow,blue,green]" Comment="SP,PV,XOUT colors" />
+      <VarDeclaration Name="W" Type="UINT" InitialValue="20" Comment="Indicator width" />
+      <VarDeclaration Name="H" Type="UINT" InitialValue="100" Comment="Indicator Height" />
+      <VarDeclaration Name="SPI" Type="UINT" InitialValue="50" Comment="Initial value for SP, 0-100%" />
+      <VarDeclaration Name="PV" Type="REAL" Comment="Process Variable, 0-100%" />
+      <VarDeclaration Name="XOUT" Type="REAL" Comment="Controller Output, 0-100%" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="AUTO" Type="BOOL" Comment="1=Auto,0=Manual" />
+      <VarDeclaration Name="SP" Type="UINT" Comment="Set Point, 0-100%" />
+    </OutputVars>
+  </InterfaceList>
+</FBType>

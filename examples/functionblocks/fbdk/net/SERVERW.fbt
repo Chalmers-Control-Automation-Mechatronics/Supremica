@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="SERVERW" Comment="Server for newline-terminated double-byte strings" >
+  <Identification Standard="61499-1" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2004-10-15" />
+  <CompilerInfo header="package fb.rt.net;" >
+    <Compiler Language="Java" Vendor="Sun" Product="JDK" Version="1.4.2" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="INIT" >
+        <With Var="QI" />
+        <With Var="ID" />
+      </Event>
+      <Event Name="RSP" Comment="Response from server" >
+        <With Var="SD_1" />
+        <With Var="QI" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="INITO" >
+        <With Var="QO" />
+        <With Var="STATUS" />
+      </Event>
+      <Event Name="IND" Comment="Request to server" >
+        <With Var="STATUS" />
+        <With Var="QO" />
+        <With Var="RD_1" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="QI" Type="BOOL" />
+      <VarDeclaration Name="ID" Type="WSTRING" Comment="IP Socket Address" />
+      <VarDeclaration Name="SD_1" Type="WSTRING" Comment="String to be sent with added newline" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="QO" Type="BOOL" />
+      <VarDeclaration Name="STATUS" Type="WSTRING" />
+      <VarDeclaration Name="RD_1" Type="WSTRING" Comment="Received String without terminating newline" />
+    </OutputVars>
+  </InterfaceList>
+</FBType>

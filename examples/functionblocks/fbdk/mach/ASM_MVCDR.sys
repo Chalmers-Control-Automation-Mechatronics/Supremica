@@ -1,0 +1,407 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE System SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<System xmlns="http://www.holobloc.com/xml/LibraryElement" Name="ASM_MVCDR" Comment="Assembly System Control+Diagnostics+HMI with Remote Model+View" >
+  <Identification Standard="61499-1" Classification="Simulation" ApplicationDomain="Assembly" Type="Dual Stroke Cylinder" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2004-10-21" Remarks="Adapted to new Load/Unload model." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2004-09-26" Remarks="Extended from ASM_MVCDL1." />
+  <Device Name="DIAGNOSTICS" Type="FRAME_DEVICE" x="1144.4445" y="527.7778" >
+    <Resource Name="IO" Type="EMB_RES" x="288.8889" y="11.111111" >
+      <FBNetwork >
+        <FB Name="TRANSPORT_SENSE" Type="PUBL_3" x="2488.8887" y="11.111111" />
+        <FB Name="TRANSPORT_ACT" Type="SUBL_3" x="477.77777" y="11.111111" />
+        <FB Name="PRESS_ACT" Type="SUBL_2" x="494.44443" y="933.3333" />
+        <FB Name="PRESS_SENSE" Type="PUBL_2" x="2950.0" y="344.44443" />
+        <FB Name="PACK" Type="PACK_BYTE" x="1038.8888" y="122.22221" />
+        <FB Name="CLT" Type="CLIENT_1" x="1544.4443" y="800.0" />
+        <FB Name="UNPK" Type="UNPK_BYTE" x="2033.3333" y="233.33333" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="TRANSPORT_ACT.INIT" dx1="27.777777" />
+          <Connection Source="TRANSPORT_ACT.IND" Destination="PACK.REQ" dx1="100.0" />
+          <Connection Source="PRESS_ACT.IND" Destination="PACK.REQ" dx1="27.777777" />
+          <Connection Source="TRANSPORT_ACT.INITO" Destination="CLT.INIT" dx1="744.4444" />
+          <Connection Source="PACK.IND" Destination="CLT.REQ" dx1="72.22222" />
+          <Connection Source="CLT.INITO" Destination="TRANSPORT_SENSE.INIT" dx1="27.777777" />
+          <Connection Source="CLT.CNF" Destination="UNPK.REQ" dx1="55.555553" />
+          <Connection Source="UNPK.IND" Destination="TRANSPORT_SENSE.REQ" dx1="27.777777" />
+          <Connection Source="TRANSPORT_SENSE.INITO" Destination="PRESS_SENSE.INIT" dx1="77.77777" dx2="77.77777" dy="977.7777" />
+          <Connection Source="TRANSPORT_SENSE.CNF" Destination="PRESS_SENSE.REQ" dx1="27.777777" dx2="105.55555" dy="777.7778" />
+          <Connection Source="PRESS_SENSE.INITO" Destination="PRESS_ACT.INIT" dx1="27.777777" dx2="77.77777" dy="1277.7777" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="TRANSPORT_ACT.RD_1" Destination="PACK.IN0" dx1="33.333332" />
+          <Connection Source="TRANSPORT_ACT.RD_2" Destination="PACK.IN1" dx1="38.888885" />
+          <Connection Source="TRANSPORT_ACT.RD_3" Destination="PACK.IN2" dx1="44.444443" />
+          <Connection Source="PRESS_ACT.RD_1" Destination="PACK.IN3" dx1="61.111107" />
+          <Connection Source="PRESS_ACT.RD_2" Destination="PACK.IN4" dx1="111.11111" />
+          <Connection Source="1" Destination="CLT.QI" dx1="1477.7777" />
+          <Connection Source="CLT.RD_1" Destination="UNPK.IN" dx1="77.77777" />
+          <Connection Source="UNPK.OUT0" Destination="TRANSPORT_SENSE.SD_1" dx1="172.22221" />
+          <Connection Source="UNPK.OUT1" Destination="TRANSPORT_SENSE.SD_2" dx1="161.1111" />
+          <Connection Source="UNPK.OUT2" Destination="TRANSPORT_SENSE.SD_3" dx1="150.0" />
+          <Connection Source="UNPK.OUT3" Destination="PRESS_SENSE.SD_1" dx1="61.111107" />
+          <Connection Source="UNPK.OUT4" Destination="PRESS_SENSE.SD_2" dx1="27.777777" />
+          <Connection Source="PACK.OUT" Destination="CLT.SD_1" dx1="27.777777" />
+          <Connection Source="&#34;localhost:4444&#34;" Destination="CLT.ID" dx1="1277.7777" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="LOG" Type="PANEL_RESOURCE" x="861.1111" y="11.111111" >
+      <FBNetwork >
+        <FB Name="DIAG" Type="SUBL_2" x="527.7778" y="11.111111" />
+        <FB Name="LOG" Type="DIAG_LOG" x="1077.7777" y="11.111111" />
+        <FB Name="CLK" Type="E_CYCLE" x="1972.2222" y="144.44444" />
+        <FB Name="DIAG_CLK" Type="PUBL_0" x="1583.3333" y="11.111111" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="DIAG.INIT" dx1="77.77777" dx2="152.9412" dy="-1.0" />
+          <Connection Source="DIAG.INITO" Destination="LOG.INIT" dx1="38.888885" dx2="805.8823" dy="-1.0" />
+          <Connection Source="DIAG.IND" Destination="LOG.REQ" dx1="77.77777" dx2="876.4706" dy="-1.0" />
+          <Connection Source="LOG.INITO" Destination="DIAG_CLK.INIT" dx1="33.333332" />
+          <Connection Source="DIAG_CLK.INITO" Destination="CLK.START" dx1="27.777777" />
+          <Connection Source="CLK.EO" Destination="DIAG_CLK.REQ" dx1="27.777777" dx2="44.444443" dy="633.3333" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="DIAG.RD_1" Destination="LOG.SRC" dx1="61.111107" dx2="1147.0588" dy="1388.2352" />
+          <Connection Source="DIAG.RD_2" Destination="LOG.COND" dx1="27.777777" dx2="1070.5883" dy="1270.5883" />
+          <Connection Source="1" Destination="LOG.QI" dx1="1011.1111" />
+          <Connection Source="t#300ms" Destination="CLK.DT" Comment="Stretched 20% from MODEL.CLOCK.CLK.DT" dx1="1811.1111" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="MONITOR" Type="EMB_RES" x="294.44443" y="344.44443" >
+      <FBNetwork >
+        <FB Name="PRESS" Type="MECH2_DIAGL" x="449.99997" y="11.111111" />
+        <FB Name="TRANSPORT" Type="DSCYL_DIAGL" x="1411.1111" y="11.111111" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="PRESS.INIT" dx1="33.333332" />
+          <Connection Source="PRESS.INITO" Destination="TRANSPORT.INIT" dx1="44.444443" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="&#34;DIAG&#34;" Destination="PRESS.DIAG_ID" dx1="305.55554" />
+          <Connection Source="&#34;PRESS&#34;" Destination="PRESS.SRC" dx1="277.77777" />
+          <Connection Source="&#34;DIAG&#34;" Destination="TRANSPORT.DIAG_ID" dx1="1266.6666" />
+          <Connection Source="&#34;TRANSPORT&#34;" Destination="TRANSPORT.SRC" dx1="1161.1111" />
+          <Connection Source="10" Destination="PRESS.NF" dx1="366.66666" />
+          <Connection Source="10" Destination="PRESS.NR" dx1="366.66666" />
+          <Connection Source="10" Destination="TRANSPORT.NF1" dx1="1327.7777" />
+          <Connection Source="10" Destination="TRANSPORT.NF2" dx1="1327.7777" />
+          <Connection Source="10" Destination="TRANSPORT.NR" dx1="1327.7777" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <FBNetwork >
+      <DataConnections>
+        <Connection Source="1" Destination="LOG.ROWS" dx1="794.4444" />
+        <Connection Source="1" Destination="LOG.COLS" dx1="794.4444" />
+      </DataConnections>
+    </FBNetwork>
+  </Device>
+  <Device Name="CONTROL" Type="FRAME_DEVICE" x="600.0" y="11.111111" >
+    <Resource Name="ASSY_CTL" Type="EMB_RES" x="1694.4443" y="422.2222" >
+      <FBNetwork >
+        <FB Name="TRANSPORT_SENSE" Type="SUBL_3" x="933.3333" y="11.111111" />
+        <FB Name="PRESS_SENSE" Type="SUBL_2" x="1466.6666" y="11.111111" />
+        <FB Name="TRANSPORT_ACT" Type="PUBL_3" x="2111.111" y="11.111111" />
+        <FB Name="PRESS_ACT" Type="PUBL_2" x="2644.4443" y="11.111111" />
+        <FB Name="CTL" Type="ASM_CTL" x="355.55554" y="1088.8888" />
+        <FB Name="RUN" Type="SUBL_1" x="433.3333" y="11.111111" />
+        <EventConnections>
+          <Connection Source="TRANSPORT_SENSE.IND" Destination="CTL.TS" dx1="127.77777" dx2="144.44444" dy="788.88885" />
+          <Connection Source="CTL.TA" Destination="TRANSPORT_ACT.REQ" dx1="972.22217" />
+          <Connection Source="CTL.PA" Destination="PRESS_ACT.REQ" dx1="1527.7777" />
+          <Connection Source="START.COLD" Destination="RUN.INIT" dx1="27.777777" />
+          <Connection Source="RUN.INITO" Destination="TRANSPORT_SENSE.INIT" dx1="27.777777" />
+          <Connection Source="RUN.IND" Destination="CTL.RUN_TRIG" dx1="61.111107" dx2="33.333332" dy="466.66666" />
+          <Connection Source="TRANSPORT_SENSE.INITO" Destination="PRESS_SENSE.INIT" dx1="27.777777" />
+          <Connection Source="PRESS_SENSE.IND" Destination="CTL.PS" dx1="88.888885" dx2="127.77777" dy="2283.3333" />
+          <Connection Source="PRESS_SENSE.INITO" Destination="TRANSPORT_ACT.INIT" dx1="38.888885" />
+          <Connection Source="TRANSPORT_ACT.INITO" Destination="PRESS_ACT.INIT" dx1="44.444443" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="CTL.CYL1_FWD" Destination="TRANSPORT_ACT.SD_1" dx1="1005.55554" />
+          <Connection Source="CTL.CYL2_FWD" Destination="TRANSPORT_ACT.SD_2" dx1="1033.3333" />
+          <Connection Source="CTL.CYL12_REV" Destination="TRANSPORT_ACT.SD_3" dx1="1072.2222" />
+          <Connection Source="CTL.PRESS_FWD" Destination="PRESS_ACT.SD_1" dx1="1572.2222" />
+          <Connection Source="CTL.PRESS_REV" Destination="PRESS_ACT.SD_2" dx1="1616.6666" />
+          <Connection Source="TRANSPORT_SENSE.RD_1" Destination="CTL.T_HOME" dx1="94.44444" dx2="183.33333" dy="405.55554" />
+          <Connection Source="TRANSPORT_SENSE.RD_2" Destination="CTL.T_MID" dx1="50.0" dx2="222.22221" dy="255.55554" />
+          <Connection Source="TRANSPORT_SENSE.RD_3" Destination="CTL.T_END" dx1="27.777777" dx2="277.77777" dy="105.55555" />
+          <Connection Source="PRESS_SENSE.RD_1" Destination="CTL.P_HOME" dx1="61.111107" dx2="66.666664" dy="1911.1111" />
+          <Connection Source="PRESS_SENSE.RD_2" Destination="CTL.P_END" dx1="27.777777" dx2="44.444443" dy="1749.9999" />
+          <Connection Source="RUN.RD_1" Destination="CTL.RUN" dx1="33.333332" dx2="66.666664" dy="94.44444" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="TRANSPORT_SENSORS" Type="PANEL_RESOURCE" x="211.1111" y="11.111111" >
+      <FBNetwork >
+        <FB Name="TRANSPORT_SENSE" Type="SUBL_3" x="94.44444" y="827.7778" />
+        <FB Name="SH" Type="OUT_BOOL" x="1072.2222" y="11.111111" />
+        <FB Name="SM" Type="OUT_BOOL" x="1516.6666" y="488.88885" />
+        <FB Name="SE" Type="OUT_BOOL" x="1988.8888" y="988.88885" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="TRANSPORT_SENSE.INIT" dx1="27.777777" dx2="33.333332" dy="588.88885" />
+          <Connection Source="TRANSPORT_SENSE.INITO" Destination="SH.INIT" dx1="61.111107" />
+          <Connection Source="SH.INITO" Destination="SM.INIT" dx1="66.666664" />
+          <Connection Source="SM.INITO" Destination="SE.INIT" dx1="88.888885" />
+          <Connection Source="TRANSPORT_SENSE.IND" Destination="SH.REQ" dx1="105.55555" dx2="5.8824" dy="764.7059" />
+          <Connection Source="SH.CNF" Destination="SM.REQ" dx1="27.777777" dx2="5.8824" dy="764.7059" />
+          <Connection Source="SM.CNF" Destination="SE.REQ" dx1="27.777777" dx2="5.8824" dy="764.7059" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="TRANSPORT_SENSE.RD_1" Destination="SH.IN" dx1="155.55554" />
+          <Connection Source="TRANSPORT_SENSE.RD_2" Destination="SM.IN" dx1="505.55554" />
+          <Connection Source="TRANSPORT_SENSE.RD_3" Destination="SE.IN" dx1="150.0" />
+          <Connection Source="&#34;TRANSPORT HOME&#34;" Destination="SH.LABEL" dx1="727.7778" />
+          <Connection Source="&#34;TRANSPORT AT MID&#34;" Destination="SM.LABEL" dx1="1155.5555" />
+          <Connection Source="&#34;TRANSPORT AT END&#34;" Destination="SE.LABEL" dx1="1622.2222" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="TRANSPORT_ACTUATORS" Type="PANEL_RESOURCE" x="999.99994" y="11.111111" >
+      <FBNetwork >
+        <FB Name="CYL1" Type="OUT_BOOL" x="650.0" y="61.111107" />
+        <FB Name="CYL2" Type="OUT_BOOL" x="1100.0" y="522.2222" />
+        <FB Name="REV" Type="OUT_BOOL" x="1555.5555" y="977.7777" />
+        <FB Name="TRANSPORT_ACT" Type="SUBL_3" x="77.77777" y="838.88885" />
+        <EventConnections>
+          <Connection Source="CYL1.INITO" Destination="CYL2.INIT" dx1="72.22222" dx2="0.0" dy="-1.0" />
+          <Connection Source="CYL2.INITO" Destination="REV.INIT" dx1="66.666664" dx2="0.0" dy="-1.0" />
+          <Connection Source="CYL2.CNF" Destination="REV.REQ" dx1="27.777777" />
+          <Connection Source="CYL1.CNF" Destination="CYL2.REQ" dx1="27.777777" />
+          <Connection Source="START.COLD" Destination="TRANSPORT_ACT.INIT" dx1="27.777777" dx2="33.333332" dy="544.4444" />
+          <Connection Source="TRANSPORT_ACT.INITO" Destination="CYL1.INIT" dx1="83.33333" />
+          <Connection Source="TRANSPORT_ACT.IND" Destination="CYL1.REQ" dx1="127.77777" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="&#34;CYL2 ADVANCE&#34;" Destination="CYL2.LABEL" dx1="811.1111" />
+          <Connection Source="&#34;RETRACT&#34;" Destination="REV.LABEL" dx1="1344.4443" />
+          <Connection Source="&#34;CYL1 ADVANCE&#34;" Destination="CYL1.LABEL" dx1="361.11108" />
+          <Connection Source="TRANSPORT_ACT.RD_1" Destination="CYL1.IN" dx1="172.22221" />
+          <Connection Source="TRANSPORT_ACT.RD_2" Destination="CYL2.IN" dx1="222.22221" />
+          <Connection Source="TRANSPORT_ACT.RD_3" Destination="REV.IN" dx1="38.888885" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="PRESS_SENSORS" Type="PANEL_RESOURCE" x="233.33333" y="650.0" >
+      <FBNetwork >
+        <FB Name="PRESS_SENSE" Type="SUBL_2" x="483.3333" y="11.111111" />
+        <FB Name="SH" Type="OUT_BOOL" x="977.7777" y="144.44444" />
+        <FB Name="SE" Type="OUT_BOOL" x="1422.2222" y="622.22217" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="PRESS_SENSE.INIT" dx1="61.111107" />
+          <Connection Source="PRESS_SENSE.INITO" Destination="SH.INIT" dx1="66.666664" />
+          <Connection Source="SH.INITO" Destination="SE.INIT" dx1="55.555553" />
+          <Connection Source="PRESS_SENSE.IND" Destination="SH.REQ" dx1="27.777777" dx2="5.8824" dy="764.7059" />
+          <Connection Source="SH.CNF" Destination="SE.REQ" dx1="27.777777" dx2="5.8824" dy="764.7059" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="PRESS_SENSE.RD_1" Destination="SH.IN" dx1="61.111107" />
+          <Connection Source="PRESS_SENSE.RD_2" Destination="SE.IN" dx1="27.777777" />
+          <Connection Source="&#34;PRESS HOME&#34;" Destination="SH.LABEL" dx1="711.1111" />
+          <Connection Source="&#34;PRESS AT END&#34;" Destination="SE.LABEL" dx1="1138.8888" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="PRESS_ACTUATORS" Type="PANEL_RESOURCE" x="994.4444" y="655.55554" >
+      <FBNetwork >
+        <FB Name="FWD" Type="OUT_BOOL" x="638.88885" y="83.33333" />
+        <FB Name="REV" Type="OUT_BOOL" x="1077.7777" y="561.1111" />
+        <FB Name="PRESS_ACT" Type="SUBL_2" x="55.555553" y="833.3333" />
+        <FB Name="RUNSTOP" Type="RADIO_BOOL" x="1677.7777" y="11.111111" />
+        <FB Name="RUN" Type="PUBL_1" x="2244.4443" y="11.111111" />
+        <EventConnections>
+          <Connection Source="FWD.INITO" Destination="REV.INIT" dx1="61.111107" />
+          <Connection Source="FWD.CNF" Destination="REV.REQ" dx1="27.777777" />
+          <Connection Source="START.COLD" Destination="PRESS_ACT.INIT" dx1="27.777777" dx2="38.888885" dy="544.4444" />
+          <Connection Source="PRESS_ACT.INITO" Destination="FWD.INIT" dx1="72.22222" />
+          <Connection Source="PRESS_ACT.IND" Destination="FWD.REQ" dx1="105.55555" />
+          <Connection Source="REV.INITO" Destination="RUNSTOP.INIT" dx1="88.888885" />
+          <Connection Source="RUNSTOP.INITO" Destination="RUN.INIT" dx1="27.777777" />
+          <Connection Source="RUNSTOP.IND" Destination="RUN.REQ" dx1="38.888885" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="&#34;PRESS ADVANCE&#34;" Destination="FWD.LABEL" dx1="322.2222" />
+          <Connection Source="&#34;PRESS RETRACT&#34;" Destination="REV.LABEL" dx1="761.1111" />
+          <Connection Source="PRESS_ACT.RD_1" Destination="FWD.IN" dx1="150.0" />
+          <Connection Source="PRESS_ACT.RD_2" Destination="REV.IN" dx1="222.22221" />
+          <Connection Source="&#34;RUN&#34;" Destination="RUNSTOP.LABEL1" dx1="1544.4443" />
+          <Connection Source="&#34;STOP&#34;" Destination="RUNSTOP.LABEL0" dx1="1522.2222" />
+          <Connection Source="RUNSTOP.OUT" Destination="RUN.SD_1" dx1="77.77777" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <FBNetwork >
+      <DataConnections>
+        <Connection Source="3" Destination="TRANSPORT_SENSORS.ROWS" dx1="144.44444" />
+        <Connection Source="1" Destination="TRANSPORT_SENSORS.COLS" dx1="144.44444" />
+        <Connection Source="3" Destination="TRANSPORT_ACTUATORS.ROWS" dx1="933.3333" />
+        <Connection Source="1" Destination="TRANSPORT_ACTUATORS.COLS" dx1="933.3333" />
+      </DataConnections>
+    </FBNetwork>
+  </Device>
+  <Device Name="MODEL" Type="RMT_FRAME" x="1677.7777" y="11.111111" >
+    <Resource Name="IO" Type="EMB_RES" x="249.99998" y="827.7778" >
+      <FBNetwork >
+        <FB Name="TRANSPORT_SENSE" Type="SUBL_3" x="588.88885" y="11.111111" />
+        <FB Name="TRANSPORT_ACT" Type="PUBL_3" x="2644.4443" y="11.111111" />
+        <FB Name="PRESS_SENSE" Type="SUBL_2" x="588.88885" y="933.3333" />
+        <FB Name="PRESS_ACT" Type="PUBL_2" x="3077.7776" y="344.44443" />
+        <FB Name="PACK" Type="PACK_BYTE" x="1133.3333" y="122.22221" />
+        <FB Name="SVR" Type="SERVER_1" x="1627.7777" y="822.22217" />
+        <FB Name="UNPK" Type="UNPK_BYTE" x="2144.4443" y="233.33333" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="TRANSPORT_SENSE.INIT" dx1="27.777777" />
+          <Connection Source="TRANSPORT_SENSE.IND" Destination="PACK.REQ" dx1="50.0" />
+          <Connection Source="PRESS_SENSE.IND" Destination="PACK.REQ" dx1="77.77777" />
+          <Connection Source="PACK.IND" Destination="SVR.RSP" dx1="66.666664" />
+          <Connection Source="TRANSPORT_SENSE.INITO" Destination="SVR.INIT" dx1="694.4444" />
+          <Connection Source="SVR.IND" Destination="UNPK.REQ" dx1="72.22222" />
+          <Connection Source="SVR.INITO" Destination="TRANSPORT_ACT.INIT" dx1="27.777777" />
+          <Connection Source="UNPK.IND" Destination="TRANSPORT_ACT.REQ" dx1="77.77777" />
+          <Connection Source="TRANSPORT_ACT.CNF" Destination="PRESS_ACT.REQ" dx1="33.333332" dx2="77.77777" dy="772.22217" />
+          <Connection Source="TRANSPORT_ACT.INITO" Destination="PRESS_ACT.INIT" dx1="61.111107" dx2="50.0" dy="916.6666" />
+          <Connection Source="PRESS_ACT.INITO" Destination="PRESS_SENSE.INIT" dx1="27.777777" dx2="61.111107" dy="1272.2222" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="TRANSPORT_SENSE.RD_1" Destination="PACK.IN0" dx1="172.22221" />
+          <Connection Source="TRANSPORT_SENSE.RD_2" Destination="PACK.IN1" dx1="161.1111" />
+          <Connection Source="TRANSPORT_SENSE.RD_3" Destination="PACK.IN2" dx1="150.0" />
+          <Connection Source="PRESS_SENSE.RD_1" Destination="PACK.IN3" dx1="122.22221" />
+          <Connection Source="PRESS_SENSE.RD_2" Destination="PACK.IN4" dx1="161.1111" />
+          <Connection Source="PACK.OUT" Destination="SVR.SD_1" dx1="27.777777" />
+          <Connection Source="1" Destination="SVR.QI" dx1="1561.1111" />
+          <Connection Source="&#34;localhost:4444&#34;" Destination="SVR.ID" dx1="1361.1111" />
+          <Connection Source="SVR.RD_1" Destination="UNPK.IN" dx1="116.666664" />
+          <Connection Source="UNPK.OUT0" Destination="TRANSPORT_ACT.SD_1" dx1="105.55555" />
+          <Connection Source="UNPK.OUT1" Destination="TRANSPORT_ACT.SD_2" dx1="100.0" />
+          <Connection Source="UNPK.OUT2" Destination="TRANSPORT_ACT.SD_3" dx1="94.44444" />
+          <Connection Source="UNPK.OUT3" Destination="PRESS_ACT.SD_1" dx1="255.55554" />
+          <Connection Source="UNPK.OUT4" Destination="PRESS_ACT.SD_2" dx1="222.22221" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="CLOCK" Type="EMB_RES" x="300.0" y="483.3333" >
+      <FBNetwork >
+        <FB Name="CLK" Type="E_CYCLE" x="933.3333" y="455.55554" />
+        <FB Name="SIM_CLK" Type="PUBL_0" x="527.7778" y="11.111111" />
+        <EventConnections>
+          <Connection Source="START.STOP" Destination="CLK.STOP" dx1="33.333332" />
+          <Connection Source="START.COLD" Destination="SIM_CLK.INIT" dx1="144.44444" />
+          <Connection Source="SIM_CLK.INITO" Destination="CLK.START" dx1="27.777777" />
+          <Connection Source="CLK.EO" Destination="SIM_CLK.REQ" dx1="27.777777" dx2="44.444443" dy="577.7778" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="t#250ms" Destination="CLK.DT" dx1="772.22217" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="TRANSPORT_MDL" Type="PANEL_RESOURCE" x="849.99994" y="633.3333" >
+      <FBNetwork >
+        <FB Name="TRANSPORT" Type="DSCYL_MDLL" x="550.0" y="11.111111" />
+        <FB Name="UNLD" Type="E_R_TRIG" x="1327.7777" y="1622.2222" />
+        <FB Name="ASM" Type="LOADL" x="2288.889" y="11.111111" />
+        <FB Name="LD_TRIG" Type="E_R_TRIG" x="1338.8888" y="1011.1111" />
+        <FB Name="ASSEMBLE" Type="SUBL_0" x="1277.7777" y="11.111111" />
+        <FB Name="LOAD" Type="LOADL" x="2294.4443" y="1122.2222" />
+        <EventConnections>
+          <Connection Source="TRANSPORT.INDS" Destination="UNLD.EI" dx1="144.44444" />
+          <Connection Source="TRANSPORT.INDS" Destination="LD_TRIG.EI" dx1="144.44444" />
+          <Connection Source="START.COLD" Destination="TRANSPORT.INIT" dx1="44.444443" />
+          <Connection Source="TRANSPORT.INITO" Destination="ASSEMBLE.INIT" dx1="100.0" />
+          <Connection Source="ASSEMBLE.INITO" Destination="ASM.INIT" dx1="44.444443" />
+          <Connection Source="ASSEMBLE.IND" Destination="ASM.REQ" dx1="61.111107" />
+          <Connection Source="UNLD.EO" Destination="TRANSPORT.UNLD" dx1="27.777777" dx2="161.1111" dy="483.3333" />
+          <Connection Source="ASM.INITO" Destination="LOAD.INIT" dx1="27.777777" dx2="133.33333" dy="927.7778" />
+          <Connection Source="LOAD.INITO" Destination="LOAD.REQ" dx1="150.0" dx2="133.33333" dy="-183.33333" />
+          <Connection Source="LD_TRIG.EO" Destination="LOAD.REQ" dx1="27.777777" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="TRANSPORT.END" Destination="UNLD.QI" dx1="50.0" />
+          <Connection Source="TRANSPORT.HOME" Destination="LD_TRIG.QI" dx1="83.33333" />
+          <Connection Source="10" Destination="TRANSPORT.VF1" dx1="466.66666" />
+          <Connection Source="10" Destination="TRANSPORT.VF2" dx1="466.66666" />
+          <Connection Source="10" Destination="TRANSPORT.VR" dx1="466.66666" />
+          <Connection Source="0.5" Destination="TRANSPORT.ETA" dx1="455.55554" />
+          <Connection Source="[255,0,255]" Destination="ASM.WKPC" dx1="2088.889" />
+          <Connection Source="VSTYLE#PEGRING" Destination="ASM.STYLE" dx1="1977.7777" />
+          <Connection Source="&#34;TRANSPORT_LOAD&#34;" Destination="ASM.ID" dx1="1944.4443" />
+          <Connection Source="VSTYLE#PEG" Destination="LOAD.STYLE" dx1="2055.5554" />
+          <Connection Source="COLOR#lightGray" Destination="LOAD.WKPC" dx1="2011.1111" />
+          <Connection Source="&#34;TRANSPORT_LOAD&#34;" Destination="LOAD.ID" dx1="1949.9999" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="PRESS_MDL" Type="PANEL_RESOURCE" x="816.6666" y="11.111111" >
+      <FBNetwork >
+        <FB Name="PRESS" Type="XBAR_MDLL" x="611.1111" y="11.111111" />
+        <FB Name="ASM_TRIG" Type="E_R_TRIG" Comment="Gate for assembly event" x="1416.6666" y="805.55554" />
+        <FB Name="ASSEMBLE" Type="PUBL_0" x="1977.7777" y="11.111111" />
+        <FB Name="LD_TRIG" Type="E_R_TRIG" x="1438.8888" y="233.33333" />
+        <FB Name="LOAD" Type="LOADL" x="2611.111" y="499.99997" />
+        <EventConnections>
+          <Connection Source="ASM_TRIG.EO" Destination="ASSEMBLE.REQ" dx1="155.55554" />
+          <Connection Source="START.COLD" Destination="PRESS.INIT" dx1="27.777777" />
+          <Connection Source="PRESS.IND" Destination="LD_TRIG.EI" dx1="100.0" />
+          <Connection Source="PRESS.IND" Destination="ASM_TRIG.EI" dx1="100.0" />
+          <Connection Source="PRESS.INITO" Destination="ASSEMBLE.INIT" dx1="111.11111" />
+          <Connection Source="ASSEMBLE.CNF" Destination="PRESS.UNLD" dx1="83.33333" dx2="183.33333" dy="1466.6666" />
+          <Connection Source="ASSEMBLE.INITO" Destination="LOAD.INIT" dx1="216.66666" />
+          <Connection Source="LD_TRIG.EO" Destination="LOAD.REQ" dx1="38.888885" />
+          <Connection Source="LOAD.INITO" Destination="LOAD.REQ" dx1="27.777777" dx2="161.1111" dy="916.6666" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="PRESS.END" Destination="ASM_TRIG.QI" dx1="27.777777" />
+          <Connection Source="10" Destination="PRESS.VF" dx1="527.7778" />
+          <Connection Source="10" Destination="PRESS.VR" dx1="527.7778" />
+          <Connection Source="PRESS.HOME" Destination="LD_TRIG.QI" dx1="44.444443" />
+          <Connection Source="VSTYLE#RING" Destination="LOAD.STYLE" dx1="2361.111" />
+          <Connection Source="[255,0,255]" Destination="LOAD.WKPC" dx1="2411.111" />
+          <Connection Source="&#34;PRESS_LOAD&#34;" Destination="LOAD.ID" dx1="2350.0" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="ASSEMBLY" Type="VIEW_PANEL" x="1761.1111" y="11.111111" >
+      <FBNetwork >
+        <FB Name="SP1" Type="XSPACE" x="638.88885" y="272.2222" />
+        <FB Name="PRESS" Type="MECH_VIEWL" Comment="Vertical press element" x="1088.8888" y="583.3333" />
+        <FB Name="SP2" Type="XSPACE" x="1799.9999" y="11.111111" />
+        <FB Name="TRANSPORT" Type="MECH_VIEWL" Comment="Dual-Cylinder Transport Mechanism" x="2288.889" y="11.111111" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="SP1.INIT" dx1="55.555553" />
+          <Connection Source="SP1.INITO" Destination="PRESS.INIT" dx1="61.111107" />
+          <Connection Source="PRESS.INITO" Destination="SP2.INIT" dx1="44.444443" />
+          <Connection Source="SP2.INITO" Destination="TRANSPORT.INIT" dx1="27.777777" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="COLOR#gray" Destination="PRESS.BKGD" dx1="866.6666" />
+          <Connection Source="3" Destination="PRESS.LEN" dx1="1022.22217" />
+          <Connection Source="25" Destination="PRESS.DIA" dx1="1005.55554" />
+          <Connection Source="1" Destination="PRESS.DIR" dx1="1022.22217" />
+          <Connection Source="[&#34;&#34;,&#34;&#34;,PART2,PART1]" Destination="SP1.LBLS" dx1="316.66666" />
+          <Connection Source="[3,3]" Destination="SP1.DIMS" dx1="533.3333" />
+          <Connection Source="25" Destination="SP1.DIA" dx1="555.55554" />
+          <Connection Source="[PressFit,&#34;&#34;,&#34;&#34;,Transport]" Destination="SP2.LBLS" dx1="1444.4443" />
+          <Connection Source="[3,3]" Destination="SP2.DIMS" dx1="1694.4443" />
+          <Connection Source="25" Destination="SP2.DIA" dx1="1716.6666" />
+          <Connection Source="7" Destination="TRANSPORT.LEN" dx1="2222.2222" />
+          <Connection Source="25" Destination="TRANSPORT.DIA" dx1="2205.5554" />
+          <Connection Source="0" Destination="TRANSPORT.DIR" dx1="2222.2222" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <FBNetwork >
+      <DataConnections>
+        <Connection Source="0" Destination="ASSEMBLY.TRACE" dx1="1694.4443" />
+        <Connection Source="25" Destination="ASSEMBLY.DIA" dx1="1677.7777" />
+        <Connection Source="[7,5]" Destination="ASSEMBLY.SIZE" dx1="1649.9999" />
+        <Connection Source="0" Destination="ASSEMBLY.VERTICAL" dx1="1694.4443" />
+      </DataConnections>
+    </FBNetwork>
+  </Device>
+  <DeviceParameters>
+    <Connection Source="[380,100,185,150]" Destination="MODEL.BOUNDS" dx1="1383.3333" />
+    <Connection Source="[100,100,280,150]" Destination="CONTROL.BOUNDS" dx1="305.55554" />
+    <Connection Source="[2,2]" Destination="CONTROL.GRID" dx1="488.88885" />
+    <Connection Source="[100,250,465,150]" Destination="DIAGNOSTICS.BOUNDS" dx1="849.99994" />
+    <Connection Source="[1,1]" Destination="DIAGNOSTICS.GRID" dx1="1033.3333" />
+  </DeviceParameters>
+</System>

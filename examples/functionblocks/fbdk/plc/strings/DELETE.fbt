@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="DELETE" Comment="IEC 61131-3,Table 29#7" >
+  <Identification Standard="61131-3" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2004-12-15" Remarks="Converted from SRC format." />
+  <CompilerInfo header="package fb.rt.plc.strings;" >
+  </CompilerInfo>
+  <InterfaceList>
+    <InputVars>
+      <VarDeclaration Name="IN" Type="WSTRING" />
+      <VarDeclaration Name="L" Type="UINT" />
+      <VarDeclaration Name="P" Type="UINT" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="OUT" Type="WSTRING" />
+    </OutputVars>
+  </InterfaceList>
+</FBType>

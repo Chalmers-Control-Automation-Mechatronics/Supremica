@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE System SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<System xmlns="http://www.holobloc.com/xml/LibraryElement" Name="RMT_DEV_TEST" Comment="RMT_DEV Test with FB_ADD_REAL and E_CTU" >
+  <Identification Standard="61499 Feasibility Demo ITA" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.5" Author="JHC" Date="2001-06-05" Remarks="Changed GUI to IN_ANY, OUT_ANY." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.4" Author="JHC" Date="2001-05-22" Remarks="Corrected UDP addresses." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.3" Author="JHC" Date="2001-04-26" Remarks="Added TEST1, TEST2 applications." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.2" Author="JHC" Date="2001-02-21" Remarks="Made all UDP sockets on 224.0.0.1 to work offline." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2001-01-05" Remarks="Added remote counter" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2001-01-03" />
+  <Application Name="TEST1" Comment="FB_ADD_REAL test" >
+    <FBNetwork >
+      <FB Name="IN1" Type="IN_ANY" x="288.2353" y="11.7647" />
+      <FB Name="PLUS" Type="FB_LABEL" x="241.1765" y="1082.3529" />
+      <FB Name="IN2" Type="IN_ANY" x="1017.6470" y="11.7647" />
+      <FB Name="AD" Type="FB_ADD_REAL" x="1529.4117" y="717.6470" />
+      <FB Name="EQUALS" Type="FB_LABEL" x="1588.2352" y="11.7647" />
+      <FB Name="OUT" Type="OUT_ANY" x="2276.4705" y="11.7647" />
+      <EventConnections>
+        <Connection Source="IN1.INITO" Destination="PLUS.INIT" dx1="41.1765" dx2="117.6471" dy="882.3529" />
+        <Connection Source="PLUS.INITO" Destination="IN2.INIT" dx1="170.5882" dx2="29.4118" dy="29.4118" />
+        <Connection Source="IN2.INITO" Destination="EQUALS.INIT" dx1="23.5294" />
+        <Connection Source="EQUALS.INITO" Destination="OUT.INIT" dx1="11.7647" />
+        <Connection Source="IN1.IND" Destination="IN2.REQ" dx1="123.5294" dx2="105.8824" dy="564.7059" />
+        <Connection Source="IN2.IND" Destination="AD.REQ" dx1="70.5882" dx2="11.7647" dy="647.0588" />
+        <Connection Source="AD.CNF" Destination="OUT.REQ" dx1="64.7059" />
+      </EventConnections>
+      <DataConnections>
+        <Connection Source="1" Destination="IN1.QI" dx1="223.5294" />
+        <Connection Source="1" Destination="IN2.QI" dx1="952.9412" />
+        <Connection Source="1" Destination="OUT.QI" dx1="2211.7646" />
+        <Connection Source="1" Destination="PLUS.QI" dx1="176.4706" />
+        <Connection Source="1" Destination="EQUALS.QI" dx1="1523.5294" />
+        <Connection Source="&#34;+&#34;" Destination="PLUS.LABEL" dx1="152.9412" />
+        <Connection Source="&#34;=&#34;" Destination="EQUALS.LABEL" dx1="1500" />
+        <Connection Source="IN1.OUT" Destination="AD.IN1" dx1="82.3529" />
+        <Connection Source="IN2.OUT" Destination="AD.IN2" dx1="29.4118" dx2="52.9412" dy="1258.8235" />
+        <Connection Source="AD.OUT" Destination="OUT.IN" dx1="135.2941" />
+        <Connection Source="&#34;REAL&#34;" Destination="IN1.TYPE" dx1="141.1765" />
+        <Connection Source="&#34;REAL&#34;" Destination="IN2.TYPE" dx1="870.5882" />
+        <Connection Source="&#34;REAL&#34;" Destination="OUT.TYPE" dx1="2129.4116" />
+        <Connection Source="10.0" Destination="IN1.IVAL" dx1="176.4706" />
+        <Connection Source="20.0" Destination="IN2.IVAL" dx1="905.8823" />
+      </DataConnections>
+    </FBNetwork>
+  </Application>
+  <Application Name="TEST2" Comment="E_CTU test" >
+    <FBNetwork >
+      <FB Name="RUNSTOP" Type="RADIO_BOOL" x="311.7647" y="11.7647" />
+      <FB Name="RESET" Type="IN_EVENT" x="1235.2941" y="11.7647" />
+      <FB Name="PV" Type="IN_ANY" x="1764.7058" y="11.7647" />
+      <FB Name="DT" Type="IN_ANY" x="2452.9412" y="11.7647" />
+      <FB Name="RSSW" Type="E_SWITCH" x="241.1765" y="1270.5883" />
+      <FB Name="CLK" Type="E_CYCLE" x="752.9412" y="1382.3529" />
+      <FB Name="CTR" Type="E_CTU" x="1276.4706" y="1529.4117" />
+      <FB Name="Q" Type="OUT_BOOL" x="2017.647" y="1117.6471" />
+      <FB Name="CV" Type="OUT_ANY" x="2670.5881" y="1117.6471" />
+      <EventConnections>
+        <Connection Source="RUNSTOP.INITO" Destination="RESET.INIT" dx1="52.9412" />
+        <Connection Source="RESET.INITO" Destination="PV.INIT" dx1="23.5294" />
+        <Connection Source="PV.INITO" Destination="DT.INIT" dx1="41.1765" dx2="141.1765" dy="1905.8823" />
+        <Connection Source="DT.INITO" Destination="Q.INIT" dx1="70.5882" dx2="129.4118" dy="911.7647" />
+        <Connection Source="Q.INITO" Destination="CV.INIT" dx1="76.4706" dx2="5.8824" dy="-1" />
+        <Connection Source="RUNSTOP.IND" Destination="RSSW.EI" dx1="76.4706" dx2="47.0588" dy="829.4117" />
+        <Connection Source="RSSW.EO0" Destination="CLK.STOP" dx1="111.7647" />
+        <Connection Source="RSSW.EO1" Destination="CLK.START" dx1="176.4706" />
+        <Connection Source="CLK.EO" Destination="CTR.CU" dx1="35.2941" />
+        <Connection Source="RESET.IND" Destination="CTR.R" dx1="35.2941" dx2="100" dy="658.8235" />
+        <Connection Source="CTR.CUO" Destination="Q.REQ" dx1="70.5882" />
+        <Connection Source="CTR.RO" Destination="Q.REQ" dx1="70.5882" />
+        <Connection Source="Q.CNF" Destination="CV.REQ" dx1="41.1765" dx2="11.7647" dy="-1" />
+      </EventConnections>
+      <DataConnections>
+        <Connection Source="1" Destination="CV.QI" dx1="2605.8823" />
+        <Connection Source="1" Destination="DT.QI" dx1="2388.2354" />
+        <Connection Source="1" Destination="PV.QI" dx1="1700" />
+        <Connection Source="1" Destination="Q.QI" dx1="1952.9412" />
+        <Connection Source="1" Destination="RESET.QI" dx1="1170.5883" />
+        <Connection Source="1" Destination="RUNSTOP.QI" dx1="247.0588" />
+        <Connection Source="&#34;STOP&#34;" Destination="RUNSTOP.LABEL0" dx1="152.9412" />
+        <Connection Source="&#34;RUN&#34;" Destination="RUNSTOP.LABEL1" dx1="176.4706" />
+        <Connection Source="&#34;RESET&#34;" Destination="RESET.LABEL" dx1="1058.8235" />
+        <Connection Source="&#34;Q&#34;" Destination="Q.LABEL" dx1="1923.5294" />
+        <Connection Source="COLOR#red" Destination="Q.C0" dx1="1800" />
+        <Connection Source="COLOR#green" Destination="Q.C1" dx1="1764.7058" />
+        <Connection Source="RUNSTOP.OUT" Destination="RSSW.G" dx1="47.0588" dx2="147.0588" dy="329.4117" />
+        <Connection Source="PV.OUT" Destination="CTR.PV" dx1="41.1765" dx2="52.9412" dy="323.5294" />
+        <Connection Source="DT.OUT" Destination="CLK.DT" dx1="282.3529" dx2="141.1765" dy="1641.1764" />
+        <Connection Source="CTR.Q" Destination="Q.IN" dx1="52.9412" />
+        <Connection Source="CTR.CV" Destination="CV.IN" dx1="882.3529" />
+        <Connection Source="&#34;UINT&#34;" Destination="CV.TYPE" dx1="2529.4116" />
+        <Connection Source="10" Destination="PV.IVAL" dx1="1682.3529" />
+        <Connection Source="&#34;UINT&#34;" Destination="PV.TYPE" dx1="1623.5294" />
+        <Connection Source="&#34;TIME&#34;" Destination="DT.TYPE" dx1="2305.8823" />
+        <Connection Source="t#500ms" Destination="DT.IVAL" dx1="2288.2354" />
+      </DataConnections>
+    </FBNetwork>
+  </Application>
+  <Device Name="DEV_TESTER" Type="FRAME_DEVICE" x="576.4706" y="88.2353" >
+    <Resource Name="RES1" Type="PANEL_RESOURCE" x="235.2941" y="111.7647" >
+      <FBNetwork >
+        <FB Name="IN1" Type="IN_ANY" x="635.2941" y="11.7647" />
+        <FB Name="PLUS" Type="FB_LABEL" x="194.1176" y="1141.1764" />
+        <FB Name="IN2" Type="IN_ANY" x="688.2353" y="1141.1764" />
+        <FB Name="PUB" Type="PUBLISH_2" x="1764.7058" y="11.7647" />
+        <FB Name="SB" Type="SUBSCRIBE_1" x="1652.9412" y="1064.7058" />
+        <FB Name="EQUALS" Type="FB_LABEL" x="2382.3528" y="11.7647" />
+        <FB Name="OUT" Type="OUT_ANY" x="2941.1765" y="11.7647" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="IN1.INIT" dx1="76.4706" dx2="17.6471" dy="170.5882" />
+          <Connection Source="START.WARM" Destination="IN1.INIT" dx1="76.4706" dx2="29.4118" dy="170.5882" />
+          <Connection Source="IN1.INITO" Destination="PLUS.INIT" dx1="94.1176" dx2="64.7059" dy="888.2353" />
+          <Connection Source="PLUS.INITO" Destination="IN2.INIT" dx1="117.6471" dx2="147.0588" dy="717.647" />
+          <Connection Source="IN2.INITO" Destination="PUB.INIT" dx1="82.3529" />
+          <Connection Source="PUB.INITO" Destination="SB.INIT" dx1="47.0588" dx2="70.5882" dy="900" />
+          <Connection Source="SB.INITO" Destination="EQUALS.INIT" dx1="135.2941" />
+          <Connection Source="EQUALS.INITO" Destination="OUT.INIT" dx1="70.5882" />
+          <Connection Source="IN1.IND" Destination="IN2.REQ" dx1="58.8235" dx2="105.8824" dy="835.2941" />
+          <Connection Source="IN2.IND" Destination="PUB.REQ" dx1="135.2941" />
+          <Connection Source="SB.IND" Destination="OUT.REQ" dx1="682.3529" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="&#34;225.0.0.1:1025&#34;" Destination="SB.ID" dx1="1370.5883" />
+          <Connection Source="&#34;225.0.0.2:1026&#34;" Destination="PUB.ID" dx1="1482.3529" />
+          <Connection Source="1" Destination="IN1.QI" dx1="570.5882" />
+          <Connection Source="1" Destination="IN2.QI" dx1="623.5294" />
+          <Connection Source="1" Destination="PUB.QI" dx1="1700" />
+          <Connection Source="1" Destination="SB.QI" dx1="1588.2352" />
+          <Connection Source="1" Destination="OUT.QI" dx1="2876.4705" />
+          <Connection Source="1" Destination="PLUS.QI" dx1="129.4118" />
+          <Connection Source="1" Destination="EQUALS.QI" dx1="2317.647" />
+          <Connection Source="&#34;+&#34;" Destination="PLUS.LABEL" dx1="105.8824" />
+          <Connection Source="&#34;=&#34;" Destination="EQUALS.LABEL" dx1="2294.1177" />
+          <Connection Source="IN1.OUT" Destination="PUB.SD_1" dx1="252.9412" />
+          <Connection Source="IN2.OUT" Destination="PUB.SD_2" dx1="364.7059" />
+          <Connection Source="SB.RD_1" Destination="OUT.IN" dx1="747.0588" />
+          <Connection Source="&#34;REAL&#34;" Destination="IN1.TYPE" dx1="488.2353" />
+          <Connection Source="&#34;REAL&#34;" Destination="IN2.TYPE" dx1="541.1765" />
+          <Connection Source="&#34;REAL&#34;" Destination="OUT.TYPE" dx1="2794.1177" />
+          <Connection Source="10.0" Destination="IN1.IVAL" dx1="523.5294" />
+          <Connection Source="20.0" Destination="IN2.IVAL" dx1="576.4706" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="RES2" Type="PANEL_RESOURCE" x="1017.647" y="105.8824" >
+      <FBNetwork >
+        <FB Name="RUNSTOP" Type="RADIO_BOOL" x="605.8823" y="11.7647" />
+        <FB Name="RESET" Type="IN_EVENT" x="382.3529" y="1211.7646" />
+        <FB Name="PUB0" Type="PUBLISH_0" x="829.4117" y="1376.4706" />
+        <FB Name="PV" Type="IN_ANY" x="1400" y="11.7647" />
+        <FB Name="PV_LBL" Type="FB_LABEL" x="1376.4706" y="1323.5294" />
+        <FB Name="DT" Type="IN_ANY" x="2094.1177" y="11.7647" />
+        <FB Name="DT_LBL" Type="FB_LABEL" x="1952.9412" y="1400" />
+        <FB Name="PUB" Type="PUBLISH_3" x="2717.647" y="335.2941" />
+        <FB Name="SB" Type="SUBSCRIBE_2" x="2623.5293" y="1611.7646" />
+        <FB Name="Q" Type="OUT_BOOL" x="3547.0588" y="1429.4117" />
+        <FB Name="CV" Type="OUT_ANY" x="3529.4116" y="217.6470" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="RUNSTOP.INIT" dx1="47.0588" />
+          <Connection Source="START.WARM" Destination="RUNSTOP.INIT" dx1="47.0588" />
+          <Connection Source="RUNSTOP.INITO" Destination="RESET.INIT" dx1="47.0588" dx2="88.2353" dy="994.1176" />
+          <Connection Source="RESET.INITO" Destination="PUB0.INIT" dx1="88.2353" />
+          <Connection Source="PUB0.INITO" Destination="PV.INIT" dx1="29.4118" />
+          <Connection Source="PV.INITO" Destination="PV_LBL.INIT" dx1="41.1765" dx2="41.1765" dy="1141.1764" />
+          <Connection Source="PV_LBL.INITO" Destination="DT.INIT" dx1="164.7059" dx2="141.1765" dy="1905.8823" />
+          <Connection Source="DT.INITO" Destination="DT_LBL.INIT" dx1="135.2941" dx2="29.4118" dy="1141.1764" />
+          <Connection Source="DT_LBL.INITO" Destination="PUB.INIT" dx1="329.4117" />
+          <Connection Source="PUB.INITO" Destination="SB.INIT" dx1="35.2941" dx2="41.1765" dy="1117.6471" />
+          <Connection Source="SB.INITO" Destination="CV.INIT" dx1="100" />
+          <Connection Source="CV.INITO" Destination="Q.INIT" dx1="41.1765" dx2="35.2941" dy="1023.5294" />
+          <Connection Source="RUNSTOP.CNF" Destination="PV.REQ" dx1="105.8824" />
+          <Connection Source="RUNSTOP.IND" Destination="PV.REQ" dx1="100" />
+          <Connection Source="RESET.IND" Destination="PUB0.REQ" dx1="41.1765" />
+          <Connection Source="PV.IND" Destination="DT.REQ" dx1="17.6471" dx2="82.3529" dy="1723.5294" />
+          <Connection Source="DT.IND" Destination="PUB.REQ" dx1="58.8235" />
+          <Connection Source="SB.IND" Destination="Q.REQ" dx1="158.8235" />
+          <Connection Source="Q.CNF" Destination="CV.REQ" dx1="70.5882" dx2="129.4118" dy="-1476.4706" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="1" Destination="CV.QI" dx1="3464.7058" />
+          <Connection Source="1" Destination="DT.QI" dx1="2029.4117" />
+          <Connection Source="1" Destination="PUB.QI" dx1="2652.9412" />
+          <Connection Source="1" Destination="PUB0.QI" dx1="764.7059" />
+          <Connection Source="1" Destination="PV.QI" dx1="1335.2941" />
+          <Connection Source="1" Destination="Q.QI" dx1="3482.3528" />
+          <Connection Source="1" Destination="RESET.QI" dx1="317.6471" />
+          <Connection Source="1" Destination="RUNSTOP.QI" dx1="541.1765" />
+          <Connection Source="1" Destination="SB.QI" dx1="2558.8235" />
+          <Connection Source="1" Destination="PV_LBL.QI" dx1="1311.7646" />
+          <Connection Source="1" Destination="DT_LBL.QI" dx1="1888.2352" />
+          <Connection Source="&#34;STOP&#34;" Destination="RUNSTOP.LABEL0" dx1="447.0588" />
+          <Connection Source="&#34;RUN&#34;" Destination="RUNSTOP.LABEL1" dx1="470.5882" />
+          <Connection Source="&#34;RESET&#34;" Destination="RESET.LABEL" dx1="205.8824" />
+          <Connection Source="&#34;PV&#34;" Destination="PV_LBL.LABEL" dx1="1264.7058" />
+          <Connection Source="&#34;DT&#34;" Destination="DT_LBL.LABEL" dx1="1841.1764" />
+          <Connection Source="&#34;Q&#34;" Destination="Q.LABEL" dx1="3452.9412" />
+          <Connection Source="COLOR#red" Destination="Q.C0" dx1="3329.4116" />
+          <Connection Source="COLOR#green" Destination="Q.C1" dx1="3294.1177" />
+          <Connection Source="RUNSTOP.OUT" Destination="PUB.SD_1" dx1="82.3529" />
+          <Connection Source="PV.OUT" Destination="PUB.SD_3" dx1="88.2353" />
+          <Connection Source="DT.OUT" Destination="PUB.SD_2" dx1="52.9412" />
+          <Connection Source="SB.RD_1" Destination="Q.IN" dx1="82.3529" />
+          <Connection Source="SB.RD_2" Destination="CV.IN" dx1="211.7647" />
+          <Connection Source="&#34;225.0.0.3:1027&#34;" Destination="PUB.ID" dx1="2435.2942" />
+          <Connection Source="&#34;225.0.0.4:1028&#34;" Destination="SB.ID" dx1="2341.1765" />
+          <Connection Source="&#34;225.0.0.5:1029&#34;" Destination="PUB0.ID" dx1="547.0588" />
+          <Connection Source="&#34;UINT&#34;" Destination="CV.TYPE" dx1="3388.2354" />
+          <Connection Source="10" Destination="PV.IVAL" dx1="1317.647" />
+          <Connection Source="&#34;UINT&#34;" Destination="PV.TYPE" dx1="1258.8235" />
+          <Connection Source="&#34;TIME&#34;" Destination="DT.TYPE" dx1="1947.0588" />
+          <Connection Source="t#500ms" Destination="DT.IVAL" dx1="1929.4117" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <FBNetwork >
+      <DataConnections>
+        <Connection Source="1" Destination="RES1.TRACE" dx1="170.5882" />
+      </DataConnections>
+    </FBNetwork>
+  </Device>
+  <Device Name="DEV1" Type="RMT_DEV" x="1252.9412" y="364.7059" >
+    <Resource Name="RES1" Type="EMB_RES" x="176.4706" y="782.3529" >
+      <FBNetwork >
+        <FB Name="FF" Type="E_SR" x="635.2941" y="11.7647" />
+        <FB Name="SB" Type="SUBSCRIBE_2" x="1005.8823" y="11.7647" />
+        <FB Name="AD" Type="FB_ADD_REAL" x="1752.9412" y="705.8823" />
+        <FB Name="PUB" Type="PUBLISH_1" x="2647.0588" y="11.7647" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="FF.S" dx1="29.4118" dx2="5.8824" dy="-70.5882" />
+          <Connection Source="START.WARM" Destination="FF.S" dx1="52.9412" dx2="11.7647" dy="-188.2353" />
+          <Connection Source="START.STOP" Destination="FF.R" dx1="82.3529" dx2="17.6471" dy="-311.7647" />
+          <Connection Source="FF.EO" Destination="SB.INIT" dx1="23.5294" />
+          <Connection Source="SB.INITO" Destination="PUB.INIT" dx1="158.8235" />
+          <Connection Source="SB.IND" Destination="AD.REQ" dx1="270.5882" />
+          <Connection Source="AD.CNF" Destination="PUB.REQ" dx1="147.0588" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="SB.RD_1" Destination="AD.IN1" dx1="135.2941" />
+          <Connection Source="SB.RD_2" Destination="AD.IN2" dx1="88.2353" />
+          <Connection Source="AD.OUT" Destination="PUB.SD_1" dx1="270.5882" />
+          <Connection Source="FF.Q" Destination="SB.QI" dx1="88.2353" />
+          <Connection Source="SB.QO" Destination="PUB.QI" dx1="282.3529" />
+          <Connection Source="&#34;225.0.0.2:1026&#34;" Destination="SB.ID" dx1="723.5294" />
+          <Connection Source="&#34;225.0.0.1:1025&#34;" Destination="PUB.ID" dx1="2364.7058" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="RES2" Type="EMB_RES" x="670.5882" y="776.4706" >
+      <FBNetwork >
+        <FB Name="SB" Type="SUBSCRIBE_3" x="1547.0588" y="11.7647" />
+        <FB Name="RST" Type="SUBSCRIBE_0" x="552.9412" y="123.5294" />
+        <FB Name="RUNSTOP" Type="E_SWITCH" x="135.2941" y="1264.7058" />
+        <FB Name="CLK" Type="E_CYCLE" x="623.5294" y="1288.2352" />
+        <FB Name="CTR" Type="E_CTU" x="1188.2352" y="1288.2352" />
+        <FB Name="PUB" Type="PUBLISH_2" x="2200" y="1064.7058" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="RST.INIT" dx1="52.9412" dx2="35.2941" dy="170.5882" />
+          <Connection Source="START.WARM" Destination="RST.INIT" dx1="17.6471" dx2="35.2941" dy="282.3529" />
+          <Connection Source="RST.INITO" Destination="SB.INIT" dx1="70.5882" dx2="23.5294" dy="-1" />
+          <Connection Source="SB.INITO" Destination="PUB.INIT" dx1="152.9412" dx2="11.7647" dy="-1" />
+          <Connection Source="SB.IND" Destination="RUNSTOP.EI" dx1="105.8824" dx2="58.8235" dy="982.3529" />
+          <Connection Source="RUNSTOP.EO0" Destination="CLK.STOP" dx1="52.9412" />
+          <Connection Source="RUNSTOP.EO1" Destination="CLK.START" dx1="94.1176" />
+          <Connection Source="CLK.EO" Destination="CTR.CU" dx1="123.5294" dx2="5.8824" dy="-117.6471" />
+          <Connection Source="RST.IND" Destination="CTR.R" dx1="82.3529" dx2="35.2941" dy="-1" />
+          <Connection Source="CTR.CUO" Destination="PUB.REQ" dx1="94.1176" dx2="29.4118" dy="-1" />
+          <Connection Source="CTR.RO" Destination="PUB.REQ" dx1="94.1176" dx2="29.4118" dy="-1" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="1" Destination="PUB.QI" dx1="2135.2942" />
+          <Connection Source="1" Destination="SB.QI" dx1="1482.3529" />
+          <Connection Source="1" Destination="RST.QI" dx1="488.2353" />
+          <Connection Source="SB.RD_1" Destination="RUNSTOP.G" dx1="41.1765" dx2="100" dy="364.7059" />
+          <Connection Source="SB.RD_2" Destination="CLK.DT" dx1="747.0588" dx2="35.2941" dy="1217.6471" />
+          <Connection Source="SB.RD_3" Destination="CTR.PV" dx1="682.3529" dx2="64.7059" dy="1058.8235" />
+          <Connection Source="CTR.Q" Destination="PUB.SD_1" dx1="129.4118" dx2="17.6471" dy="488.2353" />
+          <Connection Source="CTR.CV" Destination="PUB.SD_2" dx1="141.1765" dx2="11.7647" dy="341.1765" />
+          <Connection Source="&#34;225.0.0.3:1027&#34;" Destination="SB.ID" dx1="1264.7058" dx2="29.4118" dy="717.647" />
+          <Connection Source="&#34;225.0.0.4:1028&#34;" Destination="PUB.ID" dx1="1917.647" dx2="29.4118" dy="1770.5883" />
+          <Connection Source="&#34;225.0.0.5:1029&#34;" Destination="RST.ID" dx1="270.5882" dx2="29.4118" dy="829.4117" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+  </Device>
+  <DeviceParameters>
+    <Connection Source="[50,50,190,250]" Destination="DEV_TESTER.BOUNDS" dx1="305.8824" />
+    <Connection Source="[2,1]" Destination="DEV_TESTER.GRID" dx1="464.7059" />
+    <Connection Source="&#34;localhost:61501&#34;" Destination="DEV1.MGR_ID" dx1="964.7059" />
+  </DeviceParameters>
+  <Mapping From="TEST1.IN1" To="DEV_TESTER.RES1.IN1" />
+  <Mapping From="TEST1.PLUS" To="DEV_TESTER.RES1.PLUS" />
+  <Mapping From="TEST1.IN2" To="DEV_TESTER.RES1.IN2" />
+  <Mapping From="TEST1.EQUALS" To="DEV_TESTER.RES1.EQUALS" />
+  <Mapping From="TEST1.AD" To="DEV1.RES1.AD" />
+  <Mapping From="TEST1.OUT" To="DEV_TESTER.RES1.OUT" />
+  <Mapping From="TEST2.RUNSTOP" To="DEV_TESTER.RES2.RUNSTOP" />
+  <Mapping From="TEST2.RESET" To="DEV_TESTER.RES2.RESET" />
+  <Mapping From="TEST2.PV" To="DEV_TESTER.RES2.PV" />
+  <Mapping From="TEST2.DT" To="DEV_TESTER.RES2.DT" />
+  <Mapping From="TEST2.RSSW" To="DEV1.RES2.RUNSTOP" />
+  <Mapping From="TEST2.CLK" To="DEV1.RES2.CLK" />
+  <Mapping From="TEST2.CTR" To="DEV1.RES2.CTR" />
+  <Mapping From="TEST2.Q" To="DEV_TESTER.RES2.Q" />
+  <Mapping From="TEST2.CV" To="DEV_TESTER.RES2.CV" />
+</System>

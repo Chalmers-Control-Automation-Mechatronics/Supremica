@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="LOAD_CTL" Comment="Workpiece LOAD Solenoid Control" >
+  <Identification Standard="61499-1" Classification="Simulation" ApplicationDomain="Material Handling" Function="Control" Type="Workpiece Loading" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.2" Author="JHC" Date="2002-07-16" Remarks="Changed back to LD with IND triggering in ECC." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2002-05-24" Remarks="Changed from LD to FBD to get E_D_FF triggering." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2002-05-20" Remarks="Copied/Modified from XBAR_CTL." />
+  <CompilerInfo header="package fb.rt.mach; import fb.rt.math.*;" >
+    <Compiler Language="Java" Vendor="IBM" Product="Jikes" Version="1.06" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="REQ" >
+        <With Var="SRC_RDY" />
+        <With Var="SRC_PRESENT" />
+        <With Var="DST_RDY" />
+        <With Var="DST_PRESENT" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="IND" Comment="Change in FWD output" >
+        <With Var="FWD" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="SRC_RDY" Type="BOOL" Comment="Source in position for transfer" />
+      <VarDeclaration Name="SRC_PRESENT" Type="BOOL" Comment="Workpiece present at source" />
+      <VarDeclaration Name="DST_RDY" Type="BOOL" Comment="Destination in position for transfer" />
+      <VarDeclaration Name="DST_PRESENT" Type="BOOL" Comment="Workpiece present at destination" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="FWD" Type="BOOL" Comment="Actuator direction:1=FWD,0=REV" />
+    </OutputVars>
+  </InterfaceList>
+  <BasicFB>
+    <InternalVars>
+      <VarDeclaration Name="WAS_FWD" Type="BOOL" />
+    </InternalVars>
+    <ECC >
+      <ECState Name="START" x="305.8824" y="117.6471" >
+      </ECState>
+      <ECState Name="REQ" x="858.8235" y="523.5294" >
+        <ECAction Algorithm="REQ" />
+      </ECState>
+      <ECState Name="IND" x="858.8235" y="947.0588" >
+        <ECAction Output="IND" />
+      </ECState>
+      <ECTransition Source="START" Destination="REQ" Condition="REQ" x="582.3529" y="523.5294" />
+      <ECTransition Source="REQ" Destination="START" Condition="FWD = WAS_FWD" x="858.8235" y="117.6471" />
+      <ECTransition Source="REQ" Destination="IND" Condition="FWD &#60;> WAS_FWD" x="858.8235" y="700" />
+      <ECTransition Source="IND" Destination="START" Condition="1" x="305.8824" y="947.0588" />
+    </ECC>
+  <Algorithm Name="REQ" >
+    <LD >
+      <Rung Output="WAS_FWD" Expression="FWD" />
+      <Rung Output="FWD" Expression="SRC_RDY SRC_PRESENT &#38; DST_RDY &#38; DST_PRESENT ! &#38;" />
+    </LD>
+  </Algorithm>
+  </BasicFB>
+</FBType>

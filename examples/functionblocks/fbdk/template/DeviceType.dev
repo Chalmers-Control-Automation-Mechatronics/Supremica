@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE DeviceType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<DeviceType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="DeviceType" Comment="Device Type" >
+  <Identification Standard="61499-2" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.2" Author="JHC" Date="2003-12-05" Remarks="Renamed from NEWDEVICE." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2002-11-05" Remarks="Corrected &#60;DeviceFBNetwork> to &#60;FBNetwork>." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2000-05-27" />
+  <CompilerInfo header="package fb.rt.template;" >
+  </CompilerInfo>
+  <Resource Name="RES1" Type="ResourceType" x="11.764706" y="776.4706" >
+  </Resource>
+  <FBNetwork >
+    <FB Name="START" Type="E_RESTART" x="11.764706" y="11.764706" />
+  </FBNetwork>
+</DeviceType>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="MECH1_DIAG" Comment="Diagnostic for a Unidirectional Mechanism (Clocked)" >
+  <Identification Standard="61499-1" Classification="Diagnostics" ApplicationDomain="Mechanisms" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2004-10-20" Remarks="Renamed to replace old MECH1_DIAG." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2004-09-26" Remarks="Derived from MECH2_DIAG; made composite, incorporated clock." />
+  <CompilerInfo header="package fb.rt.mva; import fb.rt.math.*;" >
+    <Compiler Language="Java" Vendor="Sun" Product="JDK" Version="1.4.2" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="CLK" Comment="Diagnostic Clock" >
+        <With Var="END" />
+        <With Var="FWD" />
+        <With Var="N" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="FLT" Comment="Fault Indication" >
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="FWD" Type="BOOL" Comment="Forward Actuation Command from Controller" />
+      <VarDeclaration Name="END" Type="BOOL" Comment="END(Fully Advanced)Sensor" />
+      <VarDeclaration Name="N" Type="UINT" Comment="Timeout Period in CLK cycles" />
+    </InputVars>
+  </InterfaceList>
+  <FBNetwork >
+    <FB Name="TMR" Type="C_DELAY" x="1772.2222" y="350.0" />
+    <FB Name="DETECT" Type="E_TRIG" x="1344.4443" y="11.111111" />
+    <FB Name="COND" Type="FB_AND" x="999.99994" y="11.111111" />
+    <FB Name="NOT_END" Type="FB_NOT" x="672.22217" y="11.111111" />
+    <FB Name="CLK_SPLIT" Type="E_SPLIT" x="188.88889" y="11.111111" />
+    <EventConnections>
+      <Connection Source="DETECT.ER" Destination="TMR.START" dx1="61.111107" />
+      <Connection Source="DETECT.EF" Destination="TMR.STOP" dx1="27.777777" />
+      <Connection Source="COND.CNF" Destination="DETECT.EI" dx1="116.666664" />
+      <Connection Source="NOT_END.CNF" Destination="COND.REQ" dx1="27.777777" />
+      <Connection Source="TMR.EO" Destination="FLT" dx1="2194.4443" />
+      <Connection Source="CLK" Destination="CLK_SPLIT.EI" dx1="83.33333" />
+      <Connection Source="CLK_SPLIT.EO2" Destination="NOT_END.REQ" dx1="155.55554" />
+      <Connection Source="CLK_SPLIT.EO1" Destination="TMR.CLK" dx1="38.888885" />
+    </EventConnections>
+    <DataConnections>
+      <Connection Source="COND.OUT" Destination="DETECT.QI" dx1="27.777777" />
+      <Connection Source="FWD" Destination="COND.IN2" dx1="888.88885" />
+      <Connection Source="NOT_END.OUT" Destination="COND.IN1" dx1="27.777777" />
+      <Connection Source="END" Destination="NOT_END.IN" dx1="566.6666" />
+      <Connection Source="N" Destination="TMR.N" dx1="1699.9999" />
+    </DataConnections>
+  </FBNetwork>
+</FBType>

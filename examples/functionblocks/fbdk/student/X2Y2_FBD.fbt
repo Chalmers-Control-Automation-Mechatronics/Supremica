@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="X2Y2_FBD" Comment="Compute X^2-Y^2 in FBD" >
+  <Identification Standard="61499-1" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2003-08-11" Remarks="Derived from FB_X2Y2_ST." />
+  <CompilerInfo header="package fb.rt.student; import fb.rt.plc.math.*;" >
+    <Compiler Language="Java" Vendor="IBM" Product="Jikes" Version="1.0.6" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="REQ" >
+        <With Var="X" />
+        <With Var="Y" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="CNF" >
+        <With Var="OUT" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="X" Type="REAL" />
+      <VarDeclaration Name="Y" Type="REAL" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="OUT" Type="REAL" />
+    </OutputVars>
+  </InterfaceList>
+  <BasicFB>
+    <ECC >
+      <ECState Name="START" x="210.5263" y="152.63158" >
+      </ECState>
+      <ECState Name="REQ_STATE" x="552.6316" y="552.6316" >
+        <ECAction Algorithm="REQ_ALG" Output="CNF" />
+      </ECState>
+      <ECTransition Source="START" Destination="REQ_STATE" Condition="REQ" x="210.5263" y="552.6316" />
+      <ECTransition Source="REQ_STATE" Destination="START" Condition="1" x="552.6316" y="152.63158" />
+    </ECC>
+  <Algorithm Name="REQ_ALG" >
+    <FBD >
+      <FB Name="SUM" Type="ADD_REAL" x="242.10526" y="78.947365" />
+      <FB Name="DIFF" Type="SUB_REAL" x="247.36842" y="647.3684" />
+      <FB Name="PROD" Type="MUL_REAL" x="1005.2631" y="310.5263" />
+      <DataConnections>
+        <Connection Source="X" Destination="SUM.IN1" dx1="178.94737" />
+        <Connection Source="X" Destination="DIFF.IN1" dx1="184.21053" />
+        <Connection Source="Y" Destination="SUM.IN2" dx1="178.94737" />
+        <Connection Source="Y" Destination="DIFF.IN2" dx1="184.21053" />
+        <Connection Source="DIFF.OUT" Destination="PROD.IN2" dx1="305.26315" />
+        <Connection Source="SUM.OUT" Destination="PROD.IN1" dx1="321.05264" />
+        <Connection Source="PROD.OUT" Destination="OUT" dx1="1421.0526" />
+      </DataConnections>
+    </FBD>
+  </Algorithm>
+  </BasicFB>
+</FBType>

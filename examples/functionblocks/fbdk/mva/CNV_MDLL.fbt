@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="CNV_MDLL" Comment="Locally-Coupled Conveyor Model (without Gate) for 1 Workpiece" >
+  <Identification Standard="61499-1" Classification="Model" ApplicationDomain="Simulation" Function="Material Handling" Type="Conveyor" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.4" Author="JHC" Date="2004-11-11" Remarks="Deleted OPEN, CLOSED (to CNVG_MDLL)." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.3" Author="JHC" Date="2004-10-28" Remarks="Deleted STOPPER (gate)." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.2" Author="JHC" Date="2004-10-08" Remarks="Added STOPPER, LOADER." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2004-09-23" Remarks="Converted to distributed clock." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2004-09-22" Remarks="Adapted for new CNV_MDL1." />
+  <CompilerInfo header="package fb.rt.mva; import fb.rt.math.*; import fb.rt.net.*;" classdef="public class CNV_MDLL extends FBMVCD" >
+    <Compiler Language="Java" Vendor="Sun" Product="JDK" Version="1.4.2" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="INIT" Comment="Initialize" >
+        <With Var="REND_ID" />
+        <With Var="ACT_ID" />
+        <With Var="VF" />
+        <With Var="CLK_ID" />
+        <With Var="UI_ID" />
+        <With Var="SENSE_ID" />
+        <With Var="VS" />
+        <With Var="LOAD_ID" />
+      </Event>
+      <Event Name="UNLD" Comment="Unload Workpiece if at END position" >
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="INITO" Comment="View Initialized" >
+        <With Var="POS" />
+        <With Var="STYLO" />
+        <With Var="WKPO" />
+        <With Var="END" />
+      </Event>
+      <Event Name="INDR" Comment="Change in Rendering Data" >
+        <With Var="POS" />
+        <With Var="STYLO" />
+        <With Var="WKPO" />
+      </Event>
+      <Event Name="INDS" Comment="Change in Sensor Data" >
+        <With Var="END" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="CLK_ID" Type="WSTRING" InitialValue="&#34;SIM_CLK&#34;" Comment="Simulation clock channel ID" />
+      <VarDeclaration Name="REND_ID" Type="WSTRING" Comment="Rendering data channel ID to View" />
+      <VarDeclaration Name="UI_ID" Type="WSTRING" Comment="User input channel ID from View" />
+      <VarDeclaration Name="SENSE_ID" Type="WSTRING" Comment="Sensor data channel ID to Controller" />
+      <VarDeclaration Name="ACT_ID" Type="WSTRING" Comment="Actuator data channel ID from Controller" />
+      <VarDeclaration Name="LOAD_ID" Type="WSTRING" Comment="Loader channel ID for LPOS,STYLE, WKPC" />
+      <VarDeclaration Name="VF" Type="UINT" InitialValue="5" Comment="Conveyor Speed in % per CLK event" />
+      <VarDeclaration Name="VS" Type="UINT" InitialValue="50" Comment="Stopper Speed in % per CLK event" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="END" Type="BOOL" Comment="Workpiece at End Position" />
+      <VarDeclaration Name="POS" Type="UINT" Comment="Workpiece position, 0-100%" />
+      <VarDeclaration Name="STYLO" Type="VSTYLE" Comment="Currently loaded workpiece style" />
+      <VarDeclaration Name="WKPO" Type="COLOR" Comment="Currently loaded workpiece color" />
+    </OutputVars>
+  </InterfaceList>
+  <FBNetwork >
+    <FB Name="ACT" Type="SUBL_1" x="894.4444" y="11.111111" />
+    <FB Name="MDL" Type="CNV_MDL" x="2138.889" y="122.22221" />
+    <FB Name="REND_PUB" Type="PUBL_4" x="3116.6665" y="11.111111" />
+    <FB Name="CLK" Type="SUBL_0" x="1533.3333" y="11.111111" />
+    <FB Name="UI" Type="SUBL_1" x="222.22221" y="11.111111" />
+    <FB Name="SENSE_PUB" Type="PUBL_1" x="3616.6665" y="1027.7777" />
+    <FB Name="LOADER" Type="SUBL_3" x="205.55554" y="861.1111" />
+    <EventConnections>
+      <Connection Source="UNLD" Destination="MDL.UNLD" dx1="2011.1111" />
+      <Connection Source="MDL.INDR" Destination="REND_PUB.REQ" dx1="127.77777" />
+      <Connection Source="CLK.IND" Destination="MDL.CLK" dx1="33.333332" dx2="122.22221" dy="483.3333" />
+      <Connection Source="INIT" Destination="UI.INIT" dx1="116.666664" />
+      <Connection Source="ACT.INITO" Destination="CLK.INIT" dx1="27.777777" />
+      <Connection Source="CLK.INITO" Destination="REND_PUB.INIT" dx1="27.777777" />
+      <Connection Source="REND_PUB.INITO" Destination="SENSE_PUB.INIT" dx1="122.22221" />
+      <Connection Source="SENSE_PUB.INITO" Destination="INITO" dx1="4055.5554" />
+      <Connection Source="SENSE_PUB.CNF" Destination="INDS" dx1="4044.4443" />
+      <Connection Source="MDL.INDS" Destination="SENSE_PUB.REQ" dx1="422.2222" />
+      <Connection Source="REND_PUB.CNF" Destination="INDR" dx1="3544.4443" />
+      <Connection Source="UI.INITO" Destination="LOADER.INIT" dx1="27.777777" dx2="50.0" dy="600.0" />
+      <Connection Source="LOADER.INITO" Destination="ACT.INIT" dx1="144.44444" />
+      <Connection Source="LOADER.IND" Destination="MDL.LOAD" dx1="1394.4443" />
+    </EventConnections>
+    <DataConnections>
+      <Connection Source="MDL.POS" Destination="REND_PUB.SD_1" dx1="477.77777" />
+      <Connection Source="MDL.STYLO" Destination="REND_PUB.SD_2" dx1="505.55554" />
+      <Connection Source="MDL.WKPO" Destination="REND_PUB.SD_3" dx1="533.3333" />
+      <Connection Source="ACT_ID" Destination="ACT.ID" dx1="744.4444" />
+      <Connection Source="MDL.STYLO" Destination="STYLO" dx1="2688.8887" />
+      <Connection Source="MDL.WKPO" Destination="WKPO" dx1="2677.7776" />
+      <Connection Source="REND_ID" Destination="REND_PUB.ID" dx1="2944.4443" />
+      <Connection Source="MDL.POS" Destination="POS" dx1="2655.5554" />
+      <Connection Source="VF" Destination="MDL.VF" dx1="2050.0" />
+      <Connection Source="ACT.RD_1" Destination="MDL.MTR_ON" dx1="61.111107" dx2="94.44444" dy="1338.8888" />
+      <Connection Source="CLK_ID" Destination="CLK.ID" dx1="1383.3333" />
+      <Connection Source="UI_ID" Destination="UI.ID" dx1="100.0" />
+      <Connection Source="UI.RD_1" Destination="MDL.FAULT" dx1="66.666664" />
+      <Connection Source="MDL.END" Destination="SENSE_PUB.SD_1" dx1="283.3333" />
+      <Connection Source="MDL.END" Destination="END" dx1="2650.0" />
+      <Connection Source="SENSE_ID" Destination="SENSE_PUB.ID" dx1="3427.7776" />
+      <Connection Source="LOADER.RD_1" Destination="MDL.LPOS" dx1="27.777777" />
+      <Connection Source="LOADER.RD_2" Destination="MDL.STYLE" dx1="83.33333" />
+      <Connection Source="LOADER.RD_3" Destination="MDL.WKPC" dx1="122.22221" />
+      <Connection Source="LOAD_ID" Destination="LOADER.ID" dx1="33.333332" />
+    </DataConnections>
+  </FBNetwork>
+</FBType>

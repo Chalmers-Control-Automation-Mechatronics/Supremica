@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="UDP_LISTEN" Comment="Listener for a Multicast UDP Socket" >
+  <Identification Standard="61499-1" Classification="Communications" ApplicationDomain="Feasibility Demo" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.2" Author="JHC" Date="2001-05-25" Remarks="Added service sequences." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2000-05-16" Remarks="File type changed to &#34;.fbt&#34;" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2000-03-30" />
+  <CompilerInfo header="package fb.rt.ita; import java.io.*; import fb.rt.net.*;" classdef="public class UDP_LISTEN extends SUBSCRIBE_0 implements Runnable" >
+    <Compiler Language="Java" Vendor="IBM" Product="VisualAge" Version="3.0" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="INIT" Comment="Service Initialization" >
+        <With Var="QI" />
+        <With Var="ID" />
+      </Event>
+      <Event Name="RSP" Comment="Service Response" >
+        <With Var="QI" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="INITO" Comment="Initialization Confirm" >
+        <With Var="QO" />
+        <With Var="STATUS" />
+      </Event>
+      <Event Name="IND" Comment="Message received" >
+        <With Var="QO" />
+        <With Var="STATUS" />
+        <With Var="RD_1" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="QI" Type="BOOL" Comment="Event Input Qualifier" />
+      <VarDeclaration Name="ID" Type="WSTRING" Comment="Connection Identifier" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="QO" Type="BOOL" Comment="Event Output Qualifier" />
+      <VarDeclaration Name="STATUS" Type="WSTRING" Comment="Service Status" />
+      <VarDeclaration Name="RD_1" Type="WSTRING" Comment="Message in Hex up to trailing zeroes" />
+    </OutputVars>
+  </InterfaceList>
+  <Service RightInterface="UDP_LISTEN" LeftInterface="PUBLISH_x" Comment="Data Monitoring Service" >
+    <ServiceSequence Name="normal_establishment" >
+      <ServiceTransaction >
+        <InputPrimitive Interface="PUBLISH_x" Event="INIT+" Parameters="ID" />
+        <OutputPrimitive Interface="PUBLISH_x" Event="INITO+" />
+      </ServiceTransaction>
+      <ServiceTransaction >
+        <InputPrimitive Interface="UDP_LISTEN" Event="INIT+" Parameters="ID" />
+        <OutputPrimitive Interface="UDP_LISTEN" Event="INITO+" />
+      </ServiceTransaction>
+    </ServiceSequence>
+    <ServiceSequence Name="publisher_rejected_establishment" >
+      <ServiceTransaction >
+        <InputPrimitive Interface="PUBLISH_x" Event="INIT+" Parameters="ID" />
+        <OutputPrimitive Interface="PUBLISH_x" Event="INITO-" Parameters="STATUS" />
+      </ServiceTransaction>
+    </ServiceSequence>
+    <ServiceSequence Name="subscriber_rejected_establishment" >
+      <ServiceTransaction >
+        <InputPrimitive Interface="UDP_LISTEN" Event="INIT+" Parameters="ID" />
+        <OutputPrimitive Interface="UDP_LISTEN" Event="INITO-" Parameters="STATUS" />
+      </ServiceTransaction>
+    </ServiceSequence>
+    <ServiceSequence Name="normal_data_transfer" >
+      <ServiceTransaction >
+        <InputPrimitive Interface="PUBLISH_x" Event="REQ+" Parameters="SD_1" />
+        <OutputPrimitive Interface="UDP_LISTEN" Event="IND+" Parameters="RD_1" />
+      </ServiceTransaction>
+      <ServiceTransaction >
+        <OutputPrimitive Interface="PUBLISH_x" Event="CNF+" />
+      </ServiceTransaction>
+      <ServiceTransaction >
+        <InputPrimitive Interface="UDP_LISTEN" Event="RSP+" />
+      </ServiceTransaction>
+    </ServiceSequence>
+    <ServiceSequence Name="data_transfer_error" >
+      <ServiceTransaction >
+        <InputPrimitive Interface="PUBLISH_x" Event="REQ+" Parameters="SD_1" />
+        <OutputPrimitive Interface="UDP_LISTEN" Event="IND-" Parameters="STATUS" />
+      </ServiceTransaction>
+      <ServiceTransaction >
+        <OutputPrimitive Interface="PUBLISH_x" Event="CNF+" />
+      </ServiceTransaction>
+    </ServiceSequence>
+    <ServiceSequence Name="publisher_initiated_disconnect" >
+      <ServiceTransaction >
+        <InputPrimitive Interface="PUBLISH_x" Event="INIT-" />
+        <OutputPrimitive Interface="UDP_LISTEN" Event="INITO-" Parameters="STATUS" />
+      </ServiceTransaction>
+      <ServiceTransaction >
+        <OutputPrimitive Interface="PUBLISH_x" Event="INITO-" Parameters="STATUS" />
+      </ServiceTransaction>
+    </ServiceSequence>
+    <ServiceSequence Name="subscriber_initiated_disconnect" >
+      <ServiceTransaction >
+        <InputPrimitive Interface="UDP_LISTEN" Event="INIT-" />
+        <OutputPrimitive Interface="UDP_LISTEN" Event="INITO-" Parameters="STATUS" />
+      </ServiceTransaction>
+    </ServiceSequence>
+    <ServiceSequence Name="system_publisher_disconnect" >
+      <ServiceTransaction >
+        <OutputPrimitive Interface="PUBLISH_x" Event="INITO-" Parameters="STATUS" />
+      </ServiceTransaction>
+      <ServiceTransaction >
+        <OutputPrimitive Interface="UDP_LISTEN" Event="INITO-" Parameters="STATUS" />
+      </ServiceTransaction>
+    </ServiceSequence>
+    <ServiceSequence Name="system_subscriber_disconnect" >
+      <ServiceTransaction >
+        <OutputPrimitive Interface="UDP_LISTEN" Event="INITO-" Parameters="STATUS" />
+      </ServiceTransaction>
+    </ServiceSequence>
+  </Service>
+</FBType>

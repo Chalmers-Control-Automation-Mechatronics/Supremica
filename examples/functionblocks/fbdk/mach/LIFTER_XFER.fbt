@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="LIFTER_XFER" Comment="Lifter Pallet Transfer and Fault Simulation Logic" >
+  <Identification Standard="61499-2" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2004-11-12" Remarks="Added FFLT, LFLT, TFLT and associated logic." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2004-11-11" Remarks="Combined LIFTER_LDU and LIFTER_FAULT." />
+  <CompilerInfo header="package fb.rt.mach;" >
+    <Compiler Language="Java" Vendor="Sun" Product="JDK" Version="1.4.2" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="REQ" Comment="Input Change Notification" >
+        <With Var="FEED" />
+        <With Var="OPEN" />
+        <With Var="BOTTOM" />
+        <With Var="IN" />
+        <With Var="OUT" />
+        <With Var="AT_STOPPER" />
+        <With Var="IN_LIFT" />
+        <With Var="TOP" />
+        <With Var="TAKEOFF" />
+        <With Var="LFLT" />
+        <With Var="FFLT" />
+        <With Var="TFLT" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="LOAD" Comment="Load Lifter" >
+      </Event>
+      <Event Name="UNLD" Comment="Unload Lifter" >
+      </Event>
+      <Event Name="WARN" Comment="Non-Fatal Fault Warning" >
+        <With Var="HALF_IN" />
+        <With Var="JAM" />
+        <With Var="HALF_OUT" />
+      </Event>
+      <Event Name="FLT" Comment="Fatal Fault Notification" >
+        <With Var="CRUSHED" />
+        <With Var="FALLEN" />
+        <With Var="DROPPED" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="FEED" Type="BOOL" Comment="Feed Conveyor Motor ON" />
+      <VarDeclaration Name="AT_STOPPER" Type="BOOL" Comment="Pallet at Stopper Position" />
+      <VarDeclaration Name="OPEN" Type="BOOL" Comment="Stopper/Gate Open" />
+      <VarDeclaration Name="BOTTOM" Type="BOOL" Comment="Lift at Bottom Position" />
+      <VarDeclaration Name="TOP" Type="BOOL" Comment="Lift at Top Position" />
+      <VarDeclaration Name="IN_LIFT" Type="BOOL" Comment="Pallet in Lift" />
+      <VarDeclaration Name="IN" Type="BOOL" Comment="Lift Conveyor IN motor ON" />
+      <VarDeclaration Name="OUT" Type="BOOL" Comment="Lift Conveyor OUT motor ON" />
+      <VarDeclaration Name="TAKEOFF" Type="BOOL" Comment="Takeoff Conveyor Motor ON" />
+      <VarDeclaration Name="FFLT" Type="BOOL" Comment="Feed Conveyor Fault" />
+      <VarDeclaration Name="LFLT" Type="BOOL" Comment="Simulated Lifter Fault injected from UI" />
+      <VarDeclaration Name="TFLT" Type="BOOL" Comment="Takeoff Conveyor Fault" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="JAM" Type="BOOL" Comment="Jam at Lifter Entrance" />
+      <VarDeclaration Name="HALF_IN" Type="BOOL" Comment="Bottom Pallet Half In Lifter" />
+      <VarDeclaration Name="HALF_OUT" Type="BOOL" />
+      <VarDeclaration Name="CRUSHED" Type="BOOL" Comment="Crushed or Dropped" />
+      <VarDeclaration Name="DROPPED" Type="BOOL" />
+      <VarDeclaration Name="FALLEN" Type="BOOL" />
+    </OutputVars>
+  </InterfaceList>
+  <BasicFB>
+    <InternalVars>
+      <VarDeclaration Name="FCOND" Type="BOOL" Comment="Fault Condition" />
+      <VarDeclaration Name="WCOND" Type="BOOL" Comment="Warning Condition" />
+      <VarDeclaration Name="LCOND" Type="BOOL" Comment="LOAD condition" />
+      <VarDeclaration Name="UCOND" Type="BOOL" Comment="UNLD condition" />
+    </InternalVars>
+    <ECC >
+      <ECState Name="START" Comment="Initial State" x="888.88885" y="961.1111" >
+      </ECState>
+      <ECState Name="REQ" Comment="Normal execution" x="888.88885" y="444.44443" >
+        <ECAction Algorithm="REQ" />
+      </ECState>
+      <ECState Name="FAULT" x="294.44443" y="1377.7777" >
+        <ECAction Output="FLT" />
+      </ECState>
+      <ECState Name="WARNING" x="1594.4443" y="1327.7777" >
+        <ECAction Output="WARN" />
+      </ECState>
+      <ECState Name="LOADING" x="188.88889" y="66.666664" >
+        <ECAction Output="LOAD" />
+      </ECState>
+      <ECState Name="UNLOADING" x="1566.6666" y="61.111107" >
+        <ECAction Output="UNLD" />
+      </ECState>
+      <ECTransition Source="START" Destination="REQ" Condition="REQ" x="888.88885" y="616.6666" />
+      <ECTransition Source="REQ" Destination="FAULT" Condition="FCOND" x="494.44443" y="1055.5555" />
+      <ECTransition Source="REQ" Destination="WARNING" Condition="WCOND" x="1350.0" y="1022.22217" />
+      <ECTransition Source="REQ" Destination="LOADING" Condition="LCOND" x="600.0" y="316.66666" />
+      <ECTransition Source="REQ" Destination="UNLOADING" Condition="UCOND" x="1138.8888" y="305.55554" />
+      <ECTransition Source="REQ" Destination="START" Condition="1" x="1544.4443" y="677.7778" />
+      <ECTransition Source="FAULT" Destination="START" Condition="1" x="683.3333" y="1100.0" />
+      <ECTransition Source="WARNING" Destination="START" Condition="1" x="1127.7777" y="1083.3333" />
+      <ECTransition Source="LOADING" Destination="START" Condition="1" x="650.0" y="655.55554" />
+      <ECTransition Source="UNLOADING" Destination="START" Condition="1" x="1116.6666" y="650.0" />
+    </ECC>
+  <Algorithm Name="REQ" Comment="Lifter Loading Physical Logic" >
+    <LD >
+      <Rung Output="LCOND" Expression="FEED FFLT ! &#38; AT_STOPPER &#38; OPEN &#38; BOTTOM &#38; IN_LIFT ! &#38; IN &#38; OUT ! &#38; LFLT ! &#38;" />
+      <Rung Output="UCOND" Expression="TOP IN_LIFT &#38; OUT &#38; IN ! &#38; LFLT ! &#38; TAKEOFF &#38; TFLT ! &#38;" />
+      <Rung Output="JAM" Expression="FFLT ! FEED &#38; AT_STOPPER &#38; OPEN &#38; BOTTOM &#38; IN_LIFT &#38;" />
+      <Rung Output="CRUSHED" Expression="HALF_IN BOTTOM ! &#38;" />
+      <Rung Output="HALF_IN" Expression="FEED FFLT ! &#38; AT_STOPPER &#38; OPEN &#38; BOTTOM &#38; IN_LIFT ! &#38; IN ! LFLT | &#38;" />
+      <Rung Output="DROPPED" Expression="FEED FFLT ! &#38; AT_STOPPER &#38; OPEN &#38; BOTTOM ! &#38; CRUSHED ! &#38;" />
+      <Rung Output="FALLEN" Expression="HALF_OUT TOP ! &#38;" />
+      <Rung Output="HALF_OUT" Expression="TOP IN_LIFT &#38; OUT &#38; IN ! &#38; LFLT ! &#38; TAKEOFF !  TFLT | &#38;" />
+      <Rung Output="FCOND" Expression="CRUSHED DROPPED | FALLEN |" />
+      <Rung Output="WCOND" Expression="JAM HALF_IN | HALF_OUT |" />
+    </LD>
+  </Algorithm>
+  </BasicFB>
+</FBType>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="FB_SEL_REAL" Comment="REAL Selection" >
+  <Identification Standard="61499-1-D.1" Classification="Selection Functions" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2001-08-06" Remarks="XML version" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="1997-09-13" Remarks="SRC version" />
+  <CompilerInfo header="package fb.rt.math;" classdef="class FB_SEL_REAL extends FBSelectFunction" >
+    <Compiler Language="Java" Vendor="IBM" Product="VisualAge" Version="3.0" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="REQ" >
+        <With Var="G" />
+        <With Var="IN0" />
+        <With Var="IN1" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="CNF" >
+        <With Var="OUT" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="G" Type="BOOL" Comment="Selector" />
+      <VarDeclaration Name="IN0" Type="REAL" Comment="Selected when G=0" />
+      <VarDeclaration Name="IN1" Type="REAL" Comment="Selected when G=1" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="OUT" Type="REAL" Comment="Selected value" />
+    </OutputVars>
+  </InterfaceList>
+</FBType>

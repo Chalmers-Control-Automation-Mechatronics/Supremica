@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="DM_CLT" Comment="Remote Device Management Client" >
+  <Identification Standard="61499 Demo ITA" Function="Device Management" Description="Client for Remote Device Management - Use with CLIENT_2_1" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.4" Author="JHC" Date="2002-01-01" Remarks="Added WAIT, request_timeout." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.3" Author="JHC" Date="2001-01-21" Remarks="Changed to ServiceManager interface" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.2" Author="JHC" Date="2001-01-14" Remarks="Changed event inputs" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2001-01-04" Remarks="Added STATUS input" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2000-12-31" Remarks="Initial version" />
+  <CompilerInfo header="package fb.rt;" >
+    <Compiler Language="Java" Vendor="IBM" Product="VisualAge" Version="3.0" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="INIT" Comment="Comm Client Initialization Response" >
+        <With Var="QI" />
+        <With Var="STATUS" />
+      </Event>
+      <Event Name="RSP" Comment="Remote Management Response" >
+        <With Var="QI" />
+        <With Var="STATUS" />
+        <With Var="RESP" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="INITO" Comment="Initialize/Terminate Comm Client" >
+        <With Var="QO" />
+      </Event>
+      <Event Name="IND" Comment="Remote Management Request to Comm Client" >
+        <With Var="QO" />
+        <With Var="DST" />
+        <With Var="RQST" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="QI" Type="BOOL" Comment="Event Input Qualifier" />
+      <VarDeclaration Name="STATUS" Type="WSTRING" Comment="Communications Status" />
+      <VarDeclaration Name="RESP" Type="STRING" Comment="XML-encoded Response" />
+      <VarDeclaration Name="WAIT" Type="TIME" InitialValue="t#2s" Comment="Request Timeout Period(Maximum allowed IND/RSP Delay)" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="QO" Type="BOOL" Comment="Event Output Qualifier" />
+      <VarDeclaration Name="DST" Type="STRING" Comment="Destination for RQST" />
+      <VarDeclaration Name="RQST" Type="STRING" Comment="XML-encoded Request" />
+    </OutputVars>
+  </InterfaceList>
+  <Service RightInterface="SystemManager" LeftInterface="DM_CLT" >
+    <ServiceSequence Name="connect" >
+      <ServiceTransaction >
+        <InputPrimitive Interface="SystemManager" Event="connect" />
+        <OutputPrimitive Interface="DM_CLT" Event="INITO+" />
+      </ServiceTransaction>
+      <ServiceTransaction >
+        <InputPrimitive Interface="DM_CLT" Event="INIT+" />
+        <OutputPrimitive Interface="SystemManager" Event="connected" />
+      </ServiceTransaction>
+    </ServiceSequence>
+    <ServiceSequence Name="connect_err" >
+      <ServiceTransaction >
+        <InputPrimitive Interface="SystemManager" Event="connect" />
+        <OutputPrimitive Interface="DM_CLT" Event="INITO+" />
+      </ServiceTransaction>
+      <ServiceTransaction >
+        <InputPrimitive Interface="DM_CLT" Event="INIT-" Parameters="STATUS" />
+        <OutputPrimitive Interface="SystemManager" Event="error" Parameters="STATUS" />
+      </ServiceTransaction>
+    </ServiceSequence>
+    <ServiceSequence Name="normal_request" >
+      <ServiceTransaction >
+        <InputPrimitive Interface="SystemManager" Event="request" Parameters="DST,RQST" />
+        <OutputPrimitive Interface="DM_CLT" Event="IND+" Parameters="DST,RQST" />
+      </ServiceTransaction>
+      <ServiceTransaction >
+        <InputPrimitive Interface="DM_CLT" Event="RSP+" Parameters="RESP" />
+        <OutputPrimitive Interface="SystemManager" Event="response" Parameters="RESP" />
+      </ServiceTransaction>
+    </ServiceSequence>
+    <ServiceSequence Name="request_comm_err" >
+      <ServiceTransaction >
+        <InputPrimitive Interface="SystemManager" Event="request" Parameters="DST,RQST" />
+        <OutputPrimitive Interface="DM_CLT" Event="IND+" Parameters="DST,RQST" />
+      </ServiceTransaction>
+      <ServiceTransaction >
+        <InputPrimitive Interface="DM_CLT" Event="RSP-" Parameters="STATUS" />
+        <OutputPrimitive Interface="SystemManager" Event="error" Parameters="STATUS" />
+      </ServiceTransaction>
+    </ServiceSequence>
+    <ServiceSequence Name="request_timeout" Comment="No RSP within DT after IND" >
+      <ServiceTransaction >
+        <InputPrimitive Interface="SystemManager" Event="request" Parameters="DST,RQST" />
+        <OutputPrimitive Interface="DM_CLT" Event="IND+" Parameters="DST,RQST" />
+      </ServiceTransaction>
+      <ServiceTransaction >
+        <OutputPrimitive Interface="SystemManager" Event="error" Parameters="STATUS=&#34;NOT_READY&#34;" />
+      </ServiceTransaction>
+    </ServiceSequence>
+    <ServiceSequence Name="disconnect" >
+      <ServiceTransaction >
+        <InputPrimitive Interface="SystemManager" Event="disconnect" />
+        <OutputPrimitive Interface="DM_CLT" Event="INITO-" />
+      </ServiceTransaction>
+      <ServiceTransaction >
+        <InputPrimitive Interface="DM_CLT" Event="INIT-" Parameters="STATUS" />
+        <OutputPrimitive Interface="SystemManager" Event="disconnected" Parameters="STATUS" />
+      </ServiceTransaction>
+    </ServiceSequence>
+  </Service>
+</FBType>

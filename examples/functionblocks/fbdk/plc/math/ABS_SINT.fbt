@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="ABS_SINT" Comment="IEC 61131-3,Table 23#1" >
+  <Identification Standard="61131-3" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2004-12-15" Remarks="Converted from SRC format." />
+  <CompilerInfo header="package fb.rt.plc.math;" >
+  </CompilerInfo>
+  <InterfaceList>
+    <InputVars>
+      <VarDeclaration Name="IN" Type="SINT" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="OUT" Type="SINT" />
+    </OutputVars>
+  </InterfaceList>
+</FBType>

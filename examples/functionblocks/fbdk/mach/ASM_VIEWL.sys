@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE System SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<System xmlns="http://www.holobloc.com/xml/LibraryElement" Name="ASM_VIEWL" Comment="Assembly Station with Dual Stroke Cylinder" >
+  <Identification Standard="61499-1" Classification="Simulation" ApplicationDomain="Assembly" Type="Dual Stroke Cylinder" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2003-03-15" Remarks="Adapted from DRILL_VIEWL" />
+  <Device Name="HMI" Type="FRAME_DEVICE" x="594.1176" y="100.0" >
+    <Resource Name="RES1" Type="PANEL_RESOURCE" x="123.5294" y="11.7647" >
+      <FBNetwork >
+        <FB Name="PRESS" Type="MECH_HMIL" x="550.0" y="138.88889" />
+        <FB Name="TRANSPORT" Type="MECH_HMIL" x="988.88885" y="361.11108" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="PRESS.INIT" dx1="27.777777" />
+          <Connection Source="PRESS.INITO" Destination="TRANSPORT.INIT" dx1="33.333332" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="COLOR#magenta" Destination="PRESS.FGD" dx1="266.66666" />
+          <Connection Source="COLOR#lightGray" Destination="TRANSPORT.FGD" dx1="700.0" />
+          <Connection Source="COLOR#gray" Destination="PRESS.BKGD" dx1="327.77777" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+  </Device>
+  <Device Name="VIEW" Type="FRAME_DEVICE" x="605.8823" y="682.3529" >
+    <Resource Name="ASSEMBLY" Type="VIEW_PANEL" x="258.8235" y="11.7647" >
+      <FBNetwork >
+        <FB Name="SP1" Type="XSPACE" x="664.7059" y="288.2353" />
+        <FB Name="PRESS" Type="MECH_VIEWL" Comment="Vertical press element" x="1111.7646" y="552.9412" />
+        <FB Name="SP2" Type="XSPACE" x="1811.7646" y="11.7647" />
+        <FB Name="TRANSPORT" Type="MECH_VIEWL" Comment="Horizontal transport (dual-stroke cylinder)" x="2300.0" y="11.7647" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="SP1.INIT" dx1="52.9412" />
+          <Connection Source="SP1.INITO" Destination="PRESS.INIT" dx1="58.8235" />
+          <Connection Source="PRESS.INITO" Destination="SP2.INIT" dx1="47.0588" />
+          <Connection Source="SP2.INITO" Destination="TRANSPORT.INIT" dx1="29.4118" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="COLOR#gray" Destination="PRESS.BKGD" dx1="882.3529" />
+          <Connection Source="3" Destination="PRESS.LEN" dx1="1047.0588" />
+          <Connection Source="25" Destination="PRESS.DIA" dx1="1029.4117" />
+          <Connection Source="1" Destination="PRESS.DIR" dx1="1047.0588" />
+          <Connection Source="[&#34;&#34;,&#34;&#34;,PART2,PART1]" Destination="SP1.LBLS" dx1="329.4117" />
+          <Connection Source="[3,3]" Destination="SP1.DIMS" dx1="558.8235" />
+          <Connection Source="25" Destination="SP1.DIA" dx1="582.3529" />
+          <Connection Source="[PressFit,&#34;&#34;,&#34;&#34;,Transport]" Destination="SP2.LBLS" dx1="1441.1764" />
+          <Connection Source="[3,3]" Destination="SP2.DIMS" dx1="1705.8823" />
+          <Connection Source="25" Destination="SP2.DIA" dx1="1729.4117" />
+          <Connection Source="7" Destination="TRANSPORT.LEN" dx1="2235.2942" />
+          <Connection Source="25" Destination="TRANSPORT.DIA" dx1="2217.647" />
+          <Connection Source="0" Destination="TRANSPORT.DIR" dx1="2235.2942" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <FBNetwork >
+      <DataConnections>
+        <Connection Source="0" Destination="ASSEMBLY.TRACE" dx1="194.1176" />
+        <Connection Source="25" Destination="ASSEMBLY.DIA" dx1="176.4706" />
+        <Connection Source="[7,5]" Destination="ASSEMBLY.SIZE" dx1="147.0588" />
+        <Connection Source="0" Destination="ASSEMBLY.VERTICAL" dx1="194.1176" />
+      </DataConnections>
+    </FBNetwork>
+  </Device>
+  <DeviceParameters>
+    <Connection Source="[100,100,380,100]" Destination="HMI.BOUNDS" dx1="288.2353" />
+    <Connection Source="[1,1]" Destination="HMI.GRID" dx1="482.3529" />
+    <Connection Source="[480,100,185,150]" Destination="VIEW.BOUNDS" dx1="300.0" />
+  </DeviceParameters>
+</System>

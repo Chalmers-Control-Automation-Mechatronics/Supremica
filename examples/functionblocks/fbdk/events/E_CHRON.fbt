@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="E_CHRON" Comment="Event-driven Chronometer" >
+  <Identification Standard="61499-1" Classification="Event Processing" Function="Timing" Type="Elapsed time clock" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2002-01-29" Remarks="XML version" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="1998-12-09" Remarks="SRC version" />
+  <CompilerInfo header="package fb.rt.events;" >
+    <Compiler Language="Java" Vendor="IBM" Product="VisualAge" Version="3.0" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="START" Comment="Start Timing" >
+      </Event>
+      <Event Name="STOP" Comment="Stop Timing" >
+      </Event>
+      <Event Name="REQ" Comment="Request readout" >
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="EO" Comment="Data Available" >
+        <With Var="Q" />
+        <With Var="ET" />
+      </Event>
+    </EventOutputs>
+    <OutputVars>
+      <VarDeclaration Name="Q" Type="BOOL" Comment="1=Running,0=Stopped" />
+      <VarDeclaration Name="ET" Type="TIME" Comment="Time since last START up to STOP or REQ" />
+    </OutputVars>
+  </InterfaceList>
+</FBType>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE DeviceType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<DeviceType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="RMT_PRXY" Comment="Proxy for a Remotely Managed Device" >
+  <Identification Standard="61499 ITA" Description="Remotely Managed Device Proxy" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.2" Author="JHC" Date="2002-01-01" Remarks="Added WAIT input." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2001-01-21" Remarks="&#34;Unencapsulated&#34; DM_KRMT" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2000-12-31" Remarks="Initial version" />
+  <CompilerInfo header="package fb.rt; import fb.rt.net.CLIENT_2_1;" >
+    <Compiler Language="Java" Vendor="IBM" Product="VisualAge" Version="3.0" />
+  </CompilerInfo>
+  <VarDeclaration Name="MGR_ID" Type="WSTRING" InitialValue="&#34;localhost:61499&#34;" Comment="Device manager socket ID" />
+  <VarDeclaration Name="WAIT" Type="TIME" InitialValue="t#2s" Comment="Request timeout period" />
+  <FBNetwork >
+    <FB Name="MGR" Type="DM_CLT" x="282.3529" y="11.7647" />
+    <FB Name="CLT" Type="CLIENT_2_1" x="1158.8235" y="11.7647" />
+    <EventConnections>
+      <Connection Source="MGR.INITO" Destination="CLT.INIT" dx1="147.0588" />
+      <Connection Source="CLT.INITO" Destination="MGR.INIT" dx1="270.5882" dx2="252.9412" dy="1100" />
+      <Connection Source="MGR.IND" Destination="CLT.REQ" dx1="223.5294" />
+      <Connection Source="CLT.CNF" Destination="MGR.RSP" dx1="217.6470" dx2="217.6470" dy="923.5294" />
+    </EventConnections>
+    <DataConnections>
+      <Connection Source="MGR.QO" Destination="CLT.QI" dx1="452.9412" />
+      <Connection Source="CLT.QO" Destination="MGR.QI" dx1="182.3529" dx2="182.3529" dy="535.2941" />
+      <Connection Source="MGR_ID" Destination="CLT.ID" dx1="994.1176" />
+      <Connection Source="MGR.DST" Destination="CLT.SD_1" dx1="147.0588" />
+      <Connection Source="MGR.RQST" Destination="CLT.SD_2" dx1="76.4706" />
+      <Connection Source="CLT.RD_1" Destination="MGR.RESP" dx1="105.8824" dx2="105.8824" dy="211.7647" />
+      <Connection Source="CLT.STATUS" Destination="MGR.STATUS" dx1="141.1765" dx2="141.1765" dy="376.4706" />
+      <Connection Source="WAIT" Destination="MGR.WAIT" dx1="158.8235" />
+    </DataConnections>
+  </FBNetwork>
+</DeviceType>

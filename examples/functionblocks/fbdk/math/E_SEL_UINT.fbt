@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="E_SEL_UINT" Comment="Event-driven UINT selection" >
+  <Identification Standard="61499-1" Function="Math" Type="Selection" Description="UINT selection" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2004-09-23" />
+  <CompilerInfo header="package fb.rt.math;" >
+    <Compiler Language="Java" Vendor="Sun" Product="JDK" Version="1.4.2" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="EI0" Comment="Select INO" >
+        <With Var="IN0" />
+      </Event>
+      <Event Name="EI1" Comment="Select IN1" >
+        <With Var="IN1" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="EO" Comment="New selection event" >
+        <With Var="OUT" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="IN0" Type="UINT" Comment="Selected by EI0" />
+      <VarDeclaration Name="IN1" Type="UINT" Comment="Selected by EI1" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="OUT" Type="UINT" Comment="Selected value" />
+    </OutputVars>
+  </InterfaceList>
+</FBType>

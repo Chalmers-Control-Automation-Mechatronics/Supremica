@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="FB_SEL_STRING" Comment="STRING (8-bit) Selection" >
+  <Identification Standard="61499-1-D.1" Classification="Selection Functions" />
+  <VersionInfo Organization="Tait Control Systems" Version="0.1" Author="ARM" Date="2003-11-03" Remarks="Completed modification of inputs and output to STRING type" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2002-02-03" Remarks="Copied/modified from FB_SEL_WSTRING." />
+  <CompilerInfo header="package fb.rt.math;" classdef="class FB_SEL_STRING extends FBSelectFunction" >
+    <Compiler Language="Java" Vendor="IBM" Product="VisualAge" Version="3.0" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="REQ" >
+        <With Var="G" />
+        <With Var="IN0" />
+        <With Var="IN1" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="CNF" >
+        <With Var="OUT" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="G" Type="BOOL" Comment="Selector" />
+      <VarDeclaration Name="IN0" Type="STRING" Comment="Selected when G=0" />
+      <VarDeclaration Name="IN1" Type="STRING" Comment="Selected when G=1" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="OUT" Type="STRING" Comment="Selected value" />
+    </OutputVars>
+  </InterfaceList>
+</FBType>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE System SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<System xmlns="http://www.holobloc.com/xml/LibraryElement" Name="FLASHER_TEST" Comment="Flasher Test System Configuration" >
+  <Identification Standard="61499-1" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2001-07-31" Remarks="Changed IN_TIME to IN_ANY, adjusted height." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2001-02-22" />
+  <Device Name="FLASHER" Type="FRAME_DEVICE" x="1070.5883" y="529.4117" >
+    <Resource Name="RES1" Type="PANEL_RESOURCE" x="1417.647" y="970.5882" >
+      <FBNetwork >
+        <FB Name="START_PB" Type="IN_EVENT" x="588.2353" y="11.7647" />
+        <FB Name="STOP_PB" Type="IN_EVENT" x="1247.0588" y="11.7647" />
+        <FB Name="DT" Type="IN_ANY" x="1182.3529" y="858.8235" />
+        <FB Name="PERIODIC" Type="E_CYCLE" x="1735.2941" y="11.7647" />
+        <FB Name="MODE" Type="IN_CHOICE" x="2064.7058" y="1200" />
+        <FB Name="FLASHIT" Type="FLASHER4" x="2211.7646" y="11.7647" />
+        <FB Name="LEDS" Type="LED_HMI" x="2664.7058" y="11.7647" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="START_PB.INIT" dx1="11.7647" dx2="35.2941" dy="-1" />
+          <Connection Source="START_PB.INITO" Destination="STOP_PB.INIT" dx1="35.2941" dx2="76.4706" dy="994.1176" />
+          <Connection Source="STOP_PB.INITO" Destination="DT.INIT" dx1="41.1765" dx2="64.7059" dy="676.4706" />
+          <Connection Source="DT.INITO" Destination="MODE.INIT" dx1="311.7647" dx2="188.2353" dy="-1" />
+          <Connection Source="MODE.INITO" Destination="FLASHIT.INIT" dx1="41.1765" dx2="58.8235" dy="-170.5882" />
+          <Connection Source="FLASHIT.INITO" Destination="LEDS.INIT" dx1="11.7647" />
+          <Connection Source="START_PB.IND" Destination="DT.REQ" dx1="29.4118" dx2="111.7647" dy="547.0588" />
+          <Connection Source="DT.IND" Destination="PERIODIC.START" dx1="152.9412" dx2="23.5294" dy="670.5882" />
+          <Connection Source="STOP_PB.IND" Destination="PERIODIC.STOP" dx1="23.5294" dx2="76.4706" dy="600" />
+          <Connection Source="MODE.IND" Destination="FLASHIT.INIT" dx1="41.1765" dx2="58.8235" dy="-282.3529" />
+          <Connection Source="PERIODIC.EO" Destination="FLASHIT.REQ" dx1="35.2941" dx2="229.4118" dy="-1" />
+          <Connection Source="FLASHIT.CNF" Destination="LEDS.REQ" dx1="17.6471" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="DT.OUT" Destination="PERIODIC.DT" dx1="194.1176" dx2="23.5294" dy="652.9412" />
+          <Connection Source="1" Destination="MODE.QI" dx1="2000" />
+          <Connection Source="MODE.I" Destination="FLASHIT.MODE" dx1="105.8824" dx2="29.4118" dy="-882.3529" />
+          <Connection Source="FLASHIT.LED3" Destination="LEDS.LED3" dx1="29.4118" />
+          <Connection Source="FLASHIT.LED2" Destination="LEDS.LED2" dx1="35.2941" />
+          <Connection Source="FLASHIT.LED1" Destination="LEDS.LED1" dx1="41.1765" />
+          <Connection Source="FLASHIT.LED0" Destination="LEDS.LED0" dx1="47.0588" />
+          <Connection Source="&#34;FLASH_ALL,COUNT_UP,COUNT_DOWN,CHASE_UP,CHASE_DOWN&#34;" Destination="MODE.CHOICES" dx1="1035.2941" />
+          <Connection Source="1" Destination="START_PB.QI" dx1="523.5294" />
+          <Connection Source="1" Destination="STOP_PB.QI" dx1="1182.3529" />
+          <Connection Source="&#34;START&#34;" Destination="START_PB.LABEL" dx1="411.7647" />
+          <Connection Source="&#34;STOP&#34;" Destination="STOP_PB.LABEL" dx1="1088.2352" />
+          <Connection Source="1" Destination="DT.QI" dx1="1117.6471" />
+          <Connection Source="&#34;TIME&#34;" Destination="DT.TYPE" dx1="1035.2941" />
+          <Connection Source="t#250ms" Destination="DT.IVAL" dx1="1017.6470" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <FBNetwork >
+      <DataConnections>
+        <Connection Source="0" Destination="RES1.TRACE" dx1="1352.9412" />
+      </DataConnections>
+    </FBNetwork>
+  </Device>
+  <DeviceParameters>
+    <Connection Source="[100,100,320,100]" Destination="FLASHER.BOUNDS" dx1="764.7059" />
+    <Connection Source="[1,1]" Destination="FLASHER.GRID" dx1="958.8235" />
+  </DeviceParameters>
+</System>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="STACK_INT" Comment="A variable-size stack of INTs" >
+  <Identification Standard="61499-2" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2003-08-17" Remarks="Adapted from IEC 61131-3-F.4" />
+  <CompilerInfo header="package fb.rt.student;" >
+    <Compiler Language="Java" Vendor="IBM" Product="Jikes" Version="1.06" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="INIT" Comment="Empty the stack and set its maximum size to N." >
+        <With Var="N" />
+      </Event>
+      <Event Name="PUSH" Comment="Push the value of IN to the top of the stack if possible." >
+        <With Var="IN" />
+      </Event>
+      <Event Name="POP" Comment="Pop the top value off of the stack if possible." >
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="INITO" Comment="Initialization confirmation." >
+        <With Var="EMPTY" />
+        <With Var="OFLO" />
+        <With Var="OUT" />
+      </Event>
+      <Event Name="CNF" Comment="PUSH or POP confirmation." >
+        <With Var="EMPTY" />
+        <With Var="OFLO" />
+        <With Var="OUT" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="IN" Type="INT" Comment="Input to be pushed" />
+      <VarDeclaration Name="N" Type="INT" Comment="Maximum depth after INIT, 0 to 128 elements" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="EMPTY" Type="BOOL" InitialValue="1" Comment="Stack empty" />
+      <VarDeclaration Name="OFLO" Type="BOOL" InitialValue="0" Comment="Stack overflow" />
+      <VarDeclaration Name="OUT" Type="INT" InitialValue="0" Comment="Top of stack data (meaningless if EMPTY or OFLO)." />
+    </OutputVars>
+  </InterfaceList>
+  <BasicFB>
+    <InternalVars>
+      <VarDeclaration Name="STK" Type="INT" ArraySize="128" Comment="Internal stack" />
+      <VarDeclaration Name="NI" Type="INT" InitialValue="128" Comment="Storage for N upon reset" />
+      <VarDeclaration Name="PTR" Type="INT" InitialValue="-1" Comment="Stack pointer" />
+    </InternalVars>
+  <Algorithm Name="INIT" >
+    <ST Text="OFLO:=FALSE;EMPTY:=TRUE;PTR:=-1;&#10;IF N&#60;0 THEN NI:=0;&#10;ELSIF N>127 THEN NI:=127;&#10;ELSE NI:=N;&#10;END_IF;&#10;OUT:=0;&#10;INITO.serviceEvent(this);&#10;" />
+  </Algorithm>
+  <Algorithm Name="POP" >
+    <ST Text="IF NOT EMPTY THEN&#10;OFLO:=FALSE;PTR:=PTR-1;EMPTY:=PTR&#60;0;&#10;END_IF;&#10;IF EMPTY THEN OUT:=0;&#10;ELSE OUT:=STK[PTR];&#10;END_IF;&#10;CNF.serviceEvent(this);&#10;" />
+  </Algorithm>
+  <Algorithm Name="PUSH" >
+    <ST Text="IF NOT OFLO THEN&#10;  EMPTY:=FALSE;PTR:=PTR+1;OFLO:=(PTR=NI);&#10;END_IF;&#10;IF NOT OFLO THEN OUT:=IN;STK[PTR]:=IN;&#10;ELSE OUT:=0;&#10;END_IF;&#10;CNF.serviceEvent(this);&#10;" />
+  </Algorithm>
+  </BasicFB>
+</FBType>

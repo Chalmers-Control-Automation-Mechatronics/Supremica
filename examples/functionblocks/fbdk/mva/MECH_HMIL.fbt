@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="MECH_HMIL" Comment="HMI for testing MECH_VIEWL" >
+  <Identification Standard="61499-1" Classification="HMI" ApplicationDomain="SImulation" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.3" Author="JHC" Date="2004-09-04" Remarks="Changed to optimized PUBL, standardized REND_ID." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.2" Author="JHC" Date="2002-05-02" Remarks="Changed to optimized PUBL, standardized REND_ID." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2002-04-21" Remarks="Changed PUBL to PUBLISH" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2002-04-14" />
+  <CompilerInfo header="package fb.rt.mva; import fb.rt.swing.*; import fb.rt.net.*;" classdef="public class MECH_HMIL extends FBMVCD" >
+    <Compiler Language="Java" Vendor="IBM" Product="VisualAge" Version="3.0" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="INIT" Comment="Initialization Request" >
+        <With Var="REND_ID" />
+        <With Var="BKGD" />
+        <With Var="FGD" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="INITO" Comment="Initialization Confirm" >
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="REND_ID" Type="WSTRING" Comment="Data Channel ID - default is FB instaqnce name" />
+      <VarDeclaration Name="FGD" Type="COLOR" InitialValue="red" Comment="Slider Foreground Color" />
+      <VarDeclaration Name="BKGD" Type="COLOR" InitialValue="blue" Comment="Slider Background Color" />
+    </InputVars>
+  </InterfaceList>
+  <FBNetwork >
+    <FB Name="LBL" Type="FB_LABEL" x="366.66666" y="11.111111" />
+    <FB Name="POS" Type="FB_SLIDER" x="844.4444" y="11.111111" />
+    <FB Name="STYLE" Type="IN_ENUM" x="1588.8888" y="11.111111" />
+    <FB Name="WKPC" Type="IN_COLOR" x="2033.3333" y="11.111111" />
+    <FB Name="PUB" Type="PUBL_3" x="2744.4443" y="211.1111" />
+    <EventConnections>
+      <Connection Source="INIT" Destination="LBL.INIT" dx1="261.1111" />
+      <Connection Source="LBL.INITO" Destination="POS.INIT" dx1="161.1111" />
+      <Connection Source="POS.INITO" Destination="STYLE.INIT" dx1="27.777777" />
+      <Connection Source="STYLE.INITO" Destination="WKPC.INIT" dx1="33.333332" />
+      <Connection Source="WKPC.INITO" Destination="PUB.INIT" dx1="122.22221" />
+      <Connection Source="PUB.INITO" Destination="INITO" dx1="3183.3333" />
+      <Connection Source="POS.IND" Destination="STYLE.REQ" dx1="44.444443" />
+      <Connection Source="STYLE.IND" Destination="WKPC.REQ" dx1="55.555553" />
+      <Connection Source="WKPC.IND" Destination="PUB.REQ" dx1="77.77777" />
+    </EventConnections>
+    <DataConnections>
+      <Connection Source="REND_ID" Destination="PUB.ID" dx1="2572.2222" />
+      <Connection Source="REND_ID" Destination="LBL.LABEL" dx1="194.44444" />
+      <Connection Source="1" Destination="LBL.QI" dx1="300.0" />
+      <Connection Source="1" Destination="STYLE.QI" dx1="1522.2222" />
+      <Connection Source="1" Destination="WKPC.QI" dx1="1966.6666" />
+      <Connection Source="50" Destination="POS.IVAL" dx1="761.1111" />
+      <Connection Source="&#34;VSTYLE&#34;" Destination="STYLE.TYPE" dx1="1405.5555" />
+      <Connection Source="POS.OUT" Destination="PUB.SD_1" dx1="38.888885" />
+      <Connection Source="STYLE.OUT" Destination="PUB.SD_2" dx1="38.888885" />
+      <Connection Source="WKPC.OUT" Destination="PUB.SD_3" dx1="27.777777" />
+      <Connection Source="FGD" Destination="POS.FGD" dx1="733.3333" />
+      <Connection Source="BKGD" Destination="POS.BKGD" dx1="711.1111" />
+    </DataConnections>
+  </FBNetwork>
+</FBType>

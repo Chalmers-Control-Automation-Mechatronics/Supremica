@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE System SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<System xmlns="http://www.holobloc.com/xml/LibraryElement" Name="TESTBED_VIEWL" Comment="Testbed View + HMI" >
+  <Identification Standard="61499 ITA" Classification="Testbed" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.3" Author="JHC" Date="2004-10-26" Remarks="Changed rotary representation to gate on ring chute." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.2" Author="JHC" Date="2004-10-22" Remarks="Reformatted XSPACEs to work with DIA=40 or 25.." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2004-09-28" Remarks="Updated for new conveyor models." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2002-04-15" />
+  <Device Name="HMI" Type="FRAME_DEVICE" x="594.4444" y="100.0" >
+    <Resource Name="HMI_PANEL" Type="PANEL_RESOURCE" x="255.55554" y="11.111111" >
+      <FBNetwork >
+        <FB Name="CHAIN" Type="MECH_HMIL" x="461.11108" y="11.111111" />
+        <FB Name="SORT" Type="MECH_HMIL" x="933.3333" y="11.111111" />
+        <FB Name="CHUTE" Type="MECH_HMIL" x="1372.2222" y="11.111111" />
+        <FB Name="RING_FEED" Type="MECHC_HMIL" x="100.0" y="822.22217" />
+        <FB Name="ASSY_CHUTE" Type="MECH_HMIL" x="572.2222" y="822.22217" />
+        <FB Name="BELT" Type="MECH_HMIL" x="999.99994" y="822.22217" />
+        <FB Name="REJECT" Type="MECH_HMIL" x="1483.3333" y="822.22217" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="CHAIN.INIT" dx1="38.888885" />
+          <Connection Source="CHAIN.INITO" Destination="SORT.INIT" dx1="33.333332" />
+          <Connection Source="CHUTE.INITO" Destination="RING_FEED.INIT" dx1="27.777777" dx2="38.888885" dy="655.55554" />
+          <Connection Source="RING_FEED.INITO" Destination="ASSY_CHUTE.INIT" dx1="27.777777" />
+          <Connection Source="SORT.INITO" Destination="CHUTE.INIT" dx1="44.444443" />
+          <Connection Source="BELT.INITO" Destination="REJECT.INIT" dx1="77.77777" />
+          <Connection Source="ASSY_CHUTE.INITO" Destination="BELT.INIT" dx1="27.777777" />
+        </EventConnections>
+      </FBNetwork>
+    </Resource>
+  </Device>
+  <Device Name="MODEL" Type="FRAME_DEVICE" x="605.55554" y="683.3333" >
+    <Resource Name="CHAIN" Type="VIEW_PANEL" x="538.88885" y="366.66666" >
+      <FBNetwork >
+        <FB Name="SP1" Type="XSPACE" x="483.3333" y="255.55554" />
+        <FB Name="SORT" Type="SOL_VIEWL" Comment="Sort Solenoid" x="916.6666" y="11.111111" />
+        <FB Name="SP2" Type="XSPACE" x="1461.1111" y="11.111111" />
+        <FB Name="CHAIN" Type="MECH_VIEWL" Comment="First Chain Segment" x="1927.7777" y="11.111111" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="SP1.INIT" dx1="33.333332" dx2="5.8824" dy="-1.0" />
+          <Connection Source="SP1.INITO" Destination="SORT.INIT" dx1="27.777777" dx2="541.1765" dy="-1.0" />
+          <Connection Source="SORT.INITO" Destination="SP2.INIT" dx1="50.0" />
+          <Connection Source="SP2.INITO" Destination="CHAIN.INIT" dx1="27.777777" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="[&#34;&#34;,&#34;&#34;,&#34;SORT &#34;]" Destination="SP1.LBLS" dx1="244.44443" />
+          <Connection Source="[2,1]" Destination="SP1.DIMS" dx1="377.77777" />
+          <Connection Source="1" Destination="SORT.LEN" dx1="849.99994" />
+          <Connection Source="1" Destination="SORT.DIR" dx1="849.99994" />
+          <Connection Source="7" Destination="CHAIN.LEN" dx1="1861.1111" />
+          <Connection Source="2" Destination="CHAIN.DIR" dx1="1861.1111" />
+          <Connection Source="[4,1]" Destination="SP2.DIMS" dx1="1355.5555" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="CHUTES" Type="VIEW_PANEL" x="1233.3333" y="355.55554" >
+      <FBNetwork >
+        <FB Name="CHUTE" Type="MECH_VIEWL" Comment="Peg Chute" x="466.66666" y="11.111111" />
+        <FB Name="SPC4" Type="XSPACE" Comment="Ring Feed Chute" x="955.55554" y="466.66666" />
+        <FB Name="RING_FEED" Type="MECHC_VIEWL" Comment="Ring Feed Chute" x="1411.1111" y="11.111111" />
+        <FB Name="ASSY_CHUTE" Type="MECH_VIEWL" Comment="Assembly Chute" x="1966.6666" y="11.111111" />
+        <FB Name="SPC6" Type="XSPACE" x="2700.0" y="677.7778" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="CHUTE.INIT" dx1="33.333332" dx2="35.2941" dy="-1.0" />
+          <Connection Source="CHUTE.INITO" Destination="SPC4.INIT" dx1="27.777777" dx2="29.4118" dy="1376.4706" />
+          <Connection Source="SPC4.INITO" Destination="RING_FEED.INIT" dx1="27.777777" dx2="35.2941" dy="-1.0" />
+          <Connection Source="RING_FEED.INITO" Destination="ASSY_CHUTE.INIT" dx1="55.555553" />
+          <Connection Source="ASSY_CHUTE.INITO" Destination="SPC6.INIT" dx1="27.777777" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="[1,4]" Destination="SPC4.DIMS" dx1="849.99994" />
+          <Connection Source="4" Destination="CHUTE.LEN" dx1="400.0" />
+          <Connection Source="1" Destination="CHUTE.DIR" dx1="400.0" />
+          <Connection Source="2" Destination="RING_FEED.LEN" dx1="1344.4443" />
+          <Connection Source="1" Destination="RING_FEED.DIR" dx1="1344.4443" />
+          <Connection Source="2" Destination="ASSY_CHUTE.LEN" dx1="1899.9999" />
+          <Connection Source="1" Destination="ASSY_CHUTE.DIR" dx1="1899.9999" />
+          <Connection Source="[&#34; ROTARY&#34;,&#34;&#34;,&#34;&#34;,&#34;INSPECT&#34;]" Destination="SPC6.LBLS" dx1="2266.6665" />
+          <Connection Source="[4,4]" Destination="SPC6.DIMS" dx1="2594.4443" />
+          <Connection Source="1" Destination="RING_FEED.CNV" dx1="1344.4443" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="BELT" Type="VIEW_PANEL" x="1983.3333" y="350.0" >
+      <FBNetwork >
+        <FB Name="BELT" Type="MECH_VIEWL" x="483.3333" y="11.111111" />
+        <FB Name="SP2" Type="XSPACE" x="961.1111" y="711.1111" />
+        <FB Name="REJECT" Type="SOL_VIEWL" x="1450.0" y="11.111111" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="BELT.INIT" dx1="38.888885" />
+          <Connection Source="SP2.INITO" Destination="REJECT.INIT" dx1="38.888885" />
+          <Connection Source="BELT.INITO" Destination="SP2.INIT" dx1="27.777777" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="7" Destination="BELT.LEN" dx1="416.66666" />
+          <Connection Source="0" Destination="BELT.DIR" dx1="416.66666" />
+          <Connection Source="1" Destination="REJECT.LEN" dx1="1383.3333" />
+          <Connection Source="3" Destination="REJECT.DIR" dx1="1383.3333" />
+          <Connection Source="[&#34;&#34;,&#34;&#34;,&#34;REJECT &#34;,&#34;&#34;,&#34;ASSEMBLE&#34;]" Destination="SP2.LBLS" dx1="472.2222" />
+          <Connection Source="[6,1]" Destination="SP2.DIMS" dx1="855.55554" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <FBNetwork >
+      <DataConnections>
+        <Connection Source="40" Destination="CHUTES.DIA" dx1="1150.0" />
+        <Connection Source="[7,4]" Destination="CHUTES.SIZE" dx1="1122.2222" />
+        <Connection Source="1" Destination="CHUTES.VERTICAL" dx1="1166.6666" />
+        <Connection Source="40" Destination="BELT.DIA" dx1="1899.9999" />
+        <Connection Source="[7,2]" Destination="BELT.SIZE" dx1="1872.2222" />
+        <Connection Source="0" Destination="CHAIN.TRACE" dx1="472.2222" />
+        <Connection Source="40" Destination="CHAIN.DIA" dx1="455.55554" />
+        <Connection Source="[7,2]" Destination="CHAIN.SIZE" dx1="427.77777" />
+      </DataConnections>
+    </FBNetwork>
+  </Device>
+  <DeviceParameters>
+    <Connection Source="[100,100,375,360]" Destination="HMI.BOUNDS" dx1="300.0" />
+    <Connection Source="[475,100,290,360]" Destination="MODEL.BOUNDS" dx1="311.11108" />
+    <Connection Source="[1,1]" Destination="HMI.GRID" dx1="483.3333" />
+  </DeviceParameters>
+</System>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="E_CTU" Comment="Event-Driven Up Counter" >
+  <Identification Standard="61499-1-A.18" Classification="Event-driven blocks" Function="Up-counter" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2001-04-27" Remarks="XML version" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="1999-01-22" Remarks="SRC version" />
+  <CompilerInfo header="package fb.rt.event;" >
+    <Compiler Language="Java" Vendor="IBM" Product="VisualAge" Version="3.0" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="CU" Comment="Count Up" >
+        <With Var="PV" />
+      </Event>
+      <Event Name="R" Comment="Reset" >
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="CUO" Comment="Count Up Output Event" >
+        <With Var="Q" />
+        <With Var="CV" />
+      </Event>
+      <Event Name="RO" Comment="Reset Output Event" >
+        <With Var="Q" />
+        <With Var="CV" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="PV" Type="UINT" Comment="Preset Value" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="Q" Type="BOOL" Comment="CV==PV" />
+      <VarDeclaration Name="CV" Type="UINT" />
+    </OutputVars>
+  </InterfaceList>
+  <BasicFB>
+    <ECC >
+      <ECState Name="START" x="242.10526" y="94.73684" >
+      </ECState>
+      <ECState Name="CU" x="868.421" y="94.73684" >
+        <ECAction Algorithm="CU" Output="CUO" />
+      </ECState>
+      <ECState Name="R" x="452.63156" y="610.5263" >
+        <ECAction Algorithm="R" Output="RO" />
+      </ECState>
+      <ECTransition Source="START" Destination="CU" Condition="CU&#38;(CV&#60;65535)" x="868.421" y="368.42105" />
+      <ECTransition Source="CU" Destination="START" Condition="1" x="631.5789" y="94.73684" />
+      <ECTransition Source="START" Destination="R" Condition="R" x="452.63156" y="400.0" />
+      <ECTransition Source="R" Destination="START" Condition="1" x="242.10526" y="610.5263" />
+    </ECC>
+  <Algorithm Name="CU" Comment="Count Up" >
+    <ST Text="CV:=CV+1;&#10;Q:=(CV>=PV);&#10;" />
+  </Algorithm>
+  <Algorithm Name="R" Comment="Reset" >
+    <ST Text="CV:=0;&#10;Q:=0;&#10;" />
+  </Algorithm>
+  </BasicFB>
+</FBType>

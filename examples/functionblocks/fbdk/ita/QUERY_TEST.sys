@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE System SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<System xmlns="http://www.holobloc.com/xml/LibraryElement" Name="QUERY_TEST" Comment="Test QUERY Function in Remote Devices" >
+  <Identification Standard="61499 ITA" Function="QUERY Functional Test" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2001-11-24" />
+  <Application Name="TEST" >
+    <FBNetwork >
+      <FB Name="SELECT" Type="IN_CHOICE" x="570.5882" y="11.7647" />
+      <FB Name="GEN" Type="QUERY_GEN" x="1388.2352" y="858.8235" />
+      <FB Name="QTEXT" Type="IN_TEXT_S" x="2164.7058" y="11.7647" />
+      <FB Name="QUERY" Type="IN_EVENT" x="1435.2941" y="11.7647" />
+      <FB Name="CLIENT" Type="CLIENT_2_1" x="2876.4705" y="382.3529" />
+      <FB Name="RTEXT" Type="OUT_TEXT_S" x="3529.4116" y="11.7647" />
+      <EventConnections>
+        <Connection Source="SELECT.INITO" Destination="QUERY.INIT" dx1="41.1765" />
+        <Connection Source="QUERY.INITO" Destination="GEN.REQ" dx1="70.5882" dx2="141.1765" dy="658.8235" />
+        <Connection Source="GEN.CNF" Destination="QTEXT.INIT" dx1="164.7059" />
+        <Connection Source="QTEXT.INITO" Destination="CLIENT.INIT" dx1="164.7059" />
+        <Connection Source="CLIENT.INITO" Destination="RTEXT.INIT" dx1="52.9412" />
+        <Connection Source="SELECT.IND" Destination="GEN.REQ" dx1="229.4118" />
+        <Connection Source="QTEXT.CNF" Destination="CLIENT.REQ" dx1="105.8824" />
+        <Connection Source="CLIENT.CNF" Destination="RTEXT.REQ" dx1="105.8824" />
+      </EventConnections>
+      <DataConnections>
+        <Connection Source="&#34;FB,Connection&#34;" Destination="SELECT.CHOICES" dx1="294.1176" />
+        <Connection Source="SELECT.I" Destination="GEN.N" dx1="111.7647" />
+        <Connection Source="QTEXT.OUT" Destination="CLIENT.SD_2" dx1="52.9412" />
+        <Connection Source="CLIENT.RD_1" Destination="RTEXT.IN" dx1="88.2353" />
+        <Connection Source="1" Destination="SELECT.QI" dx1="505.8824" />
+        <Connection Source="1" Destination="QTEXT.QI" dx1="2100" />
+        <Connection Source="1" Destination="QUERY.QI" dx1="1370.5883" />
+        <Connection Source="1" Destination="CLIENT.QI" dx1="2811.7646" />
+        <Connection Source="1" Destination="RTEXT.QI" dx1="3464.7058" />
+        <Connection Source="&#34;QUERY&#34;" Destination="QUERY.LABEL" dx1="1258.8235" />
+        <Connection Source="&#34;localhost:61494&#34;" Destination="CLIENT.ID" dx1="2588.2354" />
+        <Connection Source="&#34;RUT&#34;" Destination="GEN.DSTI" dx1="1258.8235" />
+        <Connection Source="GEN.DSTO" Destination="CLIENT.SD_1" dx1="876.4706" />
+        <Connection Source="GEN.QUERY" Destination="QTEXT.IVAL" dx1="270.5882" />
+      </DataConnections>
+    </FBNetwork>
+  </Application>
+  <Device Name="QUERY_TESTER" Type="FRAME_DEVICE" x="605.8823" y="58.8235" >
+    <Resource Name="RES1" Type="PANEL_RESOURCE" x="1341.1764" y="511.7647" >
+      <FBNetwork >
+        <FB Name="SELECT" Type="IN_CHOICE" x="570.5882" y="11.7647" />
+        <FB Name="QUERY" Type="IN_EVENT" x="1370.5883" y="11.7647" />
+        <FB Name="GEN" Type="QUERY_GEN" x="1388.2352" y="870.5882" />
+        <FB Name="QTEXT" Type="IN_TEXT_S" x="2164.7058" y="11.7647" />
+        <FB Name="CLIENT" Type="CLIENT_2_1" x="2876.4705" y="382.3529" />
+        <FB Name="RTEXT" Type="OUT_TEXT_S" x="3529.4116" y="11.7647" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="SELECT.INIT" dx1="17.6471" />
+          <Connection Source="START.WARM" Destination="SELECT.INIT" dx1="23.5294" />
+          <Connection Source="SELECT.INITO" Destination="QUERY.INIT" dx1="41.1765" />
+          <Connection Source="QUERY.INITO" Destination="GEN.REQ" dx1="70.5882" dx2="141.1765" dy="658.8235" />
+          <Connection Source="SELECT.IND" Destination="GEN.REQ" dx1="229.4118" />
+          <Connection Source="GEN.CNF" Destination="QTEXT.INIT" dx1="164.7059" />
+          <Connection Source="QTEXT.INITO" Destination="CLIENT.INIT" dx1="164.7059" />
+          <Connection Source="QUERY.IND" Destination="QTEXT.REQ" dx1="105.8824" />
+          <Connection Source="QTEXT.CNF" Destination="CLIENT.REQ" dx1="105.8824" />
+          <Connection Source="CLIENT.INITO" Destination="RTEXT.INIT" dx1="52.9412" />
+          <Connection Source="CLIENT.CNF" Destination="RTEXT.REQ" dx1="105.8824" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="&#34;FB,Connection&#34;" Destination="SELECT.CHOICES" dx1="294.1176" />
+          <Connection Source="1" Destination="SELECT.QI" dx1="505.8824" />
+          <Connection Source="1" Destination="QUERY.QI" dx1="1305.8823" />
+          <Connection Source="&#34;QUERY&#34;" Destination="QUERY.LABEL" dx1="1194.1177" />
+          <Connection Source="SELECT.I" Destination="GEN.N" dx1="111.7647" />
+          <Connection Source="1" Destination="QTEXT.QI" dx1="2100" />
+          <Connection Source="QTEXT.OUT" Destination="CLIENT.SD_2" dx1="52.9412" />
+          <Connection Source="1" Destination="CLIENT.QI" dx1="2811.7646" />
+          <Connection Source="&#34;localhost:61494&#34;" Destination="CLIENT.ID" dx1="2588.2354" />
+          <Connection Source="&#34;RUT&#34;" Destination="GEN.DSTI" dx1="1258.8235" />
+          <Connection Source="GEN.DSTO" Destination="CLIENT.SD_1" dx1="958.8235" />
+          <Connection Source="CLIENT.RD_1" Destination="RTEXT.IN" dx1="88.2353" />
+          <Connection Source="1" Destination="RTEXT.QI" dx1="3464.7058" />
+          <Connection Source="[4,40]" Destination="QTEXT.SIZE" dx1="2035.2941" />
+          <Connection Source="GEN.QUERY" Destination="QTEXT.IVAL" dx1="264.7059" />
+          <Connection Source="[6,40]" Destination="RTEXT.SIZE" dx1="3400" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <FBNetwork >
+      <DataConnections>
+        <Connection Source="1" Destination="RES1.TRACE" dx1="1276.4706" />
+      </DataConnections>
+    </FBNetwork>
+  </Device>
+  <Device Name="DUT" Type="RMT_FRAME" Comment="Device Under Test" x="629.4117" y="617.6470" >
+    <Resource Name="RUT" Type="PANEL_RESOURCE" Comment="Resource Under Test" x="288.2353" y="105.8824" >
+      <FBNetwork >
+        <FB Name="X" Type="IN_ANY" x="641.1765" y="11.7647" />
+        <FB Name="Y" Type="IN_ANY" x="617.647" y="1141.1764" />
+        <FB Name="SUM" Type="FB_ADD_REAL" x="1464.7058" y="235.2941" />
+        <FB Name="DIFF" Type="FB_SUB_REAL" x="1423.5294" y="1311.7646" />
+        <FB Name="PROD" Type="FB_MUL_REAL" x="2252.9412" y="541.1765" />
+        <FB Name="OUT" Type="OUT_ANY" Comment="X**2-Y**2" x="2882.3528" y="317.6471" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="X.INIT" dx1="23.5294" />
+          <Connection Source="START.WARM" Destination="X.INIT" dx1="35.2941" />
+          <Connection Source="X.INITO" Destination="Y.INIT" dx1="76.4706" dx2="64.7059" dy="947.0588" />
+          <Connection Source="Y.INITO" Destination="OUT.INIT" dx1="1070.5883" />
+          <Connection Source="X.IND" Destination="Y.REQ" dx1="29.4118" dx2="105.8824" dy="788.2353" />
+          <Connection Source="Y.IND" Destination="SUM.REQ" dx1="176.4706" />
+          <Connection Source="SUM.CNF" Destination="DIFF.REQ" dx1="47.0588" dx2="82.3529" dy="605.8823" />
+          <Connection Source="DIFF.CNF" Destination="PROD.REQ" dx1="247.0588" />
+          <Connection Source="PROD.CNF" Destination="OUT.REQ" dx1="47.0588" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="X.OUT" Destination="SUM.IN1" dx1="164.7059" />
+          <Connection Source="X.OUT" Destination="DIFF.IN1" dx1="229.4118" />
+          <Connection Source="Y.OUT" Destination="SUM.IN2" dx1="317.6471" />
+          <Connection Source="Y.OUT" Destination="DIFF.IN2" dx1="317.6471" />
+          <Connection Source="SUM.OUT" Destination="PROD.IN1" dx1="152.9412" />
+          <Connection Source="DIFF.OUT" Destination="PROD.IN2" dx1="311.7647" />
+          <Connection Source="PROD.OUT" Destination="OUT.IN" dx1="147.0588" />
+          <Connection Source="&#34;REAL&#34;" Destination="X.TYPE" dx1="494.1176" />
+          <Connection Source="0.0" Destination="X.IVAL" dx1="547.0588" />
+          <Connection Source="&#34;REAL&#34;" Destination="Y.TYPE" dx1="470.5882" />
+          <Connection Source="&#34;0.0&#34;" Destination="Y.IVAL" dx1="500" />
+          <Connection Source="1" Destination="X.QI" dx1="576.4706" />
+          <Connection Source="1" Destination="Y.QI" dx1="552.9412" />
+          <Connection Source="1" Destination="OUT.QI" dx1="2817.647" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+  </Device>
+  <DeviceParameters>
+    <Connection Source="[375,50,100,150]" Destination="DUT.BOUNDS" dx1="341.1765" />
+    <Connection Source="[1,1]" Destination="DUT.GRID" dx1="517.6470" />
+    <Connection Source="&#34;localhost:61494&#34;" Destination="DUT.MGR_ID" dx1="341.1765" />
+    <Connection Source="[50,50,325,240]" Destination="QUERY_TESTER.BOUNDS" dx1="335.2941" />
+    <Connection Source="[1,1]" Destination="QUERY_TESTER.GRID" dx1="494.1176" />
+  </DeviceParameters>
+  <Mapping From="TEST.SELECT" To="QUERY_TESTER.RES1.SELECT" />
+  <Mapping From="TEST.QUERY" To="QUERY_TESTER.RES1.QUERY" />
+  <Mapping From="TEST.GEN" To="QUERY_TESTER.RES1.GEN" />
+  <Mapping From="TEST.QTEXT" To="QUERY_TESTER.RES1.QTEXT" />
+  <Mapping From="TEST.CLIENT" To="QUERY_TESTER.RES1.CLIENT" />
+  <Mapping From="TEST.RTEXT" To="QUERY_TESTER.RES1.RTEXT" />
+</System>

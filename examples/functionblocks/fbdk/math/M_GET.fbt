@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="M_GET" Comment="Retrieve a Matrix Element" >
+  <Identification Standard="61499-1" Classification="Matrix Operations" Function="Initialization" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2002-03-07" />
+  <CompilerInfo header="package fb.rt.math;" >
+    <Compiler Language="Java" Vendor="IBM" Product="VisualAge" Version="3.0" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="REQ" Comment="Retrieve the data at location INDEX" >
+        <With Var="QI" />
+        <With Var="IN" />
+        <With Var="INDEX" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="CNF" >
+        <With Var="QO" />
+        <With Var="STATUS" />
+        <With Var="OUT" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="QI" Type="BOOL" Comment="0=Inhibit,1=Enable" />
+      <VarDeclaration Name="IN" Type="MATRIX" Comment="Matrix from which to get data" />
+      <VarDeclaration Name="INDEX" Type="UINT" ArraySize="2" Comment="[row,column]" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="QO" Type="BOOL" Comment="1=OK,0=Inhibited or Error" />
+      <VarDeclaration Name="STATUS" Type="UINT" Comment="0=OK,1=INHIBITED,13=ARRAY_SIZE_ERROR" />
+      <VarDeclaration Name="OUT" Type="REAL" Comment="Data at INDEX location of IN" />
+    </OutputVars>
+  </InterfaceList>
+</FBType>

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE System SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<System xmlns="http://www.holobloc.com/xml/LibraryElement" Name="DRILL_VIEWL" Comment="Drill System View + HMI" >
+  <Identification Standard="61499-1" Classification="Simulation" ApplicationDomain="Transfer Lines" Function="Drillingd" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2004-10-18" Remarks="Changed loader/unloader to SOL_VIEWL." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2002-04-25" Remarks="Adapted from TESTBED_VIEWL" />
+  <Device Name="HMI" Type="FRAME_DEVICE" x="594.1176" y="100.0" >
+    <Resource Name="RES1" Type="PANEL_RESOURCE" x="123.5294" y="11.7647" >
+      <FBNetwork >
+        <FB Name="SUPPLY" Type="MECH_HMIL" x="455.55554" y="138.88889" />
+        <FB Name="LOAD" Type="MECH_HMIL" x="905.55554" y="11.111111" />
+        <FB Name="DRILL" Type="MECH_HMIL" x="1833.3333" y="511.11108" />
+        <FB Name="SLIDE" Type="MECHC_HMIL" x="1372.2222" y="272.2222" />
+        <FB Name="UNLOAD" Type="MECH_HMIL" x="2288.889" y="11.111111" />
+        <FB Name="TAKEOFF" Type="MECH_HMIL" x="2727.7776" y="227.77777" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="SUPPLY.INIT" dx1="33.333332" />
+          <Connection Source="SUPPLY.INITO" Destination="LOAD.INIT" dx1="27.777777" />
+          <Connection Source="LOAD.INITO" Destination="SLIDE.INIT" dx1="27.777777" />
+          <Connection Source="SLIDE.INITO" Destination="DRILL.INIT" dx1="27.777777" />
+          <Connection Source="DRILL.INITO" Destination="UNLOAD.INIT" dx1="44.444443" />
+          <Connection Source="UNLOAD.INITO" Destination="TAKEOFF.INIT" dx1="27.777777" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="COLOR#yellow" Destination="SUPPLY.FGD" dx1="205.55554" />
+          <Connection Source="COLOR#yellow" Destination="SLIDE.FGD" dx1="1122.2222" />
+          <Connection Source="COLOR#gray" Destination="DRILL.BKGD" dx1="1611.1111" />
+          <Connection Source="COLOR#yellow" Destination="DRILL.FGD" dx1="1583.3333" />
+          <Connection Source="COLOR#yellow" Destination="TAKEOFF.FGD" dx1="2477.7776" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+  </Device>
+  <Device Name="VIEW" Type="FRAME_DEVICE" x="605.8823" y="682.3529" >
+    <Resource Name="INPUT" Type="VIEW_PANEL" x="258.8235" y="11.7647" >
+      <FBNetwork >
+        <FB Name="SUPPLY" Type="MECH_VIEWL" Comment="Supply transfer mechanism" x="494.44443" y="11.111111" />
+        <FB Name="SP1" Type="XSPACE" x="1077.7777" y="700.0" />
+        <FB Name="LOAD" Type="SOL_VIEWL" Comment="Loader mechanism" x="1611.1111" y="11.111111" />
+        <FB Name="SP3" Type="XSPACE" x="2183.3333" y="11.111111" />
+        <FB Name="DRILL" Type="MECH_VIEWL" x="2600.0" y="294.44443" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="SUPPLY.INIT" dx1="33.333332" dx2="5.8824" dy="-1.0" />
+          <Connection Source="SUPPLY.INITO" Destination="SP1.INIT" dx1="33.333332" dx2="541.1765" dy="400.0" />
+          <Connection Source="SP1.INITO" Destination="LOAD.INIT" dx1="83.33333" dx2="0.0" dy="841.1765" />
+          <Connection Source="LOAD.INITO" Destination="SP3.INIT" dx1="88.888885" />
+          <Connection Source="SP3.INITO" Destination="DRILL.INIT" dx1="33.333332" dx2="105.8824" dy="-1.0" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="5" Destination="SUPPLY.LEN" dx1="427.77777" />
+          <Connection Source="1" Destination="SUPPLY.DIR" dx1="427.77777" />
+          <Connection Source="[1,2]" Destination="SP3.DIMS" dx1="2077.7776" />
+          <Connection Source="[&#34;SUPPLY&#34;,&#34;FEED&#34;,&#34;DRILL&#34;]" Destination="SP1.LBLS" dx1="661.1111" />
+          <Connection Source="[4,4]" Destination="SP1.DIMS" dx1="972.22217" />
+          <Connection Source="COLOR#gray" Destination="DRILL.BKGD" dx1="2377.7776" />
+          <Connection Source="3" Destination="DRILL.LEN" dx1="2533.3333" />
+          <Connection Source="1" Destination="DRILL.DIR" dx1="2533.3333" />
+          <Connection Source="1" Destination="LOAD.LEN" dx1="1544.4443" />
+          <Connection Source="1" Destination="LOAD.DIR" dx1="1544.4443" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="OUTPUT" Type="VIEW_PANEL" x="1041.1764" y="11.7647" >
+      <FBNetwork >
+        <FB Name="SLIDE" Type="MECHC_VIEWL" x="572.2222" y="11.111111" />
+        <FB Name="TAKEOFF" Type="MECH_VIEWL" Comment="Takeoff Transfer" x="1161.1111" y="11.111111" />
+        <FB Name="UNLOAD" Type="SOL_VIEWL" Comment="Unloader Mechanism" x="1716.6666" y="11.111111" />
+        <FB Name="SP1" Type="XSPACE" x="2216.6665" y="655.55554" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="SLIDE.INIT" dx1="44.444443" />
+          <Connection Source="SLIDE.INITO" Destination="TAKEOFF.INIT" dx1="111.11111" />
+          <Connection Source="TAKEOFF.INITO" Destination="UNLOAD.INIT" dx1="66.666664" />
+          <Connection Source="UNLOAD.INITO" Destination="SP1.INIT" dx1="88.888885" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="4" Destination="TAKEOFF.LEN" dx1="1094.4445" />
+          <Connection Source="1" Destination="TAKEOFF.DIR" dx1="1094.4445" />
+          <Connection Source="6" Destination="SLIDE.LEN" dx1="505.55554" />
+          <Connection Source="[&#34;TAKEOFF&#34;,&#34;SLIDE&#34;]" Destination="SP1.LBLS" dx1="1883.3333" />
+          <Connection Source="[3,4]" Destination="SP1.DIMS" dx1="2111.111" />
+          <Connection Source="1" Destination="UNLOAD.LEN" dx1="1649.9999" />
+          <Connection Source="1" Destination="UNLOAD.DIR" dx1="1649.9999" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <FBNetwork >
+      <DataConnections>
+        <Connection Source="0" Destination="INPUT.TRACE" dx1="194.1176" />
+        <Connection Source="25" Destination="INPUT.DIA" dx1="176.4706" />
+        <Connection Source="[6,5]" Destination="INPUT.SIZE" dx1="147.0588" />
+        <Connection Source="1" Destination="INPUT.VERTICAL" dx1="194.1176" />
+        <Connection Source="25" Destination="OUTPUT.DIA" dx1="958.8235" />
+        <Connection Source="[6,5]" Destination="OUTPUT.SIZE" dx1="929.4117" />
+      </DataConnections>
+    </FBNetwork>
+  </Device>
+  <DeviceParameters>
+    <Connection Source="[100,100,375,200]" Destination="HMI.BOUNDS" dx1="288.2353" />
+    <Connection Source="[1,1]" Destination="HMI.GRID" dx1="482.3529" />
+    <Connection Source="[475,100,220,300]" Destination="VIEW.BOUNDS" dx1="300.0" />
+  </DeviceParameters>
+</System>

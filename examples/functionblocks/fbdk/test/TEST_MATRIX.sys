@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE System SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<System xmlns="http://www.holobloc.com/xml/LibraryElement" Name="TEST_MATRIX" Comment="Test IN_MATRIX with OUT_MATRIX" >
+  <Identification Standard="61499-1" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2004-06-20" />
+  <Application Name="APP1" >
+    <FBNetwork >
+    </FBNetwork>
+  </Application>
+  <Device Name="DEV1" Type="FRAME_DEVICE" x="705.55554" y="11.111111" >
+    <Resource Name="MATRICES" Type="PANEL_RESOURCE" x="166.66666" y="11.111111" >
+      <FBNetwork >
+        <FB Name="IN" Type="IN_MATRIX" x="561.1111" y="11.111111" />
+        <FB Name="OUT" Type="OUT_MATRIX" x="1661.1111" y="11.111111" />
+        <EventConnections>
+          <Connection Source="IN.INITO" Destination="OUT.INIT" dx1="77.77777" />
+          <Connection Source="START.COLD" Destination="IN.INIT" dx1="55.555553" />
+          <Connection Source="IN.IND" Destination="OUT.REQ" dx1="144.44444" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="IN.OUT" Destination="OUT.IN" dx1="27.777777" />
+          <Connection Source="&#34;[1,2,3,4]&#34;" Destination="IN.IVAL" dx1="377.77777" />
+          <Connection Source="&#34;[4,3,2,1]&#34;" Destination="OUT.IVAL" dx1="1477.7777" />
+          <Connection Source="3" Destination="IN.ROWS" dx1="494.44443" />
+          <Connection Source="3" Destination="IN.COLS" dx1="494.44443" />
+          <Connection Source="3" Destination="OUT.ROWS" dx1="1594.4443" />
+          <Connection Source="2" Destination="OUT.COLS" dx1="1594.4443" />
+          <Connection Source="1" Destination="IN.QI" dx1="494.44443" />
+          <Connection Source="IN.QO" Destination="OUT.QI" dx1="316.66666" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <FBNetwork >
+      <DataConnections>
+        <Connection Source="1" Destination="MATRICES.ROWS" dx1="100.0" />
+        <Connection Source="2" Destination="MATRICES.COLS" dx1="100.0" />
+      </DataConnections>
+    </FBNetwork>
+  </Device>
+  <DeviceParameters>
+    <Connection Source="[100,100,350,150]" Destination="DEV1.BOUNDS" dx1="411.11108" />
+    <Connection Source="[1,1]" Destination="DEV1.GRID" dx1="594.4444" />
+  </DeviceParameters>
+</System>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE DeviceType SYSTEM "../LibraryElement.dtd" >
+<DeviceType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="RMT_DEV" Comment="Remotely Managed Device Type" >
+  <Identification Standard="61499 ITA" Description="Remotely Managed Device" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.3" Author="JHC" Date="2000-12-22" Remarks="Back to no DM_RES" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.2" Author="JHC" Date="2000-12-20" Remarks="Now contains DM_RES" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2000-05-16" Remarks="File type changed to &#34;.dev&#34;" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2000-03-19" />
+  <CompilerInfo header="package fb.rt;" classdef="public class RMT_DEV extends FBDevice implements RemoteDevice" >
+    <Compiler Language="Java" Vendor="IBM" Product="VisualAge" Version="3.0" />
+  </CompilerInfo>
+  <VarDeclaration Name="MGR_ID" Type="WSTRING" InitialValue="&#34;localhost:61499&#34;" Comment="Device manager socket ID" />
+  <Resource Name="MGR" Type="RMT_RES" x="370.5882" y="94.1176" >
+  </Resource>
+  <FBNetwork >
+    <DataConnections>
+      <Connection Source="MGR_ID" Destination="MGR.MGR_ID" dx1="205.8824" />
+    </DataConnections>
+  </FBNetwork>
+</DeviceType>

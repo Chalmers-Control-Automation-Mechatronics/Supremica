@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="UNPK_BYTE" Comment="Unpacks a BYTE to 8 BOOLs" >
+  <Identification Standard="61499-1" Classification="Math" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2002-05-07" Remarks="Copied/modified from UNPK_WORD." />
+  <CompilerInfo header="package fb.rt.math;" >
+    <Compiler Language="Java" Vendor="IBM" Product="VisualAge" Version="3.0" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="REQ" Comment="Unpack Request" >
+        <With Var="IN" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="IND" Comment="Data Change Notification" >
+        <With Var="OUT0" />
+        <With Var="OUT1" />
+        <With Var="OUT2" />
+        <With Var="OUT3" />
+        <With Var="OUT4" />
+        <With Var="OUT5" />
+        <With Var="OUT6" />
+        <With Var="OUT7" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="IN" Type="WORD" Comment="Data to Unpack" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="OUT0" Type="BOOL" Comment="Unpacked Data" />
+      <VarDeclaration Name="OUT1" Type="BOOL" />
+      <VarDeclaration Name="OUT2" Type="BOOL" />
+      <VarDeclaration Name="OUT3" Type="BOOL" />
+      <VarDeclaration Name="OUT4" Type="BOOL" />
+      <VarDeclaration Name="OUT5" Type="BOOL" />
+      <VarDeclaration Name="OUT6" Type="BOOL" />
+      <VarDeclaration Name="OUT7" Type="BOOL" />
+    </OutputVars>
+  </InterfaceList>
+  <Service RightInterface="PACK_WORD" LeftInterface="APPLICATION" >
+    <ServiceSequence Name="dataChanged" >
+      <ServiceTransaction >
+        <InputPrimitive Interface="APPLICATION" Event="REQ" Parameters="IN" />
+        <OutputPrimitive Interface="PACK_WORD" Event="unpack" />
+        <OutputPrimitive Interface="APPLICATION" Event="IND" Parameters="OUT0,...,OUT7" />
+      </ServiceTransaction>
+    </ServiceSequence>
+    <ServiceSequence Name="dataUnchanged" >
+      <ServiceTransaction >
+        <InputPrimitive Interface="APPLICATION" Event="REQ" Parameters="IN" />
+        <OutputPrimitive Interface="PACK_WORD" Event="unpack" />
+      </ServiceTransaction>
+    </ServiceSequence>
+  </Service>
+</FBType>

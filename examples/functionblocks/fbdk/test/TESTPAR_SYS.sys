@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE System SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<System xmlns="http://www.holobloc.com/xml/LibraryElement" Name="TESTPAR_SYS" Comment="Test Setting of Parameters in a System Configuration" >
+  <Identification Standard="61499-1" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2004-12-16" />
+  <Device Name="HMI" Type="FRAME_DEVICE" x="511.11108" y="11.111111" >
+    <Parameter Name="BOUNDS" Value="[100,100,75,50]" />
+    <Resource Name="RES1" Type="PANEL_RESOURCE" x="133.33333" y="11.111111" >
+      <FBNetwork >
+        <FB Name="IN" Type="IN_ANY" x="611.1111" y="11.111111" >
+          <Parameter Name="TYPE" Value="&#34;REAL&#34;" />
+          <Parameter Name="IVAL" Value="&#34;4.0&#34;" />
+        </FB>
+        <FB Name="IN_PUB" Type="PUBLISH_1" x="1505.5555" y="11.111111" >
+          <Parameter Name="ID" Value="&#34;225.0.0.1:1025&#34;" />
+          <Parameter Name="QI" Value="1" />
+        </FB>
+        <FB Name="OUT_SUB" Type="SUBSCRIBE_1" x="2366.6665" y="11.111111" >
+          <Parameter Name="ID" Value="&#34;226.0.0.1:1026&#34;" />
+          <Parameter Name="QI" Value="1" />
+        </FB>
+        <FB Name="OUT" Type="OUT_ANY" x="3061.111" y="11.111111" >
+          <Parameter Name="QI" Value="1" />
+          <Parameter Name="TYPE" Value="&#34;REAL&#34;" />
+        </FB>
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="IN.INIT" dx1="33.333332" />
+          <Connection Source="IN.INITO" Destination="IN_PUB.INIT" dx1="27.777777" />
+          <Connection Source="IN.IND" Destination="IN_PUB.REQ" dx1="44.444443" />
+          <Connection Source="IN_PUB.INITO" Destination="OUT_SUB.INIT" dx1="33.333332" />
+          <Connection Source="OUT_SUB.INITO" Destination="OUT.INIT" dx1="33.333332" />
+          <Connection Source="OUT_SUB.IND" Destination="OUT.REQ" dx1="61.111107" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="IN.OUT" Destination="IN_PUB.SD_1" dx1="27.777777" />
+          <Connection Source="OUT_SUB.RD_1" Destination="OUT.W" dx1="183.33333" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+  </Device>
+  <Device Name="TEST" Type="TESTPAR_DEV" x="1433.3333" y="11.111111" >
+  </Device>
+</System>

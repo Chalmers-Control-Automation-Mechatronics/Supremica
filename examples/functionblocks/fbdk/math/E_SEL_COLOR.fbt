@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="E_SEL_COLOR" Comment="Event-driven COLOR selection" >
+  <Identification Standard="61499-1" Function="GUI" Type="Selection" Description="Color selection" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2004-06-21" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2001-03-07" />
+  <CompilerInfo header="package fb.rt.hmi;" >
+    <Compiler Language="Java" Vendor="IBM" Product="VisualAge" Version="3.0" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="EI0" Comment="Select INO" >
+        <With Var="IN0" />
+      </Event>
+      <Event Name="EI1" Comment="Select INO" >
+        <With Var="IN1" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="EO" Comment="New selection event" >
+        <With Var="OUT" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="IN0" Type="COLOR" Comment="Selected by EI0" />
+      <VarDeclaration Name="IN1" Type="COLOR" Comment="Selected by EI1" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="OUT" Type="COLOR" Comment="Selected value" />
+    </OutputVars>
+  </InterfaceList>
+  <BasicFB>
+    <ECC >
+      <ECState Name="START" Comment="Initial State" x="570.5882" y="317.6471" >
+      </ECState>
+      <ECState Name="S0" Comment="Select IN0" x="1076.4706" y="117.6471" >
+        <ECAction Algorithm="SEL0" Output="EO" />
+      </ECState>
+      <ECState Name="S1" Comment="Select IN1" x="141.1765" y="694.1176" >
+        <ECAction Algorithm="SEL1" Output="EO" />
+      </ECState>
+      <ECTransition Source="START" Destination="S0" Condition="EI0" x="1076.4706" y="317.6471" />
+      <ECTransition Source="S0" Destination="START" Condition="1" x="570.5882" y="117.6471" />
+      <ECTransition Source="START" Destination="S1" Condition="EI1" x="141.1765" y="317.6471" />
+      <ECTransition Source="S1" Destination="START" Condition="1" x="570.5882" y="529.4117" />
+    </ECC>
+  <Algorithm Name="SEL0" >
+    <ST Text="OUT:=IN0;&#10;" />
+  </Algorithm>
+  <Algorithm Name="SEL1" >
+    <ST Text="OUT:=IN1;&#10;" />
+  </Algorithm>
+  </BasicFB>
+</FBType>

@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE System SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<System xmlns="http://www.holobloc.com/xml/LibraryElement" Name="TEST_SWING" Comment="Test of Swing components" >
+  <Identification Standard="61499-1" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2004-06-18" />
+  <Application Name="APP1" >
+    <FBNetwork >
+    </FBNetwork>
+  </Application>
+  <Device Name="DEV1" Type="FRAME_DEVICE" x="705.55554" y="11.111111" >
+    <Resource Name="RES1" Type="PANEL_RESOURCE" x="166.66666" y="11.111111" >
+      <FBNetwork >
+        <FB Name="IN" Type="FB_SLIDER" x="683.3333" y="11.111111" />
+        <FB Name="OUT" Type="FB_BAR" x="1450.0" y="11.111111" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="IN.INIT" dx1="38.888885" />
+          <Connection Source="IN.INITO" Destination="OUT.INIT" dx1="55.555553" />
+          <Connection Source="IN.IND" Destination="OUT.REQ" dx1="83.33333" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="IN.OUT" Destination="OUT.IN" dx1="177.77777" />
+          <Connection Source="100" Destination="OUT.W" dx1="1350.0" />
+          <Connection Source="25" Destination="OUT.H" dx1="1366.6666" />
+          <Connection Source="100" Destination="IN.W" dx1="583.3333" />
+          <Connection Source="25" Destination="IN.H" dx1="600.0" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="RES2" Type="PANEL_RESOURCE" x="849.99994" y="11.111111" >
+      <FBNetwork >
+        <FB Name="IN" Type="IN_ANY" x="683.3333" y="11.111111" />
+        <FB Name="OUT" Type="OUT_ANY" x="1450.0" y="11.111111" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="IN.INIT" dx1="38.888885" />
+          <Connection Source="IN.INITO" Destination="OUT.INIT" dx1="55.555553" />
+          <Connection Source="IN.IND" Destination="OUT.REQ" dx1="83.33333" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="IN.OUT" Destination="OUT.IN" dx1="177.77777" />
+          <Connection Source="&#34;UINT&#34;" Destination="IN.TYPE" dx1="544.4444" />
+          <Connection Source="&#34;UINT&#34;" Destination="OUT.TYPE" dx1="1311.1111" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="RES3" Type="PANEL_RESOURCE" x="1522.2222" y="11.111111" >
+      <FBNetwork >
+        <FB Name="IN" Type="IN_BOOL" x="683.3333" y="11.111111" />
+        <FB Name="OUT" Type="OUT_BOOL" x="1433.3333" y="11.111111" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="IN.INIT" dx1="38.888885" />
+          <Connection Source="IN.INITO" Destination="OUT.INIT" dx1="55.555553" />
+          <Connection Source="IN.IND" Destination="OUT.REQ" dx1="83.33333" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="IN.OUT" Destination="OUT.IN" dx1="266.66666" />
+          <Connection Source="&#34;IN_BOOL&#34;" Destination="IN.LABEL" dx1="483.3333" />
+          <Connection Source="&#34;OUT_BOOL&#34;" Destination="OUT.LABEL" dx1="1200.0" />
+          <Connection Source="COLOR#red" Destination="OUT.C0" dx1="1222.2222" />
+          <Connection Source="COLOR#green" Destination="OUT.C1" dx1="1188.8888" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="RES4" Type="PANEL_RESOURCE" x="2200.0" y="11.111111" >
+      <FBNetwork >
+        <FB Name="IN" Type="IN_COLOR" x="688.88885" y="11.111111" />
+        <FB Name="OUT" Type="OUT_COLOR" x="1411.1111" y="11.111111" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="IN.INIT" dx1="38.888885" />
+          <Connection Source="IN.INITO" Destination="OUT.INIT" dx1="55.555553" />
+          <Connection Source="IN.IND" Destination="OUT.REQ" dx1="83.33333" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="IN.OUT" Destination="OUT.IN" dx1="72.22222" />
+          <Connection Source="&#34;COLOR&#34;" Destination="OUT.LABEL" dx1="1238.8888" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="RES5" Type="PANEL_RESOURCE" x="249.99998" y="655.55554" >
+      <FBNetwork >
+        <FB Name="IN" Type="IN_CHOICE" x="1138.8888" y="11.111111" />
+        <FB Name="OUT" Type="OUT_ANY" x="1722.2222" y="11.111111" />
+        <FB Name="LBL" Type="FB_LABEL" x="750.0" y="11.111111" />
+        <EventConnections>
+          <Connection Source="IN.INITO" Destination="OUT.INIT" dx1="33.333332" />
+          <Connection Source="IN.IND" Destination="OUT.REQ" dx1="55.555553" />
+          <Connection Source="START.COLD" Destination="LBL.INIT" dx1="27.777777" />
+          <Connection Source="LBL.INITO" Destination="IN.INIT" dx1="27.777777" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="IN.OUT" Destination="OUT.IN" dx1="150.0" />
+          <Connection Source="10" Destination="OUT.W" dx1="1638.8888" />
+          <Connection Source="&#34;WSTRING&#34;" Destination="OUT.TYPE" dx1="1516.6666" />
+          <Connection Source="&#34;A,B,C,D&#34;" Destination="IN.CHOICES" dx1="966.6666" />
+          <Connection Source="&#34;CHOICE&#34;" Destination="LBL.LABEL" dx1="566.6666" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="RES6" Type="PANEL_RESOURCE" x="249.99998" y="655.55554" >
+      <FBNetwork >
+        <FB Name="IN" Type="IN_EVENT" x="627.7778" y="11.111111" />
+        <FB Name="OUT" Type="OUT_EVENT" x="1316.6666" y="11.111111" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="IN.INIT" dx1="33.333332" />
+          <Connection Source="IN.INITO" Destination="OUT.INIT" dx1="33.333332" />
+          <Connection Source="IN.IND" Destination="OUT.REQ" dx1="55.555553" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="&#34;IN_EVENT&#34;" Destination="IN.LABEL" dx1="411.11108" />
+          <Connection Source="&#34;OUT_EVENT&#34;" Destination="OUT.LABEL" dx1="1066.6666" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="RES7" Type="PANEL_RESOURCE" x="249.99998" y="655.55554" >
+      <FBNetwork >
+        <FB Name="IN" Type="IN_ARRAY" x="627.7778" y="11.111111" />
+        <FB Name="OUT" Type="OUT_ARRAY" x="1316.6666" y="11.111111" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="IN.INIT" dx1="33.333332" />
+          <Connection Source="IN.INITO" Destination="OUT.INIT" dx1="33.333332" />
+          <Connection Source="IN.IND" Destination="OUT.REQ" dx1="55.555553" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="IN.OUT" Destination="OUT.IN" dx1="200.0" />
+          <Connection Source="5" Destination="IN.N" dx1="561.1111" />
+          <Connection Source="&#34;UINT&#34;" Destination="IN.TYPE" dx1="488.88885" />
+          <Connection Source="&#34;[1,2,3,4,5]&#34;" Destination="IN.IVAL" dx1="422.2222" />
+          <Connection Source="5" Destination="OUT.N" dx1="1250.0" />
+          <Connection Source="&#34;UINT&#34;" Destination="OUT.TYPE" dx1="1177.7777" />
+          <Connection Source="&#34;[5,4,3]&#34;" Destination="OUT.IVAL" dx1="1161.1111" />
+          <Connection Source="10" Destination="IN.W" dx1="544.4444" />
+          <Connection Source="10" Destination="OUT.W" dx1="1233.3333" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+  </Device>
+  <DeviceParameters>
+    <Connection Source="[100,100,250,225]" Destination="DEV1.BOUNDS" dx1="411.11108" />
+    <Connection Source="[7,1]" Destination="DEV1.GRID" dx1="594.4444" />
+  </DeviceParameters>
+</System>

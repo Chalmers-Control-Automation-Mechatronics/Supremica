@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE System SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<System xmlns="http://www.holobloc.com/xml/LibraryElement" Name="Test_RMTDev" Comment="System Configuration" >
+  <Identification Standard="61499-1" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.3" Author="JHC" Date="2003-12-05" Remarks="Renamed from NEWSYSTEM." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.2" Author="JHC" Date="2002-11-05" Remarks="Fixed missing (empty) FBD in Application." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2002-01-17" Remarks="Minor cleanup" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2000-05-27" />
+  <Application Name="APP1" >
+    <FBNetwork >
+    </FBNetwork>
+  </Application>
+  <Device Name="DEV1" Type="FRAME_DEVICE" x="1694.4443" y="227.77777" >
+    <Resource Name="RES1" Type="PANEL_RESOURCE" x="905.55554" y="405.55554" >
+      <FBNetwork >
+        <FB Name="X" Type="FB_LABEL" x="711.1111" y="33.333332" />
+        <FB Name="InX" Type="IN_ANY" x="1388.8888" y="966.6666" />
+        <FB Name="Enter" Type="IN_EVENT" x="455.55554" y="966.6666" />
+        <FB Name="Publisher" Type="PUBL_2" x="3894.4443" y="2038.8888" />
+        <FB Name="Y" Type="FB_LABEL" x="2500.0" y="216.66666" />
+        <FB Name="InY" Type="IN_ANY" x="3166.6665" y="255.55554" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="X.INIT" dx1="300.0" />
+          <Connection Source="X.INITO" Destination="InX.INIT" dx1="405.55554" />
+          <Connection Source="InX.INITO" Destination="Y.INIT" dx1="327.77777" />
+          <Connection Source="Y.INITO" Destination="InY.INIT" dx1="294.44443" />
+          <Connection Source="InY.INITO" Destination="Enter.INIT" dx1="27.777777" />
+          <Connection Source="Enter.IND" Destination="InX.REQ" dx1="177.77777" />
+          <Connection Source="InX.IND" Destination="InY.REQ" dx1="1177.7777" />
+          <Connection Source="Enter.INITO" Destination="Publisher.INIT" dx1="144.44444" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="&#34;X&#34;" Destination="X.LABEL" dx1="616.6666" />
+          <Connection Source="&#34;REAL&#34;" Destination="InX.TYPE" dx1="1244.4443" />
+          <Connection Source="&#34;Enter&#34;" Destination="Enter.LABEL" dx1="311.11108" />
+          <Connection Source="InX.OUT" Destination="Publisher.SD_1" dx1="1500.0" />
+          <Connection Source="&#34;111&#34;" Destination="Publisher.ID" dx1="3772.2222" />
+          <Connection Source="&#34;Y&#34;" Destination="Y.LABEL" dx1="2405.5554" />
+          <Connection Source="&#34;REAL&#34;" Destination="InY.TYPE" dx1="3022.2222" />
+          <Connection Source="InY.OUT" Destination="Publisher.SD_2" dx1="277.77777" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+  </Device>
+  <Device Name="Ausgabe" Type="RMT_DEV" x="472.2222" y="1172.2222" >
+    <Resource Name="FOO" Type="PANEL_RESOURCE" x="1055.5555" y="1255.5555" >
+    </Resource>
+  </Device>
+  <DeviceParameters>
+    <Connection Source="[0,0,150,250]" Destination="DEV1.BOUNDS" dx1="1466.6666" />
+    <Connection Source="[0,1]" Destination="DEV1.GRID" dx1="1583.3333" />
+  </DeviceParameters>
+</System>

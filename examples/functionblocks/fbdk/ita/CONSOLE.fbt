@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="CONSOLE" Comment="Console Output Service Interface" >
+  <Identification Standard="61499-1" Classification="Debugging" Function="Console I/O" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2003-03-26" />
+  <CompilerInfo header="package fb.rt;" >
+    <Compiler Language="Java" Vendor="Sun" Product="javac(NetBeans)" Version="1.4.1" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="REQ" >
+        <With Var="OUT" />
+      </Event>
+    </EventInputs>
+    <InputVars>
+      <VarDeclaration Name="OUT" Type="WSTRING" Comment="Data to write to console" />
+    </InputVars>
+  </InterfaceList>
+</FBType>

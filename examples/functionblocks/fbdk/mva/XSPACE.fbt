@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="XSPACE" Comment="A spacer object with center and edge labels" >
+  <Identification Standard="61499-1" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2004-09-09" Remarks="Set DIA initial value to zero." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2000-04-26" />
+  <CompilerInfo header="package fb.rt.hmi;" >
+    <Compiler Language="Java" Vendor="IBM" Product="VisualAge" Version="3.0" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="INIT" Comment="Initialize" >
+        <With Var="LBLS" />
+        <With Var="COLORS" />
+        <With Var="DIMS" />
+        <With Var="DIA" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="INITO" Comment="Initialization Confirm" >
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="LBLS" Type="WSTRING" ArraySize="5" Comment="Labels:{Left,Top,Right,Bottom,Center}" />
+      <VarDeclaration Name="COLORS" Type="COLOR" ArraySize="2" InitialValue="[black,white]" Comment="{Foreground,Background}" />
+      <VarDeclaration Name="DIMS" Type="UINT" ArraySize="2" InitialValue="[3,3]" Comment="{Width,Height}in Diameters" />
+      <VarDeclaration Name="DIA" Type="UINT" Comment="Diameter dimension" />
+    </InputVars>
+  </InterfaceList>
+</FBType>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="LOADLE" Comment="LOADL with QI Enable" >
+  <Identification Standard="61499-2" Classification="Simulation" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2004-11-08" Remarks="Derived from LOADL." />
+  <CompilerInfo header="package fb.rt.mva; import fb.rt.net.*;" >
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="INIT" Comment="Service Initialization" >
+        <With Var="ID" />
+      </Event>
+      <Event Name="REQ" Comment="Publish LOAD command" >
+        <With Var="LPOS" />
+        <With Var="STYLE" />
+        <With Var="WKPC" />
+        <With Var="QI" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="INITO" Comment="Initialization Confirm" >
+      </Event>
+      <Event Name="CNF" Comment="Execution Confirmation" >
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="ID" Type="WSTRING" Comment="Local Group ID, default = FB instance name" />
+      <VarDeclaration Name="QI" Type="BOOL" Comment="0=Disable, 1=Enable" />
+      <VarDeclaration Name="LPOS" Type="UINT" Comment="Load Position in % of Conveyor Length" />
+      <VarDeclaration Name="STYLE" Type="VSTYLE" InitialValue="NONE" Comment="Input Workpiece style" />
+      <VarDeclaration Name="WKPC" Type="COLOR" InitialValue="yellow" Comment="Input Workpiece Color" />
+    </InputVars>
+  </InterfaceList>
+  <FBNetwork >
+    <FB Name="PUB" Type="PUBL_3" x="844.4444" y="11.111111" />
+    <FB Name="EN" Type="E_PERMIT" x="294.44443" y="122.22221" />
+    <EventConnections>
+      <Connection Source="INIT" Destination="PUB.INIT" dx1="738.88885" />
+      <Connection Source="PUB.INITO" Destination="INITO" dx1="1283.3333" />
+      <Connection Source="PUB.CNF" Destination="CNF" dx1="1261.1111" />
+      <Connection Source="REQ" Destination="EN.EI" dx1="183.33333" />
+      <Connection Source="EN.EO" Destination="PUB.REQ" dx1="66.666664" />
+    </EventConnections>
+    <DataConnections>
+      <Connection Source="ID" Destination="PUB.ID" dx1="766.6666" />
+      <Connection Source="LPOS" Destination="PUB.SD_1" dx1="716.6666" />
+      <Connection Source="STYLE" Destination="PUB.SD_2" dx1="700.0" />
+      <Connection Source="WKPC" Destination="PUB.SD_3" dx1="711.1111" />
+      <Connection Source="QI" Destination="EN.PERMIT" dx1="216.66666" />
+    </DataConnections>
+  </FBNetwork>
+</FBType>

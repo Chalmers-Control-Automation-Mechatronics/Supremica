@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="SOL_MDLL" Comment="Locally-Coupled Solenoid Model" >
+  <Identification Standard="61499-1" Classification="Model" ApplicationDomain="Simulation" Function="Material Handling" Type="Conveyor" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2004-09-23" Remarks="Converted to distributed clock." />
+  <CompilerInfo header="package fb.rt.mva; import fb.rt.math.*; import fb.rt.net.*;" classdef="public class SOL_MDLL1 extends FBMVCD" >
+    <Compiler Language="Java" Vendor="Sun" Product="JDK" Version="1.4.2" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="INIT" Comment="Initialize" >
+        <With Var="REND_ID" />
+        <With Var="ACT_ID" />
+        <With Var="VF" />
+        <With Var="CLK_ID" />
+        <With Var="UI_ID" />
+        <With Var="VR" />
+        <With Var="SENSE_ID" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="INITO" Comment="View Initialized" >
+        <With Var="END" />
+        <With Var="HOME" />
+      </Event>
+      <Event Name="IND" Comment="Change in Sensor Data" >
+        <With Var="HOME" />
+        <With Var="END" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="CLK_ID" Type="WSTRING" InitialValue="&#34;SIM_CLK&#34;" Comment="Simulation clock channel ID" />
+      <VarDeclaration Name="UI_ID" Type="WSTRING" Comment="User input channel ID from View" />
+      <VarDeclaration Name="REND_ID" Type="WSTRING" Comment="Rendering data channel ID to View" />
+      <VarDeclaration Name="SENSE_ID" Type="WSTRING" Comment="Sensor data channel ID to Controller" />
+      <VarDeclaration Name="ACT_ID" Type="WSTRING" Comment="Actuator data channel ID from Controller" />
+      <VarDeclaration Name="VF" Type="UINT" InitialValue="50" Comment="Forward Speed in % per CLK event" />
+      <VarDeclaration Name="VR" Type="UINT" InitialValue="50" Comment="Retract Speed in % per CLK event" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="HOME" Type="BOOL" Comment="Solenoid Fully Retracted" />
+      <VarDeclaration Name="END" Type="BOOL" Comment="Solenoid Fully Advanced" />
+    </OutputVars>
+  </InterfaceList>
+  <FBNetwork >
+    <FB Name="ACT" Type="SUBL_1" x="655.55554" y="166.66666" />
+    <FB Name="MDL" Type="SOL_MDL" x="1483.3333" y="755.55554" />
+    <FB Name="REND_PUB" Type="PUBL_1" x="2138.889" y="11.111111" />
+    <FB Name="CLK" Type="SUBL_0" x="1094.4445" y="294.44443" />
+    <FB Name="UI" Type="SUBL_1" x="233.33333" y="11.111111" />
+    <FB Name="SENS_PUB" Type="PUBL_2" x="2811.111" y="11.111111" />
+    <EventConnections>
+      <Connection Source="MDL.INDR" Destination="REND_PUB.REQ" dx1="27.777777" />
+      <Connection Source="CLK.IND" Destination="MDL.CLK" dx1="33.333332" />
+      <Connection Source="INIT" Destination="UI.INIT" dx1="127.77777" />
+      <Connection Source="UI.INITO" Destination="ACT.INIT" dx1="27.777777" />
+      <Connection Source="ACT.INITO" Destination="CLK.INIT" dx1="27.777777" />
+      <Connection Source="CLK.INITO" Destination="REND_PUB.INIT" dx1="27.777777" />
+      <Connection Source="REND_PUB.INITO" Destination="SENS_PUB.INIT" dx1="27.777777" />
+      <Connection Source="MDL.INDS" Destination="SENS_PUB.REQ" dx1="744.4444" />
+      <Connection Source="SENS_PUB.INITO" Destination="INITO" dx1="3249.9998" />
+      <Connection Source="SENS_PUB.CNF" Destination="IND" dx1="3216.6665" />
+    </EventConnections>
+    <DataConnections>
+      <Connection Source="MDL.POS" Destination="REND_PUB.SD_1" dx1="105.55555" />
+      <Connection Source="VF" Destination="MDL.VF" dx1="1394.4443" />
+      <Connection Source="ACT.RD_1" Destination="MDL.FWD" dx1="27.777777" />
+      <Connection Source="UI.RD_1" Destination="MDL.FAULT" dx1="27.777777" />
+      <Connection Source="VR" Destination="MDL.VR" dx1="1394.4443" />
+      <Connection Source="CLK_ID" Destination="CLK.ID" dx1="944.4444" />
+      <Connection Source="UI_ID" Destination="UI.ID" dx1="111.11111" />
+      <Connection Source="ACT_ID" Destination="ACT.ID" dx1="505.55554" />
+      <Connection Source="REND_ID" Destination="REND_PUB.ID" dx1="1966.6666" />
+      <Connection Source="MDL.HOME" Destination="SENS_PUB.SD_1" dx1="788.88885" />
+      <Connection Source="MDL.END" Destination="SENS_PUB.SD_2" dx1="838.88885" />
+      <Connection Source="SENSE_ID" Destination="SENS_PUB.ID" dx1="2622.2222" />
+      <Connection Source="MDL.HOME" Destination="HOME" dx1="2016.6666" />
+      <Connection Source="MDL.END" Destination="END" dx1="1988.8888" />
+    </DataConnections>
+  </FBNetwork>
+</FBType>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="SAMPLE_2" Comment="2-variable sampling-See SAMPLE_1 for sequences" >
+  <Identification Standard="61499-1" Function="Sampling" Type="2-variable" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2002-02-15" />
+  <CompilerInfo header="package fb.rt.math;" >
+    <Compiler Language="Java" Vendor="IBM" Product="VisualAge" Version="3.0" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="REQ" Comment="Request to Sample with Monitor Lock" >
+        <With Var="IN1" />
+        <With Var="IN2" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="CNF" Comment="Initial Sample or OUT1 changed" >
+        <With Var="OUT1" />
+        <With Var="OUT2" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="IN1" Type="ANY" Comment="Data to Sample" />
+      <VarDeclaration Name="IN2" Type="ANY" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="OUT1" Type="ANY" Comment="Sampled Data" />
+      <VarDeclaration Name="OUT2" Type="ANY" />
+    </OutputVars>
+  </InterfaceList>
+</FBType>

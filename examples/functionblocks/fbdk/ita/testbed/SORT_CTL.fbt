@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="SORT_CTL" Comment="Peg/Ring Sort Control" >
+  <Identification Standard="61499 ITA" Classification="Testbed" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2004-08-06" Remarks="Added RING_LOST." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2002-05-08" />
+  <CompilerInfo header="package fb.rt.ita.testbed;" >
+    <Compiler Language="Java" Vendor="Sun" Product="JDK" Version="1.4.2" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="REQ" >
+        <With Var="METAL_PEG_DETECT" />
+        <With Var="SORT_AREA_DETECT" />
+        <With Var="RING_PRESENT" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="CNF" >
+        <With Var="SORT_SOLENOID" />
+        <With Var="RING_LOST" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="SORT_AREA_DETECT" Type="BOOL" />
+      <VarDeclaration Name="METAL_PEG_DETECT" Type="BOOL" />
+      <VarDeclaration Name="RING_PRESENT" Type="BOOL" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="SORT_SOLENOID" Type="BOOL" />
+      <VarDeclaration Name="RING_LOST" Type="BOOL" Comment="Ring passed by sorter without deflection because chute was full" />
+    </OutputVars>
+  </InterfaceList>
+  <BasicFB>
+    <ECC >
+      <ECState Name="START" x="381.25" y="181.25" >
+      </ECState>
+      <ECState Name="REQ" x="662.5" y="550.0" >
+        <ECAction Algorithm="REQ" Output="CNF" />
+      </ECState>
+      <ECTransition Source="START" Destination="REQ" Condition="REQ" x="662.5" y="181.25" />
+      <ECTransition Source="REQ" Destination="START" Condition="1" x="381.25" y="550.0" />
+    </ECC>
+  <Algorithm Name="REQ" >
+    <LD >
+      <Rung Output="SORT_SOLENOID" Expression="METAL_PEG_DETECT ! SORT_AREA_DETECT &#38; RING_PRESENT ! &#38;" />
+      <Rung Output="RING_LOST" Expression="METAL_PEG_DETECT ! SORT_AREA_DETECT &#38; RING_PRESENT &#38;" />
+    </LD>
+  </Algorithm>
+  </BasicFB>
+</FBType>

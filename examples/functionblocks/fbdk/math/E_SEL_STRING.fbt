@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="E_SEL_STRING" Comment="Event-driven STRING selection" >
+  <Identification Standard="61499-1" Classification="Math" Function="Event-driven selection" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2001-11-27" Remarks="Derived from E_SEL_WSTRING." />
+  <CompilerInfo header="package fb.rt.math;" >
+    <Compiler Language="Java" Vendor="IBM" Product="VisualAge" Version="3.0" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="EI0" Comment="Select INO" >
+        <With Var="IN0" />
+      </Event>
+      <Event Name="EI1" Comment="Select INO" >
+        <With Var="IN1" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="EO" Comment="New selection event" >
+        <With Var="OUT" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="IN0" Type="STRING" Comment="Selected by EI0" />
+      <VarDeclaration Name="IN1" Type="STRING" Comment="Selected by EI1" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="OUT" Type="STRING" Comment="Selected value" />
+    </OutputVars>
+  </InterfaceList>
+</FBType>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="E_DEMUX" Comment="Event demultiplexer" >
+  <Identification Standard="61499-1" Classification="Event Processing" Function="Demultiplexing" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2002-01-29" Remarks="XML version" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="1998-05-02" Remarks="SRC version" />
+  <CompilerInfo header="package fb.rt.events;" >
+    <Compiler Language="Java" Vendor="IBM" Product="VisualAge" Version="3.0" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="EI" Comment="Event to demultiplex" >
+        <With Var="K" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="EO0" >
+      </Event>
+      <Event Name="EO1" >
+      </Event>
+      <Event Name="EO2" >
+      </Event>
+      <Event Name="EO3" Comment="Number of outputs is implementation dependent" >
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="K" Type="UINT" Comment="Event index,maximum is implementation dependent" />
+    </InputVars>
+  </InterfaceList>
+  <BasicFB>
+    <ECC >
+      <ECState Name="START" Comment="Initial State" x="1276.4706" y="794.1176" >
+      </ECState>
+      <ECState Name="TRIGGERED" Comment="Intermediate state after EI arrives" x="1276.4706" y="52.9412" >
+      </ECState>
+      <ECState Name="EO0" x="2176.4705" y="552.9412" >
+        <ECAction Output="EO0" />
+      </ECState>
+      <ECState Name="EO1" x="2023.5294" y="1435.2941" >
+        <ECAction Output="EO1" />
+      </ECState>
+      <ECState Name="EO2" x="529.4117" y="1435.2941" >
+        <ECAction Output="EO2" />
+      </ECState>
+      <ECState Name="EO3" x="70.5882" y="552.9412" >
+        <ECAction Output="EO3" />
+      </ECState>
+      <ECTransition Source="START" Destination="TRIGGERED" Condition="EI" x="1135.2941" y="547.0588" />
+      <ECTransition Source="TRIGGERED" Destination="EO0" Condition="(K=0)" x="1864.7058" y="382.3529" />
+      <ECTransition Source="TRIGGERED" Destination="EO1" Condition="(K=1)" x="1764.7058" y="964.7059" />
+      <ECTransition Source="TRIGGERED" Destination="EO2" Condition="(K=2)" x="782.3529" y="964.7059" />
+      <ECTransition Source="TRIGGERED" Destination="EO3" Condition="(K=3)" x="476.4706" y="382.3529" />
+      <ECTransition Source="TRIGGERED" Destination="START" Condition="(K>3)" x="1411.7646" y="547.0588" />
+      <ECTransition Source="EO0" Destination="START" Condition="TRUE" x="1582.3529" y="711.7647" />
+      <ECTransition Source="EO1" Destination="START" Condition="TRUE" x="1529.4117" y="1011.7647" />
+      <ECTransition Source="EO2" Destination="START" Condition="TRUE" x="1017.6470" y="1011.7647" />
+      <ECTransition Source="EO3" Destination="START" Condition="TRUE" x="864.7059" y="711.7647" />
+    </ECC>
+  </BasicFB>
+</FBType>

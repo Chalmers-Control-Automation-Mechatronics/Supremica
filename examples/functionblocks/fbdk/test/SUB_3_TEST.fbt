@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="SUB_3_TEST" Comment="Test SUB_3_LLP in a Composite Function Block" >
+  <Identification Standard="61499-2" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2002-12-17" />
+  <CompilerInfo header="package fb.rt.test;" >
+    <Compiler Language="Java" Vendor="IBM" Product="Jikes" Version="1.06" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="REQ" Comment="Normal Execution Request" >
+        <With Var="A" />
+        <With Var="B" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="CNF" Comment="Execution Confirmation" >
+        <With Var="OUT" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="A" Type="BYTE" />
+      <VarDeclaration Name="B" Type="BYTE" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="OUT" Type="BYTE" Comment="Output event qualifier" />
+    </OutputVars>
+  </InterfaceList>
+  <FBNetwork >
+    <FB Name="TEST" Type="SUB_3_LLP" x="1105.8823" y="458.8235" />
+    <EventConnections>
+      <Connection Source="REQ" Destination="TEST.REQ" dx1="994.1176" />
+      <Connection Source="TEST.CNF" Destination="CNF" dx1="1576.4706" />
+    </EventConnections>
+    <DataConnections>
+      <Connection Source="A" Destination="TEST.A" dx1="1035.2941" />
+      <Connection Source="B" Destination="TEST.B" dx1="1035.2941" />
+      <Connection Source="TEST.OUT" Destination="OUT" dx1="1582.3529" />
+    </DataConnections>
+  </FBNetwork>
+</FBType>

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="DSCYL_MDL" Comment="Model for a Double-Stroke Cylinder, Externally Clocked" >
+  <Identification Standard="61499-1" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2003-03-17" Remarks="Adapted from old DSCYL_MV." />
+  <CompilerInfo header="package fb.rt.mach; import fb.rt.math.*; import fb.rt.mva.*;" >
+    <Compiler Language="Java" Vendor="Sun" Product="JDK" Version="1.4.2" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="CLK" Comment="External Clock Event" >
+        <With Var="FAULT" />
+        <With Var="ADV1" />
+        <With Var="ADV2" />
+        <With Var="RET" />
+        <With Var="VF1" />
+        <With Var="VF2" />
+        <With Var="VR" />
+        <With Var="ETA" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="INDP" Comment="Position Change Indication" >
+        <With Var="POS" />
+      </Event>
+      <Event Name="INDS" Comment="Sensor Change Indication" >
+        <With Var="HOME" />
+        <With Var="MID" />
+        <With Var="END" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="FAULT" Type="BOOL" Comment="0=Enable,1=Simulate Fault" />
+      <VarDeclaration Name="ADV1" Type="BOOL" Comment="ADVANCE Cyl#1" />
+      <VarDeclaration Name="ADV2" Type="BOOL" Comment="ADVANCE Cyl#2" />
+      <VarDeclaration Name="RET" Type="BOOL" Comment="RETRACT Both Cylinders" />
+      <VarDeclaration Name="VF1" Type="UINT" Comment="Cyl#1 ADVANCE speed in %FS per CLK event" />
+      <VarDeclaration Name="VF2" Type="UINT" Comment="Cyl#2 ADVANCE speed in %FS per CLK event" />
+      <VarDeclaration Name="VR" Type="UINT" Comment="RETRACT speed in %FS per CLK event" />
+      <VarDeclaration Name="ETA" Type="REAL" InitialValue="0.5" Comment="Length ratio:Cyl#1/(Cyl#1+Cyl#2)" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="POS" Type="UINT" Comment="End effector position" />
+      <VarDeclaration Name="HOME" Type="BOOL" Comment="Both cylinders HOME" />
+      <VarDeclaration Name="MID" Type="BOOL" Comment="CYL1 at END,CYL2 HOME" />
+      <VarDeclaration Name="END" Type="BOOL" Comment="Both cylinders at END" />
+    </OutputVars>
+  </InterfaceList>
+  <FBNetwork >
+    <FB Name="CYL1" Type="MECH2_MDL" x="288.8889" y="11.111111" />
+    <FB Name="CYL2" Type="MECH2_MDL" x="1244.4443" y="55.555553" />
+    <FB Name="PCALC" Type="WTAV_UINT" x="222.22221" y="1266.6666" />
+    <FB Name="HCALC" Type="FB_AND" x="2083.3333" y="1233.3333" />
+    <FB Name="MCALC" Type="FB_AND" x="2611.111" y="1466.6666" />
+    <FB Name="ECALC" Type="FB_AND" x="3061.111" y="1927.7777" />
+    <EventConnections>
+      <Connection Source="HCALC.CNF" Destination="MCALC.REQ" dx1="27.777777" dx2="47.0588" dy="747.0588" />
+      <Connection Source="MCALC.CNF" Destination="ECALC.REQ" dx1="72.22222" dx2="76.4706" dy="-1.0" />
+      <Connection Source="CYL1.INDP" Destination="PCALC.REQ" dx1="122.22221" dx2="33.333332" dy="1100.0" />
+      <Connection Source="CYL2.INDP" Destination="PCALC.REQ" dx1="133.33333" dx2="33.333332" dy="1055.5555" />
+      <Connection Source="PCALC.CNF" Destination="INDP" dx1="694.4444" />
+      <Connection Source="CYL1.INDS" Destination="HCALC.REQ" dx1="277.77777" />
+      <Connection Source="CYL2.INDS" Destination="HCALC.REQ" dx1="366.66666" />
+      <Connection Source="ECALC.CNF" Destination="INDS" dx1="3455.5554" />
+      <Connection Source="CLK" Destination="CYL1.CLK" dx1="183.33333" />
+      <Connection Source="CLK" Destination="CYL2.CLK" dx1="1138.8888" />
+    </EventConnections>
+    <DataConnections>
+      <Connection Source="FAULT" Destination="CYL1.FAULT" dx1="144.44444" />
+      <Connection Source="FAULT" Destination="CYL2.FAULT" dx1="1100.0" />
+      <Connection Source="ADV1" Destination="CYL1.FWD" dx1="166.66666" />
+      <Connection Source="ADV2" Destination="CYL2.FWD" dx1="1122.2222" />
+      <Connection Source="RET" Destination="CYL1.REV" dx1="177.77777" />
+      <Connection Source="RET" Destination="CYL2.REV" dx1="1133.3333" />
+      <Connection Source="ETA" Destination="PCALC.ETA" dx1="111.11111" />
+      <Connection Source="CYL1.HOME" Destination="HCALC.IN1" dx1="238.88889" />
+      <Connection Source="CYL2.HOME" Destination="HCALC.IN2" dx1="266.66666" />
+      <Connection Source="CYL1.END" Destination="MCALC.IN1" dx1="183.33333" />
+      <Connection Source="CYL2.HOME" Destination="MCALC.IN2" dx1="266.66666" />
+      <Connection Source="CYL1.END" Destination="ECALC.IN1" dx1="183.33333" />
+      <Connection Source="CYL2.END" Destination="ECALC.IN2" dx1="66.666664" />
+      <Connection Source="CYL1.POS" Destination="PCALC.X1" dx1="72.22222" dx2="66.666664" dy="572.2222" />
+      <Connection Source="CYL2.POS" Destination="PCALC.X2" dx1="2144.4443" dx2="238.88889" dy="2061.111" />
+      <Connection Source="HCALC.OUT" Destination="HOME" dx1="2494.4443" />
+      <Connection Source="MCALC.OUT" Destination="MID" dx1="2988.8887" />
+      <Connection Source="ECALC.OUT" Destination="END" dx1="3444.4443" />
+      <Connection Source="PCALC.OUT" Destination="POS" dx1="688.88885" />
+      <Connection Source="VF1" Destination="CYL1.VF" dx1="183.33333" />
+      <Connection Source="VR" Destination="CYL1.VR" dx1="200.0" />
+      <Connection Source="VF2" Destination="CYL2.VF" dx1="1138.8888" />
+      <Connection Source="VR" Destination="CYL2.VR" dx1="1155.5555" />
+    </DataConnections>
+  </FBNetwork>
+</FBType>

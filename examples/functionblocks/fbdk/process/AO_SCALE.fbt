@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="AO_SCALE" Comment="Scale from Engineering Units to Analog Output Value" >
+  <Identification Standard="61499-1" Function="Scaling" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2005-02-22" />
+  <CompilerInfo header="package fb.rt.process;" >
+    <Compiler Language="Java" Vendor="Sun" Product="JDK" Version="1.4.2" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="INIT" Comment="Initialization Request" >
+        <With Var="MINI" />
+        <With Var="MAXI" />
+        <With Var="MINO" />
+        <With Var="MAXO" />
+        <With Var="QI" />
+      </Event>
+      <Event Name="REQ" Comment="Normal Execution Request" >
+        <With Var="IN" />
+        <With Var="QI" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="INITO" Comment="Initialization Confirm" >
+        <With Var="QO" />
+        <With Var="STATUS" />
+      </Event>
+      <Event Name="CNF" Comment="Execution Confirmation" >
+        <With Var="QO" />
+        <With Var="STATUS" />
+        <With Var="OUT" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="QI" Type="BOOL" Comment="Event Input Qualifier" />
+      <VarDeclaration Name="IN" Type="REAL" Comment="Value in Engineering Units" />
+      <VarDeclaration Name="MINI" Type="REAL" Comment="Minimum IN value" />
+      <VarDeclaration Name="MAXI" Type="REAL" InitialValue="1.0" Comment="Maximum IN value" />
+      <VarDeclaration Name="MINO" Type="UINT" Comment="OUT value corresponding to MINI" />
+      <VarDeclaration Name="MAXO" Type="UINT" InitialValue="1024" Comment="OUT value corresponding to MAXI" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="QO" Type="BOOL" Comment="Output event qualifier" />
+      <VarDeclaration Name="STATUS" Type="UINT" Comment="0=OK, 1=Inhibited, 2=Bad Scale Factor, 3=Out of Range" />
+      <VarDeclaration Name="OUT" Type="UINT" Comment="IN scaled to Analog Output Value" />
+    </OutputVars>
+  </InterfaceList>
+  <BasicFB>
+    <InternalVars>
+      <VarDeclaration Name="SF_OK" Type="BOOL" Comment="SF value is valid" />
+      <VarDeclaration Name="SF" Type="REAL" Comment="Scale Factor" />
+    </InternalVars>
+  <Algorithm Name="INIT" Comment="Initialization algorithm" >
+    <Other Language="Java" Text="QO.value = QI.value;&#10;STATUS.value = 0;&#10;if(QO.value){&#10;  SF.value = MAXI.value - MINI.value;&#10;  SF_OK.value = (SF.value != 0.0);&#10;  QO.value = SF_OK.value;&#10;  if(QO.value) SF.value = (MAXO.value-MINO.value)/SF.value;&#10;  else STATUS.value = 2;}&#10;else SF_OK.value = false;&#10;INITO.serviceEvent(this);&#10;" />
+  </Algorithm>
+  <Algorithm Name="REQ" Comment="Normally executed algorithm" >
+    <Other Language="Java" Text="QO.value = QI.value;&#10;STATUS.value = 0;&#10;if(!QO.value) STATUS.value=1;&#10;else if(!SF_OK.value){&#10;   QO.value = false;&#10;   STATUS.value=2;}&#10;else if(IN.value&#60;MINI.value){&#10;   QO.value = false;&#10;   STATUS.value = 3;&#10;   OUT.value = MINO.value;}&#10;else if(IN.value>MAXI.value){&#10;   QO.value = false;&#10;   STATUS.value = 3;&#10;   OUT.value = MAXO.value;}&#10;else OUT.value = (short)(MINO.value+(IN.value-MINI.value)*SF.value);&#10;CNF.serviceEvent(this);&#10;" />
+  </Algorithm>
+  </BasicFB>
+</FBType>

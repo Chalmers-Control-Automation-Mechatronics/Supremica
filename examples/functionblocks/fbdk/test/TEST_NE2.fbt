@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="TEST_NE2" Comment="Test &#34;&#60;>&#34; in ECC transition" >
+  <Identification Standard="61499-2" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2002-12-17" />
+  <CompilerInfo header="package fb.rt.test;" >
+    <Compiler Language="Java" Vendor="IBM" Product="JIkes" Version="1.06" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="REQ" Comment="Normal Execution Request" >
+        <With Var="A" />
+        <With Var="B" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="CNF" Comment="Execution Confirmation" >
+        <With Var="Q" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="A" Type="REAL" />
+      <VarDeclaration Name="B" Type="REAL" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="Q" Type="BOOL" Comment="A &#60;> B?" />
+    </OutputVars>
+  </InterfaceList>
+  <BasicFB>
+    <ECC >
+      <ECState Name="START" Comment="Initial State" x="505.8824" y="405.8824" >
+      </ECState>
+      <ECState Name="REQEQ" Comment="Execution when A=B" x="858.8235" y="117.6471" >
+        <ECAction Algorithm="EQ" Output="CNF" />
+      </ECState>
+      <ECState Name="REQNE" Comment="Execution when A&#60;>B" x="505.8824" y="964.7059" >
+        <ECAction Algorithm="NE" Output="CNF" />
+      </ECState>
+      <ECTransition Source="START" Destination="REQEQ" Condition="REQ&#38;(A=B)" x="858.8235" y="405.8824" />
+      <ECTransition Source="START" Destination="REQNE" Condition="REQ&#38;(A&#60;>B)" x="505.8824" y="700" />
+      <ECTransition Source="REQEQ" Destination="START" Condition="1" x="505.8824" y="117.6471" />
+      <ECTransition Source="REQNE" Destination="START" Condition="1" x="164.7059" y="688.2353" />
+    </ECC>
+  <Algorithm Name="EQ" Comment="Algorithm when A=B" >
+    <ST Text="Q := FALSE;&#10;" />
+  </Algorithm>
+  <Algorithm Name="NE" Comment="Algorithm when A&#60;>B" >
+    <ST Text="Q := TRUE;&#10;" />
+  </Algorithm>
+  </BasicFB>
+</FBType>

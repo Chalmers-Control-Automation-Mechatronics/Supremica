@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE System SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<System xmlns="http://www.holobloc.com/xml/LibraryElement" Name="FLASHER10_TEST" Comment="Test FLASHER10 with D10U10B service interface" >
+  <Identification Standard="61499-1" Classification="Communication" Function="Test" Type="DeviceNet" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2003-05-01" Remarks="Modified from D10U10B_TEST" />
+  <Device Name="HMI" Type="FRAME_DEVICE" x="682.3529" y="11.7647" >
+    <Resource Name="INS" Type="PANEL_RESOURCE" x="235.2941" y="11.7647" >
+      <FBNetwork >
+        <FB Name="RUNSTOP" Type="RADIO_BOOL" x="676.4706" y="11.7647" />
+        <FB Name="MODE" Type="IN_CHOICE" x="1488.2352" y="941.1765" />
+        <FB Name="DT" Type="IN_ANY" x="2423.5293" y="1229.4117" />
+        <FB Name="PUB3" Type="CLIENT_3_4" x="3111.7646" y="11.7647" />
+        <FB Name="EOUTS" Type="E_DEMUX" x="3735.2939" y="123.5294" />
+        <FB Name="INITO" Type="OUT_EVENT" x="4376.4707" y="11.7647" />
+        <FB Name="CNF" Type="OUT_EVENT" x="5829.4116" y="917.6470" />
+        <FB Name="QO" Type="OUT_BOOL" x="3617.647" y="1305.8823" />
+        <FB Name="STATUS" Type="OUT_ANY" x="4447.0586" y="1305.8823" />
+        <FB Name="OUT9" Type="OUT_BOOL" x="5194.1177" y="1294.1177" />
+        <FB Name="PACK" Type="OUT_EVENT" x="5076.4707" y="11.7647" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="RUNSTOP.INIT" dx1="35.2941" />
+          <Connection Source="RUNSTOP.INITO" Destination="MODE.INIT" dx1="270.5882" dx2="29.4118" dy="158.8235" />
+          <Connection Source="MODE.INITO" Destination="DT.INIT" dx1="158.8235" dx2="5.8824" dy="-1" />
+          <Connection Source="DT.INITO" Destination="PUB3.INIT" dx1="188.2353" />
+          <Connection Source="PUB3.INITO" Destination="INITO.INIT" dx1="94.1176" />
+          <Connection Source="INITO.INITO" Destination="PACK.INIT" dx1="35.2941" />
+          <Connection Source="PACK.INITO" Destination="CNF.INIT" dx1="82.3529" dx2="52.9412" dy="882.3529" />
+          <Connection Source="CNF.INITO" Destination="QO.INIT" dx1="29.4118" dx2="211.7647" dy="1529.4117" />
+          <Connection Source="QO.INITO" Destination="STATUS.INIT" dx1="176.4706" />
+          <Connection Source="STATUS.INITO" Destination="OUT9.INIT" dx1="235.2941" />
+          <Connection Source="RUNSTOP.IND" Destination="MODE.REQ" dx1="188.2353" />
+          <Connection Source="MODE.IND" Destination="DT.REQ" dx1="100" dx2="5.8824" dy="-1" />
+          <Connection Source="RUNSTOP.IND" Destination="PUB3.REQ" dx1="676.4706" />
+          <Connection Source="PUB3.CNF" Destination="QO.REQ" dx1="111.7647" />
+          <Connection Source="QO.CNF" Destination="STATUS.REQ" dx1="158.8235" />
+          <Connection Source="STATUS.CNF" Destination="OUT9.REQ" dx1="247.0588" />
+          <Connection Source="PUB3.CNF" Destination="EOUTS.EI" dx1="88.2353" />
+          <Connection Source="EOUTS.EO0" Destination="INITO.REQ" dx1="41.1765" />
+          <Connection Source="EOUTS.EO1" Destination="CNF.REQ" dx1="141.1765" />
+          <Connection Source="EOUTS.EO2" Destination="PACK.REQ" dx1="852.9412" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="MODE.I" Destination="PUB3.SD_2" dx1="329.4117" />
+          <Connection Source="&#34;FLASH_ALL,COUNT_UP,COUNT_DOWN,CHASE_UP,CHASE_DOWN&#34;" Destination="MODE.CHOICES" dx1="458.8235" />
+          <Connection Source="1" Destination="PUB3.QI" dx1="3047.0588" />
+          <Connection Source="DT.OUT" Destination="PUB3.SD_3" dx1="235.2941" />
+          <Connection Source="RUNSTOP.OUT" Destination="PUB3.SD_1" dx1="1329.4117" />
+          <Connection Source="PUB3.RD_1" Destination="EOUTS.K" dx1="176.4706" />
+          <Connection Source="PUB3.RD_2" Destination="QO.IN" dx1="52.9412" />
+          <Connection Source="PUB3.RD_4" Destination="OUT9.IN" dx1="652.9412" />
+          <Connection Source="&#34;TIME&#34;" Destination="DT.TYPE" dx1="2276.4705" />
+          <Connection Source="t#250ms" Destination="DT.IVAL" dx1="2258.8235" />
+          <Connection Source="&#34;10.88.59.32:4445&#34;" Destination="PUB3.ID" dx1="2794.1177" />
+          <Connection Source="&#34;INITO&#34;" Destination="INITO.LABEL" dx1="4223.5293" />
+          <Connection Source="&#34;CNF&#34;" Destination="CNF.LABEL" dx1="5700" />
+          <Connection Source="&#34;QO&#34;" Destination="QO.LABEL" dx1="3500" />
+          <Connection Source="&#34;CAN_STATUS&#34;" Destination="STATUS.TYPE" dx1="4176.4707" />
+          <Connection Source="20" Destination="STATUS.IVAL" dx1="4364.7056" />
+          <Connection Source="&#34;RUN&#34;" Destination="RUNSTOP.LABEL1" dx1="541.1765" />
+          <Connection Source="&#34;STOP&#34;" Destination="RUNSTOP.LABEL0" dx1="517.6470" />
+          <Connection Source="&#34;PACK&#34;" Destination="PACK.LABEL" dx1="4923.5293" />
+          <Connection Source="&#34;OUT9&#34;" Destination="OUT9.LABEL" dx1="5041.1763" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+  </Device>
+  <Device Name="CAN" Type="CAN_DEV" x="711.7647" y="994.1176" >
+    <Resource Name="CTL" Type="EMB_RES" x="370.5882" y="488.2353" >
+      <FBNetwork >
+        <FB Name="SVR" Type="SERVER_4_3" x="788.2353" y="11.7647" />
+        <FB Name="E_IN" Type="E_SWITCH" x="1358.8235" y="235.2941" />
+        <FB Name="CLK" Type="E_CYCLE" x="1400" y="1070.5883" />
+        <FB Name="FLASH" Type="FLASHER10" x="1947.0588" y="170.5882" />
+        <FB Name="PACK" Type="PACK_WORD" x="2664.7058" y="282.3529" />
+        <FB Name="CTL" Type="D10U10B" x="3376.4705" y="11.7647" />
+        <FB Name="E_OUT" Type="E_TO_UINT" x="3864.7058" y="11.7647" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="SVR.INIT" dx1="29.4118" />
+          <Connection Source="START.STOP" Destination="CLK.STOP" dx1="47.0588" />
+          <Connection Source="SVR.IND" Destination="E_IN.EI" dx1="29.4118" />
+          <Connection Source="E_IN.EO0" Destination="CLK.STOP" dx1="29.4118" dx2="58.8235" dy="676.4706" />
+          <Connection Source="E_IN.EO1" Destination="FLASH.INIT" dx1="70.5882" />
+          <Connection Source="FLASH.INITO" Destination="CTL.INIT" dx1="170.5882" />
+          <Connection Source="FLASH.INITO" Destination="CLK.START" dx1="58.8235" dx2="141.1765" dy="1611.7646" />
+          <Connection Source="CLK.EO" Destination="FLASH.REQ" dx1="94.1176" />
+          <Connection Source="FLASH.CNF" Destination="PACK.REQ" dx1="41.1765" />
+          <Connection Source="PACK.IND" Destination="CTL.WR" dx1="47.0588" />
+          <Connection Source="CTL.INITO" Destination="E_OUT.EI0" dx1="29.4118" />
+          <Connection Source="CTL.CNF" Destination="E_OUT.EI1" dx1="29.4118" />
+          <Connection Source="FLASH.CNF" Destination="E_OUT.EI2" dx1="29.4118" />
+          <Connection Source="E_OUT.EO" Destination="SVR.RSP" dx1="70.5882" dx2="211.7647" dy="2558.8235" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="SVR.RD_1" Destination="E_IN.G" dx1="47.0588" />
+          <Connection Source="SVR.RD_2" Destination="FLASH.MODE" dx1="770.5882" />
+          <Connection Source="SVR.RD_3" Destination="CLK.DT" dx1="29.4118" />
+          <Connection Source="FLASH.OUT0" Destination="PACK.IN0" dx1="64.7059" />
+          <Connection Source="FLASH.OUT1" Destination="PACK.IN1" dx1="70.5882" />
+          <Connection Source="FLASH.OUT2" Destination="PACK.IN2" dx1="82.3529" />
+          <Connection Source="FLASH.OUT3" Destination="PACK.IN3" dx1="88.2353" />
+          <Connection Source="FLASH.OUT4" Destination="PACK.IN4" dx1="94.1176" />
+          <Connection Source="FLASH.OUT5" Destination="PACK.IN5" dx1="105.8824" />
+          <Connection Source="FLASH.OUT6" Destination="PACK.IN6" dx1="111.7647" />
+          <Connection Source="FLASH.OUT7" Destination="PACK.IN7" dx1="123.5294" />
+          <Connection Source="FLASH.OUT8" Destination="PACK.IN8" dx1="129.4118" />
+          <Connection Source="FLASH.OUT9" Destination="PACK.IN9" dx1="135.2941" />
+          <Connection Source="PACK.OUT" Destination="CTL.OUT" dx1="194.1176" />
+          <Connection Source="E_OUT.N" Destination="SVR.SD_1" dx1="29.4118" dx2="158.8235" dy="1835.2941" />
+          <Connection Source="CTL.QO" Destination="SVR.SD_2" dx1="94.1176" dx2="111.7647" dy="1888.2352" />
+          <Connection Source="CTL.STATUS" Destination="SVR.SD_3" dx1="29.4118" dx2="52.9412" dy="1729.4117" />
+          <Connection Source="FLASH.OUT9" Destination="SVR.SD_4" dx1="29.4118" dx2="52.9412" dy="100" />
+          <Connection Source="1" Destination="CTL.QI" dx1="3311.7646" />
+          <Connection Source="1" Destination="SVR.QI" dx1="723.5294" />
+          <Connection Source="[16#2C,3]" Destination="CTL.ID" dx1="3194.1177" />
+          <Connection Source="&#34;localhost:4445&#34;" Destination="SVR.ID" dx1="517.6470" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="MGR" Type="RMT_RES" x="370.5882" y="94.1176" >
+    </Resource>
+  </Device>
+  <DeviceParameters>
+    <Connection Source="[100,100,340,200]" Destination="HMI.BOUNDS" dx1="376.4706" />
+    <Connection Source="[1,1]" Destination="HMI.GRID" dx1="570.5882" />
+    <Connection Source="&#34;10.88.59.32:61501&#34;" Destination="CAN.MGR_ID" dx1="376.4706" />
+    <Connection Source="0" Destination="CAN.FREQ" dx1="647.0588" />
+  </DeviceParameters>
+</System>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE DataType SYSTEM "http://www.holobloc.com/xml/DataType.dtd" >
+<DataType xmlns="http://www.holobloc.com/xml/DataType" Name="MATRIX" Comment="A Structured Data Type Representing a Matrix of REAL" >
+  <Identification Standard="61499-2" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2002-03-05" />
+  <CompilerInfo header="package fb.datatype;" >
+    <Compiler Language="Java" Vendor="IBM" Product="VisualAge" Version="3.0" />
+  </CompilerInfo>
+  <ASN1Tag Class="APPLICATION" Number="23" />
+  <StructuredType >
+    <VarDeclaration Name="M" Type="UINT" Comment="Number of Rows" />
+    <VarDeclaration Name="N" Type="UINT" Comment="Number of Columns" />
+    <VarDeclaration Name="DATA" Type="REAL" ArraySize="0" Comment="The actual matrix,total elements=M*N as initialized" />
+  </StructuredType>
+</DataType>

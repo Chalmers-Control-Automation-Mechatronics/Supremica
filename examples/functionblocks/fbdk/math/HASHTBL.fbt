@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "FBType.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="HASHTBL" Comment="Service Interface to java.util.Hashtable" >
+<Identification Standard="61499 Feasibility Demo ITA"/>
+<VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2000-04-21" Remarks="Re-implemented"/>
+<CompilerInfo  header="package fb.rt.math; import java.util.*;">
+<Compiler  Language="Java" Vendor="IBM" Product="VisualAge" Version="3.0"/>
+</CompilerInfo>
+<InterfaceList>
+<EventInputs>
+  <Event Name="INIT" Comment="Clear/Initialize Table">
+    <With Var="IVALS" />
+  </Event>
+  <Event Name="READ" Comment="Read the Value Corresponding to a Key">
+    <With Var="KEY" />
+  </Event>
+  <Event Name="WRITE" Comment="Record the Value Corresponding to a Key">
+    <With Var="KEY" />
+    <With Var="VALUE" />
+  </Event>
+</EventInputs>
+<EventOutputs>
+  <Event Name="INITO" Comment="Initialization Confirm,OUT=Empty">
+    <With Var="QO" />
+    <With Var="OUT" />
+  </Event>
+  <Event Name="CNF" Comment="READ/WRITE Result">
+    <With Var="QO" />
+    <With Var="OUT" />
+  </Event>
+</EventOutputs>
+<InputVars>
+  <VarDeclaration Name="IVALS" Type="WSTRING" Comment="KEY/VALUE Pairs,Comma-Separated" />
+  <VarDeclaration Name="KEY" Type="WSTRING" Comment="READ/WRITE Key" />
+  <VarDeclaration Name="VALUE" Type="WSTRING" Comment="WRITE value" />
+</InputVars>
+<OutputVars>
+  <VarDeclaration Name="QO" Type="BOOL" Comment="0=No Match Found" />
+  <VarDeclaration Name="OUT" Type="WSTRING" Comment="READ/WRITE result" />
+</OutputVars>
+</InterfaceList>
+<Service LeftInterface="APPLICATION" RightInterface="Hashtable" >
+  <ServiceSequence Name="init_table" >
+    <ServiceTransaction>
+      <InputPrimitive Interface="APPLICATION" Event="INIT" Parameters="KEYS,VALUES" />
+      <OutputPrimitive Interface="Hashtable" Event="clear" />
+      <OutputPrimitive Interface="APPLICATION" Event="INITO+" Parameters="OUT" />
+    </ServiceTransaction>
+  </ServiceSequence>
+  <ServiceSequence Name="normal_read" Comment="OUT=VALUE Matching KEY" >
+    <ServiceTransaction>
+      <InputPrimitive Interface="APPLICATION" Event="READ" Parameters="KEY" />
+      <OutputPrimitive Interface="Hashtable" Event="get" Parameters="KEY" />
+      <OutputPrimitive Interface="APPLICATION" Event="CNF+" Parameters="OUT" />
+    </ServiceTransaction>
+  </ServiceSequence>
+  <ServiceSequence Name="read_no_match" Comment="No match for KEY,OUT=Empty String" >
+    <ServiceTransaction>
+      <InputPrimitive Interface="APPLICATION" Event="READ" Parameters="KEY" />
+      <OutputPrimitive Interface="Hashtable" Event="get" Parameters="KEY" />
+      <OutputPrimitive Interface="APPLICATION" Event="CNF-" Parameters="&#34;&#34;" />
+    </ServiceTransaction>
+  </ServiceSequence>
+  <ServiceSequence Name="write" Comment="OUT=VALUE" >
+    <ServiceTransaction>
+      <InputPrimitive Interface="APPLICATION" Event="WRITE" Parameters="KEY,VALUE" />
+      <OutputPrimitive Interface="Hashtable" Event="put" Parameters="KEY,VALUE" />
+      <OutputPrimitive Interface="APPLICATION" Event="CNF+" Parameters="OUT" />
+    </ServiceTransaction>
+  </ServiceSequence>
+</Service>
+</FBType>

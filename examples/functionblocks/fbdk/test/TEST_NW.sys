@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE System SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<System xmlns="http://www.holobloc.com/xml/LibraryElement" Name="TEST_NW" Comment="Test of Network Segments and Links" >
+  <Identification Standard="61499-1" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2004-02-21" />
+  <Device Name="DEV1" Type="FRAME_DEVICE" x="316.66666" y="238.88889" >
+    <Parameter Name="BOUNDS" Value="[0,0,0,0]" />
+    <Resource Name="RES2" Type="PANEL_RESOURCE" x="327.77777" y="11.111111" >
+      <Parameter Name="TRACE" Value="0" />
+      <Parameter Name="ROWS" Value="0" />
+      <FBNetwork >
+        <FB Name="DLY" Type="E_DELAY" x="694.4444" y="11.111111" >
+          <Parameter Name="DT" Value="t#0ms" />
+        </FB>
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="DLY.START" dx1="38.888885" />
+          <Connection Source="START.WARM" Destination="DLY.START" dx1="77.77777" />
+          <Connection Source="START.STOP" Destination="DLY.STOP" dx1="116.666664" />
+        </EventConnections>
+      </FBNetwork>
+    </Resource>
+  </Device>
+  <Device Name="PLC1" Type="RMT_DEV" x="150.0" y="983.3333" >
+  </Device>
+  <Device Name="PLC2" Type="RMT_DEV" x="905.55554" y="949.99994" >
+  </Device>
+  <Device Name="IO1" Type="RMT_DEV" x="705.55554" y="1527.7777" >
+  </Device>
+  <Device Name="IO2" Type="RMT_DEV" x="1122.2222" y="1533.3333" >
+  </Device>
+  <Device Name="DEV2" Type="FRAME_DEVICE" x="988.88885" y="249.99998" >
+  </Device>
+  <Segment Name="SEG1" Type="Ethernet" Comment="A Segment Comment" x="827.7778" y="844.4444" dx1="1500.0" >
+    <Parameter Name="SPEED" Value="100Mbps" Comment="A parameter comment" />
+    <Parameter Name="LENGTH" Value="100m" Comment="Another parameter comment" />
+  </Segment>
+  <Segment Name="SEG2" Type="DeviceNet" x="1083.3333" y="1411.1111" dx1="999.99994" >
+    <Parameter Name="SPEED" Value="500Kbps" />
+  </Segment>
+  <Segment Name="SEG3" Type="LocalBus" Comment="Test segment with comment but no parameters" x="966.6666" y="88.888885" dx1="1200.0" />
+  <Link CommResource="DEV1" SegmentName="SEG1" Comment="A link comment" >
+    <Parameter Name="TYPE" Value="ThinWire" Comment="A link parameter comment" />
+    <Parameter Name="LENGTH" Value="500mm" Comment="Another one" />
+  </Link>
+  <Link CommResource="PLC1" SegmentName="SEG1" />
+  <Link CommResource="PLC2" SegmentName="SEG1" />
+  <Link CommResource="PLC2" SegmentName="SEG2" />
+  <Link CommResource="IO1" SegmentName="SEG2" >
+    <Parameter Name="LENGTH" Value="100mm" />
+  </Link>
+  <Link CommResource="IO2" SegmentName="SEG2" >
+    <Parameter Name="LENGTH" Value="50mm" />
+  </Link>
+  <Link CommResource="DEV1" SegmentName="SEG3" />
+  <Link CommResource="DEV2" SegmentName="SEG3" />
+</System>

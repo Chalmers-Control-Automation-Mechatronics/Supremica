@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="M_ADD" Comment="Add two matrices of REAL" >
+  <Identification Standard="61499-1" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2002-03-05" />
+  <CompilerInfo header="package fb.rt.math;" >
+    <Compiler Language="Java" Vendor="IBM" Product="VisualAge" Version="3.0" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="REQ" Comment="Set OUT to IN1+IN2" >
+        <With Var="QI" />
+        <With Var="IN1" />
+        <With Var="IN2" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="CNF" Comment="Confirmation of Requested Service" >
+        <With Var="QO" />
+        <With Var="STATUS" />
+        <With Var="OUT" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="QI" Type="BOOL" Comment="Event Input Qualifier" />
+      <VarDeclaration Name="IN1" Type="MATRIX" Comment="Augend" />
+      <VarDeclaration Name="IN2" Type="MATRIX" Comment="Addend" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="QO" Type="BOOL" Comment="Event Output Qualifier" />
+      <VarDeclaration Name="STATUS" Type="UINT" Comment="Service Status" />
+      <VarDeclaration Name="OUT" Type="MATRIX" Comment="Sum" />
+    </OutputVars>
+  </InterfaceList>
+  <Service RightInterface="RESOURCE" LeftInterface="ADD_M" >
+    <ServiceSequence Name="normal_addition" >
+      <ServiceTransaction >
+        <InputPrimitive Interface="ADD_M" Event="REQ+" Parameters="IN1,IN2" />
+        <OutputPrimitive Interface="MATRIX" Event="sum" Parameters="IN1,IN2,OUT" />
+        <OutputPrimitive Interface="ADD_M" Event="CNF+" Parameters="OUT" />
+      </ServiceTransaction>
+    </ServiceSequence>
+    <ServiceSequence Name="addition_inhibited" >
+      <ServiceTransaction >
+        <InputPrimitive Interface="ADD_M" Event="REQ-" />
+        <OutputPrimitive Interface="ADD_M" Event="CNF-" Parameters="STATUS=INHIBITED" />
+      </ServiceTransaction>
+    </ServiceSequence>
+    <ServiceSequence Name="array_size_error" >
+      <ServiceTransaction >
+        <InputPrimitive Interface="ADD_M" Event="REQ+" Parameters="IN1,IN2" />
+        <OutputPrimitive Interface="MATRIX" Event="sum" Parameters="IN1,IN2,OUT" />
+        <OutputPrimitive Interface="ADD_M" Event="CNF-" Parameters="STATUS=ARRAY_SIZE_ERROR" />
+      </ServiceTransaction>
+    </ServiceSequence>
+  </Service>
+</FBType>

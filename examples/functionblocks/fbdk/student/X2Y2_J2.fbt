@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="X2Y2_J2" Comment="Compute X^2-Y^2 in Java without ECC" >
+  <Identification Standard="61499-1" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2003-08-13" Remarks="Derived from X2Y2_J" />
+  <CompilerInfo header="package fb.rt.student; import fb.rt.math.*;" >
+    <Compiler Language="Java" Vendor="IBM" Product="Jikes" Version="1.0.6" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="REQ" >
+        <With Var="X" />
+        <With Var="Y" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="CNF" >
+        <With Var="OUT" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="X" Type="REAL" />
+      <VarDeclaration Name="Y" Type="REAL" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="OUT" Type="REAL" />
+    </OutputVars>
+  </InterfaceList>
+  <BasicFB>
+  <Algorithm Name="REQ" >
+    <Other Language="Java" Text="OUT.value = (X.value-Y.value)*(X.value+Y.value);&#10;CNF.serviceEvent(this);&#10;" />
+  </Algorithm>
+  </BasicFB>
+</FBType>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE DeviceType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<DeviceType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="TEST_DEV2" Comment="Device Type for testing TEST_RES2" >
+  <Identification Standard="61499-2" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2004-06-08" />
+  <CompilerInfo header="package fb.rt.student;" >
+  </CompilerInfo>
+  <VarDeclaration Name="INPUT_ID" Type="WSTRING" InitialValue="&#34;225.0.0.1:1025&#34;" />
+  <VarDeclaration Name="OUTPUT_ID" Type="WSTRING" InitialValue="&#34;225.0.0.1:1026&#34;" />
+  <Resource Name="RES1" Type="TEST_RES2" x="977.7777" y="11.111111" >
+  </Resource>
+  <FBNetwork >
+    <FB Name="START" Type="E_RESTART" x="11.111111" y="11.111111" />
+    <DataConnections>
+      <Connection Source="INPUT_ID" Destination="RES1.INPUT_ID" dx1="794.4444" />
+      <Connection Source="OUTPUT_ID" Destination="RES1.OUTPUT_ID" dx1="761.1111" />
+    </DataConnections>
+  </FBNetwork>
+</DeviceType>

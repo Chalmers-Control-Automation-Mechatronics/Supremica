@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="QUERY_GEN" Comment="XML Query Template Generator" >
+  <Identification Standard="61499 ITA" Function="QUERY Functional Test" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2001-11-27" Remarks="Added DSTI, DSTO" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2001-11-24" />
+  <CompilerInfo header="package fb.rt.ita;" >
+    <Compiler Language="Java" Vendor="IBM" Product="VisualAge" Version="3.0" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="REQ" Comment="Query Generation Request" >
+        <With Var="DSTI" />
+        <With Var="N" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="CNF" Comment="Query Generated" >
+        <With Var="DSTO" />
+        <With Var="QUERY" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="DSTI" Type="WSTRING" Comment="Destination" />
+      <VarDeclaration Name="N" Type="UINT" Comment="0=FB,1=Connection" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="DSTO" Type="STRING" Comment="DSTI converted to STRING" />
+      <VarDeclaration Name="QUERY" Type="WSTRING" Comment="Query Template" />
+    </OutputVars>
+  </InterfaceList>
+</FBType>

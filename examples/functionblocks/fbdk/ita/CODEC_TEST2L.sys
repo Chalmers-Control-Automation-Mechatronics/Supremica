@@ -1,0 +1,501 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE System SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<System xmlns="http://www.holobloc.com/xml/LibraryElement" Name="CODEC_TEST2L" Comment="PUBL/SUBL Test with Derived Data Types" >
+  <Identification Standard="61499-1ITA" Classification="Communications" Function="Test System" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.9" Author="JHC" Date="2004-06-23" Remarks="Deleted MONITOR (not used)." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.8" Author="JHC" Date="2004-06-22" Remarks="Modified to use IN_MATRIX, OUT_MATRIX." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.7" Author="JHC" Date="2003-12-04" Remarks="Removed QI's from PUBL/SUBLs" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.6" Author="JHC" Date="2002-03-08" Remarks="Added M_IO for MATRIX I/O" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.5" Author="JHC" Date="2002-03-06" Remarks="Added TEST_MATRIX, single TEST frame" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.4" Author="JHC" Date="2001-06-13" Remarks="Added applications including TEST_AI16C." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.3" Author="JHC" Date="2001-06-08" Remarks="Corrected UDP addresses; changed GUIs to IN_ANY, OUT_ANY" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.2" Author="JHC" Date="2001-05-30" Remarks="Saved layouts" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2000-05-16" Remarks="File type changed to &#34;.sys&#34;" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2000-04-19" />
+  <Application Name="TEST_REAL_VS" >
+    <FBNetwork >
+      <FB Name="IN21" Type="IN_ANY" x="899.99994" y="11.111111" />
+      <FB Name="OUT21" Type="OUT_ANY" x="1627.7777" y="11.111111" />
+      <EventConnections>
+        <Connection Source="IN21.IND" Destination="OUT21.REQ" dx1="100.0" />
+      </EventConnections>
+      <DataConnections>
+        <Connection Source="IN21.OUT" Destination="OUT21.IN" dx1="261.1111" />
+        <Connection Source="1" Destination="IN21.QI" dx1="833.3333" />
+        <Connection Source="20" Destination="IN21.W" dx1="816.6666" />
+        <Connection Source="&#34;REAL_VS&#34;" Destination="IN21.TYPE" dx1="700.0" />
+        <Connection Source="&#34;(VALUE:=10.0,STATUS:=1)&#34;" Destination="IN21.IVAL" dx1="466.66666" />
+        <Connection Source="1" Destination="OUT21.QI" dx1="1561.1111" />
+        <Connection Source="20" Destination="OUT21.W" dx1="1544.4443" />
+        <Connection Source="&#34;REAL_VS&#34;" Destination="OUT21.TYPE" dx1="1427.7777" />
+        <Connection Source="&#34;(VALUE:=0.0,STATUS:=0)&#34;" Destination="OUT21.IVAL" dx1="1211.1111" />
+      </DataConnections>
+    </FBNetwork>
+  </Application>
+  <Application Name="TEST_ENUMS" >
+    <FBNetwork >
+      <FB Name="IN1" Type="IN_ENUM" x="816.6666" y="11.111111" />
+      <FB Name="IN2" Type="IN_ENUM" x="1344.4443" y="122.22221" />
+      <FB Name="OUT1" Type="OUT_ANY" x="1872.2222" y="222.22221" />
+      <FB Name="OUT2" Type="OUT_ANY" x="2355.5554" y="694.4444" />
+      <EventConnections>
+        <Connection Source="IN1.INITO" Destination="IN2.INIT" dx1="77.77777" dx2="76.4706" dy="905.8823" />
+        <Connection Source="IN1.IND" Destination="IN2.REQ" dx1="38.888885" dx2="88.2353" dy="747.0588" />
+        <Connection Source="IN2.IND" Destination="OUT1.REQ" dx1="38.888885" dx2="88.2353" dy="747.0588" />
+        <Connection Source="OUT1.INITO" Destination="OUT2.INIT" dx1="116.666664" dx2="52.9412" dy="-1.0" />
+        <Connection Source="OUT1.CNF" Destination="OUT2.REQ" dx1="72.22222" dx2="52.9412" dy="-1.0" />
+      </EventConnections>
+      <DataConnections>
+        <Connection Source="IN1.OUT" Destination="OUT1.IN" dx1="61.111107" />
+        <Connection Source="IN2.OUT" Destination="OUT2.IN" dx1="27.777777" />
+        <Connection Source="1" Destination="IN1.QI" dx1="750.0" />
+        <Connection Source="&#34;ANALOG_SIGNAL_TYPE&#34;" Destination="IN1.TYPE" dx1="411.11108" />
+        <Connection Source="1" Destination="IN2.QI" dx1="1277.7777" />
+        <Connection Source="&#34;ANALOG_SIGNAL_RANGE&#34;" Destination="IN2.TYPE" dx1="916.6666" />
+        <Connection Source="1" Destination="OUT1.QI" dx1="1805.5555" />
+        <Connection Source="20" Destination="OUT1.W" dx1="1788.8888" />
+        <Connection Source="&#34;ANALOG_SIGNAL_TYPE&#34;" Destination="OUT1.TYPE" dx1="1466.6666" />
+        <Connection Source="1" Destination="OUT2.QI" dx1="2288.889" />
+        <Connection Source="20" Destination="OUT2.W" dx1="2272.2222" />
+        <Connection Source="&#34;ANALOG_SIGNAL_RANGE&#34;" Destination="OUT2.TYPE" dx1="1927.7777" />
+      </DataConnections>
+    </FBNetwork>
+  </Application>
+  <Application Name="TEST_FREQ" >
+    <FBNetwork >
+      <FB Name="IN1" Type="IN_ANY" x="335.2941" y="11.7647" />
+      <FB Name="OUT1" Type="OUT_ANY" x="964.7059" y="11.7647" />
+      <EventConnections>
+        <Connection Source="IN1.IND" Destination="OUT1.REQ" dx1="76.4706" />
+      </EventConnections>
+      <DataConnections>
+        <Connection Source="IN1.OUT" Destination="OUT1.IN" dx1="200.0" />
+        <Connection Source="1" Destination="IN1.QI" dx1="270.5882" />
+        <Connection Source="&#34;FREQ&#34;" Destination="IN1.TYPE" dx1="182.3529" />
+        <Connection Source="5.0" Destination="IN1.IVAL" dx1="241.1765" />
+        <Connection Source="1" Destination="OUT1.QI" dx1="900.0" />
+        <Connection Source="&#34;FREQ&#34;" Destination="OUT1.TYPE" dx1="811.7647" />
+        <Connection Source="0.0" Destination="OUT1.IVAL" dx1="870.5882" />
+      </DataConnections>
+    </FBNetwork>
+  </Application>
+  <Application Name="TEST_SUBR" >
+    <FBNetwork >
+      <FB Name="IN1" Type="IN_ANY" x="652.9412" y="11.7647" />
+      <FB Name="OUT1" Type="OUT_ANY" x="1576.4706" y="11.7647" />
+      <EventConnections>
+        <Connection Source="IN1.IND" Destination="OUT1.REQ" dx1="129.4118" />
+      </EventConnections>
+      <DataConnections>
+        <Connection Source="IN1.OUT" Destination="OUT1.IN" dx1="341.1765" />
+        <Connection Source="1" Destination="IN1.QI" dx1="588.2353" />
+        <Connection Source="&#34;ANALOG_DATA&#34;" Destination="IN1.TYPE" dx1="358.8235" />
+        <Connection Source="500" Destination="IN1.IVAL" dx1="552.9412" />
+        <Connection Source="1" Destination="OUT1.QI" dx1="1511.7646" />
+        <Connection Source="&#34;ANALOG_DATA&#34;" Destination="OUT1.TYPE" dx1="1282.3529" />
+        <Connection Source="0" Destination="OUT1.IVAL" dx1="1511.7646" />
+      </DataConnections>
+    </FBNetwork>
+  </Application>
+  <Application Name="TEST_AI16" >
+    <FBNetwork >
+      <FB Name="IN1" Type="IN_ANY" x="917.647" y="11.7647" />
+      <FB Name="OUT1" Type="OUT_ANY" x="2200.0" y="11.7647" />
+      <EventConnections>
+        <Connection Source="IN1.IND" Destination="OUT1.REQ" dx1="211.7647" />
+      </EventConnections>
+      <DataConnections>
+        <Connection Source="IN1.OUT" Destination="OUT1.IN" dx1="547.0588" />
+        <Connection Source="1" Destination="IN1.QI" dx1="852.9412" />
+        <Connection Source="20" Destination="IN1.W" dx1="835.2941" />
+        <Connection Source="&#34;ANALOG_16_INPUT_DATAI&#34;" Destination="IN1.TYPE" dx1="452.9412" />
+        <Connection Source="[1,2,3]" Destination="IN1.IVAL" dx1="782.3529" />
+        <Connection Source="1" Destination="OUT1.QI" dx1="2135.2942" />
+        <Connection Source="20" Destination="OUT1.W" dx1="2117.647" />
+        <Connection Source="&#34;ANALOG_16_INPUT_DATAI&#34;" Destination="OUT1.TYPE" dx1="1735.2941" />
+        <Connection Source="[0,1,2,3]" Destination="OUT1.IVAL" dx1="2035.2941" />
+      </DataConnections>
+    </FBNetwork>
+  </Application>
+  <Application Name="TEST_AI16C" Comment="Test ANALOG_16_INPUT_CONFIGURATION" >
+    <FBNetwork >
+      <FB Name="IN1" Type="IN_ANY" x="1238.8888" y="11.111111" />
+      <FB Name="OUT1" Type="OUT_ANY" x="1866.6666" y="166.66666" />
+      <EventConnections>
+        <Connection Source="IN1.IND" Destination="OUT1.REQ" dx1="83.33333" />
+      </EventConnections>
+      <DataConnections>
+        <Connection Source="IN1.OUT" Destination="OUT1.IN" dx1="105.55555" />
+        <Connection Source="1" Destination="IN1.QI" dx1="1172.2222" />
+        <Connection Source="1" Destination="OUT1.QI" dx1="1799.9999" />
+        <Connection Source="20" Destination="IN1.W" dx1="1155.5555" />
+        <Connection Source="&#34;ANALOG_16_INPUT_CONFIGURATION&#34;" Destination="IN1.TYPE" dx1="644.4444" />
+        <Connection Source="20" Destination="OUT1.W" dx1="1783.3333" />
+        <Connection Source="&#34;ANALOG_16_INPUT_CONFIGURATION&#34;" Destination="OUT1.TYPE" dx1="1272.2222" />
+      </DataConnections>
+    </FBNetwork>
+  </Application>
+  <Application Name="TEST_MATRIX" >
+    <FBNetwork >
+      <FB Name="IN" Type="IN_MATRIX" x="383.3333" y="11.111111" />
+      <FB Name="OUT" Type="OUT_MATRIX" x="1144.4445" y="11.111111" />
+      <EventConnections>
+        <Connection Source="IN.INITO" Destination="OUT.INIT" dx1="66.666664" />
+        <Connection Source="IN.IND" Destination="OUT.REQ" dx1="111.11111" />
+      </EventConnections>
+      <DataConnections>
+        <Connection Source="IN.OUT" Destination="OUT.IN" dx1="77.77777" />
+        <Connection Source="IN.QO" Destination="OUT.QI" dx1="238.88889" />
+      </DataConnections>
+    </FBNetwork>
+  </Application>
+  <Device Name="TEST" Type="FRAME_DEVICE" x="572.2222" y="11.111111" >
+    <Resource Name="SEND_REAL_VS" Type="PANEL_RESOURCE" x="22.222221" y="11.111111" >
+      <FBNetwork >
+        <FB Name="LBL" Type="FB_LABEL" x="655.55554" y="200.0" />
+        <FB Name="IN21" Type="IN_ANY" x="1472.2222" y="11.111111" />
+        <FB Name="SEND2" Type="PUBL_1" x="2416.6665" y="11.111111" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="LBL.INIT" dx1="66.666664" dx2="29.4118" dy="158.8235" />
+          <Connection Source="START.WARM" Destination="LBL.INIT" dx1="66.666664" dx2="29.4118" dy="158.8235" />
+          <Connection Source="LBL.INITO" Destination="IN21.INIT" dx1="66.666664" dx2="47.0588" dy="270.5882" />
+          <Connection Source="IN21.INITO" Destination="SEND2.INIT" dx1="66.666664" dx2="17.6471" dy="158.8235" />
+          <Connection Source="IN21.IND" Destination="SEND2.REQ" dx1="133.33333" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="1" Destination="IN21.QI" dx1="1405.5555" />
+          <Connection Source="IN21.OUT" Destination="SEND2.SD_1" dx1="38.888885" />
+          <Connection Source="&#34;225.0.1.0:1024&#34;" Destination="SEND2.ID" dx1="2144.4443" />
+          <Connection Source="20" Destination="IN21.W" dx1="1388.8888" />
+          <Connection Source="&#34;REAL_VS&#34;" Destination="IN21.TYPE" dx1="1272.2222" />
+          <Connection Source="&#34;(VALUE:=10.0,STATUS:=1)&#34;" Destination="IN21.IVAL" dx1="1038.8888" />
+          <Connection Source="1" Destination="LBL.QI" dx1="588.88885" />
+          <Connection Source="&#34; REAL_VS =>&#34;" Destination="LBL.LABEL" dx1="400.0" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="RCV_REAL_VS" Type="PANEL_RESOURCE" x="611.1111" y="11.111111" >
+      <FBNetwork >
+        <FB Name="LBL" Type="FB_LABEL" x="600.0" y="283.3333" />
+        <FB Name="RCV2" Type="SUBL_1" x="1572.2222" y="11.111111" />
+        <FB Name="OUT21" Type="OUT_ANY" x="2400.0" y="11.111111" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="LBL.INIT" dx1="66.666664" dx2="29.4118" dy="158.8235" />
+          <Connection Source="START.WARM" Destination="LBL.INIT" dx1="66.666664" dx2="29.4118" dy="158.8235" />
+          <Connection Source="LBL.INITO" Destination="RCV2.INIT" dx1="66.666664" dx2="47.0588" dy="270.5882" />
+          <Connection Source="RCV2.INITO" Destination="OUT21.INIT" dx1="111.11111" />
+          <Connection Source="RCV2.IND" Destination="OUT21.REQ" dx1="61.111107" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="1" Destination="OUT21.QI" dx1="2333.3333" />
+          <Connection Source="RCV2.RD_1" Destination="OUT21.IN" dx1="83.33333" />
+          <Connection Source="&#34;225.0.1.0:1024&#34;" Destination="RCV2.ID" dx1="1300.0" />
+          <Connection Source="23" Destination="OUT21.W" dx1="2316.6665" />
+          <Connection Source="&#34;REAL_VS&#34;" Destination="OUT21.TYPE" dx1="2200.0" />
+          <Connection Source="&#34;(VALUE:=0.0,STATUS:=0)&#34;" Destination="OUT21.IVAL" dx1="1983.3333" />
+          <Connection Source="1" Destination="LBL.QI" dx1="533.3333" />
+          <Connection Source="&#34; => REAL_VS&#34;" Destination="LBL.LABEL" dx1="344.44443" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="SEND_ENUMS" Type="PANEL_RESOURCE" x="11.111111" y="655.55554" >
+      <FBNetwork >
+        <FB Name="IN1" Type="IN_ENUM" x="638.88885" y="127.77777" />
+        <FB Name="LBL1" Type="FB_LABEL" x="1255.5555" y="11.111111" />
+        <FB Name="IN2" Type="IN_ENUM" x="1761.1111" y="455.55554" />
+        <FB Name="LBL2" Type="FB_LABEL" x="2383.3333" y="11.111111" />
+        <FB Name="SEND2" Type="PUBL_2" x="2800.0" y="455.55554" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="IN1.INIT" dx1="61.111107" dx2="76.4706" dy="-1.0" />
+          <Connection Source="START.WARM" Destination="IN1.INIT" dx1="38.888885" dx2="100.0" dy="-1.0" />
+          <Connection Source="IN1.INITO" Destination="LBL1.INIT" dx1="77.77777" dx2="76.4706" dy="-1.0" />
+          <Connection Source="LBL1.INITO" Destination="IN2.INIT" dx1="77.77777" dx2="76.4706" dy="905.8823" />
+          <Connection Source="IN2.INITO" Destination="LBL2.INIT" dx1="27.777777" dx2="58.8235" dy="-1.0" />
+          <Connection Source="LBL2.INITO" Destination="SEND2.INIT" dx1="38.888885" dx2="58.8235" dy="-1.0" />
+          <Connection Source="IN1.IND" Destination="IN2.REQ" dx1="38.888885" dx2="88.2353" dy="747.0588" />
+          <Connection Source="IN2.IND" Destination="SEND2.REQ" dx1="61.111107" dx2="82.3529" dy="-1.0" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="1" Destination="IN1.QI" dx1="572.2222" />
+          <Connection Source="1" Destination="IN2.QI" dx1="1694.4443" />
+          <Connection Source="IN1.OUT" Destination="SEND2.SD_1" dx1="66.666664" />
+          <Connection Source="IN2.OUT" Destination="SEND2.SD_2" dx1="44.444443" dx2="317.6471" dy="1252.9412" />
+          <Connection Source="&#34;ANALOG_SIGNAL_TYPE&#34;" Destination="IN1.TYPE" dx1="233.33333" />
+          <Connection Source="&#34;ANALOG_SIGNAL_RANGE&#34;" Destination="IN2.TYPE" dx1="1333.3333" />
+          <Connection Source="&#34;225.0.1.0:1025&#34;" Destination="SEND2.ID" dx1="2527.7776" />
+          <Connection Source="1" Destination="LBL1.QI" dx1="1188.8888" />
+          <Connection Source="&#34; =>&#34;" Destination="LBL1.LABEL" dx1="1138.8888" />
+          <Connection Source="1" Destination="LBL2.QI" dx1="2316.6665" />
+          <Connection Source="&#34; =>&#34;" Destination="LBL2.LABEL" dx1="2266.6665" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="RCV_ENUMS" Type="PANEL_RESOURCE" x="594.4444" y="655.55554" >
+      <FBNetwork >
+        <FB Name="RCV2" Type="SUBL_2" x="655.55554" y="11.111111" />
+        <FB Name="OUT1" Type="OUT_ANY" x="1405.5555" y="288.8889" />
+        <FB Name="OUT2" Type="OUT_ANY" x="1927.7777" y="738.88885" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="RCV2.INIT" dx1="27.777777" dx2="41.1765" dy="-1.0" />
+          <Connection Source="START.WARM" Destination="RCV2.INIT" dx1="27.777777" dx2="64.7059" dy="-1.0" />
+          <Connection Source="RCV2.INITO" Destination="OUT1.INIT" dx1="166.66666" dx2="29.4118" dy="994.1176" />
+          <Connection Source="OUT1.INITO" Destination="OUT2.INIT" dx1="155.55554" dx2="52.9412" dy="-1.0" />
+          <Connection Source="RCV2.IND" Destination="OUT1.REQ" dx1="94.44444" dx2="70.5882" dy="817.647" />
+          <Connection Source="OUT1.CNF" Destination="OUT2.REQ" dx1="105.55555" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="1" Destination="OUT1.QI" dx1="1338.8888" />
+          <Connection Source="1" Destination="OUT2.QI" dx1="1861.1111" />
+          <Connection Source="RCV2.RD_1" Destination="OUT1.IN" dx1="194.44444" dx2="111.7647" dy="211.7647" />
+          <Connection Source="RCV2.RD_2" Destination="OUT2.IN" dx1="122.22221" />
+          <Connection Source="20" Destination="OUT1.W" dx1="1322.2222" />
+          <Connection Source="&#34;ANALOG_SIGNAL_TYPE&#34;" Destination="OUT1.TYPE" dx1="999.99994" />
+          <Connection Source="20" Destination="OUT2.W" dx1="1844.4443" />
+          <Connection Source="&#34;ANALOG_SIGNAL_RANGE&#34;" Destination="OUT2.TYPE" dx1="1500.0" />
+          <Connection Source="&#34;225.0.1.0:1025&#34;" Destination="RCV2.ID" dx1="383.3333" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="SEND_FREQ" Type="PANEL_RESOURCE" x="11.111111" y="1266.6666" >
+      <FBNetwork >
+        <FB Name="LBL" Type="FB_LABEL" x="652.9412" y="200.0" />
+        <FB Name="IN1" Type="IN_ANY" x="1358.8235" y="11.7647" />
+        <FB Name="SEND1" Type="PUBL_1" x="2358.8235" y="11.7647" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="LBL.INIT" dx1="64.7059" dx2="29.4118" dy="158.8235" />
+          <Connection Source="START.WARM" Destination="LBL.INIT" dx1="64.7059" dx2="29.4118" dy="158.8235" />
+          <Connection Source="LBL.INITO" Destination="IN1.INIT" dx1="64.7059" dx2="47.0588" dy="270.5882" />
+          <Connection Source="IN1.INITO" Destination="SEND1.INIT" dx1="123.5294" dx2="82.3529" dy="-1.0" />
+          <Connection Source="IN1.IND" Destination="SEND1.REQ" dx1="111.7647" dx2="123.5294" dy="-1.0" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="1" Destination="IN1.QI" dx1="1294.1177" />
+          <Connection Source="IN1.OUT" Destination="SEND1.SD_1" dx1="52.9412" dx2="452.9412" dy="1211.7646" />
+          <Connection Source="&#34;225.0.1.0:1026&#34;" Destination="SEND1.ID" dx1="2076.4705" />
+          <Connection Source="20" Destination="IN1.W" dx1="1276.4706" />
+          <Connection Source="&#34;FREQ&#34;" Destination="IN1.TYPE" dx1="1205.8823" />
+          <Connection Source="5.0" Destination="IN1.IVAL" dx1="1264.7058" />
+          <Connection Source="1" Destination="LBL.QI" dx1="588.2353" />
+          <Connection Source="&#34; FREQ =>&#34;" Destination="LBL.LABEL" dx1="447.0588" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="RCV_FREQ" Type="PANEL_RESOURCE" x="600.0" y="1266.6666" >
+      <FBNetwork >
+        <FB Name="LBL" Type="FB_LABEL" x="652.9412" y="200.0" />
+        <FB Name="RCV1" Type="SUBL_1" x="1570.5883" y="11.7647" />
+        <FB Name="OUT1" Type="OUT_ANY" x="2311.7646" y="11.7647" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="LBL.INIT" dx1="64.7059" dx2="29.4118" dy="158.8235" />
+          <Connection Source="START.WARM" Destination="LBL.INIT" dx1="64.7059" dx2="29.4118" dy="158.8235" />
+          <Connection Source="LBL.INITO" Destination="RCV1.INIT" dx1="64.7059" dx2="47.0588" dy="270.5882" />
+          <Connection Source="RCV1.INITO" Destination="OUT1.INIT" dx1="41.1765" />
+          <Connection Source="RCV1.IND" Destination="OUT1.REQ" dx1="70.5882" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="1" Destination="OUT1.QI" dx1="2247.0588" />
+          <Connection Source="RCV1.RD_1" Destination="OUT1.IN" dx1="76.4706" />
+          <Connection Source="&#34;225.0.1.0:1026&#34;" Destination="RCV1.ID" dx1="1288.2352" />
+          <Connection Source="20" Destination="OUT1.W" dx1="2229.4116" />
+          <Connection Source="&#34;FREQ&#34;" Destination="OUT1.TYPE" dx1="2158.8235" />
+          <Connection Source="0.0" Destination="OUT1.IVAL" dx1="2217.647" />
+          <Connection Source="1" Destination="LBL.QI" dx1="588.2353" />
+          <Connection Source="&#34; => FREQ&#34;" Destination="LBL.LABEL" dx1="447.0588" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="SEND_SUBR" Type="PANEL_RESOURCE" x="1350.0" y="11.111111" >
+      <FBNetwork >
+        <FB Name="LBL" Type="FB_LABEL" x="564.7059" y="252.9412" />
+        <FB Name="IN1" Type="IN_ANY" x="1505.8823" y="11.7647" />
+        <FB Name="SEND1" Type="PUBL_1" x="2488.2354" y="11.7647" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="LBL.INIT" dx1="64.7059" dx2="29.4118" dy="158.8235" />
+          <Connection Source="START.WARM" Destination="LBL.INIT" dx1="64.7059" dx2="29.4118" dy="158.8235" />
+          <Connection Source="LBL.INITO" Destination="IN1.INIT" dx1="64.7059" dx2="52.9412" dy="270.5882" />
+          <Connection Source="IN1.INITO" Destination="SEND1.INIT" dx1="135.2941" dx2="64.7059" dy="-1.0" />
+          <Connection Source="IN1.IND" Destination="SEND1.REQ" dx1="70.5882" dx2="94.1176" dy="-1.0" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="1" Destination="IN1.QI" dx1="1441.1764" />
+          <Connection Source="IN1.OUT" Destination="SEND1.SD_1" dx1="58.8235" dx2="352.9412" dy="1211.7646" />
+          <Connection Source="&#34;ANALOG_DATA&#34;" Destination="IN1.TYPE" dx1="1211.7646" />
+          <Connection Source="500" Destination="IN1.IVAL" dx1="1405.8823" />
+          <Connection Source="&#34;225.0.1.0:1027&#34;" Destination="SEND1.ID" dx1="2205.8823" />
+          <Connection Source="1" Destination="LBL.QI" dx1="500.0" />
+          <Connection Source="&#34; ANALOG_DATA =>&#34;" Destination="LBL.LABEL" dx1="211.7647" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="RCV_SUBR" Type="PANEL_RESOURCE" x="1944.4443" y="11.111111" >
+      <FBNetwork >
+        <FB Name="LBL" Type="FB_LABEL" x="652.9412" y="200.0" />
+        <FB Name="RCV1" Type="SUBL_1" x="1564.7058" y="11.7647" />
+        <FB Name="OUT1" Type="OUT_ANY" x="2294.1177" y="11.7647" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="LBL.INIT" dx1="64.7059" dx2="29.4118" dy="158.8235" />
+          <Connection Source="START.WARM" Destination="LBL.INIT" dx1="64.7059" dx2="29.4118" dy="158.8235" />
+          <Connection Source="LBL.INITO" Destination="RCV1.INIT" dx1="64.7059" dx2="47.0588" dy="270.5882" />
+          <Connection Source="RCV1.INITO" Destination="OUT1.INIT" dx1="23.5294" />
+          <Connection Source="RCV1.IND" Destination="OUT1.REQ" dx1="41.1765" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="1" Destination="OUT1.QI" dx1="2229.4116" />
+          <Connection Source="RCV1.RD_1" Destination="OUT1.IN" dx1="64.7059" />
+          <Connection Source="&#34;ANALOG_DATA&#34;" Destination="OUT1.TYPE" dx1="2000.0" />
+          <Connection Source="0" Destination="OUT1.IVAL" dx1="2229.4116" />
+          <Connection Source="&#34;225.0.1.0:1027&#34;" Destination="RCV1.ID" dx1="1282.3529" />
+          <Connection Source="1" Destination="LBL.QI" dx1="588.2353" />
+          <Connection Source="&#34; => ANALOG_DATA&#34;" Destination="LBL.LABEL" dx1="300.0" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="SEND_AI16" Type="PANEL_RESOURCE" x="1338.8888" y="627.7778" >
+      <FBNetwork >
+        <FB Name="LBL" Type="FB_LABEL" x="652.9412" y="200.0" />
+        <FB Name="IN1" Type="IN_ANY" x="1188.2352" y="123.5294" />
+        <FB Name="SEND1" Type="PUBL_1" x="2158.8235" y="11.7647" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="LBL.INIT" dx1="64.7059" dx2="29.4118" dy="158.8235" />
+          <Connection Source="START.WARM" Destination="LBL.INIT" dx1="64.7059" dx2="29.4118" dy="158.8235" />
+          <Connection Source="LBL.INITO" Destination="IN1.INIT" dx1="64.7059" dx2="47.0588" dy="270.5882" />
+          <Connection Source="IN1.INITO" Destination="SEND1.INIT" dx1="82.3529" dx2="41.1765" dy="-1.0" />
+          <Connection Source="IN1.IND" Destination="SEND1.REQ" dx1="129.4118" dx2="58.8235" dy="-1.0" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="1" Destination="IN1.QI" dx1="1123.5294" />
+          <Connection Source="IN1.OUT" Destination="SEND1.SD_1" dx1="94.1176" dx2="229.4118" dy="1211.7646" />
+          <Connection Source="20" Destination="IN1.W" dx1="1105.8823" />
+          <Connection Source="&#34;ANALOG_16_INPUT_DATAI&#34;" Destination="IN1.TYPE" dx1="723.5294" />
+          <Connection Source="[1,2,3]" Destination="IN1.IVAL" dx1="1052.9412" />
+          <Connection Source="&#34;225.0.1.0:1028&#34;" Destination="SEND1.ID" dx1="1876.4706" />
+          <Connection Source="1" Destination="LBL.QI" dx1="588.2353" />
+          <Connection Source="&#34; ANALOG_16_INPUT_DATAI =>&#34;" Destination="LBL.LABEL" dx1="129.4118" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="RCV_AI16" Type="PANEL_RESOURCE" x="1922.2222" y="622.22217" >
+      <FBNetwork >
+        <FB Name="LBL" Type="FB_LABEL" x="652.9412" y="200.0" />
+        <FB Name="RCV1" Type="SUBL_1" x="1547.0588" y="11.7647" />
+        <FB Name="OUT1" Type="OUT_ANY" x="2276.4705" y="11.7647" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="LBL.INIT" dx1="64.7059" dx2="29.4118" dy="158.8235" />
+          <Connection Source="START.WARM" Destination="LBL.INIT" dx1="64.7059" dx2="29.4118" dy="158.8235" />
+          <Connection Source="LBL.INITO" Destination="RCV1.INIT" dx1="64.7059" dx2="47.0588" dy="270.5882" />
+          <Connection Source="RCV1.INITO" Destination="OUT1.INIT" dx1="23.5294" />
+          <Connection Source="RCV1.IND" Destination="OUT1.REQ" dx1="41.1765" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="1" Destination="OUT1.QI" dx1="2211.7646" />
+          <Connection Source="RCV1.RD_1" Destination="OUT1.IN" dx1="47.0588" />
+          <Connection Source="20" Destination="OUT1.W" dx1="2194.1177" />
+          <Connection Source="&#34;ANALOG_16_INPUT_DATAI&#34;" Destination="OUT1.TYPE" dx1="1811.7646" />
+          <Connection Source="[0,1,2,3]" Destination="OUT1.IVAL" dx1="2111.7646" />
+          <Connection Source="&#34;225.0.1.0:1028&#34;" Destination="RCV1.ID" dx1="1264.7058" />
+          <Connection Source="1" Destination="LBL.QI" dx1="588.2353" />
+          <Connection Source="&#34; => ANALOG_16_INPUT_DATAI&#34;" Destination="LBL.LABEL" dx1="129.4118" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="SEND_AI16C" Type="PANEL_RESOURCE" x="1338.8888" y="1266.6666" >
+      <FBNetwork >
+        <FB Name="LBL" Type="FB_LABEL" x="1141.1764" y="11.7647" />
+        <FB Name="IN1" Type="IN_ANY" x="1711.7646" y="11.7647" />
+        <FB Name="SEND1" Type="PUBL_1" x="2717.647" y="11.7647" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="LBL.INIT" dx1="64.7059" dx2="29.4118" dy="158.8235" />
+          <Connection Source="START.WARM" Destination="LBL.INIT" dx1="64.7059" dx2="29.4118" dy="158.8235" />
+          <Connection Source="LBL.INITO" Destination="IN1.INIT" dx1="64.7059" dx2="47.0588" dy="270.5882" />
+          <Connection Source="IN1.INITO" Destination="SEND1.INIT" dx1="223.5294" dx2="41.1765" dy="-1.0" />
+          <Connection Source="IN1.IND" Destination="SEND1.REQ" dx1="182.3529" dx2="58.8235" dy="-1.0" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="IN1.OUT" Destination="SEND1.SD_1" dx1="94.1176" dx2="229.4118" dy="1211.7646" />
+          <Connection Source="1" Destination="IN1.QI" dx1="1647.0588" />
+          <Connection Source="&#34;225.0.1.0:1029&#34;" Destination="SEND1.ID" dx1="2435.2942" />
+          <Connection Source="1" Destination="LBL.QI" dx1="1076.4706" />
+          <Connection Source="&#34;ANALOG_16_INPUT_... =>&#34;" Destination="LBL.LABEL" dx1="694.1176" />
+          <Connection Source="20" Destination="IN1.W" dx1="1629.4117" />
+          <Connection Source="&#34;ANALOG_16_INPUT_CONFIGURATION&#34;" Destination="IN1.TYPE" dx1="1088.2352" />
+          <Connection Source="(SIGNAL_TYPE:=DIFFERENTIAL,FILTER:=50,CHANNEL:=[(RANGE:=UNIPOLAR_10V),(MAX_SCALE:= 100, MIN_SCALE:=0)])" Destination="IN1.IVAL" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="RCV_AI16C" Type="PANEL_RESOURCE" x="1933.3333" y="1266.6666" >
+      <FBNetwork >
+        <FB Name="LBL" Type="FB_LABEL" x="652.9412" y="200.0" />
+        <FB Name="RCV1" Type="SUBL_1" x="1570.5883" y="11.7647" />
+        <FB Name="OUT1" Type="OUT_ANY" x="2252.9412" y="11.7647" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="LBL.INIT" dx1="64.7059" dx2="29.4118" dy="158.8235" />
+          <Connection Source="START.WARM" Destination="LBL.INIT" dx1="64.7059" dx2="29.4118" dy="158.8235" />
+          <Connection Source="LBL.INITO" Destination="RCV1.INIT" dx1="64.7059" dx2="47.0588" dy="270.5882" />
+          <Connection Source="RCV1.INITO" Destination="OUT1.INIT" dx1="23.5294" />
+          <Connection Source="RCV1.IND" Destination="OUT1.REQ" dx1="41.1765" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="RCV1.RD_1" Destination="OUT1.IN" dx1="47.0588" />
+          <Connection Source="1" Destination="OUT1.QI" dx1="2188.2354" />
+          <Connection Source="20" Destination="OUT1.W" dx1="2170.5881" />
+          <Connection Source="&#34;ANALOG_16_INPUT_CONFIGURATION&#34;" Destination="OUT1.TYPE" dx1="1629.4117" />
+          <Connection Source="&#34;225.0.1.0:1029&#34;" Destination="RCV1.ID" dx1="1288.2352" />
+          <Connection Source="1" Destination="LBL.QI" dx1="588.2353" />
+          <Connection Source="&#34; => ..._CONFIGURATION&#34;" Destination="LBL.LABEL" dx1="235.2941" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="SEND_MATRIX" Type="PANEL_RESOURCE" x="2722.2222" y="11.111111" >
+      <FBNetwork >
+        <FB Name="IN1" Type="IN_MATRIX" x="611.1111" y="11.111111" />
+        <FB Name="SEND1" Type="PUBL_1" x="1588.8888" y="11.111111" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="IN1.INIT" dx1="61.111107" dx2="29.4118" dy="170.5882" />
+          <Connection Source="START.WARM" Destination="IN1.INIT" dx1="88.888885" dx2="29.4118" dy="282.3529" />
+          <Connection Source="IN1.IND" Destination="SEND1.REQ" dx1="161.1111" dx2="58.8235" dy="-1.0" />
+          <Connection Source="IN1.INITO" Destination="SEND1.INIT" dx1="94.44444" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="IN1.OUT" Destination="SEND1.SD_1" dx1="27.777777" dx2="229.4118" dy="1211.7646" />
+          <Connection Source="1" Destination="IN1.QI" dx1="544.4444" />
+          <Connection Source="&#34;225.0.1.0:1030&#34;" Destination="SEND1.ID" dx1="1316.6666" />
+          <Connection Source="2" Destination="IN1.ROWS" dx1="544.4444" />
+          <Connection Source="3" Destination="IN1.COLS" dx1="544.4444" />
+          <Connection Source="[1,2,3,4,5,6]" Destination="IN1.IVAL" dx1="400.0" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="RCV_MATRIX" Type="PANEL_RESOURCE" x="2750.0" y="588.88885" >
+      <FBNetwork >
+        <FB Name="RCV1" Type="SUBL_1" x="566.6666" y="122.22221" />
+        <FB Name="OUT1" Type="OUT_MATRIX" x="1111.1111" y="11.111111" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="RCV1.INIT" dx1="116.666664" dx2="29.4118" dy="170.5882" />
+          <Connection Source="START.WARM" Destination="RCV1.INIT" dx1="111.11111" dx2="29.4118" dy="282.3529" />
+          <Connection Source="RCV1.INITO" Destination="OUT1.INIT" dx1="27.777777" />
+          <Connection Source="RCV1.IND" Destination="OUT1.REQ" dx1="38.888885" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="RCV1.RD_1" Destination="OUT1.IN" dx1="44.444443" />
+          <Connection Source="1" Destination="OUT1.QI" dx1="1044.4445" />
+          <Connection Source="&#34;225.0.1.0:1030&#34;" Destination="RCV1.ID" dx1="294.44443" />
+          <Connection Source="3" Destination="OUT1.ROWS" dx1="1044.4445" />
+          <Connection Source="2" Destination="OUT1.COLS" dx1="1044.4445" />
+          <Connection Source="[6,5,4,3,2,1]" Destination="OUT1.IVAL" dx1="899.99994" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <FBNetwork >
+      <DataConnections>
+        <Connection Source="1" Destination="SEND_MATRIX.ROWS" dx1="2655.5554" />
+        <Connection Source="1" Destination="SEND_MATRIX.COLS" dx1="2655.5554" />
+        <Connection Source="1" Destination="RCV_MATRIX.ROWS" dx1="2683.3333" />
+        <Connection Source="1" Destination="RCV_MATRIX.COLS" dx1="2683.3333" />
+      </DataConnections>
+    </FBNetwork>
+  </Device>
+  <DeviceParameters>
+    <Connection Source="[100,250,800,320]" Destination="TEST.BOUNDS" dx1="277.77777" />
+    <Connection Source="[4,4]" Destination="TEST.GRID" dx1="461.11108" />
+  </DeviceParameters>
+</System>

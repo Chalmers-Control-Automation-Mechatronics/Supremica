@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="C_DELAY" Comment="Clocked delayed propagation of an event-Cancellable" >
+  <Identification Standard="61499-1" Classification="Event processing" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2004-09-23" Remarks="SRC version" />
+  <CompilerInfo header="package fb.rt.mva;" >
+    <Compiler Language="Java" Vendor="Sun" Product="JDK" Version="1.4.2" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="START" Comment="Begin Delay" >
+        <With Var="N" />
+      </Event>
+      <Event Name="STOP" Comment="Cancel Delay" >
+      </Event>
+      <Event Name="CLK" Comment="Simulation Clock" >
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="EO" Comment="Delayed Event" >
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="N" Type="UINT" Comment="Delay Time in Clock Cycles" />
+    </InputVars>
+  </InterfaceList>
+  <BasicFB>
+    <InternalVars>
+      <VarDeclaration Name="COUNT" Type="UINT" />
+    </InternalVars>
+  <Algorithm Name="START" Comment="Initialization algorithm" >
+    <Other Language="Java" Text="if(COUNT.value==0) COUNT.value = N.value;&#10;" />
+  </Algorithm>
+  <Algorithm Name="STOP" Comment="Normally executed algorithm" >
+    <Other Language="Java" Text="COUNT.value=0;&#10;" />
+  </Algorithm>
+  <Algorithm Name="CLK" Comment="Normally executed algorithm" >
+    <Other Language="Java" Text="if(COUNT.value==0) return;&#10;COUNT.value--;&#10;if(COUNT.value==0) EO.serviceEvent(this);&#10;" />
+  </Algorithm>
+  </BasicFB>
+</FBType>

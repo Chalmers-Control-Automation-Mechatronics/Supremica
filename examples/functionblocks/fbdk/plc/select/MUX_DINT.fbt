@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="MUX_DINT" Comment="See MUX_ANY" >
+  <Identification Standard="61131-3" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2004-12-15" Remarks="Converted from SRC format." />
+  <CompilerInfo header="package fb.rt.plc.select;" >
+  </CompilerInfo>
+  <InterfaceList>
+    <InputVars>
+      <VarDeclaration Name="K" Type="UINT" />
+      <VarDeclaration Name="IN0" Type="DINT" />
+      <VarDeclaration Name="IN1" Type="DINT" />
+      <VarDeclaration Name="IN2" Type="DINT" />
+      <VarDeclaration Name="IN3" Type="DINT" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="OUT" Type="DINT" />
+    </OutputVars>
+  </InterfaceList>
+</FBType>

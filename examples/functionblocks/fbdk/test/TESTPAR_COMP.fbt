@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="TESTPAR_COMP" Comment="Test Java emitting of parameters in composite FB type" >
+  <Identification Standard="61499-2" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2004-12-15" />
+  <CompilerInfo header="package fb.rt.test; import fb.rt.math.*;" >
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="REQ" Comment="Normal Execution Request" >
+        <With Var="IN" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="CNF" Comment="Execution Confirmation" >
+        <With Var="OUT" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="IN" Type="REAL" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="OUT" Type="REAL" Comment="IN+2.0" />
+    </OutputVars>
+  </InterfaceList>
+  <FBNetwork >
+    <FB Name="ADD2" Type="FB_ADD_REAL" x="550.0" y="116.666664" >
+      <Parameter Name="IN2" Value="2.0" />
+    </FB>
+    <EventConnections>
+      <Connection Source="REQ" Destination="ADD2.REQ" dx1="438.8889" />
+      <Connection Source="ADD2.CNF" Destination="CNF" dx1="1083.3333" />
+    </EventConnections>
+    <DataConnections>
+      <Connection Source="ADD2.OUT" Destination="OUT" dx1="1088.8888" />
+      <Connection Source="IN" Destination="ADD2.IN1" dx1="472.2222" />
+    </DataConnections>
+  </FBNetwork>
+</FBType>

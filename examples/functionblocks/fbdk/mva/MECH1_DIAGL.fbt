@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="MECH1_DIAGL" Comment="Diagnostic for a Unidirectional Mechanism with local Clocking and Publication" >
+  <Identification Standard="61499-1" Classification="Diagnostics" ApplicationDomain="Mechanisms" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2004-10-20" Remarks="Renamed to replace old MECH1_DIAGL." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2004-09-26" Remarks="Derived from MECH2_DIAG; made composite, incorporated clock." />
+  <CompilerInfo header="package fb.rt.mva; import fb.rt.net.*;" >
+    <Compiler Language="Java" Vendor="Sun" Product="JDK" Version="1.4.2" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="INIT" >
+        <With Var="CLK_ID" />
+        <With Var="DIAG_ID" />
+        <With Var="N" />
+        <With Var="SRC" />
+        <With Var="MSG" />
+        <With Var="END" />
+        <With Var="FWD" />
+        <With Var="N" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="INITO" >
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="CLK_ID" Type="WSTRING" InitialValue="&#34;DIAG_CLK&#34;" Comment="Diagnostic Clock Local Channel ID" />
+      <VarDeclaration Name="DIAG_ID" Type="WSTRING" InitialValue="&#34;DIAG&#34;" Comment="Diagnostic output channel ID" />
+      <VarDeclaration Name="FWD" Type="BOOL" Comment="Forward Actuation Command from Controller" />
+      <VarDeclaration Name="END" Type="BOOL" Comment="END(Fully Advanced)Sensor" />
+      <VarDeclaration Name="N" Type="UINT" Comment="Timeout Period in CLK cycles" />
+      <VarDeclaration Name="SRC" Type="WSTRING" Comment="Diagnostic Source ID" />
+      <VarDeclaration Name="MSG" Type="WSTRING" InitialValue="&#34;TIMEOUT_ADVANCING&#34;" Comment="Fault message" />
+    </InputVars>
+  </InterfaceList>
+  <FBNetwork >
+    <FB Name="MONITOR" Type="MECH1_DIAG" x="650.0" y="316.66666" />
+    <FB Name="CLK" Type="SUBL_0" x="272.2222" y="11.111111" />
+    <FB Name="DIAG" Type="PUBL_2" x="1211.1111" y="533.3333" />
+    <EventConnections>
+      <Connection Source="INIT" Destination="CLK.INIT" dx1="166.66666" />
+      <Connection Source="CLK.IND" Destination="MONITOR.CLK" dx1="27.777777" />
+      <Connection Source="CLK.INITO" Destination="DIAG.INIT" dx1="572.2222" />
+      <Connection Source="MONITOR.FLT" Destination="DIAG.REQ" dx1="27.777777" />
+      <Connection Source="DIAG.INITO" Destination="INITO" dx1="1649.9999" />
+    </EventConnections>
+    <DataConnections>
+      <Connection Source="DIAG_ID" Destination="DIAG.ID" dx1="1050.0" />
+      <Connection Source="SRC" Destination="DIAG.SD_1" dx1="1105.5555" />
+      <Connection Source="MSG" Destination="DIAG.SD_2" dx1="1094.4445" />
+      <Connection Source="CLK_ID" Destination="CLK.ID" dx1="122.22221" />
+      <Connection Source="FWD" Destination="MONITOR.FWD" dx1="538.88885" />
+      <Connection Source="END" Destination="MONITOR.END" dx1="538.88885" />
+      <Connection Source="N" Destination="MONITOR.N" dx1="577.7778" />
+    </DataConnections>
+  </FBNetwork>
+</FBType>

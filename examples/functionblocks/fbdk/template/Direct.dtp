@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE DataType SYSTEM "http://www.holobloc.com/xml/DataType.dtd" >
+<DataType xmlns="http://www.holobloc.com/xml/DataType" Name="Direct" Comment="A Directly Derived Data Type" >
+  <Identification Standard="61499-2" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2003-12-06" />
+  <CompilerInfo header="package fb.rt.template;" >
+  </CompilerInfo>
+  <ASN1Tag Class="PRIVATE" Number="7" />
+  <DirectlyDerivedType BaseType="REAL" InitialValue="5.1" />
+</DataType>

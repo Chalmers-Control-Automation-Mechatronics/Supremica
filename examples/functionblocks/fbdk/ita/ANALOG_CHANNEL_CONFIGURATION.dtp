@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE DataType SYSTEM "http://www.holobloc.com/xml/DataType.dtd" >
+<DataType xmlns="http://www.holobloc.com/xml/DataType" Name="ANALOG_CHANNEL_CONFIGURATION" >
+  <Identification Standard="61131-3" Type="Data Type" Description="Table 12, #5" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.2" Author="JHC" Date="2001-06-14" Remarks="Added initial value for MAX_SCALE." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2001-03-02" Remarks="Test for revised Java code generation." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2000-11-09" />
+  <CompilerInfo header="package fb.rt.ita;" >
+    <Compiler Language="Java" Vendor="IBM" Product="VisualAge" Version="3.0" />
+  </CompilerInfo>
+  <ASN1Tag Class="PRIVATE" Number="15" />
+  <StructuredType >
+    <VarDeclaration Name="RANGE" Type="ANALOG_SIGNAL_RANGE" />
+    <VarDeclaration Name="MIN_SCALE" Type="ANALOG_DATA" />
+    <VarDeclaration Name="MAX_SCALE" Type="ANALOG_DATA" InitialValue="4095" />
+  </StructuredType>
+</DataType>

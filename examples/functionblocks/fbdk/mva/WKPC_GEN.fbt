@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="WKPC_GEN" Comment="Random Workpiece Generator" >
+  <Identification Standard="61499-1" Classification="Simulation" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.2" Author="JHC" Date="2004-09-16" Remarks="Generalized from PR_GEN." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2004-08-06" Remarks="Changed PPEG to UINT." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2002-04-11" />
+  <CompilerInfo header="package fb.rt.mva;" >
+    <Compiler Language="Java" Vendor="Sun" Product="JDK" Version="1.4.2" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="REQ" Comment="Normal Execution Request" >
+        <With Var="WS0" />
+        <With Var="WS1" />
+        <With Var="P1" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="CNF" Comment="Execution Confirmation" >
+        <With Var="OUT" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="WS0" Type="VSTYLE" InitialValue="PEG" Comment="Workpiece Style 0" />
+      <VarDeclaration Name="WS1" Type="VSTYLE" InitialValue="RING" Comment="Workpiece Style 1" />
+      <VarDeclaration Name="P1" Type="UINT" InitialValue="50" Comment="Probability that OUT=WS1 (0-100%)" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="OUT" Type="VSTYLE" InitialValue="PEG" />
+    </OutputVars>
+  </InterfaceList>
+  <BasicFB>
+  <Algorithm Name="REQ" >
+    <Other Language="Java" Text="OUT.value = ((Math.random()*100)&#60;=P1.value)? WS1.value : WS0.value;&#10;CNF.serviceEvent(this);&#10;" />
+  </Algorithm>
+  </BasicFB>
+</FBType>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="POS_SENSE" Comment="Workpiece position sensor" >
+  <Identification Standard="61499-1" Classification="Simulation" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2004-09-21" />
+  <CompilerInfo header="package fb.rt.mva;" >
+    <Compiler Language="Java" Vendor="Sun" Product="JDK" Version="1.4.2" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="SENSE" Comment="Input change notification" >
+        <With Var="POS" />
+        <With Var="P0" />
+        <With Var="P1" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="IND" Comment="Output change indication" >
+        <With Var="PRESENT" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="POS" Type="UINT" Comment="Workpiece position on conveyor (0-100%)" />
+      <VarDeclaration Name="P0" Type="UINT" Comment="Position sensor lower limit" />
+      <VarDeclaration Name="P1" Type="UINT" Comment="Position sensor upper limit" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="PRESENT" Type="BOOL" Comment="Workpiece is present between P0 and P1" />
+    </OutputVars>
+  </InterfaceList>
+  <BasicFB>
+  <Algorithm Name="SENSE" >
+    <Other Language="Java" Text="boolean newpres = (POS.value>=P0.value) &#38; (POS.value&#60;=P1.value);&#10;if(newpres!=PRESENT.value){&#10;   PRESENT.value = newpres;&#10;   IND.serviceEvent(this);}&#10;" />
+  </Algorithm>
+  </BasicFB>
+</FBType>

@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE System SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<System xmlns="http://www.holobloc.com/xml/LibraryElement" Name="CS21_TEST" Comment="CLIENT_2_1/SERVER_1_2 Test" >
+  <Identification Standard="61499-1" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.2" Author="JHC" Date="2001-10-12" Remarks="Changed CLIENT/SERVER order." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2001-07-05" Remarks="Added TEST application." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2001-06-02" />
+  <Application Name="TEST" >
+    <FBNetwork >
+      <FB Name="RSP_IN" Type="IN_ANY" x="2170.5881" y="1258.8235" />
+      <FB Name="REQ_OUT" Type="OUT_ANY" x="1235.2941" y="1258.8235" />
+      <FB Name="DST_OUT" Type="OUT_ANY" x="447.0588" y="1258.8235" />
+      <FB Name="DST_IN" Type="IN_ANY" x="435.2941" y="11.7647" />
+      <FB Name="REQ_IN" Type="IN_ANY" x="1264.7058" y="11.7647" />
+      <FB Name="RSP_OUT" Type="OUT_ANY" x="2217.647" y="11.7647" />
+      <EventConnections>
+        <Connection Source="REQ_OUT.INITO" Destination="RSP_IN.INIT" dx1="117.6471" dx2="223.5294" dy="1311.7646" />
+        <Connection Source="REQ_OUT.CNF" Destination="RSP_IN.REQ" dx1="70.5882" dx2="176.4706" dy="1164.7058" />
+        <Connection Source="DST_OUT.INITO" Destination="REQ_OUT.INIT" dx1="152.9412" />
+        <Connection Source="DST_OUT.CNF" Destination="REQ_OUT.REQ" dx1="100" />
+        <Connection Source="DST_IN.INITO" Destination="REQ_IN.INIT" dx1="23.5294" />
+        <Connection Source="DST_IN.IND" Destination="REQ_IN.REQ" dx1="35.2941" />
+        <Connection Source="REQ_IN.INITO" Destination="RSP_OUT.INIT" Comment="All I/O must be initialized" dx1="264.7059" />
+        <Connection Source="REQ_IN.IND" Destination="DST_OUT.REQ" dx1="64.7059" dx2="64.7059" dy="841.1765" />
+        <Connection Source="RSP_IN.IND" Destination="RSP_OUT.REQ" dx1="58.8235" dx2="458.8235" dy="-288.2353" />
+      </EventConnections>
+      <DataConnections>
+        <Connection Source="REQ_OUT.QO" Destination="RSP_IN.QI" dx1="35.2941" dx2="141.1765" dy="794.1176" />
+        <Connection Source="DST_OUT.QO" Destination="REQ_OUT.QI" dx1="47.0588" />
+        <Connection Source="TRUE" Destination="DST_IN.QI" dx1="305.8824" />
+        <Connection Source="1" Destination="REQ_IN.QI" dx1="1200" />
+        <Connection Source="1" Destination="RSP_OUT.QI" dx1="2152.9412" />
+        <Connection Source="DST_IN.OUT" Destination="DST_OUT.IN" dx1="52.9412" dx2="147.0588" dy="347.0588" />
+        <Connection Source="REQ_IN.OUT" Destination="REQ_OUT.IN" dx1="117.6471" dx2="94.1176" dy="447.0588" />
+        <Connection Source="RSP_IN.OUT" Destination="RSP_OUT.IN" dx1="105.8824" dx2="417.6471" dy="-782.3529" />
+        <Connection Source="12" Destination="DST_IN.W" dx1="352.9412" />
+        <Connection Source="&#34;WSTRING&#34;" Destination="DST_IN.TYPE" dx1="223.5294" />
+        <Connection Source="&#34;DEST&#34;" Destination="DST_IN.IVAL" dx1="282.3529" />
+        <Connection Source="12" Destination="REQ_IN.W" dx1="1182.3529" />
+        <Connection Source="&#34;WSTRING&#34;" Destination="REQ_IN.TYPE" dx1="1052.9412" />
+        <Connection Source="&#34;REQUEST&#34;" Destination="REQ_IN.IVAL" dx1="1047.0588" />
+        <Connection Source="12" Destination="RSP_OUT.W" dx1="2135.2942" />
+        <Connection Source="&#34;WSTRING&#34;" Destination="RSP_OUT.TYPE" dx1="2005.8823" />
+        <Connection Source="&#34;Waiting...&#34;" Destination="RSP_OUT.IVAL" dx1="2011.7646" />
+        <Connection Source="12" Destination="DST_OUT.W" dx1="364.7059" />
+        <Connection Source="&#34;WSTRING&#34;" Destination="DST_OUT.TYPE" dx1="235.2941" />
+        <Connection Source="12" Destination="REQ_OUT.W" dx1="1152.9412" />
+        <Connection Source="&#34;WSTRING&#34;" Destination="REQ_OUT.TYPE" dx1="1023.5294" />
+        <Connection Source="12" Destination="RSP_IN.W" dx1="2088.2354" />
+        <Connection Source="&#34;WSTRING&#34;" Destination="RSP_IN.TYPE" dx1="1958.8235" />
+        <Connection Source="&#34;RESPONSE&#34;" Destination="RSP_IN.IVAL" dx1="1929.4117" />
+      </DataConnections>
+    </FBNetwork>
+  </Application>
+  <Device Name="CLT" Type="FRAME_DEVICE" x="1500" y="1117.6471" >
+    <Resource Name="RES1" Type="PANEL_RESOURCE" x="1535.2941" y="970.5882" >
+      <FBNetwork >
+        <FB Name="DST_IN" Type="IN_ANY" x="694.1176" y="11.7647" />
+        <FB Name="REQ_IN" Type="IN_ANY" x="1488.2352" y="11.7647" />
+        <FB Name="REQUESTER" Type="CLIENT_2_1" x="1258.8235" y="1141.1764" />
+        <FB Name="RSP_OUT" Type="OUT_ANY" x="2064.7058" y="1141.1764" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="DST_IN.INIT" dx1="23.5294" />
+          <Connection Source="DST_IN.INITO" Destination="REQ_IN.INIT" dx1="52.9412" />
+          <Connection Source="REQ_IN.INITO" Destination="RSP_OUT.INIT" Comment="All I/O must be initialized" dx1="158.8235" />
+          <Connection Source="RSP_OUT.INITO" Destination="REQUESTER.INIT" Comment="before the CLIENT!" dx1="35.2941" dx2="35.2941" dy="-182.3529" />
+          <Connection Source="DST_IN.IND" Destination="REQ_IN.REQ" dx1="70.5882" />
+          <Connection Source="REQ_IN.IND" Destination="REQUESTER.REQ" dx1="111.7647" dx2="70.5882" dy="800" />
+          <Connection Source="REQUESTER.CNF" Destination="RSP_OUT.REQ" dx1="341.1765" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="1" Destination="REQUESTER.QI" dx1="1194.1177" />
+          <Connection Source="DST_IN.OUT" Destination="REQUESTER.SD_1" dx1="47.0588" />
+          <Connection Source="REQ_IN.OUT" Destination="REQUESTER.SD_2" dx1="76.4706" dx2="135.2941" dy="305.8824" />
+          <Connection Source="1" Destination="RSP_OUT.QI" dx1="2000" />
+          <Connection Source="REQUESTER.RD_1" Destination="RSP_OUT.IN" dx1="117.6471" />
+          <Connection Source="TRUE" Destination="DST_IN.QI" dx1="564.7059" />
+          <Connection Source="1" Destination="REQ_IN.QI" dx1="1423.5294" />
+          <Connection Source="&#34;localhost:1499&#34;" Destination="REQUESTER.ID" dx1="988.2353" />
+          <Connection Source="12" Destination="DST_IN.W" dx1="611.7647" />
+          <Connection Source="&#34;WSTRING&#34;" Destination="DST_IN.TYPE" dx1="482.3529" />
+          <Connection Source="&#34;DEST&#34;" Destination="DST_IN.IVAL" dx1="541.1765" />
+          <Connection Source="12" Destination="REQ_IN.W" dx1="1405.8823" />
+          <Connection Source="&#34;WSTRING&#34;" Destination="REQ_IN.TYPE" dx1="1276.4706" />
+          <Connection Source="&#34;REQUEST&#34;" Destination="REQ_IN.IVAL" dx1="1270.5883" />
+          <Connection Source="12" Destination="RSP_OUT.W" dx1="1982.3529" />
+          <Connection Source="&#34;WSTRING&#34;" Destination="RSP_OUT.TYPE" dx1="1852.9412" />
+          <Connection Source="&#34;Waiting...&#34;" Destination="RSP_OUT.IVAL" dx1="1858.8235" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <FBNetwork >
+      <DataConnections>
+        <Connection Source="false" Destination="RES1.TRACE" dx1="1423.5294" />
+      </DataConnections>
+    </FBNetwork>
+  </Device>
+  <Device Name="SRVR" Type="FRAME_DEVICE" Comment="SERVER must be initialized first!" x="1429.4117" y="370.5882" >
+    <Resource Name="RES1" Type="PANEL_RESOURCE" x="1152.9412" y="929.4117" >
+      <FBNetwork >
+        <FB Name="RESPONDER" Type="SERVER_1_2" x="1011.7647" y="11.7647" />
+        <FB Name="DST_OUT" Type="OUT_ANY" x="1882.3529" y="11.7647" />
+        <FB Name="REQ_OUT" Type="OUT_ANY" x="2394.1177" y="464.7059" />
+        <FB Name="RSP_IN" Type="IN_ANY" x="452.9412" y="788.2353" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="RESPONDER.INIT" dx1="23.5294" />
+          <Connection Source="RESPONDER.INITO" Destination="DST_OUT.INIT" dx1="188.2353" />
+          <Connection Source="DST_OUT.INITO" Destination="REQ_OUT.INIT" dx1="152.9412" />
+          <Connection Source="REQ_OUT.INITO" Destination="RSP_IN.INIT" dx1="117.6471" dx2="223.5294" dy="1311.7646" />
+          <Connection Source="RESPONDER.IND" Destination="DST_OUT.REQ" dx1="176.4706" />
+          <Connection Source="DST_OUT.CNF" Destination="REQ_OUT.REQ" dx1="100" />
+          <Connection Source="REQ_OUT.CNF" Destination="RSP_IN.REQ" dx1="70.5882" dx2="176.4706" dy="1164.7058" />
+          <Connection Source="RSP_IN.IND" Destination="RESPONDER.RSP" dx1="35.2941" dx2="17.6471" dy="-1" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="true" Destination="RESPONDER.QI" dx1="911.7647" />
+          <Connection Source="&#34;localhost:1499&#34;" Destination="RESPONDER.ID" dx1="741.1765" />
+          <Connection Source="RESPONDER.QO" Destination="DST_OUT.QI" dx1="147.0588" />
+          <Connection Source="DST_OUT.QO" Destination="REQ_OUT.QI" dx1="47.0588" />
+          <Connection Source="REQ_OUT.QO" Destination="RSP_IN.QI" dx1="35.2941" dx2="141.1765" dy="794.1176" />
+          <Connection Source="RESPONDER.RD_1" Destination="DST_OUT.IN" dx1="58.8235" />
+          <Connection Source="RESPONDER.RD_2" Destination="REQ_OUT.IN" dx1="47.0588" />
+          <Connection Source="RSP_IN.OUT" Destination="RESPONDER.SD_1" dx1="94.1176" dx2="29.4118" dy="447.0588" />
+          <Connection Source="12" Destination="RSP_IN.W" dx1="370.5882" />
+          <Connection Source="&#34;WSTRING&#34;" Destination="RSP_IN.TYPE" dx1="241.1765" />
+          <Connection Source="&#34;RESPONSE&#34;" Destination="RSP_IN.IVAL" dx1="211.7647" />
+          <Connection Source="12" Destination="DST_OUT.W" dx1="1800" />
+          <Connection Source="&#34;WSTRING&#34;" Destination="DST_OUT.TYPE" dx1="1670.5883" />
+          <Connection Source="12" Destination="REQ_OUT.W" dx1="2311.7646" />
+          <Connection Source="&#34;WSTRING&#34;" Destination="REQ_OUT.TYPE" dx1="2182.3528" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <FBNetwork >
+      <DataConnections>
+        <Connection Source="false" Destination="RES1.TRACE" dx1="1041.1764" />
+      </DataConnections>
+    </FBNetwork>
+  </Device>
+  <DeviceParameters>
+    <Connection Source="[100,100,125,125]" Destination="CLT.BOUNDS" dx1="1194.1177" />
+    <Connection Source="[225,100,125,125]" Destination="SRVR.BOUNDS" dx1="1123.5294" />
+    <Connection Source="[1,1]" Destination="CLT.GRID" dx1="1388.2352" />
+    <Connection Source="[1,1]" Destination="SRVR.GRID" dx1="1317.647" />
+  </DeviceParameters>
+  <Mapping From="TEST.RSP_IN" To="RESPONDER.RES1.RSP_IN" />
+  <Mapping From="TEST.REQ_OUT" To="RESPONDER.RES1.REQ_OUT" />
+  <Mapping From="TEST.DST_OUT" To="RESPONDER.RES1.DST_OUT" />
+  <Mapping From="TEST.DST_IN" To="REQUESTER.RES1.DST_IN" />
+  <Mapping From="TEST.REQ_IN" To="REQUESTER.RES1.REQ_IN" />
+  <Mapping From="TEST.RSP_OUT" To="REQUESTER.RES1.RSP_OUT" />
+</System>

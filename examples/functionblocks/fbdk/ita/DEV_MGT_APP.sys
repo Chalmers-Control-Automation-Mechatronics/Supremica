@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE System SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<System xmlns="http://www.holobloc.com/xml/LibraryElement" Name="DEV_MGT_APP" Comment="Device Management Application Model" >
+  <Identification Standard="61499-1" Classification="Device Management" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2003-03-30" Remarks="Fixed missing (empty) FBD in Application." />
+  <Application Name="APP1" >
+    <FBNetwork >
+      <FB Name="TOOL" Type="DM_CLT" x="276.4706" y="11.7647" />
+      <FB Name="MGR" Type="DEV_MGR" x="829.4117" y="11.7647" />
+      <EventConnections>
+        <Connection Source="TOOL.IND" Destination="MGR.REQ" dx1="70.5882" />
+        <Connection Source="MGR.CNF" Destination="TOOL.RSP" dx1="105.8824" dx2="117.6471" dy="841.1765" />
+      </EventConnections>
+      <DataConnections>
+        <Connection Source="TOOL.DST" Destination="MGR.DST" dx1="105.8824" />
+        <Connection Source="TOOL.RQST" Destination="MGR.RQST" dx1="100" />
+        <Connection Source="MGR.RESP" Destination="TOOL.RESP" dx1="58.8235" dx2="64.7059" dy="347.0588" />
+      </DataConnections>
+    </FBNetwork>
+  </Application>
+  <Device Name="TOOL" Type="FRAME_DEVICE" x="452.9412" y="335.2941" >
+    <Resource Name="RES1" Type="PANEL_RESOURCE" x="676.4706" y="247.0588" >
+      <FBNetwork >
+        <FB Name="CLT" Type="CLIENT_2_1" x="1458.8235" y="11.7647" />
+        <FB Name="FF" Type="E_RS" x="511.7647" y="11.7647" />
+        <FB Name="TOOL" Type="DM_CLT" x="870.5882" y="11.7647" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="FF.S" dx1="29.4118" />
+          <Connection Source="START.WARM" Destination="FF.S" dx1="29.4118" />
+          <Connection Source="START.STOP" Destination="FF.R" dx1="47.0588" />
+          <Connection Source="FF.EO" Destination="TOOL.INIT" dx1="35.2941" />
+          <Connection Source="TOOL.INITO" Destination="CLT.INIT" dx1="58.8235" />
+          <Connection Source="TOOL.IND" Destination="CLT.REQ" dx1="58.8235" />
+          <Connection Source="CLT.CNF" Destination="TOOL.RSP" dx1="111.7647" dx2="117.6471" dy="870.5882" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="FF.Q" Destination="TOOL.QI" dx1="141.1765" />
+          <Connection Source="TOOL.QO" Destination="CLT.QI" dx1="64.7059" />
+          <Connection Source="TOOL.DST" Destination="CLT.SD_1" dx1="76.4706" />
+          <Connection Source="TOOL.RQST" Destination="CLT.SD_2" dx1="29.4118" />
+          <Connection Source="CLT.STATUS" Destination="TOOL.STATUS" dx1="70.5882" dx2="76.4706" dy="382.3529" />
+          <Connection Source="CLT.RD_1" Destination="TOOL.RESP" dx1="29.4118" dx2="41.1765" dy="229.4118" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+  </Device>
+  <Device Name="DEV" Type="RMT_DEV" x="1411.7646" y="382.3529" >
+    <Resource Name="MGR" Type="RMT_RES" x="370.5882" y="94.1176" >
+    </Resource>
+  </Device>
+  <Mapping From="APP1.TOOL" To="TOOL.RES1.TOOL" />
+</System>

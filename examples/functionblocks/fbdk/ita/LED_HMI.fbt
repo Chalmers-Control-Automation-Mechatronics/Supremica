@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "../LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="LED_HMI" Comment="4-LED output emulator" >
+  <Identification Standard="61499" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2001-02-21" />
+  <CompilerInfo header="package fb.rt.ita; import fb.rt.hmi.*;" >
+    <Compiler Language="Java" Vendor="IBM" Product="VisualAge" Version="3.0" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="INIT" Comment="Initialization Request" >
+        <With Var="LED3" />
+        <With Var="LED2" />
+        <With Var="LED1" />
+        <With Var="LED0" />
+        <With Var="C0" />
+        <With Var="C1" />
+      </Event>
+      <Event Name="REQ" Comment="Display Request" >
+        <With Var="LED3" />
+        <With Var="LED2" />
+        <With Var="LED1" />
+        <With Var="LED0" />
+        <With Var="C0" />
+        <With Var="C1" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="INITO" Comment="Initialization Confirm" >
+      </Event>
+      <Event Name="CNF" Comment="Execution Confirmation" >
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="LED3" Type="BOOL" Comment="MSB" />
+      <VarDeclaration Name="LED2" Type="BOOL" />
+      <VarDeclaration Name="LED1" Type="BOOL" />
+      <VarDeclaration Name="LED0" Type="BOOL" Comment="LSB" />
+      <VarDeclaration Name="C0" Type="COLOR" InitialValue="COLOR#white" Comment="OFF color" />
+      <VarDeclaration Name="C1" Type="COLOR" InitialValue="COLOR#orange" Comment="ON color" />
+    </InputVars>
+  </InterfaceList>
+  <FBNetwork >
+    <FB Name="OUT3" Type="OUT_BOOL" x="311.7647" y="11.7647" />
+    <FB Name="OUT2" Type="OUT_BOOL" x="947.0588" y="11.7647" />
+    <FB Name="OUT1" Type="OUT_BOOL" x="1605.8823" y="11.7647" />
+    <FB Name="OUT0" Type="OUT_BOOL" x="2276.4705" y="11.7647" />
+    <EventConnections>
+      <Connection Source="INIT" Destination="OUT3.INIT" dx1="205.8824" />
+      <Connection Source="OUT3.INITO" Destination="OUT2.INIT" dx1="35.2941" />
+      <Connection Source="OUT2.INITO" Destination="OUT1.INIT" dx1="35.2941" />
+      <Connection Source="OUT1.INITO" Destination="OUT0.INIT" dx1="41.1765" />
+      <Connection Source="OUT0.INITO" Destination="INITO" dx1="2764.7058" />
+      <Connection Source="REQ" Destination="OUT3.REQ" dx1="200" />
+      <Connection Source="OUT3.CNF" Destination="OUT2.REQ" dx1="58.8235" />
+      <Connection Source="OUT2.CNF" Destination="OUT1.REQ" dx1="64.7059" />
+      <Connection Source="OUT1.CNF" Destination="OUT0.REQ" dx1="64.7059" />
+      <Connection Source="OUT0.CNF" Destination="CNF" dx1="2741.1765" />
+    </EventConnections>
+    <DataConnections>
+      <Connection Source="1" Destination="OUT3.QI" dx1="247.0588" />
+      <Connection Source="1" Destination="OUT2.QI" dx1="882.3529" />
+      <Connection Source="1" Destination="OUT1.QI" dx1="1541.1764" />
+      <Connection Source="1" Destination="OUT0.QI" dx1="2211.7646" />
+      <Connection Source="&#34;LED3&#34;" Destination="OUT3.LABEL" dx1="164.7059" />
+      <Connection Source="&#34;LED2&#34;" Destination="OUT2.LABEL" dx1="800" />
+      <Connection Source="&#34;LED1&#34;" Destination="OUT1.LABEL" dx1="1458.8235" />
+      <Connection Source="&#34;LED0&#34;" Destination="OUT0.LABEL" dx1="2129.4116" />
+      <Connection Source="LED3" Destination="OUT3.IN" dx1="188.2353" />
+      <Connection Source="LED2" Destination="OUT2.IN" dx1="823.5294" />
+      <Connection Source="LED1" Destination="OUT1.IN" dx1="1482.3529" />
+      <Connection Source="LED0" Destination="OUT0.IN" dx1="2152.9412" />
+      <Connection Source="C0" Destination="OUT3.C0" dx1="223.5294" />
+      <Connection Source="C0" Destination="OUT2.C0" dx1="858.8235" />
+      <Connection Source="C0" Destination="OUT1.C0" dx1="1517.647" />
+      <Connection Source="C0" Destination="OUT0.C0" dx1="2188.2354" />
+      <Connection Source="C1" Destination="OUT3.C1" dx1="223.5294" />
+      <Connection Source="C1" Destination="OUT2.C1" dx1="858.8235" />
+      <Connection Source="C1" Destination="OUT1.C1" dx1="1517.647" />
+      <Connection Source="C1" Destination="OUT0.C1" dx1="2188.2354" />
+    </DataConnections>
+  </FBNetwork>
+</FBType>

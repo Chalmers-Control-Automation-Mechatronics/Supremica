@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="CNV_MDL" Comment="Simple Conveyor Model for 1 Workpiece" >
+  <Identification Standard="61499-1" Classification="Simulation" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2004-09-20" Remarks="Simplified from CNV_MDL." />
+  <CompilerInfo header="package fb.rt.mva;" >
+    <Compiler Language="Java" Vendor="Sun" Product="JDK" Version="1.4.2" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="CLK" Comment="Simulation Clock Event" >
+        <With Var="MTR_ON" />
+        <With Var="VF" />
+        <With Var="FAULT" />
+      </Event>
+      <Event Name="LOAD" Comment="Load Workpiece if at HOME position" >
+        <With Var="STYLE" />
+        <With Var="WKPC" />
+        <With Var="LPOS" />
+      </Event>
+      <Event Name="UNLD" Comment="Unload Workpiece if at END position" >
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="INDR" Comment="Change in Rendering Data" >
+        <With Var="POS" />
+        <With Var="STYLO" />
+        <With Var="WKPO" />
+      </Event>
+      <Event Name="INDS" Comment="Change in Sensor Data" >
+        <With Var="END" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="MTR_ON" Type="BOOL" Comment="Motor ON command" />
+      <VarDeclaration Name="FAULT" Type="BOOL" Comment="Fault Condition" />
+      <VarDeclaration Name="VF" Type="UINT" Comment="Conveyor Speed in % per CLK event" />
+      <VarDeclaration Name="LPOS" Type="UINT" Comment="Load Position in % of Conveyor Length" />
+      <VarDeclaration Name="STYLE" Type="VSTYLE" InitialValue="NONE" Comment="Input Workpiece style" />
+      <VarDeclaration Name="WKPC" Type="COLOR" InitialValue="yellow" Comment="Input Workpiece Color" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="END" Type="BOOL" Comment="Workpiece at End Position" />
+      <VarDeclaration Name="POS" Type="UINT" Comment="Workpiece Position in % of Conveyor Length" />
+      <VarDeclaration Name="STYLO" Type="VSTYLE" InitialValue="NONE" Comment="Currently loaded workpiece style" />
+      <VarDeclaration Name="WKPO" Type="COLOR" InitialValue="blue" Comment="Currently loaded workpiece color" />
+    </OutputVars>
+  </InterfaceList>
+  <BasicFB>
+  <Algorithm Name="LOAD" >
+    <Other Language="Java" Text="POS.value = Math.min(100,LPOS.value);&#10;END.value = (POS.value==100)&#38;&#38;(STYLE.value != VSTYLE.NONE);&#10;STYLO.value = STYLE.value;&#10;WKPO.value = WKPC.value;&#10;INDR.serviceEvent(this);&#10;INDS.serviceEvent(this);&#10;" />
+  </Algorithm>
+  <Algorithm Name="UNLD" >
+    <Other Language="Java" Text="if(STYLO.value==VSTYLE.NONE) return;&#10;STYLO.value=VSTYLE.NONE;&#10;END.value = false;&#10;INDR.serviceEvent(this);&#10;INDS.serviceEvent(this);&#10;" />
+  </Algorithm>
+  <Algorithm Name="CLK" >
+    <Other Language="Java" Text="if(FAULT.value||END.value||!MTR_ON.value||(STYLO.value==VSTYLE.NONE)) return;&#10;POS.value += VF.value;&#10;if(POS.value>=100){&#10;   POS.value=100;&#10;   END.value=true;}&#10;INDR.serviceEvent(this);&#10;if(END.value) INDS.serviceEvent(this);&#10;" />
+  </Algorithm>
+  </BasicFB>
+</FBType>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="SOE" Comment="Sequence of Events" >
+  <Identification Standard="61499-2" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.2" Author="JHC" Date="2003-12-04" Remarks="Renamed for better indexing." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2002-11-05" Remarks="Corrected missing ST element in Algorithm REQ." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2000-05-30" />
+  <CompilerInfo header="package fb.rt.student;" >
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="E1" Comment="Initialization Request" >
+      </Event>
+      <Event Name="E2" Comment="Normal Execution Request" >
+      </Event>
+      <Event Name="E3" >
+      </Event>
+      <Event Name="R" Comment="RESET" >
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="EO" Comment="State Change Notification" >
+        <With Var="WARN" />
+        <With Var="SN" />
+      </Event>
+    </EventOutputs>
+    <OutputVars>
+      <VarDeclaration Name="WARN" Type="BOOL" Comment="WARNING - Sequence E1,E2,E3 Detected!" />
+      <VarDeclaration Name="SN" Type="INT" Comment="State Number = {0,1,2,3}" />
+    </OutputVars>
+  </InterfaceList>
+  <BasicFB>
+    <ECC >
+      <ECState Name="S0" Comment="Initial State" x="355.55554" y="427.77777" >
+        <ECAction Algorithm="A0" Output="EO" />
+      </ECState>
+      <ECState Name="S1" Comment="E1 detected" x="1150.0" y="66.666664" >
+        <ECAction Algorithm="A1" Output="EO" />
+      </ECState>
+      <ECState Name="S2" Comment="E1, E2 detected" x="1011.1111" y="677.7778" >
+        <ECAction Algorithm="A2" Output="EO" />
+      </ECState>
+      <ECState Name="S3" Comment="WARNING - E1,E2,E3 detected" x="488.88885" y="1066.6666" >
+        <ECAction Algorithm="A3" Output="EO" />
+      </ECState>
+      <ECTransition Source="S0" Destination="S1" Condition="E1" x="355.55554" y="66.666664" />
+      <ECTransition Source="S1" Destination="S0" Condition="R" x="499.99997" y="161.1111" />
+      <ECTransition Source="S3" Destination="S0" Condition="R" x="355.55554" y="922.22217" />
+      <ECTransition Source="S2" Destination="S0" Condition="R" x="677.7778" y="600.0" />
+      <ECTransition Source="S1" Destination="S2" Condition="E2" x="1011.1111" y="344.44443" />
+      <ECTransition Source="S2" Destination="S3" Condition="E3" x="1011.1111" y="849.99994" />
+      <ECTransition Source="S1" Destination="S0" Condition="E1" x="594.4444" y="238.88889" />
+      <ECTransition Source="S1" Destination="S0" Condition="E3" x="750.0" y="283.3333" />
+      <ECTransition Source="S2" Destination="S0" Condition="E1" x="561.1111" y="677.7778" />
+      <ECTransition Source="S2" Destination="S0" Condition="E2" x="483.3333" y="811.1111" />
+    </ECC>
+  <Algorithm Name="A0" Comment="Algorithm for S0" >
+    <ST Text="SN := 0;&#10;WARN := FALSE;&#10;" />
+  </Algorithm>
+  <Algorithm Name="A1" Comment="Algorithm for S1" >
+    <ST Text="SN := 1;&#10;" />
+  </Algorithm>
+  <Algorithm Name="A2" Comment="Algorithm for S2" >
+    <ST Text="SN := 2;&#10;" />
+  </Algorithm>
+  <Algorithm Name="A3" Comment="WARNING algorithm for S3" >
+    <ST Text="SN := 3;&#10;WARN := TRUE;&#10;" />
+  </Algorithm>
+  </BasicFB>
+</FBType>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="PUMP_VIEW" Comment="End View of a Rotating Pump" >
+  <Identification Standard="61499-1" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2004-09-01" Remarks="Deleted QI,QO; set DIA initial value = 0." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2004-08-30" Remarks="Adapted from PUMP_VIEW." />
+  <CompilerInfo header="package fb.rt.process; " >
+    <Compiler Language="Java" Vendor="Sun" Product="JDK" Version="1.4.2" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="INIT" Comment="Initialization" >
+        <With Var="DIA" />
+        <With Var="FGD" />
+        <With Var="BKGD" />
+        <With Var="IX" />
+        <With Var="ARC" />
+        <With Var="ANGLE" />
+      </Event>
+      <Event Name="REQ" Comment="Request" >
+        <With Var="ANGLE" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="INITO" Comment="Initialization Confirm" >
+      </Event>
+      <Event Name="CNF" Comment="Service Confirmation" >
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="DIA" Type="UINT" Comment="Shaft diameter in pixels" />
+      <VarDeclaration Name="FGD" Type="COLOR" InitialValue="COLOR#blue" Comment="Shaft body color" />
+      <VarDeclaration Name="BKGD" Type="COLOR" InitialValue="COLOR#white" Comment="Background color" />
+      <VarDeclaration Name="IX" Type="COLOR" InitialValue="COLOR#red" Comment="Shaft index color" />
+      <VarDeclaration Name="ARC" Type="UINT" InitialValue="15" Comment="Shaft mark width" />
+      <VarDeclaration Name="ANGLE" Type="INT" Comment="Current shaft angle" />
+    </InputVars>
+  </InterfaceList>
+</FBType>

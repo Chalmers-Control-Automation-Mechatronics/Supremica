@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE System SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<System xmlns="http://www.holobloc.com/xml/LibraryElement" Name="TEST_TEXT" Comment="Test of JTextPane-based components" >
+  <Identification Standard="61499-1" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2004-06-20" />
+  <Application Name="APP1" >
+    <FBNetwork >
+    </FBNetwork>
+  </Application>
+  <Device Name="DEV1" Type="FRAME_DEVICE" x="705.55554" y="11.111111" >
+    <Resource Name="WSTRINGS" Type="PANEL_RESOURCE" x="166.66666" y="11.111111" >
+      <FBNetwork >
+        <FB Name="IN" Type="IN_TEXT_S" x="577.7778" y="222.22221" />
+        <FB Name="OUT" Type="OUT_TEXT_S" x="1216.6666" y="472.2222" />
+        <FB Name="REQ" Type="IN_EVENT" x="2538.8887" y="11.111111" />
+        <FB Name="INQ" Type="IN_BOOL" x="1916.6666" y="11.111111" />
+        <FB Name="OUTQ" Type="IN_BOOL" x="3205.5554" y="11.111111" />
+        <EventConnections>
+          <Connection Source="REQ.IND" Destination="IN.REQ" dx1="27.777777" dx2="150.0" dy="1116.6666" />
+          <Connection Source="IN.INITO" Destination="OUT.INIT" dx1="77.77777" />
+          <Connection Source="INQ.IND" Destination="IN.REQ" dx1="72.22222" dx2="150.0" dy="1005.55554" />
+          <Connection Source="REQ.IND" Destination="OUT.REQ" dx1="27.777777" dx2="161.1111" dy="1116.6666" />
+          <Connection Source="INQ.INITO" Destination="REQ.INIT" dx1="33.333332" />
+          <Connection Source="REQ.INITO" Destination="OUTQ.INIT" dx1="44.444443" />
+          <Connection Source="START.COLD" Destination="INQ.INIT" dx1="194.44444" />
+          <Connection Source="OUTQ.INITO" Destination="IN.INIT" dx1="83.33333" dx2="188.88889" dy="1422.2222" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="INQ.OUT" Destination="IN.QI" dx1="27.777777" dx2="105.55555" dy="444.44443" />
+          <Connection Source="IN.OUT" Destination="OUT.IN" dx1="27.777777" />
+          <Connection Source="OUTQ.OUT" Destination="OUT.QI" dx1="27.777777" dx2="116.666664" dy="661.1111" />
+          <Connection Source="[6,20]" Destination="IN.SIZE" dx1="449.99997" />
+          <Connection Source="&#34;WSTRING input&#34;" Destination="IN.IVAL" dx1="294.44443" />
+          <Connection Source="&#34;WSTRING output&#34;" Destination="OUT.IVAL" dx1="916.6666" />
+          <Connection Source="[6,20]" Destination="OUT.SIZE" dx1="1088.8888" />
+          <Connection Source="&#34;>>&#34;" Destination="REQ.LABEL" dx1="2433.3333" />
+          <Connection Source="&#34;INPUT QI&#34;" Destination="INQ.LABEL" dx1="1716.6666" />
+          <Connection Source="&#34;OUTPUT QI&#34;" Destination="OUTQ.LABEL" dx1="2972.2222" />
+          <Connection Source="1" Destination="INQ.IN" dx1="1849.9999" />
+          <Connection Source="1" Destination="OUTQ.IN" dx1="3138.8887" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="STRINGS" Type="PANEL_RESOURCE" x="849.99994" y="11.111111" >
+      <FBNetwork >
+        <FB Name="IN" Type="IN_TEXT" x="577.7778" y="222.22221" />
+        <FB Name="OUT" Type="OUT_TEXT" x="1216.6666" y="472.2222" />
+        <FB Name="REQ" Type="IN_EVENT" x="2538.8887" y="11.111111" />
+        <FB Name="INQ" Type="IN_BOOL" x="1916.6666" y="11.111111" />
+        <FB Name="OUTQ" Type="IN_BOOL" x="3205.5554" y="11.111111" />
+        <EventConnections>
+          <Connection Source="REQ.IND" Destination="IN.REQ" dx1="27.777777" dx2="150.0" dy="1116.6666" />
+          <Connection Source="IN.INITO" Destination="OUT.INIT" dx1="77.77777" />
+          <Connection Source="INQ.IND" Destination="IN.REQ" dx1="72.22222" dx2="150.0" dy="1005.55554" />
+          <Connection Source="REQ.IND" Destination="OUT.REQ" dx1="27.777777" dx2="161.1111" dy="1116.6666" />
+          <Connection Source="INQ.INITO" Destination="REQ.INIT" dx1="33.333332" />
+          <Connection Source="REQ.INITO" Destination="OUTQ.INIT" dx1="44.444443" />
+          <Connection Source="START.COLD" Destination="INQ.INIT" dx1="194.44444" />
+          <Connection Source="OUTQ.INITO" Destination="IN.INIT" dx1="83.33333" dx2="188.88889" dy="1422.2222" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="INQ.OUT" Destination="IN.QI" dx1="27.777777" dx2="105.55555" dy="444.44443" />
+          <Connection Source="IN.OUT" Destination="OUT.IN" dx1="27.777777" />
+          <Connection Source="OUTQ.OUT" Destination="OUT.QI" dx1="27.777777" dx2="116.666664" dy="661.1111" />
+          <Connection Source="[6,20]" Destination="IN.SIZE" dx1="449.99997" />
+          <Connection Source="&#34;STRING input&#34;" Destination="IN.IVAL" dx1="322.2222" />
+          <Connection Source="&#34;STRING output&#34;" Destination="OUT.IVAL" dx1="944.4444" />
+          <Connection Source="[6,20]" Destination="OUT.SIZE" dx1="1088.8888" />
+          <Connection Source="&#34;>>&#34;" Destination="REQ.LABEL" dx1="2433.3333" />
+          <Connection Source="&#34;INPUT QI&#34;" Destination="INQ.LABEL" dx1="1716.6666" />
+          <Connection Source="&#34;OUTPUT QI&#34;" Destination="OUTQ.LABEL" dx1="2972.2222" />
+          <Connection Source="1" Destination="INQ.IN" dx1="1849.9999" />
+          <Connection Source="1" Destination="OUTQ.IN" dx1="3138.8887" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+  </Device>
+  <DeviceParameters>
+    <Connection Source="[100,100,350,350]" Destination="DEV1.BOUNDS" dx1="411.11108" />
+    <Connection Source="[2,1]" Destination="DEV1.GRID" dx1="594.4444" />
+  </DeviceParameters>
+</System>

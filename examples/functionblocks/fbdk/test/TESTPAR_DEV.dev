@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE DeviceType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<DeviceType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="TESTPAR_DEV" Comment="Test Java initialization of parameters in Device Type" >
+  <Identification Standard="61499-1" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2004-12-16" />
+  <CompilerInfo header="package fb.rt.test;" >
+    <Compiler Language="Java" Vendor="Sun" Product="JDK" Version="1.4.2" />
+  </CompilerInfo>
+  <VarDeclaration Name="PUBL_ID" Type="WSTRING" />
+  <Resource Name="RES1" Type="TESTPAR_RES" x="927.7778" y="11.111111" >
+    <Parameter Name="SUBSC_ID" Value="&#34;225.0.0.1:1025&#34;" />
+  </Resource>
+  <FBNetwork >
+    <FB Name="START" Type="E_RESTART" x="11.111111" y="11.111111" />
+    <DataConnections>
+      <Connection Source="PUBL_ID" Destination="RES1.PUBL_ID" dx1="755.55554" />
+    </DataConnections>
+  </FBNetwork>
+</DeviceType>

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "../LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="DEV_MGR" Comment="Device Management Service Interface" >
+<Identification Standard="61499 Demo ITA"/>
+<VersionInfo Organization="Rockwell Automation" Version="0.2" Author="JHC" Date="2000-07-24" Remarks="Simplified for XML encoding."/>
+<VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2000-05-16" Remarks="File type changed to &#34;.fbt&#34;"/>
+<VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2000-03-19"/>
+<InterfaceList>
+<EventInputs>
+  <Event Name="INIT" Comment="Service Initialization/Termination">
+    <With Var="QI" />
+  </Event>
+  <Event Name="REQ" Comment="Service Request">
+    <With Var="QI" />
+    <With Var="DST" />
+    <With Var="RQST" />
+  </Event>
+</EventInputs>
+<EventOutputs>
+  <Event Name="INITO" Comment="Initialization/Termination Confirm">
+    <With Var="QO" />
+  </Event>
+  <Event Name="CNF" Comment="Service Confirmation">
+    <With Var="RESP" />
+  </Event>
+</EventOutputs>
+<InputVars>
+  <VarDeclaration Name="QI" Type="BOOL" Comment="Event Input Qualifier" />
+  <VarDeclaration Name="DST" Type="STRING" Comment="Destination for RQST" />
+  <VarDeclaration Name="RQST" Type="STRING" Comment="XML-encoded Request" />
+</InputVars>
+<OutputVars>
+  <VarDeclaration Name="QO" Type="BOOL" Comment="Event Output Qualifier" />
+  <VarDeclaration Name="RESP" Type="STRING" Comment="XML-encoded Response" />
+</OutputVars>
+</InterfaceList>
+<Service LeftInterface="DEV_MGR" RightInterface="manager" >
+  <ServiceSequence Name="normal_establishment" >
+    <ServiceTransaction>
+      <InputPrimitive Interface="DEV_MGR" Event="INIT+" />
+      <OutputPrimitive Interface="manager" Event="init" />
+      <OutputPrimitive Interface="DEV_MGR" Event="INITO+" />
+    </ServiceTransaction>
+  </ServiceSequence>
+  <ServiceSequence Name="unsuccessful_establishment" >
+    <ServiceTransaction>
+      <InputPrimitive Interface="DEV_MGR" Event="INIT+" />
+      <OutputPrimitive Interface="manager" Event="init" />
+      <OutputPrimitive Interface="DEV_MGR" Event="INITO-" />
+    </ServiceTransaction>
+  </ServiceSequence>
+  <ServiceSequence Name="normal_request" >
+    <ServiceTransaction>
+      <InputPrimitive Interface="DEV_MGR" Event="REQ+" Parameters="RQST" />
+      <OutputPrimitive Interface="manager" Event="serviceRequest" Parameters="RQST" />
+      <OutputPrimitive Interface="DEV_MGR" Event="CNF+" Parameters="RESP" />
+    </ServiceTransaction>
+  </ServiceSequence>
+  <ServiceSequence Name="request_inhibited" >
+    <ServiceTransaction>
+      <InputPrimitive Interface="DEV_MGR" Event="REQ-" />
+      <OutputPrimitive Interface="DEV_MGR" Event="CNF-" />
+    </ServiceTransaction>
+  </ServiceSequence>
+  <ServiceSequence Name="application_initiated_termination" >
+    <ServiceTransaction>
+      <InputPrimitive Interface="DEV_MGR" Event="INIT-" />
+      <OutputPrimitive Interface="manager" Event="terminate" />
+      <OutputPrimitive Interface="DEV_MGR" Event="INITO-" />
+    </ServiceTransaction>
+  </ServiceSequence>
+  <ServiceSequence Name="device_initiated_termination" >
+    <ServiceTransaction>
+      <InputPrimitive Interface="manager" Event="terminated" />
+      <OutputPrimitive Interface="DEV_MGR" Event="INITO-" />
+    </ServiceTransaction>
+  </ServiceSequence>
+</Service>
+</FBType>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE DataType SYSTEM "http://www.holobloc.com/xml/DataType.dtd" >
+<DataType xmlns="http://www.holobloc.com/xml/DataType" Name="Array" Comment="An Array Data Type" >
+  <Identification Standard="61131-3" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2003-12-06" />
+  <CompilerInfo header="package fb.rt.template;" >
+  </CompilerInfo>
+  <ASN1Tag Class="PRIVATE" Number="8" />
+  <ArrayType BaseType="REAL" InitialValues="[1,2,3,4,5]" >
+    <Subrange LowerLimit="0" UpperLimit="4" />
+  </ArrayType>
+</DataType>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="UNPK_WORD" Comment="Unpacks a WORD to 16 BOOLs" >
+  <Identification Standard="61499-1" Classification="Math" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2002-05-07" Remarks="Renamed from UNPK_WORD, changed SD_x to OUTx." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2002-05-01" />
+  <CompilerInfo header="package fb.rt.math;" >
+    <Compiler Language="Java" Vendor="IBM" Product="VisualAge" Version="3.0" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="REQ" Comment="Unpack Request" >
+        <With Var="IN" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="IND" Comment="Data Change Notification" >
+        <With Var="OUT0" />
+        <With Var="OUT1" />
+        <With Var="OUT2" />
+        <With Var="OUT3" />
+        <With Var="OUT4" />
+        <With Var="OUT5" />
+        <With Var="OUT6" />
+        <With Var="OUT7" />
+        <With Var="OUT8" />
+        <With Var="OUT9" />
+        <With Var="OUT10" />
+        <With Var="OUT11" />
+        <With Var="OUT12" />
+        <With Var="OUT13" />
+        <With Var="OUT14" />
+        <With Var="OUT15" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="IN" Type="WORD" Comment="Data to Unpack" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="OUT0" Type="BOOL" Comment="Unpacked Data" />
+      <VarDeclaration Name="OUT1" Type="BOOL" />
+      <VarDeclaration Name="OUT2" Type="BOOL" />
+      <VarDeclaration Name="OUT3" Type="BOOL" />
+      <VarDeclaration Name="OUT4" Type="BOOL" />
+      <VarDeclaration Name="OUT5" Type="BOOL" />
+      <VarDeclaration Name="OUT6" Type="BOOL" />
+      <VarDeclaration Name="OUT7" Type="BOOL" />
+      <VarDeclaration Name="OUT8" Type="BOOL" />
+      <VarDeclaration Name="OUT9" Type="BOOL" />
+      <VarDeclaration Name="OUT10" Type="BOOL" />
+      <VarDeclaration Name="OUT11" Type="BOOL" />
+      <VarDeclaration Name="OUT12" Type="BOOL" />
+      <VarDeclaration Name="OUT13" Type="BOOL" />
+      <VarDeclaration Name="OUT14" Type="BOOL" />
+      <VarDeclaration Name="OUT15" Type="BOOL" />
+    </OutputVars>
+  </InterfaceList>
+  <Service RightInterface="PACK_WORD" LeftInterface="APPLICATION" >
+    <ServiceSequence Name="dataChanged" >
+      <ServiceTransaction >
+        <InputPrimitive Interface="APPLICATION" Event="REQ" Parameters="IN" />
+        <OutputPrimitive Interface="PACK_WORD" Event="unpack" />
+        <OutputPrimitive Interface="APPLICATION" Event="IND" Parameters="OUT0,...,OUT15" />
+      </ServiceTransaction>
+    </ServiceSequence>
+    <ServiceSequence Name="dataUnchanged" >
+      <ServiceTransaction >
+        <InputPrimitive Interface="APPLICATION" Event="REQ" Parameters="IN" />
+        <OutputPrimitive Interface="PACK_WORD" Event="unpack" />
+      </ServiceTransaction>
+    </ServiceSequence>
+  </Service>
+</FBType>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="LIMIT_ANY" Comment="Abstract superclass for IEC 61131-3 limiters" >
+  <Identification Standard="61131-3" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2004-12-15" Remarks="Converted from SRC format." />
+  <CompilerInfo header="package fb.rt.plc.select;" >
+  </CompilerInfo>
+  <InterfaceList>
+    <InputVars>
+      <VarDeclaration Name="MN" Type="ANY" Comment="Lower limit" />
+      <VarDeclaration Name="IN" Type="ANY" Comment="Value to be limited" />
+      <VarDeclaration Name="MX" Type="ANY" Comment="Upper limit" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="OUT" Type="ANY" Comment="MIN(MAX(IN,MN),MX)" />
+    </OutputVars>
+  </InterfaceList>
+</FBType>

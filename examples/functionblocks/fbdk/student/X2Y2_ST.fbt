@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="X2Y2_ST" Comment="Compute X^2-Y^2 in ST" >
+  <Identification Standard="61499-1" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2002-09-24" Remarks="Derived from FB_X2Y2_J." />
+  <CompilerInfo header="package fb.rt.student; " >
+    <Compiler Language="Java" Vendor="IBM" Product="Jikes" Version="1.0.6" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="REQ" >
+        <With Var="X" />
+        <With Var="Y" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="CNF" >
+        <With Var="OUT" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="X" Type="REAL" />
+      <VarDeclaration Name="Y" Type="REAL" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="OUT" Type="REAL" />
+    </OutputVars>
+  </InterfaceList>
+  <BasicFB>
+    <ECC >
+      <ECState Name="START" x="211.7647" y="152.9412" >
+      </ECState>
+      <ECState Name="REQ" x="552.9412" y="552.9412" >
+        <ECAction Algorithm="REQ" Output="CNF" />
+      </ECState>
+      <ECTransition Source="START" Destination="REQ" Condition="REQ" x="211.7647" y="552.9412" />
+      <ECTransition Source="REQ" Destination="START" Condition="1" x="552.9412" y="152.9412" />
+    </ECC>
+  <Algorithm Name="REQ" >
+    <ST Text="OUT := (X-Y)*(X+Y);&#10;" />
+  </Algorithm>
+  </BasicFB>
+</FBType>

@@ -1,0 +1,606 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE System SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<System xmlns="http://www.holobloc.com/xml/LibraryElement" Name="TESTBED_MVCL" Comment="Testbed Model/View/Control with Local Coupling" >
+  <Identification Standard="61499 ITA" Classification="Testbed" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.3" Author="JHC" Date="2004-11-09" Remarks="Changed LOADL to LOADLE in CHAIN_MDL." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.2" Author="JHC" Date="2004-10-28" Remarks="Changed RING_FEED to CNVG_MDLL." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2004-10-25" Remarks="Updated for new Load/Unload model." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2004-09-22" />
+  <Device Name="CONTROL" Type="FRAME_DEVICE" x="566.6666" y="11.111111" >
+    <Resource Name="SORT" Type="EMB_RES" x="194.44444" y="161.1111" >
+      <FBNetwork >
+        <FB Name="SORT_PEG_SENSE" Type="SUBL_2" x="755.55554" y="11.111111" />
+        <FB Name="RING_FEED_SENSE" Type="SUBL_1" x="1327.7777" y="11.111111" />
+        <FB Name="CTL" Type="SORT_CTL" x="583.3333" y="1061.1111" />
+        <FB Name="SORT_ACT" Type="PUBL_1" x="2161.111" y="11.111111" />
+        <FB Name="LOST" Type="E_PERMIT" Comment="RING_LOST event trigger" x="2055.5554" y="1172.2222" />
+        <FB Name="RING_LOST" Type="PUBL_0" x="2616.6665" y="11.111111" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="SORT_PEG_SENSE.INIT" dx1="33.333332" />
+          <Connection Source="SORT_PEG_SENSE.INITO" Destination="RING_FEED_SENSE.INIT" dx1="33.333332" dx2="5.8824" dy="-1.0" />
+          <Connection Source="RING_FEED_SENSE.INITO" Destination="SORT_ACT.INIT" dx1="66.666664" dx2="47.0588" dy="1270.5883" />
+          <Connection Source="SORT_PEG_SENSE.IND" Destination="CTL.REQ" dx1="77.77777" dx2="55.555553" dy="761.1111" />
+          <Connection Source="CTL.CNF" Destination="SORT_ACT.REQ" dx1="177.77777" dx2="264.7059" dy="270.5882" />
+          <Connection Source="CTL.CNF" Destination="LOST.EI" dx1="166.66666" />
+          <Connection Source="SORT_ACT.INITO" Destination="RING_LOST.INIT" dx1="27.777777" />
+          <Connection Source="LOST.EO" Destination="RING_LOST.REQ" dx1="183.33333" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="RING_FEED_SENSE.RD_1" Destination="CTL.RING_PRESENT" dx1="27.777777" dx2="188.88889" dy="244.44443" />
+          <Connection Source="CTL.SORT_SOLENOID" Destination="SORT_ACT.SD_1" dx1="227.77777" />
+          <Connection Source="SORT_PEG_SENSE.RD_1" Destination="CTL.SORT_AREA_DETECT" dx1="50.0" dx2="88.888885" dy="361.11108" />
+          <Connection Source="SORT_PEG_SENSE.RD_2" Destination="CTL.METAL_PEG_DETECT" dx1="27.777777" dx2="133.33333" dy="205.55554" />
+          <Connection Source="CTL.RING_LOST" Destination="LOST.PERMIT" dx1="61.111107" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="FEED" Type="EMB_RES" x="194.44444" y="816.6666" >
+      <FBNetwork >
+        <FB Name="RING_FEED_SENSE" Type="SUBL_1" x="683.3333" y="11.111111" />
+        <FB Name="ASSY_CHUTE_SENSE" Type="SUBL_1" x="1338.8888" y="11.111111" />
+        <FB Name="CTL" Type="FEED_CTL" x="361.11108" y="916.6666" />
+        <FB Name="ROTARY_ACT" Type="PUBL_1" x="1988.8888" y="11.111111" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="RING_FEED_SENSE.INIT" dx1="27.777777" />
+          <Connection Source="RING_FEED_SENSE.INITO" Destination="ASSY_CHUTE_SENSE.INIT" dx1="38.888885" />
+          <Connection Source="ROTARY_ACT.INITO" Destination="CTL.REQ" dx1="88.888885" dx2="88.888885" dy="1588.8888" />
+          <Connection Source="RING_FEED_SENSE.IND" Destination="CTL.REQ" dx1="100.0" dx2="88.888885" dy="516.6666" />
+          <Connection Source="ASSY_CHUTE_SENSE.IND" Destination="CTL.REQ" dx1="127.77777" dx2="88.888885" dy="1477.7777" />
+          <Connection Source="CTL.CNF" Destination="ROTARY_ACT.REQ" dx1="455.55554" />
+          <Connection Source="ASSY_CHUTE_SENSE.INITO" Destination="ROTARY_ACT.INIT" dx1="83.33333" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="RING_FEED_SENSE.RD_1" Destination="CTL.RING_PRESENT" dx1="38.888885" dx2="138.88889" dy="127.77777" />
+          <Connection Source="ASSY_CHUTE_SENSE.RD_1" Destination="CTL.ASSEMBLY_HOPPER_FULL" dx1="38.888885" dx2="38.888885" dy="1022.22217" />
+          <Connection Source="CTL.ROTARY_SOLENOID" Destination="ROTARY_ACT.SD_1" dx1="522.2222" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="INSPECT" Type="EMB_RES" x="177.77777" y="1438.8888" >
+      <FBNetwork >
+        <FB Name="INSPECT_SENSE" Type="SUBL_2" x="488.88885" y="11.111111" />
+        <FB Name="BELT_SENSE" Type="SUBL_1" x="961.1111" y="11.111111" />
+        <FB Name="REJECT_ACT" Type="PUBL_1" x="2766.6665" y="11.111111" />
+        <FB Name="REJECT" Type="REJ_CTL" x="1455.5555" y="705.55554" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="INSPECT_SENSE.INIT" dx1="27.777777" />
+          <Connection Source="INSPECT_SENSE.INITO" Destination="BELT_SENSE.INIT" dx1="38.888885" />
+          <Connection Source="BELT_SENSE.INITO" Destination="REJECT_ACT.INIT" dx1="72.22222" />
+          <Connection Source="INSPECT_SENSE.IND" Destination="REJECT.SENSE" dx1="100.0" />
+          <Connection Source="BELT_SENSE.IND" Destination="REJECT.SENSE" dx1="88.888885" />
+          <Connection Source="REJECT.CMD" Destination="REJECT_ACT.REQ" dx1="27.777777" dx2="47.0588" dy="-211.7647" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="REJECT.REJECT_SOLENOID" Destination="REJECT_ACT.SD_1" dx1="66.666664" dx2="17.6471" dy="-641.1765" />
+          <Connection Source="INSPECT_SENSE.RD_2" Destination="REJECT.RING_ASSEMBLED" dx1="27.777777" />
+          <Connection Source="INSPECT_SENSE.RD_1" Destination="REJECT.ASSEMBLY_DETECT" dx1="72.22222" />
+          <Connection Source="BELT_SENSE.RD_1" Destination="REJECT.REJECT_AREA_DETECT" dx1="27.777777" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="CHAIN_SENSORS" Type="PANEL_RESOURCE" x="833.3333" y="11.111111" >
+      <FBNetwork >
+        <FB Name="SORT_SENSE" Type="SUBL_1" x="1966.6666" y="11.111111" />
+        <FB Name="SS_OUT" Type="OUT_BOOL" x="2511.111" y="11.111111" />
+        <FB Name="SORT_PEG_SENSE" Type="SUBL_2" x="511.11108" y="11.111111" />
+        <FB Name="PEG_OUT" Type="OUT_BOOL" x="1438.8888" y="622.22217" />
+        <FB Name="SORT_OUT" Type="OUT_BOOL" x="988.88885" y="172.22221" />
+        <EventConnections>
+          <Connection Source="SORT_PEG_SENSE.INITO" Destination="SORT_OUT.INIT" dx1="77.77777" />
+          <Connection Source="SORT_PEG_SENSE.IND" Destination="SORT_OUT.REQ" dx1="27.777777" />
+          <Connection Source="SORT_OUT.INITO" Destination="PEG_OUT.INIT" dx1="77.77777" />
+          <Connection Source="SORT_OUT.CNF" Destination="PEG_OUT.REQ" dx1="27.777777" />
+          <Connection Source="START.COLD" Destination="SORT_PEG_SENSE.INIT" dx1="27.777777" />
+          <Connection Source="PEG_OUT.INITO" Destination="SORT_SENSE.INIT" dx1="55.555553" />
+          <Connection Source="SORT_SENSE.INITO" Destination="SS_OUT.INIT" dx1="27.777777" />
+          <Connection Source="SORT_SENSE.IND" Destination="SS_OUT.REQ" dx1="27.777777" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="SORT_SENSE.RD_1" Destination="SS_OUT.IN" dx1="33.333332" />
+          <Connection Source="SORT_PEG_SENSE.RD_1" Destination="SORT_OUT.IN" dx1="66.666664" />
+          <Connection Source="SORT_PEG_SENSE.RD_2" Destination="PEG_OUT.IN" dx1="33.333332" />
+          <Connection Source="&#34;SORT SOL RETURN&#34;" Destination="SS_OUT.LABEL" dx1="2166.6665" />
+          <Connection Source="&#34;SORT AREA DETECT&#34;" Destination="SORT_OUT.LABEL" dx1="622.22217" />
+          <Connection Source="&#34;METAL PEG DETECT&#34;" Destination="PEG_OUT.LABEL" dx1="1072.2222" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="CHAIN_ACTUATORS" Type="PANEL_RESOURCE" x="1666.6666" y="11.111111" >
+      <FBNetwork >
+        <FB Name="CHAIN_IN" Type="IN_BOOL" x="650.0" y="11.111111" />
+        <FB Name="CHAIN_ACT" Type="PUBL_1" x="1072.2222" y="11.111111" />
+        <FB Name="SS_IN" Type="OUT_BOOL" x="1966.6666" y="11.111111" />
+        <FB Name="SORT_ACT" Type="SUBL_1" x="1577.7777" y="11.111111" />
+        <EventConnections>
+          <Connection Source="SORT_ACT.INITO" Destination="SS_IN.INIT" dx1="61.111107" />
+          <Connection Source="SORT_ACT.IND" Destination="SS_IN.REQ" dx1="55.555553" />
+          <Connection Source="START.COLD" Destination="CHAIN_IN.INIT" dx1="38.888885" />
+          <Connection Source="CHAIN_IN.INITO" Destination="CHAIN_ACT.INIT" dx1="27.777777" />
+          <Connection Source="CHAIN_ACT.INITO" Destination="SORT_ACT.INIT" dx1="27.777777" />
+          <Connection Source="CHAIN_IN.IND" Destination="CHAIN_ACT.REQ" dx1="27.777777" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="&#34;SORT SOLENOID&#34;" Destination="SS_IN.LABEL" dx1="1655.5555" />
+          <Connection Source="&#34;CHAIN CONVEYOR&#34;" Destination="CHAIN_IN.LABEL" dx1="322.2222" />
+          <Connection Source="SORT_ACT.RD_1" Destination="SS_IN.IN" dx1="27.777777" />
+          <Connection Source="CHAIN_IN.OUT" Destination="CHAIN_ACT.SD_1" dx1="27.777777" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="CHUTE_SENSORS" Type="PANEL_RESOURCE" x="200.0" y="700.0" >
+      <FBNetwork >
+        <FB Name="RING_FEED_SENSE" Type="SUBL_3" x="138.88889" y="944.4444" />
+        <FB Name="RP_OUT" Type="OUT_BOOL" x="949.99994" y="11.111111" />
+        <FB Name="IC_OPEN" Type="OUT_BOOL" x="1527.7777" y="494.44443" />
+        <FB Name="IC_CLOSED" Type="OUT_BOOL" x="1977.7777" y="944.4444" />
+        <FB Name="ASSY_CHUTE_SENSE" Type="SUBL_1" x="2444.4443" y="11.111111" />
+        <FB Name="ASSY_OUT" Type="OUT_BOOL" x="2994.4443" y="11.111111" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="RING_FEED_SENSE.INIT" dx1="27.777777" dx2="100.0" dy="561.1111" />
+          <Connection Source="RING_FEED_SENSE.INITO" Destination="RP_OUT.INIT" dx1="88.888885" dx2="5.8824" dy="-1.0" />
+          <Connection Source="IC_OPEN.INITO" Destination="IC_CLOSED.INIT" dx1="66.666664" dx2="311.7647" dy="-1.0" />
+          <Connection Source="IC_CLOSED.INITO" Destination="ASSY_CHUTE_SENSE.INIT" dx1="66.666664" dx2="111.7647" dy="800.0" />
+          <Connection Source="ASSY_CHUTE_SENSE.INITO" Destination="ASSY_OUT.INIT" dx1="394.44443" />
+          <Connection Source="RING_FEED_SENSE.IND" Destination="RP_OUT.REQ" dx1="127.77777" />
+          <Connection Source="IC_OPEN.CNF" Destination="IC_CLOSED.REQ" dx1="33.333332" />
+          <Connection Source="ASSY_CHUTE_SENSE.IND" Destination="ASSY_OUT.REQ" dx1="322.2222" />
+          <Connection Source="RP_OUT.INITO" Destination="IC_OPEN.INIT" dx1="88.888885" />
+          <Connection Source="RP_OUT.CNF" Destination="IC_OPEN.REQ" dx1="27.777777" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="RING_FEED_SENSE.RD_1" Destination="RP_OUT.IN" dx1="427.77777" />
+          <Connection Source="&#34;RING PRESENT&#34;" Destination="RP_OUT.LABEL" dx1="661.1111" />
+          <Connection Source="&#34;INDEX CAM OPEN&#34;" Destination="IC_OPEN.LABEL" dx1="1205.5555" />
+          <Connection Source="&#34;INDEX CAM CLOSED&#34;" Destination="IC_CLOSED.LABEL" dx1="1622.2222" />
+          <Connection Source="ASSY_CHUTE_SENSE.RD_1" Destination="ASSY_OUT.IN" dx1="27.777777" />
+          <Connection Source="&#34;ASSEMBLY HOPPER FULL&#34;" Destination="ASSY_OUT.LABEL" dx1="2555.5554" />
+          <Connection Source="RING_FEED_SENSE.RD_2" Destination="IC_OPEN.IN" dx1="511.11108" />
+          <Connection Source="RING_FEED_SENSE.RD_3" Destination="IC_CLOSED.IN" dx1="27.777777" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="CHUTE_ACTUATORS" Type="PANEL_RESOURCE" x="1694.4443" y="688.88885" >
+      <FBNetwork >
+        <FB Name="ROT" Type="OUT_BOOL" x="844.4444" y="11.111111" />
+        <FB Name="ROTARY_ACT" Type="SUBL_1" x="444.44443" y="11.111111" />
+        <FB Name="RING_LOST" Type="SUBL_0" x="1261.1111" y="11.111111" />
+        <FB Name="RINGS" Type="CTU_OUT" x="1694.4443" y="11.111111" />
+        <FB Name="RST" Type="IN_EVENT" x="2900.0" y="738.88885" />
+        <FB Name="PEGS" Type="CTU_OUT" x="2094.4443" y="150.0" />
+        <FB Name="ASSYS" Type="CTU_OUT" x="2550.0" y="277.77777" />
+        <FB Name="ASSY_DET" Type="E_R_TRIG" Comment="QI = ASSEMBLY_DETECT" x="1244.4443" y="1027.7777" />
+        <FB Name="RING_ASSD" Type="E_SWITCH" Comment="G = RING_ASSEMBLED" x="1688.8888" y="1027.7777" />
+        <FB Name="INSPECT_SENSE" Type="SUBL_2" x="355.55554" y="916.6666" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="ROTARY_ACT.INIT" dx1="27.777777" />
+          <Connection Source="ROTARY_ACT.INITO" Destination="ROT.INIT" dx1="27.777777" />
+          <Connection Source="ROTARY_ACT.IND" Destination="ROT.REQ" dx1="33.333332" />
+          <Connection Source="ROT.INITO" Destination="RING_LOST.INIT" dx1="27.777777" />
+          <Connection Source="RING_LOST.INITO" Destination="RINGS.R" dx1="27.777777" />
+          <Connection Source="RING_LOST.IND" Destination="RINGS.CU" dx1="27.777777" />
+          <Connection Source="RST.IND" Destination="RINGS.R" dx1="27.777777" dx2="72.22222" dy="727.7778" />
+          <Connection Source="ASSYS.RO" Destination="RST.INIT" dx1="27.777777" />
+          <Connection Source="ASSY_DET.EO" Destination="RING_ASSD.EI" dx1="27.777777" />
+          <Connection Source="INSPECT_SENSE.IND" Destination="ASSY_DET.EI" dx1="27.777777" />
+          <Connection Source="RING_ASSD.EO0" Destination="PEGS.CU" dx1="50.0" />
+          <Connection Source="RINGS.RO" Destination="PEGS.R" dx1="55.555553" />
+          <Connection Source="PEGS.RO" Destination="ASSYS.R" dx1="61.111107" />
+          <Connection Source="RING_ASSD.EO1" Destination="ASSYS.CU" dx1="444.44443" />
+          <Connection Source="RST.INITO" Destination="INSPECT_SENSE.INIT" dx1="61.111107" dx2="44.444443" dy="894.4444" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="&#34; RINGS LOST&#34;" Destination="RINGS.LBL" dx1="1438.8888" />
+          <Connection Source="&#34;RESET CTRS&#34;" Destination="RST.LABEL" dx1="2644.4443" />
+          <Connection Source="&#34;PEGS LOST&#34;" Destination="PEGS.LBL" dx1="1855.5555" />
+          <Connection Source="&#34; ASSEMBLIES&#34;" Destination="ASSYS.LBL" dx1="2283.3333" />
+          <Connection Source="INSPECT_SENSE.RD_1" Destination="ASSY_DET.QI" dx1="27.777777" />
+          <Connection Source="INSPECT_SENSE.RD_2" Destination="RING_ASSD.G" dx1="872.22217" />
+          <Connection Source="ROTARY_ACT.RD_1" Destination="ROT.IN" dx1="44.444443" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="BELT_SENSORS" Type="PANEL_RESOURCE" x="816.6666" y="1283.3333" >
+      <FBNetwork >
+        <FB Name="PEG_FEED_SENSE" Type="SUBL_1" x="688.88885" y="11.111111" />
+        <FB Name="PARC" Type="OUT_BOOL" x="1155.5555" y="11.111111" />
+        <FB Name="INSPECT_SENSE" Type="SUBL_2" x="1627.7777" y="11.111111" />
+        <FB Name="AD" Type="OUT_BOOL" x="2205.5554" y="150.0" />
+        <FB Name="RA" Type="OUT_BOOL" x="2650.0" y="583.3333" />
+        <FB Name="BELT_SENSE" Type="SUBL_1" x="3083.3333" y="11.111111" />
+        <FB Name="RAD" Type="OUT_BOOL" x="3533.3333" y="1038.8888" />
+        <FB Name="REJECT_SENSE" Type="SUBL_1" x="3944.4443" y="11.111111" />
+        <FB Name="RS_RET" Type="OUT_BOOL" x="4394.4443" y="11.111111" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="PEG_FEED_SENSE.INIT" dx1="27.777777" />
+          <Connection Source="PEG_FEED_SENSE.INITO" Destination="PARC.INIT" dx1="88.888885" />
+          <Connection Source="PARC.INITO" Destination="INSPECT_SENSE.INIT" dx1="27.777777" />
+          <Connection Source="INSPECT_SENSE.INITO" Destination="AD.INIT" dx1="55.555553" dx2="23.5294" dy="-1.0" />
+          <Connection Source="AD.INITO" Destination="RA.INIT" dx1="61.111107" />
+          <Connection Source="RA.INITO" Destination="BELT_SENSE.INIT" dx1="27.777777" dx2="41.1765" dy="400.0" />
+          <Connection Source="BELT_SENSE.INITO" Destination="RAD.INIT" dx1="105.55555" dx2="41.1765" dy="400.0" />
+          <Connection Source="RAD.INITO" Destination="REJECT_SENSE.INIT" dx1="27.777777" dx2="70.5882" dy="-1.0" />
+          <Connection Source="REJECT_SENSE.INITO" Destination="RS_RET.INIT" dx1="27.777777" />
+          <Connection Source="PEG_FEED_SENSE.IND" Destination="PARC.REQ" dx1="44.444443" />
+          <Connection Source="INSPECT_SENSE.IND" Destination="AD.REQ" dx1="27.777777" />
+          <Connection Source="AD.CNF" Destination="RA.REQ" dx1="27.777777" />
+          <Connection Source="BELT_SENSE.IND" Destination="RAD.REQ" dx1="61.111107" />
+          <Connection Source="REJECT_SENSE.IND" Destination="RS_RET.REQ" dx1="27.777777" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="PEG_FEED_SENSE.RD_1" Destination="PARC.IN" dx1="61.111107" />
+          <Connection Source="&#34;PEG AT RING CHUTE&#34;" Destination="PARC.LABEL" dx1="788.88885" />
+          <Connection Source="REJECT_SENSE.RD_1" Destination="RS_RET.IN" dx1="27.777777" />
+          <Connection Source="&#34;REJECT SOL RETURN&#34;" Destination="RS_RET.LABEL" dx1="4016.6665" />
+          <Connection Source="INSPECT_SENSE.RD_2" Destination="RA.IN" dx1="27.777777" />
+          <Connection Source="INSPECT_SENSE.RD_1" Destination="AD.IN" dx1="172.22221" />
+          <Connection Source="&#34;ASSEMBLY DETECT&#34;" Destination="AD.LABEL" dx1="1849.9999" />
+          <Connection Source="&#34;RING ASSEMBLED&#34;" Destination="RA.LABEL" dx1="2322.2222" />
+          <Connection Source="BELT_SENSE.RD_1" Destination="RAD.IN" dx1="27.777777" />
+          <Connection Source="&#34;REJECT AREA DETECT&#34;" Destination="RAD.LABEL" dx1="3138.8887" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="BELT_ACTUATORS" Type="PANEL_RESOURCE" x="1677.7777" y="1300.0" >
+      <FBNetwork >
+        <FB Name="REJ" Type="OUT_BOOL" x="938.88885" y="11.111111" />
+        <FB Name="REJECT_ACT" Type="SUBL_1" x="472.2222" y="11.111111" />
+        <FB Name="BELT" Type="IN_BOOL" x="1372.2222" y="344.44443" />
+        <FB Name="BELT_ACT" Type="PUBL_1" x="1927.7777" y="11.111111" />
+        <EventConnections>
+          <Connection Source="BELT.INITO" Destination="BELT_ACT.INIT" dx1="27.777777" />
+          <Connection Source="BELT.IND" Destination="BELT_ACT.REQ" dx1="61.111107" />
+          <Connection Source="START.COLD" Destination="REJECT_ACT.INIT" dx1="27.777777" />
+          <Connection Source="REJECT_ACT.INITO" Destination="REJ.INIT" dx1="27.777777" />
+          <Connection Source="REJECT_ACT.IND" Destination="REJ.REQ" dx1="33.333332" />
+          <Connection Source="REJ.INITO" Destination="BELT.INIT" dx1="27.777777" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="&#34;REJECT SOLENOID&#34;" Destination="REJ.LABEL" dx1="600.0" />
+          <Connection Source="BELT.OUT" Destination="BELT_ACT.SD_1" dx1="94.44444" />
+          <Connection Source="&#34;BELT CONVEYOR&#34;" Destination="BELT.LABEL" dx1="1055.5555" />
+          <Connection Source="REJECT_ACT.RD_1" Destination="REJ.IN" dx1="94.44444" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+  </Device>
+  <Device Name="MODEL" Type="FRAME_DEVICE" x="1116.6666" y="272.2222" >
+    <Resource Name="CLOCK" Type="EMB_RES" x="55.555553" y="461.11108" >
+      <FBNetwork >
+        <FB Name="CLK" Type="E_CYCLE" x="855.55554" y="627.7778" />
+        <FB Name="SIM_CLK" Type="PUBL_0" x="527.7778" y="11.111111" />
+        <FB Name="GRAVITY" Type="FB_NOT" x="949.99994" y="11.111111" />
+        <FB Name="ROTARY_ACT" Type="SUBL_1" x="1361.1111" y="11.111111" />
+        <FB Name="ROTARY_ON" Type="FB_AND" x="1777.7777" y="188.88889" />
+        <FB Name="RING_FEED_ACT" Type="PUBL_2" x="2261.111" y="233.33333" />
+        <EventConnections>
+          <Connection Source="START.STOP" Destination="CLK.STOP" dx1="33.333332" />
+          <Connection Source="START.COLD" Destination="SIM_CLK.INIT" dx1="144.44444" />
+          <Connection Source="CLK.EO" Destination="SIM_CLK.REQ" dx1="27.777777" dx2="44.444443" dy="577.7778" />
+          <Connection Source="SIM_CLK.INITO" Destination="GRAVITY.REQ" dx1="72.22222" />
+          <Connection Source="GRAVITY.CNF" Destination="ROTARY_ACT.INIT" dx1="27.777777" />
+          <Connection Source="ROTARY_ACT.IND" Destination="ROTARY_ON.REQ" dx1="27.777777" />
+          <Connection Source="ROTARY_ON.CNF" Destination="RING_FEED_ACT.REQ" dx1="27.777777" />
+          <Connection Source="ROTARY_ACT.INITO" Destination="RING_FEED_ACT.INIT" dx1="477.77777" />
+          <Connection Source="RING_FEED_ACT.INITO" Destination="RING_FEED_ACT.REQ" dx1="27.777777" dx2="61.111107" dy="783.3333" />
+          <Connection Source="RING_FEED_ACT.INITO" Destination="CLK.START" dx1="27.777777" dx2="61.111107" dy="966.6666" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="t#250ms" Destination="CLK.DT" dx1="694.4444" />
+          <Connection Source="GRAVITY.OUT" Destination="RING_FEED_ACT.SD_1" dx1="27.777777" />
+          <Connection Source="ROTARY_ACT.RD_1" Destination="ROTARY_ON.IN1" dx1="27.777777" />
+          <Connection Source="ROTARY_ACT.RD_1" Destination="ROTARY_ON.IN2" dx1="27.777777" />
+          <Connection Source="ROTARY_ON.OUT" Destination="RING_FEED_ACT.SD_2" dx1="50.0" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="CHAIN_MDL" Type="EMB_RES" x="583.3333" y="11.111111" >
+      <FBNetwork >
+        <FB Name="PPEG" Type="SUBL_1" x="483.3333" y="11.111111" />
+        <FB Name="FEED" Type="WKPC_GEN" x="472.2222" y="983.3333" />
+        <FB Name="CHAIN" Type="CNV_MDLL" x="1450.0" y="11.111111" />
+        <FB Name="RING_FEED_LOAD" Type="SUBL_0" x="2144.4443" y="1222.2222" />
+        <FB Name="END_DETECT" Type="WP_SENSE" x="2444.4443" y="122.22221" />
+        <FB Name="CHAIN_LOAD" Type="LOADL" x="977.7777" y="11.111111" />
+        <FB Name="RELOAD" Type="E_SPLIT" x="3050.0" y="1222.2222" />
+        <FB Name="CHUTE_LOAD" Type="LOADLE" x="3372.2222" y="11.111111" />
+        <EventConnections>
+          <Connection Source="FEED.CNF" Destination="CHAIN_LOAD.REQ" dx1="33.333332" />
+          <Connection Source="START.COLD" Destination="PPEG.INIT" dx1="27.777777" />
+          <Connection Source="PPEG.INITO" Destination="CHAIN_LOAD.INIT" dx1="27.777777" />
+          <Connection Source="CHAIN_LOAD.INITO" Destination="CHAIN.INIT" dx1="27.777777" />
+          <Connection Source="RELOAD.EO1" Destination="CHAIN.UNLD" dx1="105.55555" dx2="105.55555" dy="761.1111" />
+          <Connection Source="RELOAD.EO2" Destination="FEED.REQ" dx1="72.22222" dx2="161.1111" dy="616.6666" />
+          <Connection Source="RING_FEED_LOAD.INITO" Destination="RELOAD.EI" dx1="144.44444" dx2="77.77777" dy="2394.4443" />
+          <Connection Source="RING_FEED_LOAD.IND" Destination="RELOAD.EI" dx1="144.44444" />
+          <Connection Source="CHAIN.INDR" Destination="END_DETECT.SENSE" dx1="27.777777" />
+          <Connection Source="CHAIN.INITO" Destination="CHUTE_LOAD.INIT" dx1="1155.5555" />
+          <Connection Source="CHUTE_LOAD.INITO" Destination="RING_FEED_LOAD.INIT" dx1="66.666664" dx2="50.0" dy="1022.22217" />
+          <Connection Source="END_DETECT.IND" Destination="CHUTE_LOAD.REQ" dx1="83.33333" />
+          <Connection Source="END_DETECT.IND" Destination="RELOAD.EI" dx1="44.444443" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="FEED.OUT" Destination="CHAIN_LOAD.STYLE" dx1="66.666664" />
+          <Connection Source="[255,255,0]" Destination="CHAIN_LOAD.WKPC" dx1="777.7778" />
+          <Connection Source="4" Destination="CHAIN.VF" Comment="16% per sec =100% per 6.25 sec" dx1="1383.3333" />
+          <Connection Source="PPEG.RD_1" Destination="FEED.P1" dx1="27.777777" dx2="255.55554" dy="127.77777" />
+          <Connection Source="VSTYLE#PEG" Destination="FEED.WS0" dx1="233.33333" />
+          <Connection Source="VSTYLE#RING" Destination="FEED.WS1" dx1="222.22221" />
+          <Connection Source="100" Destination="END_DETECT.P0" dx1="2344.4443" />
+          <Connection Source="100" Destination="END_DETECT.P1" dx1="2344.4443" />
+          <Connection Source="CHAIN.STYLO" Destination="END_DETECT.STYLE" dx1="150.0" />
+          <Connection Source="CHAIN.POS" Destination="END_DETECT.POS" dx1="38.888885" />
+          <Connection Source="VSTYLE#PEG" Destination="END_DETECT.REFSTYLE" dx1="2205.5554" />
+          <Connection Source="VSTYLE#PEG" Destination="CHUTE_LOAD.STYLE" dx1="3133.3333" />
+          <Connection Source="END_DETECT.MATCH" Destination="CHUTE_LOAD.QI" dx1="227.77777" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="SORT_MDL" Type="EMB_RES" x="594.4444" y="1111.1111" >
+      <FBNetwork >
+        <FB Name="SORT" Type="SOL_MDLL" x="472.2222" y="11.111111" />
+        <FB Name="DEFL_TRIG" Type="E_R_TRIG" x="966.6666" y="233.33333" />
+        <FB Name="RING_FEED_LOAD" Type="LOADL" x="1377.7777" y="11.111111" />
+        <FB Name="CHAIN_REND" Type="SUBL_2" x="1838.8888" y="11.111111" />
+        <FB Name="SORT_DETECT" Type="WP_SENSE" x="2316.6665" y="122.22221" />
+        <FB Name="SORT_PEG_SENSE" Type="PUBL_2" x="2838.8887" y="11.111111" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="SORT.INIT" dx1="27.777777" />
+          <Connection Source="SORT.IND" Destination="DEFL_TRIG.EI" dx1="27.777777" />
+          <Connection Source="SORT.INITO" Destination="RING_FEED_LOAD.INIT" dx1="505.55554" />
+          <Connection Source="DEFL_TRIG.EO" Destination="RING_FEED_LOAD.REQ" dx1="27.777777" />
+          <Connection Source="RING_FEED_LOAD.INITO" Destination="CHAIN_REND.INIT" dx1="27.777777" />
+          <Connection Source="CHAIN_REND.IND" Destination="SORT_DETECT.SENSE" dx1="27.777777" />
+          <Connection Source="CHAIN_REND.INITO" Destination="SORT_PEG_SENSE.INIT" dx1="100.0" />
+          <Connection Source="SORT_DETECT.IND" Destination="SORT_PEG_SENSE.REQ" dx1="27.777777" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="VSTYLE#RING" Destination="RING_FEED_LOAD.STYLE" dx1="1127.7777" />
+          <Connection Source="[255,255,0]" Destination="RING_FEED_LOAD.WKPC" dx1="1177.7777" />
+          <Connection Source="SORT.END" Destination="DEFL_TRIG.QI" dx1="27.777777" />
+          <Connection Source="CHAIN_REND.RD_1" Destination="SORT_DETECT.POS" dx1="44.444443" />
+          <Connection Source="CHAIN_REND.RD_2" Destination="SORT_DETECT.STYLE" dx1="27.777777" />
+          <Connection Source="57" Destination="SORT_DETECT.P0" dx1="2233.3333" />
+          <Connection Source="71" Destination="SORT_DETECT.P1" dx1="2233.3333" />
+          <Connection Source="VSTYLE#PEG" Destination="SORT_DETECT.REFSTYLE" dx1="2077.7776" />
+          <Connection Source="SORT_DETECT.PRESENT" Destination="SORT_PEG_SENSE.SD_1" dx1="55.555553" />
+          <Connection Source="SORT_DETECT.MATCH" Destination="SORT_PEG_SENSE.SD_2" dx1="27.777777" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="PEG_CHUTE" Type="EMB_RES" x="1077.7777" y="11.111111" >
+      <FBNetwork >
+        <FB Name="CHUTE" Type="CNVG_MDLL" x="583.3333" y="11.111111" />
+        <FB Name="UNLD_CHUTE" Type="E_R_TRIG" x="1150.0" y="233.33333" />
+        <FB Name="BELT_LOAD" Type="LOADL" x="1572.2222" y="11.111111" />
+        <EventConnections>
+          <Connection Source="CHUTE.INDS" Destination="UNLD_CHUTE.EI" dx1="27.777777" />
+          <Connection Source="START.COLD" Destination="CHUTE.INIT" dx1="100.0" />
+          <Connection Source="UNLD_CHUTE.EO" Destination="BELT_LOAD.REQ" dx1="55.555553" />
+          <Connection Source="BELT_LOAD.CNF" Destination="CHUTE.UNLD" dx1="61.111107" dx2="61.111107" dy="1350.0" />
+          <Connection Source="CHUTE.INITO" Destination="BELT_LOAD.INIT" dx1="27.777777" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="25" Destination="CHUTE.VF" Comment="2 sec FS" dx1="499.99997" />
+          <Connection Source="CHUTE.END" Destination="UNLD_CHUTE.QI" dx1="27.777777" />
+          <Connection Source="VSTYLE#PEG" Destination="BELT_LOAD.STYLE" dx1="1333.3333" />
+          <Connection Source="[255,255,0]" Destination="BELT_LOAD.WKPC" dx1="1372.2222" />
+          <Connection Source="&#34;RING_FEED_ACT&#34;" Destination="CHUTE.ACT_ID" dx1="272.2222" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="RING_CHUTES" Type="EMB_RES" x="1527.7777" y="11.111111" >
+      <FBNetwork >
+        <FB Name="RING_FEED" Type="CNVG_MDLL" x="577.7778" y="11.111111" />
+        <FB Name="ASSY_CHUTE" Type="CNV_MDLL" x="2483.3333" y="11.111111" />
+        <FB Name="XFER_TRIG" Type="E_R_TRIG" x="1116.6666" y="233.33333" />
+        <FB Name="ASSY_CHUTE_LOAD" Type="LOADL" x="1533.3333" y="11.111111" />
+        <FB Name="ASSEMBLED" Type="SUBL_0" x="2038.8888" y="11.111111" />
+        <EventConnections>
+          <Connection Source="XFER_TRIG.EO" Destination="ASSY_CHUTE_LOAD.REQ" dx1="27.777777" dx2="155.55554" dy="455.55554" />
+          <Connection Source="ASSY_CHUTE_LOAD.INITO" Destination="ASSEMBLED.INIT" dx1="27.777777" />
+          <Connection Source="RING_FEED.INDS" Destination="XFER_TRIG.EI" dx1="27.777777" />
+          <Connection Source="ASSY_CHUTE_LOAD.CNF" Destination="RING_FEED.UNLD" dx1="27.777777" dx2="177.77777" dy="1355.5555" />
+          <Connection Source="START.COLD" Destination="RING_FEED.INIT" dx1="27.777777" />
+          <Connection Source="RING_FEED.INITO" Destination="ASSY_CHUTE_LOAD.INIT" dx1="55.555553" />
+          <Connection Source="ASSEMBLED.INITO" Destination="ASSY_CHUTE.INIT" dx1="27.777777" />
+          <Connection Source="ASSEMBLED.IND" Destination="ASSY_CHUTE.UNLD" dx1="27.777777" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="50" Destination="ASSY_CHUTE.VF" Comment="500 ms full scale" dx1="2400.0" />
+          <Connection Source="50" Destination="RING_FEED.VF" Comment="500ms Full Scale" dx1="494.44443" />
+          <Connection Source="VSTYLE#RING" Destination="ASSY_CHUTE_LOAD.STYLE" dx1="1283.3333" />
+          <Connection Source="[255,255,0]" Destination="ASSY_CHUTE_LOAD.WKPC" dx1="1333.3333" />
+          <Connection Source="RING_FEED.OPEN" Destination="XFER_TRIG.QI" dx1="27.777777" />
+          <Connection Source="&#34;RING_FEED_ACT&#34;" Destination="ASSY_CHUTE.ACT_ID" dx1="2172.2222" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="BELT_MDL" Type="EMB_RES" x="2038.8888" y="11.111111" >
+      <FBNetwork >
+        <FB Name="BELT" Type="CNV_MDLL" x="600.0" y="11.111111" />
+        <FB Name="REJECT" Type="SOL_MDLL" x="2061.111" y="11.111111" />
+        <FB Name="END_TRIG" Type="E_R_TRIG" x="1161.1111" y="233.33333" />
+        <FB Name="END_DLY" Type="CL_DELAY" x="1588.8888" y="11.111111" />
+        <EventConnections>
+          <Connection Source="END_TRIG.EO" Destination="END_DLY.START" dx1="27.777777" />
+          <Connection Source="END_DLY.EO" Destination="BELT.UNLD" dx1="38.888885" dx2="144.44444" dy="1455.5555" />
+          <Connection Source="END_DLY.INITO" Destination="REJECT.INIT" dx1="27.777777" />
+          <Connection Source="BELT.INDS" Destination="END_TRIG.EI" dx1="27.777777" />
+          <Connection Source="BELT.INITO" Destination="END_DLY.INIT" dx1="72.22222" />
+          <Connection Source="START.COLD" Destination="BELT.INIT" dx1="38.888885" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="5" Destination="BELT.VF" Comment="20% per sec = 5 sec Full Scale" dx1="533.3333" />
+          <Connection Source="BELT.END" Destination="END_TRIG.QI" dx1="27.777777" />
+          <Connection Source="3" Destination="END_DLY.N" dx1="1522.2222" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="ASSY_MDL" Type="EMB_RES" Comment="Model for Peg/Ring Assembly" x="1277.7777" y="1111.1111" >
+      <FBNetwork >
+        <FB Name="PEG_SENSE" Type="WP_SENSE" x="933.3333" y="122.22221" />
+        <FB Name="PEG_FEED_SENSE" Type="PUBL_1" x="1666.6666" y="11.111111" />
+        <FB Name="ASSY_CHUTE_SENSE" Type="SUBL_1" x="1627.7777" y="961.1111" />
+        <FB Name="ASSEMBLE" Type="FB_AND" x="2172.2222" y="372.2222" />
+        <FB Name="ASM_TRIG" Type="E_R_TRIG" x="2511.111" y="372.2222" />
+        <FB Name="BELT_REND" Type="SUBL_2" x="466.66666" y="11.111111" />
+        <FB Name="ASSEMBLED" Type="PUBL_0" x="2888.8887" y="261.1111" />
+        <FB Name="BELT_LOAD" Type="LOADL" x="3333.3333" y="261.1111" />
+        <EventConnections>
+          <Connection Source="PEG_SENSE.IND" Destination="PEG_FEED_SENSE.REQ" dx1="61.111107" />
+          <Connection Source="PEG_FEED_SENSE.CNF" Destination="ASSEMBLE.REQ" dx1="27.777777" dx2="166.66666" dy="938.88885" />
+          <Connection Source="ASSEMBLE.CNF" Destination="ASM_TRIG.EI" dx1="38.888885" dx2="44.444443" dy="-155.55554" />
+          <Connection Source="START.COLD" Destination="BELT_REND.INIT" dx1="27.777777" />
+          <Connection Source="BELT_REND.IND" Destination="PEG_SENSE.SENSE" dx1="27.777777" />
+          <Connection Source="BELT_REND.INITO" Destination="PEG_FEED_SENSE.INIT" dx1="94.44444" />
+          <Connection Source="ASM_TRIG.EO" Destination="ASSEMBLED.REQ" dx1="27.777777" />
+          <Connection Source="PEG_FEED_SENSE.INITO" Destination="ASSEMBLED.INIT" dx1="849.99994" />
+          <Connection Source="ASSY_CHUTE_SENSE.IND" Destination="ASSEMBLE.REQ" dx1="83.33333" />
+          <Connection Source="ASSEMBLED.INITO" Destination="BELT_LOAD.INIT" dx1="33.333332" />
+          <Connection Source="ASSEMBLED.CNF" Destination="BELT_LOAD.REQ" dx1="38.888885" />
+          <Connection Source="BELT_LOAD.INITO" Destination="ASSY_CHUTE_SENSE.INIT" dx1="27.777777" dx2="44.444443" dy="1250.0" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="28" Destination="PEG_SENSE.P0" Comment="=2/7" dx1="849.99994" />
+          <Connection Source="43" Destination="PEG_SENSE.P1" Comment="=3/7" dx1="849.99994" />
+          <Connection Source="ASSEMBLE.OUT" Destination="ASM_TRIG.QI" dx1="27.777777" dx2="100.0" dy="-533.3333" />
+          <Connection Source="BELT_REND.RD_1" Destination="PEG_SENSE.POS" dx1="38.888885" />
+          <Connection Source="BELT_REND.RD_2" Destination="PEG_SENSE.STYLE" dx1="27.777777" />
+          <Connection Source="PEG_SENSE.MATCH" Destination="PEG_FEED_SENSE.SD_1" dx1="122.22221" />
+          <Connection Source="ASSY_CHUTE_SENSE.RD_1" Destination="ASSEMBLE.IN2" dx1="177.77777" />
+          <Connection Source="PEG_SENSE.MATCH" Destination="ASSEMBLE.IN1" dx1="27.777777" />
+          <Connection Source="VSTYLE#PEG" Destination="PEG_SENSE.REFSTYLE" dx1="694.4444" />
+          <Connection Source="43" Destination="BELT_LOAD.LPOS" dx1="3249.9998" />
+          <Connection Source="VSTYLE#PEGRING" Destination="BELT_LOAD.STYLE" dx1="3022.2222" />
+          <Connection Source="[255,255,0]" Destination="BELT_LOAD.WKPC" dx1="3133.3333" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="INSP_MDL" Type="EMB_RES" Comment="Inspection Model" x="2050.0" y="1111.1111" >
+      <FBNetwork >
+        <FB Name="BELT_REND" Type="SUBL_2" x="511.11108" y="11.111111" />
+        <FB Name="INSPECT" Type="WP_SENSE" x="1022.22217" y="122.22221" />
+        <FB Name="INSPECT_SENSE" Type="PUBL_2" x="1638.8888" y="11.111111" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="BELT_REND.INIT" dx1="27.777777" />
+          <Connection Source="BELT_REND.IND" Destination="INSPECT.SENSE" dx1="27.777777" />
+          <Connection Source="BELT_REND.INITO" Destination="INSPECT_SENSE.INIT" dx1="111.11111" />
+          <Connection Source="INSPECT.IND" Destination="INSPECT_SENSE.REQ" dx1="38.888885" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="BELT_REND.RD_1" Destination="INSPECT.POS" dx1="27.777777" />
+          <Connection Source="BELT_REND.RD_2" Destination="INSPECT.STYLE" dx1="27.777777" />
+          <Connection Source="71" Destination="INSPECT.P0" Comment="=5/7" dx1="938.88885" />
+          <Connection Source="85" Destination="INSPECT.P1" Comment="=6/7" dx1="938.88885" />
+          <Connection Source="INSPECT.PRESENT" Destination="INSPECT_SENSE.SD_1" dx1="94.44444" />
+          <Connection Source="INSPECT.MATCH" Destination="INSPECT_SENSE.SD_2" dx1="77.77777" />
+          <Connection Source="VSTYLE#PEGRING" Destination="INSPECT.REFSTYLE" dx1="711.1111" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="CHAIN" Type="VIEW_PANEL" x="544.4444" y="272.2222" >
+      <FBNetwork >
+        <FB Name="SP1" Type="XSPACE" x="483.3333" y="255.55554" />
+        <FB Name="SORT" Type="SOL_VIEWL" Comment="Sort Solenoid" x="861.1111" y="472.2222" />
+        <FB Name="RLBL" Type="XSPACE" x="1300.0" y="1055.5555" />
+        <FB Name="CHAIN" Type="MECH_VIEWL" Comment="First Chain Segment" x="3038.8887" y="11.111111" />
+        <FB Name="RINGPEG" Type="FB_SLIDER" x="1811.1111" y="11.111111" />
+        <FB Name="PLBL" Type="XSPACE" x="2600.0" y="355.55554" />
+        <FB Name="PPEG" Type="PUBL_1" Comment="Peg probability (0-100)" x="2211.111" y="11.111111" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="SP1.INIT" dx1="33.333332" dx2="5.8824" dy="-1.0" />
+          <Connection Source="SP1.INITO" Destination="SORT.INIT" dx1="27.777777" dx2="541.1765" dy="-1.0" />
+          <Connection Source="SORT.INITO" Destination="RLBL.INIT" dx1="50.0" />
+          <Connection Source="RLBL.INITO" Destination="RINGPEG.INIT" dx1="27.777777" dx2="5.5555553" dy="-1011.1111" />
+          <Connection Source="RINGPEG.INITO" Destination="PPEG.INIT" dx1="27.777777" />
+          <Connection Source="PPEG.INITO" Destination="PLBL.INIT" dx1="27.777777" />
+          <Connection Source="RINGPEG.IND" Destination="PPEG.REQ" dx1="27.777777" />
+          <Connection Source="PLBL.INITO" Destination="CHAIN.INIT" dx1="38.888885" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="[&#34;&#34;,&#34;&#34;,&#34;SORT &#34;]" Destination="SP1.LBLS" dx1="244.44443" />
+          <Connection Source="[2,1]" Destination="SP1.DIMS" dx1="377.77777" />
+          <Connection Source="1" Destination="SORT.LEN" dx1="794.4444" />
+          <Connection Source="1" Destination="SORT.DIR" dx1="794.4444" />
+          <Connection Source="7" Destination="CHAIN.LEN" dx1="2972.2222" />
+          <Connection Source="2" Destination="CHAIN.DIR" dx1="2972.2222" />
+          <Connection Source="[1,1]" Destination="RLBL.DIMS" dx1="1194.4445" />
+          <Connection Source="75" Destination="RINGPEG.W" dx1="1727.7777" />
+          <Connection Source="25" Destination="RINGPEG.H" dx1="1727.7777" />
+          <Connection Source="[&#34;&#34;,&#34;&#34;,&#34;PEG &#34;]" Destination="RLBL.LBLS" dx1="1083.3333" />
+          <Connection Source="COLOR#yellow" Destination="RINGPEG.FGD" dx1="1561.1111" />
+          <Connection Source="COLOR#lightGray" Destination="RINGPEG.BKGD" dx1="1522.2222" />
+          <Connection Source="[&#34; RING&#34;]" Destination="PLBL.LBLS" dx1="2433.3333" />
+          <Connection Source="[1,1]" Destination="PLBL.DIMS" dx1="2494.4443" />
+          <Connection Source="RINGPEG.OUT" Destination="PPEG.SD_1" dx1="27.777777" />
+          <Connection Source="50" Destination="RINGPEG.IVAL" dx1="1727.7777" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="CHUTES" Type="VIEW_PANEL" x="1250.0" y="272.2222" >
+      <FBNetwork >
+        <FB Name="CHUTE" Type="MECH_VIEWL" Comment="Peg Chute" x="466.66666" y="11.111111" />
+        <FB Name="SPC4" Type="XSPACE" Comment="Ring Feed Chute" x="955.55554" y="466.66666" />
+        <FB Name="RING_FEED" Type="MECHC_VIEWL" Comment="Ring Feed Chute" x="1411.1111" y="11.111111" />
+        <FB Name="ASSY_CHUTE" Type="MECH_VIEWL" Comment="Assembly Chute" x="1966.6666" y="11.111111" />
+        <FB Name="SPC6" Type="XSPACE" x="2455.5554" y="838.88885" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="CHUTE.INIT" dx1="33.333332" dx2="35.2941" dy="-1.0" />
+          <Connection Source="CHUTE.INITO" Destination="SPC4.INIT" dx1="27.777777" dx2="29.4118" dy="1376.4706" />
+          <Connection Source="SPC4.INITO" Destination="RING_FEED.INIT" dx1="27.777777" dx2="35.2941" dy="-1.0" />
+          <Connection Source="RING_FEED.INITO" Destination="ASSY_CHUTE.INIT" dx1="55.555553" />
+          <Connection Source="ASSY_CHUTE.INITO" Destination="SPC6.INIT" dx1="27.777777" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="[1,4]" Destination="SPC4.DIMS" dx1="849.99994" />
+          <Connection Source="4" Destination="CHUTE.LEN" dx1="400.0" />
+          <Connection Source="1" Destination="CHUTE.DIR" dx1="400.0" />
+          <Connection Source="2" Destination="RING_FEED.LEN" dx1="1344.4443" />
+          <Connection Source="1" Destination="RING_FEED.DIR" dx1="1344.4443" />
+          <Connection Source="2" Destination="ASSY_CHUTE.LEN" dx1="1899.9999" />
+          <Connection Source="1" Destination="ASSY_CHUTE.DIR" dx1="1899.9999" />
+          <Connection Source="[&#34; ROTARY&#34;,&#34;&#34;,&#34;&#34;,&#34;INSPECT&#34;]" Destination="SPC6.LBLS" dx1="2022.2222" />
+          <Connection Source="[4,4]" Destination="SPC6.DIMS" dx1="2350.0" />
+          <Connection Source="1" Destination="RING_FEED.CNV" dx1="1344.4443" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="BELT" Type="VIEW_PANEL" x="2011.1111" y="272.2222" >
+      <FBNetwork >
+        <FB Name="BELT" Type="MECH_VIEWL" x="483.3333" y="11.111111" />
+        <FB Name="SP2" Type="XSPACE" x="961.1111" y="711.1111" />
+        <FB Name="REJECT" Type="SOL_VIEWL" x="1450.0" y="11.111111" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="BELT.INIT" dx1="38.888885" />
+          <Connection Source="SP2.INITO" Destination="REJECT.INIT" dx1="38.888885" />
+          <Connection Source="BELT.INITO" Destination="SP2.INIT" dx1="27.777777" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="7" Destination="BELT.LEN" dx1="416.66666" />
+          <Connection Source="0" Destination="BELT.DIR" dx1="416.66666" />
+          <Connection Source="1" Destination="REJECT.LEN" dx1="1383.3333" />
+          <Connection Source="3" Destination="REJECT.DIR" dx1="1383.3333" />
+          <Connection Source="[&#34;&#34;,&#34;&#34;,&#34;REJECT &#34;,&#34;&#34;,&#34;ASSEMBLE&#34;]" Destination="SP2.LBLS" dx1="472.2222" />
+          <Connection Source="[6,1]" Destination="SP2.DIMS" dx1="855.55554" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <FBNetwork >
+      <DataConnections>
+        <Connection Source="40" Destination="CHUTES.DIA" dx1="1166.6666" />
+        <Connection Source="[7,4]" Destination="CHUTES.SIZE" dx1="1138.8888" />
+        <Connection Source="1" Destination="CHUTES.VERTICAL" dx1="1183.3333" />
+        <Connection Source="40" Destination="BELT.DIA" dx1="1927.7777" />
+        <Connection Source="[7,2]" Destination="BELT.SIZE" dx1="1899.9999" />
+        <Connection Source="0" Destination="CHAIN.TRACE" dx1="477.77777" />
+        <Connection Source="40" Destination="CHAIN.DIA" dx1="461.11108" />
+        <Connection Source="[7,2]" Destination="CHAIN.SIZE" dx1="433.3333" />
+      </DataConnections>
+    </FBNetwork>
+  </Device>
+  <DeviceParameters>
+    <Connection Source="[100,100,350,360]" Destination="CONTROL.BOUNDS" dx1="272.2222" />
+    <Connection Source="[0,2]" Destination="CONTROL.GRID" dx1="455.55554" />
+    <Connection Source="[450,100,290,360]" Destination="MODEL.BOUNDS" dx1="822.22217" />
+  </DeviceParameters>
+</System>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE DataType SYSTEM "http://www.holobloc.com/xml/DataType.dtd" >
+<DataType xmlns="http://www.holobloc.com/xml/DataType" Name="Structured" Comment="A Structured Data Type" >
+  <Identification Standard="61499-2" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2003-12-05" Remarks="Renamed from NEWSTRUCT." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2000-05-27" />
+  <CompilerInfo header="package fb.rt.template;" >
+  </CompilerInfo>
+  <ASN1Tag Class="PRIVATE" Number="5" />
+  <StructuredType >
+    <VarDeclaration Name="VAR1" Type="BOOL" />
+    <VarDeclaration Name="VAR2" Type="INT" />
+  </StructuredType>
+</DataType>

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="XSLIDE_CTL" Comment="Transfer Slide/Clamp Sequence" >
+  <Identification Standard="61499-1" Classification="Simulation" ApplicationDomain="Machining" Function="Transfer Slide" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2002-10-04" Remarks="Modified from DRILL_CTL" />
+  <CompilerInfo header="package fb.rt.mach;" >
+    <Compiler Language="Java" Vendor="IBM" Product="Jikes" Version="1.06" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="SENSE" Comment="Slide+Machine Sensors" >
+        <With Var="HOME" />
+        <With Var="END" />
+        <With Var="CLAMPED" />
+        <With Var="PRESENT" />
+        <With Var="DEND" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="ACT" Comment="Slide actuators" >
+        <With Var="FWD" />
+        <With Var="REV" />
+        <With Var="CLAMP" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="HOME" Type="BOOL" Comment="Slide at HOME position" />
+      <VarDeclaration Name="END" Type="BOOL" Comment="Slide at END position" />
+      <VarDeclaration Name="CLAMPED" Type="BOOL" Comment="Clamp at END position" />
+      <VarDeclaration Name="PRESENT" Type="BOOL" Comment="Workpiece present on Slide" />
+      <VarDeclaration Name="DEND" Type="BOOL" Comment="Tool at END position" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="FWD" Type="BOOL" Comment="Advance slide" />
+      <VarDeclaration Name="REV" Type="BOOL" Comment="Retract slide" />
+      <VarDeclaration Name="CLAMP" Type="BOOL" Comment="Clamp command, 0=open, 1=close" />
+    </OutputVars>
+  </InterfaceList>
+  <BasicFB>
+    <ECC >
+      <ECState Name="START" Comment="Initial State" x="417.6471" y="58.8235" >
+      </ECState>
+      <ECState Name="CLAMP" Comment="Clamp Workpiece" x="1705.8823" y="58.8235" >
+        <ECAction Algorithm="CLAMP" Output="ACT" />
+      </ECState>
+      <ECState Name="ADV" Comment="Advance Slide" x="1705.8823" y="729.4117" >
+        <ECAction Algorithm="ADV" Output="ACT" />
+      </ECState>
+      <ECState Name="DWELL" Comment="Tool Dwell Period" x="1705.8823" y="1135.2941" >
+        <ECAction Algorithm="DWELL" Output="ACT" />
+      </ECState>
+      <ECState Name="RET" Comment="Return Slide" x="405.8824" y="823.5294" >
+        <ECAction Algorithm="RET" Output="ACT" />
+      </ECState>
+      <ECState Name="UNCLAMP" Comment="Unclamp Workpiece" x="417.6471" y="417.6471" >
+        <ECAction Algorithm="UNCLAMP" Output="ACT" />
+      </ECState>
+      <ECTransition Source="START" Destination="CLAMP" Condition="PRESENT" x="1047.0588" y="58.8235" />
+      <ECTransition Source="CLAMP" Destination="ADV" Condition="CLAMPED" x="1705.8823" y="341.1765" />
+      <ECTransition Source="ADV" Destination="DWELL" Condition="END &#38; DEND" x="1705.8823" y="894.1176" />
+      <ECTransition Source="DWELL" Destination="RET" Condition="NOT DEND" x="405.8824" y="1135.2941" />
+      <ECTransition Source="RET" Destination="UNCLAMP" Condition="HOME" x="417.6471" y="629.4117" />
+      <ECTransition Source="UNCLAMP" Destination="START" Condition="NOT PRESENT" x="417.6471" y="258.8235" />
+    </ECC>
+  <Algorithm Name="DWELL" Comment="Turn off FWD while machining" >
+    <ST Text="FWD := false;&#10;" />
+  </Algorithm>
+  <Algorithm Name="CLAMP" Comment="Clamp Workpiece" >
+    <ST Text="CLAMP := true;&#10;" />
+  </Algorithm>
+  <Algorithm Name="ADV" Comment="Advance Slide" >
+    <ST Text="FWD:=true;&#10;REV:=false;&#10;" />
+  </Algorithm>
+  <Algorithm Name="RET" Comment="Retract Slide" >
+    <ST Text="FWD:= false;&#10;REV := true;&#10;" />
+  </Algorithm>
+  <Algorithm Name="UNCLAMP" Comment="Unclamp Workpiece" >
+    <ST Text="CLAMP := false;&#10;REV := false;&#10;" />
+  </Algorithm>
+  </BasicFB>
+</FBType>

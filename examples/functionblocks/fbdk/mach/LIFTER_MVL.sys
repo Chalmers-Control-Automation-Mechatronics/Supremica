@@ -1,0 +1,446 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE System SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<System xmlns="http://www.holobloc.com/xml/LibraryElement" Name="LIFTER_MVL" Comment="Lifter with Feed &#38; Takeoff Conveyors" >
+  <Identification Standard="61499-1" Classification="Simulation" ApplicationDomain="Assembly" Type="Dual Stroke Cylinder" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.3" Author="JHC" Date="2004-12-19" Remarks="Adjusted frame heights for WinXP." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.2" Author="JHC" Date="2004-11-11" Remarks="Combined XFER_MDL, FAULT_MDL; added faults from UIs." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2004-10-29" Remarks="Changed FEED_MDL.FEED to CNVG_MDLL." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2004-09-29" Remarks="Extended from LIFTER_VIEWL." />
+  <Device Name="HMI" Type="FRAME_DEVICE" x="594.4444" y="100.0" >
+    <Parameter Name="BOUNDS" Value="[100,100,325,195]" />
+    <Parameter Name="GRID" Value="[3,2]" />
+    <Resource Name="TAKEOFF_SENSORS" Type="PANEL_RESOURCE" x="233.33333" y="11.111111" >
+      <FBNetwork >
+        <FB Name="LIFTER_SENSE" Type="SUBL_3" x="477.77777" y="11.111111" />
+        <FB Name="FULL_OUT" Type="OUT_BOOL" x="1727.7777" y="11.111111" >
+          <Parameter Name="LABEL" Value="&#34;OUT OF LIFT&#34;" />
+        </FB>
+        <FB Name="NOT_IN_LIFT" Type="FB_NOT" x="938.88885" y="344.44443" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="LIFTER_SENSE.INIT" dx1="27.777777" />
+          <Connection Source="LIFTER_SENSE.INITO" Destination="FULL_OUT.INIT" dx1="116.666664" />
+          <Connection Source="LIFTER_SENSE.IND" Destination="NOT_IN_LIFT.REQ" dx1="55.555553" />
+          <Connection Source="NOT_IN_LIFT.CNF" Destination="FULL_OUT.REQ" dx1="88.888885" />
+          <Connection Source="FULL_OUT.INITO" Destination="NOT_IN_LIFT.REQ" dx1="27.777777" dx2="88.888885" dy="1005.55554" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="LIFTER_SENSE.RD_3" Destination="NOT_IN_LIFT.IN" dx1="77.77777" />
+          <Connection Source="NOT_IN_LIFT.OUT" Destination="FULL_OUT.IN" dx1="449.99997" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="TAKEOFF_ACTUATORS" Type="PANEL_RESOURCE" x="999.99994" y="11.111111" >
+      <FBNetwork >
+        <FB Name="TAKEOFF" Type="IN_BOOL" x="638.88885" y="11.111111" >
+          <Parameter Name="LABEL" Value="&#34;TAKEOFF MOTOR&#34;" />
+        </FB>
+        <FB Name="TAKEOFF_ACT" Type="PUBL_1" x="1094.4445" y="11.111111" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="TAKEOFF.INIT" dx1="33.333332" />
+          <Connection Source="TAKEOFF.IND" Destination="TAKEOFF_ACT.REQ" dx1="27.777777" />
+          <Connection Source="TAKEOFF.INITO" Destination="TAKEOFF_ACT.INIT" dx1="27.777777" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="TAKEOFF.OUT" Destination="TAKEOFF_ACT.SD_1" dx1="27.777777" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="LIFT_SENSORS" Type="PANEL_RESOURCE" x="216.66666" y="655.55554" >
+      <Parameter Name="ROWS" Value="2" />
+      <Parameter Name="COLS" Value="2" />
+      <FBNetwork >
+        <FB Name="LIFTER_SENSE" Type="SUBL_3" x="466.66666" y="11.111111" />
+        <FB Name="IN_LIFT" Type="OUT_BOOL" x="2066.6665" y="1205.5555" >
+          <Parameter Name="LABEL" Value="&#34;IN LIFT&#34;" />
+        </FB>
+        <FB Name="TOP" Type="OUT_BOOL" x="1116.6666" y="288.8889" >
+          <Parameter Name="LABEL" Value="&#34;TOP&#34;" />
+        </FB>
+        <FB Name="BOTTOM" Type="OUT_BOOL" x="1588.8888" y="744.4444" >
+          <Parameter Name="LABEL" Value="&#34;BOTTOM&#34;" />
+        </FB>
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="LIFTER_SENSE.INIT" dx1="27.777777" />
+          <Connection Source="TOP.CNF" Destination="BOTTOM.REQ" dx1="27.777777" />
+          <Connection Source="TOP.INITO" Destination="BOTTOM.INIT" dx1="72.22222" />
+          <Connection Source="LIFTER_SENSE.INITO" Destination="TOP.INIT" dx1="66.666664" />
+          <Connection Source="LIFTER_SENSE.IND" Destination="TOP.REQ" dx1="33.333332" />
+          <Connection Source="BOTTOM.CNF" Destination="IN_LIFT.REQ" dx1="27.777777" />
+          <Connection Source="BOTTOM.INITO" Destination="IN_LIFT.INIT" dx1="66.666664" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="LIFTER_SENSE.RD_3" Destination="IN_LIFT.IN" dx1="27.777777" />
+          <Connection Source="LIFTER_SENSE.RD_2" Destination="TOP.IN" dx1="233.33333" />
+          <Connection Source="LIFTER_SENSE.RD_1" Destination="BOTTOM.IN" dx1="150.0" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="LIFT_ACTUATORS" Type="PANEL_RESOURCE" x="966.6666" y="644.4444" >
+      <Parameter Name="ROWS" Value="2" />
+      <Parameter Name="COLS" Value="2" />
+      <FBNetwork >
+        <FB Name="UP" Type="IN_BOOL" x="511.11108" y="11.111111" >
+          <Parameter Name="LABEL" Value="&#34;RAISE&#34;" />
+        </FB>
+        <FB Name="LIFTER_ACT" Type="PUBL_2" x="1522.2222" y="572.2222" />
+        <FB Name="DOWN" Type="IN_BOOL" x="1005.55554" y="227.77777" >
+          <Parameter Name="LABEL" Value="&#34;LOWER&#34;" />
+        </FB>
+        <FB Name="LOAD" Type="IN_BOOL" x="1894.4443" y="683.3333" >
+          <Parameter Name="LABEL" Value="&#34;IN&#34;" />
+        </FB>
+        <FB Name="UNLOAD" Type="IN_BOOL" x="2377.7776" y="916.6666" >
+          <Parameter Name="LABEL" Value="&#34;OUT&#34;" />
+        </FB>
+        <FB Name="LIFT_CONVEYOR" Type="PUBL_2" x="2911.111" y="1244.4443" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="UP.INIT" dx1="27.777777" />
+          <Connection Source="LOAD.INITO" Destination="UNLOAD.INIT" dx1="27.777777" />
+          <Connection Source="LOAD.IND" Destination="UNLOAD.REQ" dx1="27.777777" />
+          <Connection Source="DOWN.IND" Destination="LIFTER_ACT.REQ" dx1="77.77777" />
+          <Connection Source="UP.IND" Destination="DOWN.REQ" dx1="27.777777" />
+          <Connection Source="DOWN.CNF" Destination="LIFTER_ACT.REQ" dx1="77.77777" />
+          <Connection Source="UP.INITO" Destination="DOWN.INIT" dx1="44.444443" />
+          <Connection Source="UNLOAD.IND" Destination="LIFT_CONVEYOR.REQ" dx1="27.777777" />
+          <Connection Source="UNLOAD.CNF" Destination="LIFT_CONVEYOR.REQ" dx1="27.777777" />
+          <Connection Source="DOWN.INITO" Destination="LIFTER_ACT.INIT" dx1="122.22221" />
+          <Connection Source="LIFTER_ACT.INITO" Destination="LOAD.INIT" dx1="27.777777" />
+          <Connection Source="UNLOAD.INITO" Destination="LIFT_CONVEYOR.INIT" dx1="66.666664" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="LOAD.OUT" Destination="LIFT_CONVEYOR.SD_1" dx1="27.777777" />
+          <Connection Source="UNLOAD.OUT" Destination="LIFT_CONVEYOR.SD_2" dx1="27.777777" />
+          <Connection Source="UP.OUT" Destination="LIFTER_ACT.SD_1" dx1="27.777777" />
+          <Connection Source="DOWN.OUT" Destination="LIFTER_ACT.SD_2" dx1="38.888885" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="FEED_SENSORS" Type="PANEL_RESOURCE" x="238.88889" y="1288.8888" >
+      <FBNetwork >
+        <FB Name="FEED_SENSE" Type="SUBL_1" x="483.3333" y="11.111111" />
+        <FB Name="AT_STOPPER" Type="OUT_BOOL" x="938.88885" y="11.111111" >
+          <Parameter Name="LABEL" Value="&#34;AT STOPPER&#34;" />
+        </FB>
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="FEED_SENSE.INIT" dx1="61.111107" />
+          <Connection Source="FEED_SENSE.INITO" Destination="AT_STOPPER.INIT" dx1="66.666664" />
+          <Connection Source="FEED_SENSE.IND" Destination="AT_STOPPER.REQ" dx1="27.777777" dx2="5.8824" dy="764.7059" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="FEED_SENSE.RD_1" Destination="AT_STOPPER.IN" dx1="27.777777" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="FEED_ACTUATORS" Type="PANEL_RESOURCE" x="983.3333" y="1294.4443" >
+      <FBNetwork >
+        <FB Name="FEED" Type="IN_BOOL" x="683.3333" y="11.111111" >
+          <Parameter Name="LABEL" Value="&#34;FEED MOTOR&#34;" />
+        </FB>
+        <FB Name="FEED_ACT" Type="PUBL_2" x="1744.4443" y="600.0" />
+        <FB Name="STOPPER_DOWN" Type="IN_BOOL" x="1255.5555" y="266.66666" >
+          <Parameter Name="LABEL" Value="&#34;STOPPER DOWN&#34;" />
+          <Parameter Name="IN" Value="0" />
+        </FB>
+        <EventConnections>
+          <Connection Source="FEED.INITO" Destination="STOPPER_DOWN.INIT" dx1="122.22221" />
+          <Connection Source="FEED.IND" Destination="STOPPER_DOWN.REQ" dx1="111.11111" />
+          <Connection Source="START.COLD" Destination="FEED.INIT" dx1="38.888885" />
+          <Connection Source="STOPPER_DOWN.INITO" Destination="FEED_ACT.INIT" dx1="94.44444" />
+          <Connection Source="STOPPER_DOWN.IND" Destination="FEED_ACT.REQ" dx1="27.777777" />
+          <Connection Source="STOPPER_DOWN.CNF" Destination="FEED_ACT.REQ" dx1="27.777777" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="FEED.OUT" Destination="FEED_ACT.SD_1" dx1="38.888885" dx2="44.444443" dy="288.8889" />
+          <Connection Source="STOPPER_DOWN.OUT" Destination="FEED_ACT.SD_2" dx1="27.777777" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+  </Device>
+  <Device Name="MODEL" Type="FRAME_DEVICE" x="605.55554" y="683.3333" >
+    <Parameter Name="BOUNDS" Value="[425,100,160,260]" />
+    <Resource Name="CLOCK" Type="EMB_RES" x="50.0" y="11.111111" >
+      <FBNetwork >
+        <FB Name="CLK" Type="E_CYCLE" x="1872.2222" y="505.55554" >
+          <Parameter Name="DT" Value="t#100ms" />
+        </FB>
+        <FB Name="SIM_CLK" Type="PUBL_0" x="600.0" y="11.111111" />
+        <FB Name="FAULT" Type="SUBL_0" x="1038.8888" y="11.111111" />
+        <FB Name="RESET" Type="SUBL_0" x="1444.4443" y="11.111111" />
+        <EventConnections>
+          <Connection Source="START.STOP" Destination="CLK.STOP" dx1="33.333332" />
+          <Connection Source="CLK.EO" Destination="SIM_CLK.REQ" dx1="27.777777" dx2="38.888885" dy="577.7778" />
+          <Connection Source="START.COLD" Destination="SIM_CLK.INIT" dx1="50.0" />
+          <Connection Source="SIM_CLK.INITO" Destination="FAULT.INIT" dx1="27.777777" />
+          <Connection Source="FAULT.INITO" Destination="RESET.INIT" dx1="27.777777" />
+          <Connection Source="RESET.INITO" Destination="CLK.START" dx1="27.777777" />
+          <Connection Source="RESET.IND" Destination="CLK.START" dx1="27.777777" />
+          <Connection Source="FAULT.IND" Destination="CLK.STOP" dx1="27.777777" />
+        </EventConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="FEED_MDL" Type="EMB_RES" x="488.88885" y="583.3333" >
+      <FBNetwork >
+        <FB Name="FEED" Type="CNVG_MDLL" x="738.88885" y="11.111111" >
+          <Parameter Name="VF" Value="20" />
+          <Parameter Name="VS" Value="50" />
+        </FB>
+        <FB Name="FEED_UNLD" Type="SUBL_0" x="1311.1111" y="11.111111" />
+        <FB Name="RESET" Type="SUBL_0" x="1744.4443" y="11.111111" />
+        <FB Name="WARN" Type="SUBL_2" x="2261.111" y="11.111111" />
+        <FB Name="WARNING" Type="LOADLE" x="3177.7776" y="322.2222" >
+          <Parameter Name="LPOS" Value="100" />
+          <Parameter Name="STYLE" Value="VSTYLE#PALLET" />
+          <Parameter Name="WKPC" Value="[255,255,0]" />
+          <Parameter Name="ID" Value="&#34;FEED_LOAD&#34;" />
+        </FB>
+        <FB Name="JAM_OR_HALFIN" Type="FB_OR" x="2716.6665" y="188.88889" />
+        <FB Name="FAULT" Type="SUBL_2" x="50.0" y="716.6666" />
+        <FB Name="CRUSHED" Type="E_PERMIT" x="88.888885" y="1577.7777" />
+        <FB Name="DROPPED" Type="LOADLE" x="838.88885" y="1722.2222" >
+          <Parameter Name="ID" Value="&#34;FEED_LOAD&#34;" />
+          <Parameter Name="LPOS" Value="100" />
+          <Parameter Name="STYLE" Value="VSTYLE#PALLET" />
+          <Parameter Name="WKPC" Value="[255,0,0]" />
+        </FB>
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="FEED.INIT" dx1="33.333332" />
+          <Connection Source="FEED.INITO" Destination="FEED_UNLD.INIT" dx1="33.333332" />
+          <Connection Source="FEED_UNLD.INITO" Destination="RESET.INIT" dx1="27.777777" />
+          <Connection Source="RESET.IND" Destination="FEED.UNLD" dx1="27.777777" dx2="161.1111" dy="1355.5555" />
+          <Connection Source="RESET.INITO" Destination="WARN.INIT" dx1="27.777777" />
+          <Connection Source="WARN.IND" Destination="JAM_OR_HALFIN.REQ" dx1="27.777777" />
+          <Connection Source="START.COLD" Destination="FAULT.INIT" dx1="27.777777" dx2="33.333332" dy="538.88885" />
+          <Connection Source="WARN.INITO" Destination="WARNING.INIT" dx1="538.88885" />
+          <Connection Source="JAM_OR_HALFIN.CNF" Destination="WARNING.REQ" dx1="27.777777" />
+          <Connection Source="FAULT.IND" Destination="CRUSHED.EI" dx1="166.66666" dx2="38.888885" dy="583.3333" />
+          <Connection Source="CRUSHED.EO" Destination="FEED.UNLD" dx1="172.22221" />
+          <Connection Source="FAULT.IND" Destination="DROPPED.REQ" dx1="166.66666" />
+          <Connection Source="WARNING.INITO" Destination="DROPPED.INIT" dx1="27.777777" dx2="44.444443" dy="1216.6666" />
+          <Connection Source="FEED_UNLD.IND" Destination="FEED.UNLD" dx1="27.777777" dx2="161.1111" dy="1355.5555" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="WARN.RD_1" Destination="JAM_OR_HALFIN.IN1" dx1="38.888885" />
+          <Connection Source="WARN.RD_2" Destination="JAM_OR_HALFIN.IN2" dx1="27.777777" />
+          <Connection Source="JAM_OR_HALFIN.OUT" Destination="WARNING.QI" dx1="27.777777" />
+          <Connection Source="FAULT.RD_1" Destination="CRUSHED.PERMIT" dx1="27.777777" dx2="55.555553" dy="216.66666" />
+          <Connection Source="FAULT.RD_2" Destination="DROPPED.QI" dx1="100.0" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="LIFTER_MDL" Type="EMB_RES" x="483.3333" y="305.55554" >
+      <FBNetwork >
+        <FB Name="LIFTER" Type="XBAR_MDLL" x="572.2222" y="11.111111" >
+          <Parameter Name="VF" Value="15" />
+          <Parameter Name="VR" Value="15" />
+        </FB>
+        <FB Name="TAKEOFF_LOAD" Type="SUBL_0" x="1255.5555" y="11.111111" />
+        <FB Name="FAULT" Type="SUBL_3" x="1672.2222" y="11.111111" />
+        <FB Name="CRUSHED" Type="LOADLE" x="2144.4443" y="350.0" >
+          <Parameter Name="ID" Value="&#34;LIFTER_LOAD&#34;" />
+          <Parameter Name="STYLE" Value="VSTYLE#PALLET" />
+          <Parameter Name="WKPC" Value="[255,0,0]" />
+        </FB>
+        <FB Name="FALLEN" Type="LOADLE" x="2616.6665" y="1355.5555" >
+          <Parameter Name="ID" Value="&#34;LIFTER_LOAD&#34;" />
+          <Parameter Name="WKPC" Value="[255,0,0]" />
+          <Parameter Name="STYLE" Value="VSTYLE#PALLET" />
+        </FB>
+        <FB Name="RESET" Type="SUBL_0" x="50.0" y="733.3333" />
+        <FB Name="WARN" Type="SUBL_3" x="2644.4443" y="11.111111" />
+        <FB Name="HALF_OUT" Type="LOADLE" x="3366.6665" y="338.8889" >
+          <Parameter Name="ID" Value="&#34;LIFTER_LOAD&#34;" />
+          <Parameter Name="STYLE" Value="VSTYLE#PALLET" />
+          <Parameter Name="WKPC" Value="[255,255,0]" />
+        </FB>
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="LIFTER.INIT" dx1="27.777777" />
+          <Connection Source="LIFTER.INITO" Destination="TAKEOFF_LOAD.INIT" dx1="27.777777" />
+          <Connection Source="TAKEOFF_LOAD.IND" Destination="LIFTER.UNLD" dx1="27.777777" dx2="133.33333" dy="1238.8888" />
+          <Connection Source="TAKEOFF_LOAD.INITO" Destination="FAULT.INIT" dx1="94.44444" />
+          <Connection Source="FAULT.INITO" Destination="CRUSHED.INIT" dx1="122.22221" />
+          <Connection Source="FAULT.IND" Destination="CRUSHED.REQ" dx1="88.888885" />
+          <Connection Source="FAULT.IND" Destination="FALLEN.REQ" dx1="561.1111" />
+          <Connection Source="CRUSHED.INITO" Destination="FALLEN.INIT" dx1="27.777777" />
+          <Connection Source="WARN.INITO" Destination="HALF_OUT.INIT" dx1="183.33333" />
+          <Connection Source="WARN.IND" Destination="HALF_OUT.REQ" dx1="61.111107" />
+          <Connection Source="RESET.INITO" Destination="LIFTER.UNLD" dx1="77.77777" />
+          <Connection Source="RESET.IND" Destination="LIFTER.UNLD" dx1="77.77777" />
+          <Connection Source="FALLEN.INITO" Destination="WARN.INIT" dx1="38.888885" dx2="72.22222" dy="-166.66666" />
+          <Connection Source="HALF_OUT.INITO" Destination="RESET.INIT" dx1="27.777777" dx2="33.333332" dy="2016.6666" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="FAULT.RD_1" Destination="CRUSHED.QI" dx1="66.666664" />
+          <Connection Source="FAULT.RD_3" Destination="FALLEN.QI" dx1="27.777777" />
+          <Connection Source="WARN.RD_3" Destination="HALF_OUT.QI" dx1="122.22221" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="XFER_MDL" Type="EMB_RES" Comment="Pallet Transfer Model" x="72.22222" y="294.44443" >
+      <FBNetwork >
+        <FB Name="MDL" Type="LIFTER_XFER" x="538.88885" y="1461.1111" />
+        <FB Name="FEED_ACT" Type="SUBL_1" x="449.99997" y="11.111111" />
+        <FB Name="FEED_SENSE" Type="SUBL_2" x="905.55554" y="11.111111" />
+        <FB Name="LIFTER_SENSE" Type="SUBL_3" x="1361.1111" y="11.111111" />
+        <FB Name="LIFT_CONVEYOR" Type="SUBL_2" x="1844.4443" y="11.111111" />
+        <FB Name="TAKEOFF_ACT" Type="SUBL_1" x="2322.2222" y="11.111111" />
+        <FB Name="LIFTER_LOAD" Type="LOADL" x="3488.8887" y="2416.6665" >
+          <Parameter Name="LPOS" Value="0" />
+          <Parameter Name="STYLE" Value="VSTYLE#PALLET" />
+          <Parameter Name="WKPC" Value="[0,255,0]" />
+        </FB>
+        <FB Name="TAKEOFF_LOAD" Type="LOADL" x="2550.0" y="2422.2222" >
+          <Parameter Name="LPOS" Value="0" />
+          <Parameter Name="STYLE" Value="VSTYLE#PALLET" />
+          <Parameter Name="WKPC" Value="[0,255,0]" />
+        </FB>
+        <FB Name="LIFTER_UI" Type="SUBL_1" x="3244.4443" y="11.111111" />
+        <FB Name="WARN" Type="PUBL_3" x="1527.7777" y="1883.3333" />
+        <FB Name="FAULT" Type="PUBL_3" x="1999.9999" y="2205.5554" />
+        <FB Name="FEED_UNLD" Type="PUBL_0" x="3044.4443" y="2422.2222" />
+        <FB Name="FEED_UI" Type="SUBL_1" x="2811.111" y="11.111111" />
+        <FB Name="TAKEOFF_UI" Type="SUBL_1" x="3711.111" y="11.111111" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="FEED_ACT.INIT" dx1="27.777777" />
+          <Connection Source="FEED_ACT.INITO" Destination="FEED_SENSE.INIT" dx1="27.777777" />
+          <Connection Source="FEED_ACT.IND" Destination="MDL.REQ" dx1="72.22222" dx2="38.888885" dy="1172.2222" />
+          <Connection Source="FEED_SENSE.IND" Destination="MDL.REQ" dx1="105.55555" dx2="38.888885" dy="1172.2222" />
+          <Connection Source="FEED_SENSE.INITO" Destination="LIFTER_SENSE.INIT" dx1="27.777777" dx2="94.44444" dy="700.0" />
+          <Connection Source="LIFTER_SENSE.IND" Destination="MDL.REQ" dx1="116.666664" dx2="38.888885" dy="1172.2222" />
+          <Connection Source="LIFTER_SENSE.INITO" Destination="LIFT_CONVEYOR.INIT" dx1="150.0" />
+          <Connection Source="LIFT_CONVEYOR.IND" Destination="MDL.REQ" dx1="88.888885" dx2="38.888885" dy="1172.2222" />
+          <Connection Source="LIFT_CONVEYOR.INITO" Destination="TAKEOFF_ACT.INIT" dx1="27.777777" />
+          <Connection Source="TAKEOFF_ACT.IND" Destination="MDL.REQ" dx1="61.111107" dx2="38.888885" dy="1172.2222" />
+          <Connection Source="LIFTER_UI.IND" Destination="MDL.REQ" dx1="61.111107" dx2="38.888885" dy="1172.2222" />
+          <Connection Source="MDL.UNLD" Destination="TAKEOFF_LOAD.REQ" dx1="1211.1111" />
+          <Connection Source="WARN.INITO" Destination="FAULT.INIT" dx1="27.777777" />
+          <Connection Source="MDL.WARN" Destination="WARN.REQ" dx1="111.11111" />
+          <Connection Source="MDL.FLT" Destination="FAULT.REQ" dx1="705.55554" />
+          <Connection Source="FAULT.INITO" Destination="TAKEOFF_LOAD.INIT" dx1="27.777777" />
+          <Connection Source="MDL.LOAD" Destination="FEED_UNLD.REQ" dx1="1761.1111" />
+          <Connection Source="FEED_UNLD.INITO" Destination="LIFTER_LOAD.INIT" dx1="133.33333" />
+          <Connection Source="FEED_UNLD.CNF" Destination="LIFTER_LOAD.REQ" dx1="27.777777" />
+          <Connection Source="TAKEOFF_LOAD.INITO" Destination="FEED_UNLD.INIT" dx1="122.22221" />
+          <Connection Source="TAKEOFF_ACT.INITO" Destination="FEED_UI.INIT" dx1="27.777777" />
+          <Connection Source="FEED_UI.INITO" Destination="LIFTER_UI.INIT" dx1="27.777777" />
+          <Connection Source="LIFTER_UI.INITO" Destination="TAKEOFF_UI.INIT" dx1="27.777777" />
+          <Connection Source="TAKEOFF_UI.INITO" Destination="WARN.INIT" dx1="100.0" dx2="38.888885" dy="1622.2222" />
+          <Connection Source="FEED_UI.IND" Destination="MDL.REQ" dx1="27.777777" dx2="38.888885" dy="1172.2222" />
+          <Connection Source="TAKEOFF_UI.IND" Destination="MDL.REQ" dx1="55.555553" dx2="38.888885" dy="1172.2222" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="FEED_ACT.RD_1" Destination="MDL.FEED" dx1="38.888885" dx2="77.77777" dy="805.55554" />
+          <Connection Source="FEED_SENSE.RD_1" Destination="MDL.AT_STOPPER" dx1="50.0" dx2="111.11111" dy="761.1111" />
+          <Connection Source="LIFTER_SENSE.RD_1" Destination="MDL.BOTTOM" dx1="72.22222" dx2="172.22221" dy="683.3333" />
+          <Connection Source="LIFTER_SENSE.RD_2" Destination="MDL.TOP" dx1="50.0" dx2="200.0" dy="550.0" />
+          <Connection Source="LIFTER_SENSE.RD_3" Destination="MDL.IN_LIFT" dx1="27.777777" dx2="227.77777" dy="411.11108" />
+          <Connection Source="LIFT_CONVEYOR.RD_1" Destination="MDL.IN" dx1="61.111107" dx2="261.1111" dy="577.7778" />
+          <Connection Source="LIFT_CONVEYOR.RD_2" Destination="MDL.OUT" dx1="27.777777" dx2="288.8889" dy="444.44443" />
+          <Connection Source="TAKEOFF_ACT.RD_1" Destination="MDL.TAKEOFF" dx1="27.777777" dx2="322.2222" dy="505.55554" />
+          <Connection Source="FEED_SENSE.RD_2" Destination="MDL.OPEN" dx1="27.777777" dx2="138.88889" dy="622.22217" />
+          <Connection Source="LIFTER_UI.RD_1" Destination="MDL.LFLT" dx1="27.777777" dx2="377.77777" dy="400.0" />
+          <Connection Source="MDL.JAM" Destination="WARN.SD_1" dx1="172.22221" />
+          <Connection Source="MDL.HALF_IN" Destination="WARN.SD_2" dx1="144.44444" />
+          <Connection Source="MDL.HALF_OUT" Destination="WARN.SD_3" dx1="116.666664" />
+          <Connection Source="MDL.CRUSHED" Destination="FAULT.SD_1" dx1="94.44444" />
+          <Connection Source="MDL.DROPPED" Destination="FAULT.SD_2" dx1="66.666664" />
+          <Connection Source="MDL.FALLEN" Destination="FAULT.SD_3" dx1="38.888885" />
+          <Connection Source="FEED_UI.RD_1" Destination="MDL.FFLT" dx1="27.777777" dx2="350.0" dy="449.99997" />
+          <Connection Source="TAKEOFF_UI.RD_1" Destination="MDL.TFLT" dx1="27.777777" dx2="411.11108" dy="350.0" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="TAKEOFF_MDL" Type="EMB_RES" x="472.2222" y="11.111111" >
+      <FBNetwork >
+        <FB Name="TAKEOFF" Type="CNV_MDLL" x="866.6666" y="11.111111" >
+          <Parameter Name="VF" Value="10" />
+        </FB>
+        <FB Name="UNLD" Type="SUBL_0" x="455.55554" y="11.111111" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="UNLD.INIT" dx1="27.777777" />
+          <Connection Source="UNLD.INITO" Destination="TAKEOFF.INIT" dx1="27.777777" />
+          <Connection Source="UNLD.IND" Destination="TAKEOFF.UNLD" dx1="27.777777" />
+        </EventConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="UI" Type="PANEL_RESOURCE" x="1105.5555" y="11.111111" >
+      <Parameter Name="ROWS" Value="2" />
+      <Parameter Name="COLS" Value="2" />
+      <FBNetwork >
+        <FB Name="FAULT_IND" Type="OUT_BOOL" x="2366.6665" y="11.111111" >
+          <Parameter Name="LABEL" Value="&#34;FAULT &#34;" />
+          <Parameter Name="C1" Value="[255,0,0]" />
+        </FB>
+        <FB Name="RESET_PB" Type="IN_EVENT" x="2777.7776" y="438.8889" >
+          <Parameter Name="LABEL" Value="&#34;RESET&#34;" />
+        </FB>
+        <FB Name="RESET" Type="PUBL_0" x="3183.3333" y="438.8889" />
+        <FB Name="LOAD_PB" Type="IN_EVENT" x="461.11108" y="11.111111" >
+          <Parameter Name="LABEL" Value="&#34;LOAD&#34;" />
+        </FB>
+        <FB Name="UNLD_PB" Type="IN_EVENT" x="1233.3333" y="366.66666" >
+          <Parameter Name="LABEL" Value="&#34;UNLOAD&#34;" />
+        </FB>
+        <FB Name="FEED_LOAD" Type="LOADL" x="838.88885" y="11.111111" >
+          <Parameter Name="STYLE" Value="VSTYLE#PALLET" />
+          <Parameter Name="WKPC" Value="[0,255,0]" />
+        </FB>
+        <FB Name="UNLD" Type="PUBL_0" x="1638.8888" y="11.111111" />
+        <FB Name="FLT" Type="E_RS" x="1722.2222" y="722.22217" />
+        <FB Name="FAULT" Type="SUBL_0" x="1205.5555" y="1177.7777" />
+        <EventConnections>
+          <Connection Source="FAULT_IND.INITO" Destination="RESET_PB.INIT" dx1="27.777777" />
+          <Connection Source="RESET_PB.INITO" Destination="RESET.INIT" dx1="27.777777" />
+          <Connection Source="RESET_PB.IND" Destination="RESET.REQ" dx1="38.888885" />
+          <Connection Source="START.COLD" Destination="LOAD_PB.INIT" dx1="27.777777" />
+          <Connection Source="LOAD_PB.INITO" Destination="FEED_LOAD.INIT" dx1="27.777777" />
+          <Connection Source="FEED_LOAD.INITO" Destination="UNLD_PB.INIT" dx1="27.777777" />
+          <Connection Source="LOAD_PB.IND" Destination="FEED_LOAD.REQ" dx1="27.777777" />
+          <Connection Source="UNLD_PB.INITO" Destination="UNLD.INIT" dx1="27.777777" />
+          <Connection Source="UNLD_PB.IND" Destination="UNLD.REQ" dx1="55.555553" />
+          <Connection Source="UNLD.INITO" Destination="FAULT_IND.INIT" dx1="27.777777" />
+          <Connection Source="RESET.CNF" Destination="UNLD.REQ" dx1="27.777777" dx2="38.888885" dy="872.22217" />
+          <Connection Source="FLT.EO" Destination="FAULT_IND.REQ" dx1="127.77777" />
+          <Connection Source="RESET.INITO" Destination="FAULT.INIT" dx1="61.111107" dx2="66.666664" dy="1305.5555" />
+          <Connection Source="FAULT.IND" Destination="FLT.S" dx1="144.44444" />
+          <Connection Source="UNLD.CNF" Destination="FLT.R" dx1="27.777777" dx2="33.333332" dy="444.44443" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="FLT.Q" Destination="FAULT_IND.IN" dx1="294.44443" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="VIEW" Type="VIEW_PANEL" x="1194.4445" y="594.4444" >
+      <Parameter Name="TRACE" Value="0" />
+      <Parameter Name="DIA" Value="30" />
+      <Parameter Name="SIZE" Value="[5,5]" />
+      <Parameter Name="VERTICAL" Value="1" />
+      <FBNetwork >
+        <FB Name="LIFTER" Type="MECH_VIEWL" x="477.77777" y="11.111111" >
+          <Parameter Name="LEN" Value="5" />
+          <Parameter Name="DIR" Value="3" />
+          <Parameter Name="BKGD" Value="COLOR#blue" />
+        </FB>
+        <FB Name="FEED" Type="MECHC_VIEWL" Comment="Feed Conveyor" x="2350.0" y="11.111111" >
+          <Parameter Name="BKGD" Value="COLOR#blue" />
+          <Parameter Name="LEN" Value="4" />
+          <Parameter Name="DIR" Value="2" />
+          <Parameter Name="CNV" Value="1" />
+        </FB>
+        <FB Name="SP2" Type="XSPACE" x="1766.6666" y="888.88885" >
+          <Parameter Name="LBLS" Value="[&#34; LIFTER&#34;,&#34;TAKEOFF==>&#34;,&#34;&#34;,&#34;&#60;==FEED&#34;]" />
+          <Parameter Name="DIMS" Value="[4,3]" />
+        </FB>
+        <FB Name="TAKEOFF" Type="MECH_VIEWL" Comment="Takeoff Conveyor" x="1311.1111" y="11.111111" >
+          <Parameter Name="LEN" Value="4" />
+          <Parameter Name="BKGD" Value="COLOR#blue" />
+        </FB>
+        <EventConnections>
+          <Connection Source="TAKEOFF.INITO" Destination="SP2.INIT" dx1="27.777777" />
+          <Connection Source="SP2.INITO" Destination="FEED.INIT" dx1="27.777777" />
+          <Connection Source="START.COLD" Destination="LIFTER.INIT" dx1="27.777777" />
+          <Connection Source="LIFTER.INITO" Destination="TAKEOFF.INIT" dx1="27.777777" />
+        </EventConnections>
+      </FBNetwork>
+    </Resource>
+  </Device>
+</System>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="E_PERMIT" Comment="Permissive propagation of an event" >
+  <Identification Standard="61499-1-A.1" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2003-12-30" Remarks="Updated for 61499-1 CDV." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2001-03-03" />
+  <CompilerInfo header="package fb.rt.events;" >
+    <Compiler Language="Java" Vendor="IBM" Product="VisualAge" Version="3.0" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="EI" Comment="Event input" >
+        <With Var="PERMIT" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="EO" Comment="Event output" >
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="PERMIT" Type="BOOL" />
+    </InputVars>
+  </InterfaceList>
+  <BasicFB>
+    <ECC >
+      <ECState Name="START" Comment="Initial State" x="633.3333" y="433.3333" >
+      </ECState>
+      <ECState Name="EO" Comment="Issue EO Event" x="1077.7777" y="72.22222" >
+        <ECAction Output="EO" />
+      </ECState>
+      <ECState Name="NULL" Comment="Do nothing if PERMIT=FALSE" x="155.55554" y="711.1111" >
+      </ECState>
+      <ECTransition Source="START" Destination="EO" Condition="EI&#38;PERMIT" x="1077.7777" y="433.3333" />
+      <ECTransition Source="EO" Destination="START" Condition="1" x="633.3333" y="72.22222" />
+      <ECTransition Source="START" Destination="NULL" Condition="EI&#38;(NOT PERMIT)" x="633.3333" y="711.1111" />
+      <ECTransition Source="NULL" Destination="START" Condition="1" x="155.55554" y="433.3333" />
+    </ECC>
+  </BasicFB>
+</FBType>

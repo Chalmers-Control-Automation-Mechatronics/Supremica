@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="WP_SENSE" Comment="Workpiece presence and style sensor" >
+  <Identification Standard="61499-1" Classification="Simulation" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2002-04-20" Remarks="Moved to fb.rt.mva" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2002-04-10" />
+  <CompilerInfo header="package fb.rt.mva;" >
+    <Compiler Language="Java" Vendor="IBM" Product="VisualAge" Version="3.0" />
+    <Compiler Language="Java" Vendor="IBM" Product="Jikes" Version="1.06" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="SENSE" Comment="Input change notification" >
+        <With Var="STYLE" />
+        <With Var="REFSTYLE" />
+        <With Var="POS" />
+        <With Var="P0" />
+        <With Var="P1" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="IND" Comment="Output change indication" >
+        <With Var="PRESENT" />
+        <With Var="MATCH" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="POS" Type="UINT" Comment="Workpiece position on conveyor (0-100%)" />
+      <VarDeclaration Name="P0" Type="UINT" Comment="Position sensor lower limit" />
+      <VarDeclaration Name="P1" Type="UINT" Comment="Position sensor upper limit" />
+      <VarDeclaration Name="STYLE" Type="VSTYLE" Comment="Workpiece style" />
+      <VarDeclaration Name="REFSTYLE" Type="VSTYLE" Comment="Style to be sensed" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="PRESENT" Type="BOOL" Comment="Workpiece is present between P0 and P1" />
+      <VarDeclaration Name="MATCH" Type="BOOL" Comment="Workpiece is present and STYLE matches REFSTYLE" />
+    </OutputVars>
+  </InterfaceList>
+  <BasicFB>
+  <Algorithm Name="SENSE" >
+    <Other Language="Java" Text="boolean newpres = (POS.value>=P0.value)&#38;&#38;(POS.value&#60;=P1.value)&#38;&#38;(STYLE.value != VSTYLE.NONE);&#10;boolean newmatch = newpres &#38; (STYLE.equals(REFSTYLE));&#10;if((newpres != PRESENT.value)||(newmatch != MATCH.value)){&#10;   PRESENT.value = newpres;&#10;   MATCH.value = newmatch;&#10;   IND.serviceEvent(this);}&#10;" />
+  </Algorithm>
+  </BasicFB>
+</FBType>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="BUGWORK" Comment="Tests parsing and generation of base-16 numbers" >
+  <Identification Standard="61499-1" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2004-05-02" Remarks="Moved to fb.rt.test." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2002-10-27" />
+  <CompilerInfo header="package fb.rt.test;" >
+    <Compiler Language="Java" Vendor="Sun" Product="JDK" Version="1.3.1" />
+    <Compiler Language="Java" Vendor="IBM" Product="Jikes" Version="1.06" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="REQ" >
+        <With Var="INMSB" />
+        <With Var="INLSB" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="CNF" >
+        <With Var="OUT" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="INMSB" Type="BYTE" />
+      <VarDeclaration Name="INLSB" Type="BYTE" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="OUT" Type="WORD" />
+    </OutputVars>
+  </InterfaceList>
+  <BasicFB>
+    <InternalVars>
+      <VarDeclaration Name="MASK" Type="WORD" InitialValue="16#00FF" />
+    </InternalVars>
+    <ECC >
+      <ECState Name="START" Comment="Initial State" x="294.1176" y="111.7647" >
+      </ECState>
+      <ECState Name="REQ" Comment="Normal execution" x="858.8235" y="435.2941" >
+        <ECAction Algorithm="REQ" Output="CNF" />
+      </ECState>
+      <ECTransition Source="START" Destination="REQ" Condition="REQ" x="294.1176" y="435.2941" />
+      <ECTransition Source="REQ" Destination="START" Condition="1" x="858.8235" y="111.7647" />
+    </ECC>
+  <Algorithm Name="REQ" >
+    <ST Text="OUT:=INMSB*256+(INLSB&#38;MASK);&#10;" />
+  </Algorithm>
+  </BasicFB>
+</FBType>

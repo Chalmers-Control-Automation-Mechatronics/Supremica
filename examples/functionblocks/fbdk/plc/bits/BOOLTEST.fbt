@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="BOOLTEST" Comment="Test Boolean AND,OR,XOR" >
+  <Identification Standard="61131-3" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2004-12-15" Remarks="Converted from SRC format." />
+  <CompilerInfo header="package fb.rt.plc.bits;" >
+  </CompilerInfo>
+  <InterfaceList>
+    <InputVars>
+      <VarDeclaration Name="I1" Type="BOOL" />
+      <VarDeclaration Name="I2" Type="BOOL" />
+      <VarDeclaration Name="I3" Type="BOOL" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="Q" Type="BOOL" />
+    </OutputVars>
+  </InterfaceList>
+  <BasicFB>
+  <Algorithm Name="REQ" >
+    <FBD >
+      <FB Name="n1" Type="NOT_BOOL" x="133.33333" y="11.111111" />
+      <FB Name="n2" Type="NOT_BOOL" x="133.33333" y="427.77777" />
+      <FB Name="a1" Type="AND_BOOL" x="344.44443" y="11.111111" />
+      <FB Name="a2" Type="AND_BOOL" x="544.4444" y="316.66666" />
+      <FB Name="o1" Type="OR_BOOL" x="766.6666" y="11.111111" />
+      <FB Name="x1" Type="XOR_BOOL" x="1055.5555" y="11.111111" />
+      <DataConnections>
+        <Connection Source="I1" Destination="n1.in" dx1="55.555553" />
+        <Connection Source="I2" Destination="n2.in" dx1="55.555553" />
+        <Connection Source="I2" Destination="a1.i2" dx1="266.66666" />
+        <Connection Source="n2.Q" Destination="a2.i2" dx1="61.111107" />
+        <Connection Source="n1.Q" Destination="a1.i1" dx1="27.777777" />
+        <Connection Source="I1" Destination="a2.i1" dx1="466.66666" />
+        <Connection Source="a1.Q" Destination="o1.i1" dx1="72.22222" />
+        <Connection Source="a2.Q" Destination="o1.i2" dx1="27.777777" />
+        <Connection Source="o1.Q" Destination="x1.i1" dx1="27.777777" />
+        <Connection Source="I3" Destination="x1.i2" dx1="977.7777" />
+        <Connection Source="x1.Q" Destination="Q" dx1="1272.2222" />
+      </DataConnections>
+    </FBD>
+  </Algorithm>
+  </BasicFB>
+</FBType>

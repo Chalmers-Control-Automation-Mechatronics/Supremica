@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE DataType SYSTEM "http://www.holobloc.com/xml/DataType.dtd" >
+<DataType xmlns="http://www.holobloc.com/xml/DataType" Name="SUBR12" Comment="A +-11-bit Subrange Data Type" >
+  <Identification Standard="61131-3" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2004-01-02" Remarks="Derived from Subrange template." />
+  <CompilerInfo header="package fb.rt.test;" >
+    <Compiler Language="Java" Vendor="IBM" Product="VisualAge" Version="3.0" />
+  </CompilerInfo>
+  <ASN1Tag Class="PRIVATE" Number="10" />
+  <SubrangeType BaseType="INT" >
+    <Subrange LowerLimit="-4095" UpperLimit="4095" />
+  </SubrangeType>
+</DataType>

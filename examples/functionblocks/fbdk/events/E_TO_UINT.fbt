@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="E_TO_UINT" Comment="Event to UINT converter (1 of 4)" >
+  <Identification Standard="61499-1" Classification="Event processing" Function="Event to integer compression" Type="UINT" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2003-04-10" />
+  <CompilerInfo header="package fb.rt.events;" >
+    <Compiler Language="Java" Vendor="IBM" Product="Jikes" Version="1.06" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="EI0" >
+      </Event>
+      <Event Name="EI1" >
+      </Event>
+      <Event Name="EI2" >
+      </Event>
+      <Event Name="EI3" >
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="EO" >
+        <With Var="N" />
+      </Event>
+    </EventOutputs>
+    <OutputVars>
+      <VarDeclaration Name="N" Type="UINT" Comment="Event number (0..4)" />
+    </OutputVars>
+  </InterfaceList>
+  <BasicFB>
+    <ECC >
+      <ECState Name="START" Comment="Initial State" x="1276.4706" y="794.1176" >
+      </ECState>
+      <ECState Name="S0" x="1276.4706" y="52.9412" >
+        <ECAction Algorithm="A0" Output="EO" />
+      </ECState>
+      <ECState Name="S1" x="2158.8235" y="794.1176" >
+        <ECAction Algorithm="A1" Output="EO" />
+      </ECState>
+      <ECState Name="S2" x="1276.4706" y="1529.4117" >
+        <ECAction Algorithm="A2" Output="EO" />
+      </ECState>
+      <ECState Name="S3" x="47.0588" y="794.1176" >
+        <ECAction Algorithm="A3" Output="EO" />
+      </ECState>
+      <ECTransition Source="START" Destination="S0" Condition="EI0" x="1276.4706" y="364.7059" />
+      <ECTransition Source="START" Destination="S1" Condition="EI1" x="1794.1176" y="794.1176" />
+      <ECTransition Source="START" Destination="S2" Condition="EI2" x="1276.4706" y="1276.4706" />
+      <ECTransition Source="START" Destination="S3" Condition="EI3" x="776.4706" y="794.1176" />
+      <ECTransition Source="S0" Destination="START" Condition="1" x="1423.5294" y="376.4706" />
+      <ECTransition Source="S1" Destination="START" Condition="1" x="1623.5294" y="905.8823" />
+      <ECTransition Source="S2" Destination="START" Condition="1" x="1094.1177" y="1100" />
+      <ECTransition Source="S3" Destination="START" Condition="1" x="852.9412" y="617.6470" />
+    </ECC>
+  <Algorithm Name="A0" >
+    <ST Text="N := 0;&#10;" />
+  </Algorithm>
+  <Algorithm Name="A1" >
+    <ST Text="N := 1;&#10;" />
+  </Algorithm>
+  <Algorithm Name="A2" >
+    <ST Text="N := 2;&#10;" />
+  </Algorithm>
+  <Algorithm Name="A3" >
+    <ST Text="N := 3;&#10;" />
+  </Algorithm>
+  </BasicFB>
+</FBType>

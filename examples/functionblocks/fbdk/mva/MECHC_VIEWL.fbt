@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="MECHC_VIEWL" Comment="Linear Mechanism View with Clamping &#38; Local Data Publish/Subscribe" >
+  <Identification Standard="61499-1" Classification="View" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.2" Author="JHC" Date="2004-10-06" Remarks="Added CNV input." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2004-09-27" Remarks="Changed order of REND vars for consitency with MECH_VIEWL.." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2002-05-21" Remarks="Copied/Modified from MECH_VIEWL." />
+  <CompilerInfo header="package fb.rt.mva; import fb.rt.net.*;" classdef="public class MECHC_VIEWL extends FBMVCD" >
+    <Compiler Language="Java" Vendor="Sun" Product="JDK" Version="1.4.2" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="INIT" Comment="Initialize" >
+        <With Var="REND_ID" />
+        <With Var="UI_ID" />
+        <With Var="BKGD" />
+        <With Var="LEN" />
+        <With Var="DIA" />
+        <With Var="DIR" />
+        <With Var="CNV" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="INITO" Comment="Initialized" >
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="REND_ID" Type="WSTRING" Comment="Rendering Data Channel from Model" />
+      <VarDeclaration Name="UI_ID" Type="WSTRING" Comment="User Input Channel to Model" />
+      <VarDeclaration Name="CNV" Type="BOOL" Comment="0=Paint workpiece with clamp,1=Paint as conveyor with gate at end." />
+      <VarDeclaration Name="BKGD" Type="COLOR" InitialValue="blue" Comment="Background Color" />
+      <VarDeclaration Name="LEN" Type="UINT" Comment="Length in Diameters" />
+      <VarDeclaration Name="DIA" Type="UINT" Comment="Diameter" />
+      <VarDeclaration Name="DIR" Type="UINT" Comment="Orientation:0=L/R,1=T/B,2=R/L,3=B/T" />
+    </InputVars>
+  </InterfaceList>
+  <FBNetwork >
+    <FB Name="REND" Type="SUBL_4" x="327.77777" y="11.111111" />
+    <FB Name="VIEW" Type="MECHC_VIEW" x="772.22217" y="11.111111" />
+    <FB Name="UI" Type="PUBL_1" x="1422.2222" y="11.111111" />
+    <EventConnections>
+      <Connection Source="INIT" Destination="REND.INIT" dx1="222.22221" />
+      <Connection Source="REND.INITO" Destination="VIEW.INIT" dx1="27.777777" />
+      <Connection Source="VIEW.INITO" Destination="UI.INIT" dx1="44.444443" />
+      <Connection Source="UI.INITO" Destination="INITO" dx1="1861.1111" />
+      <Connection Source="REND.IND" Destination="VIEW.REQ" dx1="27.777777" />
+      <Connection Source="VIEW.IND" Destination="UI.REQ" dx1="94.44444" />
+    </EventConnections>
+    <DataConnections>
+      <Connection Source="REND.RD_1" Destination="VIEW.POS" dx1="27.777777" />
+      <Connection Source="VIEW.FAULT" Destination="UI.SD_1" dx1="172.22221" />
+      <Connection Source="REND_ID" Destination="REND.ID" dx1="155.55554" />
+      <Connection Source="UI_ID" Destination="UI.ID" dx1="1300.0" />
+      <Connection Source="BKGD" Destination="VIEW.BKGD" dx1="638.88885" />
+      <Connection Source="LEN" Destination="VIEW.LEN" dx1="666.6666" />
+      <Connection Source="DIA" Destination="VIEW.DIA" dx1="672.22217" />
+      <Connection Source="DIR" Destination="VIEW.DIR" dx1="672.22217" />
+      <Connection Source="REND.RD_2" Destination="VIEW.STYLE" dx1="27.777777" />
+      <Connection Source="REND.RD_3" Destination="VIEW.WKPC" dx1="27.777777" />
+      <Connection Source="REND.RD_4" Destination="VIEW.CLAMP" dx1="27.777777" />
+      <Connection Source="CNV" Destination="VIEW.CNV" dx1="661.1111" />
+    </DataConnections>
+  </FBNetwork>
+</FBType>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="SHAFT_MDL" Comment="Model for a Rotating Shaft" >
+  <Identification Standard="61499-1" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.3" Author="JHC" Date="2004-09-04" Remarks="Subclassed from E_CYCLE." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.2" Author="JHC" Date="2001-04-24" Remarks="Moved to fb.rt.process." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2000-06-21" Remarks="Uses LibraryElement.dtd" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2000-05-01" />
+  <CompilerInfo header="package fb.rt.process;" classdef="public class SHAFT_MDL extends E_CYCLE" >
+    <Compiler Language="Java" Vendor="Sun" Product="JDK" Version="1.4.2" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="START" Comment="Start Model" >
+        <With Var="DT" />
+        <With Var="V" />
+      </Event>
+      <Event Name="STOP" Comment="Stop Model" >
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="EO" Comment="Update POS" >
+        <With Var="POS" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="DT" Type="TIME" Comment="Simulation Time Increment" />
+      <VarDeclaration Name="V" Type="INT" Comment="Angular velocity, degrees per second" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="POS" Type="INT" Comment="Pump Shaft Position {-359 to +359 degrees}" />
+    </OutputVars>
+  </InterfaceList>
+</FBType>

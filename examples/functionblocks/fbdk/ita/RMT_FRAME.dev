@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE DeviceType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<DeviceType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="RMT_FRAME" Comment="Remotely Managed Window" >
+  <Identification Standard="61499 ITA" Description="Remotely Managed Window" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.2" Author="JHC" Date="2001-11-25" Remarks="Corrected BOUNDS comment." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2001-08-14" Remarks="Added BOUNDS, GRID parameters." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2001-07-26" Remarks="Replaces RMT_DEV_HMI" />
+  <CompilerInfo header="package fb.rt.ita; import fb.rt.hmi.*;" classdef="public class RMT_DEV_HMI extends FRAME_DEVICE implements RemoteDevice" >
+    <Compiler Language="Java" Vendor="IBM" Product="VisualAge" Version="3.0" />
+  </CompilerInfo>
+  <VarDeclaration Name="BOUNDS" Type="DINT" ArraySize="4" Comment="Initial[x,y,width,height]" />
+  <VarDeclaration Name="GRID" Type="DINT" ArraySize="2" Comment="Grid layout[rows,cols]" />
+  <VarDeclaration Name="MGR_ID" Type="WSTRING" InitialValue="&#34;localhost:61499&#34;" Comment="Device manager socket ID" />
+  <Resource Name="MGR" Type="RMT_RES" x="358.8235" y="41.1765" >
+  </Resource>
+  <FBNetwork >
+    <DataConnections>
+      <Connection Source="MGR_ID" Destination="MGR.MGR_ID" dx1="194.1176" />
+    </DataConnections>
+  </FBNetwork>
+</DeviceType>

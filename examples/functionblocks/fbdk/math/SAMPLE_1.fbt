@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="SAMPLE_1" Comment="Single variable sampling" >
+  <Identification Standard="61499-1" Function="Sampling" Type="Single-variable" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2002-02-15" />
+  <CompilerInfo header="package fb.rt.math;" >
+    <Compiler Language="Java" Vendor="IBM" Product="VisualAge" Version="3.0" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="REQ" Comment="Request to Sample with Monitor Lock" >
+        <With Var="IN1" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="CNF" Comment="Initial Sample or OUT1 changed" >
+        <With Var="OUT1" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="IN1" Type="ANY" Comment="Data to Sample" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="OUT1" Type="ANY" Comment="Sampled Data" />
+    </OutputVars>
+  </InterfaceList>
+  <Service RightInterface="SAMPLE_1" LeftInterface="APPLICATION" >
+    <ServiceSequence Name="initial_sample_or_data_change" >
+      <ServiceTransaction >
+        <InputPrimitive Interface="APPLICATION" Event="REQ" Parameters="IN1" />
+        <OutputPrimitive Interface="SAMPLE" Event="isDataChanged" Parameters="IN1,OUT1" />
+        <OutputPrimitive Interface="SAMPLE" Event="copyData" Parameters="IN1,OUT1" />
+        <OutputPrimitive Interface="APPLICATION" Event="CNF" Parameters="OUT1" />
+      </ServiceTransaction>
+    </ServiceSequence>
+    <ServiceSequence Name="no_data_change" >
+      <ServiceTransaction >
+        <InputPrimitive Interface="APPLICATION" Event="REQ" Parameters="IN1" />
+        <OutputPrimitive Interface="SAMPLE" Event="isDataChanged" Parameters="IN1,OUT1" />
+      </ServiceTransaction>
+    </ServiceSequence>
+  </Service>
+</FBType>

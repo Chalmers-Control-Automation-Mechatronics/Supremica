@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="E_TABLE" Comment="Generation of a finite train of events,table driven" >
+  <Identification Standard="61499-1-A.11" Classification="Event Processing" Description="Generation of a finite train of events (table driven)" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.2" Author="JHC" Date="2002-01-30" Remarks="SIFB version" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2001-04-29" Remarks="XML version" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="1998-04-10" Remarks="SRC version" />
+  <CompilerInfo header="package fb.rt.events;" >
+    <Compiler Language="Java" Vendor="IBM" Product="VisualAge" Version="3.0" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="START" >
+        <With Var="DT" />
+        <With Var="N" />
+      </Event>
+      <Event Name="STOP" Comment="Cancel" >
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="EO" Comment="N events at periods DT,starting at DT[0]after START" >
+        <With Var="CV" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="DT" Type="TIME" ArraySize="4" Comment="Periods between events" />
+      <VarDeclaration Name="N" Type="UINT" Comment="Number of events to generate" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="CV" Type="UINT" Comment="Current event index,1 to N" />
+    </OutputVars>
+  </InterfaceList>
+  <Service RightInterface="resource" LeftInterface="E_TABLE" >
+    <ServiceSequence Name="normal_operation" Comment="N=3" >
+      <ServiceTransaction >
+        <InputPrimitive Interface="E_TABLE" Event="START" Parameters="DT" />
+      </ServiceTransaction>
+      <ServiceTransaction >
+        <OutputPrimitive Interface="E_TABLE" Event="EO" Parameters="CV=0,DT[0]after START" />
+      </ServiceTransaction>
+      <ServiceTransaction >
+        <OutputPrimitive Interface="E_TABLE" Event="EO" Parameters="CV=1,DT[1]after previous EO" />
+      </ServiceTransaction>
+      <ServiceTransaction >
+        <OutputPrimitive Interface="E_TABLE" Event="EO" Parameters="CV=2,DT[2]after previous EO" />
+      </ServiceTransaction>
+    </ServiceSequence>
+    <ServiceSequence Name="no_restart" Comment="N=3" >
+      <ServiceTransaction >
+        <InputPrimitive Interface="E_TABLE" Event="START" Parameters="DT" />
+      </ServiceTransaction>
+      <ServiceTransaction >
+        <OutputPrimitive Interface="E_TABLE" Event="EO" Parameters="CV=0,DT[0]after START" />
+      </ServiceTransaction>
+      <ServiceTransaction >
+        <InputPrimitive Interface="E_TABLE" Event="START" Parameters="DT" />
+      </ServiceTransaction>
+      <ServiceTransaction >
+        <OutputPrimitive Interface="E_TABLE" Event="EO" Parameters="CV=1,DT[1]after previous EO" />
+      </ServiceTransaction>
+      <ServiceTransaction >
+        <OutputPrimitive Interface="E_TABLE" Event="EO" Parameters="CV=2,DT[2]after previous EO" />
+      </ServiceTransaction>
+    </ServiceSequence>
+    <ServiceSequence Name="cycle_canceled" >
+      <ServiceTransaction >
+        <InputPrimitive Interface="E_TABLE" Event="START" Parameters="DT" />
+      </ServiceTransaction>
+      <ServiceTransaction >
+        <OutputPrimitive Interface="E_TABLE" Event="EO" Parameters="CV=0,DT[0]after START" />
+      </ServiceTransaction>
+      <ServiceTransaction >
+        <InputPrimitive Interface="E_TABLE" Event="STOP" />
+      </ServiceTransaction>
+    </ServiceSequence>
+  </Service>
+</FBType>

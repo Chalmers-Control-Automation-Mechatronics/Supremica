@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="E_N_TABLE" Comment="Generation of a finite train of separate events,table driven" >
+  <Identification Standard="61499-1" Classification="Event processing" Function="Event train generation" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2002-01-29" Remarks="XML version" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="1998-04-10" Remarks="SRC version" />
+  <CompilerInfo header="package fb.rt.events;" >
+    <Compiler Language="Java" Vendor="IBM" Product="VisualAge" Version="3.0" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="START" >
+        <With Var="DT" />
+        <With Var="N" />
+      </Event>
+      <Event Name="STOP" >
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="EO0" Comment="N events at periods DT,starting at DT[0]after EI" >
+      </Event>
+      <Event Name="EO1" >
+      </Event>
+      <Event Name="EO2" >
+      </Event>
+      <Event Name="EO3" Comment="Maximum number of events=DT array size" >
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="DT" Type="TIME" ArraySize="4" Comment="Periods between events,maximum is implementation dependent" />
+      <VarDeclaration Name="N" Type="UINT" Comment="Number of events to generate,up to size of DT" />
+    </InputVars>
+  </InterfaceList>
+  <FBNetwork >
+    <FB Name="EVT_GEN" Type="E_TABLE" x="347.0588" y="11.7647" />
+    <FB Name="EVT_DMX" Type="E_DEMUX" x="1011.7647" y="11.7647" />
+    <EventConnections>
+      <Connection Source="START" Destination="EVT_GEN.START" dx1="194.1176" />
+      <Connection Source="STOP" Destination="EVT_GEN.STOP" dx1="211.7647" />
+      <Connection Source="EVT_GEN.EO" Destination="EVT_DMX.EI" dx1="194.1176" />
+      <Connection Source="EVT_DMX.EO0" Destination="EO0" dx1="1435.2941" />
+      <Connection Source="EVT_DMX.EO1" Destination="EO1" dx1="1435.2941" />
+      <Connection Source="EVT_DMX.EO2" Destination="EO2" dx1="1435.2941" />
+      <Connection Source="EVT_DMX.EO3" Destination="EO3" dx1="1435.2941" />
+    </EventConnections>
+    <DataConnections>
+      <Connection Source="DT" Destination="EVT_GEN.DT" dx1="258.8235" />
+      <Connection Source="N" Destination="EVT_GEN.N" dx1="276.4706" />
+      <Connection Source="EVT_GEN.CV" Destination="EVT_DMX.K" dx1="123.5294" />
+    </DataConnections>
+  </FBNetwork>
+</FBType>

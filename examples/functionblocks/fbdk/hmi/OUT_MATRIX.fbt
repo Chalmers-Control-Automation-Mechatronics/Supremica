@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="OUT_MATRIX" Comment="Tabular MATRIX output" >
+  <Identification Standard="61499-2" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2004-06-22" />
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="INIT" Comment="Initialize matrix from IVAL" >
+        <With Var="QI" />
+        <With Var="IVAL" />
+      </Event>
+      <Event Name="REQ" Comment="Write IN to OUT and display" >
+        <With Var="QI" />
+        <With Var="IN" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="INITO" Comment="Initialization Confirm" >
+        <With Var="QO" />
+        <With Var="STATUS" />
+      </Event>
+      <Event Name="CNF" Comment="Confirmation of REQ" >
+        <With Var="QO" />
+        <With Var="STATUS" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="QI" Type="BOOL" Comment="1=Enabled,0=Inhibited" />
+      <VarDeclaration Name="ROWS" Type="UINT" InitialValue="1" Comment="Initial number of rows in the table" />
+      <VarDeclaration Name="COLS" Type="UINT" InitialValue="1" Comment="Initial number of columns in the table" />
+      <VarDeclaration Name="IVAL" Type="WSTRING" Comment="Initial data values, e.g., &#34;[1,2,3,4]&#34;" />
+      <VarDeclaration Name="IN" Type="MATRIX" Comment="New value to output" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="QO" Type="BOOL" Comment="0=OK,1=Inhibited" />
+      <VarDeclaration Name="STATUS" Type="UINT" Comment="0=OK,2=TYPE_CONVERSION_ERROR,4=INHIBITED,13=ARRAY_SIZE_ERROR" />
+    </OutputVars>
+  </InterfaceList>
+</FBType>

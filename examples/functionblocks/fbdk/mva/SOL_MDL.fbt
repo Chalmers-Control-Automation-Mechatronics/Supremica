@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="SOL_MDL" Comment="Solenoid Model" >
+  <Identification Standard="61499-1" Classification="Simulation" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2004-09-23" Remarks="Simplified, derived from CNV_MDL1." />
+  <CompilerInfo header="package fb.rt.mva;" >
+    <Compiler Language="Java" Vendor="Sun" Product="JDK" Version="1.4.2" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="CLK" Comment="Simulation Clock Event" >
+        <With Var="FWD" />
+        <With Var="VF" />
+        <With Var="FAULT" />
+        <With Var="VR" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="INDR" Comment="Change in Rendering Data" >
+        <With Var="POS" />
+      </Event>
+      <Event Name="INDS" Comment="Change in Sensor Data" >
+        <With Var="HOME" />
+        <With Var="END" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="FWD" Type="BOOL" Comment="Forward motion command" />
+      <VarDeclaration Name="FAULT" Type="BOOL" Comment="Fault Condition" />
+      <VarDeclaration Name="VF" Type="UINT" InitialValue="50" Comment="Forward Speed in % per CLK event" />
+      <VarDeclaration Name="VR" Type="UINT" InitialValue="50" Comment="Retract Speed in % per CLK event" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="POS" Type="UINT" Comment="Solenoid Position in % of Conveyor Length" />
+      <VarDeclaration Name="HOME" Type="BOOL" Comment="Solenoid Fully Retracted" />
+      <VarDeclaration Name="END" Type="BOOL" Comment="Solenoid Fully Advanced" />
+    </OutputVars>
+  </InterfaceList>
+  <BasicFB>
+  <Algorithm Name="CLK" >
+    <Other Language="Java" Text="if(FAULT.value) return;&#10;if(FWD.value){&#10;   if(END.value) return;&#10;   if(HOME.value){&#10;      HOME.value = false;&#10;      INDS.serviceEvent(this);}&#10;   POS.value += VF.value;&#10;   if(POS.value >= 100){&#10;      POS.value=100;&#10;      END.value=true;&#10;      INDS.serviceEvent(this);}}&#10;else{&#10;   if (HOME.value) return;&#10;   if(END.value){&#10;      END.value = false;&#10;      INDS.serviceEvent(this);}&#10;   POS.value -= VR.value;&#10;   if(POS.value &#60;= 0){&#10;      POS.value=0;&#10;      HOME.value=true;&#10;      INDS.serviceEvent(this);}}&#10;INDR.serviceEvent(this);&#10;" />
+  </Algorithm>
+  </BasicFB>
+</FBType>

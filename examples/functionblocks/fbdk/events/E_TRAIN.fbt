@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="E_TRAIN" Comment="Generation of a finite train of events" >
+  <Identification Standard="61499-2" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.2" Author="JHC" Date="2004-04-18" Remarks="Updated documentation." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2002-01-30" Remarks="XML (SIFB) version" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="1998-09-11" Remarks="SRC (composite) version" />
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="START" >
+        <With Var="DT" />
+        <With Var="N" />
+      </Event>
+      <Event Name="STOP" >
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="EO" Comment="N events at period DT,starting at DT after START" >
+        <With Var="CV" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="DT" Type="TIME" Comment="Period between events" />
+      <VarDeclaration Name="N" Type="UINT" Comment="Number of events to generate" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="CV" Type="UINT" Comment="EO index(0 N-1)" />
+    </OutputVars>
+  </InterfaceList>
+  <Service RightInterface="resource" LeftInterface="E_TRAIN" >
+    <ServiceSequence Name="normal_operation" Comment="N=3" >
+      <ServiceTransaction >
+        <InputPrimitive Interface="E_TRAIN" Event="START" Parameters="DT" />
+      </ServiceTransaction>
+      <ServiceTransaction >
+        <OutputPrimitive Interface="E_TRAIN" Event="EO" Parameters="CV=0" />
+      </ServiceTransaction>
+      <ServiceTransaction >
+        <OutputPrimitive Interface="E_TRAIN" Event="EO" Parameters="CV=1" />
+      </ServiceTransaction>
+      <ServiceTransaction >
+        <OutputPrimitive Interface="E_TRAIN" Event="EO" Parameters="CV=2" />
+      </ServiceTransaction>
+    </ServiceSequence>
+    <ServiceSequence Name="no_restart" Comment="N=3" >
+      <ServiceTransaction >
+        <InputPrimitive Interface="E_TRAIN" Event="START" Parameters="DT" />
+      </ServiceTransaction>
+      <ServiceTransaction >
+        <OutputPrimitive Interface="E_TRAIN" Event="EO" Parameters="CV=0" />
+      </ServiceTransaction>
+      <ServiceTransaction >
+        <InputPrimitive Interface="E_TRAIN" Event="START" Parameters="DT" />
+      </ServiceTransaction>
+      <ServiceTransaction >
+        <OutputPrimitive Interface="E_TRAIN" Event="EO" Parameters="CV=1" />
+      </ServiceTransaction>
+      <ServiceTransaction >
+        <OutputPrimitive Interface="E_TRAIN" Event="EO" Parameters="CV=2" />
+      </ServiceTransaction>
+    </ServiceSequence>
+    <ServiceSequence Name="cycle_canceled" >
+      <ServiceTransaction >
+        <InputPrimitive Interface="E_TRAIN" Event="START" Parameters="DT" />
+      </ServiceTransaction>
+      <ServiceTransaction >
+        <OutputPrimitive Interface="E_TRAIN" Event="EO" Parameters="CV=0" />
+      </ServiceTransaction>
+      <ServiceTransaction >
+        <InputPrimitive Interface="E_TRAIN" Event="STOP" />
+      </ServiceTransaction>
+    </ServiceSequence>
+  </Service>
+</FBType>

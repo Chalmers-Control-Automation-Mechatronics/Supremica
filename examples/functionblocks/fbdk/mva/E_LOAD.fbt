@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="E_LOAD" Comment="Event-driven Workpiece Load Selection" >
+  <Identification Standard="61499-1" Function="GUI" Type="Selection" Description="Color selection" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2004-09-25" Remarks="Derived from E_SEL_COLOR." />
+  <CompilerInfo header="package fb.rt.mva;" >
+    <Compiler Language="Java" Vendor="Sun" Product="JDK" Version="1.4.2" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="LD1" Comment="Load Workpiece 1" >
+        <With Var="S1" />
+        <With Var="P1" />
+        <With Var="W1" />
+      </Event>
+      <Event Name="LD2" Comment="Load Workpiece 2" >
+        <With Var="S2" />
+        <With Var="P2" />
+        <With Var="W2" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="LD" Comment="Load Command" >
+        <With Var="POS" />
+        <With Var="STYLE" />
+        <With Var="WKPC" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="P1" Type="UINT" Comment="1 Load Position 1" />
+      <VarDeclaration Name="S1" Type="VSTYLE" Comment="Workpiece 1 Style" />
+      <VarDeclaration Name="W1" Type="COLOR" Comment="Workpiece 1 Color" />
+      <VarDeclaration Name="P2" Type="UINT" Comment="Load Position 2" />
+      <VarDeclaration Name="S2" Type="VSTYLE" Comment="Workpiece 2 Style" />
+      <VarDeclaration Name="W2" Type="COLOR" Comment="Workpiece 2 Color" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="POS" Type="UINT" Comment="Load Position" />
+      <VarDeclaration Name="STYLE" Type="VSTYLE" Comment="Workpiece Style" />
+      <VarDeclaration Name="WKPC" Type="COLOR" Comment="Workpiece Color" />
+    </OutputVars>
+  </InterfaceList>
+  <BasicFB>
+  <Algorithm Name="LD1" Comment="Load Workpiece 1" >
+    <ST Text="POS := P1;&#10;STYLE := S1;&#10;WKPC := W1;&#10;LD.serviceEvent(this);&#10;" />
+  </Algorithm>
+  <Algorithm Name="LD2" Comment="Load Workpiece 2" >
+    <ST Text="POS := P2;&#10;STYLE := S2;&#10;WKPC := W2;&#10;LD.serviceEvent(this);&#10;" />
+  </Algorithm>
+  </BasicFB>
+</FBType>

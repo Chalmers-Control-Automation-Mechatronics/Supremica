@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE DataType SYSTEM "../DataType.dtd" >
+<DataType xmlns="http://www.holobloc.com/xml/DataType" Name="ANALOG_16_INPUT_DATAI" Comment="IEC 61131-3-2.3.3.2" >
+<Identification Standard="61131-3"/>
+<VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2000-05-16" Remarks="File type changed to &#34;.dtp&#34;"/>
+<VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2000-04-19"/>
+<CompilerInfo  header="package fb.rt.ita;">
+</CompilerInfo>
+<ASN1Tag Class="PRIVATE" Number="15" />
+<ArrayType BaseType="ANALOG_DATA" InitialValues="[8(-4095),8(4095)]">
+  <Subrange LowerLimit="0" UpperLimit="15"/>
+</ArrayType>
+</DataType>

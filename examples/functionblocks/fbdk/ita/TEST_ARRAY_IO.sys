@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE System SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<System xmlns="http://www.holobloc.com/xml/LibraryElement" Name="TEST_ARRAY_IO" Comment="Test ARRAY_IN,ARRAY_OUT" >
+  <Identification Standard="61499-2" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2000-05-27" />
+  <Device Name="ARRAY_IO" Type="FRAME_DEVICE" x="1029.4117" y="564.7059" >
+    <Resource Name="RES1" Type="PANEL_RESOURCE" x="982.3529" y="511.7647" >
+      <FBNetwork >
+        <FB Name="IN" Type="IN_ARRAY" x="741.1765" y="11.7647" />
+        <FB Name="OUT" Type="OUT_ARRAY" x="1594.1177" y="11.7647" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="IN.INIT" dx1="511.7647" />
+          <Connection Source="START.WARM" Destination="IN.INIT" dx1="511.7647" />
+          <Connection Source="IN.INITO" Destination="OUT.INIT" dx1="511.7647" />
+          <Connection Source="IN.IND" Destination="OUT.REQ" dx1="511.7647" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="1" Destination="IN.QI" dx1="676.4706" />
+          <Connection Source="1" Destination="OUT.QI" dx1="1529.4117" />
+          <Connection Source="&#34;[1,2]&#34;" Destination="IN.IVAL" dx1="605.8823" />
+          <Connection Source="&#34;[0,0,0,0,0]&#34;" Destination="OUT.IVAL" dx1="1382.3529" />
+          <Connection Source="5" Destination="IN.N" dx1="676.4706" />
+          <Connection Source="5" Destination="OUT.N" dx1="1529.4117" />
+          <Connection Source="&#34;INT&#34;" Destination="IN.TYPE" dx1="623.5294" />
+          <Connection Source="&#34;INT&#34;" Destination="OUT.TYPE" dx1="1476.4706" />
+          <Connection Source="IN.OUT" Destination="OUT.IN" dx1="70.5882" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+  </Device>
+  <DeviceParameters>
+    <Connection Source="[100,100,200,100]" Destination="ARRAY_IO.BOUNDS" dx1="723.5294" />
+    <Connection Source="[1,1]" Destination="ARRAY_IO.GRID" dx1="917.6470" />
+  </DeviceParameters>
+</System>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="FB_DIV_INT" Comment="INT Division" >
+  <Identification Standard="61499-1-D.1" Classification="Math" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2001-08-05" Remarks="First implementation." />
+  <CompilerInfo header="package fb.rt.math;" classdef="class FB_DIV_INT extends FBFunctionQS2" >
+    <Compiler Language="Java" Vendor="IBM" Product="VisualAge" Version="3.0" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="REQ" >
+        <With Var="QI" />
+        <With Var="IN1" />
+        <With Var="IN2" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="CNF" >
+        <With Var="QO" />
+        <With Var="STATUS" />
+        <With Var="OUT" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="QI" Type="BOOL" Comment="Event Qualifier" />
+      <VarDeclaration Name="IN1" Type="INT" Comment="Dividend" />
+      <VarDeclaration Name="IN2" Type="INT" Comment="Divisor" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="QO" Type="BOOL" Comment="Output Qualifier" />
+      <VarDeclaration Name="STATUS" Type="UINT" Comment="Operation Status" />
+      <VarDeclaration Name="OUT" Type="INT" Comment="Quotient" />
+    </OutputVars>
+  </InterfaceList>
+</FBType>

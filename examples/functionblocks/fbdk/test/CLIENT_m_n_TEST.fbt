@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="CLIENT_m_n_TEST" Comment="Test CLIENT_m_n in a Composite Function Block" >
+  <Identification Standard="61499-2" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2002-12-17" />
+  <CompilerInfo header="package fb.rt.test; import fb.rt.net.*;" >
+    <Compiler Language="Java" Vendor="IBM" Product="Jikes" Version="1.06" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="INIT" >
+        <With Var="ID" />
+      </Event>
+      <Event Name="REQ" Comment="Normal Execution Request" >
+        <With Var="A" />
+        <With Var="B" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="CNF" Comment="Execution Confirmation" >
+        <With Var="C" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="ID" Type="WSTRING" />
+      <VarDeclaration Name="A" Type="BYTE" />
+      <VarDeclaration Name="B" Type="BYTE" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="C" Type="REAL" />
+    </OutputVars>
+  </InterfaceList>
+  <FBNetwork >
+    <FB Name="TEST" Type="CLIENT_2_1" x="1105.8823" y="458.8235" />
+    <EventConnections>
+      <Connection Source="INIT" Destination="TEST.INIT" dx1="1000" />
+      <Connection Source="REQ" Destination="TEST.REQ" dx1="994.1176" />
+      <Connection Source="TEST.CNF" Destination="CNF" dx1="1594.1177" />
+    </EventConnections>
+    <DataConnections>
+      <Connection Source="1" Destination="TEST.QI" dx1="1041.1764" />
+      <Connection Source="ID" Destination="TEST.ID" dx1="1029.4117" />
+      <Connection Source="A" Destination="TEST.SD_1" dx1="1041.1764" />
+      <Connection Source="B" Destination="TEST.SD_2" dx1="1041.1764" />
+      <Connection Source="TEST.RD_1" Destination="C" dx1="1552.9412" />
+    </DataConnections>
+  </FBNetwork>
+</FBType>

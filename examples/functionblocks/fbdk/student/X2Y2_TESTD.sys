@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE System SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<System xmlns="http://www.holobloc.com/xml/LibraryElement" Name="X2Y2_TESTD" Comment="Distributed System Configuration to test X2Y2" >
+  <Identification Standard="61499-1" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2003-08-11" />
+  <Application Name="APP1" Comment="Testing FB_X2Y2" >
+    <FBNetwork >
+      <FB Name="IN1" Type="IN_ANY" x="682.3529" y="47.0588" />
+      <FB Name="IN2" Type="IN_ANY" x="688.2353" y="1129.4117" />
+      <FB Name="TESTEE" Type="X2Y2" x="1441.1764" y="158.8235" />
+      <FB Name="OUT" Type="OUT_ANY" x="2023.5294" y="47.0588" />
+      <EventConnections>
+        <Connection Source="IN1.INITO" Destination="IN2.INIT" dx1="29.4118" dx2="82.3529" dy="911.7647" />
+        <Connection Source="IN2.INITO" Destination="OUT.INIT" dx1="829.4117" />
+        <Connection Source="IN1.IND" Destination="TESTEE.REQ" dx1="282.3529" />
+        <Connection Source="IN2.IND" Destination="TESTEE.REQ" dx1="194.1176" />
+        <Connection Source="TESTEE.CNF" Destination="OUT.REQ" dx1="223.5294" />
+      </EventConnections>
+      <DataConnections>
+        <Connection Source="IN1.OUT" Destination="TESTEE.X" dx1="129.4118" />
+        <Connection Source="IN2.OUT" Destination="TESTEE.Y" dx1="276.4706" />
+        <Connection Source="TESTEE.OUT" Destination="OUT.IN" dx1="170.5882" />
+        <Connection Source="&#34;REAL&#34;" Destination="IN2.TYPE" dx1="541.1765" />
+        <Connection Source="&#34;REAL&#34;" Destination="OUT.TYPE" dx1="1876.4706" />
+        <Connection Source="&#34;REAL&#34;" Destination="IN1.TYPE" dx1="535.2941" />
+        <Connection Source="1" Destination="IN1.QI" dx1="617.647" />
+        <Connection Source="1" Destination="IN2.QI" dx1="623.5294" />
+        <Connection Source="1" Destination="OUT.QI" dx1="1958.8235" />
+      </DataConnections>
+    </FBNetwork>
+  </Application>
+  <Device Name="DEV1" Type="FRAME_DEVICE" x="582.3529" y="129.4118" >
+    <Resource Name="RES1" Type="PANEL_RESOURCE" x="200" y="129.4118" >
+      <FBNetwork >
+        <FB Name="IN1" Type="IN_ANY" x="564.7059" y="11.7647" />
+        <FB Name="IN2" Type="IN_ANY" x="1270.5883" y="11.7647" />
+        <FB Name="PUBXY" Type="PUBLISH_2" x="1841.1764" y="829.4117" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="IN1.INIT" dx1="29.4118" />
+          <Connection Source="START.WARM" Destination="IN1.INIT" dx1="29.4118" />
+          <Connection Source="IN1.INITO" Destination="IN2.INIT" dx1="29.4118" dx2="82.3529" dy="911.7647" />
+          <Connection Source="IN2.INITO" Destination="PUBXY.INIT" dx1="158.8235" dx2="82.3529" dy="911.7647" />
+          <Connection Source="IN1.IND" Destination="PUBXY.REQ" dx1="70.5882" dx2="82.3529" dy="911.7647" />
+          <Connection Source="IN2.IND" Destination="PUBXY.REQ" dx1="105.8824" dx2="82.3529" dy="911.7647" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="1" Destination="IN1.QI" dx1="500" />
+          <Connection Source="1" Destination="IN2.QI" dx1="1205.8823" />
+          <Connection Source="IN1.OUT" Destination="PUBXY.SD_1" dx1="29.4118" />
+          <Connection Source="IN2.OUT" Destination="PUBXY.SD_2" dx1="35.2941" />
+          <Connection Source="1" Destination="PUBXY.QI" dx1="1776.4706" />
+          <Connection Source="&#34;225.0.0.1:1025&#34;" Destination="PUBXY.ID" dx1="1558.8235" />
+          <Connection Source="&#34;REAL&#34;" Destination="IN1.TYPE" dx1="417.6471" />
+          <Connection Source="10" Destination="IN1.IVAL" dx1="482.3529" />
+          <Connection Source="&#34;REAL&#34;" Destination="IN2.TYPE" dx1="1123.5294" />
+          <Connection Source="20" Destination="IN2.IVAL" dx1="1188.2352" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+  </Device>
+  <Device Name="DEV2" Type="FRAME_DEVICE" x="1641.1764" y="100" >
+    <Resource Name="RES2" Type="PANEL_RESOURCE" x="582.3529" y="411.7647" >
+      <FBNetwork >
+        <FB Name="SUBXY" Type="SUBSCRIBE_2" x="564.7059" y="11.7647" />
+        <FB Name="TESTEE" Type="X2Y2" x="1100" y="347.0588" />
+        <FB Name="OUT" Type="OUT_ANY" x="1676.4706" y="11.7647" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="SUBXY.INIT" dx1="29.4118" />
+          <Connection Source="START.WARM" Destination="SUBXY.INIT" dx1="41.1765" />
+          <Connection Source="SUBXY.INITO" Destination="OUT.INIT" dx1="723.5294" />
+          <Connection Source="SUBXY.IND" Destination="TESTEE.REQ" dx1="29.4118" />
+          <Connection Source="TESTEE.CNF" Destination="OUT.REQ" dx1="29.4118" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="TESTEE.OUT" Destination="OUT.IN" dx1="29.4118" />
+          <Connection Source="&#34;REAL&#34;" Destination="OUT.TYPE" dx1="1529.4117" />
+          <Connection Source="1" Destination="OUT.QI" dx1="1611.7646" />
+          <Connection Source="1" Destination="SUBXY.QI" dx1="500" />
+          <Connection Source="SUBXY.RD_1" Destination="TESTEE.X" dx1="29.4118" />
+          <Connection Source="SUBXY.RD_2" Destination="TESTEE.Y" dx1="29.4118" />
+          <Connection Source="&#34;225.0.0.1:1025&#34;" Destination="SUBXY.ID" dx1="282.3529" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+  </Device>
+  <DeviceParameters>
+    <Connection Source="[150,150,125,100]" Destination="DEV1.BOUNDS" dx1="276.4706" />
+    <Connection Source="[1,1]" Destination="DEV1.GRID" dx1="470.5882" />
+    <Connection Source="[150,250,125,75]" Destination="DEV2.BOUNDS" dx1="1352.9412" />
+    <Connection Source="[1,1]" Destination="DEV2.GRID" dx1="1529.4117" />
+  </DeviceParameters>
+  <Mapping From="APP1.IN1" To="DEV1.RES1.IN1" />
+  <Mapping From="APP1.IN2" To="DEV1.RES1.IN2" />
+  <Mapping From="APP1.TESTEE" To="DEV2.RES2.TESTEE" />
+  <Mapping From="APP1.OUT" To="DEV2.RES2.OUT" />
+</System>

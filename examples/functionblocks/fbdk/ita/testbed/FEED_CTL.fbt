@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="FEED_CTL" Comment="Ring Feed Control" >
+  <Identification Standard="61499 ITA" Classification="Testbed" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2002-05-08" />
+  <CompilerInfo header="package fb.rt.ita.testbed;" >
+    <Compiler Language="Java" Vendor="IBM" Product="Jikes" Version="1.06" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="REQ" >
+        <With Var="RING_PRESENT" />
+        <With Var="ASSEMBLY_HOPPER_FULL" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="CNF" >
+        <With Var="ROTARY_SOLENOID" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="RING_PRESENT" Type="BOOL" />
+      <VarDeclaration Name="ASSEMBLY_HOPPER_FULL" Type="BOOL" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="ROTARY_SOLENOID" Type="BOOL" />
+    </OutputVars>
+  </InterfaceList>
+  <BasicFB>
+    <ECC >
+      <ECState Name="START" x="381.25" y="181.25" >
+      </ECState>
+      <ECState Name="REQ" x="662.5" y="550" >
+        <ECAction Algorithm="REQ" Output="CNF" />
+      </ECState>
+      <ECTransition Source="START" Destination="REQ" Condition="REQ" x="662.5" y="181.25" />
+      <ECTransition Source="REQ" Destination="START" Condition="1" x="381.25" y="550" />
+    </ECC>
+  <Algorithm Name="REQ" >
+    <LD >
+      <Rung Output="ROTARY_SOLENOID" Expression="RING_PRESENT  ASSEMBLY_HOPPER_FULL ! &#38;" />
+    </LD>
+  </Algorithm>
+  </BasicFB>
+</FBType>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="SHIFT_ANY" Comment="Abstract superclass for IEC 61131-3 bit shift functions" >
+  <Identification Standard="61131-3" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2004-12-15" Remarks="Converted from SRC format." />
+  <CompilerInfo header="package fb.rt.plc.bits;" >
+  </CompilerInfo>
+  <InterfaceList>
+    <InputVars>
+      <VarDeclaration Name="IN" Type="ANY" Comment="ANY_BIT to be shifted" />
+      <VarDeclaration Name="N" Type="UINT" Comment="Shift count" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="OUT" Type="ANY" Comment="Value of IN shifted N bits" />
+    </OutputVars>
+  </InterfaceList>
+</FBType>

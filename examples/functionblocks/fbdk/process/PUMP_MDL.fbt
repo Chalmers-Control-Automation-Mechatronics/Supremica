@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "../LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="PUMP_MDL" Comment="Simple Pump Animation Model" >
+  <Identification Standard="61499-1" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.2" Author="JHC" Date="2001-04-24" Remarks="Moved to fb.rt.process." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2000-06-21" Remarks="Uses LibraryElement.dtd" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2000-05-01" />
+  <CompilerInfo header="package fb.rt.process;" >
+    <Compiler Language="Java" Vendor="IBM" Product="VisualAge" Version="3.0" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="INIT" Comment="Initialization Request" >
+        <With Var="QI" />
+      </Event>
+      <Event Name="REQ" Comment="Simulation Increment" >
+        <With Var="QI" />
+        <With Var="FS" />
+        <With Var="V" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="INITO" Comment="Initialization Confirm" >
+        <With Var="QO" />
+        <With Var="ANGLE" />
+      </Event>
+      <Event Name="CNF" Comment="Increment Confirmation" >
+        <With Var="QO" />
+        <With Var="ANGLE" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="QI" Type="BOOL" Comment="Input event qualifier" />
+      <VarDeclaration Name="FS" Type="INT" Comment="Full-scale speed,degrees per increment" />
+      <VarDeclaration Name="V" Type="INT" Comment="Angular velocity,percent of FS" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="QO" Type="BOOL" Comment="Output event qualifier" />
+      <VarDeclaration Name="ANGLE" Type="INT" Comment="Pump Shaft Angle" />
+    </OutputVars>
+  </InterfaceList>
+  <BasicFB>
+    <ECC >
+      <ECState Name="START" Comment="Initial State" x="476.4706" y="411.7647" >
+      </ECState>
+      <ECState Name="INIT" Comment="Initialization" x="194.1176" y="82.3529" >
+        <ECAction Algorithm="INIT" Output="INITO" />
+      </ECState>
+      <ECState Name="REQ" Comment="Normal execution" x="764.7059" y="705.8823" >
+        <ECAction Algorithm="REQ" Output="CNF" />
+      </ECState>
+      <ECTransition Source="START" Destination="INIT" Condition="INIT" x="194.1176" y="411.7647" />
+      <ECTransition Source="INIT" Destination="START" Condition="1" x="476.4706" y="223.5294" />
+      <ECTransition Source="START" Destination="REQ" Condition="REQ" x="764.7059" y="411.7647" />
+      <ECTransition Source="REQ" Destination="START" Condition="1" x="476.4706" y="705.8823" />
+    </ECC>
+  <Algorithm Name="INIT" >
+    <ST Text="QO:=QI;&#10;&#10; ANGLE:=0;&#10;" />
+  </Algorithm>
+  <Algorithm Name="REQ" >
+    <ST Text="QO:=QI;&#10;&#10; IF QI THEN&#10;&#10; ANGLE:=(ANGLE+FS*V/100)MOD 360;&#10;&#10; END_IF&#10;" />
+  </Algorithm>
+  </BasicFB>
+</FBType>

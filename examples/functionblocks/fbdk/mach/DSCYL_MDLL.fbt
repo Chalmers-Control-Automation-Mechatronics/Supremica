@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="DSCYL_MDLL" Comment="Model for a Double-Stroke Cylinder, Externally Clocked" >
+  <Identification Standard="61499-1" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2004-10-20" Remarks="Added UNLD, REND_ID, LOAD_ID, LOAD_SUB, LOADER." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2004-09-25" Remarks="Extended from DSCYL_MDL1." />
+  <CompilerInfo header="package fb.rt.mach; import fb.rt.net.*; import fb.rt.mva.*;" classdef="public class DSCYL_MDLL extends FBMVCD" >
+    <Compiler Language="Java" Vendor="Sun" Product="JDK" Version="1.4.2" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="INIT" Comment="Initialize" >
+        <With Var="ACT_ID" />
+        <With Var="CLK_ID" />
+        <With Var="UI_ID" />
+        <With Var="SENSE_ID" />
+        <With Var="VF1" />
+        <With Var="VF2" />
+        <With Var="VR" />
+        <With Var="ETA" />
+        <With Var="LOAD_ID" />
+        <With Var="REND_ID" />
+      </Event>
+      <Event Name="UNLD" >
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="INITO" >
+        <With Var="POS" />
+        <With Var="HOME" />
+        <With Var="MID" />
+        <With Var="END" />
+      </Event>
+      <Event Name="INDP" Comment="Position Change Indication" >
+        <With Var="POS" />
+      </Event>
+      <Event Name="INDS" Comment="Sensor Change Indication" >
+        <With Var="HOME" />
+        <With Var="MID" />
+        <With Var="END" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="CLK_ID" Type="WSTRING" InitialValue="&#34;SIM_CLK&#34;" Comment="Simulation clock channel ID" />
+      <VarDeclaration Name="UI_ID" Type="WSTRING" Comment="User input channel ID from View" />
+      <VarDeclaration Name="REND_ID" Type="WSTRING" Comment="Local Channel ID for Rendering Data" />
+      <VarDeclaration Name="SENSE_ID" Type="WSTRING" Comment="Sensor data channel ID to Controller" />
+      <VarDeclaration Name="ACT_ID" Type="WSTRING" Comment="Actuator data channel ID from Controller" />
+      <VarDeclaration Name="LOAD_ID" Type="WSTRING" Comment="Loader data channel ID for WKPC+STYLE" />
+      <VarDeclaration Name="VF1" Type="UINT" Comment="Cyl#1 ADVANCE speed in %FS per CLK event" />
+      <VarDeclaration Name="VF2" Type="UINT" Comment="Cyl#2 ADVANCE speed in %FS per CLK event" />
+      <VarDeclaration Name="VR" Type="UINT" Comment="RETRACT speed in %FS per CLK event" />
+      <VarDeclaration Name="ETA" Type="REAL" InitialValue="0.5" Comment="Length ratio:Cyl#1/(Cyl#1+Cyl#2)" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="POS" Type="UINT" Comment="End effector position" />
+      <VarDeclaration Name="HOME" Type="BOOL" Comment="Both cylinders HOME" />
+      <VarDeclaration Name="MID" Type="BOOL" Comment="CYL1 at END,CYL2 HOME" />
+      <VarDeclaration Name="END" Type="BOOL" Comment="Both cylinders at END" />
+    </OutputVars>
+  </InterfaceList>
+  <FBNetwork >
+    <FB Name="DSCYL" Type="DSCYL_MDL" x="1011.1111" y="122.22221" />
+    <FB Name="CLK" Type="SUBL_0" x="288.8889" y="11.111111" />
+    <FB Name="UI" Type="SUBL_1" x="294.44443" y="727.7778" />
+    <FB Name="SENSE" Type="PUBL_3" x="2016.6666" y="127.77777" />
+    <FB Name="ACT" Type="SUBL_3" x="288.8889" y="1455.5555" />
+    <FB Name="LOADER" Type="E_LDU" x="1694.4443" y="1783.3333" />
+    <FB Name="LOAD_SUB" Type="SUBL_3" x="1150.0" y="1672.2222" />
+    <FB Name="RENDER" Type="PUBL_3" x="2494.4443" y="955.55554" />
+    <EventConnections>
+      <Connection Source="INIT" Destination="CLK.INIT" dx1="183.33333" />
+      <Connection Source="CLK.IND" Destination="DSCYL.CLK" dx1="94.44444" />
+      <Connection Source="CLK.INITO" Destination="UI.INIT" dx1="27.777777" dx2="50.0" dy="544.4444" />
+      <Connection Source="DSCYL.INDS" Destination="SENSE.REQ" dx1="100.0" />
+      <Connection Source="UI.INITO" Destination="ACT.INIT" dx1="27.777777" dx2="33.333332" dy="566.6666" />
+      <Connection Source="DSCYL.INDP" Destination="INDP" dx1="1494.4443" />
+      <Connection Source="DSCYL.INDS" Destination="INDS" dx1="1494.4443" />
+      <Connection Source="ACT.INITO" Destination="LOAD_SUB.INIT" dx1="261.1111" />
+      <Connection Source="LOAD_SUB.INITO" Destination="SENSE.INIT" dx1="277.77777" />
+      <Connection Source="LOAD_SUB.IND" Destination="LOADER.LD1" dx1="27.777777" />
+      <Connection Source="LOADER.LD" Destination="RENDER.REQ" dx1="27.777777" />
+      <Connection Source="SENSE.INITO" Destination="RENDER.INIT" dx1="77.77777" />
+      <Connection Source="RENDER.INITO" Destination="INITO" dx1="2933.3333" />
+      <Connection Source="UNLD" Destination="LOADER.UNLD" dx1="1566.6666" />
+      <Connection Source="DSCYL.INDP" Destination="RENDER.REQ" dx1="283.3333" />
+    </EventConnections>
+    <DataConnections>
+      <Connection Source="UI.RD_1" Destination="DSCYL.FAULT" dx1="94.44444" />
+      <Connection Source="VF1" Destination="DSCYL.VF1" dx1="905.55554" />
+      <Connection Source="VF2" Destination="DSCYL.VF2" dx1="905.55554" />
+      <Connection Source="VR" Destination="DSCYL.VR" dx1="922.22217" />
+      <Connection Source="ETA" Destination="DSCYL.ETA" dx1="899.99994" />
+      <Connection Source="DSCYL.HOME" Destination="SENSE.SD_1" dx1="233.33333" />
+      <Connection Source="DSCYL.MID" Destination="SENSE.SD_2" dx1="205.55554" />
+      <Connection Source="DSCYL.END" Destination="SENSE.SD_3" dx1="177.77777" />
+      <Connection Source="DSCYL.HOME" Destination="HOME" dx1="1511.1111" />
+      <Connection Source="DSCYL.MID" Destination="MID" dx1="1477.7777" />
+      <Connection Source="DSCYL.END" Destination="END" dx1="1483.3333" />
+      <Connection Source="ACT.RD_1" Destination="DSCYL.ADV1" dx1="127.77777" />
+      <Connection Source="ACT.RD_2" Destination="DSCYL.ADV2" dx1="161.1111" />
+      <Connection Source="ACT.RD_3" Destination="DSCYL.RET" dx1="200.0" />
+      <Connection Source="SENSE_ID" Destination="SENSE.ID" dx1="1827.7777" />
+      <Connection Source="CLK_ID" Destination="CLK.ID" dx1="138.88889" />
+      <Connection Source="UI_ID" Destination="UI.ID" dx1="172.22221" />
+      <Connection Source="ACT_ID" Destination="ACT.ID" dx1="138.88889" />
+      <Connection Source="LOAD_ID" Destination="LOAD_SUB.ID" dx1="977.7777" />
+      <Connection Source="REND_ID" Destination="RENDER.ID" dx1="2322.2222" />
+      <Connection Source="DSCYL.POS" Destination="RENDER.SD_1" dx1="255.55554" />
+      <Connection Source="LOADER.STYLE" Destination="RENDER.SD_2" dx1="55.555553" />
+      <Connection Source="LOADER.WKPC" Destination="RENDER.SD_3" dx1="100.0" />
+      <Connection Source="VSTYLE#EMPTY" Destination="LOADER.S0" dx1="1411.1111" />
+      <Connection Source="DSCYL.POS" Destination="POS" dx1="1488.8888" />
+      <Connection Source="LOAD_SUB.RD_2" Destination="LOADER.S1" dx1="27.777777" />
+      <Connection Source="LOAD_SUB.RD_3" Destination="LOADER.W1" dx1="27.777777" />
+    </DataConnections>
+  </FBNetwork>
+</FBType>

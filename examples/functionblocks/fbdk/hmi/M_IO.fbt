@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="M_IO" Comment="Tabular MATRIX I/O" >
+  <Identification Standard="61499-1" Classification="HMI" Function="MATRIX I/O" Type="Tabular Input" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2002-03-07" />
+  <CompilerInfo header="package fb.rt.hmi;" >
+    <Compiler Language="Java" Vendor="IBM" Product="VisualAge" Version="3.0" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="INIT" Comment="Initialize matrix to IN" >
+        <With Var="QI" />
+        <With Var="UE" />
+        <With Var="W" />
+        <With Var="IN" />
+      </Event>
+      <Event Name="REQ" Comment="Set value to IN" >
+        <With Var="QI" />
+        <With Var="IN" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="INITO" Comment="Initialization Confirm" >
+        <With Var="QO" />
+        <With Var="STATUS" />
+        <With Var="OUT" />
+      </Event>
+      <Event Name="CNF" Comment="Confirmation of REQ" >
+        <With Var="QO" />
+        <With Var="STATUS" />
+        <With Var="OUT" />
+      </Event>
+      <Event Name="IND" Comment="User entered data" >
+        <With Var="QO" />
+        <With Var="STATUS" />
+        <With Var="OUT" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="QI" Type="BOOL" Comment="1=Enabled,0=Inhibited" />
+      <VarDeclaration Name="UE" Type="BOOL" Comment="1=Table is User Editable" />
+      <VarDeclaration Name="W" Type="UINT" InitialValue="10" Comment="Width of each field in chars" />
+      <VarDeclaration Name="IN" Type="MATRIX" Comment="Matrix of values to display" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="QO" Type="BOOL" Comment="0=OK,1=Inhibited" />
+      <VarDeclaration Name="STATUS" Type="UINT" Comment="0=OK,2=TYPE_CONVERSION_ERROR,4=INHIBITED,13=ARRAY_SIZE_ERROR" />
+      <VarDeclaration Name="OUT" Type="MATRIX" Comment="IN value,Possibly User Edited" />
+    </OutputVars>
+  </InterfaceList>
+</FBType>

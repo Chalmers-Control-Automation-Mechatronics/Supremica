@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="TANK_MDL" Comment="Tank Fill/Drain Model" >
+  <Identification Standard="61499-1" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.5" Author="JHC" Date="2004-09-04" Remarks="Made FEED, LEVEL REAL." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.4" Author="JHC" Date="2004-09-02" Remarks="Subclassed from E_CYCLE." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.3" Author="JHC" Date="2001-04-23" Remarks="Moved to fb.rt.process." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.2" Author="JHC" Date="2000-08-29" Remarks="Removed redundant &#34;\n&#34;" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2000-06-21" Remarks="Uses LibraryElement.dtd" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2000-04-28" />
+  <CompilerInfo header="package fb.rt.process;" classdef="public class TANK_MDL extends E_CYCLE" >
+    <Compiler Language="Java" Vendor="IBM" Product="VisualAge" Version="3.0" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="START" Comment="Start model" >
+        <With Var="TF" />
+        <With Var="DT" />
+      </Event>
+      <Event Name="STOP" Comment="Stop model" >
+        <With Var="FEED" />
+        <With Var="DRAW" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="EO" Comment="Level update" >
+        <With Var="LEVEL" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="DT" Type="TIME" InitialValue="t#250ms" Comment="Simulation time interval" />
+      <VarDeclaration Name="TF" Type="TIME" InitialValue="t#30s" Comment="Filling time at(FEED-DRAW)=100" />
+      <VarDeclaration Name="FEED" Type="REAL" InitialValue="0" Comment="Liquid Feed Rate, 0-100%FS" />
+      <VarDeclaration Name="DRAW" Type="UINT" InitialValue="0" Comment="Liquid Drain Rate, 0-100%FS" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="LEVEL" Type="REAL" InitialValue="0" Comment="Liquid Level, 0-100%FS" />
+    </OutputVars>
+  </InterfaceList>
+</FBType>

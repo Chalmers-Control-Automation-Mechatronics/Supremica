@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "../LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="DM_KRMT" Comment="Remote Device Management Kernel" >
+  <Identification Standard="61499 Demo ITA" Function="Device Management" Description="Remote Device Management Kernel" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2001-01-21" Remarks="Modified per new DM_CLT service spec" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2000-12-31" Remarks="Initial version" />
+  <CompilerInfo header="package fb.rt; import fb.rt.net.*;" >
+    <Compiler Language="Java" Vendor="IBM" Product="VisualAge" Version="3.0" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventOutputs>
+      <Event Name="INITO" Comment="Initialize/Terminate Confirmation" >
+        <With Var="QO" />
+        <With Var="STATUS" />
+      </Event>
+      <Event Name="IND" Comment="Message Arrival" >
+        <With Var="QO" />
+        <With Var="STATUS" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="ID" Type="WSTRING" InitialValue="&#34;localhost:61499&#34;" Comment="Server ID" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="QO" Type="BOOL" Comment="1=Initiated,0=Terminated" />
+      <VarDeclaration Name="STATUS" Type="WSTRING" Comment="&#34;OK&#34;or Reason for Termination" />
+    </OutputVars>
+  </InterfaceList>
+  <FBNetwork >
+    <FB Name="CLT" Type="CLIENT_2_1" x="1052.9412" y="11.7647" />
+    <FB Name="MGR" Type="DM_CLT" x="323.5294" y="11.7647" />
+    <EventConnections>
+      <Connection Source="MGR.INITO" Destination="CLT.INIT" dx1="70.5882" />
+      <Connection Source="MGR.IND" Destination="CLT.REQ" dx1="47.0588" />
+      <Connection Source="CLT.INITO" Destination="INITO" dx1="1564.7058" />
+      <Connection Source="CLT.CNF" Destination="MGR.RSP" dx1="352.9412" dx2="200" dy="988.2353" />
+      <Connection Source="CLT.CNF" Destination="IND" dx1="1529.4117" dx2="100" dy="270.5882" />
+    </EventConnections>
+    <DataConnections>
+      <Connection Source="MGR.QO" Destination="CLT.QI" dx1="82.3529" dx2="170.5882" dy="723.5294" />
+      <Connection Source="CLT.QO" Destination="MGR.QI" dx1="311.7647" dx2="152.9412" dy="600" />
+      <Connection Source="CLT.QO" Destination="QO" dx1="1529.4117" />
+      <Connection Source="ID" Destination="CLT.ID" dx1="976.4706" />
+      <Connection Source="MGR.DST" Destination="CLT.SD_1" dx1="94.1176" dx2="94.1176" dy="458.8235" />
+      <Connection Source="MGR.RQST" Destination="CLT.SD_2" dx1="41.1765" dx2="64.7059" dy="247.0588" />
+      <Connection Source="CLT.RD_1" Destination="MGR.RESP" dx1="82.3529" dx2="82.3529" dy="252.9412" />
+      <Connection Source="CLT.STATUS" Destination="MGR.STATUS" dx1="164.7059" dx2="111.7647" dy="429.4117" />
+      <Connection Source="CLT.STATUS" Destination="STATUS" dx1="1605.8823" />
+    </DataConnections>
+  </FBNetwork>
+</FBType>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="EQ" Comment="IEC 61131-3,Table 28#7" >
+  <Identification Standard="IEC 61131-3" Classification="Comparison" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2001-10-05" Remarks="Copied/modified to use ANY.equals()." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="1998-12-22" Remarks="EQ_BOOL.src version" />
+  <CompilerInfo header="package fb.rt.plc.comp;import fb.rt.plc.*;" classdef="class EQ extends FBR1131Function2" >
+    <Compiler Language="Java" Vendor="IBM" Product="VisualAge" Version="3.0" />
+  </CompilerInfo>
+  <InterfaceList>
+    <InputVars>
+      <VarDeclaration Name="IN1" Type="ANY" />
+      <VarDeclaration Name="IN2" Type="ANY" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="OUT" Type="BOOL" />
+    </OutputVars>
+  </InterfaceList>
+</FBType>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="SOL_VIEWL" Comment="Solenoid View with Local Data Publish/Subscribe" >
+  <Identification Standard="61499-1" Classification="View" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2004-09-23" Remarks="Adapted from MECH_VIEWL." />
+  <CompilerInfo header="package fb.rt.mva; import fb.rt.net.*;" classdef="public class SOL_VIEWL extends FBMVCD" >
+    <Compiler Language="Java" Vendor="Sun" Product="JDK" Version="1.4.2" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="INIT" Comment="Initialize" >
+        <With Var="REND_ID" />
+        <With Var="UI_ID" />
+        <With Var="LEN" />
+        <With Var="DIA" />
+        <With Var="DIR" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="INITO" Comment="Initialized" >
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="REND_ID" Type="WSTRING" Comment="Rendering Data Channel from Model" />
+      <VarDeclaration Name="UI_ID" Type="WSTRING" Comment="User Input Channel to Model" />
+      <VarDeclaration Name="LEN" Type="UINT" Comment="Length in Diameters" />
+      <VarDeclaration Name="DIA" Type="UINT" Comment="Diameter" />
+      <VarDeclaration Name="DIR" Type="UINT" Comment="Orientation:0=L/R,1=T/B,2=R/L,3=B/T" />
+    </InputVars>
+  </InterfaceList>
+  <FBNetwork >
+    <FB Name="REND" Type="SUBL_1" x="322.2222" y="11.111111" />
+    <FB Name="VIEW" Type="MECH_VIEW" x="705.55554" y="11.111111" />
+    <FB Name="UI" Type="PUBL_1" x="1311.1111" y="11.111111" />
+    <EventConnections>
+      <Connection Source="INIT" Destination="REND.INIT" dx1="216.66666" />
+      <Connection Source="REND.INITO" Destination="VIEW.INIT" dx1="61.111107" />
+      <Connection Source="VIEW.INITO" Destination="UI.INIT" dx1="44.444443" />
+      <Connection Source="UI.INITO" Destination="INITO" dx1="1749.9999" />
+      <Connection Source="REND.IND" Destination="VIEW.REQ" dx1="27.777777" />
+      <Connection Source="VIEW.IND" Destination="UI.REQ" dx1="27.777777" />
+    </EventConnections>
+    <DataConnections>
+      <Connection Source="REND.RD_1" Destination="VIEW.POS" dx1="27.777777" />
+      <Connection Source="VIEW.FAULT" Destination="UI.SD_1" dx1="172.22221" />
+      <Connection Source="REND_ID" Destination="REND.ID" dx1="150.0" />
+      <Connection Source="UI_ID" Destination="UI.ID" dx1="1188.8888" />
+      <Connection Source="LEN" Destination="VIEW.LEN" dx1="600.0" />
+      <Connection Source="DIA" Destination="VIEW.DIA" dx1="605.55554" />
+      <Connection Source="DIR" Destination="VIEW.DIR" dx1="605.55554" />
+      <Connection Source="VSTYLE#SOLENOID" Destination="VIEW.STYLE" dx1="377.77777" />
+      <Connection Source="COLOR#lightGray" Destination="VIEW.WKPC" dx1="422.2222" />
+      <Connection Source="COLOR#darkGray" Destination="VIEW.BKGD" dx1="422.2222" />
+    </DataConnections>
+  </FBNetwork>
+</FBType>

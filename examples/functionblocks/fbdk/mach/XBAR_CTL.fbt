@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="XBAR_CTL" Comment="Transfer Bar Control" >
+  <Identification Standard="61499-1" Classification="Simulation" ApplicationDomain="Material Handling" Function="Control" Type="Transfer Bar" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2002-05-20" />
+  <CompilerInfo header="package fb.rt.mach;" >
+    <Compiler Language="Java" Vendor="IBM" Product="Jikes" Version="1.06" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="REQ" >
+        <With Var="HOME" />
+        <With Var="END" />
+        <With Var="PRESENT" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="CNF" >
+        <With Var="FWD" />
+        <With Var="REV" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="HOME" Type="BOOL" Comment="Bar at HOME position" />
+      <VarDeclaration Name="END" Type="BOOL" Comment="Bar at END position" />
+      <VarDeclaration Name="PRESENT" Type="BOOL" Comment="Workpiece Present" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="FWD" Type="BOOL" Comment="Drive Forward" />
+      <VarDeclaration Name="REV" Type="BOOL" Comment="Drive Backward" />
+    </OutputVars>
+  </InterfaceList>
+  <BasicFB>
+    <ECC >
+      <ECState Name="START" x="229.4118" y="111.7647" >
+      </ECState>
+      <ECState Name="REQ" x="588.2353" y="552.9412" >
+        <ECAction Algorithm="REQ" Output="CNF" />
+      </ECState>
+      <ECTransition Source="START" Destination="REQ" Condition="REQ" x="588.2353" y="111.7647" />
+      <ECTransition Source="REQ" Destination="START" Condition="1" x="229.4118" y="552.9412" />
+    </ECC>
+  <Algorithm Name="REQ" >
+    <LD >
+      <Rung Output="FWD" Expression="END ! PRESENT &#38; " />
+      <Rung Output="REV" Expression="HOME ! PRESENT ! &#38; " />
+    </LD>
+  </Algorithm>
+  </BasicFB>
+</FBType>

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="Proxy" Comment="Proxy Function Block Type" >
+  <Identification Standard="61499-1" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2003-12-05" Remarks="Renamed from NEWPROXY." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2003-02-05" Remarks="Copied/Modified from IB4 example." />
+  <CompilerInfo header="package fb.rt.template;" classdef="public class NEWPROXY extends FBDNProxy" >
+    <Compiler Language="Java" Vendor="IBM" Product="Jikes" Version="1.06" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="INIT" Comment="Service Initialization" >
+        <With Var="QI" />
+        <With Var="ID" />
+        <With Var="PARAMS" />
+      </Event>
+      <Event Name="REQ" Comment="Data Write/Read Request" >
+        <With Var="QI" />
+        <With Var="OUT0" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="INITO" Comment="Initialization Confirm" >
+        <With Var="QO" />
+        <With Var="STATUS" />
+      </Event>
+      <Event Name="CNF" Comment="Data Arrives" >
+        <With Var="QO" />
+        <With Var="STATUS" />
+        <With Var="IN0" />
+      </Event>
+      <Event Name="IND" Comment="Data Changed" >
+        <With Var="QO" />
+        <With Var="STATUS" />
+        <With Var="IN0" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="QI" Type="BOOL" Comment="Event Input Qualifier" />
+      <VarDeclaration Name="ID" Type="WSTRING" Comment="DNet Address" />
+      <VarDeclaration Name="PARAMS" Type="WSTRING" Comment="Service Parameters" />
+      <VarDeclaration Name="OUT0" Type="BOOL" Comment="Output to device" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="QO" Type="BOOL" Comment="Event Output Qualifier" />
+      <VarDeclaration Name="STATUS" Type="WSTRING" Comment="Service Status" />
+      <VarDeclaration Name="IN0" Type="BOOL" Comment="Input from Device" />
+    </OutputVars>
+  </InterfaceList>
+  <Service RightInterface="resource" LeftInterface="APPLICATION" >
+    <ServiceSequence Name="normal_establishment" >
+      <ServiceTransaction >
+        <InputPrimitive Interface="APPLICATION" Event="INIT+" Parameters="ID,PARAMS" />
+        <OutputPrimitive Interface="resource" Event="initialize" Parameters="ID,PARAMS" />
+        <OutputPrimitive Interface="APPLICATION" Event="INITO+" />
+      </ServiceTransaction>
+    </ServiceSequence>
+    <ServiceSequence Name="unsuccessful_establishment" >
+      <ServiceTransaction >
+        <InputPrimitive Interface="APPLICATION" Event="INIT+" Parameters="ID,PARAMS" />
+        <OutputPrimitive Interface="resource" Event="initialize" Parameters="ID,PARAMS" />
+        <OutputPrimitive Interface="APPLICATION" Event="INITO-" Parameters="STATUS" />
+      </ServiceTransaction>
+    </ServiceSequence>
+    <ServiceSequence Name="io_no_input_change" >
+      <ServiceTransaction >
+        <InputPrimitive Interface="APPLICATION" Event="REQ+" Parameters="OUT0" />
+        <OutputPrimitive Interface="resource" Event="request" Parameters="OUT0" />
+        <OutputPrimitive Interface="APPLICATION" Event="CNF+" Parameters="IN0" />
+      </ServiceTransaction>
+    </ServiceSequence>
+    <ServiceSequence Name="read_data_changed" >
+      <ServiceTransaction >
+        <InputPrimitive Interface="APPLICATION" Event="REQ+" Parameters="OUT0" />
+        <OutputPrimitive Interface="resource" Event="request" Parameters="OUT0" />
+        <OutputPrimitive Interface="APPLICATION" Event="CNF+" Parameters="IN0,IN1,IN2,IN3" />
+        <OutputPrimitive Interface="APPLICATION" Event="IND+" Parameters="IN0,IN1,IN2,IN3" />
+      </ServiceTransaction>
+    </ServiceSequence>
+    <ServiceSequence Name="request_inhibited" >
+      <ServiceTransaction >
+        <InputPrimitive Interface="APPLICATION" Event="REQ-" />
+        <OutputPrimitive Interface="APPLICATION" Event="CNF-" Parameters="STATUS" />
+      </ServiceTransaction>
+    </ServiceSequence>
+    <ServiceSequence Name="request_error" >
+      <ServiceTransaction >
+        <InputPrimitive Interface="APPLICATION" Event="REQ+" Parameters="OUT0" />
+        <OutputPrimitive Interface="resource" Event="request" Parameters="OUT0" />
+        <OutputPrimitive Interface="APPLICATION" Event="CNF-" Parameters="STATUS" />
+      </ServiceTransaction>
+    </ServiceSequence>
+    <ServiceSequence Name="error_notification" >
+      <ServiceTransaction >
+        <InputPrimitive Interface="resource" Event="error" />
+        <OutputPrimitive Interface="APPLICATION" Event="CNF-" Parameters="STATUS" />
+      </ServiceTransaction>
+    </ServiceSequence>
+    <ServiceSequence Name="application_initiated_termination" >
+      <ServiceTransaction >
+        <InputPrimitive Interface="APPLICATION" Event="INIT-" />
+        <OutputPrimitive Interface="resource" Event="terminate" />
+        <OutputPrimitive Interface="APPLICATION" Event="INITO-" Parameters="STATUS" />
+      </ServiceTransaction>
+    </ServiceSequence>
+    <ServiceSequence Name="resource_initiated_termination" >
+      <ServiceTransaction >
+        <InputPrimitive Interface="resource" Event="terminated" />
+        <OutputPrimitive Interface="APPLICATION" Event="INITO-" Parameters="STATUS" />
+      </ServiceTransaction>
+    </ServiceSequence>
+  </Service>
+</FBType>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE System SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<System xmlns="http://www.holobloc.com/xml/LibraryElement" Name="LIFTER_VIEWL" Comment="Lifter with Feed &#38; Takeoff Conveyors" >
+  <Identification Standard="61499-1" Classification="Simulation" ApplicationDomain="Assembly" Type="Dual Stroke Cylinder" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2004-12-19" Remarks="Adjusted frame heights for WinXP." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2004-06-10" Remarks="Adapted from DRILL_VIEWL" />
+  <Device Name="HMI" Type="FRAME_DEVICE" x="605.55554" y="11.111111" >
+    <Parameter Name="BOUNDS" Value="[100,100,350,205]" />
+    <Parameter Name="GRID" Value="[1,1]" />
+    <Resource Name="RES1" Type="PANEL_RESOURCE" x="122.22221" y="11.111111" >
+      <FBNetwork >
+        <FB Name="TAKEOFF" Type="MECH_HMIL" x="1344.4443" y="794.4444" >
+          <Parameter Name="FGD" Value="[0,255,0]" />
+        </FB>
+        <FB Name="FEED" Type="MECHC_HMIL" x="433.3333" y="127.77777" >
+          <Parameter Name="FGD" Value="[0,255,0]" />
+        </FB>
+        <FB Name="LIFTER" Type="MECH_HMIL" x="916.6666" y="550.0" >
+          <Parameter Name="FGD" Value="[0,255,0]" />
+        </FB>
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="FEED.INIT" dx1="27.777777" />
+          <Connection Source="LIFTER.INITO" Destination="TAKEOFF.INIT" dx1="27.777777" />
+          <Connection Source="FEED.INITO" Destination="LIFTER.INIT" dx1="38.888885" />
+        </EventConnections>
+      </FBNetwork>
+    </Resource>
+  </Device>
+  <Device Name="VIEW" Type="FRAME_DEVICE" x="1155.5555" y="294.44443" >
+    <Parameter Name="BOUNDS" Value="[450,100,160,205]" />
+    <Resource Name="LIFTER" Type="VIEW_PANEL" x="883.3333" y="11.111111" >
+      <Parameter Name="TRACE" Value="0" />
+      <Parameter Name="DIA" Value="30" />
+      <Parameter Name="SIZE" Value="[5,5]" />
+      <Parameter Name="VERTICAL" Value="1" />
+      <FBNetwork >
+        <FB Name="LIFTER" Type="MECH_VIEWL" x="477.77777" y="11.111111" >
+          <Parameter Name="LEN" Value="5" />
+          <Parameter Name="DIR" Value="3" />
+          <Parameter Name="BKGD" Value="COLOR#blue" />
+        </FB>
+        <FB Name="FEED" Type="MECHC_VIEWL" Comment="Feed Conveyor" x="2350.0" y="11.111111" >
+          <Parameter Name="BKGD" Value="COLOR#blue" />
+          <Parameter Name="LEN" Value="4" />
+          <Parameter Name="DIR" Value="2" />
+          <Parameter Name="CNV" Value="1" />
+        </FB>
+        <FB Name="SP2" Type="XSPACE" x="1766.6666" y="888.88885" >
+          <Parameter Name="LBLS" Value="[&#34; LIFTER&#34;,&#34;TAKEOFF==>&#34;,&#34;&#34;,&#34;&#60;==FEED&#34;]" />
+          <Parameter Name="DIMS" Value="[4,3]" />
+        </FB>
+        <FB Name="TAKEOFF" Type="MECH_VIEWL" Comment="Takeoff Conveyor" x="1311.1111" y="11.111111" >
+          <Parameter Name="LEN" Value="4" />
+          <Parameter Name="BKGD" Value="COLOR#blue" />
+        </FB>
+        <EventConnections>
+          <Connection Source="TAKEOFF.INITO" Destination="SP2.INIT" dx1="27.777777" />
+          <Connection Source="SP2.INITO" Destination="FEED.INIT" dx1="27.777777" />
+          <Connection Source="START.COLD" Destination="LIFTER.INIT" dx1="27.777777" />
+          <Connection Source="LIFTER.INITO" Destination="TAKEOFF.INIT" dx1="27.777777" />
+        </EventConnections>
+      </FBNetwork>
+    </Resource>
+  </Device>
+</System>

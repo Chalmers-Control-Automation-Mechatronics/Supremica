@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="WKPC_EMIT" Comment="Periodic Workpiece Emitter" >
+  <Identification Standard="61499-1" Classification="Simulation" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.2" Author="JHC" Date="2004-09-16" Remarks="Generalized from PR_EMIT." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2004-08-06" Remarks="Changed PPEG to UINT." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2002-04-11" />
+  <CompilerInfo header="package fb.rt.mva;" >
+    <Compiler Language="Java" Vendor="Sun" Product="JDK" Version="1.4.2" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="START" Comment="Start Periodic Emission" >
+        <With Var="DT" />
+        <With Var="WS0" />
+        <With Var="WS1" />
+        <With Var="P1" />
+      </Event>
+      <Event Name="STOP" Comment="Stop Emission" >
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="IND" Comment="Emission event" >
+        <With Var="OUT" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="DT" Type="TIME" InitialValue="t#6500ms" Comment="Emission period" />
+      <VarDeclaration Name="WS0" Type="VSTYLE" InitialValue="PEG" Comment="Workpiece Style 0" />
+      <VarDeclaration Name="WS1" Type="VSTYLE" InitialValue="RING" Comment="Workpiece Style 1" />
+      <VarDeclaration Name="P1" Type="UINT" InitialValue="50" Comment="Probability that OUT=WS1 (0-100%)" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="OUT" Type="VSTYLE" InitialValue="RING" Comment="PEG or RING" />
+    </OutputVars>
+  </InterfaceList>
+  <FBNetwork >
+    <FB Name="CLK" Type="E_CYCLE" x="311.11108" y="11.111111" />
+    <FB Name="GEN" Type="WKPC_GEN" x="994.4444" y="144.44444" />
+    <EventConnections>
+      <Connection Source="START" Destination="CLK.START" dx1="161.1111" />
+      <Connection Source="STOP" Destination="CLK.STOP" dx1="177.77777" />
+      <Connection Source="CLK.EO" Destination="GEN.REQ" dx1="327.77777" />
+      <Connection Source="START" Destination="GEN.REQ" dx1="849.99994" />
+      <Connection Source="GEN.CNF" Destination="IND" dx1="1433.3333" />
+    </EventConnections>
+    <DataConnections>
+      <Connection Source="DT" Destination="CLK.DT" dx1="222.22221" />
+      <Connection Source="GEN.OUT" Destination="OUT" dx1="1450.0" />
+      <Connection Source="WS0" Destination="GEN.WS0" dx1="883.3333" />
+      <Connection Source="WS1" Destination="GEN.WS1" dx1="883.3333" />
+      <Connection Source="P1" Destination="GEN.P1" dx1="905.55554" />
+    </DataConnections>
+  </FBNetwork>
+</FBType>

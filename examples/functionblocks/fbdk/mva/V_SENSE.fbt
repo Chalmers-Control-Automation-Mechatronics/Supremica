@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="V_SENSE" Comment="VSTYLE presence sensor" >
+  <Identification Standard="61499-1" Classification="Simulation" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2002-04-20" Remarks="Moved to fb.rt.mva" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2002-04-10" />
+  <CompilerInfo header="package fb.rt.mva;" >
+    <Compiler Language="Java" Vendor="IBM" Product="VisualAge" Version="3.0" />
+    <Compiler Language="Java" Vendor="IBM" Product="Jikes" Version="1.06" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="SENSE" Comment="Input change notification" >
+        <With Var="PRESENT" />
+        <With Var="STYLE" />
+        <With Var="REFSTYLE" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="IND" Comment="Output change indication" >
+        <With Var="Q" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="PRESENT" Type="BOOL" Comment="Workpiece is present" />
+      <VarDeclaration Name="STYLE" Type="VSTYLE" Comment="Workpiece style" />
+      <VarDeclaration Name="REFSTYLE" Type="VSTYLE" Comment="Style to be sensed" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="Q" Type="BOOL" Comment="Workpiece is present and STYLE matches REFSTYLE" />
+    </OutputVars>
+  </InterfaceList>
+  <BasicFB>
+  <Algorithm Name="SENSE" >
+    <Other Language="Java" Text="boolean newq = PRESENT.value &#38; (STYLE.equals(REFSTYLE));&#10;if(newq != Q.value){&#10;   Q.value = newq;&#10;   IND.serviceEvent(this);}&#10;" />
+  </Algorithm>
+  </BasicFB>
+</FBType>

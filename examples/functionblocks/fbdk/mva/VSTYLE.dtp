@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE DataType SYSTEM "http://www.holobloc.com/xml/DataType.dtd" >
+<DataType xmlns="http://www.holobloc.com/xml/DataType" Name="VSTYLE" Comment="View rendering style" >
+  <Identification Standard="61499-1" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.3" Author="JHC" Date="2004-09-29" Remarks="Added PALLET." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.2" Author="JHC" Date="2002-05-21" Remarks="Deleted CLAMP." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2002-04-25" Remarks="Added CLAMP, EMPTY; moved to fb.rt.mva." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2002-04-01" />
+  <CompilerInfo header="package fb.rt.mva;" >
+    <Compiler Language="Java" Vendor="Sun" Product="JDK" Version="1.4.2" />
+  </CompilerInfo>
+  <ASN1Tag Class="PRIVATE" Number="21" />
+  <EnumeratedType >
+    <EnumeratedValue Name="BAR" />
+    <EnumeratedValue Name="SLIDER" />
+    <EnumeratedValue Name="CYLINDER" />
+    <EnumeratedValue Name="BALL" />
+    <EnumeratedValue Name="DISC" />
+    <EnumeratedValue Name="TOOL_OFF" />
+    <EnumeratedValue Name="TOOL_ON" />
+    <EnumeratedValue Name="SOLENOID" />
+    <EnumeratedValue Name="RING" />
+    <EnumeratedValue Name="PEG" />
+    <EnumeratedValue Name="PEGRING" />
+    <EnumeratedValue Name="EMPTY" Comment="Empty Box" />
+    <EnumeratedValue Name="NONE" />
+    <EnumeratedValue Name="PALLET" />
+  </EnumeratedType>
+</DataType>

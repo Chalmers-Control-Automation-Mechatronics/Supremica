@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="FB_XOR2" Comment="Composite XOR Function Block Type" >
+  <Identification Standard="61499-2" />
+  <VersionInfo Organization="HUT" Version="0.0" Author="JHC" Date="2004-06-07" />
+  <CompilerInfo header="package fb.rt.student; import fb.rt.math.*;" >
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="REQ" Comment="Normal Execution Request" >
+        <With Var="X" />
+        <With Var="Y" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="CNF" Comment="Execution Confirmation" >
+        <With Var="OUT" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="X" Type="BOOL" />
+      <VarDeclaration Name="Y" Type="BOOL" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="OUT" Type="BOOL" Comment="X XOR Y" />
+    </OutputVars>
+  </InterfaceList>
+  <FBNetwork >
+    <FB Name="AND1" Type="FB_AND" x="1444.4443" y="872.22217" />
+    <FB Name="AND2" Type="FB_AND" x="1455.5555" y="138.88889" />
+    <FB Name="OR1" Type="FB_OR" x="2161.111" y="311.11108" />
+    <FB Name="NOTX" Type="FB_NOT" x="550.0" y="983.3333" />
+    <FB Name="NOTY" Type="FB_NOT" x="538.88885" y="249.99998" />
+    <EventConnections>
+      <Connection Source="REQ" Destination="NOTY.REQ" dx1="427.77777" />
+      <Connection Source="NOTX.CNF" Destination="AND2.REQ" dx1="405.55554" />
+      <Connection Source="AND2.CNF" Destination="AND1.REQ" dx1="27.777777" dx2="100.0" dy="572.2222" />
+      <Connection Source="AND1.CNF" Destination="OR1.REQ" dx1="155.55554" />
+      <Connection Source="NOTY.CNF" Destination="NOTX.REQ" dx1="44.444443" dx2="44.444443" dy="483.3333" />
+      <Connection Source="OR1.CNF" Destination="CNF" dx1="2544.4443" />
+    </EventConnections>
+    <DataConnections>
+      <Connection Source="AND2.OUT" Destination="OR1.IN1" dx1="288.8889" />
+      <Connection Source="AND1.OUT" Destination="OR1.IN2" dx1="344.44443" />
+      <Connection Source="NOTY.OUT" Destination="AND2.IN2" dx1="416.66666" />
+      <Connection Source="NOTX.OUT" Destination="AND1.IN2" dx1="100.0" />
+      <Connection Source="Y" Destination="NOTY.IN" dx1="472.2222" />
+      <Connection Source="X" Destination="NOTX.IN" dx1="483.3333" />
+      <Connection Source="X" Destination="AND2.IN1" dx1="1388.8888" />
+      <Connection Source="Y" Destination="AND1.IN1" dx1="1377.7777" />
+      <Connection Source="OR1.OUT" Destination="OUT" dx1="2550.0" />
+    </DataConnections>
+  </FBNetwork>
+</FBType>

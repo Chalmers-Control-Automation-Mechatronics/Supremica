@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="FLASHERW" Comment="N-bit multimode Flasher" >
+  <Identification Standard="61499" Classification="Test" Function="Flasher" Type="10 outputs" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2004-04-22" Remarks="Moved to fb.rt.math." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2003-11-23" Remarks="Generalized from FLASHER10W." />
+  <CompilerInfo header="package fb.rt.math;" >
+    <Compiler Language="Java" Vendor="Sun" Product="JDK" Version="1.3.1" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="INIT" Comment="Initialization Request" >
+        <With Var="N" />
+        <With Var="MODE" />
+      </Event>
+      <Event Name="REQ" Comment="Update Request" >
+        <With Var="MODE" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="INITO" Comment="Initialization Confirm" >
+        <With Var="OUT" />
+      </Event>
+      <Event Name="CNF" Comment="Update Confirmation" >
+        <With Var="OUT" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="N" Type="UINT" InitialValue="16" Comment="Number of bits to flash (intenally limited to 0&#60;N&#60;17)." />
+      <VarDeclaration Name="MODE" Type="UINT" Comment="0=FLASH_ALL,1=COUNT_UP,2=COUNT_DOWN,3=CHASE_UP,4=CHASE_DOWN" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="OUT" Type="WORD" />
+    </OutputVars>
+  </InterfaceList>
+</FBType>

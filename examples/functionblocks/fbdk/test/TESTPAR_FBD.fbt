@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="TESTPAR_FBD" Comment="Test Java generation of parameters in FBD algorithm" >
+  <Identification Standard="61499-2" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2004-12-15" />
+  <CompilerInfo header="package fb.rt.test; import fb.rt.plc.math.*;" >
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="REQ" Comment="Normal Execution Request" >
+        <With Var="IN" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="CNF" Comment="Execution Confirmation" >
+        <With Var="OUT" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="IN" Type="REAL" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="OUT" Type="REAL" Comment="IN + 2.0" />
+    </OutputVars>
+  </InterfaceList>
+  <BasicFB>
+    <ECC >
+      <ECState Name="START" Comment="Initial State" x="555.55554" y="427.77777" >
+      </ECState>
+      <ECState Name="REQ" Comment="Normal execution" x="216.66666" y="755.55554" >
+        <ECAction Algorithm="REQ" Output="CNF" />
+      </ECState>
+      <ECTransition Source="START" Destination="REQ" Condition="REQ" x="555.55554" y="600.0" />
+      <ECTransition Source="REQ" Destination="START" Condition="1" x="216.66666" y="427.77777" />
+    </ECC>
+  <Algorithm Name="REQ" Comment="Normally executed algorithm" >
+    <FBD >
+      <FB Name="ADDER" Type="ADD_REAL" x="405.55554" y="161.1111" >
+        <Parameter Name="IN2" Value="2.0" Comment="The parameter" />
+      </FB>
+      <DataConnections>
+        <Connection Source="IN" Destination="ADDER.IN1" dx1="327.77777" />
+        <Connection Source="ADDER.OUT" Destination="OUT" dx1="838.88885" />
+      </DataConnections>
+    </FBD>
+  </Algorithm>
+  </BasicFB>
+</FBType>

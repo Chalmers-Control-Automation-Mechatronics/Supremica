@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE DataType SYSTEM "../DataType.dtd" >
+<DataType xmlns="http://www.holobloc.com/xml/DataType" Name="FILTER_PARAMETER" Comment="IEC 61131-3,Table 12#5" >
+  <Identification Standard="61131-3" Type="Data Type" Description="Table 12, #5" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2000-11-09" />
+  <CompilerInfo header="package fb.rt.ita;" >
+    <Compiler Language="Java" Vendor="IBM" Product="VisualAge" Version="3.0" />
+  </CompilerInfo>
+  <ASN1Tag Class="PRIVATE" Number="16" />
+  <SubrangeType BaseType="SINT" >
+    <Subrange LowerLimit="0" UpperLimit="99" />
+  </SubrangeType>
+</DataType>

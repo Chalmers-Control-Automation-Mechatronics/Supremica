@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="DSCYL_DIAGL" Comment="Locally Coupled and Clocked Diagnostics for a Dual-Stroke Cylinder" >
+  <Identification Standard="61499-1" Classification="Diagnostics" ApplicationDomain="Mechanisms" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2004-10-21" Remarks="Renamed from DSCYL_DIAGCL." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2004-08-14" />
+  <CompilerInfo header="package fb.rt.mach; import fb.rt.mva.*; import fb.rt.net.*; import fb.rt.math.*;" classdef="public class DSCYL_DIAGL extends FBMVCD" >
+    <Compiler Language="Java" Vendor="Sun" Product="JDK" Version="1.4.2" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="INIT" >
+        <With Var="SENSE_ID" />
+        <With Var="ACT_ID" />
+        <With Var="DIAG_ID" />
+        <With Var="SRC" />
+        <With Var="NF1" />
+        <With Var="NF2" />
+        <With Var="NR" />
+        <With Var="MSGF1" />
+        <With Var="MSGF2" />
+        <With Var="MSGR" />
+        <With Var="CLK_ID" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="INITO" >
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="CLK_ID" Type="WSTRING" InitialValue="&#34;DIAG_CLK&#34;" Comment="Diagnostic Clock Local Channel ID" />
+      <VarDeclaration Name="SENSE_ID" Type="WSTRING" Comment="Sensor channel ID from Model" />
+      <VarDeclaration Name="ACT_ID" Type="WSTRING" Comment="Actuator channel ID from Controller" />
+      <VarDeclaration Name="DIAG_ID" Type="WSTRING" Comment="Diagnostic output channel ID" />
+      <VarDeclaration Name="SRC" Type="WSTRING" Comment="Diagnostic Source ID" />
+      <VarDeclaration Name="NF1" Type="UINT" Comment="Cylinder 1 Forward Motion Timeout Period in CLK cycles" />
+      <VarDeclaration Name="NF2" Type="UINT" Comment="Cylinder 2 Motion Timeout Period in CLK cycles" />
+      <VarDeclaration Name="NR" Type="UINT" Comment="Reverse Motion Timeout Period in CLK cycles" />
+      <VarDeclaration Name="MSGF1" Type="WSTRING" InitialValue="&#34;TIMEOUT_ADVANCING1&#34;" Comment="Message for fault on forward motion of Cylinder 1" />
+      <VarDeclaration Name="MSGF2" Type="WSTRING" InitialValue="&#34;TIMEOUT_ADVANCING2&#34;" Comment="Message for fault on forward motion of Cylinder 2" />
+      <VarDeclaration Name="MSGR" Type="WSTRING" InitialValue="&#34;TIMEOUT_RETRACTING&#34;" Comment="Message for fault on combined reverse motion" />
+    </InputVars>
+  </InterfaceList>
+  <FBNetwork >
+    <FB Name="ACT" Type="SUBL_3" x="300.0" y="11.111111" />
+    <FB Name="SENSE" Type="SUBL_3" x="1233.3333" y="11.111111" />
+    <FB Name="MONF1" Type="MECH1_DIAGL" Comment="Monitor Cylinder 1 Forward Motion" x="2088.889" y="11.111111" />
+    <FB Name="MONF2" Type="MECH1_DIAGL" Comment="Monitor Cylinder 2 Forward motion" x="2077.7776" y="1333.3333" />
+    <FB Name="MONR" Type="MECH1_DIAGL" Comment="Monitor Reverse Motion of both cylinders" x="272.2222" y="1083.3333" />
+    <FB Name="NOT_F2" Type="FB_NOT" x="1027.7777" y="988.88885" />
+    <FB Name="AND_F1" Type="FB_AND" x="1383.3333" y="988.88885" />
+    <EventConnections>
+      <Connection Source="MONF1.INITO" Destination="MONF2.INIT" dx1="61.111107" dx2="61.111107" dy="1144.4445" />
+      <Connection Source="NOT_F2.CNF" Destination="AND_F1.REQ" dx1="38.888885" dx2="38.888885" dy="-1561.1111" />
+      <Connection Source="INIT" Destination="ACT.INIT" dx1="194.44444" />
+      <Connection Source="SENSE.INITO" Destination="MONF1.INIT" dx1="61.111107" />
+      <Connection Source="ACT.IND" Destination="NOT_F2.REQ" dx1="355.55554" />
+      <Connection Source="ACT.INITO" Destination="MONR.INIT" dx1="100.0" dx2="38.888885" dy="894.4444" />
+      <Connection Source="MONR.INITO" Destination="SENSE.INIT" dx1="50.0" />
+      <Connection Source="MONF2.INITO" Destination="INITO" dx1="2633.3333" />
+    </EventConnections>
+    <DataConnections>
+      <Connection Source="ACT_ID" Destination="ACT.ID" dx1="150.0" />
+      <Connection Source="SENSE_ID" Destination="SENSE.ID" dx1="1044.4445" />
+      <Connection Source="ACT.RD_2" Destination="MONF2.FWD" dx1="200.0" />
+      <Connection Source="ACT.RD_3" Destination="MONR.FWD" dx1="72.22222" dx2="72.22222" dy="194.44444" />
+      <Connection Source="SENSE.RD_1" Destination="MONR.END" dx1="55.555553" dx2="116.666664" dy="327.77777" />
+      <Connection Source="SENSE.RD_2" Destination="MONF1.END" dx1="205.55554" />
+      <Connection Source="SENSE.RD_3" Destination="MONF2.END" dx1="205.55554" />
+      <Connection Source="CLK_ID" Destination="MONF1.CLK_ID" dx1="1938.8888" />
+      <Connection Source="DIAG_ID" Destination="MONF1.DIAG_ID" dx1="1922.2222" />
+      <Connection Source="NF1" Destination="MONF1.N" dx1="1983.3333" />
+      <Connection Source="SRC" Destination="MONF1.SRC" dx1="1977.7777" />
+      <Connection Source="MSGF1" Destination="MONF1.MSG" dx1="1938.8888" />
+      <Connection Source="CLK_ID" Destination="MONF2.CLK_ID" dx1="1927.7777" />
+      <Connection Source="DIAG_ID" Destination="MONF2.DIAG_ID" dx1="1911.1111" />
+      <Connection Source="NF2" Destination="MONF2.N" dx1="1972.2222" />
+      <Connection Source="SRC" Destination="MONF2.SRC" dx1="1966.6666" />
+      <Connection Source="MSGF2" Destination="MONF2.MSG" dx1="1927.7777" />
+      <Connection Source="NR" Destination="MONR.N" dx1="183.33333" />
+      <Connection Source="SRC" Destination="MONR.SRC" dx1="161.1111" />
+      <Connection Source="MSGR" Destination="MONR.MSG" dx1="138.88889" />
+      <Connection Source="AND_F1.OUT" Destination="MONF1.FWD" dx1="172.22221" />
+      <Connection Source="ACT.RD_2" Destination="NOT_F2.IN" dx1="200.0" />
+      <Connection Source="ACT.RD_1" Destination="AND_F1.IN2" dx1="272.2222" />
+      <Connection Source="CLK_ID" Destination="MONR.CLK_ID" dx1="122.22221" />
+      <Connection Source="DIAG_ID" Destination="MONR.DIAG_ID" dx1="105.55555" />
+      <Connection Source="NOT_F2.OUT" Destination="AND_F1.IN1" dx1="38.888885" />
+    </DataConnections>
+  </FBNetwork>
+</FBType>

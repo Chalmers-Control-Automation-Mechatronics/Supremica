@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE System SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<System xmlns="http://www.holobloc.com/xml/LibraryElement" Name="FLASHER_TESTD" Comment="Distributed Flasher Test System Configuration" >
+  <Identification Standard="61499-1" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2001-07-31" Remarks="Changed IN_TIME to IN_ANY, adjusted height." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2001-02-22" />
+  <Application Name="TEST" >
+    <FBNetwork >
+      <FB Name="START_PB" Type="IN_EVENT" x="194.1176" y="11.7647" />
+      <FB Name="STOP_PB" Type="IN_EVENT" x="676.4706" y="11.7647" />
+      <FB Name="DT" Type="IN_ANY" x="1141.1764" y="711.7647" />
+      <FB Name="PERIODIC" Type="E_CYCLE" x="1676.4706" y="11.7647" />
+      <FB Name="MODE" Type="IN_CHOICE" x="1723.5294" y="711.7647" />
+      <FB Name="FLASHIT" Type="FLASHER4" x="2411.7646" y="11.7647" />
+      <FB Name="LEDS" Type="LED_HMI" x="2941.1765" y="11.7647" />
+      <EventConnections>
+        <Connection Source="START_PB.INITO" Destination="STOP_PB.INIT" dx1="17.6471" dx2="76.4706" dy="994.1176" />
+        <Connection Source="STOP_PB.INITO" Destination="DT.INIT" dx1="58.8235" dx2="64.7059" dy="676.4706" />
+        <Connection Source="DT.INITO" Destination="MODE.INIT" dx1="188.2353" dx2="188.2353" dy="-1" />
+        <Connection Source="MODE.INITO" Destination="FLASHIT.INIT" dx1="111.7647" dx2="76.4706" dy="-123.5294" />
+        <Connection Source="FLASHIT.INITO" Destination="LEDS.INIT" dx1="17.6471" />
+        <Connection Source="START_PB.IND" Destination="DT.REQ" dx1="94.1176" dx2="111.7647" dy="547.0588" />
+        <Connection Source="DT.IND" Destination="PERIODIC.START" dx1="64.7059" dx2="23.5294" dy="670.5882" />
+        <Connection Source="STOP_PB.IND" Destination="PERIODIC.STOP" dx1="135.2941" dx2="76.4706" dy="600" />
+        <Connection Source="MODE.IND" Destination="FLASHIT.INIT" dx1="111.7647" dx2="58.8235" dy="-264.7059" />
+        <Connection Source="PERIODIC.EO" Destination="FLASHIT.REQ" dx1="100" dx2="229.4118" dy="-1" />
+        <Connection Source="FLASHIT.CNF" Destination="LEDS.REQ" dx1="23.5294" />
+      </EventConnections>
+      <DataConnections>
+        <Connection Source="DT.OUT" Destination="PERIODIC.DT" dx1="117.6471" dx2="23.5294" dy="652.9412" />
+        <Connection Source="MODE.I" Destination="FLASHIT.MODE" dx1="164.7059" dx2="29.4118" dy="-1" />
+        <Connection Source="FLASHIT.LED3" Destination="LEDS.LED3" dx1="47.0588" />
+        <Connection Source="FLASHIT.LED2" Destination="LEDS.LED2" dx1="58.8235" />
+        <Connection Source="FLASHIT.LED1" Destination="LEDS.LED1" dx1="64.7059" />
+        <Connection Source="FLASHIT.LED0" Destination="LEDS.LED0" dx1="76.4706" />
+        <Connection Source="&#34;TIME&#34;" Destination="DT.TYPE" dx1="994.1176" />
+      </DataConnections>
+    </FBNetwork>
+  </Application>
+  <Device Name="FLASHER" Type="FRAME_DEVICE" x="1000" y="664.7059" >
+    <Resource Name="RES1" Type="PANEL_RESOURCE" x="894.1176" y="470.5882" >
+      <FBNetwork >
+        <FB Name="SUB3" Type="SUBSCRIBE_3" x="605.8823" y="11.7647" />
+        <FB Name="SW" Type="E_SWITCH" x="1200" y="235.2941" />
+        <FB Name="PERIODIC" Type="E_CYCLE" x="1688.2352" y="347.0588" />
+        <FB Name="FLASHIT" Type="FLASHER4" x="2176.4705" y="11.7647" />
+        <FB Name="LEDS" Type="LED_HMI" x="2670.5881" y="11.7647" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="SUB3.INIT" dx1="58.8235" dx2="41.1765" dy="158.8235" />
+          <Connection Source="SUB3.INITO" Destination="FLASHIT.INIT" dx1="805.8823" />
+          <Connection Source="FLASHIT.INITO" Destination="LEDS.INIT" dx1="5.8824" dx2="105.8824" dy="-1" />
+          <Connection Source="SUB3.IND" Destination="SW.EI" dx1="76.4706" />
+          <Connection Source="SW.EO1" Destination="PERIODIC.START" dx1="41.1765" />
+          <Connection Source="SW.EO0" Destination="PERIODIC.STOP" dx1="82.3529" dx2="47.0588" dy="1594.1177" />
+          <Connection Source="SUB3.IND" Destination="FLASHIT.INIT" dx1="123.5294" />
+          <Connection Source="PERIODIC.EO" Destination="FLASHIT.REQ" dx1="58.8235" />
+          <Connection Source="FLASHIT.CNF" Destination="LEDS.REQ" dx1="11.7647" dx2="111.7647" dy="-1" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="SUB3.RD_3" Destination="FLASHIT.MODE" dx1="1058.8235" />
+          <Connection Source="FLASHIT.LED3" Destination="LEDS.LED3" dx1="23.5294" dx2="47.0588" dy="711.7647" />
+          <Connection Source="FLASHIT.LED2" Destination="LEDS.LED2" dx1="29.4118" dx2="41.1765" dy="552.9412" />
+          <Connection Source="FLASHIT.LED1" Destination="LEDS.LED1" dx1="29.4118" dx2="35.2941" dy="394.1176" />
+          <Connection Source="FLASHIT.LED0" Destination="LEDS.LED0" dx1="35.2941" dx2="23.5294" dy="229.4118" />
+          <Connection Source="1" Destination="SUB3.QI" dx1="541.1765" />
+          <Connection Source="SUB3.RD_1" Destination="SW.G" dx1="70.5882" dx2="41.1765" dy="-1" />
+          <Connection Source="SUB3.RD_2" Destination="PERIODIC.DT" dx1="235.2941" />
+          <Connection Source="&#34;225.0.0.1:1506&#34;" Destination="SUB3.ID" dx1="323.5294" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <FBNetwork >
+      <DataConnections>
+        <Connection Source="0" Destination="RES1.TRACE" dx1="829.4117" />
+      </DataConnections>
+    </FBNetwork>
+  </Device>
+  <Device Name="CTL_PANEL" Type="FRAME_DEVICE" x="976.4706" y="88.2353" >
+    <Resource Name="RES1" Type="PANEL_RESOURCE" x="1488.2352" y="847.0588" >
+      <FBNetwork >
+        <FB Name="RUN_PB" Type="IN_EVENT" x="564.7059" y="11.7647" />
+        <FB Name="STOP_PB" Type="IN_EVENT" x="1223.5294" y="11.7647" />
+        <FB Name="RUN_FF" Type="E_RS" x="1223.5294" y="888.2353" />
+        <FB Name="MODE" Type="IN_CHOICE" x="2100" y="1152.9412" />
+        <FB Name="DT" Type="IN_ANY" x="2164.7058" y="11.7647" />
+        <FB Name="PUB3" Type="PUBLISH_3" x="3311.7646" y="235.2941" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="RUN_PB.INIT" dx1="11.7647" dx2="41.1765" dy="588.2353" />
+          <Connection Source="RUN_PB.INITO" Destination="STOP_PB.INIT" dx1="88.2353" dx2="29.4118" dy="158.8235" />
+          <Connection Source="STOP_PB.INITO" Destination="DT.INIT" dx1="135.2941" dx2="23.5294" dy="158.8235" />
+          <Connection Source="DT.INITO" Destination="MODE.INIT" dx1="100" dx2="35.2941" dy="982.3529" />
+          <Connection Source="MODE.INITO" Destination="PUB3.INIT" dx1="141.1765" dx2="5.8824" dy="-1" />
+          <Connection Source="RUN_PB.IND" Destination="RUN_FF.S" dx1="47.0588" dx2="58.8235" dy="270.5882" />
+          <Connection Source="STOP_PB.IND" Destination="RUN_FF.R" dx1="70.5882" dx2="82.3529" dy="600" />
+          <Connection Source="RUN_FF.EO" Destination="DT.REQ" dx1="276.4706" dx2="11.7647" dy="-1" />
+          <Connection Source="DT.IND" Destination="MODE.REQ" dx1="41.1765" dx2="76.4706" dy="829.4117" />
+          <Connection Source="MODE.IND" Destination="PUB3.REQ" dx1="600" dx2="11.7647" dy="-1" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="1" Destination="MODE.QI" dx1="2035.2941" />
+          <Connection Source="MODE.I" Destination="PUB3.SD_3" dx1="741.1765" dx2="35.2941" dy="1117.6471" />
+          <Connection Source="&#34;FLASH_ALL,COUNT_UP,COUNT_DOWN,CHASE_UP,CHASE_DOWN&#34;" Destination="MODE.CHOICES" dx1="1070.5883" />
+          <Connection Source="1" Destination="RUN_PB.QI" dx1="500" />
+          <Connection Source="&#34;RUN&#34;" Destination="RUN_PB.LABEL" dx1="429.4117" />
+          <Connection Source="1" Destination="DT.QI" dx1="2100" />
+          <Connection Source="1" Destination="STOP_PB.QI" dx1="1158.8235" />
+          <Connection Source="&#34;STOP&#34;" Destination="STOP_PB.LABEL" dx1="1064.7058" />
+          <Connection Source="1" Destination="PUB3.QI" dx1="3247.0588" />
+          <Connection Source="DT.OUT" Destination="PUB3.SD_2" dx1="264.7059" dx2="58.8235" dy="717.647" />
+          <Connection Source="RUN_FF.Q" Destination="PUB3.SD_1" dx1="370.5882" dx2="58.8235" dy="717.647" />
+          <Connection Source="&#34;TIME&#34;" Destination="DT.TYPE" dx1="2017.647" />
+          <Connection Source="t#250ms" Destination="DT.IVAL" dx1="2000" />
+          <Connection Source="&#34;225.0.0.1:1506&#34;" Destination="PUB3.ID" dx1="3029.4116" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <FBNetwork >
+      <DataConnections>
+        <Connection Source="0" Destination="RES1.TRACE" dx1="1423.5294" />
+      </DataConnections>
+    </FBNetwork>
+  </Device>
+  <DeviceParameters>
+    <Connection Source="[1,1]" Destination="FLASHER.GRID" dx1="888.2353" />
+    <Connection Source="[280,100,225,75]" Destination="FLASHER.BOUNDS" dx1="711.7647" />
+    <Connection Source="[50,100,225,100]" Destination="CTL_PANEL.BOUNDS" dx1="688.2353" />
+    <Connection Source="[1,1]" Destination="CTL_PANEL.GRID" dx1="864.7059" />
+  </DeviceParameters>
+</System>

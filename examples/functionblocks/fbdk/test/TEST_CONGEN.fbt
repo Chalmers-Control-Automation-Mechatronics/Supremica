@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="TEST_CONGEN" Comment="Test Internal Connection Generation: INT=>ANY, ANY=>ANY, ANY=>INT, INT=>INT" >
+  <Identification Standard="61499-2" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2004-01-04" />
+  <CompilerInfo header="package fb.rt.test; import fb.rt.hmi.*; import fb.rt.math.*;" >
+    <Compiler Language="Java" Vendor="IBM" Product="Jikes" Version="1.06" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="INIT" >
+        <With Var="IN" />
+      </Event>
+      <Event Name="REQ" >
+        <With Var="IN" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="INITO" >
+        <With Var="OUT" />
+      </Event>
+      <Event Name="CNF" >
+        <With Var="OUT" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="IN" Type="INT" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="OUT" Type="INT" />
+    </OutputVars>
+  </InterfaceList>
+  <FBNetwork >
+    <FB Name="ADDER" Type="FB_ADD_INT" x="984.2105" y="231.57895" />
+    <FB Name="INPUT" Type="IN_ANY" x="257.89474" y="10.526316" />
+    <FB Name="OUTPUT" Type="OUT_ANY" x="1815.7894" y="10.526316" />
+    <EventConnections>
+      <Connection Source="INIT" Destination="INPUT.INIT" dx1="157.89473" />
+      <Connection Source="INPUT.INITO" Destination="OUTPUT.INIT" dx1="31.578947" />
+      <Connection Source="OUTPUT.INITO" Destination="INITO" dx1="2231.5789" />
+      <Connection Source="REQ" Destination="INPUT.REQ" dx1="152.63158" />
+      <Connection Source="OUTPUT.CNF" Destination="CNF" dx1="2210.5264" />
+      <Connection Source="INPUT.IND" Destination="ADDER.REQ" dx1="42.105263" />
+      <Connection Source="ADDER.CNF" Destination="OUTPUT.REQ" dx1="115.789474" />
+    </EventConnections>
+    <DataConnections>
+      <Connection Source="1" Destination="INPUT.QI" dx1="194.73685" />
+      <Connection Source="&#34;INT&#34;" Destination="INPUT.TYPE" dx1="147.36842" />
+      <Connection Source="1" Destination="OUTPUT.QI" dx1="1752.6316" />
+      <Connection Source="&#34;INT&#34;" Destination="OUTPUT.TYPE" dx1="1705.2632" />
+      <Connection Source="INPUT.OUT" Destination="ADDER.IN1" dx1="84.210526" dx2="84.210526" dy="826.3158" />
+      <Connection Source="IN" Destination="ADDER.IN2" dx1="910.5263" />
+      <Connection Source="ADDER.OUT" Destination="OUTPUT.IN" dx1="410.5263" />
+      <Connection Source="ADDER.OUT" Destination="OUT" dx1="1442.1052" />
+    </DataConnections>
+  </FBNetwork>
+</FBType>

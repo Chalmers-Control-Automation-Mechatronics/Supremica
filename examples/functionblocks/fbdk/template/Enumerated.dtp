@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE DataType SYSTEM "http://www.holobloc.com/xml/DataType.dtd" >
+<DataType xmlns="http://www.holobloc.com/xml/DataType" Name="Enumerated" Comment="An Enumerated Data Type" >
+  <Identification Standard="61499-2" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2003-12-06" />
+  <CompilerInfo header="package fb.rt.template;" >
+  </CompilerInfo>
+  <ASN1Tag Class="PRIVATE" Number="6" />
+  <EnumeratedType >
+    <EnumeratedValue Name="A" Comment="Enumerated value 0" />
+    <EnumeratedValue Name="B" Comment="Enumerated value 1" />
+    <EnumeratedValue Name="C" Comment="Enumerated value 2" />
+  </EnumeratedType>
+</DataType>

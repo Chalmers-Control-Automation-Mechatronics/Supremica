@@ -1,0 +1,499 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE System SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<System xmlns="http://www.holobloc.com/xml/LibraryElement" Name="DRILL_MVL" Comment="Drill System Model+View+HMI with shared simulation clock" >
+  <Identification Standard="61499-1" Classification="Simulation" ApplicationDomain="Transfer Lines" Function="Drilling" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2004-10-25" Remarks="Adapted to new Load/Unload model." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2004-09-26" />
+  <Device Name="MODEL" Type="FRAME_DEVICE" x="672.22217" y="494.44443" >
+    <Resource Name="CLOCK" Type="EMB_RES" x="105.55555" y="11.111111" >
+      <FBNetwork >
+        <FB Name="CLK" Type="E_CYCLE" x="933.3333" y="455.55554" />
+        <FB Name="SIM_CLK" Type="PUBL_0" x="527.7778" y="11.111111" />
+        <EventConnections>
+          <Connection Source="START.STOP" Destination="CLK.STOP" dx1="33.333332" />
+          <Connection Source="START.COLD" Destination="SIM_CLK.INIT" dx1="144.44444" />
+          <Connection Source="SIM_CLK.INITO" Destination="CLK.START" dx1="27.777777" />
+          <Connection Source="CLK.EO" Destination="SIM_CLK.REQ" dx1="27.777777" dx2="44.444443" dy="577.7778" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="t#250ms" Destination="CLK.DT" dx1="772.22217" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="SUPPLY_MDL" Type="EMB_RES" x="127.77777" y="311.11108" >
+      <FBNetwork >
+        <FB Name="SUPPLY" Type="XBAR_MDLL" x="638.88885" y="11.111111" />
+        <FB Name="LOAD_SOL" Type="SOL_MDLL" x="2133.3333" y="11.111111" />
+        <FB Name="UNLD" Type="E_R_TRIG" x="2688.8887" y="116.666664" />
+        <FB Name="LOAD" Type="E_R_TRIG" x="1283.3333" y="122.22221" />
+        <FB Name="SUPPLY_LOAD" Type="LOADL" x="1755.5555" y="11.111111" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="SUPPLY.INIT" dx1="33.333332" />
+          <Connection Source="LOAD_SOL.IND" Destination="UNLD.EI" dx1="72.22222" />
+          <Connection Source="SUPPLY.IND" Destination="LOAD.EI" dx1="27.777777" />
+          <Connection Source="UNLD.EO" Destination="SUPPLY.UNLD" dx1="27.777777" dx2="138.88889" dy="1338.8888" />
+          <Connection Source="SUPPLY.INITO" Destination="SUPPLY_LOAD.INIT" dx1="455.55554" />
+          <Connection Source="SUPPLY_LOAD.INITO" Destination="LOAD_SOL.INIT" dx1="27.777777" />
+          <Connection Source="LOAD_SOL.INITO" Destination="SUPPLY_LOAD.REQ" dx1="27.777777" dx2="122.22221" dy="1255.5555" />
+          <Connection Source="LOAD.EO" Destination="SUPPLY_LOAD.REQ" dx1="27.777777" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="34" Destination="LOAD_SOL.VF" dx1="2050.0" />
+          <Connection Source="50" Destination="LOAD_SOL.VR" dx1="2050.0" />
+          <Connection Source="LOAD_SOL.END" Destination="UNLD.QI" dx1="88.888885" />
+          <Connection Source="5" Destination="SUPPLY.VF" dx1="572.2222" />
+          <Connection Source="10" Destination="SUPPLY.VR" dx1="555.55554" />
+          <Connection Source="SUPPLY.HOME" Destination="LOAD.QI" dx1="27.777777" />
+          <Connection Source="0" Destination="SUPPLY_LOAD.LPOS" dx1="1688.8888" />
+          <Connection Source="VSTYLE#DISC" Destination="SUPPLY_LOAD.STYLE" dx1="1511.1111" />
+          <Connection Source="[255,255,0]" Destination="SUPPLY_LOAD.WKPC" dx1="1555.5555" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="SLIDE_MDL" Type="EMB_RES" x="122.22221" y="600.0" >
+      <FBNetwork >
+        <FB Name="SLIDE" Type="XSLIDE_MDLL" x="1355.5555" y="11.111111" />
+        <FB Name="UNLOAD" Type="SOL_MDLL" x="455.55554" y="11.111111" />
+        <FB Name="DRILL_SENSE" Type="SUBL_3" x="2033.3333" y="1050.0" />
+        <FB Name="MAKE_HOLE" Type="E_R_TRIG" x="2427.7776" y="1272.2222" />
+        <FB Name="UNLD" Type="E_R_TRIG" x="944.4444" y="122.22221" />
+        <FB Name="LOAD_SOL_SENSE" Type="SUBL_2" x="2061.111" y="11.111111" />
+        <FB Name="LOAD" Type="E_R_TRIG" x="2472.2222" y="122.22221" />
+        <FB Name="SLIDE_LOAD" Type="LOADL" x="2827.7776" y="11.111111" />
+        <FB Name="DRILLIT" Type="LOADL" x="2861.111" y="1305.5555" />
+        <EventConnections>
+          <Connection Source="DRILL_SENSE.IND" Destination="MAKE_HOLE.EI" dx1="27.777777" dx2="0.0" dy="-100.0" />
+          <Connection Source="UNLOAD.IND" Destination="UNLD.EI" dx1="27.777777" />
+          <Connection Source="UNLD.EO" Destination="SLIDE.UNLD" dx1="27.777777" />
+          <Connection Source="LOAD_SOL_SENSE.IND" Destination="LOAD.EI" dx1="27.777777" />
+          <Connection Source="START.COLD" Destination="UNLOAD.INIT" dx1="27.777777" />
+          <Connection Source="UNLOAD.INITO" Destination="SLIDE.INIT" dx1="127.77777" />
+          <Connection Source="SLIDE.INITO" Destination="LOAD_SOL_SENSE.INIT" dx1="27.777777" />
+          <Connection Source="LOAD_SOL_SENSE.INITO" Destination="SLIDE_LOAD.INIT" dx1="422.2222" />
+          <Connection Source="LOAD.EO" Destination="SLIDE_LOAD.REQ" dx1="27.777777" />
+          <Connection Source="MAKE_HOLE.EO" Destination="DRILLIT.REQ" dx1="27.777777" />
+          <Connection Source="DRILLIT.INITO" Destination="SLIDE.UNLD" dx1="27.777777" dx2="61.111107" dy="883.3333" />
+          <Connection Source="SLIDE_LOAD.INITO" Destination="DRILL_SENSE.INIT" dx1="27.777777" dx2="77.77777" dy="872.22217" />
+          <Connection Source="DRILL_SENSE.INITO" Destination="DRILLIT.INIT" dx1="472.2222" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="50" Destination="UNLOAD.VF" dx1="372.2222" />
+          <Connection Source="50" Destination="UNLOAD.VR" dx1="372.2222" />
+          <Connection Source="DRILL_SENSE.RD_2" Destination="MAKE_HOLE.QI" dx1="27.777777" dx2="11.111111" dy="1188.8888" />
+          <Connection Source="10" Destination="SLIDE.VF" dx1="1272.2222" />
+          <Connection Source="10" Destination="SLIDE.VR" dx1="1272.2222" />
+          <Connection Source="UNLOAD.END" Destination="UNLD.QI" dx1="50.0" />
+          <Connection Source="LOAD_SOL_SENSE.RD_2" Destination="LOAD.QI" dx1="38.888885" />
+          <Connection Source="0" Destination="SLIDE_LOAD.LPOS" dx1="2761.111" />
+          <Connection Source="VSTYLE#DISC" Destination="SLIDE_LOAD.STYLE" dx1="2583.3333" />
+          <Connection Source="[255,255,0]" Destination="SLIDE_LOAD.WKPC" dx1="2627.7776" />
+          <Connection Source="&#34;SLIDE_LOAD&#34;" Destination="DRILLIT.ID" dx1="2611.111" />
+          <Connection Source="100" Destination="DRILLIT.LPOS" dx1="2761.111" />
+          <Connection Source="VSTYLE#RING" Destination="DRILLIT.STYLE" dx1="2611.111" />
+          <Connection Source="[255,255,0]" Destination="DRILLIT.WKPC" dx1="2661.111" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="DRILL_MDL" Type="EMB_RES" x="122.22221" y="899.99994" >
+      <FBNetwork >
+        <FB Name="DRILL" Type="XBAR_MDLL" x="2116.6665" y="11.111111" />
+        <FB Name="DRILL_ACT" Type="SUBL_3" x="522.2222" y="11.111111" />
+        <FB Name="TOOL" Type="E_SWITCH" x="911.1111" y="233.33333" />
+        <FB Name="DRILL_LOAD" Type="LOADL" x="633.3333" y="977.7777" />
+        <FB Name="DRILL_UNLD" Type="LOADL" x="1600.0" y="972.22217" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="DRILL_ACT.INIT" dx1="27.777777" />
+          <Connection Source="DRILL_ACT.INITO" Destination="DRILL.INIT" dx1="61.111107" />
+          <Connection Source="DRILL.INITO" Destination="DRILL_LOAD.INIT" dx1="27.777777" dx2="138.88889" dy="1888.8888" />
+          <Connection Source="DRILL_LOAD.INITO" Destination="DRILL_UNLD.INIT" dx1="27.777777" />
+          <Connection Source="DRILL_ACT.IND" Destination="TOOL.EI" dx1="27.777777" />
+          <Connection Source="TOOL.EO1" Destination="DRILL_LOAD.REQ" dx1="27.777777" dx2="77.77777" dy="449.99997" />
+          <Connection Source="TOOL.EO0" Destination="DRILL_UNLD.REQ" dx1="172.22221" />
+          <Connection Source="DRILL_UNLD.INITO" Destination="DRILL_UNLD.REQ" dx1="27.777777" dx2="200.0" dy="-183.33333" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="10" Destination="DRILL.VF" dx1="2033.3333" />
+          <Connection Source="15" Destination="DRILL.VR" dx1="2033.3333" />
+          <Connection Source="VSTYLE#TOOL_ON" Destination="DRILL_LOAD.STYLE" dx1="316.66666" />
+          <Connection Source="[255,255,0]" Destination="DRILL_LOAD.WKPC" dx1="433.3333" />
+          <Connection Source="&#34;DRILL_LOAD&#34;" Destination="DRILL_UNLD.ID" dx1="1355.5555" />
+          <Connection Source="VSTYLE#TOOL_OFF" Destination="DRILL_UNLD.STYLE" dx1="1266.6666" />
+          <Connection Source="[255,255,0]" Destination="DRILL_UNLD.WKPC" dx1="1400.0" />
+          <Connection Source="DRILL_ACT.RD_3" Destination="TOOL.G" dx1="55.555553" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="TAKEOFF_MDL" Type="EMB_RES" x="127.77777" y="1166.6666" >
+      <FBNetwork >
+        <FB Name="UNLOAD_SENSE" Type="SUBL_2" x="511.11108" y="11.111111" />
+        <FB Name="TAKEOFF" Type="XBAR_MDLL" x="1811.1111" y="11.111111" />
+        <FB Name="UNLD" Type="E_R_TRIG" x="2444.4443" y="233.33333" />
+        <FB Name="LOAD" Type="E_R_TRIG" x="922.22217" y="122.22221" />
+        <FB Name="TAKEOFF_LOAD" Type="LOADL" x="1288.8888" y="11.111111" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="UNLOAD_SENSE.INIT" dx1="27.777777" />
+          <Connection Source="UNLD.EO" Destination="TAKEOFF.UNLD" dx1="55.555553" dx2="161.1111" dy="1138.8888" />
+          <Connection Source="TAKEOFF.IND" Destination="UNLD.EI" dx1="33.333332" />
+          <Connection Source="TAKEOFF.INITO" Destination="TAKEOFF.UNLD" dx1="433.3333" dx2="161.1111" dy="1361.1111" />
+          <Connection Source="UNLOAD_SENSE.IND" Destination="LOAD.EI" dx1="27.777777" />
+          <Connection Source="UNLOAD_SENSE.INITO" Destination="TAKEOFF_LOAD.INIT" dx1="249.99998" />
+          <Connection Source="TAKEOFF_LOAD.INITO" Destination="TAKEOFF.INIT" dx1="55.555553" />
+          <Connection Source="LOAD.EO" Destination="TAKEOFF_LOAD.REQ" dx1="27.777777" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="TAKEOFF.END" Destination="UNLD.QI" dx1="27.777777" />
+          <Connection Source="5" Destination="TAKEOFF.VF" dx1="1744.4443" />
+          <Connection Source="10" Destination="TAKEOFF.VR" dx1="1727.7777" />
+          <Connection Source="UNLOAD_SENSE.RD_2" Destination="LOAD.QI" dx1="38.888885" />
+          <Connection Source="0" Destination="TAKEOFF_LOAD.LPOS" dx1="1222.2222" />
+          <Connection Source="VSTYLE#RING" Destination="TAKEOFF_LOAD.STYLE" dx1="1038.8888" />
+          <Connection Source="[255,255,0]" Destination="TAKEOFF_LOAD.WKPC" dx1="1088.8888" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="INPUT_VIEW" Type="VIEW_PANEL" x="783.3333" y="11.111111" >
+      <FBNetwork >
+        <FB Name="SUPPLY" Type="MECH_VIEWL" Comment="Supply transfer mechanism" x="494.44443" y="11.111111" />
+        <FB Name="SP1" Type="XSPACE" x="1066.6666" y="800.0" />
+        <FB Name="LOAD_SOL" Type="SOL_VIEWL" Comment="Loader mechanism" x="1638.8888" y="11.111111" />
+        <FB Name="SP3" Type="XSPACE" x="2277.7776" y="11.111111" />
+        <FB Name="DRILL" Type="MECH_VIEWL" x="2716.6665" y="272.2222" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="SUPPLY.INIT" dx1="33.333332" dx2="5.8824" dy="-1.0" />
+          <Connection Source="SUPPLY.INITO" Destination="SP1.INIT" dx1="33.333332" dx2="541.1765" dy="400.0" />
+          <Connection Source="SP1.INITO" Destination="LOAD_SOL.INIT" dx1="55.555553" />
+          <Connection Source="LOAD_SOL.INITO" Destination="SP3.INIT" dx1="77.77777" />
+          <Connection Source="SP3.INITO" Destination="DRILL.INIT" dx1="33.333332" dx2="105.8824" dy="-1.0" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="5" Destination="SUPPLY.LEN" dx1="427.77777" />
+          <Connection Source="1" Destination="SUPPLY.DIR" dx1="427.77777" />
+          <Connection Source="[1,2]" Destination="SP3.DIMS" dx1="2172.2222" />
+          <Connection Source="[&#34;SUPPLY&#34;,&#34;FEED&#34;,&#34;DRILL&#34;]" Destination="SP1.LBLS" dx1="650.0" />
+          <Connection Source="[4,4]" Destination="SP1.DIMS" dx1="961.1111" />
+          <Connection Source="COLOR#gray" Destination="DRILL.BKGD" dx1="2494.4443" />
+          <Connection Source="3" Destination="DRILL.LEN" dx1="2650.0" />
+          <Connection Source="1" Destination="DRILL.DIR" dx1="2650.0" />
+          <Connection Source="1" Destination="LOAD_SOL.LEN" dx1="1572.2222" />
+          <Connection Source="1" Destination="LOAD_SOL.DIR" dx1="1572.2222" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="OUTPUT_VIEW" Type="VIEW_PANEL" x="766.6666" y="866.6666" >
+      <FBNetwork >
+        <FB Name="SLIDE" Type="MECHC_VIEWL" x="461.11108" y="11.111111" />
+        <FB Name="TAKEOFF" Type="MECH_VIEWL" Comment="Takeoff Transfer" x="1027.7777" y="11.111111" />
+        <FB Name="UNLOAD" Type="SOL_VIEWL" Comment="Unloader Mechanism" x="1544.4443" y="11.111111" />
+        <FB Name="SP1" Type="XSPACE" x="2083.3333" y="605.55554" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="SLIDE.INIT" dx1="44.444443" />
+          <Connection Source="SLIDE.INITO" Destination="TAKEOFF.INIT" dx1="111.11111" />
+          <Connection Source="TAKEOFF.INITO" Destination="UNLOAD.INIT" dx1="66.666664" />
+          <Connection Source="UNLOAD.INITO" Destination="SP1.INIT" dx1="33.333332" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="4" Destination="TAKEOFF.LEN" dx1="961.1111" />
+          <Connection Source="1" Destination="TAKEOFF.DIR" dx1="961.1111" />
+          <Connection Source="[&#34;TAKEOFF&#34;,&#34;SLIDE&#34;]" Destination="SP1.LBLS" dx1="1749.9999" />
+          <Connection Source="[3,4]" Destination="SP1.DIMS" dx1="1977.7777" />
+          <Connection Source="1" Destination="UNLOAD.LEN" dx1="1477.7777" />
+          <Connection Source="1" Destination="UNLOAD.DIR" dx1="1477.7777" />
+          <Connection Source="6" Destination="SLIDE.LEN" dx1="394.44443" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <FBNetwork >
+      <DataConnections>
+        <Connection Source="0" Destination="INPUT_VIEW.TRACE" dx1="716.6666" />
+        <Connection Source="30" Destination="INPUT_VIEW.DIA" dx1="700.0" />
+        <Connection Source="[6,5]" Destination="INPUT_VIEW.SIZE" dx1="672.22217" />
+        <Connection Source="1" Destination="INPUT_VIEW.VERTICAL" dx1="716.6666" />
+        <Connection Source="30" Destination="OUTPUT_VIEW.DIA" dx1="683.3333" />
+        <Connection Source="[6,5]" Destination="OUTPUT_VIEW.SIZE" dx1="655.55554" />
+      </DataConnections>
+    </FBNetwork>
+  </Device>
+  <Device Name="HMI" Type="FRAME_DEVICE" x="666.6666" y="11.111111" >
+    <Resource Name="SUPPLY_SENSORS" Type="PANEL_RESOURCE" x="188.88889" y="11.111111" >
+      <FBNetwork >
+        <FB Name="SUPPLY_SENSE" Type="SUBL_3" x="482.3529" y="11.7647" />
+        <FB Name="SH" Type="OUT_BOOL" x="1029.4117" y="252.9412" />
+        <FB Name="SE" Type="OUT_BOOL" x="1500.0" y="717.647" />
+        <FB Name="WP" Type="OUT_BOOL" x="1970.5883" y="1176.4706" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="SUPPLY_SENSE.INIT" dx1="58.8235" />
+          <Connection Source="SUPPLY_SENSE.INITO" Destination="SH.INIT" dx1="64.7059" />
+          <Connection Source="SH.INITO" Destination="SE.INIT" dx1="52.9412" />
+          <Connection Source="SE.INITO" Destination="WP.INIT" dx1="58.8235" />
+          <Connection Source="SUPPLY_SENSE.IND" Destination="SH.REQ" dx1="29.4118" dx2="5.8824" dy="764.7059" />
+          <Connection Source="SH.CNF" Destination="SE.REQ" dx1="29.4118" dx2="5.8824" dy="764.7059" />
+          <Connection Source="SE.CNF" Destination="WP.REQ" dx1="29.4118" dx2="5.8824" dy="764.7059" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="SUPPLY_SENSE.RD_1" Destination="SH.IN" dx1="111.7647" />
+          <Connection Source="SUPPLY_SENSE.RD_2" Destination="SE.IN" dx1="64.7059" />
+          <Connection Source="SUPPLY_SENSE.RD_3" Destination="WP.IN" dx1="29.4118" />
+          <Connection Source="&#34;SUPPLY HOME&#34;" Destination="SH.LABEL" dx1="735.2941" />
+          <Connection Source="&#34;SUPPLY AT END&#34;" Destination="SE.LABEL" dx1="1188.2352" />
+          <Connection Source="&#34;WORKPIECE PRESENT&#34;" Destination="WP.LABEL" dx1="1564.7058" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="SUPPLY_ACTUATORS" Type="PANEL_RESOURCE" x="961.1111" y="11.111111" >
+      <FBNetwork >
+        <FB Name="FWD" Type="IN_BOOL" x="533.3333" y="11.111111" />
+        <FB Name="REV" Type="IN_BOOL" x="1072.2222" y="266.66666" />
+        <FB Name="SUPPLY_ACT" Type="PUBL_2" x="1683.3333" y="672.22217" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="FWD.INIT" dx1="33.333332" />
+          <Connection Source="FWD.INITO" Destination="REV.INIT" dx1="88.888885" />
+          <Connection Source="REV.INITO" Destination="SUPPLY_ACT.INIT" dx1="127.77777" />
+          <Connection Source="FWD.IND" Destination="REV.REQ" dx1="33.333332" />
+          <Connection Source="REV.CNF" Destination="SUPPLY_ACT.REQ" dx1="83.33333" />
+          <Connection Source="REV.IND" Destination="SUPPLY_ACT.REQ" dx1="83.33333" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="FWD.OUT" Destination="SUPPLY_ACT.SD_1" dx1="27.777777" />
+          <Connection Source="REV.OUT" Destination="SUPPLY_ACT.SD_2" dx1="33.333332" />
+          <Connection Source="&#34;SUPPLY FWD&#34;" Destination="FWD.LABEL" dx1="277.77777" />
+          <Connection Source="&#34;SUPPLY REV&#34;" Destination="REV.LABEL" dx1="816.6666" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="LOAD_SENSORS" Type="PANEL_RESOURCE" x="216.66666" y="655.55554" >
+      <FBNetwork >
+        <FB Name="LOAD_SOL_SENSE" Type="SUBL_2" x="641.1765" y="11.7647" />
+        <FB Name="HOME" Type="OUT_BOOL" x="1117.6471" y="129.4118" />
+        <FB Name="END" Type="OUT_BOOL" x="1641.1764" y="605.8823" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="LOAD_SOL_SENSE.INIT" dx1="29.4118" />
+          <Connection Source="LOAD_SOL_SENSE.INITO" Destination="HOME.INIT" dx1="58.8235" />
+          <Connection Source="HOME.INITO" Destination="END.INIT" dx1="82.3529" />
+          <Connection Source="LOAD_SOL_SENSE.IND" Destination="HOME.REQ" dx1="29.4118" />
+          <Connection Source="HOME.CNF" Destination="END.REQ" dx1="41.1765" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="LOAD_SOL_SENSE.RD_1" Destination="HOME.IN" dx1="88.2353" />
+          <Connection Source="LOAD_SOL_SENSE.RD_2" Destination="END.IN" dx1="52.9412" />
+          <Connection Source="&#34;LOADER HOME&#34;" Destination="HOME.LABEL" dx1="823.5294" />
+          <Connection Source="&#34;LOADER AT END&#34;" Destination="END.LABEL" dx1="1323.5294" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="LOAD_ACTUATORS" Type="PANEL_RESOURCE" x="966.6666" y="644.4444" >
+      <FBNetwork >
+        <FB Name="LOAD_SOL" Type="IN_BOOL" x="516.6666" y="11.111111" />
+        <FB Name="LOAD_SOL_ACT" Type="PUBL_1" x="1072.2222" y="11.111111" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="LOAD_SOL.INIT" dx1="27.777777" />
+          <Connection Source="LOAD_SOL.INITO" Destination="LOAD_SOL_ACT.INIT" dx1="27.777777" />
+          <Connection Source="LOAD_SOL.IND" Destination="LOAD_SOL_ACT.REQ" dx1="61.111107" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="LOAD_SOL.OUT" Destination="LOAD_SOL_ACT.SD_1" dx1="127.77777" />
+          <Connection Source="&#34;LOAD SOL&#34;" Destination="LOAD_SOL.LABEL" dx1="300.0" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="SLIDE_SENSORS" Type="PANEL_RESOURCE" x="222.22221" y="1261.1111" >
+      <FBNetwork >
+        <FB Name="SLIDE_SENSE" Type="SUBL_5" x="527.7778" y="1244.4443" />
+        <FB Name="SH" Type="OUT_BOOL" x="1338.8888" y="11.111111" />
+        <FB Name="SE" Type="OUT_BOOL" x="1783.3333" y="494.44443" />
+        <FB Name="UCL" Type="OUT_BOOL" x="2716.6665" y="11.111111" />
+        <FB Name="CL" Type="OUT_BOOL" x="3150.0" y="483.3333" />
+        <FB Name="WP" Type="OUT_BOOL" x="2216.6665" y="938.88885" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="SLIDE_SENSE.INIT" dx1="27.777777" />
+          <Connection Source="SLIDE_SENSE.INITO" Destination="SH.INIT" dx1="116.666664" />
+          <Connection Source="SH.INITO" Destination="SE.INIT" dx1="61.111107" />
+          <Connection Source="UCL.INITO" Destination="CL.INIT" dx1="61.111107" />
+          <Connection Source="SLIDE_SENSE.IND" Destination="SH.REQ" dx1="172.22221" dx2="5.8824" dy="511.7647" />
+          <Connection Source="SH.CNF" Destination="SE.REQ" dx1="27.777777" dx2="5.8824" dy="764.7059" />
+          <Connection Source="UCL.CNF" Destination="CL.REQ" dx1="27.777777" dx2="5.8824" dy="764.7059" />
+          <Connection Source="SE.CNF" Destination="WP.REQ" dx1="27.777777" />
+          <Connection Source="SE.INITO" Destination="WP.INIT" dx1="55.555553" />
+          <Connection Source="WP.INITO" Destination="UCL.INIT" dx1="33.333332" />
+          <Connection Source="WP.CNF" Destination="UCL.REQ" dx1="72.22222" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="SLIDE_SENSE.RD_1" Destination="SH.IN" dx1="233.33333" />
+          <Connection Source="SLIDE_SENSE.RD_2" Destination="SE.IN" dx1="283.3333" />
+          <Connection Source="&#34;SLIDE HOME &#34;" Destination="SH.LABEL" dx1="1077.7777" />
+          <Connection Source="&#34;END&#34;" Destination="SE.LABEL" dx1="1649.9999" />
+          <Connection Source="&#34;UNCLAMPED &#34;" Destination="UCL.LABEL" dx1="2455.5554" />
+          <Connection Source="&#34;WORKPIECE PRESENT&#34;" Destination="WP.LABEL" dx1="1827.7777" />
+          <Connection Source="&#34;CLAMPED&#34;" Destination="CL.LABEL" dx1="2938.8887" />
+          <Connection Source="SLIDE_SENSE.RD_3" Destination="WP.IN" dx1="999.99994" />
+          <Connection Source="SLIDE_SENSE.RD_4" Destination="UCL.IN" dx1="1833.3333" />
+          <Connection Source="SLIDE_SENSE.RD_5" Destination="CL.IN" dx1="2016.6666" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="SLIDE_ACTUATORS" Type="PANEL_RESOURCE" x="972.22217" y="1261.1111" >
+      <FBNetwork >
+        <FB Name="FWD" Type="IN_BOOL" x="538.88885" y="11.111111" />
+        <FB Name="REV" Type="IN_BOOL" x="1055.5555" y="272.2222" />
+        <FB Name="CLAMP" Type="IN_BOOL" x="1577.7777" y="494.44443" />
+        <FB Name="SLIDE_ACT" Type="PUBL_3" x="2111.111" y="838.88885" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="FWD.INIT" dx1="33.333332" />
+          <Connection Source="FWD.INITO" Destination="REV.INIT" dx1="55.555553" />
+          <Connection Source="REV.INITO" Destination="CLAMP.INIT" dx1="100.0" />
+          <Connection Source="CLAMP.INITO" Destination="SLIDE_ACT.INIT" dx1="77.77777" />
+          <Connection Source="FWD.IND" Destination="REV.REQ" dx1="27.777777" />
+          <Connection Source="REV.CNF" Destination="CLAMP.REQ" dx1="27.777777" />
+          <Connection Source="REV.IND" Destination="CLAMP.REQ" dx1="27.777777" />
+          <Connection Source="CLAMP.CNF" Destination="SLIDE_ACT.REQ" dx1="27.777777" />
+          <Connection Source="CLAMP.IND" Destination="SLIDE_ACT.REQ" dx1="27.777777" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="FWD.OUT" Destination="SLIDE_ACT.SD_1" dx1="27.777777" />
+          <Connection Source="REV.OUT" Destination="SLIDE_ACT.SD_2" dx1="66.666664" />
+          <Connection Source="CLAMP.OUT" Destination="SLIDE_ACT.SD_3" dx1="27.777777" />
+          <Connection Source="&#34;SLIDE FWD&#34;" Destination="FWD.LABEL" dx1="311.11108" />
+          <Connection Source="&#34;SLIDE REV&#34;" Destination="REV.LABEL" dx1="833.3333" />
+          <Connection Source="&#34;CLAMP&#34;" Destination="CLAMP.LABEL" dx1="1405.5555" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="DRILL_SENSORS" Type="PANEL_RESOURCE" x="1766.6666" y="11.111111" >
+      <FBNetwork >
+        <FB Name="DRILL_SENSE" Type="SUBL_3" x="482.3529" y="11.7647" />
+        <FB Name="SH" Type="OUT_BOOL" x="1029.4117" y="252.9412" />
+        <FB Name="SE" Type="OUT_BOOL" x="1500.0" y="717.647" />
+        <FB Name="WP" Type="OUT_BOOL" x="1970.5883" y="1176.4706" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="DRILL_SENSE.INIT" dx1="29.4118" />
+          <Connection Source="DRILL_SENSE.INITO" Destination="SH.INIT" dx1="64.7059" />
+          <Connection Source="SH.INITO" Destination="SE.INIT" dx1="64.7059" />
+          <Connection Source="SE.INITO" Destination="WP.INIT" dx1="70.5882" />
+          <Connection Source="DRILL_SENSE.IND" Destination="SH.REQ" dx1="29.4118" />
+          <Connection Source="SH.CNF" Destination="SE.REQ" dx1="29.4118" dx2="5.8824" dy="764.7059" />
+          <Connection Source="SE.CNF" Destination="WP.REQ" dx1="29.4118" dx2="5.8824" dy="764.7059" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="DRILL_SENSE.RD_1" Destination="SH.IN" dx1="158.8235" />
+          <Connection Source="DRILL_SENSE.RD_2" Destination="SE.IN" dx1="111.7647" />
+          <Connection Source="DRILL_SENSE.RD_3" Destination="WP.IN" dx1="58.8235" />
+          <Connection Source="&#34;DRILL HOME&#34;" Destination="SH.LABEL" dx1="770.5882" />
+          <Connection Source="&#34;DRILL AT END&#34;" Destination="SE.LABEL" dx1="1223.5294" />
+          <Connection Source="&#34;SPINDLE ON&#34;" Destination="WP.LABEL" dx1="1717.647" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="DRILL_ACTUATORS" Type="PANEL_RESOURCE" x="2494.4443" y="11.111111" >
+      <FBNetwork >
+        <FB Name="FWD" Type="IN_BOOL" x="533.3333" y="11.111111" />
+        <FB Name="REV" Type="IN_BOOL" x="1055.5555" y="244.44443" />
+        <FB Name="SPIN" Type="IN_BOOL" x="1572.2222" y="594.4444" />
+        <FB Name="DRILL_ACT" Type="PUBL_3" x="2094.4443" y="922.22217" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="FWD.INIT" dx1="27.777777" />
+          <Connection Source="FWD.INITO" Destination="REV.INIT" dx1="88.888885" />
+          <Connection Source="REV.INITO" Destination="SPIN.INIT" dx1="94.44444" />
+          <Connection Source="SPIN.INITO" Destination="DRILL_ACT.INIT" dx1="94.44444" />
+          <Connection Source="FWD.IND" Destination="REV.REQ" dx1="61.111107" />
+          <Connection Source="REV.CNF" Destination="SPIN.REQ" dx1="55.555553" />
+          <Connection Source="REV.IND" Destination="SPIN.REQ" dx1="55.555553" />
+          <Connection Source="SPIN.CNF" Destination="DRILL_ACT.REQ" dx1="55.555553" />
+          <Connection Source="SPIN.IND" Destination="DRILL_ACT.REQ" dx1="55.555553" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="FWD.OUT" Destination="DRILL_ACT.SD_1" dx1="27.777777" />
+          <Connection Source="REV.OUT" Destination="DRILL_ACT.SD_2" dx1="27.777777" />
+          <Connection Source="SPIN.OUT" Destination="DRILL_ACT.SD_3" dx1="72.22222" />
+          <Connection Source="&#34;DRILL FWD&#34;" Destination="FWD.LABEL" dx1="311.11108" />
+          <Connection Source="&#34;DRILL REV&#34;" Destination="REV.LABEL" dx1="833.3333" />
+          <Connection Source="&#34;SPINDLE MOTOR&#34;" Destination="SPIN.LABEL" dx1="1261.1111" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="UNLOAD_SENSORS" Type="PANEL_RESOURCE" x="1783.3333" y="672.22217" >
+      <FBNetwork >
+        <FB Name="UNLOAD_SENSE" Type="SUBL_2" x="523.5294" y="11.7647" />
+        <FB Name="HOME" Type="OUT_BOOL" x="1047.0588" y="129.4118" />
+        <FB Name="END" Type="OUT_BOOL" x="1535.2941" y="611.7647" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="UNLOAD_SENSE.INIT" dx1="29.4118" />
+          <Connection Source="UNLOAD_SENSE.INITO" Destination="HOME.INIT" dx1="76.4706" />
+          <Connection Source="HOME.INITO" Destination="END.INIT" dx1="64.7059" />
+          <Connection Source="UNLOAD_SENSE.IND" Destination="HOME.REQ" dx1="47.0588" />
+          <Connection Source="HOME.CNF" Destination="END.REQ" dx1="41.1765" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="UNLOAD_SENSE.RD_1" Destination="HOME.IN" dx1="88.2353" />
+          <Connection Source="UNLOAD_SENSE.RD_2" Destination="END.IN" dx1="47.0588" />
+          <Connection Source="&#34;UNLOADER HOME&#34;" Destination="HOME.LABEL" dx1="711.7647" />
+          <Connection Source="&#34;UNLOADER AT END&#34;" Destination="END.LABEL" dx1="1176.4706" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="UNLOAD_ACTUATORS" Type="PANEL_RESOURCE" x="2500.0" y="672.22217" >
+      <FBNetwork >
+        <FB Name="UNLOAD" Type="IN_BOOL" x="517.647" y="11.7647" />
+        <FB Name="UNLOAD_ACT" Type="PUBL_1" x="1017.647" y="11.7647" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="UNLOAD.INIT" dx1="594.1176" />
+          <Connection Source="UNLOAD.INITO" Destination="UNLOAD_ACT.INIT" dx1="29.4118" />
+          <Connection Source="UNLOAD.IND" Destination="UNLOAD_ACT.REQ" dx1="47.0588" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="UNLOAD.OUT" Destination="UNLOAD_ACT.SD_1" dx1="64.7059" />
+          <Connection Source="&#34;UNLOAD SOL&#34;" Destination="UNLOAD.LABEL" dx1="252.9412" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="TAKEOFF_SENSORS" Type="PANEL_RESOURCE" x="1811.1111" y="1294.4443" >
+      <FBNetwork >
+        <FB Name="TAKEOFF_SENSE" Type="SUBL_3" x="483.3333" y="11.111111" />
+        <FB Name="SH" Type="OUT_BOOL" x="1027.7777" y="255.55554" />
+        <FB Name="SE" Type="OUT_BOOL" x="1500.0" y="716.6666" />
+        <FB Name="WP" Type="OUT_BOOL" x="1972.2222" y="1177.7777" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="TAKEOFF_SENSE.INIT" dx1="27.777777" />
+          <Connection Source="TAKEOFF_SENSE.INITO" Destination="SH.INIT" dx1="72.22222" />
+          <Connection Source="SH.INITO" Destination="SE.INIT" dx1="61.111107" />
+          <Connection Source="SE.INITO" Destination="WP.INIT" dx1="72.22222" />
+          <Connection Source="TAKEOFF_SENSE.IND" Destination="SH.REQ" dx1="27.777777" />
+          <Connection Source="SH.CNF" Destination="SE.REQ" dx1="27.777777" dx2="5.8824" dy="764.7059" />
+          <Connection Source="SE.CNF" Destination="WP.REQ" dx1="27.777777" dx2="5.8824" dy="764.7059" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="TAKEOFF_SENSE.RD_1" Destination="SH.IN" dx1="161.1111" />
+          <Connection Source="TAKEOFF_SENSE.RD_2" Destination="SE.IN" dx1="100.0" />
+          <Connection Source="TAKEOFF_SENSE.RD_3" Destination="WP.IN" dx1="55.555553" />
+          <Connection Source="&#34;WORKPIECE PRESENT&#34;" Destination="WP.LABEL" dx1="1583.3333" />
+          <Connection Source="&#34;TAKEOFF HOME&#34;" Destination="SH.LABEL" dx1="727.7778" />
+          <Connection Source="&#34;TAKEOFF AT END&#34;" Destination="SE.LABEL" dx1="1177.7777" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <Resource Name="TAKEOFF_ACTUATORS" Type="PANEL_RESOURCE" x="2527.7776" y="1305.5555" >
+      <FBNetwork >
+        <FB Name="FWD" Type="IN_BOOL" x="572.2222" y="11.111111" />
+        <FB Name="REV" Type="IN_BOOL" x="1072.2222" y="244.44443" />
+        <FB Name="TAKEOFF_ACT" Type="PUBL_2" x="1638.8888" y="577.7778" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="FWD.INIT" dx1="33.333332" />
+          <Connection Source="FWD.INITO" Destination="REV.INIT" dx1="72.22222" />
+          <Connection Source="REV.INITO" Destination="TAKEOFF_ACT.INIT" dx1="94.44444" />
+          <Connection Source="FWD.IND" Destination="REV.REQ" dx1="33.333332" />
+          <Connection Source="REV.CNF" Destination="TAKEOFF_ACT.REQ" dx1="55.555553" />
+          <Connection Source="REV.IND" Destination="TAKEOFF_ACT.REQ" dx1="55.555553" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="FWD.OUT" Destination="TAKEOFF_ACT.SD_1" dx1="44.444443" />
+          <Connection Source="REV.OUT" Destination="TAKEOFF_ACT.SD_2" dx1="77.77777" />
+          <Connection Source="&#34;TAKEOFF FWD&#34;" Destination="FWD.LABEL" dx1="294.44443" />
+          <Connection Source="&#34;TAKEOFF REV&#34;" Destination="REV.LABEL" dx1="800.0" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+  </Device>
+  <DeviceParameters>
+    <Connection Source="[100,100,375,360]" Destination="HMI.BOUNDS" dx1="372.2222" />
+    <Connection Source="[6,2]" Destination="HMI.GRID" dx1="555.55554" />
+    <Connection Source="[475,100,190,360]" Destination="MODEL.BOUNDS" dx1="377.77777" />
+  </DeviceParameters>
+</System>

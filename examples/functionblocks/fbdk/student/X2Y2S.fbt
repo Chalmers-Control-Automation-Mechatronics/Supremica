@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="X2Y2S" Comment="Compute X^2-Y^2(scanned)" >
+  <Identification Standard="61499-1" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2003-08-17" Remarks="Adapted from X2Y2." />
+  <CompilerInfo header="package fb.rt.student; import fb.rt.plc.math.*;" >
+    <Compiler Language="Java" Vendor="IBM" Product="Jikes" Version="1.0.6" />
+  </CompilerInfo>
+  <InterfaceList>
+    <InputVars>
+      <VarDeclaration Name="X" Type="REAL" />
+      <VarDeclaration Name="Y" Type="REAL" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="OUT" Type="REAL" />
+    </OutputVars>
+  </InterfaceList>
+  <BasicFB>
+  <Algorithm Name="REQ" Comment="Normally executed algorithm" >
+    <FBD >
+      <FB Name="ADDER" Type="ADD_REAL" x="376.4706" y="11.7647" />
+      <FB Name="SUBTR" Type="SUB_REAL" x="376.4706" y="500" />
+      <FB Name="MULR" Type="MUL_REAL" x="1347.0588" y="11.7647" />
+      <DataConnections>
+        <Connection Source="X" Destination="ADDER.IN1" dx1="311.7647" />
+        <Connection Source="Y" Destination="ADDER.IN2" dx1="311.7647" />
+        <Connection Source="X" Destination="SUBTR.IN1" dx1="311.7647" />
+        <Connection Source="Y" Destination="SUBTR.IN2" dx1="311.7647" />
+        <Connection Source="ADDER.OUT" Destination="MULR.IN1" dx1="223.5294" />
+        <Connection Source="SUBTR.OUT" Destination="MULR.IN2" dx1="300" />
+        <Connection Source="MULR.OUT" Destination="OUT" dx1="1805.8823" />
+      </DataConnections>
+    </FBD>
+  </Algorithm>
+  </BasicFB>
+</FBType>

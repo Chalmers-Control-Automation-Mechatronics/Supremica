@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE System SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<System xmlns="http://www.holobloc.com/xml/LibraryElement" Name="TEST_CSW" Comment="Test CLIENTW/SERVERW Configuration" >
+  <Identification Standard="61499-1" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2004-10-19" />
+  <Device Name="CLIENT" Type="FRAME_DEVICE" x="572.2222" y="11.111111" >
+    <Resource Name="RES1" Type="PANEL_RESOURCE" x="272.2222" y="11.111111" >
+      <FBNetwork >
+        <FB Name="SD" Type="IN_ANY" x="700.0" y="11.111111" />
+        <FB Name="CLT" Type="CLIENTW" x="1150.0" y="355.55554" />
+        <FB Name="STATUS" Type="OUT_ANY" x="1666.6666" y="11.111111" />
+        <FB Name="RD" Type="OUT_ANY" x="2172.2222" y="11.111111" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="SD.INIT" dx1="50.0" />
+          <Connection Source="SD.INITO" Destination="CLT.INIT" dx1="116.666664" />
+          <Connection Source="SD.IND" Destination="CLT.REQ" dx1="27.777777" />
+          <Connection Source="CLT.INITO" Destination="STATUS.INIT" dx1="27.777777" />
+          <Connection Source="CLT.CNF" Destination="STATUS.REQ" dx1="61.111107" />
+          <Connection Source="STATUS.INITO" Destination="RD.INIT" dx1="38.888885" />
+          <Connection Source="STATUS.CNF" Destination="RD.REQ" dx1="61.111107" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="&#34;WSTRING&#34;" Destination="SD.TYPE" dx1="494.44443" />
+          <Connection Source="&#34;DATA FROM CLIENT&#34;" Destination="SD.IVAL" dx1="344.44443" />
+          <Connection Source="SD.OUT" Destination="CLT.SD_1" dx1="27.777777" />
+          <Connection Source="&#34;localhost:4444&#34;" Destination="CLT.ID" dx1="883.3333" />
+          <Connection Source="CLT.STATUS" Destination="STATUS.IN" dx1="38.888885" />
+          <Connection Source="CLT.RD_1" Destination="RD.IN" dx1="538.88885" />
+          <Connection Source="1" Destination="CLT.QI" dx1="1083.3333" />
+          <Connection Source="25" Destination="SD.W" dx1="616.6666" />
+          <Connection Source="25" Destination="STATUS.W" dx1="1583.3333" />
+          <Connection Source="25" Destination="RD.W" dx1="2088.889" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <FBNetwork >
+      <DataConnections>
+        <Connection Source="3" Destination="RES1.ROWS" dx1="205.55554" />
+        <Connection Source="1" Destination="RES1.COLS" dx1="205.55554" />
+      </DataConnections>
+    </FBNetwork>
+  </Device>
+  <Device Name="SERVER" Type="FRAME_DEVICE" x="1105.5555" y="255.55554" >
+    <Resource Name="RES1" Type="PANEL_RESOURCE" x="233.33333" y="11.111111" >
+      <FBNetwork >
+        <FB Name="SD" Type="IN_ANY" x="700.0" y="11.111111" />
+        <FB Name="CLT" Type="SERVERW" x="1588.8888" y="511.11108" />
+        <FB Name="STATUS" Type="OUT_ANY" x="2094.4443" y="11.111111" />
+        <FB Name="RD" Type="OUT_ANY" x="2566.6665" y="11.111111" />
+        <FB Name="CONC" Type="FB_CONCAT" Comment="Force WSTRING output to replace CLT.SD" x="1088.8888" y="466.66666" />
+        <EventConnections>
+          <Connection Source="START.COLD" Destination="SD.INIT" dx1="50.0" />
+          <Connection Source="SD.INITO" Destination="CLT.INIT" dx1="522.2222" />
+          <Connection Source="CLT.INITO" Destination="STATUS.INIT" dx1="27.777777" />
+          <Connection Source="STATUS.INITO" Destination="RD.INIT" dx1="38.888885" />
+          <Connection Source="STATUS.CNF" Destination="RD.REQ" dx1="61.111107" />
+          <Connection Source="CLT.IND" Destination="STATUS.REQ" dx1="61.111107" />
+          <Connection Source="SD.IND" Destination="CONC.REQ" dx1="38.888885" />
+          <Connection Source="CONC.CNF" Destination="CLT.RSP" dx1="33.333332" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="&#34;WSTRING&#34;" Destination="SD.TYPE" dx1="494.44443" />
+          <Connection Source="&#34;DATA&#34;" Destination="SD.IVAL" dx1="550.0" />
+          <Connection Source="CLT.STATUS" Destination="STATUS.IN" dx1="88.888885" />
+          <Connection Source="CLT.RD_1" Destination="RD.IN" dx1="555.55554" />
+          <Connection Source="1" Destination="CLT.QI" dx1="1522.2222" />
+          <Connection Source="25" Destination="SD.W" dx1="616.6666" />
+          <Connection Source="25" Destination="STATUS.W" dx1="2011.1111" />
+          <Connection Source="25" Destination="RD.W" dx1="2483.3333" />
+          <Connection Source="&#34; FROM SERVER&#34;" Destination="CONC.IN2" dx1="800.0" />
+          <Connection Source="SD.OUT" Destination="CONC.IN1" dx1="27.777777" />
+          <Connection Source="CONC.OUT" Destination="CLT.SD_1" dx1="27.777777" />
+          <Connection Source="&#34;localhost:4444&#34;" Destination="CLT.ID" dx1="1322.2222" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+    <FBNetwork >
+      <DataConnections>
+        <Connection Source="3" Destination="RES1.ROWS" dx1="166.66666" />
+        <Connection Source="1" Destination="RES1.COLS" dx1="166.66666" />
+      </DataConnections>
+    </FBNetwork>
+  </Device>
+  <DeviceParameters>
+    <Connection Source="[100,100,150,125]" Destination="CLIENT.BOUNDS" dx1="277.77777" />
+    <Connection Source="[250,100,150,125]" Destination="SERVER.BOUNDS" dx1="811.1111" />
+  </DeviceParameters>
+</System>

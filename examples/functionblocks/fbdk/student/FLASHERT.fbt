@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="FLASHERT" Comment="Multi-purpose LED Flasher" >
+  <Identification Standard="61499 ITA" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2004-01-09" Remarks="Copied from FLASHER4." />
+  <CompilerInfo header="package fb.rt.student;" >
+    <Compiler Language="Java" Vendor="IBM" Product="VisualAge" Version="3.0" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="INIT" Comment="Initialization Request" >
+        <With Var="MODE" />
+      </Event>
+      <Event Name="REQ" Comment="Update Request" >
+        <With Var="MODE" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="INITO" Comment="Initialization Confirm" >
+        <With Var="LED3" />
+        <With Var="LED2" />
+        <With Var="LED1" />
+        <With Var="LED0" />
+      </Event>
+      <Event Name="CNF" Comment="Update Confirmation" >
+        <With Var="LED3" />
+        <With Var="LED2" />
+        <With Var="LED1" />
+        <With Var="LED0" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="MODE" Type="UINT" Comment="0=FLASH_ALL,1=COUNT_UP,2=COUNT_DOWN,3=CHASE_UP,4=CHASE_DOWN" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="LED3" Type="BOOL" Comment="MSB" />
+      <VarDeclaration Name="LED2" Type="BOOL" />
+      <VarDeclaration Name="LED1" Type="BOOL" />
+      <VarDeclaration Name="LED0" Type="BOOL" Comment="LSB" />
+    </OutputVars>
+  </InterfaceList>
+  <BasicFB>
+    <InternalVars>
+      <VarDeclaration Name="OFLO" Type="BOOL" />
+    </InternalVars>
+    <ECC >
+      <ECState Name="WAIT" x="1442.1052" y="1021.0526" >
+      </ECState>
+      <ECState Name="INIT" x="1442.1052" y="52.631577" >
+        <ECAction Algorithm="INIT" Output="INITO" />
+      </ECState>
+      <ECState Name="FLASH_ALL" x="2063.158" y="510.5263" >
+        <ECAction Algorithm="FLASH_ALL" Output="CNF" />
+      </ECState>
+      <ECState Name="COUNT_UP" x="2084.2104" y="1531.579" >
+        <ECAction Algorithm="COUNT_UP" Output="CNF" />
+      </ECState>
+      <ECState Name="COUNT_DOWN" x="1442.1052" y="1994.7368" >
+        <ECAction Algorithm="COUNT_DOWN" Output="CNF" />
+      </ECState>
+      <ECState Name="CHASE_UP" x="194.73685" y="1536.842" >
+        <ECAction Algorithm="CHASE_UP" Output="CNF" />
+      </ECState>
+      <ECState Name="CHASE_DOWN" x="221.05263" y="515.7895" >
+        <ECAction Algorithm="CHASE_DOWN" Output="CNF" />
+      </ECState>
+      <ECTransition Source="WAIT" Destination="INIT" Condition="INIT" x="1594.7368" y="357.89474" />
+      <ECTransition Source="WAIT" Destination="FLASH_ALL" Condition="REQ&#38;(MODE=0)" x="2063.158" y="815.7895" />
+      <ECTransition Source="WAIT" Destination="COUNT_UP" Condition="REQ&#38;(MODE=1)" x="2084.2104" y="1221.0526" />
+      <ECTransition Source="WAIT" Destination="COUNT_DOWN" Condition="REQ&#38;(MODE=2)" x="1184.2106" y="1705.2632" />
+      <ECTransition Source="WAIT" Destination="CHASE_UP" Condition="REQ&#38;(MODE=3)" x="542.1053" y="1189.4736" />
+      <ECTransition Source="WAIT" Destination="CHASE_DOWN" Condition="REQ&#38;(MODE=4)" x="405.26315" y="852.6316" />
+      <ECTransition Source="INIT" Destination="WAIT" Condition="1" x="1442.1052" y="689.4737" />
+      <ECTransition Source="FLASH_ALL" Destination="WAIT" Condition="1" x="1652.6316" y="847.3684" />
+      <ECTransition Source="COUNT_UP" Destination="WAIT" Condition="1" x="1657.8948" y="1194.7368" />
+      <ECTransition Source="COUNT_DOWN" Destination="WAIT" Condition="1" x="1442.1052" y="1352.6316" />
+      <ECTransition Source="CHASE_UP" Destination="WAIT" Condition="1" x="1010.5263" y="1194.7368" />
+      <ECTransition Source="CHASE_DOWN" Destination="WAIT" Condition="1" x="1021.0526" y="847.3684" />
+    </ECC>
+  <Algorithm Name="INIT" >
+    <ST Text="LED0:=(MODE>2);&#10;LED1:=false;&#10;LED2:=false;&#10;LED3:=false;&#10;" />
+  </Algorithm>
+  <Algorithm Name="COUNT_UP" >
+    <ST Text="LED0:=NOT LED0;&#10;IF NOT LED0 THEN&#10;LED1:=NOT LED1;&#10;IF NOT LED1 THEN&#10;LED2:=NOT LED2;&#10;IF NOT LED2 THEN LED3:=NOT LED3;END_IF;&#10;END_IF;&#10;END_IF;&#10;" />
+  </Algorithm>
+  <Algorithm Name="COUNT_DOWN" >
+    <ST Text="LED0:=NOT LED0;&#10;IF LED0 THEN&#10;LED1:=NOT LED1;&#10;IF LED1 THEN&#10;LED2:=NOT LED2;&#10;IF LED2 THEN LED3:=NOT LED3;END_IF;&#10;END_IF;&#10;END_IF;&#10;" />
+  </Algorithm>
+  <Algorithm Name="FLASH_ALL" >
+    <LD >
+      <Rung Output="LED0" Expression="LED0 ! " />
+      <Rung Output="LED1" Expression="LED1 ! " />
+      <Rung Output="LED2" Expression="LED2 ! " />
+      <Rung Output="LED3" Expression="LED3 ! " />
+    </LD>
+  </Algorithm>
+  <Algorithm Name="CHASE_UP" >
+    <LD >
+      <Rung Output="OFLO" Expression="LED3 " />
+      <Rung Output="LED3" Expression="LED2 " />
+      <Rung Output="LED2" Expression="LED1 " />
+      <Rung Output="LED1" Expression="LED0 " />
+      <Rung Output="LED0" Expression="OFLO " />
+    </LD>
+  </Algorithm>
+  <Algorithm Name="CHASE_DOWN" >
+    <LD >
+      <Rung Output="OFLO" Expression="LED0 " />
+      <Rung Output="LED0" Expression="LED1 " />
+      <Rung Output="LED1" Expression="LED2 " />
+      <Rung Output="LED2" Expression="LED3 " />
+      <Rung Output="LED3" Expression="OFLO " />
+    </LD>
+  </Algorithm>
+  </BasicFB>
+</FBType>

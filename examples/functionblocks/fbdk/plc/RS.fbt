@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="RS" Comment="IEC 61131-3 Table 34,#2" >
+  <Identification Standard="61131-3" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2004-12-15" Remarks="Converted from SRC format." />
+  <CompilerInfo header="package fb.rt.plc;" >
+  </CompilerInfo>
+  <InterfaceList>
+    <InputVars>
+      <VarDeclaration Name="S" Type="BOOL" />
+      <VarDeclaration Name="R1" Type="BOOL" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="Q1" Type="BOOL" />
+    </OutputVars>
+  </InterfaceList>
+  <BasicFB>
+  <Algorithm Name="REQ" >
+    <ST Text="IF R1 THEN Q1:=false;&#10;ELSIF S THEN Q1:=TRUE;&#10;END_IF;&#10;" />
+  </Algorithm>
+  </BasicFB>
+</FBType>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="EV_COUNTER" >
+  <Identification Standard="61499-2" />
+  <VersionInfo Organization="" Version="0.0" Author="HDF" Date="2002-12-16" />
+  <CompilerInfo header="package fb.rt.ita;" >
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="reset" >
+      </Event>
+      <Event Name="count_up" >
+      </Event>
+      <Event Name="count_down" >
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="res_done" >
+        <With Var="count" />
+      </Event>
+      <Event Name="cnt_done" >
+        <With Var="count" />
+      </Event>
+    </EventOutputs>
+    <OutputVars>
+      <VarDeclaration Name="count" Type="UINT" />
+    </OutputVars>
+  </InterfaceList>
+  <BasicFB>
+    <ECC >
+      <ECState Name="starts" >
+      </ECState>
+      <ECState Name="resets" >
+        <ECAction Algorithm="rst" Output="res_done" />
+      </ECState>
+      <ECState Name="ups" >
+        <ECAction Algorithm="cnt_up" Output="cnt_done" />
+      </ECState>
+      <ECState Name="downs" >
+        <ECAction Algorithm="cnt_down" Output="cnt_done" />
+      </ECState>
+      <ECTransition Source="starts" Destination="resets" Condition="reset" />
+      <ECTransition Source="starts" Destination="ups" Condition="count_up" />
+      <ECTransition Source="starts" Destination="downs" Condition="count_down" />
+      <ECTransition Source="resets" Destination="starts" Condition="TRUE" />
+      <ECTransition Source="ups" Destination="starts" Condition="TRUE" />
+      <ECTransition Source="downs" Destination="starts" Condition="TRUE" />
+    </ECC>
+  <Algorithm Name="rst" >
+    <ST Text="count:=0;&#10;" />
+  </Algorithm>
+  <Algorithm Name="cnt_up" >
+    <ST Text="count:=count+1;&#10;" />
+  </Algorithm>
+  <Algorithm Name="cnt_down" >
+    <ST Text="count:=count-1;&#10;" />
+  </Algorithm>
+  </BasicFB>
+</FBType>

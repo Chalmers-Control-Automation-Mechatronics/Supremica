@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="DEV_HMI" Comment="Simple Device Front Panel" >
+  <Identification Standard="61499 Feasibility Demo ITA" Description="Simple Device Front Panel" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2001-06-02" Remarks="Replaced IN,OUT_WSTRING to IN,OUT_ANY" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2001-01-08" />
+  <CompilerInfo header="package fb.rt.ita; import fb.rt.hmi.*;" >
+    <Compiler Language="Java" Vendor="IBM" Product="VisualAge" Version="3.0" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="INIT" Comment="Interface Initialization" >
+        <With Var="ID" />
+      </Event>
+      <Event Name="WARM" Comment="Warm Restart,User-provided ID" >
+      </Event>
+      <Event Name="REQ" Comment="Manager Status Change" >
+        <With Var="Q" />
+        <With Var="STATUS" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="INITO" Comment="Initialization Confirm" >
+        <With Var="IDO" />
+      </Event>
+      <Event Name="WARMO" Comment="WARM Restart confirmation" >
+        <With Var="IDO" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="ID" Type="WSTRING" InitialValue="&#34;localhost:61499&#34;" Comment="Management Socket ID" />
+      <VarDeclaration Name="Q" Type="BOOL" Comment="Manager QO" />
+      <VarDeclaration Name="STATUS" Type="WSTRING" Comment="Manager Status" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="IDO" Type="WSTRING" Comment="Initial or user-entered ID" />
+    </OutputVars>
+  </InterfaceList>
+  <FBNetwork >
+    <FB Name="IDIN" Type="IN_ANY" x="270.5882" y="11.7647" />
+    <FB Name="QOUT" Type="OUT_BOOL" x="1129.4117" y="11.7647" />
+    <FB Name="STATOUT" Type="OUT_ANY" x="1823.5294" y="11.7647" />
+    <EventConnections>
+      <Connection Source="INIT" Destination="IDIN.INIT" dx1="164.7059" />
+      <Connection Source="IDIN.INITO" Destination="QOUT.INIT" dx1="300" />
+      <Connection Source="QOUT.INITO" Destination="STATOUT.INIT" dx1="135.2941" />
+      <Connection Source="STATOUT.INITO" Destination="INITO" dx1="2282.3528" />
+      <Connection Source="WARM" Destination="IDIN.REQ" dx1="129.4118" />
+      <Connection Source="IDIN.IND" Destination="WARMO" dx1="770.5882" />
+      <Connection Source="REQ" Destination="QOUT.REQ" dx1="1017.6470" />
+      <Connection Source="QOUT.CNF" Destination="STATOUT.REQ" dx1="76.4706" />
+    </EventConnections>
+    <DataConnections>
+      <Connection Source="1" Destination="IDIN.QI" dx1="205.8824" />
+      <Connection Source="1" Destination="QOUT.QI" dx1="1064.7058" />
+      <Connection Source="1" Destination="STATOUT.QI" dx1="1758.8235" />
+      <Connection Source="24" Destination="IDIN.W" dx1="188.2353" />
+      <Connection Source="16" Destination="STATOUT.W" dx1="1741.1764" />
+      <Connection Source="ID" Destination="IDIN.IVAL" dx1="194.1176" />
+      <Connection Source="Q" Destination="QOUT.IN" dx1="1058.8235" />
+      <Connection Source="COLOR#red" Destination="QOUT.C0" dx1="911.7647" />
+      <Connection Source="COLOR#green" Destination="QOUT.C1" dx1="876.4706" />
+      <Connection Source="STATUS" Destination="STATOUT.IN" dx1="1652.9412" />
+      <Connection Source="IDIN.OUT" Destination="IDO" dx1="711.7647" />
+    </DataConnections>
+  </FBNetwork>
+</FBType>

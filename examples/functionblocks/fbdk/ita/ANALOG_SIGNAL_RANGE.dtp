@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE DataType SYSTEM "../DataType.dtd" >
+<DataType xmlns="http://www.holobloc.com/xml/DataType" Name="ANALOG_SIGNAL_RANGE" Comment="IEC 61131-3-2.3.3.2" >
+  <Identification Standard="61131-3" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.3" Author="JHC" Date="2001-03-02" Remarks="Test revised Java code generation." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.2" Author="JHC" Date="2000-05-16" Remarks="File type changed to &#34;.dtp&#34;" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2000-05-10" Remarks="Corrected encoding of values." />
+  <CompilerInfo header="package fb.rt.ita;" >
+    <Compiler Language="Java" Vendor="IBM" Product="VisualAge" Version="3.0" />
+  </CompilerInfo>
+  <ASN1Tag Class="PRIVATE" Number="11" />
+  <EnumeratedType InitialValue="UNIPOLAR_1_5V" >
+    <EnumeratedValue Name="BIPOLAR_10V" Comment="-10 to+10 VDC" />
+    <EnumeratedValue Name="UNIPOLAR_10V" Comment="0 to+10 VDC" />
+    <EnumeratedValue Name="UNIPOLAR_1_5V" Comment="+1 to+5 VDC" />
+    <EnumeratedValue Name="UNIPOLAR_0_5V" Comment="0 to+5 VDC" />
+    <EnumeratedValue Name="UNIPOLAR_4_20_MA" Comment="+4 to+20 mADC" />
+    <EnumeratedValue Name="UNIPOLAR_0_20_MA" Comment="0 to+20 mADC" />
+  </EnumeratedType>
+</DataType>

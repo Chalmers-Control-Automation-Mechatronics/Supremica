@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="STRINGTEST" Comment="Test String Assignments" >
+  <Identification Standard="61499-2" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2003-11-14" />
+  <CompilerInfo header="package fb.rt.test;" >
+    <Compiler Language="Java" Vendor="IBM" Product="Jikes" Version="1.06" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="REQ" Comment="Normal Execution Request" >
+        <With Var="IN" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="CNF" Comment="Execution Confirmation" >
+        <With Var="OUT0" />
+        <With Var="OUT1" />
+        <With Var="OUT2" />
+        <With Var="OUT3" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="IN" Type="BOOL" Comment="Input" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="OUT0" Type="BOOL" Comment="Boolean output" />
+      <VarDeclaration Name="OUT1" Type="INT" Comment="Integer output" />
+      <VarDeclaration Name="OUT2" Type="WSTRING" Comment="String output" />
+      <VarDeclaration Name="OUT3" Type="WSTRING" Comment="String output" />
+    </OutputVars>
+  </InterfaceList>
+  <BasicFB>
+  <Algorithm Name="REQ" >
+    <ST Text="OUT0:=IN;&#10;IF IN THEN&#10;OUT1:=1;&#10;OUT2 := &#34;Input is  $&#34;true$&#34;&#34;;&#10;OUT3 := &#34;Input is  $'true'&#34;;&#10;ELSE&#10;OUT1:=0;&#10;OUT2 := &#34;Input is $&#34;false$&#34;&#34;;&#10;OUT3 := &#34;Input is $'false$'&#34;;&#10;END_IF&#10;CNF.serviceEvent(this);&#10;" />
+  </Algorithm>
+  </BasicFB>
+</FBType>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="PIPE_VIEW" Comment="View of a Pipe Segment" >
+  <Identification Standard="61499-1" Classification="View" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2004-09-01" Remarks="Copied/Modified from CNV_VIEW" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2004-08-30" Remarks="Copied/Modified from CNV_VIEW" />
+  <CompilerInfo header="package fb.rt.process;" >
+    <Compiler Language="Java" Vendor="IBM" Product="VisualAge" Version="3.0" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="INIT" Comment="Initialize" >
+        <With Var="BKGD" />
+        <With Var="DIA" />
+        <With Var="W" />
+        <With Var="DIR" />
+        <With Var="FGD" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="INITO" Comment="Initialized" >
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="FGD" Type="COLOR" InitialValue="blue" Comment="Foreground Color" />
+      <VarDeclaration Name="BKGD" Type="COLOR" InitialValue="white" Comment="Background Color" />
+      <VarDeclaration Name="DIA" Type="UINT" Comment="Segment side length" />
+      <VarDeclaration Name="W" Type="UINT" InitialValue="4" Comment="Pipe width" />
+      <VarDeclaration Name="DIR" Type="UINT" ArraySize="2" Comment="[Entry,Exit]: 0=North, 1=East, 2=South, 3=West" />
+    </InputVars>
+  </InterfaceList>
+</FBType>

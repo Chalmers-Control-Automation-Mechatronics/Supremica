@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="XABS_VIEW" Comment="Abstract Superclass for a Transfer Component" >
+  <Identification Standard="61499-1" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2004-09-01" Remarks="Changed DIA initial value to 0." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2001-04-15" Remarks="Initial XML version." />
+  <CompilerInfo header="package fb.rt.hmi;" >
+    <Compiler Language="Java" Vendor="IBM" Product="VisualAge" Version="3.0" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="INIT" Comment="Initialize" >
+        <With Var="WKPC" />
+        <With Var="BKGD" />
+        <With Var="LEN" />
+        <With Var="DIA" />
+        <With Var="DIR" />
+      </Event>
+      <Event Name="REQ" Comment="Update the display" >
+        <With Var="POS" />
+        <With Var="WKPC" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="INITO" Comment="Initialized" >
+      </Event>
+      <Event Name="CNF" Comment="Displayed" >
+      </Event>
+      <Event Name="IND" Comment="Change in FAULT status" >
+        <With Var="FAULT" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="POS" Type="UINT" Comment="Position:0=HOME,100=END" />
+      <VarDeclaration Name="WKPC" Type="COLOR" InitialValue="cyan" Comment="Workpiece Color" />
+      <VarDeclaration Name="BKGD" Type="COLOR" InitialValue="blue" Comment="Transfer Bar Color" />
+      <VarDeclaration Name="LEN" Type="UINT" InitialValue="3" Comment="Bar Length in Diameters" />
+      <VarDeclaration Name="DIA" Type="UINT" Comment="Workpiece diameter" />
+      <VarDeclaration Name="DIR" Type="UINT" Comment="Orientation:0=L/R,1=T/B,2=R/L,3=B/T" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="FAULT" Type="BOOL" Comment="0=Normal,1=Fault" />
+    </OutputVars>
+  </InterfaceList>
+  <Service RightInterface="resource" LeftInterface="XABS_VIEW" >
+    <ServiceSequence Name="init_new" Comment="View component doesn't exist yet" >
+      <ServiceTransaction >
+        <InputPrimitive Interface="XABS_VIEW" Event="INIT" />
+        <OutputPrimitive Interface="resource" Event="getNewView" />
+        <OutputPrimitive Interface="resource" Event="initView" />
+        <OutputPrimitive Interface="XABS_VIEW" Event="INITO" />
+      </ServiceTransaction>
+    </ServiceSequence>
+    <ServiceSequence Name="init_old" Comment="View component exists" >
+      <ServiceTransaction >
+        <InputPrimitive Interface="XABS_VIEW" Event="INIT" />
+        <OutputPrimitive Interface="resource" Event="initView" />
+        <OutputPrimitive Interface="XABS_VIEW" Event="INITO" />
+      </ServiceTransaction>
+    </ServiceSequence>
+    <ServiceSequence Name="normal_operation" >
+      <ServiceTransaction >
+        <InputPrimitive Interface="XABS_VIEW" Event="REQ" />
+        <OutputPrimitive Interface="resource" Event="req" />
+        <OutputPrimitive Interface="XABS_VIEW" Event="CNF" />
+      </ServiceTransaction>
+    </ServiceSequence>
+    <ServiceSequence Name="fault_state_change" >
+      <ServiceTransaction >
+        <InputPrimitive Interface="resource" Event="toggleFault" />
+        <OutputPrimitive Interface="XABS_VIEW" Event="IND" />
+      </ServiceTransaction>
+    </ServiceSequence>
+  </Service>
+</FBType>

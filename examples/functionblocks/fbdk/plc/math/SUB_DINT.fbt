@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="SUB_DINT" Comment="IEC 61131-3 DINT Subtraction" >
+  <Identification Standard="61131-3" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2004-12-15" Remarks="Converted from SRC format." />
+  <CompilerInfo header="package fb.rt.plc.math;" >
+  </CompilerInfo>
+  <InterfaceList>
+    <InputVars>
+      <VarDeclaration Name="IN1" Type="DINT" Comment="Minuend" />
+      <VarDeclaration Name="IN2" Type="DINT" Comment="Subtrahend" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="OUT" Type="DINT" Comment="Difference" />
+    </OutputVars>
+  </InterfaceList>
+</FBType>

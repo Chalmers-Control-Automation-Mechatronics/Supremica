@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="FB_ADD_DINT" Comment="DINT Addition" >
+  <Identification Standard="61499-1-D.1" Classification="Math" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2001-08-01" Remarks="New (XML) version" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="1997-09-11" Remarks="Old (SRC) version" />
+  <CompilerInfo header="package fb.rt.math;" classdef="class FB_ADD_DINT extends FBFunction2" >
+    <Compiler Language="Java" Vendor="IBM" Product="VisualAge" Version="3.0" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="REQ" >
+        <With Var="IN1" />
+        <With Var="IN2" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="CNF" >
+        <With Var="OUT" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="IN1" Type="DINT" Comment="Augend" />
+      <VarDeclaration Name="IN2" Type="DINT" Comment="Addend" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="OUT" Type="DINT" Comment="Sum" />
+    </OutputVars>
+  </InterfaceList>
+</FBType>

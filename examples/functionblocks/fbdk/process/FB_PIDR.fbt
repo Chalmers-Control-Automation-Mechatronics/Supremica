@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="FB_PIDR" Comment="PID with Bumpless Transfer and Anti-Reset Windup, REAL PV+XOUT" >
+  <Identification Standard="61499-1-D.1" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2004-09-06" />
+  <CompilerInfo header="package fb.rt.process;" >
+    <Compiler Language="Java" Vendor="IBM" Product="VisualAge" Version="3.0" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="REQ" >
+        <With Var="AUTO" />
+        <With Var="PV" />
+        <With Var="SP" />
+        <With Var="X0" />
+        <With Var="KP" />
+        <With Var="TR" />
+        <With Var="TD" />
+        <With Var="DT" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="CNF" >
+        <With Var="XOUT" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="AUTO" Type="BOOL" Comment="0-manual,1-automatic" />
+      <VarDeclaration Name="PV" Type="REAL" Comment="Process variable,0-100 percent" />
+      <VarDeclaration Name="SP" Type="UINT" Comment="Set Point,0-100 percent" />
+      <VarDeclaration Name="X0" Type="UINT" Comment="Manual Output Setting,0-100 percent" />
+      <VarDeclaration Name="KP" Type="REAL" Comment="Proportionality Constant" />
+      <VarDeclaration Name="DT" Type="TIME" InitialValue="t#1s" Comment="Sampling Period" />
+      <VarDeclaration Name="TR" Type="TIME" Comment="Reset Time" />
+      <VarDeclaration Name="TD" Type="TIME" Comment="Derivative Time Constant" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="XOUT" Type="REAL" Comment="Manipulated Variable,0-100 percent" />
+    </OutputVars>
+  </InterfaceList>
+  <BasicFB>
+    <InternalVars>
+      <VarDeclaration Name="WASAUTO" Type="BOOL" />
+      <VarDeclaration Name="ERROR" Type="REAL" />
+      <VarDeclaration Name="ITERM" Type="REAL" />
+      <VarDeclaration Name="DTERM" Type="REAL" />
+      <VarDeclaration Name="X1" Type="REAL" />
+      <VarDeclaration Name="X2" Type="REAL" />
+      <VarDeclaration Name="X3" Type="REAL" />
+    </InternalVars>
+  <Algorithm Name="REQ" >
+    <ST Text="ERROR:=PV-SP;&#10;IF AUTO THEN&#10;  IF WASAUTO THEN&#10;    ITERM:=ITERM+ERROR*DT/TR;&#10;    DTERM:=(3*(PV-X3)+X1-X2)*TD/DT/10;&#10;  ELSE&#10;    ITERM:=(ERROR-X0)/KP;&#10;    DTERM:=0;&#10;  END_IF;&#10;  XOUT:=-KP*ERROR-ITERM-DTERM;&#10;ELSE XOUT:=X0;&#10;END_IF&#10;X3:=X2;X2:=X1;X1:=PV;&#10;IF XOUT&#60;0 THEN&#10;  XOUT:=0;&#10;  ITERM:=ITERM-ERROR*DT/TR;&#10;ELSIF XOUT>100 THEN&#10;  XOUT:=100;&#10;  ITERM:=ITERM-ERROR*DT/TR;&#10;END_IF;&#10;WASAUTO:=AUTO;&#10;CNF.serviceEvent(this);&#10;" />
+  </Algorithm>
+  </BasicFB>
+</FBType>

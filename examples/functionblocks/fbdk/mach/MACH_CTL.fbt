@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="MACH_CTL" Comment="Cycle Control for a Machine with Fixed Tool" >
+  <Identification Standard="61499-1" Classification="Simulation" ApplicationDomain="Machining" Function="Drilling" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.2" Author="JHC" Date="2004-10-20" Remarks="Changed algorithm to LD to recover from retracting fault." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2004-04-05" Remarks="Corrected transition SPIN -> ADV" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2002-10-03" Remarks="Modified from DRILL_CTL." />
+  <CompilerInfo header="package fb.rt.mach;" >
+    <Compiler Language="Java" Vendor="Sun" Product="JDK" Version="1.4.2" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="SENSE" Comment="Sensor data change" >
+        <With Var="WEND" />
+        <With Var="CLAMPED" />
+        <With Var="END" />
+        <With Var="SPIN" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="ACT" Comment="Actuator output change" >
+        <With Var="FWD" />
+        <With Var="REV" />
+        <With Var="SP_ON" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="WEND" Type="BOOL" Comment="Workpiece present for machining" />
+      <VarDeclaration Name="CLAMPED" Type="BOOL" Comment="Workpiece clamped" />
+      <VarDeclaration Name="END" Type="BOOL" Comment="Machine at END position" />
+      <VarDeclaration Name="SPIN" Type="BOOL" Comment="Spindle at operating speed" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="FWD" Type="BOOL" Comment="Advance machine" />
+      <VarDeclaration Name="REV" Type="BOOL" Comment="Retract machine" />
+      <VarDeclaration Name="SP_ON" Type="BOOL" Comment="Spindle motor" />
+    </OutputVars>
+  </InterfaceList>
+  <BasicFB>
+    <InternalVars>
+      <VarDeclaration Name="MACHINED" Type="BOOL" Comment="Workpiece is machined" />
+    </InternalVars>
+    <ECC >
+      <ECState Name="START" Comment="Initial State" x="333.3333" y="55.555553" >
+      </ECState>
+      <ECState Name="CTL" Comment="Execute Control Algorithm" x="638.88885" y="400.0" >
+        <ECAction Algorithm="CTL" Output="ACT" />
+      </ECState>
+      <ECTransition Source="START" Destination="CTL" Condition="SENSE" x="638.88885" y="55.555553" />
+      <ECTransition Source="CTL" Destination="START" Condition="1" x="333.3333" y="400.0" />
+    </ECC>
+  <Algorithm Name="CTL" >
+    <LD >
+      <Rung Output="SP_ON" Expression="CLAMPED" />
+      <Rung Output="MACHINED" Expression="END MACHINED | CLAMPED &#38;" />
+      <Rung Output="FWD" Expression="SPIN WEND &#38; MACHINED ! &#38;" />
+      <Rung Output="REV" Expression="FWD !" />
+    </LD>
+  </Algorithm>
+  </BasicFB>
+</FBType>

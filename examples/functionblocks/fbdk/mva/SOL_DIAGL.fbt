@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="SOL_DIAGL" Comment="Locally-Coupled and Clocked Diagnostics for a Solenoid" >
+  <Identification Standard="61499-1" Classification="Diagnostics" ApplicationDomain="Mechanisms" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2004-10-20" Remarks="Renamed to replace old SOL_DIAGL." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2004-09-27" Remarks="Derived from MECH2C_DIAGL." />
+  <CompilerInfo header="package fb.rt.mva; import fb.rt.net.*; import fb.rt.math.*;" classdef="public class SOL_DIAGCL extends FBMVCD" >
+    <Compiler Language="Java" Vendor="IBM" Product="Jikes" Version="1.06" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="INIT" >
+        <With Var="SENSE_ID" />
+        <With Var="ACT_ID" />
+        <With Var="DIAG_ID" />
+        <With Var="SRC" />
+        <With Var="NF" />
+        <With Var="NR" />
+        <With Var="MSGF" />
+        <With Var="MSGR" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="INITO" >
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="CLK_ID" Type="WSTRING" InitialValue="&#34;DIAG_CLK&#34;" Comment="Diagnostic Clock Local Channel ID" />
+      <VarDeclaration Name="SENSE_ID" Type="WSTRING" Comment="Sensor channel ID from Model" />
+      <VarDeclaration Name="ACT_ID" Type="WSTRING" Comment="Actuator channel ID from Controller" />
+      <VarDeclaration Name="DIAG_ID" Type="WSTRING" Comment="Diagnostic output channel ID" />
+      <VarDeclaration Name="SRC" Type="WSTRING" Comment="Diagnostic Source ID" />
+      <VarDeclaration Name="NF" Type="UINT" Comment="Forward Motion Timeout Period in CLK events" />
+      <VarDeclaration Name="NR" Type="UINT" Comment="Reverse Motion Timeout Period in CLK events" />
+      <VarDeclaration Name="MSGF" Type="WSTRING" InitialValue="&#34;TIMEOUT_ADVANCING&#34;" Comment="Message for fault on forward motion" />
+      <VarDeclaration Name="MSGR" Type="WSTRING" InitialValue="&#34;TIMEOUT_RETRACTING&#34;" Comment="Message for fault on reverse motion" />
+    </InputVars>
+  </InterfaceList>
+  <FBNetwork >
+    <FB Name="ACT" Type="SUBL_1" x="311.11108" y="11.111111" />
+    <FB Name="SENSE" Type="SUBL_2" x="355.55554" y="844.4444" />
+    <FB Name="MON_FWD" Type="MECH1_DIAGL" x="1172.2222" y="38.888885" />
+    <FB Name="MON_REV" Type="MECH1_DIAGL" x="1949.9999" y="622.22217" />
+    <FB Name="REV" Type="FB_NOT" x="238.88889" y="1627.7777" />
+    <EventConnections>
+      <Connection Source="MON_FWD.INITO" Destination="MON_REV.INIT" dx1="55.555553" />
+      <Connection Source="MON_REV.INITO" Destination="INITO" dx1="2544.4443" />
+      <Connection Source="INIT" Destination="ACT.INIT" dx1="205.55554" />
+      <Connection Source="ACT.INITO" Destination="SENSE.INIT" dx1="122.22221" dx2="50.0" dy="677.7778" />
+      <Connection Source="ACT.IND" Destination="REV.REQ" dx1="94.44444" dx2="94.44444" dy="516.6666" />
+      <Connection Source="SENSE.INITO" Destination="MON_FWD.INIT" dx1="116.666664" />
+    </EventConnections>
+    <DataConnections>
+      <Connection Source="ACT_ID" Destination="ACT.ID" dx1="161.1111" />
+      <Connection Source="CLK_ID" Destination="MON_FWD.CLK_ID" dx1="1022.22217" />
+      <Connection Source="DIAG_ID" Destination="MON_FWD.DIAG_ID" dx1="1005.55554" />
+      <Connection Source="ACT.RD_1" Destination="MON_FWD.FWD" dx1="33.333332" />
+      <Connection Source="NF" Destination="MON_FWD.N" dx1="1083.3333" />
+      <Connection Source="SRC" Destination="MON_FWD.SRC" dx1="1061.1111" />
+      <Connection Source="MSGF" Destination="MON_FWD.MSG" dx1="1038.8888" />
+      <Connection Source="CLK_ID" Destination="MON_REV.CLK_ID" dx1="1799.9999" />
+      <Connection Source="DIAG_ID" Destination="MON_REV.DIAG_ID" dx1="1783.3333" />
+      <Connection Source="NR" Destination="MON_REV.N" dx1="1861.1111" />
+      <Connection Source="SRC" Destination="MON_REV.SRC" dx1="1838.8888" />
+      <Connection Source="MSGR" Destination="MON_REV.MSG" dx1="1816.6666" />
+      <Connection Source="SENSE.RD_1" Destination="MON_REV.END" dx1="27.777777" />
+      <Connection Source="SENSE.RD_2" Destination="MON_FWD.END" dx1="166.66666" />
+      <Connection Source="ACT.RD_1" Destination="REV.IN" dx1="33.333332" dx2="138.88889" dy="133.33333" />
+      <Connection Source="SENSE_ID" Destination="SENSE.ID" dx1="166.66666" />
+      <Connection Source="REV.OUT" Destination="MON_REV.FWD" dx1="511.11108" />
+    </DataConnections>
+  </FBNetwork>
+</FBType>

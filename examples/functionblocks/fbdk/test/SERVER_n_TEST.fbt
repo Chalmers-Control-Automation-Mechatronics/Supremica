@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="SERVER_n_TEST" Comment="Test SERVER_n in a Composite Function Block" >
+  <Identification Standard="61499-2" />
+  <VersionInfo Organization="RA" Version="0.0" Author="JHC" Date="2002-12-17" />
+  <CompilerInfo header="package fb.rt.test; import fb.rt.net.*;" >
+    <Compiler Language="Java" Vendor="IBM" Product="JIkes" Version="1.06" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="INIT" >
+        <With Var="ID" />
+      </Event>
+      <Event Name="RSP" >
+        <With Var="C" />
+        <With Var="D" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="IND" >
+        <With Var="A" />
+        <With Var="B" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="ID" Type="WSTRING" />
+      <VarDeclaration Name="C" Type="REAL" />
+      <VarDeclaration Name="D" Type="REAL" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="A" Type="BYTE" />
+      <VarDeclaration Name="B" Type="BYTE" />
+    </OutputVars>
+  </InterfaceList>
+  <FBNetwork >
+    <FB Name="TEST" Type="SERVER_2" x="1100" y="294.1176" />
+    <EventConnections>
+      <Connection Source="INIT" Destination="TEST.INIT" dx1="994.1176" />
+      <Connection Source="TEST.IND" Destination="IND" dx1="1547.0588" />
+      <Connection Source="RSP" Destination="TEST.RSP" dx1="988.2353" />
+    </EventConnections>
+    <DataConnections>
+      <Connection Source="1" Destination="TEST.QI" dx1="1035.2941" />
+      <Connection Source="TEST.RD_1" Destination="A" dx1="1517.647" />
+      <Connection Source="TEST.RD_2" Destination="B" dx1="1517.647" />
+      <Connection Source="ID" Destination="TEST.ID" dx1="1023.5294" />
+      <Connection Source="C" Destination="TEST.SD_1" dx1="1035.2941" />
+      <Connection Source="D" Destination="TEST.SD_2" dx1="1035.2941" />
+    </DataConnections>
+  </FBNetwork>
+</FBType>

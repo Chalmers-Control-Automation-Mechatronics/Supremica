@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="WTAV_UINT" Comment="Weighted Average" >
+  <Identification Standard="61499-1" Classification="Math" Function="Weighted average" />
+  <VersionInfo Organization="Rockwell Automation" Version="0.2" Author="JHC" Date="2004-09-25" Remarks="Deleted INIT, INITO; moved to fb.rt.math." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.2" Author="JHC" Date="2003-03-17" Remarks="Moved from fb.rt.omac to fb.rt.mach." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.1" Author="JHC" Date="2002-02-28" Remarks="Changed &#34;=&#34; to &#34;:=&#34;, REAL_TO_INT to Java cast in ALGORITHM REQ." />
+  <VersionInfo Organization="Rockwell Automation" Version="0.0" Author="JHC" Date="2001-04-14" Remarks="First XML version" />
+  <CompilerInfo header="package fb.rt.math;" >
+    <Compiler Language="Java" Vendor="Sun" Product="JDK" Version="1.4.2" />
+  </CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="REQ" Comment="Normal Calculation" >
+        <With Var="X1" />
+        <With Var="X2" />
+        <With Var="ETA" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="CNF" Comment="Execution Confirmation" >
+        <With Var="OUT" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="X1" Type="UINT" Comment="Value when ETA=0.0" />
+      <VarDeclaration Name="X2" Type="UINT" Comment="Value when ETA=1.0" />
+      <VarDeclaration Name="ETA" Type="REAL" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="OUT" Type="UINT" Comment="ETA*X1+(1-ETA)*X2" />
+    </OutputVars>
+  </InterfaceList>
+  <BasicFB>
+  <Algorithm Name="REQ" Comment="Normally executed algorithm" >
+    <Other Language="Java" Text="OUT.value=(int)(X1.value+ETA.value*(X2.value-X1.value));&#10;CNF.serviceEvent(this);&#10;" />
+  </Algorithm>
+  </BasicFB>
+</FBType>
