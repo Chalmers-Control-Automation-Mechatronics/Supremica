@@ -8,6 +8,7 @@ import javax.swing.tree.*;
 import java.util.*;
 
 import org.supremica.log.*;
+import org.supremica.gui.treeview.*;
 
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;

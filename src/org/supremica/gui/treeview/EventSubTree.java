@@ -40,9 +40,5 @@ public class EventSubTree
 		return 2;
 	}
 	
-	public Icon getIcon()
-	{
-		return 
-	}
 }
 	

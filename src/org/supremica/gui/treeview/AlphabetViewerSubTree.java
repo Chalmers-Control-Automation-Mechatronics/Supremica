@@ -13,8 +13,6 @@ import org.supremica.automata.Alphabet;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.LabeledEvent;
 
-import org.supremica.gui.EventSubTree;
-
 public class AlphabetViewerSubTree	
 	extends SupremicaTreeNode
 {

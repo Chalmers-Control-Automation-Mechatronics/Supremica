@@ -2,7 +2,7 @@
 // An AutomatonSubTree is a tree node with the automaton name as root 
 // and the events as children and the states as children
 
-package org.supremica.gui;
+package org.supremica.gui.treeview;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -13,8 +13,6 @@ import java.util.*;
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.LabeledEvent;
-
-import org.supremica.gui.EventSubTree;
 
 public class AutomatonSubTree	
 	extends SupremicaTreeNode

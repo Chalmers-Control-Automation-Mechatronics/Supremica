@@ -9,7 +9,6 @@ import java.util.*;
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.LabeledEvent;
-import org.supremica.gui.EventSubTree;
 
 class AlphabetSubTree
 	extends SupremicaTreeNode

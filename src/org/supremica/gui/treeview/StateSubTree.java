@@ -2,7 +2,7 @@
 // A StateSubTree is a tree node with the state name as root 
 // and the state properties as children
 
-package org.supremica.guitreeview;
+package org.supremica.gui.treeview;
 
 import org.supremica.automata.algorithms.*;
 import java.awt.*;
