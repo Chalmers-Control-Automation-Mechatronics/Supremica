@@ -551,7 +551,7 @@ public class Specification
 			
 			
 			State if10 = currShoe.createAndAddUniqueState("q");
-			State ret10 = currShoe.createAndAddUniqueState("q");
+			//State ret10 = currShoe.createAndAddUniqueState("q");
 			
 			putR10Event= new LabeledEvent("Shoe_"+shoeNr+"put_T10R");
 			currAlphabet.addEvent(putR10Event);
@@ -753,7 +753,7 @@ public class Specification
 				currAlphabet.addEvent(pt10s20);
 				currAlphabet.addEvent(gt10s20);
 				State stat20 = currShoe.createAndAddUniqueState("q");
-				State s0ret15=currShoe.createAndAddUniqueState("q");
+				//State s0ret15=currShoe.createAndAddUniqueState("q");
 				
 				Arc bla1 = new Arc( s0ret13,stat20, gt10s20);
 				//Arc bla2 = new Arc( stat20,s0ret15,pt10s20);
