@@ -633,7 +633,8 @@ public class ActionMan
 		FORMAT_SP_DEBUG = 9, FORMAT_HTML_DEBUG = 10,
 		FORMAT_FSM = 11, FORMAT_FSM_DEBUG = 12,
 
-		FORMAT_PCG = 13, FORMAT_PCG_DEBUG = 14; // ARASH
+		FORMAT_PCG = 13, FORMAT_PCG_DEBUG = 14, // ARASH: process communication graphs
+		FORMAT_SSPC = 15; // ARASH: Sanchez SSPC tool
 
 
 
@@ -649,10 +650,11 @@ public class ActionMan
 		private final String htmlString ="html";
 		private final String fsmString = "fsm";
 		private final String pcgString = "pcg";
+		private final String sspcString = "sspc";
 
 		private final Object[] possibleValues =
 		{
-			xmlString, spString, dotString, dsxString, fsmString, htmlString, pcgString
+			xmlString, spString, dotString, dsxString, fsmString, htmlString, pcgString, sspcString
 		};
 
 		private JOptionPane pane = null;
@@ -756,6 +758,11 @@ public class ActionMan
 			else if (selectedValue == pcgString)
 			{
 				return (checkbox.isSelected()) ? FORMAT_PCG_DEBUG: FORMAT_PCG;
+			}
+
+			else if (selectedValue == sspcString)
+			{
+				return FORMAT_SSPC; // no debugview here (multiple files)
 			}
 			else
 			{
@@ -907,7 +914,7 @@ public class ActionMan
 			}
 			return;
 		}
-		else if (exportMode == FORMAT_PCG)
+		else if (exportMode == FORMAT_PCG || exportMode == FORMAT_SSPC)
 		{
 			JFileChooser  fileExporter = new JFileChooser();
 			fileExporter.setDialogTitle("Save as ...");
@@ -916,12 +923,17 @@ public class ActionMan
 				if(currFile == null) return;
 				try
 				{
-					AutomataToCommunicationGraph a2cg = new AutomataToCommunicationGraph( selectedAutomata );
-					a2cg.serialize(currFile.getAbsolutePath());
+					if(exportMode == FORMAT_PCG ) {
+						AutomataToCommunicationGraph a2cg = new AutomataToCommunicationGraph( selectedAutomata );
+						a2cg.serialize(currFile.getAbsolutePath());
+					} else {
+						new AutomataSSPCExporter(selectedAutomata, currFile.getAbsolutePath());
+					}
 				}
 				catch(Exception ex)
 				{
 				logger.debug(ex.getStackTrace());
+				ex.printStackTrace(); // TEMP!
 				}
 			}
 			return;
