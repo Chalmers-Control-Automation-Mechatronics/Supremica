@@ -54,11 +54,14 @@ public class IDE
     	contentPanel.add(toolBar, BorderLayout.NORTH);
 
 		tabPanel = new JTabbedPane();
+//		tabPanel.setLayout(new BorderLayout());
 
 		ModuleContainer currModuleContainer = moduleContainers.getActiveModuleContainer();
 		tabPanel.add(currModuleContainer.getEditorPanel());
 		tabPanel.add(currModuleContainer.getAnalyzerPanel());
 		tabPanel.add(currModuleContainer.getSimulatorPanel());
+
+		tabPanel.validate();
 
 		logPanel = new LogPanel(this, "Logger");
 
@@ -70,7 +73,8 @@ public class IDE
 
 		contentPanel.add(splitPanelVertical, BorderLayout.CENTER);
 
-//		pack();
+		pack();
+		validate();
 
     }
 

@@ -2,6 +2,8 @@ package org.supremica.gui.ide;
 
 import javax.swing.*;
 import java.awt.BorderLayout;
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
 import org.supremica.gui.WhiteScrollPane;
 import java.awt.Dimension;
 
@@ -11,6 +13,7 @@ class EditorPanel
 	private ModuleContainer moduleContainer;
 	private String name;
 	private JTabbedPane tabPanel;
+	private JPanel componentEditorPanel;
 	private EditorParametersPanel parametersPanel;
 	private EditorEventsPanel eventsPanel;
 	private EditorAliasesPanel aliasesPanel;
@@ -22,7 +25,8 @@ class EditorPanel
 		this.moduleContainer = moduleContainer;
 		this.name = name;
 
-		Dimension panelPreferredSize = new Dimension(200, 300);
+		int preferredHeight = 400;
+		Dimension panelPreferredSize = new Dimension(250, preferredHeight);
 		Dimension panelMinimumSize = new Dimension(100, 100);
 		setPreferredSize(panelPreferredSize);
 		setMinimumSize(panelMinimumSize);
@@ -53,13 +57,35 @@ class EditorPanel
 
 		tabPanel.setSelectedComponent(componentsPanel);
 
-		splitPanelHorizontal = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, tabPanel, new JPanel());
+		componentEditorPanel = new JPanel();
+		componentEditorPanel.setPreferredSize(new Dimension(600, preferredHeight));
+		componentEditorPanel.setMinimumSize(panelMinimumSize);
+
+		splitPanelHorizontal = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, tabPanel, componentEditorPanel);
 		splitPanelHorizontal.setContinuousLayout(false);
 		splitPanelHorizontal.setOneTouchExpandable(false);
 		splitPanelHorizontal.setDividerLocation(0.2);
 		splitPanelHorizontal.setResizeWeight(0.0);
 
-		add(splitPanelHorizontal, BorderLayout.CENTER);
+		// add(splitPanelHorizontal, BorderLayout.CENTER);
+
+
+		final GridBagLayout gridbag = new GridBagLayout();
+		final GridBagConstraints constraints = new GridBagConstraints();
+
+		constraints.gridy = 0;
+		constraints.weighty = 1.0;
+		constraints.anchor = GridBagConstraints.NORTH;
+
+		setLayout(gridbag);
+
+		constraints.weightx = 1.0;
+		constraints.fill = GridBagConstraints.BOTH;
+
+		gridbag.setConstraints(splitPanelHorizontal, constraints);
+		add(splitPanelHorizontal);
+
+
 	}
 
 	public String getName()

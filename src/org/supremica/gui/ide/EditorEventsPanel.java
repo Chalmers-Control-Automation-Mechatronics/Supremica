@@ -20,7 +20,7 @@ class EditorEventsPanel
 	{
 		this.moduleContainer = moduleContainer;
 		this.name = name;
-		add(createEventsPane());
+		createEventsPane();
 	}
 
 	public String getName()
@@ -29,7 +29,7 @@ class EditorEventsPanel
 		return name;
 	}
 
-	public JPanel createEventsPane()
+	public void createEventsPane()
 	{
 		final ArrayList l;
 
@@ -49,6 +49,8 @@ class EditorEventsPanel
 
 		dataList.setCellRenderer(new EventListCell());
 
+		getViewport().add(dataList);
+/*
 		JButton NewEventButton = new JButton("New Event");
 
 		NewEventButton.setActionCommand("newevent");
@@ -73,6 +75,7 @@ class EditorEventsPanel
 		p.setLayout(new GridLayout(1, 1));
 
 		return p;
+*/
 	}
 
 	public void actionPerformed(ActionEvent e)
