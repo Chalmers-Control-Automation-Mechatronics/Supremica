@@ -53,13 +53,17 @@ package org.supremica.functionblocks.model;
 
 public abstract class Variable
 {
-    private String name;
+	// The types are: EventInput, EventOutput, DataInput, DataOutput, Local
+	private String type;
 
-    public String getName()
-    {
-	return name;
-    }
+	public void setType(String t)
+	{
+		type = t;
+	}
 
-    
+	public String getType()
+	{
+		return type;
+	}
        
 }

@@ -60,9 +60,9 @@ public class BasicFBType extends FBType
 {
 
     private ECC theECC = new ECC();
-    // HashMap name,instance?
+    // TODO: HashMap name,instance?
     private List instances = new ArrayList();
-    // HashMap name,algorithm
+    // TODO: HashMap name,algorithm
     private List algorithms = new ArrayList();
 
     private BasicFBType() {}
@@ -92,8 +92,8 @@ public class BasicFBType extends FBType
 
     public void addAlgorithm(Algorithm a)
     {
-	// this needs to be solved (look att design patterns for something suitable)
-	// the problem: name of the algorithm class i unknown before FB app is developed
+	// TODO: this needs to be solved (look att design patterns for something suitable)
+	// TODO: the problem: name of the algorithm class is unknown before FB app is developed
 	algorithms.add(a);
     }
 

@@ -44,21 +44,21 @@ import java.util.*;
 
 public class ECC
 {
-    List ecStates = new LinkedList();
+	List ecStates = new LinkedList();
+	List ecTransitions = new LinkedList();
+	public ECC()
+	{
+	}
 
-    public ECC()
-    {
-    }
+	public void addECState(ECState state)
+	{
+		ecStates.add(state);
+	}
 
-    public void addECState(ECState state)
-    {
-	ecStates.add(state);
-    }
+	public ECState execute(ECState currentECState, Variables vars)
+	{
+		System.out.println("ECC.execute()");
 
-    public ECState execute(ECState currentECState, Variables vars)
-    {
-        System.out.println("ECC.execute()");
-
-        return null;
-    }
+		return null;
+	}
 }

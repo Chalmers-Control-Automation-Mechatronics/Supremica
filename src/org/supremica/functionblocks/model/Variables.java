@@ -55,9 +55,9 @@ import java.util.*;
 
 public class Variables
 {
-	private List inputEvents = new LinkedList();
-	private List outputEvents = new LinkedList();
-	private List inputData = new LinkedList();
-	private List outputData = new LinkedList();
-	private List localVariables = new LinkedList();
+	
+	private Map variables = new HashMap();
+	
+
+
 }
