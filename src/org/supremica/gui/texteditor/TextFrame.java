@@ -23,7 +23,7 @@ public class TextFrame
 	public TextFrame(String title)
 	{
 		super(title);
-		this.textpanel = new TextPanel(WIDTH-20, HEIGHT-36);
+		this.textpanel = new TextPanel();
 		getContentPane().setLayout(new BorderLayout());
 		getContentPane().add(textpanel, BorderLayout.CENTER);
 

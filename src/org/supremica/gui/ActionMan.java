@@ -73,6 +73,7 @@ import org.supremica.gui.simulator.SimulatorExecuter;
 import org.supremica.log.*;
 import org.supremica.automata.IO.FileFormats;
 
+import org.supremica.gui.help.HelpAction;
 import org.supremica.gui.texteditor.TextFrame;
 
 // -- MF -- Abstract class to save on duplicate code
@@ -111,8 +112,11 @@ public class ActionMan
 	// Ugly fixx here. We need a good way to globally get at the selected automata, the current project etc
 	// gui here is filled in by
 	public static Gui gui = null;
-	public static LanguageRestrictor languageRestrictor = new LanguageRestrictor();
-	public static StateEnumerator stateEnumerator = new StateEnumerator();
+	public static final LanguageRestrictor languageRestrictor = new LanguageRestrictor();
+	public static final FindStates findStates = new FindStates();
+	public static final StateEnumerator stateEnumerator = new StateEnumerator();
+	public static final HelpAction helpAction = new HelpAction();
+	public static final OpenAction openAction = new OpenAction(); // defined in MainToolBar (just for fun :-)
 
 	public static Gui getGui()
 	{
@@ -2099,6 +2103,7 @@ public class ActionMan
 		gui.selectAll();
 	}
 
+/* Moved to the FindStates UserAction
 	// Find States... action selected
 	public static void findStates_action(Gui gui)
 	{
@@ -2117,7 +2122,7 @@ public class ActionMan
 			logger.debug(ex.getStackTrace());
 		}
 	}
-
+*/
 	// Delete All - this really implements Close Project
 	public static void automataDeleteAll_actionPerformed(Gui gui)
 	{

@@ -1,3 +1,8 @@
+/*********************** MainPopupMenu.java *****************/
+// Free standing leaf class implementing Supremicas
+// main popup menu. Prime reason for this is easy access
+// The class instantiates itself with the menu stuff
+
 package org.supremica.gui;
 
 import java.awt.*;
@@ -14,6 +19,7 @@ import org.supremica.comm.xmlrpc.*;
 import org.supremica.gui.editor.*;
 import org.supremica.gui.help.*;
 import org.supremica.util.VPopupMenu;
+import org.supremica.util.SupremicaMenuItem;
 
 class MainPopupMenu
 	extends VPopupMenu
@@ -98,8 +104,18 @@ class MainPopupMenu
 		JMenuItem complementItem = new JMenuItem("Automaton complement");
 		menuHandler.add(complementItem, 1);
 		
-		JMenuItem languageRestrictor = new JMenuItem(ActionMan.languageRestrictor);
+		// Do this...
+		JMenuItem languageRestrictor = new SupremicaMenuItem(ActionMan.languageRestrictor);
 		menuHandler.add(languageRestrictor, 1);
+		/* ...and you can forget about this
+		languageRestrictor.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				ActionMan.languageRestrictor_actionPerformed(getGui());
+				getGui().repaint();
+			}
+		});*/
 		
 		JMenuItem interfaceItem = new JMenuItem("Interface Properties...");
 		//menuHandler.add(interfaceItem, 1);
@@ -183,10 +199,10 @@ class MainPopupMenu
 		});
 
 		//-- MF Find States --
-		JMenuItem findStatesItem = new JMenuItem("Find States...");
+		JMenuItem findStatesItem = new JMenuItem(ActionMan.findStates);
 
 		menuHandler.add(findStatesItem, 1);
-		findStatesItem.addActionListener(new ActionListener()
+/*		findStatesItem.addActionListener(new ActionListener()
 		{
 
 			// anonymous class (is this a good thing?)
@@ -196,7 +212,7 @@ class MainPopupMenu
 				getGui().repaint();
 			}
 		});
-
+*/
 		menuHandler.addSeparator();
 		// ----------------------------------------------
 		JMenuItem copyItem = new JMenuItem("Copy");
@@ -221,7 +237,7 @@ class MainPopupMenu
 		if (SupremicaProperties.fileAllowExport())
 		{
 			// This is how it would be done with an export command object
-			// JMenuItem exportItem = new JMenuItem(ActionMan.exportItem);
+			// JMenuItem exportItem = new SupremicaMenuItem(ActionMan.exportItem);
 			// menuHandler.add(exportItem, 1);
 
 			JMenuItem exportItem = new JMenuItem("Export...");

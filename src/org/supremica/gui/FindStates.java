@@ -1054,16 +1054,33 @@ class FindStatesFrame
 }
 
 public class FindStates
+	extends AbstractAction
 {
-	private JFrame frame = null;
+	private static Logger logger = LoggerFactory.createLogger(FindStates.class);
 
-	public FindStates(VisualProject theVisualProject, Automata selectedAutomata)
+	public FindStates()
 	{
-		frame = new FindStatesFrame(theVisualProject, selectedAutomata);
+		super("Find States...");
+		putValue(SHORT_DESCRIPTION, "Specify and search for significant states");
 	}
-
-	public void execute()
+	
+	public void actionPerformed(ActionEvent e)
+	// Find States... action selected
+	// public static void findStates_action(Gui gui)
 	{
-		frame.show();
+		VisualProject theProject = ActionMan.getGui().getVisualProjectContainer().getActiveProject();
+		Automata selectedAutomata = ActionMan.getGui().getSelectedAutomata();
+
+		// FindStates find_states = new FindStates(theProject, selectedAutomata);
+
+		try
+		{
+			new FindStatesFrame(theProject, selectedAutomata).show();
+		}
+		catch (Exception ex)
+		{
+			logger.error("Exception in Find States. ", ex);
+			logger.debug(ex.getStackTrace());
+		}
 	}
 }
