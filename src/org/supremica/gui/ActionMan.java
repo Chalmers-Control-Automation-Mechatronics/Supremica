@@ -3356,8 +3356,8 @@ public class ActionMan
 	// Generate Java-code
 	public static void AutomataToJava(Gui gui)
 	{
-		Automata selectedAutomata = gui.getSelectedAutomata();
-		if (selectedAutomata.size() < 1)
+		Project selectedProject = gui.getSelectedProject();
+		if (selectedProject.size() < 1)
 		{
 			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
 			return;
@@ -3374,7 +3374,7 @@ public class ActionMan
 					{
 						//Assuming a filename in the form classname.java
 						String classname = currFile.getName().substring(0, currFile.getName().length() - 5);
-						AutomataToJava exporter = new AutomataToJava(selectedAutomata, classname);
+						AutomataToJava exporter = new AutomataToJava(selectedProject, classname);
 						PrintWriter theWriter = new PrintWriter(new FileWriter(currFile));
 						exporter.serialize(theWriter);
 						theWriter.close();

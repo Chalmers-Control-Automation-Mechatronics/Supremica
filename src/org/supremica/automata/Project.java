@@ -106,11 +106,6 @@ public class Project
 		return theActions.iterator();
 	}
 
-	public Iterator actionIterator(LabeledEvent theEvent)
-	{
-		return theActions.iterator(theEvent);
-	}
-
 	public Controls getControls()
 	{
 		return theControls;
@@ -119,11 +114,6 @@ public class Project
 	public Iterator controlIterator()
 	{
 		return theControls.iterator();
-	}
-
-	public Iterator controlIterator(LabeledEvent theEvent)
-	{
-		return theControls.iterator(theEvent);
 	}
 
 	public Signals getInputSignals()
@@ -154,11 +144,6 @@ public class Project
 	public Iterator timerIterator()
 	{
 		return theTimers.iterator();
-	}
-
-	public Iterator timerIterator(LabeledEvent theEvent)
-	{
-		return theTimers.iterator(theEvent);
 	}
 
 	public boolean hasAnimation()
@@ -374,7 +359,7 @@ public class Project
 	 */
 	public Alphabet setIndicies()
 	{
-		theTimers.setIndicies();
+		theTimers.setIndices();
 		return super.setIndicies();
 	}
 

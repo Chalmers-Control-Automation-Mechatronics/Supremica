@@ -53,7 +53,7 @@ import java.util.*;
 
 public class Signals
 {
-	private Map labelToSignalMap = new HashMap();
+	private Map labelToSignalMap = new TreeMap();
 
 	public Signals()
 	{

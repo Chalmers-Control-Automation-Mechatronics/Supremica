@@ -431,7 +431,8 @@ public class BallTrackView
 
 	    //paint the simulator buffer to the canvas
 	    Graphics gN = canvas.getGraphics();
-	    gN.drawImage(im, 0, 0, this);
+	    if (gN != null)
+	    	gN.drawImage(im, 0, 0, this);
 
 	    //paint the buttons and the background of the buttons
 	    south.repaint();

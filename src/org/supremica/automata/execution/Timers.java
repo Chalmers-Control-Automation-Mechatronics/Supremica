@@ -54,20 +54,14 @@ import org.supremica.automata.LabeledEvent;
 
 public class Timers
 {
-	private HashSet theTimers = null;
-	private HashMap labelToTimerMap = null;
+	private Map labelToTimerMap = new TreeMap();
 
 	public Timers()
 	{
-		theTimers = new HashSet();
-		labelToTimerMap = new HashMap();
 	}
 
 	public Timers(Timers otherTimers)
 	{
-		theTimers = new HashSet((int) (otherTimers.size() * 1.5));
-		labelToTimerMap = new HashMap((int) (otherTimers.size() * 1.5));
-
 		for (Iterator actIt = otherTimers.iterator(); actIt.hasNext(); )
 		{
 			EventTimer currTimer = (EventTimer) actIt.next();
@@ -98,14 +92,12 @@ public class Timers
 		{
 			return false;
 		}
-		theTimers.add(theTimer);
 		labelToTimerMap.put(theTimer.getName(), theTimer);
 		return true;
 	}
 
 	public void removeTimer(EventTimer theTimer)
 	{
-		theTimers.remove(theTimer);
 		labelToTimerMap.remove(theTimer.getName());
 	}
 
@@ -118,29 +110,54 @@ public class Timers
 	{
 		return (EventTimer) labelToTimerMap.get(label);
 	}
+	
+	/**
+	 * Returns the timer that has <code>event</code> as
+	 * it's timeout event. An event can not 
+	 * be a timeout event to more than one timer. 
+	 * @param event The timeout event
+	 * @return
+	 */
+	public EventTimer getTimerWithTimeoutEvent(LabeledEvent event)
+	{
+		EventTimer timer;
+		for (Iterator it = iterator(); it.hasNext();)
+		{
+			timer = (EventTimer) it.next(); 
+			if (timer.getTimeoutEvent().equals(event.getLabel()))
+				return timer;
+		}
+		return null;
+	}
 
 	public Iterator iterator()
 	{
-		return theTimers.iterator();
+		return labelToTimerMap.values().iterator();
 	}
 
-	public Iterator iterator(LabeledEvent theEvent)
+	/**
+	 * Returns an iterator to the timers that has
+	 * this event as start event. An event can be 
+	 * startevent to more than one timer.  
+	 * @param theEvent
+	 * @return
+	 */
+	public Iterator iteratorWithStartEvent(LabeledEvent theEvent)
 	{
 		return new TimerIterator(iterator(), theEvent);
 	}
 
 	public int size()
 	{
-		return theTimers.size();
+		return labelToTimerMap.size();
 	}
 
 	public void clear()
 	{
-		theTimers.clear();
 		labelToTimerMap.clear();
 	}
 
-	public void setIndicies()
+	public void setIndices()
 	{
 		int i = 0;
 		for (Iterator theIt = iterator(); theIt.hasNext();)
@@ -154,15 +171,16 @@ public class Timers
 		implements Iterator
 	{
 		private final Iterator theIterator;
-		private LabeledEvent theEvent;
+		private LabeledEvent theStartEvent;
 		private String label;
 		private Object nextObject = null;
+		private boolean startEvent;
 
-		public TimerIterator(Iterator theIterator, LabeledEvent theEvent)
+		public TimerIterator(Iterator theIterator, LabeledEvent theStartEvent)
 		{
 			this.theIterator = theIterator;
-			this.theEvent = theEvent;
-			this.label = theEvent.getLabel();
+			this.theStartEvent = theStartEvent;
+			this.label = theStartEvent.getLabel();
 			findNextObject();
 		}
 
@@ -197,7 +215,7 @@ public class Timers
 			while (theIterator.hasNext())
 			{
 				EventTimer currTimer = (EventTimer)theIterator.next();
-				if (label.equals(currTimer.getStartEvent()) || label.equals(currTimer.getTimeoutEvent()))
+				if (label.equals(currTimer.getStartEvent()))
 				{
 					nextObject = currTimer;
 					return;

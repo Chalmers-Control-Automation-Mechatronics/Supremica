@@ -54,20 +54,14 @@ import org.supremica.automata.LabeledEvent;
 
 public class Actions
 {
-	private HashSet theActions = null;
-	private HashMap labelToActionMap = null;
+	private Map labelToActionMap = new TreeMap();
 
 	public Actions()
 	{
-		theActions = new HashSet();
-		labelToActionMap = new HashMap();
 	}
 
 	public Actions(Actions otherActions)
 	{
-		theActions = new HashSet((int) (otherActions.size() * 1.5));
-		labelToActionMap = new HashMap((int) (otherActions.size() * 1.5));
-
 		for (Iterator actIt = otherActions.iterator(); actIt.hasNext(); )
 		{
 			Action currAction = (Action) actIt.next();
@@ -98,14 +92,12 @@ public class Actions
 		{
 			return false;
 		}
-		theActions.add(theAction);
 		labelToActionMap.put(theAction.getLabel(), theAction);
 		return true;
 	}
 
 	public void removeAction(Action theAction)
 	{
-		theActions.remove(theAction);
 		labelToActionMap.remove(theAction.getLabel());
 	}
 
@@ -119,81 +111,23 @@ public class Actions
 		return (Action) labelToActionMap.get(label);
 	}
 
-	public Iterator iterator()
+	public Action getAction(LabeledEvent event)
 	{
-		return theActions.iterator();
+		return (Action) labelToActionMap.get(event.getLabel());
 	}
 
-	public Iterator iterator(LabeledEvent theEvent)
+	public Iterator iterator()
 	{
-		return new ActionIterator(iterator(), theEvent);
+		return labelToActionMap.values().iterator();
 	}
 
 	public int size()
 	{
-		return theActions.size();
+		return labelToActionMap.size();
 	}
 
 	public void clear()
 	{
-		theActions.clear();
 		labelToActionMap.clear();
-	}
-
-	class ActionIterator
-		implements Iterator
-	{
-		private final Iterator theIterator;
-		private LabeledEvent theEvent;
-		private String label;
-		private Object nextObject = null;
-
-		public ActionIterator(Iterator theIterator, LabeledEvent theEvent)
-		{
-			this.theIterator = theIterator;
-			this.theEvent = theEvent;
-			this.label = theEvent.getLabel();
-			findNextObject();
-		}
-
-		public boolean hasNext()
-		{
-			return nextObject != null;
-		}
-
-		public Object next()
-			throws NoSuchElementException
-		{
-			if (nextObject != null)
-			{
-				Object oldObject = nextObject;
-				findNextObject();
-				return oldObject;
-			}
-			else
-			{
-				throw new NoSuchElementException();
-			}
-		}
-
-		public void remove()
-			throws UnsupportedOperationException, IllegalStateException
-		{
-			throw new UnsupportedOperationException();
-		}
-
-		private void findNextObject()
-		{
-			while (theIterator.hasNext())
-			{
-				Action currAction = (Action)theIterator.next();
-				if (label.equals(currAction.getLabel()))
-				{
-					nextObject = currAction;
-					return;
-				}
-			}
-			nextObject = null;
-		}
 	}
 }

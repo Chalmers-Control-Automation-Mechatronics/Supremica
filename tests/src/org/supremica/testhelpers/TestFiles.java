@@ -64,6 +64,7 @@ public class TestFiles
 	public static final TestFiles BallProcess = new TestFiles("ballProcess.xml");
 	public static final TestFiles BallProcessJava = new TestFiles("BallProcess.java");
 	public static final TestFiles CatMouse = new TestFiles("catmouse.xml");
+	public static final TestFiles CatMouseJava = new TestFiles("CatAndMouse.java");
 	public static final TestFiles CentralLocking3Doors = new TestFiles("centralLocking3Doors.xml");
 	public static final TestFiles CircularTable = new TestFiles("circularTable.xml");
 	public static final TestFiles FlexibleManufacturingCell = new TestFiles("flexibleManufacturingCell.xml");

@@ -41,7 +41,7 @@ public class DigitalIODisplay
 
 		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
-		if (args[0].length() == 0)
+		if (args.length == 0)
 		{
 			dynClass = "BTSim";
 		}

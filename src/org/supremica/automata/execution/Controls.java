@@ -54,19 +54,14 @@ import org.supremica.automata.LabeledEvent;
 
 public class Controls
 {
-	private Set theControls = null;
-	private Map labelToControlMap = null;
-
+	private Map labelToControlMap = new TreeMap();
 
 	public Controls()
 	{
-		theControls = new HashSet();
-		labelToControlMap = new HashMap();
 	}
 
 	public Controls(Controls otherControls)
 	{
-		theControls = new HashSet((int) (otherControls.size() * 1.5));
 		labelToControlMap = new HashMap((int) (otherControls.size() * 1.5));
 
 		for (Iterator conIt = otherControls.iterator(); conIt.hasNext(); )
@@ -99,14 +94,12 @@ public class Controls
 		{
 			return false;
 		}
-		theControls.add(theControl);
 		labelToControlMap.put(theControl.getLabel(), theControl);
 		return true;
 	}
 
 	public void removeControl(Control theControl)
 	{
-		theControls.remove(theControl);
 		labelToControlMap.remove(theControl.getLabel());
 	}
 
@@ -120,81 +113,23 @@ public class Controls
 		return (Control) labelToControlMap.get(label);
 	}
 
-	public Iterator iterator()
+	public Control getControl(LabeledEvent theEvent)
 	{
-		return theControls.iterator();
+		return getControl(theEvent.getLabel());
 	}
 
-	public Iterator iterator(LabeledEvent theEvent)
+	public Iterator iterator()
 	{
-		return new ControlIterator(iterator(), theEvent);
+		return labelToControlMap.values().iterator();
 	}
 
 	public int size()
 	{
-		return theControls.size();
+		return labelToControlMap.size();
 	}
 
 	public void clear()
 	{
-		theControls.clear();
 		labelToControlMap.clear();
-	}
-
-	class ControlIterator
-		implements Iterator
-	{
-		private final Iterator theIterator;
-		private LabeledEvent theEvent;
-		private String label;
-		private Object nextObject = null;
-
-		public ControlIterator(Iterator theIterator, LabeledEvent theEvent)
-		{
-			this.theIterator = theIterator;
-			this.theEvent = theEvent;
-			this.label = theEvent.getLabel();
-			findNextObject();
-		}
-
-		public boolean hasNext()
-		{
-			return nextObject != null;
-		}
-
-		public Object next()
-			throws NoSuchElementException
-		{
-			if (nextObject != null)
-			{
-				Object oldObject = nextObject;
-				findNextObject();
-				return oldObject;
-			}
-			else
-			{
-				throw new NoSuchElementException();
-			}
-		}
-
-		public void remove()
-			throws UnsupportedOperationException, IllegalStateException
-		{
-			throw new UnsupportedOperationException();
-		}
-
-		private void findNextObject()
-		{
-			while (theIterator.hasNext())
-			{
-				Control currControl = (Control)theIterator.next();
-				if (label.equals(currControl.getLabel()))
-				{
-					nextObject = currControl;
-					return;
-				}
-			}
-			nextObject = null;
-		}
 	}
 }
