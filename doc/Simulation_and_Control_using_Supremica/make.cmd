@@ -1,5 +1,6 @@
 
 latex main
+bibtex main
 latex main
 
 dvips -t a4 -G0 -Ppdf main.dvi -o
