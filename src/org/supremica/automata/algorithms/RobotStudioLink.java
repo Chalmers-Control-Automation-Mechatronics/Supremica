@@ -677,16 +677,16 @@ End Sub
 				}
 			}
 			// Delete the spans
+			/*
 			for (int i=0;i<robots.size();i++)
 			{	// Find span part for robot i
 				String iName = ((IMechanism) robots.get(i)).getName() + "_Span";
 				activeStation.getParts().item(var(iName)).delete();
 			}
+			*/
 
 			// Create automata for each entity in the IPart called mutexPartName
-
 			createMutexAutomata();
-
 		}
 		catch (Exception ex)
 		{
@@ -707,7 +707,7 @@ End Sub
 	 * robots. The individual zones are IEntity:s in the IPart named mutexPartName.
 	 * At present, the zones have been specified manually in this code.
      */
-	public static void createMutexZones()
+	public static void createMutexZonesManual()
 	{
 		if (app == null || activeStation == null)
 		{
@@ -760,7 +760,58 @@ End Sub
 			//createBox(-0.125, 0.00, 0.75, 0, 0, 0, 0.25, 0.25, 0.25, "MutexZoneC");
 			//createBox(-0.125, 0.25, 0.75, 0, 0, 0, 0.25, 0.25, 0.25, "MutexZoneD");
 
-			/*
+			// Create automata for each entity in the IPart called mutexPartName
+			createMutexAutomata();
+		}
+		catch (Exception ex)
+		{
+			logger.error("Error when creating mutex zones. " + ex);
+		}
+	}
+
+	/**
+	 * Creates mutex zones that supposedly guarantees no collisions between
+	 * robots. The individual zones are IEntity:s in the IPart named mutexPartName.
+	 * At present, the zones have been specified manually in this code.
+     */
+	public static void createMutexZonesGrid()
+	{
+		if (app == null || activeStation == null)
+		{
+			logger.error("No connection to RobotStudio.");
+			return;
+		}
+
+		try
+		{	// Make sure there is a part called mutexPartName
+			try
+			{
+				activeStation = app.getActiveStation();
+				activeStation.getParts().item(var(mutexPartName));
+
+				/*
+				try
+				{
+					CreateXml.createXmlStation(activeStation);
+				}
+				catch (Exception u)
+				{
+					logger.error("Error building the xml file for the coordinated station");
+				}
+				*/
+			}
+			catch (ComJniException ex)
+			{
+				if (ex.ErrorCode == HResult.E_FAIL)
+				{   // No such item, construct one!
+					activeStation.getParts().add().setName(mutexPartName);
+				}
+				else
+				{  //Something is really wrong
+				   logger.error("Something is wrong! " + ex);
+			    }
+			}
+
 			// Grid with boxes of size (side * side * side) (m^3)
 			//activeStation.setFloorDepth(1);
 			//activeStation.setFloorWidth(1);
@@ -787,11 +838,9 @@ End Sub
 					}
 				}
 			}
-			*/
 
 			// Create automata for each entity in the IPart called mutexPartName
 			createMutexAutomata();
-
 		}
 		catch (Exception ex)
 		{
@@ -1750,11 +1799,11 @@ End Sub
 
 		// The size of the box surrounding the tooltip
 		private static double boxSize = 0.12; // [m]
-		private static double cylinderLength = 0.85; // [m]
+		private static double cylinderLength = 1.15; // [m]
 		private static double cylinderRadius = 0.06; // [m]
 		private static double stepSize = boxSize*3/4; // [m]
 		// The margin that should be added to the approximations
-		private static double margin = 0.10; // [m]
+		private static double margin = 0.05; // [m]
 
 		private Transform oldTransform;
 
@@ -1863,11 +1912,12 @@ End Sub
 			activeStation.setUCS(upperArm);
 			ITransform cylinderTransform = ruu.wCSToUCS(upperArm.getTransform());
 			cylinderTransform.setZ(cylinderTransform.getZ()+1.195);
+			cylinderTransform.setX(cylinderTransform.getX()-0.3-margin);
 			cylinderTransform.setRy(cylinderTransform.getRy()+Math.PI/2);
 			cylinderTransform = ruu.uCSToWCS(cylinderTransform);
 
 			// Create cylinder around the arm
-			spanPart.createSolidCylinder(cylinderTransform,cylinderRadius+margin,cylinderLength+margin);
+			spanPart.createSolidCylinder(cylinderTransform,cylinderRadius+margin,cylinderLength+2*margin);
 
 			// Create box around the tooltip
 			spanPart.createSolidBox(boxTransform,boxSize+2*margin,boxSize+2*margin,boxSize+2*margin);
@@ -1963,7 +2013,5 @@ End Sub
 
 
 */
-
-
 
 

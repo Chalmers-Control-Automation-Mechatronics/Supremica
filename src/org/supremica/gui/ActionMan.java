@@ -2645,7 +2645,19 @@ public class ActionMan
 		{
 			public void run()
 			{
-				RobotStudioLink.createMutexZones();
+				RobotStudioLink.createMutexZonesManual();
+			}
+		});
+		thread.start();
+	}
+
+	public static void robotStudioCreateMutexZonesGrid(Gui gui)
+	{
+		Thread thread = new Thread(new Runnable()
+		{
+			public void run()
+			{
+				RobotStudioLink.createMutexZonesGrid();
 			}
 		});
 		thread.start();

@@ -871,7 +871,7 @@ public class MainMenuBar
 */
 
 		// Tools.RobotStudio
-		if (SupremicaProperties.showRobotstudioLink()&&SupremicaProperties.useActiveXBridge())
+		if (SupremicaProperties.showRobotstudioLink() && SupremicaProperties.useActiveXBridge())
 		{
 			menuTools.add(new JSeparator());
 
@@ -906,13 +906,24 @@ public class MainMenuBar
 				});
 			// RobotStudioCreateMutexZones
 			JMenuItem robMutex = new JMenuItem();
-			robMutex.setText("Create Mutex Zones");
+			robMutex.setText("Create Mutex Zones 'Manually'");
 			menuRobotStudioLink.add(robMutex);
 			robMutex.addActionListener(new ActionListener()
 				{
 					public void actionPerformed(ActionEvent e)
 					{
 						ActionMan.robotStudioCreateMutexZones(ActionMan.getGui());
+					}
+				});
+			// RobotStudioCreateMutexZones
+			JMenuItem robMutexGrid = new JMenuItem();
+			robMutexGrid.setText("Create Mutex Zones Grid");
+			menuRobotStudioLink.add(robMutexGrid);
+			robMutexGrid.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						ActionMan.robotStudioCreateMutexZonesGrid(ActionMan.getGui());
 					}
 				});
 			// RobotStudioCreateMutexZones
@@ -1180,6 +1191,4 @@ public class MainMenuBar
 			}
 		});
 	}
-
-
 }
