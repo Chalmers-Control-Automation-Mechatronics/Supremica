@@ -48,7 +48,7 @@ public class FactoryExecutorDEMO extends JFrame
 					e = ec.getEditor();
 					e.setTitle("Shoefactory DEMO");
 					Editor.singleton = e;
-					e.removePaletteAction();
+					Editor.removePaletteAction();
 	
 					URL url = Supremica.class.getResource("/shoefactory/ShoeFactoryDEMO.xml");
 					
@@ -79,18 +79,18 @@ public class FactoryExecutorDEMO extends JFrame
 					//-----DEMO - reduce available slots--------
 					for(int i=0;i<9;i++)
 					{
-						boolean b = js.moveInitial("Table0", "Shoe_1put_T0L");
+						boolean b = JgrafSupervisorDEMO.moveInitial("Table0", "Shoe_1put_T0L");
 					}
 
 					for(int i=0;i<22;i++)
 					{
-						boolean b = js.moveInitial("Table1", "Shoe_1put_T1");
-						b = js.moveInitial("Table2", "Shoe_1put_T2");
+						boolean b = JgrafSupervisorDEMO.moveInitial("Table1", "Shoe_1put_T1");
+						b = JgrafSupervisorDEMO.moveInitial("Table2", "Shoe_1put_T2");
 					}
 					
 					for(int i=0;i<2;i++)
 					{
-						boolean b = js.moveInitial("IO_1", "Shoe_1get_T0R");
+						boolean b = JgrafSupervisorDEMO.moveInitial("IO_1", "Shoe_1get_T0R");
 					}
 					//------------------------------------------
 			
@@ -249,11 +249,11 @@ public class FactoryExecutorDEMO extends JFrame
 
 		if(currIndex==0)
 		{
-			return i.parseInt(shoeNumbers.get(0).toString());
+			return Integer.parseInt(shoeNumbers.get(0).toString());
 		}	
 		else if(shoeNumbers.indexOf(new Integer(currIndex)) < shoeNumbers.size()-1)	
 		{
-			return i.parseInt(shoeNumbers.get(shoeNumbers.indexOf(new Integer(currIndex))+1).toString()) ;	
+			return Integer.parseInt(shoeNumbers.get(shoeNumbers.indexOf(new Integer(currIndex))+1).toString()) ;	
 		}
 		else
 		{

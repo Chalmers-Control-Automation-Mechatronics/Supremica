@@ -4,6 +4,7 @@ import org.supremica.external.shoefactory.plantBuilder.*;
 import org.supremica.external.shoefactory.Animator.*;
 import org.supremica.gui.*;
 import grafchart.sfc.*;
+
 import java.net.URL;
 import java.util.*;
 import org.supremica.automata.*;
@@ -42,7 +43,7 @@ public class FactoryExecutor
 					e = ec.getEditor();
 					e.setTitle("Shoefactory");
 					Editor.singleton = e;
-					e.removePaletteAction();
+					Editor.removePaletteAction();
 	
 					URL url = Supremica.class.getResource("/shoefactory/ShoeFactory.xml");
 					
@@ -214,11 +215,11 @@ public class FactoryExecutor
 
 		if(currIndex==0)
 		{
-			return i.parseInt(shoeNumbers.get(0).toString());
+			return Integer.parseInt(shoeNumbers.get(0).toString());
 		}	
 		else if(shoeNumbers.indexOf(new Integer(currIndex)) < shoeNumbers.size()-1)	
 		{
-			return i.parseInt( shoeNumbers.get(shoeNumbers.indexOf(new Integer(currIndex))+1).toString() ) ;	
+			return Integer.parseInt( shoeNumbers.get(shoeNumbers.indexOf(new Integer(currIndex))+1).toString() ) ;	
 		}
 		
 		else

@@ -54,7 +54,7 @@ public class VAR
 	for (Iterator arcIt = theArcs.iterator(); arcIt.hasNext(); )
 	    {String S = null;
 	    ARC currARC = (ARC)arcIt.next();
-	    if (index.equals(S.valueOf(currARC.getTargetIndex()))) 
+	    if (index.equals(String.valueOf(currARC.getTargetIndex()))) 
 		    {
 			return true;
 		    }

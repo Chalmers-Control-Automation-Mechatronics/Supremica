@@ -262,7 +262,7 @@ public class fbd2smv
 	    String programName = fbdElement.getProgramName();
 	    String elementType = fbdElement.getElementType();
 	    String elementName = fbdElement.getElementName();
-	    String elementIndex = S.valueOf(fbdElement.getElementIndex());
+	    String elementIndex = String.valueOf(fbdElement.getElementIndex());
 
 	    if (elementType.equals("variable") || elementType.equals("box"))
 		{
@@ -297,7 +297,7 @@ public class fbd2smv
 	    String programName = fbdElement.getProgramName();
 	    String elementType = fbdElement.getElementType();
 	    String elementName = fbdElement.getElementName();
-	    String elementIndex = S.valueOf(fbdElement.getElementIndex());
+	    String elementIndex = String.valueOf(fbdElement.getElementIndex());
 
 	    if (elementType.equals("variable") || elementType.equals("box"))
 		{
@@ -455,11 +455,11 @@ public class fbd2smv
 			 *  the list of inputs will be empty or have exactly 
 			 *  one element in it.
 			 */
-			LinkedList inputs              = inputElementIndices(S.valueOf(variableOccurence.getElementIndex()), arcs);
+			LinkedList inputs              = inputElementIndices(String.valueOf(variableOccurence.getElementIndex()), arcs);
 			
 			if (inputs.size()>0)
 			    {
-				String    sourceIndex        = S.valueOf(((Tuple4)inputs.get(0)).x);
+				String    sourceIndex        = String.valueOf(((Tuple4)inputs.get(0)).x);
 				int       sourceOutputNumber = ((Tuple4)inputs.get(0)).y;
 				boolean   invert             = ((Tuple4)inputs.get(0)).invert;
 				FBDObject theFBDObject       = getElementByIndex(program, sourceIndex);
@@ -500,7 +500,7 @@ public class fbd2smv
 							moreCorners  = false;
 
 							cornerInputs = inputElementIndices(box.getIndex(), arcs);
-							sourceIndex2  = S.valueOf(((Tuple4)cornerInputs.get(0)).x);
+							sourceIndex2  = String.valueOf(((Tuple4)cornerInputs.get(0)).x);
 							theFBDObject2 = getElementByIndex(program, sourceIndex2);
 
 							if (theFBDObject2.getType().equals("box"))
@@ -742,7 +742,7 @@ String formalArgName = ((Block)smvBlocks.get(((BOX)theFBDObject.getElement()).ge
 	    {
 		String S = null;
  
-		String  sourceIndex = S.valueOf(((Tuple4)inputElementIndices.get(i)).x);
+		String  sourceIndex = String.valueOf(((Tuple4)inputElementIndices.get(i)).x);
 		int     sourceOutputNumber = ((Tuple4)inputElementIndices.get(i)).y;
 		boolean invert = ((Tuple4)inputElementIndices.get(i)).invert;
 
@@ -780,7 +780,7 @@ String formalArgName = ((Block)smvBlocks.get(((BOX)theFBDObject.getElement()).ge
 					moreDivs = false;
 					divInputIndices = inputElementIndices(box2.getIndex(), arcs);
 							    
-					sourceIndex2 = S.valueOf(((Tuple4)divInputIndices.get(0)).x);
+					sourceIndex2 = String.valueOf(((Tuple4)divInputIndices.get(0)).x);
 
 					theFBDObject2 = getElementByIndex(program, sourceIndex2);
 					if (theFBDObject2.getType().equals("box"))
@@ -880,7 +880,7 @@ String formalArgName = ((Block)smvBlocks.get(((BOX)theFBDObject.getElement()).ge
 	for (Iterator arcIt = theArcs.iterator(); arcIt.hasNext(); )
 	    {
 		ARC currARC = (ARC)arcIt.next();
-		if (boxIndex.equals(S.valueOf(currARC.getTargetIndex()))) 
+		if (boxIndex.equals(String.valueOf(currARC.getTargetIndex()))) 
 		    {
 			theInputElementIndices.add(new Tuple4(currARC.getSourceIndex(), currARC.getSourceOutputNumber(), currARC.getTargetInputNumber(), currARC.getInvert()));
 		    }
@@ -910,7 +910,7 @@ String formalArgName = ((Block)smvBlocks.get(((BOX)theFBDObject.getElement()).ge
 	for (Iterator arcIt = theArcs.iterator(); arcIt.hasNext(); )
 	    {
 		ARC currARC = (ARC)arcIt.next();
-		if (boxIndex.equals(S.valueOf(currARC.getSourceIndex()))) 
+		if (boxIndex.equals(String.valueOf(currARC.getSourceIndex()))) 
 		    {
 			theOutputElementIndices.add(new Tuple4(currARC.getTargetIndex(), currARC.getTargetInputNumber(), currARC.getSourceOutputNumber(), currARC.getInvert()));
 		    }

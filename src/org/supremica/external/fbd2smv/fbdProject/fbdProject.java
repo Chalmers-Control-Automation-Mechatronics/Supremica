@@ -116,7 +116,7 @@ public class fbdProject
 		for (int j=0; j<arcs.size(); j++ )
 		{
 		    ARC currARC = (ARC)arcs.get(j);
-		    if (index.equals(S.valueOf(currARC.getTargetIndex()))) 
+		    if (index.equals(String.valueOf(currARC.getTargetIndex()))) 
 			{
 			    return true;
 			}

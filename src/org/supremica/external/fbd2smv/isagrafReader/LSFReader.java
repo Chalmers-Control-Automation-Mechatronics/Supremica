@@ -142,9 +142,9 @@ public class LSFReader
 			    {
 				System.err.println("Unknown token: " + currToken);
 			    }
-			x = I.valueOf(currToken.substring(3, currToken.length())).intValue();
+			x = Integer.valueOf(currToken.substring(3, currToken.length())).intValue();
 			currToken = tokenizer.nextToken();
-			y = I.valueOf(currToken.substring(0, currToken.length()-1)).intValue();
+			y = Integer.valueOf(currToken.substring(0, currToken.length()-1)).intValue();
 		    }
 
 		else if (i == 3)
@@ -225,7 +225,7 @@ public class LSFReader
 
 	variablesByIndex.put(newVAR.getIndex(), newVAR);
 	variablesByName.put(newVAR.getName(), newVAR);
-	fbdElements.add(new FBDElement(programName, programIndex, (String)newVAR.getName(), elementType, I.valueOf(indexString).intValue(), x, y));
+	fbdElements.add(new FBDElement(programName, programIndex, (String)newVAR.getName(), elementType, Integer.valueOf(indexString).intValue(), x, y));
 		
     }
 
@@ -321,7 +321,7 @@ public class LSFReader
 	    }
 	   
 
-	fbdElements.add(new FBDElement(programName, programIndex, (String)newBOX.getName(), elementType, I.valueOf(indexString).intValue(), I.valueOf(x).intValue(), I.valueOf(y).intValue()));
+	fbdElements.add(new FBDElement(programName, programIndex, (String)newBOX.getName(), elementType, Integer.valueOf(indexString).intValue(), Integer.valueOf(x).intValue(), Integer.valueOf(y).intValue()));
     }
 
 
@@ -377,11 +377,11 @@ public class LSFReader
 			    {
 				System.err.println("Unknown token: " + currToken);
 			    }
-			sourceIndex = I.valueOf(currToken.substring(3, currToken.length())).intValue();
+			sourceIndex = Integer.valueOf(currToken.substring(3, currToken.length())).intValue();
 
 			currToken = tokenizer.nextToken();
 
-			sourceOutputNumber = I.valueOf(currToken.substring(0, currToken.length()-1)).intValue();
+			sourceOutputNumber = Integer.valueOf(currToken.substring(0, currToken.length()-1)).intValue();
 		    }
 
 		else if (i == 4)
@@ -390,11 +390,11 @@ public class LSFReader
 			    {
 				System.err.println("Unknown token: " + currToken);
 			    }
-			targetIndex = I.valueOf(currToken.substring(3, currToken.length())).intValue();
+			targetIndex = Integer.valueOf(currToken.substring(3, currToken.length())).intValue();
 
 			currToken = tokenizer.nextToken();
 
-			targetInputNumber = I.valueOf(currToken.substring(0, currToken.length()-1)).intValue();
+			targetInputNumber = Integer.valueOf(currToken.substring(0, currToken.length()-1)).intValue();
 		    }
 	    }
 

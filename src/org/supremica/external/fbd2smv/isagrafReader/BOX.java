@@ -12,8 +12,8 @@ public class BOX implements java.lang.Comparable
 
 	this.index = index;
 	this.name = name;
-	this.x = I.valueOf(x).intValue();
-	this.y = I.valueOf(y).intValue();
+	this.x = Integer.valueOf(x).intValue();
+	this.y = Integer.valueOf(y).intValue();
     }
 
     public int compareTo(Object o)
