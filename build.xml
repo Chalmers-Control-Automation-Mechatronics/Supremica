@@ -51,6 +51,7 @@
 *	just change "jikes" to "modern" on the next line.
 -->
 <property name="build.compiler" value="jikes"/>
+
 <!-- Enables emacs warning and error mesages. This is equals to calling jikes +E -->
 <!-- Put this in TextPad to get clickable error messages
 	Expression = ^[ \t]+\[javac\] \([A-Z]:[^:]+\):\([0-9]+\):\([0-9]+\):\([0-9]+\):
@@ -590,6 +591,8 @@
 	<chmod file="${dist}/Supremica" perm="755"/>	
 	<copy file="${templates}/Supremica.cmd" todir="${dist}"/>	
 	<chmod file="${dist}/Supremica.cmd" perm="644"/>
+	<copy file="${templates}/SupremicaProfiling.cmd" todir="${dist}"/>	
+	<chmod file="${dist}/SupremicaProfiling.cmd" perm="644"/>
 	<copy file="${templates}/SupremicaStandard.cmd" todir="${dist}"/>	
 	<chmod file="${dist}/SupremicaStandard.cmd" perm="644"/>
 	<copy file="${templates}/SupremicaApplet.html" todir="${dist}"/>	

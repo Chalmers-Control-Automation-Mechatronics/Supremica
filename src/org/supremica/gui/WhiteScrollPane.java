@@ -59,7 +59,7 @@ import java.awt.*;
 import javax.swing.*;
 
 // ** This one sets its own background to white
-class WhiteScrollPane
+public class WhiteScrollPane
 	extends JScrollPane
 {
 	private void setWhite()

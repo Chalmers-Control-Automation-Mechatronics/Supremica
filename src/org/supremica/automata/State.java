@@ -781,7 +781,7 @@ public class State
 
 		return count;
 	}
-	
+
 	public boolean isSafe()
 	{
 		return cost < MAX_COST;
@@ -846,15 +846,15 @@ public class State
 	}
 
 	/**
-	 * Follow the event "theEvent" and return the set of states that may be reached. 
+	 * Follow the event "theEvent" and return the set of states that may be reached.
 	 * Optionally also consider the states reachable also after any number of
-	 * epsilon events before and/or after "theEvent". 
+	 * epsilon events before and/or after "theEvent".
 	 *
-	 * Note that at least "theEvent" MUST be executed. 
+	 * Note that at least "theEvent" MUST be executed.
 	 *
 	 * This method should not be called for epsilon events normally (it may be sensible
-	 * in some special case but remember that there may be many epsilon events in the same 
-	 * automaton and that the epsilon closure considers all of them as the same but this 
+	 * in some special case but remember that there may be many epsilon events in the same
+	 * automaton and that the epsilon closure considers all of them as the same but this
 	 * method may treat them as unique!
 	 *
 	 * @param theEvent the event that must be executed.
@@ -878,7 +878,7 @@ public class State
 			outgoingArcsIt = outgoingArcsIterator();
 		}
 		while (outgoingArcsIt.hasNext())
-		{			
+		{
 			Arc currArc = outgoingArcsIt.nextArc();
 			if (currArc.getEvent().equals(theEvent))
 			{
@@ -900,7 +900,7 @@ public class State
 			states.add(this);
 		}
 		*/
-		
+
 		return states;
 	}
 
@@ -909,21 +909,21 @@ public class State
 	 * necessarily include the state from which the closure is calculated.
 	 *
 	 * @param includeSelf if true, this State itself is included even if no epsilon transitions
-	 * leads to it (a loop), if false, at least one epsilon transition must be executed and this State 
+	 * leads to it (a loop), if false, at least one epsilon transition must be executed and this State
 	 * itself may not be in the returned set (if there is no loop).
 	 * @return the states that can be reached by executing at least one epsilon transition.
 	 */
 	public StateSet epsilonClosure(boolean includeSelf)
 	{
 		StateSet result = new StateSet();
-		
+
 		// Include self?
 		if (includeSelf)
 		{
 			result.add(this);
 		}
 
-		// Examine states 
+		// Examine states
 		LinkedList statesToExamine = new LinkedList();
 		statesToExamine.add(this);
 		while (statesToExamine.size() != 0)
@@ -934,8 +934,8 @@ public class State
 			{
 				Arc currArc = arcIt.nextArc();
 				State state = currArc.getToState();
-				
-				if (currArc.getEvent().isEpsilon() && !currArc.isSelfLoop() && 
+
+				if (currArc.getEvent().isEpsilon() && !currArc.isSelfLoop() &&
 					!result.contains(state))
 				{
 					statesToExamine.add(state);
@@ -948,7 +948,7 @@ public class State
 	}
 
 	/**
-	 * Calculates and returns backwards epsilon closure as a StateSet. The closure includes the 
+	 * Calculates and returns backwards epsilon closure as a StateSet. The closure includes the
 	 * state from which the closure is calculated.
 	 */
 	public StateSet backwardsEpsilonClosure()
@@ -967,7 +967,7 @@ public class State
 				Arc currArc = arcIt.nextArc();
 				State state = currArc.getFromState();
 
-				if (currArc.getEvent().isEpsilon() && !currArc.isSelfLoop() && 
+				if (currArc.getEvent().isEpsilon() && !currArc.isSelfLoop() &&
 					!result.contains(state))
 				{
 					statesToExamine.add(state);
@@ -1039,7 +1039,7 @@ public class State
 	public Alphabet enabledEvents(boolean considerEpsilonClosure)
 	{
 		Alphabet enabled = new Alphabet();
-		
+
 		ArcIterator arcIt;
 		if (considerEpsilonClosure)
 		{
