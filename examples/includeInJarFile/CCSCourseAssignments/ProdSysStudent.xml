@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Automata name="Single Visual Project"  major="0"  minor="9" >
+<Automaton name="Assembly" type="Plant">
+	<Events>
+		<Event id="doneA" label="doneA" controllable="false"/>
+		<Event id="doneB" label="doneB" controllable="false"/>
+		<Event id="put2" label="put2" controllable="false"/>
+		<Event id="startA" label="startA"/>
+		<Event id="startB" label="startB"/>
+		<Event id="take2" label="take2"/>
+	</Events>
+	<States>
+		<State id="q0" initial="true" accepting="true"/>
+		<State id="q1"/>
+		<State id="q2"/>
+		<State id="q3"/>
+		<State id="q4"/>
+	</States>
+	<Transitions>
+		<Transition source="q0" dest="q1" event="take2"/>
+		<Transition source="q1" dest="q2" event="startA"/>
+		<Transition source="q1" dest="q3" event="startB"/>
+		<Transition source="q2" dest="q4" event="doneA"/>
+		<Transition source="q3" dest="q4" event="doneB"/>
+		<Transition source="q4" dest="q0" event="put2"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Attaching" type="Plant">
+	<Events>
+		<Event id="attach" label="attach"/>
+		<Event id="put3" label="put3" controllable="false"/>
+		<Event id="take3" label="take3"/>
+	</Events>
+	<States>
+		<State id="q0" initial="true" accepting="true"/>
+		<State id="q1"/>
+		<State id="q2"/>
+	</States>
+	<Transitions>
+		<Transition source="q0" dest="q1" event="take3"/>
+		<Transition source="q1" dest="q2" event="attach"/>
+		<Transition source="q2" dest="q0" event="put3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Exit" type="Plant">
+	<Events>
+		<Event id="arrivex" label="arrivex" controllable="false"/>
+		<Event id="exit" label="exit"/>
+		<Event id="leavex" label="leavex"/>
+	</Events>
+	<States>
+		<State id="q0" initial="true" accepting="true"/>
+		<State id="q1"/>
+	</States>
+	<Transitions>
+		<Transition source="q0" dest="q1" event="arrivex"/>
+		<Transition source="q1" dest="q0" event="leavex"/>
+		<Transition source="q1" dest="q0" event="exit"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Joint1" type="Plant">
+	<Events>
+		<Event id="arrive1" label="arrive1" controllable="false"/>
+		<Event id="leave1" label="leave1"/>
+		<Event id="put1" label="put1" controllable="false"/>
+		<Event id="take1" label="take1"/>
+	</Events>
+	<States>
+		<State id="q0" initial="true" accepting="true"/>
+		<State id="q1"/>
+	</States>
+	<Transitions>
+		<Transition source="q0" dest="q1" event="arrive1"/>
+		<Transition source="q0" dest="q1" event="put1"/>
+		<Transition source="q1" dest="q0" event="leave1"/>
+		<Transition source="q1" dest="q0" event="take1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Joint2" type="Plant">
+	<Events>
+		<Event id="arrive2" label="arrive2" controllable="false"/>
+		<Event id="leave2" label="leave2"/>
+		<Event id="put2" label="put2" controllable="false"/>
+		<Event id="take2" label="take2"/>
+	</Events>
+	<States>
+		<State id="q0" initial="true" accepting="true"/>
+		<State id="q1"/>
+	</States>
+	<Transitions>
+		<Transition source="q0" dest="q1" event="arrive2"/>
+		<Transition source="q0" dest="q1" event="put2"/>
+		<Transition source="q1" dest="q0" event="leave2"/>
+		<Transition source="q1" dest="q0" event="take2"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Joint3" type="Plant">
+	<Events>
+		<Event id="arrive3" label="arrive3" controllable="false"/>
+		<Event id="leave3" label="leave3"/>
+		<Event id="put3" label="put3" controllable="false"/>
+		<Event id="take3" label="take3"/>
+	</Events>
+	<States>
+		<State id="q0" initial="true" accepting="true"/>
+		<State id="q1"/>
+	</States>
+	<Transitions>
+		<Transition source="q0" dest="q1" event="arrive3"/>
+		<Transition source="q0" dest="q1" event="put3"/>
+		<Transition source="q1" dest="q0" event="leave3"/>
+		<Transition source="q1" dest="q0" event="take3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Packaging" type="Plant">
+	<Events>
+		<Event id="exit_item" label="exit_item" controllable="false"/>
+		<Event id="package" label="package"/>
+		<Event id="take_item" label="take_item"/>
+	</Events>
+	<States>
+		<State id="q0" initial="true" accepting="true"/>
+		<State id="q1"/>
+		<State id="q2"/>
+	</States>
+	<Transitions>
+		<Transition source="q0" dest="q1" event="take_item"/>
+		<Transition source="q1" dest="q2" event="package"/>
+		<Transition source="q2" dest="q0" event="exit_item"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Polishing" type="Plant">
+	<Events>
+		<Event id="dip" label="dip"/>
+		<Event id="done1" label="done1"/>
+		<Event id="polish" label="polish"/>
+		<Event id="put1" label="put1" controllable="false"/>
+		<Event id="take1" label="take1"/>
+	</Events>
+	<States>
+		<State id="q0" initial="true" accepting="true"/>
+		<State id="q1"/>
+		<State id="q2"/>
+	</States>
+	<Transitions>
+		<Transition source="q0" dest="q1" event="take1"/>
+		<Transition source="q1" dest="q2" event="done1"/>
+		<Transition source="q1" dest="q1" event="dip"/>
+		<Transition source="q1" dest="q1" event="polish"/>
+		<Transition source="q2" dest="q0" event="put1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Transporter" type="Plant">
+	<Events>
+		<Event id="arrive1" label="arrive1" controllable="false"/>
+		<Event id="arrive2" label="arrive2" controllable="false"/>
+		<Event id="arrive3" label="arrive3" controllable="false"/>
+		<Event id="arrivex" label="arrivex" controllable="false"/>
+		<Event id="enter" label="enter"/>
+		<Event id="exit" label="exit"/>
+		<Event id="leave1" label="leave1"/>
+		<Event id="leave2" label="leave2"/>
+		<Event id="leave3" label="leave3"/>
+		<Event id="leavex" label="leavex"/>
+	</Events>
+	<States>
+		<State id="q0" initial="true" accepting="true"/>
+		<State id="q1"/>
+		<State id="q2"/>
+		<State id="q3"/>
+		<State id="q4"/>
+		<State id="q5"/>
+		<State id="q6"/>
+		<State id="q7"/>
+		<State id="q8"/>
+	</States>
+	<Transitions>
+		<Transition source="q0" dest="q1" event="enter"/>
+		<Transition source="q1" dest="q2" event="arrive1"/>
+		<Transition source="q2" dest="q3" event="leave1"/>
+		<Transition source="q3" dest="q4" event="arrivex"/>
+		<Transition source="q4" dest="q5" event="leavex"/>
+		<Transition source="q4" dest="q0" event="exit"/>
+		<Transition source="q5" dest="q6" event="arrive2"/>
+		<Transition source="q6" dest="q7" event="leave2"/>
+		<Transition source="q7" dest="q8" event="arrive3"/>
+		<Transition source="q8" dest="q1" event="leave3"/>
+	</Transitions>
+</Automaton>
+</Automata>

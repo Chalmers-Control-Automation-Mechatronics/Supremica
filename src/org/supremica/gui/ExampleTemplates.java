@@ -102,7 +102,8 @@ public class ExampleTemplates
 		allGroups.add(thisGroup);
 
 		String prefix = extraPrefix + "/CCSCourseAssignments/";
-
+		thisGroup.addItem(new TemplateItem("Assignment 1 - FSM line", prefix + "FMSLineUppgift.xml"));
+		thisGroup.addItem(new TemplateItem("Assignment 1 - Production system", prefix + "ProdSysStudent.xml"));
 		thisGroup.addItem(new TemplateItem("Assignment 1 - Communication channel", prefix + "CommunicationChannel.xml"));
 	}
 
