@@ -367,13 +367,14 @@ public class ProjectBuildFromFSM
 					System.err.println("State_read_additional_events: currLine: :" +currLine + ": currToken :"+ currToken + ":");
 					if (currToken.equalsIgnoreCase("EVENTS"))
 					{ // Do nothing
-
+						System.err.println("Read EVENTS - do nothing");
 					}
 					else
 					{
 						String currEvent = currToken;
 						if (currAlphabet.containsEventWithLabel(currEvent))
 						{
+							System.err.println("Alphabet alredy contains: " + currEvent);
 							logger.warn(currEvent + " is already defined");
 						}
 						System.err.println("extra events - read: " + currEvent);
