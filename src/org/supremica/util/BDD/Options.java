@@ -164,7 +164,7 @@ public class Options
 	public static final String SHOW_GROW_NAMES [] = {
 		"None", "Node count","logNode (log scale)   ","Node delta",
 		"SAT count","logSAT",
-		"SAT delta", "Nodes & logSAT"
+		"SAT delta", "Nodes & logSAT", "Nodes & SAT delta"
 		};
 	public static final int
 		SHOW_GROW_NONE = 0,
@@ -174,7 +174,8 @@ public class Options
 		SHOW_GROW_SATCOUNT = 4,
 		SHOW_GROW_SATCOUNT_LOG = 5,
 		SHOW_GROW_SATCOUNT_DIFF = 6,
-		SHOW_GROW_NODES_AND_SATCOUNT_LOG = 7;
+		SHOW_GROW_NODES_AND_SATCOUNT_LOG = 7,
+		SHOW_GROW_NODES_AND_SATCOUNT_DIFF = 8;
 	public static int show_grow = SHOW_GROW_NONE; /** type of the BDD graph shown by GrowFrame */
 
 

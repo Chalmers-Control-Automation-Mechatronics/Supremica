@@ -160,6 +160,7 @@ public class WorksetSupervisor extends DisjSupervisor
 		if(gf != null) gf.stopTimer();
 
 		timer.report("Forward reachables found (workset)");
+		workset.done();
 
 		return r_all;
 
@@ -211,5 +212,6 @@ public class WorksetSupervisor extends DisjSupervisor
 		if(gf != null) gf.stopTimer();
 		SizeWatch.report(bdd_reachables, "Qr");
 		timer.report("Backward reachables found (workset)");
+		workset.done();
 	}
 }

@@ -779,7 +779,7 @@ class BDDPanel1
 
 		pHeuristics = new JPanel(new FlowLayout(FlowLayout.RIGHT) );
 		p.add(pHeuristics);
-		pHeuristics.add( new JLabel("PN-event and workset-automata selection"));
+		pHeuristics.add( new JLabel("PN-event and workset-automaton selection"));
 		pHeuristics.add( esHeuristics = new JComboBox());
 		insert(esHeuristics, Options.ES_HEURISTIC_NAMES, Options.es_heuristics);
 

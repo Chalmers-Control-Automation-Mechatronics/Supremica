@@ -135,7 +135,7 @@ public class Supervisor
 	 * returns an info string with the some relevant options highlighted
 	 *
 	 */
-	protected String type() {
+	public  String type() {
 		StringBuffer sb = new StringBuffer();
 		sb.append("-");
 		sb.append(Options.REACH_ALGO_NAMES[Options.algo_family]);

@@ -49,6 +49,8 @@ public class PartitionSmoothSupervisor extends DisjSupervisor {
 		manager.ref(r_all); //gets derefed by orTo and finally a deref
 
 
+		int num_access = 0, num_advance = 0; // statistics
+
 
 		i = j = 0;
 		do {
@@ -61,7 +63,11 @@ public class PartitionSmoothSupervisor extends DisjSupervisor {
 			manager.deref(front);
 			manager.deref(tmp);
 
+
 			if(r_all_p == r_all) {
+				num_access++;
+				if(i > 0) num_advance++;
+
 				i =  i + 1;
 				j = (j + 1) % size; // only for P1
 			} else i = 0;
@@ -78,12 +84,15 @@ public class PartitionSmoothSupervisor extends DisjSupervisor {
 		SizeWatch.report(bdd_reachables, "Qr");
 		timer.report("Forward reachables found (PartitionSmooth)");
 
+		if(Options.profile_on && num_access != 0) {
+			Options.out.println("Pn advances: " + ( (100 * num_advance) / num_access) + "%");
+		}
     }
 
 
     protected void computeCoReachables() {
 		GrowFrame gf = BDDGrow.getGrowFrame(manager, "backward reachability" + type());
-
+		int num_access = 0, num_advance = 0; // statistics
 		timer.reset();
 		SizeWatch.setOwner("PartitionSmoothSupervisor.computecoReachables");
 
@@ -112,6 +121,9 @@ public class PartitionSmoothSupervisor extends DisjSupervisor {
 			manager.deref(tmp);
 
 			if(r_all_p == r_all) {
+				num_access++;
+				if(i > 0) num_advance++;
+
 				i =  i + 1;
 				j = (j + 1) % size;
 			} else i = 0;
@@ -132,5 +144,8 @@ public class PartitionSmoothSupervisor extends DisjSupervisor {
 		if(gf != null) gf.stopTimer();
 		SizeWatch.report(bdd_reachables, "Qco");
 		timer.report("Co-reachables found (PartitionSmooth)");
+		if(Options.profile_on && num_access != 0) {
+			Options.out.println("Pn advances: " + ( (100 * num_advance) / num_access) + "%");
+		}
     }
 }

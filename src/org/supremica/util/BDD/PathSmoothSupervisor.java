@@ -39,7 +39,6 @@ public class PathSmoothSupervisor extends DisjSupervisor
 		int i_all   = manager.and(plant.getI(), spec.getI());
 		int r_all_p, r_all = i_all;
 
-
 		do {
 			do {
 				r_all_p = r_all;

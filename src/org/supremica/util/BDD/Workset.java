@@ -54,8 +54,14 @@ public class Workset
 
 		if(exclusive) // everything reamining, yet...
 			for(int i = 0; i < size; i++) remaining[i] = true;
+
+		ndas.reset();
 	}
 
+	public void done() {
+		ndas.done();
+	}
+	// ---------------------------------------------------
 	public String getHeuristicName() {
 		return Options.ES_HEURISTIC_NAMES[Options.es_heuristics];
 	}

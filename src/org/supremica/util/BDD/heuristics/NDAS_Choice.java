@@ -12,12 +12,21 @@ import java.util.*;
  */
 
 public class NDAS_Choice {
-	private int ndas, ring;
-	private int [] activity, queue2;
+	private final int
+		ADD_REWARD = +2,
+		ADD_PUNISH = -1,
+		ADD_REWARD_FADING = +5;
+
+
+
+	private int ndas, ring, max_activity, num_access, num_advance;
+	private int [] activity = null, queue2 = null;
 	private boolean punish_inactive;
+
+
 	public NDAS_Choice(int size) {
 		ndas = Options.ndas_heuristics;
-		ring = 0;
+		max_activity = size;
 
 		if(ndas == Options.NDAS_ACTIVITY || ndas == Options.NDAS_ACTIVITY2) {
 			// we handle NDAS_ACTIVITY and NDAS_ACTIVITY2 equal beside the small different in advance()
@@ -28,10 +37,25 @@ public class NDAS_Choice {
 
 			activity = new int[size];
 			queue2 = new int[size];
-			for(int i = 0; i < size; i++) activity[i] = 0;
+
 		}
 	}
 
+
+	public void reset() {
+		ring = 0;
+		num_access =  num_advance = 0;
+		if(activity != null) for(int i = 0; i < activity.length; i++) activity[i] = 0;
+	}
+
+	public void done() {
+
+		if(Options.profile_on && num_access != 0) {
+			Options.out.println("NDAS advances: " + ( (100 * num_advance) / num_access) + "%");
+		}
+
+	}
+	// --------------------------------------------------------------------------
 
 	public int choose(int [] queue, int size) {
 		if(size <= 0) return -1; // ERROR, no choices!
@@ -52,12 +76,23 @@ public class NDAS_Choice {
 
 
 	public void advance(int automaton, boolean changed)	{
+
+		num_access++;
+		if(changed) num_advance++;
+
 		if(ndas == Options.NDAS_ACTIVITY) {
 			if(punish_inactive) {
-				activity[automaton] += (changed) ? + 2 : -1;
+				// reward and punish
+				activity[automaton] += (changed) ? ADD_REWARD : ADD_PUNISH;
+
+				// dont let it grow more than we can handle...
+				if(activity[automaton] > max_activity) activity[automaton] = max_activity;
+				else if(activity[automaton] < -max_activity) activity[automaton] = -max_activity;
+
 			} else {
+				// reward and fade
 				for(int i = 0; i < activity.length; i++) activity[i] /= 2;
-				if(changed) activity[automaton] += 5;
+				if(changed) activity[automaton] += ADD_REWARD_FADING;
 			}
 		}
 	}

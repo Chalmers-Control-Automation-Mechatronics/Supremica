@@ -2,6 +2,7 @@ package org.supremica.util.BDD;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.io.*;
 
 public class GrowFrame
 	extends Frame
@@ -19,6 +20,8 @@ public class GrowFrame
 	private boolean stopped;
 	private Marker marker_root, marker_last;
 	protected String title;
+	protected int min_value, max_value, last_value;
+
 
 	protected GrowFrame(String txt)
 	{
@@ -40,6 +43,10 @@ public class GrowFrame
 		pNorth.add(bReturn = new Button("Graph"));
 		bReturn.addActionListener(this);
 		bReturn.setVisible(false);
+
+		this.max_value = Integer.MIN_VALUE;
+		this.min_value = Integer.MAX_VALUE;
+		this.last_value = 0;
 
 
 
@@ -83,7 +90,10 @@ public class GrowFrame
 	public void add(int value)
 	{
 		end_time = System.currentTimeMillis();
-		vars.add(value);
+		vars.add(last_value = value);
+
+		if(last_value > max_value) max_value = last_value ;
+		if(last_value < min_value) min_value = last_value ;
 
 
 		// dont update toooooo often
@@ -106,9 +116,40 @@ public class GrowFrame
 	}
 
 
+	// -------------------------------------------------------------
+
+	public int minValue() { return min_value; }
+	public int maxValue() { return max_value; }
+	public int finalValue() { return last_value; }
+	public int iterations() { return vars.getSize(); }
+	public long totalTime() { return end_time - start_time; }
+
+
+	public void save(String filename) throws IOException {
+		FileWriter fw = new FileWriter(filename);
+		String text = getText();
+		fw.write(text);
+		fw.flush();
+		fw.close();
+	}
+
+	// -------------------------------------------------------------
+
 	private void onDump()
 	{
+		String text = getText();
 
+		ta.setText(text);
+
+		canvas.setVisible(false);
+		ta.setVisible(true);
+
+		bDump.setVisible(false);
+		bReturn.setVisible(true);
+		pack();
+	}
+
+	private String getText() {
 		int size_x = vars.getSize();
 		StringBuffer sb = new StringBuffer();
 
@@ -141,14 +182,7 @@ public class GrowFrame
 		}
 
 
-		ta.setText( sb.toString());
-
-		canvas.setVisible(false);
-		ta.setVisible(true);
-
-		bDump.setVisible(false);
-		bReturn.setVisible(true);
-		pack();
+		return sb.toString();
 	}
 
 	private void onReturn()
@@ -228,14 +262,15 @@ public class GrowFrame
 		{
 			if(!showGraph) return;
 
-			int min = vars.getMin();
+			int min = min_value;
+			int max = max_value;
 
 			if (min > 0)
 			{
 				min = 0;
 			}
 
-			int max = vars.getMax();
+
 			Dimension dims = this.size();
 			int size_x = vars.getSize();
 			int size_y = (max - min);
