@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorNodeGroup
 //###########################################################################
-//# $Id: EditorNodeGroup.java,v 1.4 2005-02-21 21:33:30 flordal Exp $
+//# $Id: EditorNodeGroup.java,v 1.5 2005-02-22 21:53:14 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -57,7 +57,7 @@ public class EditorNodeGroup
 
 		resizing = bounds.isEmpty();
 		resizingFrom = new Point2D.Double(bounds.getMinX(), bounds.getMinY());
-		selected = false;
+		setSelected(false);
 
 		for (int i = 0; i < 4; i++)
 		{
@@ -315,7 +315,7 @@ public class EditorNodeGroup
 
 	public void setSelected(boolean s)
 	{
-		selected = s;
+		super.setSelected(s);
 
 		/*
 		if (s == true)
@@ -333,26 +333,14 @@ public class EditorNodeGroup
 		Graphics2D g2d = (Graphics2D) g;
 
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		g2d.setColor(getColor());
 
-		if (selected)
+		if (isSelected())
 		{
-			g2d.setColor(EditorColor.SELECTCOLOR);
-
 			for (int i = 0; i < 4; i++)
 			{
 				//g2d.fillRect((int) corners[i].getCenterX() - WIDTHD, (int) corners[i].getCenterY() - WIDTHD, 2 * WIDTHD, 2 * WIDTHD);
 				g2d.drawOval((int) corners[i].getCenterX() - WIDTHD, (int) corners[i].getCenterY() - WIDTHD, 2 * WIDTHD, 2 * WIDTHD);
-			}
-		}
-		else
-		{
-			if (getHighlighted())
-			{
-				g2d.setColor(EditorColor.HIGHLIGHTCOLOR);
-			}
-			else
-			{
-				g2d.setColor(EditorColor.NODEGROUPCOLOR);
 			}
 		}
 

@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorObject
 //###########################################################################
-//# $Id: EditorObject.java,v 1.4 2005-02-21 11:13:33 flordal Exp $
+//# $Id: EditorObject.java,v 1.5 2005-02-22 21:53:14 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -19,8 +19,6 @@ import java.awt.*;
 public class EditorObject
 {
 	protected boolean visible;
-	protected boolean selected = false;
-	private boolean highlighted = false;
 	protected int type = 0;
 	private int hash = 0;
 	public static int EDGE = 1;
@@ -28,6 +26,11 @@ public class EditorObject
 	public static int NODEGROUP = 3;
 	public static int LABEL = 4;
 	public static int LABELGROUP = 5;
+
+	// What status has this object got in the editor window? Determines color.
+	private boolean selected = false;
+	private boolean highlighted = false;
+	private boolean error = false;
 
 	public void drawObject(Graphics g)
 	{
@@ -54,12 +57,7 @@ public class EditorObject
 		selected = s;
 	}
 
-	public void setSelected()
-	{
-		selected = true;
-	}
-
-	public boolean getSelected()
+	public boolean isSelected()
 	{
 		return selected;
 	}
@@ -69,9 +67,46 @@ public class EditorObject
 		highlighted = s;
 	}
 
-	public boolean getHighlighted()
+	public boolean isHighlighted()
 	{
 		return highlighted;
+	}
+
+	public void setError(boolean s)
+	{
+		error = s;
+	}
+
+	public boolean isError()
+	{
+		return error;
+	}
+
+	public Color getColor()
+	{
+		// In order of importance
+		if (isError())
+		{
+			return EditorColor.ERRORCOLOR;
+		}
+		else if (isSelected())
+		{
+			return EditorColor.SELECTCOLOR;
+		}
+		else if (isHighlighted())
+		{
+			return EditorColor.HIGHLIGHTCOLOR;
+		}
+
+		// Defaults
+		if (getType() == NODEGROUP)
+		{
+			return EditorColor.NODEGROUPCOLOR;
+		}
+		else
+		{
+			return EditorColor.DEFAULTCOLOR;
+		}
 	}
 
 	public EditorObject()

@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorLabelGroup
 //###########################################################################
-//# $Id: EditorLabelGroup.java,v 1.4 2005-02-21 21:33:30 flordal Exp $
+//# $Id: EditorLabelGroup.java,v 1.5 2005-02-22 21:53:14 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -102,7 +102,8 @@ public class EditorLabelGroup
 		{
 			JLabel l = (JLabel) events.get(i);
 
-			if (selected)
+			/*
+			if (getSelected())
 			{
 				l.setForeground(EditorColor.SELECTCOLOR);
 			}
@@ -117,6 +118,8 @@ public class EditorLabelGroup
 					l.setForeground(EditorColor.HIGHLIGHTCOLOR);
 				}
 			}
+			*/
+			l.setForeground(getColor());
 
 			if (i == selectedLabel)
 			{

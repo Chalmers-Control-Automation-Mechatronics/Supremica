@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorEdge
 //###########################################################################
-//# $Id: EditorEdge.java,v 1.6 2005-02-22 07:54:28 flordal Exp $
+//# $Id: EditorEdge.java,v 1.7 2005-02-22 21:53:14 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -753,24 +753,8 @@ public class EditorEdge
 	{
 		Graphics2D g2d = (Graphics2D) g;
 
-		g2d.setColor(EditorColor.DEFAULTCOLOR);
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-		if (!getSelected())
-		{
-			if (!getHighlighted())
-			{
-				g2d.setColor(EditorColor.DEFAULTCOLOR);
-			}
-			else
-			{
-				g2d.setColor(EditorColor.HIGHLIGHTCOLOR);
-			}
-		}
-		else
-		{
-			g2d.setColor(EditorColor.SELECTCOLOR);
-		}
+		g2d.setColor(getColor());
 
 		if (source.isEmpty() && (dragT || dragS))
 		{
@@ -810,7 +794,7 @@ public class EditorEdge
 			drawArrow(start.getX(), start.getY(), endNode.getX(), endNode.getY(), (int) getTPointX(), (int) getTPointY(), false, g2d);
 		}
 
-		if (selected)
+		if (isSelected())
 		{
 			g2d.draw(source);
 			g2d.fill(source);

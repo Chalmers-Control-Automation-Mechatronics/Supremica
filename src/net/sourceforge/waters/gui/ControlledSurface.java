@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.9 2005-02-22 07:54:28 flordal Exp $
+//# $Id: ControlledSurface.java,v 1.10 2005-02-22 21:53:14 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -530,9 +530,8 @@ public class ControlledSurface
 
 						EditorNodeGroup nodeGroup = (EditorNodeGroup) object;
 
-						Rectangle2D.Double b = new Rectangle2D.Double();
-
-						b.setRect(nodeGroup.getBounds());
+						//Rectangle2D.Double b = new Rectangle2D.Double();
+						//b.setRect(nodeGroup.getBounds());
 
 						if (nodeGroup.getResizing() && (selectedObjects.size() == 1))
 						{
@@ -557,10 +556,13 @@ public class ControlledSurface
 							}
 						}
 
-						if (intersectsRectangle(nodeGroup.getBounds()))
-						{
-							nodeGroup.setBounds(b);
-						}
+						/* // Prevent nodegroups from moving onto nodes?
+						   if (intersectsRectangle(nodeGroup.getBounds()))
+						   {
+						   nodeGroup.setBounds(b);
+						   }
+						*/
+						nodeGroup.setError(intersectsRectangle(nodeGroup.getBounds()));
 
 						/*
 						EditorNodeGroup nodeGroup = (EditorNodeGroup) object;
@@ -681,9 +683,8 @@ public class ControlledSurface
 				{
 					EditorNodeGroup nodeGroup = (EditorNodeGroup) selectedObjects.get(0);
 
-					Rectangle2D.Double b = new Rectangle2D.Double();
-
-					b.setRect(nodeGroup.getBounds());
+					//Rectangle2D.Double b = new Rectangle2D.Double();
+					//b.setRect(nodeGroup.getBounds());
 
 					if (nodeGroup.getResizing())
 					{
@@ -707,11 +708,14 @@ public class ControlledSurface
 							nodeGroup.moveGroup(e.getX() - xoff, e.getY() - yoff);
 						}
 					}
-
+					
+					/* // Prevent nodegroups from moving onto nodes?
 					if (intersectsRectangle(nodeGroup.getBounds()))
 					{
 						nodeGroup.setBounds(b);
 					}
+					*/
+					nodeGroup.setError(intersectsRectangle(nodeGroup.getBounds()));
 				}
 			}
 		}

@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorLabel
 //###########################################################################
-//# $Id: EditorLabel.java,v 1.7 2005-02-22 01:36:16 flordal Exp $
+//# $Id: EditorLabel.java,v 1.8 2005-02-22 21:53:14 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -132,21 +132,7 @@ public class EditorLabel
 			text.setSize(text.getPreferredSize());
 		}
 
-		if (!selected)
-		{
-			if (!getHighlighted())
-			{
-				label.setForeground(EditorColor.DEFAULTCOLOR);
-			}
-			else
-			{
-				label.setForeground(EditorColor.HIGHLIGHTCOLOR);
-			}
-		}
-		else
-		{
-			label.setForeground(EditorColor.SELECTCOLOR);
-		}
+		label.setForeground(getColor());
 
 		int xposition = parent.getX() + (int) geometry.getOffset().getX();
 		int yposition = parent.getY() + (int) geometry.getOffset().getY();

@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorNode
 //###########################################################################
-//# $Id: EditorNode.java,v 1.4 2005-02-21 21:33:30 flordal Exp $
+//# $Id: EditorNode.java,v 1.5 2005-02-22 21:53:14 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -220,26 +220,12 @@ public class EditorNode
 		Set colours = getColours(EventDeclList);
 		Iterator i = colours.iterator();
 
-		propGroup.setPanelLocation();
-		g2d.setColor(EditorColor.DEFAULTCOLOR);
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		g2d.setColor(getColor());
 
-		if (selected)
+		propGroup.setPanelLocation();
+		if (!isSelected())
 		{
-			g2d.setColor(EditorColor.SELECTCOLOR);
-			propGroup.setPanelLocation();
-		}
-		else
-		{
-			if (!getHighlighted())
-			{
-				g2d.setColor(EditorColor.DEFAULTCOLOR);
-			}
-			else
-			{
-				g2d.setColor(EditorColor.HIGHLIGHTCOLOR);
-			}
-
 			propGroup.setVisible(false);
 		}
 
@@ -251,7 +237,8 @@ public class EditorNode
 
 		if (proxy.isInitial())
 		{
-			if (!selected)
+			/*
+			if (!getSelected())
 			{
 				if (!getHighlighted())
 				{
@@ -262,6 +249,7 @@ public class EditorNode
 					g2d.setColor(EditorColor.HIGHLIGHTCOLOR);
 				}
 			}
+			*/
 
 			g2d.fillOval((int) position.getX() - (WIDTH / 2), (int) position.getY() - (WIDTH / 2), WIDTH + 1, WIDTH + 1);
 
@@ -289,22 +277,7 @@ public class EditorNode
 				g2d.setColor(EditorColor.DEFAULTMARKINGCOLOR);
 				g2d.fillOval((int) position.getX() - (WIDTH / 2) + 2, (int) position.getY() - (WIDTH / 2) + 2, WIDTH - 2, WIDTH - 2);
 
-				if (selected)
-				{
-					g2d.setColor(EditorColor.SELECTCOLOR);
-					propGroup.setPanelLocation();
-				}
-				else
-				{
-					if (!getHighlighted())
-					{
-						g2d.setColor(EditorColor.DEFAULTCOLOR);
-					}
-					else
-					{
-						g2d.setColor(EditorColor.HIGHLIGHTCOLOR);
-					}
-				}
+				g2d.setColor(getColor());
 				
 				g2d.drawLine((int) position.getX(), (int) position.getY() - (WIDTH / 2), (int) position.getX(), (int) position.getY() + (WIDTH / 2));
 				g2d.drawLine((int) position.getX() - (WIDTH / 2), (int) position.getY(), (int) position.getX() + (WIDTH / 2), (int) position.getY());
@@ -336,22 +309,7 @@ public class EditorNode
 				g2d.setColor(EditorColor.DEFAULTMARKINGCOLOR);
 				g2d.fillOval((int) position.getX() - (WIDTH / 2) + 1, (int) position.getY() - (WIDTH / 2) + 1, WIDTH - 1, WIDTH - 1);
 
-				if (selected)
-				{
-					g2d.setColor(EditorColor.SELECTCOLOR);
-					propGroup.setPanelLocation();
-				}
-				else
-				{
-					if (!getHighlighted())
-					{
-						g2d.setColor(EditorColor.DEFAULTCOLOR);
-					}
-					else
-					{
-						g2d.setColor(EditorColor.HIGHLIGHTCOLOR);
-					}
-				}
+				g2d.setColor(getColor());
 
 				g2d.drawLine((int) position.getX(), (int) position.getY() - (WIDTH / 2), (int) position.getX(), (int) position.getY() + (WIDTH / 2));
 				g2d.drawLine((int) position.getX() - (WIDTH / 2), (int) position.getY(), (int) position.getX() + (WIDTH / 2), (int) position.getY());
