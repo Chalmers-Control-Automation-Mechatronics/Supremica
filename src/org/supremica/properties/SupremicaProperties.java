@@ -174,6 +174,9 @@ public final class SupremicaProperties
 	// Animator Options
 	private static final String INCLUDE_ANIMATOR = "includeAnimator";
 
+	// User Interface - with swixml and the SwingEngine - Options
+	private static final String INCLUDE_USERINTERFACE = "includeUserInterface";
+
 	// ShoeFactory Options
 	private static final String INCLUDE_SHOE_FACTORY = "includeShoeFactory";
 
@@ -276,6 +279,7 @@ public final class SupremicaProperties
 		setProperty(SYNTHESIS_REDUCE_SUPERVISORS, "false", true);
 		setProperty(GENERAL_USE_SECURITY, "false", false);
 		setProperty(INCLUDE_ANIMATOR, "false", true);
+		setProperty(INCLUDE_USERINTERFACE, "true", true);
 		setProperty(SOFTPLC_CYCLE_TIME, "40", true);
 		setProperty(SHOW_GENETIC_ALGORITHMS, "false", true);
 		setProperty(SHOW_ROBOTSTUDIO_LINK, "false", true);
@@ -1291,6 +1295,16 @@ public static String getLocalPrefsDirectory()
 	public static void setIncludeAnimator(boolean includeAnimator)
 	{
 		wp.setProperty(INCLUDE_ANIMATOR, toString(includeAnimator));
+	}
+
+	public static boolean includeUserInterface()
+	{
+		return toBoolean(wp.getProperty(INCLUDE_USERINTERFACE));
+	}
+
+	public static void setIncludeUserInterface(boolean includeUserInterface)
+	{
+		wp.setProperty(INCLUDE_USERINTERFACE, toString(includeUserInterface));
 	}
 
 	public static int getSoftplcCycleTime()

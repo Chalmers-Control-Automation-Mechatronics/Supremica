@@ -1641,6 +1641,7 @@
 		</Control>
 	</Controls>
 	<Animation path="/scenebeans/warehouse/warehouse.xml"/>
+	<UserInterface path="/swigxml/warehouse/warehouse.xml"/>
 </Execution>
 </SupremicaProject>
 

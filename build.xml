@@ -15,6 +15,7 @@
 <property name="templates" value="templates"/>
 <property name="images" value="images"/>
 <property name="animations" value="animations"/>
+<property name="userinterfaces" value="userinterfaces"/>
 <property name="examples" value="examples/includeInJarFile"/>
 <property name="help" value="help"/>
 <property name="lib" value="lib"/>

@@ -87,6 +87,7 @@ import org.supremica.util.ActionTimer;
 import org.supremica.automata.algorithms.RobotStudioLink;
 import org.supremica.gui.useractions.*;
 import org.supremica.gui.texteditor.TextFrame;
+import org.swixml.SwingEngine;
 
 // -- MF -- Abstract class to save on duplicate code
 // -- From this class is instantiated anonymous classes that implement the openFile properly
@@ -1748,6 +1749,29 @@ public class ActionMan
 		catch (Exception ex)
 		{
 			logger.error("Exception while getting Animator.", ex);
+			logger.debug(ex.getStackTrace());
+		}
+	}
+
+	// ActionMan.userInterface_action performed
+	public static void userInterface_actionPerformed(Gui gui)
+	{
+		try
+		{
+			VisualProject currProject = gui.getVisualProjectContainer().getActiveProject();
+
+			if (!currProject.hasUserInterface())
+			{
+				logger.info("No user interface present");
+
+				return;
+			}
+
+			SwingEngine swingEngine = currProject.getSwingEngine();
+		}
+		catch (Exception ex)
+		{
+			logger.error("Exception while getting user interface.", ex);
 			logger.debug(ex.getStackTrace());
 		}
 	}
