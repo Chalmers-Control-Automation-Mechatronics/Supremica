@@ -71,6 +71,7 @@ class VerificationDialogStandardPanel
 	private JComboBox verificationTypeBox;
 	private AlgorithmSelector algorithmSelector;
 	private JTextArea nbNote;
+	//private JTextArea note;// = new JTextArea("Bananas...");
 
 	//final String[] verificationData = { "Controllability",	// keep them in this order, for God's sake!
 	//									"Non-blocking",
@@ -110,14 +111,28 @@ class VerificationDialogStandardPanel
 		nbNote = new JTextArea("Note:\n" +
 								"Currently, modular non-blocking\n" +
 								"verification is not supported");
-		nbNote.setBackground(new Color(0,0,0,0)); // transparent
+		//nbNote.setBackground(new Color(0,0,0,0)); // transparent
+		nbNote.setBackground(this.getBackground());
 
 		Box standardBox = Box.createVerticalBox();
 		standardBox.add(verificationTypeBox);
 		standardBox.add(algorithmSelector);
-		this.add(standardBox, BorderLayout.CENTER);
-		this.add(nbNote, BorderLayout.SOUTH);
 
+		// NEW TRY
+		this.setLayout(new GridLayout(2,1));
+		JPanel choicePanel = new JPanel();
+		choicePanel.setLayout(new FlowLayout());
+		choicePanel.add(standardBox);
+		this.add(choicePanel);
+		JPanel notePanel = new JPanel();
+		notePanel.setLayout(new FlowLayout());
+		notePanel.add(nbNote);
+		this.add(notePanel);
+
+		// OLD TRIES
+		//this.setLayout(new FlowLayout());// this.setLayout(new BorderLayout());
+		//this.add(standardBox);//, BorderLayout.CENTER);
+		//this.add(nbNote);//, BorderLayout.SOUTH);
 	}
 
 	public void update(VerificationOptions verificationOptions)

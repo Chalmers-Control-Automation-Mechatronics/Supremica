@@ -235,6 +235,10 @@ public class AutomataVerifier
 				{
 					return monolithicNonblockingVerification();
 				}
+				//else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
+				//{
+				//	return modularNonblockingVerification();
+				//}
 				else
 				{
 					throw new UnsupportedOperationException("The selected algorithm is not implemented");
@@ -268,7 +272,6 @@ public class AutomataVerifier
 			throw new RuntimeException(e); // Try change this later
 		}
 	}
-
 
 	/**
 	 * Performs modular controllablity verification on theAutomata..
@@ -1161,6 +1164,34 @@ public class AutomataVerifier
 	}
 
 	/**
+	 * THIS DOES NOT WORK! IT'S JUST A TEST! Examines non-blocking modularily
+	 * by examining pairwise non-blocking between all automata.
+	 * THIS DOES NOT WORK! IT'S JUST A TEST!
+	 *
+	 *@return True if non-blocking, false if blocking
+	 *@exception  Exception Description of the Exception
+	 *@see  AutomataSynchronizerExecuter
+	 */
+	private boolean pairwiseNonblockingVerification()
+		throws Exception
+	{
+		// NOTE!! THIS ALGORITHM DOES NOT WORK! IT IS JUST A PRELIMINARY TEST!!
+		logger.error("Modular non-blocking verification is not implemented! This algorithm " +
+					 "examines pairwise non-blocking between all automata! DOES NOT WORK!!");
+
+		Iterator automatonIterator = theAutomata.iterator();
+		Automaton currAutomaton;
+
+		while (automatonIterator.hasNext())
+		{
+			currAutomaton = (Automaton) automatonIterator.next();
+			//Iterator subIterator = new Iterator(automatonIterator);
+		}
+
+		return false;
+	}
+
+	/**
 	 * Examines non-blocking monolithically, by examining all reachable states.
 	 * Lots and lots of work for big systems.
 	 *
@@ -1170,7 +1201,6 @@ public class AutomataVerifier
 	 */
 	private boolean moduleIsNonBlocking(Automaton theAutomaton)
 	{
-
 		// Examine all states, starting from the marked ones and moving backwards...
 		LinkedList statesToExamine = new LinkedList();
 		Iterator stateIterator = theAutomaton.stateIterator();

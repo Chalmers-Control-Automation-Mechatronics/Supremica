@@ -224,7 +224,6 @@ public class AutomataVerificationWorker
 		}
 		else if (verificationOptions.getVerificationType() == VerificationType.Nonblocking)
 		{
-
 			// Non-blocking verification...
 			// requestStop();
 			// logger.error("Option not implemented...");
@@ -269,17 +268,13 @@ public class AutomataVerificationWorker
 			{
 				if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
 				{
-
 					// Modular...
 					requestStop();
-
-					logger.error("Modular nonblocking option not yet implemented... try the monolithic algorithm instead, it's great!!");
-
+					logger.error("Modular nonblocking option not yet implemented... try the monolithic algorithm instead!");
 					return;
 				}
 				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Monolithic)
 				{
-
 					// Monolithic...
 					isNonBlocking = automataVerifier.verify();
 				}
@@ -323,7 +318,6 @@ public class AutomataVerificationWorker
 		}
 		else if (verificationOptions.getVerificationType() == VerificationType.LanguageInclusion)
 		{
-
 			// Language inclusion
 			boolean isIncluded;
 			Collection selectedAutomata = workbench.getSelectedAutomataAsCollection();
@@ -370,7 +364,6 @@ public class AutomataVerificationWorker
 
 			if ((automataA.size() < 1) || (automataB.size() < 1))
 			{
-
 				logger.error("At least one automaton must be unselected.");
 				requestStop();
 				return;
@@ -500,7 +493,6 @@ public class AutomataVerificationWorker
 				}
 				else
 				{
-
 					// Error...
 					requestStop();
 					logger.error("Language Inclusion, unavailable option chosen.");
