@@ -105,6 +105,12 @@ PROGRAM PortVaktstest
 		ST Init
 end_init:
 
+
+CAL WPrint("manuell start")
+CAL BPrintln(%IX24)
+
+
+
 CAL WPrint("Manuel Start = ")
 LD %IX24
 ST tmpb
@@ -114,6 +120,7 @@ CAL WPrint("KulaPortVakt = ")
 LD KulaPortvakt
 ST tmpb
 CAL BPrintln(tmpb)
+
 
 (*start*)
 (*	if !(Start || (KulaPortvakt || UrPortvakt))
@@ -255,6 +262,7 @@ END6:
 		JMPCN noMat
 		CAL WPrint("Läser av=")
 		CAL BPrintln(StorKula)
+
 		LD StorKula
 		ST IsStorKula
 		(*lägg till lite bättre logik*)

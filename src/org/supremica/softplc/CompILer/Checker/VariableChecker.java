@@ -5,7 +5,6 @@ import org.supremica.softplc.CompILer.Parser.*;
 import org.supremica.softplc.CompILer.Parser.SyntaxTree.*;
 import org.supremica.softplc.CompILer.CodeGen.Datatypes.*;
 import java.util.*;
-import java.lang.Exception;
 import java.util.LinkedList;
 
 
@@ -162,6 +161,14 @@ public class VariableChecker implements SimpleNodeVisitor {
 			jjtn_variable.setIsFunctionBlock(v.isFunctionBlock);
 
 			jjtn_simple_op.jjtAddChild(jjtn_variable, 0);
+
+		} else if (type == "direct_variable") {
+			ASTvariable jjtn_variable = new ASTvariable(parserTreeConstants.JJTVARIABLE);
+			jjtn_variable.setName(value);
+			jjtn_variable.setIsDirectVariable(true);
+
+			jjtn_simple_op.jjtAddChild(jjtn_variable, 0);
+
 		}
 
 		return jjtn_simple_op;
@@ -238,6 +245,17 @@ public class VariableChecker implements SimpleNodeVisitor {
 			v.fieldSelector = tokens.nextToken();
 		}
 
+
+		/*
+		 * Om variabeln är en direct variable ...
+         */
+		if (locatedVariables.containsValue(v.name))
+			{
+				v.directVariable = true;
+				return v;
+			}
+
+
 		/*
          * Check that the variable is declared, and retrieve
 		 * the variable's type.
@@ -274,7 +292,7 @@ public class VariableChecker implements SimpleNodeVisitor {
 		/*
 		 * Om variabeln är en located variable ...
          */
-		if (locatedVariables.containsKey(variableName))
+		if (locatedVariables.containsKey(v.name))
 			{
 				v.directVariable = true;
 				v.name = ((String)locatedVariables.get(v.name));
@@ -297,6 +315,7 @@ public class VariableChecker implements SimpleNodeVisitor {
 
 		return v;
 	}
+
 
 
    	public String getFunctionBlockTypeName(String fbVariableName, String blockName) {

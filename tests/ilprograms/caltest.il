@@ -235,6 +235,23 @@ PROGRAM CALTEST
       	Result_DINT  : DINT;
 		Result_BOOL  : BOOL;
 	END_VAR
+	VAR
+		b AT %QX1 : BOOL;
+	END_VAR
+
+
+	LD FALSE
+	ST %QX1
+
+	LD %QX1
+	ST Result_BOOL
+
+	CAL println_BOOL(Result_BOOL)
+
+
+	CAL println_BOOL(%QX1) 
+
+	 
 
 
 	LD DINT#10
@@ -265,6 +282,8 @@ PROGRAM CALTEST
 
 	CAL ander(in_1:=TRUE, in_2:=TRUE, out=>Result_BOOL)
 	CAL println_BOOL(Result_BOOL)
+
+
 
 
 END_PROGRAM
