@@ -133,11 +133,21 @@ public class AutomatonDocument
 		return ll;
 	}
 
-	public JGoLink newLink(StateNode from, StateNode to, String label)
+	public JGoLink newLink(StateNode from, StateNode to, ArcSet theArcSet)
 	{
 		JGoLabeledLink ll = new JGoLabeledLink(from.getPort(), to.getPort());
-		JGoText textLabel = new JGoText(label);
-		ll.setMidLabel(textLabel);
+		//JGoText textLabel = new JGoText(label);
+		Labels labels = null;
+		try
+		{
+			labels = new Labels(this, theArcSet);
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			System.err.println("AutomatonDocement: exception while constructing labels");
+		}
+		ll.setMidLabel(labels);
 		ll.setPen(getLinkPen());
 		addObjectAtHead(ll);
 		ll.setArrowHeads(false, true);
@@ -254,22 +264,13 @@ public class AutomatonDocument
 		{
 			State fromState = (State)stateIt.next();
 			StateNode fromStateNode = (StateNode)stateToStateNodeMap.get(fromState);
-			Iterator arcIt = fromState.outgoingArcsIterator();
-			while (arcIt.hasNext())
+			Iterator arcSetIt = fromState.outgoingArcSetIterator();
+			while (arcSetIt.hasNext())
 			{
-				Arc currArc = (Arc)arcIt.next();
-				State toState = currArc.getToState();
+				ArcSet currArcSet = (ArcSet)arcSetIt.next();
+				State toState = currArcSet.getToState();
 				StateNode toStateNode = (StateNode)stateToStateNodeMap.get(toState);
-				org.supremica.automata.Event currEvent = null;
-				try
-				{
-					currEvent = theAutomaton.getEvent(currArc.getEventId());
-				}
-				catch (Exception ex)
-				{
-					System.err.println("Event not found");
-				}
-				newLink(fromStateNode, toStateNode, currEvent.getLabel());
+				newLink(fromStateNode, toStateNode, currArcSet);
 			}
 		}
 
