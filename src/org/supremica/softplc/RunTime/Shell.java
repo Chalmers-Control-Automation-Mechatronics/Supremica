@@ -43,7 +43,7 @@ public class Shell {
 		Class IOClass;
 
 		try	{
-			System.out.println(io);
+			System.out.println("IO Class: " + io);
 			IOClass = Class.forName(io);
 			driver = (DigitalIODriver) IOClass.newInstance();
 			nr_Of_Signals_In = driver.getNrOfSignalsIn();
