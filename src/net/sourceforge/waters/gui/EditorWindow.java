@@ -3,7 +3,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorWindow
 //###########################################################################
-//# $Id: EditorWindow.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: EditorWindow.java,v 1.2 2005-02-17 02:59:28 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -34,39 +34,39 @@ class EditorWindow extends JFrame {
     public EditorWindow(String title, ModuleProxy module, ElementProxy element)
     {
         JFrame.setDefaultLookAndFeelDecorated(true);
-	setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setTitle(title);
-
-	toolbar = new EditorToolbar();
-
-	surface = new ControlledSurface(toolbar, this);
+		
+		toolbar = new EditorToolbar();
+		
+		surface = new ControlledSurface(toolbar, this);
         surface.setPreferredSize(new Dimension(500,500));
         surface.setMinimumSize(new Dimension(0,0));
-
+		
         events = new EditorEvents(module, element, this);
         menu = new EditorMenu(surface, this);
 
-	final Container panel = getContentPane();
-	final GridBagLayout gridbag = new GridBagLayout();
-	final GridBagConstraints constraints = new GridBagConstraints();
-	constraints.gridy = 0;
-	constraints.weighty = 1;
-	constraints.anchor = GridBagConstraints.NORTH;
-	panel.setLayout(gridbag);
-
-	gridbag.setConstraints(toolbar, constraints);
-	panel.add(toolbar);
-
-	final JScrollPane scrollpane = new JScrollPane(surface);
-	constraints.weightx = 1;
-	constraints.fill = GridBagConstraints.BOTH;
-	gridbag.setConstraints(scrollpane, constraints);
-	panel.add(scrollpane);
-
-	constraints.weightx = 0;
-	constraints.fill = GridBagConstraints.VERTICAL;
-	gridbag.setConstraints(events, constraints);
-	panel.add(events);
+		final Container panel = getContentPane();
+		final GridBagLayout gridbag = new GridBagLayout();
+		final GridBagConstraints constraints = new GridBagConstraints();
+		constraints.gridy = 0;
+		constraints.weighty = 1;
+		constraints.anchor = GridBagConstraints.NORTH;
+		panel.setLayout(gridbag);
+		
+		gridbag.setConstraints(toolbar, constraints);
+		panel.add(toolbar);
+		
+		final JScrollPane scrollpane = new JScrollPane(surface);
+		constraints.weightx = 1;
+		constraints.fill = GridBagConstraints.BOTH;
+		gridbag.setConstraints(scrollpane, constraints);
+		panel.add(scrollpane);
+		
+		constraints.weightx = 0;
+		constraints.fill = GridBagConstraints.VERTICAL;
+		gridbag.setConstraints(events, constraints);
+		panel.add(events);
 
         setJMenuBar(menu);
         pack();
@@ -75,10 +75,11 @@ class EditorWindow extends JFrame {
         this.module = module;
         this.element = element;
 
-        if(element != null && module != null) {
+        if(element != null && module != null) 
+		{
             surface.loadElement(module, element);
         }
-	surface.createOptions(this);
+		surface.createOptions(this);
     }
 
     public IdentifierProxy getBuffer(){
@@ -110,8 +111,6 @@ class EditorWindow extends JFrame {
     {
 	return surface;
     }
-
-
 }
 
     

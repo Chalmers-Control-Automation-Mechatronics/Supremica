@@ -3,7 +3,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   ModuleWindow
 //###########################################################################
-//# $Id: ModuleWindow.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: ModuleWindow.java,v 1.2 2005-02-17 02:59:28 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -427,71 +427,72 @@ public class ModuleWindow extends JFrame implements ActionListener, FocusListene
         return content;
     }
 
-    public JMenuBar createMenuBar() {
+    public JMenuBar createMenuBar() 
+	{
         JMenuBar menuBar = new JMenuBar();
-
+		
         JMenu menu = new JMenu(WLang.FileMenu);
-
-	menu.setMnemonic(KeyEvent.VK_F);
-	menu.getAccessibleContext().setAccessibleDescription(
+		
+		menu.setMnemonic(KeyEvent.VK_F);
+		menu.getAccessibleContext().setAccessibleDescription(
                                                              "The File menu");
-	menuBar.add(menu);
-
-	JMenuItem menuItem = new JMenuItem(WLang.FileNewMenu,
-                                           KeyEvent.VK_O);
-        menuItem.addActionListener(this);
-        FileNewMenu = menuItem;
-	menu.add(menuItem);
-
-	menuItem = new JMenuItem(WLang.FileOpenMenu,
-                                           KeyEvent.VK_O);
-	menuItem.addActionListener(this);
-	FileOpenMenu = menuItem;
-	menu.add(menuItem);
-
-	menuItem = new JMenuItem(WLang.FileSaveMenu,
-	KeyEvent.VK_S);
-	FileSaveMenu = menuItem;
-	menuItem.addActionListener(this);
-	menu.add(menuItem);
-
-	menuItem = new JMenuItem(WLang.FileSaveAsMenu,
-	KeyEvent.VK_A);
+		menuBar.add(menu);
+		
+		JMenuItem menuItem = new JMenuItem(WLang.FileNewMenu,
+										   KeyEvent.VK_O);
+		menuItem.addActionListener(this);
+		FileNewMenu = menuItem;
+		menu.add(menuItem);
+		
+		menuItem = new JMenuItem(WLang.FileOpenMenu,
+								 KeyEvent.VK_O);
+		menuItem.addActionListener(this);
+		FileOpenMenu = menuItem;
+		menu.add(menuItem);
+		
+		menuItem = new JMenuItem(WLang.FileSaveMenu,
+								 KeyEvent.VK_S);
+		FileSaveMenu = menuItem;
+		menuItem.addActionListener(this);
+		menu.add(menuItem);
+		
+		menuItem = new JMenuItem(WLang.FileSaveAsMenu,
+								 KeyEvent.VK_A);
         menu.add(menuItem);
-
+		
         menu.addSeparator();
-
+		
         menuItem = new JMenuItem(WLang.FilePageSetupMenu,
-	KeyEvent.VK_G);
-	menu.add(menuItem);
-
+								 KeyEvent.VK_G);
+		menu.add(menuItem);
+		
         menuItem = new JMenuItem(WLang.FilePrintMenu,
-	KeyEvent.VK_P);
-	menu.add(menuItem);
-
+								 KeyEvent.VK_P);
+		menu.add(menuItem);
+		
         menu.addSeparator();
-
-	menuItem = new JMenuItem(WLang.FileExitMenu,
-	KeyEvent.VK_X);
-	menu.add(menuItem);
+		
+		menuItem = new JMenuItem(WLang.FileExitMenu,
+								 KeyEvent.VK_X);
+		menu.add(menuItem);
         menuItem.addActionListener(this);
-
+		
         FileExitMenu = menuItem;
-
+		
         //fileChooser = new JFileChooser();
         fileChooser.addChoosableFileFilter(new WmodFileFilter());
-
-	JMenu editMenu = new JMenu("Edit");
-	menuBar.add(editMenu);
-
-	JMenu analysisMenu = new JMenu("Analysis");
-	menuBar.add(analysisMenu);
-
-	menuItem = new JMenuItem("Export To Supremica");
-    analysisMenu.add(menuItem);
-	menuItem.addActionListener(this);
-	analysisExportSupremicaMenu = menuItem;
-
+		
+		JMenu editMenu = new JMenu("Edit");
+		menuBar.add(editMenu);
+		
+		JMenu analysisMenu = new JMenu("Analysis");
+		menuBar.add(analysisMenu);
+		
+		menuItem = new JMenuItem("Export To Supremica");
+		analysisMenu.add(menuItem);
+		menuItem.addActionListener(this);
+		analysisExportSupremicaMenu = menuItem;
+		
         return menuBar;
     }
 
@@ -536,137 +537,143 @@ public class ModuleWindow extends JFrame implements ActionListener, FocusListene
 	repaint();
     }
 
-    public void actionPerformed(ActionEvent e) {
-	if("newsimple".equals(e.getActionCommand())) {
-	    DefaultMutableTreeNode parentNode = null;
-	    TreePath parentPath = ModuleSelectTree.getSelectionPath();
-
-	    /*if (parentPath == null) {
-		//There's no selection. Default to the root node.
-		parentNode = rootNode;
-	    } else {
-		parentNode = (DefaultMutableTreeNode)
+    public void actionPerformed(ActionEvent e) 
+	{
+		if("newsimple".equals(e.getActionCommand())) {
+			DefaultMutableTreeNode parentNode = null;
+			TreePath parentPath = ModuleSelectTree.getSelectionPath();
+			
+			/*if (parentPath == null) {
+			//There's no selection. Default to the root node.
+			parentNode = rootNode;
+			} else {
+			parentNode = (DefaultMutableTreeNode)
 		    (parentPath.getLastPathComponent());
 		    }*/
-
-	    EditorNewDialog diag = new EditorNewDialog(this, parentNode);
-	    logEntry("New Simple Component requested");
-
-	}
-
-	if("newforeach".equals(e.getActionCommand())) {
-	    EditorForeachDialog diag = new EditorForeachDialog(this);
-	    logEntry("New Foreach Component requested");
-	}
-
-	if("newinstance".equals(e.getActionCommand())) {
-	    InstanceEditorDialog diag = new InstanceEditorDialog(this);
-	    logEntry("New Instance Component requested");
-	}
-
-	if("newbinding".equals(e.getActionCommand())) {
-	    BindingEditorDialog diag = new BindingEditorDialog(this);
-	    logEntry("New Binding requested");
-	}
-
-	if("newevent".equals(e.getActionCommand())) {
-	    EventEditorDialog diag = new EventEditorDialog(this);
-	    logEntry("New event requested");
-	}
-
-	if("delevent".equals(e.getActionCommand())) {
-	    int index = dataList.getSelectedIndex();
-	    if(index != -1) {
-		module.getEventDeclList().remove(data.get(index));
-		data.remove(index);
-	    }
-
-	    logEntry("New event requested");
-	}
-
-	if("neweventparam".equals(e.getActionCommand())) {
-	    EventParameterEditorDialog diag = new EventParameterEditorDialog(this);
-	    logEntry("New event parameter requested");
-	}
-
-	if("newparam".equals(e.getActionCommand())) {
-	    SimpleParameterEditorDialog diag = new SimpleParameterEditorDialog(this);
-	    logEntry("New simple parameter requested");
-	}
-
-	if("SaveDebug".equals(e.getActionCommand())) {
-	    JFileChooser fc = new JFileChooser(".");
-	    int returnVal = fc.showOpenDialog(this);
-	    if(returnVal == JFileChooser.APPROVE_OPTION) {
-		try {
-		    FileOutputStream saveStream = new FileOutputStream(fc.getSelectedFile());
-		    saveStream.write(debugArea.getText().getBytes());
-		} catch(Exception exception) {
-		    logEntry("Could not save debug log: " + exception.getMessage());
-		    JOptionPane.showMessageDialog(this,
-						  "Could not save debug log: " + exception.getMessage());
+			
+			EditorNewDialog diag = new EditorNewDialog(this, parentNode);
+			logEntry("New Simple Component requested");
+			
 		}
-	    }
-	}
 
-	if(e.getSource() == FileNewMenu) {
-	    String modName = JOptionPane.showInputDialog(this, "Module Name?");
-	    try {
-		final ExpressionParser parser = new ExpressionParser();
-		ExpressionProxy ep = parser.parse(modName);
-		if(ep instanceof SimpleIdentifierProxy) {
-		    module = new ModuleProxy(modName,null);
-		    constructWindow();
-		    logEntry("New module created: " + modName);
+		if("newforeach".equals(e.getActionCommand())) {
+			EditorForeachDialog diag = new EditorForeachDialog(this);
+			logEntry("New Foreach Component requested");
 		}
-		else {
-		    logEntry("Invalid module identifier: " + modName);
-		    JOptionPane.showMessageDialog(this,
-						  "Invalid module identifier");
+		
+		if("newinstance".equals(e.getActionCommand())) {
+			InstanceEditorDialog diag = new InstanceEditorDialog(this);
+			logEntry("New Instance Component requested");
 		}
-	    } catch(final ParseException exception) {
-		ErrorWindow ew = new ErrorWindow("Parse error in identifier: " + exception.getMessage(),
-						 modName,
-						 exception.getPosition());
-		//constructWindow();
-		ModuleWindow w = new ModuleWindow("Waters");
-	    }
-	}
-
-	if(e.getSource() == FileOpenMenu) {
+		
+		if("newbinding".equals(e.getActionCommand())) {
+			BindingEditorDialog diag = new BindingEditorDialog(this);
+			logEntry("New Binding requested");
+		}
+		
+		if("newevent".equals(e.getActionCommand())) {
+			EventEditorDialog diag = new EventEditorDialog(this);
+			logEntry("New event requested");
+		}
+		
+		if("delevent".equals(e.getActionCommand())) {
+			int index = dataList.getSelectedIndex();
+			if(index != -1) {
+				module.getEventDeclList().remove(data.get(index));
+				data.remove(index);
+			}
+			
+			logEntry("New event requested");
+		}
+		
+		if("neweventparam".equals(e.getActionCommand())) {
+			EventParameterEditorDialog diag = new EventParameterEditorDialog(this);
+			logEntry("New event parameter requested");
+		}
+		
+		if("newparam".equals(e.getActionCommand())) {
+			SimpleParameterEditorDialog diag = new SimpleParameterEditorDialog(this);
+			logEntry("New simple parameter requested");
+		}
+		
+		if("SaveDebug".equals(e.getActionCommand())) {
+			JFileChooser fc = new JFileChooser(".");
+			int returnVal = fc.showOpenDialog(this);
+			if(returnVal == JFileChooser.APPROVE_OPTION) {
+				try {
+					FileOutputStream saveStream = new FileOutputStream(fc.getSelectedFile());
+					saveStream.write(debugArea.getText().getBytes());
+				} catch(Exception exception) {
+					logEntry("Could not save debug log: " + exception.getMessage());
+					JOptionPane.showMessageDialog(this,
+												  "Could not save debug log: " + exception.getMessage());
+				}
+			}
+		}
+		
+		if(e.getSource() == FileNewMenu) {
+			String modName = JOptionPane.showInputDialog(this, "Module Name?");
+			try {
+				final ExpressionParser parser = new ExpressionParser();
+				ExpressionProxy ep = parser.parse(modName);
+				if(ep instanceof SimpleIdentifierProxy) {
+					module = new ModuleProxy(modName,null);
+					constructWindow();
+					logEntry("New module created: " + modName);
+				}
+				else {
+					logEntry("Invalid module identifier: " + modName);
+					JOptionPane.showMessageDialog(this,
+												  "Invalid module identifier");
+				}
+			} catch(final ParseException exception) {
+				ErrorWindow ew = new ErrorWindow("Parse error in identifier: " + exception.getMessage(),
+												 modName,
+												 exception.getPosition());
+				//constructWindow();
+				ModuleWindow w = new ModuleWindow("Waters");
+			}
+		}
+		
+		if(e.getSource() == FileOpenMenu) {
             int returnVal = fileChooser.showOpenDialog(this);
-
+			
             if (returnVal == JFileChooser.APPROVE_OPTION) {
             	File file = fileChooser.getSelectedFile();
                 loadWmodFile(file);
-		logEntry("File opened: " + file);
-		modified = false;
-		constructWindow();
-	    } else {
+				logEntry("File opened: " + file);
+				modified = false;
+				constructWindow();
+			} else {
                 // Open cancelled...  do nothing
             }
-   	}
-
-	if(e.getSource() == FileSaveMenu) {
+		}
+		
+		if(e.getSource() == FileSaveMenu) {
             int returnVal = fileSaveChooser.showSaveDialog(this);
-
+			
             if (returnVal == JFileChooser.APPROVE_OPTION) {
             	File file = fileSaveChooser.getSelectedFile();
                 saveWmodFile(file);
-		modified = false;
-		logEntry("File saved: " + file);
-	    } else {
-                // Open cancelled...  do nothing
-            }
-   	}
+				modified = false;
+				logEntry("File saved: " + file);
+			} else {
+				// Open cancelled...  do nothing
+			}
+		}
+		
+		if(e.getSource() == FileExitMenu) 
+		{
+			System.exit(0);						
+		}
 
-	if(e.getSource() == analysisExportSupremicaMenu)
-	{
+		if(e.getSource() == analysisExportSupremicaMenu)
+		{
 			exportToSupremica();
-	}
-
+		}
+		
     }
-
+	
     public void addComponent(Object o) {
 	logEntry("addComponent: " + ((ElementProxy)o).toString());
 	if(module != null) {
