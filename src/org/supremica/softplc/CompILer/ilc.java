@@ -39,11 +39,11 @@ public class ilc
 		}
 		else
 		{
-			p.ReInit(ilReader);
+			parser.ReInit(ilReader);
 		}
 
 	    try {
-		SimpleNode n = p.Start();
+		SimpleNode n = parser.Start();
 
 		VariableChecker v = new VariableChecker(n);
 

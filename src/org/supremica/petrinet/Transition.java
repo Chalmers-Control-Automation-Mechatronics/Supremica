@@ -78,7 +78,7 @@ public class Transition
 		controllable = orgTransition.controllable;
 	}
 
-	public void setIdentity()
+	public void setIdentity(String identity)
 	{
 		this.identity = identity;
 	}

@@ -437,8 +437,8 @@ public final class IntArrayList
 		System.out.println(theList.blocksToString());
 		theList.addFirst(dummy0);
 		theList.addLast(dummy3);
-		System.out.println(theList.toString(theList.getFirst()));
-		System.out.println(theList.toString(theList.getLast()));
+		System.out.println(IntArrayList.toString(theList.getFirst()));
+		System.out.println(IntArrayList.toString(theList.getLast()));
 		System.out.println("*** Size: " + theList.size() + "\n" + theList.toString());
 		System.out.println(theList.blocksToString());
 		theList.addFirst(dummy3);

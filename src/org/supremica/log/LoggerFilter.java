@@ -75,7 +75,7 @@ public class LoggerFilter
 
 	public int decide(LoggingEvent event)
 	{
-		Priority prio = event.priority;
+		Priority prio = event.getLevel();
 
 		if (prio == Priority.DEBUG)
 		{

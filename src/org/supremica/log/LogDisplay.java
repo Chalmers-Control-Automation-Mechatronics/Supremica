@@ -217,10 +217,10 @@ public class LogDisplay
 
 	private void createAttributes()
 	{
-		Priority prio[] = Priority.getAllPossiblePriorities();
+//		Priority prio[] = Priority.getAllPossiblePriorities();
 
 		attributes = new Hashtable();
-
+/*
 		for (int i = 0; i < prio.length; i++)
 		{
 			MutableAttributeSet att = new SimpleAttributeSet();
@@ -228,7 +228,23 @@ public class LogDisplay
 			attributes.put(prio[i], att);
 			StyleConstants.setFontSize(att, 14);
 		}
+*/
+		MutableAttributeSet attError = new SimpleAttributeSet();
+		attributes.put(Priority.ERROR, attError);
+		StyleConstants.setFontSize(attError, 14);		
 
+		MutableAttributeSet attWarn = new SimpleAttributeSet();
+		attributes.put(Priority.WARN, attWarn);
+		StyleConstants.setFontSize(attWarn, 14);
+
+		MutableAttributeSet attInfo = new SimpleAttributeSet();
+		attributes.put(Priority.INFO, attInfo);
+		StyleConstants.setFontSize(attInfo, 14);
+
+		MutableAttributeSet attDebug = new SimpleAttributeSet();
+		attributes.put(Priority.DEBUG, attDebug);
+		StyleConstants.setFontSize(attDebug, 14);
+				
 		StyleConstants.setForeground((MutableAttributeSet) attributes.get(Priority.ERROR), Color.red);
 		StyleConstants.setForeground((MutableAttributeSet) attributes.get(Priority.WARN), new Color(255,127,0)); // Color.orange);
 		StyleConstants.setForeground((MutableAttributeSet) attributes.get(Priority.INFO), new Color(0, 80, 0));
@@ -260,12 +276,16 @@ public class LogDisplay
 
 	private void createIcons()
 	{
-		Priority prio[] = Priority.getAllPossiblePriorities();
+//		Priority prio[] = Priority.getAllPossiblePriorities();
 
 		icons = new Hashtable();
+		icons.put(Priority.FATAL, getIcon("/icons/BlackFlag.gif") );
+		icons.put(Priority.ERROR, getIcon("/icons/RedFlag.gif") );
+		icons.put(Priority.WARN, getIcon("/icons/OrangeFlag.gif") );
+		icons.put(Priority.INFO, getIcon("/icons/GreenFlag.gif") );
+		icons.put(Priority.DEBUG, getIcon("/icons/BlueFlag.gif") );
 
-
-
+/*
 		for (int i = 0; i < prio.length; i++)
 		{
 			if (prio[i].equals(Priority.FATAL))
@@ -295,6 +315,7 @@ public class LogDisplay
 				icons.put(prio[i], getIcon("/icons/BlueFlag.gif") );
 			}
 		}
+*/
 	}
 
 	public void append(LoggingEvent event)
@@ -328,11 +349,11 @@ public class LogDisplay
 			if (fancy)
 			{
 				textpane.setEditable(true);
-				textpane.insertIcon((ImageIcon) icons.get(event.priority));
+				textpane.insertIcon((ImageIcon) icons.get(event.getLevel()));
 				textpane.setEditable(false);
 			}
 
-			doc.insertString(doc.getLength(), text + trace, (MutableAttributeSet) attributes.get(event.priority));
+			doc.insertString(doc.getLength(), text + trace, (MutableAttributeSet) attributes.get(event.getLevel()));
 		}
 		catch (BadLocationException badex)
 		{

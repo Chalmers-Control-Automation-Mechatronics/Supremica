@@ -100,7 +100,7 @@
 	<unjar src="${lib}/jhall.jar" dest="${lib}/${unjared}"/>
 	<unjar src="${lib}/jlfgr-1_0.jar" dest="${lib}/${unjared}"/>
 	<unjar src="${lib}/junit.jar" dest="${lib}/${unjared}"/>	
-	<unjar src="${lib}/log4j-core.jar" dest="${lib}/${unjared}"/>
+<!--	<unjar src="${lib}/log4j-core.jar" dest="${lib}/${unjared}"/> -->
 	<unjar src="${lib}/log4j.jar" dest="${lib}/${unjared}"/>
 	<unjar src="${lib}/regler.jar" dest="${lib}/${unjared}"/>
 	<unjar src="${lib}/jel.jar" dest="${lib}/${unjared}"/>

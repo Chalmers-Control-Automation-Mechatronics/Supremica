@@ -15,7 +15,7 @@ public class parser/*@bgen(jjtree)*/implements parserTreeConstants, parserConsta
     {
     parser t = new parser(new BufferedReader(new FileReader(new File(args[0]))));
     try {
-      SimpleNode n = t.Start();
+      SimpleNode n = parser.Start();
       n.dump("");
     } catch (Exception e) {
       System.out.println("Oops.");

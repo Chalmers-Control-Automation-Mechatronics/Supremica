@@ -610,8 +610,8 @@ public class BallTrackView
 	private void paintHiss(Graphics g)
 	{
 		level   = rController.hissLevel();
-		lowerY  = rController.movements[4].startPos[1];
-		centerX = rController.movements[4].startPos[0];
+		lowerY  = RouteController.movements[4].startPos[1];
+		centerX = RouteController.movements[4].startPos[0];
 
 		//paint part allways visible
 		g.fillRect( (centerX - radiusX), lowerY,
@@ -631,8 +631,8 @@ public class BallTrackView
 
 	public void paintUrVan1(Graphics g)
 	{
-		int ballX   = rController.movements[4].endPos[0];
-		int ballY   = rController.movements[4].endPos[1];
+		int ballX   = RouteController.movements[4].endPos[0];
+		int ballY   = RouteController.movements[4].endPos[1];
 			level   = rController.hissLevel();
 		int space   = 1;
 			width   = 5;

@@ -136,7 +136,7 @@ public class ProgramBuilder
 						new ArrayType(Type.BOOLEAN, 1), 
 						Constants.GETFIELD));
 		il.append(new PUSH(constPoolGen, nr));    // load position
-		il.append(fac.createArrayLoad(Type.BOOLEAN));
+		il.append(InstructionFactory.createArrayLoad(Type.BOOLEAN));
 	    }
 	else
 	    {
@@ -174,7 +174,7 @@ public class ProgramBuilder
 			il.append(InstructionConstants.SWAP);
 			il.append(new PUSH(constPoolGen, nr));    // load position
 			il.append(InstructionConstants.SWAP);
-			il.append(fac.createArrayStore(Type.BOOLEAN));
+			il.append(InstructionFactory.createArrayStore(Type.BOOLEAN));
 		    }
 		else
 		    {
