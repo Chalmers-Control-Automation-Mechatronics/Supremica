@@ -29,8 +29,8 @@
 \newtheorem{definition}{Definition}
 
 \begin{document}
-\title{Implementation of Full Synchronous Composition of
-  Discrete Event Models Using IEC 61499 Function Blocks}
+\title{Implementation of Full Synchronous Composition Using
+  IEC 61499 Function Blocks}
 
 \author{\authorblockN{Goran Cengic, Knut Åkesson and
     Bengt Lennartson}
@@ -95,40 +95,40 @@ Controller, IEC~61131~\cite{iec:1131:1993}, with
 functionality for distributed execution of control objects.
 
 Shorter product life-cycles increase the demands on the
-manufacturing system. Since the product, to be produced, in
-the manufacturing plant is changing frequently the
-production equipment needs to be modified too. The frequent
-changes of the system make it time consuming and expensive
-to update the control system application to reflect the
-changes. The same problem applies to both system types
-mentioned above and it becomes even larger in mission
-critical control applications since the strict requirement
-of guaranteeing, the correct operation is imposed. Thus,
-there is a need to introduce algorithms and tools to make it
-simple and as safe as possible to modify the control system.
-The supervisory control theory,\cite{rw:con:1989}, is a
-promising framework that might be useful for this purpose.
+manufacturing system. Since products to be produced in
+manufacturing plants are changing frequently, the production
+equipment also needs to be modified. Frequent changes of the
+system make it time consuming and expensive to update the
+control system application to reflect the such changes. The
+problem becomes even larger in mission critical control
+applications since strict requirement of guaranteeing
+correct operation is then imposed. Thus, there is a need to
+introduce algorithms and tools to make it simple and as safe
+as possible to modify the control system. The supervisory
+control theory,\cite{rw:con:1989}, is a promising framework
+that might be useful for this purpose.
 
 % supervisory control
 Many man-made systems can, at some abstraction level, be
 modeled by discrete event models. A useful class of discrete
-event models is the deterministic finite automata which can
+event models is the deterministic finite automata, which can
 be used in supervisory control theory. In the theory these
-models are used, together with a formal specification of the
-desired behavior, to automatically generate a control
-function which makes the system behave within specification.
+models are used together with a formal specification of the
+desired behavior to automatically generate a control
+function which makes the system behave within the given
+specification.
 
 % synchronization
-The interaction between models is modeled by synchronization
-operator. This operator has to be implemented in control
-application in order to transfer theoretical results into
-operating control system. The implementation has to be
-distributable for it to be useful in control systems for the
-applications distributed over geographical area, like the
-ones mentioned in the beginning of the introduction.
+The interaction between subsystems is modeled by Hoare's
+full synchronous composition (FSC)~\cite{h:com:1985}. This
+operator has to be implemented in control applications in
+order to transfer theoretical results into operating control
+systems. The implementation has to be distributable to be
+applicable in control systems distributed over geographical
+areas, like the ones mentioned above.
 
-There are existing methods for implementation of
-synchronization operator using PLC programming techniques
+There are existing methods for implementation of FSC using
+PLC programming techniques
 \cite{hfl:syn:1999,hfl:mod:2001,fh:plc:1998,a:met:2002} but
 the distribution is hard to achieve in that programming
 environment. A new method presented in this paper uses the
@@ -137,23 +137,24 @@ that.
 
 % paper organization
 Mathematical definitions that are used in the paper are
-presented in the next section. After that, the most
-important definitions and results of supervisory control
-theory are introduced followed by an example showing how
-supervisory control theory can be applied in implementation
-of control application for a small system. After the example
-a method for implementation of the synchronization operator
-for any number of synchronized models is presented together
-with the argument for the correctness of the implementation.
-In Section~\ref{sec:app_SCT} some considerations for
-implementation of supervisory control theory in applications
-are presented before the conclusion of the paper.
+presented in the next section. Important definitions and
+results of supervisory control theory are introduced,
+followed by an example showing how supervisory control
+theory can be applied in implementation of control
+application for a small system. After the example a method
+for implementation of FSC for any number of synchronized
+models is presented together with the argument for the
+correctness of the implementation. Finally some
+considerations for implementation of supervisory control
+theory in applications are presented before the conclusion
+of the paper.
 
 \section{Mathematical Preliminaries}
 In~\cite{hmu:int:2003} many important results for automata
 are presented. Below, the terminology in this paper is
-introduced.\\
-\textbf{Definition:} Deterministic Finite Automaton (DFA)\\
+introduced.
+
+\textbf{Definition 1:} Deterministic Finite Automaton (DFA)\\
 A deterministic finite automaton is a 5-tuple defined as
 $${A} = \langle Q, \Sigma, \delta, q_i, Q_m\rangle$$
 where
@@ -162,13 +163,14 @@ the \emph{alphabet} which is a finite set of symbols that
 denote the occurrence of an event, $\delta:Q\times \Sigma
 \rightarrow Q$ is a \emph{transition function}, $q_i \in Q$
 is the \emph{initial state} and $Q_m \subseteq Q$ is a set
-of \emph{marked states}. $\Box$\\
-\textbf{Definition:} Enabled Event Function\\
+of \emph{marked states}.\hfill$\Box$
+
+\textbf{Definition 2:} Enabled Event Function\\
 The enabled event function $\Gamma$ is defined as
 $$\Gamma:Q\rightarrow 2^{\Sigma}$$
 where $\Gamma(q)$ is the
 set of all events $\sigma$ for which $\delta(q,\sigma)$ is
-defined. $\Box$\\
+defined.\hfill$\Box$\\
 Automata are usually visualized by directed graphs with
 states represented by nodes, transitions by arrows and
 events upon which the transitions occur by labels on the
@@ -177,8 +179,9 @@ arrows.
 Synchronous composition, \cite{h:com:1985}, is a useful
 approach to model the interaction between automata and is
 used in this paper to model the interaction between the
-system models.\\
-\textbf{Definition}: Full Synchronous Composition of two DFAs\\
+system models.
+
+\textbf{Definition 3}: Full Synchronous Composition of two DFAs\\
 The full synchronous composition of two DFAs, $A^1$ and
 $A^2$, is denoted ${A}^1||{A}^2=\langle
 Q,\Sigma,\delta,q_i,Q_m\rangle$ where $Q=Q^1 \times Q^2$,
@@ -200,13 +203,15 @@ transition function is
   \end{array}
 \end{displaymath} 
 where $q^1 \in Q^1$, $q^2 \in Q^2$ and $\sigma \in \Sigma$.
-$\Box$ In other words, if an event is in both alphabets and
-it is enabled in both automatons, the transitions associated
-with it are made simultaneously in both automatons.
+\hfill$\Box$\\
+In other words, if an event is in both alphabets and
+it is enabled in both automata, the transitions associated
+with it are made simultaneously in both automata.
 Otherwise, only the automaton containing the event in its
 alphabet makes the transition. This definition can be
-extended for several automata.\\
-\textbf{Definition}: Full Synchronous Composition of $n$ DFAs\\
+extended for several automata.
+
+\textbf{Definition 4}: Full Synchronous Composition of $n$ DFAs\\
 The full synchronous composition of DFAs, $A^1$, $A^2$ ...
 $A^n$, is denoted ${A}^1||...||{A}^n=\langle
 Q,\Sigma,\delta,q_i,Q_m\rangle$ where
@@ -233,11 +238,11 @@ where
     q^k                  & {\rm if\ }\sigma\notin\Sigma^k
   \end{cases}
 \end{equation}
-$\Box$\\
-What this definition states is that in a group of automatons
-that share one event if there is one automaton that does not
+\hfill$\Box$\\
+What this definition states is that, in a group of automata
+that share one event, if there is one automaton that does not
 have that event enabled in its current state, than the event
-is not allowed to occur in any of the other automatons in
+is not allowed to occur in any of the other automata in
 the group. That is, one automaton is able to prevent all the
 others from executing an event if it does not enable it at
 the same time as all the other automata. This property of
@@ -275,35 +280,36 @@ Fig.~\ref{fig:sup_plant} such configuration is shown.
 
 The supervisor, \texttt{S} (see Fig.~\ref{fig:sup_plant}),
 has to prevent the plant, \texttt{P}, from breaking the
-specification and from getting blocked in a state from where
-it can not reach a marked state by using as few restrictions
+specification and from getting blocked in a state, from where
+it can not reach a marked state, by using as few restrictions
 on the plant as possible. By observing the observable events
-of the plant and disabling the controllable events of the
-plant, the supervisor decides when, and if, it has to limit
+of the plant and disabling controllable events of the
+plant, the supervisor decides when and if it has to limit
 the activity of the plant in order to keep the plant's
 behavior within the specification. An important result of
 the supervisory control theory is that such a supervisor can
 be calculated from the models of the plant and specification
 so that
 $$S||P$$
-gives the system behavior.
+gives the desired system behavior with as few
+restriction of the plant as possible.
 
 In cases when there are several plant models $P_1,..,P_n$
 with given specification models $Sp_1,...,Sp_n$ the
 supervisor can also be generated and
 $$S||P_1||...||P_n$$
-gives the system behavior within specification.
+gives the system behavior within the specification.
 
-Thus to control the system so that it satisfies the
-specification, the synchronous composition of the plant and
-supervisor models has to be implemented in the control
-software. Using the conventional implementation methods,
-i.e. implementing the synchronization using PLC programming
-techniques, the solution becomes complex, which makes it
-difficult to distribute across multiple control computers.
-Next section presents an example illustrating how the
-synchronous composition might be implemented using the new
-standard.
+Hence, to control the system so that it satisfies the
+specification, the FSC of the plants and supervisor models
+has to be implemented in the control software. Using the
+conventional implementation methods, i.e. implementing the
+synchronization using PLC programming techniques makes it
+difficult to distribute the application across multiple
+control computers, which is needed when the plants are
+distributed over geographical areas. Next section presents
+an example illustrating how the synchronous composition
+might be implemented using the new standard.
 
 \section{Synchronization: An Example}
 \label{sec:example}
@@ -315,17 +321,15 @@ function blocks for a small system before a general method
 is given.
 
 Consider a system containing two plants, \texttt{P1} and
-\texttt{P2}, shown in Fig.~\ref{fig:plants}.These plant
-models may represent two manufacturing resources with a
-1-place buffer in-between. All events in the models are
-controllable and observable. The desired behavior of the
-system is that event \texttt{b} must always precede event
-\texttt{c}, which means that a product must leave buffer
-before another one can enter. The supervisor for this
-specification can be generated and is shown in
-Fig.~\ref{fig:sup}. In cases where the specification is
-more complex it needs to be modeled using the automaton and
-provided for the supervisor generation.
+\texttt{P2}, shown in Fig.~\ref{fig:plants}. All events in
+the models are controllable and observable. The desired
+behavior of the system is that event \texttt{b} must always
+precede event \texttt{c}. These plant models together with
+the specification may represent two manufacturing resources
+with a 1-place buffer in-between. The specification means
+then that a product must leave buffer before another one can
+enter. The supervisor for this specification can be
+generated and is shown in Fig.~\ref{fig:sup}.
 \begin{figure}[b]
   \centering 
   \fig[scale=0.55]{\texttt{P1}}{figures/P1_aut} 
@@ -338,58 +342,57 @@ provided for the supervisor generation.
 \begin{figure}[b]
   \centering 
   \fig[scale=0.55]{\texttt{S}}{figures/Sp_aut}
-  \caption{The model of the supervisor that make shure that
+  \caption{The model of the supervisor that makes sure 
     event \texttt{b} always occurs before event \texttt{c}.}
   \label{fig:sup}
 \end{figure}
 \begin{figure}[t]
-  \centering 
-  \fig[scale=0.45]{\texttt{SYS}}{figures/Sys_aut}
+  \centering \fig[scale=0.4]{\texttt{SYS}}{figures/Sys_aut}
   \caption{The model of possible system behavior while satisfying
     the desired system behavior, $S||P_1||P_2$.}
   \label{fig:sys}
 \end{figure}
-Full synchronous execution of these models gives the system
-that behaves as freely as possible while fulfilling the
-specification. The resulting model of the system is shown in
-Fig.~\ref{fig:sys}.
+Full synchronous execution of \texttt{P1}, \texttt{P2} and
+\texttt{S} gives the system that behaves as freely as
+possible while fulfilling the specification. The resulting
+model of the system is shown in Fig.~\ref{fig:sys}.
 
-% IEC 61499 intro
+\subsection{IEC 61499 Basics}
 The emerging standard IEC 61499 specifies a generic
 architecture for measurement and control of industrial
 processes. The architecture is based on functional software
 units called function blocks. The most common type of
-function block in an application is basic function block and
-it is shown in Fig.~\ref{fig:61499_intro} using the
-graphical representation. This type of block executes
-algorithms based on the arriving events and generates new
-events that are passed on when the algorithms finish
-execution. The algorithms use data associated with incoming
-events to update the internal variables and produce the
-output data associated with the outgoing events. Which
-algorithms are invoked is controlled by the execution
-control chart (ECC) which is an automaton with algorithms
-associated with different states. When a state is entered
-the algorithms associated with it are executed once and the
-ECC stays in the state until a condition for leaving is
-fulfilled. The conditions upon which transitions occur are
-boolean expressions involving event input variables,
-internal variables, input variables, and output variables.
-When the expression evaluates to \texttt{true} the
-transition occur. Special case is transition labeled with
-\texttt{1}, it is taken as soon as the algorithms finish
-execution.
+function block in an application is the basic function block
+shown in Fig.~\ref{fig:61499_intro} using the graphical
+representation. This type of block executes algorithms based
+on the arriving events and generates new events that are
+passed on when the algorithms finish execution. The
+algorithms use data associated with incoming events to
+update the internal variables and produce the output data
+associated with the outgoing events. Which algorithms are
+invoked is controlled by the execution control chart (ECC),
+which is an automaton with algorithms associated with
+different states. When a state is entered the algorithms
+associated with it are executed once and the ECC stays in
+the state until a condition for leaving is fulfilled. The
+conditions upon which transitions occur are boolean
+expressions involving event input variables, internal
+variables, input variables, and output variables. When the
+expression evaluates to \texttt{true} the transition occur.
+Special case is transition labeled with \texttt{1}; it is
+taken as soon as the algorithms finish execution.
 \begin{figure}
   \centering
-  \includegraphics[scale=0.65]{figures/basic_block}
+  \includegraphics[scale=0.8]{figures/basic_block}
   \caption{Anatomy of a basic function block type.}
   \label{fig:61499_intro}
 \end{figure}
 
+\subsection{Example Implementation}
 Function block types that generate the behavior of the plant
 and supervisor models for the example are shown in
 Fig.~\ref{fig:systemFBs}. The event input of each block type
-is \texttt{OCCURRED}. It signals that an discrete event has
+is \texttt{OCCURRED}. It signals that a discrete event has
 occurred and that the model should update its state
 according to the data inputs. The data inputs are boolean
 variables representing the discrete events in the model's
@@ -411,21 +414,59 @@ inputs and outputs of the block type are application
 specific, since they are defined by the models that will be
 synchronized. The event input and output, on the other hand,
 are the same for all applications which also makes the ECC
-of the block type the same for all applications. The ECC for
-the block type is shown in Fig.~\ref{fig:ecc_sync}. The
-\texttt{DISABLE\_EVENTS} algorithm associated with the
-\texttt{SYNC} state is where the synchronized execution is
-implemented. The \texttt{UPDATE} event is sent as soon as
-the \texttt{DISABLE\_EVENTS} algorithm has finished
-execution.
+of the block type the same for all applications. 
+
+The synchronization block reads the enabled events of the
+synchronized models and disables the events that are not
+enabled in all the models that have that event in their
+alphabets. Each boolean data input signals if the event in
+the model represented by that input is enabled
+(\texttt{true}) or disabled (\texttt{false}). By setting the
+corresponding data output to \texttt{false} the
+synchronization block signals that the transition labeled by
+that event is not allowed to occur in the model during the
+next update cycle.
+
+The ECC for the block type is shown in
+Fig.~\ref{fig:ecc_sync}. The \texttt{DISABLE\_EVENTS}
+algorithm associated with the \texttt{SYNC} state is where
+the synchronized execution is implemented. The
+\texttt{UPDATE} event is sent as soon as the
+\texttt{DISABLE\_EVENTS} algorithm has finished execution.
+The following implementation of the algorithm in IEC 61131
+structured text does the computation:
+\begin{verbatim}
+EO_P1_a := EI_P1_a;
+EO_P1_b := EI_P1_b AND EI_S_b;
+EO_P2_c := EI_P2_c AND EI_S_c;
+EO_P2_d := EI_P2_d;
+EO_S_b := EI_P1_b AND EI_S_b;
+EO_S_c := EI_P2_c AND EI_S_c;
+\end{verbatim}
+To calculate each data output a logical expression
+consisting of all data inputs that represent the same event,
+connected by logical \texttt{and} operation, is used. This
+means that if the event is enabled in all of the models that
+have the event in their alphabet it is allowed to occur in
+the next update cycle. Otherwise the expression is false and
+the event is disabled. 
+
+Since the event \texttt{a} is in the alphabet of the
+\texttt{P1} model only, it is always allowed to occur if it
+is enabled. The event \texttt{b} is allowed to occur in
+\texttt{P1} model only if it is enabled in \texttt{P1} and
+\texttt{S} models at the same time since it is contained in
+both alphabets. The same applies to the event \texttt{b} in
+\texttt{S} model, hence the same logical expression. Events
+\texttt{d} and \texttt{c} are treated in the same manner.
 
 \begin{figure}
   \centering
-  \includegraphics[scale=0.45]{figures/P1}\\(a)
+  \includegraphics[scale=0.5]{figures/P1}\\(a)
   \vskip 5mm
-  \includegraphics[scale=0.45]{figures/P2}\\(b)
+  \includegraphics[scale=0.5]{figures/P2}\\(b)
   \vskip 5mm
-  \includegraphics[scale=0.45]{figures/Sp}\\(c)
+  \includegraphics[scale=0.5]{figures/Sp}\\(c)
   \caption{The function block types implementing (a)
     plant 1, (b) plant 2, and (c) supervisor.}
   \label{fig:systemFBs}
@@ -438,46 +479,11 @@ execution.
 \end{figure}
 \begin{figure}
   \centering
-  \includegraphics[scale=0.45]{figures/sync_ecc}
+  \includegraphics[scale=0.5]{figures/sync_ecc}
   \caption{The execution control chart for the
     synchronization function block type.}
   \label{fig:ecc_sync}
 \end{figure}
-
-The synchronization block reads the enabled events of the
-synchronized models and disables the events that are not
-enabled in all the models that have that event in their
-alphabets. Each boolean data input signals if the event in
-the model represented by that input is enabled
-(\texttt{true}) or disabled (\texttt{false}). By setting the
-corresponding data output to \texttt{false} the
-synchronization block signals that the transition labeled by
-that event is not allowed to occur in the model during the
-next update cycle. To calculate each data output a logical
-expression consisting of all data inputs that represent the
-same event, connected by logical \texttt{and} operation, is
-used. This means that if the event is enabled in all of the
-models that have the event in their alphabet it is allowed
-to occur in the next update cycle. Otherwise the expression
-is false and the event is disabled. Following implementation
-of the \texttt{DISABLE\_EVENTS} algorithm in IEC 61131
-structured text does the computation:
-\begin{verbatim}
-EO_P1_a := EI_P1_a;
-EO_P1_b := EI_P1_b AND EI_S_b;
-EO_P2_c := EI_P2_c AND EI_S_c;
-EO_P2_d := EI_P2_d;
-EO_S_b := EI_P1_b AND EI_S_b;
-EO_S_c := EI_P2_c AND EI_S_c;
-\end{verbatim}
-Since the event \texttt{a} is in the alphabet of the
-\texttt{P1} model only, it is always allowed to occur if it
-is enabled. The event \texttt{b} is allowed to occur in
-\texttt{P1} model only if it is enabled in \texttt{P1} and
-\texttt{S} models at the same time since it is contained in
-both alphabets. The same applies to the event \texttt{b} in
-\texttt{S} model, hence the same logical expression. Events
-\texttt{d} and \texttt{c} are treated in the same manner.
 
 The control application connecting all of the function
 blocks together is shown in Fig.~\ref{fig:app}. Small
@@ -574,15 +580,15 @@ second line to be \texttt{EO\_P1\_b}. Looking for the event
 produces the whole \texttt{DISABLE\_EVENTS} algorithm in the
 example.
 
-When algorithm is generated what is left is to connect
+When the algorithm is generated what is left is to connect
 instances of the model function blocks with the
 synchronization function block to generate the control
 application. Some further considerations for the
-implementation of supervisory control theory are presented in
-the following section.
+implementation of supervisory control theory are presented
+in the following section.
 
 \section{Applications in supervisory control theory}
-\label{sec:app_SCT}
+\label{sec:app_sct}
 Since the general method presented is suitable for computer
 implementation it is interesting to investigate how this
 fact can ease the implementation of control applications
@@ -616,17 +622,18 @@ parts.
   \label{fig:old_app_struct}
 \end{figure}
 
-In software tool Supremica \cite{aff:sup:2003,www:sup:2004},
-algorithms from supervisory control theory are implemented
-so that a supervisor can be synthesized from automata models
-of the plants and specifications. The algorithm that
-implements the general method for synchronization according
-to this paper is also implemented in the same tool. What
-this means is that the control engineer can focus on the
-correct modeling of the plants and transferring of the
-informal specifications to the specification models for use
-in the Supremica tool. Then the tool automatically generates
-the supervisor in form of an automaton model, function block
+In the software tool Supremica
+\cite{aff:sup:2003,www:sup:2004}, algorithms from
+supervisory control theory are implemented so that a
+supervisor can be synthesized from automata models of the
+plants and specifications. The algorithm that implements the
+general method for synchronization according to this paper
+is also implemented in the same tool. What this means is
+that the control engineer can focus on the correct modeling
+of the plants and transferring of the informal
+specifications to the specification models for use in the
+Supremica tool. Then the tool automatically generates the
+supervisor in form of an automaton model, function block
 types that implement the skeleton for the plants, the
 supervisor automaton, synchronous composition function block
 and finally the control application that connects the
@@ -636,18 +643,12 @@ case refers to the fact that the communication with the
 hardware has to be implemented by hand but all the behavior
 of the models is automatically generated. Using the tool to
 generate the control application gives new application
-structure as shown in Fig.~\ref{fig:new_app_struct}. In
-this structure, only the models for the generation of the
-plant blocks and the hardware control portion of those
-blocks have to be upgraded whenever the plants in the system
-change. All other parts of the application are regenerated
+structure as shown in Fig.~\ref{fig:new_app_struct}. In this
+structure, only the models for the generation of the plant
+blocks and the hardware control portion of those blocks have
+to be upgraded whenever the plants in the system change. All
+other parts of the application are regenerated
 automatically.
-\begin{figure}[b]
-  \centering 
-  \includegraphics[scale=0.6]{figures/new_app_struct}
-  \caption{A new structure for distributed control applications.}
-  \label{fig:new_app_struct}
-\end{figure}
 
 When trying to implement the control application for complex
 systems with many plants and specifications the problem of
@@ -664,10 +665,17 @@ synchronization of all types of representations since the
 model interface (see Fig.~\ref{fig:model_interface}) is
 based on events which are a general characteristic of the
 discrete event models.
+\begin{figure}[!hb]
+  \centering 
+  \includegraphics[scale=0.6]{figures/new_app_struct}
+  \caption{A new structure for distributed control applications.}
+  \label{fig:new_app_struct}
+\end{figure}
+\vfil
 
 \section{Conclusion}
 Using supervisory control theory in construction of control
-applications can significantly reduce development time but
+applications can significantly reduce development time, but
 until now it was difficult to apply the theory to
 implementation of distributed control applications. Using
 the emerging standard IEC 61499 it becomes significantly
@@ -677,7 +685,7 @@ application development in an efficient way.
 
 Since the method is implemented in the Supremica tool it
 significantly contributes to the shorter control application
-development time since it is a part in automatic generation
+development time, since it is a part in automatic generation
 of control applications. The method is also future proof by
 using an inherent characteristic of discrete event models
 for the interface upon which synchronization function block
@@ -686,7 +694,7 @@ is generated.
 The method and function block programming in general can be
 tested using the Function Block Development Kit (FBDK),
 \cite{c:fun:2002}. For further information about IEC 61499
-function blocks see \cite{c:ope:2002}.
+function blocks, see \cite{c:ope:2002}.
 
 
 \bibliography{/home/cengic/research/Bibliographies/desbib.bib}
