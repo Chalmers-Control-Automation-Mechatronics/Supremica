@@ -1376,36 +1376,11 @@ public class ActionMan
 	public static void automataSynchronize_actionPerformed(Gui gui)
 	{
 		// Retrieve the selected automata and make a sanity check
-		Automata selectedAutomata = gui.getSelectedAutomata();
-
+		Automata selectedAutomata = gui.getSelectedAutomata();		
 		if (!selectedAutomata.sanityCheck(gui, 2, true, false, true, true))
 		{
 			return;
 		}
-
-		/*
-		if (selectedAutomata.size() < 2)
-		{
-				JOptionPane.showMessageDialog(gui.getComponent(), "At least two automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
-
-				return;
-		}
-
-		// Do a sanity check, does all automata have initial states?
-		// There is a method for this, Automata.hasInitialState(), but
-		// it doesn't tell which automaton breaks the test...
-		Iterator autIt = selectedAutomata.iterator();
-		while (autIt.hasNext())
-		{
-				Automaton currAutomaton = (Automaton) autIt.next();
-				String currAutomatonName = currAutomaton.getName();
-				if (!currAutomaton.hasInitialState())
-				{
-						JOptionPane.showMessageDialog(gui.getComponent(), "The automaton " + currAutomatonName + " does not have an initial state!", "Alert", JOptionPane.ERROR_MESSAGE);
-						return;
-				}
-		}
-		*/
 
 		// Get the default options
 		SynchronizationOptions synchronizationOptions;
@@ -1463,84 +1438,8 @@ public class ActionMan
 		if (selectedAutomata.size() > 1)
 		{
 			SynchronizationOptions syncOptions;
-
-			// try
-			// {
 			syncOptions = SynchronizationOptions.getDefaultSynthesisOptions();
 
-			/*
-			syncOptions = new SynchronizationOptions(SupremicaProperties.syncNbrOfExecuters(),
-																							 SynchronizationType.Prioritized,
-																							 SupremicaProperties.syncInitialHashtableSize(),
-																							 SupremicaProperties.syncExpandHashtable(),
-																							 true, // This is the only difference from default!
-																							 SupremicaProperties.syncExpandForbiddenStates(),
-																							 false,
-																							 false,
-																							 true,
-																							 SupremicaProperties.verboseMode(),
-																							 true,
-																							 true);
-			*/
-
-			/*
-			}
-			catch (Exception ex)
-			{
-					JOptionPane.showMessageDialog(gui.getComponent(), "Invalid synchronizationOptions", "Alert", JOptionPane.ERROR_MESSAGE);
-					logger.debug(ex.getStackTrace());
-					return;
-			}
-			*/
-
-			/*
-			Automata currAutomata = new Automata();
-			Iterator autIt = selectedAutomata.iterator();
-
-			while (autIt.hasNext())
-			{
-					Automaton currAutomaton = (Automaton) autIt.next();
-					String currAutomatonName = currAutomaton.getName();
-
-					// No initial state -- remove from synthesis (or cancel entirely)
-					if (!currAutomaton.hasInitialState())
-					{
-							int cont = JOptionPane.showConfirmDialog(gui.getComponent(),
-																					"The automaton " + currAutomatonName +
-																					" does not have an initial state.\nSkip it or cancel...",
-																					"Alert",
-																					JOptionPane.OK_CANCEL_OPTION,
-																					JOptionPane.WARNING_MESSAGE);
-
-							if(cont == JOptionPane.OK_OPTION)
-							{
-									continue; // skip currAutomaton from the synthesis
-							}
-							else // JOptionPane.CANCEL_OPTION
-							{
-									return; // cancel entirely
-							}
-					}
-					// Undefined type -- remove from synthesis (or cancel entirely)
-					if(currAutomaton.getType() == AutomatonType.Undefined)
-					{
-							int cont = JOptionPane.showConfirmDialog(gui.getComponent(),
-																									"The automaton " + currAutomatonName + " is of 'Undefined' type.\nSkip it or cancel...",
-																									"Alert",
-																									JOptionPane.OK_CANCEL_OPTION,
-																									JOptionPane.WARNING_MESSAGE);
-							if(cont == JOptionPane.OK_OPTION)
-							{
-									continue; // skip currAutomaton from the synthesis
-							}
-							else // JOptionPane.CANCEL_OPTION
-							{
-									return; // cancel entirely
-							}
-					}
-					currAutomata.addAutomaton(currAutomaton);
-			}
-			*/
 			try
 			{
 				AutomataSynthesizer synthesizer = new AutomataSynthesizer(gui, selectedAutomata, syncOptions, synthesizerOptions);
@@ -1562,7 +1461,6 @@ public class ActionMan
 
 			try
 			{
-
 				// ARASH: this is IDIOTIC! why didnt we prepare for more than one monolithc algorithm???
 				// (this is a dirty fix, should use a factory instead)
 				AutomatonSynthesizer synthesizer = (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.MonolithicSingleFixpoint)
@@ -1752,37 +1650,22 @@ public class ActionMan
 		// Retrieve the selected automata and make a sanity check
 		Automata selectedAutomata = gui.getSelectedAutomata();
 
+		// Sanitycheck
 		if (!selectedAutomata.sanityCheck(gui, 1, true, false, false, true))
 		{
 			return;
 		}
 
-		/*
-		if (selectedAutomata.size() < 1)
-		{
-				JOptionPane.showMessageDialog(gui.getFrame(), "At least one automaton must be selected!",
-																		  "Alert", JOptionPane.ERROR_MESSAGE);
-
-				return;
-		}
-		*/
+		// How many selected?
 		if (selectedAutomata.size() == 1)
-		{    // One automaton selected
-
-			/*
+		{    
 			// One automaton selected
-			Automaton currAutomaton = (Automaton) autIt.next();
-			String currAutomatonName = currAutomaton.getName();
 
-			if (!currAutomaton.hasInitialState())
-			{
-					JOptionPane.showMessageDialog(gui.getFrame(), "The automaton " + currAutomatonName +
-					" does not have an initial state!", "Alert", JOptionPane.ERROR_MESSAGE);
-			}
-			*/
+			// Get automaton
 			Automaton theAutomaton = selectedAutomata.getFirstAutomaton();
 			String currAutomatonName = theAutomaton.getName();
 
+			// Get AutomatonExplorer
 			try
 			{
 				AutomatonExplorer explorer = gui.getVisualProjectContainer().getActiveProject().getAutomatonExplorer(currAutomatonName);
@@ -1796,25 +1679,14 @@ public class ActionMan
 		else
 		{    // Many automata selected
 
-			/*
-			// Many automata selected
-			Automata currAutomata = new Automata();
-
-			while (autIt.hasNext())
+			// The AutomataExplorer can not take care of nondeterministic processes...
+			if (!selectedAutomata.isDeterministic())
 			{
-					Automaton currAutomaton = (Automaton) autIt.next();
-					String currAutomatonName = currAutomaton.getName();
-
-					if (!currAutomaton.hasInitialState())
-					{
-							JOptionPane.showMessageDialog(gui.getFrame(), "The automaton " + currAutomatonName + " does not have an initial state!", "Alert", JOptionPane.ERROR_MESSAGE);
-
-							return;
-					}
-
-					currAutomata.addAutomaton(currAutomaton);
+				logger.error("The current project is nondeterministic. Exploration of nondeterministic automata " + 
+							 "is currently not supported.");
 			}
-			*/
+
+			// Get AutomataExplorer
 			try
 			{
 				JOptionPane.showMessageDialog(gui.getComponent(), "The automata explorer only works in the \"forward\" direction!", "Alert", JOptionPane.INFORMATION_MESSAGE);
@@ -1835,6 +1707,12 @@ public class ActionMan
 	// Project.Simulator action performed
 	public static void simulator_actionPerformed(Gui gui)
 	{
+		// We can not simulate nondeterministic processes properly just yet...
+		if (!gui.getVisualProjectContainer().getActiveProject().isDeterministic())
+		{
+			logger.error("The current project is nondeterministic. Simulation of nondeterminism is currently not supported.");
+		}
+
 		try
 		{
 			VisualProject currProject = gui.getVisualProjectContainer().getActiveProject();
@@ -1895,7 +1773,12 @@ public class ActionMan
 			return;
 		}
 
+		// Timer
+		ActionTimer timer = new ActionTimer();
+		timer.start();
+
 		// Iterate over automata and minimiza
+		Automata result = new Automata();
 		Iterator autIt = selectedAutomata.iterator();
 		while (autIt.hasNext())
 		{
@@ -1905,7 +1788,7 @@ public class ActionMan
 			{
 				AutomatonMinimizer autMinimizer = new AutomatonMinimizer(currAutomaton);
 				Automaton newAutomaton = autMinimizer.getMinimizedAutomaton(options);
-				gui.addAutomaton(newAutomaton);
+				result.addAutomaton(newAutomaton);
 			}
 			catch (Exception ex)
 			{
@@ -1918,6 +1801,20 @@ public class ActionMan
 			{
 				gui.getVisualProjectContainer().getActiveProject().removeAutomaton(currAutomaton);
 			}
+		}
+
+		// Timer
+		timer.stop();
+		logger.info("Execution completed after " + timer.toString());
+
+		// Add new automata
+		try
+		{
+			gui.addAutomata(result);
+		}
+		catch (Exception ex)
+		{
+			logger.error(ex);
 		}
 	}
 
@@ -2898,7 +2795,6 @@ public class ActionMan
 	/**
 	 * Just a test...
 	 */
-
 	/*
 	public static void trainSimulator(Gui gui)
 	{

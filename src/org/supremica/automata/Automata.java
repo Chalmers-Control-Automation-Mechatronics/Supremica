@@ -1267,7 +1267,10 @@ public class Automata
 	}
 
 	/**
-	 * Only care about the size of the automata
+	 * Examines automata size.
+	 *
+	 * @param gui If gui != null, a JOptionPane shows the results and guides the user.
+	 * @param minSize Minimum size of the automata.
 	 */
 	public boolean sanityCheck(Gui gui, int minSize)
 	{
@@ -1275,8 +1278,7 @@ public class Automata
 	}
 
 	/**
-	 * Examines automata size and, optionally, if all automata
-	 * has initial states and/or a defined type.
+	 * Examines automata size and - optionally - some other stuff.
 	 *
 	 * @param gui If gui != null, a JOptionPane shows the results and guides the user.
 	 * @param minSize Minimum size of the automata.
@@ -1284,32 +1286,45 @@ public class Automata
 	 * @param mustHaveType Test requires that the automata are not of undefined type.
 	 * @param mustBeControllabilityConsistent Test requires that an event has the same
 	 * controllability status in all automata.
+	 * @param explicitly Examines and warns if there are disjoint sets of automata 
+	 * (considering shared events)
 	 *
 	 * This method was originally in gui.ActionMan (to handle the gui-stuff conveniently).
 	 */
-	public boolean sanityCheck(Gui gui, int minSize, boolean mustHaveInitial, boolean mustHaveValidType, boolean mustBeControllabilityConsistent, boolean examineStructure)
+	public boolean sanityCheck(Gui gui, int minSize, boolean mustHaveInitial, boolean mustHaveValidType, 
+							   boolean mustBeControllabilityConsistent, boolean examineStructure)
 	{
 		// Is this automata empty? If so, just bail out.
 		if (size() <= 0)
 		{
+			// This is InsaNe
 			return false;
 		}
 
 		// Warns if there are events with equal (lowercase) names. 
-		//Always do this check (irritating? well yes... but those are really bad names!)
-		isEventNamesSafe();
+		// Always do this check (irritating? well yes... but those are really bad names!)
+		if (isEventNamesSafe())
+		{
+			// Warning has been written in log window by isEventNamesSafe.
+		}
 
 		// Examines controllability consistency
-		if (mustBeControllabilityConsistent && !isEventControllabilityConsistent())
+		if (mustBeControllabilityConsistent)
 		{
-			return false;
+			if (!isEventControllabilityConsistent())
+			{
+				return false;
+			}
 		}
 
 		// Warns if the system has disjoint modules (the system can be divided into at least two sets
 		// of modules whose union alphabets are disjoint)
 		if (examineStructure)
 		{
-			isSeveralSystems();
+			if (isSeveralSystems())
+			{
+				// Warning has been written in the log window by isSeveralSystems.
+			}
 		}
 
 		// Examines each automaton for an initial state
@@ -1342,7 +1357,7 @@ public class Automata
 						logger.error("The automaton " + currAutomaton + " has no initial state.");
 					}
 
-					// This is iNsaNe!
+					// This is iNsanE!
 					return false;
 				}
 			}
@@ -1385,8 +1400,8 @@ public class Automata
 		// Make sure the automata has the right size!
 		if ((minSize > 0) && (size() < minSize))
 		{
+			// Generate message
 			String size;
-
 			if (minSize == 1)
 			{
 				size = "one automaton";
@@ -1399,7 +1414,6 @@ public class Automata
 			{
 				size = minSize + " automata";
 			}
-
 			String message = "At least " + size + " must be selected!";
 
 			// Present result
@@ -1416,7 +1430,7 @@ public class Automata
 			return false;
 		}
 
-		// Sane!
+		// Perfectly sane!
 		return true;
 	}
 }

@@ -85,10 +85,7 @@ public class AutomataSynchronizerWorker
 	{
 		if (mode == MODE_SYNC)
 		{
-
-			// Date startDate = new Date();
 			ActionTimer timer = new ActionTimer();
-
 			timer.start();
 
 			AutomataSynchronizer theSynchronizer;

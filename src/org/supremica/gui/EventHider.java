@@ -53,7 +53,6 @@ class EventHiderDialog
 		public OkButton()
 		{
 			super("Ok");
-			System.err.println("OK!");
 
 			setToolTipText("Do the hiding");
 			addActionListener(new ActionListener()
@@ -148,10 +147,22 @@ public class EventHider
 	 */
 	public static void hide(Automaton aut, Alphabet alpha)
 	{
-		// Create silent event tau
-		LabeledEvent tau = new LabeledEvent("tau");
-		tau.setEpsilon(true);
-		aut.getAlphabet().addEvent(tau);
+		// Get/create silent event tau
+		LabeledEvent tau = aut.getAlphabet().getEvent("tau");
+		if (tau == null)
+		{
+			tau = new LabeledEvent("tau");
+			tau.setEpsilon(true);
+			aut.getAlphabet().addEvent(tau);
+		}
+		else
+		{
+			if (!tau.isEpsilon())
+			{
+				logger.error("The event 'tau' is reserved and must be unbservable!");
+				return;
+			}
+		}
 		
 		// Modify arcs
 		for (ArcIterator arcIt = aut.arcIterator(); arcIt.hasNext(); )
