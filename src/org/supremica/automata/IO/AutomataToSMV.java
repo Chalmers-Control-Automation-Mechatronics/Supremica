@@ -214,6 +214,7 @@ public class AutomataToSMV
 			pw.println("\tAut_" + currAutomaton.getSynchIndex() + " : Automaton_" + currAutomaton.getSynchIndex() + "(s);");
 		}
 		pw.println();
+		printSpecifications(pw);
 	}
 
 
@@ -278,6 +279,69 @@ public class AutomataToSMV
 		return buff.toString();
 	}
 
+
+	void printSpecifications(PrintWriter pw)
+	{
+		//printControllabilitySpecification(pw);
+		printNonblockingSpecification(pw);
+		//printLivenessSpecification(pw);
+	}
+
+	void printControllabilitySpecification(PrintWriter pw)
+	{
+		pw.println("-- Controllability verification");
+		pw.print("SPEC");
+
+		pw.println("");
+	}
+
+
+	void printNonblockingSpecification(PrintWriter pw)
+	{
+		pw.println("-- Nonblocking verification");
+		pw.print("SPEC AG EF (");
+
+		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext();)
+		{
+			pw.print("(");
+			Automaton currAutomaton = (Automaton)autIt.next();
+			int currAutomatonIndex = currAutomaton.getSynchIndex();
+			boolean hasAcceptingState = false;
+			boolean hasPreviousTerm = false;
+			for (StateIterator stateIt = currAutomaton.stateIterator(); stateIt.hasNext(); )
+			{
+				State currState = stateIt.nextState();
+				if (currState.isAccepting() && !currState.isForbidden())
+				{
+					hasAcceptingState = true;
+					if (hasPreviousTerm)
+					{
+						pw.print(" | ");
+					}
+					hasPreviousTerm = true;
+					pw.print("s.q_" + currAutomatonIndex + " = q_" + currAutomatonIndex + "_" + currState.getSynchIndex());
+				}
+			}
+			if (!hasAcceptingState)
+			{
+				pw.print("FALSE");
+			}
+			pw.print(")");
+			if (autIt.hasNext())
+			{
+				pw.print(" & ");
+			}
+		}
+
+		pw.println(")");
+	}
+
+	void printLivenessSpecification(PrintWriter pw)
+	{
+		pw.println("-- Liveness verification");
+		pw.print("SPEC ");
+		pw.println();
+	}
 
 	public void serializeSMV(PrintWriter pw)
 		throws Exception
