@@ -230,25 +230,42 @@ public class LogDisplay
 		}
 */
 		MutableAttributeSet attError = new SimpleAttributeSet();
-		attributes.put(Priority.ERROR, attError);
-		StyleConstants.setFontSize(attError, 14);		
+		attributes.put(Level.ERROR, attError);
+		StyleConstants.setFontSize(attError, 14);
 
 		MutableAttributeSet attWarn = new SimpleAttributeSet();
-		attributes.put(Priority.WARN, attWarn);
+		attributes.put(Level.WARN, attWarn);
 		StyleConstants.setFontSize(attWarn, 14);
 
 		MutableAttributeSet attInfo = new SimpleAttributeSet();
-		attributes.put(Priority.INFO, attInfo);
+		attributes.put(Level.INFO, attInfo);
 		StyleConstants.setFontSize(attInfo, 14);
 
 		MutableAttributeSet attDebug = new SimpleAttributeSet();
-		attributes.put(Priority.DEBUG, attDebug);
+		attributes.put(Level.DEBUG, attDebug);
 		StyleConstants.setFontSize(attDebug, 14);
-				
-		StyleConstants.setForeground((MutableAttributeSet) attributes.get(Priority.ERROR), Color.red);
-		StyleConstants.setForeground((MutableAttributeSet) attributes.get(Priority.WARN), new Color(255,127,0)); // Color.orange);
-		StyleConstants.setForeground((MutableAttributeSet) attributes.get(Priority.INFO), new Color(0, 80, 0));
-		StyleConstants.setForeground((MutableAttributeSet) attributes.get(Priority.DEBUG), Color.blue);
+
+		MutableAttributeSet attFatal = new SimpleAttributeSet();
+		attributes.put(Level.FATAL, attFatal);
+		StyleConstants.setFontSize(attFatal, 14);
+
+		MutableAttributeSet attAll = new SimpleAttributeSet();
+		attributes.put(Level.ALL, attAll);
+		StyleConstants.setFontSize(attAll, 14);
+
+		MutableAttributeSet attOff = new SimpleAttributeSet();
+		attributes.put(Level.OFF, attOff);
+		StyleConstants.setFontSize(attOff, 14);
+
+		StyleConstants.setForeground((MutableAttributeSet) attributes.get(Level.ERROR), Color.red);
+		StyleConstants.setForeground((MutableAttributeSet) attributes.get(Level.WARN), new Color(255,127,0)); // Color.orange);
+		StyleConstants.setForeground((MutableAttributeSet) attributes.get(Level.INFO), new Color(0, 80, 0));
+		StyleConstants.setForeground((MutableAttributeSet) attributes.get(Level.DEBUG), Color.blue);
+		StyleConstants.setForeground((MutableAttributeSet) attributes.get(Level.FATAL), Color.red);
+		StyleConstants.setForeground((MutableAttributeSet) attributes.get(Level.ALL), Color.blue);
+		StyleConstants.setForeground((MutableAttributeSet) attributes.get(Level.OFF), Color.red);
+
+
 	}
 
 	public void close() {}
@@ -279,11 +296,13 @@ public class LogDisplay
 //		Priority prio[] = Priority.getAllPossiblePriorities();
 
 		icons = new Hashtable();
-		icons.put(Priority.FATAL, getIcon("/icons/BlackFlag.gif") );
-		icons.put(Priority.ERROR, getIcon("/icons/RedFlag.gif") );
-		icons.put(Priority.WARN, getIcon("/icons/OrangeFlag.gif") );
-		icons.put(Priority.INFO, getIcon("/icons/GreenFlag.gif") );
-		icons.put(Priority.DEBUG, getIcon("/icons/BlueFlag.gif") );
+		icons.put(Level.FATAL, getIcon("/icons/BlackFlag.gif") );
+		icons.put(Level.ERROR, getIcon("/icons/RedFlag.gif") );
+		icons.put(Level.WARN, getIcon("/icons/OrangeFlag.gif") );
+		icons.put(Level.INFO, getIcon("/icons/GreenFlag.gif") );
+		icons.put(Level.DEBUG, getIcon("/icons/BlueFlag.gif") );
+		icons.put(Level.ALL, getIcon("/icons/BlackFlag.gif") );
+		icons.put(Level.OFF, getIcon("/icons/BlackFlag.gif") );
 
 /*
 		for (int i = 0; i < prio.length; i++)
@@ -416,7 +435,7 @@ public class LogDisplay
 		this.doc = textpane.getStyledDocument();
 	}
 
-	private void setColor(Priority p, String v)
+	private void setColor(Level p, String v)
 	{
 		StyleConstants.setForeground((MutableAttributeSet) attributes.get(p), parseColor(v));
 	}
@@ -453,27 +472,27 @@ public class LogDisplay
 
 		if (option.equalsIgnoreCase(COLOR_OPTION_FATAL))
 		{
-			setColor(Priority.FATAL, value);
+			setColor(Level.FATAL, value);
 		}
 
 		if (option.equalsIgnoreCase(COLOR_OPTION_ERROR))
 		{
-			setColor(Priority.ERROR, value);
+			setColor(Level.ERROR, value);
 		}
 
 		if (option.equalsIgnoreCase(COLOR_OPTION_WARN))
 		{
-			setColor(Priority.WARN, value);
+			setColor(Level.WARN, value);
 		}
 
 		if (option.equalsIgnoreCase(COLOR_OPTION_INFO))
 		{
-			setColor(Priority.INFO, value);
+			setColor(Level.INFO, value);
 		}
 
 		if (option.equalsIgnoreCase(COLOR_OPTION_DEBUG))
 		{
-			setColor(Priority.DEBUG, value);
+			setColor(Level.DEBUG, value);
 		}
 
 		if (option.equalsIgnoreCase(COLOR_OPTION_BACKGROUND))

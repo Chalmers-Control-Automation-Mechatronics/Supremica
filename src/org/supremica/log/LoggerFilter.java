@@ -75,9 +75,9 @@ public class LoggerFilter
 
 	public int decide(LoggingEvent event)
 	{
-		Priority prio = event.getLevel();
+		Level prio = event.getLevel();
 
-		if (prio == Priority.DEBUG)
+		if (prio == Level.DEBUG)
 		{
 			if (allowDebugs)
 			{
@@ -87,7 +87,7 @@ public class LoggerFilter
 			return Filter.DENY;
 		}
 
-		if (prio == Priority.INFO)
+		if (prio == Level.INFO)
 		{
 			if (allowInfos)
 			{
@@ -97,7 +97,7 @@ public class LoggerFilter
 			return Filter.DENY;
 		}
 
-		if (prio == Priority.WARN)
+		if (prio == Level.WARN)
 		{
 			if (allowWarns)
 			{
@@ -107,7 +107,7 @@ public class LoggerFilter
 			return Filter.DENY;
 		}
 
-		if (prio == Priority.ERROR)
+		if (prio == Level.ERROR)
 		{
 			if (allowErrors)
 			{
@@ -117,7 +117,7 @@ public class LoggerFilter
 			return Filter.DENY;
 		}
 
-		if (prio == Priority.FATAL)
+		if (prio == Level.FATAL)
 		{
 			if (allowFatals)
 			{
