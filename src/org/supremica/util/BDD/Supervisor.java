@@ -1012,35 +1012,32 @@ public class Supervisor
 		manager.deref(explicitly_forbidden);
 
 		// 1.c maybe the user has some request about the reachability of the computed safe states ?
-		if(Options.sup_reachability_type == Options.SUP_REACHABILITY_UC || Options.sup_reachability_type == Options.SUP_REACHABILITY_ALL)
+		if(Options.sup_reachability_type != Options.SUP_REACHABILITY_IGNORE)
 		{
-			Timer t2 = null;
-			if(Options.profile_on)
+			Timer t2 = Options.profile_on ? new Timer("Supervisor.getSafeStatesNBC") : null;
+			String msg = "";
+
+			switch(Options.sup_reachability_type)
 			{
-				t2 = new Timer("Supervisor.getSafeStatesNBC");
+				case Options.SUP_REACHABILITY_UC:
+					x = manager.andTo(x, getReachables() );
+					msg = "computed the intersection of reachable states and uncontrollables";
+					break;
+				case Options.SUP_REACHABILITY_ALL:
+					int not_reachable = manager.not(getReachables() );
+					x = manager.orTo(x, not_reachable);
+					manager.deref(not_reachable);
+					msg = "added unreachable states as forbidden states";
+					break;
+				case Options.SUP_REACHABILITY_DONTCARE:
+					x = manager.orTo(x, manager.getDontCareS() );
+					msg = "added dont-care states to forbidden states";
+					break;
 			}
 
-			// first, we need the reachable states:
-			int forward = getReachables();
-
-			// now, how do we handle this ?
-			if( Options.sup_reachability_type == Options.SUP_REACHABILITY_UC )  // only uc(P||Sp) is tested for reachability
+			if(t2 != null)
 			{
-				x = manager.andTo(x, forward);
-				if(Options.profile_on)
-				{
-					t2.report("computed the intersection of reachable states and uncontrollables");
-				}
-			}
-			else /* Options.sup_reachability_type == Options.SUP_REACHABILITY_ALL */ // everything must be reachable
-			{
-				int not_reachable = manager.not(forward);
-				x = manager.orTo(x, not_reachable);
-				manager.deref(not_reachable);
-				if(Options.profile_on)
-				{
-					t2.report("added unreachable states as forbidden states");
-				}
+				t2.report(msg);
 			}
 		}
 

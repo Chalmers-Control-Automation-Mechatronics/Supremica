@@ -222,11 +222,13 @@ public class Options
 
 	/** In safe-state supervisor synthesis, we must decide to include reachability or not */
 	public static final String[] SUP_REACHABILITY_NAMES = {
-		"ignored", "uc(P||Sp) must be reachable", "total reachability constraint"
+		"ignored", "forbid dont-care states",
+		"uc(P||Sp) must be reachable", "total reachability constraint"
 	};
 	public static final int SUP_REACHABILITY_IGNORE = 0,
-		SUP_REACHABILITY_UC = 1,
-		SUP_REACHABILITY_ALL = 2;
+		SUP_REACHABILITY_DONTCARE = 1,
+		SUP_REACHABILITY_UC = 2,
+		SUP_REACHABILITY_ALL = 3;
 	public static int sup_reachability_type = SUP_REACHABILITY_IGNORE;
 
 

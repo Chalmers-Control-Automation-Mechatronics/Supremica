@@ -20,8 +20,8 @@ public class BDDAutomata
 	// the global alphabet
 	private Event[] original_events;
 	private int events_size;
-	private int bdd_total_initial, bdd_total_cube, bdd_total_cubep,
-				bdd_total_cubepp;
+	private int bdd_total_initial, bdd_dont_care;
+	private int bdd_total_cube, bdd_total_cubep, bdd_total_cubepp;
 
 	// vector sizes
 	private int size_states, size_events, size_all;
@@ -112,29 +112,17 @@ public class BDDAutomata
 
 		// ... then we do the second initialization which needs
 		// all automata to be presented ( se createPair)
-		keep = getOne();
-
-		ref(keep);
-
-		bdd_total_initial = getOne();
-
-		ref(bdd_total_initial);
-
-		bdd_total_cube = getOne();
-
-		ref(bdd_total_cube);
-
-		bdd_total_cubep = getOne();
-
-		ref(bdd_total_cubep);
-
-		bdd_total_cubepp = getOne();
-
-		ref(bdd_total_cubepp);
+		keep = ref ( getOne() );
+		bdd_total_initial = ref ( getOne() );
+		bdd_total_cube = ref ( getOne() );
+		bdd_total_cubep = ref ( getOne() );
+		bdd_total_cubepp = ref ( getOne() );
+		bdd_dont_care = ref( getZero() );
 
 		for (i = components - 1; i >= 0; --i)
 		{
 			automata[i].init();
+			bdd_dont_care = orTo(bdd_dont_care, automata[i].getDontCareS() );
 
 			keep = andTo(keep, automata[i].getKeep());
 			bdd_total_initial = andTo(bdd_total_initial, automata[i].getI());
@@ -301,7 +289,11 @@ public class BDDAutomata
 	{
 		return bdd_total_cube;
 	}
-	;
+
+	public int getDontCareS()
+	{
+		return bdd_dont_care;
+	}
 
 	public int getStatepCube()
 	{
