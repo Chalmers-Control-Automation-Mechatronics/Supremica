@@ -420,11 +420,11 @@ public final class AutomataSynchronizerHelper
 		return theStates.iterator();
 	}
 
-	public int getNumberOfStates()
+	public int getNumberOfAddedStates()
 	{
-		return helperData.nbrOfCheckedStates;
+		return helperData.nbrOfAddedStates;
 	}
-
+	
 	public State[][] getIndexFormStateTable()
 	{
 		return theAutomataIndexForm.getStateTable();

@@ -12,6 +12,8 @@ import org.supremica.log.*;
 import org.supremica.automata.Automata;
 import org.supremica.automata.algorithms.SearchStates;
 
+import org.supremica.gui.Presenter;
+
 class PresentStatesTableModel
 	extends AbstractTableModel
 {
@@ -154,40 +156,60 @@ class UserInterruptFrame
 	public UserInterruptFrame()
 	{
 		Utility.setupFrame(this, 0, 0);
-		JOptionPane.showMessageDialog(this, "Search interruped by user", "User INterrupt", JOptionPane.INFORMATION_MESSAGE);
+		JOptionPane.showMessageDialog(this, "Search interruped by user", "User Interrupt", JOptionPane.INFORMATION_MESSAGE);
 	}
 }
 
 // 
-public class PresentStates
+public class PresentStates extends Presenter
 {
 	private JFrame frame = null;
-	private SearchStates searchs = null;
+	private SearchStates searchs = null; 
 	private Automata automata = null;
 	private boolean dispose_frame = false;
 
-	public PresentStates(SearchStates ss, Automata a)
+	public PresentStates(JFrame frame, SearchStates ss, Automata a)
 	{
-		searchs = ss;
-		automata = a;
+		super(ss);
+		
+		this.frame = frame;
+		this.searchs = ss;
+		this.automata = a;
+	}
 
-		// conOut(); // for debug purposes
-		if (ss.numberFound() > 0)
+	public void taskFinished()
+	{
+		if (searchs.numberFound() > 0)
 		{
-			frame = new PresentStatesFrame(ss, a);
+			frame = new PresentStatesFrame(searchs, automata);
 		}
-		else if (!ss.wasStopped())
+		else // it was not stopped but none found
 		{
 			frame = new NoStatesFoundFrame();
 			dispose_frame = true;    // for some reason the frame cannot dispose of itself
 		}
-		else
+		execute();
+	}
+	
+	public void taskStopped()
+	{
+		frame = new UserInterruptFrame();
+		dispose_frame = true;
+		execute();
+	}
+	
+
+	public void execute()
+	{
+		frame.show();
+
+		if (dispose_frame)
 		{
-			frame = new UserInterruptFrame();
-			dispose_frame = true;
+			frame.dispose();
 		}
 	}
-
+	
+	// Debugging only
 	private void conOut()
 	{
 
@@ -213,16 +235,6 @@ public class PresentStates
 			}
 
 			System.out.println(">");
-		}
-	}
-
-	public void execute()
-	{
-		frame.show();
-
-		if (dispose_frame)
-		{
-			frame.dispose();
 		}
 	}
 }

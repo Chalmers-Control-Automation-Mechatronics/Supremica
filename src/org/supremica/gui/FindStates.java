@@ -519,13 +519,14 @@ class FindStatesFrame
 		return (FindStatesTab) tabbedPane.getSelectedComponent();
 	}
 
+/*
 	private void showCompositeStates(SearchStates ss)
 	{
 		PresentStates present_states = new PresentStates(ss, getAutomata());
 
 		present_states.execute();
 	}
-
+*/
 	class FindButton
 		extends JButton
 	{
@@ -576,8 +577,7 @@ class FindStatesFrame
 
 	// ****************** Testing only ********** copied straight (almost) from the Monitor project
 	class Task
-		extends Thread
-		implements Monitorable
+		extends MonitorableThread
 	{
 		private int p;
 		private int i = 0;
@@ -612,6 +612,7 @@ class FindStatesFrame
 
 		public int getProgress()
 		{
+			System.out.println("Task::getProgress - " + getActivity());
 			if (mode)
 			{
 				return p;
@@ -638,12 +639,38 @@ class FindStatesFrame
 		{
 			requestStop = true;
 		}
-
+		public boolean wasStopped()
+		{
+			return requestStop;
+		}
 		public ExecutionDialogMode getMode()    // ** Changed but not used **
 		{
 			return null;
 		}
-	}    // ****************************************************
+	}    
+	// ****** Still more testing stuff
+	class PresentResult extends Presenter
+	{
+		JFrame frame;
+		
+		public PresentResult(JFrame frame, MonitorableThread task)
+		{
+			super(task);
+			this.frame = frame;
+		}
+		public void taskFinished()
+		{
+			// System.err.println(task.getName() + " - final value was: " + task.getProgress());
+			JOptionPane.showMessageDialog(frame, task.getName() + " - final value was: " + task.getProgress(), "Task finished", JOptionPane.INFORMATION_MESSAGE);
+		}
+		public void taskStopped()
+		{
+			// System.err.println(task.getName() + " was stopped");
+			JOptionPane.showMessageDialog(frame, task.getName() + " cancelled by user", "Task cancelled", JOptionPane.WARNING_MESSAGE);
+		}
+
+	}
+	// ****************************************************
 
 	private void goAhead()
 	{
@@ -653,23 +680,31 @@ class FindStatesFrame
 
 			if (matcher != null)
 			{
-
-				// SearchStates ss = new SearchStates(getAutomata(), matcher);
-				Task ss = new Task();
-
+				/*
+				// Start the task
+				Task task = new Task();	// SearchStates ss = new SearchStates(getAutomata(), matcher);
+				task.start();
+				
+				// Start the monitor
+				Monitor monitor = new Monitor("Message...", "Note", task);
+				monitor.startMonitor(this, 0, 1000);
+				
+				// Start the presenter (waits for the task)
+				PresentResult present = new PresentResult(this, task);
+				present.start();
+				
+				*/
+				SearchStates ss = new SearchStates(getAutomata(), matcher);
 				ss.start();    // Start the synchronization thread
-
-				// /setCursor(WAIT_CURSOR);
-				// ExecutionDialog exedlg = new ExecutionDialog(this, "Finding States...", ss);
+				
 				Monitor monitor = new Monitor("Finding states...", "", ss);
+				monitor.startMonitor(this, 0, 1000);
 
-				monitor.spawn(this);    // spawn the monitor with this as parent
+				PresentStates present_states = new PresentStates(this, ss, getAutomata());
+				present_states.start();
+				
+				/**/
 
-				// ss.setExecutionDialog(exedlg);
-				ss.join();     // wait for ss to finish
-
-				// /setCursor(DEFAULT_CURSOR);
-				// showCompositeStates(ss);
 			}
 
 			// else do nothing
