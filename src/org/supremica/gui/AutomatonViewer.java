@@ -61,7 +61,7 @@ public class AutomatonViewer
 {
 	private Automaton theAutomaton;
 
-	public AutomatonViewer(Automaton theAutomaton)
+	protected AutomatonViewer(Automaton theAutomaton) // protected, use VisualProject::getAutomatonViewer instead
 		throws Exception
 	{
 		this.theAutomaton = theAutomaton;

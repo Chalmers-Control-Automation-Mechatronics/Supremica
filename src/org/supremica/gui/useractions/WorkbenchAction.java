@@ -29,6 +29,8 @@ public class WorkbenchAction
 	// Note, we avoid (short-circut) the ActionMan here... should we?
 	public void actionPerformed(ActionEvent e)
 	{
+		// ActionMan.workbench_actionPerformed(ActionMan.getGui());
+		
 		VisualProject theProject = ActionMan.getGui().getVisualProjectContainer().getActiveProject();
 		Automata selectedAutomata = ActionMan.getGui().getSelectedAutomata();
 

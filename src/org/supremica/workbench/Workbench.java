@@ -31,6 +31,7 @@ class MyAutomatonToDot
 {
 	public MyAutomatonToDot(Automaton automaton)
 	{
+		// logger.info("MyAutomatonToDot::constructed");
 		super(automaton);
 	}
 
@@ -53,6 +54,7 @@ class MyAutomatonViewer
 	public MyAutomatonViewer(Automaton theAutomaton)
 		throws Exception
 	{
+		// logger.info("MyAutomatonViewer::constructed");
 		super(theAutomaton);
 	}
 
@@ -70,6 +72,15 @@ class MyAutomatonViewer
 	}
 }
 
+class MyAutomatonViewerFactory
+	implements AutomatonViewerFactory
+{
+	public AutomatonViewer createAutomatonViewer(Automaton automaton)
+		throws Exception
+	{
+		return new MyAutomatonViewer(automaton);
+	}
+}
 //
 class ButtonImpl
 	extends JButton
@@ -128,7 +139,12 @@ class SynchButton
 
 			wb.automaton = wb.syncher.getAutomaton();
 
+			/* Which behavior is the "correct" one?
+			 * If we set the name, the user won't be asked, not even if asame-named automaton already exists
+			 * If we don't set the name, the user will be prompted with a suggested name, and prompted again until a unique name is given
+			 */
 			wb.automaton.setName(wb.automaton.getComment());
+			ActionMan.getGui().addAutomaton(wb.automaton);
 
 			// Note that there may be explicitly specified uc-states
 			// These are not "new" in a direct sense, but...
@@ -599,6 +615,14 @@ class ButtonPanel
 		panel.add(new DoneButton(wb));
 		add(panel);
 	}
+	public void disable()
+	{
+		setEnabled(false);
+	}
+	public void enable()
+	{
+		setEnabled(true);
+	}
 }
 
 class InfoPanel
@@ -625,7 +649,7 @@ public class Workbench
 	Automata automata = null;    // these are used "globally" in this file
 	Automaton automaton = null;    // eventually the resulting supervisor
 	VisualProject project = null;
-	AutomatonViewer viewer = null;
+//	AutomatonViewer viewer = null;	// Each workbench manages only a single viewer
 	AutomataSynchronizer syncher = null;
 	private ParamPanel params;
 	private ButtonPanel buttons;
@@ -675,18 +699,11 @@ public class Workbench
 
 	void close()
 	{
-		if (viewer != null)
+		hideGraph();
+		
+		if (toAddIt() == false)
 		{
-			viewer.dispose();
-
-			viewer = null;
-		}
-
-		if (toAddIt() && (automaton != null))
-		{
-			project.addAutomaton(automaton);
-
-			automaton = null;
+			project.removeAutomaton(automaton);
 		}
 	}
 
@@ -695,33 +712,49 @@ public class Workbench
 	{
 		if (toShowGraph())    // we should show it
 		{
-			if (viewer == null)    // if not already shown
+			try
 			{
-				viewer = new MyAutomatonViewer(automaton);
-
-				viewer.run();
-			}
-			else    // have the new automaton drawn in the old window
-			{
-				if (viewer.isVisible() == false)
+				if(project.existsAutomatonViewer(automaton))
 				{
-					viewer.show();
+					AutomatonViewer viewer = project.returnAutomatonViewer(automaton);
+					if (viewer.isVisible() == false)
+					{
+						viewer.show();
+					}
+					viewer.update();
 				}
-
-				viewer.update();
-				logger.debug("Viewer updated");
+				else
+				{
+					if(project.showAutomatonViewer(automaton))
+					{
+						AutomatonViewer viewer = project.createAutomatonViewer(automaton, new MyAutomatonViewerFactory());
+						viewer.show();
+					}
+				}
 			}
-		}
+			catch(Exception excp)
+			{
+				System.out.println("Something bad occurred");
+			}
+		}	
 	}
 
 	void hideGraph()
 	{
-		if (viewer != null)
+		try
 		{
-			if (viewer.isVisible())
+			if (project.existsAutomatonViewer(automaton))
 			{
-				viewer.hide();
+				AutomatonViewer viewer = project.returnAutomatonViewer(automaton);
+				if (viewer.isVisible())
+				{
+					viewer.hide();
+				}
 			}
+		}
+		catch(Exception excp)
+		{
+			logger.error("Error in hiding viewer", excp);
 		}
 	}
 
@@ -775,6 +808,7 @@ public class Workbench
 		return num;
 	}
 
+	// For debugging only
 	public static void main(String args[])
 		throws Exception
 	{

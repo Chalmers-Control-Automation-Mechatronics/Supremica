@@ -85,6 +85,8 @@ class MainPopupMenu
 
 		JMenuItem workbench = new SupremicaMenuItem(new WorkbenchAction());
 		menuHandler.add(workbench, 1);
+		// JMenuItem testbench = new SupremicaMenuItem(new TestBenchAction());
+		// menuHandler.add(testbench, 1);
 		menuHandler.addSeparator();
 
 		JMenuItem purgeItem = new JMenuItem("Purge");

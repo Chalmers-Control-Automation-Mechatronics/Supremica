@@ -2159,48 +2159,35 @@ public class ActionMan
 			return;
 		}
 
-		/*
-		if (selectedAutomata.size() < 1)
-		{
-				JOptionPane.showMessageDialog(gui.getFrame(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
-				return;
-		}
-		*/
 		Iterator autIt = selectedAutomata.iterator();
-
 		while (autIt.hasNext())
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
 
-			//String currAutomatonName = currAutomaton.getName();
-			int maxNbrOfStates = SupremicaProperties.getDotMaxNbrOfStatesWithoutWarning();
-
-			if (maxNbrOfStates < currAutomaton.nbrOfStates())
-			{
-
-				// Why isn't this in AutomatonViewer??
-				// Every user of AutomatonViewer has to manage this for himself!?
-				String msg = currAutomaton + " has " + currAutomaton.nbrOfStates() + " states. It is not recommended to display an automaton with more than " + maxNbrOfStates + " states. Do you want to abort viewing?";
-
-				msg = EncodingHelper.linebreakAdjust(msg);
-
-				int res = JOptionPane.showOptionDialog(gui.getFrame(), msg, "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null);
-
-				if (res == 0)
-				{
-
-					// Abort - YES
-					return;
-				}
-			}
-
-			/*
-			if (!currAutomaton.hasInitialState())
-			{
-					JOptionPane.showMessageDialog(gui.getFrame(), "The automaton does not have an initial state!", "Alert", JOptionPane.ERROR_MESSAGE);
-					return;
-			}
-			*/
+			/*-- Now in VisulaProject::getAutomatonViewer
+			 *
+			 *	//String currAutomatonName = currAutomaton.getName();
+			 *	int maxNbrOfStates = SupremicaProperties.getDotMaxNbrOfStatesWithoutWarning();
+			 *
+			 *	if (maxNbrOfStates < currAutomaton.nbrOfStates())
+			 *	{
+			 *	
+			 *	// Why isn't this in AutomatonViewer??
+			 *	// Every user of AutomatonViewer has to manage this for himself!?
+			 *	String msg = currAutomaton + " has " + currAutomaton.nbrOfStates() + " states. It is not recommended to display an automaton with more than " + maxNbrOfStates + " states. Do you want to abort viewing?";
+			 *
+			 *	msg = EncodingHelper.linebreakAdjust(msg);
+			 *
+			 *	int res = JOptionPane.showOptionDialog(gui.getFrame(), msg, "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null);
+			 *
+			 *	if (res == 0)
+			 *	{
+			 *		// Abort - YES
+			 *		return;
+			 *	}
+			 *	}
+			 */
+			
 			try
 			{
 				AutomatonViewer viewer = gui.getVisualProjectContainer().getActiveProject().getAutomatonViewer(currAutomaton.getName());

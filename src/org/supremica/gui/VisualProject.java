@@ -68,6 +68,7 @@ import org.supremica.util.ResourceClassLoader;
 import org.swixml.SwingEngine;
 //import org.swixml.Localizer;
 import org.supremica.util.SupremicaException;
+import org.supremica.automata.IO.EncodingHelper; // should really be in the util-package, not?
 
 /**
  * VisualProject is responsible for keeping track of all windows and other "visual" resources
@@ -83,11 +84,11 @@ public class VisualProject
 	private Animator theAnimator = null;    // Lazy construction
 	private SwingEngine theSwingEngine = null;    // Lazy construction
 	private Container theUserInterface = null;    // Lazy construction
-	private HashMap theAutomatonViewerContainer = new HashMap();
 	private SimulatorExecuter theSimulator = null;    // Lazy construction
 	private RecipeEditor theRecipeEditor = null;    // Lazy construction
 	private JGrafchartSupremicaEditor theJGrafchartEditor = null;    // Lazy construction
 	private CellEditor theCellEditor = null;    // Lazy construction
+	private HashMap theAutomatonViewerContainer = new HashMap();
 	private HashMap theAutomatonExplorerContainer = new HashMap();
 	private HashMap theAutomatonFrameContainer = new HashMap();
 	private HashMap theAutomatonDocumentContainer = new HashMap();
@@ -303,45 +304,113 @@ public class VisualProject
 		this.projectFile = projectFile;
 	}
 
+	/* This code is no good, but slightly better now.
+	 * The default behavior was (and is) to create a new viewer if none existed
+	 * Now there is at least a possibility to simply ask for viewers and not have
+	 * new ones generated if none already exists (however, if a non-visible viewer exists
+	 * it will be shown, is this good?). It is also possible to reuse this code
+	 * for using your own personal favorite viewer, that's what factories are for.
+	 * Note that the previous (bad) default behavior is preserved.
+	 *
+	 * Suggestion for better code. Break this into three functions
+	 * existsAutomatonViewer, createAutomatonViewer, returnAutomatonViewer
+	 * None of these should alter the visibility of the viewer!
+	 * This would also solve the exception problem that occurs when you simply want to
+	 * as whether a viewer exists for a certain automaton..
+	 */
 	public AutomatonViewer getAutomatonViewer(String automatonName)
 		throws Exception
 	{
-		if (theAutomatonViewerContainer.containsKey(automatonName))
+		return getAutomatonViewer(automatonName, new DefaultAutomatonViewerFactory());
+	}
+
+	public AutomatonViewer getAutomatonViewer(String automatonName, AutomatonViewerFactory maker)
+		throws Exception
+	{
+		Automaton automaton = getAutomaton(automatonName);
+		if(automaton == null)
 		{
-			AutomatonViewer viewer = (AutomatonViewer) theAutomatonViewerContainer.get(automatonName);
-
-			viewer.setVisible(true);
-			viewer.setState(Frame.NORMAL);
-
-			return viewer;
+			throw new SupremicaException(automatonName + " does not exist in VisualProjectContainer");		
 		}
-		else
+		
+		if (existsAutomatonViewer(automaton)) 
 		{
-			Automaton currAutomaton = getAutomaton(automatonName);
-
-			if (currAutomaton != null)
+			if(showAutomatonViewer(automaton))
 			{
-				try
-				{
-					AutomatonViewer viewer = new AutomatonViewer(currAutomaton);
+				AutomatonViewer viewer = returnAutomatonViewer(automaton);
 
-					theAutomatonViewerContainer.put(automatonName, viewer);
+				viewer.setVisible(true);
+				viewer.setState(Frame.NORMAL);
+
+				return viewer;
+			}
+			else return null; // null here means "viewer exists but user cancelled due to large num states"
+		}
+		else if(maker != null)
+		{
+			try
+			{
+				if(showAutomatonViewer(automaton))
+				{
+					AutomatonViewer viewer = createAutomatonViewer(automaton, maker);
 					viewer.setVisible(true);
 
 					return viewer;
 				}
-				catch (Exception ex)
-				{
-					throw new SupremicaException("Error while viewing: " + automatonName);
-				}
+				else return null;	// null here means "viewer not created since user cancelled due to large state-space"
 			}
-			else
+			catch (Exception ex)
 			{
-				throw new SupremicaException(automatonName + " does not exist in VisualProjectContainer");
+				throw new SupremicaException("Error while viewing: " + automatonName);
 			}
 		}
+		else
+		{
+			return null; // null here means "no viewer exists and you didn't want me to construct a new one"
+		}
 	}
+	
+	// This is what it should really be like, one task - one function...
+	public boolean showAutomatonViewer(Automaton automaton)
+	{
+		int maxNbrOfStates = SupremicaProperties.getDotMaxNbrOfStatesWithoutWarning();
+		if (maxNbrOfStates < automaton.nbrOfStates())
+		{
+			String msg = automaton.getName() + " has " + automaton.nbrOfStates() + " states. It is not recommended to display an automaton with more than " + maxNbrOfStates + " states.";
+			msg = EncodingHelper.linebreakAdjust(msg);
 
+			Object[] options = { "Continue", "Abort" };
+			int response = JOptionPane.showOptionDialog(ActionMan.gui.getFrame(), msg, "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[1]);
+			if(response == JOptionPane.NO_OPTION)
+			{
+				return false; // user chose to "Abort"
+			}	
+		}
+		
+		return true;
+	}
+	
+	// When will any of these throw an exception?? When automaton == null, but else...?
+	public boolean existsAutomatonViewer(Automaton automaton)
+		throws Exception
+	{
+		return theAutomatonViewerContainer.containsKey(automaton.getName());
+	}
+	
+	public AutomatonViewer returnAutomatonViewer(Automaton automaton)
+		throws Exception
+	{
+		return (AutomatonViewer) theAutomatonViewerContainer.get(automaton.getName());
+	}
+	
+	public AutomatonViewer createAutomatonViewer(Automaton automaton, AutomatonViewerFactory maker)
+		throws Exception
+	{
+		AutomatonViewer viewer = maker.createAutomatonViewer(automaton);
+		theAutomatonViewerContainer.put(automaton.getName(), viewer);
+		return viewer;	
+	}
+	
 	public JInternalFrame getAutomatonFrame(String automatonName)
 		throws Exception
 	{

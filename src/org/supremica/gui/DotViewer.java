@@ -507,6 +507,7 @@ public class DotViewer
 				logger.error("Error while viewing " + objectName, ex);
 				logger.debug(ex.getStackTrace());
 			}
+
 		}
 	}
 
@@ -977,6 +978,7 @@ class Builder
 
 	public void run()
 	{
+		theViewer.setCursor(java.awt.Cursor.WAIT_CURSOR);
 		if (mode == BUILD)
 		{
 			try
@@ -987,6 +989,7 @@ class Builder
 			{
 				logger.error("Cannot display object.");
 				logger.debug(ex.getStackTrace());
+				theViewer.setCursor(java.awt.Cursor.DEFAULT_CURSOR);
 
 				return;
 			}
@@ -999,6 +1002,7 @@ class Builder
 		{
 			theViewer.draw();
 		}
+		theViewer.setCursor(java.awt.Cursor.DEFAULT_CURSOR);
 	}
 
 	public void stopProcess()
@@ -1006,6 +1010,7 @@ class Builder
 		if (theViewer != null)
 		{
 			theViewer.stopProcess();
+			theViewer.setCursor(java.awt.Cursor.DEFAULT_CURSOR);
 		}
 	}
 }
