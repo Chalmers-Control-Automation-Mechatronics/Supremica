@@ -119,7 +119,7 @@ public class AutomataToHierarchyToDot
 			return ", color = green";
 		}
 
-		return "";
+		return ", color = white";
 	}
 
 	public void serialize(PrintWriter pw)
@@ -145,8 +145,11 @@ public class AutomataToHierarchyToDot
 			pw.println("\tnode [shape = ellipse];");
 		}
 		// Filled?
-		pw.println("\tnode [style = filled];");
-
+		if (useColors)
+		{
+			pw.println("\tnode [style = filled];");
+		}
+		
 		// The automata are nodes in the graph		
 		//for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
 		for (int i=0; i<theAutomata.size(); i++)
@@ -170,9 +173,16 @@ public class AutomataToHierarchyToDot
 				Automaton otherAutomaton = theAutomata.getAutomatonAt(j);
 				Alphabet otherAlphabet = otherAutomaton.getAlphabet();
 				
-				if (currAlphabet.nbrOfCommonEvents(otherAlphabet) > 0)
+				int weight = currAlphabet.nbrOfCommonEvents(otherAlphabet);
+				if (weight > 0)
 				{
-					pw.println("\t\"" + currAutomaton.getName() + "\" -- \"" + otherAutomaton.getName() + "\"[weight = 0.0];");		
+					//pw.print("\t\"" + currAutomaton.getName() + "\" -- \"" + otherAutomaton.getName() + "\";");
+					pw.print("\t\"" + currAutomaton.getName() + "\" -- \"" + otherAutomaton.getName() + "\" ");
+					if (weight == 1)
+						pw.print("[style = dashed, ");
+					if (weight > 1)
+						pw.print("[style = solid, ");
+					pw.println("label = " + weight + "];");
 				}
 			}
 		}
