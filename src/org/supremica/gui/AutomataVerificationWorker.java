@@ -187,12 +187,12 @@ public class AutomataVerificationWorker
 			{
 				if (isControllable)
 				{
-					JOptionPane.showMessageDialog(workbench.getFrame(), "The automata is controllable!",
+					JOptionPane.showMessageDialog(workbench.getFrame(), "The system is controllable!",
 												  "Good news", JOptionPane.INFORMATION_MESSAGE);
 				}
 				else
 				{
-					JOptionPane.showMessageDialog(workbench.getFrame(), "The automata is NOT controllable!",
+					JOptionPane.showMessageDialog(workbench.getFrame(), "The system is NOT controllable!",
 												  "Bad news", JOptionPane.INFORMATION_MESSAGE);
 				}
 			}

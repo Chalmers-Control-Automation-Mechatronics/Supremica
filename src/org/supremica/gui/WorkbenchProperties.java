@@ -129,7 +129,6 @@ public final class WorkbenchProperties
 		setProperty(SYNTHESIS_PURGE, "true");
 		setProperty(SYNTHESIS_OPTIMIZE, "true");
 		setProperty(SYNTHESIS_MAXIMALLY_PERMISSIVE, "true");
-
 		setProperty(GENERAL_USE_SECURITY, "false");
 	}
 
