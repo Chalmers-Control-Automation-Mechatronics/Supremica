@@ -146,8 +146,10 @@ public class Automata
 		total_size_allocated = Math.pow(2, variable_count);
 		variable_count = variable_count * 3 + Util.log2ceil(alphabet.getSize());
 
-		if(Options.debug_on || Options.profile_on)
+		if(Options.debug_on || Options.profile_on) {
 			Options.out.println("The theoretical number of states is " + Util.showHugeNumber( total_size));
+			Options.out.println("Universe size is " + Util.showHugeNumber( total_size_allocated));
+		}
 
 		// .... and, we are done
 		closed = true;
