@@ -57,7 +57,8 @@ import org.supremica.automata.*;
 import org.supremica.automata.IO.*;
 import org.supremica.properties.*;
 
-import helma.xmlrpc.*;
+// import helma.xmlrpc.*;
+import org.apache.xmlrpc.*;
 
 public class Server
 {
@@ -115,6 +116,7 @@ public class Server
 		XmlRpc.setDebug( SupremicaProperties.isXmlRpcDebugging() );
 
 		theServer.addHandler("$default", this);
+		theServer.start();
 
 	}
 
