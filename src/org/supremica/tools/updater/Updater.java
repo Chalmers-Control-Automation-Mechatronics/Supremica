@@ -53,9 +53,14 @@ import java.io.*;
 import java.util.*;
 import java.net.*;
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+
 
 public class Updater
+	extends JFrame
 {
+/*
 	private String host = null;
 	private Properties localProperties = null;
 	private Properties remoteProperties = null;
@@ -63,10 +68,84 @@ public class Updater
 	private static final String SupremicaFilename = "Supremica.jar";
 	private static final String SupremicaVersionFilename = "SupremicaVersion.cfg";
 
-	public Updater(String host)
-	{
-		this.host = host;
-	}
+    public final static int ONE_SECOND = 1000;
+
+    private ProgressMonitor progressMonitor;
+    private Timer timer;
+    private JButton startButton;
+    private LongTask task;
+    private JTextArea taskOutput;
+    private String newline = "\n";
+
+    public Updater(String host) {
+        super("Supremica Updater");
+        this.host = host;
+        task = new LongTask();
+
+        //Create the demo's UI.
+        startButton = new JButton("Update");
+        startButton.setActionCommand("start");
+        startButton.addActionListener(new ButtonListener());
+
+        taskOutput = new JTextArea(5, 20);
+        taskOutput.setMargin(new Insets(5,5,5,5));
+        taskOutput.setEditable(false);
+
+        JPanel contentPane = new JPanel();
+        contentPane.setLayout(new BorderLayout());
+        contentPane.add(startButton, BorderLayout.NORTH);
+        contentPane.add(new JScrollPane(taskOutput), BorderLayout.CENTER);
+        contentPane.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        setContentPane(contentPane);
+
+        //Create a timer.
+        timer = new Timer(ONE_SECOND, new TimerListener());
+    }
+
+    //
+    // The actionPerformed method in this class
+    // is called each time the Timer "goes off".
+    //
+    class TimerListener implements ActionListener {
+        public void actionPerformed(ActionEvent evt) {
+            if (progressMonitor.isCanceled() || task.done()) {
+                progressMonitor.close();
+                task.stop();
+                Toolkit.getDefaultToolkit().beep();
+                timer.stop();
+                if (task.done()) {
+                    taskOutput.append("Task completed." + newline);
+                }
+                startButton.setEnabled(true);
+            } else {
+                progressMonitor.setNote(task.getMessage());
+                progressMonitor.setProgress(task.getCurrent());
+                taskOutput.append(task.getMessage() + newline);
+                taskOutput.setCaretPosition(
+                    taskOutput.getDocument().getLength());
+            }
+        }
+    }
+
+    //
+    // The actionPerformed method in this class
+    // is called when the user presses the start button.
+    //
+    class ButtonListener implements ActionListener {
+        public void actionPerformed(ActionEvent evt) {
+            progressMonitor = new ProgressMonitor(ProgressMonitorDemo.this,
+                                      "Downloading",
+                                      "", 0, task.getLengthOfTask());
+            progressMonitor.setProgress(0);
+            progressMonitor.setMillisToDecideToPopup(2 * ONE_SECOND);
+
+            startButton.setEnabled(false);
+            task.go();
+            timer.start();
+        }
+    }
+
+
 
 	public void loadProperties()
 		throws Exception
@@ -81,13 +160,18 @@ public class Updater
 		remoteStream.close();
 	}
 
-	public boolean updateNeeded()
+	public boolean doUpdate()
 		throws Exception
 	{
 		loadProperties();
-		if (localProperties == null || remoteProperties == null)
+		if (localProperties == null)
 		{
 			return true;
+		}
+		if (remoteProperties == null)
+		{
+			JOptionPane.showMessageDialog(this, "Could not find information about new Supremica versions.\nUpdate aborted.", "Information", JOptionPane.ERROR_MESSAGE);
+			return false;
 		}
 		String localVersion = localProperties.getProperty("SupremicaVersion");
 		String remoteVersion = remoteProperties.getProperty("SupremicaVersion");
@@ -95,14 +179,31 @@ public class Updater
 		{
 			return true;
 		}
-		return !localVersion.equalsIgnoreCase(remoteVersion);
+		if (localVersion.equalsIgnoreCase(remoteVersion))
+		{
+			JOptionPane.showMessageDialog(this, "Supremica is up to date.\nCurrent version is: " + localVersion, "Information", JOptionPane.INFORMATION_MESSAGE);
+			return false;
+		}
+
+		int response = JOptionPane.showConfirmDialog(this, "Installed version: " + localVersion + "\nNew version: " + remoteVersion + "\n\nUpdate Supremica", "Update Supremica", JOptionPane.YES_NO_OPTION);
+		if (response == JOptionPane.YES_OPTION)
+		{
+			return true;
+		}
+		return false;
 	}
 
 	public void writeLocalFile(InputStream iStream, File outFile)
 		throws Exception
 	{
+		try
+		{
 		FileOutputStream outStream = new FileOutputStream(outFile);
-		BufferedInputStream bIStream = new BufferedInputStream(iStream);
+		ProgressMonitorInputStream progressMonitorStream =
+			new ProgressMonitorInputStream(this, "Reading", iStream);
+		BufferedInputStream bIStream = new BufferedInputStream(progressMonitorStream);
+		ProgressMonitor monitor = progressMonitorStream.getProgressMonitor();
+
 		byte[] buffer = new byte[1024];
 		int offset = 0;
 		int nbrOfReadBytes = 0;
@@ -112,19 +213,25 @@ public class Updater
 			if (nbrOfReadBytes >= 0)
 			{
 				outStream.write(buffer, offset, nbrOfReadBytes);
-				offset = offset + nbrOfReadBytes;
 			}
 		}
 		while (nbrOfReadBytes >= 0);
 		outStream.flush();
 		outStream.close();
+		}
+		catch (Exception e)
+		{
+			System.err.println(e);
+			e.printStackTrace();
+		}
 	}
 
 	public InputStream getRemoteFile(String fileName)
 		throws Exception
 	{
 		URL url = new URL(host + fileName);
-		HttpURLConnection httpConnection = (HttpURLConnection)url.openConnection();
+		HttpURLConnection httpConnection;
+		httpConnection = (HttpURLConnection)url.openConnection();
 		httpConnection.connect();
 		InputStream iStream = httpConnection.getInputStream();
 		return iStream;
@@ -142,20 +249,88 @@ public class Updater
 	public void update()
 		throws Exception
 	{
-		if (!updateNeeded())
+		if (!doUpdate())
 		{
 			return;
 		}
-		File newSupremicaVersionFile = new File("tmp_ " + SupremicaVersionFilename);
+		File newSupremicaVersionFile = new File("tmp_" + SupremicaVersionFilename);
 		File newSupremicaFile = new File("tmp_" + SupremicaFilename);
-		writeLocalFile(getRemoteFile(SupremicaVersionFilename), newSupremicaVersionFile);
-		writeLocalFile(getRemoteFile(SupremicaFilename), newSupremicaFile);
+		InputStream remoteSupremicaVersionStream;
+		InputStream remoteSupremicaStream;
+		try
+		{
+			remoteSupremicaVersionStream = getRemoteFile(SupremicaVersionFilename);
+		}
+		catch (Exception e)
+		{
+			JOptionPane.showMessageDialog(this,"Error downloading: " + SupremicaVersionFilename + ".\nUpdate aborted.", "Download error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		try
+		{
+			remoteSupremicaStream = getRemoteFile(SupremicaFilename);
+		}
+		catch (Exception e)
+		{
+			JOptionPane.showMessageDialog(this,"Error downloading: " + SupremicaFilename + ".\nUpdate aborted.", "Download error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		try
+		{
+			writeLocalFile(remoteSupremicaVersionStream, newSupremicaVersionFile);
+		}
+		catch (Exception e)
+		{
+			JOptionPane.showMessageDialog(this,"Error writing file: " + newSupremicaVersionFile + ".\nUpdate aborted.", "File access error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		try
+		{
+			writeLocalFile(remoteSupremicaStream, newSupremicaFile);
+		}
+		catch (Exception e)
+		{
+			JOptionPane.showMessageDialog(this,"Error writing file: " + newSupremicaFile + ".\nUpdate aborted.", "File access error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
 		File orgSupremicaVersionFile = new File(SupremicaVersionFilename);
 		File orgSupremicaFile = new File(SupremicaFilename);
-		orgSupremicaVersionFile.delete();
-		orgSupremicaFile.delete();
-		newSupremicaVersionFile.renameTo(orgSupremicaVersionFile);
-		newSupremicaFile.renameTo(orgSupremicaFile);
+		try
+		{
+			orgSupremicaVersionFile.delete();
+		}
+		catch (Exception e)
+		{
+			JOptionPane.showMessageDialog(this,"Error deleting file: " + SupremicaVersionFilename + ".\nUpdate aborted.", "File access error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		try
+		{
+			orgSupremicaFile.delete();
+		}
+		catch (Exception e)
+		{
+			JOptionPane.showMessageDialog(this,"Error deleting file: " + SupremicaFilename + ".\nUpdate aborted.", "File access error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		try
+		{
+			newSupremicaVersionFile.renameTo(orgSupremicaVersionFile);
+		}
+		catch (Exception e)
+		{
+			JOptionPane.showMessageDialog(this,"Error renaming file: " + "tmp_" + SupremicaVersionFilename + " to " + SupremicaVersionFilename + ".\nUpdate aborted.", "File access error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		try
+		{
+			newSupremicaFile.renameTo(orgSupremicaFile);
+		}
+		catch (Exception e)
+		{
+			JOptionPane.showMessageDialog(this,"Error renaming file: " + "tmp_" + SupremicaFilename + " to " + SupremicaFilename + ".\nUpdate aborted.", "File access error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
 	}
 
 
@@ -163,6 +338,13 @@ public class Updater
 	{
 
 		Updater updater = new Updater("http://www.s2.chalmers.se/~ka/supremica/");
+        updater.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                System.exit(0);
+            }
+        });
+        updater.pack();
+        updater.setVisible(true);
 		try
 		{
 			updater.update();
@@ -174,4 +356,6 @@ public class Updater
 
 
 	}
+*/
 }
+
