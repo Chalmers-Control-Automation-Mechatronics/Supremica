@@ -193,6 +193,11 @@ public class BaseLI
 	 * we know that some ordering algos are more sutied for this kind of work:
 	 */
 	private void change_order() {
+
+		saved_order = Options.ordering_algorithm;
+
+		/*
+		// TEMPORARLY DISABLED
 		int good_order = Options.AO_HEURISTIC_BFS;
 		if(Options.ordering_algorithm != good_order) {
 			System.err.println("\nNOTE:\n\nFor better performance, Supremica will now use the '"
@@ -200,8 +205,9 @@ public class BaseLI
 				+ "' variable ordering heuristic instead of the choosen heuristic.\n");
 		}
 
-		saved_order = Options.ordering_algorithm;
 		Options.ordering_algorithm = good_order;
+		*/
+
 
 	}
 
