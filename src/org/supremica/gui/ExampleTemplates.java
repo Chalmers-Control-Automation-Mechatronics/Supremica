@@ -61,6 +61,7 @@ public class ExampleTemplates
 	private final TemplateGroup CCSCourseAssignmentSolutions = new TemplateGroup(TemplateTypes.CCSCourseAssignmentSolutions);
 	private final TemplateGroup OtherExamples = new TemplateGroup(TemplateTypes.OtherExample);
 	private final TemplateGroup AIPExamples = new TemplateGroup(TemplateTypes.AIPExample);
+	private final TemplateGroup OperatorSupervisorExamples = new TemplateGroup(TemplateTypes.OperatorSupervisorExample);
 	private final TemplateGroup StandardComponents = new TemplateGroup(TemplateTypes.StandardComponent);
 	private static final String extraPrefix = "/includeInJarFile";
 	private List allGroups = new LinkedList();
@@ -78,6 +79,7 @@ public class ExampleTemplates
 		initializeCCSCourseAssignmentSolutions();
 		initializeOtherExamples();
 		initializeAIPExamples();
+		initializeOperatorSupervisorExamples();
 		initializeStandardComponents();
 	}
 
@@ -163,6 +165,18 @@ public class ExampleTemplates
 		thisGroup.addItem(new TemplateItem("AIP System 7 - Top TU 4", prefix + "aip/System7_Top_TU4.xml"));
 
 	}
+
+	private void initializeOperatorSupervisorExamples()
+	{
+		TemplateGroup thisGroup = OperatorSupervisorExamples;
+
+		allGroups.add(thisGroup);
+
+		String prefix = extraPrefix + "/OperatorSupervisor/";
+		thisGroup.addItem(new TemplateItem("Warehouse k=2", prefix + "warehouse_k2.xml"));
+		thisGroup.addItem(new TemplateItem("Warehouse k=13", prefix + "warehouse_k13.xml"));
+	}
+
 
 	private void initializeStandardComponents()
 	{
