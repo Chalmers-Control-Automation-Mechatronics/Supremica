@@ -1,4 +1,4 @@
 #/bin/sh
 
-env LD_LIBRARY_PATH=. java -cp Supremica.jar org.supremica.apps.Supremica -p SupremicaProperties.cfg
+env LD_LIBRARY_PATH=. java -cp Supremica.jar:SupremicaLib.jar org.supremica.apps.Supremica -p SupremicaProperties.cfg
 

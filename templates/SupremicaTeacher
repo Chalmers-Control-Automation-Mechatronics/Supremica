@@ -1,3 +1,3 @@
 #/bin/sh
 
-java -cp Supremica.jar org.supremica.apps.SupremicaTeacher
+java -cp Supremica.jar:SupremicaLib.jar org.supremica.apps.SupremicaTeacher

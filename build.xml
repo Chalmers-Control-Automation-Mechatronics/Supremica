@@ -102,11 +102,7 @@
 	<unjar src="${lib}/natutil.jar" dest="${lib}/${unjared}"/>
 	<unjar src="${lib}/scenebeansXmlCompability.jar" dest="${lib}/${unjared}"/>
 	<unjar src="${lib}/BCEL.jar" dest="${lib}/${unjared}"/>
-    <unjar src="${lib}/concurrent.jar" dest="${lib}/${unjared}"/>
-
-	<!-- jintegra -->
-    <!--unjar src="${lib}/jintegra_reduced_logging.jar" dest="${lib}/${unjared}"/-->
-
+	<unjar src="${lib}/concurrent.jar" dest="${lib}/${unjared}"/>
  	<mkdir dir="${lib}/licensed"/>
  	<touch file="${lib}/licensed/JGo.jar"/>	
  	<touch file="${lib}/licensed/JGoLayout.jar"/>	 	
@@ -281,7 +277,7 @@
 *	and packages all files into a jar file that can
 *	be executed without any other dependencies. 
 -->
-<target name="rebuild" depends="clean,version,build">
+<target name="rebuild" depends="clean,version,build,jar_supremica_lib">
 </target>
 
 <!-- Build:
@@ -310,7 +306,7 @@
 *	and packages all files into a jar file that can
 *	be executed without any other dependencies. 
 -->
-<target name="rebuild_supremica" depends="clean,version,build_supremica">
+<target name="rebuild_supremica" depends="clean,version,build_supremica,jar_supremica_lib">
 </target>
 
 <!-- Rebuild:
@@ -318,7 +314,7 @@
 *	and packages all files into a jar file that can
 *	be executed without any other dependencies. 
 -->
-<target name="rebuild_supremica_student" depends="clean,version,build_supremica_student">
+<target name="rebuild_supremica_student" depends="clean,version,build_supremica_student,jar_supremica_lib">
 </target>
 
 <!-- Rebuild:
@@ -326,7 +322,7 @@
 *	and packages all files into a jar file that can
 *	be executed without any other dependencies. 
 -->
-<target name="rebuild_supremica_teacher" depends="clean,version,build_supremica_teacher">
+<target name="rebuild_supremica_teacher" depends="clean,version,build_supremica_teacher,jar_supremica_lib">
 </target>
 
 
@@ -342,19 +338,18 @@
 *	and packages all files into a jar file that can
 *	be executed without any other dependencies. 
 -->
-<target name="rebuild_jgrafchart" depends="clean,version,build_jgrafchart">
+<target name="rebuild_jgrafchart" depends="clean,version,build_jgrafchart,jar_supremica_lib">
 </target>
 
 <target name="jar_jgrafchart">
 	<jar jarfile="${dist}/Supremica.jar" manifest="${templates}/JGRAFCHART_MANIFEST.MF"> 
 		<fileset dir="${build}"/>
-		<fileset dir="${javalibs.dir}">		
-			<patternset>
-				<include name="com/nwoods/**"/>
-				<include name="se/lth/control/realtime/**"/>
-				<exclude name="com/nwoods/layout/**"/>
-			</patternset>	
-		</fileset>
+	</jar>
+</target>
+
+<target name="jar_supremica_lib">
+	<jar jarfile="${dist}/SupremicaLib.jar"> 
+		<fileset dir="${javalibs.dir}"/>		
 	</jar>
 </target>
 
@@ -369,7 +364,6 @@
 		<fileset dir="${images}"/>
 		<fileset dir="${examples}"/>
 		<fileset dir="${animations}"/>		
-		<fileset dir="${javalibs.dir}"/>		
 		<fileset dir="${runtimesoftplcbuild}"/>	
 	</jar>
 </target>
@@ -389,7 +383,6 @@
 		<fileset dir="${images}"/>
 		<fileset dir="${examples}"/>
 		<fileset dir="${animations}"/>			
-		<fileset dir="${javalibs.dir}"/>		
 		<fileset dir="${runtimesoftplcbuild}"/>	
 	</jar>
 </target>
@@ -400,7 +393,6 @@
 		<fileset dir="${images}"/>
 		<fileset dir="${examples}"/>
 		<fileset dir="${animations}"/>			
-		<fileset dir="${javalibs.dir}"/>		
 		<fileset dir="${runtimesoftplcbuild}"/>	
 	</jar>
 </target>
@@ -411,7 +403,6 @@
 		<fileset dir="${images}"/>
 		<fileset dir="${examples}"/>
 		<fileset dir="${animations}"/>			
-		<fileset dir="${javalibs.dir}"/>	
 		<fileset dir="${runtimesoftplcbuild}"/>	
 
 	</jar>
@@ -531,8 +522,10 @@
 
 <target name="deployNT">
 	<copy file="${dist}/Supremica.jar" todir="H:\public_html\Supremica\updates\noarch"/>	
+	<copy file="${dist}/SupremicaLib.jar" todir="H:\public_html\Supremica\updates\noarch"/>	
 	<copy file="${dist}/SupremicaVersion.txt" todir="H:\public_html\Supremica\updates\noarch"/>
 	<copy file="${dist}/Supremica.jar" todir="U:\temp\SupremicaInstaller\SupremicaDist\Runtime\NoArch"/>	
+	<copy file="${dist}/SupremicaLib.jar" todir="U:\temp\SupremicaInstaller\SupremicaDist\Runtime\NoArch"/>	
 	<copy file="${dist}/SupremicaVersion.txt" todir="U:\temp\SupremicaInstaller\SupremicaDist\Runtime\NoArch"/>	
 	<exec executable="C:\Progra~1\INNOSE~1\iscc.exe">
 		<arg value="U:\temp\SupremicaInstaller\SupremicaDist.iss"/>
