@@ -100,19 +100,16 @@ public class AutomataBuildFromVALID
 
 			if (root.getName() == "graph")
 			{
-
 				// DGRF-file
 				automatonFromDGRF(root, "", "Undefined");
 			}
 			else if (root.getName() == "module")
 			{
-
 				// VMOD-file
 				automataFromVMOD(root, "");
 			}
 			else if (root.getName() == "project")
 			{
-
 				// VPRJ-file
 				automataFromVPRJ(root);
 			}

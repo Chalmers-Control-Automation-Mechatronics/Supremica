@@ -1,4 +1,4 @@
-/******************* PropertiesAction.java *********************/
+/******************* MoveAutomataDownAction.java *********************/
 package org.supremica.gui.useractions;
 
 import java.awt.*;

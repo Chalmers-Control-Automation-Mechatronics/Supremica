@@ -510,6 +510,7 @@ public class ActionMan
 			return;
 		}
 
+		// Avoid automata that can't move any further
 		Iterator autIt;
 		if (directionIsUp)
 		{
@@ -536,6 +537,7 @@ public class ActionMan
 			}
 		}
 
+		// Move automata that can move!
 		Automaton currAutomaton;
 		while (autIt.hasNext())
 		{
@@ -544,6 +546,7 @@ public class ActionMan
 			selectionIndices[index++] = theProject.getAutomatonIndex(currAutomaton);
 		}
 
+		// Update the selection
 		gui.clearSelection();
 		gui.selectAutomata(selectionIndices);
 	}
