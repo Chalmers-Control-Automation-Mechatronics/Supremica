@@ -1,5 +1,5 @@
 <?xml version="1.0" standalone="no" ?>
-<!DOCTYPE vt SYSTEM "vt.dtd">
+<!DOCTYPE vt SYSTEM "file://vt.dtd">
 <vt version="1.0">
     <variables count="6">
         <var index="0" type="enum" domain_size="2"/>
