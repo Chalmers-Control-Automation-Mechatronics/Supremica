@@ -50,12 +50,7 @@
 package org.supremica.automata.IO;
 
 import org.supremica.log.*;
-import org.supremica.automata.Alphabet;
-import org.supremica.automata.AlphabetHelpers;
-import org.supremica.automata.Automata;
-import org.supremica.automata.Automaton;
-import org.supremica.automata.State;
-import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.*;
 import java.io.*;
 import java.util.*;
 
@@ -64,9 +59,14 @@ public class AutomataToSattLineSFC
 {
 	private static Logger logger = LoggerFactory.createLogger(AutomataToSattLineSFC.class);
 
-	public AutomataToSattLineSFC(Automata automata)
+	public AutomataToSattLineSFC(Project theProject)
 	{
-		super(automata);
+		this(theProject, (SattLineHelper)SattLineHelper.getInstance());
+	}
+
+	public AutomataToSattLineSFC(Project theProject, IEC61131Helper theHelper)
+	{
+		super(theProject, theHelper);
 	}
 
 	public void serialize(String filename)
@@ -77,10 +77,12 @@ public class AutomataToSattLineSFC
 	{    // Empty
 	}
 
-	public void serialize_s(PrintWriter pw)
+	public void serialize_s(File theFile, String filename)
+		throws Exception
 	{
+		PrintWriter pw = new PrintWriter(new FileWriter(theFile));
 
-		// Start of file header
+		/*// Start of file header
 		Date theDate = new Date();
 
 		//logger.info(theDate.toString());
@@ -88,9 +90,9 @@ public class AutomataToSattLineSFC
 		pw.println("\"Original file date: ---\"");
 		pw.print("\"Program date: 2001-08-10-10:42:24.724, name: ");    // Should perhaps get current date and time
 
-		if (automata.getName() != null)
+		if (theProject.getName() != null)
 		{
-			pw.println(" " + automata.getName().replace('.', '_') + " \"");
+			pw.println(" " + theProject.getName().replace('.', '_') + " \"");
 		}
 		else
 		{
@@ -98,23 +100,30 @@ public class AutomataToSattLineSFC
 		}
 
 		pw.println("(* This program unit was created by Supremica. *)");
-		pw.println("");
+		pw.println("");*/
+
+		theHelper.printBeginProgram(pw, filename);
 
 		// End of file header
-		// Start of BasePicture Invocation
+		/*// Start of BasePicture Invocation
 		pw.println("BasePicture Invocation");
 		pw.println("   ( 0.0 , 0.0 , 0.0 , 1.0 , 1.0 ");
 		pw.println("    ) : MODULEDEFINITION DateCode_ 492916896 ( GroupConn = ProgStationData.");    // Don't know importance of DateCode
-		pw.println("GroupProgFast )\n");
+		pw.println("GroupProgFast )\n");*/
+
+		((SattLineHelper) theHelper).printBasePictureInvocation(pw);
 
 		// Start of variable declarations
-		pw.println("LOCALVARIABLES");
+		/*pw.println("LOCALVARIABLES");*/
+		((SattLineHelper) theHelper).printBeginLocalVariables(pw);
+
+		// Output local variables
 
 		Alphabet unionAlphabet = null;
 
 		try
 		{
-			unionAlphabet = AlphabetHelpers.getUnionAlphabet(automata);
+			unionAlphabet = AlphabetHelpers.getUnionAlphabet(theProject);
 		}
 		catch (Exception ex)
 		{
@@ -160,135 +169,65 @@ public class AutomataToSattLineSFC
 		}
 
 		pw.println(": boolean;");
-		pw.println("ProgStationData: ProgStationData;\n");
+
+		// End of output of local variables
+		//pw.println("ProgStationData: ProgStationData;\n");
+		((SattLineHelper) theHelper).printEndLocalVariables(pw);
 
 		// End of variable declarations.
 		// Start of submodule invocations
-		pw.println("SUBMODULES");
+		/*pw.println("SUBMODULES");
 		pw.println("ProgStationControl1 Invocation");
-		pw.println("( 1.18 , 0.72 , 0.0 , 0.1 , 0.1 ) : ProgStationControl;");
+		pw.println("( 1.18 , 0.72 , 0.0 , 0.1 , 0.1 ) : ProgStationControl;");*/
+		((SattLineHelper) theHelper).printSubModules(pw);
 
 		// End of submodule invocations
 		// Start of Module definition.
-		pw.println("ModuleDef");
+		/*pw.println("ModuleDef");
 		pw.println("ClippingBounds = ( -10.0 , -10.0 ) ( 10.0 , 10.0 )");
 		pw.println("ZoomLimits = 0.0 0.01\n");
 
 		// End of Module definition
 		// Start of Module code.
-		pw.println("ModuleCode\n");
+		pw.println("ModuleCode\n");*/
+		((SattLineHelper) theHelper).printBeginModuleDefinition(pw);
 
 		// Here comes the automata, the tricky part.
-		for (Iterator automataIt = automata.iterator(); automataIt.hasNext(); )
-		{
+		automatonConverter(theProject, pw);
 
-			// Each automaton is translated into a SattLine Sequence.
-			// A sequence has the following structure. Step - Transition - Step - Transition ...
-			// A step may be followed by an ALTERNATIVSEQuence which has ALTERNATIVEBRANCHes.
-			// This is the case if there is more than one transition from a state.
-			// The difficulty is to know when the alternative branches merge, and if they do it the "SattLine way".
-			// A transition may be followed by a PARALLELSEQuence which has PARALLELBRANCHes.
-			// This cannot happen for an automaton.
-			Automaton aut = (Automaton) automataIt.next();
-
-			aut.clearVisitedStates();
-
-			transitionCounter = 1;
-
-			if (aut.getName().length() > 16)
-			{
-				logger.warn("The name of automaton " + aut.getName() + " is too long. Identifiers are limited to 20 characters in SattLine. The new name is Automaton_" + automatonCounter);
-				aut.setName("Automaton_" + automatonCounter++);
-			}
-
-			// If there is _no_ ordinary, that is, non-fork, arc to the first step in drawing order it is an OPENSEQUENCE.
-			// Won't check that for now ...
-			// Might want to parameterise COORD so that sequences are not drawn on top of each other.
-			State initState = aut.getInitialState();
-
-			if (initState.nbrOfIncomingArcs() > 0)
-			{
-				pw.println("SEQUENCE " + aut.getName().replace('.', '_') + coord);
-			}
-			else
-			{
-				pw.println("OPENSEQUENCE " + aut.getName().replace('.', '_') + coord);
-			}
-
-			printSequence(aut, initState, pw);
-			aut.clearVisitedStates();
-
-			if (initState.nbrOfIncomingArcs() > 0)
-			{
-				pw.println("ENDSEQUENCE\n\n");
-			}
-			else
-			{
-				pw.println("ENDOPENSEQUENCE\n\n");
-			}
-		}    // End of automata conversion
 
 		// Event Monitors should be generated here.
-		generateEventMonitors(automata, pw);
+		generateEventMonitors(theProject, pw);
 
 		// End of Module code
-		pw.println("ENDDEF (*BasePicture*);");
+		//pw.println("ENDDEF (*BasePicture*);");
+		theHelper.printEndProgram(pw);
 
 		// End of BasePicture
+		pw.close();
 	}
 
-	public void serialize_g(PrintWriter pw)
+	public void serialize_g(File theFile, String filename)
+		throws Exception
 	{
-		pw.println("\" Syntax version 2.19, date: 2001-08-10-10:42:24.724 N \" ");
+		PrintWriter theWriter = new PrintWriter(new FileWriter(theFile));
+		((SattLineHelper) theHelper).printGFile(theWriter, filename);
+		theWriter.close();
 	}
 
-	public void serialize_p(PrintWriter pw)
+	public void serialize_p(File theFile, String filename)
+		throws Exception
 	{
-		pw.println("DistributionData");
-		pw.println(" ( Version \"Distributiondata version 1.0\" )");
-		pw.println("SourceCodeSystems");
-		pw.println(" (  )");
-		pw.println("ExecutingSystems");
-		pw.println(" (  )");
+		PrintWriter theWriter = new PrintWriter(new FileWriter(theFile));
+		((SattLineHelper) theHelper).printLFile(theWriter, filename);
+		theWriter.close();
 	}
 
-	public void serialize_l(PrintWriter pw)
+	public void serialize_l(File theFile, String filename)
+		throws Exception
 	{
-		pw.println("nucleuslib");
-	}
-
-	protected String getTransitionConditionPrefix()
-	{
-		return " WAIT_FOR ";
-	}
-
-	protected String getTransitionConditionSuffix()
-	{
-		return "";
-	}
-	protected String getCoord()
-	{
-		// Should perhaps parameterise COORD
-		return " COORD -0.5, 0.5 OBJSIZE 0.5, 0.5";
-	}
-
-	protected String getActionP1Prefix()
-	{
-		return "ENTERCODE";
-	}
-
-	protected String getActionP1Suffix()
-	{
-		return "";
-	}
-
-	protected String getActionP0Prefix()
-	{
-		return "EXITCODE";
-	}
-
-	protected String getActionP0Suffix()
-	{
-		return "";
+		PrintWriter theWriter = new PrintWriter(new FileWriter(theFile));
+		((SattLineHelper) theHelper).printPFile(theWriter, filename);
+		theWriter.close();
 	}
 }

@@ -269,6 +269,20 @@ public class Events
 		return nbrOfFoundEvents;
 	}
 
+	public int nbrOfUncontrollableEvents()
+	{
+		int nbrOfFoundEvents = 0;
+		for (EventIterator evIt = iterator(); evIt.hasNext(); )
+		{
+			LabeledEvent currEvent = evIt.nextEvent();
+			if (!currEvent.isControllable())
+			{
+				nbrOfFoundEvents++;
+			}
+		}
+		return nbrOfFoundEvents;
+	}
+
 	/**
 	 * Returns the number of unobservable events, epsilon events
 	 * are assumed to be unobservable

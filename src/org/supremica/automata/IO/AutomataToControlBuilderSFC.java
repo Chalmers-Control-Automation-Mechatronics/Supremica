@@ -50,13 +50,7 @@
 package org.supremica.automata.IO;
 
 import org.supremica.log.*;
-import org.supremica.automata.Alphabet;
-import org.supremica.automata.AlphabetHelpers;
-import org.supremica.automata.Arc;
-import org.supremica.automata.Automata;
-import org.supremica.automata.Automaton;
-import org.supremica.automata.State;
-import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.*;
 import java.io.*;
 import java.util.*;
 
@@ -64,24 +58,23 @@ public class AutomataToControlBuilderSFC
 	implements AutomataSerializer
 {
 	private static Logger logger = LoggerFactory.createLogger(AutomataToControlBuilderSFC.class);
+	protected ControlBuilderHelper theHelper = null;
 	private String fileName = null;
-	protected Automata automata;
-	protected Automaton automaton;
+	protected Project theProject;
 	protected boolean debugMode = false;
 	protected int transitionCounter = 0;
 	protected int eventMonitorCounter = 0;
 	protected int automatonCounter = 1;
-	protected String coord = getCoord();
-	protected String transitionConditionPrefix = getTransitionConditionPrefix();
-	protected String transitionConditionSuffix = getTransitionConditionSuffix();
-	protected String actionP1Prefix = getActionP1Prefix();
-	protected String actionP1Suffix = getActionP1Suffix();
-	protected String actionP0Prefix = getActionP0Prefix();
-	protected String actionP0Suffix = getActionP0Suffix();
 
-	public AutomataToControlBuilderSFC(Automata automata)
+	public AutomataToControlBuilderSFC(Project theProject)
 	{
-		this.automata = automata;
+		this(theProject, ControlBuilderHelper.getInstance());
+	}
+
+	public AutomataToControlBuilderSFC(Project theProject, IEC61131Helper theHelper)
+	{
+		this.theProject = theProject;
+		this.theHelper = (ControlBuilderHelper)theHelper;
 	}
 
 	public void serialize(String fileName)
@@ -141,7 +134,7 @@ public class AutomataToControlBuilderSFC
 
 		try
 		{
-			unionAlphabet = AlphabetHelpers.getUnionAlphabet(automata);
+			unionAlphabet = AlphabetHelpers.getUnionAlphabet(theProject);
 		}
 		catch (Exception ex)
 		{
@@ -169,58 +162,10 @@ public class AutomataToControlBuilderSFC
 		// End of variable declarations.
 
 		// Here comes the automata, the tricky part.
-		for (Iterator automataIt = automata.iterator(); automataIt.hasNext(); )
-		{
-
-			// Each automaton is translated into a ControlBuilder Sequence.
-			// A sequence has the following structure. Step - Transition - Step - Transition ...
-			// A step may be followed by an ALTERNATIVSEQuence which has ALTERNATIVEBRANCHes.
-			// This is the case if there is more than one transition from a state.
-			// The difficulty is to know when the alternative branches merge, and if they do it the "ControlBuilder way".
-			// A transition may be followed by a PARALLELSEQuence which has PARALLELBRANCHes.
-			// This cannot happen for an automaton.
-			Automaton aut = (Automaton) automataIt.next();
-
-			aut.clearVisitedStates();
-
-			transitionCounter = 1;
-
-			if (aut.getName().length() > 28)
-			{
-				logger.warn("The name of automaton " + aut.getName() + " is too long. Identifiers are limited to 32 characters in ControlBuilder. The new name is Automaton_" + automatonCounter);
-				aut.setName("Automaton_" + automatonCounter++);
-			}
-
-			// If there is _no_ ordinary, that is, non-fork, arc to the first step in drawing order it is an OPENSEQUENCE.
-			// Is this reaaly correct? Won't check that for now ...
-			// OPENSEQUENCE might not be supported in ControlBuilder
-			// COORD must be same for all sequences? Should probably be obsoleted.
-			State initState = aut.getInitialState();
-
-			if (initState.nbrOfIncomingArcs() > 0)
-			{
-				pw.println("SEQUENCE " + aut.getName().replace('.', '_') + "  (SeqControl)" + coord);
-			}
-			else
-			{
-				pw.println("OPENSEQUENCE " + aut.getName().replace('.', '_') + "  (SeqControl)" + coord);
-			}
-
-			printSequence(aut, initState, pw);
-			aut.clearVisitedStates();
-
-			if (initState.nbrOfIncomingArcs() > 0)
-			{
-				pw.println("ENDSEQUENCE\n\n");
-			}
-			else
-			{
-				pw.println("ENDOPENSEQUENCE\n\n");
-			}
-		}    // End of automata conversion
+		automatonConverter(theProject, pw);
 
 		// Event Monitors should be generated here.
-		generateEventMonitors(automata, pw);
+		generateEventMonitors(theProject, pw);
 
 		// End of Program code
 		pw.println("END_PROGRAM;\n");
@@ -260,7 +205,60 @@ public class AutomataToControlBuilderSFC
 		pw.println(" ( ColorModel HLS\n )");
 	}
 
-	protected void generateEventMonitors(Automata theAutomata, PrintWriter pw)
+	protected void automatonConverter(Project theProject, PrintWriter pw)
+	{
+		for (Iterator automataIt = theProject.iterator(); automataIt.hasNext(); )
+		{
+
+			// Each automaton is translated into a ControlBuilder Sequence.
+			// A sequence has the following structure. Step - Transition - Step - Transition ...
+			// A step may be followed by an ALTERNATIVSEQuence which has ALTERNATIVEBRANCHes.
+			// This is the case if there is more than one transition from a state.
+			// The difficulty is to know when the alternative branches merge, and if they do it the "ControlBuilder way".
+			// A transition may be followed by a PARALLELSEQuence which has PARALLELBRANCHes.
+			// This cannot happen for an automaton.
+			Automaton aut = (Automaton) automataIt.next();
+
+			aut.clearVisitedStates();
+
+			transitionCounter = 1;
+
+			if (aut.getName().length() > theHelper.getIdentifierLengthLimit())
+			{
+				logger.warn("The name of automaton " + aut.getName() + theHelper.getIdentifierLengthErrorMessage() + automatonCounter);
+				aut.setName("Automaton_" + automatonCounter++);
+			}
+
+			// If there is _no_ ordinary, that is, non-fork, arc to the first step in drawing order it is an OPENSEQUENCE.
+			// Is this reaaly correct? Won't check that for now ...
+			// OPENSEQUENCE might not be supported in ControlBuilder
+			// COORD must be same for all sequences? Should probably be obsoleted.
+			State initState = aut.getInitialState();
+
+			if (initState.nbrOfIncomingArcs() > 0)
+			{
+				pw.println("SEQUENCE " + aut.getName().replace('.', '_') + theHelper.getSequenceControlString() + theHelper.getCoord());
+			}
+			else
+			{
+				pw.println("OPENSEQUENCE " + aut.getName().replace('.', '_') + theHelper.getSequenceControlString() + theHelper.getCoord());
+			}
+
+			printSequence(aut, initState, pw);
+			aut.clearVisitedStates();
+
+			if (initState.nbrOfIncomingArcs() > 0)
+			{
+				pw.println("ENDSEQUENCE\n\n");
+			}
+			else
+			{
+				pw.println("ENDOPENSEQUENCE\n\n");
+			}
+		}    // End of automata conversion
+	}
+
+	protected void generateEventMonitors(Project theProject, PrintWriter pw)
 	{
 
 		// Step 1. Get alphabet
@@ -268,7 +266,7 @@ public class AutomataToControlBuilderSFC
 
 		try
 		{
-			unionAlphabet = AlphabetHelpers.getUnionAlphabet(theAutomata);
+			unionAlphabet = AlphabetHelpers.getUnionAlphabet(theProject);
 		}
 		catch (Exception ex)
 		{
@@ -290,18 +288,22 @@ public class AutomataToControlBuilderSFC
 				// Step 3. Compute ExtendedConflict(event)
 				logger.debug(theEvent.getLabel());
 
-				Alphabet extConfAlphabet = extendedConflict(theAutomata, theEvent, testAlphabet);
+				Alphabet extConfAlphabet = extendedConflict(theProject, theEvent, testAlphabet);
 
 				testAlphabet.minus(extConfAlphabet);
 				logger.debug(Integer.toString(testAlphabet.size()));
 
-				// Step 4. Compute EventMonitor()
-				printEventMonitor(theAutomata, extConfAlphabet, pw);
+				/* Step 4. Compute EventMonitor()
+				 We must take care of the controllability of the events in this
+				 step. Only controllable events should be generated. The uncontrollable
+				 ones should disable the generation of the controllable. */
+
+				printEventMonitor(theProject, extConfAlphabet, pw);
 			}
 		}    // Step 5. Terminate if event set exhausted
 	}
 
-	protected Alphabet extendedConflict(Automata theAutomata, LabeledEvent theEvent, Alphabet iteratorAlphabet)
+	protected Alphabet extendedConflict(Project theProject, LabeledEvent theEvent, Alphabet iteratorAlphabet)
 	{
 
 		// Step 1. Initialise. C = {theEvent}, D = empty.
@@ -335,7 +337,7 @@ public class AutomataToControlBuilderSFC
 				{
 
 					// Step 3. Let C = C + Conflict(e), D = D + {e}.
-					Alphabet conflictAlphabet = computeConflict(theAutomata, confEvent);
+					Alphabet conflictAlphabet = computeConflict(theProject, confEvent);
 
 					theExtConfAlphabet.union(conflictAlphabet);
 
@@ -366,7 +368,7 @@ public class AutomataToControlBuilderSFC
 		return theExtConfAlphabet;
 	}
 
-	protected Alphabet computeConflict(Automata theAutomata, LabeledEvent theEvent)
+	protected Alphabet computeConflict(Project theProject, LabeledEvent theEvent)
 	{
 		Alphabet confAlphabet = new Alphabet();
 
@@ -386,7 +388,7 @@ public class AutomataToControlBuilderSFC
 		// Iterera över automaterna, finns händelsen i en automat så måste vi hitta
 		// samtliga tillstånd som har en övergång med händelsen. För varje tillstånd
 		// itereras över utgående bågar för att hitta motsvarande händelser.
-		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
+		for (Iterator autIt = theProject.iterator(); autIt.hasNext(); )
 		{
 			Automaton aut = (Automaton) autIt.next();
 			Alphabet theAlphabet = aut.getAlphabet();
@@ -471,26 +473,39 @@ public class AutomataToControlBuilderSFC
 		return confAlphabet;
 	}
 
-	protected void printEventMonitor(Automata theAutomata, Alphabet theAlphabet, PrintWriter pw)
+	protected void printEventMonitor(Project theProject, Alphabet theAlphabet, PrintWriter pw)
 	{
 
-		// Step 1. Initialise. Create initial step
+		/* Step 1. Initialise. Create initial step
+		 Now we have to be careful. We should only create an event monitor
+		 in the case that there are controllable events in theAlphabet. Perhaps
+		 it is better to handle this in generateEventMonitor, but I think it is
+		 easier to do it here. */
+
+		if (theAlphabet.nbrOfControllableEvents() == 0)
+		{
+			// Nothing to generate.
+			return;
+		}
+
+		/* OK, there is at least one controllable event in theAlphabet.
+		 We have something to generate. */
 		int stepCounter = 0;
 		boolean firstEvent = true;
 
 		transitionCounter = 1;
 
 		// eventMonitorCounter++;
-		pw.println("SEQUENCE EventMonitor_" + ++eventMonitorCounter + coord);
+		pw.println("SEQUENCE EventMonitor_" + ++eventMonitorCounter + theHelper.getCoord());
 		pw.println("SEQINITSTEP EM" + eventMonitorCounter + "_" + stepCounter++);
 
-		// Step 2. For each event e in theAlphabet
-		if (theAlphabet.size() > 1)
+		/* Step 2. For each controllable event e in theAlphabet */
+		if (theAlphabet.nbrOfControllableEvents() > 1)
 		{
 			pw.println("ALTERNATIVESEQ");
 		}
 
-		for (Iterator eventIt = theAlphabet.iterator(); eventIt.hasNext(); )
+		for (Iterator eventIt = theAlphabet.controllableEventIterator(); eventIt.hasNext(); )
 		{
 			LabeledEvent currEvent = (LabeledEvent) eventIt.next();
 
@@ -503,20 +518,21 @@ public class AutomataToControlBuilderSFC
 				pw.println("ALTERNATIVEBRANCH");
 			}
 
-			// (a) Create transition t with t.C = preset()
-			String transitionCondition = computeGenerationCondition(theAutomata, currEvent);
+			/* (a) Create transition t with t.C = preset() && NOT uncontrollableEvents
+			 That is, a controllable event should not be generated when an uncontrollable
+			 event in extended conflict has occurred. */
+			String transitionCondition = computeGenerationCondition(theProject, theAlphabet, currEvent);
 
-			pw.println("SEQTRANSITION EM" + eventMonitorCounter + "_Tr" + transitionCounter++ + transitionConditionPrefix + transitionCondition + transitionConditionSuffix);
+			pw.println("SEQTRANSITION EM" + eventMonitorCounter + "_Tr" + transitionCounter++ + theHelper.getTransitionConditionPrefix() + transitionCondition + theHelper.getTransitionConditionSuffix());
 
 			// (b) Create step with action e
 			pw.println("SEQSTEP EM" + eventMonitorCounter + "_" + stepCounter++);
-			pw.println(actionP1Prefix + currEvent.getLabel().replace('.', '_') + " := True;" + actionP1Suffix);
-			pw.println(actionP0Prefix + currEvent.getLabel().replace('.', '_') + " := False;" + actionP0Suffix);
+			printEventMonitorAction(currEvent, pw);
 
 			// (c) Create transition t' with t'.C = not preset()
-			transitionCondition = computeCeaseCondition(theAutomata, currEvent);
+			transitionCondition = computeCeaseCondition(theProject, currEvent);
 
-			pw.println("SEQTRANSITION EM" + eventMonitorCounter + "_Tr" + transitionCounter++ + transitionConditionPrefix + transitionCondition + transitionConditionSuffix);
+			pw.println("SEQTRANSITION EM" + eventMonitorCounter + "_Tr" + transitionCounter++ + theHelper.getTransitionConditionPrefix() + transitionCondition + theHelper.getTransitionConditionSuffix());
 		}
 
 		if (theAlphabet.size() > 1)
@@ -528,13 +544,28 @@ public class AutomataToControlBuilderSFC
 		logger.debug("Printing Event Monitor");
 	}
 
-	protected String computeGenerationCondition(Automata theAutomata, LabeledEvent theEvent)
+	protected void printEventMonitorAction(LabeledEvent theEvent, PrintWriter pw)
+	{
+		pw.println(theHelper.getActionP1Prefix() + theEvent.getLabel().replace('.', '_') +  theHelper.getAssignmentOperator() + "True;" + theHelper.getActionP1Suffix());
+		pw.println(theHelper.getActionP0Prefix() + theEvent.getLabel().replace('.', '_') +  theHelper.getAssignmentOperator() + "False;" + theHelper.getActionP0Suffix());
+	}
+
+
+	protected String computeGenerationCondition(Project theProject, Alphabet theExtConfAlphabet, LabeledEvent theEvent)
 	{
 		StringBuffer theCondition = new StringBuffer();
 		boolean firstAutomaton = true;
 		boolean nextAutomaton = false;
 
-		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
+		/* We create the uncontrollable disablement condition first. */
+		if (theExtConfAlphabet.nbrOfUncontrollableEvents() > 0)
+		{
+			String theUcCondition = ucDisablementCondition(theExtConfAlphabet);
+			theCondition.append(theUcCondition);
+		}
+
+		/* And then the actual generation condition. */
+		for (Iterator autIt = theProject.iterator(); autIt.hasNext(); )
 		{
 			Automaton aut = (Automaton) autIt.next();
 			Alphabet theAlphabet = aut.getAlphabet();
@@ -616,13 +647,36 @@ public class AutomataToControlBuilderSFC
 		return theCondition.toString();
 	}
 
-	protected String computeCeaseCondition(Automata theAutomata, LabeledEvent theEvent)
+	protected String ucDisablementCondition(Alphabet theAlphabet)
+	{
+		StringBuffer theCondition = new StringBuffer();
+		boolean firstUcEvent = true;
+		theCondition.append("NOT (");
+
+		for (Iterator ucEventIt = theAlphabet.uncontrollableEventIterator(); ucEventIt.hasNext(); )
+		{
+			LabeledEvent theUcEvent = (LabeledEvent) ucEventIt.next();
+			if (firstUcEvent)
+			{
+				firstUcEvent = false;
+			}
+			else
+			{
+				theCondition.append(" AND ");
+			}
+			theCondition.append(theUcEvent.getLabel().replace('.', '_'));
+		}
+		theCondition.append(") AND ");
+		return theCondition.toString();
+	}
+
+	protected String computeCeaseCondition(Project theProject, LabeledEvent theEvent)
 	{
 		StringBuffer theCondition = new StringBuffer();
 		boolean firstAutomaton = true;
 		boolean nextAutomaton = false;
 
-		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
+		for (Iterator autIt = theProject.iterator(); autIt.hasNext(); )
 		{
 			Automaton aut = (Automaton) autIt.next();
 			Alphabet theAlphabet = aut.getAlphabet();
@@ -790,7 +844,7 @@ public class AutomataToControlBuilderSFC
 		{
 			LabeledEvent event = theArc.getEvent(); // theAutomaton.getEvent(theArc.getEventId());
 
-			pw.println("SEQTRANSITION " + theAutomaton.getName().replace('.', '_') + "_Tr" + transitionCounter++ + transitionConditionPrefix + event.getLabel().replace('.', '_') + transitionConditionSuffix);
+			pw.println("SEQTRANSITION " + theAutomaton.getName().replace('.', '_') + "_Tr" + transitionCounter++ + theHelper.getTransitionConditionPrefix() + event.getLabel().replace('.', '_') + theHelper.getTransitionConditionSuffix());
 		}
 		catch (Exception ex)
 		{
@@ -803,40 +857,5 @@ public class AutomataToControlBuilderSFC
 	protected void printFork(Automaton theAutomaton, State theState, PrintWriter pw)
 	{
 		pw.println("SEQFORK " + theAutomaton.getName().replace('.', '_') + "__" + theState.getId() + " SEQBREAK");
-	}
-
-	protected String getTransitionConditionPrefix()
-	{
-		return " TRANSITIONCODEBLOCK\nSTRUCTUREDTEXT\n";
-	}
-
-	protected String getTransitionConditionSuffix()
-	{
-		return "\nEND_CODEBLOCK";
-	}
-
-	protected String getCoord()
-	{
-		return " COORD 0.0, 0.0 OBJSIZE 1.0, 1.0";
-	}
-
-	protected String getActionP1Prefix()
-	{
-		return "ENTERCODEBLOCK STRUCTUREDTEXT\n";
-	}
-
-	protected String getActionP1Suffix()
-	{
-		return "\nEND_CODEBLOCK";
-	}
-
-	protected String getActionP0Prefix()
-	{
-		return "EXITCODEBLOCK STRUCTUREDTEXT\n";
-	}
-
-	protected String getActionP0Suffix()
-	{
-		return "\nEND_CODEBLOCK";
 	}
 }

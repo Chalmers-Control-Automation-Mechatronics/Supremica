@@ -747,6 +747,18 @@ public class MainMenuBar
 			}
 		});
 
+		JMenuItem menuToolsCodeGenerationSattLineSFCForBallProcess = new JMenuItem();
+
+		menuToolsCodeGenerationSattLineSFCForBallProcess.setText("ABB SattLine SFC for Ball Process...");
+		menuToolsCodeGeneration.add(menuToolsCodeGenerationSattLineSFCForBallProcess);
+		menuToolsCodeGenerationSattLineSFCForBallProcess.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				ActionMan.AutomataToSattLineSFCForBallProcess(ActionMan.getGui());
+			}
+		});
+
 		JMenuItem menuToolsCodeGenerationBC = new JMenuItem();
 
 		menuToolsCodeGenerationBC.setText("Java Bytecode...");

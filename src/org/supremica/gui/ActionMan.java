@@ -2703,7 +2703,7 @@ public class ActionMan
 	}
 
 	/**
-	 * Just a test... 
+	 * Just a test...
 	 */
 	/*
 	public static void trainSimulator(Gui gui)
@@ -2949,20 +2949,15 @@ public class ActionMan
 	// Generate SattLine SFCs
 	public static void AutomataToSattLineSFC(Gui gui)
 	{
-		Automata selectedAutomata = gui.getSelectedAutomata();
+		Project selectedProject = gui.getSelectedProject();
 
-		if (selectedAutomata.size() < 1)
+		if (selectedProject.size() < 1)
 		{
 			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
 
 			return;
 		}
-		if (selectedAutomata.hasSelfLoop())
-		{
-			JOptionPane.showMessageDialog(gui.getComponent(), "Self-loops are not supported in SFC. The ST and IL mode can handle self-loops!", "Not supported", JOptionPane.ERROR_MESSAGE);
-			return;
-		}
-		if (!selectedAutomata.isAllEventsPrioritized())
+		if (!selectedProject.isAllEventsPrioritized())
 		{
 			JOptionPane.showMessageDialog(gui.getComponent(), "All events must prioritized in this mode. The ST and IL mode can handle non-prioritized events!", "Not supported", JOptionPane.ERROR_MESSAGE);
 			return;
@@ -2980,6 +2975,7 @@ public class ActionMan
 				{
 					String prefixName = null;
 					String pathName = currFile.getAbsolutePath();
+					String filename = currFile.getName();
 
 					if (pathName.endsWith(".s"))
 					{
@@ -2989,24 +2985,18 @@ public class ActionMan
 					{
 						prefixName = pathName;
 					}
+					File sFile = new File(prefixName + ".s");
+					File gFile = new File(prefixName + ".g");
+					File lFile = new File(prefixName + ".l");
+					File pFile = new File(prefixName + ".p");
 					try
 					{
-						AutomataToSattLineSFC exporter = new AutomataToSattLineSFC(selectedAutomata);
+						AutomataToSattLineSFC exporter = new AutomataToSattLineSFC(selectedProject);
 
-
-						PrintWriter pw_s = new PrintWriter(new FileWriter(prefixName + ".s"));
-						PrintWriter pw_g = new PrintWriter(new FileWriter(prefixName + ".g"));
-						PrintWriter pw_l = new PrintWriter(new FileWriter(prefixName + ".l"));
-						PrintWriter pw_p = new PrintWriter(new FileWriter(prefixName + ".p"));
-
-						exporter.serialize_s(pw_s);
-						exporter.serialize_g(pw_g);
-						exporter.serialize_l(pw_l);
-						exporter.serialize_p(pw_p);
-						pw_s.close();
-						pw_g.close();
-						pw_l.close();
-						pw_p.close();
+						exporter.serialize_s(sFile, filename);
+						exporter.serialize_g(gFile, filename);
+						exporter.serialize_l(lFile, filename);
+						exporter.serialize_p(pFile, filename);
 					}
 					catch (Exception ex)
 					{
@@ -3021,23 +3011,88 @@ public class ActionMan
 		}
 	}
 
-	// Generate ABB Control Builder SFCs
-	public static void AutomataToControlBuilderSFC(Gui gui)
+	// Generate SattLine SFCs for the Ball Process
+	public static void AutomataToSattLineSFCForBallProcess(Gui gui)
 	{
-		Automata selectedAutomata = gui.getSelectedAutomata();
+		Project selectedProject = gui.getSelectedProject();
 
-		if (selectedAutomata.size() < 1)
+		if (selectedProject.size() < 1)
 		{
 			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
 
 			return;
 		}
-		if (selectedAutomata.hasSelfLoop())
+		if (!selectedProject.isAllEventsPrioritized())
+		{
+			JOptionPane.showMessageDialog(gui.getComponent(), "All events must prioritized in this mode. The ST and IL mode can handle non-prioritized events!", "Not supported", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+
+		JFileChooser fileExporter = FileDialogs.getSFileExporter();
+
+		if (fileExporter.showSaveDialog(gui.getComponent()) == JFileChooser.APPROVE_OPTION)
+		{
+			File currFile = fileExporter.getSelectedFile();
+
+			if (currFile != null)
+			{
+				if (!currFile.isDirectory())
+				{
+					String prefixName = null;
+					String pathName = currFile.getAbsolutePath();
+					String filename = currFile.getName();
+
+					if (pathName.endsWith(".s"))
+					{
+						prefixName = pathName.substring(0, pathName.length() - 2);
+					}
+					else
+					{
+						prefixName = pathName;
+					}
+					File sFile = new File(prefixName + ".s");
+					File gFile = new File(prefixName + ".g");
+					File lFile = new File(prefixName + ".l");
+					File pFile = new File(prefixName + ".p");
+					try
+					{
+						AutomataToSattLineSFCForBallProcess exporter = new AutomataToSattLineSFCForBallProcess(selectedProject);
+
+						exporter.serialize_s(sFile, filename);
+						exporter.serialize_g(gFile, filename);
+						exporter.serialize_l(lFile, filename);
+						exporter.serialize_p(pFile, filename);
+					}
+					catch (Exception ex)
+					{
+						logger.error("Exception while generating Ball Process SattLine code to files " + prefixName + "{\".s\", \".g\", \".l\", \".p\"}");
+						logger.debug(ex.getStackTrace());
+						return;
+					}
+					logger.info("SattLine SFC files for the Ball Process successfully generated at " + prefixName + "{\".s\", \".g\", \".l\", \".p\"}");
+
+				}
+			}
+		}
+	}
+
+	// Generate ABB Control Builder SFCs
+	public static void AutomataToControlBuilderSFC(Gui gui)
+	{
+		Project selectedProject = gui.getSelectedProject();
+
+		if (selectedProject.size() < 1)
+		{
+			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+
+			return;
+		}
+		if (selectedProject.hasSelfLoop())
 		{
 			JOptionPane.showMessageDialog(gui.getComponent(), "Self-loops are not supported in SFC. The ST and IL mode can handle self-loops!", "Not supported", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
-		if (!selectedAutomata.isAllEventsPrioritized())
+		if (!selectedProject.isAllEventsPrioritized())
 		{
 			JOptionPane.showMessageDialog(gui.getComponent(), "All events must prioritized in this mode. The ST and IL mode can handle non-prioritized events!", "Not supported", JOptionPane.ERROR_MESSAGE);
 			return;
@@ -3068,7 +3123,7 @@ public class ActionMan
 					File prjFile = new File(prefixName + ".prj");
 					try
 					{
-						AutomataToControlBuilderSFC exporter = new AutomataToControlBuilderSFC(selectedAutomata);
+						AutomataToControlBuilderSFC exporter = new AutomataToControlBuilderSFC(selectedProject);
 
 						exporter.serializeApp(appFile, filename);
 						exporter.serializePrj(prjFile, filename);

@@ -174,4 +174,59 @@ public class ControlBuilderHelper
 		pw.println("ColorTable");
 		pw.println(" ( ColorModel HLS\n )");
 	}
+
+	public String getActionP1Prefix()
+	{
+		return "ENTERCODEBLOCK STRUCTUREDTEXT\n";
+	}
+
+	public String getActionP1Suffix()
+	{
+		return "\nEND_CODEBLOCK";
+	}
+
+	public String getActionP0Prefix()
+	{
+		return "EXITCODEBLOCK STRUCTUREDTEXT\n";
+	}
+
+	public String getActionP0Suffix()
+	{
+		return "\nEND_CODEBLOCK";
+	}
+
+	public String getAssignmentOperator()
+	{
+		return " := ";
+	}
+
+	public String getSequenceControlString()
+	{
+		return "  (SeqControl)";
+	}
+
+	public String getIdentifierLengthErrorMessage()
+	{
+		return " is too long. Identifiers are limited to 32 characters in ControlBuilder. The new name is Automaton_";
+	}
+
+	public int getIdentifierLengthLimit()
+	{
+		return 28;
+	}
+
+	public String getTransitionConditionPrefix()
+	{
+		return " TRANSITIONCODEBLOCK\nSTRUCTUREDTEXT\n";
+	}
+
+	public String getTransitionConditionSuffix()
+	{
+		return "\nEND_CODEBLOCK";
+	}
+
+	public String getCoord()
+	{
+		return " COORD 0.0, 0.0 OBJSIZE 1.0, 1.0";
+	}
 }
