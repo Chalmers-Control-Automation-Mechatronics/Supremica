@@ -9,6 +9,7 @@
 <property name="examples" value="examples"/>
 <property name="templates" value="templates"/>
 <property name="images" value="images"/>
+<property name="animations" value="animations"/>
 <property name="examples" value="examples/includeInJarFile"/>
 <property name="help" value="help"/>
 <property name="lib" value="lib"/>
@@ -290,6 +291,7 @@
 		<fileset dir="${build}"/>
 		<fileset dir="${images}"/>
 		<fileset dir="${examples}"/>
+		<fileset dir="${animations}"/>		
 		<fileset dir="${javalibs.dir}"/>		
 	</jar>
 </target>
@@ -308,6 +310,7 @@
 		</fileset>
 		<fileset dir="${images}"/>
 		<fileset dir="${examples}"/>
+		<fileset dir="${animations}"/>			
 		<fileset dir="${javalibs.dir}"/>		
 	</jar>
 </target>
@@ -326,6 +329,7 @@
 		</fileset>
 		<fileset dir="${images}"/>
 		<fileset dir="${examples}"/>
+		<fileset dir="${animations}"/>			
 		<fileset dir="${javalibs.dir}"/>		
 	</jar>
 </target>
@@ -335,6 +339,7 @@
 		<fileset dir="${build}"/>
 		<fileset dir="${images}"/>
 		<fileset dir="${examples}"/>
+		<fileset dir="${animations}"/>			
 		<fileset dir="${javalibs.dir}"/>	
 	</jar>
 </target>
