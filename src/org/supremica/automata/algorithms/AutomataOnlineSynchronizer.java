@@ -513,6 +513,11 @@ public final class AutomataOnlineSynchronizer
 
 		return true;
 	}
+	
+	public boolean isEnabled(LabeledEvent theEvent)
+	{
+		return isEnabled(theEvent.getSynchIndex());	
+	}
 
 	public boolean isEnabled(int eventIndex)
 	{

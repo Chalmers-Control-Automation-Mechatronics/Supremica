@@ -314,9 +314,17 @@ public class SimulatorExecuter
 		}
 
 		// Update the state here
-		currState = onlineSynchronizer.doTransition(event);		
+		onlineSynchronizer.setCurrState(currState);
+		if (onlineSynchronizer.isEnabled(event))
+		{
+			currState = onlineSynchronizer.doTransition(event);		
 //		return onlineSynchronizer.doTransition(events[index]);
-		update();
+			update();
+		}
+		else
+		{
+			logger.error("The event " + event.getLabel() + " is not enabled");	
+		}
 		return currState != null;
 	}
 

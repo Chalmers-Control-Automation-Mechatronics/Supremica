@@ -117,7 +117,7 @@ public class SimulatorEventListModel
 		this.showState = showState;
 	}
 
-	public void update()
+	public synchronized void update()
 	{
 		//logger.info("SimulatorEventListModel.update");
 		AutomataOnlineSynchronizer onlineSynchronizer = helper.getCoExecuter();

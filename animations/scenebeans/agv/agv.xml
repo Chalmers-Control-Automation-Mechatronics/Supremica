@@ -2,7 +2,7 @@
 
 <animation width="395" height="714">
 
-	<behaviour id="input1.go" algorithm="Track" event="input1.end">
+	<behaviour id="input1.go" algorithm="Track" >
 		<param name="pointCount" value="5" />
 
 		<param name="point" index="0" value="(80,41)" />
@@ -22,7 +22,7 @@
 		<param name="point" index="4" value="(80,41)" />	
 	</behaviour>
 
-	<behaviour id="input3.go" algorithm="Track" event="input3.end">
+	<behaviour id="input3.go" algorithm="Track">
 		<param name="pointCount" value="5" />
 
 		<param name="point" index="0" value="(46,166)" />
@@ -42,7 +42,7 @@
 		<param name="point" index="4" value="(46,166)" />	
 	</behaviour>
 
-	<behaviour id="output.go" algorithm="Track" event="output.end">
+	<behaviour id="output.go" algorithm="Track">
 		<param name="pointCount" value="5" />
 
 		<param name="point" index="0" value="(379,659)" />
@@ -62,7 +62,7 @@
 		<param name="point" index="4" value="(379,659)" />	
 	</behaviour>
 
-	<behaviour id="ws1_part1.go" algorithm="Track" event="ws1_part1.end">
+	<behaviour id="ws1_part1.go" algorithm="Track">
 		<param name="pointCount" value="5" />
 
 		<param name="point" index="0" value="(44,396)" />
@@ -84,7 +84,7 @@
 		<param name="point" index="4" value="(44,396)" />	
 	</behaviour>
 
-	<behaviour id="ws1_part2.go" algorithm="Track" event="ws1_part2.end">
+	<behaviour id="ws1_part2.go" algorithm="Track">
 		<param name="pointCount" value="7" />
 
 		<param name="point" index="0" value="(67,407)" />
@@ -112,7 +112,7 @@
 		<param name="point" index="6" value="(67,407)" />
 	</behaviour>
 
-	<behaviour id="ws2.go" algorithm="Track" event="ws2.end">
+	<behaviour id="ws2.go" algorithm="Track">
 		<param name="pointCount" value="9" />
 
 		<param name="point" index="0" value="(379,243)" />
@@ -146,7 +146,7 @@
 		<param name="point" index="8" value="(379,243)" />
 	</behaviour>
 
-	<behaviour id="ws3.go" algorithm="Track" event="ws3.end">
+	<behaviour id="ws3.go" algorithm="Track">
 		<param name="pointCount" value="9" />
 
 		<param name="point" index="0" value="(345,558)" />
@@ -180,7 +180,7 @@
 		<param name="point" index="8" value="(345,558)" />
 	</behaviour>
 	
-	<behaviour id="agv1.go" algorithm="Track" event="agv1.end">
+	<behaviour id="agv1.go" algorithm="Track">
 		<param name="pointCount" value="11" />
 
 		<param name="point" index="0" value="(101,41)" />
@@ -222,7 +222,7 @@
 		<param name="point" index="10" value="(101,41)" />		
 	</behaviour>
 
-	<behaviour id="agv2.go" algorithm="Track" event="agv2.end">
+	<behaviour id="agv2.go" algorithm="Track">
 		<param name="pointCount" value="11" />
 		
 		<param name="point" index="0" value="(272,328)" />
@@ -264,7 +264,7 @@
 		<param name="point" index="10" value="(272,328)" />		
 	</behaviour>
 
-	<behaviour id="agv3.go" algorithm="Track" event="agv3.end">
+	<behaviour id="agv3.go" algorithm="Track">
 		<param name="pointCount" value="23" />
 		
 		<param name="point" index="0" value="(272,406)" />
@@ -350,7 +350,7 @@
 		<param name="point" index="22" value="(272,406)" />				
 	</behaviour>
 
-	<behaviour id="agv4.go" algorithm="Track" event="agv4.end">
+	<behaviour id="agv4.go" algorithm="Track">
 		<param name="pointCount" value="19" />
 		
 		<param name="point" index="0" value="(153,478)" />
@@ -420,7 +420,7 @@
 		<param name="point" index="18" value="(153,478)" />		
 	</behaviour>
 
-	<behaviour id="agv5.go" algorithm="Track" event="agv5.end">
+	<behaviour id="agv5.go" algorithm="Track">
 		<param name="pointCount" value="17" />
 		
 		<param name="point" index="0" value="(272,640)" />
