@@ -209,9 +209,14 @@ public class AutomataToHierarchyToDot
 					//pw.print("\t\"" + currAutomaton.getName() + "\" -- \"" + otherAutomaton.getName() + "\";");
 					pw.print("\t\"" + currAutomaton.getName() + "\" -- \"" + otherAutomaton.getName() + "\" ");
 					if (weight == 1)
-						pw.print("[style = dashed, ");
-					if (weight > 1)
+					{
+						// pw.print("[style = dashed, "); // This was impopular... /hguo
 						pw.print("[style = solid, ");
+					}
+					if (weight > 1)
+					{
+						pw.print("[style = solid, ");
+					}
 					pw.println("label = " + weight + "];");
 				}
 			}
