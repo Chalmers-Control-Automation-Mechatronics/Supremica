@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,14 +47,18 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.automata.algorithms;
 
+
+
 import org.supremica.automata.*;
+
 import java.util.*;
+
 
 public class AutomatonComplement
 {
+
 	private Automaton theAutomaton;
 
 	public AutomatonComplement(Automaton theAutomaton)
@@ -63,6 +68,7 @@ public class AutomatonComplement
 
 	public Automaton execute()
 	{
+
 		Alphabet alphabet = theAutomaton.getAlphabet();
 		State newState = null;
 		Event currEvent;
@@ -71,50 +77,67 @@ public class AutomatonComplement
 		Iterator eventIterator;
 		Iterator outgoingArcsIterator;
 		Iterator stateIterator = theAutomaton.stateIterator();
+
 		while (stateIterator.hasNext())
 		{
 			currState = (State) stateIterator.next();
+
 			// Invert marking
 			if (currState.isAccepting())
+			{
 				currState.setAccepting(false);
+			}
 			else
+			{
 				currState.setAccepting(true);
+			}
 
 			// Add arcs for all events that are not currently outgoing from the current state.
 			eventIterator = alphabet.iterator();
+
 			while (eventIterator.hasNext())
 			{
 				found = false;
 				currEvent = (Event) eventIterator.next();
 				outgoingArcsIterator = currState.outgoingArcsIterator();
+
 				while (outgoingArcsIterator.hasNext())
+				{
 					if (currEvent.equalId(((Arc) outgoingArcsIterator.next()).getEventId()))
 					{
 						found = true;
+
 						break;
 					}
+				}
+
 				if (!found)
 				{
 					if (newState == null)
 					{
 						newState = new State("qc");
 					}
+
 					theAutomaton.addArc(new Arc(currState, newState, currEvent.getId()));
 				}
 			}
 		}
+
 		// Add self loops to the extra state...
 		if (newState != null)
 		{
 			theAutomaton.addState(newState);
 			newState.setName("qc");
 			newState.setAccepting(true);
+
 			eventIterator = alphabet.iterator();
+
 			while (eventIterator.hasNext())
 			{
 				theAutomaton.addArc(new Arc(newState, newState, ((Event) eventIterator.next()).getId()));
 			}
 		}
+
 		return theAutomaton;
 	}
 }

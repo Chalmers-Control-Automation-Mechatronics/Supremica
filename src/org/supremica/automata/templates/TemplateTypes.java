@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,27 +47,30 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.automata.templates;
+
+
 
 import java.util.*;
 
+
 public class TemplateTypes
 {
-	private static List collection = new LinkedList();
 
+	private static List collection = new LinkedList();
 	public static final TemplateTypes Undefined = new TemplateTypes("Undefined");
 	public static final TemplateTypes CCSBookExample = new TemplateTypes("CCS-Book Examples");
 	public static final TemplateTypes CCSBookExercise = new TemplateTypes("CCS-Book Exercises");
 	public static final TemplateTypes CCSCourseAssignment = new TemplateTypes("CCS-Course Assignments");
 	public static final TemplateTypes OtherExample = new TemplateTypes("Other Examples");
 	public static final TemplateTypes StandardComponent = new TemplateTypes("Standard Components");
-
 	private String description;
 
 	private TemplateTypes(String description)
 	{
+
 		this.description = description;
+
 		collection.add(this);
 	}
 

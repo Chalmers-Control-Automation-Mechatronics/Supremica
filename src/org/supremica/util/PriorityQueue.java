@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,37 +47,35 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.util;
+
 
 
 public final class PriorityQueue
 {
+
 	private Element root = null;
 	private int size = 0;
 
+	public PriorityQueue() {}
 
-	public PriorityQueue()
-	{
-
-	}
-/*
-	public void insert(PriorityQueueObject obj)
-	{
-		size++;
-		Element newElement = new Element(obj);
-	}
-
-	public PriorityQueueObject getMin()
-	{
-
-	}
-
-	public PriorityQueueObject removeMin()
-	{
-		size--;
-	}*/
-
+	/*
+	 *       public void insert(PriorityQueueObject obj)
+	 *       {
+	 *               size++;
+	 *               Element newElement = new Element(obj);
+	 *       }
+	 *
+	 *       public PriorityQueueObject getMin()
+	 *       {
+	 *
+	 *       }
+	 *
+	 *       public PriorityQueueObject removeMin()
+	 *       {
+	 *               size--;
+	 *       }
+	 */
 	public int size()
 	{
 		return size;
@@ -85,6 +84,7 @@ public final class PriorityQueue
 
 class Element
 {
+
 	private PriorityQueueObject obj;
 	private Element left = null;
 	private Element right = null;

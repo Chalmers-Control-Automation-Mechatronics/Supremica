@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,23 +47,31 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.gui;
+
+
 
 import java.awt.*;
 import java.awt.event.*;
+
 import javax.swing.*;
+
 import org.supremica.automata.algorithms.*;
 
 
-abstract class SynthesizerPanel extends JPanel
+abstract class SynthesizerPanel
+	extends JPanel
 {
+
 	public abstract void update(SynthesizerOptions s);
+
 	public abstract void regain(SynthesizerOptions s);
 }
 
-class SD_StandardPanel extends SynthesizerPanel
+class SD_StandardPanel
+	extends SynthesizerPanel
 {
+
 	private JComboBox synthesisTypeBox;
 	private JComboBox algorithmTypeBox;
 	private JCheckBox purgeBox;
@@ -70,10 +79,10 @@ class SD_StandardPanel extends SynthesizerPanel
 
 	public SD_StandardPanel()
 	{
+
 		Box standardBox = Box.createVerticalBox();
 
 		synthesisTypeBox = new JComboBox(SynthesisType.toArray());
-
 		algorithmTypeBox = new JComboBox(SynthesisAlgorithm.toArray());
 		purgeBox = new JCheckBox("Purge result");
 		optimizeBox = new JCheckBox("Optimize result");
@@ -82,41 +91,50 @@ class SD_StandardPanel extends SynthesizerPanel
 		standardBox.add(algorithmTypeBox);
 		standardBox.add(purgeBox);
 		standardBox.add(optimizeBox);
-
 		this.add(standardBox);
 	}
+
 	public void update(SynthesizerOptions synthesizerOptions)
 	{
+
 		synthesisTypeBox.setSelectedItem(synthesizerOptions.getSynthesisType());
 		algorithmTypeBox.setSelectedItem(synthesizerOptions.getSynthesisAlgorithm());
 		purgeBox.setSelected(synthesizerOptions.doPurge());
 		optimizeBox.setSelected(synthesizerOptions.getOptimize());
 	}
+
 	public void regain(SynthesizerOptions synthesizerOptions)
 	{
-		synthesizerOptions.setSynthesisType((SynthesisType)synthesisTypeBox.getSelectedItem());
-		synthesizerOptions.setSynthesisAlgorithm((SynthesisAlgorithm)algorithmTypeBox.getSelectedItem());
+
+		synthesizerOptions.setSynthesisType((SynthesisType) synthesisTypeBox.getSelectedItem());
+		synthesizerOptions.setSynthesisAlgorithm((SynthesisAlgorithm) algorithmTypeBox.getSelectedItem());
 		synthesizerOptions.setPurge(purgeBox.isSelected());
 		synthesizerOptions.setOptimize(optimizeBox.isSelected());
 	}
 }
-class SD_AdvancedPanel extends SynthesizerPanel
+
+class SD_AdvancedPanel
+	extends SynthesizerPanel
 {
+
 	private JCheckBox maximallyPermissiveBox;
 
 	public SD_AdvancedPanel()
 	{
+
 		Box advancedBox = Box.createVerticalBox();
+
 		maximallyPermissiveBox = new JCheckBox("Maximally permissive result");
 
 		advancedBox.add(maximallyPermissiveBox);
-
 		this.add(advancedBox);
 	}
+
 	public void update(SynthesizerOptions synthesizerOptions)
 	{
 		maximallyPermissiveBox.setSelected(synthesizerOptions.getMaximallyPermissive());
 	}
+
 	public void regain(SynthesizerOptions synthesizerOptions)
 	{
 		synthesizerOptions.setMaximallyPermissive(maximallyPermissiveBox.isSelected());
@@ -126,17 +144,15 @@ class SD_AdvancedPanel extends SynthesizerPanel
 public class SynthesizerDialog
 	implements ActionListener
 {
+
 	private JButton okButton;
 	private JButton cancelButton;
 	private SynthesizerOptions synthesizerOptions;
-
 	SD_StandardPanel standardPanel;
 
 	// private JCheckBox maximallyPermissiveBox;
 	SD_AdvancedPanel advancedPanel;
-
 	private JDialog dialog;
-
 	private JFrame parentFrame;
 
 	/**
@@ -144,9 +160,11 @@ public class SynthesizerDialog
 	 */
 	public SynthesizerDialog(JFrame parentFrame, SynthesizerOptions synthesizerOptions)
 	{
-		dialog = new JDialog(parentFrame, true); //modal
+
+		dialog = new JDialog(parentFrame, true);	// modal
 		this.parentFrame = parentFrame;
 		this.synthesizerOptions = synthesizerOptions;
+
 		dialog.setTitle("Synthesizer options");
 		dialog.setSize(new Dimension(400, 300));
 
@@ -155,13 +173,10 @@ public class SynthesizerDialog
 		standardPanel = new SD_StandardPanel();
 		advancedPanel = new SD_AdvancedPanel();
 
-        JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.addTab("Standard options", null,
-                          standardPanel,
-                          "Standard options");
-        tabbedPane.addTab("Advanced options", null,
-                          advancedPanel,
-                          "Advanced options");
+		JTabbedPane tabbedPane = new JTabbedPane();
+
+		tabbedPane.addTab("Standard options", null, standardPanel, "Standard options");
+		tabbedPane.addTab("Advanced options", null, advancedPanel, "Advanced options");
 
 		/** standardPanel
 		Box standardBox = Box.createVerticalBox();
@@ -198,17 +213,18 @@ public class SynthesizerDialog
 
 		// buttonPanel
 		JPanel buttonPanel = new JPanel();
+
 		okButton = addButton(buttonPanel, "OK");
 		cancelButton = addButton(buttonPanel, "Cancel");
 
 		contentPane.add("Center", tabbedPane);
 		contentPane.add("South", buttonPanel);
 
-		//** MF ** Fix to get the frigging thing centered
+		// ** MF ** Fix to get the frigging thing centered
 		Dimension dim = dialog.getMinimumSize();
+
 		dialog.setLocation(Utility.getPosForCenter(dim));
 		dialog.setResizable(false);
-
 		update();
 	}
 
@@ -222,11 +238,14 @@ public class SynthesizerDialog
 		advancedPanel.update(synthesizerOptions);
 	}
 
-   	private JButton addButton(Container container, String name)
+	private JButton addButton(Container container, String name)
 	{
+
 		JButton button = new JButton(name);
+
 		button.addActionListener(this);
 		container.add(button);
+
 		return button;
 	}
 
@@ -237,12 +256,15 @@ public class SynthesizerDialog
 
 	public void actionPerformed(ActionEvent event)
 	{
+
 		Object source = event.getSource();
+
 		if (source == okButton)
 		{
 			synthesizerOptions.setDialogOK(true);
 			standardPanel.regain(synthesizerOptions);
 			advancedPanel.regain(synthesizerOptions);
+
 			if (synthesizerOptions.isValid())
 			{
 				dialog.setVisible(false);
@@ -255,7 +277,7 @@ public class SynthesizerDialog
 		}
 		else if (source == cancelButton)
 		{
-			synthesizerOptions.setDialogOK(false); // Already done...
+			synthesizerOptions.setDialogOK(false);		// Already done...
 			dialog.setVisible(false);
 			dialog.dispose();
 		}

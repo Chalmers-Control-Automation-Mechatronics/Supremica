@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,19 +47,23 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.automata;
 
+
+
 import java.util.*;
+
 import org.supremica.gui.*;
+
 import org.apache.log4j.*;
 
 import org.supremica.gui.*;
 
+
 public class ProjectContainer
 {
-	private static Category thisCategory = LogDisplay.createCategory(ProjectContainer.class.getName());
 
+	private static Category thisCategory = LogDisplay.createCategory(ProjectContainer.class.getName());
 	private List theProjects;
 
 	public ProjectContainer()
@@ -78,6 +83,7 @@ public class ProjectContainer
 
 	public Project getProject(String name)
 	{
+
 		if (name == null)
 		{
 			return null;
@@ -85,17 +91,19 @@ public class ProjectContainer
 
 		for (Iterator projIt = iterator(); projIt.hasNext(); )
 		{
-			Project currProject = (Project)projIt.next();
+			Project currProject = (Project) projIt.next();
+
 			if (name.equals(currProject.getName()))
 			{
 				return currProject;
 			}
 		}
+
 		return null;
 	}
 
 	public Iterator iterator()
 	{
 		return theProjects.iterator();
-	}	
+	}
 }

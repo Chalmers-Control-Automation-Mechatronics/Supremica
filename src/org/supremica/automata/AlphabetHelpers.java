@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,10 +47,12 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.automata;
 
+
+
 import java.util.*;
+
 
 public class AlphabetHelpers
 {
@@ -57,13 +60,17 @@ public class AlphabetHelpers
 	public static Alphabet getUnionAlphabet(Automata theAutomata)
 		throws Exception
 	{
+
 		EventsSet eventsSet = new EventsSet();
+
 		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
 		{
-			Automaton currAutomaton = (Automaton)autIt.next();
+			Automaton currAutomaton = (Automaton) autIt.next();
 			Alphabet currAlphabet = currAutomaton.getAlphabet();
+
 			eventsSet.add(currAlphabet);
 		}
+
 		return getUnionAlphabet(eventsSet, "a");
 	}
 
@@ -74,27 +81,33 @@ public class AlphabetHelpers
 	public static Alphabet getUnionAlphabet(EventsSet alphabets, String idPrefix)
 		throws IllegalArgumentException, Exception
 	{
+
 		if (alphabets.size() < 1)
+		{
 			throw new IllegalArgumentException("At least one alphabet is necessary");
+		}
 
 		EventsSet eventSet = new EventsSet();
-
 		Events unionEvents = EventsHelpers.union(alphabets);
-
-        Alphabet newAlphabet = new Alphabet();
+		Alphabet newAlphabet = new Alphabet();
 
 		// Iterate over all events
-        Iterator eventsIt = unionEvents.iterator();
-		while(eventsIt.hasNext())
+		Iterator eventsIt = unionEvents.iterator();
+
+		while (eventsIt.hasNext())
 		{
-			Event currEvent = (Event)eventsIt.next();
+			Event currEvent = (Event) eventsIt.next();
+
 			eventSet.clear();
+
 			// Iterate over all alphabets, and find those alphabets that
-            // contain an event with currEvent.getLabel
+			// contain an event with currEvent.getLabel
 			Iterator alphabetIt = alphabets.iterator();
-			while(alphabetIt.hasNext())
+
+			while (alphabetIt.hasNext())
 			{
-				Alphabet currAlphabet = (Alphabet)alphabetIt.next();
+				Alphabet currAlphabet = (Alphabet) alphabetIt.next();
+
 				if (currAlphabet.containsEventWithLabel(currEvent.getLabel()))
 				{
 					eventSet.add(currAlphabet.getEventWithLabel(currEvent.getLabel()));
@@ -102,6 +115,7 @@ public class AlphabetHelpers
 			}
 
 			Event newEvent = EventHelpers.createEvent(eventSet, idPrefix);
+
 			newEvent.setId(newAlphabet.getUniqueId(idPrefix));
 			newAlphabet.addEvent(newEvent);
 		}

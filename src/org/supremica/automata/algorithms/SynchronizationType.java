@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,24 +47,27 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.automata.algorithms;
+
+
 
 import java.util.*;
 
+
 public class SynchronizationType
 {
-	private static Collection types = new LinkedList();
 
+	private static Collection types = new LinkedList();
 	public static final SynchronizationType Prioritized = new SynchronizationType("Prioritized Synchronization");
 	public static final SynchronizationType Full = new SynchronizationType("Full Synchronization");
 	public static final SynchronizationType Broadcast = new SynchronizationType("Broadcast Synchronization");
-
 	private String description = null;
 
 	private SynchronizationType(String description)
 	{
+
 		types.add(this);
+
 		this.description = description;
 	}
 

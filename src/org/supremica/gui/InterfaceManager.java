@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,24 +47,29 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.gui;
 
+
+
 import javax.swing.*;
+
 import org.apache.log4j.*;
+
 
 public class InterfaceManager
 {
+
 	private static Category thisCategory = LogDisplay.createCategory(InterfaceManager.class.getName());
 	private static InterfaceManager instance = null;
 
 	private InterfaceManager()
 	{
+
 		try
 		{
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
 			thisCategory.fatal("Error while setting LookAndFeel");
 			System.exit(0);
@@ -72,10 +78,12 @@ public class InterfaceManager
 
 	public static synchronized InterfaceManager getInstance()
 	{
+
 		if (instance == null)
 		{
 			instance = new InterfaceManager();
 		}
+
 		return instance;
 	}
 }

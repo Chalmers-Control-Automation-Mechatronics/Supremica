@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,14 +47,18 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.automata;
 
+
+
 import java.util.*;
+
 import org.supremica.gui.*;
+
 import org.apache.log4j.*;
 
 import org.supremica.gui.*;
+
 
 /**
  * A set of Automata with common actions and an AutomatonContainer.
@@ -62,6 +67,7 @@ import org.supremica.gui.*;
 public class Project
 	extends Automata
 {
+
 	private static Category thisCategory = LogDisplay.createCategory(Project.class.getName());
 	private AutomatonContainer theContainer = null;
 
@@ -72,8 +78,11 @@ public class Project
 
 	public Project(Project otherProject)
 	{
+
 		super(otherProject);
+
 		theContainer = new AutomatonContainer(otherProject.theContainer);
+
 		try
 		{
 			theContainer.add(otherProject);
@@ -88,5 +97,4 @@ public class Project
 	{
 		return theContainer;
 	}
-	
 }

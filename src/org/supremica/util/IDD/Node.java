@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,24 +47,24 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.util.IDD;
+
+
 
 import java.util.*;
 
+
 public final class Node
 {
+
 	// level -1: true node
 	// level -2: false node
 	// level -3: undefined
 	// level 0: root node
 	// level >=1: non-terminal nodes (except the root node)
 	private int level = -3;
-
 	private static int nextFreeId = 0;
-
 	private final int id;
-
 	private Node[] children;
 
 	public Node(int nbrOfChildren)
@@ -73,12 +74,12 @@ public final class Node
 
 	public Node(int nbrOfChildren, int level)
 	{
-		this.level = level;
 
+		this.level = level;
 		id = nextFreeId++;
 
 		if (nbrOfChildren > 0)
-		{ // The terminal nodes does not have children
+		{		// The terminal nodes does not have children
 			children = new Node[nbrOfChildren];
 		}
 		else
@@ -93,9 +94,11 @@ public final class Node
 	 */
 	public Node(Node cloneNode)
 	{
+
 		this.level = cloneNode.level;
 
 		int nbrOfChildren = cloneNode.children.length;
+
 		if (nbrOfChildren > 0)
 		{
 			children = new Node[nbrOfChildren];
@@ -108,27 +111,32 @@ public final class Node
 		id = nextFreeId++;
 	}
 
-
 	/**
 	 * Two nodes are equal if they have the same children.
 	 */
 	public boolean equals(Object other)
 	{
-		Node otherNode = (Node)other;
+
+		Node otherNode = (Node) other;
+
 		return id == otherNode.id;
 	}
 
 	public boolean sameChildren(Node other)
 	{
+
 		Node[] otherChildren = other.children;
+
 		for (int i = 0; i < children.length; i++)
 		{
+
 			// Same is the same objects
 			if (children[i] != otherChildren[i])
 			{
 				return false;
 			}
 		}
+
 		return true;
 	}
 
@@ -204,6 +212,7 @@ public final class Node
 
 	public void negate()
 	{
+
 		if (level == -1)
 		{
 			level = -2;
@@ -221,8 +230,11 @@ public final class Node
 
 	public String toString()
 	{
+
 		StringBuffer sb = new StringBuffer();
+
 		sb.append("Id: " + id);
+
 		if (isRoot())
 		{
 			sb.append(" Root");
@@ -235,19 +247,23 @@ public final class Node
 		{
 			sb.append(" False");
 		}
+
 		sb.append("\nChildren: ");
+
 		if (children != null)
 		{
 			for (int i = 0; i < children.length; i++)
 			{
 				sb.append(children[i] + " ");
 			}
+
 			sb.append("\n");
 		}
 		else
 		{
 			sb.append("none\n");
 		}
+
 		return sb.toString();
 	}
 }

@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,20 +47,21 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.automata.algorithms;
+
+
 
 import java.util.*;
 
+
 public class SynthesisType
 {
-	private static Collection types = new LinkedList();
 
+	private static Collection types = new LinkedList();
 	public static final SynthesisType Controllable = new SynthesisType("Controllable");
 	public static final SynthesisType Nonblocking = new SynthesisType("Nonblocking");
 	public static final SynthesisType Both = new SynthesisType("Both");
 	public static final SynthesisType Unknown = new SynthesisType("Unknown", false);
-
 	private String description = null;
 
 	private SynthesisType(String description)
@@ -69,10 +71,12 @@ public class SynthesisType
 
 	private SynthesisType(String description, boolean selectable)
 	{
+
 		if (selectable)
 		{
 			types.add(this);
 		}
+
 		this.description = description;
 	}
 
@@ -88,18 +92,22 @@ public class SynthesisType
 
 	public static SynthesisType toType(String type)
 	{
+
 		if (type.equals(Controllable.toString()))
 		{
 			return Controllable;
 		}
+
 		if (type.equals(Nonblocking.toString()))
 		{
 			return Nonblocking;
 		}
+
 		if (type.equals(Both.toString()))
 		{
 			return Both;
 		}
+
 		return Unknown;
 	}
 

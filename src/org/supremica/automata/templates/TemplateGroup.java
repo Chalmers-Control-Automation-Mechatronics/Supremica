@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,16 +47,19 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.automata.templates;
 
+
+
 import java.util.*;
+
 import org.supremica.automata.*;
+
 
 public class TemplateGroup
 {
-	private List items = new LinkedList();
 
+	private List items = new LinkedList();
 	private TemplateTypes type;
 	private String description;
 

@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,15 +47,17 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.recipe;
+
+
 
 import java.util.*;
 
+
 public class InternalOperationRecipeStatus
 {
-	private static List collection = new LinkedList();
 
+	private static List collection = new LinkedList();
 	public static final InternalOperationRecipeStatus Undetermined = new InternalOperationRecipeStatus();
 	public static final InternalOperationRecipeStatus NotStarted = new InternalOperationRecipeStatus();
 	public static final InternalOperationRecipeStatus Running = new InternalOperationRecipeStatus();

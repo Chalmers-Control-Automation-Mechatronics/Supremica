@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,48 +47,44 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.automata.algorithms;
+
+
 
 import org.supremica.automata.*;
 import org.supremica.util.*;
-
 import org.supremica.gui.*;
+
 import org.apache.log4j.*;
 
 import java.util.*;
+
 
 /**
  * Contains information that is common to all synchronization threads.
  */
 public final class AutomataSynchronizerHelper
 {
- 	private AutomataIndexForm theAutomataIndexForm;
 
-  	private IntArrayHashTable theStates;
-
-   	private static Category thisCategory = LogDisplay.createCategory(AutomataSynchronizerHelper.class.getName());
-
+	private AutomataIndexForm theAutomataIndexForm;
+	private IntArrayHashTable theStates;
+	private static Category thisCategory = LogDisplay.createCategory(AutomataSynchronizerHelper.class.getName());
 	private IntArrayList statesToProcess;
 	private int nbrOfStatesToProcess = 0;
 
-  	// Two locks are used to limit the access the statesToProcess
- 	private Object gettingFromStatesToProcessLock = new Object();
-  	private Object addingToStatesToProcessLock = new Object();
-
+	// Two locks are used to limit the access the statesToProcess
+	private Object gettingFromStatesToProcessLock = new Object();
+	private Object addingToStatesToProcessLock = new Object();
 	private Automata theAutomata;
 	private Automaton theAutomaton;
-
 	private boolean automataIsControllable = true;
 
 	/** Keeps information common to helpers. */
 	private HelperData helperData;
-
 	private SynchronizationOptions syncOptions = null;
 
 	// Used by AutomataSynchronizerExecuter
 	private StateMemorizer stateMemorizer = new StateMemorizer();
-
 	private boolean rememberUncontrollable = false;
 	private boolean expandEventsUsingPriority = false;
 	private IntArrayList fromStateList = new IntArrayList();
@@ -111,13 +108,15 @@ public final class AutomataSynchronizerHelper
 	// Stop execution after amount of state
 	private int stopExecutionLimit = -1;
 
- 	public AutomataSynchronizerHelper(Automata theAutomata, SynchronizationOptions syncOptions)
- 		throws Exception
-    {
+	public AutomataSynchronizerHelper(Automata theAutomata, SynchronizationOptions syncOptions)
+		throws Exception
+	{
+
 		if (theAutomata == null)
 		{
 			throw new Exception("theAutomata must be non-null");
 		}
+
 		if (syncOptions == null)
 		{
 			throw new Exception("syncOptions must be non-null");
@@ -127,34 +126,35 @@ public final class AutomataSynchronizerHelper
 		this.syncOptions = syncOptions;
 		verboseMode = syncOptions.verboseMode();
 		helperData = new HelperData();
-
-		statesToProcess  = new IntArrayList();
+		statesToProcess = new IntArrayList();
 		nbrOfStatesToProcess = 0;
-
 		theStates = new IntArrayHashTable(syncOptions.getInitialHashtableSize(), syncOptions.expandHashtable());
-  		theAutomaton = new Automaton();
+		theAutomaton = new Automaton();
 
 		Alphabet theAlphabet = theAutomata.getUnionAlphabet();
+
 		theAutomaton.setAlphabet(theAlphabet);
 
-  		try
-  		{
+		try
+		{
 			theAutomataIndexForm = new AutomataIndexForm(theAutomata, theAutomaton);
 		}
 		catch (Exception e)
 		{
 			thisCategory.error("Error while computing AutomataIndexForm");
+
 			throw e;
 		}
-    }
+	}
 
 	/**
 	 * Constructs new helper but keeps the same AutomataIndexForm-, Automata-, HelperData and Automaton-Objects.
 	 * @see AutomataVerificationOptions#findUncontrollableStates(int[])
 	 */
- 	public AutomataSynchronizerHelper(AutomataSynchronizerHelper orgHelper)
- 		throws Exception
-    {
+	public AutomataSynchronizerHelper(AutomataSynchronizerHelper orgHelper)
+		throws Exception
+	{
+
 		theAutomata = orgHelper.getAutomata();
 		theAutomaton = orgHelper.getAutomaton();
 		theAutomataIndexForm = orgHelper.getAutomataIndexForm();
@@ -162,23 +162,24 @@ public final class AutomataSynchronizerHelper
 		verboseMode = syncOptions.verboseMode();
 		helperData = orgHelper.getHelperData();
 		executionDialog = orgHelper.getExecutionDialog();
-
-		statesToProcess  = new IntArrayList();
+		statesToProcess = new IntArrayList();
 		nbrOfStatesToProcess = 0;
-
 		theStates = new IntArrayHashTable(syncOptions.getInitialHashtableSize(), syncOptions.expandHashtable());
 	}
 
 	public void clear()
 	{
+
 		theStates.clear();
+
 		automataIsControllable = true;
 		coExecute = false;
 		coExecuter = null;
 		rememberTrace = false;
 		exhaustiveSearch = false;
 		rememberUncontrollable = false;
-		expandEventsUsingPriority = false; // Should be an external option?!? FIXA!
+		expandEventsUsingPriority = false;		// Should be an external option?!? FIXA!
+
 		// Is there anything else that needs to be cleared?...
 	}
 
@@ -187,49 +188,52 @@ public final class AutomataSynchronizerHelper
 		return syncOptions;
 	}
 
-    public Automaton getAutomaton()
-    {
-        return theAutomaton;
-    }
+	public Automaton getAutomaton()
+	{
+		return theAutomaton;
+	}
 
-    public Automata getAutomata()
-    {
-        return theAutomata;
-    }
+	public Automata getAutomata()
+	{
+		return theAutomata;
+	}
 
-    public AutomataIndexForm getAutomataIndexForm()
-    {
+	public AutomataIndexForm getAutomataIndexForm()
+	{
 		return theAutomataIndexForm;
-    }
+	}
 
 	public HelperData getHelperData()
 	{
 		return helperData;
 	}
 
-    /**
-     * Add a state to the queue of states waiting for being processed.
-     * This is only called by the addInitialState and addState methods.
-     */
-    public void addStateToProcess(int[] state)
-    {
-        synchronized (addingToStatesToProcessLock)
-        {
-			statesToProcess.addLast(state);
-			nbrOfStatesToProcess++;
-   		}
-    }
+	/**
+	 * Add a state to the queue of states waiting for being processed.
+	 * This is only called by the addInitialState and addState methods.
+	 */
+	public void addStateToProcess(int[] state)
+	{
 
-    /**
-     * @return a state if there are more states to process, null otherwise.
-     */
-    public int[] getStateToProcess()
-    {
+		synchronized (addingToStatesToProcessLock)
+		{
+			statesToProcess.addLast(state);
+
+			nbrOfStatesToProcess++;
+		}
+	}
+
+	/**
+	 * @return a state if there are more states to process, null otherwise.
+	 */
+	public int[] getStateToProcess()
+	{
+
 		synchronized (gettingFromStatesToProcessLock)
-        {
-			if (nbrOfStatesToProcess == 0 || stopExecutionLimit == 0)
+		{
+			if ((nbrOfStatesToProcess == 0) || (stopExecutionLimit == 0))
 			{
-	        	return null;
+				return null;
 			}
 
 			if (stopExecutionLimit > 0)
@@ -256,6 +260,7 @@ public final class AutomataSynchronizerHelper
 					fromStateList.removeLast();
 					stateTrace.addLast(statesToProcess.getLast());
 				}
+
 				if (stateTrace.size() == 0)
 				{
 					stateTrace.addLast(statesToProcess.getLast());
@@ -267,39 +272,42 @@ public final class AutomataSynchronizerHelper
 			else
 			{
 				if (coExecute)
-				{	// Depth first search
+				{		// Depth first search
 					return statesToProcess.removeLast();
 				}
 				else
-				{	// Width first search
+				{		// Width first search
 					return statesToProcess.removeFirst();
 				}
 			}
-   		}
-    }
+		}
+	}
 
- 	// Add this state to theStates
-    public void addState(int[] state)
+	// Add this state to theStates
+	public void addState(int[] state)
 		throws Exception
-    {
-        int[] newState = theStates.add(state);
-        if (newState != null)
-        {
-			if (rememberTrace && stateTrace.size() == 0)
-			{   // Add initial state
+	{
+
+		int[] newState = theStates.add(state);
+
+		if (newState != null)
+		{
+			if (rememberTrace && (stateTrace.size() == 0))
+			{		// Add initial state
 				stateTrace.add(newState);
 			}
-            addStatus(newState);
-        	addStateToProcess(newState);
+
+			addStatus(newState);
+			addStateToProcess(newState);
 
 			// helperData.incrNbrOfAddedStates();
 			helperData.nbrOfAddedStates++;
 
 			/*
-			if (verboseMode && helperData.getNbrOfAddedStates() % 10000 == 0)
-					thisCategory.debug(nbrOfAddedStates + " new states found so far.");
-			*/
-        }
+			 * if (verboseMode && helperData.getNbrOfAddedStates() % 10000 == 0)
+			 *               thisCategory.debug(nbrOfAddedStates + " new states found so far.");
+			 */
+		}
 		else
 		{
 			if (rememberTrace && (fromStateList.size() != 0))
@@ -316,18 +324,19 @@ public final class AutomataSynchronizerHelper
 		{
 			if (executionDialog != null)
 			{
+
 				// executionDialog.setValue(helperData.getNbrOfCheckedStates());
 				executionDialog.setValue(helperData.nbrOfCheckedStates);
 			}
 
 			/*
-			if (verboseMode && helperData.getNbrOfCheckedStates() % 10000 == 0)
-					thisCategory.debug(nbrOfCheckedStates + " states checked so far.");
-			*/
+			 * if (verboseMode && helperData.getNbrOfCheckedStates() % 10000 == 0)
+			 *               thisCategory.debug(nbrOfCheckedStates + " states checked so far.");
+			 */
 		}
-    }
+	}
 
-   	public void setExecutionDialog(ExecutionDialog executionDialog)
+	public void setExecutionDialog(ExecutionDialog executionDialog)
 	{
 		this.executionDialog = executionDialog;
 	}
@@ -337,49 +346,55 @@ public final class AutomataSynchronizerHelper
 		return executionDialog;
 	}
 
+	/**
+	 * If the toState does not exist then make a copy of this state
+	 * and add it to the set of states and to the set of states waiting for processing.
+	 * If it exists then find it.
+	 * Insert the arc.
+	 */
+	public void addState(int[] fromState, int[] toState, int eventIndex)
+		throws Exception
+	{
 
-    /**
-     * If the toState does not exist then make a copy of this state
-     * and add it to the set of states and to the set of states waiting for processing.
-     * If it exists then find it.
-     * Insert the arc.
-     */
-    public void addState(int[] fromState, int[] toState, int eventIndex)
-    	throws Exception
-    {
 		if (rememberTrace)
 		{
 			fromStateList.addLast(fromState);
 		}
+
 		addState(toState);
-    }
+	}
 
-    public void addStatus(int[] state)
-    {
-    	int[][] stateStatusTable = theAutomataIndexForm.getStateStatusTable();
+	public void addStatus(int[] state)
+	{
+
+		int[][] stateStatusTable = theAutomataIndexForm.getStateStatusTable();
 		int tmpStatus = stateStatusTable[0][state[0]];
+		boolean forbidden = AutomataIndexFormHelper.isForbidden(tmpStatus);
+		int currStatus;
 
-  		boolean forbidden = AutomataIndexFormHelper.isForbidden(tmpStatus);
-  		int currStatus;
-    	for (int i = 1; i < state.length - 1; i++)
-    	{
-			if (activeAutomata == null || activeAutomata[i] == true)
+		for (int i = 1; i < state.length - 1; i++)
+		{
+			if ((activeAutomata == null) || (activeAutomata[i] == true))
 			{
 				currStatus = stateStatusTable[i][state[i]];
-				tmpStatus &= currStatus; // works for everything except forbidden
+				tmpStatus &= currStatus;	// works for everything except forbidden
 				forbidden |= AutomataIndexFormHelper.isForbidden(currStatus);
 			}
 		}
-  		if (forbidden)
-  		{
-    		tmpStatus |= (1 << 2);
-		}
-  		state[state.length - 1] = tmpStatus;
-    }
 
-    public void setForbidden(int[] state, boolean forbidden)
-    {
+		if (forbidden)
+		{
+			tmpStatus |= (1 << 2);
+		}
+
+		state[state.length - 1] = tmpStatus;
+	}
+
+	public void setForbidden(int[] state, boolean forbidden)
+	{
+
 		int currStatus = state[state.length - 1];
+
 		if (forbidden)
 		{
 			currStatus |= (1 << 2);
@@ -388,33 +403,34 @@ public final class AutomataSynchronizerHelper
 		{
 			currStatus &= ~(1 << 2);
 		}
-		state[state.length -1] = currStatus;
+
+		state[state.length - 1] = currStatus;
 	}
 
-    public int[][] getStateTable()
-    {
-    	return theStates.getTable();
-    }
+	public int[][] getStateTable()
+	{
+		return theStates.getTable();
+	}
 
 	public Iterator getStateIterator()
 	{
 		return theStates.iterator();
 	}
 
-    public State[][] getIndexFormStateTable()
-    {
-    	return theAutomataIndexForm.getStateTable();
-    }
+	public State[][] getIndexFormStateTable()
+	{
+		return theAutomataIndexForm.getStateTable();
+	}
 
-    public int getStateIndex(int[] state)
-    {
-    	return theStates.getIndex(state);
-    }
+	public int getStateIndex(int[] state)
+	{
+		return theStates.getIndex(state);
+	}
 
-    public String toString()
-    {
-    	return theStates.toString();
-    }
+	public String toString()
+	{
+		return theStates.toString();
+	}
 
 	/**
 	 * Used for getting the synchronization result to the worker-class.
@@ -462,7 +478,7 @@ public final class AutomataSynchronizerHelper
 
 	public void setExpandEventsUsingPriority(boolean use)
 	{
-		 expandEventsUsingPriority = use;
+		expandEventsUsingPriority = use;
 	}
 
 	public boolean getExpandEventsUsingPriority()
@@ -473,23 +489,29 @@ public final class AutomataSynchronizerHelper
 	// Returns array with priorities, 0 is the highest priority, larger numbers - lower priority
 	public int[] getEventPriority()
 	{
-	    Alphabet unionAlphabet = theAutomaton.getAlphabet();
+
+		Alphabet unionAlphabet = theAutomaton.getAlphabet();
 		int[] eventPriority = new int[unionAlphabet.size()];
 		int index = 0;
-		for (Iterator eventIterator = unionAlphabet.iterator(); eventIterator.hasNext();)
+
+		for (Iterator eventIterator = unionAlphabet.iterator(); eventIterator.hasNext(); )
 		{
 			Event currEvent = (Event) eventIterator.next();
+
 			if (currEvent.getExpansionPriority() < 0)
-			{   // The events are already ordered after synchIndex!
-			    // eventPriority[currEvent.getSynchIndex()] = 10;
+			{		// The events are already ordered after synchIndex!
+
+				// eventPriority[currEvent.getSynchIndex()] = 10;
 				eventPriority[index++] = 10;
 			}
 			else
-			{   // The events are already ordered after synchIndex!
+			{		// The events are already ordered after synchIndex!
+
 				// eventPriority[currEvent.getSynchIndex()] = currEvent.getExpansionPriority();
 				eventPriority[index++] = currEvent.getExpansionPriority();
 			}
 		}
+
 		return eventPriority;
 	}
 
@@ -503,6 +525,7 @@ public final class AutomataSynchronizerHelper
 	 */
 	public void displayInfo()
 	{
+
 		// thisCategory.info("During the execution, " + helperData.getNbrOfCheckedStates() + " states were examined.");
 		// thisCategory.info("During the execution, " + helperData.getNbrOfAddedStates() + " new states were found.");
 		thisCategory.info("During the execution, " + helperData.nbrOfCheckedStates + " states were examined.");
@@ -515,22 +538,28 @@ public final class AutomataSynchronizerHelper
 	public void displayTrace()
 		throws Exception
 	{
+
 		Alphabet unionAlphabet = theAutomaton.getAlphabet();
 
 		// We have to have an executer for finding the transitions
 		clear();
+
 		AutomataOnlineSynchronizer executer = new AutomataOnlineSynchronizer(this);
+
 		executer.initialize();
 
 		// This version does not remove shortcuts, add this later
 		StringBuffer trace = new StringBuffer();
 		int[] prevState = null;
-		for (Iterator traceIt = stateTrace.iterator(); traceIt.hasNext();)
+
+		for (Iterator traceIt = stateTrace.iterator(); traceIt.hasNext(); )
 		{
 			int[] nextState = (int[]) traceIt.next();
+
 			if (prevState != null)
 			{
 				int currEventIndex = executer.findTransition(prevState, nextState);
+
 				trace.append(" ");
 				trace.append(unionAlphabet.getEventWithIndex(currEventIndex).getLabel());
 			}
@@ -539,52 +568,51 @@ public final class AutomataSynchronizerHelper
 		}
 
 		/*
-		// This tries to find shortcuts in the trace by looking one-step ahead
-		StringBuffer trace = new StringBuffer();
-		int[] fromState;
-		for (int i = 0; i < stateTrace.size() - 1; i++)
-		{
-			int[] fromState = (int[]) stateTrace.get(i);
-			executer.setCurrState(fromState);
-			for (int j = stateTrace.size() - 1; j > i; j--)
-			{
-				int index = executer.findTransition(fromState, (int[]) stateTrace.get(j));
-				if (index >= 0)
-				{ // thisCategory.debug("Event: " + unionAlphabet.getEventWithIndex(index).getLabel());
-					trace.append(unionAlphabet.getEventWithIndex(index).getLabel());
-					if (j != stateTrace.size() - 1)
-					{
-						trace.append(",");
-					}
-					if (j > i+1)
-					{
-						thisCategory.debug("Shortcut found from state number " + i + " to state number " + j + ".");
-					}
-					i = j-1;
-					break;
-				}
-				if (i == j-1)
-				{
-					throw new Exception("Error in AutomataSynchronizerHelper.displayTrace(). Impossible transition found.");
-				}
-			}
-		}
-		*/
-
+		 * // This tries to find shortcuts in the trace by looking one-step ahead
+		 * StringBuffer trace = new StringBuffer();
+		 * int[] fromState;
+		 * for (int i = 0; i < stateTrace.size() - 1; i++)
+		 * {
+		 *       int[] fromState = (int[]) stateTrace.get(i);
+		 *       executer.setCurrState(fromState);
+		 *       for (int j = stateTrace.size() - 1; j > i; j--)
+		 *       {
+		 *               int index = executer.findTransition(fromState, (int[]) stateTrace.get(j));
+		 *               if (index >= 0)
+		 *               { // thisCategory.debug("Event: " + unionAlphabet.getEventWithIndex(index).getLabel());
+		 *                       trace.append(unionAlphabet.getEventWithIndex(index).getLabel());
+		 *                       if (j != stateTrace.size() - 1)
+		 *                       {
+		 *                               trace.append(",");
+		 *                       }
+		 *                       if (j > i+1)
+		 *                       {
+		 *                               thisCategory.debug("Shortcut found from state number " + i + " to state number " + j + ".");
+		 *                       }
+		 *                       i = j-1;
+		 *                       break;
+		 *               }
+		 *               if (i == j-1)
+		 *               {
+		 *                       throw new Exception("Error in AutomataSynchronizerHelper.displayTrace(). Impossible transition found.");
+		 *               }
+		 *       }
+		 * }
+		 */
 		thisCategory.info("The trace leading to the uncontrollable state is:" + trace.toString() + ".");
 
 		/*
-		thisCategory.error("And again...");
-
-		while (stateTrace.size() > 1)
-		{
-			index = executer.findTransition((int[]) stateTrace.removeFirst(), (int[]) stateTrace.getFirst());
-			if (index >= 0)
-				thisCategory.debug("Event: " + unionAlphabet.getEventWithIndex(index).getLabel());
-			else
-				thisCategory.error("Possible error?");
-		}
-		*/
+		 * thisCategory.error("And again...");
+		 *
+		 * while (stateTrace.size() > 1)
+		 * {
+		 *       index = executer.findTransition((int[]) stateTrace.removeFirst(), (int[]) stateTrace.getFirst());
+		 *       if (index >= 0)
+		 *               thisCategory.debug("Event: " + unionAlphabet.getEventWithIndex(index).getLabel());
+		 *       else
+		 *               thisCategory.error("Possible error?");
+		 * }
+		 */
 	}
 
 	public void setCoExecute(boolean coExecute)
@@ -610,35 +638,44 @@ public final class AutomataSynchronizerHelper
 	public void printUncontrollableStates()
 		throws Exception
 	{
+
 		int[] automataIndices = new int[theAutomata.size()];
-		for(int i = 0; i < theAutomata.size(); i++)
+
+		for (int i = 0; i < theAutomata.size(); i++)
 		{
 			automataIndices[i] = i;
 		}
+
 		printUncontrollableStates(automataIndices);
 	}
 
 	public void printUncontrollableStates(int[] automataIndices)
 		throws Exception
 	{
+
 		int problemPlant;
 		int problemEvent;
 		Automaton problemAutomaton;
 		int[] currState = new int[automataIndices.length];
 		State[][] stateTable = getIndexFormStateTable();
-		for (Iterator stateHolderIterator = stateMemorizer.iterator(automataIndices); stateHolderIterator.hasNext();)
+
+		for (Iterator stateHolderIterator = stateMemorizer.iterator(automataIndices); stateHolderIterator.hasNext(); )
 		{
 			StateHolder stateHolder = (StateHolder) stateHolderIterator.next();
+
 			currState = stateHolder.getArray();
 			problemPlant = stateHolder.getProblemPlant();
 			problemEvent = stateHolder.getProblemEvent();
 			problemAutomaton = theAutomata.getAutomatonAt(problemPlant);
+
 			StringBuffer state = new StringBuffer();
 			boolean firstEntry = true;
+
 			for (int i = 0; i < currState.length; i++)
 			{
+
 				// Only print states that are not initial if we are looking at a full state
-				if (!stateTable[automataIndices[i]][currState[i]].isInitial() || automataIndices.length < theAutomata.size())
+				if (!stateTable[automataIndices[i]][currState[i]].isInitial() || (automataIndices.length < theAutomata.size()))
 				{
 					if (firstEntry)
 					{
@@ -648,21 +685,26 @@ public final class AutomataSynchronizerHelper
 					{
 						state.append(", ");
 					}
+
 					state.append(theAutomata.getAutomatonAt(automataIndices[i]).getName());
 					state.append(": ");
 					state.append(stateTable[automataIndices[i]][currState[i]].getName());
 				}
 			}
+
 			String reason = "the uncontrollable event " + theAutomaton.getAlphabet().getEventWithIndex(problemEvent).getLabel() + " in the plant " + problemAutomaton.getName() + " is enabled.";
+
 			thisCategory.error("The state: " + state.toString() + " is uncontrollable since " + reason);
 		}
 	}
 
 	public boolean isAllAutomataPlants()
 	{
-		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext();)
+
+		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
 		{
-			Automaton currAutomaton = (Automaton)autIt.next();
+			Automaton currAutomaton = (Automaton) autIt.next();
+
 			if (currAutomaton.getType() != AutomatonType.Plant)
 			{
 				return false;
@@ -674,9 +716,11 @@ public final class AutomataSynchronizerHelper
 
 	public boolean isAllAutomataSupervisors()
 	{
-		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext();)
+
+		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
 		{
-			Automaton currAutomaton = (Automaton)autIt.next();
+			Automaton currAutomaton = (Automaton) autIt.next();
+
 			if (currAutomaton.getType() != AutomatonType.Supervisor)
 			{
 				return false;
@@ -688,9 +732,11 @@ public final class AutomataSynchronizerHelper
 
 	public boolean isAllAutomataSpecifications()
 	{
-		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext();)
+
+		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
 		{
-			Automaton currAutomaton = (Automaton)autIt.next();
+			Automaton currAutomaton = (Automaton) autIt.next();
+
 			if (currAutomaton.getType() != AutomatonType.Specification)
 			{
 				return false;
@@ -702,6 +748,7 @@ public final class AutomataSynchronizerHelper
 
 	public void selectAutomata(int[] automataIndices)
 	{
+
 		if (activeAutomata == null)
 		{
 			activeAutomata = new boolean[theAutomata.size()];
@@ -721,35 +768,34 @@ public final class AutomataSynchronizerHelper
 	}
 
 	/*
-	public void newAutomaton(ArrayList selectedAutomata)
-		throws Exception
-	{   // Used by automataaSynthesizer (essential when building more than one automata)
-  		theAutomaton = new Automaton();
-
-  		// Compute the new alphabet
-		EventsSet theAlphabets = new EventsSet();
-		Iterator autIt = selectedAutomata.iterator();
-		while (autIt.hasNext())
-		{
-			Automaton currAutomaton = (Automaton)autIt.next();
-			Alphabet currAlphabet = currAutomaton.getAlphabet();
-			theAlphabets.add(currAlphabet);
-		}
-
-		try
-  		{
-			Alphabet theAlphabet = AlphabetHelpers.getUnionAlphabet(theAlphabets, "a");
-			theAutomaton.setAlphabet(theAlphabet);
-		}
-  		catch (Exception e)
-    	{
-			System.err.println("Error while generating union alphabet: " + e);
- 			thisCategory.error("Error while generating union alphabet: " + e);
-        	throw e;
-     	}
-	}
-	*/
-
+	 * public void newAutomaton(ArrayList selectedAutomata)
+	 *       throws Exception
+	 * {   // Used by automataaSynthesizer (essential when building more than one automata)
+	 *       theAutomaton = new Automaton();
+	 *
+	 *       // Compute the new alphabet
+	 *       EventsSet theAlphabets = new EventsSet();
+	 *       Iterator autIt = selectedAutomata.iterator();
+	 *       while (autIt.hasNext())
+	 *       {
+	 *               Automaton currAutomaton = (Automaton)autIt.next();
+	 *               Alphabet currAlphabet = currAutomaton.getAlphabet();
+	 *               theAlphabets.add(currAlphabet);
+	 *       }
+	 *
+	 *       try
+	 *       {
+	 *               Alphabet theAlphabet = AlphabetHelpers.getUnionAlphabet(theAlphabets, "a");
+	 *               theAutomaton.setAlphabet(theAlphabet);
+	 *       }
+	 *       catch (Exception e)
+	 * {
+	 *               System.err.println("Error while generating union alphabet: " + e);
+	 *               thisCategory.error("Error while generating union alphabet: " + e);
+	 *       throw e;
+	 * }
+	 * }
+	 */
 	public void stopExecutionAfter(int stopExecutionLimit)
 	{
 		this.stopExecutionLimit = stopExecutionLimit;
@@ -757,14 +803,13 @@ public final class AutomataSynchronizerHelper
 
 	private class HelperData
 	{
+
 		// private int nbrOfAddedStates = 0;
 		// private int nbrOfCheckedStates = 0;
 		public int nbrOfAddedStates = 0;
 		public int nbrOfCheckedStates = 0;
 
-		public HelperData()
-		{
-		}
+		public HelperData() {}
 
 		public void incrNbrOfAddedStates()
 		{
@@ -778,7 +823,7 @@ public final class AutomataSynchronizerHelper
 
 		public void incrNbrOfCheckedStates()
 		{
-		    nbrOfCheckedStates++;
+			nbrOfCheckedStates++;
 		}
 
 		public int getNbrOfCheckedStates()
@@ -787,6 +832,3 @@ public final class AutomataSynchronizerHelper
 		}
 	}
 }
-
-
-

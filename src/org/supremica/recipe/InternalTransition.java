@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,16 +47,18 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.recipe;
+
+
 
 import java.util.*;
 
+
 public class InternalTransition
 {
+
 	private List prevOperations = new LinkedList();
 	private List nextOperations = new LinkedList();
-
 	private String identity;
 	private boolean controllable;
 
@@ -66,10 +69,12 @@ public class InternalTransition
 
 	public InternalTransition(String identity, boolean controllable)
 	{
+
 		if (identity == null)
 		{
 			System.err.println("null identity");
 		}
+
 		this.identity = identity;
 		this.controllable = controllable;
 	}
@@ -117,33 +122,41 @@ public class InternalTransition
 
 	public boolean isEnabled(InternalOperationState theState)
 	{
+
 		Iterator prevOperationIt = prevOperations.iterator();
+
 		while (prevOperationIt.hasNext())
 		{
-			InternalOperation currOperation = (InternalOperation)prevOperationIt.next();
+			InternalOperation currOperation = (InternalOperation) prevOperationIt.next();
+
 			if (!theState.isActive(currOperation))
 			{
 				return false;
 			}
 		}
+
 		return true;
 	}
 
 	public InternalOperationState fire(InternalOperationState oldState)
 	{
-		InternalOperationState newState = new InternalOperationState(oldState);
 
+		InternalOperationState newState = new InternalOperationState(oldState);
 		Iterator operationIt = prevOperations.iterator();
-		while(operationIt.hasNext())
+
+		while (operationIt.hasNext())
 		{
-			InternalOperation currOperation = (InternalOperation)operationIt.next();
+			InternalOperation currOperation = (InternalOperation) operationIt.next();
+
 			newState.deactiveOperation(currOperation);
 		}
 
 		operationIt = nextOperations.iterator();
-		while(operationIt.hasNext())
+
+		while (operationIt.hasNext())
 		{
-			InternalOperation currOperation = (InternalOperation)operationIt.next();
+			InternalOperation currOperation = (InternalOperation) operationIt.next();
+
 			newState.setActive(currOperation);
 		}
 
@@ -152,26 +165,32 @@ public class InternalTransition
 
 	public String toString()
 	{
-		StringBuffer sb = new StringBuffer();
-		sb.append("InternalTransition: " + identity + "\n");
 
+		StringBuffer sb = new StringBuffer();
+
+		sb.append("InternalTransition: " + identity + "\n");
 		sb.append("\tPrevious operations:\n");
+
 		Iterator operationIt = prevOperations.iterator();
-		while(operationIt.hasNext())
+
+		while (operationIt.hasNext())
 		{
-			InternalOperation currOperation = (InternalOperation)operationIt.next();
+			InternalOperation currOperation = (InternalOperation) operationIt.next();
+
 			sb.append("\t\t" + currOperation.getIdentity() + "\n");
 		}
 
 		sb.append("\tNext operations:\n");
+
 		operationIt = nextOperations.iterator();
-		while(operationIt.hasNext())
+
+		while (operationIt.hasNext())
 		{
-			InternalOperation currOperation = (InternalOperation)operationIt.next();
+			InternalOperation currOperation = (InternalOperation) operationIt.next();
+
 			sb.append("\t\t" + currOperation.getIdentity() + "\n");
 		}
 
 		return sb.toString();
 	}
-
 }

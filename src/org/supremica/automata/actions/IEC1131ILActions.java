@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,12 +47,14 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.automata.actions;
+
+
 
 public class IEC1131ILActions
 	implements Actions
 {
+
 	public String getType()
 	{
 		return "IEC 61331-1 IL";
@@ -76,5 +79,4 @@ public class IEC1131ILActions
 	{
 		return "";
 	}
-
 }

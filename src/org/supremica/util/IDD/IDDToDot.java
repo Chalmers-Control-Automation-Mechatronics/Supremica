@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,14 +47,18 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.util.IDD;
 
+
+
 import java.io.*;
+
 import java.util.*;
+
 
 public class IDDToDot
 {
+
 	private IDD theIDD;
 	private boolean leftToRight = false;
 	private boolean withCircles = true;
@@ -86,10 +91,12 @@ public class IDDToDot
 	}
 
 	public void serialize(PrintWriter pw)
- 		throws Exception
+		throws Exception
 	{
+
 		pw.println("digraph IDD {");
 		pw.println("\tcenter = true;");
+
 		if (leftToRight)
 		{
 			pw.println("\trankdir = LR;");
@@ -104,29 +111,31 @@ public class IDDToDot
 			pw.println("\tnode [shape = plaintext];");
 		}
 
-		//DestStateMap destStateMap = null;
-		//destStateMap = new DestStateMap(theIDD.nbrOfNodes());
-
-
+		// DestStateMap destStateMap = null;
+		// destStateMap = new DestStateMap(theIDD.nbrOfNodes());
 		// Write out all ranks
-
 		pw.println("{ rank = same;");
 		pw.print("\"level_" + 0 + "\"; ");
 		pw.print("\"" + theIDD.getRootNode().getId() + "\";");
 		pw.println("}");
 
 		int nbrOfLevels = theIDD.nbrOfLevels();
+
 		for (int i = 1; i < nbrOfLevels; i++)
 		{
 			pw.println("{ rank = same; ");
 			pw.println("\"level_" + i + "\"; ");
+
 			List currNodeList = theIDD.getNodesAtLevel(i);
 			Iterator nodeIt = currNodeList.iterator();
+
 			while (nodeIt.hasNext())
 			{
-				Node currNode = (Node)nodeIt.next();
+				Node currNode = (Node) nodeIt.next();
+
 				pw.print("\"" + currNode.getId() + "\"; ");
 			}
+
 			pw.println("}");
 		}
 
@@ -137,16 +146,17 @@ public class IDDToDot
 		pw.println("}");
 
 		// Write out all arcs
-
 		serialize(pw, theIDD.getRootNode());
 
 		for (int i = 1; i < nbrOfLevels; i++)
 		{
 			List currNodeList = theIDD.getNodesAtLevel(i);
 			Iterator nodeIt = currNodeList.iterator();
+
 			while (nodeIt.hasNext())
 			{
-				Node currNode = (Node)nodeIt.next();
+				Node currNode = (Node) nodeIt.next();
+
 				serialize(pw, currNode);
 			}
 		}
@@ -157,17 +167,19 @@ public class IDDToDot
 		for (int i = 0; i < nbrOfLevels; i++)
 		{
 			int j = i + 1;
+
 			pw.print("\t\"" + "level_" + i + "\" [label = \"");
 			pw.print(i);
 			pw.println("\"]; ");
 			pw.print("\t\"" + "level_" + i + "\" -> \"" + "level_" + j);
 			pw.println("\";");
 		}
+
 		int j = nbrOfLevels;
+
 		pw.print("\t\"" + "level_" + j + "\" [label = \"");
 		pw.print(j);
 		pw.println("\"]; ");
-
 		pw.println("}");
 		pw.flush();
 		pw.close();
@@ -175,50 +187,62 @@ public class IDDToDot
 
 	private void serialize(PrintWriter pw, Node theNode)
 	{
+
 		pw.print("\t\"" + theNode.getId() + "\" [label = \"");
+
 		boolean prevText = false;
+
 		if (theNode.isFalse())
 		{
 			pw.print("0");
+
 			prevText = true;
 		}
 		else if (theNode.isTrue())
 		{
 			pw.print("1");
+
 			prevText = true;
 		}
+
 		if (withId)
 		{
 			if (prevText)
 			{
 				pw.print(":");
 			}
+
 			pw.print(theNode.getId());
+
 			prevText = true;
 		}
+
 		if (withLevel)
 		{
 			if (prevText)
 			{
 				pw.print(":");
 			}
+
 			pw.print(theNode.getLevel());
 		}
+
 		pw.println("\"]; ");
 
 		Node[] children = theNode.getChildren();
+
 		if (children != null)
 		{
 			for (int i = 0; i < children.length; i++)
 			{
 				Node currChild = children[i];
+
 				pw.print("\t\"" + theNode.getId() + "\" -> \"" + currChild.getId());
 				pw.print("\" [ label = \"");
 				pw.print(i);
 				pw.println("\" ];");
 			}
 		}
-
 	}
 
 	public void serialize(String fileName)

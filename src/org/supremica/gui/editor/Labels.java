@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -58,75 +59,86 @@ import java.awt.Rectangle;
 
 import org.supremica.automata.*;
 
-public class Labels extends JGoArea {
 
-    private ArcSet            theArcSet = null;
-    private AutomatonDocument doc       = null;
+public class Labels
+	extends JGoArea
+{
 
-    public Labels(AutomatonDocument doc, ArcSet theArcSet) throws Exception {
+	private ArcSet theArcSet = null;
+	private AutomatonDocument doc = null;
 
-        this.doc       = doc;
-        this.theArcSet = theArcSet;
+	public Labels(AutomatonDocument doc, ArcSet theArcSet)
+		throws Exception
+	{
 
-        updateArcs();
-    }
+		this.doc = doc;
+		this.theArcSet = theArcSet;
 
-    public void initialize() {
+		updateArcs();
+	}
 
-        setSelectable(true);
-        setDraggable(true);
-        setResizable(true);
-    }
+	public void initialize()
+	{
 
-    public void updateArcs() throws Exception {
+		setSelectable(true);
+		setDraggable(true);
+		setResizable(true);
+	}
 
-        Automaton theAutomaton = doc.getAutomaton();
-        Alphabet  theAlphabet  = theAutomaton.getAlphabet();
+	public void updateArcs()
+		throws Exception
+	{
 
-        for (Iterator arcIt = theArcSet.iterator(); arcIt.hasNext(); ) {
-            Arc     currArc   = (Arc) arcIt.next();
-            String  eventId   = currArc.getEventId();
-            Event   currEvent = theAlphabet.getEventWithId(eventId);
-            JGoText theText   = new JGoText(currEvent.getLabel());
+		Automaton theAutomaton = doc.getAutomaton();
+		Alphabet theAlphabet = theAutomaton.getAlphabet();
 
-            addObjectAtTail(theText);
-        }
-    }
+		for (Iterator arcIt = theArcSet.iterator(); arcIt.hasNext(); )
+		{
+			Arc currArc = (Arc) arcIt.next();
+			String eventId = currArc.getEventId();
+			Event currEvent = theAlphabet.getEventWithId(eventId);
+			JGoText theText = new JGoText(currEvent.getLabel());
 
-    public void geometryChange(Rectangle rect) {
-        super.geometryChange(rect);
-        layoutChildren();
-    }
+			addObjectAtTail(theText);
+		}
+	}
 
-    public void layoutChildren() {
+	public void geometryChange(Rectangle rect)
+	{
+		super.geometryChange(rect);
+		layoutChildren();
+	}
 
-        // System.err.println("layoutChildren");
-        int     top      = getTop();
-        int     left     = getLeft();
-        JGoText prevText = null;
-        int     i        = 0;
+	public void layoutChildren()
+	{
 
-        for (JGoListPosition pos = getFirstObjectPos(); pos != null;
-                pos = getNextObjectPos(pos)) {
+		// System.err.println("layoutChildren");
+		int top = getTop();
+		int left = getLeft();
+		JGoText prevText = null;
+		int i = 0;
 
-            // System.out.println("layout: " + i);
-            JGoText theText = (JGoText) getObjectAtPos(pos);
+		for (JGoListPosition pos = getFirstObjectPos(); pos != null; pos = getNextObjectPos(pos))
+		{
 
-            theText.setSpotLocation(Center, left, top + 15 * i);
+			// System.out.println("layout: " + i);
+			JGoText theText = (JGoText) getObjectAtPos(pos);
 
-            i++;
+			theText.setSpotLocation(Center, left, top + 15 * i);
 
-            /*
-            if (prevText != null)
-            {
-                    theText.setSpotLocation(TopLeft, prevText, BottomLeft);
-            }
-            else
-            {
-                    theText.setSpotLocation(TopLeft, getSpotLocation(TopLeft));
-            }*/
-            prevText = theText;
-        }
-    }
+			i++;
+
+			/*
+			 * if (prevText != null)
+			 * {
+			 *       theText.setSpotLocation(TopLeft, prevText, BottomLeft);
+			 * }
+			 * else
+			 * {
+			 *       theText.setSpotLocation(TopLeft, getSpotLocation(TopLeft));
+			 * }
+			 */
+			prevText = theText;
+		}
+	}
 }
-

@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,89 +47,98 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.automata.algorithms;
+
+
 
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.Stoppable;
 import org.supremica.gui.*;
+
 import org.apache.log4j.*;
 
 import java.util.*;
+
 import java.io.PrintWriter;
+
 
 public class AutomataSynchronizer
 	implements Stoppable
 {
-   	private static Category thisCategory =
-		LogDisplay.createCategory(AutomataSynchronizer.class.getName());
 
- 	private Automata theAutomata;
-
- 	private AutomataSynchronizerHelper synchHelper;
+	private static Category thisCategory = LogDisplay.createCategory(AutomataSynchronizer.class.getName());
+	private Automata theAutomata;
+	private AutomataSynchronizerHelper synchHelper;
 	private SynchronizationOptions syncOptions;
-
-   	private ArrayList synchronizationExecuters;
+	private ArrayList synchronizationExecuters;
 
 	// For stopping execution
 	private boolean stopRequested = false;
 
-	public AutomataSynchronizer(Automata theAutomata,
-		SynchronizationOptions syncOptions)
+	public AutomataSynchronizer(Automata theAutomata, SynchronizationOptions syncOptions)
 		throws Exception
 	{
-  		this.theAutomata = theAutomata;
-		this.syncOptions = syncOptions;
 
-	   	synchHelper = new AutomataSynchronizerHelper(theAutomata, syncOptions);
+		this.theAutomata = theAutomata;
+		this.syncOptions = syncOptions;
+		synchHelper = new AutomataSynchronizerHelper(theAutomata, syncOptions);
 
 		// Allocate and initialize the synchronizationExecuters
 		int nbrOfExecuters = syncOptions.getNbrOfExecuters();
-     	synchronizationExecuters = new ArrayList(nbrOfExecuters);
-     	for (int i = 0; i < nbrOfExecuters; i++)
-      	{
-           	AutomataSynchronizerExecuter currSynchronizationExecuter =
-            	new AutomataSynchronizerExecuter(synchHelper);
-        	synchronizationExecuters.add(currSynchronizationExecuter);
-       	}
+
+		synchronizationExecuters = new ArrayList(nbrOfExecuters);
+
+		for (int i = 0; i < nbrOfExecuters; i++)
+		{
+			AutomataSynchronizerExecuter currSynchronizationExecuter = new AutomataSynchronizerExecuter(synchHelper);
+
+			synchronizationExecuters.add(currSynchronizationExecuter);
+		}
 	}
 
 	public void execute()
 		throws Exception
 	{
-  		State currInitialState;
-  		int[] initialState = new int[theAutomata.size() + 1]; // +1 status field
 
-    	// Build the initial state
-       	Iterator autIt = theAutomata.iterator();
-     	while (autIt.hasNext())
+		State currInitialState;
+		int[] initialState = new int[theAutomata.size() + 1];		// +1 status field
+
+		// Build the initial state
+		Iterator autIt = theAutomata.iterator();
+
+		while (autIt.hasNext())
 		{
-			Automaton currAutomaton = (Automaton)autIt.next();
-   			currInitialState = currAutomaton.getInitialState();
-      		initialState[currAutomaton.getIndex()] = currInitialState.getIndex();
-	   	}
-     	synchHelper.addState(initialState);
+			Automaton currAutomaton = (Automaton) autIt.next();
 
-       	// Start all the synchronization executers and wait for completetion
-      	// For the moment we assume that we only have one thread
+			currInitialState = currAutomaton.getInitialState();
+			initialState[currAutomaton.getIndex()] = currInitialState.getIndex();
+		}
+
+		synchHelper.addState(initialState);
+
+		// Start all the synchronization executers and wait for completetion
+		// For the moment we assume that we only have one thread
 		for (int i = 0; i < synchronizationExecuters.size(); i++)
 		{
-       		AutomataSynchronizerExecuter currExec =
-				(AutomataSynchronizerExecuter)synchronizationExecuters.get(i);
+			AutomataSynchronizerExecuter currExec = (AutomataSynchronizerExecuter) synchronizationExecuters.get(i);
+
 			currExec.start();
 		}
+
 		((AutomataSynchronizerExecuter) synchronizationExecuters.get(0)).join();
 	}
-	
- 	public Automaton getAutomaton()
+
+	public Automaton getAutomaton()
 		throws Exception
-  	{
-		AutomataSynchronizerExecuter currExec =
-			(AutomataSynchronizerExecuter) synchronizationExecuters.get(0);
+	{
+
+		AutomataSynchronizerExecuter currExec = (AutomataSynchronizerExecuter) synchronizationExecuters.get(0);
+
 		try
 		{
 			if (currExec.buildAutomaton())
 			{
+
 				// System.out.println(synchHelper.getAutomaton() == null);
 				return synchHelper.getAutomaton();
 			}
@@ -140,6 +150,7 @@ public class AutomataSynchronizer
 		catch (Exception ex)
 		{
 			thisCategory.error(ex.toString());
+
 			throw ex;
 		}
 	}
@@ -151,8 +162,12 @@ public class AutomataSynchronizer
 
 	public void requestStop()
 	{
-		stopRequested = true;		
+
+		stopRequested = true;
+
 		for (int i = 0; i < synchronizationExecuters.size(); i++)
+		{
 			((AutomataSynchronizerExecuter) synchronizationExecuters.get(i)).requestStop();
+		}
 	}
 }

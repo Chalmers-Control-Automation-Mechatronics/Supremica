@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,73 +47,78 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.automata.algorithms;
+
+
 
 import org.supremica.automata.*;
 
 import java.util.*;
+
 import org.supremica.util.IntArrayHashTable;
+
 import java.io.PrintWriter;
 
 import org.supremica.gui.*;
+
 // import org.apache.log4j.*;
 import org.supremica.gui.Gui;
 
+
 public class AutomataSynthesizer
 {
-	// private static Category thisCategory = LogDisplay.createCategory(AutomataSynthesizer.class.getName());
 
-    private Automata theAutomata;
+	// private static Category thisCategory = LogDisplay.createCategory(AutomataSynthesizer.class.getName());
+	private Automata theAutomata;
 	private int nbrOfExecuters;
 	private HashMap eventToAutomataMap = new HashMap();
-
-    private AutomataSynchronizerHelper synchHelper;
-    private ArrayList synchronizationExecuters;
-    private SynchronizationOptions synchronizationOptions;
+	private AutomataSynchronizerHelper synchHelper;
+	private ArrayList synchronizationExecuters;
+	private SynchronizationOptions synchronizationOptions;
 	private SynthesizerOptions synthesizerOptions;
 	private int[] initialState;
-
 	private AutomatonContainer theAutomatonContainer;
-
 	private Gui workbench;
 
 	// For the optimization...
 	private Automata newAutomata = new Automata();
 	private boolean maximallyPermissive;
 
-    public AutomataSynthesizer(Gui workbench, Automata theAutomata, SynchronizationOptions synchronizationOptions, SynthesizerOptions synthesizerOptions)
+	public AutomataSynthesizer(Gui workbench, Automata theAutomata, SynchronizationOptions synchronizationOptions, SynthesizerOptions synthesizerOptions)
 		throws Exception
 	{
+
 		Automaton currAutomaton;
 		State currInitialState;
 
 		this.theAutomata = theAutomata;
 		this.synchronizationOptions = synchronizationOptions;
 		this.synthesizerOptions = synthesizerOptions;
-		initialState = new int[this.theAutomata.size() + 1]; // + 1 status field
+		initialState = new int[this.theAutomata.size() + 1];	// + 1 status field
 		nbrOfExecuters = this.synchronizationOptions.getNbrOfExecuters();
-
 		this.workbench = workbench;
 		theAutomatonContainer = workbench.getAutomatonContainer();
 		maximallyPermissive = synthesizerOptions.getMaximallyPermissive();
 
 		SynthesisType synthesisType = synthesizerOptions.getSynthesisType();
 		SynthesisAlgorithm synthesisAlgorithm = synthesizerOptions.getSynthesisAlgorithm();
+
 		if (!AutomataSynthesizer.validOptions(synthesisType, synthesisAlgorithm))
 		{
 			throw new Exception("Illegal combination of synthesis type and algorithm");
 		}
 
- 		try
+		try
 		{
 			synchHelper = new AutomataSynchronizerHelper(theAutomata, synchronizationOptions);
 
 			AlphabetAnalyzer alphabetAnalyzer = new AlphabetAnalyzer(theAutomata);
+
 			eventToAutomataMap = alphabetAnalyzer.getUncontrollableEventToPlantMap();
 
 			// Build the initial state
 			Iterator autIt = theAutomata.iterator();
+
 			while (autIt.hasNext())
 			{
 				currAutomaton = (Automaton) autIt.next();
@@ -122,79 +128,98 @@ public class AutomataSynthesizer
 		}
 		catch (Exception e)
 		{
-			//-- MF -- System.err.println("Error while initializing synchronization helper. " + e);
+
+			// -- MF -- System.err.println("Error while initializing synchronization helper. " + e);
 			workbench.error("Error while initializing synchronization helper. " + e);
+
 			throw e;
+
 			// e.printStackTrace();
 		}
 	}
 
 	public static boolean validOptions(SynthesisType type, SynthesisAlgorithm algorithm)
 	{
+
 		if (type == SynthesisType.Unknown)
 		{
 			return false;
 		}
+
 		if (algorithm == SynthesisAlgorithm.Unknown)
 		{
 			return false;
 		}
+
 		if (algorithm == SynthesisAlgorithm.IDD)
 		{
 			return false;
 		}
+
 		if (algorithm == SynthesisAlgorithm.Modular)
 		{
 			if (type == SynthesisType.Controllable)
 			{
 				return true;
 			}
+
 			return false;
 		}
+
 		return true;
 	}
 
 	// Synthesizes controllable supervisors
-    public void execute()
+	public void execute()
 		throws Exception
 	{
+
 		Event currEvent;
 		Automaton theAutomaton;
 		Automaton currPlantAutomaton;
 		Automaton currSupervisorAutomaton;
 		ArrayList selectedAutomata = new ArrayList();
+
 		// Iterator eventIterator;
 		Iterator plantIterator;
 
 		// Loop over supervisors/specifications and find plants containing equal uncontrollable events
 		Iterator supervisorIterator = theAutomata.iterator();
+
 		while (supervisorIterator.hasNext())
 		{
 			currSupervisorAutomaton = (Automaton) supervisorIterator.next();
-			if ((currSupervisorAutomaton.getType() == AutomatonType.Supervisor) ||
-				(currSupervisorAutomaton.getType() == AutomatonType.Specification))
-			{	// Examine uncontrollable events in currSupervisorAutomaton and select plants accordingly
+
+			if ((currSupervisorAutomaton.getType() == AutomatonType.Supervisor) || (currSupervisorAutomaton.getType() == AutomatonType.Specification))
+			{		// Examine uncontrollable events in currSupervisorAutomaton and select plants accordingly
 				selectedAutomata.add(currSupervisorAutomaton);
+
 				ArrayList eventList = new ArrayList(currSupervisorAutomaton.eventCollection());
+
 				// eventIterator = currSupervisorAutomaton.eventIterator();
 				// while (eventIterator.hasNext())
 				while (!eventList.isEmpty())
 				{
+
 					// currEvent = (Event) eventIterator.next();
 					currEvent = (Event) eventList.remove(0);
+
 					if (!currEvent.isControllable())
 					{
 						if (eventToAutomataMap.get(currEvent) != null)
 						{
-							plantIterator = ((Set)eventToAutomataMap.get(currEvent)).iterator();
+							plantIterator = ((Set) eventToAutomataMap.get(currEvent)).iterator();
+
 							while (plantIterator.hasNext())
 							{
 								currPlantAutomaton = (Automaton) plantIterator.next();
+
 								// This check is performed in eventToAutomataMap
 								// if (currPlantAutomaton.getType() == AutomatonType.Plant)
 								if (!selectedAutomata.contains(currPlantAutomaton))
 								{
 									selectedAutomata.add(currPlantAutomaton);
+
 									// If we want a maximally permissive result, we need to add plants with
 									// uncontrollable events common to the already added plants too...
 									if (maximallyPermissive)
@@ -208,17 +233,18 @@ public class AutomataSynthesizer
 				}
 
 				if (selectedAutomata.size() > 1)
-				{	// Clear the hash-table and set some variables in the synchronization helper
+				{		// Clear the hash-table and set some variables in the synchronization helper
 					synchHelper.clear();
 					synchHelper.addState(initialState);
-					synchHelper.getAutomaton().removeAllStates(); // Essential when building more than one automaton
+					synchHelper.getAutomaton().removeAllStates();		// Essential when building more than one automaton
 
 					// Allocate and initialize the synchronizationExecuters
 					ArrayList synchronizationExecuters = new ArrayList(nbrOfExecuters);
+
 					for (int i = 0; i < nbrOfExecuters; i++)
 					{
-						AutomataSynchronizerExecuter currSynchronizationExecuter =
-							new AutomataSynchronizerExecuter(synchHelper);
+						AutomataSynchronizerExecuter currSynchronizationExecuter = new AutomataSynchronizerExecuter(synchHelper);
+
 						synchronizationExecuters.add(currSynchronizationExecuter);
 					}
 
@@ -226,57 +252,66 @@ public class AutomataSynthesizer
 					// For the moment we assume that we only have one thread
 					for (int i = 0; i < synchronizationExecuters.size(); i++)
 					{
-						AutomataSynchronizerExecuter currExec =
-							(AutomataSynchronizerExecuter) synchronizationExecuters.get(i);
+						AutomataSynchronizerExecuter currExec = (AutomataSynchronizerExecuter) synchronizationExecuters.get(i);
+
 						currExec.selectAutomata(selectedAutomata);
 						currExec.start();
 					}
-					((AutomataSynchronizerExecuter)synchronizationExecuters.get(0)).join();
+
+					((AutomataSynchronizerExecuter) synchronizationExecuters.get(0)).join();
 
 					if (!synchHelper.getAutomataIsControllable())
-					{	// Only add supervisors with uncontrollable states
+					{		// Only add supervisors with uncontrollable states
 
 						// Print the names of the automata in selectedAutomata
 						Object[] automatonArray = selectedAutomata.toArray();
 						String automataNames = ((Automaton) automatonArray[0]).getName();
+
 						for (int i = 1; i < automatonArray.length; i++)
 						{
 							automataNames = automataNames + " || " + ((Automaton) automatonArray[i]).getName();
 						}
-						//-- MF -- thisCategory.info(automataNames);
+
+						// -- MF -- thisCategory.info(automataNames);
 						workbench.info(automataNames);
 
-						AutomataSynchronizerExecuter currExec =
-							(AutomataSynchronizerExecuter)synchronizationExecuters.get(0);
+						AutomataSynchronizerExecuter currExec = (AutomataSynchronizerExecuter) synchronizationExecuters.get(0);
+
 						currExec.buildAutomaton(false);
 
 						try
 						{
 							theAutomaton = new Automaton(synchHelper.getAutomaton());
-							String newName = theAutomatonContainer.getUniqueAutomatonName("Synth_" + ((Automaton)selectedAutomata.get(0)).getName());
+
+							String newName = theAutomatonContainer.getUniqueAutomatonName("Synth_" + ((Automaton) selectedAutomata.get(0)).getName());
+
 							theAutomaton.setName(newName);
 							theAutomaton.setType(AutomatonType.Supervisor);
 							theAutomaton.setAlphabet(unionAlphabet(selectedAutomata));
 
 							AutomatonSynthesizer synthesizer = new AutomatonSynthesizer(workbench, theAutomaton, synthesizerOptions);
-							synthesizer.synthesize();
 
+							synthesizer.synthesize();
 							newAutomata.addAutomaton(theAutomaton);
 						}
 						catch (Exception ex)
 						{
-							//-- MF -- thisCategory.error("Exception while adding the new automaton.");
+
+							// -- MF -- thisCategory.error("Exception while adding the new automaton.");
 							workbench.error("Exception while adding the new automaton.");
 						}
 					}
 				}
+
 				selectedAutomata.clear();
 			}
 		}
+
 		if (synthesizerOptions.getOptimize())
 		{
 			optimize(theAutomata, new Automata(newAutomata));
 		}
+
 		// theAutomatonContainer.add(newAutomata);
 		workbench.addAutomata(newAutomata);
 	}
@@ -287,14 +322,16 @@ public class AutomataSynthesizer
 	public Alphabet unionAlphabet(ArrayList selectedAutomata)
 		throws Exception
 	{
-		Alphabet theAlphabet = new Alphabet();
 
+		Alphabet theAlphabet = new Alphabet();
 		EventsSet theAlphabets = new EventsSet();
 		Iterator autIt = selectedAutomata.iterator();
+
 		while (autIt.hasNext())
 		{
-			Automaton currAutomaton = (Automaton)autIt.next();
+			Automaton currAutomaton = (Automaton) autIt.next();
 			Alphabet currAlphabet = currAutomaton.getAlphabet();
+
 			theAlphabets.add(currAlphabet);
 		}
 
@@ -304,9 +341,11 @@ public class AutomataSynthesizer
 		}
 		catch (Exception e)
 		{
+
 			// System.err.println("Error while generating union alphabet: " + e);
-			//-- MF -- thisCategory.error("Error while generating union alphabet: " + e);
+			// -- MF -- thisCategory.error("Error while generating union alphabet: " + e);
 			workbench.error("Error while generating union alphabet: " + e);
+
 			throw e;
 		}
 
@@ -314,11 +353,14 @@ public class AutomataSynthesizer
 		Alphabet unionAlphabet = synchHelper.getAutomaton().getAlphabet();
 		Iterator eventIt = theAlphabet.iterator();
 		Event currEvent;
+
 		while (eventIt.hasNext())
 		{
 			currEvent = (Event) eventIt.next();
+
 			currEvent.setId(unionAlphabet.getEventWithLabel(currEvent.getLabel()).getId());
 		}
+
 		theAlphabet.rehash();
 
 		return theAlphabet;
@@ -328,8 +370,9 @@ public class AutomataSynthesizer
 	 * Removes unnecessary automata, i.e. synthesized supervisors that don't affect the controllability.
 	 * @param newAutomata the Automata-object containing the new supervisors.
 	 */
- 	private void optimize(Automata theAutomata, Automata newAutomata)
+	private void optimize(Automata theAutomata, Automata newAutomata)
 	{
+
 		Automata currAutomata = new Automata();
 		AutomataFastControllabilityCheck theFastControllabilityCheck;
 		SynchronizationOptions syncOptions;
@@ -340,39 +383,51 @@ public class AutomataSynthesizer
 		}
 		catch (Exception ex)
 		{
-			//-- MF -- thisCategory.error("Exception in SynchronizationOptions." + ex);
+
+			// -- MF -- thisCategory.error("Exception in SynchronizationOptions." + ex);
 			workbench.error("Exception in SynchronizationOptions." + ex);
+
 			return;
 		}
 
 		if (!synthesizerOptions.doPurge())
-		{   // The automata aren't purged but they must be for the optimization to work...
+		{		// The automata aren't purged but they must be for the optimization to work...
 			Iterator autIt = newAutomata.iterator();
+
 			while (autIt.hasNext())
 			{
 				AutomatonPurge automatonPurge = new AutomatonPurge((Automaton) autIt.next());
+
 				automatonPurge.execute();
 			}
 		}
+
 		currAutomata.addAutomata(theAutomata);
 		currAutomata.addAutomata(newAutomata);
 
-		for (int i=newAutomata.size()-1; i >= 0; i--)
+		for (int i = newAutomata.size() - 1; i >= 0; i--)
 		{
 			currAutomata.removeAutomaton(newAutomata.getAutomatonAt(i));
+
 			try
 			{
-				theFastControllabilityCheck =
-					new AutomataFastControllabilityCheck(currAutomata, syncOptions);
+				theFastControllabilityCheck = new AutomataFastControllabilityCheck(currAutomata, syncOptions);
+
 				if (theFastControllabilityCheck.execute())
+				{
 					this.newAutomata.removeAutomaton(this.newAutomata.getAutomatonAt(i));
+				}
 				else
+				{
 					currAutomata.addAutomaton(newAutomata.getAutomatonAt(i));
+				}
 			}
 			catch (Exception ex)
 			{
-				//-- MF -- thisCategory.error("Exception in AutomataSynthesizer.optimize. " + ex);
+
+				// -- MF -- thisCategory.error("Exception in AutomataSynthesizer.optimize. " + ex);
 				workbench.error("Exception in AutomataSynthesizer.optimize. " + ex);
+
 				return;
 			}
 		}

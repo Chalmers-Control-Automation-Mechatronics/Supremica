@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,18 +47,20 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.gui;
+
+
 
 import javax.swing.filechooser.*;
 import javax.swing.*;
 
+
 public class FileDialogs
 {
+
 	private JFileChooser fileImporter = null;
 	private JFileChooser fileExporter = null;
 	private JFileChooser fileSaveAs = null;
-
 	private FileFilter xmlFilter = null;
 	private FileFilter vprjFilter = null;
 	private FileFilter vmodFilter = null;
@@ -68,140 +71,175 @@ public class FileDialogs
 	private FileFilter gifFilter = null;
 	private FileFilter mifFilter = null;
 	private FileFilter sFilter = null;
-
 	private static FileDialogs fd = new FileDialogs();
 
-	private FileDialogs()
+	private FileDialogs() {}
+
+	public static JFileChooser getXMLFileSaveAs()
 	{
+
+		JFileChooser fileSaveAs = fd.getFileSaveAs();
+
+		fileSaveAs.resetChoosableFileFilters();
+		fileSaveAs.setFileFilter(fd.getXMLFilter());
+
+		return fileSaveAs;
 	}
 
- 	public static JFileChooser getXMLFileSaveAs()
- 	{
- 		JFileChooser fileSaveAs = fd.getFileSaveAs();
- 		fileSaveAs.resetChoosableFileFilters();
- 		fileSaveAs.setFileFilter(fd.getXMLFilter());
- 		return fileSaveAs;
- 	}
+	public static JFileChooser getXMLFileImporter()
+	{
 
- 	public static JFileChooser getXMLFileImporter()
- 	{
- 		JFileChooser fileImporter = fd.getFileImporter();
- 		fileImporter.resetChoosableFileFilters();
- 		fileImporter.setFileFilter(fd.getXMLFilter());
- 		return fileImporter;
- 	}
+		JFileChooser fileImporter = fd.getFileImporter();
 
-  	public static JFileChooser getVALIDFileImporter()
- 	{
- 		JFileChooser fileImporter = fd.getFileImporter();
- 		fileImporter.resetChoosableFileFilters();
+		fileImporter.resetChoosableFileFilters();
+		fileImporter.setFileFilter(fd.getXMLFilter());
+
+		return fileImporter;
+	}
+
+	public static JFileChooser getVALIDFileImporter()
+	{
+
+		JFileChooser fileImporter = fd.getFileImporter();
+
+		fileImporter.resetChoosableFileFilters();
 		fileImporter.addChoosableFileFilter(fd.getDGRFFilter());
 		fileImporter.addChoosableFileFilter(fd.getVMODFilter());
- 		fileImporter.setFileFilter(fd.getVPRJFilter());
- 		return fileImporter;
- 	}
+		fileImporter.setFileFilter(fd.getVPRJFilter());
 
- 	public static JFileChooser getXMLFileExporter()
- 	{
- 		JFileChooser fileExporter = fd.getFileExporter();
- 		fileExporter.resetChoosableFileFilters();
- 		fileExporter.setFileFilter(fd.getXMLFilter());
- 		return fileExporter;
- 	}
+		return fileImporter;
+	}
 
- 	public static JFileChooser getDSXFileExporter()
- 	{
- 		JFileChooser fileExporter = fd.getFileExporter();
- 		fileExporter.resetChoosableFileFilters();
- 		fileExporter.setFileFilter(fd.getDSXFilter());
- 		return fileExporter;
- 	}
+	public static JFileChooser getXMLFileExporter()
+	{
 
- 	public static JFileChooser getDOTFileExporter()
- 	{
-  		JFileChooser fileExporter = fd.getFileExporter();
- 		fileExporter.resetChoosableFileFilters();
- 		fileExporter.setFileFilter(fd.getDOTFilter());
- 		return fileExporter;
- 	}
+		JFileChooser fileExporter = fd.getFileExporter();
 
- 	public static JFileChooser getEPSFileExporter()
- 	{
-  		JFileChooser fileExporter = fd.getFileExporter();
- 		fileExporter.resetChoosableFileFilters();
- 		fileExporter.setFileFilter(fd.getEPSFilter());
- 		return fileExporter;
- 	}
+		fileExporter.resetChoosableFileFilters();
+		fileExporter.setFileFilter(fd.getXMLFilter());
 
- 	public static JFileChooser getMIFFileExporter()
- 	{
-  		JFileChooser fileExporter = fd.getFileExporter();
- 		fileExporter.resetChoosableFileFilters();
- 		fileExporter.setFileFilter(fd.getMIFFilter());
- 		return fileExporter;
- 	}
+		return fileExporter;
+	}
 
- 	public static JFileChooser getGIFFileExporter()
- 	{
-  		JFileChooser fileExporter = fd.getFileExporter();
- 		fileExporter.resetChoosableFileFilters();
- 		fileExporter.setFileFilter(fd.getGIFFilter());
- 		return fileExporter;
- 	}
+	public static JFileChooser getDSXFileExporter()
+	{
 
- 	public static JFileChooser getSFileExporter()
- 	{
-  		JFileChooser fileExporter = fd.getFileExporter();
- 		fileExporter.resetChoosableFileFilters();
- 		fileExporter.setFileFilter(fd.getSFilter());
- 		return fileExporter;
- 	}
+		JFileChooser fileExporter = fd.getFileExporter();
 
- 	private JFileChooser getFileImporter()
- 	{
- 		if (fileImporter == null)
- 		{
+		fileExporter.resetChoosableFileFilters();
+		fileExporter.setFileFilter(fd.getDSXFilter());
+
+		return fileExporter;
+	}
+
+	public static JFileChooser getDOTFileExporter()
+	{
+
+		JFileChooser fileExporter = fd.getFileExporter();
+
+		fileExporter.resetChoosableFileFilters();
+		fileExporter.setFileFilter(fd.getDOTFilter());
+
+		return fileExporter;
+	}
+
+	public static JFileChooser getEPSFileExporter()
+	{
+
+		JFileChooser fileExporter = fd.getFileExporter();
+
+		fileExporter.resetChoosableFileFilters();
+		fileExporter.setFileFilter(fd.getEPSFilter());
+
+		return fileExporter;
+	}
+
+	public static JFileChooser getMIFFileExporter()
+	{
+
+		JFileChooser fileExporter = fd.getFileExporter();
+
+		fileExporter.resetChoosableFileFilters();
+		fileExporter.setFileFilter(fd.getMIFFilter());
+
+		return fileExporter;
+	}
+
+	public static JFileChooser getGIFFileExporter()
+	{
+
+		JFileChooser fileExporter = fd.getFileExporter();
+
+		fileExporter.resetChoosableFileFilters();
+		fileExporter.setFileFilter(fd.getGIFFilter());
+
+		return fileExporter;
+	}
+
+	public static JFileChooser getSFileExporter()
+	{
+
+		JFileChooser fileExporter = fd.getFileExporter();
+
+		fileExporter.resetChoosableFileFilters();
+		fileExporter.setFileFilter(fd.getSFilter());
+
+		return fileExporter;
+	}
+
+	private JFileChooser getFileImporter()
+	{
+
+		if (fileImporter == null)
+		{
 			fileImporter = new JFileChooser();
+
 			fileImporter.setDialogType(JFileChooser.SAVE_DIALOG);
-			fileImporter.setCurrentDirectory(
-				new java.io.File(WorkbenchProperties.getFileOpenPath()));
+			fileImporter.setCurrentDirectory(new java.io.File(WorkbenchProperties.getFileOpenPath()));
 			fileImporter.setMultiSelectionEnabled(true);
- 		}
- 		return fileImporter;
- 	}
+		}
 
- 	private JFileChooser getFileExporter()
- 	{
- 		if (fileExporter == null)
- 		{
+		return fileImporter;
+	}
+
+	private JFileChooser getFileExporter()
+	{
+
+		if (fileExporter == null)
+		{
 			fileExporter = new JFileChooser();
+
 			fileExporter.setDialogType(JFileChooser.OPEN_DIALOG);
-			fileExporter.setCurrentDirectory(
-				new java.io.File(WorkbenchProperties.getFileSavePath()));
+			fileExporter.setCurrentDirectory(new java.io.File(WorkbenchProperties.getFileSavePath()));
 			fileExporter.setMultiSelectionEnabled(false);
- 		}
- 		return fileExporter;
- 	}
+		}
 
- 	private JFileChooser getFileSaveAs()
- 	{
- 		if (fileSaveAs == null)
- 		{
+		return fileExporter;
+	}
+
+	private JFileChooser getFileSaveAs()
+	{
+
+		if (fileSaveAs == null)
+		{
 			fileSaveAs = new JFileChooser();
-			fileSaveAs.setDialogType(JFileChooser.OPEN_DIALOG);
-			fileSaveAs.setCurrentDirectory(
-				new java.io.File(WorkbenchProperties.getFileSavePath()));
-			fileSaveAs.setMultiSelectionEnabled(false);
- 		}
- 		return fileSaveAs;
- 	}
 
- 	private FileFilter getXMLFilter()
- 	{
- 		if (xmlFilter == null)
- 		{
+			fileSaveAs.setDialogType(JFileChooser.OPEN_DIALOG);
+			fileSaveAs.setCurrentDirectory(new java.io.File(WorkbenchProperties.getFileSavePath()));
+			fileSaveAs.setMultiSelectionEnabled(false);
+		}
+
+		return fileSaveAs;
+	}
+
+	private FileFilter getXMLFilter()
+	{
+
+		if (xmlFilter == null)
+		{
 			xmlFilter = new FileFilter()
-			{ // Anonymous class
+			{		// Anonymous class
+
 				public boolean accept(java.io.File f)
 				{
 					return f.getName().toLowerCase().endsWith(".xml") || f.isDirectory();
@@ -213,75 +251,87 @@ public class FileDialogs
 				}
 			};
 		}
+
 		return xmlFilter;
- 	}
+	}
 
 	private FileFilter getVPRJFilter()
- 	{
- 		if (vprjFilter == null)
- 		{
-			vprjFilter = new FileFilter()
-				{ // Anonymous class
-					public boolean accept(java.io.File f)
-					{
-						return f.getName().toLowerCase().endsWith(".vprj") ||  f.isDirectory();
-					}
+	{
 
-					public String getDescription()
-					{
-						return "VPRJ files (*.vprj)";
-					}
-				};
+		if (vprjFilter == null)
+		{
+			vprjFilter = new FileFilter()
+			{		// Anonymous class
+
+				public boolean accept(java.io.File f)
+				{
+					return f.getName().toLowerCase().endsWith(".vprj") || f.isDirectory();
+				}
+
+				public String getDescription()
+				{
+					return "VPRJ files (*.vprj)";
+				}
+			};
 		}
+
 		return vprjFilter;
 	}
 
 	private FileFilter getVMODFilter()
- 	{
- 		if (vmodFilter == null)
- 		{
-			vmodFilter = new FileFilter()
-				{ // Anonymous class
-					public boolean accept(java.io.File f)
-					{
-						return f.getName().toLowerCase().endsWith(".vmod") ||  f.isDirectory();
-					}
+	{
 
-					public String getDescription()
-					{
-						return "VMOD files (*.vmod)";
-					}
-				};
+		if (vmodFilter == null)
+		{
+			vmodFilter = new FileFilter()
+			{		// Anonymous class
+
+				public boolean accept(java.io.File f)
+				{
+					return f.getName().toLowerCase().endsWith(".vmod") || f.isDirectory();
+				}
+
+				public String getDescription()
+				{
+					return "VMOD files (*.vmod)";
+				}
+			};
 		}
+
 		return vmodFilter;
 	}
 
 	private FileFilter getDGRFFilter()
- 	{
- 		if (dgrfFilter == null)
- 		{
-			dgrfFilter = new FileFilter()
-				{ // Anonymous class
-					public boolean accept(java.io.File f)
-					{
-						return f.getName().toLowerCase().endsWith(".dgrf") ||  f.isDirectory();
-					}
+	{
 
-					public String getDescription()
-					{
-						return "DGRF files (*.dgrf)";
-					}
-				};
+		if (dgrfFilter == null)
+		{
+			dgrfFilter = new FileFilter()
+			{		// Anonymous class
+
+				public boolean accept(java.io.File f)
+				{
+					return f.getName().toLowerCase().endsWith(".dgrf") || f.isDirectory();
+				}
+
+				public String getDescription()
+				{
+					return "DGRF files (*.dgrf)";
+				}
+			};
 		}
+
 		return dgrfFilter;
 	}
 
- 	private FileFilter getDSXFilter()
- 	{
- 		if (dsxFilter == null)
- 		{
+	private FileFilter getDSXFilter()
+	{
+
+		if (dsxFilter == null)
+		{
 			dsxFilter = new FileFilter()
-			{ // Anonymous class
+			{		// Anonymous class
+
 				public boolean accept(java.io.File f)
 				{
 					return f.getName().toLowerCase().endsWith(".dsx") || f.isDirectory();
@@ -293,15 +343,18 @@ public class FileDialogs
 				}
 			};
 		}
-		return dsxFilter;
- 	}
 
- 	private FileFilter getDOTFilter()
- 	{
- 		if (dotFilter == null)
- 		{
+		return dsxFilter;
+	}
+
+	private FileFilter getDOTFilter()
+	{
+
+		if (dotFilter == null)
+		{
 			dotFilter = new FileFilter()
-			{ // Anonymous class
+			{		// Anonymous class
+
 				public boolean accept(java.io.File f)
 				{
 					return f.getName().toLowerCase().endsWith(".dot") || f.isDirectory();
@@ -313,15 +366,18 @@ public class FileDialogs
 				}
 			};
 		}
-		return dotFilter;
- 	}
 
- 	private FileFilter getEPSFilter()
- 	{
- 		if (epsFilter == null)
- 		{
+		return dotFilter;
+	}
+
+	private FileFilter getEPSFilter()
+	{
+
+		if (epsFilter == null)
+		{
 			epsFilter = new FileFilter()
-			{ // Anonymous class
+			{		// Anonymous class
+
 				public boolean accept(java.io.File f)
 				{
 					return f.getName().toLowerCase().endsWith(".eps") || f.isDirectory();
@@ -333,15 +389,18 @@ public class FileDialogs
 				}
 			};
 		}
-		return epsFilter;
- 	}
 
- 	private FileFilter getGIFFilter()
- 	{
- 		if (gifFilter == null)
- 		{
+		return epsFilter;
+	}
+
+	private FileFilter getGIFFilter()
+	{
+
+		if (gifFilter == null)
+		{
 			gifFilter = new FileFilter()
-			{ // Anonymous class
+			{		// Anonymous class
+
 				public boolean accept(java.io.File f)
 				{
 					return f.getName().toLowerCase().endsWith(".gif") || f.isDirectory();
@@ -353,15 +412,18 @@ public class FileDialogs
 				}
 			};
 		}
-		return gifFilter;
- 	}
 
- 	private FileFilter getMIFFilter()
- 	{
- 		if (mifFilter == null)
- 		{
+		return gifFilter;
+	}
+
+	private FileFilter getMIFFilter()
+	{
+
+		if (mifFilter == null)
+		{
 			mifFilter = new FileFilter()
-			{ // Anonymous class
+			{		// Anonymous class
+
 				public boolean accept(java.io.File f)
 				{
 					return f.getName().toLowerCase().endsWith(".mif") || f.isDirectory();
@@ -373,15 +435,18 @@ public class FileDialogs
 				}
 			};
 		}
-		return mifFilter;
- 	}
 
- 	private FileFilter getSFilter()
- 	{
- 		if (sFilter == null)
- 		{
+		return mifFilter;
+	}
+
+	private FileFilter getSFilter()
+	{
+
+		if (sFilter == null)
+		{
 			sFilter = new FileFilter()
-			{ // Anonymous class
+			{		// Anonymous class
+
 				public boolean accept(java.io.File f)
 				{
 					return f.getName().toLowerCase().endsWith(".s") || f.isDirectory();
@@ -393,6 +458,7 @@ public class FileDialogs
 				}
 			};
 		}
+
 		return sFilter;
- 	}
+	}
 }

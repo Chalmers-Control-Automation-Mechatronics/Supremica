@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,13 +47,17 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.gui.editor;
 
+
+
 import java.awt.Container;
+
 import javax.swing.AbstractAction;
 import javax.swing.Icon;
+
 import com.nwoods.jgo.*;
+
 import java.util.Vector;
 
 
@@ -61,24 +66,29 @@ import java.util.Vector;
 public abstract class AppAction
 	extends AbstractAction
 {
+
 	private static Vector myAllActions = new Vector();
 	private Container myApp;
 
 	public AppAction(String name, Container app)
 	{
+
 		super(name);
+
 		init(app);
 	}
 
 	public AppAction(String name, Icon icon, Container app)
 	{
+
 		super(name, icon);
+
 		init(app);
 	}
 
 	public AutomataEditor getApp()
 	{
-		return (AutomataEditor)myApp;
+		return (AutomataEditor) myApp;
 	}
 
 	public AutomatonView getView()
@@ -88,13 +98,15 @@ public abstract class AppAction
 
 	private final void init(Container app)
 	{
+
 		myApp = app;
+
 		myAllActions.add(this);
 	}
 
 	public String toString()
 	{
-		return (String)getValue(NAME);
+		return (String) getValue(NAME);
 	}
 
 	// by default each AppAction is disabled if there's no current view
@@ -108,20 +120,22 @@ public abstract class AppAction
 		setEnabled(canAct());
 	}
 
-
 	public void free()
 	{
+
 		myAllActions.removeElement(this);
+
 		myApp = null;
 	}
-
 
 	// keep track of all instances of AppAction
 	public static void updateAllActions()
 	{
+
 		for (int i = 0; i < myAllActions.size(); i++)
 		{
-			AppAction act = (AppAction)myAllActions.elementAt(i);
+			AppAction act = (AppAction) myAllActions.elementAt(i);
+
 			act.updateEnabled();
 		}
 	}
@@ -130,5 +144,4 @@ public abstract class AppAction
 	{
 		return myAllActions;
 	}
-
 }

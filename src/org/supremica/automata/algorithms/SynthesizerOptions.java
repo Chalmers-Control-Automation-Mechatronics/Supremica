@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,13 +47,16 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.automata.algorithms;
+
+
 
 import org.supremica.gui.WorkbenchProperties;
 
+
 public final class SynthesizerOptions
 {
+
 	private boolean dialogOK = false;
 	private SynthesisType synthesisType;
 	private SynthesisAlgorithm synthesisAlgorithm;
@@ -60,18 +64,14 @@ public final class SynthesizerOptions
 	private boolean optimize;
 	private boolean maximallyPermissive;
 
-
 	public SynthesizerOptions()
 	{
-		this(WorkbenchProperties.synthesisSynthesisType(),
-			 WorkbenchProperties.synthesisAlgorithmType(),
-			 WorkbenchProperties.synthesisPurge(),
-			 WorkbenchProperties.synthesisOptimize(),
-			 WorkbenchProperties.synthesisMaximallyPermissive());
+		this(WorkbenchProperties.synthesisSynthesisType(), WorkbenchProperties.synthesisAlgorithmType(), WorkbenchProperties.synthesisPurge(), WorkbenchProperties.synthesisOptimize(), WorkbenchProperties.synthesisMaximallyPermissive());
 	}
 
 	public SynthesizerOptions(SynthesisType synthesisType, SynthesisAlgorithm synthesisAlgorithm, boolean purge, boolean optimize, boolean maximallyPermissive)
 	{
+
 		this.synthesisType = synthesisType;
 		this.synthesisAlgorithm = synthesisAlgorithm;
 		this.purge = purge;
@@ -96,7 +96,9 @@ public final class SynthesizerOptions
 
 	public void setSynthesisType(SynthesisType type)
 	{
-	    synthesisType = type;
+
+		synthesisType = type;
+
 		WorkbenchProperties.setSynthesisSynthesisType(type);
 	}
 
@@ -107,7 +109,9 @@ public final class SynthesizerOptions
 
 	public void setSynthesisAlgorithm(SynthesisAlgorithm algorithm)
 	{
-	    synthesisAlgorithm = algorithm;
+
+		synthesisAlgorithm = algorithm;
+
 		WorkbenchProperties.setSynthesisAlgorithmType(algorithm);
 	}
 
@@ -118,7 +122,9 @@ public final class SynthesizerOptions
 
 	public void setPurge(boolean bool)
 	{
-	    purge = bool;
+
+		purge = bool;
+
 		WorkbenchProperties.setSynthesisPurge(bool);
 	}
 
@@ -129,7 +135,9 @@ public final class SynthesizerOptions
 
 	public void setOptimize(boolean bool)
 	{
-	    optimize = bool;
+
+		optimize = bool;
+
 		WorkbenchProperties.setSynthesisOptimize(bool);
 	}
 
@@ -140,7 +148,9 @@ public final class SynthesizerOptions
 
 	public void setMaximallyPermissive(boolean bool)
 	{
-	    maximallyPermissive = bool;
+
+		maximallyPermissive = bool;
+
 		WorkbenchProperties.setSynthesisMaximallyPermissive(bool);
 	}
 

@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,20 +47,26 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.automata.algorithms;
+
+
 
 import org.supremica.automata.*;
 
 import java.util.*;
+
 import java.io.*;
+
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.parsers.SAXParser;
+
 import org.xml.sax.*;
+
 
 public class AutomataBuildFromXml
 	extends HandlerBase
 {
+
 	private static final String automataStr = "Automata";
 	private static final String automatonStr = "Automaton";
 	private static final String eventsStr = "Events";
@@ -79,16 +86,13 @@ public class AutomataBuildFromXml
 	private static final String immediateStr = "immediate";
 	private static final String owner = "owner";
 	private static final String hash = "hash";
-
 	private static AutomataBuildFromXml builder = null;
 	private Automata currAutomata = null;
 	private Automaton currAutomaton = null;
 	private Alphabet currAlphabet = null;
 	private Locator locator = null;
 
-	private AutomataBuildFromXml()
-	{
-	}
+	private AutomataBuildFromXml() {}
 
 	public static Automata build(File file)
 		throws Exception
@@ -108,7 +112,6 @@ public class AutomataBuildFromXml
 		return build(fileName, false);
 	}
 
-
 	public static Automata build(InputStream is)
 		throws Exception
 	{
@@ -124,14 +127,18 @@ public class AutomataBuildFromXml
 	public static Automata build(InputStream is, boolean validate)
 		throws Exception
 	{
+
 		InputSource source = new InputSource(is);
+
 		return build(source, validate);
 	}
 
 	public static Automata build(Reader r, boolean validate)
 		throws Exception
 	{
+
 		InputSource source = new InputSource(r);
+
 		return build(source, validate);
 	}
 
@@ -140,12 +147,14 @@ public class AutomataBuildFromXml
 	{
 
 		SAXParserFactory parserFactory = SAXParserFactory.newInstance();
+
 		parserFactory.setValidating(validate);
 
 		if (builder == null)
 		{
 			builder = new AutomataBuildFromXml();
 		}
+
 		SAXParser parser = parserFactory.newSAXParser();
 
 		try
@@ -156,6 +165,7 @@ public class AutomataBuildFromXml
 		{
 			throw new Exception(ex.getMessage());
 		}
+
 		return builder.currAutomata;
 	}
 
@@ -164,12 +174,14 @@ public class AutomataBuildFromXml
 	{
 
 		SAXParserFactory parserFactory = SAXParserFactory.newInstance();
+
 		parserFactory.setValidating(validate);
 
 		if (builder == null)
 		{
 			builder = new AutomataBuildFromXml();
 		}
+
 		SAXParser parser = parserFactory.newSAXParser();
 
 		try
@@ -180,6 +192,7 @@ public class AutomataBuildFromXml
 		{
 			throw new Exception(ex.getMessage());
 		}
+
 		return builder.currAutomata;
 	}
 
@@ -191,6 +204,7 @@ public class AutomataBuildFromXml
 	public final void startElement(String name, AttributeList attributes)
 		throws SAXException
 	{
+
 		// in order of frequency
 		if (transitionStr.equals(name))
 		{
@@ -212,15 +226,9 @@ public class AutomataBuildFromXml
 		{
 			doAutomata(attributes);
 		}
-		else if (eventsStr.equals(name))
-		{
-		}
-		else if (statesStr.equals(name))
-		{
-		}
-		else if (transitionsStr.equals(name))
-		{
-		}
+		else if (eventsStr.equals(name)) {}
+		else if (statesStr.equals(name)) {}
+		else if (transitionsStr.equals(name)) {}
 		else
 		{
 			throwException("Unknown element: " + name);
@@ -230,28 +238,33 @@ public class AutomataBuildFromXml
 	public final void doAutomata(AttributeList attributes)
 		throws SAXException
 	{
+
 		currAutomata = new Automata();
 
 		String name = attributes.getValue("name");
+
 		if (name != null)
 		{
 			currAutomata.setName(name);
 		}
 
 		String owner = attributes.getValue("owner");
+
 		if (name != null)
 		{
 			currAutomata.setOwner(owner);
 		}
 
 		String hash = attributes.getValue("hash");
+
 		if (hash != null)
 		{
 			currAutomata.setHash(hash);
 		}
-	
+
 		int majorVersion = 0;
 		String majorStringVersion = attributes.getValue("major");
+
 		if (majorStringVersion != null)
 		{
 			majorVersion = Integer.parseInt(majorStringVersion);
@@ -259,6 +272,7 @@ public class AutomataBuildFromXml
 
 		int minorVersion = 0;
 		String minorStringVersion = attributes.getValue("minor");
+
 		if (minorStringVersion != null)
 		{
 			minorVersion = Integer.parseInt(minorStringVersion);
@@ -268,6 +282,7 @@ public class AutomataBuildFromXml
 		{
 			throw new SAXException("Unsupported file format.");
 		}
+
 		if (minorVersion > 9)
 		{
 			throw new SAXException("Unsupported file format.");
@@ -277,16 +292,19 @@ public class AutomataBuildFromXml
 	public final void doAutomaton(AttributeList attributes)
 		throws SAXException
 	{
+
 		currAutomaton = new Automaton();
 		currAlphabet = new Alphabet();
 
 		String name = attributes.getValue("name");
+
 		if (name == null)
 		{
 			throwException("name attribute is missing");
 		}
 
 		String type = attributes.getValue("type");
+
 		if (type != null)
 		{
 			String lowerCaseType = type.toLowerCase();
@@ -294,23 +312,26 @@ public class AutomataBuildFromXml
 			String specificationLowerCase = AutomatonType.Specification.toString().toLowerCase();
 			String supervisorLowerCase = AutomatonType.Supervisor.toString().toLowerCase();
 			AutomatonType currType = AutomatonType.Undefined;
+
 			if (lowerCaseType.equals(plantLowerCase))
 			{
 				currType = AutomatonType.Plant;
 			}
+
 			if (lowerCaseType.equals(specificationLowerCase))
 			{
 				currType = AutomatonType.Specification;
 			}
+
 			if (lowerCaseType.equals(supervisorLowerCase))
 			{
 				currType = AutomatonType.Supervisor;
 			}
+
 			currAutomaton.setType(currType);
 		}
 
 		currAutomaton.setName(name);
-
 		currAutomaton.setAlphabet(currAlphabet);
 		currAutomata.addAutomaton(currAutomaton);
 	}
@@ -318,17 +339,19 @@ public class AutomataBuildFromXml
 	public final void doEvent(AttributeList attributes)
 		throws SAXException
 	{
+
 		String id = null;
 		String label = null;
 		boolean controllable = true;
 		boolean prioritized = true;
 		boolean immediate = false;
-
 		int length = attributes.getLength();
 		String currName;
+
 		for (int i = 0; i < length; i++)
 		{
 			currName = attributes.getName(i);
+
 			if (idStr.equals(currName))
 			{
 				id = attributes.getValue(i);
@@ -379,21 +402,22 @@ public class AutomataBuildFromXml
 		}
 	}
 
-
 	public final void doState(AttributeList attributes)
 		throws SAXException
 	{
+
 		String id = null;
 		String name = null;
 		boolean initial = false;
 		boolean accepting = false;
 		boolean forbidden = false;
-
 		int length = attributes.getLength();
 		String currName;
+
 		for (int i = 0; i < length; i++)
 		{
 			currName = attributes.getName(i);
+
 			if (idStr.equals(currName))
 			{
 				id = attributes.getValue(i);
@@ -427,6 +451,7 @@ public class AutomataBuildFromXml
 		}
 
 		State currState = new State();
+
 		currState.setId(id);
 		currState.setName(name);
 		currState.setInitial(initial);
@@ -438,31 +463,37 @@ public class AutomataBuildFromXml
 	public final void doTransition(AttributeList attributes)
 		throws SAXException
 	{
+
 		String source = attributes.getValue("source");
+
 		if (source == null)
 		{
 			throwException("source attribute is missing");
 		}
 
 		String dest = attributes.getValue("dest");
+
 		if (dest == null)
 		{
 			throwException("dest attribute is missing");
 		}
 
 		String event = attributes.getValue("event");
+
 		if (event == null)
 		{
 			throwException("event attribute is missing");
 		}
 
 		State sourceState = currAutomaton.getStateWithId(source);
+
 		if (sourceState == null)
 		{
 			throwException("Cannot find source state: " + source);
 		}
 
 		State destState = currAutomaton.getStateWithId(dest);
+
 		if (destState == null)
 		{
 			throwException("Cannot find dest state: " + dest);
@@ -476,9 +507,11 @@ public class AutomataBuildFromXml
 	public final void throwException(String msg)
 		throws SAXException
 	{
+
 		int line = locator.getLineNumber();
 		int column = locator.getColumnNumber();
 		String exMsg = "Error while parsing at line: " + line + ". Reason: \"" + msg + "\"";
+
 		throw new SAXException(exMsg);
 	}
 }

@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,8 +47,9 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.gui;
+
+
 
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.*;
@@ -57,9 +59,13 @@ import org.supremica.gui.Gui;
 
 import java.awt.*;
 import java.awt.event.*;
+
 import java.io.*;
+
 import javax.swing.*;
+
 import java.util.*;
+
 
 /**
  * Thread dealing with verification.
@@ -68,73 +74,83 @@ public class AutomataVerificationWorker
 	extends Thread
 	implements Stoppable
 {
-//	private static Category thisCategory = LogDisplay.createCategory(AutomataVerificationWorker.class.getName());
 
-//-- MF --	private Supremica workbench = null;
+	// private static Category thisCategory = LogDisplay.createCategory(AutomataVerificationWorker.class.getName());
+	// -- MF --      private Supremica workbench = null;
 	private Gui workbench = null;
 	private Automata theAutomata = null;
 	private AutomatonContainer theAutomatonContainer = null;
+
 	// private String newAutomatonName = null;
 	// private Automaton theAutomaton = null;
 	private SynchronizationOptions synchronizationOptions;
 	private VerificationOptions verificationOptions;
 	private ExecutionDialog executionDialog;
 	private boolean stopRequested = false;
-
 	private EventQueue eventQueue = new EventQueue();
 
-	public AutomataVerificationWorker(/* Supremica workbench,*/ Gui workbench,
-									  Automata theAutomata,
-									  SynchronizationOptions synchronizationOptions,
-									  VerificationOptions verificationOptions)
+	public AutomataVerificationWorker(	/* Supremica workbench, */Gui workbench, Automata theAutomata, SynchronizationOptions synchronizationOptions, VerificationOptions verificationOptions)
 	{
+
 		this.workbench = workbench;
 		this.theAutomata = theAutomata;
 		theAutomatonContainer = workbench.getAutomatonContainer();
+
 		// this.newAutomatonName = newAutomatonName;
 		this.synchronizationOptions = synchronizationOptions;
 		this.verificationOptions = verificationOptions;
+
 		this.start();
 	}
 
 	public void run()
 	{
+
 		Date startDate;
 		Date endDate;
 		final AutomataVerifier automataVerifier;
 
 		// Cancel dialog initialization...
 		final ArrayList threadsToStop = new ArrayList();
-		threadsToStop.add(this);
 
+		threadsToStop.add(this);
 		eventQueue.invokeLater(new Runnable()
-			{   public void run()
-				{
-					executionDialog = new ExecutionDialog(workbench, "Verifying", threadsToStop);
-					executionDialog.setMode(ExecutionDialogMode.verifying);
-				}
-			});
+		{
+
+			public void run()
+			{
+
+				executionDialog = new ExecutionDialog(workbench, "Verifying", threadsToStop);
+
+				executionDialog.setMode(ExecutionDialogMode.verifying);
+			}
+		});
 
 		if (verificationOptions.getVerificationType() == 0)
-		{   // Controllability verification...
+		{		// Controllability verification...
 			boolean isControllable;
 
 			if (theAutomata.size() < 2)
 			{
 				JOptionPane.showMessageDialog(workbench.getFrame(), "At least two automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
 				requestStop();
+
 				return;
 			}
 
 			try
 			{
 				automataVerifier = new AutomataVerifier(theAutomata, synchronizationOptions, verificationOptions);
- 				eventQueue.invokeLater(new Runnable()
-					{   public void run()
-						{
-							automataVerifier.getHelper().setExecutionDialog(executionDialog);
-						}
-					});
+
+				eventQueue.invokeLater(new Runnable()
+				{
+
+					public void run()
+					{
+						automataVerifier.getHelper().setExecutionDialog(executionDialog);
+					}
+				});
+
 				// automataVerifier.getHelper().setExecutionDialog(executionDialog);
 				threadsToStop.add(automataVerifier);
 			}
@@ -142,44 +158,54 @@ public class AutomataVerificationWorker
 			{
 				requestStop();
 				JOptionPane.showMessageDialog(workbench.getFrame(), e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+
 				// thisCategory.error(e.getMessage());
 				workbench.error(e.getMessage());
+
 				return;
 			}
 
 			startDate = new Date();
+
 			try
 			{
 				if (verificationOptions.getAlgorithmType() == 0)
-				{   // Modular...
+				{		// Modular...
 					isControllable = automataVerifier.modularControllabilityVerification();
 				}
 				else if (verificationOptions.getAlgorithmType() == 1)
-				{	// Monolithic...
+				{		// Monolithic...
 					isControllable = automataVerifier.monolithicControllabilityVerification();
 				}
 				else if (verificationOptions.getAlgorithmType() == 2)
-				{   // IDD...
+				{		// IDD...
 					requestStop();
+
 					// thisCategory.error("Option not implemented...");
 					workbench.error("Option not implemented...");
+
 					return;
 				}
 				else
-				{   // Error...
+				{		// Error...
 					requestStop();
+
 					// thisCategory.error("Unavailable option chosen.");
 					workbench.error("Unavailable option chosen.");
+
 					return;
 				}
 			}
 			catch (Exception e)
 			{
 				requestStop();
+
 				// thisCategory.error("Error in AutomataVerificationWorker when verifying automata. " + e);
 				workbench.error("Error in AutomataVerificationWorker when verifying automata. " + e);
+
 				return;
 			}
+
 			endDate = new Date();
 
 			// Present result...
@@ -187,27 +213,26 @@ public class AutomataVerificationWorker
 			{
 				if (isControllable)
 				{
-					JOptionPane.showMessageDialog(workbench.getFrame(), "The system is controllable!",
-												  "Good news", JOptionPane.INFORMATION_MESSAGE);
+					JOptionPane.showMessageDialog(workbench.getFrame(), "The system is controllable!", "Good news", JOptionPane.INFORMATION_MESSAGE);
 				}
 				else
 				{
-					JOptionPane.showMessageDialog(workbench.getFrame(), "The system is NOT controllable!",
-												  "Bad news", JOptionPane.INFORMATION_MESSAGE);
+					JOptionPane.showMessageDialog(workbench.getFrame(), "The system is NOT controllable!", "Bad news", JOptionPane.INFORMATION_MESSAGE);
 				}
 			}
 		}
 		else if (verificationOptions.getVerificationType() == 1)
-		{	// Non-blocking verification...
+		{				// Non-blocking verification...
 			requestStop();
+
 			// thisCategory.error("Option not implemented...");
 			workbench.error("Option not implemented...");
+
 			return;
 		}
 		else if (verificationOptions.getVerificationType() == 2)
-		{	// Language inclusion
+		{				// Language inclusion
 			boolean isIncluded;
-
 			Collection selectedAutomata = workbench.getSelectedAutomataAsCollection();
 			Automata automataA = new Automata();
 			Automata automataB = new Automata();
@@ -225,28 +250,40 @@ public class AutomataVerificationWorker
 				catch (Exception ex)
 				{
 					requestStop();
+
 					// thisCategory.error("Exception in AutomatonContainer.");
 					workbench.error("Exception in AutomatonContainer.");
+
 					return;
 				}
+
 				currAutomatonName = currAutomaton.getName();
+
 				if (currAutomaton.getInitialState() == null)
 				{
 					requestStop();
 					JOptionPane.showMessageDialog(workbench.getFrame(), "The automaton " + currAutomatonName + " does not have an initial state!", "Alert", JOptionPane.ERROR_MESSAGE);
+
 					return;
 				}
+
 				if (selectedAutomata.contains(currAutomaton))
+				{
 					automataB.addAutomaton(new Automaton(currAutomaton));
+				}
 				else
+				{
 					automataA.addAutomaton(new Automaton(currAutomaton));
+				}
 			}
 
-			if (automataA.size() < 1 || automataB.size() < 1)
+			if ((automataA.size() < 1) || (automataB.size() < 1))
 			{
+
 				// thisCategory.error("At least one automaton must be unselected.");
 				workbench.error("At least one automaton must be unselected.");
 				requestStop();
+
 				return;
 			}
 
@@ -257,20 +294,28 @@ public class AutomataVerificationWorker
 			Iterator automatonIteratorA = automataA.iterator();
 			Iterator eventIteratorA;
 			Iterator eventIteratorB;
+
 			while (automatonIteratorA.hasNext())
 			{
 				currAutomaton = (Automaton) automatonIteratorA.next();
+
 				Alphabet currAlphabet = currAutomaton.getAlphabet();
+
 				theAlphabets.add(currAlphabet);
 				currAutomaton.setType(AutomatonType.Plant);
+
 				eventIteratorA = currAutomaton.eventIterator();
-				while(eventIteratorA.hasNext())
+
+				while (eventIteratorA.hasNext())
 				{
 					((org.supremica.automata.Event) eventIteratorA.next()).setControllable(false);
 				}
 			}
+
 			if (theAlphabets.size() == 1)
+			{
 				unionAlphabet = (Alphabet) theAlphabets.get(0);
+			}
 			else
 			{
 				try
@@ -280,8 +325,10 @@ public class AutomataVerificationWorker
 				catch (Exception e)
 				{
 					requestStop();
+
 					// thisCategory.error("Error when calculating union alphabet. " + e);
 					workbench.error("Error when calculating union alphabet. " + e);
+
 					return;
 				}
 			}
@@ -291,18 +338,27 @@ public class AutomataVerificationWorker
 			// specifications
 			Iterator automatonIteratorB = automataB.iterator();
 			org.supremica.automata.Event currEvent;
+
 			while (automatonIteratorB.hasNext())
 			{
 				currAutomaton = (Automaton) automatonIteratorB.next();
+
 				currAutomaton.setType(AutomatonType.Supervisor);
+
 				eventIteratorB = currAutomaton.eventIterator();
-				while(eventIteratorB.hasNext())
+
+				while (eventIteratorB.hasNext())
 				{
 					currEvent = (org.supremica.automata.Event) eventIteratorB.next();
+
 					if (unionAlphabet.containsEventWithLabel(currEvent.getLabel()))
+					{
 						currEvent.setControllable(false);
+					}
 					else
+					{
 						currEvent.setControllable(true);
+					}
 				}
 			}
 
@@ -313,11 +369,16 @@ public class AutomataVerificationWorker
 			try
 			{
 				automataVerifier = new AutomataVerifier(automataA, synchronizationOptions, verificationOptions);
+
 				eventQueue.invokeLater(new Runnable()
-					{   public void run()
-						{ automataVerifier.getHelper().setExecutionDialog(executionDialog);
-						}
-					});
+				{
+
+					public void run()
+					{
+						automataVerifier.getHelper().setExecutionDialog(executionDialog);
+					}
+				});
+
 				// automataVerifier.getHelper().setExecutionDialog(executionDialog);
 				threadsToStop.add(automataVerifier);
 			}
@@ -325,44 +386,54 @@ public class AutomataVerificationWorker
 			{
 				requestStop();
 				JOptionPane.showMessageDialog(workbench.getFrame(), e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+
 				// thisCategory.error(e.getMessage());
 				workbench.error(e.getMessage());
+
 				return;
 			}
 
 			startDate = new Date();
+
 			try
 			{
 				if (verificationOptions.getAlgorithmType() == 0)
-				{   // Modular...
+				{		// Modular...
 					isIncluded = automataVerifier.modularControllabilityVerification();
 				}
 				else if (verificationOptions.getAlgorithmType() == 1)
-				{	// Monolithic...
+				{		// Monolithic...
 					isIncluded = automataVerifier.monolithicControllabilityVerification();
 				}
 				else if (verificationOptions.getAlgorithmType() == 2)
-				{   // IDD...
+				{		// IDD...
 					requestStop();
+
 					// thisCategory.error("Option not implemented...");
 					workbench.error("Option not implemented...");
+
 					return;
 				}
 				else
-				{   // Error...
+				{		// Error...
 					requestStop();
+
 					// thisCategory.error("Unavailable option chosen.");
 					workbench.error("Unavailable option chosen.");
+
 					return;
 				}
 			}
 			catch (Exception e)
 			{
 				requestStop();
+
 				// thisCategory.error("Error in AutomataVerificationWorker when verifying automata. " + e);
 				workbench.error("Error in AutomataVerificationWorker when verifying automata. " + e);
+
 				return;
 			}
+
 			endDate = new Date();
 
 			// Present result...
@@ -379,30 +450,37 @@ public class AutomataVerificationWorker
 			}
 		}
 		else
-		{   // Error...
+		{				// Error...
 			requestStop();
+
 			// thisCategory.error("Unavailable option chosen.");
 			workbench.error("Unavailable option chosen.");
+
 			return;
 		}
 
 		// Present result...
 		automataVerifier.getHelper().displayInfo();
+
 		if (!stopRequested)
 		{
+
 			// thisCategory.info("Execution completed after " + (endDate.getTime()-startDate.getTime())/1000.0 + " seconds.");
-			workbench.info("Execution completed after " + (endDate.getTime()-startDate.getTime())/1000.0 + " seconds.");
+			workbench.info("Execution completed after " + (endDate.getTime() - startDate.getTime()) / 1000.0 + " seconds.");
 		}
 		else
 		{
+
 			// thisCategory.info("Execution stopped after " + (endDate.getTime()-startDate.getTime())/1000.0 + " seconds.");
-			workbench.info("Execution stopped after " + (endDate.getTime()-startDate.getTime())/1000.0 + " seconds.");
+			workbench.info("Execution stopped after " + (endDate.getTime() - startDate.getTime()) / 1000.0 + " seconds.");
 		}
+
 		requestStop();
 	}
 
 	public void requestStop()
 	{
+
 		if (executionDialog != null)
 		{
 			executionDialog.setMode(ExecutionDialogMode.hide);

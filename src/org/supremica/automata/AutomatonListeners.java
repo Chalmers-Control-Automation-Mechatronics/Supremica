@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,14 +47,17 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.automata;
 
+
+
 import java.util.*;
+
 
 public class AutomatonListeners
 	extends Listeners
 {
+
 	public static final int MODE_STATE_ADDED = 1;
 	public static final int MODE_STATE_REMOVED = 2;
 	public static final int MODE_ARC_ADDED = 3;
@@ -67,6 +71,7 @@ public class AutomatonListeners
 
 	public void notifyListeners(int mode, Object o)
 	{
+
 		if (batchUpdate)
 		{
 			updateNeeded = true;
@@ -76,33 +81,35 @@ public class AutomatonListeners
 			if (listeners != null)
 			{
 				Iterator listenerIt = listeners.iterator();
+
 				while (listenerIt.hasNext())
 				{
-					AutomatonListener currListener = (AutomatonListener)listenerIt.next();
+					AutomatonListener currListener = (AutomatonListener) listenerIt.next();
+
 					if (mode == MODE_STATE_ADDED)
 					{
-						currListener.stateAdded((Automaton)owner, (State)o);
+						currListener.stateAdded((Automaton) owner, (State) o);
 					}
 					else if (mode == MODE_STATE_REMOVED)
 					{
-						currListener.stateRemoved((Automaton)owner, (State)o);
+						currListener.stateRemoved((Automaton) owner, (State) o);
 					}
 					else if (mode == MODE_ARC_ADDED)
 					{
-						currListener.arcAdded((Automaton)owner, (Arc)o);
+						currListener.arcAdded((Automaton) owner, (Arc) o);
 					}
 					else if (mode == MODE_ARC_REMOVED)
 					{
-						currListener.arcRemoved((Automaton)owner, (Arc)o);
+						currListener.arcRemoved((Automaton) owner, (Arc) o);
 					}
 					else if (mode == MODE_ATTRIBUTE_CHANGED)
 					{
-						currListener.attributeChanged((Automaton)owner);
+						currListener.attributeChanged((Automaton) owner);
 					}
 				}
 			}
+
 			updateNeeded = false;
 		}
 	}
-
 }

@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,20 +47,21 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.automata.algorithms;
+
+
 
 import java.util.*;
 
+
 public class SynthesisAlgorithm
 {
-	private static Collection types = new LinkedList();
 
+	private static Collection types = new LinkedList();
 	public static final SynthesisAlgorithm Monolithic = new SynthesisAlgorithm("Monolithic");
 	public static final SynthesisAlgorithm Modular = new SynthesisAlgorithm("Modular");
 	public static final SynthesisAlgorithm IDD = new SynthesisAlgorithm("IDD", false);
 	public static final SynthesisAlgorithm Unknown = new SynthesisAlgorithm("Unknown", false);
-
 	private String description = null;
 
 	private SynthesisAlgorithm(String description)
@@ -69,10 +71,12 @@ public class SynthesisAlgorithm
 
 	private SynthesisAlgorithm(String description, boolean selectable)
 	{
+
 		if (selectable)
 		{
 			types.add(this);
 		}
+
 		this.description = description;
 	}
 
@@ -88,18 +92,22 @@ public class SynthesisAlgorithm
 
 	public static SynthesisAlgorithm toAlgorithm(String algorithm)
 	{
+
 		if (algorithm.equals(Monolithic.toString()))
 		{
 			return Monolithic;
 		}
+
 		if (algorithm.equals(Modular.toString()))
 		{
 			return Modular;
 		}
+
 		if (algorithm.equals(IDD.toString()))
 		{
 			return IDD;
 		}
+
 		return Unknown;
 	}
 

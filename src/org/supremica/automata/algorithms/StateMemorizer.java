@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,11 +47,13 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.automata.algorithms;
+
+
 
 // Skräp
 import org.supremica.gui.*;
+
 import org.apache.log4j.*;
 
 import java.util.Iterator;
@@ -59,11 +62,13 @@ import java.util.Hashtable;
 
 
 public final class StateMemorizer
-{	// Skräp
+{		// Skräp
+
 	private static Category thisCategory = LogDisplay.createCategory(StateMemorizer.class.getName());
 
 	private class HashtableHolder
 	{
+
 		private Hashtable stateHash;
 		private int[] automataIndices;
 
@@ -89,134 +94,180 @@ public final class StateMemorizer
 	private Hashtable tableHash = new Hashtable(1023);
 	private int[] automataIndices;
 
-    public StateMemorizer()
-    {
-	}
+	public StateMemorizer() {}
 
 	public StateMemorizer(int[] automataIndices)
-    {
+	{
 		this.automataIndices = automataIndices;
 	}
 
 	public void add(int[] automataIndices, int[] fullState, int problemPlant, int problemEvent)
 	{
+
 		int[] stateIndices = stateCompression(automataIndices, fullState);
 		Hashtable stateHash = (Hashtable) tableHash.get(new StateHolder(automataIndices));
+
 		if (stateHash == null)
 		{
 			stateHash = new Hashtable(47);
+
 			tableHash.put(new StateHolder(automataIndices), stateHash);
 			tableList.add(new HashtableHolder(stateHash, automataIndices));
 		}
+
 		stateHash.put(new StateHolder(stateIndices), new StateHolder(stateIndices, problemPlant, problemEvent));
 	}
 
 	public void remove(int[] automataIndices, int[] fullState)
 	{
+
 		int[] stateIndices = stateCompression(automataIndices, fullState);
 		Hashtable stateHash = (Hashtable) tableHash.get(new StateHolder(automataIndices));
+
 		stateHash.remove(new StateHolder(stateIndices));
 	}
 
 	// Iterates through the tableList and examines all hashtables for the state...
 	public boolean contains(int[] fullState)
 	{
+
 		HashtableHolder hashtableHolder;
 		Iterator tableIterator = tableList.iterator();
+
 		while (tableIterator.hasNext())
 		{
-		    hashtableHolder = (HashtableHolder) tableIterator.next();
+			hashtableHolder = (HashtableHolder) tableIterator.next();
+
 			if (contains(hashtableHolder.getAutomataIndices(), fullState))
+			{
 				return true;
+			}
 		}
+
 		return false;
 	}
 
 	public boolean contains(int[] automataIndices, int[] fullState)
 	{
+
 		int[] stateIndices = stateCompression(automataIndices, fullState);
 		Hashtable stateHash = (Hashtable) tableHash.get(new StateHolder(automataIndices));
+
 		return stateHash.containsKey(new StateHolder(stateIndices));
 	}
 
 	private StateHolder getStateHolder(int[] automataIndices, int[] fullState)
 	{
+
 		int[] stateIndices = stateCompression(automataIndices, fullState);
 		Hashtable stateHash = (Hashtable) tableHash.get(new StateHolder(automataIndices));
+
 		return (StateHolder) stateHash.get(new StateHolder(stateIndices));
 	}
 
 	// Returns indices of the states in the automata represented by the indices in automataIndices
 	private int[] stateCompression(int[] automataIndices, int[] fullState)
 	{
+
 		int[] stateIndices = new int[automataIndices.length];
+
 		for (int i = 0; i < automataIndices.length; i++)
+		{
 			stateIndices[i] = fullState[automataIndices[i]];
+		}
+
 		return stateIndices;
 	}
 
 	// Marks a state as found if found, see the method clean.
 	public boolean find(int[] automataIndices, int[] fullState)
-  	{
-  		if (contains(automataIndices, fullState))
- 			getStateHolder(automataIndices, fullState).setFound(true);
+	{
+
+		if (contains(automataIndices, fullState))
+		{
+			getStateHolder(automataIndices, fullState).setFound(true);
+		}
 		else
+		{
 			return false;
+		}
+
 		return true;
-  	}
+	}
 
 	// Count uncontrollable states
 	public int size()
 	{
+
 		int count = 0;
 		HashtableHolder hashtableHolder;
 		Iterator tableIterator = tableList.iterator();
+
 		while (tableIterator.hasNext())
 		{
 			hashtableHolder = (HashtableHolder) tableIterator.next();
 			count = count + size(hashtableHolder.getAutomataIndices());
 		}
+
 		return count;
 	}
 
 	// Count uncontrollable states in single hashtable
 	public int size(int[] automataIndices)
 	{
-		//return ((Hashtable) tableHash.get(new StateHolder(automataIndices))).size();
+
+		// return ((Hashtable) tableHash.get(new StateHolder(automataIndices))).size();
 		Hashtable hashtable = (Hashtable) tableHash.get(new StateHolder(automataIndices));
+
 		if (hashtable != null)
+		{
 			return hashtable.size();
+		}
 		else
+		{
 			return 0;
+		}
 	}
 
 	public void clear(int[] automataIndices)
 	{
+
 		// ((Hashtable) tableHash.get(new StateHolder(automataIndices))).clear();
 		Hashtable hashtable = (Hashtable) tableHash.get(new StateHolder(automataIndices));
+
 		tableList.remove(new HashtableHolder(hashtable, automataIndices));
+
 		hashtable = null;
 	}
 
 	// Removes states that are not marked as "found" in
 	// the hashtable associated with automataIndices
- 	public void clean(int[] automataIndices)
- 	{
+	public void clean(int[] automataIndices)
+	{
+
 		Iterator stateIterator = iterator(automataIndices);
 		StateHolder stateHolder;
+
 		while (stateIterator.hasNext())
 		{
 			stateHolder = (StateHolder) stateIterator.next();
-			if (!stateHolder.isFound())
-				stateIterator.remove();
-			else
-				stateHolder.setFound(false);
-		}
- 	}
 
- 	public Iterator iterator(int[] automataIndices)
- 	{
+			if (!stateHolder.isFound())
+			{
+				stateIterator.remove();
+			}
+			else
+			{
+				stateHolder.setFound(false);
+			}
+		}
+	}
+
+	public Iterator iterator(int[] automataIndices)
+	{
+
 		Hashtable stateHash = (Hashtable) tableHash.get(new StateHolder(automataIndices));
+
 		return stateHash.values().iterator();
- 	}
+	}
 }

@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,20 +47,20 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.automata.algorithms;
 
+
+
 import org.supremica.gui.*;
+
 import org.apache.log4j.*;
+
 
 public final class IDDOptions
 {
-   	private static Category thisCategory = LogDisplay.createCategory(IDDOptions.class.getName());
+
+	private static Category thisCategory = LogDisplay.createCategory(IDDOptions.class.getName());
 
 	public IDDOptions()
-		throws Exception
-	{
-	}
-
-
+		throws Exception {}
 }

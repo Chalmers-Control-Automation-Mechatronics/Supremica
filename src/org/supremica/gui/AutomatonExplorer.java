@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,122 +47,133 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.gui;
+
+
 
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.*;
 
 import java.awt.*;
 import java.awt.event.*;
+
 import java.io.*;
+
 import javax.swing.*;
+
 import java.util.*;
+
 
 public class AutomatonExplorer
 	extends JFrame
 	implements AutomatonListener
 {
-	private Automaton theAutomaton;
 
-    private BorderLayout layout = new BorderLayout();
-    private JPanel contentPane;
-    private JMenuBar menuBar = new JMenuBar();
-    private StateViewer stateViewer;
-    private ExplorerController controller;
+	private Automaton theAutomaton;
+	private BorderLayout layout = new BorderLayout();
+	private JPanel contentPane;
+	private JMenuBar menuBar = new JMenuBar();
+	private StateViewer stateViewer;
+	private ExplorerController controller;
 
 	public AutomatonExplorer(Automaton theAutomaton)
 		throws Exception
 	{
+
 		this.theAutomaton = theAutomaton;
 
 		theAutomaton.getListeners().addListener(this);
-
 		setBackground(Color.white);
 
-		contentPane = (JPanel)getContentPane();
-		contentPane.setLayout(layout);
-		// contentPane.add(toolBar, BorderLayout.NORTH);
+		contentPane = (JPanel) getContentPane();
 
+		contentPane.setLayout(layout);
+
+		// contentPane.add(toolBar, BorderLayout.NORTH);
 		setTitle(theAutomaton.getName());
 		setSize(400, 500);
 
 		// Center the window
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		Dimension frameSize = getSize();
+
 		if (frameSize.height > screenSize.height)
 		{
 			frameSize.height = screenSize.height;
 		}
+
 		if (frameSize.width > screenSize.width)
 		{
 			frameSize.width = screenSize.width;
 		}
+
 		setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
-
-
 		addWindowListener(new WindowAdapter()
-			{
-				public void windowClosing(WindowEvent e)
-				{
-					setVisible(false);
-					dispose();
-				}
-			});
+		{
 
+			public void windowClosing(WindowEvent e)
+			{
+				setVisible(false);
+				dispose();
+			}
+		});
 		initMenubar();
 
 		State currState = theAutomaton.getInitialState();
+
 		if (currState == null)
 		{
 			throw new Exception("No initial state");
 		}
 
 		stateViewer = new StateViewer(theAutomaton);
+
 		contentPane.add(stateViewer, BorderLayout.CENTER);
 
 		controller = new ExplorerController(stateViewer, theAutomaton);
+
 		contentPane.add(controller, BorderLayout.SOUTH);
-
 		stateViewer.setController(controller);
-
 		stateViewer.goToInitialState();
 	}
 
 	public void initialize()
 	{
-        setIconImage(Supremica.cornerImage);
+		setIconImage(Supremica.cornerImage);
 		stateViewer.initialize();
 	}
 
-    private void initMenubar()
-    {
-    	setJMenuBar(menuBar);
+	private void initMenubar()
+	{
 
-    	// File
-	    JMenu menuFile = new JMenu();
-	    menuFile.setText("File");
-	    menuFile.setMnemonic(KeyEvent.VK_F);
+		setJMenuBar(menuBar);
+
+		// File
+		JMenu menuFile = new JMenu();
+
+		menuFile.setText("File");
+		menuFile.setMnemonic(KeyEvent.VK_F);
+
 		// File.Close
-	    JMenuItem menuFileClose = new JMenuItem();
-	    menuFileClose.setText("Close");
+		JMenuItem menuFileClose = new JMenuItem();
+
+		menuFileClose.setText("Close");
 		menuFile.add(menuFileClose);
+		menuBar.add(menuFile);
+		menuFileClose.addActionListener(new ActionListener()
+		{
 
-    	menuBar.add(menuFile);
-
-        menuFileClose.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent e)
-            {
+			public void actionPerformed(ActionEvent e)
+			{
 				setVisible(false);
 				dispose();
-            }
-        });
-
+			}
+		});
 	}
 
 	public void updated(Object o)
 	{
+
 		if (o == theAutomaton)
 		{
 			stateViewer.goToInitialState();
@@ -192,18 +204,18 @@ public class AutomatonExplorer
 	{
 		updated(aut);
 	}
-
 }
 
 class StateViewer
 	extends JPanel
 {
+
 	private Automaton theAutomaton;
 	private State currState;
-    private EventList forwardEvents;
-    private EventList backwardEvents;
-    private ExplorerController controller;
-    private StateDisplayer stateDisplayer;
+	private EventList forwardEvents;
+	private EventList backwardEvents;
+	private ExplorerController controller;
+	private StateDisplayer stateDisplayer;
 	private JSplitPane eventSplitter;
 	private JSplitPane stateEventSplitter;
 	private LinkedList prevStates = new LinkedList();
@@ -211,14 +223,19 @@ class StateViewer
 
 	public StateViewer(Automaton theAutomaton)
 	{
+
 		setLayout(new BorderLayout());
+
 		this.theAutomaton = theAutomaton;
 		forwardEvents = new EventList(this, theAutomaton, true);
 		backwardEvents = new EventList(this, theAutomaton, false);
+
 		backwardEvents.setShowStateId(true);
+
 		eventSplitter = new JSplitPane(JSplitPane.VERTICAL_SPLIT, forwardEvents, backwardEvents);
 		stateDisplayer = new StateDisplayer(this, theAutomaton);
 		stateEventSplitter = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, stateDisplayer, eventSplitter);
+
 		add(stateEventSplitter, BorderLayout.CENTER);
 	}
 
@@ -235,13 +252,19 @@ class StateViewer
 
 	private void setCurrState(State newState, boolean isUndo)
 	{
+
 		if (!isUndo)
 		{
 			if (currState != null)
+			{
 				prevStates.addLast(currState);
+			}
+
 			nextStates.clear();
 		}
+
 		currState = newState;
+
 		update();
 	}
 
@@ -249,19 +272,24 @@ class StateViewer
 	{
 		return currState;
 	}
-	
+
 	public void goToInitialState()
 	{
+
 		prevStates.clear();
+
 		currState = null;
+
 		setCurrState(theAutomaton.getInitialState(), false);
 	}
 
 	public void undoState()
 	{
+
 		if (prevStates.size() > 0)
 		{
-			State newState = (State)prevStates.removeLast();
+			State newState = (State) prevStates.removeLast();
+
 			nextStates.addFirst(currState);
 			setCurrState(newState, true);
 		}
@@ -274,9 +302,11 @@ class StateViewer
 
 	public void redoState()
 	{
+
 		if (nextStates.size() > 0)
 		{
-			State newState = (State)nextStates.removeFirst();
+			State newState = (State) nextStates.removeFirst();
+
 			prevStates.addLast(currState);
 			setCurrState(newState, true);
 		}
@@ -289,6 +319,7 @@ class StateViewer
 
 	public void update()
 	{
+
 		stateDisplayer.setCurrState(currState);
 		forwardEvents.setCurrState(currState);
 		backwardEvents.setCurrState(currState);
@@ -299,12 +330,12 @@ class StateViewer
 	{
 		this.controller = controller;
 	}
-
 }
 
 class EventList
 	extends JPanel
 {
+
 	private boolean forward;
 	private boolean showStateId = false;
 	private Automaton theAutomaton;
@@ -315,19 +346,21 @@ class EventList
 
 	public EventList(StateViewer stateViewer, Automaton theAutomaton, boolean forward)
 	{
+
 		setLayout(new BorderLayout());
 
 		this.stateViewer = stateViewer;
 		this.theAutomaton = theAutomaton;
 		this.forward = forward;
-
 		eventsList = new EventListModel(theAutomaton, forward);
 		theList = new JList(eventsList);
 
 		JScrollPane scrollPanel = new JScrollPane(theList);
+
 		theList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
 		String label;
+
 		if (forward)
 		{
 			label = "Outgoing events";
@@ -336,29 +369,32 @@ class EventList
 		{
 			label = "Incoming events";
 		}
+
 		JLabel jLabel = new JLabel(label);
-		//jLabel.setOpaque(true);
-		//jLabel.setBackground(Color.yellow);
+
+		// jLabel.setOpaque(true);
+		// jLabel.setBackground(Color.yellow);
 		add(jLabel, BorderLayout.NORTH);
-
 		add(scrollPanel, BorderLayout.CENTER);
-
 		theList.addMouseListener(new MouseAdapter()
+		{
+
+			public void mouseClicked(MouseEvent e)
 			{
-				public void mouseClicked(MouseEvent e)
+
+				if (e.getClickCount() == 2)
 				{
-					if (e.getClickCount() == 2)
+					int index = theList.locationToIndex(e.getPoint());
+
+					if (index >= 0)
 					{
-						int index = theList.locationToIndex(e.getPoint());
-						if (index >= 0)
-						{
-							State newState = eventsList.getStateAt(index);
-							updateStateViewer(newState);
-						}
+						State newState = eventsList.getStateAt(index);
+
+						updateStateViewer(newState);
 					}
 				}
 			}
-		);
+		});
 	}
 
 	public void setShowStateId(boolean showStateId)
@@ -368,7 +404,9 @@ class EventList
 
 	public void setCurrState(State currState)
 	{
+
 		this.currState = currState;
+
 		theList.clearSelection();
 		update();
 	}
@@ -387,6 +425,7 @@ class EventList
 class EventListModel
 	extends AbstractListModel
 {
+
 	private State currState;
 	private ArrayList currArcs = new ArrayList();
 	private boolean forward;
@@ -396,6 +435,7 @@ class EventListModel
 
 	public EventListModel(Automaton theAutomaton, boolean forward)
 	{
+
 		this.forward = forward;
 		this.theAutomaton = theAutomaton;
 		this.theAlphabet = theAutomaton.getAlphabet();
@@ -403,7 +443,9 @@ class EventListModel
 
 	public void setCurrState(State currState)
 	{
+
 		this.currState = currState;
+
 		update();
 	}
 
@@ -414,7 +456,9 @@ class EventListModel
 
 	public void update()
 	{
+
 		Iterator arcIt;
+
 		if (forward)
 		{
 			arcIt = currState.outgoingArcsIterator();
@@ -423,12 +467,16 @@ class EventListModel
 		{
 			arcIt = currState.incomingArcsIterator();
 		}
+
 		currArcs.clear();
+
 		while (arcIt.hasNext())
 		{
-			Arc currArc = (Arc)arcIt.next();
+			Arc currArc = (Arc) arcIt.next();
+
 			currArcs.add(currArc);
 		}
+
 		fireContentsChanged(this, 0, currArcs.size() - 1);
 	}
 
@@ -439,9 +487,11 @@ class EventListModel
 
 	public Object getElementAt(int index)
 	{
-		Arc currArc = (Arc)currArcs.get(index);
+
+		Arc currArc = (Arc) currArcs.get(index);
 		String eventId = currArc.getEventId();
 		org.supremica.automata.Event currEvent;
+
 		try
 		{
 			currEvent = theAlphabet.getEventWithId(eventId);
@@ -449,19 +499,23 @@ class EventListModel
 		catch (Exception e)
 		{
 			System.err.println("Error: Could not find " + eventId + " in alphabet!\n");
+
 			return null;
 		}
 
 		StringBuffer responseString = new StringBuffer();
+
 		if (!currEvent.isControllable())
 		{
-
 			responseString.append("!");
 		}
+
 		responseString.append(currEvent.getLabel());
+
 		if (showState)
 		{
 			State currState;
+
 			if (forward)
 			{
 				currState = currArc.getToState();
@@ -470,15 +524,19 @@ class EventListModel
 			{
 				currState = currArc.getFromState();
 			}
+
 			responseString.append(" [state name: " + currState.getName() + "]");
 		}
+
 		return responseString.toString();
 	}
 
 	public State getStateAt(int index)
 	{
-		Arc currArc = (Arc)currArcs.get(index);
+
+		Arc currArc = (Arc) currArcs.get(index);
 		State newState;
+
 		if (forward)
 		{
 			newState = currArc.getToState();
@@ -487,6 +545,7 @@ class EventListModel
 		{
 			newState = currArc.getFromState();
 		}
+
 		return newState;
 	}
 }
@@ -494,6 +553,7 @@ class EventListModel
 class StateDisplayer
 	extends JPanel
 {
+
 	private StateViewer stateViewer;
 	private Automaton theAutomaton;
 	private JCheckBox isInitialBox = new JCheckBox("initial");
@@ -507,61 +567,69 @@ class StateDisplayer
 	{
 		stateViewer.getCurrState().setAccepting(b);
 	}
+
 	private void changeStateForbidden(boolean b)
 	{
 		stateViewer.getCurrState().setForbidden(b);
 	}
-	
+
 	public StateDisplayer(StateViewer stateViewer, Automaton theAutomaton)
 	{
+
 		setLayout(new BorderLayout());
+
 		this.stateViewer = stateViewer;
 		this.theAutomaton = theAutomaton;
 
 		JLabel header = new JLabel("Current state");
-        //header.setOpaque(true);
-        //header.setBackground(Color.yellow);
-        add(header, BorderLayout.NORTH);
 
-        Box statusBox = new Box(BoxLayout.Y_AXIS);
-        isInitialBox.setEnabled(false);
+		// header.setOpaque(true);
+		// header.setBackground(Color.yellow);
+		add(header, BorderLayout.NORTH);
+
+		Box statusBox = new Box(BoxLayout.Y_AXIS);
+
+		isInitialBox.setEnabled(false);
 		isInitialBox.setBackground(Color.white);
-        statusBox.add(isInitialBox);
-        
-        isAcceptingBox.setEnabled(true);
+		statusBox.add(isInitialBox);
+		isAcceptingBox.setEnabled(true);
 		isAcceptingBox.setBackground(Color.white);
 		isAcceptingBox.addActionListener(new ActionListener()
-										{
-											public void actionPerformed(ActionEvent e)
-											{
-												changeStateAccepting(((JCheckBox)e.getSource()).isSelected());
-											}
-										});
-        statusBox.add(isAcceptingBox);
-        
-        isForbiddenBox.setEnabled(true);
+		{
+
+			public void actionPerformed(ActionEvent e)
+			{
+				changeStateAccepting(((JCheckBox) e.getSource()).isSelected());
+			}
+		});
+		statusBox.add(isAcceptingBox);
+		isForbiddenBox.setEnabled(true);
 		isForbiddenBox.setBackground(Color.white);
 		isForbiddenBox.addActionListener(new ActionListener()
-										{
-											public void actionPerformed(ActionEvent e)
-											{
-												changeStateForbidden(((JCheckBox)e.getSource()).isSelected());
-											}
-										});
-        statusBox.add(isForbiddenBox);
-        
-        statusBox.add(stateCost);
-        statusBox.add(stateId);
-        statusBox.add(stateName);
+		{
 
-        JScrollPane boxScroller = new JScrollPane(statusBox);
-        add(boxScroller, BorderLayout.CENTER);
+			public void actionPerformed(ActionEvent e)
+			{
+				changeStateForbidden(((JCheckBox) e.getSource()).isSelected());
+			}
+		});
+		statusBox.add(isForbiddenBox);
+		statusBox.add(stateCost);
+		statusBox.add(stateId);
+		statusBox.add(stateName);
+
+		JScrollPane boxScroller = new JScrollPane(statusBox);
+
+		add(boxScroller, BorderLayout.CENTER);
+
 		JViewport vp = boxScroller.getViewport();
+
 		vp.setBackground(Color.white);
 	}
 
 	public void setCurrState(State currState)
 	{
+
 		isInitialBox.setSelected(currState.isInitial());
 		isAcceptingBox.setSelected(currState.isAccepting());
 		isForbiddenBox.setSelected(currState.isForbidden());
@@ -574,6 +642,7 @@ class StateDisplayer
 class ExplorerController
 	extends JPanel
 {
+
 	private StateViewer stateViewer;
 	private Automaton theAutomaton;
 	private JButton undoButton;
@@ -581,48 +650,56 @@ class ExplorerController
 
 	public ExplorerController(StateViewer stateViewer, Automaton theAutomaton)
 	{
+
 		setLayout(new BorderLayout());
 
 		this.stateViewer = stateViewer;
 		this.theAutomaton = theAutomaton;
 
-        Box redoBox = new Box(BoxLayout.X_AXIS);
+		Box redoBox = new Box(BoxLayout.X_AXIS);
+
 		undoButton = new JButton("Undo");
 		redoButton = new JButton("Redo");
+
 		redoBox.add(undoButton);
 		redoBox.add(redoButton);
 		add(redoBox, BorderLayout.NORTH);
 
 		JButton resetButton = new JButton("Reset");
-        add(resetButton, BorderLayout.CENTER);
-        undoButton.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-				undo_actionPerformed(e);
-            }
-        });
-        redoButton.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-				redo_actionPerformed(e);
-            }
-        });
 
-    	resetButton.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-                reset_actionPerformed(e);
-            }
-        });
+		add(resetButton, BorderLayout.CENTER);
+		undoButton.addActionListener(new ActionListener()
+		{
+
+			public void actionPerformed(ActionEvent e)
+			{
+				undo_actionPerformed(e);
+			}
+		});
+		redoButton.addActionListener(new ActionListener()
+		{
+
+			public void actionPerformed(ActionEvent e)
+			{
+				redo_actionPerformed(e);
+			}
+		});
+		resetButton.addActionListener(new ActionListener()
+		{
+
+			public void actionPerformed(ActionEvent e)
+			{
+				reset_actionPerformed(e);
+			}
+		});
 	}
 
 	public void reset_actionPerformed(ActionEvent e)
 	{
+
 		stateViewer.goToInitialState();
-		//stateViewer.initialize();
+
+		// stateViewer.initialize();
 	}
 
 	public void undo_actionPerformed(ActionEvent e)

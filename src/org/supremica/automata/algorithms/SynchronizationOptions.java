@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,16 +47,19 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.automata.algorithms;
 
+
+
 import org.supremica.gui.*;
+
 import org.apache.log4j.*;
+
 
 public final class SynchronizationOptions
 {
-   	private static Category thisCategory = LogDisplay.createCategory(SynchronizationOptions.class.getName());
 
+	private static Category thisCategory = LogDisplay.createCategory(SynchronizationOptions.class.getName());
 	private final SynchronizationType syncType;
 	private final boolean forbidUnconStates;
 	private final boolean expandForbiddenStates;
@@ -67,48 +71,31 @@ public final class SynchronizationOptions
 	private final boolean expandEventsUsingPriority;
 	private final boolean verboseMode;
 
-
 	public SynchronizationOptions()
 		throws Exception
 	{
-		this(
-			WorkbenchProperties.syncNbrOfExecuters(),
-			SynchronizationType.Prioritized,
-			WorkbenchProperties.syncInitialHashtableSize(),
-			WorkbenchProperties.syncExpandHashtable(),
-			WorkbenchProperties.syncForbidUncontrollableStates(),
-			WorkbenchProperties.syncExpandForbiddenStates(),
-			false,
-			false,
-			true,
-			WorkbenchProperties.verboseMode()
-		);
+		this(WorkbenchProperties.syncNbrOfExecuters(), SynchronizationType.Prioritized, WorkbenchProperties.syncInitialHashtableSize(), WorkbenchProperties.syncExpandHashtable(), WorkbenchProperties.syncForbidUncontrollableStates(), WorkbenchProperties.syncExpandForbiddenStates(), false, false, true, WorkbenchProperties.verboseMode());
 	}
 
-	public SynchronizationOptions(int nbrOfExecuters,
-		SynchronizationType syncType,
-		int initialHashtableSize,
-		boolean expandHashtable,
-		boolean forbidUnconStates,
-		boolean expandForbiddenStates,
-		boolean terminateIfUnconState,
-		boolean expandEventsUsingPriority,
-		boolean buildAutomaton,
-		boolean verboseMode)
+	public SynchronizationOptions(int nbrOfExecuters, SynchronizationType syncType, int initialHashtableSize, boolean expandHashtable, boolean forbidUnconStates, boolean expandForbiddenStates, boolean terminateIfUnconState, boolean expandEventsUsingPriority, boolean buildAutomaton, boolean verboseMode)
 		throws Exception
 	{
+
 		if (syncType == null)
 		{
 			throw new Exception("synchType must be non-null");
 		}
+
 		if (nbrOfExecuters < 1)
 		{
 			throw new Exception("nbrOfExcuters must be at least 1");
 		}
+
 		if (initialHashtableSize < 100)
 		{
 			throw new Exception("initialHashtableSize must be at least 100");
 		}
+
 		this.nbrOfExecuters = nbrOfExecuters;
 		this.syncType = syncType;
 		this.initialHashtableSize = initialHashtableSize;

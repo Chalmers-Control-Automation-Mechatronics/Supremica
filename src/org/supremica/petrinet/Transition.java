@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,19 +47,19 @@
  *
  * Supremica is owned and represented by KA.
  */
-
-
 package org.supremica.petrinet;
+
+
 
 import java.util.*;
 
+
 public class Transition
 {
+
 	private List prevPlaces = new LinkedList();
 	private List nextPlaces = new LinkedList();
-
 	private List prevInhibitorPlaces = new LinkedList();
-
 	private String identity;
 	private String label;
 	boolean controllable = true;
@@ -76,6 +77,7 @@ public class Transition
 
 	public Transition(Transition orgTransition)
 	{
+
 		identity = orgTransition.identity;
 		label = orgTransition.label;
 		controllable = orgTransition.controllable;
@@ -83,7 +85,7 @@ public class Transition
 
 	public void setIdentity()
 	{
-		this.identity =	identity;
+		this.identity = identity;
 	}
 
 	public String getIdentity()
@@ -148,34 +150,43 @@ public class Transition
 
 	public String toString()
 	{
-		StringBuffer sb = new StringBuffer();
-		sb.append("Transition: " + identity + "\n");
 
+		StringBuffer sb = new StringBuffer();
+
+		sb.append("Transition: " + identity + "\n");
 		sb.append("\tPrevious places:\n");
+
 		Iterator placeIt = prevPlaces.iterator();
-		while(placeIt.hasNext())
+
+		while (placeIt.hasNext())
 		{
-			Place currPlace = (Place)placeIt.next();
+			Place currPlace = (Place) placeIt.next();
+
 			sb.append("\t\t" + currPlace.getIdentity() + "\n");
 		}
 
 		sb.append("\tNext places:\n");
+
 		placeIt = nextPlaces.iterator();
-		while(placeIt.hasNext())
+
+		while (placeIt.hasNext())
 		{
-			Place currPlace = (Place)placeIt.next();
+			Place currPlace = (Place) placeIt.next();
+
 			sb.append("\t\t" + currPlace.getIdentity() + "\n");
 		}
 
 		sb.append("\tPrev inhibitor places:\n");
+
 		placeIt = prevInhibitorPlaces.iterator();
-		while(placeIt.hasNext())
+
+		while (placeIt.hasNext())
 		{
-			Place currPlace = (Place)placeIt.next();
+			Place currPlace = (Place) placeIt.next();
+
 			sb.append("\t\t" + currPlace.getIdentity() + "\n");
 		}
 
 		return sb.toString();
 	}
-
 }

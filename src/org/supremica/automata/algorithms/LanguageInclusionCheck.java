@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,17 +47,22 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.automata.algorithms;
+
+
 
 import org.supremica.automata.*;
 
 import java.util.*;
+
 import org.supremica.util.IntArrayHashTable;
+
 import java.io.PrintWriter;
 
 import org.supremica.gui.*;
+
 import org.apache.log4j.*;
+
 
 /**
  * @deprecated No longer used! Use AutomataVerificationWorker instead!
@@ -64,17 +70,18 @@ import org.apache.log4j.*;
  */
 public class LanguageInclusionCheck
 {
-	private static Category thisCategory = LogDisplay.createCategory(LanguageInclusionCheck.class.getName());
 
+	private static Category thisCategory = LogDisplay.createCategory(LanguageInclusionCheck.class.getName());
 	private Automata AutomataA;
 	private Automata AutomataB;
-    private SynchronizationOptions syncOptions;
+	private SynchronizationOptions syncOptions;
 
 	public LanguageInclusionCheck(Automata AutomataA, Automata AutomataB, SynchronizationOptions syncOptions)
 		throws IllegalArgumentException
-    {   // Make copies of AutomataA and AutomataB
+	{		// Make copies of AutomataA and AutomataB
+
 		this.AutomataA = new Automata(AutomataA);
-	    this.AutomataB = new Automata(AutomataB);
+		this.AutomataB = new Automata(AutomataB);
 		this.syncOptions = syncOptions;
 	}
 
@@ -83,57 +90,79 @@ public class LanguageInclusionCheck
 	 */
 	public boolean execute()
 		throws Exception
-    {
+	{
+
 		Automaton currAutomaton;
 		Iterator eventIteratorA;
 		Iterator eventIteratorB;
 
-  		// Compute the union alphabet of the events in automataA, mark all
+		// Compute the union alphabet of the events in automataA, mark all
 		// events in automataA as uncontrollable and the automata as plants
 		EventsSet theAlphabets = new EventsSet();
 		Alphabet unionAlphabet;
 		Iterator automatonIteratorA = AutomataA.iterator();
+
 		while (automatonIteratorA.hasNext())
 		{
 			currAutomaton = (Automaton) automatonIteratorA.next();
+
 			Alphabet currAlphabet = currAutomaton.getAlphabet();
+
 			theAlphabets.add(currAlphabet);
 			currAutomaton.setType(AutomatonType.Plant);
+
 			eventIteratorA = currAutomaton.eventIterator();
-			while(eventIteratorA.hasNext())
+
+			while (eventIteratorA.hasNext())
 			{
 				((Event) eventIteratorA.next()).setControllable(false);
 			}
 		}
+
 		if (theAlphabets.size() == 1)
+		{
 			unionAlphabet = (Alphabet) theAlphabets.get(0);
+		}
 		else
+		{
 			unionAlphabet = AlphabetHelpers.getUnionAlphabet(theAlphabets, "");
+		}
 
 		// Change events in the automata in automata B to uncontrollable if they
 		// are included in the union alphabet found above, mark the automata as
 		// specifications
 		Iterator automatonIteratorB = AutomataB.iterator();
 		Event currEvent;
+
 		while (automatonIteratorB.hasNext())
 		{
 			currAutomaton = (Automaton) automatonIteratorB.next();
+
 			currAutomaton.setType(AutomatonType.Supervisor);
+
 			eventIteratorB = currAutomaton.eventIterator();
-			while(eventIteratorB.hasNext())
+
+			while (eventIteratorB.hasNext())
 			{
 				currEvent = (Event) eventIteratorB.next();
+
 				if (unionAlphabet.containsEventWithLabel(currEvent.getLabel()))
+				{
 					currEvent.setControllable(false);
+				}
 				else
+				{
 					currEvent.setControllable(true);
+				}
 			}
 		}
 
 		// After the above preparations, the language inclusion check
 		// can be performed as a controllability check...
 		AutomataA.addAutomata(AutomataB);
+
 		AutomataFastControllabilityCheck controllabilityCheck = new AutomataFastControllabilityCheck(AutomataA, syncOptions);
+
 		return controllabilityCheck.execute();
-	}	
+	}
 }

@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,35 +47,42 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.apps;
 
+
+
 import java.io.*;
+
 import java.awt.*;
+
 import javax.swing.*;
 
 import org.apache.log4j.*;
+
 import org.supremica.gui.*;
+
 
 public class SupremicaApplet
 	extends JApplet
 {
+
 	private static Category thisCategory = LogDisplay.createCategory(org.supremica.gui.Supremica.class.getName());
 	private org.supremica.gui.Supremica workbench;
 	private SplashWindow splash;
 
-	public SupremicaApplet()
-	{
-	}
+	public SupremicaApplet() {}
 
 	private void doSplash()
 	{
+
 		splash = new SplashWindow();
+
 		splash.setVisible(true);
 	}
 
 	private void setProperties()
 	{
+
 		WorkbenchProperties.setFileAllowOpen(false);
 		WorkbenchProperties.setFileAllowSave(false);
 		WorkbenchProperties.setFileAllowImport(false);
@@ -87,18 +95,19 @@ public class SupremicaApplet
 
 	public void init()
 	{
-		setProperties();
 
+		setProperties();
 		setSize(200, 100);
 		setBackground(Color.gray);
 
 		Panel topPanel = new Panel();
+
 		topPanel.setLayout(new BorderLayout());
 		getContentPane().add(topPanel);
 
 		Label labelHello = new Label("Starting Supremica...");
-		topPanel.add(labelHello, BorderLayout.NORTH);
 
+		topPanel.add(labelHello, BorderLayout.NORTH);
 		doSplash();
 
 		if (workbench == null)
@@ -107,6 +116,7 @@ public class SupremicaApplet
 		}
 
 		boolean packFrame = false;
+
 		// Validate frames that have preset sizes
 		// Pack frames that have useful preferred size info, e.g. from their layout
 		if (packFrame)
@@ -117,17 +127,21 @@ public class SupremicaApplet
 		{
 			workbench.validate();
 		}
+
 		// Center the window
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		Dimension frameSize = workbench.getSize();
+
 		if (frameSize.height > screenSize.height)
 		{
 			frameSize.height = screenSize.height;
 		}
+
 		if (frameSize.width > screenSize.width)
 		{
 			frameSize.width = screenSize.width;
 		}
+
 		workbench.setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
 		workbench.initialize();
 		splash.setVisible(false);
@@ -138,10 +152,10 @@ public class SupremicaApplet
 
 	public void destroy()
 	{
-			if (workbench != null)
-			{
-				workbench.destroy();
-			}
-	}
 
+		if (workbench != null)
+		{
+			workbench.destroy();
+		}
+	}
 }

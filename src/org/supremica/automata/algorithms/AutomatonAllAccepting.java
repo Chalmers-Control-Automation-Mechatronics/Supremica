@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,14 +47,18 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.automata.algorithms;
 
+
+
 import org.supremica.automata.*;
+
 import java.util.*;
+
 
 public class AutomatonAllAccepting
 {
+
 	private Automaton theAutomaton;
 
 	public AutomatonAllAccepting(Automaton theAutomaton)
@@ -63,13 +68,18 @@ public class AutomatonAllAccepting
 
 	public void execute()
 	{
+
 		theAutomaton.beginTransaction();
+
 		Iterator stateIt = theAutomaton.stateIterator();
+
 		while (stateIt.hasNext())
 		{
-			State currState = (State)stateIt.next();
+			State currState = (State) stateIt.next();
+
 			currState.setAccepting(true);
 		}
+
 		theAutomaton.invalidate();
 		theAutomaton.endTransaction();
 	}

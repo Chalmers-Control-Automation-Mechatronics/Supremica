@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,95 +47,98 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.gui;
+
+
 
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.*;
 
 import java.awt.*;
 import java.awt.event.*;
+
 import javax.swing.*;
 import javax.swing.tree.*;
+
 import java.util.*;
 
 
 public class AlphabetViewer
 	extends JFrame
 {
-    private JPanel contentPane;
-    private JMenuBar menuBar = new JMenuBar();
+
+	private JPanel contentPane;
+	private JMenuBar menuBar = new JMenuBar();
 	private AlphabetViewerPanel alphabetPanel;
 
 	public AlphabetViewer(Automaton theAutomaton)
 		throws Exception
 	{
+
 		alphabetPanel = new AlphabetViewerPanel(theAutomaton);
+		contentPane = (JPanel) getContentPane();
 
-		contentPane = (JPanel)getContentPane();
-		//contentPane.setLayout(new BorderLayout());
-		//contentPane.add(toolBar, BorderLayout.NORTH);
-
+		// contentPane.setLayout(new BorderLayout());
+		// contentPane.add(toolBar, BorderLayout.NORTH);
 		setTitle("Alphabet Viewer: " + theAutomaton.getName());
 		setSize(400, 500);
 		addWindowListener(new WindowAdapter()
+		{
+
+			public void windowClosing(WindowEvent e)
 			{
-				public void windowClosing(WindowEvent e)
-				{
-					setVisible(false);
-					dispose();
-				}
-			});
+				setVisible(false);
+				dispose();
+			}
+		});
 
 		// Center the window
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		Dimension frameSize = getSize();
+
 		if (frameSize.height > screenSize.height)
 		{
 			frameSize.height = screenSize.height;
 		}
+
 		if (frameSize.width > screenSize.width)
 		{
 			frameSize.width = screenSize.width;
 		}
+
 		setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
-
-        setIconImage(Supremica.cornerImage);
-
+		setIconImage(Supremica.cornerImage);
 		initMenubar();
-
 		contentPane.add(alphabetPanel, BorderLayout.CENTER);
 	}
 
-    private void initMenubar()
-    {
-    	setJMenuBar(menuBar);
+	private void initMenubar()
+	{
 
-    	// File
-	    JMenu menuFile = new JMenu();
-	    menuFile.setText("File");
-	    menuFile.setMnemonic(KeyEvent.VK_F);
+		setJMenuBar(menuBar);
+
+		// File
+		JMenu menuFile = new JMenu();
+
+		menuFile.setText("File");
+		menuFile.setMnemonic(KeyEvent.VK_F);
+
 		// File.Close
-	    JMenuItem menuFileClose = new JMenuItem();
-	    menuFileClose.setText("Close");
+		JMenuItem menuFileClose = new JMenuItem();
+
+		menuFileClose.setText("Close");
 		menuFile.add(menuFileClose);
+		menuBar.add(menuFile);
+		menuFileClose.addActionListener(new ActionListener()
+		{
 
-    	menuBar.add(menuFile);
-
-        menuFileClose.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent e)
-            {
+			public void actionPerformed(ActionEvent e)
+			{
 				setVisible(false);
 				dispose();
-            }
-        });
+			}
+		});
 	}
 
-    public void initialize()
-    {
-
-    }
-
+	public void initialize() {}
 }
-

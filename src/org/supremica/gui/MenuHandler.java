@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,37 +47,41 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.gui;
 
+
+
 import java.util.*;
+
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
+
+
 // MF -- Small changes here to make the main popup menu usefable from other tables
 // MF -- Instead of hardwiring the menuhandler to a certain table, it takes a table param where appropriate
 // MF -- I also made the menuhandler accessible from org.supremica.gui.Supremica
 public class MenuHandler
 {
-	// private final JTable theTable;
 
+	// private final JTable theTable;
 	private final JPopupMenu oneAutomataMenu = new JPopupMenu();
 	private final JPopupMenu twoAutomataMenu = new JPopupMenu();
-
 	boolean oneAutomataMenuLastSep = false;
 	boolean twoAutomataMenuLastSep = false;
-
 	private final LinkedList zeroAutomataItems = new LinkedList();
 	private final LinkedList oneAutomataItems = new LinkedList();
 	private final LinkedList twoAutomataItems = new LinkedList();
 
-	public MenuHandler(/* JTable theTable */)
+	public MenuHandler(	/* JTable theTable */)
 	{
+
 		// this.theTable = theTable;
 	}
 
 	public void add(JMenuItem theMenuItem, int minNbrOfAutomata)
 	{
+
 		if (minNbrOfAutomata == 0)
 		{
 			zeroAutomataItems.add(theMenuItem);
@@ -90,63 +95,78 @@ public class MenuHandler
 			twoAutomataItems.add(theMenuItem);
 		}
 
-		//System.err.println("new item");
-		//if (minNbrOfAutomata <= 2)
-		//{
-			//System.err.println("Added to two menu");
-			twoAutomataMenu.add(theMenuItem);
-			twoAutomataMenuLastSep = false;
-		//}
-		/*if (minNbrOfAutomata <= 1)
-		{
-			System.err.println("Added to one menu");
-			oneAutomataMenu.add(theMenuItem);
-			oneAutomataMenuLastSep = false;
-		}*/
+		// System.err.println("new item");
+		// if (minNbrOfAutomata <= 2)
+		// {
+		// System.err.println("Added to two menu");
+		twoAutomataMenu.add(theMenuItem);
 
+		twoAutomataMenuLastSep = false;
+
+		// }
+
+		/*
+		 * if (minNbrOfAutomata <= 1)
+		 * {
+		 *       System.err.println("Added to one menu");
+		 *       oneAutomataMenu.add(theMenuItem);
+		 *       oneAutomataMenuLastSep = false;
+		 * }
+		 */
 	}
 
 	public void addSeparator()
 	{
+
 		if (!oneAutomataMenuLastSep)
 		{
 			oneAutomataMenu.addSeparator();
+
 			oneAutomataMenuLastSep = true;
 		}
+
 		if (!twoAutomataMenuLastSep)
 		{
 			twoAutomataMenu.addSeparator();
+
 			twoAutomataMenuLastSep = true;
 		}
 	}
 
-// Shoudl not knwo anything about table, doesnät even need to know about gui
-	public JPopupMenu getDisabledPopupMenu(int nbrOfAutomata/* JTable theTable */)
+	// Shoudl not knwo anything about table, doesnät even need to know about gui
+	public JPopupMenu getDisabledPopupMenu(int nbrOfAutomata /* JTable theTable */)
 	{
+
 		// int nbrOfAutomata = theTable.getSelectedRowCount();
 		setEnabled(twoAutomataItems, nbrOfAutomata >= 2);
 		setEnabled(oneAutomataItems, nbrOfAutomata >= 1);
 		setEnabled(zeroAutomataItems, nbrOfAutomata >= 0);
+
 		return twoAutomataMenu;
 	}
 
-
 	public JPopupMenu getTrimmedPopupMenu(JTable theTable)
 	{
+
 		int nbrOfAutomata = theTable.getSelectedRowCount();
+
 		if (nbrOfAutomata >= 2)
 		{
 			return twoAutomataMenu;
 		}
+
 		return oneAutomataMenu;
 	}
 
 	private void setEnabled(LinkedList theList, boolean enable)
 	{
+
 		Iterator menuItemIt = theList.iterator();
+
 		while (menuItemIt.hasNext())
 		{
-			JMenuItem currItem = (JMenuItem)menuItemIt.next();
+			JMenuItem currItem = (JMenuItem) menuItemIt.next();
+
 			currItem.setEnabled(enable);
 		}
 	}

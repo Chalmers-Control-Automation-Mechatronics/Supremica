@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,33 +47,39 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.automata.algorithms;
 
+
+
 import java.util.*;
+
 import org.supremica.automata.*;
+
 
 public class RemoveSelfArcs
 {
-	private RemoveSelfArcs()
-	{
-	}
+
+	private RemoveSelfArcs() {}
 
 	public static void execute(Automaton theAutomaton)
 		throws Exception
 	{
+
 		Iterator stateIt = theAutomaton.stateIterator();
+
 		while (stateIt.hasNext())
 		{
-			State currState = (State)stateIt.next();
+			State currState = (State) stateIt.next();
 
 			// Remove all event that begins and ends in the current state
 			Iterator arcIt = currState.safeOutgoingArcsIterator();
+
 			while (arcIt.hasNext())
 			{
-				Arc currArc = (Arc)arcIt.next();
+				Arc currArc = (Arc) arcIt.next();
 				State fromState = currArc.getFromState();
 				State toState = currArc.getToState();
+
 				if (fromState == toState)
 				{
 					currArc.clear();

@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,13 +47,16 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.automata.templates;
+
+
 
 import java.util.*;
 
+
 public class TemplateProperties
 {
+
 	private String stateNamePrefix = null;
 	private String stateNameSuffix = null;
 	private String labelPrefix = null;
@@ -60,9 +64,7 @@ public class TemplateProperties
 	private String stateNameRegExp = null;
 	private String labelRegExp = null;
 
-	public TemplateProperties()
-	{
-	}
+	public TemplateProperties() {}
 
 	public void setStateNamePrefix(String prefix)
 	{
@@ -106,45 +108,51 @@ public class TemplateProperties
 
 	public String getNewStateName(String stateName)
 	{
+
 		if (!matchesStateName(stateName))
 		{
 			return stateName;
 		}
 
 		StringBuffer sb = new StringBuffer();
-		if (stateNamePrefix != null && !stateNamePrefix.equals(""))
+
+		if ((stateNamePrefix != null) &&!stateNamePrefix.equals(""))
 		{
 			sb.append(stateNamePrefix);
 		}
 
 		sb.append(stateName);
 
-		if (stateNameSuffix != null && !stateNameSuffix.equals(""))
+		if ((stateNameSuffix != null) &&!stateNameSuffix.equals(""))
 		{
 			sb.append(stateNameSuffix);
 		}
+
 		return sb.toString();
 	}
 
 	public String getNewLabel(String label)
 	{
+
 		if (!matchesLabel(label))
 		{
 			return label;
 		}
 
 		StringBuffer sb = new StringBuffer();
-		if (labelPrefix != null && !labelPrefix.equals(""))
+
+		if ((labelPrefix != null) &&!labelPrefix.equals(""))
 		{
 			sb.append(labelPrefix);
 		}
 
 		sb.append(label);
 
-		if (labelSuffix != null && !labelSuffix.equals(""))
+		if ((labelSuffix != null) &&!labelSuffix.equals(""))
 		{
 			sb.append(labelSuffix);
 		}
+
 		return sb.toString();
 	}
 }

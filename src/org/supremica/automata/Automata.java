@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,12 +47,16 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.automata;
 
+
+
 import java.util.*;
-import org.supremica.gui.*; 
+
+import org.supremica.gui.*;
+
 import org.apache.log4j.*;
+
 
 /**
  * A collection of Automaton-objects.
@@ -59,11 +64,11 @@ import org.apache.log4j.*;
  */
 public class Automata
 {
-	private static Category thisCategory = LogDisplay.createCategory(Automata.class.getName());
 
-	private ArrayList theAutomata; // Efficiency reasons
- 	private HashMap nameMap;
- 	private String name = null;
+	private static Category thisCategory = LogDisplay.createCategory(Automata.class.getName());
+	private ArrayList theAutomata;		// Efficiency reasons
+	private HashMap nameMap;
+	private String name = null;
 	private AutomataListeners listeners = null;
 	private String owner = "Supremica";
 	private String hash = null;
@@ -71,13 +76,16 @@ public class Automata
 	public Automata()
 	{
 		theAutomata = new ArrayList();
-  		nameMap = new HashMap();
+		nameMap = new HashMap();
 	}
 
 	public Automata(Automata oldAutomata)
 	{
+
 		this();
+
 		Iterator automataIterator = oldAutomata.iterator();
+
 		while (automataIterator.hasNext())
 		{
 			addAutomaton(new Automaton((Automaton) automataIterator.next()));
@@ -86,20 +94,26 @@ public class Automata
 
 	public void addAutomaton(Automaton aut)
 	{
+
 		theAutomata.add(aut);
-  		nameMap.put(aut.getName(), aut);
+		nameMap.put(aut.getName(), aut);
 		notifyListeners(AutomataListeners.MODE_AUTOMATON_ADDED, aut);
 	}
 
 	public void addAutomata(Automata automata)
 	{
+
 		Iterator automataIterator = automata.iterator();
+
 		while (automataIterator.hasNext())
+		{
 			addAutomaton((Automaton) automataIterator.next());
+		}
 	}
 
 	public void removeAutomaton(Automaton aut)
 	{
+
 		theAutomata.remove(aut);
 		nameMap.remove(aut.getName());
 		notifyListeners(AutomataListeners.MODE_AUTOMATON_REMOVED, aut);
@@ -107,6 +121,7 @@ public class Automata
 
 	public void renameAutomaton(Automaton aut, String newName)
 	{
+
 		nameMap.remove(aut.getName());
 		aut.setName(newName);
 		nameMap.put(aut.getName(), aut);
@@ -117,7 +132,7 @@ public class Automata
 	{
 		this.owner = owner;
 	}
-	
+
 	public String getOwner()
 	{
 		return owner;
@@ -135,12 +150,14 @@ public class Automata
 
 	public String computeHash()
 	{
+
 		long checksum = checksum();
 		long ownerhash = owner.hashCode();
 		long extrahash = 0x314C;
-		long totalhash = checksum*ownerhash*extrahash;
+		long totalhash = checksum * ownerhash * extrahash;
 		String newHash = Long.toHexString(totalhash);
-		return newHash;	
+
+		return newHash;
 	}
 
 	public Alphabet getUnionAlphabet()
@@ -159,19 +176,19 @@ public class Automata
 		return theAutomata.size();
 	}
 
- 	public Automaton getAutomatonAt(int i)
+	public Automaton getAutomatonAt(int i)
 	{
-		return (Automaton)theAutomata.get(i);
+		return (Automaton) theAutomata.get(i);
 	}
 
- 	public boolean containsAutomaton(String name)
-  	{
+	public boolean containsAutomaton(String name)
+	{
 		return nameMap.containsKey(name);
 	}
 
- 	public Automaton getAutomaton(String name)
-  	{
-		return (Automaton)nameMap.get(name);
+	public Automaton getAutomaton(String name)
+	{
+		return (Automaton) nameMap.get(name);
 	}
 
 	public String getName()
@@ -186,19 +203,24 @@ public class Automata
 
 	public AutomataListeners getListeners()
 	{
+
 		if (listeners == null)
 		{
 			listeners = new AutomataListeners(this);
 		}
+
 		return listeners;
 	}
 
 	public long checksum()
-	{ // Ad-hoc checksum algorithm
+	{		// Ad-hoc checksum algorithm
+
 		long checksum = 53562951413L;
-		for (Iterator aIt = iterator(); aIt.hasNext();)
+
+		for (Iterator aIt = iterator(); aIt.hasNext(); )
 		{
-			Automaton currAutomaton = (Automaton)aIt.next();
+			Automaton currAutomaton = (Automaton) aIt.next();
+
 			checksum = checksum + currAutomaton.checksum();
 		}
 
@@ -207,13 +229,16 @@ public class Automata
 
 	private void notifyListeners()
 	{
+
 		if (listeners != null)
 		{
 			listeners.notifyListeners();
 		}
 	}
+
 	private void notifyListeners(int mode, Automaton a)
 	{
+
 		if (listeners != null)
 		{
 			listeners.notifyListeners(mode, a);
@@ -222,6 +247,7 @@ public class Automata
 
 	public void beginTransaction()
 	{
+
 		if (listeners != null)
 		{
 			listeners.beginTransaction();
@@ -230,6 +256,7 @@ public class Automata
 
 	public void endTransaction()
 	{
+
 		if (listeners != null)
 		{
 			listeners.endTransaction();

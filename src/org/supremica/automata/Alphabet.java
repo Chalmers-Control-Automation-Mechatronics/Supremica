@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,10 +47,12 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.automata;
 
+
+
 import java.util.*;
+
 
 /**
  * Similar to Events, but with allows for the fast lookup of an event based on the id.
@@ -65,6 +68,7 @@ import java.util.*;
 public class Alphabet
 	extends Events
 {
+
 	private HashMap idMap;
 	private int idIndex = 0;
 	private Listeners listeners = null;
@@ -76,13 +80,14 @@ public class Alphabet
 
 	public Alphabet(Alphabet orgAlphabet)
 	{
+
 		super(orgAlphabet);
-		
+
 		idMap = new HashMap();
 		idIndex = orgAlphabet.idIndex;
+
 		// theEvents = new TreeMap(orgAlphabet.theEvents);
 		// setEvents(orgAlphabet.getEvents());
-		
 		rehash();
 	}
 
@@ -109,10 +114,15 @@ public class Alphabet
 	public Event getEventWithId(String id)
 		throws Exception
 	{
+
 		if (containsEventWithId(id))
-			return (Event)idMap.get(id);
+		{
+			return (Event) idMap.get(id);
+		}
 		else
+		{
 			throw new Exception("Alphabet.getEventWithId: No event with id \"" + id + "\" exists");
+		}
 	}
 
 	/**
@@ -123,13 +133,16 @@ public class Alphabet
 	public void addEvent(Event event)
 		throws Exception
 	{
+
 		if (!containsEventWithId(event.getId()))
 		{
 			idMap.put(event.getId(), event);
 			super.addEvent(event);
 		}
 		else
+		{
 			throw new Exception("Alphabet.addEvent: An event with id \"" + event.getId() + "\" already exists");
+		}
 	}
 
 	/**
@@ -154,22 +167,28 @@ public class Alphabet
 	 */
 	public String toString()
 	{
+
 		StringBuffer tmpBuf = new StringBuffer("Alphabet:\n   idMap: " + idMap + '\n');
+
 		tmpBuf.append(super.toString());
+
 		return tmpBuf.toString();
 	}
 
 	public Listeners getListeners()
 	{
+
 		if (listeners == null)
 		{
 			listeners = new Listeners(this);
 		}
+
 		return listeners;
 	}
 
 	private void notifyListeners()
 	{
+
 		if (listeners != null)
 		{
 			listeners.notifyListeners();
@@ -181,14 +200,19 @@ public class Alphabet
 	 */
 	public void rehash()
 	{
+
 		super.rehash();
+
 		Event event;
 		Iterator eventIt = iterator();
+
 		idMap.clear();
+
 		while (eventIt.hasNext())
 		{
 			event = (Event) eventIt.next();
+
 			idMap.put(event.getId(), event);
-		}	
+		}
 	}
 }

@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,39 +47,48 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.apps;
 
+
+
 import java.util.*;
+
 import org.apache.log4j.*;
+
 import helma.xmlrpc.*;
+
 import org.supremica.gui.*;
+
 
 public class SupremicaClient
 {
-	private SupremicaClient()
-	{
 
-	}
+	private SupremicaClient() {}
 
 	public static void main(String[] args)
 		throws Exception
 	{
+
 		XmlRpcClient xmlrpc = new XmlRpcClient("http://localhost:" + WorkbenchProperties.getXmlRpcPort());
 
 		// this method return a vector of strings
-		Vector params = new Vector ();
+		Vector params = new Vector();
 		Vector resultVec = (Vector) xmlrpc.execute("getAutomataIdentities", params);
+
 		System.out.println(resultVec);
 
 		// download all automata
 		for (int i = 0; i < resultVec.size(); i++)
 		{
 			params.clear();
+
 			Vector innerArg = new Vector();
+
 			innerArg.add(resultVec.get(i));
 			params.add(innerArg);
-			String currAutomata = (String)xmlrpc.execute("getAutomata", params);
+
+			String currAutomata = (String) xmlrpc.execute("getAutomata", params);
+
 			System.out.println(currAutomata);
 		}
 	}

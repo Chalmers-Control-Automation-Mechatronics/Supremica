@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,10 +47,12 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.petrinet;
 
+
+
 import java.util.*;
+
 
 /**
  * This is a Petri net class
@@ -63,16 +66,16 @@ import java.util.*;
  *
  *  p1.setTime(4); // optional
  *
- *	p1.setMarking(1); // optional
+ *      p1.setMarking(1); // optional
  *
  *  myPN.addPlace(p1);
  *  myPN.addPlace(p2);
  *
- *	Transition t1 = new Transition("t1");
+ *      Transition t1 = new Transition("t1");
  *
- *	t1.setControllable(false); // optional
- *	t1.setLabel("a"); // optional
- *	t2.setLabel("b"); // optional
+ *      t1.setControllable(false); // optional
+ *      t1.setLabel("a"); // optional
+ *      t2.setLabel("b"); // optional
  *
  *  myPN.addTransition(t1);
  *  myPN.addTransition(t2);
@@ -80,14 +83,13 @@ import java.util.*;
  *  myPN.addArc(p1, t1);
  *  myPN.addArc(t1, p2);
  **/
-
 public class PetriNet
 {
+
 	private HashMap places = new HashMap();
 	private List orderedPlaces = new LinkedList();
 	private HashMap transitions = new HashMap();
 	private List orderedTransitions = new LinkedList();
-
 	private String identity;
 
 	public PetriNet(String identity)
@@ -108,11 +110,14 @@ public class PetriNet
 	public void addPlace(Place place)
 		throws Exception
 	{
+
 		String id = place.getIdentity();
+
 		if (id == null)
 		{
 			throw new Exception("Identity must be non null");
 		}
+
 		if (places.containsKey(id))
 		{
 			throw new Exception(id + " already exists");
@@ -126,11 +131,14 @@ public class PetriNet
 	public void addTransition(Transition transition)
 		throws Exception
 	{
+
 		String id = transition.getIdentity();
+
 		if (id == null)
 		{
 			throw new Exception("Identity must be non null");
 		}
+
 		if (transitions.containsKey(id))
 		{
 			throw new Exception(id + " already exists");
@@ -163,12 +171,12 @@ public class PetriNet
 
 	public Place getPlace(String identity)
 	{
-		return (Place)places.get(identity);
+		return (Place) places.get(identity);
 	}
 
 	public Transition getTransition(String identity)
 	{
-		return (Transition)transitions.get(identity);
+		return (Transition) transitions.get(identity);
 	}
 
 	public Iterator placeIterator()
@@ -198,56 +206,65 @@ public class PetriNet
 	public PetriNet createCopy(String newIdentity)
 		throws Exception
 	{
+
 		PetriNet newPetriNet = new PetriNet(newIdentity);
 
 		// Create copies of all places
 		Iterator placeIt = placeIterator();
+
 		while (placeIt.hasNext())
 		{
-			Place currPlace = (Place)placeIt.next();
+			Place currPlace = (Place) placeIt.next();
 			Place newPlace = new Place(currPlace);
+
 			newPetriNet.addPlace(newPlace);
 		}
 
 		// Create copies of all transitions
 		Iterator transitionIt = transitionIterator();
+
 		while (transitionIt.hasNext())
 		{
-			Transition currTransition = (Transition)transitionIt.next();
+			Transition currTransition = (Transition) transitionIt.next();
 			Transition newTransition = new Transition(currTransition);
+
 			newPetriNet.addTransition(newTransition);
 		}
 
 		// Create copies of all arcs
 		// Each element is responsible for creating its outgoing arcs
-
 		// Start with creating all outgoing arcs from the operations
 		placeIt = placeIterator();
+
 		while (placeIt.hasNext())
 		{
-			Place orgPlace = (Place)placeIt.next();
+			Place orgPlace = (Place) placeIt.next();
 			Place newPlace = newPetriNet.getPlace(orgPlace.getIdentity());
 
 			transitionIt = orgPlace.nextTransitionIterator();
+
 			while (transitionIt.hasNext())
 			{
-				Transition orgTransition = (Transition)transitionIt.next();
+				Transition orgTransition = (Transition) transitionIt.next();
 				Transition newTransition = newPetriNet.getTransition(orgTransition.getIdentity());
+
 				newPetriNet.addArc(newPlace, newTransition);
 			}
 		}
 
 		// Now create all outgoing arcs from the transitions
 		transitionIt = transitionIterator();
+
 		while (transitionIt.hasNext())
 		{
-			Transition orgTransition = (Transition)transitionIt.next();
+			Transition orgTransition = (Transition) transitionIt.next();
 			Transition newTransition = newPetriNet.getTransition(orgTransition.getIdentity());
 
 			placeIt = orgTransition.nextPlaceIterator();
+
 			while (placeIt.hasNext())
 			{
-				Place orgPlace = (Place)placeIt.next();
+				Place orgPlace = (Place) placeIt.next();
 				Place newPlace = newPetriNet.getPlace(orgPlace.getIdentity());
 
 				newPetriNet.addArc(newTransition, newPlace);
@@ -261,34 +278,42 @@ public class PetriNet
 	{
 
 		Iterator transitionIt = transitionIterator();
+
 		while (transitionIt.hasNext())
 		{
-			Transition currTransition = (Transition)transitionIt.next();
+			Transition currTransition = (Transition) transitionIt.next();
+
 			if (currTransition.hasInhibitorArc())
 			{
 				return true;
 			}
 		}
+
 		return false;
 	}
 
 	public String toString()
 	{
+
 		StringBuffer sb = new StringBuffer();
 
 		sb.append("PetriNet: " + identity + "\n");
 
 		Iterator placeIt = placeIterator();
+
 		while (placeIt.hasNext())
 		{
-			Place currPlace = (Place)placeIt.next();
+			Place currPlace = (Place) placeIt.next();
+
 			sb.append(currPlace);
 		}
 
 		Iterator transitionIt = transitionIterator();
+
 		while (transitionIt.hasNext())
 		{
-			Transition currTransition = (Transition)transitionIt.next();
+			Transition currTransition = (Transition) transitionIt.next();
+
 			sb.append(currTransition);
 		}
 

@@ -1,137 +1,200 @@
-
 package org.jgrafchart;
 
+
+
 import com.nwoods.jgo.*;
+
 import java.awt.*;
+
 import java.util.*;
 
-public abstract class InternalVariable extends JGoArea implements Readable, Writable  {
 
-  protected JGoRectangle myBorder = null;
-  protected JGoText myValue = null;
-//  private JGoText myTag = null;
-  protected JGoText myName = null;
-  protected InternalVariable redirect = null;
+public abstract class InternalVariable
+	extends JGoArea
+	implements Readable, Writable
+{
 
+	protected JGoRectangle myBorder = null;
+	protected JGoText myValue = null;
 
-  public InternalVariable() {
-    super();
-  }
+	// private JGoText myTag = null;
+	protected JGoText myName = null;
+	protected InternalVariable redirect = null;
 
-  public InternalVariable(Point loc) {
+	public InternalVariable()
+	{
+		super();
+	}
 
-    super();
-    setSize(65,45);
-    setSelectable(true);
-    setGrabChildSelection(false);
-    setDraggable(true);
-    setResizable(false);
+	public InternalVariable(Point loc)
+	{
 
-    myBorder = new JGoRectangle(getTopLeft(), getSize());
-    myBorder.setPen(new JGoPen(JGoPen.SOLID,2,new Color(0.0F,0.0F,0.0F)));
-    myBorder.setSelectable(false);
-    myBorder.setDraggable(false);
+		super();
 
-    setLocation(loc);
+		setSize(65, 45);
+		setSelectable(true);
+		setGrabChildSelection(false);
+		setDraggable(true);
+		setResizable(false);
 
-    myName =  new JGoText("Var");
-    myName.setSelectable(true);
-    myName.setEditable(true);
-    myName.setEditOnSingleClick(true);
-    myName.setDraggable(false);
-    myName.setAlignment(JGoText.ALIGN_CENTER);
-    myName.setTransparent(true);
-    myValue =  new JGoText("");
-    myValue.setSelectable(false);
-    myValue.setEditable(false);
-    myValue.setEditOnSingleClick(false);
-    myValue.setDraggable(false);
-    myValue.setAlignment(JGoText.ALIGN_LEFT);
-    myValue.setTransparent(true);
-    addObjectAtHead(myBorder);
-    addObjectAtTail(myName);
-    addObjectAtTail(myValue);
-    layoutChildren();
-  }
+		myBorder = new JGoRectangle(getTopLeft(), getSize());
 
-  public JGoObject copyObject(JGoCopyEnvironment env)
-  {
-    InternalVariable newobj = (InternalVariable)super.copyObject(env); 
-    return newobj;
-  }
+		myBorder.setPen(new JGoPen(JGoPen.SOLID, 2, new Color(0.0F, 0.0F, 0.0F)));
+		myBorder.setSelectable(false);
+		myBorder.setDraggable(false);
+		setLocation(loc);
 
-  public void copyChildren(JGoArea newarea,JGoCopyEnvironment env) {
+		myName = new JGoText("Var");
 
-   InternalVariable  newobj = (InternalVariable)newarea;
-   if (myBorder != null) {
-      newobj.myBorder = (JGoRectangle)myBorder.copyObject(env);
-      newobj.addObjectAtHead(newobj.myBorder);
-    }
-   if (myName != null) {
-      newobj.myName = (JGoText)myName.copyObject(env);
-      newobj.addObjectAtTail(newobj.myName);
-    }    
-   if (myValue != null) {
-      newobj.myValue = (JGoText)myValue.copyObject(env);
-      newobj.addObjectAtTail(newobj.myValue);
-    }
-  }
+		myName.setSelectable(true);
+		myName.setEditable(true);
+		myName.setEditOnSingleClick(true);
+		myName.setDraggable(false);
+		myName.setAlignment(JGoText.ALIGN_CENTER);
+		myName.setTransparent(true);
 
-  public Point getLocation(Point p)
-  {
-      return getSpotLocation(Center, p);
-  }
+		myValue = new JGoText("");
 
-  public void setLocation(int x, int y) {
+		myValue.setSelectable(false);
+		myValue.setEditable(false);
+		myValue.setEditOnSingleClick(false);
+		myValue.setDraggable(false);
+		myValue.setAlignment(JGoText.ALIGN_LEFT);
+		myValue.setTransparent(true);
+		addObjectAtHead(myBorder);
+		addObjectAtTail(myName);
+		addObjectAtTail(myValue);
+		layoutChildren();
+	}
 
-     myBorder.setSpotLocation(Center, x, y); 
-     layoutChildren();
-  }
+	public JGoObject copyObject(JGoCopyEnvironment env)
+	{
 
-  public void layoutChildren() {
+		InternalVariable newobj = (InternalVariable) super.copyObject(env);
 
-    if (myBorder == null) return;
-    if (myName != null) {
-      myName.setSpotLocation(TopCenter, myBorder, BottomCenter);
-    }
-    if (myValue != null) {
-      myValue.setSpotLocation(LeftCenter, myBorder, Center);
-    }
-  }
+		return newobj;
+	}
 
-  public void geometryChange(Rectangle prevRect)
-  {
-    // see if this is just a move and not a scale
-    if ((prevRect.width == getWidth()) &&
-        (prevRect.height == getHeight())) {
-      // let the default JGoArea implementation do the work
-      super.geometryChange(prevRect);
-    } 
-    layoutChildren();
-  }
+	public void copyChildren(JGoArea newarea, JGoCopyEnvironment env)
+	{
 
-  public boolean isBoolean() {
-    return false;
-  }
+		InternalVariable newobj = (InternalVariable) newarea;
 
-  public boolean isInteger() { return false;}
-  public boolean isString() {return false;}
+		if (myBorder != null)
+		{
+			newobj.myBorder = (JGoRectangle) myBorder.copyObject(env);
 
-  public String getName() {return myName.getText();}
+			newobj.addObjectAtHead(newobj.myBorder);
+		}
 
-  public boolean getBoolVal() {return false;}
-  public boolean getOldBoolVal() {return false;}
+		if (myName != null)
+		{
+			newobj.myName = (JGoText) myName.copyObject(env);
 
-  public void setStoredStringAction(String s) {}
+			newobj.addObjectAtTail(newobj.myName);
+		}
 
-  public String getStringVal() {return new String("");}
-  public String getOldStringVal() {return new String("");}
+		if (myValue != null)
+		{
+			newobj.myValue = (JGoText) myValue.copyObject(env);
 
-  public void initializeDisplay() {}
+			newobj.addObjectAtTail(newobj.myValue);
+		}
+	}
 
-  public void setRedirect(InternalVariable iv) {
-    redirect = iv;
-    initializeDisplay();
-  }
+	public Point getLocation(Point p)
+	{
+		return getSpotLocation(Center, p);
+	}
 
+	public void setLocation(int x, int y)
+	{
+		myBorder.setSpotLocation(Center, x, y);
+		layoutChildren();
+	}
+
+	public void layoutChildren()
+	{
+
+		if (myBorder == null)
+		{
+			return;
+		}
+
+		if (myName != null)
+		{
+			myName.setSpotLocation(TopCenter, myBorder, BottomCenter);
+		}
+
+		if (myValue != null)
+		{
+			myValue.setSpotLocation(LeftCenter, myBorder, Center);
+		}
+	}
+
+	public void geometryChange(Rectangle prevRect)
+	{
+
+		// see if this is just a move and not a scale
+		if ((prevRect.width == getWidth()) && (prevRect.height == getHeight()))
+		{
+
+			// let the default JGoArea implementation do the work
+			super.geometryChange(prevRect);
+		}
+
+		layoutChildren();
+	}
+
+	public boolean isBoolean()
+	{
+		return false;
+	}
+
+	public boolean isInteger()
+	{
+		return false;
+	}
+
+	public boolean isString()
+	{
+		return false;
+	}
+
+	public String getName()
+	{
+		return myName.getText();
+	}
+
+	public boolean getBoolVal()
+	{
+		return false;
+	}
+
+	public boolean getOldBoolVal()
+	{
+		return false;
+	}
+
+	public void setStoredStringAction(String s) {}
+
+	public String getStringVal()
+	{
+		return new String("");
+	}
+
+	public String getOldStringVal()
+	{
+		return new String("");
+	}
+
+	public void initializeDisplay() {}
+
+	public void setRedirect(InternalVariable iv)
+	{
+
+		redirect = iv;
+
+		initializeDisplay();
+	}
 }

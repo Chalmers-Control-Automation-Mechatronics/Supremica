@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,23 +47,28 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.automata;
 
+
+
 import java.util.*;
+
 // import org.supremica.gui.editor.*; //** MF ** The model should know _zilch_ about the view/UI
 import java.awt.Point;
 
+
 public class State
 {
+
 	public final static int MIN_COST = 0;
 	public final static int MAX_COST = Integer.MAX_VALUE;
 	public final static int UNDEF_COST = -1;
 	public final static int UNDEF_POS = Integer.MIN_VALUE;
-
 	private int index = -1;
+
 	// id is the internal identifier, i.e. for directing arcs etc.
 	private String id = "";
+
 	// name is the external identifier, i.e. the string appearing in Supremica
 	private String name = "";
 	private boolean initial = false;
@@ -78,28 +84,29 @@ public class State
 	private int y = UNDEF_POS;
 	private int radius = 9;
 	private boolean selected = false;
-//	private StateNode stateNode = null;
 
+	// private StateNode stateNode = null;
 	private LinkedList incomingArcs = new LinkedList();
 	private LinkedList outgoingArcs = new LinkedList();
-
 	private List outgoingArcSets = new LinkedList();
-
 	private Listeners listeners = null;
 
-	public State()
-	{
-	}
+	public State() {}
 
 	public State(String id)
 	{
+
 		this();
+
 		setId(id);
 		setName(id);
 	}
+
 	public State(String id, String name)
 	{
+
 		this();
+
 		setId(id);
 		setId(name);
 	}
@@ -110,18 +117,20 @@ public class State
 	 */
 	public State(State otherState)
 	{
+
 		this();
+
 		index = otherState.index;
-  		id = otherState.id;
-	    	name = otherState.name;
-     		initial = otherState.initial;
-	      	accepting = otherState.accepting;
-    		forbidden = otherState.forbidden;
-	     	first = otherState.first;
-	      	last = otherState.last;
-	      	cost = otherState.cost;
-	      	equivClass = otherState.equivClass;
-      		visited = otherState.visited;
+		id = otherState.id;
+		name = otherState.name;
+		initial = otherState.initial;
+		accepting = otherState.accepting;
+		forbidden = otherState.forbidden;
+		first = otherState.first;
+		last = otherState.last;
+		cost = otherState.cost;
+		equivClass = otherState.equivClass;
+		visited = otherState.visited;
 		x = otherState.x;
 		y = otherState.y;
 		radius = otherState.radius;
@@ -209,11 +218,17 @@ public class State
 
 	public void setForbidden(boolean forbidden)
 	{
+
 		this.forbidden = forbidden;
+
 		if (forbidden)
+		{
 			cost = State.MAX_COST;
+		}
 		else
+		{
 			cost = State.MIN_COST;
+		}
 	}
 
 	public void setActive(boolean active)
@@ -269,7 +284,7 @@ public class State
 
 	public boolean equals(Object state)
 	{
-		return id.equals(((State)state).id);
+		return id.equals(((State) state).id);
 	}
 
 	public int hashCode()
@@ -284,19 +299,23 @@ public class State
 
 	public void addOutgoingArc(Arc theArc)
 	{
+
 		outgoingArcs.addLast(theArc);
 
 		ArcSet theArcSet = getArcSet(theArc);
+
 		if (theArcSet == null)
 		{
+
 			// Did not find an arcset - generate one.
 			State fromState = theArc.getToState();
+
 			theArcSet = new ArcSet(theArc.getFromState(), theArc.getToState());
+
 			outgoingArcSets.add(theArcSet);
 		}
+
 		theArcSet.addArc(theArc);
-
-
 	}
 
 	public void removeIncomingArc(Arc theArc)
@@ -306,8 +325,11 @@ public class State
 
 	public void removeOutgoingArc(Arc theArc)
 	{
+
 		outgoingArcs.remove(theArc);
+
 		ArcSet theArcSet = getArcSet(theArc);
+
 		if (theArcSet != null)
 		{
 			outgoingArcSets.remove(theArcSet);
@@ -316,15 +338,19 @@ public class State
 
 	private ArcSet getArcSet(Arc theArc)
 	{
+
 		State toState = theArc.getToState();
+
 		for (Iterator arcSetIt = outgoingArcSets.iterator(); arcSetIt.hasNext(); )
 		{
-			ArcSet currArcSet = (ArcSet)arcSetIt.next();
+			ArcSet currArcSet = (ArcSet) arcSetIt.next();
+
 			if (currArcSet.getToState() == toState)
 			{
 				return currArcSet;
 			}
 		}
+
 		// Couldn't find an arcset
 		return null;
 	}
@@ -341,7 +367,7 @@ public class State
 
 	public Iterator safeOutgoingArcsIterator()
 	{
-		return ((LinkedList)outgoingArcs.clone()).iterator();
+		return ((LinkedList) outgoingArcs.clone()).iterator();
 	}
 
 	public Iterator incomingArcsIterator()
@@ -396,21 +422,27 @@ public class State
 
 	public void removeArcs()
 	{
-		LinkedList outArcs = (LinkedList)outgoingArcs.clone();
-		LinkedList inArcs = (LinkedList)incomingArcs.clone();
 
+		LinkedList outArcs = (LinkedList) outgoingArcs.clone();
+		LinkedList inArcs = (LinkedList) incomingArcs.clone();
 		Iterator arcIt = outArcs.iterator();
+
 		while (arcIt.hasNext())
 		{
-			Arc currArc = (Arc)arcIt.next();
+			Arc currArc = (Arc) arcIt.next();
+
 			currArc.clear();
 		}
+
 		arcIt = inArcs.iterator();
+
 		while (arcIt.hasNext())
 		{
-			Arc currArc = (Arc)arcIt.next();
+			Arc currArc = (Arc) arcIt.next();
+
 			currArc.clear();
 		}
+
 		outgoingArcs.clear();
 		incomingArcs.clear();
 		outArcs.clear();
@@ -421,58 +453,68 @@ public class State
 	{
 		return cost < MAX_COST;
 	}
-/** MF ** I assume these have something with the view/UI to do
-	public void setStateNode(StateNode stateNode)
-	{
-		this.stateNode = stateNode;
-	}
 
-	public StateNode getStateNode()
-	{
-		return stateNode;
-	}
-**/
+	/** MF ** I assume these have something with the view/UI to do
+																	public void setStateNode(StateNode stateNode)
+																	{
+																																	this.stateNode = stateNode;
+																	}
+
+																	public StateNode getStateNode()
+																	{
+																																	return stateNode;
+																	}
+	**/
+
 	/**
 	 * Follow the event e and return the next state.
 	 * If e is not active then return null.
 	 **/
 	public State nextState(Event e)
 	{
+
 		Iterator outgoingArcsIt = outgoingArcs.iterator();
 		String eventId = e.getId();
+
 		while (outgoingArcsIt.hasNext())
 		{
-			Arc currArc = (Arc)outgoingArcsIt.next();
+			Arc currArc = (Arc) outgoingArcsIt.next();
+
 			if (currArc.getEventId().equals(eventId))
 			{
 				return currArc.getToState();
 			}
 		}
+
 		return null;
 	}
 
 	public boolean contains(int x1, int y1)
 	{
+
 		int radius2 = radius * radius;
-		int distance2 = (x - x1)*(x - x1) + (y - y1)*(y - y1);
+		int distance2 = (x - x1) * (x - x1) + (y - y1) * (y - y1);
+
 		return (distance2 <= radius2);
 	}
 
 	public Listeners getListeners()
 	{
+
 		if (listeners == null)
 		{
 			listeners = new Listeners(this);
 		}
+
 		return listeners;
 	}
 
 	private void notifyListeners()
 	{
+
 		if (listeners != null)
 		{
 			listeners.notifyListeners();
 		}
 	}
 }
-

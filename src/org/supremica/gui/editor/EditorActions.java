@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,8 +47,9 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.gui.editor;
+
+
 
 import java.awt.*;
 import java.awt.event.*;
@@ -58,28 +60,26 @@ import javax.swing.event.*;
 import com.nwoods.jgo.*;
 import com.nwoods.jgo.layout.JGoNetwork;
 
+
 public class EditorActions
 {
-	private AutomataEditor theEditor = null;
 
+	private AutomataEditor theEditor = null;
 	private AppAction fileAddAction = null;
 	private AppAction fileOpenAction = null;
 	private AppAction fileSaveAction = null;
 	private AppAction fileSaveAsAction = null;
 	private AppAction filePrintAction = null;
 	private AppAction fileCloseAction = null;
-
 	private AppAction editCutAction = null;
 	private AppAction editCopyAction = null;
 	private AppAction editPasteAction = null;
 	private AppAction editDeleteAction = null;
 	private AppAction editUndoAction = null;
 	private AppAction editRedoAction = null;
-
 	private AppAction viewZoomAction = null;
 	private AppAction viewZoomInAction = null;
 	private AppAction viewZoomOutAction = null;
-
 	private AppAction helpHelpTopicsAction = null;
 
 	public EditorActions(AutomataEditor theEditor)
@@ -89,12 +89,14 @@ public class EditorActions
 
 	public AppAction getFileAddAction()
 	{
+
 		if (fileAddAction == null)
 		{
 			fileAddAction = new AppAction("Add", theEditor)
 			{
-   				public void actionPerformed(ActionEvent e)
-   				{
+
+				public void actionPerformed(ActionEvent e)
+				{
 					theEditor.fileAdd();
 				}
 
@@ -104,15 +106,18 @@ public class EditorActions
 				}
 			};
 		}
+
 		return fileAddAction;
 	}
 
 	public AppAction getFileOpenAction()
 	{
+
 		if (fileOpenAction == null)
 		{
 			fileOpenAction = new AppAction("Open...", theEditor)
 			{
+
 				public void actionPerformed(ActionEvent e)
 				{
 					theEditor.fileOpen();
@@ -124,15 +129,18 @@ public class EditorActions
 				}
 			};
 		}
+
 		return fileOpenAction;
 	}
 
 	public AppAction getFileSaveAction()
 	{
+
 		if (fileSaveAction == null)
 		{
 			fileSaveAction = new AppAction("Save", theEditor)
 			{
+
 				public void actionPerformed(ActionEvent e)
 				{
 					theEditor.fileSave();
@@ -144,34 +152,41 @@ public class EditorActions
 				}
 			};
 		}
+
 		return fileSaveAction;
 	}
 
 	public AppAction getFileSaveAsAction()
 	{
+
 		if (fileSaveAsAction == null)
 		{
 			fileSaveAsAction = new AppAction("Save As...", theEditor)
 			{
+
 				public void actionPerformed(ActionEvent e)
 				{
 					theEditor.fileSaveAs();
 				}
+
 				public boolean canAct()
 				{
 					return true;
 				}
 			};
 		}
+
 		return fileSaveAsAction;
 	}
 
 	public AppAction getFilePrintAction()
 	{
+
 		if (filePrintAction == null)
 		{
 			filePrintAction = new AppAction("Print", theEditor)
 			{
+
 				public void actionPerformed(ActionEvent e)
 				{
 					theEditor.filePrint();
@@ -183,15 +198,18 @@ public class EditorActions
 				}
 			};
 		}
+
 		return filePrintAction;
 	}
 
 	public AppAction getFileCloseAction()
 	{
+
 		if (fileCloseAction == null)
 		{
 			fileCloseAction = new AppAction("Close", theEditor)
 			{
+
 				public void actionPerformed(ActionEvent e)
 				{
 					theEditor.fileClose();
@@ -203,8 +221,7 @@ public class EditorActions
 				}
 			};
 		}
+
 		return fileCloseAction;
 	}
 }
-
-

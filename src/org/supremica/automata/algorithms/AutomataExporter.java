@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,32 +47,34 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.automata.algorithms;
 
+
+
 import java.io.*;
+
 import java.util.*;
 
 import org.supremica.automata.*;
 
+
 class AutomataExporter
 {
+
 	static final int TO_XML = 1;
 	static final int TO_DOT = 2;
 	static final int TO_DSX = 3;
-
 	static final int SYSTEM = 10;
 	static final int FILE = 11;
-
 	static final int TOPDOWN = 20;
 	static final int LEFTRIGHT = 21;
 
 	public static void main(String args[])
 		throws Exception
 	{
+
 		String inputFileName = "";
 		String outputFileName = "";
-
 		int outputType = TO_XML;
 		int outputMedia = SYSTEM;
 		int outputDirection = TOPDOWN;
@@ -82,76 +85,98 @@ class AutomataExporter
 
 		// Get filename
 		if (args.length == 0)
-   		{
+		{
 			System.out.print("Usage: AutomataExporter options (inputFileName.xml | -)");
-			System.out.println("[(-t | --type) (xml|dot|dsx)] : The output format" );
+			System.out.println("[(-t | --type) (xml|dot|dsx)] : The output format");
 			System.out.println("[(-o | -output) filename] : The output fileName");
 			System.out.println("[(-a | -automaton) (0|1|...)] : The automaton to export");
 			System.out.println("[(-p | -parameter) (leftright|topdown|nostatename|validate)] : parameter to the exporter");
-			return;
-   		}
 
-   		int i = 0;
-		while(i < args.length)
-   		{
-   			if (args[i].equals("--type") || args[i].equals("-t"))
-   			{
-   				i++;
+			return;
+		}
+
+		int i = 0;
+
+		while (i < args.length)
+		{
+			if (args[i].equals("--type") || args[i].equals("-t"))
+			{
+				i++;
+
 				if (args[i].equals("xml"))
+				{
 					outputType = TO_XML;
+				}
 				else if (args[i].equals("dot"))
+				{
 					outputType = TO_DOT;
+				}
 				else if (args[i].equals("dsx"))
+				{
 					outputType = TO_DSX;
-   			}
-   			else if (args[i].equals("--object") || args[i].equals("-o"))
-   			{
-   				i++;
-   				outputMedia = FILE;
+				}
+			}
+			else if (args[i].equals("--object") || args[i].equals("-o"))
+			{
+				i++;
+
+				outputMedia = FILE;
 				outputFileName = args[i];
-   			}
-   			else if (args[i].equals("--automaton") || args[i].equals("-a"))
-   			{
-   				i++;
-				automatonToExport =  (new Integer(args[i])).intValue();
-   			}
-   			else if (args[i].equals("--parameter") || args[i].equals("-p"))
-   			{
-   				i++;
+			}
+			else if (args[i].equals("--automaton") || args[i].equals("-a"))
+			{
+				i++;
+
+				automatonToExport = (new Integer(args[i])).intValue();
+			}
+			else if (args[i].equals("--parameter") || args[i].equals("-p"))
+			{
+				i++;
+
 				if (args[i].equals("leftright"))
+				{
 					outputDirection = LEFTRIGHT;
+				}
 				else if (args[i].equals("topdown"))
+				{
 					outputDirection = TOPDOWN;
+				}
 				else if (args[i].equals("nostatename"))
+				{
 					withLabel = false;
+				}
 				else if (args[i].equals("validate"))
+				{
 					validate = true;
-   			}
-   			else if (args[i].equals("-"))
-   			{
+				}
+			}
+			else if (args[i].equals("-"))
+			{
 				inputMedia = SYSTEM;
-   			}
-   			else
-   			{
+			}
+			else
+			{
 				inputFileName = args[i];
 				inputMedia = FILE;
-   			}
-   			i++;
-   		}
+			}
 
-   		// AutomataBuildFromXml builder = new AutomataBuildFromXml();
+			i++;
+		}
 
-   		Automata theAutomata;
-   		if (inputMedia == FILE)
+		// AutomataBuildFromXml builder = new AutomataBuildFromXml();
+		Automata theAutomata;
+
+		if (inputMedia == FILE)
 		{
-   		 	theAutomata = AutomataBuildFromXml.build(inputFileName, validate);
-   		 }
+			theAutomata = AutomataBuildFromXml.build(inputFileName, validate);
+		}
 		else
 		{
-   		 	theAutomata = AutomataBuildFromXml.build(new FileInputStream(FileDescriptor.in), validate);
-   		 }
+			theAutomata = AutomataBuildFromXml.build(new FileInputStream(FileDescriptor.in), validate);
+		}
 
 		PrintWriter pw;
+
 		if (outputMedia == FILE)
 		{
 			pw = new PrintWriter(new FileWriter(outputFileName));
@@ -164,30 +189,42 @@ class AutomataExporter
 		if (outputType == TO_XML)
 		{
 			AutomataToXml serializer;
-			if (automatonToExport == -1) // Export all automata
-   			{
+
+			if (automatonToExport == -1)	// Export all automata
+			{
 				serializer = new AutomataToXml(theAutomata);
 			}
-   			else
-   			{
+			else
+			{
 				serializer = new AutomataToXml(theAutomata.getAutomatonAt(automatonToExport));
 			}
-   			serializer.serialize(pw);
+
+			serializer.serialize(pw);
 		}
 		else if (outputType == TO_DOT)
 		{
-			if (automatonToExport == -1) // Export the first automaton
+			if (automatonToExport == -1)	// Export the first automaton
+			{
 				automatonToExport = 0;
+			}
+
 			AutomatonToDot serializer = new AutomatonToDot(theAutomata.getAutomatonAt(automatonToExport));
-			serializer.setLeftToRight(outputDirection == LEFTRIGHT ? true : false);
+
+			serializer.setLeftToRight((outputDirection == LEFTRIGHT)
+									  ? true
+									  : false);
 			serializer.setWithLabels(withLabel);
 			serializer.serialize(pw);
 		}
 		else if (outputType == TO_DSX)
 		{
-			if (automatonToExport == -1) // Export the first automaton
+			if (automatonToExport == -1)	// Export the first automaton
+			{
 				automatonToExport = 0;
+			}
+
 			AutomatonToDsx serializer = new AutomatonToDsx(theAutomata.getAutomatonAt(automatonToExport));
+
 			serializer.serialize(pw);
 		}
 	}

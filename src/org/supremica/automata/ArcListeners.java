@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,14 +47,17 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.automata;
 
+
+
 import java.util.*;
+
 
 public class ArcListeners
 	extends Listeners
 {
+
 	public static final int MODE_ARC_ADDED = 1;
 	public static final int MODE_ARC_REMOVED = 2;
 
@@ -64,6 +68,7 @@ public class ArcListeners
 
 	public void notifyListeners(int mode, Object o)
 	{
+
 		if (batchUpdate)
 		{
 			updateNeeded = true;
@@ -73,21 +78,23 @@ public class ArcListeners
 			if (listeners != null)
 			{
 				Iterator listenerIt = listeners.iterator();
+
 				while (listenerIt.hasNext())
 				{
-					ArcListener currListener = (ArcListener)listenerIt.next();
+					ArcListener currListener = (ArcListener) listenerIt.next();
+
 					if (mode == MODE_ARC_ADDED)
 					{
-						currListener.arcAdded((Arc)o);
+						currListener.arcAdded((Arc) o);
 					}
 					else if (mode == MODE_ARC_REMOVED)
 					{
-						currListener.arcRemoved((Arc)o);
+						currListener.arcRemoved((Arc) o);
 					}
 				}
 			}
+
 			updateNeeded = false;
 		}
 	}
-
 }

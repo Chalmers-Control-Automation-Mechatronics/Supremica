@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,16 +47,19 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.apps;
+
+
 
 import java.awt.*;
 import java.awt.event.*;
+
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
 
 import java.util.*;
+
 import java.io.*;
 
 import org.apache.log4j.*;
@@ -66,8 +70,10 @@ import org.supremica.automata.algorithms.*;
 import org.supremica.comm.xmlrpc.*;
 import org.supremica.gui.*;
 
+
 public class SupremicaServer
 {
+
 	private static Category thisCategory = LogDisplay.createCategory(SupremicaServer.class.getName());
 	private AutomatonContainer theAutomatonContainer = null;
 	private Server xmlRpcServer = null;
@@ -75,28 +81,32 @@ public class SupremicaServer
 	// Construct the frame
 	public SupremicaServer()
 	{
+
 		theAutomatonContainer = new AutomatonContainer();
 
 		thisCategory.info("Supremica version: " + (new Version()).toString());
 
-			boolean serverStarted = true;
-			try
-			{
-				xmlRpcServer = new Server(theAutomatonContainer, WorkbenchProperties.getXmlRpcPort());
-			}
-			catch (Exception e)
-			{
-				serverStarted = false;
-				thisCategory.error("Error while starting XML-RPC server");
-			}
-			if (serverStarted)
-			{
-				thisCategory.info("XML-RPC server running on port " + WorkbenchProperties.getXmlRpcPort());
-			}
+		boolean serverStarted = true;
+
+		try
+		{
+			xmlRpcServer = new Server(theAutomatonContainer, WorkbenchProperties.getXmlRpcPort());
+		}
+		catch (Exception e)
+		{
+			serverStarted = false;
+
+			thisCategory.error("Error while starting XML-RPC server");
+		}
+
+		if (serverStarted)
+		{
+			thisCategory.info("XML-RPC server running on port " + WorkbenchProperties.getXmlRpcPort());
+		}
 	}
 
 	public static void main(String args[])
 	{
-		SupremicaServer	server = new SupremicaServer();
+		SupremicaServer server = new SupremicaServer();
 	}
 }

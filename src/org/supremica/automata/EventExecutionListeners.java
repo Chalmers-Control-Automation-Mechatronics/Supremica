@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,10 +47,12 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.automata;
 
+
+
 import java.util.*;
+
 
 public class EventExecutionListeners
 	extends Listeners
@@ -62,15 +65,17 @@ public class EventExecutionListeners
 
 	public void notifyListeners()
 	{
+
 		if (listeners != null)
 		{
 			Iterator listenerIt = listeners.iterator();
+
 			while (listenerIt.hasNext())
 			{
-				AutomataListener currListener = (AutomataListener)listenerIt.next();
+				AutomataListener currListener = (AutomataListener) listenerIt.next();
+
 				currListener.updated(owner);
 			}
 		}
 	}
-
 }

@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,23 +47,26 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.gui;
+
+
 
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.border.*;
+
 import java.awt.*;
 import java.awt.event.*;
 
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.Event;
-
 import org.supremica.automata.*;
+
 
 public class SelectEventDialog
 	extends JDialog
 {
+
 	private org.supremica.automata.Event selectedEvent = null;
 	private JPanel contentPane = null;
 	private Alphabet theAlphabet = null;
@@ -70,98 +74,114 @@ public class SelectEventDialog
 
 	public SelectEventDialog(Frame owner, Automaton theAutomaton)
 	{
+
 		super(owner, "Select event", true);
 
 		this.theAutomaton = theAutomaton;
 		theAlphabet = theAutomaton.getAlphabet();
+		contentPane = (JPanel) getContentPane();
 
-		contentPane = (JPanel)getContentPane();
 		contentPane.setLayout(new BorderLayout());
-
 		setSize(400, 300);
 
 		JLabel introText = new JLabel("Select an event. If necessary, create the event first");
+
 		contentPane.add(introText, BorderLayout.NORTH);
 
 		Box horizBox1 = Box.createHorizontalBox();
 		JButton okButton = new JButton("OK");
 		JButton cancelButton = new JButton("Cancel");
+
 		horizBox1.add(Box.createGlue());
 		horizBox1.add(okButton);
 		horizBox1.add(Box.createGlue());
 		horizBox1.add(cancelButton);
 		horizBox1.add(Box.createGlue());
-
 		contentPane.add(horizBox1, BorderLayout.SOUTH);
 
 		Box horizBox2 = Box.createHorizontalBox();
 		AlphabetPanel alphabetPanel = new AlphabetPanel(theAlphabet);
 		CreateEventPanel createEventPanel = new CreateEventPanel(theAlphabet);
+
 		horizBox2.add(alphabetPanel);
 		horizBox2.add(createEventPanel);
-
 		contentPane.add(horizBox2, BorderLayout.CENTER);
+		okButton.addActionListener(new ActionListener()
+		{
 
-        okButton.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent e)
-            {
+			public void actionPerformed(ActionEvent e)
+			{
 				setVisible(false);
-            }
-        });
+			}
+		});
+		cancelButton.addActionListener(new ActionListener()
+		{
 
-        cancelButton.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-            	selectedEvent = null;
+			public void actionPerformed(ActionEvent e)
+			{
+
+				selectedEvent = null;
+
 				setVisible(false);
-            }
-        });
+			}
+		});
 
 		// Center the window
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		Dimension frameSize = getSize();
+
 		if (frameSize.height > screenSize.height)
 		{
 			frameSize.height = screenSize.height;
 		}
+
 		if (frameSize.width > screenSize.width)
 		{
 			frameSize.width = screenSize.width;
 		}
+
 		setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
 	}
 
 	public org.supremica.automata.Event getEvent()
 	{
+
 		selectedEvent = null;
+
 		setVisible(true);
+
 		return selectedEvent;
 	}
-
 }
 
 class AlphabetPanel
 	extends JPanel
 {
+
 	private Alphabet theAlphabet;
-	//private JList theEventList = new JList();
+
+	// private JList theEventList = new JList();
 	private JLabel test1 = new JLabel("test1");
 
 	public AlphabetPanel(Alphabet theAlphabet)
 	{
+
 		this.theAlphabet = theAlphabet;
+
 		add(test1, BorderLayout.CENTER);
+
 		Border border = BorderFactory.createTitledBorder("Select event");
+
 		setBorder(border);
-		//add(theEventList, BorderLayout.CENTER);
+
+		// add(theEventList, BorderLayout.CENTER);
 	}
 }
 
 class CreateEventPanel
 	extends JPanel
 {
+
 	private Alphabet theAlphabet;
 	private JTextField labelField;
 	private JCheckBox controllableCheckBox;
@@ -170,52 +190,58 @@ class CreateEventPanel
 
 	public CreateEventPanel(Alphabet theAlphabet)
 	{
+
 		this.theAlphabet = theAlphabet;
 
-		//setLayout(Box.createHorizontalBox());
-
+		// setLayout(Box.createHorizontalBox());
 		Border border = BorderFactory.createTitledBorder("Create event");
+
 		setBorder(border);
 
 		Box vertBox = Box.createVerticalBox();
-		add(vertBox);
 
+		add(vertBox);
 		vertBox.add(new JLabel("Label"));
 
 		labelField = new JTextField();
-		vertBox.add(labelField);
 
+		vertBox.add(labelField);
 		vertBox.add(Box.createVerticalStrut(5));
 
 		controllableCheckBox = new JCheckBox("controllable", true);
+
 		vertBox.add(controllableCheckBox);
 
 		prioritizedCheckBox = new JCheckBox("prioritized", true);
-		vertBox.add(prioritizedCheckBox);
 
+		vertBox.add(prioritizedCheckBox);
 		add(Box.createGlue());
 
 		createEventButton = new JButton("Create event");
+
 		vertBox.add(createEventButton);
+		createEventButton.addActionListener(new ActionListener()
+		{
 
-        createEventButton.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent e)
-            {
+			public void actionPerformed(ActionEvent e)
+			{
+
 				Alphabet alph = getAlphabet();
+				String currLabel = labelField.getText();
 
-            	String currLabel = labelField.getText();
-            	if (alph.containsEventWithLabel(currLabel))
-            	{
+				if (alph.containsEventWithLabel(currLabel))
+				{
 					JOptionPane.showMessageDialog(null, "Existing event", "An event " + currLabel + "does already exists", JOptionPane.ERROR_MESSAGE);
-            	}
-            	else
-            	{
-            		Event newEvent = new Event(currLabel);
-            		newEvent.setId(alph.getUniqueId("e"));
+				}
+				else
+				{
+					Event newEvent = new Event(currLabel);
+
+					newEvent.setId(alph.getUniqueId("e"));
+
 					try
 					{
-            			alph.addEvent(newEvent);
+						alph.addEvent(newEvent);
 					}
 					catch (Exception ex)
 					{
@@ -223,9 +249,8 @@ class CreateEventPanel
 						System.exit(0);
 					}
 				}
-            }
-        });
-
+			}
+		});
 	}
 
 	private Alphabet getAlphabet()
@@ -235,6 +260,7 @@ class CreateEventPanel
 
 	public void setVisible(boolean visible)
 	{
+
 		labelField.setText("");
 		controllableCheckBox.setSelected(true);
 		prioritizedCheckBox.setSelected(true);

@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,14 +47,18 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.automata.algorithms;
 
+
+
 import org.supremica.automata.*;
+
 import java.util.*;
+
 
 public class AutomatonMinimizer
 {
+
 	private Automaton theAutomaton;
 	private Alphabet theAlphabet;
 
@@ -66,16 +71,16 @@ public class AutomatonMinimizer
 	public Automaton getMinimizedAutomaton()
 		throws Exception
 	{
-		EquivalenceClasses equivClasses = new EquivalenceClasses();
 
+		EquivalenceClasses equivClasses = new EquivalenceClasses();
 		EquivalenceClass acceptingStates = new EquivalenceClass();
 		EquivalenceClass forbiddenStates = new EquivalenceClass();
 		EquivalenceClass rejectingStates = new EquivalenceClass();
+		Iterator stateIt = theAutomaton.stateIterator();
 
-		Iterator stateIt =  theAutomaton.stateIterator();
 		while (stateIt.hasNext())
 		{
-			State currState = (State)stateIt.next();
+			State currState = (State) stateIt.next();
 
 			if (currState.isForbidden())
 			{
@@ -98,10 +103,12 @@ public class AutomatonMinimizer
 		{
 			equivClasses.add(acceptingStates);
 		}
+
 		if (rejectingStates.size() > 0)
 		{
 			equivClasses.add(rejectingStates);
 		}
+
 		if (forbiddenStates.size() > 0)
 		{
 			equivClasses.add(forbiddenStates);
@@ -114,30 +121,33 @@ public class AutomatonMinimizer
 		catch (Exception e)
 		{
 			e.printStackTrace(System.err);
+
 			throw e;
 		}
 
 		Automaton newAutomaton = buildAutomaton(equivClasses);
+
 		return newAutomaton;
 	}
 
 	public Automaton getMinimizedAutomaton(boolean sameEquivClassInitially)
 		throws Exception
 	{
+
 		if (sameEquivClassInitially)
 		{
 			EquivalenceClasses equivClasses = new EquivalenceClasses();
-
 			EquivalenceClass initialClass = new EquivalenceClass();
+			Iterator stateIt = theAutomaton.stateIterator();
 
-			Iterator stateIt =  theAutomaton.stateIterator();
 			while (stateIt.hasNext())
 			{
-				State currState = (State)stateIt.next();
+				State currState = (State) stateIt.next();
 
 				currState.setEquivalenceClass(initialClass);
 				initialClass.add(currState);
 			}
+
 			equivClasses.add(initialClass);
 
 			try
@@ -147,10 +157,12 @@ public class AutomatonMinimizer
 			catch (Exception e)
 			{
 				e.printStackTrace(System.err);
+
 				throw e;
 			}
 
 			Automaton newAutomaton = buildAutomaton(equivClasses);
+
 			return newAutomaton;
 		}
 		else
@@ -163,6 +175,7 @@ public class AutomatonMinimizer
 	{
 
 		Automaton newAutomaton = new Automaton();
+
 		newAutomaton.setType(theAutomaton.getType());
 		newAutomaton.setAlphabet(theAlphabet);
 		newAutomaton.setName("min" + theAutomaton.getName());
@@ -170,10 +183,12 @@ public class AutomatonMinimizer
 		// Associate one state with each equivalence class
 		int currNbrOfStates = 0;
 		Iterator equivClassIt = equivClasses.iterator();
+
 		while (equivClassIt.hasNext())
 		{
-			EquivalenceClass currEquivClass = (EquivalenceClass)equivClassIt.next();
+			EquivalenceClass currEquivClass = (EquivalenceClass) equivClassIt.next();
 			State currState = new State();
+
 			currState.setId("q" + currNbrOfStates++);
 
 			if (currEquivClass.isInitial())
@@ -196,19 +211,22 @@ public class AutomatonMinimizer
 
 		// Build all transitions
 		equivClassIt = equivClasses.iterator();
+
 		while (equivClassIt.hasNext())
 		{
-			EquivalenceClass currEquivClass = (EquivalenceClass)equivClassIt.next();
+			EquivalenceClass currEquivClass = (EquivalenceClass) equivClassIt.next();
 			State fromState = currEquivClass.getState();
 			Iterator outgoingArcsIt = currEquivClass.outgoingArcsIterator();
+
 			while (outgoingArcsIt.hasNext())
 			{
-				Arc currArc = (Arc)outgoingArcsIt.next();
+				Arc currArc = (Arc) outgoingArcsIt.next();
 				String currEventId = currArc.getEventId();
 				State oldToState = currArc.getToState();
-				EquivalenceClass nextEquivalenceClass = (EquivalenceClass)oldToState.getEquivalenceClass();
+				EquivalenceClass nextEquivalenceClass = (EquivalenceClass) oldToState.getEquivalenceClass();
 				State toState = nextEquivalenceClass.getState();
 				Arc newArc = new Arc(fromState, toState, currEventId);
+
 				newAutomaton.addArc(newArc);
 			}
 		}
@@ -218,63 +236,79 @@ public class AutomatonMinimizer
 
 	private void doMinimization(EquivalenceClasses equivClasses)
 	{
+
 		boolean refined;
+
 		do
 		{
 			refined = false;
+
 			Iterator classIt = equivClasses.safeIterator();
+
 			while (classIt.hasNext())
 			{
-				EquivalenceClass currClass = (EquivalenceClass)classIt.next();
+				EquivalenceClass currClass = (EquivalenceClass) classIt.next();
+
 				refined = doMinimization(equivClasses, currClass) || refined;
 			}
-		} while (refined);
+		}
+		while (refined);
 	}
 
 	private boolean doMinimization(EquivalenceClasses equivClasses, EquivalenceClass equivClass)
 	{
+
 		boolean refined = false;
 		Iterator eventIt = theAlphabet.eventIterator();
+
 		while (eventIt.hasNext())
 		{
-			Event currEvent = (Event)eventIt.next();
+			Event currEvent = (Event) eventIt.next();
+
 			refined = doMinimization(equivClasses, equivClass, currEvent) || refined;
 		}
+
 		return refined;
 	}
 
 	private boolean doMinimization(EquivalenceClasses equivClasses, EquivalenceClass equivClass, Event e)
 	{
-		//System.err.println("A iteration in doMinimization <classes, class, event>");
+
+		// System.err.println("A iteration in doMinimization <classes, class, event>");
 		EquivalenceClassHolder newEquivClassHolder = equivClass.split(e);
-		//System.err.println(newEquivClassHolder.size() + " new equivalence classes");
+
+		// System.err.println(newEquivClassHolder.size() + " new equivalence classes");
 		if (newEquivClassHolder.size() > 1)
 		{
-			//System.err.println("------------------");
-			//System.err.println("equivClasses" + equivClasses);
-			//System.err.println("newEquivClasses" + newEquivClassHolder);
 
+			// System.err.println("------------------");
+			// System.err.println("equivClasses" + equivClasses);
+			// System.err.println("newEquivClasses" + newEquivClassHolder);
 			// Remove the current class from all equivalenceClasses
-			//System.err.println("Before equivClasses" + equivClasses);
+			// System.err.println("Before equivClasses" + equivClasses);
 			equivClasses.remove(equivClass);
-			//System.err.println("After equivClasses" + equivClasses);
+
+			// System.err.println("After equivClasses" + equivClasses);
 			equivClass.clear();
 
 			// Set the new equivalence class in all states
-			//newEquivClassHolder.update();
+			// newEquivClassHolder.update();
 			// Add the new classes to equivClasses
 			equivClasses.addAll(newEquivClassHolder);
-			//System.err.println("equivClasses" + equivClasses);
-			//System.err.println("newEquivClasses" + newEquivClassHolder);
-			//System.err.println("------------------");
+
+			// System.err.println("equivClasses" + equivClasses);
+			// System.err.println("newEquivClasses" + newEquivClassHolder);
+			// System.err.println("------------------");
 			return true;
 		}
 		else
 		{
+
 			// All classifies to the same class.
 			// No need to do anything except maybe helping
 			// the garbage collector
 			newEquivClassHolder.clear();
+
 			return false;
 		}
 	}
@@ -282,6 +316,7 @@ public class AutomatonMinimizer
 
 class EquivalenceClasses
 {
+
 	private LinkedList equivClasses = new LinkedList();
 
 	public void add(EquivalenceClass equivClass)
@@ -291,10 +326,13 @@ class EquivalenceClasses
 
 	public void addAll(EquivalenceClassHolder equivClassHolder)
 	{
+
 		Iterator equivIt = equivClassHolder.iterator();
+
 		while (equivIt.hasNext())
 		{
-			EquivalenceClass currEquivClass = (EquivalenceClass)equivIt.next();
+			EquivalenceClass currEquivClass = (EquivalenceClass) equivIt.next();
+
 			currEquivClass.update();
 			equivClasses.add(currEquivClass);
 		}
@@ -312,7 +350,7 @@ class EquivalenceClasses
 
 	public Iterator safeIterator()
 	{
-		return ((LinkedList)equivClasses.clone()).iterator();
+		return ((LinkedList) equivClasses.clone()).iterator();
 	}
 
 	public void clear()
@@ -327,28 +365,33 @@ class EquivalenceClasses
 
 	public String toString()
 	{
+
 		StringBuffer sb = new StringBuffer();
 		Iterator equivClassIt = equivClasses.iterator();
+
 		sb.append("(");
+
 		while (equivClassIt.hasNext())
 		{
-			EquivalenceClass currEquivClass = (EquivalenceClass)equivClassIt.next();
+			EquivalenceClass currEquivClass = (EquivalenceClass) equivClassIt.next();
+
 			sb.append(currEquivClass);
 		}
+
 		sb.append(")");
+
 		return sb.toString();
 	}
 }
 
 class EquivalenceClass
 {
+
 	private LinkedList states = new LinkedList();
 	private State newState;
 	private EquivalenceClass nextClass = null;
 
-	public EquivalenceClass()
-	{
-	}
+	public EquivalenceClass() {}
 
 	public EquivalenceClass(EquivalenceClass nextClass)
 	{
@@ -360,13 +403,15 @@ class EquivalenceClass
 		return nextClass;
 	}
 
-
 	public void update()
 	{
+
 		Iterator stateIt = states.iterator();
+
 		while (stateIt.hasNext())
 		{
-			State currState = (State)stateIt.next();
+			State currState = (State) stateIt.next();
+
 			currState.setEquivalenceClass(this);
 		}
 	}
@@ -393,35 +438,45 @@ class EquivalenceClass
 
 	public boolean isInitial()
 	{
+
 		Iterator stateIt = states.iterator();
+
 		while (stateIt.hasNext())
 		{
-			State currState = (State)stateIt.next();
+			State currState = (State) stateIt.next();
+
 			if (currState.isInitial())
 			{
 				return true;
 			}
 		}
+
 		return false;
 	}
 
 	public boolean isAccepting()
 	{
-		State currState = (State)states.getFirst();
+
+		State currState = (State) states.getFirst();
+
 		if (currState.isAccepting())
 		{
 			return true;
 		}
+
 		return false;
 	}
 
 	public boolean isForbidden()
 	{
-		State currState = (State)states.getFirst();
+
+		State currState = (State) states.getFirst();
+
 		if (currState.isForbidden())
 		{
 			return true;
 		}
+
 		return false;
 	}
 
@@ -441,8 +496,10 @@ class EquivalenceClass
 
 	public Iterator outgoingArcsIterator()
 	{
-		State currState = (State)states.getFirst();
+
+		State currState = (State) states.getFirst();
 		Iterator currIt = currState.outgoingArcsIterator();
+
 		return currIt;
 	}
 
@@ -451,22 +508,27 @@ class EquivalenceClass
 	 */
 	public EquivalenceClassHolder split(Event e)
 	{
+
 		// System.err.println("Splitting " + e.getLabel());
 		EquivalenceClassHolder newEquivalenceClassHolder = new EquivalenceClassHolder();
+
 		// Build a list of equivalance classes that e transfers to
 		Iterator stateIt = iterator();
+
 		while (stateIt.hasNext())
 		{
-			State currState = (State)stateIt.next();
+			State currState = (State) stateIt.next();
 			State nextState = currState.nextState(e);
-
 			EquivalenceClass nextEquivalenceClass = null;
+
 			if (nextState != null)
 			{
-				nextEquivalenceClass = (EquivalenceClass)nextState.getEquivalenceClass();
+				nextEquivalenceClass = (EquivalenceClass) nextState.getEquivalenceClass();
 			}
+
 			newEquivalenceClassHolder.addState(currState, nextEquivalenceClass);
 		}
+
 		return newEquivalenceClassHolder;
 	}
 
@@ -482,19 +544,25 @@ class EquivalenceClass
 
 	public String toString()
 	{
+
 		StringBuffer sb = new StringBuffer();
+
 		sb.append("[");
+
 		Iterator stateIt = states.iterator();
+
 		while (stateIt.hasNext())
 		{
-			State currState = (State)stateIt.next();
+			State currState = (State) stateIt.next();
+
 			sb.append(" " + currState.getId());
 		}
+
 		sb.append("]");
+
 		return sb.toString();
 	}
 }
-
 
 /**
  * Temporary help object for storing new equivalence classes.
@@ -503,18 +571,22 @@ class EquivalenceClass
 class EquivalenceClassHolder
 	extends HashMap
 {
+
 	public void addState(State state, EquivalenceClass nextClass)
 	{
+
 		// If the next equivalence class does not exist create it
 		if (!containsKey(nextClass))
 		{
 			EquivalenceClass newEquivClass = new EquivalenceClass(nextClass);
+
 			put(nextClass, newEquivClass);
 		}
 
 		// Now get the EquivalenceClass associated with the nextEquivClass
 		// and add the state to it.
-		EquivalenceClass theEquivalenceClass = (EquivalenceClass)get(nextClass);
+		EquivalenceClass theEquivalenceClass = (EquivalenceClass) get(nextClass);
+
 		theEquivalenceClass.add(state);
 	}
 
@@ -525,25 +597,34 @@ class EquivalenceClassHolder
 
 	public void update()
 	{
+
 		Iterator equivClassIt = iterator();
+
 		while (equivClassIt.hasNext())
 		{
-			EquivalenceClass currEquivClass = (EquivalenceClass)equivClassIt.next();
+			EquivalenceClass currEquivClass = (EquivalenceClass) equivClassIt.next();
+
 			currEquivClass.update();
 		}
 	}
 
 	public String toString()
 	{
+
 		StringBuffer sb = new StringBuffer();
 		Iterator equivClassIt = iterator();
+
 		sb.append("(");
+
 		while (equivClassIt.hasNext())
 		{
-			EquivalenceClass currEquivClass = (EquivalenceClass)equivClassIt.next();
+			EquivalenceClass currEquivClass = (EquivalenceClass) equivClassIt.next();
+
 			sb.append(currEquivClass);
 		}
+
 		sb.append(")");
+
 		return sb.toString();
 	}
 }

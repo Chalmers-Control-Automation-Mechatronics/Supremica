@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,8 +47,9 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.gui;
+
+
 
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.*;
@@ -56,15 +58,20 @@ import org.apache.log4j.*;
 
 import java.awt.*;
 import java.awt.event.*;
+
 import java.io.*;
+
 import javax.swing.*;
+
 import java.util.*;
 
 import att.grappa.*;
 
+
 public class PreLoader
 	extends Thread
 {
+
 	private static Category thisCategory = LogDisplay.createCategory(PreLoader.class.getName());
 	private static PreLoader thisPreLoader = null;
 	private static final String dummyDot = "digraph state_automaton {graph [ center = true ];node [ label = \"Dummy\", shape = plaintext ];}";
@@ -72,9 +79,7 @@ public class PreLoader
 	private static Graph grappaGraph = null;
 	private static GrappaPanel grappaPanel = null;
 
-	private PreLoader()
-	{
-	}
+	private PreLoader() {}
 
 	public void run()
 	{
@@ -83,10 +88,13 @@ public class PreLoader
 
 	private void load()
 	{
-		//thisCategory.debug("running preloader");
-		//thisCategory.debug(dummyDot);
+
+		// thisCategory.debug("running preloader");
+		// thisCategory.debug(dummyDot);
 		StringReader reader = new StringReader(dummyDot);
+
 		grappaParser = new Parser(reader);
+
 		try
 		{
 			grappaParser.parse();
@@ -94,20 +102,26 @@ public class PreLoader
 		catch (Exception ex)
 		{
 			thisCategory.error("Exception in PreLoader");
+
 			return;
 		}
+
 		grappaGraph = grappaParser.getGraph();
 		grappaPanel = new GrappaPanel(grappaGraph);
+
 		grappaPanel.setScaleToFit(false);
 	}
 
 	public static synchronized PreLoader getPreLoader()
 	{
+
 		if (thisPreLoader == null)
 		{
 			thisPreLoader = new PreLoader();
+
 			thisPreLoader.start();
 		}
+
 		return thisPreLoader;
 	}
 }

@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,16 +47,19 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.gui;
+
+
 
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.*;
 
 import java.awt.*;
 import java.awt.event.*;
+
 import javax.swing.*;
 import javax.swing.tree.*;
+
 import java.util.*;
 
 
@@ -63,37 +67,36 @@ public class AlphabetViewerPanel
 	extends JPanel
 	implements AutomatonListener
 {
+
 	private Automaton theAutomaton;
 	private Alphabet theAlphabet;
-
-    private boolean showId = false;
-    private boolean updateNeeded = false;
-
+	private boolean showId = false;
+	private boolean updateNeeded = false;
 	private JTree theTree = new JTree();
 	private JScrollPane scrollPanel = new JScrollPane(theTree);
 
 	public AlphabetViewerPanel(Automaton theAutomaton)
 		throws Exception
 	{
+
 		this.theAutomaton = theAutomaton;
+
 		theAutomaton.getListeners().addListener(this);
+
 		theAlphabet = theAutomaton.getAlphabet();
 
 		setLayout(new BorderLayout());
 
 		// setPreferredSize(new Dimension(75, 400));
 		add(scrollPanel, BorderLayout.CENTER);
-
 		build();
 	}
 
-    public void initialize()
-    {
-
-    }
+	public void initialize() {}
 
 	public void updated(Object o)
 	{
+
 		if (o == theAutomaton)
 		{
 			update();
@@ -127,6 +130,7 @@ public class AlphabetViewerPanel
 
 	public void update()
 	{
+
 		if (!isVisible())
 		{
 			updateNeeded = true;
@@ -136,9 +140,10 @@ public class AlphabetViewerPanel
 			try
 			{
 				build();
+
 				updateNeeded = false;
 			}
-			catch(Exception e)
+			catch (Exception e)
 			{
 				System.err.println("Error while updating AlphabetViewer");
 			}
@@ -148,57 +153,70 @@ public class AlphabetViewerPanel
 	public void build()
 		throws Exception
 	{
+
 		DefaultMutableTreeNode root = new DefaultMutableTreeNode("Alphabet");
 		int nbrOfEvents = 0;
 		Iterator eventIt = theAlphabet.iterator();
+
 		while (eventIt.hasNext())
 		{
-			org.supremica.automata.Event currEvent = (org.supremica.automata.Event)eventIt.next();
+			org.supremica.automata.Event currEvent = (org.supremica.automata.Event) eventIt.next();
 			DefaultMutableTreeNode currEventNode = new DefaultMutableTreeNode(currEvent.getLabel());
+
 			root.add(currEventNode);
+
 			DefaultMutableTreeNode currControllableNode = new DefaultMutableTreeNode("controllable: " + currEvent.isControllable());
+
 			currEventNode.add(currControllableNode);
+
 			DefaultMutableTreeNode currPrioritizedNode = new DefaultMutableTreeNode("prioritized: " + currEvent.isPrioritized());
+
 			currEventNode.add(currPrioritizedNode);
+
 			if (showId)
 			{
 				DefaultMutableTreeNode currIdNode = new DefaultMutableTreeNode("id: " + currEvent.getId());
+
 				currEventNode.add(currIdNode);
 			}
 		}
 
 		DefaultTreeModel treeModel = new DefaultTreeModel(root);
+
 		theTree.setModel(treeModel);
 		revalidate();
 	}
 
 	public void setVisible(boolean toVisible)
 	{
+
 		super.setVisible(toVisible);
+
 		if (updateNeeded)
 		{
 			update();
 		}
 	}
-
 }
+
 /*
-class Renderer
-	extends DefaultTreeCellRenderer
-{
-	public Renderer()
-	{
-		super();
-	}
-
-}
-
-class Editor
-	extends DefaultTreeEditor
-{
-	public Editor()
-	{
-		super();
-	}
-
-}*/
+ * class Renderer
+ *       extends DefaultTreeCellRenderer
+ * {
+ *       public Renderer()
+ *       {
+ *               super();
+ *       }
+ *
+ * }
+ *
+ * class Editor
+ *       extends DefaultTreeEditor
+ * {
+ *       public Editor()
+ *       {
+ *               super();
+ *       }
+ *
+ * }
+ */

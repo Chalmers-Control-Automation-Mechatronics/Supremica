@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,10 +47,12 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.recipe;
 
+
+
 import java.util.*;
+
 
 /**
  * This is container class for storing several
@@ -57,11 +60,10 @@ import java.util.*;
  */
 public class InternalOperationRecipes
 {
+
 	private HashMap theRecipes = new HashMap();
 
-	public InternalOperationRecipes()
-	{
-	}
+	public InternalOperationRecipes() {}
 
 	public void addRecipe(InternalOperationRecipe theRecipe)
 		throws Exception
@@ -78,16 +80,18 @@ public class InternalOperationRecipes
 	public void removeRecipe(String recipeName)
 		throws Exception
 	{
+
 		if (!contains(recipeName))
 		{
 			throw new Exception(recipeName + " does not exists");
 		}
+
 		theRecipes.remove(recipeName);
 	}
 
 	public InternalOperationRecipe getRecipe(String recipeName)
 	{
-		return (InternalOperationRecipe)theRecipes.get(recipeName);
+		return (InternalOperationRecipe) theRecipes.get(recipeName);
 	}
 
 	public boolean contains(InternalOperationRecipe theRecipe)
@@ -113,9 +117,10 @@ public class InternalOperationRecipes
 	public static void main(String args[])
 		throws Exception
 	{
-		InternalOperationRecipes theRecipes = new InternalOperationRecipes();
 
+		InternalOperationRecipes theRecipes = new InternalOperationRecipes();
 		InternalOperationRecipe firstRecipe = new InternalOperationRecipe("firstRecipe");
+
 		theRecipes.addRecipe(firstRecipe);
 
 		InternalOperation p1 = new InternalOperation("p1");
@@ -128,7 +133,6 @@ public class InternalOperationRecipes
 		p1.addResourceCandidate("m1");
 		p1.addResourceCandidate("m2");
 		p4.addResourceCandidate("m3");
-
 		firstRecipe.addOperation(p1);
 		firstRecipe.addOperation(p2);
 		firstRecipe.addOperation(p3);
@@ -156,27 +160,29 @@ public class InternalOperationRecipes
 		firstRecipe.addArc(p3, t2);
 		firstRecipe.addArc(p4, t3);
 		firstRecipe.addArc(p4, t4);
-		//firstRecipe.addArc(p5, t5);
-		//firstRecipe.addArc(p6, t6);
 
+		// firstRecipe.addArc(p5, t5);
+		// firstRecipe.addArc(p6, t6);
 		// Arcs from transitions to operations
 		firstRecipe.addArc(t1, p2);
 		firstRecipe.addArc(t1, p3);
 		firstRecipe.addArc(t2, p4);
 		firstRecipe.addArc(t3, p5);
 		firstRecipe.addArc(t4, p6);
-		//firstRecipe.addArc(t5, p1);
-		//firstRecipe.addArc(t6, p1);
 
+		// firstRecipe.addArc(t5, p1);
+		// firstRecipe.addArc(t6, p1);
 		InternalOperationRecipe secondRecipe = firstRecipe.createCopy("secondRecipe");
+
 		theRecipes.addRecipe(secondRecipe);
 
 		Iterator recipeIt = theRecipes.iterator();
+
 		while (recipeIt.hasNext())
 		{
-			InternalOperationRecipe currRecipe = (InternalOperationRecipe)recipeIt.next();
+			InternalOperationRecipe currRecipe = (InternalOperationRecipe) recipeIt.next();
+
 			System.out.println(currRecipe);
 		}
-
 	}
 }

@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,23 +47,22 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.recipe;
+
+
 
 import java.util.*;
 
+
 public class InternalOperation
 {
+
 	private LinkedList prevTransitions = new LinkedList();
 	private LinkedList nextTransitions = new LinkedList();
-
 	private ArrayList resourceCandidates = new ArrayList();
-
 	private String identity;
 	private String activeResource = null;
-
 	private int time = Integer.MIN_VALUE;
-
 	private int index = -1;
 
 	public InternalOperation(String identity)
@@ -72,13 +72,15 @@ public class InternalOperation
 
 	public InternalOperation(InternalOperation orgOperation)
 	{
+
 		identity = orgOperation.identity;
 		activeResource = orgOperation.activeResource;
-		time = 	orgOperation.time;
+		time = orgOperation.time;
 		index = orgOperation.index;
 
 		// Copy the resource candidates
 		Iterator resourceIt = orgOperation.resourceCandidates();
+
 		addResourceCandidates(resourceIt);
 	}
 
@@ -129,9 +131,11 @@ public class InternalOperation
 
 	public void addResourceCandidates(Iterator resourceIt)
 	{
+
 		while (resourceIt.hasNext())
 		{
-			String resource = (String)resourceIt.next();
+			String resource = (String) resourceIt.next();
+
 			addResourceCandidate(resource);
 		}
 	}
@@ -184,31 +188,40 @@ public class InternalOperation
 
 	public String toString()
 	{
+
 		StringBuffer sb = new StringBuffer();
 
 		sb.append("InternalOperation: " + identity + " initial: " + isInitial() + " final: " + isFinal() + "\n");
-
 		sb.append("\tPrevious transitions:\n");
+
 		Iterator transitionsIt = prevTransitions.iterator();
+
 		while (transitionsIt.hasNext())
 		{
-			InternalTransition currTransition = (InternalTransition)transitionsIt.next();
+			InternalTransition currTransition = (InternalTransition) transitionsIt.next();
+
 			sb.append("\t\t" + currTransition.getIdentity() + "\n");
 		}
 
 		sb.append("\tNext transitions:\n");
+
 		transitionsIt = nextTransitions.iterator();
+
 		while (transitionsIt.hasNext())
 		{
-			InternalTransition currTransition = (InternalTransition)transitionsIt.next();
+			InternalTransition currTransition = (InternalTransition) transitionsIt.next();
+
 			sb.append("\t\t" + currTransition.getIdentity() + "\n");
 		}
 
 		sb.append("\tResources:\n");
+
 		Iterator resourceIt = resourceCandidates.iterator();
+
 		while (resourceIt.hasNext())
 		{
-			String currResource = (String)resourceIt.next();
+			String currResource = (String) resourceIt.next();
+
 			sb.append("\t\t" + currResource + "\n");
 		}
 

@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,13 +47,16 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.automata;
+
+
 
 import java.util.*;
 
+
 public class MultipleState
 {
+
 	private ArrayList theStates;
 
 	public MultipleState(int capacity)
@@ -62,22 +66,23 @@ public class MultipleState
 
 	public MultipleState(MultipleState state)
 	{
+
 		// Todo
 	}
 
 	public State getStateAt(int index)
 	{
-		return (State)theStates.get(index);
+		return (State) theStates.get(index);
 	}
 
- 	public void setStateAt(int index, State state)
-  	{
-    	theStates.add(index, state);
-   	}
+	public void setStateAt(int index, State state)
+	{
+		theStates.add(index, state);
+	}
 
 	public boolean equals(Object state)
 	{
-		return theStates.equals(((MultipleState)state).theStates);
+		return theStates.equals(((MultipleState) state).theStates);
 	}
 
 	public int hashCode()
@@ -85,4 +90,3 @@ public class MultipleState
 		return theStates.hashCode();
 	}
 }
-

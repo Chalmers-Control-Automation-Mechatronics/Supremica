@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,12 +47,15 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.automata;
+
+
 
 public interface ArcListener
 	extends Listener
 {
+
 	public void arcAdded(Arc arc);
+
 	public void arcRemoved(Arc arc);
 }

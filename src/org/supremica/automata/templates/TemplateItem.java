@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,18 +47,23 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.automata.templates;
 
+
+
 import java.util.*;
+
 import java.net.*;
+
 import java.io.*;
 
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.*;
 
+
 public class TemplateItem
 {
+
 	private String description;
 	private String path;
 
@@ -80,17 +86,20 @@ public class TemplateItem
 	public Automata createInstance()
 		throws Exception
 	{
+
 		try
 		{
 			URL url = TemplateItem.class.getResource(path);
 			InputStream stream = url.openStream();
 			Automata theAutomata = AutomataBuildFromXml.build(stream);
+
 			return theAutomata;
 		}
 		catch (Exception ex)
 		{
 			System.err.println(ex);
 			ex.printStackTrace();
+
 			throw ex;
 		}
 	}

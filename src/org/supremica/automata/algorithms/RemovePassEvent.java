@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,18 +47,19 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.automata.algorithms;
 
+
+
 import java.util.*;
+
 import org.supremica.automata.*;
+
 
 public class RemovePassEvent
 {
 
-	private RemovePassEvent()
-	{
-	}
+	private RemovePassEvent() {}
 
 	/**
 	 * If the pass event is active from a state q leading to q', then
@@ -67,42 +69,52 @@ public class RemovePassEvent
 	public static void execute(Automaton theAutomaton)
 		throws Exception
 	{
-		Alphabet theAlphabet = theAutomaton.getAlphabet();
 
+		Alphabet theAlphabet = theAutomaton.getAlphabet();
 		Iterator stateIt = theAutomaton.stateIterator();
+
 		while (stateIt.hasNext())
-		{ // Find a state with an outgoing pass event
-			State currState = (State)stateIt.next();
+		{								// Find a state with an outgoing pass event
+			State currState = (State) stateIt.next();
 			Iterator arcIt = currState.safeOutgoingArcsIterator();
+
 			while (arcIt.hasNext())
 			{
-				Arc currArc = (Arc)arcIt.next();
+				Arc currArc = (Arc) arcIt.next();
 				String currEventId = currArc.getEventId();
 				Event currEvent = theAlphabet.getEventWithId(currEventId);
+
 				if (currEvent.getLabel().equals("pass"))
-				{ // A state with outgoing pass event is found
-				  // Copy all uncontrollable arcs
+				{						// A state with outgoing pass event is found
+
+					// Copy all uncontrollable arcs
 					State currToState = currArc.getToState();
 					Iterator nextArcIt = currToState.outgoingArcsIterator();
+
 					while (nextArcIt.hasNext())
 					{
-						Arc nextArc = (Arc)nextArcIt.next();
+						Arc nextArc = (Arc) nextArcIt.next();
 						String nextEventId = nextArc.getEventId();
 						Event nextEvent = theAlphabet.getEventWithId(nextEventId);
+
 						if (!nextEvent.isControllable())
 						{
 							State nextToState = nextArc.getToState();
 							Arc newArc = new Arc(currState, nextToState, nextEventId);
 						}
 					}
-					currArc.clear(); // Remove the pass event
+
+					currArc.clear();	// Remove the pass event
+
 					// We can do a break here?
 				}
 			}
 		}
+
 		if (theAlphabet.containsEventWithLabel("pass"))
 		{
 			Event passEvent = theAlphabet.getEventWithLabel("pass");
+
 			theAlphabet.removeEvent(passEvent);
 		}
 	}

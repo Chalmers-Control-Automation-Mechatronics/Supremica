@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,158 +47,162 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.gui;
+
+
 
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.*;
 
 import java.awt.*;
 import java.awt.event.*;
+
 import java.io.*;
+
 import javax.swing.*;
+
 import java.util.*;
+
 
 public class AutomataExplorer
 	extends JFrame
 	implements AutomatonListener
 {
+
 	private Automata theAutomata;
-
-    private BorderLayout layout = new BorderLayout();
-    private JPanel contentPane;
-    private JMenuBar menuBar = new JMenuBar();
-    private AutomataStateViewer stateViewer;
-    private AutomataExplorerController controller;
-
+	private BorderLayout layout = new BorderLayout();
+	private JPanel contentPane;
+	private JMenuBar menuBar = new JMenuBar();
+	private AutomataStateViewer stateViewer;
+	private AutomataExplorerController controller;
 	private AutomataSynchronizerHelper helper;
 	private AutomataOnlineSynchronizer onlineSynchronizer;
 
 	public AutomataExplorer(Automata theAutomata)
 		throws Exception
 	{
+
 		this.theAutomata = theAutomata;
 
-		SynchronizationOptions syncOptions = new SynchronizationOptions(
-			WorkbenchProperties.syncNbrOfExecuters(),
-			SynchronizationType.Prioritized,
-			WorkbenchProperties.syncInitialHashtableSize(),
-			WorkbenchProperties.syncExpandHashtable(),
-			WorkbenchProperties.syncForbidUncontrollableStates(),
-			WorkbenchProperties.syncExpandForbiddenStates(),
-			false,
-			false,
-			false,
-			WorkbenchProperties.verboseMode());
+		SynchronizationOptions syncOptions = new SynchronizationOptions(WorkbenchProperties.syncNbrOfExecuters(), SynchronizationType.Prioritized, WorkbenchProperties.syncInitialHashtableSize(), WorkbenchProperties.syncExpandHashtable(), WorkbenchProperties.syncForbidUncontrollableStates(), WorkbenchProperties.syncExpandForbiddenStates(), false, false, false, WorkbenchProperties.verboseMode());
 
 		helper = new AutomataSynchronizerHelper(theAutomata, syncOptions);
 
 		// Build the initial state
 		Automaton currAutomaton;
 		State currInitialState;
-	    int[] initialState = new int[this.theAutomata.size() + 1]; // + 1 status field
+		int[] initialState = new int[this.theAutomata.size() + 1];		// + 1 status field
 		Iterator autIt = this.theAutomata.iterator();
+
 		while (autIt.hasNext())
 		{
 			currAutomaton = (Automaton) autIt.next();
 			currInitialState = currAutomaton.getInitialState();
 			initialState[currAutomaton.getIndex()] = currInitialState.getIndex();
 		}
+
 		AutomataExplorerHelper.setInitialState(initialState);
 
 		onlineSynchronizer = new AutomataOnlineSynchronizer(helper);
+
 		onlineSynchronizer.initialize();
 		onlineSynchronizer.setCurrState(initialState);
 		helper.setCoExecuter(onlineSynchronizer);
-
 		theAutomata.getListeners().addListener(this);
-
 		setBackground(Color.white);
 
 		contentPane = (JPanel) getContentPane();
-		contentPane.setLayout(layout);
-		// contentPane.add(toolBar, BorderLayout.NORTH);
 
-		/// setTitle(theAutomaton.getName());
+		contentPane.setLayout(layout);
+
+		// contentPane.add(toolBar, BorderLayout.NORTH);
+		// / setTitle(theAutomaton.getName());
 		setTitle("AutomataExplorer");
 		setSize(400, 500);
 
 		// Center the window
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		Dimension frameSize = getSize();
+
 		if (frameSize.height > screenSize.height)
 		{
 			frameSize.height = screenSize.height;
 		}
+
 		if (frameSize.width > screenSize.width)
 		{
 			frameSize.width = screenSize.width;
 		}
+
 		setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
-
 		addWindowListener(new WindowAdapter()
-			{
-				public void windowClosing(WindowEvent e)
-				{
-					setVisible(false);
-					dispose();
-				}
-			});
+		{
 
+			public void windowClosing(WindowEvent e)
+			{
+				setVisible(false);
+				dispose();
+			}
+		});
 		initMenubar();
 
-		/// stateViewer = new StateViewer(theAutomaton);
+		// / stateViewer = new StateViewer(theAutomaton);
 		stateViewer = new AutomataStateViewer(helper);
+
 		contentPane.add(stateViewer, BorderLayout.CENTER);
 
-		/// controller = new ExplorerController(stateViewer, theAutomaton);
+		// / controller = new ExplorerController(stateViewer, theAutomaton);
 		controller = new AutomataExplorerController(stateViewer, helper);
+
 		contentPane.add(controller, BorderLayout.SOUTH);
-
 		stateViewer.setController(controller);
-
 		stateViewer.goToInitialState();
 	}
 
 	public void initialize()
 	{
-        setIconImage(Supremica.cornerImage);
+		setIconImage(Supremica.cornerImage);
 		stateViewer.initialize();
 	}
 
-    private void initMenubar()
-    {
-    	setJMenuBar(menuBar);
+	private void initMenubar()
+	{
 
-    	// File
-	    JMenu menuFile = new JMenu();
-	    menuFile.setText("File");
-	    menuFile.setMnemonic(KeyEvent.VK_F);
+		setJMenuBar(menuBar);
+
+		// File
+		JMenu menuFile = new JMenu();
+
+		menuFile.setText("File");
+		menuFile.setMnemonic(KeyEvent.VK_F);
+
 		// File.Close
-	    JMenuItem menuFileClose = new JMenuItem();
-	    menuFileClose.setText("Close");
+		JMenuItem menuFileClose = new JMenuItem();
+
+		menuFileClose.setText("Close");
 		menuFile.add(menuFileClose);
+		menuBar.add(menuFile);
+		menuFileClose.addActionListener(new ActionListener()
+		{
 
-    	menuBar.add(menuFile);
-
-        menuFileClose.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent e)
-            {
+			public void actionPerformed(ActionEvent e)
+			{
 				setVisible(false);
 				dispose();
-            }
-        });
+			}
+		});
 	}
 
 	public void updated(Object o)
 	{
-		/* Trams. FIXA!
-		if (o == theAutomata)
-		{
-			stateViewer.goToInitialState();
-		}
-		*/
+
+		/*
+		 * Trams. FIXA!
+		 * if (o == theAutomata)
+		 * {
+		 *       stateViewer.goToInitialState();
+		 * }
+		 */
 	}
 
 	public void stateAdded(Automaton aut, State q)
@@ -226,10 +231,10 @@ public class AutomataExplorer
 	}
 }
 
-
 class AutomataStateViewer
 	extends JPanel
 {
+
 	private Automata theAutomata;
 	private AutomataSynchronizerHelper helper;
 	private int[] currState;
@@ -244,15 +249,19 @@ class AutomataStateViewer
 
 	public AutomataStateViewer(AutomataSynchronizerHelper helper)
 	{
+
 		setLayout(new BorderLayout());
+
 		theAutomata = helper.getAutomata();
 		this.helper = helper;
 		forwardEvents = new AutomataEventList(this, helper, true);
 		backwardEvents = new AutomataEventList(this, helper, false);
-		/// backwardEvents.setShowStateId(true); // Svårlöst? FIXA!!
+
+		// / backwardEvents.setShowStateId(true); // Svårlöst? FIXA!!
 		eventSplitter = new JSplitPane(JSplitPane.VERTICAL_SPLIT, forwardEvents, backwardEvents);
 		stateDisplayer = new AutomataStateDisplayer(this, helper);
 		stateEventSplitter = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, stateDisplayer, eventSplitter);
+
 		add(stateEventSplitter, BorderLayout.CENTER);
 	}
 
@@ -269,29 +278,40 @@ class AutomataStateViewer
 
 	private void setCurrState(int[] newState, boolean isUndo)
 	{
+
 		if (!isUndo)
 		{
 			if (currState != null)
+			{
 				prevStates.addLast(currState);
+			}
+
 			nextStates.clear();
 		}
+
 		currState = newState;
+
 		update();
 	}
 
 	public void goToInitialState()
 	{
+
 		prevStates.clear();
+
 		currState = null;
+
 		helper.getCoExecuter().setCurrState(AutomataExplorerHelper.getInitialState());
 		setCurrState(AutomataExplorerHelper.getInitialState(), false);
 	}
 
 	public void undoState()
 	{
+
 		if (prevStates.size() > 0)
 		{
 			int[] newState = (int[]) prevStates.removeLast();
+
 			nextStates.addFirst(currState);
 			setCurrState(newState, true);
 		}
@@ -304,9 +324,11 @@ class AutomataStateViewer
 
 	public void redoState()
 	{
+
 		if (nextStates.size() > 0)
 		{
 			int[] newState = (int[]) nextStates.removeFirst();
+
 			prevStates.addLast(currState);
 			setCurrState(newState, true);
 		}
@@ -319,6 +341,7 @@ class AutomataStateViewer
 
 	public void update()
 	{
+
 		// The order of theese are changed, for states to be properly forbidden...
 		forwardEvents.setCurrState(currState);
 		backwardEvents.setCurrState(currState);
@@ -335,6 +358,7 @@ class AutomataStateViewer
 class AutomataEventList
 	extends JPanel
 {
+
 	private boolean forward;
 	private boolean showStateId = false;
 	private Automata theAutomata;
@@ -345,19 +369,21 @@ class AutomataEventList
 
 	public AutomataEventList(AutomataStateViewer stateViewer, AutomataSynchronizerHelper helper, boolean forward)
 	{
+
 		setLayout(new BorderLayout());
 
 		this.stateViewer = stateViewer;
 		this.theAutomata = helper.getAutomata();
 		this.forward = forward;
-
 		eventsList = new AutomataEventListModel(helper, forward);
 		theList = new JList(eventsList);
 
 		JScrollPane scrollPanel = new JScrollPane(theList);
+
 		theList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
 		String label;
+
 		if (forward)
 		{
 			label = "Outgoing events";
@@ -366,29 +392,32 @@ class AutomataEventList
 		{
 			label = "Incoming events";
 		}
+
 		JLabel jLabel = new JLabel(label);
-		//jLabel.setOpaque(true);
-		//jLabel.setBackground(Color.yellow);
+
+		// jLabel.setOpaque(true);
+		// jLabel.setBackground(Color.yellow);
 		add(jLabel, BorderLayout.NORTH);
-
 		add(scrollPanel, BorderLayout.CENTER);
-
 		theList.addMouseListener(new MouseAdapter()
+		{
+
+			public void mouseClicked(MouseEvent e)
 			{
-				public void mouseClicked(MouseEvent e)
+
+				if (e.getClickCount() == 2)
 				{
-					if (e.getClickCount() == 2)
+					int index = theList.locationToIndex(e.getPoint());
+
+					if (index >= 0)
 					{
-						int index = theList.locationToIndex(e.getPoint());
-						if (index >= 0)
-						{
-							int[] newState = eventsList.getStateAt(index);
-							updateStateViewer(newState);
-						}
+						int[] newState = eventsList.getStateAt(index);
+
+						updateStateViewer(newState);
 					}
 				}
 			}
-		);
+		});
 	}
 
 	public void setShowStateId(boolean showStateId)
@@ -398,7 +427,9 @@ class AutomataEventList
 
 	public void setCurrState(int[] currState)
 	{
+
 		this.currState = currState;
+
 		theList.clearSelection();
 		update();
 	}
@@ -417,8 +448,10 @@ class AutomataEventList
 class AutomataEventListModel
 	extends AbstractListModel
 {
+
 	private int[] currState;
-	/// private ArrayList currArcs = new ArrayList();
+
+	// / private ArrayList currArcs = new ArrayList();
 	private int[] events;
 	private int eventAmount = 0;
 	private boolean forward;
@@ -429,6 +462,7 @@ class AutomataEventListModel
 
 	public AutomataEventListModel(AutomataSynchronizerHelper helper, boolean forward)
 	{
+
 		this.forward = forward;
 		this.helper = helper;
 		this.theAutomata = helper.getAutomata();
@@ -437,7 +471,9 @@ class AutomataEventListModel
 
 	public void setCurrState(int[] currState)
 	{
+
 		this.currState = currState;
+
 		update();
 	}
 
@@ -448,37 +484,45 @@ class AutomataEventListModel
 
 	public void update()
 	{
+
 		AutomataOnlineSynchronizer onlineSynchronizer = helper.getCoExecuter();
 
 		if (forward)
+		{
 			events = onlineSynchronizer.getOutgoingEvents(currState);
+		}
 		else
+		{
 			events = onlineSynchronizer.getIncomingEvents(currState);
+		}
 
 		eventAmount = 0;
+
 		while (events[eventAmount] != Integer.MAX_VALUE)
+		{
 			eventAmount++;
+		}
 
 		fireContentsChanged(this, 0, eventAmount - 1);
 
 		/*
-		Iterator arcIt;
-		if (forward)
-		{
-			arcIt = currState.outgoingArcsIterator();
-		}
-		else
-		{
-			arcIt = currState.incomingArcsIterator();
-		}
-		currArcs.clear();
-		while (arcIt.hasNext())
-		{
-			Arc currArc = (Arc)arcIt.next();
-			currArcs.add(currArc);
-		}
-		fireContentsChanged(this, 0, currArcs.size() - 1);
-		*/
+		 * Iterator arcIt;
+		 * if (forward)
+		 * {
+		 *       arcIt = currState.outgoingArcsIterator();
+		 * }
+		 * else
+		 * {
+		 *       arcIt = currState.incomingArcsIterator();
+		 * }
+		 * currArcs.clear();
+		 * while (arcIt.hasNext())
+		 * {
+		 *       Arc currArc = (Arc)arcIt.next();
+		 *       currArcs.add(currArc);
+		 * }
+		 * fireContentsChanged(this, 0, currArcs.size() - 1);
+		 */
 	}
 
 	public int getSize()
@@ -488,22 +532,23 @@ class AutomataEventListModel
 
 	public Object getElementAt(int index)
 	{
-		/*
-		/// Arc currArc = (Arc)currArcs.get(index);
-		String eventId = currArc.getEventId(events[index]);
-		org.supremica.automata.Event currEvent;
-		try
-		{
-			currEvent = theAlphabet.getEventWithId(eventId);
-		}
-		catch (Exception e)
-		{
-			System.err.println("Error: Could not find " + eventId + " in alphabet!\n");
-			return null;
-		}
-		*/
 
+		/*
+		 * /// Arc currArc = (Arc)currArcs.get(index);
+		 * String eventId = currArc.getEventId(events[index]);
+		 * org.supremica.automata.Event currEvent;
+		 * try
+		 * {
+		 *       currEvent = theAlphabet.getEventWithId(eventId);
+		 * }
+		 * catch (Exception e)
+		 * {
+		 *       System.err.println("Error: Could not find " + eventId + " in alphabet!\n");
+		 *       return null;
+		 * }
+		 */
 		org.supremica.automata.Event currEvent;
+
 		try
 		{
 			currEvent = theAlphabet.getEventWithIndex(events[index]);
@@ -511,58 +556,64 @@ class AutomataEventListModel
 		catch (Exception e)
 		{
 			System.err.println("Error: Could not find event in alphabet!\n");
+
 			return null;
 		}
 
 		StringBuffer responseString = new StringBuffer();
+
 		if (!currEvent.isControllable())
 		{
 			responseString.append("!");
 		}
+
 		responseString.append(currEvent.getLabel());
 
 		/*
-		if (showState)
-		{
-			int[] currState;
-			if (forward)
-			{
-				currState = currArc.getToState();
-			}
-			else
-			{
-				currState = currArc.getFromState();
-			}
-			responseString.append(" [state name: " + currState.getName() + "]");
-		}
-		*/
-
-	 	return responseString.toString();
+		 * if (showState)
+		 * {
+		 *       int[] currState;
+		 *       if (forward)
+		 *       {
+		 *               currState = currArc.getToState();
+		 *       }
+		 *       else
+		 *       {
+		 *               currState = currArc.getFromState();
+		 *       }
+		 *       responseString.append(" [state name: " + currState.getName() + "]");
+		 * }
+		 */
+		return responseString.toString();
 	}
 
 	public int[] getStateAt(int index)
 	{
+
 		AutomataOnlineSynchronizer onlineSynchronizer = helper.getCoExecuter();
+
 		return onlineSynchronizer.doTransition(events[index]);
+
 		/*
-		Arc currArc = (Arc)currArcs.get(index);
-		State newState;
-		if (forward)
-		{
-			newState = currArc.getToState();
-		}
-		else
-		{
-			newState = currArc.getFromState();
-		}
-		return newState;
-		*/
+		 * Arc currArc = (Arc)currArcs.get(index);
+		 * State newState;
+		 * if (forward)
+		 * {
+		 *       newState = currArc.getToState();
+		 * }
+		 * else
+		 * {
+		 *       newState = currArc.getFromState();
+		 * }
+		 * return newState;
+		 */
 	}
 }
 
 class AutomataStateDisplayer
 	extends JPanel
 {
+
 	private AutomataStateViewer stateViewer;
 	private Automata theAutomata;
 	private JCheckBox isInitialBox = new JCheckBox("initial");
@@ -575,41 +626,53 @@ class AutomataStateDisplayer
 
 	public AutomataStateDisplayer(AutomataStateViewer stateViewer, AutomataSynchronizerHelper helper)
 	{
+
 		setLayout(new BorderLayout());
+
 		this.stateViewer = stateViewer;
 		this.theAutomata = helper.getAutomata();
-		this.helper = helper; // New!
+		this.helper = helper;		// New!
 
 		JLabel header = new JLabel("Current composite state");
-        //header.setOpaque(true);
-        //header.setBackground(Color.yellow);
-        add(header, BorderLayout.NORTH);
 
-        Box statusBox = new Box(BoxLayout.Y_AXIS);
-        isInitialBox.setEnabled(false);
+		// header.setOpaque(true);
+		// header.setBackground(Color.yellow);
+		add(header, BorderLayout.NORTH);
+
+		Box statusBox = new Box(BoxLayout.Y_AXIS);
+
+		isInitialBox.setEnabled(false);
 		isInitialBox.setBackground(Color.white);
-        statusBox.add(isInitialBox);
-        isAcceptingBox.setEnabled(false);
+		statusBox.add(isInitialBox);
+		isAcceptingBox.setEnabled(false);
 		isAcceptingBox.setBackground(Color.white);
-        statusBox.add(isAcceptingBox);
-        isForbiddenBox.setEnabled(false);
+		statusBox.add(isAcceptingBox);
+		isForbiddenBox.setEnabled(false);
 		isForbiddenBox.setBackground(Color.white);
-        statusBox.add(isForbiddenBox);
-        statusBox.add(stateCost);
-        statusBox.add(stateId);
-        statusBox.add(stateName);
+		statusBox.add(isForbiddenBox);
+		statusBox.add(stateCost);
+		statusBox.add(stateId);
+		statusBox.add(stateName);
 
-        JScrollPane boxScroller = new JScrollPane(statusBox);
-        add(boxScroller, BorderLayout.CENTER);
+		JScrollPane boxScroller = new JScrollPane(statusBox);
+
+		add(boxScroller, BorderLayout.CENTER);
+
 		JViewport vp = boxScroller.getViewport();
+
 		vp.setBackground(Color.white);
 	}
 
 	public void setCurrState(int[] currState)
 	{
+
 		helper.addStatus(currState);
+
 		if (!helper.getCoExecuter().isControllable())
-			helper.setForbidden(currState,true);
+		{
+			helper.setForbidden(currState, true);
+		}
+
 		// isInitialBox.setSelected(currState.isInitial());
 		// isAcceptingBox.setSelected(currState.isAccepting());
 		// isForbiddenBox.setSelected(currState.isForbidden());
@@ -619,6 +682,7 @@ class AutomataStateDisplayer
 		isInitialBox.setSelected(AutomataIndexFormHelper.isInitial(currState));
 		isAcceptingBox.setSelected(AutomataIndexFormHelper.isAccepting(currState));
 		isForbiddenBox.setSelected(AutomataIndexFormHelper.isForbidden(currState));
+
 		// stateCost.setText("cost: Gratis?");
 		// stateId.setText("id: Hemligt?");
 		// stateName.setText("name: Hemligt?");
@@ -628,6 +692,7 @@ class AutomataStateDisplayer
 class AutomataExplorerController
 	extends JPanel
 {
+
 	private AutomataStateViewer stateViewer;
 	private Automata theAutomata;
 	private JButton undoButton;
@@ -635,47 +700,55 @@ class AutomataExplorerController
 
 	public AutomataExplorerController(AutomataStateViewer stateViewer, AutomataSynchronizerHelper synchHelper)
 	{
+
 		setLayout(new BorderLayout());
 
 		this.stateViewer = stateViewer;
 		this.theAutomata = synchHelper.getAutomata();
 
 		Box redoBox = new Box(BoxLayout.X_AXIS);
+
 		undoButton = new JButton("Undo");
 		redoButton = new JButton("Redo");
+
 		redoBox.add(undoButton);
 		redoBox.add(redoButton);
 		add(redoBox, BorderLayout.NORTH);
 
 		JButton resetButton = new JButton("Reset");
-        add(resetButton, BorderLayout.CENTER);
-        undoButton.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-				undo_actionPerformed(e);
-            }
-        });
-        redoButton.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-				redo_actionPerformed(e);
-            }
-        });
 
-    	resetButton.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-                reset_actionPerformed(e);
-            }
-        });
+		add(resetButton, BorderLayout.CENTER);
+		undoButton.addActionListener(new ActionListener()
+		{
+
+			public void actionPerformed(ActionEvent e)
+			{
+				undo_actionPerformed(e);
+			}
+		});
+		redoButton.addActionListener(new ActionListener()
+		{
+
+			public void actionPerformed(ActionEvent e)
+			{
+				redo_actionPerformed(e);
+			}
+		});
+		resetButton.addActionListener(new ActionListener()
+		{
+
+			public void actionPerformed(ActionEvent e)
+			{
+				reset_actionPerformed(e);
+			}
+		});
 	}
 
 	public void reset_actionPerformed(ActionEvent e)
 	{
+
 		stateViewer.goToInitialState();
+
 		// stateViewer.initialize();
 	}
 
@@ -698,6 +771,7 @@ class AutomataExplorerController
 
 class AutomataExplorerHelper
 {
+
 	private static int[] initialState;
 
 	public static void setInitialState(int[] state)
@@ -707,23 +781,24 @@ class AutomataExplorerHelper
 
 	public static int[] getInitialState()
 	{
+
 		// return (int[]) initialState.clone();
 		return initialState;
 	}
 }
 
 /*
-class Transition
-{
-	private int[] fromState;
-	private int event;
-	private int[] toState;
-
-	public Transition(int[] fromState, int event, int[] toState)
-	{
-		this.fromState = fromState;
-		this.event = event;
-		this.toState = toState;
-	}
-}
-*/
+ * class Transition
+ * {
+ *       private int[] fromState;
+ *       private int event;
+ *       private int[] toState;
+ *
+ *       public Transition(int[] fromState, int event, int[] toState)
+ *       {
+ *               this.fromState = fromState;
+ *               this.event = event;
+ *               this.toState = toState;
+ *       }
+ * }
+ */

@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,16 +47,21 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.automata.algorithms;
 
+
+
 import java.io.*;
+
 import java.util.*;
+
 import org.supremica.automata.*;
+
 
 public class AutomatonToDot
 	implements AutomataSerializer
 {
+
 	private Automaton aut;
 	private boolean leftToRight = false;
 	private boolean withLabel = true;
@@ -91,31 +97,38 @@ public class AutomatonToDot
 	{
 		this.useColors = useColors;
 	}
+
 	private String getColor(State s)
 	{
+
 		if (!useColors)
 		{
 			return "";
 		}
-		if (s.isAccepting() && !s.isForbidden())
+
+		if (s.isAccepting() &&!s.isForbidden())
 		{
 			return ", color = green";
 		}
+
 		if (s.isForbidden())
 		{
 			return ", color = red";
 		}
+
 		return "";
 	}
 
 	public void serialize(PrintWriter pw)
- 		throws Exception
+		throws Exception
 	{
+
 		Vector initialStates = new Vector();
 		final String initPrefix = "__init_";
 
 		pw.println("digraph state_automaton {");
 		pw.println("\tcenter = true;");
+
 		if (leftToRight)
 		{
 			pw.println("\trankdir = LR;");
@@ -127,19 +140,23 @@ public class AutomatonToDot
 			pw.println("}");
 			pw.flush();
 			pw.close();
+
 			return;
 		}
+
 		Iterator states = aut.stateIterator();
+
 		while (states.hasNext())
 		{
-			State state = (State)states.next();
+			State state = (State) states.next();
 
 			if (state.isInitial())
 			{
 				initialStates.addElement(state);
 				pw.println("\tnode [shape = plaintext] \"" + initPrefix + state.getId() + "\";");
 			}
-			if (state.isAccepting() && !state.isForbidden())
+
+			if (state.isAccepting() &&!state.isForbidden())
 			{
 				if (withCircles)
 				{
@@ -150,11 +167,13 @@ public class AutomatonToDot
 					pw.println("\tnode [shape = ellipse] \"" + state.getId() + "\";");
 				}
 			}
+
 			if (state.isForbidden())
 			{
 				pw.println("\tnode [shape = box] \"" + state.getId() + "\";");
 			}
 		}
+
 		if (withCircles)
 		{
 			pw.println("\tnode [shape = circle];");
@@ -163,25 +182,32 @@ public class AutomatonToDot
 		{
 			pw.println("\tnode [shape = plaintext];");
 		}
+
 		for (int i = 0; i < initialStates.size(); i++)
 		{
-			String stateId = ((State)initialStates.elementAt(i)).getId();
+			String stateId = ((State) initialStates.elementAt(i)).getId();
+
 			pw.println("\t\"" + initPrefix + stateId + "\" [label = \"\"]; ");
 			pw.println("\t\"" + initPrefix + stateId + "\" [height = \"0\"]; ");
 			pw.println("\t\"" + initPrefix + stateId + "\" [width = \"0\"]; ");
 			pw.println("\t\"" + initPrefix + stateId + "\" -> \"" + stateId + "\";");
 		}
+
 		Alphabet theAlphabet = aut.getAlphabet();
 
 		states = aut.stateIterator();
+
 		while (states.hasNext())
 		{
-			State sourceState = (State)states.next();
+			State sourceState = (State) states.next();
+
 			pw.print("\t\"" + sourceState.getId() + "\" [label = \"");
+
 			if (withLabel)
 			{
 				pw.print(sourceState.getName());
 			}
+
 			pw.println("\"" + getColor(sourceState) + "]; ");
 
 			for (Iterator arcSets = sourceState.outgoingArcSetIterator(); arcSets.hasNext(); )
@@ -189,18 +215,30 @@ public class AutomatonToDot
 				ArcSet currArcSet = (ArcSet) arcSets.next();
 				State fromState = currArcSet.getFromState();
 				State toState = currArcSet.getToState();
+
 				pw.print("\t\"" + fromState.getId() + "\" -> \"" + toState.getId());
 				pw.print("\" [ label = \"");
-				for (Iterator arcIt = currArcSet.iterator(); arcIt.hasNext();)
+
+				for (Iterator arcIt = currArcSet.iterator(); arcIt.hasNext(); )
 				{
-					Arc currArc = (Arc)arcIt.next();
+					Arc currArc = (Arc) arcIt.next();
 					Event thisEvent = theAlphabet.getEventWithId(currArc.getEventId());
+
 					if (!thisEvent.isControllable())
+					{
 						pw.print("!");
+					}
+
 					if (!thisEvent.isPrioritized())
+					{
 						pw.print("?");
+					}
+
 					if (thisEvent.isImmediate())
+					{
 						pw.print("#");
+					}
+
 					pw.print(thisEvent.getLabel());
 
 					if (arcIt.hasNext())
@@ -208,27 +246,28 @@ public class AutomatonToDot
 						pw.print("\\n");
 					}
 				}
+
 				pw.println("\" ];");
 			}
 		}
-/*
-		// An attemp to always start at the initial state.
-		// The problem is that a rectangle is drawn around the initial state.
-		Iterator stateIt = initialStates.iterator();
-		while(stateIt.hasNext())
-		{
-			State currState = (State)stateIt.next();
-			pw.println("\t{ rank = min ;");
-			pw.println("\t\t" + initPrefix + currState.getId() + ";");
-			pw.println("\t\t" + currState.getId() + ";");
-			pw.println("\t}");
-		}
-*/
+
+		/*
+		 *               // An attemp to always start at the initial state.
+		 *               // The problem is that a rectangle is drawn around the initial state.
+		 *               Iterator stateIt = initialStates.iterator();
+		 *               while(stateIt.hasNext())
+		 *               {
+		 *                       State currState = (State)stateIt.next();
+		 *                       pw.println("\t{ rank = min ;");
+		 *                       pw.println("\t\t" + initPrefix + currState.getId() + ";");
+		 *                       pw.println("\t\t" + currState.getId() + ";");
+		 *                       pw.println("\t}");
+		 *               }
+		 */
 		pw.println("}");
 		pw.flush();
 		pw.close();
 	}
-
 
 	public void serialize(String fileName)
 		throws Exception

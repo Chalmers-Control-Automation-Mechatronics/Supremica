@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,54 +47,55 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.automata.algorithms;
+
+
 
 import org.supremica.automata.*;
 import org.supremica.gui.*;
+
 import org.apache.log4j.*;
 
 import java.util.ArrayList;
 
-/**  
+
+/**
  * @deprecated DYNG-DEPRECATED, ALLTIHOP, NU ANVÄNDS AutomataSynchronizerExecuter TILL ALLT SÅN'T HÄR TRAMS
  */
 public final class AutomataFastControllabilityCheckExecuter
 	extends Thread
 {
-	private static Category thisCategory = LogDisplay.createCategory(AutomataFastControllabilityCheckExecuter.class.getName());
 
+	private static Category thisCategory = LogDisplay.createCategory(AutomataFastControllabilityCheckExecuter.class.getName());
 	private final AutomataSynchronizerHelper helper;
 	private final AutomataIndexForm indexForm;
+	private final int nbrOfAutomata;
+	private final int nbrOfEvents;
+	private final int[][][] nextStateTable;
+	private final int[][][] outgoingEventsTable;
+	private final boolean[][] prioritizedEventsTable;
+	private final boolean[] typeIsPlantTable;
+	private final boolean[] controllableEventsTable;
 
-    private final int nbrOfAutomata;
-    private final int nbrOfEvents;
+	// private final boolean[] prioritizedEventInResultAutomaton;
+	private int[][] currOutgoingEvents;
+	private int[] currOutgoingEventsIndex;
+	private int[] currPlantAutomata;
+	private int[] automataIndices;
+	private int[] nextState;
+	private int[] currEnabledEvents;
 
-    private final int[][][] nextStateTable;
-    private final int[][][] outgoingEventsTable;
-    private final boolean[][] prioritizedEventsTable;
-    private final boolean[] typeIsPlantTable;
-    private final boolean[] controllableEventsTable;
-    //	private final boolean[] prioritizedEventInResultAutomaton;
-
-    private int[][] currOutgoingEvents;
-    private int[] currOutgoingEventsIndex;
-    private int[] currPlantAutomata;
-    private int[] automataIndices;
-    private int[] nextState;
-    private int[] currEnabledEvents;
-    //	private int[] currPlantEnabledEvents;
-    private boolean controllableState;
-
+	// private int[] currPlantEnabledEvents;
+	private boolean controllableState;
 	private int problemPlant = Integer.MAX_VALUE;
 	private int problemEvent = Integer.MAX_VALUE;
-
 	private StateMemorizer potentiallyUncontrollableStates;
 
-    public AutomataFastControllabilityCheckExecuter(AutomataSynchronizerHelper synchronizerHelper)
-    {
-        helper = synchronizerHelper;
-        indexForm = helper.getAutomataIndexForm();
+	public AutomataFastControllabilityCheckExecuter(AutomataSynchronizerHelper synchronizerHelper)
+	{
+
+		helper = synchronizerHelper;
+		indexForm = helper.getAutomataIndexForm();
 		nbrOfAutomata = helper.getAutomata().size();
 		nbrOfEvents = helper.getAutomaton().getAlphabet().size();
 		nextStateTable = indexForm.getNextStateTable();
@@ -102,11 +104,12 @@ public final class AutomataFastControllabilityCheckExecuter
 		typeIsPlantTable = indexForm.getTypeIsPlantTable();
 		controllableEventsTable = indexForm.getControllableEventsTable();
 		potentiallyUncontrollableStates = helper.getStateMemorizer();
-    }
+	}
 
 	// Select two automata
 	public void selectTwoAutomata(int plantIndex, int supervisorIndex)
 	{
+
 		automataIndices = new int[2];
 		automataIndices[0] = plantIndex;
 		automataIndices[1] = supervisorIndex;
@@ -115,7 +118,9 @@ public final class AutomataFastControllabilityCheckExecuter
 	// Select some automata
 	public void selectAutomata(ArrayList automataToBeSelected)
 	{
+
 		automataIndices = new int[automataToBeSelected.size()];
+
 		for (int i = 0; i < automataToBeSelected.size(); i++)
 		{
 			automataIndices[i] = ((Automaton) automataToBeSelected.get(i)).getIndex();
@@ -126,25 +131,29 @@ public final class AutomataFastControllabilityCheckExecuter
 	// A more narrow selection can be made in many cases
 	public void selectAllAutomata()
 	{
+
 		automataIndices = new int[nbrOfAutomata];
+
 		for (int i = 0; i < nbrOfAutomata; i++)
 		{
 			automataIndices[i] = i;
 		}
 	}
 
-    private final void initialize()
-    {
+	private final void initialize()
+	{
+
 		currOutgoingEvents = new int[nbrOfAutomata][];
 		currOutgoingEventsIndex = new int[nbrOfAutomata];
+		nextState = new int[nbrOfAutomata + 1];		// +1 status field
+		currEnabledEvents = new int[nbrOfEvents + 1];		// Always end with Integer.MAX_VALUE
 
-		nextState = new int[nbrOfAutomata + 1]; // +1 status field
-		currEnabledEvents = new int[nbrOfEvents + 1]; // Always end with Integer.MAX_VALUE
-		//		currPlantEnabledEvents = new int[nbrOfEvents + 1]; // Always end with Integer.MAX_VALUE
-    }
+		// currPlantEnabledEvents = new int[nbrOfEvents + 1]; // Always end with Integer.MAX_VALUE
+	}
 
-    private final void enabledEvents(int[] currState)
-    {
+	private final void enabledEvents(int[] currState)
+	{
+
 		int currMinEventIndex = Integer.MAX_VALUE;
 		int nbrOfSelectedAutomata = automataIndices.length;
 
@@ -153,21 +162,21 @@ public final class AutomataFastControllabilityCheckExecuter
 		// currOutgoingEventsIndex.
 		// Also find the smallest event index possible from
 		// the current state.
-		for(int i = 0; i < nbrOfSelectedAutomata; i++)
+		for (int i = 0; i < nbrOfSelectedAutomata; i++)
 		{
+
 			// Initialization part
 			int currAutIndex = automataIndices[i];
 			int currSingleStateIndex = currState[currAutIndex];
 
-			currOutgoingEvents[currAutIndex] =
-				outgoingEventsTable[currAutIndex][currSingleStateIndex];
-
+			currOutgoingEvents[currAutIndex] = outgoingEventsTable[currAutIndex][currSingleStateIndex];
 			currOutgoingEventsIndex[currAutIndex] = 0;
 
 			// Find the event with the smallest index.
 			// The last element currOutgoingEvents[currAutIndex]
 			// is always Integer.MAX_VALUE
 			int currEventIndex = currOutgoingEvents[currAutIndex][0];
+
 			if (currEventIndex < currMinEventIndex)
 			{
 				currMinEventIndex = currEventIndex;
@@ -176,87 +185,95 @@ public final class AutomataFastControllabilityCheckExecuter
 
 		// Compute all events that are enabled in the current state
 		int nbrOfEnabledEvents = 0;
-		//		int nbrOfPlantEnabledEvents = 0;
+
+		// int nbrOfPlantEnabledEvents = 0;
 		boolean thisEventOk;
 		boolean thisPlantEventOk;
 		boolean canExecuteInPlant;
-		controllableState = true;
-		while (currMinEventIndex < Integer.MAX_VALUE)
-	    {
-			int currEventIndex = currMinEventIndex;
-			currMinEventIndex = Integer.MAX_VALUE;
 
+		controllableState = true;
+
+		while (currMinEventIndex < Integer.MAX_VALUE)
+		{
+			int currEventIndex = currMinEventIndex;
+
+			currMinEventIndex = Integer.MAX_VALUE;
 			thisEventOk = true;
 			thisPlantEventOk = true;
 			canExecuteInPlant = false;
+
 			int currAutIndex = 0;
 			int currAutEventIndex = 0;
 
 			// Check that this event is possible in all automata
 			// must be ready to execute this event
 			for (int i = 0; i < nbrOfSelectedAutomata; i++)
-		    {
+			{
 				currAutIndex = automataIndices[i];
 
 				// This is the index of the "next" event in the current automaton
-				currAutEventIndex =
-					currOutgoingEvents[currAutIndex][currOutgoingEventsIndex[currAutIndex]];
+				currAutEventIndex = currOutgoingEvents[currAutIndex][currOutgoingEventsIndex[currAutIndex]];
 
 				if (prioritizedEventsTable[currAutIndex][currEventIndex])
-			    { // The event is prioritized in currAutomaton
+				{		// The event is prioritized in currAutomaton
 					if (!(currEventIndex == currAutEventIndex))
-				    {
+					{
+
 						// Then currIndex (the event) must also be the
 						// current event in this automaton
 						thisEventOk = false;
 
 						if (typeIsPlantTable[currAutIndex])
-					    {
+						{
+
 							// Then currIndex (the event) must also be the
 							// current event in this automaton
 							thisPlantEventOk = false;
-					    }
-				    }
-			    }
+						}
+					}
+				}
 
 				// Check if this can be executed in a plant
 				if (!canExecuteInPlant && typeIsPlantTable[currAutIndex])
-			    {
+				{
 					if (currEventIndex == currAutEventIndex)
-				    {
+					{
+
 						// Then currIndex (the event) must also be the
 						// current event in this automaton
 						canExecuteInPlant = true;
-				    }
-			    }
+					}
+				}
 
 				// If the automata can execute the current event then
 				// find the next event for this automaton and state
 				// Independently of the alphabets!
 				if (currEventIndex == currAutEventIndex)
-			    { // Point to the next index;
+				{		// Point to the next index;
 					int tmpIndex = currOutgoingEventsIndex[currAutIndex];
+
 					currOutgoingEventsIndex[currAutIndex] = ++tmpIndex;
-					currAutEventIndex =
-						currOutgoingEvents[currAutIndex][tmpIndex];
-			    }
+					currAutEventIndex = currOutgoingEvents[currAutIndex][tmpIndex];
+				}
 
 				// Find the new minimum index
 				if (currAutEventIndex < currMinEventIndex)
 				{
 					currMinEventIndex = currAutEventIndex;
 				}
-		    }
+			}
 
 			if (thisEventOk)
-		    {
+			{
 				currEnabledEvents[nbrOfEnabledEvents++] = currEventIndex;
-		    }
+			}
 
-			if (!thisEventOk && canExecuteInPlant && thisPlantEventOk && !controllableEventsTable[currEventIndex])
+			if (!thisEventOk && canExecuteInPlant && thisPlantEventOk &&!controllableEventsTable[currEventIndex])
 			{
 				controllableState = false;
+
 				helper.setAutomataIsControllable(false);
+
 				// FIXA (vill ha fler sabbande händelser, i en array, stuk)
 				problemPlant = currAutIndex;
 				problemEvent = currEventIndex;
@@ -266,27 +283,30 @@ public final class AutomataFastControllabilityCheckExecuter
 		// Always add integer.MAX_VALUE as the last element
 		// currEnabledEvents[nbrOfEnabledEvents++] = Integer.MAX_VALUE;
 		currEnabledEvents[nbrOfEnabledEvents] = Integer.MAX_VALUE;
-    }
+	}
 
-    public void run()
-    {
-    	initialize();
+	public void run()
+	{
 
-        // Get the first state to process
-       	int[] currState = helper.getStateToProcess();
+		initialize();
+
+		// Get the first state to process
+		int[] currState = helper.getStateToProcess();
 
 		// main loop
-     	while (currState != null)
-	    {
+		while (currState != null)
+		{
 			enabledEvents(currState);
 
 			if (controllableState)
 			{
 				int i = 0;
 				int currEventIndex = currEnabledEvents[i];
+
 				// Handle all events
 				while (currEventIndex != Integer.MAX_VALUE)
 				{
+
 					// Generate an array that contains the indicies of each state
 					System.arraycopy(currState, 0, nextState, 0, currState.length);
 
@@ -294,14 +314,15 @@ public final class AutomataFastControllabilityCheckExecuter
 					for (int j = 0; j < automataIndices.length; j++)
 					{
 						int currAutomatonIndex = automataIndices[j];
-						int currSingleNextState =
-							nextStateTable[currAutomatonIndex][currState[currAutomatonIndex]][currEventIndex];
+						int currSingleNextState = nextStateTable[currAutomatonIndex][currState[currAutomatonIndex]][currEventIndex];
+
 						// Jump in all automata that have this event defined.
 						if (currSingleNextState != Integer.MAX_VALUE)
 						{
 							nextState[currAutomatonIndex] = currSingleNextState;
 						}
 					}
+
 					// Add this state to the automaton
 					// and include it in the queue of states waiting for
 					// processing if it has not been processed before
@@ -314,216 +335,238 @@ public final class AutomataFastControllabilityCheckExecuter
 						System.err.println(e);
 						System.exit(0);
 					}
+
 					currEventIndex = currEnabledEvents[++i];
 				}
 			}
 			else
 			{
+
 				// We now know that there is an uncontrollable state
 				// We'd like to remember this state and later on try to show that
 				// it will be excluded in the total synchronization or not
 				potentiallyUncontrollableStates.add(automataIndices, currState, problemPlant, problemEvent);
 			}
-			currState = helper.getStateToProcess();
-	    }
-    }
 
-    public void buildAutomaton()
-    {
-        Automaton theAutomaton = helper.getAutomaton();
-        theAutomaton.setName("regaut");
-        int[][] currStateTable = helper.getStateTable();
+			currState = helper.getStateToProcess();
+		}
+	}
+
+	public void buildAutomaton()
+	{
+
+		Automaton theAutomaton = helper.getAutomaton();
+
+		theAutomaton.setName("regaut");
+
+		int[][] currStateTable = helper.getStateTable();
 		Alphabet theAlphabet = theAutomaton.getAlphabet();
 
-        // Create all states
+		// Create all states
 		for (int i = 0; i < currStateTable.length; i++)
-	    {
+		{
 			if (currStateTable[i] != null)
-		    {
+			{
 				int[] currState = currStateTable[i];
-    			State newState = new State();
+				State newState = new State();
 
-    			newState.setIndex(i);
+				newState.setIndex(i);
 
-          		boolean longformId = true;
-       			if (longformId)
-			    {
+				boolean longformId = true;
+
+				if (longformId)
+				{
 					State[][] stateTable = indexForm.getStateTable();
 					StringBuffer sb = new StringBuffer();
-					//					for (int j = 0; j < currState.length; j++)
-					//    				{
+
+					// for (int j = 0; j < currState.length; j++)
+					// {
 					// System.out.print(currState[j] + " ");
-					//            			sb.append(stateTable[j][currState[j]].getId());
-					//					}
+					// sb.append(stateTable[j][currState[j]].getId());
+					// }
 					// System.out.println("");
 					for (int j = 0; j < currState.length - 1; j++)
-				    {
+					{
+
 						// System.out.println(stateTable[j][currState[j]]);
 						sb.append(stateTable[j][currState[j]].getId());
-				    }
-     				newState.setId(sb.toString());
-			    }
+					}
+
+					newState.setId(sb.toString());
+				}
 				else
-			    {
-       				newState.setId("q" + i);
-			    }
+				{
+					newState.setId("q" + i);
+				}
+
 				newState.setName(newState.getId());
 				newState.setInitial(AutomataIndexFormHelper.isInitial(currState));
 				newState.setAccepting(AutomataIndexFormHelper.isAccepting(currState));
 				newState.setForbidden(AutomataIndexFormHelper.isForbidden(currState));
 				newState.setFirst(AutomataIndexFormHelper.isFirst(currState));
 				newState.setLast(AutomataIndexFormHelper.isLast(currState));
-
 				theAutomaton.addState(newState);
-		    }
-	    }
+			}
+		}
 
-        // Create all transitions
+		// Create all transitions
 		for (int k = 0; k < currStateTable.length; k++)
-	    {
- 			if (currStateTable[k] != null)
-		    {
- 				int[] currState = currStateTable[k];
-    			State thisState = theAutomaton.getStateWithIndex(k);
+		{
+			if (currStateTable[k] != null)
+			{
+				int[] currState = currStateTable[k];
+				State thisState = theAutomaton.getStateWithIndex(k);
 
 				enabledEvents(currState);
 
-		      	int i = 0;
-		      	int currEventIndex = currEnabledEvents[i];
+				int i = 0;
+				int currEventIndex = currEnabledEvents[i];
 
-         		// Handle all events
-		        while (currEventIndex != Integer.MAX_VALUE)
-			    {
+				// Handle all events
+				while (currEventIndex != Integer.MAX_VALUE)
+				{
+
 					// Generate an array that contains the indicies of each state
-		         	System.arraycopy(currState, 0, nextState, 0, currState.length);
+					System.arraycopy(currState, 0, nextState, 0, currState.length);
 
-		    		// Iterate over all automata to construct the new state
+					// Iterate over all automata to construct the new state
 					for (int j = 0; j < automataIndices.length; j++)
-				    {
-		           		int currAutomatonIndex = automataIndices[j];
-						int currSingleNextState =
-							nextStateTable[currAutomatonIndex][currState[currAutomatonIndex]][currEventIndex];
-		           		// Jump in all automata that have this event active.
+					{
+						int currAutomatonIndex = automataIndices[j];
+						int currSingleNextState = nextStateTable[currAutomatonIndex][currState[currAutomatonIndex]][currEventIndex];
+
+						// Jump in all automata that have this event active.
 						if (currSingleNextState != Integer.MAX_VALUE)
-					    {
+						{
 							nextState[currAutomatonIndex] = currSingleNextState;
-					    }
-				    }
+						}
+					}
 
 					try
-				    {
+					{
+
 						// Check if nextState exists
 						int nextIndex = helper.getStateIndex(nextState);
+
 						if (nextIndex >= 0)
-					    {
+						{
 							State nextState = theAutomaton.getStateWithIndex(nextIndex);
 							Event theEvent = theAlphabet.getEventWithIndex(currEventIndex);
-       						Arc newArc = new Arc(thisState, nextState, theEvent.getId());
+							Arc newArc = new Arc(thisState, nextState, theEvent.getId());
+
 							theAutomaton.addArc(newArc);
-					    }
-				    }
+						}
+					}
 					catch (Exception e)
-				    {
-		        		System.err.println(e);
-		           		System.exit(0);
-				    }
+					{
+						System.err.println(e);
+						System.exit(0);
+					}
 
-		         	currEventIndex = currEnabledEvents[++i];
-			    }
-		    }
-	    }
-    }
-	
-    public String printArray(int[] theArray)
-    {
+					currEventIndex = currEnabledEvents[++i];
+				}
+			}
+		}
+	}
+
+	public String printArray(int[] theArray)
+	{
+
 		StringBuffer sb = new StringBuffer();
+
 		sb.append("[");
+
 		for (int i = 0; i < theArray.length; i++)
-	    {
+		{
 			sb.append(theArray[i]);
-			if (i != theArray.length -1)
-		    {
+
+			if (i != theArray.length - 1)
+			{
 				sb.append(", ");
-		    }
-	    }
+			}
+		}
+
 		sb.append("]");
+
 		return sb.toString();
-    }
+	}
 
-    /*
-      public int[][] previousStates(int[] state, int currEventIndex)
-      {
-      int[][][][] prevStatesTable = theAutomataIndexForm.getPrevStatesTable();
-      int[] nbrOfPrevStates = int[nbrOfAutomata];
-      int[] currIndexOfPrevStates = int[nbrOfAutomata];
-      int[] currPrevState = int[nbrOfAutomata + 1];
+	/*
+	 * public int[][] previousStates(int[] state, int currEventIndex)
+	 * {
+	 * int[][][][] prevStatesTable = theAutomataIndexForm.getPrevStatesTable();
+	 * int[] nbrOfPrevStates = int[nbrOfAutomata];
+	 * int[] currIndexOfPrevStates = int[nbrOfAutomata];
+	 * int[] currPrevState = int[nbrOfAutomata + 1];
+	 *
+	 * // First compute the maximum nbr of previous states
+	 * int maxNbrOfPreviousStates = 1;
+	 * for (int i = 1; i < state.length - 1; i++)
+	 * {
+	 * // ToDo Check if this automaton is among the selected
+	 *
+	 * int currAutomatonIndex = i;
+	 * int currStateIndex = state[currAutomatonIndex];
+	 * int[] prevStates = prevStatesTable[currAutomatonIndex][currStateIndex][currEventIndex];
+	 * if (prevStates != null)
+	 * {
+	 * int currNbrOfPreviousStates = prevStates[prevStates.length - 1];
+	 * nbrOfPrevStates[i] = currNbrOfPreviousStates;
+	 * if (currNbrOfPreviousStates > 0)
+	 * {
+	 * currIndexOfPrevStates
+	 * }
+	 * else
+	 * {
+	 * currIndexOfPreviousState[i] = 0;
+	 * }
+	 * maxNbrOfPreviousStates = maxNbrOfPreviousStates * currNbrOfPreviousStates;
+	 * }
+	 * }
+	 *
+	 * int[][] previousStates = new int[maxNbrOfPreviousState][];
+	 * for (int i = 1; i < state.length - 2; i++)
+	 * {
+	 * for(int j = i + 1; j < )
+	 *
+	 * }
+	 *
+	 * // Check if this event is included
+	 * int[] existingPrevState = theStates.get(currPrevState);
+	 * if (existingPrevState != null)
+	 * {
+	 * // Check if the event is really possible
+	 * if (isValidTransition(existingPrevState, state, currEventIndex))
+	 * {
+	 * previousStates[xx] = existingPrevState;
+	 * }
+	 * }
+	 *
+	 * }
+	 */
 
-      // First compute the maximum nbr of previous states
-      int maxNbrOfPreviousStates = 1;
-      for (int i = 1; i < state.length - 1; i++)
-      {
-      // ToDo Check if this automaton is among the selected
+	/**
+	 * Check if the event is possible between fromState and toState.
+	 * For perfomance reasons we assume that event is possible in
+	 * at least one of the original automata.
+	 */
 
-      int currAutomatonIndex = i;
-      int currStateIndex = state[currAutomatonIndex];
-      int[] prevStates = prevStatesTable[currAutomatonIndex][currStateIndex][currEventIndex];
-      if (prevStates != null)
-      {
-      int currNbrOfPreviousStates = prevStates[prevStates.length - 1];
-      nbrOfPrevStates[i] = currNbrOfPreviousStates;
-      if (currNbrOfPreviousStates > 0)
-      {
-      currIndexOfPrevStates
-      }
-      else
-      {
-      currIndexOfPreviousState[i] = 0;
-      }
-      maxNbrOfPreviousStates = maxNbrOfPreviousStates * currNbrOfPreviousStates;
-      }
-      }
+	/*
+	 *    public boolean isValidTransition(int[] fromState, int[] toState, int event)
+	 *     {
+	 *     if (prioritizedEventInResultAutomaton[event])
+	 *     { // Check that event is possible from all automata that have
+	 *     // this event as prioritized.
+	 *
+	 *     // To do
+	 *     }
+	 *     else
+	 *     { // We assume that the event is possible in at least one of the
+	 *     // original automata.
+	 *     return true;
+	 *     }
+	 *     }
+	 */
 
-      int[][] previousStates = new int[maxNbrOfPreviousState][];
-      for (int i = 1; i < state.length - 2; i++)
-      {
-      for(int j = i + 1; j < )
-
-      }
-
-      // Check if this event is included
-      int[] existingPrevState = theStates.get(currPrevState);
-      if (existingPrevState != null)
-      {
-      // Check if the event is really possible
-      if (isValidTransition(existingPrevState, state, currEventIndex))
-      {
-      previousStates[xx] = existingPrevState;
-      }
-      }
-
-      }
-    */
-
-    /**
-     * Check if the event is possible between fromState and toState.
-     * For perfomance reasons we assume that event is possible in
-     * at least one of the original automata.
-     */
-    /*    public boolean isValidTransition(int[] fromState, int[] toState, int event)
-	  {
-	  if (prioritizedEventInResultAutomaton[event])
-	  { // Check that event is possible from all automata that have
-    	  // this event as prioritized.
-
-	  // To do
-	  }
-	  else
-	  { // We assume that the event is possible in at least one of the
-    	  // original automata.
-	  return true;
-	  }
-	  }
-    */
 	// */
 }
-

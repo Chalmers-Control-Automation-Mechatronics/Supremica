@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,36 +47,42 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.petrinet.algorithms;
 
+
+
 import org.supremica.petrinet.*;
+
 
 public class TimedMarking
 	extends Marking
 {
+
 	private int[] marking;
-	private int[] remainingTime; // In current operation
+	private int[] remainingTime;	// In current operation
 	private int elapsedTime;
 	private static int nbrOfProductPlaces;
 	private static PetriNet pn;
 
 	/* Use one-product relaxation for this estimate */
-/*	public int value()
-	{
-		int worstEstimate = Integer.MAX_VALUE;
 
-		for (int i = 0; i < nbrOfProductPlaces; i++)
-		{
-			if (marking[i] > 0)
-			{
-				int currEstimate = remainingTime[i] + pn.getPlace(i).getRemainingTime();
-				if (worstEstimate > currEstimate)
-				{
-					worstEstimate = currEstimate;
-				}
-			}
-		}
-		return elapsedTime; // fix this  + max(remainingTime);
-	}*/
+	/*
+	 *      public int value()
+	 *       {
+	 *               int worstEstimate = Integer.MAX_VALUE;
+	 *
+	 *               for (int i = 0; i < nbrOfProductPlaces; i++)
+	 *               {
+	 *                       if (marking[i] > 0)
+	 *                       {
+	 *                               int currEstimate = remainingTime[i] + pn.getPlace(i).getRemainingTime();
+	 *                               if (worstEstimate > currEstimate)
+	 *                               {
+	 *                                       worstEstimate = currEstimate;
+	 *                               }
+	 *                       }
+	 *               }
+	 *               return elapsedTime; // fix this  + max(remainingTime);
+	 *       }
+	 */
 }

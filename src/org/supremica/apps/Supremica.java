@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,47 +47,58 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.apps;
 
+
+
 import java.io.*;
+
 import java.awt.*;
 
 import org.apache.log4j.*;
+
 import org.supremica.gui.*;
 
-// import org.jgrafchart.*;
 
+// import org.jgrafchart.*;
 public class Supremica
 {
+
 	private static Category thisCategory = LogDisplay.createCategory(org.supremica.gui.Supremica.class.getName());
 	private static org.supremica.gui.Supremica workbench;
 	private static SplashWindow splash;
 
-	private Supremica()
-	{
-	}
+	private Supremica() {}
 
 	private static void doSplash()
 	{
+
 		splash = new SplashWindow();
+
 		splash.setVisible(true);
 	}
 
 	public static void startSupremica()
 	{
+
 		doSplash();
+
 		workbench = new org.supremica.gui.Supremica();
+
 		init();
 	}
+
 	public static void startSupremica(String arg)
 	{
-//		if (args.length >= 1)
-//		{
-//			workbench.openAutomataXMLFile(new File(args[0]));
-//		}
+
+		// if (args.length >= 1)
+		// {
+		// workbench.openAutomataXMLFile(new File(args[0]));
+		// }
 		doSplash();
+
 		workbench = new org.supremica.gui.Supremica(arg);
+
 		init();
 	}
 
@@ -94,6 +106,7 @@ public class Supremica
 	{
 
 		boolean packFrame = false;
+
 		// Validate frames that have preset sizes
 		// Pack frames that have useful preferred size info, e.g. from their layout
 		if (packFrame)
@@ -104,32 +117,36 @@ public class Supremica
 		{
 			workbench.validate();
 		}
+
 		// Center the window
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		Dimension frameSize = workbench.getSize();
+
 		if (frameSize.height > screenSize.height)
 		{
 			frameSize.height = screenSize.height;
 		}
+
 		if (frameSize.width > screenSize.width)
 		{
 			frameSize.width = screenSize.width;
 		}
+
 		workbench.setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
 		workbench.initialize();
-       	splash.setVisible(false);
+		splash.setVisible(false);
 		workbench.setVisible(true);
 
 		PreLoader preLoader = PreLoader.getPreLoader();
 	}
 
-/*
-	public static void startJGrafChart()
-	{
-    	Basic2GC app = new Basic2GC();
-    	app.updateActions();
-	}
-*/
+	/*
+	 *       public static void startJGrafChart()
+	 *       {
+	 *       Basic2GC app = new Basic2GC();
+	 *       app.updateActions();
+	 *       }
+	 */
 
 	// Main method
 	public static void main(String[] args)
@@ -141,10 +158,11 @@ public class Supremica
 			{
 				startSupremica();
 			}
-//			else if (args[0].equalsIgnoreCase("JGrafChart"))
-//			{
-//				startJGrafChart();
-//			}
+
+			// else if (args[0].equalsIgnoreCase("JGrafChart"))
+			// {
+			// startJGrafChart();
+			// }
 			else
 			{
 				startSupremica(args[0]);
@@ -154,6 +172,5 @@ public class Supremica
 		{
 			startSupremica();
 		}
-
 	}
 }

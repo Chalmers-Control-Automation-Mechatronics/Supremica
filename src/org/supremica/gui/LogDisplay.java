@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,16 +47,18 @@
  *
  * Supremica is owned and represented by KA.
  */
-
-
 package org.supremica.gui;
+
 
 
 import java.awt.Color;
 import java.awt.Image;
 import java.awt.Toolkit;
+
 import java.io.*;
+
 import java.net.URL;
+
 import java.util.Enumeration;
 import java.util.StringTokenizer;
 import java.util.Hashtable;
@@ -74,33 +77,31 @@ import javax.swing.text.TabSet;
 import javax.swing.text.TabStop;
 
 import org.apache.log4j.*;
-
 import org.apache.log4j.spi.LoggingEvent;
 import org.apache.log4j.helpers.Loader;
 import org.apache.log4j.helpers.QuietWriter;
-//import org.apache.log4j.helpers.TracerPrintWriter;
+
+// import org.apache.log4j.helpers.TracerPrintWriter;
 import org.apache.log4j.helpers.OptionConverter;
 
 
 public class LogDisplay
 	extends AppenderSkeleton
 {
+
 	private static final InterfaceManager theInterfaceManager = InterfaceManager.getInstance();
 	private static LogDisplay theLogDisplay = null;
-
 	private JScrollPane theTextPaneScrollPane;
 	private JTextPane textpane;
 	private StyledDocument doc;
-//	private TracerPrintWriter tp;
+
+	// private TracerPrintWriter tp;
 	private StringWriter sw;
 	private QuietWriter qw;
 	private Hashtable attributes;
 	private Hashtable icons;
-
 	private String label;
-
 	private boolean fancy;
-
 	final String LABEL_OPTION = "Label";
 	final String COLOR_OPTION_FATAL = "Color.Emerg";
 	final String COLOR_OPTION_ERROR = "Color.Error";
@@ -114,225 +115,299 @@ public class LogDisplay
 
 	private LogDisplay()
 	{
-	super();
-	//layout = new PatternLayout("%-5p %d [%t]:  %m%n");
-	layout = new PatternLayout("%-5p %m%n");
-	name = "Debug";
-	setTextPane(new JTextPane());
-	theTextPaneScrollPane = new JScrollPane(textpane);
-	createAttributes();
-	createIcons();
-	this.label = "";
-	this.sw = new StringWriter();
-	this.qw = new QuietWriter(sw, errorHandler);
-	//this.tp = new TracerPrintWriter(qw);
-	this.fancy = true;
+
+		super();
+
+		// layout = new PatternLayout("%-5p %d [%t]:  %m%n");
+		layout = new PatternLayout("%-5p %m%n");
+		name = "Debug";
+
+		setTextPane(new JTextPane());
+
+		theTextPaneScrollPane = new JScrollPane(textpane);
+
+		createAttributes();
+		createIcons();
+
+		this.label = "";
+		this.sw = new StringWriter();
+		this.qw = new QuietWriter(sw, errorHandler);
+
+		// this.tp = new TracerPrintWriter(qw);
+		this.fancy = true;
 	}
 
 	public synchronized static LogDisplay getInstance()
 	{
+
 		if (theLogDisplay == null)
 		{
 			theLogDisplay = new LogDisplay();
 		}
+
 		return theLogDisplay;
 	}
 
 	public synchronized static Category createCategory(String name)
 	{
+
 		Category thisCategory = Category.getInstance(name);
+
 		thisCategory.addAppender(getInstance());
+
 		return thisCategory;
 	}
 
 	private void createAttributes()
 	{
-	Priority prio[] = Priority.getAllPossiblePriorities();
 
-	attributes = new Hashtable();
-	for (int i=0; i<prio.length;i++)
-	{
-		MutableAttributeSet att = new SimpleAttributeSet();
-		attributes.put(prio[i], att);
-		StyleConstants.setFontSize(att,14);
-	}
-	StyleConstants.setForeground((MutableAttributeSet)attributes.get(Priority.ERROR), Color.red);
-	StyleConstants.setForeground((MutableAttributeSet)attributes.get(Priority.WARN), Color.red);
-	StyleConstants.setForeground((MutableAttributeSet)attributes.get(Priority.INFO), new Color(0, 80, 0));
-	StyleConstants.setForeground((MutableAttributeSet)attributes.get(Priority.DEBUG), Color.blue);
+		Priority prio[] = Priority.getAllPossiblePriorities();
+
+		attributes = new Hashtable();
+
+		for (int i = 0; i < prio.length; i++)
+		{
+			MutableAttributeSet att = new SimpleAttributeSet();
+
+			attributes.put(prio[i], att);
+			StyleConstants.setFontSize(att, 14);
+		}
+
+		StyleConstants.setForeground((MutableAttributeSet) attributes.get(Priority.ERROR), Color.red);
+		StyleConstants.setForeground((MutableAttributeSet) attributes.get(Priority.WARN), Color.red);
+		StyleConstants.setForeground((MutableAttributeSet) attributes.get(Priority.INFO), new Color(0, 80, 0));
+		StyleConstants.setForeground((MutableAttributeSet) attributes.get(Priority.DEBUG), Color.blue);
 	}
 
-	public void close()
-	{
-	}
+	public void close() {}
 
 	private void createIcons()
 	{
-	Priority prio[] = Priority.getAllPossiblePriorities();
 
-	icons = new Hashtable();
-	for (int i=0; i<prio.length;i++) {
-	  if (prio[i].equals(Priority.FATAL))
-	icons.put(prio[i], new ImageIcon(Supremica.class.getResource("/icons/RedFlag.gif")));
-	  if (prio[i].equals(Priority.ERROR))
-	icons.put(prio[i], new ImageIcon(Supremica.class.getResource("/icons/RedFlag.gif")));
-	  if (prio[i].equals(Priority.WARN))
-	icons.put(prio[i], new ImageIcon(Supremica.class.getResource("/icons/RedFlag.gif")));
-	  if (prio[i].equals(Priority.INFO))
-	icons.put(prio[i], new ImageIcon(Supremica.class.getResource("/icons/GreenFlag.gif")));
-	  if (prio[i].equals(Priority.DEBUG))
-	icons.put(prio[i], new ImageIcon(Supremica.class.getResource("/icons/BlueFlag.gif")));
-	}
+		Priority prio[] = Priority.getAllPossiblePriorities();
+
+		icons = new Hashtable();
+
+		for (int i = 0; i < prio.length; i++)
+		{
+			if (prio[i].equals(Priority.FATAL))
+			{
+				icons.put(prio[i], new ImageIcon(Supremica.class.getResource("/icons/RedFlag.gif")));
+			}
+
+			if (prio[i].equals(Priority.ERROR))
+			{
+				icons.put(prio[i], new ImageIcon(Supremica.class.getResource("/icons/RedFlag.gif")));
+			}
+
+			if (prio[i].equals(Priority.WARN))
+			{
+				icons.put(prio[i], new ImageIcon(Supremica.class.getResource("/icons/RedFlag.gif")));
+			}
+
+			if (prio[i].equals(Priority.INFO))
+			{
+				icons.put(prio[i], new ImageIcon(Supremica.class.getResource("/icons/GreenFlag.gif")));
+			}
+
+			if (prio[i].equals(Priority.DEBUG))
+			{
+				icons.put(prio[i], new ImageIcon(Supremica.class.getResource("/icons/BlueFlag.gif")));
+			}
+		}
 	}
 
 	public void append(LoggingEvent event)
 	{
-	String text = this.layout.format(event);
-	String trace = "";
-	// Print Stacktrace
-	// Quick Hack maybe there is a better/faster way?
 
-/* This is not compiling anylonger - fix this  /Knut
-	if (event.throwableInfo != null)
-	{
-		//event.throwable.printStackTrace(tp);
-		for (int i=0; i< sw.getBuffer().length(); i++)
+		String text = this.layout.format(event);
+		String trace = "";
+
+		// Print Stacktrace
+		// Quick Hack maybe there is a better/faster way?
+
+		/*
+		 * This is not compiling anylonger - fix this  /Knut
+		 *       if (event.throwableInfo != null)
+		 *       {
+		 *               //event.throwable.printStackTrace(tp);
+		 *               for (int i=0; i< sw.getBuffer().length(); i++)
+		 *               {
+		 *                       if (sw.getBuffer().charAt(i)=='\t')
+		 *                       {
+		 *                               sw.getBuffer().replace(i,i+1,"        ");
+		 *                       }
+		 *               }
+		 *               trace = sw.toString();
+		 *               sw.getBuffer().delete(0,sw.getBuffer().length());
+		 *       }
+		 */
+		textpane.setCaretPosition(doc.getLength());
+
+		try
 		{
-			if (sw.getBuffer().charAt(i)=='\t')
+			if (fancy)
 			{
-				sw.getBuffer().replace(i,i+1,"        ");
+				textpane.setEditable(true);
+				textpane.insertIcon((ImageIcon) icons.get(event.priority));
+				textpane.setEditable(false);
 			}
+
+			doc.insertString(doc.getLength(), text + trace, (MutableAttributeSet) attributes.get(event.priority));
 		}
-		trace = sw.toString();
-		sw.getBuffer().delete(0,sw.getBuffer().length());
-	}
-*/
-	textpane.setCaretPosition(doc.getLength());
-	try
-	{
-		if (fancy)
+		catch (BadLocationException badex)
 		{
-			textpane.setEditable(true);
-			textpane.insertIcon((ImageIcon)icons.get(event.priority));
-			textpane.setEditable(false);
+			System.err.println(badex);
 		}
-		doc.insertString(doc.getLength(), text + trace,
-			(MutableAttributeSet)attributes.get(event.priority));
-	}
-	catch (BadLocationException badex)
-	{
-		System.err.println(badex);
-	}
 	}
 
 	public JComponent getComponent()
 	{
-	return theTextPaneScrollPane;
+		return theTextPaneScrollPane;
 	}
 
 	public String getLabel()
 	{
-	return label;
+		return label;
 	}
 
 	public String[] getOptionStrings()
 	{
-	return new String[] {LABEL_OPTION, COLOR_OPTION_FATAL, COLOR_OPTION_ERROR,
-		COLOR_OPTION_WARN, COLOR_OPTION_INFO, COLOR_OPTION_DEBUG,
-		COLOR_OPTION_BACKGROUND, FANCY_OPTION,
-		FONT_NAME_OPTION, FONT_SIZE_OPTION};
+
+		return new String[]{ LABEL_OPTION, COLOR_OPTION_FATAL,
+							 COLOR_OPTION_ERROR, COLOR_OPTION_WARN,
+							 COLOR_OPTION_INFO, COLOR_OPTION_DEBUG,
+							 COLOR_OPTION_BACKGROUND, FANCY_OPTION,
+							 FONT_NAME_OPTION, FONT_SIZE_OPTION };
 	}
 
+	private Color parseColor(String v)
+	{
 
-	private Color parseColor (String v)
-	{
-	StringTokenizer st = new StringTokenizer(v,",");
-	int val[] = {255,255,255,255};
-	int i=0;
-	while (st.hasMoreTokens())
-	{
-		val[i]=Integer.parseInt(st.nextToken());
-		i++;
-	}
-	return new Color(val[0],val[1],val[2],val[3]);
+		StringTokenizer st = new StringTokenizer(v, ",");
+		int val[] = { 255, 255, 255, 255 };
+		int i = 0;
+
+		while (st.hasMoreTokens())
+		{
+			val[i] = Integer.parseInt(st.nextToken());
+
+			i++;
+		}
+
+		return new Color(val[0], val[1], val[2], val[3]);
 	}
 
 	public void setLayout(Layout layout)
 	{
-	this.layout=layout;
+		this.layout = layout;
 	}
 
 	public void setName(String name)
 	{
-	this.name = name;
+		this.name = name;
 	}
-
 
 	private void setTextPane(JTextPane textpane)
 	{
-	this.textpane = textpane;
-	textpane.setEditable(false);
-	textpane.setBackground(Color.white);
-	this.doc = textpane.getStyledDocument();
+
+		this.textpane = textpane;
+
+		textpane.setEditable(false);
+		textpane.setBackground(Color.white);
+
+		this.doc = textpane.getStyledDocument();
 	}
 
 	private void setColor(Priority p, String v)
 	{
-	StyleConstants.setForeground(
-		(MutableAttributeSet)attributes.get(p),parseColor(v));
+		StyleConstants.setForeground((MutableAttributeSet) attributes.get(p), parseColor(v));
 	}
 
 	private void setFontSize(int size)
 	{
-	Enumeration e = attributes.elements();
-	while (e.hasMoreElements())
-	{
-		StyleConstants.setFontSize((MutableAttributeSet)e.nextElement(),size);
-	}
-	return;
+
+		Enumeration e = attributes.elements();
+
+		while (e.hasMoreElements())
+		{
+			StyleConstants.setFontSize((MutableAttributeSet) e.nextElement(), size);
+		}
+
+		return;
 	}
 
 	private void setFontName(String name)
 	{
-	Enumeration e = attributes.elements();
-	while (e.hasMoreElements())
-	{
-		StyleConstants.setFontFamily((MutableAttributeSet)e.nextElement(),name);
-	}
-	return;
+
+		Enumeration e = attributes.elements();
+
+		while (e.hasMoreElements())
+		{
+			StyleConstants.setFontFamily((MutableAttributeSet) e.nextElement(), name);
+		}
+
+		return;
 	}
 
 	public void setOption(String option, String value)
 	{
-	if (option.equalsIgnoreCase(LABEL_OPTION))
-		this.label=value;
-	if (option.equalsIgnoreCase(COLOR_OPTION_FATAL))
-		setColor(Priority.FATAL,value);
-	if (option.equalsIgnoreCase(COLOR_OPTION_ERROR))
-		setColor(Priority.ERROR,value);
-	if (option.equalsIgnoreCase(COLOR_OPTION_WARN))
-		setColor(Priority.WARN,value);
-	if (option.equalsIgnoreCase(COLOR_OPTION_INFO))
-		setColor(Priority.INFO,value);
-	if (option.equalsIgnoreCase(COLOR_OPTION_DEBUG))
-		setColor(Priority.DEBUG,value);
-	if (option.equalsIgnoreCase(COLOR_OPTION_BACKGROUND))
-		textpane.setBackground(parseColor(value));
-	if (option.equalsIgnoreCase(FANCY_OPTION))
-		fancy = OptionConverter.toBoolean(value, fancy);
-	if (option.equalsIgnoreCase(FONT_SIZE_OPTION))
-		setFontSize(Integer.parseInt(value));
-	if (option.equalsIgnoreCase(FONT_NAME_OPTION))
-		setFontName(value);
-	return;
+
+		if (option.equalsIgnoreCase(LABEL_OPTION))
+		{
+			this.label = value;
+		}
+
+		if (option.equalsIgnoreCase(COLOR_OPTION_FATAL))
+		{
+			setColor(Priority.FATAL, value);
+		}
+
+		if (option.equalsIgnoreCase(COLOR_OPTION_ERROR))
+		{
+			setColor(Priority.ERROR, value);
+		}
+
+		if (option.equalsIgnoreCase(COLOR_OPTION_WARN))
+		{
+			setColor(Priority.WARN, value);
+		}
+
+		if (option.equalsIgnoreCase(COLOR_OPTION_INFO))
+		{
+			setColor(Priority.INFO, value);
+		}
+
+		if (option.equalsIgnoreCase(COLOR_OPTION_DEBUG))
+		{
+			setColor(Priority.DEBUG, value);
+		}
+
+		if (option.equalsIgnoreCase(COLOR_OPTION_BACKGROUND))
+		{
+			textpane.setBackground(parseColor(value));
+		}
+
+		if (option.equalsIgnoreCase(FANCY_OPTION))
+		{
+			fancy = OptionConverter.toBoolean(value, fancy);
+		}
+
+		if (option.equalsIgnoreCase(FONT_SIZE_OPTION))
+		{
+			setFontSize(Integer.parseInt(value));
+		}
+
+		if (option.equalsIgnoreCase(FONT_NAME_OPTION))
+		{
+			setFontName(value);
+		}
+
+		return;
 	}
 
 	public boolean requiresLayout()
 	{
-	return true;
+		return true;
 	}
-
-	}
-
-
-
+}

@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,13 +47,16 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.automata.algorithms;
+
+
 
 import org.supremica.automata.*;
 
 import java.util.*;
+
 import java.io.PrintWriter;
+
 
 /**
  * @deprecated use AutomataVerifier instead.
@@ -60,60 +64,64 @@ import java.io.PrintWriter;
  */
 public class AutomataControllabilityCheck
 {
-    private Automata theAutomata;
 
-    private AutomataSynchronizerHelper synchHelper;
-    private ArrayList synchronizationExecuters;
+	private Automata theAutomata;
+	private AutomataSynchronizerHelper synchHelper;
+	private ArrayList synchronizationExecuters;
 
-    public AutomataControllabilityCheck(
-		Automata theAutomata,
-		SynchronizationOptions syncOptions)
+	public AutomataControllabilityCheck(Automata theAutomata, SynchronizationOptions syncOptions)
 		throws Exception
-    {
-		this.theAutomata = theAutomata;
+	{
 
+		this.theAutomata = theAutomata;
 		synchHelper = new AutomataSynchronizerHelper(theAutomata, syncOptions);
 
-    	// Build the initial state
+		// Build the initial state
 		Automaton currAutomaton;
 		State currInitialState;
-		int[] initialState = new int[theAutomata.size() + 1]; // +1 status field
-       	Iterator autIt = theAutomata.iterator();
-     	while (autIt.hasNext())
-	    {
-			currAutomaton = (Automaton)autIt.next();
+		int[] initialState = new int[theAutomata.size() + 1];		// +1 status field
+		Iterator autIt = theAutomata.iterator();
+
+		while (autIt.hasNext())
+		{
+			currAutomaton = (Automaton) autIt.next();
 			currInitialState = currAutomaton.getInitialState();
-      		initialState[currAutomaton.getIndex()] = currInitialState.getIndex();
-	    }
-     	synchHelper.addState(initialState);
+			initialState[currAutomaton.getIndex()] = currInitialState.getIndex();
+		}
+
+		synchHelper.addState(initialState);
 		synchHelper.setExhaustiveSearch(true);
 
 		int nbrOfExecuters = syncOptions.getNbrOfExecuters();
+
 		// Allocate and initialize the synchronizationExecuters
-     	synchronizationExecuters = new ArrayList(nbrOfExecuters);
-     	for (int i = 0; i < nbrOfExecuters; i++)
-	    {
-           	AutomataSynchronizerExecuter currSynchronizationExecuter =
-				new AutomataSynchronizerExecuter(synchHelper);
-        	synchronizationExecuters.add(currSynchronizationExecuter);
-	    }
-    }
+		synchronizationExecuters = new ArrayList(nbrOfExecuters);
 
-    // boolean istället för void
-    public boolean execute()
+		for (int i = 0; i < nbrOfExecuters; i++)
+		{
+			AutomataSynchronizerExecuter currSynchronizationExecuter = new AutomataSynchronizerExecuter(synchHelper);
+
+			synchronizationExecuters.add(currSynchronizationExecuter);
+		}
+	}
+
+	// boolean istället för void
+	public boolean execute()
 		throws Exception
-    {
-       	// Start all the synchronization executers and wait for completion
-      	// For the moment we assume that we only have one thread
+	{
 
+		// Start all the synchronization executers and wait for completion
+		// For the moment we assume that we only have one thread
 		for (int i = 0; i < synchronizationExecuters.size(); i++)
 		{
-			AutomataSynchronizerExecuter currExec =
-				(AutomataSynchronizerExecuter)synchronizationExecuters.get(i);
+			AutomataSynchronizerExecuter currExec = (AutomataSynchronizerExecuter) synchronizationExecuters.get(i);
+
 			currExec.selectAllAutomata();
 			currExec.start();
 		}
-		((AutomataSynchronizerExecuter)synchronizationExecuters.get(0)).join();
+
+		((AutomataSynchronizerExecuter) synchronizationExecuters.get(0)).join();
+
 		return synchHelper.getAutomataIsControllable();
-    }
+	}
 }

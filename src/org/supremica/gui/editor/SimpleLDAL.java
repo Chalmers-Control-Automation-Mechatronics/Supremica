@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,13 +47,16 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.gui.editor;
+
+
 
 import java.awt.Color;
 import java.awt.Point;
+
 import java.util.Iterator;
 import java.util.LinkedList;
+
 import com.nwoods.jgo.layout.JGoLayeredDigraphAutoLayout;
 import com.nwoods.jgo.layout.JGoNetwork;
 import com.nwoods.jgo.layout.JGoNetworkLink;
@@ -61,67 +65,78 @@ import com.nwoods.jgo.layout.JGoLayeredDigraphAutoLayoutLinkData;
 import com.nwoods.jgo.JGoPort;
 import com.nwoods.jgo.JGoLink;
 
-public class SimpleLDAL extends JGoLayeredDigraphAutoLayout
+
+public class SimpleLDAL
+	extends JGoLayeredDigraphAutoLayout
 {
-  public SimpleLDAL()
-  {
-    super();
-  }
 
-  public SimpleLDAL(AutomatonDocument pGoDoc)
-  {
-    super(pGoDoc);
-  }
+	public SimpleLDAL()
+	{
+		super();
+	}
 
-  public SimpleLDAL(AutomatonDocument pGoDoc, JGoNetwork pNetwork)
-  {
-    super(pGoDoc, pNetwork);
-  }
+	public SimpleLDAL(AutomatonDocument pGoDoc)
+	{
+		super(pGoDoc);
+	}
 
-  public SimpleLDAL(AutomatonDocument pGoDoc,
-    int NlayerSpacing, int NcolumnSpacing, int NdirectionOption, int NcycleremoveOption,
-    int NlayeringOption, int NinitializeOption, int Niterations, int NaggressiveOption, AutomataEditor app)
-  {
-    super(pGoDoc, NlayerSpacing, NcolumnSpacing, NdirectionOption, NcycleremoveOption,
-      NlayeringOption, NinitializeOption, Niterations, NaggressiveOption);
-    myApp = app;
-  }
+	public SimpleLDAL(AutomatonDocument pGoDoc, JGoNetwork pNetwork)
+	{
+		super(pGoDoc, pNetwork);
+	}
 
-  public SimpleLDAL(AutomatonDocument pGoDoc, JGoNetwork pNetwork,
-    int NlayerSpacing, int NcolumnSpacing, int NdirectionOption, int NcycleremoveOption,
-    int NlayeringOption, int NinitializeOption, int Niterations, int NaggressiveOption, AutomataEditor app)
-  {
-    super(pGoDoc, pNetwork, NlayerSpacing, NcolumnSpacing, NdirectionOption, NcycleremoveOption,
-      NlayeringOption, NinitializeOption, Niterations, NaggressiveOption);
-    myApp = app;
-  }
+	public SimpleLDAL(AutomatonDocument pGoDoc, int NlayerSpacing, int NcolumnSpacing, int NdirectionOption, int NcycleremoveOption, int NlayeringOption, int NinitializeOption, int Niterations, int NaggressiveOption, AutomataEditor app)
+	{
 
-  public int getLinkMinLength(JGoNetworkLink pLink)
-  {
-    JGoNetworkNode pFromNode = pLink.getFromNode();
-    JGoNetworkNode pToNode = pLink.getToNode();
+		super(pGoDoc, NlayerSpacing, NcolumnSpacing, NdirectionOption, NcycleremoveOption, NlayeringOption, NinitializeOption, Niterations, NaggressiveOption);
 
-    if ((pFromNode.getJGoObject() != null) && (pToNode.getJGoObject() != null)) {
-      Color fromColor = ((StateNode)(pFromNode.getJGoObject())).getColor();
-      Color toColor = ((StateNode)(pToNode.getJGoObject())).getColor();
+		myApp = app;
+	}
 
-      if (fromColor == toColor) {
-        return 1 * super.getLinkMinLength(pLink);
-      } else {
-        return 2 * super.getLinkMinLength(pLink);
-      }
-    }
+	public SimpleLDAL(AutomatonDocument pGoDoc, JGoNetwork pNetwork, int NlayerSpacing, int NcolumnSpacing, int NdirectionOption, int NcycleremoveOption, int NlayeringOption, int NinitializeOption, int Niterations, int NaggressiveOption, AutomataEditor app)
+	{
 
-    return super.getLinkMinLength(pLink);
-  }
+		super(pGoDoc, pNetwork, NlayerSpacing, NcolumnSpacing, NdirectionOption, NcycleremoveOption, NlayeringOption, NinitializeOption, Niterations, NaggressiveOption);
 
-  public void progressUpdate(double progress)
-  {
-    if(progress == 1.0)
-      myApp.setStatus("Simple Layered Digraph Auto-Layout: 100% done.");
-    else
-      myApp.setStatus("Simple Layered Digraph Auto-Layout: " + (100 * progress) + "% done.");
-  }
+		myApp = app;
+	}
 
-  private AutomataEditor myApp = null;
+	public int getLinkMinLength(JGoNetworkLink pLink)
+	{
+
+		JGoNetworkNode pFromNode = pLink.getFromNode();
+		JGoNetworkNode pToNode = pLink.getToNode();
+
+		if ((pFromNode.getJGoObject() != null) && (pToNode.getJGoObject() != null))
+		{
+			Color fromColor = ((StateNode) (pFromNode.getJGoObject())).getColor();
+			Color toColor = ((StateNode) (pToNode.getJGoObject())).getColor();
+
+			if (fromColor == toColor)
+			{
+				return 1 * super.getLinkMinLength(pLink);
+			}
+			else
+			{
+				return 2 * super.getLinkMinLength(pLink);
+			}
+		}
+
+		return super.getLinkMinLength(pLink);
+	}
+
+	public void progressUpdate(double progress)
+	{
+
+		if (progress == 1.0)
+		{
+			myApp.setStatus("Simple Layered Digraph Auto-Layout: 100% done.");
+		}
+		else
+		{
+			myApp.setStatus("Simple Layered Digraph Auto-Layout: " + (100 * progress) + "% done.");
+		}
+	}
+
+	private AutomataEditor myApp = null;
 }

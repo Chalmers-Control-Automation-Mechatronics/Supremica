@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,15 +47,17 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.automata;
+
+
 
 import java.util.*;
 
+
 public class AutomatonType
 {
-	private static List collection = new LinkedList();
 
+	private static List collection = new LinkedList();
 	public static final AutomatonType Undefined = new AutomatonType();
 	public static final AutomatonType Plant = new AutomatonType();
 	public static final AutomatonType Specification = new AutomatonType();
@@ -72,47 +75,58 @@ public class AutomatonType
 
 	public static AutomatonType toType(String value)
 	{
+
 		if (value == null)
 		{
 			return null;
 		}
+
 		if (value.equals("Undefined"))
 		{
 			return Undefined;
 		}
+
 		if (value.equals("Plant"))
 		{
 			return Plant;
 		}
+
 		if (value.equals("Specification"))
 		{
 			return Specification;
 		}
+
 		if (value.equals("Supervisor"))
 		{
 			return Supervisor;
 		}
+
 		return Undefined;
 	}
 
 	public String toString()
 	{
+
 		if (this == Undefined)
 		{
 			return "Undefined";
 		}
+
 		if (this == Plant)
 		{
 			return "Plant";
 		}
+
 		if (this == Specification)
 		{
 			return "Specification";
 		}
+
 		if (this == Supervisor)
 		{
 			return "Supervisor";
 		}
+
 		return "Unknown type";
 	}
 }

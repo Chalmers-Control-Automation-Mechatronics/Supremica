@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,21 +47,26 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.gui;
+
+
 
 import java.awt.*;
 import java.awt.event.*;
+
 import java.io.*;
+
 import javax.swing.*;
+
 import java.util.*;
+
 
 public class PreferencesDialog
 	extends JDialog
 {
+
 	private JPanel contentPane = null;
 	private JTabbedPane theTabbedPanel = null;
-
 	private FilePanel theFilePanel = null;
 	private CommunicationPanel theCommunicationPanel = null;
 	private LayoutPanel theLayoutPanel = null;
@@ -69,53 +75,61 @@ public class PreferencesDialog
 
 	public PreferencesDialog(Frame owner)
 	{
+
 		super(owner, "Preferences", true);
 
-		contentPane = (JPanel)getContentPane();
+		contentPane = (JPanel) getContentPane();
 		theTabbedPanel = new JTabbedPane();
+
 		contentPane.add(theTabbedPanel, BorderLayout.CENTER);
 
 		theSynchronizationPanel = new SynchronizationPanel(this);
+
 		theTabbedPanel.add("Synchronization", theSynchronizationPanel);
 
 		theLayoutPanel = new LayoutPanel(this);
+
 		theTabbedPanel.add("Layout", theLayoutPanel);
 
 		theCommunicationPanel = new CommunicationPanel(this);
+
 		theTabbedPanel.add("Communication", theCommunicationPanel);
 
 		if (WorkbenchProperties.fileAllowOpen() || WorkbenchProperties.fileAllowSave())
 		{
 			theFilePanel = new FilePanel(this);
+
 			theTabbedPanel.add("File", theFilePanel);
 		}
 
 		theControllerPanel = new PreferencesControllerPanel(this);
-		contentPane.add(theControllerPanel, BorderLayout.SOUTH);
 
+		contentPane.add(theControllerPanel, BorderLayout.SOUTH);
 		setSize(400, 350);
 
 		// Center the window
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		Dimension frameSize = getSize();
+
 		if (frameSize.height > screenSize.height)
 		{
 			frameSize.height = screenSize.height;
 		}
+
 		if (frameSize.width > screenSize.width)
 		{
 			frameSize.width = screenSize.width;
 		}
+
 		setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
-
 		addWindowListener(new WindowAdapter()
-			{
-				public void windowClosing(WindowEvent e)
-				{
-					doCancel();
-				}
-			});
+		{
 
+			public void windowClosing(WindowEvent e)
+			{
+				doCancel();
+			}
+		});
 	}
 
 	public void doCancel()
@@ -126,6 +140,7 @@ public class PreferencesDialog
 
 	public void doApply()
 	{
+
 		if (setAttributes())
 		{
 			doCancel();
@@ -134,19 +149,23 @@ public class PreferencesDialog
 
 	public void setVisible(boolean toVisible)
 	{
+
 		if (toVisible)
 		{
 			getAttributes();
 		}
+
 		super.setVisible(toVisible);
 	}
 
 	private void getAttributes()
 	{
+
 		if (theFilePanel != null)
 		{
 			theFilePanel.update();
 		}
+
 		theCommunicationPanel.update();
 		theLayoutPanel.update();
 		theSynchronizationPanel.update();
@@ -154,6 +173,7 @@ public class PreferencesDialog
 
 	private boolean setAttributes()
 	{
+
 		if (theFilePanel != null)
 		{
 			if (!theFilePanel.doApply())
@@ -161,18 +181,22 @@ public class PreferencesDialog
 				return false;
 			}
 		}
+
 		if (!theCommunicationPanel.doApply())
 		{
 			return false;
 		}
+
 		if (!theLayoutPanel.doApply())
 		{
 			return false;
 		}
+
 		if (!theSynchronizationPanel.doApply())
 		{
 			return false;
 		}
+
 		return true;
 	}
 
@@ -183,7 +207,9 @@ public class PreferencesDialog
 
 	public static int getInt(String label, String theIntStr, int minValue)
 	{
+
 		int theInt = Integer.MIN_VALUE;
+
 		try
 		{
 			theInt = Integer.parseInt(theIntStr);
@@ -191,15 +217,19 @@ public class PreferencesDialog
 		catch (NumberFormatException ex)
 		{
 			JOptionPane.showMessageDialog(null, label + " must be a number.", "Illegal format", JOptionPane.ERROR_MESSAGE);
+
 			// JOptionPane.showMessageDialog(this, label + " must be a number.", "Illegal format", JOptionPane.ERROR_MESSAGE);
 			return Integer.MIN_VALUE;
 		}
+
 		if (theInt < minValue)
 		{
 			JOptionPane.showMessageDialog(null, label + " must be at least " + minValue + ".", "Illegal format", JOptionPane.ERROR_MESSAGE);
+
 			// JOptionPane.showMessageDialog(this, label + " must be at least " + minValue + ".", "Illegal format", JOptionPane.ERROR_MESSAGE);
 			return Integer.MIN_VALUE;
 		}
+
 		return theInt;
 	}
 }
@@ -207,36 +237,40 @@ public class PreferencesDialog
 class FilePanel
 	extends JPanel
 {
-	private PreferencesDialog theDialog = null;
 
+	private PreferencesDialog theDialog = null;
 	private JTextField fileOpenPath = null;
 	private JTextField fileSavePath = null;
 
 	public FilePanel(PreferencesDialog theDialog)
 	{
+
 		this.theDialog = theDialog;
 
-        Box propertiesBox = new Box(BoxLayout.Y_AXIS);
+		Box propertiesBox = new Box(BoxLayout.Y_AXIS);
 
 		add(propertiesBox, BorderLayout.CENTER);
 
-		JLabel fileOpenPathLabel =
-			new JLabel("File open path");
+		JLabel fileOpenPathLabel = new JLabel("File open path");
+
 		propertiesBox.add(fileOpenPathLabel);
 
 		fileOpenPath = new JTextField();
+
 		propertiesBox.add(fileOpenPath);
 
-		JLabel fileSavePathLabel =
-			new JLabel("File save path");
+		JLabel fileSavePathLabel = new JLabel("File save path");
+
 		propertiesBox.add(fileSavePathLabel);
 
 		fileSavePath = new JTextField();
+
 		propertiesBox.add(fileSavePath);
 	}
 
 	public boolean doApply()
 	{
+
 		WorkbenchProperties.setFileOpenPath(fileOpenPath.getText());
 		WorkbenchProperties.setFileSavePath(fileSavePath.getText());
 
@@ -253,40 +287,45 @@ class FilePanel
 class CommunicationPanel
 	extends JPanel
 {
-	private PreferencesDialog theDialog = null;
 
+	private PreferencesDialog theDialog = null;
 	private JCheckBox useXmlRpc = null;
 	private JTextField xmlRpcPort = null;
 
 	public CommunicationPanel(PreferencesDialog theDialog)
 	{
+
 		this.theDialog = theDialog;
 
-        Box propertiesBox = new Box(BoxLayout.Y_AXIS);
+		Box propertiesBox = new Box(BoxLayout.Y_AXIS);
 
 		add(propertiesBox, BorderLayout.CENTER);
 
-		useXmlRpc =
-			new JCheckBox("Run XML-RPC server");
+		useXmlRpc = new JCheckBox("Run XML-RPC server");
+
 		propertiesBox.add(useXmlRpc);
 
-		JLabel xmlRpcPortLabel =
-			new JLabel("Use port number");
+		JLabel xmlRpcPortLabel = new JLabel("Use port number");
+
 		propertiesBox.add(xmlRpcPortLabel);
 
 		xmlRpcPort = new JTextField();
+
 		propertiesBox.add(xmlRpcPort);
 	}
 
 	public boolean doApply()
 	{
+
 		WorkbenchProperties.setXmlRpcActive(useXmlRpc.isSelected());
 
 		int port = theDialog.getInt("XML-RPC Port", xmlRpcPort.getText(), 1);
+
 		if (port == Integer.MIN_VALUE)
 		{
 			return false;
 		}
+
 		WorkbenchProperties.setXmlRpcPort(port);
 
 		return true;
@@ -295,16 +334,15 @@ class CommunicationPanel
 	public void update()
 	{
 		useXmlRpc.setSelected(WorkbenchProperties.isXmlRpcActive());
-		xmlRpcPort.setText(
-			Integer.toString(WorkbenchProperties.getXmlRpcPort()));
+		xmlRpcPort.setText(Integer.toString(WorkbenchProperties.getXmlRpcPort()));
 	}
 }
 
 class LayoutPanel
 	extends JPanel
 {
-	private PreferencesDialog theDialog = null;
 
+	private PreferencesDialog theDialog = null;
 	private JCheckBox dotLeftToRight = null;
 	private JCheckBox dotWithStateLabels = null;
 	private JCheckBox dotWithCircles = null;
@@ -315,67 +353,67 @@ class LayoutPanel
 
 	public LayoutPanel(PreferencesDialog theDialog)
 	{
+
 		this.theDialog = theDialog;
 
-        Box propertiesBox = new Box(BoxLayout.Y_AXIS);
+		Box propertiesBox = new Box(BoxLayout.Y_AXIS);
 
 		add(propertiesBox, BorderLayout.CENTER);
 
-		dotLeftToRight =
-			new JCheckBox("Layout from left to right");
+		dotLeftToRight = new JCheckBox("Layout from left to right");
+
 		propertiesBox.add(dotLeftToRight);
 
-		dotWithStateLabels =
-			new JCheckBox("Draw state labels");
+		dotWithStateLabels = new JCheckBox("Draw state labels");
+
 		propertiesBox.add(dotWithStateLabels);
 
-		dotWithCircles =
-			new JCheckBox("Draw states as circles");
+		dotWithCircles = new JCheckBox("Draw states as circles");
+
 		propertiesBox.add(dotWithCircles);
 
-		dotUseColors =
-			new JCheckBox("Draw with colors");
+		dotUseColors = new JCheckBox("Draw with colors");
+
 		propertiesBox.add(dotUseColors);
 
-		dotUseMultipleLabels =
-			new JCheckBox("Draw multiple labels");
+		dotUseMultipleLabels = new JCheckBox("Draw multiple labels");
+
 		propertiesBox.add(dotUseMultipleLabels);
 
-		JLabel dotCommandLabel =
-			new JLabel("Dot command");
+		JLabel dotCommandLabel = new JLabel("Dot command");
+
 		propertiesBox.add(dotCommandLabel);
 
 		dotCommand = new JTextField();
+
 		propertiesBox.add(dotCommand);
 
-		JLabel dotMaxNbrOfStatesLabel =
-			new JLabel("Maximum number of states without warning");
+		JLabel dotMaxNbrOfStatesLabel = new JLabel("Maximum number of states without warning");
+
 		propertiesBox.add(dotMaxNbrOfStatesLabel);
 
 		dotMaxNbrOfStates = new JTextField();
+
 		propertiesBox.add(dotMaxNbrOfStates);
 	}
 
 	public boolean doApply()
 	{
-		WorkbenchProperties.setDotLeftToRight(
-			dotLeftToRight.isSelected());
-		WorkbenchProperties.setDotWithStateLabels(
-			dotWithStateLabels.isSelected());
-		WorkbenchProperties.setDotWithCircles(
-			dotWithCircles.isSelected());
-		WorkbenchProperties.setDotUseColors(
-			dotUseColors.isSelected());
-		WorkbenchProperties.setDotUseMultipleLabels(
-			dotUseMultipleLabels.isSelected());
 
+		WorkbenchProperties.setDotLeftToRight(dotLeftToRight.isSelected());
+		WorkbenchProperties.setDotWithStateLabels(dotWithStateLabels.isSelected());
+		WorkbenchProperties.setDotWithCircles(dotWithCircles.isSelected());
+		WorkbenchProperties.setDotUseColors(dotUseColors.isSelected());
+		WorkbenchProperties.setDotUseMultipleLabels(dotUseMultipleLabels.isSelected());
 		WorkbenchProperties.setDotExecuteCommand(dotCommand.getText());
 
 		int maxNbrOfStates = theDialog.getInt("Max number of states without warning", dotMaxNbrOfStates.getText(), 0);
+
 		if (maxNbrOfStates == Integer.MIN_VALUE)
 		{
 			return false;
 		}
+
 		WorkbenchProperties.setDotMaxNbrOfStatesWithoutWarning(maxNbrOfStates);
 
 		return true;
@@ -383,27 +421,22 @@ class LayoutPanel
 
 	public void update()
 	{
-		dotLeftToRight.setSelected(
-			WorkbenchProperties.isDotLeftToRight());
-		dotWithStateLabels.setSelected(
-			WorkbenchProperties.isDotWithStateLabels());
-		dotWithCircles.setSelected(
-			WorkbenchProperties.isDotWithCircles());
-		dotUseColors.setSelected(
-			WorkbenchProperties.isDotUseColors());
-		dotUseMultipleLabels.setSelected(
-			WorkbenchProperties.isDotUseMultipleLabels());
+
+		dotLeftToRight.setSelected(WorkbenchProperties.isDotLeftToRight());
+		dotWithStateLabels.setSelected(WorkbenchProperties.isDotWithStateLabels());
+		dotWithCircles.setSelected(WorkbenchProperties.isDotWithCircles());
+		dotUseColors.setSelected(WorkbenchProperties.isDotUseColors());
+		dotUseMultipleLabels.setSelected(WorkbenchProperties.isDotUseMultipleLabels());
 		dotCommand.setText(WorkbenchProperties.getDotExecuteCommand());
-		dotMaxNbrOfStates.setText(
-			Integer.toString(WorkbenchProperties.getDotMaxNbrOfStatesWithoutWarning()));
+		dotMaxNbrOfStates.setText(Integer.toString(WorkbenchProperties.getDotMaxNbrOfStatesWithoutWarning()));
 	}
 }
 
 class SynchronizationPanel
 	extends JPanel
 {
-	private PreferencesDialog theDialog = null;
 
+	private PreferencesDialog theDialog = null;
 	private JCheckBox forbidUncontrollableStates = null;
 	private JCheckBox expandForbiddenStates = null;
 	private JCheckBox expandHashtable = null;
@@ -413,66 +446,70 @@ class SynchronizationPanel
 
 	public SynchronizationPanel(PreferencesDialog theDialog)
 	{
+
 		this.theDialog = theDialog;
 
-        Box propertiesBox = new Box(BoxLayout.Y_AXIS);
+		Box propertiesBox = new Box(BoxLayout.Y_AXIS);
 
 		add(propertiesBox, BorderLayout.CENTER);
 
-		forbidUncontrollableStates =
-			new JCheckBox("Forbid uncontrollable states");
+		forbidUncontrollableStates = new JCheckBox("Forbid uncontrollable states");
+
 		propertiesBox.add(forbidUncontrollableStates);
 
-		expandForbiddenStates =
-			new JCheckBox("Expand forbidden states");
+		expandForbiddenStates = new JCheckBox("Expand forbidden states");
+
 		propertiesBox.add(expandForbiddenStates);
 
-		expandHashtable =
-			new JCheckBox("Expand hashtable");
+		expandHashtable = new JCheckBox("Expand hashtable");
+
 		propertiesBox.add(expandHashtable);
 
-		verboseMode =
-			new JCheckBox("Verbose mode");
+		verboseMode = new JCheckBox("Verbose mode");
+
 		propertiesBox.add(verboseMode);
 
-		JLabel hashtableSizeLabel =
-			new JLabel("Initial size of the hashtable");
+		JLabel hashtableSizeLabel = new JLabel("Initial size of the hashtable");
+
 		propertiesBox.add(hashtableSizeLabel);
 
 		hashtableSize = new JTextField();
+
 		propertiesBox.add(hashtableSize);
 
-		JLabel nbrOfExecutersLabel =
-			new JLabel("Nbr of threads");
+		JLabel nbrOfExecutersLabel = new JLabel("Nbr of threads");
+
 		propertiesBox.add(nbrOfExecutersLabel);
 
 		nbrOfExecuters = new JTextField();
+
 		propertiesBox.add(nbrOfExecuters);
 	}
 
 	public boolean doApply()
 	{
-		WorkbenchProperties.setSyncForbidUncontrollableStates(
-			forbidUncontrollableStates.isSelected());
-		WorkbenchProperties.setSyncExpandForbiddenStates(
-			expandForbiddenStates.isSelected());
-		WorkbenchProperties.setSyncExpandHashtable(
-			expandHashtable.isSelected());
-		WorkbenchProperties.setVerboseMode(
-			verboseMode.isSelected());
+
+		WorkbenchProperties.setSyncForbidUncontrollableStates(forbidUncontrollableStates.isSelected());
+		WorkbenchProperties.setSyncExpandForbiddenStates(expandForbiddenStates.isSelected());
+		WorkbenchProperties.setSyncExpandHashtable(expandHashtable.isSelected());
+		WorkbenchProperties.setVerboseMode(verboseMode.isSelected());
 
 		int size = theDialog.getInt("Hashtable size", hashtableSize.getText(), 100);
+
 		if (size == Integer.MIN_VALUE)
 		{
 			return false;
 		}
+
 		WorkbenchProperties.setSyncInitialHashtableSize(size);
 
 		int nbrOfThreads = theDialog.getInt("Nbr of threads", nbrOfExecuters.getText(), 1);
+
 		if (nbrOfThreads == Integer.MIN_VALUE)
 		{
 			return false;
 		}
+
 		WorkbenchProperties.setSyncNbrOfExecuters(nbrOfThreads);
 
 		return true;
@@ -480,33 +517,30 @@ class SynchronizationPanel
 
 	public void update()
 	{
-		forbidUncontrollableStates.setSelected(
-			WorkbenchProperties.syncForbidUncontrollableStates());
-		expandForbiddenStates.setSelected(
-			WorkbenchProperties.syncExpandForbiddenStates());
-		expandHashtable.setSelected(
-			WorkbenchProperties.syncExpandHashtable());
-		verboseMode.setSelected(
-			WorkbenchProperties.verboseMode());
-		hashtableSize.setText(
-			Integer.toString(WorkbenchProperties.syncInitialHashtableSize()));
-		nbrOfExecuters.setText(
-			Integer.toString(WorkbenchProperties.syncNbrOfExecuters()));
+
+		forbidUncontrollableStates.setSelected(WorkbenchProperties.syncForbidUncontrollableStates());
+		expandForbiddenStates.setSelected(WorkbenchProperties.syncExpandForbiddenStates());
+		expandHashtable.setSelected(WorkbenchProperties.syncExpandHashtable());
+		verboseMode.setSelected(WorkbenchProperties.verboseMode());
+		hashtableSize.setText(Integer.toString(WorkbenchProperties.syncInitialHashtableSize()));
+		nbrOfExecuters.setText(Integer.toString(WorkbenchProperties.syncNbrOfExecuters()));
 	}
 }
 
 class PreferencesControllerPanel
 	extends JPanel
 {
+
 	private PreferencesDialog theDialog = null;
 	private JButton applyButton = null;
 	private JButton cancelButton = null;
 
 	public PreferencesControllerPanel(PreferencesDialog theDialog)
 	{
+
 		this.theDialog = theDialog;
 
-        Box buttonBox = new Box(BoxLayout.X_AXIS);
+		Box buttonBox = new Box(BoxLayout.X_AXIS);
 
 		add(buttonBox, BorderLayout.CENTER);
 
@@ -516,22 +550,22 @@ class PreferencesControllerPanel
 		buttonBox.add(applyButton);
 		buttonBox.add(Box.createVerticalGlue());
 		buttonBox.add(cancelButton);
+		applyButton.addActionListener(new ActionListener()
+		{
 
-        applyButton.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent e)
-            {
+			public void actionPerformed(ActionEvent e)
+			{
 				apply_actionPerformed(e);
-            }
-        });
+			}
+		});
+		cancelButton.addActionListener(new ActionListener()
+		{
 
-        cancelButton.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent e)
-            {
+			public void actionPerformed(ActionEvent e)
+			{
 				cancel_actionPerformed(e);
-            }
-        });
+			}
+		});
 	}
 
 	public void cancel_actionPerformed(ActionEvent e)

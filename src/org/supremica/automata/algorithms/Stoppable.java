@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,20 +47,12 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.automata.algorithms;
+
+
 
 /** For stopping running threads and stuff. */
 public interface Stoppable
 {
 	public void requestStop();
 }
-
-
-
-
-
-
-
-
-

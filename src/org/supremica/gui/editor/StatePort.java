@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,27 +47,35 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.gui.editor;
 
+
+
 import com.nwoods.jgo.*;
+
 import java.awt.*;
+
 
 /**
 * To get the link arrowheads' point at the edge of the ellipse,
 * we need to override how the link point is computed, rather
 * than depending on the built-in mechanism specifying a spot.
 */
-public class StatePort extends JGoPort
+public class StatePort
+	extends JGoPort
 {
+
 	public JGoEllipse myEllipse = null;
 
 	public StatePort()
 	{
+
 		super();
+
 		setSelectable(false);
 		setDraggable(false);
-		setStyle(StyleEllipse);  // black circle/ellipse
+		setStyle(StyleEllipse);		// black circle/ellipse
+
 		// use custom link spots for both links coming in and going out
 		setFromSpot(JGoObject.NoSpot);
 		setToSpot(JGoObject.NoSpot);
@@ -77,6 +86,7 @@ public class StatePort extends JGoPort
 	*/
 	public Point getLinkPointFromPoint(int x, int y, Point p)
 	{
+
 		if (p == null)
 		{
 			p = new Point();
@@ -92,12 +102,11 @@ public class StatePort extends JGoPort
 		double y2 = center.y;
 
 		center = myEllipse.getSpotLocation(JGoObject.Center);
+
 		double U = center.x;
 		double V = center.y;
-
 		double P = myEllipse.getWidth();
 		double Q = myEllipse.getHeight();
-
 		double A = (4.0 / (P * P)) * (x2 - x1) * (x2 - x1) + (4.0 / (Q * Q)) * (y2 - y1) * (y2 - y1);
 		double B = (8.0 / (P * P)) * (x2 - x1) * (x1 - U) + (8.0 / (Q * Q)) * (y2 - y1) * (y1 - V);
 		double C = (4.0 / (P * P)) * (x1 - U) * (x1 - U) + (4.0 / (Q * Q)) * (y1 - V) * (y1 - V) - 1.0;
@@ -110,39 +119,41 @@ public class StatePort extends JGoPort
 
 		double T1 = (-1.0 * B - Math.sqrt(D)) / (2.0 * A);
 		double T2 = (-1.0 * B + Math.sqrt(D)) / (2.0 * A);
-
 		double t1 = Math.min(T1, T2);
 		double t2 = Math.max(T1, T2);
 
 		if ((0.0 <= t1) && (t1 <= 1.0))
 		{
-			p.x = (int)Math.round(x1 + t1 * (x2 - x1));
-			p.y = (int)Math.round(y1 + t1 * (y2 - y1));
+			p.x = (int) Math.round(x1 + t1 * (x2 - x1));
+			p.y = (int) Math.round(y1 + t1 * (y2 - y1));
+
 			return p;
 		}
 		else if ((0.0 <= t2) && (t2 <= 1.0))
 		{
-			p.x = (int)Math.round(x1 + t2 * (x2 - x1));
-			p.y = (int)Math.round(y1 + t2 * (y2 - y1));
+			p.x = (int) Math.round(x1 + t2 * (x2 - x1));
+			p.y = (int) Math.round(y1 + t2 * (y2 - y1));
+
 			return p;
 		}
 
 		return p;
 	}
-/*
-	boolean isValidDestination()
-	{
-		return true;
-	}
 
-	boolean isValidLink()
-	{
-		return true;
-	}
-
- 	boolean isValidSource()
- 	{
- 		return true;
- 	}
-*/
+	/*
+	 *       boolean isValidDestination()
+	 *       {
+	 *               return true;
+	 *       }
+	 *
+	 *       boolean isValidLink()
+	 *       {
+	 *               return true;
+	 *       }
+	 *
+	 *       boolean isValidSource()
+	 *       {
+	 *               return true;
+	 *       }
+	 */
 }

@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,24 +47,25 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.gui;
 
+
+
 import java.util.*;
+
 import org.supremica.automata.templates.*;
+
 
 public class ExampleTemplates
 {
-	private static ExampleTemplates templates = null;
 
+	private static ExampleTemplates templates = null;
 	private final TemplateGroup CCSBookExamples = new TemplateGroup(TemplateTypes.CCSBookExample);
 	private final TemplateGroup CCSBookExercises = new TemplateGroup(TemplateTypes.CCSBookExercise);
 	private final TemplateGroup CCSCourseAssignments = new TemplateGroup(TemplateTypes.CCSCourseAssignment);
 	private final TemplateGroup OtherExamples = new TemplateGroup(TemplateTypes.OtherExample);
 	private final TemplateGroup StandardComponents = new TemplateGroup(TemplateTypes.StandardComponent);
-
 	private static final String extraPrefix = "/includeInJarFile";
-
 	private List allGroups = new LinkedList();
 
 	private ExampleTemplates()
@@ -73,6 +75,7 @@ public class ExampleTemplates
 
 	private void initialize()
 	{
+
 		initializeCCSBookExamples();
 		initializeCCSBookExercises();
 		initializeCCSCourseAssignments();
@@ -82,47 +85,65 @@ public class ExampleTemplates
 
 	private void initializeCCSBookExamples()
 	{
+
 		TemplateGroup thisGroup = CCSBookExamples;
+
 		allGroups.add(thisGroup);
 	}
 
 	private void initializeCCSBookExercises()
 	{
+
 		TemplateGroup thisGroup = CCSBookExercises;
+
 		allGroups.add(thisGroup);
+
 		String prefix = extraPrefix + "/CCSBookExercises/";
+
 		thisGroup.addItem(new TemplateItem("4.5 - Robot & Machine", prefix + "Ex4_5.xml"));
 	}
 
 	private void initializeCCSCourseAssignments()
 	{
+
 		TemplateGroup thisGroup = CCSCourseAssignments;
+
 		allGroups.add(thisGroup);
+
 		String prefix = extraPrefix + "/CCSCourseAssignments/";
+
 		thisGroup.addItem(new TemplateItem("Assignment 1 - Communication channel", prefix + "CommunicationChannel.xml"));
 	}
 
 	private void initializeOtherExamples()
 	{
+
 		TemplateGroup thisGroup = OtherExamples;
+
 		allGroups.add(thisGroup);
+
 		String prefix = extraPrefix + "/OtherExamples/";
+
 		thisGroup.addItem(new TemplateItem("Central locking system - 3 doors", prefix + "centralLocking3Doors.xml"));
 		thisGroup.addItem(new TemplateItem("Flexible manufacturing system", prefix + "flexibleManufacturingSystem.xml"));
 	}
 
 	private void initializeStandardComponents()
 	{
+
 		TemplateGroup thisGroup = StandardComponents;
+
 		allGroups.add(thisGroup);
 	}
 
 	public synchronized static ExampleTemplates getInstance()
 	{
+
 		if (templates == null)
 		{
 			templates = new ExampleTemplates();
 		}
+
 		return templates;
 	}
 
@@ -130,5 +151,4 @@ public class ExampleTemplates
 	{
 		return allGroups.iterator();
 	}
-
 }

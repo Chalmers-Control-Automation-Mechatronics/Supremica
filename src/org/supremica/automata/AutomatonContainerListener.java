@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,13 +47,17 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.automata;
+
+
 
 public interface AutomatonContainerListener
 	extends Listener
 {
+
 	public void automatonAdded(AutomatonContainer container, Automaton automaton);
+
 	public void automatonRemoved(AutomatonContainer container, Automaton automaton);
+
 	public void automatonRenamed(AutomatonContainer container, Automaton automaton);
 }

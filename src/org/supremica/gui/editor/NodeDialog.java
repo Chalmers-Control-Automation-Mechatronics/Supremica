@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,225 +47,256 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.gui.editor;
 
+
+
 import java.awt.*;
+
 import javax.swing.*;
+
 import java.awt.event.*;
 
-public class NodeDialog extends JDialog {
 
+public class NodeDialog
+	extends JDialog
+{
 
-  JPanel panel1 = new JPanel();
+	JPanel panel1 = new JPanel();
+	JLabel label1 = new JLabel();
+	JLabel label2 = new JLabel();
+	JTextField ports = new JTextField();
+	JTextField label = new JTextField();
+	ButtonGroup group1 = new ButtonGroup();
+	JRadioButton horizontal = new JRadioButton();
+	JRadioButton vertical = new JRadioButton();
+	JButton OKButton = new JButton();
+	JButton CancelButton = new JButton();
 
-  JLabel label1 = new JLabel();
-  JLabel label2 = new JLabel();
+	public NodeDialog(Frame frame, String title, boolean modal, AutomatonView view)
+	{
 
-  JTextField ports = new JTextField();
-  JTextField label = new JTextField();
+		super(frame, title, modal);
 
-  ButtonGroup group1 = new ButtonGroup();
+		try
+		{
+			myView = view;
 
-  JRadioButton horizontal = new JRadioButton();
-  JRadioButton vertical = new JRadioButton();
+			jbInit();
+			pack();
+			UpdateDialog();
+		}
+		catch (Exception ex)
+		{
+			ex.printStackTrace();
+		}
+	}
 
-  JButton OKButton = new JButton();
-  JButton CancelButton = new JButton();
+	public NodeDialog()
+	{
+		this(null, "", false, null);
+	}
 
-  public NodeDialog(Frame frame, String title, boolean modal, AutomatonView view)
-  {
-    super(frame, title, modal);
-    try  {
-      myView = view;
-      jbInit();
-      pack();
-      UpdateDialog();
-    }
-    catch(Exception ex) {
-      ex.printStackTrace();
-    }
-  }
+	void jbInit()
+		throws Exception
+	{
 
-  public NodeDialog()
-  {
-    this(null, "", false, null);
-  }
+		panel1.setLayout(null);
+		panel1.setMinimumSize(new Dimension(250, 100));
+		panel1.setPreferredSize(new Dimension(250, 100));
+		OKButton.addActionListener(new java.awt.event.ActionListener()
+		{
 
-  void jbInit() throws Exception
-  {
-    panel1.setLayout(null);
-    panel1.setMinimumSize(new Dimension(250, 100));
-    panel1.setPreferredSize(new Dimension(250, 100));
-    OKButton.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(ActionEvent e)
+			{
+				OKButton_actionPerformed(e);
+			}
+		});
+		CancelButton.addActionListener(new java.awt.event.ActionListener()
+		{
 
-      public void actionPerformed(ActionEvent e) {
-        OKButton_actionPerformed(e);
-      }
-    });
-    CancelButton.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(ActionEvent e)
+			{
+				CancelButton_actionPerformed(e);
+			}
+		});
+		OKButton.addKeyListener(new java.awt.event.KeyAdapter()
+		{
 
-      public void actionPerformed(ActionEvent e) {
-        CancelButton_actionPerformed(e);
-      }
-    });
+			public void keyPressed(KeyEvent e)
+			{
+				OKButton_keyPressed(e);
+			}
+		});
+		CancelButton.addKeyListener(new java.awt.event.KeyAdapter()
+		{
 
-    OKButton.addKeyListener(new java.awt.event.KeyAdapter() {
+			public void keyPressed(KeyEvent e)
+			{
+				CancelButton_keyPressed(e);
+			}
+		});
+		getContentPane().add(panel1);
+		OKButton.setText("OK");
+		OKButton.setFont(new Font("Dialog", Font.PLAIN, 12));
+		OKButton.setBounds(new Rectangle(165, 10, 80, 22));
+		panel1.add(OKButton);
+		CancelButton.setText("Cancel");
+		CancelButton.setFont(new Font("Dialog", Font.PLAIN, 12));
+		CancelButton.setBounds(new Rectangle(166, 40, 80, 22));
+		panel1.add(CancelButton);
+		label1.setText("Ports");
+		label1.setBounds(new Rectangle(10, 10, 50, 20));
+		panel1.add(label1);
+		label2.setText("Label");
+		label2.setBounds(new Rectangle(10, 35, 50, 20));
+		panel1.add(label2);
+		ports.setText("1");
+		ports.setBounds(new Rectangle(60, 10, 80, 20));
+		panel1.add(ports);
+		label.setBounds(new Rectangle(60, 35, 80, 20));
+		panel1.add(label);
+		group1.add(horizontal);
+		group1.add(vertical);
+		horizontal.setText("Horizontal");
+		horizontal.setSelected(true);
+		horizontal.setBounds(new Rectangle(10, 60, 80, 20));
+		panel1.add(horizontal);
+		vertical.setText("Vertical");
+		vertical.setBounds(new Rectangle(10, 80, 80, 20));
+		panel1.add(vertical);
+	}
 
-      public void keyPressed(KeyEvent e) {
-        OKButton_keyPressed(e);
-      }
-    });
-    CancelButton.addKeyListener(new java.awt.event.KeyAdapter() {
+	void UpdateDialog() {}
 
-      public void keyPressed(KeyEvent e) {
-        CancelButton_keyPressed(e);
-      }
-    });
-    getContentPane().add(panel1);
+	void UpdateControl()
+	{
 
-    OKButton.setText("OK");
-    OKButton.setFont(new Font("Dialog", Font.PLAIN, 12));
-    OKButton.setBounds(new Rectangle(165, 10, 80, 22));
-    panel1.add(OKButton);
-    CancelButton.setText("Cancel");
-    CancelButton.setFont(new Font("Dialog", Font.PLAIN, 12));
-    CancelButton.setBounds(new Rectangle(166, 40, 80, 22));
-    panel1.add(CancelButton);
+		/*
+		 *   if(myView != null){
+		 *     String s = label.getText();
+		 *     int numPorts = Integer.parseInt(ports.getText());
+		 *     if(numPorts <= 0)
+		 *       numPorts = 1;
+		 *     else if(numPorts > 100)
+		 *       numPorts = 100;
+		 *     if (s.length() > 0)
+		 *       myView.insertNode(null, s, numPorts, horizontal.isSelected());
+		 *     else
+		 *       myView.insertNode(null, null, numPorts, horizontal.isSelected());
+		 *   }
+		 */
+	}
 
-    label1.setText("Ports");
-    label1.setBounds(new Rectangle(10, 10, 50, 20));
-    panel1.add(label1);
-    label2.setText("Label");
-    label2.setBounds(new Rectangle(10, 35, 50, 20));
-    panel1.add(label2);
+	public void addNotify()
+	{
 
-    ports.setText("1");
-    ports.setBounds(new Rectangle(60, 10, 80, 20));
-    panel1.add(ports);
+		// Record the size of the window prior to calling parents addNotify.
+		Dimension d = getSize();
 
-    label.setBounds(new Rectangle(60, 35, 80, 20));
-    panel1.add(label);
+		super.addNotify();
 
-    group1.add(horizontal);
-    group1.add(vertical);
-    horizontal.setText("Horizontal");
-    horizontal.setSelected(true);
-    horizontal.setBounds(new Rectangle(10, 60, 80, 20));
-    panel1.add(horizontal);
-    vertical.setText("Vertical");
-    vertical.setBounds(new Rectangle(10, 80, 80, 20));
-    panel1.add(vertical);
-  }
+		if (fComponentsAdjusted)
+		{
+			return;
+		}
 
-  void UpdateDialog()
-  {
+		// Adjust components according to the insets
+		Insets insets = getInsets();
 
-  }
+		setSize(insets.left + insets.right + d.width, insets.top + insets.bottom + d.height);
 
-  void UpdateControl()
-  {
-/*
-    if(myView != null){
-      String s = label.getText();
-      int numPorts = Integer.parseInt(ports.getText());
-      if(numPorts <= 0)
-        numPorts = 1;
-      else if(numPorts > 100)
-        numPorts = 100;
-      if (s.length() > 0)
-        myView.insertNode(null, s, numPorts, horizontal.isSelected());
-      else
-        myView.insertNode(null, null, numPorts, horizontal.isSelected());
-    }
-*/
-  }
+		Component components[] = getComponents();
 
-  public void addNotify()
-  {
-    // Record the size of the window prior to calling parents addNotify.
-    Dimension d = getSize();
+		for (int i = 0; i < components.length; i++)
+		{
+			Point p = components[i].getLocation();
 
-    super.addNotify();
+			p.translate(insets.left, insets.top);
+			components[i].setLocation(p);
+		}
 
-    if (fComponentsAdjusted)
-      return;
+		fComponentsAdjusted = true;
+	}
 
-    // Adjust components according to the insets
-    Insets insets = getInsets();
-    setSize(insets.left + insets.right + d.width, insets.top + insets.bottom + d.height);
-    Component components[] = getComponents();
-    for (int i = 0; i < components.length; i++)
-    {
-      Point p = components[i].getLocation();
-      p.translate(insets.left, insets.top);
-      components[i].setLocation(p);
-    }
-    fComponentsAdjusted = true;
-  }
+	// Used for addNotify check.
+	boolean fComponentsAdjusted = false;
 
-    // Used for addNotify check.
-  boolean fComponentsAdjusted = false;
+	/**
+	 * Shows or hides the component depending on the boolean flag b.
+	 * @param b  if true, show the component; otherwise, hide the component.
+	 * @see javax.swing.JComponent#isVisible
+	 */
+	public void setVisible(boolean b)
+	{
 
-  /**
-   * Shows or hides the component depending on the boolean flag b.
-   * @param b  if true, show the component; otherwise, hide the component.
-   * @see javax.swing.JComponent#isVisible
-   */
-  public void setVisible(boolean b)
-  {
-    if (b) {
-      Rectangle bounds = getParent().getBounds();
-      Rectangle abounds = getBounds();
+		if (b)
+		{
+			Rectangle bounds = getParent().getBounds();
+			Rectangle abounds = getBounds();
 
-      setLocation(bounds.x + Math.abs((bounds.width - abounds.width)/ 2),
-                  bounds.y + Math.abs((bounds.height - abounds.height)/2));
-    }
-    super.setVisible(b);
-  }
+			setLocation(bounds.x + Math.abs((bounds.width - abounds.width) / 2), bounds.y + Math.abs((bounds.height - abounds.height) / 2));
+		}
 
-  void OKButton_actionPerformed(ActionEvent e)
-  {
-    OnOK();
-  }
+		super.setVisible(b);
+	}
 
-  void OnOK()
-  {
-    try {
-      UpdateControl();
-      this.dispose();             // Free system resources
-    } catch (Exception e) {
-    }
-  }
+	void OKButton_actionPerformed(ActionEvent e)
+	{
+		OnOK();
+	}
 
-  void CancelButton_actionPerformed(ActionEvent e)
-  {
-    OnCancel();
-  }
+	void OnOK()
+	{
 
-  void OnCancel()
-  {
-    try {
-      this.dispose();             // Free system resources
-    } catch (Exception e) {
-    }
-  }
+		try
+		{
+			UpdateControl();
+			this.dispose();		// Free system resources
+		}
+		catch (Exception e) {}
+	}
 
-  void OKButton_keyPressed(KeyEvent e) {
-    if (e.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
-      OnOK();
-    } else if (e.getKeyCode() == java.awt.event.KeyEvent.VK_ESCAPE) {
-      OnCancel();
-    }
-  }
+	void CancelButton_actionPerformed(ActionEvent e)
+	{
+		OnCancel();
+	}
 
-  void CancelButton_keyPressed(KeyEvent e) {
-    if (e.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
-      OnCancel();
-    } else if (e.getKeyCode() == java.awt.event.KeyEvent.VK_ESCAPE) {
-      OnCancel();
-    }
-  }
+	void OnCancel()
+	{
 
-  AutomatonView myView = null;
+		try
+		{
+			this.dispose();		// Free system resources
+		}
+		catch (Exception e) {}
+	}
+
+	void OKButton_keyPressed(KeyEvent e)
+	{
+
+		if (e.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER)
+		{
+			OnOK();
+		}
+		else if (e.getKeyCode() == java.awt.event.KeyEvent.VK_ESCAPE)
+		{
+			OnCancel();
+		}
+	}
+
+	void CancelButton_keyPressed(KeyEvent e)
+	{
+
+		if (e.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER)
+		{
+			OnCancel();
+		}
+		else if (e.getKeyCode() == java.awt.event.KeyEvent.VK_ESCAPE)
+		{
+			OnCancel();
+		}
+	}
+
+	AutomatonView myView = null;
 }

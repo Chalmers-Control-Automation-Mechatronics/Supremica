@@ -1,17 +1,19 @@
-// Knut Åkesson
 
+// Knut Åkesson
 package org.jgrafchart.io.LTH;
+
+
 
 import org.jgrafchart.io.DigitalIO;
 import org.jgrafchart.io.DigitalInput;
 import org.jgrafchart.io.DigitalOutput;
 
+
 public class LTHDigitalIO
 	implements DigitalIO
 {
-	public LTHDigitalIO()
-	{
-	}
+
+	public LTHDigitalIO() {}
 
 	public DigitalInput getInput(int channel)
 		throws Exception
@@ -25,4 +27,3 @@ public class LTHDigitalIO
 		return new LTHDigitalOutput(channel);
 	}
 }
-

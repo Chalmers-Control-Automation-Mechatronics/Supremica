@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,13 +47,15 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.automata;
+
+
 
 import java.util.*;
 
+
 /**
- * Contains a collection of events. 
+ * Contains a collection of events.
  * Implements functionality for quickly
  * returning a event with a given label.
  *
@@ -66,6 +69,7 @@ import java.util.*;
  */
 public class Events
 {
+
 	private TreeMap theEvents;
 
 	/**
@@ -78,13 +82,15 @@ public class Events
 
 	public Events(Events orgEvents)
 	{
+
 		this();
+
 		// theEvents = new TreeMap(orgEvents.theEvents);
 		// Deep copy
-		for(Iterator it = orgEvents.iterator(); it.hasNext(); )
+		for (Iterator it = orgEvents.iterator(); it.hasNext(); )
 		{
+			Event newEvent = new Event((Event) it.next());
 
-			Event newEvent = new Event((Event)it.next());
 			theEvents.put(newEvent.getLabel(), newEvent);
 		}
 	}
@@ -144,11 +150,11 @@ public class Events
 	public Event getEventWithLabel(String label)
 		throws Exception
 	{
-		// System.err.println(label);
 
+		// System.err.println(label);
 		if (containsEventWithLabel(label))
 		{
-			return (Event)theEvents.get(label);
+			return (Event) theEvents.get(label);
 		}
 		else
 		{
@@ -156,17 +162,22 @@ public class Events
 		}
 	}
 
- 	public Event getEventWithIndex(int index)
+	public Event getEventWithIndex(int index)
 		throws Exception
 	{
-     		Iterator eventIt = iterator();
+
+		Iterator eventIt = iterator();
 
 		while (eventIt.hasNext())
-  		{
-        	Event currEvent = (Event)eventIt.next();
-         	if (currEvent.getSynchIndex() == index)
-          		return currEvent;
-        }
+		{
+			Event currEvent = (Event) eventIt.next();
+
+			if (currEvent.getSynchIndex() == index)
+			{
+				return currEvent;
+			}
+		}
+
 		throw new Exception("No event with index '" + index + "' exists");
 	}
 
@@ -180,7 +191,9 @@ public class Events
 
 	public String toString()
 	{
+
 		StringBuffer tmpBuf = new StringBuffer("Events:\n   theEvents: " + theEvents);
+
 		return tmpBuf.toString();
 	}
 
@@ -197,16 +210,20 @@ public class Events
 	 */
 	public void rehash()
 	{
+
 		TreeMap newEvents = new TreeMap();
+
 		// theEvents = new TreeMap(orgEvents.theEvents);
 		// Deep copy
-		for(Iterator it = iterator(); it.hasNext(); )
+		for (Iterator it = iterator(); it.hasNext(); )
 		{
+			Event currEvent = (Event) it.next();
 
-			Event currEvent = (Event)it.next();
 			newEvents.put(currEvent.getLabel(), currEvent);
 		}
+
 		theEvents.clear();
+
 		theEvents = newEvents;
 	}
 }

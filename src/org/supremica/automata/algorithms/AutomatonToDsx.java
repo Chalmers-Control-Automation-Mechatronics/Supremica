@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,17 +47,21 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.automata.algorithms;
 
+
+
 import java.util.*;
+
 import java.io.*;
 
 import org.supremica.automata.*;
 
+
 public class AutomatonToDsx
 	implements AutomataSerializer
 {
+
 	private Automaton aut;
 
 	public AutomatonToDsx(Automaton aut)
@@ -65,63 +70,100 @@ public class AutomatonToDsx
 	}
 
 	public void serialize(PrintWriter pw)
- 		throws Exception
+		throws Exception
 	{
+
 		pw.println("STATESPACE;");
 		pw.println("number of states: " + aut.nbrOfStates());
 		pw.println("number of events: " + aut.nbrOfEvents());
 
 		// Print all states
 		Iterator states = aut.stateIterator();
+
 		while (states.hasNext())
 		{
-			State state = (State)states.next();
+			State state = (State) states.next();
+
 			pw.print(state.getName());
+
 			if (states.hasNext())
+			{
 				pw.print(", ");
+			}
 			else
+			{
 				pw.println(":");
+			}
 		}
 
 		// Print all events
 		Iterator events = aut.eventIterator();
+
 		while (events.hasNext())
 		{
-			Event event = (Event)events.next();
+			Event event = (Event) events.next();
+
 			if (!event.isControllable())
+			{
 				pw.print("!");
+			}
+
 			if (!event.isPrioritized())
+			{
 				pw.print("?");
+			}
+
 			pw.print(event.getLabel());
+
 			if (events.hasNext())
+			{
 				pw.print(", ");
+			}
 			else
+			{
 				pw.println(":");
+			}
 		}
 
 		// Print all transitions
 		states = aut.stateIterator();
+
 		while (states.hasNext())
 		{
-			State sourceState = (State)states.next();
+			State sourceState = (State) states.next();
+
 			pw.print(sourceState.getName());
+
 			if (sourceState.isInitial())
+			{
 				pw.print(",i");
+			}
+
 			if (sourceState.isAccepting())
+			{
 				pw.print(",d");
+			}
+
 			if (sourceState.isForbidden())
+			{
 				pw.print(",x");
+			}
+
 			pw.print(":");
 
 			Iterator outgoingArcs = sourceState.outgoingArcsIterator();
+
 			while (outgoingArcs.hasNext())
 			{
-				Arc arc = (Arc)outgoingArcs.next();
+				Arc arc = (Arc) outgoingArcs.next();
 				State destState = arc.getToState();
+
 				pw.print(" " + destState.getName() + ":" + aut.getAlphabet().getEventWithId(arc.getEventId()).getLabel());
 			}
+
 			pw.println("");
 		}
+
 		pw.flush();
 		pw.close();
 	}

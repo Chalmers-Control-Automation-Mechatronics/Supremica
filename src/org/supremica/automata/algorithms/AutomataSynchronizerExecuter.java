@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,17 +47,20 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.automata.algorithms;
+
+
 
 import org.supremica.automata.*;
 import org.supremica.gui.*;
+
 import org.apache.log4j.*;
 
 import java.util.Arrays;
 
 // For the automata selection methods
 import java.util.ArrayList;
+
 
 /**
  * Performs all kinds of synchronization tasks, for synchronization, verification and synthesis.
@@ -68,21 +72,18 @@ import java.util.ArrayList;
 public final class AutomataSynchronizerExecuter
 	extends Thread
 {
+
 	private final AutomataSynchronizerHelper helper;
 	private final AutomataIndexForm indexForm;
-
- 	private static Category thisCategory = LogDisplay.createCategory(AutomataSynchronizerExecuter.class.getName());
-
+	private static Category thisCategory = LogDisplay.createCategory(AutomataSynchronizerExecuter.class.getName());
 	private final int nbrOfAutomata;
 	private final int nbrOfEvents;
-
 	private final int[][][] nextStateTable;
 	private final int[][][] outgoingEventsTable;
 	private final boolean[][] prioritizedEventsTable;
 	private final boolean[] typeIsPlantTable;
 	private final boolean[] controllableEventsTable;
 	private final boolean[] immediateEventsTable;
-
 	private int[][] currOutgoingEvents;
 	private int[] currOutgoingEventsIndex;
 	private int[] automataIndices;
@@ -90,23 +91,25 @@ public final class AutomataSynchronizerExecuter
 	private int[] nextState;
 	private int[] currEnabledEvents;
 	private boolean controllableState;
-
 	private static final int IMMEDIATE_NOT_AVAILABLE = -1;
 	private int immediateEvent = IMMEDIATE_NOT_AVAILABLE;
-
 
 	/** Options determining how the synchronization should be performed.
 	 */
 	private final SynchronizationOptions syncOptions;
+
 	/** Determines if uncontrollable states should be marked as forbidden.
 	 * @see SynchronizationOptions */
 	private boolean forbidUncontrollableStates;
+
 	/** Determines if uncontrollable states should be expanded in the synchronization.
 	 * @see SynchronizationOptions */
 	private boolean expandForbiddenStates;
+
 	/** Determines if more detailed information on the progress of things should be displayed.
 	 * @see SynchronizationOptions */
 	private boolean verboseMode;
+
 	/** Determines synchronization type.
 	 * @see SynchronizationType
 	 * @see SynchronizationOptions */
@@ -120,7 +123,6 @@ public final class AutomataSynchronizerExecuter
 	private boolean expandEventsUsingPriority;
 	private boolean rememberUncontrollable = false;
 	private boolean exhaustiveSearch = false;
-
 	private boolean coExecute = false;
 	private AutomataOnlineSynchronizer coExecuter = null;
 
@@ -133,13 +135,14 @@ public final class AutomataSynchronizerExecuter
 	/**
 	 * @param synchronizerHelper helper for multithread execution.
 	 */
-    public AutomataSynchronizerExecuter(AutomataSynchronizerHelper synchronizerHelper)
-    {
-        helper = synchronizerHelper;
+	public AutomataSynchronizerExecuter(AutomataSynchronizerHelper synchronizerHelper)
+	{
+
+		helper = synchronizerHelper;
 		indexForm = helper.getAutomataIndexForm();
- 		nbrOfAutomata = helper.getAutomata().size();
+		nbrOfAutomata = helper.getAutomata().size();
 		nbrOfEvents = helper.getAutomaton().getAlphabet().size();
-  		nextStateTable = indexForm.getNextStateTable();
+		nextStateTable = indexForm.getNextStateTable();
 		outgoingEventsTable = indexForm.getOutgoingEventsTable();
 		prioritizedEventsTable = indexForm.getPrioritizedEventsTable();
 		typeIsPlantTable = indexForm.getTypeIsPlantTable();
@@ -164,25 +167,31 @@ public final class AutomataSynchronizerExecuter
 		forbidUncontrollableStates = syncOptions.forbidUncontrollableStates();
 		expandForbiddenStates = syncOptions.expandForbiddenStates();
 		verboseMode = syncOptions.verboseMode();
+
 		if (rememberUncontrollable)
 		{
 			expandForbiddenStates = false;
 		}
-    }
+	}
 
 	/**
 	 * @deprecated Used by deprecated method AutomataPairWiseCheck.
 	 */
+
 	// Only used by AutomataPairWiseCheck (removable)
 	// Select two automata
 	public void selectTwoAutomata(int plantIndex, int supervisorIndex)
 		throws Exception
 	{
+
 		automataIndices = new int[2];
 		automataIndices[0] = plantIndex;
 		automataIndices[1] = supervisorIndex;
+
 		if (exhaustiveSearch)
+		{
 			throw new Exception("Exhaustive search used wrong way!");
+		}
 	}
 
 	/**
@@ -191,14 +200,20 @@ public final class AutomataSynchronizerExecuter
 	public void selectAutomata(ArrayList automataToBeSelected)
 		throws Exception
 	{
+
 		automataIndices = new int[automataToBeSelected.size()];
+
 		for (int i = 0; i < automataToBeSelected.size(); i++)
 		{
 			automataIndices[i] = ((Automaton) automataToBeSelected.get(i)).getIndex();
 		}
-		helper.selectAutomata(automataIndices); // FIXA!
+
+		helper.selectAutomata(automataIndices);		// FIXA!
+
 		if (exhaustiveSearch)
+		{
 			throw new Exception("Exhaustive search used wrong way!");
+		}
 	}
 
 	/**
@@ -207,9 +222,13 @@ public final class AutomataSynchronizerExecuter
 	public void selectAutomata(int[] automataIndices)
 		throws Exception
 	{
+
 		this.automataIndices = automataIndices;
+
 		if (exhaustiveSearch)
+		{
 			throw new Exception("Exhaustive search used wrong way!");
+		}
 	}
 
 	/**
@@ -217,7 +236,9 @@ public final class AutomataSynchronizerExecuter
 	 */
 	public void selectAllAutomata()
 	{
+
 		automataIndices = new int[nbrOfAutomata];
+
 		for (int i = 0; i < nbrOfAutomata; i++)
 		{
 			automataIndices[i] = i;
@@ -229,14 +250,17 @@ public final class AutomataSynchronizerExecuter
 	 */
 	public final void initialize()
 	{
+
 		currOutgoingEvents = new int[nbrOfAutomata][];
 		currOutgoingEventsIndex = new int[nbrOfAutomata];
 
 		if (automataIndices == null)
+		{
 			selectAllAutomata();
+		}
 
-		nextState = new int[nbrOfAutomata + 1]; // +1 status field
-		currEnabledEvents = new int[nbrOfEvents + 1]; // Always end with Integer.MAX_VALUE
+		nextState = new int[nbrOfAutomata + 1];		// +1 status field
+		currEnabledEvents = new int[nbrOfEvents + 1];		// Always end with Integer.MAX_VALUE
 	}
 
 	/**
@@ -245,8 +269,9 @@ public final class AutomataSynchronizerExecuter
 	 *
 	 * @param currState the (full) state to be examined.
 	 */
- 	private final void enabledEvents(int[] currState)
-  	{
+	private final void enabledEvents(int[] currState)
+	{
+
 		int currMinEventIndex = Integer.MAX_VALUE;
 		int nbrOfSelectedAutomata = automataIndices.length;
 
@@ -255,21 +280,21 @@ public final class AutomataSynchronizerExecuter
 		// currOutgoingEventsIndex.
 		// Also find the smallest event index possible from
 		// the current state.
-		for(int i = 0; i < nbrOfSelectedAutomata; i++)
+		for (int i = 0; i < nbrOfSelectedAutomata; i++)
 		{
+
 			// Initialization part
 			int currAutIndex = automataIndices[i];
 			int currSingleStateIndex = currState[currAutIndex];
 
-			currOutgoingEvents[currAutIndex] =
-				outgoingEventsTable[currAutIndex][currSingleStateIndex];
-
+			currOutgoingEvents[currAutIndex] = outgoingEventsTable[currAutIndex][currSingleStateIndex];
 			currOutgoingEventsIndex[currAutIndex] = 0;
 
 			// Find the event with the smallest index.
 			// The last element currOutgoingEvents[currAutIndex]
 			// is always Integer.MAX_VALUE
 			int currEventIndex = currOutgoingEvents[currAutIndex][0];
+
 			if (currEventIndex < currMinEventIndex)
 			{
 				currMinEventIndex = currEventIndex;
@@ -281,17 +306,19 @@ public final class AutomataSynchronizerExecuter
 		boolean thisEventOk;
 		boolean thisPlantEventOk;
 		boolean canExecuteInPlant;
+
 		controllableState = true;
 		immediateEvent = IMMEDIATE_NOT_AVAILABLE;
 
 		while (currMinEventIndex < Integer.MAX_VALUE)
 		{
 			int currEventIndex = currMinEventIndex;
-			currMinEventIndex = Integer.MAX_VALUE;
 
+			currMinEventIndex = Integer.MAX_VALUE;
 			thisEventOk = true;
 			thisPlantEventOk = true;
 			canExecuteInPlant = false;
+
 			int currAutIndex = 0;
 			int currAutEventIndex = 0;
 
@@ -302,21 +329,22 @@ public final class AutomataSynchronizerExecuter
 				currAutIndex = automataIndices[i];
 
 				// This is the index of the "next" event in the current automaton
-				currAutEventIndex =
-					currOutgoingEvents[currAutIndex][currOutgoingEventsIndex[currAutIndex]];
+				currAutEventIndex = currOutgoingEvents[currAutIndex][currOutgoingEventsIndex[currAutIndex]];
 
 				if (syncType == SynchronizationType.Prioritized)
 				{
 					if (prioritizedEventsTable[currAutIndex][currEventIndex])
-					{   // The event is prioritized in currAutomaton
+					{			// The event is prioritized in currAutomaton
 						if (!(currEventIndex == currAutEventIndex))
 						{
+
 							// Then currIndex (the event) must also be the
 							// current event in this automaton
 							thisEventOk = false;
 
 							if (typeIsPlantTable[currAutIndex])
 							{
+
 								// Then currIndex (the event) must also be the
 								// current event in this automaton
 								thisPlantEventOk = false;
@@ -328,12 +356,14 @@ public final class AutomataSynchronizerExecuter
 				{
 					if (!(currEventIndex == currAutEventIndex))
 					{
+
 						// Then currIndex (the event) must also be the
 						// current event in this automaton
 						thisEventOk = false;
 
 						if (typeIsPlantTable[currAutIndex])
 						{
+
 							// Then currIndex (the event) must also be the
 							// current event in this automaton
 							thisPlantEventOk = false;
@@ -344,6 +374,7 @@ public final class AutomataSynchronizerExecuter
 				{
 					if (typeIsPlantTable[currAutIndex])
 					{
+
 						// Then currIndex (the event) must also be the
 						// current event in this automaton
 						thisPlantEventOk = false;
@@ -352,6 +383,7 @@ public final class AutomataSynchronizerExecuter
 				else
 				{
 					thisCategory.error("Unknown SynchronizationType");
+
 					// throw new Exception("Unknown SynchronizationType");
 				}
 
@@ -359,12 +391,13 @@ public final class AutomataSynchronizerExecuter
 				if (!canExecuteInPlant && typeIsPlantTable[currAutIndex])
 				{
 					if (currEventIndex == currAutEventIndex)
-					{	// Then currIndex (the event) must also be the
+					{			// Then currIndex (the event) must also be the
+
 						// current event in this automaton
 						canExecuteInPlant = true;
 
 						if (rememberUncontrollable)
-						{   // Remember uncontrollable states
+						{		// Remember uncontrollable states
 							problemEvent = currEventIndex;
 							problemPlant = currAutIndex;
 						}
@@ -375,11 +408,11 @@ public final class AutomataSynchronizerExecuter
 				// find the next event for this automaton and state
 				// Independently of the alphabets!
 				if (currEventIndex == currAutEventIndex)
-				{ // Point to the next index;
+				{				// Point to the next index;
 					int tmpIndex = currOutgoingEventsIndex[currAutIndex];
+
 					currOutgoingEventsIndex[currAutIndex] = ++tmpIndex;
-					currAutEventIndex =
-						currOutgoingEvents[currAutIndex][tmpIndex];
+					currAutEventIndex = currOutgoingEvents[currAutIndex][tmpIndex];
 				}
 
 				// Find the new minimum index
@@ -392,9 +425,10 @@ public final class AutomataSynchronizerExecuter
 			if (thisEventOk)
 			{
 				if (immediateEventsTable[currEventIndex])
-				{ // Clear out everything else and abort the search for enabled events
-				  // If several events that are immediate are found
-				  // Then the one with smallest index are chosen.
+				{		// Clear out everything else and abort the search for enabled events
+
+					// If several events that are immediate are found
+					// Then the one with smallest index are chosen.
 					immediateEvent = currEventIndex;
 					nbrOfEnabledEvents = 0;
 					currEnabledEvents[nbrOfEnabledEvents++] = immediateEvent;
@@ -406,15 +440,19 @@ public final class AutomataSynchronizerExecuter
 				}
 			}
 
-			if (!thisEventOk && canExecuteInPlant && thisPlantEventOk && !controllableEventsTable[currEventIndex])
-			{   // Uncontrollable state found
+			if (!thisEventOk && canExecuteInPlant && thisPlantEventOk &&!controllableEventsTable[currEventIndex])
+			{					// Uncontrollable state found
 				controllableState = false;
+
 				helper.setAutomataIsControllable(false);
 
 				if (exhaustiveSearch)
-				{   // Stop when uncontrollable state found
+				{				// Stop when uncontrollable state found
 					if (verboseMode)
+					{
 						thisCategory.info("Uncontrollable state found.");
+					}
+
 					return;
 				}
 			}
@@ -424,64 +462,81 @@ public final class AutomataSynchronizerExecuter
 		currEnabledEvents[nbrOfEnabledEvents++] = Integer.MAX_VALUE;
 
 		if (expandEventsUsingPriority)
-		{   // Choose outgoing events among the possibilities, choose after priority...
+		{		// Choose outgoing events among the possibilities, choose after priority...
 			int insertionIndex = 0;
 			int i = 0;
 			int minPrio = 2;
 			int currPrio = 0;
 			int currEvent;
+
 			while ((currPrio < minPrio) && (insertionIndex == 0))
 			{
 				i = 0;
 				currEvent = currEnabledEvents[i++];
+
 				currPrio++;
+
 				while (currEvent != Integer.MAX_VALUE)
 				{
 					if (eventPriority[currEvent] <= currPrio)
 					{
 						currEnabledEvents[insertionIndex++] = currEvent;
 					}
+
 					currEvent = currEnabledEvents[i++];
 				}
 			}
+
 			// ... or if no events are prioritized, take the first two...
 			if (insertionIndex == 0)
 			{
 				insertionIndex = 2;
 			}
+
 			currEnabledEvents[insertionIndex] = Integer.MAX_VALUE;
 		}
 
 		if (coExecute)
-		{   // In co-execution mode, an enabledEvents-method in another executer
+		{		// In co-execution mode, an enabledEvents-method in another executer
+
 			// follows the automaton we're suspecting has uncontrollable states.
 			int insertionIndex = 0;
 			int i = 0;
 			int currEvent = currEnabledEvents[i++];
+
 			while (currEvent != Integer.MAX_VALUE)
 			{
 				if (coExecuter.isEnabled(currEvent))
 				{
 					currEnabledEvents[insertionIndex++] = currEvent;
 				}
+
 				currEvent = currEnabledEvents[i++];
 			}
 
 			if (insertionIndex == 0)
-			{   // Found no corresponding transitions in the suspect automaton...
-				// /*
- 				if (verboseMode)
-				 	thisCategory.debug("The suspect automaton has no corresponding transitions, wandering aimlessly...");
-				//  */
-				// Here, the insertionIndex sets the maximium amount of states that are examined...
-				// insertionIndex = 2;
-				insertionIndex = currEnabledEvents.length-1;
-			}
-			else
-			{   // There are transitions in the suspect automaton...
+			{		// Found no corresponding transitions in the suspect automaton...
+
 				// /*
 				if (verboseMode)
+				{
+					thisCategory.debug("The suspect automaton has no corresponding transitions, wandering aimlessly...");
+				}
+
+				// */
+				// Here, the insertionIndex sets the maximium amount of states that are examined...
+				// insertionIndex = 2;
+				insertionIndex = currEnabledEvents.length - 1;
+			}
+			else
+			{		// There are transitions in the suspect automaton...
+
+				// /*
+				if (verboseMode)
+				{
 					thisCategory.debug("Following transitions in the suspect automaton, there are " + insertionIndex + " such transitions...");
+				}
+
 				// */
 			}
 
@@ -492,9 +547,8 @@ public final class AutomataSynchronizerExecuter
 	/**
 	 * Performs the synchronization.
 	 */
-    public void run()
-    {
-
+	public void run()
+	{
 
 		initialize();
 
@@ -502,52 +556,66 @@ public final class AutomataSynchronizerExecuter
 		int[] currState = helper.getStateToProcess();
 
 		// main loop
-		while (currState != null && !stopRequested)
+		while ((currState != null) &&!stopRequested)
 		{
 			if (coExecute)
+			{
 				coExecuter.setCurrState(currState);
+			}
 
 			enabledEvents(currState);
 
 			if (!controllableState)
-			{	// We'd like to remember this state and later on try to show that
+			{		// We'd like to remember this state and later on try to show that
+
 				// it will be excluded in the total synchronization...  or not.
 				if (rememberUncontrollable)
-					if (currUncontrollableEvent == -1 || currUncontrollableEvent == problemEvent)
+				{
+					if ((currUncontrollableEvent == -1) || (currUncontrollableEvent == problemEvent))
+					{
 						potentiallyUncontrollableStates.add(automataIndices, currState, problemPlant, problemEvent);
+					}
+				}
+
 				// We now know that there is an uncontrollable state
 				if (exhaustiveSearch)
+				{
 					return;
+				}
+
 				// Forbid uncontrollable state?
 				if (forbidUncontrollableStates)
+				{
 					helper.setForbidden(currState, true);
+				}
 			}
 
 			if (controllableState || expandForbiddenStates)
-			{   // Expand state
+			{		// Expand state
 				int i = 0;
 				int currEventIndex = currEnabledEvents[i];
+
 				// Handle all events
 				while (currEventIndex != Integer.MAX_VALUE)
-				{	// Generate an array that contains the indicies of each state
+				{		// Generate an array that contains the indicies of each state
 					System.arraycopy(currState, 0, nextState, 0, currState.length);
 
 					// Iterate over all automata to construct the new state
 					for (int j = 0; j < automataIndices.length; j++)
 					{
 						int currAutomatonIndex = automataIndices[j];
-						int currSingleNextState =
-							nextStateTable[currAutomatonIndex][currState[currAutomatonIndex]][currEventIndex];
+						int currSingleNextState = nextStateTable[currAutomatonIndex][currState[currAutomatonIndex]][currEventIndex];
+
 						// Jump in all automata that have this event defined.
 						if (currSingleNextState != Integer.MAX_VALUE)
 						{
 							nextState[currAutomatonIndex] = currSingleNextState;
 						}
 					}
+
 					// Add this state to the automaton
 					// and include it in the queue of states waiting for
 					// processing if it has not been processed before
-
 					// Update this to check if the state is not forbidden instead of
 					// only controllable.
 					try
@@ -558,15 +626,16 @@ public final class AutomataSynchronizerExecuter
 					{
 						System.err.println(e);
 						thisCategory.error("Error in SynchronizerExecuter");
+
 						return;
 					}
 
 					currEventIndex = currEnabledEvents[++i];
 				}
 			}
-      		currState = helper.getStateToProcess();
-        }
 
+			currState = helper.getStateToProcess();
+		}
 	}
 
 	/**
@@ -577,6 +646,7 @@ public final class AutomataSynchronizerExecuter
 	 */
 	public void requestStop()
 	{
+
 		// System.out.println("Executer requested to stop.");
 		stopRequested = true;
 	}
@@ -588,7 +658,7 @@ public final class AutomataSynchronizerExecuter
 	 */
 	public boolean buildAutomaton()
 		throws Exception
-    {
+	{
 		return buildAutomaton(true);
 	}
 
@@ -600,267 +670,282 @@ public final class AutomataSynchronizerExecuter
 	 */
 	public boolean buildAutomaton(boolean longformId)
 		throws Exception
-    {
+	{
 
 		try
 		{
+			Automaton theAutomaton = helper.getAutomaton();
 
-        Automaton theAutomaton = helper.getAutomaton();
-        theAutomaton.setName("regaut");
-		Alphabet theAlphabet = theAutomaton.getAlphabet();
+			theAutomaton.setName("regaut");
 
-        int[][] currStateTable = helper.getStateTable();
-		int stateNumber = 0;
+			Alphabet theAlphabet = theAutomaton.getAlphabet();
+			int[][] currStateTable = helper.getStateTable();
+			int stateNumber = 0;
+			ExecutionDialog executionDialog = helper.getExecutionDialog();
 
-		ExecutionDialog executionDialog = helper.getExecutionDialog();
-		if (executionDialog != null)
-		{
-			executionDialog.initProgressBar(0, currStateTable.length);
-			executionDialog.setMode(ExecutionDialogMode.buildingStates);
-		}
-
-        // Create all states
-		for (int i = 0; i < currStateTable.length; i++)
-  		{
-
-			if (i % 100 == 0)
+			if (executionDialog != null)
 			{
-				if (executionDialog != null)
+				executionDialog.initProgressBar(0, currStateTable.length);
+				executionDialog.setMode(ExecutionDialogMode.buildingStates);
+			}
+
+			// Create all states
+			for (int i = 0; i < currStateTable.length; i++)
+			{
+				if (i % 100 == 0)
 				{
-					executionDialog.setProgress(i);
-				}
-			}
-
-			if (stopRequested)
-			{
-				return false;
-			}
-
-			if (currStateTable[i] != null)
-   			{
-				int[] currState = currStateTable[i];
-    			State newState = new State();
-
-    			newState.setIndex(i);
-
-       			if (longformId)
-          		{
-                	State[][] stateTable = indexForm.getStateTable();
-                	StringBuffer sb = new StringBuffer();
-					for (int j = 0; j < currState.length - 1; j++)
-     				{
-             			sb.append(stateTable[j][currState[j]].getId());
+					if (executionDialog != null)
+					{
+						executionDialog.setProgress(i);
 					}
-     				newState.setId(sb.toString());
-                }
-                else
-                {
-       				newState.setId("q" + stateNumber++);
 				}
-				newState.setName(newState.getId());
-          		newState.setInitial(AutomataIndexFormHelper.isInitial(currState));
-          		newState.setAccepting(AutomataIndexFormHelper.isAccepting(currState));
-           		newState.setForbidden(AutomataIndexFormHelper.isForbidden(currState));
-          		newState.setFirst(AutomataIndexFormHelper.isFirst(currState));
-          		newState.setLast(AutomataIndexFormHelper.isLast(currState));
 
-          		theAutomaton.addState(newState);
-			}
-        }
-
-		if (executionDialog != null)
-		{
-			executionDialog.initProgressBar(0, currStateTable.length);
-			executionDialog.setMode(ExecutionDialogMode.buildingTransitions);
-		}
-
-        // Create all transitions
- 		for (int k = 0; k < currStateTable.length; k++)
-  		{
-			if (k % 100 == 0)
-				if (executionDialog != null)
+				if (stopRequested)
 				{
-					executionDialog.setProgress(k);
+					return false;
 				}
 
+				if (currStateTable[i] != null)
+				{
+					int[] currState = currStateTable[i];
+					State newState = new State();
 
-			if (stopRequested)
-			{
-				theAlphabet = null;
-				theAutomaton = null;
-				// theAutomaton.setDisabled(true);
-				// System.out.println(theAutomaton == null);
-				// System.out.println(helper.getAutomaton() == null);
-				return false;
+					newState.setIndex(i);
+
+					if (longformId)
+					{
+						State[][] stateTable = indexForm.getStateTable();
+						StringBuffer sb = new StringBuffer();
+
+						for (int j = 0; j < currState.length - 1; j++)
+						{
+							sb.append(stateTable[j][currState[j]].getId());
+						}
+
+						newState.setId(sb.toString());
+					}
+					else
+					{
+						newState.setId("q" + stateNumber++);
+					}
+
+					newState.setName(newState.getId());
+					newState.setInitial(AutomataIndexFormHelper.isInitial(currState));
+					newState.setAccepting(AutomataIndexFormHelper.isAccepting(currState));
+					newState.setForbidden(AutomataIndexFormHelper.isForbidden(currState));
+					newState.setFirst(AutomataIndexFormHelper.isFirst(currState));
+					newState.setLast(AutomataIndexFormHelper.isLast(currState));
+					theAutomaton.addState(newState);
+				}
 			}
-			if (currStateTable[k] != null)
-   			{
-				int[] currState = currStateTable[k];
-    			State thisState = theAutomaton.getStateWithIndex(k);
 
-				enabledEvents(currState);
+			if (executionDialog != null)
+			{
+				executionDialog.initProgressBar(0, currStateTable.length);
+				executionDialog.setMode(ExecutionDialogMode.buildingTransitions);
+			}
 
-		      	int i = 0;
-		      	int currEventIndex = currEnabledEvents[i];
+			// Create all transitions
+			for (int k = 0; k < currStateTable.length; k++)
+			{
+				if (k % 100 == 0)
+				{
+					if (executionDialog != null)
+					{
+						executionDialog.setProgress(k);
+					}
+				}
 
-         		// Handle all events
-		        while (currEventIndex != Integer.MAX_VALUE)
-		        {
-		  			// Generate an array that contains the indicies of each state
-		         	System.arraycopy(currState, 0, nextState, 0, currState.length);
+				if (stopRequested)
+				{
+					theAlphabet = null;
+					theAutomaton = null;
 
-		    		// Iterate over all automata to construct the new state
-					for (int j = 0; j < automataIndices.length; j++)
-		    		{
-		           		int currAutomatonIndex = automataIndices[j];
-						int currSingleNextState =
-		     				nextStateTable[currAutomatonIndex][currState[currAutomatonIndex]][currEventIndex];
-		           		// Jump in all automata that have this event active.
-		            	if (currSingleNextState != Integer.MAX_VALUE)
-		            	{
-		            		nextState[currAutomatonIndex] = currSingleNextState;
-		               	}
-		            }
+					// theAutomaton.setDisabled(true);
+					// System.out.println(theAutomaton == null);
+					// System.out.println(helper.getAutomaton() == null);
+					return false;
+				}
 
-		            try
-		            {
-                  		// Check if nextState exists
-                  		int nextIndex = helper.getStateIndex(nextState);
-                    	if (nextIndex >= 0)
-                     	{
-                      		State nextState = theAutomaton.getStateWithIndex(nextIndex);
-							Event theEvent = theAlphabet.getEventWithIndex(currEventIndex);
-       						Arc newArc = new Arc(thisState, nextState, theEvent.getId());
-                    		theAutomaton.addArc(newArc);
-                     	}
-		       		}
-		            catch (Exception e)
-		            {
-		        		System.err.println(e);
-		           		System.exit(0);
-		       		}
+				if (currStateTable[k] != null)
+				{
+					int[] currState = currStateTable[k];
+					State thisState = theAutomaton.getStateWithIndex(k);
 
-		         	currEventIndex = currEnabledEvents[++i];
-		         }
-          	}
-        }
+					enabledEvents(currState);
 
-        if (helper.isAllAutomataPlants())
-        {
-			theAutomaton.setType(AutomatonType.Plant);
-		}
-		else if (helper.isAllAutomataSupervisors())
-        {
-			theAutomaton.setType(AutomatonType.Supervisor);
-		}
-		else if (helper.isAllAutomataSpecifications())
-        {
-			theAutomaton.setType(AutomatonType.Specification);
-		}
-		else
-		{
-			theAutomaton.setType(AutomatonType.Undefined);
-		}
+					int i = 0;
+					int currEventIndex = currEnabledEvents[i];
 
-		return true;
+					// Handle all events
+					while (currEventIndex != Integer.MAX_VALUE)
+					{
 
+						// Generate an array that contains the indicies of each state
+						System.arraycopy(currState, 0, nextState, 0, currState.length);
+
+						// Iterate over all automata to construct the new state
+						for (int j = 0; j < automataIndices.length; j++)
+						{
+							int currAutomatonIndex = automataIndices[j];
+							int currSingleNextState = nextStateTable[currAutomatonIndex][currState[currAutomatonIndex]][currEventIndex];
+
+							// Jump in all automata that have this event active.
+							if (currSingleNextState != Integer.MAX_VALUE)
+							{
+								nextState[currAutomatonIndex] = currSingleNextState;
+							}
+						}
+
+						try
+						{
+
+							// Check if nextState exists
+							int nextIndex = helper.getStateIndex(nextState);
+
+							if (nextIndex >= 0)
+							{
+								State nextState = theAutomaton.getStateWithIndex(nextIndex);
+								Event theEvent = theAlphabet.getEventWithIndex(currEventIndex);
+								Arc newArc = new Arc(thisState, nextState, theEvent.getId());
+
+								theAutomaton.addArc(newArc);
+							}
+						}
+						catch (Exception e)
+						{
+							System.err.println(e);
+							System.exit(0);
+						}
+
+						currEventIndex = currEnabledEvents[++i];
+					}
+				}
+			}
+
+			if (helper.isAllAutomataPlants())
+			{
+				theAutomaton.setType(AutomatonType.Plant);
+			}
+			else if (helper.isAllAutomataSupervisors())
+			{
+				theAutomaton.setType(AutomatonType.Supervisor);
+			}
+			else if (helper.isAllAutomataSpecifications())
+			{
+				theAutomaton.setType(AutomatonType.Specification);
+			}
+			else
+			{
+				theAutomaton.setType(AutomatonType.Undefined);
+			}
+
+			return true;
 		}
 		catch (OutOfMemoryError ex)
 		{
 			throw new Exception("Out of memory. Try to increase the JVM heap.");
 		}
-    }
+	}
 
-   private String printTypeIsPlantTable()
-    {
+	private String printTypeIsPlantTable()
+	{
+
 		StringBuffer sb = new StringBuffer();
+
 		sb.append("[");
+
 		for (int i = 0; i < typeIsPlantTable.length; i++)
 		{
 			sb.append(typeIsPlantTable[i]);
+
 			if (i != typeIsPlantTable.length - 1)
 			{
 				sb.append(", ");
 			}
 		}
+
 		sb.append("]");
+
 		return sb.toString();
 	}
 
-/*
-    public int[][] previousStates(int[] state, int currEventIndex)
-    {
-   		int[][][][] prevStatesTable = theAutomataIndexForm.getPrevStatesTable();
-   		int[] nbrOfPrevStates = int[nbrOfAutomata];
-   		int[] currIndexOfPrevStates = int[nbrOfAutomata];
-   		int[] currPrevState = int[nbrOfAutomata + 1];
+	/*
+	 *   public int[][] previousStates(int[] state, int currEventIndex)
+	 *   {
+	 *               int[][][][] prevStatesTable = theAutomataIndexForm.getPrevStatesTable();
+	 *               int[] nbrOfPrevStates = int[nbrOfAutomata];
+	 *               int[] currIndexOfPrevStates = int[nbrOfAutomata];
+	 *               int[] currPrevState = int[nbrOfAutomata + 1];
+	 *
+	 *               // First compute the maximum nbr of previous states
+	 *       int maxNbrOfPreviousStates = 1;
+	 *       for (int i = 1; i < state.length - 1; i++)
+	 *       {
+	 *               // ToDo Check if this automaton is among the selected
+	 *
+	 *               int currAutomatonIndex = i;
+	 *               int currStateIndex = state[currAutomatonIndex];
+	 *               int[] prevStates = prevStatesTable[currAutomatonIndex][currStateIndex][currEventIndex];
+	 *               if (prevStates != null)
+	 *               {
+	 *                       int currNbrOfPreviousStates = prevStates[prevStates.length - 1];
+	 *                       nbrOfPrevStates[i] = currNbrOfPreviousStates;
+	 *                       if (currNbrOfPreviousStates > 0)
+	 *                       {
+	 *                               currIndexOfPrevStates
+	 *                       }
+	 *                       else
+	 *                       {
+	 *                               currIndexOfPreviousState[i] = 0;
+	 *                       }
+	 *                       maxNbrOfPreviousStates = maxNbrOfPreviousStates * currNbrOfPreviousStates;
+	 *               }
+	 *       }
+	 *
+	 *       int[][] previousStates = new int[maxNbrOfPreviousState][];
+	 *               for (int i = 1; i < state.length - 2; i++)
+	 *               {
+	 *                       for(int j = i + 1; j < )
+	 *
+	 *               }
+	 *
+	 *               // Check if this event is included
+	 *               int[] existingPrevState = theStates.get(currPrevState);
+	 *               if (existingPrevState != null)
+	 *               {
+	 *                       // Check if the event is really possible
+	 *                       if (isValidTransition(existingPrevState, state, currEventIndex))
+	 *                       {
+	 *                               previousStates[xx] = existingPrevState;
+	 *                       }
+	 *               }
+	 *
+	 *   }
+	 */
 
-   		// First compute the maximum nbr of previous states
-    	int maxNbrOfPreviousStates = 1;
-    	for (int i = 1; i < state.length - 1; i++)
-    	{
-    		// ToDo Check if this automaton is among the selected
+	/**
+	 * Check if the event is possible between fromState and toState.
+	 * For perfomance reasons we assume that event is possible in
+	 * at least one of the original automata.
+	 */
 
-    		int currAutomatonIndex = i;
-    		int currStateIndex = state[currAutomatonIndex];
-    		int[] prevStates = prevStatesTable[currAutomatonIndex][currStateIndex][currEventIndex];
-    		if (prevStates != null)
-    		{
-    			int currNbrOfPreviousStates = prevStates[prevStates.length - 1];
-    			nbrOfPrevStates[i] = currNbrOfPreviousStates;
-    			if (currNbrOfPreviousStates > 0)
-    			{
-    				currIndexOfPrevStates
-    			}
-    			else
-    			{
-    				currIndexOfPreviousState[i] = 0;
-    			}
-    			maxNbrOfPreviousStates = maxNbrOfPreviousStates * currNbrOfPreviousStates;
-    		}
-    	}
-
-    	int[][] previousStates = new int[maxNbrOfPreviousState][];
-		for (int i = 1; i < state.length - 2; i++)
-		{
-			for(int j = i + 1; j < )
-
-		}
-
-		// Check if this event is included
-		int[] existingPrevState = theStates.get(currPrevState);
-		if (existingPrevState != null)
-		{
-			// Check if the event is really possible
-			if (isValidTransition(existingPrevState, state, currEventIndex))
-			{
-				previousStates[xx] = existingPrevState;
-			}
-		}
-
-    }
-*/
-
-    /**
-     * Check if the event is possible between fromState and toState.
-     * For perfomance reasons we assume that event is possible in
-     * at least one of the original automata.
-     */
-/*    public boolean isValidTransition(int[] fromState, int[] toState, int event)
-    {
-    	if (prioritizedEventInResultAutomaton[event])
-    	{ // Check that event is possible from all automata that have
-    	  // this event as prioritized.
-
-    		// To do
-    	}
-    	else
-    	{ // We assume that the event is possible in at least one of the
-    	  // original automata.
-    		return true;
-    	}
-    }
-*/
+	/*
+	 *    public boolean isValidTransition(int[] fromState, int[] toState, int event)
+	 *   {
+	 *       if (prioritizedEventInResultAutomaton[event])
+	 *       { // Check that event is possible from all automata that have
+	 *         // this event as prioritized.
+	 *
+	 *               // To do
+	 *       }
+	 *       else
+	 *       { // We assume that the event is possible in at least one of the
+	 *         // original automata.
+	 *               return true;
+	 *       }
+	 *   }
+	 */
 
 	/**
 	 * Method for finding transitions between states. Used by displayTrace() in AutomataSynchronizerHelper.
@@ -872,31 +957,38 @@ public final class AutomataSynchronizerExecuter
 	 */
 	public int findTransition(int[] fromState, int[] toState)
 	{
+
 		enabledEvents(fromState);
 
 		int i = 0;
 		int currEventIndex = currEnabledEvents[i];
+
 		// Handle all events
 		while (currEventIndex != Integer.MAX_VALUE)
-		{	// Generate an array that contains the indicies of each state
+		{		// Generate an array that contains the indicies of each state
 			System.arraycopy(fromState, 0, nextState, 0, fromState.length);
 
 			// Iterate over all automata to construct the new state
 			for (int j = 0; j < nbrOfAutomata; j++)
 			{
 				int currAutomatonIndex = j;
-				int currSingleNextState =
-					nextStateTable[currAutomatonIndex][fromState[currAutomatonIndex]][currEventIndex];
+				int currSingleNextState = nextStateTable[currAutomatonIndex][fromState[currAutomatonIndex]][currEventIndex];
+
 				// Jump in all automata that have this event active.
 				if (currSingleNextState != Integer.MAX_VALUE)
 				{
 					nextState[currAutomatonIndex] = currSingleNextState;
 				}
 			}
+
 			if (equalsIntArray(nextState, toState))
+			{
 				return currEventIndex;
+			}
+
 			currEventIndex = currEnabledEvents[++i];
 		}
+
 		return -1;
 	}
 
@@ -904,14 +996,18 @@ public final class AutomataSynchronizerExecuter
 	 * Compares two arrays, except for the last element (the status field)
 	 * @return true if equal, false otherwise.
 	 */
- 	private static boolean equalsIntArray(int[] firstArray, int[] secondArray)
- 	{	// Assume that the last element is a status field
+	private static boolean equalsIntArray(int[] firstArray, int[] secondArray)
+	{		// Assume that the last element is a status field
+
 		for (int i = 0; i < firstArray.length - 1; i++)
-  		{
+		{
 			if (firstArray[i] != secondArray[i])
+			{
 				return false;
-        }
-        return true;
+			}
+		}
+
+		return true;
 	}
 
 	/**

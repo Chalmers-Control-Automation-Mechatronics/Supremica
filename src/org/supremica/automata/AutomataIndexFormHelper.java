@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,161 +47,215 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.automata;
+
+
 
 import java.util.StringTokenizer;
 
+
 public final class AutomataIndexFormHelper
 {
-    public static int[] createCopyOfState(int[] state)
-    {
+
+	public static int[] createCopyOfState(int[] state)
+	{
+
 		int[] newState = new int[state.length];
-  		System.arraycopy(state, 0, newState, 0, state.length);
-    	return newState;
-    }
+
+		System.arraycopy(state, 0, newState, 0, state.length);
+
+		return newState;
+	}
 
 	/**
 	* bit
- 	* 0: initial
-  	* 1: accepting
-    * 2: forbidden
-    * 3: first
-    * 4: last
-    * 5: fastClearStatus
+	* 0: initial
+	* 1: accepting
+* 2: forbidden
+* 3: first
+* 4: last
+* 5: fastClearStatus
 	*/
-    public static int createStatus(State state)
-    {
-        int status = 0;
-        if (state.isInitial())
-        	status |= 1;
-        if (state.isAccepting())
-         	status |= (1 << 1);
-        if (state.isForbidden())
-         	status |= (1 << 2);
-        if (state.isFirst())
-         	status |= (1 << 3);
-        if (state.isLast())
+	public static int createStatus(State state)
+	{
+
+		int status = 0;
+
+		if (state.isInitial())
+		{
+			status |= 1;
+		}
+
+		if (state.isAccepting())
+		{
+			status |= (1 << 1);
+		}
+
+		if (state.isForbidden())
+		{
+			status |= (1 << 2);
+		}
+
+		if (state.isFirst())
+		{
+			status |= (1 << 3);
+		}
+
+		if (state.isLast())
+		{
 			status |= (1 << 4);
+		}
+
 		return status;
-    }
-
-
-    public static boolean isInitial(int status)
-    {
-  		return (status & 1) == 1;
 	}
 
-    public static boolean isAccepting(int status)
-    {
-  		return ((status >> 1) & 1)  == 1;
+	public static boolean isInitial(int status)
+	{
+		return (status & 1) == 1;
 	}
 
-    public static boolean isForbidden(int status)
-    {
-  		return ((status >> 2) & 1) == 1;
+	public static boolean isAccepting(int status)
+	{
+		return ((status >> 1) & 1) == 1;
 	}
 
-    public static boolean isFirst(int status)
-    {
-  		return ((status >> 3) & 1) == 1;
+	public static boolean isForbidden(int status)
+	{
+		return ((status >> 2) & 1) == 1;
+	}
+
+	public static boolean isFirst(int status)
+	{
+		return ((status >> 3) & 1) == 1;
 	}
 
 	public static boolean isLast(int status)
-    {
-  		return ((status >> 4) & 1) == 1;
+	{
+		return ((status >> 4) & 1) == 1;
 	}
 
-    public static boolean isInitial(int[] state)
-    {
-  		return isInitial(state[state.length - 1]);
+	public static boolean isInitial(int[] state)
+	{
+		return isInitial(state[state.length - 1]);
 	}
 
-    public static boolean isAccepting(int[] state)
-    {
-  		return isAccepting(state[state.length - 1]);
+	public static boolean isAccepting(int[] state)
+	{
+		return isAccepting(state[state.length - 1]);
 	}
 
-    public static boolean isForbidden(int[] state)
-    {
-  		return isForbidden(state[state.length - 1]);
+	public static boolean isForbidden(int[] state)
+	{
+		return isForbidden(state[state.length - 1]);
 	}
 
-    public static boolean isFirst(int[] state)
-    {
-  		return isFirst(state[state.length - 1]);
+	public static boolean isFirst(int[] state)
+	{
+		return isFirst(state[state.length - 1]);
 	}
 
 	public static boolean isLast(int[] state)
-    {
-  		return isLast(state[state.length - 1]);
+	{
+		return isLast(state[state.length - 1]);
 	}
 
- 	/**
-    * Build a state from a string.
-    * The string must be of the form
-    * [state1 state2 state3 state4 state5 status]
-    */
- 	public static int[] buildStateFromString(String stringState)
-  	{
-   		String trimmedString = stringState.trim();
+	/**
+* Build a state from a string.
+* The string must be of the form
+* [state1 state2 state3 state4 state5 status]
+*/
+	public static int[] buildStateFromString(String stringState)
+	{
+
+		String trimmedString = stringState.trim();
 		int indexOfLeft = trimmedString.indexOf('[');
-  		if (indexOfLeft == -1)
-    		return null;
-  		int indexOfRight = trimmedString.indexOf(']');
-		if (indexOfRight == -1)
-  			return null;
-     	if (!(indexOfLeft < indexOfRight))
-      		return null;
 
-        StringTokenizer st = new StringTokenizer(
-        	trimmedString.substring(indexOfLeft + 1, indexOfRight));
- 		int nbrOfTokens = st.countTokens();
-   		if (nbrOfTokens < 1)
-     		return null;
-
-        int[] newState = new int[nbrOfTokens];
-        int i = 0;
-        while (st.hasMoreTokens())
-        {
-        	String currToken = st.nextToken();
-         	try
-          	{
-         		int tmpInt = Integer.parseInt(currToken);
-         		newState[i++] = tmpInt;
-           	}
-            catch (NumberFormatException e)
-            {
-            	return null;
-            }
-        }
-        if (i == nbrOfTokens)
-        	return newState;
-        else
-        	return null;
-	}
-
- 	public static String dumpState(int[] state)
-  	{
-       	StringBuffer sb = new StringBuffer("[");
-     	for (int i = 0; i < state.length; i++)
-      	{
-			sb.append(state[i]);
-   			if (i != (state.length - 1))
-      			sb.append(" ");
+		if (indexOfLeft == -1)
+		{
+			return null;
 		}
-  		sb.append("]");
-    	return sb.toString();
+
+		int indexOfRight = trimmedString.indexOf(']');
+
+		if (indexOfRight == -1)
+		{
+			return null;
+		}
+
+		if (!(indexOfLeft < indexOfRight))
+		{
+			return null;
+		}
+
+		StringTokenizer st = new StringTokenizer(trimmedString.substring(indexOfLeft + 1, indexOfRight));
+		int nbrOfTokens = st.countTokens();
+
+		if (nbrOfTokens < 1)
+		{
+			return null;
+		}
+
+		int[] newState = new int[nbrOfTokens];
+		int i = 0;
+
+		while (st.hasMoreTokens())
+		{
+			String currToken = st.nextToken();
+
+			try
+			{
+				int tmpInt = Integer.parseInt(currToken);
+
+				newState[i++] = tmpInt;
+			}
+			catch (NumberFormatException e)
+			{
+				return null;
+			}
+		}
+
+		if (i == nbrOfTokens)
+		{
+			return newState;
+		}
+		else
+		{
+			return null;
+		}
 	}
 
- 	public static void main(String[] args)
-  	{
-   		String orgString = "[10]";
+	public static String dumpState(int[] state)
+	{
+
+		StringBuffer sb = new StringBuffer("[");
+
+		for (int i = 0; i < state.length; i++)
+		{
+			sb.append(state[i]);
+
+			if (i != (state.length - 1))
+			{
+				sb.append(" ");
+			}
+		}
+
+		sb.append("]");
+
+		return sb.toString();
+	}
+
+	public static void main(String[] args)
+	{
+
+		String orgString = "[10]";
 		int[] state = buildStateFromString(orgString);
-  		if (state == null)
-    		System.err.println("state == null");
+
+		if (state == null)
+		{
+			System.err.println("state == null");
+		}
+
 		System.out.println("org: " + orgString);
 		System.out.println("parsed: " + dumpState(state));
 	}
-
 }

@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,12 +47,14 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.automata;
+
+
 
 import java.util.*;
 
-public class EventsSet extends ArrayList
-{
 
+public class EventsSet
+	extends ArrayList
+{
 }

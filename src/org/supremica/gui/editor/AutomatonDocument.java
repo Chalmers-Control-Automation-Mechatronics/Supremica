@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,17 +47,23 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.gui.editor;
+
+
 
 import java.awt.*;
 import java.awt.event.*;
+
 import javax.swing.*;
+
 import java.io.*;
+
 import java.util.*;
+
 import com.nwoods.jgo.*;
 
 import org.supremica.automata.*;
+
 
 // AutomatonDocument, for this example, has just a few properties:
 // Location and Link Pen.
@@ -66,25 +73,25 @@ import org.supremica.automata.*;
 public class AutomatonDocument
 	extends JGoDocument
 {
+
 	// Event hints
 	public static final int NameChanged = JGoDocumentEvent.LAST + 1;
 	public static final int LocationChanged = JGoDocumentEvent.LAST + 2;
 
 	// State
 	private JGoPen myPen = JGoPen.make(JGoPen.SOLID, 2, Color.black);
-
 	private String myLocation = "";
-
 	private AutomatonContainer theAutomatonContainer = null;
 	private Automaton theAutomaton = null;
-
 	private boolean changed = false;
 	private boolean layoutNeeded = false;
 
 	public AutomatonDocument(AutomatonContainer theAutomatonContainer, Automaton theAutomaton)
 	{
+
 		this.theAutomatonContainer = theAutomatonContainer;
 		this.theAutomaton = theAutomaton;
+
 		build();
 	}
 
@@ -100,36 +107,48 @@ public class AutomatonDocument
 
 	public void setLocation(String newloc)
 	{
+
 		String oldLocation = getLocation();
+
 		if (!oldLocation.equals(newloc))
 		{
 			myLocation = newloc;
+
 			fireUpdate(LocationChanged, 0, null, 0, oldLocation);
 		}
 	}
 
 	public StateNode newStateNode(Point p)
 	{
+
 		State newState = new State(theAutomaton.getUniqueStateId());
+
 		theAutomaton.addState(newState);
-		newState.setXY((int)p.getX(), (int)p.getY());
+		newState.setXY((int) p.getX(), (int) p.getY());
+
 		return newStateNode(newState);
 	}
 
 	public StateNode newStateNode(State theState)
 	{
+
 		StateNode stateNode = new StateNode(theState);
+
 		stateNode.initialize();
 		addObjectAtTail(stateNode);
+
 		return stateNode;
 	}
 
 	public JGoLink newLink(StateNode from, StateNode to)
 	{
+
 		JGoLink ll = new JGoLink(from.getPort(), to.getPort());
+
 		ll.setPen(getLinkPen());
 		addObjectAtHead(ll);
 		ll.setArrowHeads(false, true);
+
 		return ll;
 	}
 
@@ -137,8 +156,10 @@ public class AutomatonDocument
 	{
 
 		JGoLabeledLink ll = new JGoLabeledLink(from.getPort(), to.getPort());
-		//JGoText textLabel = new JGoText(label);
+
+		// JGoText textLabel = new JGoText(label);
 		Labels labels = null;
+
 		try
 		{
 			labels = new Labels(this, theArcSet);
@@ -148,23 +169,27 @@ public class AutomatonDocument
 			e.printStackTrace();
 			System.err.println("AutomatonDocement: exception while constructing labels");
 		}
+
 		ll.setMidLabel(labels);
 		ll.setPen(getLinkPen());
 		addObjectAtHead(ll);
 		ll.setArrowHeads(false, true);
+
 		return ll;
 	}
 
 	// creating a new link between layout nodes.
 	public JGoLink newLink(JGoPort from, JGoPort to)
 	{
+
 		JGoLink ll = new JGoLink(from, to);
+
 		ll.setPen(getLinkPen());
 		addObjectAtHead(ll);
 		ll.setArrowHeads(false, true);
+
 		return ll;
 	}
-
 
 	public JGoPen getLinkPen()
 	{
@@ -173,19 +198,25 @@ public class AutomatonDocument
 
 	public void setLinkPen(JGoPen p)
 	{
+
 		if (!getLinkPen().equals(p))
 		{
 			myPen = p;
+
 			// now update all links
 			JGoListPosition pos = getFirstObjectPos();
+
 			while (pos != null)
 			{
 				JGoObject obj = getObjectAtPos(pos);
+
 				// only consider top-level objects
 				pos = getNextObjectPosAtTop(pos);
+
 				if (obj instanceof JGoLink)
 				{
-					JGoLink link = (JGoLink)obj;
+					JGoLink link = (JGoLink) obj;
+
 					link.setPen(p);
 				}
 			}
@@ -194,29 +225,36 @@ public class AutomatonDocument
 
 	public StatePort pickPort(Point pointToCheck)
 	{
+
 		JGoListPosition pos = this.getLastObjectPos();
+
 		while (pos != null)
 		{
 			JGoObject obj = this.getObjectAtPos(pos);
+
 			pos = this.getPrevObjectPos(pos);
 
 			if (obj.isVisible() && obj.isPointInObj(pointToCheck))
 			{
 				if (obj instanceof JGoArea)
 				{
+
 					// handle inside area
-					JGoObject child = ((JGoArea)obj).pickObject(pointToCheck, false);
+					JGoObject child = ((JGoArea) obj).pickObject(pointToCheck, false);
+
 					if (child != null)
 					{
 						obj = child;
 					}
 				}
+
 				if (obj instanceof StatePort)
 				{
-					return (StatePort)obj;
+					return (StatePort) obj;
 				}
 			}
 		}
+
 		return null;
 	}
 
@@ -252,32 +290,37 @@ public class AutomatonDocument
 
 		// First add all states
 		Iterator stateIt = theAutomaton.stateIterator();
+
 		while (stateIt.hasNext())
 		{
-			State currState = (State)stateIt.next();
+			State currState = (State) stateIt.next();
 			StateNode currStateNode = newStateNode(currState);
+
 			currStateNode.initialize();
 			stateToStateNodeMap.put(currState, currStateNode);
 		}
 
 		// Then add all transitions
 		stateIt = theAutomaton.stateIterator();
+
 		while (stateIt.hasNext())
 		{
-			State fromState = (State)stateIt.next();
-			StateNode fromStateNode = (StateNode)stateToStateNodeMap.get(fromState);
+			State fromState = (State) stateIt.next();
+			StateNode fromStateNode = (StateNode) stateToStateNodeMap.get(fromState);
 			Iterator arcSetIt = fromState.outgoingArcSetIterator();
+
 			while (arcSetIt.hasNext())
 			{
-				ArcSet currArcSet = (ArcSet)arcSetIt.next();
+				ArcSet currArcSet = (ArcSet) arcSetIt.next();
 				State toState = currArcSet.getToState();
-				StateNode toStateNode = (StateNode)stateToStateNodeMap.get(toState);
+				StateNode toStateNode = (StateNode) stateToStateNodeMap.get(toState);
+
 				newLink(fromStateNode, toStateNode, currArcSet);
 			}
 		}
 
 		setLayoutNeeded(true);
-		//setLayoutNeeded(!theAutomaton.hasLayout());
-	}
 
+		// setLayoutNeeded(!theAutomaton.hasLayout());
+	}
 }

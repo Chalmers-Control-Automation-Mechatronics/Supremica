@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,10 +47,12 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.comm.xmlrpc;
 
+
+
 import java.util.*;
+
 import java.io.*;
 
 import org.supremica.automata.*;
@@ -58,65 +61,79 @@ import org.supremica.gui.*;
 
 import helma.xmlrpc.*;
 
+
 public class Server
 {
+
 	private AutomatonContainer container;
 	private WebServer theServer;
 
 	public Server(AutomatonContainer container, int port)
 		throws Exception
 	{
+
 		this.container = container;
 		theServer = new WebServer(port);
+
 		theServer.addHandler("$default", this);
 	}
 
-
 	public Vector getAutomataIdentities()
 	{
-		Vector theIdentities = new Vector();
 
+		Vector theIdentities = new Vector();
 		Iterator autIt = container.automatonIterator();
+
 		while (autIt.hasNext())
 		{
-			String currName = (String)autIt.next();
+			String currName = (String) autIt.next();
+
 			theIdentities.add(currName);
 		}
+
 		return theIdentities;
 	}
 
 	public String getAutomata(Vector automataIdentities)
 		throws XmlRpcException
 	{
+
 		// Construct an automata object
 		Automata theAutomata = new Automata();
+
 		for (int i = 0; i < automataIdentities.size(); i++)
 		{
-			String currName = (String)automataIdentities.get(i);
+			String currName = (String) automataIdentities.get(i);
 			Automaton currAutomaton;
+
 			try
 			{
-				currAutomaton  = container.getAutomaton(currName);
+				currAutomaton = container.getAutomaton(currName);
 			}
 			catch (Exception e)
 			{
 				throw new XmlRpcException(0, currName + " does not exist.");
 			}
+
 			theAutomata.addAutomaton(currAutomaton);
 		}
 
 		AutomataToXml exporter = new AutomataToXml(theAutomata);
 		StringWriter response = new StringWriter();
 		PrintWriter pw = new PrintWriter(response);
+
 		exporter.serialize(pw);
+
 		return response.toString();
 	}
 
 	public void addAutomata(String automataXmlEncoding)
 		throws XmlRpcException
 	{
+
 		StringReader reader = new StringReader(automataXmlEncoding);
 		Automata theAutomata;
+
 		try
 		{
 			theAutomata = AutomataBuildFromXml.build(reader);
@@ -125,10 +142,13 @@ public class Server
 		{
 			throw new XmlRpcException(0, "Error while parsing automataXmlEncoding.");
 		}
+
 		Iterator autIt = theAutomata.iterator();
+
 		while (autIt.hasNext())
 		{
-			Automaton currAutomaton = (Automaton)autIt.next();
+			Automaton currAutomaton = (Automaton) autIt.next();
+
 			try
 			{
 				container.add(currAutomaton);
@@ -143,9 +163,11 @@ public class Server
 	public void removeAutomata(Vector automataIdentities)
 		throws XmlRpcException
 	{
+
 		for (int i = 0; i < automataIdentities.size(); i++)
 		{
-			String currName = (String)automataIdentities.get(i);
+			String currName = (String) automataIdentities.get(i);
+
 			try
 			{
 				container.remove(currName);
@@ -157,18 +179,9 @@ public class Server
 		}
 	}
 
-	public void synchronizeAutomata(Vector automataIdentitites,
-		String newautomatonIdentitity)
-		throws XmlRpcException
-	{
-
-	}
+	public void synchronizeAutomata(Vector automataIdentitites, String newautomatonIdentitity)
+		throws XmlRpcException {}
 
 	public void minimizeAutomaton(String automatonIdentity, String newIdentity)
-		throws XmlRpcException
-	{
-
-	}
-
+		throws XmlRpcException {}
 }
-

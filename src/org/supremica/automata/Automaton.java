@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,80 +47,91 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.automata;
 
+
+
 import java.util.*;
+
 
 public class Automaton
 	implements ArcListener
 {
+
 	private Alphabet alphabet;
 	private String name;
- 	private List theStates;
+	private List theStates;
 	private int index = -1;
 	private Map idStateMap;
- 	private Map indexStateMap;
- 	private ArcSet theArcs;
- 	private State initialState;
- 	private boolean isDisabled = false;
- 	private AutomatonType type = AutomatonType.Undefined;
- 	private int uniqueStateIndex = 0;
- 	private boolean hasLayout = false;
-
- 	private AutomatonListeners listeners = null;
+	private Map indexStateMap;
+	private ArcSet theArcs;
+	private State initialState;
+	private boolean isDisabled = false;
+	private AutomatonType type = AutomatonType.Undefined;
+	private int uniqueStateIndex = 0;
+	private boolean hasLayout = false;
+	private AutomatonListeners listeners = null;
 
 	public Automaton()
 	{
+
 		alphabet = new Alphabet();
 		idStateMap = new HashMap();
-  		indexStateMap = new HashMap();
+		indexStateMap = new HashMap();
 		theStates = new LinkedList();
 		theArcs = new ArcSet();
 	}
 
 	public Automaton(String name)
 	{
+
 		this();
+
 		setName(name);
 	}
 
 	public Automaton(Automaton orgAut)
 	{
+
 		this();
-        	Alphabet orgAlphabet = orgAut.getAlphabet();
-	        Alphabet newAlphabet = new Alphabet(orgAlphabet);
-        	type = orgAut.type;
+
+		Alphabet orgAlphabet = orgAut.getAlphabet();
+		Alphabet newAlphabet = new Alphabet(orgAlphabet);
+
+		type = orgAut.type;
 
 		setName(orgAut.getName());
-	        setAlphabet(newAlphabet);
+		setAlphabet(newAlphabet);
 
 		// Create all states
 		Iterator states = orgAut.stateIterator();
+
 		while (states.hasNext())
 		{
-			State orgState = (State)states.next();
+			State orgState = (State) states.next();
 			State newState = new State(orgState);
-      			addState(newState);
+
+			addState(newState);
 		}
 
 		try
-		{	// Create all transitions
+		{		// Create all transitions
 			states = orgAut.stateIterator();
+
 			while (states.hasNext())
 			{
-				State orgSourceState = (State)states.next();
+				State orgSourceState = (State) states.next();
 				State newSourceState = getStateWithId(orgSourceState.getId());
-
 				Iterator outgoingArcs = orgSourceState.outgoingArcsIterator();
+
 				while (outgoingArcs.hasNext())
 				{
-					Arc orgArc = (Arc)outgoingArcs.next();
+					Arc orgArc = (Arc) outgoingArcs.next();
 					State orgDestState = orgArc.getToState();
-
 					Event currEvent = orgAlphabet.getEventWithId(orgArc.getEventId());
 					State newDestState = getStateWithId(orgDestState.getId());
 					Arc newArc = new Arc(newSourceState, newDestState, currEvent.getId());
+
 					addArc(newArc);
 				}
 			}
@@ -163,29 +175,32 @@ public class Automaton
 
 	public void addState(State state)
 	{
+
 		theStates.add(state);
 		idStateMap.put(state.getId(), state);
-  		indexStateMap.put(new Integer(state.getIndex()), state);
-  		if (state.isInitial())
-  		{
-    		this.initialState = state;
-    	}
+		indexStateMap.put(new Integer(state.getIndex()), state);
 
-    	notifyListeners(AutomatonListeners.MODE_STATE_ADDED, state);
+		if (state.isInitial())
+		{
+			this.initialState = state;
+		}
+
+		notifyListeners(AutomatonListeners.MODE_STATE_ADDED, state);
 	}
 
 	public void removeState(State state)
 	{
+
 		if (state == initialState)
 		{
 			initialState = null;
 		}
+
 		theStates.remove(state);
 		state.removeArcs();
 		idStateMap.remove(state.getId());
 		indexStateMap.remove(new Integer(state.getIndex()));
-
-    	notifyListeners(AutomatonListeners.MODE_STATE_REMOVED, state);
+		notifyListeners(AutomatonListeners.MODE_STATE_REMOVED, state);
 	}
 
 	public boolean hasInitialState()
@@ -193,23 +208,25 @@ public class Automaton
 		return initialState != null;
 	}
 
- 	public State getInitialState()
-  	{
+	public State getInitialState()
+	{
 		return initialState;
 	}
 
 	public void addArc(Arc arc)
 	{
+
 		arc.getListeners().addListener(this);
 		theArcs.addArc(arc);
-	    	notifyListeners(AutomatonListeners.MODE_ARC_ADDED, arc);
+		notifyListeners(AutomatonListeners.MODE_ARC_ADDED, arc);
 	}
 
 	public void removeArc(Arc arc)
 	{
+
 		theArcs.removeArc(arc);
 		arc.clear();
-    		notifyListeners(AutomatonListeners.MODE_ARC_REMOVED, arc);
+		notifyListeners(AutomatonListeners.MODE_ARC_REMOVED, arc);
 	}
 
 	public boolean containsState(State state)
@@ -219,7 +236,7 @@ public class Automaton
 
 	public State getState(State state)
 	{
-		return (State)idStateMap.get(state.getId());
+		return (State) idStateMap.get(state.getId());
 	}
 
 	public boolean containsStateWithId(String id)
@@ -229,17 +246,17 @@ public class Automaton
 
 	public State getStateWithId(String id)
 	{
-		return (State)idStateMap.get(id);
+		return (State) idStateMap.get(id);
 	}
 
- 	public boolean containsStateWithIndex(int index)
+	public boolean containsStateWithIndex(int index)
 	{
 		return indexStateMap.containsKey(new Integer(index));
 	}
 
 	public State getStateWithIndex(int index)
 	{
-		return (State)indexStateMap.get(new Integer(index));
+		return (State) indexStateMap.get(new Integer(index));
 	}
 
 	public String getStateNameWithIndex(int index)
@@ -269,7 +286,7 @@ public class Automaton
 	{
 		return alphabet.size();
 	}
-	
+
 	public int nbrOfTransitions()
 	{
 		return theArcs.size();
@@ -277,46 +294,58 @@ public class Automaton
 
 	public int nbrOfAcceptingStates()
 	{
+
 		int nbrOfAcceptingStates = 0;
 		Iterator stateIt = stateIterator();
+
 		while (stateIt.hasNext())
 		{
-			State currState = (State)stateIt.next();
+			State currState = (State) stateIt.next();
+
 			if (currState.isAccepting())
 			{
 				nbrOfAcceptingStates++;
 			}
 		}
+
 		return nbrOfAcceptingStates;
 	}
 
 	public int nbrOfForbiddenStates()
 	{
+
 		int nbrOfForbiddenStates = 0;
 		Iterator stateIt = stateIterator();
+
 		while (stateIt.hasNext())
 		{
-			State currState = (State)stateIt.next();
+			State currState = (State) stateIt.next();
+
 			if (currState.isForbidden())
 			{
 				nbrOfForbiddenStates++;
 			}
 		}
+
 		return nbrOfForbiddenStates;
 	}
 
 	public int nbrOfAcceptingAndForbiddenStates()
 	{
+
 		int nbrOfAcceptingAndForbiddenStates = 0;
 		Iterator stateIt = stateIterator();
+
 		while (stateIt.hasNext())
 		{
-			State currState = (State)stateIt.next();
+			State currState = (State) stateIt.next();
+
 			if (currState.isAccepting() && currState.isForbidden())
 			{
 				nbrOfAcceptingAndForbiddenStates++;
 			}
 		}
+
 		return nbrOfAcceptingAndForbiddenStates;
 	}
 
@@ -340,7 +369,6 @@ public class Automaton
 		return (new ArcSet(theArcs)).iterator();
 	}
 
-
 	/**
 	 *
 	 **/
@@ -348,7 +376,6 @@ public class Automaton
 	{
 		return null;
 	}
-
 
 	public Iterator eventIterator()
 	{
@@ -382,32 +409,39 @@ public class Automaton
 
 	public String getUniqueStateId()
 	{
+
 		String newId;
+
 		do
 		{
 			newId = "q" + uniqueStateIndex++;
 		}
 		while (containsStateWithId(newId));
+
 		return newId;
 	}
 
 	public void clearVisitedStates()
 	{
+
 		Iterator stateIt = stateIterator();
+
 		while (stateIt.hasNext())
 		{
-			State currState = (State)stateIt.next();
+			State currState = (State) stateIt.next();
+
 			currState.setVisited(false);
 		}
 	}
 
 	public void removeAllStates()
 	{
-		beginTransaction();
 
+		beginTransaction();
 		idStateMap.clear();
 		indexStateMap.clear();
 		theStates.clear();
+
 		initialState = null;
 
 		if (listeners != null)
@@ -418,18 +452,21 @@ public class Automaton
 		endTransaction();
 	}
 
-
 	public State getState(int x, int y)
 	{
+
 		Iterator stateIt = stateIterator();
+
 		while (stateIt.hasNext())
 		{
-			State currState = (State)stateIt.next();
+			State currState = (State) stateIt.next();
+
 			if (currState.contains(x, y))
 			{
 				return currState;
 			}
 		}
+
 		return null;
 	}
 
@@ -442,76 +479,84 @@ public class Automaton
 	{
 		this.hasLayout = hasLayout;
 	}
-	
+
 	public long checksum()
-	{ // Ad-hoc checksum algorithm
+	{		// Ad-hoc checksum algorithm
+
 		long checksum = 0;
-		
-		for (Iterator sIt = stateIterator(); sIt.hasNext();)
+
+		for (Iterator sIt = stateIterator(); sIt.hasNext(); )
 		{
 			State currState = (State) sIt.next();
-			
 			int part1 = 1;
 			int part2 = 2;
-						
 			String id = currState.getId();
+
 			if (id != null)
 			{
 				part1 = id.hashCode();
 			}
 
 			String name = currState.getName();
+
 			if (name != null)
 			{
 				part2 = name.hashCode();
 			}
-						
+
 			int part3 = currState.nbrOfIncomingArcs();
 			int part4 = currState.nbrOfOutgoingArcs();
-			
+
 			checksum = part1 + part2 + part3 + part4;
 		}
-		
+
 		int part5 = nbrOfStates();
 		int part6 = nbrOfEvents();
 		int part7 = nbrOfTransitions();
-		
 		int part8 = 1;
+
 		if (name != null)
 		{
-			part8 = name.hashCode(); 
+			part8 = name.hashCode();
 		}
-		
+
 		if (part5 > 0)
 		{
 			checksum = checksum * part5;
 		}
+
 		if (part6 > 0)
 		{
 			checksum = checksum * part6;
 		}
+
 		if (part7 > 0)
 		{
 			checksum = checksum * part7;
 		}
+
 		if (part8 > 0)
 		{
 			checksum = checksum * part8;
-		}			
+		}
+
 		return checksum;
 	}
 
 	public Listeners getListeners()
 	{
+
 		if (listeners == null)
 		{
 			listeners = new AutomatonListeners(this);
 		}
+
 		return listeners;
 	}
 
 	private void notifyListeners(int mode, Object o)
 	{
+
 		if (listeners != null)
 		{
 			listeners.notifyListeners(mode, o);
@@ -520,6 +565,7 @@ public class Automaton
 
 	private void notifyListeners()
 	{
+
 		if (listeners != null)
 		{
 			listeners.notifyListeners();
@@ -528,6 +574,7 @@ public class Automaton
 
 	public void invalidate()
 	{
+
 		if (listeners != null)
 		{
 			listeners.notifyListeners();
@@ -536,6 +583,7 @@ public class Automaton
 
 	public void beginTransaction()
 	{
+
 		if (listeners != null)
 		{
 			listeners.beginTransaction();
@@ -544,21 +592,16 @@ public class Automaton
 
 	public void endTransaction()
 	{
+
 		if (listeners != null)
 		{
 			listeners.endTransaction();
 		}
 	}
 
-	public void updated(Object o)
-	{
+	public void updated(Object o) {}
 
-	}
-
-	public void arcAdded(Arc arc)
-	{
-
-	}
+	public void arcAdded(Arc arc) {}
 
 	public void arcRemoved(Arc arc)
 	{

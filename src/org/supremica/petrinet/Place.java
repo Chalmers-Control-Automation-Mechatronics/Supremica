@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,22 +47,22 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.petrinet;
+
+
 
 import java.util.*;
 
+
 public class Place
 {
+
 	private List prevTransitions = new LinkedList();
 	private List nextTransitions = new LinkedList();
-
 	private List nextInhibitorTransitions = new LinkedList();
-
 	private String identity;
 	private int time = Integer.MIN_VALUE;
 	private int marking = 0;
-
 	private int index = -1;
 
 	public Place(String identity)
@@ -74,6 +75,7 @@ public class Place
 	 **/
 	public Place(Place orgPlace)
 	{
+
 		identity = orgPlace.identity;
 		time = orgPlace.time;
 		marking = orgPlace.time;
@@ -136,23 +138,29 @@ public class Place
 
 	public String toString()
 	{
+
 		StringBuffer sb = new StringBuffer();
 
 		sb.append("Place: " + identity + "\n");
-
 		sb.append("\tPrevious transitions:\n");
+
 		Iterator transitionsIt = prevTransitions.iterator();
+
 		while (transitionsIt.hasNext())
 		{
-			Transition currTransition = (Transition)transitionsIt.next();
+			Transition currTransition = (Transition) transitionsIt.next();
+
 			sb.append("\t\t" + currTransition.getIdentity() + "\n");
 		}
 
 		sb.append("\tNext transitions:\n");
+
 		transitionsIt = nextTransitions.iterator();
+
 		while (transitionsIt.hasNext())
 		{
-			Transition currTransition = (Transition)transitionsIt.next();
+			Transition currTransition = (Transition) transitionsIt.next();
+
 			sb.append("\t\t" + currTransition.getIdentity() + "\n");
 		}
 

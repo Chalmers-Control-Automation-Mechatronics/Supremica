@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,15 +47,19 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.gui;
 
+
+
 import java.util.*;
+
 import org.supremica.automata.*;
+
 
 public class AutomatonContainerListeners
 	extends Listeners
 {
+
 	public static final int MODE_AUTOMATON_ADDED = 1;
 	public static final int MODE_AUTOMATON_REMOVED = 2;
 	public static final int MODE_AUTOMATON_RENAMED = 3;
@@ -71,6 +76,7 @@ public class AutomatonContainerListeners
 
 	public void notifyListeners(int mode, Automaton a)
 	{
+
 		if (batchUpdate)
 		{
 			updateNeeded = true;
@@ -80,26 +86,27 @@ public class AutomatonContainerListeners
 			if (listeners != null)
 			{
 				Iterator listenerIt = listeners.iterator();
+
 				while (listenerIt.hasNext())
 				{
-					AutomatonContainerListener currListener =
-						(AutomatonContainerListener)listenerIt.next();
+					AutomatonContainerListener currListener = (AutomatonContainerListener) listenerIt.next();
+
 					if (mode == MODE_AUTOMATON_ADDED)
 					{
-						currListener.automatonAdded((AutomatonContainer)owner, a);
+						currListener.automatonAdded((AutomatonContainer) owner, a);
 					}
 					else if (mode == MODE_AUTOMATON_REMOVED)
 					{
-						currListener.automatonRemoved((AutomatonContainer)owner, a);
+						currListener.automatonRemoved((AutomatonContainer) owner, a);
 					}
 					else if (mode == MODE_AUTOMATON_RENAMED)
 					{
-						currListener.automatonRenamed((AutomatonContainer)owner, a);
+						currListener.automatonRenamed((AutomatonContainer) owner, a);
 					}
 				}
 			}
+
 			updateNeeded = false;
 		}
 	}
-
 }

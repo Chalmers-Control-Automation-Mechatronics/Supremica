@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,12 +47,12 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.automata.algorithms;
+
+
 
 import org.supremica.automata.*;
 import org.supremica.util.*;
-
 import org.supremica.gui.*;
 import org.supremica.util.IDD.*;
 
@@ -62,96 +63,97 @@ import java.util.*;
 
 public final class AutomataIDDHelper
 {
-   	private static Category thisCategory = LogDisplay.createCategory(AutomataSynchronizerHelper.class.getName());
 
- 	private AutomataIndexForm theAutomataIndexForm;
-
+	private static Category thisCategory = LogDisplay.createCategory(AutomataSynchronizerHelper.class.getName());
+	private AutomataIndexForm theAutomataIndexForm;
 	private Automata theAutomata;
 	private Automaton theAutomaton;
-
 	private IDDOptions iddOptions = null;
-
 	private IDD[] enableEventPredicateArray;
 
- 	public AutomataIDDHelper(Automata theAutomata, IDDOptions iddOptions)
- 		throws Exception
-    {
+	public AutomataIDDHelper(Automata theAutomata, IDDOptions iddOptions)
+		throws Exception
+	{
+
 		if (theAutomata == null)
 		{
 			throw new Exception("theAutomata must be non-null");
 		}
+
 		if (iddOptions == null)
 		{
 			throw new Exception("IDDOptions must be non-null");
 		}
 
 		this.theAutomata = theAutomata;
-
 		this.iddOptions = iddOptions;
+		theAutomaton = new Automaton();
 
-  		theAutomaton = new Automaton();
-
-  		// Compute the new alphabet
+		// Compute the new alphabet
 		EventsSet theAlphabets = new EventsSet();
 		Iterator autIt = theAutomata.iterator();
+
 		while (autIt.hasNext())
 		{
-			Automaton currAutomaton = (Automaton)autIt.next();
+			Automaton currAutomaton = (Automaton) autIt.next();
 			Alphabet currAlphabet = currAutomaton.getAlphabet();
+
 			theAlphabets.add(currAlphabet);
 		}
 
 		try
-  		{
+		{
 			Alphabet theAlphabet = AlphabetHelpers.getUnionAlphabet(theAlphabets, "a");
+
 			theAutomaton.setAlphabet(theAlphabet);
 		}
-  		catch (Exception e)
-    	{
- 			thisCategory.error("Error while generating union alphabet: " + e);
-        	throw e;
-     	}
+		catch (Exception e)
+		{
+			thisCategory.error("Error while generating union alphabet: " + e);
 
-  		try
-  		{
-    		theAutomataIndexForm = new AutomataIndexForm(theAutomata, theAutomaton);
+			throw e;
+		}
+
+		try
+		{
+			theAutomataIndexForm = new AutomataIndexForm(theAutomata, theAutomaton);
 		}
 		catch (Exception e)
 		{
 			thisCategory.error("Error while computing AutomataIndexForm");
+
 			throw e;
 		}
-    }
-
-	public void clear()
-	{
 	}
+
+	public void clear() {}
 
 	public IDDOptions getIddOptions()
 	{
 		return iddOptions;
 	}
 
-    public Automaton getAutomaton()
-    {
-        return theAutomaton;
-    }
-
-    public Automata getAutomata()
-    {
-        return theAutomata;
-    }
-
-    public AutomataIndexForm getAutomataIndexForm()
-    {
-		return theAutomataIndexForm;
-    }
-
-/*
-	private boolean buildEnableEventPredicates()
+	public Automaton getAutomaton()
 	{
-		Alphabet unionAlphabet = theAutomaton.getAlphabet();
-		enableEventPredicateArray = new IDD[unionAlphabet.getSize()];
+		return theAutomaton;
+	}
 
-	}*/
+	public Automata getAutomata()
+	{
+		return theAutomata;
+	}
+
+	public AutomataIndexForm getAutomataIndexForm()
+	{
+		return theAutomataIndexForm;
+	}
+
+	/*
+	 *       private boolean buildEnableEventPredicates()
+	 *       {
+	 *               Alphabet unionAlphabet = theAutomaton.getAlphabet();
+	 *               enableEventPredicateArray = new IDD[unionAlphabet.getSize()];
+	 *
+	 *       }
+	 */
 }

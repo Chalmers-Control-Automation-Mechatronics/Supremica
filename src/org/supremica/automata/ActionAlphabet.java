@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,25 +47,27 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.automata;
 
+
+
 import java.util.*;
+
 import org.supremica.gui.*;
+
 import org.apache.log4j.*;
+
 
 public class ActionAlphabet
 	extends Alphabet
 {
+
 	private static Category thisCategory = LogDisplay.createCategory(ActionAlphabet.class.getName());
 
-	public ActionAlphabet()
-	{
-	}
+	public ActionAlphabet() {}
 
 	public ActionAlphabet(ActionAlphabet otherAlphabet)
 	{
 		super(otherAlphabet);
 	}
-	
 }

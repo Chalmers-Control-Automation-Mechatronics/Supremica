@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,24 +47,27 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.automata.algorithms;
 
+
+
 import java.util.*;
+
 import org.supremica.gui.*;
+
 import org.apache.log4j.*;
 
 import org.supremica.automata.*;
 
+
 public class AlphabetAnalyzer
 {
-   	private static Category thisCategory = LogDisplay.createCategory(AlphabetAnalyzer.class.getName());
 
-   	private Automata theAutomata;
+	private static Category thisCategory = LogDisplay.createCategory(AlphabetAnalyzer.class.getName());
+	private Automata theAutomata;
 
 	/** Map from an Event-object to the Set of Automaton-objects that contains this event. */
 	private HashMap eventToAutomataMap = new HashMap();
-
 	private Collection eventCollection;
 
 	public AlphabetAnalyzer(Automata theAutomata)
@@ -82,14 +86,15 @@ public class AlphabetAnalyzer
 	 */
 	public HashMap getUncontrollableEventToPlantMap()
 	{
+
 		try
 		{
 			buildUncontrollableEventToPlantMap();
 		}
 		catch (Exception e)
-	    {
-         	System.err.println("Error in AlphabetAnalyzer. " + e);
-          	System.exit(0);
+		{
+			System.err.println("Error in AlphabetAnalyzer. " + e);
+			System.exit(0);
 		}
 
 		return eventToAutomataMap;
@@ -97,15 +102,19 @@ public class AlphabetAnalyzer
 
 	private void buildEventToAutomataMap()
 	{
+
 		Iterator automataIt = theAutomata.iterator();
+
 		while (automataIt.hasNext())
 		{
-	  		Automaton currAutomaton = (Automaton)automataIt.next();
-			Alphabet currAlphabet = (Alphabet)currAutomaton.getAlphabet();
+			Automaton currAutomaton = (Automaton) automataIt.next();
+			Alphabet currAlphabet = (Alphabet) currAutomaton.getAlphabet();
 			Iterator eventIt = currAlphabet.iterator();
+
 			while (eventIt.hasNext())
 			{
-				Event currEvent = (Event)eventIt.next();
+				Event currEvent = (Event) eventIt.next();
+
 				insertEvent(currEvent, currAutomaton);
 			}
 		}
@@ -116,19 +125,26 @@ public class AlphabetAnalyzer
 
 	private void buildUncontrollableEventToPlantMap()
 	{
+
 		Iterator automataIt = theAutomata.iterator();
+
 		while (automataIt.hasNext())
 		{
-	  		Automaton currAutomaton = (Automaton)automataIt.next();
+			Automaton currAutomaton = (Automaton) automataIt.next();
+
 			if (currAutomaton.getType() == AutomatonType.Plant)
 			{
-				Alphabet currAlphabet = (Alphabet)currAutomaton.getAlphabet();
+				Alphabet currAlphabet = (Alphabet) currAutomaton.getAlphabet();
 				Iterator eventIt = currAlphabet.iterator();
+
 				while (eventIt.hasNext())
 				{
-					Event currEvent = (Event)eventIt.next();
+					Event currEvent = (Event) eventIt.next();
+
 					if (!currEvent.isControllable())
+					{
 						insertEvent(currEvent, currAutomaton);
+					}
 				}
 			}
 		}
@@ -136,37 +152,47 @@ public class AlphabetAnalyzer
 
 	private void insertEvent(Event ev, Automaton aut)
 	{
-		Set automatonSet = (Set)eventToAutomataMap.get(ev);
+
+		Set automatonSet = (Set) eventToAutomataMap.get(ev);
+
 		if (automatonSet == null)
 		{
 			automatonSet = new HashSet();
+
 			eventToAutomataMap.put(ev, automatonSet);
 		}
+
 		automatonSet.add(aut);
 	}
 
 	/**
-	 * Determines if an event is not synchronized, that is, present in ledd than two automata. 
+	 * Determines if an event is not synchronized, that is, present in ledd than two automata.
 	 * @param ev the event that should be examined.
 	 * @return true if the given event is present in zero or one automata, and false if it is present on more than one automata.
 	 */
 	public boolean isUnsynchronizedEvent(Event ev)
 	{
-		Set automatonSet = (Set)eventToAutomataMap.get(ev);
+
+		Set automatonSet = (Set) eventToAutomataMap.get(ev);
+
 		if (automatonSet == null)
 		{
 			return true;
 		}
+
 		return automatonSet.size() <= 1;
 	}
 
 	public void printUnsynchronizedEvents()
 	{
+
 		Set eventSet = eventToAutomataMap.keySet();
 		Iterator eventIt = eventSet.iterator();
+
 		while (eventIt.hasNext())
 		{
-			Event currEvent = (Event)eventIt.next();
+			Event currEvent = (Event) eventIt.next();
+
 			if (isUnsynchronizedEvent(currEvent))
 			{
 				thisCategory.info("UnsynchronizedEvent: " + currEvent.getLabel());
@@ -176,15 +202,18 @@ public class AlphabetAnalyzer
 
 	private void checkAllPairs()
 	{
+
 		eventCollection = eventToAutomataMap.values();
 
 		int nbrOfAutomata = theAutomata.size();
+
 		for (int i = 0; i < nbrOfAutomata - 1; i++)
 		{
 			for (int j = i + 1; j < nbrOfAutomata; j++)
 			{
 				Automaton leftAut = theAutomata.getAutomatonAt(i);
 				Automaton rightAut = theAutomata.getAutomatonAt(j);
+
 				pairComparison(leftAut, rightAut);
 			}
 		}
@@ -192,20 +221,20 @@ public class AlphabetAnalyzer
 
 	private void pairComparison(Automaton leftAut, Automaton rightAut)
 	{
+
 		int nbrOnlyLeft = 0;
 		int nbrOnlyRight = 0;
 		int nbrCommon = 0;
 		int nbrUniqueLeft = 0;
 		int nbrUniqueRight = 0;
 		int newUnique = 0;
-
 		boolean inLeft;
 		boolean inRight;
-
 		Iterator eventMapIt = eventCollection.iterator();
+
 		while (eventMapIt.hasNext())
 		{
-			Set currSet = (Set)eventMapIt.next();
+			Set currSet = (Set) eventMapIt.next();
 
 			inLeft = currSet.contains(leftAut);
 			inRight = currSet.contains(rightAut);
@@ -213,6 +242,7 @@ public class AlphabetAnalyzer
 			if (inLeft && inRight)
 			{
 				nbrCommon++;
+
 				if (currSet.size() == 2)
 				{
 					newUnique++;
@@ -221,6 +251,7 @@ public class AlphabetAnalyzer
 			else if (inLeft)
 			{
 				nbrOnlyLeft++;
+
 				if (currSet.size() == 1)
 				{
 					nbrUniqueLeft++;
@@ -229,13 +260,15 @@ public class AlphabetAnalyzer
 			else if (inRight)
 			{
 				nbrOnlyRight++;
+
 				if (currSet.size() == 1)
 				{
 					nbrUniqueRight++;
 				}
 			}
 		}
-		if (nbrOnlyLeft == 0 && nbrOnlyRight == 0)
+
+		if ((nbrOnlyLeft == 0) && (nbrOnlyRight == 0))
 		{
 			thisCategory.info("Alphabet: " + leftAut.getName() + " == " + rightAut.getName() + " new unsych: " + newUnique);
 		}
@@ -245,23 +278,25 @@ public class AlphabetAnalyzer
 			{
 				thisCategory.info("Alphabet: " + leftAut.getName() + " <= " + rightAut.getName() + " new unsych: " + newUnique);
 			}
+
 			if (nbrOnlyRight == 0)
 			{
 				thisCategory.info("Alphabet: " + rightAut.getName() + " <= " + leftAut.getName() + " new unsych: " + newUnique);
 			}
 		}
+
 		/*
-		if (nbrOnlyLeft == 0)
-			System.out.println("*** left <= right");
-		if (nbrOnlyRight == 0)
-			System.out.println("*** right <= left");
-		System.out.println("left: " + leftAut.getName() + " right: " + rightAut.getName());
-		System.out.println("#left: " + nbrOnlyLeft +
-			" #right: " + nbrOnlyRight +
-			" #common: " + nbrCommon);
-		System.out.println("#uleft: " + nbrUniqueLeft +
-			" #uright: " + nbrUniqueRight +
-			" #newUnique: " + newUnique);
-		*/
+		 * if (nbrOnlyLeft == 0)
+		 *       System.out.println("*** left <= right");
+		 * if (nbrOnlyRight == 0)
+		 *       System.out.println("*** right <= left");
+		 * System.out.println("left: " + leftAut.getName() + " right: " + rightAut.getName());
+		 * System.out.println("#left: " + nbrOnlyLeft +
+		 *       " #right: " + nbrOnlyRight +
+		 *       " #common: " + nbrCommon);
+		 * System.out.println("#uleft: " + nbrUniqueLeft +
+		 *       " #uright: " + nbrUniqueRight +
+		 *       " #newUnique: " + newUnique);
+		 */
 	}
 }

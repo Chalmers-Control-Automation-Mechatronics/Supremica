@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,23 +47,27 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.gui.editor;
 
+
+
 import com.nwoods.jgo.*;
+
 import java.awt.*;
+
 import org.supremica.automata.*;
+
 
 public class StateNode
 	extends JGoArea
 {
+
 	static int myStdSize = 20;
 
 	// State
 	protected JGoEllipse myEllipse = null;
 	protected JGoText myLabel = null;
 	protected StatePort thePort = null;
-
 	protected State theState = null;
 
 	/**
@@ -71,51 +76,65 @@ public class StateNode
 	*/
 	public StateNode(State theState)
 	{
+
 		super();
+
 		this.theState = theState;
 	}
 
 	public JGoObject copyObject(JGoCopyEnvironment env)
 	{
-		StateNode newobj = (StateNode)super.copyObject(env);
+
+		StateNode newobj = (StateNode) super.copyObject(env);
+
 		if (newobj != null)
 		{
+
 			// the JGoObjects that are part of this area are copied
 			// separately by copyChildren()
 			// no other fields to copy
 		}
+
 		return newobj;
 	}
 
 	// Fix how to copy a state !??
 	public void copyChildren(JGoArea newarea, JGoCopyEnvironment env)
 	{
+
 		// don't bother calling JGoArea's default implementation,
 		// so that we can set our fields explicitly
-		StateNode newobj = (StateNode)newarea;
+		StateNode newobj = (StateNode) newarea;
+
 		if (myEllipse != null)
 		{
-			newobj.myEllipse = (JGoEllipse)myEllipse.copyObject(env);
+			newobj.myEllipse = (JGoEllipse) myEllipse.copyObject(env);
+
 			newobj.addObjectAtHead(newobj.myEllipse);
 		}
 
 		if (myLabel != null)
 		{
-			newobj.myLabel = (JGoText)myLabel.copyObject(env);
+			newobj.myLabel = (JGoText) myLabel.copyObject(env);
+
 			newobj.addObjectAtTail(newobj.myLabel);
 		}
 
 		if (theState != null)
 		{
 			newobj.theState = new State(theState);
+
 			// newobj.theState.setId(); // New id is needed
 		}
 
 		Point c = newobj.myEllipse.getSpotLocation(Center);
 		StatePort op = thePort;
-		StatePort np = (StatePort)op.copyObject(env);
+		StatePort np = (StatePort) op.copyObject(env);
+
 		newobj.thePort = np;
+
 		newobj.addObjectAtTail(np);
+
 		np.myEllipse = newobj.myEllipse;
 	}
 
@@ -130,6 +149,7 @@ public class StateNode
 	*/
 	public void layoutChildren()
 	{
+
 		if (myEllipse == null)
 		{
 			return;
@@ -137,24 +157,29 @@ public class StateNode
 
 		if (myLabel != null)
 		{
+
 			// put the label above the node
 			myLabel.setSpotLocation(TopCenter, myEllipse, BottomCenter);
+
 			// put the label below the node
-			//myLabel.setSpotLocation(TopCenter, myEllipse, BottomCenter);
+			// myLabel.setSpotLocation(TopCenter, myEllipse, BottomCenter);
 		}
 
 		if (thePort != null)
 		{
 			Point c = myEllipse.getSpotLocation(Center);
+
 			thePort.setSpotLocation(Center, c.x, c.y);
 		}
 	}
 
 	public void initialize()
 	{
+
 		if (theState == null)
 		{
 			System.err.println("State in StateNode is null");
+
 			return;
 		}
 
@@ -165,13 +190,16 @@ public class StateNode
 		// children, all of whom are currently !isSelectable().
 		setSelectable(false);
 		setGrabChildSelection(true);
+
 		// the user can move this node around
 		setDraggable(true);
+
 		// the user cannot resize this node
 		setResizable(false);
 
 		// create the bigger circle/ellipse around and behind the port
 		myEllipse = new JGoEllipse(getTopLeft(), getSize());
+
 		myEllipse.setSelectable(false);
 		myEllipse.setDraggable(false);
 
@@ -181,30 +209,33 @@ public class StateNode
 		// if there is a string, create a label with a transparent
 		// background that is centered
 		String labeltext = theState.getName();
+
 		if (labeltext == null)
 		{
 			labeltext = theState.getId();
 		}
-/*
-		if (labeltext != null)
-		{
-			myLabel = new JGoText(labeltext);
-			myLabel.setSelectable(false);
-			myLabel.setDraggable(false);
-			myLabel.setAlignment(JGoText.ALIGN_CENTER);
-			myLabel.setTransparent(true);
-		}
-*/
+
+		/*
+		 *               if (labeltext != null)
+		 *               {
+		 *                       myLabel = new JGoText(labeltext);
+		 *                       myLabel.setSelectable(false);
+		 *                       myLabel.setDraggable(false);
+		 *                       myLabel.setAlignment(JGoText.ALIGN_CENTER);
+		 *                       myLabel.setTransparent(true);
+		 *               }
+		 */
 
 		// create a Port, which knows how to make sure
 		// connected JGoLinks have a reasonable end point
 		thePort = new StatePort();
 		thePort.myEllipse = myEllipse;
-		thePort.setSize(8, 8);
 
+		thePort.setSize(8, 8);
 
 		// add all the children to the area
 		addObjectAtHead(myEllipse);
+
 		if (myLabel != null)
 		{
 			addObjectAtTail(myLabel);
@@ -221,16 +252,21 @@ public class StateNode
 
 	public String getToolTipText()
 	{
+
 		String stateId = theState.getId();
+
 		if (stateId == null)
 		{
 			return null;
 		}
+
 		String stateName = theState.getName();
-		if (stateName == null || stateName.equals(""))
+
+		if ((stateName == null) || stateName.equals(""))
 		{
 			return "Id: \"" + stateId + "\"";
 		}
+
 		return "Id: \"" + stateId + "\" Name: \"" + stateName + "\"";
 	}
 
@@ -270,24 +306,24 @@ public class StateNode
 		setPen(JGoPen.makeStockPen(c));
 	}
 
-/*
-	public void colorChange()
-	{
-		Color c = getColor();
-		if (c == Color.red)
-		{
-			setColor(Color.green);
-		}
-		else if (c == Color.green)
-		{
-			setColor(Color.blue);
-		}
-		else if (c == Color.blue)
-		{
-			setColor(Color.red);
-		}
-	}
-*/
+	/*
+	 *       public void colorChange()
+	 *       {
+	 *               Color c = getColor();
+	 *               if (c == Color.red)
+	 *               {
+	 *                       setColor(Color.green);
+	 *               }
+	 *               else if (c == Color.green)
+	 *               {
+	 *                       setColor(Color.blue);
+	 *               }
+	 *               else if (c == Color.blue)
+	 *               {
+	 *                       setColor(Color.red);
+	 *               }
+	 *       }
+	 */
 	public JGoPort getPort()
 	{
 		return thePort;
@@ -312,5 +348,4 @@ public class StateNode
 	{
 		return myLabel;
 	}
-
 }

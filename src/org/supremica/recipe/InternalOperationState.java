@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,16 +47,18 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.recipe;
+
+
 
 import java.util.*;
 
+
 public class InternalOperationState
 {
+
 	private String[] activeOperations;
 	private int[] activeResources;
-
 	private static final String undeterminedResource = new String("");
 	private boolean initial = false;
 
@@ -67,9 +70,11 @@ public class InternalOperationState
 
 	public InternalOperationState(InternalOperationState oldState)
 	{
+
 		this(oldState.activeOperations.length);
-      	System.arraycopy(oldState.activeOperations, 0, activeOperations, 0, oldState.activeOperations.length);
-     	System.arraycopy(oldState.activeResources, 0, activeResources, 0, oldState.activeResources.length);
+
+		System.arraycopy(oldState.activeOperations, 0, activeOperations, 0, oldState.activeOperations.length);
+		System.arraycopy(oldState.activeResources, 0, activeResources, 0, oldState.activeResources.length);
 	}
 
 	public void setActive(InternalOperation op)
@@ -99,6 +104,7 @@ public class InternalOperationState
 
 	public void resetState()
 	{
+
 		for (int i = 0; i < activeOperations.length; i++)
 		{
 			activeOperations[i] = null;
@@ -115,13 +121,11 @@ public class InternalOperationState
 		this.initial = initial;
 	}
 
-	public void computeNextResourceSet()
-	{
-
-	}
+	public void computeNextResourceSet() {}
 
 	public void resetResourceSet()
 	{
+
 		for (int i = 0; i < activeResources.length; i++)
 		{
 			activeResources[i] = -1;

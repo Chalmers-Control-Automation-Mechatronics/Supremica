@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,11 +47,13 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.gui;
+
+
 
 public class ExecutionDialogMode
 {
+
 	public static ExecutionDialogMode synchronizing = new ExecutionDialogMode("Synchronizing");
 	public static ExecutionDialogMode verifying = new ExecutionDialogMode("Verifying");
 	public static ExecutionDialogMode synthesizing = new ExecutionDialogMode("Synthesizing");
@@ -58,7 +61,6 @@ public class ExecutionDialogMode
 	public static ExecutionDialogMode buildingTransitions = new ExecutionDialogMode("BuildingTransitions");
 	public static ExecutionDialogMode hide = new ExecutionDialogMode("Hide");
 	public static ExecutionDialogMode uninitialized = new ExecutionDialogMode("Uninitialized");
-
 	private final String id;
 
 	private ExecutionDialogMode(String id)
@@ -70,6 +72,4 @@ public class ExecutionDialogMode
 	{
 		return id;
 	}
-
 }
-

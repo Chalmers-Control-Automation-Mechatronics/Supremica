@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,10 +47,12 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.petrinet;
 
+
+
 import java.util.*;
+
 
 /**
  * This is container class for storing several
@@ -57,11 +60,10 @@ import java.util.*;
  */
 public class PetriNets
 {
+
 	private HashMap thePetriNets = new HashMap();
 
-	public PetriNets()
-	{
-	}
+	public PetriNets() {}
 
 	public void addPetriNet(PetriNet thePetriNet)
 		throws Exception
@@ -78,16 +80,18 @@ public class PetriNets
 	public void removePetriNet(String petriNetName)
 		throws Exception
 	{
+
 		if (!contains(petriNetName))
 		{
 			throw new Exception(petriNetName + " does not exists");
 		}
+
 		thePetriNets.remove(petriNetName);
 	}
 
 	public PetriNet getPetriNet(String petriNetName)
 	{
-		return (PetriNet)thePetriNets.get(petriNetName);
+		return (PetriNet) thePetriNets.get(petriNetName);
 	}
 
 	public boolean contains(PetriNet thePetriNet)
@@ -108,9 +112,10 @@ public class PetriNets
 	public static void main(String args[])
 		throws Exception
 	{
-		PetriNets thePetriNets = new PetriNets();
 
-		PetriNet firstPetriNet  = new PetriNet("firstPetriNet");
+		PetriNets thePetriNets = new PetriNets();
+		PetriNet firstPetriNet = new PetriNet("firstPetriNet");
+
 		thePetriNets.addPetriNet(firstPetriNet);
 
 		Place p1 = new Place("p1");
@@ -122,9 +127,7 @@ public class PetriNets
 
 		p1.setTime(4);
 		p4.setTime(3);
-
 		p1.setMarking(1);
-
 		firstPetriNet.addPlace(p1);
 		firstPetriNet.addPlace(p2);
 		firstPetriNet.addPlace(p3);
@@ -152,27 +155,29 @@ public class PetriNets
 		firstPetriNet.addArc(p3, t2);
 		firstPetriNet.addArc(p4, t3);
 		firstPetriNet.addArc(p4, t4);
-		//firstPetriNet.addArc(p5, t5);
-		//firstPetriNet.addArc(p6, t6);
 
+		// firstPetriNet.addArc(p5, t5);
+		// firstPetriNet.addArc(p6, t6);
 		// Arcs from transitions to places
 		firstPetriNet.addArc(t1, p2);
 		firstPetriNet.addArc(t1, p3);
 		firstPetriNet.addArc(t2, p4);
 		firstPetriNet.addArc(t3, p5);
 		firstPetriNet.addArc(t4, p6);
-		//firstPetriNet.addArc(t5, p1);
-		//firstPetriNet.addArc(t6, p1);
 
+		// firstPetriNet.addArc(t5, p1);
+		// firstPetriNet.addArc(t6, p1);
 		PetriNet secondPetriNet = firstPetriNet.createCopy("secondPetriNet");
+
 		thePetriNets.addPetriNet(secondPetriNet);
 
 		Iterator petriNetIt = thePetriNets.iterator();
+
 		while (petriNetIt.hasNext())
 		{
-			PetriNet currPetriNet = (PetriNet)petriNetIt.next();
+			PetriNet currPetriNet = (PetriNet) petriNetIt.next();
+
 			System.out.println(currPetriNet);
 		}
-
 	}
 }

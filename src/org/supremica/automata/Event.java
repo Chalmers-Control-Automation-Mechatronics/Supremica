@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,14 +47,17 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.automata;
+
+
 
 import java.util.*;
 
+
 public class Event
-    implements Comparable
+	implements Comparable
 {
+
 	private String id = "";
 	private String label = "";
 	private boolean controllable = true;
@@ -61,27 +65,29 @@ public class Event
 	private boolean immediate = false;
 	private int expansionPriority = -1;
 	private int synchIndex = -1;
-//	private Action theAction = null;
 
-	public Event()
-	{
-	}
+	// private Action theAction = null;
+	public Event() {}
 
 	public Event(String label)
 	{
+
 		this.label = label;
-		//** MF ** if I instantiate with only a label, I (probably) want the id to be the same (not?)
-		//** MF ** adding this cannot break any code, cannit?
+
+		// ** MF ** if I instantiate with only a label, I (probably) want the id to be the same (not?)
+		// ** MF ** adding this cannot break any code, cannit?
 		this.id = label;
 	}
+
 	public Event(String label, String id)
 	{
 		setLabel(label);
 		setId(id);
 	}
-	
+
 	public Event(Event e)
 	{
+
 		id = e.id;
 		label = e.label;
 		controllable = e.controllable;
@@ -97,13 +103,13 @@ public class Event
 	/**
 	 * Calls update in all execution listeners.
 	 */
-	/*
-	public void execute()
-	{
-		notifyExceutionListeners();
-	}
-	*/
 
+	/*
+	 * public void execute()
+	 * {
+	 *       notifyExceutionListeners();
+	 * }
+	 */
 	public String getId()
 	{
 		return id;
@@ -144,7 +150,6 @@ public class Event
 		this.immediate = immediate;
 	}
 
-
 	public boolean isPrioritized()
 	{
 		return prioritized;
@@ -167,19 +172,21 @@ public class Event
 
 	public boolean equals(Object obj)
 	{
+
 		// System.err.println("equalsObject");
-		return this.label.equals(((Event)obj).label);
+		return this.label.equals(((Event) obj).label);
 	}
 
 	public boolean equals(String label)
 	{
+
 		// System.err.println("equalsString");
 		return this.label.equals(label);
 	}
 
 	public boolean equalId(Object obj)
 	{
-		return this.id.equals(((Event)obj).id);
+		return this.id.equals(((Event) obj).id);
 	}
 
 	public boolean equalId(String id)
@@ -202,27 +209,29 @@ public class Event
 		this.synchIndex = synchIndex;
 	}
 
-    public int compareTo(Object event)
-    {
-        // System.err.println("CompareTo");
-        return label.compareTo(((Event)event).label);
-    }
-/*
-	public Listeners getExceutionListeners()
+	public int compareTo(Object event)
 	{
-		if (listeners == null)
-		{
-			listeners = new AutomatonListeners(this);
-		}
-		return listeners;
+
+		// System.err.println("CompareTo");
+		return label.compareTo(((Event) event).label);
 	}
 
-	private void notifyExceutionListeners()
-	{
-		if (listeners != null)
-		{
-			listeners.notifyListeners();
-		}
-	}
-*/
+	/*
+	 *       public Listeners getExceutionListeners()
+	 *       {
+	 *               if (listeners == null)
+	 *               {
+	 *                       listeners = new AutomatonListeners(this);
+	 *               }
+	 *               return listeners;
+	 *       }
+	 *
+	 *       private void notifyExceutionListeners()
+	 *       {
+	 *               if (listeners != null)
+	 *               {
+	 *                       listeners.notifyListeners();
+	 *               }
+	 *       }
+	 */
 }

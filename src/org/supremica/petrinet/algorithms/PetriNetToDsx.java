@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,22 +47,28 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.petrinet.algorithms;
 
+
+
 import java.util.*;
+
 import java.io.*;
 
 import org.supremica.petrinet.*;
 
+
 public class PetriNetToDsx
 {
+
 	private PetriNet pn;
 
 	public PetriNetToDsx(PetriNet pn)
 		throws Exception
 	{
+
 		this.pn = pn;
+
 		if (pn.hasInhibitorArcs())
 		{
 			throw new Exception("PetriNets with inhibitor arcs are not supported");
@@ -69,86 +76,121 @@ public class PetriNetToDsx
 	}
 
 	public void serialize(PrintWriter pw)
- 		throws Exception
+		throws Exception
 	{
+
 		pw.println("PETRINET;");
 		pw.println("number of places: " + pn.nbrOfPlaces());
 		pw.println("number of transitions: " + pn.nbrOfTransitions());
 
 		// Print all places
 		Iterator places = pn.placeIterator();
+
 		while (places.hasNext())
 		{
-			Place place = (Place)places.next();
+			Place place = (Place) places.next();
+
 			pw.print(place.getIdentity());
 
 			int currTime = place.getTime();
+
 			if (currTime != Integer.MIN_VALUE)
 			{
 				pw.print("(" + currTime + ")");
 			}
 
 			int currMarking = place.getMarking();
+
 			if (currMarking != 0)
 			{
 				pw.print("." + currMarking);
 			}
+
 			if (places.hasNext())
+			{
 				pw.print(", ");
+			}
 			else
+			{
 				pw.println(":");
+			}
 		}
 
 		// Print all transitions
 		Iterator transitionIt = pn.transitionIterator();
+
 		while (transitionIt.hasNext())
 		{
-			Transition transition = (Transition)transitionIt.next();
+			Transition transition = (Transition) transitionIt.next();
+
 			pw.print(transition.getIdentity());
+
 			if (transition.getLabel() != null)
 			{
 				pw.print(".");
+
 				if (!transition.isControllable())
+				{
 					pw.print("!");
+				}
+
 				pw.print(transition.getLabel());
 			}
+
 			if (transitionIt.hasNext())
+			{
 				pw.print(", ");
+			}
 			else
+			{
 				pw.println(":");
+			}
 		}
 
 		// Print structure
 		transitionIt = pn.transitionIterator();
+
 		while (transitionIt.hasNext())
 		{
-			Transition currTransition = (Transition)transitionIt.next();
+			Transition currTransition = (Transition) transitionIt.next();
+
 			pw.print(currTransition.getIdentity() + ": ");
 
 			// Print prev places
 			Iterator placeIt = currTransition.prevPlaceIterator();
+
 			while (placeIt.hasNext())
 			{
-				Place currPlace = (Place)placeIt.next();
+				Place currPlace = (Place) placeIt.next();
+
 				pw.print(currPlace.getIdentity());
+
 				if (placeIt.hasNext())
+				{
 					pw.print(", ");
+				}
 			}
 
 			pw.print(": ");
 
 			// Print next places
 			placeIt = currTransition.nextPlaceIterator();
+
 			while (placeIt.hasNext())
 			{
-				Place currPlace = (Place)placeIt.next();
+				Place currPlace = (Place) placeIt.next();
+
 				pw.print(currPlace.getIdentity());
+
 				if (placeIt.hasNext())
+				{
 					pw.print(", ");
+				}
 			}
 
 			pw.println("");
 		}
+
 		pw.flush();
 	}
 
@@ -168,8 +210,7 @@ public class PetriNetToDsx
 		throws Exception
 	{
 
-		PetriNet firstPetriNet  = new PetriNet("firstPetriNet");
-
+		PetriNet firstPetriNet = new PetriNet("firstPetriNet");
 		Place p1 = new Place("p1");
 		Place p2 = new Place("p2");
 		Place p3 = new Place("p3");
@@ -179,9 +220,7 @@ public class PetriNetToDsx
 
 		p1.setTime(4);
 		p4.setTime(3);
-
 		p1.setMarking(1);
-
 		firstPetriNet.addPlace(p1);
 		firstPetriNet.addPlace(p2);
 		firstPetriNet.addPlace(p3);
@@ -198,9 +237,7 @@ public class PetriNetToDsx
 
 		t2.setControllable(false);
 		t2.setLabel("a");
-
 		t3.setLabel("b");
-
 		firstPetriNet.addTransition(t1);
 		firstPetriNet.addTransition(t2);
 		firstPetriNet.addTransition(t3);
@@ -227,6 +264,7 @@ public class PetriNetToDsx
 		firstPetriNet.addArc(t6, p1);
 
 		PetriNetToDsx exporter = new PetriNetToDsx(firstPetriNet);
+
 		exporter.serialize(System.out);
 	}
 }

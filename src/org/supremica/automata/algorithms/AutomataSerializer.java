@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,15 +47,21 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.automata.algorithms;
+
+
 
 // package org.supremica;
 import java.io.PrintWriter;
 import java.io.IOException;
 
+
 public interface AutomataSerializer
 {
-	void serialize(PrintWriter pr) throws Exception;
-	void serialize(String fileName) throws Exception;
+
+	void serialize(PrintWriter pr)
+		throws Exception;
+
+	void serialize(String fileName)
+		throws Exception;
 }

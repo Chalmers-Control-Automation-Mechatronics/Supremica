@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,76 +47,81 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.recipe;
+
+
 
 import org.supremica.petrinet.*;
 import org.supremica.petrinet.algorithms.*;
+
 import java.util.*;
+
 import java.io.*;
+
 
 public class RecipeResourcePetriNetBuilder
 {
-//	private PlantConnections plantConnections;
 
+	// private PlantConnections plantConnections;
 	private PetriNet thePetriNet;
 	private InternalOperationRecipes theRecipes;
-
 	private List firstPlaces = new LinkedList();
 	private List lastPlaces = new LinkedList();
-
 	private HashMap resourcePlaces = new HashMap();
-
 	private int transitionCounter = 1;
-
 	private int nbr_of_resource_places = 0;
 	private int[] product_start_index;
 	private int recipeCounter = 0;
 
-	public RecipeResourcePetriNetBuilder()
-	{
-	}
+	public RecipeResourcePetriNetBuilder() {}
 
-/*	public RecipeResourcePetriNetBuilder(PlantConnections plantConnections)
-	{
-		this.plantConnections = plantConnections;
-	}*/
-
+	/*
+	 *      public RecipeResourcePetriNetBuilder(PlantConnections plantConnections)
+	 *       {
+	 *               this.plantConnections = plantConnections;
+	 *       }
+	 */
 	public PetriNet buildPetriNet(InternalOperationRecipes theRecipes)
 		throws Exception
 	{
-		this.theRecipes = theRecipes;
 
+		this.theRecipes = theRecipes;
 		nbr_of_resource_places = 0;
 		product_start_index = new int[theRecipes.nbrOfRecipes()];
 		recipeCounter = 0;
-
 		thePetriNet = new PetriNet("unknown");
 
 		Iterator recipeIt = theRecipes.iterator();
+
 		while (recipeIt.hasNext())
 		{
-			InternalOperationRecipe currRecipe = (InternalOperationRecipe)recipeIt.next();
+			InternalOperationRecipe currRecipe = (InternalOperationRecipe) recipeIt.next();
+
 			doInternalOperationRecipe(currRecipe);
 		}
 
 		// Create goalTransit
 		Transition goalTransit = new Transition("goaltransit");
+
 		thePetriNet.addTransition(goalTransit);
 
 		// Create all arcs to the goalTransit
 		Iterator lastPlacesIt = lastPlaces.iterator();
+
 		while (lastPlacesIt.hasNext())
 		{
-			Place currPlace = (Place)lastPlacesIt.next();
+			Place currPlace = (Place) lastPlacesIt.next();
+
 			thePetriNet.addArc(currPlace, goalTransit);
 		}
 
 		// Add all resource places
 		Iterator resourceIt = resourcePlaces.values().iterator();
+
 		while (resourceIt.hasNext())
 		{
-			Place currPlace = (Place)resourceIt.next();
+			Place currPlace = (Place) resourceIt.next();
+
 			thePetriNet.addPlace(currPlace);
 		}
 
@@ -124,11 +130,13 @@ public class RecipeResourcePetriNetBuilder
 
 	public String buildComments()
 	{
+
 		StringBuffer sb = new StringBuffer();
 		int nbr_of_product_places = thePetriNet.nbrOfPlaces() - nbr_of_resource_places;
 
 		sb.append("nbr_of_products: " + theRecipes.nbrOfRecipes() + "\n");
 		sb.append("nbr_of_product_places: " + nbr_of_product_places + "\n");
+
 		for (int i = 0; i < product_start_index.length; i++)
 		{
 			sb.append("product_start_index: " + product_start_index[i] + "\n");
@@ -139,21 +147,24 @@ public class RecipeResourcePetriNetBuilder
 		return sb.toString();
 	}
 
-
 	private Place getResourcePlace(String name)
 		throws Exception
 	{
+
 		if (resourcePlaces.containsKey(name))
 		{
-			return (Place)resourcePlaces.get(name);
+			return (Place) resourcePlaces.get(name);
 		}
 		else
 		{
 			nbr_of_resource_places++;
+
 			Place newPlace = new Place(name);
+
 			newPlace.setMarking(1);
 			newPlace.setTime(0);
 			resourcePlaces.put(name, newPlace);
+
 			// thePetriNet.addPlace(newPlace); // Do this after all products are created
 			return newPlace;
 		}
@@ -161,26 +172,29 @@ public class RecipeResourcePetriNetBuilder
 
 	private Place getPlace(String recipe, String operation, String resource)
 	{
+
 		String name = recipe + "_" + operation + "_" + resource;
+
 		return thePetriNet.getPlace(name);
 	}
-
 
 	private void doInternalOperationRecipe(InternalOperationRecipe theRecipe)
 		throws Exception
 	{
+
 		String recipeName = theRecipe.getIdentity();
 
 		// Create first and last places
 		Place firstPlace = new Place(recipeName + "_first");
+
 		thePetriNet.addPlace(firstPlace);
 		firstPlace.setMarking(1);
 		firstPlace.setTime(0);
 
 		Place lastPlace = new Place(recipeName + "_last");
+
 		thePetriNet.addPlace(lastPlace);
 		lastPlace.setTime(0);
-
 		firstPlaces.add(firstPlaces);
 		lastPlaces.add(lastPlace);
 
@@ -189,15 +203,18 @@ public class RecipeResourcePetriNetBuilder
 
 		// Create a place for each <operation,resource>
 		Iterator operationIt = theRecipe.operationIterator();
+
 		while (operationIt.hasNext())
 		{
-			InternalOperation currOperation = (InternalOperation)operationIt.next();
+			InternalOperation currOperation = (InternalOperation) operationIt.next();
 			String currOperationName = currOperation.getIdentity();
 			Iterator resourceIt = currOperation.resourceCandidateIterator();
+
 			while (resourceIt.hasNext())
 			{
-				String currResourceName = (String)resourceIt.next();
+				String currResourceName = (String) resourceIt.next();
 				Place currPlace = new Place(recipeName + "_" + currOperationName + "_" + currResourceName);
+
 				if (currOperation.getTime() != Integer.MIN_VALUE)
 				{
 					currPlace.setTime(currOperation.getTime());
@@ -206,43 +223,50 @@ public class RecipeResourcePetriNetBuilder
 				{
 					currPlace.setTime(0);
 				}
+
 				thePetriNet.addPlace(currPlace);
 			}
 		}
 
 		// Create an outgoing transition for each combination of <next_operation, resource>
 		operationIt = theRecipe.operationIterator();
+
 		while (operationIt.hasNext())
 		{
-			InternalOperation currOperation = (InternalOperation)operationIt.next();
+			InternalOperation currOperation = (InternalOperation) operationIt.next();
 			String currOperationName = currOperation.getIdentity();
 			Iterator resourceIt = currOperation.resourceCandidateIterator();
+
 			while (resourceIt.hasNext())
 			{
-				String currResourceName = (String)resourceIt.next();
+				String currResourceName = (String) resourceIt.next();
 
 				// Final operation
 				if (currOperation.isFinal())
 				{
 					Transition currTransition = new Transition("t_" + transitionCounter++);
+
 					thePetriNet.addTransition(currTransition);
 
 					Place prevPlace = getPlace(recipeName, currOperationName, currResourceName);
+
 					thePetriNet.addArc(prevPlace, currTransition);
 					thePetriNet.addArc(currTransition, lastPlace);
 				}
 
 				// Iterate over all the next transitions in the InternalOperationRecipe
 				Iterator intTransitionIt = currOperation.nextTransitionIterator();
+
 				while (intTransitionIt.hasNext())
 				{
-					InternalTransition intTransition = (InternalTransition)intTransitionIt.next();
+					InternalTransition intTransition = (InternalTransition) intTransitionIt.next();
 
 					// Check that we have a valid structure
 					if (intTransition.nbrOfPrevOperations() > 1)
 					{
 						throw new Exception("Only recipes with single prev operations are supported");
 					}
+
 					if (intTransition.nbrOfNextOperations() > 1)
 					{
 						throw new Exception("Only recipes with single next operations are supported");
@@ -252,31 +276,38 @@ public class RecipeResourcePetriNetBuilder
 					if (currOperation.isInitial())
 					{
 						Transition currTransition = new Transition("t_" + transitionCounter++);
+
 						thePetriNet.addTransition(currTransition);
 						currTransition.setLabel(recipeName + "_" + currOperationName + "_" + currResourceName);
+
 						Place resourcePlace = getResourcePlace(currResourceName);
+
 						thePetriNet.addArc(resourcePlace, currTransition);
 						thePetriNet.addArc(firstPlace, currTransition);
 
 						Place prevPlace = getPlace(recipeName, currOperationName, currResourceName);
+
 						thePetriNet.addArc(currTransition, prevPlace);
 					}
 
 					// For all cases.
 					Iterator nextOperationIt = intTransition.nextOperationIterator();
+
 					while (nextOperationIt.hasNext())
 					{
-						InternalOperation nextOperation = (InternalOperation)nextOperationIt.next();
+						InternalOperation nextOperation = (InternalOperation) nextOperationIt.next();
 						String nextOperationName = nextOperation.getIdentity();
 
 						// Find all possible resource candidates for the next resource
 						Iterator nextResourceIt = nextOperation.resourceCandidateIterator();
+
 						while (nextResourceIt.hasNext())
 						{
-							String nextResourceName = (String)nextResourceIt.next();
+							String nextResourceName = (String) nextResourceIt.next();
 
 							// Create a transition for this allocation
 							Transition currTransition = new Transition("t_" + transitionCounter++);
+
 							thePetriNet.addTransition(currTransition);
 							currTransition.setLabel(recipeName + "_" + nextOperationName + "_" + nextResourceName);
 
@@ -288,12 +319,15 @@ public class RecipeResourcePetriNetBuilder
 
 							if (!currResourceName.equals(nextResourceName))
 							{
+
 								// Add resource allocating arc
 								Place nextResourcePlace = getResourcePlace(nextResourceName);
+
 								thePetriNet.addArc(nextResourcePlace, currTransition);
 
 								// Add resource deallocating arc
 								Place prevResourcePlace = getResourcePlace(currResourceName);
+
 								thePetriNet.addArc(currTransition, prevResourcePlace);
 							}
 						}
@@ -308,52 +342,55 @@ public class RecipeResourcePetriNetBuilder
 	{
 
 		InternalOperationRecipes recipes = new InternalOperationRecipes();
-
 		InternalOperationRecipe b1 = new InternalOperationRecipe("b1");
+
 		recipes.addRecipe(b1);
 
 		InternalOperation o1 = new InternalOperation("o1");
+
 		b1.addOperation(o1);
+
 		InternalOperation o2 = new InternalOperation("o2");
+
 		b1.addOperation(o2);
+
 		InternalOperation o3 = new InternalOperation("o3");
+
 		b1.addOperation(o3);
 
 		InternalTransition t1 = new InternalTransition("t1");
+
 		b1.addTransition(t1);
 		b1.addArc(o1, t1);
 		b1.addArc(t1, o2);
 
 		InternalTransition t2 = new InternalTransition("t2");
+
 		b1.addTransition(t2);
 		b1.addArc(o2, t2);
 		b1.addArc(t2, o3);
-
 		o1.addResourceCandidate("u1");
 		o1.addResourceCandidate("u2");
 		o1.setTime(1);
-
 		o2.addResourceCandidate("u2");
 		o2.addResourceCandidate("u3");
 		o2.setTime(2);
-
 		o3.addResourceCandidate("u2");
 		o3.addResourceCandidate("u3");
 		o3.setTime(3);
 
 		InternalOperationRecipe b2 = b1.createCopy("b2");
+
 		recipes.addRecipe(b2);
 
 		RecipeResourcePetriNetBuilder builder = new RecipeResourcePetriNetBuilder();
 		PetriNet pn = builder.buildPetriNet(recipes);
-
 		PetriNetToDsx exporter = new PetriNetToDsx(pn);
-
 		PrintWriter pw = new PrintWriter(System.out);
+
 		exporter.serialize(pw);
 		pw.println();
 		pw.println(builder.buildComments());
 		pw.flush();
 	}
-
 }

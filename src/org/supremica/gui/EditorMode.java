@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,17 +47,18 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.gui;
+
+
 
 public class EditorMode
 {
+
 	public static final int MODE_EDIT = 1;
 	public static final int MODE_ADD_STATE = 2;
 	public static final int MODE_ADD_ARC = 3;
 	public static final int MODE_ADD_ARC_FIRST_SELECTED = 4;
 	public static final int MODE_EDIT_DRAGGING_STATE = 5;
-
 	private int mode = MODE_EDIT;
 
 	public int getMode()

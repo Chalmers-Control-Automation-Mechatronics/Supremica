@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,34 +47,44 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.gui.help;
 
+
+
 import javax.help.*;
+
 import java.net.URL;
+
 import org.supremica.gui.Supremica;
+
 
 public class ContentHelp
 {
+
 	private HelpBroker helpBroker = null;
 
 	public ContentHelp()
 	{
+
 		String helpsetName = "help/ccs.hs";
 		HelpSet hs = null;
+
 		try
 		{
 			ClassLoader cl = Supremica.class.getClassLoader();
 			URL hsURL = HelpSet.findHelpSet(cl, helpsetName);
+
 			hs = new HelpSet(null, hsURL);
 		}
 		catch (Exception e)
 		{
-			System.err.println("HelpSet "+ helpsetName + " not found");
+			System.err.println("HelpSet " + helpsetName + " not found");
+
 			return;
 		}
 
 		helpBroker = hs.createHelpBroker();
+
 		if (helpBroker == null)
 		{
 			System.err.println("HelpBroker is null");
@@ -84,5 +95,4 @@ public class ContentHelp
 	{
 		return helpBroker;
 	}
-
 }

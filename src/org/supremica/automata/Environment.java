@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,15 +47,16 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.automata;
+
+
 
 import java.util.*;
 
+
 public interface Environment
 {
-//	public static final int TYPE_BOOLEAN = 1;
 
-//	protected static final dataVariables = new HashMap();
-
+	// public static final int TYPE_BOOLEAN = 1;
+	// protected static final dataVariables = new HashMap();
 }

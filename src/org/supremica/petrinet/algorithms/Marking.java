@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,29 +47,31 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.petrinet.algorithms;
+
+
 
 import org.supremica.petrinet.*;
 import org.supremica.automata.*;
 
+
 public class Marking
 	extends State
 {
+
 	private int[] marking;
 
-	public Marking()
-	{
-	}
-/*
-	public boolean equals(Object marking)
-	{
-		return id.equals(((Marking)marking).id);
-	}
+	public Marking() {}
 
-	public int hashCode()
-	{
-		return id.hashCode();
-	}
-*/
+	/*
+	 *       public boolean equals(Object marking)
+	 *       {
+	 *               return id.equals(((Marking)marking).id);
+	 *       }
+	 *
+	 *       public int hashCode()
+	 *       {
+	 *               return id.hashCode();
+	 *       }
+	 */
 }

@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,20 +47,23 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.gui;
 
+
+
 import java.util.*;
+
 import java.io.*;
+
 import org.supremica.automata.algorithms.SynthesisType;
 import org.supremica.automata.algorithms.SynthesisAlgorithm;
+
 
 /**
  * To compile a student version with copy protected files set
  * GeneralUseSecurity to true.
  * If allowSuperUserLogin is set to true then it is possible to login in as "ESS
  */
-
 
 /**
  * Properties for Supremica.
@@ -101,6 +105,7 @@ public final class WorkbenchProperties
 	private static final String SYNC_INITIAL_HASHTABLE_SIZE = "syncInitialHashtableSize";
 	private static final String SYNC_EXPAND_HASHTABLE = "syncExpandHashtable";
 	private static final String SYNC_NBR_OF_EXECUTERS = "synchNbrOfExecuters";
+
 	// Verification Options
 	private static final String VERIFY_VERIFICATION_TYPE = "verifyVerificationType";
 	private static final String VERIFY_ALGORITHM_TYPE = "verifyAlgorithmType";
@@ -108,19 +113,19 @@ public final class WorkbenchProperties
 	private static final String VERIFY_REACHABILITY_STATE_LIMIT = "verifyReachabilityStateLimit";
 	private static final String VERIFY_ONE_EVENT_AT_A_TIME = "verifyOneEventAtATime";
 	private static final String VERIFY_SKIP_UNCONTROLLABILITY_CHECK = "skipUncontrollabilityCheck";
+
 	// Synthesizer Options
 	private static final String SYNTHESIS_SYNTHESIS_TYPE = "synthesisSynthesisType";
 	private static final String SYNTHESIS_ALGORITHM_TYPE = "synthesisAlgorithmType";
 	private static final String SYNTHESIS_PURGE = "synthesisPurge";
 	private static final String SYNTHESIS_OPTIMIZE = "synthesisOptimize";
 	private static final String SYNTHESIS_MAXIMALLY_PERMISSIVE = "synthesisMaximallyPermissive";
-
 	private static final String GENERAL_USE_SECURITY = "GeneralUseSecurity";
-
 	private static final WorkbenchProperties wp = new WorkbenchProperties();
 
 	private WorkbenchProperties()
 	{
+
 		setProperty(FILE_OPEN_PATH, "../examples/");
 		setProperty(FILE_SAVE_PATH, ".");
 		setProperty(FILE_ALLOW_OPEN, "true");
@@ -128,7 +133,6 @@ public final class WorkbenchProperties
 		setProperty(FILE_ALLOW_IMPORT, "true");
 		setProperty(FILE_ALLOW_EXPORT, "true");
 		setProperty(FILE_ALLOW_QUIT, "true");
-
 		setProperty(XML_RPC_ACTIVE, "false");
 		setProperty(XML_RPC_PORT, "9112");
 		setProperty(DOT_USE, "true");
@@ -167,14 +171,18 @@ public final class WorkbenchProperties
 	public static void load(String fileName)
 		throws IOException
 	{
+
 		// System.err.println("PropertiesLoad");
 		FileInputStream fileStream = new FileInputStream(fileName);
+
 		wp.load(fileStream);
 	}
 
 	public static String getFileOpenPath()
 	{
+
 		File theFile = new File(wp.getProperty(FILE_OPEN_PATH));
+
 		return theFile.getAbsolutePath();
 	}
 
@@ -185,7 +193,9 @@ public final class WorkbenchProperties
 
 	public static String getFileSavePath()
 	{
+
 		File theFile = new File(wp.getProperty(FILE_SAVE_PATH));
+
 		return theFile.getAbsolutePath();
 	}
 
@@ -559,6 +569,7 @@ public final class WorkbenchProperties
 
 	private static String toString(boolean b)
 	{
+
 		if (b)
 		{
 			return Boolean.TRUE.toString();

@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,14 +47,18 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.automata.algorithms;
 
+
+
 import org.supremica.automata.*;
+
 import java.util.*;
+
 
 public class AutomatonPurge
 {
+
 	private Automaton theAutomaton;
 
 	public AutomatonPurge(Automaton theAutomaton)
@@ -63,12 +68,14 @@ public class AutomatonPurge
 
 	public void execute()
 	{
-		LinkedList stateList = new LinkedList();
 
+		LinkedList stateList = new LinkedList();
 		Iterator stateIt = theAutomaton.stateIterator();
+
 		while (stateIt.hasNext())
 		{
-			State currState = (State)stateIt.next();
+			State currState = (State) stateIt.next();
+
 			if (currState.getCost() == State.MAX_COST)
 			{
 				stateList.addLast(currState);
@@ -78,14 +85,15 @@ public class AutomatonPurge
 		theAutomaton.beginTransaction();
 
 		stateIt = stateList.iterator();
+
 		while (stateIt.hasNext())
 		{
-			State currState = (State)stateIt.next();
+			State currState = (State) stateIt.next();
+
 			theAutomaton.removeState(currState);
 		}
 
 		theAutomaton.endTransaction();
-
 		stateList.clear();
 	}
 }

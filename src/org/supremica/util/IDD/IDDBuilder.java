@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,14 +47,18 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.util.IDD;
 
+
+
 import java.util.*;
+
 import java.io.*;
+
 
 public final class IDDBuilder
 {
+
 	private IDD theIDD = null;
 	private int[] nbrOfBranches;
 
@@ -65,14 +70,17 @@ public final class IDDBuilder
 
 	public void or(int variable, int value)
 	{
-		IDD newIDD = new IDD(nbrOfBranches, variable, value);
-		theIDD = IDD.or(theIDD, newIDD);
 
+		IDD newIDD = new IDD(nbrOfBranches, variable, value);
+
+		theIDD = IDD.or(theIDD, newIDD);
 	}
 
 	public void or(int variable, int[] values)
 	{
+
 		IDD newIDD = new IDD(nbrOfBranches, variable, values);
+
 		theIDD = IDD.or(theIDD, newIDD);
 	}
 
@@ -81,5 +89,3 @@ public final class IDDBuilder
 		return theIDD;
 	}
 }
-
-

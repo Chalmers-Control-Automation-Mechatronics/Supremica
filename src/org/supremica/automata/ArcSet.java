@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,16 +47,20 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.automata;
+
+
 
 import java.util.*;
 
+
 public class ArcSet
 {
+
 	private State fromState = null;
 	private State toState = null;
-//	private ArcListeners listeners = null;
+
+	// private ArcListeners listeners = null;
 	private List theArcs = null;
 
 	public ArcSet()
@@ -65,7 +70,9 @@ public class ArcSet
 
 	public ArcSet(State from, State to)
 	{
+
 		this();
+
 		fromState = from;
 		toState = to;
 	}
@@ -85,7 +92,7 @@ public class ArcSet
 		return fromState;
 	}
 
-	public void addArc(Arc theArc)	
+	public void addArc(Arc theArc)
 	{
 		theArcs.add(theArc);
 	}
@@ -94,7 +101,7 @@ public class ArcSet
 	{
 		theArcs.remove(theArc);
 	}
-	
+
 	public void clear()
 	{
 		theArcs.clear();
@@ -109,30 +116,31 @@ public class ArcSet
 	{
 		return theArcs.iterator();
 	}
-/*
-	public Listeners getListeners()
-	{
-		if (listeners == null)
-		{
-			listeners = new ArcListeners(this);
-		}
-		return listeners;
-	}
 
-	private void notifyListeners()
-	{
-		if (listeners != null)
-		{
-			listeners.notifyListeners();
-		}
-	}
-
-	private void notifyListeners(int mode, Object o)
-	{
-		if (listeners != null)
-		{
-			listeners.notifyListeners(mode, o);
-		}
-	}
-*/
+	/*
+	 *       public Listeners getListeners()
+	 *       {
+	 *               if (listeners == null)
+	 *               {
+	 *                       listeners = new ArcListeners(this);
+	 *               }
+	 *               return listeners;
+	 *       }
+	 *
+	 *       private void notifyListeners()
+	 *       {
+	 *               if (listeners != null)
+	 *               {
+	 *                       listeners.notifyListeners();
+	 *               }
+	 *       }
+	 *
+	 *       private void notifyListeners(int mode, Object o)
+	 *       {
+	 *               if (listeners != null)
+	 *               {
+	 *                       listeners.notifyListeners(mode, o);
+	 *               }
+	 *       }
+	 */
 }

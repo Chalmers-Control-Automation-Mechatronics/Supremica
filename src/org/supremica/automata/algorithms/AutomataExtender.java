@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,16 +47,20 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.automata.algorithms;
 
+
+
 import java.util.*;
+
 import java.io.*;
 
 import org.supremica.automata.*;
 
+
 public class AutomataExtender
 {
+
 	private Automaton orgAut;
 	private Automaton newAut;
 	private int k = 1;
@@ -68,14 +73,14 @@ public class AutomataExtender
 		orgAut = aut;
 	}
 
- 	public void setK(int k)
-  	{
+	public void setK(int k)
+	{
 		this.k = k;
 	}
 
- 	public int getK()
-  	{
-    	return k;
+	public int getK()
+	{
+		return k;
 	}
 
 	public void setMode(int mode)
@@ -88,42 +93,46 @@ public class AutomataExtender
 		return mode;
 	}
 
- 	public void execute()
-  		throws Exception
-  	{
-       	newAut = new Automaton();
-        newAut.setName(orgAut.getName());
+	public void execute()
+		throws Exception
+	{
 
-        Alphabet orgAlphabet = orgAut.getAlphabet();
-        Alphabet newAlphabet = new Alphabet(orgAlphabet);
+		newAut = new Automaton();
 
+		newAut.setName(orgAut.getName());
+
+		Alphabet orgAlphabet = orgAut.getAlphabet();
+		Alphabet newAlphabet = new Alphabet(orgAlphabet);
 		String passEventId = orgAlphabet.getUniqueId(newAut.getName());
+
 		if (mode == MODE_REMOVE_UNCON_TOP_EVENTS)
 		{
 			Event passEvent = new Event("pass");
-			passEvent.setControllable(true);
 
+			passEvent.setControllable(true);
 			passEvent.setId(passEventId);
 			newAlphabet.addEvent(passEvent);
 		}
 
-        newAut.setAlphabet(newAlphabet);
+		newAut.setAlphabet(newAlphabet);
 
-        HashMap stateMap = new HashMap(orgAut.nbrOfStates());
-
-     	int nbrOfStateCopies = Math.max(2, k + 1);
+		HashMap stateMap = new HashMap(orgAut.nbrOfStates());
+		int nbrOfStateCopies = Math.max(2, k + 1);
 
 		// Add a controllable version of each uncontrollable event
 		if (mode == MODE_CHANGE_UNCON_TOP_EVENTS)
 		{
 			LinkedList newEvents = new LinkedList();
 			Iterator eventIt = newAlphabet.iterator();
+
 			while (eventIt.hasNext())
 			{
-				Event currEvent = (Event)eventIt.next();
+				Event currEvent = (Event) eventIt.next();
+
 				if (!currEvent.isControllable())
 				{
 					Event newEvent = new Event(currEvent);
+
 					newEvent.setControllable(true);
 					newEvent.setLabel(currEvent.getLabel());
 					newEvent.setId(currEvent.getId() + "_c");
@@ -132,127 +141,132 @@ public class AutomataExtender
 			}
 
 			eventIt = newEvents.iterator();
+
 			while (eventIt.hasNext())
 			{
+				Event currEvent = (Event) eventIt.next();
 
-				Event currEvent = (Event)eventIt.next();
 				newAlphabet.addEvent(currEvent);
 			}
 		}
 
 		// Create all states
 		Iterator states = orgAut.stateIterator();
+
 		while (states.hasNext())
 		{
-			State orgState = (State)states.next();
-
-   			ArrayList newStates = new ArrayList(nbrOfStateCopies);
-
-      		for (int i = 0; i < nbrOfStateCopies; i++)
-        	{
-				State newState = new State(orgState);
-       			newState.setId(orgState.getId() + "_" + i);
-          		StringBuffer labelExt = new StringBuffer("");
-            	for (int j = 0; j < i; j++)
-             	{
-					//labelExt.append("'");
-     				labelExt.append("p");
-				}
-
-    			newState.setName(orgState.getName() + labelExt.toString());
-
-          		// Assume that we have seen zero unobservable event
-            	// when we start the system
-       			if ((i > 0) && newState.isInitial())
-          		{
-           			newState.setInitial(false);
-             	}
-
-				newStates.add(newState);
-      			newAut.addState(newState);
-    		}
-      		stateMap.put(orgState, newStates);
-
-		}
-
-  		// Create all transitions
- 		states = orgAut.stateIterator();
-		while (states.hasNext())
-		{
-			State orgSourceState = (State)states.next();
-   			ArrayList newStates = (ArrayList)stateMap.get(orgSourceState);
+			State orgState = (State) states.next();
+			ArrayList newStates = new ArrayList(nbrOfStateCopies);
 
 			for (int i = 0; i < nbrOfStateCopies; i++)
-   			{
-          		State newSourceState = (State)newStates.get(i);
+			{
+				State newState = new State(orgState);
 
-   				Iterator outgoingArcs = orgSourceState.outgoingArcsIterator();
+				newState.setId(orgState.getId() + "_" + i);
+
+				StringBuffer labelExt = new StringBuffer("");
+
+				for (int j = 0; j < i; j++)
+				{
+
+					// labelExt.append("'");
+					labelExt.append("p");
+				}
+
+				newState.setName(orgState.getName() + labelExt.toString());
+
+				// Assume that we have seen zero unobservable event
+				// when we start the system
+				if ((i > 0) && newState.isInitial())
+				{
+					newState.setInitial(false);
+				}
+
+				newStates.add(newState);
+				newAut.addState(newState);
+			}
+
+			stateMap.put(orgState, newStates);
+		}
+
+		// Create all transitions
+		states = orgAut.stateIterator();
+
+		while (states.hasNext())
+		{
+			State orgSourceState = (State) states.next();
+			ArrayList newStates = (ArrayList) stateMap.get(orgSourceState);
+
+			for (int i = 0; i < nbrOfStateCopies; i++)
+			{
+				State newSourceState = (State) newStates.get(i);
+				Iterator outgoingArcs = orgSourceState.outgoingArcsIterator();
+
 				while (outgoingArcs.hasNext())
 				{
-					Arc orgArc = (Arc)outgoingArcs.next();
+					Arc orgArc = (Arc) outgoingArcs.next();
 					State orgDestState = orgArc.getToState();
-
-       				Event currEvent = orgAlphabet.getEventWithId(orgArc.getEventId());
+					Event currEvent = orgAlphabet.getEventWithId(orgArc.getEventId());
 
 					if (i < k)
-	 				{ // Copy all transitions
-              			if (currEvent.isControllable())
-                 		{ // Add an arc to the "first" copy of orgDestState
-                       		State newDestState =
-                         		(State)((ArrayList)stateMap.get(orgDestState)).get(0);
-                        	Arc newArc = new Arc(newSourceState, newDestState, currEvent.getId());
-                         	newAut.addArc(newArc);
-                       	}
-                        else
-                        { // Add an arc to the i + 1 copy of orgDestState
-                       		State newDestState =
-                         		(State)((ArrayList)stateMap.get(orgDestState)).get(i + 1);
-                        	Arc newArc = new Arc(newSourceState, newDestState, currEvent.getId());
-                         	newAut.addArc(newArc);
-                        }
-	        		}
-	          		else
-	            	{ // Copy only controllable transitions
-              			if (currEvent.isControllable())
-                 		{ // Add an arc to the "first" copy of orgDestState
-                       		State newDestState =
-                         		(State)((ArrayList)stateMap.get(orgDestState)).get(0);
-                        	Arc newArc = new Arc(newSourceState, newDestState, currEvent.getId());
-                         	newAut.addArc(newArc);
-                       	}
+					{		// Copy all transitions
+						if (currEvent.isControllable())
+						{		// Add an arc to the "first" copy of orgDestState
+							State newDestState = (State) ((ArrayList) stateMap.get(orgDestState)).get(0);
+							Arc newArc = new Arc(newSourceState, newDestState, currEvent.getId());
+
+							newAut.addArc(newArc);
+						}
+						else
+						{		// Add an arc to the i + 1 copy of orgDestState
+							State newDestState = (State) ((ArrayList) stateMap.get(orgDestState)).get(i + 1);
+							Arc newArc = new Arc(newSourceState, newDestState, currEvent.getId());
+
+							newAut.addArc(newArc);
+						}
+					}
+					else
+					{		// Copy only controllable transitions
+						if (currEvent.isControllable())
+						{		// Add an arc to the "first" copy of orgDestState
+							State newDestState = (State) ((ArrayList) stateMap.get(orgDestState)).get(0);
+							Arc newArc = new Arc(newSourceState, newDestState, currEvent.getId());
+
+							newAut.addArc(newArc);
+						}
+
 						if (mode == MODE_CHANGE_UNCON_TOP_EVENTS)
 						{
 							if (!currEvent.isControllable())
 							{
-								State newDestState =
-									(State)((ArrayList)stateMap.get(orgDestState)).get(k);
+								State newDestState = (State) ((ArrayList) stateMap.get(orgDestState)).get(k);
 								Arc newArc = new Arc(newSourceState, newDestState, currEvent.getId() + "_c");
+
 								newAut.addArc(newArc);
 							}
 						}
-	             	}
+					}
 				}
 
 				// Add a controllable version of each uncontrollable event
 				if (mode == MODE_REMOVE_UNCON_TOP_EVENTS)
 				{
+
 					// Add pass event
 					if (i == nbrOfStateCopies - 1)
 					{
-						State newDestState = (State)newStates.get(i - 1);
+						State newDestState = (State) newStates.get(i - 1);
 						Arc newArc = new Arc(newSourceState, newDestState, passEventId);
+
 						newAut.addArc(newArc);
 					}
 				}
-      		}
+			}
 		}
 	}
 
- 	public Automaton getNewAutomaton()
-  	{
-    	return newAut;
+	public Automaton getNewAutomaton()
+	{
+		return newAut;
 	}
-
-
-
 }

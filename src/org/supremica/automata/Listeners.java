@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,22 +47,22 @@
  *
  * Supremica is owned and represented by KA.
  */
-
-
 package org.supremica.automata;
+
+
 
 import java.util.*;
 
+
 public class Listeners
 {
+
 	protected List listeners = null;
 	protected Object owner;
 	protected boolean batchUpdate = false;
 	protected boolean updateNeeded = false;
 
-	private Listeners()
-	{
-	}
+	private Listeners() {}
 
 	protected Listeners(Object owner)
 	{
@@ -70,15 +71,18 @@ public class Listeners
 
 	public void addListener(Listener l)
 	{
+
 		if (listeners == null)
 		{
 			listeners = new LinkedList();
 		}
+
 		listeners.add(l);
 	}
 
 	public void removeListener(Listener l)
 	{
+
 		if (listeners != null)
 		{
 			listeners.remove(l);
@@ -92,7 +96,9 @@ public class Listeners
 
 	public void endTransaction()
 	{
+
 		batchUpdate = false;
+
 		if (updateNeeded)
 		{
 			notifyListeners();
@@ -106,6 +112,7 @@ public class Listeners
 
 	public void notifyListeners()
 	{
+
 		if (batchUpdate)
 		{
 			updateNeeded = true;
@@ -115,12 +122,15 @@ public class Listeners
 			if (listeners != null)
 			{
 				Iterator listenerIt = listeners.iterator();
+
 				while (listenerIt.hasNext())
 				{
-					Listener currListener = (Listener)listenerIt.next();
+					Listener currListener = (Listener) listenerIt.next();
+
 					currListener.updated(owner);
 				}
 			}
+
 			updateNeeded = false;
 		}
 	}

@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,8 +47,9 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.gui.editor;
+
+
 
 import java.awt.*;
 import java.awt.event.*;
@@ -58,16 +60,17 @@ import org.supremica.gui.*;
 import org.supremica.automata.AutomatonContainer;
 import org.supremica.automata.Automaton;
 
+
 public class AutomatonFrame
 	extends JInternalFrame
 {
+
 	private AutomatonDocument theDocument = null;
 
 	public AutomatonFrame(AutomatonDocument theDocument)
 	{
 		this.theDocument = theDocument;
 	}
-
 
 	public AutomatonDocument getAutomatonDocument()
 	{
