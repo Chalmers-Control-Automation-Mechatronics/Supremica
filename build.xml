@@ -218,7 +218,8 @@
 		verbose="false"
 		includes="
 			${supremica_basedir}/external/**,
-			${jgrafchart_basedir}/external/**"	
+			${jgrafchart_basedir}/external/**"
+		source="1.4"
 	/>
 </target>
 
@@ -240,8 +241,8 @@
 			${supremica_basedir}/external/comInterfaces/**,
 			${supremica_basedir}/sattline/**,
 			${supremica_basedir}/supervisor/**"	
+		source="1.4"
 	/>
-
 </target>
 
 <!-- Compile Supremica Tests
@@ -254,14 +255,14 @@
 		destdir="${testsbuild}"
 		includeJavaRuntime="yes"
 		deprecation="false"
-		verbose="false" >
-		
+		verbose="false"
+		source="1.4"
+		>
 		<classpath>	
 			<pathelement location="${build}" />
 			<pathelement path="${lib}/${unjared}" />
 		</classpath>
 	</javac>
-
 </target>
 
 <!-- Compile:
@@ -528,7 +529,7 @@
 			<pathelement location="${testsbuild}" />
 			<pathelement path="${lib}/${unjared}" />
 			<pathelement path="${java.class.path}" />
-		</classpath>	
+		</classpath>
 	</java>
 </target>
 
@@ -594,7 +595,10 @@
 			<pathelement location="${dist}/Supremica.jar" />
 			<pathelement location="${dist}/SupremicaLib.jar" />
 			<pathelement path="${java.class.path}" />
-		</classpath>		 
+		</classpath>
+		<assertions>
+			 <enable/>
+		</assertions>		 
 	</java>
 </target>
 
