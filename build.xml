@@ -185,6 +185,7 @@
 		includeJavaRuntime="yes"
 		deprecation="false"
 		verbose="false"
+		nowarn="true"
 		excludes="
 			${jgrafchart_basedir}/**,
 			${supremica_basedir}/external/**,
