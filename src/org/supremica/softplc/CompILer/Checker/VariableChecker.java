@@ -113,7 +113,7 @@ public class VariableChecker implements SimpleNodeVisitor {
 		if (inParameters != null) {
 			for (i = 0; i < inParameters.size(); i++)
 				{
-					System.out.println("*** PARAM: " + ((Param)inParameters.get(i)).parameter + " VALUE=" + ((Param)inParameters.get(i)).value + " TYPE=" + ((Param)inParameters.get(i)).parameterType);
+					//System.out.println("*** PARAM: " + ((Param)inParameters.get(i)).parameter + " VALUE=" + ((Param)inParameters.get(i)).value + " TYPE=" + ((Param)inParameters.get(i)).parameterType);
 
 					p = (Param)inParameters.get(i);
 
@@ -245,7 +245,7 @@ public class VariableChecker implements SimpleNodeVisitor {
 		if (outParameters != null) {
 			for (i = 0; i < outParameters.size(); i++)
 				{
-					System.out.println("*** PARAM: " + ((Param)outParameters.get(i)).parameter + " VALUE=" + ((Param)outParameters.get(i)).value);
+					//System.out.println("*** PARAM: " + ((Param)outParameters.get(i)).parameter + " VALUE=" + ((Param)outParameters.get(i)).value);
 
 
 					p = (Param)outParameters.get(i);
@@ -347,7 +347,7 @@ public class VariableChecker implements SimpleNodeVisitor {
 							//							fb_type = (String)fbVariables.get(p.parameter);
 						}
 
-					System.out.println("### OutParameterType=" + outParameterType);
+					//System.out.println("### OutParameterType=" + outParameterType);
 
 					jjtn_variable = new ASTvariable(parserTreeConstants.JJTVARIABLE);
 					jjtn_variable.setName(p.value);
@@ -678,7 +678,6 @@ public class VariableChecker implements SimpleNodeVisitor {
 			Node[] children = n.getChildren();
 			if (children != null) {
 				for (int i=0; i < children.length; i++) {
-					System.out.println("___ Child #" + i);
 					SimpleNode c = (SimpleNode)children[i];
 					if (c != null) {
 						((VCinfo)o).childIndex = ((VCinfo)o).childIndex + 1;

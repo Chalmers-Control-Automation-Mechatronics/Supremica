@@ -149,16 +149,32 @@ END_FUNCTION_BLOCK
 
 
 FUNCTION_BLOCK DOUBLER
-   VAR_IN_OUT
-      A : DINT;
-   END_VAR
+	VAR_IN_OUT
+		A : DINT;
+	END_VAR
 
-   LD A
-   ADD A
+	LD A
+	ADD A
 
-   ST A
+	ST A
 
 END_FUNCTION_BLOCK
+
+
+FUNCTION_BLOCK ADDER
+	VAR_IN_OUT
+		in_1 : DINT;
+	    in_2 : DINT;
+		out  : DINT;
+	END_VAR
+
+	LD in_1
+	ADD in_2
+
+	ST out
+
+END_FUNCTION_BLOCK
+
 
 
 PROGRAM CALTEST
@@ -173,37 +189,19 @@ PROGRAM CALTEST
 		println_REAL : PrintlnREAL;
 		println_BOOL : PrintlnBOOL;
 
-      	db1          : DOUBLER;
+      	doubler      : DOUBLER;
+		adder        : ADDER;
       	Result       : DINT;
    END_VAR
 
 
-(*
-	LD DINT#5
-    ST db1.A
-    CAL db1
-    LD db1.A
-
-    ST println_DINT.output 
-    CAL println_DINT
-*)
-
-
-    CAL db1(A:=DINT#7)
-    LD db1.A
-
+    CAL doubler(A:=DINT#7)
+    LD doubler.A
 	ST Result
+	CAL println_DINT(output:=Result)	
 
-(*
-    ST println_DINT.output 
-    CAL println_DINT
-*)
-
-CAL println_DINT(output:=Result)
-
-
-
-
-   
+	CAL adder(in_1:=DINT#100, in_2:=DINT#200, out=>Result)
+	CAL println_DINT(output:=Result)	
+	
 
 END_PROGRAM
