@@ -283,8 +283,8 @@ public class AutomatonToDot
 		{
 		 	State currState = (State)stateIt.next();
 		 	pw.println("\t{ rank = min ;");
-		 	pw.println("\t\t" + initPrefix + currState.getId() + ";");
-		 	pw.println("\t\t" + currState.getId() + ";");
+		 	pw.println("\t\t\"" + initPrefix + currState.getId() + "\";");
+		 	pw.println("\t\t\"" + currState.getId() + "\";");
 		 	pw.println("\t}");
 		}
 

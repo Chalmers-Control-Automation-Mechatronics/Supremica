@@ -96,8 +96,8 @@ public class AutomatonSplit
 				if (splitA.nbrOfEvents() == 0 || splitB.nbrOfEvents() == 0)
 					continue;
 
-				splitA.setComment(original.getComment() + "_A");
-				splitB.setComment(original.getComment() + "_B");
+				splitA.setComment(original.getName() + "_A");
+				splitB.setComment(original.getName() + "_B");
 				split.addAutomaton(splitA);
 				split.addAutomaton(splitB);
 				break;
