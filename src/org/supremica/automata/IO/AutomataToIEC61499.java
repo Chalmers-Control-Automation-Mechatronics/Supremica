@@ -49,7 +49,6 @@
  */
 package org.supremica.automata.IO;
 
-import org.supremica.util.SupremicaException;
 import java.io.*;
 import java.util.*;
 import java.text.DateFormat;
