@@ -140,6 +140,7 @@ public final class SupremicaProperties
 	private static final String SYNTHESIS_PURGE = "synthesisPurge";
 	private static final String SYNTHESIS_OPTIMIZE = "synthesisOptimize";
 	private static final String SYNTHESIS_MAXIMALLY_PERMISSIVE = "synthesisMaximallyPermissive";
+	private static final String SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL = "synthesisMaximallyPermissiveIncremental";
 	private static final String SYNTHESIS_REDUCE_SUPERVISORS = "synthesisReduceSupervisors";
 	private static final String GENERAL_USE_SECURITY = "GeneralUseSecurity";
 
@@ -260,6 +261,7 @@ public final class SupremicaProperties
 		setProperty(SYNTHESIS_PURGE, "false", true);
 		setProperty(SYNTHESIS_OPTIMIZE, "false", true);
 		setProperty(SYNTHESIS_MAXIMALLY_PERMISSIVE, "true", true);
+		setProperty(SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL, "true", true);
 		setProperty(SYNTHESIS_REDUCE_SUPERVISORS, "false", true);
 		setProperty(GENERAL_USE_SECURITY, "false", false);
 		setProperty(INCLUDE_ANIMATOR, "false", true);
@@ -1031,6 +1033,16 @@ public final class SupremicaProperties
 	public static void setSynthesisMaximallyPermissive(boolean bool)
 	{
 		wp.setProperty(SYNTHESIS_MAXIMALLY_PERMISSIVE, toString(bool));
+	}
+
+	public static boolean synthesisMaximallyPermissiveIncremental()
+	{
+		return toBoolean(wp.getProperty(SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL));
+	}
+
+	public static void setSynthesisMaximallyPermissiveIncremental(boolean bool)
+	{
+		wp.setProperty(SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL, toString(bool));
 	}
 
 	public static boolean synthesisReduceSupervisors()

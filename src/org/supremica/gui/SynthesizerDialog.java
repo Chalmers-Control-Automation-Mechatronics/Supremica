@@ -226,19 +226,30 @@ class SynthesizerDialogStandardPanel
 class SynthesizerDialogAdvancedPanel
 	extends SynthesizerPanel implements ActionListener
 {
-	private JCheckBox maximallyPermissiveBox;
 	private JCheckBox reduceSupervisorsBox;
+	private JCheckBox maximallyPermissiveBox;
+	private JCheckBox maximallyPermissiveIncrementalBox;
 	private JTextArea note;
 
 	public SynthesizerDialogAdvancedPanel()
 	{
 		Box advancedBox = Box.createVerticalBox();
 
-		maximallyPermissiveBox = new JCheckBox("Maximally permissive result");
 		reduceSupervisorsBox = new JCheckBox("Reduce supervisors");
+		reduceSupervisorsBox.setToolTipText("Remove redundant states and events from synthesized supervisors");
+
+		maximallyPermissiveBox = new JCheckBox("Maximally permissive result");
+		maximallyPermissiveBox.setToolTipText("Guarantee maximally permissive result");
+
+		maximallyPermissiveIncrementalBox = new JCheckBox("Incremental algorithm");
+		maximallyPermissiveIncrementalBox.setToolTipText("Use incremental algorithm for maximally permissive synthesis");
+
 		reduceSupervisorsBox.addActionListener(this);
-		advancedBox.add(maximallyPermissiveBox);
+		maximallyPermissiveIncrementalBox.addActionListener(this);
+		maximallyPermissiveBox.addActionListener(this);
 		advancedBox.add(reduceSupervisorsBox);
+		advancedBox.add(maximallyPermissiveBox);
+		advancedBox.add(maximallyPermissiveIncrementalBox);
 
 		note = new JTextArea("Note:\n" +
 				"'Purge result' must be selected for supervisor\n" +
@@ -252,27 +263,25 @@ class SynthesizerDialogAdvancedPanel
 
 	public void update(SynthesizerOptions synthesizerOptions)
 	{
-		maximallyPermissiveBox.setSelected(synthesizerOptions.getMaximallyPermissive());
 		reduceSupervisorsBox.setSelected(synthesizerOptions.getReduceSupervisors());
+		maximallyPermissiveBox.setSelected(synthesizerOptions.getMaximallyPermissive());
+		maximallyPermissiveIncrementalBox.setSelected(synthesizerOptions.getMaximallyPermissiveIncremental());
 	}
 
 	public void regain(SynthesizerOptions synthesizerOptions)
 	{
-		synthesizerOptions.setMaximallyPermissive(maximallyPermissiveBox.isSelected());
 		synthesizerOptions.setReduceSupervisors(reduceSupervisorsBox.isSelected());
+		synthesizerOptions.setMaximallyPermissive(maximallyPermissiveBox.isSelected());
+		synthesizerOptions.setMaximallyPermissiveIncremental(maximallyPermissiveIncrementalBox.isSelected());
 	}
 
 	public void actionPerformed(ActionEvent e)
 	{
-		if(reduceSupervisorsBox.isSelected())
-		{
-			// purgeBox.setSelected(true);
-			note.setVisible(true);
-		}
-		if(!reduceSupervisorsBox.isSelected())
-		{
-			note.setVisible(false);
-		}
+		// Incremental box enabled?
+		maximallyPermissiveIncrementalBox.setEnabled(maximallyPermissiveBox.isSelected());
+
+		// Display note?
+		note.setVisible(reduceSupervisorsBox.isSelected());
 	}
 }
 
@@ -284,7 +293,6 @@ public class SynthesizerDialog
 	private SynthesizerOptions synthesizerOptions;
 	SynthesizerDialogStandardPanel standardPanel;
 
-	// private JCheckBox maximallyPermissiveBox;
 	SynthesizerDialogAdvancedPanel advancedPanel;
 	private JDialog dialog;
 	private JFrame parentFrame;

@@ -155,7 +155,6 @@ public class Alphabet
 		}
 	}
 
-
 	/**
 	 * Given an event, returns an "equal" event from this alphabet
 	 * The def of "equal" is an internal matter.
@@ -166,7 +165,6 @@ public class Alphabet
 	{
 		return getEventWithId(event.getId());
 	}
-
 
 	/**
 	 * Add an event to the alphabet. Check with containsEventWithId to make
@@ -364,6 +362,34 @@ public class Alphabet
 		Alphabet result = new Alphabet(op1);
 		result.union(op2);
 		return result;
+	}
+
+	/**
+	 * Returns the controllable part of the alphabet.
+	 */
+	public Alphabet getControllableAlphabet()
+	{
+		Alphabet subAlphabet = new Alphabet();
+		for (EventIterator evIt = controllableEventIterator(); evIt.hasNext();)
+		{
+			subAlphabet.addEvent(evIt.nextEvent());
+		}
+
+		return subAlphabet;
+	}
+
+	/**
+	 * Returns the uncontrollable part of the alphabet.
+	 */
+	public Alphabet getUncontrollableAlphabet()
+	{
+		Alphabet subAlphabet = new Alphabet();
+		for (EventIterator evIt = uncontrollableEventIterator(); evIt.hasNext();)
+		{
+			subAlphabet.addEvent(evIt.nextEvent());
+		}
+		
+		return subAlphabet;
 	}
 
 	public void setIndicies()

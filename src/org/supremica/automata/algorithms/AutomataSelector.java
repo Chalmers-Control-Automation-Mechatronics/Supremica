@@ -151,7 +151,9 @@ class AutomataSelector
 		return partialSet;
 	}
 
-	// To your current selection of spec and plants, add all plants that have this event
+	/**
+	 * To your current selection of spec and plants, add all plants that have this event
+	 */
 	public Automata addPlants(LabeledEvent currEvent)
 	{
 		if (eventToAutomataMap.get(currEvent) != null)
@@ -176,6 +178,9 @@ class AutomataSelector
 		return partialSet; // return the updated set
 	}
 
+	/**
+	 * To your current selection of spec and plants, add all plants that have these events
+	 */
 	public Automata addPlants(Alphabet events)
 	{
 		for(Iterator it = events.iterator(); it.hasNext(); )

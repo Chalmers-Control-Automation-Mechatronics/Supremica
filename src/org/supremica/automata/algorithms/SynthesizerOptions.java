@@ -58,21 +58,23 @@ public final class SynthesizerOptions
 	private boolean purge;
 	private boolean optimize;
 	private boolean maximallyPermissive;
+	private boolean maximallyPermissiveIncremental;
 	private boolean reduceSupervisors;
 	private boolean rememberDisabledEvents;
 
 	public SynthesizerOptions()
 	{
-		this(SupremicaProperties.synthesisSynthesisType(), SupremicaProperties.synthesisAlgorithmType(), SupremicaProperties.synthesisPurge(), SupremicaProperties.synthesisOptimize(), SupremicaProperties.synthesisMaximallyPermissive(), SupremicaProperties.synthesisReduceSupervisors());
+		this(SupremicaProperties.synthesisSynthesisType(), SupremicaProperties.synthesisAlgorithmType(), SupremicaProperties.synthesisPurge(), SupremicaProperties.synthesisOptimize(), SupremicaProperties.synthesisMaximallyPermissive(), SupremicaProperties.synthesisMaximallyPermissiveIncremental(), SupremicaProperties.synthesisReduceSupervisors());
 	}
 
-	public SynthesizerOptions(SynthesisType synthesisType, SynthesisAlgorithm synthesisAlgorithm, boolean purge, boolean optimize, boolean maximallyPermissive, boolean reduceSupervisors)
+	public SynthesizerOptions(SynthesisType synthesisType, SynthesisAlgorithm synthesisAlgorithm, boolean purge, boolean optimize, boolean maximallyPermissive, boolean maximallyPermissiveIncremental, boolean reduceSupervisors)
 	{
 		this.synthesisType = synthesisType;
 		this.synthesisAlgorithm = synthesisAlgorithm;
 		this.purge = purge;
 		this.optimize = optimize;
 		this.maximallyPermissive = maximallyPermissive;
+		this.maximallyPermissiveIncremental = maximallyPermissiveIncremental;
 		this.reduceSupervisors = reduceSupervisors;
 	}
 
@@ -159,6 +161,18 @@ public final class SynthesizerOptions
 	public boolean getMaximallyPermissive()
 	{
 		return maximallyPermissive;
+	}
+
+	public void setMaximallyPermissiveIncremental(boolean bool)
+	{
+		maximallyPermissiveIncremental = bool;
+
+		SupremicaProperties.setSynthesisMaximallyPermissiveIncremental(bool);
+	}
+
+	public boolean getMaximallyPermissiveIncremental()
+	{
+		return maximallyPermissiveIncremental;
 	}
 
 	public void setReduceSupervisors(boolean bool)
