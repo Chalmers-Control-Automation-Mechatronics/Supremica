@@ -153,6 +153,12 @@ public class AutomataVerificationWorker
 			successMessage = "The system is non-blocking!";
 			failureMessage = "The system is blocking!";
 		}
+		else if (verificationOptions.getVerificationType() == VerificationType.MutuallyNonblocking)
+		{
+			// Non-blocking verification...
+			successMessage = "The system is mutually non-blocking!";
+			failureMessage = "The system might be mutually blocking!";
+		}
 		else if (verificationOptions.getVerificationType() == VerificationType.LanguageInclusion)
 		{
 			// Language inclusion verification...

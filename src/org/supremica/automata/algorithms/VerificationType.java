@@ -56,6 +56,7 @@ public class VerificationType
 	private static Collection types = new LinkedList();
 	public static final VerificationType Controllability = new VerificationType("Controllability");
 	public static final VerificationType Nonblocking = new VerificationType("Nonblocking");
+	public static final VerificationType MutuallyNonblocking = new VerificationType("Mutually Nonblocking");
 	public static final VerificationType LanguageInclusion = new VerificationType("Language Inclusion");
 	public static final VerificationType Unknown = new VerificationType("Unknown", false);
 	private String description = null;
@@ -95,6 +96,11 @@ public class VerificationType
 		if (type.equals(LanguageInclusion.toString()))
 		{
 			return LanguageInclusion;
+		}
+
+		if (type.equals(MutuallyNonblocking.toString()))
+		{
+			return MutuallyNonblocking;
 		}
 
 		if (type.equals(Nonblocking.toString()))

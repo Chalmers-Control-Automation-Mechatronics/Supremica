@@ -438,7 +438,6 @@
    <Transition event="c3" source="q2" dest="q0" />
   </Transitions>
  </Automaton>
-
 <Execution>
 	<Actions>
 

@@ -762,7 +762,7 @@ public class Supremica
 			if (projectName != null)
 			{
 				getActiveProject().setName(projectName);
-				logger.debug("Project name changed to \"" + projectName + "\"");
+				//logger.debug("Project name changed to \"" + projectName + "\"");
 			}
 		}
 

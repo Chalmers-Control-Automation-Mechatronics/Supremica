@@ -79,13 +79,13 @@ public class AlphabetAnalyzer
 		buildEventToAutomataMap();
 
 		checkAllPairs();
-		printUnsynchronizedEvents();		
+		//printUnsynchronizedEvents();
 	}
 
 	private void buildEventToAutomataMap()
 	{
 		buildEventToAutomataMap(theAutomata);
-	}	
+	}
 
 	private void buildEventToAutomataMap(Automata anAutomata)
 	{
@@ -137,7 +137,7 @@ public class AlphabetAnalyzer
 			  throw e;
 		  }
 		  //*/
-		
+
 		  //buildUncontrollableEventToPlantMap();
 		return eventToAutomataMap;
 	}
@@ -197,6 +197,11 @@ public class AlphabetAnalyzer
 		}
 
 		return automatonSet.size() <= 1;
+	}
+
+	public Iterator eventIterator()
+	{
+		return eventToAutomataMap.keySet().iterator();
 	}
 
 	public void printUnsynchronizedEvents()

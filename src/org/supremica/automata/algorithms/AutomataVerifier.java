@@ -188,6 +188,20 @@ public class AutomataVerifier
 			}
 		}
 
+		// Check MutuallyNonblocking
+		if (verificationOptions.getVerificationType() == VerificationType.MutuallyNonblocking)
+		{
+			if (theAutomata.size() < 1)
+			{
+				return "At least one automaton must be selected!";
+			}
+
+			if (verificationOptions.getAlgorithmType() != VerificationAlgorithm.Modular)
+			{
+				return "The mutually nonblocking algorithm \n" + "is a modular algorithm!";
+			}
+		}
+
 		// Check Language Inclusion
 		if (verificationOptions.getVerificationType() == VerificationType.LanguageInclusion)
 		{
@@ -263,6 +277,21 @@ public class AutomataVerifier
 					throw new UnsupportedOperationException("The selected algorithm is not implemented");
 				}
 			}
+			else if (verificationOptions.getVerificationType() == VerificationType.MutuallyNonblocking)
+			{
+				if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
+				{
+					// This algorithm is under implementation!!
+					return modularMutuallyNonblockingVerification();
+
+					// This algorithm only verifies pairwise nonblocking!!!
+					// return pairwiseNonblockingVerification();
+				}
+				else
+				{
+					throw new UnsupportedOperationException("The selected algorithm is not implemented");
+				}
+			}
 			else if (verificationOptions.getVerificationType() == VerificationType.LanguageInclusion)
 			{
 
@@ -313,6 +342,20 @@ public class AutomataVerifier
 		// This last one is not really good... we'd like to do this only once! Perhaps
 		// a switch in the synchronizeroptions or verificationsptions instead? FIXA!!
 		synchHelper.considerAllEventsUncontrollable();
+	}
+
+	/**
+	 * Performs modular mutually nonblocking verification on theAutomata.
+	 *
+	 *@return  true if mutually nonblocking, false if not or false (with error message) if don't know.
+	 *@exception  Exception Description of the Exception
+	 *@see  AutomataVerificationWorker
+	 */
+	private boolean modularMutuallyNonblockingVerification()
+		throws Exception
+	{
+		MutuallyNonblockingVerifier theVerifier = new MutuallyNonblockingVerifier(theAutomata);
+		return theVerifier.isMutuallyNonblocking();
 	}
 
 	/**

@@ -1723,6 +1723,7 @@ public class ActionMan
 			statusStr.append("\n\tNumber of events: " + currAutomaton.nbrOfEvents());
 			statusStr.append("\n\tNumber of transitions: " + currAutomaton.nbrOfTransitions());
 			statusStr.append("\n\tNumber of accepting states: " + currAutomaton.nbrOfAcceptingStates());
+			statusStr.append("\n\tNumber of mutually accepting states: " + currAutomaton.nbrOfMutuallyAcceptingStates());
 			statusStr.append("\n\tNumber of forbidden states: " + currAutomaton.nbrOfForbiddenStates());
 
 			int acceptingAndForbiddenStates = currAutomaton.nbrOfAcceptingAndForbiddenStates();
@@ -2032,7 +2033,7 @@ public class ActionMan
 			if (projectName != null)
 			{
 				gui.getVisualProjectContainer().getActiveProject().setName(projectName);
-				gui.info("Project name changed to \"" + projectName + "\"");
+				//gui.info("Project name changed to \"" + projectName + "\"");
 				gui.getVisualProjectContainer().getActiveProject().updateFrameTitles();
 			}
 		}

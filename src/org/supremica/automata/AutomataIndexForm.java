@@ -99,6 +99,9 @@ public final class AutomataIndexForm
 	// <automaton, event> -> <state[]>
 	private int[][][] enableEventsTable;
 
+	// <automaton> -> <max state index in current automaton>
+	private int[] automatonStateMaxIndex;
+
 	private Automata theAutomata = null;
 
 
@@ -161,6 +164,7 @@ public final class AutomataIndexForm
 			immediateEventsTable = generateCopy1DBooleanArray(indexForm.immediateEventsTable);
 			automataSize = generateCopy1DIntArray(indexForm.automataSize);
 			enableEventsTable = generateCopy3DIntArray(indexForm.enableEventsTable);
+			automatonStateMaxIndex = generateCopy1DIntArray(indexForm.automatonStateMaxIndex);
 		}
 		else
 		{
@@ -177,7 +181,13 @@ public final class AutomataIndexForm
 			immediateEventsTable = indexForm.immediateEventsTable;
 			automataSize = indexForm.automataSize;
 			enableEventsTable = indexForm.enableEventsTable;
+			automatonStateMaxIndex = indexForm.automatonStateMaxIndex;
 		}
+	}
+
+	public int nbrOfAutomata()
+	{
+		return theAutomata.size();
 	}
 
 	public void generateAutomataIndices(Automata theAutomata)
@@ -197,7 +207,7 @@ public final class AutomataIndexForm
 
 			AutomatonType currAutomatonType = currAutomaton.getType();
 			typeIsPlantTable[i] = currAutomatonType == AutomatonType.Plant;
-			typeIsSupSpecTable[i] = ((currAutomatonType == AutomatonType.Supervisor) || 
+			typeIsSupSpecTable[i] = ((currAutomatonType == AutomatonType.Supervisor) ||
 									 (currAutomatonType == AutomatonType.Specification));
 			automataSize[i] = currAutomaton.nbrOfStates();
 		}
@@ -205,10 +215,10 @@ public final class AutomataIndexForm
 
 	/**
 	 * Defines the typeIsPlantTable to "point to" the automata in plantAutomata
-	 * in spite of what these automata (or the other automata in theAutomata, 
+	 * in spite of what these automata (or the other automata in theAutomata,
 	 * for that matter) really are!! The other automata are considered Supervisors.
 	 *
-	 *@param plantAutomata The automata that should be considered plants. 
+	 *@param plantAutomata The automata that should be considered plants.
 	 * The other automata are considered upervisors.
 	 */
 	public void defineTypeIsPlantTable(Automata plantAutomata)
@@ -283,6 +293,7 @@ public final class AutomataIndexForm
 	{
 		stateTable = new State[theAutomata.size()][];
 		stateStatusTable = new int[theAutomata.size()][];
+		automatonStateMaxIndex = new int[theAutomata.size()];
 
 		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext();)
 		{
@@ -293,6 +304,7 @@ public final class AutomataIndexForm
 			stateTable[currAutomatonIndex] = new State[currNbrOfStates];
 			stateStatusTable[currAutomatonIndex] = new int[currNbrOfStates];
 
+			int maxIndex = 0;
 			for (StateIterator stateIt = currAutomaton.stateIterator(); stateIt.hasNext(); )
 			{
 				State currState = stateIt.nextState();
@@ -301,9 +313,13 @@ public final class AutomataIndexForm
 
 				stateTable[currAutomatonIndex][currIndex] = currState;
 				stateStatusTable[currAutomatonIndex][currIndex] = AutomataIndexFormHelper.createStatus(currState);
-
+				if (currIndex > maxIndex)
+				{
+					maxIndex = currIndex;
+				}
 				//currIndex++;
 			}
+			automatonStateMaxIndex[currAutomatonIndex] = maxIndex;
 		}
 	}
 
@@ -628,6 +644,12 @@ public final class AutomataIndexForm
 	public State getState(int automatonIndex, int stateIndex)
 	{
 		return stateTable[automatonIndex][stateIndex];
+	}
+
+	/** Returns the highest state index in each automaton */
+	public int[] getAutomatonStateMaxIndex()
+	{
+		return automatonStateMaxIndex;
 	}
 
 	private int[] generateCopy1DIntArray(int[] oldArray)

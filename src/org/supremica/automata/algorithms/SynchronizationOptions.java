@@ -71,38 +71,38 @@ public final class SynchronizationOptions
 	private boolean dialogOK = false;
 
 	public SynchronizationOptions()
-		throws Exception
+		throws IllegalArgumentException
 	{
-		this(SupremicaProperties.syncNbrOfExecuters(), 
-			SynchronizationType.Prioritized, 
-			SupremicaProperties.syncInitialHashtableSize(), 
-			SupremicaProperties.syncExpandHashtable(), 
-			SupremicaProperties.syncForbidUncontrollableStates(), 
-			SupremicaProperties.syncExpandForbiddenStates(), 
+		this(SupremicaProperties.syncNbrOfExecuters(),
+			SynchronizationType.Prioritized,
+			SupremicaProperties.syncInitialHashtableSize(),
+			SupremicaProperties.syncExpandHashtable(),
+			SupremicaProperties.syncForbidUncontrollableStates(),
+			SupremicaProperties.syncExpandForbiddenStates(),
 			false, 	// terminate if uncontrollable state found
 			false, 	// expandEventsUsingPriority
 			true, 	// buildAutomaton
-			SupremicaProperties.verboseMode(), 
+			SupremicaProperties.verboseMode(),
 			true, 	// requireConsistentControllability
 			true);	// requireConsistentImmediate
 	}
 
 	public SynchronizationOptions(int nbrOfExecuters, SynchronizationType syncType, int initialHashtableSize, boolean expandHashtable, boolean forbidUnconStates, boolean expandForbiddenStates, boolean terminateIfUnconState, boolean expandEventsUsingPriority, boolean buildAutomaton, boolean verboseMode, boolean requireConsistentControllability, boolean requireConsistentImmediate)
-		throws Exception
+		throws IllegalArgumentException
 	{
 		if (syncType == null)
 		{
-			throw new Exception("synchType must be non-null");
+			throw new IllegalArgumentException("synchType must be non-null");
 		}
 
 		if (nbrOfExecuters < 1)
 		{
-			throw new Exception("nbrOfExcuters must be at least 1");
+			throw new IllegalArgumentException("nbrOfExcuters must be at least 1");
 		}
 
 		if (initialHashtableSize < 100)
 		{
-			throw new Exception("initialHashtableSize must be at least 100");
+			throw new IllegalArgumentException("initialHashtableSize must be at least 100");
 		}
 
 		this.nbrOfExecuters = nbrOfExecuters;

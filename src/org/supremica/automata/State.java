@@ -68,6 +68,7 @@ public class State
 	private String name = "";
 	private boolean initial = false;
 	private boolean accepting = false;
+	private boolean mutuallyAccepting = false;
 	private boolean forbidden = false;
 	private boolean active = false;
 	private boolean first = false;
@@ -121,6 +122,7 @@ public class State
 		name = otherState.name;
 		initial = otherState.initial;
 		accepting = otherState.accepting;
+		mutuallyAccepting = otherState.mutuallyAccepting;
 		forbidden = otherState.forbidden;
 		first = otherState.first;
 		last = otherState.last;
@@ -239,9 +241,20 @@ public class State
 		return accepting;
 	}
 
+	public boolean isMutuallyAccepting()
+	{
+		return mutuallyAccepting;
+	}
+
 	public void setAccepting(boolean accepting)
 	{
 		this.accepting = accepting;
+		this.mutuallyAccepting = accepting;
+	}
+
+	public void setMutuallyAccepting(boolean accepting)
+	{
+		this.mutuallyAccepting = accepting;
 	}
 
 	public boolean isForbidden()

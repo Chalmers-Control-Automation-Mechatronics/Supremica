@@ -110,7 +110,7 @@ public class AutomatonExplorer
 //		setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
 
 		Utility.setupFrame(this, 400, 500);
-		
+
 		addWindowListener(new WindowAdapter()
 		{
 			public void windowClosing(WindowEvent e)
@@ -583,6 +583,7 @@ class StateDisplayer
 	private Automaton theAutomaton;
 	private JCheckBox isInitialBox = new JCheckBox("initial");
 	private JCheckBox isAcceptingBox = new JCheckBox("accepting");
+	private JCheckBox isMutuallyAcceptingBox = new JCheckBox("mutually accepting");
 	private JCheckBox isForbiddenBox = new JCheckBox("forbidden");
 	private JLabel stateCost = new JLabel();
 	private JLabel stateId = new JLabel();
@@ -591,6 +592,11 @@ class StateDisplayer
 	private void changeStateAccepting(boolean b)
 	{
 		stateViewer.getCurrState().setAccepting(b);
+	}
+
+	private void changeStateMutuallyAccepting(boolean b)
+	{
+		stateViewer.getCurrState().setMutuallyAccepting(b);
 	}
 
 	private void changeStateForbidden(boolean b)
@@ -626,6 +632,16 @@ class StateDisplayer
 			}
 		});
 		statusBox.add(isAcceptingBox);
+		isMutuallyAcceptingBox.setEnabled(true);
+		isMutuallyAcceptingBox.setBackground(Color.white);
+		isMutuallyAcceptingBox.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				changeStateMutuallyAccepting(((JCheckBox) e.getSource()).isSelected());
+			}
+		});
+		statusBox.add(isMutuallyAcceptingBox);
 		isForbiddenBox.setEnabled(true);
 		isForbiddenBox.setBackground(Color.white);
 		isForbiddenBox.addActionListener(new ActionListener()
@@ -653,6 +669,7 @@ class StateDisplayer
 	{
 		isInitialBox.setSelected(currState.isInitial());
 		isAcceptingBox.setSelected(currState.isAccepting());
+		isMutuallyAcceptingBox.setSelected(currState.isMutuallyAccepting());
 		isForbiddenBox.setSelected(currState.isForbidden());
 		stateCost.setText("cost: " + currState.getCost());
 //		stateId.setText("id: " + currState.getId());

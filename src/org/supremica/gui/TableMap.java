@@ -124,9 +124,9 @@ public class TableMap
 		return model.isCellEditable(row, column);
 	}
 
-	// 
+	//
 	// Implementation of the TableModelListener interface,
-	// 
+	//
 	// By default forward all events to all the listeners.
 	public void tableChanged(TableModelEvent e)
 	{

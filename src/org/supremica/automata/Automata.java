@@ -82,16 +82,16 @@ public class Automata
 	{
 		this(oldAutomata, false);
 	}
-	
+
 	/**
 	 * Construct an Automata object with a single automaton.
 	 **/
 	public Automata(Automaton theAutomaton)
 	{
 		this();
-		addAutomaton(theAutomaton);	
+		addAutomaton(theAutomaton);
 	}
-	
+
 	/**
 	 * Does not make a new copy of the contained automata unless shallowCopy is false
 	 */

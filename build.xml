@@ -47,8 +47,10 @@
 	Line Register = 2
 	Column Register = 3
 -->
+<!--
 <property name="build.compiler.emacs" value="true"/>
 <property name="build.compiler.pedantic" value="false"/>
+-->
 
 <!-- 
 *	Run this script after checking out the sources for the
@@ -205,7 +207,7 @@
 		nowarn="false"
 		excludes="
 			${jgrafchart_basedir}/**,
-			${supremica_basedir}/external/**,
+			${supremica_basedir}/external/comInterfaces/**,
 			${supremica_basedir}/sattline/**,
 			${supremica_basedir}/supervisor/**"	
 	/>
@@ -417,6 +419,8 @@
 	<chmod file="${dist}/SupremicaLocal.cmd" perm="644"/>
 	<copy file="${templates}/SupremicaLocal" todir="${dist}"/>	
 	<chmod file="${dist}/SupremicaLocal" perm="755"/>
+	<copy file="${templates}/SupremicaRobot.cmd" todir="${dist}"/>	
+	<chmod file="${dist}/SupremicaRobot.cmd" perm="755"/>
 </target>
 
 <target name="startfiles_supremica" depends="startfiles_local_supremica,startfiles_supremica_student,startfiles_supremica_teacher">

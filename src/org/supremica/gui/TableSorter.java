@@ -259,18 +259,18 @@ public class TableSorter
 	public void reallocateIndexes()
 	{
 		int rowCount = model.getRowCount();
-		
+
 		// Set up a new array of indexes with the right number of elements
 		// for the new data model.
 		indexes = new int[rowCount];
-		
+
 		// Initialise with the identity mapping.
 		for (int row = 0; row < rowCount; row++)
 		{
 			indexes[row] = row;
-		}		
+		}
 	}
-	
+
 	public void tableChanged(TableModelEvent e)
 	{
 		// System.out.println("Sorter: tableChanged");
@@ -282,7 +282,7 @@ public class TableSorter
 	{
 		if (indexes.length != model.getRowCount())
 		{
-			System.err.println("Sorter not informed of a change in model.");
+			// System.err.println("Sorter not informed of a change in model.");
 		}
 	}
 

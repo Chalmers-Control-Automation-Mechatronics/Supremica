@@ -243,7 +243,7 @@ public class Automaton
 	}
 
 	// Quick and ugly fixx, see bug report
-	// When working with the state-indices, sometimes, somehow the indices in 
+	// When working with the state-indices, sometimes, somehow the indices in
 	// indexStateMap become different from the indices stored in the States
 	// This func iterates over the states and rebuilds the map
 	// Used by ModifiedAstar
@@ -256,7 +256,7 @@ public class Automaton
 			indexStateMap.put(new Integer(state.getIndex()), state);
 		}
 	}
-	
+
 	public void addState(State state)
 		throws IllegalArgumentException
 	{
@@ -753,6 +753,24 @@ public class Automaton
 		return nbrOfAcceptingStates;
 	}
 
+	public int nbrOfMutuallyAcceptingStates()
+	{
+		int nbrOfAcceptingStates = 0;
+		Iterator stateIt = stateIterator();
+
+		while (stateIt.hasNext())
+		{
+			State currState = (State) stateIt.next();
+
+			if (currState.isMutuallyAccepting())
+			{
+				nbrOfAcceptingStates++;
+			}
+		}
+
+		return nbrOfAcceptingStates;
+	}
+
 	public int nbrOfForbiddenStates()
 	{
 		int nbrOfForbiddenStates = 0;
@@ -793,7 +811,7 @@ public class Automaton
 	public int depth()
 	{
 		int depth=0;
-		
+
 		for (StateIterator stateIterator = stateIterator(); stateIterator.hasNext();)
 		{
 			// Measure the shortest trace to the state.
@@ -811,7 +829,7 @@ public class Automaton
 			if (stateDepth>depth)
 				depth = stateDepth;
 		}
-		
+
 		return depth;
 	}
 
@@ -821,7 +839,7 @@ public class Automaton
 	public int depthSum(Alphabet anAlphabet)
 	{
 		int depthSum = 0;
-		
+
 		for (StateIterator stateIterator = stateIterator(); stateIterator.hasNext();)
 		{
 			// Measure the shortest trace to the state.
@@ -843,11 +861,11 @@ public class Automaton
 				if (anAlphabet.contains(arcIterator.nextEvent()))
 					depthSum += stateDepth;
 			}
-		}		
-		
+		}
+
 		return depthSum;
 	}
-	
+
 	public StateIterator stateIterator()
 	{
 		return new StateIterator(theStates.iterator());
@@ -1174,6 +1192,38 @@ public class Automaton
 		}
 		reverseAssociatedState(currState.getAssociatedState(), currState);
 		currState.setAssociatedState(nextState);
+	}
+
+	public void extendMutuallyAccepting(Events safeEvents)
+	{
+		boolean changes = true;
+		while (changes)
+		{
+			changes = false;
+
+			for (Iterator stateIt = stateIterator(); stateIt.hasNext();)
+			{
+				State currState = (State) stateIt.next();
+				if (currState.isMutuallyAccepting())
+				{
+					for (ArcIterator arcIt = currState.incomingArcsIterator(); arcIt.hasNext();)
+					{
+						Arc currArc = arcIt.nextArc();
+						LabeledEvent arcEvent = currArc.getEvent();
+						if (safeEvents.containsEventWithLabel(arcEvent.getLabel()))
+						{
+							State fromState = currArc.getFromState();
+							if (!fromState.isMutuallyAccepting())
+							{
+								fromState.setMutuallyAccepting(true);
+								changes = true;
+							}
+						}
+					}
+				}
+			}
+
+		}
 	}
 
 	/**
@@ -1616,7 +1666,7 @@ public class Automaton
 			currState = null;
 		}
 	}
-	
+
 	// These are useful for debugging (etc)
 	public String toString()
 	{
@@ -1624,7 +1674,7 @@ public class Automaton
 
 		sbuf.append(getName());
 		sbuf.append("::");
-		
+
 		for(Iterator it = arcIterator(); it.hasNext(); )
 		{
 			Arc arc = (Arc)it.next();
@@ -1636,10 +1686,10 @@ public class Automaton
 	public String toCode()
 	{
 		StringBuffer sbuf = new StringBuffer();
-	
+
 		sbuf.append("Automaton " + getName() + " = new Automaton(\"" + getName() + "\");");
 		sbuf.append("\t\t{\t\t\t" + getName() + ".setType(AutomatonType." + getType().toString() + ");\n");
-		
+
 		for(StateIterator sit = stateIterator(); sit.hasNext(); )
 		{
 			State state = sit.nextState();
@@ -1662,14 +1712,14 @@ public class Automaton
 			sbuf.append("LabeledEvent " + ev.getLabel() + " = new LabeledEvent(\"" + ev.getLabel() + "\");");
 			sbuf.append("\t" + getName() + ".getAlphabet().addEvent(" + ev.getLabel() + ");\n");
 		}
-		
+
 		for(ArcIterator ait = arcIterator(); ait.hasNext(); )
 		{
 			Arc arc = ait.nextArc();
 			sbuf.append(getName() + ".addArc(new Arc(" + arc.getFromState().getName() + ", " + arc.getToState().getName() + ", " + arc.getEvent().getLabel() + "));\n");
 		}
 		sbuf.append("}\n");
-	
+
 		return sbuf.toString();
 	}
 }
