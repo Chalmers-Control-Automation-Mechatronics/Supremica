@@ -7,5 +7,5 @@ public class Options
 	static final boolean debug_on = false;
 	static final boolean sanity_check_on = false;
 	static final boolean user_alters_PCG = false;
-	static final boolean show_grow = true;
+	static final boolean show_grow = false;
 }

@@ -179,12 +179,14 @@ public class Group
 
 			manager.ref(bdd_t);
 		}
+		/*
 		else if (size == 1)
 		{
 			bdd_t = members[0].getT();
 
 			manager.ref(bdd_t);    // because we will deref it later here (see reset)
 		}
+		*/
 		else
 		{
 			bdd_t = manager.getOne();

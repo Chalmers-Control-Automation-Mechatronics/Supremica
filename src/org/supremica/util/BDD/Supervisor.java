@@ -126,7 +126,7 @@ public class Supervisor
 		int t_p = plant.getT();
 		int cubep_sp = spec.getCubep();
 		int cubep_p = plant.getCubep();
-		int sigma_u = manager.getSigmaU();
+		int sigma_u = manager.and( plant.getSigmaU(), spec.getSigmaU()); // WAS manager.getSigmaU();
 		int sigma_cube = manager.getEventCube();
 		int tmp10 = manager.exists(t_sp, cubep_sp);
 		int tmp1 = manager.not(tmp10);
@@ -150,6 +150,7 @@ public class Supervisor
 
 		manager.recursiveDeref(tmp2);
 		manager.recursiveDeref(cube2);
+		manager.recursiveDeref(sigma_u);
 
 		has_uncontrollables = true;
 		bdd_uncontrollables = tmp4;
