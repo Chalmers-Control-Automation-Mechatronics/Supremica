@@ -1,4 +1,4 @@
-module xor(x, y, z, compute)
+module xor(x, y, compute)
 {
 	input x, y, compute: boolean;
 	output z: boolean;

@@ -40,8 +40,6 @@ public class BLKReader
 	String blockName = null;
 	String isagrafBlockName;
 
-	System.out.println("   File:" + file); 
-
         while ((input = br.readLine()) != null)
 	    {
 		if ((input.trim()).startsWith("input")  )
@@ -51,8 +49,6 @@ public class BLKReader
 			for (int i=0; tokenizer.hasMoreTokens(); i++)
 			    {
 				String currToken = (tokenizer.nextToken()).trim();
-
-				System.out.println("      Input: " + currToken);
 
 				inputArguments.add(new Argument(currToken, type));
 			    }
@@ -66,8 +62,6 @@ public class BLKReader
 			    {
 				String currToken = (tokenizer.nextToken()).trim();
 
-				System.out.println("      Output: " + currToken);
-
 				outputArguments.add(new Argument(currToken, type));
 			    }
 		    } 
@@ -78,7 +72,6 @@ public class BLKReader
 	    }
 	fr.close();
 
-	System.out.println("return new Block: " + blockName);
 	return new Block(blockName, inputArguments, outputArguments);
     }
 
@@ -98,7 +91,14 @@ public class BLKReader
 	
 		while ((input = br.readLine()) != null)
 		    {
-			pw.println(input);
+			if (input.indexOf("output ") > 0 )
+			    {
+				pw.println(input.substring(input.indexOf("output ")+6, input.length()));
+			    }
+			else
+			    {
+				pw.println(input);
+			    }
 		    }
 		pw.println("");
 		fr.close();
