@@ -63,7 +63,7 @@ class EventExecuter
 		doRun = false;		
 	}
 	
-	public synchronized void tryExecuteEvent()
+	public void tryExecuteEvent()
 	{
 		if (executeUncontrollableEvents)
 		{

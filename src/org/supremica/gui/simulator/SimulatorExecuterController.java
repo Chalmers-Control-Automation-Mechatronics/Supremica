@@ -91,8 +91,8 @@ class SimulatorExecuterController
 //		ImageIcon homeImg = new ImageIcon(SimulatorExecuterController.class.getResource("/toolbarButtonGraphics/navigation/Home24.gif"));
 
 
-		executeUncontrollableEvents = new JCheckBox("Execute uncontrollable events");
-		executeControllableEvents = new JCheckBox("Execute controllable events");
+		executeUncontrollableEvents = new JCheckBox("Automatically execute uncontrollable events");
+		executeControllableEvents = new JCheckBox("Automatically execute controllable events");
 //		undoButton = new JButton(backwardImg);
 //		undoButton.setToolTipText("Back");
 //		redoButton = new JButton(forwardImg);
