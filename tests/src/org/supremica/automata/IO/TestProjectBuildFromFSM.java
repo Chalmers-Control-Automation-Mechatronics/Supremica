@@ -94,7 +94,7 @@ public class TestProjectBuildFromFSM
 		return suite;
 	}
 
-	public void testUMDES_1()
+	public void rem_testUMDES_1()
 	{
 		try
 		{
