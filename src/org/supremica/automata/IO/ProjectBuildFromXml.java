@@ -485,7 +485,7 @@ public class ProjectBuildFromXml
 		currEvent.setOperator(operator);
 		currEvent.setImmediate(immediate);
 		currEvent.setEpsilon(epsilon);
-
+                                                     
 		// Associate the id with the event
 		idEventMap.put(id, currEvent);
 

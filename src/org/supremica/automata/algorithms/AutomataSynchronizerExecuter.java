@@ -58,6 +58,8 @@ import org.supremica.automata.Arc;
 import org.supremica.automata.AutomataIndexForm;
 import org.supremica.automata.AutomataIndexFormHelper;
 import org.supremica.automata.Automaton;
+import org.supremica.automata.Automata;
+import org.supremica.automata.AutomatonIterator;
 import org.supremica.automata.AutomatonType;
 import org.supremica.automata.State;
 import org.supremica.automata.LabeledEvent;
@@ -163,7 +165,6 @@ public final class AutomataSynchronizerExecuter
 	/** For stopping of thread. */
 	private boolean stopRequested = false;
 
-
 	// Synchonization of all executors
 	private Rendezvous executerRendezvous = null;
 
@@ -221,8 +222,34 @@ public final class AutomataSynchronizerExecuter
 	/**
 	 * Selects the automata in the ArrayList for synchronization.
 	 *
+	 *@param  automataToBeSelected Automata representing the automata to be selected
+	 *@exception  Exception Throws exception if exhaustive search is used.
+	 */
+	public void selectAutomata(Automata automataToBeSelected)
+		throws Exception
+	{
+		automataIndices = new int[automataToBeSelected.size()];
+
+		int i = 0;
+		for (AutomatonIterator autIt = automataToBeSelected.iterator(); autIt.hasNext(); )
+		{
+			automataIndices[i++] = autIt.nextAutomaton().getIndex();
+		}
+
+		helper.selectAutomata(automataIndices);
+
+		// FIXA!
+		if (exhaustiveSearch)
+		{
+			throw new Exception("Exhaustive search used in the wrong way!");
+		}
+	}
+
+	/**
+	 * Selects the automata in the ArrayList for synchronization.
+	 *
 	 *@param  automataToBeSelected ArrayList of the automata to be selected
-	 *@exception  Exception Throws exception if exhaustiva search is used.
+	 *@exception  Exception Throws exception if exhaustive search is used.
 	 */
 	public void selectAutomata(ArrayList automataToBeSelected)
 		throws Exception
@@ -247,7 +274,7 @@ public final class AutomataSynchronizerExecuter
 	 * Selects the automata with the indices in automataIndices for synchronization
 	 *
 	 *@param automataIndices Array of int with the indices of the automata to be selected.
-	 *@exception  Exception Throws exception if exhaustiva search is used.
+	 *@exception  Exception Throws exception if exhaustive search is used.
 	 */
 	public void selectAutomata(int[] automataIndices)
 		throws Exception
@@ -605,16 +632,19 @@ public final class AutomataSynchronizerExecuter
 				coExecuter.setCurrState(currState);
 			}
 
+			// Update currEnabledEvents
 			enabledEvents(currState);
 
+			// Is this state deadlocked?
 			if (syncOptions.buildAutomaton() && currEnabledEvents[0] == Integer.MAX_VALUE)
 			{
 				helper.setDeadlocked(currState, true);
 			}
 
+			// Was the state uncontrollable?
 			if (!controllableState)
 			{
-				// We'd like to remember this state and later on try to show that
+				// Maybe we'd like to remember this state and later on try to show that
 				// it will be excluded in the total synchronization...  or not.
 				if (rememberUncontrollable)
 				{
@@ -637,6 +667,7 @@ public final class AutomataSynchronizerExecuter
 				}
 			}
 
+			// Should we expand this state?
 			if (controllableState || expandForbiddenStates)
 			{
 				// Expand state
@@ -681,11 +712,9 @@ public final class AutomataSynchronizerExecuter
 							//	yield();
 							//}
 						//}
-
 					}
 					catch (Exception e)
 					{
-						// System.err.println(e);
 						logger.error("Error in SynchronizerExecuter");
 						logger.debug(e.getStackTrace());
 						return;
@@ -695,12 +724,12 @@ public final class AutomataSynchronizerExecuter
 				}
 			}
 
+			// Get a new state to process from the helper!
 			currState = helper.getStateToProcess();
-
 			if (currState == null)
 			{
 				// This thread tells the other threads that it failed to get
-				// a new state, thus when all threads has enter this state
+				// a new state, thus when all threads has entered this state
 				// all threads can stop executing. There is one exception
 				// and this is the possibility for this thread to experience
 				// a temporary shortage of states and at this position
@@ -833,7 +862,6 @@ public final class AutomataSynchronizerExecuter
 					}
 
 					newState.setAutomataSynchronizerExecutorIndex(i);
-
 					newState.setName(newState.getId());
 					newState.setInitial(AutomataIndexFormHelper.isInitial(currState));
 					newState.setAccepting(AutomataIndexFormHelper.isAccepting(currState));
@@ -903,7 +931,6 @@ public final class AutomataSynchronizerExecuter
 
 						try
 						{
-
 							// Check if nextState exists
 							int nextIndex = helper.getStateIndex(nextState);
 

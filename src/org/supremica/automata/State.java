@@ -275,10 +275,12 @@ public class State
 		{
 			cost = State.MAX_COST;
 		}
+		/* // This has nothing to do with it, right?
 		else
 		{
 			cost = State.MIN_COST;
 		}
+		*/
 	}
 
 	public void setActive(boolean active)

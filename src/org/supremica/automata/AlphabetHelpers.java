@@ -105,7 +105,7 @@ public class AlphabetHelpers
 			throw new IllegalArgumentException("At least one alphabet is necessary");
 		}
 
-		EventsSet eventSet = new EventsSet();
+		EventsSet eventsSet = new EventsSet();
 		Events unionEvents = EventsHelpers.union(alphabets);
 		Alphabet newAlphabet = new Alphabet();
 
@@ -115,23 +115,22 @@ public class AlphabetHelpers
 		{
 			LabeledEvent currEvent = (LabeledEvent) eventsIt.next();
 
-			eventSet.clear();
+			eventsSet.clear();
 
 			// Iterate over all alphabets, and find those alphabets that
 			// contain an event with currEvent.getLabel
 			Iterator alphabetIt = alphabets.iterator();
-
 			while (alphabetIt.hasNext())
 			{
 				Alphabet currAlphabet = (Alphabet) alphabetIt.next();
 
 				if (currAlphabet.containsEventWithLabel(currEvent.getLabel()))
 				{
-					eventSet.add(currAlphabet.getEventWithLabel(currEvent.getLabel()));
+					eventsSet.add(currAlphabet.getEventWithLabel(currEvent.getLabel()));
 				}
 			}
 
-			LabeledEvent newEvent = EventHelpers.createEvent(eventSet, requireConsistentControllability, requireConsistentImmediate);
+			LabeledEvent newEvent = EventHelpers.createEvent(eventsSet, requireConsistentControllability, requireConsistentImmediate);
 			
 			// If we get here, the events are consistent (or consistency is not to be checked)
 			

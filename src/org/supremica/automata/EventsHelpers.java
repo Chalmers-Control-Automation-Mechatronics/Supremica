@@ -1,4 +1,3 @@
-
 /*
  *  Supremica Software License Agreement
  *
@@ -75,7 +74,6 @@ public class EventsHelpers
 	{
 		if (eventsSet.size() >= 1)
 		{
-
 			// this was >= 2 but why could we not have union over 1 or even 0 number of elements??
 			// Build the new set of events
 			Iterator eventsSetIt = eventsSet.iterator();

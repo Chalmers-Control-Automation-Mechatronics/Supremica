@@ -55,6 +55,8 @@ import org.supremica.automata.Alphabet;
 import org.supremica.automata.AlphabetHelpers;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
+import org.supremica.automata.EventIterator;
+import org.supremica.automata.AutomatonIterator;
 import org.supremica.automata.EventsSet;
 import org.supremica.automata.State;
 import org.supremica.automata.Arc;
@@ -394,54 +396,46 @@ public class AutomataVerifier
 		}
 
 		potentiallyUncontrollableStates = synchHelper.getStateMemorizer();
-		LabeledEvent currEvent;
-		Automaton currPlantAutomaton;
-		Automaton currSupervisorAutomaton;
-		ArrayList selectedAutomata = new ArrayList();
-		Iterator eventIterator;
-		Iterator plantIterator;
+		Automata selectedAutomata = new Automata();
 		boolean allModulesControllable = true;
-		Iterator supervisorIterator = theAutomata.iterator();
-		// boolean[] typeIsPlantTable = synchHelper.getAutomataIndexForm().getTypeIsPlantTable();
 		boolean[] typeIsSupSpecTable = synchHelper.getAutomataIndexForm().getTypeIsSupSpecTable();
 		boolean[] controllableEventsTable = synchHelper.getAutomataIndexForm().getControllableEventsTable();
 
-		loop:
-		while (supervisorIterator.hasNext())
+		// Iterate over supervisors/specifications
+		loop: for (AutomatonIterator supIt = theAutomata.iterator(); supIt.hasNext();)
 		{
-			// Iterate over supervisors/specifications
-			currSupervisorAutomaton = (Automaton) supervisorIterator.next();
+			Automaton currSupervisorAutomaton = supIt.nextAutomaton();
 
-			// To enable the overriding the AutomatonType of automata!
+			// To enable the overriding the AutomatonType of automata we use typeIsSupSpecTable!
 			// if ((currSupervisorAutomaton.getType() == AutomatonType.Supervisor) || (currSupervisorAutomaton.getType() == AutomatonType.Specification))
 			// if (!typeIsPlantTable[currSupervisorAutomaton.getIndex()])
 			if (typeIsSupSpecTable[currSupervisorAutomaton.getIndex()])
 			{
-				// logger.info("Supervisor: " + currSupervisorAutomaton.getName());
+				// This is a relevant automaton!
+				selectedAutomata.addAutomaton(currSupervisorAutomaton);
+
 				// Examine uncontrollable events in currSupervisorAutomaton
 				// and select plants containing these events
-				selectedAutomata.add(currSupervisorAutomaton);
-				eventIterator = currSupervisorAutomaton.eventIterator();
-				while (eventIterator.hasNext())
+				for (EventIterator eventIt = currSupervisorAutomaton.eventIterator(); eventIt.hasNext();)
 				{
-					currEvent = (LabeledEvent) eventIterator.next();
+					LabeledEvent currEvent = eventIt.nextEvent();
 
 					// To enable overriding the controllability status of events!
 					//if (!currEvent.isControllable())
 					if (!controllableEventsTable[currEvent.getSynchIndex()])
 					{
+						// Note that in the language inclusion case, the
+						// uncontrollableEventToPlantMap has been adjusted...
 						if (uncontrollableEventToPlantMap.get(currEvent) != null)
 						{
-							// Note that in the language inclusion case, the
-							// uncontrollableEventToPlantMap has been adjusted...
-							plantIterator = ((Set) uncontrollableEventToPlantMap.get(currEvent)).iterator();
-							while (plantIterator.hasNext())
+							// Iterate over the plants and add them to selectedAutomata
+							for (Iterator plantIt = ((Set) uncontrollableEventToPlantMap.
+													 get(currEvent)).iterator(); plantIt.hasNext();)
 							{
-								currPlantAutomaton = (Automaton) plantIterator.next();
-								if (!selectedAutomata.contains(currPlantAutomaton))
+								Automaton currPlantAutomaton = (Automaton) plantIt.next();
+								if (!selectedAutomata.containsAutomaton(currPlantAutomaton))
 								{
-									// logger.info("Plant: " + currPlantAutomaton.getName());
-									selectedAutomata.add(currPlantAutomaton);
+									selectedAutomata.addAutomaton(currPlantAutomaton);
 								}
 							}
 
@@ -468,11 +462,9 @@ public class AutomataVerifier
 										break loop;
 									}
 
-									// Clean selectedAutomata
-									while (selectedAutomata.size() > 1)
-									{
-										selectedAutomata.remove(1);
-									}
+									// Clean selectedAutomata before continuing
+									selectedAutomata.clear();
+									selectedAutomata.addAutomaton(currSupervisorAutomaton);
 								}
 							}
 						}
@@ -504,114 +496,16 @@ public class AutomataVerifier
 					}
 				}
 
-				// Clean selectedAutomata
+				// Clean selectedAutomata before continuing
 				selectedAutomata.clear();
 			}
 		}
 
-		/*
-		potentiallyUncontrollableStates = synchHelper.getStateMemorizer();
-		LabeledEvent currEvent;
-		Automaton currPlantAutomaton;
-		Automaton currSupervisorAutomaton;
-		ArrayList selectedAutomata = new ArrayList();
-		Iterator eventIterator;
-		Iterator plantIterator;
-		boolean allModulesControllable = true;
-		Iterator supervisorIterator = theAutomata.iterator();
-
-		loop:
-		while (supervisorIterator.hasNext())
-		{
-			// Iterate over supervisors/specifications
-			currSupervisorAutomaton = (Automaton) supervisorIterator.next();
-
-			if ((currSupervisorAutomaton.getType() == AutomatonType.Supervisor) || (currSupervisorAutomaton.getType() == AutomatonType.Specification))
-			{
-				// Examine uncontrollable events in currSupervisorAutomaton
-				// and select plants containing these events
-				selectedAutomata.add(currSupervisorAutomaton);
-				eventIterator = currSupervisorAutomaton.eventIterator();
-				while (eventIterator.hasNext())
-				{
-					currEvent = (LabeledEvent) eventIterator.next();
-					if (!currEvent.isControllable())
-					{
-						if (uncontrollableEventToPlantMap.get(currEvent) != null)
-						{
-							plantIterator = ((Set) uncontrollableEventToPlantMap.get(currEvent)).iterator();
-							while (plantIterator.hasNext())
-							{
-								currPlantAutomaton = (Automaton) plantIterator.next();
-								if (!selectedAutomata.contains(currPlantAutomaton))
-								{
-									selectedAutomata.add(currPlantAutomaton);
-								}
-							}
-
-							if (oneEventAtATime)
-							{
-								if (stopRequested)
-								{
-									return false;
-								}
-
-								if (selectedAutomata.size() > 1)
-								{
-									// Check module
-									allModulesControllable = allModulesControllable && moduleIsControllable(selectedAutomata);
-
-									// Stop if uncontrollable
-									if (!allModulesControllable)
-									{
-										if (verboseMode)
-										{
-											logger.info("Uncontrollable state found.");
-										}
-										break loop;
-									}
-
-									// Clean selectedAutomata
-									while (selectedAutomata.size() > 1)
-									{
-										selectedAutomata.remove(1);
-									}
-								}
-							}
-						}
-					}
-				}
-
-				if (!oneEventAtATime)
-				{
-					if (stopRequested)
-					{
-						return false;
-					}
-
-					if (selectedAutomata.size() > 1)
-					{
-						// Check module
-						allModulesControllable = allModulesControllable && moduleIsControllable(selectedAutomata);
-
-						// Stop if uncontrollable
-						if (!allModulesControllable)
-						{
-							break loop;
-						}
-					}
-				}
-
-				selectedAutomata.clear();
-			}
-		}
-		*/
-
-		// loop finished.
+		// Did the loop finish without failure?
 		if (failure)
 		{
 			logger.warn("Supremica's modular verification algorithm can't solve this " +
-						 "problem. Try the monolithic algorithm instead. There are " +
+						 "problem. Try the monolithic or BDD algorithm instead. There are " +
 						 potentiallyUncontrollableStates.size() +
 						 " states that perhaps makes this system uncontrollable.");
 			return false;
@@ -628,14 +522,14 @@ public class AutomataVerifier
 	 *@exception  Exception Description of the Exception
 	 *@see  AutomataSynchronizerExecuter
 	 */
-	private boolean moduleIsControllable(ArrayList selectedAutomata)
+	//private boolean moduleIsControllable(ArrayList selectedAutomata)
+	private boolean moduleIsControllable(Automata selectedAutomata)
 		throws Exception
 	{
 		// Clear the hash-table and set some variables in the synchronization helper
 		synchHelper.clear();
 		synchHelper.setRememberUncontrollable(true);
 		synchHelper.addState(initialState);
-		// logger.info("nbrOfStatesToProcess: " + synchHelper.getNbrOfStatesToProcess());
 
 		if (stopRequested)
 		{
@@ -659,7 +553,6 @@ public class AutomataVerifier
 			currExec.selectAutomata(selectedAutomata);
 			currExec.start();
 		}
-
 		((AutomataSynchronizerExecuter) synchronizationExecuters.get(0)).join();
 
 		if (stopRequested)
@@ -667,6 +560,7 @@ public class AutomataVerifier
 			return false;
 		}
 
+		// The name of the "synchronized" automata
 		StringBuffer automataNames = new StringBuffer();
 		if (verboseMode)
 		{
@@ -685,19 +579,23 @@ public class AutomataVerifier
 			// Try to add some more automata
 			// Make array with indices of selected automata to remember which were originally selected
 			int[] automataIndices = new int[selectedAutomata.size()];
-			for (int i = 0; i < selectedAutomata.size(); i++)
+			int i = 0;
+			for (AutomatonIterator autIt = selectedAutomata.iterator(); autIt.hasNext();)
 			{
-				automataIndices[i] = ((Automaton) selectedAutomata.get(i)).getIndex();
+				automataIndices[i++] = autIt.nextAutomaton().getIndex();
 			}
 
 			if (verboseMode)
 			{
-				String states = "";
-				if (potentiallyUncontrollableStates.size(automataIndices) == 1)
+				String states;
+				int size = potentiallyUncontrollableStates.size(automataIndices);
+				if (size == 1)
 					states = "one state";
+				else if (size == 2)
+					states = "two states";
 				else
-					states = potentiallyUncontrollableStates.size(automataIndices) + " states";
-
+					states = size + " states";
+				
 				logger.info("'" + automataNames + "' has " + states +
 							 " that might be uncontrollable...");
 			}
@@ -723,9 +621,7 @@ public class AutomataVerifier
 
 			// Make nbrOfAttempts attempts on prooving controllability and
 			// uncontrollability alternatingly and then give up
-			// int nbrOfAttempts = 5;
 			int nbrOfAttempts = verificationOptions.getNbrOfAttempts();
-
 			stateAmount = 1;
 			for (attempt = 1; attempt <= nbrOfAttempts; attempt++)
 			{
@@ -734,9 +630,10 @@ public class AutomataVerifier
 					logger.debug("Attempt number " + attempt + ".");
 				}
 
+				// Have we already added all similar automata?
 				if (similarAutomata.length == selectedAutomata.size() - automataIndices.length)
 				{
-					// Already added all similar automata, try to find more similarities
+					// Try to find more similarities
 					int[] moreSimilarAutomata = findSimilarAutomata(theAutomata, selectedAutomata);
 					int[] newSimilarAutomata = new int[similarAutomata.length + moreSimilarAutomata.length];
 
@@ -784,14 +681,15 @@ public class AutomataVerifier
 					return false;
 				}
 
-				// Are there any potentially uncontrollable states?
+				// Are there any potentially uncontrollable states left?
 				if (potentiallyUncontrollableStates.size(automataIndices) > 0)
 				{
 					if (!verificationOptions.getSkipUncontrollabilityCheck())
 					{
 						if (verboseMode)
 						{
-							logger.info("Couldn't prove controllability, trying to prove uncontrollability...");
+							logger.info("Couldn't prove controllability, " + 
+										"trying to prove uncontrollability...");
 						}
 
 						// Try to prove remaining states in the stateMemorizer as being uncontrollable
@@ -859,7 +757,7 @@ public class AutomataVerifier
 	 *@see  #compareAlphabets(org.supremica.automata.Alphabet, org.supremica.automata.Alphabet)
 	 *@see  #excludeUncontrollableStates(int[], java.util.ArrayList, int[])
 	 */
-	private int[] findSimilarAutomata(Automata theAutomata, ArrayList selectedAutomata)
+	private int[] findSimilarAutomata(Automata theAutomata, Automata selectedAutomata)
 		throws Exception
 	{
 		int amountOfSelected = selectedAutomata.size();
@@ -873,63 +771,45 @@ public class AutomataVerifier
 		}
 
 		// Compute the union alphabet of the automata in selectedAutomata
-		Alphabet synchAlphabet;
+		Alphabet synchAlphabet = selectedAutomata.getUnionAlphabet();
+
+		// Do the work, compare the new automata with the already selected
 		Automaton currAutomaton;
-		EventsSet theAlphabets = new EventsSet();
-
-		for (int i = 0; i < selectedAutomata.size(); i++)
-		{
-			currAutomaton = (Automaton) selectedAutomata.get(i);
-
-			Alphabet currAlphabet = currAutomaton.getAlphabet();
-
-			theAlphabets.add(currAlphabet);
-		}
-
-		synchAlphabet = AlphabetHelpers.getUnionAlphabet(theAlphabets); // , "");
-
 		int[] tempArray = new int[amountOfUnselected];
 		double[] arraySortValue = new double[amountOfUnselected];
 		int count = 0;
-		boolean found = false;
-		Iterator automataIterator = theAutomata.iterator();
-
-		while (automataIterator.hasNext())
+		for (AutomatonIterator autIt = theAutomata.iterator(); autIt.hasNext();)
 		{
-			currAutomaton = (Automaton) automataIterator.next();
+			currAutomaton = autIt.nextAutomaton();
+			
+			// Is this automaton interesting?
+			if (selectedAutomata.containsAutomaton(currAutomaton))
+			{
+				continue;
+			}
+
+			// This line is the essence of it all...
 			arraySortValue[count] = compareAlphabets(currAutomaton.getAlphabet(), synchAlphabet);
 			// arraySortValue[count] = compareAlphabets(synchAlphabet, currAutomaton.getAlphabet());
-
+			
+			// Did we get a value?
 			if (arraySortValue[count] > 0)
 			{
-				for (int i = 0; i < amountOfSelected; i++)
-				{
-					if (currAutomaton == (Automaton) selectedAutomata.get(i))
-					{
-						found = true;
-					}
-				}
+				tempArray[count++] = currAutomaton.getIndex();
 
-				if (!found)
-				{
-					tempArray[count++] = currAutomaton.getIndex();
-				}
-
+				// Have we found everything possible already?				
 				if (count == amountOfUnselected)
 				{
 					break;
 				}
-
-				found = false;
 			}
 		}
-
+	
+		// Did we find anything interesting at all?
 		if (count == 0)
 		{
 			return null;
 		}
-
-		int[] outArray = new int[count];
 
 		// Bubblesort the array according to arraySortValue... bubblesort? FIXA!
 		double tempDouble = 0;
@@ -954,6 +834,9 @@ public class AutomataVerifier
 				}
 			}
 		}
+
+		// Return an array of apropriate length
+		int[] outArray = new int[count];
 		System.arraycopy(tempArray, 0, outArray, 0, count);
 
 		return outArray;
@@ -1016,11 +899,11 @@ public class AutomataVerifier
 	 * automata in the current composition with automata with similar alphabets.
 	 *
 	 *@param  similarAutomata integer array with indices of automata with similar alphabets (from similarAutomata()).
-	 *@param  selectedAutomata ArrayList of the Automaton-objects currently selected (the ones in the current "composition" plus perhaps some of the similar automata from earlier rins of this method).
+	 *@param  selectedAutomata The automata currently selected (the ones in the current "composition" plus perhaps some of the similar automata from earlier runs of this method).
 	 *@param  automataIndices integer array with indices of automata in the current "composition".
 	 *@see  #findSimilarAutomata(org.supremica.automata.Automata, java.util.ArrayList)
 	 */
-	private void excludeUncontrollableStates(int[] similarAutomata, ArrayList selectedAutomata, int[] automataIndices)
+	private void excludeUncontrollableStates(int[] similarAutomata, Automata selectedAutomata, int[] automataIndices)
 		throws Exception
 	{
 		String addedAutomata = "";
@@ -1041,7 +924,7 @@ public class AutomataVerifier
 			// Been here before, already added some automata
 			for (int i = 0; i < start; i++)
 			{
-				addedAutomata = addedAutomata + theAutomata.getAutomatonAt(similarAutomata[i]).toString();
+				addedAutomata = addedAutomata + " " + theAutomata.getAutomatonAt(similarAutomata[i]);
 			}
 
 			// Increase the limit each time
@@ -1055,12 +938,13 @@ public class AutomataVerifier
 
 		synchHelper.clear();
 
+		// Add some of the similar automata, but make sure the stateAmount doesn't explode!
 		for (int i = start; i < similarAutomata.length; i++)
 		{
 			// Add automaton
-			selectedAutomata.add(theAutomata.getAutomatonAt(similarAutomata[i]));
+			selectedAutomata.addAutomaton(theAutomata.getAutomatonAt(similarAutomata[i]));
 
-			addedAutomata = addedAutomata + " '" + theAutomata.getAutomatonAt(similarAutomata[i]).getName() + "'";
+			addedAutomata = addedAutomata + " " + theAutomata.getAutomatonAt(similarAutomata[i]);
 			stateAmount = stateAmount * theAutomata.getAutomatonAt(similarAutomata[i]).nbrOfStates();
 
 			if ((stateAmount > stateAmountLimit) || (i == similarAutomata.length - 1))
@@ -1093,7 +977,6 @@ public class AutomataVerifier
 					currExec.selectAutomata(selectedAutomata);
 					currExec.start();
 				}
-
 				((AutomataSynchronizerExecuter) synchronizationExecuters.get(0)).join();
 
 				if (stopRequested)
@@ -1105,11 +988,11 @@ public class AutomataVerifier
 				// that are not represented in the new synchronization
 				int[][] currStateTable = synchHelper.getStateTable();
 				int stateCount = 0;
-
 				for (int j = 0; j < currStateTable.length; j++)
 				{
 					if (currStateTable[j] != null)
 					{
+						// Look for the state among the potentially uncontrollable states
 						potentiallyUncontrollableStates.find(automataIndices, currStateTable[j]);
 
 						// Instead of using clear()... se *** above
@@ -1144,28 +1027,30 @@ public class AutomataVerifier
 					case 1:
 						message = "Still one state ";
 						break;
+					case 2:
+						message = "Still two states ";
+						break;
 					default:
 						message = "Still " + statesLeft + " states ";
 					}
 					logger.info(message + "left after adding" + addedAutomata + ".");
-					//logger.info(message + "left after adding" + selectedAutomata + ".");
 				}
 
+				// Are we ready?
 				if (statesLeft == 0)
+				{
 					return;
+				}
 
+				// Is it time to give up this attempt?
 				if (stateAmount > stateAmountLimit)
 				{
-					// Limit reached!!
+					// Make sure the limit and the real amount is not too different in magnitude.
+					stateAmountLimit = (stateAmount / 1000) * 1000;
+
 					break;
 				}
 			}
-		}
-
-		if (stateAmount > stateAmountLimit)
-		{
-			// Make sure the limit and the real amount is not too different in magnitude.
-			stateAmountLimit = (stateAmount / 1000) * 1000;
 		}
 	}
 
@@ -1208,7 +1093,6 @@ public class AutomataVerifier
 
 		// Initialize the synchronizationExecuters
 		synchronizationExecuters.clear();
-
 		for (int i = 0; i < nbrOfExecuters; i++)
 		{
 			AutomataSynchronizerExecuter currSynchronizationExecuter = new AutomataSynchronizerExecuter(uncontrollabilityCheckHelper);
@@ -1268,8 +1152,6 @@ public class AutomataVerifier
 		 */
 	}
 
-
-
 	/**
 	 * Answers YES/NO to the language inclusion problem
 	 *
@@ -1278,9 +1160,6 @@ public class AutomataVerifier
     private boolean BDDLanguageInclusionVerification()
 	throws Exception
     {
-
-
-
 		Automata unselected = ActionMan.getGui().getUnselectedAutomata();
 
 		// we already know the answer: L(P) = \Sigma^*
@@ -1290,8 +1169,6 @@ public class AutomataVerifier
 
 		Automata selected = new Automata(theAutomata, true); /* <-- MUST BE SHALLOW COPY ... */
 		selected.removeAutomata(unselected); /* .. OR THIS REMOVE WONT WORK !!! */
-
-
 
 		boolean ret  = false;
 		org.supremica.util.BDD.Timer timer = new org.supremica.util.BDD.Timer("BDDLanguageInclusionVerification");
@@ -1396,7 +1273,6 @@ public class AutomataVerifier
 
 		Options.out.flush();
 		return ret;
-
     }
 
 	/**
@@ -1410,7 +1286,6 @@ public class AutomataVerifier
 	private boolean monolithicControllabilityVerification()
 		throws Exception
 	{
-		// timer.start();
 		synchHelper.addState(initialState);
 		synchHelper.setExhaustiveSearch(true);
 
@@ -1430,9 +1305,7 @@ public class AutomataVerifier
 			currExec.selectAllAutomata();
 			currExec.start();
 		}
-
 		((AutomataSynchronizerExecuter) synchronizationExecuters.get(0)).join();
-		// timer.stop();
 
 		return synchHelper.getAutomataIsControllable();
 	}
@@ -1453,8 +1326,6 @@ public class AutomataVerifier
 	private boolean monolithicNonblockingVerification()
 		throws Exception
 	{
-		// timer.start();
-
 		synchHelper.addState(initialState);
 		synchHelper.setExhaustiveSearch(false);
 
@@ -1472,11 +1343,11 @@ public class AutomataVerifier
 			currExec.selectAllAutomata();
 			currExec.start();
 		}
-
 		((AutomataSynchronizerExecuter) synchronizationExecuters.get(0)).join();
 		AutomataSynchronizerExecuter currExec = (AutomataSynchronizerExecuter) synchronizationExecuters.get(0);
-		Automaton theAutomaton;
 
+		// Get the synchronized automaton
+		Automaton theAutomaton;
 		try
 		{
 			if (currExec.buildAutomaton())
@@ -1490,14 +1361,11 @@ public class AutomataVerifier
 		}
 		catch (Exception ex)
 		{
-			// timer.stop(); // No, java has no destructors, have to do this manually!!
-
 			logger.error("Error when building automaton: " + ex.toString());
 			logger.debug(ex.getStackTrace());
 			throw ex;
 		}
 
-		// timer.stop();
 		return moduleIsNonblocking(theAutomaton);
 	}
 
