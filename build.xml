@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
 
-<project name="Supremica" default="rebuild" basedir=".">
+<project name="Supremica and JGrafChart" default="rebuild" basedir=".">
 
 <property name="src" value="src"/>
 <property name="build" value="build"/>
@@ -13,8 +13,14 @@
 <property name="lib" value="lib"/>
 <property name="unjared" value="unjared"/>
 
-<property name="my_basepackage" value="org.supremica"/>
-<property name="my_basedir" value="org/supremica"/>
+<property name="xmlrpc_basepackage" value="helma"/>
+<property name="xmlrpc_basedir" value="helma"/>
+
+<property name="supremica_basepackage" value="org.supremica"/>
+<property name="supremica_basedir" value="org/supremica"/>
+
+<property name="jgrafchart_basepackage" value="org.jgrafchart"/>
+<property name="jgrafchart_basedir" value="org/jgrafchart"/>
 
 <property name="project.name" value="Supremica"/>
 <property name="backup.dir" value="../backup"/>
@@ -109,7 +115,7 @@
 
 <target name="build_jni">
 	<exec executable="javah">
-		<arg value="-jni -o ${src}/${my_basedir}/sattline/openmms/JOpenMMS.h ${my_packagedir}.sattline.openmms.JOpenMMS"/>
+		<arg value="-jni -o ${src}/${supremica_basedir}/sattline/openmms/JOpenMMS.h ${my_packagedir}.sattline.openmms.JOpenMMS"/>
 	</exec>
 </target>
 
@@ -123,16 +129,34 @@
 </target>
 
 <target name="version" depends="init">
-	<delete quiet="true" file="${src}/${my_basedir}/Version.java"/>
-	<copy file="${templates}/Version.tmpl" tofile="${src}/${my_basedir}/Version.java"/>	
-	<replace file="${src}/${my_basedir}/Version.java" token="@BUILDDATE" value="${DSTAMP}${TSTAMP}"/>
+	<delete quiet="true" file="${src}/${supremica_basedir}/Version.java"/>
+	<copy file="${templates}/Version.tmpl" tofile="${src}/${supremica_basedir}/Version.java"/>	
+	<replace file="${src}/${supremica_basedir}/Version.java" token="@BUILDDATE" value="${DSTAMP}${TSTAMP}"/>
 </target>
 
 <!-- Compile:
 *	Reuses existing class files, but recompiles those
 *	source files that have changed.
 -->
-<target name="compile">
+<target name="compile" depends="compile_supremica,compile_jgrafchart">
+	<javac
+		srcdir="${src}"
+		destdir="${build}"
+		classpath="${lib}/${unjared}"
+		includeJavaRuntime="yes"
+		deprecation="false"
+		verbose="false"
+		includes="
+			${supremica_basedir}/external/**,
+			${jgrafchart_basedir}/external/**"	
+	/>
+</target>
+
+<!-- Compile:
+*	Reuses existing class files, but recompiles those
+*	source files that have changed.
+-->
+<target name="compile_supremica">
 	<javac
 		srcdir="${src}"
 		destdir="${build}"
@@ -141,8 +165,29 @@
 		deprecation="false"
 		verbose="false"
 		excludes="
-			${my_basedir}/sattline/**,
-			${my_basedir}/supervisor/**"	
+			${jgrafchart_basedir}/**,
+			${supremica_basedir}/external/**,
+			${supremica_basedir}/sattline/**,
+			${supremica_basedir}/supervisor/**"	
+	/>
+
+</target>
+
+<!-- Compile:
+*	Reuses existing class files, but recompiles those
+*	source files that have changed.
+-->
+<target name="compile_jgrafchart">
+	<javac
+		srcdir="${src}"
+		destdir="${build}"
+		classpath="${lib}/${unjared}"
+		includeJavaRuntime="yes"
+		deprecation="false"
+		verbose="false"
+		excludes="${supremica_basedir}/**,
+			${jgrafchart_basedir}/external/**,		
+			${xmlrpc_basedir}/**"	
 	/>
 
 </target>
@@ -151,20 +196,7 @@
 *	A standard compilation followed by packaging
 *	all files into a jar file. 
 -->
-<target name="build" depends="compile">
-	<jar jarfile="${dist}/Supremica.jar" manifest="${templates}/MANIFEST.MF"> 
-		<fileset dir="${build}"/>
-		<fileset dir="${images}"/>
-		<fileset dir="${javalibs.dir}"/>
-	</jar>
-	<copy file="${templates}/Supremica" todir="${dist}"/>	
-	<chmod file="${dist}/Supremica" perm="755"/>	
-	<copy file="${templates}/Supremica.cmd" todir="${dist}"/>	
-	<chmod file="${dist}/Supremica.cmd" perm="644"/>
-	<copy file="${templates}/JGrafChart" todir="${dist}"/>	
-	<chmod file="${dist}/JGrafChart" perm="755"/>	
-	<copy file="${templates}/JGrafChart.cmd" todir="${dist}"/>	
-	<chmod file="${dist}/JGrafChart.cmd" perm="644"/>	
+<target name="build" depends="compile,jar,startfiles_supremica,startfiles_jgrafchart">
 </target>
 
 <!-- Rebuild:
@@ -172,27 +204,94 @@
 *	and packages all files into a jar file that can
 *	be executed without any other dependencies. 
 -->
-<target name="rebuild" depends="clean,version,compile">
-	<jar jarfile="${dist}/Supremica.jar" manifest="${templates}/MANIFEST.MF"> 
+<target name="rebuild" depends="clean,version,compile,jar">
+</target>
+
+<!-- Build:
+*	A standard compilation followed by packaging
+*	all files into a jar file. 
+-->
+<target name="build_supremica" depends="compile_supremica,jar_supremica,startfiles_supremica">
+</target>
+
+<!-- Rebuild:
+*	Deletes all existing class files, recompiles all files,
+*	and packages all files into a jar file that can
+*	be executed without any other dependencies. 
+-->
+<target name="rebuild_supremica" depends="clean,version,compile_supremica,jar_supremica,startfiles_supremica">
+</target>
+
+
+<!-- Build:
+*	A standard compilation followed by packaging
+*	all files into a jar file. 
+-->
+<target name="build_jgrafchart" depends="compile_jgrafchart,jar_jgrafchart,startfiles_jgrafchart">
+</target>
+
+<!-- Rebuild:
+*	Deletes all existing class files, recompiles all files,
+*	and packages all files into a jar file that can
+*	be executed without any other dependencies. 
+-->
+<target name="rebuild_jgrafchart" depends="clean,compile_jgrafchart,jar_jgrafchart,startfiles_jgrafchart">
+</target>
+
+<target name="jar_jgrafchart">
+	<jar jarfile="${dist}/JGrafChart.jar" manifest="${templates}/JGRAFCHART_MANIFEST.MF"> 
+		<fileset dir="${build}"/>
+		<fileset dir="${javalibs.dir}">		
+			<patternset>
+				<include name="com/nwoods/**"/>
+				<include name="se/lth/control/realtime/**"/>
+				<exclude name="com/nwoods/layout/**"/>
+			</patternset>	
+		</fileset>
+	</jar>
+</target>
+
+<target name="jar_supremica">
+	<jar jarfile="${dist}/Supremica.jar" manifest="${templates}/SUPREMICA_MANIFEST.MF"> 
 		<fileset dir="${build}"/>
 		<fileset dir="${images}"/>
-		<fileset dir="${javalibs.dir}"/>
+		<fileset dir="${javalibs.dir}">		
+		</fileset>
 	</jar>
+</target>
+
+<target name="jar">
+	<jar jarfile="${dist}/Supremica.jar" manifest="${templates}/ALL_MANIFEST.MF"> 
+		<fileset dir="${build}"/>
+		<fileset dir="${images}"/>
+		<fileset dir="${javalibs.dir}">	
+		</fileset>
+	</jar>
+</target>
+
+<target name="startfiles_supremica">
 	<copy file="${templates}/Supremica" todir="${dist}"/>	
 	<chmod file="${dist}/Supremica" perm="755"/>	
 	<copy file="${templates}/Supremica.cmd" todir="${dist}"/>	
-	<chmod file="${dist}/Supremica.cmd" perm="644"/>	
+	<chmod file="${dist}/Supremica.cmd" perm="644"/>
+</target>
+
+<target name="startfiles_jgrafchart">
 	<copy file="${templates}/JGrafChart" todir="${dist}"/>	
 	<chmod file="${dist}/JGrafChart" perm="755"/>	
 	<copy file="${templates}/JGrafChart.cmd" todir="${dist}"/>	
-	<chmod file="${dist}/JGrafChart.cmd" perm="644"/>			
+	<chmod file="${dist}/JGrafChart.cmd" perm="644"/>
 </target>
 
-<target name="doc">
+<target name="doc" depends="doc_supremica,doc_jgrafchart">
+</target>
+
+
+<target name="doc_supremica">
 	<javadoc
 		sourcepath="${src}"
 		destdir="${doc}/api"
-		packagenames="${my_basepackage}.automata.*,${my_basepackage}.gui.*,${my_basepackage}.util.*,${my_basepackage}.apps.*"
+		packagenames="${supremica_basepackage}.automata.*,${supremica_basepackage}.gui.*,${supremica_basepackage}.util.*,${supremica_basepackage}.apps.*"
 		classpath="${lib}/${unjared}"
 		author="true"
 		version="true"
@@ -206,8 +305,25 @@
 	</javadoc>
 </target>
 
+<target name="doc_jgrafchart">
+	<javadoc
+		sourcepath="${src}"
+		destdir="${doc}/api"
+		packagenames="${jgrafchart_basepackage}.*"
+		classpath="${lib}/${unjared}"
+		author="true"
+		version="true"
+		use="true"
+		private="true"
+		windowtitle="JGrafChart API"
+		doctitle="JGrafChart"
+		
+		bottom="Copyright &#169; 2001 Karl-Erik Arzen. All Rights Reserved.">
+	</javadoc>
+</target>
+
 <target name="run">
-	<java classname="${my_basepackage}.apps.Supremica" fork="yes">
+	<java classname="${supremica_basepackage}.apps.Supremica" fork="yes">
 		<classpath>
 			<pathelement location="${dist}/Supremica.jar" />
 			<pathelement path="${java.class.path}" />
@@ -217,7 +333,7 @@
 
 
 <target name="deploy">
-	<java classname="${my_basepackage}.apps.Supremica" fork="yes">
+	<java classname="${supremica_basepackage}.apps.Supremica" fork="yes">
 		<classpath>
 			<pathelement location="${dist}/Supremica.jar" />
 			<pathelement path="${java.class.path}" />

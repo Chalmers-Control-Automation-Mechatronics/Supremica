@@ -1,5 +1,7 @@
-import javax.swing.*; 
-import javax.swing.text.*; 
+package org.jgrafchart;
+
+import javax.swing.*;
+import javax.swing.text.*;
 
 import java.awt.Toolkit;
 import java.text.NumberFormat;
@@ -39,9 +41,9 @@ public class WholeNumberField extends JTextField {
     }
 
     protected class WholeNumberDocument extends PlainDocument {
-        public void insertString(int offs, 
+        public void insertString(int offs,
                                  String str,
-                                 AttributeSet a) 
+                                 AttributeSet a)
                 throws BadLocationException {
             char[] source = str.toCharArray();
             char[] result = new char[source.length];

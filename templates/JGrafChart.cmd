@@ -1,2 +1,2 @@
-@java -jar Supremica.jar JGrafChart
+@java -jar JGrafChart.jar
 
