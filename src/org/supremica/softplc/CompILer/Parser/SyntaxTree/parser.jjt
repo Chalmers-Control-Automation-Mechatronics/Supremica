@@ -937,7 +937,7 @@ Token variable_name() ://#void:
 TOKEN:
 {
 	<direct_variable: "%" <location_prefix> <size_prefix> <integer> ("." <integer>)* >
-      | <#location_prefix : "I" | "Q" | "M">
+	  | <#location_prefix : "I" | "Q" | "M">
 // <NIL> ger varning, så ta bort den för tillfället
       | <#size_prefix: "X" | "B" | "W" | "D" | "L" >
 }
@@ -1355,7 +1355,7 @@ void incompl_located_var_decl() :
 void incompl_location() :
 {}
 {
-	"AT" "%" ("I" | "Q" | "M") "*"
+	("AT%I" | "AT%Q" | "AT%M") "*"
 }
 
 void var_spec() :

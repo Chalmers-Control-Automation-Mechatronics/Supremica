@@ -2463,7 +2463,7 @@ Token variable_name() ://#void:
 TOKEN:
 {
 	<direct_variable: "%" <location_prefix> <size_prefix> <integer> ("." <integer>)* >
-      | <#location_prefix : "I" | "Q" | "M">
+	  | <#location_prefix : "I" | "Q" | "M">
 // <NIL> ger varning, s\u00e5 ta bort den f\u00f6r tillf\u00e4llet
       | <#size_prefix: "X" | "B" | "W" | "D" | "L" >
 }
@@ -4006,7 +4006,7 @@ void incompl_location() :
 {/*@bgen(jjtree) incompl_location */
         try {
 /*@egen*/
-	"AT" "%" ("I" | "Q" | "M") "*"/*@bgen(jjtree)*/
+	("AT%I" | "AT%Q" | "AT%M") "*"/*@bgen(jjtree)*/
         } finally {
           if (jjtc000) {
             jjtree.closeNodeScope(jjtn000, true);
