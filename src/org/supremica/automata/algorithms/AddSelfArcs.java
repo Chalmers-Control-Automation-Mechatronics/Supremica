@@ -170,7 +170,8 @@ public class AddSelfArcs
 		while (eventIt.hasNext())
 		{
 			LabeledEvent currEvent = (LabeledEvent) eventIt.next();
-			Arc currArc = new Arc(currState, currState, currEvent.getId());
+			// Arc currArc = new Arc(currState, currState, currEvent.getId());
+			Arc currArc = new Arc(currState, currState, currEvent);
 
 			theAutomaton.addArc(currArc);
 		}
@@ -220,7 +221,8 @@ public class AddSelfArcs
 		while (eventIt.hasNext())
 		{
 			LabeledEvent currEvent = (LabeledEvent) eventIt.next();
-			Arc currArc = new Arc(currState, currState, currEvent.getId());
+			// Arc currArc = new Arc(currState, currState, currEvent.getId());
+			Arc currArc = new Arc(currState, currState, currEvent);
 
 			theAutomaton.addArc(currArc);
 		}

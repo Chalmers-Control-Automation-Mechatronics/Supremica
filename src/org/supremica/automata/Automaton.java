@@ -116,7 +116,6 @@ public class Automaton
 
 		// Create all states
 		Iterator states = orgAut.stateIterator();
-
 		while (states.hasNext())
 		{
 			State orgState = (State) states.next();
@@ -127,7 +126,6 @@ public class Automaton
 
 		try
 		{
-
 			// Create all transitions
 			states = orgAut.stateIterator();
 
@@ -141,9 +139,13 @@ public class Automaton
 				{
 					Arc orgArc = (Arc) outgoingArcs.next();
 					State orgDestState = orgArc.getToState();
-					LabeledEvent currEvent = orgAlphabet.getEventWithId(orgArc.getEventId());
 					State newDestState = getStateWithId(orgDestState.getId());
-					Arc newArc = new Arc(newSourceState, newDestState, currEvent.getId());
+					
+					LabeledEvent currEvent = newAlphabet.getEventWithId(orgArc.getEventId());
+					// LabeledEvent currEvent = orgAlphabet.getEventWithId(orgArc.getEventId());
+					
+					Arc newArc = new Arc(newSourceState, newDestState, currEvent);
+					// Arc newArc = new Arc(newSourceState, newDestState, currEvent.getId());
 
 					addArc(newArc);
 				}
@@ -431,7 +433,7 @@ public class Automaton
 
 	// used by automata/algorithms/ProjectBuildFromXml.java
 	// used by automata/algorithms/AutomataBuildFromVALID.java
-	public State getStateWithId(String id)
+	private State getStateWithId(String id)
 	{
 		return (State) idStateMap.get(id);
 	}

@@ -99,16 +99,24 @@ class Philosopher
 
 		// And finally the arcs - first the left side (where the left is picked up
 		// and put down first)
-		philo.addArc(new Arc(states[INIT], states[L_UP], events[L_TAKE].getId()));
-		philo.addArc(new Arc(states[L_UP], states[EAT], events[R_TAKE].getId()));
-		philo.addArc(new Arc(states[EAT], states[L_DN], events[L_PUT].getId()));
-		philo.addArc(new Arc(states[L_DN], states[INIT], events[R_PUT].getId()));
+//		philo.addArc(new Arc(states[INIT], states[L_UP], events[L_TAKE].getId()));
+//		philo.addArc(new Arc(states[L_UP], states[EAT], events[R_TAKE].getId()));
+//		philo.addArc(new Arc(states[EAT], states[L_DN], events[L_PUT].getId()));
+//		philo.addArc(new Arc(states[L_DN], states[INIT], events[R_PUT].getId()));
+		philo.addArc(new Arc(states[INIT], states[L_UP], events[L_TAKE]));
+		philo.addArc(new Arc(states[L_UP], states[EAT], events[R_TAKE]));
+		philo.addArc(new Arc(states[EAT], states[L_DN], events[L_PUT]));
+		philo.addArc(new Arc(states[L_DN], states[INIT], events[R_PUT]));
 
 		// And then the right side (where th eright fork is picked up and put down first)
-		philo.addArc(new Arc(states[INIT], states[R_UP], events[R_TAKE].getId()));
-		philo.addArc(new Arc(states[R_UP], states[EAT], events[L_TAKE].getId()));
-		philo.addArc(new Arc(states[EAT], states[R_DN], events[R_PUT].getId()));
-		philo.addArc(new Arc(states[R_DN], states[INIT], events[L_PUT].getId()));
+//		philo.addArc(new Arc(states[INIT], states[R_UP], events[R_TAKE].getId()));
+//		philo.addArc(new Arc(states[R_UP], states[EAT], events[L_TAKE].getId()));
+//		philo.addArc(new Arc(states[EAT], states[R_DN], events[R_PUT].getId()));
+//		philo.addArc(new Arc(states[R_DN], states[INIT], events[L_PUT].getId()));
+		philo.addArc(new Arc(states[INIT], states[R_UP], events[R_TAKE]));
+		philo.addArc(new Arc(states[R_UP], states[EAT], events[L_TAKE]));
+		philo.addArc(new Arc(states[EAT], states[R_DN], events[R_PUT]));
+		philo.addArc(new Arc(states[R_DN], states[INIT], events[L_PUT]));
 
 		inited = true;
 	}
@@ -233,17 +241,26 @@ class EatingPhilosopher
 
 		// And finally the arcs - first the left side (where the left is picked up
 		// and put down first)
-		philo.addArc(new Arc(states[INIT], states[L_UP], events[L_TAKE].getId()));
-		philo.addArc(new Arc(states[L_UP], states[EAT], events[R_TAKE].getId()));
-		philo.addArc(new Arc(states[EAT], states[EAT2], events[START_EATING].getId()));
-		philo.addArc(new Arc(states[EAT2], states[L_DN], events[L_PUT].getId()));
-		philo.addArc(new Arc(states[L_DN], states[INIT], events[R_PUT].getId()));
+//		philo.addArc(new Arc(states[INIT], states[L_UP], events[L_TAKE].getId()));
+//		philo.addArc(new Arc(states[L_UP], states[EAT], events[R_TAKE].getId()));
+//		philo.addArc(new Arc(states[EAT], states[EAT2], events[START_EATING].getId()));
+//		philo.addArc(new Arc(states[EAT2], states[L_DN], events[L_PUT].getId()));
+//		philo.addArc(new Arc(states[L_DN], states[INIT], events[R_PUT].getId()));
+		philo.addArc(new Arc(states[INIT], states[L_UP], events[L_TAKE]));
+		philo.addArc(new Arc(states[L_UP], states[EAT], events[R_TAKE]));
+		philo.addArc(new Arc(states[EAT], states[EAT2], events[START_EATING]));
+		philo.addArc(new Arc(states[EAT2], states[L_DN], events[L_PUT]));
+		philo.addArc(new Arc(states[L_DN], states[INIT], events[R_PUT]));
 
-		// And then the right side (where th eright fork is picked up and put down first)
-		philo.addArc(new Arc(states[INIT], states[R_UP], events[R_TAKE].getId()));
-		philo.addArc(new Arc(states[R_UP], states[EAT], events[L_TAKE].getId()));
-		philo.addArc(new Arc(states[EAT2], states[R_DN], events[R_PUT].getId()));
-		philo.addArc(new Arc(states[R_DN], states[INIT], events[L_PUT].getId()));
+		// And then the right side (where the right fork is picked up and put down first)
+//		philo.addArc(new Arc(states[INIT], states[R_UP], events[R_TAKE].getId()));
+//		philo.addArc(new Arc(states[R_UP], states[EAT], events[L_TAKE].getId()));
+//		philo.addArc(new Arc(states[EAT2], states[R_DN], events[R_PUT].getId()));
+//		philo.addArc(new Arc(states[R_DN], states[INIT], events[L_PUT].getId()));
+		philo.addArc(new Arc(states[INIT], states[R_UP], events[R_TAKE]));
+		philo.addArc(new Arc(states[R_UP], states[EAT], events[L_TAKE]));
+		philo.addArc(new Arc(states[EAT2], states[R_DN], events[R_PUT]));
+		philo.addArc(new Arc(states[R_DN], states[INIT], events[L_PUT]));
 
 		inited = true;
 	}
@@ -330,10 +347,14 @@ class Chopstick
 		}
 
 		// And finally the arcs - there's four of them
-		fork.addArc(new Arc(states[0], states[1], events[0].getId()));
-		fork.addArc(new Arc(states[0], states[1], events[1].getId()));
-		fork.addArc(new Arc(states[1], states[0], events[2].getId()));
-		fork.addArc(new Arc(states[1], states[0], events[3].getId()));
+//		fork.addArc(new Arc(states[0], states[1], events[0].getId()));
+//		fork.addArc(new Arc(states[0], states[1], events[1].getId()));
+//		fork.addArc(new Arc(states[1], states[0], events[2].getId()));
+//		fork.addArc(new Arc(states[1], states[0], events[3].getId()));
+		fork.addArc(new Arc(states[0], states[1], events[0]));
+		fork.addArc(new Arc(states[0], states[1], events[1]));
+		fork.addArc(new Arc(states[1], states[0], events[2]));
+		fork.addArc(new Arc(states[1], states[0], events[3]));
 
 		inited = true;
 	}

@@ -33,8 +33,10 @@ class BrickBuilder
 
 		automaton.getAlphabet().addEvent(src_dst);
 		automaton.getAlphabet().addEvent(dst_src);
-		automaton.addArc(new Arc(source, dest, src_dst.getLabel()));
-		automaton.addArc(new Arc(dest, source, dst_src.getLabel()));
+//		automaton.addArc(new Arc(source, dest, src_dst.getLabel()));
+//		automaton.addArc(new Arc(dest, source, dst_src.getLabel()));
+		automaton.addArc(new Arc(source, dest, src_dst));
+		automaton.addArc(new Arc(dest, source, dst_src));
 	}
 
 	private void addDown(int r, int c, int num, boolean reverse)
@@ -51,8 +53,10 @@ class BrickBuilder
 
 		automaton.getAlphabet().addEvent(src_dst);
 		automaton.getAlphabet().addEvent(dst_src);
-		automaton.addArc(new Arc(source, dest, src_dst.getLabel()));
-		automaton.addArc(new Arc(dest, source, dst_src.getLabel()));
+//		automaton.addArc(new Arc(source, dest, src_dst.getLabel()));
+//		automaton.addArc(new Arc(dest, source, dst_src.getLabel()));
+		automaton.addArc(new Arc(source, dest, src_dst));
+		automaton.addArc(new Arc(dest, source, dst_src));
 	}
 
 	public BrickBuilder(final int r, final int c)

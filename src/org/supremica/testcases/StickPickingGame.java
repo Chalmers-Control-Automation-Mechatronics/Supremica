@@ -69,9 +69,12 @@ class Sticks
 			getAlphabet().addEvent(pe.a2);
 			getAlphabet().addEvent(pe.a3);
 
-			addArc(new Arc(s0, s1, pe.a1.getId()));
-			addArc(new Arc(s0, s2, pe.a2.getId()));
-			addArc(new Arc(s0, s3, pe.a3.getId()));
+//			addArc(new Arc(s0, s1, pe.a1.getId()));
+//			addArc(new Arc(s0, s2, pe.a2.getId()));
+//			addArc(new Arc(s0, s3, pe.a3.getId()));
+			addArc(new Arc(s0, s1, pe.a1));
+			addArc(new Arc(s0, s2, pe.a2));
+			addArc(new Arc(s0, s3, pe.a3));
 
 			for(int i = 1; i < num-2; ++i)
 			{
@@ -79,20 +82,26 @@ class Sticks
 				s1 = s2;
 				s2 = s3;
 				s3 = sticks[i+3];
-				addArc(new Arc(s0, s1, pe.a1.getId()));
-				addArc(new Arc(s0, s2, pe.a2.getId()));
-				addArc(new Arc(s0, s3, pe.a3.getId()));
+//				addArc(new Arc(s0, s1, pe.a1.getId()));
+//				addArc(new Arc(s0, s2, pe.a2.getId()));
+//				addArc(new Arc(s0, s3, pe.a3.getId()));
+				addArc(new Arc(s0, s1, pe.a1));
+				addArc(new Arc(s0, s2, pe.a2));
+				addArc(new Arc(s0, s3, pe.a3));
 			}
 
 			s0 = s1;
 			s1 = s2;
 			s2 = s3; // sticks[num-1];
-			addArc(new Arc(s0, s1, pe.a1.getId()));
-			addArc(new Arc(s0, s2, pe.a2.getId()));
+//			addArc(new Arc(s0, s1, pe.a1.getId()));
+//			addArc(new Arc(s0, s2, pe.a2.getId()));
+			addArc(new Arc(s0, s1, pe.a1));
+			addArc(new Arc(s0, s2, pe.a2));
 
 			s0 = s1;
 			s1 = s2;
-			addArc(new Arc(s0, s1, pe.a1.getId()));
+//			addArc(new Arc(s0, s1, pe.a1.getId()));
+			addArc(new Arc(s0, s1, pe.a1));
 		}
 
 
@@ -131,10 +140,12 @@ class Players
 			State to = players[i+1];	// ...to this one
 			addState(to);
 
-			addArc(new Arc(from, to, pe.a1.getId()));
-			addArc(new Arc(from, to, pe.a2.getId()));
-			addArc(new Arc(from, to, pe.a3.getId()));
-
+//			addArc(new Arc(from, to, pe.a1.getId()));
+//			addArc(new Arc(from, to, pe.a2.getId()));
+//			addArc(new Arc(from, to, pe.a3.getId()));
+			addArc(new Arc(from, to, pe.a1));
+			addArc(new Arc(from, to, pe.a2));
+			addArc(new Arc(from, to, pe.a3));
 		}
 
 		// finally, add the last to first player arcs
@@ -146,9 +157,12 @@ class Players
 		State from = players[num-1];	// from this guy...
 		State to = players[0];	// ...to this one
 
-		addArc(new Arc(from, to, pe.a1.getId()));
-		addArc(new Arc(from, to, pe.a2.getId()));
-		addArc(new Arc(from, to, pe.a3.getId()));
+//		addArc(new Arc(from, to, pe.a1.getId()));
+//		addArc(new Arc(from, to, pe.a2.getId()));
+//		addArc(new Arc(from, to, pe.a3.getId()));
+		addArc(new Arc(from, to, pe.a1));
+		addArc(new Arc(from, to, pe.a2));
+		addArc(new Arc(from, to, pe.a3));
 
 		players = null; // done with the cache
 	}

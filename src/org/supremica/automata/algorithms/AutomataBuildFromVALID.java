@@ -65,6 +65,10 @@ public class AutomataBuildFromVALID
 	private SAXBuilder docBuilder;
 	private String filePath;
 
+	// mappings between id and state/event
+	private Map idStateMap = new HashMap();
+	private Map idEventMap = new HashMap();
+	
 	public AutomataBuildFromVALID(ProjectFactory theProjectFactory)
 	{
 		this.theProjectFactory = theProjectFactory;
@@ -355,10 +359,14 @@ public class AutomataBuildFromVALID
 
 			element = (Element) i.next();
 
-			currEvent.setId(element.getAttributeValue("name"));
-			currEvent.setLabel(element.getAttributeValue("name"));
+			String eventId = element.getAttributeValue("name");
+			currEvent.setId(eventId);
+			currEvent.setLabel(eventId);
 			currEvent.setControllable(element.getAttributeValue("controllable").equals("1"));
 			currEvent.setPrioritized(true);
+			
+			idEventMap.put(eventId, currEvent);
+			
 			currAlphabet.addEvent(currEvent);
 		}
 
@@ -375,10 +383,14 @@ public class AutomataBuildFromVALID
 
 			element = (Element) i.next();
 
-			currState.setId(element.getChild("label").getAttributeValue("name"));
-			currState.setName(element.getChild("label").getAttributeValue("name"));
+			String stateId = element.getChild("label").getAttributeValue("name");
+			currState.setId(stateId);
+			currState.setName(stateId);	// id and name, always the same
 			currState.setInitial(element.getAttributeValue("initial").equals("1"));
 			currState.setAccepting(element.getAttributeValue("marked").equals("1"));
+			
+			idStateMap.put(stateId, currState);
+			
 			currAutomaton.addState(currState);
 		}
 
@@ -389,9 +401,9 @@ public class AutomataBuildFromVALID
 
 		while (i.hasNext())
 		{
-			State sourceState = new State();
-			State destState = new State();
-			String event = "";
+			// State sourceState = null; // new State();
+			State destState = null; // new State();
+			// String event = "";
 
 			element = (Element) i.next();
 
@@ -408,11 +420,13 @@ public class AutomataBuildFromVALID
 			// Self loops
 			if (element.getAttributeValue("isLoop").equals("1"))
 			{
-				destState = currAutomaton.getStateWithId(element.getChild("source").getAttributeValue("name"));
+				destState = (State)idStateMap.get(element.getChild("source").getAttributeValue("name"));
+				// destState = currAutomaton.getStateWithId(element.getChild("source").getAttributeValue("name"));
 			}
 			else
 			{
-				destState = currAutomaton.getStateWithId(element.getChild("target").getAttributeValue("name"));
+				destState = (State)idStateMap.get(element.getChild("target").getAttributeValue("name"));
+				// destState = currAutomaton.getStateWithId(element.getChild("target").getAttributeValue("name"));
 			}
 
 			eventList = element.getChild("labelGroup").getChildren("label");
@@ -422,14 +436,17 @@ public class AutomataBuildFromVALID
 			while (j.hasNext())
 			{
 				element = (Element) j.next();
-				event = element.getAttributeValue("name");
-
+				String eventId = element.getAttributeValue("name");
+				LabeledEvent event = (LabeledEvent)idEventMap.get(eventId);
+				
 				Iterator k = stateList.iterator();
 
 				while (k.hasNext())
 				{
 					element = (Element) k.next();
-					sourceState = currAutomaton.getStateWithId(element.getAttributeValue("name"));
+					
+					State sourceState = (State)idStateMap.get(element.getAttributeValue("name"));
+					// sourceState = currAutomaton.getStateWithId(element.getAttributeValue("name"));
 
 					currAutomaton.addArc(new Arc(sourceState, destState, event));
 				}

@@ -69,6 +69,10 @@ public class AutomataToXml
 	private final static int majorFileVersion = 0;
 	private final static int minorFileVersion = 9;
 
+	// mappings between state/event and id
+	private Map stateIdMap = new HashMap();
+	private Map eventIdMap = new HashMap();
+
 	public AutomataToXml(Automata automata)
 	{
 		this.automata = automata;
@@ -116,14 +120,18 @@ public class AutomataToXml
 			// Print all events
 			pw.println("\t<Events>");
 
+			int eventId = 0;
+			
 			Iterator eventIt = aut.eventIterator();
-
 			while (eventIt.hasNext())
 			{
 				LabeledEvent event = (LabeledEvent) eventIt.next();
-
-				pw.print("\t\t<Event id=\"" + normalize(event.getId()) + "\" label=\"" + normalize(event.getLabel()) + "\"");
-
+				eventIdMap.put(event, new Integer(eventId));
+				pw.print("\t\t<Event id=\"" + eventId + "\" label=\"" + normalize(event.getLabel()) + "\"");
+				eventId++;
+				//--
+				// pw.print("\t\t<Event id=\"" + normalize(event.getId()) + "\" label=\"" + normalize(event.getLabel()) + "\"");
+				//--
 				if (!event.isControllable())
 				{
 					pw.print(" controllable=\"false\"");
@@ -152,19 +160,25 @@ public class AutomataToXml
 			// Print all states
 			pw.println("\t<States>");
 
+			int stateId = 0; // we need to make up ids
+			
 			Iterator stateIt = aut.stateIterator();
-
 			while (stateIt.hasNext())
 			{
 				State state = (State) stateIt.next();
-
-				pw.print("\t\t<State id=\"" + normalize(state.getId()) + "\"");
-
-				if (!state.getId().equals(state.getName()))
-				{
-					pw.print(" name=\"" + normalize(state.getName()) + "\"");
-				}
-
+				stateIdMap.put(state, new Integer(stateId)); // The arc must be able to find it fast
+				pw.print("\t\t<State id=\"" + stateId + "\""); // no longer need to normalize
+				stateId++;
+				//--
+				// pw.print("\t\t<State id=\"" + normalize(state.getId()) + "\"");
+				//--
+				pw.print(" name=\"" + normalize(state.getName()) + "\""); // always print the name
+				//--
+				// if (!state.getId().equals(state.getName()))
+				// {
+				// 	pw.print(" name=\"" + normalize(state.getName()) + "\"");
+				// }
+				//--
 				if (state.isInitial())
 				{
 					pw.print(" initial=\"true\"");
@@ -209,16 +223,24 @@ public class AutomataToXml
 			while (stateIt.hasNext())
 			{
 				State sourceState = (State) stateIt.next();
+				Object sourceId = stateIdMap.get(sourceState);
+				
 				Iterator outgoingArcsIt = sourceState.outgoingArcsIterator();
-
 				while (outgoingArcsIt.hasNext())
 				{
 					Arc arc = (Arc) outgoingArcsIt.next();
 					State destState = arc.getToState();
-
-					pw.print("\t\t<Transition source=\"" + normalize(sourceState.getId()));
-					pw.print("\" dest=\"" + normalize(destState.getId()));
-					pw.println("\" event=\"" + normalize(arc.getEventId()) + "\"/>");
+					Object destId = stateIdMap.get(destState);
+					LabeledEvent event = arc.getEvent();
+					Object eventID = eventIdMap.get(event);
+					pw.print("\t\t<Transition source=\"" + sourceId);
+					pw.print("\" dest=\"" + destId);
+					pw.println("\" event=\"" + eventID + "\"/>");
+					//--
+					// pw.print("\t\t<Transition source=\"" + normalize(sourceState.getId()));
+					// pw.print("\" dest=\"" + normalize(destState.getId()));
+					// pw.println("\" event=\"" + normalize(arc.getEventId()) + "\"/>");
+					//--
 				}
 			}
 

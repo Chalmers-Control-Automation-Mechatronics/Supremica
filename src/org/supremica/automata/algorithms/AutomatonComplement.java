@@ -111,7 +111,8 @@ public class AutomatonComplement
 					{
 						dumpState = theAutomaton.createAndAddUniqueState("dump");
 					}
-					theAutomaton.addArc(new Arc(currState, dumpState, currEvent.getId()));
+					// theAutomaton.addArc(new Arc(currState, dumpState, currEvent.getId()));
+					theAutomaton.addArc(new Arc(currState, dumpState, currEvent));
 				}
 			}
 		}
@@ -125,7 +126,8 @@ public class AutomatonComplement
 
 			while (eventIterator.hasNext())
 			{
-				theAutomaton.addArc(new Arc(dumpState, dumpState, ((LabeledEvent) eventIterator.next()).getId()));
+				// theAutomaton.addArc(new Arc(dumpState, dumpState, ((LabeledEvent) eventIterator.next()).getId()));
+				theAutomaton.addArc(new Arc(dumpState, dumpState, ((LabeledEvent) eventIterator.next())));
 			}
 		}
 

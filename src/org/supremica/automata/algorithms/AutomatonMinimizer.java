@@ -219,11 +219,13 @@ public class AutomatonMinimizer
 			while (outgoingArcsIt.hasNext())
 			{
 				Arc currArc = (Arc) outgoingArcsIt.next();
-				String currEventId = currArc.getEventId();
+				// String currEventId = currArc.getEventId();
+				LabeledEvent currEvent = currArc.getEvent();
 				State oldToState = currArc.getToState();
 				EquivalenceClass nextEquivalenceClass = (EquivalenceClass) oldToState.getStateClass(); // getEquivalenceClass();
 				State toState = nextEquivalenceClass.getState(newAutomaton);
-				Arc newArc = new Arc(fromState, toState, currEventId);
+				// Arc newArc = new Arc(fromState, toState, currEventId);
+				Arc newArc = new Arc(fromState, toState, currEvent);
 
 				newAutomaton.addArc(newArc);
 			}

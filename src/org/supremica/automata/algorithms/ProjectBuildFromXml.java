@@ -115,6 +115,10 @@ public class ProjectBuildFromXml
 	private InputProtocol inputProtocol = InputProtocol.UnknownProtocol;
 	private File thisFile = null;
 
+	// mappings between id and state/event
+	private Map idStateMap = new HashMap();
+	private Map idEventMap = new HashMap();
+
 	public ProjectBuildFromXml(ProjectFactory theProjectFactory)
 	{
 		this.theProjectFactory = theProjectFactory;
@@ -409,6 +413,9 @@ public class ProjectBuildFromXml
 		currEvent.setPrioritized(prioritized);
 		currEvent.setImmediate(immediate);
 
+		// Associate the id with the event
+		idEventMap.put(id, currEvent);
+		
 		try
 		{
 			currAlphabet.addEvent(currEvent);
@@ -473,52 +480,58 @@ public class ProjectBuildFromXml
 		currState.setInitial(initial);
 		currState.setAccepting(accepting);
 		currState.setForbidden(forbidden);
+		
+		// Associate the id with the state
+		idStateMap.put(id, currState);
+		
 		currAutomaton.addState(currState);
 	}
 
 	public final void doTransition(Attributes attributes)
 		throws SAXException
 	{
-		String source = attributes.getValue("source");
-
-		if (source == null)
+		// Transition ::source
+		String sourceId = attributes.getValue("source");
+		if (sourceId == null)
 		{
 			throwException("source attribute is missing");
 		}
-
-		String dest = attributes.getValue("dest");
-
-		if (dest == null)
+		// Get the state corresponding to this id
+		State sourceState = (State)idStateMap.get(sourceId);
+		// State sourceState = currAutomaton.getStateWithId(sourceId);
+		if (sourceState == null)
+		{
+			throwException("Cannot find source state: " + sourceId);
+		}
+		// Transition::dest
+		String destId = attributes.getValue("dest");
+		if (destId == null)
 		{
 			throwException("dest attribute is missing");
 		}
-
-		String event = attributes.getValue("event");
-
-		if (event == null)
+		// Get the state corresponding to this id
+		State destState = (State)idStateMap.get(destId);
+		// State destState = currAutomaton.getStateWithId(destId);
+		if (destState == null)
+		{
+			throwException("Cannot find dest state: " + destId);
+		}
+		// Transition::event
+		String eventId = attributes.getValue("event");
+		if (eventId == null)
 		{
 			throwException("event attribute is missing");
 		}
+		// Get the event corresponding to this id
+		LabeledEvent event = (LabeledEvent)idEventMap.get(eventId);
+		// Create and add the arc
+		Arc arc = new Arc(sourceState, destState, event);
 
-		State sourceState = currAutomaton.getStateWithId(source);
-
-		if (sourceState == null)
-		{
-			throwException("Cannot find source state: " + source);
-		}
-
-		State destState = currAutomaton.getStateWithId(dest);
-
-		if (destState == null)
-		{
-			throwException("Cannot find dest state: " + dest);
-		}
-
-		Arc a = new Arc(sourceState, destState, event);
+		// Arc arc = new Arc(sourceState, destState, eventId);
 
 		try
 		{
-			currAutomaton.addArc(a);
+			currAutomaton.addArc(arc);
 		}
 		catch (Exception ex)
 		{
@@ -621,7 +634,8 @@ public class ProjectBuildFromXml
 			throwException("id attribute is missing");
 		}
 
-		State currState = currAutomaton.getStateWithId(id);
+		State currState = (State)idStateMap.get(id);
+		// State currState = currAutomaton.getStateWithId(id);
 
 		if (currState == null)
 		{

@@ -43,9 +43,13 @@ class User
 		addState(usin);
 
 		// and finally the transitions
-		addArc(new Arc(init, requ, ai.getId()));
-		addArc(new Arc(requ, usin, bi.getId()));
-		addArc(new Arc(usin, init, ci.getId()));
+//		addArc(new Arc(init, requ, ai.getId()));
+//		addArc(new Arc(requ, usin, bi.getId()));
+//		addArc(new Arc(usin, init, ci.getId()));
+		addArc(new Arc(init, requ, ai));
+		addArc(new Arc(requ, usin, bi));
+		addArc(new Arc(usin, init, ci));
+
 
 		// done!
 	}
@@ -91,14 +95,22 @@ class Fifo
 		addState(q4);
 
 		// and add transitions
-		addArc(new Arc(q0, q1, a1.getId()));
-		addArc(new Arc(q0, q2, a2.getId()));
-		addArc(new Arc(q1, q3, a2.getId()));
-		addArc(new Arc(q1, q0, b1.getId()));
-		addArc(new Arc(q2, q4, a1.getId()));
-		addArc(new Arc(q2, q0, b2.getId()));
-		addArc(new Arc(q3, q2, b1.getId()));
-		addArc(new Arc(q4, q1, b2.getId()));
+//		addArc(new Arc(q0, q1, a1.getId()));
+//		addArc(new Arc(q0, q2, a2.getId()));
+//		addArc(new Arc(q1, q3, a2.getId()));
+//		addArc(new Arc(q1, q0, b1.getId()));
+//		addArc(new Arc(q2, q4, a1.getId()));
+//		addArc(new Arc(q2, q0, b2.getId()));
+//		addArc(new Arc(q3, q2, b1.getId()));
+//		addArc(new Arc(q4, q1, b2.getId()));
+		addArc(new Arc(q0, q1, a1));
+		addArc(new Arc(q0, q2, a2));
+		addArc(new Arc(q1, q3, a2));
+		addArc(new Arc(q1, q0, b1));
+		addArc(new Arc(q2, q4, a1));
+		addArc(new Arc(q2, q0, b2));
+		addArc(new Arc(q3, q2, b1));
+		addArc(new Arc(q4, q1, b2));
 	}
 }
 
@@ -138,10 +150,14 @@ class Mutex
 		addState(z);
 
 		// and add transitions
-		addArc(new Arc(x, z, b2.getId()));
-		addArc(new Arc(x, y, b1.getId()));
-		addArc(new Arc(z, x, c2.getId()));
-		addArc(new Arc(y, x, c1.getId()));
+//		addArc(new Arc(x, z, b2.getId()));
+//		addArc(new Arc(x, y, b1.getId()));
+//		addArc(new Arc(z, x, c2.getId()));
+//		addArc(new Arc(y, x, c1.getId()));
+		addArc(new Arc(x, z, b2));
+		addArc(new Arc(x, y, b1));
+		addArc(new Arc(z, x, c2));
+		addArc(new Arc(y, x, c1));
 	}
 }
 

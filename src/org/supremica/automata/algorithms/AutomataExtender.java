@@ -101,10 +101,12 @@ public class AutomataExtender
 		Alphabet orgAlphabet = orgAut.getAlphabet();
 		Alphabet newAlphabet = new Alphabet(orgAlphabet);
 		String passEventId = orgAlphabet.getUniqueId(newAut.getName());
+		LabeledEvent passEvent = new LabeledEvent("pass", passEventId);
+		newAlphabet.addEvent(passEvent);
 
 		if (mode == MODE_REMOVE_UNCON_TOP_EVENTS)
 		{
-			LabeledEvent passEvent = new LabeledEvent("pass");
+			// LabeledEvent passEvent = new LabeledEvent("pass");
 
 			passEvent.setControllable(true);
 			passEvent.setId(passEventId);
@@ -203,7 +205,9 @@ public class AutomataExtender
 				{
 					Arc orgArc = (Arc) outgoingArcs.next();
 					State orgDestState = orgArc.getToState();
-					LabeledEvent currEvent = orgAlphabet.getEventWithId(orgArc.getEventId());
+					// LabeledEvent currEvent = orgAlphabet.getEventWithId(orgArc.getEventId());
+					// BIG WARNING, Red Flag here, may be broken...
+					LabeledEvent currEvent = newAlphabet.getEventWithId(orgArc.getEventId());
 
 					if (i < k)
 					{
@@ -214,7 +218,8 @@ public class AutomataExtender
 
 							// Add an arc to the "first" copy of orgDestState
 							State newDestState = (State) ((ArrayList) stateMap.get(orgDestState)).get(0);
-							Arc newArc = new Arc(newSourceState, newDestState, currEvent.getId());
+							// Arc newArc = new Arc(newSourceState, newDestState, currEvent.getId());
+							Arc newArc = new Arc(newSourceState, newDestState, currEvent);
 
 							newAut.addArc(newArc);
 						}
@@ -223,7 +228,8 @@ public class AutomataExtender
 
 							// Add an arc to the i + 1 copy of orgDestState
 							State newDestState = (State) ((ArrayList) stateMap.get(orgDestState)).get(i + 1);
-							Arc newArc = new Arc(newSourceState, newDestState, currEvent.getId());
+							// Arc newArc = new Arc(newSourceState, newDestState, currEvent.getId());
+							Arc newArc = new Arc(newSourceState, newDestState, currEvent);
 
 							newAut.addArc(newArc);
 						}
@@ -237,7 +243,8 @@ public class AutomataExtender
 
 							// Add an arc to the "first" copy of orgDestState
 							State newDestState = (State) ((ArrayList) stateMap.get(orgDestState)).get(0);
-							Arc newArc = new Arc(newSourceState, newDestState, currEvent.getId());
+							// Arc newArc = new Arc(newSourceState, newDestState, currEvent.getId());
+							Arc newArc = new Arc(newSourceState, newDestState, currEvent);
 
 							newAut.addArc(newArc);
 						}
@@ -247,7 +254,12 @@ public class AutomataExtender
 							if (!currEvent.isControllable())
 							{
 								State newDestState = (State) ((ArrayList) stateMap.get(orgDestState)).get(k);
-								Arc newArc = new Arc(newSourceState, newDestState, currEvent.getId() + "_c");
+								// Arc newArc = new Arc(newSourceState, newDestState, currEvent.getId() + "_c");
+								// WARNING Red Flag, may be broken...
+								// Do we know this event id (currEvent.getId() + "_c") exists? What if not?
+								// It does, it was created above and added to newAlphabet
+								LabeledEvent cEvent = newAlphabet.getEventWithId(currEvent.getId() + "_c");
+								Arc newArc = new Arc(newSourceState, newDestState, cEvent);
 
 								newAut.addArc(newArc);
 							}
@@ -263,7 +275,9 @@ public class AutomataExtender
 					if (i == nbrOfStateCopies - 1)
 					{
 						State newDestState = (State) newStates.get(i - 1);
-						Arc newArc = new Arc(newSourceState, newDestState, passEventId);
+						// Arc newArc = new Arc(newSourceState, newDestState, passEventId);
+						// WARNING, Red Flag, may be broken...
+						Arc newArc = new Arc(newSourceState, newDestState, passEvent);
 
 						newAut.addArc(newArc);
 					}

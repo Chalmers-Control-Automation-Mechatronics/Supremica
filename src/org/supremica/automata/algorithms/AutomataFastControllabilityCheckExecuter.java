@@ -455,7 +455,8 @@ public final class AutomataFastControllabilityCheckExecuter
 						{
 							State nextState = theAutomaton.getStateWithIndex(nextIndex);
 							LabeledEvent theEvent = theAlphabet.getEventWithIndex(currEventIndex);
-							Arc newArc = new Arc(thisState, nextState, theEvent.getId());
+							// Arc newArc = new Arc(thisState, nextState, theEvent.getId());
+							Arc newArc = new Arc(thisState, nextState, theEvent);
 
 							theAutomaton.addArc(newArc);
 						}

@@ -104,7 +104,9 @@ public class RemovePassEvent
 						if (!nextEvent.isControllable())
 						{
 							State nextToState = nextArc.getToState();
-							Arc newArc = new Arc(currState, nextToState, nextEventId);
+							// Arc newArc = new Arc(currState, nextToState, nextEventId);
+							// WARNING, Red Flag, may be broken...
+							Arc newArc = new Arc(currState, nextToState, nextEvent);
 						}
 					}
 
