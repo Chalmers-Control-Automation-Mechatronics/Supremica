@@ -96,6 +96,11 @@ public class ArcSet
 		theArcs.remove(theArc);
 	}
 
+	public Arc removeArc()
+	{
+		return (Arc) theArcs.remove(0);
+	}
+
 	public void clear()
 	{
 		theArcs.clear();

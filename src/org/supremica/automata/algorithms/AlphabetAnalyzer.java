@@ -286,18 +286,21 @@ public class AlphabetAnalyzer
 
 		if ((nbrOnlyLeft == 0) && (nbrOnlyRight == 0))
 		{
-			logger.info("Alphabet: " + leftAut.getName() + " == " + rightAut.getName() + " new unsych: " + newUnique);
+			logger.info("Alphabet: " + leftAut.getName() + " == " + 
+						rightAut.getName() + " new unsych: " + newUnique);
 		}
 		else
 		{
 			if (nbrOnlyLeft == 0)
 			{
-				logger.info("Alphabet: " + leftAut.getName() + " <= " + rightAut.getName() + " new unsych: " + newUnique);
+				logger.info("Alphabet: " + leftAut.getName() + " <= " + 
+							rightAut.getName() + " new unsych: " + newUnique);
 			}
 
 			if (nbrOnlyRight == 0)
 			{
-				logger.info("Alphabet: " + rightAut.getName() + " <= " + leftAut.getName() + " new unsych: " + newUnique);
+				logger.info("Alphabet: " + rightAut.getName() + " <= " + 
+							leftAut.getName() + " new unsych: " + newUnique);
 			}
 		}
 

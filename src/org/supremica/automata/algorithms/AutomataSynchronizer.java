@@ -188,6 +188,20 @@ public class AutomataSynchronizer
 	}
 
 	/**
+	 * Standard method for synchronizing two automata with default options.
+	 * @returns Automaton object representing the synchronous composition.
+	 */
+	public static Automaton synchronizeAutomata(Automaton autA, Automaton autB)
+		throws Exception
+	{
+		Automata automata = new Automata();
+		automata.addAutomaton(autA);
+		automata.addAutomaton(autB);
+
+		return synchronizeAutomata(automata);
+	}
+
+	/**
 	 * Standard method for synchronizing automata with default options.
 	 * @returns Automaton object representing the synchronous composition.
 	 */

@@ -1337,6 +1337,14 @@ public class AutomataVerifier
 	private boolean monolithicNonblockingVerification()
 		throws Exception
 	{
+		// Maybe the system is monolithic already?
+		if (theAutomata.size()==1)
+		{
+			// No need to synchronize!
+			return moduleIsNonblocking(theAutomata.getFirstAutomaton());
+		}
+
+		// Otherwise we must synchronize...
 		synchHelper.addState(initialState);
 		synchHelper.setExhaustiveSearch(false);
 
@@ -1377,7 +1385,7 @@ public class AutomataVerifier
 			throw ex;
 		}
 
-		return moduleIsNonblocking(theAutomaton);
+		return moduleIsNonblocking(theAutomaton, true);
 	}
 
 	private boolean isIndividuallyNonBlocking()
@@ -1857,11 +1865,28 @@ public class AutomataVerifier
 	 */
 	private static boolean moduleIsNonblocking(Automaton theAutomaton)
 	{
-		Automaton theAutomatonCopy = new Automaton(theAutomaton);
+		return moduleIsNonblocking(theAutomaton, false);
+	}
+
+	/**
+	 * Examines non-blocking monolithically, by examining all reachable states.
+	 * Allows destructive verification (perhaps we don't need to make a copy)
+	 *
+	 *@return True if non-blocking, false if blocking
+	 *@exception  Exception Description of the Exception
+	 *@see AutomataSynchronizerExecuter
+	 */
+	private static boolean moduleIsNonblocking(Automaton theAutomaton, boolean destructive)
+	{
+		// Should we save the original by creating a copy that we can destroy?
+		if (!destructive)
+		{
+			theAutomaton = new Automaton(theAutomaton);
+		}
 
 		// Examine all states, starting from the marked ones and moving backwards...
 		LinkedList statesToExamine = new LinkedList();
-		Iterator stateIterator = theAutomatonCopy.stateIterator();
+		Iterator stateIterator = theAutomaton.stateIterator();
 		State currState;
 
 		// Add all marked states
@@ -1892,20 +1917,20 @@ public class AutomataVerifier
 				}
 			}
 
-			theAutomatonCopy.removeState(examinedState);
+			theAutomaton.removeState(examinedState);
 		}
 
-		stateIterator = theAutomatonCopy.stateIterator();
+		stateIterator = theAutomaton.stateIterator();
 
 		while (stateIterator.hasNext())
 		{
 			currState = (State) stateIterator.next();
 			logger.info("Blocking state: " + currState.getName());
 			// If we did a copy of theAutomata before we destroyed it we could display the trace...
-			// logger.info("Trace to blocking state: " + (theAutomatonCopy.getTrace(currState)).toString());
+			// logger.info("Trace to blocking state: " + (theAutomaton.getTrace(currState)).toString());
 		}
 
-		return theAutomatonCopy.nbrOfStates() == 0;
+		return theAutomaton.nbrOfStates() == 0;
 	}
 
 	/**

@@ -301,7 +301,7 @@ public class MutuallyNonblockingVerifier
 							" is mutually accepting from the first run.");
 			}
 
-			// As long as we haven't established mutual nonblocking, we loop infinitely...			
+			// As long as we haven't established mutual nonblocking, we loop...			
 			while (!ok)
 			{
 				if (stopRequested)
@@ -311,27 +311,6 @@ public class MutuallyNonblockingVerifier
 				Automaton interestingAutomaton = getInterestingAutomaton(currSynchAutomata, currSynchAutomaton);
 				if (interestingAutomaton == null)
 				{
-					/* // Test if it really is blocking...
-					try
-					{
-						if (!AutomataVerifier.verifyNonblocking(currSynchAutomaton))
-						{
-							logger.error("Ooook.");
-						}
-						else
-						{
-							logger.error("Baaad.");
-
-							Gui gui = ActionMan.getGui();
-							gui.getVisualProjectContainer().getActiveProject().addAutomaton(currSynchAutomaton);
-						}
-					}
-					catch (Exception tjong)
-					{
-						logger.error(tjong);
-					}
-					*/
-
 					if (verifyBlockingBySafeEvents(currSynchAutomaton, currSafeEvents))
 					{
 						logger.error("The automaton " + currAutomaton + " definitely has blocking states!");
@@ -365,7 +344,8 @@ public class MutuallyNonblockingVerifier
 					currSafeEvents.addEvents(alreadySafe);
 					
 					// Synchronize!
-					currSynchAutomaton = AutomataSynchronizer.synchronizeAutomata(currSynchAutomata);
+					// currSynchAutomaton = AutomataSynchronizer.synchronizeAutomata(currSynchAutomata);
+					currSynchAutomaton = AutomataSynchronizer.synchronizeAutomata(currSynchAutomaton, interestingAutomaton);
 				}
 				catch (Exception ex)
 				{
@@ -383,12 +363,20 @@ public class MutuallyNonblockingVerifier
 
 				// Are there apparent blocks in currSynchAutomaton? Maybe we can prove they're unreachable?
 				//languageInclusionTest(currSynchAutomaton);
+				/*
 				if (!AutomataVerifier.verifyNonblocking(currSynchAutomaton))
 				{
 					logger.fatal("There are apparent blocks!! This is a good time for language inclusion tests!");
 					count++;
 				}
+				*/
+
+				// How many unique events are there in currSynchAutomata?
+				Alphabet uniqueEvents = findUniqueEvents(currSynchAutomata, theAutomata);
 				
+				// Remove as many transitions of uniqueEvents as you dare...
+				count = count + removeUniqueEventTransitions(currSynchAutomaton, uniqueEvents);
+
 				/*
 				// Add automaton to gui
  				Gui gui = ActionMan.getGui();
@@ -421,6 +409,7 @@ public class MutuallyNonblockingVerifier
 				// Assuming the system is controllable, we can ignore all uncontrollable (forbidden) states!!
 				//ok = (currSynchAutomaton.nbrOfStates()-currSynchAutomaton.nbrOfForbiddenStates() == currSynchAutomaton.nbrOfMutuallyAcceptingNotForbiddenStates());
 
+				// Some statistics
 				logger.fatal("states: " + currSynchAutomaton.nbrOfStates() + " forb: " + 
 							 currSynchAutomaton.nbrOfForbiddenStates() + " mutnotforb: " + 
 							 currSynchAutomaton.nbrOfMutuallyAcceptingNotForbiddenStates() + " mut: " + 
@@ -487,8 +476,8 @@ public class MutuallyNonblockingVerifier
 		int bestValue = Integer.MAX_VALUE;
 		for (int i = 0; i < interestingEvents.size(); i++)
 		{
-			int index = i;
-			// int index = (int) Math.floor(Math.random() * interestingEvents.size());
+			// int index = i;
+			int index = (int) Math.floor(Math.random() * interestingEvents.size());
 
 			LabeledEvent currEvent = (LabeledEvent) interestingEvents.elementAt(index);
 			
@@ -657,6 +646,79 @@ public class MutuallyNonblockingVerifier
 					}
 				}
 			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * Removes as many as possible of the transitions with uniqueEvents, but avoids nondeterminism and
+	 * destroying the local stateset of the "first automaton"...
+	 *
+	 * @returns Amount of removed transitions
+	 */
+	private int removeUniqueEventTransitions(Automaton automaton, Alphabet alpha)
+	{
+		int nbrOfRemoved = 0;
+
+		// Loop over states
+		for (StateIterator stateIt = automaton.stateIterator(); stateIt.hasNext();)
+		{
+			State currState = stateIt.nextState();
+			ArcSet removeArcs = new ArcSet();
+			
+			// Loop over outgoing arcs
+			for (ArcIterator arcIt = currState.outgoingArcsIterator(); arcIt.hasNext();)
+			{
+				Arc currArc = arcIt.nextArc();
+				
+				// Selfloops can always be removed!
+				if (alpha.contains(currArc.getEvent()) && currArc.isSelfLoop())
+				{
+					removeArcs.addArc(currArc);
+				}
+			}
+			
+			// Remove arcs
+			for (int i=0; i<removeArcs.size(); i++)
+				//for (ArcIterator arcIt = removeArcs.iterator(); arcIt.hasNext();)
+			{
+				//automaton.removeArc(arcIt.nextArc());
+				automaton.removeArc(removeArcs.removeArc());
+				nbrOfRemoved++;
+			}
+		}
+		
+		return nbrOfRemoved;
+	}		
+
+	/**
+	 * Examines how many unique events there are in automataA compared to automataB
+	 */
+	private Alphabet findUniqueEvents(Automata automataA, Automata automataB)
+	{
+		Alphabet result = null;
+
+		// Make sure automataA is not included in automataB (which would make the test really stupid)
+		Automata automataBminusA = new Automata(automataB);
+		for(AutomatonIterator autIt = automataA.iterator(); autIt.hasNext();)
+		{
+			automataBminusA.removeAutomaton(autIt.nextAutomaton().getName());
+		}
+		
+		try
+		{
+			Alphabet alphabetA = AlphabetHelpers.getUnionAlphabet(automataA);
+			Alphabet alphabetB = AlphabetHelpers.getUnionAlphabet(automataBminusA);
+		
+			alphabetA.minus(alphabetB);
+			result = alphabetA;
+			
+			 logger.info(alphabetA);
+		}
+		catch (Exception oj)
+		{
+			logger.error(oj);
 		}
 
 		return result;

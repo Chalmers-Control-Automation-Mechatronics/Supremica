@@ -208,7 +208,8 @@ public class Alphabet
 
 		if(doThrow == true)
 		{
-			throw new RuntimeException("Alphabet.addEvent: An event with id \"" + event.getId() + "\" already exists");
+			throw new RuntimeException("Alphabet.addEvent: An event with id \"" + 
+									   event.getId() + "\" already exists");
 		}
 		else // doThrow == false => construct unique id, and add for real
 		{
@@ -243,7 +244,7 @@ public class Alphabet
 					removeEvent(currEvent.getLabel());
 				}
 				catch (Exception ex)
-				{    // This should be impossible
+				{   // This should be impossible
 					logger.error("Alphabet.minus. Trying to remove a non-existing event. " + ex);
 					logger.debug(ex.getStackTrace());
 				}
@@ -545,17 +546,18 @@ public class Alphabet
 	 */
 	public String toString()
 	{
-	/*	StringBuffer tmpBuf = new StringBuffer("Alphabet:\n   idMap: " + idMap + '\n');
-
-		tmpBuf.append(super.toString());
-
-		return tmpBuf.toString();
-	*/
+		/*	
+		  StringBuffer tmpBuf = new StringBuffer("Alphabet:\n   idMap: " + idMap + '\n');
+		  
+		  tmpBuf.append(super.toString());
+		  
+		  return tmpBuf.toString();
+		*/
 		StringBuffer buf = new StringBuffer("{");
 		for(Iterator it = iterator(); it.hasNext(); )
 		{
 			LabeledEvent ev = (LabeledEvent)it.next();
-			buf.append(ev.getLabel());
+			buf.append(ev);
 			if (it.hasNext())
 				buf.append(", ");
 		}

@@ -81,6 +81,7 @@ import org.supremica.automata.templates.*;
 import org.supremica.automata.algorithms.*;
 import org.supremica.automata.*;
 import org.supremica.gui.animators.scenebeans.*;
+import org.supremica.gui.animators.tsim.*;
 import org.supremica.gui.automataExplorer.AutomataExplorer;
 import org.supremica.gui.simulator.SimulatorExecuter;
 import org.supremica.external.robotCoordination.AutomataBuilder;
@@ -1747,7 +1748,6 @@ public class ActionMan
 		}
 	}
 
-
 	// Project.Simulator action performed
 	public static void simulator_actionPerformed(Gui gui)
 	{
@@ -2656,6 +2656,26 @@ public class ActionMan
 										  JOptionPane.ERROR_MESSAGE);
 		}
 	}
+
+	/**
+	 * Just a test... 
+	 */
+	/*
+	public static void trainSimulator(Gui gui)
+	{
+		Thread thread = new Thread(new Runnable()
+		{
+			public void run()
+			{
+				TrainSimulator trainSimulator = new TrainSimulator();
+				trainSimulator.exec();
+			}
+		});
+		thread.start();
+		//TrainSimulator trainSimulator = new TrainSimulator();
+		//trainSimulator.exec();
+	}
+	*/
 
 	public static void robotStudioOpenStation(Gui gui)
 	{
