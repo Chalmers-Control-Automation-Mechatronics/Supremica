@@ -1,11 +1,11 @@
 package org.supremica.external.robotCoordination;
 
-import org.supremica.external.comInterfaces.robotstudio_3_0.RobotStudio.*;
-import org.supremica.external.comInterfaces.robotstudio_3_0.RobotStudio.enum.RsKinematicRole;
+import org.supremica.external.comInterfaces.robotstudio_3_1.RobotStudio.*;
+import org.supremica.external.comInterfaces.robotstudio_3_1.RobotStudio.enums.RsKinematicRole;
 import com.inzoom.comjni.Variant;
 import com.inzoom.comjni.SafeArray;
 import com.inzoom.comjni.ComJniException;
-import com.inzoom.comjni.enum.HResult;
+import com.inzoom.comjni.enums.HResult;
 import org.supremica.log.*;
 import org.supremica.automata.*;
 import java.util.*;
@@ -103,7 +103,7 @@ public class RobotStudioInterface
 					zones = Part.getPartFromUnknown(station.getParts().item(var(ZONEPART_NAME)));
 				}
 				catch (Exception ex)
-				{   
+				{
 					// No such part?
 					zones = Part.getPartFromUnknown(station.getParts().add());
 					zones.setName(ZONEPART_NAME);
@@ -733,20 +733,20 @@ public class RobotStudioInterface
 			return 0;
 		}
 
-		public int stationAfterOpen(org.supremica.external.comInterfaces.robotstudio_3_0.RobotStudio.Station Station)
+		public int stationAfterOpen(org.supremica.external.comInterfaces.robotstudio_3_1.RobotStudio.Station Station)
 		{
 			logger.info("Station opened.");
 
 			return 0;
 		}
 
-		public int stationBeforeSave(org.supremica.external.comInterfaces.robotstudio_3_0.RobotStudio.Station Station, boolean[] Cancel)
+		public int stationBeforeSave(org.supremica.external.comInterfaces.robotstudio_3_1.RobotStudio.Station Station, boolean[] Cancel)
 		{
 			//logger.info("Station being saved...");
 			return 0;
 		}
 
-		public int stationAfterSave(org.supremica.external.comInterfaces.robotstudio_3_0.RobotStudio.Station Station)
+		public int stationAfterSave(org.supremica.external.comInterfaces.robotstudio_3_1.RobotStudio.Station Station)
 		{
 			logger.info("Station saved...");
 
@@ -759,19 +759,19 @@ public class RobotStudioInterface
 			return 0;
 		}
 
-		public int libraryAfterOpen(org.supremica.external.comInterfaces.robotstudio_3_0.RobotStudio.RsObject RsObject)
+		public int libraryAfterOpen(org.supremica.external.comInterfaces.robotstudio_3_1.RobotStudio.RsObject RsObject)
 		{
 			//logger.info("Library opened.");
 			return 0;
 		}
 
-		public int libraryBeforeSave(org.supremica.external.comInterfaces.robotstudio_3_0.RobotStudio.RsObject RsObject, boolean[] Cancel)
+		public int libraryBeforeSave(org.supremica.external.comInterfaces.robotstudio_3_1.RobotStudio.RsObject RsObject, boolean[] Cancel)
 		{
 			//logger.info("Library being saved...");
 			return 0;
 		}
 
-		public int libraryAfterSave(org.supremica.external.comInterfaces.robotstudio_3_0.RobotStudio.RsObject RsObject)
+		public int libraryAfterSave(org.supremica.external.comInterfaces.robotstudio_3_1.RobotStudio.RsObject RsObject)
 		{
 			//logger.info("Library saved.");
 			return 0;

@@ -55,8 +55,8 @@ package org.supremica.automata.algorithms;
 */
 import org.supremica.util.SupremicaException;
 import org.supremica.external.robotCoordinationABB.CreateXml;
-import org.supremica.external.comInterfaces.robotstudio_3_0.RobotStudio.*;
-import org.supremica.external.comInterfaces.robotstudio_3_0.RobotStudio.enum.RsKinematicRole;
+import org.supremica.external.comInterfaces.robotstudio_3_1.RobotStudio.*;
+import org.supremica.external.comInterfaces.robotstudio_3_1.RobotStudio.enums.RsKinematicRole;
 import org.supremica.automata.*;
 import org.supremica.log.*;
 import java.util.*;
@@ -68,16 +68,17 @@ import com.inzoom.comjni.SafeArray;
 //import com.inzoom.comjni.IDispatch;
 //import com.inzoom.comjni.IUnknown;
 import com.inzoom.comjni.ComJniException;
-import com.inzoom.comjni.enum.HResult;
+import com.inzoom.comjni.enums.HResult;
 
 // Frame
 import java.awt.*;
 import java.awt.event.*;
 
+/**
+ * @deprecated Don't keep this class other than for reference.
+ */
 public class RobotStudioLink
-
-//extends Thread
-implements Runnable, DAppEvents
+	implements Runnable, DAppEvents
 {
 	// Initialize jacoZoom
 	static
@@ -1278,21 +1279,21 @@ End Sub
 		return 0;
 	}
 
-	public int stationAfterOpen(org.supremica.external.comInterfaces.robotstudio_3_0.RobotStudio.Station Station)
+	public int stationAfterOpen(org.supremica.external.comInterfaces.robotstudio_3_1.RobotStudio.Station Station)
 	{
 		logger.info("Station opened.");
 
 		return 0;
 	}
 
-	public int stationBeforeSave(org.supremica.external.comInterfaces.robotstudio_3_0.RobotStudio.Station Station, boolean[] Cancel)
+	public int stationBeforeSave(org.supremica.external.comInterfaces.robotstudio_3_1.RobotStudio.Station Station, boolean[] Cancel)
 	{
 
 		//logger.info("Station being saved...");
 		return 0;
 	}
 
-	public int stationAfterSave(org.supremica.external.comInterfaces.robotstudio_3_0.RobotStudio.Station Station)
+	public int stationAfterSave(org.supremica.external.comInterfaces.robotstudio_3_1.RobotStudio.Station Station)
 	{
 		logger.info("Station saved...");
 
@@ -1306,21 +1307,21 @@ End Sub
 		return 0;
 	}
 
-	public int libraryAfterOpen(org.supremica.external.comInterfaces.robotstudio_3_0.RobotStudio.RsObject RsObject)
+	public int libraryAfterOpen(org.supremica.external.comInterfaces.robotstudio_3_1.RobotStudio.RsObject RsObject)
 	{
 
 		//logger.info("Library opened.");
 		return 0;
 	}
 
-	public int libraryBeforeSave(org.supremica.external.comInterfaces.robotstudio_3_0.RobotStudio.RsObject RsObject, boolean[] Cancel)
+	public int libraryBeforeSave(org.supremica.external.comInterfaces.robotstudio_3_1.RobotStudio.RsObject RsObject, boolean[] Cancel)
 	{
 
 		//logger.info("Library being saved...");
 		return 0;
 	}
 
-	public int libraryAfterSave(org.supremica.external.comInterfaces.robotstudio_3_0.RobotStudio.RsObject RsObject)
+	public int libraryAfterSave(org.supremica.external.comInterfaces.robotstudio_3_1.RobotStudio.RsObject RsObject)
 	{
 
 		//logger.info("Library saved.");
@@ -1893,7 +1894,7 @@ End Sub
 		 * something. In general, this does NOT mean that the whole robot has stopped colliding.
 		 * Therefore, we must count the collision ends...
 		 */
-		public synchronized int collisionEnd(org.supremica.external.comInterfaces.robotstudio_3_0.RobotStudio.RsObject collidingObject)
+		public synchronized int collisionEnd(org.supremica.external.comInterfaces.robotstudio_3_1.RobotStudio.RsObject collidingObject)
 		{
 			try
 			{

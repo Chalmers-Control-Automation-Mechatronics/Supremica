@@ -127,7 +127,7 @@
 	<unjar src="${lib}/xmlBlaster.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/xtdash.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/jgrafchart.jar" dest="${lib}/${unjared}"/>	
-	<unjar src="${lib}/interfaceRobotStudio3_0.jar" dest="${lib}/${unjared}"/>	
+	<unjar src="${lib}/interfaceRobotStudio3_1.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/WMFWriter2D.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/sysutils.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/swixml.jar" dest="${lib}/${unjared}"/>	

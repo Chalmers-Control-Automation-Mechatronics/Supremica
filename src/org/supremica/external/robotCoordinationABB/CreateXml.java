@@ -60,11 +60,11 @@ import java.io.FileWriter;
 import java.util.*;
 import org.supremica.automata.*;
 import org.supremica.log.*;
-import org.supremica.external.comInterfaces.robotstudio_3_0.RobotStudio.*;
+import org.supremica.external.comInterfaces.robotstudio_3_1.RobotStudio.*;
 import com.inzoom.comjni.Variant;
 import com.inzoom.comjni.SafeArray;
 import com.inzoom.comjni.ComJniException;
-import com.inzoom.comjni.enum.HResult;
+import com.inzoom.comjni.enums.HResult;
 
 public class CreateXml
 {
