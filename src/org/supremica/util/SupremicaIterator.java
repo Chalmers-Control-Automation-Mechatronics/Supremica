@@ -53,6 +53,9 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 
+/**
+ * This is an experimental class, Please do not use it.
+ */
 public class SupremicaIterator
 {
 	private final Iterator theIterator;
