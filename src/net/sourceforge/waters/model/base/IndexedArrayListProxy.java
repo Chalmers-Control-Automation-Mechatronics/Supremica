@@ -1,9 +1,10 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: waters.model.base
 //# CLASS:   IndexedArrayListProxy
 //###########################################################################
-//# $Id: IndexedArrayListProxy.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: IndexedArrayListProxy.java,v 1.2 2005-02-22 21:23:54 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.base;
@@ -17,6 +18,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.RandomAccess;
 import javax.xml.bind.JAXBException;
 
 import net.sourceforge.waters.xsd.base.ElementType;
@@ -45,7 +47,7 @@ import net.sourceforge.waters.xsd.base.ElementType;
 
 public class IndexedArrayListProxy
   extends AbstractList
-  implements IndexedListProxy
+  implements IndexedListProxy, RandomAccess
 {
 
   //#########################################################################
@@ -124,7 +126,7 @@ public class IndexedArrayListProxy
    *                     inconsistencies.
    */
   public IndexedArrayListProxy(final ElementType parent,
-			       final ProxyFactory factory)
+                               final ProxyFactory factory)
     throws ModelException
   {
     this(true, parent, factory);
@@ -148,8 +150,8 @@ public class IndexedArrayListProxy
    *                     inconsistencies.
    */
   public IndexedArrayListProxy(final boolean primary,
-			       final ElementType parent,
-			       final ProxyFactory factory)
+                               final ElementType parent,
+                               final ProxyFactory factory)
     throws ModelException
   {
     mIsPrimary = primary;
@@ -194,7 +196,7 @@ public class IndexedArrayListProxy
     final Object victim = mProxyList.remove(index);
     if (victim != null) {
       final NamedProxy named =
-	(NamedProxy) victim;
+        (NamedProxy) victim;
       mProxyMap.remove(named.getName());
       afterRemove(named);
     }
@@ -220,10 +222,10 @@ public class IndexedArrayListProxy
     while (iter.hasNext()) {
       final ElementType element = (ElementType) iter.next();
       final NamedProxy proxy =
-	(NamedProxy) factory.createProxy(element);
+        (NamedProxy) factory.createProxy(element);
       final String name = proxy.getName();
       if (mProxyMap.containsKey(name)) {
-	throw createDuplicateName(name);
+        throw createDuplicateName(name);
       }
       beforeAdd(proxy);
       mProxyList.add(proxy);
@@ -286,7 +288,7 @@ public class IndexedArrayListProxy
     final Iterator iter = collection.iterator();
     while (iter.hasNext()) {
       final NamedProxy proxy =
-	(NamedProxy) iter.next();
+        (NamedProxy) iter.next();
       changed |= (insert(proxy) != null);
     }
     return changed;
@@ -336,7 +338,7 @@ public class IndexedArrayListProxy
       final NamedProxy elem1 = (NamedProxy) iter1.next();
       final Object elem2 = iter2.next();
       if (!elem1.equalsWithGeometry(elem2)) {
-	return false;
+        return false;
       }
     }
     return true;
@@ -351,15 +353,15 @@ public class IndexedArrayListProxy
     final Iterator iter = iterator();
     if (iter.hasNext()) {
       if (getPPrintName() != null) {
-	printer.print(getPPrintName());
-	printer.print(' ');
+        printer.print(getPPrintName());
+        printer.print(' ');
       }
       printer.println('{');
       printer.indentIn();
       while (iter.hasNext()) {
-	final NamedProxy proxy =
-	  (NamedProxy) iter.next();
-	proxy.pprintln(printer);
+        final NamedProxy proxy =
+          (NamedProxy) iter.next();
+        proxy.pprintln(printer);
       }
       printer.indentOut();
       printer.println('}');
@@ -385,9 +387,9 @@ public class IndexedArrayListProxy
       final List elist = factory.getElementList(container);
       final ElementFactory nextfactory = factory.getNextFactory();
       while (iter.hasNext()) {
-	final Proxy proxy = (Proxy) iter.next();
-	final ElementType element = proxy.toJAXB(nextfactory);
-	elist.add(element);
+        final Proxy proxy = (Proxy) iter.next();
+        final ElementType element = proxy.toJAXB(nextfactory);
+        elist.add(element);
       }
       return container;
     } else {
@@ -442,7 +444,7 @@ public class IndexedArrayListProxy
   {
     if (mIsPrimary) {
       final UniqueElementProxy unique =
-	(UniqueElementProxy) proxy;
+        (UniqueElementProxy) proxy;
       unique.joinMap(this);
     }
   }
@@ -451,7 +453,7 @@ public class IndexedArrayListProxy
   {
     if (mIsPrimary) {
       final UniqueElementProxy unique =
-	(UniqueElementProxy) proxy;
+        (UniqueElementProxy) proxy;
       unique.leaveMap();
     }
   }

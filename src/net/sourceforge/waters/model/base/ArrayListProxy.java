@@ -1,9 +1,10 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters
+//# Project: Waters
 //# PACKAGE: waters.model.base
 //# CLASS:   ArrayListProxy
 //###########################################################################
-//# $Id: ArrayListProxy.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: ArrayListProxy.java,v 1.2 2005-02-22 21:23:54 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.base;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.RandomAccess;
 import javax.xml.bind.JAXBException;
 
 import net.sourceforge.waters.xsd.base.ElementType;
@@ -25,7 +27,10 @@ import net.sourceforge.waters.xsd.base.ElementType;
  * @author Robi Malik
  */
 
-public class ArrayListProxy extends AbstractList implements ListProxy {
+public class ArrayListProxy
+  extends AbstractList
+  implements ListProxy, RandomAccess
+{
 
   //#########################################################################
   //# Constructors
@@ -50,9 +55,9 @@ public class ArrayListProxy extends AbstractList implements ListProxy {
       mProxyList = new ArrayList(elist.size());
       final Iterator iter = elist.iterator();
       while (iter.hasNext()) {
-	final ElementType element = (ElementType) iter.next();
-	final Proxy proxy = factory.createProxy(element);
-	mProxyList.add(proxy);
+        final ElementType element = (ElementType) iter.next();
+        final Proxy proxy = factory.createProxy(element);
+        mProxyList.add(proxy);
       }
     }
   }
@@ -113,7 +118,7 @@ public class ArrayListProxy extends AbstractList implements ListProxy {
       final ElementProxy elem1 = (ElementProxy) iter1.next();
       final Object elem2 = iter2.next();
       if (!elem1.equalsWithGeometry(elem2)) {
-	return false;
+        return false;
       }
     }
     return true;
@@ -132,8 +137,8 @@ public class ArrayListProxy extends AbstractList implements ListProxy {
       printer.println('{');
       printer.indentIn();
       while (iter.hasNext()) {
-	final Proxy proxy = (Proxy) iter.next();
-	proxy.pprintln(printer);
+        final Proxy proxy = (Proxy) iter.next();
+        proxy.pprintln(printer);
       }
       printer.indentOut();
       printer.print('}');
@@ -164,9 +169,9 @@ public class ArrayListProxy extends AbstractList implements ListProxy {
       final List elist = factory.getElementList(container);
       final ElementFactory nextfactory = factory.getNextFactory();
       while (iter.hasNext()) {
-	final Proxy proxy = (Proxy) iter.next();
-	final ElementType element = proxy.toJAXB(nextfactory);
-	elist.add(element);
+        final Proxy proxy = (Proxy) iter.next();
+        final ElementType element = proxy.toJAXB(nextfactory);
+        elist.add(element);
       }
       return container;
     } else {
