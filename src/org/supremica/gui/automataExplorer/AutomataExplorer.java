@@ -67,6 +67,7 @@ public class AutomataExplorer
 	extends JFrame
 	implements AutomatonListener
 {
+	private static final long serialVersionUID = 1L;
 	private Automata theAutomata;
 	private BorderLayout layout = new BorderLayout();
 	private JPanel contentPane;

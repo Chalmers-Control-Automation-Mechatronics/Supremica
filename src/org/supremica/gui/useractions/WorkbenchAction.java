@@ -16,6 +16,8 @@ import org.supremica.workbench.Workbench;
 public class WorkbenchAction
 	extends AbstractAction
 {
+	private static final long serialVersionUID = 1L;
+	
 	private static Logger logger = LoggerFactory.createLogger(WorkbenchAction.class);
 	private Workbench wb;
 

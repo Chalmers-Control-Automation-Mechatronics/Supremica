@@ -474,6 +474,7 @@ public class LogDisplay
 	class LoggerPopupMenu
 		extends VPopupMenu
 	{
+		private static final long serialVersionUID = 1L;
 		private LoggerFilter filter = null;
 		private JCheckBoxMenuItem fatalItem = null;
 		private JCheckBoxMenuItem errorItem = null;

@@ -94,6 +94,7 @@ import org.supremica.automata.algorithms.RobotStudioLink;
 public class MainMenuBar
 	extends JMenuBar
 {
+	private static final long serialVersionUID = 1L;
 	private Supremica supremica;
 	private ContentHelp help = null;
 	private CSH.DisplayHelpFromSource helpDisplayer = null;
