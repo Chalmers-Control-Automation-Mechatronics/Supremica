@@ -545,7 +545,6 @@ public class Supremica
 
 			JMenuItem menuToolsCodeGenerationSattLineSFC = new JMenuItem();
 			menuToolsCodeGenerationSattLineSFC.setText("SattLine SFC...");
-			menuToolsCodeGenerationSattLineSFC.setEnabled(false);
 
 			menuToolsCodeGeneration.add(menuToolsCodeGenerationSattLineSFC);
 

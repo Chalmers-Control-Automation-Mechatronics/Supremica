@@ -59,11 +59,8 @@ public class AutomataToSattLineSFC
 {
 	private Automata automata;
 	private Automaton automaton;
-	private boolean canonical;
 	private boolean debugMode = false;
 
-	private static final int majorFileVersion = 0;
-	private static final int minorFileVersion = 9;
 
 	public AutomataToSattLineSFC(Automata automata)
 	{
@@ -71,106 +68,12 @@ public class AutomataToSattLineSFC
 		canonical = false;
 	}
 
-	public AutomataToSattLineSFC(Automaton automaton)
-	{
-		this.automata = new Automata();
-		this.automata.addAutomaton(automaton);
-		canonical = false;
-	}
-
 	public void serialize_s(PrintWriter pw)
 	{
 		pw.println("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
-		pw.print("<Automata");
-		if (automata.getName() != null)
-		{
-			pw.print(" name=\"" + normalize(automata.getName()) + "\" ");
-		}
-
-		pw.print(" major=\"" + majorFileVersion + "\" ");
-		pw.print(" minor=\"" + minorFileVersion + "\" ");
-
-		pw.println(">");
-
-		Iterator automataIt = automata.iterator();
-		while (automataIt.hasNext())
-		{
-			Automaton aut = (Automaton)automataIt.next();
-			pw.println("<Automaton name=\"" + aut.getName() + "\" type=\"" + aut.getType().toString() + "\">");
-
-			// Print all events
-			pw.println("\t<Events>");
-			Iterator eventIt = aut.eventIterator();
-			while (eventIt.hasNext())
-			{
-				Event event = (Event)eventIt.next();
-				pw.print("\t\t<Event id=\"" + normalize(event.getId()) + "\" label=\"" + normalize(event.getLabel()) + "\"");
-				if (!event.isControllable())
-					pw.print(" controllable=\"false\"");
-				if (!event.isPrioritized())
-					pw.print(" prioritized=\"false\"");
-				if (event.isImmediate())
-					pw.print(" immediate=\"true\"");
-				if (debugMode)
-					pw.print(" synchIndex=" + event.getSynchIndex());
-				pw.println("/>");
-			}
-			pw.println("\t</Events>");
-
-			// Print all states
-			pw.println("\t<States>");
-			Iterator stateIt = aut.stateIterator();
-			while (stateIt.hasNext())
-			{
-				State state = (State)stateIt.next();
-				pw.print("\t\t<State id=\"" + normalize(state.getId()) + "\"");
-				if (!state.getId().equals(state.getName()))
-					pw.print(" name=\"" + normalize(state.getName()) + "\"");
-				if (state.isInitial())
-					pw.print(" initial=\"true\"");
-				if (state.isAccepting())
-					pw.print(" accepting=\"true\"");
-				if (state.isForbidden())
-					pw.print(" forbidden=\"true\"");
-				int value = state.getCost();
-				if (value != State.UNDEF_COST)
-					pw.print(" cost=\"" + value + "\"");
-				if (debugMode)
-					pw.print(" synchIndex=" + state.getIndex());
-     			// printIntArray(pw, ((StateRegular)state).getOutgoingEventsIndicies());
-				pw.println("/>");
-			}
-			pw.println("\t</States>");
-
-
-			// Print all transitions
-			pw.println("\t<Transitions>");
-			stateIt = aut.stateIterator();
-			while (stateIt.hasNext())
-			{
-				State sourceState = (State)stateIt.next();
-				Iterator outgoingArcsIt = sourceState.outgoingArcsIterator();
-				while (outgoingArcsIt.hasNext())
-				{
-					Arc arc = (Arc)outgoingArcsIt.next();
-					State destState = arc.getToState();
-					pw.print("\t\t<Transition source=\"" + normalize(sourceState.getId()));
-					pw.print("\" dest=\"" + normalize(destState.getId()));
-					pw.println("\" event=\"" + normalize(arc.getEventId()) + "\"/>");
-				}
-			}
-			pw.println("\t</Transitions>");
-			pw.println("</Automaton>");
-		}
 		pw.println("</Automata>");
 		pw.flush();
 		pw.close();
-	}
-
-	public void serialize(String fileName)
-		throws IOException
-	{
-		serialize(new PrintWriter(new FileWriter(fileName)));
 	}
 
 	public void serialize_g(PrintWriter pw)
@@ -187,67 +90,5 @@ public class AutomataToSattLineSFC
 	{
 
 	}
-
-	private String normalize(String s)
-	{
-		StringBuffer str = new StringBuffer();
-		int len = (s != null) ? s.length() : 0;
-		for (int i = 0; i < len; i++)
-		{
-			char ch = s.charAt(i);
-			switch (ch)
-			{
-				case '<':
-				{
-					str.append("&lt;");
-					break;
-				}
-				case '>':
-				{
-					str.append("&gt;");
-					break;
-				}
-				case '&':
-				{
-					str.append("&amp;");
-					break;
-				}
-				case '"':
-				{
-					str.append("&quot;");
-					break;
-				}
-				case '\r':
-				case '\n':
-				{
-					if (canonical)
-					{
-						str.append("&#");
-						str.append(Integer.toString(ch));
-						str.append(';');
-						break;
-					}
-					// else, default append char
-				}
-				default:
-				{
-					str.append(ch);
-				}
-			}
-		}
-		return str.toString();
-	}
-
-	void printIntArray(PrintWriter pw, int[] theArray)
-	{
-    	for (int i=0; i < theArray.length; i++)
-     	{
-          	if (i == 0)
-        		pw.print(theArray[i]);
-          	else
-				pw.print(" " + theArray[i]);
-      	}
-	}
-
 
 }
