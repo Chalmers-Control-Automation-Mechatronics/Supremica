@@ -129,13 +129,16 @@ public class AutomataVerifier
 
 	public static String validOptions(Automata theAutomata, VerificationOptions verificationOptions)
 	{
-		// Modular algorithms demand system with more than one module...
-		if ((theAutomata.size() <= 1) &&
+		// Modular algorithms demand systems with more than one module...
+		/*
+		if (((theAutomata.size() <= 1) && 
+			 !(verificationOptions.getVerificationType() == VerificationType.LanguageInclusion)) &&
 			(verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular))
 		{
 			logger.warn("Using monolithic algorithm instead, since the system is not modular.");
 			verificationOptions.setAlgorithmType(VerificationAlgorithm.Monolithic);
 		}
+		*/
 
 		// Check IDD
 		if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.IDD)
