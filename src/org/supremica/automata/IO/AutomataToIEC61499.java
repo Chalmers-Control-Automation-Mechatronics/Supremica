@@ -98,7 +98,6 @@ public class AutomataToIEC61499
 		this.theProject = theProject;
 		this.theHelper = IEC61131Helper.getInstance();
 		allEvents = this.theProject.setIndicies();
-		commentsOn();
 	}
 
 
@@ -132,7 +131,7 @@ public class AutomataToIEC61499
 		// OCCURRED event signals a new automaton event to the automata and is thus coupled 
 		// to the input variables that represent the automaton events.
 	 	pw.println("EVENT_INPUT");
-	 	pw.println("\tINIT;");
+	 	pw.println("\tINIT : INIT_EVENT;");
 		pw.println("\tRESET;");
 		pw.println("\tOCCURRED WITH "); 
 		for(Iterator alphIt=allEvents.iterator(); alphIt.hasNext();)
@@ -140,11 +139,11 @@ public class AutomataToIEC61499
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
 			if (alphIt.hasNext())
 			{
-				pw.println("\t\tEI_" + currEvent.getSynchIndex()+ ",");
+				pw.println("\t\tEI_" + currEvent.getLabel()+ ",");
 			} 
 			else 
 			{
-				pw.println("\t\tEI_" + currEvent.getSynchIndex()+ ";");
+				pw.println("\t\tEI_" + currEvent.getLabel()+ ";");
 			}
 		}
 		pw.println("END_EVENT");
@@ -155,17 +154,18 @@ public class AutomataToIEC61499
 		// For now the only output event is DONE and it is coupled with the output variables that
 		// represent the state of the automata after the transition upon receving a automaton event.
 		pw.println("EVENT_OUTPUT");
+		pw.println("\tINITO : INIT_EVENT");
 		pw.println("\tDONE WITH ");
 		for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext();) 
 		{
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
 			if (alphIt.hasNext()) 
 			{
-				pw.println("\t\tEO_" + currEvent.getSynchIndex() + ",");
+				pw.println("\t\tEO_" + currEvent.getLabel() + ",");
 			} 
 			else 
 			{
-				pw.println("\t\tEO_" + currEvent.getSynchIndex() + ";");
+				pw.println("\t\tEO_" + currEvent.getLabel() + ";");
 			}
 		}
 		pw.println("END_EVENT");
@@ -179,7 +179,7 @@ public class AutomataToIEC61499
 		for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext();)
 		{
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-			pw.print("\tEI_" + currEvent.getSynchIndex() + " : BOOL;"); 
+			pw.print("\tEI_" + currEvent.getLabel() + " : BOOL;"); 
 			if (comments)
 			{
 				pw.print("\t(* " + currEvent.getLabel() + " *)");
@@ -195,7 +195,7 @@ public class AutomataToIEC61499
 		for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext();)
 		{
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-			pw.print("\tEO_" + currEvent.getSynchIndex() + " : BOOL;");
+			pw.print("\tEO_" + currEvent.getLabel() + " : BOOL;");
 			if (comments)
 			{
 				pw.print("\t(* " + currEvent.getLabel() + " *)");
@@ -249,7 +249,7 @@ public class AutomataToIEC61499
 		// States of the ECC
 		pw.println("EC_STATES");
 		pw.println("\tSTART;");
-		pw.println("\tINIT : INIT;");
+		pw.println("\tINIT : INIT, RESET, COMP_ENABLED -> INITO;");
 		pw.println("\tRESET : RESET;");
 		pw.println("\tTRANSITION : TRANSITION;");
 		pw.println("\tCOMP_ENABLED : COMP_ENABLED -> DONE;");
@@ -258,9 +258,9 @@ public class AutomataToIEC61499
 		// Transitions of the ECC
 		pw.println("EC_TRANSITIONS");
 		pw.println("\tSTART TO INIT := INIT;");
+		pw.println("\tINIT TO START := 1;");
 		pw.println("\tSTART TO RESET := RESET;");
 		pw.println("\tSTART TO TRANSITION := OCCURRED;");
-		pw.println("\tINIT TO RESET := 1;");
 		pw.println("\tRESET TO COMP_ENABLED := 1;");
 		pw.println("\tCOMP_ENABLED TO START := 1;");
 		pw.println("\tTRANSITION TO COMP_ENABLED := 1;");
@@ -361,7 +361,7 @@ public class AutomataToIEC61499
 
 			boolean previousCondition = false;
 
-			pw.println("\tIF (EI_" + currEventIndex + " AND EO_" + currEventIndex + ")");
+			pw.println("\tIF (EI_" + currEvent.getLabel() + " AND EO_" + currEvent.getLabel() + ")");
 			pw.println("\tTHEN");
 
 			for (Iterator autIt = theProject.iterator(); autIt.hasNext();)
@@ -460,7 +460,7 @@ public class AutomataToIEC61499
 
 				boolean previousCondition = false;
 
-				pw.print("\tEO_" + currEventIndex + " := ");
+				pw.print("\tEO_" + currEvent.getLabel() + " := ");
 
 				for (Iterator autIt = theProject.iterator(); autIt.hasNext(); )
 				{

@@ -3793,8 +3793,7 @@ public class ActionMan
 
 		JFileChooser fileExporter = FileDialogs.getExportFileChooser(FileFormats.FBT);
 
-		if (fileExporter.showSaveDialog(gui.getComponent())
-			== JFileChooser.APPROVE_OPTION) {
+		if (fileExporter.showSaveDialog(gui.getComponent()) == JFileChooser.APPROVE_OPTION) {
 			File currFile = fileExporter.getSelectedFile();
 
 			if (currFile != null) {
