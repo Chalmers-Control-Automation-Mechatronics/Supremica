@@ -205,14 +205,14 @@ public class AutomataToSattLineSFCForBallProcess
 							{
 								firstState = false;
 
-								theCondition.append("(" + aut.getName().replace('.', '_') + "__" + sourceState.getId() + ".X");
-								lineLength = lineLength + 5 + aut.getName().length() + sourceState.getId().length();
+								theCondition.append("(" + aut.getName().replace('.', '_') + "__" + sourceState.getName() + ".X");
+								lineLength = lineLength + 5 + aut.getName().length() + sourceState.getName().length();
 								logger.debug("Current transition condition: " + theCondition);
 							}
 							else
 							{
-								theCondition.append(" OR " + aut.getName().replace('.', '_') + "__" + sourceState.getId() + ".X");
-								lineLength = lineLength + 8 + aut.getName().length() + sourceState.getId().length();
+								theCondition.append(" OR " + aut.getName().replace('.', '_') + "__" + sourceState.getName() + ".X");
+								lineLength = lineLength + 8 + aut.getName().length() + sourceState.getName().length();
 							}
 						}
 					}
@@ -365,18 +365,18 @@ public class AutomataToSattLineSFCForBallProcess
 							{
 								firstState = false;
 
-								// theCondition.append("(" + aut.getName().replace('.', '_') + "__" + sourceState.getId() + ".X");
-								// lineLength = lineLength + 5 + aut.getName().length() + sourceState.getId().length();
-								theCondition.append("(" + aut.getName().replace('.', '_') + "__" + destinationState.getId() + ".X");
-								lineLength = lineLength + 5 + aut.getName().length() + destinationState.getId().length();
+								// theCondition.append("(" + aut.getName().replace('.', '_') + "__" + sourceState.getName() + ".X");
+								// lineLength = lineLength + 5 + aut.getName().length() + sourceState.getName().length();
+								theCondition.append("(" + aut.getName().replace('.', '_') + "__" + destinationState.getName() + ".X");
+								lineLength = lineLength + 5 + aut.getName().length() + destinationState.getName().length();
 								logger.debug("Current transition condition: " + theCondition);
 							}
 							else
 							{
-								// theCondition.append(" AND " + aut.getName().replace('.', '_') + "__" + sourceState.getId() + ".X");
-								// lineLength = lineLength + 9 + aut.getName().length() + sourceState.getId().length();
-								theCondition.append(" OR " + aut.getName().replace('.', '_') + "__" + destinationState.getId() + ".X");
-								lineLength = lineLength + 8 + aut.getName().length() + destinationState.getId().length();
+								// theCondition.append(" AND " + aut.getName().replace('.', '_') + "__" + sourceState.getName() + ".X");
+								// lineLength = lineLength + 9 + aut.getName().length() + sourceState.getName().length();
+								theCondition.append(" OR " + aut.getName().replace('.', '_') + "__" + destinationState.getName() + ".X");
+								lineLength = lineLength + 8 + aut.getName().length() + destinationState.getName().length();
 							}
 						}
 					}
@@ -424,7 +424,7 @@ public class AutomataToSattLineSFCForBallProcess
 
 			if (event.getLabel().equalsIgnoreCase("timer"))
 			{
-				pw.println("SEQTRANSITION " + theAutomaton.getName().replace('.', '_') + "_Tr" + transitionCounter++ + theHelper.getTransitionConditionPrefix() + theAutomaton.getName().replace('.', '_') + "__" + theArc.getFromState().getId() + ".T > 1000" + theHelper.getTransitionConditionSuffix());
+				pw.println("SEQTRANSITION " + theAutomaton.getName().replace('.', '_') + "_Tr" + transitionCounter++ + theHelper.getTransitionConditionPrefix() + theAutomaton.getName().replace('.', '_') + "__" + theArc.getFromState().getName() + ".T > 1000" + theHelper.getTransitionConditionSuffix());
 			}
 			/*else if (event.getLabel().equalsIgnoreCase("IP.ManuellStart") || event.getLabel().equalsIgnoreCase("IP.AutoStart"))
 			{

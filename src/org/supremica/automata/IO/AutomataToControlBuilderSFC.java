@@ -620,12 +620,12 @@ public class AutomataToControlBuilderSFC
 							{
 								firstState = false;
 
-								theCondition.append("(" + aut.getName().replace('.', '_') + "__" + sourceState.getId() + ".X");
+								theCondition.append("(" + aut.getName().replace('.', '_') + "__" + sourceState.getName() + ".X");
 								logger.debug("Current transition condition: " + theCondition);
 							}
 							else
 							{
-								theCondition.append(" OR " + aut.getName().replace('.', '_') + "__" + sourceState.getId() + ".X");
+								theCondition.append(" OR " + aut.getName().replace('.', '_') + "__" + sourceState.getName() + ".X");
 							}
 						}
 					}
@@ -739,12 +739,12 @@ public class AutomataToControlBuilderSFC
 							{
 								firstState = false;
 
-								theCondition.append("(" + aut.getName().replace('.', '_') + "__" + sourceState.getId() + ".X");
+								theCondition.append("(" + aut.getName().replace('.', '_') + "__" + sourceState.getName() + ".X");
 								logger.debug("Current transition condition: " + theCondition);
 							}
 							else
 							{
-								theCondition.append(" AND " + aut.getName().replace('.', '_') + "__" + sourceState.getId() + ".X");
+								theCondition.append(" AND " + aut.getName().replace('.', '_') + "__" + sourceState.getName() + ".X");
 							}
 						}
 					}
@@ -844,11 +844,11 @@ public class AutomataToControlBuilderSFC
 	{
 		if (theState.isInitial())
 		{
-			pw.println("SEQINITSTEP " + theAutomaton.getName().replace('.', '_') + "__" + theState.getId());
+			pw.println("SEQINITSTEP " + theAutomaton.getName().replace('.', '_') + "__" + theState.getName());
 		}
 		else
 		{
-			pw.println("SEQSTEP " + theAutomaton.getName().replace('.', '_') + "__" + theState.getId());
+			pw.println("SEQSTEP " + theAutomaton.getName().replace('.', '_') + "__" + theState.getName());
 		}
 	}
 
@@ -870,6 +870,6 @@ public class AutomataToControlBuilderSFC
 
 	protected void printFork(Automaton theAutomaton, State theState, PrintWriter pw)
 	{
-		pw.println("SEQFORK " + theAutomaton.getName().replace('.', '_') + "__" + theState.getId() + " SEQBREAK");
+		pw.println("SEQFORK " + theAutomaton.getName().replace('.', '_') + "__" + theState.getName() + " SEQBREAK");
 	}
 }
