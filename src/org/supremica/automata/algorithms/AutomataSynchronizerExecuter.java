@@ -84,6 +84,7 @@ public final class AutomataSynchronizerExecuter
 	private final int[][][] nextStateTable;
 	private final int[][][] outgoingEventsTable;
 	private final boolean[][] prioritizedEventsTable;
+	private final boolean[][] alphabetEventsTable;
 	private final boolean[] typeIsPlantTable;
 	private final boolean[] controllableEventsTable;
 	private final boolean[] immediateEventsTable;
@@ -96,7 +97,7 @@ public final class AutomataSynchronizerExecuter
 	private boolean controllableState;
 	private final static int IMMEDIATE_NOT_AVAILABLE = -1;
 	private int immediateEvent = IMMEDIATE_NOT_AVAILABLE;
-	
+
 	private int numberOfAddedStates = 0;
 
 	/** Options determining how the synchronization should be performed. */
@@ -162,6 +163,7 @@ public final class AutomataSynchronizerExecuter
 		nextStateTable = indexForm.getNextStateTable();
 		outgoingEventsTable = indexForm.getOutgoingEventsTable();
 		prioritizedEventsTable = indexForm.getPrioritizedEventsTable();
+		alphabetEventsTable = indexForm.getAlphabetEventsTable();
 		typeIsPlantTable = indexForm.getTypeIsPlantTable();
 		controllableEventsTable = indexForm.getControllableEventsTable();
 		immediateEventsTable = indexForm.getImmediateEventsTable();
@@ -360,9 +362,6 @@ public final class AutomataSynchronizerExecuter
 						// The event is prioritized in currAutomaton
 						if (!(currEventIndex == currAutEventIndex))
 						{
-
-							// Then currIndex (the event) must also be the
-							// current event in this automaton
 							thisEventOk = false;
 
 							if (typeIsPlantTable[currAutIndex])
@@ -377,19 +376,21 @@ public final class AutomataSynchronizerExecuter
 				}
 				else if (syncType == SynchronizationType.Full)
 				{
-					if (!(currEventIndex == currAutEventIndex))
+					if (alphabetEventsTable[currAutIndex][currEventIndex])
 					{
-
-						// Then currIndex (the event) must also be the
-						// current event in this automaton
-						thisEventOk = false;
-
-						if (typeIsPlantTable[currAutIndex])
+						// The event is prioritized in currAutomaton
+						if (!(currEventIndex == currAutEventIndex))
 						{
 
-							// Then currIndex (the event) must also be the
-							// current event in this automaton
-							thisPlantEventOk = false;
+							thisEventOk = false;
+
+							if (typeIsPlantTable[currAutIndex])
+							{
+
+								// Then currIndex (the event) must also be the
+								// current event in this automaton
+								thisPlantEventOk = false;
+							}
 						}
 					}
 				}
