@@ -1,4 +1,0 @@
-#/bin/sh
-
-java org.supremica.softplc.RunTime.DigitalIODisplay org.supremica.softplc.Simulator.BTSim;
-
