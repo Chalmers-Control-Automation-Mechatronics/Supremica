@@ -63,84 +63,504 @@ public class Evaluator {
 	private Variables vars = null;
 	private Printer printer = new Printer(System.out);
 
-	public Evaluator(Variables v) { vars=v; }
-
-	public Boolean evalExpression(Expression e) 
-	{
-		return null;
+	public Evaluator(Variables v) 
+	{ 
+		vars=v; 
 	}
 
-	public Boolean evalOrExpression(OrExpression e)
+	public Boolean evalExpression(Expression e) throws Exception
+	{
+		return evalOrExpression(e.a);
+	}
+
+	public Boolean evalOrExpression(OrExpression e) throws Exception
 	{
 		if (e instanceof BinaryOrExpression) 
 		{
+			Object a = evalOrExpression(((BinaryOrExpression) e).a);
+			Object b = evalOrExpression(((BinaryOrExpression) e).b);
+			if (a instanceof Boolean && b instanceof Boolean)
+			{
+				return new Boolean(((Boolean) a).booleanValue() || ((Boolean) b).booleanValue());
+			}
+			else
+			{
+				System.out.println("Eval: Incompatible type in :");
+				printer.prOrExpression(e,4);
+				throw new Exception();
+			}				
 		}
 		else if (e instanceof UnaryOrExpression)
 		{
+			return evalXorExpression(((UnaryOrExpression) e).a);
 		}
-		return null;
+		System.out.println("Eval: Can not determine the child type of OrExpression: ");
+		printer.prOrExpression(e,4);
+		throw new Exception();
 	}
 
-	public Boolean evalXorExpression(XorExpression e)
+	public Boolean evalXorExpression(XorExpression e) throws Exception
 	{
 		if (e instanceof BinaryXorExpression) 
 		{
+			Object a = evalXorExpression(((BinaryXorExpression) e).a);
+			Object b = evalXorExpression(((BinaryXorExpression) e).b);
+			if (a instanceof Boolean && b instanceof Boolean)
+			{
+				return new Boolean((!((Boolean) a).booleanValue() && ((Boolean) b).booleanValue()) || (((Boolean) a).booleanValue() && !((Boolean) b).booleanValue()));
+			}
+			else
+			{
+				System.out.println("Eval: Incompatible type in :");
+				printer.prXorExpression(e,4);
+				throw new Exception();
+			}				
 		}
 		else if (e instanceof UnaryXorExpression)
 		{
+			return evalAndExpression(((UnaryXorExpression) e).a);
 		}
-		return null;
+		System.out.println("Eval: Can not determine the child type of XorExpression: ");
+		printer.prXorExpression(e,4);
+		throw new Exception();
 	}
 
-	public Boolean evalAndExpression(AndExpression e)
+	public Boolean evalAndExpression(AndExpression e) throws Exception
 	{
 		if (e instanceof BinaryAndExpression) 
 		{
+			Object a = evalAndExpression(((BinaryAndExpression) e).a);
+			Object b = evalAndExpression(((BinaryAndExpression) e).b);
+			if (a instanceof Boolean && b instanceof Boolean)
+			{
+				return new Boolean(((Boolean) a).booleanValue() && ((Boolean) b).booleanValue());
+			}
+			else
+			{
+				System.out.println("Eval: Incompatible type in :");
+				printer.prAndExpression(e,4);
+				throw new Exception();
+			}				
 		}
 		else if (e instanceof UnaryAndExpression)
 		{
+			return evalComparison(((UnaryAndExpression) e).a);
 		}
-		return null;
+		System.out.println("Eval: Can not determine the child type of AndExpression: ");
+		printer.prAndExpression(e,4);
+		throw new Exception();
 	}
 
-	public Boolean evalComparison(Comparison e)
+	public Boolean evalComparison(Comparison e) throws Exception
 	{
 		if (e instanceof Eq)
 		{ 
+			Object a = evalAddExpression(((Eq) e).a);
+			if (a instanceof Integer)
+			{
+				Object b = evalAddExpression(((Eq) e).b);
+				if(b instanceof Integer)
+				{
+					return new Boolean(((Integer) a).intValue() == ((Integer) b).intValue());
+				}
+				else if(b instanceof Float)
+				{
+					return new Boolean(((Integer) a).intValue() == ((Float) b).floatValue());
+				}
+				else
+				{
+					System.out.println("Eval: Incompatible types in :");
+					printer.prComparison(e,4);
+					throw new Exception();
+				}
+			}
+			else if (a instanceof Float)
+			{
+				Object b = evalAddExpression(((Eq) e).b);
+				if(b instanceof Integer)
+				{
+					return new Boolean(((Float) a).floatValue() == ((Integer) b).intValue());
+				}
+				else if(b instanceof Float)
+				{
+					return new Boolean(((Float) a).floatValue() == ((Float) b).floatValue());
+				}
+				else
+				{
+					System.out.println("Eval: Incompatible types in :");
+					printer.prComparison(e,4);
+					throw new Exception();
+				}				
+			}
+			else if (a instanceof String)
+			{
+				Object b = evalAddExpression(((Eq) e).b);
+				if(b instanceof String)
+				{
+					return new Boolean(((String) a).equals(((String) b).toString()));
+				}
+				else
+				{
+					System.out.println("Eval: Incompatible types in :");
+					printer.prComparison(e,4);
+					throw new Exception();
+				}				
+			}
+			else
+			{
+				System.out.println("Eval: Incompatible type in :");
+				printer.prComparison(e,4);
+				throw new Exception();
+			}				
 		}
 		else if (e instanceof Neq)
 		{ 
+			Object a = evalAddExpression(((Neq) e).a);
+			if (a instanceof Integer)
+			{
+				Object b = evalAddExpression(((Neq) e).b);
+				if(b instanceof Integer)
+				{
+					return new Boolean(((Integer) a).intValue() != ((Integer) b).intValue());
+				}
+				else if(b instanceof Float)
+				{
+					return new Boolean(((Integer) a).intValue() != ((Float) b).floatValue());
+				}
+				else
+				{
+					System.out.println("Eval: Incompatible types in :");
+					printer.prComparison(e,4);
+					throw new Exception();
+				}
+			}
+			else if (a instanceof Float)
+			{
+				Object b = evalAddExpression(((Neq) e).b);
+				if(b instanceof Integer)
+				{
+					return new Boolean(((Float) a).floatValue() != ((Integer) b).intValue());
+				}
+				else if(b instanceof Float)
+				{
+					return new Boolean(((Float) a).floatValue() != ((Float) b).floatValue());
+				}
+				else
+				{
+					System.out.println("Eval: Incompatible types in :");
+					printer.prComparison(e,4);
+					throw new Exception();
+				}				
+			}
+			else if (a instanceof String)
+			{
+				Object b = evalAddExpression(((Neq) e).b);
+				if(b instanceof String)
+				{
+					return new Boolean( ! ((String) a).equals(((String) b).toString()));
+				}
+				else
+				{
+					System.out.println("Eval: Incompatible types in :");
+					printer.prComparison(e,4);
+					throw new Exception();
+				}				
+			}
+			else
+			{
+				System.out.println("Eval: Incompatible type in :");
+				printer.prComparison(e,4);
+				throw new Exception();
+			}				
 		}
 		else if (e instanceof Less)
 		{ 
+			Object a = evalAddExpression(((Less) e).a);
+			if (a instanceof Integer)
+			{
+				Object b = evalAddExpression(((Less) e).b);
+				if(b instanceof Integer)
+				{
+					return new Boolean(((Integer) a).intValue() < ((Integer) b).intValue());
+				}
+				else if(b instanceof Float)
+				{
+					return new Boolean(((Integer) a).intValue() < ((Float) b).floatValue());
+				}
+				else
+				{
+					System.out.println("Eval: Incompatible types in :");
+					printer.prComparison(e,4);
+					throw new Exception();
+				}
+			}
+			else if (a instanceof Float)
+			{
+				Object b = evalAddExpression(((Less) e).b);
+				if(b instanceof Integer)
+				{
+					return new Boolean(((Float) a).floatValue() < ((Integer) b).intValue());
+				}
+				else if(b instanceof Float)
+				{
+					return new Boolean(((Float) a).floatValue() < ((Float) b).floatValue());
+				}
+				else
+				{
+					System.out.println("Eval: Incompatible types in :");
+					printer.prComparison(e,4);
+					throw new Exception();
+				}				
+			}
+			else
+			{
+				System.out.println("Eval: Incompatible type in :");
+				printer.prComparison(e,4);
+				throw new Exception();
+			}				
 		}
 		else if (e instanceof LessEq)
 		{ 
+			Object a = evalAddExpression(((LessEq) e).a);
+			if (a instanceof Integer)
+			{
+				Object b = evalAddExpression(((LessEq) e).b);
+				if(b instanceof Integer)
+				{
+					return new Boolean(((Integer) a).intValue() <= ((Integer) b).intValue());
+				}
+				else if(b instanceof Float)
+				{
+					return new Boolean(((Integer) a).intValue() <= ((Float) b).floatValue());
+				}
+				else
+				{
+					System.out.println("Eval: Incompatible types in :");
+					printer.prComparison(e,4);
+					throw new Exception();
+				}
+			}
+			else if (a instanceof Float)
+			{
+				Object b = evalAddExpression(((LessEq) e).b);
+				if(b instanceof Integer)
+				{
+					return new Boolean(((Float) a).floatValue() <= ((Integer) b).intValue());
+				}
+				else if(b instanceof Float)
+				{
+					return new Boolean(((Float) a).floatValue() <= ((Float) b).floatValue());
+				}
+				else
+				{
+					System.out.println("Eval: Incompatible types in :");
+					printer.prComparison(e,4);
+					throw new Exception();
+				}				
+			}
+			else
+			{
+				System.out.println("Eval: Incompatible type in :");
+				printer.prComparison(e,4);
+				throw new Exception();
+			}				
 		}
 		else if (e instanceof More)
 		{ 
+			Object a = evalAddExpression(((More) e).a);
+			if (a instanceof Integer)
+			{
+				Object b = evalAddExpression(((More) e).b);
+				if(b instanceof Integer)
+				{
+					return new Boolean(((Integer) a).intValue() > ((Integer) b).intValue());
+				}
+				else if(b instanceof Float)
+				{
+					return new Boolean(((Integer) a).intValue() > ((Float) b).floatValue());
+				}
+				else
+				{
+					System.out.println("Eval: Incompatible types in :");
+					printer.prComparison(e,4);
+					throw new Exception();
+				}
+			}
+			else if (a instanceof Float)
+			{
+				Object b = evalAddExpression(((More) e).b);
+				if(b instanceof Integer)
+				{
+					return new Boolean(((Float) a).floatValue() > ((Integer) b).intValue());
+				}
+				else if(b instanceof Float)
+				{
+					return new Boolean(((Float) a).floatValue() > ((Float) b).floatValue());
+				}
+				else
+				{
+					System.out.println("Eval: Incompatible types in :");
+					printer.prComparison(e,4);
+					throw new Exception();
+				}				
+			}
+			else
+			{
+				System.out.println("Eval: Incompatible type in :");
+				printer.prComparison(e,4);
+				throw new Exception();
+			}				
 		}
 		else if (e instanceof MoreEq)
 		{ 
+			Object a = evalAddExpression(((MoreEq) e).a);
+			if (a instanceof Integer)
+			{
+				Object b = evalAddExpression(((MoreEq) e).b);
+				if(b instanceof Integer)
+				{
+					return new Boolean(((Integer) a).intValue() >= ((Integer) b).intValue());
+				}
+				else if(b instanceof Float)
+				{
+					return new Boolean(((Integer) a).intValue() >= ((Float) b).floatValue());
+				}
+				else
+				{
+					System.out.println("Eval: Incompatible types in :");
+					printer.prComparison(e,4);
+					throw new Exception();
+				}
+			}
+			else if (a instanceof Float)
+			{
+				Object b = evalAddExpression(((MoreEq) e).b);
+				if(b instanceof Integer)
+				{
+					return new Boolean(((Float) a).floatValue() >= ((Integer) b).intValue());
+				}
+				else if(b instanceof Float)
+				{
+					return new Boolean(((Float) a).floatValue() >= ((Float) b).floatValue());
+				}
+				else
+				{
+					System.out.println("Eval: Incompatible types in :");
+					printer.prComparison(e,4);
+					throw new Exception();
+				}				
+			}
+			else
+			{
+				System.out.println("Eval: Incompatible type in :");
+				printer.prComparison(e,4);
+				throw new Exception();
+			}				
 		}
 		else if (e instanceof UnaryComparison)
 		{ 
+			Object a = evalAddExpression(((UnaryComparison) e).a);
+			if (a instanceof Boolean)
+			{
+				return (Boolean) a;
+			}
+			else
+			{
+				System.out.println("Eval: Incompatible type in :");
+				printer.prComparison(e,4);
+				throw new Exception();
+			}
 		}
-		return null;
+		System.out.println("Eval: Can not determine the child type of Comparison: ");
+		printer.prComparison(e,4);
+		throw new Exception();
 	}
 
-	public Object evalAddExpression(AddExpression e)
+	public Object evalAddExpression(AddExpression e) throws Exception
 	{
 		if (e instanceof Plus)
 		{ 
+			Object a = evalAddExpression(((Plus) e).a);
+			if (a instanceof Integer)
+			{
+				Object b = evalAddExpression(((Plus) e).b);
+				if(b instanceof Integer)
+				{
+					return new Integer(((Integer) a).intValue() + ((Integer) b).intValue());
+				}
+				else
+				{
+					System.out.println("Eval: Incompatible types in :");
+					printer.prAddExpression(e,4);
+					throw new Exception();
+				}
+			}
+			else if (a instanceof Float)
+			{
+				Object b = evalAddExpression(((Plus) e).b);
+				if(b instanceof Float)
+				{
+					return new Float(((Float) a).floatValue() + ((Float) b).floatValue());
+				}
+				else
+				{
+					System.out.println("Eval: Incompatible types in :");
+					printer.prAddExpression(e,4);
+					throw new Exception();
+				}				
+			}
+			else
+			{
+				System.out.println("Eval: Incompatible type in :");
+				printer.prAddExpression(e,4);
+				throw new Exception();
+			}				
 		}
 		else if (e instanceof Minus)
 		{ 
+			Object a = evalAddExpression(((Minus) e).a);
+			if (a instanceof Integer)
+			{
+				Object b = evalAddExpression(((Minus) e).b);
+				if(b instanceof Integer)
+				{
+					return new Integer(((Integer) a).intValue() - ((Integer) b).intValue());
+				}
+				else
+				{
+					System.out.println("Eval: Incompatible types in :");
+					printer.prAddExpression(e,4);
+					throw new Exception();
+				}
+			}
+			else if (a instanceof Float)
+			{
+				Object b = evalAddExpression(((Minus) e).b);
+				if(b instanceof Float)
+				{
+					return new Float(((Float) a).floatValue() - ((Float) b).floatValue());
+				}
+				else
+				{
+					System.out.println("Eval: Incompatible types in :");
+					printer.prAddExpression(e,4);
+					throw new Exception();
+				}				
+			}
+			else
+			{
+				System.out.println("Eval: Incompatible type in :");
+				printer.prAddExpression(e,4);
+				throw new Exception();
+			}				
 		}
 		else if (e instanceof UnaryAddExpression)
 		{ 
+			return evalTerm(((UnaryAddExpression) e).a);
 		}
-		return null;
+		System.out.println("Eval: Can not determine the child type of AddExpression: ");
+		printer.prAddExpression(e,4);
+		throw new Exception();
 	}
 
 	public Object evalTerm(Term e) throws Exception
@@ -148,10 +568,10 @@ public class Evaluator {
 		if (e instanceof Times)
 		{
 			Object a = evalTerm(((Times) e).a);
-			if (a!=null && a instanceof Integer)
+			if (a instanceof Integer)
 			{
 				Object b = evalTerm(((Times) e).b);
-				if(b!=null && b instanceof Integer)
+				if(b instanceof Integer)
 				{
 					return new Integer(((Integer) a).intValue() * ((Integer) b).intValue());
 				}
@@ -162,10 +582,10 @@ public class Evaluator {
 					throw new Exception();
 				}
 			}
-			else if (a!=null && a instanceof Float)
+			else if (a instanceof Float)
 			{
 				Object b = evalTerm(((Times) e).b);
-				if(b!=null && b instanceof Float)
+				if(b instanceof Float)
 				{
 					return new Float(((Float) a).floatValue() * ((Float) b).floatValue());
 				}
@@ -176,14 +596,20 @@ public class Evaluator {
 					throw new Exception();
 				}				
 			}
+			else
+			{
+				System.out.println("Eval: Incompatible type in :");
+				printer.prTerm(e,4);
+				throw new Exception();
+			}				
 		}
 		else if (e instanceof Div)
 		{ 
 			Object a = evalTerm(((Div) e).a);
-			if (a!=null && a instanceof Integer)
+			if (a instanceof Integer)
 			{
 				Object b = evalTerm(((Div) e).b);
-				if(b!=null && b instanceof Integer)
+				if(b instanceof Integer)
 				{
 					return new Integer(((Integer) a).intValue() / ((Integer) b).intValue());
 				}
@@ -194,10 +620,10 @@ public class Evaluator {
 					throw new Exception();
 				}
 			}
-			else if (a!=null && a instanceof Float)
+			else if (a instanceof Float)
 			{
 				Object b = evalTerm(((Div) e).b);
-				if(b!=null && b instanceof Float)
+				if(b instanceof Float)
 				{
 					return new Float(((Float) a).floatValue() / ((Float) b).floatValue());
 				}
@@ -208,18 +634,24 @@ public class Evaluator {
 					throw new Exception();
 				}				
 			}
+			else
+			{
+				System.out.println("Eval: Incompatible type in :");
+				printer.prTerm(e,4);
+				throw new Exception();
+			}				
 		}
 		else if (e instanceof Mod)
 		{ 
 			Object a = evalTerm(((Mod) e).a);
-			if (a!=null && a instanceof Integer)
+			if (a instanceof Integer)
 			{
 				Object b = evalTerm(((Div) e).b);
-				if(b!=null && b instanceof Integer)
+				if(b instanceof Integer)
 				{
 					return new Integer(((Integer) a).intValue() % ((Integer) b).intValue());
 				}
-				else if(b!=null && b instanceof Float)
+				else if(b instanceof Float)
 				{
 					return new Float(((Integer) a).intValue() % ((Float) b).floatValue());
 				}
@@ -230,14 +662,14 @@ public class Evaluator {
 					throw new Exception();
 				}
 			}
-			else if (a!=null && a instanceof Float)
+			else if (a instanceof Float)
 			{
 				Object b = evalTerm(((Div) e).b);
-				if(b!=null && b instanceof Integer)
+				if(b instanceof Integer)
 				{
 					return new Float(((Float) a).floatValue() % ((Integer) b).intValue());
 				}
-				else if(b!=null && b instanceof Float)
+				else if(b instanceof Float)
 				{
 					return new Float(((Float) a).floatValue() % ((Float) b).floatValue());
 				}
@@ -248,6 +680,12 @@ public class Evaluator {
 					throw new Exception();
 				}				
 			}
+			else
+			{
+				System.out.println("Eval: Incompatible type in :");
+				printer.prTerm(e,4);
+				throw new Exception();
+			}				
 		}
 		else if (e instanceof UnaryTerm)
 		{ 

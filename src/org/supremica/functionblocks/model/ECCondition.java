@@ -62,47 +62,55 @@ import org.supremica.functionblocks.model.interpreters.st.*;
 
 public class ECCondition
 {
-	private String condition = null;
-	private StringReader stringReader = null;
-	private Lexer lexer = null;
-	private Parser parser = null;
 
 	private Expression abstractSyntax = null;
 
 	private ECCondition() {}
 
-	public ECCondition(String cond)
+	public ECCondition(String condition)
 	{
-		setCondition(cond);
+		
+		System.out.println("ECCondition: Making new instance with condition: " + condition);
+		setCondition(condition);
 	}
 
-	public void setCondition(String cond)
+	public void setCondition(String condition)
 	{
 	
-		condition = cond;
-
-		stringReader = new StringReader(condition);
+		StringReader stringReader = new StringReader(condition);
 		
-		lexer = new Lexer((Reader) stringReader);
+		Lexer lexer = new Lexer((Reader) stringReader);
 
-		parser = new Parser((Scanner) lexer);
+		Parser parser = new Parser((Scanner) lexer);
 
 		try 
-		{ 
+		{
+			System.out.println("ECCondition: Parsing...");
 			abstractSyntax = (Expression) parser.parse().value; 
 		} 
 		catch(Exception e) 
 		{
 			
 		}
-		
-		new Printer(System.out).prExpression(abstractSyntax,0);
+
+		//new Printer(System.out).prExpression(abstractSyntax,0);
 
 	}
 
-	public boolean evaluate(Variables vars)
+	public Boolean evaluate(Variables vars)
 	{
-		return true;
+		
+		System.out.println("ECCondition: evaluate()");
+		try 
+		{ 
+			return new Evaluator(vars).evalExpression(abstractSyntax);
+		} 
+		catch(Exception e) 
+		{
+			System.out.println(e.toString());
+			System.exit(0);
+		}
+		return null;
 	}
 	
 }

@@ -103,7 +103,7 @@ public class ECC
 			for(Iterator iter = ecTransitionsWithSameSource.iterator();iter.hasNext();)
 			{
 				ECTransition temp = (ECTransition) iter.next();
-				if(!temp.getCondition().evaluate(vars)) iter.remove();
+				if(! temp.getCondition().evaluate(vars).booleanValue()) iter.remove();
 			}
 		}
 		else
