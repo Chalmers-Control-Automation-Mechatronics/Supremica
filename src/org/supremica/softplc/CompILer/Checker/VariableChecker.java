@@ -1033,6 +1033,7 @@ public class VariableChecker implements SimpleNodeVisitor {
 
 	}
 
+    /*
 	public Object visitIL_CALL_JAVA_OPERATOR(ASTil_call_java_operator n,
 											 Object o) {
         Node[] children = n.getChildren();
@@ -1047,7 +1048,7 @@ public class VariableChecker implements SimpleNodeVisitor {
         return null;
 
 	}
-
+    */
 
 	public Object visitIL_OPERAND_LIST(ASTil_operand_list n, Object o) {
         Node[] children = n.getChildren();

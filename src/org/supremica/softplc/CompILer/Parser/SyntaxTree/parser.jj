@@ -5748,7 +5748,7 @@ void il_fb_call() :
  * programmed in java.
  */
 
-    ( il_call_operator() | il_call_java_operator() )
+    il_call_operator() //| il_call_java_operator() )
         fb_name()
         ("("
          (
@@ -6270,43 +6270,27 @@ TOKEN:
 }
 
 
-void il_call_java_operator() :
+//void il_call_java_operator() :
 /* Added in addition to the normal grammar to handle
  * calls to function blocks programmed in java.
  */
-{/*@bgen(jjtree) il_call_java_operator */
-        ASTil_call_java_operator jjtn000 = new ASTil_call_java_operator(JJTIL_CALL_JAVA_OPERATOR);
-        boolean jjtc000 = true;
-        jjtree.openNodeScope(jjtn000);
-/*@egen*/
-	Token t;
-}
-{/*@bgen(jjtree) il_call_java_operator */
-        try {
-/*@egen*/
-	t = <il_call_java_op>/*@bgen(jjtree)*/
-        {
-          jjtree.closeNodeScope(jjtn000, true);
-          jjtc000 = false;
-        }
-/*@egen*/
-	{jjtn000.setName(t.image);}/*@bgen(jjtree)*/
-        } finally {
-          if (jjtc000) {
-            jjtree.closeNodeScope(jjtn000, true);
-          }
-        }
-/*@egen*/
-}
-
-
-TOKEN:
-/* Added in addition to the normal grammar to handle
- * calls to function blocks programmed in java.
- */
+/*
 {
-	<il_call_java_op: "CAL_JAVA" >
+Token t;
 }
+{
+    t = <il_call_java_op>
+    {jjtThis.setName(t.image);}
+}
+*/
+
+//TOKEN:
+/* Added in addition to the normal grammar to handle
+ * calls to function blocks programmed in java.
+ */
+//{
+//	<il_call_java_op: "CAL_JAVA" >
+//}
 
 
 

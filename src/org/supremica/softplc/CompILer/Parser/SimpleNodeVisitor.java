@@ -25,8 +25,9 @@ public interface SimpleNodeVisitor
 
 	Object visitIL_CALL_OPERATOR(ASTil_call_operator n, Object o);
 
-	Object visitIL_CALL_JAVA_OPERATOR(ASTil_call_java_operator n, Object o);
-
+    /*
+      Object visitIL_CALL_JAVA_OPERATOR(ASTil_call_java_operator n, Object o);
+     */
 	Object visitIL_EXPRESSION(ASTil_expression n, Object o);
 
 	Object visitIL_FB_CALL(ASTil_fb_call n, Object o);

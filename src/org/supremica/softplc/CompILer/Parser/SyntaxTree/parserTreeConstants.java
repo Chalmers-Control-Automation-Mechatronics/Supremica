@@ -179,9 +179,8 @@ public interface parserTreeConstants
   public int JJTIL_ASSIGN_OPERATOR = 172;
   public int JJTIL_ASSIGN_OUT_OPERATOR = 173;
   public int JJTIL_CALL_OPERATOR = 174;
-  public int JJTIL_CALL_JAVA_OPERATOR = 175;
-  public int JJTIL_RETURN_OPERATOR = 176;
-  public int JJTIL_JUMP_OPERATOR = 177;
+  public int JJTIL_RETURN_OPERATOR = 175;
+  public int JJTIL_JUMP_OPERATOR = 176;
 
 
   public String[] jjtNodeName = {
@@ -360,7 +359,6 @@ public interface parserTreeConstants
     "il_assign_operator",
     "il_assign_out_operator",
     "il_call_operator",
-    "il_call_java_operator",
     "il_return_operator",
     "il_jump_operator",
   };

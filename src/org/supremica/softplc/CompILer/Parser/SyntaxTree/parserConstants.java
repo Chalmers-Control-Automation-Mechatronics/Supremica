@@ -33,14 +33,13 @@ public interface parserConstants {
   int single_byte_string_spec = 82;
   int double_byte_string_spec = 83;
   int il_call_op = 113;
-  int il_call_java_op = 114;
-  int il_return_op = 115;
-  int il_jump_op = 116;
-  int il_expr_operator = 117;
-  int il_simple_operator = 118;
-  int identifier = 119;
-  int digit = 120;
-  int letter = 121;
+  int il_return_op = 114;
+  int il_jump_op = 115;
+  int il_expr_operator = 116;
+  int il_simple_operator = 117;
+  int identifier = 118;
+  int digit = 119;
+  int letter = 120;
 
   int DEFAULT = 0;
   int WithinComment = 1;
@@ -160,7 +159,6 @@ public interface parserConstants {
     "\"VAR_CONFIG\"",
     "\"NOT\"",
     "<il_call_op>",
-    "\"CAL_JAVA\"",
     "<il_return_op>",
     "<il_jump_op>",
     "<il_expr_operator>",
