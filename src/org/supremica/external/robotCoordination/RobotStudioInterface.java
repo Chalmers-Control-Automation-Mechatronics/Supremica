@@ -642,6 +642,7 @@ public class RobotStudioInterface
 				}
 				*/
 
+				/*
 				// If no collisions, not much needs to be done...
 				if (richPath.size() == 2)
 				{
@@ -659,7 +660,8 @@ public class RobotStudioInterface
 					
 					return;
 				}
-
+				*/
+				
 				// The richPath should be used to generate the automata!
 				// Modify zone automata
 				for (int i=0; i< richPath.size(); i++)
@@ -726,64 +728,69 @@ public class RobotStudioInterface
 					Position secondPos = (Position) richPath.get(1);
 					Position secondLastPos = (Position) richPath.get(richPath.size()-2);
 					Position lastPos = (Position) richPath.get(richPath.size()-1);
-					assert(richPath.size() > 2);
+					//assert(richPath.size() > 2);
 					assert(from.getName().equals(firstPos.getName()));
 					assert(to.getName().equals(lastPos.getName()));
-					State firstState = new State(firstPos.getName() + secondPos.getName());
-					rob.addState(firstState);
-					State lastState = rob.getStateWithName(from.getName() + to.getName());
-					lastState.setName(secondLastPos.getName() + lastPos.getName());
 
-					// Set cost for first state, must be int, so it now is the number of milliseconds
-					firstState.setCost((int) (1000*firstPos.getTime()));
-
-					// Modify original arcs
-					LabeledEvent firstEvent = new LabeledEvent(firstPos.getName() + secondPos.getName());
-					rob.getAlphabet().addEvent(firstEvent);
-					//logger.info("Nbr of incoming: " + lastState.nbrOfIncomingArcs());
-					LinkedList toBeRemoved = new LinkedList();
-					for (ArcIterator arcIt = lastState.incomingArcsIterator(); arcIt.hasNext(); )
+					// Only if there was at least one collision
+					if (richPath.size() > 2)
 					{
-						Arc currArc = arcIt.nextArc();
+						State firstState = new State(firstPos.getName() + secondPos.getName());
+						rob.addState(firstState);
+						State lastState = rob.getStateWithName(from.getName() + to.getName());
+						lastState.setName(secondLastPos.getName() + lastPos.getName());
+						
+						// Set cost for first state, must be int, so it now is the number of milliseconds
+						firstState.setCost((int) (1000*firstPos.getTime()));
+						
+						// Modify original arcs
+						LabeledEvent firstEvent = new LabeledEvent(firstPos.getName() + secondPos.getName());
+						rob.getAlphabet().addEvent(firstEvent);
+						//logger.info("Nbr of incoming: " + lastState.nbrOfIncomingArcs());
+						LinkedList toBeRemoved = new LinkedList();
+						for (ArcIterator arcIt = lastState.incomingArcsIterator(); arcIt.hasNext(); )
+						{
+							Arc currArc = arcIt.nextArc();
 						toBeRemoved.add(currArc);
-
+						
 						Arc newArc = new Arc(currArc.getFromState(), firstState, firstEvent);
 						rob.addArc(newArc);
-					}
-					while (toBeRemoved.size() > 0)
-					{
-						rob.removeArc(((Arc) toBeRemoved.remove(0)));
-					}
-					LabeledEvent oldEvent = rob.getAlphabet().getEvent(from.getName() + to.getName());
-					rob.getAlphabet().removeEvent(oldEvent);
-
-					// Add sequence
-					State currState = firstState;
-					for (int i=1; i<richPath.size()-1; i++)
-					{
-						RichPosition currPos = (RichPosition) richPath.get(i);
-						RichPosition nextPos = (RichPosition) richPath.get(i+1);
-
-						// Add new arc and stuff
-						State nextState;
-						if (i == richPath.size()-2)
-						{
-							nextState = lastState;
 						}
-						else
+						while (toBeRemoved.size() > 0)
 						{
-							nextState = new State(currPos.getName() + nextPos.getName());
-							rob.addState(nextState);
+							rob.removeArc(((Arc) toBeRemoved.remove(0)));
 						}
-						LabeledEvent event = new LabeledEvent(currPos.getName() + nextPos.getName());
-						rob.getAlphabet().addEvent(event);
-						Arc arc = new Arc(currState, nextState, event);
-						rob.addArc(arc);
-
-						// Set cost, must be int, so it now is the number of milliseconds
-						nextState.setCost((int) (1000*(nextPos.getTime() - currPos.getTime())));
-
-						currState = nextState;
+						LabeledEvent oldEvent = rob.getAlphabet().getEvent(from.getName() + to.getName());
+						rob.getAlphabet().removeEvent(oldEvent);
+						
+						// Add sequence
+						State currState = firstState;
+						for (int i=1; i<richPath.size()-1; i++)
+						{
+							RichPosition currPos = (RichPosition) richPath.get(i);
+							RichPosition nextPos = (RichPosition) richPath.get(i+1);
+							
+							// Add new arc and stuff
+							State nextState;
+							if (i == richPath.size()-2)
+							{
+								nextState = lastState;
+							}
+							else
+							{
+								nextState = new State(currPos.getName() + nextPos.getName());
+								rob.addState(nextState);
+							}
+							LabeledEvent event = new LabeledEvent(currPos.getName() + nextPos.getName());
+							rob.getAlphabet().addEvent(event);
+							Arc arc = new Arc(currState, nextState, event);
+							rob.addArc(arc);
+							
+							// Set cost, must be int, so it now is the number of milliseconds
+							nextState.setCost((int) (1000*(nextPos.getTime() - currPos.getTime())));
+							
+							currState = nextState;
+						}
 					}
 
 					// MODIFY ROBOT TARGET AUTOMATON
@@ -804,63 +811,68 @@ public class RobotStudioInterface
 					Position secondLastPos = (Position) richPath.get(1);             //
 					RichPosition secondPos = (RichPosition) richPath.get(richPath.size()-2); //
 					RichPosition firstPos = (RichPosition) richPath.get(richPath.size()-1);  //
-					State firstState = new State(firstPos.getName() + secondPos.getName());
-					rob.addState(firstState);
-					State lastState =  rob.getStateWithName(to.getName() + from.getName());  //
-					lastState.setName(secondLastPos.getName() + lastPos.getName());
 
-					// Set cost for first state, must be int, so it now is the number of milliseconds
-					firstState.setCost((int) (1000*(firstPos.getTime() - secondPos.getTime()))); //
-
-					// Modify original arcs
-					LabeledEvent firstEvent = new LabeledEvent(firstPos.getName() + secondPos.getName());
-					rob.getAlphabet().addEvent(firstEvent);
-					// logger.info("Nbr of incoming: " + lastState.nbrOfIncomingArcs());
-					//ArcIterator arcIt = lastState.incomingArcsIterator();
-					LinkedList toBeRemoved = new LinkedList();
-					//for (Arc currArc = arcIt.nextArc(); arcIt.hasNext(); currArc = arcIt.nextArc())
-					for (ArcIterator arcIt = lastState.incomingArcsIterator(); arcIt.hasNext(); )
+					// Only if there was at least one collision
+					if (richPath.size() > 2)
 					{
-						Arc currArc = arcIt.nextArc();
-						toBeRemoved.add(currArc);
-
-						Arc newArc = new Arc(currArc.getFromState(), firstState, firstEvent);
-						rob.addArc(newArc);
-					}
-					while (toBeRemoved.size() > 0)
-					{
-						rob.removeArc(((Arc) toBeRemoved.remove(0)));
-					}
-					LabeledEvent oldEvent = rob.getAlphabet().getEvent(to.getName() + from.getName()); //
-					rob.getAlphabet().removeEvent(oldEvent);
-
-					// Add sequence
-					State currState = firstState;
-					for (int i=richPath.size()-2; i>0; i--) //
-					{
-						RichPosition currPos = (RichPosition) richPath.get(i);
-						RichPosition nextPos = (RichPosition) richPath.get(i-1); //
-
-						// Add new arc and stuff
-						State nextState;
-						if (i == 1) //
+						State firstState = new State(firstPos.getName() + secondPos.getName());
+						rob.addState(firstState);
+						State lastState =  rob.getStateWithName(to.getName() + from.getName());  //
+						lastState.setName(secondLastPos.getName() + lastPos.getName());
+						
+						// Set cost for first state, must be int, so it now is the number of milliseconds
+						firstState.setCost((int) (1000*(firstPos.getTime() - secondPos.getTime()))); //
+						
+						// Modify original arcs
+						LabeledEvent firstEvent = new LabeledEvent(firstPos.getName() + secondPos.getName());
+						rob.getAlphabet().addEvent(firstEvent);
+						// logger.info("Nbr of incoming: " + lastState.nbrOfIncomingArcs());
+						//ArcIterator arcIt = lastState.incomingArcsIterator();
+						LinkedList toBeRemoved = new LinkedList();
+						//for (Arc currArc = arcIt.nextArc(); arcIt.hasNext(); currArc = arcIt.nextArc())
+						for (ArcIterator arcIt = lastState.incomingArcsIterator(); arcIt.hasNext(); )
 						{
-							nextState = lastState;
+							Arc currArc = arcIt.nextArc();
+							toBeRemoved.add(currArc);
+							
+							Arc newArc = new Arc(currArc.getFromState(), firstState, firstEvent);
+							rob.addArc(newArc);
 						}
-						else
+						while (toBeRemoved.size() > 0)
 						{
-							nextState = new State(currPos.getName() + nextPos.getName());
-							rob.addState(nextState);
+							rob.removeArc(((Arc) toBeRemoved.remove(0)));
 						}
-						LabeledEvent event = new LabeledEvent(currPos.getName() + nextPos.getName());
-						rob.getAlphabet().addEvent(event);
-						Arc arc = new Arc(currState, nextState, event);
-						rob.addArc(arc);
-
-						// Set cost, must be int, so it now is the number of milliseconds
-						nextState.setCost((int) (1000*(currPos.getTime() - nextPos.getTime()))); //
-
-						currState = nextState;
+						LabeledEvent oldEvent = rob.getAlphabet().getEvent(to.getName() + from.getName()); //
+						rob.getAlphabet().removeEvent(oldEvent);
+						
+						// Add sequence
+						State currState = firstState;
+						for (int i=richPath.size()-2; i>0; i--) //
+						{
+							RichPosition currPos = (RichPosition) richPath.get(i);
+							RichPosition nextPos = (RichPosition) richPath.get(i-1); //
+							
+							// Add new arc and stuff
+							State nextState;
+							if (i == 1) //
+							{
+								nextState = lastState;
+							}
+							else
+							{
+								nextState = new State(currPos.getName() + nextPos.getName());
+								rob.addState(nextState);
+							}
+							LabeledEvent event = new LabeledEvent(currPos.getName() + nextPos.getName());
+							rob.getAlphabet().addEvent(event);
+							Arc arc = new Arc(currState, nextState, event);
+							rob.addArc(arc);
+							
+							// Set cost, must be int, so it now is the number of milliseconds
+							nextState.setCost((int) (1000*(currPos.getTime() - nextPos.getTime()))); //
+							
+							currState = nextState;
+						}
 					}
 
 					// MODIFY ROBOT TARGET AUTOMATON
