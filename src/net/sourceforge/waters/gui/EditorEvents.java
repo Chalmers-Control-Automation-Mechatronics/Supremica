@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorEvents
 //###########################################################################
-//# $Id: EditorEvents.java,v 1.9 2005-02-22 22:38:42 robi Exp $
+//# $Id: EditorEvents.java,v 1.10 2005-02-23 19:51:16 robi Exp $
 //###########################################################################
 
 
@@ -14,13 +14,20 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
 import javax.swing.DefaultCellEditor;
 import javax.swing.ImageIcon;
+import javax.swing.InputMap;
 import javax.swing.JFormattedTextField;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTable;
+import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -91,7 +98,15 @@ public class EditorEvents
 		final ListSelectionModel selmodel = getSelectionModel();
 		final ListSelectionListener listener = new SelectionListener();
 		selmodel.addListSelectionListener(listener);
+
+		final InputMap inputmap = getInputMap();
+		inputmap.put(STROKE_TAB, ACTNAME_DOWN);
+		inputmap.put(STROKE_SHIFT_TAB, ACTNAME_UP);
+		final ActionMap actionmap = getActionMap();
+		actionmap.put(ACTNAME_DOWN, new NavigationAction(ACTNAME_DOWN, 1));
+		actionmap.put(ACTNAME_UP, new NavigationAction(ACTNAME_UP, -1));
 	}
+
 
 
 	//#######################################################################
@@ -358,6 +373,44 @@ public class EditorEvents
 
 
 	//#######################################################################
+	//# Local Class NavigationAction
+	private class NavigationAction extends AbstractAction
+	{
+
+		//###################################################################
+		//# Data Members
+		private NavigationAction(final String name, final int offset)
+		{
+			super(name);
+			mOffset = offset;
+		}
+
+
+
+		//###################################################################
+		//# Interface ava.awt.event.ActionListener
+		public void actionPerformed(final ActionEvent event)
+		{
+			if (!isEditing()) {
+				final ListSelectionModel selmodel = getSelectionModel();
+				final int numrows = getRowCount(); 
+				final int selrow = selmodel.getLeadSelectionIndex();
+				final int newrow = (selrow + numrows + mOffset) % numrows;
+				setRowSelectionInterval(newrow, newrow);
+			}
+		}
+
+
+
+		//###################################################################
+		//# Data Members
+		private final int mOffset;
+
+	}
+
+
+
+	//#######################################################################
 	//# Data Members
 	private IdentifierProxy mBuffer;
 
@@ -369,5 +422,13 @@ public class EditorEvents
 	private static final int MINCOLUMNWIDTH0 = 20;
 	private static final int COLUMNWIDTH1 = 96;
 	private static final int MINCOLUMNWIDTH1 = 24;
+
+	private static final KeyStroke STROKE_TAB =
+		KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0);
+	private static final KeyStroke STROKE_SHIFT_TAB =
+		KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.SHIFT_MASK);
+
+	private static final String ACTNAME_DOWN = "EditorEvents.DOWN";
+	private static final String ACTNAME_UP = "EditorEvents.UP";
 
 }
