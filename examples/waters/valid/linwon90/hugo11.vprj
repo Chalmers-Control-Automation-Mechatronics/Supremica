@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE project PUBLIC "project" "project.dtd">
+
+<project name="hugo11"
+         legacy="1"
+         generatorName="VALID-II"
+         generatorVersion="2.9b2"
+         version="1.0"
+         creationDate="2005-02-21 09:20:32 GMT+12:00"
+         modificationDate="2005-02-21 09:35:12 GMT+12:00">
+<uses module="hugo11_main"/>
+</project>

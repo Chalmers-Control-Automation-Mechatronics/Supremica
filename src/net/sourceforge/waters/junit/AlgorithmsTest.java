@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.junit
 //# CLASS:   AlgorithmsTest
 //###########################################################################
-//# $Id: AlgorithmsTest.java,v 1.2 2005-02-18 01:32:42 robi Exp $
+//# $Id: AlgorithmsTest.java,v 1.3 2005-02-20 23:29:48 robi Exp $
 //###########################################################################
 
 
@@ -72,6 +72,24 @@ public class AlgorithmsTest extends WatersTestCase
     final String[] events = {"put[1]"};
     final ProductDESProxy des = compileValid(subdirname, "subsystem");
     final AutomatonProxy hidden = hide(des, "subsystem", events, false);
+    save(des, hidden);
+    final ProductDESProxy expected = getExpectedValid(subdirname, hidden);
+    testExpected(hidden, expected);
+    final AutomatonProxy reduced1 = reduce(des, hidden, ":reduced");
+    save(des, hidden);
+    testExpected(reduced1, expected);
+    final AutomatonProxy reduced2 = reduce(reduced1);
+    testExpected(reduced2, expected);
+  }
+
+  public void testHide_linwon90_hugo11()
+    throws IOException, JAXBException, WatersException,
+	   TransformerConfigurationException
+  {
+    final String subdirname = "linwon90";
+    final String[] events = {"tau1", "tau2"};
+    final ProductDESProxy des = compileValid(subdirname, "hugo11");
+    final AutomatonProxy hidden = hide(des, "hugo11", events, false);
     save(des, hidden);
     final ProductDESProxy expected = getExpectedValid(subdirname, hidden);
     testExpected(hidden, expected);

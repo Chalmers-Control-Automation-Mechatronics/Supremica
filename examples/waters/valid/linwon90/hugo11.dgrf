@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="hugo11" version="1.0" valid="1"
+	hasGeometry="1" width="356" height="223"
+	generatorName="DGE" generatorVersion="2.9b2"
+	creationDate="2005-02-20 21:24:49 GMT"
+	modificationDate="2005-02-20 21:34:57 GMT">
+<events>
+<event controllable="1" name="f1"/>
+<event controllable="1" name="f2"/>
+<event controllable="1" name="tau1"/>
+<event controllable="1" name="tau2"/>
+</events>
+<nodes>
+<node>
+<rendering><point x="96" y="256"/></rendering>
+<label name="s9">
+<rendering><point x="8" y="15"/></rendering>
+</label>
+</node>
+<node>
+<rendering><point x="352" y="192"/></rendering>
+<label name="s10">
+<rendering><point x="8" y="19"/></rendering>
+</label>
+</node>
+<node>
+<rendering><point x="224" y="192"/></rendering>
+<label name="s8">
+<rendering><point x="7" y="18"/></rendering>
+</label>
+</node>
+<node>
+<rendering><point x="160" y="192"/></rendering>
+<label name="s4">
+<rendering><point x="-22" y="17"/></rendering>
+</label>
+</node>
+<node>
+<rendering><point x="96" y="192"/></rendering>
+<label name="s7">
+<rendering><point x="8" y="19"/></rendering>
+</label>
+</node>
+<node marked="1">
+<rendering><point x="352" y="128"/></rendering>
+<label name="s6">
+<rendering><point x="7" y="18"/></rendering>
+</label>
+</node>
+<node marked="1">
+<rendering><point x="288" y="128"/></rendering>
+<label name="s5">
+<rendering><point x="-5" y="20"/></rendering>
+</label>
+</node>
+<node marked="1">
+<rendering><point x="224" y="128"/></rendering>
+<label name="s3">
+<rendering><point x="7" y="18"/></rendering>
+</label>
+</node>
+<node marked="1">
+<rendering><point x="160" y="128"/></rendering>
+<label name="s1">
+<rendering><point x="-16" y="19"/></rendering>
+</label>
+</node>
+<node marked="1">
+<rendering><point x="96" y="128"/></rendering>
+<label name="s2">
+<rendering><point x="7" y="18"/></rendering>
+</label>
+</node>
+<node initial="1" marked="1">
+<rendering><point x="128" y="64"/></rendering>
+<label name="s0">
+<rendering><point x="-8" y="24"/></rendering>
+</label>
+</node>
+</nodes>
+<edges>
+<edge>
+<source name="s4"/>
+<target name="s8"/>
+<labelGroup>
+<rendering><point x="-12" y="-2"/></rendering>
+<label name="tau2"/>
+</labelGroup>
+</edge>
+<edge>
+<source name="s4"/>
+<target name="s7"/>
+<labelGroup>
+<rendering><point x="-9" y="-3"/></rendering>
+<label name="tau1"/>
+</labelGroup>
+</edge>
+<edge>
+<source name="s10"/>
+<target name="s5"/>
+<labelGroup>
+<rendering><point x="-19" y="5"/></rendering>
+<label name="f2"/>
+</labelGroup>
+</edge>
+<edge>
+<rendering><point x="134" y="159"/></rendering>
+<source name="s7"/>
+<target name="s3"/>
+<labelGroup>
+<rendering><point x="-16" y="1"/></rendering>
+<label name="f2"/>
+</labelGroup>
+</edge>
+<edge>
+<source name="s7"/>
+<target name="s9"/>
+<labelGroup>
+<rendering><point x="-9" y="3"/></rendering>
+<label name="tau1"/>
+</labelGroup>
+</edge>
+<edge>
+<source name="s1"/>
+<target name="s4"/>
+<labelGroup>
+<rendering><point x="3" y="5"/></rendering>
+<label name="f1"/>
+</labelGroup>
+</edge>
+<edge>
+<rendering><point x="225" y="103"/></rendering>
+<source name="s1"/>
+<target name="s5"/>
+<labelGroup>
+<rendering><point x="-16" y="-2"/></rendering>
+<label name="tau2"/>
+</labelGroup>
+</edge>
+<edge>
+<source name="s1"/>
+<target name="s3"/>
+<labelGroup>
+<rendering><point x="-12" y="-2"/></rendering>
+<label name="tau1"/>
+</labelGroup>
+</edge>
+<edge>
+<source name="s6"/>
+<target name="s10"/>
+<labelGroup>
+<rendering><point x="-16" y="5"/></rendering>
+<label name="f1"/>
+</labelGroup>
+</edge>
+<edge>
+<source name="s0"/>
+<target name="s2"/>
+<labelGroup>
+<rendering><point x="-29" y="-6"/></rendering>
+<label name="tau1"/>
+</labelGroup>
+</edge>
+<edge>
+<source name="s0"/>
+<target name="s1"/>
+<labelGroup>
+<rendering><point x="2" y="-3"/></rendering>
+<label name="tau2"/>
+</labelGroup>
+</edge>
+<edge>
+<source name="s3"/>
+<target name="s8"/>
+<labelGroup>
+<rendering><point x="5" y="4"/></rendering>
+<label name="f1"/>
+</labelGroup>
+</edge>
+<edge>
+<rendering><point x="289" y="102"/></rendering>
+<source name="s3"/>
+<target name="s6"/>
+<labelGroup>
+<rendering><point x="-9" y="-3"/></rendering>
+<label name="tau2"/>
+</labelGroup>
+</edge>
+<edge>
+<rendering><point x="162" y="103"/></rendering>
+<source name="s3"/>
+<target name="s2"/>
+<labelGroup>
+<rendering><point x="-46" y="8"/></rendering>
+<label name="tau1"/>
+</labelGroup>
+</edge>
+<edge>
+<source name="s2"/>
+<target name="s7"/>
+<labelGroup>
+<rendering><point x="-13" y="6"/></rendering>
+<label name="f1"/>
+</labelGroup>
+</edge>
+<edge>
+<source name="s8"/>
+<target name="s10"/>
+<labelGroup>
+<rendering><point x="-11" y="-2"/></rendering>
+<label name="tau2"/>
+</labelGroup>
+</edge>
+<edge>
+<source name="s8"/>
+<target name="s1"/>
+<labelGroup>
+<rendering><point x="1" y="-2"/></rendering>
+<label name="f2"/>
+</labelGroup>
+</edge>
+<edge>
+<source name="s8"/>
+<target name="s9"/>
+<labelGroup>
+<rendering><point x="6" y="8"/></rendering>
+<label name="tau1"/>
+</labelGroup>
+</edge>
+<edge>
+<rendering><point x="49" y="192"/></rendering>
+<source name="s9"/>
+<target name="s2"/>
+<labelGroup>
+<rendering><point x="-16" y="4"/></rendering>
+<label name="f2"/>
+</labelGroup>
+</edge>
+<edge>
+<source name="s5"/>
+<target name="s8"/>
+<labelGroup>
+<rendering><point x="6" y="3"/></rendering>
+<label name="f1"/>
+</labelGroup>
+</edge>
+<edge>
+<source name="s5"/>
+<target name="s6"/>
+<labelGroup>
+<rendering><point x="-14" y="12"/></rendering>
+<label name="tau1"/>
+</labelGroup>
+</edge>
+</edges>
+</graph>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE module PUBLIC "module" "module.dtd">
+
+<module name="hugo11_main"
+        legacy="1"
+        arity="0"
+        generatorName="VALID-II"
+        generatorVersion="2.9b2"
+        version="1.0"
+        creationDate="2005-02-21 09:20:32 GMT+12:00"
+        modificationDate="2005-02-21 09:35:12 GMT+12:00">
+<interface/>
+<local>
+<event name="f1"
+       controllable="1"
+       arity="0">
+</event>
+<event name="f2"
+       controllable="1"
+       arity="0">
+</event>
+<event name="tau1"
+       controllable="1"
+       arity="0">
+</event>
+<event name="tau2"
+       controllable="1"
+       arity="0">
+</event>
+</local>
+<parts>
+<component graph="hugo11" kind="spec"/>
+</parts>
+</module>

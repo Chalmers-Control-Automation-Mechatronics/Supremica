@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ProductDES Name="hugo11" xmlns="http://waters.sourceforge.net/xsd/des">
+<EventList>
+<Event Kind="PROPOSITION" Name=":omega"/>
+<Event Kind="CONTROLLABLE" Name="f1"/>
+<Event Kind="CONTROLLABLE" Name="f2"/>
+<Event Kind="CONTROLLABLE" Name="tau1"/>
+<Event Kind="CONTROLLABLE" Name="tau2"/>
+</EventList>
+<AutomataList>
+<Automaton Kind="SPEC" Name=":reduced">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="f1"/>
+<EventRef Name="f2"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name=":b0">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name=":b1"/>
+</StateList>
+<TransitionList>
+<Transition Event="f1" Source=":b0" Target=":b1"/>
+<Transition Event="f2" Source=":b1" Target=":b0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="hugo11">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="f1"/>
+<EventRef Name="f2"/>
+<EventRef Name="tau1"/>
+<EventRef Name="tau2"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="s0">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="s1">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="s10"/>
+<State Name="s2">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="s3">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="s4"/>
+<State Name="s5">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="s6">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="s7"/>
+<State Name="s8"/>
+<State Name="s9"/>
+</StateList>
+<TransitionList>
+<Transition Event="f2" Source="s9" Target="s2"/>
+<Transition Event="f2" Source="s10" Target="s5"/>
+<Transition Event="tau2" Source="s8" Target="s10"/>
+<Transition Event="f2" Source="s8" Target="s1"/>
+<Transition Event="tau1" Source="s8" Target="s9"/>
+<Transition Event="tau2" Source="s4" Target="s8"/>
+<Transition Event="tau1" Source="s4" Target="s7"/>
+<Transition Event="f2" Source="s7" Target="s3"/>
+<Transition Event="tau1" Source="s7" Target="s9"/>
+<Transition Event="f1" Source="s6" Target="s10"/>
+<Transition Event="f1" Source="s5" Target="s8"/>
+<Transition Event="tau1" Source="s5" Target="s6"/>
+<Transition Event="f1" Source="s3" Target="s8"/>
+<Transition Event="tau2" Source="s3" Target="s6"/>
+<Transition Event="tau1" Source="s3" Target="s2"/>
+<Transition Event="f1" Source="s1" Target="s4"/>
+<Transition Event="tau2" Source="s1" Target="s5"/>
+<Transition Event="tau1" Source="s1" Target="s3"/>
+<Transition Event="f1" Source="s2" Target="s7"/>
+<Transition Event="tau1" Source="s0" Target="s2"/>
+<Transition Event="tau2" Source="s0" Target="s1"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="hugo11:tau1:tau2">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="f1"/>
+<EventRef Name="f2"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="s0">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Initial="true" Name="s1">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="s10"/>
+<State Initial="true" Name="s2">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Initial="true" Name="s3">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="s4"/>
+<State Initial="true" Name="s5">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Initial="true" Name="s6">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="s7"/>
+<State Name="s8"/>
+<State Name="s9"/>
+</StateList>
+<TransitionList>
+<Transition Event="f1" Source="s3" Target="s10"/>
+<Transition Event="f1" Source="s5" Target="s9"/>
+<Transition Event="f2" Source="s4" Target="s1"/>
+<Transition Event="f1" Source="s6" Target="s10"/>
+<Transition Event="f2" Source="s8" Target="s2"/>
+<Transition Event="f1" Source="s3" Target="s7"/>
+<Transition Event="f1" Source="s1" Target="s8"/>
+<Transition Event="f1" Source="s0" Target="s7"/>
+<Transition Event="f1" Source="s0" Target="s10"/>
+<Transition Event="f1" Source="s5" Target="s10"/>
+<Transition Event="f2" Source="s7" Target="s3"/>
+<Transition Event="f2" Source="s8" Target="s3"/>
+<Transition Event="f2" Source="s9" Target="s2"/>
+<Transition Event="f2" Source="s4" Target="s3"/>
+<Transition Event="f1" Source="s1" Target="s9"/>
+<Transition Event="f1" Source="s0" Target="s8"/>
+<Transition Event="f2" Source="s4" Target="s5"/>
+<Transition Event="f2" Source="s7" Target="s6"/>
+<Transition Event="f2" Source="s4" Target="s2"/>
+<Transition Event="f1" Source="s1" Target="s4"/>
+<Transition Event="f2" Source="s10" Target="s5"/>
+<Transition Event="f1" Source="s2" Target="s7"/>
+<Transition Event="f1" Source="s3" Target="s9"/>
+<Transition Event="f1" Source="s0" Target="s4"/>
+<Transition Event="f2" Source="s8" Target="s5"/>
+<Transition Event="f1" Source="s1" Target="s10"/>
+<Transition Event="f1" Source="s5" Target="s8"/>
+<Transition Event="f2" Source="s10" Target="s6"/>
+<Transition Event="f1" Source="s1" Target="s7"/>
+<Transition Event="f2" Source="s8" Target="s6"/>
+<Transition Event="f2" Source="s8" Target="s1"/>
+<Transition Event="f1" Source="s3" Target="s8"/>
+<Transition Event="f2" Source="s7" Target="s2"/>
+<Transition Event="f1" Source="s2" Target="s9"/>
+</TransitionList>
+</Automaton>
+</AutomataList>
+</ProductDES>
+
