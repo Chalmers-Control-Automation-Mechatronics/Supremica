@@ -181,6 +181,15 @@
 	<delete file="${backup.dir}/${project.name}_${DSTAMP}_${TSTAMP}.tar"/>
 </target>
 
+<target name="backup_src" depends="init,clean">
+	<tar tarfile="${backup.dir}/${project.name}_onlysrc_${DSTAMP}_${TSTAMP}.tar" 
+		basedir="../${project.name}/src"
+		excludes="rsync/**,put,get"/>
+	<gzip zipfile="${backup.dir}/${project.name}_onlysrc_${DSTAMP}_${TSTAMP}.tar.gz"
+		src="${backup.dir}/${project.name}_onlysrc_${DSTAMP}_${TSTAMP}.tar"/>
+	<delete file="${backup.dir}/${project.name}_onlysrc_${DSTAMP}_${TSTAMP}.tar"/>
+</target>
+
 <target name="version" depends="init">
 	<delete quiet="true" file="${src}/${supremica_basedir}/Version.java"/>
 	<copy file="${templates}/Version.tmpl" tofile="${src}/${supremica_basedir}/Version.java"/>	
