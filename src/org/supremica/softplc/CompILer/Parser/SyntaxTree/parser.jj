@@ -370,7 +370,7 @@ TOKEN: /* double_byte_character_representation */
 TOKEN:  /* common_character_representation */
 	/* Egna till\u00e4gg:
 	 * " "
-     * "\u00e5", ...
+	 * "\u00e5", ...
 	 */
 
 {
