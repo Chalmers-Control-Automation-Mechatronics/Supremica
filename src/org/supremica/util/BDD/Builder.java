@@ -45,7 +45,7 @@ public class Builder {
 	    {
 		org.supremica.automata.Automaton s_a = (org.supremica.automata.Automaton) it.next();
 
-		automata.createAutomaton(s_a.getName());
+		automata.createAutomaton(s_a, s_a.getName());
 
 		Automaton a = automata.getCurrent();
 

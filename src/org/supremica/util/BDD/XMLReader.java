@@ -89,7 +89,7 @@ class XMLReader
 			String name = attributes.getValue(VALUE_NAME);
 			int type = getType(attributes.getValue(VALUE_TYPE));
 
-			automata.createAutomaton(name);
+			automata.createAutomaton(name, null);
 			automata.getCurrent().setType(type);
 		}
 		else if (qName.equals(TYPE_STATE))

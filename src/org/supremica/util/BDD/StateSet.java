@@ -31,22 +31,19 @@ public class StateSet
 	public State getByName(String name)
 	    throws BDDException
 	{
-		BDDAssert.bddAssert(!closed, "[StateSet.getIdByName]BAD FUNCTION CALL!");
-
 		State by_id = null;
 
-		for (Enumeration e = elements(); e.hasMoreElements(); )
-		{
-			State s = (State) e.nextElement();
-
-			if (s.name_id.equals(name))
-			{
-				return s;
+		if(closed) {
+			for(int i = 0; i < states.length; i++) {
+				if(states[i].name_id.equals(name))	return states[i];
+				if(states[i].name.equals(name)) by_id = states[i];
 			}
+		} else {
 
-			if(s.name.equals(name))
-			{
-				by_id = s;
+			for (Enumeration e = elements(); e.hasMoreElements(); ) {
+				State s = (State) e.nextElement();
+				if (s.name_id.equals(name))		return s;
+				if(s.name.equals(name))			by_id = s;
 			}
 		}
 

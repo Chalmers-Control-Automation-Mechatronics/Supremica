@@ -287,9 +287,9 @@ public class Automaton
 
 		notifyListeners(AutomatonListeners.MODE_STATE_ADDED, state);
 	}
-	
+
 	/**
-	 * Returns a list of control inconsisten events among the 
+	 * Returns a list of control inconsisten events among the
 	 * given states are consistent.
 	 * We have an inconsistency if an event is explicitly
 	 * removed in one state and explicitly enabled in another.
@@ -302,7 +302,7 @@ public class Automaton
 	{
 		Events explicitlyForbiddenEvents = new Events();
 
-		// We start by computing the set of explicitly 
+		// We start by computing the set of explicitly
 		// forbidden events
 		for (StateIterator stateIt = stateset.iterator(); stateIt.hasNext(); )
 		{
@@ -318,7 +318,7 @@ public class Automaton
 					{
 						try
 						{
-							explicitlyForbiddenEvents.addEvent(currEvent);		
+							explicitlyForbiddenEvents.addEvent(currEvent);
 						}
 						catch (Exception ex)
 						{
@@ -332,8 +332,8 @@ public class Automaton
 
 		// We continuing by iterating over the
 		// all explicitly allowed events and check
-		// that those are not in the list of explicitly 
-		// forbidden events 
+		// that those are not in the list of explicitly
+		// forbidden events
 		Events controlInconsistentEvents = new Events();
 		for (StateIterator stateIt = stateset.iterator(); stateIt.hasNext(); )
 		{
@@ -349,7 +349,7 @@ public class Automaton
 					{
 						try
 						{
-							controlInconsistentEvents.addEvent(currEvent);		
+							controlInconsistentEvents.addEvent(currEvent);
 						}
 						catch (Exception ex)
 						{
@@ -359,7 +359,7 @@ public class Automaton
 					}
 				}
 			}
-		}		
+		}
 
 		return controlInconsistentEvents;
 	}
@@ -374,7 +374,7 @@ public class Automaton
 		Events explicitlyForbiddenEvents = new Events();
 		Map eventToStateMap = new HashMap();
 
-		// We start by computing the set of explicitly 
+		// We start by computing the set of explicitly
 		// forbidden events
 		for (StateIterator stateIt = stateset.iterator(); stateIt.hasNext(); )
 		{
@@ -390,7 +390,7 @@ public class Automaton
 					{
 						try
 						{
-							explicitlyForbiddenEvents.addEvent(currEvent);		
+							explicitlyForbiddenEvents.addEvent(currEvent);
 							eventToStateMap.put(currEvent, nextState);
 						}
 						catch (Exception ex)
@@ -405,8 +405,8 @@ public class Automaton
 
 		// We continuing by iterating over the
 		// all explicitly allowed events and check
-		// that those are not in the list of explicitly 
-		// forbidden events 
+		// that those are not in the list of explicitly
+		// forbidden events
 		Events controlInconsistentEvents = new Events();
 		for (StateIterator stateIt = stateset.iterator(); stateIt.hasNext(); )
 		{
@@ -424,7 +424,7 @@ public class Automaton
 						{
 							State forbiddenState = (State)eventToStateMap.get(currEvent);
 							currArc.setToState(forbiddenState);
-							controlInconsistentEvents.addEvent(currEvent);		
+							controlInconsistentEvents.addEvent(currEvent);
 						}
 						catch (Exception ex)
 						{
@@ -434,7 +434,7 @@ public class Automaton
 					}
 				}
 			}
-		}		
+		}
 
 		return controlInconsistentEvents;
 	}
@@ -1442,12 +1442,12 @@ public class Automaton
 		invalidate();
 		endTransaction();
 	}
-	
+
 	public void setAllStatesAsAccepting()
 	{
 		setAllStatesAsAccepting(false);
 	}
-	
+
 	public void setAllStatesAsAccepting(boolean keepForbidden)
 	{
 		beginTransaction();
@@ -1457,18 +1457,18 @@ public class Automaton
 			if (keepForbidden)
 			{
 				if (!currState.isForbidden())
-				{	
+				{
 					currState.setAccepting(true);
 				}
 			}
 			else
 			{
 				currState.setAccepting(true);
-				currState.setForbidden(false);	
+				currState.setForbidden(false);
 			}
 		}
 		invalidate();
-		endTransaction();		
+		endTransaction();
 	}
 
 	public void setAllMutuallyAcceptingStatesAsAccepting()
@@ -1487,20 +1487,20 @@ public class Automaton
 				if (keepForbidden)
 				{
 					if (!currState.isForbidden())
-					{	
+					{
 						currState.setAccepting(true);
 					}
 				}
 				else
 				{
 					currState.setAccepting(true);
-					currState.setForbidden(false);	
+					currState.setForbidden(false);
 				}
 			}
 		}
 		invalidate();
-		endTransaction();		
-	}		
+		endTransaction();
+	}
 
 	/**
 	 * Makes all mutually accepting or accepting states non-accepting and all non-accepting states accepting.
@@ -1518,7 +1518,7 @@ public class Automaton
 			{
 				currState.setAccepting(true);
 			}
-		}		
+		}
 	}
 
 	/**
@@ -1553,7 +1553,7 @@ public class Automaton
 		{
 			listeners.setUpdateNeeded(true);
 		}
- 		
+
 		endTransaction();
 	}
 

@@ -23,12 +23,12 @@ public class Automata
 		return automata;
 	}
 
-	public Automaton createAutomaton(String name)
+	public Automaton createAutomaton(Object org, String name)
 	    throws BDDException
 	{
 		BDDAssert.bddAssert(!closed, "[Automata.createAutomaton] BAD function call");
 
-		current = new Automaton(name, alphabet);
+		current = new Automaton(name, alphabet, org);
 
 		automata.addElement(current);
 

@@ -10,8 +10,8 @@ public class BDDAutomaton
 	private BDDAutomata manager;
 	private Automaton automaton;
     private DependencySet dependency = null;
-    private int index, membership; /** membership is used to modify plant/spec time */
-	private int num_bits, num_states, num_arcs;
+    /* package */ int index;
+	private int num_bits, num_states, num_arcs, membership; /** membership is used to modify plant/spec time */
 	private State[] states;
 	private Arc[] arcs;
 	private Event[] events;

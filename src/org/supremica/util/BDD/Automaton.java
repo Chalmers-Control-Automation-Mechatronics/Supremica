@@ -39,18 +39,23 @@ public class Automaton
 	private EventSet eventSet = new EventSet();
 	private ArcSet arcSet = new ArcSet();
 	private EventManager alphabet;
+	private Object original; // the Supremica automata
+
 	private int [][] eventFlowMatrix = null;
 	private boolean [] care_set, care_set_uc; // Events that we have in our alphabeth, and are uncontrollabe
 	private int [] event_usage; // how many times each event was used
 
 
 
+
+
 	// ------------------------------------------------------------------------------------------
 
-	public Automaton(String name, EventManager alphabet)
+	public Automaton(String name, EventManager alphabet, Object original)
 	{
 		this.alphabet = alphabet;
 		this.name = name;
+		this.original = original;
 		type = TYPE_UNKNOWN;
 		closed = false;
 	}
@@ -99,6 +104,14 @@ public class Automaton
 		{
 			arcSet.add(name, from, to);
 		}
+	}
+
+	// ------------------------------------------------------------
+
+	/** returns the supremica-automata this object was built from */
+	public Object getSupremicaModel()
+	{
+		return original;
 	}
 
 	// ------------------------------------------------------------

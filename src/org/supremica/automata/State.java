@@ -492,7 +492,7 @@ public class State
 	{
 		return new ArcIterator(incomingArcs.iterator());
 	}
-	
+
 	public StateIterator nextStateIterator()
 	{
 		StateSet nextStates = new StateSet();
