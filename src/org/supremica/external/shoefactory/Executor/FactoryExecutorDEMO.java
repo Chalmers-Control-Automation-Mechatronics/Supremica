@@ -18,12 +18,12 @@ public class FactoryExecutorDEMO
 	public static int threadSleepInterval=200;
 	boolean type;
 	static PlantDEMO shoePlant;
-	static int shoeNr=1, firstIndex=0, sNr=0;
+	static int shoeNr=1, sNr=0;
 	static Gui gui;
 	static EditorAPI e;
 	static ArrayList shoes = new ArrayList();
 	static ArrayList shoeNumbers = new ArrayList();
-	GCDocument top, jgSupervisor;
+	static GCDocument top, jgSupervisor;
 
 	public FactoryExecutorDEMO()
 	{
@@ -33,7 +33,7 @@ public class FactoryExecutorDEMO
 	public void start(boolean [] sv, Gui g)
 	{
 		gui = g;
-		String[] args = {""};
+		String[] args = {"-geometry", "1024x700"};
 		
 		if(sv[21])
 			type=true;
@@ -45,65 +45,74 @@ public class FactoryExecutorDEMO
 		{
 			if(shoeNr==1)
 			{
-				e = new EditorAPI(args);
-				Editor.singleton = e;
-				e.removePaletteAction();
-
-				URL url = Supremica.class.getResource("/shoefactory/ShoeFactoryDEMO.xml");
-				top = e.openWorkspace(url.getPath());
-
-				jgSupervisor = e.newWorkspace();
-				JgrafSupervisorDEMO js = new JgrafSupervisorDEMO(jgSupervisor,shoeNr);
-
-				shoePlant = new PlantDEMO();
-				gui.addProject(shoePlant.getPlant());
-
-				SpecificationDEMO shoeSpec = new SpecificationDEMO(shoeNr,type);
-				gui.addProject(shoeSpec.getSpec());
-
-				SyncBuilder syncPlant = new SyncBuilder(gui, shoePlant.getPlant());
-				syncPlant.synthesizePlants("theSupervisor");
-		
-				//-----DEMO - reduce available slots--------
-				for(int i=0;i<9;i++)
-				{
-					boolean b = js.moveInitial("Table0", "Shoe_1put_T0L");
-				}
-				for(int i=0;i<22;i++)
-				{
-					boolean b = js.moveInitial("Table1", "Shoe_1put_T1");
-					b = js.moveInitial("Table2", "Shoe_1put_T2");
-				}
-				//------------------------------------------
-		
-				GCDocument newShoe = e.newWorkspace();
-				ShoeDEMO s = new ShoeDEMO(newShoe, type, shoeNr);
-				shoes.add(newShoe);
-				shoeNumbers.add(new Integer(shoeNr));
+				EditorCreator ec = new EditorCreator(args);
 				
-				newShoe.setSpeed(threadSleepInterval/2);
-				top.setSpeed(threadSleepInterval);
-				jgSupervisor.setSpeed(threadSleepInterval);
-
-				boolean OK = e.compileWorkspace(top);
-				if(OK)
+				if(!ec.isStarted())
 				{
-					e.startWorkspace(top);
+					e = ec.getEditor();
+					e.setTitle("Shoefactory DEMO");
+					Editor.singleton = e;
+					e.removePaletteAction();
+	
+					URL url = Supremica.class.getResource("/shoefactory/ShoeFactoryDEMO.xml");
+					
+					//needed to replace %20 with spaces in the path");
+					String xmlPath = (url.getPath()).replaceAll("%20"," ");
+					top = e.openWorkspace(xmlPath);
+	
+					jgSupervisor = e.newWorkspace();
+					JgrafSupervisorDEMO js = new JgrafSupervisorDEMO(jgSupervisor,shoeNr);
+	
+					shoePlant = new PlantDEMO();
+					gui.addProject(shoePlant.getPlant());
+	
+					SpecificationDEMO shoeSpec = new SpecificationDEMO(shoeNr,type);
+					gui.addProject(shoeSpec.getSpec());
+	
+					SyncBuilder syncPlant = new SyncBuilder(gui, shoePlant.getPlant());
+					syncPlant.synthesizePlants("theSupervisor");
+			
+					//-----DEMO - reduce available slots--------
+					for(int i=0;i<9;i++)
+					{
+						boolean b = js.moveInitial("Table0", "Shoe_1put_T0L");
+					}
+					for(int i=0;i<22;i++)
+					{
+						boolean b = js.moveInitial("Table1", "Shoe_1put_T1");
+						b = js.moveInitial("Table2", "Shoe_1put_T2");
+					}
+					//------------------------------------------
+			
+					GCDocument newShoe = e.newWorkspace();
+					ShoeDEMO s = new ShoeDEMO(newShoe, type, shoeNr);
+					shoes.add(newShoe);
+					shoeNumbers.add(new Integer(shoeNr));
+					
+					newShoe.setSpeed(threadSleepInterval);
+					top.setSpeed(threadSleepInterval);
+					jgSupervisor.setSpeed(threadSleepInterval);
+	
+					boolean OK = e.compileWorkspace(top);
+					if(OK)
+					{
+						e.startWorkspace(top);
+					}
+	
+					OK = e.compileWorkspace(jgSupervisor);
+					if(OK)
+					{
+						e.startWorkspace(jgSupervisor);
+					}
+	
+					OK = e.compileWorkspace(newShoe);
+					if(OK)
+					{
+						//e.startWorkspace(newShoe);
+					}
+					
+					shoeNr++;
 				}
-
-				OK = e.compileWorkspace(jgSupervisor);
-				if(OK)
-				{
-					e.startWorkspace(jgSupervisor);
-				}
-
-				OK = e.compileWorkspace(newShoe);
-				if(OK)
-				{
-					//e.startWorkspace(newShoe);
-				}
-				
-				shoeNr++;
 			}
 			else
 			{
@@ -153,9 +162,8 @@ public class FactoryExecutorDEMO
 		}
 	}
 	
-	public static boolean saveValues(int fi, int s)
+	public static boolean saveValues(int s)
 	{
-		firstIndex = fi;
 		sNr = s;
 		return true;
 	}
@@ -164,11 +172,6 @@ public class FactoryExecutorDEMO
 	public static int getSValue()
 	{
 		return sNr;
-	}
-
-	public static int getFiValue()
-	{
-		return firstIndex;
 	}
 
 	public static boolean deleteShoe (int nr)
@@ -219,7 +222,7 @@ public class FactoryExecutorDEMO
 		for(int nr=1; nr<=shoes.size(); nr++)
 		{
 			GCDocument temp = (GCDocument)shoes.get(nr-1);
-			temp.setSpeed(time/2);
+			temp.setSpeed(time);
 		}
 
 		top.setSpeed(time);
@@ -236,10 +239,11 @@ public class FactoryExecutorDEMO
 		}	
 		else if(shoeNumbers.indexOf(new Integer(currIndex)) < shoeNumbers.size()-1)	
 		{
-			return i.parseInt( shoeNumbers.get(shoeNumbers.indexOf(new Integer(currIndex))+1).toString() ) ;	
+			return i.parseInt(shoeNumbers.get(shoeNumbers.indexOf(new Integer(currIndex))+1).toString()) ;	
 		}
-		
 		else
+		{
 			return -1;
+		}
 	}
 }

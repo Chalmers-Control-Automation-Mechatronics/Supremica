@@ -18,14 +18,13 @@ public class FactoryExecutor
 	public static int threadSleepInterval=100;
 	boolean[] stationV;
 	static Plant shoePlant;
-	static int shoeNr=1, firstIndex=0, sNr=0;
+	static int shoeNr=1, sNr=0;
 	static Gui gui;
 	static EditorAPI e;
 	static ArrayList shoes = new ArrayList();
 	static ArrayList shoeNumbers = new ArrayList();
-	GCDocument top;
-	GCDocument  jgSupervisor;
-//jgsup static för linj
+	static GCDocument top, jgSupervisor;
+
 	public FactoryExecutor()
 	{
 
@@ -35,60 +34,69 @@ public class FactoryExecutor
 	{
 		stationV = sv;
 		gui = g;
-		String[] args = {""};
+		String[] args = {"-geometry", "1024x700"};
 
 		try
 		{
 			if(shoeNr==1)
 			{
-				e = new EditorAPI(args);
-				Editor.singleton = e;
-				e.removePaletteAction();
-
-				URL url = Supremica.class.getResource("/shoefactory/ShoeFactory.xml");
-				top = e.openWorkspace(url.getPath());
-
-				jgSupervisor = e.newWorkspace();
-				JgrafSupervisor js = new JgrafSupervisor(jgSupervisor,shoeNr);
-
-				shoePlant = new Plant();
-				gui.addProject(shoePlant.getPlant());
-
-				Specification shoeSpec = new Specification(shoeNr,sv);
-				gui.addProject(shoeSpec.getSpec());
-
-				SyncBuilder syncPlant = new SyncBuilder(gui, shoePlant.getPlant());
-				syncPlant.synthesizePlants("theSupervisor");
-
-				GCDocument newShoe = e.newWorkspace();
-				Shoe s = new Shoe(newShoe, stationV, shoeNr);
-				shoes.add(newShoe);
-				shoeNumbers.add(new Integer(shoeNr));
+				EditorCreator ec = new EditorCreator(args);
 				
-				newShoe.setSpeed(threadSleepInterval);
-				top.setSpeed(threadSleepInterval);
-				jgSupervisor.setSpeed(threadSleepInterval);
-				
-
-				boolean OK = e.compileWorkspace(top);
-				if(OK)
+				if(!ec.isStarted())
 				{
-					e.startWorkspace(top);
+					e = ec.getEditor();
+					e.setTitle("Shoefactory");
+					Editor.singleton = e;
+					e.removePaletteAction();
+	
+					URL url = Supremica.class.getResource("/shoefactory/ShoeFactory.xml");
+					
+					//needed to replace %20 with spaces in the path");
+					String xmlPath = (url.getPath()).replaceAll("%20"," ");
+					top = e.openWorkspace(xmlPath);
+	
+					jgSupervisor = e.newWorkspace();
+					JgrafSupervisor js = new JgrafSupervisor(jgSupervisor,shoeNr);
+	
+					shoePlant = new Plant();
+					gui.addProject(shoePlant.getPlant());
+	
+					Specification shoeSpec = new Specification(shoeNr,sv);
+					gui.addProject(shoeSpec.getSpec());
+	
+					SyncBuilder syncPlant = new SyncBuilder(gui, shoePlant.getPlant());
+					syncPlant.synthesizePlants("theSupervisor");
+	
+					GCDocument newShoe = e.newWorkspace();
+					Shoe s = new Shoe(newShoe, stationV, shoeNr);
+					shoes.add(newShoe);
+					shoeNumbers.add(new Integer(shoeNr));
+					
+					newShoe.setSpeed(threadSleepInterval);
+					top.setSpeed(threadSleepInterval);
+					jgSupervisor.setSpeed(threadSleepInterval);
+					
+	
+					boolean OK = e.compileWorkspace(top);
+					if(OK)
+					{
+						e.startWorkspace(top);
+					}
+	
+					OK = e.compileWorkspace(jgSupervisor);
+					if(OK)
+					{
+						e.startWorkspace(jgSupervisor);
+					}
+	
+					OK = e.compileWorkspace(newShoe);
+					if(OK)
+					{
+						//e.startWorkspace(newShoe);
+					}
+					
+					shoeNr++;
 				}
-
-				OK = e.compileWorkspace(jgSupervisor);
-				if(OK)
-				{
-					e.startWorkspace(jgSupervisor);
-				}
-
-				OK = e.compileWorkspace(newShoe);
-				if(OK)
-				{
-					//e.startWorkspace(newShoe);
-				}
-				
-				shoeNr++;
 			}
 			else
 			{
@@ -138,9 +146,8 @@ public class FactoryExecutor
 		}
 	}
 	
-	public static boolean saveValues(int fI, int s)
+	public static boolean saveValues(int s)
 	{
-		firstIndex = fI;
 		sNr = s;
 		return true;
 	}
@@ -149,11 +156,6 @@ public class FactoryExecutor
 	public static int getSValue()
 	{
 		return sNr;
-	}
-	
-	public static int getFiValue()
-	{
-		return firstIndex;
 	}
 
 	public static boolean deleteShoe (int nr)
@@ -210,17 +212,6 @@ public class FactoryExecutor
 		top.setSpeed(time);
 		jgSupervisor.setSpeed(time);
 	}
-	
-/*	public static boolean chngspeed(int ms)
-		{	
-			jgSupervisor.setSpeed(ms);
-			return true;
-		}			
-	
-*/	
-	
-	
-	
 	
 	public static int getShoeIndex(int currIndex)
 	{

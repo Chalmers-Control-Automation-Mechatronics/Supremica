@@ -258,7 +258,7 @@ public class ConfigitDEMO extends JFrame
 		buttonPanel.setBorder(panelBorder);
 		buttonPanel.add(JR, FlowLayout.LEFT);
 		buttonPanel.add(JB, FlowLayout.CENTER);
-		buttonPanel.add(JC, FlowLayout.CENTER);
+		buttonPanel.add(JC, FlowLayout.RIGHT);
 		buttonPanel.add(JQ, FlowLayout.RIGHT);
 
 		lGend1.addActionListener(this);

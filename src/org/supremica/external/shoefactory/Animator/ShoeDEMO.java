@@ -21,7 +21,7 @@ public class ShoeDEMO
 	{
 		shoe = doc;
 		shoe.setWorkspaceName("Shoe"+nr);
-		shoe.setFrameRectangle(new Rectangle(0,0,800,800));
+		shoe.setFrameRectangle(new Rectangle(0,0,800,400));
 		shoeNr=nr;
 		stationVisit = sV;
 
@@ -243,106 +243,62 @@ public class ShoeDEMO
 		BooleanVariable start = doc.createBooleanVariable(400,150,"start","0");
 		BooleanVariable leave = doc.createBooleanVariable(500,150,"leavetable","0");
 
-		IntegerVariable rotations = doc.createIntegerVariable(600,150,"rotations","0");
-		IntegerVariable syncTabrot = doc.createIntegerVariable(700,150,"syncTabrot","0");
-
 		if(currentTable==1)
 		{
-			IntegerVariable iv0 = doc.createIntegerVariable(400,50,"workTime0","2");
-
-			GCStepInitial initialStep = doc.createInitialStep(100,y,"Start","P syncTabrot=ShoefactoryDEMO.tables.table1.rot;");
+			GCStepInitial initialStep = doc.createInitialStep(100,y,"Start",";");
 			y+=100;
 			GCTransition tr0 = doc.createTransition(100,y,"start");
 			y+=50;
-			GCStep s0 = doc.createStep(100,y,"S0","S start=0;\nS rotations=rotations+1;\nS syncTabrot=ShoefactoryDEMO.tables.table1.rot;");
-			GCTransition tr1 = doc.createTransition(300,y+40,"rotations!="+stationRot[0]+" & syncTabrot!=ShoefactoryDEMO.tables.table1.rot");
+			GCStep s0 = doc.createStep(100,y,"S0","S start=0;");
 			y+=100;
-			doc.connect(initialStep,tr0);
-			doc.connect(tr0,s0);
-			doc.connect(s0,tr1);
-			doc.connect(tr1,s0);
-
-			GCTransition tr2a = doc.createTransition(100,y,"!station0");
-			GCTransition tr2b = doc.createTransition(300,y,"Events.get_T1_S0 & station0");
-			GCTransition tr2f = doc.createTransition(1100,y,"rotations>23");
+			GCTransition tr2b = doc.createTransition(100,y,"Events.get_T1_S0 & station0");
 			y+=50;
-			GCStep s1a = doc.createStep(100,y,"S1a","S rotations=0;\nS leavetable=1;");
-			GCStep s1b = doc.createStep(300,y,"Station0","S ShoefactoryDEMO.stations.station0.enterStation=1;\nS ShoefactoryDEMO.tables.table1.fullSlot.set(nrOfRot,0);");
-			GCStep s1f = doc.createStep(1100,y,"S1b","S rotations=0;");
+			GCStep s1b = doc.createStep(100,y,"Station0","S ShoefactoryDEMO.stations.station0.enterStation=1;\nS ShoefactoryDEMO.tables.table1.fullSlot.set(nrOfRot,0);");
 			y+=100;
-			GCTransition tr3a = doc.createTransition(100,y,"1");
-			GCTransition tr3b = doc.createTransition(300,y,"Events.put_T1_S0");
-			GCTransition tr3f = doc.createTransition(1100,y,"1");
+			GCTransition tr3b = doc.createTransition(100,y,"Events.put_T1_S0");
 			y+=50;
-			GCStep s2b = doc.createStep(300,y,"S2","S ShoefactoryDEMO.stations.station0.leaveStation=1;\nS station0=0;\nS ShoefactoryDEMO.tables.table1.fullSlot.set(applyStaticMethod(\"org.supremica.external.shoefactory.Animator.ShoeDEMO\",\"getIndex\",\"int\",\"int\",ShoefactoryDEMO.tables.table1.rot,\"int\","+stationRot[0] +"),1);\nS nrOfRot=applyStaticMethod(\"org.supremica.external.shoefactory.Animator.ShoeDEMO\",\"getIndex\",\"int\",\"int\",ShoefactoryDEMO.tables.table1.rot,\"int\","+stationRot[0] +");");
+			GCStep s2b = doc.createStep(300,y,"S2","S ShoefactoryDEMO.stations.station0.leaveStation=1;\nS station0=0;\nS ShoefactoryDEMO.tables.table1.fullSlot.set(applyStaticMethod(\"org.supremica.external.shoefactory.Animator.ShoeDEMO\",\"getIndex\",\"int\",\"int\",ShoefactoryDEMO.tables.table1.rot,\"int\","+stationRot[0] +"),1);\nS nrOfRot=applyStaticMethod(\"org.supremica.external.shoefactory.Animator.ShoeDEMO\",\"getIndex\",\"int\",\"int\",ShoefactoryDEMO.tables.table1.rot,\"int\","+stationRot[0] +");\nS leavetable=1;");
 			y+=100;
 			GCTransition tr4b = doc.createTransition(300,y,"1");
 			y+=50;
-
-			doc.connect(s0,tr2a);
+			
+			doc.connect(initialStep,tr0);
+			doc.connect(tr0,s0);
 			doc.connect(s0,tr2b);
-			doc.connect(s0,tr2f);
-			doc.connect(tr2a,s1a);
 			doc.connect(tr2b,s1b);
-			doc.connect(tr2f,s1f);
-			doc.connect(s1a,tr3a);
 			doc.connect(s1b,tr3b);
-			doc.connect(s1f,tr3f);
-			doc.connect(tr3a,initialStep);
 			doc.connect(tr3b,s2b);
-			doc.connect(tr3f,s0);
 			doc.connect(s2b,tr4b);
-
-			doc.connect(tr4b,s0);
+			doc.connect(tr4b,initialStep);
 		}
 
 		if(currentTable==2)
 		{
-			IntegerVariable iv1 = doc.createIntegerVariable(500,50,"workTime1","2");
-
-			GCStepInitial initialStep = doc.createInitialStep(100,y,"Start","P syncTabrot=ShoefactoryDEMO.tables.table2.rot;");
+			GCStepInitial initialStep = doc.createInitialStep(100,y,"Start",";");
 			y+=100;
 			GCTransition tr0 = doc.createTransition(100,y,"start");
 			y+=50;
-			GCStep s0 = doc.createStep(100,y,"S0","S start=0;\nS rotations=rotations+1;\nS syncTabrot=ShoefactoryDEMO.tables.table2.rot;");
-			GCTransition tr1 = doc.createTransition(300,y+40,"rotations!="+stationRot[1]+" & syncTabrot!=ShoefactoryDEMO.tables.table2.rot");
+			GCStep s0 = doc.createStep(100,y,"S0","S start=0;");
 			y+=100;
+			GCTransition tr2c = doc.createTransition(100,y,"Events.get_T2_S1 & station1");
+			y+=50;
+			GCStep s1c = doc.createStep(100,y,"Station1","S ShoefactoryDEMO.stations.station1.enterStation=1;\nS ShoefactoryDEMO.tables.table2.fullSlot.set(nrOfRot,0);");
+			y+=100;
+			GCTransition tr3c = doc.createTransition(100,y,"Events.put_T2_S1");
+			y+=50;
+			GCStep s2c = doc.createStep(100,y,"S2","S ShoefactoryDEMO.stations.station1.leaveStation=1;\nS station1=0;\nS ShoefactoryDEMO.tables.table2.fullSlot.set(applyStaticMethod(\"org.supremica.external.shoefactory.Animator.ShoeDEMO\",\"getIndex\",\"int\",\"int\",ShoefactoryDEMO.tables.table2.rot,\"int\","+stationRot[1] +"),1);\nS nrOfRot=applyStaticMethod(\"org.supremica.external.shoefactory.Animator.ShoeDEMO\",\"getIndex\",\"int\",\"int\",ShoefactoryDEMO.tables.table2.rot,\"int\","+stationRot[1] +");\nS leavetable=1;");
+			y+=100;
+			GCTransition tr4c = doc.createTransition(100,y,"1");
+			y+=50;
+			
 			doc.connect(initialStep,tr0);
 			doc.connect(tr0,s0);
-			doc.connect(s0,tr1);
-			doc.connect(tr1,s0);
-
-			GCTransition tr2a = doc.createTransition(100,y,"!station1");
-			GCTransition tr2c = doc.createTransition(500,y,"Events.get_T2_S1 & station1");
-			GCTransition tr2g = doc.createTransition(1300,y,"rotations>23");
-			y+=50;
-			GCStep s1a = doc.createStep(100,y,"S1a","S rotations =0;\nS leavetable=1;");
-			GCStep s1c = doc.createStep(500,y,"Station1","S ShoefactoryDEMO.stations.station1.enterStation=1;\nS ShoefactoryDEMO.tables.table2.fullSlot.set(nrOfRot,0);");
-			GCStep s1g = doc.createStep(1300,y,"S1b","S rotations =0;");
-			y+=100;
-			GCTransition tr3a = doc.createTransition(100,y,"1");
-			GCTransition tr3c = doc.createTransition(500,y,"Events.put_T2_S1");
-			GCTransition tr3g = doc.createTransition(1300,y,"1");
-			y+=50;
-			GCStep s2c = doc.createStep(500,y,"S2","S ShoefactoryDEMO.stations.station1.leaveStation=1;\nS station1=0;\nS ShoefactoryDEMO.tables.table2.fullSlot.set(applyStaticMethod(\"org.supremica.external.shoefactory.Animator.ShoeDEMO\",\"getIndex\",\"int\",\"int\",ShoefactoryDEMO.tables.table2.rot,\"int\","+stationRot[1] +"),1);\nS nrOfRot=applyStaticMethod(\"org.supremica.external.shoefactory.Animator.ShoeDEMO\",\"getIndex\",\"int\",\"int\",ShoefactoryDEMO.tables.table2.rot,\"int\","+stationRot[1] +");");
-			y+=100;
-			GCTransition tr4c = doc.createTransition(500,y,"1");
-			y+=50;
-
-			doc.connect(s0,tr2a);
 			doc.connect(s0,tr2c);
-			doc.connect(s0,tr2g);
-			doc.connect(tr2a,s1a);
 			doc.connect(tr2c,s1c);
-			doc.connect(tr2g,s1g);
-			doc.connect(s1a,tr3a);
 			doc.connect(s1c,tr3c);
-			doc.connect(s1g,tr3g);
-			doc.connect(tr3a,initialStep);
 			doc.connect(tr3c,s2c);
-			doc.connect(tr3g,s0);
 			doc.connect(s2c,tr4c);
-			doc.connect(tr4c,s0);
+			doc.connect(tr4c,initialStep);
 		}
 	}
 

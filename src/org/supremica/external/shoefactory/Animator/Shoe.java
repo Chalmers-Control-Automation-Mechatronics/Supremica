@@ -24,7 +24,7 @@ public class Shoe
 	{
 		shoe = doc;
 		shoe.setWorkspaceName("Shoe"+nr);
-		shoe.setFrameRectangle(new Rectangle(0,0,800,800));
+		shoe.setFrameRectangle(new Rectangle(0,0,800,400));
 		shoeNr=nr;
 		stationVisit = sV;
 
@@ -715,12 +715,6 @@ public class Shoe
 
 		if(currentTable==6)
 		{
-			IntegerVariable iv0 = doc.createIntegerVariable(400,50,"workTime0","2");
-			IntegerVariable iv1 = doc.createIntegerVariable(500,50,"workTime1","2");
-			IntegerVariable iv2 = doc.createIntegerVariable(600,50,"workTime2","2");
-			IntegerVariable iv3 = doc.createIntegerVariable(700,50,"workTime3","2");
-			IntegerVariable iv4 = doc.createIntegerVariable(800,50,"workTime4","2");
-
 			GCStepInitial initialStep = doc.createInitialStep(100,y,"Start","P syncTabrot=Shoefactory.tables.table6.rot;");
 			y+=100;
 			GCTransition tr0 = doc.createTransition(100,y,"start");
@@ -817,11 +811,6 @@ public class Shoe
 
 		if(currentTable==7)
 		{
-			IntegerVariable iv0 = doc.createIntegerVariable(400,50,"workTime5","2");
-			IntegerVariable iv1 = doc.createIntegerVariable(500,50,"workTime6","2");
-			IntegerVariable iv2 = doc.createIntegerVariable(600,50,"workTime7","2");
-			IntegerVariable iv3 = doc.createIntegerVariable(700,50,"workTime8","2");
-
 			GCStepInitial initialStep = doc.createInitialStep(100,y,"Start","P syncTabrot=Shoefactory.tables.table7.rot;");
 			y+=100;
 			GCTransition tr0 = doc.createTransition(100,y,"start");
@@ -907,10 +896,6 @@ public class Shoe
 
 		if(currentTable==8)
 		{
-			IntegerVariable iv0 = doc.createIntegerVariable(400,50,"workTime9","2");
-			IntegerVariable iv1 = doc.createIntegerVariable(500,50,"workTime10","2");
-			IntegerVariable iv2 = doc.createIntegerVariable(600,50,"workTime11","2");
-
 			GCStepInitial initialStep = doc.createInitialStep(100,y,"Start","P syncTabrot=Shoefactory.tables.table8.rot;");
 			y+=100;
 			GCTransition tr0 = doc.createTransition(100,y,"start");
@@ -985,11 +970,6 @@ public class Shoe
 
 		if(currentTable==9)
 		{
-			IntegerVariable iv0 = doc.createIntegerVariable(400,50,"workTime12","2");
-			IntegerVariable iv1 = doc.createIntegerVariable(500,50,"workTime13","2");
-			IntegerVariable iv2 = doc.createIntegerVariable(600,50,"workTime14","2");
-			IntegerVariable iv3 = doc.createIntegerVariable(700,50,"workTime15","2");
-
 			GCStepInitial initialStep = doc.createInitialStep(100,y,"Start","P syncTabrot=Shoefactory.tables.table9.rot;");
 			y+=100;
 			GCTransition tr0 = doc.createTransition(100,y,"start");
@@ -1075,7 +1055,6 @@ public class Shoe
 
 		if(currentTable==10)
 		{
-			IntegerVariable iv0 = doc.createIntegerVariable(400,50,"workTime20","2");
 			IntegerVariable iv1 = doc.createIntegerVariable(400,50,"from12","0");
 
 			GCStepInitial initialStep = doc.createInitialStep(100,y,"Start","P syncTabrot=Shoefactory.tables.table10.rot;");
@@ -1130,10 +1109,6 @@ public class Shoe
 
 		if(currentTable==11)
 		{
-			IntegerVariable iv0 = doc.createIntegerVariable(400,50,"workTime21","2");
-			IntegerVariable iv1 = doc.createIntegerVariable(500,50,"workTime22","2");
-			IntegerVariable iv2 = doc.createIntegerVariable(600,50,"workTime23","2");
-
 			GCStepInitial initialStep = doc.createInitialStep(100,y,"Start","P syncTabrot=Shoefactory.tables.table11.rot;");
 			y+=100;
 			GCTransition tr0 = doc.createTransition(100,y,"start");
@@ -1208,11 +1183,6 @@ public class Shoe
 
 		if(currentTable==12)
 		{
-			IntegerVariable iv0 = doc.createIntegerVariable(400,50,"workTime16","2");
-			IntegerVariable iv1 = doc.createIntegerVariable(500,50,"workTime17","2");
-			IntegerVariable iv2 = doc.createIntegerVariable(600,50,"workTime18","2");
-			IntegerVariable iv3 = doc.createIntegerVariable(700,50,"workTime19","2");
-
 			GCStepInitial initialStep = doc.createInitialStep(100,y,"Start","P syncTabrot=Shoefactory.tables.table12.rot;");
 			y+=100;
 			GCTransition tr0 = doc.createTransition(100,y,"start");
