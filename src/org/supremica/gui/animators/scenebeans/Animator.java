@@ -22,16 +22,18 @@ public class Animator
 	implements ActionListener
 {
 	AnimationCanvas _canvas;
-	MouseDispatcher _dispatcher;
-	List _commands, _events, _announced;
-	Checkbox _paused, _centered, _stretched, _aspect;
+	private MouseDispatcher _dispatcher;
+	private List _commands, _events, _announced;
+	private Checkbox _paused, _centered, _stretched, _aspect;
+	private JPanel contentPane;
 
 	public Animator(String detail)
 		throws Exception
 	{
 		super("Supremica Animator - " + detail);
+		contentPane = (JPanel)getContentPane();
 		setIconImage(Supremica.cornerImage);
-		setLayout(new GridBagLayout());
+		contentPane.setLayout(new GridBagLayout());
 
 		GridBagConstraints pos = new GridBagConstraints();
 
@@ -40,7 +42,7 @@ public class Animator
 		pos.gridx = 0;
 		pos.gridy = 0;
 
-		add(new Label("Commands", Label.CENTER), pos);
+		contentPane.add(new Label("Commands", Label.CENTER), pos);
 
 		pos.gridy++;
 
@@ -48,20 +50,20 @@ public class Animator
 		_commands = new List(8, false);
 
 		_commands.addActionListener(this);
-		add(_commands, pos);
+		contentPane.add(_commands, pos);
 
 		pos.gridy++;
 
 		pos.weighty = 0.0;
 
-		add(new Label("Events", Label.CENTER), pos);
+		contentPane.add(new Label("Events", Label.CENTER), pos);
 
 		pos.gridy++;
 
 		pos.weighty = 1.0;
 		_events = new List(8, false);
 
-		add(_events, pos);
+		contentPane.add(_events, pos);
 
 		pos.gridy++;
 
@@ -75,7 +77,7 @@ public class Animator
 				_canvas.setPaused(_paused.getState());
 			}
 		});
-		add(_paused, pos);
+		contentPane.add(_paused, pos);
 
 		pos.gridy++;
 
@@ -89,7 +91,7 @@ public class Animator
 				_canvas.setAnimationCentered(_centered.getState());
 			}
 		});
-		add(_centered, pos);
+		contentPane.add(_centered, pos);
 
 		pos.gridy++;
 
@@ -103,7 +105,7 @@ public class Animator
 				_canvas.setAnimationStretched(_stretched.getState());
 			}
 		});
-		add(_stretched, pos);
+		contentPane.add(_stretched, pos);
 
 		pos.gridy++;
 
@@ -117,7 +119,7 @@ public class Animator
 				_canvas.setAnimationAspectFixed(_aspect.getState());
 			}
 		});
-		add(_aspect, pos);
+		contentPane.add(_aspect, pos);
 
 		pos.gridx++;
 
@@ -132,7 +134,7 @@ public class Animator
 		RenderingHints hints = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
 		_canvas.setRenderingHints(hints);
-		add(_canvas, pos);
+		contentPane.add(_canvas, pos);
 
 		pos.gridx++;
 
@@ -141,7 +143,7 @@ public class Animator
 		pos.weighty = 0.0;
 		pos.gridheight = 1;
 
-		add(new Label("Announced", Label.CENTER), pos);
+		contentPane.add(new Label("Announced", Label.CENTER), pos);
 
 		pos.gridy++;
 
@@ -149,7 +151,7 @@ public class Animator
 		pos.gridheight = GridBagConstraints.REMAINDER;
 		_announced = new List(8, false);
 
-		add(_announced, pos);
+		contentPane.add(_announced, pos);
 
 		_dispatcher = new MouseDispatcher(_canvas.getSceneGraph(), _canvas);
 

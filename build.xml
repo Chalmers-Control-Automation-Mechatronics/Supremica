@@ -79,7 +79,9 @@
 	<unjar src="${lib}/regler.jar" dest="${lib}/${unjared}"/>
 	<unjar src="${lib}/jel.jar" dest="${lib}/${unjared}"/>
 	<unjar src="${lib}/scenebeans.jar" dest="${lib}/${unjared}"/>
-
+	<unjar src="${lib}/natutil.jar" dest="${lib}/${unjared}"/>
+	<unjar src="${lib}/scenebeansXmlCompability.jar" dest="${lib}/${unjared}"/>
+	
  	<mkdir dir="${lib}/licensed"/>
  	<touch file="${lib}/licensed/JGo.jar"/>	
  	<touch file="${lib}/licensed/JGoLayout.jar"/>	 	
