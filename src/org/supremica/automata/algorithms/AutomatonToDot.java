@@ -61,7 +61,6 @@ public class AutomatonToDot
 	private boolean withLabel = true;
 	private boolean withCircles = false;
 	private boolean useColors = false;
-	private boolean useMultiLabels = true;
 
 	public AutomatonToDot(Automaton aut)
 	{
@@ -92,12 +91,6 @@ public class AutomatonToDot
 	{
 		this.useColors = useColors;
 	}
-
-	public void setUseMultipleLabels(boolean useMultiLabels)
-	{
-		this.useMultiLabels = useMultiLabels;
-	}
-
 	private String getColor(State s)
 	{
 		if (!useColors)
@@ -178,13 +171,6 @@ public class AutomatonToDot
 			pw.println("\t\"" + initPrefix + stateId + "\" [width = \"0\"]; ");
 			pw.println("\t\"" + initPrefix + stateId + "\" -> \"" + stateId + "\";");
 		}
-
-		DestStateMap destStateMap = null;
-		if (useMultiLabels)
-		{
-			destStateMap = new DestStateMap(aut.nbrOfStates());
-		}
-
 		Alphabet theAlphabet = aut.getAlphabet();
 
 		states = aut.stateIterator();
@@ -198,64 +184,31 @@ public class AutomatonToDot
 			}
 			pw.println("\"" + getColor(sourceState) + "]; ");
 
-			if (useMultiLabels)
+			for (Iterator arcSets = sourceState.outgoingArcSetIterator(); arcSets.hasNext(); )
 			{
-				destStateMap.clear();
-
-				Iterator outgoingArcs = sourceState.outgoingArcsIterator();
-				while (outgoingArcs.hasNext())
+				ArcSet currArcSet = (ArcSet) arcSets.next();
+				State fromState = currArcSet.getFromState();
+				State toState = currArcSet.getToState();
+				pw.print("\t\"" + fromState.getId() + "\" -> \"" + toState.getId());
+				pw.print("\" [ label = \"");
+				for (Iterator arcIt = currArcSet.iterator(); arcIt.hasNext();)
 				{
-					Arc arc = (Arc)outgoingArcs.next();
-					State destState = (State)arc.getToState();
-					destStateMap.addState(destState, arc);
-				}
-
-				Iterator destStateIt = destStateMap.getDestStateIterator();
-				while (destStateIt.hasNext())
-				{
-					State destState = (State)destStateIt.next();
-					pw.print("\t\"" + sourceState.getId() + "\" -> \"" + destState.getId());
-					pw.print("\" [ label = \"");
-					Iterator arcIt = destStateMap.getArcIterator(destState);
-					while (arcIt.hasNext())
-					{
-						Arc currArc = (Arc)arcIt.next();
-						Event thisEvent = theAlphabet.getEventWithId(currArc.getEventId());
-						if (!thisEvent.isControllable())
-							pw.print("!");
-						if (!thisEvent.isPrioritized())
-							pw.print("?");
-						if (thisEvent.isImmediate())
-							pw.print("#");
-						pw.print(thisEvent.getLabel());
-
-						if (arcIt.hasNext())
-						{
-							pw.print("\\n");
-						}
-					}
-					pw.println("\" ];");
-				}
-
-			}
-			else
-			{
-				Iterator outgoingArcs = sourceState.outgoingArcsIterator();
-				while (outgoingArcs.hasNext())
-				{
-					Arc arc = (Arc)outgoingArcs.next();
-					State destState = (State)arc.getToState();
-					pw.print("\t\"" + sourceState.getId() + "\" -> \"" + destState.getId());
-					Event thisEvent = theAlphabet.getEventWithId(arc.getEventId());
-					pw.print("\" [ label = \"");
+					Arc currArc = (Arc)arcIt.next();
+					Event thisEvent = theAlphabet.getEventWithId(currArc.getEventId());
 					if (!thisEvent.isControllable())
 						pw.print("!");
 					if (!thisEvent.isPrioritized())
 						pw.print("?");
 					if (thisEvent.isImmediate())
 						pw.print("#");
-					pw.println(thisEvent.getLabel() + "\" ];");
+					pw.print(thisEvent.getLabel());
+
+					if (arcIt.hasNext())
+					{
+						pw.print("\\n");
+					}
 				}
+				pw.println("\" ];");
 			}
 		}
 /*

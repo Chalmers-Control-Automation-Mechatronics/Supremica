@@ -83,7 +83,7 @@ public class State
 	private LinkedList incomingArcs = new LinkedList();
 	private LinkedList outgoingArcs = new LinkedList();
 
-	private List outgoingArcSet = new LinkedList();
+	private List outgoingArcSets = new LinkedList();
 
 	private Listeners listeners = null;
 
@@ -95,12 +95,7 @@ public class State
 	{
 		this();
 		setId(id);
-		//** MF ** if I instantiate with only the id, I (probably) want the name to be the same (not?)
-		//** MF ** adding this cannot break any code, cannit?
 		setName(id);
-		//** MF ** Note also teh discrepancy with Event, where it is the extrernal name that is set
-		//** MF ** at instantiation, and not the id.
-
 	}
 	public State(String id, String name)
 	{
@@ -108,6 +103,7 @@ public class State
 		setId(id);
 		setId(name);
 	}
+
 	/**
 	 * This copy constructor does only copy the states attributes.
 	 * The incoming and outgoing arcs are not copied.
@@ -289,16 +285,18 @@ public class State
 	public void addOutgoingArc(Arc theArc)
 	{
 		outgoingArcs.addLast(theArc);
-/*
-		State toState = theArc.getToState();
-		ArcSet currArcSet = (ArcSet)stateToArcSetMap.get(toState);
-		if (currArcSet == null)
+
+		ArcSet theArcSet = getArcSet(theArc);
+		if (theArcSet == null)
 		{
-			currArcSet = new ArcSet();
-			stateToArcSetMap.put(toState, currArcSet);
+			// Did not find an arcset - generate one.
+			State fromState = theArc.getToState();
+			theArcSet = new ArcSet(theArc.getFromState(), theArc.getToState());
+			outgoingArcSets.add(theArcSet);
 		}
-		currArcSet.addArc(theArc);
-*/
+		theArcSet.addArc(theArc);
+
+	
 	}
 
 	public void removeIncomingArc(Arc theArc)
@@ -309,42 +307,37 @@ public class State
 	public void removeOutgoingArc(Arc theArc)
 	{
 		outgoingArcs.remove(theArc);
-/*
-		State toState = theArc.getToState();
-		ArcSet currArcSet = (ArcSet)stateToArcSetMap.get(toState);
-		if (currArcSet != null)
+		ArcSet theArcSet = getArcSet(theArc);
+		if (theArcSet != null)
 		{
-			currArcSet.removeArc(theArc);
+			outgoingArcSets.remove(theArcSet);
 		}
-*/
 	}
-/*
-	private ArcSet getArcSet(State toState)
+
+	private ArcSet getArcSet(Arc theArc)
 	{
-		Iterator arcSetIt = outgoingArcSet.iterator();
-		while (arcSetIt.hasNext())
+		State toState = theArc.getToState();
+		for (Iterator arcSetIt = outgoingArcSets.iterator(); arcSetIt.hasNext(); )
 		{
-			ArcSet currArcSet = (ArcSet)currArcSet.next();
+			ArcSet currArcSet = (ArcSet)arcSetIt.next();
 			if (currArcSet.getToState() == toState)
 			{
 				return currArcSet;
 			}
 		}
 		// Couldn't find an arcset
-		ArcSet newArcSet = new ArcSet(this, toState);
+		return null;
 	}
-*/
+
 	public Iterator outgoingArcsIterator()
 	{
 		return outgoingArcs.iterator();
 	}
 
-/*
 	public Iterator outgoingArcSetIterator()
 	{
-		return 
+		return outgoingArcSets.iterator();
 	}
-*/
 
 	public Iterator safeOutgoingArcsIterator()
 	{
@@ -476,31 +469,5 @@ public class State
 			listeners.notifyListeners();
 		}
 	}
-/*
-	private class ArcSetIterator
-		implements Iterator
-	{
-		private Iterator it;
-
-		public ArcSetIterator()
-		{
-			it = stateToArcSet.iterator();
-		}
-
-		public boolean hasNext()
-		{
-
-		}
-
-		public Object next()
-		{
-
-		}
-
-		public void remove()
-		{
-			throw new UnsupportedOperationException(); 
-		}
-	}*/
 }
 

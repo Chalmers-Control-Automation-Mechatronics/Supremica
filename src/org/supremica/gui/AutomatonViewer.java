@@ -89,8 +89,6 @@ public class AutomatonViewer
     	"Draw state names", WorkbenchProperties.isDotWithStateLabels());
     private JCheckBoxMenuItem useColorsCheckBox = new JCheckBoxMenuItem(
     	"Draw colors", WorkbenchProperties.isDotUseColors());
-    private JCheckBoxMenuItem useMultipleLabelsCheckBox = new JCheckBoxMenuItem(
-    	"Allow multiple labels", WorkbenchProperties.isDotUseMultipleLabels());
     private JCheckBoxMenuItem automaticUpdateCheckBox = new JCheckBoxMenuItem(
     	"Automatic update", WorkbenchProperties.isDotAutomaticUpdate());
 
@@ -224,7 +222,7 @@ public class AutomatonViewer
 	    JMenu menuFile = new JMenu();
 	    menuFile.setText("File");
 	    menuFile.setMnemonic(KeyEvent.VK_F);
-    	menuBar.add(menuFile);
+	menuBar.add(menuFile);
 		// File.Export
 	    JMenuItem menuFileExport = new JMenuItem();
 	    menuFileExport.setText("Export...");
@@ -245,7 +243,6 @@ public class AutomatonViewer
     	menuLayout.add(withLabelsCheckBox);
    		menuLayout.add(withCirclesCheckBox);
     	menuLayout.add(useColorsCheckBox);
-		menuLayout.add(useMultipleLabelsCheckBox);
     	menuLayout.addSeparator();
 	    JMenuItem menuLayoutUpdate = new JMenuItem();
 	    menuLayoutUpdate.setText("Update");
@@ -353,18 +350,6 @@ public class AutomatonViewer
 				}
             }
         });
-
-		useMultipleLabelsCheckBox.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-				if (automaticUpdateCheckBox.isSelected())
-				{
-					update();
-				}
-            }
-        });
-
         menuLayoutUpdate.addActionListener(new ActionListener()
         {
             public void actionPerformed(ActionEvent e)
@@ -411,7 +396,6 @@ public class AutomatonViewer
 		exporter.setWithLabels(withLabelsCheckBox.isSelected());
 		exporter.setWithCircles(withCirclesCheckBox.isSelected());
 		exporter.setUseColors(useColorsCheckBox.isSelected());
-		exporter.setUseMultipleLabels(useMultipleLabelsCheckBox.isSelected());
 
 		try
 		{
@@ -579,7 +563,6 @@ public class AutomatonViewer
 						exporter.setLeftToRight(leftToRightCheckBox.isSelected());
 						exporter.setWithLabels(withLabelsCheckBox.isSelected());
 						exporter.setUseColors(useColorsCheckBox.isSelected());
-						exporter.setUseMultipleLabels(useMultipleLabelsCheckBox.isSelected());
 
 						initializeStreams(dotArgument);
 
@@ -592,7 +575,7 @@ public class AutomatonViewer
 						BufferedOutputStream buffOutStream = new BufferedOutputStream(fw);
 						BufferedInputStream buffInStream = new BufferedInputStream(fromDotStream);
 						int currChar = buffInStream.read();
-						while (currChar != -1)
+					while (currChar != -1)
 						{
 							buffOutStream.write(currChar);
 							currChar = buffInStream.read();
