@@ -187,7 +187,7 @@ public final class AutomataSynchronizerHelper
 	public void clear()
 	{
 		theStates.clear();
-		
+
 		automataIsControllable = true;
 		coExecute = false;
 		coExecuter = null;
@@ -336,7 +336,7 @@ public final class AutomataSynchronizerHelper
 	 */
 	public void addState(int[] fromState, int[] toState, int eventIndex)
 		throws Exception
-	{			
+	{
 		if (rememberTrace)
 		{
 			fromStateList.addLast(fromState);
@@ -375,10 +375,10 @@ public final class AutomataSynchronizerHelper
 				// Add initial state
 				stateTrace.add(newState);
 			}
-			
+
 			addStatus(newState);
 			addStateToProcess(newState);
-			
+
 			// helperData.incrNbrOfAddedStates();
 			helperData.nbrOfAddedStates++;
 		}
@@ -386,12 +386,12 @@ public final class AutomataSynchronizerHelper
 		{
 			fromStateList.removeLast();
 		}
-		
+
 		helperData.nbrOfCheckedStates++;
 
 		if ((executionDialog != null) && (helperData.nbrOfCheckedStates % 2000 == 0))
 		{
-			executionDialog.setValue((int)helperData.nbrOfCheckedStates);
+			executionDialog.setValue((int)helperData.nbrOfAddedStates);
 		}
 	}
 
@@ -460,7 +460,7 @@ public final class AutomataSynchronizerHelper
 		/*
 		if (logger.isDebugEnabled())
 		{
-			logger.debug("Deadlocked state:\n" + 
+			logger.debug("Deadlocked state:\n" +
 						 AutomataIndexFormHelper.dumpVerboseState(state, theAutomataIndexForm));
 			logger.debug(displayTrace(state));
 		}
@@ -709,7 +709,7 @@ public final class AutomataSynchronizerHelper
 					}
 					else
 					{
-						return prevString + " -> \"" + 
+						return prevString + " -> \"" +
 							unionAlphabet.getEventWithIndex(currEventIndex).getLabel() + "\"";
 					}
 					// logger.info(unionAlphabet.getEventWithIndex(currEventIndex).getLabel());
@@ -778,7 +778,7 @@ public final class AutomataSynchronizerHelper
 		Automaton problemAutomaton;
 		int[] currState = new int[automataIndices.length];
 		State[][] stateTable = getIndexFormStateTable();
-		
+
 		for (Iterator stateHolderIterator = stateMemorizer.iterator(automataIndices); stateHolderIterator.hasNext(); )
 		{
 			StateHolder stateHolder = (StateHolder) stateHolderIterator.next();
@@ -811,8 +811,8 @@ public final class AutomataSynchronizerHelper
 				}
 			}
 
-			String reason = "the uncontrollable event " + 
-				theAutomaton.getAlphabet().getEventWithIndex(problemEvent).toString() + 
+			String reason = "the uncontrollable event " +
+				theAutomaton.getAlphabet().getEventWithIndex(problemEvent).toString() +
 				" is enabled in the plant " + problemAutomaton.toString();
 			logger.info("The state '" + state.toString() + "' is uncontrollable since " + reason + ".");
 		}
@@ -900,7 +900,7 @@ public final class AutomataSynchronizerHelper
 			controllableEventsTable[i] = false;
 		}
 	}
-	
+
 	public class HelperData
 	{
 		public long nbrOfAddedStates = 0;
