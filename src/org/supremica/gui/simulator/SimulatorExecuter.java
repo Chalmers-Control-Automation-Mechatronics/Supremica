@@ -265,7 +265,7 @@ public class SimulatorExecuter
 		//logger.info("AnimationEvent: " + ev.getName());
 	}
 
-	public void executeEvent(LabeledEvent event)
+	public synchronized void executeEvent(LabeledEvent event)
 	{
 		String label = event.getLabel();
 
