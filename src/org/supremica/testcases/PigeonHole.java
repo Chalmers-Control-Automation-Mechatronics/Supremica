@@ -107,7 +107,7 @@ public class PigeonHole
 				last = next;
 			}
 
-			h.setType(AutomatonType.Plant);
+			h.setType(AutomatonType.Specification);
 			project.addAutomaton(h);
 		}
 	}

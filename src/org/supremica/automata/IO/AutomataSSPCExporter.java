@@ -23,7 +23,7 @@ public class AutomataSSPCExporter
 	private File file;
 	private String path;
 	private HashMap fileMap, eventMap;
-	private int event_count = 0;
+	private int event_count = 0, state_count;
 
 	/** save the automata to disk, use 'file' for the system (project) file name */
 	public AutomataSSPCExporter(Automata automata, String file)
@@ -35,6 +35,8 @@ public class AutomataSSPCExporter
 		this.eventMap = new HashMap();
 
 		PrintWriter system = new PrintWriter(new FileOutputStream(file));
+		PrintWriter plant = new PrintWriter(new FileOutputStream(file + ".plant"));
+		PrintWriter spec = new PrintWriter(new FileOutputStream(file + ".spec"));
 
 		for (Iterator autIt = automata.iterator(); autIt.hasNext(); )
 		{
@@ -43,9 +45,16 @@ public class AutomataSSPCExporter
 
 			system.println(name + ".fsm");
 			saveOne(currAutomaton, name);
+
+			if(currAutomaton.isPlant()) {
+				plant.println(name + ".fsm");
+			} else if(currAutomaton.isSpecification() || currAutomaton.isSupervisor()) {
+				spec.println(name + ".fsm");
+			}
 		}
 
-		system.flush();
+		plant.close();
+		spec.close();
 		system.close();
 	}
 
@@ -128,15 +137,28 @@ public class AutomataSSPCExporter
 	{
 		File file2 = new File(path, name + ".fsm");
 		PrintWriter me = new PrintWriter(new FileOutputStream(file2));
+		HashMap stateMap = new HashMap(); // String -> Integer map
+
 
 		me.println("FSM " + name);
 		me.println();
 
+		// 1. build the state map
+		for (Iterator states = a.stateIterator(); states.hasNext(); )
+		{
+			State state = (State) states.next();
+			Integer num = new Integer(state_count++);
+			stateMap.put(state, num);
+		}
+
+		// dump the state/transition list
 		for (Iterator states = a.stateIterator(); states.hasNext(); )
 		{
 			State state = (State) states.next();
 
-			me.print("\tSTATE " + state.getName());
+			Integer num = (Integer) stateMap.get(state);
+			me.print("\tSTATE " + num.intValue() );
+
 
 			if (state.isInitial())
 			{
@@ -157,15 +179,16 @@ public class AutomataSSPCExporter
 
 				// String tname = arc.getLabel();
 				int tname = getEvent(arc.getLabel());
-
-				me.println("\t\tTRANSITION " + tname + " TO " + arc.getToState().getName());
+				State toState = arc.getToState();
+				Integer toInt = (Integer) stateMap.get(toState);
+				me.println("\t\tTRANSITION " + tname + " TO " + toInt.intValue() );
 			}
 
 			me.println();
 		}
 
+		// dump uncontrollable list
 		int count = 0;
-
 		for (EventIterator ei = a.eventIterator(); ei.hasNext(); )
 		{
 			LabeledEvent le = (LabeledEvent) ei.next();
