@@ -1,6 +1,5 @@
-(*
-Skall testa EQ 
-*)
+(* Must test EQ before this.
+ *)
 PROGRAM ArithmeticTest
    VAR
 	BB1, BB2, BB3 : BOOL;
@@ -31,11 +30,6 @@ CAL WPrintln("Testing MUL")
 CAL WPrintln("Testing DIV")
 
 CAL WPrintln("Testing MOD")
-
-
-
-
-
 
 END_PROGRAM
 

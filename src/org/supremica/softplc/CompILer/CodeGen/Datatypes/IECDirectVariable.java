@@ -16,9 +16,11 @@ public class IECDirectVariable
 									   * memory direct variables are not allowed
 									   */
 	
-	private TypeConstant type = TypeConstant.T_BOOL;    /* only allowed; this implementation
-														 * only allows BOOL direct variables
-														 */
+	private TypeConstant type = TypeConstant.T_BOOL;    
+	/* only allowed; this implementation
+	 * only allows BOOL direct variables
+	 */
+
 	private int number;    // direct variable number
 
 	// should be a list to represent the "dot"-notation

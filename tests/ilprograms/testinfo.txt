@@ -69,3 +69,17 @@ Test av alla il-expression....
 Filer:
 -------------------------------------------
 Testa stdFBs skrivna i java (och även i il)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
