@@ -166,11 +166,11 @@ public class AutomataToSattLineSFCForBallProcess
 		{
 			LabeledEvent event = theArc.getEvent(); // theAutomaton.getEvent(theArc.getEventId());
 
-			if (event.getLabel().equals("timer"))
+			if (event.getLabel().equalsIgnoreCase("timer"))
 			{
 				pw.println("SEQTRANSITION " + theAutomaton.getName().replace('.', '_') + "_Tr" + transitionCounter++ + theHelper.getTransitionConditionPrefix() + theAutomaton.getName().replace('.', '_') + "__" + theArc.getFromState().getId() + ".T > 1000" + theHelper.getTransitionConditionSuffix());
 			}
-			else if (event.getLabel().equals("IP.ManuellStart") || event.getLabel().equals("IP.AutoStart"))
+			else if (event.getLabel().equalsIgnoreCase("IP.ManuellStart") || event.getLabel().equalsIgnoreCase("IP.AutoStart"))
 			{
 				pw.println("SEQTRANSITION " + theAutomaton.getName().replace('.', '_') + "_Tr" + transitionCounter++ + theHelper.getTransitionConditionPrefix() + "NOT " + event.getLabel() + theHelper.getTransitionConditionSuffix());
 			}
