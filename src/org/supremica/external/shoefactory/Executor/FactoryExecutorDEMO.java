@@ -70,17 +70,26 @@ public class FactoryExecutorDEMO
 					gui.addProject(shoeSpec.getSpec());
 	
 					SyncBuilder syncPlant = new SyncBuilder(gui, shoePlant.getPlant());
-					syncPlant.synthesizePlants("theSupervisor");
+					
+				//Syncronize or Synthesize
+					syncPlant.synchronizePlants("theSupervisor");
+					//syncPlant.synthesizePlants("theSupervisor");
 			
 					//-----DEMO - reduce available slots--------
 					for(int i=0;i<9;i++)
 					{
 						boolean b = js.moveInitial("Table0", "Shoe_1put_T0L");
 					}
+
 					for(int i=0;i<22;i++)
 					{
 						boolean b = js.moveInitial("Table1", "Shoe_1put_T1");
 						b = js.moveInitial("Table2", "Shoe_1put_T2");
+					}
+					
+					for(int i=0;i<2;i++)
+					{
+						boolean b = js.moveInitial("IO_1", "Shoe_1get_T0R");
 					}
 					//------------------------------------------
 			
@@ -134,7 +143,10 @@ public class FactoryExecutorDEMO
 				remove_Aut(6+shoes.size());
 
 				SyncBuilder syncPlant = new SyncBuilder(gui, shoePlant.getPlant());
-				syncPlant.synthesizePlants("theSupervisor");
+				
+			//Syncronize or Synthesize
+				syncPlant.synchronizePlants("theSupervisor");
+				//syncPlant.synthesizePlants("theSupervisor");
 					
 				shoeNr++;
 	

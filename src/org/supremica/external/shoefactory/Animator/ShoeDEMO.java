@@ -328,8 +328,8 @@ public class ShoeDEMO
 			GCStep s02b = doc.createStep(400,y,"move_table2","S ShoefactoryDEMO.tables.table0.fullSlot.set(nrOfRot,0);\nS ShoefactoryDEMO.agvs.agv0.from0to2=1;");
 			GCStep s02c = doc.createStep(100,y,"move_table1","S ShoefactoryDEMO.tables.table0.fullSlot.set(nrOfRot,0);\nS ShoefactoryDEMO.agvs.agv0.from0to1=1;");
 			y+=100;
-			GCTransition tr2b = doc.createTransition(400,y,"ShoefactoryDEMO.agvs.agv0.atgoalB");
-			GCTransition tr2c = doc.createTransition(100,y,"ShoefactoryDEMO.agvs.agv0.atgoalA");
+			GCTransition tr2b = doc.createTransition(400,y,"ShoefactoryDEMO.agvs.agv0.atgoal");
+			GCTransition tr2c = doc.createTransition(100,y,"ShoefactoryDEMO.agvs.agv0.atgoal");
 			y+=50;
 			GCStep s2b = doc.createStep(400,y,"S_toTable2_end","P nrOfRot=ShoefactoryDEMO.tables.table2.rot;");
 			GCStep s2c = doc.createStep(100,y,"S_toTable1_end","P nrOfRot=ShoefactoryDEMO.tables.table1.rot;");
@@ -337,8 +337,8 @@ public class ShoeDEMO
 			GCTransition tr3b = doc.createTransition(400,y,"Events.put_T2");
 			GCTransition tr3c = doc.createTransition(100,y,"Events.put_T1");
 			y+=50;
-			GCStep s3b = doc.createStep(400,y,"S_atTable2","S currentTable = 2;\nS ShoefactoryDEMO.tables.table2.fullSlot.set(nrOfRot,1);\nS ShoefactoryDEMO.agvs.agv0.busyB=0;\nS moveReady=1;");
-			GCStep s3c = doc.createStep(100,y,"S_atTable1","S currentTable = 1;\nS ShoefactoryDEMO.tables.table1.fullSlot.set(nrOfRot,1);\nS ShoefactoryDEMO.agvs.agv0.busyA=0;\nS moveReady=1;");
+			GCStep s3b = doc.createStep(400,y,"S_atTable2","S currentTable = 2;\nS ShoefactoryDEMO.tables.table2.fullSlot.set(nrOfRot,1);\nS ShoefactoryDEMO.agvs.agv0.busy=0;\nS moveReady=1;");
+			GCStep s3c = doc.createStep(100,y,"S_atTable1","S currentTable = 1;\nS ShoefactoryDEMO.tables.table1.fullSlot.set(nrOfRot,1);\nS ShoefactoryDEMO.agvs.agv0.busy=0;\nS moveReady=1;");
 			y+=100;
 			GCTransition trEndb = doc.createTransition(400,y,"1");
 			GCTransition trEndc = doc.createTransition(100,y,"1");
@@ -377,8 +377,8 @@ public class ShoeDEMO
 			GCStep s02b = doc.createStep(100,y,"move_table0","S ShoefactoryDEMO.tables.table1.fullSlot.set(nrOfRot,0);\nS ShoefactoryDEMO.agvs.agv0.from1to0=1;");
 			GCStep s02c = doc.createStep(700,y,"move_table2","S ShoefactoryDEMO.tables.table1.fullSlot.set(nrOfRot,0);\nS ShoefactoryDEMO.agvs.agv0.from1to2=1;");
 			y+=100;
-			GCTransition tr2b = doc.createTransition(100,y,"ShoefactoryDEMO.agvs.agv0.atgoalA");
-			GCTransition tr2c = doc.createTransition(700,y,"ShoefactoryDEMO.agvs.agv0.atgoalC");
+			GCTransition tr2b = doc.createTransition(100,y,"ShoefactoryDEMO.agvs.agv0.atgoal");
+			GCTransition tr2c = doc.createTransition(700,y,"ShoefactoryDEMO.agvs.agv0.atgoal");
 			y+=50;
 			GCStep s2b = doc.createStep(100,y,"S_toTable0_end","P nrOfRot=applyStaticMethod(\"org.supremica.external.shoefactory.Animator.ShoeDEMO\",\"getRota\",\"int\",\"int\",ShoefactoryDEMO.tables.table0.rot);");
 			GCStep s2c = doc.createStep(700,y,"S_toTable2_end","P nrOfRot=ShoefactoryDEMO.tables.table2.rot;");
@@ -386,8 +386,8 @@ public class ShoeDEMO
 			GCTransition tr3b = doc.createTransition(100,y,"Events.put_T0R");
 			GCTransition tr3c = doc.createTransition(700,y,"Events.put_T2");
 			y+=50;
-			GCStep s3b = doc.createStep(100,y,"S_atTable0","S currentTable = 0;\nS ShoefactoryDEMO.tables.table0.fullSlot.set(nrOfRot,1);\nS ShoefactoryDEMO.agvs.agv0.busyA=0;\nS moveReady=1;");
-			GCStep s3c = doc.createStep(700,y,"S_atTable2","S currentTable = 2;\nS ShoefactoryDEMO.tables.table2.fullSlot.set(nrOfRot,1);\nS ShoefactoryDEMO.agvs.agv0.busyC=0;\nS moveReady=1;");
+			GCStep s3b = doc.createStep(100,y,"S_atTable0","S currentTable = 0;\nS ShoefactoryDEMO.tables.table0.fullSlot.set(nrOfRot,1);\nS ShoefactoryDEMO.agvs.agv0.busy=0;\nS moveReady=1;");
+			GCStep s3c = doc.createStep(700,y,"S_atTable2","S currentTable = 2;\nS ShoefactoryDEMO.tables.table2.fullSlot.set(nrOfRot,1);\nS ShoefactoryDEMO.agvs.agv0.busy=0;\nS moveReady=1;");
 			y+=100;
 			GCTransition trEndb = doc.createTransition(100,y,"1");
 			GCTransition trEndc = doc.createTransition(700,y,"1");
@@ -426,8 +426,8 @@ public class ShoeDEMO
 			GCStep s02b = doc.createStep(100,y,"move_table0","S ShoefactoryDEMO.tables.table2.fullSlot.set(nrOfRot,0);\nS ShoefactoryDEMO.agvs.agv0.from2to0=1;");
 			GCStep s02c = doc.createStep(400,y,"move_table1","S ShoefactoryDEMO.tables.table2.fullSlot.set(nrOfRot,0);\nS ShoefactoryDEMO.agvs.agv0.from2to1=1;");
 			y+=100;
-			GCTransition tr2b = doc.createTransition(100,y,"ShoefactoryDEMO.agvs.agv0.atgoalB");
-			GCTransition tr2c = doc.createTransition(400,y,"ShoefactoryDEMO.agvs.agv0.atgoalC");
+			GCTransition tr2b = doc.createTransition(100,y,"ShoefactoryDEMO.agvs.agv0.atgoal");
+			GCTransition tr2c = doc.createTransition(400,y,"ShoefactoryDEMO.agvs.agv0.atgoal");
 			y+=50;
 			GCStep s2b = doc.createStep(100,y,"S_toTable0_end","P nrOfRot=applyStaticMethod(\"org.supremica.external.shoefactory.Animator.ShoeDEMO\",\"getRota\",\"int\",\"int\",ShoefactoryDEMO.tables.table0.rot);");
 			GCStep s2c = doc.createStep(400,y,"S_toTable1_end","P nrOfRot=ShoefactoryDEMO.tables.table1.rot;");
@@ -435,8 +435,8 @@ public class ShoeDEMO
 			GCTransition tr3b = doc.createTransition(100,y,"Events.put_T0R");
 			GCTransition tr3c = doc.createTransition(400,y,"Events.put_T1");
 			y+=50;
-			GCStep s3b = doc.createStep(100,y,"S_atTable0","S currentTable = 0;\nS ShoefactoryDEMO.tables.table0.fullSlot.set(nrOfRot,1);\nS ShoefactoryDEMO.agvs.agv0.busyB=0;\nS moveReady=1;");
-			GCStep s3c = doc.createStep(400,y,"S_atTable1","S currentTable = 1;\nS ShoefactoryDEMO.tables.table1.fullSlot.set(nrOfRot,1);\nS ShoefactoryDEMO.agvs.agv0.busyC=0;\nS moveReady=1;");
+			GCStep s3b = doc.createStep(100,y,"S_atTable0","S currentTable = 0;\nS ShoefactoryDEMO.tables.table0.fullSlot.set(nrOfRot,1);\nS ShoefactoryDEMO.agvs.agv0.busy=0;\nS moveReady=1;");
+			GCStep s3c = doc.createStep(400,y,"S_atTable1","S currentTable = 1;\nS ShoefactoryDEMO.tables.table1.fullSlot.set(nrOfRot,1);\nS ShoefactoryDEMO.agvs.agv0.busy=0;\nS moveReady=1;");
 			y+=100;
 			GCTransition trEndb = doc.createTransition(100,y,"1");
 			GCTransition trEndc = doc.createTransition(400,y,"1");

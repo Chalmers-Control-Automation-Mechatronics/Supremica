@@ -196,7 +196,7 @@ public class JgrafSupervisorDEMO
 		if(index==0)
 			actionString = actionString+"S currStation=\"Shoe\"+index+\".station1\";\nS stepString = \"Shoe\"+index+\".ShoeControl.S0.x\";\nS "+getEventsA[index]+" = applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"isEventEnabled\",\"boolean\",\"string\",supervisor,\"string\",\"Shoe_\"+index+\""+getEventsA[index]+"\") & getRot^==ShoefactoryDEMO.tables.table0.rot & !currStation^ & stepString^;\n";
 		else
-			actionString = actionString+"S agvString = applyStaticMethod(\"org.supremica.external.shoefactory.Animator.JgrafSupervisorDEMO\",\"checkAgv\",\"string\",\"string\",\"Shoe_\"+index+\""+getEventsA[index]+"\",\"int\",gotoString^);\nS stepString = \"Shoe\"+index+\".ShoeControl.moveFromTable0.S0.x\";\nS "+getEventsA[index]+" = applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"isEventEnabled\",\"boolean\",\"string\",supervisor,\"string\",\"Shoe_\"+index+\""+getEventsA[index]+"\") & applyStaticMethod(\"java.lang.Math\",\"abs\",\"int\",\"int\",getRot^-ShoefactoryDEMO.tables.table0.rot)==6 & !agvString^ & stepString^;\n";
+			actionString = actionString+"S agvString = \"ShoefactoryDEMO.agvs.agv0.busy\";\nS stepString = \"Shoe\"+index+\".ShoeControl.moveFromTable0.S0.x\";\nS "+getEventsA[index]+" = applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"isEventEnabled\",\"boolean\",\"string\",supervisor,\"string\",\"Shoe_\"+index+\""+getEventsA[index]+"\") & applyStaticMethod(\"java.lang.Math\",\"abs\",\"int\",\"int\",getRot^-ShoefactoryDEMO.tables.table0.rot)==6 & !agvString^ & stepString^;\n";
 
 																																																																																																								
 		GCTransition trEn1 = supervisor.createTransition(xPos,yPos,getEventsA[index]);
@@ -221,7 +221,7 @@ public class JgrafSupervisorDEMO
 	{
 		int tNr=index+1, xPos=300+100*(index+putEventsA.length+putEventsB.length+putEventsC.length+getEventsA.length);
 		conditionString = conditionString+getEventsB[index]+" | ";
-		actionString = actionString+"S agvString = applyStaticMethod(\"org.supremica.external.shoefactory.Animator.JgrafSupervisorDEMO\",\"checkAgv\",\"string\",\"string\",\"Shoe_\"+index+\""+getEventsB[index]+"\",\"int\",gotoString^);\nS stepString = \"Shoe\"+index+\".ShoeControl.moveFromTable"+tNr+".S0.x\";\nS "+getEventsB[index]+" = applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"isEventEnabled\",\"boolean\",\"string\",supervisor,\"string\",\"Shoe_\"+index+\""+getEventsB[index]+"\") & getRot^==ShoefactoryDEMO.tables.table"+tNr+".rot & !agvString^ & stepString^;\n";
+		actionString = actionString+"S agvString = \"ShoefactoryDEMO.agvs.agv0.busy\";\nS stepString = \"Shoe\"+index+\".ShoeControl.moveFromTable"+tNr+".S0.x\";\nS "+getEventsB[index]+" = applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"isEventEnabled\",\"boolean\",\"string\",supervisor,\"string\",\"Shoe_\"+index+\""+getEventsB[index]+"\") & getRot^==ShoefactoryDEMO.tables.table"+tNr+".rot & !agvString^ & stepString^;\n";
 
 		GCTransition trEn1 = supervisor.createTransition(xPos,yPos,getEventsB[index]);
 		GCStep s1 = supervisor.createStep(xPos,yPos+50,"Step"+stepID,"S success = applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"executeEvent\",\"boolean\",\"string\",supervisor,\"string\",\"Shoe_\"+index+\""+getEventsB[index]+"\");\nS success = applyStaticMethod(\"org.supremica.external.shoefactory.Animator.JgrafSupervisorDEMO\",\"moveInitial\",\"boolean\",\"string\",\"shoeSpec\"+index,\"string\",\"Shoe_\"+index+\""+getEventsB[index]+"\");\nS success = applyStaticMethod(\"org.supremica.external.shoefactory.Animator.JgrafSupervisorDEMO\",\"moveInitial\",\"boolean\",\"string\",\"Table"+tNr+"\",\"string\",\"Shoe_\"+index+\""+getEventsB[index]+"\");\nS success = applyStaticMethod(\"org.supremica.external.shoefactory.Animator.JgrafSupervisorDEMO\",\"moveInitial\",\"boolean\",\"string\",\"IO_1\",\"string\",\"Shoe_\"+index+\""+getEventsB[index]+"\");\nS currEvent = \"Shoe\"+index+\".Events."+getEventsB[index]+"\";\nS currEvent^=1;");
@@ -275,32 +275,6 @@ public class JgrafSupervisorDEMO
 			return false;
 		}
 	}
-	
-	//Gives the correct String to the supervisor when it checks an agv
-	public static String checkAgv(String event, int gotoTable)
-	{
-		if(event.endsWith("R"))
-		{
-			if(gotoTable==1)
-				return "ShoefactoryDEMO.agvs.agv0.busyA";
-			else
-				return "ShoefactoryDEMO.agvs.agv0.busyB";
-		}
-		else if(event.endsWith("1"))
-		{
-			if(gotoTable==0)
-				return "ShoefactoryDEMO.agvs.agv0.busyA";
-			else
-				return "ShoefactoryDEMO.agvs.agv0.busyC";
-		}
-		else
-		{
-			if(gotoTable==0)
-				return "ShoefactoryDEMO.agvs.agv0.busyB";
-			else
-				return "ShoefactoryDEMO.agvs.agv0.busyC";
-		}
-	}	
 		
 	public static boolean checkRotationsToStation(int tRot, int nrOfRot, int stRot)
 	{
