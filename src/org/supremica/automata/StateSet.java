@@ -2,7 +2,7 @@
 /********************** StateSet.java *************************/
 
 // Implementation of a useful state set.
-// Note that a Set implmentation considers two elements e1 and e2 equal
+// Note that a Set implementation considers two elements e1 and e2 equal
 // if e1.equals(e2) == true; Surely this also means that e2.equals(e1)
 // must then also be true (but the docs do not require this).
 // For State, equals(Object obj) compares id's, so in practice
@@ -12,6 +12,7 @@ package org.supremica.automata;
 
 import java.util.*;
 import org.supremica.automata.State;
+import org.supremica.properties.SupremicaProperties;
 
 class StateComparator
 	implements Comparator
@@ -41,6 +42,19 @@ public class StateSet
 	public StateSet()
 	{
 		theSet = new TreeSet(new StateComparator());
+	}
+
+	/**
+	 * Create a StateSet containing all the states of an automaton
+	 */
+	public StateSet(Automaton aut)
+	{
+		this();
+		
+		for (StateIterator stateIt = aut.stateIterator(); stateIt.hasNext(); )
+		{
+			this.add(stateIt.nextState());
+		}
 	}
 
 	// Shallow copy (should it be deep?)
@@ -151,7 +165,7 @@ public class StateSet
 	{
 		StringBuffer buf = new StringBuffer();
 
-		buf.append("StateSet[" + size() + "]:{");
+		buf.append("StateSet[" + size() + "]: {");
 
 		Iterator it = iterator();
 
@@ -159,13 +173,34 @@ public class StateSet
 		{
 			State state = (State) it.next();
 
-			buf.append(state.getName());
-			buf.append(",");
+			//buf.append(state.getName());
+			buf.append(state);
+			if (it.hasNext())
+				buf.append(",");
 		}
 
 		buf.append("}");
 
 		return buf.toString();
+	}
+
+	/**
+	 * Returns the state set that can reach some state in the current state set in a transition
+	 * associated with event.
+	 */
+	public StateSet previousStates(LabeledEvent event)
+	{
+		StateSet prevStates = new StateSet();
+
+		for (StateIterator stateIt = iterator(); stateIt.hasNext(); )
+		{
+			for (StateIterator prevIt = stateIt.nextState().previousStateIterator(event); prevIt.hasNext(); )
+			{
+				prevStates.add(prevIt.nextState());
+			}
+		}
+
+		return prevStates;
 	}
 
 	/**
@@ -183,7 +218,6 @@ public class StateSet
 	 */
 	public State createNewState()
 	{
-
 		// boolean i = false;   // initial?
 		boolean d = false;    // desired?
 		boolean x = false;    // forbidden?
@@ -195,14 +229,15 @@ public class StateSet
 			State state = (State) stateit.next();
 
 			buf.append(state.getName());
-			buf.append(".");    // STATE_SEPARATOR -- should be globally user definable
+ 			buf.append(SupremicaProperties.getStateSeparator());    // STATE_SEPARATOR -- should be globally user definable
 
 			// i |= state.isInitial();
 			d |= state.isAccepting();
 			x |= state.isForbidden();
 		}
 
-		buf.setLength(buf.length() - 1);    // truncate last '.'
+		// Truncate last separator
+		buf.setLength(buf.length() - SupremicaProperties.getStateSeparator().length());    
 
 		// logger.info("StateSet::createNewState -- " + buf.toString());
 		State newstate = new State(buf.toString());

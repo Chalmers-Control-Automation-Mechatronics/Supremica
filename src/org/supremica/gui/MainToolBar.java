@@ -23,14 +23,14 @@ public class MainToolBar
 	private static final ViewAction viewAction = new ViewAction();
 	private static final StatusAction statusAction = new StatusAction();
 
-	//private static final MoveAutomataUpAction moveAutomataUpAction = new MoveAutomataUpAction();
-	//private static final MoveAutomataDownAction moveAutomataDownAction = new MoveAutomataDownAction();
 	private static final MoveAutomataAction moveAutomataToTopAction = new MoveAutomataAction(true, true);
 	private static final MoveAutomataAction moveAutomataUpAction = new MoveAutomataAction(true, false);
 	private static final MoveAutomataAction moveAutomataDownAction = new MoveAutomataAction(false, false);
 	private static final MoveAutomataAction moveAutomataToBottomAction = new MoveAutomataAction(false, true);
+
 	private static final PreferencesAction preferencesAction = new PreferencesAction();
 	private static final EditAction editAction = new EditAction(supremica);
+
 	private static final Insets theInsets = new Insets(0, 0, 0, 0);
 
 	public MainToolBar(Supremica supremica)

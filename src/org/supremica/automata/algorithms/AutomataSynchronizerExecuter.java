@@ -65,6 +65,7 @@ import org.supremica.automata.AutomatonIterator;
 import org.supremica.automata.AutomatonType;
 import org.supremica.automata.CompositeState;
 import org.supremica.automata.LabeledEvent;
+import org.supremica.properties.SupremicaProperties;
 import EDU.oswego.cs.dl.util.concurrent.Rendezvous;
 
 /**
@@ -101,8 +102,8 @@ public final class AutomataSynchronizerExecuter
 	private boolean controllableState;
 	private final static int IMMEDIATE_NOT_AVAILABLE = -1;
 	private int immediateEvent = IMMEDIATE_NOT_AVAILABLE;
-	private final static String SEPARATOR_STRING = ".";    // Should be user-definable!!
-	private final static int SEPARATOR_LENGTH = 1;    // for this particular case!
+	private final static String SEPARATOR_STRING = SupremicaProperties.getStateSeparator();
+	private final static int SEPARATOR_LENGTH = SEPARATOR_STRING.length();
 	private int numberOfAddedStates = 0;
 
 	/** Options determining how the synchronization should be performed. */

@@ -375,12 +375,11 @@ public class RobotStudioInterface
 
 		/**
 		 * Calculates the intersections between each pair of spans.
-		 * Puts them into the part called "MutexZones" and then deletes the spans.
+		 * Puts them into the part called ZONEPART_NAME and then deletes the spans.
 		 */
 		public void intersectSpans(Robot robotA, Robot robotB)
 			throws Exception
 		{
-
 			// Get the parts containing the spans
 			IPart spansA = station.getParts().item(var(robotA.getName() + SPANS_SUFFIX));
 			IPart spansB = station.getParts().item(var(robotB.getName() + SPANS_SUFFIX));
@@ -412,7 +411,6 @@ public class RobotStudioInterface
 					}
 					catch (Exception e)
 					{
-
 						// Either the spans were disjoint or there was an error. Whatever.
 						//logger.info(spanA.getName() + " and " + spanB.getName() + " are disjoint.");
 					}
@@ -423,13 +421,11 @@ public class RobotStudioInterface
 		// DAppEvents interface methods
 		public void selectionChanged()
 		{
-
 			//logger.info("Selection changed.");
 		}
 
 		public void quit()
 		{
-
 			// This is fatal, cause this has never ever happened
 			// and I'd like to know if it ever does! (It should, Magnus said!)
 			logger.fatal("RobotStudio is shutting down. Please tell Hugo " + "if, when and how you got this message!");
@@ -439,7 +435,6 @@ public class RobotStudioInterface
 
 		public int stationBeforeOpen(String Path, boolean[] Cancel)
 		{
-
 			//logger.info("Station being opened...");
 			return 0;
 		}
@@ -453,7 +448,6 @@ public class RobotStudioInterface
 
 		public int stationBeforeSave(org.supremica.external.comInterfaces.robotstudio_3_0.RobotStudio.Station Station, boolean[] Cancel)
 		{
-
 			//logger.info("Station being saved...");
 			return 0;
 		}
@@ -467,28 +461,24 @@ public class RobotStudioInterface
 
 		public int libraryBeforeOpen(String FileName, boolean[] Cancel)
 		{
-
 			//logger.info("Library being opened...");
 			return 0;
 		}
 
 		public int libraryAfterOpen(org.supremica.external.comInterfaces.robotstudio_3_0.RobotStudio.RsObject RsObject)
 		{
-
 			//logger.info("Library opened.");
 			return 0;
 		}
 
 		public int libraryBeforeSave(org.supremica.external.comInterfaces.robotstudio_3_0.RobotStudio.RsObject RsObject, boolean[] Cancel)
 		{
-
 			//logger.info("Library being saved...");
 			return 0;
 		}
 
 		public int libraryAfterSave(org.supremica.external.comInterfaces.robotstudio_3_0.RobotStudio.RsObject RsObject)
 		{
-
 			//logger.info("Library saved.");
 			return 0;
 		}
@@ -567,7 +557,7 @@ public class RobotStudioInterface
 
 			/**
 			 * Function used to check if the robot collides with some object
-			 * before the simulation starts.
+			 * (before the simulation starts).
 			 */
 			private boolean entityCollidesWith(IMechanism robot, IEntity object)
 				throws Exception
@@ -646,7 +636,6 @@ public class RobotStudioInterface
 			{
 				try
 				{
-
 					// basic information
 					String objectName = collidingObject.getName();
 					double time = controller.getMotionTime();

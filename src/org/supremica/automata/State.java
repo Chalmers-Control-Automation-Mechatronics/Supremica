@@ -152,7 +152,7 @@ public class State
 		y = otherState.y;
 		radius = otherState.radius;
 
-// Här är skurken.....  
+// Här är skurken..... vilken jäv**a skurk? Skriv ordentliga kommentarer!!!
 //              outgoingArcs = otherState.outgoingArcs;
 	}
 
@@ -554,6 +554,40 @@ public class State
 		}
 
 		return nextStates.iterator();
+	}
+
+	public StateIterator previousStateIterator()
+	{
+		StateSet previousStates = new StateSet();
+		ArcIterator arcIt = incomingArcsIterator();
+
+		while (arcIt.hasNext())
+		{
+			previousStates.add(((Arc) arcIt.next()).getFromState());
+		}
+
+		return previousStates.iterator();
+	}
+
+	/**
+	 * StateIterator for the states that can reach this state in one transition
+	 * along the event event.
+	 */
+	public StateIterator previousStateIterator(LabeledEvent event)
+	{
+		StateSet previousStates = new StateSet();
+		ArcIterator arcIt = incomingArcsIterator();
+
+		while (arcIt.hasNext())
+		{
+			Arc arc = (Arc) arcIt.next();
+			if (arc.getEvent().equals(event))
+			{
+				previousStates.add(arc.getFromState());
+			}
+		}
+
+		return previousStates.iterator();
 	}
 
 	public int nbrOfIncomingArcs()

@@ -60,16 +60,13 @@ import org.supremica.util.BDD.Options;
 /**
  * Properties for Supremica.
  *
- *
  * Note: As the BDD part also is a stand-alone application and have its own configuration
  *       classes, we must when loading/saving property files also sync with the BDD
  *       configurator. this is done from the updateBDDOptions() function.
- *
  **/
 public final class SupremicaProperties
 	extends Properties
 {
-
 	/** the last property file used, so we write back changes to the correct config file */
 	private static String lastPropertyFile = null;
 	private static final String DOC_DB_SERVER_NAME = "docdbHost";
@@ -103,9 +100,10 @@ public final class SupremicaProperties
 	private static final String GENERAL_LOOKANDFEEL = "generalLookAndFeel";
 
 	//private static final String GENERAL_INCLUDE_ANIMATIONS = "generalIncludeAnimations";
+
+	// WHAT IS RCP!?!?!???! IS THAT INTUITIVELY CLEAR OR HAD IT BEEN A GOOD IDEA TO WRITE 
+	// AN ENLIGHTENING COMMENT??!! Grrrrrrr...
 	private static final String GENERAL_USE_RCP = "generalUseRcp";
-	private static final String GENERAL_USE_ROBOTCOORDINATION = "generalUseRobotCoordination";
-	private static final String GENERAL_USE_ROBOTCOORDINATION_ABB = "generalUseRobotCoordinationABB";
 
 	// Logging options
 	private static final String LOG_TO_CONSOLE = "logToConsole";
@@ -114,11 +112,14 @@ public final class SupremicaProperties
 	// File Options
 	private static final String FILE_OPEN_PATH = "fileOpenPath";
 	private static final String FILE_SAVE_PATH = "fileSavePath";
-	private static final String FILE_ALLOW_OPEN = "FileAllowOpen";
-	private static final String FILE_ALLOW_SAVE = "FileAllowSave";
-	private static final String FILE_ALLOW_IMPORT = "FileAllowImport";
-	private static final String FILE_ALLOW_EXPORT = "FileAllowExport";
-	private static final String FILE_ALLOW_QUIT = "FileAllowQuit";
+	private static final String FILE_ALLOW_OPEN = "fileAllowOpen";
+	private static final String FILE_ALLOW_SAVE = "fileAllowSave";
+	private static final String FILE_ALLOW_IMPORT = "fileAllowImport";
+	private static final String FILE_ALLOW_EXPORT = "fileAllowExport";
+	private static final String FILE_ALLOW_QUIT = "fileAllowQuit";
+
+	// General properties
+	private static final String GENERAL_STATE_SEPARATOR = "stateSeparator";
 
 	// Synchronization Options
 	private static final String SYNC_FORBID_UNCON_STATES = "syncForbidUncontrollableStates";
@@ -192,15 +193,16 @@ public final class SupremicaProperties
 	private static final String SOFTPLC_CYCLE_TIME = "softplcCycleTime";
 	private static Vector softplcInterfaces = new Vector();
 
-	// Special Menu Options
+	// Robot coordination Options
+	private static final String GENERAL_USE_ROBOTCOORDINATION = "generalUseRobotCoordination"; 
+
+	// Junk
+	private static final String SHOW_ROBOTSTUDIO_LINK = "showRobotstudioLink"; // Hugo's old stuff
+	private static final String SHOW_COORDINATION_ABB = "showCoordinationABB"; // Domenico's stuff
+	private static final String GENERAL_USE_ROBOTCOORDINATION_ABB = "generalUseRobotCoordinationABB";
 	private static final String SHOW_GENETIC_ALGORITHMS = "showGeneticAlgorithms";
-	private static final String SHOW_ROBOTSTUDIO_LINK = "showRobotstudioLink";
 
-	// Coordination ABB
-	private static final String SHOW_COORDINATION_ABB = "showCoordinationABB";
-
-	// ActiveXBridge
-	private static final String USE_ACTIVEX_BRIDGE = "useActiveXBridge";
+	// What's this for?
 	private Set forbidExternalModification = new HashSet();
 
 	// There is a good reason why we do the initialization like this.
@@ -216,6 +218,8 @@ public final class SupremicaProperties
 
 	private SupremicaProperties()
 	{
+		// The arguments to setProperty are (key, value, allowExternalModification)
+
 		setProperty(FILE_OPEN_PATH, System.getProperty("user.home"), true);
 		setProperty(FILE_SAVE_PATH, System.getProperty("user.home"), true);
 		setProperty(FILE_ALLOW_OPEN, "true", true);
@@ -263,11 +267,15 @@ public final class SupremicaProperties
 		setProperty(LOG_TO_CONSOLE, "false", true);
 		setProperty(LOG_TO_GUI, "false", true);
 		setProperty(ALLOW_SUPERUSER_LOGIN, "true", false);
+		// General
+		setProperty(GENERAL_STATE_SEPARATOR, ".", true);
+		// Synchronization
 		setProperty(SYNC_FORBID_UNCON_STATES, "true", true);
 		setProperty(SYNC_EXPAND_FORBIDDEN_STATES, "true", true);
 		setProperty(SYNC_INITIAL_HASHTABLE_SIZE, Integer.toString((1 << 14) - 1), true);
 		setProperty(SYNC_EXPAND_HASHTABLE, "true", true);
 		setProperty(SYNC_NBR_OF_EXECUTERS, "1", true);
+		// Verification
 		setProperty(VERIFY_VERIFICATION_TYPE, VerificationType.Controllability.toString(), true);
 		setProperty(VERIFY_ALGORITHM_TYPE, VerificationAlgorithm.Modular.toString(), true);
 		setProperty(VERIFY_EXCLUSION_STATE_LIMIT, "1000", true);
@@ -275,6 +283,7 @@ public final class SupremicaProperties
 		setProperty(VERIFY_ONE_EVENT_AT_A_TIME, "false", true);
 		setProperty(VERIFY_SKIP_UNCONTROLLABILITY_CHECK, "false", true);
 		setProperty(VERIFY_NBR_OF_ATTEMPTS, "5", true);
+		// Synthesis
 		setProperty(SYNTHESIS_SYNTHESIS_TYPE, SynthesisType.Both.toString(), true);
 		setProperty(SYNTHESIS_ALGORITHM_TYPE, SynthesisAlgorithm.Monolithic.toString(), true);
 		setProperty(SYNTHESIS_PURGE, "false", true);
@@ -282,19 +291,20 @@ public final class SupremicaProperties
 		setProperty(SYNTHESIS_MAXIMALLY_PERMISSIVE, "true", true);
 		setProperty(SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL, "true", true);
 		setProperty(SYNTHESIS_REDUCE_SUPERVISORS, "false", true);
+		// Simulation stuff
+		setProperty(SIMULATION_IS_EXTERNAL, "false", false);
+		setProperty(SIMULATION_CYCLE_TIME, "100", false);
+		// The rest (move to where it belongs!!!)
 		setProperty(GENERAL_USE_SECURITY, "false", false);
 		setProperty(INCLUDE_ANIMATOR, "false", true);
 		setProperty(INCLUDE_USERINTERFACE, "false", true);
 		setProperty(SOFTPLC_CYCLE_TIME, "40", true);
-		setProperty(SHOW_GENETIC_ALGORITHMS, "false", true);
 		setProperty(SHOW_ROBOTSTUDIO_LINK, "false", true);
-		setProperty(USE_ACTIVEX_BRIDGE, "false", true);
 		setProperty(SHOW_COORDINATION_ABB, "false", true);
 		softplcInterfaces.add(new org.supremica.gui.SoftplcInterface("org.supremica.softplc.Simulator.BTSim"));
-
-		// Simulation stuff
-		setProperty(SIMULATION_IS_EXTERNAL, "false", false);
-		setProperty(SIMULATION_CYCLE_TIME, "100", false);
+		
+		// Junk
+		setProperty(SHOW_GENETIC_ALGORITHMS, "false", true);
 	}
 
 	// --------------------------------------------------------------
@@ -480,106 +490,80 @@ public final class SupremicaProperties
 		}
 	}
 
-
 	/**
 	 * @return <code>true</code>, if the application is running on Mac OS 8/9, <code>false</code> otherwise
 	 */
-
 	public static boolean isMacOS()
 	{
 		return com.muchsoft.util.Sys.isMacOS();
 	}
 
-
-
 	/**
 	 * @return <code>true</code>, if the application is running on Mac OS X, <code>false</code> otherwise
 	 */
-
 	public static boolean isMacOSX()
 	{
 		return com.muchsoft.util.Sys.isMacOSX();
 	}
 
-
-
 	/**
 	 * @return <code>true</code>, if the application is running on a Mac (OS 8, 9 or X), <code>false</code> otherwise
 	 */
-
 	public static boolean isAMac()
 	{
 		return com.muchsoft.util.Sys.isAMac();
 	}
 
-
-
 	/**
 	 * @return <code>true</code>, if the application is running on Linux, <code>false</code> otherwise
 	 */
-
 	public static boolean isLinux()
 	{
 		return com.muchsoft.util.Sys.isLinux();
 	}
 
-
-
 	/**
 	 * @return <code>true</code>, if the application is running on Windows, <code>false</code> otherwise
 	 */
-
 	public static boolean isWindows()
 	{
 		return com.muchsoft.util.Sys.isWindows();
 	}
 
-
-
 	/**
 	 * @return <code>true</code>, if the application is running on OS/2, <code>false</code> otherwise
 	 */
-
 	public static boolean isOS2()
 	{
 		return com.muchsoft.util.Sys.isOS2();
 	}
-
-
 
 	/**
 	 * The home directory contains the user's data and applications. On UNIX systems this directory is denoted
 	 * by <code>~</code> and can be queried through the system property <code>user.home</code>.
 	 * @return the user's home directory without a trailing path separator
 	 */
-
 	public static String getHomeDirectory()
 	{
 
 		return com.muchsoft.util.Sys.getHomeDirectory();
 	}
 
-
-
 	/**
 	 * The directory from which the application was launched is called the working directory. Its path can
 	 * be queried through the system property <code>user.dir</code>.
 	 * @return the application's working directory without a trailing path separator
 	 */
-
 	public static String getWorkingDirectory()
 	{
 		return com.muchsoft.util.Sys.getWorkingDirectory();
 	}
-
-
 
 	/**
 	 * The preferences directory contains the user's configuration files. On Mac OS X, this method returns
 	 * <code>~/Library/Preferences</code>, on all other systems the user's home directory is used.
 	 * @return the user's preferences directory without a trailing path separator
 	 */
-
 	public static String getPrefsDirectory()
 	{
 			return com.muchsoft.util.Sys.getPrefsDirectory();
@@ -594,7 +578,6 @@ public final class SupremicaProperties
 	 * <i>Please note: There is no guarantee that your application has permission to use this directory!</i>
 	 * @return the shared preferences directory (without a trailing path separator) of all users on a local computer
 	 */
-
 	public static String getLocalPrefsDirectory()
 	{
 			return com.muchsoft.util.Sys.getLocalPrefsDirectory();
@@ -609,7 +592,6 @@ public final class SupremicaProperties
 	 * <code>/Library/Java/Home</code> on Mac OS X.
 	 * @return the Java home directory without a trailing path separator
 	 */
-
 	public static String getJavaHome()
 	{
 		return com.muchsoft.util.Sys.getJavaHome();
@@ -739,6 +721,8 @@ public final class SupremicaProperties
 		wp.setProperty(GENERAL_USE_ROBOTCOORDINATION, toString(allow));
 	}
 
+	/* WHAT'S THE DIFFERENCE!??!? WHY IS THERE A DIFFERENCE!! WASN'T THE WHOLE BLOODY 
+	   POINT THAT THERE WOULDN'T BE A DIFFERENCE? AAARGH. I'M SO UPSET!!!
 	public static boolean generalUseRobotCoordinationABB()
 	{
 		return toBoolean(wp.getProperty(GENERAL_USE_ROBOTCOORDINATION_ABB));
@@ -748,6 +732,7 @@ public final class SupremicaProperties
 	{
 		wp.setProperty(GENERAL_USE_ROBOTCOORDINATION_ABB, toString(allow));
 	}
+	*/
 
 	public static boolean fileAllowImport()
 	{
@@ -909,6 +894,17 @@ public final class SupremicaProperties
 	public static void setLookAndFeel(String command)
 	{
 		wp.setProperty(GENERAL_LOOKANDFEEL, command);
+	}
+
+	// General
+	public static String getStateSeparator()
+	{
+		return wp.getProperty(GENERAL_STATE_SEPARATOR);
+	}
+
+	public static void setStateSeparator(String command)
+	{
+		wp.setProperty(GENERAL_STATE_SEPARATOR, command);
 	}
 
 	public static String getDotExecuteCommand()
@@ -1440,11 +1436,6 @@ public final class SupremicaProperties
 	public static void setShowRobotstudioLink(boolean show)
 	{
 		wp.setProperty(SHOW_ROBOTSTUDIO_LINK, toString(show));
-	}
-
-	public static boolean useActiveXBridge()
-	{
-		return toBoolean(wp.getProperty(USE_ACTIVEX_BRIDGE));
 	}
 
 	public static boolean showCoordinationABB()

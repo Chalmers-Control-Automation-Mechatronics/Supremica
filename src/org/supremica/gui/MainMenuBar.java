@@ -289,8 +289,9 @@ public class MainMenuBar
 					ActionMan.fileImportValid(ActionMan.getGui());
 				}
 			});
-
-			if (SupremicaProperties.generalUseRobotCoordination())
+	
+			// /* WHAT'S THE DIFFERENCE BETWEEN THESE TWO? THERE IS NO DOCUMENTATION!!! AAAAARGH!!
+			if (SupremicaProperties.generalUseRobotCoordination() || true)
 			{
 
 				//File.Import.RobotCoordination
@@ -307,9 +308,9 @@ public class MainMenuBar
 				});
 			}
 
-			if (SupremicaProperties.generalUseRobotCoordinationABB())
+			// if (SupremicaProperties.generalUseRobotCoordinationABB())
+			if (SupremicaProperties.generalUseRobotCoordination())
 			{
-
 				// File.Import.RobotCoordinationABB
 				JMenuItem menuFileImportRobotCoordinationABB = new JMenuItem();
 
@@ -323,6 +324,7 @@ public class MainMenuBar
 					}
 				});
 			}
+			// */
 
 			separatorNeeded = true;
 		}
@@ -982,7 +984,7 @@ public class MainMenuBar
 */
 
 		// Tools.RobotCellExaminer
-		if (false)
+		if (SupremicaProperties.generalUseRobotCoordination())
 		{
 			menuTools.add(new JSeparator());
 
@@ -1000,7 +1002,8 @@ public class MainMenuBar
 		}
 
 		// Tools.RobotStudio
-		if (SupremicaProperties.showRobotstudioLink() && SupremicaProperties.useActiveXBridge())
+		// This is Hugo's old implementation
+		if (SupremicaProperties.showRobotstudioLink())
 		{
 			menuTools.add(new JSeparator());
 
@@ -1129,6 +1132,7 @@ public class MainMenuBar
 		}
 
 		// Tools.CoordinationABB
+		// This is Domenico's implementation, the result from his master's thesis
 		if (SupremicaProperties.showCoordinationABB())
 		{
 			menuTools.add(new JSeparator());

@@ -17,7 +17,6 @@ public class MoveAutomataAction
 	{
 		if (directionIsUp && allTheWay)
 		{
-
 			//super("Move automata to top...", new ImageIcon(Supremica.class.getResource("/icons/ToTop16.gif")));
 			putValue(NAME, "Move automata to top...");
 			putValue(SMALL_ICON, new ImageIcon(Supremica.class.getResource("/icons/ToTop16.gif")));

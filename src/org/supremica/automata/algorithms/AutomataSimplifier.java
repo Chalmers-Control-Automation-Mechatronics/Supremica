@@ -5,7 +5,7 @@ import org.supremica.log.*;
 import org.supremica.automata.*;
 
 /**
- * simplify a project by removing and transformingthe automata
+ * simplify a project by removing and transforming the automata
  *
  */
 public class AutomataSimplifier

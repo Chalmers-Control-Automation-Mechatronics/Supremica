@@ -1284,6 +1284,12 @@ public class Automata
 	 */
 	public boolean sanityCheck(Gui gui, int minSize, boolean mustHaveInitial, boolean mustHaveValidType, boolean mustBeControllabilityConsistent)
 	{
+		// Is this automata empty? If so, just bail out.
+		if (size() <= 0)
+		{
+			return false;
+		}
+
 		// Warns if there are events with equal (lowercase) names.
 		isEventNamesSafe();
 

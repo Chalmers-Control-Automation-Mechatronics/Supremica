@@ -56,6 +56,7 @@ import org.supremica.automata.Automaton;
 import org.supremica.automata.State;
 import org.supremica.automata.LabeledEvent;
 import org.supremica.automata.StateSet;
+import org.supremica.properties.SupremicaProperties;
 
 // Factory object for generating the correct class according to prefs
 class EqClassFactory
@@ -229,7 +230,7 @@ public class AutomatonMinimizer
 				State oldToState = currArc.getToState();
 				EquivalenceClass nextEquivalenceClass = (EquivalenceClass) oldToState.getStateClass();    // getEquivalenceClass();
 				State toState = nextEquivalenceClass.getState(newAutomaton);
-
+				
 				// Arc newArc = new Arc(fromState, toState, currEventId);
 				Arc newArc = new Arc(fromState, toState, currEvent);
 
@@ -708,8 +709,9 @@ class EqClass
 
 			while (it.hasNext())
 			{
-				str.append(((State) it.next()).getName());
+				str.append(((State) it.next()).getName() + SupremicaProperties.getStateSeparator());
 			}
+			str.setLength(str.length() - SupremicaProperties.getStateSeparator().length());    
 
 			createNewState(theAutomaton, str.toString());
 		}

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Automata name="verriegel3" comment="A large model of a car's central locking system imported from VALID. The model was originally developed as a case study within the BMBF project KORSYS. This is the original central locking model including three doors. The system is controllable and nonblocking. If the automaton 'noreset.WSP' is removed, the system is blocking.">
+<Automata name="verriegel3" comment="A large model of a car's central locking system. The model was originally developed as a case study within the BMBF project KORSYS. This is the most simple of the models including only three doors. The system is controllable and nonblocking. If the automaton 'noreset.WSP' is removed, the system is blocking.">
 <Automaton name="wspcount" type="Specification">
 	<Events>
 		<Event id="ER" label="ER"/>

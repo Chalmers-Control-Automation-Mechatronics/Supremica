@@ -244,16 +244,13 @@ class SynthesizerDialogAdvancedPanel
 	{
 		Box advancedBox = Box.createVerticalBox();
 
-		reduceSupervisorsBox = new JCheckBox("Reduce supervisors");
-
+		reduceSupervisorsBox = new JCheckBox("Reduce supervisors (experimental)");
 		reduceSupervisorsBox.setToolTipText("Remove redundant states and events from synthesized supervisors");
 
 		maximallyPermissiveBox = new JCheckBox("Maximally permissive result");
-
 		maximallyPermissiveBox.setToolTipText("Guarantee maximally permissive result");
 
 		maximallyPermissiveIncrementalBox = new JCheckBox("Incremental algorithm");
-
 		maximallyPermissiveIncrementalBox.setToolTipText("Use incremental algorithm for maximally permissive synthesis");
 		reduceSupervisorsBox.addActionListener(this);
 		maximallyPermissiveIncrementalBox.addActionListener(this);

@@ -96,7 +96,6 @@ public class TestAutomata
 	{
 		try
 		{
-
 			ProjectBuildFromXml builder = new ProjectBuildFromXml();
 			Project theProject = builder.build(TestFiles.getFile(TestFiles.Ex4_5_b));
 			assertTrue(theProject.nbrOfAutomata() == 3);
@@ -122,10 +121,7 @@ public class TestAutomata
 					assertTrue(currIndex >= minIndex);
 					assertTrue(currIndex <= maxIndex);
 				}
-
 			}
-
-
 		}
 		catch (Exception ex)
 		{

@@ -53,6 +53,9 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+import org.supremica.automata.IO.*;
+import org.supremica.testhelpers.*;
+
 public class TestStateSet
 	extends TestCase
 {
@@ -61,7 +64,7 @@ public class TestStateSet
 	{
 		super(name);
 	}
-
+	
 	/**
 	 * Sets up the test fixture.
 	 * Called before every test case method.
@@ -121,6 +124,22 @@ public class TestStateSet
 		assertTrue(oneset.equals(oneset));
 		assertTrue(!(oneset == twoset));
 		assertTrue(oneset.equals(twoset));
-	}
+		
+		try
+		{
+			ProjectBuildFromXml builder = new ProjectBuildFromXml();
+			Project theProject = builder.build(TestFiles.getFile(TestFiles.CentralLocking3Doors));
+			
+			Automaton aut = theProject.getAutomaton("decoder");
+			StateSet ss = new StateSet(aut);
+			StateSet ps = ss.previousStates(aut.getAlphabet().getEvent("ER"));
 
+			assertTrue(ps.size() == 5);
+			// System.err.println(ps);
+		}
+		catch (Exception ex)
+		{
+			System.err.println(ex);
+		}
+	}
 }

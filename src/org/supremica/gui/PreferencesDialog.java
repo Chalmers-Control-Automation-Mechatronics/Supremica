@@ -65,7 +65,7 @@ public class PreferencesDialog
 	private FilePanel theFilePanel = null;
 	private CommunicationPanel theCommunicationPanel = null;
 	private SimulationPanel theSimulationPanel = null;
-	private RobotCoordinationPanel theRobotCoordinationPanel = null;
+	// private RobotCoordinationPanel theRobotCoordinationPanel = null;
 	/* yes, it has package access! */
 	BDDPanel1 theBDDPanel1 = null;
 	private BDDPanel2 theBDDPanel2 = null;
@@ -74,6 +74,7 @@ public class PreferencesDialog
 	private SynchronizationPropertiesPanel theSynchronizationPanel = null;
 	private SoftPLCPanel theSoftPLCPanel = null;
 	private PreferencesControllerPanel theControllerPanel = null;
+	private GeneralPanel theGeneralPanel = null;
 	private Frame owner;
 
 	public PreferencesDialog(Frame owner)
@@ -86,42 +87,38 @@ public class PreferencesDialog
 
 		contentPane.add(theTabbedPanel, BorderLayout.CENTER);
 
-		theSynchronizationPanel = new SynchronizationPropertiesPanel(this);
+		theGeneralPanel = new GeneralPanel(this);
+		theTabbedPanel.add("General", theGeneralPanel);
 
+		theSynchronizationPanel = new SynchronizationPropertiesPanel(this);
 		theTabbedPanel.add("Synchronization", theSynchronizationPanel);
 
 		theLayoutPanel = new LayoutPanel(this);
-
 		theTabbedPanel.add("Layout", theLayoutPanel);
 
 		theCommunicationPanel = new CommunicationPanel(this);
-
 		theTabbedPanel.add("Communication", theCommunicationPanel);
 
 		theSoftPLCPanel = new SoftPLCPanel(this);
-
 		theTabbedPanel.add("SoftPLC", theSoftPLCPanel);
 
 		theBDDPanel1 = new BDDPanel1(this);
-
 		theTabbedPanel.add("BDD 1", theBDDPanel1);
 
 		theBDDPanel2 = new BDDPanel2(this);
-
 		theTabbedPanel.add("BDD 2", theBDDPanel2);
 
 		theBDDPanel3 = new BDDPanel3(this);
-
 		theTabbedPanel.add("BDD 3", theBDDPanel3);
 
 		theSimulationPanel = new SimulationPanel(this);
-
 		theTabbedPanel.add("Simulation", theSimulationPanel);
 
 		/*
 		theRobotCoordinationPanel = new RobotCoordinationPanel(this);
 		theTabbedPanel.add("Robot coordination", theRobotCoordinationPanel);
 		*/
+
 		if (SupremicaProperties.fileAllowOpen() || SupremicaProperties.fileAllowSave())
 		{
 			theFilePanel = new FilePanel(this);
@@ -212,8 +209,10 @@ public class PreferencesDialog
 		theBDDPanel3.update();
 		theCommunicationPanel.update();
 		theLayoutPanel.update();
+		theGeneralPanel.update();
 		theSynchronizationPanel.update();
 		theSoftPLCPanel.update();
+		// theRobotCoordinationPanel.update();
 	}
 
 	private boolean setAttributes()
@@ -260,6 +259,11 @@ public class PreferencesDialog
 			return false;
 		}
 
+		if (!theGeneralPanel.doApply())
+		{
+			return false;
+		}
+
 		if (!theSynchronizationPanel.doApply())
 		{
 			return false;
@@ -274,7 +278,14 @@ public class PreferencesDialog
 		{
 			return false;
 		}
-
+		
+		/*
+		if (!theRobotCoordinationPanel.doApply())
+		{
+			return false;
+		}
+		*/
+		
 		return true;
 	}
 
@@ -555,6 +566,38 @@ class LayoutPanel
 	}
 }
 
+class GeneralPanel
+	extends JPanel
+{
+	private PreferencesDialog theDialog = null;
+	private JTextField stateSeparator = null;
+
+	public GeneralPanel(PreferencesDialog theDialog)
+	{
+		this.theDialog = theDialog;
+
+		Box propertiesBox = new Box(BoxLayout.Y_AXIS);
+		add(propertiesBox, BorderLayout.CENTER);
+
+		JLabel stateSeparatorLabel = new JLabel("State separator");
+		propertiesBox.add(stateSeparatorLabel);
+		stateSeparator = new JTextField();
+		propertiesBox.add(stateSeparator);
+	}
+
+	public boolean doApply()
+	{
+		SupremicaProperties.setStateSeparator(stateSeparator.getText());
+
+		return true;
+	}
+
+	public void update()
+	{
+		stateSeparator.setText(SupremicaProperties.getStateSeparator());
+	}
+}
+
 class SynchronizationPropertiesPanel
 	extends JPanel
 {
@@ -571,39 +614,28 @@ class SynchronizationPropertiesPanel
 		this.theDialog = theDialog;
 
 		Box propertiesBox = new Box(BoxLayout.Y_AXIS);
-
 		add(propertiesBox, BorderLayout.CENTER);
 
 		forbidUncontrollableStates = new JCheckBox("Forbid uncontrollable states");
-
 		propertiesBox.add(forbidUncontrollableStates);
 
 		expandForbiddenStates = new JCheckBox("Expand forbidden states");
-
 		propertiesBox.add(expandForbiddenStates);
 
 		expandHashtable = new JCheckBox("Expand hashtable");
-
 		propertiesBox.add(expandHashtable);
 
 		verboseMode = new JCheckBox("Verbose mode");
-
 		propertiesBox.add(verboseMode);
 
 		JLabel hashtableSizeLabel = new JLabel("Initial size of the hashtable");
-
 		propertiesBox.add(hashtableSizeLabel);
-
 		hashtableSize = new JTextField();
-
 		propertiesBox.add(hashtableSize);
 
 		JLabel nbrOfExecutersLabel = new JLabel("Nbr of threads");
-
 		propertiesBox.add(nbrOfExecutersLabel);
-
 		nbrOfExecuters = new JTextField();
-
 		propertiesBox.add(nbrOfExecuters);
 	}
 
@@ -615,21 +647,17 @@ class SynchronizationPropertiesPanel
 		SupremicaProperties.setVerboseMode(verboseMode.isSelected());
 
 		int size = PreferencesDialog.getInt("Hashtable size", hashtableSize.getText(), 100);
-
 		if (size == Integer.MIN_VALUE)
 		{
 			return false;
 		}
-
 		SupremicaProperties.setSyncInitialHashtableSize(size);
 
 		int nbrOfThreads = PreferencesDialog.getInt("Nbr of threads", nbrOfExecuters.getText(), 1);
-
 		if (nbrOfThreads == Integer.MIN_VALUE)
 		{
 			return false;
 		}
-
 		SupremicaProperties.setSyncNbrOfExecuters(nbrOfThreads);
 
 		return true;
@@ -1174,6 +1202,7 @@ class SimulationPanel
 	}
 }
 
+/*
 class RobotCoordinationPanel
 	extends JPanel
 {
@@ -1206,3 +1235,4 @@ class RobotCoordinationPanel
 		showRobotCoordination.setSelected(SupremicaProperties.generalUseRobotCoordination());
 	}
 }
+*/
