@@ -377,16 +377,11 @@ public final class AutomataSynchronizerHelper
     	return theStates.getTable();
     }
 
-	public Iterator stateIterator()
+	public Iterator getStateIterator()
 	{
 		return theStates.iterator();
 	}
-/*
-    public IntArrayHashTable getStates()
-    {
-		return theStates;
-	}
-*/
+
     public State[][] getIndexFormStateTable()
     {
     	return theAutomataIndexForm.getStateTable();
