@@ -64,7 +64,7 @@ public class AutomataExtender
 	private int k = 1;
 	private static int MODE_REMOVE_UNCON_TOP_EVENTS = 1;
 	private static int MODE_CHANGE_UNCON_TOP_EVENTS = 2;
-	private int mode = MODE_CHANGE_UNCON_TOP_EVENTS;
+	private int mode = MODE_REMOVE_UNCON_TOP_EVENTS;
 
 	public AutomataExtender(Automaton aut)
 	{
@@ -102,7 +102,7 @@ public class AutomataExtender
 		Alphabet newAlphabet = new Alphabet(orgAut.getAlphabet());
 		// String passEventId = orgAlphabet.getUniqueId(newAut.getName());
 		LabeledEvent passEvent = new LabeledEvent("pass", "3.1415926");
-		newAlphabet.addEvent(passEvent);
+		// newAlphabet.addEvent(passEvent);
 
 		if (mode == MODE_REMOVE_UNCON_TOP_EVENTS)
 		{

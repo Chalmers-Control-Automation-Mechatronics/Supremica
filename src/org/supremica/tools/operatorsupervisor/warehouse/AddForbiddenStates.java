@@ -59,7 +59,7 @@ public class AddForbiddenStates
 
 		PrintWriter pw = new PrintWriter(System.out);
 
-		AutomataToXml serializer = new AutomataToXml(theAutomata);
+		ProjectToSP serializer = new ProjectToSP(theAutomata);
 		serializer.serialize(pw);
 	}
 }
