@@ -334,7 +334,7 @@ public final class AutomataSynchronizerHelper
 	 *@param eventIndex The feature to be added to the State attribute
 	 *@exception  Exception Description of the Exception
 	 */
-	public void addState(int[] fromState, int[] toState, int eventIndex)
+	public void addState(int[] fromState, int[] toState)
 		throws Exception
 	{
 		if (rememberTrace)
@@ -343,7 +343,7 @@ public final class AutomataSynchronizerHelper
 		}
 
 		if (true)    // What? /Hguo.
-		{
+		{			
 			int prevStateIndex = theStates.getIndex(fromState);
 
 			if (prevStateIndex >= 0)

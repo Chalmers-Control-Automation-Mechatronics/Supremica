@@ -83,42 +83,38 @@ public class EventHelpers
 	 * Creates a new event from a set of events
 	 *
 	 *@param  eventSet Description of the Parameter
-	 *@param  prefix ??? Never used, what was it good for ???
 	 *@return  Description of the Return Value
 	 *@exception  IllegalArgumentException Description of the Exception
 	 *@exception  Exception Description of the Exception
 	 */
-	static LabeledEvent createEvent(EventsSet eventSet,    /* String prefix,*/
-									boolean requireConsistentControllability, boolean requireConsistentImmediate)
+	static LabeledEvent createEvent(EventsSet eventSet, boolean requireConsistentControllability, 
+									boolean requireConsistentImmediate)
 		throws IllegalArgumentException, Exception
 	{
 		if (eventSet.size() <= 0)
 		{
 			throw new IllegalArgumentException("At least one event in the set is necessary");
-
-			// IllegalArgumentException excp = new IllegalArgumentException("At least one event in the set is necessary");
-			// excp.printStackTrace();
-			// throw excp;
 		}
 
 		Iterator eventIt = eventSet.iterator();
-		LabeledEvent tmpEvent = (LabeledEvent) eventIt.next();
+		LabeledEvent firstEvent = (LabeledEvent) eventIt.next();
 
 		// Some initializations
-// This function (createEvent) is only used by AlphabetHelpers::getUnionAlphabet
-// That function (getUnionAlphabet) manages the id by itself, so avoiding id-fddlng here would seem to be safe
-//              String id = tmpEvent.getId();
-		String label = tmpEvent.getLabel();
-		boolean controllable = tmpEvent.isControllable();
-		boolean prioritized = tmpEvent.isPrioritized();
-		boolean operatorIncrease = tmpEvent.isOperatorIncrease();
-		boolean operatorReset = tmpEvent.isOperatorReset();
-		boolean observable = tmpEvent.isObservable();
-		boolean immediate = tmpEvent.isImmediate();
+		// This function (createEvent) is only used by AlphabetHelpers::getUnionAlphabet
+		// That function (getUnionAlphabet) manages the id by itself, so avoiding id-fddlng
+		// here would seem to be safe
+		//              String id = firstEvent.getId();
+		String label = firstEvent.getLabel();
+		boolean controllable = firstEvent.isControllable();
+		boolean prioritized = firstEvent.isPrioritized();
+		boolean operatorIncrease = firstEvent.isOperatorIncrease();
+		boolean operatorReset = firstEvent.isOperatorReset();
+		boolean observable = firstEvent.isObservable();
+		boolean immediate = firstEvent.isImmediate();
 
 		while (eventIt.hasNext())
 		{
-			tmpEvent = (LabeledEvent) eventIt.next();
+			LabeledEvent tmpEvent = (LabeledEvent) eventIt.next();
 
 			if (!label.equals(tmpEvent.getLabel()))
 			{
@@ -127,35 +123,40 @@ public class EventHelpers
 
 			if (requireConsistentControllability && (controllable != tmpEvent.isControllable()))
 			{
-				String errorMsg = "Controllability of an event must be the same in all automata. Controllability of " + label + " is not consistent.";
-
+				String errorMsg = "Controllability of an event must be the same in all automata. " +
+					"Controllability of " + label + " is not consistent.";
+				
 				throw new SupremicaException(errorMsg);
 			}
 
 			if (requireConsistentImmediate && (immediate != tmpEvent.isImmediate()))
 			{
-				String errorMsg = "Immediate of an event must be the same in all automata. Immediate of " + label + " is not consistent.";
+				String errorMsg = "Immediate of an event must be the same in all automata. " + 
+					"Immediate of " + label + " is not consistent.";
 
 				throw new SupremicaException(errorMsg);
 			}
 
 			if (operatorIncrease != tmpEvent.isOperatorIncrease())
 			{
-				String errorMsg = "OperatorIncrease of an event must be the same in all automata. Operator of " + label + " is not consistent.";
+				String errorMsg = "OperatorIncrease of an event must be the same in all automata. " + 
+					"Operator of " + label + " is not consistent.";
 
 				throw new SupremicaException(errorMsg);
 			}
 
 			if (operatorReset != tmpEvent.isOperatorReset())
 			{
-				String errorMsg = "OperatorReset of an event must be the same in all automata. Operator of " + label + " is not consistent.";
+				String errorMsg = "OperatorReset of an event must be the same in all automata. " + 
+					"Operator of " + label + " is not consistent.";
 
 				throw new SupremicaException(errorMsg);
 			}
 
 			if (observable != tmpEvent.isObservable())
 			{
-				String errorMsg = "Observability of an event must be the same in all automata. Observability of " + label + " is not consistent.";
+				String errorMsg = "Observability of an event must be the same in all automata. " + 
+					"Observability of " + label + " is not consistent.";
 
 				throw new SupremicaException(errorMsg);
 			}
@@ -163,6 +164,7 @@ public class EventHelpers
 			prioritized = prioritized || tmpEvent.isPrioritized();
 		}
 
+		/*
 		LabeledEvent theEvent = new LabeledEvent(label);    // , id);
 
 		// theEvent.setId(id);
@@ -173,6 +175,13 @@ public class EventHelpers
 		theEvent.setOperatorIncrease(operatorIncrease);
 		theEvent.setOperatorReset(operatorReset);
 		theEvent.setObservable(observable);
+		*/
+
+		// The new event should be a copy, except for the prioritized status, that we may change!
+		// The above construction was bound to give problems when something new was introduced!
+		LabeledEvent theEvent = new LabeledEvent(firstEvent);
+		theEvent.setSynchIndex(-1);
+		theEvent.setPrioritized(prioritized);
 
 		return theEvent;
 	}

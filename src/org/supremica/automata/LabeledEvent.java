@@ -52,7 +52,6 @@ package org.supremica.automata;
 public class LabeledEvent
 	implements Comparable
 {
-
 	// The label is what shows in the dot-figures, this is the
 	// global identifier of an event, appearing in the alphabet
 	private String label = "";
@@ -75,7 +74,6 @@ public class LabeledEvent
 
 	public LabeledEvent(LabeledEvent e)
 	{
-
 		label = e.label;
 		controllable = e.controllable;
 		prioritized = e.prioritized;
@@ -167,9 +165,9 @@ public class LabeledEvent
 		return epsilon;
 	}
 
-	public void setEpsilon(boolean b)
+	public void setEpsilon(boolean epsilon)
 	{
-		epsilon = b;
+		this.epsilon = epsilon;
 	}
 
 	public void setExpansionPriority(int expansionPriority)

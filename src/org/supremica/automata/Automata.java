@@ -835,13 +835,11 @@ public class Automata
 	 */
 	public Alphabet setIndicies()
 	{
-
 		// Get the union alphabet
 		Alphabet theAlphabet;
 
 		try
 		{
-
 			// Why "this, false, false"?!? Shouldn't it be "this, true, true"?  /hugo
 			theAlphabet = AlphabetHelpers.getUnionAlphabet(this, false, false);
 		}
@@ -872,7 +870,8 @@ public class Automata
 	{
 		try
 		{
-			return AlphabetHelpers.getUnionAlphabet(this);
+			// If consistency is important, that has to be said explicitly
+			return AlphabetHelpers.getUnionAlphabet(this, false, false);
 		}
 		catch (Exception ex)
 		{
@@ -1300,17 +1299,17 @@ public class Automata
 		//Always do this check (irritating? well yes... but those are really bad names!)
 		isEventNamesSafe();
 
+		// Examines controllability consistency
+		if (mustBeControllabilityConsistent && !isEventControllabilityConsistent())
+		{
+			return false;
+		}
+
 		// Warns if the system has disjoint modules (the system can be divided into at least two sets
 		// of modules whose union alphabets are disjoint)
 		if (examineStructure)
 		{
 			isSeveralSystems();
-		}
-
-		// Examines controllability consistency
-		if (mustBeControllabilityConsistent && !isEventControllabilityConsistent())
-		{
-			return false;
 		}
 
 		// Examines each automaton for an initial state

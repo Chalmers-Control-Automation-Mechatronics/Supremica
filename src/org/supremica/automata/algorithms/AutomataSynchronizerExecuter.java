@@ -87,17 +87,18 @@ public final class AutomataSynchronizerExecuter
 	private final int nbrOfAutomata;
 	private final int nbrOfEvents;
 	private final int[][][] nextStateTable;
+	private final int[][][][] nextStatesTable;
 	private final int[][][] outgoingEventsTable;
 	private final boolean[][] prioritizedEventsTable;
 	private final boolean[][] alphabetEventsTable;
 	private final boolean[] typeIsPlantTable;
 	private final boolean[] controllableEventsTable;
 	private final boolean[] immediateEventsTable;
+	private final boolean[] epsilonEventsTable; // New! For the nondeterministic case...
 	private int[][] currOutgoingEvents;
 	private int[] currOutgoingEventsIndex;
 	private int[] automataIndices;
 	private int[] currPlantAutomata;
-	private int[] nextState;
 	private int[] currEnabledEvents;
 	private int[] currDisabledEvents;
 	private boolean controllableState;
@@ -194,13 +195,14 @@ public final class AutomataSynchronizerExecuter
 		// Indexform parameters
 		indexForm = helper.getAutomataIndexForm();
 		nextStateTable = indexForm.getNextStateTable();
-		//nextStatesTable = indexForm.getNextStatesTable(); // New! For the nondeterministic case...
+		nextStatesTable = indexForm.getNextStatesTable(); // New! For the nondeterministic case...
 		outgoingEventsTable = indexForm.getOutgoingEventsTable();
 		prioritizedEventsTable = indexForm.getPrioritizedEventsTable();
 		alphabetEventsTable = indexForm.getAlphabetEventsTable();
 		typeIsPlantTable = indexForm.getTypeIsPlantTable();
 		controllableEventsTable = indexForm.getControllableEventsTable();
 		immediateEventsTable = indexForm.getImmediateEventsTable();
+		epsilonEventsTable = indexForm.getEpsilonEventsTable();
 
 		// Syncoptions parameters
 		syncOptions = synchronizerHelper.getSynchronizationOptions();
@@ -315,7 +317,7 @@ public final class AutomataSynchronizerExecuter
 			selectAllAutomata();
 		}
 
-		nextState = AutomataIndexFormHelper.createState(nbrOfAutomata);
+		//nextState = AutomataIndexFormHelper.createState(nbrOfAutomata);
 
 		// +1 status field (always end with Integer.MAX_VALUE)
 		currEnabledEvents = new int[nbrOfEvents + 1];
@@ -331,7 +333,7 @@ public final class AutomataSynchronizerExecuter
 	 *
 	 * The enabled events can then be found in currEnabledEvents[].
 	 *
-	 *@param  currState the (full) state to be examined.
+	 *@param currState the (full) state to be examined.
 	 */
 	private final void enabledEvents(int[] currState)
 	{
@@ -356,7 +358,6 @@ public final class AutomataSynchronizerExecuter
 			// The last element currOutgoingEvents[currAutIndex]
 			// is always Integer.MAX_VALUE
 			int currEventIndex = currOutgoingEvents[currAutIndex][0];
-
 			if (currEventIndex < currMinEventIndex)
 			{
 				currMinEventIndex = currEventIndex;
@@ -372,7 +373,7 @@ public final class AutomataSynchronizerExecuter
 
 		controllableState = true;
 		immediateEvent = IMMEDIATE_NOT_AVAILABLE;
-
+		
 		while (currMinEventIndex < Integer.MAX_VALUE)
 		{
 			int currEventIndex = currMinEventIndex;
@@ -405,7 +406,8 @@ public final class AutomataSynchronizerExecuter
 							//... this event should not be executed
 							thisEventOk = false;
 
-							// For controllability we need to know whether the event was disabled by a plant or a spec
+							// For controllability we need to know whether the event was 
+							// disabled by a plant or a spec
 							if (typeIsPlantTable[currAutIndex])
 							{
 								thisPlantEventOk = false;
@@ -435,6 +437,7 @@ public final class AutomataSynchronizerExecuter
 				}
 				else if (syncType == SynchronizationType.Broadcast)
 				{
+					// Why is this?
 					if (typeIsPlantTable[currAutIndex])
 					{
 						thisPlantEventOk = false;
@@ -443,8 +446,6 @@ public final class AutomataSynchronizerExecuter
 				else
 				{
 					logger.error("Unknown SynchronizationType");
-
-					// throw new SupremicaException("Unknown SynchronizationType");
 				}
 
 				// Check if this can be executed in a plant
@@ -483,14 +484,16 @@ public final class AutomataSynchronizerExecuter
 					currMinEventIndex = currAutEventIndex;
 				}
 			}
-
-			if (thisEventOk)
+			
+			// If everything is ok, or the event is epsilon, it is enabled!
+			// (If the event is epsilon, a lot of the above could have been ignored...)
+			if (thisEventOk || epsilonEventsTable[currEventIndex])
 			{
 				if (immediateEventsTable[currEventIndex])
 				{
 					// Clear out everything else and abort the search for enabled events
 					// If several events that are immediate are found
-					// Then the one with smallest index are chosen.
+					// Then the one with smallest index is chosen.
 					immediateEvent = currEventIndex;
 					nbrOfEnabledEvents = 0;
 					currEnabledEvents[nbrOfEnabledEvents++] = immediateEvent;
@@ -502,7 +505,8 @@ public final class AutomataSynchronizerExecuter
 				}
 			}
 			else
-			{   // Keep track of the disabled events
+			{
+				// Keep track of the disabled events
 				// This is used when synthesizing supervisors with partial observability
 				if (canExecuteInPlant)
 				{
@@ -688,21 +692,24 @@ public final class AutomataSynchronizerExecuter
 				// Handle all events
 				while (currEventIndex != Integer.MAX_VALUE)
 				{
-					// Generate an array that contains the indicies of each state
-					System.arraycopy(currState, 0, nextState, 0, currState.length);
+					/* **CHANGE FOR NONDETERMINISM**
+					// Generate an array that contains the indicies of each state. 
+					// Copy the old state, some parts won't change!
+					//System.arraycopy(currState, 0, nextState, 0, currState.length);
+					int[] nextState = AutomataIndexFormHelper.createCopyOfState(currState);
 
 					// This is where we should add some stuff to take care of
-					// any non-determinism.
+					// any nondeterminism.
 					// Iterate over all automata to construct the new state
-					for (int j = 0; j < automataIndices.length; j++)
+			 		for (int j = 0; j < automataIndices.length; j++)
 					{
-						int currAutomatonIndex = automataIndices[j];
-						int currSingleNextState = nextStateTable[currAutomatonIndex][currState[currAutomatonIndex]][currEventIndex];
-
+ 						int currAutomatonIndex = automataIndices[j];
+	 					int currSingleNextState = nextStateTable[currAutomatonIndex][currState[currAutomatonIndex]][currEventIndex];
+						
 						// Jump in all automata that have this event defined.
-						if (currSingleNextState != Integer.MAX_VALUE)
-						{
-							nextState[currAutomatonIndex] = currSingleNextState;
+		 				if (currSingleNextState != Integer.MAX_VALUE)
+			 			{
+				 			nextState[currAutomatonIndex] = currSingleNextState;
 						}
 					}
 
@@ -713,16 +720,20 @@ public final class AutomataSynchronizerExecuter
 					// only controllable.
 					try
 					{
-						helper.addState(currState, nextState, currEventIndex);
+						helper.addState(currState, nextState);
 					}
 					catch (Exception e)
 					{
-						logger.error("Error in SynchronizerExecuter");
+						logger.error("Error in AutomataSynchronizerExecuter");
 						logger.debug(e.getStackTrace());
 
 						return;
 					}
-
+					*/
+					
+					// Find new permutations (recursion)
+					addNondeterministicStatePermutations(currState, currEventIndex);
+					
 					// Get next enabled event
 					currEventIndex = currEnabledEvents[++i];
 				}
@@ -732,16 +743,17 @@ public final class AutomataSynchronizerExecuter
 			currState = helper.getStateToProcess();
 
 			if (currState == null)
-			{				// This thread tells the other threads that it failed to get
+			{
+				// This thread tells the other threads that it failed to get
 				// a new state, thus when all threads has entered this state
 				// all threads can stop executing. There is one exception
 				// and this is the possibility for this thread to experience
 				// a temporary shortage of states and at this position
-				// other threads might notice this thread that new
+				// other threads might inform this thread that new
 				// states to process now exist.
 				boolean finished = false;
 
-				while (!finished && (currState == null) &&!stopRequested)
+				while (!finished && (currState == null) && !stopRequested)
 				{
 					try
 					{
@@ -762,6 +774,101 @@ public final class AutomataSynchronizerExecuter
 					}
 				}
 			}
+		}
+	}
+
+	/**
+	 * Starts a recursion adding all nondeterministic alternatives
+	 */
+	private void addNondeterministicStatePermutations(int[] currState, int currEventIndex)
+	{
+		// Let nextIndex be the index of the next automaton that has this event enabled at least once
+		int nextIndex = -1;
+		while (nextStatesTable[automataIndices[++nextIndex]][currState[automataIndices[nextIndex]]][currEventIndex][0] == Integer.MAX_VALUE);
+
+		// Initialize nextState array
+		int[] nextState = AutomataIndexFormHelper.createCopyOfState(currState);
+
+		// Start recursion
+		addNextStatePermutation(currState, nextState, currEventIndex, nextIndex);
+	}
+
+	/**
+	 * For finding the nondeterministic permutations of possible next states
+	 */
+	private void addNextStatePermutation(int[] currState, int[] nextState, int currEventIndex, int index)
+	{
+		// Is this index an "end index"
+		if (index == Integer.MAX_VALUE)
+		{
+			// Add the current nextState as new state
+			try
+			{
+				helper.addState(currState, nextState);
+
+				//logger.info("Add state: " + nextState[0] + "." + nextState[1]);
+			}
+			catch (Exception e)
+			{
+				logger.error("Error in AutomataSynchronizerExecuter");
+				logger.debug(e.getStackTrace());
+			}
+			
+			return;
+		}
+
+		// Find the local constants 
+		int currAutomatonIndex = automataIndices[index];
+		int i = 0;
+		int currSingleNextState = nextStatesTable[currAutomatonIndex][currState[currAutomatonIndex]][currEventIndex][i];
+		// Let nextIndex be the index (for automataIndices) of the next automaton that has this 
+		// event enabled at least once
+		int nextIndex;
+		for (nextIndex = index+1; nextIndex <= automataIndices.length; nextIndex++)
+		{
+			if (nextIndex == automataIndices.length)
+			{
+				nextIndex = Integer.MAX_VALUE;
+				break;
+			}
+			if (nextStatesTable[automataIndices[nextIndex]][currState[automataIndices[nextIndex]]][currEventIndex][0] != Integer.MAX_VALUE)
+			{
+				// This nextIndex is fine!
+				break;
+			}
+		}
+
+		// It is assumed that this method is only called for viable 
+		// indices (where there really are enabled events)!
+		while (currSingleNextState != Integer.MAX_VALUE)
+		{			
+			// Update the nextState array
+			nextState[currAutomatonIndex] = currSingleNextState;
+			
+			// If the event is an epsilon event, there is no synchronization!
+			// A jump in one automaton is enough!
+			if (epsilonEventsTable[currEventIndex])
+			{
+				// Add the current nextState
+				addNextStatePermutation(currState, nextState, currEventIndex, Integer.MAX_VALUE);
+				// Reset the nextState array
+				nextState[currAutomatonIndex] = currState[currAutomatonIndex];
+			}
+			else
+			{
+				// Next depth of the recursion
+				addNextStatePermutation(currState, nextState, currEventIndex, nextIndex);
+			}		
+
+			// Update the current substate for this automaton
+			currSingleNextState = nextStatesTable[currAutomatonIndex][currState[currAutomatonIndex]][currEventIndex][++i];
+		}
+
+		if ((nextIndex != Integer.MAX_VALUE) && epsilonEventsTable[currEventIndex])
+		{
+			// Reset the nextState array and start a new "recursion" (with epsilon events, the "recursion"
+			// is actually a straight sequence
+			addNextStatePermutation(currState, nextState, currEventIndex, nextIndex);
 		}
 	}
 
@@ -920,7 +1027,7 @@ public final class AutomataSynchronizerExecuter
 						continue;
 					}
 
-					// Adjust the array currEnabledEvents to fit the currState
+					// Adjust the array currEnabledEvents to fit currState
 					enabledEvents(currState);
 
 					// Handle all events in a while-loop
@@ -928,9 +1035,10 @@ public final class AutomataSynchronizerExecuter
 					int currEventIndex = currEnabledEvents[i];
 					while (currEventIndex != Integer.MAX_VALUE)
 					{
+						/* **CHANGE FOR NONDETERMINISM**
 						// Generate an array that contains the indices of each state
-						/// Why copy? nextState is overwritten in the next for-loop?!?
-						System.arraycopy(currState, 0, nextState, 0, currState.length);
+						// Copy the old state, some parts won't change!
+						int[] nextState = AutomataIndexFormHelper.createCopyOfState(currState);
 
 						// Iterate over all automata to construct the new state
 						for (int j = 0; j < automataIndices.length; j++)
@@ -954,21 +1062,24 @@ public final class AutomataSynchronizerExecuter
 							if (nextIndex >= 0)
 							{
 								// Create new arc
-								State nextState = theAutomaton.getStateWithIndex(nextIndex);
+								State toState = theAutomaton.getStateWithIndex(nextIndex);
 								LabeledEvent theEvent = theAlphabet.getEventWithIndex(currEventIndex);
-								Arc newArc = new Arc(thisState, nextState, theEvent);
+								Arc newArc = new Arc(thisState, toState, theEvent);
 
 								theAutomaton.addArc(newArc);
 							}
 						}
 						catch (Exception e)
 						{	
-							// System.err.println(e);
-							// System.exit(0);
 							logger.error("Exception when checking next state. " + e);
 							logger.debug(e.getStackTrace());
 						}
+						*/
 
+						// Recursion for adding arcs, also nondeterministic
+						addNondeterministicArcPermutations(currState, currEventIndex);
+						
+						// Next event
 						currEventIndex = currEnabledEvents[++i];
 					}
 
@@ -1018,6 +1129,130 @@ public final class AutomataSynchronizerExecuter
 			throw new SupremicaException("Out of memory. Try to increase the JVM heap.");    // why not throw new SupremicaException(ex)?
 		}
 	}
+
+
+
+
+
+
+
+	/**
+	 * Starts a recursion adding all nondeterministic alternatives
+	 */
+	private void addNondeterministicArcPermutations(int[] currState, int currEventIndex)
+	{
+		// Let nextIndex be the index of the next automaton that has this event enabled at least once
+		int nextIndex = -1;
+		while (nextStatesTable[automataIndices[++nextIndex]][currState[automataIndices[nextIndex]]][currEventIndex][0] == Integer.MAX_VALUE);
+
+		// Initialize nextState array
+		int[] nextState = AutomataIndexFormHelper.createCopyOfState(currState);
+
+		// Start recursion
+		addNextArcPermutation(currState, nextState, currEventIndex, nextIndex);
+	}
+
+	/**
+	 * For finding the nondeterministic permutations of possible next states
+	 */
+	private void addNextArcPermutation(int[] currState, int[] nextState, int currEventIndex, int index)
+	{
+		// Is this index an "end index"
+		if (index == Integer.MAX_VALUE)
+		{
+			// Add arc
+			try
+			{
+				// Check if nextState exists
+				int nextIndex = helper.getStateIndex(nextState);
+				
+				if (nextIndex >= 0)
+				{
+					// Get fromState (from currState) and toState (from nextState) and the event
+					Automaton theAutomaton = helper.getAutomaton();
+					State fromState = theAutomaton.getStateWithIndex(helper.getStateIndex(currState));
+					State toState = theAutomaton.getStateWithIndex(nextIndex);
+					LabeledEvent theEvent = theAutomaton.getAlphabet().getEventWithIndex(currEventIndex);
+
+					// Create new arc
+					Arc newArc = new Arc(fromState, toState, theEvent);
+					//logger.info("Add arc: " + newArc);
+					theAutomaton.addArc(newArc);
+				}
+			}
+			catch (Exception e)
+			{	
+				logger.error("Exception when checking next state. " + e);
+				logger.debug(e.getStackTrace());
+			}
+
+			return;
+		}
+
+		// Find the local constants 
+		int currAutomatonIndex = automataIndices[index];
+		int i = 0;
+		int currSingleNextState = nextStatesTable[currAutomatonIndex][currState[currAutomatonIndex]][currEventIndex][i];
+		// Let nextIndex be the index (for automataIndices) of the next automaton that has this 
+		// event enabled at least once
+		int nextIndex;
+		for (nextIndex = index+1; nextIndex <= automataIndices.length; nextIndex++)
+		{
+			if (nextIndex == automataIndices.length)
+			{
+				nextIndex = Integer.MAX_VALUE;
+				break;
+			}
+			if (nextStatesTable[automataIndices[nextIndex]][currState[automataIndices[nextIndex]]][currEventIndex][0] != Integer.MAX_VALUE)
+			{
+				// This nextIndex is fine!
+				break;
+			}
+		}
+
+		// It is assumed that this method is only called for viable 
+		// indices (where there really are enabled events)!
+		while (currSingleNextState != Integer.MAX_VALUE)
+		{			
+			// Update the nextState array
+			nextState[currAutomatonIndex] = currSingleNextState;
+			
+			// If the event is an epsilon event, there is no synchronization!
+			// A jump in one automaton is enough!
+			if (epsilonEventsTable[currEventIndex])
+			{
+				// Add the current nextState
+				addNextArcPermutation(currState, nextState, currEventIndex, Integer.MAX_VALUE);
+				// Reset the nextState array
+				nextState[currAutomatonIndex] = currState[currAutomatonIndex];
+			}
+			else
+			{
+				// Next depth of the recursion
+				addNextArcPermutation(currState, nextState, currEventIndex, nextIndex);
+			}		
+
+			// Update the current substate for this automaton
+			currSingleNextState = nextStatesTable[currAutomatonIndex][currState[currAutomatonIndex]][currEventIndex][++i];
+		}
+
+		if ((nextIndex != Integer.MAX_VALUE) && epsilonEventsTable[currEventIndex])
+		{
+			// Reset the nextState array and start a new "recursion" (with epsilon events, the "recursion"
+			// is actually a straight sequence
+			addNextArcPermutation(currState, nextState, currEventIndex, nextIndex);
+		}
+	}
+
+
+
+
+
+
+
+
+
+
 
 	private String printTypeIsPlantTable()
 	{
@@ -1139,10 +1374,11 @@ public final class AutomataSynchronizerExecuter
 
 		// Handle all events
 		while (currEventIndex != Integer.MAX_VALUE)
-		{    // Generate an array that contains the indicies of each state, nextstate, initialize
-
+		{    
+			// Generate an array that contains the indicies of each state, nextstate, initialize
 			// it with the values of toState, to get the correct status values in the end!
-			System.arraycopy(toState, 0, nextState, 0, fromState.length);
+			// System.arraycopy(toState, 0, nextState, 0, fromState.length);
+			int[] nextState = AutomataIndexFormHelper.createCopyOfState(toState);
 
 			// System.arraycopy(fromState, 0, nextState, 0, fromState.length);
 			// Iterate over all automata to construct the new state
@@ -1233,9 +1469,6 @@ public final class AutomataSynchronizerExecuter
 	// To synchronize the two executers...
 	public void setCurrState(int[] state)
 	{
-
-		//currState = state;
-		//enabledEvents(currState);
 		enabledEvents(state);
 	}
 
@@ -1257,11 +1490,9 @@ public final class AutomataSynchronizerExecuter
 		//System.err.println("doTransition: eventIndex " + eventIndex);
 		// Counting on correct input here... only enabled events, please...
 		// Construct new state
+		//System.arraycopy(currState, 0, nextState, 0, currState.length);
 		int[] nextState = AutomataIndexFormHelper.createCopyOfState(currState);
 
-		//int[] nextState = new int[currState.length];
-		//System.arraycopy(currState, 0, nextState, 0, currState.length);
-		//System.err.println("doTransition: nbrOfSelectedAutomata " + nbrOfSelectedAutomata);
 		// Iterate over all automata to construct the new state
 		//for (int j = 0; j < nbrOfSelectedAutomata; j++)
 		for (int j = 0; j < automataIndices.length; j++)
@@ -1272,13 +1503,10 @@ public final class AutomataSynchronizerExecuter
 			// Jump in all automata that have this event active.
 			if (currSingleNextState != Integer.MAX_VALUE)
 			{
-
-				// currState[currAutomatonIndex] = currSingleNextState;
 				nextState[currAutomatonIndex] = currSingleNextState;
 			}
 		}
 
-		// enabledEvents(nextState);
 		// System.arraycopy(nextState, 0, currState, 0, currState.length);
 		currState = nextState;
 

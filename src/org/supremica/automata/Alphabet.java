@@ -590,20 +590,6 @@ public class Alphabet
 			if (!other.contains(currEvent.getLabel()))
 			{
 				removeList.add(currEvent);
-
-				//removeList.add(currEvent.getLabel());
-
-				/*
-				try
-				{
-					removeEvent(currEvent.getLabel());
-				}
-				catch (Exception ex)
-				{   // This should be impossible
-						logger.error("Alphabet.intersect. Trying to remove a non-existing event. " + ex);
-						logger.debug(ex.getStackTrace());
-				}
-				*/
 			}
 		}
 
@@ -623,8 +609,6 @@ public class Alphabet
 	 */
 	public boolean overlap(Alphabet other)
 	{
-		ArrayList removeList = new ArrayList();
-
 		for (Iterator alphIt = this.iterator(); alphIt.hasNext(); )
 		{
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
@@ -737,7 +721,7 @@ public class Alphabet
 		for (EventIterator evIt = iterator(); evIt.hasNext(); )
 		{
 			LabeledEvent currEvent = evIt.nextEvent();
-			LabeledEvent otherEvent = otherAlphabet.getEvent(currEvent.getLabel());
+			LabeledEvent otherEvent = otherAlphabet.getEvent(currEvent);
 
 			if (otherEvent == null)
 			{
@@ -797,7 +781,7 @@ public class Alphabet
 			throw new IllegalArgumentException();
 		}
 
-		LabeledEvent thisEvent = getEvent(otherEvent.getLabel());
+		LabeledEvent thisEvent = getEvent(otherEvent);
 
 		return thisEvent.isPrioritized();
 	}
@@ -813,7 +797,7 @@ public class Alphabet
 			throw new IllegalArgumentException();
 		}
 
-		LabeledEvent thisEvent = getEvent(otherEvent.getLabel());
+		LabeledEvent thisEvent = getEvent(otherEvent);
 
 		return thisEvent.isControllable();
 	}
