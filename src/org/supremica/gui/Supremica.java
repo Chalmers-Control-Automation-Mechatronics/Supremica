@@ -61,18 +61,10 @@ import javax.help.*;
 import org.supremica.log.*;
 import org.supremica.*;
 import org.supremica.automata.algorithms.*;
-import org.supremica.automata.templates.*;
 import org.supremica.comm.xmlrpc.*;
-import org.supremica.gui.editor.*;
 import org.supremica.gui.help.*;
 import org.supremica.properties.SupremicaProperties;
 import org.supremica.automata.*;
-import org.supremica.gui.*;
-import org.supremica.automata.*;
-import org.supremica.util.*;
-import org.supremica.automata.execution.Controls;
-import org.supremica.automata.execution.Actions;
-import org.supremica.gui.animators.scenebeans.*;
 import org.supremica.automata.IO.*;
 
 public class Supremica
