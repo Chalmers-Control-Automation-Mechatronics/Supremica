@@ -1,0 +1,333 @@
+###
+### Jindent 3.24 property file -- http://www.jindent.de
+###
+
+
+
+
+### General -- Convention
+
+conventionName                            = "Supremica Style"
+conventionString                          = "'Formatted in $conventionName$ Style on' EEE, MMM d, ''yy"
+conventionNotePosition                    = "none"
+blankLinesToSeparateConventionNote        = 2
+
+
+### General -- Jindent Note
+
+jindentNotePosition                       = "none"
+blankLinesToSeparateJindentNote           = 2
+
+
+
+### Header/Footer -- Header Template
+
+headerSmartMode                           = infinite
+
+headerIdentifyKey                         = ""
+
+blankLinesBeforeHeader                    = 1
+header[00]                                = ""
+blankLinesAfterHeader                     = 0
+
+
+### Header/Footer -- Footer Template
+
+footerSmartMode                           = infinite
+
+footerIdentifyKey                         = ""
+
+blankLinesBeforeFooter                    = 0
+footer[00]                                = ""
+blankLinesAfterFooter                     = 0
+
+
+
+### Indentation -- Misc
+
+tabulatorSize                             = 4
+indentSize                                = 4
+firstLevelIndent                          = 0
+indentCaseFromSwitch                      = false
+labelNewLine                              = true
+indentLabels                              = true
+
+minimumCommentIndent                      = 4
+
+indentLeadingsByTabs                      = true
+indentCommentsByTabs                      = true
+indentDeclarationsByTabs                  = false
+indentAssignmentsByTabs                   = false
+
+
+### Indentation -- Alignment
+
+alignComments                             = true
+alignDeclarations                         = false
+alignAssignments                          = false
+alignTernaryConditions                    = true
+alignTernaryExpressions                   = true
+alignTooLongComments                      = false
+
+
+
+### Braces -- Style
+
+leftBraceNewLineGeneral                   = true
+rightBraceNewLineGeneral                  = true
+indentLeftBraceGeneral                    = 0
+indentRightBraceGeneral                   = 0
+indentAfterRightBraceGeneral              = 0
+
+cuddleEmptyBracesGeneral                  = true
+indentCuddledBracesGeneral                = 1
+
+
+leftBraceNewLineClassInterface            = true
+rightBraceNewLineClassInterface           = true
+indentLeftBraceClassInterface             = 0
+indentRightBraceClassInterface            = 0
+indentAfterRightBraceClassInterface       = 0
+
+cuddleEmptyBracesClassInterface           = false
+indentCuddledBracesClassInterface         = 1
+
+
+leftBraceNewLineMethod                    = true
+rightBraceNewLineMethod                   = true
+indentLeftBraceMethod                     = 0
+indentRightBraceMethod                    = 0
+indentAfterRightBraceMethod               = 0
+
+cuddleEmptyBracesMethod                   = true
+indentCuddledBracesMethod                 = 1
+
+
+leftBraceNewLineTryCatch                  = true
+rightBraceNewLineTryCatch                 = true
+indentLeftBraceTryCatch                   = 0
+indentRightBraceTryCatch                  = 0
+indentAfterRightBraceTryCatch             = 0
+
+cuddleEmptyBracesTryCatch                 = true
+indentCuddledBracesTryCatch               = 1
+
+
+### Braces -- Insert At
+
+insertBracesAtIfElse                      = true
+insertBracesAtFor                         = true
+insertBracesAtWhile                       = true
+insertBracesAtDoWhile                     = true
+
+insertParenthesisAtConditions             = true
+
+
+### Braces -- If-Else
+
+singleIfStatementInOneLine                = false
+singleElseStatementInOneLine              = false
+specialElseIfTreatment                    = true
+
+
+
+### JavaDoc -- Misc
+
+deleteJavaDocComments                     = false
+formatJavaDocComments                     = false
+
+insertMissingJavaDocTags                  = false
+deleteObsoleteJavaDocTags                 = false
+
+createPublicClassInterfaceJavaDocs        = false
+createFriendlyClassInterfaceJavaDocs      = false
+createPrivateClassInterfaceJavaDocs       = false
+createProtectedClassInterfaceJavaDocs     = false
+
+createPublicMethodJavaDocs                = false
+createFriendlyMethodJavaDocs              = false
+createPrivateMethodJavaDocs               = false
+createProtectedMethodJavaDocs             = false
+
+createPublicFieldJavaDocs                 = false
+createFriendlyFieldJavaDocs               = false
+createPrivateFieldJavaDocs                = false
+createProtectedFieldJavaDocs              = false
+
+
+### JavaDoc -- Templates
+
+sortExceptionsInTemplates                 = true
+
+javaDocMethodTop[00]                      = "/**"
+javaDocMethodTop[01]                      = " * Method $objectName$"
+javaDocMethodTop[02]                      = " *"
+javaDocMethodParamSeparator[00]           = " *"
+javaDocMethodParam[00]                    = " * @param $paramName$"
+javaDocMethodReturn[00]                   = " *"
+javaDocMethodReturn[01]                   = " * @return"
+javaDocMethodExceptionSeparator[00]       = " *"
+javaDocMethodException[00]                = " * @throws $exceptionName$"
+javaDocMethodBottom[00]                   = " *"
+javaDocMethodBottom[01]                   = " */"
+
+javaDocConstructorTop[00]                 = "/**"
+javaDocConstructorTop[01]                 = " * Constructor $objectName$"
+javaDocConstructorTop[02]                 = " *"
+javaDocConstructorParamSeparator[00]      = " *"
+javaDocConstructorParam[00]               = " * @param $paramName$"
+javaDocConstructorExceptionSeparator[00]  = " *"
+javaDocConstructorException[00]           = " * @throws $exceptionName$"
+javaDocConstructorBottom[00]              = " *"
+javaDocConstructorBottom[01]              = " */"
+
+javaDocClass[00]                          = "/**"
+javaDocClass[01]                          = " * Class $objectName$"
+javaDocClass[02]                          = " *"
+javaDocClass[03]                          = " *"
+javaDocClass[04]                          = " * @author"
+javaDocClass[05]                          = " * @version %I%, %G%"
+javaDocClass[06]                          = " */"
+
+javaDocInterface[00]                      = "/**"
+javaDocInterface[01]                      = " * Interface $objectName$"
+javaDocInterface[02]                      = " *"
+javaDocInterface[03]                      = " *"
+javaDocInterface[04]                      = " * @author"
+javaDocInterface[05]                      = " * @version %I%, %G%"
+javaDocInterface[06]                      = " */"
+
+javaDocField[00]                          = "/** Field $objectName$           */"
+
+
+
+### Comments -- Format/Delete
+
+deleteBlockComments                       = false
+deleteSingleLineComments                  = false
+deleteTrailingComments                    = false
+deleteEndOfLineComments                   = false
+
+formatBlockComments                       = true
+formatSingleLineComments                  = true
+formatTrailingComments                    = true
+formatEndOfLineComments                   = true
+
+
+### Comments -- Exceptions
+
+neverIndentFirstColumnComments            = false
+neverFormatFirstColumnComments            = false
+
+neverFormatHeader                         = false
+neverFormatFooter                         = false
+
+
+
+### Separation -- Misc
+
+keepBlankLines                            = 0
+
+minLinesToInsertBlankLineInClasses        = 3
+minLinesToInsertBlankLineInMethods        = 3
+
+
+### Separation -- Separate
+
+separateChunksByComments                  = true
+allowBreakSeparatedFromCaseBlock          = false
+blankLinesBetweenCaseBlocks               = 1
+blankLinesBetweenChunks                   = 1
+
+comparableImportDepth                     = 2
+blankLinesToSeparateImports               = 1
+
+blankLinesBetweenClassInterface           = 2
+
+
+### Separation -- Insert Blank Lines
+
+blankLinesAfterDeclarations               = 1
+blankLinesAfterMethods                    = 1
+blankLinesAfterClasses                    = 1
+blankLinesAfterInterfaces                 = 1
+
+blankLinesBeforeJavaDocComments           = 1
+blankLinesAfterJavaDocComments            = 0
+
+blankLinesBeforeBlockComments             = 1
+blankLinesAfterBlockComments              = 0
+
+blankLinesBeforeSingleLineComments        = 1
+blankLinesAfterSingleLineComments         = 0
+
+blankLinesBeforeEndOfLineComments         = 1
+blankLinesAfterEndOfLineComments          = 0
+
+blankLinesAfterSwitch                     = 1
+blankLinesAfterPackage                    = 3
+blankLinesAfterLastImport                 = 2
+
+
+
+### Whitespaces -- Padding
+
+separateAssignmentOperators               = true
+separateConditionalOperators              = true
+separateComparisonOperators               = true
+separateNumericalOperators                = true
+
+paddingCastParenthesis                    = false
+paddingParenthesis                        = false
+paddingBrackets                           = false
+paddingBraces                             = true
+
+
+### Whitespaces -- Space Before
+
+spaceBeforeMethodDeclarationParenthesis   = false
+spaceBeforeMethodCallParenthesis          = false
+spaceBeforeBrackets                       = false
+spaceBeforeBracketsInTypes                = false
+spaceBeforeStatementParenthesis           = true
+spaceBeforeConditionBang                  = false
+spaceBeforeCaseColon                      = true
+
+
+### Whitespaces -- Space After
+
+spaceAfterComma                           = true
+spaceAfterSemicolon                       = true
+spaceAfterCasting                         = true
+
+
+### Whitespaces -- No Spaces
+
+noSpacesInEmptyForExpressions             = true
+
+
+
+### Line Wrapping -- Misc
+
+maxFieldElementsPerLine                   = infinite
+
+wrapLines                                 = false
+wrapBecauseOfComments                     = false
+wrapLongMethodNames                       = true
+maxLineLength                             = 78
+deepIndent                                = 45
+forceIndent                               = 8
+forceIndentTolerance                      = 4
+
+allowWrappingAfterAssignments             = true
+allowWrappingAfterParenthesis             = true
+preferWrappingAfterThrows                 = true
+
+
+alwaysWrapThrows                          = true
+alwaysWrapExtends                         = true
+alwaysWrapImplements                      = true
+
+indentWrappedThrows                       = 4
+indentWrappedExtends                      = 4
+indentWrappedImplements                   = 4

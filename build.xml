@@ -188,6 +188,7 @@
 		verbose="false"
 		excludes="${supremica_basedir}/**,
 			${jgrafchart_basedir}/external/**,		
+			${jgrafchart_basedir}/io/**,
 			${xmlrpc_basedir}/**"	
 	/>
 
