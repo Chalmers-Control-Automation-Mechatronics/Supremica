@@ -227,6 +227,11 @@ public class AutomataExplorer
 	{
 		updated(aut);
 	}
+
+	public void automatonRenamed(Automaton aut, String oldName)
+	{
+		updated(aut);
+	}
 }
 
 class AutomataStateViewer

@@ -124,6 +124,11 @@ public class AlphabetViewerPanel
 		updated(aut);
 	}
 
+	public void automatonRenamed(Automaton aut, String oldName)
+	{
+		updated(aut);
+	}
+
 	public void update()
 	{
 		if (!isVisible())

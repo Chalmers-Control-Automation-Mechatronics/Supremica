@@ -61,4 +61,6 @@ public interface AutomatonListener
 	public void arcRemoved(Automaton aut, Arc a);
 
 	public void attributeChanged(Automaton aut);
+
+	public void automatonRenamed(Automaton aut, String oldName);
 }

@@ -229,6 +229,29 @@ public class AutomatonContainer
 		notifyListeners(AutomatonContainerListeners.MODE_AUTOMATON_RENAMED, automaton);
 	}
 
+	public void renamed(Automaton automaton, String oldName)
+		throws Exception
+	{
+		if (!containsAutomaton(oldName))
+		{
+			throw new Exception(oldName + " does not exist.");
+		}
+
+		if (containsAutomaton(automaton.getName()))
+		{
+			throw new Exception(automaton.getName() + " does already exist.");
+		}
+
+		remove(oldName, true);
+
+		int autIndex = theAutomatonNames.indexOf(oldName);
+
+		theAutomatonNames.set(autIndex,automaton.getName() );
+		add(automaton, automaton.getName(), true);
+		update();
+		notifyListeners(AutomatonContainerListeners.MODE_AUTOMATON_RENAMED, automaton);
+	}
+
 	public String getUniqueAutomatonName()
 	{
 		return getUniqueAutomatonName("Untitled");
@@ -690,6 +713,18 @@ public class AutomatonContainer
 
 	public void attributeChanged(Automaton aut)
 	{    // Do nothing
+	}
+
+	public void automatonRenamed(Automaton aut, String oldName)
+	{
+		try
+		{
+			renamed(aut, oldName);
+		}
+		catch (Exception e)
+		{
+			// Fix this
+		}
 	}
 
 	public int getSize()

@@ -188,6 +188,11 @@ public class AutomatonViewer
 		updated(aut);
 	}
 
+	public void automatonRenamed(Automaton aut, String oldName)
+	{
+		updated(aut);
+	}
+
 	public void setVisible(boolean toVisible)
 	{
 		super.setVisible(toVisible);
@@ -361,7 +366,7 @@ public class AutomatonViewer
 			try
 			{
 				build();
-
+				setTitle(theAutomaton.getName());
 				updateNeeded = false;
 			}
 			catch (Exception e)

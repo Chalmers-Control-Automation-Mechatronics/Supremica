@@ -59,6 +59,7 @@ public class AutomatonListeners
 	public static final int MODE_ARC_ADDED = 3;
 	public static final int MODE_ARC_REMOVED = 4;
 	public static final int MODE_ATTRIBUTE_CHANGED = 5;
+	public static final int MODE_AUTOMATON_RENAMED = 6;
 
 	public AutomatonListeners(Object owner)
 	{
@@ -100,6 +101,10 @@ public class AutomatonListeners
 					else if (mode == MODE_ATTRIBUTE_CHANGED)
 					{
 						currListener.attributeChanged((Automaton) owner);
+					}
+					else if (mode == MODE_AUTOMATON_RENAMED)
+					{
+						currListener.automatonRenamed((Automaton) owner, (String) o);
 					}
 				}
 			}
