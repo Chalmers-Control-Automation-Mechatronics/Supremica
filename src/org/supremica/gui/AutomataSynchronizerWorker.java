@@ -151,11 +151,12 @@ public class AutomataSynchronizerWorker
 			// Present result
 			if (!stopRequested)
 			{
+				/*-- MF -- Removed the name-fiddling let the project handle this -- But who, where?? */
 				if (theAutomaton != null)
 				{
 					theAutomaton.setName(newAutomatonName);
 				}
-
+				/**/
 				mode = MODE_UPDATE;
 
 				java.awt.EventQueue.invokeLater(this);

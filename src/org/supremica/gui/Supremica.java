@@ -1272,6 +1272,14 @@ public class Supremica
 
 	public int addAutomata(Automata currAutomata)
 	{
+		//-- MF -- debug stuff, is there no way to remove the if under no-debug-build?
+		if(currAutomata.size() == 0)
+		{
+			logger.debug("Supremica::addAutomata(): adding empty automata.");
+			return 0; // "nothing to do, nowhere to go-o" [Ramones 1978]
+		}
+		//-- MF --
+		
 		int nbrOfAddedAutomata = 0;
 		Iterator autIt = currAutomata.iterator();
 
@@ -1297,9 +1305,9 @@ public class Supremica
 	// Here we manage all necessary user interaction
 	public boolean addAutomaton(Automaton currAutomaton)
 	{
-
-		// Force the user to enter a new name if the name is ""
-		if (currAutomaton.getName().equals(""))
+		logger.debug("Supremica::addAutomaton(" + currAutomaton.getName() + ")");
+		// Force the user to enter a new name if it has no name
+		if (currAutomaton.getName() == null || currAutomaton.getName().equals(""))
 		{
 			String autName = getNewAutomatonName("Enter a new name", "");
 

@@ -63,22 +63,39 @@ abstract class SynthesizerPanel
 }
 
 class SynthesizerDialogStandardPanel
-	extends SynthesizerPanel
+	extends SynthesizerPanel implements ActionListener
 {
 	private JComboBox synthesisTypeBox;
 	private JComboBox algorithmTypeBox;
 	private JCheckBox purgeBox;
 	private JCheckBox optimizeBox;
 
-	public SynthesizerDialogStandardPanel()
+	public SynthesizerDialogStandardPanel(int num)
 	{
 		Box standardBox = Box.createVerticalBox();
-
+		
+		if(num > 1)
+		{
+			algorithmTypeBox = new JComboBox(SynthesisAlgorithm.toArray());
+		}
+		else
+		{
+			algorithmTypeBox = new JComboBox();
+			algorithmTypeBox.addItem(SynthesisAlgorithm.Monolithic);
+		}
+		algorithmTypeBox.addActionListener(this);
 		synthesisTypeBox = new JComboBox(SynthesisType.toArray());
-		algorithmTypeBox = new JComboBox(SynthesisAlgorithm.toArray());
+		
 		purgeBox = new JCheckBox("Purge result");
+		purgeBox.setToolTipText("Remove all forbidden states");
+		
 		optimizeBox = new JCheckBox("Optimize result");
-
+		optimizeBox.setToolTipText("Remove supervisors that don't affect the controllability");
+		if(num == 1)
+		{		
+			optimizeBox.setEnabled(false);
+		}
+		
 		standardBox.add(synthesisTypeBox);
 		standardBox.add(algorithmTypeBox);
 		standardBox.add(purgeBox);
@@ -100,6 +117,18 @@ class SynthesizerDialogStandardPanel
 		synthesizerOptions.setSynthesisAlgorithm((SynthesisAlgorithm) algorithmTypeBox.getSelectedItem());
 		synthesizerOptions.setPurge(purgeBox.isSelected());
 		synthesizerOptions.setOptimize(optimizeBox.isSelected());
+	}
+	
+	public void actionPerformed(ActionEvent e)
+	{
+		if((SynthesisAlgorithm) algorithmTypeBox.getSelectedItem() == SynthesisAlgorithm.Monolithic)
+		{
+			optimizeBox.setEnabled(false);
+		}
+		else
+		{
+			optimizeBox.setEnabled(true);
+		}
 	}
 }
 
@@ -145,7 +174,7 @@ public class SynthesizerDialog
 	/**
 	 * Creates modal dialog box for input of synthesizer options.
 	 */
-	public SynthesizerDialog(JFrame parentFrame, SynthesizerOptions synthesizerOptions)
+	public SynthesizerDialog(JFrame parentFrame, int numSelected, SynthesizerOptions synthesizerOptions)
 	{
 		dialog = new JDialog(parentFrame, true);    // modal
 		this.parentFrame = parentFrame;
@@ -156,7 +185,7 @@ public class SynthesizerDialog
 
 		Container contentPane = dialog.getContentPane();
 
-		standardPanel = new SynthesizerDialogStandardPanel();
+		standardPanel = new SynthesizerDialogStandardPanel(numSelected);
 		advancedPanel = new SynthesizerDialogAdvancedPanel();
 
 		JTabbedPane tabbedPane = new JTabbedPane();

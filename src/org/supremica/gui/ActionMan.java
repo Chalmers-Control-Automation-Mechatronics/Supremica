@@ -807,6 +807,7 @@ public class ActionMan
 		//-- MF - Isn't this "wrong". An automaton can exist without a name.
 		//-- MF - The name is a gui-thing, and should be handled there
 		//-- MF - When an unnamed automatan is added, the gui should ask for a name
+		/** Yes, it's wrong, let it be handled elsewhere -- But where?? **/
 		String newAutomatonName = "Dummy";
 
 		if (synchronizationOptions.buildAutomaton())
@@ -817,7 +818,7 @@ public class ActionMan
 			{
 				return;
 			}
-		}
+		}/**/
 
 		Automata currAutomata = new Automata();
 		Iterator autIt = selectedAutomata.iterator();
@@ -853,7 +854,7 @@ public class ActionMan
 		}
 
 		SynthesizerOptions synthesizerOptions = new SynthesizerOptions();
-		SynthesizerDialog synthesizerDialog = new SynthesizerDialog(gui.getFrame(), synthesizerOptions);
+		SynthesizerDialog synthesizerDialog = new SynthesizerDialog(gui.getFrame(), selectedAutomata.size(), synthesizerOptions);
 
 		synthesizerDialog.show();
 
@@ -912,7 +913,7 @@ public class ActionMan
 				ex.printStackTrace();
 			}
 		}
-		else
+		else // single automaton selected
 		{
 			Iterator autIt = selectedAutomata.iterator();
 

@@ -54,7 +54,7 @@ import org.supremica.util.IntArrayHashTable;
 import java.io.PrintWriter;
 import org.supremica.gui.*;
 
-// import org.supremica.log.*;
+import org.supremica.log.*;
 import org.supremica.gui.Gui;
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.AlphabetHelpers;
@@ -66,10 +66,84 @@ import org.supremica.automata.EventsSet;
 import org.supremica.automata.State;
 import org.supremica.automata.LabeledEvent;
 
+//-- MF -- Pass AutomatSelector a set of specs/sups/plants, 
+//-- MF -- For each spec/sup it returns that automaton together with the plants with which it shares uc-events
+//-- MF -- If closedSet == true the returned set is closed in that all plants that share uc-events with any plant in the set is also included
+class AutomataSelector
+{
+	private boolean closedSet;
+	private Automata globalSet;
+	private Automata partialSet;
+	private Iterator specIterator;
+	private HashMap eventToAutomataMap = new HashMap();
+
+	public AutomataSelector(Automata globalSet, boolean closedSet)
+	{
+		this.globalSet = globalSet;
+		this.closedSet = closedSet;
+		specIterator = globalSet.iterator();
+
+		AlphabetAnalyzer alphabetAnalyzer = new AlphabetAnalyzer(globalSet);
+		eventToAutomataMap = alphabetAnalyzer.getUncontrollableEventToPlantMap();
+	}
+	
+	// Loop over supervisors/specifications and find plants containing equal uncontrollable events
+	public Automata next()
+	{
+		partialSet.clear();
+		
+		while (specIterator.hasNext())
+		{
+			Automaton currSupervisorAutomaton = (Automaton) specIterator.next();
+			
+			if ((currSupervisorAutomaton.getType() == AutomatonType.Supervisor) || (currSupervisorAutomaton.getType() == AutomatonType.Specification))
+			{
+				// Examine uncontrollable events in currSupervisorAutomaton and select plants accordingly
+				partialSet.addAutomaton(currSupervisorAutomaton);
+
+				ArrayList eventList = new ArrayList(currSupervisorAutomaton.eventCollection());
+
+				while (!eventList.isEmpty())
+				{
+					LabeledEvent currEvent = (LabeledEvent) eventList.remove(0);
+
+					if (!currEvent.isControllable())
+					{
+						if (eventToAutomataMap.get(currEvent) != null)
+						{
+							Iterator plantIterator = ((Set) eventToAutomataMap.get(currEvent)).iterator();
+
+							while (plantIterator.hasNext())
+							{
+								Automaton currPlantAutomaton = (Automaton) plantIterator.next();
+
+								// This check is performed in eventToAutomataMap
+								// if (currPlantAutomaton.getType() == AutomatonType.Plant)
+								if (!partialSet.containsAutomaton(currPlantAutomaton))
+								{
+									partialSet.addAutomaton(currPlantAutomaton);
+
+									// If we want a closed set, we need to add plants with
+									// uncontrollable events common to the already added plants too...
+									if (closedSet)
+									{
+										eventList.addAll(currPlantAutomaton.eventCollection());
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		return partialSet; // empty, only when we're done. For a spec with no matching plants, this spec will be included	}
+	}
+}
+
 public class AutomataSynthesizer
 {
-
-	// private static Logger logger = LoggerFactory.createLogger(AutomataSynthesizer.class);
+	private static Logger logger = LoggerFactory.createLogger(AutomataSynthesizer.class);
 	private Automata theAutomata;
 	private int nbrOfExecuters;
 	private HashMap eventToAutomataMap = new HashMap();
@@ -79,13 +153,13 @@ public class AutomataSynthesizer
 	private SynthesizerOptions synthesizerOptions;
 	private int[] initialState;
 	private VisualProjectContainer theVisualProjectContainer;
-	private Gui workbench;
+	private Gui gui;
 
 	// For the optimization...
 	private Automata newAutomata = new Automata();
 	private boolean maximallyPermissive;
 
-	public AutomataSynthesizer(Gui workbench, Automata theAutomata, SynchronizationOptions synchronizationOptions, SynthesizerOptions synthesizerOptions)
+	public AutomataSynthesizer(Gui gui, Automata theAutomata, SynchronizationOptions synchronizationOptions, SynthesizerOptions synthesizerOptions)
 		throws Exception
 	{
 		Automaton currAutomaton;
@@ -98,13 +172,14 @@ public class AutomataSynthesizer
 
 		// + 1 status field
 		nbrOfExecuters = this.synchronizationOptions.getNbrOfExecuters();
-		this.workbench = workbench;
-		theVisualProjectContainer = workbench.getVisualProjectContainer();
+		this.gui = gui;
+		theVisualProjectContainer = gui.getVisualProjectContainer();
 		maximallyPermissive = synthesizerOptions.getMaximallyPermissive();
 
 		SynthesisType synthesisType = synthesizerOptions.getSynthesisType();
 		SynthesisAlgorithm synthesisAlgorithm = synthesizerOptions.getSynthesisAlgorithm();
 
+		//-- MF -- Should this be tested here? There should be no possibility selecting invalid combinations!
 		if (!AutomataSynthesizer.validOptions(synthesisType, synthesisAlgorithm))
 		{
 			throw new Exception("Illegal combination of synthesis type and algorithm");
@@ -132,7 +207,7 @@ public class AutomataSynthesizer
 		{
 
 			// -- MF -- System.err.println("Error while initializing synchronization helper. " + e);
-			workbench.error("Error while initializing synchronization helper. " + e);
+			logger.error("Error while initializing synchronization helper. " + e);
 
 			throw e;
 
@@ -151,27 +226,91 @@ public class AutomataSynthesizer
 		{
 			return false;
 		}
-
-		if (algorithm == SynthesisAlgorithm.IDD)
+		else if (algorithm == SynthesisAlgorithm.IDD)
 		{
-			return false;
+			return false; // Not implemented (yet)
 		}
-
-		if (algorithm == SynthesisAlgorithm.Modular)
+		else if (algorithm == SynthesisAlgorithm.Modular)
 		{
 			if (type == SynthesisType.Controllable)
 			{
-				return true;
+				return true; // modular AND controllable ok
 			}
-
+			else if(type == SynthesisType.Nonblocking)
+			{
+				return false; // modular AND nonblocking not ok (at the moment)
+			}
+			else if(type == SynthesisType.Both)
+			{
+				return false; // modular AND nonblocking AND controllable not ok (at the moment)
+			}
+			
 			return false;
 		}
-
-		return true;
+		else // it can only be monolithic (at the moment?)
+		{
+			return true;	// and monolithic we can do everything - right?
+		}
 	}
 
 	// Synthesizes controllable supervisors
 	public void execute()
+		throws Exception
+	{
+		/* -- MF -- Old stuff (slightly refactored) */
+		if(modularControllability()) // only add if something has been synthesized
+		{
+			if (synthesizerOptions.getOptimize())
+			{
+				optimize(theAutomata, new Automata(newAutomata));
+			}
+
+			// theVisualProjectContainer.add(newAutomata);
+			gui.addAutomata(newAutomata);
+		}
+		else // nothing was synthesized, the system can be used as is - but what about non-blocking?
+		{
+			logger.info("No uncontrollabilities found, the specifications can be used as supervisors, as is");
+		}
+		
+		/* -- MF -- new stuff
+		
+		if(synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.Monolithic)
+		{
+			// monolithic case, just whack the entire stuff into the monolithic algo	
+			Automaton automaton = new Automaton();
+			doMonolithic(theAutomata, automaton); // we always do something, at least we synch
+			// if purge, it's already been done
+			if(automaton == null)
+				logger.debug("Something fishy here (anAutomaton == null)");
+			else
+				logger.debug("anAutomaton != null");
+			gui.addAutomaton(automaton); // let the user choose the name
+			
+		}
+		else // modular case
+		{
+			Automata modSupervisors = new Automata(); // collects the calculated supervisors
+			Automaton automaton = new Automaton(); // "out" value for doMonolithic
+			
+			AutomataSelector selector = new AutomataSelector(theAutomata, synthesizerOptions.getMaximallyPermissive());
+			for(Automata automata = selector.next(); automata.size() > 0; automata = selector.next())
+			{
+				if(automata.size() > 1) // no need to do anything for a singleton spec
+				{
+					if(doMonolithic(automata, automaton))
+					{
+						modSupervisors.addAutomaton(automaton);
+					}
+				}
+			}
+		}*/
+	}
+	
+	//-- MF -- This synthesizes modular controllable supervisors (no non-blocking, that is)
+	//-- MF -- Thsi is the original one
+	//-- MF -- Returns whether anything has been synthesized
+	private boolean modularControllability()
 		throws Exception
 	{
 		LabeledEvent currEvent;
@@ -179,7 +318,8 @@ public class AutomataSynthesizer
 		Automaton currPlantAutomaton;
 		Automaton currSupervisorAutomaton;
 		ArrayList selectedAutomata = new ArrayList();
-
+		boolean foundUncontrollable = false;
+		
 		// Iterator eventIterator;
 		Iterator plantIterator;
 
@@ -189,10 +329,9 @@ public class AutomataSynthesizer
 		while (supervisorIterator.hasNext())
 		{
 			currSupervisorAutomaton = (Automaton) supervisorIterator.next();
-
+			
 			if ((currSupervisorAutomaton.getType() == AutomatonType.Supervisor) || (currSupervisorAutomaton.getType() == AutomatonType.Specification))
 			{
-
 				// Examine uncontrollable events in currSupervisorAutomaton and select plants accordingly
 				selectedAutomata.add(currSupervisorAutomaton);
 
@@ -233,7 +372,7 @@ public class AutomataSynthesizer
 						}
 					}
 				}
-
+								
 				if (selectedAutomata.size() > 1)
 				{
 
@@ -267,7 +406,8 @@ public class AutomataSynthesizer
 
 					if (!synchHelper.getAutomataIsControllable())
 					{
-
+						foundUncontrollable = true;
+						
 						// Only add supervisors with uncontrollable states
 						// Print the names of the automata in selectedAutomata
 						Object[] automatonArray = selectedAutomata.toArray();
@@ -278,8 +418,7 @@ public class AutomataSynthesizer
 							automataNames = automataNames + " || " + ((Automaton) automatonArray[i]).getName();
 						}
 
-						// -- MF -- logger.info(automataNames);
-						workbench.info(automataNames);
+						logger.info(automataNames);
 
 						AutomataSynchronizerExecuter currExec = (AutomataSynchronizerExecuter) synchronizationExecuters.get(0);
 
@@ -295,7 +434,7 @@ public class AutomataSynthesizer
 							theAutomaton.setType(AutomatonType.Supervisor);
 							theAutomaton.setAlphabet(unionAlphabet(selectedAutomata));
 
-							AutomatonSynthesizer synthesizer = new AutomatonSynthesizer(workbench, theAutomaton, synthesizerOptions);
+							AutomatonSynthesizer synthesizer = new AutomatonSynthesizer(gui, theAutomaton, synthesizerOptions);
 
 							synthesizer.synthesize();
 							newAutomata.addAutomaton(theAutomaton);
@@ -304,7 +443,7 @@ public class AutomataSynthesizer
 						{
 
 							// -- MF -- logger.error("Exception while adding the new automaton.");
-							workbench.error("Exception while adding the new automaton.");
+							logger.error("Exception while adding the new automaton.");
 						}
 					}
 				}
@@ -312,16 +451,47 @@ public class AutomataSynthesizer
 				selectedAutomata.clear();
 			}
 		}
-
+/*
 		if (synthesizerOptions.getOptimize())
 		{
 			optimize(theAutomata, new Automata(newAutomata));
 		}
 
-		// theVisualProjectContainer.add(newAutomata);
-		workbench.addAutomata(newAutomata);
+		if(foundUncontrollable) // only add if something has been synthesized
+		{
+			// theVisualProjectContainer.add(newAutomata);
+			gui.addAutomata(newAutomata);
+		}
+		else // nothing was synthesized, the system can be used as is - but what about non-blocking?
+		{
+			logger.info("No uncontrollabilities found, the specifications can be used as supervisors, as is");
+		}
+*/
+		return foundUncontrollable;
 	}
 
+	//-- MF -- This is the engine, synchronizes the given automata, and calcs the forbidden states
+	//-- MF -- Returns true if states have been forbidden
+	//-- MF -- anAutomaton is an out-parameter, the synched result
+	private boolean doMonolithic(Automata automata, Automaton anAutomaton)
+		throws Exception // simply throws everything upwards
+	{
+		boolean didSomething = false;
+		
+		AutomataSynchronizer syncher = new AutomataSynchronizer(automata, synchronizationOptions);
+		syncher.execute(); // should be able to interrupt this one, just not now...
+		anAutomaton = syncher.getAutomaton();
+		didSomething |= syncher.getHelper().getAutomataIsControllable();
+		
+		// We need to synthesize even if the result above is controllable
+		// Nonblocking may ruin this 
+				
+		AutomatonSynthesizer synthesizer = new AutomatonSynthesizer(gui, anAutomaton, synthesizerOptions);
+		didSomething |= synthesizer.synthesize(); // should also be able to interrupt this one....
+		
+		return didSomething;
+	}
+	
 	/**
 	 * Returns union alphabet of the automata in selectedAutomata
 	 *
@@ -353,7 +523,7 @@ public class AutomataSynthesizer
 
 			// System.err.println("Error while generating union alphabet: " + e);
 			// -- MF -- logger.error("Error while generating union alphabet: " + e);
-			workbench.error("Error while generating union alphabet: " + e);
+			gui.error("Error while generating union alphabet: " + e);
 
 			throw e;
 		}
@@ -393,9 +563,7 @@ public class AutomataSynthesizer
 		}
 		catch (Exception ex)
 		{
-
-			// -- MF -- logger.error("Exception in SynchronizationOptions." + ex);
-			workbench.error("Exception in SynchronizationOptions." + ex);
+			logger.error("Exception in SynchronizationOptions." + ex);
 
 			return;
 		}
@@ -436,9 +604,7 @@ public class AutomataSynthesizer
 			}
 			catch (Exception ex)
 			{
-
-				// -- MF -- logger.error("Exception in AutomataSynthesizer.optimize. " + ex);
-				workbench.error("Exception in AutomataSynthesizer.optimize. " + ex);
+				logger.error("Exception in AutomataSynthesizer.optimize. " + ex);
 
 				return;
 			}

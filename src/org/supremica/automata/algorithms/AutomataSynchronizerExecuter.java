@@ -725,7 +725,7 @@ public final class AutomataSynchronizerExecuter
 		{
 			Automaton theAutomaton = helper.getAutomaton();
 
-			theAutomaton.setName("regaut");
+			// theAutomaton.setName("regaut");
 
 			Alphabet theAlphabet = theAutomaton.getAlphabet();
 			int[][] currStateTable = helper.getStateTable();

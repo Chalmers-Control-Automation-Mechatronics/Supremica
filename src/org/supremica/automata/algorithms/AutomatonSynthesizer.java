@@ -85,24 +85,26 @@ public class AutomatonSynthesizer
 	}
 
 	// Synthesize a monolithic supervisor
-	public void synthesize()
+	public boolean synthesize()
 		throws Exception
 	{
 		theAutomaton.beginTransaction();
 
 		SynthesisType synthesisType = synthesizerOptions.getSynthesisType();
-
+		
+		boolean didSomething = false; //-- MF -- records whether we actually did anything
+		
 		if (synthesisType == SynthesisType.Controllable)
 		{
-			synthesizeControllable();
+			didSomething = synthesizeControllable();
 		}
 		else if (synthesisType == SynthesisType.Nonblocking)
 		{
-			synthesizeNonblocking();
+			didSomething = synthesizeNonblocking();
 		}
 		else if (synthesisType == SynthesisType.Both)
 		{
-			synthesizeControllableNonblocking();
+			didSomething = synthesizeControllableNonblocking();
 		}
 
 		if (synthesizerOptions.doPurge())
@@ -112,13 +114,13 @@ public class AutomatonSynthesizer
 
 		theAutomaton.invalidate();
 		theAutomaton.endTransaction();
+		return didSomething;
 	}
 
 	// Synthesize a controllable and nonblocking supervisor
-	private void synthesizeControllableNonblocking()
+	private boolean synthesizeControllableNonblocking()
 		throws Exception
 	{
-		boolean newUnsafeStates;
 		LinkedList stateList = new LinkedList();
 		Iterator stateIt = theAutomaton.stateIterator();
 
@@ -126,7 +128,7 @@ public class AutomatonSynthesizer
 		{
 			State currState = (State) stateIt.next();
 
-			if (currState.isAccepting() &&!currState.isForbidden())
+			if (currState.isAccepting() && !currState.isForbidden())
 			{
 				acceptingStates.addLast(currState);
 				currState.setCost(State.MIN_COST);
@@ -142,6 +144,7 @@ public class AutomatonSynthesizer
 		// Do fixed point iteration
 		doControllable(stateList);
 
+		boolean newUnsafeStates = false;
 		do
 		{
 			stateList = doCoreachable();
@@ -158,6 +161,7 @@ public class AutomatonSynthesizer
 
 		// Set MIN_COST to all safe states
 		// Forbid the rest
+		boolean didSomething = false; //-- MF -- records whether we actually did anything
 		stateIt = theAutomaton.stateIterator();
 
 		while (stateIt.hasNext())
@@ -171,17 +175,19 @@ public class AutomatonSynthesizer
 			else
 			{
 				currState.setForbidden(true);
+				didSomething = true;
 			}
 		}
 
 		theAutomaton.setType(AutomatonType.Supervisor);
+		return didSomething;
 	}
 
 	// Synthesize a controllable supervisor
-	private void synthesizeControllable()
+	private boolean synthesizeControllable()
 		throws Exception
 	{
-		boolean newUnsafeStates;
+		// boolean newUnsafeStates;
 		LinkedList stateList = new LinkedList();
 		Iterator stateIt = theAutomaton.stateIterator();
 
@@ -221,6 +227,7 @@ public class AutomatonSynthesizer
 
 		// Set MIN_COST to all safe states
 		// Forbid the rest
+		boolean didSomething = false; //-- MF -- records whether we actually did anything
 		stateIt = theAutomaton.stateIterator();
 
 		while (stateIt.hasNext())
@@ -234,13 +241,15 @@ public class AutomatonSynthesizer
 			else
 			{
 				currState.setForbidden(true);
+				didSomething = true;
 			}
 		}
 
 		theAutomaton.setType(AutomatonType.Supervisor);
+		return didSomething;
 	}
 
-	private void synthesizeNonblocking()
+	private boolean synthesizeNonblocking()
 		throws Exception
 	{
 		boolean newUnsafeStates;
@@ -257,6 +266,7 @@ public class AutomatonSynthesizer
 
 		// Set MIN_COST to all safe states
 		// Forbid the rest
+		boolean didSomething = false; //-- MF -- records whether we actually did anything
 		Iterator stateIt = theAutomaton.stateIterator();
 
 		while (stateIt.hasNext())
@@ -270,10 +280,13 @@ public class AutomatonSynthesizer
 			else
 			{
 				currState.setForbidden(true);
+				didSomething = true;
 			}
 		}
 
 		theAutomaton.setType(AutomatonType.Supervisor);
+		
+		return didSomething;
 	}
 
 	private LinkedList doCoreachable()
@@ -341,10 +354,10 @@ public class AutomatonSynthesizer
 			System.err.println("found " + nbrOfNewUnsafeStates + " new blocking states");
 		}
 
-		return stateStack;
+		return stateStack; // return the set of non-coreachable states
 	}
 
-	private boolean doControllable(LinkedList stateStack)
+	private boolean doControllable(LinkedList stateStack) // returns true if uncontrollable states found
 		throws Exception
 	{
 		if (debugMode)
@@ -434,14 +447,14 @@ public class AutomatonSynthesizer
 				Arc currArc = (Arc) arcIt.next();
 				State toState = currArc.getToState();
 
-				if ((toState.getCost() != State.MAX_COST) &&!toState.isVisited())
+				if ((toState.getCost() != State.MAX_COST) && !toState.isVisited())
 				{
 					toState.setVisited(true);
 					stateStack.addLast(toState);
 				}
 			}
 		}
-
+		
 		Iterator stateIt = theAutomaton.stateIterator();
 
 		while (stateIt.hasNext())
@@ -453,6 +466,7 @@ public class AutomatonSynthesizer
 				currState.setCost(State.MAX_COST);
 			}
 		}
+		
 	}
 
 	private void purge()

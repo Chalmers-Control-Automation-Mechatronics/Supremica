@@ -53,7 +53,12 @@ public class Version
 {
 	public String toString()
 	{
-		return "200112171420";
+		return "200201151207";
+	}
+	
+	public static String version()
+	{
+		return "200201151207";
 	}
 }
 
