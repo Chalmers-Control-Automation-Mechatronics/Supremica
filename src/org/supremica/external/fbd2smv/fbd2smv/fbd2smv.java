@@ -24,37 +24,6 @@ public class fbd2smv
 
 	isagrafReader igReader = new isagrafReader(fbdProjectPath);
 	fbdProj                = igReader.getFbdProject();
-
-	/* <test> */
-  	  LinkedList fbdElements = fbdProj.getFBDElements();
-	  System.out.println("fbdElements.size()=" + fbdElements.size());
-
-	  Collections.sort(fbdElements);
-	
-	  for(int i=0; i < fbdElements.size(); i++)
-	      {
-		  org.supremica.external.fbd2smv.isagrafReader.FBDElement fbdElement = ( org.supremica.external.fbd2smv.isagrafReader.FBDElement)fbdElements.get(i);
-
-		  System.out.println(fbdElement.getProgramName() + ", " + fbdElement.getProgramIndex() + ", " + fbdElement.getElementName() + ", " + fbdElement.getElementType() + ", " + fbdElement.getX() + ", " + fbdElement.getY());
-	      }
-	
-	/* </test> */
-
-
-
-	/* <test> */
-  	  LinkedList indices = fbdProj.getOutputVariableIndicesByVariableName("E_Go");
-	  System.out.println("indices.size()=" + indices.size());
-	
-	  for(int i=0; i < indices.size(); i++)
-	      {
-		  String[] str = (String[])indices.get(i);
-		  System.out.println(str[0] + " " + str[1]);
-	      }
-	
-	/* </test> */
-
-
 		
 	LinkedList programs    = fbdProj.getPrograms();
 	LinkedList varBooleans = fbdProj.dictionaryGetBooleans();
@@ -66,9 +35,13 @@ public class fbd2smv
 	BLKReader blkReader = new BLKReader(smvBlocksPath);
 	smvBlocks = blkReader.getBlocks();
 
-	printControllerModule(pw, programs);
+	LinkedList fbdElements = fbdProj.getFBDElements();
+	translateBoxNames2(fbdElements);
+
+
+	printControllerModule(pw, fbdElements);
 	blkReader.printBlocks(pw);
-	printMainModule(pw, programs, varBooleans, varIntegers);
+	printMainModule(pw, programs, varBooleans, varIntegers, fbdElements);
 
 	pw.flush();
 	pw.close();
@@ -131,9 +104,121 @@ public class fbd2smv
 	    }
     }
 
+    private void translateBoxNames_H(HashMap boxes)
+    {
+	String boxName;
+
+	for (Iterator boxIt = boxes.keySet().iterator(); boxIt.hasNext();)
+	    {
+		String boxKey = (String)boxIt.next();
+		BOX currentBox = (BOX)boxes.get(boxKey);
+		boxName = currentBox.getName();
+
+		if (boxName.equals("=1"))
+		    { 
+			((BOX)boxes.get(boxKey)).setName("xor");
+		    }
+		else if (boxName.equals("&"))
+		    { 
+			((BOX)boxes.get(boxKey)).setName("and");
+		    }
+		else if (boxName.equals(">=1"))
+		    { 
+			((BOX)boxes.get(boxKey)).setName("or");
+		    }
+		else if (boxName.equals(">"))
+		    { 
+			((BOX)boxes.get(boxKey)).setName("gt");
+		    }
+		else if (boxName.equals("<"))
+		    { 
+			((BOX)boxes.get(boxKey)).setName("lt");
+		    }
+		else if (boxName.equals("+"))
+		    { 
+			((BOX)boxes.get(boxKey)).setName("add");
+		    }
+		else if (boxName.equals("-"))
+		    { 
+			((BOX)boxes.get(boxKey)).setName("substract");
+		    }
+		else if (boxName.equals("="))
+		    { 
+			((BOX)boxes.get(boxKey)).setName("equal");
+		    }
+		else if (boxName.equals("*"))
+		    { 
+			((BOX)boxes.get(boxKey)).setName("mult");
+		    }
+		else if (boxName.equals("/"))
+		    { 
+			((BOX)boxes.get(boxKey)).setName("div");
+		    }
+	    }
+    }
+
+
+
+    private void translateBoxNames2(LinkedList fbdElements)
+    {
+	String boxName;
+	
+	for (int i=0; i<fbdElements.size(); i++)
+	    {
+		FBDElement fbdElement = (FBDElement)fbdElements.get(i);
+
+		if(fbdElement.getElementType().equals("box"))
+		    {
+		    
+			boxName = fbdElement.getElementName();
+
+			if (boxName.equals("=1"))
+			    { 
+				fbdElement.setElementName("xor");
+			    }
+			else if (boxName.equals("&"))
+			    { 
+				fbdElement.setElementName("and");
+			    }
+			else if (boxName.equals(">=1"))
+			    { 
+				fbdElement.setElementName("or");
+			    }
+			else if (boxName.equals(">"))
+			    { 
+				fbdElement.setElementName("gt");
+			    }
+			else if (boxName.equals("<"))
+			    { 
+				fbdElement.setElementName("lt");
+			    }
+			else if (boxName.equals("+"))
+			    { 
+				fbdElement.setElementName("add");
+			    }
+			else if (boxName.equals("-"))
+			    { 
+				fbdElement.setElementName("substract");
+			    }
+			else if (boxName.equals("="))
+			    { 
+				fbdElement.setElementName("equal");
+			    }
+			else if (boxName.equals("*"))
+			    { 
+				fbdElement.setElementName("mult");
+			    }
+			else if (boxName.equals("/"))
+			    { 
+				fbdElement.setElementName("div");
+			    }
+		    }
+	    }
+    }
 
 	
-    void printControllerModule(PrintWriter pw, LinkedList programs) 
+    	
+    void printControllerModule(PrintWriter pw, LinkedList fbdElements) 
     {
 	String str = "";
 	String blockName = null;
@@ -141,36 +226,43 @@ public class fbd2smv
 
 	LinkedList boxes;
 	Program program;
-	String programName = null;
-	String previousProgramName = null;
+	//	String programName = null;
+	//	String previousProgramName = null;
 	String previousBlockName;
 	String index = null;
 	String previousIndex;
+	String S = null;
 
 	pw.println("MODULE controller()");
 	pw.println("{");
-		
+
+
+	/*  Declaration of states
+	 *
+	 */
 	StringBuffer buff = new StringBuffer("\tstate : {idle, read_input, ");
-		
-	for (int i=0; i<programs.size(); i++)
-	    {
-		program = (Program)programs.get(i); 
-		programName = program.getName();
-		boxes = program.getBoxesWithoutCornersList();
-		translateBoxNames(boxes);
 
-		for (int j=0; j<boxes.size(); j++)
-		    {
-			blockName = ((BOX)boxes.get(j)).getName();
-			buff.append("compute_" + programName + "_" + blockName + "_" + ((BOX)boxes.get(j)).index + ", ");
-		    }
+	for (int i=0; i<fbdElements.size(); i++)
+	{
+	    FBDElement fbdElement = (FBDElement)fbdElements.get(i);
+	    String programName = fbdElement.getProgramName();
+	    String elementType = fbdElement.getElementType();
+	    String elementName = fbdElement.getElementName();
+	    String elementIndex = S.valueOf(fbdElement.getElementIndex());
 
-	    }
+	    if (elementType.equals("variable") || elementType.equals("box"))
+		{
+		    buff.append("compute_" + programName + "_" + elementName + "_" + elementIndex + ", ");
+		}
+	}
 
 	buff.append(" write_output};");
 	pw.println(buff.toString());
 
-
+	
+	/*  Assignment of state values
+	 *
+	 */
 	pw.println("");
 	pw.println("");
 	pw.println("\tinit(state) := idle;");
@@ -178,45 +270,39 @@ public class fbd2smv
 	pw.println("\t\tcase {");
 	pw.println("\t\t\tstate = idle: read_input; ");
 
-	for (int i=0; i<programs.size(); i++)
-	    {
-		previousProgramName = programName;
-		program = (Program)programs.get(i); 
-		programName = program.getName();
-		boxes = program.getBoxesWithoutCornersList();
 
-		if (boxes.size() > 0) 
-		    {
-			previousBlockName = blockName;
-			previousIndex = index;
-			blockName = ((BOX)boxes.get(0)).getName();
-			index = ((BOX)boxes.get(0)).index;
+	String previousProgramName  = null;
+	String previousElementName  = null;
+	String previousElementIndex = null;
 
-			if (i==0)
-			    {
-				pw.println("\t\t\tstate = read_input: compute_" + programName + "_" + blockName + "_" + ((BOX)boxes.get(0)).index + ";"); 
-			    }
-			else
-			    {
-				pw.println("\t\t\tstate = compute_" +  previousProgramName + "_" + previousBlockName +"_" + previousIndex + ": compute_" + programName + "_" + blockName + "_" + ((BOX)boxes.get(0)).index + ";"); 
-			    }
-		    }
-				
-		for (int j=1; j<boxes.size(); j++)
-		    {
-			previousBlockName = blockName;
-			previousIndex = index;
-			blockName = ((BOX)boxes.get(j)).getName();
-			index = ((BOX)boxes.get(j)).index;
+	for (int i=0; i<fbdElements.size(); i++)
+	{
+	    FBDElement fbdElement = (FBDElement)fbdElements.get(i);
+	    String programName = fbdElement.getProgramName();
+	    String elementType = fbdElement.getElementType();
+	    String elementName = fbdElement.getElementName();
+	    String elementIndex = S.valueOf(fbdElement.getElementIndex());
 
-						
+	    if (elementType.equals("variable") || elementType.equals("box"))
+		{
+		    if (i==0)
+			{
+			    pw.println("\t\t\tstate = read_input: compute_" + programName + "_" + elementName + "_" + elementIndex + ";"); 
+			}
+		    
+		    else
+			{
+			    pw.println("\t\t\tstate = compute_" +  previousProgramName + "_" + previousElementName +"_" + previousElementIndex + ": compute_" + programName + "_" + elementName + "_" + elementIndex + ";"); 
+			}
+		    previousProgramName  = programName;
+		    previousElementName  = elementName;
+		    previousElementIndex = elementIndex;
+		}
+	}
 
-			pw.println("\t\t\tstate = " + "compute_" + programName + "_" + previousBlockName + "_" + previousIndex  + ": compute_" + programName + "_" + blockName + "_" + index + ";");
-		    }
 
-	    }
-
-	pw.println("\t\t\tstate = compute_" + programName + "_" + blockName + "_" + index +  ": read_input;");
+	
+	pw.println("\t\t\tstate = compute_" + previousProgramName + "_" + previousElementName + "_" + previousElementIndex +  ": read_input;");
 		
 	pw.println("\t\t\t1: state;");
         pw.println("\t\t};");
@@ -226,250 +312,237 @@ public class fbd2smv
 	
     }
 
-    void printMainModule(PrintWriter pw, LinkedList programs, LinkedList varBooleans, LinkedList varIntegers)
+
+
+
+    void printMainModule(PrintWriter pw, LinkedList programs, LinkedList varBooleans, LinkedList varIntegers, LinkedList fbdElements)
     {
-	String str = "";
-	String blockName;
-
-
-	//HashMap variables = program.getVariables();
-	//LinkedList arcs   = program.getArcs();
-	//HashMap boxes         = program.getBoxes()
-	LinkedList boxesList;
-	Program program;
-	HashMap variables;
+	StringBuffer buff = new StringBuffer("");
 
 	pw.println("MODULE main()");
 	pw.println("{");
 
+	
+       /* Declaration of boolean variables
+	*
+	*/
 	if (varBooleans.size() > 0 )
 	    {
-		str = "\t";
+		buff.append("\t");
 		for (int i = 0; i<varBooleans.size(); i++) 
 		    {
-			str = str + varBooleans.get(i);
+			buff.append(varBooleans.get(i));
 			if (i < varBooleans.size() - 1)
 			    {
-				str = str + ", ";
+				buff.append(", ");
 			    }
 		    }
-		str = str + ": boolean;";
-		pw.println(str);
+		buff.append(": boolean;");
+		pw.println(buff.toString());
 	    }
 
 
-	System.out.println("varIntegers.size()=" + varIntegers.size());
+       /* Declaration of integer variables
+	*
+	*/
 	if (varIntegers.size() > 0 )
 	    {
-		str = "\t";
+		buff = new StringBuffer("");
 		for (int i = 0; i<varIntegers.size(); i++) 
 		    {
-			str = str + varIntegers.get(i);
+			buff.append(varIntegers.get(i));
 			if (i < varIntegers.size() - 1)
 			    {
-				str = str + ", ";
+				buff.append(", ");
 			    }
 		    }
-		str = str + ": -32..32;";
-		pw.println(str);
+		buff.append(": -32..32;");
+		pw.println(buff.toString());
 	    }
 
 
 
 
-	
-
-	// Utskrift av variabler
-	HashMap variablesHashMap = new HashMap();
-
-	LinkedList fbdElements = fbdProj.getFBDElements();
+       /* 
+	*  Grouping of variables
+	*  There may be many occurences of a variable in a project, 
+	*  spread over various programs.
+	*  For each occurence of the variable there will be
+	*  a distinct fbdElement. These fbdElements must be grouped
+	*  to print the assignments of values to the variable 
+	*
+	*/
+	HashMap variables = new HashMap();
 	
 	for (int i=0; i<fbdElements.size(); i++)
 	{
-	    org.supremica.external.fbd2smv.isagrafReader.FBDElement fbdElement = ( org.supremica.external.fbd2smv.isagrafReader.FBDElement)fbdElements.get(i);
-
+	    FBDElement fbdElement = (FBDElement)fbdElements.get(i);
+	    String variableName = fbdElement.getElementName();
+	    
 	    if (fbdElement.getElementType().equals("variable"))
 		{
-		    if (variablesHashMap.containsKey(fbdElement.getElementName()))
+		    /* All occurences of a variable are grouped in a 
+		     * LinkedList called "variable" 
+		     * If this is the first occurence of the variable then
+		     * the LinkedList is created and pit in the "variables" Hashmap. 
+		     * Otherwise the corresponding
+		     * LinkedList is retrieved and the current occurence of
+		     * the variable is added to the LinkedList.
+		     */
+		    if (variables.containsKey(variableName))
 			{
-			    LinkedList variableList = (LinkedList)variablesHashMap.get(fbdElement.getElementName());
-			    variableList.add(fbdElement);
+			    LinkedList variable = (LinkedList)variables.get(variableName);
+			    variable.add(fbdElement);
 			} 
 		    else
 			{
-			    LinkedList variableList  = new LinkedList();
-			    variableList.add(fbdElement);
-			    variablesHashMap.put(fbdElement.getElementName(), variableList);
+			    LinkedList variable  = new LinkedList();
+			    variable.add(fbdElement);
+			    variables.put(variableName, variable);
 			}
 		}
 	}
 
-	for (Iterator fbdIt = variablesHashMap.keySet().iterator(); fbdIt.hasNext();)
-	    {
-		String varName = (String)fbdIt.next();
-		LinkedList curVariable = (LinkedList)variablesHashMap.get(varName);
 
+
+
+	/*
+	 * Printing of variable assigments
+	 */ 
+	
+	for (Iterator fbdIt = variables.keySet().iterator(); fbdIt.hasNext();)
+	    {
+		String variableName = (String)fbdIt.next();
+		LinkedList variable = (LinkedList)variables.get(variableName);
 
 		pw.println("");
-		pw.println("\tnext(" + varName + ") := case");
+		pw.println("\tnext(" + variableName + ") := case");
 		pw.println("\t{");
 		pw.println("\t\tctrl.state = read_input : {0, 1};");
 
-		for (int i=0;i<curVariable.size();i++)
+		for (int i=0; i<variable.size(); i++)
 		    {
-			org.supremica.external.fbd2smv.isagrafReader.FBDElement curVariableElement = ( org.supremica.external.fbd2smv.isagrafReader.FBDElement)curVariable.get(i);		
+			FBDElement   variableOccurence = (FBDElement)variable.get(i);
+			Program      program           = (Program)programs.get(variableOccurence.getProgramIndex());
+			LinkedList   arcs              = program.getArcs();		
+			HashMap      boxes             = program.getBoxes();
+			String       S                 = null;
+			buff = new StringBuffer("");
 
-			String S = null;
-			Program prog  = (Program)programs.get(curVariableElement.getProgramIndex());
-			LinkedList arcs      = prog.getArcs();		
-			HashMap    boxes     = prog.getBoxes();
-			String outputVariableDeclaration = "\t\t\t";
+			translateBoxNames_H(boxes);
 
-			LinkedList inputs = inputElementIndices(S.valueOf(curVariableElement.getElementIndex()), arcs);
 
-			if (inputs.size() > 0)
+			/* 
+			 *  Retrieve a list of inputs to the variable 
+			 *  A variable can have at most one input, therefore
+			 *  the list of inputs will be empty or have exactly 
+			 *  one element in it.
+			 */
+			LinkedList inputs              = inputElementIndices(S.valueOf(variableOccurence.getElementIndex()), arcs);
+			
+			if (inputs.size()>0)
 			    {
+				String    sourceIndex        = S.valueOf(((Tuple4)inputs.get(0)).x);
+				int       sourceOutputNumber = ((Tuple4)inputs.get(0)).y;
+				boolean   invert             = ((Tuple4)inputs.get(0)).invert;
+				FBDObject theFBDObject       = getElementByIndex(program, sourceIndex);
 
-				String  sourceIndex = S.valueOf(((Tuple4)inputs.get(0)).x);
-				int     sourceOutputNumber = ((Tuple4)inputs.get(0)).y;
-				boolean invert = ((Tuple4)inputs.get(0)).invert;
-
-				FBDElement theFBDElement = getElementByIndex(prog, sourceIndex);
-
-				if (theFBDElement.getType().equals("variable") ) 
+				/* The input to the variable is another variable */
+				if (theFBDObject.getType().equals("variable") ) 
 				    {
+					buff.append(((VAR)theFBDObject.getElement()).getName() + ";");
 				    }
-				else if (theFBDElement.getType().equals("box") ) 
-				    {
 
+				/* The input to the variable is a box */
+				else if (theFBDObject.getType().equals("box") ) 
+				    {
 					/*
-					 * Ta reda på vilken av input-boxens utsignaler
-					 * som ska kopplas till den aktuella boxens insignal
+					 * The box may have multiple output signals.
+					 * Determine which of the output signals is
+					 * connected to the variable's input
 					 * 
 					 */
+					BOX box = ((BOX)theFBDObject.getElement());
 
-					BOX box2 = ((BOX)theFBDElement.getElement());
-					if ((box2.getName().equals("{\\div}")))
+					/*
+					 *  If the current box is a corner (corners are named {\div})
+					 *  we need to move back until we are dealing with
+					 *  a conventional box
+					 *
+					 */
+					if ((box.getName().equals("{\\div}")))
 					    {
-						System.out.println("*** 3 ***");
+						LinkedList cornerInputs  = new LinkedList();
+						boolean    moreCorners   = true;
+						FBDObject  theFBDObject2 = null;
+						String     sourceIndex2  = null;
+						BOX        box2          = null;
 
-						LinkedList divInputIndices = new LinkedList();
-						boolean moreDivs = true;
-						FBDElement theFBDElement2 = null;
-						String sourceIndex2 = null;
-						while (moreDivs)
+						while (moreCorners)
 						    {
-							moreDivs = false;
-							divInputIndices = inputElementIndices(box2.getIndex(), arcs);
-							    
-							sourceIndex2 = S.valueOf(((Tuple4)divInputIndices.get(0)).x);
+							moreCorners  = false;
 
-							theFBDElement2 = getElementByIndex(prog, sourceIndex2);
-							if (theFBDElement2.getType().equals("box"))
+							cornerInputs = inputElementIndices(box.getIndex(), arcs);
+							sourceIndex2  = S.valueOf(((Tuple4)cornerInputs.get(0)).x);
+							theFBDObject2 = getElementByIndex(program, sourceIndex2);
+
+							if (theFBDObject2.getType().equals("box"))
 							    {
-								box2 = (BOX)boxes.get(sourceIndex2);
-								moreDivs = box2.getName().equals("{\\div}");
+								box = (BOX)boxes.get(sourceIndex2);
+								moreCorners = box.getName().equals("{\\div}");
 							    }
 						    }
 
-						theFBDElement = theFBDElement2;
+						theFBDObject = theFBDObject2;
 						sourceIndex = sourceIndex2;
 					    }
-					    
-
 
 					if (invert)
 					    {
-						 outputVariableDeclaration =  outputVariableDeclaration + "!";
+						 buff.append("!");
 					    }
 
-					if (theFBDElement.getType().equals("variable") ) 
+					if (theFBDObject.getType().equals("variable") ) 
 					    {
-						//boxDeclaration =  outputVariableDeclaration + ((VAR)theFBDElement.getElement()).getName() + ", ";
+						buff.append(((VAR)theFBDObject.getElement()).getName() + ";");
 					    } 
 				
 					else
 					    {
 
-						String formalArgName = ((Block)smvBlocks.get(((BOX)theFBDElement.getElement()).getName())).getOutputArgumentName(sourceOutputNumber);
-						 outputVariableDeclaration =  outputVariableDeclaration + prog.getName() + "_" + ((Block)smvBlocks.get(((BOX)theFBDElement.getElement()).getName())).getName() + "_" + sourceIndex + "." + formalArgName + "; ";
+						String formalArgName = ((Block)smvBlocks.get(((BOX)theFBDObject.getElement()).getName())).getOutputArgumentName(sourceOutputNumber);
+						buff.append(program.getName() + "_" + ((Block)smvBlocks.get(((BOX)theFBDObject.getElement()).getName())).getName() + "_" + sourceIndex + "." + formalArgName + ";");
 			
 					    }
 
-					pw.println(outputVariableDeclaration);
 				    }
+
+				pw.println("\t\tctrl.state = compute_" + program.getName() + "_" + variableName + "_" + variableOccurence.getElementIndex() + ": " + buff.toString());
 			    }
 
-		    		
-		    
-
-
-
-			System.out.println("\t\t\t inputs.size()=" + inputs.size());
-
-			pw.println("\t\t" + i + "_" + curVariableElement.getElementIndex() + "                       : " +  "att fixa" + ";");
-
-
-			System.out.println("\t\t" + curVariableElement.getProgramName() + ": " + curVariableElement.getElementName() + ": (" + curVariableElement.getX() + ", " + curVariableElement.getY() + ")");
-		    }
+			
+			 }
 		
-		pw.println("\t\t1                       : " +  varName + ";");
+
+		pw.println("\t\t1                       : " +  variableName + ";");
 		pw.println("\t};");
-
-
-		System.out.println("%%%%% " + curVariable.size());
+		pw.println("");
 	    }
 
-
-
-
-	for (int i = 0; i<varBooleans.size(); i++) 
-	    {
-		String varName = (String)varBooleans.get(i);
-			    
-		if (!fbdProj.isOutputVariable(varName))
-
-		    {
-			pw.println("");
-			pw.println("\tnext(" + varName + ") := case");
-			pw.println("\t{");
-			pw.println("\t\tctrl.state = read_input : {0, 1};");
-			pw.println("\t\t1                       : " +  varName + ";");
-			pw.println("\t};");
-			//}
-			//}
-		    }
-	    }
-
-
-	for (int i = 0; i<varIntegers.size(); i++) 
-	    {
-		String varName = (String)varIntegers.get(i);
-			    
-		if (!fbdProj.isOutputVariable(varName))
-
-		    {
-			pw.println("");
-			pw.println("\tnext(" + varName + ") := case");
-			pw.println("\t{");
-			pw.println("\t\tctrl.state = read_input : {-32..32};");
-			pw.println("\t\t1                       : " +  varName + ";");
-			pw.println("\t};");
-		    }
-	    }
-
-
-	pw.println("");
 	pw.println("\tctrl: controller;");
 	pw.println("");
+
+
+
+
 
 	// Utskrift av block
         String boxDeclaration = null;
         for(int i=0; i<programs.size(); i++)
             {
-                program = (Program)programs.get(i);
+                Program    program    = (Program)programs.get(i);
+                LinkedList boxesList  = program.getBoxesList();
 
-                boxesList  = program.getBoxesList();
                 for (int j = 0; j<boxesList.size(); j++) {
                     if (!(((BOX)boxesList.get(j)).getName()).equals("{\\div}"))
                         {
@@ -479,12 +552,15 @@ public class fbd2smv
                 }
             }
 
+	pw.println("");
+	pw.println("}");
 
-
+	pw.flush();
  
 
 
 	// Utskrift av output-variabler
+	/*
 	for(int i=0; i<programs.size(); i++)
 	    {
 		program   = (Program)programs.get(i);
@@ -517,23 +593,25 @@ public class fbd2smv
 				int     sourceOutputNumber = ((Tuple4)inputElementIndices.get(i)).y;
 				boolean invert = ((Tuple4)inputElementIndices.get(i)).invert;
 
-				FBDElement theFBDElement = getElementByIndex(program, sourceIndex);
+				FBDObject theFBDObject = getElementByIndex(program, sourceIndex);
 
-				if (theFBDElement.getType().equals("variable") ) 
+				if (theFBDObject.getType().equals("variable") ) 
 				    {
 					System.out.println("*** 1 ***");
 					if (invert)
 					    {
-						outputVariableDeclaration =  outputVariableDeclaration + "!" + ((VAR)theFBDElement.getElement()).getName() + ", ";
+						outputVariableDeclaration =  outputVariableDeclaration + "!" + ((VAR)theFBDObject.getElement()).getName() + ", ";
 					    }
 					else
 					    {
-						 outputVariableDeclaration =  outputVariableDeclaration + ((VAR)theFBDElement.getElement()).getName() + ", ";
+						 outputVariableDeclaration =  outputVariableDeclaration + ((VAR)theFBDObject.getElement()).getName() + ", ";
 					    }
 				    } 
-				else if (theFBDElement.getType().equals("box") ) 
+				else if (theFBDObject.getType().equals("box") ) 
 				    {
 					System.out.println("*** 2 ***");
+
+	*/
 
 					/*
 					 * Ta reda på vilken av input-boxens utsignaler
@@ -541,14 +619,16 @@ public class fbd2smv
 					 * 
 					 */
 
-					BOX box2 = ((BOX)theFBDElement.getElement());
+	/*
+
+					BOX box2 = ((BOX)theFBDObject.getElement());
 					if ((box2.getName().equals("{\\div}")))
 					    {
 						System.out.println("*** 3 ***");
 
 						LinkedList divInputIndices = new LinkedList();
 						boolean moreDivs = true;
-						FBDElement theFBDElement2 = null;
+						FBDObject theFBDObject2 = null;
 						String sourceIndex2 = null;
 						while (moreDivs)
 						    {
@@ -557,15 +637,15 @@ public class fbd2smv
 							    
 							sourceIndex2 = S.valueOf(((Tuple4)divInputIndices.get(0)).x);
 
-							theFBDElement2 = getElementByIndex(program, sourceIndex2);
-							if (theFBDElement2.getType().equals("box"))
+							theFBDObject2 = getElementByIndex(program, sourceIndex2);
+							if (theFBDObject2.getType().equals("box"))
 							    {
 								box2 = (BOX)boxes.get(sourceIndex2);
 								moreDivs = box2.getName().equals("{\\div}");
 							    }
 						    }
 
-						theFBDElement = theFBDElement2;
+						theFBDObject = theFBDObject2;
 						sourceIndex = sourceIndex2;
 					    }
 					    
@@ -576,16 +656,16 @@ public class fbd2smv
 						 outputVariableDeclaration =  outputVariableDeclaration + "!";
 					    }
 
-					if (theFBDElement.getType().equals("variable") ) 
+					if (theFBDObject.getType().equals("variable") ) 
 					    {
-						boxDeclaration =  outputVariableDeclaration + ((VAR)theFBDElement.getElement()).getName() + ", ";
+						boxDeclaration =  outputVariableDeclaration + ((VAR)theFBDObject.getElement()).getName() + ", ";
 					    } 
 				
 					else
 					    {
 
-						String formalArgName = ((Block)smvBlocks.get(((BOX)theFBDElement.getElement()).getName())).getOutputArgumentName(sourceOutputNumber);
-						 outputVariableDeclaration =  outputVariableDeclaration + program.getName() + "_" + ((Block)smvBlocks.get(((BOX)theFBDElement.getElement()).getName())).getName() + "_" + sourceIndex + "." + formalArgName + "; ";
+						String formalArgName = ((Block)smvBlocks.get(((BOX)theFBDObject.getElement()).getName())).getOutputArgumentName(sourceOutputNumber);
+						 outputVariableDeclaration =  outputVariableDeclaration + program.getName() + "_" + ((Block)smvBlocks.get(((BOX)theFBDObject.getElement()).getName())).getName() + "_" + sourceIndex + "." + formalArgName + "; ";
 			
 					    }
 
@@ -602,6 +682,7 @@ public class fbd2smv
 	
 	System.out.println(boxDeclaration);
 	pw.println("}");
+	*/
     }
 
     
@@ -610,7 +691,7 @@ public class fbd2smv
     {
 	String     blockName;
 	String     boxDeclaration = null;
-	FBDElement theFBDElement  = null;
+	FBDObject theFBDObject  = null;
 		
 	//	HashMap variables    = program.getVariables();
 	HashMap boxes        = program.getBoxes();
@@ -636,20 +717,20 @@ public class fbd2smv
 		int     sourceOutputNumber = ((Tuple4)inputElementIndices.get(i)).y;
 		boolean invert = ((Tuple4)inputElementIndices.get(i)).invert;
 
-		theFBDElement = getElementByIndex(program, sourceIndex);
+		theFBDObject = getElementByIndex(program, sourceIndex);
 
-		if (theFBDElement.getType().equals("variable") ) 
+		if (theFBDObject.getType().equals("variable") ) 
 		    {
 			if (invert)
 			    {
-				boxDeclaration = boxDeclaration + "!" + ((VAR)theFBDElement.getElement()).getName() + ", ";
+				boxDeclaration = boxDeclaration + "!" + ((VAR)theFBDObject.getElement()).getName() + ", ";
 			    }
 			else
 			    {
-				boxDeclaration = boxDeclaration + ((VAR)theFBDElement.getElement()).getName() + ", ";
+				boxDeclaration = boxDeclaration + ((VAR)theFBDObject.getElement()).getName() + ", ";
 			    }
 		    } 
-		else if (theFBDElement.getType().equals("box") ) 
+		else if (theFBDObject.getType().equals("box") ) 
 		    {
 			/*
 			 * Ta reda på vilken av input-boxens utsignaler
@@ -657,12 +738,12 @@ public class fbd2smv
 			 * 
 			 */
 
-			BOX box2 = ((BOX)theFBDElement.getElement());
+			BOX box2 = ((BOX)theFBDObject.getElement());
 			if ((box2.getName().equals("{\\div}")))
 			    {
 				LinkedList divInputIndices = new LinkedList();
 				boolean    moreDivs = true;
-				FBDElement theFBDElement2 = null;
+				FBDObject theFBDObject2 = null;
 				String     sourceIndex2 = null;
 
 				while (moreDivs)
@@ -672,15 +753,15 @@ public class fbd2smv
 							    
 					sourceIndex2 = S.valueOf(((Tuple4)divInputIndices.get(0)).x);
 
-					theFBDElement2 = getElementByIndex(program, sourceIndex2);
-					if (theFBDElement2.getType().equals("box"))
+					theFBDObject2 = getElementByIndex(program, sourceIndex2);
+					if (theFBDObject2.getType().equals("box"))
 					    {
 						box2 = (BOX)boxes.get(sourceIndex2);
 						moreDivs = box2.getName().equals("{\\div}");
 					    }
 				    }
 
-				theFBDElement = theFBDElement2;
+				theFBDObject = theFBDObject2;
 				sourceIndex = sourceIndex2;
 			    }
 					    
@@ -692,17 +773,17 @@ public class fbd2smv
 			    }
 
 
-			if (theFBDElement.getType().equals("variable") ) 
+			if (theFBDObject.getType().equals("variable") ) 
 			    {
-				boxDeclaration = boxDeclaration + ((VAR)theFBDElement.getElement()).getName() + ", ";
+				boxDeclaration = boxDeclaration + ((VAR)theFBDObject.getElement()).getName() + ", ";
 			    } 
 			else
 			    {
 
-				System.out.println("%%% BOX.getname()='" + ((BOX)theFBDElement.getElement()).getName() + "'");
+				System.out.println("%%% BOX.getname()='" + ((BOX)theFBDObject.getElement()).getName() + "'");
 
-				String formalArgName = ((Block)smvBlocks.get(((BOX)theFBDElement.getElement()).getName())).getOutputArgumentName(sourceOutputNumber);
-				boxDeclaration = boxDeclaration + program.getName() + "_" + ((Block)smvBlocks.get(((BOX)theFBDElement.getElement()).getName())).getName() + "_" + sourceIndex + "." + formalArgName + ", ";
+				String formalArgName = ((Block)smvBlocks.get(((BOX)theFBDObject.getElement()).getName())).getOutputArgumentName(sourceOutputNumber);
+				boxDeclaration = boxDeclaration + program.getName() + "_" + ((Block)smvBlocks.get(((BOX)theFBDObject.getElement()).getName())).getName() + "_" + sourceIndex + "." + formalArgName + ", ";
 			    }
 		    }
 	    }
@@ -722,24 +803,24 @@ public class fbd2smv
 	  String targetIndex = S.valueOf(((Tuple4)outputElementIndices.get(i)).x);
 	  int targetInputNumber = ((Tuple4)outputElementIndices.get(i)).y;
 
-	  theFBDElement = getElementByIndex(program, targetIndex);
+	  theFBDObject = getElementByIndex(program, targetIndex);
 
-	  if (theFBDElement.getType().equals("variable") ) 
+	  if (theFBDObject.getType().equals("variable") ) 
 	  {
-	  boxDeclaration = boxDeclaration + ((VAR)theFBDElement.getElement()).getName() + ", ";
+	  boxDeclaration = boxDeclaration + ((VAR)theFBDObject.getElement()).getName() + ", ";
 	  } 
 
-	  else if (theFBDElement.getType().equals("box") ) 
+	  else if (theFBDObject.getType().equals("box") ) 
 	  {
 
-	  System.out.println("BLOCKNAME (output): " + ((BOX)theFBDElement.getElement()).getName()  + "_" + ((BOX)theFBDElement.getElement()).getIndex());
+	  System.out.println("BLOCKNAME (output): " + ((BOX)theFBDObject.getElement()).getName()  + "_" + ((BOX)theFBDObject.getElement()).getIndex());
 					    
 
 
 
-	  String formalArgName = ((Block)smvBlocks.get(((BOX)theFBDElement.getElement()).getName())).getInputArgumentName(targetInputNumber);
+	  String formalArgName = ((Block)smvBlocks.get(((BOX)theFBDObject.getElement()).getName())).getInputArgumentName(targetInputNumber);
 
-	  boxDeclaration = boxDeclaration + program.getName() + "_" + ((Block)smvBlocks.get(((BOX)theFBDElement.getElement()).getName())).getName() + "_" + targetIndex + "." + formalArgName + ", ";
+	  boxDeclaration = boxDeclaration + program.getName() + "_" + ((Block)smvBlocks.get(((BOX)theFBDObject.getElement()).getName())).getName() + "_" + targetIndex + "." + formalArgName + ", ";
 	  }
 
 	  }
@@ -812,12 +893,12 @@ public class fbd2smv
     }
 
 
-    class FBDElement
+    class FBDObject
     {
 	Object element;
 	String type;
 
-	public FBDElement(Object e, String t)
+	public FBDObject(Object e, String t)
 	{
 	    this.element = e;
 	    this.type = t;
@@ -836,16 +917,16 @@ public class fbd2smv
     
 
 
-    public FBDElement getElementByIndex(Program program, String index)
+    public FBDObject getElementByIndex(Program program, String index)
     {
 	HashMap variables        = program.getVariablesByIndex();
 	HashMap boxes            = program.getBoxes();
-	FBDElement theFBDElement = null;
+	FBDObject theFBDObject = null;
 
 	if (variables.containsKey(index))
 	    {
-		theFBDElement = new FBDElement(variables.get(index), "variable");
-		return theFBDElement;
+		theFBDObject = new FBDObject(variables.get(index), "variable");
+		return theFBDObject;
 	    }
 	/*
 	  if (theRelays.containsKey(index))
@@ -855,8 +936,8 @@ public class fbd2smv
 	*/
 	if (boxes.containsKey(index))
 	    {
-		theFBDElement = new FBDElement(boxes.get(index), "box");
-		return theFBDElement;
+		theFBDObject = new FBDObject(boxes.get(index), "box");
+		return theFBDObject;
 	    }
 
 	return null;

@@ -189,9 +189,34 @@ public class LSFReader
 
 	VAR newVAR = new VAR(indexString, varName);
 
+
+	if (varName.equals("TRUE"))
+	    {
+		varName = "1";
+	    }
+
+	if (varName.equals("FALSE"))
+	    {
+		varName = "0";
+	    }
+
+
+	char c = varName.charAt(0);       
+	String elementType = null;
+
+	if (Character.isLetter(c))
+	    {
+		elementType = "variable";
+	    }
+	else
+	    {
+		elementType = "constant";
+	    }
+	
+
 	variablesByIndex.put(newVAR.getIndex(), newVAR);
 	variablesByName.put(newVAR.getName(), newVAR);
-	fbdElements.add(new FBDElement(programName, programIndex, (String)newVAR.getName(), "variable", I.valueOf(indexString).intValue(), x, y));
+	fbdElements.add(new FBDElement(programName, programIndex, (String)newVAR.getName(), elementType, I.valueOf(indexString).intValue(), x, y));
 		
     }
 
@@ -275,7 +300,19 @@ public class LSFReader
 
 	BOX newBOX = new BOX(indexString, boxName, x, y);
 	boxes.put(newBOX.getIndex(), newBOX);
-	fbdElements.add(new FBDElement(programName, programIndex, (String)newBOX.getName(), "box", I.valueOf(indexString).intValue(), I.valueOf(x).intValue(), I.valueOf(y).intValue()));
+	
+	String elementType;
+	if(boxName.equals("{\\div}"))
+	{
+	    elementType = "corner";
+	}
+	else
+	    {
+		elementType = "box";
+	    }
+	   
+
+	fbdElements.add(new FBDElement(programName, programIndex, (String)newBOX.getName(), elementType, I.valueOf(indexString).intValue(), I.valueOf(x).intValue(), I.valueOf(y).intValue()));
     }
 
 

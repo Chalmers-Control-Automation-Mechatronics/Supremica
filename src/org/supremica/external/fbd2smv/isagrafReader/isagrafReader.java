@@ -25,6 +25,7 @@ public class isagrafReader
 
 	//buildProgramList();
 	buildPrograms(programList, fbdElements);
+	Collections.sort(fbdElements);
     }
 
 

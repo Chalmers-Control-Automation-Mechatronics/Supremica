@@ -34,6 +34,11 @@ public class FBDElement implements java.lang.Comparable
 	return elementName;
     }
 
+    public void setElementName(String name)
+    {
+	elementName = name;
+    }
+
     public String getElementType()
     {
 	return elementType;
