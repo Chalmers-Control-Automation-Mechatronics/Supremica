@@ -35,7 +35,7 @@ Supremica is following.
 	> export CVS_RSH=ssh  (for bash)
 	> setenv CVS_RSH ssh  (for tcsh)
 	After this you can checkout the sources, change ka to your username.
-	> cvs -d ka@linnea.s2.chalmers.se:/users/s2/cvs checkout Supremica
+	> cvs -d ka@supremica.s2.chalmers.se:/home/cvs checkout Supremica
 	
 	If you have licensed version of JGo and/or JGo Layout then
 	copy the licensed jar files to
