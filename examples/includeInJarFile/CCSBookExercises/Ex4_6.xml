@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<Automata name="Two Machines & a Buffer" comment="Classical example of uncontrollable specfication. Adapted from 'Supervisory Control of a Class of Discrete Event Processes' by P. Ramadge and M. Wonham">
+<Automata name="Two Machines and a Buffer" comment="Classical example of uncontrollable specfication. Adapted from 'Supervisory Control of a Class of Discrete Event Processes' by P. Ramadge and M. Wonham">
 <Automaton name="Machine 1" type="Plant">
 	<Events>
 		<Event id="l1" label="load1"/>

@@ -139,7 +139,7 @@ class SynthesizerDialogStandardPanel
 		{
 			super("Note:\n" +
 				"Currently, the modular nonblocking algorithm\n" +
-				"does not gurantee global nonblocking. The only\n" +
+				"does not guarantee global nonblocking. The only\n" +
 				"gurantee is that each supervisor is nonblockng\n" +
 				"with respect to the plants that it controls");
 			super.setBackground(new Color(0,0,0,transparent));
