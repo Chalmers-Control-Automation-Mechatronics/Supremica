@@ -44,6 +44,9 @@ class MainPopupMenu
 		JMenuItem alphabetItem = new JMenuItem("View alphabet");
 		menuHandler.add(alphabetItem, 1);
 
+		JMenuItem statesItem = new JMenuItem("View states");
+		menuHandler.add(statesItem, 1);
+
 		if (SupremicaProperties.useDot())
 		{
 			JMenuItem viewItem = new JMenuItem("View automaton");
@@ -333,7 +336,16 @@ class MainPopupMenu
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				ActionMan.automatonAlphabet_actionPerformed(getGui());
+				// ActionMan.automatonAlphabet_actionPerformed(getGui());
+				ActionMan.alphabetView_actionPerformed(getGui());
+				getGui().repaint();
+			}
+		});
+		statesItem.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				ActionMan.statesView_actionPerformed(getGui());
 				getGui().repaint();
 			}
 		});

@@ -64,7 +64,8 @@ public class AutomataHierarchyViewer
 		throws Exception
 	{
 		this.theAutomata = theAutomata;
-		super.setObjectName("Hierarchy " + theAutomata.getName());
+		//super.setObjectName("Hierarchy " + theAutomata);
+		super.setObjectName("Hierarchy");
 		theAutomata.getListeners().addListener(this);
 	}
 

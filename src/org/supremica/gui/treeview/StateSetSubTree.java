@@ -13,10 +13,14 @@ import java.util.*;
 
 import org.supremica.automata.State;
 import org.supremica.automata.StateSet;
+import org.supremica.gui.Supremica;
 
 public class StateSetSubTree
 	extends SupremicaTreeNode
 {
+	private static ImageIcon statesIcon = 
+		new ImageIcon(Supremica.class.getResource("/icons/States16.gif"));
+
 	public StateSetSubTree(StateSet states)
 	{
 		super("States");
@@ -32,5 +36,20 @@ public class StateSetSubTree
 			State state = (State)stateit.next();
 			root.add(new StateSubTree(state));
 		}
+	}
+
+	public Icon getOpenIcon()
+	{		
+		return statesIcon;
+	}
+
+	public Icon getClosedIcon()
+	{
+		return getOpenIcon();
+	}
+
+	public Icon getLeafIcon()
+	{
+		return getOpenIcon();
 	}
 }

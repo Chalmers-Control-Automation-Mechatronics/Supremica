@@ -75,12 +75,15 @@ public class MutuallyNonblockingVerifier
 	private final int MUTUALLY_NONBLOCKING_NO = 2;
 	private int[] automatonIsMutuallyNonblocking;
 
+	// SynchronizationOptions
+	private boolean verboseMode = false;
+
 	// Largest amount of synchronized automata during execution
 	private int maxSynchronized = 0;
 
 	// General count variables
 	private int count = 0;
-	private int index = 0;
+	private int tjong = 0;
 
 	public MutuallyNonblockingVerifier(Automata theAutomata)
 	{
@@ -99,8 +102,8 @@ public class MutuallyNonblockingVerifier
 	{
 		this(theAutomata);
 		this.synchHelper = synchHelper;
+		verboseMode = synchHelper.getSynchronizationOptions().verboseMode();		
 	}
-
 
 	public boolean isMutuallyNonblocking()
 	{
@@ -128,10 +131,19 @@ public class MutuallyNonblockingVerifier
 		logger.info(synchronizedEvents + " synchronized events.");
 		*/
 
-		// Do the work!
 		// synchTest();
 		// safeEventsTest();
-		work();
+
+		// Do the work!
+		try 
+		{
+			work();
+		}
+		catch (Exception ex)
+		{
+			logger.error("Error in MutuallyNonblockingVerifier: " + ex);
+			requestStop();
+		}
 
 		// Analyze and present result
 		boolean allMutuallyNonblocking = true;
@@ -142,7 +154,6 @@ public class MutuallyNonblockingVerifier
 		{
 			Automaton currAutomaton = (Automaton)autIt.next();
 			int index = theAutomata.getAutomatonIndex(currAutomaton);
-			// if (currAutomaton.nbrOfStates() == currAutomaton.nbrOfMutuallyAcceptingStates())
 			if (automatonIsMutuallyNonblocking[index] == MUTUALLY_NONBLOCKING_YES)
 			{
 				logger.info("Automaton " + currAutomaton + " is mutually nonblocking!");
@@ -183,8 +194,9 @@ public class MutuallyNonblockingVerifier
 						theAutomata.size() + " automata are mutually nonblocking.");
 		}
 
-		logger.info("During verification, at most " + maxSynchronized + " automata were synchronized.");
+		logger.info("During verification, at most " + maxSynchronized + " of " + theAutomata.size() + " automata were synchronized.");
 		logger.info("Count: " + count + ".");
+		logger.info("Tjong: " + tjong + ".");
 
 		return allMutuallyNonblocking;
 	}
@@ -221,6 +233,7 @@ public class MutuallyNonblockingVerifier
 	 * Does work. Not very well, though...
 	 */
 	private void work()
+		throws Exception
 	{
 		// A copy that we can do what we like with.
 		Automata theAutomataCopy = new Automata(theAutomata);
@@ -296,6 +309,9 @@ public class MutuallyNonblockingVerifier
 				logger.info("Second run: Examining automaton " + currAutomaton + " closer.");
 			}
 
+			// Use BDD algorithm for coaccessibility check?
+			// boolean useBDDAlgorithm = false;
+
 			// As long as we haven't established mutual nonblocking, we loop...
 			while (!ok)
 			{
@@ -306,6 +322,7 @@ public class MutuallyNonblockingVerifier
 				Automaton interestingAutomaton = getInterestingAutomaton(currSynchAutomata, currSynchAutomaton);
 				if (interestingAutomaton == null)
 				{
+					// This hints that the system might be blocking?
 					if (verifyBlockingBySafeEvents(currSynchAutomaton, currSafeEvents))
 					{
 						logger.error("The automaton " + currAutomaton + " definitely has blocking states!");
@@ -331,34 +348,38 @@ public class MutuallyNonblockingVerifier
 
 				// Add the interesting automaton
 				currSynchAutomata.addAutomaton(interestingAutomaton);
-				try
-				{
-					// If there were safe events in the added automaton, they are safe here too!
-					Events alreadySafe = safeEventsMap.getEvents(interestingAutomaton);
-					logger.debug("The events " + alreadySafe +
-								 " were already established to be safe in " + interestingAutomaton + ".");
-					currSafeEvents.addEvents(alreadySafe);
 
-					// Synchronize!
-					// currSynchAutomaton = AutomataSynchronizer.synchronizeAutomata(currSynchAutomata);
-					// Make sure the accepting status propagates
-					currSynchAutomaton.setAllMutuallyAcceptingStatesAsAccepting();
-					currSynchAutomaton = AutomataSynchronizer.synchronizeAutomata(currSynchAutomaton,
-																				  interestingAutomaton);
-					currSynchAutomaton.setName(currSynchAutomaton.getComment());
-				}
-				catch (Exception ex)
+				// How many automata are we looking at? Are we breaking the record?
+				if (currSynchAutomata.size() > maxSynchronized)
 				{
-					logger.error(ex);
-					requestStop();
-					return;
+					maxSynchronized = currSynchAutomata.size();
 				}
+
+				// If there were safe events in the added automaton, they are safe here too!
+				Events alreadySafe = safeEventsMap.getEvents(interestingAutomaton);
+				logger.debug("The events " + alreadySafe +
+							 " were already established to be safe in " + interestingAutomaton + ".");
+				currSafeEvents.addEvents(alreadySafe);
+
+				// The events that are unique to this subsystem are safe!
+				Alphabet uniqueEvents = findUniqueEvents(currSynchAutomata, theAutomata);
+				logger.debug("Events unique to this subsystem are: " + uniqueEvents + ".");
+				currSafeEvents.addEvents(uniqueEvents);
 
 				// Did there appear new safe events?
-				//addSafeEvents(currSafeEvents, currSynchAutomaton, theAutomataCopy);
-				addSafeEvents(currSafeEvents, currSynchAutomaton.getAlphabet(),
-							  currSynchAutomata, theAutomataCopy);
+				addSafeEvents(currSafeEvents, currSynchAutomata, theAutomataCopy);
 				logger.info("Checking " + currSynchAutomata + ". \nSafe events: " + currSafeEvents + ".");
+
+				// BELOW COMES THE MONOLITHIC-APPROACH SPECIFIC CODE!
+				
+				// Synchronize! 
+				// Make sure the accepting status propagates
+				currSynchAutomaton.setAllMutuallyAcceptingStatesAsAccepting();
+				currSynchAutomaton = AutomataSynchronizer.synchronizeAutomata(currSynchAutomaton,
+																			  interestingAutomaton);
+				currSynchAutomaton.setName(currSynchAutomaton.getComment());
+
+				// Extend the safe event coaccessibility
 				currSynchAutomaton.extendMutuallyAccepting(currSafeEvents);
 
 				// Are there apparent blocks in currSynchAutomaton? Maybe we can prove they're unreachable?
@@ -370,30 +391,27 @@ public class MutuallyNonblockingVerifier
 					count++;
 				}
 				*/
-
-				// How many unique events are there in currSynchAutomata?
-				Alphabet uniqueEvents = findUniqueEvents(currSynchAutomata, theAutomata);
-				logger.info("Events unique to this subsystem are: " + uniqueEvents + ".");
-
+				
 				// Remove as many transitions of uniqueEvents as you dare...
 				if (uniqueEvents != null && uniqueEvents.size() > 0)
 					count = count + removeUniqueEventTransitions(currSynchAutomaton, uniqueEvents);
-
-				// Show automaton with only unique events!
+				
+				/*
+				// Show automaton with only unique events! Oh if we only could remove
+				// those unnecessary states!
 				if (uniqueEvents.size() > 0)
 				{
 					Automaton copy = new Automaton(currSynchAutomaton);
 					// Remove all arcs wich are not safe events
 					for (ArcIterator arcIt = copy.safeArcIterator(); arcIt.hasNext();)
 					{
-						Arc currArc = arcIt.nextArc();
-						if (!uniqueEvents.contains(currArc.getEvent()))
-						{
-							copy.removeArc(currArc);
-						}
+							Arc currArc = arcIt.nextArc();
+							if (!uniqueEvents.contains(currArc.getEvent()))
+							{
+								copy.removeArc(currArc);
+							}
 					}
-
-					/*
+					
 					// Add automaton to gui
 					// Ignore enormous automata...
 					if (currSynchAutomaton.nbrOfStates() < 400)
@@ -401,55 +419,52 @@ public class MutuallyNonblockingVerifier
 						Gui gui = ActionMan.getGui();
 						gui.getVisualProjectContainer().getActiveProject().addAutomaton(copy);
 					}
-					*/
 				}
+				*/
 
 				/*
 				// Add automaton to gui
- 				Gui gui = ActionMan.getGui();
+				Gui gui = ActionMan.getGui();
 				gui.getVisualProjectContainer().getActiveProject().addAutomaton(currSynchAutomaton);
 				*/
-
+				
 				// Examinine original automaton compared to the synchronized automaton
 				int nbrAccepting = currAutomaton.nbrOfMutuallyAcceptingStates();
 				projectAcceptingStatus(currAutomaton, currSynchAutomaton);
-
+				
 				// If the amount of accepting states has increased, maybe we're finished!
 				if (currAutomaton.nbrOfMutuallyAcceptingStates() > nbrAccepting)
 				{
 					logger.info("Progress was made, new mutually accepting states found... (" +
 								currAutomaton.nbrOfMutuallyAcceptingStates() + " > " + nbrAccepting + ")");
-
+					
 					// Mutually nonblocking? We need to examine currSynchAutomaton... one could think that it's
 					// enough examining the original automaton, now that we have projected the accepting
 					// status, but there might be states there that are unreachable!!
 					ok = (currSynchAutomaton.nbrOfStates() == currSynchAutomaton.nbrOfMutuallyAcceptingStates());
 
+					// Assuming the system is controllable, we can ignore all uncontrollable (forbidden) states!!
+					//ok = (currSynchAutomaton.nbrOfStates()-currSynchAutomaton.nbrOfForbiddenStates() == 
+					// 	    currSynchAutomaton.nbrOfMutuallyAcceptingNotForbiddenStates());				
+	
 					// Restart loop with (refined) original automaton
 					currSynchAutomaton = new Automaton(currAutomaton);
 					currSynchAutomata = new Automata(currSynchAutomaton);
 					currSafeEvents = new Events(safeEventsMap.getEvents(currAutomaton));
 				}
-
-				// Assuming the system is controllable, we can ignore all uncontrollable (forbidden) states!!
-				//ok = (currSynchAutomaton.nbrOfStates()-currSynchAutomaton.nbrOfForbiddenStates() == currSynchAutomaton.nbrOfMutuallyAcceptingNotForbiddenStates());
-
+								
 				// Some statistics
 				logger.fatal("states: " + currSynchAutomaton.nbrOfStates() + " forb: " +
 							 currSynchAutomaton.nbrOfForbiddenStates() + " mutnotforb: " +
 							 currSynchAutomaton.nbrOfMutuallyAcceptingNotForbiddenStates() + " mut: " +
 							 currSynchAutomaton.nbrOfMutuallyAcceptingStates());
-
-				// How many automata did we synchronize? Did we break the record?
-				if (currSynchAutomata.size() > maxSynchronized)
-				{
-					maxSynchronized = currSynchAutomata.size();
-				}
-
+								
 				// Have we had enough of this mma..mmammm..mmmammmm...mmmadness?
-				if (currSynchAutomaton.nbrOfStates() > 2500)
+				if (currSynchAutomaton.nbrOfStates() > 2000)
 				{
- 					logger.error("Gave up because of state explosion!");
+					// Switch to BDD verification?
+					// useBDDAlgorithm = true;
+					logger.error("Gave up because of state explosion!");
 					break;
 				}
 			}
@@ -483,8 +498,8 @@ public class MutuallyNonblockingVerifier
 	}
 
 	/**
-	 * Adds the most interesting automaton in theAutomata to theAutomata and
-	 * synchronizes it with theSynch, returning the resulting automaton.
+	 * Finds the most interesting automaton in theAutomata relative (in some sense) to synchAutomaton and
+	 * returns it.
 	 */
 	private Automaton getInterestingAutomaton(Automata synchAutomata, Automaton synchAutomaton)
 	{
@@ -503,8 +518,8 @@ public class MutuallyNonblockingVerifier
 		int bestValue = Integer.MAX_VALUE;
 		for (int i = 0; i < interestingEvents.size(); i++)
 		{
-			// int index = i;
-			int index = (int) Math.floor(Math.random() * interestingEvents.size());
+			int index = i;
+			// int index = (int) Math.floor(Math.random() * interestingEvents.size());
 
 			LabeledEvent currEvent = (LabeledEvent) interestingEvents.elementAt(index);
 
@@ -800,28 +815,22 @@ public class MutuallyNonblockingVerifier
 		// Nothing left?
 		if (automataBminusA.size() == 0)
 		{
-			return null;
+			// Everything is unique!!
+			return automataA.getUnionAlphabet();
 		}
 
-		try
-		{
-			Alphabet alphabetA = AlphabetHelpers.getUnionAlphabet(automataA);
-			Alphabet alphabetB = AlphabetHelpers.getUnionAlphabet(automataBminusA);
-
-			alphabetA.minus(alphabetB);
-			result = alphabetA;
-		}
-		catch (Exception oj)
-		{
-			logger.error(oj);
-		}
+		Alphabet alphabetA = automataA.getUnionAlphabet();
+		Alphabet alphabetB = automataBminusA.getUnionAlphabet();
+		
+		alphabetA.minus(alphabetB);
+		result = alphabetA;
 
 		return result;
 	}
 
 	/**
-	 * Examines if the blocking states in theAutomaton are reachable by making a language
-	 * inclusion test.
+	 * Examines if the blocking states (or rather - the not mutually accepting states) in 
+	 * theAutomaton are reachable by making a language inclusion test.
 	 */
 	private void languageInclusionTest(Automaton theAutomaton)
 	{
@@ -902,28 +911,31 @@ public class MutuallyNonblockingVerifier
 
 	/**
 	 * Add safe events to theSafeEvents according to the safeness of the events in theAutomaton.
+	 *
+	 * @param theAutomataCopy Will be fiddled with, don't bring sensitive information here. 
 	 */
 	private void addSafeEvents(Events theSafeEvents, Automaton currAutomaton, Automata theAutomataCopy)
 	{
-		addSafeEvents(theSafeEvents, currAutomaton.getAlphabet(), new Automata(currAutomaton), theAutomataCopy);
+		addSafeEvents(theSafeEvents, new Automata(currAutomaton), theAutomataCopy);
 	}
 
 	/**
 	 * Add safe events to theSafeEvents according to the safeness of the events in selectedAutomata.
+	 *
+	 * @param theAutomataCopy Will be fiddled with, don't bring sensitive information here. 
 	 */
-	private void addSafeEvents(Events theSafeEvents, Alphabet theAlphabet,
-							   Automata selectedAutomata, Automata theAutomataCopy)
+	private void addSafeEvents(Events theSafeEvents, Automata selectedAutomata, Automata theAutomataCopy)
 	{
-		//Alphabet theAlphabet = theAutomaton.getAlphabet();
+		// Get the alphabets of the selected automata
+		Alphabet theAlphabet = selectedAutomata.getUnionAlphabet();
+
+		// Iterate over the alphabet
 		for (Iterator evIt = theAlphabet.iterator(); evIt.hasNext(); )
 		{
-			// This test should be here because of the 'continue' statements below.
 			if (stopRequested)
 				return;
 
 			LabeledEvent currEvent = (LabeledEvent)evIt.next();
-			//logger.debug("Event: " + currEvent + " (" +
-			//			(currEvent.isControllable() ? "controllable" : "uncontrollable") + ")...");
 
 			// Perhaps we have already added this event?
 			if (theSafeEvents.containsEventWithLabel(currEvent))
@@ -949,7 +961,8 @@ public class MutuallyNonblockingVerifier
 			boolean isSafe = checkSafeness(theAutomataCopy, selectedAutomata, currEvent);
 			if (isSafe)
 			{
-				logger.debug("The event " + currEvent + " is safe.");
+				if (verboseMode)
+					logger.debug("The event " + currEvent + " is safe.");
 
 				try
 				{
@@ -963,7 +976,8 @@ public class MutuallyNonblockingVerifier
 			}
 			else
 			{
-				logger.debug("The event " + currEvent + " is unsafe.");
+				if (verboseMode)
+					logger.debug("The event " + currEvent + " is unsafe.");
 			}
 
 			if (stopRequested)
@@ -989,7 +1003,6 @@ public class MutuallyNonblockingVerifier
 		for (Iterator autIt = totalSystem.iterator(); autIt.hasNext();)
 		{
 			Automaton currAutomaton = (Automaton)autIt.next();
-			//if (currAutomaton.getName() == thePlantAutomaton.getName()) // Equal name? Is this enough?
 			if (thePlantAutomata.containsAutomaton(currAutomaton.getName())) // Equal name? Is this enough?
 			{
 				currAutomaton.setType(AutomatonType.Plant);
@@ -1193,6 +1206,26 @@ public class MutuallyNonblockingVerifier
 	}
 
 	/**
+	 * Compute NB?, ignores all events [and their arcs!] not in the given alphabet.
+	 *
+	 * TODO: we should switch to BDDs only if the system is becoming too large
+	 *       (BDD algos have some startup latency...)
+	 *
+	 * I think the exception is thrown only if there is something wrong with th input automata
+	 * (non existing events in transitions or controllability inconsistency)
+	 *
+	 *    /Arash
+	 */
+	public boolean isMutuallyCoaccessibleBDD(Automata automata, Alphabet alphabet)
+		throws Exception 
+	{
+		AutomataBDDVerifier abf = new AutomataBDDVerifier(automata, alphabet, null);
+		boolean ret = abf.isNonBlocking();
+		abf.cleanup();
+		return ret;
+	}
+
+	/**
 	 * Method that stops MutuallyNonblockingVerifier as soon as possible.
 	 *
 	 * @see  ExecutionDialog
@@ -1288,26 +1321,4 @@ class AutomataToEventMap
 		}
 		return sb.toString();
 	}
-
-
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Compute NB?, ignores all events [and their arcs!] not in the given alphabet.
-	 *
-	 * TODO: we should switch to BDDs only if the system is becoming too large
-	 *       (BDD algos have some startup latency...)
-	 *
-	 * I think the exception is thrown only if there is something wrong with th input automata
-	 * (non existing events in transitions or controllability inconsistency)
-	 *
-	 *    /Arash
-	 */
-	public boolean isMutuallyCoaccessible(Automata automata, Alphabet alphabet) throws Exception {
-		AutomataBDDVerifier abf = new AutomataBDDVerifier(automata, alphabet, null );
-		boolean ret = abf.isNonBlocking();
-		abf.cleanup();
-		return ret;
-	}
-
 }

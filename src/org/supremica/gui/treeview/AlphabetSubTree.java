@@ -11,10 +11,14 @@ import java.util.*;
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.LabeledEvent;
+import org.supremica.gui.Supremica;
 
 public class AlphabetSubTree
 	extends SupremicaTreeNode
 {
+	private static ImageIcon alphabetIcon = 
+		new ImageIcon(Supremica.class.getResource("/icons/Alphabet16.gif"));
+
 	public AlphabetSubTree(Alphabet alpha)
 	{
 		super("Alphabet");
@@ -34,5 +38,19 @@ public class AlphabetSubTree
 			root.add(new EventSubTree(currEvent));
 		}
 	}
+
+	public Icon getOpenIcon()
+	{		
+		return alphabetIcon;
+	}
+
+	public Icon getClosedIcon()
+	{
+		return getOpenIcon();
+	}
+
+	public Icon getLeafIcon()
+	{
+		return getOpenIcon();
+	}
 }
-	

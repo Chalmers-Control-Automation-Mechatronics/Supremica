@@ -371,8 +371,9 @@ public class AutomataSynthesizer
 		else if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.Modular) // modular case
 		{
 			theTimer.start();
-			doModular(theAutomata);
+			Automata newSupervisors = doModular(theAutomata);
 			theTimer.stop();
+			gui.addAutomata(newSupervisors); // let the user choose the name later
 		}
 		else if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.BDD) // more BDD Stuff
 		{
@@ -449,7 +450,7 @@ public class AutomataSynthesizer
 	/**
 	 * Does modular synthesis...
 	 */
-	private void doModular(Automata theAutomata)
+	private Automata doModular(Automata theAutomata)
 		throws Exception
 	{
 		Automata modSupervisors = new Automata(); // collects the calculated supervisors
@@ -517,13 +518,10 @@ public class AutomataSynthesizer
 			optimize(theAutomata, modSupervisors);
 		}
 		
-		if (modSupervisors.size() > 0)
+		if (modSupervisors.size() == 0)
 		{
-			gui.addAutomata(modSupervisors);
-		}
-		else
-		{
-			logger.info("No problems found, the specifications can be used as supervisors, as is.");
+			logger.info("No problems found, the current specifications and supervisors " + 
+						"can be used to supervise the system.");
 		}
 		
 		if(synthesizerOptions.getSynthesisType() == SynthesisType.Nonblocking ||
@@ -533,6 +531,8 @@ public class AutomataSynthesizer
 						"is that each supervisor is individually nonblocking with respect to the " +
 						"plants it controls");
 		}
+
+		return modSupervisors;
 	}
 	
 	// se the real implementation below

@@ -1624,34 +1624,6 @@ public class ActionMan
 																		   syncOptions, verificationOptions);
 	}
 
-	// Automaton.Alphabet action performed
-	public static void automatonAlphabet_actionPerformed(Gui gui)
-	{
-		//logger.debug("ActionMan::automatonAlphabet_actionPerformed(gui)");
-
-		Automata selectedAutomata = gui.getSelectedAutomata();
-		if (!selectedAutomata.sanityCheck(gui, 1, false, false, true))
-		{
-			return;
-		}
-
-		// Why not simpy instantiate an AlphabetViewer with the given
-		// automata object?? Use AutomataViewer instead!
-		try
-		{
-			// AlphabetViewer alphabetviewer = new AlphabetViewer(selectedAutomata);
-			AutomataViewer alphabetviewer = new AutomataViewer(selectedAutomata, true, false);
-			alphabetviewer.setVisible(true);
-		}
-		catch(Exception ex)
-		{
-			// logger.error("Exception in AlphabetViewer", ex);
-			logger.error("Exception in AutomataViewer: " + ex);
-			logger.debug(ex.getStackTrace());
-			return;
-		}
-	}
-
 	// Automaton.ActionAndControlViewer action performed
 	public static void actionAndControlViewer_actionPerformed(Gui gui)
 	{
@@ -1933,6 +1905,58 @@ public class ActionMan
 			logger.error("Exception in AutomataHierarchyViewer.", ex);
 			logger.debug(ex.getStackTrace());
 
+			return;
+		}
+	}
+
+	// View the automatas individual states in a tree structure
+	public static void statesView_actionPerformed(Gui gui)
+	{
+		Automata selectedAutomata = gui.getSelectedAutomata();
+		if (!selectedAutomata.sanityCheck(gui, 1, false, false, true))
+		{
+			return;
+		}
+
+		try
+		{
+			AutomataViewer statesViewer = new AutomataViewer(selectedAutomata, false, true);
+			statesViewer.setVisible(true);
+		}
+		catch(Exception ex)
+		{
+			// logger.error("Exception in AlphabetViewer", ex);
+			logger.error("Exception in AutomataViewer: " + ex);
+			logger.debug(ex.getStackTrace());
+			return;
+		}
+	}
+
+	// Automaton.Alphabet action performed
+	// public static void automatonAlphabet_actionPerformed(Gui gui)
+	public static void alphabetView_actionPerformed(Gui gui)
+	{
+		//logger.debug("ActionMan::automatonAlphabet_actionPerformed(gui)");
+
+		Automata selectedAutomata = gui.getSelectedAutomata();
+		if (!selectedAutomata.sanityCheck(gui, 1, false, false, true))
+		{
+			return;
+		}
+
+		// Why not simpy instantiate an AlphabetViewer with the given
+		// automata object?? Use AutomataViewer instead!
+		try
+		{
+			// AlphabetViewer alphabetviewer = new AlphabetViewer(selectedAutomata);
+			AutomataViewer alphabetViewer = new AutomataViewer(selectedAutomata, true, false);
+			alphabetViewer.setVisible(true);
+		}
+		catch(Exception ex)
+		{
+			// logger.error("Exception in AlphabetViewer", ex);
+			logger.error("Exception in AutomataViewer: " + ex);
+			logger.debug(ex.getStackTrace());
 			return;
 		}
 	}

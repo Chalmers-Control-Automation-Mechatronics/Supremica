@@ -18,11 +18,11 @@ import org.supremica.gui.Supremica;
 public class AutomatonSubTree	
 	extends SupremicaTreeNode
 {
-	private ImageIcon plantIcon = 
+	private static ImageIcon plantIcon = 
 		new ImageIcon(Supremica.class.getResource("/icons/Plant16.gif"));
-	private ImageIcon specificationIcon = 
+	private static ImageIcon specificationIcon = 
 		new ImageIcon(Supremica.class.getResource("/icons/Specification16.gif"));
-	private ImageIcon interfaceIcon = 
+	private static ImageIcon interfaceIcon = 
 		new ImageIcon(Supremica.class.getResource("/icons/Interface16.gif"));
 
 	public AutomatonSubTree(Automaton automaton, boolean includeAlphabet, boolean includeStates)

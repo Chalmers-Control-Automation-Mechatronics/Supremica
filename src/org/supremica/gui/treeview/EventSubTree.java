@@ -23,9 +23,9 @@ import org.supremica.gui.Supremica;
 public class EventSubTree
 	extends SupremicaTreeNode
 {
-	private ImageIcon controllableIcon = 
+	private static ImageIcon controllableIcon = 
 		new ImageIcon(Supremica.class.getResource("/icons/ControllableEvent16.gif"));
-	private ImageIcon uncontrollableIcon = 
+	private static ImageIcon uncontrollableIcon = 
 		new ImageIcon(Supremica.class.getResource("/icons/UncontrollableEvent16.gif"));
 
 	public EventSubTree(LabeledEvent event)
