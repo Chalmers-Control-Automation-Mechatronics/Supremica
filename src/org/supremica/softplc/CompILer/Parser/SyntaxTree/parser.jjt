@@ -286,7 +286,7 @@ TOKEN: /* double_byte_character_representation */
 TOKEN:  /* common_character_representation */
 	/* Egna tillägg:
 	 * " "
-     * "å", ...
+	 * "å", ...
 	 */
 
 {

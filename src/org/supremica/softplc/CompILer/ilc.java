@@ -12,7 +12,6 @@ import java.io.*;
 public class ilc
 {
     public static void main(String[] args) {
-	System.out.println("ilc startar...");
 	if (args.length != 2)
 	    {
 		System.err.println("Usage: ilcompiler file.il outputDir");
@@ -29,17 +28,23 @@ public class ilc
 	try {
 	    BufferedReader ilReader = new BufferedReader(new FileReader(new File(ilFile)));
 	    
+	    if (logger != null)
+		logger.info("Compiling " + ilFile + "...");
+	    else
+		System.out.println("Compiling " + ilFile + "...");
 	    parser p = new parser(ilReader);
 	    
 	    try {
 		SimpleNode n = p.Start();
 		
-		// XXXn.dump("");
+		// XXX
+		n.dump("");
 		
 		new VariableChecker(n);
 		//XXX new VaribleChecker(n,logger);
-		
-		// XXXn.dump("");
+		//System.out.println("VarChecker färdig");
+		// XXX
+		//n.dump("");
 		
 		JavaBytecodeGenerator jb = new JavaBytecodeGenerator(n, outDir, logger, debug);
 		//XXXnew JavaBytecodeGenerator(n, null/*output directory*/, logger);

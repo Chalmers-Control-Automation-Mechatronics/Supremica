@@ -355,6 +355,14 @@ public abstract class ProgramAndFBBuilder
 					   var.getFieldSelector(), Type.STRING
 					   , Constants.GETFIELD));
 			    }
+			else if (type == TypeConstant.T_DERIVED)
+			    { //XXX den här måste kontrolleras
+				il.append(fac.createFieldAccess
+					  (/*fb type name*/var.getTypeName(),
+					   var.getFieldSelector(), Type.OBJECT
+					   , Constants.GETFIELD));
+				warn("Type not checked when loading derived data types"); //XXX stämmer det
+			    }
 			else
 			    {
 				error("IO variables in function blocks can not be of type "+type);
@@ -365,7 +373,7 @@ public abstract class ProgramAndFBBuilder
 			// XXX should implement this
 			error("Only loading of elements in " +
 			      "derived variables are implemented " +
-			      "so far.");
+			      "so far. Not load of derived itself"); //XXX
 		    }
 	    }
 	else
@@ -483,6 +491,15 @@ public abstract class ProgramAndFBBuilder
 					   var.getFieldSelector(), Type.STRING,
 					   Constants.PUTFIELD));
 			    }
+			else if (type == TypeConstant.T_DERIVED) //XXX funkar inte detta utan att ha typnamnet för derived var så
+			                                         //XXX struntar vi i det.
+			    {
+				il.append(InstructionConstants.SWAP);
+				il.append(fac.createFieldAccess
+					  (/*fb type name*/var.getTypeName(),
+					   var.getFieldSelector(), Type.OBJECT,
+					   Constants.PUTFIELD));
+			    }
 			else
 			    {
 				error("IO variables in function blocks can "+
@@ -492,9 +509,9 @@ public abstract class ProgramAndFBBuilder
 		else
 		    {    /* the derived variable itself */
 			// XXX should implement this
-			error("Only loading of elements in " +
-					   "derived variables are implemented " +
-					   "so far.");
+			error("Only storing of elements in " +
+			      "derived variables are implemented " +
+			      "so far. Not store of derived itself."); //XXX
 		    }
 	    }
 	else
@@ -2234,6 +2251,10 @@ public abstract class ProgramAndFBBuilder
 			else if (var.getType() == TypeConstant.T_REAL)
 			    {
 				ilRun.append(fac.createInvoke("java.io.PrintStream", print_type, Type.VOID, new Type[]{ Type.FLOAT }, Constants.INVOKEVIRTUAL));
+			    }
+			else if (var.getType() == TypeConstant.T_WSTRING)
+			    {
+				ilRun.append(fac.createInvoke("java.io.PrintStream", print_type, Type.VOID, new Type[]{ Type.STRING }, Constants.INVOKEVIRTUAL));
 			    }
 			else
 			    {
