@@ -8,22 +8,22 @@ package org.supremica.softplc.CompILer.Parser.SyntaxTree;
 public final class SimpleCharStream
 {
 	public static final boolean staticFlag = true;
-	static int bufsize;
-	static int available;
-	static int tokenBegin;
-	static public int bufpos = -1;
-	static private int bufline[];
-	static private int bufcolumn[];
-	static private int column = 0;
-	static private int line = 1;
-	static private boolean prevCharIsCR = false;
-	static private boolean prevCharIsLF = false;
-	static private java.io.Reader inputStream;
-	static private char[] buffer;
-	static private int maxNextCharInd = 0;
-	static private int inBuf = 0;
+	int bufsize;
+	int available;
+	int tokenBegin;
+	public int bufpos = -1;
+	private int bufline[];
+	private int bufcolumn[];
+	private int column = 0;
+	private int line = 1;
+	private boolean prevCharIsCR = false;
+	private boolean prevCharIsLF = false;
+	private java.io.Reader inputStream;
+	private char[] buffer;
+	private int maxNextCharInd = 0;
+	private int inBuf = 0;
 
-	static private final void ExpandBuff(boolean wrapAround)
+	private void ExpandBuff(boolean wrapAround)
 	{
 		char[] newbuffer = new char[bufsize + 2048];
 		int newbufline[] = new int[bufsize + 2048];
@@ -75,7 +75,7 @@ public final class SimpleCharStream
 		tokenBegin = 0;
 	}
 
-	static private final void FillBuff()
+	private void FillBuff()
 		throws java.io.IOException
 	{
 		if (maxNextCharInd == available)
@@ -142,7 +142,7 @@ public final class SimpleCharStream
 		}
 	}
 
-	static public final char BeginToken()
+	public final char BeginToken()
 		throws java.io.IOException
 	{
 		tokenBegin = -1;
@@ -154,7 +154,7 @@ public final class SimpleCharStream
 		return c;
 	}
 
-	static private final void UpdateLineColumn(char c)
+	private void UpdateLineColumn(char c)
 	{
 		column++;
 
@@ -202,7 +202,7 @@ public final class SimpleCharStream
 		bufcolumn[bufpos] = column;
 	}
 
-	static public final char readChar()
+	public final char readChar()
 		throws java.io.IOException
 	{
 		if (inBuf > 0)
@@ -233,7 +233,7 @@ public final class SimpleCharStream
 	 * @deprecated
 	 * @see #getEndColumn
 	 */
-	static public final int getColumn()
+	public final int getColumn()
 	{
 		return bufcolumn[bufpos];
 	}
@@ -242,32 +242,32 @@ public final class SimpleCharStream
 	 * @deprecated
 	 * @see #getEndLine
 	 */
-	static public final int getLine()
+	public final int getLine()
 	{
 		return bufline[bufpos];
 	}
 
-	static public final int getEndColumn()
+	public final int getEndColumn()
 	{
 		return bufcolumn[bufpos];
 	}
 
-	static public final int getEndLine()
+	public final int getEndLine()
 	{
 		return bufline[bufpos];
 	}
 
-	static public final int getBeginColumn()
+	public final int getBeginColumn()
 	{
 		return bufcolumn[tokenBegin];
 	}
 
-	static public final int getBeginLine()
+	public final int getBeginLine()
 	{
 		return bufline[tokenBegin];
 	}
 
-	static public final void backup(int amount)
+	public final void backup(int amount)
 	{
 		inBuf += amount;
 
@@ -362,7 +362,7 @@ public final class SimpleCharStream
 		ReInit(dstream, startline, startcolumn, 4096);
 	}
 
-	static public final String GetImage()
+	public final String GetImage()
 	{
 		if (bufpos >= tokenBegin)
 		{
@@ -374,7 +374,7 @@ public final class SimpleCharStream
 		}
 	}
 
-	static public final char[] GetSuffix(int len)
+	public final char[] GetSuffix(int len)
 	{
 		char[] ret = new char[len];
 
@@ -391,7 +391,7 @@ public final class SimpleCharStream
 		return ret;
 	}
 
-	static public void Done()
+	public void Done()
 	{
 		buffer = null;
 		bufline = null;
@@ -401,7 +401,7 @@ public final class SimpleCharStream
 	/**
 	 * Method to adjust line and column numbers for the start of a token.<BR>
 	 */
-	static public void adjustBeginLineColumn(int newLine, int newCol)
+	public void adjustBeginLineColumn(int newLine, int newCol)
 	{
 		int start = tokenBegin;
 		int len;
