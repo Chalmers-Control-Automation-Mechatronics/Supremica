@@ -102,11 +102,12 @@
 	<unjar src="${lib}/natutil.jar" dest="${lib}/${unjared}"/>
 	<unjar src="${lib}/scenebeansXmlCompability.jar" dest="${lib}/${unjared}"/>
 	<unjar src="${lib}/BCEL.jar" dest="${lib}/${unjared}"/>
-    <unjar src="${lib}/concurrent.jar" dest="${lib}/${unjared}"/>
-    <unjar src="${lib}/jgl3.1.0.jar" dest="${lib}/${unjared}"/>
- 	<mkdir dir="${lib}/licensed"/>
- 	<touch file="${lib}/licensed/JGo.jar"/>	
- 	<touch file="${lib}/licensed/JGoLayout.jar"/>	 	
+	<unjar src="${lib}/concurrent.jar" dest="${lib}/${unjared}"/>
+	<unjar src="${lib}/jgl3.1.0.jar" dest="${lib}/${unjared}"/>
+	<unjar src="${lib}/izmcomjni.jar" dest="${lib}/${unjared}"/>
+	<mkdir dir="${lib}/licensed"/>
+	<touch file="${lib}/licensed/JGo.jar"/>	
+	<touch file="${lib}/licensed/JGoLayout.jar"/>	 	
 	<unjar src="${lib}/licensed/JGo.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/licensed/JGoLayout.jar" dest="${lib}/${unjared}"/>
 	
