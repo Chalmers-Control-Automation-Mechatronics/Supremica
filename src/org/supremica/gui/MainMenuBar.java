@@ -255,7 +255,6 @@ public class MainMenuBar
 
 		if (SupremicaProperties.fileAllowImport())
 		{
-
 			// File.Import
 			JMenu menuFileImport = new JMenu();
 
@@ -326,7 +325,6 @@ public class MainMenuBar
 
 		if (SupremicaProperties.fileAllowExport())
 		{
-
 			// File.Export
 			JMenu menuFileExport = new JMenu();
 
@@ -436,7 +434,6 @@ public class MainMenuBar
 
 		if (SupremicaProperties.generalUseSecurity())
 		{
-
 			// File.Login
 			JMenuItem menuFileLogin = new JMenuItem();
 

@@ -79,17 +79,22 @@ public class RobotStudioLink
 	implements DAppEvents
 {
 	// Initialize jacoZoom
-	static
-	{
-		com.inzoom.comjni.Dll.runRoyaltyFree(643622874);
-	}
+	static {com.inzoom.comjni.Dll.runRoyaltyFree(643622874);}
 
 	private static Logger logger = LoggerFactory.createLogger(RobotStudioLink.class);
 
+	/** The RobotStudio application. */
 	private static Application app = null;
-	private static Gui gui;
-	private static IStation activeStation;
+	/** The active RopbotStudio station. */
+	private static IStation activeStation = null;
+	/** The name of the current active station. */
 	private static String stationName;
+	/** The Supremica gui. */
+	private static Gui gui;
+
+	// Constants
+	/** The name of the Path containing the mutex zones, don't change! */
+	private final static String mutexPartName = "MutexZones";
 
 	// Generated automata
 	private static Automata robotAutomata;
@@ -113,7 +118,7 @@ public class RobotStudioLink
 	{
 		String stationName = "C:/temp/RobSuprTestStation/RobSuprTest.stn";
 		RobotStudioLink rsl = new RobotStudioLink(gui, stationName);
-		rsl.init();
+		rsl.start();
 
 		//programStructureTest();
 
@@ -122,6 +127,52 @@ public class RobotStudioLink
 		//pathSplittingTest();
 	}
 
+/* FROM VB
+Private Sub CommandButton13_Click()
+    Dim pOld As path
+    Dim tRef As TargetRef
+
+    Set pOld = ActiveStation.Paths("MOV_mv_flaeche")
+    Set tRef = ActiveStation.Paths("MOV_mv_flaeche").TargetRefs(4)
+    Call SplitPath(pOld, tRef)
+End Sub
+
+Sub SplitPath(pOld As path, t As TargetRef)
+
+    Set m = ActiveStation.ActiveMechanism
+    Dim pNew As path
+    Set pNew = m.Paths.Add
+    pNew.name = "Split"
+
+    Dim index As Integer
+
+    ' get the index of the target
+    For iCount = 1 To pOld.TargetRefs.Count
+        If pOld.TargetRefs(iCount) = t Then
+            index = iCount
+        End If
+    Next iCount
+
+    UserOptions.UseRobotConfiguration = False
+    MsgBox UserOptions.UseRobotConfiguration
+
+    ' copy the targets and delete it from the old path
+    Dim tRef As TargetRef
+    Dim tempTarget As ITarget
+    Dim i As Integer
+    i = 1
+    While i <= index
+        Set tempTarget = pOld.TargetRefs(1).target
+        Call pNew.Insert(tempTarget)
+        ' dont delete the last one
+        If Not i = index Then
+            Call pOld.TargetRefs(1).Delete
+        End If
+        i = i + 1
+    Wend
+End Sub
+*/
+
 	public static void pathSplittingTest()
 	{
 		//IPath path = activeStation.getPaths().item(var("I1A1"));
@@ -129,7 +180,7 @@ public class RobotStudioLink
 
 	/**
 	 * This test is supposed to show wether a path contains information
-	 * on what mechanism it controls... so to speak.
+	 * on what mechanism it controls... so to speak. It turned out it doesn't!
 	 */
 	public static void mechanismFromPathTest()
 	{
@@ -251,6 +302,7 @@ public class RobotStudioLink
 					Thread.sleep(1000);
 				}
 			}
+
 			LinkedList robots = getMechanismsWithRole(activeStation, RsKinematicRole.rsKinematicRoleRobot);
 			//LinkedList devices = getMechanismsWithRole(activeStation, RsKinematicRole.rsKinematicRoleDevice);
 			//LinkedList tools = getMechanismsWithRole(activeStation, RsKinematicRole.rsKinematicRoleTool);
@@ -261,6 +313,10 @@ public class RobotStudioLink
 			for (int i=0;i<robots.size();i++)
 			{
 				IMechanism robot = (IMechanism) robots.get(i);
+
+				//IWorkObjects workObjects = robot.getWorkObjects();
+				//for (int j=1; j<=workObjects.getCount(); j++)
+				//	logger.info("wo(" + j + ") = " + workObjects.item(var(j)).getName() + " " + workObjects.item(var(j)).getTargets().item(var(1)).getName());
 
 				//robot.examine();
 				//robot.unexamine();
@@ -306,23 +362,20 @@ public class RobotStudioLink
 				// Wait for the simulation to stop
 				simulationListener.waitForSimulationStop();
 
-				/*
-					robot.moveAlongPath(robot.getPaths().item(var(1)));
-				*/
-
 				// Generate automaton and add automaton to gui
 				double[] targetTimes = mechanismListener.getTargetTimes();
 				Automaton robotAutomaton = buildAutomaton(robot, targetTimes);
 				robotAutomata.addAutomaton(robotAutomaton);
 				gui.addAutomaton(robotAutomaton);
 
-				// Adjust mutex automaton
+				// Adjust mutex automata
 				//for (Iterator autIt = mutexAutomata.iterator(); autIt.hasNext();)
 				for (int j=0; j<mutexAutomata.size(); j++)
 				{
 					//Automaton mutexAutomaton = (Automaton) autIt.next();
 					Automaton mutexAutomaton = mutexAutomata.getAutomatonAt(j);
 					String zoneName = mutexAutomaton.getName();
+					// Get the collision times for this zone recorded during the simulation
 					double[][] collisionTimes = mechanismListener.getCollisionTimes(zoneName);
 					if (collisionTimes != null)
 					{
@@ -340,7 +393,6 @@ public class RobotStudioLink
 				mech.remove_MechanismEventsListener(mechanismListener);
 				sim.removeDSimulationEventsListener(simulationListener);
 			}
-
 	    }
 	    catch(Exception e)
 	    {
@@ -349,6 +401,49 @@ public class RobotStudioLink
 	    }
 
 		return;
+	}
+
+	/**
+	 * Runs simulation of certain path presuming the controller is started.
+	 */
+	private static double runSimulation(IPath path)
+		throws Exception
+	{
+		// Get the active mechanism
+		IMechanism mechanism = activeStation.getActiveMechanism();
+
+		// Adjust program
+		// Find program structure (find the main procedure)
+		IABBS4Procedure main = getMainProcedure(mechanism);
+		if (main == null || main.getProcedureCalls().getCount() == 0)
+			throw new Exception("No main procedure in program.");
+		// Rename main procedure
+		main.setName("oldMainTemp");
+		// Create new main procedure
+		IABBS4Procedure newMain = main.getParent().getProcedures().add();
+		newMain.setName("main");
+		// Add our path
+		IABBS4ProcedureCalls calls = newMain.getProcedureCalls();
+		calls.add(path.getProcedure());
+
+		// Add SimulationListener
+		ISimulation simulation = activeStation.getSimulations().item(var(1));
+		Simulation sim = Simulation.getSimulationFromUnknown(simulation);
+		SimulationListener simulationListener = new SimulationListener();
+		sim.addDSimulationEventsListener(simulationListener);
+		// Start a thread running the simulation in RobotStudio
+		simulation.start();
+		// Wait for the simulation to stop
+		simulationListener.waitForSimulationStop();
+		// Stop listening!
+		sim.removeDSimulationEventsListener(simulationListener);
+
+		// Restore the old main procedure
+		newMain.delete();
+		main.setName("main");
+
+		// Return simulation time...
+		return 0;
 	}
 
 	/**
@@ -388,23 +483,21 @@ public class RobotStudioLink
 		if (main == null || main.getProcedureCalls().getCount() == 0)
 			throw new Exception("No main procedure in program.");
 
-		// Create automaton
-		Automaton automaton = new Automaton();
-		Alphabet alphabet = automaton.getAlphabet();
-
-		// Set automaton name to mechanism name
-		automaton.setName(mechanism.getName());
+		// Create automaton of plant type and with the mechanism's name
+		Automaton automaton = new Automaton(mechanism.getName());
 		automaton.setType(AutomatonType.Plant);
+		Alphabet alphabet = automaton.getAlphabet();
 
 		// Initial state
 		State state = automaton.createAndAddUniqueState(null);
 		state.setName("Home");
 		state.setAccepting(true);
-		state.setCost(0);
+		if (targetTimes != null)
+			state.setCost(0);
  		automaton.setInitialState(state);
 
 		// Loop through the subprodecures of the main procedure in the ABBS4Controller program
-		// create arcs for every path (procedure)
+		// create 2 arcs and 1 state for every path (procedure)
 		State prevState;
 		LabeledEvent startEvent;
 		LabeledEvent stopEvent;
@@ -415,7 +508,7 @@ public class RobotStudioLink
 
 			prevState = state;
 
-			// Create start event and from prevState to state
+			// Create X_start event and from prevState to state
 			startEvent = new LabeledEvent(pathName + "_start");
 			if (!alphabet.containsEqualEvent(startEvent))
 				alphabet.addEvent(startEvent);
@@ -431,12 +524,12 @@ public class RobotStudioLink
 
 			prevState = state;
 
-			// Create end event and from prevState to state
+			// Create X_finish event and from prevState to state
 			stopEvent = new LabeledEvent(pathName + "_finish");
 			stopEvent.setControllable(false);
 			if (!alphabet.containsEqualEvent(stopEvent))
 				alphabet.addEvent(stopEvent);
-			if (i==calls.getCount())
+			if (i == calls.getCount())
 			{   // Loop back home
 				state = automaton.getInitialState();
 			}
@@ -460,7 +553,6 @@ public class RobotStudioLink
 		throws Exception
 	{
 		IABBS4Modules modules = mechanism.getController().getModules();
-	   	//Thread.sleep(2000);
 		for (int i=1;i<=modules.getCount();i++)
 		{
 			//logger.info(modules.item(var(i)).getName());
@@ -482,14 +574,13 @@ public class RobotStudioLink
 	}
 
 	/**
-	 * Creates mutex zones that guarantees no collisions between robots
+	 * Creates mutex zones that guarantees no collisions between robots.
+	 * The individual zones are IEntities in the IPart named mutexPartName.
      */
 	public static void createMutexZones()
 	{
 		try
-		{
-			// Make sure there is a part for mutexPartName
-			final String mutexPartName = "MutexZones"; // This name should be fixed!
+		{	// Make sure there is a part for mutexPartName
 			try
 			{
 				activeStation = app.getActiveStation();
@@ -507,17 +598,17 @@ public class RobotStudioLink
 			    }
 			}
 
+			// CRASHES HERE IF ZONES ALREADY CREATED! FIXA!
 			// Create two boxes (two IEntity), both members of the IPart "MutexZones"
-			createBox(-0.25, 0.125, 0.75, 0, 0, 0, 0.5, 0.5, 0.5, mutexPartName, "MutexZone1");
-			createBox(-0.25, -0.625, 0.75, 0, 0, 0, 0.5, 0.5, 0.5, mutexPartName, "MutexZone2");
-			createBox(-0.125, -0.125, 0.875, 0, 0, 0, 0.25, 0.25, 0.25, mutexPartName, "MutexZone3");
+			createBox(-0.25, 0.125, 0.75, 0, 0, 0, 0.5, 0.5, 0.5, "MutexZone1");
+			createBox(-0.25, -0.625, 0.75, 0, 0, 0, 0.5, 0.5, 0.5, "MutexZone2");
+			createBox(-0.125, -0.125, 0.875, 0, 0, 0, 0.25, 0.25, 0.25, "MutexZone3");
 
 			// Create automata representing the mutexzones (one per zone)
 			IPart mutexPart = activeStation.getParts().item(var(mutexPartName));
 			IEntities mutexEntities = mutexPart.getEntities();
 			for (int i=1; i<=mutexEntities.getCount(); i++)
-			{
-				// Construct automaton
+			{	// Construct automaton
 				String entityName = mutexEntities.item(var(i)).getName();
 				Automaton automaton = new Automaton(entityName);
 				automaton.setType(AutomatonType.Specification);
@@ -542,10 +633,9 @@ public class RobotStudioLink
 	/**
 	 * Creates box (intended to be a mutual exclusion volume)
 	 *
-	 * @par mutexPartName The name of the part containing all mutexzones
 	 * @par name The name of this certain mutexbox
 	 */
-	private static void createBox(double tx, double ty, double tz, double rx, double ry, double rz, double wx, double wy, double wz, String mutexPartName, String name)
+	private static void createBox(double tx, double ty, double tz, double rx, double ry, double rz, double wx, double wy, double wz, String name)
 		throws Exception
 	{
 		// Create a new IEntity
@@ -640,7 +730,7 @@ public class RobotStudioLink
 			}
 			catch (Exception ex)
 			{
-				logger.error("Vitrual Controller could not be started.");
+				logger.error("Virtual Controller could not be started.");
 				return;
 			}
 			//IABBS4Controller controller = robot.getController();
@@ -652,12 +742,11 @@ public class RobotStudioLink
 			logger.error("Couldn't find robot or controller.");
 			return;
 		}
-
 	}
 
 	/**
-	 * Starts thread that moves robot along path. The controller must be
-	 * started for the (active) mechanism robot.
+	 * Starts thread that moves robot along path. The controller must
+	 * already be started for the (active) mechanism robot.
 	 */
 	public static void moveRobotAlongPath(IMechanism robot, IPath path)
 		throws Exception
@@ -701,7 +790,7 @@ public class RobotStudioLink
 		// Get parent name and test if it's correctly formatted
 		String frameName = path.getParent().getName();
 		if (!frameName.endsWith(">Elements"))
-			throw new Exception("Path member of illegal frame, \"" + frameName +"\".");
+			throw new Exception("Path " + path.getName() + " is member of an illegal frame, \"" + frameName +"\".");
 
 		// Get the name of the mechanism
 		String mechName = frameName.substring(1,frameName.length()-9); // 9 is the length of ">Elements"
@@ -770,16 +859,18 @@ public class RobotStudioLink
 	// DAppEvents interface methods
   	public void selectionChanged()
   	{
+		//logger.info("Selection changed.");
   	}
   	public void quit()
   	{
 		// This is fatal, cause this has never ever happened
 		// and I'd like to know if it ever does!
-		logger.fatal("RobotStudio is shutting down.");
+		logger.fatal("RobotStudio is shutting down. Please tell Hugo if you get this message!");
 		clean();
   	}
   	public int stationBeforeOpen(String Path,boolean[] Cancel)
   	{
+		//logger.info("Station being opened...");
     	return 0;
   	}
   	public int stationAfterOpen(org.supremica.external.comInterfaces.robotstudio_2_0.RobotStudio.Station Station)
@@ -789,27 +880,32 @@ public class RobotStudioLink
   	}
   	public int stationBeforeSave(org.supremica.external.comInterfaces.robotstudio_2_0.RobotStudio.Station Station,boolean[] Cancel)
   	{
+		//logger.info("Station being saved...");
     	return 0;
   	}
   	public int stationAfterSave(org.supremica.external.comInterfaces.robotstudio_2_0.RobotStudio.Station Station)
   	{
+		logger.info("Station saved...");
     	return 0;
   	}
   	public int libraryBeforeOpen(String FileName,boolean[] Cancel)
   	{
-		logger.info("Library opened.");
+		//logger.info("Library being opened...");
     	return 0;
   	}
 	public int libraryAfterOpen(org.supremica.external.comInterfaces.robotstudio_2_0.RobotStudio.RsObject RsObject)
   	{
+		//logger.info("Library opened.");
     	return 0;
   	}
   	public int libraryBeforeSave(org.supremica.external.comInterfaces.robotstudio_2_0.RobotStudio.RsObject RsObject,boolean[] Cancel)
   	{
+		//logger.info("Library being saved...");
     	return 0;
   	}
   	public int libraryAfterSave(org.supremica.external.comInterfaces.robotstudio_2_0.RobotStudio.RsObject RsObject)
   	{
+		//logger.info("Library saved.");
     	return 0;
   	}
   	public int started()
@@ -951,282 +1047,321 @@ public class RobotStudioLink
 			}
 		}
 	}
-}
 
-class MechanismListener extends _MechanismEventsAdapter
-{
-	private static Logger logger = LoggerFactory.createLogger(MechanismListener.class);
-
-	private IABBS4Controller controller = null;
-	private LinkedList targetTimes = new LinkedList(); // Doubles of targetReached-times
-	private LinkedList collisions = new LinkedList();  // CollisionDatas of collisionStart/End-times
-	private boolean leavingTarget = true;       // targetReached is invoked twice for every Target!
-	private boolean controllerStarted = false;  // Used in the wait-methods
-
-	// Events generated by RobotStudio.Mechanism
- 	public int targetReached()
-  	{
-		try
-		{
-			double motionTime = controller.getMotionTime();
-			targetTimes.add(new Double(motionTime));
-			if (!leavingTarget)
-				logger.info("Target reached at time " + (float) motionTime);
-			leavingTarget = !leavingTarget;
-		}
-		catch(Exception seeIfICare)
-		{
-		}
-		return 0;
-  	}
-	public int tick(float systemTime)
+	private static class MechanismListener extends _MechanismEventsAdapter
 	{
-		// This is fatal, cause this has never ever happened
-		// and I'd like to know if it ever does!
-		logger.fatal("Mechtick: " + systemTime);
-		return 0;
-	}
-  	public synchronized int collisionStart(RsObject collidingObject)
-  	{
-		try
-		{
-			String objectName = collidingObject.getName();
-			CollisionData data;
-			if (!collisions.contains(new CollisionData(objectName)))
-			{
-				data = new CollisionData();
-				data.setName(objectName);
-				data.setCount(0);
-				collisions.add(data);
-			}
-			else
-			{
-				data = (CollisionData) collisions.get(collisions.indexOf(new CollisionData(objectName)));
-			}
+		private static Logger logger = LoggerFactory.createLogger(MechanismListener.class);
 
-			if (data.getCount() == 0)
+		private IABBS4Controller controller = null;
+		private LinkedList targetTimes = new LinkedList(); // Doubles of targetReached-times
+		private LinkedList collisions = new LinkedList();  // CollisionDatas of collisionStart/End-times
+		private boolean leavingTarget = true;       // targetReached is invoked twice for every Target!
+		private boolean controllerStarted = false;  // Used in the wait-methods
+
+		// Events generated by RobotStudio.Mechanism
+		public int targetReached()
+		{
+			try
 			{
-				data.setStartTime(controller.getMotionTime());
-				logger.info("Start of collision with " + objectName + " at time " + (float) data.startTime);
+				double motionTime = controller.getMotionTime();
+				targetTimes.add(new Double(motionTime));
+				if (!leavingTarget)
+					logger.info("Target reached at time " + (float) motionTime);
+				leavingTarget = !leavingTarget;
 			}
-			data.setCount(data.getCount()+1);
-		}
-		catch (Exception whatever)
-		{
-		}
-    	return 0;
-  	}
-  	public synchronized int collisionEnd(org.supremica.external.comInterfaces.robotstudio_2_0.RobotStudio.RsObject collidingObject)
-  	{
-		try
-		{
-			String objectName = collidingObject.getName();
-			CollisionData data;
-			if (!collisions.contains(new CollisionData(objectName)))
+			catch(Exception seeIfICare)
 			{
-				logger.error("Collision ended mysteriously.");
-				return 1;
 			}
-			else
+			return 0;
+		}
+		public int tick(float systemTime)
+		{
+			// This is fatal, cause this has never ever happened
+			// and I'd like to know if it ever does!
+			logger.fatal("Mechtick: " + systemTime + ", please tell Hugo if you get this message.");
+			return 0;
+		}
+		public synchronized int collisionStart(RsObject collidingObject)
+		{
+			try
 			{
-				data = (CollisionData) collisions.get(collisions.indexOf(new CollisionData(objectName)));
-			}
+				String objectName = collidingObject.getName();
+				CollisionData data;
+				if (!collisions.contains(new CollisionData(objectName)))
+				{
+					data = new CollisionData();
+					data.setName(objectName);
+					data.setCount(0);
+					collisions.add(data);
+				}
+				else
+				{
+					data = (CollisionData) collisions.get(collisions.indexOf(new CollisionData(objectName)));
+				}
 
-			data.setCount(data.getCount()-1);
-			if (data.getCount() == 0)
+				// Is this the start?
+				if (data.getCount() == 0)
+				{
+					data.setStartTime(controller.getMotionTime());
+					logger.info("Start of collision with " + objectName + " at time " + (float) data.startTime);
+					//createTargetAtTCP(controller.getMechanism().getName() + "Enter" + objectName);
+					createTargetAtTCP("In" + objectName);
+				}
+				data.setCount(data.getCount()+1);
+			}
+			catch (Exception whatever)
 			{
-				data.setEndTime(controller.getMotionTime());
-				logger.info("End of collision with " + objectName+ " at time " + (float) data.endTime);
 			}
+			return 0;
 		}
-		catch (Exception whatever)
+		public synchronized int collisionEnd(org.supremica.external.comInterfaces.robotstudio_2_0.RobotStudio.RsObject collidingObject)
 		{
-		}
-  	  	return 0;
-  	}
-	public synchronized int afterControllerStarted()
-	{
-		controllerStarted = true;
-		logger.info("Virtual Controller started.");
-		notify();
-		return 0;
-	}
-	public synchronized int afterControllerShutdown()
-	{
-		controllerStarted = false;
-		logger.info("Virtual Controller shut down.");
-		notify();
-		return 0;
-	}
-
-	// Junk constructed by me
-	public void setController(IABBS4Controller controller)
-	{
-		this.controller = controller;
-	}
-	public double[] getTargetTimes()
-	{
-		double[] times = new double[targetTimes.size()];
-		for (int i=0; i<times.length; i++)
-			times[i] = ((Double) targetTimes.get(i)).doubleValue();
-		return times;
-	}
-	public double[][] getCollisionTimes(String mutexZone)
-	{
-		//CollisionData data = (CollisionData) collisions.get(collisions.indexOf(new CollisionData(mutexZone)));
-		int index = collisions.indexOf(new CollisionData(mutexZone));
-		//int index = collisions.indexOf(mutexZone);
-		if (index >= 0)
-		{
-			CollisionData data = (CollisionData) collisions.get(index);
-			return data.getTimes();
-		}
-		else
-		{
-			return null;
-		}
-	}
-	public synchronized void waitForControllerStart()
-	{
-		try
-		{
-			while (!controllerStarted)
+			try
 			{
-				wait();
-			}
+				String objectName = collidingObject.getName();
+				CollisionData data;
+				if (!collisions.contains(new CollisionData(objectName)))
+				{
+					logger.error("Collision ended mysteriously.");
+					return 1;
+				}
+				else
+				{
+					data = (CollisionData) collisions.get(collisions.indexOf(new CollisionData(objectName)));
+				}
 
-			// Make sure the controller is really started before we return
-			Thread.sleep(2500);
-		}
-		catch (Exception ex)
-		{
-			//System.out.println("Interrupted! " + ex);
-			logger.error("Interrupted! " + ex);
-		}
-		return;
-	}
-	public synchronized void waitForControllerShutDown()
-	{
-		try
-		{
-			while (controllerStarted)
+				// Is this the end?
+				data.setCount(data.getCount()-1);
+				if (data.getCount() == 0)
+				{
+					data.setEndTime(controller.getMotionTime());
+					logger.info("End of collision with " + objectName+ " at time " + (float) data.endTime);
+					//createTargetAtTCP(controller.getMechanism().getName() + "Exit" + objectName);
+					createTargetAtTCP("Out" + objectName);
+				}
+			}
+			catch (Exception whatever)
 			{
-				wait();
 			}
-
-			// Make sure the controller is really shut down before we return
-			Thread.sleep(2500);
+			return 0;
 		}
-		catch (Exception ex)
+		public synchronized int afterControllerStarted()
 		{
-			//System.out.println("Interrupted! " + ex);
-			logger.error("Interrupted! " + ex);
+			controllerStarted = true;
+			logger.info("Virtual Controller started.");
+			notify();
+			return 0;
 		}
-		return;
-	}
-
-	/**
-	 * An object containing data concerning the collision with a certain object
-	 */
-	private class CollisionData
-	{	/** Name of colliding object. */
-		private String name;
-		/** Number of started collisions. */
-		private int count;
-		/** Collision starting time. */
-		private double startTime;
-		/** Collision ending time. */
-		private double endTime;
-
-		private LinkedList timeList = new LinkedList();
-
-		CollisionData()
+		public synchronized int afterControllerShutdown()
 		{
-		}
-		CollisionData(String name)
-		{
-			this.name = name;
+			controllerStarted = false;
+			logger.info("Virtual Controller shut down.");
+			notify();
+			return 0;
 		}
 
-		// Object methods
-		public String toString()
+		// Junk constructed by me
+		public void setController(IABBS4Controller controller)
 		{
-			return name;
+			this.controller = controller;
 		}
-		public boolean equals(Object object)
+		public double[] getTargetTimes()
 		{
-			return (name.equals(object.toString()));
-		}
-		public void setName(String name)
-		{
-			this.name = name;
-		}
-		public int getCount()
-		{
-			return count;
-		}
-		public void setCount(int count)
-		{
-			this.count = count;
-		}
-		public void setStartTime(double time)
-		{
-			startTime = time;
-		}
-		public void setEndTime(double time)
-		{
-			endTime = time;
-			timeList.add(new double[]{startTime, endTime});
-		}
-		public double[][] getTimes()
-		{
-			double[][] times = new double[timeList.size()][2];
-			for (int i=0; i<timeList.size(); i++)
-			{
-				times[i] = (double[]) timeList.get(i);
-			}
+			double[] times = new double[targetTimes.size()];
+			for (int i=0; i<times.length; i++)
+				times[i] = ((Double) targetTimes.get(i)).doubleValue();
 			return times;
 		}
-	}
-}
-
-class SimulationListener extends DSimulationEventsAdapter
-{
-	private static Logger logger = LoggerFactory.createLogger(SimulationListener.class);
-
-	boolean simulationRunning = true;
-
-	// Events generated by RobotStudio.ISimulation
-  	public synchronized void stop()
-  	{
-		simulationRunning = false;
-		logger.info("Simulation finished.");
-		notify();
-  	}
-  	public void tick(double time)
-  	{
-		//System.out.println("Simtick: " + time);
-  	}
-
-	// Junk constructed by me
-  	public synchronized void waitForSimulationStop()
-  	{
-		try
+		public double[][] getCollisionTimes(String mutexZone)
 		{
-			simulationRunning = true;
-			while (simulationRunning)
+			//CollisionData data = (CollisionData) collisions.get(collisions.indexOf(new CollisionData(mutexZone)));
+			int index = collisions.indexOf(new CollisionData(mutexZone));
+			//int index = collisions.indexOf(mutexZone);
+			if (index >= 0)
 			{
-				wait();
+				CollisionData data = (CollisionData) collisions.get(index);
+				return data.getTimes();
+			}
+			else
+			{
+				return null;
+			}
+		}
+		public synchronized void waitForControllerStart()
+		{
+			try
+			{
+				while (!controllerStarted)
+				{
+					wait();
+				}
+
+				// Make sure the controller is really started before we return
+				Thread.sleep(2500);
+			}
+			catch (Exception ex)
+			{
+				//System.out.println("Interrupted! " + ex);
+				logger.error("Interrupted! " + ex);
+			}
+			return;
+		}
+		public synchronized void waitForControllerShutDown()
+		{
+			try
+			{
+				while (controllerStarted)
+				{
+					wait();
+				}
+
+				// Make sure the controller is really shut down before we return
+				Thread.sleep(2500);
+			}
+			catch (Exception ex)
+			{
+				//System.out.println("Interrupted! " + ex);
+				logger.error("Interrupted! " + ex);
+			}
+			return;
+		}
+		/**
+	 	 * Creates a new target at the current position. The target will be
+	 	 * named targetName:x if targetName is not too long (16 characters?).
+		 */
+		private void createTargetAtTCP(String targetName)
+			throws Exception
+		{
+			// Create a new target
+			IMechanism mechanism = controller.getMechanism();
+			ITarget newTarget = mechanism.getWorkObjects().item(var(1)).getTargets().add();
+			IToolFrame toolFrame = mechanism.getActiveToolFrame();
+			newTarget.setTransform(toolFrame.getTransform());
+
+			// Set a catchy name
+			boolean ok = false;
+			String suffix = ":1";
+			int nbr = 1;
+			while (!ok)
+			{
+				try
+				{
+					newTarget.setName(targetName + suffix);
+					ok = true;
+				}
+				catch (Exception e)
+				{
+					suffix = ":" + ++nbr;
+					if (nbr>=10)
+						ok = true;
+				}
+			}
+		}
+
+		/**
+		 * An object containing data concerning the collision with a certain object
+		 */
+		private class CollisionData
+		{	/** Name of colliding object. */
+			private String name;
+			/** Number of started collisions. */
+			private int count;
+			/** Collision starting time. */
+			private double startTime;
+			/** Collision ending time. */
+			private double endTime;
+
+			private LinkedList timeList = new LinkedList();
+
+			CollisionData()
+			{
+			}
+			CollisionData(String name)
+			{
+				this.name = name;
 			}
 
-			// Make sure the simulation is really over before we return
-			Thread.sleep(1000);
+			// Object methods
+			public String toString()
+			{
+				return name;
+			}
+			public boolean equals(Object object)
+			{
+				return (name.equals(object.toString()));
+			}
+			public void setName(String name)
+			{
+				this.name = name;
+			}
+			public int getCount()
+			{
+				return count;
+			}
+			public void setCount(int count)
+			{
+				this.count = count;
+			}
+			public void setStartTime(double time)
+			{
+				startTime = time;
+			}
+			public void setEndTime(double time)
+			{
+				endTime = time;
+				timeList.add(new double[]{startTime, endTime});
+			}
+			public double[][] getTimes()
+			{
+				double[][] times = new double[timeList.size()][2];
+				for (int i=0; i<timeList.size(); i++)
+				{
+					times[i] = (double[]) timeList.get(i);
+				}
+				return times;
+			}
 		}
-		catch (Exception ex)
+	}
+
+	private static class SimulationListener extends DSimulationEventsAdapter
+	{
+		private static Logger logger = LoggerFactory.createLogger(SimulationListener.class);
+
+		boolean simulationRunning = true;
+
+		// Events generated by RobotStudio.ISimulation
+		public synchronized void stop()
 		{
-			//System.out.println("Interrupted! " + ex);
-			logger.error("Interrupted! " + ex);
+			simulationRunning = false;
+			logger.info("Simulation finished.");
+			notify();
 		}
-		return;
+		public void tick(double time)
+		{
+			//System.out.println("Simtick: " + time);
+		}
+
+		// Junk constructed by me
+		public synchronized void waitForSimulationStop()
+		{
+			try
+			{
+				simulationRunning = true;
+				while (simulationRunning)
+				{
+					wait();
+				}
+
+				// Make sure the simulation is really over before we return
+				Thread.sleep(1000);
+			}
+			catch (Exception ex)
+			{
+				//System.out.println("Interrupted! " + ex);
+				logger.error("Interrupted! " + ex);
+			}
+			return;
+		}
 	}
 }
+
