@@ -765,8 +765,9 @@
 		version="true"
 		use="true"
 		private="true"
+		source="1.4"
 		windowtitle="Supremica API"
-		link="http://java.sun.com/j2se/1.4/docs/api"				
+		link="http://java.sun.com/j2se/1.5/docs/api"				
 		bottom="Copyright &#169; 2001 - 2005 Supremica and Knut Åkesson. All Rights Reserved.">
 		<doctitle><![CDATA[<h1>Supremica API Documentation</h1>]]></doctitle>
 	</javadoc>
