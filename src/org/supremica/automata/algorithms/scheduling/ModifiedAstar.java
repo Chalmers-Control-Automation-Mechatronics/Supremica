@@ -361,7 +361,7 @@ public class ModifiedAstar
 
 		}
 		timer.stop();
-		return null;
+		return null;	// never reached a (globally) marked state!!
 	}
 
 	// Take a step in the direction of aut

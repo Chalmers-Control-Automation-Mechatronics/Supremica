@@ -67,7 +67,7 @@ public class AutomataToXml
 	private Automata automata;
 	private Automaton automaton;
 	private boolean canonical;
-	private boolean includeCost = false;
+	private boolean includeCost = true;
 	private boolean debugMode = false;
 	private final static int majorFileVersion = 0;
 	private final static int minorFileVersion = 9;
@@ -282,7 +282,7 @@ public class AutomataToXml
 			}
 		}
 	}
-	
+
 	public boolean writeCost(boolean b)
 	{
 		boolean old = includeCost;

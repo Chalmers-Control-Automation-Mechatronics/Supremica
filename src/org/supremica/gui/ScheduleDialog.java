@@ -102,7 +102,7 @@ class WeightsPanel
 		EnableButton()
 		{
 			super("Use weights");
-			
+
 			addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
@@ -112,16 +112,16 @@ class WeightsPanel
 			});
 
 		}
-		
+
 	}
-	
+
 	private EnableButton enableButton = new EnableButton();
-	
+
 	WeightsPanel()
 	{
 		setLayout(new GridLayout(1, 2));
 		setBorder(BorderFactory.createTitledBorder("Weights"));
-		
+
 		add(enableButton);
 		add(gWeight);
 		add(hWeight);
@@ -258,7 +258,12 @@ public class ScheduleDialog
 			ModifiedAstar mastar = new ModifiedAstar(automata, weights.getCalculator(estimates.getEstimator(automata)));
 			// Element elem = algorithms.getAlgorithm() == 3 ? mastar.walk3() : mastar.walk1();
 			Element elem = mastar.walk3();
-			logger.info(mastar.trace(elem));
+			if(elem == null)
+			{
+				throw new RuntimeException("no marked state found");
+			}
+
+			// logger.info(mastar.trace(elem));
 			Automaton automaton = mastar.getAutomaton(elem);
 			ActionMan.getGui().addAutomaton(automaton);
 		}
