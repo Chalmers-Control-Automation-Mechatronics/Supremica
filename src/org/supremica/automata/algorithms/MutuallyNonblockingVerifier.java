@@ -233,7 +233,9 @@ public class MutuallyNonblockingVerifier
 				try
 				{
 					// If there were safe events in the added automaton, they are safe here too!
-					currEvents.addEvents(safeEventsMap.getEvents(interestingAutomaton));
+					Events alreadySafe = safeEventsMap.getEvents(interestingAutomaton);
+					logger.debug("The events " + alreadySafe + " were already established to be safe in " + interestingAutomaton + ".");
+					currEvents.addEvents(alreadySafe);
 					
 					// Synchronize!
 					currSynchAutomaton = AutomataSynchronizer.synchronizeAutomata(currSynchAutomata);
@@ -251,13 +253,17 @@ public class MutuallyNonblockingVerifier
 				logger.info("Checking " + currSynchAutomata + ". \nSafeEvents " + currEvents + ".");				
 				currSynchAutomaton.extendMutuallyAccepting(currEvents);
 
+				/*
+				// Add automaton to gui
 				Gui gui = ActionMan.getGui();
 				currSynchAutomaton.setName(currSynchAutomaton.getComment());
 				gui.getVisualProjectContainer().getActiveProject().addAutomaton(currSynchAutomaton);
+				*/
 
 				// ok = (currSynchAutomaton.nbrOfStates() == currSynchAutomaton.nbrOfMutuallyAcceptingStates());
 				// Ignore all uncontrollable (forbidden) states!!
 				ok = (currSynchAutomaton.nbrOfStates()-currSynchAutomaton.nbrOfForbiddenStates() == currSynchAutomaton.nbrOfMutuallyAcceptingNotForbiddenStates());
+				logger.fatal("states: " + currSynchAutomaton.nbrOfStates() + " forb: " + currSynchAutomaton.nbrOfForbiddenStates() + " mutnotforb: " + currSynchAutomaton.nbrOfMutuallyAcceptingNotForbiddenStates() + " mut: " + currSynchAutomaton.nbrOfMutuallyAcceptingStates());
 			}
 
 			// It worked! Set all states as mutually accepting in currAutomaton
@@ -355,16 +361,16 @@ public class MutuallyNonblockingVerifier
 			logger.info("Adding " + bestAutomaton + ", most important event: " + bestEvent + ".");
 			
 			// The automaton we add should be accepting in all states!
-				Automaton allAcceptingAutomaton = new Automaton(bestAutomaton);
-				AutomatonAllAccepting allAccepting = new AutomatonAllAccepting(allAcceptingAutomaton);
-				allAccepting.execute();
-				
-				//return bestAutomaton;
-				return allAcceptingAutomaton;
+			Automaton allAcceptingAutomaton = new Automaton(bestAutomaton);
+			AutomatonAllAccepting allAccepting = new AutomatonAllAccepting(allAcceptingAutomaton);
+			allAccepting.execute();
+			
+			//return bestAutomaton;
+			return allAcceptingAutomaton;
 		}
 		
 		logger.error("It didn't work. I'm giving up... but there may still be hope!");
-		logger.error("This can't happen, right? " + interestingEvents.size());
+		logger.error("This can't happen, right? Then there must be 0 interesting events and there are... " + interestingEvents.size() + "!");
 	
 		return null;
 
@@ -459,7 +465,7 @@ public class MutuallyNonblockingVerifier
 				}
 			}
 
-			logger.info("Synchronizing " + synchAutomata);
+			logger.debug("Synchronizing " + synchAutomata);
 
 			try
 			{
@@ -576,14 +582,14 @@ public class MutuallyNonblockingVerifier
 				return;
 
 			LabeledEvent currEvent = (LabeledEvent)evIt.next();
-			logger.info("Event: " + currEvent + " (" + 
+			logger.debug("Event: " + currEvent + " (" + 
 						(currEvent.isControllable() ? "controllable" : "uncontrollable") + ")...");
 			
 			// Perhaps we have already added this event?
 			//if (safeEventsMap.containsEvent(theAutomaton, currEvent))
 			if (theSafeEvents.containsEventWithLabel(currEvent))
 			{
-				logger.info("Already established to be safe!");
+				logger.debug("Already established to be safe!");
 				continue;
 			}
 			
@@ -604,7 +610,7 @@ public class MutuallyNonblockingVerifier
 			boolean isSafe = checkSafeness(theAutomataCopy, theAutomaton, currEvent);
 			if (isSafe)
 			{
-				logger.info("The event is safe.");
+				logger.debug("The event is safe.");
 				
 				try
 				{
@@ -618,7 +624,7 @@ public class MutuallyNonblockingVerifier
 			}
 			else
 			{
-				logger.info("The event is unsafe.");
+				logger.debug("The event is not safe.");
 			}
 			
 			if (stopRequested)
@@ -639,14 +645,14 @@ public class MutuallyNonblockingVerifier
 				return;
 
 			LabeledEvent currEvent = (LabeledEvent)evIt.next();
-			logger.info("Event: " + currEvent + " (" + 
+			logger.debug("Event: " + currEvent + " (" + 
 						(currEvent.isControllable() ? "controllable" : "uncontrollable") + ")...");
 			
 			// Perhaps we have already added this event?
 			//if (safeEventsMap.containsEvent(theAutomaton, currEvent))
 			if (theSafeEvents.containsEventWithLabel(currEvent))
 			{
-				logger.info("Already established to be safe!");
+				logger.debug("Already established to be safe!");
 				continue;
 			}
 			
@@ -667,7 +673,7 @@ public class MutuallyNonblockingVerifier
 			boolean isSafe = checkSafeness(theAutomataCopy, selectedAutomata, currEvent);
 			if (isSafe)
 			{
-				logger.info("The event is safe.");
+				logger.debug("The event is safe.");
 				
 				try
 				{
@@ -681,7 +687,7 @@ public class MutuallyNonblockingVerifier
 			}
 			else
 			{
-				logger.info("The event is unsafe.");
+				logger.debug("The event is unsafe.");
 			}
 			
 			if (stopRequested)
@@ -778,9 +784,15 @@ public class MutuallyNonblockingVerifier
 		boolean isSafe = false;
 		try
 		{
+			// Disable warn messages during verification
+			LoggerFilter filter = LoggerFactory.getLoggerFilter();
+			boolean allowWarn = filter.allowWarn();
+			filter.setAllowWarn(false);
+
 			theVerifier = new AutomataVerifier(totalSystem, synchronizationOptions, verificationOptions);
 			isSafe = theVerifier.verify();
-			// logger.debug(new Boolean(isSafe));
+
+			filter.setAllowWarn(allowWarn);
 		}
 		catch (Exception ex)
 		{
@@ -799,8 +811,10 @@ public class MutuallyNonblockingVerifier
 	private Vector interestingEvents(Automaton theAutomaton)
 	{
 		int[] value = new int[theAutomaton.nbrOfEvents()];
+		int[] blockValue = new int[theAutomaton.nbrOfEvents()];
 		Alphabet theAlphabet = new Alphabet(theAutomaton.getAlphabet());
 		theAlphabet.setIndicies();
+		boolean noValue = true;
 
 		// Give score to interesting events
 		for (ArcIterator arcIt = theAutomaton.arcIterator(); arcIt.hasNext(); )
@@ -813,11 +827,19 @@ public class MutuallyNonblockingVerifier
 				continue;
 			}
 
+			// Is this an arc that could help us with the mutual nonblocking?
 			int index = theAlphabet.getEventWithLabel(currArc.getEvent().getLabel()).getSynchIndex();
 			if (currArc.getToState().isMutuallyAccepting() && !currArc.getToState().isForbidden() && !currArc.getFromState().isMutuallyAccepting())
 			{
+				noValue = false;
 				value[index]++;
 			}
+
+			// If there is no way to prove nonblocking, maybe we can prove it's not blocking!
+			if (noValue && !currArc.getToState().isMutuallyAccepting() && currArc.getFromState().isMutuallyAccepting())
+			{
+				blockValue[index]++;
+			}				
 
 			/*
 			// The from-state should be unacceptable.  :o)  Not funny. 
@@ -839,6 +861,14 @@ public class MutuallyNonblockingVerifier
 			*/
 		}
 
+		// Is there no results in the value array?
+		if (noValue)
+		{
+			// It seems blocking! Use blockValue instead!
+			logger.info("The systems appears blocking, but we will se...");
+			value = blockValue;
+		}
+
 		// Sort the result
 		Vector result = new Vector(value.length, 0);		
 		for (int i = 0; i < value.length; i++)
@@ -854,7 +884,7 @@ public class MutuallyNonblockingVerifier
 
 			// If the best event had value 0, there's no point in continuing.
 			if (value[high] == 0)
-				return result;
+				break;
 
 			// Add the best event to the result
 			result.add(i, theAlphabet.getEventWithIndex(high));

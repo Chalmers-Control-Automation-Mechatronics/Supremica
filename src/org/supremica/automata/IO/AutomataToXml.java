@@ -109,7 +109,7 @@ public class AutomataToXml
 			pw.print(" hash=\"" + automata.getHash() + "\"");
 		}
 
-		if (automata.getComment() != null)
+		if ((automata.getComment() != null) && !automata.getComment().equals(""))
 		{
 			pw.print(" comment=\"" + EncodingHelper.normalize(automata.getComment()) + "\"");
 		}

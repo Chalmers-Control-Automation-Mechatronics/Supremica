@@ -164,7 +164,6 @@ public class Events
 			if (!containsEventWithLabel(currEvent))
 			{
 				addEvent(currEvent);
-				// System.err.println("HAHA! THIS ONE IS SAFE! " + currEvent);
 			}
 		}
 	}
