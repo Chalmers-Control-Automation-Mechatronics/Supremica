@@ -320,6 +320,7 @@ public class Supremica
 		setIconImage(Supremica.cornerImage);
 		setVisible(true);
 		splitPaneVertical.setDividerLocation(0.7);
+		// Set the preferred column width of the automaton table
 		int tableWidth = theAutomatonTable.getWidth();
 		int tableWidthEntity = tableWidth/12;
 		TableColumnModel theTableColumnModel = theAutomatonTable.getColumnModel();
@@ -339,7 +340,7 @@ public class Supremica
 				currColumn.setPreferredWidth(tableWidthEntity*2);
 			}
 		}
-		setVisible(false);
+		//setVisible(false);
 	}
 
 	public void initMenubar()
