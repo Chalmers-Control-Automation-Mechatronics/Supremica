@@ -52,12 +52,12 @@ package org.supremica.automata;
 import java.util.*;
 import org.supremica.gui.*;
 import org.supremica.log.*;
-import org.supremica.gui.*;
 
 public class ProjectContainer
 {
 	private static Logger logger = LoggerFactory.createLogger(ProjectContainer.class);
 	private List theProjects;
+	private Project currentProject;
 
 	public ProjectContainer()
 	{
@@ -66,12 +66,25 @@ public class ProjectContainer
 
 	public void addProject(Project theProject)
 	{
+		addProject(theProject, false);
+	}
+
+	public void addProject(Project theProject, boolean setActive)
+	{
 		theProjects.add(theProject);
+		if (setActive)
+		{
+			currentProject = theProject;
+		}
 	}
 
 	public void removeProject(Project theProject)
 	{
 		theProjects.remove(theProject);
+		if (currentProject == theProject)
+		{
+			currentProject = null;
+		}
 	}
 
 	public Project getProject(String name)
@@ -94,8 +107,24 @@ public class ProjectContainer
 		return null;
 	}
 
+	public Project getActiveProject()
+	{
+		return currentProject;
+	}
+
+	public void setActiveProject(Project theProject)
+	{
+		this.currentProject = theProject;
+	}
+
 	public Iterator iterator()
 	{
 		return theProjects.iterator();
+	}
+
+
+	public String getUniqueProjectName()
+	{ // Implement this
+		return "Untiled";
 	}
 }
