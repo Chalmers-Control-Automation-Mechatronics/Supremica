@@ -540,16 +540,12 @@ public class ActionMan
 
 								exporter.serialize(currFile.getAbsolutePath());
 							}
-
-							// ++ ARASH
 							else if (exportMode == FORMAT_RCP)
 							{
 								AutomatonToRcp exporter = new AutomatonToRcp(currAutomaton);
 
 								exporter.serialize(currFile.getAbsolutePath());
 							}
-
-							// -- ARASH
 						}
 						catch (Exception ex)
 						{
@@ -1738,36 +1734,19 @@ public class ActionMan
 		}
 	}
 
-	// TestCases... - open the test cases dialog, and add the result to the current set of automata
+	// Animations
 	public static void animator(Gui gui, AnimationItem item)
 	{
-		/*
+
 		try
 		{
-			final Animator view = new Animator(args[0]);
-
-			view.addWindowListener(new WindowAdapter()
-			{
-				public void windowClosing(WindowEvent ev)
-				{
-					view.dispose();
-				}
-
-				public void windowClosed(WindowEvent ev)
-				{
-					view.dispose();
-				}
-			});
-
-			XMLAnimationParser parser = new XMLAnimationParser(new File(args[0]), view._canvas);
-
-			view.setAnimation(parser.parseAnimation());
-			view.setVisible(true);
+			Animator animator = item.createInstance();
+			animator.setVisible(true);
 		}
 		catch (Exception ex)
 		{
 			ex.printStackTrace();
-		}*/
+		}
 	}
 
 	// Generate SattLine SFCs

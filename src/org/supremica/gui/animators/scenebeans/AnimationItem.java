@@ -52,8 +52,20 @@ package org.supremica.gui.animators.scenebeans;
 import java.util.*;
 import java.net.*;
 import java.io.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.geom.*;
+import javax.swing.*;
 import org.supremica.automata.algorithms.*;
 import org.supremica.automata.Automata;
+import uk.ac.ic.doc.scenebeans.*;
+import uk.ac.ic.doc.scenebeans.activity.*;
+import uk.ac.ic.doc.scenebeans.behaviour.*;
+import uk.ac.ic.doc.scenebeans.event.*;
+import uk.ac.ic.doc.scenebeans.animation.*;
+import uk.ac.ic.doc.scenebeans.animation.parse.*;
+import uk.ac.ic.doc.scenebeans.pick.*;
+import uk.ac.ic.doc.scenebeans.input.*;
 
 public class AnimationItem
 {
@@ -76,16 +88,38 @@ public class AnimationItem
 		return path;
 	}
 
-	public Automata createInstance()
+	public Animator createInstance()
 		throws Exception
 	{
 		try
 		{
-			URL url = AnimationItem.class.getResource(path);
-			InputStream stream = url.openStream();
-			Automata theAutomata = AutomataBuildFromXml.build(stream);
 
-			return theAutomata;
+			final Animator view = new Animator(description + " path: " + path);
+
+			view.addWindowListener(new WindowAdapter()
+			{
+				public void windowClosing(WindowEvent ev)
+				{
+					view.dispose();
+				}
+
+				public void windowClosed(WindowEvent ev)
+				{
+					view.dispose();
+				}
+			});
+
+			URL url = AnimationItem.class.getResource(path);
+			XMLAnimationParser parser = new XMLAnimationParser(url, view._canvas);
+
+			view.setAnimation(parser.parseAnimation());
+
+			return view;
+
+			//URL url = AnimationItem.class.getResource(path);
+			//InputStream stream = url.openStream();
+			//Automata theAutomata = AutomataBuildFromXml.build(stream);
+			// return theAutomata;
 		}
 		catch (Exception ex)
 		{

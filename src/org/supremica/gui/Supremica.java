@@ -696,7 +696,7 @@ public class Supremica
 		JMenu menuToolsAnimations = new JMenu();
 
 		menuToolsAnimations.setText("Animations");
-		menuFile.add(menuToolsAnimations);
+		menuTools.add(menuToolsAnimations);
 
 		ExampleAnimations exAnim = ExampleAnimations.getInstance();
 
