@@ -467,6 +467,8 @@ public final class AutomataSynchronizerExecuter
 	 */
     public void run()
     {
+		try
+		{
     	initialize();
 
         // Get the first state to process
@@ -537,13 +539,18 @@ public final class AutomataSynchronizerExecuter
 			}
       		currState = helper.getStateToProcess();
         }
-    }
+		}
+		catch (Exception ex)
+		{
+			System.out.println("Error: " + ex);
+		}
+   }
 
 	/**
 	 * A call to this method stops the execution of the run-method or the buildAutomaton-method as soon as possible.
-	 * The call is made from the AutomataSynchronizer.
 	 *
 	 * @see AutomataSynchronizer
+	 * @see AutomataVerifier
 	 */
 	public void requestStop()
 	{
@@ -551,7 +558,7 @@ public final class AutomataSynchronizerExecuter
 	}
 
 	/**
-	 * Builds automaton using concatenates state names as new state names.
+	 * Builds automaton using concatenated state names as new state names.
 	 * 
 	 * @return true if build successful, false if build is stopped with requestStop().
 	 */
@@ -602,6 +609,7 @@ public final class AutomataSynchronizerExecuter
 				// System.out.println(helper.getAutomaton() == null);
 				return false;
 			}
+
 			if (currStateTable[i] != null)
    			{
 				int[] currState = currStateTable[i];

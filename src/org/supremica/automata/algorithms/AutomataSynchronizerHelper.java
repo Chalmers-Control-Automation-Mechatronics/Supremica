@@ -60,7 +60,6 @@ import java.util.*;
 /**
  * Contains information that is common to all synchronization threads.
  */
-
 public final class AutomataSynchronizerHelper
 {
  	private AutomataIndexForm theAutomataIndexForm;
@@ -288,7 +287,9 @@ public final class AutomataSynchronizerHelper
   		if (++nbrOfCheckedStates % 1000 == 0)
 		{
 			if (cancelDialog != null)
+			{
 				cancelDialog.updateCounter(nbrOfCheckedStates);
+			}
 			if (verboseMode)
 				if (nbrOfCheckedStates % 10000 == 0)
 					thisCategory.debug(nbrOfCheckedStates + " states checked so far.");

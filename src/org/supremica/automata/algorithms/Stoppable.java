@@ -49,7 +49,7 @@
 
 package org.supremica.automata.algorithms;
 
-// For stopping running threads and stuff
+/** For stopping running threads and stuff. */
 public interface Stoppable
 {
 	public void requestStop();

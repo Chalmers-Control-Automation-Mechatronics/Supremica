@@ -68,7 +68,7 @@ public class LanguageInclusionCheck
 
 	public LanguageInclusionCheck(Automata AutomataA, Automata AutomataB, SynchronizationOptions syncOptions)
 		throws IllegalArgumentException
-    {
+    {   // Make copies of AutomataA and AutomataB
 		this.AutomataA = new Automata(AutomataA);
 	    this.AutomataB = new Automata(AutomataB);
 		this.syncOptions = syncOptions;

@@ -75,7 +75,7 @@ public class AutomataVerifier
 	private HashMap uncontrollableEventToPlantMap = new HashMap();
 
     private AutomataSynchronizerHelper synchHelper;
-    private ArrayList synchronizationExecuters;
+    private ArrayList synchronizationExecuters = new ArrayList();
 	private StateMemorizer potentiallyUncontrollableStates;
 	private int[] initialState;
 
@@ -111,7 +111,7 @@ public class AutomataVerifier
 		synchHelper = new AutomataSynchronizerHelper(theAutomata, synchronizationOptions);
 
 		// Allocate the synchronizationExecuters
-		synchronizationExecuters = new ArrayList(nbrOfExecuters);
+		// synchronizationExecuters = new ArrayList(nbrOfExecuters);
 
 		// Build the initial state
 	    initialState = new int[theAutomata.size() + 1]; // + 1 status field
@@ -146,6 +146,7 @@ public class AutomataVerifier
 			thisCategory.error("Option not implemented...");
 			return false;
 		}
+		else
 		{   // Error...
 			thisCategory.error("Unavailable option chosen.");
 			return false;
@@ -164,7 +165,9 @@ public class AutomataVerifier
 	}
 
 	/** 
-	 * Performs the modular verification of controllability. 
+	 * Performs modular controllablity verification using the AutomataSynchronizerExecuter.
+	 * @return true if controllable, false if not or false if don't know.
+	 * @see AutomataSynchronizerExecuter
 	 */
 	public boolean modularControllabilityVerification()
 		throws Exception
@@ -215,7 +218,7 @@ public class AutomataVerifier
 					synchHelper.addState(initialState);
 
 					// Initialize the synchronizationExecuters
-					synchronizationExecuters.clear();
+					// synchronizationExecuters.clear();
 					for (int i = 0; i < nbrOfExecuters; i++)
 					{
 						AutomataSynchronizerExecuter currSynchronizationExecuter =
@@ -503,7 +506,7 @@ public class AutomataVerifier
  					if (currStateTable[j] != null)
  					{
 						potentiallyUncontrollableStates.find(automataIndices, currStateTable[j]);
- 						currStateTable[j] = null; // Instead of using clear()... se *** above
+						currStateTable[j] = null; // Instead of using clear()... se *** above
  						stateCount++;
 					}
 				}
@@ -628,7 +631,7 @@ public class AutomataVerifier
 		synchHelper.setCoExecute(true);
 		synchHelper.setCoExecuter(onlineSynchronizer);
 		synchHelper.setExhaustiveSearch(true);
-		synchHelper.setRememberUncontrollable(true);
+		// synchHelper.setRememberUncontrollable(true);
 		AutomataSynchronizerExecuter executer = new AutomataSynchronizerExecuter(synchHelper);
 		executer.selectAllAutomata();
 		executer.start();
@@ -642,7 +645,7 @@ public class AutomataVerifier
 	{
 		synchHelper.addState(initialState);
 		synchHelper.setExhaustiveSearch(true);
-
+		
 		// Initialize the synchronizationExecuters
 		for (int i = 0; i < nbrOfExecuters; i++)
 		{
