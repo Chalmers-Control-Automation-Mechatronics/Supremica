@@ -64,6 +64,7 @@ import javax.help.*;
 import org.supremica.*;
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.*;
+import org.supremica.automata.templates.*;
 import org.supremica.comm.xmlrpc.*;
 import org.supremica.gui.editor.*;
 import org.supremica.gui.help.*;
@@ -289,6 +290,22 @@ public class Supremica
 
 	public void initMenubar()
 	{
+		class NewFromTemplateHandler
+			implements ActionListener
+		{
+			private TemplateItem item = null;
+
+			public NewFromTemplateHandler(TemplateItem item)
+			{
+				this.item = item;
+			}
+
+			public void actionPerformed(ActionEvent e)
+			{
+				ActionMan.fileNewFromTemplate(getGui(), item);
+			}
+		}
+
 		boolean separatorNeeded = false;
 
 		setJMenuBar(menuBar);
@@ -298,7 +315,7 @@ public class Supremica
 		menuFile.setText("File");
 		menuFile.setMnemonic(KeyEvent.VK_F);
 		menuBar.add(menuFile);
-/*
+
 		// File.New
 		JMenuItem menuFileNew = new JMenuItem();
 		menuFileNew.setText("New...");
@@ -316,21 +333,24 @@ public class Supremica
 		menuFileNewFromTemplate.setText("New From Template");
 		menuFile.add(menuFileNewFromTemplate);
 
-		// File.NewFromTemplateStandardComponents
-		JMenu menuFileNewFromTemplateStandardComponents = new JMenu();
-		menuFileNewFromTemplateStandardComponents.setText("Standard Components");
-		menuFileNewFromTemplate.add(menuFileNewFromStandardComponents);
+		ExampleTemplates exTempl = ExampleTemplates.getInstance();
+		for (Iterator groupIt = exTempl.iterator(); groupIt.hasNext(); )
+		{
+			TemplateGroup currGroup = (TemplateGroup)groupIt.next();
+			JMenu menuFileNewFromTemplateGroup = new JMenu();
+			menuFileNewFromTemplateGroup.setText(currGroup.getDescription());
+			menuFileNewFromTemplate.add(menuFileNewFromTemplateGroup);
 
-		// File.NewFromTemplateBookExamples
-		JMenu menuFileNewFromTemplateBookExamples = new JMenu();
-		menuFileNewFromTemplateBookExamples.setText("CCS Book Examples");
-		menuFileNewFromTemplate.add(menuFileNewFromTemplateBookExamples);
+			for (Iterator itemIt = currGroup.iterator(); itemIt.hasNext(); )
+			{
+				TemplateItem currItem = (TemplateItem) itemIt.next();
 
-		// File.NewFromTemplateOtherExamples
-		JMenu menuFileNewFromTemplateOtherExamples = new JMenu();
-		menuFileNewFromTemplateOtherExamples.setText("Other Examples");
-		menuFileNewFromTemplate.add(menuFileNewFromTemplateOtherExamples);
-*/
+				JMenuItem menuItem = new JMenuItem();
+				menuItem.setText(currItem.getDescription());
+				menuFileNewFromTemplateGroup.add(menuItem);
+				menuItem.addActionListener(new NewFromTemplateHandler(currItem));
+			}
+		}
 
 		if (WorkbenchProperties.fileAllowOpen())
 		{
@@ -1095,65 +1115,14 @@ public class Supremica
 	}
 
 	public int addAutomata(Automata currAutomata)
-		// throws Exception
 	{
-		// Note - this code was both in importValidFile and openAutomataXMLFile above - duplicate code!!
 		int nbrOfAddedAutomata = 0;
 		Iterator autIt = currAutomata.iterator();
 
 		while (autIt.hasNext())
 		{
 			Automaton currAutomaton = (Automaton)autIt.next();
-			/* Use the addAutoamaton function below
-			boolean add = true;
 
-			// Force the user to enter a new name if the name is ""
-			// Note that a null name is not allowed by AutomataBuildFromXml
-			if (currAutomaton.getName().equals(""))
-			{
-				String autName = getNewAutomatonName("Enter a new name", "");
-				if (autName == null)
-				{
-					add = false;
-					return 0; // It's not ok to cancel!
-				}
-				else
-				{
-					currAutomaton.setName(autName);
-				}
-			}
-
-			if (theAutomatonContainer.containsAutomaton(currAutomaton.getName()))
-			{
-				String autName = currAutomaton.getName();
-
-				JOptionPane.showMessageDialog(this, autName + " already exists", "Alert",
-											  JOptionPane.ERROR_MESSAGE);
-
-				autName = getNewAutomatonName("Enter a new name", autName + "(2)");
-				if (autName == null)
-				{
-					add = false; // It's not ok to cancel!
-				}
-				else
-				{
-					currAutomaton.setName(autName);
-				}
-			}
-			if (add)
-			{
-				nbrOfAddedAutomata++;
-				try
-				{
-					theAutomatonContainer.add(currAutomaton); // throws Exception if the automaton already exists
-				}
-				catch(Exception excp) // should never occur, we test for this condition already
-				{
-					thisCategory.error("Error while adding: " + excp.getMessage());
-					return nbrOfAddedAutomata;
-				}
-			}
-			***/
 			if(addAutomaton(currAutomaton))
 			{
 				nbrOfAddedAutomata++;
@@ -1165,6 +1134,7 @@ public class Supremica
 		}
 		return nbrOfAddedAutomata;
 	}
+
 	// We need a single entry to add automata to the gui
 	// Here we manage all necessary user interaction
 	public boolean addAutomaton(Automaton currAutomaton)
@@ -1186,7 +1156,14 @@ public class Supremica
 		if (theAutomatonContainer.containsAutomaton(currAutomaton.getName()))
 		{
 			String autName = currAutomaton.getName();
+			String newName = theAutomatonContainer.getUniqueAutomatonName(autName);
+			currAutomaton.setName(newName);
 
+			Gui gui = getGui();
+
+			gui.info("Name conflict - " + autName + " does already exist. Changed name of new " + autName + " to " + newName + ".");
+
+/*
 			JOptionPane.showMessageDialog(this, autName + " already exists", "Alert",
 										  JOptionPane.ERROR_MESSAGE);
 
@@ -1199,6 +1176,7 @@ public class Supremica
 			{
 				currAutomaton.setName(autName);
 			}
+*/
 		}
 
 		try

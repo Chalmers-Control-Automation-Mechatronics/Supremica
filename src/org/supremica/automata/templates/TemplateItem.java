@@ -50,19 +50,21 @@
 package org.supremica.automata.templates;
 
 import java.util.*;
+import java.net.*;
+import java.io.*;
+
 import org.supremica.automata.*;
+import org.supremica.automata.algorithms.*;
 
-public class TemplateGroup
+public class TemplateItem
 {
-	private List items = new LinkedList();
-
-	private TemplateTypes type;
 	private String description;
+	private String path;
 
-	public TemplateGroup(TemplateTypes type)
+	public TemplateItem(String description, String path)
 	{
-		this.type = type;
-		this.description = type.getDescription();
+		this.description = description;
+		this.path = path;
 	}
 
 	public String getDescription()
@@ -70,13 +72,26 @@ public class TemplateGroup
 		return description;
 	}
 
-	public void addItem(TemplateItem item)
+	public String getPath()
 	{
-		items.add(item);
+		return path;
 	}
 
-	public Iterator iterator()
+	public Automata createInstance()
+		throws Exception
 	{
-		return items.iterator();
+		try
+		{
+			URL url = TemplateItem.class.getResource(path);
+			InputStream stream = url.openStream();
+			Automata theAutomata = AutomataBuildFromXml.build(stream);
+			return theAutomata;
+		}
+		catch (Exception ex)
+		{
+			System.err.println(ex);
+			ex.printStackTrace();
+			throw ex;
+		}
 	}
 }

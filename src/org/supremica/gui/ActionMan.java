@@ -61,6 +61,7 @@ import java.io.*;
 
 import org.supremica.*;
 import org.supremica.automata.*;
+import org.supremica.automata.templates.*;
 import org.supremica.automata.algorithms.*;
 import org.supremica.comm.xmlrpc.*;
 import org.supremica.gui.Gui;
@@ -98,8 +99,18 @@ public class ActionMan
 	}
 
 	// File.NewFromTemplate action performed
-	public static void fileNewFromTemplate(Gui gui)
+	public static void fileNewFromTemplate(Gui gui, TemplateItem item)
 	{
+		Automata newAutomata;
+		try
+		{
+			newAutomata = item.createInstance();
+			gui.addAutomata(newAutomata);
+		}
+		catch (Exception ex)
+		{
+			JOptionPane.showMessageDialog(gui.getComponent(), "Error while creating the template!", "Alert", JOptionPane.ERROR_MESSAGE);
+		}
 	}
 
 	// File.Login action performed
@@ -1495,10 +1506,10 @@ public class ActionMan
 		{
 			find_states.execute();
 		}
-		catch(Exception excp)
+		catch(Exception ex)
 		{
 			// thisCategory.error(excp.toString());
-			gui.error(excp.toString());
+			gui.error(ex.toString());
 		}
 
 	}
@@ -1514,9 +1525,9 @@ public class ActionMan
 	public static void testCases(Gui gui)
 		throws Exception
 	{
-		TestCasesDialog tc_dlg = new TestCasesDialog(gui.getFrame());
-		tc_dlg.show();
-		Automata automata = tc_dlg.getAutomata();
+		TestCasesDialog testCasesDialog = new TestCasesDialog(gui.getFrame());
+		testCasesDialog.show();
+		Automata automata = testCasesDialog.getAutomata();
 		if(automata != null)
 		{
 			gui.addAutomata(automata);
