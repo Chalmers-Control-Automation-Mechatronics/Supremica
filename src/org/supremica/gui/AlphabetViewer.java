@@ -73,7 +73,7 @@ public class AlphabetViewer
 		// contentPane.setLayout(new BorderLayout());
 		// contentPane.add(toolBar, BorderLayout.NORTH);
 		setTitle("Alphabet Viewer: " + theAutomaton.getName());
-		setSize(400, 500);
+		setSize(200, 500);
 		addWindowListener(new WindowAdapter()
 		{
 			public void windowClosing(WindowEvent e)

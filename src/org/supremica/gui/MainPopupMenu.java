@@ -13,9 +13,10 @@ import org.supremica.automata.algorithms.*;
 import org.supremica.comm.xmlrpc.*;
 import org.supremica.gui.editor.*;
 import org.supremica.gui.help.*;
+import org.supremica.util.VPopupMenu;
 
 class MainPopupMenu
-	extends JPopupMenu
+	extends VPopupMenu
 {
 	private MenuHandler menuHandler = null;
 

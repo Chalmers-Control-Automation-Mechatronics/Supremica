@@ -53,6 +53,7 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
+import org.supremica.util.VPopupMenu;
 
 // MF -- Small changes here to make the main popup menu usefable from other tables
 // MF -- Instead of hardwiring the menuhandler to a certain table, it takes a table param where appropriate
@@ -61,8 +62,8 @@ public class MenuHandler
 {
 
 	// private final JTable theTable;
-	private final JPopupMenu oneAutomataMenu = new JPopupMenu();
-	private final JPopupMenu twoAutomataMenu = new JPopupMenu();
+	private final JPopupMenu oneAutomataMenu = new VPopupMenu();
+	private final JPopupMenu twoAutomataMenu = new VPopupMenu();
 	boolean oneAutomataMenuLastSep = false;
 	boolean twoAutomataMenuLastSep = false;
 	private final LinkedList zeroAutomataItems = new LinkedList();

@@ -134,11 +134,11 @@ public class VisualProject
 			theAutomatonDocumentContainer.put(aut.getName(), theDocument);
 
 		}
-		AlphabetViewer theAlphabetViewer = (AlphabetViewer) theAutomatonDocumentContainer.get(oldName);
+		AlphabetViewer theAlphabetViewer = (AlphabetViewer) theAlphabetViewerContainer.get(oldName);
 		if (theAlphabetViewer != null)
 		{
-			theAutomatonDocumentContainer.remove(oldName);
-			theAutomatonDocumentContainer.put(aut.getName(), theAlphabetViewer);
+			theAlphabetViewerContainer.remove(oldName);
+			theAlphabetViewerContainer.put(aut.getName(), theAlphabetViewer);
 		}
 		super.automatonRenamed(aut, oldName);
 
@@ -175,12 +175,12 @@ public class VisualProject
 			//theDocument.dispose();
 			theAutomatonDocumentContainer.remove(aut.getName());
 		}
-		AlphabetViewer theAlphabetViewer = (AlphabetViewer) theAutomatonDocumentContainer.get(aut.getName());
+		AlphabetViewer theAlphabetViewer = (AlphabetViewer) theAlphabetViewerContainer.get(aut.getName());
 		if (theAlphabetViewer != null)
 		{
 			theAlphabetViewer.setVisible(false);
 			theAlphabetViewer.dispose();
-			theAutomatonDocumentContainer.remove(aut.getName());
+			theAlphabetViewerContainer.remove(aut.getName());
 		}
 	}
 
