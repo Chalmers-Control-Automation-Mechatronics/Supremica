@@ -2,50 +2,47 @@
  <SupremicaProject name="Robot" major="0" minor="9">
  <Automaton name="robot_1" type="Plant">
  <Events>
-  <Event id="0" label="A_e_0" /> 
-  <Event id="1" label="A_e_1" /> 
-  <Event id="2" label="A_e_2" controllable="false" /> 
-  <Event id="3" label="A_e_3" controllable="false" /> 
-  <Event id="4" label="A_e_4" controllable="false" /> 
-  <Event id="5" label="A_e_5" controllable="false" /> 
+  <Event id="0" label="robot_1_start" /> 
+  <Event id="1" label="b1_1" /> 
+  <Event id="2" label="u1_1" controllable="false"/> 
+  <Event id="3" label="u1_2" controllable="false" /> 
+  <Event id="4" label="robot_1_home" controllable="false" /> 
   </Events>
  <States>
-  <State id="0" name="A_q_0" initial="true" accepting="true" /> 
-  <State id="1" name="A_q_1" /> 
-  <State id="2" name="A_q_2" /> 
-  <State id="3" name="A_q_3" /> 
-  <State id="4" name="A_q_4" /> 
-  <State id="5" name="A_q_5" /> 
+  <State id="0" name="q_0" initial="true" accepting="true" /> 
+  <State id="1" name="q_1" /> 
+  <State id="2" name="q_2" /> 
+  <State id="3" name="q_3" /> 
+  <State id="4" name="q_4" /> 
   </States>
  <Transitions>
   <Transition source="0" dest="1" event="0" /> 
   <Transition source="1" dest="2" event="1" /> 
   <Transition source="2" dest="3" event="2" /> 
   <Transition source="3" dest="4" event="3" /> 
-  <Transition source="4" dest="5" event="4" /> 
-  <Transition source="5" dest="0" event="5" /> 
+  <Transition source="4" dest="0" event="4" /> 
   </Transitions>
   </Automaton>
  <Automaton name="robot_2" type="Plant">
  <Events>
-  <Event id="0" label="B_e_0" /> 
-  <Event id="1" label="B_e_1" /> 
-  <Event id="2" label="B_e_2" /> 
-  <Event id="3" label="B_e_3" controllable="false" /> 
-  <Event id="4" label="B_e_4" controllable="false" /> 
-  <Event id="5" label="B_e_5" /> 
-  <Event id="6" label="B_e_6" controllable="false" /> 
-  <Event id="7" label="B_e_7" controllable="false" /> 
+  <Event id="0" label="robot_2_start" /> 
+  <Event id="1" label="b2_1" /> 
+  <Event id="2" label="b2_2" /> 
+  <Event id="3" label="u2_1" controllable="false" /> 
+  <Event id="4" label="u2_2" controllable="false" /> 
+  <Event id="5" label="b2_3" /> 
+  <Event id="6" label="u2_3" controllable="false" /> 
+  <Event id="7" label="robot_2_home" controllable="false" /> 
   </Events>
  <States>
-  <State id="0" name="B_q_0" initial="true" accepting="true" /> 
-  <State id="1" name="B_q_1" /> 
-  <State id="2" name="B_q_2" /> 
-  <State id="3" name="B_q_3" /> 
-  <State id="4" name="B_q_4" /> 
-  <State id="5" name="B_q_5" /> 
-  <State id="6" name="B_q_6" /> 
-  <State id="7" name="B_q_7" /> 
+  <State id="0" name="q_0" initial="true" accepting="true" /> 
+  <State id="1" name="q_1" /> 
+  <State id="2" name="q_2" /> 
+  <State id="3" name="q_3" /> 
+  <State id="4" name="q_4" /> 
+  <State id="5" name="q_5" /> 
+  <State id="6" name="q_6" /> 
+  <State id="7" name="q_7" /> 
   </States>
  <Transitions>
   <Transition source="0" dest="1" event="0" /> 
@@ -60,38 +57,41 @@
   </Automaton>
  <Automaton name="robot_3" type="Plant">
  <Events>
-  <Event id="0" label="C_e_0" /> 
-  <Event id="1" label="C_e_1" /> 
-  <Event id="2" label="C_e_2" /> 
-  <Event id="3" label="C_e_3" controllable="false" /> 
-  <Event id="4" label="C_e_4" controllable="false" /> 
+  <Event id="0" label="robot_3_start" /> 
+  <Event id="1" label="b3_1" /> 
+  <Event id="2" label="u3_1" controllable="false" /> 
+  <Event id="3" label="u3_2" controllable="false" /> 
+  <Event id="4" label="u3_3" controllable="false" /> 
+  <Event id="5" label="robot_3_home" controllable="false" /> 
   </Events>
  <States>
-  <State id="0" name="C_q_0" initial="true" accepting="true" /> 
-  <State id="1" name="C_q_1" /> 
-  <State id="2" name="C_q_2" /> 
-  <State id="3" name="C_q_3" /> 
-  <State id="4" name="C_q_4" /> 
+  <State id="0" name="q_0" initial="true" accepting="true" /> 
+  <State id="1" name="q_1" /> 
+  <State id="2" name="q_2" /> 
+  <State id="3" name="q_3" /> 
+  <State id="4" name="q_4" /> 
+  <State id="5" name="q_5" /> 
   </States>
  <Transitions>
   <Transition source="0" dest="1" event="0" /> 
   <Transition source="1" dest="2" event="1" /> 
   <Transition source="2" dest="3" event="2" /> 
   <Transition source="3" dest="4" event="3" /> 
-  <Transition source="4" dest="0" event="4" /> 
+  <Transition source="4" dest="5" event="4" /> 
+  <Transition source="5" dest="0" event="5" /> 
   </Transitions>
   </Automaton>
- <Automaton name="IL_1" type="Specification">
+ <Automaton name="Spec_1" type="Specification">
  <Events>
-  <Event id="0" label="A_e_1" /> 
-  <Event id="1" label="A_e_3" controllable="false" /> 
-  <Event id="2" label="B_e_2" /> 
-  <Event id="3" label="B_e_4" controllable="false" /> 
+  <Event id="0" label="b3_1" /> 
+  <Event id="1" label="u3_2" controllable="false" /> 
+  <Event id="2" label="b2_2" /> 
+  <Event id="3" label="u2_2" controllable="false" /> 
   </Events>
  <States>
-  <State id="0" name="D_q_0" initial="true" accepting="true" /> 
-  <State id="1" name="D_q_1" /> 
-  <State id="2" name="D_q_2" /> 
+  <State id="0" name="q_0" initial="true" accepting="true" /> 
+  <State id="1" name="q_1" /> 
+  <State id="2" name="q_2" /> 
   </States>
  <Transitions>
   <Transition source="0" dest="1" event="0" /> 
@@ -100,31 +100,31 @@
   <Transition source="2" dest="0" event="3" /> 
   </Transitions>
   </Automaton>
- <Automaton name="IL_2" type="Specification">
+ <Automaton name="Spec_2" type="Specification">
  <Events>
-  <Event id="0" label="A_e_1" /> 
-  <Event id="1" label="A_e_4" controllable="false" /> 
+  <Event id="0" label="b3_1" /> 
+  <Event id="1" label="u3_3" controllable="false" /> 
   </Events>
  <States>
-  <State id="0" name="E_q_0" initial="true" accepting="true" /> 
-  <State id="1" name="E_q_1" /> 
+  <State id="0" name="q_0" initial="true" accepting="true" /> 
+  <State id="1" name="q_1" /> 
   </States>
  <Transitions>
   <Transition source="0" dest="1" event="0" /> 
   <Transition source="1" dest="0" event="1" /> 
   </Transitions>
   </Automaton>
- <Automaton name="IL_3" type="Specification">
+ <Automaton name="Spec_3" type="Specification">
  <Events>
-  <Event id="0" label="B_e_1" /> 
-  <Event id="1" label="B_e_3" controllable="false" /> 
-  <Event id="2" label="C_e_1" /> 
-  <Event id="3" label="C_e_2" controllable="false" /> 
+  <Event id="0" label="b2_1" /> 
+  <Event id="1" label="u2_1" controllable="false" /> 
+  <Event id="2" label="b1_1" /> 
+  <Event id="3" label="u1_1" controllable="false" /> 
   </Events>
  <States>
-  <State id="0" name="F_q_0" initial="true" accepting="true" /> 
-  <State id="1" name="F_q_1" /> 
-  <State id="2" name="F_q_2" /> 
+  <State id="0" name="q_0" initial="true" accepting="true" /> 
+  <State id="1" name="q_1" /> 
+  <State id="2" name="q_2" /> 
   </States>
  <Transitions>
   <Transition source="0" dest="1" event="0" /> 
@@ -133,31 +133,31 @@
   <Transition source="2" dest="0" event="3" /> 
   </Transitions>
   </Automaton>
- <Automaton name="IL_4" type="Specification">
+ <Automaton name="Spec_4" type="Specification">
  <Events>
-  <Event id="0" label="A_e_1" /> 
-  <Event id="1" label="A_e_2" controllable="false" /> 
+  <Event id="0" label="b3_1" /> 
+  <Event id="1" label="u3_1" controllable="false" /> 
   </Events>
  <States>
-  <State id="0" name="G_q_0" initial="true" accepting="true" /> 
-  <State id="1" name="G_q_1" /> 
+  <State id="0" name="q_0" initial="true" accepting="true" /> 
+  <State id="1" name="q_1" /> 
   </States>
  <Transitions>
   <Transition source="0" dest="1" event="0" /> 
   <Transition source="1" dest="0" event="1" /> 
   </Transitions>
   </Automaton>
- <Automaton name="IL_5" type="Specification">
+ <Automaton name="Spec_5" type="Specification">
  <Events>
-  <Event id="0" label="B_e_5" /> 
-  <Event id="1" label="B_e_6" controllable="false" /> 
-  <Event id="2" label="C_e_1" /> 
-  <Event id="3" label="C_e_2" controllable="false" /> 
+  <Event id="0" label="b2_3" /> 
+  <Event id="1" label="u2_3" controllable="false" /> 
+  <Event id="2" label="b1_1" /> 
+  <Event id="3" label="u1_2" controllable="false" /> 
   </Events>
  <States>
-  <State id="0" name="H_q_0" initial="true" accepting="true" /> 
-  <State id="1" name="H_q_1" /> 
-  <State id="2" name="H_q_2" /> 
+  <State id="0" name="q_0" initial="true" accepting="true" /> 
+  <State id="1" name="q_1" /> 
+  <State id="2" name="q_2" /> 
   </States>
  <Transitions>
   <Transition source="0" dest="1" event="0" /> 
@@ -172,135 +172,136 @@
 
  <!--  robot_1   --> 
 <Actions>
- <Action label="A_e_5">
-  <Command command="robot_1.go" /> 
+ <Action label="robot_1_home">
   </Action>
- <Action label="A_e_0">
+ <Action label="robot_1_start">
+  <Command command="robot_1.reset" />  
+  </Action>
+ <Action label="b1_1">
   <Command command="robot_1.go" />  
   </Action>
- <Action label="A_e_1">
+ <Action label="u1_1">
   <Command command="robot_1.go" />  
   </Action>
- <Action label="A_e_2">
+ <Action label="u1_2">
   <Command command="robot_1.go" />  
   </Action>
- <Action label="A_e_3">
-  <Command command="robot_1.go" />  
-  </Action>
- <Action label="A_e_4">
-  <Command command="robot_1.go" />  
-  </Action>
+
+
 
  <!--  robot_2   --> 
 
- <Action label="B_e_7">
-  <Command command="robot_2.go" /> 
+ <Action label="robot_2_home">
   </Action>
- <Action label="B_e_0">
+ <Action label="robot_2_start">
+  <Command command="robot_2.reset" />  
+  </Action>
+ <Action label="b2_1">
   <Command command="robot_2.go" />  
   </Action>
- <Action label="B_e_1">
+ <Action label="b2_2">
   <Command command="robot_2.go" />  
   </Action>
- <Action label="B_e_2">
+ <Action label="u2_1">
   <Command command="robot_2.go" />  
   </Action>
- <Action label="B_e_3">
+ <Action label="u2_2">
   <Command command="robot_2.go" />  
   </Action>
- <Action label="B_e_4">
+ <Action label="b2_3">
   <Command command="robot_2.go" />  
   </Action>
- <Action label="B_e_5">
-  <Command command="robot_2.go" />  
-  </Action>
- <Action label="B_e_6">
+ <Action label="u2_3">
   <Command command="robot_2.go" />  
   </Action>
 
  <!--  robot_3   --> 
 
- <Action label="C_e_4">
-  <Command command="robot_3.go" /> 
+ <Action label="robot_3_home">
+ </Action>
+ <Action label="robot_3_start">
+  <Command command="robot_3.reset" />  
   </Action>
- <Action label="C_e_0">
+ <Action label="b3_1">
   <Command command="robot_3.go" />  
   </Action>
- <Action label="C_e_1">
+ <Action label="u3_1">
   <Command command="robot_3.go" />  
   </Action>
- <Action label="C_e_2">
+ <Action label="u3_2">
   <Command command="robot_3.go" />  
   </Action>
- <Action label="C_e_3">
+ <Action label="u3_3">
   <Command command="robot_3.go" />  
   </Action>
-</Actions>
 
+</Actions>
  <Controls>
 
+
  <!--  robot_1   --> 
- <Control label="A_e_5">
+ <Control label="robot_1_home">
   <Condition condition="robot_1.end" /> 
   </Control>
- <Control label="A_e_0">
+ <Control label="robot_1_start">
   <Condition condition="robot_1.end" />  
   </Control>
- <Control label="A_e_1">
+ <Control label="b1_1">
   <Condition condition="robot_1.end" />  
   </Control>
- <Control label="A_e_2">
+ <Control label="u1_1">
   <Condition condition="robot_1.end" />  
   </Control>
- <Control label="A_e_3">
-  <Condition condition="robot_1.end" />  
-  </Control>
- <Control label="A_e_4">
+ <Control label="u1_2">
   <Condition condition="robot_1.end" />  
   </Control>
 
  <!--  robot_2   --> 
- <Control label="B_e_7">
+ <Control label="robot_2_home">
   <Condition condition="robot_2.end" /> 
   </Control>
- <Control label="B_e_0">
+ <Control label="robot_2_start">
   <Condition condition="robot_2.end" />  
   </Control>
- <Control label="B_e_1">
+ <Control label="b2_1">
   <Condition condition="robot_2.end" />  
   </Control>
- <Control label="B_e_2">
+ <Control label="b2_2">
   <Condition condition="robot_2.end" />  
   </Control>
- <Control label="B_e_3">
+ <Control label="u2_1">
   <Condition condition="robot_2.end" />  
   </Control>
- <Control label="B_e_4">
+ <Control label="u2_2">
   <Condition condition="robot_2.end" />  
   </Control>
- <Control label="B_e_5">
+ <Control label="b2_3">
   <Condition condition="robot_2.end" />  
   </Control>
- <Control label="B_e_6">
+ <Control label="u2_3">
   <Condition condition="robot_2.end" />  
   </Control>
 
  <!--  robot_3   --> 
- <Control label="C_e_4">
+ <Control label="robot_3_home">
   <Condition condition="robot_3.end" /> 
   </Control>
- <Control label="C_e_0">
+ <Control label="robot_3_start">
   <Condition condition="robot_3.end" />  
   </Control>
- <Control label="C_e_1">
+ <Control label="b3_1">
   <Condition condition="robot_3.end" />  
   </Control>
- <Control label="C_e_2">
+ <Control label="u3_1">
   <Condition condition="robot_3.end" />  
   </Control>
- <Control label="C_e_3">
+ <Control label="u3_2">
   <Condition condition="robot_3.end" />  
   </Control>
+ <Control label="u3_3">
+  <Condition condition="robot_3.end" />  
+  </Control>
+  
   </Controls>
   
 	<Animation path="/scenebeans/weldingRobots/weldingRobots.xml"/>

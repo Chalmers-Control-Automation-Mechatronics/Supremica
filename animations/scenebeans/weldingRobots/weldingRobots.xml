@@ -1,108 +1,110 @@
 <?xml version="1.0" ?> 
- <animation width="757" height="568">
- <behaviour id="robot_1.go" algorithm="Track">
-  <param name="pointCount" value="14" /> 
-  <param name="point" index="0" value="(538,434)" /> 
+ <animation width="700" height="374">
+
+
+  <behaviour id="robot_1.go" algorithm="Track">
+  <param name="pointCount" value="10" /> 
+  <param name="point" index="0" value="(109,358)" /> 
   <param name="duration" index="0" value="1" />
-  <param name="event" index="0" value="robot_1.end" />   
-  <param name="point" index="1" value="(584,378)" /> 
-  <param name="duration" index="1" value="1" />  
-  <param name="event" index="1" value="robot_1.end" />     
-  <param name="point" index="2" value="(654,222)" /> 
+  <param name="event" index="0" value="robot_1.end" /> 
+  <param name="point" index="1" value="(100,290)" /> 
+  <param name="duration" index="1" value="1" />
+  <param name="point" index="2" value="(88,196)" /> 
   <param name="duration" index="2" value="1" />
-  <param name="event" index="2" value="robot_1.end" />
-  <param name="point" index="3" value="(669,190)" /> 
-  <param name="duration" index="3" value="1" />
-  <param name="point" index="4" value="(708,233)" /> 
+  <param name="point" index="3" value="(57,197)" /> 
+  <param name="duration" index="3" value="1" /> 
+  <param name="point" index="4" value="(80,39)" /> 
   <param name="duration" index="4" value="1" />
-  <param name="point" index="5" value="(708,245)" /> 
+  <param name="event" index="4" value="robot_1.end" />     
+  <param name="point" index="5" value="(184,47)" />
   <param name="duration" index="5" value="1" />
-  <param name="event" index="5" value="robot_1.end" />
-  <param name="point" index="6" value="(703,270)" /> 
+  <param name="point" index="6" value="(402,70)" /> 
   <param name="duration" index="6" value="1" />
-  <param name="point" index="7" value="(694,247)" />
-  <param name="duration" index="7" value="1" />
-  <param name="point" index="8" value="(689,246)" /> 
-  <param name="duration" index="8" value="1" /> 
-  <param name="point" index="9" value="(672,279)" /> 
-  <param name="duration" index="9" value="1" />
-  <param name="point" index="10" value="(674,330)" /> 
-  <param name="duration" index="10" value="1" />
-  <param name="point" index="11" value="(684,329)" /> 
-  <param name="duration" index="11" value="1" />
-  <param name="point" index="12" value="(627,381)" /> 
-  <param name="duration" index="12" value="1" />
-  <param name="event" index="12" value="robot_1.end" />  
-  <param name="point" index="13" value="(538,434)" />   
+  <param name="point" index="7" value="(383,58)" /> 
+  <param name="duration" index="7" value="1" />  
+  <param name="event" index="7" value="robot_1.end" />   
+  <param name="point" index="8" value="(211,247)" /> 
+  <param name="duration" index="8" value="1" />
+  <param name="event" index="8" value="robot_1.end" />     
+  <param name="point" index="9" value="(109,358)" /> 
   </behaviour>
+
 
   <behaviour id="robot_2.go" algorithm="Track">
   <param name="pointCount" value="15" /> 
-  <param name="point" index="0" value="(348,434)" /> 
+  <param name="point" index="0" value="(319,359)" /> 
   <param name="duration" index="0" value="1" />
   <param name="event" index="0" value="robot_2.end" /> 
-  <param name="point" index="1" value="(308,303)" /> 
+  <param name="point" index="1" value="(276,257)" /> 
   <param name="duration" index="1" value="1" />
-  <param name="point" index="2" value="(291,226)" /> 
+  <param name="point" index="2" value="(240,172)" /> 
   <param name="duration" index="2" value="1" />
-  <param name="point" index="3" value="(287,209)" /> 
+  <param name="point" index="3" value="(234,155)" /> 
   <param name="duration" index="3" value="1" /> 
-  <param name="point" index="4" value="(461,239)" /> 
+  <param name="point" index="4" value="(404,181)" /> 
   <param name="duration" index="4" value="1" />
-  <param name="point" index="5" value="(461,230)" />
+  <param name="point" index="5" value="(404,157)" />
   <param name="duration" index="5" value="1" />
   <param name="event" index="5" value="robot_2.end" />
-  <param name="point" index="6" value="(566,181)" /> 
+  <param name="point" index="6" value="(513,119)" /> 
   <param name="duration" index="6" value="1" />  
-  <param name="point" index="7" value="(652,145)" /> 
+  <param name="point" index="7" value="(589,90)" /> 
   <param name="duration" index="7" value="1" />
-  <param name="point" index="8" value="(553,121)" /> 
+  <param name="event" index="7" value="robot_2.end" /> 
+  <param name="point" index="8" value="(501,70)" /> 
   <param name="duration" index="8" value="1" /> 
-  <param name="point" index="9" value="(392,89)" /> 
+  <param name="event" index="8" value="robot_2.end" /> 
+  <param name="point" index="9" value="(332,36)" /> 
   <param name="duration" index="9" value="1" />
   <param name="event" index="9" value="robot_2.end" />
-  <param name="point" index="10" value="(353,91)" /> 
+  <param name="point" index="10" value="(293,29)" /> 
   <param name="duration" index="10" value="1" />
-  <param name="point" index="11" value="(290,69)" /> 
+  <param name="point" index="11" value="(250,24)" /> 
   <param name="duration" index="11" value="1" /> 
-  <param name="point" index="12" value="(270,69)" /> 
+  <param name="point" index="12" value="(226,23)" /> 
   <param name="duration" index="12" value="1" />
-  <param name="point" index="13" value="(295,180)" /> 
+  <param name="event" index="12" value="robot_2.end" />   
+  <param name="point" index="13" value="(254,122)" /> 
   <param name="duration" index="13" value="1" />  
-  <param name="point" index="14" value="(348,434)" />   
+  <param name="event" index="13" value="robot_2.end" />   
+  <param name="point" index="14" value="(319,359)" />   
   </behaviour>
 
-  <behaviour id="robot_3.go" algorithm="Track">
-  <param name="pointCount" value="12" /> 
-  <param name="point" index="0" value="(148,434)" /> 
+ <behaviour id="robot_3.go" algorithm="Track">
+  <param name="pointCount" value="13" /> 
+  <param name="point" index="0" value="(500,359)" /> 
   <param name="duration" index="0" value="1" />
-  <param name="event" index="0" value="robot_3.end" /> 
-  <param name="point" index="1" value="(144,352)" /> 
+  <param name="event" index="0" value="robot_3.end" />   
+  <param name="point" index="1" value="(517,315)" /> 
   <param name="duration" index="1" value="1" />  
-  <param name="point" index="2" value="(137,241)" /> 
+  <param name="event" index="1" value="robot_3.end" />     
+  <param name="point" index="2" value="(624,169)" /> 
   <param name="duration" index="2" value="1" />
-  <param name="point" index="3" value="(137,241)" /> 
-  <param name="duration" index="3" value="1" /> 
-  <param name="point" index="4" value="(106,242)" /> 
+  <param name="point" index="3" value="(600,118)" /> 
+  <param name="duration" index="3" value="1" />
+  <param name="point" index="4" value="(639,161)" /> 
   <param name="duration" index="4" value="1" />
-  <param name="point" index="5" value="(106,242)" />
+  <param name="event" index="4" value="robot_3.end" />   
+  <param name="point" index="5" value="(639,181)" /> 
   <param name="duration" index="5" value="1" />
-  <param name="point" index="6" value="(118,88)" /> 
+  <param name="point" index="6" value="(639,208)" /> 
   <param name="duration" index="6" value="1" />
-  <param name="event" index="6" value="robot_3.end" />
-  <param name="point" index="7" value="(215,96)" /> 
-  <param name="duration" index="7" value="1" />  
-  <param name="point" index="8" value="(452,115)" /> 
-  <param name="duration" index="8" value="1" />
-  <param name="point" index="9" value="(433,112)" /> 
+  <param name="point" index="7" value="(624,169)" />
+  <param name="duration" index="7" value="1" />
+  <param name="point" index="8" value="(609,224)" /> 
+  <param name="duration" index="8" value="1" /> 
+  <param name="point" index="9" value="(608,266)" /> 
   <param name="duration" index="9" value="1" />
-  <param name="point" index="10" value="(265,294)" /> 
-  <param name="duration" index="10" value="1" /> 
-  <!--param name="event" index="10" value="robot_3.end" /-->    
-  <param name="point" index="11" value="(148,434)" />   
+  <param name="point" index="10" value="(629,266)" /> 
+  <param name="duration" index="10" value="1" />
+  <param name="event" index="10" value="robot_3.end" />   
+  <param name="point" index="11" value="(564,317)" /> 
+  <param name="duration" index="11" value="1" />
+  <param name="event" index="11" value="robot_3.end" />
+  <param name="point" index="12" value="(500,359)" />  
   </behaviour>
 
- <define id="robot_1_arm">
+ <define id="robot_3_arm">
  <primitive type="sprite">
   <param name="src" value="image/robotArm.gif" /> 
   <param name="hotspot" value="(13,4)" /> 
@@ -118,7 +120,7 @@
   <primitive type="null" /> 
   </define>
 
- <define id="robot_3_arm">
+ <define id="robot_1_arm">
  <primitive type="sprite">
   <param name="src" value="image/robotArm.gif" /> 
   <param name="hotspot" value="(13,4)" /> 
@@ -137,22 +139,22 @@
  <draw>
 
  <transform type="translate">
-  <param name="x" value="538" /> 
-  <param name="y" value="434" /> 
+  <param name="x" value="109" /> 
+  <param name="y" value="358" /> 
   <animate param="translation" behaviour="robot_1.go" /> 
   <paste object="robot_1_arm" /> 
   </transform>
 
  <transform type="translate">
-  <param name="x" value="348" /> 
-  <param name="y" value="434" /> 
+  <param name="x" value="319" /> 
+  <param name="y" value="359" /> 
   <animate param="translation" behaviour="robot_2.go" /> 
   <paste object="robot_2_arm" /> 
   </transform>
-
+  
  <transform type="translate">
-  <param name="x" value="148" /> 
-  <param name="y" value="434" /> 
+  <param name="x" value="500" /> 
+  <param name="y" value="359" /> 
   <animate param="translation" behaviour="robot_3.go" /> 
   <paste object="robot_3_arm" /> 
   </transform>
@@ -170,6 +172,12 @@
   <start behaviour="robot_1.go" /> 
   </command>
 
+<command name="robot_1.reset">
+	<announce event = "~robot_1.end"/>
+	<reset behaviour="robot_1.go"/>
+	<start behaviour="robot_1.go"/>
+</command>
+
  <event object="robot_1.go" event="robot_1.end">
   <announce event="robot_1.end" /> 
   <stop behaviour="robot_1.go" /> 
@@ -182,6 +190,12 @@
   <start behaviour="robot_2.go" /> 
   </command>
 
+<command name="robot_2.reset">
+	<announce event = "~robot_2.end"/>
+	<reset behaviour="robot_2.go"/>
+	<start behaviour="robot_2.go"/>
+</command>
+
  <event object="robot_2.go" event="robot_2.end">
   <announce event="robot_2.end" /> 
   <stop behaviour="robot_2.go" /> 
@@ -193,6 +207,12 @@
   <announce event="~robot_3.end" /> 
   <start behaviour="robot_3.go" /> 
   </command>
+
+<command name="robot_3.reset">
+	<announce event = "~robot_3.end"/>
+	<reset behaviour="robot_3.go"/>
+	<start behaviour="robot_3.go"/>
+</command>
 
  <event object="robot_3.go" event="robot_3.end">
   <announce event="robot_3.end" /> 
