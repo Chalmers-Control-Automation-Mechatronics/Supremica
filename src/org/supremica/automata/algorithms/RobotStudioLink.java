@@ -125,9 +125,6 @@ public class RobotStudioLink
 	public static void pathSplittingTest()
 	{
 		//IPath path = activeStation.getPaths().item(var("I1A1"));
-
-
-
 	}
 
 	/**
@@ -327,9 +324,11 @@ public class RobotStudioLink
 					Automaton mutexAutomaton = mutexAutomata.getAutomatonAt(j);
 					String zoneName = mutexAutomaton.getName();
 					double[][] collisionTimes = mechanismListener.getCollisionTimes(zoneName);
-
-					// Exmine the times of target reaching and mutexzone collisions
-					synchronize(mutexAutomaton, robotAutomaton, collisionTimes, targetTimes);
+					if (collisionTimes != null)
+					{
+						// Examine the times of target reaching and mutexzone collisions
+						synchronize(mutexAutomaton, robotAutomaton, collisionTimes, targetTimes);
+					}
 				}
 
 				// Shut down the controller
@@ -511,6 +510,7 @@ public class RobotStudioLink
 			// Create two boxes (two IEntity), both members of the IPart "MutexZones"
 			createBox(-0.25, 0.125, 0.75, 0, 0, 0, 0.5, 0.5, 0.5, mutexPartName, "MutexZone1");
 			createBox(-0.25, -0.625, 0.75, 0, 0, 0, 0.5, 0.5, 0.5, mutexPartName, "MutexZone2");
+			createBox(-0.125, -0.125, 0.875, 0, 0, 0, 0.25, 0.25, 0.25, mutexPartName, "MutexZone3");
 
 			// Create automata representing the mutexzones (one per zone)
 			IPart mutexPart = activeStation.getParts().item(var(mutexPartName));
@@ -1073,8 +1073,18 @@ class MechanismListener extends _MechanismEventsAdapter
 	}
 	public double[][] getCollisionTimes(String mutexZone)
 	{
-		CollisionData data = (CollisionData) collisions.get(collisions.indexOf(new CollisionData(mutexZone)));
-		return data.getTimes();
+		//CollisionData data = (CollisionData) collisions.get(collisions.indexOf(new CollisionData(mutexZone)));
+		int index = collisions.indexOf(new CollisionData(mutexZone));
+		//int index = collisions.indexOf(mutexZone);
+		if (index >= 0)
+		{
+			CollisionData data = (CollisionData) collisions.get(index);
+			return data.getTimes();
+		}
+		else
+		{
+			return null;
+		}
 	}
 	public synchronized void waitForControllerStart()
 	{
