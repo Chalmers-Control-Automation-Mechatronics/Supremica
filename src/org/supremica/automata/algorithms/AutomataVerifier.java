@@ -601,7 +601,7 @@ public class AutomataVerifier
 					states = "two states";
 				else
 					states = size + " states";
-				
+
 				logger.info("'" + automataNames + "' has " + states +
 							 " that might be uncontrollable...");
 			}
@@ -699,7 +699,7 @@ public class AutomataVerifier
 					{
 						if (verboseMode)
 						{
-							logger.info("Couldn't prove controllability, " + 
+							logger.info("Couldn't prove controllability, " +
 										"trying to prove uncontrollability...");
 						}
 
@@ -792,7 +792,7 @@ public class AutomataVerifier
 		for (AutomatonIterator autIt = theAutomata.iterator(); autIt.hasNext();)
 		{
 			currAutomaton = autIt.nextAutomaton();
-			
+
 			// Is this automaton interesting?
 			if (selectedAutomata.containsAutomaton(currAutomaton))
 			{
@@ -802,20 +802,20 @@ public class AutomataVerifier
 			// This line is the essence of it all...
 			arraySortValue[count] = compareAlphabets(currAutomaton.getAlphabet(), synchAlphabet);
 			// arraySortValue[count] = compareAlphabets(synchAlphabet, currAutomaton.getAlphabet());
-			
+
 			// Did we get a value?
 			if (arraySortValue[count] > 0)
 			{
 				tempArray[count++] = currAutomaton.getIndex();
 
-				// Have we found everything possible already?				
+				// Have we found everything possible already?
 				if (count == amountOfUnselected)
 				{
 					break;
 				}
 			}
 		}
-	
+
 		// Did we find anything interesting at all?
 		if (count == 0)
 		{
@@ -1191,13 +1191,13 @@ public class AutomataVerifier
 				abf.cleanup();
 				break;
 			case Options.INCLUSION_ALGO_MODULAR:
-				ModularBDDLanguageInclusion mli = new ModularBDDLanguageInclusion(selected, unselected, synchHelper.getHelperData());
+				org.supremica.util.BDD.li.ModularLI mli = new org.supremica.util.BDD.li.ModularLI(selected, unselected, synchHelper.getHelperData());
 				ret = mli.passLanguageInclusion();
 				mli.cleanup();
 
 				break;
 			case Options.INCLUSION_ALGO_INCREMENTAL:
-				IncrementalBDDLanguageInclusion ili = new IncrementalBDDLanguageInclusion(selected, unselected, synchHelper.getHelperData());
+				org.supremica.util.BDD.li.IncrementalLI ili = new org.supremica.util.BDD.li.IncrementalLI (selected, unselected, synchHelper.getHelperData());
 				ret = ili.passLanguageInclusion();
 				ili.cleanup();
 				break;
@@ -1242,13 +1242,13 @@ public class AutomataVerifier
 				abf.cleanup();
 				break;
 			case Options.INCLUSION_ALGO_MODULAR:
-				ModularBDDLanguageInclusion mli = new ModularBDDLanguageInclusion(theAutomata, synchHelper.getHelperData());
+				org.supremica.util.BDD.li.ModularLI mli = new org.supremica.util.BDD.li.ModularLI(theAutomata, synchHelper.getHelperData());
 				ret = mli.isControllable();
 				mli.cleanup();
 
 				break;
 			case Options.INCLUSION_ALGO_INCREMENTAL:
-				IncrementalBDDLanguageInclusion ili = new IncrementalBDDLanguageInclusion(theAutomata, synchHelper.getHelperData());
+				org.supremica.util.BDD.li.IncrementalLI ili = new org.supremica.util.BDD.li.IncrementalLI( theAutomata, synchHelper.getHelperData() );
 				ret = ili.isControllable();
 				ili.cleanup();
 				break;

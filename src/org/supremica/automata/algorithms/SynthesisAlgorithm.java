@@ -55,11 +55,13 @@ public class SynthesisAlgorithm
 {
 	private static Collection types = new LinkedList();
 	public static final SynthesisAlgorithm Monolithic = new SynthesisAlgorithm("Monolithic");
-	public static final SynthesisAlgorithm MonolithicSingleFixpoint = new SynthesisAlgorithm("Monolithic (single fixpoint)", false);
 	public static final SynthesisAlgorithm Modular = new SynthesisAlgorithm("Modular");
-	public static final SynthesisAlgorithm BDD = new SynthesisAlgorithm("BDD");
 	public static final SynthesisAlgorithm IDD = new SynthesisAlgorithm("IDD", false);
 	public static final SynthesisAlgorithm Unknown = new SynthesisAlgorithm("Unknown", false);
+
+	public static final SynthesisAlgorithm MonolithicSingleFixpoint = new SynthesisAlgorithm("Monolithic (single fixpoint)", false); // works, but is very slow [due to lame implementation :s ]
+	public static final SynthesisAlgorithm BDD = new SynthesisAlgorithm("BDD", false); // works, but we cant handle the results yet
+
 	private String description = null;
 
 	private SynthesisAlgorithm(String description)

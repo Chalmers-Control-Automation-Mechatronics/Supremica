@@ -14,7 +14,7 @@ import java.util.*;
 public class NDAS_Choice {
 	private final int
 		ADD_REWARD = +2,
-		ADD_PUNISH = -1,
+		ADD_PUNISH = -1,	// tabu search magic number?
 		ADD_REWARD_FADING = +5;
 
 
@@ -28,12 +28,12 @@ public class NDAS_Choice {
 		ndas = Options.ndas_heuristics;
 		max_activity = size;
 
-		if(ndas == Options.NDAS_ACTIVITY || ndas == Options.NDAS_ACTIVITY2) {
+		if(ndas == Options.NDAS_RL || ndas == Options.NDAS_RL_TABU) {
 			// we handle NDAS_ACTIVITY and NDAS_ACTIVITY2 equal beside the small different in advance()
-			if(ndas == Options.NDAS_ACTIVITY2) {
-				punish_inactive = false;
-				ndas = Options.NDAS_ACTIVITY;
-			} else punish_inactive = true;
+			if(ndas == Options.NDAS_RL_TABU) {
+				punish_inactive = true;
+				ndas = Options.NDAS_RL;
+			} else punish_inactive = false;
 
 			activity = new int[size];
 			queue2 = new int[size];
@@ -67,7 +67,7 @@ public class NDAS_Choice {
 			case Options.NDAS_LAST: 	return queue[size-1];
 			case Options.NDAS_RANDOM:	return queue[ (int)(Math.random() * size) ];
 			case Options.NDAS_RING:		return queue[ ring++ % size ];
-			case Options.NDAS_ACTIVITY: return find_best_active(queue, size);
+			case Options.NDAS_RL:       return find_best_active(queue, size);
 
 		}
 
@@ -80,7 +80,7 @@ public class NDAS_Choice {
 		num_access++;
 		if(changed) num_advance++;
 
-		if(ndas == Options.NDAS_ACTIVITY) {
+		if(ndas == Options.NDAS_RL_TABU) {
 			if(punish_inactive) {
 				// reward and punish
 				activity[automaton] += (changed) ? ADD_REWARD : ADD_PUNISH;

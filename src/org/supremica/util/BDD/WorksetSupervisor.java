@@ -138,6 +138,25 @@ public class WorksetSupervisor extends DisjSupervisor
 		int r_all_p, r_all = manager.ref(bdd_i);
 
 
+		// initial burst mode
+		if(Options.burst_mode) {
+			for(int i = 0; i < clusters.length; i++) {
+				do{
+					r_all_p = r_all;
+					int tmp = manager.relProd(clusters[i].getTwave() , bdd_i, s_cube);
+					int tmp2 = manager.replace(tmp, perm_sp2s);
+					manager.deref(tmp);
+
+					r_all = manager.orTo(r_all, tmp2);
+					manager.deref(tmp2);
+
+					if (gf != null)	gf.add( r_all );
+				} while(r_all_p != r_all);
+			}
+			if (gf != null)	gf.mark("Burst done");
+		}
+
+
 		while(!workset.empty()) {
 			int p = workset.pickOne();
 			int r_all_org = r_all;
@@ -184,6 +203,23 @@ public class WorksetSupervisor extends DisjSupervisor
 		manager.deref(m_all);
 
 
+
+		// initial burst mode:
+			if(Options.burst_mode) {
+				for(int i = 0; i < clusters.length; i++) {
+					do{
+						r_all_p = r_all;
+						int tmp = manager.relProd(clusters[i].getTwave(), m_all, sp_cube);
+						int tmp2 = manager.replace(tmp, perm_s2sp);
+						manager.deref(tmp);
+						r_all = manager.orTo(r_all, tmp2);
+						manager.deref(tmp2);
+
+						if (gf != null)	gf.add( r_all );
+					} while(r_all_p != r_all);
+				}
+				if (gf != null)	gf.mark("Burst done");
+			}
 
 
 		while(!workset.empty()) {

@@ -17,6 +17,7 @@ public class Util
 
 	// -------------------------------------------------
 
+
 	/** duplicates a vector of booleans */
 	public static boolean [] duplicate(boolean [] x) {
 		int len = x.length;
@@ -63,6 +64,15 @@ public class Util
 		return x;
 	}
 
+	/** set all elements to this value */
+	public static void set(int [] v, int value) {
+		for(int i = 0; i < v.length; i++) v[i] = value;
+	}
+
+	/** copy vector */
+	public static void set(int [] dst, int [] src) {
+		for(int i = 0; i < dst.length; i++) dst[i] = src[i];
+	}
 	// -------------------------------------------------
 
 	public static int suggest_nodecount(Automata a)

@@ -28,6 +28,7 @@ public class BDDAutomaton
 	private int bdd_care_s, bdd_dontcare_s;
 	private int bdd_care_sp, bdd_dontcare_sp;
 	private int index_first_bdd, index_last_bdd;
+	public int extra1, extra2; /** used by other algos */
 
 	public BDDAutomaton(BDDAutomata manager, Automaton a, int index)
 	{

@@ -9,7 +9,7 @@ import java.util.*;
 /**
  * depth first ordering, AKA topological sort
  *
- * XXX: we should traverse the nodes w.r.t weights (maybe dijkstra's algo...)
+ * it traverses the nodes w.r.t weights - the implementatio is not as elegant as dijkstra's algo :(
  *
  * XXX: we havent tested if the starting point given by get_least_connected is really good !
  *
@@ -25,29 +25,50 @@ public class DFSSolver extends Solver {
 
 		count = 0;
 
-		// WAS: dfs(0); // start with the first state
-		dfs( get_least_connected() );
+		int [] stack = new int[size];
+		int tos = 0;
+		int first = get_least_connected() ;
+		stack[tos++] = first;
 
+		while(tos > 0) {
+			int curr = stack[--tos];
+			org[curr].extra1 = 1;
+			org[curr].extra2 = count++;
+
+			int start = tos;
+			for(int i = 0; i < size; i++)
+				if(i != curr && (org[i].wlocal[curr] > 0) && org[i].extra1 == 0) {
+					stack[tos++] = i;
+					org[i].extra1 = -1; // to make sure we dont select it again!
+				}
+
+
+			// sort element 'start' to 'tos'-1
+			sort(stack, start, tos, curr);
+		}
 
 		// fix those with no ordering:
 		for(int i = 0; i < size; i++) if(org[i].extra1 == 0)  org[i].extra2 = count++;
+
 
 		// now, sort according to our new DFS order
 		for(int i = 0; i < size; i++) solved[ org[i].extra2 ] = org[i];
 
 	}
 
-	/** recursively DFS mark the graph */
-	private void dfs(int j) {
-		org[j].extra1 = 1;
-		org[j].extra2 = count++;
 
-		for(int i = 0; i < size; i++) {
-			// traverse in the original array-order, TO BE CHANGED
-			if(i != j && (org[i].wlocal[j] > 0) && org[i].extra1 == 0) {
-				dfs(i);
-			}
+	/**
+	 * just sort so the automaton with largest dependency gets places on top of stack and
+	 * therefor traversed first :)
+	 */
+	private void sort(int [] data, int start, int end, int parent) {
+		for(int i = start; i < end; i++) {
+			int min = i;
+			for(int j = i+1; j< end; j++)
+				if( org[data[j]].wlocal[parent]  <  org[data[min]].wlocal[parent])
+					min = j;
+
+			int tmp = data[min]; data[min] = data[i]; data[i] = tmp;
 		}
 	}
-
 }

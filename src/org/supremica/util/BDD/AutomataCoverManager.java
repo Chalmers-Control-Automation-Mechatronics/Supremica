@@ -5,6 +5,8 @@ package org.supremica.util.BDD;
 import org.supremica.util.BDD.heuristics.*;
 import java.util.*;
 
+
+
 public class AutomataCoverManager {
 	private BDDAutomata manager;
 	private PerEventTransitionSystem pets;

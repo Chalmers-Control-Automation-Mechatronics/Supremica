@@ -682,7 +682,7 @@ class BDDPanel1
     private PreferencesDialog theDialog = null;
     private JCheckBox alterPCG, traceOn, ucOptimistic, nbOptimistic;
     /* package access */ JCheckBox debugOn;
-    private JCheckBox localSaturation, encodingFill, sizeWatch, profileOn;
+    private JCheckBox localSaturation, encodingFill, sizeWatch, profileOn, burstMode;
 
     private JComboBox algorithmFamily, dssiHeuristics, ndasHeuristics;
     private JComboBox inclusionAlgorithm, asHeuristics, esHeuristics, frontierStrategy;
@@ -723,7 +723,10 @@ class BDDPanel1
 		pWest.add( encodingFill = new JCheckBox("Full encoding of S", Options.fill_statevars) );
 		encodingFill.setEnabled(false);
 
+		pWest.add( burstMode = new JCheckBox("Burst-mode workset", Options.burst_mode) );
+
 		// -------------------------------------------------------
+
 		Box p = new Box(BoxLayout.Y_AXIS);
 		add(p, BorderLayout.EAST);
 
@@ -808,6 +811,7 @@ class BDDPanel1
 		Options.user_alters_PCG  = alterPCG.isSelected();
 		// Options.uc_optimistic    = ucOptimistic.isSelected();
 		// Options.nb_optimistic    = nbOptimistic.isSelected();
+		Options.burst_mode          = burstMode.isSelected();
 		Options.trace_on         = traceOn.isSelected();
 		Options.profile_on         = profileOn.isSelected();
 		Options.debug_on         = debugOn.isSelected();

@@ -3,6 +3,9 @@ package org.supremica.util.BDD.test;
 import java.io.*;
 
 import org.supremica.util.BDD.*;
+import org.supremica.util.BDD.li.*;
+
+
 import org.supremica.automata.*;
 import org.supremica.automata.IO.*;
 import org.supremica.automata.algorithms.*;
@@ -123,7 +126,8 @@ public class TestAlgo {
 
 	private void incrementalC(boolean result) throws Exception {
 		System.out.print("incrC ");
-		IncrementalBDDLanguageInclusion ili = new IncrementalBDDLanguageInclusion(automata1, null);
+		// IncrementalBDDLanguageInclusion ili = new IncrementalBDDLanguageInclusion(automata1, null);
+		IncrementalLI ili = new IncrementalLI(automata1, null);
 		boolean is_controllable = ili.isControllable();
 		ili.cleanup();
 
@@ -138,7 +142,7 @@ public class TestAlgo {
 	private void modularC(boolean result) throws Exception {
 
 		System.out.print("modC ");
-		ModularBDDLanguageInclusion mli = new ModularBDDLanguageInclusion(automata1, null);
+		ModularLI mli = new ModularLI(automata1, null);
 		boolean is_controllable = mli.isControllable();
 		mli.cleanup();
 
@@ -159,6 +163,14 @@ public class TestAlgo {
 		n = 40 - nam.length();
 		while(n-- > 0) System.out.print(' ');
 		System.out.flush();
+
+
+		if(Options.debug_on ) {
+			Options.out.println("\n\n\n\n\n\n\n\n\n\n\n");
+			Options.out.println("********************************************************************");
+			Options.out.println("Loaded " + nam);
+			Options.out.println("\n\n\n\n\n\n\n\n\n\n\n");
+		}
 	}
 	// ------------------------------------------------------------------------------------
 	public void runTests() throws Exception {
@@ -166,6 +178,7 @@ public class TestAlgo {
 		int len = TEST_FILES.length;
 
 		System.out.println("Using serach algorithm: " + Options.REACH_ALGO_NAMES[Options.algo_family]);
+
 		for(int i = 0; i < len; i++) {
 			announce(TEST_FILES[i]);
 
@@ -195,9 +208,19 @@ public class TestAlgo {
 
 
 	public static void main(String [] args) {
-		// these will create a lot of noise!
+
 		Options.profile_on = false;
-		Options.debug_on = false;
+
+
+		try {
+			Options.debug_on = true;
+			FileOutputStream fos = new FileOutputStream("bdd_tests.txt", false);
+			PrintStream ps = new PrintStream(fos);
+			Options.out = ps;
+			Options.debug_on = true;
+		} catch(IOException exx) {
+			Options.out.println("Could not set proof file: " + exx);
+		}
 
 
 		// remeber, there is no GUI:

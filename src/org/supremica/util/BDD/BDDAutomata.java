@@ -31,10 +31,14 @@ public class BDDAutomata
 	private int[] events;
 
 	// private int events_bits;
-	private int bdd_events_cube, bdd_events_u, bdd_events_c;
+	private int bdd_events_cube, bdd_events, bdd_events_u, bdd_events_c;
 
 	// we dont like to hang the system, so we decrease our priority:
-	int saved_priority;
+	private int saved_priority;
+
+	/** this is used in recursive show_transition calls, dont touch */
+	private boolean show_transition_is_half;
+
 
 	public BDDAutomata(Automata a)
 	{
@@ -210,6 +214,8 @@ public class BDDAutomata
 			// printSet(original_events[i].bdd);
 		}
 
+		bdd_events = or(bdd_events_c, bdd_events_u);
+
 		has_events = true;
 
 		// ---------------------------------------- create global S->S' and S'->S permutations
@@ -280,6 +286,11 @@ public class BDDAutomata
 		return bdd_events_u;
 	}
 
+	public int getSigma()
+	{
+		return bdd_events;
+	}
+
 	public int getSigmaC()
 	{
 		return bdd_events_c;
@@ -342,10 +353,15 @@ public class BDDAutomata
 	{
 
 		check("cleanup");
-
 		for (int i = 0; i < components; i++)
 		{
 			automata[i].cleanup();
+		}
+
+		if(has_events) {
+			deref(bdd_events_u);
+			deref(bdd_events_c);
+			deref(bdd_events);
 		}
 
 		deletePair(permute_s2sp);
@@ -401,6 +417,13 @@ public class BDDAutomata
 
 	private void show_states_rec(String[] saved, boolean[] cares, int bdd, int level)
 	{
+		// no need to continue if there is nothing there anyway...
+		if(bdd == getZero())
+		{
+			return;
+		}
+
+		// termination condition
 		if (level >= components)
 		{
 			Options.out.print(" < ");
@@ -426,6 +449,12 @@ public class BDDAutomata
 		}
 		else
 		{
+			if(dont_care(bdd, automata[level].getCareS(), automata[level].getCube()) ) {
+				saved[level] = "-";
+				show_states_rec(saved, cares, bdd, level + 1);
+				return;
+			}
+
 			int zero = getZero();    // ok not refed
 			State[] states = automata[level].getStates();
 
@@ -735,8 +764,29 @@ public class BDDAutomata
 	}
 
 	// -------------------------------------------------------- show_transitions
+
+	/**
+	 * for a transition T: Q x E --> Q, the half-transition is T': subset Q x E
+	 *
+	 */
+	public void show_half_transitions(int bdd) {
+		show_transition_is_half = true;
+		show_transitions_internal(bdd);
+	}
+
+	/**
+	 * print the notation of this transition in the global state space
+	 * this function can be very slow for medium and large functions
+	 */
 	public void show_transitions(int bdd)
 	{
+		show_transition_is_half = false;
+		show_transitions_internal(bdd);
+	}
+
+	private void show_transitions_internal(int bdd)
+	{
+
 		String[] names = new String[components * 2 + 1];    // the last one for events
 
 		for (int i = 0; i < names.length; i++)
@@ -744,20 +794,44 @@ public class BDDAutomata
 			names[i] = null;
 		}
 
-		Options.out.println("T = {");
+		Options.out.println(show_transition_is_half ? "T-half = {" : "T = {");
 		show_transitions_rec0(names, bdd, 0);
 		Options.out.println("};");
 	}
 
+	/** show the first part (State from) of a transition */
 	private void show_transitions_rec0(String[] names, int bdd, int level)
-	{    // for S
-		if (level >= components)
-		{
-			show_transitions_rec1(names, bdd, 0);
+	{
 
+		if(bdd == getZero() )
+		{
 			return;
 		}
 
+
+		// for S
+		if (level >= components)
+		{
+			if(show_transition_is_half)
+			{
+				show_transitions_rec2(names, bdd);
+			}
+			else
+			{
+				show_transitions_rec1(names, bdd, 0);
+			}
+			return;
+		}
+
+		// see if it is dont care!
+		if(dont_care(bdd, automata[level].getCareS(), automata[level].getCube()) ) {
+			names[level] = "-";
+			show_transitions_rec0(names, bdd, level + 1);
+			return;
+		}
+
+
+		// show exactly what it was:
 		State[] states = automata[level].getStates();
 		int zero = getZero();
 
@@ -776,14 +850,33 @@ public class BDDAutomata
 		}
 	}
 
+
+	/** show the second part (State to) of a transition */
 	private void show_transitions_rec1(String[] names, int bdd, int level)
-	{    // for S'
+	{
+		if(bdd == getZero())
+		{
+			return;
+		}
+
+		// for S'
 		if (level >= components)
 		{
 			show_transitions_rec2(names, bdd);
 
 			return;
 		}
+
+
+
+		// see if it doesnt matter
+		if(dont_care(bdd, automata[level].getCareSp(), automata[level].getCubep()) ) {
+			names[components + level] = "-";
+			show_transitions_rec1(names, bdd, level + 1);
+			return;
+		}
+
+
 
 		State[] states = automata[level].getStates();
 		int zero = getZero();
@@ -803,10 +896,24 @@ public class BDDAutomata
 		}
 	}
 
+
+	/** show the event part of a transition */
 	private void show_transitions_rec2(String[] names, int bdd)
 	{    // and for Sigma
 		final int pos = components * 2;
 		int zero = getZero();
+
+		if(bdd == zero)
+		{
+			return;
+		}
+
+		// see if it is a dont care!
+		if(dont_care(bdd, bdd_events, bdd_events_cube) ){
+			names[pos] = "-";
+			show_transitions_print(names);
+			return;
+		}
 
 		for (int i = 0; i < events_size; i++)
 		{
@@ -827,7 +934,7 @@ public class BDDAutomata
 	{    // pretty printer for the transition list
 		int i;
 
-		Options.out.print("  ( <");
+		Options.out.print("  [ (");
 
 		for (i = 0; i < components; i++)
 		{
@@ -842,7 +949,7 @@ public class BDDAutomata
 			}
 		}
 
-		Options.out.print(">, ");
+		Options.out.print("),  ");
 
 		String event = list[components * 2];
 
@@ -851,7 +958,12 @@ public class BDDAutomata
 			event = "??";
 		}
 
-		Options.out.print(event + "  -> <");
+		if(show_transition_is_half) {
+			Options.out.println(event + "  ]");
+			return;
+		}
+
+		Options.out.print(event + "       ==>>      (");
 
 		for (i = 0; i < components; i++)
 		{
@@ -866,7 +978,7 @@ public class BDDAutomata
 			}
 		}
 
-		Options.out.println("> ), ");
+		Options.out.println(") ], ");
 	}
 
 	// -----------------------------------------------------------------------------
@@ -950,138 +1062,37 @@ public class BDDAutomata
 		return bdd;
 	}
 
-	// ------------------------------------------------ work in progress stuffs
-	public void internal_test()
-	{
-		Options.out.println(" ---------------- internal_test ---------------");
+	// ----------------------------------------------------------------
 
-		Timer timer = new Timer();
+	/**
+	 * see if the set/function/whatever 'bdd' includes all elements of 'values',
+	 * that is, this is a dont-care situation (= any element of 'values' would do)
+	 * the domain of 'values' must be given with its 'cube'
+	 *
+	 * NOTE: THIS FUNCTION IS NOT VERY EFFICIENT!!!
+	 */
+	private boolean dont_care(int bdd, int values, int cube) {
 
-		// gc(); // DEBUG
-		Supervisor sup = new Supervisor(this, automata);
-
-		timer.report("Supervisor intansiated");
-
-		int r = sup.getReachables();    // gc();
-		int u = sup.getReachableUncontrollables();    // gc();
-		int d = sup.getDeadlocks();    // gc();
-		int c = sup.getCoReachables();    // gc();
-		int safe = sup.getSafeStates(true, true);    // gc();
-
-		// DEBUG:
-		// Options.out.print("Deadlocks: ");     show_states(d);
-		Options.out.println("-------- All done, counting states now -----------");
-		count_states("reachables", r);
-		count_states("co-reachaboes", c);
-		count_states("uncontrollable (reachable)", u);
-		count_states("deadlocks", d);
-		count_states("safe states", safe);
-
-		/* show any deadlocks, but only the 20 first ones */
-		if (d != getZero())
+		if(bdd == getOne())
 		{
-			sup.trace_set("deadlock", d, 20);
+			return true;
 		}
 
-		sup.cleanup();
 
-		/*
-		 * // ------------------------------ get a prioritized composition
-		 * Timer timer = new Timer();
-		 * int t_all = getOne();
-		 * // initial = getOne();
-		 * // cube = getOne();
-		 *
-		 *
-		 * for(int i = components-1; i >= 0; --i) {
-		 * BDDAutomaton a = automata[i];
-		 *
-		 * // initial = andTo(initial, a.getI() );
-		 * // cube    = andTo( cube,   a.getCube() );
-		 * t_all = andTo(t_all, a.getTpri() );
-		 *
-		 *
-		 * // Options.out.print("t_all="); printSet(t_all);
-		 * Options.out.print((100 * i / components) + "% left ...         \r");
-		 * }
-		 *
-		 * timer.report("Prioritized composition done");
-		 * int cube = and(bdd_total_cube, events_cube); ref(cube);
-		 *
-		 * BDDAssert.debug("Prioritized composition");
-		 * // Options.out.println("T-all = "); printSet(t_all);
-		 * // show_states(t_all, null);
-		 * BDDAssert.debug("|prioritizied T-all| = " + nodeCount(t_all));
-		 *
-		 *
-		 * timer.reset();
-		 * // test reachability on this t_all:
-		 * int r_all = simple_forward(bdd_total_initial, t_all, cube);
-		 *
-		 * // show_states(r_all, null);
-		 * // show_transitions( and(t_all, not(keep)));
-		 * // printSet( and(t_all, not(keep)));
-		 * timer.report("Reachable states found");
-		 *
-		 *
-		 * timer.reset();
-		 * int r_all_partitioned = partitioned_forward();
-		 * timer.report("Partitioned forward reachability");
-		 *
-		 * timer.reset();
-		 * count_states("States in r_all", r_all);
-		 * timer.report("States counted");
-		 */
-	}
 
-	private int partitioned_forward()
-	{
-		int rp = 0, r = bdd_total_initial;
-		int[] cubes = new int[components];
-		int last = getOne();
 
-		ref(last);
+		int tmp = relProd(bdd, values, cube);
 
-		for (int i = components - 1; i >= 0; --i)
+		if(tmp == bdd)
 		{
-			cubes[i] = and(last, automata[i].getCube());
-			last = cubes[i];
+			deref(tmp);
+			return true;
 		}
 
-		deref(getOne());    // 'last' is changed to something else now;)
 
-		int front = r;
+		deref(tmp);
 
-		do
-		{
-			rp = r;
+		return false;
 
-			ref(r);
-
-			for (int i = components - 1; i >= 0; --i)
-			{
-				BDDAutomaton a = automata[i];
-				int tmp2 = relProd(a.getTpri(), front, cubes[i] /* WAS a.getCube() */);
-
-				deref(front);
-
-				front = tmp2;
-			}
-
-			int tmp2 = exists(front, bdd_events_cube);
-
-			deref(front);
-
-			front = replace(tmp2, permute_sp2s);
-
-			deref(tmp2);
-
-			r = orTo(r, front);
-
-			deref(r);    // what is this ????
-		}
-		while (rp != r);
-
-		return r;
 	}
 }

@@ -205,15 +205,16 @@ public class Options
 
 	/** Non-deteministic Automata Selection: how to use between equally expensive automata ? (see for example Workset.java) */
 	public static final String [] NDAS_HEURISTIC_NAMES =
-		{ "Random          ", "Topologically first", "Topologically last", "Ring", "Activity (reward/punish)", "Activity (reward/fade)" };
+		{ "Random          ", "Topologically first", "Topologically last", "Ring",
+		"Reinforcement learning", "Reinforcement learning (tabu)" };
 	public static final int
 		NDAS_RANDOM = 0,
 		NDAS_FIRST = 1,
 		NDAS_LAST = 2,
 		NDAS_RING = 3,
-		NDAS_ACTIVITY = 4,
-		NDAS_ACTIVITY2 = 5;
-	public static int ndas_heuristics = NDAS_RANDOM;
+		NDAS_RL = 4,
+		NDAS_RL_TABU = 5;
+	public static int ndas_heuristics = NDAS_RL_TABU;
 
 
 	/** state encoding of states in an automaton */
@@ -249,6 +250,7 @@ public class Options
     public static boolean local_saturation = false;
     public static boolean uc_optimistic = true;
     public static boolean nb_optimistic = true;
+    public static boolean burst_mode = false; /** initial burst mode: to do some initial work before the reachability algo realy starts */
 
 
 
