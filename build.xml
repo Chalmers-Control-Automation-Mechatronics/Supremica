@@ -88,6 +88,7 @@
 	<unjar src="${lib}/scenebeans.jar" dest="${lib}/${unjared}"/>
 	<unjar src="${lib}/natutil.jar" dest="${lib}/${unjared}"/>
 	<unjar src="${lib}/scenebeansXmlCompability.jar" dest="${lib}/${unjared}"/>
+	<unjar src="${lib}/BCEL.jar" dest="${lib}/${unjared}"/>
 	
  	<mkdir dir="${lib}/licensed"/>
  	<touch file="${lib}/licensed/JGo.jar"/>	
