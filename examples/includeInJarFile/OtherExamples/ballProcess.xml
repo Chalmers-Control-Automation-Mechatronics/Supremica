@@ -138,6 +138,63 @@
 			<Transition event="em.elevator.release_station" source="q_13" dest="q_0" />			
 		</Transitions>
 	</Automaton>
+	<Automaton name="Progress spec: Measure station - measure" type="Specification">
+		<Events>
+			<Event id="em.request_measure" label="em.request_measure" controllable="true" prioritized="true" />
+			<Event id="measure.go_out" label="measure.go_out" controllable="true" prioritized="true" />
+			<Event id="em.timer_measure.start" label="em.timer_measure.start" controllable="true" prioritized="true" />
+			<Event id="em.timer_measure.timeout" label="em.timer_measure.timeout" controllable="false" prioritized="true" />
+			<Event id="em.small_ball" label="em.small_ball" controllable="false" prioritized="true" />
+			<Event id="em.large_ball" label="em.large_ball" controllable="false" prioritized="true" />
+			<Event id="measure.go_in" label="measure.go_in" controllable="true" prioritized="true" />
+			<Event id="em.measure.allocate_station" label="em.measure.allocate_station" controllable="true" prioritized="true" />
+			<Event id="em.measure.release_station" label="em.measure.release_station" controllable="true" prioritized="true" />
+		</Events>
+		<States>
+			<State id="q_0" initial="true" accepting="true" />
+			<State id="q_0_1" accepting="false" />
+			<State id="q_0_2" accepting="false" />
+			<State id="q_1" accepting="false" />
+			<State id="q_2" accepting="false" />
+			<State id="q_3" accepting="false" />
+			<State id="q_4" accepting="false" />
+			<State id="q_5" accepting="false" />
+		</States>
+		<Transitions>
+			<Transition event="em.request_measure" source="q_0" dest="q_0_1" />
+			<Transition event="em.measure.allocate_station" source="q_0_1" dest="q_0_2" />
+			<Transition event="measure.go_out" source="q_0_2" dest="q_1" />
+			<Transition event="em.timer_measure.start" source="q_1" dest="q_2" />
+			<Transition event="em.timer_measure.timeout" source="q_2" dest="q_3" />
+			<Transition event="em.small_ball" source="q_3" dest="q_4" />
+			<Transition event="em.large_ball" source="q_3" dest="q_4" />
+			<Transition event="measure.go_in" source="q_4" dest="q_5" />
+			<Transition event="em.measure.release_station" source="q_5" dest="q_0" />
+		</Transitions>
+	</Automaton>
+	<Automaton name="Progress spec: Measure station - putter" type="Specification">
+		<Events>
+			<Event id="em.request_putter" label="em.request_putter" controllable="true" prioritized="true" />
+			<Event id="em.start_put" label="em.start_putter" controllable="true" prioritized="true" />
+			<Event id="em.stop_put" label="em.stop_putter" controllable="true" prioritized="true" />
+			<Event id="em.putter.allocate_station" label="em.putter.allocate_station" controllable="true" prioritized="true" />
+			<Event id="em.putter.release_station" label="em.putter.release_station" controllable="true" prioritized="true" />
+		</Events>
+		<States>
+			<State id="q_0" initial="true" accepting="true" />
+			<State id="q_1" accepting="false" />
+			<State id="q_2" accepting="false" />
+			<State id="q_4" accepting="false" />
+			<State id="q_5" accepting="false" />
+		</States>
+		<Transitions>
+			<Transition event="em.request_putter" source="q_0" dest="q_1" />
+			<Transition event="em.putter.allocate_station" source="q_1" dest="q_2" />
+			<Transition event="em.start_put" source="q_2" dest="q_4" />
+			<Transition event="em.stop_put" source="q_4" dest="q_5" />
+			<Transition event="em.putter.release_station" source="q_5" dest="q_0" />
+		</Transitions>
+	</Automaton>
 
 	<!-- -->
 	<!-- Interaction specs -->
@@ -172,11 +229,50 @@
 			<Transition event="em.is_up" source="q_5" dest="q_0" />
 		</Transitions>
 	</Automaton>	
+	<Automaton name="Interaction spec: Measure station" type="Specification">
+		<Events>
+			<Event id="em.measure.allocate_station" label="em.measure.allocate_station" controllable="true" prioritized="true" />
+			<Event id="em.measure.release_station" label="em.measure.release_station" controllable="true" prioritized="true" />
+			<Event id="em.putter.allocate_station" label="em.putter.allocate_station" controllable="true" prioritized="true" />
+			<Event id="em.putter.release_station" label="em.putter.release_station" controllable="true" prioritized="true" />
+			<Event id="em.elevator.allocate_station" label="em.elevator.allocate_station" controllable="true" prioritized="true" />
+			<Event id="em.elevator.release_station" label="em.elevator.release_station" controllable="true" prioritized="true" />
+			<Event id="em.start_measure" label="em.start_measure" controllable="true" prioritized="true" />
+			<Event id="em.stop_measure" label="em.stop_measure" controllable="true" prioritized="true" />
+			<Event id="em.start_put" label="em.start_put" controllable="true" prioritized="true" />
+			<Event id="em.stop_put" label="em.stop_put" controllable="true" prioritized="true" />
+			<Event id="em.go_up" label="em.go_up" controllable="true" prioritized="true" />
+			<Event id="em.go_down" label="em.go_down" controllable="true" prioritized="true" />
+		</Events>
+		<States>
+			<State id="q_0" initial="true" accepting="true" />
+			<State id="q_1" />
+			<State id="q_2" />
+			<State id="q_3" />			
+		</States>
+		<Transitions>
+			<Transition event="em.measure.allocate_station" source="q_0" dest="q_1" />
+			<Transition event="em.measure.release_station" source="q_1" dest="q_0" />
+			<Transition event="em.putter.allocate_station" source="q_0" dest="q_2" />
+			<Transition event="em.putter.release_station" source="q_2" dest="q_0" />
+			<Transition event="em.elevator.allocate_station" source="q_0" dest="q_3" />
+			<Transition event="em.elevator.release_station" source="q_3" dest="q_0" />
+			<Transition event="em.start_measure" source="q_1" dest="q_1" />
+			<Transition event="em.stop_measure" source="q_1" dest="q_1" />			
+			<Transition event="em.start_put" source="q_2" dest="q_2" />
+			<Transition event="em.stop_put" source="q_2" dest="q_2" />	
+			<Transition event="em.go_up" source="q_3" dest="q_3" />
+			<Transition event="em.go_down" source="q_3" dest="q_3" />
+		</Transitions>
+	</Automaton>
 
 	<!-- -->
 	<!-- Plant specs -->
 	<!-- -->
 	
+	<!-- -->
+	<!-- Input signals -->
+	<!-- --> 
 	<Automaton name="Plant: Manual button" type="Plant">
 		<Events>
 			<Event id="button.manual.pressed" label="button.manual.pressed" controllable="false" prioritized="true" />
@@ -191,8 +287,8 @@
 		</States>
 		<Transitions>
 			<Transition event="button.manual.pressed" source="q_0" dest="q_1" />
-			<Transition event="button.manual.released" source="q_1" dest="q_2" />
-			<Transition event="mode.manual" source="q_2" dest="q_0" />
+			<Transition event="button.manual.released" source="q_2" dest="q_0" />
+			<Transition event="mode.manual" source="q_1" dest="q_2" />
 		</Transitions>
 	</Automaton>
 	<Automaton name="Plant: Automatic button" type="Plant">
@@ -208,8 +304,8 @@
 		</States>
 		<Transitions>
 			<Transition event="button.automatic.pressed" source="q_0" dest="q_1" />
-			<Transition event="button.automatic.released" source="q_1" dest="q_2" />
-			<Transition event="mode.automatic" source="q_2" dest="q_0" />
+			<Transition event="button.automatic.released" source="q_2" dest="q_0" />
+			<Transition event="mode.automatic" source="q_1" dest="q_2" />
 		</Transitions>
 	</Automaton>	
 	<Automaton name="Plant: Gatekeeper - In" type="Plant">

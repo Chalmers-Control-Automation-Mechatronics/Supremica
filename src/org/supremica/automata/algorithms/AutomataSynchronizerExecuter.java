@@ -566,7 +566,7 @@ public final class AutomataSynchronizerExecuter
 		int[] currState = helper.getStateToProcess();
 
 		// main loop
-		while ((currState != null) &&!stopRequested)
+		while ((currState != null) && !stopRequested)
 		{
 			if (coExecute)
 			{
@@ -638,6 +638,7 @@ public final class AutomataSynchronizerExecuter
 						helper.addState(currState, nextState, currEventIndex);
 						if(numberOfAddedStates++ % 10000 == 0)
 						{
+							// KA: What the heck is this?? Extremly ugly.
 							for (int j = 0; j < 10; j++)
 							{
 								yield();

@@ -96,14 +96,14 @@ public class AutomataSynchronizer
 		// Build the initial state - and the comment
 		Iterator autIt = theAutomata.iterator();
 		StringBuffer comment = new StringBuffer();;
-		
+
 		while (autIt.hasNext())
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
 
 			currInitialState = currAutomaton.getInitialState();
 			initialState[currAutomaton.getIndex()] = currInitialState.getIndex();
-			
+
 			comment.append(currAutomaton.getName());
 			comment.append(" || ");
 		}
@@ -111,7 +111,7 @@ public class AutomataSynchronizer
 		comment.delete(comment.length()-4, comment.length());
 		synchHelper.addState(initialState);
 		synchHelper.addComment(comment.toString());
-		
+
 		// Start all the synchronization executers and wait for completetion
 		for (int i = 0; i < synchronizationExecuters.size(); i++)
 		{
@@ -120,8 +120,11 @@ public class AutomataSynchronizer
 			currExec.start();
 		}
 
-		// For the moment we assume that we only have one thread
-		((AutomataSynchronizerExecuter) synchronizationExecuters.get(0)).join();
+		for (int i = 0; i < synchronizationExecuters.size(); i++)
+		{
+			((AutomataSynchronizerExecuter) synchronizationExecuters.get(i)).join();
+		}
+
 	}
 
 	public void displayInfo()

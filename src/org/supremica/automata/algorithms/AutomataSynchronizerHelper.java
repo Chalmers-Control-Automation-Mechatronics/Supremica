@@ -81,8 +81,9 @@ public final class AutomataSynchronizerHelper
 	private int nbrOfDeadlockedStates = 0;
 
 	// Two locks are used to limit the access the statesToProcess
-	private Object gettingFromStatesToProcessLock = new Object();
-	private Object addingToStatesToProcessLock = new Object();
+	private final Object gettingFromStatesToProcessLock = new Object();
+	private final Object addingToStatesToProcessLock = gettingFromStatesToProcessLock;
+	private final Object addStateLock = new Object();
 	private Automata theAutomata;
 	private Automaton theAutomaton; // the result
 	private boolean automataIsControllable = true;
@@ -311,7 +312,11 @@ public final class AutomataSynchronizerHelper
 	public void addState(int[] state)
 		throws Exception
 	{
-		int[] newState = theStates.add(state);
+		int[] newState = null;
+		synchronized (addStateLock)
+		{
+			newState = theStates.add(state);
+		}
 
 		if (newState != null)
 		{
