@@ -45,7 +45,6 @@
 <property name="xsl" location="${xml}/xsl"/>
 <property name="logs" location="logs"/>
 
-
 <!--
 *	If you for some reason prefer javac instead of jikes,
 *	just change "jikes" to "modern" on the next line.
@@ -753,12 +752,14 @@
 		</classpath>	
 	</java>
 </target>
+<!--
+		packagenames="${supremica_basepackage}.automata.*,${supremica_basepackage}.gui.*,${supremica_basepackage}.util.*,${supremica_basepackage}.apps.*,${supremica_basepackage}.functionblocks.*"
+-->
 
 <target name="doc_supremica">
 	<javadoc
 		sourcepath="${src}"
 		destdir="${doc}/api"
-		packagenames="${supremica_basepackage}.automata.*,${supremica_basepackage}.gui.*,${supremica_basepackage}.util.*,${supremica_basepackage}.apps.*,${supremica_basepackage}.functionblocks.*"
 		classpath="${lib}/${unjared}"
 		encoding="ISO-8859-1"
 		author="true"
@@ -768,10 +769,23 @@
 		source="1.4"
 		maxmemory="512m"
 		windowtitle="Supremica API"
-		link="http://java.sun.com/j2se/1.5/docs/api"				
 		bottom="Copyright &#169; 2001 - 2005 Supremica and Knut Åkesson. All Rights Reserved.">
-		<doctitle><![CDATA[<h1>Supremica API Documentation</h1>]]></doctitle>
+		<doctitle><![CDATA[<h1>Supremica and Waters API Documentation</h1>]]></doctitle>
+		<packageset dir="${src}">
+			<include name="org/supremica/**/*"/>
+			<include name="net/sourceforge/waters/**/*"/>
+			<exclude name="org/supremica/functionblocks/xsd/*/impl/**"/>
+			<exclude name="net/sourceforge/waters/xsd/*/impl/**"/>
+			<exclude name="org/supremica/softplc/**"/>
+		</packageset>	
+		<link href="${java14.api.url}"
+			offline="true" packagelistLoc="${docsrc}/offline/j2sdk1.4.2"/>
+		<link href="${jaxme.api.url}"
+			offline="true" packagelistLoc="${docsrc}/offline/jaxme"/>
+		<link href="${junit.api.url}"
+			offline="true" packagelistLoc="${docsrc}/offline/junit"/>
 	</javadoc>
+
 </target>
 <!--	THIS ONE WAS PREVIOUSLY INCLUDED ABOVE...  -->
 <!--	overview="${templates}/Overview.html"      -->
