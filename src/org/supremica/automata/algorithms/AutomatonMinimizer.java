@@ -232,7 +232,7 @@ public class AutomatonMinimizer
 			int trivialCount = mergeTriviallyObservationEquivalentStates(theAutomaton);
 			if (trivialCount > 0)
 			{
-				logger.verbose("Removed " + trivialCount + " trivially silent states " +
+				logger.verbose("Removed " + trivialCount + " trivially equivalent states " +
 							   "before running the partitioning.");
 			}
 			int loopCount = mergeEpsilonLoops(theAutomaton); // Not entirely OE if marking is considered!

@@ -445,7 +445,7 @@ public class FileDialogs
 	{
 		if (vprjFilter == null)
 		{
-			vprjFilter = makeFileFilter(".vprj", "Valid Project files (*.vprj)");
+			vprjFilter = makeFileFilter(".vprj", "VALID Project files (*.vprj)");
 		}
 
 		return vprjFilter;
@@ -455,7 +455,7 @@ public class FileDialogs
 	{
 		if (vmodFilter == null)
 		{
-			vmodFilter = makeFileFilter(".vmod", "Valid Module files (*.vmod)");
+			vmodFilter = makeFileFilter(".vmod", "VALID Module files (*.vmod)");
 		}
 
 		return vmodFilter;
@@ -465,7 +465,7 @@ public class FileDialogs
 	{
 		if (dgrfFilter == null)
 		{
-			dgrfFilter = makeFileFilter(".dgrf", "Valid Graph files (*.dgrf)");
+			dgrfFilter = makeFileFilter(".dgrf", "VALID Graph files (*.dgrf)");
 		}
 
 		return dgrfFilter;
