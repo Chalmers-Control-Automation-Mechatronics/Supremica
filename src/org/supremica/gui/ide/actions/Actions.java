@@ -15,9 +15,9 @@ public class Actions
 
 	public EditorSelectAction editorSelectAction;
 
-	public EditorAddStateAction editorAddStateAction;
+	public EditorAddNodeAction editorAddNodeAction;
 	public EditorAddNodeGroupAction editorAddNodeGroupAction;
-	public EditorAddTransitionAction editorAddTransitionAction;
+	public EditorAddEdgeAction editorAddEdgeAction;
 	public EditorAddEventAction editorAddEventAction;
 
 	public Actions(IDE ide)
@@ -32,9 +32,9 @@ public class Actions
 
 		editorSelectAction = new EditorSelectAction(ide);
 
-		editorAddStateAction = new EditorAddStateAction(ide);
+		editorAddNodeAction = new EditorAddNodeAction(ide);
 		editorAddNodeGroupAction = new EditorAddNodeGroupAction(ide);
-		editorAddTransitionAction = new EditorAddTransitionAction(ide);
+		editorAddEdgeAction = new EditorAddEdgeAction(ide);
 		editorAddEventAction = new EditorAddEventAction(ide);
 	}
 }

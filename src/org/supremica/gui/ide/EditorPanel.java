@@ -62,6 +62,11 @@ public class EditorPanel
 	public void addToolBarEntries(JToolBar toolBar)
 	{
 		toolBar.addSeparator();
+		toolBar.add(getActions().editorSelectAction);
+		toolBar.add(getActions().editorAddNodeAction);
+		toolBar.add(getActions().editorAddNodeGroupAction);
+		toolBar.add(getActions().editorAddEdgeAction);
+		toolBar.add(getActions().editorAddEventAction);
 		toolBar.addSeparator();
 	}
 

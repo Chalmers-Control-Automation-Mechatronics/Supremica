@@ -118,7 +118,7 @@ public class ModuleContainer
 
 	public void updateAutomata()
 	{
-		System.err.println("updateAutomata");
+		//System.err.println("updateAutomata");
 		ModuleProxy currModule = getModuleProxy();
 		ProjectBuildFromWaters builder = new ProjectBuildFromWaters();
 		Project supremicaProject = builder.build(currModule);

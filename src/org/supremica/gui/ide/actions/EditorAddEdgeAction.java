@@ -8,18 +8,18 @@ import java.awt.event.KeyEvent;
 import org.supremica.gui.ide.ModuleContainer;
 import org.supremica.gui.ide.IDE;
 
-public class EditorAddTransitionAction
+public class EditorAddEdgeAction
 	extends AbstractAction
 	implements IDEAction
 {
 	private IDE ide;
 
-	public EditorAddTransitionAction(IDE ide)
+	public EditorAddEdgeAction(IDE ide)
 	{
 		this.ide = ide;
 
-		putValue(Action.NAME, "Add Transition");
-		putValue(Action.SHORT_DESCRIPTION, "Add Transition");
+		putValue(Action.NAME, "Add Edge");
+		putValue(Action.SHORT_DESCRIPTION, "Add Edge");
 		putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/waters/edge.gif")));
 	}
 
@@ -30,6 +30,6 @@ public class EditorAddTransitionAction
 
 	public void doAction()
 	{
-		System.err.println("Add Transition is not implemented yet!");
+		System.err.println("Add Edge is not implemented yet!");
 	}
 }

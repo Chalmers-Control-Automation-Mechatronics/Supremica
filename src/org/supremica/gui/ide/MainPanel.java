@@ -54,35 +54,16 @@ class MainPanel
 		return moduleContainer.getActions();
 	}
 
-/*
-	public JToolBar getToolBar(JToolBar parentToolBar)
-	{
-		return parentToolBar;
-	}
-*/
 	protected GridBagConstraints getGridBagConstraints()
 	{
 		return constraints;
 	}
-
-//	public abstract void replaceRightComponent(Component newComponent);
 
 	public void addToolBarEntries(JToolBar toolbar)
 	{
 		return; //Default is to do nothing
 	}
 
-/*
-	public void replaceRightComponent(Component newComponent)
-	{
-		Component existingComponent = getRightComponent();
-		if (existingComponent != null)
-		{
-			splitPanelHorizontal.remove(existingComponent);
-		}
-		splitPanelHorizontal.add(newComponent);
-	}
-*/
 	public void setRightComponent(Component newComponent)
 	{
 		Component oldComponent = getRightComponent();
