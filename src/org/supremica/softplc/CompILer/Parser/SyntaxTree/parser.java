@@ -9789,7 +9789,7 @@ public class parser/*@bgen(jjtree)*/implements parserTreeConstants, parserConsta
 
   static private boolean jj_initialized_once = false;
   static public parserTokenManager token_source;
-  static ASCII_CharStream jj_input_stream;
+  static SimpleCharStream jj_input_stream;
   static public Token token, jj_nt;
   static private int jj_ntk;
   static private Token jj_scanpos, jj_lastpos;
@@ -9814,7 +9814,7 @@ public class parser/*@bgen(jjtree)*/implements parserTreeConstants, parserConsta
       throw new Error();
     }
     jj_initialized_once = true;
-    jj_input_stream = new ASCII_CharStream(stream, 1, 1);
+    jj_input_stream = new SimpleCharStream(stream, 1, 1);
     token_source = new parserTokenManager(jj_input_stream);
     token = new Token();
     jj_ntk = -1;
@@ -9842,7 +9842,7 @@ public class parser/*@bgen(jjtree)*/implements parserTreeConstants, parserConsta
       throw new Error();
     }
     jj_initialized_once = true;
-    jj_input_stream = new ASCII_CharStream(stream, 1, 1);
+    jj_input_stream = new SimpleCharStream(stream, 1, 1);
     token_source = new parserTokenManager(jj_input_stream);
     token = new Token();
     jj_ntk = -1;
