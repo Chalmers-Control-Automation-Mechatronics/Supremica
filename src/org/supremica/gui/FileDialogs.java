@@ -102,7 +102,7 @@ public class FileDialogs
 
 		fileExport.resetChoosableFileFilters();
 		fileExport.setFileFilter(fd.getFilter(fileType));
- 
+
 		return fileExport;
 	}
 
@@ -591,6 +591,6 @@ public class FileDialogs
 			classFilter = makeFileFilter(".class", "Java class files (*.class)");
 		}
 
-		return nqcFilter;
+		return classFilter;
 	}
 }
