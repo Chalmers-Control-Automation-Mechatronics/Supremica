@@ -71,18 +71,18 @@ class SimulatorExecuterController
 	extends JPanel
 {
 	private SimulatorStateViewer stateViewer;
-	private Automata theAutomata;
+//	private Automata theAutomata;
 //	private JButton undoButton;
 //	private JButton redoButton;
 	private JCheckBox executeUncontrollableEvents;
 	private JCheckBox executeControllableEvents;
 
-	public SimulatorExecuterController(SimulatorStateViewer stateViewer, AutomataSynchronizerHelper synchHelper)
+	public SimulatorExecuterController(SimulatorStateViewer stateViewer)
 	{
 		setLayout(new BorderLayout());
 
 		this.stateViewer = stateViewer;
-		this.theAutomata = synchHelper.getAutomata();
+//		this.theAutomata = synchHelper.getAutomata();
 
 		Box redoBox = new Box(BoxLayout.Y_AXIS);
 
@@ -180,9 +180,9 @@ class SimulatorExecuterController
 		stateViewer.executeControllableEvents(executeControllableEvents.isSelected());
 	}
 
-	public void update()
-	{
+//	public void update()
+//	{
 //		undoButton.setEnabled(stateViewer.undoEnabled());
 //		redoButton.setEnabled(stateViewer.redoEnabled());
-	}
+//	}
 }

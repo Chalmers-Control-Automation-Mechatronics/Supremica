@@ -70,8 +70,8 @@ import org.supremica.automata.LabeledEvent;
 public class SimulatorStateDisplayer
 	extends JPanel
 {
-	private SimulatorStateViewer stateViewer;
-	private Automata theAutomata;
+//	private SimulatorStateViewer stateViewer;
+//	private Automata theAutomata;
 	private JCheckBox isInitialBox = new JCheckBox("initial");
 	private JCheckBox isAcceptingBox = new JCheckBox("accepting");
 	private JCheckBox isForbiddenBox = new JCheckBox("forbidden");
@@ -80,12 +80,12 @@ public class SimulatorStateDisplayer
 	private JLabel stateName = new JLabel();
 	private AutomataSynchronizerHelper helper;
 
-	public SimulatorStateDisplayer(SimulatorStateViewer stateViewer, AutomataSynchronizerHelper helper)
+	public SimulatorStateDisplayer(AutomataSynchronizerHelper helper)
 	{
 		setLayout(new BorderLayout());
 
-		this.stateViewer = stateViewer;
-		this.theAutomata = helper.getAutomata();
+//		this.stateViewer = stateViewer;
+//		this.theAutomata = helper.getAutomata();
 		this.helper = helper;
 
 		JLabel header = new JLabel("Current composite state");

@@ -51,11 +51,15 @@
 package org.supremica.gui.simulator;
 
 import org.supremica.automata.algorithms.*;
+import org.supremica.log.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import javax.swing.*;
+import javax.swing.event.ListDataListener;
+import javax.swing.event.ListDataEvent;
 import java.util.*;
+import org.supremica.log.*;
 import org.supremica.properties.SupremicaProperties;
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.Arc;
@@ -69,23 +73,27 @@ import org.supremica.automata.LabeledEvent;
 
 public class SimulatorEventList
 	extends JPanel
+	implements ListDataListener
 {
+	private static Logger logger = LoggerFactory.createLogger(SimulatorEventList.class);
 	private boolean showStateId = false;
 	private Automata theAutomata;
 	private int[] currState;
-	private SimulatorStateViewer stateViewer;
+//	private SimulatorStateViewer stateViewer;
+	private SimulatorExecuter theExecuter;
 	private SimulatorEventListModel eventsList;
 	private JList theList;
-	private boolean allowEventSelection = false;
+//	private boolean allowEventSelection = false;
 
-	public SimulatorEventList(SimulatorStateViewer stateViewer, AutomataSynchronizerHelper helper, Project theProject, AnimationSignals theSignals, boolean showDisabledEvents)
+	public SimulatorEventList(SimulatorExecuter theExecuter, AutomataSynchronizerHelper helper, Project theProject)
 	{
 		setLayout(new BorderLayout());
 
-		this.stateViewer = stateViewer;
+//		this.stateViewer = stateViewer;
+		this.theExecuter = theExecuter;
 		this.theAutomata = helper.getAutomata();
-		eventsList = new SimulatorEventListModel(helper, theProject, theSignals, showDisabledEvents);
-		allowEventSelection = !showDisabledEvents;
+		eventsList = new SimulatorEventListModel(theExecuter, helper, theProject);
+//		allowEventSelection = true;
 		theList = new JList(eventsList);
 
 		JScrollPane scrollPanel = new JScrollPane(theList);
@@ -94,14 +102,14 @@ public class SimulatorEventList
 
 		JLabel jLabel = null;
 
-		if (showDisabledEvents)
-		{
-			jLabel = new JLabel("Outgoing events");
-		}
-		else
-		{
+//		if (showDisabledEvents)
+//		{
+//			jLabel = new JLabel("Outgoing events");
+//		}
+//		else
+//		{
 			jLabel = new JLabel("Enabled events");
-		}
+//		}
 
 		add(jLabel, BorderLayout.NORTH);
 		add(scrollPanel, BorderLayout.CENTER);
@@ -120,11 +128,16 @@ public class SimulatorEventList
 							// KA : These two commands should probably be executed without interruption
 							// Try with a wrapper object
 							LabeledEvent currEvent = eventsList.getEventAt(index);
-							int[] newState = eventsList.getStateAt(index);
-
 							executeEvent(currEvent);
-
-							updateStateViewer(newState);
+//							int[] newState = eventsList.getStateAt(index);
+//							if (!eventsList.executeEvent(currEvent))
+//							{
+//								logger.warn("Failed to execute event: " + currEvent.getLabel());	
+//							}
+//							else
+//							{							
+//								executeEvent(currEvent, newState);
+//							}
 						}
 					}
 				}
@@ -134,7 +147,7 @@ public class SimulatorEventList
 
 	public boolean clickable()
 	{
-		return allowEventSelection;
+		return true;
 	}
 
 	public void setShowStateId(boolean showStateId)
@@ -142,27 +155,33 @@ public class SimulatorEventList
 		eventsList.setShowStateId(showStateId);
 	}
 
-	public void setCurrState(int[] currState)
-	{
-		this.currState = currState;
-
-		theList.clearSelection();
-		update();
-	}
+//	public void setCurrState(int[] currState)
+//	{
+//		this.currState = currState;
+//
+//		theList.clearSelection();
+//		update();
+//	}
 
 	public void update()
 	{
-		eventsList.setCurrState(currState);
+		theList.clearSelection();
+//		eventsList.setCurrState(currState);
 	}
 
-	private void updateStateViewer(int[] newState)
+//	private void updateStateViewer(int[] newState)
+//	{
+//		stateViewer.setCurrState(newState);
+//	}
+//
+//	private void executeEvent(LabeledEvent event)
+//	{
+//		stateViewer.executeEvent(event);
+//	}
+	
+	private void executeEvent(LabeledEvent currEvent)
 	{
-		stateViewer.setCurrState(newState);
-	}
-
-	private void executeEvent(LabeledEvent event)
-	{
-		stateViewer.executeEvent(event);
+		theExecuter.executeEvent(currEvent);		
 	}
 	
 	public SimulatorEventListModel getEventListModel()
@@ -170,4 +189,18 @@ public class SimulatorEventList
 		return eventsList;	
 	}
 
+	public void contentsChanged(ListDataEvent e)
+	{
+		update();		
+	}
+	
+	public void intervalAdded(ListDataEvent e)
+	{
+		contentsChanged(e);	
+	}
+
+	public void intervalRemoved(ListDataEvent e)
+	{
+		contentsChanged(e);		
+	}  	
 }

@@ -3,6 +3,7 @@ package org.supremica.gui.simulator;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.ListDataEvent;
 import org.supremica.automata.LabeledEvent;
+import org.supremica.log.*;
 
 /**
  * @author ka
@@ -11,40 +12,42 @@ import org.supremica.automata.LabeledEvent;
  */
 
 class EventExecuter
-	extends Thread
+//	extends Thread
 	implements ListDataListener
 {
-	private long sleepTime = 1000;
+	private static Logger logger = LoggerFactory.createLogger(EventExecuter.class);
+	
+//	private long sleepTime = 1000;
 	private boolean doRun = true;	
 	private boolean executeControllableEvents = false;
 	private boolean executeUncontrollableEvents = false;
-	private SimulatorExecuter theExecuter;
 	private SimulatorEventListModel eventModel;
+	private SimulatorExecuter theExecuter;
 	
-	public EventExecuter(long sleepTime, SimulatorExecuter executer, SimulatorEventListModel eventModel)
+	public EventExecuter(SimulatorExecuter theExecuter, SimulatorEventListModel eventModel)
 	{
-		this.sleepTime = sleepTime;	
-		this.theExecuter = executer;
+//		this.sleepTime = sleepTime;	
 		this.eventModel = eventModel;
+		this.theExecuter = theExecuter;
 		eventModel.addListDataListener(this);
 	}	
 	
-	public void run()
-	{
-		while (doRun)
-		{
-			try 
-			{
-				Thread.sleep(sleepTime);
-			} 
-			catch (InterruptedException e) 
-			{
-			
-			}		
-			tryExecuteEvent();
-		}	
-	}
-	
+//	public void run()
+//	{
+//		while (doRun)
+//		{
+//			try 
+//			{
+//				Thread.sleep(sleepTime);
+//			} 
+//			catch (InterruptedException e) 
+//			{
+//			
+//			}		
+//			tryExecuteEvent();
+//		}	
+//	}
+//	
 	public void executeControllableEvents(boolean executeControllableEvents)
 	{
 		this.executeControllableEvents = executeControllableEvents;
@@ -64,7 +67,7 @@ class EventExecuter
 		doRun = false;		
 	}
 	
-	public synchronized void tryExecuteEvent()
+	private synchronized void tryExecuteEvent()
 	{
 		if (executeUncontrollableEvents)
 		{
@@ -74,7 +77,11 @@ class EventExecuter
 				LabeledEvent currEvent = eventModel.getEventAt(i);
 				if (!currEvent.isControllable())
 				{
-					theExecuter.executeEvent(currEvent);					
+					logger.info("Automatically executed event: " + currEvent.getLabel());
+					if (!theExecuter.executeEvent(currEvent))
+					{
+						logger.warn("Failed to execute event: " + currEvent.getLabel());	
+					}					
 					return;
 				}	
 			}
@@ -88,12 +95,18 @@ class EventExecuter
 				LabeledEvent currEvent = eventModel.getEventAt(i);
 				if (currEvent.isControllable())
 				{
-					theExecuter.executeEvent(currEvent);					
+					logger.info("Automatically executed event: " + currEvent.getLabel());
+					if (!theExecuter.executeEvent(currEvent))
+					{
+						logger.warn("Failed to execute event: " + currEvent.getLabel());	
+					}		
 					return;
 				}	
 			}			
 		}	
 	}
+	
+
 
 	public void contentsChanged(ListDataEvent e)
 	{

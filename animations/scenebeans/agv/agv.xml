@@ -793,6 +793,16 @@
 		<announce event = "~ws1_part2.end"/>
 		<start behaviour="ws1_part2.go"/>
 	</command>
+	<command name="ws1_part1.reset">
+		<announce event = "~ws1_part1.end"/>
+		<reset behaviour="ws1_part1.go"/>
+		<start behaviour="ws1_part1.go"/>
+	</command>	
+	<command name="ws1_part2.reset">
+		<announce event = "~ws1_part2.end"/>
+		<reset behaviour="ws1_part2.go"/>
+		<start behaviour="ws1_part2.go"/>
+	</command>	
 	<command name="ws1.addpart1">
 		<announce event = "~ws1_part1.end"/>
 		<set object="ws1_part1_primitive_switch" param="current" value="0" />
@@ -801,7 +811,6 @@
 	<command name="ws1.removepart1">
 		<announce event = "~ws1_part1.end"/>
 		<set object="ws1_part1_primitive_switch" param="current" value="1" />
-		<reset behaviour="ws1_part1.go"/>
 		<start behaviour="ws1_part1.go"/>
 	</command>	
 	<command name="ws1.addpart2">
@@ -812,7 +821,6 @@
 	<command name="ws1.removepart2">
 		<announce event = "~ws1_part2.end"/>
 		<set object="ws1_part2_primitive_switch" param="current" value="1" />
-		<reset behaviour="ws1_part2.go"/>
 		<start behaviour="ws1_part2.go"/>
 	</command>
 	<event object="ws1_part1.go" event="ws1_part1.end">

@@ -74,9 +74,10 @@ import org.supremica.automata.execution.Condition;
 
 public class SimulatorEventListModel
 	extends AbstractListModel
+	implements SignalObserver
 {
 	private static Logger logger = LoggerFactory.createLogger(SimulatorEventListModel.class);
-	private int[] currState;
+	// private int[] currState;
 	private int[] events;
 	private int eventAmount = 0;
 	private Automata theAutomata;
@@ -84,28 +85,32 @@ public class SimulatorEventListModel
 	private Controls theControls;
 	private Alphabet theAlphabet;
 	private boolean showState = false;
-	private boolean showDisabledEvents = true;
+	private boolean showDisabledEvents = false;
 	private AutomataSynchronizerHelper helper;
-	private AnimationSignals theSignals;
+//	private AnimationSignals theSignals;
+	private SimulatorExecuter theExecuter;
 
-	public SimulatorEventListModel(AutomataSynchronizerHelper helper, Project theProject, AnimationSignals theSignals, boolean showDisabledEvents)
+	public SimulatorEventListModel(SimulatorExecuter theExecuter, AutomataSynchronizerHelper helper, Project theProject)
 	{
 		this.helper = helper;
 		this.theAutomata = helper.getAutomata();
 		this.theProject = theProject;
 		this.theControls = theProject.getControls();
 		this.theAlphabet = helper.getAutomaton().getAlphabet();
-		this.showDisabledEvents = showDisabledEvents;
-		this.theSignals = theSignals;
+//		this.showDisabledEvents = showDisabledEvents;
+//		this.theSignals = theSignals;
+		this.theExecuter = theExecuter;
 		events = new int[helper.getNbrOfEvents() + 1];
+		theExecuter.registerSignalObserver(this);
+//		theSignals.registerInterest(this);
 	}
 
-	public void setCurrState(int[] currState)
-	{
-		this.currState = currState;
-
-		update();
-	}
+//	public void setCurrState(int[] currState)
+//	{
+//		this.currState = currState;
+//
+//		update();
+//	}
 
 	public void setShowStateId(boolean showState)
 	{
@@ -116,7 +121,7 @@ public class SimulatorEventListModel
 	{
 		//logger.info("SimulatorEventListModel.update");
 		AutomataOnlineSynchronizer onlineSynchronizer = helper.getCoExecuter();
-		int[] extEvents = onlineSynchronizer.getOutgoingEvents(currState);
+		int[] extEvents = onlineSynchronizer.getOutgoingEvents(theExecuter.getCurrentState());
 		System.arraycopy(extEvents, 0, events, 0, events.length);
 		if (!showDisabledEvents)
 		{
@@ -143,7 +148,7 @@ public class SimulatorEventListModel
 					for (Iterator condIt = currControl.conditionIterator(); condIt.hasNext();)
 					{
 						Condition condition = (Condition)condIt.next();
-						conditionsFulfilled = conditionsFulfilled && theSignals.isTrue(condition.getLabel());
+						conditionsFulfilled = conditionsFulfilled && theExecuter.isTrue(condition);
 					}
 					if (conditionsFulfilled)
 					{
@@ -226,11 +231,22 @@ public class SimulatorEventListModel
 		return currEvent;
 	}
 
-	public int[] getStateAt(int index)
-	{
-		//System.err.println("getStateAt: " + index);
-		AutomataOnlineSynchronizer onlineSynchronizer = helper.getCoExecuter();
+//	public int[] getStateAt(int index)
+//	{
+//		//System.err.println("getStateAt: " + index);
+//		AutomataOnlineSynchronizer onlineSynchronizer = helper.getCoExecuter();
+//
+//		return onlineSynchronizer.doTransition(events[index]);
+//	}
+//	
+//	public synchronized boolean executeEvent(LabeledEvent theEvent)
+//	{
+//		theExecuter.executeEvent(theEvent);	
+//		return true;	
+//	}
 
-		return onlineSynchronizer.doTransition(events[index]);
+	public void signalUpdated()
+	{
+		update();		
 	}
 }

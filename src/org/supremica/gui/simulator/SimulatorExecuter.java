@@ -95,6 +95,7 @@ public class SimulatorExecuter
 	private Animator theAnimator;
 	private Animation theAnimation;
 	private AnimationSignals theAnimationSignals;
+	private int[] currState;
 
 
 	public SimulatorExecuter(VisualProject theProject)
@@ -142,6 +143,7 @@ public class SimulatorExecuter
 
 		onlineSynchronizer.initialize();
 		onlineSynchronizer.setCurrState(initialState);
+		currState = initialState;
 		helper.setCoExecuter(onlineSynchronizer);
 		//theProject.getListeners().addListener(this);
 		setBackground(Color.white);
@@ -180,16 +182,16 @@ public class SimulatorExecuter
 		});
 		initMenubar();
 
-		stateViewer = new SimulatorStateViewer(this, helper, theAnimationSignals);
+		stateViewer = new SimulatorStateViewer(this, helper);
 
 		contentPane.add(stateViewer, BorderLayout.CENTER);
 
 		// / controller = new ExplorerController(stateViewer, theAutomaton);
-		controller = new SimulatorExecuterController(stateViewer, helper);
-
+		controller = new SimulatorExecuterController(stateViewer);
 		contentPane.add(controller, BorderLayout.SOUTH);
 		stateViewer.setController(controller);
-		stateViewer.goToInitialState();
+//		stateViewer.goToInitialState();
+		update();
 	}
 
 	public void initialize()
@@ -264,9 +266,25 @@ public class SimulatorExecuter
 	{
 		//logger.info("AnimationEvent: " + ev.getName());
 	}
-
-	public synchronized void executeEvent(LabeledEvent event)
+	
+	public synchronized int[] getCurrentState()
 	{
+		return currState;
+	}
+
+	public void registerSignalObserver(SignalObserver listener)
+	{
+		theAnimationSignals.registerInterest(listener);		
+	}
+	
+	public boolean isTrue(Condition theCondition)
+	{
+		return theAnimationSignals.isTrue(theCondition.getLabel());
+	}
+
+	public synchronized boolean executeEvent(LabeledEvent event)
+	{
+
 		String label = event.getLabel();
 
 		if (theControls != null)
@@ -294,6 +312,12 @@ public class SimulatorExecuter
 				}
 			}
 		}
+
+		// Update the state here
+		currState = onlineSynchronizer.doTransition(event);		
+//		return onlineSynchronizer.doTransition(events[index]);
+		update();
+		return currState != null;
 	}
 
 	public void resetAnimation()
@@ -307,6 +331,10 @@ public class SimulatorExecuter
 		return theProject;
 	}
 
+	public void update()
+	{
+		theAnimationSignals.notifyObservers();			
+	}
 }
 
 

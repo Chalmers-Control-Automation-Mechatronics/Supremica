@@ -52,7 +52,7 @@ class AnimationSignals
 
 	}
 
-	private void notifyObservers()
+	public void notifyObservers()
 	{
 		for (Iterator obsIt = observers.iterator(); obsIt.hasNext();)
 		{

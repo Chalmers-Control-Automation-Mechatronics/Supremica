@@ -70,24 +70,24 @@ import org.supremica.automata.LabeledEvent;
 
 public class SimulatorStateViewer
 	extends JPanel
-	implements SignalObserver
+//	implements SignalObserver
 {
 	private Automata theAutomata;
 	private Project theProject;
 	private AutomataSynchronizerHelper helper;
-	private int[] currState;
+//	private int[] currState;
 	private SimulatorEventList forwardEvents;
-	private SimulatorEventList backwardEvents;
+//	private SimulatorEventList backwardEvents;
 	private SimulatorExecuterController controller;
 	private SimulatorStateDisplayer stateDisplayer;
-	private JSplitPane eventSplitter;
+//	private JSplitPane eventSplitter;
 	private JSplitPane stateEventSplitter;
-	private LinkedList prevStates = new LinkedList();
-	private LinkedList nextStates = new LinkedList();
+//	private LinkedList prevStates = new LinkedList();
+//	private LinkedList nextStates = new LinkedList();
 	private SimulatorExecuter simulator;
 	private EventExecuter theExecuter;
 
-	public SimulatorStateViewer(SimulatorExecuter simulator, AutomataSynchronizerHelper helper, AnimationSignals theAnimationSignals)
+	public SimulatorStateViewer(SimulatorExecuter simulator, AutomataSynchronizerHelper helper)
 	{
 		setLayout(new BorderLayout());
 
@@ -96,108 +96,109 @@ public class SimulatorStateViewer
 
 		theAutomata = helper.getAutomata();
 		this.helper = helper;
-		forwardEvents = new SimulatorEventList(this, helper, theProject, theAnimationSignals, false);
-		backwardEvents = new SimulatorEventList(this, helper, theProject, theAnimationSignals, true);
+		forwardEvents = new SimulatorEventList(simulator, helper, theProject);
+		//backwardEvents = new SimulatorEventList(this, helper, theProject, theAnimationSignals, true);
 
-		eventSplitter = new JSplitPane(JSplitPane.VERTICAL_SPLIT, forwardEvents, backwardEvents);
-		stateDisplayer = new SimulatorStateDisplayer(this, helper);
-		stateEventSplitter = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, stateDisplayer, eventSplitter);
+		//eventSplitter = new JSplitPane(JSplitPane.VERTICAL_SPLIT, forwardEvents, backwardEvents);
+		stateDisplayer = new SimulatorStateDisplayer(helper);
+		stateEventSplitter = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, stateDisplayer, forwardEvents);
 
 		add(stateEventSplitter, BorderLayout.CENTER);
-		theAnimationSignals.registerInterest(this);
-		theExecuter = new EventExecuter(1000, simulator, forwardEvents.getEventListModel());
+		//theAnimationSignals.registerInterest(this);
+		theExecuter = new EventExecuter(simulator, forwardEvents.getEventListModel());
 	}
 
 	public void initialize()
 	{
-		eventSplitter.setDividerLocation(0.5);
+//		eventSplitter.setDividerLocation(0.5);
 		stateEventSplitter.setDividerLocation(0.6);
 	}
 
-	public void setCurrState(int[] newState)
-	{
-		setCurrState(newState, false);
-	}
+//	public void setCurrState(int[] newState)
+//	{
+//		setCurrState(newState, false);
+//	}
 
-	private void setCurrState(int[] newState, boolean isUndo)
-	{
-		if (!isUndo)
-		{
-			if (currState != null)
-			{
-				prevStates.addLast(currState);
-			}
+//	private void setCurrState(int[] newState, boolean isUndo)
+//	{
+//		if (!isUndo)
+//		{
+//			if (currState != null)
+//			{
+//				prevStates.addLast(currState);
+//			}
+//
+//			nextStates.clear();
+//		}
+//
+//		currState = newState;
+//
+//		update();
+//	}
 
-			nextStates.clear();
-		}
+//	public void goToInitialState()
+//	{
+//		prevStates.clear();
+//
+//		currState = null;
+//
+//		helper.getCoExecuter().setCurrState(SimulatorExecuterHelper.getInitialState());
+//		setCurrState(SimulatorExecuterHelper.getInitialState(), false);
+//		simulator.resetAnimation();
+//	}
+//	
+//	public void undoState()
+//	{
+//		if (prevStates.size() > 0)
+//		{
+//			int[] newState = (int[]) prevStates.removeLast();
+//
+//			nextStates.addFirst(currState);
+//			setCurrState(newState, true);
+//		}
+//	}
 
-		currState = newState;
+//	public boolean undoEnabled()
+//	{
+//		return prevStates.size() > 0;
+//	}
+//
+//	public void redoState()
+//	{
+//		if (nextStates.size() > 0)
+//		{
+//			int[] newState = (int[]) nextStates.removeFirst();
+//
+//			prevStates.addLast(currState);
+//			setCurrState(newState, true);
+//		}
+//	}
+//
+//	public boolean redoEnabled()
+//	{
+//		return nextStates.size() > 0;
+//	}
 
-		update();
-	}
-
-	public void goToInitialState()
-	{
-		prevStates.clear();
-
-		currState = null;
-
-		helper.getCoExecuter().setCurrState(SimulatorExecuterHelper.getInitialState());
-		setCurrState(SimulatorExecuterHelper.getInitialState(), false);
-		simulator.resetAnimation();
-	}
-	
-	public void undoState()
-	{
-		if (prevStates.size() > 0)
-		{
-			int[] newState = (int[]) prevStates.removeLast();
-
-			nextStates.addFirst(currState);
-			setCurrState(newState, true);
-		}
-	}
-
-	public boolean undoEnabled()
-	{
-		return prevStates.size() > 0;
-	}
-
-	public void redoState()
-	{
-		if (nextStates.size() > 0)
-		{
-			int[] newState = (int[]) nextStates.removeFirst();
-
-			prevStates.addLast(currState);
-			setCurrState(newState, true);
-		}
-	}
-
-	public boolean redoEnabled()
-	{
-		return nextStates.size() > 0;
-	}
-
-	public void update()
-	{
+//	public void update()
+//	{
 
 		// The order of theese are changed, for states to be properly forbidden...
-		forwardEvents.setCurrState(currState);
-		backwardEvents.setCurrState(currState);
-		stateDisplayer.setCurrState(currState);
-		controller.update();
-	}
+//		forwardEvents.setCurrState(currState);
+//		backwardEvents.setCurrState(currState);
+//		stateDisplayer.setCurrState(currState);
+//		controller.update();
+//	}
 	
-	public void signalUpdated()
-	{
-		update();	
-	}
+//	public void signalUpdated()
+//	{
+//		update();	
+//	}
 
-	public void executeEvent(LabeledEvent event)
-	{
-		simulator.executeEvent(event);
-	}
+//	public void executeEvent(LabeledEvent event, int[] newState)
+//	{
+//		simulator.executeEvent(event);
+//		setCurrState(newState);
+//	}
 
 	public void setController(SimulatorExecuterController controller)
 	{
@@ -213,5 +214,10 @@ public class SimulatorStateViewer
 	{
 		theExecuter.executeUncontrollableEvents(doExecute);	
 	}
+	
+//	public SimulatorExecuter getSimulatorExecuter()
+//	{
+//		return simulator;	
+//	}
 }
 

@@ -58,6 +58,7 @@ import java.util.ArrayList;
 import org.supremica.automata.AutomataIndexForm;
 import org.supremica.automata.AutomataIndexFormHelper;
 import org.supremica.automata.Automaton;
+import org.supremica.automata.LabeledEvent;
 
 /**
  * Used in the "Automata Explorer" (an early version that is on ice since way back and therefore not completed).
@@ -553,6 +554,12 @@ public final class AutomataOnlineSynchronizer
 	 *  return isControllable;
 	 *  }
 	 */
+
+	public int[] doTransition(LabeledEvent theEvent)
+	{
+		return doTransition(theEvent.getSynchIndex());	
+	}
+
 	public int[] doTransition(int eventIndex)
 	{
 
