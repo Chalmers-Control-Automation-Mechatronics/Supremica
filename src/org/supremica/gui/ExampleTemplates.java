@@ -98,7 +98,8 @@ public class ExampleTemplates
 
 		String prefix = extraPrefix + "/CCSBookExercises/";
 
-		thisGroup.addItem(new TemplateItem("4.5 - Robot & Machine", prefix + "Ex4_5.xml"));
+		thisGroup.addItem(new TemplateItem("4.5 - Robot & Machine: All events controllable", prefix + "Ex4_5_all_con.xml"));
+		thisGroup.addItem(new TemplateItem("4.5 - Robot & Machine: Put is uncontrollable", prefix + "Ex4_5_b_uncon.xml"));
 	}
 
 	private void initializeCCSCourseAssignments()
