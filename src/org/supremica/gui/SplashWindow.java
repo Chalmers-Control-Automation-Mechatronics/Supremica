@@ -45,6 +45,6 @@ public class SplashWindow
                 BorderLayout layout = new BorderLayout();
                 this.setLayout(layout);
                 ImageIcon imageIcon = new ImageIcon(Supremica.class.getResource("/splash_v1.gif"));
-                layout.add(new JLabel(imageIcon), BorderLayout.CENTER);
+                this.add(new JLabel(imageIcon), BorderLayout.CENTER);
         }
 }
