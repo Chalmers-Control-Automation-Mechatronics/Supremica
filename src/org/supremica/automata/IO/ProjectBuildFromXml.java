@@ -395,6 +395,14 @@ public class ProjectBuildFromXml
 		}
 		currAutomaton.setType(currType);
 
+
+		String comment = attributes.getValue("comment");
+
+		if (comment != null)
+		{
+			currAutomaton.setComment(comment);
+		}
+
 		//currAutomaton.setAlphabet(currAlphabet);
 		currProject.addAutomaton(currAutomaton);
 	}

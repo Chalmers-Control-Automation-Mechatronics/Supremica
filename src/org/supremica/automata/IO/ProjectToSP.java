@@ -111,7 +111,16 @@ public class ProjectToSP
 		{
 			Automaton aut = (Automaton) projectIt.next();
 
-			pw.println("<Automaton name=\"" + aut.getName() + "\" type=\"" + aut.getType().toString() + "\">");
+			pw.print("<Automaton name=\"" + aut.getName() + "\" type=\"" + aut.getType().toString() + "\"");
+			if (aut.getComment() != null)
+			{
+				if (!aut.getComment().equals(""))
+				{
+					pw.print(" comment=\"" + EncodingHelper.normalize(aut.getComment()) + "\"");
+				}
+			}
+
+			pw.println(">");
 
 			// Print all events
 			pw.println("\t<Events>");

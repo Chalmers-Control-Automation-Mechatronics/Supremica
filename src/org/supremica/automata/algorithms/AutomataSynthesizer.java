@@ -75,18 +75,16 @@ class AutomataSelector
 {
 	private static Logger logger = LoggerFactory.createLogger(AutomataSelector.class);
 
-	private boolean closedSet;
 	private Automata globalSet;
 	private Automata partialSet = new Automata();
 	private Iterator specIterator;
 	private HashMap eventToAutomataMap = new HashMap();
 	private boolean seenSpec = false; // keep track of wether no spec exists, may need to do some job anyway
 
-	public AutomataSelector(Automata globalSet, boolean closedSet)
+	public AutomataSelector(Automata globalSet)
 		throws Exception
 	{
 		this.globalSet = globalSet;
-		this.closedSet = closedSet;
 		this.specIterator = globalSet.iterator();
 
 		AlphabetAnalyzer alphabetAnalyzer = new AlphabetAnalyzer(globalSet);
@@ -118,6 +116,7 @@ class AutomataSelector
 
 					if (!currEvent.isControllable())
 					{
+						addPlant(currEvent); /*
 						if (eventToAutomataMap.get(currEvent) != null)
 						{
 							Iterator plantIterator = ((Set) eventToAutomataMap.get(currEvent)).iterator();
@@ -142,6 +141,7 @@ class AutomataSelector
 								}
 							}
 						}
+						*/
 					}
 				}
 				break; // Note, we break out of the while loop here
@@ -151,7 +151,6 @@ class AutomataSelector
 	}
 
 	// To your current selection of spec and plants, add all plants that have this event
-	// Note -- except for the closedSet stuff, this code is identical to the inner loop above. Merge?
 	public Automata addPlant(LabeledEvent currEvent)
 	{
 		if (eventToAutomataMap.get(currEvent) != null)
@@ -168,6 +167,8 @@ class AutomataSelector
 				{
 					partialSet.addAutomaton(currPlantAutomaton);
 					logger.debug("AutomataSelector::Added plant " + currPlantAutomaton.getName());
+					
+					// closedSet stuff removed
 
 				}
 			}
@@ -345,8 +346,7 @@ public class AutomataSynthesizer
 
 			Automata modSupervisors = new Automata(); // collects the calculated supervisors
 
-//			AutomataSelector selector = new AutomataSelector(theAutomata, synthesizerOptions.getMaximallyPermissive());
-			AutomataSelector selector = new AutomataSelector(theAutomata, false);	// always start with non-max perm
+			AutomataSelector selector = new AutomataSelector(theAutomata);	// always start with non-max perm
 			for(Automata automata = selector.next(); automata.size() > 0; automata = selector.next())
 			{
 				if(automata.size() > 1) // no need to do anything for a singleton spec
@@ -357,16 +357,19 @@ public class AutomataSynthesizer
 						retval.automaton.setComment("sup(" + retval.automaton.getComment() + ")");
 
 						Alphabet disabledEvents = checkMaximallyPermissive(automata, retval.disabledEvents);
-						if (disabledEvents.size() > 0) // it's not (guaranteed to be) maximally permissive...
+						if(synthesizerOptions.getMaximallyPermissive()) // If we should care about max perm...
 						{
-							if(synthesizerOptions.getMaximallyPermissive()) // ...but we should care
+							while(disabledEvents.size() > 0) // ...then do so until we're known to be maximally permissive...
 							{
-								// This would be all there is to it!
 								automata = selector.addPlants(disabledEvents);
 								retval = doMonolithic(automata); // now we're *guaranteed* max perm
 								retval.automaton.setComment("sup(" + retval.automaton.getComment() + ")");
+								disabledEvents = checkMaximallyPermissive(automata, retval.disabledEvents);
 							}
-							else
+						}
+						else	// we should not care about max perm, but should notify
+						{
+							if(disabledEvents.size() > 0)	// not guranteed to be max perm
 							{
 								logger.info("The synthesized supervisor " + retval.automaton.getComment() + " might not be maximally permissive due to:");
 								for (Iterator evIt = disabledEvents.iterator(); evIt.hasNext();)
@@ -376,10 +379,10 @@ public class AutomataSynthesizer
 
 								}
 							}
-						}
-						else
-						{
-							logger.info("The synthesized supervisor " + retval.automaton.getComment() + " is maximally permissive.");
+							else	// it's max perm in any case
+							{
+								logger.info("The synthesized supervisor " + retval.automaton.getComment() + " is maximally permissive.");
+							}
 						}
 						
 						modSupervisors.addAutomaton(retval.automaton);

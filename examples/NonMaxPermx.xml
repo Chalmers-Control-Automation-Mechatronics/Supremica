@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Automata>
+ <Automaton name="P1">
+  <Events>
+   <Event id="c1" label="c1" controllable="true" prioritized="true" />
+   <Event id="u1" label="u1" controllable="false" prioritized="true" />
+   <Event id="u2" label="u2" controllable="false" prioritized="true" />
+  </Events>
+  <States>
+   <State id="p10" initial="true" />
+   <State id="p11" />
+   <State id="p12" />
+   <State id="p15" />
+   <State id="p13" />
+   <State id="p14" />
+  </States>
+  <Transitions>
+   <Transition event="c1" source="p10" dest="p11" />
+   <Transition event="u1" source="p11" dest="p12" />
+   <Transition event="c1" source="p12" dest="p15" />
+   <Transition event="u2" source="p12" dest="p13" />
+   <Transition event="u1" source="p13" dest="p14" />
+  </Transitions>
+ </Automaton>
+ <Automaton name="P2">
+  <Events>
+   <Event id="c1" label="c1" controllable="true" prioritized="true" />
+   <Event id="u2" label="u2" controllable="false" prioritized="true" />
+   <Event id="u3" label="u3" controllable="false" prioritized="true" />
+  </Events>
+  <States>
+   <State id="p20" initial="true" />
+   <State id="p21" />
+   <State id="p22" />
+   <State id="p23" />
+  </States>
+  <Transitions>
+   <Transition event="c1" source="p20" dest="p21" />
+   <Transition event="u2" source="p22" dest="p20" />
+   <Transition event="u3" source="p21" dest="p23" />
+   <Transition event="c1" source="p23" dest="p22" />
+  </Transitions>
+ </Automaton>
+ <Automaton name="Sp1">
+  <Events>
+   <Event id="c1" label="c1" controllable="true" prioritized="true" />
+   <Event id="u1" label="u1" controllable="false" prioritized="true" />
+  </Events>
+  <States>
+   <State id="q0" initial="true" />
+   <State id="q1" />
+   <State id="q2" />
+   <State id="q3" />
+  </States>
+  <Transitions>
+   <Transition event="c1" source="q0" dest="q1" />
+   <Transition event="u1" source="q1" dest="q2" />
+   <Transition event="c1" source="q2" dest="q3" />
+  </Transitions>
+ </Automaton>
+ <Automaton name="P3">
+  <Events>
+   <Event id="u3" label="u3" controllable="false" prioritized="true" />
+   <Event id="c3" label="c3" controllable="true" prioritized="true" />
+  </Events>
+  <States>
+   <State id="p30" initial="true" />
+   <State id="p31" />
+  </States>
+  <Transitions>
+   <Transition event="u3" source="p30" dest="p31" />
+   <Transition event="c3" source="p31" dest="p30" />
+  </Transitions>
+ </Automaton>
+</Automata>
