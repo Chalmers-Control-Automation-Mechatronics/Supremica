@@ -5,7 +5,7 @@
 This XML Schema file describes the organization of a Supremica project file.
 Nice tutorials on XML Schema can be fount at
 http://www.w3schools.com/schema/default.asp and
-http://www.xml.com/pub/a/2000/11/29/schemas/part1.html
+http://www.xml.com/pub/a/2000/11/29/schemas/part1.html.
 Specification of XML Schema etc can be found at http://www.w3.org/XML/Schema
 		</xs:documentation>
 	</xs:annotation>
@@ -16,7 +16,8 @@ Specification of XML Schema etc can be found at http://www.w3.org/XML/Schema
 			<xs:enumeration value="Specification" />
 			<xs:enumeration value="Supervisor" />
 			<xs:enumeration value="Interface" />
-			<xs:enumeration value="Undefined" /> <!-- Deprecated, use Specification instead -->
+			 <!-- Undefined is deprecated, use Specification instead -->
+			<xs:enumeration value="Undefined" />
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:complexType name="Automaton">
@@ -114,7 +115,7 @@ Includes timers and signals.
 	<xs:annotation>
 		<xs:documentation>
 Timer:
-The name attribute should be globally unique. The startEvent and timeoutEvent
+The name attribute should be unique among all timers. The startEvent and timeoutEvent
 attributes should be given the label of the corresponding event. (If label
 is undefined for the event, then the id is used). The delay is in milliseconds.
 		</xs:documentation>
@@ -133,7 +134,7 @@ is undefined for the event, then the id is used). The delay is in milliseconds.
 	<xs:annotation>
 		<xs:documentation>
 Signal:
-The label and port should both individually be unique within either the output
+The label and port should both individually be unique either within the output
 signals or within the input signals.
 		</xs:documentation>
 	</xs:annotation>
@@ -162,7 +163,7 @@ event.
 	</xs:complexType>
 	<xs:complexType name="Actions">
 		<xs:sequence>
-			<xs:element name="Action" type="Action" maxOccurs="unbounded" />
+			<xs:element name="Action" type="Action" minOccurs="0" maxOccurs="unbounded" />
 		</xs:sequence>
 	</xs:complexType>
 	<xs:annotation>
@@ -191,7 +192,7 @@ The label attribute should refer to the label of the event.
 	</xs:complexType>
 	<xs:complexType name="Controls">
 		<xs:sequence>
-			<xs:element name="Control" type="Control" maxOccurs="unbounded" />
+			<xs:element name="Control" type="Control" minOccurs="0" maxOccurs="unbounded" />
 		</xs:sequence>
 	</xs:complexType>
 	<xs:annotation>
