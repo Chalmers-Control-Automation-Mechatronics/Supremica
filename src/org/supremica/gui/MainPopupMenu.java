@@ -352,11 +352,12 @@ class MainPopupMenu
 			});
 
 			// BDD crap, sorry for the compressed lines... /Arash
-			JMenuItem miR, miCR;
+			JMenuItem miR, miCR, miXXX;
 
 			expMenu.addSeparator();
 			expMenu.add(miR = new JMenuItem("BDD/Reachability"));
 			expMenu.add(miCR = new JMenuItem("BDD/CoReachability"));
+			expMenu.add(miXXX = new JMenuItem("BDD/UnderConstructionAlgo"));
 			expMenu.addSeparator();
 			miR.addActionListener(new ActionListener()
 			{
@@ -371,6 +372,13 @@ class MainPopupMenu
 				{
 					ActionMan.DoBDDCoReachability();
 				}
+			});
+			miXXX.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						ActionMan.DoBDDUnderConstruction();
+					}
 			});
 		}
 

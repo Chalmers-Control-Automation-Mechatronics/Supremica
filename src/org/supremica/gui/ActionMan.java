@@ -4160,6 +4160,11 @@ public class ActionMan
 		org.supremica.util.BDD.test.DeveloperTest.DoCoReachability(gui.getSelectedAutomata());
 	}
 
+	public static void DoBDDUnderConstruction()
+	{
+			org.supremica.util.BDD.test.DeveloperTest.DoUnderConstruction(gui.getSelectedAutomata());
+	}
+
 	// ------------------------------------------------------------------
 
 	/**
