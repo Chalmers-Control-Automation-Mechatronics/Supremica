@@ -421,6 +421,22 @@ public class MainMenuBar
 		menuProject.setMnemonic(KeyEvent.VK_P);
 		add(menuProject);
 
+		// Project.document db
+		JMenuItem menuProjectDocumentDB = new JMenuItem();
+		menuProjectDocumentDB.setText("Document Databse...");
+		menuProject.add(menuProjectDocumentDB);
+		menuProjectDocumentDB.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				org.supremica.comm.documentdb.DocumentRPCDatabase.createNew(supremica);
+			}
+		});
+
+		menuProject.addSeparator();
+
+
+
 		// Project.Rename
 		JMenuItem menuProjectRename = new JMenuItem();
 		menuProjectRename.setText("Rename...");

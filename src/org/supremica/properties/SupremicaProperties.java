@@ -69,6 +69,13 @@ public final class SupremicaProperties
 	private static String lastPropertyFile = null;
 
 
+	private static final String DOC_DB_SERVER_NAME = "docdbHost";
+	private static final String DOC_DB_SERVER_PORT = "docdbPort";
+	private static final String DOC_DB_SERVER_USER = "docdbUser";
+	private static final String DOC_DB_SERVER_DOC  = "docdbDoc";
+
+
+
 
 	private static final String XML_RPC_ACTIVE = "xmlRpcActive";
 	private static final String XML_RPC_PORT = "xmlRpcPort";
@@ -196,6 +203,12 @@ public final class SupremicaProperties
 		setProperty(FILE_ALLOW_IMPORT, "true", true);
 		setProperty(FILE_ALLOW_EXPORT, "true", true);
 		setProperty(FILE_ALLOW_QUIT, "true", true);
+
+		setProperty(DOC_DB_SERVER_NAME, "localhost", true);
+		setProperty(DOC_DB_SERVER_PORT, "9111", true);
+		setProperty(DOC_DB_SERVER_USER, "", true);
+		setProperty(DOC_DB_SERVER_DOC, "work", true);
+
 		setProperty(XML_RPC_ACTIVE, "false", true);
 		setProperty(XML_RPC_DEBUG, "false", true);
 		setProperty(XML_RPC_PORT, "9112", true);
@@ -546,6 +559,50 @@ public final class SupremicaProperties
 	{
 		wp.setProperty(FILE_ALLOW_QUIT, toString(allow));
 	}
+
+
+	// -----------------------------------------
+
+	public static int getDocDBPort()
+	{
+		return toInt(wp.getProperty(DOC_DB_SERVER_PORT));
+	}
+
+	public static void setDocDBPort(int port)
+	{
+			wp.setProperty(DOC_DB_SERVER_PORT, toString(port));
+	}
+
+	public static String getDocDBHost()
+	{
+		return wp.getProperty(DOC_DB_SERVER_NAME);
+	}
+
+	public static void setDocDBHost(String x)
+	{
+		wp.setProperty(DOC_DB_SERVER_NAME, x);
+	}
+
+	public static String getDocDBUsername()
+	{
+		return wp.getProperty(DOC_DB_SERVER_USER);
+	}
+
+	public static void setDocDBUsername(String x)
+	{
+		wp.setProperty(DOC_DB_SERVER_USER, x);
+	}
+
+	public static String getDocDBDocument()
+	{
+		return wp.getProperty(DOC_DB_SERVER_DOC);
+	}
+
+	public static void setDocDBDocument(String x)
+	{
+		wp.setProperty(DOC_DB_SERVER_DOC, x);
+	}
+
 
 	// -----------------------------------------
 	public static boolean isXmlRpcActive()

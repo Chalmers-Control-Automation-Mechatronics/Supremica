@@ -268,3 +268,7 @@ public class IncrementalLI extends BaseLI {
 		}
 	}
 }
+
+/*
+$Log: not supported by cvs2svn $
+*/
