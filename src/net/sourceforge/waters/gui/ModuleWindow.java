@@ -3,7 +3,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   ModuleWindow
 //###########################################################################
-//# $Id: ModuleWindow.java,v 1.3 2005-02-17 03:01:19 flordal Exp $
+//# $Id: ModuleWindow.java,v 1.4 2005-02-17 19:59:55 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -378,7 +378,7 @@ public class ModuleWindow extends JFrame implements ActionListener, FocusListene
 				ed = new EditorWindow(scp.getName() +
 						      " - Waters Editor",
 						      module,
-						      (ElementProxy)scp);
+						      scp);
 			    }
 			}
 		    }
@@ -728,7 +728,7 @@ public class ModuleWindow extends JFrame implements ActionListener, FocusListene
 		EditorWindow ed = new EditorWindow(scp.getName() +
 						   " - Waters Editor",
 						   module,
-						   (ElementProxy)scp);
+						   scp);
 	    }
 
 	    ModuleSelectTree.expandPath(new TreePath(parentNode.getPath()));

@@ -3,82 +3,125 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EventListCell
 //###########################################################################
-//# $Id: SimpleExpressionCell.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: SimpleExpressionCell.java,v 1.2 2005-02-17 19:59:55 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.io.File;
-import java.io.IOException;
-import javax.xml.bind.JAXBException;
-import net.sourceforge.waters.model.base.*;
-import net.sourceforge.waters.model.module.IdentifiedElementProxy;
-import net.sourceforge.waters.model.base.ProxyMarshaller;
-import net.sourceforge.waters.model.module.ModuleMarshaller;
-import net.sourceforge.waters.model.module.*;
-import java.util.ArrayList;
-import net.sourceforge.waters.xsd.base.EventKind;
-import net.sourceforge.waters.model.expr.IdentifierProxy;
+import javax.swing.InputVerifier;
+import javax.swing.JComponent;
+import javax.swing.JFormattedTextField;
+import javax.swing.text.DefaultFormatter;
+import javax.swing.text.DefaultFormatterFactory;
 
-class SimpleExpressionCell extends JLabel implements ListCellRenderer {
-    final static ImageIcon controllableIcon = new ImageIcon(EventListCell.class.getResource("/icons/waters/controllable.gif"));
-    final static ImageIcon uncontIcon = new ImageIcon(EventListCell.class.getResource("/icons/waters/uncontrollable.gif"));
-    final static ImageIcon propIcon = new ImageIcon(EventListCell.class.getResource("/icons/waters/proposition.gif"));
-    private ModuleProxy module;
+import net.sourceforge.waters.model.expr.ExpressionParser;
+import net.sourceforge.waters.model.expr.SimpleExpressionProxy;
+import net.sourceforge.waters.model.expr.ParseException;
 
-    public Component getListCellRendererComponent(
-                                                  JList list,
-                                                  Object value,            // value to display
-                                                  int index,               // cell index
-                                                  boolean isSelected,      // is the cell selected
-                                                  boolean cellHasFocus)    // the list and the cell have the focus
+
+public class SimpleExpressionCell extends JFormattedTextField
+{
+  
+  //#########################################################################
+  //# Constructors
+  public SimpleExpressionCell()
+  {
+    this(SimpleExpressionProxy.TYPE_ANY);
+  }
+
+  public SimpleExpressionCell(final int mask)
+  {
+    this(null, mask);
+  }
+
+  public SimpleExpressionCell(final SimpleExpressionProxy expr)
+  {
+    this(expr, SimpleExpressionProxy.TYPE_ANY);
+  }
+
+  public SimpleExpressionCell(final SimpleExpressionProxy expr, final int mask)
+  {
+    mTypeMask = mask;
+    mParser = new ExpressionParser();
+
+    final DefaultFormatter formatter = new SimpleExpressionFormatter();
+    final DefaultFormatterFactory factory =
+      new DefaultFormatterFactory(formatter);
+    setFormatterFactory(factory);
+    final InputVerifier verifier = new SimpleExpressionVerifier();
+    setInputVerifier(verifier);
+    if (expr != null) {
+      setValue(expr);
+    }
+  }
+
+
+  //#########################################################################
+  //# Local Class SimpleExpressionFormatter
+  private class SimpleExpressionFormatter extends DefaultFormatter
+  {
+
+    //#######################################################################
+    //# Constructors
+    private SimpleExpressionFormatter()
     {
-        String name;
-	ImageIcon icon = null;
-	EventDeclProxy e = null;
-	if (module != null){
-	    for (int i = 0; i < module.getEventDeclList().size(); i++){
-		if (((IdentifierProxy)value).getName().equals(((EventDeclProxy)module.getEventDeclList().get(i)).getName())){
-		    e = (EventDeclProxy)module.getEventDeclList().get(i);
-		}
-	    }
-	}
-        name = ((IdentifierProxy)value).toString();
-
-	if(e == null){
-	    icon = propIcon;
-	}
-	else if(e.getKind().equals(EventKind.CONTROLLABLE)) {
-	    icon = controllableIcon;
-	}
-	else if(e.getKind().equals(EventKind.UNCONTROLLABLE)) {
-	    icon = uncontIcon;
-	}
-	else {
-	    icon = propIcon;
-	}
-
-        setText(name);
-	setIcon(icon);
-
-        if (isSelected) {
-            setBackground(list.getSelectionBackground());
-            setForeground(list.getSelectionForeground());
-        }
-        else {
-            setBackground(list.getBackground());
-            setForeground(list.getForeground());
-        }
-        setEnabled(list.isEnabled());
-        setFont(list.getFont());
-        setOpaque(true);
-        return this;
+      setCommitsOnValidEdit(false);
+      setAllowsInvalid(true);
     }
 
-    public SimpleExpressionCell(ModuleProxy m){
-	module = m;
+    //#######################################################################
+    //# Overrides for class javax.swing.text.DefaultFormatter
+    public Object stringToValue(final String input)
+      throws java.text.ParseException
+    {
+      try {
+	return mParser.parse(input, mTypeMask);
+      } catch (final ParseException exception) {
+	throw exception.getJavaException();
+      }
     }
+
+  }
+
+
+  //#########################################################################
+  //# Local Class SimpleExpressionVerifier
+  private static class SimpleExpressionVerifier extends InputVerifier
+  {
+
+    //#######################################################################
+    //# Overrides for class javax.swing.InputVerifier
+    public boolean verify(final JComponent input)
+    {
+      if (input instanceof JFormattedTextField) {
+	final JFormattedTextField textfield = (JFormattedTextField) input;
+	try {
+	  textfield.commitEdit();
+	  return true;
+	} catch (final java.text.ParseException exception) {
+	  final String msg = exception.getMessage();
+	  final String text = textfield.getText();
+	  final int pos = exception.getErrorOffset();
+	  final ErrorWindow window = new ErrorWindow(msg, text, pos);
+	  textfield.setCaretPosition(pos);
+          return false;
+	}
+      } else {
+	return true;
+      }
+    }
+
+    public boolean shouldYieldFocus(final JComponent input)
+    {
+      return verify(input);
+    }
+
+  }
+ 
+
+  //#########################################################################
+  //# Data Members
+  private final int mTypeMask;
+  private final ExpressionParser mParser;
+
 }
