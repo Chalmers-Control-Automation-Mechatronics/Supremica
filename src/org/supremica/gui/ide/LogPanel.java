@@ -3,13 +3,13 @@ package org.supremica.gui.ide;
 import javax.swing.*;
 import org.supremica.gui.WhiteScrollPane;
 
-class EditorPanel
+class LogPanel
 	extends WhiteScrollPane
 {
 	private IDE ide;
 	private String title;
 
-	EditorPanel(IDE ide, String title)
+	LogPanel(IDE ide, String title)
 	{
 		this.ide = ide;
 		this.title = title;

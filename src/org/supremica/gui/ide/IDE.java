@@ -13,6 +13,7 @@ public class IDE
 	private IDEToolBar toolBar;
 	private EditorPanel editorPanel;
 	private AnalyzerPanel analyzerPanel;
+	private LogPanel logPanel;
 
     public IDE()
     {
@@ -24,8 +25,9 @@ public class IDE
     	menuBar = new IDEMenuBar(this);
     	toolBar = new IDEToolBar(this);
 
-		editorPanel = new EditorPanel("Editor");
-		analyzerPanel = new AnalyzerPanel("Analyzer");
+		editorPanel = new EditorPanel(this, "Editor");
+		analyzerPanel = new AnalyzerPanel(this, "Analyzer");
+		logPanel = new LogPanel(this, "Logger");
     }
 
 	public Actions getActions()
