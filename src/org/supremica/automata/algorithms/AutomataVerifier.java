@@ -190,7 +190,7 @@ public class AutomataVerifier
 		Iterator plantIterator;
 		boolean allModulesControllable = true;
 		Iterator supervisorIterator = theAutomata.iterator();
-		while (supervisorIterator.hasNext())
+		loop: while (supervisorIterator.hasNext())
 		{   // Iterate over supervisors/specifications
 			currSupervisorAutomaton = (Automaton) supervisorIterator.next();
 			if ((currSupervisorAutomaton.getType() == AutomatonType.Supervisor) ||
@@ -221,7 +221,7 @@ public class AutomataVerifier
 									
 									// Stop if uncontrollable
 									if (!allModulesControllable)
-										return false;
+										break loop;
 									
 									// Clean selectedAutomata	
 									while(selectedAutomata.size() > 1) 
@@ -240,7 +240,7 @@ public class AutomataVerifier
 	
 						// Stop if uncontrollable						
 						if (!allModulesControllable)
-							return false;
+							break loop;
 					}
 				}
 				
@@ -251,11 +251,12 @@ public class AutomataVerifier
 			}
 		}
 
+		// loop finished.
 		if (failure)
 		{
 			thisCategory.error("Supremicas modular verification algorithm can't solve this problem. Try the monolithic algorithm instead. There are " + potentiallyUncontrollableStates.size() + " states that perhaps makes this system uncontrollable.");
 		}
-
+		
 		return allModulesControllable;
 	}
 
@@ -321,17 +322,29 @@ public class AutomataVerifier
 			
 			// Sort automata in order of similar alphabets
 			int[] similarAutomata = findSimilarAutomata(theAutomata, selectedAutomata);
-			if (similarAutomata != null)
+			if (similarAutomata == null)
+			{   // There are no similar automata, this module must be uncontrollable
 				if (verboseMode)
-					thisCategory.info("There are " + similarAutomata.length + " automata with similar alphabets...");
+				{	// Print the uncontrollable state(s)...
+					synchHelper.printUncontrollableStates();
+					// Print event trace reaching uncontrollable state
+					// synchHelper.displayTrace();  // CAN'T BE DONE... TRACE NOT REMEMBERED... FIXA!
+					// Print info on amount of states examined
+					// synchHelper.displayInfo(); // This is done always in AutomataVerificationWorker
+				}
+				return false;
+			}
+			
+			if (verboseMode)
+				thisCategory.info("There are " + similarAutomata.length + " automata with similar alphabets...");
 			
 			for (int attempt = 1; attempt <= 5; attempt++)
-			{
+			{   // Make five attempts on prooving controllability and uncontrollability
 				if (verboseMode)
 					thisCategory.info("Attempt number " + attempt + ".");
-
+				
 				if (similarAutomata.length == selectedAutomata.size() - automataIndices.length)
-				{	// Already added all similar automata
+				{	// Already added all similar automata, try to find more similarities
 					int[] moreSimilarAutomata = findSimilarAutomata(theAutomata, selectedAutomata);
 					int[] newSimilarAutomata = new int[similarAutomata.length + moreSimilarAutomata.length];
 					if (moreSimilarAutomata != null)
@@ -345,17 +358,25 @@ public class AutomataVerifier
 					else
 					{
 						if (verboseMode)
+						{						
 							thisCategory.info("All similar automata are already added, no chance for controllability.");
+							// Print the uncontrollable state(s)...
+							synchHelper.printUncontrollableStates();
+							// Print event trace reaching uncontrollable state
+							// synchHelper.displayTrace();  // CAN'T BE DONE... TRACE NOT REMEMBERED... FIXA!
+							// Print info on amount of states examined
+							// synchHelper.displayInfo(); // This is done always in AutomataVerificationWorker
+						}
+						return false;
 					}
 				}
 				
-				if (similarAutomata != null)
-				{	// Add the similar automata  in hope of removing uncontrollable
-					// states from potentiallyUncontrollableStates...
-					excludeUncontrollableStates(similarAutomata, selectedAutomata, automataIndices);
-					if (stopRequested)
-						return false;
-				}
+				// Add the similar automata  in hope of removing uncontrollable
+				// states from potentiallyUncontrollableStates...
+				excludeUncontrollableStates(similarAutomata, selectedAutomata, automataIndices);
+				
+				if (stopRequested)
+					return false;
 				
 				if (potentiallyUncontrollableStates.size(automataIndices) > 0)
 				{
@@ -631,75 +652,10 @@ public class AutomataVerifier
 				}
 			}
 		}
+
 		if (stateAmount > stateAmountLimit)
 			stateAmountLimit = (stateAmount/1000)*1000;
 	}
-
-	/*
-	private boolean oldFindUncontrollableStates(int[] automataIndices, int[] similarAutomata)
-		throws Exception
-	{
-		synchHelper.clear();
-		// synchHelper.setRememberUncontrollable(false);
-		synchHelper.setExpandEventsUsingPriority(true);
-		synchHelper.setRememberTrace(true);
-		synchHelper.addState(initialState);
-
-		thisCategory.debug("Searching for uncontrollable states...");
-
-		// Set expansion priority
-		Iterator eventIterator;
-		Automaton currAutomaton;
-		Alphabet currAlphabet;
-		Alphabet unionAlphabet = synchHelper.getAutomaton().getAlphabet();
-		Event currEvent;
-		for (int i = 0; i < similarAutomata.length; i++)
-		{
-			currAlphabet = theAutomata.getAutomatonAt(similarAutomata[i]).getAlphabet();
-			eventIterator = currAlphabet.iterator();
-			while (eventIterator.hasNext())
-			{
-				currEvent = unionAlphabet.getEventWithLabel(((Event) eventIterator.next()).getLabel());
-				currEvent.setExpansionPriority(2);
-				// thisCategory.debug("Titta: " + currEvent.getLabel() + " " + currEvent.getExpansionPriority());
-			}
-		}
-		for (int i = 0; i < automataIndices.length; i++)
-		{
-			currAlphabet = theAutomata.getAutomatonAt(automataIndices[i]).getAlphabet();
-			eventIterator = currAlphabet.iterator();
-			while (eventIterator.hasNext())
-			{
-				currEvent = unionAlphabet.getEventWithLabel(((Event) eventIterator.next()).getLabel());
-				currEvent.setExpansionPriority(1);
-				// thisCategory.debug("Titta: " + currEvent.getLabel() + " " + currEvent.getExpansionPriority());
-			}
-		}
-
-		// Allocate and initialize the synchronizationExecuters
-		ArrayList synchronizationExecuters = new ArrayList(nbrOfExecuters);
-		for (int i = 0; i < nbrOfExecuters; i++)
-		{
-			AutomataSynchronizerExecuter currSynchronizationExecuter =
-				new AutomataSynchronizerExecuter(synchHelper);
-			synchronizationExecuters.add(currSynchronizationExecuter);
-		}
-
-		// Start all the synchronization executers and wait for completion
-		// For the moment we assume that we only have one thread
-		for (int i = 0; i < synchronizationExecuters.size(); i++)
-		{
-			AutomataSynchronizerExecuter currExec =
-				(AutomataSynchronizerExecuter) synchronizationExecuters.get(i);
-			currExec.selectAllAutomata();
-			currExec.start();
-		}
-		((AutomataSynchronizerExecuter)synchronizationExecuters.get(0)).join();
-		// synchHelper.setExpandEventsUsingPriority(false);
-		// synchHelper.setRememberTrace(false);
-		return !synchHelper.getAutomataIsControllable();
-	}
-	*/
 
 	/**
 	 * Makes attempt on finding states in the total synchronization that REALLY are uncontrollable.
@@ -716,7 +672,7 @@ public class AutomataVerifier
 		onlineSynchronizer.selectAutomata(automataIndices);
 		onlineSynchronizer.initialize();
 
-		// The order of the two first lines here is important...
+		// The order of the two first synchHelper-commands here is important...
 		if (verboseMode)
 			synchHelper.setRememberTrace(true);
 		synchHelper.addState(initialState);
@@ -724,8 +680,9 @@ public class AutomataVerifier
 		synchHelper.setCoExecuter(onlineSynchronizer);
 		synchHelper.setExhaustiveSearch(true);
 		synchHelper.setRememberUncontrollable(true);
-
+		
 		// Initialize the synchronizationExecuters
+		synchronizationExecuters.clear();
 		for (int i = 0; i < nbrOfExecuters; i++)
 		{
 			AutomataSynchronizerExecuter currSynchronizationExecuter =
@@ -746,6 +703,11 @@ public class AutomataVerifier
 		return !synchHelper.getAutomataIsControllable();
 	}
 
+	/**
+	 * Examines controllability by synchronizing all automata in the system and in each state check if some uncontrollable 
+	 * event is enabled in a plant and not in a supervisor. 
+	 * @see AutomataSynchronizerExecuter
+	 */
 	public boolean monolithicControllabilityVerification()
 		throws Exception
 	{

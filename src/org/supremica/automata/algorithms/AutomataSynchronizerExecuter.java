@@ -433,7 +433,7 @@ public final class AutomataSynchronizerExecuter
 
 		if (coExecute)
 		{   // In co-execution mode, a enabledEvents-method in another executer 
-			// follows the automaton we're suspecting has controllable states.
+			// follows the automaton we're suspecting has uncontrollable states.
 			int insertionIndex = 0;
 			int i = 0;
 			int currEvent = currEnabledEvents[i++];
@@ -471,21 +471,19 @@ public final class AutomataSynchronizerExecuter
 	 */
     public void run()
     {
-		//try
-		{
-    	initialize();
+		initialize();
 
-        // Get the first state to process
-       	int[] currState = helper.getStateToProcess();
-
- 		// main loop
-     	while (currState != null && !stopRequested)
-     	{			
+		// Get the first state to process
+		int[] currState = helper.getStateToProcess();
+		
+		// main loop
+		while (currState != null && !stopRequested)
+		{			
 			if (coExecute)
 				coExecuter.setCurrState(currState);
-
+			
 			enabledEvents(currState);
-
+			
 			if (!controllableState)
 			{	// We'd like to remember this state and later on try to show that
 				// it will be excluded in the total synchronization...  or not.
@@ -499,7 +497,7 @@ public final class AutomataSynchronizerExecuter
 				if (forbidUncontrollableStates)
 					helper.setForbidden(currState, true);
 			}
-
+			
 			if (controllableState || expandForbiddenStates)
 			{   // Expand state
 				int i = 0;
@@ -543,12 +541,7 @@ public final class AutomataSynchronizerExecuter
 			}
       		currState = helper.getStateToProcess();
         }
-		}
-		// catch (Exception ex)
-		{
-			// System.out.println("Error!!: " + ex);
-		}
-   }
+	}
 
 	/**
 	 * A call to this method stops the execution of the run-method or the buildAutomaton-method as soon as possible.

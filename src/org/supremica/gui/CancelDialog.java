@@ -289,6 +289,7 @@ public class CancelDialog
 				});
 			// setVisible(false);
 		}
+		dispose();
 	}
 
 	public void actionPerformed(ActionEvent event)
@@ -314,5 +315,6 @@ public class CancelDialog
  		{
 			System.out.println("What the hell was that? That was kinda' gross.");
 		}
+		dispose();
 	}
 }
