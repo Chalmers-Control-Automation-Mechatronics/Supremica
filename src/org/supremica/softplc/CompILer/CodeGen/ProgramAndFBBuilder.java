@@ -974,7 +974,7 @@ public abstract class ProgramAndFBBuilder
 			BranchInstruction ifne = new IFEQ(null);
 			InstructionHandle skipStore;
 			ilRun.append(InstructionConstants.DUP);
-			/* XXX
+			/* 
 			 * need to check that IL's result reg has type BOOL,
 			 *  (should be done in TypeChecker)
 			 */
@@ -2610,105 +2610,14 @@ public abstract class ProgramAndFBBuilder
 	ilRun.append(fac.createInvoke(fbTypeName, "run", Type.VOID, Type.NO_ARGS, Constants.INVOKEVIRTUAL));
     }
 
-
-
-
-    /**
-     * hack för att få print att fungera på ett enkelt sätt
-     * This method is deprecated
-     */ 
-    public void emitIL_FB_CALL(IlCallOperator op, String fb_name,Object[] args)
-    {
-	fb_name = fb_name.toLowerCase();
-
-	BranchInstruction callCondition = new IFEQ(null);    // dummy init
-
-	if (op == IlCallOperator.CAL) {}
-	else if (op == IlCallOperator.CALC)
-	    {
-
-		// if result reg == true -> make call
-		ilRun.append(InstructionConstants.DUP);
-
-		// callCondition = new IFEQ(null);
-		ilRun.append(callCondition);
-	    }
-	else if (op == IlCallOperator.CALCN)
-	    {
-
-		// if result reg == false -> make call
-		ilRun.append(InstructionConstants.DUP);
-
-		callCondition = new IFNE(null);
-
-		ilRun.append(callCondition);
-	    }
-
-	// make call
-	if (fb_name.equals("print") || fb_name.equals("println"))
-	    {
-		emitPRINT(args, fb_name);
-	    }
-	else
-	    {
-		//XXX jovisst,,,,error("Calls to function blocks not yet " + "implemented");
-	    }
-
-	// set conditional target
-	if ((op == IlCallOperator.CALC) || (op == IlCallOperator.CALCN))
-	    {
-		InstructionHandle end_call = ilRun.append(InstructionConstants.NOP);
-
-		callCondition.setTarget(end_call);
-	    }
-    }
-
-    private void emitPRINT(Object[] args, String print_type)
-    {
-	ObjectType pStream = new ObjectType("java.io.PrintStream");
-
-	for (int i = 0; i < args.length; i++)
-	    {
-		if (args[i] instanceof TypeWSTRING)
-		    {
-			ilRun.append(fac.createFieldAccess("java.lang.System", "out", pStream, Constants.GETSTATIC));
-			ilRun.append(new PUSH(constPoolGen, ((TypeWSTRING) args[i]).getValue()));
-			ilRun.append(fac.createInvoke("java.io.PrintStream", print_type, Type.VOID, new Type[]{ Type.STRING }, Constants.INVOKEVIRTUAL));
-		    }
-		else if (args[i] instanceof IECVariable)
-		    {
-			IECVariable var = (IECVariable) args[i];
-
-			ilRun.append(fac.createFieldAccess("java.lang.System", "out", pStream, Constants.GETSTATIC));
-			ilRun.append(emitLoadVariable(var));
-
-			if (var.getType() == TypeConstant.T_BOOL)
-			    {
-				ilRun.append(fac.createInvoke("java.io.PrintStream", print_type, Type.VOID, new Type[]{ Type.BOOLEAN }, Constants.INVOKEVIRTUAL));
-			    }
-			else if (var.getType() == TypeConstant.T_DINT)
-			    {
-				ilRun.append(fac.createInvoke("java.io.PrintStream", print_type, Type.VOID, new Type[]{ Type.INT }, Constants.INVOKEVIRTUAL));
-			    }
-			else if (var.getType() == TypeConstant.T_REAL)
-			    {
-				ilRun.append(fac.createInvoke("java.io.PrintStream", print_type, Type.VOID, new Type[]{ Type.FLOAT }, Constants.INVOKEVIRTUAL));
-			    }
-			else if (var.getType() == TypeConstant.T_WSTRING)
-			    {
-				ilRun.append(fac.createInvoke("java.io.PrintStream", print_type, Type.VOID, new Type[]{ Type.STRING }, Constants.INVOKEVIRTUAL));
-			    }
-			else
-			    {
-				errorsPresent = true;
-
-				error("Cannot print things of type: " + var.getType());
-			    }
-		    }
-		else
-		    {
-			error("Print not implemented for this type");
-		    }
-	    }
-    }
 }
+
+
+
+
+
+
+
+
+
+

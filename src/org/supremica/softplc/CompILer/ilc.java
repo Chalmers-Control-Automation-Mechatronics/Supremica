@@ -37,32 +37,35 @@ public class ilc
 	    try {
 		SimpleNode n = p.Start();
 		
-		// XXX
-		//n.dump("");
-		
 		VariableChecker v = new VariableChecker(n);
 		
 		//XXX new VaribleChecker(n,logger);
-		//System.out.println("VarChecker färdig");
-		// XXX
-		
 		if (v.check()) {
-		    //n.dump("");
 		    JavaBytecodeGenerator jb = new JavaBytecodeGenerator(n, outDir, logger, debug);
-		    //XXXFile temp = jb.getTempFile();
 		} else {
 		    System.err.println("VariableChecker failed");
 		}
 	    }
 	    catch (Exception e)
 		{
-		    System.out.println(e.getMessage());
+			if (logger != null)
+				logger.error(e.getMessage());
+			else
+				System.out.println(e.getMessage());
 		    e.printStackTrace();
 		}
 	}
 	catch (Throwable e)
 	    {
-		System.out.println("Unable to parse input " + e);
+			if (logger != null)
+				logger.error("Unable to parse input " + e);
+			else
+				System.out.println("Unable to parse input " + e);
 	    }
     }
 }
+
+
+
+
+

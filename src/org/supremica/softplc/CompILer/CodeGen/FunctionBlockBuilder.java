@@ -22,20 +22,17 @@ public class FunctionBlockBuilder
      */
     private static String[] interfaces = {"org.supremica.softplc.CompILer.CodeGen.IEC_Interfaces.IEC_FunctionBlock" };
 
-	//XXX skall denna finns
-    public File getTempFile() {return null;};
-
     /**Constructor ProgramBuilder constructs a new frame for
      * IL program generation
      * @param functionBlockName name of IL function block be
      *                         generated (i.e. classfile name)
      * @param outDir output directory for class files
      * @param logger a logger object for messages
-     * @param debug set whether debug messages should appear at standard output.
-     *              Only used if there is no logger provided
+     * @param debug set whether debug messages should appear at 
+	 *              standard output. Only used if there is no logger provided
      */
-    public FunctionBlockBuilder(String functionBlockName, String outDir, Logger logger, 
-				boolean debug)
+    public FunctionBlockBuilder(String functionBlockName, String outDir, 
+								Logger logger, boolean debug)
     {
 	this.logger = logger;
 	this.debug = debug;
@@ -97,7 +94,7 @@ public class FunctionBlockBuilder
     public void emitDirectInit(IECDirectVariable v, TypeBOOL i)
     {
 	error("Direct variables are not allowed in function and therefore " + 
-	      "you can't initialise such vars." + v);
+	      "you can't initialise such variables. " + v);
     }
 
     /**
@@ -110,7 +107,7 @@ public class FunctionBlockBuilder
      */
     InstructionList emitLoadVariable(IECDirectVariable var)
     {
-	error("Reference to direct variable not allowed in function blocks"+var);
+	error("Reference to direct variable not allowed in function blocks "+var);
 	return new InstructionList();
     }
 
@@ -121,7 +118,7 @@ public class FunctionBlockBuilder
      */
     InstructionList emitStoreVariable(IECDirectVariable var)
     {
-	error("Reference to direct variable not allowed in function blocks"+var);
+	error("Reference to direct variable not allowed in function blocks "+var);
 	return new InstructionList();
     }
 }

@@ -12,7 +12,7 @@ import java.io.File;
 /**
  * handles java bytecode generation for IL programs. Especially 
  * parts that differs from function blocks (common parts are handled
- * by @see ProgramAndFunctionBlockBuilder)
+ * by {@link ProgramAndFBBuilder})
  * @author Anders Röding
  */
 
@@ -46,7 +46,7 @@ public class ProgramBuilder
 
 	classFileName = dumpClassDir.concat("/" + programName.concat(".class"));
 
-	// create the new program class
+	/* create the new program class */
 	classGen = new ClassGen(className, "java.lang.Object", "<generated>", 
 				Constants.ACC_PUBLIC, implementedInterfaces);
 	constPoolGen = classGen.getConstantPool();
@@ -80,8 +80,8 @@ public class ProgramBuilder
 	ilInit.append(fac.createInvoke("java.lang.Object", "<init>", Type.VOID, 
 				       Type.NO_ARGS, Constants.INVOKESPECIAL));
 	/* initialize arrays for direct variables */
-	ilInit.append(InstructionConstants.THIS);    // this
-	ilInit.append(InstructionConstants.ALOAD_1);    /* reference to directInput array */
+	ilInit.append(InstructionConstants.THIS);    /* load reference to this */
+	ilInit.append(InstructionConstants.ALOAD_1); /* reference to directInput array */
 	ilInit.append(fac.createFieldAccess(className, directInput, 
 					    new ArrayType(Type.BOOLEAN, 1), 
 					    Constants.PUTFIELD));
@@ -135,12 +135,13 @@ public class ProgramBuilder
 		il.append(fac.createFieldAccess(className, source, 
 						new ArrayType(Type.BOOLEAN, 1), 
 						Constants.GETFIELD));
-		il.append(new PUSH(constPoolGen, nr));    // ladda pos
+		il.append(new PUSH(constPoolGen, nr));    // load position
 		il.append(fac.createArrayLoad(Type.BOOLEAN));
 	    }
 	else
 	    {
-		error("Loading direct variables of type " + type + " not yet implemented");
+		error("Loading direct variables of type " + type + 
+			  " not yet implemented");
 	    }
 	return il;
     }

@@ -4,16 +4,19 @@ import java.util.*;
 import de.fub.bytecode.generic.*;
 
 /**
- * this class handles labels and jump operations during the bytecode generation.
- * Since we have to know where labels are positioned to be able to jump to them 
- * there position in the bytecode is stored in an object of this kind during the
- * code generation process.
- * Also bytecode jumpoperations are stored until the corresponding label's position
- * is known. There after the branch/jump target is set.
+ * this class handles labels and jump operations during the bytecode 
+ * generation. Since we have to know where labels are positioned to 
+ * be able to jump to them their position in the bytecode is stored 
+ * in an object of this kind during the code generation process.
+ * Also bytecode jumpoperations are stored until the corresponding 
+ * label's position is known. There after the branch/jump target is set.
  * @author Anders Röding
  */
 public class JumpController
 {
+	/**
+	 * Hashtable containing jumpinformation
+	 */
     Hashtable table = new Hashtable();
 
     /**

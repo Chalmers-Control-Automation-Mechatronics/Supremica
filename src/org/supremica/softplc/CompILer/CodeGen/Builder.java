@@ -79,7 +79,4 @@ public interface Builder
 	 * generates code for an IL jump operation.
 	 */
 	void emitIL_JUMP_OPERATION(IlJumpOperator op, String targetLabel);
-
-	//XXX il_fb_call är en hackfunktion
-	//	void emitIL_FB_CALL(IlCallOperator op, String fb_name, Object[] args);
 }
