@@ -63,7 +63,8 @@ import org.supremica.automata.*;
 // The latter two may appear to belong to a view instead of being
 // part of a document, but here these attributes can be conveniently
 // stored persistently.
-public class AutomatonDocument extends JGoDocument
+public class AutomatonDocument
+	extends JGoDocument
 {
 	// Event hints
 	public static final int NameChanged = JGoDocumentEvent.LAST + 1;

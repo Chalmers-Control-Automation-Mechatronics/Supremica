@@ -78,8 +78,10 @@ public class Automata
 		this();
 		Iterator automataIterator = oldAutomata.iterator();
 		while (automataIterator.hasNext())
+		{
 			// addAutomaton((Automaton) automataIterator.next());
 			addAutomaton(new Automaton((Automaton) automataIterator.next()));
+		}
 	}
 
 	public void addAutomaton(Automaton aut)
