@@ -21,9 +21,11 @@ Supremica is following.
 	If you are at one of S2's Unix computers:
 	> cvs checkout Supremica
 	
-	If you are at an external computer:
+	If you are at an external computer. First you need
+	to tell CVS to use ssh. To do this write:
 	> export CVS_RSH=ssh  (for bash)
 	> setenv CVS_RSH ssh  (for tcsh)
+	After this you can checkout the sources.
 	> cvs -d ka@linus.s2.chalmers.se:/users/s2/cvs checkout Supremica
 
 2. Compiling
@@ -87,7 +89,7 @@ More information
 Ant - the build systems
 http://jakarta.apache.org/ant/
 
-Cvs - the 
+Cvs - the Concurrent Version System
 http://www.cvshome.org/
 
 Sun Java JDK
@@ -95,3 +97,4 @@ http://java.sun.com/
 
 IBM Java JDK
 http://www.ibm.com/java
+
