@@ -25,6 +25,22 @@ public class fbd2smv
 	isagrafReader igReader = new isagrafReader(fbdProjectPath);
 	fbdProj                = igReader.getFbdProject();
 
+	/* <test> */
+  	  LinkedList fbdElements = fbdProj.getFBDElements();
+	  System.out.println("fbdElements.size()=" + fbdElements.size());
+
+	  Collections.sort(fbdElements);
+	
+	  for(int i=0; i < fbdElements.size(); i++)
+	      {
+		  org.supremica.external.fbd2smv.isagrafReader.FBDElement fbdElement = ( org.supremica.external.fbd2smv.isagrafReader.FBDElement)fbdElements.get(i);
+
+		  System.out.println(fbdElement.getProgramName() + ", " + fbdElement.getProgramIndex() + ", " + fbdElement.getElementName() + ", " + fbdElement.getElementType() + ", " + fbdElement.getX() + ", " + fbdElement.getY());
+	      }
+	
+	/* </test> */
+
+
 
 	/* <test> */
   	  LinkedList indices = fbdProj.getOutputVariableIndicesByVariableName("E_Go");

@@ -8,10 +8,11 @@ public class fbdProject
     private Dictionary dictionary  = new Dictionary();
     private LinkedList programs    = new LinkedList();
     private LinkedList programList = new LinkedList();
+    private LinkedList fbdElements = new LinkedList();
 
     //private HashMap    variables   = new HashMap();
     //private HashMap    boxes       = new HashMap();
-    //private LinkedList    arcs        = new HashMap();    
+    //private LinkedList    arcs     = new HashMap();    
     
     
     
@@ -60,6 +61,11 @@ public class fbdProject
     public LinkedList getPrograms()
     {
 	return programs;
+    }
+
+    public LinkedList getFBDElements()
+    {
+	return fbdElements;
     }
 
     /*
@@ -157,6 +163,7 @@ public class fbdProject
     }
     
 
+
     /*
     public LinkedList getOutputVariables()
     {
@@ -180,10 +187,10 @@ public class fbdProject
 
 	    }
 	}
-
-	
     }
     */
+
+
 
 
     /*

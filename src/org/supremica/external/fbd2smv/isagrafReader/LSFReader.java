@@ -10,9 +10,16 @@ public class LSFReader
     private HashMap variablesByIndex = new HashMap();
     private HashMap boxes            = new HashMap();
     private LinkedList arcs          = new LinkedList();
+    private LinkedList fbdElements;
+    private String programName;
+    private int programIndex;
 
-    public LSFReader(FileReader fr) throws IOException
+
+    public LSFReader(FileReader fr, String programName, int programIndex, LinkedList fbdElements) throws IOException
     {
+	this.programName = programName;
+	this.programIndex = programIndex;
+	this.fbdElements = fbdElements;
 	BufferedReader br = new BufferedReader(fr);
 	parse(br);
     }
@@ -38,6 +45,12 @@ public class LSFReader
     public LinkedList getArcs()
     {
 	return arcs;
+    }
+
+    
+    public LinkedList getFbdElements()
+    {
+	return fbdElements;
     }
 
 
@@ -101,6 +114,9 @@ public class LSFReader
     {
 	String indexString = null;
 	String varName     = null;
+	Integer I = null;
+	int x = -1;
+	int y = -1;
 
 	StringTokenizer tokenizer = new StringTokenizer(line, ",");
 
@@ -127,7 +143,9 @@ public class LSFReader
 			    {
 				System.err.println("Unknown token: " + currToken);
 			    }
-			tokenizer.nextToken();
+			x = I.valueOf(currToken.substring(3, currToken.length())).intValue();
+			currToken = tokenizer.nextToken();
+			y = I.valueOf(currToken.substring(0, currToken.length()-1)).intValue();
 		    }
 
 		else if (i == 3)
@@ -173,6 +191,7 @@ public class LSFReader
 
 	variablesByIndex.put(newVAR.getIndex(), newVAR);
 	variablesByName.put(newVAR.getName(), newVAR);
+	fbdElements.add(new FBDElement(programName, programIndex, (String)newVAR.getName(), "variable", x, y));
 		
     }
 
@@ -183,6 +202,7 @@ public class LSFReader
 	String boxName     = null;
 	String x = null;
 	String y = null;
+	Integer I = null;
 
 	StringTokenizer tokenizer = new StringTokenizer(line, ",");
 
@@ -255,6 +275,7 @@ public class LSFReader
 
 	BOX newBOX = new BOX(indexString, boxName, x, y);
 	boxes.put(newBOX.getIndex(), newBOX);
+	fbdElements.add(new FBDElement(programName, programIndex, (String)newBOX.getName(), "box", I.valueOf(x).intValue(), I.valueOf(y).intValue()));
     }
 
 

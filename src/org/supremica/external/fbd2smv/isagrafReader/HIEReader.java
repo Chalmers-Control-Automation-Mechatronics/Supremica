@@ -7,7 +7,7 @@ import org.supremica.external.fbd2smv.util.*;
 public class HIEReader
 {
 
-    HashMap programs = new HashMap();
+    LinkedList programs = new LinkedList();
 
     public HIEReader(FileReader fr) throws IOException
     {
@@ -19,16 +19,19 @@ public class HIEReader
     void parse(BufferedReader br) throws IOException
     {
         String input;
-	int index = 0;
 	
         while ((input = br.readLine()) != null)
 	    {
 		if (input.endsWith("(_FBD)"))
 		    {
-			programs.put(input.substring(0, input.indexOf("(_FBD)")), new Integer(index));
-			index++;
+			programs.add(input.substring(0, input.indexOf("(_FBD)")));
 		    }
 	    }
+    }
+
+    public LinkedList getPrograms()
+    {
+	return programs;
     }
     
 }

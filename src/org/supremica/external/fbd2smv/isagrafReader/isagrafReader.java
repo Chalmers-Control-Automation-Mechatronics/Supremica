@@ -15,8 +15,16 @@ public class isagrafReader
     {
 	this.fbdProjectPath = fbdProjectPath;
 	buildDictionary();
+
+	LinkedList fbdElements = fbdProj.getFBDElements();
+
+	FileReader fr = new FileReader(fbdProjectPath + "appli.hie");
+	LinkedList programList;
+	HIEReader hieReader = new HIEReader(fr);
+	programList = hieReader.getPrograms();
+
 	//buildProgramList();
-	buildPrograms();
+	buildPrograms(programList, fbdElements);
     }
 
 
@@ -52,27 +60,25 @@ public class isagrafReader
     }
 
 
-    private void buildPrograms() throws IOException
+    private void buildPrograms(LinkedList programList, LinkedList fbdElements) throws IOException
     {
-	LinkedList programFiles;
 	FileFinder fileFinder = new FileFinder();
-	programFiles = fileFinder.getFiles(fbdProjectPath, "lsf");
 
-
-	for (int i=0; i<programFiles.size(); i++)
+	for (int i=0; i<programList.size(); i++)
 	    {
-		System.out.println("==== PROGRAM: " + (String)programFiles.get(i) + " =====");
-		buildProgram((String)programFiles.get(i));
+		System.out.println("==== PROGRAM: " + (String)programList.get(i) + " =====");
+		buildProgram((String)programList.get(i), i, fbdElements);
 	    }
 
     }
 
-    private void buildProgram(String programName) throws IOException
+    private void buildProgram(String programName, int programIndex, LinkedList fbdElements) throws IOException
     {
-	FileReader fr = new FileReader(fbdProjectPath + programName);
-	LSFReader lsfReader = new LSFReader(fr);
+	System.out.println(programName);
+	FileReader fr = new FileReader(fbdProjectPath + programName + ".lsf");
+	LSFReader lsfReader = new LSFReader(fr, programName, programIndex, fbdElements);
 	fr.close();
-	Program program = new Program(programName.substring(0, programName.indexOf(".")), lsfReader.getVariablesByIndex(), lsfReader.getVariablesByName(), lsfReader.getBoxes(), lsfReader.getArcs());
+	Program program = new Program(programName, lsfReader.getVariablesByIndex(), lsfReader.getVariablesByName(), lsfReader.getBoxes(), lsfReader.getArcs());
 	fbdProj.addProgram(program);
     }
 
