@@ -216,12 +216,42 @@
 <target name="build_supremica" depends="compile_supremica,jar_supremica,startfiles_supremica">
 </target>
 
+<!-- Build:
+*	A standard compilation followed by packaging
+*	all files into a jar file. 
+-->
+<target name="build_supremica_student" depends="compile_supremica,jar_supremica_student,startfiles_supremica_student">
+</target>
+
+<!-- Build:
+*	A standard compilation followed by packaging
+*	all files into a jar file. 
+-->
+<target name="build_supremica_teacher" depends="compile_supremica,jar_supremica_teacher,startfiles_supremica_teacher">
+</target>
+
 <!-- Rebuild:
 *	Deletes all existing class files, recompiles all files,
 *	and packages all files into a jar file that can
 *	be executed without any other dependencies. 
 -->
 <target name="rebuild_supremica" depends="clean,version,build_supremica">
+</target>
+
+<!-- Rebuild:
+*	Deletes all existing class files, recompiles all files,
+*	and packages all files into a jar file that can
+*	be executed without any other dependencies. 
+-->
+<target name="rebuild_supremica_student" depends="clean,version,build_supremica_student">
+</target>
+
+<!-- Rebuild:
+*	Deletes all existing class files, recompiles all files,
+*	and packages all files into a jar file that can
+*	be executed without any other dependencies. 
+-->
+<target name="rebuild_supremica_teacher" depends="clean,version,build_supremica_teacher">
 </target>
 
 
@@ -258,8 +288,43 @@
 		<fileset dir="${build}"/>
 		<fileset dir="${images}"/>
 		<fileset dir="${examples}"/>
-		<fileset dir="${javalibs.dir}">		
+		<fileset dir="${javalibs.dir}"/>		
+	</jar>
+</target>
+
+<target name="jar_supremica_student">
+	<jar jarfile="${dist}/Supremica.jar" manifest="${templates}/SUPREMICA_MANIFEST.MF"> 
+		<fileset dir="${build}">
+			<patternset>
+				<include name="**/*"/>
+				<exclude name="org/supremica/apps/Supremica.class"/>
+				<exclude name="org/supremica/apps/SupremicaApplet.class"/>
+				<exclude name="org/supremica/apps/SupremicaTeacher.class"/>
+				<exclude name="org/supremica/apps/SupremicaClient.class"/>
+				<exclude name="org/supremica/apps/SupremicaServer.class"/>
+			</patternset>			
 		</fileset>
+		<fileset dir="${images}"/>
+		<fileset dir="${examples}"/>
+		<fileset dir="${javalibs.dir}"/>		
+	</jar>
+</target>
+
+<target name="jar_supremica_teacher">
+	<jar jarfile="${dist}/Supremica.jar" manifest="${templates}/SUPREMICA_MANIFEST.MF"> 
+		<fileset dir="${build}">
+			<patternset>
+				<include name="**/*"/>
+				<exclude name="org/supremica/apps/Supremica.class"/>
+				<exclude name="org/supremica/apps/SupremicaApplet.class"/>
+				<exclude name="org/supremica/apps/SupremicaStudent.class"/>
+				<exclude name="org/supremica/apps/SupremicaClient.class"/>
+				<exclude name="org/supremica/apps/SupremicaServer.class"/>
+			</patternset>			
+		</fileset>
+		<fileset dir="${images}"/>
+		<fileset dir="${examples}"/>
+		<fileset dir="${javalibs.dir}"/>		
 	</jar>
 </target>
 
@@ -268,12 +333,11 @@
 		<fileset dir="${build}"/>
 		<fileset dir="${images}"/>
 		<fileset dir="${examples}"/>
-		<fileset dir="${javalibs.dir}">	
-		</fileset>
+		<fileset dir="${javalibs.dir}"/>	
 	</jar>
 </target>
 
-<target name="startfiles_supremica">
+<target name="startfiles_supremica" depends="startfiles_supremica_student,startfiles_supremica_teacher">
 	<copy file="${templates}/Supremica" todir="${dist}"/>	
 	<chmod file="${dist}/Supremica" perm="755"/>	
 	<copy file="${templates}/Supremica.cmd" todir="${dist}"/>	
@@ -282,6 +346,20 @@
 	<chmod file="${dist}/SupremicaApplet.html" perm="644"/>	
 	<copy file="${templates}/SupremicaAppletViewer.html" todir="${dist}"/>	
 	<chmod file="${dist}/SupremicaAppletViewer.html" perm="644"/>	
+</target>
+
+<target name="startfiles_supremica_student">
+	<copy file="${templates}/SupremicaStudent" todir="${dist}"/>	
+	<chmod file="${dist}/SupremicaStudent" perm="755"/>	
+	<copy file="${templates}/SupremicaStudent.cmd" todir="${dist}"/>	
+	<chmod file="${dist}/SupremicaStudent.cmd" perm="644"/>
+</target>
+
+<target name="startfiles_supremica_teacher">
+	<copy file="${templates}/SupremicaTeacher" todir="${dist}"/>	
+	<chmod file="${dist}/SupremicaTeacher" perm="755"/>	
+	<copy file="${templates}/SupremicaTeacher.cmd" todir="${dist}"/>	
+	<chmod file="${dist}/SupremicaTeacher.cmd" perm="644"/>
 </target>
 
 <target name="startfiles_jgrafchart">

@@ -51,18 +51,24 @@ package org.supremica.apps;
 
 import org.supremica.properties.SupremicaProperties;
 
-public class Supremica
+public class SupremicaTeacher
 {
+	// Same as SupremicaStudent but with setAllowSuperUserLogin to true
 	static
 	{
-		SupremicaProperties.setUseSecurity(false);
+		SupremicaProperties.setUseSecurity(true);
 		SupremicaProperties.setXmlRpcActive(false);
-		SupremicaProperties.setAllowSuperUserLogin(false);
-		SupremicaProperties.setUseDot(true);
+		SupremicaProperties.setAllowSuperUserLogin(true);
+		SupremicaProperties.setUseDot(false);
+		SupremicaProperties.setFileAllowImport(false);
+		SupremicaProperties.setFileAllowExport(false);
 	}
 
 	public static void main(String[] args)
 	{
-		SupremicaWithGui.startSupremica(args);
+		if (args != null)
+		{
+			SupremicaWithGui.startSupremica(args);
+		}
 	}
 }

@@ -55,12 +55,6 @@ import org.supremica.automata.algorithms.SynthesisType;
 import org.supremica.automata.algorithms.SynthesisAlgorithm;
 
 /**
- * To compile a student version with copy protected files set
- * GeneralUseSecurity to true.
- * If allowSuperUserLogin is set to true then it is possible to login in as "ESS
- */
-
-/**
  * Properties for Supremica.
  *
  **/
@@ -390,6 +384,12 @@ public final class SupremicaProperties
 	{
 		return toBoolean(wp.getProperty(ALLOW_SUPERUSER_LOGIN));
 	}
+
+	public static void setAllowSuperUserLogin(boolean mode)
+	{
+		wp.setProperty(ALLOW_SUPERUSER_LOGIN, toString(mode));
+	}
+
 
 	public static boolean logToConsole()
 	{

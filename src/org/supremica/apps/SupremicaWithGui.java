@@ -49,20 +49,87 @@
  */
 package org.supremica.apps;
 
+import java.io.*;
+import java.awt.*;
+import org.supremica.log.*;
 import org.supremica.properties.SupremicaProperties;
+import org.supremica.gui.*;
 
-public class Supremica
+// import org.jgrafchart.*;
+public class SupremicaWithGui
 {
 	static
 	{
-		SupremicaProperties.setUseSecurity(false);
-		SupremicaProperties.setXmlRpcActive(false);
-		SupremicaProperties.setAllowSuperUserLogin(false);
-		SupremicaProperties.setUseDot(true);
+		SupremicaProperties.setLogToConsole(false);
+		SupremicaProperties.setLogToGUI(true);
 	}
 
-	public static void main(String[] args)
+	private static Logger logger = LoggerFactory.createLogger(org.supremica.gui.Supremica.class);
+
+	private SupremicaWithGui() {}
+
+	public static void startSupremica()
 	{
-		SupremicaWithGui.startSupremica(args);
+		startSupremica(null);
 	}
+
+	public static void startSupremica(String[] args)
+	{
+		SplashWindow splash = new SplashWindow();
+
+		splash.setVisible(true);
+
+		org.supremica.gui.Supremica workbench = null;
+
+		if (args != null)
+		{
+			if (args.length > 0)
+			{
+				workbench = new org.supremica.gui.Supremica(args[0]);
+			}
+			else
+			{
+				workbench = new org.supremica.gui.Supremica(null);
+			}
+		}
+		else
+		{
+			workbench = new org.supremica.gui.Supremica(null);
+		}
+
+		boolean packFrame = false;
+
+		// Validate frames that have preset sizes
+		// Pack frames that have useful preferred size info, e.g. from their layout
+		if (packFrame)
+		{
+			workbench.pack();
+		}
+		else
+		{
+			workbench.validate();
+		}
+
+		// Center the window
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		Dimension frameSize = workbench.getSize();
+
+		if (frameSize.height > screenSize.height)
+		{
+			frameSize.height = screenSize.height;
+		}
+
+		if (frameSize.width > screenSize.width)
+		{
+			frameSize.width = screenSize.width;
+		}
+
+		workbench.setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
+		workbench.initialize();
+		splash.setVisible(false);
+		workbench.setVisible(true);
+
+		PreLoader preLoader = PreLoader.getPreLoader();
+	}
+
 }
