@@ -252,7 +252,7 @@ public class SFCToSMV
 	private void transitionRelation(List stepsInOneSFC,int sfcNumber,int numberOfSFCs)
 	{
 		boolean initial = true;
-
+		boolean noInitCondition = false;
 		if(numberOfSFCs > 1 && sfcNumber == 1)
 		{
 			write("\tif(turn = 1)");
@@ -328,7 +328,17 @@ public class SFCToSMV
 					condition = condition.concat(" | start_"+sfcNumber);
 			}
 */
-
+			
+			if (initial)
+			{
+				if(condition.equals(""))
+				{
+					condition = condition.concat("start_"+sfcNumber);
+					noInitCondition = true;
+				}	
+			}	
+					
+			
 			if(initial)
 				write("\t\tif( "+condition+" )");	//Completing the If part
 			else
@@ -425,50 +435,52 @@ public class SFCToSMV
 
 		}//main while loop
 
-
-		for(Iterator stepIt = stepsInOneSFC.iterator(); stepIt.hasNext(); )
+		if(!noInitCondition)
 		{
-			SFCStep currStep = (SFCStep) stepIt.next();
-			System.err.println("Debug: " + currStep.getId() + "isInitial: " + currStep.isInitialStep() );
-			if (currStep.isInitialStep())
+			for(Iterator stepIt = stepsInOneSFC.iterator(); stepIt.hasNext(); )
 			{
-				List initialModList = new LinkedList();
-				List initialStepActions = new LinkedList();
-				write("\t\telse if (start_" + sfcNumber + ")");
-				write("\t\t{");
-				write("\t\t\tnext(start_" + sfcNumber + ") := 0;");
-				String stepId = currStep.getId();
-				initialModList.add(stepId);
-				write("\t\t\tnext(" + stepId + ") := 1;");
-				initialStepActions = currStep.getActionsList();
-				/************************************************************/
-				if(initialStepActions != null)
+				SFCStep currStep = (SFCStep) stepIt.next();
+				System.err.println("Debug: " + currStep.getId() + "isInitial: " + currStep.isInitialStep() );
+				if (currStep.isInitialStep())
 				{
-
-					Iterator initStepActionsIt = initialStepActions.iterator();
-					while(initStepActionsIt.hasNext())
+					List initialModList = new LinkedList();
+					List initialStepActions = new LinkedList();
+					write("\t\telse if (start_" + sfcNumber + ")");
+					write("\t\t{");
+					write("\t\t\tnext(start_" + sfcNumber + ") := 0;");
+					String stepId = currStep.getId();
+					initialModList.add(stepId);
+					write("\t\t\tnext(" + stepId + ") := 1;");
+					initialStepActions = currStep.getActionsList();
+					/************************************************************/
+					if(initialStepActions != null)
 					{
-						SFCAction anAction = (SFCAction) initStepActionsIt.next();
-
-						if(anAction.getActionType().equals("N"))
+	
+						Iterator initStepActionsIt = initialStepActions.iterator();
+						while(initStepActionsIt.hasNext())
 						{
-							write("\t\t\t"+getNActionString(anAction.getLeftHandSide()));
-							//avoidDupActions.add(anAction.getLeftHandSide());
-							initialModList.add(anAction.getLeftHandSide());
-						}
-						else if(anAction.getActionType().equals("S"))
-						{
-
-							write("\t\t\t"+getSActionString(anAction));
-							//avoidDupActions.add(anAction.getLeftHandSide());
-							initialModList.add(anAction.getLeftHandSide());
+							SFCAction anAction = (SFCAction) initStepActionsIt.next();
+	
+							if(anAction.getActionType().equals("N"))
+							{
+								write("\t\t\t"+getNActionString(anAction.getLeftHandSide()));
+								//avoidDupActions.add(anAction.getLeftHandSide());
+								initialModList.add(anAction.getLeftHandSide());
+							}
+							else if(anAction.getActionType().equals("S"))
+							{
+	
+								write("\t\t\t"+getSActionString(anAction));
+								//avoidDupActions.add(anAction.getLeftHandSide());
+								initialModList.add(anAction.getLeftHandSide());
+							}
 						}
 					}
+					writeRestOfSMVVars(initialModList,"\t\t\t");
+					write("\t\t\tnext(turn) := (turn mod "+(numberOfSFCs+1)+")+1;");
+					/************************************************************/
+					write("\t\t}");
 				}
-				writeRestOfSMVVars(initialModList,"\t\t\t");
-				write("\t\t\tnext(turn) := (turn mod "+(numberOfSFCs+1)+")+1;");
-				/************************************************************/
-				write("\t\t}");
 			}
 		}
 		writeFinalElseBlock("\t\t\t",numberOfSFCs);
