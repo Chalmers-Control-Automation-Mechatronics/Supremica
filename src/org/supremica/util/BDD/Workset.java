@@ -198,7 +198,15 @@ public class Workset
 			case Options.ES_HEURISTIC_TOPDOWN:
 				for(int i = 0; i < size; i++)
 					if(remaining[i] && workset[i] > 0) {
-						queue[queue_size++] = i;
+						queue[queue_size++] = i; // only ine
+						break;
+					}
+				break;
+
+			case Options.ES_HEURISTIC_BOTTOMUP:
+				for(int i = size-1; i >= 0; i--)
+					if(remaining[i]  && workset[i] > 0) {
+						queue[queue_size++] = i; // only ine
 						break;
 					}
 				break;

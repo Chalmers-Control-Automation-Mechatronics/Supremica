@@ -26,6 +26,7 @@ public class AutomataOrderingHeuristicFactory {
 			// all these use the same engine, the solver is different and the selection is handled internally...
 			case Options.AO_HEURISTIC_TSP:
 			case Options.AO_HEURISTIC_DFS:
+			case Options.AO_HEURISTIC_BFS:
 			case Options.AO_HEURISTIC_STCT:
 			case Options.AO_HEURISTIC_TSP_STCT:
 			case Options.AO_HEURISTIC_TSP_SIFT:
