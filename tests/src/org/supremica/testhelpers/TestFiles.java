@@ -71,6 +71,8 @@ public class TestFiles
 	public static final TestFiles Verriegel3 = new TestFiles("verriegel3.xml");
 	public static final TestFiles Verriegel3Language = new TestFiles("verriegel3_language.xml");
 	public static final TestFiles Verriegel3Uncontrollable = new TestFiles("verriegel3_uncontrollable.xml");
+	public static final TestFiles Ex4_5_a = new TestFiles("ex4_5_a.xml");
+	public static final TestFiles Ex4_5_b = new TestFiles("ex4_5_b.xml");
 
 	private static final String testFilePrefix = "./tests/testfiles/";
 

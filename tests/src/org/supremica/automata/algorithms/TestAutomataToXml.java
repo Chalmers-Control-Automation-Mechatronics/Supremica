@@ -47,7 +47,7 @@
  *
  *  Supremica is owned and represented by KA.
  */
-package org.supremica.automata;
+package org.supremica.automata.algorithms;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -58,13 +58,13 @@ import org.supremica.automata.*;
 import org.supremica.automata.algorithms.*;
 import java.io.*;
 
-public class TestProjectToSP
+public class TestAutomataToXml
 	extends TestCase
 {
 	private static final String tempFilePrefix = "SupremicaDummyFile";
 	private static final String tempFileSuffix = "xml";
 
-	public TestProjectToSP(String name)
+	public TestAutomataToXml(String name)
 	{
 		super(name);
 	}
@@ -91,7 +91,7 @@ public class TestProjectToSP
 	 */
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite(TestProjectToSP.class);
+		TestSuite suite = new TestSuite(TestAutomataToXml.class);
 		return suite;
 	}
 
@@ -104,7 +104,7 @@ public class TestProjectToSP
 			Project theOriginalProject = originalBuilder.build(testFileAgv);
 			assertTrue(theOriginalProject.nbrOfAutomata() > 0);
 			File tempFile = File.createTempFile(tempFilePrefix, tempFileSuffix);
-			ProjectToSP exporter = new ProjectToSP(theOriginalProject);
+			AutomataToXml exporter = new AutomataToXml(theOriginalProject);
 			exporter.serialize(tempFile);
 			ProjectBuildFromXml secondBuilder = new ProjectBuildFromXml();
 			Project theSecondProject = secondBuilder.build(tempFile);
