@@ -129,7 +129,7 @@ public final class SupremicaProperties
     private static final String BDD_TRACE_ON  = "bddTraceOn";
     private static final String BDD_DEBUG_ON  = "bddDebugOn";
     private static final String BDD_ALGORITHM = "bddAlgorithm";
-
+    private static final String BDD_COUNT_ALGO= "bddCountAlgorithm";
 
 	// Animator Options
 	private static final String INCLUDE_ANIMATOR = "includeAnimator";
@@ -216,12 +216,12 @@ public final class SupremicaProperties
 		softplcInterfaces.add(new org.supremica.gui.SoftplcInterface("org.supremica.softplc.Simulator.BTSim"));
 
 		// BDD stuffs
-		setProperty(BDD_SHOW_GROW, toString(Options.show_grow), true);
-		setProperty(BDD_ALTER_PCG, toString(Options.user_alters_PCG), true);
-		setProperty(BDD_TRACE_ON , toString(Options.trace_on), true);
-		setProperty(BDD_DEBUG_ON , toString(Options.debug_on), true);
-		setProperty(BDD_ALGORITHM, toString(Options.algo_family), true);
-
+		setProperty(BDD_SHOW_GROW , toString(Options.show_grow), true);
+		setProperty(BDD_ALTER_PCG , toString(Options.user_alters_PCG), true);
+		setProperty(BDD_TRACE_ON  , toString(Options.trace_on), true);
+		setProperty(BDD_DEBUG_ON  , toString(Options.debug_on), true);
+		setProperty(BDD_ALGORITHM , toString(Options.algo_family), true);
+		setProperty(BDD_COUNT_ALGO, toString(Options.count_algo), true);
 
 	}
 
@@ -781,6 +781,9 @@ public final class SupremicaProperties
     	public static int getBDDAlgorithm(){  return toInt(wp.getProperty(BDD_ALGORITHM));    }
     	public static void setBDDAlgorithm(int a){  wp.setProperty(BDD_ALGORITHM, toString(a));    }
 
+    	public static int getBDDCountAlgorithm(){  return toInt(wp.getProperty(BDD_COUNT_ALGO));    }
+    	public static void setBDDCountAlgorithm(int a){  wp.setProperty(BDD_COUNT_ALGO, toString(a));    }
+
 	public static boolean getBDDShowGrow(){  return toBoolean(wp.getProperty(BDD_SHOW_GROW));    }
     	public static void setBDDShowGrow(boolean a){  wp.setProperty(BDD_SHOW_GROW, toString(a));    }
 
@@ -805,6 +808,7 @@ public final class SupremicaProperties
 	    setBDDAlterPCG(Options.user_alters_PCG);
 	    setBDDDebugOn(Options.debug_on);
 	    setBDDTraceOn(Options.trace_on);
+	    setBDDCountAlgorithm(Options.count_algo);
 	} else {
 	    // Properties -> Options
 	    Options.algo_family     = getBDDAlgorithm();
@@ -812,6 +816,7 @@ public final class SupremicaProperties
 	    Options.user_alters_PCG = getBDDAlterPCG();
 	    Options.debug_on        = getBDDDebugOn();
 	    Options.trace_on        = getBDDTraceOn();
+	    Options.count_algo      = getBDDCountAlgorithm();
 	}
     }
 
