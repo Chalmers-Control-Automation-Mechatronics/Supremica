@@ -60,7 +60,7 @@ public class BasicFBType extends FBType
 {
 
 	private ECC theECC = new ECC();
-	private Map instances = new HashMap();
+	//not needed private Map instances = new HashMap();
 
 	private Variables variables = new Variables();
 
@@ -83,7 +83,8 @@ public class BasicFBType extends FBType
 		System.out.println("BasicFBType.createInstace(" + name + ")");
 		BasicFBInstance newInstance = new BasicFBInstance(name,resource,this);
 		// construct the newInstance
-		//instances.add(newInstance); // not yet
+		//    copy all variables
+		//    for all InputEvents make queueus
 		return newInstance;
 	}
 

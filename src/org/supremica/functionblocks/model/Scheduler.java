@@ -93,7 +93,10 @@ public class Scheduler
 	
 	public void addFinishedJob(Job j)
 	{
-		finishedJobs.add(j);
+		synchronized(finishedJobs)
+		{
+			finishedJobs.add(j);
+		}
 	}
 	
 	

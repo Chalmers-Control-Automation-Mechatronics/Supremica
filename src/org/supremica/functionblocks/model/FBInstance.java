@@ -52,10 +52,11 @@
 package org.supremica.functionblocks.model;
 
 
-public abstract class FBInstance
+public abstract class FBInstance extends NamedObject
 {
-    String name;
-    
-    public abstract void handleEvent();
+	
+	public abstract void handleEvent();
+	
+	public abstract void queueEvent(String eventInput);
 
 }

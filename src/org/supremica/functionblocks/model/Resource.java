@@ -80,6 +80,7 @@ public class Resource
 		fbType.addVariable("OCCURED", new BooleanVariable("EventInput",false));
 		fbType.addVariable("DONE", new BooleanVariable("EventOutput",false));
 		fbType.addVariable("invoked", new IntegerVariable("Local",0));
+
 		// Build ECC 
 		fbType.getECC().addInitialState("INIT");
 		fbType.getECC().addState("STATE");
@@ -89,6 +90,7 @@ public class Resource
 
 		fbInstance = fbType.createInstance("P1inst");
 		fbInstance.addEventInputQueue("OCCURRED");
+		fbInstance.addEventOutputConnection("DONE", new Connection(fbInstance,"OCCURRED"));
 
 		fbInstance.queueEvent("OCCURRED");
 	

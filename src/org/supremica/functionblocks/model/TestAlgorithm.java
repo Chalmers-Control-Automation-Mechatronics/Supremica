@@ -57,7 +57,7 @@ public class TestAlgorithm extends Algorithm
 	public void execute(Variables vars)
 	{
 		IntegerVariable invoked = (IntegerVariable) vars.getVariable("invoked");
-		System.out.println("TestAlgorithm.execute(): invoked: " + invoked.getValue() + " times.");
 		invoked.setValue(invoked.getValue().intValue() + 1);
+		System.out.println("TestAlgorithm.execute(): invoked: " + invoked.getValue() + " times.");
 	}
 }

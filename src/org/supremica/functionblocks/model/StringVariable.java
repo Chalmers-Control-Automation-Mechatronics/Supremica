@@ -72,5 +72,10 @@ public class StringVariable extends Variable
 		return value;
 		
 	}
-    
+
+    	public Object clone()
+	{
+		return new StringVariable(getType(),getValue());
+	}
+
 }

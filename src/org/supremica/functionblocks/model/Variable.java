@@ -72,4 +72,6 @@ public abstract class Variable
 		return type;
 	}
 
+	public abstract Object clone();
+
 }

@@ -72,5 +72,11 @@ public class BooleanVariable extends Variable
 		return value;
 		
 	}
-    
+
+	public Object clone()
+	{
+		return new BooleanVariable(getType(),getValue().booleanValue());
+	}
+
+
 }

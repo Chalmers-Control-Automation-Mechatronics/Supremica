@@ -71,5 +71,10 @@ public class IntegerVariable extends Variable
 	{
 		return value;
 	}
-    
+
+   	public Object clone()
+	{
+		return new IntegerVariable(getType(),getValue().intValue());
+	}
+ 
 }

@@ -71,5 +71,10 @@ public class FloatVariable extends Variable
 	{
 		return value;
 	}
-    
+
+    	public Object clone()
+	{
+		return new FloatVariable(getType(),getValue().floatValue());
+	}
+
 }

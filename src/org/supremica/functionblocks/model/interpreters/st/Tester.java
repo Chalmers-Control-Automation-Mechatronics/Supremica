@@ -68,10 +68,10 @@ import org.supremica.functionblocks.model.ECCondition;
  */
 public class Tester 
 {
-
+	
 	public Tester()
 	{
-
+		
 		// Test ST interpreter
 		Variables testVars = new Variables();
 		testVars.addVariable("bvar", new BooleanVariable("Local", true));
@@ -102,7 +102,8 @@ public class Tester
 		System.out.println("evaluation result: " + testCond.evaluate(testVars));
 		testCond.set("svar");
 		System.out.println("evaluation result: " + testCond.evaluate(testVars));
-		
+		testCond.set("(FALSE) AND TRUE AND (TRUE OR ((FALSE) OR TRUE) AND TRUE) OR 3.14 >= TRUE");
+		System.out.println("evaluation result: " + testCond.evaluate(testVars));
 	}
 
 }

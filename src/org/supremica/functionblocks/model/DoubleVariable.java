@@ -71,5 +71,11 @@ public class DoubleVariable extends Variable
 	{
 		return value;
 	}
+
+	public Object clone()
+	{
+		return new DoubleVariable(getType(),getValue().doubleValue());
+	}
+
     
 }

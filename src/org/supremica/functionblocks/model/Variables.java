@@ -58,7 +58,6 @@ public class Variables
 	
 	private Map variables = new HashMap();
 
-
 	public Variable getVariable(String name)
 	{
 		return (Variable) variables.get(name);
@@ -74,4 +73,16 @@ public class Variables
 		return variables.keySet().iterator();
 	}
 
+	public Object clone()
+	{
+		Variables newVars = new Variables();
+		for (Iterator iter = iterator(); iter.hasNext();)
+		{
+			String curName = (String) iter.next();
+			Variable curVar = getVariable(curName);
+			newVars.addVariable(curName, (Variable) curVar.clone());
+		}
+		return newVars;
+	}
+	
 }

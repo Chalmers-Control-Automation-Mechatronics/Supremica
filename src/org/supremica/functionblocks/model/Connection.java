@@ -50,34 +50,29 @@
 package org.supremica.functionblocks.model;
 
 import java.util.*;
-/*
-<!ELEMENT Connection EMPTY>
-<!ATTLIST Connection
- Source CDATA #REQUIRED
- Destination CDATA #REQUIRED
- Comment CDATA #IMPLIED
- dx1 CDATA #IMPLIED
- dx2 CDATA #IMPLIED
- dy CDATA #IMPLIED
->
-*/
 
 public class Connection
 {
-	String source;
-	String destination;
-	String comment;
-	float dx1;
-	float dx2;
-	float dy;
+	
+	private FBInstance toFBInstance;
+	private String input;
 
-	private Connection()
+	private Connection() {}
+
+	public Connection(FBInstance fb, String i)
 	{
+		toFBInstance = fb;
+		input = i;
 	}
 
-	public Connection(String source, String destination)
+	public FBInstance getToFBInstance()
 	{
-		this.source = source;
-		this.destination = destination;
+		return toFBInstance;
 	}
+
+	public String getInput()
+	{
+		return input;
+	}
+
 }
