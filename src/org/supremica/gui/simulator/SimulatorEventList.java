@@ -164,5 +164,10 @@ public class SimulatorEventList
 	{
 		stateViewer.executeEvent(event);
 	}
+	
+	public SimulatorEventListModel getEventListModel()
+	{
+		return eventsList;	
+	}
 
 }

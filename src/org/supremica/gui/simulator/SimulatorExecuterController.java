@@ -72,8 +72,10 @@ class SimulatorExecuterController
 {
 	private SimulatorStateViewer stateViewer;
 	private Automata theAutomata;
-	private JButton undoButton;
-	private JButton redoButton;
+//	private JButton undoButton;
+//	private JButton redoButton;
+	private JCheckBox executeUncontrollableEvents;
+	private JCheckBox executeControllableEvents;
 
 	public SimulatorExecuterController(SimulatorStateViewer stateViewer, AutomataSynchronizerHelper synchHelper)
 	{
@@ -82,74 +84,105 @@ class SimulatorExecuterController
 		this.stateViewer = stateViewer;
 		this.theAutomata = synchHelper.getAutomata();
 
-		Box redoBox = new Box(BoxLayout.X_AXIS);
+		Box redoBox = new Box(BoxLayout.Y_AXIS);
 
-		ImageIcon forwardImg = new ImageIcon(SimulatorExecuterController.class.getResource("/toolbarButtonGraphics/navigation/Forward24.gif"));
-		ImageIcon backwardImg = new ImageIcon(SimulatorExecuterController.class.getResource("/toolbarButtonGraphics/navigation/Back24.gif"));
-		ImageIcon homeImg = new ImageIcon(SimulatorExecuterController.class.getResource("/toolbarButtonGraphics/navigation/Home24.gif"));
+//		ImageIcon forwardImg = new ImageIcon(SimulatorExecuterController.class.getResource("/toolbarButtonGraphics/navigation/Forward24.gif"));
+//		ImageIcon backwardImg = new ImageIcon(SimulatorExecuterController.class.getResource("/toolbarButtonGraphics/navigation/Back24.gif"));
+//		ImageIcon homeImg = new ImageIcon(SimulatorExecuterController.class.getResource("/toolbarButtonGraphics/navigation/Home24.gif"));
 
-		undoButton = new JButton(backwardImg);
-		undoButton.setToolTipText("Back");
-		redoButton = new JButton(forwardImg);
-		redoButton.setToolTipText("Forward");
-		JButton resetButton = new JButton(homeImg);
-		resetButton.setToolTipText("Go to the initial state");
 
-		redoBox.add(Box.createHorizontalGlue());
-		redoBox.add(Box.createHorizontalGlue());
-		redoBox.add(undoButton);
-		redoBox.add(Box.createHorizontalGlue());
-		redoBox.add(redoButton);
-		redoBox.add(Box.createHorizontalGlue());
-		redoBox.add(resetButton);
-		redoBox.add(Box.createHorizontalGlue());
-		redoBox.add(Box.createHorizontalGlue());
+		executeUncontrollableEvents = new JCheckBox("Execute uncontrollable events");
+		executeControllableEvents = new JCheckBox("Execute controllable events");
+//		undoButton = new JButton(backwardImg);
+//		undoButton.setToolTipText("Back");
+//		redoButton = new JButton(forwardImg);
+//		redoButton.setToolTipText("Forward");
+//		JButton resetButton = new JButton(homeImg);
+//		resetButton.setToolTipText("Go to the initial state");
+
+		redoBox.add(executeUncontrollableEvents);
+		redoBox.add(executeControllableEvents);
+//		redoBox.add(Box.createHorizontalGlue());
+//		redoBox.add(Box.createHorizontalGlue());
+////		redoBox.add(undoButton);
+//		redoBox.add(Box.createHorizontalGlue());
+////		redoBox.add(redoButton);
+//		redoBox.add(Box.createHorizontalGlue());
+////		redoBox.add(resetButton);
+//		redoBox.add(Box.createHorizontalGlue());
+//		redoBox.add(Box.createHorizontalGlue());
 
 		add(redoBox, BorderLayout.NORTH);
 
-		undoButton.addActionListener(new ActionListener()
+		executeUncontrollableEvents.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				undo_actionPerformed(e);
+				executeUncontrollableEvents_actionPerformed(e);
 			}
 		});
-		redoButton.addActionListener(new ActionListener()
+
+		executeControllableEvents.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				redo_actionPerformed(e);
+				executeControllableEvents_actionPerformed(e);
 			}
 		});
-		resetButton.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				reset_actionPerformed(e);
-			}
-		});
+		
+//		undoButton.addActionListener(new ActionListener()
+//		{
+//			public void actionPerformed(ActionEvent e)
+//			{
+//				undo_actionPerformed(e);
+//			}
+//		});
+//		redoButton.addActionListener(new ActionListener()
+//		{
+//			public void actionPerformed(ActionEvent e)
+//			{
+//				redo_actionPerformed(e);
+//			}
+//		});
+//		resetButton.addActionListener(new ActionListener()
+//		{
+//			public void actionPerformed(ActionEvent e)
+//			{
+//				reset_actionPerformed(e);
+//			}
+//		});
 	}
 
-	public void reset_actionPerformed(ActionEvent e)
-	{
-		stateViewer.goToInitialState();
+//	public void reset_actionPerformed(ActionEvent e)
+//	{
+//		stateViewer.goToInitialState();
+//
+//		// stateViewer.initialize();
+//	}
+//
+//	public void undo_actionPerformed(ActionEvent e)
+//	{
+//		stateViewer.undoState();
+//	}
+//
+//	public void redo_actionPerformed(ActionEvent e)
+//	{
+//		stateViewer.redoState();
+//	}
 
-		// stateViewer.initialize();
+	public void executeUncontrollableEvents_actionPerformed(ActionEvent e)
+	{
+		stateViewer.executeUncontrollableEvents(executeUncontrollableEvents.isSelected());
 	}
 
-	public void undo_actionPerformed(ActionEvent e)
+	public void executeControllableEvents_actionPerformed(ActionEvent e)
 	{
-		stateViewer.undoState();
-	}
-
-	public void redo_actionPerformed(ActionEvent e)
-	{
-		stateViewer.redoState();
+		stateViewer.executeControllableEvents(executeControllableEvents.isSelected());
 	}
 
 	public void update()
 	{
-		undoButton.setEnabled(stateViewer.undoEnabled());
-		redoButton.setEnabled(stateViewer.redoEnabled());
+//		undoButton.setEnabled(stateViewer.undoEnabled());
+//		redoButton.setEnabled(stateViewer.redoEnabled());
 	}
 }

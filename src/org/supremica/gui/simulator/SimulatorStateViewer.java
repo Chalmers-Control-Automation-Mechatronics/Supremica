@@ -85,6 +85,7 @@ public class SimulatorStateViewer
 	private LinkedList prevStates = new LinkedList();
 	private LinkedList nextStates = new LinkedList();
 	private SimulatorExecuter simulator;
+	private EventExecuter theExecuter;
 
 	public SimulatorStateViewer(SimulatorExecuter simulator, AutomataSynchronizerHelper helper, AnimationSignals theAnimationSignals)
 	{
@@ -104,6 +105,7 @@ public class SimulatorStateViewer
 
 		add(stateEventSplitter, BorderLayout.CENTER);
 		theAnimationSignals.registerInterest(this);
+		theExecuter = new EventExecuter(1000, simulator, forwardEvents.getEventListModel());
 	}
 
 	public void initialize()
@@ -144,7 +146,7 @@ public class SimulatorStateViewer
 		setCurrState(SimulatorExecuterHelper.getInitialState(), false);
 		simulator.resetAnimation();
 	}
-
+	
 	public void undoState()
 	{
 		if (prevStates.size() > 0)
@@ -202,5 +204,14 @@ public class SimulatorStateViewer
 		this.controller = controller;
 	}
 	
-
+	public void executeControllableEvents(boolean doExecute)
+	{
+		theExecuter.executeControllableEvents(doExecute);	
+	}
+	
+	public void executeUncontrollableEvents(boolean doExecute)
+	{
+		theExecuter.executeUncontrollableEvents(doExecute);	
+	}
 }
+
