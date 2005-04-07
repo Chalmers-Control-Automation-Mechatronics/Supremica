@@ -68,6 +68,12 @@ public class BasicFBType extends FBType
 
 	private Variables variables = new Variables();
 
+	// Alogrithms
+	// map algorithm name to algorithm text
+	private Map algorithms = new HashMap();
+	// map algorithm name to algorithm variables map;
+	private Map algorithmVariablesMap = new HashMap();
+
 
 	// Constructors
 	private BasicFBType() {}

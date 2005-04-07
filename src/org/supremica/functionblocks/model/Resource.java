@@ -58,9 +58,12 @@ import java.io.FileReader;
 public class Resource extends NamedObject
 {
 	
+	private Loader loader;
+
 	private Scheduler scheduler;
 	private Map fbTypes = new HashMap();
 	private Map appFragments = new HashMap();
+
 
 	private Resource() {}
 	
@@ -69,6 +72,8 @@ public class Resource extends NamedObject
 		System.out.println("Resource(" + name + ")");
 
 		setName(name);
+
+		loader = new Loader(this);
 		scheduler = new Scheduler(this);
 
 		// creat the test application

@@ -63,19 +63,49 @@ import org.supremica.functionblocks.xsd.libraryelement.FBType;
  *
  * Created: Mon Apr  4 10:29:32 2005
  *
- * @author <a href="mailto:cengic@cenga.s2.chalmers.se">Goran Cengic</a>
+ * @author Goran
  * @version 1.0
  */
 public class Loader 
 {
 
-	/**
-	 * Creates a new <code>Loader</code> instance.
-	 *
-	 */
-	public Loader()
-	{
+	private Resource resource;
+	private JAXBContext context;
+	private Unmarshaller unmarshaller;
+	private Object unmarshalledXmlObject;
 
+	public Loader(Resource res)
+	{
+		resource = res;
+		try
+		{
+		context = JAXBContext.newInstance("org.supremica.functionblocks.xsd.libraryelement");
+		}
+		catch (Exception e)
+		{
+			System.err.println(e);
+		}
 	}
 
+	public void load(String fileName)
+	{
+		try
+		{
+			unmarshaller = context.createUnmarshaller();
+			unmarshaller.setValidating(false);
+			
+			unmarshalledXmlObject = unmarshaller.unmarshal(new File(fileName));
+		}
+		catch (Exception e)
+		{
+			System.err.println(e);
+		}
+
+		if (unmarshalledXmlObject instanceof FBType)
+		{
+			FBType xmlFBTypeData = (FBType) unmarshalledXmlObject;
+		}
+
+	}
+	
 }
