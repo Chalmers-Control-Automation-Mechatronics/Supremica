@@ -121,5 +121,15 @@ public class BasicFBType extends FBType
 	{
 		((Event) events.get(event)).addWithData(dataVar);
 	}
-	
+
+    public void addAlgorithm(Algorithm alg)
+    {
+	algorithms.put(alg.getName(),alg);
+    }
+
+    public Algorithm getAlgorithm(String name)
+    {
+	return (Algorithm) algorithms.get(name);
+    }
+
 }

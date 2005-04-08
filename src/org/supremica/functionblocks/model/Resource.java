@@ -79,7 +79,10 @@ public class Resource extends NamedObject
 
 
 		// creat the test application
-
+		
+		loader.load("/home/cengic/devel/workspace/Supremica/examples/functionblocks/FBRuntime/TestType.fbt");
+		
+		/*
 		// FB types
 		addBasicFBType("P1");
 		BasicFBType fbType = (BasicFBType) getFBType("P1");
@@ -99,15 +102,22 @@ public class Resource extends NamedObject
 		fbType.getECC().addTransition("INIT", "STATE", "OCCURRED");
 		fbType.getECC().addTransition("STATE", "INIT", "TRUE");
 		// create algorithm
-		fbType.getECC().getState("STATE").addAction(new JavaTextAlgorithm("TestJavaTextAlgorithm.jscript"), "DONE");
-		
+		fbType.addAlgorithm(new JavaTextAlgorithm("TestAlg",
+							  "invoked = invoked + 1;" +
+							  "DO = DI + 1;" +
+							  "System.out.println(\"TestAlgorithm.execute(): invoked: \" + invoked + \" times.\");" +
+							  "System.out.println(\"TestAlgorithm.execute(): DO: \" + DO + \".\");"
+							  ));
+							  
+		fbType.getECC().getState("STATE").addAction("TestAlg", "DONE");
+		*/
 		// FB application fragment
 		addApplicationFragment("AppFrag");
 		ApplicationFragment appFrag =  getApplicationFragment("AppFrag");
  
 		// add FB instances to app frag
-		appFrag.addFBInstance("inst1","P1");
-		appFrag.addFBInstance("inst2","P1");
+		appFrag.addFBInstance("inst1","TestType");
+		appFrag.addFBInstance("inst2","TestType");
 
 		// connections
 		appFrag.addEventConnection("inst1","DONE","inst2","OCCURRED");

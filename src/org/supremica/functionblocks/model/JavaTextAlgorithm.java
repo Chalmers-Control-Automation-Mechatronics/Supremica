@@ -53,19 +53,20 @@ import bsh.Interpreter;
 
 import java.util.Iterator;
 import java.io.Reader;
-import java.io.FileReader;
+import java.io.StringReader;
 
 public class JavaTextAlgorithm extends Algorithm
 {
 
 	private Interpreter interpreter;
 
-	private String fileName;
+	private String algorithmText;
 
-	public JavaTextAlgorithm(String fn)
+	public JavaTextAlgorithm(String n, String algText)
 	{
 		interpreter = new Interpreter();
-		fileName = fn;
+		algorithmText = algText;
+		name = n;
 	}
 
 	public void execute(Variables vars)
@@ -117,7 +118,7 @@ public class JavaTextAlgorithm extends Algorithm
 
 		try
 		{
-			Reader algTextReader = new FileReader(fileName);
+			Reader algTextReader = new StringReader(algorithmText);
 			interpreter.eval(algTextReader);
 		}
 		catch (Exception e)

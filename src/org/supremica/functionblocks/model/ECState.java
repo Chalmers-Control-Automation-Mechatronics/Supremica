@@ -65,7 +65,7 @@ public class ECState extends NamedObject
 	}
     
 
-	void addAction(Algorithm alg, String evout)
+	void addAction(String alg, String evout)
 	{
 		ecActions.add(new ECAction(alg,evout));
 	}

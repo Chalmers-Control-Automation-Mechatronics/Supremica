@@ -53,16 +53,16 @@ package org.supremica.functionblocks.model;
 
 public class ECAction
 {
-    Algorithm algorithm = null;
+    String algorithm = null;
     String outputEventName = null;
     
-    public ECAction(Algorithm alg, String out)
+    public ECAction(String alg, String out)
     {
 	algorithm = alg;
 	outputEventName = out;
     }
 
-    public Algorithm getAlgorithm()
+    public String getAlgorithm()
     {
 	return algorithm;
     }

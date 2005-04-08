@@ -81,9 +81,7 @@
 
 <target name="initialize_dirs">
  	<mkdir dir="${build}"/>
-	<delete includeEmptyDirs="true" >
-		<fileset dir="${build}" />
-	</delete>
+	<delete dir="${build}" includeEmptyDirs="true" />
 
  	<mkdir dir="${testsbuild}"/>
 	<delete includeEmptyDirs="true" >
@@ -189,15 +187,7 @@
 </target>
 
 
-<target name="clean">
-	<mkdir dir="${build}"/>
-	<delete dir="${build}" includeEmptyDirs="true"/>
-	<mkdir dir="${build}"/>
-
-	<mkdir dir="${testsbuild}"/>
-	<delete dir="${testsbuild}" includeEmptyDirs="true"/>
-	<mkdir dir="${testsbuild}"/>
-
+<target name="clean" depends="clean_build">
 	<mkdir dir="${dist}"/>	
 	<delete>
 		<fileset dir="${dist}">
@@ -215,14 +205,6 @@
 			</patternset>
 		</fileset>
 	</delete>	
-
-	<delete>
-		<fileset dir="${src}/org/supremica/functionblocks/xsd">
-			<patternset id="cleanjaxbfiles">
-				<include name="**"/>
-			</patternset>
-		</fileset>
-	</delete>
 
 	<mkdir dir="${src}/org/w3"/>
 	<delete>
