@@ -86,7 +86,7 @@ public class FunctionblockViewer
 
 		JAXBContext context = JAXBContext.newInstance("org.supremica.functionblocks.xsd.datatype:org.supremica.functionblocks.xsd.libraryelement:org.supremica.functionblocks.xsd.fbmanagement:");
 		Unmarshaller unmarshaller = context.createUnmarshaller();
-s		unmarshaller.setValidating(false);
+		unmarshaller.setValidating(false);
 		Marshaller marshaller = context.createMarshaller();
     	marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 

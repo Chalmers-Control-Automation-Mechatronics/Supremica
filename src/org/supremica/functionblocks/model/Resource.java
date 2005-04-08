@@ -76,21 +76,22 @@ public class Resource extends NamedObject
 		loader = new Loader(this);
 		scheduler = new Scheduler(this);
 
+
+
 		// creat the test application
-	
+
 		// FB types
 		addBasicFBType("P1");
 		BasicFBType fbType = (BasicFBType) getFBType("P1");
 
 		// only one event input and output for now
 		fbType.addVariable("OCCURRED", new BooleanVariable("EventInput",false));
+		fbType.addDataAssociation("OCCURRED","DI");
 		fbType.addVariable("DONE", new BooleanVariable("EventOutput",false));
+		fbType.addDataAssociation("DONE","DO");
 		fbType.addVariable("DI", new IntegerVariable("DataInput",0));
 		fbType.addVariable("DO", new IntegerVariable("DataOutput",0));
 		fbType.addVariable("invoked", new IntegerVariable("Local",0));
-
-		fbType.addDataAssociation("OCCURRED","DI");
-		fbType.addDataAssociation("DONE","DO");
 
 		// Build ECC 
 		fbType.getECC().addInitialState("INIT");

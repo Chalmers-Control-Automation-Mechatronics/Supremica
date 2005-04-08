@@ -76,7 +76,7 @@ class AlgorithmExecutingThread extends Thread
 			if (scheduler.getNumberOfScheduledJobs() > 0)
 			{
 				Job currentJob = scheduler.getNextScheduledJob();
-				System.out.println("AlgorithmExecutingThread: executing " +currentJob.getInstance().getName() + " algorithm");
+				//System.out.println("AlgorithmExecutingThread: executing " +currentJob.getInstance().getName() + " algorithm");
 				currentJob.getAlgorithm().execute(currentJob.getVariables());
 				currentJob.getInstance().finishedJob(currentJob);
 			}
