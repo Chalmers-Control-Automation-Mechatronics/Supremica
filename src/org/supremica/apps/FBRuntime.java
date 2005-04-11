@@ -53,12 +53,12 @@ package org.supremica.apps;
 
 import org.supremica.functionblocks.model.*;
 
-public class FBRT 
+public class FBRuntime 
 {
     
     public static void main(String[] args)
     {
-	Device theDevice = new Device("FBRT Device");
+	Device theDevice = new Device("FBRT Device", args);
 	theDevice.runDevice();
     }
 
