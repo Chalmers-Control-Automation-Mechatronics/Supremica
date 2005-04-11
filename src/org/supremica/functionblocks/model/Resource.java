@@ -57,124 +57,65 @@ import java.io.FileReader;
  */
 public class Resource extends NamedObject
 {
+
+    private Device device; // device the resource belongs to
 	
-	private Loader loader;
-
-	private Scheduler scheduler;
-	private Map fbTypes = new HashMap();
-	private Map appFragments = new HashMap();
+    private Scheduler scheduler;
+    private Map fbTypes = new HashMap();
+    private Map appFragments = new HashMap();
 
 
-	private Resource() {}
+    private Resource() {}
 	
-	public Resource(String name)
-	{
-		System.out.println("Resource(" + name + ")");
+    public Resource(String name)
+    {
+	System.out.println("Resource(" + name + ")");
 
-		setName(name);
+	setName(name);
 
-		loader = new Loader(this);
-		scheduler = new Scheduler(this);
-
-
-
-		// creat the test application
-		
-		loader.load("/home/cengic/devel/workspace/Supremica/examples/functionblocks/FBRuntime/TestType.fbt");
-		
-		/*
-		// FB types
-		addBasicFBType("P1");
-		BasicFBType fbType = (BasicFBType) getFBType("P1");
-
-		// only one event input and output for now
-		fbType.addVariable("OCCURRED", new BooleanVariable("EventInput",false));
-		fbType.addDataAssociation("OCCURRED","DI");
-		fbType.addVariable("DONE", new BooleanVariable("EventOutput",false));
-		fbType.addDataAssociation("DONE","DO");
-		fbType.addVariable("DI", new IntegerVariable("DataInput",0));
-		fbType.addVariable("DO", new IntegerVariable("DataOutput",0));
-		fbType.addVariable("invoked", new IntegerVariable("Local",0));
-
-		// Build ECC 
-		fbType.getECC().addInitialState("INIT");
-		fbType.getECC().addState("STATE");
-		fbType.getECC().addTransition("INIT", "STATE", "OCCURRED");
-		fbType.getECC().addTransition("STATE", "INIT", "TRUE");
-		// create algorithm
-		fbType.addAlgorithm(new JavaTextAlgorithm("TestAlg",
-							  "invoked = invoked + 1;" +
-							  "DO = DI + 1;" +
-							  "System.out.println(\"TestAlgorithm.execute(): invoked: \" + invoked + \" times.\");" +
-							  "System.out.println(\"TestAlgorithm.execute(): DO: \" + DO + \".\");"
-							  ));
-							  
-		fbType.getECC().getState("STATE").addAction("TestAlg", "DONE");
-		*/
-		// FB application fragment
-		addApplicationFragment("AppFrag");
-		ApplicationFragment appFrag =  getApplicationFragment("AppFrag");
- 
-		// add FB instances to app frag
-		appFrag.addFBInstance("inst1","TestType");
-		appFrag.addFBInstance("inst2","TestType");
-
-		// connections
-		appFrag.addEventConnection("inst1","DONE","inst2","OCCURRED");
-		appFrag.addEventConnection("inst2","DONE","inst1","OCCURRED");
-
-		appFrag.addDataConnection("inst1","DO","inst2","DI");
-		appFrag.addDataConnection("inst2","DO","inst1","DI");
-
-
-		// kick off 
-		appFrag.getFBInstance("inst1").queueEvent("OCCURRED");
+	scheduler = new Scheduler(this);
 	
-		//Interpreter tester
-		//new Tester();
+    }
 
-	
-	}
-
-	void handleConfigurationRequests()
-	{
-		System.out.println("Resource.handleConfigurationRequests()");
-	}
+    void handleConfigurationRequests()
+    {
+	System.out.println("Resource.handleConfigurationRequests()");
+    }
     
-	void runResource()
-	{
-		System.out.println("Resource.runResource()");	
-		scheduler.runEvents();
-	}
+    void runResource()
+    {
+	System.out.println("Resource.runResource()");	
+	scheduler.runEvents();
+    }
 
-	String getName()
-	{
-		return name;
-	}
+    String getName()
+    {
+	return name;
+    }
 
-	Scheduler getScheduler()
-	{
-		return scheduler;
-	}
+    Scheduler getScheduler()
+    {
+	return scheduler;
+    }
 	
-	public void addApplicationFragment(String name)
-	{
-		appFragments.put(name, new ApplicationFragment(this));
-	}
+    public void addApplicationFragment(String name)
+    {
+	appFragments.put(name, new ApplicationFragment(this));
+    }
 
-	public ApplicationFragment getApplicationFragment(String name)
-	{
-		return (ApplicationFragment) appFragments.get(name);
-	}
+    public ApplicationFragment getApplicationFragment(String name)
+    {
+	return (ApplicationFragment) appFragments.get(name);
+    }
 
-	public void addBasicFBType(String name)
-	{
-		fbTypes.put(name,new BasicFBType(name,this));
-	}
+    public void addBasicFBType(String name)
+    {
+	fbTypes.put(name,new BasicFBType(name,this));
+    }
 
-	public FBType getFBType(String name)
-	{
-		return (FBType) fbTypes.get(name);
-	}
+    public FBType getFBType(String name)
+    {
+	return (FBType) fbTypes.get(name);
+    }
 
 }

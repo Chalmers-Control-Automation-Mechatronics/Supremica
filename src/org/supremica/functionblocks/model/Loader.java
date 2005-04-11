@@ -69,61 +69,134 @@ import org.supremica.functionblocks.xsd.libraryelement.*;
  */
 public class Loader 
 {
-    
+    private Device device;
     private Resource resource;
     private JAXBContext context;
     private Unmarshaller unmarshaller;
-    private Object unmarshalledXmlObject;
-    
-    public Loader(Resource res)
+
+    public Loader(Device dev)
     {
-	resource = res;
+	device = dev;
 	try
 	{
 	    context = JAXBContext.newInstance("org.supremica.functionblocks.xsd.libraryelement");
+	    unmarshaller = context.createUnmarshaller();
+	    unmarshaller.setValidating(false);
 	}
 	catch (Exception e)
 	{
 	    java.lang.System.err.println(e);
+	    java.lang.System.exit(1);
 	}
     }
-    
+
     public void load(String fileName)
     {
 	try
 	{
-	    unmarshaller = context.createUnmarshaller();
-	    unmarshaller.setValidating(false);
-	    
-	    unmarshalledXmlObject = unmarshaller.unmarshal(new File(fileName));
+	    Object unmarshalledXmlObject = unmarshaller.unmarshal(new File(fileName));
+	    if (unmarshalledXmlObject instanceof org.supremica.functionblocks.xsd.libraryelement.FBType)
+	    {
+		loadFBType((org.supremica.functionblocks.xsd.libraryelement.FBType) unmarshalledXmlObject);
+	    }
+	    else if (unmarshalledXmlObject instanceof org.supremica.functionblocks.xsd.libraryelement.System)
+	    {
+		loadSystem((org.supremica.functionblocks.xsd.libraryelement.System) unmarshalledXmlObject);
+	    }
 	}
 	catch (Exception e)
 	{
 	    java.lang.System.err.println(e);
-	}
-	
-	if (unmarshalledXmlObject instanceof org.supremica.functionblocks.xsd.libraryelement.FBType)
-	{
-	    loadFBType();
-	}
-	else if (unmarshalledXmlObject instanceof org.supremica.functionblocks.xsd.libraryelement.FBType)
-	{
-	}
-    }
-    
-    private void loadFBType()
-    {
-	org.supremica.functionblocks.xsd.libraryelement.FBType xmlFBTypeData = (org.supremica.functionblocks.xsd.libraryelement.FBType) unmarshalledXmlObject;
-	if (xmlFBTypeData.isSetBasicFB())
-	{
-	    constructNewBasicFBType();
+	    java.lang.System.exit(1);
 	}
     }
 
-    // Construct  new BasicFBType in this loaders resource
-    private void constructNewBasicFBType()
+    private void loadSystem(org.supremica.functionblocks.xsd.libraryelement.System xmlSystemData)
     {
-	org.supremica.functionblocks.xsd.libraryelement.FBType xmlFBTypeData = (org.supremica.functionblocks.xsd.libraryelement.FBType) unmarshalledXmlObject;
+	if (xmlSystemData.isSetDevice())
+	{
+	    org.supremica.functionblocks.xsd.libraryelement.Device theDevice = (org.supremica.functionblocks.xsd.libraryelement.Device) xmlSystemData.getDevice().get(0);
+	    if(theDevice.isSetResource())
+	    {
+		for (Iterator resIter = theDevice.getResource().iterator();resIter.hasNext();)
+		{
+		    org.supremica.functionblocks.xsd.libraryelement.Resource curResource = (org.supremica.functionblocks.xsd.libraryelement.Resource) resIter.next();
+		    device.addResource(curResource.getName());
+		    resource = device.getResource(curResource.getName());
+		    if (curResource.isSetFBNetwork())
+		    {
+			constructNewFBNetwork(curResource.getFBNetwork());
+		    }
+		}
+	    }
+	}
+    }
+    
+    private void constructNewFBNetwork(org.supremica.functionblocks.xsd.libraryelement.FBNetworkType xmlFBNetworkData)
+    {
+	resource.addApplicationFragment("FBNetwork");
+	ApplicationFragment appFrag =  resource.getApplicationFragment("FBNetwork");
+	if (xmlFBNetworkData.isSetFB())
+	{
+	    for (Iterator fbIter = xmlFBNetworkData.getFB().iterator(); fbIter.hasNext();)
+	    {
+		org.supremica.functionblocks.xsd.libraryelement.FB curFB = (org.supremica.functionblocks.xsd.libraryelement.FB) fbIter.next();
+		// get and load the FB type
+		if(resource.getFBType(curFB.getType() + ".fbt") == null)
+		{ 
+		    load("/home/cengic/devel/workspace/Supremica/examples/functionblocks/FBRuntime/" + curFB.getType() + ".fbt");
+		}
+		appFrag.addFBInstance(curFB.getName(),curFB.getType());
+	    }
+	}
+	if (xmlFBNetworkData.isSetEventConnections())
+	{
+	    //java.lang.System.out.println("Event Connections:");
+	    for (Iterator eventConnIter = xmlFBNetworkData.getEventConnections().getConnection().iterator(); eventConnIter.hasNext();)
+	    {
+		org.supremica.functionblocks.xsd.libraryelement.Connection curConn = (org.supremica.functionblocks.xsd.libraryelement.Connection) eventConnIter.next();
+		String source = curConn.getSource();
+		String dest = curConn.getDestination();
+		String sinst = source.substring(0,source.indexOf("."));
+		String sout = source.substring(source.indexOf(".")+1,source.length());
+		String dinst = dest.substring(0,dest.indexOf("."));
+		String din = dest.substring(dest.indexOf(".")+1,dest.length());
+		//java.lang.System.out.println("from:" + sinst + "!" + sout);
+		//java.lang.System.out.println("to:" + dinst + "!" + din);
+		appFrag.addEventConnection(sinst, sout, dinst, din);
+	    }
+	}
+	if (xmlFBNetworkData.isSetDataConnections())
+	{
+	    //java.lang.System.out.println("Data Connections:");
+	    for (Iterator dataConnIter = xmlFBNetworkData.getDataConnections().getConnection().iterator(); dataConnIter.hasNext();)
+	    {
+		org.supremica.functionblocks.xsd.libraryelement.Connection curConn = (org.supremica.functionblocks.xsd.libraryelement.Connection) dataConnIter.next();
+		String source = curConn.getSource();
+		String dest = curConn.getDestination();
+		String sinst = source.substring(0,source.indexOf("."));
+		String sout = source.substring(source.indexOf(".")+1,source.length());
+		String dinst = dest.substring(0,dest.indexOf("."));
+		String din = dest.substring(dest.indexOf(".")+1,dest.length());
+		//java.lang.System.out.println("from: " + sinst + "!" + sout);
+		//java.lang.System.out.println("to: " + dinst + "!" + din);
+		appFrag.addDataConnection(sinst, sout, dinst, din);
+	    }
+	}
+    }
+    
+    private void loadFBType(org.supremica.functionblocks.xsd.libraryelement.FBType xmlFBTypeData)
+    {
+	if (xmlFBTypeData.isSetBasicFB())
+	{
+	    constructNewBasicFBType(xmlFBTypeData);
+	}
+    }
+
+
+    private void constructNewBasicFBType(org.supremica.functionblocks.xsd.libraryelement.FBType xmlFBTypeData)
+    {
+
 	resource.addBasicFBType(xmlFBTypeData.getName());
 	BasicFBType newBasicFBType = (BasicFBType) resource.getFBType(xmlFBTypeData.getName());
 	    

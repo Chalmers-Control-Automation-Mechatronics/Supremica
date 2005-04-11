@@ -59,22 +59,93 @@ public class Device
 
     private String name;
     private Resource managementResource;
-    private List resources = new ArrayList();
+    private Map resources = new HashMap();
+
+    private Loader loader;
 
     private Device() {}
 
     public Device(String name)
     {
-	
 	System.out.println("Device(" + name + ")");
-	//as for now the test application is run in the managementResource
-	managementResource = new Resource("Management");
+	loader = new Loader(this);
+		
+	loader.load("/home/cengic/devel/workspace/Supremica/examples/functionblocks/FBRuntime/TestSystem.sys");
+	// kick off 
+	getResource("TestResource").getApplicationFragment("FBNetwork").getFBInstance("inst1").queueEvent("OCCURRED");
+
+	/*
+	// FB types
+	addBasicFBType("P1");
+	BasicFBType fbType = (BasicFBType) getFBType("P1");
+
+	// only one event input and output for now
+	fbType.addVariable("OCCURRED", new BooleanVariable("EventInput",false));
+	fbType.addDataAssociation("OCCURRED","DI");
+	fbType.addVariable("DONE", new BooleanVariable("EventOutput",false));
+	fbType.addDataAssociation("DONE","DO");
+	fbType.addVariable("DI", new IntegerVariable("DataInput",0));
+	fbType.addVariable("DO", new IntegerVariable("DataOutput",0));
+	fbType.addVariable("invoked", new IntegerVariable("Local",0));
+
+	// Build ECC 
+	fbType.getECC().addInitialState("INIT");
+	fbType.getECC().addState("STATE");
+	fbType.getECC().addTransition("INIT", "STATE", "OCCURRED");
+	fbType.getECC().addTransition("STATE", "INIT", "TRUE");
+	// create algorithm
+	fbType.addAlgorithm(new JavaTextAlgorithm("TestAlg",
+	"invoked = invoked + 1;" +
+	"DO = DI + 1;" +
+	"System.out.println(\"TestAlgorithm.execute(): invoked: \" + invoked + \" times.\");" +
+	"System.out.println(\"TestAlgorithm.execute(): DO: \" + DO + \".\");"
+	));
+							  
+	fbType.getECC().getState("STATE").addAction("TestAlg", "DONE");
+	*/
+
+	
+	/*
+	// FB application fragment
+	addApplicationFragment("AppFrag");
+	ApplicationFragment appFrag =  getApplicationFragment("AppFrag");
+	
+	// add FB instances to app frag
+	appFrag.addFBInstance("inst1","TestType");
+	appFrag.addFBInstance("inst2","TestType");
+	
+	// connections
+	appFrag.addEventConnection("inst1","DONE","inst2","OCCURRED");
+	appFrag.addEventConnection("inst2","DONE","inst1","OCCURRED");
+	
+	appFrag.addDataConnection("inst1","DO","inst2","DI");
+	appFrag.addDataConnection("inst2","DO","inst1","DI");
+	
+	*/
+
+	//Interpreter tester
+	//new Tester();
+
+    }
+
+    public void addResource(String name)
+    {
+	resources.put(name,new Resource(name));
+
+    }
+
+    public Resource getResource(String name)
+    {
+	return (Resource) resources.get(name);
     }
 
     public void runDevice()
     {
 	System.out.println("Device.runDevice()");
-	managementResource.runResource();
+	for (Iterator iter = resources.keySet().iterator();iter.hasNext();)
+	{
+	    getResource((String) iter.next()).runResource();
+	}
     }
 
 }

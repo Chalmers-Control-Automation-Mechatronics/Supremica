@@ -90,15 +90,6 @@ public class Scheduler
 		return (Job) scheduledJobs.remove(0);
 	}
 	
-	/*
-	public void addFinishedJob(Job j)
-	{
-		synchronized(finishedJobs)
-		{
-			finishedJobs.add(j);
-		}
-	}
-	*/
 	
 	public synchronized FBInstance getNextScheduledFBInstance()
 	{
@@ -116,24 +107,7 @@ public class Scheduler
 		return (FBInstance) scheduledFBInstances.remove(0);
 	}
 	
-	/*
-	public void notifyFinished()
-	{
-		
-		synchronized(finishedJobs)
-		{
-			//System.out.println("Scheduler.notifyFinished()");
-			for (Iterator iter = finishedJobs.iterator(); iter.hasNext();)
-			{
-				Job finishedJob = (Job) iter.next();
-				finishedJob.getInstance().finishedJob(finishedJob);
-				//System.out.println("Scheduler.notifyFinished(): notified one");
-				iter.remove();
-			}
-		}
-	}
-	*/
-	
+
 	public void runEvents()
 	{
 		System.out.println("Scheduler.runEvents()");
