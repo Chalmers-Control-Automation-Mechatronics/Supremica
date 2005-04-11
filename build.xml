@@ -81,17 +81,22 @@
 
 <target name="initialize_dirs">
  	<mkdir dir="${build}"/>
-	<delete dir="${build}" includeEmptyDirs="true" />
+	<delete includeEmptyDirs="true" >
+		<fileset dir="${build}" />
+	</delete>
+ 	<mkdir dir="${build}"/>
 
  	<mkdir dir="${testsbuild}"/>
 	<delete includeEmptyDirs="true" >
 		<fileset dir="${testsbuild}" />
 	</delete>
+ 	<mkdir dir="${testsbuild}"/>
 
  	<mkdir dir="${dist}"/>
 	<delete includeEmptyDirs="true" >
 		<fileset dir="${dist}" />
 	</delete>
+ 	<mkdir dir="${dist}"/>
 
 	<mkdir dir="${lib}/${unjared}"/>
 	<delete includeEmptyDirs="true" >
