@@ -1,0 +1,3 @@
+#/bin/sh
+
+env LD_LIBRARY_PATH=. java -cp $SUPREMICA_HOME/dist/Supremica.jar:$SUPREMICA_HOME/dist/SupremicaLib.jar -enableassertions org.supremica.apps.FBRuntime $*

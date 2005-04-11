@@ -65,12 +65,12 @@ public class Device
 
     private Device() {}
 
-    public Device(String name)
+    public Device(String name, String[] args)
     {
 	System.out.println("Device(" + name + ")");
 	loader = new Loader(this);
 		
-	loader.load("/home/cengic/devel/workspace/Supremica/examples/functionblocks/FBRuntime/TestSystem.sys");
+	loader.load(args[0]);
 	// kick off 
 	getResource("TestResource").getApplicationFragment("FBNetwork").getFBInstance("inst1").queueEvent("OCCURRED");
 
