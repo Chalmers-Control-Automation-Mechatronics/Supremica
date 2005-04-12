@@ -58,7 +58,7 @@ public class FBRuntime
     
     public static void main(String[] args)
     {
-	Device theDevice = new Device("FBRT Device", args);
+	Device theDevice = new Device("FBRuntime Device", args);
 	theDevice.runDevice();
     }
 

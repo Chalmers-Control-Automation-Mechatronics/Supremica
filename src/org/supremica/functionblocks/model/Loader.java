@@ -59,7 +59,7 @@ import org.supremica.functionblocks.xsd.libraryelement.*;
 
 /**
  * The Loader class uses JAXB to load a FB 
- * application into the FBRT and then run it.
+ * application into the FBRuntime and then run it.
  *
  *
  * Created: Mon Apr  4 10:29:32 2005
