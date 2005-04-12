@@ -326,8 +326,8 @@ public class EditorNode
 			// Draw initial state arrow
 			drawInitialStateArrow(g2d);
 
-			// Draw it thicker!
-			//g2d.setStroke(DOUBLESTROKE);
+			// Draw line thicker!
+			g2d.setStroke(DOUBLESTROKE);
 		}
 		g2d.drawOval(getX() - RADIUS, getY() - RADIUS, WIDTH, WIDTH);			
 		g2d.setStroke(BASICSTROKE);

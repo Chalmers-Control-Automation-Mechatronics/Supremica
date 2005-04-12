@@ -833,7 +833,7 @@ public class State
 	}
 
 	/**
-	 * Follow the event "theEvent" and return the set of states that may be reached. ()
+	 * Follow the event "theEvent" and return the set of states that may be reached.
 	 */
 	public StateSet nextStates(LabeledEvent theEvent)
 	{
@@ -860,7 +860,7 @@ public class State
 	{
 		StateSet states = new StateSet();
 
-		assert(!theEvent.isEpsilon());
+		assert(!theEvent.isEpsilon()); // See above!
 
 		// Do the stuff
 		ArcIterator outgoingArcsIt;

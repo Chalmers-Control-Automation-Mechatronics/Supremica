@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<Automata name="Ex2_2">
+<Automata name="Ex2_2 - Kanban" comment="Adapted from 'Notes on Control of Discrete-Event Systems' by W.M. Wonham (Example 3.3.3). As soon as a buffer (a 'hopper') is emptied, it sends a request back through the system for a new product. HOP1 is the last hopper in the production line and this is from where the orders are taken. A model of a just-in-time production system.">
+<!-- This model is backwards!
  <Automaton name="HOP1">
   <Events>
    <Event id="e100" label="e100" controllable="true" prioritized="true" />
@@ -10,22 +11,8 @@
    <State id="q1" x="214" y="91" />
   </States>
   <Transitions>
-   <Transition event="e100" source="q0" dest="q1" x="156" y="133" />
-   <Transition event="e10" source="q1" dest="q0" x="141" y="46" />
-  </Transitions>
- </Automaton>
- <Automaton name="HOP2">
-  <Events>
-   <Event id="e12" label="e12" controllable="true" prioritized="true" />
-   <Event id="e20" label="e20" controllable="true" prioritized="true" />
-  </Events>
-  <States>
-   <State id="q0" initial="true" x="86" y="91" />
-   <State id="q1" x="214" y="91" />
-  </States>
-  <Transitions>
-   <Transition event="e12" source="q0" dest="q1" x="156" y="133" />
-   <Transition event="e20" source="q1" dest="q0" x="142" y="46" />
+   <Transition event="e100" source="q0" dest="q1"/>
+   <Transition event="e10" source="q1" dest="q0"/>
   </Transitions>
  </Automaton>
  <Automaton name="BB1">
@@ -38,50 +25,8 @@
    <State id="q1" x="214" y="91" />
   </States>
   <Transitions>
-   <Transition event="e100" source="q0" dest="q1" x="156" y="133" />
-   <Transition event="e12" source="q1" dest="q0" x="142" y="46" />
-  </Transitions>
- </Automaton>
- <Automaton name="BB2">
-  <Events>
-   <Event id="e12" label="e12" controllable="true" prioritized="true" />
-   <Event id="e22" label="e22" controllable="true" prioritized="true" />
-  </Events>
-  <States>
-   <State id="q0" initial="true" x="86" y="91" />
-   <State id="q1" x="214" y="91" />
-  </States>
-  <Transitions>
-   <Transition event="e12" source="q0" dest="q1" x="156" y="133" />
-   <Transition event="e22" source="q1" dest="q0" x="142" y="46" />
-  </Transitions>
- </Automaton>
- <Automaton name="M1">
-  <Events>
-   <Event id="e10" label="e10" controllable="true" prioritized="true" />
-   <Event id="e11" label="e11" controllable="true" prioritized="true" />
-  </Events>
-  <States>
-   <State id="q0" initial="true" x="86" y="91" />
-   <State id="q1" x="214" y="91" />
-  </States>
-  <Transitions>
-   <Transition event="e10" source="q0" dest="q1" x="156" y="133" />
-   <Transition event="e11" source="q1" dest="q0" x="142" y="46" />
-  </Transitions>
- </Automaton>
- <Automaton name="M2">
-  <Events>
-   <Event id="e20" label="e20" controllable="true" prioritized="true" />
-   <Event id="e21" label="e21" controllable="true" prioritized="true" />
-  </Events>
-  <States>
-   <State id="q0" initial="true" x="86" y="91" />
-   <State id="q1" x="214" y="91" />
-  </States>
-  <Transitions>
-   <Transition event="e20" source="q0" dest="q1" x="156" y="133" />
-   <Transition event="e21" source="q1" dest="q0" x="142" y="46" />
+   <Transition event="e100" source="q0" dest="q1"/>
+   <Transition event="e12" source="q1" dest="q0"/>
   </Transitions>
  </Automaton>
  <Automaton name="Q1">
@@ -94,8 +39,50 @@
    <State id="q1" x="214" y="91" />
   </States>
   <Transitions>
-   <Transition event="e11" source="q0" dest="q1" x="156" y="133" />
-   <Transition event="e12" source="q1" dest="q0" x="142" y="46" />
+   <Transition event="e11" source="q0" dest="q1"/>
+   <Transition event="e12" source="q1" dest="q0"/>
+  </Transitions>
+ </Automaton>
+ <Automaton name="M1">
+  <Events>
+   <Event id="e10" label="e10" controllable="true" prioritized="true" />
+   <Event id="e11" label="e11" controllable="true" prioritized="true" />
+  </Events>
+  <States>
+   <State id="q0" initial="true" x="86" y="91" />
+   <State id="q1" x="214" y="91" />
+  </States>
+  <Transitions>
+   <Transition event="e10" source="q0" dest="q1"/>
+   <Transition event="e11" source="q1" dest="q0"/>
+  </Transitions>
+ </Automaton>
+ <Automaton name="HOP2">
+  <Events>
+   <Event id="e12" label="e12" controllable="true" prioritized="true" />
+   <Event id="e20" label="e20" controllable="true" prioritized="true" />
+  </Events>
+  <States>
+   <State id="q0" initial="true" x="86" y="91" />
+   <State id="q1" x="214" y="91" />
+  </States>
+  <Transitions>
+   <Transition event="e12" source="q0" dest="q1"/>
+   <Transition event="e20" source="q1" dest="q0"/>
+  </Transitions>
+ </Automaton>
+ <Automaton name="BB2">
+  <Events>
+   <Event id="e12" label="e12" controllable="true" prioritized="true" />
+   <Event id="e22" label="e22" controllable="true" prioritized="true" />
+  </Events>
+  <States>
+   <State id="q0" initial="true" x="86" y="91" />
+   <State id="q1" x="214" y="91" />
+  </States>
+  <Transitions>
+   <Transition event="e12" source="q0" dest="q1"/>
+   <Transition event="e22" source="q1" dest="q0"/>
   </Transitions>
  </Automaton>
  <Automaton name="Q2">
@@ -108,8 +95,135 @@
    <State id="q1" x="214" y="91" />
   </States>
   <Transitions>
-   <Transition event="e21" source="q0" dest="q1" x="156" y="133" />
-   <Transition event="e22" source="q1" dest="q0" x="142" y="46" />
+   <Transition event="e21" source="q0" dest="q1"/>
+   <Transition event="e22" source="q1" dest="q0"/>
+  </Transitions>
+ </Automaton>
+ <Automaton name="M2">
+  <Events>
+   <Event id="e20" label="e20" controllable="true" prioritized="true" />
+   <Event id="e21" label="e21" controllable="true" prioritized="true" />
+  </Events>
+  <States>
+   <State id="q0" initial="true" x="86" y="91" />
+   <State id="q1" x="214" y="91" />
+  </States>
+  <Transitions>
+   <Transition event="e20" source="q0" dest="q1"/>
+   <Transition event="e21" source="q1" dest="q0"/>
+  </Transitions>
+ </Automaton>
+-->
+ <Automaton name="HOP1">
+  <Events>
+   <Event id="e100" label="e100" controllable="true" prioritized="true" />
+   <Event id="e10" label="e10" controllable="true" prioritized="true" />
+  </Events>
+  <States>
+   <State id="q0" initial="true" x="86" y="91" />
+   <State id="q1" x="214" y="91" />
+  </States>
+  <Transitions>
+   <Transition event="e100" source="q1" dest="q0"/>
+   <Transition event="e10" source="q0" dest="q1"/>
+  </Transitions>
+ </Automaton>
+ <Automaton name="BB1">
+  <Events>
+   <Event id="e100" label="e100" controllable="true" prioritized="true" />
+   <Event id="e12" label="e12" controllable="true" prioritized="true" />
+  </Events>
+  <States>
+   <State id="q0" initial="true" x="86" y="91" />
+   <State id="q1" x="214" y="91" />
+  </States>
+  <Transitions>
+   <Transition event="e100" source="q1" dest="q0"/>
+   <Transition event="e12" source="q0" dest="q1"/>
+  </Transitions>
+ </Automaton>
+ <Automaton name="Q1">
+  <Events>
+   <Event id="e11" label="e11" controllable="true" prioritized="true" />
+   <Event id="e12" label="e12" controllable="true" prioritized="true" />
+  </Events>
+  <States>
+   <State id="q0" initial="true" x="86" y="91" />
+   <State id="q1" x="214" y="91" />
+  </States>
+  <Transitions>
+   <Transition event="e11" source="q1" dest="q0"/>
+   <Transition event="e12" source="q0" dest="q1"/>
+  </Transitions>
+ </Automaton>
+ <Automaton name="M1">
+  <Events>
+   <Event id="e10" label="e10" controllable="true" prioritized="true" />
+   <Event id="e11" label="e11" controllable="true" prioritized="true" />
+  </Events>
+  <States>
+   <State id="q0" initial="true" x="86" y="91" />
+   <State id="q1" x="214" y="91" />
+  </States>
+  <Transitions>
+   <Transition event="e10" source="q1" dest="q0"/>
+   <Transition event="e11" source="q0" dest="q1"/>
+  </Transitions>
+ </Automaton>
+ <Automaton name="HOP2">
+  <Events>
+   <Event id="e12" label="e12" controllable="true" prioritized="true" />
+   <Event id="e20" label="e20" controllable="true" prioritized="true" />
+  </Events>
+  <States>
+   <State id="q0" initial="true" x="86" y="91" />
+   <State id="q1" x="214" y="91" />
+  </States>
+  <Transitions>
+   <Transition event="e12" source="q1" dest="q0"/>
+   <Transition event="e20" source="q0" dest="q1"/>
+  </Transitions>
+ </Automaton>
+ <Automaton name="BB2">
+  <Events>
+   <Event id="e12" label="e12" controllable="true" prioritized="true" />
+   <Event id="e22" label="e22" controllable="true" prioritized="true" />
+  </Events>
+  <States>
+   <State id="q0" initial="true" x="86" y="91" />
+   <State id="q1" x="214" y="91" />
+  </States>
+  <Transitions>
+   <Transition event="e12" source="q1" dest="q0"/>
+   <Transition event="e22" source="q0" dest="q1"/>
+  </Transitions>
+ </Automaton>
+ <Automaton name="Q2">
+  <Events>
+   <Event id="e21" label="e21" controllable="true" prioritized="true" />
+   <Event id="e22" label="e22" controllable="true" prioritized="true" />
+  </Events>
+  <States>
+   <State id="q0" initial="true" x="86" y="91" />
+   <State id="q1" x="214" y="91" />
+  </States>
+  <Transitions>
+   <Transition event="e21" source="q1" dest="q0"/>
+   <Transition event="e22" source="q0" dest="q1"/>
+  </Transitions>
+ </Automaton>
+ <Automaton name="M2">
+  <Events>
+   <Event id="e20" label="e20" controllable="true" prioritized="true" />
+   <Event id="e21" label="e21" controllable="true" prioritized="true" />
+  </Events>
+  <States>
+   <State id="q0" initial="true" x="86" y="91" />
+   <State id="q1" x="214" y="91" />
+  </States>
+  <Transitions>
+   <Transition event="e20" source="q1" dest="q0"/>
+   <Transition event="e21" source="q0" dest="q1"/>
   </Transitions>
  </Automaton>
 </Automata>

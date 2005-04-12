@@ -8,7 +8,7 @@ import java.awt.Color;
  */
 class EditorColor
 {
-	private static final int SHADOWALPHA = 16;
+	private static final int SHADOWALPHA = 32;
 
 	public static Color DRAGSELECTCOLOR = new Color(0,0,255,32); 
 
@@ -27,7 +27,7 @@ class EditorColor
 	public static Color DEFAULTCOLOR = Color.BLACK; 
 	public static Color DEFAULTSHADOWCOLOR = new Color(0,0,0,SHADOWALPHA); 
 	public static Color DEFAULTCOLOR_NODEGROUP = Color.lightGray; 
-	public static Color DEFAULTSHADOWCOLOR_NODEGROUP = new Color(0,0,0,SHADOWALPHA/2); 
+	public static Color DEFAULTSHADOWCOLOR_NODEGROUP = new Color(0,0,0,SHADOWALPHA); 
 
 	public static Color INVISIBLE = new Color(0,0,0,0);
 }

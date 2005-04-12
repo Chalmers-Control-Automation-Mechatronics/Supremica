@@ -216,61 +216,30 @@ public class AutomatonMinimizer
 
 			// Now we're ready for partitioning!
 		}
-		else if (equivalenceRelation == EquivalenceRelation.ObservationEquivalence)  
+		else if (equivalenceRelation == EquivalenceRelation.ObservationEquivalence ||
+				 equivalenceRelation == EquivalenceRelation.ConflictEquivalence)  
 		{
 			// Merge silent loops and other obvious OE stuff (to save computation later)...
-			// This is actually NOT entirely OE, considering the marked states!! 
-			int trivialCount = mergeTriviallyObservationEquivalentStates(theAutomaton);
-			if (trivialCount > 0)
-			{
-				logger.verbose("Removed " + trivialCount + " trivially equivalent states " +
-							   "before running the partitioning.");
-			}
-			int loopCount = mergeEpsilonLoops(theAutomaton); // Not entirely OE if marking is considered!
-			if (loopCount > 0)
-			{
-				logger.verbose("Removed " + loopCount + " states involved in silent loops " +
-							   "before running the partitioning.");
-			}
-
-			// Debug
-			preMinimizationTimer.stop();
-			logger.debug("Pre partitioning: " + preMinimizationTimer);
-			partitioningTimer.start();
-
-			// Now we're ready for partitioning!
-		}
-		else if (equivalenceRelation == EquivalenceRelation.ConflictEquivalence)  
-		{
-			// Merge silent loops
 			// Don't bother if there is only one event in alphabet (epsilon or not)
 			if (theAutomaton.getAlphabet().size() > 1)
 			{
-				int loopCount = mergeEpsilonLoops(theAutomaton);
+				int trivialCount = mergeTriviallyObservationEquivalentStates(theAutomaton);
+				if (trivialCount > 0)
+				{
+					logger.verbose("Removed " + trivialCount + " trivially equivalent states " +
+								   "before running the partitioning.");
+				}
+				int loopCount = mergeEpsilonLoops(theAutomaton); 
 				if (loopCount > 0)
 				{
 					logger.verbose("Removed " + loopCount + " states involved in silent loops " +
 								   "before running the partitioning.");
 				}
-			}
-			else if ((theAutomaton.nbrOfEpsilonEvents() == 1) && useShortNames)
-			{
-				// The conflict equivalent automaton is just one state, the initial state. 
-				// Marked if the automaton is nonblocking, nonmarked otherwise.
-				Automaton newAutomaton = new Automaton("min(" + theAutomaton.getName() + ")");
-				State initial = new State("q0");
-				initial.setInitial(true);
-				newAutomaton.addState(initial);	
-
-				// Accepting iff nonblocking
-				initial.setAccepting(AutomataVerifier.verifyMonolithicNonblocking(new Automata(theAutomaton)));
-
-				return newAutomaton;
-			}
-
+			}				
+			
 			// Debug
 			preMinimizationTimer.stop();
-			logger.debug("Merge loops: " + preMinimizationTimer);
+			logger.debug("Trivially OE stuff: " + preMinimizationTimer);
 			adjustMarkingTimer.start();	
 			
 			////////////
@@ -278,33 +247,62 @@ public class AutomatonMinimizer
 			////////////
 			
 			// Adjust marking based on epsilon transitions 
-			int countD = ruleD(theAutomaton); // Not OE
+			int countD = ruleD(theAutomaton);
 			totalD += countD;
 			
 			// Debug
 			adjustMarkingTimer.stop();	
 			logger.debug("Adjust markings: " + adjustMarkingTimer);
-			rulesTimer.start();
-	
+			
 			if (stopRequested)
 			{
 				return null;
 			}
-
-			//////////////////////
-			// RULES A, B, C, F //
-			//////////////////////
 			
-			int count = runRules(theAutomaton);
-			if (count > 0)
+			///////////////////////////
+			// Conflict Equivalence- //
+			// specific stuff        //
+			///////////////////////////
+			
+			if (equivalenceRelation == EquivalenceRelation.ConflictEquivalence)
 			{
-				logger.verbose("Removed " + count + " states based on conflict equivalence " +
-							   "before running partitioning.");
+				rulesTimer.start();
+
+				// If there is just one event and it's epsilon, 
+				// it's easy! (If we don't care about state names.)
+				if ((theAutomaton.getAlphabet().size() == 1) && 
+					(theAutomaton.nbrOfEpsilonEvents() == 1) && 
+					useShortNames)
+				{
+					// The conflict equivalent automaton is just one state, the initial state. 
+					// Marked if the automaton is nonblocking, nonmarked otherwise.
+					Automaton newAutomaton = new Automaton("min(" + theAutomaton.getName() + ")");
+					State initial = new State("q0");
+					initial.setInitial(true);
+					newAutomaton.addState(initial);	
+					
+					// Accepting iff nonblocking
+					initial.setAccepting(AutomataVerifier.verifyMonolithicNonblocking(new Automata(theAutomaton)));
+					
+					return newAutomaton;
+				}
+				
+				//////////////////////
+				// RULES A, B, C, F //
+				//////////////////////
+				
+				int count = runRules(theAutomaton);
+				if (count > 0)
+				{
+					logger.verbose("Removed " + count + " states based on conflict equivalence " +
+								   "before running partitioning.");
+				}
+				
+				// Debug
+				rulesTimer.stop();	
+				logger.debug("Rules A, B, C and F: " + rulesTimer);
 			}
-			
-			// Debug
-			rulesTimer.stop();	
-			logger.debug("Rules A, B, C and F: " + rulesTimer);
+
 			partitioningTimer.start();
 			
 			// Now we're ready for partitioning!
@@ -328,11 +326,6 @@ public class AutomatonMinimizer
 			
 			// Partition
 			findCoarsestPartitioning(equivClasses);
-			
-			if (stopRequested)
-			{
-				return null;
-			}
 		}
 		catch (Exception ex)
 		{
@@ -346,6 +339,11 @@ public class AutomatonMinimizer
 		partitioningTimer.stop();	
 		logger.debug("Partitioning: " + partitioningTimer);
 		automataBuildTimer.start();
+
+		if (stopRequested)
+		{
+			return null;
+		}
 
 		// Build the minimized automaton based on the partitioning in equivClasses
 		Automaton newAutomaton = buildAutomaton(equivClasses);
@@ -630,7 +628,7 @@ public class AutomatonMinimizer
 	/**
 	 * Finds the coarsest partitioning of the supplied equivalence classes.
 	 * In each partition, all states have corresponding outgoing arcs. Based
-	 * on this, an automaton with a minimal number of states can be generated...
+	 * on this, an automaton with a minimal number of states wrt OE can be generated...
 	 */
 	private void findCoarsestPartitioning(EquivalenceClasses equivClasses)
 	{
@@ -786,10 +784,12 @@ public class AutomatonMinimizer
 			StateSet nextStates;
 			if (e.isEpsilon())
 			{
+				// Find the states that can be reached by epsilons, i.e. the epsilonclosure of currState
 				nextStates = currState.epsilonClosure(true);
 			}
 			else
-			{
+			{	
+				// Find the states that can be reached by e from the epsilonclosure of currState
 				nextStates = currState.nextStates(e, true);
 			}
 			EquivalenceClass nextClass = new EquivalenceClass();
