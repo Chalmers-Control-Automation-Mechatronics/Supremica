@@ -65,13 +65,13 @@ public class Device
 
     private Device() {}
 
-    public Device(String name, String[] args)
+    public Device(String name, String systemFile)
     {
 	System.out.println("Device(" + name + ")");
 	loader = new Loader(this);
-		
-	loader.load(args[0]);
-	// kick off 
+
+	loader.load(systemFile);
+	// kick off
 	getResource("TestResource").getApplicationFragment("FBNetwork").getFBInstance("inst1").queueEvent("OCCURRED");
 
 	/*
@@ -88,7 +88,7 @@ public class Device
 	fbType.addVariable("DO", new IntegerVariable("DataOutput",0));
 	fbType.addVariable("invoked", new IntegerVariable("Local",0));
 
-	// Build ECC 
+	// Build ECC
 	fbType.getECC().addInitialState("INIT");
 	fbType.getECC().addState("STATE");
 	fbType.getECC().addTransition("INIT", "STATE", "OCCURRED");
@@ -100,27 +100,27 @@ public class Device
 	"System.out.println(\"TestAlgorithm.execute(): invoked: \" + invoked + \" times.\");" +
 	"System.out.println(\"TestAlgorithm.execute(): DO: \" + DO + \".\");"
 	));
-							  
+
 	fbType.getECC().getState("STATE").addAction("TestAlg", "DONE");
 	*/
 
-	
+
 	/*
 	// FB application fragment
 	addApplicationFragment("AppFrag");
 	ApplicationFragment appFrag =  getApplicationFragment("AppFrag");
-	
+
 	// add FB instances to app frag
 	appFrag.addFBInstance("inst1","TestType");
 	appFrag.addFBInstance("inst2","TestType");
-	
+
 	// connections
 	appFrag.addEventConnection("inst1","DONE","inst2","OCCURRED");
 	appFrag.addEventConnection("inst2","DONE","inst1","OCCURRED");
-	
+
 	appFrag.addDataConnection("inst1","DO","inst2","DI");
 	appFrag.addDataConnection("inst2","DO","inst1","DI");
-	
+
 	*/
 
 	//Interpreter tester

@@ -640,6 +640,8 @@
 	<chmod file="${dist}/FunctionblockViewer" perm="755"/>
 	<copy file="${templates}/FBRuntime" todir="${dist}"/>	
 	<chmod file="${dist}/FBRuntime" perm="755"/>
+	<copy file="${templates}/FBRuntime.cmd" todir="${dist}"/>	
+	<chmod file="${dist}/FBRuntime.cmd" perm="644"/>
 	<copy file="${templates}/SupremicaProfiling.cmd" todir="${dist}"/>	
 	<chmod file="${dist}/SupremicaProfiling.cmd" perm="644"/>
 	<copy file="${templates}/SupremicaStandard.cmd" todir="${dist}"/>	

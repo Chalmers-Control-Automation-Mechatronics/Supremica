@@ -55,10 +55,11 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.JAXBException;
 import org.supremica.functionblocks.xsd.libraryelement.*;
+import org.supremica.properties.SupremicaProperties;
 
 
 /**
- * The Loader class uses JAXB to load a FB 
+ * The Loader class uses JAXB to load a FB
  * application into the FBRuntime and then run it.
  *
  *
@@ -67,7 +68,7 @@ import org.supremica.functionblocks.xsd.libraryelement.*;
  * @author Goran
  * @version 1.0
  */
-public class Loader 
+public class Loader
 {
     private Device device;
     private Resource resource;
@@ -131,7 +132,7 @@ public class Loader
 	    }
 	}
     }
-    
+
     private void constructNewFBNetwork(org.supremica.functionblocks.xsd.libraryelement.FBNetworkType xmlFBNetworkData)
     {
 	resource.addApplicationFragment("FBNetwork");
@@ -143,8 +144,8 @@ public class Loader
 		org.supremica.functionblocks.xsd.libraryelement.FB curFB = (org.supremica.functionblocks.xsd.libraryelement.FB) fbIter.next();
 		// get and load the FB type
 		if(resource.getFBType(curFB.getType() + ".fbt") == null)
-		{ 
-		    load("/home/cengic/devel/workspace/Supremica/examples/functionblocks/FBRuntime/" + curFB.getType() + ".fbt");
+		{
+		    load(SupremicaProperties.getFBRuntimeLibraryPath() + "/" + curFB.getType() + ".fbt");
 		}
 		appFrag.addFBInstance(curFB.getName(),curFB.getType());
 	    }
@@ -184,7 +185,7 @@ public class Loader
 	    }
 	}
     }
-    
+
     private void loadFBType(org.supremica.functionblocks.xsd.libraryelement.FBType xmlFBTypeData)
     {
 	if (xmlFBTypeData.isSetBasicFB())
@@ -199,7 +200,7 @@ public class Loader
 
 	resource.addBasicFBType(xmlFBTypeData.getName());
 	BasicFBType newBasicFBType = (BasicFBType) resource.getFBType(xmlFBTypeData.getName());
-	    
+
 	// Build the interface
 	// event inputs
 	for (Iterator iter = xmlFBTypeData.getInterfaceList().getEventInputs().getEvent().iterator(); iter.hasNext();)
@@ -234,7 +235,7 @@ public class Loader
 		if (curVar.isSetInitialValue())
 		{
 		    newBasicFBType.addVariable(curVar.getName(), new IntegerVariable("DataInput",new Integer(curVar.getInitialValue()).intValue()));
-		}  
+		}
 		else
 		{
 		    newBasicFBType.addVariable(curVar.getName(), new IntegerVariable("DataInput",0));
@@ -245,7 +246,7 @@ public class Loader
 		if (curVar.isSetInitialValue())
 		{
 		    newBasicFBType.addVariable(curVar.getName(), new BooleanVariable("DataInput",new Boolean(curVar.getInitialValue()).booleanValue()));
-		}  
+		}
 		else
 		{
 		    newBasicFBType.addVariable(curVar.getName(), new BooleanVariable("DataInput",false));
@@ -256,7 +257,7 @@ public class Loader
 		if (curVar.isSetInitialValue())
 		{
 		    newBasicFBType.addVariable(curVar.getName(), new DoubleVariable("DataInput",new Double(curVar.getInitialValue()).doubleValue()));
-		}  
+		}
 		else
 		{
 		    newBasicFBType.addVariable(curVar.getName(), new DoubleVariable("DataInput",0.0));
@@ -267,7 +268,7 @@ public class Loader
 		if (curVar.isSetInitialValue())
 		{
 		    newBasicFBType.addVariable(curVar.getName(), new StringVariable("DataInput", curVar.getInitialValue()));
-		}  
+		}
 		else
 		{
 		    newBasicFBType.addVariable(curVar.getName(), new StringVariable("DataInput",""));
@@ -283,7 +284,7 @@ public class Loader
 		if (curVar.isSetInitialValue())
 		{
 		    newBasicFBType.addVariable(curVar.getName(), new IntegerVariable("DataOutput",new Integer(curVar.getInitialValue()).intValue()));
-		}  
+		}
 		else
 		{
 		    newBasicFBType.addVariable(curVar.getName(), new IntegerVariable("DataOutput",0));
@@ -294,7 +295,7 @@ public class Loader
 		if (curVar.isSetInitialValue())
 		{
 		    newBasicFBType.addVariable(curVar.getName(), new BooleanVariable("DataOutput",new Boolean(curVar.getInitialValue()).booleanValue()));
-		}  
+		}
 		else
 		{
 		    newBasicFBType.addVariable(curVar.getName(), new BooleanVariable("DataOutput",false));
@@ -305,7 +306,7 @@ public class Loader
 		if (curVar.isSetInitialValue())
 		{
 		    newBasicFBType.addVariable(curVar.getName(), new DoubleVariable("DataOutput",new Double(curVar.getInitialValue()).doubleValue()));
-		}  
+		}
 		else
 		{
 		    newBasicFBType.addVariable(curVar.getName(), new DoubleVariable("DataOutput",0.0));
@@ -316,7 +317,7 @@ public class Loader
 		if (curVar.isSetInitialValue())
 		{
 		    newBasicFBType.addVariable(curVar.getName(), new StringVariable("DataOutput", curVar.getInitialValue()));
-		}  
+		}
 		else
 		{
 		    newBasicFBType.addVariable(curVar.getName(), new StringVariable("DataOutput",""));
@@ -324,7 +325,7 @@ public class Loader
 	    }
 	}
 	// End Build the interface
-		
+
 	// Build internal variables
 	if (xmlFBTypeData.getBasicFB().isSetInternalVars())
 	{
@@ -336,7 +337,7 @@ public class Loader
 		    if (curVar.isSetInitialValue())
 		    {
 			newBasicFBType.addVariable(curVar.getName(), new IntegerVariable("Local",new Integer(curVar.getInitialValue()).intValue()));
-		    }  
+		    }
 		    else
 		    {
 			newBasicFBType.addVariable(curVar.getName(), new IntegerVariable("Local",0));
@@ -347,7 +348,7 @@ public class Loader
 		    if (curVar.isSetInitialValue())
 		    {
 			newBasicFBType.addVariable(curVar.getName(), new BooleanVariable("Local",new Boolean(curVar.getInitialValue()).booleanValue()));
-		    }  
+		    }
 		    else
 		    {
 			newBasicFBType.addVariable(curVar.getName(), new BooleanVariable("Local",false));
@@ -358,7 +359,7 @@ public class Loader
 		    if (curVar.isSetInitialValue())
 		    {
 			newBasicFBType.addVariable(curVar.getName(), new DoubleVariable("Local",new Double(curVar.getInitialValue()).doubleValue()));
-		    }  
+		    }
 		    else
 		    {
 			newBasicFBType.addVariable(curVar.getName(), new DoubleVariable("Local",0.0));
@@ -369,7 +370,7 @@ public class Loader
 		    if (curVar.isSetInitialValue())
 		    {
 			newBasicFBType.addVariable(curVar.getName(), new StringVariable("Local", curVar.getInitialValue()));
-		    }  
+		    }
 		    else
 		    {
 			newBasicFBType.addVariable(curVar.getName(), new StringVariable("Local",""));
@@ -379,7 +380,7 @@ public class Loader
 	}
 	// End Build internal variables
 
-	
+
 	// Build ECC
 	// Build States
 	int curStateNum = 0;
@@ -430,8 +431,8 @@ public class Loader
 	    }
 	}
 	// End Build Algorithms
-	
+
     }
-    
-    
+
+
 }
