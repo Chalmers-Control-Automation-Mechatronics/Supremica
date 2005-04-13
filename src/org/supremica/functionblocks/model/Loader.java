@@ -195,7 +195,7 @@ public class Loader
     }
 
 
-    private void constructNewBasicFBType(org.supremica.functionblocks.xsd.libraryelement.FBType xmlFBTypeData)
+	private void constructNewBasicFBType(org.supremica.functionblocks.xsd.libraryelement.FBType xmlFBTypeData)
     {
 
 		resource.addBasicFBType(xmlFBTypeData.getName());
