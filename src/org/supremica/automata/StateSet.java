@@ -74,14 +74,18 @@ public class StateSet
 		return ss;
 	}
 
-	// Make me the union of myself and s2
+	/**
+	 * Make me the union of myself and s2.
+	 */
 	public void union(StateSet s2)
 	{
 		modified();
 		theSet.addAll(s2.theSet);
 	}
 
-	// Make me the intersection of myself and s2
+	/**
+	 * Make me the intersection of myself and s2.
+	 */
 	public void intersect(StateSet s2)
 	{
 		modified();

@@ -175,7 +175,7 @@ public class AutomatonSplit
 				// Remove one event from the automaton´s alphabet
 				Automaton reduction = removeEvent(result, event);
 				
-				// Have we removed something vital? (If not, that's good!)
+				// Have we removed something we shouldn't have?
 				Automata automataA = new Automata();
 				automataA.addAutomaton(reduction);
 				automataA.addAutomata(parents);
@@ -281,6 +281,7 @@ public class AutomatonSplit
 	 * Merges the from and to states of a transition, the transition itself
 	 * becomes a self loop.
 	 */
+	/*
 	private static Automaton removeTransition(Automaton automaton, Arc arc)
 		throws Exception
 	{
@@ -298,36 +299,6 @@ public class AutomatonSplit
 		Automaton result = minimizer.getMinimizedAutomaton(options);
 
 		return result;
-
-		/*
-		for (ArcIterator arcIt = toState.incomingArcsIterator();
-				arcIt.hasNext(); )
-		{
-			Arc currArc = arcIt.nextArc();
-
-			currArc.setToState(fromState);
-		}
-
-		for (ArcIterator arcIt = toState.outgoingArcsIterator();
-				arcIt.hasNext(); )
-		{
-			Arc currArc = arcIt.nextArc();
-
-			currArc.setFromState(fromState);
-		}
-
-		// Make deterministic
-		Determinizer detm = new Determinizer(automaton);
-
-		detm.execute();
-
-		Automaton deterministic = detm.getNewAutomaton();
-
-		// Minimize
-		AutomatonMinimizer minimizer = new AutomatonMinimizer(deterministic);
-		Automaton result = minimizer.getMinimizedAutomaton(MinimizationOptions.getDefaultMinimizationOptions());
-
-		return result;
-		*/
 	}
+	*/
 }
