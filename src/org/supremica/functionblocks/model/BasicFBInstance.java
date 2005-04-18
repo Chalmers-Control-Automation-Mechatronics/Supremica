@@ -72,218 +72,221 @@ public class BasicFBInstance extends FBInstance
 	
     public BasicFBInstance(String n, Resource r, BasicFBType t)
     {
-	name = n;
-	resource = r;
-	fbType = t;
-	currentECState = fbType.getECC().getInitialState();
+		name = n;
+		resource = r;
+		fbType = t;
+		currentECState = fbType.getECC().getInitialState();
     }
 
     public void setVariables(Variables vars)
     {
-	variables = vars;
+		variables = vars;
     }
 
     public void addVariable(String name, Variable var)
     {
-	variables.addVariable(name,var);
+		variables.addVariable(name,var);
     }
 
     public void setEvents(Map i)
     {
-	events = i;
+		events = i;
     }
 	
     public void addEventOutputConnection(String output, Connection cnt)
     {
-	eventOutputConnections.put(output,cnt);
+		eventOutputConnections.put(output, cnt);
     }
     
     public void addDataInputConnection(String input, Connection cnt)
     {	
-	dataInputConnections.put(input, cnt);
+		dataInputConnections.put(input, cnt);
     }
 
     public Variable getDataOutput(String name)
     {
-	if (!((Variable) variables.getVariable(name)).getType().equals("DataOutput"))
-	{
-	    System.out.println("BasicFBInstance: no such DataOutput " + name);
-	    System.exit(0);
-	}
-	return (Variable) variables.getVariable(name);
+		if (!((Variable) variables.getVariable(name)).getType().equals("DataOutput"))
+		{
+			System.out.println("BasicFBInstance: no such DataOutput " + name);
+			System.exit(0);
+		}
+		return (Variable) variables.getVariable(name);
     }
-
+	
     public void queueEvent(String eventInput)
     {
-	//System.out.println("BasicFBInstace.queueEvent(): " + eventInput);
-	if(variables.getVariable(eventInput) != null)
-	    if(variables.getVariable(eventInput).getType().equals("EventInput"))
-	    {
-		eventInputQueue.add((Event) events.get(eventInput));
-		resource.getScheduler().scheduleFBInstance(this);
-	    }
-	    else
-	    {
-		System.out.println("BasicFBInstance: No event input " + eventInput);
-		System.exit(0);
-	    }
-	else
-	{
-	    System.out.println("BasicFBInstance: No event input " + eventInput);
-	    System.exit(0);
-	}
+		synchronized(eventInputQueue)
+		{
+			//System.out.println("BasicFBInstace.queueEvent(): " + eventInput);
+			if(variables.getVariable(eventInput) != null)
+				if(variables.getVariable(eventInput).getType().equals("EventInput"))
+				{
+					eventInputQueue.add((Event) events.get(eventInput));
+					resource.getScheduler().scheduleFBInstance(this);
+				}
+				else
+				{
+					System.out.println("BasicFBInstance: No event input " + eventInput);
+					System.exit(0);
+				}
+			else
+			{
+				System.out.println("BasicFBInstance: No event input " + eventInput);
+				System.exit(0);
+			}
+		}
     }
 	
     public void handleEvent()
     {
-	//System.out.println("BasicFBInstance.handleEvent()");
-	if(handlingEvent)
-	{
-	    resource.getScheduler().scheduleFBInstance(this);
-	    return;			
-	}
-
-	currentEvent = getNextEvent();
-	if(currentEvent != null)
-	{
-	    handlingEvent = true;
-
-	    // set all InputEvents to false
-	    for (Iterator iter = variables.iterator();iter.hasNext();)
-	    {
-		String curName = (String) iter.next();
-		if (((Variable) variables.getVariable(curName)).getType().equals("EventInput"))
+		//System.out.println("BasicFBInstance.handleEvent()");
+		if(handlingEvent)
 		{
-		    ((BooleanVariable) variables.getVariable(curName)).setValue(false);
+			resource.getScheduler().scheduleFBInstance(this);
+			return;			
 		}
-	    }
 
-	    // set the var corrensponding to the input event to TRUE 
-	    ((BooleanVariable) variables.getVariable(currentEvent.getName())).setValue(true);
-	    getDataVariables(currentEvent);
+		currentEvent = getNextEvent();
+		if(currentEvent != null)
+		{
+			handlingEvent = true;
 
-	    // and execute the ecc
-	    ECState newECState = updateECC();
-	    if (newECState != currentECState)
-	    {
-		handleNewState(newECState);
-	    }
-	}
+			// set all InputEvents to false
+			for (Iterator iter = variables.iterator();iter.hasNext();)
+			{
+				String curName = (String) iter.next();
+				if (((Variable) variables.getVariable(curName)).getType().equals("EventInput"))
+				{
+					((BooleanVariable) variables.getVariable(curName)).setValue(false);
+				}
+			}
+
+			// set the var corrensponding to the input event to TRUE 
+			((BooleanVariable) variables.getVariable(currentEvent.getName())).setValue(true);
+			getDataVariables(currentEvent);
+
+			// and execute the ecc
+			ECState newECState = updateECC();
+			if (newECState != currentECState)
+			{
+				handleNewState(newECState);
+			}
+		}
     }
 	
     public void finishedJob(Job theJob)
     {
-	//System.out.println("BasicFBInstance.finishedJob()");
-	setVariables(theJob.getVariables());
-	sendOutput();
-	handleState();
+		//System.out.println("BasicFBInstance.finishedJob()");
+		setVariables(theJob.getVariables());
+		sendOutput();
+		handleState();
     }
 
     private Event getNextEvent()
     {
-	return  (Event) eventInputQueue.remove();
+		return  (Event) eventInputQueue.remove();
     }
 	
     private void getDataVariables(Event event)
     {
-	// get the data variables associated with this event and put the in variables attribute
-	for (Iterator iter = event.withIterator();iter.hasNext();)
-	{
-	    String curName = (String) iter.next();
-	    Connection curConnection  = (Connection) dataInputConnections.get(curName);
-	    Variable outputVar = curConnection.getFBInstance().getDataOutput(curConnection.getSignalName());
-	    if(outputVar instanceof IntegerVariable)
-	    {
-		((IntegerVariable) variables.getVariable(curName)).setValue(((IntegerVariable) outputVar).getValue().intValue());
-	    }
-	    else if(outputVar instanceof IntegerVariable)
-	    {
-		((IntegerVariable) variables.getVariable(curName)).setValue(((IntegerVariable) outputVar).getValue().intValue());
-	    }
-	    else if(outputVar instanceof IntegerVariable)
-	    {
-		((IntegerVariable) variables.getVariable(curName)).setValue(((IntegerVariable) outputVar).getValue().intValue());
-	    }
-	    else if(outputVar instanceof IntegerVariable)
-	    {
-		((IntegerVariable) variables.getVariable(curName)).setValue(((IntegerVariable) outputVar).getValue().intValue());
-	    }
-	    else if(outputVar instanceof IntegerVariable)
-	    {
-		((IntegerVariable) variables.getVariable(curName)).setValue(((IntegerVariable) outputVar).getValue().intValue());
-	    }
+		// get the data variables associated with this event and put the in variables attribute
+		for (Iterator iter = event.withIterator();iter.hasNext();)
+		{
+			String curName = (String) iter.next();
+			Connection curConnection  = (Connection) dataInputConnections.get(curName);
+			Variable outputVar = curConnection.getFBInstance().getDataOutput(curConnection.getSignalName());
+			if(outputVar instanceof IntegerVariable)
+			{
+				((IntegerVariable) variables.getVariable(curName)).setValue(((IntegerVariable) outputVar).getValue().intValue());
+			}
+			else if(outputVar instanceof IntegerVariable)
+			{
+				((IntegerVariable) variables.getVariable(curName)).setValue(((IntegerVariable) outputVar).getValue().intValue());
+			}
+			else if(outputVar instanceof IntegerVariable)
+			{
+				((IntegerVariable) variables.getVariable(curName)).setValue(((IntegerVariable) outputVar).getValue().intValue());
+			}
+			else if(outputVar instanceof IntegerVariable)
+			{
+				((IntegerVariable) variables.getVariable(curName)).setValue(((IntegerVariable) outputVar).getValue().intValue());
+			}
+			else if(outputVar instanceof IntegerVariable)
+			{
+				((IntegerVariable) variables.getVariable(curName)).setValue(((IntegerVariable) outputVar).getValue().intValue());
+			}
 			
-	}
+		}
     }
 	
 
     private ECState updateECC()
     {
-	return fbType.getECC().execute(currentECState, variables);
+		return fbType.getECC().execute(currentECState, variables);
     }
 
     // initializes the handling of new state
     private void handleNewState(ECState state)
     {
-	currentECState = state;
-	// set total number of actions in this state
-	actionsLeft = currentECState.getNumberOfActions();
-	// and get the iterator for them
-	actionsIterator = currentECState.actionsIterator();
-	handleState();
+		currentECState = state;
+		// set total number of actions in this state
+		actionsLeft = currentECState.getNumberOfActions();
+		// and get the iterator for them
+		actionsIterator = currentECState.actionsIterator();
+		handleState();
     }
 	
     // handles currentState between actions
     private void handleState()
     {
-	if (actionsLeft > 0 )
-	{
-	    handleAction((ECAction) actionsIterator.next());
-	}
+		if (actionsLeft > 0 )
+		{
+			handleAction((ECAction) actionsIterator.next());
+		}
 		
-	if (actionsLeft == 0)
-	{
-	    // set event var to false
-	    ((BooleanVariable) variables.getVariable(currentEvent.getName())).setValue(false);
-	    // repeat the handling of the state if state is changed
-	    ECState newECState = updateECC(); 
-	    if (newECState != currentECState)
-	    {
-		handleNewState(newECState);
-	    }
-	    else
-	    {
-		// we're done with the event
-		//System.out.println("BasicFBInstance: Done with event " + currentEvent.getName() + " and in ECState " + currentECState.getName());
-		handlingEvent = false;
-	    }
-	}
+		if (actionsLeft == 0)
+		{
+			// set event var to false
+			((BooleanVariable) variables.getVariable(currentEvent.getName())).setValue(false);
+			// repeat the handling of the state if state is changed
+			ECState newECState = updateECC(); 
+			if (newECState != currentECState)
+			{
+				handleNewState(newECState);
+			}
+			else
+			{
+				// we're done with the event
+				//System.out.println("BasicFBInstance: Done with event " + currentEvent.getName() + " and in ECState " + currentECState.getName());
+				handlingEvent = false;
+			}
+		}
     }
 
     private void handleAction(ECAction action)
     {
-	currentECAction = action;
-	if (currentECAction.getAlgorithm() != null)
-	{
-	    Variables algVars =  (Variables) variables.clone();
-	    resource.getScheduler().scheduleJob(new Job(this, fbType.getAlgorithm(currentECAction.getAlgorithm()), algVars));
-	}
-	else if (currentECAction.getAlgorithm() == null && currentECAction.getOutput() != null)
-	{
-	    sendOutput();
-	    handleState();
-	}
+		currentECAction = action;
+		if (currentECAction.getAlgorithm() != null)
+		{
+			Variables algVars =  (Variables) variables.clone();
+			resource.getScheduler().scheduleJob(new Job(this, fbType.getAlgorithm(currentECAction.getAlgorithm()), algVars));
+		}
+		else if (currentECAction.getAlgorithm() == null && currentECAction.getOutput() != null)
+		{
+			sendOutput();
+			handleState();
+		}
     }
 
     private void sendOutput()
     {
-	if (currentECAction.getOutput() != null)
-	{
-	    Connection outputConnection = (Connection) eventOutputConnections.get(currentECAction.getOutput());
-	    FBInstance toInstance = outputConnection.getFBInstance();
-	    toInstance.queueEvent(outputConnection.getSignalName());
-	}
-	actionsLeft = actionsLeft - 1;
+		if (currentECAction.getOutput() != null)
+		{
+			Connection outputConnection = (Connection) eventOutputConnections.get(currentECAction.getOutput());
+			FBInstance toInstance = outputConnection.getFBInstance();
+			toInstance.queueEvent(outputConnection.getSignalName());
+		}
+		actionsLeft = actionsLeft - 1;
     }
 	
 }
