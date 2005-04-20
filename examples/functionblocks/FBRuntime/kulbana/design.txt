@@ -1,32 +1,141 @@
+==============================================
 Konstruktion av FB applikationen för kulbanan.
-============================================== 
+==============================================
 
 Denna fil beskriver hur FB applikationen för styrning av
 kulbanan är uppbyggd.
 
-FB-typer från uppdelningen i fysiska komponenter (typnamn i parantesen): 
-   Portvakt (PV), Mätlyft (ML), Mätstation (MS), Hiss (HI), 
+FB-typer från uppdelningen i fysiska komponenter (typnamn i parantesen):
+   Portvakt (PV), Mätlyft (ML), Mätstation (MS), Hiss (HI),
    Våning (VG), Arm (AR) och Knappar och Lampan (HMI)
 
 
 Portvakt:
----------
+=========
+
 Interface:
+----------
+
 events in/ut public:
-   in: ge_kula	- kommer när ny kula efterfrågas av mätlyft
-   ut: kommer	- skickas när kulan är på väg till hissen, dvs
-				  när UrPortvakt har släppt kulan
-   in: ny_kula	- kommer när armen har släppt kulan
+	in: ge_kula		- kommer när ny kula efterfrågas av mätlyft
+	ut: kommer		- skickas när kulan är på väg till hissen, dvs
+				  	  när UrPortvakt har släppt kulan
+	in: ny_kula		- kommer när armen har släppt kulan
+
 events in/ut private:
-   ut: in_portvakt with value   - sätter InPortvakt signalen till value
-   in: kula_portvakt_r_trig		- kommer när rising edge upptäcks på KulaPortvakt 
+	ut: in_portvakt with värde	- sätter InPortvakt signalen till value
+	in: kula_portvakt_r_trig	- kommer när rising edge upptäcks på KulaPortvakt
 								  signalen
-   ut: ur_portvakt with value	- sätter UrPortvakt signalen till value
-	 
-data in/ut public:
-   inga
+	ut: ur_portvakt with value	- sätter UrPortvakt signalen till value
+
 data in/ut private:
-   ut: value (boolean)		    - bär värdet för sensor sättning
+	ut: värde (boolean)		- värdet för sensor sättning
 
 Lokala variabler:
-   frigjorda_kulor (integer)    - antal kulor i systemet
+-----------------
+
+   frigjorda_kulor (integer)	- antal kulor i systemet
+
+Grafisk representation:
+-----------------------
+						   _____________________________________
+                     -----| init                          inito |-----
+                     -----| ny_kula						 kommer |-----
+                     -----| ge_kula	   	   	   	   	   	   	    |
+                          |    -----------------------------    |
+                     -----| kula_portvakt_r_trig   	in_portvakt |--*--
+                          |					    	ut_portvakt |--*--
+                       	  |_	                               _|  |
+  					 	   _|  	                              |_   |
+  					   	  |	   	            PV 	                |  |
+						  |				----------              |  |
+						  |										|  |
+  						  |	   -----------------------------    |  |
+                          |                               värde |--*--
+  						  |_____________________________________|
+
+
+Mätlyft:
+========
+
+Interface:
+----------
+
+events in/ut public:
+	ut: ge_kula		- skickas när ML är beredd att ta kula
+	in: ny_kula		- kommer när PV har släppt kulan
+	ut: uppe		- skickas när ML är uppe med kulan
+	in: tom			- kommer när ML är tom
+
+events in/ut private:
+	in: kula_mätlyft_r_trig
+	in: mätlyft_nere_r_trig
+	in: mätlyft_uppe_r_trig
+	in: kula_mätstation_r_trig
+	ut: upp_mätlyft with värde
+
+data in/ut private:
+	ut: värde (boolean)
+
+Grafisk representations:
+------------------------
+						   _____________________________________
+                     -----| init                          inito |-----
+                     -----| ny_kula	   	   	   	   	   	ge_kula |-----
+                     -----| tom	   	   	   	   	   	   	   uppe |-----
+                          |    -----------------------------    |
+                     -----| kula_mätlyft_r_trig     upp_mätlyft |--*--
+                     -----|	mätlyft_nere_r_trig    	            |  |
+   	   	   			 -----|	mätlyft_uppe_r_trig	   	   	   	   	|  |
+					 -----|	kula_mätstation_r_trig 	   	   	   	|  |
+                       	  |_	                               _|  |
+  					 	   _|  	                              |_   |
+  					   	  |	   	            ML 	                |  |
+						  |				----------              |  |
+						  |										|  |
+  						  |	   -----------------------------    |  |
+                          |                               värde |--*--
+  						  |_____________________________________|
+
+Mätstation:
+===========
+
+Interface:
+----------
+
+events in/ut public:
+	in: ge_kula					- skickas när HI är beredd att ta kula
+	in: ny_kula					- kommer när ML är uppe med kulan
+	ut: kommer with liten		- skickas när MS har skickat ut kulan
+
+events in/ut private:
+	ut: mät with värde
+	ut: ur_mätning with värde
+
+data in/ut public:
+	ut: liten (boolean)			- true om liten kula uppmätt
+
+data in/ut private:
+	ut: värde (boolean)
+
+Grafisk representations:
+------------------------
+						   _____________________________________
+                     -----| init                          inito |-----
+                     -----| ge_kula	   	   	   	   	   	 kommer |-*---
+                     -----| ny_kula	   	   	   	  	   	        | |
+                          |    -----------------------------    | |
+                          |                                 mät |-|*--
+                          |    	                     ur_mätning |-|*--
+                       	  |_	                               _| ||
+  					 	   _|  	                              |_  ||
+  					   	  |	   	            MS 	                | ||
+						  |				----------              | ||
+						  |								  liten |-*|---
+  						  |	   -----------------------------    |  |
+                          |                               värde |--*--
+  						  |_____________________________________|
+
+Hiss:
+=====
+
