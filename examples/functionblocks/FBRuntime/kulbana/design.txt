@@ -1,0 +1,32 @@
+Konstruktion av FB applikationen för kulbanan.
+============================================== 
+
+Denna fil beskriver hur FB applikationen för styrning av
+kulbanan är uppbyggd.
+
+FB-typer från uppdelningen i fysiska komponenter (typnamn i parantesen): 
+   Portvakt (PV), Mätlyft (ML), Mätstation (MS), Hiss (HI), 
+   Våning (VG), Arm (AR) och Knappar och Lampan (HMI)
+
+
+Portvakt:
+---------
+Interface:
+events in/ut public:
+   in: ge_kula	- kommer när ny kula efterfrågas av mätlyft
+   ut: kommer	- skickas när kulan är på väg till hissen, dvs
+				  när UrPortvakt har släppt kulan
+   in: ny_kula	- kommer när armen har släppt kulan
+events in/ut private:
+   ut: in_portvakt with value   - sätter InPortvakt signalen till value
+   in: kula_portvakt_r_trig		- kommer när rising edge upptäcks på KulaPortvakt 
+								  signalen
+   ut: ur_portvakt with value	- sätter UrPortvakt signalen till value
+	 
+data in/ut public:
+   inga
+data in/ut private:
+   ut: value (boolean)		    - bär värdet för sensor sättning
+
+Lokala variabler:
+   frigjorda_kulor (integer)    - antal kulor i systemet
