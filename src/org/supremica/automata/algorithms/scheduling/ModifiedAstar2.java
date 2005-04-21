@@ -646,6 +646,9 @@ public class ModifiedAstar2
 				State currState = new State(currNode.getParent().toString());
 				LabeledEvent event = findCurrentEvent(currNode.getParent(), currNode);
 
+				if (currNode.getParent().getParent() == null)
+					currState.setInitial(true);
+					
 				scheduleAuto.addState(currState);
 				scheduleAuto.getAlphabet().addEvent(event);
 				scheduleAuto.addArc(new Arc(currState, nextState, event));
@@ -659,16 +662,6 @@ public class ModifiedAstar2
 				logger.debug(ex.getStackTrace());
 			}
 		}
-		
-		State inittState = new State(currNode.toString());
-		inittState.setInitial(true);
-		scheduleAuto.addState(inittState);
-		
-		logger.warn("currNode.toString() = " + currNode.toString());
-		logger.warn("initstate tillagt = " + inittState + "; isInitial = " + inittState.isInitial());
-		logger.warn("currNode_hasParent = " + currNode.getParent());
-		logger.warn("contains initState by name = " + scheduleAuto.containsStateWithName(currNode.toString()));
-		logger.warn("contains initState by state = " + scheduleAuto.containsState(inittState));
 		
 		return scheduleAuto;
 	}
