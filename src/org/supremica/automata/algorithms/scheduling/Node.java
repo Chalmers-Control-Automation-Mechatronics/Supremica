@@ -177,48 +177,38 @@ public class Node
 		}	
 		str += theStates[theStates.length-1].getName() + "]";
 		
-		str += ";   g = " + accumulatedCost + ";   Tv = [";
+		str += "; g = " + accumulatedCost + "; Tv = [";
 		for (int i=0; i<currentCosts.length-1; i++)
 			str += currentCosts[i] + " ";
 		str += currentCosts[currentCosts.length-1] + "]";
 		
 		return str;
 	}
-/*	
+	
 	public String toStringLight() {
-		String str = "";
+		String str = "[";
 		
-		for (int i=0; i<theStates.length-1; i++) 
-			str += theStates[i].getName() + ".";
-		str += theStates[theStates.length-1].getName() + "   g = " + accumulatedCost + "   Tv = [";
+		for (int i=0; i<theStates.length; i++) 
+			str += theStates[i].getName() + " ";
 		
-		for (int i=0; i<currentCosts.length-1; i++) {
-			if (currentCosts[i] > -1)
-				str += currentCosts[i] + " ";
-		}
-		if (currentCosts[currentCosts.length-1] > -1)
-			str += currentCosts[currentCosts.length-1];
 		str += "]";
 		
 		return str;
 	}
-*/	
+	
 
-	/*
-	public int hashCode()
-	{
+	
+	public int hashCode() {
 		int hash = 1;
 		
 		for (int i = 0; i < theStates.length; i++) {
 			hash += hash * theStates[i].getIndex();
-			hash *= 10;
+			hash *= 100;
 		}
-		
-		hash += hash * 100;
 		
 		return hash;
 	}
-*/
+
 	public boolean equals(Node otherNode) { 
 		if (theStates.length != otherNode.getStates().length)
 			return false; 
@@ -230,4 +220,11 @@ public class Node
 			
 		return true;
 	}
+	
+	public void resetCosts() {
+		accumulatedCost = 0;
+		for (int i=0; i<currentCosts.length; i++)
+			currentCosts[i] = 0;
+	}
 }
+

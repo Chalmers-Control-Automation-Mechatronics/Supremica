@@ -37,7 +37,8 @@ public class ModifiedAstar2
 	private ArrayList openList;
 	
 	/** Contains already examined (i.e. "closed") nodes. */
-	private ArrayList closedList;
+	//private ArrayList closedList;
+	private Hashtable closedNodes;
 	
 	/** Hashtable containing the estimated cost for each robot, having states as keys. **/
 	private Hashtable[] oneProdRelax; 
@@ -55,6 +56,10 @@ public class ModifiedAstar2
 	private Automaton theAutomaton;
 	
 	private Automata theAutomata;
+	
+//	private int[] currAutomataIndex;
+	
+	private int searchCounter;
 
 	public ModifiedAstar2(Automaton theAutomaton)
 	{
@@ -71,13 +76,12 @@ public class ModifiedAstar2
 	{
 		timer = new ActionTimer();
 		openList = new ArrayList();
-		closedList = new ArrayList();
+//		closedList = new ArrayList();
+		closedNodes = new Hashtable();
 		
 		if (theAutomata == null)
 			oneProdRelax[0] = new Hashtable();
 		else {
-			initOnlineSynchronizer();
-			
 			int nrOfPlants = theAutomata.getPlantAutomata().size();
 			oneProdRelax = new Hashtable[nrOfPlants];
 			for (int i=0; i<nrOfPlants; i++)
@@ -88,7 +92,8 @@ public class ModifiedAstar2
 				for (int i=0; i<twoProdRelax.length; i++)
 					twoProdRelax[i] = new Hashtable();
 			}
-				
+			
+			initOnlineSynchronizer(theAutomata);
 		}
 	}
 
@@ -100,6 +105,7 @@ public class ModifiedAstar2
 		// Den här if/else-slingan är ful och borde snyggas till (ersättas) en dag. 
 		// Körs igång om en synkning har valts som schemaläggningsoffer.
 		if (theAutomata == null) {
+/*
 			timer.start();
 	
 			int counter = 0;
@@ -132,7 +138,7 @@ public class ModifiedAstar2
 					}
 				}
 			}
-	
+*/	
 			return null;
 		}
 		// Om istället flera automater skall online-synkas-och-schemaläggas...
@@ -147,34 +153,67 @@ public class ModifiedAstar2
 				logger.info("Time for 2nd preprocessing: " + timer.elapsedTime() + " ms");
 			}
 			
+//			currAutomataIndex = null;
+			
+		
 			timer.start();
-			return scheduleFrom(new Node(makeInitialState()));
+			Node currNode = scheduleFrom(new Node(makeInitialState()));
+
+/*
+			if (currNode == null)
+				return null;
+			else if (!currNode.isAccepting())
+				return null;
+			else {
+*/
+				logger.info(currNode + ". States searched: " + searchCounter + " in time: " + timer.elapsedTime() + " ms.");
+				return currNode;
+//			}
 		}
 	}
 	
 	private Node scheduleFrom(Node initNode) {
+		return scheduleFrom(initNode, null);
+	}
+	
+	private Node scheduleFrom(Node initNode, int[] currAutomataIndex) {
 		openList.clear();
-		closedList.clear();
+//		closedList.clear();
+		closedNodes.clear();
 		openList.add(initNode);
 		
-		int counter = 0;
+//		int counter = 0;
 		
 		while (!openList.isEmpty()) {
-			counter++;
+			searchCounter++;
 			Node currNode = (Node) openList.remove(0);				
-			closedList.add(currNode);
-			
-			if (currNode.isAccepting()) {
-				logger.info(currNode + ". States searched: " + closedList.size() + " in time: " + timer.elapsedTime() + " ms.");
-				logger.info("A-stjärnat " + counter + " ggr");
+//			closedList.add(currNode);			
+	
+			if (currNode.isAccepting())
 				return currNode;
+			else if (currAutomataIndex != null) {
+				boolean acceptingWhenRelaxed = true;
+				
+				for (int i=0; i<currAutomataIndex.length; i++) {
+					if (!currNode.getState(currAutomataIndex[i]).isAccepting())
+						acceptingWhenRelaxed = false;
+				}
+				
+				if (acceptingWhenRelaxed)
+					return currNode;
 			}
+
+			boolean useOneProdRelax = false;
+			if (currAutomataIndex != null || theAutomata.getPlantAutomata().size() <= 2)
+				useOneProdRelax = true;
 			
-			Iterator childIter = expandNode(currNode).iterator();
+			closedNodes.put(currNode, new Integer(calcEstimatedCost(currNode, useOneProdRelax)));		
+			
+			Iterator childIter = expandNode(currNode, currAutomataIndex).iterator();		
 			while (childIter.hasNext()) {
 				Node childNode = (Node)childIter.next();
-				if (!isOnAList(childNode))
-					putOnOpenList(childNode);
+				if (!isOnAList(childNode, useOneProdRelax))
+					putOnOpenList(childNode, useOneProdRelax);
 			}				
 		}
 		
@@ -182,41 +221,59 @@ public class ModifiedAstar2
 		return null;
 	}
 	
-	private ArrayList expandNode(Node node) {
-		ArrayList childNodes = new ArrayList();
-		
+	private Collection expandNode(Node node) {
+		return expandNode(node, null);
+	}
+	
+	private Collection expandNode(Node node, int[] currAutomataIndex) {
+		//ArrayList childNodes = new ArrayList();
+		Hashtable childNodes = new Hashtable();
 		int[] currStateIndex = AutomataIndexFormHelper.createState(node.size());
+		
 		for (int i=0; i<node.size(); i++) 
 			currStateIndex[i] = node.getState(i).getIndex();
-		
+	
 		int[] currOutgoingEvents = onlineSynchronizer.getOutgoingEvents(currStateIndex);
+//	logger.error("currOE.length = " + currOutgoingEvents.length);
 		for (int i=0; i<currOutgoingEvents.length; i++) {
 			if (onlineSynchronizer.isEnabled(currOutgoingEvents[i])) {
-				int[] nextState = onlineSynchronizer.doTransition(currStateIndex, currOutgoingEvents[i]);
-				State[] theStates = new State[theAutomata.size()];
+				int[] nextStateIndex = onlineSynchronizer.doTransition(currStateIndex, currOutgoingEvents[i]);
+
+				boolean indexChanged = false;
+				if (currAutomataIndex != null) {
+					for (int k=0; k<currAutomataIndex.length; k++) {
+						if (nextStateIndex[currAutomataIndex[k]] != currStateIndex[currAutomataIndex[k]])
+							indexChanged = true;
+					}
+				}
 				
-				for (int j=0; j<theAutomata.size(); j++)
-					theStates[j] = autoIndexForm.getState(j, nextState[j]);
-				
-				childNodes.add(new Node(theStates, node));
+				if (currAutomataIndex == null || indexChanged) {
+					State[] theStates = new State[currStateIndex.length-2];
+					for (int j=0; j<theStates.length; j++)
+						theStates[j] = autoIndexForm.getState(j, nextStateIndex[j]);
+
+					Node newNode = new Node(theStates, node);
+					if (!childNodes.containsValue(newNode))
+						childNodes.put(newNode, newNode);
+				}			
 			}
 		}
-		
-		return childNodes;
+
+		return childNodes.values();
 	}
 
 	/**
 	 * 			Inserts the node into the openList according to the estimatedCost (ascending).
 	 * @param 	node
 	 */
-	private void putOnOpenList(Node node) {
-		int estimatedCost = calcEstimatedCost(node);
+	private void putOnOpenList(Node node, boolean useOneProdRelax) {
+		int estimatedCost = calcEstimatedCost(node, useOneProdRelax);
 		int counter = 0;
 		Iterator iter = openList.iterator();
 		
 		while (iter.hasNext()) {
 			Node n = (Node)iter.next();
-			if (estimatedCost < calcEstimatedCost(n)) {
+			if (estimatedCost < calcEstimatedCost(n, useOneProdRelax)) {
 				openList.add(counter, node);
 				return;
 			}
@@ -235,14 +292,14 @@ public class ModifiedAstar2
 	 * 		   	the guy on the closedList. 
 	 */
 	// Också lite fult...
-	private boolean isOnAList(Node node) {
-		int estimatedCost = calcEstimatedCost(node);
+	private boolean isOnAList(Node node, boolean useOneProdRelax) {
+		int estimatedCost = calcEstimatedCost(node, useOneProdRelax);
 		
 		Iterator iter = openList.iterator();
 		while (iter.hasNext()) {
 			Node n = (Node)iter.next();
-			if (node.equals(n)) {
-				if (estimatedCost >= calcEstimatedCost(n))
+			if (node.hashCode() == n.hashCode()) {
+				if (estimatedCost >= calcEstimatedCost(n, useOneProdRelax))
 					return true;
 				else {
 					openList.remove(openList.indexOf(n));
@@ -251,34 +308,29 @@ public class ModifiedAstar2
 			}
 		}
 		
-		iter = closedList.iterator();
-		
-		while(iter.hasNext()) {
-			Node n = (Node)iter.next();
-			if (node.equals(n)) {
-				if (estimatedCost >= calcEstimatedCost(n))
-					return true;
-				else {
-					closedList.remove(closedList.indexOf(n));
-					return false;
-				}
-			}			
+		if (closedNodes.containsKey(node)) {
+			if (estimatedCost >= ((Integer)closedNodes.get(node)).intValue())
+				return true;
+			else {
+				closedNodes.remove(node);
+				return false;
+			}
 		}
-		
-		return false;
+		else
+			return false;
 	}
 
 	/**
 	 * @param initialState
 	 */
-	private void initOnlineSynchronizer() {
+	private void initOnlineSynchronizer(Automata synchedAutos) {
 		//	Get current options
 		SynchronizationOptions syncOptions = new SynchronizationOptions();
 		syncOptions.setBuildAutomaton(false);
 		syncOptions.setRequireConsistentControllability(false);
 
 		try {
-			AutomataSynchronizerHelper helper = new AutomataSynchronizerHelper(theAutomata, syncOptions);
+			AutomataSynchronizerHelper helper = new AutomataSynchronizerHelper(synchedAutos, syncOptions);
 			onlineSynchronizer = new AutomataSynchronizerExecuter(helper);
 			onlineSynchronizer.initialize();
 			autoIndexForm = helper.getAutomataIndexForm();
@@ -355,73 +407,145 @@ public class ModifiedAstar2
 	 * 			twoProdRelax.
 	 */
 	private void preprocess2() {
-		int hashtableCounter = -1;
+		logger.warn("Börjar preprocess2:a....");
+		
+//		int hashtableCounter = -1;
 		Automata plantAutomata = theAutomata.getPlantAutomata();
-		for (int i=0; i<plantAutomata.size()-1; i++) {
-			for (int j=i+1; j<plantAutomata.size(); j++) {
-				hashtableCounter++;
+		
+		
+		for (int i=0; i<1; i++) { //plantAutomata.size()-1; i++) {
+			for (int j=i+1; j<i+2; j++) { //plantAutomata.size(); j++) {
+//				hashtableCounter++;
+				int hashtableIndex = calcHashtableIndex(i,j);
+				
+				int schedCounter = 0;
+				
+				int[] currAutomataIndex = new int[]{theAutomata.getAutomatonIndex(plantAutomata.getAutomatonAt(i)),
+													theAutomata.getAutomatonIndex(plantAutomata.getAutomatonAt(j))};
+/*				
+				Automata currAutomata = new Automata(plantAutomata.getAutomatonAt(i));
+				currAutomata.addAutomaton(plantAutomata.getAutomatonAt(j));
+			currAutomata.addAutomata(theAutomata.getSpecificationAutomata());
+*/
+//				initOnlineSynchronizer(currAutomata);
+//plantAutomata.getAutomatonAt(2).setDisabled(true);
 				
 				ArrayList tree = new ArrayList();
-				State[] theStates = new State[]{plantAutomata.getAutomatonAt(i).getInitialState(), 
-												plantAutomata.getAutomatonAt(j).getInitialState()};		
-				tree.add(new Node(theStates));
 				
+//				State[] theStates = makeInitialState();
+				//State[] theStates = new State[]{plantAutomata.getAutomatonAt(i).getInitialState(), 
+				//								plantAutomata.getAutomatonAt(j).getInitialState()};
+//				State[] theStates = new State[currAutomata.size()];				
+//				for (int k=0; k<theStates.length; k++)
+//					theStates[k] = currAutomata.getAutomatonAt(k).getInitialState();
+				
+				tree.add(new Node(makeInitialState()));
+
 				while (!tree.isEmpty()) {
 					Node currNode = (Node)tree.remove(0);
-					tree.add(expandNode(currNode));
-					
-					Node accNode = scheduleFrom(currNode);
-					twoProdRelax[hashtableCounter].put(currNode, new Integer(accNode.getAccumulatedCost()));					
+					tree.addAll(expandNode(currNode, currAutomataIndex));	
+		
+					schedCounter++;
+					currNode.resetCosts();
+					Node accNode = scheduleFrom(currNode, currAutomataIndex);
+
+					if (accNode != null)
+						twoProdRelax[hashtableIndex].put(currNode, new Integer(accNode.getAccumulatedCost()));
 				}
+				
+				logger.warn("Schedade " + schedCounter + " gånger");
 			}
 		}
+		
+		logger.warn("Klar med preprocess2:andet");
 	}
 	
+	/**
+	 * 	Räknar ut en passande index för hashtabellen till en tvårobot-relaxering mha en 
+	 * 	klurig (och förhoppningsvis korrekt) formel.
+	 * @param i
+	 * @param j
+	 * @return
+	 */
+	private int calcHashtableIndex(int i, int j) {
+		int size = theAutomata.getPlantAutomata().size();
+	
+		return (int) (i*(size - 1.5) - 0.5*(i*i) - 1 + j); 
+	}
+/*
 	private int calcEstimatedCost(Node theNode) {
-		int[] costs = theNode.getCurrentCosts();
+		return calcEstimatedCost(theNode, false);
+	}
+*/	
+	private int calcEstimatedCost(Node theNode, boolean useOneProdRelax) {
+/*		int[] costs = theNode.getCurrentCosts();
 		int counter = 0;
 		
 		for (int i=0; i<costs.length; i++) {
 			if (costs[i] >= 0)
 				counter++;
 		}
-		
-		if (counter <= 2) 
+*/		
+//		if (counter <= 2)
+		if (useOneProdRelax)
 			return theNode.getAccumulatedCost() + getOneProdRelaxation(theNode);
 		else
 			return theNode.getAccumulatedCost() + getTwoProdRelaxation(theNode);
 	}
 	
+//	 Det här är fult och borde göras om till att likan getTwoProdRelaxation på nåt sätt
 	private int getOneProdRelaxation(Node theNode) {
 		Automata plantAutomata = theAutomata.getPlantAutomata();
 		int estimate = 0;
 		
-		for (int i=0; i<plantAutomata.size(); i++) {
-			int altEstimate = theNode.getCurrentCosts()[i] + ((Integer)oneProdRelax[i].get(theNode.getState(i))).intValue();
-		
-			if (altEstimate > estimate)
-				estimate = altEstimate;	
+		// Den här upprepningen är det fula
+//		if (currAutomataIndex == null) {
+			for (int i=0; i<plantAutomata.size(); i++) {
+				int altEstimate = theNode.getCurrentCosts()[i] + ((Integer)oneProdRelax[i].get(theNode.getState(i))).intValue();
+			
+				if (altEstimate > estimate)
+					estimate = altEstimate;	
+			}
+//		}
+/*		else {
+			for (int i=0; i<theNode.size(); i++) {
+				int altEstimate = theNode.getCurrentCosts()[i] + ((Integer)oneProdRelax[currAutomataIndex[i]].get(theNode.getState(i))).intValue();
+			
+				if (altEstimate > estimate)
+					estimate = altEstimate;	
+			}
 		}
-
+*/		
 		return estimate;
 	}
 	
 	private int getTwoProdRelaxation(Node theNode) {
 		int plantAutomataSize = theAutomata.getPlantAutomata().size();
-		int estimate = 0;
-		int hashtableCounter = 0;
+		int[] currentCosts = theNode.getCurrentCosts();
+//		int hashtableCounter = 0;
 		
+		int estimate = 0;
 		for (int i=0; i<plantAutomataSize-1; i++) {
 			for (int j=i+1; j<plantAutomataSize; j++) {
-				State[] theStates = new State[]{theNode.getState(i), theNode.getState(j)};
-				int altEstimate = ((Integer)twoProdRelax[hashtableCounter].get(new Node(theStates))).intValue();
+//				State[] theStates = new State[]{theNode.getState(i), theNode.getState(j)};
+//				int altEstimate = ((Integer)twoProdRelax[hashtableCounter].get(new Node(theStates))).intValue();
+				
+				// Funkar bara om alla noder i den totala synkningen har 2-prod-relaxerats
+				// Har de det?????????????
+				int altEstimate = ((Integer)twoProdRelax[calcHashtableIndex(i,j)].get(theNode)).intValue();
 				
 				if (altEstimate > estimate)
 					estimate = altEstimate;	
 			}		
 		}
+		
+		int minCurrCost = currentCosts[0];
+		for (int i=1; i<currentCosts.length; i++) {
+			if (currentCosts[i] < minCurrCost)
+				minCurrCost = currentCosts[i];
+		}
 
-		return estimate;
+		return estimate + minCurrCost;
 	}
 	
 	// Borde kanske ligga i "Automaton.java" men det kanske inte är tillräckligt
@@ -470,7 +594,7 @@ public class ModifiedAstar2
 	 *
 	 *      @return true if the insertion operation has been performed.
 	 */
-	private boolean insertIntoClosedList(Node node)
+/*	private boolean insertIntoClosedList(Node node)
 	{
 		String key = node.getName();
 		int cursor = 0;
@@ -505,7 +629,7 @@ public class ModifiedAstar2
 
 		return true;
 	}
-	
+*/	
 	public Automaton buildScheduleAutomaton(Node currNode)
 	{
 		Automaton scheduleAuto = new Automaton();
@@ -535,11 +659,17 @@ public class ModifiedAstar2
 				logger.debug(ex.getStackTrace());
 			}
 		}
-
-		State initState = new State(currNode.toString());
-		initState.setInitial(true);
-		scheduleAuto.addState(initState);
-
+		
+		State inittState = new State(currNode.toString());
+		inittState.setInitial(true);
+		scheduleAuto.addState(inittState);
+		
+		logger.warn("currNode.toString() = " + currNode.toString());
+		logger.warn("initstate tillagt = " + inittState + "; isInitial = " + inittState.isInitial());
+		logger.warn("currNode_hasParent = " + currNode.getParent());
+		logger.warn("contains initState by name = " + scheduleAuto.containsStateWithName(currNode.toString()));
+		logger.warn("contains initState by state = " + scheduleAuto.containsState(inittState));
+		
 		return scheduleAuto;
 	}
 
@@ -577,13 +707,14 @@ public class ModifiedAstar2
 		
 		return null;
 	}
-	
+/*	
 	public Integer makeMapKey(Node node)
 	{
 		int hash = 1;
 		
 		for (int i = 0; i < node.size(); i++) {
 			hash += hash * node.getState(i).getIndex();
+			// Varför just 10???
 			hash *= 10;
 		}
 		
@@ -591,7 +722,7 @@ public class ModifiedAstar2
 		
 		return new Integer(hash);
 	}
-
+*/
 	/**
 	 *      Checks if a possible accumulatedCost-loss is fully compensated by
 	 *      every currentCosts-savings.
