@@ -23,23 +23,23 @@ public class Node
 	{
 		this(theState, null);
 	}
-	
+
 	public Node(State[] theStates) {
 		this(theStates, null);
 	}
-	
+
 	// Något fult..................
 	public Node(State[] theStates, Node theParent) {
 		currentCosts = new int[theStates.length];
 		this.theStates = new State[theStates.length];
-		
+
 		for (int i=0; i<theStates.length; i++)
 			this.theStates[i] = theStates[i];
 
 		if (theParent != null) {
 			this.theParent = theParent;
 			int costReduction = 0;
-			
+
 			for (int i=0; i<theStates.length; i++) {
 				if (theStates[i].getCost() > -1) {
 					if (!(theParent.getState(i).getName().equals(theStates[i].getName()))) {
@@ -48,25 +48,25 @@ public class Node
 						accumulatedCost = theParent.getAccumulatedCost() + costReduction;
 					}
 				}
-				else 
+				else
 					currentCosts[i] = theStates[i].getCost();
-			}		
+			}
 
 			for (int i=0; i<theStates.length; i++) {
 				if (theStates[i].getCost() > -1) {
 					if (theParent.getState(i).getName().equals(theStates[i].getName())) {
 						currentCosts[i] = theParent.getCurrentCosts()[i] - costReduction;
-						
+
 						if (currentCosts[i] < 0)
 							currentCosts[i] = 0;
 					}
-				}			
+				}
 			}
 		}
-		else {				
-			for (int i=0; i<theStates.length; i++) 
+		else {
+			for (int i=0; i<theStates.length; i++)
 				currentCosts[i] = theStates[i].getCost();
-			
+
 			accumulatedCost = 0;
 		}
 	}
@@ -138,7 +138,7 @@ public class Node
 				if (!theStates[i].isAccepting())
 					return false;
 			}
-			
+
 			return true;
 		}
 	}
@@ -147,11 +147,11 @@ public class Node
 	{
 		return theState.getName();
 	}
-	
+
 	public State[] getStates() {
 		return theStates;
 	}
-	
+
 	/**
 	 * @param i
 	 * @return
@@ -161,66 +161,68 @@ public class Node
 			return theStates[i];
 		return null;
 	}
-	
+
 	public int size() {
 		if (theStates == null)
 			return 1;
 		else
 			return theStates.length;
 	}
-	
+
 	public String toString() {
 		String str = "[";
-		
+
 		for (int i=0; i<theStates.length-1; i++) {
 			str += theStates[i].getName() + " ";
-		}	
+		}
 		str += theStates[theStates.length-1].getName() + "]";
-		
+
 		str += "; g = " + accumulatedCost + "; Tv = [";
 		for (int i=0; i<currentCosts.length-1; i++)
 			str += currentCosts[i] + " ";
 		str += currentCosts[currentCosts.length-1] + "]";
-		
+
 		return str;
 	}
-	
+
 	public String toStringLight() {
 		String str = "[";
-		
-		for (int i=0; i<theStates.length; i++) 
+
+		for (int i=0; i<theStates.length; i++)
 			str += theStates[i].getName() + " ";
-		
+
 		str += "]";
-		
+
 		return str;
 	}
-	
 
-	
+
+
 	public int hashCode() {
 		int hash = 1;
-		
+
 		for (int i = 0; i < theStates.length; i++) {
 			hash += hash * theStates[i].getIndex();
 			hash *= 100;
 		}
-		
+
 		return hash;
 	}
 
-	public boolean equals(Node otherNode) { 
+	public boolean equals(Object obj) {
+		Node otherNode = (Node)obj;
+
 		if (theStates.length != otherNode.getStates().length)
-			return false; 
-		
-		for (int i=0; i<theStates.length; i++) {
-			if (theStates[i].getIndex() != otherNode.getState(i).getIndex())
-				return false;
+					return false;
+
+				for (int i=0; i<theStates.length; i++) {
+					if (theStates[i].getIndex() != otherNode.getState(i).getIndex())
+						return false;
 		}
-			
+
 		return true;
 	}
-	
+
 	public void resetCosts() {
 		accumulatedCost = 0;
 		for (int i=0; i<currentCosts.length; i++)

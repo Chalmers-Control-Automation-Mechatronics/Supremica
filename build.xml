@@ -319,6 +319,25 @@
 	/>
 </target>
 
+<!-- Compile:
+*	Reuses existing class files, but recompiles those
+*	source files that have changed.
+-->
+<target name="compile_scheduling">
+	<javac
+		srcdir="${src}"
+		destdir="${build}"
+		classpath="${lib}/${unjared}"
+		includeJavaRuntime="yes"
+		deprecation="false"
+		verbose="false"
+		nowarn="true"
+		includes="
+			${supremica_basedir}/automata/algorithms/scheduling/**"		
+		source="1.4"
+	/>
+</target>
+
 <!-- Compile Supremica Tests
 *	Reuses existing class files, but recompiles those
 *	source files that have changed.
