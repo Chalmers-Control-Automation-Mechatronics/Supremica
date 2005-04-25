@@ -186,14 +186,11 @@ public class ModifiedAstar2
 		openList.clear();
 		closedNodes.clear();
 		openList.add(initNode);
-
-		Node currNode = null;
-
+		
 		while (!openList.isEmpty()) {
 			searchCounter++;
-			//Node
-			currNode = (Node) openList.remove(0);
-
+			Node currNode = (Node) openList.remove(0);
+		
 			if (currNode.isAccepting())
 				return currNode;
 			else if (currAutomataIndex != null) {
@@ -208,7 +205,7 @@ public class ModifiedAstar2
 					return currNode;
 			}
 
-			boolean useOneProdRelax = false;
+			boolean	useOneProdRelax = false;
 			if (currAutomataIndex != null || theAutomata.getPlantAutomata().size() <= 2)
 				useOneProdRelax = true;
 
@@ -223,24 +220,8 @@ public class ModifiedAstar2
 			}
 		}
 
-
-
-
-		String s = "[";
-		for (int i=0; i<currAutomataIndex.length; i++) {
-			s += currAutomataIndex[i] + " ";
-		}
-		s += "];    ";
-		for (int i=0; i<currAutomataIndex.length; i++) {
-			s += currNode.getState(currAutomataIndex[i]) + " ";
-		}
-
-
-
-
-
-		logger.error("Inget markerat tillstånd kunde hittas............, s = " + s);
-		logger.info("currNode = " + currNode);
+		logger.error("Inget markerat tillstånd kunde hittas............");
+		return null;
 	}
 
 	private Collection expandNode(Node node) {
@@ -319,9 +300,11 @@ public class ModifiedAstar2
 
 		Iterator iter = openList.iterator();
 		while (iter.hasNext()) {
-			Node n = (Node)iter.next();
-			if (node.hashCode() == n.hashCode()) {
-				if (estimatedCost >= calcEstimatedCost(n, useOneProdRelax))
+//			Node n = (Node)iter.next();
+//			if (node.hashCode() == n.hashCode()) {
+			Object n = iter.next();
+			if (node.equals(n)) {
+				if (estimatedCost >= calcEstimatedCost((Node)n, useOneProdRelax))
 					return true;
 				else {
 					openList.remove(openList.indexOf(n));
