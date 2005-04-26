@@ -39,6 +39,8 @@ public class ModifiedAstar2
 	/** Contains already examined (i.e. "closed") nodes. */
 	//private ArrayList closedList;
 	private Hashtable closedNodes;
+	
+//	private TreeMap openNodes;
 
 	/** Hashtable containing the estimated cost for each robot, having states as keys. **/
 	private Hashtable[] oneProdRelax;
@@ -77,6 +79,7 @@ public class ModifiedAstar2
 		timer = new ActionTimer();
 		openList = new ArrayList();
 		closedNodes = new Hashtable();
+//		openNodes = new TreeMap();
 
 		if (theAutomata == null)
 			oneProdRelax[0] = new Hashtable();
@@ -169,9 +172,11 @@ public class ModifiedAstar2
 				return null;
 			else {
 */
+
 				infoStr += "\tA*-iterations: " + searchCounter + " in time: " + timer.elapsedTime() + " ms.\n";
 				infoStr += "\t\t"+ currNode;
 				logger.info(infoStr);
+
 
 				return currNode;
 //			}
@@ -184,12 +189,16 @@ public class ModifiedAstar2
 
 	private Node scheduleFrom(Node initNode, int[] currAutomataIndex) {
 		openList.clear();
+//		openNodes.clear();
 		closedNodes.clear();
 		openList.add(initNode);
+//		openNodes.put(new Double(0), initNode);
 		
 		while (!openList.isEmpty()) {
+//		while (!openNodes.isEmpty()) {
 			searchCounter++;
 			Node currNode = (Node) openList.remove(0);
+//			Node currNode = (Node) openNodes.remove(openNodes.firstKey());
 		
 			if (currNode.isAccepting())
 				return currNode;
@@ -298,21 +307,24 @@ public class ModifiedAstar2
 	private boolean isOnAList(Node node, boolean useOneProdRelax) {
 		int estimatedCost = calcEstimatedCost(node, useOneProdRelax);
 
+//		Collection values = openNodes.values();
+//		Iterator iter = values.iterator();
 		Iterator iter = openList.iterator();
 		while (iter.hasNext()) {
-//			Node n = (Node)iter.next();
-//			if (node.hashCode() == n.hashCode()) {
 			Object n = iter.next();
+			
 			if (node.equals(n)) {
 				if (estimatedCost >= calcEstimatedCost((Node)n, useOneProdRelax))
 					return true;
 				else {
 					openList.remove(openList.indexOf(n));
+//					openNodes.
 					return false;
 				}
 			}
 		}
 
+		
 		if (closedNodes.containsKey(node)) {
 			if (estimatedCost >= ((Integer)closedNodes.get(node)).intValue())
 				return true;
