@@ -66,7 +66,7 @@ public class Resource extends NamedObject
 
 
     private Resource() {}
-	
+
     public Resource(String name)
     {
 	System.out.println("Resource(" + name + ")");
