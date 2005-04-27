@@ -59,7 +59,9 @@ public class ModifiedAstar2
 
 	private Automata theAutomata;
 
-//	private int[] currAutomataIndex;
+	private Automata plantAutomata;
+
+	private int[] activeAutomataIndex;
 
 	private int searchCounter;
 
@@ -80,6 +82,8 @@ public class ModifiedAstar2
 		openList = new ArrayList();
 		closedNodes = new Hashtable();
 //		openNodes = new TreeMap();
+
+		plantAutomata = theAutomata.getPlantAutomata();
 
 		if (theAutomata == null)
 			oneProdRelax[0] = new Hashtable();
@@ -163,24 +167,63 @@ public class ModifiedAstar2
 
 			timer.start();
 			searchCounter = 0;
-			Node currNode = scheduleFrom(new Node(makeInitialState()));
+//			Node currNode = scheduleFrom(new Node(makeInitialState()));
 
+
+
+
+
+
+			activeAutomataIndex = new int[plantAutomata.size()];
+			for (int i=0; i<activeAutomataIndex.length; i++) {
+				activeAutomataIndex[i] = theAutomata.getAutomatonIndex(plantAutomata.getAutomatonAt(i));
+			}
+			int[] initialNode = makeInitialNode();
+			int[] currNode = scheduleFrom(initialNode);
+
+			String s1 = "";
+			String s2 = "";
+			for (int i=0; i<initialNode.length; i++) {
+				s1 += initialNode[i] + " ";
+				s2 += currNode[i] + " ";
+			}
+			logger.warn("initial = " + s1);
+			logger.warn("final = " + s2);
+
+
+
+
+			
 /*
-			if (currNode == null)
-				return null;
-			else if (!currNode.isAccepting())
-				return null;
-			else {
-*/
 
 				infoStr += "\tA*-iterations: " + searchCounter + " in time: " + timer.elapsedTime() + " ms.\n";
 				infoStr += "\t\t"+ currNode;
 				logger.info(infoStr);
 
-
 				return currNode;
+*/
+return null;
 //			}
 		}
+	}
+
+	private int[] scheduleFrom(int[] initNode) {
+		int[] finalNode = new int[initNode.length];
+
+		openList.clear();
+		closedNodes.clear();
+		openList.add(initNode);
+		
+		while(!openList.isEmpty()) {
+			//Skall inte denna ökas på senare i slingan????
+			searchCounter++;
+
+			finalNode = (int[]) openList.remove(0);
+
+			expandNode(finalNode);
+		}
+
+		return finalNode;
 	}
 
 	private Node scheduleFrom(Node initNode) {
@@ -214,7 +257,7 @@ public class ModifiedAstar2
 					return currNode;
 			}
 
-			boolean	useOneProdRelax = false;
+			boolean useOneProdRelax = false;
 			if (currAutomataIndex != null || theAutomata.getPlantAutomata().size() <= 2)
 				useOneProdRelax = true;
 
@@ -233,6 +276,44 @@ public class ModifiedAstar2
 		return null;
 	}
 
+	private Collection expandNode(int[] node) {
+		int[] currStateIndex = AutomataIndexFormHelper.createState(theAutomata.size());
+		for (int i=0; i<currStateIndex.length; i++)
+			currStateIndex[i] = node[i];
+
+		int[] currOutgoingEvents = onlineSynchronizer.getOutgoingEvents(currStateIndex);
+
+		for (int i=0; i<currOutgoingEvents.length; i++) {
+			if (onlineSynchronizer.isEnabled(currOutgoingEvents[i])) {
+				int[] nextStateIndex = onlineSynchronizer.doTransition(currStateIndex, currOutgoingEvents[i]);
+
+				boolean indexChanged = false;
+				if (activeAutomataIndex.length < plantAutomata.size()) {
+					for (int k=0; k<activeAutomataIndex.length; k++) {
+						if (nextStateIndex[activeAutomataIndex[k]] != currStateIndex[activeAutomataIndex[k]])
+							indexChanged = true;
+					}
+				}
+
+				if (indexChanged || activeAutomataIndex.length == plantAutomata.size()) {
+				//TODO: Skapa int[] newNode
+/*
+					State[] theStates = new State[currStateIndex.length-2];
+					for (int j=0; j<theStates.length; j++)
+						theStates[j] = autoIndexForm.getState(j, nextStateIndex[j]);
+
+					Node newNode = new Node(theStates, node);
+					if (!childNodes.containsValue(newNode))
+						childNodes.put(newNode, newNode);
+*/
+				}
+			}
+		}
+
+		return null;
+	}
+
+
 	private Collection expandNode(Node node) {
 		return expandNode(node, null);
 	}
@@ -244,6 +325,12 @@ public class ModifiedAstar2
 
 		for (int i=0; i<node.size(); i++)
 			currStateIndex[i] = node.getState(i).getIndex();
+
+		logger.warn("curr node = " + node.toStringLight());
+		String s = "";
+		for (int a=0; a<currStateIndex.length; a++)
+			s += currStateIndex[a] + " ";
+		logger.info("index = " + s);
 
 		int[] currOutgoingEvents = onlineSynchronizer.getOutgoingEvents(currStateIndex);
 
@@ -357,6 +444,7 @@ public class ModifiedAstar2
 		//helper.setCoExecuter(onlineSynchronizer);
 	}
 
+	// Bör kommas bort snart
 	private State[] makeInitialState() {
 		State[] initialState = new State[theAutomata.size()];
 
@@ -364,6 +452,28 @@ public class ModifiedAstar2
 			initialState[i] = theAutomata.getAutomatonAt(i).getInitialState();
 
 		return initialState;
+	}
+
+	private int[] makeInitialNode() {
+		int[] defaultStateIndex = AutomataIndexFormHelper.createState(theAutomata.size());
+		int[] initialNode = new int[defaultStateIndex.length + theAutomata.size() + theAutomata.getPlantAutomata().size() + 1];
+		Automata plantAutomata = theAutomata.getPlantAutomata();
+
+		for (int i=0; i<theAutomata.size(); i++) 
+			initialNode[i] = theAutomata.getAutomatonAt(i).getInitialState().getIndex();
+		
+		for (int i=theAutomata.size(); i<defaultStateIndex.length; i++)
+			initialNode[i] = defaultStateIndex[i];
+
+		for (int i=defaultStateIndex.length; i<(defaultStateIndex.length + theAutomata.size()); i++)
+			initialNode[i] = -1;
+	
+		for (int i=0; i<plantAutomata.size(); i++) 
+			initialNode[i + defaultStateIndex.length + theAutomata.size()] = plantAutomata.getAutomatonAt(i).getInitialState().getCost();
+
+		initialNode[initialNode.length-1] = 0;
+
+		return initialNode;
 	}
 
 	/**
