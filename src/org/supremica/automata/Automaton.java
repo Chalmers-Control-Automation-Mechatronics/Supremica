@@ -586,22 +586,6 @@ public class Automaton
 		int index = state.getIndex();
 		indexStateMap.remove(new Integer(index));
 		notifyListeners(AutomatonListeners.MODE_STATE_REMOVED, state);
-
-		/* Äh! Funkar ju inte?
-		// Replace the index of the State with the highest index with the removed State's index
-		int lastIndex = indexStateMap.size()-1;
-		if (index != lastIndex)
-		{
-			logger.info("--------" + lastIndex + "---------");
-			logger.info("" + ((State) indexStateMap.get(new Integer(lastIndex-1)) != null));
-			logger.info("" + ((State) indexStateMap.get(new Integer(lastIndex)) != null));
-			logger.info("" + ((State) indexStateMap.get(new Integer(lastIndex+1)) != null));
-			State lastState = (State) indexStateMap.get(new Integer(lastIndex));
-			lastState.setIndex(index);
-			indexStateMap.remove(new Integer(lastIndex));
-			indexStateMap.put(new Integer(index), state);
-		}
-		*/
 	}
 
 	public boolean hasInitialState()

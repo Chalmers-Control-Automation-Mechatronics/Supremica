@@ -607,6 +607,18 @@ class GeneralPanel
 
 	public boolean doApply()
 	{
+		// Sanity check...
+		String newSeparatorString = stateSeparator.getText();
+		if (newSeparatorString.contains("q"))
+		{
+			JOptionPane.showMessageDialog(null, "'" + newSeparatorString + 
+										  "' is not an appropriate state separator string.\n" + 
+										  "Please avoid numerals and the letter 'q' in the\n" + 
+										  "separator string", "Inappropriate state separator string", JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
+
+		// Do the applying!
 		int nbrOfThreads = PreferencesDialog.getInt("Nbr of threads", nbrOfExecuters.getText(), 1);
 		if (nbrOfThreads == Integer.MIN_VALUE) // What's this good for??
 		{
