@@ -182,7 +182,7 @@ public class State
 	*/
 
 	/**
-	 * This is an ugly method that only are needed when dealing
+	 * This is an ugly method that only is needed when dealing
 	 * with automataIndexForm. All methods that works with index
 	 * needs special initialisation that is not automatically done.
 	 * This method is not recommended for general use.
@@ -193,7 +193,7 @@ public class State
 	}
 
 	/**
-	 * This is an ugly method that only are needed when dealing
+	 * This is an ugly method that only is needed when dealing
 	 * with automataIndexForm. All methods that works with index
 	 * needs special initialisation that is not automatically done.
 	 * This method is not recommended for general use.

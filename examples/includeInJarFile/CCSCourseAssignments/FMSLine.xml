@@ -7,7 +7,7 @@
 	</Events>
 	<States>
 		<State id="m50" initial="true" accepting="true"/>
-		<State id="m51"/>
+		<State id="m51" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="m50" dest="m51" event="s5"/>
@@ -21,7 +21,7 @@
 	</Events>
 	<States>
 		<State id="m40" initial="true" accepting="true"/>
-		<State id="m41"/>
+		<State id="m41" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="m40" dest="m41" event="s4"/>
@@ -35,7 +35,7 @@
 	</Events>
 	<States>
 		<State id="m30" initial="true" accepting="true"/>
-		<State id="m31"/>
+		<State id="m31" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="m30" dest="m31" event="s3"/>
@@ -49,7 +49,7 @@
 	</Events>
 	<States>
 		<State id="m20" initial="true" accepting="true"/>
-		<State id="m21"/>
+		<State id="m21" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="m20" dest="m21" event="s2"/>
@@ -63,7 +63,7 @@
 	</Events>
 	<States>
 		<State id="m10" initial="true" accepting="true"/>
-		<State id="m11"/>
+		<State id="m11" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="m10" dest="m11" event="s1"/>

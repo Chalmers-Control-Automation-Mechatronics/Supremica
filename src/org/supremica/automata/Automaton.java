@@ -315,12 +315,14 @@ public class Automaton
 		return isDisabled;
 	}
 
-	// Quick and ugly fixx, see bug report
-	// When working with the state-indices, sometimes, somehow the indices in
-	// indexStateMap become different from the indices stored in the State:s
-	// This func iterates over the states and rebuilds the map
-	// Used by ModifiedAstar
-	//  When is the slow and beautiful fixx due?
+	//  When is the slow and beautiful fixx due? When EXACTLY does the indices "become different"?
+	/** 
+	 * Quick and ugly fixx, see bug report
+	 * When working with the state-indices, sometimes, somehow the indices in
+	 * indexStateMap become different from the indices stored in the State:s
+	 * This func iterates over the states and rebuilds the map
+	 * Used by ModifiedAstar
+	 */
 	public void remapStateIndices()
 	{
 		indexStateMap.clear();

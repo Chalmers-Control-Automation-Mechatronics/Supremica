@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<SupremicaProject name="AGV" comment="Example from J.O. Moody and P.J. Antsaklis, 'Supervisory Control of Discrete Event Systems Using Petri Nets', p.120.">
+<SupremicaProject name="AGV" comment="Example from J.O. Moody and P.J. Antsaklis, 'Supervisory Control of Discrete Event Systems Using Petri Nets', p.120. The last specification 'ZoneX' was not included in the original model and it introduces a new zone at the input station (the leftmost one in the animation figure). Without 'ZoneX' the system is nonblocking, with 'ZoneX' the system is blocking. The system is not controllable. Modular controllability synthesis works fine here and just so happens to return a modular supervisor that is also nonblocking (in both cases).">
 <!-- Input stations -->
 <Automaton name="Input1" type="Plant">
 	<Events>
@@ -299,7 +299,7 @@
   </Transitions>
  </Automaton>
  <!-- Zone specs -->
- <Automaton name="Zon1" type="Specification">
+ <Automaton name="Zone1" type="Specification">
 	<Events>
 		<Event id="c1" label="c1"/>
 		<Event id="c2" label="c2"/>
@@ -328,7 +328,7 @@
 		<Transition source="q4" dest="q0" event="u10"/>
 	</Transitions>
 </Automaton>
- <Automaton name="Zon2" type="Specification">
+ <Automaton name="Zone2" type="Specification">
   <Events>
    <Event id="c6" label="c6" controllable="true" prioritized="true" />
    <Event id="u21" label="u21" controllable="false" prioritized="true" />
@@ -357,7 +357,7 @@
    <Transition event="u27" source="q3" dest="q0" />
   </Transitions>
  </Automaton>
-<Automaton name="Zon3" type="Specification">
+<Automaton name="Zone3" type="Specification">
 	<Events>
 		<Event id="c4" label="c4"/>
 		<Event id="c7" label="c7"/>
@@ -386,7 +386,7 @@
 		<Transition source="q4" dest="q0" event="u40"/>
 	</Transitions>
 </Automaton>
-<Automaton name="Zon4" type="Specification">
+<Automaton name="Zone4" type="Specification">
 	<Events>
 		<Event id="c8" label="c8"/>
 		<Event id="c9" label="c9"/>
@@ -415,9 +415,8 @@
 		<Transition source="q4" dest="q0" event="u52"/>
 	</Transitions>
 </Automaton>
-<!-- Only one AGV at the input statiosn at a time -->
-<!--
-<Automaton name="ZonX" type="Specification">
+<!-- Only one AGV at the input station at a time -->
+<Automaton name="ZoneX" type="Specification">
   <Events>
    <Event id="u11" label="u11" controllable="false" prioritized="true" />
    <Event id="u24" label="u24" controllable="false" prioritized="true" />
@@ -435,8 +434,7 @@
    <Transition event="c1" source="q1" dest="q0" />
    <Transition event="c3" source="q2" dest="q0" />
   </Transitions>
- </Automaton>
--->
+</Automaton>
 <Execution>
 	<Actions>
 

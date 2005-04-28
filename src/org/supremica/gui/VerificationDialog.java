@@ -266,18 +266,25 @@ public class VerificationDialog
 			updateNote();
 		}
 
+		/**
+		 * Changes the available options on the panel based on the current choice.
+		 */
 		private void updatePanel()
 		{
-			//if ((verificationTypeBox.getSelectedItem() == VerificationType.Nonblocking) || 
-			//	(verificationTypeBox.getSelectedItem() == VerificationType.MutuallyNonblocking))
-			if ((verificationTypeBox.getSelectedItem() == VerificationType.Controllability) && 
+			// Some kind of ugly stuff goes on here, the "advanced panel" is supposed to be the one
+			// with index 1.
+			int advancedTabIndex = 1;
+
+			// Change the advanced panel
+			if ((verificationTypeBox.getSelectedItem() == VerificationType.Controllability ||
+				 verificationTypeBox.getSelectedItem() == VerificationType.InverseControllability) && 
 				(algorithmSelector.getSelectedItem() == VerificationAlgorithm.Modular))
 			{
 				// Show advanced controllability options!
 				//tabbedPane.add("Advanced options", null, advancedPanelControllability, "Advanced options");
 				//int index = tabbedPane.indexOfComponent(advancedPanelControllability);
-				tabbedPane.setComponentAt(1, advancedPanelControllability);
-				tabbedPane.setEnabledAt(1, true);
+				tabbedPane.setComponentAt(advancedTabIndex, advancedPanelControllability);
+				tabbedPane.setEnabledAt(advancedTabIndex, true);
 			}
 			else if ((verificationTypeBox.getSelectedItem() == VerificationType.Nonblocking) &&
 				  (algorithmSelector.getSelectedItem() == VerificationAlgorithm.Modular))
@@ -285,22 +292,36 @@ public class VerificationDialog
 				// Show advanced nonblocking options!
 				//tabbedPane.remove(advancedPanelControllability);
 				//int index = tabbedPane.indexOfComponent(advancedPanelControllability);
-				tabbedPane.setComponentAt(1, advancedPanelNonblocking);
-				tabbedPane.setEnabledAt(1, true);
+				tabbedPane.setComponentAt(advancedTabIndex, advancedPanelNonblocking);
+				tabbedPane.setEnabledAt(advancedTabIndex, true);
 			}
 			else
 			{
-				tabbedPane.setEnabledAt(1, false);
+				tabbedPane.setEnabledAt(advancedTabIndex, false);
+			}
+
+			// Force things depending on earlier choice
+			if (verificationTypeBox.getSelectedItem() == VerificationType.MutuallyNonblocking)
+			{
+				// Force the modular algorithm
+				algorithmSelector.forceModular();
+			}
+			else
+			{
+				// Allow all
+				algorithmSelector.allowAll();
 			}
 		}
 
+		/**
+		 * Changes the displayed note depending on the current choice.
+		 */
 		private void updateNote()
 		{
-			if (verificationTypeBox.getSelectedItem() == VerificationType.Nonblocking)
+			// Change the note
+			if (verificationTypeBox.getSelectedItem() == VerificationType.Nonblocking &&
+				algorithmSelector.getSelectedItem() == VerificationAlgorithm.Modular)
 			{
-				// Force the monolithic algorithm
-				//algorithmSelector.forceMonolithic();
-				//note.setText("Note:\n" + "Currently, modular nonblocking\n" + "verification is not supported.");
 				note.setText("Note:\n" + "This algorithm uses incremental\n" +
 							 "composition and minimization with\n" +
 							 "respect to conflict equivalence.");
@@ -308,20 +329,30 @@ public class VerificationDialog
 			}
 			else if (verificationTypeBox.getSelectedItem() == VerificationType.MutuallyNonblocking)
 			{
-				// Force the modular algorithm
-				algorithmSelector.forceModular();
-				note.setText("Note:\n" + "Mutual nonblocking is inherently modular\n" + "and hence there is no monolithic algoritm.");
+				note.setText("Note:\n" + "Mutual nonblocking is inherently modular\n" + 
+							 "and hence there is no monolithic algoritm.");
 				note.setVisible(true);
 			}
 			else if (verificationTypeBox.getSelectedItem() == VerificationType.LanguageInclusion)
 			{
-				algorithmSelector.allowAll();
-				note.setText("Note:\n" + "This verifies whether the language of the unselected\n" + "automata is included in the inverse projection of\n" + "the language of the selected automata.\n" + "  The alphabet of the unselected automata must\n" + "include the alphabet of the selected automata.\n");
+				note.setText("Note:\n" + "This verifies whether the language of the unselected\n" + 
+							 "automata is included in the inverse projection of\n" + 
+							 "the language of the selected automata.\n" + 
+							 "  The alphabet of the unselected automata must\n" + 
+							 "include the alphabet of the selected automata.");
 				note.setVisible(true);
 			}
-			else    // Something else is selected
+			else if (verificationTypeBox.getSelectedItem() == VerificationType.InverseControllability)
 			{
-				algorithmSelector.allowAll();
+				note.setText("Note:\n" + "This verifies whether the controllable events in the\n" +
+							 "supervisor candidate are always accepted by\n" + 
+							 "the plant. That is, the supervisor is considered\n" + 
+							 "to be a controller as in the input/output approach\n" + 
+							 "to control of DES presented by Balemi.");
+				note.setVisible(true);
+			}
+			else // Something else is selected
+			{
 				note.setVisible(false);
 			}
 		}

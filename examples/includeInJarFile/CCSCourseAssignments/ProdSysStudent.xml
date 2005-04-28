@@ -11,10 +11,10 @@
 	</Events>
 	<States>
 		<State id="q0" initial="true" accepting="true"/>
-		<State id="q1"/>
-		<State id="q2"/>
-		<State id="q3"/>
-		<State id="q4"/>
+		<State id="q1" accepting="true"/>
+		<State id="q2" accepting="true"/>
+		<State id="q3" accepting="true"/>
+		<State id="q4" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="q0" dest="q1" event="take2"/>
@@ -33,8 +33,8 @@
 	</Events>
 	<States>
 		<State id="q0" initial="true" accepting="true"/>
-		<State id="q1"/>
-		<State id="q2"/>
+		<State id="q1" accepting="true"/>
+		<State id="q2" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="q0" dest="q1" event="take3"/>
@@ -50,7 +50,7 @@
 	</Events>
 	<States>
 		<State id="q0" initial="true" accepting="true"/>
-		<State id="q1"/>
+		<State id="q1" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="q0" dest="q1" event="arrivex"/>
@@ -67,7 +67,7 @@
 	</Events>
 	<States>
 		<State id="q0" initial="true" accepting="true"/>
-		<State id="q1"/>
+		<State id="q1" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="q0" dest="q1" event="arrive1"/>
@@ -85,7 +85,7 @@
 	</Events>
 	<States>
 		<State id="q0" initial="true" accepting="true"/>
-		<State id="q1"/>
+		<State id="q1" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="q0" dest="q1" event="arrive2"/>
@@ -103,7 +103,7 @@
 	</Events>
 	<States>
 		<State id="q0" initial="true" accepting="true"/>
-		<State id="q1"/>
+		<State id="q1" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="q0" dest="q1" event="arrive3"/>
@@ -120,8 +120,8 @@
 	</Events>
 	<States>
 		<State id="q0" initial="true" accepting="true"/>
-		<State id="q1"/>
-		<State id="q2"/>
+		<State id="q1" accepting="true"/>
+		<State id="q2" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="q0" dest="q1" event="take_item"/>
@@ -139,8 +139,8 @@
 	</Events>
 	<States>
 		<State id="q0" initial="true" accepting="true"/>
-		<State id="q1"/>
-		<State id="q2"/>
+		<State id="q1" accepting="true"/>
+		<State id="q2" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="q0" dest="q1" event="take1"/>
@@ -165,14 +165,14 @@
 	</Events>
 	<States>
 		<State id="q0" initial="true" accepting="true"/>
-		<State id="q1"/>
-		<State id="q2"/>
-		<State id="q3"/>
-		<State id="q4"/>
-		<State id="q5"/>
-		<State id="q6"/>
-		<State id="q7"/>
-		<State id="q8"/>
+		<State id="q1" accepting="true"/>
+		<State id="q2" accepting="true"/>
+		<State id="q3" accepting="true"/>
+		<State id="q4" accepting="true"/>
+		<State id="q5" accepting="true"/>
+		<State id="q6" accepting="true"/>
+		<State id="q7" accepting="true"/>
+		<State id="q8" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="q0" dest="q1" event="enter"/>
