@@ -1,4 +1,3 @@
-
 /******************** ModifiedAstar2.java **************************
  * AKs implementation of Tobbes modified Astar search algo
  * Basically this is a guided tree-search algorithm, like
@@ -43,7 +42,8 @@ public class ModifiedAstar2
 //	private TreeMap openNodes;
 
 	/** Hashtable containing the estimated cost for each robot, having states as keys. **/
-	private Hashtable[] oneProdRelax;
+//	private Hashtable[] oneProdRelax;
+	private ArrayList oneProdRelax;
 
 	/** Hashtable containing the estimated cost for each combination of two robots **/
 	private Hashtable[] twoProdRelax;
@@ -67,6 +67,8 @@ public class ModifiedAstar2
 	
 	// Hjälper till att omvandla stateIndex-ar till hash-värden.
 	private int[] keyMapping;
+	
+	boolean useOneProdRelax;
 
 	public ModifiedAstar2(Automaton theAutomaton)
 	{
@@ -93,14 +95,18 @@ public class ModifiedAstar2
 		for (int i=1; i<keyMapping.length; i++) {
 			keyMapping[i] = keyMapping[i-1] * (theAutomata.getAutomatonAt(i-1).nbrOfStates() + 1);
 		}
+		
+		useOneProdRelax = true;
 
 		if (theAutomata == null)
-			oneProdRelax[0] = new Hashtable();
+			return;
+//			oneProdRelax[0] = new Hashtable();
 		else {
-			int nrOfPlants = theAutomata.getPlantAutomata().size();
-			oneProdRelax = new Hashtable[nrOfPlants];
-			for (int i=0; i<nrOfPlants; i++)
-				oneProdRelax[i] = new Hashtable();
+			int nrOfPlants = plantAutomata.size();
+//			oneProdRelax = new Hashtable[nrOfPlants];
+			oneProdRelax = new ArrayList(nrOfPlants);
+//			for (int i=0; i<nrOfPlants; i++)
+//				oneProdRelax[i] = new Hashtable();
 
 			if (nrOfPlants > 2) {
 				twoProdRelax = new Hashtable[nrOfPlants * (nrOfPlants - 1) / 2];
@@ -162,7 +168,7 @@ public class ModifiedAstar2
 
 			timer.start();
 			preprocess1();
-			infoStr += "\t1st preprocessing in " + timer.elapsedTime() + " ms\n";
+			infoStr += "\t1st preprocessing in " + timer.elapsedTime() + " ms\n";	
 
 			if (theAutomata.getPlantAutomata().size() > 2) {
 				timer.start();
@@ -187,15 +193,10 @@ public class ModifiedAstar2
 			for (int i=0; i<activeAutomataIndex.length; i++) {
 				activeAutomataIndex[i] = theAutomata.getAutomatonIndex(plantAutomata.getAutomatonAt(i));
 			}
-			int[] initialNode = makeInitialNode();
-			logger.warn("initial_name = " + getNodeName(initialNode));
-
-			Iterator collIt = expandNode(initialNode).iterator();
-			while(collIt.hasNext()) {
-				int[] currNode = (int[]) collIt.next();
-				logger.warn("expandedNode_name ---> " + getNodeName(currNode));
-			}
-
+			int[] accNode = scheduleFrom(makeInitialNode());
+			logger.info("accNode = " + getNodeSignature(accNode));
+			
+			
 /*
 
 				infoStr += "\tA*-iterations: " + searchCounter + " in time: " + timer.elapsedTime() + " ms.\n";
@@ -232,7 +233,7 @@ return null;
 	}
 
 	private int[] scheduleFrom(int[] initNode) {
-		int[] finalNode = new int[initNode.length];
+		int[] currNode = new int[initNode.length];
 
 		openList.clear();
 		closedNodes.clear();
@@ -242,12 +243,166 @@ return null;
 			//Skall inte denna ökas på senare i slingan????
 			searchCounter++;
 
-			finalNode = (int[]) openList.remove(0);
+			currNode = (int[]) openList.remove(0);
+			
+			if (isAcceptingNode(currNode))
+				return currNode;
+			
+			closedNodes.put(getKey(currNode), currNode);
+			
+			useOneProdRelax = false;
+			if (activeAutomataIndex.length <= 2 || plantAutomata.size() <= 2)
+				useOneProdRelax = true;
 
-			expandNode(finalNode);
+			Iterator childIter = expandNode(currNode).iterator();
+			while (childIter.hasNext()) {
+				int[] nextNode = (int[])childIter.next();
+				
+				if (!isOnAList(nextNode))
+					putOnOpenList(nextNode);
+			}	
 		}
 
-		return finalNode;
+		return currNode;
+	}
+	
+	private boolean isOnAList(int[] node) {
+		Integer currKey = getKey(node);
+		
+		int estimatedCost = calcEstimatedCost(node);
+		
+		int index = -1;
+		Iterator iter = openList.iterator();
+		while (iter.hasNext()) {
+			index++;
+			
+			int[] openNode = (int[])iter.next();
+			
+			if (currKey.equals(getKey(openNode))) {
+				if (estimatedCost >= calcEstimatedCost(openNode))
+					return true;
+				else {
+					openList.set(index, node);
+					return false;
+				}
+			}
+		}
+		
+		if (closedNodes.containsKey(currKey)) {
+			if (estimatedCost >= calcEstimatedCost((int[])closedNodes.get(currKey)))
+				return true;
+			else {
+				closedNodes.remove(node);
+				return false;
+			}
+		}
+	
+		return false;
+	}
+	
+	/**
+	 * 			Checks if some node is on the openList or closedList. If found, a comparison
+	 * 			between the estimated costs is done to decide which node to keep as optimal.
+	 *
+	 * @param 	node
+	 * @return 	true if node is already on the closedList and has an estimated cost not lower than
+	 * 		   	the guy on the closedList.
+	 */
+	// Också lite fult...
+	private boolean isOnAList(Node node, boolean useOneProdRelax) {
+		int estimatedCost = calcEstimatedCost(node, useOneProdRelax);
+
+//		Collection values = openNodes.values();
+//		Iterator iter = values.iterator();
+		Iterator iter = openList.iterator();
+		while (iter.hasNext()) {
+			Object n = iter.next();
+			
+			if (node.equals(n)) {
+				if (estimatedCost >= calcEstimatedCost((Node)n, useOneProdRelax))
+					return true;
+				else {
+					openList.remove(openList.indexOf(n));
+//					openNodes.
+					return false;
+				}
+			}
+		}
+		
+		if (closedNodes.containsKey(node)) {
+			if (estimatedCost >= ((Integer)closedNodes.get(node)).intValue())
+				return true;
+			else {
+				closedNodes.remove(node);
+				return false;
+			}
+		}
+		else
+			return false;
+	}
+	
+	private int calcEstimatedCost(int[] node) {
+		if (useOneProdRelax)
+			return node[node.length-1] + getOneProdRelaxation(node);
+		else
+			return node[node.length-1] + getTwoProdRelaxation(node);
+	}
+	
+	private int getOneProdRelaxation(int[] node) {
+		int estimate = 0;
+		int[] currCosts = getCosts(node);
+		
+		for (int i=0; i<plantAutomata.size(); i++) {
+			//int altEstimate = theNode.getCurrentCosts()[i] + ((Integer)oneProdRelax[i].get(theNode.getState(i))).intValue();
+			int altEstimate = currCosts[i] + ((int[])oneProdRelax.get(i))[node[activeAutomataIndex[i]]]; 
+
+			if (altEstimate > estimate)
+				estimate = altEstimate;
+		}
+		
+		return estimate;
+	}
+	
+	private int getTwoProdRelaxation(int[] node) {
+		int estimate = 0;
+		
+		return estimate;
+	}
+	
+//	 Det här är fult och borde göras om till att likan getTwoProdRelaxation på nåt sätt
+/*	private int getOneProdRelaxation(Node theNode) {
+		int estimate = 0;
+
+		// Den här upprepningen är det fula
+//		if (currAutomataIndex == null) {
+			for (int i=0; i<plantAutomata.size(); i++) {
+				int altEstimate = theNode.getCurrentCosts()[i] + ((Integer)oneProdRelax[i].get(theNode.getState(i))).intValue();
+
+				if (altEstimate > estimate)
+					estimate = altEstimate;
+			}
+//		}
+/*		else {
+			for (int i=0; i<theNode.size(); i++) {
+				int altEstimate = theNode.getCurrentCosts()[i] + ((Integer)oneProdRelax[currAutomataIndex[i]].get(theNode.getState(i))).intValue();
+
+				if (altEstimate > estimate)
+					estimate = altEstimate;
+			}
+		}
+
+		return estimate;
+	}
+*/	
+	
+	private boolean isAcceptingNode(int[] node) {
+		for (int i=0; i<activeAutomataIndex.length; i++) {
+			int index = activeAutomataIndex[i];
+			if (!theAutomata.getAutomatonAt(index).getStateWithIndex(node[index]).isAccepting()) 
+				return false;
+		}
+		
+		return true;
 	}
 
 	private Node scheduleFrom(Node initNode) {
@@ -441,6 +596,25 @@ return null;
 
 		return childNodes.values();
 	}
+	
+	private void putOnOpenList(int[] node) {
+		int estimatedCost = calcEstimatedCost(node);
+		int counter = 0;
+		Iterator iter = openList.iterator();
+
+		while (iter.hasNext()) {
+			int[] openNode = (int[])iter.next();
+			
+			if (estimatedCost <= calcEstimatedCost(openNode)) {
+				openList.add(counter, node);
+				return;
+			}
+			
+			counter++;
+		}
+
+		openList.add(node);
+	}
 
 	/**
 	 * 			Inserts the node into the openList according to the estimatedCost (ascending).
@@ -461,48 +635,6 @@ return null;
 		}
 
 		openList.add(node);
-	}
-
-	/**
-	 * 			Checks if some node is on the openList or closedList. If found, a comparison
-	 * 			between the estimated costs is done to decide which node to keep as optimal.
-	 *
-	 * @param 	node
-	 * @return 	true if node is already on the closedList and has an estimated cost not lower than
-	 * 		   	the guy on the closedList.
-	 */
-	// Också lite fult...
-	private boolean isOnAList(Node node, boolean useOneProdRelax) {
-		int estimatedCost = calcEstimatedCost(node, useOneProdRelax);
-
-//		Collection values = openNodes.values();
-//		Iterator iter = values.iterator();
-		Iterator iter = openList.iterator();
-		while (iter.hasNext()) {
-			Object n = iter.next();
-			
-			if (node.equals(n)) {
-				if (estimatedCost >= calcEstimatedCost((Node)n, useOneProdRelax))
-					return true;
-				else {
-					openList.remove(openList.indexOf(n));
-//					openNodes.
-					return false;
-				}
-			}
-		}
-
-		
-		if (closedNodes.containsKey(node)) {
-			if (estimatedCost >= ((Integer)closedNodes.get(node)).intValue())
-				return true;
-			else {
-				closedNodes.remove(node);
-				return false;
-			}
-		}
-		else
-			return false;
 	}
 
 	/**
@@ -553,6 +685,51 @@ return null;
 		return makeNode(initialStates, null, initialCosts);
 	}
 
+	private boolean preprocess1() {
+		for (int i=0; i<plantAutomata.size(); i++) {
+			Automaton theAuto = plantAutomata.getAutomatonAt(i);
+			State markedState = findAcceptingState(theAuto);
+			ArrayList estList = new ArrayList();
+			
+			int[] relax = new int[theAuto.nbrOfStates()];
+			for (int j=0; j<relax.length; j++) 
+				relax[j] = -1;
+
+			if (markedState == null)
+				return false;
+			else {
+				relax[markedState.getIndex()] = markedState.getCost();
+				estList.add(markedState);
+
+				while (!estList.isEmpty()) {
+					ArcIterator incomingArcIterator = ((State)estList.remove(0)).incomingArcsIterator();
+
+					while (incomingArcIterator.hasNext()) {
+						Arc currArc = incomingArcIterator.nextArc();
+						State currState = currArc.getFromState();
+						State nextState = currArc.getToState();
+						//int remainingCost = ((Integer)(oneProdRelax[i].get(currArc.getToState()))).intValue();
+
+						if (relax[currState.getIndex()] == -1) {
+							relax[currState.getIndex()] = relax[nextState.getIndex()] + nextState.getCost();
+							estList.add(currState);			
+						}
+						else {
+							int newRemainingCost = nextState.getCost() +  relax[nextState.getIndex()];
+
+							if (newRemainingCost < relax[currState.getIndex()]) 
+								relax[currState.getIndex()] = newRemainingCost;
+						}
+					}
+				}
+			}				
+			
+			oneProdRelax.add(i, relax);
+		}
+		
+		return true;
+	}
+	
 	/**
 	 * 			Calculates the costs for a one-product relaxation (i.e. as if there
 	 * 			would only be one robot in the cell) and stores it in the hashtable
@@ -562,7 +739,8 @@ return null;
 	 * 			an accepting state.
 	 * @return 	true, otherwise
 	 */
-	private boolean preprocess1() {
+	//TODO - komma bort och gör om till int[]. 
+/*	private boolean preprocess1() {
 		Automata plantAutomata = theAutomata.getPlantAutomata();
 
 		for (int i=0; i<plantAutomata.size(); i++) {
@@ -604,7 +782,7 @@ return null;
 
 		return true;
 	}
-
+*/
 	/**
 	 * 			Calculates the costs for a two-product relaxation (i.e. as if there
 	 * 			would only be two robots in the cell) and stores it in the hashtable
@@ -680,47 +858,7 @@ return null;
 		return calcEstimatedCost(theNode, false);
 	}
 */
-	private int calcEstimatedCost(Node theNode, boolean useOneProdRelax) {
-/*		int[] costs = theNode.getCurrentCosts();
-		int counter = 0;
 
-		for (int i=0; i<costs.length; i++) {
-			if (costs[i] >= 0)
-				counter++;
-		}
-*/
-//		if (counter <= 2)
-		if (useOneProdRelax)
-			return theNode.getAccumulatedCost() + getOneProdRelaxation(theNode);
-		else
-			return theNode.getAccumulatedCost() + getTwoProdRelaxation(theNode);
-	}
-
-//	 Det här är fult och borde göras om till att likan getTwoProdRelaxation på nåt sätt
-	private int getOneProdRelaxation(Node theNode) {
-		Automata plantAutomata = theAutomata.getPlantAutomata();
-		int estimate = 0;
-
-		// Den här upprepningen är det fula
-//		if (currAutomataIndex == null) {
-			for (int i=0; i<plantAutomata.size(); i++) {
-				int altEstimate = theNode.getCurrentCosts()[i] + ((Integer)oneProdRelax[i].get(theNode.getState(i))).intValue();
-
-				if (altEstimate > estimate)
-					estimate = altEstimate;
-			}
-//		}
-/*		else {
-			for (int i=0; i<theNode.size(); i++) {
-				int altEstimate = theNode.getCurrentCosts()[i] + ((Integer)oneProdRelax[currAutomataIndex[i]].get(theNode.getState(i))).intValue();
-
-				if (altEstimate > estimate)
-					estimate = altEstimate;
-			}
-		}
-*/
-		return estimate;
-	}
 
 	private int getTwoProdRelaxation(Node theNode) {
 		int plantAutomataSize = theAutomata.getPlantAutomata().size();
@@ -903,22 +1041,7 @@ return null;
 
 		return null;
 	}
-/*
-	public Integer makeMapKey(Node node)
-	{
-		int hash = 1;
 
-		for (int i = 0; i < node.size(); i++) {
-			hash += hash * node.getState(i).getIndex();
-			// Varför just 10???
-			hash *= 10;
-		}
-
-		hash += hash * 100 * calcEstimatedCost(node);
-
-		return new Integer(hash);
-	}
-*/
 	/**
 	 *      Checks if a possible accumulatedCost-loss is fully compensated by
 	 *      every currentCosts-savings.
@@ -946,5 +1069,17 @@ return null;
 
 			return true;
 		}
+	}
+/*	
+	private int calcEstimatedCost(Node theNode, boolean useOneProdRelax) {
+		if (useOneProdRelax)
+			return theNode.getAccumulatedCost() + getOneProdRelaxation(theNode);
+		else
+			return theNode.getAccumulatedCost() + getTwoProdRelaxation(theNode);
+	}
+*/
+	
+	private int calcEstimatedCost(Node theNode, boolean useOneProdRelax) {
+		return 0;
 	}
 }
