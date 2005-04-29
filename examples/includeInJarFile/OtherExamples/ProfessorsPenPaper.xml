@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Automata name="" major="0" minor="9" comment="Two Professors competing for mutual resources, pen and paper. Each Professor can request any of the resources in any order. Both resources are needed simultaneously to work. The spec essentially says that the Professors should be able to work and rest over and over again. Manual synthesis of one supervisor for each spec will lead to a blocking system. Supremica is smarter than that.">
+<Automaton name="Professor 1" type="Plant">
+	<Events>
+		<Event id="0" label="paper11"/>
+		<Event id="1" label="pen11"/>
+		<Event id="2" label="return10" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="p10" initial="true" accepting="true"/>
+		<State id="1" name="work" accepting="true"/>
+		<State id="2" name="paper" accepting="true"/>
+		<State id="3" name="pen" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="3" event="1"/>
+		<Transition source="0" dest="2" event="0"/>
+		<Transition source="1" dest="0" event="2"/>
+		<Transition source="2" dest="1" event="1"/>
+		<Transition source="3" dest="1" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Professor 2" type="Plant">
+	<Events>
+		<Event id="0" label="paper21"/>
+		<Event id="1" label="pen21"/>
+		<Event id="2" label="return20" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="p20" initial="true" accepting="true"/>
+		<State id="1" name="work" accepting="true"/>
+		<State id="2" name="paper" accepting="true"/>
+		<State id="3" name="pen" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="3" event="1"/>
+		<Transition source="0" dest="2" event="0"/>
+		<Transition source="1" dest="0" event="2"/>
+		<Transition source="2" dest="1" event="1"/>
+		<Transition source="3" dest="1" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Pen" type="Specification">
+	<Events>
+		<Event id="0" label="pen11"/>
+		<Event id="1" label="pen21"/>
+		<Event id="2" label="return10" controllable="false"/>
+		<Event id="3" label="return20" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" accepting="true"/>
+		<State id="1" name="q1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="0" event="2"/>
+		<Transition source="1" dest="0" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Paper" type="Specification">
+	<Events>
+		<Event id="0" label="paper11"/>
+		<Event id="1" label="paper21"/>
+		<Event id="2" label="return10" controllable="false"/>
+		<Event id="3" label="return20" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" accepting="true"/>
+		<State id="1" name="q1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="0" event="2"/>
+		<Transition source="1" dest="0" event="3"/>
+	</Transitions>
+</Automaton>
+</Automata>

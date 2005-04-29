@@ -193,9 +193,9 @@ public class MinimizationDialog
 			note.setBackground(this.getBackground());
 
 			Box standardBox = Box.createHorizontalBox();
-			standardBox.add(new JLabel("     ")); // Ugly fix to get stuff centered
+			standardBox.add(new JLabel("      ")); // Ugly fix to get stuff centered
 			standardBox.add(minimizationTypeBox);
-			standardBox.add(new JLabel("     ")); // Ugly fix to get stuff centered
+			standardBox.add(new JLabel("      ")); // Ugly fix to get stuff centered
 			Box anotherBox = Box.createVerticalBox();
 			anotherBox.add(alsoTransitions);
 			anotherBox.add(keepOriginal);

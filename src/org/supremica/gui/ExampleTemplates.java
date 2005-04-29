@@ -179,6 +179,7 @@ public class ExampleTemplates
 	thisGroup.addItem(new TemplateItem("Telecommunications Network (incomplete)", prefix + "telecommunicationsNetwork.xml"));
 	thisGroup.addItem(new TemplateItem("Automatic Car Park Gate", prefix + "AutomaticCarParkGate.xml"));
 	thisGroup.addItem(new TemplateItem("Bisimulation Equivalence Execise", prefix + "Bisimulation.xml"));
+	thisGroup.addItem(new TemplateItem("Professors, Pen and Paper", prefix + "ProfessorsPenPaper.xml"));
     }
 
     private void initializeAIPExamples()
@@ -187,21 +188,21 @@ public class ExampleTemplates
 
 	allGroups.add(thisGroup);
 
-	String prefix = extraPrefix + "/OtherExamples/";
+	String prefix = extraPrefix + "/OtherExamples/api/";
 
-	thisGroup.addItem(new TemplateItem("AIP System 1 - System 1", prefix + "aip/System1_system1.xml"));
-	thisGroup.addItem(new TemplateItem("AIP System 1 - Top AS 1", prefix + "aip/System1_Top_AS1.xml"));
-	thisGroup.addItem(new TemplateItem("AIP System 2 - System 2", prefix + "aip/System2_system2.xml"));
-	thisGroup.addItem(new TemplateItem("AIP System 2 - Top AS 2", prefix + "aip/System2_Top_AS2.xml"));
-	thisGroup.addItem(new TemplateItem("AIP System 3 - System 3", prefix + "aip/System3_system3.xml"));
-	thisGroup.addItem(new TemplateItem("AIP System 3 - Top AS 3", prefix + "aip/System3_Top_AS3.xml"));
-	thisGroup.addItem(new TemplateItem("AIP System 4 - System 4", prefix + "aip/System4_system4.xml"));
-	thisGroup.addItem(new TemplateItem("AIP System 4 - Top TU 1", prefix + "aip/System4_Top_TU1.xml"));
-	thisGroup.addItem(new TemplateItem("AIP System 5 - System 5", prefix + "aip/System5_system5.xml"));
-	thisGroup.addItem(new TemplateItem("AIP System 5 - Top TU 2", prefix + "aip/System5_Top_TU2.xml"));
-	thisGroup.addItem(new TemplateItem("AIP System 6 - System 6", prefix + "aip/System6_system6.xml"));
-	thisGroup.addItem(new TemplateItem("AIP System 7 - System 7", prefix + "aip/System7_system7.xml"));
-	thisGroup.addItem(new TemplateItem("AIP System 7 - Top TU 4", prefix + "aip/System7_Top_TU4.xml"));
+	thisGroup.addItem(new TemplateItem("AIP System 1 - System 1", prefix + "System1_system1.xml"));
+	thisGroup.addItem(new TemplateItem("AIP System 1 - Top AS 1", prefix + "System1_Top_AS1.xml"));
+	thisGroup.addItem(new TemplateItem("AIP System 2 - System 2", prefix + "System2_system2.xml"));
+	thisGroup.addItem(new TemplateItem("AIP System 2 - Top AS 2", prefix + "System2_Top_AS2.xml"));
+	thisGroup.addItem(new TemplateItem("AIP System 3 - System 3", prefix + "System3_system3.xml"));
+	thisGroup.addItem(new TemplateItem("AIP System 3 - Top AS 3", prefix + "System3_Top_AS3.xml"));
+	thisGroup.addItem(new TemplateItem("AIP System 4 - System 4", prefix + "System4_system4.xml"));
+	thisGroup.addItem(new TemplateItem("AIP System 4 - Top TU 1", prefix + "System4_Top_TU1.xml"));
+	thisGroup.addItem(new TemplateItem("AIP System 5 - System 5", prefix + "System5_system5.xml"));
+	thisGroup.addItem(new TemplateItem("AIP System 5 - Top TU 2", prefix + "System5_Top_TU2.xml"));
+	thisGroup.addItem(new TemplateItem("AIP System 6 - System 6", prefix + "System6_system6.xml"));
+	thisGroup.addItem(new TemplateItem("AIP System 7 - System 7", prefix + "System7_system7.xml"));
+	thisGroup.addItem(new TemplateItem("AIP System 7 - Top TU 4", prefix + "System7_Top_TU4.xml"));
     }
 
     private void initializeCentralLockExamples()
@@ -210,17 +211,17 @@ public class ExampleTemplates
 
 	allGroups.add(thisGroup);
 
-	String prefix = extraPrefix + "/OtherExamples/";
+	String prefix = extraPrefix + "/OtherExamples/centralLock/";
 
-	thisGroup.addItem(new TemplateItem("Central Lock - 3 Doors", prefix + "centralLock/verriegel3.xml"));
-	thisGroup.addItem(new TemplateItem("Central Lock - 3 Doors - Uncontrollable", prefix + "centralLock/verriegel3_uncontrollable.xml"));
-	thisGroup.addItem(new TemplateItem("Central Lock - 3 Doors - Language Inclusion", prefix + "centralLock/verriegel3_language_inclusion.xml"));
-	thisGroup.addItem(new TemplateItem("Central Lock - 3 Doors - Language Exclusion", prefix + "centralLock/verriegel3_language_exclusion.xml"));
-	//thisGroup.addItem(new TemplateItem("Central Lock - 3 Doors - Synchronized Plants", prefix + "centralLock/verriegel3_joint.xml"));
-	//thisGroup.addItem(new TemplateItem("Central Lock - 3 Doors - Synchronized Plants Uncontrollable", prefix + "centralLock/verriegel3_joint_uncontrollable.xml"));
-	thisGroup.addItem(new TemplateItem("Central Lock - 4 Doors", prefix + "centralLock/verriegel4.xml"));
-	thisGroup.addItem(new TemplateItem("Central Lock - 4 Doors - Language Inclusion", prefix + "centralLock/verriegel4_language_inclusion.xml"));
-	thisGroup.addItem(new TemplateItem("Central Lock - 4 Doors - Language Exclusion", prefix + "centralLock/verriegel4_language_exclusion.xml"));
+	thisGroup.addItem(new TemplateItem("Central Lock - 3 Doors", prefix + "verriegel3.xml"));
+	thisGroup.addItem(new TemplateItem("Central Lock - 3 Doors - Uncontrollable", prefix + "verriegel3_uncontrollable.xml"));
+	thisGroup.addItem(new TemplateItem("Central Lock - 3 Doors - Language Inclusion", prefix + "verriegel3_language_inclusion.xml"));
+	thisGroup.addItem(new TemplateItem("Central Lock - 3 Doors - Language Exclusion", prefix + "verriegel3_language_exclusion.xml"));
+	//thisGroup.addItem(new TemplateItem("Central Lock - 3 Doors - Synchronized Plants", prefix + "verriegel3_joint.xml"));
+	//thisGroup.addItem(new TemplateItem("Central Lock - 3 Doors - Synchronized Plants Uncontrollable", prefix + "verriegel3_joint_uncontrollable.xml"));
+	thisGroup.addItem(new TemplateItem("Central Lock - 4 Doors", prefix + "verriegel4.xml"));
+	thisGroup.addItem(new TemplateItem("Central Lock - 4 Doors - Language Inclusion", prefix + "verriegel4_language_inclusion.xml"));
+	thisGroup.addItem(new TemplateItem("Central Lock - 4 Doors - Language Exclusion", prefix + "verriegel4_language_exclusion.xml"));
     }
 
     private void initializeOperatorSupervisorExamples()

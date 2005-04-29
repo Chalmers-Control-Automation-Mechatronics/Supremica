@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Automata name="Ex2_6">
-<Automaton name="Man, Swimming Controllable Wolf, Goat, Cabbage" type="Undefined">
+<Automata name="Ex4_1">
+<Automaton name="Man, Swimming Controllable Wolf, Goat, Cabbage" type="Plant">
 	<Events>
 		<Event id="m"/>
 		<Event id="mw"/>
@@ -90,7 +90,7 @@
 		<Transition dest="GC-MW" source="WGC-M" event="w"/>
 	</Transitions>
 </Automaton>
-<Automaton name="Man, Swimming Uncontrollable Wolf, Goat, Cabbage" type="Undefined">
+<Automaton name="Man, Swimming Uncontrollable Wolf, Goat, Cabbage" type="Plant">
 	<Events>
 		<Event id="m"/>
 		<Event id="mw"/>

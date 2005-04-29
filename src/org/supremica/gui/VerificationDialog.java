@@ -386,10 +386,10 @@ public class VerificationDialog
 		{
 			minimizationStrategy = new JComboBox(MinimizationStrategy.toArray());
 			Box strategyBox = Box.createHorizontalBox();
-			strategyBox.add(new JLabel("   ")); // Ugly fix to get stuff centered
+			strategyBox.add(new JLabel("      ")); // Ugly fix to get stuff centered
 			strategyBox.add(new JLabel("Minimization strategy: "));
 			strategyBox.add(minimizationStrategy);
-			strategyBox.add(new JLabel("   ")); // Ugly fix to get stuff centered
+			strategyBox.add(new JLabel("      ")); // Ugly fix to get stuff centered
 			this.add(strategyBox);
 
 			ruleA = new JCheckBox("Rule A");
