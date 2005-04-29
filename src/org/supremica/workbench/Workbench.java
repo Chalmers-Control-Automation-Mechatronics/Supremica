@@ -93,6 +93,9 @@ class MyAutomatonViewerFactory
 	}
 }
 
+/**
+ * Parent class for workbench buttons.
+ */
 class ButtonImpl
 	extends JButton
 {
@@ -110,6 +113,10 @@ class ButtonImpl
 	}
 }
 
+/**
+ * Synch button. Composes the automata selected in the gui, generating the first candidate
+ * for a supervisor, a "total" specification.
+ */
 class SynchButton
 	extends ButtonImpl
 {
@@ -119,7 +126,7 @@ class SynchButton
 
 	SynchButton(Workbench wb)
 	{
-		super("Synch", wb, "Synchronize the selected automata");
+		super("Synch", wb, "Synchronize the selected automata (make total specification)");
 
 		addActionListener(new ActionListener()
 		{
@@ -157,11 +164,11 @@ class SynchButton
 			 */
 			wb.automaton.setName("sup(" + wb.automaton.getComment() + ")");
 			wb.automaton.setType(AutomatonType.Supervisor);
-			ActionMan.getGui().addAutomaton(wb.automaton);
+			//ActionMan.getGui().addAutomaton(wb.automaton);
 
 			// Note that there may be explicitly specified uc-states
 			// These are not "new" in a direct sense, but...
-			wb.showMessage(wb.automaton.nbrOfForbiddenStates() + 
+			wb.showMessage(wb.automaton.nbrOfForbiddenStates() +
 						   " forbidden state(s) (out of " + wb.automaton.nbrOfStates() + ")");
 			wb.showGraph();
 
@@ -177,6 +184,11 @@ class SynchButton
 	}
 }
 
+/**
+ * "Compare" button, this button examines the controllablity status of the current 
+ * supervisor with respect to the plant model that it is supposed to control, i.e. 
+ * the plants (and all other automata) that were selected previously in the gui.
+ */
 class CompareButton
 	extends ButtonImpl
 {
@@ -213,7 +225,7 @@ class CompareButton
 			SynchronizationOptions synch_ops = SynchronizationOptions.getDefaultSynchronizationOptions();
 			synch_ops.setForbidUncontrollableStates(true);
 			synch_ops.setExpandForbiddenStates(true); // (may be explicit ones)
-			synch_ops.setExpandEventsUsingPriority(false);
+			synch_ops.setBase class for ExpandEventsUsingPriority(false);
 			synch_ops.setBuildAutomaton(true);
 			synch_ops.setRequireConsistentControllability(true);
 			synch_ops.setRequireConsistentImmediate(false);
@@ -249,47 +261,47 @@ class CompareButton
 		synch_ops.setRequireConsistentControllability(true);
 		synch_ops.setRequireConsistentImmediate(false);
 		synch_ops.setRememberDisabledEvents(false); // don't redirect disabled events to dump-state
-		
+
 		try
 		{
 			num_x_states = wb.automaton.nbrOfForbiddenStates();
-			
+
 			wb.automaton.clearSelectedStates();
-			
+
 			//wb.syncher = new AutomataSynchronizer(wb.automata, synch_ops);
 			Automata plantsAndSupervisors = new Automata(wb.automata);
 			Automaton candidateSupervisor = new Automaton(wb.automaton);
 			// We need this ugly thing to be able to find the proper state name after composition...
-			candidateSupervisor.normalizeStateIdentities(); 
+			candidateSupervisor.normalizeStateIdentities();
 			plantsAndSupervisors.addAutomaton(candidateSupervisor);
 			wb.syncher = new AutomataSynchronizer(plantsAndSupervisors, synch_ops);
-						
+
 			wb.syncher.execute();
-			
+
 			Automaton aut = wb.syncher.getAutomaton();
-			
+
 			for (Iterator it = aut.stateIterator(); it.hasNext(); )
 			{
 				State state = (State) it.next();
-				
+
 				logger.debug("state " + state.getName() + " is " + (state.isForbidden()
 																	? ""
 																	: "not") + " forbidden");
-				
+
 				// Make this state forbidden in the supervisor candidate!
 				if (state.isForbidden())
-				{		
-					// Find the proper state name (we've composed so we must remove the final 
-					// part of the name - from the last stateseparator an onward (we "know" 
-					// there are no later stateseparators in the name (unless the stateseparator 
-					// coincides with the normalized name (omg that would be stupid)) since we've 
+				{
+					// Find the proper state name (we've composed so we must remove the final
+					// part of the name - from the last stateseparator an onward (we "know"
+					// there are no later stateseparators in the name (unless the stateseparator
+					// coincides with the normalized name (omg that would be stupid)) since we've
 					// normalized the names above!))
 					String name = state.getName();
 					name = name.substring(0, name.lastIndexOf(SupremicaProperties.getStateSeparator()));
 
-					// Find this state in automaton					
+					// Find this state in automaton
 					State s = wb.automaton.getStateWithName(name);
-					
+
 					s.setForbidden(true);
 					s.setSelected(true);
 					logger.debug("Setting " + s.getName() + " forbidden");
@@ -298,19 +310,19 @@ class CompareButton
 		}
 		catch (Exception excp)
 		{
-			
+
 			// synchronizer may throw. what then?
 			logger.error(excp + " in CompareButton::action");
 			logger.debug(excp.getStackTrace());
-			
+
 			return;
 		}
-		
+
 		// In any case we do this and let wb handle how...
 		try
 		{
 			wb.showGraph();
-			wb.showMessage(wb.automaton.nbrOfForbiddenStates()-num_x_states + 
+			wb.showMessage(wb.automaton.nbrOfForbiddenStates()-num_x_states +
 						   " new uncontrollable state(s)");
 			wb.automaton.invalidate();
 
@@ -328,7 +340,7 @@ class CompareButton
 }
 
 /**
- * Controllability.
+ * Controllability button.
  */
 class ContButton
 	extends ButtonImpl
@@ -389,7 +401,7 @@ class ContButton
 			}
 
 			wb.showGraph();
-			wb.showMessage(wb.automaton.nbrOfForbiddenStates()-num_x_states + 
+			wb.showMessage(wb.automaton.nbrOfForbiddenStates()-num_x_states +
 						   " new uncontrollable state(s)");
 			wb.automaton.invalidate();
 
@@ -405,7 +417,7 @@ class ContButton
 }
 
 /**
- * Coreachability. 
+ * Coreachability button.
  */
 class NonblockButton
 	extends ButtonImpl
@@ -459,7 +471,7 @@ class NonblockButton
 			}
 
 			wb.showGraph();
-			wb.showMessage(wb.automaton.nbrOfForbiddenStates()-num_x_states + 
+			wb.showMessage(wb.automaton.nbrOfForbiddenStates()-num_x_states +
 						   " new blocking state(s)");
 			wb.automaton.invalidate();
 		}
@@ -474,7 +486,7 @@ class NonblockButton
 }
 
 /**
- * Reachability.
+ * Reachability button.
  */
 class ReachButton
 	extends ButtonImpl
@@ -532,7 +544,7 @@ class ReachButton
 			}
 
 			wb.showGraph();
-			wb.showMessage(wb.automaton.nbrOfForbiddenStates()-num_x_states + 
+			wb.showMessage(wb.automaton.nbrOfForbiddenStates()-num_x_states +
 						   " new unreachable state(s)");
 			wb.automaton.invalidate();
 
@@ -548,7 +560,7 @@ class ReachButton
 }
 
 /**
- * Purge.
+ * Purge button.
  */
 class PurgeButton
 	extends ButtonImpl
@@ -603,6 +615,9 @@ class PurgeButton
 	}
 }
 
+/**
+ * Done button.
+ */
 class DoneButton
 	extends ButtonImpl
 {
@@ -623,6 +638,13 @@ class DoneButton
 
 	void action(ActionEvent e)
 	{
+		// Add to gui?
+		if (wb.automaton != null && wb.toAddIt())
+		{
+			ActionMan.getGui().addAutomaton(wb.automaton);
+		}
+		
+		// Exit
 		wb.close();
 		wb.dispose();
 	}
@@ -646,8 +668,8 @@ class ParamPanel
 		setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Parameters"));
 		setLayout(new VerticalFlowLayout(true, 0));
 		add(show_graph = new JCheckBox("Show graph", true));
-		add(list_uc = new JCheckBox("List new uncontrollable states", true));
-		add(list_nb = new JCheckBox("List new non-blocking states", true));
+		//add(list_uc = new JCheckBox("List new uncontrollable states", true));
+		//add(list_nb = new JCheckBox("List new non-blocking states", true));
 		add(add_it = new JCheckBox("Add final result to the project", true));
 		show_graph.addActionListener(new ActionListener()
 		{
@@ -675,7 +697,6 @@ class ParamPanel
 		}
 		catch (Exception excp)
 		{
-
 			// what now?
 		}
 	}
@@ -830,16 +851,18 @@ public class Workbench
 		showMessage("Press Synch to get started");
 
 		updateButtons();
+		pack();
 	}
 
 	void close()
 	{
 		hideGraph();
-
+		/*
 		if (automaton != null && toAddIt() == false)
 		{
 			project.removeAutomaton(automaton);
 		}
+		*/
 	}
 
 	void showGraph()
@@ -891,14 +914,14 @@ public class Workbench
 			logger.error("Error in hiding viewer", excp);
 		}
 	}
-		
+
 	void showMessage(String mess)
 	{
 		info.setText(mess);
 
-		if (toListUC()) {}
+		//if (toListUC()) {}
 	}
-	
+
 	/**
 	 * What is this one supposed to do?
 	 */
@@ -924,7 +947,7 @@ public class Workbench
 	}
 
 	/**
-	 * What is this one supposed to do?
+	 * Returns true if "Add final result to the project" is selected.
 	 */
 	boolean toAddIt()
 	{
@@ -958,7 +981,7 @@ public class Workbench
 
 			if (automata.isNoAutomataPlants())
 			{
-				buttons.compareButton.setEnabled(false);				
+				buttons.compareButton.setEnabled(false);
 			}
 		}
 	}
