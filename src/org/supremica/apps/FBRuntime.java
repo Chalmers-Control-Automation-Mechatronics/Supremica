@@ -60,24 +60,32 @@ public class FBRuntime
 
     public static void main(String[] args)
     {
+
 		if (args.length < 1)
 		{
 			System.err.println("Usage: FBRuntime file.sys [libraryPath]");
 			return;
 		}
 
-		String systemFileName = args[0];
+ 		String systemFileName = args[0];
 
-		if (args.length == 2)
-		{
-			SupremicaProperties.setFBRuntimeLibraryPath(args[1]);
-		}
-		else
-		{
-			File systemFile = new File(systemFileName);
-			File libraryDirectory = systemFile.getParentFile();
-			SupremicaProperties.setFBRuntimeLibraryPath(libraryDirectory.getAbsolutePath());
-		}
+ 		if (args.length == 2)
+ 		{
+ 			SupremicaProperties.setFBRuntimeLibraryPath(args[1]);
+ 		}
+ 		else
+ 		{
+ 			File systemFile = new File(systemFileName);
+ 			File libraryDirectory = systemFile.getParentFile();
+			if (libraryDirectory != null)
+			{
+				SupremicaProperties.setFBRuntimeLibraryPath(libraryDirectory.getAbsolutePath());
+			}
+			else
+			{
+				SupremicaProperties.setFBRuntimeLibraryPath("");
+			}
+ 		}
 
 		Device theDevice = new Device("FBRuntime Device", args[0]);
 		theDevice.runDevice();
