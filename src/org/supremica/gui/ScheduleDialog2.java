@@ -95,7 +95,7 @@ public class ScheduleDialog2
 				ModifiedAstar2 mastar = new ModifiedAstar2(ActionMan.getGui().getSelectedAutomata());
 
 					
-				Node acceptingNode = mastar.walk();
+				int[] acceptingNode = mastar.walk();
 				
 				if (acceptingNode == null)
 				{
