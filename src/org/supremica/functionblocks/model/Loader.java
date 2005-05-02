@@ -135,19 +135,26 @@ public class Loader
 
     private void constructNewFBNetwork(org.supremica.functionblocks.xsd.libraryelement.FBNetworkType xmlFBNetworkData)
     {
-		resource.addApplicationFragment("FBNetwork");
-		ApplicationFragment appFrag =  resource.getApplicationFragment("FBNetwork");
+		resource.addFBNetwork("FBNetwork");
+		FBNetwork fbNet =  resource.getFBNetwork("FBNetwork");
 		if (xmlFBNetworkData.isSetFB())
 		{
 			for (Iterator fbIter = xmlFBNetworkData.getFB().iterator(); fbIter.hasNext();)
 			{
 				org.supremica.functionblocks.xsd.libraryelement.FB curFB = (org.supremica.functionblocks.xsd.libraryelement.FB) fbIter.next();
 				// get and load the FB type
-				if(resource.getFBType(curFB.getType() + ".fbt") == null)
+				if(resource.getFBType(curFB.getType()) == null)
 				{
-					load(SupremicaProperties.getFBRuntimeLibraryPath() + "/" + curFB.getType() + ".fbt");
+					if (SupremicaProperties.getFBRuntimeLibraryPath().equals(""))
+					{
+						load(curFB.getType() + ".fbt");
+					}
+					else
+					{
+						load(SupremicaProperties.getFBRuntimeLibraryPath() + "/" + curFB.getType() + ".fbt");
+					}
 				}
-				appFrag.addFBInstance(curFB.getName(),curFB.getType());
+				fbNet.addFBInstance(curFB.getName(),curFB.getType());
 			}
 		}
 		if (xmlFBNetworkData.isSetEventConnections())
@@ -164,7 +171,7 @@ public class Loader
 				String din = dest.substring(dest.indexOf(".")+1,dest.length());
 				//java.lang.System.out.println("from:" + sinst + "!" + sout);
 				//java.lang.System.out.println("to:" + dinst + "!" + din);
-				appFrag.addEventConnection(sinst, sout, dinst, din);
+				fbNet.addEventConnection(sinst, sout, dinst, din);
 			}
 		}
 		if (xmlFBNetworkData.isSetDataConnections())
@@ -181,7 +188,7 @@ public class Loader
 				String din = dest.substring(dest.indexOf(".")+1,dest.length());
 				//java.lang.System.out.println("from: " + sinst + "!" + sout);
 				//java.lang.System.out.println("to: " + dinst + "!" + din);
-				appFrag.addDataConnection(sinst, sout, dinst, din);
+				fbNet.addDataConnection(sinst, sout, dinst, din);
 			}
 		}
     }

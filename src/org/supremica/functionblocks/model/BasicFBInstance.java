@@ -103,6 +103,7 @@ public class BasicFBInstance extends FBInstance
 		dataInputConnections.put(input, cnt);
     }
 
+	// This method provides its output data to the calling BasicFBInstance
     public Variable getDataOutput(String name)
     {
 		if (!((Variable) variables.getVariable(name)).getType().equals("DataOutput"))

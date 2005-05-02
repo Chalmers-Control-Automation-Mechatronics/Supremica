@@ -77,13 +77,13 @@ public class FBRuntime
  		{
  			File systemFile = new File(systemFileName);
  			File libraryDirectory = systemFile.getParentFile();
-			if (libraryDirectory != null)
+			if (libraryDirectory == null)
 			{
-				SupremicaProperties.setFBRuntimeLibraryPath(libraryDirectory.getAbsolutePath());
+				SupremicaProperties.setFBRuntimeLibraryPath("");
 			}
 			else
 			{
-				SupremicaProperties.setFBRuntimeLibraryPath("");
+				SupremicaProperties.setFBRuntimeLibraryPath(libraryDirectory.getAbsolutePath());
 			}
  		}
 

@@ -62,60 +62,60 @@ public class Resource extends NamedObject
 	
     private Scheduler scheduler;
     private Map fbTypes = new HashMap();
-    private Map appFragments = new HashMap();
+    private Map fbNetworks = new HashMap();
 
 
     private Resource() {}
 
     public Resource(String name)
     {
-	System.out.println("Resource(" + name + ")");
-
-	setName(name);
-
-	scheduler = new Scheduler(this);
+		System.out.println("Resource(" + name + ")");
+		
+		setName(name);
+		
+		scheduler = new Scheduler(this);
 	
     }
 
     void handleConfigurationRequests()
     {
-	System.out.println("Resource.handleConfigurationRequests()");
+		System.out.println("Resource.handleConfigurationRequests()");
     }
-    
+
     void runResource()
     {
-	System.out.println("Resource.runResource()");	
-	scheduler.runEvents();
+		System.out.println("Resource.runResource()");	
+		scheduler.runEvents();
     }
 
     String getName()
     {
-	return name;
+		return name;
     }
 
     Scheduler getScheduler()
     {
-	return scheduler;
+		return scheduler;
     }
 	
-    public void addApplicationFragment(String name)
+    public void addFBNetwork(String name)
     {
-	appFragments.put(name, new ApplicationFragment(this));
+		fbNetworks.put(name, new FBNetwork(this));
     }
 
-    public ApplicationFragment getApplicationFragment(String name)
+    public FBNetwork getFBNetwork(String name)
     {
-	return (ApplicationFragment) appFragments.get(name);
+		return (FBNetwork) fbNetworks.get(name);
     }
 
     public void addBasicFBType(String name)
     {
-	fbTypes.put(name,new BasicFBType(name,this));
+		fbTypes.put(name,new BasicFBType(name,this));
     }
 
     public FBType getFBType(String name)
     {
-	return (FBType) fbTypes.get(name);
+		return (FBType) fbTypes.get(name);
     }
 
 }

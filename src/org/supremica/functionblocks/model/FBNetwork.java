@@ -47,51 +47,49 @@
  * Supremica is owned and represented by KA.
  */
 /**
- * @author Cengic
+ * @author cengic
  */
-
+/*
+ * Created on Dec 16, 2004
+ */
 package org.supremica.functionblocks.model;
 
-import java.util.*;
-
-public class Device
+import java.util.Map;
+import java.util.HashMap;
+public class FBNetwork
 {
 
-    private String name;
-    private Resource managementResource;
-    private Map resources = new HashMap();
+	private Resource resource;
+	// instances
+	private Map fbInstances = new HashMap();
 
-    private Loader loader;
-
-    private Device() {}
-
-    public Device(String name, String systemFile)
-    {
-		System.out.println("Device(" + name + ")");
-		loader = new Loader(this);
-		
-		loader.load(systemFile);
-		// kick off
-		getResource("TestResource").getFBNetwork("FBNetwork").getFBInstance("inst1").queueEvent("OCCURRED");
-	}		
-
-    public void addResource(String name)
-    {
-		resources.put(name,new Resource(name));
-    }
+	private FBNetwork() {}
 	
-    public Resource getResource(String name)
-    {
-		return (Resource) resources.get(name);
-    }
-	
-    public void runDevice()
-    {
-		System.out.println("Device.runDevice()");
-		for (Iterator iter = resources.keySet().iterator();iter.hasNext();)
-		{
-			getResource((String) iter.next()).runResource();
-		}
-    }
+	public FBNetwork(Resource res)
+	{
+		resource = res;
+	}
+
+	public void addFBInstance(String name,String fbType)
+	{
+		fbInstances.put(name,resource.getFBType(fbType).createInstance(name));
+	}
+
+	public FBInstance getFBInstance(String name)
+	{
+		return (FBInstance) fbInstances.get(name);
+	}
+
+	public void addEventConnection(String fromInstance,String fromOutput, String toInstance, String toInput)
+	{
+		Connection newConn = new Connection(getFBInstance(toInstance), toInput);
+		getFBInstance(fromInstance).addEventOutputConnection(fromOutput, newConn);
+	}
+
+	public void addDataConnection(String fromInstance,String fromOutput, String toInstance, String toInput)
+	{
+		Connection newConn = new Connection(getFBInstance(fromInstance), fromOutput);
+		getFBInstance(toInstance).addDataInputConnection(toInput, newConn);
+	}
 
 }
