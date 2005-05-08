@@ -30,6 +30,7 @@
   <property name="jniglue.jar" location="${jar}/jniglue.jar"/>
   <property name="test.jar" location="${jar}/waters_test.jar"/>
   <property name="waters.jar" location="${jar}/waters.jar"/>
+  <property name="waters424.jar" location="${jar}/waters424.jar"/>
 
   <path id="external-classpath">
     <pathelement path="${jwsdp.classpath}"/>
@@ -100,6 +101,29 @@
         <exclude name="net/sourceforge/waters/gui/**"/>
         <exclude name="net/sourceforge/waters/junit/**"/>
         <exclude name="net/sourceforge/waters/xsd/**"/>
+      </fileset>
+      <zipfileset file="${xsl}/vw.xsl"
+	          fullpath="net/sourceforge/waters/valid/vw.xsl"/>
+    </jar>
+  </target>
+
+  <target name="424" depends="jaxb-compile,waters-compile"
+          description="Build archive for COMP424-05A asssignment.">
+    <jar jarfile="${waters424.jar}">
+      <fileset dir="${classes}">
+        <include name="net/sourceforge/waters/**/*.class"/>
+        <exclude name="net/sourceforge/waters/build/**"/>
+        <exclude name="net/sourceforge/waters/gui/**"/>
+        <exclude name="net/sourceforge/waters/junit/**"/>
+        <exclude name="net/sourceforge/waters/model/analysis/**"/>
+        <exclude name="net/sourceforge/waters/samples/**"/>
+        <include name="org/w3/**/*.class"/>
+      </fileset>
+      <fileset dir="${src}">
+        <include name="net/sourceforge/waters/xsd/**/*.properties"/>
+        <include name="net/sourceforge/waters/xsd/**/*.ser"/>
+        <include name="org/w3/**/*.properties"/>
+        <include name="org/w3/**/*.ser"/>
       </fileset>
       <zipfileset file="${xsl}/vw.xsl"
 	          fullpath="net/sourceforge/waters/valid/vw.xsl"/>
@@ -223,7 +247,11 @@
       </packageset>
       <packageset dir="${supremica.src}">
         <include name="net/sourceforge/waters/**/*"/>
+        <exclude name="net/sourceforge/waters/build/**"/>
         <exclude name="net/sourceforge/waters/gui/**"/>
+        <exclude name="net/sourceforge/waters/junit/**"/>
+        <exclude name="net/sourceforge/waters/model/analysis/**"/>
+        <exclude name="net/sourceforge/waters/samples/**"/>
       </packageset>
       <doctitle><![CDATA[<h1>Waters API Documentation</h1>]]></doctitle>
       <link href="${java14.api.url}"
