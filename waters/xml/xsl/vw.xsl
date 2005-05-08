@@ -31,7 +31,7 @@
 <!-- Module / ConstantAliasList                                           -->
 <!-- ==================================================================== -->
 
-<xsl:template match="definitions[count(node()) = 0]"/>
+<xsl:template match="definitions[count(./*) = 0]"/>
 
 <xsl:template match="definitions">
   <ConstantAliasList>
@@ -57,9 +57,9 @@
 <!-- Module / EventDeclList                                               -->
 <!-- ==================================================================== -->
 
-<xsl:template match="interface[count(node()) = 0]"/>
+<xsl:template match="interface[count(./*) = 0]"/>
 
-<xsl:template match="local[count(node()) = 0]"/>
+<xsl:template match="local[count(./*) = 0]"/>
 
 <xsl:template match="local">
   <EventDeclList>
@@ -106,7 +106,7 @@
 <!-- Module / ComponentList                                               -->
 <!-- ==================================================================== -->
 
-<xsl:template match="parts[count(node()) = 0]"/>
+<xsl:template match="parts[count(./*) = 0]"/>
 
 <xsl:template match="parts">
   <ComponentList>
@@ -182,7 +182,7 @@
   </Graph>
 </xsl:template>
 
-<xsl:template match="events[count(node()) = 0]"/>
+<xsl:template match="events[count(./*) = 0]"/>
 
 <xsl:template match="events">
   <EventList>
@@ -196,7 +196,7 @@
   </xsl:call-template>
 </xsl:template>
 
-<xsl:template match="nodes[count(node()) = 0]"/>
+<xsl:template match="nodes[count(./*) = 0]"/>
 
 <xsl:template match="nodes">
   <NodeList>
@@ -238,12 +238,14 @@
 <xsl:template match="nodeElement">
   <NodeRef>
     <xsl:attribute name="Name">
-      <xsl:value-of select="@name"/>
+      <xsl:call-template name="replace-dollars">
+        <xsl:with-param name="name" select="@name"/>
+      </xsl:call-template>
     </xsl:attribute>
   </NodeRef>
 </xsl:template>
 
-<xsl:template match="edges[count(node()) = 0]"/>
+<xsl:template match="edges[count(./*) = 0]"/>
 
 <xsl:template match="edges">
   <EdgeList>
