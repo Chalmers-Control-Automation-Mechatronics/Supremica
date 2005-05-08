@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="never_blow_up" version="1.0" valid="1"
+	hasGeometry="1" width="37" height="37"
+	generatorName="DGE" generatorVersion="2.9b2"
+	creationDate="2005-05-08 08:28:53 GMT" modificationDate="2005-05-08 08:28:53 GMT">
+	<events>
+		<event controllable="0" name="blow_up"/>
+	</events>
+	<nodes>
+		<node initial="1" marked="1">
+			<rendering><point x="176" y="96"/></rendering>
+			<label name="never">
+				<rendering><point x="-17" y="21"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+	</edges>
+</graph>

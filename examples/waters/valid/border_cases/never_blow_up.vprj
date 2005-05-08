@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE project PUBLIC "project" "project.dtd">
+
+<project name="never_blow_up"
+         legacy="1"
+         generatorName="VALID-II"
+         generatorVersion="2.9b2"
+         version="1.0"
+         creationDate="2005-05-08 20:28:10 GMT+12:00"
+         modificationDate="2005-05-08 20:32:16 GMT+12:00">
+<uses module="never_blow_up_main"/>
+</project>
