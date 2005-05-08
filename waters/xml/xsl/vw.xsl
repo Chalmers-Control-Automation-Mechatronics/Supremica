@@ -390,11 +390,29 @@
       <xsl:variable
         name="body"
         select="substring($expr,2,string-length($expr)-2)"/>
-      <EnumSetExpression>
-        <xsl:call-template name="collect-enum-members">
-          <xsl:with-param name="list" select="normalize-space($body)"/>
-        </xsl:call-template>
-      </EnumSetExpression>
+      <xsl:choose>
+        <xsl:when test="format-number($body,'#')='NaN'">
+          <EnumSetExpression>
+            <xsl:call-template name="collect-enum-members">
+              <xsl:with-param name="list" select="normalize-space($body)"/>
+            </xsl:call-template>
+          </EnumSetExpression>
+        </xsl:when>
+        <xsl:otherwise>
+          <IntRangeExpression>
+            <IntConstant>
+              <xsl:attribute name="Value">
+                <xsl:value-of select="$body"/>
+              </xsl:attribute>
+            </IntConstant>
+            <IntConstant>
+              <xsl:attribute name="Value">
+                <xsl:value-of select="$body"/>
+              </xsl:attribute>
+            </IntConstant>
+          </IntRangeExpression>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:when>
     <xsl:when test="starts-with($expr,'$')">
       <SimpleIdentifier>
