@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+
+<graph name="machine"
+       version="1.0"
+       valid="1"
+       hasGeometry="1"
+       width="373"
+       height="108"
+       generatorName="DGE"
+       generatorVersion="2.7.9"
+       creationDate="2002-04-12 07:01:54 GMT"
+       modificationDate="2002-04-12 07:23:10 GMT">
+	<events>
+		<event controllable="1" name="machine_load.GROUP"></event>
+		<event controllable="0" name="machine_unload.GROUP"></event>
+	</events>
+	<nodes>
+		<node initial="0" marked="0">
+			<rendering><point x="234" y="249"></point></rendering>
+			<label name="WORKING">
+				<rendering><point x="11" y="5"></point></rendering>
+			</label>
+		</node>
+		<node initial="1" marked="1">
+			<rendering><point x="234" y="162"></point></rendering>
+			<label name="IDLE">
+				<rendering><point x="11" y="5"></point></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge isLoop="0">
+			<rendering><point x="192" y="201"></point></rendering>
+			<source name="IDLE"></source>
+			<target name="WORKING"></target>
+			<labelGroup>
+				<rendering><point x="-132" y="4"></point></rendering>
+				<label name="machine_load.GROUP"></label>
+			</labelGroup>
+		</edge>
+		<edge isLoop="0">
+			<rendering><point x="274" y="201"></point></rendering>
+			<source name="WORKING"></source>
+			<target name="IDLE"></target>
+			<labelGroup>
+				<rendering><point x="6" y="3"></point></rendering>
+				<label name="machine_unload.GROUP"></label>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

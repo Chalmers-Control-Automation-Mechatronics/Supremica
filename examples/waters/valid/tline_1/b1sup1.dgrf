@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="b1sup1" version="1.0" valid="1"
+	hasGeometry="1" width="283" height="273"
+	generatorName="DGE" generatorVersion="2.7.9"
+	creationDate="2002-04-17 06:34:38 GMT" modificationDate="2002-04-17 06:35:15 GMT">
+	<events>
+		<event controllable="0" name="tu_accept.GROUP"/>
+		<event controllable="0" name="tu_accept.PREV"/>
+		<event controllable="1" name="tu_load.PREV"/>
+	</events>
+	<nodes>
+		<node initial="1" marked="1">
+			<rendering><point x="208" y="80"/></rendering>
+			<label name="EMPTY">
+				<rendering><point x="-53" y="5"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="208" y="160"/></rendering>
+			<label name="FILLED1">
+				<rendering><point x="-60" y="5"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="208" y="240"/></rendering>
+			<label name="FILLED2">
+				<rendering><point x="-63" y="7"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="208" y="320"/></rendering>
+			<label name="FILLED3">
+				<rendering><point x="-61" y="7"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge isLoop="1">
+			<rendering><point x="244" y="240"/></rendering>
+			<source name="FILLED2"/>
+			<labelGroup>
+				<rendering><point x="3" y="6"/></rendering>
+				<label name="tu_load.PREV"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="176" y="279"/></rendering>
+			<source name="FILLED2"/>
+			<target name="FILLED3"/>
+			<labelGroup>
+				<rendering><point x="-97" y="5"/></rendering>
+				<label name="tu_accept.PREV"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="242" y="199"/></rendering>
+			<source name="FILLED2"/>
+			<target name="FILLED1"/>
+			<labelGroup>
+				<rendering><point x="6" y="5"/></rendering>
+				<label name="tu_accept.GROUP"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="242" y="80"/></rendering>
+			<source name="EMPTY"/>
+			<labelGroup>
+				<rendering><point x="6" y="-3"/></rendering>
+				<label name="tu_accept.GROUP"/>
+				<label name="tu_load.PREV">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="176" y="120"/></rendering>
+			<source name="EMPTY"/>
+			<target name="FILLED1"/>
+			<labelGroup>
+				<rendering><point x="-95" y="5"/></rendering>
+				<label name="tu_accept.PREV"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="243" y="279"/></rendering>
+			<source name="FILLED3"/>
+			<target name="FILLED2"/>
+			<labelGroup>
+				<rendering><point x="6" y="4"/></rendering>
+				<label name="tu_accept.GROUP"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="176" y="201"/></rendering>
+			<source name="FILLED1"/>
+			<target name="FILLED2"/>
+			<labelGroup>
+				<rendering><point x="-96" y="4"/></rendering>
+				<label name="tu_accept.PREV"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="242" y="119"/></rendering>
+			<source name="FILLED1"/>
+			<target name="EMPTY"/>
+			<labelGroup>
+				<rendering><point x="5" y="5"/></rendering>
+				<label name="tu_accept.GROUP"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="242" y="160"/></rendering>
+			<source name="FILLED1"/>
+			<labelGroup>
+				<rendering><point x="6" y="5"/></rendering>
+				<label name="tu_load.PREV"/>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>
