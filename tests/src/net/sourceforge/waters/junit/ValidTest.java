@@ -1,11 +1,11 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.junit
 //# CLASS:   ValidTest
 //###########################################################################
-//# $Id: ValidTest.java,v 1.3 2005-05-08 00:27:15 robi Exp $
+//# $Id: ValidTest.java,v 1.4 2005-05-08 04:09:01 robi Exp $
 //###########################################################################
-
 
 package net.sourceforge.waters.junit;
 
@@ -20,6 +20,7 @@ import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.ProductDESMarshaller;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.expr.IndexOutOfRangeException;
+import net.sourceforge.waters.model.expr.TypeMismatchException;
 import net.sourceforge.waters.model.module.ModuleMarshaller;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.valid.ValidUnmarshaller;
@@ -29,11 +30,18 @@ public class ValidTest extends WatersTestCase
 {
 
   //#########################################################################
-  //# Test Cases
-  public void testImport_ftuer()
+  //# Successful Test Cases
+  public void testImport_bmw_fh()
     throws Exception
   {
-    testImport("central_locking", "ftuer");
+    testImport("bmw_fh", "bmw_fh");
+  }
+
+  public void testImport_bmw_fh_bad()
+    throws Exception
+  {
+    testImport("bmw_fh", "bmw_fh_bad",
+               TypeMismatchException.class, "'CLOSE'");
   }
 
   public void testImport_debounce()
@@ -58,7 +66,13 @@ public class ValidTest extends WatersTestCase
     throws Exception
   {
     testImport("fischertechnik", "fischertechnik_bad",
-	       IndexOutOfRangeException.class, "'ST'");
+               IndexOutOfRangeException.class, "'ST'");
+  }
+
+  public void testImport_ftuer()
+    throws Exception
+  {
+    testImport("central_locking", "ftuer");
   }
 
   public void testImport_mazes()
@@ -95,7 +109,7 @@ public class ValidTest extends WatersTestCase
   //#########################################################################
   //# Utilities
   void testImport(final String subdir, final String name,
-		  final Class exclass, final String culprit)
+                  final Class exclass, final String culprit)
     throws Exception
   {
     try {
@@ -103,15 +117,15 @@ public class ValidTest extends WatersTestCase
       assertTrue("Expected " + exclass.getName() + " not caught!", false);
     } catch (final WatersException exception) {
       if (exception.getClass() == exclass) {
-	if (culprit != null) {
-	  final String msg = exception.getMessage();
-	  assertTrue("Caught " + exclass.getName() +
-		     " as expected, but message '" + msg +
-		     " does not mention culprit " + culprit + "!",
-		     msg.indexOf(culprit) >= 0);
-	}
+        if (culprit != null) {
+          final String msg = exception.getMessage();
+          assertTrue("Caught " + exclass.getName() +
+                     " as expected, but message '" + msg +
+                     " does not mention culprit " + culprit + "!",
+                     msg.indexOf(culprit) >= 0);
+        }
       } else {
-	throw exception;
+        throw exception;
       }
     }
   }
@@ -143,7 +157,7 @@ public class ValidTest extends WatersTestCase
   }
 
   ProductDESProxy testCompile(final ModuleProxy module,
-			      final File outfilename)
+                              final File outfilename)
     throws Exception
   {
     final ModuleCompiler compiler =
@@ -154,15 +168,15 @@ public class ValidTest extends WatersTestCase
   }
 
   void testCompare(final DocumentProxy doc,
-		   final File filename,
-		   final String kindname)
+                   final File filename,
+                   final String kindname)
     throws Exception
   {
     final DocumentProxy doc2 = mDocumentManager.load(filename);
     final ElementProxy elem  = (ElementProxy) doc;
     assertTrue("Identical documents from different sources!", elem != doc2);
     assertTrue("Unexpected " + kindname + " contents!",
-	       elem.equalsWithGeometry(doc2));
+               elem.equalsWithGeometry(doc2));
   }
 
 

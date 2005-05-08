@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE project PUBLIC "project" "project.dtd">
+
+<project name="bmw_fh_bad"
+         legacy="1"
+         generatorName="VALID-II"
+         generatorVersion="2.9b2"
+         version="1.0"
+         creationDate="2005-05-08 14:04:25 GMT+12:00"
+         modificationDate="2005-05-08 16:00:59 GMT+12:00">
+<uses module="bmw_fh_bad_main"/>
+</project>

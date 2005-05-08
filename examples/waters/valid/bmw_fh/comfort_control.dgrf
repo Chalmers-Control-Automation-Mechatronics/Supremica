@@ -1,33 +1,190 @@
-dgrf2.3.3
-//s 426 311
-11
-c CMFT_BACK.CLOSE
-c CMFT_BACK.OPEN
-c cmft_cond_doors
-c cmft_cond_key
-c cmft_start
-c CMFT_STOP
-c FH_UNLOCK
-u REQ.CLOSE
-u REQ.OPEN
-u REQ.STOP
-c timer
-5
-256 144 8 0 0 29 -6 request
-256 224 8 0 0 -38 4 cmft
-112 144 8 1 1 -32 11 off
-256 320 8 0 0 19 4 esc
-384 320 8 0 0 15 5 esc_req
-12
-2 cmft 295 227 5 3 1 10 0 0
-3 cmft esc 256 271 -66 -12 3 9 0 0 2 0 13 3 0 26
-1 request cmft -16 3 2 1 0 0 0 0 13
-2 request 276 113 11 -15 2 10 0 0 4 0 13
-3 request off 185 160 -51 12 3 9 0 0 2 0 13 3 0 26
-2 esc 239 347 -43 17 1 9 0 0
-3 esc esc_req 317 303 -18 -22 2 8 0 0 7 0 13
-3 esc off 164 296 -80 3 1 5 0 0
-3 esc_req request 358 176 18 13 1 5 0 0
-3 esc_req esc 319 340 -29 17 3 9 0 0 2 0 13 3 0 26
-3 off request 182 127 -29 -22 2 7 0 0 8 0 13
-2 off 90 116 -63 -27 2 9 0 0 6 0 13
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="comfort_control" version="1.0" valid="1"
+	hasGeometry="1" width="426" height="322"
+	generatorName="DGE" generatorVersion="2.9b2"
+	creationDate="2005-05-08 02:12:05 GMT" modificationDate="2005-05-08 02:12:05 GMT">
+	<events>
+		<event controllable="1" name="CMFT_BACK.CLOSE"/>
+		<event controllable="1" name="CMFT_BACK.OPEN"/>
+		<event controllable="1" name="cmft_cond_doors"/>
+		<event controllable="1" name="cmft_cond_key"/>
+		<event controllable="1" name="cmft_start"/>
+		<event controllable="1" name="CMFT_STOP"/>
+		<event controllable="1" name="FH_UNLOCK"/>
+		<event controllable="0" name="REQ.CLOSE"/>
+		<event controllable="0" name="REQ.OPEN"/>
+		<event controllable="0" name="REQ.STOP"/>
+		<event controllable="1" name="timer"/>
+	</events>
+	<nodes>
+		<node>
+			<rendering><point x="384" y="320"/></rendering>
+			<label name="esc_req">
+				<rendering><point x="15" y="5"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="256" y="320"/></rendering>
+			<label name="esc">
+				<rendering><point x="19" y="4"/></rendering>
+			</label>
+		</node>
+		<node initial="1" marked="1">
+			<rendering><point x="112" y="144"/></rendering>
+			<label name="off">
+				<rendering><point x="-32" y="11"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="256" y="224"/></rendering>
+			<label name="cmft">
+				<rendering><point x="-38" y="4"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="256" y="144"/></rendering>
+			<label name="request">
+				<rendering><point x="29" y="-6"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge isLoop="1">
+			<rendering><point x="295" y="227"/></rendering>
+			<source name="cmft"/>
+			<labelGroup>
+				<rendering><point x="5" y="3"/></rendering>
+				<label name="timer"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="256" y="271"/></rendering>
+			<source name="cmft"/>
+			<target name="esc"/>
+			<labelGroup>
+				<rendering><point x="-66" y="-12"/></rendering>
+				<label name="REQ.STOP"/>
+				<label name="cmft_cond_doors">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+				<label name="cmft_cond_key">
+					<rendering><point x="0" y="30"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="request"/>
+			<target name="cmft"/>
+			<labelGroup>
+				<rendering><point x="-16" y="3"/></rendering>
+				<label name="CMFT_BACK.OPEN"/>
+				<label name="CMFT_BACK.CLOSE">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="276" y="113"/></rendering>
+			<source name="request"/>
+			<labelGroup>
+				<rendering><point x="11" y="-15"/></rendering>
+				<label name="timer"/>
+				<label name="cmft_start">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="185" y="160"/></rendering>
+			<source name="request"/>
+			<target name="off"/>
+			<labelGroup>
+				<rendering><point x="-51" y="12"/></rendering>
+				<label name="REQ.STOP"/>
+				<label name="cmft_cond_doors">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+				<label name="cmft_cond_key">
+					<rendering><point x="0" y="30"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="182" y="127"/></rendering>
+			<source name="off"/>
+			<target name="request"/>
+			<labelGroup>
+				<rendering><point x="-29" y="-22"/></rendering>
+				<label name="REQ.CLOSE"/>
+				<label name="REQ.OPEN">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="90" y="116"/></rendering>
+			<source name="off"/>
+			<labelGroup>
+				<rendering><point x="-63" y="-27"/></rendering>
+				<label name="REQ.STOP"/>
+				<label name="FH_UNLOCK">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="358" y="176"/></rendering>
+			<source name="esc_req"/>
+			<target name="request"/>
+			<labelGroup>
+				<rendering><point x="18" y="13"/></rendering>
+				<label name="CMFT_STOP"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="319" y="340"/></rendering>
+			<source name="esc_req"/>
+			<target name="esc"/>
+			<labelGroup>
+				<rendering><point x="-29" y="17"/></rendering>
+				<label name="REQ.STOP"/>
+				<label name="cmft_cond_doors">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+				<label name="cmft_cond_key">
+					<rendering><point x="0" y="30"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="164" y="296"/></rendering>
+			<source name="esc"/>
+			<target name="off"/>
+			<labelGroup>
+				<rendering><point x="-80" y="3"/></rendering>
+				<label name="CMFT_STOP"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="317" y="303"/></rendering>
+			<source name="esc"/>
+			<target name="esc_req"/>
+			<labelGroup>
+				<rendering><point x="-18" y="-22"/></rendering>
+				<label name="REQ.OPEN"/>
+				<label name="REQ.CLOSE">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="239" y="347"/></rendering>
+			<source name="esc"/>
+			<labelGroup>
+				<rendering><point x="-43" y="17"/></rendering>
+				<label name="REQ.STOP"/>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

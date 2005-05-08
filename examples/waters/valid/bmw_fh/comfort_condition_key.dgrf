@@ -1,22 +1,91 @@
-dgrf2.0.2
-//s 279 214
-11
-c CMFT_BACK.CLOSE
-c CMFT_BACK.OPEN
-c cmft_cond_key
-c CMFT_FRONT.CLOSE
-c CMFT_FRONT.OPEN
-c CMFT_ROOF.CLOSE
-c CMFT_ROOF.OPEN
-c cmft_start
-u KEY_PLUG
-u KEY_UNPLUG
-c timer
-2
-208 160 8 1 1 16 1 no_key
-208 240 8 0 0 17 6 key
-4
-2 key 175 258 -97 2 1 2 0 0
-3 key no_key 226 200 9 5 1 9 0 0
-3 no_key key 192 201 -74 3 1 8 0 0
-2 no_key 176 134 -131 -66 8 7 0 0 1 0 16 6 0 32 4 0 48 0 0 64 5 0 80 3 0 96 10 0 112
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="comfort_condition_key" version="1.0" valid="1"
+	hasGeometry="1" width="278" height="218"
+	generatorName="DGE" generatorVersion="2.9b2"
+	creationDate="2005-05-08 02:12:05 GMT" modificationDate="2005-05-08 02:12:05 GMT">
+	<events>
+		<event controllable="1" name="CMFT_BACK.CLOSE"/>
+		<event controllable="1" name="CMFT_BACK.OPEN"/>
+		<event controllable="1" name="cmft_cond_key"/>
+		<event controllable="1" name="CMFT_FRONT.CLOSE"/>
+		<event controllable="1" name="CMFT_FRONT.OPEN"/>
+		<event controllable="1" name="CMFT_ROOF.CLOSE"/>
+		<event controllable="1" name="CMFT_ROOF.OPEN"/>
+		<event controllable="1" name="cmft_start"/>
+		<event controllable="0" name="KEY_PLUG"/>
+		<event controllable="0" name="KEY_UNPLUG"/>
+		<event controllable="1" name="timer"/>
+	</events>
+	<nodes>
+		<node>
+			<rendering><point x="208" y="240"/></rendering>
+			<label name="key">
+				<rendering><point x="17" y="6"/></rendering>
+			</label>
+		</node>
+		<node initial="1" marked="1">
+			<rendering><point x="208" y="160"/></rendering>
+			<label name="no_key">
+				<rendering><point x="16" y="1"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge isLoop="1">
+			<rendering><point x="175" y="258"/></rendering>
+			<source name="key"/>
+			<labelGroup>
+				<rendering><point x="-97" y="2"/></rendering>
+				<label name="cmft_cond_key"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="226" y="200"/></rendering>
+			<source name="key"/>
+			<target name="no_key"/>
+			<labelGroup>
+				<rendering><point x="9" y="5"/></rendering>
+				<label name="KEY_UNPLUG"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="192" y="201"/></rendering>
+			<source name="no_key"/>
+			<target name="key"/>
+			<labelGroup>
+				<rendering><point x="-74" y="3"/></rendering>
+				<label name="KEY_PLUG"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="176" y="134"/></rendering>
+			<source name="no_key"/>
+			<labelGroup>
+				<rendering><point x="-131" y="-66"/></rendering>
+				<label name="cmft_start"/>
+				<label name="CMFT_BACK.OPEN">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+				<label name="CMFT_ROOF.OPEN">
+					<rendering><point x="0" y="30"/></rendering>
+				</label>
+				<label name="CMFT_FRONT.OPEN">
+					<rendering><point x="0" y="45"/></rendering>
+				</label>
+				<label name="CMFT_BACK.CLOSE">
+					<rendering><point x="0" y="60"/></rendering>
+				</label>
+				<label name="CMFT_ROOF.CLOSE">
+					<rendering><point x="0" y="75"/></rendering>
+				</label>
+				<label name="CMFT_FRONT.CLOSE">
+					<rendering><point x="0" y="90"/></rendering>
+				</label>
+				<label name="timer">
+					<rendering><point x="0" y="105"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

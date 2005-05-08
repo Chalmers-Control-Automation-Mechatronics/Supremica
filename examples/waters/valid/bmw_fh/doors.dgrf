@@ -1,11 +1,45 @@
-dgrf2.4.7
-//s 198 81
-2
-u CLOSE.DOOR
-u OPEN.DOOR
-2
-112 80 8 1 1 -54 6 closed
-208 80 8 0 0 14 4 open
-2
-3 open closed 159 63 -43 -7 1 0 0 0
-3 closed open 159 96 -40 19 1 1 0 0
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="doors" version="1.0" valid="1"
+	hasGeometry="1" width="198" height="83"
+	generatorName="DGE" generatorVersion="2.9b2"
+	creationDate="2005-05-08 02:12:06 GMT" modificationDate="2005-05-08 03:58:50 GMT">
+	<events>
+		<event controllable="0" name="CLOSEDOOR.DOOR"/>
+		<event controllable="0" name="OPENDOOR.DOOR"/>
+	</events>
+	<nodes>
+		<node initial="1" marked="1">
+			<rendering><point x="112" y="80"/></rendering>
+			<label name="closed">
+				<rendering><point x="-54" y="6"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="208" y="80"/></rendering>
+			<label name="open">
+				<rendering><point x="14" y="4"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge>
+			<rendering><point x="159" y="63"/></rendering>
+			<source name="open"/>
+			<target name="closed"/>
+			<labelGroup>
+				<rendering><point x="-43" y="-7"/></rendering>
+				<label name="CLOSEDOOR.DOOR"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="159" y="96"/></rendering>
+			<source name="closed"/>
+			<target name="open"/>
+			<labelGroup>
+				<rendering><point x="-40" y="19"/></rendering>
+				<label name="OPENDOOR.DOOR"/>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

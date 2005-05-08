@@ -1,12 +1,48 @@
-dgrf2.0.2
-//s 189 101
-3
-u REQ.CLOSE
-u REQ.OPEN
-u REQ.STOP
-2
-96 128 8 0 0 18 6 request
-96 48 8 1 1 17 1 no_request
-2
-3 request no_request 134 86 5 2 1 2 0 0
-1 no_request request -77 -10 2 0 0 0 1 0 16
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="comfort_function" version="1.0" valid="1"
+	hasGeometry="1" width="191" height="105"
+	generatorName="DGE" generatorVersion="2.9b2"
+	creationDate="2005-05-08 02:12:06 GMT" modificationDate="2005-05-08 02:12:06 GMT">
+	<events>
+		<event controllable="0" name="REQ.CLOSE"/>
+		<event controllable="0" name="REQ.OPEN"/>
+		<event controllable="0" name="REQ.STOP"/>
+	</events>
+	<nodes>
+		<node initial="1" marked="1">
+			<rendering><point x="96" y="48"/></rendering>
+			<label name="no_request">
+				<rendering><point x="17" y="1"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="96" y="128"/></rendering>
+			<label name="request">
+				<rendering><point x="18" y="6"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge>
+			<rendering><point x="134" y="86"/></rendering>
+			<source name="request"/>
+			<target name="no_request"/>
+			<labelGroup>
+				<rendering><point x="5" y="2"/></rendering>
+				<label name="REQ.STOP"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="no_request"/>
+			<target name="request"/>
+			<labelGroup>
+				<rendering><point x="-77" y="-10"/></rendering>
+				<label name="REQ.CLOSE"/>
+				<label name="REQ.OPEN">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

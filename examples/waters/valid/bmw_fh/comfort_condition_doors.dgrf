@@ -1,28 +1,135 @@
-dgrf2.4.7
-//s 288 335
-13
-u CLOSE.DRD
-u CLOSE.PSD
-c CMFT_BACK.CLOSE
-c CMFT_BACK.OPEN
-c cmft_cond_doors
-c CMFT_FRONT.CLOSE
-c CMFT_FRONT.OPEN
-c CMFT_ROOF.CLOSE
-c CMFT_ROOF.OPEN
-c cmft_start
-u OPEN.DRD
-u OPEN.PSD
-c timer
-3
-208 128 8 1 1 13 3 doors_closed
-208 320 8 0 0 21 9 doors_open
-208 224 8 0 0 17 4 door_open
-7
-2 door_open 173 222 -103 4 1 4 0 0
-3 door_open doors_closed 240 176 6 -8 2 0 0 0 1 0 13
-1 door_open doors_open -77 -2 2 10 0 0 11 0 13
-1 doors_closed door_open -75 -5 2 10 0 0 11 0 13
-2 doors_closed 174 104 -134 -71 8 9 0 0 3 0 13 8 0 26 6 0 39 2 0 52 7 0 65 5 0 78 12 0 91
-3 doors_open door_open 241 271 6 -3 2 0 0 0 1 0 13
-2 doors_open 182 346 -107 -4 1 4 0 0
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="comfort_condition_doors" version="1.0" valid="1"
+	hasGeometry="1" width="321" height="337"
+	generatorName="DGE" generatorVersion="2.9b2"
+	creationDate="2005-05-08 02:12:05 GMT" modificationDate="2005-05-08 03:57:41 GMT">
+	<events>
+		<event controllable="0" name="CLOSEDOOR.DRD"/>
+		<event controllable="0" name="CLOSEDOOR.PSD"/>
+		<event controllable="1" name="CMFT_BACK.CLOSE"/>
+		<event controllable="1" name="CMFT_BACK.OPEN"/>
+		<event controllable="1" name="cmft_cond_doors"/>
+		<event controllable="1" name="CMFT_FRONT.CLOSE"/>
+		<event controllable="1" name="CMFT_FRONT.OPEN"/>
+		<event controllable="1" name="CMFT_ROOF.CLOSE"/>
+		<event controllable="1" name="CMFT_ROOF.OPEN"/>
+		<event controllable="1" name="cmft_start"/>
+		<event controllable="0" name="OPENDOOR.DRD"/>
+		<event controllable="0" name="OPENDOOR.PSD"/>
+		<event controllable="1" name="timer"/>
+	</events>
+	<nodes>
+		<node initial="1" marked="1">
+			<rendering><point x="208" y="128"/></rendering>
+			<label name="doors_closed">
+				<rendering><point x="13" y="3"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="208" y="320"/></rendering>
+			<label name="doors_open">
+				<rendering><point x="21" y="9"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="208" y="224"/></rendering>
+			<label name="door_open">
+				<rendering><point x="17" y="4"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge isLoop="1">
+			<rendering><point x="174" y="104"/></rendering>
+			<source name="doors_closed"/>
+			<labelGroup>
+				<rendering><point x="-134" y="-71"/></rendering>
+				<label name="cmft_start"/>
+				<label name="CMFT_BACK.OPEN">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+				<label name="CMFT_ROOF.OPEN">
+					<rendering><point x="0" y="30"/></rendering>
+				</label>
+				<label name="CMFT_FRONT.OPEN">
+					<rendering><point x="0" y="45"/></rendering>
+				</label>
+				<label name="CMFT_BACK.CLOSE">
+					<rendering><point x="0" y="60"/></rendering>
+				</label>
+				<label name="CMFT_ROOF.CLOSE">
+					<rendering><point x="0" y="75"/></rendering>
+				</label>
+				<label name="CMFT_FRONT.CLOSE">
+					<rendering><point x="0" y="90"/></rendering>
+				</label>
+				<label name="timer">
+					<rendering><point x="0" y="105"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="doors_closed"/>
+			<target name="door_open"/>
+			<labelGroup>
+				<rendering><point x="-99" y="-7"/></rendering>
+				<label name="OPENDOOR.DRD"/>
+				<label name="OPENDOOR.PSD">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="240" y="176"/></rendering>
+			<source name="door_open"/>
+			<target name="doors_closed"/>
+			<labelGroup>
+				<rendering><point x="6" y="-8"/></rendering>
+				<label name="CLOSEDOOR.DRD"/>
+				<label name="CLOSEDOOR.PSD">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="173" y="222"/></rendering>
+			<source name="door_open"/>
+			<labelGroup>
+				<rendering><point x="-103" y="4"/></rendering>
+				<label name="cmft_cond_doors"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="door_open"/>
+			<target name="doors_open"/>
+			<labelGroup>
+				<rendering><point x="-101" y="-3"/></rendering>
+				<label name="OPENDOOR.DRD"/>
+				<label name="OPENDOOR.PSD">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="241" y="271"/></rendering>
+			<source name="doors_open"/>
+			<target name="door_open"/>
+			<labelGroup>
+				<rendering><point x="6" y="-3"/></rendering>
+				<label name="CLOSEDOOR.DRD"/>
+				<label name="CLOSEDOOR.PSD">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="182" y="346"/></rendering>
+			<source name="doors_open"/>
+			<labelGroup>
+				<rendering><point x="-107" y="-4"/></rendering>
+				<label name="cmft_cond_doors"/>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

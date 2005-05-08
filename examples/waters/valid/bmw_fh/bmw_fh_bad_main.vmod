@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE module PUBLIC "module" "module.dtd">
+
+<module name="bmw_fh_bad_main"
+        legacy="1"
+        arity="0"
+        generatorName="VALID-II"
+        generatorVersion="2.9b2"
+        version="1.0"
+        creationDate="2005-05-08 14:04:25 GMT+12:00"
+        modificationDate="2005-05-08 16:00:59 GMT+12:00">
+<interface/>
+<local>
+<event name="usaus"
+       controllable="0"
+       arity="0">
+</event>
+<event name="nocountry"
+       controllable="0"
+       arity="0">
+</event>
+<event name="OPEN"
+       controllable="0"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{PSD DRD}">
+<alias old="OPEN.$_0" new="OPEN[$_0]"/>
+</foreach-alias>
+<event name="cmft_start"
+       controllable="1"
+       arity="0">
+</event>
+<event name="CLOSE"
+       controllable="0"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{DRD PSD}">
+<alias old="CLOSE.$_0" new="CLOSE[$_0]"/>
+</foreach-alias>
+<event name="reset"
+       controllable="1"
+       arity="0">
+<comment>
+Zur?cksetzen des Timers.
+
+---
+
+Reset the timer.
+</comment>
+</event>
+<event name="fh_cond_ecefin"
+       controllable="1"
+       arity="0">
+</event>
+<event name="cmft_cond_doors"
+       controllable="1"
+       arity="0">
+</event>
+<event name="read_country"
+       controllable="1"
+       arity="0">
+</event>
+<event name="ecefin"
+       controllable="0"
+       arity="0">
+</event>
+<event name="CMFT_BACK"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{CLOSE OPEN}">
+<alias old="CMFT_BACK.$_0" new="CMFT_BACK[$_0]"/>
+</foreach-alias>
+<event name="KEY_PLUG"
+       controllable="0"
+       arity="0">
+</event>
+<event name="cmft_cond_key"
+       controllable="1"
+       arity="0">
+</event>
+<event name="KL_R_OFF"
+       controllable="0"
+       arity="0">
+</event>
+<event name="KL_R_ON"
+       controllable="0"
+       arity="0">
+</event>
+<event name="fh_cond_door_open"
+       controllable="1"
+       arity="0">
+</event>
+<event name="KL_50_ON"
+       controllable="0"
+       arity="0">
+</event>
+<event name="fh_cond_doors_closed"
+       controllable="1"
+       arity="0">
+</event>
+<event name="KL_50_OFF"
+       controllable="0"
+       arity="0">
+</event>
+<event name="timer"
+       controllable="1"
+       arity="0">
+<comment>
+Start des Timers.
+
+---
+
+Starts the timer.
+</comment>
+</event>
+<event name="CMFT_FRONT"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{CLOSE OPEN}">
+<alias old="CMFT_FRONT.$_0" new="CMFT_FRONT[$_0]"/>
+</foreach-alias>
+<event name="KEY_UNPLUG"
+       controllable="0"
+       arity="0">
+</event>
+<event name="REQ"
+       controllable="0"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{OPEN STOP CLOSE}">
+<alias old="REQ.$_0" new="REQ[$_0]"/>
+</foreach-alias>
+<event name="FH_LOCK"
+       controllable="1"
+       arity="0">
+</event>
+<event name="CMFT_ROOF"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{CLOSE OPEN}">
+<alias old="CMFT_ROOF.$_0" new="CMFT_ROOF[$_0]"/>
+</foreach-alias>
+<event name="CMFT_STOP"
+       controllable="1"
+       arity="0">
+</event>
+<event name="fh_cond_kl_r"
+       controllable="1"
+       arity="0">
+</event>
+<event name="timeout"
+       controllable="0"
+       arity="0">
+<comment>
+Timeout des Timers.
+
+---
+
+Timout of the timer.
+</comment>
+</event>
+<event name="FH_UNLOCK"
+       controllable="1"
+       arity="0">
+</event>
+</local>
+<parts>
+<component graph="fh_condition_doors_bad" kind="spec"/>
+<component graph="fh_condition_kl_r" kind="spec"/>
+<component graph="comfort_control" kind="spec"/>
+<component graph="comfort_function" kind="plant"/>
+<component graph="fh_condition_ecefin_bad" kind="spec"/>
+<component graph="fh" kind="spec"/>
+<component graph="readcountry" kind="plant"/>
+<component graph="comfort_condition_key" kind="spec"/>
+<component graph="comfort_condition_doors_bad" kind="spec"/>
+<component graph="timer" kind="plant"/>
+<component graph="fh_sync_cmft" kind="spec"/>
+<foreach-instance dummy="FUNC" range="{OPEN CLOSE}">
+<instance name="comfort[$FUNC]" module="comfort_spec">
+<nameParam name="CMFT_BACK" value="CMFT_BACK[$FUNC]"/>
+<nameParam name="cmft_cond_doors" value="cmft_cond_doors"/>
+<nameParam name="cmft_cond_key" value="cmft_cond_key"/>
+<nameParam name="CMFT_FRONT" value="CMFT_FRONT[$FUNC]"/>
+<nameParam name="CMFT_ROOF" value="CMFT_ROOF[$FUNC]"/>
+<nameParam name="cmft_start" value="cmft_start"/>
+<nameParam name="reset" value="reset"/>
+<nameParam name="timer" value="timer"/>
+<nameParam name="REQ_FUNC" value="REQ[$FUNC]"/>
+<nameParam name="timeout" value="timeout"/>
+<nameParam name="REQ_STOP" value="REQ[STOP]"/>
+</instance>
+</foreach-instance>
+<foreach-instance dummy="DOOR" range="{DRD PSD}">
+<instance name="doors_bad[$DOOR]" module="doors_bad_plant">
+<nameParam name="CLOSE" value="CLOSE[$DOOR]"/>
+<nameParam name="OPEN" value="OPEN[$DOOR]"/>
+</instance>
+</foreach-instance>
+<component graph="lock" kind="plant"/>
+</parts>
+</module>

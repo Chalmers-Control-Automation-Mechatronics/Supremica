@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+
+<graph name="doors_bad"
+       version="1.0"
+       valid="1"
+       hasGeometry="1"
+       width="198"
+       height="83"
+       generatorName="DGE"
+       generatorVersion="2.9b2"
+       creationDate="2005-05-08 03:58:24 GMT"
+       modificationDate="2005-05-08 03:58:24 GMT">
+	<events>
+		<event controllable="0" name="CLOSE.DOOR"></event>
+		<event controllable="0" name="OPEN.DOOR"></event>
+	</events>
+	<nodes>
+		<node initial="0" marked="0">
+			<rendering><point x="208" y="80"></point></rendering>
+			<label name="open">
+				<rendering><point x="14" y="4"></point></rendering>
+			</label>
+		</node>
+		<node initial="1" marked="1">
+			<rendering><point x="112" y="80"></point></rendering>
+			<label name="closed">
+				<rendering><point x="-54" y="6"></point></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge isLoop="0">
+			<rendering><point x="159" y="96"></point></rendering>
+			<source name="closed"></source>
+			<target name="open"></target>
+			<labelGroup>
+				<rendering><point x="-40" y="19"></point></rendering>
+				<label name="OPEN.DOOR"></label>
+			</labelGroup>
+		</edge>
+		<edge isLoop="0">
+			<rendering><point x="159" y="63"></point></rendering>
+			<source name="open"></source>
+			<target name="closed"></target>
+			<labelGroup>
+				<rendering><point x="-43" y="-7"></point></rendering>
+				<label name="CLOSE.DOOR"></label>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

@@ -1,9 +1,10 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: waters.model.expr
 //# CLASS:   TypeMismatchException
 //###########################################################################
-//# $Id: TypeMismatchException.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: TypeMismatchException.java,v 1.2 2005-05-08 04:09:01 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.expr;
@@ -43,7 +44,7 @@ public class TypeMismatchException extends EvalException {
    */
   public TypeMismatchException(final Proxy expr, final String typename)
   {
-    super("Expression '" + expr + "' is not of type" + typename + "!", expr);
+    super("Expression '" + expr + "' is not of type " + typename + "!", expr);
   }
 
   /**
@@ -56,8 +57,8 @@ public class TypeMismatchException extends EvalException {
    *                  {@link SimpleExpressionProxy}.
    */
   public TypeMismatchException(final Proxy expr,
-			       final Value subvalue,
-			       final int mask)
+                               final Value subvalue,
+                               final int mask)
   {
      this(expr, subvalue, SimpleExpressionProxy.getTypeName(mask));
   }
@@ -70,12 +71,12 @@ public class TypeMismatchException extends EvalException {
    * @param  typename The name of the expected type.
    */
   public TypeMismatchException(final Proxy expr,
-			       final Value subvalue,
-			       final String typename)
+                               final Value subvalue,
+                               final String typename)
   {
     super("Expression '" + expr +
-	  "' (evaluated to " + subvalue + ") is not of type" +
-	  typename + "!", expr);
+          "' (evaluated to " + subvalue + ") is not of type " +
+          typename + "!", expr);
   }
 
 }

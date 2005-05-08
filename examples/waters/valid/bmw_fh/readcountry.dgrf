@@ -1,13 +1,53 @@
-dgrf2.0.2
-//s 161 107
-4
-u ecefin
-u nocountry
-c read_country
-u usaus
-2
-176 64 8 0 0 14 -6 s1
-64 64 8 1 1 -21 -6 s0
-2
-3 s1 s0 121 79 -25 17 3 0 0 0 1 0 16 3 0 32
-3 s0 s1 120 48 -33 -7 1 2 0 0
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="readcountry" version="1.0" valid="1"
+	hasGeometry="1" width="166" height="109"
+	generatorName="DGE" generatorVersion="2.9b2"
+	creationDate="2005-05-08 02:12:03 GMT" modificationDate="2005-05-08 02:12:03 GMT">
+	<events>
+		<event controllable="0" name="ecefin"/>
+		<event controllable="0" name="nocountry"/>
+		<event controllable="1" name="read_country"/>
+		<event controllable="0" name="usaus"/>
+	</events>
+	<nodes>
+		<node initial="1" marked="1">
+			<rendering><point x="64" y="64"/></rendering>
+			<label name="s0">
+				<rendering><point x="-21" y="-6"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="176" y="64"/></rendering>
+			<label name="s1">
+				<rendering><point x="14" y="-6"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge>
+			<rendering><point x="120" y="48"/></rendering>
+			<source name="s0"/>
+			<target name="s1"/>
+			<labelGroup>
+				<rendering><point x="-33" y="-7"/></rendering>
+				<label name="read_country"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="121" y="79"/></rendering>
+			<source name="s1"/>
+			<target name="s0"/>
+			<labelGroup>
+				<rendering><point x="-25" y="17"/></rendering>
+				<label name="ecefin"/>
+				<label name="nocountry">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+				<label name="usaus">
+					<rendering><point x="0" y="30"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

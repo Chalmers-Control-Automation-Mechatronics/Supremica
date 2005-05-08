@@ -1,21 +1,109 @@
-dgrf2.4.7
-//s 266 193
-6
-u CLOSE.DRD
-u CLOSE.PSD
-c fh_cond_door_open
-c fh_cond_doors_closed
-u OPEN.DRD
-u OPEN.PSD
-3
-224 48 8 1 1 13 3 doors_closed
-224 208 8 0 0 13 5 doors_open
-224 128 8 0 0 14 5 door_open
-7
-2 door_open 192 129 -118 3 1 2 0 0
-3 door_open doors_closed 209 88 -81 -1 2 1 0 0 0 0 13
-3 door_open doors_open 240 168 8 -3 2 5 0 0 4 0 13
-3 doors_closed door_open 240 88 7 -2 2 5 0 0 4 0 13
-2 doors_closed 192 48 -133 1 1 3 0 0
-3 doors_open door_open 209 168 -78 -2 2 1 0 0 0 0 13
-2 doors_open 192 209 -118 4 1 2 0 0
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="fh_condition_doors" version="1.0" valid="1"
+	hasGeometry="1" width="299" height="193"
+	generatorName="DGE" generatorVersion="2.9b2"
+	creationDate="2005-05-08 02:12:05 GMT" modificationDate="2005-05-08 03:59:35 GMT">
+	<events>
+		<event controllable="0" name="CLOSEDOOR.DRD"/>
+		<event controllable="0" name="CLOSEDOOR.PSD"/>
+		<event controllable="1" name="fh_cond_door_open"/>
+		<event controllable="1" name="fh_cond_doors_closed"/>
+		<event controllable="0" name="OPENDOOR.DRD"/>
+		<event controllable="0" name="OPENDOOR.PSD"/>
+	</events>
+	<nodes>
+		<node initial="1" marked="1">
+			<rendering><point x="224" y="48"/></rendering>
+			<label name="doors_closed">
+				<rendering><point x="13" y="3"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="224" y="208"/></rendering>
+			<label name="doors_open">
+				<rendering><point x="13" y="5"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="224" y="128"/></rendering>
+			<label name="door_open">
+				<rendering><point x="14" y="5"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge isLoop="1">
+			<rendering><point x="192" y="209"/></rendering>
+			<source name="doors_open"/>
+			<labelGroup>
+				<rendering><point x="-118" y="4"/></rendering>
+				<label name="fh_cond_door_open"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="209" y="168"/></rendering>
+			<source name="doors_open"/>
+			<target name="door_open"/>
+			<labelGroup>
+				<rendering><point x="-104" y="-4"/></rendering>
+				<label name="CLOSEDOOR.PSD"/>
+				<label name="CLOSEDOOR.DRD">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="192" y="48"/></rendering>
+			<source name="doors_closed"/>
+			<labelGroup>
+				<rendering><point x="-133" y="1"/></rendering>
+				<label name="fh_cond_doors_closed"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="240" y="88"/></rendering>
+			<source name="doors_closed"/>
+			<target name="door_open"/>
+			<labelGroup>
+				<rendering><point x="7" y="-2"/></rendering>
+				<label name="OPENDOOR.PSD"/>
+				<label name="OPENDOOR.DRD">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="240" y="168"/></rendering>
+			<source name="door_open"/>
+			<target name="doors_open"/>
+			<labelGroup>
+				<rendering><point x="8" y="-3"/></rendering>
+				<label name="OPENDOOR.PSD"/>
+				<label name="OPENDOOR.DRD">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="209" y="88"/></rendering>
+			<source name="door_open"/>
+			<target name="doors_closed"/>
+			<labelGroup>
+				<rendering><point x="-103" y="-2"/></rendering>
+				<label name="CLOSEDOOR.PSD"/>
+				<label name="CLOSEDOOR.DRD">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="192" y="129"/></rendering>
+			<source name="door_open"/>
+			<labelGroup>
+				<rendering><point x="-118" y="3"/></rendering>
+				<label name="fh_cond_door_open"/>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>
