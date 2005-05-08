@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.junit
 //# CLASS:   ValidTest
 //###########################################################################
-//# $Id: ValidTest.java,v 1.4 2005-05-08 04:09:01 robi Exp $
+//# $Id: ValidTest.java,v 1.5 2005-05-08 09:27:48 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.junit;
@@ -75,10 +75,22 @@ public class ValidTest extends WatersTestCase
     testImport("central_locking", "ftuer");
   }
 
+  public void testImport_koordwsp()
+    throws Exception
+  {
+    testImport("central_locking", "koordwsp");
+  }
+
   public void testImport_mazes()
     throws Exception
   {
     testImport("mazes", "mazes");
+  }
+
+  public void testImport_never_blow_up()
+    throws Exception
+  {
+    testImport("border_cases", "never_blow_up");
   }
 
   public void testImport_safetydisplay()
