@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.junit
 //# CLASS:   ValidTest
 //###########################################################################
-//# $Id: ValidTest.java,v 1.5 2005-05-08 09:27:48 robi Exp $
+//# $Id: ValidTest.java,v 1.6 2005-05-08 23:39:13 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.junit;
@@ -115,6 +115,12 @@ public class ValidTest extends WatersTestCase
     throws Exception
   {
     testImport("smd", "smdreset");
+  }
+
+  public void testImport_tline_1()
+    throws Exception
+  {
+    testImport("tline_1", "tline_1");
   }
 
 
