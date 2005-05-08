@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE project PUBLIC "project" "project.dtd">
+
+<project name="dreitueren"
+         legacy="1"
+         generatorName="VALID-II"
+         generatorVersion="2.7b5"
+         version="1.0"
+         creationDate="2000-07-06 07:20:50 GMT"
+         modificationDate="2000-10-11 07:52:37 GMT">
+<uses module="dreitueren_main"/>
+</project>
