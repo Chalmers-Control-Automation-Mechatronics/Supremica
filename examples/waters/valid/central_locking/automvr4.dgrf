@@ -2,8 +2,8 @@
 <!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
 <graph name="automvr4" version="1.0" valid="1"
 	hasGeometry="1" width="325" height="513"
-	generatorName="DGE" generatorVersion="2.8.0"
-	creationDate="2000-10-31 13:08:36 GMT" modificationDate="2002-07-19 13:56:12 GMT">
+	generatorName="DGE" generatorVersion="2.9b2"
+	creationDate="2000-10-31 13:08:36 GMT" modificationDate="2005-05-08 09:16:41 GMT">
 	<events>
 		<event controllable="1" name="autom_VR"/>
 		<event controllable="1" name="ER"/>
@@ -22,7 +22,7 @@
 		<event controllable="0" name="tuer_auf.BT"/>
 		<event controllable="0" name="tuer_auf.FH"/>
 		<event controllable="0" name="tuer_auf.FT"/>
-		<event controllable="1" name="WSP"/>
+		<event controllable="1" name="wsp"/>
 		<event controllable="1" name="ZS"/>
 	</events>
 	<nodes>
@@ -81,69 +81,78 @@
 		</nodeGroup>
 	</nodes>
 	<edges>
-		<edge isLoop="1">
-			<rendering><point x="276" y="496"/></rendering>
-			<source name="AU3"/>
-			<labelGroup>
-				<rendering><point x="2" y="6"/></rendering>
-				<label name="SERFS"/>
-			</labelGroup>
-		</edge>
 		<edge>
-			<rendering><point x="137" y="359"/></rendering>
-			<source name="AU3"/>
-			<target name="VR"/>
+			<rendering><point x="310" y="118"/></rendering>
+			<source name="$1"/>
+			<target name="ER"/>
 			<labelGroup>
-				<rendering><point x="-39" y="-6"/></rendering>
-				<label name="autom_VR"/>
-			</labelGroup>
-		</edge>
-		<edge>
-			<source name="AU2"/>
-			<target name="AU3"/>
-			<labelGroup>
-				<rendering><point x="-37" y="3"/></rendering>
-				<label name="timeout.FS"/>
+				<rendering><point x="-68" y="-68"/></rendering>
+				<label name="soft_CS">
+					<actualSource name="AU1"/>
+					<actualSource name="AU2"/>
+					<actualSource name="AU3"/>
+					<actualSource name="FS"/>
+					<actualSource name="VR"/>
+					<actualSource name="ER"/>
+				</label>
+				<label name="tuer_auf.BH">
+					<rendering><point x="0" y="15"/></rendering>
+					<actualSource name="AU1"/>
+					<actualSource name="AU2"/>
+					<actualSource name="AU3"/>
+					<actualSource name="FS"/>
+					<actualSource name="VR"/>
+					<actualSource name="ER"/>
+				</label>
+				<label name="tuer_auf.BT">
+					<rendering><point x="0" y="30"/></rendering>
+					<actualSource name="AU1"/>
+					<actualSource name="AU2"/>
+					<actualSource name="AU3"/>
+					<actualSource name="FS"/>
+					<actualSource name="VR"/>
+					<actualSource name="ER"/>
+				</label>
+				<label name="tuer_auf.FH">
+					<rendering><point x="0" y="45"/></rendering>
+					<actualSource name="AU1"/>
+					<actualSource name="AU2"/>
+					<actualSource name="AU3"/>
+					<actualSource name="FS"/>
+					<actualSource name="VR"/>
+					<actualSource name="ER"/>
+				</label>
+				<label name="tuer_auf.FT">
+					<rendering><point x="0" y="60"/></rendering>
+					<actualSource name="AU1"/>
+					<actualSource name="AU2"/>
+					<actualSource name="AU3"/>
+					<actualSource name="FS"/>
+					<actualSource name="VR"/>
+					<actualSource name="ER"/>
+				</label>
 			</labelGroup>
 		</edge>
 		<edge isLoop="1">
-			<rendering><point x="274" y="416"/></rendering>
-			<source name="AU2"/>
+			<rendering><point x="276" y="336"/></rendering>
+			<source name="AU1"/>
 			<labelGroup>
-				<rendering><point x="5" y="5"/></rendering>
+				<rendering><point x="-10" y="-9"/></rendering>
 				<label name="SERFS"/>
-			</labelGroup>
-		</edge>
-		<edge isLoop="1">
-			<rendering><point x="269" y="230"/></rendering>
-			<source name="FS"/>
-			<labelGroup>
-				<rendering><point x="-18" y="-9"/></rendering>
-				<label name="reset.FS"/>
+				<label name="reset.FS">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
 				<label name="timeout.FS">
-					<rendering><point x="0" y="16"/></rendering>
+					<rendering><point x="0" y="30"/></rendering>
 				</label>
 			</labelGroup>
 		</edge>
 		<edge>
-			<rendering><point x="192" y="229"/></rendering>
-			<source name="FS"/>
-			<target name="VR"/>
+			<source name="AU1"/>
+			<target name="AU2"/>
 			<labelGroup>
-				<rendering><point x="-26" y="-24"/></rendering>
-				<label name="WSP"/>
-				<label name="ER">
-					<rendering><point x="0" y="16"/></rendering>
-				</label>
-				<label name="SER">
-					<rendering><point x="0" y="32"/></rendering>
-				</label>
-				<label name="ZS">
-					<rendering><point x="0" y="48"/></rendering>
-				</label>
-				<label name="TAST">
-					<rendering><point x="0" y="64"/></rendering>
-				</label>
+				<rendering><point x="-29" y="2"/></rendering>
+				<label name="time.FS"/>
 			</labelGroup>
 		</edge>
 		<edge>
@@ -153,7 +162,39 @@
 				<rendering><point x="-49" y="-13"/></rendering>
 				<label name="soft_ER"/>
 				<label name="soft_SER.FT">
-					<rendering><point x="0" y="16"/></rendering>
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="269" y="230"/></rendering>
+			<source name="FS"/>
+			<labelGroup>
+				<rendering><point x="-18" y="-9"/></rendering>
+				<label name="reset.FS"/>
+				<label name="timeout.FS">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="192" y="229"/></rendering>
+			<source name="FS"/>
+			<target name="VR"/>
+			<labelGroup>
+				<rendering><point x="-26" y="-24"/></rendering>
+				<label name="wsp"/>
+				<label name="ER">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+				<label name="SER">
+					<rendering><point x="0" y="30"/></rendering>
+				</label>
+				<label name="ZS">
+					<rendering><point x="0" y="45"/></rendering>
+				</label>
+				<label name="TAST">
+					<rendering><point x="0" y="60"/></rendering>
 				</label>
 			</labelGroup>
 		</edge>
@@ -172,28 +213,28 @@
 				<rendering><point x="-50" y="-73"/></rendering>
 				<label name="ER"/>
 				<label name="SER">
-					<rendering><point x="0" y="16"/></rendering>
+					<rendering><point x="0" y="15"/></rendering>
 				</label>
 				<label name="ZS">
-					<rendering><point x="0" y="32"/></rendering>
+					<rendering><point x="0" y="30"/></rendering>
 				</label>
 				<label name="TAST">
-					<rendering><point x="0" y="48"/></rendering>
+					<rendering><point x="0" y="45"/></rendering>
 				</label>
-				<label name="WSP">
-					<rendering><point x="0" y="64"/></rendering>
+				<label name="wsp">
+					<rendering><point x="0" y="60"/></rendering>
 				</label>
 				<label name="soft_VR">
-					<rendering><point x="0" y="80"/></rendering>
+					<rendering><point x="0" y="75"/></rendering>
 				</label>
 				<label name="soft_ZS">
-					<rendering><point x="0" y="96"/></rendering>
+					<rendering><point x="0" y="90"/></rendering>
 				</label>
 				<label name="reset.FS">
-					<rendering><point x="0" y="112"/></rendering>
+					<rendering><point x="0" y="105"/></rendering>
 				</label>
 				<label name="timeout.FS">
-					<rendering><point x="0" y="128"/></rendering>
+					<rendering><point x="0" y="120"/></rendering>
 				</label>
 			</labelGroup>
 		</edge>
@@ -205,7 +246,7 @@
 				<rendering><point x="-29" y="-19"/></rendering>
 				<label name="soft_ER"/>
 				<label name="soft_SER.FT">
-					<rendering><point x="0" y="16"/></rendering>
+					<rendering><point x="0" y="15"/></rendering>
 				</label>
 			</labelGroup>
 		</edge>
@@ -217,7 +258,7 @@
 				<rendering><point x="-19" y="-6"/></rendering>
 				<label name="soft_VR"/>
 				<label name="soft_ZS">
-					<rendering><point x="0" y="16"/></rendering>
+					<rendering><point x="0" y="15"/></rendering>
 				</label>
 			</labelGroup>
 		</edge>
@@ -228,51 +269,62 @@
 				<rendering><point x="1" y="-85"/></rendering>
 				<label name="ER"/>
 				<label name="SER">
-					<rendering><point x="0" y="16"/></rendering>
+					<rendering><point x="0" y="15"/></rendering>
 				</label>
 				<label name="ZS">
-					<rendering><point x="0" y="32"/></rendering>
+					<rendering><point x="0" y="30"/></rendering>
 				</label>
 				<label name="TAST">
-					<rendering><point x="0" y="48"/></rendering>
+					<rendering><point x="0" y="45"/></rendering>
 				</label>
-				<label name="WSP">
-					<rendering><point x="0" y="64"/></rendering>
+				<label name="wsp">
+					<rendering><point x="0" y="60"/></rendering>
 				</label>
 				<label name="soft_ER">
-					<rendering><point x="0" y="80"/></rendering>
+					<rendering><point x="0" y="75"/></rendering>
 				</label>
 				<label name="soft_SER.FT">
-					<rendering><point x="0" y="96"/></rendering>
+					<rendering><point x="0" y="90"/></rendering>
 				</label>
 				<label name="reset.FS">
-					<rendering><point x="0" y="112"/></rendering>
+					<rendering><point x="0" y="105"/></rendering>
 				</label>
 				<label name="timeout.FS">
-					<rendering><point x="0" y="128"/></rendering>
+					<rendering><point x="0" y="120"/></rendering>
 				</label>
-			</labelGroup>
-		</edge>
-		<edge>
-			<source name="AU1"/>
-			<target name="AU2"/>
-			<labelGroup>
-				<rendering><point x="-29" y="2"/></rendering>
-				<label name="time.FS"/>
 			</labelGroup>
 		</edge>
 		<edge isLoop="1">
-			<rendering><point x="276" y="336"/></rendering>
-			<source name="AU1"/>
+			<rendering><point x="274" y="416"/></rendering>
+			<source name="AU2"/>
 			<labelGroup>
-				<rendering><point x="-10" y="-9"/></rendering>
+				<rendering><point x="5" y="5"/></rendering>
 				<label name="SERFS"/>
-				<label name="reset.FS">
-					<rendering><point x="0" y="16"/></rendering>
-				</label>
-				<label name="timeout.FS">
-					<rendering><point x="0" y="32"/></rendering>
-				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="AU2"/>
+			<target name="AU3"/>
+			<labelGroup>
+				<rendering><point x="-37" y="3"/></rendering>
+				<label name="timeout.FS"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="137" y="359"/></rendering>
+			<source name="AU3"/>
+			<target name="VR"/>
+			<labelGroup>
+				<rendering><point x="-39" y="-6"/></rendering>
+				<label name="autom_VR"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="276" y="496"/></rendering>
+			<source name="AU3"/>
+			<labelGroup>
+				<rendering><point x="2" y="6"/></rendering>
+				<label name="SERFS"/>
 			</labelGroup>
 		</edge>
 		<edge>
@@ -287,74 +339,22 @@
 					<actualSource name="AU3"/>
 				</label>
 				<label name="SER">
-					<rendering><point x="0" y="16"/></rendering>
+					<rendering><point x="0" y="15"/></rendering>
 					<actualSource name="AU1"/>
 					<actualSource name="AU2"/>
 					<actualSource name="AU3"/>
 				</label>
 				<label name="ZS">
-					<rendering><point x="0" y="32"/></rendering>
+					<rendering><point x="0" y="30"/></rendering>
 					<actualSource name="AU1"/>
 					<actualSource name="AU2"/>
 					<actualSource name="AU3"/>
 				</label>
 				<label name="TAST">
-					<rendering><point x="0" y="48"/></rendering>
+					<rendering><point x="0" y="45"/></rendering>
 					<actualSource name="AU1"/>
 					<actualSource name="AU2"/>
 					<actualSource name="AU3"/>
-				</label>
-			</labelGroup>
-		</edge>
-		<edge>
-			<rendering><point x="310" y="118"/></rendering>
-			<source name="$1"/>
-			<target name="ER"/>
-			<labelGroup>
-				<rendering><point x="-68" y="-68"/></rendering>
-				<label name="soft_CS">
-					<actualSource name="AU1"/>
-					<actualSource name="AU2"/>
-					<actualSource name="AU3"/>
-					<actualSource name="FS"/>
-					<actualSource name="VR"/>
-					<actualSource name="ER"/>
-				</label>
-				<label name="tuer_auf.BH">
-					<rendering><point x="0" y="16"/></rendering>
-					<actualSource name="AU1"/>
-					<actualSource name="AU2"/>
-					<actualSource name="AU3"/>
-					<actualSource name="FS"/>
-					<actualSource name="VR"/>
-					<actualSource name="ER"/>
-				</label>
-				<label name="tuer_auf.BT">
-					<rendering><point x="0" y="32"/></rendering>
-					<actualSource name="AU1"/>
-					<actualSource name="AU2"/>
-					<actualSource name="AU3"/>
-					<actualSource name="FS"/>
-					<actualSource name="VR"/>
-					<actualSource name="ER"/>
-				</label>
-				<label name="tuer_auf.FH">
-					<rendering><point x="0" y="48"/></rendering>
-					<actualSource name="AU1"/>
-					<actualSource name="AU2"/>
-					<actualSource name="AU3"/>
-					<actualSource name="FS"/>
-					<actualSource name="VR"/>
-					<actualSource name="ER"/>
-				</label>
-				<label name="tuer_auf.FT">
-					<rendering><point x="0" y="64"/></rendering>
-					<actualSource name="AU1"/>
-					<actualSource name="AU2"/>
-					<actualSource name="AU3"/>
-					<actualSource name="FS"/>
-					<actualSource name="VR"/>
-					<actualSource name="ER"/>
 				</label>
 			</labelGroup>
 		</edge>

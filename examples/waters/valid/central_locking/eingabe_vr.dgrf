@@ -3,7 +3,7 @@
 <graph name="eingabe_vr" version="1.0" valid="1"
 	hasGeometry="1" width="219" height="208"
 	generatorName="DGE" generatorVersion="2.9b2"
-	creationDate="2004-09-07 08:48:29 GMT" modificationDate="2004-09-07 08:48:29 GMT">
+	creationDate="2004-09-07 08:48:29 GMT" modificationDate="2005-05-08 09:07:29 GMT">
 	<events>
 		<event controllable="1" name="CS_ok"/>
 		<event controllable="0" name="ER_BT"/>
@@ -17,18 +17,18 @@
 		<event controllable="0" name="VR_FS"/>
 		<event controllable="0" name="VR_FT"/>
 		<event controllable="0" name="VR_HK"/>
-		<event controllable="1" name="WSP"/>
+		<event controllable="1" name="wsp"/>
 	</events>
 	<nodes>
-		<node initial="1" marked="1">
-			<rendering><point x="64" y="176"/></rendering>
-			<label name="IN">
-				<rendering><point x="-8" y="24"/></rendering>
-			</label>
-		</node>
 		<node>
 			<rendering><point x="176" y="176"/></rendering>
 			<label name="VR">
+				<rendering><point x="-8" y="24"/></rendering>
+			</label>
+		</node>
+		<node initial="1" marked="1">
+			<rendering><point x="64" y="176"/></rendering>
+			<label name="IN">
 				<rendering><point x="-8" y="24"/></rendering>
 			</label>
 		</node>
@@ -73,7 +73,7 @@
 				<label name="TAST">
 					<rendering><point x="0" y="120"/></rendering>
 				</label>
-				<label name="WSP">
+				<label name="wsp">
 					<rendering><point x="0" y="135"/></rendering>
 				</label>
 				<label name="soft_CS">
@@ -98,7 +98,7 @@
 			<source name="IN"/>
 			<labelGroup>
 				<rendering><point x="-19" y="-133"/></rendering>
-				<label name="WSP"/>
+				<label name="wsp"/>
 				<label name="soft_CS">
 					<rendering><point x="0" y="15"/></rendering>
 				</label>

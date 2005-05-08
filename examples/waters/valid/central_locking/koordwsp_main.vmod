@@ -4,11 +4,11 @@
 <module name="koordwsp_main"
         legacy="1"
         arity="0"
-        generatorName="Dpr2Vmod"
-        generatorVersion="2.7b6"
+        generatorName="VALID-II"
+        generatorVersion="2.9b2"
         version="1.0"
-        creationDate="2000-06-06 06:20:52 GMT"
-        modificationDate="2000-10-31 13:08:08 GMT">
+        creationDate="2000-06-05 18:20:52 GMT"
+        modificationDate="2005-05-08 21:09:50 GMT+12:00">
 <interface/>
 <definitions>
 <typeDefinition name="Timers" expression="{FS WSP}"/>
@@ -60,11 +60,15 @@
 <foreach-alias dummy="_0" range="$Timers">
 <alias old="reset.$_0" new="reset[$_0]"/>
 </foreach-alias>
-<event name="done_ER"
+<event name="wsp"
        controllable="1"
        arity="0">
 </event>
 <event name="TAST"
+       controllable="1"
+       arity="0">
+</event>
+<event name="done_ER"
        controllable="1"
        arity="0">
 </event>
@@ -88,10 +92,6 @@
 <foreach-alias dummy="_0" range="$Timers">
 <alias old="time.$_0" new="time[$_0]"/>
 </foreach-alias>
-<event name="WSP"
-       controllable="1"
-       arity="0">
-</event>
 <event name="ER_FS"
        controllable="0"
        arity="0">
@@ -104,6 +104,10 @@
        controllable="0"
        arity="0">
 </event>
+<event name="soft_CS"
+       controllable="1"
+       arity="0">
+</event>
 <event name="soft_SER"
        controllable="1"
        arity="1">
@@ -112,16 +116,12 @@
 <foreach-alias dummy="_0" range="$Tueren">
 <alias old="soft_SER.$_0" new="soft_SER[$_0]"/>
 </foreach-alias>
-<event name="soft_CS"
-       controllable="1"
+<event name="CS"
+       controllable="0"
        arity="0">
 </event>
 <event name="soft_ER"
        controllable="1"
-       arity="0">
-</event>
-<event name="CS"
-       controllable="0"
        arity="0">
 </event>
 <event name="cod_ser"
@@ -129,10 +129,6 @@
        arity="0">
 </event>
 <event name="done_VR"
-       controllable="1"
-       arity="0">
-</event>
-<event name="ZSA"
        controllable="1"
        arity="0">
 </event>
@@ -144,6 +140,10 @@
 <foreach-alias dummy="_0" range="$Tueren">
 <alias old="tuer_zu.$_0" new="tuer_zu[$_0]"/>
 </foreach-alias>
+<event name="ZSA"
+       controllable="1"
+       arity="0">
+</event>
 <event name="ER"
        controllable="1"
        arity="0">
@@ -212,11 +212,11 @@
 <foreach-alias dummy="_0" range="$Counters">
 <alias old="inc_ctr.$_0" new="inc_ctr[$_0]"/>
 </foreach-alias>
-<event name="soft_VR"
+<event name="CS_ok"
        controllable="1"
        arity="0">
 </event>
-<event name="CS_ok"
+<event name="soft_VR"
        controllable="1"
        arity="0">
 </event>
@@ -268,6 +268,7 @@
 <component graph="eingabe_fs" kind="spec"/>
 <component graph="crash" kind="spec"/>
 <component graph="decoder" kind="spec"/>
+<component graph="keine_wsp" kind="spec"/>
 <foreach-instance dummy="NAME" range="$Timers">
 <instance name="timer[$NAME]" module="timer_plant">
 <nameParam name="reset" value="reset[$NAME]"/>
@@ -275,7 +276,6 @@
 <nameParam name="timeout" value="timeout[$NAME]"/>
 </instance>
 </foreach-instance>
-<component graph="keine_wsp" kind="spec"/>
 <component graph="zsi" kind="spec"/>
 <component graph="cod_ser" kind="plant"/>
 <component graph="eingabe_ser" kind="spec"/>
@@ -283,8 +283,8 @@
 <component graph="check_cod_ser" kind="spec"/>
 <component graph="zuendung" kind="plant"/>
 <component graph="kein_zs" kind="spec"/>
-<component graph="wsptime" kind="spec"/>
 <component graph="warten" kind="spec"/>
+<component graph="wsptime" kind="spec"/>
 <component graph="eingabe_zs" kind="spec"/>
 </parts>
 </module>

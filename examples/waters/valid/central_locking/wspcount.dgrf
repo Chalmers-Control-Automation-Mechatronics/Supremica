@@ -3,7 +3,7 @@
 <graph name="wspcount" version="1.0" valid="1"
 	hasGeometry="1" width="383" height="182"
 	generatorName="DGE" generatorVersion="2.9b2"
-	creationDate="2004-09-07 08:51:00 GMT" modificationDate="2004-09-07 08:51:00 GMT">
+	creationDate="2004-09-07 08:51:00 GMT" modificationDate="2005-05-08 09:08:03 GMT">
 	<events>
 		<event controllable="1" name="autom_VR"/>
 		<event controllable="0" name="ctr_ge_max.WSP"/>
@@ -14,20 +14,14 @@
 		<event controllable="1" name="SERFS"/>
 		<event controllable="1" name="TAST"/>
 		<event controllable="0" name="timeout.WSP"/>
-		<event controllable="1" name="WSP"/>
+		<event controllable="1" name="wsp"/>
 		<event controllable="1" name="ZS"/>
 	</events>
 	<nodes>
-		<node initial="1" marked="1">
-			<rendering><point x="96" y="112"/></rendering>
-			<label name="COOL">
-				<rendering><point x="-39" y="16"/></rendering>
-			</label>
-		</node>
 		<node>
-			<rendering><point x="288" y="112"/></rendering>
-			<label name="TST">
-				<rendering><point x="-33" y="13"/></rendering>
+			<rendering><point x="384" y="112"/></rendering>
+			<label name="WSP">
+				<rendering><point x="-38" y="15"/></rendering>
 			</label>
 		</node>
 		<node>
@@ -37,13 +31,39 @@
 			</label>
 		</node>
 		<node>
-			<rendering><point x="384" y="112"/></rendering>
-			<label name="WSP">
-				<rendering><point x="-38" y="15"/></rendering>
+			<rendering><point x="288" y="112"/></rendering>
+			<label name="TST">
+				<rendering><point x="-33" y="13"/></rendering>
+			</label>
+		</node>
+		<node initial="1" marked="1">
+			<rendering><point x="96" y="112"/></rendering>
+			<label name="COOL">
+				<rendering><point x="-39" y="16"/></rendering>
 			</label>
 		</node>
 	</nodes>
 	<edges>
+		<edge>
+			<rendering><point x="186" y="157"/></rendering>
+			<source name="TST"/>
+			<target name="COOL"/>
+			<labelGroup>
+				<rendering><point x="-21" y="0"/></rendering>
+				<label name="ctr_lt_max.WSP"/>
+				<label name="timeout.WSP">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="TST"/>
+			<target name="WSP"/>
+			<labelGroup>
+				<rendering><point x="-44" y="-8"/></rendering>
+				<label name="ctr_ge_max.WSP"/>
+			</labelGroup>
+		</edge>
 		<edge isLoop="1">
 			<rendering><point x="99" y="77"/></rendering>
 			<source name="COOL"/>
@@ -82,6 +102,34 @@
 			</labelGroup>
 		</edge>
 		<edge>
+			<source name="CNT"/>
+			<target name="TST"/>
+			<labelGroup>
+				<rendering><point x="-33" y="-7"/></rendering>
+				<label name="inc_ctr.WSP"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="144" y="140"/></rendering>
+			<source name="CNT"/>
+			<target name="COOL"/>
+			<labelGroup>
+				<rendering><point x="-23" y="3"/></rendering>
+				<label name="timeout.WSP"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="193" y="76"/></rendering>
+			<source name="CNT"/>
+			<labelGroup>
+				<rendering><point x="-30" y="-9"/></rendering>
+				<label name="ctr_ge_max.WSP"/>
+				<label name="ctr_lt_max.WSP">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
 			<rendering><point x="231" y="192"/></rendering>
 			<source name="WSP"/>
 			<target name="COOL"/>
@@ -95,55 +143,7 @@
 			<source name="WSP"/>
 			<labelGroup>
 				<rendering><point x="-14" y="-3"/></rendering>
-				<label name="WSP"/>
-			</labelGroup>
-		</edge>
-		<edge>
-			<rendering><point x="186" y="157"/></rendering>
-			<source name="TST"/>
-			<target name="COOL"/>
-			<labelGroup>
-				<rendering><point x="-21" y="0"/></rendering>
-				<label name="ctr_lt_max.WSP"/>
-				<label name="timeout.WSP">
-					<rendering><point x="0" y="15"/></rendering>
-				</label>
-			</labelGroup>
-		</edge>
-		<edge>
-			<source name="TST"/>
-			<target name="WSP"/>
-			<labelGroup>
-				<rendering><point x="-44" y="-8"/></rendering>
-				<label name="ctr_ge_max.WSP"/>
-			</labelGroup>
-		</edge>
-		<edge>
-			<rendering><point x="144" y="140"/></rendering>
-			<source name="CNT"/>
-			<target name="COOL"/>
-			<labelGroup>
-				<rendering><point x="-23" y="3"/></rendering>
-				<label name="timeout.WSP"/>
-			</labelGroup>
-		</edge>
-		<edge>
-			<source name="CNT"/>
-			<target name="TST"/>
-			<labelGroup>
-				<rendering><point x="-33" y="-7"/></rendering>
-				<label name="inc_ctr.WSP"/>
-			</labelGroup>
-		</edge>
-		<edge isLoop="1">
-			<rendering><point x="193" y="76"/></rendering>
-			<source name="CNT"/>
-			<labelGroup>
-				<rendering><point x="-30" y="-9"/></rendering>
-				<label name="ctr_ge_max.WSP"/>
-				<label name="ctr_lt_max.WSP">
-					<rendering><point x="0" y="15"/></rendering>
-				</label>
+				<label name="wsp"/>
 			</labelGroup>
 		</edge>
 	</edges>

@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE graph PUBLIC "graph" "graph.dtd">
-<graph version="2.5.7" width="39" height="21">
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="noreset" version="1.0" valid="1"
+	hasGeometry="1" width="39" height="21"
+	generatorName="DGE" generatorVersion="2.9b2"
+	creationDate="2005-05-08 09:15:56 GMT" modificationDate="2005-05-08 09:15:56 GMT">
 	<events>
-		<event controllable="1">reset.NAME</event>
+		<event controllable="1" name="reset.NAME"/>
 	</events>
 	<nodes>
-		<node x="48" y="48" size="8" initial="1" marked="1">
-			<label dx="12" dy="5">s0</label>
+		<node initial="1" marked="1">
+			<rendering><point x="48" y="48"/></rendering>
+			<label name="s0">
+				<rendering><point x="12" y="5"/></rendering>
+			</label>
 		</node>
 	</nodes>
 	<edges>

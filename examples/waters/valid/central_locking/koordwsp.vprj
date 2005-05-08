@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE project PUBLIC "project" "project.dtd">
+
+<project name="koordwsp"
+         legacy="1"
+         generatorName="VALID-II"
+         generatorVersion="2.9b2"
+         version="1.0"
+         creationDate="2000-06-05 18:20:52 GMT"
+         modificationDate="2005-05-08 21:09:50 GMT+12:00">
+<uses module="koordwsp_main"/>
+</project>

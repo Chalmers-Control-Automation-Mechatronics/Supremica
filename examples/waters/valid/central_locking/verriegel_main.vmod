@@ -5,10 +5,10 @@
         legacy="1"
         arity="0"
         generatorName="VALID-II"
-        generatorVersion="2.8b1"
+        generatorVersion="2.9b2"
         version="1.0"
-        creationDate="2000-08-06 06:20:58 GMT"
-        modificationDate="2001-03-28 13:20:05 GMT">
+        creationDate="2000-08-05 18:20:58 GMT"
+        modificationDate="2005-05-08 21:11:27 GMT+12:00">
 <interface/>
 <definitions>
 <typeDefinition name="HeckTueren" expression="{HT}"/>
@@ -112,11 +112,15 @@
 <foreach-alias dummy="_0" range="$Tueren">
 <alias old="MVR_aus.$_0" new="MVR_aus[$_0]"/>
 </foreach-alias>
-<event name="TAST"
+<event name="wsp"
        controllable="1"
        arity="0">
 </event>
 <event name="done_ER"
+       controllable="1"
+       arity="0">
+</event>
+<event name="TAST"
        controllable="1"
        arity="0">
 </event>
@@ -148,10 +152,6 @@
 <foreach-alias dummy="_0" range="$Timers">
 <alias old="time.$_0" new="time[$_0]"/>
 </foreach-alias>
-<event name="WSP"
-       controllable="1"
-       arity="0">
-</event>
 <event name="ER_FS"
        controllable="0"
        arity="0">
@@ -196,10 +196,6 @@
 <foreach-alias dummy="_0" range="$Tueren">
 <alias old="MZS_aus.$_0" new="MZS_aus[$_0]"/>
 </foreach-alias>
-<event name="soft_CS"
-       controllable="1"
-       arity="0">
-</event>
 <event name="soft_SER"
        controllable="1"
        arity="1">
@@ -208,6 +204,10 @@
 <foreach-alias dummy="_0" range="$Tueren">
 <alias old="soft_SER.$_0" new="soft_SER[$_0]"/>
 </foreach-alias>
+<event name="soft_CS"
+       controllable="1"
+       arity="0">
+</event>
 <event name="time_ZS"
        controllable="1"
        arity="1">
@@ -224,16 +224,20 @@
 <foreach-alias dummy="_0" range="$Tueren">
 <alias old="start_VR.$_0" new="start_VR[$_0]"/>
 </foreach-alias>
-<event name="CS"
-       controllable="0"
-       arity="0">
-</event>
 <event name="soft_ER"
        controllable="1"
        arity="0">
 </event>
+<event name="CS"
+       controllable="0"
+       arity="0">
+</event>
 <event name="cod_ser"
        controllable="0"
+       arity="0">
+</event>
+<event name="done_VR"
+       controllable="1"
        arity="0">
 </event>
 <event name="time_W"
@@ -244,7 +248,7 @@
 <foreach-alias dummy="_0" range="$Tueren">
 <alias old="time_W.$_0" new="time_W[$_0]"/>
 </foreach-alias>
-<event name="done_VR"
+<event name="ZSA"
        controllable="1"
        arity="0">
 </event>
@@ -256,10 +260,6 @@
 <foreach-alias dummy="_0" range="$Tueren">
 <alias old="tuer_zu.$_0" new="tuer_zu[$_0]"/>
 </foreach-alias>
-<event name="ZSA"
-       controllable="1"
-       arity="0">
-</event>
 <event name="ER"
        controllable="1"
        arity="0">
@@ -284,6 +284,10 @@
 <foreach-alias dummy="_0" range="$Counters">
 <alias old="ctr_ge_max.$_0" new="ctr_ge_max[$_0]"/>
 </foreach-alias>
+<event name="ZSI"
+       controllable="1"
+       arity="0">
+</event>
 <event name="start_ZS"
        controllable="1"
        arity="1">
@@ -292,10 +296,6 @@
 <foreach-alias dummy="_0" range="$Tueren">
 <alias old="start_ZS.$_0" new="start_ZS[$_0]"/>
 </foreach-alias>
-<event name="ZSI"
-       controllable="1"
-       arity="0">
-</event>
 <event name="done_ZS"
        controllable="1"
        arity="0">
@@ -324,14 +324,6 @@
        controllable="0"
        arity="0">
 </event>
-<event name="timeout"
-       controllable="0"
-       arity="1">
-<posParam pos="0" value="$Timers"/>
-</event>
-<foreach-alias dummy="_0" range="$Timers">
-<alias old="timeout.$_0" new="timeout[$_0]"/>
-</foreach-alias>
 <event name="STZV"
        controllable="0"
        arity="1">
@@ -339,6 +331,14 @@
 </event>
 <foreach-alias dummy="_0" range="$Tueren">
 <alias old="STZV.$_0" new="STZV[$_0]"/>
+</foreach-alias>
+<event name="timeout"
+       controllable="0"
+       arity="1">
+<posParam pos="0" value="$Timers"/>
+</event>
+<foreach-alias dummy="_0" range="$Timers">
+<alias old="timeout.$_0" new="timeout[$_0]"/>
 </foreach-alias>
 <event name="is_cod_ser"
        controllable="1"
@@ -368,11 +368,11 @@
 <foreach-alias dummy="_0" range="$Counters">
 <alias old="inc_ctr.$_0" new="inc_ctr[$_0]"/>
 </foreach-alias>
-<event name="CS_ok"
+<event name="soft_VR"
        controllable="1"
        arity="0">
 </event>
-<event name="soft_VR"
+<event name="CS_ok"
        controllable="1"
        arity="0">
 </event>
@@ -492,7 +492,6 @@
 <nameParam name="tuer_zu" value="tuer_zu[$TUER]"/>
 </instance>
 </foreach-instance>
-<component graph="decoder" kind="spec"/>
 <foreach-instance dummy="TUER" range="$FahrerTueren">
 <instance name="ftuer[$TUER]" module="ftuer_spec">
 <nameParam name="async" value="async[$TUER]"/>
@@ -518,7 +517,7 @@
 <nameParam name="timeout" value="timeout[$TUER]"/>
 </instance>
 </foreach-instance>
-<component graph="keine_wsp" kind="spec"/>
+<component graph="decoder" kind="spec"/>
 <foreach-instance dummy="NAME" range="{WSP FS}">
 <instance name="timer[$NAME]" module="timer_plant">
 <nameParam name="reset" value="reset[$NAME]"/>
@@ -526,6 +525,7 @@
 <nameParam name="timeout" value="timeout[$NAME]"/>
 </instance>
 </foreach-instance>
+<component graph="keine_wsp" kind="spec"/>
 <foreach-instance dummy="TUER" range="$VorderTueren">
 <instance name="tmotor1[$TUER]" module="tmotor1_spec">
 <nameParam name="MER_an" value="MER_an[$TUER]"/>
@@ -598,8 +598,8 @@
 <component graph="check_cod_ser" kind="spec"/>
 <component graph="zuendung" kind="plant"/>
 <component graph="kein_zs" kind="spec"/>
-<component graph="warten" kind="spec"/>
 <component graph="wsptime" kind="spec"/>
+<component graph="warten" kind="spec"/>
 <component graph="eingabe_zs" kind="spec"/>
 <foreach-instance dummy="TUER" range="$VorderTueren">
 <instance name="mvrstzv[$TUER]" module="mvrstzv_plant">

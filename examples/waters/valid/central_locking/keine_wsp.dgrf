@@ -3,7 +3,7 @@
 <graph name="keine_wsp" version="1.0" valid="1"
 	hasGeometry="1" width="228" height="253"
 	generatorName="DGE" generatorVersion="2.9b2"
-	creationDate="2004-09-07 08:49:02 GMT" modificationDate="2004-09-07 08:49:02 GMT">
+	creationDate="2004-09-07 08:49:02 GMT" modificationDate="2005-05-08 09:07:53 GMT">
 	<events>
 		<event controllable="1" name="ER"/>
 		<event controllable="0" name="ER_BT"/>
@@ -19,20 +19,20 @@
 		<event controllable="0" name="VR_FS"/>
 		<event controllable="0" name="VR_FT"/>
 		<event controllable="0" name="VR_HK"/>
-		<event controllable="1" name="WSP"/>
+		<event controllable="1" name="wsp"/>
 		<event controllable="1" name="ZS"/>
 	</events>
 	<nodes>
-		<node>
-			<rendering><point x="192" y="144"/></rendering>
-			<label name="WSP">
-				<rendering><point x="-16" y="21"/></rendering>
-			</label>
-		</node>
 		<node initial="1" marked="1">
 			<rendering><point x="80" y="144"/></rendering>
 			<label name="IDLE">
 				<rendering><point x="-17" y="21"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="192" y="144"/></rendering>
+			<label name="WSP">
+				<rendering><point x="-16" y="21"/></rendering>
 			</label>
 		</node>
 	</nodes>
@@ -91,7 +91,7 @@
 				<label name="soft_CS">
 					<rendering><point x="0" y="75"/></rendering>
 				</label>
-				<label name="WSP">
+				<label name="wsp">
 					<rendering><point x="0" y="90"/></rendering>
 				</label>
 			</labelGroup>
