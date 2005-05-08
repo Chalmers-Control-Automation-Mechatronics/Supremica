@@ -112,6 +112,8 @@
     <jar jarfile="${waters424.jar}">
       <fileset dir="${classes}">
         <include name="net/sourceforge/waters/**/*.class"/>
+        <exclude
+           name="net/sourceforge/waters/analysis/Controllability*.class"/>
         <exclude name="net/sourceforge/waters/build/**"/>
         <exclude name="net/sourceforge/waters/gui/**"/>
         <exclude name="net/sourceforge/waters/junit/**"/>
@@ -246,7 +248,7 @@
         <exclude name="net/sourceforge/waters/xsd/*/impl/**"/>
       </packageset>
       <packageset dir="${supremica.src}">
-        <include name="net/sourceforge/waters/**/*"/>
+        <include name="net/sourceforge/waters/**"/>
         <exclude name="net/sourceforge/waters/build/**"/>
         <exclude name="net/sourceforge/waters/gui/**"/>
         <exclude name="net/sourceforge/waters/junit/**"/>
