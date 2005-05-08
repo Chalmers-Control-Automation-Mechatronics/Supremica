@@ -1,11 +1,11 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: waters.samples.maze
 //# CLASS:   MazeCompiler
 //###########################################################################
-//# $Id: MazeCompiler.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: MazeCompiler.java,v 1.2 2005-05-08 00:27:15 robi Exp $
 //###########################################################################
-
 
 package net.sourceforge.waters.samples.maze;
 
@@ -20,8 +20,8 @@ import javax.xml.bind.JAXBException;
 
 import net.sourceforge.waters.model.base.DuplicateNameException;
 import net.sourceforge.waters.model.base.DocumentProxy;
+import net.sourceforge.waters.model.base.JAXBMarshaller;
 import net.sourceforge.waters.model.base.ModelException;
-import net.sourceforge.waters.model.base.ProxyMarshaller;
 import net.sourceforge.waters.model.base.UnexpectedWatersException;
 import net.sourceforge.waters.model.expr.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
@@ -41,31 +41,31 @@ public class MazeCompiler
   //#########################################################################
   //# Constructors
   public MazeCompiler(final File inputdir,
-		      final File outputdir)
+                      final File outputdir)
     throws JAXBException
   {
     this(inputdir, outputdir, true, new ModuleMarshaller());
   }
 
   public MazeCompiler(final File inputdir,
-		      final File outputdir,
-		      final boolean bfs)
+                      final File outputdir,
+                      final boolean bfs)
     throws JAXBException
   {
     this(inputdir, outputdir, bfs, new ModuleMarshaller());
   }
 
   public MazeCompiler(final File inputdir,
-		      final File outputdir,
-		      final ProxyMarshaller marshaller)
+                      final File outputdir,
+                      final JAXBMarshaller marshaller)
   {
     this(inputdir, outputdir, true, marshaller);
   }
 
   public MazeCompiler(final File inputdir,
-		      final File outputdir,
-		      final boolean bfs,
-		      final ProxyMarshaller marshaller)
+                      final File outputdir,
+                      final boolean bfs,
+                      final JAXBMarshaller marshaller)
   {
     mInputDir = inputdir;
     mOutputDir = outputdir;
@@ -207,7 +207,7 @@ public class MazeCompiler
   private File mInputDir;
   private File mOutputDir;
 
-  private final ProxyMarshaller mMarshaller;
+  private final JAXBMarshaller mMarshaller;
   private final MazeReader mReader;
   private final Set mCopiedModules;
 

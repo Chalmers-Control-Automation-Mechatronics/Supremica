@@ -3,19 +3,17 @@
 //# PACKAGE: waters.junit
 //# CLASS:   ProductDESTest
 //###########################################################################
-//# $Id: ProductDESTest.java,v 1.2 2005-02-21 03:14:14 robi Exp $
+//# $Id: ProductDESTest.java,v 1.3 2005-05-08 00:27:15 robi Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.junit;
 
 import java.io.File;
-import java.io.IOException;
 import javax.xml.bind.JAXBException;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import net.sourceforge.waters.model.base.ModelException;
 import net.sourceforge.waters.model.base.ProxyMarshaller;
 import net.sourceforge.waters.model.des.ProductDESMarshaller;
 
@@ -37,13 +35,13 @@ public class ProductDESTest extends JAXBTestCase
   //#########################################################################
   //# Test Cases
   public void testParse_small_factory_2()
-    throws JAXBException, ModelException, IOException
+    throws Exception
   {
     testParse("small_factory_2");
   }
 
   public void testMarshal_small_factory_2()
-    throws JAXBException, ModelException, IOException
+    throws Exception
   {
     testMarshal("small_factory_2");
   }

@@ -3,21 +3,18 @@
 //# PACKAGE: net.sourceforge.waters.junit
 //# CLASS:   ValidTest
 //###########################################################################
-//# $Id: ValidTest.java,v 1.2 2005-02-21 03:14:14 robi Exp $
+//# $Id: ValidTest.java,v 1.3 2005-05-08 00:27:15 robi Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.junit;
 
 import java.io.File;
-import java.io.IOException;
 import javax.xml.bind.JAXBException;
-import javax.xml.transform.TransformerConfigurationException;
 
 import net.sourceforge.waters.model.base.DocumentManager;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.ElementProxy;
-import net.sourceforge.waters.model.base.ModelException;
 import net.sourceforge.waters.model.base.WatersException;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.ProductDESMarshaller;
@@ -34,72 +31,62 @@ public class ValidTest extends WatersTestCase
   //#########################################################################
   //# Test Cases
   public void testImport_ftuer()
-    throws IOException, JAXBException, WatersException,
-	   TransformerConfigurationException
+    throws Exception
   {
     testImport("central_locking", "ftuer");
   }
 
   public void testImport_debounce()
-    throws IOException, JAXBException, WatersException,
-	   TransformerConfigurationException
+    throws Exception
   {
     testImport("debounce", "debounce");
   }
 
   public void testImport_falko()
-    throws IOException, JAXBException, WatersException,
-	   TransformerConfigurationException
+    throws Exception
   {
     testImport("falko", "falko");
   }
 
   public void testImport_fischertechnik()
-    throws IOException, JAXBException, WatersException,
-	   TransformerConfigurationException
+    throws Exception
   {
     testImport("fischertechnik", "fischertechnik");
   }
 
   public void testImport_fischertechnik_bad()
-    throws IOException, JAXBException, WatersException,
-	   TransformerConfigurationException
+    throws Exception
   {
     testImport("fischertechnik", "fischertechnik_bad",
 	       IndexOutOfRangeException.class, "'ST'");
   }
 
   public void testImport_mazes()
-    throws IOException, JAXBException, WatersException,
-	   TransformerConfigurationException
+    throws Exception
   {
     testImport("mazes", "mazes");
   }
 
   public void testImport_safetydisplay()
-    throws IOException, JAXBException, WatersException,
-	   TransformerConfigurationException
+    throws Exception
   {
     testImport("safetydisplay", "safetydisplay");
   }
 
   public void testImport_safetydisplay_uncont()
-    throws IOException, JAXBException, WatersException,
-	   TransformerConfigurationException
+    throws Exception
   {
     testImport("safetydisplay", "safetydisplay_uncont");
   }
 
   public void testImport_small()
-    throws IOException, JAXBException, WatersException,
-	   TransformerConfigurationException
+    throws Exception
   {
     testImport("small", "small");
   }
 
   public void testImport_smdreset()
-    throws IOException, JAXBException, WatersException,
-	   TransformerConfigurationException
+    throws Exception
   {
     testImport("smd", "smdreset");
   }
@@ -109,8 +96,7 @@ public class ValidTest extends WatersTestCase
   //# Utilities
   void testImport(final String subdir, final String name,
 		  final Class exclass, final String culprit)
-    throws IOException, JAXBException, WatersException,
-	   TransformerConfigurationException
+    throws Exception
   {
     try {
       testImport(subdir, name);
@@ -131,8 +117,7 @@ public class ValidTest extends WatersTestCase
   }
 
   void testImport(final String subdir, final String name)
-    throws IOException, JAXBException, WatersException,
-	   TransformerConfigurationException
+    throws Exception
   {
     final String inextname = name + "_main.vmod";
     final File indirname = new File(mInputDirectory, subdir);
@@ -150,17 +135,16 @@ public class ValidTest extends WatersTestCase
   }
 
   ModuleProxy testImport(final File infilename, final File outfilename)
-    throws IOException, JAXBException, ModelException,
-	   TransformerConfigurationException
+    throws Exception
   {
-    final ModuleProxy module = mUnmarshaller.unmarshal(infilename);
+    final ModuleProxy module = (ModuleProxy) mDocumentManager.load(infilename);
     mModuleMarshaller.marshal(module, outfilename);
     return module;
   }
 
   ProductDESProxy testCompile(final ModuleProxy module,
 			      final File outfilename)
-    throws JAXBException, WatersException, IOException
+    throws Exception
   {
     final ModuleCompiler compiler =
       new ModuleCompiler(module, mDocumentManager);
@@ -172,7 +156,7 @@ public class ValidTest extends WatersTestCase
   void testCompare(final DocumentProxy doc,
 		   final File filename,
 		   final String kindname)
-    throws JAXBException, ModelException
+    throws Exception
   {
     final DocumentProxy doc2 = mDocumentManager.load(filename);
     final ElementProxy elem  = (ElementProxy) doc;
@@ -188,7 +172,7 @@ public class ValidTest extends WatersTestCase
   protected void setUp()
     throws JAXBException
   {
-    mUnmarshaller = new ValidUnmarshaller();
+    final ValidUnmarshaller importer = new ValidUnmarshaller();
     mDESMarshaller = new ProductDESMarshaller();
     mModuleMarshaller = new ModuleMarshaller();
     mInputDirectory = new File(getInputRoot(), "valid");
@@ -196,11 +180,11 @@ public class ValidTest extends WatersTestCase
     mDocumentManager = new DocumentManager();
     mDocumentManager.register(mDESMarshaller);
     mDocumentManager.register(mModuleMarshaller);
+    mDocumentManager.register(importer);
   }
 
   protected void tearDown()
   {
-    mUnmarshaller = null;
     mDESMarshaller = null;
     mModuleMarshaller = null;
     mInputDirectory = null;
@@ -211,7 +195,6 @@ public class ValidTest extends WatersTestCase
 
   //#########################################################################
   //# Data Members
-  private ValidUnmarshaller mUnmarshaller;
   private ProductDESMarshaller mDESMarshaller;
   private ModuleMarshaller mModuleMarshaller;
   private DocumentManager mDocumentManager;

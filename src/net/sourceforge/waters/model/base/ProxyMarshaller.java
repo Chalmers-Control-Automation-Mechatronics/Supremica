@@ -1,24 +1,16 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: waters.model.base
+//# PACKAGE: net.sourceforge.waters.model.base
 //# CLASS:   ProxyMarshaller
 //###########################################################################
-//# $Id: ProxyMarshaller.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: ProxyMarshaller.java,v 1.2 2005-05-08 00:27:15 robi Exp $
 //###########################################################################
-
 
 package net.sourceforge.waters.model.base;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-
-import net.sourceforge.waters.xsd.base.NamedType;
+import java.util.Collection;
 
 
 /**
@@ -37,21 +29,8 @@ import net.sourceforge.waters.xsd.base.NamedType;
  * @author Robi Malik
  */
 
-public abstract class ProxyMarshaller
+public interface ProxyMarshaller
 {
-
-  //#########################################################################
-  //# Constructors
-  public ProxyMarshaller(final String packname)
-    throws JAXBException
-  {
-    final JAXBContext context = JAXBContext.newInstance(packname);
-    mUnmarshaller = context.createUnmarshaller();
-    mUnmarshaller.setValidating(true);
-    mMarshaller = context.createMarshaller();
-    mMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-  }
-
 
   //#########################################################################
   //# Access Methods
@@ -66,12 +45,7 @@ public abstract class ProxyMarshaller
    *                  serious semantic inconsistencies.
    */
   public DocumentProxy unmarshal(final File filename)
-    throws JAXBException, ModelException
-  {
-    final NamedType doc = (NamedType) mUnmarshaller.unmarshal(filename);
-    final DocumentProxy docproxy = createProxy(doc, filename);
-    return docproxy;
-  }
+    throws Exception;
 
   /**
    * Write a document to a file.
@@ -83,41 +57,19 @@ public abstract class ProxyMarshaller
    *                  opened.
    */
   public void marshal(final DocumentProxy docproxy,
-		      final File filename)
-     throws JAXBException, IOException
-  {
-    final NamedType doc = createElement(docproxy);
-    final FileOutputStream stream = new FileOutputStream(filename);
-    final PrintWriter writer = new PrintWriter(stream);
-    try {
-      mMarshaller.marshal(doc, writer);
-    } finally {
-      writer.close();
-    }
-  }
+                      final File filename)
+    throws Exception;
 
 
   //#########################################################################
   //# Provided by Subclasses
-  public abstract DocumentProxy createProxy(NamedType doc, File location)
-    throws ModelException;
-  public abstract NamedType createElement(DocumentProxy docproxy)
-    throws JAXBException;
-
   /**
    * Get a default extension for the XML files handled by this wrapper.
    */
-  public abstract String getDefaultExtension();
+  public String getDefaultExtension();
 
-  /**
-   * Get the class of the documents handled by this wrapper.
-   */
-  public abstract Class getOutputClass();
+  public Collection getSupportedExtensions();
 
-
-  //#########################################################################
-  //# Data Members
-  private final Marshaller mMarshaller;
-  private final Unmarshaller mUnmarshaller;
+  public Collection getMarshalledClasses();
 
 }

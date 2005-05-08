@@ -1,21 +1,20 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   ComponentCompilerTask
 //###########################################################################
-//# $Id: ComponentCompilerTask.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: ComponentCompilerTask.java,v 1.2 2005-05-08 00:27:15 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
 
 import java.io.File;
 import java.util.Map;
-import javax.xml.bind.JAXBException;
 
 import net.sourceforge.waters.model.base.DocumentManager;
 import net.sourceforge.waters.model.base.DuplicateNameException;
 import net.sourceforge.waters.model.base.DocumentManager;
-import net.sourceforge.waters.model.base.ModelException;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.expr.DuplicateIdentifierException;
@@ -51,7 +50,7 @@ class ComponentCompilerTask
   //#########################################################################
   //# Constructors
   ComponentCompilerTask(final CompilerContext context,
-			final ModuleCompiler environment)
+                        final ModuleCompiler environment)
   {
     super(context);
     mEnvironment = environment;
@@ -74,8 +73,8 @@ class ComponentCompilerTask
       compileForeach(foreach);
     } else {
       throw new ClassCastException
-	("ComponentCompilerTask can't compile item of class " +
-	 proxy.getClass().getName() + "!");
+        ("ComponentCompilerTask can't compile item of class " +
+         proxy.getClass().getName() + "!");
     }
   }
 
@@ -107,21 +106,21 @@ class ComponentCompilerTask
       final String instname = ident.evalToName(context);
       final Map bindings = inst.getBindingMap();
       final ParameterContext actuals =
-	new ParameterContext(bindings, context);
+        new ParameterContext(bindings, context);
       final DocumentManager manager = mEnvironment.getDocumentManager();
       final File path = context.getPath();
       final String filename = inst.getModuleName();
       final ModuleProxy module =
-	(ModuleProxy) manager.load(path, filename, ModuleProxy.class);
+        (ModuleProxy) manager.load(path, filename, ModuleProxy.class);
       final String fullname = context.getPrefixedName(instname);
       final CompilerContext newcontext =
-	new CompilerContext(module, fullname);
+        new CompilerContext(module, fullname);
       final ModuleCompilerTask task =
       new ModuleCompilerTask(newcontext, mEnvironment);
       task.compileModule(module, actuals);
-    } catch (final JAXBException exception) {
-      throw new InstantiationException(exception, inst);
-    } catch (final ModelException exception) {
+    } catch (final EvalException exception) {
+      throw exception;
+    } catch (final Exception exception) {
       throw new InstantiationException(exception, inst);
     }
   }

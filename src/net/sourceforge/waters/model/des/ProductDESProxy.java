@@ -4,7 +4,7 @@
 //# PACKAGE: waters.model.des
 //# CLASS:   ProductDESProxy
 //###########################################################################
-//# $Id: ProductDESProxy.java,v 1.2 2005-02-21 19:19:51 robi Exp $
+//# $Id: ProductDESProxy.java,v 1.3 2005-05-08 00:27:15 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.des;
@@ -114,7 +114,7 @@ public class ProductDESProxy
   //# Getters and Setters
   /**
    * Gets the set of events for this product DES.
-   * @return  An unmodifiable set of objects of type EventProxy.
+   * @return  An unmodifiable set of objects of type {@link EventProxy}.
    */
   public Collection getEvents()
   {
@@ -164,7 +164,7 @@ public class ProductDESProxy
 
   /**
    * Gets the list of automata for this product DES.
-   * @return  An unmodifiable list of objects of type AutomatonProxy.
+   * @return  An unmodifiable list of objects of type {@link AutomatonProxy}.
    */
   public Collection getAutomata()
   {

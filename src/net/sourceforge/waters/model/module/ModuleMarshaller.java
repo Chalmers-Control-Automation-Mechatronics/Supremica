@@ -1,11 +1,11 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: waters.model.module
 //# CLASS:   ModuleMarshaller
 //###########################################################################
-//# $Id: ModuleMarshaller.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: ModuleMarshaller.java,v 1.2 2005-05-08 00:27:15 robi Exp $
 //###########################################################################
-
 
 package net.sourceforge.waters.model.module;
 
@@ -13,14 +13,14 @@ import java.io.File;
 import javax.xml.bind.JAXBException;
 
 import net.sourceforge.waters.model.base.DocumentProxy;
+import net.sourceforge.waters.model.base.JAXBMarshaller;
 import net.sourceforge.waters.model.base.ModelException;
-import net.sourceforge.waters.model.base.ProxyMarshaller;
 import net.sourceforge.waters.xsd.base.NamedType;
 import net.sourceforge.waters.xsd.module.ModuleType;
 
 
 /**
- * A {@link ProxyMarshaller} that can read and write modules.  This is a
+ * A {@link JAXBMarshaller} that can read and write modules.  This is a
  * convenient wrapper that provides an easy way to convert between Waters
  * Module (<CODE>.wmod</CODE>) files and their corresponding module
  * structures (class {@link ModuleProxy}).
@@ -28,7 +28,7 @@ import net.sourceforge.waters.xsd.module.ModuleType;
  * @author Robi Malik
  */
 
-public class ModuleMarshaller extends ProxyMarshaller
+public class ModuleMarshaller extends JAXBMarshaller
 {
 
   //#########################################################################
@@ -44,7 +44,7 @@ public class ModuleMarshaller extends ProxyMarshaller
 
 
   //#########################################################################
-  //# Overrides for Abstract Base Class ProxyMarshaller
+  //# Overrides for Abstract Base Class JAXBMarshaller
   public DocumentProxy createProxy(final NamedType doc, final File location)
     throws ModelException
   {

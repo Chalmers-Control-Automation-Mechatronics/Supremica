@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.junit
 //# CLASS:   AlgorithmsTest
 //###########################################################################
-//# $Id: AlgorithmsTest.java,v 1.2 2005-02-21 02:53:48 robi Exp $
+//# $Id: AlgorithmsTest.java,v 1.3 2005-05-08 00:27:15 robi Exp $
 //###########################################################################
 
 
@@ -179,7 +179,8 @@ public class AlgorithmsTest extends WatersTestCase
     final String inextname = modname + "_main.vmod";
     final File indirname = new File(mValidInputDirectory, subdirname);
     final File infilename = new File(indirname, inextname);
-    final ModuleProxy module = mValidUnmarshaller.unmarshal(infilename);
+    final ModuleProxy module =
+      (ModuleProxy) mValidUnmarshaller.unmarshal(infilename);
     return compile(module);
   }
 

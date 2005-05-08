@@ -1,9 +1,10 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: waters.model.des
+//# PACKAGE: net.sourceforge.waters.model.des
 //# CLASS:   AutomatonProxy
 //###########################################################################
-//# $Id: AutomatonProxy.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: AutomatonProxy.java,v 1.2 2005-05-08 00:27:15 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.des;
@@ -41,13 +42,15 @@ import net.sourceforge.waters.xsd.des.TransitionListType;
  * <P>A finite-state machine.</P>
  *
  * <P>This class is a straightforward representation of a finite-state
- * machine as part of a discrete-event system, consisting of an event
- * alphabet, a list of states, and a list transitions.</P>
+ * machine or Kripke structure.  It consists of an event alphabet, a list
+ * of states, and a list transitions.</P>
  *
- * <P>The event alphabet contains all the events that are used for
- * synchronisation between this and other automata. Events not contained in
- * the event alphabet are assumed to be selflooped in all states of this
- * automaton.</P>
+ * <P>The alphabet contains all the events that are used for
+ * synchronisation between this and other automata, and all the
+ * propositions used to label states of this Kripke structure. Events not
+ * contained in the alphabet are assumed to be selflooped in all states of
+ * this automaton. Propositions not contained in the alphabet are assumed
+ * to be true in all states.</P>
  *
  * <P>In addition, finite-state machines in a discrete-event systems
  * context can be classified as <I>plant</I> or <I>specification</I>.
@@ -61,14 +64,14 @@ public class AutomatonProxy extends ImmutableNamedProxy {
   //#########################################################################
   //# Constructors
   public AutomatonProxy(final String name,
-			final ComponentKind kind)
+                        final ComponentKind kind)
   {
     this(name, kind, null);
   }
 
   public AutomatonProxy(final String name,
-			final ComponentKind kind,
-			final EventLookupFactory eventfactory)
+                        final ComponentKind kind,
+                        final EventLookupFactory eventfactory)
   {
     super(name);
     mKind = kind;
@@ -79,7 +82,7 @@ public class AutomatonProxy extends ImmutableNamedProxy {
   }
 
   AutomatonProxy(final AutomatonType aut,
-		 final EventLookupFactory eventfactory)
+                 final EventLookupFactory eventfactory)
     throws ModelException
   {
     super(aut);
@@ -98,18 +101,25 @@ public class AutomatonProxy extends ImmutableNamedProxy {
 
   //#########################################################################
   //# Getters and Setters
+  /**
+   * Gets the kind (<I>plant</I>, <I>specification</I>, etc.) of this
+   * automaton.
+   */
   public ComponentKind getKind()
   {
     return mKind;
   }
 
+  /**
+   * Sets the kind of this automaton.
+   */
   public void setKind(final ComponentKind kind)
   {
     mKind = kind;
   }
 
   /**
-   * Get the set of events for this automaton.
+   * Gets the set of events for this automaton.
    * @return  An unmodifiable set of objects of type {@link EventProxy}.
    */
   public Set getEvents()
@@ -118,7 +128,7 @@ public class AutomatonProxy extends ImmutableNamedProxy {
   }
 
   /**
-   * Get the set of states for this automaton.
+   * Gets the set of states for this automaton.
    * @return  An unmodifiable set of objects of type {@link StateProxy}.
    */
   public Set getStates()
@@ -127,16 +137,16 @@ public class AutomatonProxy extends ImmutableNamedProxy {
   }
 
   /**
-   * Get the list of transitions for this automaton.
+   * Gets the list of transitions for this automaton.
    * @return  An unmodifiable list of objects of type {@link TransitionProxy}.
    */
-  public List getTransitions()
+  public Collection getTransitions()
   {
     return Collections.unmodifiableList(mTransitionListProxy);
   }
 
   /**
-   * Add an event to this automaton.
+   * Adds an event to this automaton.
    * This method makes sure that the automaton's event set includes
    * the given event, by adding it if not already present.
    * @param  event  The event to be added.
@@ -151,12 +161,12 @@ public class AutomatonProxy extends ImmutableNamedProxy {
   }
 
   /**
-   * Add a state to this automaton.
-   * Before adding, it makes sure that the all the state's propositions
+   * Adds a state to this automaton.
+   * Before adding, this method makes sure that all the state's propositions
    * are included in the event set, by adding them if necessary.
    * @param  state  The state to be added.
    * @return The item that is now contained in the collection. This may be
-   *         the given item or another one that is equal and was there
+   *         the given state or another one that is equal and was there
    *         before.
    * @throws DuplicateNameException to indicate that the automaton already
    *                has a state or an event with the same name.
@@ -173,7 +183,7 @@ public class AutomatonProxy extends ImmutableNamedProxy {
   }
 
   /**
-   * Add a transition to this automaton.
+   * Adds a transition to this automaton.
    * This method appends the given transition to the automaton's transition
    * list. Before adding, it makes sure that the transition's event is
    * included in the event set, by adding it if necessary.
@@ -189,22 +199,22 @@ public class AutomatonProxy extends ImmutableNamedProxy {
   {
     if (!mStateSetProxy.contains(trans.getSource())) {
       throw new IllegalArgumentException
-	("Source state '" + trans.getSource().getName() +
-	 "' must be added to automaton '" + getName() +
-	 "' before inserting transition!");
+        ("Source state '" + trans.getSource().getName() +
+         "' must be added to automaton '" + getName() +
+         "' before inserting transition!");
     }
     if (!mStateSetProxy.contains(trans.getTarget())) {
       throw new IllegalArgumentException
-	("Target state '" + trans.getTarget().getName() +
-	 "' must be added to automaton '" + getName() +
-	 "' before inserting transition!");
+        ("Target state '" + trans.getTarget().getName() +
+         "' must be added to automaton '" + getName() +
+         "' before inserting transition!");
     }
     addEvent(trans.getEvent());
     mTransitionListProxy.add(trans);
   }
 
   /**
-   * Find a state with given name.
+   * Finds a state with given name.
    * @param  name   The name of the state to be looked for.
    * @return The corresponding state of the automaton.
    * @throws NameNotFoundException to indicate that the automaton
@@ -224,10 +234,10 @@ public class AutomatonProxy extends ImmutableNamedProxy {
     if (super.equals(partner)) {
       final AutomatonProxy aut = (AutomatonProxy) partner;
       return
-	getKind().equals(aut.getKind()) &&
-	mEventRefSetProxy.equals(aut.mEventRefSetProxy) &&
-	mStateSetProxy.equals(aut.mStateSetProxy) &&
-	equalTransitionSets(mTransitionListProxy, aut.mTransitionListProxy);
+        getKind().equals(aut.getKind()) &&
+        mEventRefSetProxy.equals(aut.mEventRefSetProxy) &&
+        mStateSetProxy.equals(aut.mStateSetProxy) &&
+        equalTransitionSets(mTransitionListProxy, aut.mTransitionListProxy);
     } else {
       return false;
     }    
@@ -303,8 +313,8 @@ public class AutomatonProxy extends ImmutableNamedProxy {
     if (mEventFactory != null) {
       final Iterator iter = collection.iterator();
       while (iter.hasNext()) {
-	final EventProxy event = (EventProxy) iter.next();
-	verifyGlobalEvent(event);
+        final EventProxy event = (EventProxy) iter.next();
+        verifyGlobalEvent(event);
       }
     }
   }
@@ -313,16 +323,16 @@ public class AutomatonProxy extends ImmutableNamedProxy {
   {
     if (mEventFactory != null) {
       if (!mEventFactory.contains(event)) {
-	throw new IllegalArgumentException
-	  ("Event '" + event.getName() +
-	   "' must be added to global list before usage in automaton '"
-	   + getName() + "'!");
+        throw new IllegalArgumentException
+          ("Event '" + event.getName() +
+           "' must be added to global list before usage in automaton '"
+           + getName() + "'!");
       }
     }
   }
 
   private static boolean equalTransitionSets(final List list1,
-					     final List list2)
+                                             final List list2)
   {
     if (list1.size() == list2.size()) {
       final Set set1 = new HashSet(list1);
@@ -360,15 +370,15 @@ public class AutomatonProxy extends ImmutableNamedProxy {
     protected NameNotFoundException createNameNotFound(final String name)
     {
       return new NameNotFoundException
-	("Automaton '" + getName() +
-	 "' does not have an event named '" + name + "'!");
+        ("Automaton '" + getName() +
+         "' does not have an event named '" + name + "'!");
     }
     
     protected DuplicateNameException createDuplicateName(final String name)
     {
       return new DuplicateNameException
-	("Automaton '" + getName() +
-	 "' already contains an event named '" + name + "'!");
+        ("Automaton '" + getName() +
+         "' already contains an event named '" + name + "'!");
     }
   
   }
@@ -388,7 +398,7 @@ public class AutomatonProxy extends ImmutableNamedProxy {
       throws ModelException
     {
       super(aut.getStateList(),
-	    new StateProxy.StateProxyFactory(eventfactory));
+            new StateProxy.StateProxyFactory(eventfactory));
     }
 
     //#######################################################################
@@ -401,15 +411,15 @@ public class AutomatonProxy extends ImmutableNamedProxy {
     protected NameNotFoundException createNameNotFound(final String name)
     {
       return new NameNotFoundException
-	("Automaton '" + getName() +
-	 "' does not have a state named '" + name + "'!");
+        ("Automaton '" + getName() +
+         "' does not have a state named '" + name + "'!");
     }
     
     protected DuplicateNameException createDuplicateName(final String name)
     {
       return new DuplicateNameException
-	("Automaton '" + getName() +
-	 "' already contains a state named '" + name + "'!");
+        ("Automaton '" + getName() +
+         "' already contains a state named '" + name + "'!");
     }
 
   }
@@ -426,13 +436,13 @@ public class AutomatonProxy extends ImmutableNamedProxy {
     }
 
     TransitionListProxy(final AutomatonType aut,
-			final EventLookupFactory eventfactory,
-			final StateLookupFactory statefactory)
+                        final EventLookupFactory eventfactory,
+                        final StateLookupFactory statefactory)
       throws ModelException
     {
       super(aut.getTransitionList(),
-	    new TransitionProxy.TransitionProxyFactory
-	          (eventfactory, statefactory));
+            new TransitionProxy.TransitionProxyFactory
+                  (eventfactory, statefactory));
     }
 
     //#######################################################################

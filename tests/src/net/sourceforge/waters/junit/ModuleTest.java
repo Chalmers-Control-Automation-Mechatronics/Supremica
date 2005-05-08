@@ -3,14 +3,13 @@
 //# PACKAGE: waters.junit
 //# CLASS:   ModuleTest
 //###########################################################################
-//# $Id: ModuleTest.java,v 1.3 2005-03-16 02:06:27 robi Exp $
+//# $Id: ModuleTest.java,v 1.4 2005-05-08 00:27:15 robi Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.junit;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -50,74 +49,74 @@ public class ModuleTest
   //#########################################################################
   //# Marshalling Test Cases
   public void testParse_buffer_sf1()
-    throws JAXBException, ModelException, IOException
+    throws Exception
   {
     testParse("buffer_sf1");
   }
 
   public void testParse_colours()
-    throws JAXBException, ModelException, IOException
+    throws Exception
   {
     testParse("colours");
   }
 
   public void testParse_machine()
-    throws JAXBException, ModelException, IOException
+    throws Exception
   {
     testParse("machine");
   }
 
   public void testParse_small_factory_2()
-    throws JAXBException, ModelException, IOException
+    throws Exception
   {
     testParse("small_factory_2");
   }
 
   public void testParse_small_factory_n()
-    throws JAXBException, ModelException, IOException
+    throws Exception
   {
     testParse("small_factory_n");
   }
 
   public void testParse_tictactoe()
-    throws JAXBException, ModelException, IOException
+    throws Exception
   {
     testParse("tictactoe");
   }
 
 
   public void testMarshal_buffer_sf1()
-    throws JAXBException, ModelException, IOException
+    throws Exception
   {
     testMarshal("buffer_sf1");
   }
 
   public void testMarshal_colours()
-    throws JAXBException, ModelException, IOException
+    throws Exception
   {
     testMarshal("colours");
   }
 
   public void testMarshal_machine()
-    throws JAXBException, ModelException, IOException
+    throws Exception
   {
     testMarshal("machine");
   }
 
   public void testMarshal_small_factory_2()
-    throws JAXBException, ModelException, IOException
+    throws Exception
   {
     testMarshal("small_factory_2");
   }
 
   public void testMarshal_small_factory_n()
-    throws JAXBException, ModelException, IOException
+    throws Exception
   {
     testMarshal("small_factory_n");
   }
 
   public void testMarshal_tictactoe()
-    throws JAXBException, ModelException, IOException
+    throws Exception
   {
     testMarshal("tictactoe");
   }
@@ -126,28 +125,28 @@ public class ModuleTest
   //#########################################################################
   //# Handcrafting Test Cases
   public void testHandcraft_edge0()
-    throws JAXBException, ModelException, IOException
+    throws Exception
   {
     final ModuleProxy handcrafted = handcraft_edge0();
     testHandcraft(handcrafted);
   }
 
   public void testHandcraft_nodegroup0()
-    throws JAXBException, ModelException, IOException
+    throws Exception
   {
     final ModuleProxy handcrafted = handcraft_nodegroup0();
     testHandcraft(handcrafted);
   }
 
   public void testHandcraft_nodegroup1()
-    throws JAXBException, ModelException, IOException
+    throws Exception
   {
     final ModuleProxy handcrafted = handcraft_nodegroup1();
     testHandcraft(handcrafted);
   }
 
   public void testHandcraft_nodegroup2()
-    throws JAXBException, ModelException, IOException
+    throws Exception
   {
     final ModuleProxy handcrafted = handcraft_nodegroup2();
     testHandcraft(handcrafted);

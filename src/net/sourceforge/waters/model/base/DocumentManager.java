@@ -1,18 +1,19 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: waters.model.base
 //# CLASS:   DocumentManager
 //###########################################################################
-//# $Id: DocumentManager.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: DocumentManager.java,v 1.2 2005-05-08 00:27:15 robi Exp $
 //###########################################################################
-
 
 package net.sourceforge.waters.model.base;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
-import javax.xml.bind.JAXBException;
 
 
 /**
@@ -86,7 +87,7 @@ public class DocumentManager {
    */
   public DocumentProxy load
     (final File path, final String name, final Class clazz)
-    throws JAXBException, ModelException
+    throws Exception
   {
     final ProxyMarshaller marshaller = findProxyMarshaller(clazz);
     final String extname = name + marshaller.getDefaultExtension();
@@ -115,7 +116,7 @@ public class DocumentManager {
    *                  serious semantic inconsistencies.
    */
    public DocumentProxy load(final File filename)
-    throws JAXBException, ModelException
+    throws Exception
   {
     final Object cached = mDocumentCache.get(filename);
     if (cached != null) {
@@ -146,10 +147,18 @@ public class DocumentManager {
    */
   public void register(final ProxyMarshaller marshaller)
   {
-    final Class clazz = marshaller.getOutputClass();
-    final String extension = marshaller.getDefaultExtension();
-    mClassMap.put(clazz, marshaller);
-    mExtensionMap.put(extension, marshaller);
+    final Collection classes = marshaller.getMarshalledClasses();
+    final Iterator citer = classes.iterator();
+    while (citer.hasNext()) {
+      final Class clazz = (Class) citer.next();
+      mClassMap.put(clazz, marshaller);
+    }
+    final Collection extensions = marshaller.getSupportedExtensions();
+    final Iterator eiter = extensions.iterator();
+    while (eiter.hasNext()) {
+      final String extension = (String) eiter.next();
+      mExtensionMap.put(extension, marshaller);
+    }
   }
 
 
@@ -170,7 +179,7 @@ public class DocumentManager {
       return marshaller;
     } else {
       throw new IllegalArgumentException
-	("Unsupported document class " + clazz.getName() + "!");
+        ("Unsupported document class " + clazz.getName() + "!");
     }
   }
 

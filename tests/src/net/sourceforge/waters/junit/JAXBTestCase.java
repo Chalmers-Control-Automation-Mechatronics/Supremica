@@ -3,7 +3,7 @@
 //# PACKAGE: waters.junit
 //# CLASS:   JAXBTestCase
 //###########################################################################
-//# $Id: JAXBTestCase.java,v 1.2 2005-02-21 03:14:14 robi Exp $
+//# $Id: JAXBTestCase.java,v 1.3 2005-05-08 00:27:15 robi Exp $
 //###########################################################################
 
 
@@ -16,7 +16,6 @@ import javax.xml.bind.JAXBException;
 
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.ElementProxy;
-import net.sourceforge.waters.model.base.ModelException;
 import net.sourceforge.waters.model.base.ModelPrinter;
 import net.sourceforge.waters.model.base.ProxyMarshaller;
 
@@ -28,7 +27,7 @@ abstract class JAXBTestCase
   //#########################################################################
   //# Utilities
   DocumentProxy testParse(final String name)
-    throws JAXBException, ModelException, IOException
+    throws Exception
   {
     final ProxyMarshaller marshaller = getProxyMarshaller();
     final String extname = name + marshaller.getDefaultExtension();
@@ -37,7 +36,7 @@ abstract class JAXBTestCase
   }
 
   DocumentProxy testParse(final File filename)
-    throws JAXBException, ModelException, IOException
+    throws Exception
   {
     final ProxyMarshaller marshaller = getProxyMarshaller();
     final DocumentProxy proxy = marshaller.unmarshal(filename);
@@ -47,7 +46,7 @@ abstract class JAXBTestCase
   }
 
   DocumentProxy testMarshal(final String name)
-    throws JAXBException, ModelException, IOException
+    throws Exception
   {
     final ProxyMarshaller marshaller = getProxyMarshaller();
     final String extname = name + marshaller.getDefaultExtension();
@@ -57,7 +56,7 @@ abstract class JAXBTestCase
   }
 
   DocumentProxy testMarshal(final File infilename, final File outfilename)
-    throws JAXBException, ModelException, IOException
+    throws Exception
   {
     final ProxyMarshaller marshaller = getProxyMarshaller();
     final DocumentProxy proxy1 = marshaller.unmarshal(infilename);
@@ -75,7 +74,7 @@ abstract class JAXBTestCase
   }
 
   void testHandcraft(final DocumentProxy handcrafted)
-    throws JAXBException, ModelException, IOException
+    throws Exception
   {
     final ProxyMarshaller marshaller = getProxyMarshaller();
     final String name = handcrafted.getName();
