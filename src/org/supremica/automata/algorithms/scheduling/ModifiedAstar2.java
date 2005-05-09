@@ -129,11 +129,12 @@ public class ModifiedAstar2
 			preprocess1();
 			infoStr += "\t1st preprocessing in " + timer.elapsedTime() + " ms\n";	
 
-			if (theAutomata.getPlantAutomata().size() > 2) {
+			if (plantAutomata.size() > 2) {
 				timer.start();
-				String prep2Info = preprocess2();
+//				String prep2Info = preprocess2();
+				preprocess2();
 				infoStr += "\t2nd preprocessing in " + timer.elapsedTime() + " ms\n";
-				infoStr += prep2Info;
+//				infoStr += prep2Info;
 			}
 
 			timer.start();
@@ -231,10 +232,10 @@ public class ModifiedAstar2
 	 */
 	private boolean isOnAList(int[] node) {
 		Integer currKey = getKey(node);
-		
+
 		int estimatedCost = calcEstimatedCost(node);
-		
 		int index = -1;
+		
 		Iterator iter = openList.iterator();
 		while (iter.hasNext()) {
 			index++;
@@ -250,7 +251,7 @@ public class ModifiedAstar2
 				}
 			}
 		}
-		
+
 		if (closedNodes.containsKey(currKey)) {
 			if (estimatedCost >= calcEstimatedCost((int[])closedNodes.get(currKey)))
 				return true;
@@ -273,8 +274,8 @@ public class ModifiedAstar2
 	private int getOneProdRelaxation(int[] node) {
 		int estimate = 0;
 		int[] currCosts = getCosts(node);
-		
-		for (int i=0; i<plantAutomata.size(); i++) {
+
+		for (int i=0; i<activeAutomataIndex.length; i++) {
 			//int altEstimate = theNode.getCurrentCosts()[i] + ((Integer)oneProdRelax[i].get(theNode.getState(i))).intValue();
 			int altEstimate = currCosts[i] + ((int[])oneProdRelax.get(i))[node[activeAutomataIndex[i]]]; 
 
@@ -284,11 +285,66 @@ public class ModifiedAstar2
 		
 		return estimate;
 	}
-	
+
 	private int getTwoProdRelaxation(int[] node) {
 		int estimate = 0;
+		int[] currentCosts = getCosts(node);
+		int plantAutomataSize = plantAutomata.size();
+		activeAutomataIndex = new int[2];
 		
-		return estimate;
+		for (int i=0; i<plantAutomataSize-1; i++) {
+			for (int j=i+1; j<plantAutomataSize; j++) {
+				activeAutomataIndex[0] = i;
+				activeAutomataIndex[1] = j;
+				
+				// Funkar bara om alla noder i den totala synkningen har 2-prod-relaxerats
+				// Har de det?????????????
+				Object relaxation = twoProdRelax[calcHashtableIndex(i,j)].get(getKey(node));
+				if (relaxation != null) {
+					int altEstimate = ((Integer) relaxation).intValue();
+
+					if (altEstimate > estimate)
+						estimate = altEstimate;
+				}
+			}
+		}
+		
+		int minCurrCost = currentCosts[0];
+		for (int i=1; i<currentCosts.length; i++) {
+			if (currentCosts[i] < minCurrCost)
+				minCurrCost = currentCosts[i];
+		}
+
+		return estimate + minCurrCost;
+	}
+
+	private int getTwoProdRelaxation(Node theNode) {
+		int plantAutomataSize = plantAutomata.size();
+		int[] currentCosts = theNode.getCurrentCosts();
+
+		int estimate = 0;
+		for (int i=0; i<plantAutomataSize-1; i++) {
+			for (int j=i+1; j<plantAutomataSize; j++) {
+
+				// Funkar bara om alla noder i den totala synkningen har 2-prod-relaxerats
+				// Har de det?????????????
+				Object relaxation = twoProdRelax[calcHashtableIndex(i,j)].get(theNode);
+				if (relaxation != null) {
+					int altEstimate = ((Integer) relaxation).intValue();
+
+					if (altEstimate > estimate)
+						estimate = altEstimate;
+				}
+			}
+		}
+
+		int minCurrCost = currentCosts[0];
+		for (int i=1; i<currentCosts.length; i++) {
+			if (currentCosts[i] < minCurrCost)
+				minCurrCost = currentCosts[i];
+		}
+
+		return estimate + minCurrCost;
 	}
 	
 	private boolean isAcceptingNode(int[] node) {
@@ -386,12 +442,12 @@ public class ModifiedAstar2
 
 		return childNodes.values();
 	}
-	
+
 	private Integer getKey(int[] node) {
 		int key = 0;
 		
-		for (int i=0; i<theAutomata.size(); i++)
-			key += node[i]*keyMapping[i];
+		for (int i=0; i<activeAutomataIndex.length; i++)
+			key += node[activeAutomataIndex[i]]*keyMapping[activeAutomataIndex[i]];
 		
 		return new Integer(key);
 	}
@@ -433,9 +489,16 @@ public class ModifiedAstar2
 		return newCosts;
 	}
 	
+	private int[] resetCosts(int[] node) {	
+		for (int i = 2*theAutomata.size() + AutomataIndexFormHelper.STATE_EXTRA_DATA; i<node.length; i++)
+			node[i] = 0;
+		
+		return node;
+	}
+	
 	private int[] getCosts(int[] node) {
-		int[] costs = new int[activeAutomataIndex.length + 1];
-		int startIndex = node.length - activeAutomataIndex.length - 1;
+		int[] costs = new int[plantAutomata.size() + 1];
+		int startIndex = theAutomata.size() + AutomataIndexFormHelper.STATE_EXTRA_DATA;
 		
 		for (int i=0; i<costs.length; i++)
 			costs[i] = node[startIndex + i];
@@ -573,7 +636,7 @@ public class ModifiedAstar2
 	 * 			an accepting state.
 	 * @return 	true, otherwise
 	 */	
-	private boolean preprocess1() {
+	private void preprocess1() {
 		for (int i=0; i<plantAutomata.size(); i++) {
 			Automaton theAuto = plantAutomata.getAutomatonAt(i);
 			State markedState = findAcceptingState(theAuto);
@@ -584,7 +647,7 @@ public class ModifiedAstar2
 				relax[j] = -1;
 
 			if (markedState == null)
-				return false;
+				return;
 			else {
 				relax[markedState.getIndex()] = markedState.getCost();
 				estList.add(markedState);
@@ -614,15 +677,39 @@ public class ModifiedAstar2
 			
 			oneProdRelax.add(i, relax);
 		}
-		
-		return true;
 	}
 	
-	private String preprocess2() {
-		return "Hej! Preprocess2() är nog inte implementerat än...";
+	private void preprocess2() {
+		for (int i=0; i<plantAutomata.size()-1; i++) {
+			for (int j=i+1; j<plantAutomata.size(); j++) {
+				int hashtableIndex = calcHashtableIndex(i,j);
+
+				activeAutomataIndex = new int[2];
+				activeAutomataIndex[0] = theAutomata.getAutomatonIndex(plantAutomata.getAutomatonAt(i));
+				activeAutomataIndex[1] = theAutomata.getAutomatonIndex(plantAutomata.getAutomatonAt(j));
+	
+				int schedCounter = 0;
+	
+				ArrayList activeNodes = new ArrayList();	
+				activeNodes.add(makeInitialNode());
+		
+				while (!activeNodes.isEmpty()) {
+					int[] currNode = (int[])activeNodes.remove(0);
+	
+					if (! (twoProdRelax[hashtableIndex].containsKey(getKey(currNode)))) {
+						activeNodes.addAll(expandNode(currNode));
+		
+						schedCounter++;
+						int[] accNode = scheduleFrom(resetCosts(currNode));
+
+						if (accNode != null)
+							twoProdRelax[hashtableIndex].put(getKey(currNode), new Integer(accNode[accNode.length-1]));
+					}
+				}
+			}
+		}
 	}
 
-	//TODO: omvandla till int[]
 	/**
 	 * 			Calculates the costs for a two-product relaxation (i.e. as if there
 	 * 			would only be two robots in the cell) and stores it in the hashtable
@@ -681,8 +768,7 @@ public class ModifiedAstar2
 		return infoStr;
 	}
 */
-	
-	//TODO: Detta tankesätt är för krångligt. Förenkla!
+
 	/**
 	 * 	Räknar ut en passande index för hashtabellen till en tvårobot-relaxering mha en
 	 * 	klurig (och förhoppningsvis korrekt) formel.
@@ -700,36 +786,6 @@ public class ModifiedAstar2
 		return calcEstimatedCost(theNode, false);
 	}
 */
-
-	//TODO: Omvandla till int[]
-	private int getTwoProdRelaxation(Node theNode) {
-		int plantAutomataSize = theAutomata.getPlantAutomata().size();
-		int[] currentCosts = theNode.getCurrentCosts();
-
-		int estimate = 0;
-		for (int i=0; i<plantAutomataSize-1; i++) {
-			for (int j=i+1; j<plantAutomataSize; j++) {
-
-				// Funkar bara om alla noder i den totala synkningen har 2-prod-relaxerats
-				// Har de det?????????????
-				Object relaxation = twoProdRelax[calcHashtableIndex(i,j)].get(theNode);
-				if (relaxation != null) {
-					int altEstimate = ((Integer) relaxation).intValue();
-
-					if (altEstimate > estimate)
-						estimate = altEstimate;
-				}
-			}
-		}
-
-		int minCurrCost = currentCosts[0];
-		for (int i=1; i<currentCosts.length; i++) {
-			if (currentCosts[i] < minCurrCost)
-				minCurrCost = currentCosts[i];
-		}
-
-		return estimate + minCurrCost;
-	}
 
 	// Borde kanske ligga i "Automaton.java" men det kanske inte är tillräckligt
 	// generellt för det. Om man inte har att göra med schemaläggning, kan det väl
