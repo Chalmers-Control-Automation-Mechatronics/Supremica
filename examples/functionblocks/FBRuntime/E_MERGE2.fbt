@@ -1,26 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
-<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="TestType" >
-  <VersionInfo Organization="Chalmers" Version="0.1" Author="Goran" Date="2005-04-08" />
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="E_MERGE2" >
+  <VersionInfo Organization="Chalmers" Version="1.0" Author="Goran Cengic" Date="2005-05-11" />
   <InterfaceList>
     <EventInputs>
-      <Event Name="OCCURRED" >
+      <Event Name="EI1" >
+      </Event>
+      <Event Name="EI2" >
       </Event>
     </EventInputs>
     <EventOutputs>
-      <Event Name="DONE" >
+      <Event Name="EO" >
       </Event>
     </EventOutputs>
   </InterfaceList>
   <BasicFB>
     <ECC>
-        <ECState Name="INIT">
+        <ECState Name="START">
 		</ECState>    
-        <ECState Name="STATE">
-		<ECAction Algorithm="TestAlg" Output="DONE"/>
+        <ECState Name="EO">
+			<ECAction Output="EO"/>
 		</ECState>    
-	<ECTransition Source="INIT" Destination="STATE" Condition="OCCURRED" />
-	<ECTransition Source="STATE" Destination="INIT" Condition="1" />
+	<ECTransition Source="START" Destination="EO" Condition="EI1" />
+	<ECTransition Source="START" Destination="EO" Condition="EI2" />
+	<ECTransition Source="EO" Destination="START" Condition="1" />
     </ECC>
   </BasicFB>
 </FBType>
