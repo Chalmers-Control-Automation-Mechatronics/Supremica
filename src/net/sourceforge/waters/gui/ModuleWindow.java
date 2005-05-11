@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   ModuleWindow
 //###########################################################################
-//# $Id: ModuleWindow.java,v 1.9 2005-03-11 09:25:31 flordal Exp $
+//# $Id: ModuleWindow.java,v 1.10 2005-05-11 13:07:55 knut Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -116,6 +116,11 @@ public class ModuleWindow
 			JOptionPane.showMessageDialog(this, "Error loading module file! (ModelException)");
 			logEntry("ModelException - Failed to load: " + wmodf);
 		}
+		catch (final Exception exception)
+		{
+			JOptionPane.showMessageDialog(this, "Error loading module file! (Exception)");
+			logEntry("ModelException - Failed to load: " + wmodf);
+		}
 	}
 
 	public void saveWmodFile(File wmodf)
@@ -139,6 +144,11 @@ public class ModuleWindow
 		{
 			JOptionPane.showMessageDialog(this, "Error saving module file! (IOException)");
 			logEntry("IOException - Failed to save: " + wmodf);
+		}
+		catch (final Exception exception)
+		{
+			JOptionPane.showMessageDialog(this, "Error loading module file! (Exception)");
+			logEntry("ModelException - Failed to load: " + wmodf);
 		}
 	}
 

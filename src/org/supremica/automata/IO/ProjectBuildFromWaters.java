@@ -140,7 +140,7 @@ public class ProjectBuildFromWaters
 			}
 
 			// Create transitions
-			List currWatersTransitions = currWatersAutomaton.getTransitions();
+			Collection currWatersTransitions = currWatersAutomaton.getTransitions();
 			for (Iterator trIt = currWatersTransitions.iterator(); trIt.hasNext(); )
 			{
 				TransitionProxy currWatersTransition = (TransitionProxy)trIt.next();

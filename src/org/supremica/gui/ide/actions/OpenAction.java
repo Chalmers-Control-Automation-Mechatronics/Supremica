@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   OpenAction
 //###########################################################################
-//# $Id: OpenAction.java,v 1.8 2005-03-24 10:09:16 torda Exp $
+//# $Id: OpenAction.java,v 1.9 2005-05-11 13:07:55 knut Exp $
 //###########################################################################
 
 
@@ -104,6 +104,8 @@ public class OpenAction
 				showParseError("Could not parse module file", file, exception);
 			} catch (final ModelException exception) {
 				showParseError("Could not parse module file", file, exception);
+			} catch (final Exception exception) {
+				showParseError("Could not parse module file", file, exception);
 			}
 		}
 
@@ -139,7 +141,7 @@ public class OpenAction
 		{
 			try {
 				final ValidUnmarshaller unmarshaller = new ValidUnmarshaller();
-				final ModuleProxy module = unmarshaller.unmarshal(file);
+				final ModuleProxy module = (ModuleProxy) unmarshaller.unmarshal(file);
 				installContainer(module);
 			} catch (final IOException exception) {
 				showParseError
@@ -151,6 +153,9 @@ public class OpenAction
 				showParseError
 					("Error importing from VALID module", file, exception);
 			} catch (final TransformerConfigurationException exception) {
+				showParseError
+					("Error importing from VALID module", file, exception);
+			} catch (final Exception exception) {
 				showParseError
 					("Error importing from VALID module", file, exception);
 			}
