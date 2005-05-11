@@ -62,6 +62,7 @@ public abstract class FBInstance extends NamedObject
 	public abstract void addEventOutputConnection(String eventOutput, Connection cnt);
 	public abstract void addDataInputConnection(String dataInput, Connection cnt);
 
+	public abstract Connection getEventOutputConnection(String eventOutput);
 	public abstract Variable getDataOutput(String name);
 
 }

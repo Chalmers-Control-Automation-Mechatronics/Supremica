@@ -84,7 +84,7 @@ public class Resource extends NamedObject
 
     void runResource()
     {
-		System.out.println("Resource.runResource()");	
+		System.out.println("Resource.runResource()");
 		scheduler.runEvents();
     }
 

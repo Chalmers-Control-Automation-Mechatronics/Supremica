@@ -103,6 +103,11 @@ public class BasicFBInstance extends FBInstance
 		dataInputConnections.put(input, cnt);
     }
 
+	public Connection getEventOutputConnection(String output)
+	{
+		return (Connection) eventOutputConnections.get(output);
+	}
+
 	// This method provides its output data to the calling BasicFBInstance
     public Variable getDataOutput(String name)
     {

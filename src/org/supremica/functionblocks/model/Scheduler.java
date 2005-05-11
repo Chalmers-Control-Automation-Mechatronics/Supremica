@@ -61,8 +61,8 @@ public class Scheduler
 {
 	private Resource resource;
 	
-	private List scheduledFBInstances = new LinkedList();
-	private List scheduledJobs = Collections.synchronizedList(new LinkedList());
+	private List<FBInstance> scheduledFBInstances = new LinkedList<FBInstance>();
+	private List<Job> scheduledJobs = Collections.synchronizedList(new LinkedList<Job>());
 	//private List finishedJobs = Collections.synchronizedList(new LinkedList());
 	
 	private AlgorithmExecutingThread algorithmThread = null;
@@ -111,6 +111,16 @@ public class Scheduler
 	public void runEvents()
 	{
 		System.out.println("Scheduler.runEvents()");
+
+		// find all E_RESTART COLD connections and queue events on them
+		for (Iterator iter = resource.getFBType("E_RESTART").instanceIterator(); iter.hasNext();) 
+		{
+			FBInstance eRestartInstance = (FBInstance) iter.next();
+			Connection outputConnection = eRestartInstance.getEventOutputConnection("COLD");
+			FBInstance toInstance = outputConnection.getFBInstance();
+			toInstance.queueEvent(outputConnection.getSignalName());
+		}
+
 		while (true)
 		{
 			FBInstance selectedFBInstance = getNextScheduledFBInstance();

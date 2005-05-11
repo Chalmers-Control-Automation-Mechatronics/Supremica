@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="E_RESTART" >
+  <VersionInfo Organization="Chalmers" Version="0.1" Author="Goran" Date="2005-04-08" />
+  <InterfaceList>
+    <EventOutputs>
+      <Event Name="COLD" Type="EVENT">
+      </Event>
+      <Event Name="WARM" Type="EVENT">
+      </Event>
+      <Event Name="STOP" Type="EVENT">
+      </Event>
+    </EventOutputs>
+  </InterfaceList>
+</FBType>

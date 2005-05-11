@@ -124,12 +124,17 @@ public class BasicFBType extends FBType
 
     public void addAlgorithm(Algorithm alg)
     {
-	algorithms.put(alg.getName(),alg);
+		algorithms.put(alg.getName(),alg);
     }
 
     public Algorithm getAlgorithm(String name)
     {
-	return (Algorithm) algorithms.get(name);
+		return (Algorithm) algorithms.get(name);
     }
+
+	public Iterator instanceIterator()
+	{
+		return instances.keySet().iterator();
+	}
 
 }

@@ -50,5 +50,7 @@ public abstract class FBType extends NamedObject
 	Resource resource;
 	
 	public abstract FBInstance createInstance(String name);
+
+	public abstract Iterator instanceIterator();
 	
 }

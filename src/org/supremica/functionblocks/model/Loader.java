@@ -195,16 +195,6 @@ public class Loader
 
     private void loadFBType(org.supremica.functionblocks.xsd.libraryelement.FBType xmlFBTypeData)
     {
-		if (xmlFBTypeData.isSetBasicFB())
-		{
-			constructNewBasicFBType(xmlFBTypeData);
-		}
-    }
-
-
-	private void constructNewBasicFBType(org.supremica.functionblocks.xsd.libraryelement.FBType xmlFBTypeData)
-    {
-
 		resource.addBasicFBType(xmlFBTypeData.getName());
 		BasicFBType newBasicFBType = (BasicFBType) resource.getFBType(xmlFBTypeData.getName());
 
@@ -332,6 +322,17 @@ public class Loader
 			}
 		}
 		// End Build the interface
+		
+		// Load BasicFB if it exist
+		if (xmlFBTypeData.isSetBasicFB())
+		{
+			constructNewBasicFBType(xmlFBTypeData,newBasicFBType);
+		}
+    }
+
+
+	private void constructNewBasicFBType(org.supremica.functionblocks.xsd.libraryelement.FBType xmlFBTypeData, BasicFBType newBasicFBType)
+    {
 
 		// Build internal variables
 		if (xmlFBTypeData.getBasicFB().isSetInternalVars())
