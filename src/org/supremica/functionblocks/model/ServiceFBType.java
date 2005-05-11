@@ -55,7 +55,7 @@ package org.supremica.functionblocks.model;
 /**
  * @author cengic
  */
-public class ServiceFBType extends BasicFBType
+public class ServiceFBType
 {
 
 
