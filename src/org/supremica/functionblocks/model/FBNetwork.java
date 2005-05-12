@@ -82,12 +82,14 @@ public class FBNetwork
 
 	public void addEventConnection(String fromInstance,String fromOutput, String toInstance, String toInput)
 	{
+		System.out.println("FBNetwork.addEventConnection: From " + fromInstance + "." + fromOutput + " to " + toInstance + "." + toInput);
 		Connection newConn = new Connection(getFBInstance(toInstance), toInput);
 		getFBInstance(fromInstance).addEventOutputConnection(fromOutput, newConn);
 	}
 
 	public void addDataConnection(String fromInstance,String fromOutput, String toInstance, String toInput)
 	{
+		System.out.println("FBNetwork.addDataConnection: From " + fromInstance + "." + fromOutput + " to " + toInstance + "." + toInput);
 		Connection newConn = new Connection(getFBInstance(fromInstance), fromOutput);
 		getFBInstance(toInstance).addDataInputConnection(toInput, newConn);
 	}

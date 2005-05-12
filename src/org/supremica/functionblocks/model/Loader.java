@@ -199,125 +199,144 @@ public class Loader
 		BasicFBType newBasicFBType = (BasicFBType) resource.getFBType(xmlFBTypeData.getName());
 
 		// Build the interface
-		// event inputs
-		for (Iterator iter = xmlFBTypeData.getInterfaceList().getEventInputs().getEvent().iterator(); iter.hasNext();)
+		if (xmlFBTypeData.isSetInterfaceList())
 		{
-			org.supremica.functionblocks.xsd.libraryelement.Event curEvent = (org.supremica.functionblocks.xsd.libraryelement.Event) iter.next();
-			newBasicFBType.addVariable(curEvent.getName(), new BooleanVariable("EventInput",false));
-			// data associations
-			for (Iterator withIter = curEvent.getWith().iterator(); withIter.hasNext();)
+
+			// event inputs
+			if (xmlFBTypeData.getInterfaceList().isSetEventInputs())
 			{
-				org.supremica.functionblocks.xsd.libraryelement.With curWith = (org.supremica.functionblocks.xsd.libraryelement.With) withIter.next();
-				newBasicFBType.addDataAssociation(curEvent.getName(), curWith.getVar());
-			}
-		}
-		// event outputs
-		for (Iterator iter = xmlFBTypeData.getInterfaceList().getEventOutputs().getEvent().iterator(); iter.hasNext();)
-		{
-			org.supremica.functionblocks.xsd.libraryelement.Event curEvent = (org.supremica.functionblocks.xsd.libraryelement.Event) iter.next();
-			newBasicFBType.addVariable(curEvent.getName(), new BooleanVariable("EventOutput",false));
-			// data associations
-			for (Iterator withIter = curEvent.getWith().iterator(); withIter.hasNext();)
-			{
-				org.supremica.functionblocks.xsd.libraryelement.With curWith = (org.supremica.functionblocks.xsd.libraryelement.With) withIter.next();
-				newBasicFBType.addDataAssociation(curEvent.getName(), curWith.getVar());
-			}
-		}
-		// input data variables
-		for (Iterator iter = xmlFBTypeData.getInterfaceList().getInputVars().getVarDeclaration().iterator(); iter.hasNext();)
-		{
-			org.supremica.functionblocks.xsd.libraryelement.VarDeclaration curVar = (org.supremica.functionblocks.xsd.libraryelement.VarDeclaration) iter.next();
-			if (curVar.getType().toLowerCase().equals("int"))
-			{
-				if (curVar.isSetInitialValue())
+				for (Iterator iter = xmlFBTypeData.getInterfaceList().getEventInputs().getEvent().iterator(); iter.hasNext();)
 				{
-					newBasicFBType.addVariable(curVar.getName(), new IntegerVariable("DataInput",new Integer(curVar.getInitialValue()).intValue()));
-				}
-				else
-				{
-					newBasicFBType.addVariable(curVar.getName(), new IntegerVariable("DataInput",0));
+					org.supremica.functionblocks.xsd.libraryelement.Event curEvent = (org.supremica.functionblocks.xsd.libraryelement.Event) iter.next();
+					newBasicFBType.addVariable(curEvent.getName(), new BooleanVariable("EventInput",false));
+					// data associations
+					for (Iterator withIter = curEvent.getWith().iterator(); withIter.hasNext();)
+					{
+						org.supremica.functionblocks.xsd.libraryelement.With curWith = (org.supremica.functionblocks.xsd.libraryelement.With) withIter.next();
+						newBasicFBType.addDataAssociation(curEvent.getName(), curWith.getVar());
+					}
 				}
 			}
-			else if (curVar.getType().toLowerCase().equals("bool"))
+
+			// event outputs
+			if (xmlFBTypeData.getInterfaceList().isSetEventOutputs())
 			{
-				if (curVar.isSetInitialValue())
+				for (Iterator iter = xmlFBTypeData.getInterfaceList().getEventOutputs().getEvent().iterator(); iter.hasNext();)
 				{
-					newBasicFBType.addVariable(curVar.getName(), new BooleanVariable("DataInput",new Boolean(curVar.getInitialValue()).booleanValue()));
-				}
-				else
-				{
-					newBasicFBType.addVariable(curVar.getName(), new BooleanVariable("DataInput",false));
+					org.supremica.functionblocks.xsd.libraryelement.Event curEvent = (org.supremica.functionblocks.xsd.libraryelement.Event) iter.next();
+					newBasicFBType.addVariable(curEvent.getName(), new BooleanVariable("EventOutput",false));
+					// data associations
+					for (Iterator withIter = curEvent.getWith().iterator(); withIter.hasNext();)
+					{
+						org.supremica.functionblocks.xsd.libraryelement.With curWith = (org.supremica.functionblocks.xsd.libraryelement.With) withIter.next();
+						newBasicFBType.addDataAssociation(curEvent.getName(), curWith.getVar());
+					}
 				}
 			}
-			else if (curVar.getType().toLowerCase().equals("real"))
+
+			// input data variables
+			if (xmlFBTypeData.getInterfaceList().isSetInputVars())
 			{
-				if (curVar.isSetInitialValue())
+				for (Iterator iter = xmlFBTypeData.getInterfaceList().getInputVars().getVarDeclaration().iterator(); iter.hasNext();)
 				{
-					newBasicFBType.addVariable(curVar.getName(), new DoubleVariable("DataInput",new Double(curVar.getInitialValue()).doubleValue()));
-				}
-				else
-				{
-					newBasicFBType.addVariable(curVar.getName(), new DoubleVariable("DataInput",0.0));
+					org.supremica.functionblocks.xsd.libraryelement.VarDeclaration curVar = (org.supremica.functionblocks.xsd.libraryelement.VarDeclaration) iter.next();
+					if (curVar.getType().toLowerCase().equals("int"))
+					{
+						if (curVar.isSetInitialValue())
+						{
+							newBasicFBType.addVariable(curVar.getName(), new IntegerVariable("DataInput",new Integer(curVar.getInitialValue()).intValue()));
+						}
+						else
+						{
+							newBasicFBType.addVariable(curVar.getName(), new IntegerVariable("DataInput",0));
+						}
+					}
+					else if (curVar.getType().toLowerCase().equals("bool"))
+					{
+						if (curVar.isSetInitialValue())
+						{
+							newBasicFBType.addVariable(curVar.getName(), new BooleanVariable("DataInput",new Boolean(curVar.getInitialValue()).booleanValue()));
+						}
+						else
+						{
+							newBasicFBType.addVariable(curVar.getName(), new BooleanVariable("DataInput",false));
+						}
+					}
+					else if (curVar.getType().toLowerCase().equals("real"))
+					{
+						if (curVar.isSetInitialValue())
+						{
+							newBasicFBType.addVariable(curVar.getName(), new DoubleVariable("DataInput",new Double(curVar.getInitialValue()).doubleValue()));
+						}
+						else
+						{
+							newBasicFBType.addVariable(curVar.getName(), new DoubleVariable("DataInput",0.0));
+						}
+					}
+					else if (curVar.getType().toLowerCase().equals("string"))
+					{
+						if (curVar.isSetInitialValue())
+						{
+							newBasicFBType.addVariable(curVar.getName(), new StringVariable("DataInput", curVar.getInitialValue()));
+						}
+						else
+						{
+							newBasicFBType.addVariable(curVar.getName(), new StringVariable("DataInput",""));
+						}
+					}
 				}
 			}
-			else if (curVar.getType().toLowerCase().equals("string"))
+
+			// output data variables
+			if (xmlFBTypeData.getInterfaceList().isSetOutputVars())
 			{
-				if (curVar.isSetInitialValue())
+				for (Iterator iter = xmlFBTypeData.getInterfaceList().getOutputVars().getVarDeclaration().iterator(); iter.hasNext();)
 				{
-					newBasicFBType.addVariable(curVar.getName(), new StringVariable("DataInput", curVar.getInitialValue()));
-				}
-				else
-				{
-					newBasicFBType.addVariable(curVar.getName(), new StringVariable("DataInput",""));
-				}
-			}
-		}
-		// output data variables
-		for (Iterator iter = xmlFBTypeData.getInterfaceList().getOutputVars().getVarDeclaration().iterator(); iter.hasNext();)
-		{
-			org.supremica.functionblocks.xsd.libraryelement.VarDeclaration curVar = (org.supremica.functionblocks.xsd.libraryelement.VarDeclaration) iter.next();
-			if (curVar.getType().toLowerCase().equals("int"))
-			{
-				if (curVar.isSetInitialValue())
-				{
-					newBasicFBType.addVariable(curVar.getName(), new IntegerVariable("DataOutput",new Integer(curVar.getInitialValue()).intValue()));
-				}
-				else
-				{
-					newBasicFBType.addVariable(curVar.getName(), new IntegerVariable("DataOutput",0));
-				}
-			}
-			else if (curVar.getType().toLowerCase().equals("bool"))
-			{
-				if (curVar.isSetInitialValue())
-				{
-					newBasicFBType.addVariable(curVar.getName(), new BooleanVariable("DataOutput",new Boolean(curVar.getInitialValue()).booleanValue()));
-				}
-				else
-				{
-					newBasicFBType.addVariable(curVar.getName(), new BooleanVariable("DataOutput",false));
-				}
-			}
-			else if (curVar.getType().toLowerCase().equals("real"))
-			{
-				if (curVar.isSetInitialValue())
-				{
-					newBasicFBType.addVariable(curVar.getName(), new DoubleVariable("DataOutput",new Double(curVar.getInitialValue()).doubleValue()));
-				}
-				else
-				{
-					newBasicFBType.addVariable(curVar.getName(), new DoubleVariable("DataOutput",0.0));
-				}
-			}
-			else if (curVar.getType().toLowerCase().equals("string"))
-			{
-				if (curVar.isSetInitialValue())
-				{
-					newBasicFBType.addVariable(curVar.getName(), new StringVariable("DataOutput", curVar.getInitialValue()));
-				}
-				else
-				{
-					newBasicFBType.addVariable(curVar.getName(), new StringVariable("DataOutput",""));
+					org.supremica.functionblocks.xsd.libraryelement.VarDeclaration curVar = (org.supremica.functionblocks.xsd.libraryelement.VarDeclaration) iter.next();
+					if (curVar.getType().toLowerCase().equals("int"))
+					{
+						if (curVar.isSetInitialValue())
+						{
+							newBasicFBType.addVariable(curVar.getName(), new IntegerVariable("DataOutput",new Integer(curVar.getInitialValue()).intValue()));
+						}
+						else
+						{
+							newBasicFBType.addVariable(curVar.getName(), new IntegerVariable("DataOutput",0));
+						}
+					}
+					else if (curVar.getType().toLowerCase().equals("bool"))
+					{
+						if (curVar.isSetInitialValue())
+						{
+							newBasicFBType.addVariable(curVar.getName(), new BooleanVariable("DataOutput",new Boolean(curVar.getInitialValue()).booleanValue()));
+						}
+						else
+						{
+							newBasicFBType.addVariable(curVar.getName(), new BooleanVariable("DataOutput",false));
+						}
+					}
+					else if (curVar.getType().toLowerCase().equals("real"))
+					{
+						if (curVar.isSetInitialValue())
+						{
+							newBasicFBType.addVariable(curVar.getName(), new DoubleVariable("DataOutput",new Double(curVar.getInitialValue()).doubleValue()));
+						}
+						else
+						{
+							newBasicFBType.addVariable(curVar.getName(), new DoubleVariable("DataOutput",0.0));
+						}
+					}
+					else if (curVar.getType().toLowerCase().equals("string"))
+					{
+						if (curVar.isSetInitialValue())
+						{
+							newBasicFBType.addVariable(curVar.getName(), new StringVariable("DataOutput", curVar.getInitialValue()));
+						}
+						else
+						{
+							newBasicFBType.addVariable(curVar.getName(), new StringVariable("DataOutput",""));
+						}
+					}
 				}
 			}
 		}

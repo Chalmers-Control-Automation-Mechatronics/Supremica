@@ -113,14 +113,16 @@ public class Scheduler
 		System.out.println("Scheduler.runEvents()");
 
 		// find all E_RESTART COLD connections and queue events on them
-		System.out.println("Searching for E_RESTART.");
+		System.out.println("Scheduler.runEvents(): Searching for E_RESTART.");
 		for (Iterator iter = resource.getFBType("E_RESTART").instanceIterator(); iter.hasNext();) 
 		{
 			FBInstance eRestartInstance = (FBInstance) iter.next();
 			Connection outputConnection = eRestartInstance.getEventOutputConnection("COLD");
 			FBInstance toInstance = outputConnection.getFBInstance();
+			System.out.println("Scheduler.runEvents(): Queueing event on " + toInstance.getName() + "." + outputConnection.getSignalName());
 			toInstance.queueEvent(outputConnection.getSignalName());
 		}
+		System.out.println("Scheduler.runEvents(): Done.");
 
 		while (true)
 		{

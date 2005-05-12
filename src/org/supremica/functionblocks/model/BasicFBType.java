@@ -97,6 +97,8 @@ public class BasicFBType extends FBType
 
 		newInstance.setVariables((Variables) variables.clone());
 
+		instances.put(name,newInstance);
+
 		return newInstance;
 	}
 
@@ -134,7 +136,7 @@ public class BasicFBType extends FBType
 
 	public Iterator instanceIterator()
 	{
-		return instances.keySet().iterator();
+		return instances.values().iterator();
 	}
 
 }
