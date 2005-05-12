@@ -48,8 +48,8 @@
 <!--
 *	If you for some reason prefer javac instead of jikes,
 *	just change "jikes" to "modern" on the next line.
--->
 <property name="build.compiler" value="modern"/>
+-->
 
 <!-- Enables emacs warning and error mesages. This is equals to calling jikes +E -->
 <!-- Put this in TextPad to get clickable error messages
@@ -283,6 +283,8 @@
 -->
 <target name="compile_supremica" depends="startfiles_local_supremica">
 	<javac
+	    debug="true"
+		debuglevel="source"
 		srcdir="${src}"
 		destdir="${build}"
 		classpath="${lib}/${unjared}"
@@ -297,6 +299,8 @@
 			${supremica_basedir}/supervisor/**,	
 			${supremica_basedir}/functionblocks/xsd/**"	
 		source="1.4"
+		fork="true"
+		memoryMaximumSize="128M"
 	/>
 </target>
 
