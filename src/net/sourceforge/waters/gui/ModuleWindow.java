@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   ModuleWindow
 //###########################################################################
-//# $Id: ModuleWindow.java,v 1.10 2005-05-11 13:07:55 knut Exp $
+//# $Id: ModuleWindow.java,v 1.11 2005-05-12 12:39:24 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -154,7 +154,6 @@ public class ModuleWindow
 
 	public void exportToSupremica()
 	{
-
 		//System.err.println("exportToSupremica");
 		ModuleProxy currModule = getModuleProxy();
 		ProjectBuildFromWaters builder = new ProjectBuildFromWaters();

@@ -50,6 +50,7 @@ package org.supremica.automata.IO;
 
 import java.io.*;
 import org.supremica.automata.Alphabet;
+import org.supremica.automata.AlphabetHelpers;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 
@@ -214,7 +215,10 @@ public class AutomataToHierarchyToDot
 			{
 				Automaton otherAutomaton = theAutomata.getAutomatonAt(j);
 				Alphabet otherAlphabet = otherAutomaton.getAlphabet();
-				int weight = currAlphabet.nbrOfCommonEvents(otherAlphabet);
+
+				Alphabet intersection = AlphabetHelpers.intersect(currAlphabet, otherAlphabet);
+				int weight = intersection.nbrOfEvents();
+				int uncon = intersection.nbrOfUncontrollableEvents();
 
 				if (weight > 0)
 				{
@@ -234,7 +238,7 @@ public class AutomataToHierarchyToDot
 						pw.print("[style = solid, ");
 					}
 
-					pw.println("label = " + weight + "];");
+					pw.println("label = \"" + weight + " (" + uncon + ")\"];");
 				}
 			}
 		}

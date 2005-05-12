@@ -1907,10 +1907,12 @@ public class ActionMan
 				"recommended to display the modular structure for more than " + maxNbrOfStates +
 				" automata.";
 			msg = EncodingHelper.linebreakAdjust(msg);
-
+			
 			Object[] options = { "Continue", "Abort" };
 			int response = JOptionPane.showOptionDialog(ActionMan.gui.getFrame(), msg, "Warning",
-				JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[1]);
+														JOptionPane.YES_NO_OPTION, 
+														JOptionPane.WARNING_MESSAGE, 
+														null, options, options[1]);
 			if(response == JOptionPane.NO_OPTION)
 			{
 				return;

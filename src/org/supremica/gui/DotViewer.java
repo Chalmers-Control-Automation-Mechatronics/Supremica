@@ -61,6 +61,11 @@ import org.supremica.automata.IO.*;
 import org.supremica.gui.texteditor.TextFrame;
 import java.awt.geom.Rectangle2D;
 
+/**
+ * Abstract class for the viewer frame. Implemented by the different viewers.
+ *
+ * @see AutomatonViewer, AutomataHierarchyViewer
+ */
 public abstract class DotViewer
 	extends JFrame
 	implements DotBuilderGraphObserver
