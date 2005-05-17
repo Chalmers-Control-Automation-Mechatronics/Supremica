@@ -655,9 +655,8 @@ public class Automata
 	 */
 	public boolean isEventNamesSafe()
 	{
-		// Get the union alphabet, ignoring consistency for now
+		// Get the union alphabet (ignoring consistency here)
 		Alphabet unionAlphabet = null;
-
 		try
 		{
 			unionAlphabet = AlphabetHelpers.getUnionAlphabet(this, false, false);
@@ -667,6 +666,17 @@ public class Automata
 			logger.error(ex);
 		}
 
+		// Check that there are no spaces in the start or end of event names!
+		for (EventIterator evIt = unionAlphabet.iterator(); evIt.hasNext(); )
+		{
+			LabeledEvent event = evIt.nextEvent();
+			if (event.getLabel().startsWith(" ") || event.getLabel().endsWith(" "))
+			{
+				logger.warn("The event '" + event.getLabel() + "' has spaces in the beginning or end of its label. This is not recommended.");
+			}
+		}
+
+		// Chech that no event names have the same alphabetic value
 		return !unionAlphabet.hasEqualEventNamesIgnoringCase();
 	}
 
@@ -1372,14 +1382,12 @@ public class Automata
 			return false;
 		}
 
-		/*
 		// Warns if there are events with equal (lowercase) names.
 		// Always do this check (irritating? well yes... but those are really bad names!)
 		if (!isEventNamesSafe())
 		{
 			// Warning has been written in log window by isEventNamesSafe.
 		}
-		*/
 
 		// Examines controllability consistency
 		if (mustBeControllabilityConsistent)
