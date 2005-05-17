@@ -139,6 +139,7 @@ public class Scheduler
 	{
 		//System.out.println("Scheduler.scheduleJob()");
 		scheduledJobs.add(j);
+		algorithmThread.notifyNewJob();
 	}
 
 	public synchronized void scheduleFBInstance(FBInstance fbInst)

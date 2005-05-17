@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
 <FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="TestType" >
   <VersionInfo Organization="Chalmers" Version="0.1" Author="Goran" Date="2005-04-08" />
   <InterfaceList>
@@ -25,15 +24,12 @@
         <VarDeclaration Name="invoked" Type="INT" />
     </InternalVars>
     <ECC>
-        <ECState Name="INIT">
-	</ECState>    
+        <ECState Name="INIT" />
         <ECState Name="STATE">
-		<ECAction Algorithm="TestAlg" Output="DONE"/>
-	</ECState>    
-	<ECTransition Source="INIT" Destination="STATE"
-	Condition="OCCURRED" />
-	<ECTransition Source="STATE" Destination="INIT"
-	Condition="1" />
+		    <ECAction Algorithm="TestAlg" Output="DONE"/>
+	    </ECState>    
+		<ECTransition Source="INIT" Destination="STATE" Condition="OCCURRED" />
+		<ECTransition Source="STATE" Destination="INIT" Condition="1" />
     </ECC>
     <Algorithm Name="TestAlg">
         <Other Language="Java" Text=

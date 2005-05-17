@@ -1,25 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
 <FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="E_MERGE2" >
   <VersionInfo Organization="Chalmers" Version="1.0" Author="Goran Cengic" Date="2005-05-11" />
   <InterfaceList>
     <EventInputs>
-      <Event Name="EI1" >
-      </Event>
-      <Event Name="EI2" >
-      </Event>
+      <Event Name="EI1" />
+      <Event Name="EI2" />
     </EventInputs>
     <EventOutputs>
-      <Event Name="EO" >
-      </Event>
+      <Event Name="EO" />
     </EventOutputs>
   </InterfaceList>
   <BasicFB>
     <ECC>
-        <ECState Name="START">
-		</ECState>    
+        <ECState Name="START" />
         <ECState Name="EO">
-			<ECAction Output="EO"/>
+			<ECAction Output="EO" />
 		</ECState>    
 	<ECTransition Source="START" Destination="EO" Condition="EI1" />
 	<ECTransition Source="START" Destination="EO" Condition="EI2" />

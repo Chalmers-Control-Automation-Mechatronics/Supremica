@@ -52,8 +52,7 @@ package org.supremica.functionblocks.management;
 /**
  * @author Cengic
  */
-public class Editor 
-	extends Tool
+public class Editor extends Tool
 {
 
 }

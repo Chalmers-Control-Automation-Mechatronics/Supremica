@@ -73,12 +73,32 @@ class AlgorithmExecutingThread extends Thread
 	{
 		while (true) 
 		{
-			if (scheduler.getNumberOfScheduledJobs() > 0)
-			{
-				Job currentJob = scheduler.getNextScheduledJob();
-				currentJob.getAlgorithm().execute(currentJob.getVariables());
-				currentJob.getInstance().finishedJob(currentJob);
-			}
+			Job currentJob = getNextScheduledJob();
+			currentJob.getAlgorithm().execute(currentJob.getVariables());
+			currentJob.getInstance().finishedJob(currentJob);
 		}	
 	}   
+	
+	public synchronized Job getNextScheduledJob()
+	{
+		while(scheduler.getNumberOfScheduledJobs() == 0)
+		{			
+			try
+			{
+				wait();
+			}
+			catch(InterruptedException e)
+			{
+				System.err.println("AlgorithmExecutingThread: InterruptedException");
+				e.printStackTrace(System.err);
+			}
+		}
+		return scheduler.getNextScheduledJob();
+	}
+
+	public synchronized void notifyNewJob()
+	{
+		notify();
+	}
+	
 }
