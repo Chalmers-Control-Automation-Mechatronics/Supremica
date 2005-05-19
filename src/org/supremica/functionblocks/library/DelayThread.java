@@ -89,7 +89,8 @@ class DelayThread extends Thread
 		// send output only if the delay wasn't aborted
 		if (sendOutput)
 		{
-			Connection cnt = fb.getEventOutputConnection("EO");
+			Connection cnt = fbInstance.getEventOutputConnection("EO");
+			cnt.getFBInstance().queueEvent(cnt.getSignalName());
 		}
 	}   
 }
