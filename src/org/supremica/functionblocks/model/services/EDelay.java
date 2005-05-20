@@ -59,7 +59,7 @@ import  org.supremica.functionblocks.model.BasicFBInstance;
  * @author <a href="mailto:cengic@cenga.s2.chalmers.se">Goran Cengic</a>
  * @version 1.0
  */
-public class EDelay extends ServiceFB
+public class EDelay// extends ServiceFB
 {
 
 	/**
