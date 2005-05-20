@@ -46,17 +46,36 @@
  *
  * Supremica is owned and represented by KA.
  */
-
-/*
- * Created on Dec 16, 2004
- */
-package org.supremica.functionblocks.model;
-
 /**
  * @author cengic
  */
-public class ServiceFBType
+package org.supremica.functionblocks.model;
+
+import java.util.*;
+
+public class ServiceFBType extends FBType
 {
 
+	private Map instances = new HashMap();
+	private Map events = new HashMap();
+	private Variables variables = new Variables();
+
+
+	private ServiceFBType() {}
+
+	public ServiceFBType(String n,Resource r)
+	{
+		
+	}
+
+	public FBInstance createInstance(String name)
+	{
+		return null;
+	}
+	
+	public Iterator instanceIterator()
+	{
+		return null;
+	}
 
 }

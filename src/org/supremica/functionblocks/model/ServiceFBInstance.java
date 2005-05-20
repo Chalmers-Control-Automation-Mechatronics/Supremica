@@ -55,9 +55,34 @@ package org.supremica.functionblocks.model;
 /**
  * @author cengic
  */
-public class ServiceFBInstance
+public class ServiceFBInstance extends FBInstance
 {
 
+	private ServiceFBInstance() {}
+	
+	public ServiceFBInstance(String n, Resource r, ServiceFBType t)
+	{
+		
+	}
 
+	public void handleEvent()
+	{}
+
+	public void queueEvent(String eventInput)
+	{}
+
+	public void addEventOutputConnection(String eventOutput, Connection cnt)
+	{}
+	public void addDataInputConnection(String dataInput, Connection cnt)
+	{}
+
+	public Connection getEventOutputConnection(String eventOutput)
+	{
+		return null;
+	}
+	public Variable getDataOutput(String name)
+	{
+		return null;
+	}
 
 }

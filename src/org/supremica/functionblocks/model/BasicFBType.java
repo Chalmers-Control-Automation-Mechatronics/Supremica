@@ -83,8 +83,8 @@ public class BasicFBType extends FBType
 		System.out.println("BasicFBType(" + name + "," + r.getName()  + ")");
 		this.name = name;
 		resource = r;
+	
 	}
-
 
 
 	// Methods 
