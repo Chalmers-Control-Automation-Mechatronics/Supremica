@@ -119,6 +119,8 @@ public class ModifiedAstar2
 	 */
 	public int[] walk() throws Exception
 	{
+		expandNode(makeInitialNode());
+		
 		if (theAutomata == null) {
 			throw new Exception("Choose several automata to schedule...");
 		}
@@ -407,7 +409,8 @@ public class ModifiedAstar2
 		return null;
 	}
 */
-	private Collection expandNode(int[] node) {
+	private Collection<int> expandNode(int[] node) {
+		
 		Hashtable childNodes = new Hashtable();
 		int[] currStateIndex = AutomataIndexFormHelper.createState(theAutomata.size());
 		for (int i=0; i<currStateIndex.length; i++)
@@ -498,7 +501,7 @@ public class ModifiedAstar2
 	
 	private int[] getCosts(int[] node) {
 		int[] costs = new int[plantAutomata.size() + 1];
-		int startIndex = theAutomata.size() + AutomataIndexFormHelper.STATE_EXTRA_DATA;
+		int startIndex = 2*theAutomata.size() + AutomataIndexFormHelper.STATE_EXTRA_DATA;
 		
 		for (int i=0; i<costs.length; i++)
 			costs[i] = node[startIndex + i];
@@ -520,7 +523,6 @@ public class ModifiedAstar2
 	}
 
 	private Collection expandNode(Node node, int[] currAutomataIndex) {
-		//ArrayList childNodes = new ArrayList();
 		Hashtable childNodes = new Hashtable();
 		int[] currStateIndex = AutomataIndexFormHelper.createState(node.size());
 
