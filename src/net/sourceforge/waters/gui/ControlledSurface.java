@@ -670,20 +670,24 @@ public class ControlledSurface
 
 							EditorEdge edge = (EditorEdge) object;
 							
-							if (edge.getDragC())
+							if (edge.getDragS())
+							{
+								edge.setSource(e.getX(), e.getY());
+							}
+							/*
+							else if (edge.getDragC())
 							{
 								edge.setTPoint(e.getX(), e.getY());
 							}
+							*/
 							else if (edge.getDragT())
 							{
 								edge.setTarget(e.getX(), e.getY());
 							}
-							else if (edge.getDragS())
+							else // Just move it otherwise
 							{
-								edge.setSource(e.getX(), e.getY());
+								edge.setTPoint(edge.getTPointX() + dx, edge.getTPointY() + dy);
 							}
-
-							break;
 						}
 						
 						// If clicking on a node or nodegroup, draw a new edge!
@@ -704,8 +708,6 @@ public class ControlledSurface
 							{
 								lines.add(dat);
 							}
-		
-							break;
 						}
 						else if (object.getType() == EditorObject.NODEGROUP)
 						{
@@ -726,13 +728,11 @@ public class ControlledSurface
 							{
 								lines.add(dat);
 							}
-							
-							break;
 						}
 					}
 				
 					// Update highlighting!
-					updateHighlighting(e);
+					//updateHighlighting(e);
 				}
 
 				// Are we resizing a nodegroup?
@@ -967,15 +967,15 @@ public class ControlledSurface
 		// Unhighlight highligted stuff not in focus
 		if ((highlightedObject != null) && !highlightedObject.equals(o))
 		{
-			highlightedObject.setHighlighted(false);
-
-			// Don't highlight children
+			// Unhighlight children
 			LinkedList children = getChildren(highlightedObject);
 			while (children.size() != 0)
 			{
 				((EditorObject) children.remove(0)).setHighlighted(false);
 			}
 
+			// Unhighlight object
+			highlightedObject.setHighlighted(false);
 			highlightedObject = null;
 
 			needRepaint = true;
@@ -984,8 +984,9 @@ public class ControlledSurface
 		// Highlight stuff in focus!
 		if (o != null && !o.equals(highlightedObject))
 		{
-			o.setHighlighted(true);
+			// Highlight object
 			highlightedObject = o;
+			highlightedObject.setHighlighted(true);
 
 			// Highlight children
 			LinkedList children = getChildren(highlightedObject);
@@ -1021,7 +1022,8 @@ public class ControlledSurface
 		if (e.getButton() == MouseEvent.BUTTON1)
 		{
 			if (e.getClickCount() == 1)
-			{				
+			{	
+				// Should we add a new node?
 				if (T.getPlace() == EditorToolbar.NODE)
 				{
 					int posX;
@@ -1029,30 +1031,6 @@ public class ControlledSurface
 					
 					if (nodesSnap)
 					{
-						/*
-						while (posX + gridSize < e.getX())
-						{
-							posX += gridSize;
-						}  
-						
-						// Which one is closer?
-						if (e.getX() - posX > (posX + gridSize) - e.getX())
-						{
-							posX += gridSize;
-						}
-						
-						while (posY + gridSize < e.getY())
-						{
-							posY += gridSize;
-						}
-						
-						// Which one is closer?
-						if (e.getY() - posY > (posY + gridSize) - e.getY())
-						{
-							posY += gridSize;
-						}
-						*/
-
 						posX = findGrid(e.getX());
 						posY = findGrid(e.getY());
 					}
@@ -1095,6 +1073,7 @@ public class ControlledSurface
 						//graph.getNodes().add(np);
 					}
 				}
+
 				/** Nonsense?
 				else if (T.getPlace() == EditorToolbar.EDGE)
 				{
@@ -1127,10 +1106,9 @@ public class ControlledSurface
 			// Double click
 			else if (e.getClickCount() == 2)
 			{
+				// Change names on double clicking a label, change order when clicking labelgroup!
 				if (T.getPlace() == EditorToolbar.SELECT)
 				{
-					// Change names on double click!
-
 					/* What's this?
 					   if (selectedNode != null)
 					   {

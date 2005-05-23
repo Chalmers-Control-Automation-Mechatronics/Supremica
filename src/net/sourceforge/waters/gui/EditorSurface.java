@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.22 2005-03-18 00:58:08 flordal Exp $
+//# $Id: EditorSurface.java,v 1.23 2005-05-23 13:35:15 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -677,7 +677,7 @@ public class EditorSurface
 			}
 		}
 
-		// But edges before nodegroups, because they are hiding the edges otherwise...
+		// But edges before nodegroups, because they are hiding the edge handles otherwise...
 		for (int i = 0; i < edges.size(); i++)
 		{
 			if (((EditorEdge) edges.get(i)).wasClicked(ex, ey))
@@ -1306,7 +1306,7 @@ public class EditorSurface
 				// Approximate curve
 				QuadCurve2D.Double curve = edge.getCurve();
 				FlatteningPathIterator it = 
-					new FlatteningPathIterator(curve.getPathIterator(new AffineTransform()), 2.0, 25);
+					new FlatteningPathIterator(curve.getPathIterator(new AffineTransform()), 5.0, 5);
 				while (!it.isDone())
 				{
 					double[] segment = new double[6];

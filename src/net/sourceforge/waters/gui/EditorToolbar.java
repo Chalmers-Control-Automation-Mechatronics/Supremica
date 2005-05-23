@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorToolbar
 //###########################################################################
-//# $Id: EditorToolbar.java,v 1.4 2005-02-21 10:22:09 flordal Exp $
+//# $Id: EditorToolbar.java,v 1.5 2005-05-23 13:35:15 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -34,7 +34,7 @@ public class EditorToolbar
 	public static final String NODEGROUP = "nodegroup";
 	public static final String INITIAL = "initial";
 	public static final String EDGE = "edge";
-	public static final String COLOR = "color";
+	public static final String EVENT = "event";
 
 	//#########################################################################
 	//# Constructors
@@ -47,7 +47,7 @@ public class EditorToolbar
 		createButton(NODEGROUP, "Create Group Nodes", false);
 		createButton(INITIAL, "Set Initial Nodes", false);
 		createButton(EDGE, "Create Edges", false);
-		createButton(COLOR, "Drag Events", false);
+		createButton(EVENT, "Drag Events", false);
 	}
 
 	//#########################################################################

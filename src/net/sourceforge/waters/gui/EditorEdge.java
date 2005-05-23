@@ -1,10 +1,9 @@
-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: waters.gui
 //# CLASS:   EditorEdge
 //###########################################################################
-//# $Id: EditorEdge.java,v 1.19 2005-03-18 00:58:08 flordal Exp $
+//# $Id: EditorEdge.java,v 1.20 2005-05-23 13:35:15 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -16,7 +15,8 @@ import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.base.ElementProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 
-/** <p>The editor's internal representation of edges.</p>
+/** 
+ * <p>The editor's internal representation of edges.</p>
  *
  * <p>This represents edges within the graph of the component.  It currently supports
  *  Bezier-curve geometry, with a single control point only.</p>
@@ -32,17 +32,18 @@ import net.sourceforge.waters.model.module.NodeProxy;
 public class EditorEdge
 	extends EditorObject
 {
-	private int angle;
 	/** The start can be either a node or a nodegroup. */
 	private EditorObject startNode; 
 	/** The end is a node. */
 	private EditorNode endNode;
 
+	/** The control point ("target") */
 	private Point2D.Double tPoint;
 
 	/** Boolean keeping track of whether the edge is a straight line or not. */
 	private boolean straight;
 
+	// Handles
 	private Rectangle2D.Double source = new Rectangle2D.Double();
 	private boolean dragS = false;
 	private Rectangle2D.Double target = new Rectangle2D.Double();	
@@ -556,7 +557,7 @@ public class EditorEdge
 
 	private boolean onLine(double x, double y)
 	{
-		// If were "behind" a node, were not on the line...
+		// If we're "behind" a node, we're not on the line...
 		if (((start.getX() < x) && (endNode.getX() < x)) || 
 			((start.getY() < y) && (endNode.getY() < y)) || 
 			((start.getX() > x) && (endNode.getX() > x)) || 
@@ -589,10 +590,14 @@ public class EditorEdge
 			return (Math.abs((double) (x - start.getX())) <= 2);
 		}
 	}
-
+	
+	/**
+	 * Calculates the tear, i.e. the drop-shaped line used for selfloops.
+	 */
 	protected ArrayList createTear()
 	{
-		double dist = (double) Math.sqrt((getCPointX() - start.getX()) * (getCPointX() - start.getX()) + (getCPointY() - start.getY()) * (getCPointY() - start.getY())) * tearRatio;
+		double dist = (double) Math.sqrt(Math.pow(getCPointX() - start.getX(), 2) + 
+										 Math.pow(getCPointY() - start.getY(), 2)) * tearRatio;
 		double r = dist / 2;
 		double xP = (double) ((getCPointX() - start.getX()) * (1 - (tearRatio / 2))) + start.getX() - r;
 		double yP = (double) ((getCPointY() - start.getY()) * (1 - (tearRatio / 2))) + start.getY() - r;
@@ -711,21 +716,28 @@ public class EditorEdge
 		return startNode == endNode;
 	}
 
-	private void drawArrow(double x1, double y1, double x2, double y2, int posX, int posY, boolean loop, Graphics2D g2d)
+	/**
+	 * Draws an arrow.
+	 *
+	 * @param x1 x-coordinate of starting point of edge
+	 * @param y1 y-coordinate of starting point of edge
+	 * @param x2 x-coordinate of ending point of edge
+	 * @param y2 y-coordinate of ending point of edge
+	 * @param posX x-coordinate of arrow point
+	 * @param posY y-coordinate of arrow point
+	 * @param loop true if edge is a loop
+	 * @param g2d the graphical surface where the arrow should be drawn
+	 */ 
+	/*
+	private void drawArrow(double x1, double y1, 
+						   double x2, double y2, 
+						   int posX, int posY, 
+						   boolean loop, Graphics2D g2d)
 	{
+		// The direction of the arrow
 		double theta;
-		int l = 8;
-		int direction;
-
-		if (y1 >= y2)
-		{
-			direction = 1;
-		}
-		else
-		{
-			direction = -1;
-		}
-
+		
+		// Determine angle
 		if (y1 == y2)
 		{
 			theta = Math.PI / 2;
@@ -740,31 +752,99 @@ public class EditorEdge
 			theta = Math.atan((double) (x1 - x2) / (double) (y1 - y2));
 		}
 
-		int[] xcoords = new int[3];
-		int[] ycoords = new int[3];
+		// Did arctan give the correct angle or should we add 180 degrees?
+		if (y1 < y2)
+		{
+			theta += Math.PI;
+		}
 
+		// If it's a loop, it's special!
 		if (loop)
 		{
 			theta -= Math.PI / 2;
 		}
+			
+		drawArrow(posX, posY, theta, g2d);
+	}
+	*/
 
-		xcoords[0] = posX - direction * (int) ((Math.sqrt(Math.pow(l, 2) + Math.pow(l, 2)) / 2) * Math.sin(theta));
-		ycoords[0] = posY - direction * (int) ((Math.sqrt(Math.pow(l, 2) + Math.pow(l, 2)) / 2) * Math.cos(theta));
-		xcoords[1] = xcoords[0] + (int) (l * Math.sin(theta - Math.PI / 6)) * direction;
-		ycoords[1] = ycoords[0] + (int) (l * Math.cos(theta - Math.PI / 6)) * direction;
-		xcoords[2] = xcoords[0] + (int) (l * Math.cos(Math.PI / 2 - (theta + Math.PI / 6))) * direction;
-		ycoords[2] = ycoords[0] + (int) (l * Math.sin(Math.PI / 2 - (theta + Math.PI / 6))) * direction;
-
-		g2d.fillPolygon(xcoords, ycoords, 3);
+	/**
+	 * Draws an arrow with its point EditorNode.RADIUS back from (x2, y2) pointing in the direction defined 
+	 * by the two points (x1, y1) and (x2, y2).
+	 */
+	private void drawArrow(double x1, double y1, double x2, double y2, Graphics2D g2d)
+	{
+		drawArrow(x1, y1, x2, y2, EditorNode.RADIUS, g2d);
 	}
 
+	/**
+	 * Draws an arrow with its point distance back from (x2, y2) pointing in the direction defined 
+	 * by the two points (x1, y1) and (x2, y2).
+	 */
+		private void drawArrow(double x1, double y1, double x2, double y2, int distance, Graphics2D g2d)
+	{
+		//Find angle!
+		double theta;
+		if (y1 == y2)
+		{
+			theta = Math.PI / 2;
+			
+			if (x1 < x2)
+			{
+				theta *= -1;
+			}
+		}
+		else
+		{
+			theta = Math.atan((double) (x1 - x2) / (double) (y1 - y2));
+		}
+		// Did arctan give the correct angle or should we add 180 degrees?
+		if (y1 < y2)
+		{
+			theta += Math.PI;
+		}
+		
+		// Find position!
+		int posX = (int) Math.ceil(x2 + Math.sin(theta)*distance);
+		int posY = (int) Math.ceil(y2 + Math.cos(theta)*distance);
+		
+		// Draw arrow!
+		drawArrow(posX, posY, theta, g2d);
+	}
+	
+	/**
+	 * Draws on g2d an arrow with its point in (x, y), pointing in the angle theta.
+	 */
+	private void drawArrow(int x, int y, double theta, Graphics2D g2d)
+	{
+		// The length of the side of the arrow
+		int length = 10;
+		// The angular width of the arrow (half of it actually)
+		double phi = Math.PI / 8;
+		
+		// Arrays of coordinates for the corners
+		int[] xcoords = new int[3];
+		int[] ycoords = new int[3];		
+		
+		// Draw arrow at the control point
+		xcoords[0] = x;// - (int) ((Math.sqrt(Math.pow(length, 2) + Math.pow(length, 2))/2) * Math.sin(theta));
+		ycoords[0] = y;// - (int) ((Math.sqrt(Math.pow(length, 2) + Math.pow(length, 2))/2) * Math.cos(theta));
+		xcoords[1] = xcoords[0] + (int) (length * Math.sin(theta - phi));
+		ycoords[1] = ycoords[0] + (int) (length * Math.cos(theta - phi));
+		xcoords[2] = xcoords[0] + (int) (length * Math.cos(Math.PI / 2 - (theta + phi)));
+		ycoords[2] = ycoords[0] + (int) (length * Math.sin(Math.PI / 2 - (theta + phi)));
+		
+		// Do the drawing!
+		g2d.fillPolygon(xcoords, ycoords, 3); 
+	}
+
+	// What does this method do? /hguo
 	private void findIntersection(Rectangle2D.Double i, Point2D.Double s, Point2D.Double e)
 	{
 		e.setLocation(e.getX() - s.getX(), e.getY() - s.getY());
 
 		if (0 == e.getX())
 		{
-
 			/*      if (l.intersects(s.getX()-1, s.getY() + endNode.getWidth()/2-1, 2, 2)){
 				i.setFrameFromCenter(s.getX(), s.getY() + endNode.getWidth()/2+WIDTH, s.getX() + WIDTH,
 				s.getY() + endNode.getWidth()/2 + 2* WIDTH);
@@ -820,12 +900,30 @@ public class EditorEdge
 			int x2 = (int) target.getCenterX();
 			int y2 = (int) target.getCenterY(); 
 			
+			// Draw shadow
+			if (shadow && isHighlighted())
+			{
+				g2d.setStroke(SHADOWSTROKE);
+				g2d.setColor(getShadowColor());				
+				g2d.drawLine(x1, y1, x2, y2);
+				g2d.setColor(getColor());
+				g2d.setStroke(BASICSTROKE);
+			}
+
 			g2d.drawLine(x1, y1, x2, y2);
+
+			drawArrow(x1, y1, x2, y2, 0, g2d);
+
+			/*
 			drawArrow(x1, y1, x2, y2, (x1 + x2) / 2, (y1 + y2) / 2, false, g2d);
+			*/
 		}
 		else if (isSelfLoop())
 		{
 			ArrayList a = createTear();
+
+			// Initialize the edge (somehow this strange call does exactly what we want)
+			setTPoint(getTPointX(), getTPointY());
 			
 			// Draw shadow
 			if (shadow && isHighlighted())
@@ -843,10 +941,18 @@ public class EditorEdge
 			g2d.draw((Arc2D.Double) a.get(0));
 			g2d.draw((Line2D.Double) a.get(1));
 			g2d.draw((Line2D.Double) a.get(2));
+
+			Line2D.Double endline = (Line2D.Double) a.get(2);
+			drawArrow((int) endline.getX1(), (int) endline.getY1(), 
+					  (int) endline.getX2(), (int) endline.getY2(), 
+					  g2d);
+
+			/*
 			drawArrow(getCPointX(), getCPointY(), 
 					  start.getX(), start.getY(), 
 					  (int) getTPointX(), (int) getTPointY(), 
 					  true, g2d);
+			*/
 		}
 		else
 		{
@@ -874,11 +980,61 @@ public class EditorEdge
 										  start.getX() + WIDTHD, start.getY() + WIDTHD);
 			}
 			
+			// Draw arrow
 			findIntersection(target, new Point2D.Double(endNode.getX(), endNode.getY()), 
 							 new Point2D.Double((double) getCPointX(), (double) getCPointY()));
+			/*
 			drawArrow(start.getX(), start.getY(), 
 					  endNode.getX(), endNode.getY(), 
-					  (int) getTPointX(), (int) getTPointY(), false, g2d);
+					  (int) getTPointX(), (int) getTPointY(), 
+					  false, g2d);
+			*/
+
+			// Find the (second) last approximation point and use it and the endNode to draw the arrow!
+			double x1 = start.getX();
+			double y1 = start.getY();
+			double x2 = endNode.getX();
+			double y2 = endNode.getY();
+			QuadCurve2D.Double curve = getCurve();
+			FlatteningPathIterator it = 
+				new FlatteningPathIterator(curve.getPathIterator(new AffineTransform()), 5.0, 5);
+			while (!it.isDone())
+			{
+				double[] segment = new double[6];
+				int type = it.currentSegment(segment);
+
+				it.next();
+
+				// If there is another one (the last one?) take the current one!
+				if (!it.isDone())
+				{
+					x1 = segment[0];				
+					y1 = segment[1];
+				}
+			}
+
+			drawArrow(x1, y1, x2, y2, g2d);
+
+			/*
+			// Draw approximated curve
+			QuadCurve2D.Double curve = getCurve();
+			FlatteningPathIterator it = 
+				new FlatteningPathIterator(curve.getPathIterator(new AffineTransform()), 5.0, 5);
+			while (!it.isDone())
+			{
+				double[] segment = new double[6];
+				int type = it.currentSegment(segment);
+				
+				// Only care about the first point, it's not such a big deal, anyway?
+				double x = segment[0];				
+				double y = segment[1];
+
+				g2d.setColor(Color.RED);
+				g2d.draw(new Ellipse2D.Double(x,y,1,1));	
+
+				it.next();
+			}
+			*/
 		}
 		
 		if (isSelected())
