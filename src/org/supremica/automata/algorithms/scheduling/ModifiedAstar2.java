@@ -20,9 +20,9 @@ import java.util.*;
 
 import org.supremica.log.*;
 import org.supremica.automata.*;
-import org.supremica.automata.algorithms.AutomataSynchronizerExecuter;
-import org.supremica.automata.algorithms.AutomataSynchronizerHelper;
-import org.supremica.automata.algorithms.SynchronizationOptions;
+//import org.supremica.automata.algorithms.AutomataSynchronizerExecuter;
+//import org.supremica.automata.algorithms.AutomataSynchronizerHelper;
+//import org.supremica.automata.algorithms.SynchronizationOptions;
 import org.supremica.util.ActionTimer;
 
 public class ModifiedAstar2
@@ -45,82 +45,86 @@ public class ModifiedAstar2
 //	private Hashtable[] oneProdRelax;
 	private ArrayList oneProdRelax;
 
-	/** Hashtable containing the estimated cost for each combination of two robots **/
-	private Hashtable[] twoProdRelax;
+    /** Hashtable containing the estimated cost for each combination of two robots **/
+    private Hashtable[] twoProdRelax;
+    
+    /** Needed for online expansion of the Nodes **/
+//      private AutomataSynchronizerExecuter onlineSynchronizer;
+    
+    /** Det kanske kan inte behövs utan kan fixas genom helper (???) **/
+    // private AutomataIndexForm autoIndexForm;
+    
+    //Den kanske man inte behöver spara... AK
+    private Automaton theAutomaton;
+    
+    private Automata theAutomata;
+    
+    private Automata plantAutomata;
+    
+    private int[] activeAutomataIndex;
+    
+    private int searchCounter;
 
-	/** Needed for online expansion of the Nodes **/
-	private AutomataSynchronizerExecuter onlineSynchronizer;
-
-	/** Det kanske kan inte behövs utan kan fixas genom helper (???) **/
-	private AutomataIndexForm autoIndexForm;
-
-	//Den kanske man inte behöver spara... AK
-	private Automaton theAutomaton;
-
-	private Automata theAutomata;
-
-	private Automata plantAutomata;
-
-	private int[] activeAutomataIndex;
-
-	private int searchCounter;
+    private NodeExpander expander;
 	
-	// Hjälper till att omvandla stateIndex-ar till hash-värden.
-	private int[] keyMapping;
+    // Hjälper till att omvandla stateIndex-ar till hash-värden.
+    private int[] keyMapping;
 	
-	boolean useOneProdRelax;
+    private boolean useOneProdRelax;
+    
+    public ModifiedAstar2(Automaton theAutomaton)
+    {
+	this.theAutomaton = theAutomaton;
+	init(false);
+    }
 
-	public ModifiedAstar2(Automaton theAutomaton)
-	{
-		this.theAutomaton = theAutomaton;
-		init();
-	}
+    public ModifiedAstar2(Automata theAutomata) {
+	this(theAutomata, true);
+    }
 
-	public ModifiedAstar2(Automata theAutomata) {
-		this.theAutomata = theAutomata;
-		init();
-	}
+    public ModifiedAstar2(Automata theAutomata, boolean manualExpansion) {
+	this.theAutomata = theAutomata;
+	init(manualExpansion);
+    }
 
-	private void init()
-	{
-		timer = new ActionTimer();
-		openList = new ArrayList();
-		closedNodes = new Hashtable();
-
-		plantAutomata = theAutomata.getPlantAutomata();
+    private void init(boolean manualExpansion) {
+	timer = new ActionTimer();
+	openList = new ArrayList();
+	closedNodes = new Hashtable();
+	expander = new NodeExpander(manualExpansion, theAutomata, this);
+	
+	plantAutomata = theAutomata.getPlantAutomata();
 		
-		keyMapping = new int[theAutomata.size()];
-		keyMapping[0] = 1;
-		for (int i=1; i<keyMapping.length; i++) {
-			keyMapping[i] = keyMapping[i-1] * (theAutomata.getAutomatonAt(i-1).nbrOfStates() + 1);
-		}
-		
-		useOneProdRelax = true;
-
-		if (theAutomata == null)
-			return;
-		else {
-			int nrOfPlants = plantAutomata.size();
-			
-			oneProdRelax = new ArrayList(nrOfPlants);
-
-			if (nrOfPlants > 2) {
-				twoProdRelax = new Hashtable[nrOfPlants * (nrOfPlants - 1) / 2];
-				for (int i=0; i<twoProdRelax.length; i++)
-					twoProdRelax[i] = new Hashtable();
-			}
-
-			initOnlineSynchronizer(theAutomata);
-		}
+	keyMapping = new int[theAutomata.size()];
+	keyMapping[0] = 1;
+	for (int i=1; i<keyMapping.length; i++) {
+	    keyMapping[i] = keyMapping[i-1] * (theAutomata.getAutomatonAt(i-1).nbrOfStates() + 1);
 	}
+	
+	useOneProdRelax = true;
+	
+	if (theAutomata == null)
+	    return;
+	else {
+	    int nrOfPlants = plantAutomata.size();
+	    
+	    oneProdRelax = new ArrayList(nrOfPlants);
+	    
+	    if (nrOfPlants > 2) {
+		twoProdRelax = new Hashtable[nrOfPlants * (nrOfPlants - 1) / 2];
+		for (int i=0; i<twoProdRelax.length; i++)
+		    twoProdRelax[i] = new Hashtable();
+	    }
+	    
+	    //	    initOnlineSynchronizer(theAutomata);
+	}
+    }
 
 	/**
 	 *      Walks through the tree of possible paths in search for the optimal one.
 	 */
 	public int[] walk() throws Exception
 	{
-		expandNode(makeInitialNode());
-		
 		if (theAutomata == null) {
 			throw new Exception("Choose several automata to schedule...");
 		}
@@ -212,7 +216,7 @@ public class ModifiedAstar2
 			if (activeAutomataIndex.length <= 2 || plantAutomata.size() <= 2)
 				useOneProdRelax = true;
 
-			Iterator childIter = expandNode(currNode).iterator();
+			Iterator childIter = expander.expandNode(currNode, activeAutomataIndex).iterator();
 			while (childIter.hasNext()) {
 				int[] nextNode = (int[])childIter.next();
 				
@@ -275,7 +279,7 @@ public class ModifiedAstar2
 	
 	private int getOneProdRelaxation(int[] node) {
 		int estimate = 0;
-		int[] currCosts = getCosts(node);
+		int[] currCosts = expander.getCosts(node);
 
 		for (int i=0; i<activeAutomataIndex.length; i++) {
 			//int altEstimate = theNode.getCurrentCosts()[i] + ((Integer)oneProdRelax[i].get(theNode.getState(i))).intValue();
@@ -290,7 +294,7 @@ public class ModifiedAstar2
 
 	private int getTwoProdRelaxation(int[] node) {
 		int estimate = 0;
-		int[] currentCosts = getCosts(node);
+		int[] currentCosts = expander.getCosts(node);
 		int plantAutomataSize = plantAutomata.size();
 		activeAutomataIndex = new int[2];
 		
@@ -409,44 +413,44 @@ public class ModifiedAstar2
 		return null;
 	}
 */
-	private Collection<Integer> expandNode(int[] node) {
+// 	private Collection expandNode(int[] node) {
 		
-		Hashtable childNodes = new Hashtable();
-		int[] currStateIndex = AutomataIndexFormHelper.createState(theAutomata.size());
-		for (int i=0; i<currStateIndex.length; i++)
-			currStateIndex[i] = node[i];
+// 		Hashtable childNodes = new Hashtable();
+// 		int[] currStateIndex = AutomataIndexFormHelper.createState(theAutomata.size());
+// 		for (int i=0; i<currStateIndex.length; i++)
+// 			currStateIndex[i] = node[i];
 
-		int[] currOutgoingEvents = onlineSynchronizer.getOutgoingEvents(currStateIndex);
+// 		int[] currOutgoingEvents = onlineSynchronizer.getOutgoingEvents(currStateIndex);
 
-		for (int i=0; i<currOutgoingEvents.length; i++) {
-			if (onlineSynchronizer.isEnabled(currOutgoingEvents[i])) {
-				int[] nextStateIndex = onlineSynchronizer.doTransition(currStateIndex, currOutgoingEvents[i]);
+// 		for (int i=0; i<currOutgoingEvents.length; i++) {
+// 			if (onlineSynchronizer.isEnabled(currOutgoingEvents[i])) {
+// 				int[] nextStateIndex = onlineSynchronizer.doTransition(currStateIndex, currOutgoingEvents[i]);
 
-				int changedIndex = -1;
-				for (int k=0; k<activeAutomataIndex.length; k++) {
-					if (nextStateIndex[activeAutomataIndex[k]] != currStateIndex[activeAutomataIndex[k]]) {
-						changedIndex = k;
-						break;
-					}
-				}
+// 				int changedIndex = -1;
+// 				for (int k=0; k<activeAutomataIndex.length; k++) {
+// 					if (nextStateIndex[activeAutomataIndex[k]] != currStateIndex[activeAutomataIndex[k]]) {
+// 						changedIndex = k;
+// 						break;
+// 					}
+// 				}
 
-				if (changedIndex > -1) { // || activeAutomataIndex.length == plantAutomata.size()) {
-					Integer currKey = getKey(nextStateIndex);
+// 				if (changedIndex > -1) { // || activeAutomataIndex.length == plantAutomata.size()) {
+// 					Integer currKey = getKey(nextStateIndex);
 
-					if (!childNodes.contains(currKey)) {
-						int newCost = plantAutomata.getAutomatonAt(changedIndex).getStateWithIndex(nextStateIndex[activeAutomataIndex[changedIndex]]).getCost();
-						int[] newCosts = updateCosts(getCosts(node), changedIndex, newCost);
+// 					if (!childNodes.contains(currKey)) {
+// 						int newCost = plantAutomata.getAutomatonAt(changedIndex).getStateWithIndex(nextStateIndex[activeAutomataIndex[changedIndex]]).getCost();
+// 						int[] newCosts = updateCosts(getCosts(node), changedIndex, newCost);
 					
-						childNodes.put(currKey, makeNode(nextStateIndex, node, newCosts));
-					}
-				}
-			}
-		}
+// 						childNodes.put(currKey, makeNode(nextStateIndex, node, newCosts));
+// 					}
+// 				}
+// 			}
+// 		}
 
-		return childNodes.values();
-	}
+// 		return childNodes.values();
+// 	}
 
-	private Integer getKey(int[] node) {
+	public Integer getKey(int[] node) {
 		int key = 0;
 		
 		for (int i=0; i<activeAutomataIndex.length; i++)
@@ -455,42 +459,42 @@ public class ModifiedAstar2
 		return new Integer(key);
 	}
 	
-	private int[] makeNode(int[] stateIndices, int[] parentNode, int[] costs) {
-		int[] newNode = new int[stateIndices.length + theAutomata.size() + costs.length];
+// 	private int[] makeNode(int[] stateIndices, int[] parentNode, int[] costs) {
+// 		int[] newNode = new int[stateIndices.length + theAutomata.size() + costs.length];
 		
-		for (int i=0; i<stateIndices.length; i++)
-			newNode[i] = stateIndices[i];
-		if (parentNode != null) {
-			for (int i=0; i<theAutomata.size(); i++)
-				newNode[i + stateIndices.length] = parentNode[i];
-		}
-		else {
-			for (int i=0; i<theAutomata.size(); i++)
-				newNode[i + stateIndices.length] = -1;
-		}
-		for (int i=0; i<costs.length; i++)
-			newNode[i + stateIndices.length + theAutomata.size()] = costs[i];
+// 		for (int i=0; i<stateIndices.length; i++)
+// 			newNode[i] = stateIndices[i];
+// 		if (parentNode != null) {
+// 			for (int i=0; i<theAutomata.size(); i++)
+// 				newNode[i + stateIndices.length] = parentNode[i];
+// 		}
+// 		else {
+// 			for (int i=0; i<theAutomata.size(); i++)
+// 				newNode[i + stateIndices.length] = -1;
+// 		}
+// 		for (int i=0; i<costs.length; i++)
+// 			newNode[i + stateIndices.length + theAutomata.size()] = costs[i];
 		
-		return newNode;
-	}
+// 		return newNode;
+// 	}
 	
-	private int[] updateCosts(int[] costs, int changedIndex, int newCost) {
-		int[] newCosts = new int[costs.length];
+// 	private int[] updateCosts(int[] costs, int changedIndex, int newCost) {
+// 		int[] newCosts = new int[costs.length];
 		
-		for (int i=0; i<costs.length-1; i++) {
-			if (i == changedIndex)
-				newCosts[i] = newCost;
-			else {
-				newCosts[i] = costs[i] - costs[changedIndex]; 
-				if (newCosts[i] < 0)
-					newCosts[i] = 0;
-			}
-		}
+// 		for (int i=0; i<costs.length-1; i++) {
+// 			if (i == changedIndex)
+// 				newCosts[i] = newCost;
+// 			else {
+// 				newCosts[i] = costs[i] - costs[changedIndex]; 
+// 				if (newCosts[i] < 0)
+// 					newCosts[i] = 0;
+// 			}
+// 		}
 		
-		newCosts[newCosts.length-1] = costs[costs.length-1] + costs[changedIndex];
+// 		newCosts[newCosts.length-1] = costs[costs.length-1] + costs[changedIndex];
 		
-		return newCosts;
-	}
+// 		return newCosts;
+// 	}
 	
 	private int[] resetCosts(int[] node) {	
 		for (int i = 2*theAutomata.size() + AutomataIndexFormHelper.STATE_EXTRA_DATA; i<node.length; i++)
@@ -499,15 +503,15 @@ public class ModifiedAstar2
 		return node;
 	}
 	
-	private int[] getCosts(int[] node) {
-		int[] costs = new int[plantAutomata.size() + 1];
-		int startIndex = 2*theAutomata.size() + AutomataIndexFormHelper.STATE_EXTRA_DATA;
+// 	private int[] getCosts(int[] node) {
+// 		int[] costs = new int[plantAutomata.size() + 1];
+// 		int startIndex = 2*theAutomata.size() + AutomataIndexFormHelper.STATE_EXTRA_DATA;
 		
-		for (int i=0; i<costs.length; i++)
-			costs[i] = node[startIndex + i];
+// 		for (int i=0; i<costs.length; i++)
+// 			costs[i] = node[startIndex + i];
 		
-		return costs;
-	}
+// 		return costs;
+// 	}
 	
 	private int[] getStates(int[] node) {
 		int[] states = new int[theAutomata.size()];
@@ -518,45 +522,45 @@ public class ModifiedAstar2
 		return states;
 	}
 
-	private Collection expandNode(Node node) {
-		return expandNode(node, null);
-	}
+// 	private Collection expandNode(Node node) {
+// 		return expandNode(node, null);
+// 	}
 
-	private Collection expandNode(Node node, int[] currAutomataIndex) {
-		Hashtable childNodes = new Hashtable();
-		int[] currStateIndex = AutomataIndexFormHelper.createState(node.size());
+// 	private Collection expandNode(Node node, int[] currAutomataIndex) {
+// 		Hashtable childNodes = new Hashtable();
+// 		int[] currStateIndex = AutomataIndexFormHelper.createState(node.size());
 
-		for (int i=0; i<node.size(); i++)
-			currStateIndex[i] = node.getState(i).getIndex();
+// 		for (int i=0; i<node.size(); i++)
+// 			currStateIndex[i] = node.getState(i).getIndex();
 
-		int[] currOutgoingEvents = onlineSynchronizer.getOutgoingEvents(currStateIndex);
+// 		int[] currOutgoingEvents = onlineSynchronizer.getOutgoingEvents(currStateIndex);
 
-		for (int i=0; i<currOutgoingEvents.length; i++) {
-			if (onlineSynchronizer.isEnabled(currOutgoingEvents[i])) {
-				int[] nextStateIndex = onlineSynchronizer.doTransition(currStateIndex, currOutgoingEvents[i]);
+// 		for (int i=0; i<currOutgoingEvents.length; i++) {
+// 			if (onlineSynchronizer.isEnabled(currOutgoingEvents[i])) {
+// 				int[] nextStateIndex = onlineSynchronizer.doTransition(currStateIndex, currOutgoingEvents[i]);
 
-				boolean indexChanged = false;
-				if (currAutomataIndex != null) {
-					for (int k=0; k<currAutomataIndex.length; k++) {
-						if (nextStateIndex[currAutomataIndex[k]] != currStateIndex[currAutomataIndex[k]])
-							indexChanged = true;
-					}
-				}
+// 				boolean indexChanged = false;
+// 				if (currAutomataIndex != null) {
+// 					for (int k=0; k<currAutomataIndex.length; k++) {
+// 						if (nextStateIndex[currAutomataIndex[k]] != currStateIndex[currAutomataIndex[k]])
+// 							indexChanged = true;
+// 					}
+// 				}
 
-				if (currAutomataIndex == null || indexChanged) {
-					State[] theStates = new State[currStateIndex.length-2];
-					for (int j=0; j<theStates.length; j++)
-						theStates[j] = autoIndexForm.getState(j, nextStateIndex[j]);
+// 				if (currAutomataIndex == null || indexChanged) {
+// 					State[] theStates = new State[currStateIndex.length-2];
+// 					for (int j=0; j<theStates.length; j++)
+// 						theStates[j] = autoIndexForm.getState(j, nextStateIndex[j]);
 
-					Node newNode = new Node(theStates, node);
-					if (!childNodes.containsValue(newNode))
-						childNodes.put(newNode, newNode);
-				}
-			}
-		}
+// 					Node newNode = new Node(theStates, node);
+// 					if (!childNodes.containsValue(newNode))
+// 						childNodes.put(newNode, newNode);
+// 				}
+// 			}
+// 		}
 
-		return childNodes.values();
-	}
+// 		return childNodes.values();
+// 	}
 	
 	/**
 	 * 			Inserts the node into the openList according to the estimatedCost (ascending).
@@ -581,29 +585,29 @@ public class ModifiedAstar2
 		openList.add(node);
 	}
 
-	/**
-	 * @param initialState
-	 */
-	private void initOnlineSynchronizer(Automata synchedAutos) {
-		//	Get current options
-		SynchronizationOptions syncOptions = new SynchronizationOptions();
-		syncOptions.setBuildAutomaton(false);
-		syncOptions.setRequireConsistentControllability(false);
+// 	/**
+// 	 * @param initialState
+// 	 */
+// 	private void initOnlineSynchronizer(Automata synchedAutos) {
+// 		//	Get current options
+// 		SynchronizationOptions syncOptions = new SynchronizationOptions();
+// 		syncOptions.setBuildAutomaton(false);
+// 		syncOptions.setRequireConsistentControllability(false);
 
-		try {
-			AutomataSynchronizerHelper helper = new AutomataSynchronizerHelper(synchedAutos, syncOptions);
-			onlineSynchronizer = new AutomataSynchronizerExecuter(helper);
-			onlineSynchronizer.initialize();
-			autoIndexForm = helper.getAutomataIndexForm();
+// 		try {
+// 			AutomataSynchronizerHelper helper = new AutomataSynchronizerHelper(synchedAutos, syncOptions);
+// 			onlineSynchronizer = new AutomataSynchronizerExecuter(helper);
+// 			onlineSynchronizer.initialize();
+// 			autoIndexForm = helper.getAutomataIndexForm();
 			
-			// Så fult borde det väl inte vara ändå... Buggen borde tas om hand i AutomataIndexForm tycker man. 
-			for (int i=0; i<theAutomata.size(); i++)
-				theAutomata.getAutomatonAt(i).remapStateIndices();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		//helper.setCoExecuter(onlineSynchronizer);
-	}
+// 			// Så fult borde det väl inte vara ändå... Buggen borde tas om hand i AutomataIndexForm tycker man. 
+// 			for (int i=0; i<theAutomata.size(); i++)
+// 				theAutomata.getAutomatonAt(i).remapStateIndices();
+// 		} catch (Exception e) {
+// 			e.printStackTrace();
+// 		}
+// 		//helper.setCoExecuter(onlineSynchronizer);
+// 	}
 
 	// Bör kommas bort snart
 /*	private State[] makeInitialState() {
@@ -627,7 +631,7 @@ public class ModifiedAstar2
 			initialCosts[i] = plantAutomata.getAutomatonAt(i).getInitialState().getCost();
 		initialCosts[initialCosts.length-1] = 0;
 
-		return makeNode(initialStates, null, initialCosts);
+		return expander.makeNode(initialStates, null, initialCosts);
 	}
 
 	/**
@@ -699,7 +703,7 @@ public class ModifiedAstar2
 					int[] currNode = (int[])activeNodes.remove(0);
 	
 					if (! (twoProdRelax[hashtableIndex].containsKey(getKey(currNode)))) {
-						activeNodes.addAll(expandNode(currNode));
+					    activeNodes.addAll(expander.expandNode(currNode, activeAutomataIndex));
 		
 						schedCounter++;
 						int[] accNode = scheduleFrom(resetCosts(currNode));

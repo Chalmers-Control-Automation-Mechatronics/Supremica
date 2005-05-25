@@ -11,12 +11,13 @@ import org.supremica.automata.algorithms.scheduling.*;
 public class ScheduleDialog2
 	extends JDialog
 {
-	private static final long serialVersionUID = 1L;
-	private static final String[] optiMethodNames = new String[]{ "Modified A*" };
-	private static final String[] heuristicsNames = new String[]{ "Default" };
-	private static Logger logger = LoggerFactory.createLogger(ScheduleDialog2.class);
-	private JComboBox optiMethodsBox;
-	private JComboBox heuristicsBox;
+    private static final long serialVersionUID = 1L;
+    private static final String[] optiMethodNames = new String[]{ "Modified A*" };
+    private static final String[] heuristicsNames = new String[]{ "Default" };
+    private static Logger logger = LoggerFactory.createLogger(ScheduleDialog2.class);
+    private JComboBox optiMethodsBox;
+    private JComboBox heuristicsBox;
+    private JCheckBox nodeExpander;
 
 	public ScheduleDialog2()
 	{
@@ -49,34 +50,36 @@ public class ScheduleDialog2
 		});
 
 		JLabel optiMethodsLabel = new JLabel("Optimization methods: \t \t");
-
 		optiMethodsBox = new JComboBox(optiMethodNames);
 
 		JLabel heuristicsLabel = new JLabel("Heuristics: \t \t");
-
 		heuristicsBox = new JComboBox(heuristicsNames);
+
+		nodeExpander = new JCheckBox("use AK's node expander", true);
 
 		/******** Base containers of the dialog ***********/
 		JPanel buttonPanel = new JPanel();
-
 		buttonPanel.add(okButton);
 		buttonPanel.add(cancelButton);
 
 		JPanel optiPanel = new JPanel();
-
 		optiPanel.add(optiMethodsLabel);
 		optiPanel.add(optiMethodsBox);
 
 		JPanel heuristicsPanel = new JPanel();
-
 		heuristicsPanel.add(heuristicsLabel);
 		heuristicsPanel.add(heuristicsBox);
 
+		JPanel expanderPanel = new JPanel();
+		expanderPanel.add(nodeExpander);
+
 		/******** Layout of the dialog ***********/
-		getContentPane().setLayout(new GridLayout(3, 1));
+		getContentPane().setLayout(new GridLayout(4, 1));
 		getContentPane().add(optiPanel);
 		getContentPane().add(heuristicsPanel);
+		getContentPane().add(expanderPanel);
 		getContentPane().add(buttonPanel);
+
 		Utility.setDefaultButton(this, okButton);
 		Utility.setupDialog(this, 300, 150);
 	}
@@ -92,7 +95,7 @@ public class ScheduleDialog2
 			if (optiMethodsBox.getSelectedItem().equals("Modified A*"))
 			{
 				//Automaton theAutomaton = ActionMan.getGui().getSelectedAutomata().getFirstAutomaton();
-				ModifiedAstar2 mastar = new ModifiedAstar2(ActionMan.getGui().getSelectedAutomata());
+			    ModifiedAstar2 mastar = new ModifiedAstar2(ActionMan.getGui().getSelectedAutomata(), nodeExpander.isSelected());
 
 					
 				int[] acceptingNode = mastar.walk();
