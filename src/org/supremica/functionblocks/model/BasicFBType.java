@@ -59,35 +59,58 @@ import java.util.*;
 public class BasicFBType extends FBType
 {
 
-	private ECC theECC = new ECC();
-
-	// needed to update all the instances when the type def is updated
+	// all instance of this type
 	private Map instances = new HashMap();
-
+	// representing the events in the queue
 	private Map events = new HashMap();
-
+	// variables in an FB type
 	private Variables variables = new Variables();
-
+	// the ECC of the type
+	private ECC theECC = new ECC();
 	// Alogrithms
 	// map algorithm name to algorithm text
 	private Map algorithms = new HashMap();
 	// map algorithm name to algorithm variables map;
 	//private Map algorithmVariablesMap = new HashMap();
 
+	//==========================================================================
 
-	// Constructors
+	// forbid this kind of instantiation
 	private BasicFBType() {}
 
-	public BasicFBType(String name,Resource r)
+	// instantiate BasicFBType of name n in resource r 
+	public BasicFBType(String n,Resource r)
 	{
-		System.out.println("BasicFBType(" + name + "," + r.getName()  + ")");
-		this.name = name;
+		System.out.println("BasicFBType(" + n + "," + r.getName()  + ")");
+		name = n;
 		resource = r;
+	}
 	
+	//==========================================================================
+	
+	// add a variable var of the name name to the type 
+	public void addVariable(String name, Variable var)
+	{
+		variables.addVariable(name,var);
+		
+		// if event var add it to events
+		if (var.getType().equals("EventInput") || var.getType().equals("EventOutput"))
+		{
+			events.put(name,new Event(name));
+		}
+		
+		// update instances
+		for (Iterator iter=instanceIterator(); iter.hasNext();)
+		{
+			((BasicFBInstance) iter.next()).addVariable(name,var);
+		}
 	}
 
+	public void addDataAssociation(String event, String dataVar)
+	{
+		((Event) events.get(event)).addWithData(dataVar);
+	}
 
-	// Methods 
 	public FBInstance createInstance(String name)
 	{
 		System.out.println("BasicFBType.createInstace(" + name + ")");
@@ -102,26 +125,15 @@ public class BasicFBType extends FBType
 		return newInstance;
 	}
 
+	public Iterator instanceIterator()
+	{
+		return instances.values().iterator();
+	}
+
 	public ECC getECC()
 	{
 		//System.out.println("BasicFBType.getECC()");
 		return theECC;
-	}
-
-	public void addVariable(String name, Variable var)
-	{
-		variables.addVariable(name,var);
-		// check for input event and add to events
-		if (var.getType().equals("EventInput") || var.getType().equals("EventOutput"))
-		{
-			events.put(name,new Event(name));
-		}
-		// update instances
-	}
-
-	public void addDataAssociation(String event, String dataVar)
-	{
-		((Event) events.get(event)).addWithData(dataVar);
 	}
 
     public void addAlgorithm(Algorithm alg)
@@ -134,9 +146,5 @@ public class BasicFBType extends FBType
 		return (Algorithm) algorithms.get(name);
     }
 
-	public Iterator instanceIterator()
-	{
-		return instances.values().iterator();
-	}
 
 }

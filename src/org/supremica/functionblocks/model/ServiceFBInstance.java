@@ -66,15 +66,19 @@ public class ServiceFBInstance extends FBInstance
 	}
 
 	public void handleEvent()
-	{}
+	{
+	}
 
 	public void queueEvent(String eventInput)
-	{}
+	{
+	}
 
 	public void addEventOutputConnection(String eventOutput, Connection cnt)
-	{}
+	{
+	}
 	public void addDataInputConnection(String dataInput, Connection cnt)
-	{}
+	{
+	}
 
 	public Connection getEventOutputConnection(String eventOutput)
 	{

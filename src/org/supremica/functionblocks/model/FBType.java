@@ -48,6 +48,11 @@ public abstract class FBType extends NamedObject
 {
 	
 	Resource resource;
+
+
+	public abstract void addVariable(String name, Variable var);
+
+	public abstract void addDataAssociation(String event, String dataVar);
 	
 	public abstract FBInstance createInstance(String name);
 

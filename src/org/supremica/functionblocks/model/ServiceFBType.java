@@ -65,8 +65,32 @@ public class ServiceFBType extends FBType
 
 	public ServiceFBType(String n,Resource r)
 	{
-		
+		System.out.println("ServiceFBType(" + name + "," + r.getName()  + ")");
+		this.name = name;
+		resource = r;		
 	}
+
+	public void addVariable(String name, Variable var)
+	{
+		variables.addVariable(name,var);
+		
+		// if event var add it to events
+		if (var.getType().equals("EventInput") || var.getType().equals("EventOutput"))
+		{
+			events.put(name,new Event(name));
+		}
+		
+		// update instances
+		for (Iterator iter=instanceIterator(); iter.hasNext();)
+		{
+			((BasicFBInstance) iter.next()).addVariable(name,var);
+		}		
+	}
+	
+	public void addDataAssociation(String event, String dataVar)
+	{
+	}
+
 
 	public FBInstance createInstance(String name)
 	{

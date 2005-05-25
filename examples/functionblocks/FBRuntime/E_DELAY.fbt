@@ -15,29 +15,4 @@
       <VarDeclaration Name="DT" Type="INT" />
     </InputVars>
   </InterfaceList>
-  <BasicFB>
-    <ECC>
-        <ECState Name="INIT" />
-        <ECState Name="STOP" />
-			<ECAction Algorithm="START"/>
-		</ECState>    
-        <ECState Name="START">
-			<ECAction Algorithm="STOP"/>
-		</ECState>    
-	    <ECTransition Source="INIT" Destination="START" Condition="START"/>
-	    <ECTransition Source="INIT" Destination="STOP" Condition="STOP"/>
-	    <ECTransition Source="START" Destination="INIT" Condition="1"/>
-	    <ECTransition Source="STOP" Destination="INIT" Condition="1"/>
-    </ECC>
-    <Algorithm Name="Start">
-        <Other Language="Java" Text="
-	" 
-	/>	
-    </Algorithm>
-    <Algorithm Name="Stop">
-        <Other Language="Java" Text="
-	" 
-	/>	
-    </Algorithm>
-  </BasicFB>
 </FBType>
