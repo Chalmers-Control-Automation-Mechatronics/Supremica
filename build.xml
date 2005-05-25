@@ -298,7 +298,7 @@
 			${supremica_basedir}/sattline/**,
 			${supremica_basedir}/supervisor/**,	
 			${supremica_basedir}/functionblocks/xsd/**"	
-		source="1.4"
+		source="1.5"
 		fork="true"
 		memoryMaximumSize="128M"
 	/>
@@ -796,7 +796,7 @@
 		version="true"
 		use="true"
 		private="true"
-		source="1.4"
+		source="1.5"
 		maxmemory="512m"
 		windowtitle="Supremica API"
 		bottom="Copyright &#169; 2001 - 2005 Supremica and Knut Åkesson, Goran Cengic, Martin Fabin, Hugo Flordal, Robi Malik, Arash Vahidi. All Rights Reserved.">
