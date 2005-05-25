@@ -409,7 +409,7 @@ public class ModifiedAstar2
 		return null;
 	}
 */
-	private Collection<int> expandNode(int[] node) {
+	private Collection<Integer> expandNode(int[] node) {
 		
 		Hashtable childNodes = new Hashtable();
 		int[] currStateIndex = AutomataIndexFormHelper.createState(theAutomata.size());
