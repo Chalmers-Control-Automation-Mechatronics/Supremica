@@ -13,9 +13,14 @@ public class NodeExpander {
 
     private boolean manualExpansion;
     private AutomataSynchronizerExecuter onlineSynchronizer;
+    private AutomataIndexForm indexForm;
     private Automata theAutomata, plantAutomata;
-
     private ModifiedAstar2 master;
+    private Hashtable zoneEventTable;
+
+    /***********************************************************************
+     *                Start-up methods                                     *
+     ***********************************************************************/
 
     public NodeExpander(boolean manualExpansion, Automata theAutomata, ModifiedAstar2 master) {
 	this.manualExpansion = manualExpansion;
@@ -26,7 +31,64 @@ public class NodeExpander {
 
 	if (!manualExpansion)
 	    initOnlineSynchronizer();
+	else {
+	    initAutomataIndexForm();
+	    initZoneEventTable();
+	    logger.warn("zet = " + zoneEventTable);
+	}
     }
+
+    public Collection expandNode(int[] node, int[] activeAutomataIndex) {
+	if (!manualExpansion) 
+	    return expandNodeWithSupremica(node, activeAutomataIndex);
+	else
+	    return expandNodeManually(node, activeAutomataIndex);
+    }
+
+
+    /***********************************************************************
+     *               Methods for node expansion using                      *
+     *               "manual" technique (adjusted for scheduling)          *
+     ***********************************************************************/
+
+    private void initAutomataIndexForm() {
+	try {
+	    //	Get current options
+	    SynchronizationOptions syncOptions = new SynchronizationOptions();
+	    syncOptions.setBuildAutomaton(false);
+	    syncOptions.setRequireConsistentControllability(false);
+
+	    AutomataSynchronizerHelper helper = new AutomataSynchronizerHelper(theAutomata, syncOptions);
+	    indexForm = helper.getAutomataIndexForm();
+	}
+	catch (Exception e) {
+	    e.printStackTrace();
+	}
+    }
+
+    private void initZoneEventTable() {
+	zoneEventTable = new Hashtable();
+
+	for (int i=0; i<theAutomata.size(); i++) {
+	    Automaton theAuto = theAutomata.getAutomatonAt(i);
+	    
+	    if (theAuto.isSpecification()) {
+		EventIterator eventIt = theAuto.getAlphabet().iterator();
+
+		while(eventIt.hasNext()) 
+		    zoneEventTable.put(eventIt.nextEvent(), new Integer(i));
+	    }
+	}
+    }
+
+    public Collection expandNodeManually(int[] node, int[] activeAutomataIndex) {
+	return null;
+    }
+
+    /***********************************************************************
+     *               Methods for node expansion using Supremicas           *
+     *               "in-built" synchronizer                               *
+     ***********************************************************************/
 
     /**
      * @param initialState
@@ -50,7 +112,7 @@ public class NodeExpander {
 	}
     }
 
-    public Collection expandNode(int[] node, int[] activeAutomataIndex) {
+    public Collection expandNodeWithSupremica(int[] node, int[] activeAutomataIndex) {
         Hashtable childNodes = new Hashtable();
 
 	int[] currStateIndex = AutomataIndexFormHelper.createState(theAutomata.size());
@@ -86,6 +148,11 @@ public class NodeExpander {
 	
 	return childNodes.values();
     }
+
+
+    /***********************************************************************
+     *                         Auxiliary methods                           *
+     ***********************************************************************/
 
     public int[] makeNode(int[] stateIndices, int[] parentNode, int[] costs) {
 	int[] newNode = new int[stateIndices.length + theAutomata.size() + costs.length];
