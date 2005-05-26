@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.des
 //# CLASS:   AutomatonProxy
 //###########################################################################
-//# $Id: AutomatonProxy.java,v 1.2 2005-05-08 00:27:15 robi Exp $
+//# $Id: AutomatonProxy.java,v 1.3 2005-05-26 02:43:34 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.des;
@@ -63,15 +63,30 @@ public class AutomatonProxy extends ImmutableNamedProxy {
 
   //#########################################################################
   //# Constructors
+  /**
+   * Creates an empty automaton.
+   * @param  name         The name to be given to the new automaton.
+   * @param  kind         The kind (<I>plant</I>, <I>specification</I>, etc.)
+   *                      of the new automaton.
+   */
   public AutomatonProxy(final String name,
                         final ComponentKind kind)
   {
     this(name, kind, null);
   }
 
-  public AutomatonProxy(final String name,
-                        final ComponentKind kind,
-                        final EventLookupFactory eventfactory)
+  /**
+   * Creates an empty automaton.
+   * @param  name         The name to be given to the new automaton.
+   * @param  kind         The kind (<I>plant</I>, <I>specification</I>, etc.)
+   *                      of the new automaton.
+   * @param  eventfactory An event set which contains all events that may
+   *                      be added to this automaton. This is used for
+   *                      consistency checks.
+   */
+  AutomatonProxy(final String name,
+                 final ComponentKind kind,
+                 final EventLookupFactory eventfactory)
   {
     super(name);
     mKind = kind;
@@ -81,6 +96,16 @@ public class AutomatonProxy extends ImmutableNamedProxy {
     mTransitionListProxy = new TransitionListProxy();
   }
 
+  /**
+   * Creates an automaton from a parsed XML structure.
+   * @param  aut          The parsed XML structure of the new automaton.
+   * @param  eventfactory The event set of the {@link ProductDESProxy} to
+   *                      which the automaton will be added. It is used
+   *                      to look up events by their names given in the XML.
+   * @throws ModelException to indicate that the XML structure could
+   *                      not be converted due to serious semantic
+   *                      inconsistencies.
+   */
   AutomatonProxy(final AutomatonType aut,
                  final EventLookupFactory eventfactory)
     throws ModelException
@@ -119,7 +144,10 @@ public class AutomatonProxy extends ImmutableNamedProxy {
   }
 
   /**
-   * Gets the set of events for this automaton.
+   * Gets the event alphabet for this automaton.
+   * This method returns the set of events on which this automaton
+   * synchronises, or the set of all events that can occur on its
+   * transitions.
    * @return  An unmodifiable set of objects of type {@link EventProxy}.
    */
   public Set getEvents()
