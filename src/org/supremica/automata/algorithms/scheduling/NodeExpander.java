@@ -16,7 +16,9 @@ public class NodeExpander {
     private AutomataIndexForm indexForm;
     private Automata theAutomata, plantAutomata;
     private ModifiedAstar2 master;
-    private Hashtable zoneEventTable;
+    private Hashtable specEventTable;
+    private int[][][] outgoingEventsTable;
+    private int[][][] nextStateTable;
 
     /***********************************************************************
      *                Start-up methods                                     *
@@ -33,8 +35,7 @@ public class NodeExpander {
 	    initOnlineSynchronizer();
 	else {
 	    initAutomataIndexForm();
-	    initZoneEventTable();
-	    logger.warn("zet = " + zoneEventTable);
+	    initSpecEventTable();
 	}
     }
 
@@ -60,14 +61,20 @@ public class NodeExpander {
 
 	    AutomataSynchronizerHelper helper = new AutomataSynchronizerHelper(theAutomata, syncOptions);
 	    indexForm = helper.getAutomataIndexForm();
+
+	    for (int i=0; i<theAutomata.size(); i++)
+		theAutomata.getAutomatonAt(i).remapStateIndices();
+
+	    outgoingEventsTable = indexForm.getOutgoingEventsTable();
+	    nextStateTable = indexForm.getNextStateTable();
 	}
 	catch (Exception e) {
 	    e.printStackTrace();
 	}
     }
 
-    private void initZoneEventTable() {
-	zoneEventTable = new Hashtable();
+    private void initSpecEventTable() {
+	specEventTable = new Hashtable();
 
 	for (int i=0; i<theAutomata.size(); i++) {
 	    Automaton theAuto = theAutomata.getAutomatonAt(i);
@@ -76,13 +83,51 @@ public class NodeExpander {
 		EventIterator eventIt = theAuto.getAlphabet().iterator();
 
 		while(eventIt.hasNext()) 
-		    zoneEventTable.put(eventIt.nextEvent(), new Integer(i));
+		    specEventTable.put(eventIt.nextEvent(), new Integer(i));
 	    }
 	}
     }
 
     public Collection expandNodeManually(int[] node, int[] activeAutomataIndex) {
-	return null;
+	ArrayList children = new ArrayList();
+
+	for (int i=0; i<activeAutomataIndex.length; i++) {
+	    int automatonIndex = activeAutomataIndex[i]; 
+	    int stateIndex = node[automatonIndex];
+
+	    State st = theAutomata.getAutomatonAt(automatonIndex).getStateWithIndex(stateIndex);
+	    ArcIterator arcIt = st.outgoingArcsIterator();
+	
+	    while (arcIt.hasNext()) {
+		LabeledEvent currEvent = arcIt.nextArc().getEvent();
+		int currSpecIndex = ((Integer) specEventTable.get(currEvent)).intValue();
+		StateIterator enabledStatesIt = theAutomata.getAutomatonAt(currSpecIndex).statesThatEnableEventIterator(currEvent.getLabel());
+
+		while (enabledStatesIt.hasNext()) {
+		    State specState = enabledStatesIt.nextState();
+		    if (node[currSpecIndex] == specState.getIndex()) {
+			int nextPlantStateIndex = st.nextState(currEvent).getIndex();
+			int nextSpecStateIndex = specState.nextState(currEvent).getIndex();
+
+ 		     	int[] nextStateIndices = new int[theAutomata.size() + AutomataIndexFormHelper.STATE_EXTRA_DATA];
+			for (int k=0; k<nextStateIndices.length; k++) 
+			    nextStateIndices[k] = node[k];
+			nextStateIndices[i] = nextPlantStateIndex;
+			nextStateIndices[currSpecIndex] = nextSpecStateIndex;
+
+			int[] newCosts = updateCosts(getCosts(node), i, st.nextState(currEvent).getCost());
+
+			children.add(makeNode(nextStateIndices, node, newCosts));
+
+			break;
+		    }
+		}
+	    }
+	}
+
+	//	logger.warn("children = " + children);
+
+	return children;
     }
 
     /***********************************************************************

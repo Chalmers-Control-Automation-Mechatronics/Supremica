@@ -160,7 +160,7 @@ public class ModifiedAstar2
     		}
 	}
 	
-	private String printArray(int[] node) {
+	public String printArray(int[] node) {
 		String s = "[";
 		
 		for (int i=0; i<node.length-1; i++) {
@@ -219,6 +219,7 @@ public class ModifiedAstar2
 			Iterator childIter = expander.expandNode(currNode, activeAutomataIndex).iterator();
 			while (childIter.hasNext()) {
 				int[] nextNode = (int[])childIter.next();
+				logger.warn("nextNode = " + printArray(nextNode));
 				
 				if (!isOnAList(nextNode))
 					putOnOpenList(nextNode);
