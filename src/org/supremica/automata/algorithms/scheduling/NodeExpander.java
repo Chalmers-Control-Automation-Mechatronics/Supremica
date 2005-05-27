@@ -89,6 +89,7 @@ public class NodeExpander {
     }
 
     public Collection expandNodeManually(int[] node, int[] activeAutomataIndex) {
+	logger.info("expandar");
 	ArrayList children = new ArrayList();
 
 	for (int i=0; i<activeAutomataIndex.length; i++) {
@@ -96,38 +97,62 @@ public class NodeExpander {
 	    int stateIndex = node[automatonIndex];
 
 	    State st = theAutomata.getAutomatonAt(automatonIndex).getStateWithIndex(stateIndex);
+	    logger.info("st = " + st);
 	    ArcIterator arcIt = st.outgoingArcsIterator();
-	
+	    logger.info("arcIt = " + arcIt);
 	    while (arcIt.hasNext()) {
 		LabeledEvent currEvent = arcIt.nextArc().getEvent();
+		logger.info("currEvent.0 = " + currEvent);
 		int currSpecIndex = ((Integer) specEventTable.get(currEvent)).intValue();
+		logger.info("specIndex = " + currSpecIndex);
 		StateIterator enabledStatesIt = theAutomata.getAutomatonAt(currSpecIndex).statesThatEnableEventIterator(currEvent.getLabel());
-
+		logger.info("eStIt = " + enabledStatesIt);
 		while (enabledStatesIt.hasNext()) {
 		    State specState = enabledStatesIt.nextState();
 		    if (node[currSpecIndex] == specState.getIndex()) {
-			int nextPlantStateIndex = st.nextState(currEvent).getIndex();
-			int nextSpecStateIndex = specState.nextState(currEvent).getIndex();
+			int[] changedIndices = new int[]{i, currSpecIndex};
+			int[] newStateIndices = new int[]{st.nextState(currEvent).getIndex(), specState.nextState(currEvent).getIndex()};
+			children.add(newNode(node, changedIndices, newStateIndices, st.nextState(currEvent).getCost()));
+		// 	logger.info("currEvent = " + currEvent);
+// 			State nextPlantState = st.nextState(currEvent);
+// 			logger.info("nps = " + nextPlantState);
+// 			int nextPlantStateIndex = nextPlantState.getIndex();
+// 			int nextSpecStateIndex = specState.nextState(currEvent).getIndex();
 
- 		     	int[] nextStateIndices = new int[theAutomata.size() + AutomataIndexFormHelper.STATE_EXTRA_DATA];
-			for (int k=0; k<nextStateIndices.length; k++) 
-			    nextStateIndices[k] = node[k];
-			nextStateIndices[i] = nextPlantStateIndex;
-			nextStateIndices[currSpecIndex] = nextSpecStateIndex;
+//  		     	int[] nextStateIndices = new int[theAutomata.size() + AutomataIndexFormHelper.STATE_EXTRA_DATA];
+// 			for (int k=0; k<nextStateIndices.length; k++) 
+// 			    nextStateIndices[k] = node[k];
+// 			nextStateIndices[i] = nextPlantStateIndex;
+// 			nextStateIndices[currSpecIndex] = nextSpecStateIndex;
 
-			int[] newCosts = updateCosts(getCosts(node), i, st.nextState(currEvent).getCost());
+// 			int[] newCosts = updateCosts(getCosts(node), i, st.nextState(currEvent).getCost());
 
-			children.add(makeNode(nextStateIndices, node, newCosts));
+// 			children.add(makeNode(nextStateIndices, node, newCosts));
 
 			break;
 		    }
 		}
 	    }
+	    logger.info("klarexpandat");
 	}
 
 	//	logger.warn("children = " + children);
 
 	return children;
+    }
+
+    public int[] newNode(int[] node, int[] changedIndices, int[] newStateIndices, int newCost) {
+	int[] nextStateIndices = new int[theAutomata.size() + AutomataIndexFormHelper.STATE_EXTRA_DATA];
+
+	for (int k=0; k<nextStateIndices.length; k++) 
+	    nextStateIndices[k] = node[k];
+
+	for (int i=0; i<changedIndices.length; i++)
+	    nextStateIndices[changedIndices[i]] = newStateIndices[i];
+	
+	int[] newCosts = updateCosts(getCosts(node), changedIndices[0], newCost);
+
+	return makeNode(nextStateIndices, node, newCosts);
     }
 
     /***********************************************************************
