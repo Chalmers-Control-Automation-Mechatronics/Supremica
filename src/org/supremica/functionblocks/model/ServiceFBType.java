@@ -79,7 +79,7 @@ public class ServiceFBType extends FBType
 		{
 			events.put(name,new Event(name));
 		}
-		
+
 		// update instances
 		for (Iterator iter=instanceIterator(); iter.hasNext();)
 		{
@@ -89,6 +89,7 @@ public class ServiceFBType extends FBType
 	
 	public void addDataAssociation(String event, String dataVar)
 	{
+		
 	}
 
 
