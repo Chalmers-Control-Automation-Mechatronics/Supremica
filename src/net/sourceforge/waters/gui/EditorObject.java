@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorObject
 //###########################################################################
-//# $Id: EditorObject.java,v 1.10 2005-03-15 05:32:34 flordal Exp $
+//# $Id: EditorObject.java,v 1.11 2005-05-27 10:28:21 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -127,12 +127,17 @@ public class EditorObject
 			{
 				return EditorColor.DEFAULTCOLOR_NODEGROUP;
 			}
+			else if (getType() == LABEL)
+			{
+				return EditorColor.DEFAULTCOLOR_LABEL;
+			}
 			return EditorColor.DEFAULTCOLOR;
 		}
 	}		
 
 	public Color getShadowColor()
 	{
+		/*
 		// In order of importance
 		if (isError())
 		{
@@ -142,12 +147,6 @@ public class EditorObject
 		{
 			return EditorColor.SELECTSHADOWCOLOR;
 		}
-		/*
-		else if (isHighlighted())
-		{
-			return EditorColor.HIGHLIGHTSHADOWCOLOR;
-		}
-		*/
 		else
 		{
 			// Defaults
@@ -157,6 +156,10 @@ public class EditorObject
 			}
 			return EditorColor.DEFAULTSHADOWCOLOR;
 		}
+		*/
+
+		// Return the shadowed variant of the ordinary color of this object
+		return EditorColor.shadow(getColor());
 	}
 
 	public EditorObject()

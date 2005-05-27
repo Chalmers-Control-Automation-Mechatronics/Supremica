@@ -3,7 +3,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorEdge
 //###########################################################################
-//# $Id: EditorEdge.java,v 1.20 2005-05-23 13:35:15 flordal Exp $
+//# $Id: EditorEdge.java,v 1.21 2005-05-27 10:28:21 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -42,6 +42,9 @@ public class EditorEdge
 
 	/** Boolean keeping track of whether the edge is a straight line or not. */
 	private boolean straight;
+
+	/** Arrows at end of transition edge (otherwise it will sit in the middle). */
+	private static boolean arrowAtEnd = false;
 
 	// Handles
 	private Rectangle2D.Double source = new Rectangle2D.Double();
@@ -140,6 +143,9 @@ public class EditorEdge
 		}
 
 		// Initialize the edge (somehow this strange call does exactly what we want)
+		// Without this call, when the mouse is moved above the handle of one of the _curved_ edges,
+		// the labelgroup on that edge jumps to the side!! Presumably TPoint is not properly set 
+		// before this call...
 		setTPoint(getTPointX(), getTPointY());
 	}
 
@@ -717,7 +723,11 @@ public class EditorEdge
 	}
 
 	/**
-	 * Draws an arrow.
+	 * Draws an arrow at the point (posX, posY) (presumably in the middle) the edge from 
+	 * (x1, y1) to (x2, y2). If the edge is a self-loop the argument loop should be true.
+	 *
+	 * This is the "original" drawArrow method, the methods below this one are cleaned up
+	 * versions. This one, however is used for drawing arrows "in the middle" of edges.
 	 *
 	 * @param x1 x-coordinate of starting point of edge
 	 * @param y1 y-coordinate of starting point of edge
@@ -728,16 +738,24 @@ public class EditorEdge
 	 * @param loop true if edge is a loop
 	 * @param g2d the graphical surface where the arrow should be drawn
 	 */ 
-	/*
 	private void drawArrow(double x1, double y1, 
 						   double x2, double y2, 
 						   int posX, int posY, 
 						   boolean loop, Graphics2D g2d)
 	{
-		// The direction of the arrow
 		double theta;
-		
-		// Determine angle
+		int l = 8;
+		int direction;
+
+		if (y1 >= y2)
+		{
+			direction = 1;
+		}
+		else
+		{
+			direction = -1;
+		}
+
 		if (y1 == y2)
 		{
 			theta = Math.PI / 2;
@@ -752,25 +770,31 @@ public class EditorEdge
 			theta = Math.atan((double) (x1 - x2) / (double) (y1 - y2));
 		}
 
-		// Did arctan give the correct angle or should we add 180 degrees?
-		if (y1 < y2)
-		{
-			theta += Math.PI;
-		}
-
-		// If it's a loop, it's special!
 		if (loop)
 		{
 			theta -= Math.PI / 2;
 		}
-			
-		drawArrow(posX, posY, theta, g2d);
+		
+		int[] xcoords = new int[3];
+		int[] ycoords = new int[3];
+
+		// The first pair of coordinates is the point of the arrow, it is adjusted somewhat
+		// from (posX, posY)
+		xcoords[0] = posX - direction * (int) ((Math.sqrt(Math.pow(l, 2) + Math.pow(l, 2)) / 2) * Math.sin(theta));
+		ycoords[0] = posY - direction * (int) ((Math.sqrt(Math.pow(l, 2) + Math.pow(l, 2)) / 2) * Math.cos(theta));
+		xcoords[1] = xcoords[0] + (int) (l * Math.sin(theta - Math.PI / 6)) * direction;
+		ycoords[1] = ycoords[0] + (int) (l * Math.cos(theta - Math.PI / 6)) * direction;
+		xcoords[2] = xcoords[0] + (int) (l * Math.cos(Math.PI / 2 - (theta + Math.PI / 6))) * direction;
+		ycoords[2] = ycoords[0] + (int) (l * Math.sin(Math.PI / 2 - (theta + Math.PI / 6))) * direction;
+
+		g2d.fillPolygon(xcoords, ycoords, 3);
+
+		//drawArrow(posX, posY, theta, g2d);
 	}
-	*/
 
 	/**
-	 * Draws an arrow with its point EditorNode.RADIUS back from (x2, y2) pointing in the direction defined 
-	 * by the two points (x1, y1) and (x2, y2).
+	 * Draws an arrow with its point EditorNode.RADIUS back from (x2, y2) pointing in the direction 
+	 * indicated by the two points (x1, y1) and (x2, y2).
 	 */
 	private void drawArrow(double x1, double y1, double x2, double y2, Graphics2D g2d)
 	{
@@ -778,7 +802,7 @@ public class EditorEdge
 	}
 
 	/**
-	 * Draws an arrow with its point distance back from (x2, y2) pointing in the direction defined 
+	 * Draws an arrow with its point distance back from (x2, y2) pointing in the direction indicated 
 	 * by the two points (x1, y1) and (x2, y2).
 	 */
 		private void drawArrow(double x1, double y1, double x2, double y2, int distance, Graphics2D g2d)
@@ -826,7 +850,7 @@ public class EditorEdge
 		int[] xcoords = new int[3];
 		int[] ycoords = new int[3];		
 		
-		// Draw arrow at the control point
+		// Draw arrow, the first pair of coordinates is the point
 		xcoords[0] = x;// - (int) ((Math.sqrt(Math.pow(length, 2) + Math.pow(length, 2))/2) * Math.sin(theta));
 		ycoords[0] = y;// - (int) ((Math.sqrt(Math.pow(length, 2) + Math.pow(length, 2))/2) * Math.cos(theta));
 		xcoords[1] = xcoords[0] + (int) (length * Math.sin(theta - phi));
@@ -904,7 +928,7 @@ public class EditorEdge
 			if (shadow && isHighlighted())
 			{
 				g2d.setStroke(SHADOWSTROKE);
-				g2d.setColor(getShadowColor());				
+				g2d.setColor(getShadowColor());
 				g2d.drawLine(x1, y1, x2, y2);
 				g2d.setColor(getColor());
 				g2d.setStroke(BASICSTROKE);
@@ -912,11 +936,14 @@ public class EditorEdge
 
 			g2d.drawLine(x1, y1, x2, y2);
 
-			drawArrow(x1, y1, x2, y2, 0, g2d);
-
-			/*
-			drawArrow(x1, y1, x2, y2, (x1 + x2) / 2, (y1 + y2) / 2, false, g2d);
-			*/
+			if (arrowAtEnd)
+			{
+				drawArrow(x1, y1, x2, y2, 0, g2d);
+			}
+			else
+			{
+				drawArrow(x1, y1, x2, y2, (x1 + x2) / 2, (y1 + y2) / 2, false, g2d);
+			}
 		}
 		else if (isSelfLoop())
 		{
@@ -941,18 +968,21 @@ public class EditorEdge
 			g2d.draw((Arc2D.Double) a.get(0));
 			g2d.draw((Line2D.Double) a.get(1));
 			g2d.draw((Line2D.Double) a.get(2));
-
-			Line2D.Double endline = (Line2D.Double) a.get(2);
-			drawArrow((int) endline.getX1(), (int) endline.getY1(), 
-					  (int) endline.getX2(), (int) endline.getY2(), 
-					  g2d);
-
-			/*
-			drawArrow(getCPointX(), getCPointY(), 
-					  start.getX(), start.getY(), 
-					  (int) getTPointX(), (int) getTPointY(), 
-					  true, g2d);
-			*/
+			
+			if (arrowAtEnd)
+			{
+				Line2D.Double endline = (Line2D.Double) a.get(2);
+				drawArrow((int) endline.getX1(), (int) endline.getY1(), 
+						  (int) endline.getX2(), (int) endline.getY2(), 
+						  g2d);
+			}
+			else
+			{
+				drawArrow(getCPointX(), getCPointY(), 
+						  start.getX(), start.getY(), 
+						  (int) getTPointX(), (int) getTPointY(), 
+						  true, g2d);
+			}
 		}
 		else
 		{
@@ -983,38 +1013,41 @@ public class EditorEdge
 			// Draw arrow
 			findIntersection(target, new Point2D.Double(endNode.getX(), endNode.getY()), 
 							 new Point2D.Double((double) getCPointX(), (double) getCPointY()));
-			/*
-			drawArrow(start.getX(), start.getY(), 
-					  endNode.getX(), endNode.getY(), 
-					  (int) getTPointX(), (int) getTPointY(), 
-					  false, g2d);
-			*/
-
-			// Find the (second) last approximation point and use it and the endNode to draw the arrow!
-			double x1 = start.getX();
-			double y1 = start.getY();
-			double x2 = endNode.getX();
-			double y2 = endNode.getY();
-			QuadCurve2D.Double curve = getCurve();
-			FlatteningPathIterator it = 
-				new FlatteningPathIterator(curve.getPathIterator(new AffineTransform()), 5.0, 5);
-			while (!it.isDone())
+			if (arrowAtEnd)
 			{
-				double[] segment = new double[6];
-				int type = it.currentSegment(segment);
-
-				it.next();
-
-				// If there is another one (the last one?) take the current one!
-				if (!it.isDone())
+				// Find the (second) last approximation point and use it and the endNode to draw the arrow!
+				double x1 = start.getX();
+				double y1 = start.getY();
+				double x2 = endNode.getX();
+				double y2 = endNode.getY();
+				QuadCurve2D.Double curve = getCurve();
+				FlatteningPathIterator it = 
+					new FlatteningPathIterator(curve.getPathIterator(new AffineTransform()), 5.0, 5);
+				while (!it.isDone())
 				{
-					x1 = segment[0];				
-					y1 = segment[1];
+					double[] segment = new double[6];
+					int type = it.currentSegment(segment);
+					
+					it.next();
+					
+					// If there is another one (the last one?) take the current one!
+					if (!it.isDone())
+					{
+						x1 = segment[0];				
+						y1 = segment[1];
+					}
 				}
+				
+				drawArrow(x1, y1, x2, y2, g2d);
+			}					
+			else	 
+			{
+				drawArrow(start.getX(), start.getY(), 
+						  endNode.getX(), endNode.getY(), 
+						  (int) getTPointX(), (int) getTPointY(), 
+						  false, g2d);
 			}
-
-			drawArrow(x1, y1, x2, y2, g2d);
-
+			
 			/*
 			// Draw approximated curve
 			QuadCurve2D.Double curve = getCurve();

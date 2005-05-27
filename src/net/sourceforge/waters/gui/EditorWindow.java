@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorWindow
 //###########################################################################
-//# $Id: EditorWindow.java,v 1.12 2005-03-04 07:58:29 knut Exp $
+//# $Id: EditorWindow.java,v 1.13 2005-05-27 10:28:21 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -199,8 +199,5 @@ public class EditorWindow
 		}
 
 		document.close();
-
-
-
 	}
 }
