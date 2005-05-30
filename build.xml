@@ -338,7 +338,7 @@
 		nowarn="true"
 		includes="
 			${supremica_basedir}/automata/algorithms/scheduling/**"		
-		source="1.4"
+		source="1.5"
 	/>
 </target>
 

@@ -16,7 +16,7 @@ public class NodeExpander {
     private AutomataIndexForm indexForm;
     private Automata theAutomata, plantAutomata;
     private ModifiedAstar2 master;
-    private Hashtable specEventTable;
+    private Hashtable<LabeledEvent, Integer> specEventTable;
     private int[][][] outgoingEventsTable;
     private int[][][] nextStateTable;
 
@@ -74,7 +74,7 @@ public class NodeExpander {
     }
 
     private void initSpecEventTable() {
-	specEventTable = new Hashtable();
+	specEventTable = new Hashtable<LabeledEvent, Integer>();
 
 	for (int i=0; i<theAutomata.size(); i++) {
 	    Automaton theAuto = theAutomata.getAutomatonAt(i);
@@ -83,13 +83,12 @@ public class NodeExpander {
 		EventIterator eventIt = theAuto.getAlphabet().iterator();
 
 		while(eventIt.hasNext()) 
-		    specEventTable.put(eventIt.nextEvent(), new Integer(i));
+		    specEventTable.put(eventIt.nextEvent(), i);
 	    }
 	}
     }
 
     public Collection expandNodeManually(int[] node, int[] activeAutomataIndex) {
-	logger.info("expandar");
 	ArrayList children = new ArrayList();
 
 	for (int i=0; i<activeAutomataIndex.length; i++) {
@@ -97,46 +96,30 @@ public class NodeExpander {
 	    int stateIndex = node[automatonIndex];
 
 	    State st = theAutomata.getAutomatonAt(automatonIndex).getStateWithIndex(stateIndex);
-	    logger.info("st = " + st);
 	    ArcIterator arcIt = st.outgoingArcsIterator();
-	    logger.info("arcIt = " + arcIt);
+
 	    while (arcIt.hasNext()) {
 		LabeledEvent currEvent = arcIt.nextArc().getEvent();
-		logger.info("currEvent.0 = " + currEvent);
-		int currSpecIndex = ((Integer) specEventTable.get(currEvent)).intValue();
-		logger.info("specIndex = " + currSpecIndex);
-		StateIterator enabledStatesIt = theAutomata.getAutomatonAt(currSpecIndex).statesThatEnableEventIterator(currEvent.getLabel());
-		logger.info("eStIt = " + enabledStatesIt);
-		while (enabledStatesIt.hasNext()) {
-		    State specState = enabledStatesIt.nextState();
-		    if (node[currSpecIndex] == specState.getIndex()) {
-			int[] changedIndices = new int[]{i, currSpecIndex};
-			int[] newStateIndices = new int[]{st.nextState(currEvent).getIndex(), specState.nextState(currEvent).getIndex()};
-			children.add(newNode(node, changedIndices, newStateIndices, st.nextState(currEvent).getCost()));
-		// 	logger.info("currEvent = " + currEvent);
-// 			State nextPlantState = st.nextState(currEvent);
-// 			logger.info("nps = " + nextPlantState);
-// 			int nextPlantStateIndex = nextPlantState.getIndex();
-// 			int nextSpecStateIndex = specState.nextState(currEvent).getIndex();
+		Object currSpecIndexObj = specEventTable.get(currEvent);
+		
+		if (currSpecIndexObj == null)
+		    children.add(newNode(node, new int[]{i}, new int[]{st.nextState(currEvent).getIndex()}, st.nextState(currEvent).getCost()));
+		else {
+		    int currSpecIndex = ((Integer)currSpecIndexObj).intValue();
+		    StateIterator enabledStatesIt = theAutomata.getAutomatonAt(currSpecIndex).statesThatEnableEventIterator(currEvent.getLabel());
 
-//  		     	int[] nextStateIndices = new int[theAutomata.size() + AutomataIndexFormHelper.STATE_EXTRA_DATA];
-// 			for (int k=0; k<nextStateIndices.length; k++) 
-// 			    nextStateIndices[k] = node[k];
-// 			nextStateIndices[i] = nextPlantStateIndex;
-// 			nextStateIndices[currSpecIndex] = nextSpecStateIndex;
-
-// 			int[] newCosts = updateCosts(getCosts(node), i, st.nextState(currEvent).getCost());
-
-// 			children.add(makeNode(nextStateIndices, node, newCosts));
-
-			break;
+		    while (enabledStatesIt.hasNext()) {
+			State specState = enabledStatesIt.nextState();
+			if (node[currSpecIndex] == specState.getIndex()) {
+			    int[] changedIndices = new int[]{i, currSpecIndex};
+			    int[] newStateIndices = new int[]{st.nextState(currEvent).getIndex(), specState.nextState(currEvent).getIndex()};
+			    children.add(newNode(node, changedIndices, newStateIndices, st.nextState(currEvent).getCost()));
+			    break;
+			}
 		    }
 		}
 	    }
-	    logger.info("klarexpandat");
 	}
-
-	//	logger.warn("children = " + children);
 
 	return children;
     }

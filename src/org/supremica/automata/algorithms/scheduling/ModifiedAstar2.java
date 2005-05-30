@@ -219,7 +219,6 @@ public class ModifiedAstar2
 			Iterator childIter = expander.expandNode(currNode, activeAutomataIndex).iterator();
 			while (childIter.hasNext()) {
 				int[] nextNode = (int[])childIter.next();
-				logger.warn("nextNode = " + printArray(nextNode));
 				
 				if (!isOnAList(nextNode))
 					putOnOpenList(nextNode);
