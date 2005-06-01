@@ -42,24 +42,10 @@
  */
 package org.supremica.functionblocks.model;
 
-
 import java.util.*;
 
 public class BasicFBInstance extends FBInstance
 {
-
-    private Resource resource;
-    private BasicFBType fbType;
-
-    // maps event names to event classes representing them
-    private Map events;
-
-    private EventQueue eventInputQueue = new EventQueue();
-
-    private Map eventOutputConnections = new HashMap();
-    private Map dataInputConnections = new HashMap();
-
-    private Variables variables;
 
     private Event currentEvent;
     private ECState currentECState;
@@ -68,6 +54,7 @@ public class BasicFBInstance extends FBInstance
     private Iterator actionsIterator;
     private int actionsLeft;
 
+	//================================================================
     private BasicFBInstance() {}
 	
     public BasicFBInstance(String n, Resource r, BasicFBType t)
@@ -75,73 +62,10 @@ public class BasicFBInstance extends FBInstance
 		name = n;
 		resource = r;
 		fbType = t;
-		currentECState = fbType.getECC().getInitialState();
+		currentECState = ((BasicFBType) fbType).getECC().getInitialState();
     }
+	//================================================================
 
-    public void setVariables(Variables vars)
-    {
-		variables = vars;
-    }
-
-    public void addVariable(String name, Variable var)
-    {
-		variables.addVariable(name,var);
-    }
-
-    public void setEvents(Map i)
-    {
-		events = i;
-    }
-	
-    public void addEventOutputConnection(String output, Connection cnt)
-    {
-		eventOutputConnections.put(output, cnt);
-    }
-    
-    public void addDataInputConnection(String input, Connection cnt)
-    {	
-		dataInputConnections.put(input, cnt);
-    }
-
-	public Connection getEventOutputConnection(String output)
-	{
-		return (Connection) eventOutputConnections.get(output);
-	}
-
-	// This method provides its output data to the calling BasicFBInstance
-    public Variable getDataOutput(String name)
-    {
-		if (!((Variable) variables.getVariable(name)).getType().equals("DataOutput"))
-		{
-			System.out.println("BasicFBInstance: no such DataOutput " + name);
-			System.exit(0);
-		}
-		return (Variable) variables.getVariable(name);
-    }
-	
-    public void queueEvent(String eventInput)
-    {
-		synchronized(eventInputQueue)
-		{
-			//System.out.println("BasicFBInstace.queueEvent(): " + eventInput);
-			if(variables.getVariable(eventInput) != null)
-				if(variables.getVariable(eventInput).getType().equals("EventInput"))
-				{
-					eventInputQueue.add((Event) events.get(eventInput));
-					resource.getScheduler().scheduleFBInstance(this);
-				}
-				else
-				{
-					System.out.println("BasicFBInstance: No event input " + eventInput);
-					System.exit(0);
-				}
-			else
-			{
-				System.out.println("BasicFBInstance: No event input " + eventInput);
-				System.exit(0);
-			}
-		}
-    }
 	
     public void handleEvent()
     {
@@ -167,8 +91,10 @@ public class BasicFBInstance extends FBInstance
 				}
 			}
 
-			// set the var corrensponding to the input event to TRUE 
+			// set the corrensponding event var of the input event to TRUE 
 			((BooleanVariable) variables.getVariable(currentEvent.getName())).setValue(true);
+
+			// get input data values
 			getDataVariables(currentEvent);
 
 			// and execute the ecc
@@ -228,7 +154,7 @@ public class BasicFBInstance extends FBInstance
 
     private ECState updateECC()
     {
-		return fbType.getECC().execute(currentECState, variables);
+		return ((BasicFBType) fbType).getECC().execute(currentECState, variables);
     }
 
     // initializes the handling of new state
@@ -275,7 +201,7 @@ public class BasicFBInstance extends FBInstance
 		if (currentECAction.getAlgorithm() != null)
 		{
 			Variables algVars =  (Variables) variables.clone();
-			resource.getScheduler().scheduleJob(new Job(this, fbType.getAlgorithm(currentECAction.getAlgorithm()), algVars));
+			resource.getScheduler().scheduleJob(new Job(this, ((BasicFBType) fbType).getAlgorithm(currentECAction.getAlgorithm()), algVars));
 		}
 		else if (currentECAction.getAlgorithm() == null && currentECAction.getOutput() != null)
 		{

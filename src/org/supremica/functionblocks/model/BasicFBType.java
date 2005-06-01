@@ -59,14 +59,9 @@ import java.util.*;
 public class BasicFBType extends FBType
 {
 
-	// all instance of this type
-	private Map instances = new HashMap();
-	// representing the events in the queue
-	private Map events = new HashMap();
-	// variables in an FB type
-	private Variables variables = new Variables();
 	// the ECC of the type
 	private ECC theECC = new ECC();
+
 	// Alogrithms
 	// map algorithm name to algorithm text
 	private Map algorithms = new HashMap();
@@ -88,28 +83,6 @@ public class BasicFBType extends FBType
 	
 	//==========================================================================
 	
-	// add a variable var of the name name to the type 
-	public void addVariable(String name, Variable var)
-	{
-		variables.addVariable(name,var);
-		
-		// if event var add it to events
-		if (var.getType().equals("EventInput") || var.getType().equals("EventOutput"))
-		{
-			events.put(name,new Event(name));
-		}
-		
-		// update instances
-		for (Iterator iter=instanceIterator(); iter.hasNext();)
-		{
-			((BasicFBInstance) iter.next()).addVariable(name,var);
-		}
-	}
-
-	public void addDataAssociation(String event, String dataVar)
-	{
-		((Event) events.get(event)).addWithData(dataVar);
-	}
 
 	public FBInstance createInstance(String name)
 	{
@@ -125,14 +98,8 @@ public class BasicFBType extends FBType
 		return newInstance;
 	}
 
-	public Iterator instanceIterator()
-	{
-		return instances.values().iterator();
-	}
-
 	public ECC getECC()
 	{
-		//System.out.println("BasicFBType.getECC()");
 		return theECC;
 	}
 

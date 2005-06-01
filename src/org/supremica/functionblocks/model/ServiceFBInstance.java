@@ -62,31 +62,16 @@ public class ServiceFBInstance extends FBInstance
 	
 	public ServiceFBInstance(String n, Resource r, ServiceFBType t)
 	{
-		
+		name = n;
+		resource = r;
+		fbType = t;
 	}
 
 	public void handleEvent()
 	{
-	}
-
-	public void queueEvent(String eventInput)
-	{
-	}
-
-	public void addEventOutputConnection(String eventOutput, Connection cnt)
-	{
-	}
-	public void addDataInputConnection(String dataInput, Connection cnt)
-	{
-	}
-
-	public Connection getEventOutputConnection(String eventOutput)
-	{
-		return null;
-	}
-	public Variable getDataOutput(String name)
-	{
-		return null;
+		// setup variables for the script
+		// execute Java script
+		// extract variables from script
 	}
 
 }

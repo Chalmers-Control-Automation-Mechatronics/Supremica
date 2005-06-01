@@ -47,15 +47,44 @@ import java.util.*;
 public abstract class FBType extends NamedObject
 {
 	
+	// resource to which this type belongs
 	Resource resource;
+	// representing the events in the queue
+	Map events = new HashMap();
+	// all instance of this type
+	Map instances = new HashMap();
+	// variables in an FB type
+	Variables variables = new Variables();
 
 
-	public abstract void addVariable(String name, Variable var);
+	// add a variable of the name to the type
+	public void addVariable(String name, Variable var)
+	{
+		variables.addVariable(name,var);
+		
+		// if event var add it to events
+		if (var.getType().equals("EventInput") || var.getType().equals("EventOutput"))
+		{
+			events.put(name,new Event(name));
+		}
+		
+		// update instances
+		for (Iterator iter=instanceIterator(); iter.hasNext();)
+		{
+			((BasicFBInstance) iter.next()).addVariable(name,var);
+		}
+	}
 
-	public abstract void addDataAssociation(String event, String dataVar);
-	
+	public void addDataAssociation(String event, String dataVar)
+	{
+		((Event) events.get(event)).addWithData(dataVar);
+	}
+
 	public abstract FBInstance createInstance(String name);
 
-	public abstract Iterator instanceIterator();
-	
+	public Iterator instanceIterator()
+	{
+		return instances.values().iterator();
+	}
+
 }

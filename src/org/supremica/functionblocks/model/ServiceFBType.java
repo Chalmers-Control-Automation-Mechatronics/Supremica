@@ -56,11 +56,7 @@ import java.util.*;
 public class ServiceFBType extends FBType
 {
 
-	private Map instances = new HashMap();
-	private Map events = new HashMap();
-	private Variables variables = new Variables();
-
-
+	//====================================================================================
 	private ServiceFBType() {}
 
 	public ServiceFBType(String n,Resource r)
@@ -69,38 +65,21 @@ public class ServiceFBType extends FBType
 		this.name = name;
 		resource = r;		
 	}
-
-	public void addVariable(String name, Variable var)
-	{
-		variables.addVariable(name,var);
-		
-		// if event var add it to events
-		if (var.getType().equals("EventInput") || var.getType().equals("EventOutput"))
-		{
-			events.put(name,new Event(name));
-		}
-
-		// update instances
-		for (Iterator iter=instanceIterator(); iter.hasNext();)
-		{
-			((BasicFBInstance) iter.next()).addVariable(name,var);
-		}		
-	}
-	
-	public void addDataAssociation(String event, String dataVar)
-	{
-		
-	}
+	//====================================================================================
 
 
 	public FBInstance createInstance(String name)
 	{
-		return null;
+		System.out.println("ServiceFBType.createInstace(" + name + ")");
+		ServiceFBInstance newInstance = new ServiceFBInstance(name,resource,this);	
+		
+		newInstance.setEvents(events);
+
+		newInstance.setVariables((Variables) variables.clone());
+
+		instances.put(name,newInstance);
+
+		return newInstance;
 	}
 	
-	public Iterator instanceIterator()
-	{
-		return null;
-	}
-
 }
