@@ -635,12 +635,8 @@ public class ModifiedAstar2
 	}
 
 	/**
-	 * 			Calculates the costs for a one-product relaxation (i.e. as if there
-	 * 			would only be one robot in the cell) and stores it in oneProdRelax.
-	 *
-	 * @return	false, if any of the automata to be scheduled does not contain
-	 * 			an accepting state.
-	 * @return 	true, otherwise
+	 * Calculates the costs for a one-product relaxation (i.e. as if there
+	 * would only be one robot in the cell) and stores it in oneProdRelax.
 	 */	
 	private void preprocess1() {
 		for (int i=0; i<plantAutomata.size(); i++) {
@@ -775,23 +771,31 @@ public class ModifiedAstar2
 	}
 */
 
+	///////////////////////////////////////////////////////////////////////////
+	// Vad är detta? Kommentarer på svenska!??!! Supremica-koncernens        //
+	// officiella språk är ju engelska!!                                     //
+	///////////////////////////////////////////////////////////////////////////
+
 	/**
 	 * 	Räknar ut en passande index för hashtabellen till en tvårobot-relaxering mha en
 	 * 	klurig (och förhoppningsvis korrekt) formel.
+   	 *
 	 * @param i
 	 * @param j
-	 * @return
+	 * @return här måste man skriva något vettigt!!!
 	 */
-	private int calcHashtableIndex(int i, int j) {
+	private int calcHashtableIndex(int i, int j) 
+	{
 		int size = theAutomata.getPlantAutomata().size();
-
+		
 		return (int) (i*(size - 1.5) - 0.5*(i*i) - 1 + j);
 	}
-/*
-	private int calcEstimatedCost(Node theNode) {
-		return calcEstimatedCost(theNode, false);
-	}
-*/
+
+	/*
+	  private int calcEstimatedCost(Node theNode) {
+	  return calcEstimatedCost(theNode, false);
+	  }
+	*/
 
 	// Borde kanske ligga i "Automaton.java" men det kanske inte är tillräckligt
 	// generellt för det. Om man inte har att göra med schemaläggning, kan det väl

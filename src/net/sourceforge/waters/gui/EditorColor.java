@@ -32,7 +32,7 @@ class EditorColor
 	 * Returns a shadowed variant of the supplied color. The alpha-value is changed to 
 	 * SHADOWALPHA.
 	 *
-	 * @see SHADOWALPHA
+	 * @see #SHADOWALPHA
 	 */
 	protected static Color shadow(Color color)
 	{

@@ -154,7 +154,7 @@ public class Node
 
 	/**
 	 * @param i
-	 * @return
+	 * @return the State at position i in theStates.
 	 */
 	public State getState(int i) {
 		if (theStates != null)

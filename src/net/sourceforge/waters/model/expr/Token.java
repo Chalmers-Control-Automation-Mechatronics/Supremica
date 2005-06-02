@@ -3,7 +3,7 @@
 //# PACKAGE: waters.model.expr
 //# CLASS:   Token
 //###########################################################################
-//# $Id: Token.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: Token.java,v 1.2 2005-06-02 12:18:03 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.expr;
@@ -12,11 +12,11 @@ package net.sourceforge.waters.model.expr;
 /**
  * A token passed from the scanner to the parser.
  *
- * @see ExpressionScanner, ExpressionParser
+ * @see ExpressionScanner
+ * @see ExpressionParser
  *
  * @author Robi Malik
  */
-
 class Token {
 
   //#########################################################################
@@ -35,10 +35,10 @@ class Token {
    * Gets the type of this token.
    * The token type identifies this token as a integer constant,
    * operator, parentheses, etc.
-   * @return One of {@link END}, {@link OPENBR}, {@link OPENEN},
-   *         {@link OPENSQ}, {@link CLOSEBR}, {@link CLOSEEN},
-   *         {@link CLOSESQ}, {@link COMMA}, {@link OPERATOR},
-   *         {@link NUMBER}, {@link SYMBOL}.
+   * @return One of {@link #END}, {@link #OPENBR}, {@link #OPENEN},
+   *         {@link #OPENSQ}, {@link #CLOSEBR}, {@link #CLOSEEN},
+   *         {@link #CLOSESQ}, {@link #COMMA}, {@link #OPERATOR},
+   *         {@link #NUMBER}, {@link #SYMBOL}.
    */
   int getType()
   {

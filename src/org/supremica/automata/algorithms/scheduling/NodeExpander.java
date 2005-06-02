@@ -143,26 +143,27 @@ public class NodeExpander {
      *               "in-built" synchronizer                               *
      ***********************************************************************/
 
-    /**
-     * @param initialState
-     */
-    private void initOnlineSynchronizer() {
-	//	Get current options
-	SynchronizationOptions syncOptions = new SynchronizationOptions();
-	syncOptions.setBuildAutomaton(false);
-	syncOptions.setRequireConsistentControllability(false);
-	
-	try {
-	    AutomataSynchronizerHelper helper = new AutomataSynchronizerHelper(theAutomata, syncOptions);
-	    onlineSynchronizer = new AutomataSynchronizerExecuter(helper);
-	    onlineSynchronizer.initialize();
-	    
-	    // Så fult borde det väl inte vara ändå... Buggen borde tas om hand i AutomataIndexForm tycker man. 
-	    for (int i=0; i<theAutomata.size(); i++)
-		theAutomata.getAutomatonAt(i).remapStateIndices();
-	} catch (Exception e) {
-	    e.printStackTrace();
-	}
+    private void initOnlineSynchronizer() 
+	{
+		//	Get current options
+		SynchronizationOptions syncOptions = new SynchronizationOptions();
+		syncOptions.setBuildAutomaton(false);
+		syncOptions.setRequireConsistentControllability(false);
+		
+		try 
+		{
+			AutomataSynchronizerHelper helper = new AutomataSynchronizerHelper(theAutomata, syncOptions);
+			onlineSynchronizer = new AutomataSynchronizerExecuter(helper);
+			onlineSynchronizer.initialize();
+			
+			// Så fult borde det väl inte vara ändå... Buggen borde tas om hand i AutomataIndexForm tycker man. 
+			for (int i=0; i<theAutomata.size(); i++)
+				theAutomata.getAutomatonAt(i).remapStateIndices();
+		} 
+		catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
     }
 
     public Collection expandNodeWithSupremica(int[] node, int[] activeAutomataIndex) {

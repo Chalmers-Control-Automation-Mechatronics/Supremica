@@ -3,7 +3,7 @@
 //# PACKAGE: waters.model.module
 //# CLASS:   NodeProxy
 //###########################################################################
-//# $Id: NodeProxy.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: NodeProxy.java,v 1.2 2005-06-02 12:18:03 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
@@ -73,7 +73,7 @@ public abstract class NodeProxy extends UniqueElementProxy {
 
   /**
    * Creates a node from a parsed XML structure.
-   * @param  geo         The parsed XML structure representing the
+   * @param  state       The parsed XML structure representing the
    *                     node to be created.
    * @throws ModelException to indicate that the XML structure could
    *                     not be converted due to serious semantic

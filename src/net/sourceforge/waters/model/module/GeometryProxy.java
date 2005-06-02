@@ -3,7 +3,7 @@
 //# PACKAGE: waters.model.module
 //# CLASS:   GeometryProxy
 //###########################################################################
-//# $Id: GeometryProxy.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: GeometryProxy.java,v 1.2 2005-06-02 12:18:03 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
@@ -36,7 +36,6 @@ import net.sourceforge.waters.xsd.module.PointType;
  *
  * @author Robi Malik
  */
-
 public abstract class GeometryProxy extends ElementProxy {
 
   //#########################################################################

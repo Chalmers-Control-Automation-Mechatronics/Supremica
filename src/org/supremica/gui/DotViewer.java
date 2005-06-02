@@ -64,7 +64,8 @@ import java.awt.geom.Rectangle2D;
 /**
  * Abstract class for the viewer frame. Implemented by the different viewers.
  *
- * @see AutomatonViewer, AutomataHierarchyViewer
+ * @see AutomatonViewer
+ * @see AutomataHierarchyViewer
  */
 public abstract class DotViewer
 	extends JFrame
