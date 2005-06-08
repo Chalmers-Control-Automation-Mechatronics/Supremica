@@ -69,7 +69,7 @@ public class BasicFBInstance extends FBInstance
 	
     public void handleEvent()
     {
-		//System.out.println("BasicFBInstance.handleEvent()");
+	
 		if(handlingEvent)
 		{
 			resource.getScheduler().scheduleFBInstance(this);
@@ -77,32 +77,30 @@ public class BasicFBInstance extends FBInstance
 		}
 
 		currentEvent = getNextEvent();
-		if(currentEvent != null)
+		
+		handlingEvent = true;
+		
+		// set all InputEvents to false
+		for (Iterator iter = variables.iterator();iter.hasNext();)
 		{
-			handlingEvent = true;
-
-			// set all InputEvents to false
-			for (Iterator iter = variables.iterator();iter.hasNext();)
+			String curName = (String) iter.next();
+			if (((Variable) variables.getVariable(curName)).getType().equals("EventInput"))
 			{
-				String curName = (String) iter.next();
-				if (((Variable) variables.getVariable(curName)).getType().equals("EventInput"))
-				{
-					((BooleanVariable) variables.getVariable(curName)).setValue(false);
-				}
+				((BooleanVariable) variables.getVariable(curName)).setValue(false);
 			}
-
-			// set the corrensponding event var of the input event to TRUE 
-			((BooleanVariable) variables.getVariable(currentEvent.getName())).setValue(true);
-
-			// get input data values
-			getDataVariables(currentEvent);
-
-			// and execute the ecc
-			ECState newECState = updateECC();
-			if (newECState != currentECState)
-			{
-				handleNewState(newECState);
-			}
+		}
+		
+		// set the corrensponding event var of the input event to TRUE 
+		((BooleanVariable) variables.getVariable(currentEvent.getName())).setValue(true);
+		
+		// get input data values
+		getDataVariables(currentEvent);
+		
+		// and execute the ecc
+		ECState newECState = updateECC();
+		if (newECState != currentECState)
+		{
+			handleNewState(newECState);
 		}
     }
 	
@@ -121,7 +119,7 @@ public class BasicFBInstance extends FBInstance
 	
     private void getDataVariables(Event event)
     {
-		// get the data variables associated with this event and put the in variables attribute
+		// get the data variables associated with this event and put them in variables attribute
 		for (Iterator iter = event.withIterator();iter.hasNext();)
 		{
 			String curName = (String) iter.next();

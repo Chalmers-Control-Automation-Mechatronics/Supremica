@@ -50,11 +50,17 @@
 /*
  * Created on Dec 16, 2004
  */
-package org.supremica.functionblocks.model;
-
 /**
  * @author cengic
  */
+package org.supremica.functionblocks.model;
+
+import bsh.Interpreter;
+
+import java.util.Iterator;
+import java.io.Reader;
+import java.io.StringReader;
+
 public class ServiceFBInstance extends FBInstance
 {
 
@@ -69,9 +75,7 @@ public class ServiceFBInstance extends FBInstance
 
 	public void handleEvent()
 	{
-		// setup variables for the script
-		// execute Java script
-		// extract variables from script
+		
 	}
-
+	
 }
