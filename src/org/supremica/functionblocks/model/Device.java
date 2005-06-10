@@ -77,7 +77,7 @@ public class Device
 
     public void addResource(String name)
     {
-		resources.put(name,new Resource(name));
+		resources.put(name,new Resource(name,this));
     }
 	
     public Resource getResource(String name)

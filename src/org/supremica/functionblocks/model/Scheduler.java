@@ -61,7 +61,7 @@ public class Scheduler
 {
 	private Resource resource;
 	
-	private List scheduledFBInstances = new LinkedList();
+	private List scheduledBasicFBInstances = new LinkedList();
 	private List scheduledJobs = Collections.synchronizedList(new LinkedList());
 	//private List finishedJobs = Collections.synchronizedList(new LinkedList());
 	
@@ -91,9 +91,9 @@ public class Scheduler
 	}
 	
 	
-	public synchronized FBInstance getNextScheduledFBInstance()
+	public synchronized BasicFBInstance getNextScheduledBasicFBInstance()
 	{
-		while(scheduledFBInstances.size() == 0)
+		while(scheduledBasicFBInstances.size() == 0)
 		{			
 			try
 			{
@@ -104,7 +104,7 @@ public class Scheduler
 				System.err.println("Scheduler: InterruptedException");
 			}
 		}
-		return (FBInstance) scheduledFBInstances.remove(0);
+		return (BasicFBInstance) scheduledBasicFBInstances.remove(0);
 	}
 	
 
@@ -113,23 +113,20 @@ public class Scheduler
 		System.out.println("Scheduler.runEvents()");
 
 		// find all E_RESTART COLD connections and queue events on them
-		System.out.println("Scheduler.runEvents(): Searching for E_RESTART.");
 		for (Iterator iter = resource.getFBType("E_RESTART").instanceIterator(); iter.hasNext();) 
 		{
 			FBInstance eRestartInstance = (FBInstance) iter.next();
 			Connection outputConnection = eRestartInstance.getEventOutputConnection("COLD");
 			FBInstance toInstance = outputConnection.getFBInstance();
-			System.out.println("Scheduler.runEvents(): Queueing event on " + toInstance.getName() + "." + outputConnection.getSignalName());
 			toInstance.queueEvent(outputConnection.getSignalName());
 		}
-		System.out.println("Scheduler.runEvents(): Done.");
 
 		while (true)
 		{
-			FBInstance selectedFBInstance = getNextScheduledFBInstance();
-			if(selectedFBInstance != null)
+			BasicFBInstance selectedBasicFBInstance = getNextScheduledBasicFBInstance();
+			if(selectedBasicFBInstance != null)
 			{
-				selectedFBInstance.handleEvent();
+				selectedBasicFBInstance.handleEvent();
 			}
 			//resource.handleConfigurationRequests();
 		}
@@ -137,14 +134,13 @@ public class Scheduler
     
 	public void scheduleJob(Job j)
 	{
-		//System.out.println("Scheduler.scheduleJob()");
 		scheduledJobs.add(j);
 		algorithmThread.notifyNewJob();
 	}
 
-	public synchronized void scheduleFBInstance(FBInstance fbInst)
+	public synchronized void scheduleBasicFBInstance(BasicFBInstance fbInst)
 	{
-		scheduledFBInstances.add(fbInst);
+		scheduledBasicFBInstances.add(fbInst);
 		notify();
 	}
    

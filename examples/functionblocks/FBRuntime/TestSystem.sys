@@ -6,11 +6,13 @@
       <FBNetwork>
         <FB Name="restart" Type="E_RESTART" />
         <FB Name="merge" Type="E_MERGE2" />
+        <FB Name="delay" Type="E_DELAY" />
         <FB Name="inst1" Type="TestType" />
         <FB Name="inst2" Type="TestType" />
         <EventConnections>
           <Connection Source="restart.COLD" Destination="merge.EI2" />
-          <Connection Source="merge.EO" Destination="inst1.OCCURRED" />
+          <Connection Source="merge.EO" Destination="delay.START" />
+          <Connection Source="delay.EO" Destination="inst1.OCCURRED" />
           <Connection Source="inst1.DONE" Destination="inst2.OCCURRED" />
           <Connection Source="inst2.DONE" Destination="merge.EI1" />
         </EventConnections>

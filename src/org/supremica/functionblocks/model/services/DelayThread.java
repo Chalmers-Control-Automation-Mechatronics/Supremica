@@ -69,8 +69,17 @@ class DelayThread extends Thread
 		fbInstance = fb;
 	}
 
+	public void setDelayTime(int d)
+	{
+		delay = d;
+	}
 
-	public void abortDelay()
+	public void notifyNewDelay()
+	{
+		notify();
+	}
+
+	public void stopDelay()
 	{
 		sendOutput = false;
 	}
@@ -79,6 +88,7 @@ class DelayThread extends Thread
 	{
 		try
 		{
+			wait();
 			sleep(delay);
 		}
 		catch(InterruptedException e)
@@ -86,11 +96,11 @@ class DelayThread extends Thread
 			System.err.println("DelayThread: Interrupted Exception");
 			e.printStackTrace(System.err);
 		}
-		// send output only if the delay wasn't aborted
+		// send output only if the delay wasn't stopde
 		if (sendOutput)
 		{
 			Connection cnt = fbInstance.getEventOutputConnection("EO");
 			cnt.getFBInstance().queueEvent(cnt.getSignalName());
 		}
-	}   
+	}   	
 }

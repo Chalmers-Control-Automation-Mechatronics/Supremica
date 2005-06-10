@@ -52,18 +52,22 @@
 package org.supremica.functionblocks.model;
 
 import java.util.*;
+import java.io.File;
 
 public class ServiceFBType extends FBType
 {
+	
+	private File serviceScript;
 
 	//====================================================================================
 	private ServiceFBType() {}
 
-	public ServiceFBType(String n,Resource r)
+	public ServiceFBType(String n,Resource r, File s)
 	{
-		System.out.println("ServiceFBType(" + name + "," + r.getName()  + ")");
-		this.name = name;
-		resource = r;		
+		System.out.println("ServiceFBType(" + n + "," + r.getName()  + ")");
+		this.name = n;
+		resource = r;
+		serviceScript = s;
 	}
 	//====================================================================================
 
@@ -71,7 +75,7 @@ public class ServiceFBType extends FBType
 	public FBInstance createInstance(String name)
 	{
 		System.out.println("ServiceFBType.createInstace(" + name + ")");
-		ServiceFBInstance newInstance = new ServiceFBInstance(name,resource,this);	
+		ServiceFBInstance newInstance = new ServiceFBInstance(name, resource, this, serviceScript);	
 		
 		newInstance.setEvents(events);
 

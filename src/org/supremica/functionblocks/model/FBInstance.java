@@ -67,6 +67,7 @@ public abstract class FBInstance extends NamedObject
 	Map dataInputConnections = new HashMap();
 	// instance's variables
     Variables variables;
+    Event currentEvent;
 
 
 	public void setVariables(Variables vars)
@@ -110,31 +111,44 @@ public abstract class FBInstance extends NamedObject
 		return (Variable) variables.getVariable(name);
     }
 
-		
-    public void queueEvent(String eventInput)
+    public Event getNextEvent()
     {
-		synchronized(eventInputQueue)
+		return  (Event) eventInputQueue.remove();
+    }
+
+    public void getDataVariables(Event event)
+    {
+		// get the data variables associated with this event and put them in variables attribute
+		for (Iterator iter = event.withIterator();iter.hasNext();)
 		{
-			if(variables.getVariable(eventInput) != null)
-				if(variables.getVariable(eventInput).getType().equals("EventInput"))
-				{
-					eventInputQueue.add((Event) events.get(eventInput));
-					resource.getScheduler().scheduleFBInstance(this);
-				}
-				else
-				{
-					System.out.println("FBInstance: No event input " + eventInput);
-					System.exit(0);
-				}
-			else
+			String curName = (String) iter.next();
+			Connection curConnection  = (Connection) dataInputConnections.get(curName);
+			if (curConnection != null)
 			{
-				System.out.println("FBInstance: No event input " + eventInput);
-				System.exit(0);
+				Variable outputVar = curConnection.getFBInstance().getDataOutput(curConnection.getSignalName());
+				if(outputVar instanceof StringVariable)
+				{
+					((StringVariable) variables.getVariable(curName)).setValue(((StringVariable) outputVar).getValue());
+				}
+				else if(outputVar instanceof IntegerVariable)
+				{
+					((IntegerVariable) variables.getVariable(curName)).setValue(((IntegerVariable) outputVar).getValue().intValue());
+				}
+				else if(outputVar instanceof DoubleVariable)
+				{
+					((DoubleVariable) variables.getVariable(curName)).setValue(((DoubleVariable) outputVar).getValue().doubleValue());
+				}
+				else if(outputVar instanceof FloatVariable)
+				{
+					((FloatVariable) variables.getVariable(curName)).setValue(((FloatVariable) outputVar).getValue().floatValue());
+				}
+				else if(outputVar instanceof BooleanVariable)
+				{
+					((BooleanVariable) variables.getVariable(curName)).setValue(((BooleanVariable) outputVar).getValue().booleanValue());
+				}
 			}
 		}
     }
 
-
-	public abstract void handleEvent();
-	
+    public abstract void queueEvent(String eventInput);
 }

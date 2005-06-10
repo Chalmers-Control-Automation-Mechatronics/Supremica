@@ -49,8 +49,7 @@
 package org.supremica.functionblocks.model;
 
 import java.util.*;
-import java.io.Reader;
-import java.io.FileReader;
+import java.io.File;
 
 /**
  * @author Cengic
@@ -67,11 +66,13 @@ public class Resource extends NamedObject
 
     private Resource() {}
 
-    public Resource(String name)
+    public Resource(String name, Device d)
     {
 		System.out.println("Resource(" + name + ")");
 		
 		setName(name);
+
+		device = d;
 		
 		scheduler = new Scheduler(this);
 	
@@ -111,6 +112,11 @@ public class Resource extends NamedObject
     public void addBasicFBType(String name)
     {
 		fbTypes.put(name,new BasicFBType(name,this));
+    }
+
+    public void addServiceFBType(String name, File serviceScript)
+    {
+		fbTypes.put(name,new ServiceFBType(name,this,serviceScript));
     }
 
     public FBType getFBType(String name)

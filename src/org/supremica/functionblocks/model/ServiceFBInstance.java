@@ -56,26 +56,120 @@
 package org.supremica.functionblocks.model;
 
 import bsh.Interpreter;
-
 import java.util.Iterator;
+import java.io.File;
 import java.io.Reader;
-import java.io.StringReader;
+import java.io.FileReader;
 
 public class ServiceFBInstance extends FBInstance
 {
+	private File serviceScript;
 
+	private Object serviceState;
+	
+	private Interpreter interpreter = new Interpreter();
+
+
+	//==========================================================================
 	private ServiceFBInstance() {}
 	
-	public ServiceFBInstance(String n, Resource r, ServiceFBType t)
+	public ServiceFBInstance(String n, Resource r, ServiceFBType t, File script)
 	{
 		name = n;
 		resource = r;
 		fbType = t;
+		serviceScript = script;
+		initialize();
+	}
+	//==========================================================================
+
+
+	public void initialize()
+	{
+		try
+		{
+			interpreter.set("serviceInitialize", true);
+			interpreter.set("serviceFB", this);
+			interpreter.set("serviceState", serviceState);
+			
+			// evaluate the serviceScript
+			Reader serviceScriptReader = new FileReader(serviceScript);
+			interpreter.eval(serviceScriptReader);
+			
+			serviceState = interpreter.get("serviceState");
+			interpreter.set("serviceInitialize", false);
+		}
+		catch (Exception e)
+		{
+			System.err.println(e);
+		}
 	}
 
-	public void handleEvent()
+	public void queueEvent(String eventInput)
 	{
+		if(variables.getVariable(eventInput) != null)
+			if(variables.getVariable(eventInput).getType().equals("EventInput"))
+			{
+				currentEvent = (Event) events.get(eventInput);
+			}
+			else
+			{
+				System.err.println("ServiceFBInstance: No event input " + eventInput);
+				System.exit(0);
+			}
+		else
+		{
+			System.err.println("ServiceFBInstance: No event input " + eventInput);
+			System.exit(0);
+		}
 		
+		// set all InputEvents to false
+		for (Iterator iter = variables.iterator();iter.hasNext();)
+		{
+			String curName = (String) iter.next();
+			if (((Variable) variables.getVariable(curName)).getType().equals("EventInput"))
+			{
+				((BooleanVariable) variables.getVariable(curName)).setValue(false);
+			}
+		}
+		
+		// set the corrensponding event var of the input event to TRUE 
+		((BooleanVariable) variables.getVariable(currentEvent.getName())).setValue(true);
+		
+		// get input data values
+		getDataVariables(currentEvent);
+		
+		try
+		{
+			interpreter.set("serviceFB", this);
+			interpreter.set("serviceState", serviceState);
+			interpreter.set("serviceEvent", currentEvent);
+			interpreter.set("serviceVariables", variables);
+			
+			// evaluate the serviceScript
+			Reader serviceScriptReader = new FileReader(serviceScript);
+			interpreter.eval(serviceScriptReader);
+			
+			serviceState = interpreter.get("serviceState");
+			variables = (Variables) interpreter.get("serviceVariables");
+		}
+		catch (Exception e)
+		{
+			System.err.println(e);
+		}
 	}
 	
+	public void sendOutput(String eventOutput)
+    {
+		Connection outputConnection = (Connection) eventOutputConnections.get(eventOutput);
+		if (outputConnection != null)
+		{
+			FBInstance toInstance = outputConnection.getFBInstance();
+			toInstance.queueEvent(outputConnection.getSignalName());
+		}
+		else
+		{
+			System.err.println("ServiceFBInstance.sendOutput(): no such event output: " + eventOutput);
+		}
+    }
 }

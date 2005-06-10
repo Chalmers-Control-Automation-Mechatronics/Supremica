@@ -107,7 +107,7 @@ public class Loader
 		}
 		catch (Exception e)
 		{
-			java.lang.System.err.println(e);
+			e.printStackTrace(java.lang.System.err);
 			java.lang.System.exit(1);
 		}
     }
@@ -126,17 +126,61 @@ public class Loader
 					resource = device.getResource(curResource.getName());
 					if (curResource.isSetFBNetwork())
 					{
-						constructNewFBNetwork(curResource.getFBNetwork());
+						loadFBNetwork((org.supremica.functionblocks.xsd.libraryelement.FBNetwork) curResource.getFBNetwork());
 					}
 				}
 			}
 		}
     }
 
-    private void constructNewFBNetwork(org.supremica.functionblocks.xsd.libraryelement.FBNetworkType xmlFBNetworkData)
+    private void loadFBType(org.supremica.functionblocks.xsd.libraryelement.FBType xmlFBTypeData)
     {
+		if (xmlFBTypeData.isSetFBNetwork())
+		{
+			// load composite FB
+		}
+		else if (xmlFBTypeData.getName().equals("E_DELAY"))
+		{
+			resource.addServiceFBType("E_DELAY", new File(SupremicaProperties.getFBRuntimeLibraryPath() + "/E_DELAY.jscript"));
+
+			ServiceFBType newServiceFBType =  (ServiceFBType) resource.getFBType("E_DELAY");
+			
+			constructFBInterface(xmlFBTypeData,newServiceFBType);
+
+		}
+		else if (xmlFBTypeData.getName().equals("E_RESTART"))
+		{
+			
+			resource.addBasicFBType("E_RESTART");
+			
+			BasicFBType newBasicFBType = (BasicFBType) resource.getFBType("E_RESTART");
+			
+			constructFBInterface(xmlFBTypeData,newBasicFBType);
+
+		}
+		else if (xmlFBTypeData.isSetBasicFB())
+		{
+			// load  BasicFBType
+			
+			resource.addBasicFBType(xmlFBTypeData.getName());
+			
+			BasicFBType newBasicFBType = (BasicFBType) resource.getFBType(xmlFBTypeData.getName());
+			
+			constructFBInterface(xmlFBTypeData,newBasicFBType);
+			
+			constructBasicFBType(xmlFBTypeData,newBasicFBType);
+		}
+    }
+
+    private void loadFBNetwork(org.supremica.functionblocks.xsd.libraryelement.FBNetwork xmlFBNetworkData)
+	{
 		resource.addFBNetwork("FBNetwork");
 		FBNetwork fbNet =  resource.getFBNetwork("FBNetwork");
+		constructFBNetwork(xmlFBNetworkData,fbNet);
+	}
+
+    private void constructFBNetwork(org.supremica.functionblocks.xsd.libraryelement.FBNetwork xmlFBNetworkData, FBNetwork newFBNetwork)
+    {
 		if (xmlFBNetworkData.isSetFB())
 		{
 			for (Iterator fbIter = xmlFBNetworkData.getFB().iterator(); fbIter.hasNext();)
@@ -154,7 +198,7 @@ public class Loader
 						load(SupremicaProperties.getFBRuntimeLibraryPath() + "/" + curFB.getType() + ".fbt");
 					}
 				}
-				fbNet.addFBInstance(curFB.getName(),curFB.getType());
+				newFBNetwork.addFBInstance(curFB.getName(),curFB.getType());
 			}
 		}
 		if (xmlFBNetworkData.isSetEventConnections())
@@ -171,7 +215,7 @@ public class Loader
 				String din = dest.substring(dest.indexOf(".")+1,dest.length());
 				//java.lang.System.out.println("from:" + sinst + "!" + sout);
 				//java.lang.System.out.println("to:" + dinst + "!" + din);
-				fbNet.addEventConnection(sinst, sout, dinst, din);
+				newFBNetwork.addEventConnection(sinst, sout, dinst, din);
 			}
 		}
 		if (xmlFBNetworkData.isSetDataConnections())
@@ -188,32 +232,30 @@ public class Loader
 				String din = dest.substring(dest.indexOf(".")+1,dest.length());
 				//java.lang.System.out.println("from: " + sinst + "!" + sout);
 				//java.lang.System.out.println("to: " + dinst + "!" + din);
-				fbNet.addDataConnection(sinst, sout, dinst, din);
+				newFBNetwork.addDataConnection(sinst, sout, dinst, din);
 			}
 		}
     }
-
-    private void loadFBType(org.supremica.functionblocks.xsd.libraryelement.FBType xmlFBTypeData)
-    {
-		resource.addBasicFBType(xmlFBTypeData.getName());
-		BasicFBType newBasicFBType = (BasicFBType) resource.getFBType(xmlFBTypeData.getName());
-
+	
+	private void constructFBInterface(org.supremica.functionblocks.xsd.libraryelement.FBType xmlFBTypeData, FBType newFBType)
+	{
+		
 		// Build the interface
 		if (xmlFBTypeData.isSetInterfaceList())
 		{
-
+			
 			// event inputs
 			if (xmlFBTypeData.getInterfaceList().isSetEventInputs())
 			{
 				for (Iterator iter = xmlFBTypeData.getInterfaceList().getEventInputs().getEvent().iterator(); iter.hasNext();)
 				{
 					org.supremica.functionblocks.xsd.libraryelement.Event curEvent = (org.supremica.functionblocks.xsd.libraryelement.Event) iter.next();
-					newBasicFBType.addVariable(curEvent.getName(), new BooleanVariable("EventInput",false));
+					newFBType.addVariable(curEvent.getName(), new BooleanVariable("EventInput",false));
 					// data associations
 					for (Iterator withIter = curEvent.getWith().iterator(); withIter.hasNext();)
 					{
 						org.supremica.functionblocks.xsd.libraryelement.With curWith = (org.supremica.functionblocks.xsd.libraryelement.With) withIter.next();
-						newBasicFBType.addDataAssociation(curEvent.getName(), curWith.getVar());
+						newFBType.addDataAssociation(curEvent.getName(), curWith.getVar());
 					}
 				}
 			}
@@ -224,12 +266,12 @@ public class Loader
 				for (Iterator iter = xmlFBTypeData.getInterfaceList().getEventOutputs().getEvent().iterator(); iter.hasNext();)
 				{
 					org.supremica.functionblocks.xsd.libraryelement.Event curEvent = (org.supremica.functionblocks.xsd.libraryelement.Event) iter.next();
-					newBasicFBType.addVariable(curEvent.getName(), new BooleanVariable("EventOutput",false));
+					newFBType.addVariable(curEvent.getName(), new BooleanVariable("EventOutput",false));
 					// data associations
 					for (Iterator withIter = curEvent.getWith().iterator(); withIter.hasNext();)
 					{
 						org.supremica.functionblocks.xsd.libraryelement.With curWith = (org.supremica.functionblocks.xsd.libraryelement.With) withIter.next();
-						newBasicFBType.addDataAssociation(curEvent.getName(), curWith.getVar());
+						newFBType.addDataAssociation(curEvent.getName(), curWith.getVar());
 					}
 				}
 			}
@@ -244,44 +286,44 @@ public class Loader
 					{
 						if (curVar.isSetInitialValue())
 						{
-							newBasicFBType.addVariable(curVar.getName(), new IntegerVariable("DataInput",new Integer(curVar.getInitialValue()).intValue()));
+							newFBType.addVariable(curVar.getName(), new IntegerVariable("DataInput",new Integer(curVar.getInitialValue()).intValue()));
 						}
 						else
 						{
-							newBasicFBType.addVariable(curVar.getName(), new IntegerVariable("DataInput",0));
+							newFBType.addVariable(curVar.getName(), new IntegerVariable("DataInput",0));
 						}
 					}
 					else if (curVar.getType().toLowerCase().equals("bool"))
 					{
 						if (curVar.isSetInitialValue())
 						{
-							newBasicFBType.addVariable(curVar.getName(), new BooleanVariable("DataInput",new Boolean(curVar.getInitialValue()).booleanValue()));
+							newFBType.addVariable(curVar.getName(), new BooleanVariable("DataInput",new Boolean(curVar.getInitialValue()).booleanValue()));
 						}
 						else
 						{
-							newBasicFBType.addVariable(curVar.getName(), new BooleanVariable("DataInput",false));
+							newFBType.addVariable(curVar.getName(), new BooleanVariable("DataInput",false));
 						}
 					}
 					else if (curVar.getType().toLowerCase().equals("real"))
 					{
 						if (curVar.isSetInitialValue())
 						{
-							newBasicFBType.addVariable(curVar.getName(), new DoubleVariable("DataInput",new Double(curVar.getInitialValue()).doubleValue()));
+							newFBType.addVariable(curVar.getName(), new DoubleVariable("DataInput",new Double(curVar.getInitialValue()).doubleValue()));
 						}
 						else
 						{
-							newBasicFBType.addVariable(curVar.getName(), new DoubleVariable("DataInput",0.0));
+							newFBType.addVariable(curVar.getName(), new DoubleVariable("DataInput",0.0));
 						}
 					}
 					else if (curVar.getType().toLowerCase().equals("string"))
 					{
 						if (curVar.isSetInitialValue())
 						{
-							newBasicFBType.addVariable(curVar.getName(), new StringVariable("DataInput", curVar.getInitialValue()));
+							newFBType.addVariable(curVar.getName(), new StringVariable("DataInput", curVar.getInitialValue()));
 						}
 						else
 						{
-							newBasicFBType.addVariable(curVar.getName(), new StringVariable("DataInput",""));
+							newFBType.addVariable(curVar.getName(), new StringVariable("DataInput",""));
 						}
 					}
 				}
@@ -297,60 +339,54 @@ public class Loader
 					{
 						if (curVar.isSetInitialValue())
 						{
-							newBasicFBType.addVariable(curVar.getName(), new IntegerVariable("DataOutput",new Integer(curVar.getInitialValue()).intValue()));
+							newFBType.addVariable(curVar.getName(), new IntegerVariable("DataOutput",new Integer(curVar.getInitialValue()).intValue()));
 						}
 						else
 						{
-							newBasicFBType.addVariable(curVar.getName(), new IntegerVariable("DataOutput",0));
+							newFBType.addVariable(curVar.getName(), new IntegerVariable("DataOutput",0));
 						}
 					}
 					else if (curVar.getType().toLowerCase().equals("bool"))
 					{
 						if (curVar.isSetInitialValue())
 						{
-							newBasicFBType.addVariable(curVar.getName(), new BooleanVariable("DataOutput",new Boolean(curVar.getInitialValue()).booleanValue()));
+							newFBType.addVariable(curVar.getName(), new BooleanVariable("DataOutput",new Boolean(curVar.getInitialValue()).booleanValue()));
 						}
 						else
 						{
-							newBasicFBType.addVariable(curVar.getName(), new BooleanVariable("DataOutput",false));
+							newFBType.addVariable(curVar.getName(), new BooleanVariable("DataOutput",false));
 						}
 					}
 					else if (curVar.getType().toLowerCase().equals("real"))
 					{
 						if (curVar.isSetInitialValue())
 						{
-							newBasicFBType.addVariable(curVar.getName(), new DoubleVariable("DataOutput",new Double(curVar.getInitialValue()).doubleValue()));
+							newFBType.addVariable(curVar.getName(), new DoubleVariable("DataOutput",new Double(curVar.getInitialValue()).doubleValue()));
 						}
 						else
 						{
-							newBasicFBType.addVariable(curVar.getName(), new DoubleVariable("DataOutput",0.0));
+							newFBType.addVariable(curVar.getName(), new DoubleVariable("DataOutput",0.0));
 						}
 					}
 					else if (curVar.getType().toLowerCase().equals("string"))
 					{
 						if (curVar.isSetInitialValue())
 						{
-							newBasicFBType.addVariable(curVar.getName(), new StringVariable("DataOutput", curVar.getInitialValue()));
+							newFBType.addVariable(curVar.getName(), new StringVariable("DataOutput", curVar.getInitialValue()));
 						}
 						else
 						{
-							newBasicFBType.addVariable(curVar.getName(), new StringVariable("DataOutput",""));
+							newFBType.addVariable(curVar.getName(), new StringVariable("DataOutput",""));
 						}
 					}
 				}
 			}
 		}
 		// End Build the interface
-		
-		// Load BasicFB if it exist
-		if (xmlFBTypeData.isSetBasicFB())
-		{
-			constructNewBasicFBType(xmlFBTypeData,newBasicFBType);
-		}
-    }
+}
 
 
-	private void constructNewBasicFBType(org.supremica.functionblocks.xsd.libraryelement.FBType xmlFBTypeData, BasicFBType newBasicFBType)
+	private void constructBasicFBType(org.supremica.functionblocks.xsd.libraryelement.FBType xmlFBTypeData, BasicFBType newBasicFBType)
     {
 
 		// Build internal variables
