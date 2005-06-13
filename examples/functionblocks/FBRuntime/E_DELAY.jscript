@@ -1,25 +1,37 @@
 import org.supremica.functionblocks.model.*;
+//import org.supremica.functionblocks.model.services.DelayThread;
+
+ServiceFBInstance serviceFB = (ServiceFBInstance) serviceFB;
+Map serviceState = (Map) serviceState;
+Event serviceEvent = (Event) serviceEvent;
+Variables serviceVariables = (Variables) serviceVariables;
+//DelayThread delayThread;
 
 if (serviceInitialize)
 {
 	System.out.println("E_DELAY.jscript: Initialization");
-	serviceState = new HashMap(); // will hold service state data
+	serviceState = new HashMap();
 
 	// create service thread
-	//Thread delayThread = new DelayThread(((IntegerVariable) serviceFB.variables.getVariable("DT")).getValue().intValue(),serviceFB);
-	//serviceState.put("delayThread", delatThread);
-
+	//delayThread = new DelayThread(serviceFB);
+	//serviceState.put("delayThread", delayThread);
 }
 else
 {
+
 	String eventName  = ((Event) serviceEvent).getName();
+
 	if (eventName.equals("START"))
 	{ 
-		System.out.println("E_DELAY.jscript: START event received");
-		((ServiceFBInstance) serviceFB).sendOutput("EO");
+		//System.out.println("E_DELAY.jscript: START event received");
+		//int delayTime = ((IntegerVariable) serviceVariables.getVariable("DT")).getValue().intValue();
+		//	serviceState.get("delayThread").setDelayTime(delayTime);	
+		//serviceState.get("delayThread").startDelay();
+		serviceFB.sendOutput("EO");
 	}
 	else if (eventName.equals("STOP"))
 	{	
-		System.out.println("E_DELAY.jscript: STOP event received");
+		//System.out.println("E_DELAY.jscript: STOP event received");
+		//serviceState.get("delayThread").stopDelay();
 	}
 }

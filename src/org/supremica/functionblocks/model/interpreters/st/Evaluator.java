@@ -638,7 +638,7 @@ public class Evaluator {
 			Object a = evalTerm(((Mod) e).a);
 			if (a instanceof Integer)
 			{
-				Object b = evalTerm(((Div) e).b);
+				Object b = evalTerm(((Mod) e).b);
 				if(b instanceof Integer)
 				{
 					return new Integer(((Integer) a).intValue() % ((Integer) b).intValue());
@@ -656,7 +656,7 @@ public class Evaluator {
 			}
 			else if (a instanceof Double)
 			{
-				Object b = evalTerm(((Div) e).b);
+				Object b = evalTerm(((Mod) e).b);
 				if(b instanceof Integer)
 				{
 					return new Double(((Double) a).doubleValue() % ((Integer) b).intValue());

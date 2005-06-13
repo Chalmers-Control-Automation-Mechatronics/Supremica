@@ -196,7 +196,10 @@ public class BasicFBInstance extends FBInstance
 		if (currentECAction.getOutput() != null)
 		{
 			Connection outputConnection = (Connection) eventOutputConnections.get(currentECAction.getOutput());
-			outputConnection.getFBInstance().queueEvent(outputConnection.getSignalName());
+			if (outputConnection != null)
+			{
+				outputConnection.getFBInstance().queueEvent(outputConnection.getSignalName());
+			}
 		}
 		actionsLeft = actionsLeft - 1;
     }

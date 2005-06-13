@@ -90,7 +90,9 @@ public class ServiceFBInstance extends FBInstance
 		{
 			interpreter.set("serviceInitialize", true);
 			interpreter.set("serviceFB", this);
-			interpreter.set("serviceState", serviceState);
+			interpreter.set("serviceState", null);
+			interpreter.set("serviceEvent", null);
+			interpreter.set("serviceVariables", null);
 			
 			// evaluate the serviceScript
 			Reader serviceScriptReader = new FileReader(serviceScript);

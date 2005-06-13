@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="Kulbana" >
+  <VersionInfo Organization="Chalmers" Version="0.1" Author="Goran" Date="2005-06-12" />
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="InPortvakt" />
+      <Event Name="UrPortvakt" />
+      <Event Name="UppMatlyft" />
+      <Event Name="Mat" />
+      <Event Name="UrMatning" />
+      <Event Name="UppHissVan1" />
+      <Event Name="UppHissVan2" />
+      <Event Name="UtVan1" />
+      <Event Name="UtVan2" />
+      <Event Name="UppArmVan1" />
+      <Event Name="UppArmVan2" />
+      <Event Name="ArmHem" />
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="KulaPortvak" />
+      <Event Name="KulaMatlyft" />
+      <Event Name="MatlyftNere" />
+      <Event Name="KulaMatstation" />
+      <Event Name="StorKula" />
+      <Event Name="LitenKula" />
+      <Event Name="KulaHiss" />
+      <Event Name="HissNere" />
+      <Event Name="KulaVan1" />
+      <Event Name="KulaVan2" />
+      <Event Name="PlockaVan1" />
+      <Event Name="PlockaVan2" />
+      <Event Name="ArmVan1" />
+      <Event Name="ArmVan2" />
+      <Event Name="ArmHemma" />
+    </EventOutputs>
+  </InterfaceList>
+  <BasicFB>
+    <InternalVars>
+        <VarDeclaration Name="liten_kula" Type="INT" InitialValue="0" />
+    </InternalVars>
+    <ECC>
+        <ECState Name="INIT" />
+        <ECState Name="STATE1">
+		    <ECAction Algorithm="PrintKulaPortvakt" Output="KulaPortvakt" />
+	    </ECState>    
+        <ECState Name="STATE2">
+		    <ECAction Algorithm="PrintKulaMatlyft" Output="KulaMatlyft" />
+	    </ECState>    
+        <ECState Name="STATE3">
+		    <ECAction Algorithm="PrintKulaMatstation" Output="KulaMatstation" />
+	    </ECState>    
+        <ECState Name="STATE4">
+		    <ECAction Algorithm="PrintStorKula" Output="StorKula" />
+	    </ECState>    
+        <ECState Name="STATE5">
+		    <ECAction Algorithm="PrintLitenKula" Output="LitenKula" />
+	    </ECState>    
+        <ECState Name="STATE6">
+		    <ECAction Algorithm="PrintKulaHiss" Output="KulaHiss" />
+		    <ECAction Output="MatlyftNere" />
+	    </ECState>    
+        <ECState Name="STATE7">
+		    <ECAction Algorithm="PrintKulaVan1" Output="KulaVan1" />
+	    </ECState>    
+        <ECState Name="STATE8">
+		    <ECAction Algorithm="PrintKulaVan2" Output="KulaVan2" />
+	    </ECState>    
+        <ECState Name="STATE9">
+		    <ECAction Algorithm="PrintPlockaVan1" Output="PlockaVan1" />
+		    <ECAction Output="HissNere" />
+	    </ECState>    
+        <ECState Name="STATE10">
+		    <ECAction Algorithm="PrintPlockaVan2" Output="PlockaVan2" />
+		    <ECAction Output="HissNere" />
+	    </ECState>    
+        <ECState Name="STATE11">
+		    <ECAction Algorithm="PrintArmVan1" Output="ArmVan1" />
+	    </ECState>    
+        <ECState Name="STATE12">
+		    <ECAction Algorithm="PrintArmVan2" Output="ArmVan2" />
+	    </ECState>    
+        <ECState Name="STATE13">
+		    <ECAction Algorithm="PrintArmHemma" Output="ArmHemma" />
+	    </ECState>    
+
+
+		<ECTransition Source="INIT" Destination="STATE1" Condition="InPortvakt" />
+		<ECTransition Source="STATE1" Destination="INIT" Condition="1" />
+
+		<ECTransition Source="INIT" Destination="STATE2" Condition="UrPortvakt" />
+		<ECTransition Source="STATE2" Destination="INIT" Condition="1" />
+
+		<ECTransition Source="INIT" Destination="STATE3" Condition="UppMatlyft" />
+		<ECTransition Source="STATE3" Destination="INIT" Condition="1" />
+
+		<ECTransition Source="INIT" Destination="STATE4" Condition="Mat AND (liten_kula MOD 3 = 0)" />
+		<ECTransition Source="STATE4" Destination="INIT" Condition="1" />
+
+		<ECTransition Source="INIT" Destination="STATE5" Condition="Mat AND (liten_kula MOD 3 &gt; 0)" />
+		<ECTransition Source="STATE5" Destination="INIT" Condition="1" />
+
+		<ECTransition Source="INIT" Destination="STATE6" Condition="UrMatning" />
+		<ECTransition Source="STATE6" Destination="INIT" Condition="1" />
+
+		<ECTransition Source="INIT" Destination="STATE7" Condition="UppHissVan1" />
+		<ECTransition Source="STATE7" Destination="INIT" Condition="1" />
+
+		<ECTransition Source="INIT" Destination="STATE8" Condition="UppHissVan2" />
+		<ECTransition Source="STATE8" Destination="INIT" Condition="1" />
+
+		<ECTransition Source="INIT" Destination="STATE9" Condition="UtVan1" />
+		<ECTransition Source="STATE9" Destination="INIT" Condition="1" />
+
+		<ECTransition Source="INIT" Destination="STATE10" Condition="UtVan2" />
+		<ECTransition Source="STATE10" Destination="INIT" Condition="1" />
+
+		<ECTransition Source="INIT" Destination="STATE11" Condition="UppArmVan1" />
+		<ECTransition Source="STATE11" Destination="INIT" Condition="1" />
+
+		<ECTransition Source="INIT" Destination="STATE12" Condition="UppArmVan2" />
+		<ECTransition Source="STATE12" Destination="INIT" Condition="1" />
+
+		<ECTransition Source="INIT" Destination="STATE13" Condition="ArmHem" />
+		<ECTransition Source="STATE13" Destination="INIT" Condition="1" />
+
+
+    </ECC>
+    <Algorithm Name="PrintKulaPortvakt">
+        <Other Language="Java" Text=
+		"System.out.println(&#34;KulaPortvakt&#34;);" />	
+    </Algorithm>
+    <Algorithm Name="PrintKulaMatlyft">
+        <Other Language="Java" Text=
+		"System.out.println(&#34;KulaMatlyft&#34;);" />	
+    </Algorithm>
+    <Algorithm Name="PrintKulaMatstation">
+        <Other Language="Java" Text=
+		"System.out.println(&#34;KulaMatstation&#34;);" />	
+    </Algorithm>
+    <Algorithm Name="PrintStorKula">
+        <Other Language="Java" Text=
+		"liten_kula = liten_kula + 1;
+		System.out.println(&#34;StorKula&#34;);" />	
+    </Algorithm>
+    <Algorithm Name="PrintLitenKula">
+        <Other Language="Java" Text=
+		"liten_kula = liten_kula + 1;
+		System.out.println(&#34;LitenKula&#34;);" />	
+    </Algorithm>
+    <Algorithm Name="PrintKulaHiss">
+        <Other Language="Java" Text=
+		"System.out.println(&#34;KulaHiss&#34;);" />	
+    </Algorithm>
+    <Algorithm Name="PrintKulaVan1">
+        <Other Language="Java" Text=
+		"System.out.println(&#34;KulaVan1&#34;);" />	
+    </Algorithm>
+    <Algorithm Name="PrintKulaVan2">
+        <Other Language="Java" Text=
+		"System.out.println(&#34;KulaVan2&#34;);" />	
+    </Algorithm>
+    <Algorithm Name="PrintPlockaVan1">
+        <Other Language="Java" Text=
+		"System.out.println(&#34;PlockaVan1&#34;);" />	
+    </Algorithm>
+    <Algorithm Name="PrintPlockaVan2">
+        <Other Language="Java" Text=
+		"System.out.println(&#34;PlockaVan2&#34;);" />	
+    </Algorithm>
+    <Algorithm Name="PrintArmVan1">
+        <Other Language="Java" Text=
+		"System.out.println(&#34;ArmVan1&#34;);" />	
+    </Algorithm>
+    <Algorithm Name="PrintArmVan2">
+        <Other Language="Java" Text=
+		"System.out.println(&#34;ArmVan2&#34;);" />	
+    </Algorithm>
+    <Algorithm Name="PrintArmHemma">
+        <Other Language="Java" Text=
+		"System.out.println(&#34;ArmHemma&#34;);" />	
+    </Algorithm>
+  </BasicFB>
+</FBType>

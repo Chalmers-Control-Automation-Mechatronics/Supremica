@@ -72,6 +72,8 @@ public class Loader
 {
     private Device device;
     private Resource resource;
+	private FBNetwork fbNetwork;
+
     private JAXBContext context;
     private Unmarshaller unmarshaller;
 
@@ -89,6 +91,13 @@ public class Loader
 			java.lang.System.err.println(e);
 			java.lang.System.exit(1);
 		}
+
+		if (SupremicaProperties.getFBRuntimeLibraryPath().equals(""))
+		{
+			SupremicaProperties.setFBRuntimeLibraryPath(".");
+		}
+		
+		
     }
 
     public void load(String fileName)
@@ -121,12 +130,14 @@ public class Loader
 			{
 				for (Iterator resIter = theDevice.getResource().iterator();resIter.hasNext();)
 				{
-					org.supremica.functionblocks.xsd.libraryelement.Resource curResource = (org.supremica.functionblocks.xsd.libraryelement.Resource) resIter.next();
-					device.addResource(curResource.getName());
-					resource = device.getResource(curResource.getName());
-					if (curResource.isSetFBNetwork())
+					org.supremica.functionblocks.xsd.libraryelement.Resource curXmlResource = (org.supremica.functionblocks.xsd.libraryelement.Resource) resIter.next();
+					device.addResource(curXmlResource.getName());
+					resource = device.getResource(curXmlResource.getName());
+					if (curXmlResource.isSetFBNetwork())
 					{
-						loadFBNetwork((org.supremica.functionblocks.xsd.libraryelement.FBNetwork) curResource.getFBNetwork());
+						resource.addFBNetwork("FBNetwork");
+						fbNetwork = resource.getFBNetwork("FBNetwork");
+						constructFBNetwork((org.supremica.functionblocks.xsd.libraryelement.FBNetwork) curXmlResource.getFBNetwork());
 					}
 				}
 			}
@@ -138,25 +149,6 @@ public class Loader
 		if (xmlFBTypeData.isSetFBNetwork())
 		{
 			// load composite FB
-		}
-		else if (xmlFBTypeData.getName().equals("E_DELAY"))
-		{
-			resource.addServiceFBType("E_DELAY", new File(SupremicaProperties.getFBRuntimeLibraryPath() + "/E_DELAY.jscript"));
-
-			ServiceFBType newServiceFBType =  (ServiceFBType) resource.getFBType("E_DELAY");
-			
-			constructFBInterface(xmlFBTypeData,newServiceFBType);
-
-		}
-		else if (xmlFBTypeData.getName().equals("E_RESTART"))
-		{
-			
-			resource.addBasicFBType("E_RESTART");
-			
-			BasicFBType newBasicFBType = (BasicFBType) resource.getFBType("E_RESTART");
-			
-			constructFBInterface(xmlFBTypeData,newBasicFBType);
-
 		}
 		else if (xmlFBTypeData.isSetBasicFB())
 		{
@@ -170,16 +162,29 @@ public class Loader
 			
 			constructBasicFBType(xmlFBTypeData,newBasicFBType);
 		}
+		// load service FBs
+		else if (xmlFBTypeData.getName().equals("E_DELAY"))
+		{
+
+			// TODO: Fix path for loading of DELAY
+			resource.addServiceFBType("E_DELAY", new File("E_DELAY.jscript"));
+			
+			ServiceFBType newServiceFBType =  (ServiceFBType) resource.getFBType("E_DELAY");
+			
+			constructFBInterface(xmlFBTypeData,newServiceFBType);
+		}
+		else if (xmlFBTypeData.getName().equals("E_RESTART"))
+		{
+			resource.addBasicFBType("E_RESTART");
+			
+			BasicFBType newBasicFBType = (BasicFBType) resource.getFBType("E_RESTART");
+			
+			constructFBInterface(xmlFBTypeData,newBasicFBType);
+		}
     }
 
-    private void loadFBNetwork(org.supremica.functionblocks.xsd.libraryelement.FBNetwork xmlFBNetworkData)
-	{
-		resource.addFBNetwork("FBNetwork");
-		FBNetwork fbNet =  resource.getFBNetwork("FBNetwork");
-		constructFBNetwork(xmlFBNetworkData,fbNet);
-	}
 
-    private void constructFBNetwork(org.supremica.functionblocks.xsd.libraryelement.FBNetwork xmlFBNetworkData, FBNetwork newFBNetwork)
+    private void constructFBNetwork(org.supremica.functionblocks.xsd.libraryelement.FBNetwork xmlFBNetworkData)
     {
 		if (xmlFBNetworkData.isSetFB())
 		{
@@ -189,18 +194,20 @@ public class Loader
 				// get and load the FB type
 				if(resource.getFBType(curFB.getType()) == null)
 				{
-					if (SupremicaProperties.getFBRuntimeLibraryPath().equals(""))
-					{
-						load(curFB.getType() + ".fbt");
-					}
-					else
-					{
-						load(SupremicaProperties.getFBRuntimeLibraryPath() + "/" + curFB.getType() + ".fbt");
-					}
+					//if (SupremicaProperties.getFBRuntimeLibraryPath().equals(""))
+					//{
+					//	load(curFB.getType() + ".fbt");
+					//}
+					//else
+					//{
+					load(SupremicaProperties.getFBRuntimeLibraryPath() + "/" + curFB.getType() + ".fbt");
+					//}
 				}
-				newFBNetwork.addFBInstance(curFB.getName(),curFB.getType());
+				fbNetwork.addFBInstance(curFB.getName(),curFB.getType());
 			}
 		}
+		
+
 		if (xmlFBNetworkData.isSetEventConnections())
 		{
 			//java.lang.System.out.println("Event Connections:");
@@ -215,9 +222,11 @@ public class Loader
 				String din = dest.substring(dest.indexOf(".")+1,dest.length());
 				//java.lang.System.out.println("from:" + sinst + "!" + sout);
 				//java.lang.System.out.println("to:" + dinst + "!" + din);
-				newFBNetwork.addEventConnection(sinst, sout, dinst, din);
+				fbNetwork.addEventConnection(sinst, sout, dinst, din);
 			}
 		}
+		
+
 		if (xmlFBNetworkData.isSetDataConnections())
 		{
 			//java.lang.System.out.println("Data Connections:");
@@ -232,7 +241,7 @@ public class Loader
 				String din = dest.substring(dest.indexOf(".")+1,dest.length());
 				//java.lang.System.out.println("from: " + sinst + "!" + sout);
 				//java.lang.System.out.println("to: " + dinst + "!" + din);
-				newFBNetwork.addDataConnection(sinst, sout, dinst, din);
+				fbNetwork.addDataConnection(sinst, sout, dinst, din);
 			}
 		}
     }

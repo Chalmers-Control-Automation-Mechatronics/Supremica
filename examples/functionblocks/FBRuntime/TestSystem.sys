@@ -4,17 +4,36 @@
   <Device  Name="Test Device" Type="DeviceType_not_used">
     <Resource Name="TestResource" Type="ResourceType_not_used">
       <FBNetwork>
+	    <FB Name="kulbana" Type="Kulbana" />
         <FB Name="restart" Type="E_RESTART" />
         <FB Name="merge" Type="E_MERGE2" />
         <FB Name="delay" Type="E_DELAY" />
         <FB Name="inst1" Type="TestType" />
         <FB Name="inst2" Type="TestType" />
         <EventConnections>
-          <Connection Source="restart.COLD" Destination="merge.EI2" />
-          <Connection Source="merge.EO" Destination="delay.START" />
+          <Connection Source="restart.COLD" Destination="merge.EI1" />
+
+          <Connection Source="merge.EO" Destination="kulbana.InPortvakt" />
+
           <Connection Source="delay.EO" Destination="inst1.OCCURRED" />
           <Connection Source="inst1.DONE" Destination="inst2.OCCURRED" />
           <Connection Source="inst2.DONE" Destination="merge.EI1" />
+
+          <Connection Source="kulbana.KulaPortvakt" Destination="kulbana.UrPortvakt" />
+          <Connection Source="kulbana.KulaMatlyft" Destination="kulbana.UppMatlyft" />
+          <Connection Source="kulbana.KulaMatstation" Destination="kulbana.Mat" />
+          <Connection Source="kulbana.StorKula" Destination="kulbana.UppHissVan1" />
+          <Connection Source="kulbana.LitenKula" Destination="kulbana.UppHissVan2" />
+          <Connection Source="kulbana.KulaVan1" Destination="kulbana.UtVan1" />
+          <Connection Source="kulbana.KulaVan2" Destination="kulbana.UtVan2" />
+          <Connection Source="kulbana.PlockaVan1" Destination="kulbana.UppArmVan1" />
+          <Connection Source="kulbana.PlockaVan2" Destination="kulbana.UppArmVan2" />
+          <Connection Source="kulbana.ArmVan1" Destination="kulbana.ArmHem" />
+          <Connection Source="kulbana.ArmVan2" Destination="kulbana.ArmHem" />
+          <Connection Source="kulbana.ArmHemma" Destination="merge.EI2" />
+
+		  
+		  
         </EventConnections>
         <DataConnections>
           <Connection Source="inst1.DO" Destination="inst2.DI" />

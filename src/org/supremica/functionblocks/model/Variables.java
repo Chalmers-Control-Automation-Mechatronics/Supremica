@@ -56,6 +56,8 @@ import java.util.Iterator;
 
 public class Variables
 {
+
+	// TODO: make one map for each type of variable
 	
 	private Map variables = new HashMap();
 

@@ -62,10 +62,9 @@ class DelayThread extends Thread
 
 	private DelayThread() {} 
 
-	public DelayThread(int d, FBInstance fb)
+	public DelayThread(FBInstance fb)
 	{
 		setName("DelayThread");
-		delay = d;
 		fbInstance = fb;
 	}
 
@@ -74,14 +73,16 @@ class DelayThread extends Thread
 		delay = d;
 	}
 
-	public void notifyNewDelay()
+	public void startDelay()
 	{
+		sendOutput = true;
 		notify();
 	}
 
 	public void stopDelay()
 	{
 		sendOutput = false;
+		notify();
 	}
 
 	public void run()
@@ -89,7 +90,7 @@ class DelayThread extends Thread
 		try
 		{
 			wait();
-			sleep(delay);
+			wait(delay);
 		}
 		catch(InterruptedException e)
 		{
