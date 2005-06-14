@@ -89,9 +89,7 @@ public class ECC
 
 	ECState execute(ECState currentECState, Variables vars)
 	{
-		
-		//System.out.println("ECC.execute()");
-		
+
 		// find all transitions that have currentECState in their source
 		List ecTransitionsWithSameSource = new LinkedList();
 

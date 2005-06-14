@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="KulaMatlyft" >
+  <VersionInfo Organization="Chalmers" Version="0.1" Author="MFBL" Date="2005-05-13" />
+  
+  <InterfaceList>
+  
+    <EventInputs>
+      <Event Name="KulaMatlyft" />
+      <Event Name="MatlyftNere" />
+    </EventInputs>
+    
+    <EventOutputs>
+      <Event Name="UppMatlyft" />
+    </EventOutputs>
+    
+  </InterfaceList>
+  
+  <BasicFB>
+
+    <ECC>
+        
+        <ECState Name="q0" />
+        <ECState Name="q1">
+            <ECAction Output="UppMatlyft"/>
+	</ECState> 
+	
+	<ECTransition Source="q0" Destination="q1" Condition="KulaMatlyft" />
+	<ECTransition Source="q1" Destination="q0" Condition="MatlyftNere" />
+	
+    </ECC>
+
+  </BasicFB>
+
+</FBType>

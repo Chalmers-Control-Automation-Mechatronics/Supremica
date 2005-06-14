@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="Matstation" >
+  <VersionInfo Organization="Chalmers" Version="0.1" Author="JohanPetter" Date="2005-04-08" />
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="KulaMatstation" />
+      <Event Name="Storkula" />
+      <Event Name="Litenkula" />
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="Mat" />
+      <Event Name="Urmatning" />
+    </EventOutputs>
+  </InterfaceList>
+  <BasicFB>
+    <ECC>
+        <ECState Name="INIT" />
+        <ECState Name="STATE1">
+	  	<ECAction Output="Mat" />
+	</ECState>
+        <ECState Name="STATE2">
+	    	<ECAction Output="Urmatning" />
+	</ECState>
+	<ECTransition Source="INIT" Destination="STATE1" Condition="KulaMatstation" />
+	<ECTransition Source="STATE1" Destination="STATE2" Condition="Storkula OR Litenkula" />
+	<ECTransition Source="STATE2" Destination="INIT" Condition="1" />
+    </ECC>
+  </BasicFB>
+</FBType>

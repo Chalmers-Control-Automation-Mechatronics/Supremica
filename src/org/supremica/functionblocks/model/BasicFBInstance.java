@@ -100,6 +100,8 @@ public class BasicFBInstance extends FBInstance
 		currentEvent = getNextEvent();
 		
 		handlingEvent = true;
+
+		//System.out.println("BasicFBInstance(" + getName() + "): handling event " + currentEvent.getName() + " from Ecc state " + currentECState.getName());
 		
 		// set all InputEvents to false
 		for (Iterator iter = variables.iterator();iter.hasNext();)

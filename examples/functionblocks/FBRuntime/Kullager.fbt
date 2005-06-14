@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="Kullager">
+  <VersionInfo Organization="Chalmers" Version="0.1" Author="Kobetski Flordal" Date="2005-04-08"/>
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="KULAFRAMME"/>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="PUTTAUT"/>
+    </EventOutputs>
+  </InterfaceList>
+  <BasicFB>
+    <ECC>
+        <ECState Name="VANTE"/>
+        <ECState Name="PUTTA">
+	    <ECAction Output="PUTTAUT"/>
+	</ECState>
+	<ECTransition Source="VANTE" Destination="PUTTA" Condition="KULAFRAMME"/>
+	<ECTransition Source="PUTTA" Destination="VANTE" Condition="1"/>
+    </ECC>
+  </BasicFB>
+</FBType>

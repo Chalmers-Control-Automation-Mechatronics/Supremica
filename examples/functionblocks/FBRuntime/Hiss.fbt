@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="Hiss" >
+  <VersionInfo Organization="Chalmers" Version="0.1" Author="MF  BL" Date="2005-05-13" />
+  
+  <InterfaceList>
+  
+    <EventInputs>
+      <Event Name="StorKula" />
+      <Event Name="LitenKula" />
+      <Event Name="KulaHiss" />
+      <Event Name="HissNere" />	
+    </EventInputs>
+  
+    <EventOutputs>
+      <Event Name="UppHissVan1" />
+      <Event Name="UppHissVan2" />
+    </EventOutputs>
+    
+  </InterfaceList>
+  
+  <BasicFB>
+
+    <ECC>
+        <ECState Name="q0" />
+        <ECState Name="q1" />
+        <ECState Name="q2">
+            <ECAction Output="UppHissVan2"/>
+	</ECState> 
+	<ECState Name="q3" />
+        <ECState Name="q4">
+            <ECAction Output="UppHissVan1"/>
+	</ECState> 
+	
+	<ECTransition Source="q0" Destination="q1" Condition="StorKula" />
+	<ECTransition Source="q1" Destination="q2" Condition="KulaHiss" />
+	<ECTransition Source="q0" Destination="q3" Condition="LitenKula" />
+	<ECTransition Source="q3" Destination="q4" Condition="KulaHiss" />
+	<ECTransition Source="q2" Destination="q0" Condition="HissNere" />
+	<ECTransition Source="q4" Destination="q0" Condition="HissNere" />
+	
+    </ECC>
+
+  </BasicFB>
+
+</FBType>

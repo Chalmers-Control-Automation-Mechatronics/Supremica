@@ -12,13 +12,13 @@
   </InterfaceList>
   <BasicFB>
     <ECC>
-        <ECState Name="START" />
-        <ECState Name="S0">
-			<ECAction Output="EO1" />
-			<ECAction Output="EO2" />
-		</ECState>    
-	<ECTransition Source="START" Destination="SO" Condition="EI" />
-	<ECTransition Source="SO" Destination="START" Condition="1" />
+        <ECState Name="S0" />
+        <ECState Name="S1">
+		<ECAction Output="EO1" />
+		<ECAction Output="EO2" />
+	</ECState>    
+	<ECTransition Source="S0" Destination="S1" Condition="EI" />
+	<ECTransition Source="S1" Destination="S0" Condition="1" />
     </ECC>
   </BasicFB>
 </FBType>

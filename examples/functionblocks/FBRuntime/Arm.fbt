@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="Arm" >
+  <VersionInfo Organization="Chalmers" Version="0.1" Author="Author Name" Date="2005-04-08" />
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="PlockaVan1"/>
+      <Event Name="PlockaVan2"/>
+      <Event Name="ArmVan1"/>
+      <Event Name="ArmVan2"/>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="UppArmVan1"/>
+      <Event Name="UppArmVan2"/>
+      <Event Name="ArmHem"/>
+    </EventOutputs>
+  </InterfaceList>
+  <BasicFB>
+    <ECC>
+        <ECState Name="ARM_HEMMA" />
+        <ECState Name="PLOCKA_VAN_1">
+		<ECAction Output="UppArmVan1"/>
+	</ECState>    
+	<ECState Name="PLOCKA_VAN_2">
+		<ECAction Output="UppArmVan2"/>
+	</ECState>    
+	<ECState Name="ARM_VAN_1">
+		<ECAction Output="ArmHem"/>
+	</ECState>    
+	<ECState Name="ARM_VAN_2">
+		<ECAction Output="ArmHem"/>
+	</ECState>    
+	
+	<ECTransition Source="ARM_HEMMA" Destination="PLOCKA_VAN_1" Condition="PlockaVan1" />
+	<ECTransition Source="ARM_HEMMA" Destination="PLOCKA_VAN_2" Condition="PlockaVan2" />
+	<ECTransition Source="PLOCKA_VAN_1" Destination="ARM_VAN_1" Condition="ArmVan1" />
+	<ECTransition Source="PLOCKA_VAN_2" Destination="ARM_VAN_2" Condition="ArmVan2" />
+	<ECTransition Source="ARM_VAN_1" Destination="ARM_HEMMA" Condition="1" />
+	<ECTransition Source="ARM_VAN_2" Destination="ARM_HEMMA" Condition="1" />
+    </ECC>
+  </BasicFB>
+</FBType>
