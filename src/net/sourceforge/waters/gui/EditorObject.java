@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorObject
 //###########################################################################
-//# $Id: EditorObject.java,v 1.11 2005-05-27 10:28:21 flordal Exp $
+//# $Id: EditorObject.java,v 1.12 2005-06-15 09:19:14 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -32,7 +32,7 @@ public class EditorObject
 	private boolean highlighted = false;
 	private boolean error = false;
 
-	// Should we paint shadow on highlighted objects?
+	// Should we draw a shadow on highlighted objects?
 	protected boolean shadow = true;
 
 	// Different pens for drawing
@@ -137,26 +137,12 @@ public class EditorObject
 
 	public Color getShadowColor()
 	{
-		/*
-		// In order of importance
-		if (isError())
+		// Overrides
+		if (!isSelected() && !isError() && getType() == NODEGROUP)
 		{
-			return EditorColor.ERRORSHADOWCOLOR;
+			// Unfortunately, the light gray color gives a too weak shadow!
+			return EditorColor.shadow(EditorColor.DEFAULTCOLOR_NODEGROUP.darker().darker());
 		}
-		else if (isSelected())
-		{
-			return EditorColor.SELECTSHADOWCOLOR;
-		}
-		else
-		{
-			// Defaults
-			if (getType() == NODEGROUP)
-			{
-				return EditorColor.DEFAULTSHADOWCOLOR_NODEGROUP;
-			}
-			return EditorColor.DEFAULTSHADOWCOLOR;
-		}
-		*/
 
 		// Return the shadowed variant of the ordinary color of this object
 		return EditorColor.shadow(getColor());

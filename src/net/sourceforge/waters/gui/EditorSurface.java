@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.23 2005-05-23 13:35:15 flordal Exp $
+//# $Id: EditorSurface.java,v 1.24 2005-06-15 09:19:14 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -332,9 +332,21 @@ public class EditorSurface
 
 	public void delNode(EditorNode n)
 	{
+		//System.err.println("---------------");
 		for (int i = 0; i < edges.size(); i++)
 		{
 			EditorEdge e = (EditorEdge) edges.get(i);
+
+			/*
+			try
+			{
+				System.err.println(((EditorNode) e.getStartNode()).getName() + " " + e.getEndNode().getName());
+			}
+			catch (Exception watchMeNotCare)
+			{
+				System.err.println("*** " + e.getEndNode().getName());
+			}
+			*/			
 
 			if ((e.getStartNode() == n) || (e.getEndNode() == n))
 			{
@@ -1526,15 +1538,6 @@ public class EditorSurface
 
 			// Put the current figure into the Graphics object!
 			print(g);
-
-			/*
-			// Bounding box (but it's wrong)
-			int llx = (int) (area.getX());
-			int lly = (int) (area.getY() + area.getHeight());
-			int urx = (int) (area.getX() + area.getWidth());
-			int ury = (int) (area.getY());
-			System.err.println("%%BoundingBox: " + llx + " " + lly + " " + urx + " " + ury);
-			*/
 
 			// OK to print!
 			return (PAGE_EXISTS);

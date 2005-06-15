@@ -135,6 +135,8 @@ public class Automata
 	{
 		if (containsAutomaton(aut.getName()))
 		{
+			logger.error("Name conflict, multiple automata with name '" + aut.getName() + "', discarding last one added.");
+			
 			// Already here!
 			return;
 		}
