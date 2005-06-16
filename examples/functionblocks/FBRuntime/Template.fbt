@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="TestType" >
-  <VersionInfo Organization="Chalmers" Version="0.1" Author="Goran" Date="2005-04-08" />
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="Template" >
+  <VersionInfo Organization="Chalmers" Version="0.1" Author="Author Name" Date="2005-04-08" />
   <InterfaceList>
     <EventInputs>
       <Event Name="OCCURRED" >
@@ -28,7 +28,7 @@
         <ECState Name="STATE">
 		    <ECAction Algorithm="TestAlg" Output="DONE"/>
 	    </ECState>    
-		<ECTransition Source="INIT" Destination="STATE" Condition="blah" />
+		<ECTransition Source="INIT" Destination="STATE" Condition="OCCURRED" />
 		<ECTransition Source="STATE" Destination="INIT" Condition="1" />
     </ECC>
     <Algorithm Name="TestAlg">

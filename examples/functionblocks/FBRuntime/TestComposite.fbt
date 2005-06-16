@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="TestComposite" >
+  <VersionInfo Organization="Chalmers" Version="0.1" Author="Author Name" Date="2005-06-15" />
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="EI" >
+        <With Var="DI" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="EO" >
+        <With Var="DO" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="DI" Type="INT" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="DO" Type="INT" />
+    </OutputVars>
+  </InterfaceList>
+	<FBNetwork>
+		<FB Name="inst1" Type="TestType" />
+		<FB Name="inst2" Type="TestType" />
+	<EventConnections>
+		<Connection Source="EI" Destination="inst1.OCCURRED" />
+		<Connection Source="inst1.DONE" Destination="inst2.OCCURRED" />
+		<Connection Source="inst2.DONE" Destination="EO" />
+	</EventConnections>
+	<DataConnections>
+		<Connection Source="DI" Destination="inst1.DI" />
+		<Connection Source="inst1.DO" Destination="inst2.DI" />
+		<Connection Source="inst2.DO" Destination="DO" />
+	</DataConnections>
+  </FBNetwork>
+</FBType>
