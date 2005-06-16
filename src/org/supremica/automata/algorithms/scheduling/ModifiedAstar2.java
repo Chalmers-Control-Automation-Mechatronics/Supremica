@@ -32,7 +32,8 @@ public class ModifiedAstar2 {
     private ArrayList openList;
     
     /** Contains already examined (i.e. "closed") nodes. */
-    private Hashtable<Integer, int[]> closedNodes;
+//     private Hashtable<Integer, int[]> closedNodes;
+    private ClosedNodes closedNodes;
     
     /** Hashtable containing the estimated cost for each robot, having states as keys. **/
     private ArrayList oneProdRelax;
@@ -80,9 +81,10 @@ public class ModifiedAstar2 {
     private void init(boolean manualExpansion) {
 	timer = new ActionTimer();
 	openList = new ArrayList();
-	closedNodes = new Hashtable<Integer, int[]>();
+// 	closedNodes = new Hashtable<Integer, int[]>();
+	closedNodes = new ClosedNodes(theAutomata.size() + AutomataIndexFormHelper.STATE_EXTRA_DATA);
 	expander = new NodeExpander(manualExpansion, theAutomata, this);
-	
+
 	plantAutomata = theAutomata.getPlantAutomata();
 		
 	keyMapping = new int[theAutomata.size()];
@@ -108,80 +110,81 @@ public class ModifiedAstar2 {
 	}
     }
 
-	/**
-	 *      Walks through the tree of possible paths in search for the optimal one.
-	 */
-	public int[] walk() throws Exception
-	{
-		if (theAutomata == null) {
-			throw new Exception("Choose several automata to schedule...");
-		}
-		else {
-			String infoStr = "Processing times:\n";
-
-			timer.start();
-			preprocess1();
-			infoStr += "\t1st preprocessing in " + timer.elapsedTime() + " ms\n";	
-
-			if (plantAutomata.size() > 2) {
-				timer.start();
-//				String prep2Info = preprocess2();
-				preprocess2();
-				infoStr += "\t2nd preprocessing in " + timer.elapsedTime() + " ms\n";
-//				infoStr += prep2Info;
-			}
-
-			timer.start();
-			searchCounter = 0;
-
-			activeAutomataIndex = new int[plantAutomata.size()];
-			for (int i=0; i<activeAutomataIndex.length; i++) {
-				activeAutomataIndex[i] = theAutomata.getAutomatonIndex(plantAutomata.getAutomatonAt(i));
-			}
-			int[] accNode = scheduleFrom(makeInitialNode());
-			
-			infoStr += "\tA*-iterations: " + searchCounter + " in time: " + timer.elapsedTime() + " ms.\n";
-			infoStr += "\t\t"+ printNodeSignature(accNode);
-			logger.info(infoStr);
-
-			return accNode;
-    		}
+    /**
+     *      Walks through the tree of possible paths in search for the optimal one.
+     */
+    public int[] walk() throws Exception
+    {
+	if (theAutomata == null) {
+	    throw new Exception("Choose several automata to schedule...");
 	}
+	else {
+	    String infoStr = "Processing times:\n";
+	    
+	    timer.start();
+	    preprocess1();
+	    infoStr += "\t1st preprocessing in " + timer.elapsedTime() + " ms\n";	
+	    
+	    if (plantAutomata.size() > 2) {
+		timer.start();
+		//				String prep2Info = preprocess2();
+		preprocess2();
+		infoStr += "\t2nd preprocessing in " + timer.elapsedTime() + " ms\n";
+		//				infoStr += prep2Info;
+	    }
+	    
+	    timer.start();
+	    searchCounter = 0;
+	    
+	    activeAutomataIndex = new int[plantAutomata.size()];
+	    for (int i=0; i<activeAutomataIndex.length; i++) {
+		activeAutomataIndex[i] = theAutomata.getAutomatonIndex(plantAutomata.getAutomatonAt(i));
+	    }
+	    int[] accNode = scheduleFrom(makeInitialNode());
+	    
+	    infoStr += "\tA*-iterations: " + searchCounter + " in time: " + timer.elapsedTime() + " ms.\n";
+// 	    infoStr += "\t\t"+ printNodeSignature(accNode);
+	    infoStr += "\t\t" + "g = " + accNode[accNode.length-1];
+	    logger.info(infoStr);
+	    
+	    return accNode;
+	}
+    }
+    
+    public String printArray(int[] node) {
+	String s = "[";
+		
+	for (int i=0; i<node.length-1; i++) {
+	    s += node[i] + " ";
+	}
+	s += node[node.length-1] + "]";
+		
+	return s;
+    }
 	
-	public String printArray(int[] node) {
-		String s = "[";
+    private String printNodeSignature(int[] node) {
+	String s = printNodeName(node) + "; Tv = [";
 		
-		for (int i=0; i<node.length-1; i++) {
-			s += node[i] + " ";
-		}
-		s += node[node.length-1] + "]";
+	int addIndex = node.length - (plantAutomata.size() + 1);
+	for (int i=0; i<plantAutomata.size()-1; i++) 
+	    s += node[i + addIndex] +  " ";
+	s += node[node.length-2] + "]; g = ";
 		
-		return s;
-	}
+	s += node[node.length-1];
+		
+	return s;
+    }
 	
-	private String printNodeSignature(int[] node) {
-		String s = printNodeName(node) + "; Tv = [";
+    private String printNodeName(int[] node) {
+	String s = "[";
 		
-		int addIndex = node.length - (plantAutomata.size() + 1);
-		for (int i=0; i<plantAutomata.size()-1; i++) 
-			s += node[i + addIndex] +  " ";
-		s += node[node.length-2] + "]; g = ";
-		
-		s += node[node.length-1];
-		
-		return s;
+	for (int i=0; i<theAutomata.size()-1; i++) {
+	    s += theAutomata.getAutomatonAt(i).getStateWithIndex(node[i]) + " ";
 	}
-	
-	private String printNodeName(int[] node) {
-		String s = "[";
+	s += theAutomata.getAutomatonAt(theAutomata.size()-1).getStateWithIndex(node[theAutomata.size()-1]) + "]";
 		
-		for (int i=0; i<theAutomata.size()-1; i++) {
-			s += theAutomata.getAutomatonAt(i).getStateWithIndex(node[i]) + " ";
-		}
-		s += theAutomata.getAutomatonAt(theAutomata.size()-1).getStateWithIndex(node[theAutomata.size()-1]) + "]";
-		
-		return s;
-	}
+	return s;
+    }
 
     private int[] scheduleFrom(int[] initNode) {
 	int[] currNode = new int[initNode.length];
@@ -189,8 +192,9 @@ public class ModifiedAstar2 {
 	openList.clear();
 	closedNodes.clear();
 	openList.add(initNode);
-	
+
 	while(!openList.isEmpty()) {
+	   
 	    searchCounter++;
 	    
 	    currNode = (int[]) openList.remove(0);
@@ -200,8 +204,8 @@ public class ModifiedAstar2 {
 		return currNode;
 	    }
 	    
-	    closedNodes.put(getKey(currNode), currNode);
-	    
+	    closedNodes.putNode(getKey(currNode), currNode);
+
 	    useOneProdRelax = false;
 	    if (activeAutomataIndex.length <= 2 || plantAutomata.size() <= 2)
 		useOneProdRelax = true;
@@ -209,24 +213,26 @@ public class ModifiedAstar2 {
 	    Iterator childIter = expander.expandNode(currNode, activeAutomataIndex).iterator();
 	    while (childIter.hasNext()) {
 		int[] nextNode = (int[])childIter.next();
-		
-		if (!isOnAList(nextNode))
+
+ 		if (!isOnAList(nextNode)) 
 		    putOnOpenList(nextNode);
-	    }	
+		   
+	    }
 	}
 		
 	return currNode;
     }
 	
-	/**
-	 * 			Checks if some node is on the openList or closedList. If found, a comparison
-	 * 			between the estimated costs is done to decide which node to keep as optimal.
-	 *
-	 * @param 	node
-	 * @return 	true if node is already on the closedList and has an estimated cost not lower than
-	 * 		   	the guy on the closedList.
-	 */
+    /**
+     * 			Checks if some node is on the openList or closedList. If found, a comparison
+     * 			between the estimated costs is done to decide which node to keep as optimal.
+     *
+     * @param 	node
+     * @return 	true if node is already on the closedList and has an estimated cost not lower than
+     * 		   	the guy on the closedList.
+     */
     private boolean isOnAList(int[] node) {
+
 	Integer currKey = getKey(node);
 	
 	int estimatedCost = calcEstimatedCost(node);
@@ -241,8 +247,8 @@ public class ModifiedAstar2 {
 	    if (currKey.equals(getKey(openNode))) {
 		if (higherCostInAllDirections(node, openNode))
 		    return true;
-		else if (higherCostInAllDirections(openNode, node)) {
-// 		    openList.set(index, node);
+		else if (smallerCostInAllDirections(node, openNode)) {
+		    // 		    openList.set(index, node);
 		    openList.remove(index);
 		    return false;
 		}
@@ -258,27 +264,75 @@ public class ModifiedAstar2 {
 
 	    if (higherCostInAllDirections(node, closedNode))
 		return true;
-	    else if (higherCostInAllDirections(closedNode, node)) {
-		purgeClosedList(closedNode);
-// 		closedNodes.remove(node);
-		return false;
+	    else if (smallerCostInAllDirections(node, closedNode)) {
+// 		closedNodes.replaceNode(closedNode, node);
+// 		purgeClosedList(closedNode);
+// 		closedNodes.remove(closedNode);
+// 		return false;
 	    }
-	    else
-		logger.warn("bananskal");
-	    
+	    else {
+// /		logger.warn("bananskal");
+	    }
+
 	    return false; 
 	}
 	
 	return false;
     }
 
+    /**
+     * Inserts the node into the openList according to the estimatedCost (ascending).
+     * @param 	node
+     */
+    private void putOnOpenList(int[] node) {
+	int estimatedCost = calcEstimatedCost(node);
+	int counter = 0;
+	Iterator iter = openList.iterator();
+	
+	while (iter.hasNext()) {
+	    int[] openNode = (int[])iter.next();
+	    
+	    if (estimatedCost <= calcEstimatedCost(openNode)) {
+		openList.add(counter, node);
+// 		logger.info("added " + printArray(node) + " to the open list");
+		return;
+	    }
+	    
+	    counter++;
+	}
+	
+	openList.add(node);
+    }
+
     private boolean higherCostInAllDirections(int[] currNode, int[] existingNode) {
 	int startIndex = 2*theAutomata.size() + AutomataIndexFormHelper.STATE_EXTRA_DATA;
-	int accCostPosition = currNode.length - 1;
+	int diff = currNode.length - startIndex - 1 ;
+	int movingStartIndex = startIndex;
 
-	for (int i=startIndex; i<accCostPosition; i++) {
-	    if ((currNode[i]+currNode[accCostPosition]) < (existingNode[i]+existingNode[accCostPosition]))
-		return false;
+	while (movingStartIndex < existingNode.length) {
+	    for (int i=0; i<diff; i++) {
+		if ((currNode[i+startIndex] + currNode[diff+startIndex]) < (existingNode[i+movingStartIndex]+existingNode[diff+movingStartIndex]))
+		    return false;
+	    }
+
+	    movingStartIndex += diff + theAutomata.size() + 1;
+	}
+
+	return true;
+    }
+
+    private boolean smallerCostInAllDirections(int[] currNode, int[] existingNode) {
+	int startIndex = 2*theAutomata.size() + AutomataIndexFormHelper.STATE_EXTRA_DATA;
+	int diff = currNode.length - startIndex - 1 ;
+	int movingStartIndex = startIndex;
+
+	while (movingStartIndex < existingNode.length) {
+	    for (int i=0; i<diff; i++) {
+		if ((currNode[i+startIndex] + currNode[diff+startIndex]) > (existingNode[i+movingStartIndex]+existingNode[diff+movingStartIndex]))
+		    return false;
+	    }
+
+	    movingStartIndex += diff + theAutomata.size() + 1;
 	}
 
 	return true;
@@ -288,21 +342,21 @@ public class ModifiedAstar2 {
      * Removes the node purgedNode and all its successors from the closed list. 
      * @param int[] purgedNode - the root of the tree that is to be removed from the closed list. 
      */
-    private void purgeClosedList(int[] purgedNode) {
-	ArrayList<int[]> toPurge = new ArrayList<int[]>();
-	toPurge.add(purgedNode);
+  //   private void purgeClosedList(int[] purgedNode) {
+// 	ArrayList<int[]> toPurge = new ArrayList<int[]>();
+// 	toPurge.add(purgedNode);
 	
-	while (!toPurge.isEmpty()) {
-	    int[] currNode = toPurge.remove(0);
+// 	while (!toPurge.isEmpty()) {
+// 	    int[] currNode = toPurge.remove(0);
 
-	    Integer key = getKey(currNode);
-	    if (closedNodes.containsKey(key)) {
-		closedNodes.remove(key);
+// 	    Integer key = getKey(currNode);
+// 	    if (closedNodes.containsKey(key)) {
+// 		closedNodes.remove(key);
 	    
-		toPurge.addAll(expander.expandNode(currNode, activeAutomataIndex));
-	    }
-	}
-    }
+// 		toPurge.addAll(expander.expandNode(currNode, activeAutomataIndex));
+// 	    }
+// 	}
+//     }
 	
     private int calcEstimatedCost(int[] node) {
 	if (useOneProdRelax)
@@ -393,29 +447,6 @@ public class ModifiedAstar2 {
 	return states;
     }
     
-    /**
-     * Inserts the node into the openList according to the estimatedCost (ascending).
-     * @param 	node
-     */
-    private void putOnOpenList(int[] node) {
-	int estimatedCost = calcEstimatedCost(node);
-	int counter = 0;
-	Iterator iter = openList.iterator();
-	
-	while (iter.hasNext()) {
-	    int[] openNode = (int[])iter.next();
-	    
-	    if (estimatedCost <= calcEstimatedCost(openNode)) {
-		openList.add(counter, node);
-		return;
-	    }
-	    
-	    counter++;
-	}
-	
-	openList.add(node);
-    }
-
     private int[] makeInitialNode() {
 	int[] initialStates = AutomataIndexFormHelper.createState(theAutomata.size());
 	int[] initialCosts = new int[plantAutomata.size() + 1];
@@ -622,7 +653,7 @@ public class ModifiedAstar2 {
 	for (int i=0; i<parentIndex.length; i++)
 	    parentIndex[i] = node[i + addIndex];
 	
-	return (int[]) closedNodes.get(getKey(parentIndex));
+	return (int[]) closedNodes.getNode(getKey(parentIndex));
     }
     
     public Automaton buildScheduleAutomaton(int[] currNode) {
