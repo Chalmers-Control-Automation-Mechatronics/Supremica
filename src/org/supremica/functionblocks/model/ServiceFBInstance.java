@@ -107,7 +107,7 @@ public class ServiceFBInstance extends FBInstance
 		}
 	}
 
-	public void queueEvent(String eventInput)
+	public void receiveEvent(String eventInput)
 	{
 		if(variables.getVariable(eventInput) != null)
 			if(variables.getVariable(eventInput).getType().equals("EventInput"))
@@ -139,7 +139,7 @@ public class ServiceFBInstance extends FBInstance
 		((BooleanVariable) variables.getVariable(currentEvent.getName())).setValue(true);
 		
 		// get input data values
-		getDataVariables(currentEvent);
+		getDataInputs(currentEvent);
 		
 		try
 		{
@@ -167,7 +167,7 @@ public class ServiceFBInstance extends FBInstance
 		if (outputConnection != null)
 		{
 			FBInstance toInstance = outputConnection.getFBInstance();
-			toInstance.queueEvent(outputConnection.getSignalName());
+			toInstance.receiveEvent(outputConnection.getSignalName());
 		}
 		else
 		{

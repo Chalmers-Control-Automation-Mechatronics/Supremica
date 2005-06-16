@@ -114,6 +114,11 @@ public class Resource extends NamedObject
 		fbTypes.put(name,new BasicFBType(name,this));
     }
 
+    public void addCompositeFBType(String name)
+    {
+		fbTypes.put(name,new CompositeFBType(name,this));
+    }
+
     public void addServiceFBType(String name, File serviceScript)
     {
 		fbTypes.put(name,new ServiceFBType(name,this,serviceScript));

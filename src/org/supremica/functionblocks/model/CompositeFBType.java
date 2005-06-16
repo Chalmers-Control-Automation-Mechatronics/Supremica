@@ -52,10 +52,140 @@
  */
 package org.supremica.functionblocks.model;
 
+import java.util.*;
+import java.lang.*;
+
 /**
  * @author cengic
  */
-public class CompositeFBType //extends FBType
+public class CompositeFBType extends FBType
 {
 
+	// map instance names to type names
+	private Map fbInstanceNames = new HashMap();
+
+	// map from event cnt spec to to event cnt spec 
+	private Map eventConnectionSpecs = new HashMap();
+	private Map dataConnectionSpecs = new HashMap();
+
+
+	//====================================================================================
+	private CompositeFBType() {}
+	
+	public CompositeFBType(String n,Resource r)
+	{
+		System.out.println("CompositeFBType(" + n + "," + r.getName()  + ")");
+		this.name = n;
+		resource = r;
+	}
+	//====================================================================================
+
+	public FBInstance createInstance(String name)	
+	{
+		System.out.println("CompositeFBType.createInstace(" + name + ")");
+		CompositeFBInstance newInstance = new CompositeFBInstance(name,resource,this);	
+		
+		// first instantiate all internal instances
+		for (Iterator iter = fbInstanceNames.keySet().iterator(); iter.hasNext();)
+		{
+			String curFBInstName = (String) iter.next();
+			String curFBTypeName = (String) fbInstanceNames.get(curFBInstName);
+			newInstance.addFBInstance(curFBInstName,curFBTypeName);
+		}
+		// then make event connections
+		for (Iterator iter = eventConnectionSpecs.keySet().iterator(); iter.hasNext();)
+		{
+			String curFrom = (String) iter.next();
+			String curTo = (String) eventConnectionSpecs.get(curFrom);
+
+			String curFromInstance = getInstanceName(curFrom);
+			String curFromSignal = getSignalName(curFrom);
+			String curToInstance = getInstanceName(curTo);
+			String curToSignal = getSignalName(curTo);
+
+			if (curFromInstance.equals(""))
+			{
+				// internal event input connection
+				newInstance.addInternalEventInputConnection(curFromSignal, curToInstance, curToSignal);
+			}
+			else if (curToInstance.equals(""))
+			{
+				// internal event output connection
+				newInstance.addInternalEventOutputConnection(curFromInstance, curFromSignal, curToSignal);
+			}
+			else
+			{
+				// internal instance event connection
+				newInstance.addEventConnection(curFromInstance, curFromSignal, curToInstance, curToSignal);
+			}
+
+		}
+		// finally make data connections
+		for (Iterator iter = dataConnectionSpecs.keySet().iterator(); iter.hasNext();)
+		{
+			String curFrom = (String) iter.next();
+			String curTo = (String) dataConnectionSpecs.get(curFrom);
+
+			String curFromInstance = getInstanceName(curFrom);
+			String curFromSignal = getSignalName(curFrom);
+			String curToInstance = getInstanceName(curTo);
+			String curToSignal = getSignalName(curTo);
+
+			if (curFromInstance.equals(""))
+			{
+				// internal data input connection
+				newInstance.addInternalDataInputConnection(curFromSignal, curToInstance, curToSignal);
+			}
+			else if (curToInstance.equals(""))
+			{
+				// internal data output connection
+				newInstance.addInternalDataOutputConnection(curFromInstance, curFromSignal, curToSignal);
+			}
+			else
+			{
+				// internal instance data connection
+				newInstance.addDataConnection(curFromInstance, curFromSignal, curToInstance, curToSignal);
+			}
+
+		}
+
+		instances.put(name,newInstance);
+
+		return newInstance;
+	}
+
+	public void addFBInstance(String instName,String typeName)
+	{
+		fbInstanceNames.put(instName,typeName);
+	}
+	
+	public void addEventConnection(String from, String to)
+	{
+		eventConnectionSpecs.put(from,to);
+	}
+	
+	public void addDataConnection(String from, String to)
+	{
+		dataConnectionSpecs.put(from,to);
+	}
+
+	private String getInstanceName(String cntSpec)
+	{
+		if (cntSpec.indexOf(".") < 0)
+		{
+			return "";
+		}
+		return cntSpec.substring(0,cntSpec.indexOf("."));
+	}
+	
+	private String getSignalName(String cntSpec)
+	{
+		if (cntSpec.indexOf(".") < 0)
+		{
+			return cntSpec;
+		}
+		
+		return cntSpec.substring(cntSpec.indexOf(".")+1,cntSpec.length());
+	}
+	
 }

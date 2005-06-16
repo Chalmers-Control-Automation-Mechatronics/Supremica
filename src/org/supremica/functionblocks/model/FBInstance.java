@@ -62,7 +62,6 @@ public abstract class FBInstance extends NamedObject
 	FBType fbType;
 	// maps event names to event classes representing them
 	Map events;
-	EventQueue eventInputQueue = new EventQueue();
 	Map eventOutputConnections = new HashMap();
 	Map dataInputConnections = new HashMap();
 	// instance's variables
@@ -95,28 +94,19 @@ public abstract class FBInstance extends NamedObject
 		dataInputConnections.put(input, cnt);
     }
 
-	public Connection getEventOutputConnection(String output)
-	{
-		return (Connection) eventOutputConnections.get(output);
-	}
-
-	// This method provides its output data to the calling BasicFBInstance
-    public Variable getDataOutput(String name)
+	// This method provides output data to the calling BasicFBInstance
+    public Variable getDataOutput(String dataOutput)
     {
-		if (!((Variable) variables.getVariable(name)).getType().equals("DataOutput"))
+		if (!((Variable) variables.getVariable(dataOutput)).getType().equals("DataOutput"))
 		{
-			System.out.println("BasicFBInstance: no such DataOutput " + name);
+			System.out.println("FBInstance(" + getName() + "): no such DataOutput " + dataOutput);
 			System.exit(0);
 		}
-		return (Variable) variables.getVariable(name);
+		return (Variable) variables.getVariable(dataOutput);
     }
 
-    public Event getNextEvent()
-    {
-		return  (Event) eventInputQueue.remove();
-    }
 
-    public void getDataVariables(Event event)
+    public void getDataInputs(Event event)
     {
 		// get the data variables associated with this event and put them in variables attribute
 		for (Iterator iter = event.withIterator();iter.hasNext();)
@@ -150,5 +140,20 @@ public abstract class FBInstance extends NamedObject
 		}
     }
 
-    public abstract void queueEvent(String eventInput);
+	public void sendEvent(String outputEventName)
+	{
+		Connection outputConnection = (Connection) eventOutputConnections.get(outputEventName);
+		if (outputConnection != null)
+		{
+			FBInstance toInstance = outputConnection.getFBInstance();
+			toInstance.receiveEvent(outputConnection.getSignalName());
+		}
+		else
+		{
+			System.err.println("FBInstance(" + getName() + ").sendEvent() : Warning: Event output " + outputEventName + " is not connected.");
+		}
+	}
+	
+    public abstract void receiveEvent(String eventInput);
+
 }

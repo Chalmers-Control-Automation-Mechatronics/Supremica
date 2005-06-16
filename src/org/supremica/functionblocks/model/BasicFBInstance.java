@@ -53,6 +53,9 @@ public class BasicFBInstance extends FBInstance
     private Iterator actionsIterator;
     private int actionsLeft;
 
+	private EventQueue eventInputQueue = new EventQueue();
+
+
 	//================================================================
     private BasicFBInstance() {}
 	
@@ -65,7 +68,12 @@ public class BasicFBInstance extends FBInstance
     }
 	//================================================================
 
-	public void queueEvent(String eventInput)
+    public Event getNextEvent()
+    {
+		return  (Event) eventInputQueue.remove();
+    }
+
+	public void receiveEvent(String eventInput)
 	{
 		synchronized(eventInputQueue)
 		{
@@ -77,12 +85,12 @@ public class BasicFBInstance extends FBInstance
 				}
 				else
 				{
-					System.out.println("FBInstance: No event input " + eventInput);
+					System.out.println("BasicFBInstance(" + getName() + "): No event input " + eventInput);
 					System.exit(0);
 				}
 			else
 			{
-				System.out.println("FBInstance: No event input " + eventInput);
+				System.out.println("BasicFBInstance(" + getName() + "): No event input " + eventInput);
 				System.exit(0);
 			}
 		}
@@ -117,7 +125,7 @@ public class BasicFBInstance extends FBInstance
 		((BooleanVariable) variables.getVariable(currentEvent.getName())).setValue(true);
 		
 		// get input data values
-		getDataVariables(currentEvent);
+		getDataInputs(currentEvent);
 		
 		// and execute the ecc
 		ECState newECState = updateECC();
@@ -130,7 +138,7 @@ public class BasicFBInstance extends FBInstance
     public void finishedJob(Job theJob)
     {
 		setVariables(theJob.getVariables());
-		sendOutput();
+		sendEvent();
 		handleState();
     }
 
@@ -188,19 +196,19 @@ public class BasicFBInstance extends FBInstance
 		}
 		else if (currentECAction.getAlgorithm() == null && currentECAction.getOutput() != null)
 		{
-			sendOutput();
+			sendEvent();
 			handleState();
 		}
     }
 
-    private void sendOutput()
+    private void sendEvent()
     {
 		if (currentECAction.getOutput() != null)
 		{
 			Connection outputConnection = (Connection) eventOutputConnections.get(currentECAction.getOutput());
 			if (outputConnection != null)
 			{
-				outputConnection.getFBInstance().queueEvent(outputConnection.getSignalName());
+				outputConnection.getFBInstance().receiveEvent(outputConnection.getSignalName());
 			}
 		}
 		actionsLeft = actionsLeft - 1;

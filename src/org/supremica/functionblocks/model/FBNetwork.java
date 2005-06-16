@@ -70,9 +70,9 @@ public class FBNetwork
 		resource = res;
 	}
 
-	public void addFBInstance(String name,String fbType)
+	public void addFBInstance(String instName,String typeName)
 	{
-		fbInstances.put(name,resource.getFBType(fbType).createInstance(name));
+		fbInstances.put(instName,resource.getFBType(typeName).createInstance(instName));
 	}
 
 	public FBInstance getFBInstance(String name)
@@ -80,18 +80,17 @@ public class FBNetwork
 		return (FBInstance) fbInstances.get(name);
 	}
 
-	public void addEventConnection(String fromInstance,String fromOutput, String toInstance, String toInput)
+	public void addEventConnection(String fromInstance,String fromEvent, String toInstance, String toEvent)
 	{
-		System.out.println("FBNetwork.addEventConnection: From " + fromInstance + "." + fromOutput + " to " + toInstance + "." + toInput);
-		Connection newConn = new Connection(getFBInstance(toInstance), toInput);
-		getFBInstance(fromInstance).addEventOutputConnection(fromOutput, newConn);
+		System.out.println("FBNetwork.addEventConnection: From " + fromInstance + "." + fromEvent + " to " + toInstance + "." + toEvent);
+		Connection newConn = new Connection(getFBInstance(toInstance), toEvent);
+		getFBInstance(fromInstance).addEventOutputConnection(fromEvent, newConn);
 	}
 
-	public void addDataConnection(String fromInstance,String fromOutput, String toInstance, String toInput)
+	public void addDataConnection(String fromInstance,String fromData, String toInstance, String toData)
 	{
-		System.out.println("FBNetwork.addDataConnection: From " + fromInstance + "." + fromOutput + " to " + toInstance + "." + toInput);
-		Connection newConn = new Connection(getFBInstance(fromInstance), fromOutput);
-		getFBInstance(toInstance).addDataInputConnection(toInput, newConn);
+		System.out.println("FBNetwork.addDataConnection: From " + fromInstance + "." + fromData + " to " + toInstance + "." + toData);
+		Connection newConn = new Connection(getFBInstance(fromInstance), fromData);
+		getFBInstance(toInstance).addDataInputConnection(toData, newConn);
 	}
-
 }

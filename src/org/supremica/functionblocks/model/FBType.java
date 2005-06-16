@@ -49,9 +49,9 @@ public abstract class FBType extends NamedObject
 	
 	// resource to which this type belongs
 	Resource resource;
-	// representing the events in the queue
+	// representing the events and their with data
 	Map events = new HashMap();
-	// all instance of this type
+	// all instances of this type
 	Map instances = new HashMap();
 	// variables in an FB type
 	Variables variables = new Variables();

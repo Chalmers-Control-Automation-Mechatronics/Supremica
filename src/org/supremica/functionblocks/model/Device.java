@@ -71,8 +71,6 @@ public class Device
 		loader = new Loader(this);
 		
 		loader.load(systemFile);
-		// kick off
-		//getResource("TestResource").getFBNetwork("FBNetwork").getFBInstance("inst1").queueEvent("OCCURRED");
 	}		
 
     public void addResource(String name)

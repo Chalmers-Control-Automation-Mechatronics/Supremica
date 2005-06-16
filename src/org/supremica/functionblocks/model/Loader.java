@@ -90,14 +90,7 @@ public class Loader
 		{
 			java.lang.System.err.println(e);
 			java.lang.System.exit(1);
-		}
-
-		if (SupremicaProperties.getFBRuntimeLibraryPath().equals(""))
-		{
-			SupremicaProperties.setFBRuntimeLibraryPath(".");
-		}
-		
-		
+		}		
     }
 
     public void load(String fileName)
@@ -149,6 +142,14 @@ public class Loader
 		if (xmlFBTypeData.isSetFBNetwork())
 		{
 			// load composite FB
+
+			resource.addCompositeFBType(xmlFBTypeData.getName());
+			
+			CompositeFBType newCompositeFBType = (CompositeFBType) resource.getFBType(xmlFBTypeData.getName());
+			
+			constructFBInterface(xmlFBTypeData,newCompositeFBType);
+			
+			constructCompositeFBType((org.supremica.functionblocks.xsd.libraryelement.FBNetwork) xmlFBTypeData.getFBNetwork(),newCompositeFBType);
 		}
 		else if (xmlFBTypeData.isSetBasicFB())
 		{
@@ -194,14 +195,7 @@ public class Loader
 				// get and load the FB type
 				if(resource.getFBType(curFB.getType()) == null)
 				{
-					//if (SupremicaProperties.getFBRuntimeLibraryPath().equals(""))
-					//{
-					//	load(curFB.getType() + ".fbt");
-					//}
-					//else
-					//{
 					load(SupremicaProperties.getFBRuntimeLibraryPath() + "/" + curFB.getType() + ".fbt");
-					//}
 				}
 				fbNetwork.addFBInstance(curFB.getName(),curFB.getType());
 			}
@@ -504,6 +498,49 @@ public class Loader
 		}
 		// End Build Algorithms
 
+    }
+
+    private void constructCompositeFBType(org.supremica.functionblocks.xsd.libraryelement.FBNetwork xmlFBNetworkData, CompositeFBType newCompositeFBType)
+    {
+		if (xmlFBNetworkData.isSetFB())
+		{
+			for (Iterator fbIter = xmlFBNetworkData.getFB().iterator(); fbIter.hasNext();)
+			{
+				org.supremica.functionblocks.xsd.libraryelement.FB curFB = (org.supremica.functionblocks.xsd.libraryelement.FB) fbIter.next();
+				// get and load the FB type
+				if(resource.getFBType(curFB.getType()) == null)
+				{
+					load(SupremicaProperties.getFBRuntimeLibraryPath() + "/" + curFB.getType() + ".fbt");
+				}
+				newCompositeFBType.addFBInstance(curFB.getName(),curFB.getType());
+			}
+		}
+		
+
+		if (xmlFBNetworkData.isSetEventConnections())
+		{
+			//java.lang.System.out.println("Event Connections:");
+			for (Iterator eventConnIter = xmlFBNetworkData.getEventConnections().getConnection().iterator(); eventConnIter.hasNext();)
+			{
+				org.supremica.functionblocks.xsd.libraryelement.Connection curConn = (org.supremica.functionblocks.xsd.libraryelement.Connection) eventConnIter.next();
+				String source = curConn.getSource();
+				String dest = curConn.getDestination();
+				newCompositeFBType.addEventConnection(source, dest);
+			}
+		}
+		
+
+		if (xmlFBNetworkData.isSetDataConnections())
+		{
+			//java.lang.System.out.println("Data Connections:");
+			for (Iterator dataConnIter = xmlFBNetworkData.getDataConnections().getConnection().iterator(); dataConnIter.hasNext();)
+			{
+				org.supremica.functionblocks.xsd.libraryelement.Connection curConn = (org.supremica.functionblocks.xsd.libraryelement.Connection) dataConnIter.next();
+				String source = curConn.getSource();
+				String dest = curConn.getDestination();
+				newCompositeFBType.addDataConnection(source, dest);
+			}
+		}
     }
 
 

@@ -116,9 +116,7 @@ public class Scheduler
 		for (Iterator iter = resource.getFBType("E_RESTART").instanceIterator(); iter.hasNext();) 
 		{
 			FBInstance eRestartInstance = (FBInstance) iter.next();
-			Connection outputConnection = eRestartInstance.getEventOutputConnection("COLD");
-			FBInstance toInstance = outputConnection.getFBInstance();
-			toInstance.queueEvent(outputConnection.getSignalName());
+			eRestartInstance.sendEvent("COLD");
 		}
 
 		while (true)
