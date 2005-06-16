@@ -12,8 +12,8 @@ public class ScheduleDialog2
 	extends JDialog
 {
     private static final long serialVersionUID = 1L;
-    private static final String[] optiMethodNames = new String[]{ "Modified A*" };
-    private static final String[] heuristicsNames = new String[]{ "Default" };
+    private static final String[] optiMethodNames = new String[]{"Modified A*", "Modified IDA*"};
+    private static final String[] heuristicsNames = new String[]{"1-product relax"};
     private static Logger logger = LoggerFactory.createLogger(ScheduleDialog2.class);
     private JComboBox optiMethodsBox;
     private JComboBox heuristicsBox;
@@ -90,30 +90,29 @@ public class ScheduleDialog2
      */
     void doit()
     {
-	try
-	    {
-		if (optiMethodsBox.getSelectedItem().equals("Modified A*"))
-		    {
-			//Automaton theAutomaton = ActionMan.getGui().getSelectedAutomata().getFirstAutomaton();
-			ModifiedAstar2 mastar = new ModifiedAstar2(ActionMan.getGui().getSelectedAutomata(), nodeExpander.isSelected());		
-			
-			int[] acceptingNode = mastar.walk();
-			
-			if (acceptingNode == null)
-			    {
-				throw new RuntimeException("no marked state found");
-			    }
-			
-			Automaton schedule = mastar.buildScheduleAutomaton(acceptingNode);
-			
-			ActionMan.getGui().addAutomaton(schedule);	
-		    }
-	    }
-	catch (Exception excp)
-	    {
-		logger.error("ScheduleDialog::doit " + excp);
-		logger.debug(excp.getStackTrace());
-	    }
+	try {
+	    ModifiedAstar2 mastar;
+	    
+	    if (optiMethodsBox.getSelectedItem().equals("Modified A*"))
+		mastar = new ModifiedAstar2(ActionMan.getGui().getSelectedAutomata(), nodeExpander.isSelected(), false);	
+	    else if (optiMethodsBox.getSelectedItem().equals("Modified IDA*"))
+		mastar = new ModifiedAstar2(ActionMan.getGui().getSelectedAutomata(), nodeExpander.isSelected(), true);	
+	    else 
+		throw new Exception("Unknown optimization method");
+
+	    int[] acceptingNode = mastar.walk();
+	    
+	    if (acceptingNode == null)
+		throw new RuntimeException("no marked state found");
+		
+	    Automaton schedule = mastar.buildScheduleAutomaton(acceptingNode);
+		
+	    ActionMan.getGui().addAutomaton(schedule);	
+	}
+	catch (Exception excp) {
+	    logger.error("ScheduleDialog::doit " + excp);
+	    logger.debug(excp.getStackTrace());
+	}
 	
 	done();
     }

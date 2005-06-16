@@ -11,13 +11,28 @@ import org.supremica.automata.algorithms.SynchronizationOptions;
 public class NodeExpander {
     private static Logger logger = LoggerFactory.createLogger(NodeExpander.class);
 
+    /** Decides if the expansion of the nodes should be done using the methods of this class or using Supremicas methods */
     private boolean manualExpansion;
+
+    /** Needed to be able to use Supremicas expansion/synchronization methods */
     private AutomataSynchronizerExecuter onlineSynchronizer;
+
+    /** Contains maps between states and corresponding indices, in order to compress the used memory and speed up operations */
     private AutomataIndexForm indexForm;
+    
+    /** The selected automata to be scheduled */
     private Automata theAutomata, plantAutomata;
+
+    /** The calling class */
     private ModifiedAstar2 master;
+
+    /** Maps every event that is specified to the corresponing specification automaton, in order to speed up the expansion */
     private Hashtable<LabeledEvent, Integer> specEventTable;
+
+    /** Needed for manual expansion */
     private int[][][] outgoingEventsTable;
+
+    /** Needed for manual expansion */
     private int[][][] nextStateTable;
 
     /***********************************************************************
