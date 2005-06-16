@@ -70,7 +70,7 @@ public class FBRuntime
  			File libraryDirectory = systemFile.getParentFile();
 			if (libraryDirectory == null)
 			{
-				SupremicaProperties.setFBRuntimeLibraryPath("");
+				SupremicaProperties.setFBRuntimeLibraryPath(".");
 			}
 			else
 			{
