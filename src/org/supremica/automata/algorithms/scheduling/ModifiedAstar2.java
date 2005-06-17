@@ -59,6 +59,8 @@ public class ModifiedAstar2 {
 
     /** Decides whether 1-prod-relaxation should be used. */
     private boolean useOneProdRelax;
+    
+    private boolean consistentHeuristic = false;
  
     /** Deprecated */
     public ModifiedAstar2(Automaton theAutomaton)
@@ -260,21 +262,25 @@ public class ModifiedAstar2 {
 	}
 	
 	if (closedNodes.containsKey(currKey)) {
-	    int[] closedNode = (int[]) closedNodes.get(currKey);
-
-	    if (higherCostInAllDirections(node, closedNode))
+	    if (consistentHeuristic) 
 		return true;
-	    else if (smallerCostInAllDirections(node, closedNode)) {
-// 		closedNodes.replaceNode(closedNode, node);
-// 		purgeClosedList(closedNode);
-// 		closedNodes.remove(closedNode);
-// 		return false;
-	    }
 	    else {
-// /		logger.warn("bananskal");
-	    }
+		int[] closedNode = (int[]) closedNodes.get(currKey);
 
-	    return false; 
+		if (higherCostInAllDirections(node, closedNode))
+		    return true;
+		else if (smallerCostInAllDirections(node, closedNode)) {
+		    // 		closedNodes.replaceNode(closedNode, node);
+		    // 		purgeClosedList(closedNode);
+		    // 		closedNodes.remove(closedNode);
+		    // 		return false;
+		}
+		else {
+		    // /		logger.warn("bananskal");
+		}
+
+		return false; 
+	    }
 	}
 	
 	return false;
@@ -359,8 +365,20 @@ public class ModifiedAstar2 {
 //     }
 	
     private int calcEstimatedCost(int[] node) {
-	if (useOneProdRelax)
-	    return node[node.length-1] + getOneProdRelaxation(node);
+	if (useOneProdRelax) {
+// 	    return node[node.length-1] + getOneProdRelaxation(node);
+
+	    // The following code inside the if-loop is needed to ensure consistency of the heuristic
+	    int[] parent = getParent(node);
+	    
+	    int fNode = node[node.length-1] + getOneProdRelaxation(node);
+	    int fParent = parent[parent.length-1] + getOneProdRelaxation(parent);
+
+	    if (fParent > fNode)
+		return fParent;
+	    else
+		return fNode;
+	}
 	else
 	    return node[node.length-1] + getTwoProdRelaxation(node);
     }
