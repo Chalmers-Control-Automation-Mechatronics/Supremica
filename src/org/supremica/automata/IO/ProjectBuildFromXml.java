@@ -436,7 +436,16 @@ public class ProjectBuildFromXml
 		}
 
 		//currAutomaton.setAlphabet(currAlphabet);
-		currProject.addAutomaton(currAutomaton);
+		if (currProject.containsAutomaton(currAutomaton.getName()))
+		{
+			// Already there!?!
+			logger.error("Name conflict, multiple automata with name " + 
+						 currAutomaton + ", discarding last one added.");
+		}
+		else
+		{
+			currProject.addAutomaton(currAutomaton);
+		}
 	}
 
 	public final void doEvent(Attributes attributes)

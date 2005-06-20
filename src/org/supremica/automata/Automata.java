@@ -131,6 +131,10 @@ public class Automata
 		}
 	}
 
+	/**
+	 * Adds the automaton aut to this Automata. If there already is an automaton with the
+	 * same name as aut, aut is NOT added.
+	 */
 	public void addAutomaton(Automaton aut)
 	{
 		if (containsAutomaton(aut.getName()))
@@ -140,6 +144,7 @@ public class Automata
 			logger.error("Name conflict, multiple automata with name " + 
 						 aut + ", discarding last one added.");
 			*/
+
 			return;
 		}
 
@@ -151,6 +156,10 @@ public class Automata
 		// logger.debug("Automata.addAutomaton: " + aut.getName());
 	}
 
+	/**
+	 * Adds all automata in 'automata' to this Automata. Automata with the same name as 
+	 * already present automata are NOT added.
+	 */
 	public void addAutomata(Automata automata)
 	{
 		for (Iterator autIt = automata.iterator(); autIt.hasNext(); )

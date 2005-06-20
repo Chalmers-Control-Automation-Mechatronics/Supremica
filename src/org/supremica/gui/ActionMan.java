@@ -2213,7 +2213,6 @@ public class ActionMan
 		}
 		catch (Exception ex)
 		{
-
 			// this exception is caught while opening
 			logger.error("Error while opening " + file.getAbsolutePath() + " .", ex);
 			logger.debug(ex.getStackTrace());
