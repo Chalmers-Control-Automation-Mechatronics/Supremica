@@ -6,14 +6,17 @@
       <FBNetwork>
         <FB Name="restart" Type="E_RESTART" />
         <FB Name="merge" Type="E_MERGE2" />
-        <FB Name="comptest" Type="TestComposite" />
+        <FB Name="comptest1" Type="TestComposite" />
+        <FB Name="comptest2" Type="TestComposite" />
         <EventConnections>
           <Connection Source="restart.COLD" Destination="merge.EI2" />
-          <Connection Source="merge.EO" Destination="comptest.EI" />
-          <Connection Source="comptest.EO" Destination="merge.EI1" />
+          <Connection Source="merge.EO" Destination="comptest1.EI" />
+          <Connection Source="comptest1.EO" Destination="comptest2.EI" />
+          <Connection Source="comptest2.EO" Destination="merge.EI1" />
         </EventConnections>
         <DataConnections>
-          <Connection Source="comptest.DO" Destination="comptest.DI" />
+          <Connection Source="comptest1.DO" Destination="comptest2.DI" />
+          <Connection Source="comptest2.DO" Destination="comptest1.DI" />
         </DataConnections>
       </FBNetwork>
     </Resource>

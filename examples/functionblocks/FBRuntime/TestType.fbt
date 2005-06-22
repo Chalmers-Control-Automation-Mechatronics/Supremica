@@ -28,7 +28,7 @@
         <ECState Name="STATE">
 		    <ECAction Algorithm="TestAlg" Output="DONE"/>
 	    </ECState>    
-		<ECTransition Source="INIT" Destination="STATE" Condition="blah" />
+		<ECTransition Source="INIT" Destination="STATE" Condition="OCCURRED" />
 		<ECTransition Source="STATE" Destination="INIT" Condition="1" />
     </ECC>
     <Algorithm Name="TestAlg">
