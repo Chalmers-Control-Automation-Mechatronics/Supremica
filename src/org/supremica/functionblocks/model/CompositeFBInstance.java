@@ -145,7 +145,7 @@ public class CompositeFBInstance extends FBInstance
     public void addDataInputConnection(String input, Connection cnt)
     {	
 		Connection internalCnt = (Connection) internalDataInputConnections.get(input);
-		internalCnt.getFBInstance().addDataInputConnection(internalCnt.getSignalName(),cnt);		
+		internalCnt.getFBInstance().addDataInputConnection(internalCnt.getSignalName(),cnt);	
     }
 
 	public void receiveEvent(String eventInput)
@@ -157,6 +157,6 @@ public class CompositeFBInstance extends FBInstance
 	public Variable getDataOutput(String dataOutput)
     {
 		Connection internalCnt = (Connection) internalDataOutputConnections.get(dataOutput);
-		return internalCnt.getFBInstance().getDataOutput(internalCnt.getSignalName());				
+		return internalCnt.getFBInstance().getDataOutput(internalCnt.getSignalName());	
     }
 }

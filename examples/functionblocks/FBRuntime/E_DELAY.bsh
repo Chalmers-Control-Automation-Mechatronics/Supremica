@@ -1,11 +1,10 @@
 import org.supremica.functionblocks.model.*;
-//import org.supremica.functionblocks.model.services.DelayThread;
 
 ServiceFBInstance serviceFB = (ServiceFBInstance) serviceFB;
 Map serviceState = (Map) serviceState;
 Event serviceEvent = (Event) serviceEvent;
 Variables serviceVariables = (Variables) serviceVariables;
-//DelayThread delayThread;
+Thread delayThread;
 
 if (serviceInitialize)
 {
@@ -34,4 +33,25 @@ else
 		//System.out.println("E_DELAY.jscript: STOP event received");
 		//serviceState.get("delayThread").stopDelay();
 	}
+}
+
+
+delayThread()
+{
+
+
+	startDelay()
+	{
+	}
+
+	stopDelay()
+	{
+	}
+	
+	run()
+	{
+	}
+
+
+	return this;
 }

@@ -50,7 +50,6 @@
 package org.supremica.functionblocks.library;
 
 import org.supremica.functionblocks.model.FBInstance;
-import org.supremica.functionblocks.model.Connection;
 
 class DelayThread extends Thread
 {
