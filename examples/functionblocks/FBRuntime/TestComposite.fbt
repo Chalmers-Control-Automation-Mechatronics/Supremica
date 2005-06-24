@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="TestComposite" >
-  <VersionInfo Organization="Chalmers" Version="0.1" Author="Author Name" Date="2005-06-15" />
+  <VersionInfo Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2005-06-15" />
   <InterfaceList>
     <EventInputs>
       <Event Name="EI" >
@@ -23,9 +23,9 @@
 		<FB Name="inst1" Type="TestType" />
 		<FB Name="inst2" Type="TestType" />
 	<EventConnections>
-		<Connection Source="EI" Destination="inst1.OCCURRED" />
-		<Connection Source="inst1.DONE" Destination="inst2.OCCURRED" />
-		<Connection Source="inst2.DONE" Destination="EO" />
+		<Connection Source="EI" Destination="inst1.EI" />
+		<Connection Source="inst1.EO" Destination="inst2.EI" />
+		<Connection Source="inst2.EO" Destination="EO" />
 	</EventConnections>
 	<DataConnections>
 		<Connection Source="DI" Destination="inst1.DI" />

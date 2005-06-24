@@ -55,7 +55,6 @@ public class BasicFBInstance extends FBInstance
 
 	private EventQueue eventInputQueue = new EventQueue();
 
-
 	//================================================================
     private BasicFBInstance() {}
 	
@@ -68,7 +67,7 @@ public class BasicFBInstance extends FBInstance
     }
 	//================================================================
 
-    public Event getNextEvent()
+    private Event getNextEvent()
     {
 		return  (Event) eventInputQueue.remove();
     }

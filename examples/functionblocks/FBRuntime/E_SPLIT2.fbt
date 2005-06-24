@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="E_SPLIT2" >
-  <VersionInfo Organization="Chalmers" Version="1.0" Author="Goran Cengic" Date="2005-06-12" />
+  <VersionInfo Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2005-06-12" />
   <InterfaceList>
     <EventInputs>
       <Event Name="EI" />

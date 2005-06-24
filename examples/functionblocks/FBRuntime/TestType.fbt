@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="TestType" >
-  <VersionInfo Organization="Chalmers" Version="0.1" Author="Goran" Date="2005-04-08" />
+  <VersionInfo Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2005-04-08" />
   <InterfaceList>
     <EventInputs>
-      <Event Name="OCCURRED" >
+      <Event Name="EI" >
         <With Var="DI" />
       </Event>
     </EventInputs>
     <EventOutputs>
-      <Event Name="DONE" >
+      <Event Name="EO" >
         <With Var="DO" />
       </Event>
     </EventOutputs>
@@ -26,13 +26,13 @@
     <ECC>
         <ECState Name="INIT" />
         <ECState Name="STATE">
-		    <ECAction Algorithm="TestAlg" Output="DONE"/>
+		    <ECAction Algorithm="TestAlg" Output="EO"/>
 	    </ECState>    
-		<ECTransition Source="INIT" Destination="STATE" Condition="OCCURRED" />
+		<ECTransition Source="INIT" Destination="STATE" Condition="EI" />
 		<ECTransition Source="STATE" Destination="INIT" Condition="1" />
     </ECC>
     <Algorithm Name="TestAlg">
-        <Other Language="Java" Text=
+    <Other Language="Java" Text=
 	"invoked = invoked + 1;
 	DO = DI + 1;
 	System.out.println(&#34;TestAlg:invoked: &#34; + invoked + &#34; times.&#34;);

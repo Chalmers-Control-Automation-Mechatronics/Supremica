@@ -1,21 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<System xmlns="http://www.holobloc.com/xml/LibraryElement" Name="Test System" >
-  <VersionInfo  Author="Goran" Organization="Chalmers" Version="0.1" Date="2005-06-15" />
-  <Device  Name="Test Device" Type="DeviceType_not_used">
-    <Resource Name="TestResource" Type="ResourceType_not_used">
-      <FBNetwork>
-        <FB Name="restart" Type="E_RESTART" />
-        <FB Name="delay" Type="E_DELAY" />
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="E_CYCLE" >
+  <VersionInfo Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2005-06-24" />
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="START" >
+        <With Var="DT" />
+      </Event>
+	  <Event Name="STOP" />
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="EO" />
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="DT" Type="INT" />
+    </InputVars>
+  </InterfaceList>
+  <FBNetwork>
         <FB Name="merge" Type="E_MERGE2" />
+        <FB Name="delay" Type="E_DELAY" />
+        <FB Name="split" Type="E_SPLIT2" />
         <EventConnections>
-          <Connection Source="restart.COLD" Destination="merge.EI1" />
+          <Connection Source="START" Destination="merge.EI1" />
           <Connection Source="merge.EO" Destination="delay.START" />
-          <Connection Source="delay.EO" Destination="merge.EI2" />
+          <Connection Source="delay.EO" Destination="split.EI" />
+          <Connection Source="split.EO1" Destination="merge.EI2" />		  
+          <Connection Source="split.EO2" Destination="EO" />		  
+          <Connection Source="STOP" Destination="delay.STOP" />		  
         </EventConnections>
 		<DataConnections>
-          <Connection Source="1000" Destination="delay.DT" />
+          <Connection Source="DT" Destination="delay.DT" />
         </DataConnections>
       </FBNetwork>
-    </Resource>
-  </Device>
-</System>
+</FBType>

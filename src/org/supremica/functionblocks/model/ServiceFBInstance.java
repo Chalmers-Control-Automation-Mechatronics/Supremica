@@ -107,8 +107,10 @@ public class ServiceFBInstance extends FBInstance
 		}
 	}
 
+
 	public void receiveEvent(String eventInput)
 	{
+
 		if(variables.getVariable(eventInput) != null)
 			if(variables.getVariable(eventInput).getType().equals("EventInput"))
 			{
@@ -160,5 +162,4 @@ public class ServiceFBInstance extends FBInstance
 			System.err.println(e);
 		}
 	}
-	
 }
