@@ -65,7 +65,7 @@ public class ServiceFBType extends FBType
 	public ServiceFBType(String n,Resource r, File s)
 	{
 		System.out.println("ServiceFBType(" + n + "," + r.getName()  + ")");
-		this.name = n;
+		setName(n);
 		resource = r;
 		serviceScript = s;
 	}

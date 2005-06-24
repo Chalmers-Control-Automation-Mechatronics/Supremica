@@ -75,7 +75,7 @@ public class ServiceFBInstance extends FBInstance
 	
 	public ServiceFBInstance(String n, Resource r, ServiceFBType t, File script)
 	{
-		name = n;
+		setName(n);
 		resource = r;
 		fbType = t;
 		serviceScript = script;
@@ -161,17 +161,4 @@ public class ServiceFBInstance extends FBInstance
 		}
 	}
 	
-	public void sendOutput(String eventOutput)
-    {
-		Connection outputConnection = (Connection) eventOutputConnections.get(eventOutput);
-		if (outputConnection != null)
-		{
-			FBInstance toInstance = outputConnection.getFBInstance();
-			toInstance.receiveEvent(outputConnection.getSignalName());
-		}
-		else
-		{
-			System.err.println("ServiceFBInstance.sendOutput(): no such event output: " + eventOutput);
-		}
-    }
 }

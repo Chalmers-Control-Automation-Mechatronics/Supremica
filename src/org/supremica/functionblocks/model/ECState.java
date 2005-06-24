@@ -61,7 +61,7 @@ public class ECState extends NamedObject
     
 	ECState(String name)
 	{
-		this.name = name;
+		setName(name);
 	}
     
 

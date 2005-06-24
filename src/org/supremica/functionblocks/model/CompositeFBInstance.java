@@ -76,7 +76,7 @@ public class CompositeFBInstance extends FBInstance
 	
     public CompositeFBInstance(String n, Resource r, CompositeFBType t)
     {
-		name = n;
+		setName(n);
 		resource = r;
 		fbType = t;
     }

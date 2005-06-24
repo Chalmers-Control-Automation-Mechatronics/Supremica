@@ -80,17 +80,85 @@ public class FBNetwork
 		return (FBInstance) fbInstances.get(name);
 	}
 
-	public void addEventConnection(String fromInstance,String fromEvent, String toInstance, String toEvent)
+	public void addEventConnection(String source, String dest)
 	{
-		System.out.println("FBNetwork.addEventConnection: From " + fromInstance + "." + fromEvent + " to " + toInstance + "." + toEvent);
-		Connection newConn = new Connection(getFBInstance(toInstance), toEvent);
-		getFBInstance(fromInstance).addEventOutputConnection(fromEvent, newConn);
+		
+		String fromInstance = getInstanceName(source);
+		String fromSignal = getSignalName(source);
+		String toInstance = getInstanceName(dest);
+		String toSignal = getSignalName(dest);
+		
+		if (fromInstance.equals(""))
+		{
+			System.err.println("FBNetwork.addEventConnection(): from instance is empty in connection from " + source +" to " + dest);
+		}
+		else if (toInstance.equals(""))
+		{
+			System.err.println("FBNetwork.addEventConnection(): to instance is empty in connection from " + source +" to " + dest);
+		}
+		else if (fromInstance.equals(toInstance))
+		{
+			System.err.println("FBNetwork.addEventConnection(): source instance (" + source +") is equal to destination instance (" + dest + ")");
+			System.err.println("                              : that is not allowed according to standard!");
+			System.exit(0);
+		}
+		else
+		{
+		
+			System.out.println("FBNetwork.addEventConnection: From " + source + " to " + dest);
+			Connection newConn = new Connection(getFBInstance(toInstance), toSignal);
+			getFBInstance(fromInstance).addEventOutputConnection(fromSignal, newConn);
+			
+		}
+
 	}
 
-	public void addDataConnection(String fromInstance,String fromData, String toInstance, String toData)
+	public void addDataConnection(String source, String dest)
 	{
-		System.out.println("FBNetwork.addDataConnection: From " + fromInstance + "." + fromData + " to " + toInstance + "." + toData);
-		Connection newConn = new Connection(getFBInstance(fromInstance), fromData);
-		getFBInstance(toInstance).addDataInputConnection(toData, newConn);
+		
+		String fromInstance = getInstanceName(source);
+		String fromSignal = getSignalName(source);
+		String toInstance = getInstanceName(dest);
+		String toSignal = getSignalName(dest);
+		
+		if (fromInstance.equals(""))
+		{
+			// Constant specification
+			System.out.println("FBNetwork.addDataConnection(): setting data input " + dest +" to " + source);
+			getFBInstance(toInstance).setVariableValue(toSignal, new Integer(fromSignal));
+		}
+		else if (toInstance.equals(""))
+		{
+			System.err.println("FBNetwork.addDataConnection(): to instance is empty in connection from " + source +" to " + dest);
+		}
+		else
+		{
+			System.out.println("FBNetwork.addDataConnection: From " + source + " to " + dest);			
+			Connection newConn = new Connection(getFBInstance(fromInstance), fromSignal);
+			getFBInstance(toInstance).addDataInputConnection(toSignal, newConn);			
+		}
+
 	}
+
+
+	private String getInstanceName(String cntSpec)
+	{
+		if (cntSpec.indexOf(".") < 0)
+		{
+			return "";
+		}
+
+		return cntSpec.substring(0,cntSpec.indexOf("."));
+	}
+	
+	private String getSignalName(String cntSpec)
+	{
+		if (cntSpec.indexOf(".") < 0)
+		{
+			return cntSpec;
+		}
+		
+		return cntSpec.substring(cntSpec.indexOf(".")+1,cntSpec.length());
+	}
+	
 }

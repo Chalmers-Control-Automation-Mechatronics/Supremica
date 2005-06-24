@@ -55,14 +55,14 @@ package org.supremica.functionblocks.model;
 public class NamedObject extends ManagedObject
 {
 
-	String name = "Unnamed";
+	private String name = "Unnamed";
 	
 	void setName(String n)
 	{
 		name = n;
 	}
 
-	String getName()
+	public String getName()
 	{
 		return name;
 	}

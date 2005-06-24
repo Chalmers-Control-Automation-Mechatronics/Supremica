@@ -61,7 +61,7 @@ public class BasicFBInstance extends FBInstance
 	
     public BasicFBInstance(String n, Resource r, BasicFBType t)
     {
-		name = n;
+		setName(n);
 		resource = r;
 		fbType = t;
 		currentECState = ((BasicFBType) fbType).getECC().getInitialState();

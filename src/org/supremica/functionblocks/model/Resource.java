@@ -89,11 +89,6 @@ public class Resource extends NamedObject
 		scheduler.runEvents();
     }
 
-    String getName()
-    {
-		return name;
-    }
-
     Scheduler getScheduler()
     {
 		return scheduler;

@@ -75,7 +75,7 @@ public class CompositeFBType extends FBType
 	public CompositeFBType(String n,Resource r)
 	{
 		System.out.println("CompositeFBType(" + n + "," + r.getName()  + ")");
-		this.name = n;
+		setName(n);
 		resource = r;
 	}
 	//====================================================================================

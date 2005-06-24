@@ -64,7 +64,7 @@ public class JavaTextAlgorithm extends Algorithm
 
 	public JavaTextAlgorithm(String n, String algText)
 	{
-		name = n;
+		setName(n);
 		algorithmText = algText;
 		interpreter = new Interpreter();
 	}

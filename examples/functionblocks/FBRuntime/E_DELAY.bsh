@@ -1,19 +1,27 @@
 import org.supremica.functionblocks.model.*;
+import org.supremica.functionblocks.model.services.DelayThread;
+
 
 ServiceFBInstance serviceFB = (ServiceFBInstance) serviceFB;
 Map serviceState = (Map) serviceState;
 Event serviceEvent = (Event) serviceEvent;
 Variables serviceVariables = (Variables) serviceVariables;
-Thread delayThread;
+
 
 if (serviceInitialize)
 {
-	System.out.println("E_DELAY.jscript: Initialization");
+
+	System.out.println("E_DELAY.bsh(" + serviceFB.getName() + "): Initialization");
 	serviceState = new HashMap();
 
+// 	int invoked = 0;
+// 	serviceState.put("invoked", invoked);
+
 	// create service thread
-	//delayThread = new DelayThread(serviceFB);
-	//serviceState.put("delayThread", delayThread);
+	Thread delayThread = new DelayThread(serviceFB);
+	serviceState.put("delayThread", delayThread);
+	delayThread.start();
+
 }
 else
 {
@@ -22,36 +30,28 @@ else
 
 	if (eventName.equals("START"))
 	{ 
-		//System.out.println("E_DELAY.jscript: START event received");
-		//int delayTime = ((IntegerVariable) serviceVariables.getVariable("DT")).getValue().intValue();
-		//	serviceState.get("delayThread").setDelayTime(delayTime);	
-		//serviceState.get("delayThread").startDelay();
-		serviceFB.sendOutput("EO");
+		System.out.println("E_DELAY.bsh(" + serviceFB.getName() + "): START event received");
+		int delayTime = ((IntegerVariable) serviceVariables.getVariable("DT")).getValue().intValue();
+		serviceState.get("delayThread").setDelayTime(delayTime);	
+		serviceState.get("delayThread").startDelay();
+		
+// 		int invoked = serviceState.get("invoked");
+// 		if (invoked == 5)
+// 		{
+// 			serviceState.get("delayThread").deactivateService();			
+// 		}
+// 		else
+// 		{
+// 			invoked = invoked + 1 ;
+// 			System.out.println("E_DELAY.bsh: invoked = " + invoked );
+// 		}
+// 		serviceState.put("invoked", invoked);
+
 	}
 	else if (eventName.equals("STOP"))
 	{	
-		//System.out.println("E_DELAY.jscript: STOP event received");
-		//serviceState.get("delayThread").stopDelay();
+		System.out.println("E_DELAY.bsh(" + serviceFB.getName() + "): STOP event received");
+		serviceState.get("delayThread").stopDelay();
 	}
 }
 
-
-delayThread()
-{
-
-
-	startDelay()
-	{
-	}
-
-	stopDelay()
-	{
-	}
-	
-	run()
-	{
-	}
-
-
-	return this;
-}

@@ -168,7 +168,7 @@ public class Loader
 		{
 
 			// TODO: Fix path for loading of DELAY
-			resource.addServiceFBType("E_DELAY", new File("E_DELAY.jscript"));
+			resource.addServiceFBType("E_DELAY", new File("E_DELAY.bsh"));
 			
 			ServiceFBType newServiceFBType =  (ServiceFBType) resource.getFBType("E_DELAY");
 			
@@ -208,15 +208,7 @@ public class Loader
 			for (Iterator eventConnIter = xmlFBNetworkData.getEventConnections().getConnection().iterator(); eventConnIter.hasNext();)
 			{
 				org.supremica.functionblocks.xsd.libraryelement.Connection curConn = (org.supremica.functionblocks.xsd.libraryelement.Connection) eventConnIter.next();
-				String source = curConn.getSource();
-				String dest = curConn.getDestination();
-				String sinst = source.substring(0,source.indexOf("."));
-				String sout = source.substring(source.indexOf(".")+1,source.length());
-				String dinst = dest.substring(0,dest.indexOf("."));
-				String din = dest.substring(dest.indexOf(".")+1,dest.length());
-				//java.lang.System.out.println("from:" + sinst + "!" + sout);
-				//java.lang.System.out.println("to:" + dinst + "!" + din);
-				fbNetwork.addEventConnection(sinst, sout, dinst, din);
+				fbNetwork.addEventConnection(curConn.getSource(), curConn.getDestination());
 			}
 		}
 		
@@ -227,15 +219,7 @@ public class Loader
 			for (Iterator dataConnIter = xmlFBNetworkData.getDataConnections().getConnection().iterator(); dataConnIter.hasNext();)
 			{
 				org.supremica.functionblocks.xsd.libraryelement.Connection curConn = (org.supremica.functionblocks.xsd.libraryelement.Connection) dataConnIter.next();
-				String source = curConn.getSource();
-				String dest = curConn.getDestination();
-				String sinst = source.substring(0,source.indexOf("."));
-				String sout = source.substring(source.indexOf(".")+1,source.length());
-				String dinst = dest.substring(0,dest.indexOf("."));
-				String din = dest.substring(dest.indexOf(".")+1,dest.length());
-				//java.lang.System.out.println("from: " + sinst + "!" + sout);
-				//java.lang.System.out.println("to: " + dinst + "!" + din);
-				fbNetwork.addDataConnection(sinst, sout, dinst, din);
+				fbNetwork.addDataConnection(curConn.getSource(), curConn.getDestination());
 			}
 		}
     }

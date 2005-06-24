@@ -79,6 +79,13 @@ public abstract class FBInstance extends NamedObject
 		variables.addVariable(name,var);
     }
 
+	// hack for constant data reading
+	// TODO: after switch to BSH for ECC change this too
+	public void setVariableValue(String name, Object value)
+	{
+		((IntegerVariable) variables.getVariable(name)).setValue(((Integer) value).intValue());
+	}
+
     public void setEvents(Map i)
     {
 		events = i;

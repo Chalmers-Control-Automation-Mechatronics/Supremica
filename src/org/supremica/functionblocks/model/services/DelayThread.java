@@ -47,16 +47,18 @@
  * Supremica is owned and represented by KA.
  */
 
-package org.supremica.functionblocks.library;
+package org.supremica.functionblocks.model.services;
 
 import org.supremica.functionblocks.model.FBInstance;
 
-class DelayThread extends Thread
+public class DelayThread extends Thread
 {
 
 	private int delay;
 	private boolean sendOutput = true;
 	private FBInstance fbInstance;
+	
+	private boolean serviceActive = true;
 
 
 	private DelayThread() {} 
@@ -67,39 +69,61 @@ class DelayThread extends Thread
 		fbInstance = fb;
 	}
 
-	public void setDelayTime(int d)
+	public synchronized void setDelayTime(int d)
 	{
+		//System.out.println("DelayThread: Setting delay time to: " + d + " ms");
 		delay = d;
 	}
 
-	public void startDelay()
+	public synchronized void startDelay()
 	{
+		//System.out.println("DelayThread: startDelay()");		
 		sendOutput = true;
 		notify();
 	}
 
-	public void stopDelay()
+	public synchronized void stopDelay()
 	{
+		//System.out.println("DelayThread: stopDelay()");		
 		sendOutput = false;
 		notify();
 	}
 
-	public void run()
+	public synchronized void deactivateService()
 	{
-		try
+		//System.out.println("DelayThread: deactivateService()");		
+		serviceActive = false;
+		notify();
+		notify();
+	}
+
+	public synchronized void run()
+	{
+		while (serviceActive)
 		{
-			wait();
-			wait(delay);
+
+			try
+			{
+				//System.out.println("DelayThread: Calling wait()");
+				wait();
+				//System.out.println("DelayThread: Calling wait(" + delay + ")");
+				wait(delay);
+			}
+			catch(InterruptedException e)
+			{
+				System.err.println("DelayThread: Interrupted Exception");
+				e.printStackTrace(System.err);
+			}
+
+			// send output only if the delay wasn't stoped
+			if (sendOutput)
+			{
+				//System.out.println("DelayThread: sending EO event");
+				fbInstance.sendEvent("EO");
+			}
 		}
-		catch(InterruptedException e)
-		{
-			System.err.println("DelayThread: Interrupted Exception");
-			e.printStackTrace(System.err);
-		}
-		// send output only if the delay wasn't stopde
-		if (sendOutput)
-		{
-			fbInstance.sendEvent("EO");
-		}
+		
+		//System.out.println("DelayThread: exiting run()");
+
 	}   	
 }

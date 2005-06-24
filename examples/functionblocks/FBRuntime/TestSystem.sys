@@ -5,16 +5,31 @@
     <Resource Name="TestResource" Type="ResourceType_not_used">
       <FBNetwork>
         <FB Name="restart" Type="E_RESTART" />
+        <FB Name="delay3s" Type="E_DELAY" />
+        <FB Name="delay4s" Type="E_DELAY" />
+        <FB Name="delay5s" Type="E_DELAY" />
         <FB Name="merge" Type="E_MERGE2" />
+		<FB Name="split1" Type="E_SPLIT2" />
+		<FB Name="split2" Type="E_SPLIT2" />
         <FB Name="comptest1" Type="TestComposite" />
         <FB Name="comptest2" Type="TestComposite" />
         <EventConnections>
           <Connection Source="restart.COLD" Destination="merge.EI2" />
-          <Connection Source="merge.EO" Destination="comptest1.EI" />
+          <Connection Source="merge.EO" Destination="split1.EI" />
+          <Connection Source="split1.EO1" Destination="split2.EI" />  
+          <Connection Source="split1.EO2" Destination="delay3s.START" />  
+          <Connection Source="split2.EO1" Destination="delay4s.START" />  
+          <Connection Source="split2.EO2" Destination="delay5s.START" />  
+          <Connection Source="delay3s.EO" Destination="delay5s.STOP" />
+          <Connection Source="delay4s.EO" Destination="delay5s.START" />
+          <Connection Source="delay5s.EO" Destination="comptest1.EI" />
           <Connection Source="comptest1.EO" Destination="comptest2.EI" />
           <Connection Source="comptest2.EO" Destination="merge.EI1" />
         </EventConnections>
         <DataConnections>
+          <Connection Source="3000" Destination="delay3s.DT" />
+          <Connection Source="4000" Destination="delay4s.DT" />
+          <Connection Source="5000" Destination="delay5s.DT" />
           <Connection Source="comptest1.DO" Destination="comptest2.DI" />
           <Connection Source="comptest2.DO" Destination="comptest1.DI" />
         </DataConnections>

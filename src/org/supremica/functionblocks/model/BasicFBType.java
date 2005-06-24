@@ -77,7 +77,7 @@ public class BasicFBType extends FBType
 	public BasicFBType(String n,Resource r)
 	{
 		System.out.println("BasicFBType(" + n + "," + r.getName()  + ")");
-		name = n;
+		setName(n);
 		resource = r;
 	}
 	
