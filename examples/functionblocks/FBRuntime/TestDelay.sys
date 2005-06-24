@@ -5,22 +5,22 @@
     <Resource Name="TestResource" Type="ResourceType_not_used">
       <FBNetwork>
         <FB Name="restart" Type="E_RESTART" />
-        <FB Name="merge" Type="E_MERGE2" />
-    	<FB Name="split1" Type="E_SPLIT2" />
-		<FB Name="split2" Type="E_SPLIT2" />
+        <FB Name="merge_restart" Type="E_MERGE2" />
+        <FB Name="merge" Type="E_MERGE3" />
+    	<FB Name="split" Type="E_SPLIT3" />
         <FB Name="delay3s" Type="E_DELAY" />
         <FB Name="delay4s" Type="E_DELAY" />
         <FB Name="delay5s" Type="E_DELAY" />
 	    <EventConnections>
-          <Connection Source="restart.COLD" Destination="merge.EI1" />
-          <Connection Source="merge.EO" Destination="split1.EI" />
-          <Connection Source="split1.EO1" Destination="split2.EI" />  
-          <Connection Source="split1.EO2" Destination="delay3s.START" />  
-          <Connection Source="split2.EO1" Destination="delay4s.START" />  
-          <Connection Source="split2.EO2" Destination="delay5s.START" />  
+          <Connection Source="restart.COLD" Destination="merge_restart.EI1" />
+          <Connection Source="merge_restart.EO" Destination="split.EI" />
+          <Connection Source="split.EO1" Destination="delay3s.START" />  
+          <Connection Source="split.EO2" Destination="delay4s.START" />  
+          <Connection Source="split.EO3" Destination="merge.EI1" />  
           <Connection Source="delay3s.EO" Destination="delay5s.STOP" />
-          <Connection Source="delay4s.EO" Destination="delay5s.START" />
-          <Connection Source="delay5s.EO" Destination="merge.EI2" />
+          <Connection Source="delay4s.EO" Destination="merge.EI3" />
+          <Connection Source="merge.EO" Destination="delay5s.START" />  
+          <Connection Source="delay5s.EO" Destination="merge_restart.EI2" />
         </EventConnections>
 		<DataConnections>
           <Connection Source="3000" Destination="delay3s.DT" />

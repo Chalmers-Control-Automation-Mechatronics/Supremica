@@ -162,4 +162,9 @@ public class ServiceFBInstance extends FBInstance
 			System.err.println(e);
 		}
 	}
+
+	public Object getServiceState()
+	{
+		return serviceState;
+	}
 }

@@ -49,25 +49,29 @@
 
 package org.supremica.functionblocks.model.services;
 
-import org.supremica.functionblocks.model.FBInstance;
+import org.supremica.functionblocks.model.ServiceFBInstance;
+
+import java.util.HashMap;
 
 public class DelayThread extends Thread
 {
 
 	private int delay;
 	private boolean sendOutput = true;
-	private FBInstance fbInstance;
-	
 	private boolean serviceActive = true;
+	private ServiceFBInstance serviceFBInstance;
 
 
+	//========================================================================
 	private DelayThread() {} 
 
-	public DelayThread(FBInstance fb)
+	public DelayThread(ServiceFBInstance fb)
 	{
 		setName("DelayThread");
-		fbInstance = fb;
+		serviceFBInstance = fb;
 	}
+	//========================================================================
+
 
 	public synchronized void setDelayTime(int d)
 	{
@@ -101,7 +105,6 @@ public class DelayThread extends Thread
 	{
 		while (serviceActive)
 		{
-
 			try
 			{
 				//System.out.println("DelayThread: Calling wait()");
@@ -119,11 +122,10 @@ public class DelayThread extends Thread
 			if (sendOutput)
 			{
 				//System.out.println("DelayThread: sending EO event");
-				fbInstance.sendEvent("EO");
+				((HashMap) serviceFBInstance.getServiceState()).put("delaying", new Boolean(false));
+				serviceFBInstance.sendEvent("EO");
 			}
 		}
-		
 		//System.out.println("DelayThread: exiting run()");
-
 	}   	
 }
