@@ -50,4 +50,3 @@ else
 		serviceState.put("delaying", new Boolean(false));		
 	}
 }
-
