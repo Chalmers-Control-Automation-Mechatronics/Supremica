@@ -566,10 +566,8 @@
 	</jar>
 	<delete>
 		<fileset dir="${lib}">
-			<!--patternset id="cleanjaxdbunjaredclassfiles"-->
-				<include name="org/w3/**"/>
-				<include name="org/supremica/functionblocks/xsd/**"/>
-			<!--/patternset-->
+			<include name="org/w3/**"/>
+			<include name="org/supremica/functionblocks/xsd/**"/>
 		</fileset>
 	</delete>
 	<unjar src="${lib}/functionblocks_jaxb.jar" dest="${lib}/${unjared}"/>		

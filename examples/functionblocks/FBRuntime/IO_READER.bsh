@@ -46,12 +46,7 @@
  *
  * Supremica is owned and represented by KA.
  */
-/**
- * @author Goran Cengic
- */
-
 import org.supremica.functionblocks.model.*;
-import org.supremica.functionblocks.model.services.DelayThread;
 
 
 ServiceFBInstance serviceFB = (ServiceFBInstance) serviceFB;
@@ -63,16 +58,13 @@ Variables serviceVariables = (Variables) serviceVariables;
 if (serviceInitialize)
 {
 
-	System.out.println("E_DELAY.bsh(" + serviceFB.getName() + "): Initialization");
+	System.out.println("IO_READER.bsh(" + serviceFB.getName() + "): Initialization");
 	serviceState = new HashMap();
 
-	// flag for discarding incoming events
-	serviceState.put("delaying", new Boolean(false));
-
 	// create service thread
-	Thread delayThread = new DelayThread(serviceFB);
-	serviceState.put("delayThread", delayThread);
-	delayThread.start();
+	reader = readerThread(serviceFB);
+	serviceState.put("readerThread", reader);
+	new Thread(reader).start();
 
 }
 else
@@ -101,4 +93,9 @@ else
 		serviceState.get("delayThread").stopDelay();
 		serviceState.put("delaying", new Boolean(false));		
 	}
+}
+
+readerThread(SerivceFBInstance serviceFB)
+{
+	
 }

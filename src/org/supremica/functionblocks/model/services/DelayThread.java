@@ -46,6 +46,9 @@
  *
  * Supremica is owned and represented by KA.
  */
+/**
+ * @author Cengic
+ */
 
 package org.supremica.functionblocks.model.services;
 
