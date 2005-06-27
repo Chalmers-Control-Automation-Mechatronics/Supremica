@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<System xmlns="http://www.holobloc.com/xml/LibraryElement" Name="Test Reader" >
+  <VersionInfo  Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2005-06-27" />
+  <Device  Name="Test Device" Type="DeviceType_not_used">
+    <Resource Name="TestResource" Type="ResourceType_not_used">
+      <FBNetwork>
+        <FB Name="restart" Type="E_RESTART" />
+        <FB Name="cycle" Type="E_CYCLE" />
+        <FB Name="split" Type="E_SPLIT2" />
+        <FB Name="reader1" Type="IO_READER" />
+        <FB Name="reader2" Type="IO_READER" />
+        <EventConnections>
+          <Connection Source="restart.COLD" Destination="cycle.START" />
+          <Connection Source="cycle.EO" Destination="split.EI" />
+          <Connection Source="split.EO1" Destination="reader1.REQ" />
+          <Connection Source="split.EO2" Destination="reader2.REQ" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="1000" Destination="cycle.DT" />
+          <Connection Source="1" Destination="reader1.INPUT" />
+          <Connection Source="2" Destination="reader2.INPUT" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+  </Device>
+</System>

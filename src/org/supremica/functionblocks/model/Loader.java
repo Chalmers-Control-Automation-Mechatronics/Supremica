@@ -190,6 +190,11 @@ public class Loader
 			
 			constructFBInterface(xmlFBTypeData,newBasicFBType);
 		}
+		else
+		{
+			java.lang.System.err.println("Loader.loadFBType(): The type " + xmlFBTypeData.getName() + " is not yet supported!");
+			java.lang.System.exit(0);			
+		}
     }
 
 

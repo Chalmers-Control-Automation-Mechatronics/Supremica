@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<System xmlns="http://www.holobloc.com/xml/LibraryElement" Name="Test System Delay" >
+<System xmlns="http://www.holobloc.com/xml/LibraryElement" Name="Test Delay" >
   <VersionInfo  Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2005-06-24" />
   <Device  Name="Test Device" Type="DeviceType_not_used">
     <Resource Name="TestResource" Type="ResourceType_not_used">

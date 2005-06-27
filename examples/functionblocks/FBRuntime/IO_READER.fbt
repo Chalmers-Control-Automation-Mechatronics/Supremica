@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="IO_READER" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="IO_READER">
   <VersionInfo Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2005-06-27" />
   <InterfaceList>
-      <Event Name="REQ" >
+    <EventInputs>
+      <Event Name="REQ">
         <With Var="INPUT" />
       </Event>
     </EventInputs>
     <EventOutputs>
-      <Event Name="CNF" >
+      <Event Name="CNF">
         <With Var="VALUE" />
       </Event>
     </EventOutputs>
