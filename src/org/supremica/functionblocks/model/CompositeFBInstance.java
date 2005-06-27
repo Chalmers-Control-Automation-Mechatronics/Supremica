@@ -55,7 +55,7 @@ package org.supremica.functionblocks.model;
 import java.util.*;
 
 /**
- * @author cengic
+ * @author Goran Cengic
  */
 public class CompositeFBInstance extends FBInstance
 {

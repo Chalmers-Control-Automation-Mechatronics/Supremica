@@ -50,7 +50,7 @@
 package org.supremica.functionblocks.model;
 
 /**
- * @author Cengic
+ * @author Goran Cengic
  */
 public class FBManager
 {

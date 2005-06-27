@@ -1,5 +1,5 @@
 /* The scanner definition for the IEC 61131-3 ST language */
-/* Author: cengic */	
+/* Author: Goran Cengic */	
 
 package org.supremica.functionblocks.model.interpreters.st;
 

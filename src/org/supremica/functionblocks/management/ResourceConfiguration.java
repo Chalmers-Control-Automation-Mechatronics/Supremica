@@ -51,7 +51,7 @@ package org.supremica.functionblocks.management;
 
 
 /**
- * @author Cengic
+ * @author Goran Cengic
  */
 public class ResourceConfiguration
 	extends NamedDeclaration

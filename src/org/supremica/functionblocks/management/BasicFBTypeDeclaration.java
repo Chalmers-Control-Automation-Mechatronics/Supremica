@@ -53,7 +53,7 @@ import java.io.*;
 import java.util.*;
 
 /**
- * @author Cengic
+ * @author Goran Cengic
  */
 public class BasicFBTypeDeclaration
 	extends FBTypeDeclaration

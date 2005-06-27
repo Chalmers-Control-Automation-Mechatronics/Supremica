@@ -56,7 +56,7 @@ import java.util.*;
 import java.lang.*;
 
 /**
- * @author cengic
+ * @author Goran Cengic
  */
 public class CompositeFBType extends FBType
 {

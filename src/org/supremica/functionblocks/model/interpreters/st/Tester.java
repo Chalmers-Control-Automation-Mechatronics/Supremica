@@ -59,12 +59,7 @@ import org.supremica.functionblocks.model.ECCondition;
 
 /**
  * Class for testing of the ST interpreter
- *
- *
- * Created: Thu Mar 17 08:56:38 2005
- *
- * @author <a href="mailto:cengic@cenga.s2.chalmers.se">Goran Cengic</a>
- * @version 1.0
+ * @author Goran Cengic
  */
 public class Tester 
 {

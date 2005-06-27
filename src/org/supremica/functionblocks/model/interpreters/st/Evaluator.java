@@ -47,7 +47,7 @@
  * Supremica is owned and represented by KA.
  */
 /*
- * @author cengic
+ * @author Goran Cengic
  */
 package org.supremica.functionblocks.model.interpreters.st;
 import org.supremica.functionblocks.model.interpreters.st.abstractsyntax.*;

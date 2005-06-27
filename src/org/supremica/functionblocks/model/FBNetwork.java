@@ -47,7 +47,7 @@
  * Supremica is owned and represented by KA.
  */
 /**
- * @author cengic
+ * @author Goran Cengic
  */
 /*
  * Created on Dec 16, 2004

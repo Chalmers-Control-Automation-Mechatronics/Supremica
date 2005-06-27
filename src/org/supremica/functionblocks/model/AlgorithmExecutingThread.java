@@ -51,7 +51,7 @@
  * Created on Jan 11, 2005
  */
 /**
- * @author cengic
+ * @author Goran Cengic
  */
 package org.supremica.functionblocks.model;
 

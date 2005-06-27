@@ -50,7 +50,7 @@
 package org.supremica.functionblocks.management;
 
 /**
- * @author Cengic
+ * @author Goran Cengic
  */
 abstract public class Tool 
 {

@@ -52,7 +52,7 @@ package org.supremica.functionblocks.management;
 import java.util.*;
 
 /**
- * @author Cengic
+ * @author Goran Cengic
  */
 public class FBTypeDeclaration
 	extends LibraryElement

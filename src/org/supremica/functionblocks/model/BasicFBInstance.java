@@ -38,7 +38,7 @@
  * Supremica is owned and represented by KA.
  */
 /**
- * @author Cengic
+ * @author Goran Cengic
  */
 package org.supremica.functionblocks.model;
 
