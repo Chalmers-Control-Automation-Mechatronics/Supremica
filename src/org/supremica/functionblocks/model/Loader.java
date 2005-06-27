@@ -95,22 +95,32 @@ public class Loader
 
     public void load(String fileName)
     {
-		try
+		
+		File file = new File(fileName);
+		if (file.exists())
 		{
-			Object unmarshalledXmlObject = unmarshaller.unmarshal(new File(fileName));
-			if (unmarshalledXmlObject instanceof org.supremica.functionblocks.xsd.libraryelement.FBType)
+			try
 			{
-				loadFBType((org.supremica.functionblocks.xsd.libraryelement.FBType) unmarshalledXmlObject);
+				Object unmarshalledXmlObject = unmarshaller.unmarshal(file);
+				if (unmarshalledXmlObject instanceof org.supremica.functionblocks.xsd.libraryelement.FBType)
+				{
+					loadFBType((org.supremica.functionblocks.xsd.libraryelement.FBType) unmarshalledXmlObject);
+				}
+				else if (unmarshalledXmlObject instanceof org.supremica.functionblocks.xsd.libraryelement.System)
+				{
+					loadSystem((org.supremica.functionblocks.xsd.libraryelement.System) unmarshalledXmlObject);
+				}
 			}
-			else if (unmarshalledXmlObject instanceof org.supremica.functionblocks.xsd.libraryelement.System)
+			catch (Exception e)
 			{
-				loadSystem((org.supremica.functionblocks.xsd.libraryelement.System) unmarshalledXmlObject);
+				e.printStackTrace(java.lang.System.err);
+				java.lang.System.exit(1);
 			}
 		}
-		catch (Exception e)
+		else
 		{
-			e.printStackTrace(java.lang.System.err);
-			java.lang.System.exit(1);
+			java.lang.System.err.println("Loader.load(" + fileName + "): The file does not exist!");
+			java.lang.System.exit(0);
 		}
     }
 
@@ -166,9 +176,7 @@ public class Loader
 		// load service FBs
 		else if (xmlFBTypeData.getName().equals("E_DELAY"))
 		{
-
-			// TODO: Fix path for loading of DELAY
-			resource.addServiceFBType("E_DELAY", new File("E_DELAY.bsh"));
+			resource.addServiceFBType("E_DELAY", new File(SupremicaProperties.getFBRuntimeLibraryPath() + "/E_DELAY.bsh"));
 			
 			ServiceFBType newServiceFBType =  (ServiceFBType) resource.getFBType("E_DELAY");
 			

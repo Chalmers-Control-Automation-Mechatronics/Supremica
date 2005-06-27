@@ -46,12 +46,12 @@
 <property name="logs" location="logs"/>
 
 <!--
-*	If you for some reason prefer javac instead of jikes,
+*	If you prefer javac instead of jikes,
 *	just change "jikes" to "modern" on the next line.
 <property name="build.compiler" value="modern"/>
 -->
 
-<!-- Enables emacs warning and error mesages. This is equals to calling jikes +E -->
+<!-- Enables emacs warning and error mesages. This is equal to calling jikes +E -->
 <!-- Put this in TextPad to get clickable error messages
 	Expression = ^[ \t]+\[javac\] \([A-Z]:[^:]+\):\([0-9]+\):\([0-9]+\):\([0-9]+\):
 	File Register = 1
@@ -60,60 +60,23 @@
 -->
 <property name="build.compiler.emacs" value="true"/>
 <!--
-<property name="build.compiler.emacs" value="true"/>
 <property name="build.compiler.pedantic" value="false"/>
 -->
 
 <!-- 
-*	Run this script after checking out the sources for the
+*	Build this target after checking out the sources for the
 *	first time. 
-*	You should also run everytime one of jar files below
+*	You should also run it every time one of the jar files below
 *	has been updated.
-*
 -->
+<target name="initialize" depends="clean,initialize_jars,version,build,jar_supremica_lib"/>
 
+<!--
 <target name="eclipse_initialize">
+	<delete dir="${eclipselib}"/>
  	<mkdir dir="${eclipselib}"/>
-	<delete includeEmptyDirs="true" >
-		<fileset dir="${eclipselib}" />
-	</delete>
 </target>
-
-<target name="initialize_dirs">
- 	<mkdir dir="${build}"/>
-	<delete includeEmptyDirs="true" >
-		<fileset dir="${build}" />
-	</delete>
- 	<mkdir dir="${build}"/>
-
- 	<mkdir dir="${testsbuild}"/>
-	<delete includeEmptyDirs="true" >
-		<fileset dir="${testsbuild}" />
-	</delete>
- 	<mkdir dir="${testsbuild}"/>
-
- 	<mkdir dir="${dist}"/>
-	<delete includeEmptyDirs="true" >
-		<fileset dir="${dist}" />
-	</delete>
- 	<mkdir dir="${dist}"/>
-
-	<mkdir dir="${lib}/${unjared}"/>
-	<delete includeEmptyDirs="true" >
-		<fileset dir="${lib}/${unjared}" />
-	</delete>
-
-	<mkdir dir="${resources}"/>
-	<delete includeEmptyDirs="true" >
-		<fileset dir="${resources}" />
-	</delete>
-
-	<mkdir dir="${lib}/${unjared}/META-INF"/>
-	<delete includeEmptyDirs="true">
-		<fileset dir="${lib}/${unjared}/META-INF"/>
-	</delete>
-
-</target>
+-->
 
 <target name="initialize_jars">	
  	<unjar src="${lib}/rpcdocdbClient.jar" dest="${lib}/${unjared}"/>	
@@ -174,54 +137,41 @@
 	-->	
 </target>
 
-<target name="initialize" depends="clean,initialize_dirs,initialize_jars,version,build,jar_supremica_lib">
-</target>
 
 <target name="init">
 	<tstamp/>
 </target>
 
 <target name="clean_build">
-	<mkdir dir="${build}"/>
-	<delete dir="${build}" includeEmptyDirs="true"/>
+	<delete dir="${build}"/>
 	<mkdir dir="${build}"/>
 
-	<mkdir dir="${testsbuild}"/>
-	<delete dir="${testsbuild}" includeEmptyDirs="true"/>
+	<delete dir="${testsbuild}"/>
 	<mkdir dir="${testsbuild}"/>
 </target>
 
 
 <target name="clean" depends="clean_build">
+	<delete dir="${dist}"/>
 	<mkdir dir="${dist}"/>	
-	<delete>
-		<fileset dir="${dist}">
-			<patternset id="cleandistfiles">
-				<include name="**"/>
-			</patternset>
-		</fileset>
-	</delete>		
 
+	<delete dir="${src}/net/sourceforge/waters/xsd"/>
 	<mkdir dir="${src}/net/sourceforge/waters/xsd"/>
-	<delete>
-		<fileset dir="${src}/net/sourceforge/waters/xsd">
-			<patternset id="cleanjaxbfiles">
-				<include name="**"/>
-			</patternset>
-		</fileset>
-	</delete>	
 
+	<delete dir="${src}/org/w3"/>
 	<mkdir dir="${src}/org/w3"/>
-	<delete>
-		<fileset dir="${src}/org/w3">
-			<patternset id="cleanjaxbw3files">
-				<include name="**"/>
-			</patternset>
-		</fileset>
-	</delete>	
 
-	<mkdir dir="${doc}/api"/>	
 	<delete dir="${doc}/api"/>
+	<mkdir dir="${doc}/api"/>	
+
+	<delete dir="${lib}/${unjared}"/>
+	<mkdir dir="${lib}/${unjared}"/>
+
+	<delete dir="${resources}"/>
+	<mkdir dir="${resources}"/>
+
+	<delete dir="${lib}/${unjared}/META-INF"/>
+	<mkdir dir="${lib}/${unjared}/META-INF"/>
 </target>
 
 <target name="build_jni">
@@ -498,10 +448,10 @@
 <target name="jar_supremica">
 	<jar jarfile="${dist}/Supremica.jar" manifest="${templates}/SUPREMICA_MANIFEST.MF"> 
 		<fileset dir="${build}">
-			<patternset>
+			<!--patternset-->
 				<include name="**/*"/>
 				<exclude name="org/supremica/apps/SupremicaTeacher.class"/>
-			</patternset>			
+			<!--/patternset-->			
 		</fileset>
 		<fileset dir="${images}"/>
 		<fileset dir="${examples}"/>
@@ -539,14 +489,14 @@
 <target name="jar_supremica_student">
 	<jar jarfile="${dist}/Supremica.jar" manifest="${templates}/SUPREMICA_MANIFEST.MF"> 
 		<fileset dir="${build}">
-			<patternset>
+			<!--patternset-->
 				<include name="**/*"/>
 				<exclude name="org/supremica/apps/Supremica.class"/>
 				<exclude name="org/supremica/apps/SupremicaApplet.class"/>
 				<exclude name="org/supremica/apps/SupremicaTeacher.class"/>
 				<exclude name="org/supremica/apps/SupremicaClient.class"/>
 				<exclude name="org/supremica/apps/SupremicaServer.class"/>
-			</patternset>			
+			<!--/patternset-->			
 		</fileset>
 		<fileset dir="${images}"/>
 		<fileset dir="${examples}"/>
@@ -594,10 +544,10 @@
 	</jar>
 	<delete>
 		<fileset dir="${lib}">
-			<patternset id="cleanjaxdbunjaredclassfiles">
+			<!--patternset id="cleanjaxdbunjaredclassfiles"-->
 				<include name="org/w3/**"/>
 				<include name="net/sourceforge/waters/xsd/**"/>
-			</patternset>
+			<!--/patternset-->
 		</fileset>
 	</delete>
 	<unjar src="${lib}/waters_jaxb.jar" dest="${lib}/${unjared}"/>		
@@ -616,10 +566,10 @@
 	</jar>
 	<delete>
 		<fileset dir="${lib}">
-			<patternset id="cleanjaxdbunjaredclassfiles">
+			<!--patternset id="cleanjaxdbunjaredclassfiles"-->
 				<include name="org/w3/**"/>
 				<include name="org/supremica/functionblocks/xsd/**"/>
-			</patternset>
+			<!--/patternset-->
 		</fileset>
 	</delete>
 	<unjar src="${lib}/functionblocks_jaxb.jar" dest="${lib}/${unjared}"/>		
@@ -712,11 +662,9 @@
 </target>
 -->
 
-<target name="doc" depends="doc_supremica">
-</target>
+<target name="doc" depends="doc_supremica"/>
 
-<target name="run_tests" depends="run_tests_supremica">
-</target>
+<target name="run_tests" depends="run_tests_supremica"/>
 
 <target name="run_tests_supremica" depends="compile_supremica,compile_tests_supremica">
 	<java fork="yes" classname="junit.textui.TestRunner"

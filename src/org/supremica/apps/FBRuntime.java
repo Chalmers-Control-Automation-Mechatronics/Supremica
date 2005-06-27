@@ -66,7 +66,9 @@ public class FBRuntime
 		if (args.length == 1)
  		{
 			systemFileName = args[0];	
- 			File systemFile = new File(systemFileName);
+ 
+			// set library directory property
+			File systemFile = new File(systemFileName);
  			File libraryDirectory = systemFile.getParentFile();
 			if (libraryDirectory == null)
 			{

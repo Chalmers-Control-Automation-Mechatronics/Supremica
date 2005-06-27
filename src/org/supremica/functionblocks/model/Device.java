@@ -67,7 +67,7 @@ public class Device
 
     public Device(String name, String systemFile)
     {
-		System.out.println("Device(" + name + ")");
+		System.out.println("Device(" + name + "): Loading device with " + systemFile + " file.");
 		loader = new Loader(this);
 		
 		loader.load(systemFile);
