@@ -57,45 +57,42 @@ Variables serviceVariables = (Variables) serviceVariables;
 
 if (serviceInitialize)
 {
-
 	System.out.println("IO_READER.bsh(" + serviceFB.getName() + "): Initialization");
 	serviceState = new HashMap();
 
 	// create service thread
 	reader = readerThread(serviceFB);
-	serviceState.put("readerThread", reader);
+	serviceState.put("reader", reader);
 	new Thread(reader).start();
-
 }
 else
 {
 
 	String eventName  = ((Event) serviceEvent).getName();
 
-	if (eventName.equals("START"))
-	{ 
-		if (((Boolean) serviceState.get("delaying")).booleanValue())
-		{
-			System.out.println("E_DELAY.bsh(" + serviceFB.getName() + "): Discarding START event");
-			return;
-		}
-		
-		System.out.println("E_DELAY.bsh(" + serviceFB.getName() + "): START event received");
-		int delayTime = ((IntegerVariable) serviceVariables.getVariable("DT")).getValue().intValue();
-		serviceState.get("delayThread").setDelayTime(delayTime);	
-		serviceState.get("delayThread").startDelay();
-		serviceState.put("delaying", new Boolean(true));
-		
-	}
-	else if (eventName.equals("STOP"))
-	{	
-		System.out.println("E_DELAY.bsh(" + serviceFB.getName() + "): STOP event received");
-		serviceState.get("delayThread").stopDelay();
-		serviceState.put("delaying", new Boolean(false));		
+	if (eventName.equals("REQ"))
+	{ 	
+		int inputSignal = ((IntegerVariable) serviceVariables.getVariable("INPUT")).getValue();
+		System.out.println("IO_READER.bsh(" + serviceFB.getName() + "): REQ event received with INPUT " + inputSignal);		
+		serviceState.get("reader").readInput(inputSignal);
 	}
 }
 
 readerThread(SerivceFBInstance serviceFB)
 {
-	
+
+	public synchronized void readInput(int input)
+	{
+		notify();
+	}
+
+	public synchronized void run()
+	{
+		wait();
+		((BooleanVariable) serviceVariables.getVariable("VALUE")).setValue(true);		
+		System.out.println("IO_READER.bsh(" + serviceFB.getName() + "): Sending CNF event");		
+		serviceFBInstance.sendEvent("CNF");	
+	}
+
+	return this;
 }

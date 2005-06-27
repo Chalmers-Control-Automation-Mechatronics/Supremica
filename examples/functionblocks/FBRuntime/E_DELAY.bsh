@@ -70,7 +70,7 @@ if (serviceInitialize)
 	serviceState.put("delaying", new Boolean(false));
 
 	// create service thread
-	Thread delayThread = new DelayThread(serviceFB);
+	DelayThread delayThread = new DelayThread(serviceFB);
 	serviceState.put("delayThread", delayThread);
 	delayThread.start();
 
