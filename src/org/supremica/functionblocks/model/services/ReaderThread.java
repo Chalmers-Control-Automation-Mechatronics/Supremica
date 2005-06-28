@@ -98,7 +98,7 @@ public class ReaderThread extends Thread
 				e.printStackTrace(System.err);
 			}
 			
-// 			serviceFB.setVariableValue("VALUE", new Boolean(true));
+			serviceFB.setVariableValue("VALUE", new Boolean(true));
 			
 			System.out.println("IO_READER.bsh(" + serviceFB.getName() + "): Sending CNF event");		
 			serviceFB.sendEvent("CNF");				
