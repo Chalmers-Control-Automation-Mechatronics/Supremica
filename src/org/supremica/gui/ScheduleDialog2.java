@@ -4,6 +4,8 @@ package org.supremica.gui;
 
 import javax.swing.*;
 import java.awt.GridLayout;
+import java.awt.BorderLayout;
+
 import org.supremica.log.*;
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.scheduling.*;
@@ -12,12 +14,14 @@ public class ScheduleDialog2
 	extends JDialog
 {
     private static final long serialVersionUID = 1L;
-    private static final String[] optiMethodNames = new String[]{"Modified A*", "Modified IDA*"};
+    private static final String[] optiMethodNames = new String[]{"Modified A*", "Modified IDA*", "Modified SMA*"};
     private static final String[] heuristicsNames = new String[]{"1-product relax"};
     private static Logger logger = LoggerFactory.createLogger(ScheduleDialog2.class);
     private JComboBox optiMethodsBox;
     private JComboBox heuristicsBox;
     private JCheckBox nodeExpander;
+    private int memoryCapacity;
+    private JTextField memoryCapacityField;
 
     public ScheduleDialog2()
     {
@@ -56,12 +60,14 @@ public class ScheduleDialog2
 	heuristicsBox = new JComboBox(heuristicsNames);
 	
 	nodeExpander = new JCheckBox("use AK's node expander", true);
+
+	memoryCapacityField = new JTextField("300", 10);
 	
 	/******** Base containers of the dialog ***********/
 	JPanel buttonPanel = new JPanel();
 	buttonPanel.add(okButton);
 	buttonPanel.add(cancelButton);
-	
+
 	JPanel optiPanel = new JPanel();
 	optiPanel.add(optiMethodsLabel);
 	optiPanel.add(optiMethodsBox);
@@ -70,18 +76,41 @@ public class ScheduleDialog2
 	heuristicsPanel.add(heuristicsLabel);
 	heuristicsPanel.add(heuristicsBox);
 	
-	JPanel expanderPanel = new JPanel();
-	expanderPanel.add(nodeExpander);
+	JPanel smaPanel = new JPanel();
+	smaPanel.add(new JLabel("Nr of nodes in memory (SMA*)"));
+	smaPanel.add(memoryCapacityField);
+
+// 	JPanel expanderPanel = new JPanel();
+// 	expanderPanel.add(nodeExpander);
+
+	/********* Composite containers *******************/
 	
-	/******** Layout of the dialog ***********/
-	getContentPane().setLayout(new GridLayout(4, 1));
-	getContentPane().add(optiPanel);
-	getContentPane().add(heuristicsPanel);
-	getContentPane().add(expanderPanel);
-	getContentPane().add(buttonPanel);
+	JPanel algorithmPanel = new JPanel();
+	algorithmPanel.setLayout(new GridLayout(2,1));
+	algorithmPanel.add(optiPanel);
+	algorithmPanel.add(heuristicsPanel);
+
+	JPanel specPanel = new JPanel();
+	specPanel.setLayout(new GridLayout(2,1));
+	specPanel.add(nodeExpander);
+	specPanel.add(smaPanel);
+
+	JTabbedPane tabbedPane = new JTabbedPane();
+	tabbedPane.addTab("Algorithms", algorithmPanel);
+	tabbedPane.addTab("Specifications", specPanel);
 	
+// 	/******** Layout of the dialog ***********/
+// 	getContentPane().setLayout(new GridLayout(4, 1));
+// 	getContentPane().add(optiPanel);
+// 	getContentPane().add(heuristicsPanel);
+// 	getContentPane().add(expanderPanel);
+// 	getContentPane().add(buttonPanel);
+	
+	getContentPane().add("Center", tabbedPane);
+	getContentPane().add("South", buttonPanel);
+
 	Utility.setDefaultButton(this, okButton);
-	Utility.setupDialog(this, 300, 150);
+	Utility.setupDialog(this, 300, 250);
     }
 
     /**
@@ -91,21 +120,21 @@ public class ScheduleDialog2
     void doit()
     {
 	try {
+	    readMemoryCapacity();
+
 	    ModifiedAstar2 mastar;
 	    
 	    if (optiMethodsBox.getSelectedItem().equals("Modified A*"))
-		mastar = new ModifiedAstar2(ActionMan.getGui().getSelectedAutomata(), nodeExpander.isSelected(), false);	
+		mastar = new ModifiedAstar2(ActionMan.getGui().getSelectedAutomata(), nodeExpander.isSelected(), false);
 	    else if (optiMethodsBox.getSelectedItem().equals("Modified IDA*"))
 		mastar = new ModifiedAstar2(ActionMan.getGui().getSelectedAutomata(), nodeExpander.isSelected(), true);	
+	    else if (optiMethodsBox.getSelectedItem().equals("Modified SMA*"))
+		throw new Exception("SMA* not implemented yet...");
 	    else 
 		throw new Exception("Unknown optimization method");
 
-	    int[] acceptingNode = mastar.walk();
-	    
-	    if (acceptingNode == null)
-		throw new RuntimeException("no marked state found");
-		
-	    Automaton schedule = mastar.buildScheduleAutomaton(acceptingNode);
+// 	    int[] acceptingNode = mastar.walk();
+	    Automaton schedule = mastar.walk();       
 		
 	    ActionMan.getGui().addAutomaton(schedule);	
 	}
@@ -125,5 +154,9 @@ public class ScheduleDialog2
 	setVisible(false);
 	dispose();
 	getParent().repaint();
+    }
+
+    void readMemoryCapacity() {
+	memoryCapacity = (int) (new Integer(memoryCapacityField.getText()));
     }
 }

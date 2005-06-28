@@ -115,7 +115,7 @@ public class ModifiedAstar2 {
     /**
      *      Walks through the tree of possible paths in search for the optimal one.
      */
-    public int[] walk() throws Exception
+    public Automaton walk() throws Exception
     {
 	if (theAutomata == null) {
 	    throw new Exception("Choose several automata to schedule...");
@@ -143,13 +143,19 @@ public class ModifiedAstar2 {
 		activeAutomataIndex[i] = theAutomata.getAutomatonIndex(plantAutomata.getAutomatonAt(i));
 	    }
 	    int[] accNode = scheduleFrom(makeInitialNode());
+
+	    if (accNode == null)
+		throw new RuntimeException("no marked state found");
+	    Automaton schedule = buildScheduleAutomaton(accNode);
+
+//  	    closedNodes.clear();
 	    
 	    infoStr += "\tA*-iterations: " + searchCounter + " in time: " + timer.elapsedTime() + " ms.\n";
 // 	    infoStr += "\t\t"+ printNodeSignature(accNode);
 	    infoStr += "\t\t" + "g = " + accNode[accNode.length-1];
 	    logger.info(infoStr);
 	    
-	    return accNode;
+	    return schedule;
 	}
     }
     
