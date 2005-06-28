@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.24 2005-06-15 09:19:14 flordal Exp $
+//# $Id: EditorSurface.java,v 1.25 2005-06-28 01:10:22 siw4 Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -332,9 +332,7 @@ public class EditorSurface
 
 	public void delNode(EditorNode n)
 	{
-		//System.err.println("---------------");
-		for (int i = 0; i < edges.size(); i++)
-		{
+		for (int i = edges.size()-1; i >= 0; i--) {
 			EditorEdge e = (EditorEdge) edges.get(i);
 
 			/*
@@ -355,7 +353,7 @@ public class EditorSurface
 			}
 		}
 
-		for (int i = 0; i < labels.size(); i++)
+		for (int i = labels.size()-1; i >= 0; i--)
 		{
 			EditorLabel e = (EditorLabel) labels.get(i);
 
@@ -587,7 +585,7 @@ public class EditorSurface
 
 	public void delNodeGroup(EditorNodeGroup n)
 	{
-		for (int i = 0; i < edges.size(); i++)
+		for (int i = edges.size()-1; i >= 0; i--)
 		{
 			EditorEdge e = (EditorEdge) edges.get(i);
 
