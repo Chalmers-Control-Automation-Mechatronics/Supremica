@@ -163,6 +163,40 @@ public class ServiceFBInstance extends FBInstance
 		}
 	}
 
+	// hack for constant data reading
+	// TODO: after switch to BSH for ECC change this too
+	public void setVariableValue(String name, Object value)
+	{
+		Variable var = variables.getVariable(name);
+
+		if ( var == null)
+		{
+			System.err.println("ServiceFBInstance.setVariableValue(): No such variable " + name);
+			System.exit(1);
+		}
+		
+		if(var instanceof StringVariable)
+		{
+			((StringVariable) variables.getVariable(name)).setValue(((String) value));
+		}
+		else if(var instanceof IntegerVariable)
+		{
+			((IntegerVariable) variables.getVariable(name)).setValue(((Integer) value).intValue());
+		}
+		else if(var instanceof DoubleVariable)
+		{
+			((DoubleVariable) variables.getVariable(name)).setValue(((Double) value).doubleValue());
+		}
+		else if(var instanceof FloatVariable)
+		{
+			((FloatVariable) variables.getVariable(name)).setValue(((Float) value).floatValue());
+		}
+		else if(var instanceof BooleanVariable)
+		{
+			((BooleanVariable) variables.getVariable(name)).setValue(((Boolean) value).booleanValue());
+		}
+	}
+	
 	public Object getServiceState()
 	{
 		return serviceState;

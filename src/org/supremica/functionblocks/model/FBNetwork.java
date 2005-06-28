@@ -77,6 +77,11 @@ public class FBNetwork
 
 	public FBInstance getFBInstance(String name)
 	{
+		if (fbInstances.get(name) == null)
+		{
+			System.err.println("FBNetwork.getFBInstance(" + name+ "): No such FB instance " + name);
+			System.exit(1);
+		}
 		return (FBInstance) fbInstances.get(name);
 	}
 

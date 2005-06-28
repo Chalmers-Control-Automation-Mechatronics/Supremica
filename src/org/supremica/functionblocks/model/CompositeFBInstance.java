@@ -159,4 +159,20 @@ public class CompositeFBInstance extends FBInstance
 		Connection internalCnt = (Connection) internalDataOutputConnections.get(dataOutput);
 		return internalCnt.getFBInstance().getDataOutput(internalCnt.getSignalName());	
     }
+	
+	// hack for constant data reading
+	// TODO: after switch to BSH for ECC change this too
+	public void setVariableValue(String name, Object value)
+	{
+
+		if (variables.getVariable(name) == null)
+		{
+			System.err.println("CompositeFBInstance.setVariableValue(): No such variable " + name);
+			System.exit(1);
+		}
+
+		Connection internalCnt = (Connection) internalDataInputConnections.get(name);		
+		internalCnt.getFBInstance().setVariableValue(internalCnt.getSignalName(),value);
+	}
+
 }

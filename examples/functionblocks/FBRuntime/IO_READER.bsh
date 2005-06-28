@@ -48,12 +48,12 @@
  */
 import org.supremica.functionblocks.model.*;
 
+import org.supremica.functionblocks.model.services.ReaderThread;
 
 ServiceFBInstance serviceFB = (ServiceFBInstance) serviceFB;
 Map serviceState = (Map) serviceState;
 Event serviceEvent = (Event) serviceEvent;
 Variables serviceVariables = (Variables) serviceVariables;
-
 
 if (serviceInitialize)
 {
@@ -61,9 +61,9 @@ if (serviceInitialize)
 	serviceState = new HashMap();
 
 	// create service thread
-	reader = readerThread(serviceFB);
+	ReaderThread reader = new ReaderThread(serviceFB);
 	serviceState.put("reader", reader);
-	new Thread(reader).start();
+	reader.start();
 }
 else
 {
@@ -78,23 +78,3 @@ else
 	}
 }
 
-//=================================================================================================
-
-readerThread(SerivceFBInstance serviceFB)
-{
-
-	public synchronized void readInput(int input)
-	{
-		notify();
-	}
-
-	public synchronized void run()
-	{
-		wait();
-		((BooleanVariable) serviceVariables.getVariable("VALUE")).setValue(true);		
-		System.out.println("IO_READER.bsh(" + serviceFB.getName() + "): Sending CNF event");		
-		serviceFBInstance.sendEvent("CNF");	
-	}
-
-	return this;
-}

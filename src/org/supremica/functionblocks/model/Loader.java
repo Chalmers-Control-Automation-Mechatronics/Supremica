@@ -174,6 +174,14 @@ public class Loader
 			constructBasicFBType(xmlFBTypeData,newBasicFBType);
 		}
 		// load service FBs
+		else if (xmlFBTypeData.getName().equals("IO_READER"))
+		{
+			resource.addServiceFBType("IO_READER", new File(SupremicaProperties.getFBRuntimeLibraryPath() + "/IO_READER.bsh"));
+			
+			ServiceFBType newServiceFBType =  (ServiceFBType) resource.getFBType("IO_READER");
+			
+			constructFBInterface(xmlFBTypeData,newServiceFBType);
+		}
 		else if (xmlFBTypeData.getName().equals("E_DELAY"))
 		{
 			resource.addServiceFBType("E_DELAY", new File(SupremicaProperties.getFBRuntimeLibraryPath() + "/E_DELAY.bsh"));

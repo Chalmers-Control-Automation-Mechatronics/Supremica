@@ -16,7 +16,7 @@
           <Connection Source="split.EO2" Destination="reader2.REQ" />
         </EventConnections>
         <DataConnections>
-          <Connection Source="1000" Destination="cycle.DT" />
+          <Connection Source="5000" Destination="cycle.DT" />
           <Connection Source="1" Destination="reader1.INPUT" />
           <Connection Source="2" Destination="reader2.INPUT" />
         </DataConnections>

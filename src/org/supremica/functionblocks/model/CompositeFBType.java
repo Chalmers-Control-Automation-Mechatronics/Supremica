@@ -149,6 +149,10 @@ public class CompositeFBType extends FBType
 
 		}
 
+		newInstance.setEvents(events);
+
+		newInstance.setVariables((Variables) variables.clone());
+
 		instances.put(name,newInstance);
 
 		return newInstance;

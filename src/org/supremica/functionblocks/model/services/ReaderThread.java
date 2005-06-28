@@ -52,55 +52,35 @@
 
 package org.supremica.functionblocks.model.services;
 
-import org.supremica.functionblocks.model.ServiceFBInstance;
+import org.supremica.functionblocks.model.*;
 
-import java.util.HashMap;
 
-public class DelayThread extends Thread
+public class ReaderThread extends Thread
 {
 
-	private int delay;
-	private boolean sendOutput = true;
 	private boolean serviceActive = true;
 	private ServiceFBInstance serviceFB;
 
-
 	//========================================================================
-	private DelayThread() {} 
+	private ReaderThread() {} 
 
-	public DelayThread(ServiceFBInstance fb)
+	public ReaderThread(ServiceFBInstance fb)
 	{
-		setName("DelayThread");
+		setName("ReaderThread");
 		serviceFB = fb;
 	}
 	//========================================================================
 
 
-	public synchronized void setDelayTime(int d)
+	public synchronized void readInput(int input)
 	{
-		//System.out.println("DelayThread: Setting delay time to: " + d + " ms");
-		delay = d;
-	}
-
-	public synchronized void startDelay()
-	{
-		//System.out.println("DelayThread: startDelay()");		
-		sendOutput = true;
-		notify();
-	}
-
-	public synchronized void stopDelay()
-	{
-		//System.out.println("DelayThread: stopDelay()");		
-		sendOutput = false;
 		notify();
 	}
 
 	public synchronized void deactivateService()
 	{
-		//System.out.println("DelayThread: deactivateService()");		
+		//System.out.println("ReaderThread: deactivateService()");		
 		serviceActive = false;
-		notify();
 		notify();
 	}
 
@@ -110,25 +90,18 @@ public class DelayThread extends Thread
 		{
 			try
 			{
-				//System.out.println("DelayThread: Calling wait()");
 				wait();
-				//System.out.println("DelayThread: Calling wait(" + delay + ")");
-				wait(delay);
 			}
 			catch(InterruptedException e)
 			{
-				System.err.println("DelayThread: Interrupted Exception");
+				System.err.println("ReaderThread: Interrupted Exception");
 				e.printStackTrace(System.err);
 			}
-
-			// send output only if the delay wasn't stoped
-			if (sendOutput)
-			{
-				//System.out.println("DelayThread: sending EO event");
-				((HashMap) serviceFB.getServiceState()).put("delaying", new Boolean(false));
-				serviceFB.sendEvent("EO");
-			}
+			
+// 			serviceFB.setVariableValue("VALUE", new Boolean(true));
+			
+			System.out.println("IO_READER.bsh(" + serviceFB.getName() + "): Sending CNF event");		
+			serviceFB.sendEvent("CNF");				
 		}
-		//System.out.println("DelayThread: exiting run()");
 	}   	
 }
