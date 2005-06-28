@@ -58,6 +58,8 @@ import org.supremica.functionblocks.model.*;
 public class ReaderThread extends Thread
 {
 
+	private int inputSignal;
+
 	private boolean serviceActive = true;
 	private ServiceFBInstance serviceFB;
 
@@ -74,6 +76,7 @@ public class ReaderThread extends Thread
 
 	public synchronized void readInput(int input)
 	{
+		inputSignal = input;
 		notify();
 	}
 
@@ -98,6 +101,9 @@ public class ReaderThread extends Thread
 				e.printStackTrace(System.err);
 			}
 			
+			// read signal from the Digital I/O card.
+			
+			//set data output
 			serviceFB.setVariableValue("VALUE", new Boolean(true));
 			
 			System.out.println("IO_READER.bsh(" + serviceFB.getName() + "): Sending CNF event");		
