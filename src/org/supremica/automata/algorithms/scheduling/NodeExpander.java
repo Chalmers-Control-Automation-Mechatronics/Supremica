@@ -18,28 +18,28 @@ public class NodeExpander {
     private AutomataSynchronizerExecuter onlineSynchronizer;
 
     /** Contains maps between states and corresponding indices, in order to compress the used memory and speed up operations */
-    private AutomataIndexForm indexForm;
+//     private AutomataIndexForm indexForm;
     
     /** The selected automata to be scheduled */
     private Automata theAutomata, plantAutomata;
 
     /** The calling class */
-    private ModifiedAstar2 master;
+    private ModifiedAstar master;
 
     /** Maps every event that is specified to the corresponing specification automaton, in order to speed up the expansion */
     private Hashtable<LabeledEvent, Integer> specEventTable;
 
-    /** Needed for manual expansion */
-    private int[][][] outgoingEventsTable;
+//     /** Needed for manual expansion */
+//     private int[][][] outgoingEventsTable;
 
-    /** Needed for manual expansion */
-    private int[][][] nextStateTable;
+//     /** Needed for manual expansion */
+//     private int[][][] nextStateTable;
 
     /***********************************************************************
      *                Start-up methods                                     *
      ***********************************************************************/
 
-    public NodeExpander(boolean manualExpansion, Automata theAutomata, ModifiedAstar2 master) {
+    public NodeExpander(boolean manualExpansion, Automata theAutomata, ModifiedAstar master) {
 	this.manualExpansion = manualExpansion;
 	this.theAutomata = theAutomata;
 	this.master = master;
@@ -48,8 +48,9 @@ public class NodeExpander {
 
 	if (!manualExpansion)
 	    initOnlineSynchronizer();
-	else {
-	    initAutomataIndexForm();
+	else {	   
+	    for (int i=0; i<theAutomata.size(); i++)
+		theAutomata.getAutomatonAt(i).remapStateIndices();
 	    initSpecEventTable();
 	}
     }
@@ -66,27 +67,6 @@ public class NodeExpander {
      *               Methods for node expansion using                      *
      *               "manual" technique (adjusted for scheduling)          *
      ***********************************************************************/
-
-    private void initAutomataIndexForm() {
-	try {
-	    //	Get current options
-	    SynchronizationOptions syncOptions = new SynchronizationOptions();
-	    syncOptions.setBuildAutomaton(false);
-	    syncOptions.setRequireConsistentControllability(false);
-
-	    AutomataSynchronizerHelper helper = new AutomataSynchronizerHelper(theAutomata, syncOptions);
-	    indexForm = helper.getAutomataIndexForm();
-
-	    for (int i=0; i<theAutomata.size(); i++)
-		theAutomata.getAutomatonAt(i).remapStateIndices();
-
-	    outgoingEventsTable = indexForm.getOutgoingEventsTable();
-	    nextStateTable = indexForm.getNextStateTable();
-	}
-	catch (Exception e) {
-	    e.printStackTrace();
-	}
-    }
 
     private void initSpecEventTable() {
 	specEventTable = new Hashtable<LabeledEvent, Integer>();

@@ -5,14 +5,15 @@ package org.supremica.gui.useractions;
 import java.awt.event.*;
 import javax.swing.*;
 import org.supremica.log.*;
-import org.supremica.gui.ScheduleDialog;
+import org.supremica.gui.*;
 
+/**
+ *      Implements the dialog box allowing to choose different scheduling techniques.
+ */
 public class ScheduleAction
 	extends AbstractAction
 {
-	private static final long serialVersionUID = 1L;
-
-	private static Logger logger = LoggerFactory.createLogger(ScheduleAction.class);
+	private static Logger logger = LoggerFactory.createLogger(ScheduleAction2.class);
 
 	public ScheduleAction()
 	{
@@ -21,25 +22,13 @@ public class ScheduleAction
 		putValue(SHORT_DESCRIPTION, "Schedule selected automata (experimental)");
 	}
 
+	/**
+	 *      Calls the ScheduleDialog if the number of selected automata is equal to one.
+	 *      (Otherwise, synchronization is strongly recommended.)
+	 */
 	public void actionPerformed(ActionEvent e)
 	{
 		ScheduleDialog dlg = new ScheduleDialog();
-
-		dlg.setVisible(true);
-
-/*              Automata automata = ActionMan.getGui().getSelectedAutomata();
-				try
-				{
-						ModifiedAstar mastar = new ModifiedAstar(automata);
-						Element elem = mastar.walk1();
-						logger.info(mastar.trace(elem));
-						Automaton automaton = mastar.getAutomaton(elem);
-						ActionMan.getGui().addAutomaton(automaton);
-				}
-				catch(Exception excp)
-				{
-						logger.error(excp);
-				}
-*/
+		dlg.show();
 	}
 }
