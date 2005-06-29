@@ -13,7 +13,7 @@ import org.supremica.gui.*;
 public class ScheduleAction
 	extends AbstractAction
 {
-	private static Logger logger = LoggerFactory.createLogger(ScheduleAction2.class);
+	private static Logger logger = LoggerFactory.createLogger(ScheduleAction.class);
 
 	public ScheduleAction()
 	{
