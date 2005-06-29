@@ -486,7 +486,7 @@ public class AutomataVerifier
 
 					// To enable overriding the controllability status of events!
 					//if (!currEvent.isControllable())
-					if (!controllableEventsTable[currEvent.getSynchIndex()])
+					if (!controllableEventsTable[currEvent.getIndex()])
 					{
 
 						// Note that in the language inclusion case, the

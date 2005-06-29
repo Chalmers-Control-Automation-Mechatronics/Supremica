@@ -172,7 +172,7 @@ public class ProjectToSP
 
 				if (debugMode)
 				{
-					pw.print(" synchIndex=" + event.getSynchIndex());
+					pw.print(" index=" + event.getIndex());
 				}
 
 				pw.println("/>");

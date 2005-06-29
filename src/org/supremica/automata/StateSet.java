@@ -7,7 +7,7 @@
 // must then also be true (but the docs do not require this).
 // For State, equals(Object obj) compares id's, so in practice
 // StateSet is only well-defined for states of the same automaton.
-// StateSet gurantees an ordering defined by the names of the states
+// StateSet guarantees an ordering defined by the names of the states
 package org.supremica.automata;
 
 import java.util.*;

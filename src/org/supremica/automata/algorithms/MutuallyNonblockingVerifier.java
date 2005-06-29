@@ -1230,7 +1230,7 @@ public class MutuallyNonblockingVerifier
 
 			/*
 			// The from-state should be unacceptable.  :o)  Not funny.
-			int index = theAlphabet.getEventWithLabel(currArc.getEvent().getLabel()).getSynchIndex();
+			int index = theAlphabet.getEventWithLabel(currArc.getEvent().getLabel()).getIndex();
 			if (!currArc.getFromState().isMutuallyAccepting())
 			{
 					value[index] = value[index] + 1;

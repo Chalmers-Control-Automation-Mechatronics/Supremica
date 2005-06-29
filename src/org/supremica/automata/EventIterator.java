@@ -53,7 +53,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 public class EventIterator
-	implements Iterator
+	implements Iterator<LabeledEvent>
 {
 	private final Iterator theIterator;
 
@@ -67,12 +67,15 @@ public class EventIterator
 		return theIterator.hasNext();
 	}
 
-	public Object next()
+	public LabeledEvent next()
 		throws NoSuchElementException
 	{
-		return theIterator.next();
+		return (LabeledEvent) theIterator.next();
 	}
 
+	/**
+	 * @deprecated Use {@link #next} instead.
+	 */
 	public LabeledEvent nextEvent()
 		throws NoSuchElementException
 	{

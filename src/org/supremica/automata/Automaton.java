@@ -727,9 +727,9 @@ public class Automaton
 
 			foundEvents.clear();
 
-			for (ArcIterator evIt = currState.outgoingArcsIterator(); evIt.hasNext(); )
+			for (Iterator<Arc> evIt = currState.outgoingArcsIterator(); evIt.hasNext(); )
 			{
-				LabeledEvent currEvent = evIt.nextEvent();
+				LabeledEvent currEvent = evIt.next().getEvent();
 
 				// Epsilon event?
 				if (currEvent.isEpsilon())
@@ -1195,10 +1195,10 @@ public class Automaton
 			}
 
 			// Calculate sum of
-			for (ArcIterator arcIterator = currState.outgoingArcsIterator();
+			for (Iterator<Arc> arcIterator = currState.outgoingArcsIterator();
 					arcIterator.hasNext(); )
 			{
-				if (anAlphabet.contains(arcIterator.nextEvent()))
+				if (anAlphabet.contains(arcIterator.next().getEvent()))
 				{
 					depthSum += stateDepth;
 				}
@@ -2239,7 +2239,7 @@ public class Automaton
 			return arcIt.hasNext();
 		}
 
-		public Object next()    // really returns LabeledEvent
+		public LabeledEvent next() 
 		{
 			Arc nextArc = (Arc) arcIt.next();
 
@@ -2290,7 +2290,7 @@ public class Automaton
 			return currState != null;
 		}
 
-		public Object next()
+		public State next()
 		{
 			State returnState = currState;
 

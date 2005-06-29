@@ -53,7 +53,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 public class StateIterator
-	implements Iterator
+	implements Iterator<State>
 {
 	private final Iterator theIterator;
 
@@ -67,12 +67,15 @@ public class StateIterator
 		return theIterator.hasNext();
 	}
 
-	public Object next()
+	public State next()
 		throws NoSuchElementException
 	{
-		return theIterator.next();
+		return (State) theIterator.next();
 	}
 
+	/**
+	 * @deprecated Use {@link #next} instead.
+	 */
 	public State nextState()
 		throws NoSuchElementException
 	{

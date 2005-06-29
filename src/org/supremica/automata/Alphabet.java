@@ -204,10 +204,9 @@ public class Alphabet
 	 */
 	public void addEvents(Alphabet otherEvents)
 	{
-		for (EventIterator eventIt = otherEvents.iterator();
-				eventIt.hasNext(); )
+		for (Iterator<LabeledEvent> eventIt = otherEvents.iterator(); eventIt.hasNext(); )
 		{
-			LabeledEvent currEvent = eventIt.nextEvent();
+			LabeledEvent currEvent = eventIt.next();
 
 			if (!contains(currEvent))
 			{
@@ -287,13 +286,11 @@ public class Alphabet
 	public LabeledEvent getEventWithIndex(int index)
 		throws IllegalArgumentException
 	{
-		Iterator eventIt = iterator();
-
-		while (eventIt.hasNext())
+		for (Iterator<LabeledEvent> evIt = iterator(); evIt.hasNext(); )
 		{
-			LabeledEvent currEvent = (LabeledEvent) eventIt.next();
+			LabeledEvent currEvent = evIt.next();
 
-			if (currEvent.getSynchIndex() == index)
+			if (currEvent.getIndex() == index)
 			{
 				return currEvent;
 			}
@@ -306,9 +303,9 @@ public class Alphabet
 	{
 		int nbrOfFoundEvents = 0;
 
-		for (EventIterator evIt = iterator(); evIt.hasNext(); )
+		for (Iterator<LabeledEvent> evIt = iterator(); evIt.hasNext(); )
 		{
-			LabeledEvent currEvent = evIt.nextEvent();
+			LabeledEvent currEvent = evIt.next();
 
 			if (currEvent.isControllable())
 			{
@@ -323,9 +320,9 @@ public class Alphabet
 	{
 		int nbrOfFoundEvents = 0;
 
-		for (EventIterator evIt = iterator(); evIt.hasNext(); )
+		for (Iterator<LabeledEvent> evIt = iterator(); evIt.hasNext(); )
 		{
-			LabeledEvent currEvent = evIt.nextEvent();
+			LabeledEvent currEvent = evIt.next();
 
 			if (!currEvent.isControllable())
 			{
@@ -344,9 +341,9 @@ public class Alphabet
 	{
 		int nbrOfFoundEvents = 0;
 
-		for (EventIterator evIt = iterator(); evIt.hasNext(); )
+		for (Iterator<LabeledEvent> evIt = iterator(); evIt.hasNext(); )
 		{
-			LabeledEvent currEvent = evIt.nextEvent();
+			LabeledEvent currEvent = evIt.next();
 
 			if (!currEvent.isObservable() || currEvent.isEpsilon())
 			{
@@ -361,9 +358,9 @@ public class Alphabet
 	{
 		int nbrOfFoundEvents = 0;
 
-		for (EventIterator evIt = iterator(); evIt.hasNext(); )
+		for (Iterator<LabeledEvent> evIt = iterator(); evIt.hasNext(); )
 		{
-			LabeledEvent currEvent = evIt.nextEvent();
+			LabeledEvent currEvent = evIt.next();
 
 			if (currEvent.isPrioritized())
 			{
@@ -378,9 +375,9 @@ public class Alphabet
 	{
 		int nbrOfFoundEvents = 0;
 
-		for (EventIterator evIt = iterator(); evIt.hasNext(); )
+		for (Iterator<LabeledEvent> evIt = iterator(); evIt.hasNext(); )
 		{
-			LabeledEvent currEvent = evIt.nextEvent();
+			LabeledEvent currEvent = evIt.next();
 
 			if (currEvent.isImmediate())
 			{
@@ -395,9 +392,9 @@ public class Alphabet
 	{
 		int nbrOfFoundEvents = 0;
 
-		for (EventIterator evIt = iterator(); evIt.hasNext(); )
+		for (Iterator<LabeledEvent> evIt = iterator(); evIt.hasNext(); )
 		{
-			LabeledEvent currEvent = evIt.nextEvent();
+			LabeledEvent currEvent = evIt.next();
 
 			if (currEvent.isEpsilon())
 			{
@@ -432,9 +429,9 @@ public class Alphabet
 
 		if (size() > 0)
 		{
-			for (EventIterator it = iterator(); it.hasNext(); )
+			for (Iterator<LabeledEvent> it = iterator(); it.hasNext(); )
 			{
-				LabeledEvent event = it.nextEvent();
+				LabeledEvent event = it.next();
 
 				sbuf.append(event);
 
@@ -546,9 +543,9 @@ public class Alphabet
 	 */
 	public void minus(Alphabet other)
 	{
-		for (Iterator alphIt = other.iterator(); alphIt.hasNext(); )
+		for (Iterator<LabeledEvent> alphIt = other.iterator(); alphIt.hasNext(); )
 		{
-			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
+			LabeledEvent currEvent = alphIt.next();
 
 			if (contains(currEvent.getLabel()))
 			{
@@ -557,7 +554,7 @@ public class Alphabet
 					removeEvent(currEvent.getLabel());
 
 					//  Quick check if this alphabet is almost empty
-					if ((this.size() == 1) && !other.contains(this.iterator().nextEvent()))
+					if ((this.size() == 1) && !other.contains(this.iterator().next()))
 					{
 						return;
 					}
@@ -660,9 +657,9 @@ public class Alphabet
 	{
 		Alphabet subAlphabet = new Alphabet();
 
-		for (EventIterator evIt = controllableEventIterator(); evIt.hasNext(); )
+		for (Iterator<LabeledEvent> evIt = controllableEventIterator(); evIt.hasNext(); )
 		{
-			subAlphabet.addEvent(evIt.nextEvent());
+			subAlphabet.addEvent(evIt.next());
 		}
 
 		return subAlphabet;
@@ -675,10 +672,10 @@ public class Alphabet
 	{
 		Alphabet subAlphabet = new Alphabet();
 
-		for (EventIterator evIt = uncontrollableEventIterator();
+		for (Iterator<LabeledEvent> evIt = uncontrollableEventIterator();
 				evIt.hasNext(); )
 		{
-			subAlphabet.addEvent(evIt.nextEvent());
+			subAlphabet.addEvent(evIt.next());
 		}
 
 		return subAlphabet;
@@ -688,9 +685,9 @@ public class Alphabet
 	{
 		int i = 0;
 
-		for (EventIterator evIt = iterator(); evIt.hasNext(); )
+		for (Iterator<LabeledEvent> evIt = iterator(); evIt.hasNext(); )
 		{
-			LabeledEvent currEvent = evIt.nextEvent();
+			LabeledEvent currEvent = evIt.next();
 
 			currEvent.setSynchIndex(i++);
 		}
@@ -699,9 +696,9 @@ public class Alphabet
 	public void setIndicies(Alphabet otherAlphabet)
 		throws IllegalArgumentException
 	{
-		for (EventIterator evIt = iterator(); evIt.hasNext(); )
+		for (Iterator<LabeledEvent> evIt = iterator(); evIt.hasNext(); )
 		{
-			LabeledEvent currEvent = evIt.nextEvent();
+			LabeledEvent currEvent = evIt.next();
 			LabeledEvent otherEvent = otherAlphabet.getEvent(currEvent);
 
 			if (otherEvent == null)
@@ -856,11 +853,11 @@ public class Alphabet
 	{
 		int nbrOfCommon = 0;
 
-		EventIterator eventIterator = iterator();
+		Iterator<LabeledEvent> eventIterator = iterator();
 		while (eventIterator.hasNext())
 		{
 			LabeledEvent currEvent;
-			currEvent = eventIterator.nextEvent();
+			currEvent = eventIterator.next();
 
 			if (otherAlphabet.contains(currEvent))
 			{
@@ -873,11 +870,11 @@ public class Alphabet
 
 	public boolean hasCommonEvents(Alphabet otherAlphabet)
 	{
-		EventIterator eventIterator = iterator();
+		Iterator<LabeledEvent> eventIterator = iterator();
 		while (eventIterator.hasNext())
 		{
 			LabeledEvent currEvent;
-			currEvent = eventIterator.nextEvent();
+			currEvent = eventIterator.next();
 
 			if (otherAlphabet.contains(currEvent))
 			{
@@ -900,19 +897,19 @@ public class Alphabet
 		boolean found = false;
 
 		// Iterate
-		for (EventIterator copyIt = copy.iterator(); copyIt.hasNext(); )
+		for (Iterator<LabeledEvent> copyIt = copy.iterator(); copyIt.hasNext(); )
 		{
-			LabeledEvent eventA = copyIt.nextEvent();
+			LabeledEvent eventA = copyIt.next();
 
 			// Another iterator
-			EventIterator eventIt = iterator();
+			Iterator<LabeledEvent> eventIt = iterator();
 
 			// Make sure each pair is only examined once (assumes same order in both iterations!)
-			while (!eventA.equals(eventIt.nextEvent()));
+			while (!eventA.equals(eventIt.next()));
 
 			while (eventIt.hasNext())
 			{
-				LabeledEvent eventB = eventIt.nextEvent();
+				LabeledEvent eventB = eventIt.next();
 
 				// Compare names ignoring case
 				if (eventA.getLabel().equalsIgnoreCase(eventB.getLabel()))

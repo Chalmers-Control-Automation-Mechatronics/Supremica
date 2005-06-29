@@ -120,7 +120,7 @@ public class ProjectToHtml
 		{
 			Automaton aut = (Automaton) projectIt.next();
 
-			pw.println("<li> <a href=\"automaton" + aut.getSynchIndex() + ".html\">" + EncodingHelper.normalize(aut.getName()) + "</a></li>");
+			pw.println("<li> <a href=\"automaton" + aut.getIndex() + ".html\">" + EncodingHelper.normalize(aut.getName()) + "</a></li>");
 		}
 
 		pw.println("</ul>");
@@ -132,7 +132,7 @@ public class ProjectToHtml
 		{
 			Automaton aut = (Automaton) projectIt.next();
 
-			pw.println("<li> <a href=\"automaton" + aut.getSynchIndex() + ".html\">" + EncodingHelper.normalize(aut.getName()) + "</a></li>");
+			pw.println("<li> <a href=\"automaton" + aut.getIndex() + ".html\">" + EncodingHelper.normalize(aut.getName()) + "</a></li>");
 		}
 
 		pw.println("</ul>");
@@ -144,7 +144,7 @@ public class ProjectToHtml
 		{
 			Automaton aut = (Automaton) projectIt.next();
 
-			pw.println("<li> <a href=\"automaton" + aut.getSynchIndex() + ".html\">" + EncodingHelper.normalize(aut.getName()) + "</a></li>");
+			pw.println("<li> <a href=\"automaton" + aut.getIndex() + ".html\">" + EncodingHelper.normalize(aut.getName()) + "</a></li>");
 		}
 
 		pw.println("</ul>");
@@ -156,7 +156,7 @@ public class ProjectToHtml
 		{
 			Automaton aut = (Automaton) projectIt.next();
 
-			pw.println("<li> <a href=\"automaton" + aut.getSynchIndex() + ".html\">" + EncodingHelper.normalize(aut.getName()) + "</a></li>");
+			pw.println("<li> <a href=\"automaton" + aut.getIndex() + ".html\">" + EncodingHelper.normalize(aut.getName()) + "</a></li>");
 		}
 
 		pw.println("</ul>");
@@ -179,7 +179,7 @@ public class ProjectToHtml
 		{
 			LabeledEvent event = (LabeledEvent) eventIt.next();
 
-			pw.println("<li> <a href=\"event" + event.getSynchIndex() + ".html\">" + EncodingHelper.normalize(event.getLabel()) + "</a></li>");
+			pw.println("<li> <a href=\"event" + event.getIndex() + ".html\">" + EncodingHelper.normalize(event.getLabel()) + "</a></li>");
 		}
 
 		pw.println("</ul>");
@@ -199,7 +199,7 @@ public class ProjectToHtml
 	public void serializeEvent(LabeledEvent theEvent)
 		throws Exception
 	{
-		PrintWriter pw = getPrintWriter("event" + theEvent.getSynchIndex() + ".html");
+		PrintWriter pw = getPrintWriter("event" + theEvent.getIndex() + ".html");
 
 		printHtmlBegin(pw, "Supremica Event: " + theEvent.getLabel());
 		pw.println("<h1>Event: " + EncodingHelper.normalize(theEvent.getLabel()) + "</h1>");

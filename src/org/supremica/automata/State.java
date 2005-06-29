@@ -900,12 +900,12 @@ public class State
 	}
 
 	/**
-	 * Calculates and returns epsilon closure as a StateSet. Optionally, the closure does or does not
-	 * necessarily include the state from which the closure is calculated.
+	 * Calculates and returns (forward) epsilon closure as a StateSet. Optionally, the closure
+	 * does or does not necessarily include the state from which the closure is calculated.
 	 *
 	 * @param includeSelf if true, this State itself is included even if no epsilon transitions
-	 * leads to it (a loop), if false, at least one epsilon transition must be executed and this State
-	 * itself may not be in the returned set (if there is no loop).
+	 * leads to it (a loop), if false, at least one epsilon transition must be executed and this
+	 * State itself may not be in the returned set (if there is no loop).
 	 * @return the states that can be reached by executing at least one epsilon transition.
 	 */
 	public StateSet epsilonClosure(boolean includeSelf)

@@ -53,7 +53,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 public class ArcIterator
-	implements Iterator
+	implements Iterator<Arc>
 {
 	private Iterator theIterator;
 
@@ -67,22 +67,28 @@ public class ArcIterator
 		return theIterator.hasNext();
 	}
 
-	public Object next()
+	public Arc next()
 		throws NoSuchElementException
 	{
-		return theIterator.next();
+		return (Arc) theIterator.next();
 	}
 
+	/**
+	 * @deprecated Use {@link #next} instead.
+	 */
 	public Arc nextArc()
 		throws NoSuchElementException
 	{
 		return (Arc) next();
 	}
 
+	/**
+	 * @deprecated Don't be lazy. Use {@link #next()}.getEvent() instead.
+	 */
 	public LabeledEvent nextEvent()
 		throws NoSuchElementException
 	{
-		return (LabeledEvent) nextArc().getEvent();
+		return (LabeledEvent) next().getEvent();
 	}
 
 	public void remove()

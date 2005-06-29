@@ -67,7 +67,7 @@ public class LabeledEvent
 	private boolean epsilon = false;
 	private boolean proposition = false;
 	private int expansionPriority = -1;
-	private int synchIndex = -1;
+	private int index = -1;
 
 	public LabeledEvent() {}
 
@@ -87,7 +87,7 @@ public class LabeledEvent
 		immediate = e.immediate;
 		epsilon = e.epsilon;
 		proposition = e.proposition;
-		synchIndex = e.synchIndex;
+		index = e.index;
 	}
 
 	public LabeledEvent(EventProxy e)
@@ -248,12 +248,17 @@ public class LabeledEvent
 
 	public int getSynchIndex()
 	{
-		return synchIndex;
+		return index;
 	}
 
-	void setSynchIndex(int synchIndex)
+	void setSynchIndex(int index)
 	{
-		this.synchIndex = synchIndex;
+		this.index = index;
+	}
+
+	public int getIndex()
+	{
+		return getSynchIndex();
 	}
 
 	public int compareTo(Object event)

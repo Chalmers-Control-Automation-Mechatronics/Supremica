@@ -53,7 +53,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 public class AutomatonIterator
-	implements Iterator
+	implements Iterator<Automaton>
 {
 	private final Iterator theIterator;
 
@@ -67,12 +67,15 @@ public class AutomatonIterator
 		return theIterator.hasNext();
 	}
 
-	public Object next()
+	public Automaton next()
 		throws NoSuchElementException
 	{
-		return theIterator.next();
+		return (Automaton) theIterator.next();
 	}
 
+	/**
+	 * @deprecated Use {@link #next} instead.
+	 */
 	public Automaton nextAutomaton()
 		throws NoSuchElementException
 	{
