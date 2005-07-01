@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorEvents
 //###########################################################################
-//# $Id: EditorEvents.java,v 1.10 2005-02-23 19:51:16 robi Exp $
+//# $Id: EditorEvents.java,v 1.11 2005-07-01 04:13:12 siw4 Exp $
 //###########################################################################
 
 
@@ -18,6 +18,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DragSource;
+import java.awt.dnd.DragGestureEvent;
+import java.awt.dnd.DragGestureListener;
+import java.awt.dnd.InvalidDnDOperationException;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.DefaultCellEditor;
@@ -105,6 +113,14 @@ public class EditorEvents
 		final ActionMap actionmap = getActionMap();
 		actionmap.put(ACTNAME_DOWN, new NavigationAction(ACTNAME_DOWN, 1));
 		actionmap.put(ACTNAME_UP, new NavigationAction(ACTNAME_UP, -1));
+
+		dragSource = DragSource.getDefaultDragSource();
+		dgListener = new DGListener();
+		
+		// component, action, listener
+		dragSource.createDefaultDragGestureRecognizer(this,
+													  dragAction,
+													  dgListener); 
 	}
 
 
@@ -179,7 +195,7 @@ public class EditorEvents
 
 	public IdentifierProxy getBuffer()
 	{
-		return mBuffer;
+		return null;
 	}
 
 
@@ -408,13 +424,78 @@ public class EditorEvents
 
 	}
 
+	//#######################################################################
+	//# Representation of Transferable
+
+
+	private class IdentifierTransfer implements Transferable
+	{
+		// the IdentifierProxy transferred by this Object
+		Object ip_;
+		DataFlavor data_;
+		
+		/**
+		 * creates a new transferable object containing the specified IdentifierProxy
+		 *
+		 * @param ip the IdentifierProxy being transferred
+		 */
+
+		public IdentifierTransfer(Object ip)
+		{
+			ip_ = ip;
+			data_ = new DataFlavor(ip.getClass(), ip.getClass().getName());
+		}
+		
+		public Object getTransferData(DataFlavor f)
+			throws UnsupportedFlavorException
+		{
+			if (isDataFlavorSupported(f))
+				return ip_;
+			else
+				throw new UnsupportedFlavorException(f);
+		}
+	   
+		public DataFlavor[] getTransferDataFlavors()
+		{
+			DataFlavor[] d = new DataFlavor[1];
+			d[0] = data_;
+			return d;
+		}
+
+		public boolean isDataFlavorSupported(DataFlavor f)
+		{
+			return f.getRepresentationClass().isAssignableFrom(data_.getRepresentationClass());
+		}
+	}
+
+	private class DGListener implements DragGestureListener
+	{
+		public void dragGestureRecognized(DragGestureEvent e)
+		{
+			System.out.println("drag recognized");
+			final int row = rowAtPoint(e.getDragOrigin());
+			if (row == -1) {
+				return;
+			}
+			final EventTableModel model = (EventTableModel) getModel();
+			Transferable t = new IdentifierTransfer(model.getEvent(row));
+			try {
+				e.startDrag(DragSource.DefaultCopyDrop, t);
+				System.out.println("drag started");
+			}catch( InvalidDnDOperationException idoe ) {
+				System.err.println( idoe );
+			}
+		}
+	}
 
 
 	//#######################################################################
 	//# Data Members
 	private IdentifierProxy mBuffer;
-
-
+	private DragSource dragSource;
+	private DragGestureListener dgListener;
+	//	private DragSourceListener dsListener;
+	private int dragAction = DnDConstants.ACTION_COPY;
 
 	//#######################################################################
 	//# Class Constants
@@ -429,6 +510,6 @@ public class EditorEvents
 		KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.SHIFT_MASK);
 
 	private static final String ACTNAME_DOWN = "EditorEvents.DOWN";
-	private static final String ACTNAME_UP = "EditorEvents.UP";
+	private static final String ACTNAME_UP = "EditorEvents.UP";	
 
 }

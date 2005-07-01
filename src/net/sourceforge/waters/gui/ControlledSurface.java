@@ -1,4 +1,4 @@
-
+ 
 package net.sourceforge.waters.gui;
 
 import java.lang.*;
@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.*;
 import java.awt.event.*;
+import java.awt.datatransfer.DataFlavor;
 import java.awt.dnd.*;
 import java.io.File;
 import java.io.IOException;
@@ -38,6 +39,9 @@ public class ControlledSurface
 	private LinkedList toBeDeselected = new LinkedList();
 
 	private EditorObject highlightedObject = null;
+
+    private DropTarget dropTarget;
+    private DropTargetListener dtListener;
 
 	public void setOptionsVisible(boolean v)
 	{
@@ -786,6 +790,7 @@ public class ControlledSurface
 
 	public void mouseReleased(MouseEvent e)
 	{
+	    System.out.println("ahgha");
 		// This is for triggering the popup 
 		maybeShowPopup(e);
 
@@ -1206,5 +1211,41 @@ public class ControlledSurface
 		this.addMouseMotionListener(this);
 		this.addKeyListener(this);
 		this.requestFocusInWindow();
+		dtListener = new DTListener();
+		dropTarget = new DropTarget(this, 
+					    dtListener);
 	}
+
+    private class DTListener extends DropTargetAdapter
+    {
+	public void drop(DropTargetDropEvent e)
+	{
+	    EditorObject o = getObjectAtPosition((int)e.getLocation().getX(), (int)e.getLocation().getY());
+	    System.out.println("drop onto ?");
+	    if (o instanceof EditorEdge) {
+		EditorEdge edge = (EditorEdge)o;
+		IdentifierProxy ip;
+		System.out.println("drop onto Edge");
+		if (e.getTransferable().isDataFlavorSupported(new DataFlavor(IdentifierProxy.class, "IdentifierProxy"))) {
+		    try {		   
+			ip = (IdentifierProxy)e.getTransferable().getTransferData(new DataFlavor(IdentifierProxy.class
+										 , "IdentifierProxy"));
+			System.out.println("correct type");
+			for (int i = 0; i < events.size(); i++)
+			    {
+				if (((EditorLabelGroup) events.get(i)).getParent() == edge)
+				    {
+					((EditorLabelGroup) events.get(i)).addEvent(ip);
+					e.dropComplete(true);
+					return;
+				    }
+			    }
+		    } catch (Throwable t) {
+			System.out.println(t);
+		    }
+		}
+	    }
+	    e.dropComplete(false);
+	}	
+    }
 }

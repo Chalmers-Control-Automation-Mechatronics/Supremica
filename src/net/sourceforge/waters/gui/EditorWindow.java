@@ -4,13 +4,16 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorWindow
 //###########################################################################
-//# $Id: EditorWindow.java,v 1.13 2005-05-27 10:28:21 flordal Exp $
+//# $Id: EditorWindow.java,v 1.14 2005-07-01 04:13:12 siw4 Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.dnd.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.IOException;
 import javax.xml.bind.JAXBException;
@@ -45,6 +48,7 @@ public class EditorWindow
 
 	public EditorWindow(String title, ModuleProxy module, SimpleComponentProxy element)
 	{
+	    System.out.println("ahgha");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setTitle(title);
 
