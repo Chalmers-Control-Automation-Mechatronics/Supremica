@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="IO_WRITER">
+  <VersionInfo Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2005-07-04" />
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="REQ">
+        <With Var="OUTPUT" />
+        <With Var="VALUE" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="CNF"/>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="OUTPUT" Type="INT" 
+	    Comment="The number of the input pin to read from
+	      the digital I/O card."/>
+      <VarDeclaration Name="VALUE" Type="BOOL"
+	  Comment="The value to write to the digital I/O card."/>
+    </InputVars>
+  </InterfaceList>
+</FBType>

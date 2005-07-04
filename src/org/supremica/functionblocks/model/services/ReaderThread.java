@@ -103,9 +103,11 @@ public class ReaderThread extends Thread
 			
 			// read signal from the Digital I/O card.
 			
-			//set data output
+
+			// set data output to read value
 			serviceFB.setVariableValue("VALUE", new Boolean(true));
 			
+			// send output event
 			System.out.println("IO_READER.bsh(" + serviceFB.getName() + "): Sending CNF event");		
 			serviceFB.sendEvent("CNF");				
 		}

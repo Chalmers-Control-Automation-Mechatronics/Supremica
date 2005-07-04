@@ -50,55 +50,65 @@
  * @author Goran Cengic
  */
 
+package org.supremica.functionblocks.model.services;
+
 import org.supremica.functionblocks.model.*;
-import org.supremica.functionblocks.model.services.DelayThread;
 
 
-ServiceFBInstance serviceFB = (ServiceFBInstance) serviceFB;
-Map serviceState = (Map) serviceState;
-Event serviceEvent = (Event) serviceEvent;
-Variables serviceVariables = (Variables) serviceVariables;
-
-
-if (serviceInitialize)
+public class WriterThread extends Thread
 {
 
-	System.out.println("E_DELAY.bsh(" + serviceFB.getName() + "): Initialization");
-	serviceState = new HashMap();
+	private int outputSignal;
+	private boolean outputValue;
 
-	// flag for discarding incoming events
-	serviceState.put("delaying", new Boolean(false));
+	private boolean serviceActive = true;
+	private ServiceFBInstance serviceFB;
 
-	// create service thread
-	DelayThread delayThread = new DelayThread(serviceFB);
-	serviceState.put("delayThread", delayThread);
-	delayThread.start();
+	//========================================================================
+	private WriterThread() {} 
 
-}
-else
-{
+	public WriterThread(ServiceFBInstance fb)
+	{
+		setName("WriterThread");
+		serviceFB = fb;
+	}
+	//========================================================================
 
-	String eventName  = ((Event) serviceEvent).getName();
 
-	if (eventName.equals("START"))
-	{ 
-		if (((Boolean) serviceState.get("delaying")).booleanValue())
+	public synchronized void writeOutput(int output,boolean value)
+	{
+		outputSignal = output;
+		outputValue = value;
+		notify();
+	}
+
+	public synchronized void deactivateService()
+	{
+		//System.out.println("WriterThread: deactivateService()");		
+		serviceActive = false;
+		notify();
+	}
+
+	public synchronized void run()
+	{
+		while (serviceActive)
 		{
-			System.out.println("E_DELAY.bsh(" + serviceFB.getName() + "): Discarding START event");
-			return;
+			try
+			{
+				wait();
+			}
+			catch(InterruptedException e)
+			{
+				System.err.println("WriterThread: Interrupted Exception");
+				e.printStackTrace(System.err);
+			}
+			
+			// write value to the signal of the Digital I/O card.
+			
+
+			// send output event
+			System.out.println("IO_WRITER.bsh(" + serviceFB.getName() + "): Sending CNF event");		
+			serviceFB.sendEvent("CNF");				
 		}
-		
-		//System.out.println("E_DELAY.bsh(" + serviceFB.getName() + "): START event received");
-		int delayTime = ((IntegerVariable) serviceVariables.getVariable("DT")).getValue().intValue();
-		serviceState.get("delayThread").setDelayTime(delayTime);	
-		serviceState.get("delayThread").startDelay();
-		serviceState.put("delaying", new Boolean(true));
-		
-	}
-	else if (eventName.equals("STOP"))
-	{	
-		System.out.println("E_DELAY.bsh(" + serviceFB.getName() + "): STOP event received");
-		serviceState.get("delayThread").stopDelay();
-		serviceState.put("delaying", new Boolean(false));		
-	}
+	}   	
 }

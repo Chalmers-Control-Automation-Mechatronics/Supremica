@@ -151,7 +151,7 @@ public abstract class FBInstance extends NamedObject
 		}
 		else
 		{
-			System.err.println("FBInstance(" + getName() + ").sendEvent() : Warning: Event output " + outputEventName + " is not connected.");
+			//System.err.println("FBInstance(" + getName() + ").sendEvent() : Warning: Event output " + outputEventName + " is not connected.");
 		}
 	}
 	

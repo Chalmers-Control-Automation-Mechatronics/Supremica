@@ -46,59 +46,36 @@
  *
  * Supremica is owned and represented by KA.
  */
-/**
- * @author Goran Cengic
- */
-
 import org.supremica.functionblocks.model.*;
-import org.supremica.functionblocks.model.services.DelayThread;
 
+import org.supremica.functionblocks.model.services.WriterThread;
 
 ServiceFBInstance serviceFB = (ServiceFBInstance) serviceFB;
 Map serviceState = (Map) serviceState;
 Event serviceEvent = (Event) serviceEvent;
 Variables serviceVariables = (Variables) serviceVariables;
 
-
 if (serviceInitialize)
 {
-
-	System.out.println("E_DELAY.bsh(" + serviceFB.getName() + "): Initialization");
+	System.out.println("IO_WRITER.bsh(" + serviceFB.getName() + "): Initialization");
 	serviceState = new HashMap();
 
-	// flag for discarding incoming events
-	serviceState.put("delaying", new Boolean(false));
-
 	// create service thread
-	DelayThread delayThread = new DelayThread(serviceFB);
-	serviceState.put("delayThread", delayThread);
-	delayThread.start();
-
+	WriterThread writer = new WriterThread(serviceFB);
+	serviceState.put("writer", writer);
+	writer.start();
 }
 else
 {
 
 	String eventName  = ((Event) serviceEvent).getName();
 
-	if (eventName.equals("START"))
-	{ 
-		if (((Boolean) serviceState.get("delaying")).booleanValue())
-		{
-			System.out.println("E_DELAY.bsh(" + serviceFB.getName() + "): Discarding START event");
-			return;
-		}
-		
-		//System.out.println("E_DELAY.bsh(" + serviceFB.getName() + "): START event received");
-		int delayTime = ((IntegerVariable) serviceVariables.getVariable("DT")).getValue().intValue();
-		serviceState.get("delayThread").setDelayTime(delayTime);	
-		serviceState.get("delayThread").startDelay();
-		serviceState.put("delaying", new Boolean(true));
-		
-	}
-	else if (eventName.equals("STOP"))
-	{	
-		System.out.println("E_DELAY.bsh(" + serviceFB.getName() + "): STOP event received");
-		serviceState.get("delayThread").stopDelay();
-		serviceState.put("delaying", new Boolean(false));		
+	if (eventName.equals("REQ"))
+	{ 	
+		int outputSignal = ((IntegerVariable) serviceVariables.getVariable("OUTPUT")).getValue();
+		boolean outputValue = ((BooleanVariable) serviceVariables.getVariable("VALUE")).getValue();
+		System.out.println("IO_WRITER.bsh(" + serviceFB.getName() + "): REQ event received with OUTPUT " + outputSignal + " and VALUE " + outputValue);
+		serviceState.get("writer").writeOutput(outputSignal, outputValue);
 	}
 }
+

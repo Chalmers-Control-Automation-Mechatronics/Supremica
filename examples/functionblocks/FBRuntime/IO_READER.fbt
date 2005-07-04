@@ -14,12 +14,12 @@
     </EventOutputs>
     <InputVars>
       <VarDeclaration Name="INPUT" Type="INT" 
-	  Comment="The number of the input pin to read from
-	  the digital I/O card."/>
+	    Comment="The number of the input pin to read from
+	      the digital I/O card."/>
     </InputVars>
     <OutputVars>
-      <VarDeclaration Name="VALUE" Type="BOOL" Comment="The
-	  value rad from the digital I/O card."/>
+      <VarDeclaration Name="VALUE" Type="BOOL" 
+	    Comment="The value read from the digital I/O card."/>
     </OutputVars>
   </InterfaceList>
 </FBType>
