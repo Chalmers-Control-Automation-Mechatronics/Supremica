@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="ADLINK_IO">
+  <VersionInfo Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2005-07-04" />
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="READ"/>
+      <Event Name="WRITE">
+        <With Var="OUTPUT1" />
+        <With Var="OUTPUT2" />
+        <With Var="OUTPUT3" />
+        <With Var="OUTPUT4" />
+        <With Var="OUTPUT5" />
+        <With Var="OUTPUT6" />
+        <With Var="OUTPUT7" />
+        <With Var="OUTPUT8" />
+        <With Var="OUTPUT9" />
+        <With Var="OUTPUT10" />
+        <With Var="OUTPUT11" />
+        <With Var="OUTPUT12" />
+        <With Var="OUTPUT13" />
+        <With Var="OUTPUT14" />
+        <With Var="OUTPUT15" />
+        <With Var="OUTPUT16" />
+        <With Var="OUTPUT17" />
+        <With Var="OUTPUT18" />
+        <With Var="OUTPUT19" />
+        <With Var="OUTPUT20" />
+        <With Var="OUTPUT21" />
+        <With Var="OUTPUT22" />
+        <With Var="OUTPUT23" />
+        <With Var="OUTPUT24" />
+        <With Var="OUTPUT25" />
+        <With Var="OUTPUT26" />
+        <With Var="OUTPUT27" />
+        <With Var="OUTPUT28" />
+        <With Var="OUTPUT29" />
+        <With Var="OUTPUT30" />
+        <With Var="OUTPUT31" />
+        <With Var="OUTPUT32" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="VALUES">
+        <With Var="INPUT1" />
+        <With Var="INPUT2" />
+        <With Var="INPUT3" />
+        <With Var="INPUT4" />
+        <With Var="INPUT5" />
+        <With Var="INPUT6" />
+        <With Var="INPUT7" />
+        <With Var="INPUT8" />
+        <With Var="INPUT9" />
+        <With Var="INPUT10" />
+        <With Var="INPUT11" />
+        <With Var="INPUT12" />
+        <With Var="INPUT13" />
+        <With Var="INPUT14" />
+        <With Var="INPUT15" />
+        <With Var="INPUT16" />
+        <With Var="INPUT17" />
+        <With Var="INPUT18" />
+        <With Var="INPUT19" />
+        <With Var="INPUT20" />
+        <With Var="INPUT21" />
+        <With Var="INPUT22" />
+        <With Var="INPUT23" />
+        <With Var="INPUT24" />
+        <With Var="INPUT25" />
+        <With Var="INPUT26" />
+        <With Var="INPUT27" />
+        <With Var="INPUT28" />
+        <With Var="INPUT29" />
+        <With Var="INPUT30" />
+        <With Var="INPUT31" />
+        <With Var="INPUT32" />
+      </Event>
+      <Event Name="CNF"/>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="OUTPUT1" Type="BOOL"/>
+      <VarDeclaration Name="OUTPUT2" Type="BOOL"/>
+      <VarDeclaration Name="OUTPUT3" Type="BOOL"/>
+      <VarDeclaration Name="OUTPUT4" Type="BOOL"/>
+      <VarDeclaration Name="OUTPUT5" Type="BOOL"/>
+      <VarDeclaration Name="OUTPUT6" Type="BOOL"/>
+      <VarDeclaration Name="OUTPUT7" Type="BOOL"/>
+      <VarDeclaration Name="OUTPUT8" Type="BOOL"/>
+      <VarDeclaration Name="OUTPUT9" Type="BOOL"/>
+      <VarDeclaration Name="OUTPUT10" Type="BOOL"/>
+      <VarDeclaration Name="OUTPUT11" Type="BOOL"/>
+      <VarDeclaration Name="OUTPUT12" Type="BOOL"/>
+      <VarDeclaration Name="OUTPUT13" Type="BOOL"/>
+      <VarDeclaration Name="OUTPUT14" Type="BOOL"/>
+      <VarDeclaration Name="OUTPUT15" Type="BOOL"/>
+      <VarDeclaration Name="OUTPUT16" Type="BOOL"/>
+      <VarDeclaration Name="OUTPUT17" Type="BOOL"/>
+      <VarDeclaration Name="OUTPUT18" Type="BOOL"/>
+      <VarDeclaration Name="OUTPUT19" Type="BOOL"/>
+      <VarDeclaration Name="OUTPUT20" Type="BOOL"/>
+      <VarDeclaration Name="OUTPUT21" Type="BOOL"/>
+      <VarDeclaration Name="OUTPUT22" Type="BOOL"/>
+      <VarDeclaration Name="OUTPUT23" Type="BOOL"/>
+      <VarDeclaration Name="OUTPUT24" Type="BOOL"/>
+      <VarDeclaration Name="OUTPUT25" Type="BOOL"/>
+      <VarDeclaration Name="OUTPUT26" Type="BOOL"/>
+      <VarDeclaration Name="OUTPUT27" Type="BOOL"/>
+      <VarDeclaration Name="OUTPUT28" Type="BOOL"/>
+      <VarDeclaration Name="OUTPUT29" Type="BOOL"/>
+      <VarDeclaration Name="OUTPUT30" Type="BOOL"/>
+      <VarDeclaration Name="OUTPUT31" Type="BOOL"/>
+      <VarDeclaration Name="OUTPUT32" Type="BOOL"/>
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="INPUT1" Type="BOOL"/>
+      <VarDeclaration Name="INPUT2" Type="BOOL"/>
+      <VarDeclaration Name="INPUT3" Type="BOOL"/>
+      <VarDeclaration Name="INPUT4" Type="BOOL"/>
+      <VarDeclaration Name="INPUT5" Type="BOOL"/>
+      <VarDeclaration Name="INPUT6" Type="BOOL"/>
+      <VarDeclaration Name="INPUT7" Type="BOOL"/>
+      <VarDeclaration Name="INPUT8" Type="BOOL"/>
+      <VarDeclaration Name="INPUT9" Type="BOOL"/>
+      <VarDeclaration Name="INPUT10" Type="BOOL"/>
+      <VarDeclaration Name="INPUT11" Type="BOOL"/>
+      <VarDeclaration Name="INPUT12" Type="BOOL"/>
+      <VarDeclaration Name="INPUT13" Type="BOOL"/>
+      <VarDeclaration Name="INPUT14" Type="BOOL"/>
+      <VarDeclaration Name="INPUT15" Type="BOOL"/>
+      <VarDeclaration Name="INPUT16" Type="BOOL"/>
+      <VarDeclaration Name="INPUT17" Type="BOOL"/>
+      <VarDeclaration Name="INPUT18" Type="BOOL"/>
+      <VarDeclaration Name="INPUT19" Type="BOOL"/>
+      <VarDeclaration Name="INPUT20" Type="BOOL"/>
+      <VarDeclaration Name="INPUT21" Type="BOOL"/>
+      <VarDeclaration Name="INPUT22" Type="BOOL"/>
+      <VarDeclaration Name="INPUT23" Type="BOOL"/>
+      <VarDeclaration Name="INPUT24" Type="BOOL"/>
+      <VarDeclaration Name="INPUT25" Type="BOOL"/>
+      <VarDeclaration Name="INPUT26" Type="BOOL"/>
+      <VarDeclaration Name="INPUT27" Type="BOOL"/>
+      <VarDeclaration Name="INPUT28" Type="BOOL"/>
+      <VarDeclaration Name="INPUT29" Type="BOOL"/>
+      <VarDeclaration Name="INPUT30" Type="BOOL"/>
+      <VarDeclaration Name="INPUT31" Type="BOOL"/>
+      <VarDeclaration Name="INPUT32" Type="BOOL"/>
+    </OutputVars>
+  </InterfaceList>
+</FBType>

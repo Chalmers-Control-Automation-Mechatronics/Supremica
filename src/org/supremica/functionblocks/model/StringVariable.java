@@ -62,12 +62,12 @@ public class StringVariable extends Variable
 		value=s;
 	}
 
-	public void setValue(String v)
+	public synchronized void setValue(String v)
 	{
 		value = v;
 	}
 
-	public String getValue()
+	public synchronized String getValue()
 	{
 		return value;
 		

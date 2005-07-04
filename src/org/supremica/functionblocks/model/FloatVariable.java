@@ -62,12 +62,12 @@ public class FloatVariable extends Variable
 		value = new Float(f);
 	}
 
-	public void setValue(float i)
+	public synchronized void setValue(float i)
 	{
 		value = new Float(i);
 	}
 
-	public Float getValue()
+	public synchronized Float getValue()
 	{
 		return value;
 	}

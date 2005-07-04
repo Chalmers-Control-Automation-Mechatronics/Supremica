@@ -62,12 +62,12 @@ public class IntegerVariable extends Variable
 		value = new Integer(i);
 	}
 
-	public void setValue(int i)
+	public synchronized void setValue(int i)
 	{
 		value = new Integer(i);
 	}
 
-	public Integer getValue()
+	public synchronized Integer getValue()
 	{
 		return value;
 	}

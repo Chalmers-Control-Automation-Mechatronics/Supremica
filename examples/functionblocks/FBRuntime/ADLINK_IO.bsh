@@ -46,41 +46,39 @@
  *
  * Supremica is owned and represented by KA.
  */
+import org.supremica.functionblocks.model.*;
 
-package org.supremica.functionblocks.model;
+import org.supremica.functionblocks.model.services.AdlinkIOThread;
 
-import java.lang.Double;
+ServiceFBInstance serviceFB = (ServiceFBInstance) serviceFB;
+Map serviceState = (Map) serviceState;
+Event serviceEvent = (Event) serviceEvent;
+Variables serviceVariables = (Variables) serviceVariables;
 
-public class DoubleVariable extends Variable
+if (serviceInitialize)
 {
-	
-	private Double value = new Double(0.0);
+	System.out.println("ADLINK_IO.bsh(" + serviceFB.getName() + "): Initialization");
+	serviceState = new HashMap();
 
-	public DoubleVariable(String type, double d)
-	{
-		super(type);
-		value = new Double(d);
-	}
-
-	public synchronized void setValue(double i)
-	{
-		value = new Double(i);
-	}
-
-	public synchronized Double getValue()
-	{
-		return value;
-	}
-
-	public Object clone()
-	{
-		return new DoubleVariable(getType(),getValue().doubleValue());
-	}
-
-	public String toString()
-	{
-		return getType() + " " + value.toString();
-	}
-
-    
+	// create service thread
+	AdlinkIOThread adlinkIO = new AdlinkIOThread(serviceFB,serviceVariables);
+	serviceState.put("adlinkIO", adlinkIO);
+	adlinkIO.start();
 }
+else
+{
+
+	String eventName  = ((Event) serviceEvent).getName();
+
+	if (eventName.equals("READ"))
+	{ 	
+		System.out.println("ADLINK_IO.bsh(" + serviceFB.getName() + "): READ event received");
+		serviceState.get("adlinkIO").readInputs();
+	}
+	else if (eventName.equals("WRITE"))
+	{ 	
+		System.out.println("ADLINK_IO.bsh(" + serviceFB.getName() + "): WRITE event received");
+		serviceState.get("reader").writeOutputs();
+	}	
+}
+

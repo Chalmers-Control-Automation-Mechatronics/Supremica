@@ -62,12 +62,12 @@ public class BooleanVariable extends Variable
 		value = new Boolean(b);
 	}
 
-	public void setValue(boolean v)
+	public synchronized void setValue(boolean v)
 	{
 		value = new Boolean(v);
 	}
 
-	public Boolean getValue()
+	public synchronized Boolean getValue()
 	{
 		return value;
 		
