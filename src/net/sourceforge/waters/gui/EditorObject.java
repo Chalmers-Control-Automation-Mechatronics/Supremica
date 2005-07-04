@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorObject
 //###########################################################################
-//# $Id: EditorObject.java,v 1.13 2005-07-04 22:17:26 siw4 Exp $
+//# $Id: EditorObject.java,v 1.14 2005-07-04 23:06:48 siw4 Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -17,7 +17,7 @@ import java.awt.*;
  * @author Gian Perrone
  */
 public class EditorObject
-{
+{   
 	protected boolean visible;
 	protected int type = 0;
 	private int hash = 0;
@@ -26,12 +26,17 @@ public class EditorObject
 	public static int NODEGROUP = 3;
 	public static int LABEL = 4;
 	public static int LABELGROUP = 5;
-
+    /** is being draggedOver*/
+    public static int NOTDRAG = 0;
+    /** is being draggedOver and can drop data*/
+    public static int CANDROP = 1;
+    /** is being draggedOver but can't drop data*/
+    public static int CANTDROP = 2;
 	// What status has this object got in the editor window? Determines color.
 	private boolean selected = false;
 	private boolean highlighted = false;
 	private boolean error = false;
-    private boolean mDragOver = false;
+    private int mDragOver = NOTDRAG;
 
 	// Should we draw a shadow on highlighted objects?
 	protected boolean shadow = true;
@@ -102,12 +107,12 @@ public class EditorObject
 		return error;
 	}
 
-    public void setDragOver(boolean d)
+    public void setDragOver(int d)
     {
 	mDragOver = d;
     }
     
-    public boolean isDragOver()
+    public int getDragOver()
     {
 	return mDragOver;
     }
@@ -123,10 +128,14 @@ public class EditorObject
 			}
 			return EditorColor.ERRORCOLOR;
 		}
-		else if (isDragOver())
+		else if (getDragOver() == CANDROP)
 		{
-		    return EditorColor.DRAGOVERCOLOR;
+		    return EditorColor.CANDROP;
 		}		
+		else if (getDragOver() == CANTDROP)
+		{
+		    return EditorColor.CANTDROP;
+		}
 		else if (isSelected())
 		{
 			return EditorColor.SELECTCOLOR;
