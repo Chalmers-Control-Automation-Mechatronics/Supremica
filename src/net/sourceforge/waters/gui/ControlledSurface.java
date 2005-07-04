@@ -14,6 +14,7 @@ import javax.xml.bind.JAXBException;
 import net.sourceforge.waters.model.base.*;
 import net.sourceforge.waters.model.module.*;
 import net.sourceforge.waters.model.expr.*;
+import net.sourceforge.waters.xsd.base.EventKind;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -956,18 +957,18 @@ public class ControlledSurface
 
 	public void mouseMoved(MouseEvent e)
 	{
-		updateHighlighting(e);
+		updateHighlighting(e.getPoint());
 	}
 	
 	/**
 	 * Updates highlighting based on the current location of the mouse pointer.
 	 */
-	private void updateHighlighting(MouseEvent e)
+	private void updateHighlighting(Point2D e)
 	{
 		boolean needRepaint = false;
 
 		// Highlight things that are moved over...
-		EditorObject o = getObjectAtPosition(e.getX(), e.getY());
+		EditorObject o = getObjectAtPosition((int)e.getX(), (int)e.getY());
 
 		// Unhighlight highligted stuff not in focus
 		if ((highlightedObject != null) && !highlightedObject.equals(o))
@@ -1218,34 +1219,82 @@ public class ControlledSurface
 
     private class DTListener extends DropTargetAdapter
     {
+	private void addToNode(EditorNode n, IdentifierProxy i)
+	{
+	    n.addProposition(i);
+	    repaint();
+	}
+
+	private void addToEdge(EditorEdge e, IdentifierProxy ip)
+	{
+	    for (int i = 0; i < events.size(); i++)	{
+		EditorLabelGroup g = (EditorLabelGroup) events.get(i);
+		if (g.getParent() == (EditorObject) e) {
+		    //delEdge(e); // Recursive call!??
+		    addToLabelGroup(g, ip);		 
+		}
+	    }
+	}
+
+	private void addToLabelGroup(EditorLabelGroup l, IdentifierProxy i)
+	{
+	    l.addEvent(i);
+	}
+
+	public void dragOver(DropTargetDragEvent e)
+	{
+	    updateHighlighting(e.getLocation());
+	}
+
 	public void drop(DropTargetDropEvent e)
 	{
-	    EditorObject o = getObjectAtPosition((int)e.getLocation().getX(), (int)e.getLocation().getY());
-	    System.out.println("drop onto ?");
-	    if (o instanceof EditorEdge) {
-		EditorEdge edge = (EditorEdge)o;
-		IdentifierProxy ip;
-		System.out.println("drop onto Edge");
-		if (e.getTransferable().isDataFlavorSupported(new DataFlavor(IdentifierProxy.class, "IdentifierProxy"))) {
-		    try {		   
-			ip = (IdentifierProxy)e.getTransferable().getTransferData(new DataFlavor(IdentifierProxy.class
-										 , "IdentifierProxy"));
-			System.out.println("correct type");
-			for (int i = 0; i < events.size(); i++)
-			    {
-				if (((EditorLabelGroup) events.get(i)).getParent() == edge)
-				    {
-					((EditorLabelGroup) events.get(i)).addEvent(ip);
-					e.dropComplete(true);
-					return;
-				    }
-			    }
-		    } catch (Throwable t) {
-			System.out.println(t);
+	    DataFlavor d = new DataFlavor(IdentifierWithKind.class, "IdentifierWithKind");
+	    if (e.getTransferable().isDataFlavorSupported(d)) {
+		try {
+		    IdentifierWithKind i = (IdentifierWithKind)e.getTransferable().getTransferData(d);
+		    EventKind ek = i.getKind();
+		    IdentifierProxy ip = i.getIdentifier();
+		    /*		    if (!root.getEventPane().contains(ip)) {
+			e.dropComplete(false);
+			return;
+			}*/
+		    EditorObject o = getObjectAtPosition((int)e.getLocation().getX(), (int)e.getLocation().getY());
+		    System.out.println("drop onto ?");
+		    if (ek == null) {
+			if (o instanceof EditorNode) {
+			    addToNode((EditorNode)o, ip);
+			}
+			if (o instanceof EditorEdge) {
+			    addToEdge((EditorEdge)o, ip);
+			}
+			if (o instanceof EditorLabelGroup) {
+			    addToLabelGroup((EditorLabelGroup)o, ip);
+			}
+			e.dropComplete(true);
+			return;
 		    }
+		    if (ek.equals(EventKind.PROPOSITION)) {
+			if (o instanceof EditorNode) {
+			    addToNode((EditorNode)o, ip);
+			}
+			e.dropComplete(true);
+			return;
+		    }
+		    if (ek.equals(EventKind.CONTROLLABLE) || ek.equals(EventKind.UNCONTROLLABLE)) {
+			if (o instanceof EditorEdge) {
+			    addToEdge((EditorEdge)o, ip);
+			}
+			if (o instanceof EditorLabelGroup) {
+			    addToLabelGroup((EditorLabelGroup)o, ip);
+			}
+			e.dropComplete(true);
+			return;
+		    }	
+		} catch (Throwable t) {
+		    System.out.println(t);
 		}
 	    }
 	    e.dropComplete(false);
-	}	
+	}
     }
 }

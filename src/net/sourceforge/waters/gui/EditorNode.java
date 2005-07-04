@@ -98,6 +98,11 @@ public class EditorNode
 		return propGroup;
 	}
 
+    public void addProposition(IdentifierProxy i)
+    {
+	proxy.getPropositions().add(i);
+    }
+
 	public void setInitial(boolean newinitial)
 	{
 		proxy.setInitial(newinitial);

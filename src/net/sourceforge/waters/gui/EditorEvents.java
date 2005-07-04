@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorEvents
 //###########################################################################
-//# $Id: EditorEvents.java,v 1.11 2005-07-01 04:13:12 siw4 Exp $
+//# $Id: EditorEvents.java,v 1.12 2005-07-04 02:56:13 siw4 Exp $
 //###########################################################################
 
 
@@ -468,6 +468,7 @@ public class EditorEvents
 		}
 	}
 
+
 	private class DGListener implements DragGestureListener
 	{
 		public void dragGestureRecognized(DragGestureEvent e)
@@ -478,7 +479,7 @@ public class EditorEvents
 				return;
 			}
 			final EventTableModel model = (EventTableModel) getModel();
-			Transferable t = new IdentifierTransfer(model.getEvent(row));
+			Transferable t = new IdentifierTransfer(model.createIdentifierWithKind(model.getEvent(row)));
 			try {
 				e.startDrag(DragSource.DefaultCopyDrop, t);
 				System.out.println("drag started");

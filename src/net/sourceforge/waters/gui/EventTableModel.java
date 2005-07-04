@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EventTableModel
 //###########################################################################
-//# $Id: EventTableModel.java,v 1.5 2005-03-06 22:42:49 robi Exp $
+//# $Id: EventTableModel.java,v 1.6 2005-07-04 02:56:13 siw4 Exp $
 //###########################################################################
 
 
@@ -295,6 +295,10 @@ class EventTableModel
 		}
 	}
 
+	public IdentifierWithKind createIdentifierWithKind(IdentifierProxy ip_)
+	{
+		return new IdentifierWithKind(ip_, guessEventKind(ip_));
+	}
 
 
 	//#######################################################################
