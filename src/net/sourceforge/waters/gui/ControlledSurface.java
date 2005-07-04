@@ -1219,6 +1219,8 @@ public class ControlledSurface
 
     private class DTListener extends DropTargetAdapter
     {
+	private EditorObject drag = null;
+
 	private void addToNode(EditorNode n, IdentifierProxy i)
 	{
 	    n.addProposition(i);
@@ -1243,7 +1245,62 @@ public class ControlledSurface
 
 	public void dragOver(DropTargetDragEvent e)
 	{
-	    updateHighlighting(e.getLocation());
+	    DataFlavor d = new DataFlavor(IdentifierWithKind.class, "IdentifierWithKind");
+	    int operation = DnDConstants.ACTION_MOVE;
+	    EditorObject o = null;
+	    if (drag != null) {
+		drag.setDragOver(false);
+	    }
+	    drag = null;
+	    if (e.getTransferable().isDataFlavorSupported(d)) {
+		try {
+		    IdentifierWithKind i = (IdentifierWithKind)e.getTransferable().getTransferData(d);
+		    EventKind ek = i.getKind();
+		    IdentifierProxy ip = i.getIdentifier();
+		    o = getObjectAtPosition((int)e.getLocation().getX(), (int)e.getLocation().getY());
+		    drag = o;
+		    /*		    if (!root.getEventPane().contains(ip)) {
+			e.dropComplete(false);
+			return;
+			}*/
+		    System.out.println((o != null));
+		    if (ek == null) {
+			if (o instanceof EditorNode) {
+			    operation = DnDConstants.ACTION_COPY;
+			}
+			if (o instanceof EditorEdge) {
+			    operation = DnDConstants.ACTION_COPY;
+			}
+			if (o instanceof EditorLabelGroup) {
+			    operation = DnDConstants.ACTION_COPY;
+			}
+		    }
+		    else if (ek.equals(EventKind.PROPOSITION)) {
+			if (o instanceof EditorNode) {
+			    operation = DnDConstants.ACTION_COPY;
+			}			
+		    }
+		    else if (ek.equals(EventKind.CONTROLLABLE) || ek.equals(EventKind.UNCONTROLLABLE)) {
+			if (o instanceof EditorEdge) {
+			    operation = DnDConstants.ACTION_COPY;
+			}
+			if (o instanceof EditorLabelGroup) {
+ 			    operation = DnDConstants.ACTION_COPY;
+			}
+		    }
+		} catch (Throwable t) {
+		    System.out.println(t);
+		}
+	    }
+	    System.out.println((o != null));
+	    if (o != null) {
+		if (operation == DnDConstants.ACTION_COPY) {
+		    o.setDragOver(true);
+		}    
+	    }
+	    updateHighlighting(e.getLocation());   
+	    System.out.println(""+operation);
+	    e.acceptDrag(operation);
 	}
 
 	public void drop(DropTargetDropEvent e)

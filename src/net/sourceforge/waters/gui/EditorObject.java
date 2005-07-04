@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorObject
 //###########################################################################
-//# $Id: EditorObject.java,v 1.12 2005-06-15 09:19:14 flordal Exp $
+//# $Id: EditorObject.java,v 1.13 2005-07-04 22:17:26 siw4 Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -31,6 +31,7 @@ public class EditorObject
 	private boolean selected = false;
 	private boolean highlighted = false;
 	private boolean error = false;
+    private boolean mDragOver = false;
 
 	// Should we draw a shadow on highlighted objects?
 	protected boolean shadow = true;
@@ -101,6 +102,16 @@ public class EditorObject
 		return error;
 	}
 
+    public void setDragOver(boolean d)
+    {
+	mDragOver = d;
+    }
+    
+    public boolean isDragOver()
+    {
+	return mDragOver;
+    }
+
 	public Color getColor()
 	{
 		// In order of importance
@@ -112,6 +123,10 @@ public class EditorObject
 			}
 			return EditorColor.ERRORCOLOR;
 		}
+		else if (isDragOver())
+		{
+		    return EditorColor.DRAGOVERCOLOR;
+		}		
 		else if (isSelected())
 		{
 			return EditorColor.SELECTCOLOR;

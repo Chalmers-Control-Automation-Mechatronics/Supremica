@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorEvents
 //###########################################################################
-//# $Id: EditorEvents.java,v 1.12 2005-07-04 02:56:13 siw4 Exp $
+//# $Id: EditorEvents.java,v 1.13 2005-07-04 22:17:26 siw4 Exp $
 //###########################################################################
 
 
@@ -25,6 +25,9 @@ import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DragSource;
 import java.awt.dnd.DragGestureEvent;
 import java.awt.dnd.DragGestureListener;
+import java.awt.dnd.DragSourceAdapter;
+import java.awt.dnd.DragSourceDragEvent;
+import java.awt.dnd.DragSourceListener;
 import java.awt.dnd.InvalidDnDOperationException;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -114,13 +117,15 @@ public class EditorEvents
 		actionmap.put(ACTNAME_DOWN, new NavigationAction(ACTNAME_DOWN, 1));
 		actionmap.put(ACTNAME_UP, new NavigationAction(ACTNAME_UP, -1));
 
-		dragSource = DragSource.getDefaultDragSource();
-		dgListener = new DGListener();
+		mDragSource = DragSource.getDefaultDragSource();
+		mDGListener = new DGListener();
+		mDSListener = new DSListener();
 		
 		// component, action, listener
-		dragSource.createDefaultDragGestureRecognizer(this,
-													  dragAction,
-													  dgListener); 
+		mDragSource.createDefaultDragGestureRecognizer(this,
+													  mDragAction,
+													  mDGListener);
+		mDragSource.addDragSourceListener(mDSListener);
 	}
 
 
@@ -468,6 +473,20 @@ public class EditorEvents
 		}
 	}
 
+	private class DSListener extends DragSourceAdapter
+	{	  		
+		public void dragOver(DragSourceDragEvent e)
+		{
+			System.out.println("MouseMoved");
+			if (e.getTargetActions() == DnDConstants.ACTION_COPY) {
+				
+				e.getDragSourceContext().setCursor(DragSource.DefaultCopyDrop);
+			}
+			else {
+				e.getDragSourceContext().setCursor(DragSource.DefaultCopyNoDrop);
+			}
+		}
+	}
 
 	private class DGListener implements DragGestureListener
 	{
@@ -493,10 +512,10 @@ public class EditorEvents
 	//#######################################################################
 	//# Data Members
 	private IdentifierProxy mBuffer;
-	private DragSource dragSource;
-	private DragGestureListener dgListener;
-	//	private DragSourceListener dsListener;
-	private int dragAction = DnDConstants.ACTION_COPY;
+	private DragSource mDragSource;
+	private DragGestureListener mDGListener;
+	private DragSourceListener mDSListener;
+	private int mDragAction = DnDConstants.ACTION_COPY;
 
 	//#######################################################################
 	//# Class Constants
