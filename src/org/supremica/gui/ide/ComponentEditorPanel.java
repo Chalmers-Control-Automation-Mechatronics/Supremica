@@ -37,8 +37,8 @@ public class ComponentEditorPanel
 		this.moduleContainer = moduleContainer;
 		this.module = moduleContainer.getModuleProxy();
 
-		toolbar = new EditorToolbar();
-		surface = new ControlledSurface(toolbar, this);
+		surface = new ControlledSurface(this);
+		toolbar = new EditorToolbar(surface);
 
 		surface.setPreferredSize(IDEDimensions.rightEditorPreferredSize);
 		surface.setMinimumSize(IDEDimensions.rightEditorMinimumSize);

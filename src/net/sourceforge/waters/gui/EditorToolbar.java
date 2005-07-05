@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorToolbar
 //###########################################################################
-//# $Id: EditorToolbar.java,v 1.5 2005-05-23 13:35:15 flordal Exp $
+//# $Id: EditorToolbar.java,v 1.6 2005-07-05 02:32:07 siw4 Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -28,26 +28,20 @@ public class EditorToolbar
 	private ToolButtonListener mLastSelected;
 	//private static final Color SELECTIONCOLOR = new Color(255, 200, 240);
 	private static final Color SELECTIONCOLOR = new Color(255, 0, 240);
-
-	public static final String SELECT = "select";
-	public static final String NODE = "node";
-	public static final String NODEGROUP = "nodegroup";
-	public static final String INITIAL = "initial";
-	public static final String EDGE = "edge";
-	public static final String EVENT = "event";
+    private final ControlledSurface mControlled;
 
 	//#########################################################################
 	//# Constructors
-	public EditorToolbar()
+	public EditorToolbar(ControlledSurface c)
 	{
-		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-
-		mLastSelected = createButton(SELECT, "Select", true);
-		createButton(NODE, "Create Nodes", false);
-		createButton(NODEGROUP, "Create Group Nodes", false);
-		createButton(INITIAL, "Set Initial Nodes", false);
-		createButton(EDGE, "Create Edges", false);
-		createButton(EVENT, "Drag Events", false);
+	    mControlled = c;
+		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));		
+		mLastSelected = createButton(ControlledSurface.SELECT, "Select", true);
+		createButton(ControlledSurface.NODE, "Create Nodes", false);
+		createButton(ControlledSurface.NODEGROUP, "Create Group Nodes", false);
+		createButton(ControlledSurface.INITIAL, "Set Initial Nodes", false);
+		createButton(ControlledSurface.EDGE, "Create Edges", false);
+		createButton(ControlledSurface.EVENT, "Drag Events", false);
 	}
 
 	//#########################################################################
@@ -56,12 +50,12 @@ public class EditorToolbar
 	/**
 	 * Find out which tool is currently selected
 	 * @return The ActionCommand for the currently selected tool
-	 */
+	 *//*
 	public String getPlace()
 	{
 		return mGroup.getSelection().getActionCommand();
 	}
-
+	   */
 	//#########################################################################
 	//# Rendering Buttons
 	private ToolButtonListener createButton(final String command, final String tooltip, final boolean selected)
@@ -84,7 +78,9 @@ public class EditorToolbar
 		final ToolButtonListener listener = new ToolButtonListener(panel, button);
 
 		button.addActionListener(listener);
-
+		if (selected) {
+		    mControlled.setCommand(command);
+		}
 		return listener;
 	}
 
@@ -132,7 +128,9 @@ public class EditorToolbar
 		{
 			mLastSelected.showButton();
 			showButton();
-
+			if (mButton.isSelected()) {
+			    mControlled.setCommand(mButton.getActionCommand());
+			}
 			mLastSelected = this;
 		}
 

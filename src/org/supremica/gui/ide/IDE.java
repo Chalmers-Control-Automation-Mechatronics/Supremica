@@ -250,7 +250,9 @@ public class IDE
 
 	public void setEditorMode(IDEAction theAction)
 	{
-
+	    if (getActiveEditorWindowInterface() != null) {
+		getActiveEditorWindowInterface().getControlledSurface().setCommand((String)theAction.getValue(Action.ACTION_COMMAND_KEY));
+	    }
 	}
 
 	public EditorWindowInterface getActiveEditorWindowInterface()

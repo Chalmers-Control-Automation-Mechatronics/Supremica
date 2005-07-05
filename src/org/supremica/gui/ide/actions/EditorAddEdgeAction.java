@@ -4,6 +4,7 @@ import javax.swing.Action;
 import javax.swing.ImageIcon;
 import java.awt.event.ActionEvent;
 import org.supremica.gui.ide.IDE;
+import net.sourceforge.waters.gui.ControlledSurface;
 
 public class EditorAddEdgeAction
 	extends IDEAction
@@ -17,6 +18,7 @@ public class EditorAddEdgeAction
 		putValue(Action.NAME, "Add Edge");
 		putValue(Action.SHORT_DESCRIPTION, "Add Edge");
 		putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/waters/edge16.gif")));
+		putValue(Action.ACTION_COMMAND_KEY, ControlledSurface.EDGE);
 	}
 
 	public void actionPerformed(ActionEvent e)

@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorWindow
 //###########################################################################
-//# $Id: EditorWindow.java,v 1.14 2005-07-01 04:13:12 siw4 Exp $
+//# $Id: EditorWindow.java,v 1.15 2005-07-05 02:32:07 siw4 Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -52,8 +52,8 @@ public class EditorWindow
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setTitle(title);
 
-		toolbar = new EditorToolbar();
-		surface = new ControlledSurface(toolbar, this);
+		surface = new ControlledSurface(this);
+		toolbar = new EditorToolbar(surface);
 
 		surface.setPreferredSize(new Dimension(500, 500));
 		surface.setMinimumSize(new Dimension(0, 0));

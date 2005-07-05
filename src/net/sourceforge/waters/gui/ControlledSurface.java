@@ -22,7 +22,15 @@ public class ControlledSurface
 	extends EditorSurface
 	implements MouseMotionListener, MouseListener, KeyListener
 {
-	private ControlledSurface S;
+	public static final String SELECT = "select";
+	public static final String NODE = "node";
+	public static final String NODEGROUP = "nodegroup";
+	public static final String INITIAL = "initial";
+	public static final String EDGE = "edge";
+	public static final String EVENT = "event";
+
+    private String mCommand = SELECT;
+    private ControlledSurface S;
 	private EditorToolbar T;
 	private EditorOptions options;
 	private EditorNode sNode = null;
@@ -43,6 +51,16 @@ public class ControlledSurface
 
     private DropTarget dropTarget;
     private DropTargetListener dtListener;
+
+    public void setCommand(String s)
+    {
+	mCommand = s;
+    }
+    
+    public String getCommand()
+    {
+	return mCommand;
+    }
 
 	public void setOptionsVisible(boolean v)
 	{
@@ -240,7 +258,7 @@ public class ControlledSurface
 				}
 
 				// If SELECT is active, this means that we're starting a drag-select...
-				if (T.getPlace() == EditorToolbar.SELECT)
+				if (getCommand() == SELECT)
 				{
 					// Start of drag-select?
 					dragStartX = e.getX();
@@ -251,7 +269,7 @@ public class ControlledSurface
 				}
 
 				// If NODEGROUP is active, we're adding a new group!
-				if (T.getPlace() == EditorToolbar.NODEGROUP)
+				if (getCommand() == NODEGROUP)
 				{
 					EditorNodeGroup nodeGroup;
 					if (nodesSnap)
@@ -283,7 +301,7 @@ public class ControlledSurface
 				//selectChange(o);
 
 				// Only if SELECT is chosen multiple selection is possible...
-				if (!(T.getPlace() == EditorToolbar.SELECT))
+				if (!(getCommand() == SELECT))
 				{
 					deselectAll();
 				}
@@ -389,10 +407,10 @@ public class ControlledSurface
 			hasDragged = true;
 
 			// If we're not in a nice mode, let's end it right here and right now
-			if ((T.getPlace() != EditorToolbar.SELECT) &&
-				(T.getPlace() != EditorToolbar.NODE) &&
-				(T.getPlace() != EditorToolbar.EDGE) &&
-				(T.getPlace() != EditorToolbar.NODEGROUP))
+			if ((getCommand() != SELECT) &&
+				(getCommand() != NODE) &&
+				(getCommand() != EDGE) &&
+				(getCommand() != NODEGROUP))
 			{
 				return;
 			}
@@ -504,7 +522,7 @@ public class ControlledSurface
 			}
 
 			// Multiple selection?
-			if (T.getPlace() == EditorToolbar.SELECT)
+			if (getCommand() == SELECT)
 			{
 				// Don't unselect! We're dragging!
 				toBeDeselected.clear();
@@ -658,7 +676,7 @@ public class ControlledSurface
 				// Single selection! (Multiple selection is only allowed in SELECT-mode.)
 				
 				// Edge drawing...
-				if (T.getPlace() == EditorToolbar.EDGE )
+				if (getCommand() == EDGE )
 				{
 					// There should only be one object here, or maybe two, 
 					// a node and it's label or an edge and it's labelgroup...
@@ -741,7 +759,7 @@ public class ControlledSurface
 				}
 
 				// Are we resizing a nodegroup?
-				if (nodeGroupIsSelected() && ((T.getPlace() == EditorToolbar.NODEGROUP) || (T.getPlace() == EditorToolbar.SELECT)))
+				if (nodeGroupIsSelected() && ((getCommand() == NODEGROUP) || (getCommand() == SELECT)))
 				{
 					EditorNodeGroup nodeGroup = (EditorNodeGroup) selectedObjects.get(0);
 
@@ -838,7 +856,7 @@ public class ControlledSurface
 			}
 
 			// Draw an edge if EditorToolbar.EDGE is selected
-			if (hasDragged && ((nodeIsSelected() || nodeGroupIsSelected()) && (T.getPlace() == EditorToolbar.EDGE)))
+			if (hasDragged && ((nodeIsSelected() || nodeGroupIsSelected()) && (getCommand() == EDGE)))
 			{
 				while (selectedObjects.size() != 0)
 				{
@@ -900,7 +918,7 @@ public class ControlledSurface
 			}
 
 			// Redefine edge if it has been changed
-			if ((T.getPlace() == EditorToolbar.EDGE) || (T.getPlace() == EditorToolbar.SELECT))
+			if ((getCommand() == EDGE) || (getCommand() == SELECT))
 			{
 				if (edgeIsSelected() && (selectedObjects.size() <= 2))
 				{
@@ -1030,7 +1048,7 @@ public class ControlledSurface
 			if (e.getClickCount() == 1)
 			{	
 				// Should we add a new node?
-				if (T.getPlace() == EditorToolbar.NODE)
+				if (getCommand() == NODE)
 				{
 					int posX;
 					int posY;
@@ -1095,7 +1113,7 @@ public class ControlledSurface
 				*/
 
 				// Set clicked node to initial
-				if (T.getPlace() == EditorToolbar.INITIAL)
+				if (getCommand() == INITIAL)
 				{
 					EditorNode n = (EditorNode) getObjectAtPosition(e.getX(), e.getY());
 					
@@ -1113,7 +1131,7 @@ public class ControlledSurface
 			else if (e.getClickCount() == 2)
 			{
 				// Change names on double clicking a label, change order when clicking labelgroup!
-				if (T.getPlace() == EditorToolbar.SELECT)
+				if (getCommand() == SELECT)
 				{
 					/* What's this?
 					   if (selectedNode != null)
@@ -1202,10 +1220,9 @@ public class ControlledSurface
 	}
 	*/
 
-	public ControlledSurface(EditorToolbar et, EditorWindowInterface r)
+	public ControlledSurface(EditorWindowInterface r)
 	{
 		S = this;
-		T = et;
 		root = r;
 
 		this.addMouseListener(this);

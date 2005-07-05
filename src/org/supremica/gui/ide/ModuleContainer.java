@@ -23,7 +23,7 @@ public class ModuleContainer
 	private Component selectedComponent = null;
 	private VisualProject theVisualProject = new VisualProject();
 	private Map componentToPanelMap = new HashMap();
-
+  
 	public ModuleContainer(IDE ide, ModuleProxy module)
 	{
 		this.ide = ide;

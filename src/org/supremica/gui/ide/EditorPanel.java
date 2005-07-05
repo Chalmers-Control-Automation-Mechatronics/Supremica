@@ -84,8 +84,11 @@ public class EditorPanel
 
 	public EditorWindowInterface getActiveEditorWindowInterface()
 	{
-		return null;
-//		return getEditorWindowInterface();
+	    if (getRightComponent() instanceof EditorWindowInterface) {
+		return (EditorWindowInterface)getRightComponent();
+	    }
+	    return null;
+    //	    return getEditorWindowInterface();
 	}
 
 }
