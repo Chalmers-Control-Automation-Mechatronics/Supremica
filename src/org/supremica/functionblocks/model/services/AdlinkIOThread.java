@@ -77,7 +77,7 @@ public class AdlinkIOThread extends Thread
 
 		try
 		{
-			//driver = new AdlinkPCI7432();
+			driver = new AdlinkPCI7432();
 		}
 		catch(Exception e)
 		{
@@ -127,7 +127,7 @@ public class AdlinkIOThread extends Thread
 				// read from the Digital I/O card.
 				try
 				{
-					//driver.getSignalArray(readValues);
+					driver.getSignalArray(readValues);
 				}
 				catch(Exception e)
 				{
@@ -159,7 +159,7 @@ public class AdlinkIOThread extends Thread
 				// write to the Digital I/O card.
 				try
 				{
-					//driver.setSignalArray(writeValues);
+					driver.setSignalArray(writeValues);
 				}
 				catch(Exception e)
 				{
