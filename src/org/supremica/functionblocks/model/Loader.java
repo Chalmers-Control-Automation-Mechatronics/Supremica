@@ -174,6 +174,14 @@ public class Loader
 			constructBasicFBType(xmlFBTypeData,newBasicFBType);
 		}
 		// load service FBs
+		else if (xmlFBTypeData.getName().equals("ADLINK_IO"))
+		{
+			resource.addServiceFBType("ADLINK_IO", new File(SupremicaProperties.getFBRuntimeLibraryPath() + "/ADLINK_IO.bsh"));
+			
+			ServiceFBType newServiceFBType =  (ServiceFBType) resource.getFBType("ADLINK_IO");
+			
+			constructFBInterface(xmlFBTypeData,newServiceFBType);
+		}
 		else if (xmlFBTypeData.getName().equals("IO_READER"))
 		{
 			resource.addServiceFBType("IO_READER", new File(SupremicaProperties.getFBRuntimeLibraryPath() + "/IO_READER.bsh"));
@@ -208,7 +216,7 @@ public class Loader
 		}
 		else
 		{
-			java.lang.System.err.println("Loader.loadFBType(): The type " + xmlFBTypeData.getName() + " is not yet supported!");
+			java.lang.System.err.println("Loader.loadFBType(): The type " + xmlFBTypeData.getName() + " is not supported yet!");
 			java.lang.System.exit(0);			
 		}
     }

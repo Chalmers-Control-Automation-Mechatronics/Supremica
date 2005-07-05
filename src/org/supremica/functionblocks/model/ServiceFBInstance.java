@@ -69,6 +69,7 @@ public class ServiceFBInstance extends FBInstance
 	
 	private Interpreter interpreter = new Interpreter();
 
+	private Event currentEvent;
 
 	//==========================================================================
 	private ServiceFBInstance() {}
@@ -79,7 +80,6 @@ public class ServiceFBInstance extends FBInstance
 		resource = r;
 		fbType = t;
 		serviceScript = script;
-		initialize();
 	}
 	//==========================================================================
 
@@ -92,7 +92,7 @@ public class ServiceFBInstance extends FBInstance
 			interpreter.set("serviceFB", this);
 			interpreter.set("serviceState", null);
 			interpreter.set("serviceEvent", null);
-			interpreter.set("serviceVariables", null);
+			interpreter.set("serviceVariables", variables);
 			
 			// evaluate the serviceScript
 			Reader serviceScriptReader = new FileReader(serviceScript);
@@ -107,14 +107,13 @@ public class ServiceFBInstance extends FBInstance
 		}
 	}
 
-
 	public void receiveEvent(String eventInput)
 	{
-
 		if(variables.getVariable(eventInput) != null)
 			if(variables.getVariable(eventInput).getType().equals("EventInput"))
 			{
 				currentEvent = (Event) events.get(eventInput);
+				resource.getScheduler().scheduleFBInstance(this);
 			}
 			else
 			{
@@ -126,7 +125,10 @@ public class ServiceFBInstance extends FBInstance
 			System.err.println("ServiceFBInstance: No event input " + eventInput);
 			System.exit(0);
 		}
-		
+	}
+
+	public void handleEvent()
+	{
 		// set all InputEvents to false
 		for (Iterator iter = variables.iterator();iter.hasNext();)
 		{
@@ -136,7 +138,6 @@ public class ServiceFBInstance extends FBInstance
 				((BooleanVariable) variables.getVariable(curName)).setValue(false);
 			}
 		}
-		
 		// set the corrensponding event var of the input event to TRUE 
 		((BooleanVariable) variables.getVariable(currentEvent.getName())).setValue(true);
 		
@@ -163,8 +164,6 @@ public class ServiceFBInstance extends FBInstance
 		}
 	}
 
-	// hack for constant data reading
-	// TODO: after switch to BSH for ECC change this too
 	public void setVariableValue(String name, Object value)
 	{
 		Variable var = variables.getVariable(name);
@@ -201,4 +200,5 @@ public class ServiceFBInstance extends FBInstance
 	{
 		return serviceState;
 	}
+	
 }

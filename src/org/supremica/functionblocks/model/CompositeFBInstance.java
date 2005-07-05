@@ -88,7 +88,7 @@ public class CompositeFBInstance extends FBInstance
 
 	public void addFBInstance(String instName,String typeName)
 	{
-		fbInstances.put(instName,resource.getFBType(typeName).createInstance(instName));
+		fbInstances.put(instName,resource.getFBType(typeName).createInstance(getName()+"."+instName));
 	}	
 
 	public FBInstance getFBInstance(String instName)
@@ -160,8 +160,6 @@ public class CompositeFBInstance extends FBInstance
 		return internalCnt.getFBInstance().getDataOutput(internalCnt.getSignalName());	
     }
 	
-	// hack for constant data reading
-	// TODO: after switch to BSH for ECC change this too
 	public void setVariableValue(String name, Object value)
 	{
 
@@ -173,6 +171,11 @@ public class CompositeFBInstance extends FBInstance
 
 		Connection internalCnt = (Connection) internalDataInputConnections.get(name);		
 		internalCnt.getFBInstance().setVariableValue(internalCnt.getSignalName(),value);
+	}
+
+	public void handleEvent()
+	{
+		// Doesn't do anything. Just here to satisfy the abstraction of FBInstace.
 	}
 
 }

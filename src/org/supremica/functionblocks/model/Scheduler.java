@@ -61,7 +61,7 @@ public class Scheduler
 {
 	private Resource resource;
 	
-	private List scheduledBasicFBInstances = new LinkedList();
+	private List scheduledFBInstances = new LinkedList();
 	private List scheduledJobs = Collections.synchronizedList(new LinkedList());
 	//private List finishedJobs = Collections.synchronizedList(new LinkedList());
 	
@@ -91,9 +91,9 @@ public class Scheduler
 	}
 	
 	
-	public synchronized BasicFBInstance getNextScheduledBasicFBInstance()
+	public synchronized FBInstance getNextScheduledFBInstance()
 	{
-		while(scheduledBasicFBInstances.size() == 0)
+		while(scheduledFBInstances.size() == 0)
 		{			
 			try
 			{
@@ -101,10 +101,10 @@ public class Scheduler
 			}
 			catch(InterruptedException e)
 			{
-				System.err.println("Scheduler: InterruptedException");
+				System.err.println("Scheduler.getNextScheduledFBInstance(): InterruptedException");
 			}
 		}
-		return (BasicFBInstance) scheduledBasicFBInstances.remove(0);
+		return (FBInstance) scheduledFBInstances.remove(0);
 	}
 	
 
@@ -121,11 +121,8 @@ public class Scheduler
 
 		while (true)
 		{
-			BasicFBInstance selectedBasicFBInstance = getNextScheduledBasicFBInstance();
-			if(selectedBasicFBInstance != null)
-			{
-				selectedBasicFBInstance.handleEvent();
-			}
+			FBInstance selectedFBInstance = getNextScheduledFBInstance();
+			selectedFBInstance.handleEvent();
 			//resource.handleConfigurationRequests();
 		}
 	}
@@ -136,9 +133,9 @@ public class Scheduler
 		algorithmThread.notifyNewJob();
 	}
 
-	public synchronized void scheduleBasicFBInstance(BasicFBInstance fbInst)
+	public synchronized void scheduleFBInstance(FBInstance fbInst)
 	{
-		scheduledBasicFBInstances.add(fbInst);
+		scheduledFBInstances.add(fbInst);
 		notify();
 	}
    

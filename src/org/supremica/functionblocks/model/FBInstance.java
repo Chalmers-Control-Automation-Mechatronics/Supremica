@@ -157,6 +157,8 @@ public abstract class FBInstance extends NamedObject
 	
     public abstract void receiveEvent(String eventInput);
 
+	public abstract void handleEvent();
+
 	public abstract void setVariableValue(String name, Object value);
 
 }

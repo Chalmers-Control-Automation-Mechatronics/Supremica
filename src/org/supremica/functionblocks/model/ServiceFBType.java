@@ -78,11 +78,11 @@ public class ServiceFBType extends FBType
 		ServiceFBInstance newInstance = new ServiceFBInstance(name, resource, this, serviceScript);	
 		
 		newInstance.setEvents(events);
-
 		newInstance.setVariables((Variables) variables.clone());
+		newInstance.initialize();
 
 		instances.put(name,newInstance);
-
+	
 		return newInstance;
 	}
 	

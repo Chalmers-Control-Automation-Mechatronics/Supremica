@@ -101,12 +101,12 @@ public class FBNetwork
 		{
 			System.err.println("FBNetwork.addEventConnection(): to instance is empty in connection from " + source +" to " + dest);
 		}
-		else if (fromInstance.equals(toInstance))
-		{
-			System.err.println("FBNetwork.addEventConnection(): source instance (" + source +") is equal to destination instance (" + dest + ")");
-			System.err.println("                              : that is not allowed according to standard!");
-			System.exit(0);
-		}
+		//else if (fromInstance.equals(toInstance))
+		//{
+		//	System.err.println("FBNetwork.addEventConnection(): source instance (" + source +") is equal to destination instance (" + dest + ")");
+		//	System.err.println("                              : that is not allowed according to standard!");
+		//	System.exit(0);
+		//}
 		else
 		{
 		

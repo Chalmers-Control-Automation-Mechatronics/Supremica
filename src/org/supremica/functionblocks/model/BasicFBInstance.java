@@ -67,8 +67,7 @@ public class BasicFBInstance extends FBInstance
     }
 	//================================================================
 
-	// hack for constant data reading
-	// TODO: after switch to BSH for ECC change this too
+
 	public void setVariableValue(String name, Object value)
 	{
 		Variable var = variables.getVariable(name);
@@ -114,7 +113,7 @@ public class BasicFBInstance extends FBInstance
 				if(variables.getVariable(eventInput).getType().equals("EventInput"))
 				{
 					eventInputQueue.add((Event) events.get(eventInput));
-					resource.getScheduler().scheduleBasicFBInstance(this);
+					resource.getScheduler().scheduleFBInstance(this);
 				}
 				else
 				{
@@ -134,7 +133,7 @@ public class BasicFBInstance extends FBInstance
 	
 		if(handlingEvent)
 		{
-			resource.getScheduler().scheduleBasicFBInstance(this);
+			resource.getScheduler().scheduleFBInstance(this);
 			return;			
 		}
 

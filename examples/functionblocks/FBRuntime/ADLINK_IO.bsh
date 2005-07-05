@@ -78,7 +78,7 @@ else
 	else if (eventName.equals("WRITE"))
 	{ 	
 		System.out.println("ADLINK_IO.bsh(" + serviceFB.getName() + "): WRITE event received");
-		serviceState.get("reader").writeOutputs();
+		serviceState.get("adlinkIO").writeOutputs();
 	}	
 }
 
