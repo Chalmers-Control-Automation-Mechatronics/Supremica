@@ -87,7 +87,7 @@ public abstract class FBInstance extends NamedObject
 
     public void addEventOutputConnection(String output, Connection cnt)
     {
-		if (eventOutputConnection.get(output) == null)
+		if (eventOutputConnections.get(output) == null)
 		{
 			eventOutputConnections.put(output, cnt);
 		}
@@ -99,7 +99,7 @@ public abstract class FBInstance extends NamedObject
     
     public void addDataInputConnection(String input, Connection cnt)
     {	
-		if (dataInputConnection.get(input) == null)
+		if (dataInputConnections.get(input) == null)
 		{
 			dataInputConnections.put(input, cnt);
 		}
