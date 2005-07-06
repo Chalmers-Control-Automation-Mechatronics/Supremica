@@ -191,7 +191,7 @@ public class TestAutomatonMinimizer
 			assertTrue((min.nbrOfStates() == 3) && 
 					   (min.nbrOfTransitions() == 3) &&
 					   (min.getStateWithName("2.0.1").nbrOfOutgoingArcs() == 2));
-
+			
 			/* PROBLEM! THE ALGORITHM DOES WRONG THE SECOND TIME IT IS USED... OLD DATA LINGERING?
 			// Test bisimulation equivalence minimization
 			minimizer = new AutomatonMinimizer(theProject.getAutomaton("Test (from Westin)"));
@@ -200,6 +200,10 @@ public class TestAutomatonMinimizer
 					   (min.nbrOfTransitions() == 4) &&
 					   (min.getStateWithName("q2.q1.p1").nbrOfOutgoingArcs() == 2));
 			*/
+		}
+		catch (UnsatisfiedLinkError ex)
+		{
+			System.err.println("The library BisimulationEquivalence is missing.");
 		}
 		catch (Exception ex)
 		{
