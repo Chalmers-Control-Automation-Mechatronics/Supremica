@@ -679,7 +679,7 @@ public class Automaton
 	}
 
 	/**
-	 * Returns true if it finds one accepting state, else returns false
+	 * Returns true if it finds an accepting state, else returns false
 	 * Iterates over all states _only_if_ no accepting states exist (or only
 	 * the last one is accepting)
 	 */
@@ -690,6 +690,26 @@ public class Automaton
 			State currState = stateIt.nextState();
 
 			if (currState.isAccepting())
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Returns true if it finds a nonaccepting state, else returns false
+	 * Iterates over all states _only_if_ no accepting states exist (or only
+	 * the last one is accepting)
+	 */
+	public boolean hasNonacceptingState()
+	{
+		for (StateIterator stateIt = stateIterator(); stateIt.hasNext(); )
+		{
+			State currState = stateIt.nextState();
+
+			if (!currState.isAccepting())
 			{
 				return true;
 			}
@@ -1343,7 +1363,7 @@ public class Automaton
 	 */
 	public void normalizeStateIdentities()
 	{
-		setStateIndicies();
+		setStateIndices();
 
 		for (StateIterator stateIt = stateIterator(); stateIt.hasNext(); )
 		{
@@ -1365,7 +1385,7 @@ public class Automaton
 		index = automatonIndex;
 
 		alphabet.setIndicies();
-		setStateIndicies();
+		setStateIndices();
 	}
 
 	void setIndicies(int automatonIndex, Alphabet otherAlphabet)
@@ -1373,10 +1393,10 @@ public class Automaton
 		index = automatonIndex;
 
 		alphabet.setIndicies(otherAlphabet);
-		setStateIndicies();
+		setStateIndices();
 	}
 
-	private void setStateIndicies()
+	private void setStateIndices()
 	{
 		int i = 0;
 

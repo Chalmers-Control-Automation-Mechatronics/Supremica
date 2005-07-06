@@ -57,21 +57,27 @@ public class EquivalenceRelation
 	/** Language equivalence. */
 	public static final EquivalenceRelation LanguageEquivalence = 
 		new EquivalenceRelation("Language equivalence", true);
-	/** Observation equivalence. */
-	public static final EquivalenceRelation ObservationEquivalence = 
-		new EquivalenceRelation("Observation equivalence", true);
 	/** Conflict equivalence. */
 	public static final EquivalenceRelation ConflictEquivalence = 
 		new EquivalenceRelation("Conflict equivalence", true);
-	/** For minimization using the conflict equivalence minimization rules only. */
-	public static final EquivalenceRelation ConflictEquivalenceMinimizationRules = 
-		new EquivalenceRelation("Conflict equivalence minimization rules", false);
+	/** Observation equivalence (aka Weak bisimulation equivalence). */
+	public static final EquivalenceRelation ObservationEquivalence = 
+		new EquivalenceRelation("Observation equivalence", true);
+	/** Bisimulation equivalence (aka Strong bisimulation equivalence). */
+	public static final EquivalenceRelation BisimulationEquivalence = 
+		new EquivalenceRelation("Bisimulation equivalence", true);
 	/** Failures equivalence. */
 	public static final EquivalenceRelation FailureEquivalence = 
 		new EquivalenceRelation("Failure equivalence", false);
 	/** Undefined equivalence relation. */
 	public static final EquivalenceRelation Undefined = 
 		new EquivalenceRelation("Undefined", false);
+
+	/** For minimization using the conflict equivalence minimization rules only. */
+	public static final EquivalenceRelation ConflictEquivalenceMinimizationRules = 
+		new EquivalenceRelation("Conflict equivalence minimization rules", false);
+
+	/**	The name of the equivalence relation. */
 	private String identifier;
 
 	private EquivalenceRelation(String identifier, boolean add)

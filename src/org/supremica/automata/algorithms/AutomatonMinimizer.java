@@ -52,31 +52,35 @@ package org.supremica.automata.algorithms;
 import java.util.*;
 import org.supremica.log.*;
 import org.supremica.automata.*;
+import org.supremica.automata.algorithms.minimization.*;
 import org.supremica.automata.algorithms.standard.Determinizer;
 import org.supremica.properties.SupremicaProperties;
 import org.supremica.gui.ExecutionDialog;
 
 // Factory object for generating the correct class according to prefs
 /*
-class EqClassFactory
-{
-	static EquivalenceClass getEqClass()
-	{
-		return new EqClass();
-	}
-
-	static EquivalenceClass getEqClass(EquivalenceClass eqc)
-	{
-		return new EqClass(eqc);
-	}
-}
+  class EqClassFactory
+  {
+  static EquivalenceClass getEqClass()
+  {
+  return new EqClass();
+  }
+  
+  static EquivalenceClass getEqClass(EquivalenceClass eqc)
+  {
+  return new EqClass(eqc);
+  }
+  }
 */
 
+/**
+ * Describe class <code>AutomatonMinimizer</code> here.
+ */
 public class AutomatonMinimizer
 	implements Stoppable
 {
 	private static Logger logger = LoggerFactory.createLogger(AutomatonMinimizer.class);
-
+	
 	// Stoppable stuff
 	private ExecutionDialog executionDialog = null;
 	private boolean stopRequested = false;
@@ -101,6 +105,7 @@ public class AutomatonMinimizer
 
 	/**
 	 * Basic constructor.
+	 * @param theAutomaton an <code>Automaton</code> value
 	 */
 	public AutomatonMinimizer(Automaton theAutomaton)
 	{
@@ -133,7 +138,7 @@ public class AutomatonMinimizer
 		}
 
 		// Make reachable
-        SynthesizerOptions synthOptions = SynthesizerOptions.getDefaultSynthesizerOptions();
+		SynthesizerOptions synthOptions = SynthesizerOptions.getDefaultSynthesizerOptions();
 		AutomatonSynthesizer synth = new AutomatonSynthesizer(theAutomaton, synthOptions);
 		synth.doReachable(true);
 		LinkedList toBeRemoved = new LinkedList();
@@ -145,7 +150,7 @@ public class AutomatonMinimizer
 				logger.verbose("The state " + state + " will be removed since it is not reachable.");
 				toBeRemoved.add(state);
 			}
-
+			
 			if (state.isForbidden())
 			{
 				// logger.fatal("The state " + state + " is forbidden.");
@@ -155,10 +160,20 @@ public class AutomatonMinimizer
 		{
 			theAutomaton.removeState((State) toBeRemoved.remove(0));
 		}
-
+		
 		// Find out what to do
 		EquivalenceRelation equivalenceRelation = options.getMinimizationType();
-		if (equivalenceRelation == EquivalenceRelation.LanguageEquivalence)
+		if (equivalenceRelation == EquivalenceRelation.BisimulationEquivalence)
+		{
+			//Minimize and return
+			BisimulationEquivalenceMinimizer.minimize(theAutomaton, useShortNames);
+
+			theAutomaton.setComment("min(" + theAutomaton.getName() + ")");
+			theAutomaton.setName("");
+
+			return theAutomaton;
+		}
+		else if (equivalenceRelation == EquivalenceRelation.LanguageEquivalence)
 		{
 			// Is this automaton nondeterministic?
 			if (!theAutomaton.isDeterministic())
@@ -373,129 +388,6 @@ public class AutomatonMinimizer
 		}
 	}
 	*/
-
-	/**
-	 * Merges two states, giving the new state the union of incoming and outgoing transitions,
-	 * if at least one state was accepting, the result is accepting, and similarily for
-	 * initial and forbidden states
-	 */
-	public State mergeStates(Automaton aut, State one, State two, boolean useShortNames)
-	{
-		// Don't merge if equal
-		if (one.equals(two))
-		{
-			return one;
-		}
-
-		// Make new state
-		State newState;
-		if (useShortNames)
-		{
-			newState = aut.createUniqueState();
-		}
-		else
-		{
-			newState = new State(one.getName() + SupremicaProperties.getStateSeparator() + two.getName());
-		}
-		aut.addState(newState);
-
-		// Set markings
-		if (one.isAccepting() || two.isAccepting()) // Looks odd but is correct?
-		{
-			newState.setAccepting(true);
-		}
-		if (one.isForbidden() || two.isForbidden())
-		{
-			newState.setForbidden(true);
-		}
-		if (one.isInitial() || two.isInitial())
-		{
-			newState.setInitial(true);
-			aut.setInitialState(newState);
-		}
-
-		// Add transitions
-		LinkedList toBeAdded = new LinkedList();
-		for (ArcIterator arcIt = one.outgoingArcsIterator(); arcIt.hasNext(); )
-		{
-			Arc arc = arcIt.nextArc();
-			State toState = arc.getToState();
-			if (toState.equals(one) || toState.equals(two))
-			{
-				toState = newState;
-			}
-
-			toBeAdded.add(new Arc(newState, toState, arc.getEvent()));
-		}
-		for (ArcIterator arcIt = two.outgoingArcsIterator(); arcIt.hasNext(); )
-		{
-			Arc arc = arcIt.nextArc();
-			State toState = arc.getToState();
-			if (toState.equals(one) || toState.equals(two))
-			{
-				toState = newState;
-			}
-
-			toBeAdded.add(new Arc(newState, toState, arc.getEvent()));
-		}
-		for (ArcIterator arcIt = one.incomingArcsIterator(); arcIt.hasNext(); )
-		{
-			Arc arc = arcIt.nextArc();
-			State fromState = arc.getFromState();
-			if (fromState.equals(one) || fromState.equals(two))
-			{
-				fromState = newState;
-			}
-
-			toBeAdded.add(new Arc(fromState, newState, arc.getEvent()));
-		}
-		for (ArcIterator arcIt = two.incomingArcsIterator(); arcIt.hasNext(); )
-		{
-			Arc arc = arcIt.nextArc();
-			State fromState = arc.getFromState();
-			if (fromState.equals(one) || fromState.equals(two))
-			{
-				fromState = newState;
-			}
-
-			toBeAdded.add(new Arc(fromState, newState, arc.getEvent()));
-		}
-		// Add the new arcs!
-		while (toBeAdded.size() != 0)
-		{
-			// Add if not already there or epsilon selfloop
-			Arc arc = (Arc) toBeAdded.remove(0);
-			if (arc.getEvent().isEpsilon() && arc.isSelfLoop())
-			{
-				continue;
-			}
-			if (!arc.getFromState().containsOutgoingArc(arc))
-			{
-				aut.addArc(arc);
-			}
-		}
-
-		// Remove the states
-		aut.removeState(one);
-		aut.removeState(two);
-
-		/*
-		// Adjust the index of the new state (see the "Här blir det fel" discussion in AutomataIndexForm)
-		if (one.getIndex() < two.getIndex())
-		{
-			// Take over the index of state one
-			newState.setIndex(one.getIndex());
-		}
-		else
-		{
-			// Take over the index of state two
-			newState.setIndex(two.getIndex());
-		}
-		*/
-
-		// Return the new state
-		return newState;
-	}
 
 	private void checkStateIndices(Automaton aut)
 	{
@@ -903,7 +795,7 @@ public class AutomatonMinimizer
 					// Merge!
 					count++;
 					statesToExamine.remove(two);
-					State state = mergeStates(aut, one, two, useShortNames);
+					State state = MinimizationHelper.mergeStates(aut, one, two, useShortNames);
 					statesToExamine.add(state);
 					// Add states that may have changed to stack
 					for (ArcIterator it = state.incomingArcsIterator(); it.hasNext(); )
@@ -963,7 +855,7 @@ public class AutomatonMinimizer
 					// Merge!
 					count++;
 					statesToExamine.remove(two);
-					one = mergeStates(aut, one, two, useShortNames);
+					one = MinimizationHelper.mergeStates(aut, one, two, useShortNames);
 				}
 			}
 		}
@@ -1115,7 +1007,7 @@ public class AutomatonMinimizer
 					{
 						aut.removeArc(arc); // We can remove this one, it will become an epsilon self-loop!
 						statesToExamine.remove(two);
-						State mergeState = mergeStates(aut, two, one, useShortNames);
+						State mergeState = MinimizationHelper.mergeStates(aut, two, one, useShortNames);
 						countA++;
 						statesToExamine.add(mergeState);
 						// Add states that may have changed to stack
@@ -1266,7 +1158,7 @@ public class AutomatonMinimizer
 					{
 						// Merge states!
 						//logger.info("Merging " + old.getState() + " and " + info.getState() + ".");
-						State merge = mergeStates(aut, old.getState(), info.getState(), useShortNames);
+						State merge = MinimizationHelper.mergeStates(aut, old.getState(), info.getState(), useShortNames);
 						countB++;
 						old.setState(merge);
 						change = true;						

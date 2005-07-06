@@ -66,7 +66,7 @@ public class TestFiles
 	public static final TestFiles AutomaticCarParkGate = new TestFiles("AutomaticCarParkGate.xml");
 	public static final TestFiles BallProcess = new TestFiles("ballProcess.xml");
 	public static final TestFiles BallProcessJava = new TestFiles("BallProcess.java");
-	public static final TestFiles Bisimulation = new TestFiles("bisimulation.xml");
+	public static final TestFiles BisimulationEquivalence = new TestFiles("bisimulationEquivalence.xml");
 	public static final TestFiles CatMouse = new TestFiles("catmouse.xml");
 	public static final TestFiles CatMouseJava = new TestFiles("CatAndMouse.java");
 	public static final TestFiles CentralLocking3Doors = new TestFiles("centralLocking3Doors.xml");
@@ -78,6 +78,7 @@ public class TestFiles
 	public static final TestFiles FlexibleManufacturingSystem = new TestFiles("flexibleManufacturingSystem.xml");
 	public static final TestFiles MachineBufferMachine = new TestFiles("MachineBufferMachine.xml");
 	public static final TestFiles NondeterministicComposition = new TestFiles("NondeterministicComposition.xml");
+	public static final TestFiles ObservationEquivalence = new TestFiles("observationEquivalence.xml");
 	public static final TestFiles RobotAssemblyCell = new TestFiles("robotAssemblyCell.xml");
 	public static final TestFiles Verriegel3 = new TestFiles("verriegel3.xml");
 	public static final TestFiles Verriegel3LanguageInclusion = new TestFiles("verriegel3_language_inclusion.xml");

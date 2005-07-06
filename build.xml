@@ -303,7 +303,7 @@
 		includeJavaRuntime="yes"
 		deprecation="false"
 		verbose="false"
-		source="1.4"
+		source="1.5"
 		>
 		<classpath>	
 			<pathelement location="${build}" />
@@ -635,6 +635,8 @@
 	<chmod file="${dist}/JavaClipboard.dll" perm="644"/>
 	<copy file="${platform}/linux.x86/lib/libbuddy.so" todir="${dist}"/>	
 	<chmod file="${dist}/libbuddy.so" perm="644"/>
+	<copy file="${platform}/linux.x86/lib/libBisimulationEquivalence.so" todir="${dist}"/>	
+	<chmod file="${dist}/libBisimulationEquivalence.so" perm="644"/>
 </target>
 
 <target name="startfiles_supremica_student">
@@ -668,6 +670,7 @@
 	<java fork="yes" classname="junit.textui.TestRunner"
 		taskname="junit" failonerror="true">
 		<arg value="org.supremica.TestPackageSupremica"/>
+        <jvmarg value="-Djava.library.path=${dist}"/>
 		<classpath>	
 			<pathelement location="${build}" />
 			<pathelement location="${testsbuild}" />
@@ -825,6 +828,8 @@
 	<chmod file="${installer.dir}\Input\21100280.LIC" perm="644"/>
 	<copy file="${platform}/linux.x86/lib/libbuddy.so" todir="${installer.dir}\Input"/>	
 	<chmod file="${installer.dir}\Input\libbuddy.so" perm="644"/>
+	<copy file="${platform}/linux.x86/lib/libBisimulationEquivalence.so" todir="${installer.dir}\Input"/>	
+	<chmod file="${installer.dir}\Input\libBisimulationEquivalence.so" perm="644"/>
 	<exec executable="C:\Progra~1\INNOSE~1\iscc.exe">
 		<arg value="C:\Supremica Installer\SupremicaDist.iss"/>
 	</exec>
@@ -845,6 +850,8 @@
 	<chmod file="${installer.dir}\Input\21100280.LIC" perm="644"/>
 	<copy file="${platform}/linux.x86/lib/libbuddy.so" todir="${installer.dir}\Input"/>	
 	<chmod file="${installer.dir}\Input\libbuddy.so" perm="644"/>
+	<copy file="${platform}/linux.x86/lib/libBisimulationEquivalence.so" todir="${installer.dir}\Input"/>	
+	<chmod file="${installer.dir}\Input\libBisimulationEquivalence.so" perm="644"/>
 	<exec executable="C:\Progra~1\INNOSE~1\iscc.exe">
 		<arg value="C:\Supremica Installer\SupremicaDist.iss"/>
 	</exec>

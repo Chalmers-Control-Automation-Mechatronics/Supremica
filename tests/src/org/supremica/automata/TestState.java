@@ -95,7 +95,7 @@ public class TestState
 		try
 		{
 			ProjectBuildFromXml builder = new ProjectBuildFromXml();
-			Project theProject = builder.build(TestFiles.getFile(TestFiles.Bisimulation));
+			Project theProject = builder.build(TestFiles.getFile(TestFiles.ObservationEquivalence));
 			Automaton aut = theProject.getAutomaton("P1F1F2");
 			State state = aut.getInitialState();
 			

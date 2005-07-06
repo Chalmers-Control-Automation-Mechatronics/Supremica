@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Automata name="StrongBisimulation" comment="Testfiles for bisimulation equivalence (aka strong bisimulation equivalence).">
+<Automaton name="Test (from Fernandez)" type="Plant">
+	<Events>
+		<Event id="a"/>
+		<Event id="b"/>
+		<Event id="c"/>
+	</Events>
+	<States>
+		<State id="0" initial="true"/>
+		<State id="1"/>
+		<State id="2"/>
+		<State id="3"/>
+		<State id="4"/>
+		<State id="5"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="a"/>
+		<Transition source="0" dest="3" event="b"/>
+		<Transition source="1" dest="2" event="a"/>
+		<Transition source="1" dest="4" event="b"/>
+		<Transition source="1" dest="3" event="b"/>
+		<Transition source="2" dest="1" event="a"/>
+		<Transition source="2" dest="4" event="b"/>
+		<Transition source="3" dest="5" event="c"/>
+		<Transition source="4" dest="5" event="c"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Test (from Westin)" type="Plant">
+	<Events>
+		<Event id="a"/>
+		<Event id="b"/>
+		<Event id="c"/>
+		<Event id="tau" epsilon="true"/>
+	</Events>
+	<States>
+		<State id="init" initial="true"/>
+		<State id="p0"/>
+		<State id="p1"/>
+		<State id="q0"/>
+		<State id="q1"/>
+		<State id="q2"/>
+		<State id="p2"/>
+		<State id="p3"/>
+		<State id="q3"/>
+		<State id="q4"/>
+		<State id="q5"/>
+		<State id="q6"/>
+	</States>
+	<Transitions>
+		<Transition source="init" dest="p0" event="tau"/>
+		<Transition source="init" dest="q0" event="tau"/>
+		<Transition source="p0" dest="p1" event="a"/>
+		<Transition source="p1" dest="p2" event="b"/>
+		<Transition source="p1" dest="p3" event="c"/>
+		<Transition source="q0" dest="q1" event="a"/>
+		<Transition source="q0" dest="q2" event="a"/>
+		<Transition source="q1" dest="q3" event="b"/>
+		<Transition source="q1" dest="q4" event="c"/>
+		<Transition source="q2" dest="q5" event="c"/>
+		<Transition source="q2" dest="q6" event="b"/>
+	</Transitions>
+</Automaton>
+</Automata>
