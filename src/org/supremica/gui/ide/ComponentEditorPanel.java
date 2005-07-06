@@ -38,8 +38,8 @@ public class ComponentEditorPanel
 		this.moduleContainer = moduleContainer;
 		this.module = moduleContainer.getModuleProxy();
 		toolbar = new EditorToolbar();
-		if (moduleContainer.getEditorToolBar() instanceof ControlledToolbar) {
-		    surface = new ControlledSurface(this, (ControlledToolbar)moduleContainer.getEditorToolBar());
+		if (moduleContainer.getEditorPanel().getToolBar() instanceof ControlledToolbar) {
+		    surface = new ControlledSurface(this, (ControlledToolbar)moduleContainer.getEditorPanel().getToolBar());
 		} else {
 		    surface = new ControlledSurface(this, toolbar);
 		}
