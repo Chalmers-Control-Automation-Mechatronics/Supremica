@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="E_SWITCH" >
+  <VersionInfo Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2005-07-05" />
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="EI" >
+        <With Var="G" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="EO0" />
+      <Event Name="EO1" />
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="G" Type="BOOL" />
+    </InputVars>
+  </InterfaceList>
+  <BasicFB>
+    <ECC>
+        <ECState Name="START" />
+        <ECState Name="G0">
+		    <ECAction Output="EO0"/>
+	    </ECState>    
+        <ECState Name="G1">
+		    <ECAction Output="EO1"/>
+	    </ECState>    
+		<ECTransition Source="START" Destination="G0" Condition="EI AND NOT G" />
+		<ECTransition Source="G0" Destination="START" Condition="1" />
+		<ECTransition Source="START" Destination="G1" Condition="EI AND G" />
+		<ECTransition Source="G1" Destination="START" Condition="1" />
+    </ECC>
+  </BasicFB>
+</FBType>

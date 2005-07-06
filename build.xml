@@ -544,7 +544,7 @@
 	</jar>
 	<delete>
 		<fileset dir="${lib}">
-			<!--patternset id="cleanjaxdbunjaredclassfiles"-->
+			<!--patternset id="cleanjaxbunjaredclassfiles"-->
 				<include name="org/w3/**"/>
 				<include name="net/sourceforge/waters/xsd/**"/>
 			<!--/patternset-->

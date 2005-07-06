@@ -87,12 +87,26 @@ public abstract class FBInstance extends NamedObject
 
     public void addEventOutputConnection(String output, Connection cnt)
     {
-		eventOutputConnections.put(output, cnt);
+		if (eventOutputConnection.get(output) == null)
+		{
+			eventOutputConnections.put(output, cnt);
+		}
+		else
+		{
+			System.out.println("FBInstace("+getName()+").addEventOutputConnection(): Warning: Event output "+output+" is already connected!");
+		}
     }
     
     public void addDataInputConnection(String input, Connection cnt)
     {	
-		dataInputConnections.put(input, cnt);
+		if (dataInputConnection.get(input) == null)
+		{
+			dataInputConnections.put(input, cnt);
+		}
+		else
+		{
+			System.out.println("FBInstace("+getName()+").addDataInputConnection(): Warning: Data input "+input+" is already connected!");
+		}
     }
 
 	// This method provides output data to the calling BasicFBInstance
@@ -148,10 +162,6 @@ public abstract class FBInstance extends NamedObject
 		{
 			FBInstance toInstance = outputConnection.getFBInstance();
 			toInstance.receiveEvent(outputConnection.getSignalName());
-		}
-		else
-		{
-			//System.err.println("FBInstance(" + getName() + ").sendEvent() : Warning: Event output " + outputEventName + " is not connected.");
 		}
 	}
 	

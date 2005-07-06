@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="E_F_TRIG" >
+  <VersionInfo Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2005-07-05" />
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="EI" >
+        <With Var="QI" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="EO" />
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="QI" Type="BOOL" />
+    </InputVars>
+  </InterfaceList>
+  <FBNetwork>
+	<FB Name="dflip" Type="E_D_FF" />
+	<FB Name="switch" Type="E_SWITCH" />
+	<EventConnections>
+	  <Connection Source="EI" Destination="dflip.CLK" />
+	  <Connection Source="dflip.EO" Destination="switch.EI" />
+	  <Connection Source="switch.EO0" Destination="EO" />
+	</EventConnections>
+	<DataConnections>
+	  <Connection Source="QI" Destination="dflip.D" />
+	  <Connection Source="dflip.Q" Destination="switch.G" />
+	</DataConnections>
+  </FBNetwork>
+</FBType>
