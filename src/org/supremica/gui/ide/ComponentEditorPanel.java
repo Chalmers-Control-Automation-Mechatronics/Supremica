@@ -77,10 +77,10 @@ public class ComponentEditorPanel
 		add(split);
 
 		//		split.setUI(new newUI());
-		if (events.calculateWidth1() > moduleContainer.getEditorPanel().getRightComponent().getWidth()/2) {
+		if (events.getBestWidth() > moduleContainer.getEditorPanel().getRightComponent().getWidth()/2) {
 		    split.setDividerLocation((int)moduleContainer.getEditorPanel().getRightComponent().getWidth()/2);
 		} else {
-		    split.setDividerLocation(events.calculateWidth1());
+		    split.setDividerLocation(events.getBestWidth());
 		}
 		System.out.println(split.getDividerLocation());
 		System.out.println("MAX :" + split.getMaximumDividerLocation());

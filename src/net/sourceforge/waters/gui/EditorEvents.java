@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorEvents
 //###########################################################################
-//# $Id: EditorEvents.java,v 1.14 2005-07-06 03:55:10 siw4 Exp $
+//# $Id: EditorEvents.java,v 1.15 2005-07-06 04:09:56 siw4 Exp $
 //###########################################################################
 
 
@@ -242,7 +242,7 @@ public class EditorEvents
 	}
 
 
-	public int calculateWidth1()
+	private int calculateWidth1()
 	{
 		final TableModel model = getModel();
 		final TableCellRenderer renderer = getDefaultRenderer(Object.class);
@@ -259,10 +259,33 @@ public class EditorEvents
 				maxwidth = width;
 			}
 		}
-		System.out.println(maxwidth);
 		return maxwidth;
 	}
 
+	public int getBestWidth()
+	{
+		final TableModel model = getModel();
+		final TableCellRenderer renderer = getDefaultRenderer(Object.class);
+		final int rows = getRowCount();
+		int maxwidth = 1;
+		for (int row = 0; row < rows; row++) {			
+			int width = 0;
+			for (int i = 0; i < getColumnCount(); i++) {
+				final Object value = model.getValueAt(row, i);
+				final Component comp =
+					renderer.getTableCellRendererComponent
+					(this, value, false, false, row, i);
+				final Dimension size = comp.getPreferredSize();
+				width += size.width;
+				System.out.println(row + " " + i + " " + width);
+			}
+			if (width > maxwidth) {
+				maxwidth = width;
+			}
+		}
+		System.out.println(maxwidth);
+		return maxwidth;
+	}
 
 	//#######################################################################
 	//# Local Class RendererNoFocus
