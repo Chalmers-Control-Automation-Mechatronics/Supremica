@@ -125,12 +125,6 @@ abstract class MainPanel
 		return null;
 	}
 
-    public IDEToolBar getToolBar()
-    {
-	return thisToolBar;
-    }
-
-
  	class EmptyRightPanel
  		extends WhiteScrollPane
  	{

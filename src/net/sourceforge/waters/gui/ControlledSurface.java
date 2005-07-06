@@ -56,6 +56,12 @@ public class ControlledSurface
 	return mToolbar.getCommand();
     }
 
+    public void setToolbar(ControlledToolbar t)
+    {
+	mToolbar = t;
+    }
+
+
 	public void setOptionsVisible(boolean v)
 	{
 		options.setVisible(v);

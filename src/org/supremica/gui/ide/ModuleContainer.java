@@ -30,6 +30,11 @@ public class ModuleContainer
 		this.module = module;
 		setSelectedComponent(getEditorPanel());
 	}
+    
+        public IDE getIDE() 
+        {
+	    return ide;
+	}
 
 	public String getName()
 	{

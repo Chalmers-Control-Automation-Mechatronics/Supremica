@@ -240,7 +240,7 @@ class EditorComponentsPanel
 //							}
 							EditorPanel editorPanel = moduleContainer.getEditorPanel();
 							editorPanel.setRightComponent(moduleContainer.getComponentEditorPanel(scp));
-//							ed = new EditorWindow(scp.getName(), module, scp);
+							//							ed = new EditorWindow(scp.getName(), module, scp);
 						}
 					}
 				}

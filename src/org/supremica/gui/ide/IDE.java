@@ -217,6 +217,11 @@ public class IDE
 		return ideToolBar;
 	}
 
+        public IDEToolBar getToolBar()
+        {
+	    return ideToolBar;
+	}
+
 	// Overridden so we can exit when window is closed
 	protected void processWindowEvent(WindowEvent e)
 	{
