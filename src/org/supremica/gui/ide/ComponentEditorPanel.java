@@ -1,6 +1,7 @@
 package org.supremica.gui.ide;
 
 import javax.swing.*;
+import javax.swing.plaf.basic.BasicSplitPaneUI;
 import java.awt.*;
 import java.io.File;
 import net.sourceforge.waters.model.module.*;
@@ -68,14 +69,23 @@ public class ComponentEditorPanel
 		final JSplitPane split = new JSplitPane
 			(JSplitPane.HORIZONTAL_SPLIT, scrollevents, scrollsurface);
 		viewevents.setBackground(Color.WHITE);
-		split.setResizeWeight(0.0);
-		split.setDividerLocation(0.2);
 
 		constraints.weightx = 1.0;
 		constraints.fill = GridBagConstraints.BOTH;
 
 		gridbag.setConstraints(split, constraints);
 		add(split);
+
+		//		split.setUI(new newUI());
+		if (events.calculateWidth1() > moduleContainer.getEditorPanel().getRightComponent().getWidth()/2) {
+		    split.setDividerLocation((int)moduleContainer.getEditorPanel().getRightComponent().getWidth()/2);
+		} else {
+		    split.setDividerLocation(events.calculateWidth1());
+		}
+		System.out.println(split.getDividerLocation());
+		System.out.println("MAX :" + split.getMaximumDividerLocation());
+		System.out.println("PREF :" + events.getPreferredSize().getWidth());
+		System.out.println("WIDTH :" + moduleContainer.getEditorPanel().getRightComponent().getWidth());
 		//setJMenuBar(menu);
 //		pack();
 		setVisible(true);
@@ -160,4 +170,12 @@ public class ComponentEditorPanel
 	{
 
 	}
+
+    private class newUI extends BasicSplitPaneUI
+    {
+	public int getMinimumDividerLocation(JSplitPane jc)
+	{
+	    return 20000;
+	}
+    }
 }

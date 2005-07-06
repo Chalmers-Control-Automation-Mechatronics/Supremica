@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorEvents
 //###########################################################################
-//# $Id: EditorEvents.java,v 1.13 2005-07-04 22:17:26 siw4 Exp $
+//# $Id: EditorEvents.java,v 1.14 2005-07-06 03:55:10 siw4 Exp $
 //###########################################################################
 
 
@@ -242,7 +242,7 @@ public class EditorEvents
 	}
 
 
-	private int calculateWidth1()
+	public int calculateWidth1()
 	{
 		final TableModel model = getModel();
 		final TableCellRenderer renderer = getDefaultRenderer(Object.class);
@@ -259,9 +259,9 @@ public class EditorEvents
 				maxwidth = width;
 			}
 		}
+		System.out.println(maxwidth);
 		return maxwidth;
 	}
-
 
 
 	//#######################################################################
@@ -507,6 +507,7 @@ public class EditorEvents
 			}
 		}
 	}
+		
 
 
 	//#######################################################################

@@ -3,6 +3,7 @@ package org.supremica.gui.ide;
 import javax.swing.*;
 import java.awt.GridBagLayout;
 import net.sourceforge.waters.gui.EditorWindowInterface;
+import net.sourceforge.waters.gui.ControlledSurface;
 
 public class EditorPanel
 	extends MainPanel
@@ -66,6 +67,7 @@ public class EditorPanel
 		editorButtonGroup = new ButtonGroup();
 		toolBar.addSeparator();
 		(toolBar.add(getActions().editorSelectAction, editorButtonGroup)).setSelected(true);
+		toolBar.setCommand(ControlledSurface.SELECT);
 		toolBar.add(getActions().editorAddNodeAction, editorButtonGroup);
 		toolBar.add(getActions().editorAddNodeGroupAction, editorButtonGroup);
 		toolBar.add(getActions().editorAddEdgeAction, editorButtonGroup);
