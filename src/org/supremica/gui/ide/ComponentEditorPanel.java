@@ -8,6 +8,7 @@ import net.sourceforge.waters.model.expr.IdentifierProxy;
 import org.supremica.gui.GraphicsToClipboard;
 import net.sourceforge.waters.gui.EditorToolbar;
 import net.sourceforge.waters.gui.ControlledSurface;
+import net.sourceforge.waters.gui.ControlledToolbar;
 import net.sourceforge.waters.gui.EditorMenu;
 import net.sourceforge.waters.gui.EditorEvents;
 import net.sourceforge.waters.gui.EditorWindowInterface;
@@ -36,10 +37,13 @@ public class ComponentEditorPanel
 		//setTitle(title);
 		this.moduleContainer = moduleContainer;
 		this.module = moduleContainer.getModuleProxy();
-
-		surface = new ControlledSurface(this);
-		toolbar = new EditorToolbar(surface);
-
+		toolbar = new EditorToolbar();
+		if (moduleContainer.getEditorToolBar() instanceof ControlledToolbar) {
+		    surface = new ControlledSurface(this, (ControlledToolbar)moduleContainer.getEditorToolBar());
+		} else {
+		    surface = new ControlledSurface(this, toolbar);
+		}
+		
 		surface.setPreferredSize(IDEDimensions.rightEditorPreferredSize);
 		surface.setMinimumSize(IDEDimensions.rightEditorMinimumSize);
 

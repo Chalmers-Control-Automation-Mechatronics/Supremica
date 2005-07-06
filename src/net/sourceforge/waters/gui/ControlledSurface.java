@@ -29,9 +29,8 @@ public class ControlledSurface
 	public static final String EDGE = "edge";
 	public static final String EVENT = "event";
 
-    private String mCommand = SELECT;
     private ControlledSurface S;
-	private EditorToolbar T;
+	private ControlledToolbar mToolbar;
 	private EditorOptions options;
 	private EditorNode sNode = null;
 	private int lastX = 0;
@@ -51,15 +50,10 @@ public class ControlledSurface
 
     private DropTarget dropTarget;
     private DropTargetListener dtListener;
-
-    public void setCommand(String s)
-    {
-	mCommand = s;
-    }
     
     public String getCommand()
     {
-	return mCommand;
+	return mToolbar.getCommand();
     }
 
 	public void setOptionsVisible(boolean v)
@@ -1220,11 +1214,11 @@ public class ControlledSurface
 	}
 	*/
 
-	public ControlledSurface(EditorWindowInterface r)
+	public ControlledSurface(EditorWindowInterface r, ControlledToolbar t)
 	{
 		S = this;
 		root = r;
-
+		mToolbar = t;
 		this.addMouseListener(this);
 		this.addMouseMotionListener(this);
 		this.addKeyListener(this);

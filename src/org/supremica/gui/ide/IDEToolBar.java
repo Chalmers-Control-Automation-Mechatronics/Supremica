@@ -6,13 +6,16 @@ import javax.swing.*;
 import java.util.*;
 import org.supremica.gui.ide.actions.IDEAction;
 import org.supremica.log.*;
-
+import net.sourceforge.waters.gui.ControlledToolbar;
 
 public class IDEToolBar
 	extends JToolBar
+        implements ControlledToolbar
 {
 	private static Logger logger = LoggerFactory.createLogger(IDEToolBar.class);
 	private static final Insets theInsets = new Insets(0, 0, 0, 0);
+    // note do this nicer
+    private String command = "";
 
 	private List collection = new LinkedList();
 
@@ -100,5 +103,14 @@ public class IDEToolBar
 	{
 		return collection.size();
 	}
-
+    
+        public String getCommand()
+        {
+	    return command;
+	}
+    
+        public void setCommand(String c)
+        {
+	    command = c;
+	}
 }

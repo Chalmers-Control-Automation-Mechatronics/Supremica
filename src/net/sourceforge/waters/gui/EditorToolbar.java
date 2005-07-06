@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorToolbar
 //###########################################################################
-//# $Id: EditorToolbar.java,v 1.6 2005-07-05 02:32:07 siw4 Exp $
+//# $Id: EditorToolbar.java,v 1.7 2005-07-06 01:00:13 siw4 Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -20,7 +20,8 @@ import javax.swing.border.Border;
  * @author Simon Ware
  */
 public class EditorToolbar
-	extends JPanel
+    extends JPanel
+    implements ControlledToolbar
 {
 	//#########################################################################
 	//# Data Members
@@ -28,13 +29,11 @@ public class EditorToolbar
 	private ToolButtonListener mLastSelected;
 	//private static final Color SELECTIONCOLOR = new Color(255, 200, 240);
 	private static final Color SELECTIONCOLOR = new Color(255, 0, 240);
-    private final ControlledSurface mControlled;
 
 	//#########################################################################
 	//# Constructors
-	public EditorToolbar(ControlledSurface c)
+	public EditorToolbar()
 	{
-	    mControlled = c;
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));		
 		mLastSelected = createButton(ControlledSurface.SELECT, "Select", true);
 		createButton(ControlledSurface.NODE, "Create Nodes", false);
@@ -77,10 +76,7 @@ public class EditorToolbar
 
 		final ToolButtonListener listener = new ToolButtonListener(panel, button);
 
-		button.addActionListener(listener);
-		if (selected) {
-		    mControlled.setCommand(command);
-		}
+		button.addActionListener(listener);    
 		return listener;
 	}
 
@@ -128,9 +124,6 @@ public class EditorToolbar
 		{
 			mLastSelected.showButton();
 			showButton();
-			if (mButton.isSelected()) {
-			    mControlled.setCommand(mButton.getActionCommand());
-			}
 			mLastSelected = this;
 		}
 
@@ -141,4 +134,9 @@ public class EditorToolbar
 			EditorToolbar.this.showButton(mPanel, mButton);
 		}
 	}
+
+    public String getCommand()
+    {
+	return mGroup.getSelection().getActionCommand();
+    }
 }
