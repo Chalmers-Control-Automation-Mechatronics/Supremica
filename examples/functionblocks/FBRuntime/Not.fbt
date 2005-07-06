@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="Not" >
+  <VersionInfo Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2005-07-05" />6
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="EI" >
+        <With Var="A" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="EO" >
+        <With Var="AN" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="A" Type="BOOL" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="AN" Type="BOOL" InitialValue="true" />
+    </OutputVars>
+  </InterfaceList>
+  <BasicFB>
+    <ECC>
+        <ECState Name="Q0" />
+        <ECState Name="Q1">
+		    <ECAction Algorithm="NOT" Output="EO"/>
+	    </ECState>    
+		<ECTransition Source="Q0" Destination="Q1" Condition="EI" />
+		<ECTransition Source="Q1" Destination="Q0" Condition="1" />
+    </ECC>
+    <Algorithm Name="NOT">
+	    <Other Language="Java" Text="AN = !A;" />	
+    </Algorithm>
+  </BasicFB>
+</FBType>

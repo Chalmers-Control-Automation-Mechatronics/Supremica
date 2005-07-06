@@ -160,7 +160,7 @@ public class CompositeFBInstance extends FBInstance
 		return internalCnt.getFBInstance().getDataOutput(internalCnt.getSignalName());	
     }
 	
-	public void setVariableValue(String name, Object value)
+	public void setVariableValue(String name, String value)
 	{
 
 		if (variables.getVariable(name) == null)

@@ -5,21 +5,32 @@
     <Resource Name="TestResource" Type="ResourceType_not_used">
       <FBNetwork>
         <FB Name="restart" Type="E_RESTART" />
-        <FB Name="delay" Type="E_DELAY" />
-        <FB Name="merge" Type="E_MERGE2" />
-        <FB Name="rtrig" Type="E_R_TRIG" />
-        <FB Name="ftrig" Type="E_F_TRIG" />
+        <FB Name="merge" Type="E_MERGE3" />
+        <FB Name="splitEO0" Type="E_SPLIT2" />
+        <FB Name="splitEO1" Type="E_SPLIT2" />
+        <FB Name="ff" Type="E_D_FF" />
+        <FB Name="not" Type="Not" />
+        <FB Name="switch" Type="E_SWITCH" />
+        <FB Name="prtEO0" Type="Print" />
+        <FB Name="prtEO1" Type="Print" />
         <EventConnections>
-          <Connection Source="restart.COLD" Destination="merge.EI2" />
-          <Connection Source="merge.EO" Destination="delay.START" />
-          <Connection Source="delay.EO" Destination="comptest1.EI" />
-          <Connection Source="comptest1.EO" Destination="comptest2.EI" />
-          <Connection Source="comptest2.EO" Destination="merge.EI1" />
+          <Connection Source="restart.COLD" Destination="merge.EI3" />
+          <Connection Source="merge.EO" Destination="ff.CLK" />
+          <Connection Source="ff.EO" Destination="not.EI" />
+          <Connection Source="not.EO" Destination="switch.EI" />
+          <Connection Source="switch.EO0" Destination="splitEO0.EI" />
+          <Connection Source="switch.EO1" Destination="splitEO1.EI" />
+          <Connection Source="splitEO0.EO1" Destination="prtEO0.PRINT" />
+          <Connection Source="splitEO1.EO1" Destination="prtEO1.PRINT" />
+          <Connection Source="splitEO0.EO2" Destination="merge.EI1" />
+          <Connection Source="splitEO1.EO2" Destination="merge.EI2" />
         </EventConnections>
         <DataConnections>
-          <Connection Source="3000" Destination="delay.DT" />
-          <Connection Source="comptest1.DO" Destination="comptest2.DI" />
-          <Connection Source="comptest2.DO" Destination="comptest1.DI" />
+          <Connection Source="Switch EO0 occurred" Destination="prtEO0.TEXT" />
+          <Connection Source="Switch EO1 occurred" Destination="prtEO1.TEXT" />
+          <Connection Source="ff.Q" Destination="not.A" />
+          <Connection Source="not.AN" Destination="switch.G" />
+          <Connection Source="not.AN" Destination="ff.D" />
         </DataConnections>
       </FBNetwork>
     </Resource>

@@ -124,7 +124,7 @@ public class FBNetwork
 		{
 			// Constant specification
 			System.out.println("FBNetwork.addDataConnection(): setting data input " + dest +" to " + source);
-			getFBInstance(toInstance).setVariableValue(toSignal, new Integer(fromSignal));
+			getFBInstance(toInstance).setVariableValue(toSignal, fromSignal);
 		}
 		else if (toInstance.equals(""))
 		{

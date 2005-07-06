@@ -169,6 +169,36 @@ public abstract class FBInstance extends NamedObject
 
 	public abstract void handleEvent();
 
-	public abstract void setVariableValue(String name, Object value);
+	public void setVariableValue(String name, String value)
+	{
+		Variable var = variables.getVariable(name);
+
+		if ( var == null)
+		{
+			System.err.println("ServiceFBInstance.setVariableValue(): No such variable " + name);
+			System.exit(1);
+		}
+		
+		if(var instanceof StringVariable)
+		{
+			((StringVariable) variables.getVariable(name)).setValue(value);
+		}
+		else if(var instanceof IntegerVariable)
+		{
+			((IntegerVariable) variables.getVariable(name)).setValue(new Integer(value));
+		}
+		else if(var instanceof DoubleVariable)
+		{
+			((DoubleVariable) variables.getVariable(name)).setValue(new Double(value));
+		}
+		else if(var instanceof FloatVariable)
+		{
+			((FloatVariable) variables.getVariable(name)).setValue(new Float(value));
+		}
+		else if(var instanceof BooleanVariable)
+		{
+			((BooleanVariable) variables.getVariable(name)).setValue(new Boolean(value));
+		}
+	}
 
 }

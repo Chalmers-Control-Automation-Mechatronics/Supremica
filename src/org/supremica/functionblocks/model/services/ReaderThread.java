@@ -105,7 +105,7 @@ public class ReaderThread extends Thread
 			
 
 			// set data output to read value
-			serviceFB.setVariableValue("VALUE", new Boolean(true));
+			serviceFB.setVariableValue("VALUE", "true");
 			
 			// send output event
 			System.out.println("IO_READER.bsh(" + serviceFB.getName() + "): Sending CNF event");		
