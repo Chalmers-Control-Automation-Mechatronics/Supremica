@@ -79,11 +79,19 @@ public class BisimulationEquivalenceMinimizer
 {
 	private static Logger logger = LoggerFactory.createLogger(BisimulationEquivalenceMinimizer.class);
 
+	private static boolean libraryOK;
+
 	/**
 	 * Minimizes automaton with respect to bisimulation equivalence.
 	 */
 	public static void minimize(Automaton aut, boolean useShortNames)
 	{
+		// Did we find the library?
+		if (!libraryOK)
+		{
+			return;
+		}
+
 		// Set the indices in the automaton.
 		aut.setIndicies();
 
@@ -196,6 +204,15 @@ public class BisimulationEquivalenceMinimizer
 	// Load library
 	static
 	{
-		System.loadLibrary("BisimulationEquivalence");
+		try
+		{
+			System.loadLibrary("BisimulationEquivalence");
+			libraryOK = true;
+		}
+		catch (UnsatisfiedLinkError ex)
+		{
+			logger.error("The library BisimulationEquivalence, which this algorithm relies upon, is not in the path.");
+			libraryOK = false;
+		}
 	}
 }
