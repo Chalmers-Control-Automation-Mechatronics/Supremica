@@ -106,7 +106,7 @@ public class ServiceFBInstance extends FBInstance
 			System.err.println(e);
 		}
 	}
-
+	
 	public void receiveEvent(String eventInput)
 	{
 		if(variables.getVariable(eventInput) != null)

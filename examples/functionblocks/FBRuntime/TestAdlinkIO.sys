@@ -5,14 +5,15 @@
     <Resource Name="TestResource" Type="ResourceType_not_used">
       <FBNetwork>
         <FB Name="restart" Type="E_RESTART" />
-        <FB Name="merge" Type="E_MERGE2" />
+        <FB Name="cycle" Type="E_CYCLE" />
         <FB Name="adlink" Type="ADLINK_IO" />
         <EventConnections>
-          <Connection Source="restart.COLD" Destination="merge.EI2" />
-          <Connection Source="merge.EO" Destination="adlink.READ" />
-          <Connection Source="adlink.VALUES" Destination="adlink.WRITE" />
-          <Connection Source="adlink.CNF" Destination="merge.EI1" />
+          <Connection Source="restart.COLD" Destination="cycle.START" />
+          <Connection Source="cycle.EO" Destination="adlink.READ" />
         </EventConnections>
+		<DataConnections>
+          <Connection Source="1" Destination="cycle.DT" />		   
+		</DataConnections>
       </FBNetwork>
     </Resource>
   </Device>
