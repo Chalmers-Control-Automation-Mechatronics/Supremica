@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorEvents
 //###########################################################################
-//# $Id: EditorEvents.java,v 1.15 2005-07-06 04:09:56 siw4 Exp $
+//# $Id: EditorEvents.java,v 1.16 2005-07-07 03:24:12 siw4 Exp $
 //###########################################################################
 
 
@@ -81,7 +81,7 @@ public class EditorEvents
 	public EditorEvents(final ModuleProxy module,
 						final GraphProxy graph)
 	{
-		final TableModel model = new EventTableModel(graph, module);
+		final TableModel model = new EventTableModel(graph, module, this);
 		final Dimension ispacing = new Dimension(0, 0);
 
 		setModel(model);

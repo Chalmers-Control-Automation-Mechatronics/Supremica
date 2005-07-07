@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EventTableModel
 //###########################################################################
-//# $Id: EventTableModel.java,v 1.6 2005-07-04 02:56:13 siw4 Exp $
+//# $Id: EventTableModel.java,v 1.7 2005-07-07 03:24:12 siw4 Exp $
 //###########################################################################
 
 
@@ -12,11 +12,16 @@ package net.sourceforge.waters.gui;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TreeSet;
 import javax.swing.ImageIcon;
+import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 
 import net.sourceforge.waters.model.expr.IdentifierProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
@@ -39,15 +44,17 @@ import net.sourceforge.waters.xsd.base.EventKind;
 
 class EventTableModel
 	extends AbstractTableModel
-{
+{  
 
 	//#######################################################################
 	//# Constructors
-	EventTableModel(final GraphProxy graph, final ModuleProxy module)
+	EventTableModel(final GraphProxy graph, final ModuleProxy module, final JTable table)
 	{
+		mTable = table;
 		mGraph = graph;
 		mModule = module;
 		mEvents = collectEvents();
+		addTableModelListener(new TableHandler());
 	}
 
 
@@ -345,6 +352,28 @@ class EventTableModel
 
 	}
 
+	private class TableHandler implements TableModelListener
+	{
+		public void tableChanged(TableModelEvent e)
+		{
+			Collections.sort(mEvents, new StringComparator());
+			mTable.repaint();
+		}
+
+		private class StringComparator implements Comparator
+		{
+			public int compare (Object o1, Object o2)
+			{
+				return o1.toString().compareTo(o2.toString());
+			}
+
+			public boolean equals(Object o)
+			{
+				return this == o;
+			}
+		}
+	}
+
 
 
 	//#####################################################################
@@ -352,5 +381,6 @@ class EventTableModel
 	private final GraphProxy mGraph;
 	private final ModuleProxy mModule;
 	private final List mEvents;
+	private final JTable mTable;
 
 }
