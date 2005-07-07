@@ -7,12 +7,26 @@
         <FB Name="restart" Type="E_RESTART" />
         <FB Name="cycle" Type="E_CYCLE" />
         <FB Name="adlink" Type="ADLINK_IO" />
+		<FB Name="rtrig" Type="E_R_TRIG" />
+		<FB Name="ftrig" Type="E_F_TRIG" />
+		<FB Name="trigsplit" Type="E_SPLIT2" />		
+		<FB Name="printr" Type="Print" />		
+		<FB Name="printf" Type="Print" />				
         <EventConnections>
           <Connection Source="restart.COLD" Destination="cycle.START" />
           <Connection Source="cycle.EO" Destination="adlink.READ" />
+          <Connection Source="adlink.VALUES" Destination="trigsplit.EI" />
+          <Connection Source="trigsplit.EO1" Destination="rtrig.EI" />
+          <Connection Source="trigsplit.EO2" Destination="ftrig.EI" />
+          <Connection Source="rtrig.EO" Destination="printr.PRINT" />
+          <Connection Source="ftrig.EO" Destination="printf.PRINT" />
         </EventConnections>
 		<DataConnections>
-          <Connection Source="1" Destination="cycle.DT" />		   
+          <Connection Source="100" Destination="cycle.DT" />		   
+          <Connection Source="adlink.INPUT10" Destination="rtrig.QI" />		   
+          <Connection Source="adlink.INPUT10" Destination="ftrig.QI" />		   
+          <Connection Source="Rising edge detected" Destination="printr.TEXT" />		   
+          <Connection Source="Falling edge detected" Destination="printf.TEXT" />		   
 		</DataConnections>
       </FBNetwork>
     </Resource>

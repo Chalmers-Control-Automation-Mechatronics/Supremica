@@ -140,7 +140,7 @@ public class AdlinkIOThread extends Thread
 				// set data output vars to read values
 				for (int i=0; i<32; i++)
 				{
-					System.out.println("AdlinkIOThread.run(): Setting var INPUT" + (i+1) + " to " + readValues[i]);
+					//System.out.println("AdlinkIOThread.run(): Setting var INPUT" + (i+1) + " to " + readValues[i]);
 					((BooleanVariable) serviceFBVariables.getVariable("INPUT" + (i+1))).setValue(new Boolean(readValues[i]));
 				}
 				
@@ -163,7 +163,7 @@ public class AdlinkIOThread extends Thread
 				}
 				catch(Exception e)
 				{
-					System.err.println("AdlinkIOThread: Cought exception trying to write to Adlink PCI7432 card!");
+					//System.err.println("AdlinkIOThread: Cought exception trying to write to Adlink PCI7432 card!");
 					e.printStackTrace(System.err);
 				}
 				
