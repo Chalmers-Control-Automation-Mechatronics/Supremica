@@ -43,7 +43,7 @@
  */
 
 #include <jni.h>
-#include "org_supremica_automata_algorithms_AutomatonMinimizerObservationEquivalence.h"
+#include "org_supremica_automata_algorithms_minimization_BisimulationEquivalenceMinimizer.h"
 
 #include <stdio.h>
 #include <ctype.h>
@@ -528,9 +528,9 @@ int input()
 	  
 	  if (stateTab[i].index == to_state) {
 		/* Put edge first in list of incident
-		   edges to 'to element' */
+		   edges to 'to_element' */
 		ed->in_edges = stateTab[i].ep->in_edges[rel];
-		stateTab[i] .ep->in_edges[rel] = ed;
+		stateTab[i].ep->in_edges[rel] = ed;
 		to_found = TRUE;
 	  }
 	  i++;
@@ -873,8 +873,6 @@ int step_3()
    * Construct a new X'i block called T
    * Link T into C
    * Put D and D' as new Q blocks in T
-   *
-   *
    *
    *
    */
@@ -1340,6 +1338,57 @@ JNIEXPORT jintArray JNICALL Java_org_supremica_automata_algorithms_minimization_
 
   jResult = (*env)->NewIntArray(env, length);
   (*env)->SetIntArrayRegion(env, jResult, 0, length, result);
+
+  // Free memory!
+  // QBLOCKS
+  struct qblock *q;
+  struct qblock *qold;  
+  for (q=Q; q!=NULL; q=qold)
+  {
+	// ELEMENTS
+	struct element *el;
+	struct element *elold;
+	for (el=q->first; el!=NULL; el=elold)
+	{
+	  // EDGES
+	  int i;
+	  for (i=0; i<MAXREL; i++)
+	  {
+		struct edge *ed = el->in_edges[i];
+		if (ed != NULL)
+		{
+		  if (ed->cp != NULL)
+			free(ed->cp);
+		  free(ed);
+		}
+		else
+		{
+		  break;
+		}
+	  }
+	  elold = el->next;
+	  if (el->cp != NULL)
+		free(el->cp);
+	  free(el);
+	}	
+	qold = q->q_next;
+	free(q);
+  }
+  // XBLOCKS
+  struct xblock *x;
+  struct xblock *xold;
+  for (x=C; x!=NULL; x=xold)
+  {
+	xold = x->next;
+	free(x);
+  }
+
+  // Reset constants
+  E_1_B = NULL;
+  Bprime = NULL;
+  rel = 0;
+  Last_rel = 0;
+  Iteration = 0;
 
   return jResult;
 }

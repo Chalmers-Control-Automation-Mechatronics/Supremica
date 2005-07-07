@@ -192,14 +192,12 @@ public class TestAutomatonMinimizer
 					   (min.nbrOfTransitions() == 3) &&
 					   (min.getStateWithName("2.0.1").nbrOfOutgoingArcs() == 2));
 			
-			/* PROBLEM! THE ALGORITHM DOES WRONG THE SECOND TIME IT IS USED... OLD DATA LINGERING?
 			// Test bisimulation equivalence minimization
 			minimizer = new AutomatonMinimizer(theProject.getAutomaton("Test (from Westin)"));
 			min = minimizer.getMinimizedAutomaton(options);
 			assertTrue((min.nbrOfStates() == 4) && 
 					   (min.nbrOfTransitions() == 4) &&
 					   (min.getStateWithName("q2.q1.p1").nbrOfOutgoingArcs() == 2));
-			*/
 		}
 		catch (UnsatisfiedLinkError ex)
 		{

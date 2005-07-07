@@ -65,7 +65,7 @@ import org.supremica.log.*;
  *
  * Then write the code and place it in a c-file.
  *
- * Compile the c-file with (something like)
+ * On linux, compile the c-file with (something like)
  *
  * cc -shared -fPIC -I$JAVA_HOME/include -I$JAVA_HOME/include/linux org_supremica_automata_algorithms_minimization_BisimulationEquivalenceMinimizer.c -o ~/Supremica/dist/libBisimulationEquivalence.so
  *

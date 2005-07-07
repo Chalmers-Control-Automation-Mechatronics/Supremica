@@ -7,30 +7,31 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-/*
- * Class:     org_supremica_automata_algorithms_minimization_BisimulationEquivalenceMinimizer
- * Method:    initialize
- * Signature: (III[I[I)V
- */
-JNIEXPORT void JNICALL Java_org_supremica_automata_algorithms_minimization_BisimulationEquivalenceMinimizer_initialize
+  
+  /*
+   * Class:     org_supremica_automata_algorithms_minimization_BisimulationEquivalenceMinimizer
+   * Method:    initialize
+   * Signature: (III[I[I)V
+   */
+  JNIEXPORT void JNICALL Java_org_supremica_automata_algorithms_minimization_BisimulationEquivalenceMinimizer_initialize
   (JNIEnv *, jclass, jint, jint, jint, jintArray, jintArray);
-
-/*
- * Class:     org_supremica_automata_algorithms_minimization_BisimulationEquivalenceMinimizer
- * Method:    partition
- * Signature: ()V
- */
-JNIEXPORT void JNICALL Java_org_supremica_automata_algorithms_minimization_BisimulationEquivalenceMinimizer_partition
+  
+  /*
+   * Class:     org_supremica_automata_algorithms_minimization_BisimulationEquivalenceMinimizer
+   * Method:    partition
+   * Signature: ()V
+   */
+  JNIEXPORT void JNICALL Java_org_supremica_automata_algorithms_minimization_BisimulationEquivalenceMinimizer_partition
   (JNIEnv *, jclass);
-
-/*
- * Class:     org_supremica_automata_algorithms_minimization_BisimulationEquivalenceMinimizer
- * Method:    getPartitioning
- * Signature: ()[I
- */
-JNIEXPORT jintArray JNICALL Java_org_supremica_automata_algorithms_minimization_BisimulationEquivalenceMinimizer_getPartitioning
+  
+  /*
+   * Class:     org_supremica_automata_algorithms_minimization_BisimulationEquivalenceMinimizer
+   * Method:    getPartitioning
+   * Signature: ()[I
+   */
+  JNIEXPORT jintArray JNICALL Java_org_supremica_automata_algorithms_minimization_BisimulationEquivalenceMinimizer_getPartitioning
   (JNIEnv *, jclass);
-
+  
 #ifdef __cplusplus
 }
 #endif
