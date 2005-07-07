@@ -204,6 +204,8 @@ public class BisimulationEquivalenceMinimizer
 	// Load library
 	static
 	{
+		System.loadLibrary("BisimulationEquivalence");
+		/*
 		try
 		{
 			System.loadLibrary("BisimulationEquivalence");
@@ -214,5 +216,6 @@ public class BisimulationEquivalenceMinimizer
 			logger.error("The library BisimulationEquivalence, which this algorithm relies upon, is not in the path.");
 			libraryOK = false;
 		}
+		*/
 	}
 }
