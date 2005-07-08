@@ -79,7 +79,7 @@ public class BisimulationEquivalenceMinimizer
 {
 	private static Logger logger = LoggerFactory.createLogger(BisimulationEquivalenceMinimizer.class);
 
-	private static boolean libraryOK;
+	private static boolean libraryOK = true;
 
 	/**
 	 * Minimizes automaton with respect to bisimulation equivalence.

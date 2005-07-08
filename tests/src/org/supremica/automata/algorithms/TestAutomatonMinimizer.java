@@ -187,6 +187,7 @@ public class TestAutomatonMinimizer
 
 			// Test bisimulation equivalence minimization
 			AutomatonMinimizer minimizer = new AutomatonMinimizer(theProject.getAutomaton("Test (from Fernandez)"));
+			minimizer.useShortStateNames(false);
 			Automaton min = minimizer.getMinimizedAutomaton(options);
 			assertTrue((min.nbrOfStates() == 3) && 
 					   (min.nbrOfTransitions() == 3) &&
@@ -194,6 +195,7 @@ public class TestAutomatonMinimizer
 			
 			// Test bisimulation equivalence minimization
 			minimizer = new AutomatonMinimizer(theProject.getAutomaton("Test (from Westin)"));
+			minimizer.useShortStateNames(false);
 			min = minimizer.getMinimizedAutomaton(options);
 			assertTrue((min.nbrOfStates() == 4) && 
 					   (min.nbrOfTransitions() == 4) &&
