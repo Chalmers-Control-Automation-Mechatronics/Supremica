@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.base
 //# CLASS:   JAXBMarshaller
 //###########################################################################
-//# $Id: JAXBMarshaller.java,v 1.1 2005-05-08 00:27:15 robi Exp $
+//# $Id: JAXBMarshaller.java,v 1.2 2005-07-08 01:05:34 robi Exp $
 //###########################################################################
 
 
@@ -40,7 +40,8 @@ import net.sourceforge.waters.xsd.base.NamedType;
  * @author Robi Malik
  */
 
-public abstract class JAXBMarshaller implements ProxyMarshaller
+public abstract class JAXBMarshaller<D extends DocumentProxy>
+  implements ProxyMarshaller<D>
 {
 
   //#########################################################################
@@ -68,12 +69,11 @@ public abstract class JAXBMarshaller implements ProxyMarshaller
    *                  not be converted to proper classes due to
    *                  serious semantic inconsistencies.
    */
-  public DocumentProxy unmarshal(final File filename)
+  public D unmarshal(final File filename)
     throws JAXBException, ModelException
   {
     final NamedType doc = (NamedType) mUnmarshaller.unmarshal(filename);
-    final DocumentProxy docproxy = createProxy(doc, filename);
-    return docproxy;
+    return createProxy(doc, filename);
   }
 
   /**
@@ -85,8 +85,7 @@ public abstract class JAXBMarshaller implements ProxyMarshaller
    * @throws IOException to indicate that the output file could not be
    *                  opened.
    */
-  public void marshal(final DocumentProxy docproxy,
-                      final File filename)
+  public void marshal(final D docproxy, final File filename)
      throws JAXBException, IOException
   {
     final NamedType doc = createElement(docproxy);
@@ -99,13 +98,13 @@ public abstract class JAXBMarshaller implements ProxyMarshaller
     }
   }
 
-  public Collection getSupportedExtensions()
+  public Collection<String> getSupportedExtensions()
   {
     final String ext = getDefaultExtension();
     return Collections.singletonList(ext);
   }
 
-  public Collection getMarshalledClasses()
+  public Collection<Class> getMarshalledClasses()
   {
     final Class clazz = getOutputClass();
     return Collections.singletonList(clazz);
@@ -114,9 +113,9 @@ public abstract class JAXBMarshaller implements ProxyMarshaller
 
   //#########################################################################
   //# Provided by Subclasses
-  public abstract DocumentProxy createProxy(NamedType doc, File location)
+  public abstract D createProxy(NamedType doc, File location)
     throws ModelException;
-  public abstract NamedType createElement(DocumentProxy docproxy)
+  public abstract NamedType createElement(D docproxy)
     throws JAXBException;
 
   /**

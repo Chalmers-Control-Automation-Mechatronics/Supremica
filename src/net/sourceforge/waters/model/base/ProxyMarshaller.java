@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.base
 //# CLASS:   ProxyMarshaller
 //###########################################################################
-//# $Id: ProxyMarshaller.java,v 1.2 2005-05-08 00:27:15 robi Exp $
+//# $Id: ProxyMarshaller.java,v 1.3 2005-07-08 01:05:34 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.base;
@@ -29,7 +29,7 @@ import java.util.Collection;
  * @author Robi Malik
  */
 
-public interface ProxyMarshaller
+public interface ProxyMarshaller<D extends DocumentProxy>
 {
 
   //#########################################################################
@@ -44,7 +44,7 @@ public interface ProxyMarshaller
    *                  not be converted to proper classes due to
    *                  serious semantic inconsistencies.
    */
-  public DocumentProxy unmarshal(final File filename)
+  public D unmarshal(final File filename)
     throws Exception;
 
   /**
@@ -56,8 +56,7 @@ public interface ProxyMarshaller
    * @throws IOException to indicate that the output file could not be
    *                  opened.
    */
-  public void marshal(final DocumentProxy docproxy,
-                      final File filename)
+  public void marshal(final D docproxy, final File filename)
     throws Exception;
 
 
@@ -68,8 +67,8 @@ public interface ProxyMarshaller
    */
   public String getDefaultExtension();
 
-  public Collection getSupportedExtensions();
+  public Collection<String> getSupportedExtensions();
 
-  public Collection getMarshalledClasses();
+  public Collection<Class> getMarshalledClasses();
 
 }

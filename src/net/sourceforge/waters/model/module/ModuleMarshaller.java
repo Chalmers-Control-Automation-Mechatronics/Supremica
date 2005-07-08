@@ -4,7 +4,7 @@
 //# PACKAGE: waters.model.module
 //# CLASS:   ModuleMarshaller
 //###########################################################################
-//# $Id: ModuleMarshaller.java,v 1.2 2005-05-08 00:27:15 robi Exp $
+//# $Id: ModuleMarshaller.java,v 1.3 2005-07-08 01:05:34 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
@@ -12,7 +12,6 @@ package net.sourceforge.waters.model.module;
 import java.io.File;
 import javax.xml.bind.JAXBException;
 
-import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.JAXBMarshaller;
 import net.sourceforge.waters.model.base.ModelException;
 import net.sourceforge.waters.xsd.base.NamedType;
@@ -28,7 +27,8 @@ import net.sourceforge.waters.xsd.module.ModuleType;
  * @author Robi Malik
  */
 
-public class ModuleMarshaller extends JAXBMarshaller
+public class ModuleMarshaller
+  extends JAXBMarshaller<ModuleProxy>
 {
 
   //#########################################################################
@@ -45,17 +45,16 @@ public class ModuleMarshaller extends JAXBMarshaller
 
   //#########################################################################
   //# Overrides for Abstract Base Class JAXBMarshaller
-  public DocumentProxy createProxy(final NamedType doc, final File location)
+  public ModuleProxy createProxy(final NamedType doc, final File location)
     throws ModelException
   {
     final ModuleType module = (ModuleType) doc;
     return new ModuleProxy(module, location);
   }
 
-  public NamedType createElement(final DocumentProxy docproxy)
+  public NamedType createElement(final ModuleProxy moduleproxy)
     throws JAXBException
   {
-    final ModuleProxy moduleproxy = (ModuleProxy) docproxy;
     return moduleproxy.toModuleType();
   }
 

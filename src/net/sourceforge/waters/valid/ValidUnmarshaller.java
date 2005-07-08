@@ -4,7 +4,7 @@
 //# PACKAGE: waters.valid
 //# CLASS:   ValidUnmarshaller
 //###########################################################################
-//# $Id: ValidUnmarshaller.java,v 1.2 2005-05-08 00:27:15 robi Exp $
+//# $Id: ValidUnmarshaller.java,v 1.3 2005-07-08 01:05:34 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.valid;
@@ -20,14 +20,14 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerConfigurationException;
 
-import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.ModelException;
 import net.sourceforge.waters.model.base.ProxyMarshaller;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.xsd.module.ModuleType;
 
 
-public class ValidUnmarshaller implements ProxyMarshaller
+public class ValidUnmarshaller
+  implements ProxyMarshaller<ModuleProxy>
 {
 
   //#########################################################################
@@ -44,7 +44,7 @@ public class ValidUnmarshaller implements ProxyMarshaller
 
   //#########################################################################
   //# Access Methods
-  public DocumentProxy unmarshal(File filename)
+  public ModuleProxy unmarshal(File filename)
     throws IOException, JAXBException, ModelException,
            TransformerConfigurationException
   {
@@ -63,7 +63,7 @@ public class ValidUnmarshaller implements ProxyMarshaller
     return modproxy;
   }
 
-  public void marshal(final DocumentProxy docproxy,
+  public void marshal(final ModuleProxy docproxy,
                       final File filename)
   {
     throw new UnsupportedOperationException
@@ -75,14 +75,14 @@ public class ValidUnmarshaller implements ProxyMarshaller
     return null;
   }
 
-  public Collection getSupportedExtensions()
+  public Collection<String> getSupportedExtensions()
   {
-    return EXTENSIONS;
+    return EXTENSIONS_UNMOD;
   }
 
-  public Collection getMarshalledClasses()
+  public Collection<Class> getMarshalledClasses()
   {
-    return Collections.EMPTY_LIST;
+    return Collections.emptyList();
   }
 
 
@@ -90,7 +90,9 @@ public class ValidUnmarshaller implements ProxyMarshaller
   //# Data Members
   private final Unmarshaller mUnmarshaller;
 
-  private static final Collection EXTENSIONS = new LinkedList();
+  private static final Collection<String> EXTENSIONS = new LinkedList();
+  private static final Collection<String> EXTENSIONS_UNMOD =
+    Collections.unmodifiableCollection(EXTENSIONS);
   private static final String EXT_VMOD = ".vmod";
   private static final String EXT_VPRJ = ".vprj";
 
