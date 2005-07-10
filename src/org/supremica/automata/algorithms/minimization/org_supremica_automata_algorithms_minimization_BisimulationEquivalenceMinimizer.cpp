@@ -49,6 +49,7 @@
 #include <jni.h>
 #include "org_supremica_automata_algorithms_minimization_BisimulationEquivalenceMinimizer.h"
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <ctype.h>
 
