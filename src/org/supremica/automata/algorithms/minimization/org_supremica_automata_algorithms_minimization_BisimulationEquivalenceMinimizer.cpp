@@ -42,7 +42,9 @@
  ***********************************************************************************************
  */
 
+#ifdef _WINDOWS
 #include <windows.h>
+#endif
 
 #include <jni.h>
 #include "org_supremica_automata_algorithms_minimization_BisimulationEquivalenceMinimizer.h"
