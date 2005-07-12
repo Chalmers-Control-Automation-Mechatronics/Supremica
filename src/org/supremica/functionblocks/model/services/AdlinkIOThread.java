@@ -77,7 +77,7 @@ public class AdlinkIOThread extends Thread
 
 		try
 		{
-			//driver = new AdlinkPCI7432();
+			driver = new AdlinkPCI7432();
 		}
 		catch(Exception e)
 		{
@@ -127,11 +127,11 @@ public class AdlinkIOThread extends Thread
 				// read from the Digital I/O card.
 				try
 				{
-					//driver.getSignalArray(readValues);
+					driver.getSignalArray(readValues);
 				}
 				catch(Exception e)
 				{
-					System.err.println("AdlinkIOThread: Cought exception trying to write to Adlink PCI7432 card!");
+					//System.err.println("AdlinkIOThread: Cought exception trying to write to Adlink PCI7432 card!");
 					e.printStackTrace(System.err);
 				}
 
@@ -159,11 +159,11 @@ public class AdlinkIOThread extends Thread
 				// write to the Digital I/O card.
 				try
 				{
-					//driver.setSignalArray(writeValues);
+					driver.setSignalArray(writeValues);
 				}
 				catch(Exception e)
 				{
-					//System.err.println("AdlinkIOThread: Cought exception trying to write to Adlink PCI7432 card!");
+					System.err.println("AdlinkIOThread: Cought exception trying to write to Adlink PCI7432 card!");
 					e.printStackTrace(System.err);
 				}
 				

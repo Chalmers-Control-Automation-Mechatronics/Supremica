@@ -22,9 +22,9 @@
           <Connection Source="ftrig.EO" Destination="printf.PRINT" />
         </EventConnections>
 		<DataConnections>
-          <Connection Source="100" Destination="cycle.DT" />		   
-          <Connection Source="adlink.INPUT10" Destination="rtrig.QI" />		   
-          <Connection Source="adlink.INPUT10" Destination="ftrig.QI" />		   
+          <Connection Source="1000" Destination="cycle.DT" />		   
+          <Connection Source="adlink.INPUT3" Destination="rtrig.QI" />		   
+          <Connection Source="adlink.INPUT3" Destination="ftrig.QI" />		   
           <Connection Source="Rising edge detected" Destination="printr.TEXT" />		   
           <Connection Source="Falling edge detected" Destination="printf.TEXT" />		   
 		</DataConnections>

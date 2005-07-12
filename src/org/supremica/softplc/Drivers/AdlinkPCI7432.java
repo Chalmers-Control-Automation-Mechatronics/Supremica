@@ -304,6 +304,6 @@ public class AdlinkPCI7432
 
 	static
 	{
-		System.loadLibrary("AdlinkPCI7432");
+		System.load("C:/Documents and Settings/cengic/My Documents/devel/Supremica/src/org/supremica/softplc/Drivers/AdlinkPCI7432.dll");
 	}
 }
