@@ -23,6 +23,9 @@ public class Actions
 	public ExitAction exitAction;
 
 	public EditorCopyAction editorCopyAction;
+    public EditorUndoAction editorUndoAction;
+    public EditorRedoAction editorRedoAction;
+
 
 	public EditorSelectAction editorSelectAction;
 
@@ -63,6 +66,12 @@ public class Actions
 
 		editorCopyAction = new EditorCopyAction(ide);
 		editorActions.add(editorCopyAction);
+
+		editorUndoAction = new EditorUndoAction(ide);
+		//		editorActions.add(editorUndoAction);
+
+		editorRedoAction = new EditorRedoAction(ide);
+		//		editorActions.add(editorRedoAction);
 
 		editorSelectAction = new EditorSelectAction(ide);
 		editorActions.add(editorSelectAction);

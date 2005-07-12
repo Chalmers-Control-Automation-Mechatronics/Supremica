@@ -3,7 +3,7 @@
 //# PACKAGE: waters.model.module
 //# CLASS:   NodeSetProxy
 //###########################################################################
-//# $Id: NodeSetProxy.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: NodeSetProxy.java,v 1.2 2005-07-12 03:56:00 siw4 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
@@ -165,7 +165,13 @@ class NodeSetProxy
   {
     final String name = node.getName();
     final NamedProxy found = get(name);
-    return found.equals(node);
+    //    return found.equals(node);
+    // above gives null pointer exception when not found
+    if (found == null) {
+	return false;
+    } else {
+	return found.equals(node);
+    }
   }
 
   public NamedProxy find(final String name)

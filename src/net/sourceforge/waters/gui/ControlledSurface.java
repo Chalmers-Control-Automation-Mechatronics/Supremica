@@ -11,6 +11,7 @@ import java.awt.dnd.*;
 import java.io.File;
 import java.io.IOException;
 import javax.xml.bind.JAXBException;
+import net.sourceforge.waters.gui.command.*;
 import net.sourceforge.waters.model.base.*;
 import net.sourceforge.waters.model.module.*;
 import net.sourceforge.waters.model.expr.*;
@@ -1067,28 +1068,8 @@ public class ControlledSurface
 					// Is there already a node present?
 					if ((getObjectAtPosition(posX, posY) == null) || (getObjectAtPosition(posX, posY).getType() != EditorObject.NODE))
 					{
-						// Find a unique name!
-						int i;
-						for (i=0; i<=nodes.size(); i++)
-						{
-							boolean found = false;
-							for (int j=0; j<nodes.size(); j++)
-							{
-								if (((EditorNode) nodes.get(j)).getName().equals("s" + i))
-								{
-									found = true;
-									break;
-								}
-							}
-							if (!found)
-							{
-								break;
-							}
-						}
-						addNode("s" + i, posX, posY);
-						
-						examineCollisions();  
-						
+					    Command createNode = new CreateNodeCommand(this, posX, posY);
+					    root.getUndoInterface().executeCommand(createNode);
 						//addLabel(getLastNode(), "", 0, break20);
 						
 						//SimpleNodeProxy np = new SimpleNodeProxy("s" + nodes.size());
@@ -1125,6 +1106,18 @@ public class ControlledSurface
 					unsetAllInitial();
 					n.setInitial(true);
 				}
+				EditorObject o = getObjectAtPosition(e.getX(), e.getY());
+				if (getCommand() == SELECT) {
+				    if (o.getType() == EditorObject.LABELGROUP  && edgeIsSelected()) {
+					EditorLabelGroup l = (EditorLabelGroup) o;
+					l.setSelected(true);
+					if (l == null) {
+					    return;
+					}
+					
+					l.setSelectedLabel(e.getX(), e.getY());
+				    }
+				}
 			}
 				
 			// Double click
@@ -1147,6 +1140,7 @@ public class ControlledSurface
 					*/
 				
 					EditorObject o = getObjectAtPosition(e.getX(), e.getY());
+					
 					
 					if (o != null)
 					{

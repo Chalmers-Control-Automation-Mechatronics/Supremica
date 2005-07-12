@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorMenu
 //###########################################################################
-//# $Id: EditorMenu.java,v 1.12 2005-03-30 23:15:31 flordal Exp $
+//# $Id: EditorMenu.java,v 1.13 2005-07-12 03:56:00 siw4 Exp $
 //###########################################################################
 
 
@@ -36,6 +36,8 @@ public class EditorMenu
 	public final JMenuItem FileNewMenu;
 	public final JMenuItem PrintMenu;
 	public final JMenuItem FileExitMenu;
+	public final JMenuItem mEditUndo;
+	public final JMenuItem mEditRedo;
 	public final JMenuItem mToolsCreateEvent;
 	public final JMenuItem ToolsOptionsMenu;
 	public final JMenuItem editDeleteMenu;
@@ -86,9 +88,22 @@ public class EditorMenu
 		this.add(menu);
 
 		menuItem = new JMenuItem("Undo");
-		menuItem.setEnabled(false);
+		menuItem.setEnabled(root.getUndoInterface().canUndo());
 		menuItem.setToolTipText("Not implemented yet");
 		menu.add(menuItem);
+		menuItem.addActionListener(this);
+
+		mEditUndo = menuItem;
+
+		menuItem = new JMenuItem("Redo");
+		menuItem.setEnabled(root.getUndoInterface().canRedo());
+		menuItem.setToolTipText("Not implemented yet");
+		menu.add(menuItem);
+		menu.addSeparator();
+		menuItem.addActionListener(this);
+
+		mEditRedo = menuItem;
+
 		menu.addSeparator();
 
 	/*
@@ -170,6 +185,13 @@ public class EditorMenu
 		fileChooser.addChoosableFileFilter(new WmodFileFilter());
 	}
 
+	protected void paintComponent(Graphics g) 
+	{
+		mEditRedo.setEnabled(root.getUndoInterface().canRedo());
+		mEditUndo.setEnabled(root.getUndoInterface().canUndo());
+		super.paintComponent(g);
+	}
+
 	public void actionPerformed(ActionEvent e)
 	{
 		if (e.getSource() == FileNewMenu)
@@ -232,6 +254,22 @@ public class EditorMenu
 		if (e.getSource() == editCopyAsWMFMenu)
 		{
 			root.copyAsWMFToClipboard();
+		}
+
+		if (e.getSource() == mEditUndo)
+		{
+			if (root.getUndoInterface().canUndo()) {
+				root.getUndoInterface().undo();
+			}
+			mEditUndo.setEnabled(root.getUndoInterface().canUndo());
+		}
+
+		if (e.getSource() == mEditRedo)
+		{
+			if (root.getUndoInterface().canRedo()) {
+				root.getUndoInterface().redo();
+			}
+			mEditRedo.setEnabled(root.getUndoInterface().canRedo());
 		}
 
 		if (e.getSource() == editCreatePDFMenu)

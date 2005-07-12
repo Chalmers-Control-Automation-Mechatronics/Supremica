@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorLabelGroup
 //###########################################################################
-//# $Id: EditorLabelGroup.java,v 1.10 2005-03-18 00:58:08 flordal Exp $
+//# $Id: EditorLabelGroup.java,v 1.11 2005-07-12 03:56:00 siw4 Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -69,8 +69,6 @@ public class EditorLabelGroup
 
 		Rectangle r = new Rectangle(panel.getX(), panel.getY(), panel.getWidth(), panel.getHeight());
 
-		selectedLabel = -1;
-
 		return (r.contains(ex, ey));
 	}
 
@@ -92,20 +90,20 @@ public class EditorLabelGroup
 
 		panel.requestFocus();
 
-		for (int i = 0; i < events.size(); i++)
-		{
-			JLabel l = (JLabel) events.get(i);
-
-			if (l.getBounds().contains(ex, ey))
-			{
-				selectedLabel = i;
-				
-				return;
-			}
-		}
-
-		selectedLabel = -1;
+		selectedLabel = getLabelIndexAt(ex, ey);
 	}
+
+    private int getLabelIndexAt(int ex, int ey)
+    {
+	for (int i = 0; i < events.size(); i++) {
+	    JLabel l = (JLabel) events.get(i);
+	    
+	    if (l.getBounds().contains(ex, ey)) {
+		return i;	 
+	    }
+	}
+	return -1;
+    }
 
 	public void setPanelLocation()
 	{
@@ -184,9 +182,11 @@ public class EditorLabelGroup
 
 	public void addEvent(IdentifierProxy i)    //put stuff for events from proxy
 	{
+	    if (!proxy.contains(i)) {
 		proxy.add(i);
 		addToPanel(i.toString());
 		resizePanel();
+	    }
 	}
 
 	public void removeEvent(int i)    //put stuff for events from proxy
@@ -196,18 +196,7 @@ public class EditorLabelGroup
 		/*
 		shadowPanel.remove(i);
 		*/
-
-		/* This looked wierd... the indices i and j are used... what's the loop for if i is used anyway?
-		JLabel l = (JLabel) events.get(i);
-		for (int j = 0; j < proxy.size(); j++)
-		{
-			if (((IdentifierProxy) proxy.get(j)).toString().equals(l.getText()))
-			{
-				proxy.remove(i);
-			}
-		}
-		*/
-		proxy.remove(i);		
+		proxy.remove(i);
 	}
 
 	public void setAnchor(String anchor)
@@ -333,6 +322,14 @@ public class EditorLabelGroup
 	public int getHeight()
 	{
 		return panel.getHeight();
+	}
+
+	public void setSelected(boolean s)
+	{
+		super.setSelected(s);
+		if (!s) {
+		    selectedLabel = -1;
+		}
 	}
 
 	public EditorLabelGroup(EditorEdge par, EditorSurface e)

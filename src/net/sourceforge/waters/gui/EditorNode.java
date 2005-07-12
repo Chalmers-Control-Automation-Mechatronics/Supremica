@@ -22,7 +22,6 @@ x * <p>The internal editor representation of node objects.</p>
 public class EditorNode
 	extends EditorObject
 {
-	private EditorShade shade;
 	protected int hash = 0;
 	protected Point2D.Double position;
 	private SimpleNodeProxy proxy;
@@ -58,22 +57,21 @@ public class EditorNode
 	}
 	*/
 
-	public EditorNode(int x, int y, EditorShade s, SimpleNodeProxy np, EditorSurface e)
+	public EditorNode(int x, int y, SimpleNodeProxy np, EditorSurface e)
 	{
-		this(s, np, e);
+		this(np, e);
 
 		// Override position
 		position = new Point2D.Double(x, y);
 		proxy.setPointGeometry(new PointGeometryProxy(position));
 	}
 
-	public EditorNode(EditorShade s, SimpleNodeProxy np, EditorSurface e)
+	public EditorNode(SimpleNodeProxy np, EditorSurface e)
 	{
 		// This is a node
 		type = NODE;
 
 		// Variables
-		shade = s;
 		proxy = np;
 
 		// Find position
@@ -100,7 +98,9 @@ public class EditorNode
 
     public void addProposition(IdentifierProxy i)
     {
-	proxy.getPropositions().add(i);
+	if (!proxy.getPropositions().contains(i)) {
+	    proxy.getPropositions().add(i);
+	}
     }
 
 	public void setInitial(boolean newinitial)
@@ -179,11 +179,6 @@ public class EditorNode
 				(x <= (getX() + RADIUS)) && 
 				((getY() - RADIUS) <= y) && 
 				(y <= (getY() + RADIUS)));
-	}
-
-	public void setShade(EditorShade s)
-	{
-		shade = s;
 	}
 
 	public Set getColours(java.util.List eventDeclList)

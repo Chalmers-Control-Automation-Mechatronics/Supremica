@@ -65,7 +65,8 @@ public class IDEMenuBar
 		add(menuEdit);
 
 		menuEdit.add(new JMenuItem(ide.getActions().editorCopyAction));
-
+		menuEdit.add(new JMenuItem(ide.getActions().editorUndoAction));
+		menuEdit.add(new JMenuItem(ide.getActions().editorRedoAction));
 		//
 		// Module
 		//

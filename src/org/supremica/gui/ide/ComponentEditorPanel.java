@@ -13,6 +13,7 @@ import net.sourceforge.waters.gui.ControlledToolbar;
 import net.sourceforge.waters.gui.EditorMenu;
 import net.sourceforge.waters.gui.EditorEvents;
 import net.sourceforge.waters.gui.EditorWindowInterface;
+import net.sourceforge.waters.gui.command.UndoInterface;
 
 
 
@@ -75,8 +76,6 @@ public class ComponentEditorPanel
 
 		gridbag.setConstraints(split, constraints);
 		add(split);
-
-		//		split.setUI(new newUI());
 		if (events.getBestWidth() > moduleContainer.getEditorPanel().getRightComponent().getWidth()/2) {
 		    split.setDividerLocation((int)moduleContainer.getEditorPanel().getRightComponent().getWidth()/2);
 		} else {
@@ -139,6 +138,17 @@ public class ComponentEditorPanel
 	{
 		return events;
 	}
+    
+    public void setDisplayed()
+    {
+	EditorPanel editorPanel = moduleContainer.getEditorPanel();
+	editorPanel.setRightComponent(this);
+    }
+
+    public UndoInterface getUndoInterface()
+    {
+	return moduleContainer;
+    }
 
 	public void copyAsWMFToClipboard()
 	{
@@ -170,12 +180,4 @@ public class ComponentEditorPanel
 	{
 
 	}
-
-    private class newUI extends BasicSplitPaneUI
-    {
-	public int getMinimumDividerLocation(JSplitPane jc)
-	{
-	    return 20000;
-	}
-    }
 }

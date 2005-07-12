@@ -4,11 +4,15 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorWindow
 //###########################################################################
-//# $Id: EditorWindow.java,v 1.16 2005-07-06 01:00:13 siw4 Exp $
+//# $Id: EditorWindow.java,v 1.17 2005-07-12 03:56:00 siw4 Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
 import javax.swing.*;
+import javax.swing.undo.AbstractUndoableEdit;
+import javax.swing.undo.CannotRedoException;
+import javax.swing.undo.CannotUndoException;
+import javax.swing.undo.UndoManager;
 import java.awt.*;
 import java.awt.dnd.*;
 import java.awt.event.MouseEvent;
@@ -17,6 +21,8 @@ import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.IOException;
 import javax.xml.bind.JAXBException;
+import net.sourceforge.waters.gui.command.Command;
+import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.model.module.IdentifiedElementProxy;
 import net.sourceforge.waters.model.base.ProxyMarshaller;
 import net.sourceforge.waters.model.module.ModuleMarshaller;
@@ -45,9 +51,11 @@ public class EditorWindow
 	private ModuleProxy module = null;
 	private boolean isSaved = false;
 	private GraphicsToClipboard toClipboard = null;
+	private final UndoInterface mUndoInterface;
 
-	public EditorWindow(String title, ModuleProxy module, SimpleComponentProxy element)
+	public EditorWindow(String title, ModuleProxy module, SimpleComponentProxy element, UndoInterface undoInterface)
 	{
+		mUndoInterface = undoInterface;
 	    System.out.println("ahgha");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setTitle(title);
@@ -167,6 +175,17 @@ public class EditorWindow
 
 		surface.print(theGraphics);
 		toClipboard.copyToClipboard();
+	}
+
+	public UndoInterface getUndoInterface()
+	{
+		return mUndoInterface;
+	}
+
+	public void setDisplayed()
+	{
+		setVisible(true);
+		requestFocus();
 	}
 
 	public void createPDF(File file)

@@ -4,13 +4,17 @@
 //# PACKAGE: waters.gui
 //# CLASS:   ModuleWindow
 //###########################################################################
-//# $Id: ModuleWindow.java,v 1.11 2005-05-12 12:39:24 flordal Exp $
+//# $Id: ModuleWindow.java,v 1.12 2005-07-12 03:56:00 siw4 Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
 import javax.swing.*;
 import javax.swing.tree.*;
 import javax.swing.event.*;
+import javax.swing.undo.AbstractUndoableEdit;
+import javax.swing.undo.CannotRedoException;
+import javax.swing.undo.CannotUndoException;
+import javax.swing.undo.UndoManager;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
@@ -21,6 +25,8 @@ import java.util.ArrayList;
 import java.beans.*;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import java.util.Date;
+import net.sourceforge.waters.gui.command.Command;
+import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.expr.SimpleExpressionProxy;
@@ -39,7 +45,7 @@ import org.supremica.automata.Project;
  */
 public class ModuleWindow
 	extends JFrame
-	implements ActionListener, FocusListener
+	implements ActionListener, FocusListener, UndoInterface
 {
 	private ModuleProxy module = null;
 	private JFileChooser fileChooser = new JFileChooser(".");
@@ -74,6 +80,7 @@ public class ModuleWindow
 	private JList paramdataList = null;
 	private DefaultListModel paramData = null;
 	private org.supremica.gui.Supremica supremica = null;
+	private final UndoManager mUndoManager = new UndoManager();
 
 	public ModuleWindow(String title)
 	{
@@ -101,6 +108,7 @@ public class ModuleWindow
 			final ProxyMarshaller marshaller = new ModuleMarshaller();
 
 			module = (ModuleProxy) marshaller.unmarshal(wmodf);
+			mUndoManager.discardAllEdits();
 		}
 		catch (final JAXBException exception)
 		{
@@ -455,7 +463,7 @@ public class ModuleWindow
 
 							if (scp != null)
 							{
-								ed = new EditorWindow(scp.getName() + " - Waters Editor", module, scp);
+								ed = new EditorWindow(scp.getName() + " - Waters Editor", module, scp, ModuleWindow.this);
 							}
 						}
 					}
@@ -860,7 +868,7 @@ public class ModuleWindow
 
 				logEntry("Adding SimpleComponentProxy: " + scp.getName());
 
-				EditorWindow ed = new EditorWindow(scp.getName() + " - Waters Editor", module, scp);
+				EditorWindow ed = new EditorWindow(scp.getName() + " - Waters Editor", module, scp, this);
 			}
 
 			ModuleSelectTree.expandPath(new TreePath(parentNode.getPath()));
@@ -883,6 +891,39 @@ public class ModuleWindow
 	public ModuleProxy getModuleProxy()
 	{
 		return module;
+	}
+
+	public void addUndoable(AbstractUndoableEdit e)
+	{
+		mUndoManager.addEdit(e);
+	}
+
+	public void executeCommand(Command c)
+	{
+		c.execute();
+		if (c instanceof AbstractUndoableEdit) {
+			addUndoable((AbstractUndoableEdit)c);
+		}
+	}
+
+	public boolean canRedo()
+	{
+		return mUndoManager.canRedo();
+	}
+
+	public boolean canUndo()
+	{
+		return mUndoManager.canUndo();
+	}
+
+	public void redo() throws CannotRedoException
+	{
+		mUndoManager.redo();
+	}
+
+	public void undo() throws CannotUndoException
+	{
+		mUndoManager.undo();
 	}
 
 	public static void main(String[] args)

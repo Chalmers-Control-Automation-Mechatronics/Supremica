@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.25 2005-06-28 01:10:22 siw4 Exp $
+//# $Id: EditorSurface.java,v 1.26 2005-07-12 03:56:00 siw4 Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -308,26 +308,28 @@ public class EditorSurface
 	{
 		SimpleNodeProxy np = new SimpleNodeProxy(name);
 
-		// Add proxy
-		graph.getNodes().add(np);
-
-		EditorNode n = new EditorNode(x, y, shade, np, this);
+		EditorNode n = new EditorNode(x, y, np, this);
 
 		addNode(n);
 	}
 
 	public void addNode(SimpleNodeProxy np)
 	{
-		EditorNode n = new EditorNode(shade, np, this);
+		EditorNode n = new EditorNode(np, this);
 
 		addNode(n);
 	}
 
 	public void addNode(EditorNode n)
 	{
-		nodes.add(n);
-		addLabel(n, n.getName());
-		repaint();
+	    System.out.println(n.getProxy());
+	    if (!graph.getNodes().contains(n.getProxy())) {
+		graph.getNodes().add(n.getProxy());
+	    }
+	    nodes.add(n);
+	    addLabel(n, n.getName());
+	    repaint();
+	    examineCollisions();  
 	}
 
 	public void delNode(EditorNode n)
@@ -375,16 +377,16 @@ public class EditorSurface
 		GroupNodeProxy n = new GroupNodeProxy("NodeGroup" + nodeGroups.size());
 		n.setGeometry(new BoxGeometryProxy(x, y, w, h));
 
-		// Add proxy
-		graph.getNodes().add(n);
-
 		return addNodeGroup(n);
 	}
 
 	public EditorNodeGroup addNodeGroup(GroupNodeProxy n)
 	{
 		EditorNodeGroup g = new EditorNodeGroup(n);
-
+		// Add proxy
+		if (!graph.getNodes().contains(n)) {
+		    graph.getNodes().add(n);
+		}
 		nodeGroups.add(g);
 		examineCollisions();
 		repaint();
@@ -478,7 +480,6 @@ public class EditorSurface
 			x = (int) ep.getStartPoint().getPoint().getX();
 			y = (int) ep.getStartPoint().getPoint().getY();
 		}
-
 		EditorEdge e = new EditorEdge(n1, n2, x, y, ep);
 
 		edges.add(e);
@@ -1561,4 +1562,34 @@ public class EditorSurface
 	{
 		repaint(true);
 	}
+
+    public EditorWindowInterface getEditorInterface()
+    {
+	return root;
+    }
+
+    public java.util.List getNodes()
+    {
+	return nodes;
+    }
+
+    public java.util.List getNodeGroups()
+    {
+	return nodeGroups;
+    }
+
+    public java.util.List getEdges()
+    {
+	return edges;
+    }
+
+    public java.util.List getLabels()
+    {
+	return labels;
+    }
+
+    public java.util.List getLabelGroups()
+    {
+	return events;
+    }
 }

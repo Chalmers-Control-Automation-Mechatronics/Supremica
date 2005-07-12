@@ -4,6 +4,10 @@ import java.util.*;
 import java.awt.Component;
 import javax.swing.JFrame;
 import javax.swing.JToolBar;
+import javax.swing.undo.AbstractUndoableEdit;
+import javax.swing.undo.CannotRedoException;
+import javax.swing.undo.CannotUndoException;
+import javax.swing.undo.UndoManager;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import org.supremica.automata.IO.ProjectBuildFromWaters;
@@ -11,8 +15,10 @@ import org.supremica.gui.VisualProject;
 import org.supremica.automata.Project;
 import org.supremica.gui.ide.actions.Actions;
 import net.sourceforge.waters.gui.EditorWindowInterface;
+import net.sourceforge.waters.gui.command.Command;
+import net.sourceforge.waters.gui.command.UndoInterface;
 
-public class ModuleContainer
+public class ModuleContainer implements UndoInterface
 {
 	private IDE ide;
 	private final ModuleProxy module;
@@ -23,6 +29,7 @@ public class ModuleContainer
 	private Component selectedComponent = null;
 	private VisualProject theVisualProject = new VisualProject();
 	private Map componentToPanelMap = new HashMap();
+    private final UndoManager mUndoManager = new UndoManager();
   
 	public ModuleContainer(IDE ide, ModuleProxy module)
 	{
@@ -125,6 +132,45 @@ public class ModuleContainer
 	public EditorWindowInterface getActiveEditorWindowInterface()
 	{
 		return getEditorPanel().getActiveEditorWindowInterface();
+	}
+
+	public void addUndoable(AbstractUndoableEdit e)
+	{
+		mUndoManager.addEdit(e);
+		ide.getActions().editorRedoAction.setEnabled(canRedo());
+		ide.getActions().editorUndoAction.setEnabled(canUndo());
+	}
+
+	public void executeCommand(Command c)
+	{
+		c.execute();
+		if (c instanceof AbstractUndoableEdit) {
+			addUndoable((AbstractUndoableEdit)c);
+		}
+	}
+
+	public boolean canRedo()
+	{
+		return mUndoManager.canRedo();
+	}
+
+	public boolean canUndo()
+	{
+		return mUndoManager.canUndo();
+	}
+
+	public void redo() throws CannotRedoException
+	{
+		mUndoManager.redo();
+		ide.getActions().editorRedoAction.setEnabled(canRedo());
+		ide.getActions().editorUndoAction.setEnabled(canUndo());
+	}
+
+	public void undo() throws CannotUndoException
+	{
+		mUndoManager.undo();
+		ide.getActions().editorRedoAction.setEnabled(canRedo());
+		ide.getActions().editorUndoAction.setEnabled(canUndo());
 	}
 
 	public void updateAutomata()
