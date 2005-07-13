@@ -627,6 +627,8 @@
 	<chmod file="${dist}/SupremicaPropertiesStandard.cfg" perm="644"/>
 	<copy file="${platform}/win.x86/lib/buddy.dll" todir="${dist}"/>	
 	<chmod file="${dist}/buddy.dll" perm="644"/> 
+    <copy file="${platform}/win.x86/lib/BisimulationEquivalence.dll" todir="${dist}"/>	
+	<chmod file="${dist}/BisimulationEquivalence.dll" perm="644"/> 
 	<copy file="${platform}/win.x86/lib/izmjnicom.dll" todir="${dist}"/>	
 	<chmod file="${dist}/izmjnicom.dll" perm="644"/>
 	<copy file="${platform}/win.x86/lib/21100280.LIC" todir="${dist}"/>	
@@ -822,6 +824,8 @@
 	<copy file="${dist}/SupremicaVersion.txt" todir="C:\Supremica Installer\Input\Runtime\NoArch"/>	
 	<copy file="${platform}/win.x86/lib/buddy.dll" todir="${installer.dir}\Input"/>	
 	<chmod file="${installer.dir}\Input\buddy.dll" perm="644"/>
+	<copy file="${platform}/win.x86/lib/BisimulationEquivalence.dll" todir="${installer.dir}\Input"/>	
+	<chmod file="${installer.dir}\Input\BisimulationEquivalence.dll" perm="644"/>
 	<copy file="${platform}/win.x86/lib/izmjnicom.dll" todir="${installer.dir}\Input"/>	
 	<chmod file="${installer.dir}\Input\izmjnicom.dll" perm="644"/>
 	<copy file="${platform}/win.x86/lib/21100280.LIC" todir="${installer.dir}\Input"/>	
@@ -844,6 +848,8 @@
 	<copy file="${dist}/SupremicaVersion.txt" todir="C:\Supremica Installer\Input\Runtime\NoArch"/>	
 	<copy file="${platform}/win.x86/lib/buddy.dll" todir="${installer.dir}\Input"/>	
 	<chmod file="${installer.dir}\Input\buddy.dll" perm="644"/>
+	<copy file="${platform}/win.x86/lib/BisimulationEquivalence.dll" todir="${installer.dir}\Input"/>	
+	<chmod file="${installer.dir}\Input\BisimulationEquivalence.dll" perm="644"/>
 	<copy file="${platform}/win.x86/lib/izmjnicom.dll" todir="${installer.dir}\Input"/>	
 	<chmod file="${installer.dir}\Input\izmjnicom.dll" perm="644"/>
 	<copy file="${platform}/win.x86/lib/21100280.LIC" todir="${installer.dir}\Input"/>	

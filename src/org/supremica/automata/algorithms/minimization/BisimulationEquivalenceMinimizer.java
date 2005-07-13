@@ -60,7 +60,7 @@ import org.supremica.log.*;
  * Partition Refinement" by Sven Westin.
  *
  * Run (something like) this command to generate the header-file...
- *  
+ *
  * javah -classpath ~/Supremica/build -jni org.supremica.automata.algorithms.minimization.BisimulationEquivalenceMinimizer
  *
  * Then write the code and place it in a c-file.
@@ -77,145 +77,126 @@ import org.supremica.log.*;
  */
 public class BisimulationEquivalenceMinimizer
 {
-	private static Logger logger = LoggerFactory.createLogger(BisimulationEquivalenceMinimizer.class);
+    private static Logger logger = LoggerFactory.createLogger(BisimulationEquivalenceMinimizer.class);
 
-	private static boolean libraryOK = true;
+    /**
+     * Minimizes automaton with respect to bisimulation equivalence.
+     */
+    public static void minimize(Automaton aut, boolean useShortNames)
+        throws UnsatisfiedLinkError
+    {
+        // Set the indices in the automaton.
+        aut.setIndicies();
 
-	/**
-	 * Minimizes automaton with respect to bisimulation equivalence.
-	 */
-	public static void minimize(Automaton aut, boolean useShortNames)
-	{
-		// Did we find the library?
-		if (!libraryOK)
-		{
-			return;
-		}
+        // States...
+        State[] states = new State[aut.nbrOfStates()];
 
-		// Set the indices in the automaton.
-		aut.setIndicies();
+        // Initialize
+        {
+            // The initial partitioning in an array, separated by -1 elements.
+            // Normally, there should be two partitions, the set of  marked and
+            // the set of nonmarked states
+            int nbrOfPartitions;
+            if (aut.hasAcceptingState() && aut.hasNonacceptingState())
+            {
+                nbrOfPartitions = 2;
+            }
+            else
+            {
+                nbrOfPartitions = 1;
+            }
+            int[] initialPartitioning = new int[aut.nbrOfStates()-1+nbrOfPartitions];
+            int forwIndex = 0;
+            int backIndex = initialPartitioning.length-1;
+            for (Iterator<State> stIt = aut.stateIterator(); stIt.hasNext(); )
+            {
+                State state = stIt.next();
+                int index = state.getIndex();
+                assert((state.getIndex() >= 0) && (state.getIndex() < aut.nbrOfStates()));
+                states[index] = state;
+                if (!state.isAccepting())
+                {
+                    // Should check the epsilon closure if observation equivalence!!!
+                    initialPartitioning[forwIndex++] = index;
+                }
+                else
+                {
+                    initialPartitioning[backIndex--] = index;
+                }
 
-		// States...
-		State[] states = new State[aut.nbrOfStates()];
+                if (forwIndex == backIndex)
+                {
+                    initialPartitioning[forwIndex] = -1;
+                }
+            }
+            // This is an array of int, every third int is the index of a
+            // from-state, event or to-state respectively...
+            int[] transitions = new int[aut.nbrOfTransitions()*3];
+            int index = 0;
+            for (Iterator<Arc> arcIt = aut.arcIterator(); arcIt.hasNext(); )
+            {
+                Arc arc = arcIt.next();
+                transitions[index++] = arc.getFromState().getIndex();
+                transitions[index++] = arc.getEvent().getIndex();
+                transitions[index++] = arc.getToState().getIndex();
+            }
 
-		// Initialize
-		{
-			// The initial partitioning in an array, separated by -1 elements.
-			// Normally, there should be two partitions, the set of  marked and 
-			// the set of nonmarked states
-			int nbrOfPartitions;
-			if (aut.hasAcceptingState() && aut.hasNonacceptingState())
-			{
-				nbrOfPartitions = 2;
-			}
-			else
-			{
-				nbrOfPartitions = 1;
-			}
-			int[] initialPartitioning = new int[aut.nbrOfStates()-1+nbrOfPartitions];
-			int forwIndex = 0;
-			int backIndex = initialPartitioning.length-1;
-			for (Iterator<State> stIt = aut.stateIterator(); stIt.hasNext(); )
-			{
-				State state = stIt.next();
-				int index = state.getIndex();
-				assert((state.getIndex() >= 0) && (state.getIndex() < aut.nbrOfStates()));
-				states[index] = state;
-				if (!state.isAccepting())
-				{
-					// Should check the epsilon closure if observation equivalence!!!
-					initialPartitioning[forwIndex++] = index;
-				}
-				else
-				{
-					initialPartitioning[backIndex--] = index;
-				}
-				
-				if (forwIndex == backIndex)
-				{
-					initialPartitioning[forwIndex] = -1;
-				}
-			}
-			// This is an array of int, every third int is the index of a 
-			// from-state, event or to-state respectively...
-			int[] transitions = new int[aut.nbrOfTransitions()*3];
-			int index = 0;
-			for (Iterator<Arc> arcIt = aut.arcIterator(); arcIt.hasNext(); )
-			{
-				Arc arc = arcIt.next();
-				transitions[index++] = arc.getFromState().getIndex();
-				transitions[index++] = arc.getEvent().getIndex();
-				transitions[index++] = arc.getToState().getIndex();
-			}
+            // Initialize native functions
+            initialize(aut.nbrOfStates(), aut.nbrOfEvents(), aut.nbrOfTransitions(),
+                       initialPartitioning, transitions);
+        }
 
-			// Initialize native functions
-			initialize(aut.nbrOfStates(), aut.nbrOfEvents(), aut.nbrOfTransitions(), 
-					   initialPartitioning, transitions);
-		}
+        // Do the partitioning
+        partition();
 
-		// Do the partitioning
-		partition();
-		
-		// Merge partitions based on the partitioning done in the native environment
-		int[] part = getPartitioning();  		
-		State blob = null;
-		for (int i=0; i<part.length; i++)
-		{
-			if (part[i] != -1)
-			{
-				//logger.info("part[" + i + "] = " + part[i] + ", " + states[part[i]].getName());
-				if (blob == null)
-				{
-					blob = states[part[i]];
-				}
-				else
-				{
-					State state = states[part[i]];
-					//logger.info("Merging " + blob + " and " + state);
-					blob = MinimizationHelper.mergeStates(aut, blob, state, useShortNames);
-				}
-			}
-			else
-			{
-				//logger.info("Next partition:");
-				// Prepare for new blob
-				blob = null;
-			}
-			
-			// Merge states in partition!
-		}
-	}
+        // Merge partitions based on the partitioning done in the native environment
+        int[] part = getPartitioning();
+        State blob = null;
+        for (int i=0; i<part.length; i++)
+        {
+            if (part[i] != -1)
+            {
+                //logger.info("part[" + i + "] = " + part[i] + ", " + states[part[i]].getName());
+                if (blob == null)
+                {
+                    blob = states[part[i]];
+                }
+                else
+                {
+                    State state = states[part[i]];
+                    //logger.info("Merging " + blob + " and " + state);
+                    blob = MinimizationHelper.mergeStates(aut, blob, state, useShortNames);
+                }
+            }
+            else
+            {
+                //logger.info("Next partition:");
+                // Prepare for new blob
+                blob = null;
+            }
 
-	/**
-	 * Initializes the native class with the necessary information.
-	 */
-	private static native void initialize(int nbrOfStates, int nbrOfEvents, int nbrOfTransitions, int[] initialPartitioning, int[] transitions);
+            // Merge states in partition!
+        }
+    }
 
-	/**
-	 * Runs the Generalized Relational Coarsest Partition Algorithm.
-	 */
-	private static native void partition();
+    /**
+     * Initializes the native class with the necessary information.
+     */
+    private static native void initialize(int nbrOfStates, int nbrOfEvents, int nbrOfTransitions, int[] initialPartitioning, int[] transitions);
 
-	/**
-	 * Returns an int-array representing the coarsest partitioning.
-	 */
-	private static native int[] getPartitioning();
+    /**
+     * Runs the Generalized Relational Coarsest Partition Algorithm.
+     */
+    private static native void partition();
 
-	// Load library
-	static
-	{
-		System.loadLibrary("BisimulationEquivalence");
-		/*
-		try
-		{
-			System.loadLibrary("BisimulationEquivalence");
-			libraryOK = true;
-		}
-		catch (UnsatisfiedLinkError ex)
-		{
-			logger.error("The library BisimulationEquivalence, which this algorithm relies upon, is not in the path.");
-			libraryOK = false;
-		}
-		*/
-	}
+    /**
+     * Returns an int-array representing the coarsest partitioning.
+     */
+    private static native int[] getPartitioning();
+
+    // Load library
+    static
+    {
+        System.loadLibrary("BisimulationEquivalence");
+    }
 }

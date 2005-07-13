@@ -59,207 +59,197 @@ import org.supremica.automata.IO.*;
 import java.util.*;
 
 public class TestAutomatonMinimizer
-	extends TestCase
+    extends TestCase
 {
-	public TestAutomatonMinimizer(String name)
-	{
-		super(name);
-	}
+    public TestAutomatonMinimizer(String name)
+    {
+        super(name);
+    }
 
-	/**
-	 * Sets up the test fixture.
-	 * Called before every test case method.
-	 */
-	protected void setUp()
-	{
-	}
+    /**
+     * Sets up the test fixture.
+     * Called before every test case method.
+     */
+    protected void setUp()
+    {
+    }
 
-	/**
-	 * Tears down the test fixture.
-	 * Called after every test case method.
-	 */
-	protected void tearDown()
-	{
-	}
+    /**
+     * Tears down the test fixture.
+     * Called after every test case method.
+     */
+    protected void tearDown()
+    {
+    }
 
-	/**
-	 * Assembles and returns a test suite
-	 * for all the test methods of this test case.
-	 */
-	public static Test suite()
-	{
-		TestSuite suite = new TestSuite(TestAutomatonMinimizer.class);
-		return suite;
-	}
+    /**
+     * Assembles and returns a test suite
+     * for all the test methods of this test case.
+     */
+    public static Test suite()
+    {
+        TestSuite suite = new TestSuite(TestAutomatonMinimizer.class);
+        return suite;
+    }
 
-	public void testLanguageEquivalenceMinimization()
-	{
-		try
-		{
-			/*
-			ProjectBuildFromXml builder = new ProjectBuildFromXml();
-			Project theProject = builder.build(TestFiles.getFile(TestFiles.Bisimulation));
-			MinimizationOptions options = MinimizationOptions.getDefaultMinimizationOptions();
-			options.setMinimizationType(EquivalenceRelation.LanguageEquivalence);
-			options.setKeepOriginal(true);
+    public void testLanguageEquivalenceMinimization()
+    {
+        try
+        {
+            ProjectBuildFromXml builder = new ProjectBuildFromXml();
+            Project theProject = builder.build(TestFiles.getFile(TestFiles.MachineBufferMachine));
+            SynchronizationOptions syncOptions = SynchronizationOptions.getDefaultSynchronizationOptions();
+            syncOptions.setForbidUncontrollableStates(true);
+            AutomataSynchronizer synchronizer = new AutomataSynchronizer(theProject, syncOptions);
+            synchronizer.execute();
+            Automaton synch = synchronizer.getAutomaton();
+            Alphabet alpha = synch.getAlphabet();
+            Alphabet hide = new Alphabet();
+            hide.addEvent(alpha.getEvent("Start1"));
+            hide.addEvent(alpha.getEvent("Start2"));
+            hide.addEvent(alpha.getEvent("End1"));
+            hide.addEvent(alpha.getEvent("End2"));
+            hide = AlphabetHelpers.minus(alpha, hide);
+            synch.hide(hide);
 
-			// Test language equivalence minimization
-			AutomatonMinimizer minimizer = new AutomatonMinimizer(theProject.getAutomaton("viii.b"));
-			Automaton languageMin = minimizer.getMinimizedAutomaton(options);
-			assertTrue((languageMin.nbrOfStates() == 3) && (languageMin.nbrOfTransitions() == 4));
-			*/
+            MinimizationOptions options = MinimizationOptions.getDefaultMinimizationOptions();
+            options.setMinimizationType(EquivalenceRelation.LanguageEquivalence);
 
-			ProjectBuildFromXml builder = new ProjectBuildFromXml();
-			Project theProject = builder.build(TestFiles.getFile(TestFiles.MachineBufferMachine));
-			SynchronizationOptions syncOptions = SynchronizationOptions.getDefaultSynchronizationOptions();
-			syncOptions.setForbidUncontrollableStates(true);
-			AutomataSynchronizer synchronizer = new AutomataSynchronizer(theProject, syncOptions);
-			synchronizer.execute();
-			Automaton synch = synchronizer.getAutomaton();
-			Alphabet alpha = synch.getAlphabet();
-			Alphabet hide = new Alphabet();
-			hide.addEvent(alpha.getEvent("Start1"));
-			hide.addEvent(alpha.getEvent("Start2"));
-			hide.addEvent(alpha.getEvent("End1"));
-			hide.addEvent(alpha.getEvent("End2"));
-			hide = AlphabetHelpers.minus(alpha, hide);
-			synch.hide(hide);
-					
-			MinimizationOptions options = MinimizationOptions.getDefaultMinimizationOptions();
-			options.setMinimizationType(EquivalenceRelation.LanguageEquivalence);
+            // Test language equivalence minimization
+            AutomatonMinimizer minimizer = new AutomatonMinimizer(synch);
+            Automaton languageMin = minimizer.getMinimizedAutomaton(options);
+            assertTrue(languageMin.nbrOfStates() == 8);
+            assertTrue(languageMin.nbrOfTransitions() == 18);
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+            assertTrue(false);
+        }
+    }
 
-			// Test language equivalence minimization
-			AutomatonMinimizer minimizer = new AutomatonMinimizer(synch);
-			Automaton languageMin = minimizer.getMinimizedAutomaton(options);
-			assertTrue(languageMin.nbrOfStates() == 8);
-			assertTrue(languageMin.nbrOfTransitions() == 18);
-		}
-		catch (Exception ex)
-		{
-			ex.printStackTrace();
-			assertTrue(false);
-		}
-	}
+    public void testObservationEquivalenceMinimization()
+    {
+        try
+        {
+            ProjectBuildFromXml builder = new ProjectBuildFromXml();
+            Project theProject = builder.build(TestFiles.getFile(TestFiles.ObservationEquivalence));
+            MinimizationOptions options = MinimizationOptions.getDefaultMinimizationOptions();
+            options.setMinimizationType(EquivalenceRelation.ObservationEquivalence);
+            options.setAlsoTransitions(true);
+            options.setKeepOriginal(true);
 
-	public void testObservationEquivalenceMinimization()
-	{
-		try
-		{
-			ProjectBuildFromXml builder = new ProjectBuildFromXml();
-			Project theProject = builder.build(TestFiles.getFile(TestFiles.ObservationEquivalence));
-			MinimizationOptions options = MinimizationOptions.getDefaultMinimizationOptions();
-			options.setMinimizationType(EquivalenceRelation.ObservationEquivalence);
-			options.setAlsoTransitions(true);
-			options.setKeepOriginal(true);
-			
-			// Test observation equivalence minimization
-			AutomatonMinimizer minimizer = new AutomatonMinimizer(theProject.getAutomaton("viii.b"));
-			Automaton observationMin = minimizer.getMinimizedAutomaton(options);
-			assertTrue((observationMin.nbrOfStates() == 5) && 
-					   (observationMin.nbrOfTransitions() == 9) && 
-					   (observationMin.getStateWithName("0").nbrOfOutgoingArcs() == 3));
-			
-			// Test a part of the dining philosophers example (observation equivalence minimization)
-			minimizer = new AutomatonMinimizer(theProject.getAutomaton("P1F1F2"));
-			//options.setIgnoreMarking(true);
-			observationMin = minimizer.getMinimizedAutomaton(options);
-			assertTrue(observationMin.nbrOfStates() == 6);
-			assertTrue(observationMin.nbrOfTransitions() == 10);
-			assertTrue(observationMin.nbrOfEpsilonTransitions() == 2);
-		}
-		catch (Exception ex)
-		{
-			ex.printStackTrace();
-			assertTrue(false);
-		}
-	}
+            // Test observation equivalence minimization
+            AutomatonMinimizer minimizer = new AutomatonMinimizer(theProject.getAutomaton("viii.b"));
+            Automaton observationMin = minimizer.getMinimizedAutomaton(options);
+            assertTrue((observationMin.nbrOfStates() == 5) &&
+                       (observationMin.nbrOfTransitions() == 9) &&
+                       (observationMin.getStateWithName("0").nbrOfOutgoingArcs() == 3));
 
-	public void testBisimulationEquivalenceMinimization()
-	{
-		try
-		{
-			ProjectBuildFromXml builder = new ProjectBuildFromXml();	
-			Project theProject = builder.build(TestFiles.getFile(TestFiles.BisimulationEquivalence));
-			MinimizationOptions options = MinimizationOptions.getDefaultMinimizationOptions();
-			options.setMinimizationType(EquivalenceRelation.BisimulationEquivalence);
-			options.setAlsoTransitions(true);
-			options.setKeepOriginal(true);
+            // Test a part of the dining philosophers example (observation equivalence minimization)
+            minimizer = new AutomatonMinimizer(theProject.getAutomaton("P1F1F2"));
+            //options.setIgnoreMarking(true);
+            observationMin = minimizer.getMinimizedAutomaton(options);
+            assertTrue(observationMin.nbrOfStates() == 6);
+            assertTrue(observationMin.nbrOfTransitions() == 10);
+            assertTrue(observationMin.nbrOfEpsilonTransitions() == 2);
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+            assertTrue(false);
+        }
+    }
 
-			// Test bisimulation equivalence minimization
-			AutomatonMinimizer minimizer = new AutomatonMinimizer(theProject.getAutomaton("Test (from Fernandez)"));
-			minimizer.useShortStateNames(false);
-			Automaton min = minimizer.getMinimizedAutomaton(options);
-			assertTrue((min.nbrOfStates() == 3) && 
-					   (min.nbrOfTransitions() == 3) &&
-					   (min.getStateWithName("2.0.1").nbrOfOutgoingArcs() == 2));
-			
-			// Test bisimulation equivalence minimization
-			minimizer = new AutomatonMinimizer(theProject.getAutomaton("Test (from Westin)"));
-			minimizer.useShortStateNames(false);
-			min = minimizer.getMinimizedAutomaton(options);
-			assertTrue((min.nbrOfStates() == 4) && 
-					   (min.nbrOfTransitions() == 4) &&
-					   (min.getStateWithName("q2.q1.p1").nbrOfOutgoingArcs() == 2));
-		}
-		catch (UnsatisfiedLinkError ex)
-		{
-			System.err.println("The library BisimulationEquivalence is missing.");
-		}
-		catch (Exception ex)
-		{
-			ex.printStackTrace();
-			assertTrue(false);
-		}
-	}
+    public void testBisimulationEquivalenceMinimization()
+    {
+        try
+        {
+            ProjectBuildFromXml builder = new ProjectBuildFromXml();
+            Project theProject = builder.build(TestFiles.getFile(TestFiles.BisimulationEquivalence));
+            MinimizationOptions options = MinimizationOptions.getDefaultMinimizationOptions();
+            options.setMinimizationType(EquivalenceRelation.BisimulationEquivalence);
+            options.setAlsoTransitions(true);
+            options.setKeepOriginal(true);
 
-	public void testConflictEquivalenceMinimization()
-	{
-		try
-		{
-			ProjectBuildFromXml builder = new ProjectBuildFromXml();
-			Project theProject = builder.build(TestFiles.getFile(TestFiles.ConflictEquivalence));
-			
-			Automata tests = theProject.getPlantAutomata();
-			Automata min = new Automata();
-			Automata key = theProject.getSpecificationAutomata();
+            AutomatonMinimizer minimizer;
+            Automaton min;
 
-			// Iterate over tests and minimize each individually
-			AutomatonIterator autIt = tests.iterator();
-			while (autIt.hasNext())
-			{
-				Automaton currAutomaton = autIt.nextAutomaton();
+            //System.err.println("Fernandez");
+            // Test bisimulation equivalence minimization
+            minimizer = new AutomatonMinimizer(theProject.getAutomaton("Test (from Fernandez)"));
+            min = minimizer.getMinimizedAutomaton(options);
+            assertTrue((min.nbrOfStates() == 3) &&
+                       (min.nbrOfTransitions() == 3) &&
+                       (min.getStateWithName("2.0.1").nbrOfOutgoingArcs() == 2));
 
-				// Minimize this one
-				AutomatonMinimizer minimizer = new AutomatonMinimizer(currAutomaton);
-				MinimizationOptions options = new MinimizationOptions();
-				options.setMinimizationType(EquivalenceRelation.ConflictEquivalence);
-				options.setCompositionalMinimization(false);
-				options.setAlsoTransitions(true);
-				options.setKeepOriginal(true);
-				Automaton newAutomaton = minimizer.getMinimizedAutomaton(options);
-				min.addAutomaton(newAutomaton);
-			}
+            //System.err.println("Westin");
+            // Test bisimulation equivalence minimization
+            minimizer = new AutomatonMinimizer(theProject.getAutomaton("Test (from Westin)"));
+            min = minimizer.getMinimizedAutomaton(options);
+            assertTrue((min.nbrOfStates() == 4) &&
+                       (min.nbrOfTransitions() == 4) &&
+                       (min.getStateWithName("q2.q1.p1").nbrOfOutgoingArcs() == 2));
+        }
+        catch (UnsatisfiedLinkError ex)
+        {
+            System.err.println("The library BisimulationEquivalence is missing.");
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+            assertTrue(false);
+        }
+    }
 
-			// Compare the minimized automata with the correct solution
-			for (int i=0; i<min.size(); i++)
-			{
-				Automaton currMin = min.getAutomatonAt(i);
-				Automaton currKey = key.getAutomatonAt(i);
+    public void testConflictEquivalenceMinimization()
+    {
+        try
+        {
+            ProjectBuildFromXml builder = new ProjectBuildFromXml();
+            Project theProject = builder.build(TestFiles.getFile(TestFiles.ConflictEquivalence));
 
-				// System.err.println(currMin + " vs. " + currKey);
+            Automata tests = theProject.getPlantAutomata();
+            Automata min = new Automata();
+            Automata key = theProject.getSpecificationAutomata();
 
-				assertTrue(currMin.nbrOfStates() == currKey.nbrOfStates());
-				assertTrue(currMin.getAlphabet().equals(currKey.getAlphabet()));
-				assertTrue(currMin.nbrOfTransitions() == currKey.nbrOfTransitions());
-				assertTrue(currMin.nbrOfEpsilonTransitions() == currKey.nbrOfEpsilonTransitions());
-				assertTrue(currMin.getInitialState().nbrOfOutgoingArcs() == currKey.getInitialState().nbrOfOutgoingArcs());
-				assertTrue(currMin.getInitialState().nbrOfIncomingArcs() == currKey.getInitialState().nbrOfIncomingArcs());
-			}
-		}
-		catch (Exception ex)
-		{
-			ex.printStackTrace();
-			assertTrue(false);
-		}		
-	}
+            // Iterate over tests and minimize each individually
+            AutomatonIterator autIt = tests.iterator();
+            while (autIt.hasNext())
+            {
+                Automaton currAutomaton = autIt.nextAutomaton();
+
+                // Minimize this one
+                AutomatonMinimizer minimizer = new AutomatonMinimizer(currAutomaton);
+                MinimizationOptions options = new MinimizationOptions();
+                options.setMinimizationType(EquivalenceRelation.ConflictEquivalence);
+                options.setCompositionalMinimization(false);
+                options.setAlsoTransitions(true);
+                options.setKeepOriginal(true);
+                Automaton newAutomaton = minimizer.getMinimizedAutomaton(options);
+                min.addAutomaton(newAutomaton);
+            }
+
+            // Compare the minimized automata with the correct solution
+            for (int i=0; i<min.size(); i++)
+            {
+                Automaton currMin = min.getAutomatonAt(i);
+                Automaton currKey = key.getAutomatonAt(i);
+
+                // System.err.println(currMin + " vs. " + currKey);
+
+                assertTrue(currMin.nbrOfStates() == currKey.nbrOfStates());
+                assertTrue(currMin.getAlphabet().equals(currKey.getAlphabet()));
+                assertTrue(currMin.nbrOfTransitions() == currKey.nbrOfTransitions());
+                assertTrue(currMin.nbrOfEpsilonTransitions() == currKey.nbrOfEpsilonTransitions());
+                assertTrue(currMin.getInitialState().nbrOfOutgoingArcs() == currKey.getInitialState().nbrOfOutgoingArcs());
+                assertTrue(currMin.getInitialState().nbrOfIncomingArcs() == currKey.getInitialState().nbrOfIncomingArcs());
+            }
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+            assertTrue(false);
+        }
+    }
 }

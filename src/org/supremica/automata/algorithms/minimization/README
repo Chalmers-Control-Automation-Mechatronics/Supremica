@@ -1,4 +1,0 @@
-Compiling on Mac OS X:
-
-g++ -c -I /System/Library/Frameworks/JavaVM.framework/Headers/ org_supremica_automata_algorithms_minimization_BisimulationEquivalenceMinimizer.cpp 
-g++ -dynamiclib -install_name BisimulationEquivalenceMinimizer.dylib -o BisimulationEquivalenceMinimizer.dylib org_supremica_automata_algorithms_minimization_BisimulationEquivalenceMinimizer.o    

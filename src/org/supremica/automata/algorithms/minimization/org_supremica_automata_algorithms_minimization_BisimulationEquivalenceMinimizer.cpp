@@ -13,7 +13,7 @@
  *            Comments rewritten. Names of identifiers changed.
  *                                   890420                     Sven Westin
  *
- * 1.2        Modified code to run by JNI-calls.
+ * 1.2        Modified code to run by JNI-calls (see cvs system for further modifications).
  *                                   050706                     Hugo Flordal
  *
  * NOTE: Code for tracing and debugging is removed from this version.
@@ -37,10 +37,24 @@
  *
  ************************************************************************************************
  *
- * For compilation instructions, see BisimulationEquivalenceMinimizer.java
+ * COMPILING INSTRUCTIONS
  *
- ***********************************************************************************************
- */
+ * Note that you probably have to change the folders to include
+ *
+ * Compiling on Windows:
+ *
+ * cl -I"c:\Program Files\Java\jdk1.5.0_04"\include -I"c:\Program Files\Java\jdk1.5.0_04"\include\win32 -I"C:\Program Files\Microsoft Visual Studio .NET 2003\Vc7"\include -LD org_supremica_automata_algorithms_minimization_BisimulationEquivalenceMinimizer.cpp -FeBisimulationEquivalence.dll /link /LIBPATH:"C:\Program Files\Microsoft Visual Studio .NET 2003\Vc7"\lib
+ *
+ * Compiling on Linux:
+ *
+ * g++ -shared -fPIC -I$JAVA_HOME/include -I$JAVA_HOME/include/linux org_supremica_automata_algorithms_minimization_BisimulationEquivalenceMinimizer.cpp -o ~/Supremica/platform/linux.x86/lib/libBisimulationEquivalence.so
+ *
+ * Compiling on Mac OS X:
+ *
+ * g++ -c -I /System/Library/Frameworks/JavaVM.framework/Headers/ org_supremica_automata_algorithms_minimization_BisimulationEquivalenceMinimizer.cpp
+ * g++ -dynamiclib -install_name BisimulationEquivalenceMinimizer.dylib -o BisimulationEquivalenceMinimizer.dylib org_supremica_automata_algorithms_minimization_BisimulationEquivalenceMinimizer.o
+ *
+ ************************************************************************************************/
 
 #ifdef _WINDOWS
 #include <windows.h>
@@ -64,23 +78,20 @@
 // Stuff by Hugo //
 ///////////////////
 
-int NBROFSTATES, NBROFEVENTS, NBROFTRANSITIONS, NBROFINITIALPARTITIONS;
-int* INITIALPARTITIONING;
-int* TRANSITIONS;
+int NBROFSTATES, NBROFEVENTS, NBROFTRANSITIONS;
 
 /*********************************************************************************************
  *
  * Data Structures
  *
- **********************************************************************************************
- */
+ *********************************************************************************************/
 
 
 /**
  * Element node. One for each element in the set
  */
 struct element
-{
+{  
   int index; /* Index of state */
   struct element *next; /* Next element in Q block */
   struct element *prev; /* Previous element in Q block */
@@ -127,16 +138,16 @@ struct qblock
   struct qblock *q_prev; /* Previous Q block */
   struct element *first; /* First element in block */
   struct xblock *my_x_block[MAXREL]; /* Array of pointers to X
-											 block's to which this
-											 block belongs.  Each
-											 member (my x block[i])
-											 points to a X block in X
-											 partition 'i' (may be
-											 NULL) */
+										block's to which this
+										block belongs.  Each
+										member (my x block[i])
+										points to a X block in X
+										partition 'i' (may be
+										NULL) */
   struct qblock *q_tmp; /* Associated blocks (Used in step 4) */
   struct qblock *splitl; /* List of splitted Q blocks (step 4) */
-  struct qblock *x_next [MAXREL]; /* Next Q block in this X block
-									 (in partition X i) */
+  struct qblock *x_next[MAXREL]; /* Next Q block in this X block
+									(in partition X i) */
   struct qblock *x_prev[MAXREL]; /* Previous Q block in this X block
 									(in partition X_i) */
 };
@@ -171,9 +182,7 @@ struct count
  *
  * Globals
  *
- **********************************************************************************************
- */
-
+ *********************************************************************************************/
 
 struct qblock *Q = NULL; /* Pointer to Q partition */
 struct xblock *C = NULL; /* Pointer to the set C */
@@ -188,11 +197,8 @@ struct element *Bprime = NULL;
    in B, i.e. no copy of Q block
    node. Step 3,5, and 7 */
 
-int rel = 0; /* Relation on which we partition in this refinement
-				step */
-int Last_rel = 0; /* Highest existing relation
-					 - number. Determined
-					 in input routine */
+int rel = -1; /* Relation on which we partition in this refinement
+				 step */
 
 int Iteration = 0 ; /* Number of current refinement step */
 
@@ -201,8 +207,7 @@ int Iteration = 0 ; /* Number of current refinement step */
  *
  * Help Routines
  *
- **********************************************************************************************
- */
+ *********************************************************************************************/
 
 int error(char *s, int al, int a2,int a3, int a4, int a5)
 {
@@ -236,8 +241,7 @@ int step_4();
  * to make porting easier.
  *
  *
- **********************************************************************************************
- */
+ **********************************************************************************************/
 
 struct element *make_element_node()
 {
@@ -290,7 +294,7 @@ struct xblock *make_xblock_node()
   if (!(xb = (struct xblock *) malloc(sizeof(struct xblock))))
 	error("make xblock node: no available memory");
   // xb->relation = NULL;
-  xb->relation = 0; // HUGO
+  xb->relation = -1; // HUGO
   xb->q_first = NULL;
   xb->next = xb->prev = NULL;
   return(xb);
@@ -305,268 +309,7 @@ struct count *make_count_node()
   return(cp);
 } /* make_count_node */
 
-
-/*********************************************************************************************
- *
- * Input procedures
- *
- * Input of start partition (from standard input) and
- * creation of the data-structure on which to partition.
- *
- **********************************************************************************************
- */
-
-/* Global data for input-routines */
-
-#ifndef MAXSYMBOLS
-# define MAXSYMBOLS 100
-#endif
-
-/* Table used in , input' routine
-   when connecting edges to nodes */
-struct symboltable {
-  int index;
-  struct element *ep;
-  struct count *cp[MAXREL];
-}stateTab[MAXSYMBOLS];
-
-/*
-  Table used to get name, index
-  and corresponding X block of a
-  relation
-*/
-struct relation_table {
-  int index;
-  struct xblock *xb;
-}eventTab[MAXREL];
-
-/*
- * Input
- *
- * This procedure reads symbols (using 'get_symbol') and
- * builds the linked data-structure upon whIch the partition
- * algorithm works. When 'input' is ready 'Q' will point to
- * the list of Q blocks in the initial partition P. C will point
- * to 'Last_rel' X block's each containing all the Q blocks in the
- * initial partition (i.e. we have 'Last_rel' X partitions each
- * containing one single
- * block namely the block of all elements.
- */
-int input()
-{
-  /*
-  struct stateTable {
-	int index;
-	struct element *ep;
-	struct count *cp[NBROFEVENTS+1];
-  }stateTab[NBROFSTATES];
-
-  struct eventTable {
-	int index;
-	struct xblock *xb;
-  }eventTab[NBROFEVENTS+1];
-  */
-
-  int n=0;
-  int i = 0;
-  struct element *el,*elp;
-  struct qblock *qb,*qbp;
-  struct xblock *xbc,*xbp;
-  struct edge *ed;
-  int stateindex;
-  int from_found,to_found;
-  int rel;
-  int pos;
-
-  /*
-	Make a chain of X blocks (size MAXREL).
-	Make C point to first X block. Give each
-	X block number 1,2..MAXREL-1 (We actually
-	need only the number of X blocks as the
-	number of different relation's input (Last_rel)
-	but as 'Last_rel' is still unknown we make
-	MAXREL X block's in the chain. The chain
-	will be cut of when we know 'Last_rel'.
-	Each X block will contain all the Q blocks
-	at initialization.
-
-	We make rel_tab point to the X blocks to
-	make the building of the Q blocks easier
-  */
-
-  C = xbp = make_xblock_node();
-  C->relation = 1; /* 0 not used, */
-  eventTab[1].xb = xbp;
-
-  for (i = 2 ; i < NBROFEVENTS+1 ; i++) {
-	eventTab[i].xb = xbc = make_xblock_node();
-	xbc->relation = i;
-	xbp->next = xbc;
-	xbc->prev = xbp;
-	xbp = xbc;
-  }
-
-  /* First get the initial partitions! */
-
-  pos = 0;
-  while ((pos != NBROFSTATES+NBROFINITIALPARTITIONS-1) && ((stateindex = INITIALPARTITIONING[pos++]) != -1))
-  {
-	/* Start of a new Q block */
-	qb = make_qblock_node();
-
-	if (eventTab[1].xb->q_first == NULL)
-	{
-	  /* First Q block */
-	  Q = qbp = qb;
-	  for (i = 1 ; i < NBROFEVENTS+1; i++) {
-		eventTab[i].xb->q_first = qb;
-		qb->my_x_block[i] = eventTab[i].xb;
-	  }
-	}
-	else
-	{
-	  /* Put new qblock last in list of Q blocks
-		 and last in list of Q blocks for this
-		 X block */
-	  qbp->q_next = qb;
-	  qb->q_prev = qbp;
-	  for (i = 1 ; i < NBROFEVENTS+1; i++) {
-		qbp->x_next[i] = qb;
-		qb->x_prev[i] = qbp;
-		qb->my_x_block[i] = eventTab[i].xb;
-	  }
-	  qbp = qb;
-	}
-
-	/* First element in the qblock */
-
-	el = elp = make_element_node();
-	qb->first = el;
-
-	qb->n_elements = 1;
-	el->index = stateindex;
-	el->my_qblock = qb;
-
-	/* Put element in symbol table for later use
-	   when scanning edges */
-
-	stateTab[stateindex].index = stateindex;
-	stateTab[stateindex].ep = el;
-	if (stateindex == MAXSYMBOLS)
-	  error("Input: No more symboltable space");
-
-	while ((pos != NBROFSTATES+NBROFINITIALPARTITIONS-1) && ((stateindex = INITIALPARTITIONING[pos++]) != -1))
-	{
-	  /* get rest of elements */
-
-	  el = make_element_node();
-	  elp->next = el;
-	  el->prev = elp;
-	  elp = el;
-	  qb->n_elements++;
-	  el->index = stateindex;
-	  el->my_qblock = qb;
-
-	  stateTab[stateindex].index = stateindex;
-	  stateTab[stateindex].ep = el;
-	  if (stateindex==MAXSYMBOLS)
-		error("Input: No more symboltable space");
-	}
-  }
-
-  /* Now get the edges! */
-
-  pos = 0;
-  while (pos < NBROFTRANSITIONS*3)
-  {
-	int from_state = TRANSITIONS[pos++];
-	int event = TRANSITIONS[pos++];
-	int to_state = TRANSITIONS[pos++];
-
-	/* Make new edge node */
-	ed = make_edge_node();
-
-	/* Get number of last relation (in a
-	   terribly ineffective way) */
-	// IMPROVEMENT POSSIBLE
-
-	for (i = 1; i <= Last_rel; i++)
-	{
-	  /* Note! Start at 1. Relation number 0 considered as error! */
-	  if (eventTab[i].index == event)
-	  {
-		/* Relation-name found. Save number */
-		rel = i;
-		break;
-	  }
-	}
-
-	if (i > Last_rel)
-	{
-	  /* 'rel name' not seen before. Make a new entry
-		 in the 'eventTab' */
-
-	  if (Last_rel < (MAXREL-1)) {
-		eventTab[++Last_rel].index = event;
-		rel = Last_rel;
-	  }
-	  else
-		error("Input: No more relations allowed");
-	}
-
-	/* Scan all the names in symbol-table
-	   until from-node and to-node
-	   corresponding to this edge is found.
-	   (Linear search, not terribly effective */
-	// IMPROVEMENT POSSIBLE
-
-	from_found = to_found = FALSE;
-	i = 0;
-	while ((!from_found || !to_found) && (i < NBROFSTATES))
-	{
-	  if (stateTab[i].index == from_state)
-	  {
-		/* Make edge point to 'from_element' */
-		ed->from_element = stateTab[i].ep;
-		from_found = TRUE;
-
-		/* Create a count node if no one exists Make edge point to
-		   count-node Increment count node */
-		if (stateTab[i].cp[rel] == NULL)
-		{
-		  ed->cp = stateTab[i].cp[rel] = make_count_node();
-		}
-		else
-		{
-		  stateTab[i].cp[rel]->counter++;
-		  ed->cp = stateTab[i].cp[rel];
-		}
-	  }
-
-	  if (stateTab[i].index == to_state) {
-		/* Put edge first in list of incident
-		   edges to 'to_element' */
-		ed->in_edges = stateTab[i].ep->in_edges[rel];
-		stateTab[i].ep->in_edges[rel] = ed;
-		to_found = TRUE;
-	  }
-	  i++;
-	}
-  }
-
-  /*
-	eventTab[NBROFEVENTS].xb->next = NULL;
-	for(i = NBROFEVENTS+1 ; i < MAXREL; i++) {
-	qb->my_x_block[i] = NULL;
-	qb->x_next[i] = qb->x_prev[i] = NULL;
-  }
-  */
-
-  return 0;
-} /* input */
-
-
-/*********************************************************************************************
+/***************************************************************************************
  *
  * Procedures implementing the
  * Strong Bisimulation Equivalence Algorithm
@@ -625,7 +368,7 @@ int transform()
 	  curr_el = curr_qb-> first;
 	  while (curr_el != NULL)
 	  {
-		if ((ed = curr_el->in_edges [rel]) != NULL)
+		if ((ed = curr_el->in_edges[rel]) != NULL)
 		{
 		  if (E_1_B == NULL)
 		  {
@@ -699,12 +442,11 @@ int transform()
 } /* transform */
 
 
-/********************************************************************************************** *
+/***********************************************************************************************
  *
  * Generalized Relational Coarsest Partition Algorithm
  *
- ***********************************************************************************************
- */
+ ***********************************************************************************************/
 
 /*
   Step 1: Find a block S in X and a
@@ -715,24 +457,24 @@ int transform()
   the doubly linked list C as the block S.
   The number of the relation on which to partition (stored in the
   X block node) is saved in the global variable 'reI'. From the
-  X block the smallest (least number of elements) of the two first 0 blocks will be taken as the refinement block B. If the remaining block S-B is still compound, leave it in C. Otherwise remove S-B from C. Delete it's associated X block node.
+  X block the smallest (least number of elements) of the two first Q blocks will be taken as the refinement block B. If the remaining block S-B is still compound, leave it in C. Otherwise remove S-B from C. Delete it's associated X block node.
 */
 
 int step_1_2()
 {
   struct xblock *xb; struct qblock *q1,*q2;
-  if ( (xb = C) == NULL)   /* Get first block in set C */
+  if ((xb = C) == NULL)   /* Get first block in set C */
 	error("step_1:No X block");
 
   rel = xb->relation;   /* Save number of relation on
 						   which to partition
 						   (Needed later..)	*/
-  if ( (q1 = xb->q_first) == NULL) 	/* Get pointers to two first
-									   0 blocks in current X block */
+  if ((q1 = xb->q_first) == NULL) 	/* Get pointers to two first
+									   Q blocks in current X block */
 	error("step_1:No Q block in X block");
-  if ( (q2 = q1->x_next[rel]) == NULL)
+  if ((q2 = q1->x_next[rel]) == NULL)
  	error ("step_l:X block not compound");
-  /* Choose the smallest of the two first 0 blocks to be our refinement block B */
+  /* Choose the smallest of the two first Q blocks to be our refinement block B */
   B = (q1->n_elements < q2->n_elements) ? q1 : q2 ;
   /* Remove B from the X block */
   if (B==q1) {
@@ -769,13 +511,12 @@ int step_1_2()
 
   /*
    *
-   *
    *    Step 3: Find the set of elements in U having
    * i-labelled edges incident to B
    *
    * 1. Copy elements in B to a temporary set pointed to by
    * 'Bprime'. This is done by duplicating the pointers linking the
-   * elements of the 0 block B together into a new set of pointers
+   * elements of the Q block B together into a new set of pointers
    * (stored in the element records. , Bprime' points to the first
    * element in the set B.
    *
@@ -897,8 +638,6 @@ int step_3()
    *
    *
    */
-
-
 int step_4()
 {
   struct element *curr_el = E_1_B;
@@ -989,8 +728,7 @@ int step_4()
 	   X'i separately) */
 
 
-
-	for (i = 1 ; i <= Last_rel; i++) {
+	for (i=0 ; i<NBROFEVENTS; i++) {
 
 	  qbDp->my_x_block[i] = qbD->my_x_block[i];
 
@@ -1021,7 +759,6 @@ int step_4()
 		  qbDp->my_x_block[i]->q_first->x_prev[i] = qbDp;
 		qbDp->x_prev[i] = NULL;
 		qbDp->my_x_block[i]->q_first = qbDp;
-
 
 	  }
 	  else {
@@ -1068,8 +805,6 @@ int step_4()
 
 
   /* HERE DISPOSE of qblock pointed to by qbD is possible */
-
-
 
 
 
@@ -1240,19 +975,16 @@ int step_7()
  * (i.e. for every i in I. X_i = 0).
  *
  */
-
 int grcp()
 {
-
   if (Q == NULL)
 	error ("partition: No Q block !");
   if (Q -> q_next == NULL)
 	return 0;
-  /* If there initially is only one Q block
-	 then, for every i in I.
-	 Q = X_i ,i.e. , all processes
-	 are bisimulation equivalent
-  */
+	// If there initially is only one Q block
+	// then, for every i in I.
+	// Q = X_i ,i.e. , all processes
+	// are bisimulation equivalent
 
   while (C != NULL) {
 
@@ -1276,20 +1008,18 @@ int grcp()
 /**
  * Initializes the partitioning stuff using the supplied information.
  */
-JNIEXPORT void JNICALL Java_org_supremica_automata_algorithms_minimization_BisimulationEquivalenceMinimizer_initialize(JNIEnv* env, jobject obj, jint nbrOfStates, jint nbrOfEvents, jint nbrOfTransitions, jintArray initialPartitioning, jintArray transitions)
+JNIEXPORT void JNICALL Java_org_supremica_automata_algorithms_minimization_BisimulationEquivalenceMinimizer_initialize(JNIEnv* env, jclass obj, jint nbrOfStates, jint nbrOfEvents, jint nbrOfTransitions, jintArray initialPartitioning, jintArray transitions)
 {
   NBROFSTATES = (int) nbrOfStates;
   NBROFEVENTS = (int) nbrOfEvents;
   NBROFTRANSITIONS = (int) nbrOfTransitions;
-  NBROFINITIALPARTITIONS = 1+((env)->GetArrayLength(initialPartitioning))-nbrOfStates;
+  int NBROFINITIALPARTITIONS = 1 + env->GetArrayLength(initialPartitioning) - nbrOfStates;
 
-  /*
   printf("States: %i, events: %i, transitions: %i, partitions: %i\n", NBROFSTATES, NBROFEVENTS, NBROFTRANSITIONS, NBROFINITIALPARTITIONS);
-  */
 
   // Assign initial partitioning
   // Get a c-array with the values
-  INITIALPARTITIONING = (int *)(env)->GetIntArrayElements(initialPartitioning, NULL);
+  int *INITIALPARTITIONING = (int *) env->GetIntArrayElements(initialPartitioning, NULL);
 
   /*
   int i;
@@ -1300,7 +1030,7 @@ JNIEXPORT void JNICALL Java_org_supremica_automata_algorithms_minimization_Bisim
 
   // Assign transition array
   // Get a c-array with the values
-  TRANSITIONS = (int *)(env)->GetIntArrayElements(transitions, NULL);
+  int *TRANSITIONS = (int *) env->GetIntArrayElements(transitions, NULL);
 
   /*
   for(i=0; i<NBROFTRANSITIONS*3; )
@@ -1310,14 +1040,187 @@ JNIEXPORT void JNICALL Java_org_supremica_automata_algorithms_minimization_Bisim
   }
   printf("\n");
   */
+
+  /*********************************************************************************************
+   *
+   * The rest of the code derives from input()
+   *
+   * Input of start partition and
+   * creation of the data-structure on which to partition.
+   *
+   *********************************************************************************************/
+
+  int n=0;
+  int i=0, j=0;
+  struct element *el,*elp;
+  struct qblock *qb,*qbp;
+  struct xblock *xbc,*xbp;
+  struct edge *ed;
+  int stateindex;
+  int pos;
+
+  // Allocate memory for xblocks, one per event
+  xblock** xblocks;
+  if (!(xblocks = (xblock**) malloc((NBROFEVENTS)*sizeof(xblock*))))
+    error ("make_xblocks: no available memory");
+  // Allocate memory for elements, one per state
+  element** elements;
+  if (!(elements = (element**) malloc((NBROFSTATES)*sizeof(element*))))
+    error ("make_elements: no available memory");
+  // Allocate memory for counts, one per state-event combo
+  count** counts;
+  if (!(counts = (count**) malloc((NBROFSTATES*NBROFEVENTS)*sizeof(count*))))
+    error ("make_counts: no available memory");
+  for (i=0; i<NBROFSTATES*NBROFEVENTS; i++)
+  	counts[i] = NULL;
+
+  /*
+	Make a chain of X blocks (size NBROFEVENTS+1).
+	Make C point to first X block. Give each
+	X block number 1,2..NBROFEVENTS
+	Each X block will contain all the Q blocks
+	at initialization.
+
+	We make rel_tab point to the X blocks to
+	make the building of the Q blocks easier
+  */
+  C = xbp = make_xblock_node();
+  C->relation = 0;
+  xblocks[0] = xbp;
+  for (i=1; i<NBROFEVENTS; i++) {
+	xblocks[i] = xbc = make_xblock_node();
+	xbc->relation = i;
+	xbp->next = xbc;
+	xbc->prev = xbp;
+	xbp = xbc;
+  }
+
+  /* First get the initial partitions! */
+
+  pos = 0;
+  while ((pos != NBROFSTATES+NBROFINITIALPARTITIONS-1) && ((stateindex = INITIALPARTITIONING[pos++]) != -1))
+  {
+	/* Start of a new Q block */
+	qb = make_qblock_node();
+
+	if (xblocks[0]->q_first == NULL)
+	{
+	  /* First Q block */
+	  Q = qbp = qb;
+	  for (i=0 ; i<NBROFEVENTS; i++) {
+		xblocks[i]->q_first = qb;
+		qb->my_x_block[i] = xblocks[i];
+	  }
+	}
+	else
+	{
+	  /* Put new qblock last in list of Q blocks
+		 and last in list of Q blocks for this
+		 X block */
+	  qbp->q_next = qb;
+	  qb->q_prev = qbp;
+	  for (i = 0 ; i < NBROFEVENTS; i++) {
+		qbp->x_next[i] = qb;
+		qb->x_prev[i] = qbp;
+		qb->my_x_block[i] = xblocks[i];
+	  }
+	  qbp = qb;
+	}
+
+	// First element in the qblock
+	el = elp = make_element_node();
+	qb->first = el;
+	qb->n_elements = 1;
+	el->index = stateindex;
+	el->my_qblock = qb;
+
+	// Put element in symbol table for later use
+	// when scanning edges
+	elements[stateindex] = el;
+	if (stateindex == NBROFSTATES)
+	  error("Input: No more symboltable space");
+
+	while ((pos != NBROFSTATES+NBROFINITIALPARTITIONS-1) && ((stateindex = INITIALPARTITIONING[pos++]) != -1))
+	{
+	  // get rest of elements
+
+	  el = make_element_node();
+	  elp->next = el;
+	  el->prev = elp;
+	  elp = el;
+	  qb->n_elements++;
+	  el->index = stateindex;
+	  el->my_qblock = qb;
+
+	  elements[stateindex] = el;
+	  if (stateindex==NBROFSTATES)
+		error("Input: No more symboltable space");
+	}
+  }
+
+  // Now get the edges!
+  pos = 0;
+  while (pos < NBROFTRANSITIONS*3)
+  {
+	int from_state = TRANSITIONS[pos++];
+	int event = TRANSITIONS[pos++];
+	int to_state = TRANSITIONS[pos++];
+
+	// Make new edge node
+	ed = make_edge_node();
+
+	// From-state stuff
+	// Make edge point to 'from_element'
+	ed->from_element = elements[from_state];
+	// Create a count node if no one exists Make edge point to
+	// count-node Increment count node
+	if (counts[from_state*NBROFEVENTS+event] == NULL)
+	{
+	  ed->cp = counts[from_state*NBROFEVENTS+event] = make_count_node();
+	}
+	else
+	{
+	  counts[from_state*NBROFEVENTS+event]->counter++;
+	  ed->cp = counts[from_state*NBROFEVENTS+event];
+	}
+
+	// To-state stuff
+	// Put edge first in list of incident
+	// edges to 'to_element'
+	ed->in_edges = elements[to_state]->in_edges[event];
+	elements[to_state]->in_edges[event] = ed;
+  }
+
+	/*
+  // DEBUG
+	for (i=0; i<NBROFSTATES; i++)
+	{
+		printf("State: %i (%i)", i, NBROFSTATES);
+		int j;
+	  	for (j=0; j<NBROFEVENTS; j++)
+	  	{
+			if(counts[i*NBROFEVENTS+j] != NULL)
+		  		printf(" count: %i (ev: %i)", counts[i*NBROFEVENTS+j]->counter, j);
+		}
+		printf("\n");
+	  	for (j=0; j<NBROFEVENTS; j++)
+	  	{
+	  		edge *ed = elements[i]->in_edges[j];
+			while (ed != NULL)
+			{
+				printf(" From %i (ev: %i)\n", ed->from_element->index, j);
+				ed = ed->in_edges;
+			}
+		}
+	}
+	*/
 }
 
 /**
  * Does the partitioning.
  */
-JNIEXPORT void JNICALL Java_org_supremica_automata_algorithms_minimization_BisimulationEquivalenceMinimizer_partition(JNIEnv* env, jobject obj)
+JNIEXPORT void JNICALL Java_org_supremica_automata_algorithms_minimization_BisimulationEquivalenceMinimizer_partition(JNIEnv* env, jclass obj)
 {
-  input();
   transform();
   grcp();
 }
@@ -1326,7 +1229,7 @@ JNIEXPORT void JNICALL Java_org_supremica_automata_algorithms_minimization_Bisim
  * Generates an int-array with indices to states in equivalence classes, separated by -1 elements.
  * Returns a java int-array.
  */
-JNIEXPORT jintArray JNICALL Java_org_supremica_automata_algorithms_minimization_BisimulationEquivalenceMinimizer_getPartitioning(JNIEnv* env, jobject obj)
+JNIEXPORT jintArray JNICALL Java_org_supremica_automata_algorithms_minimization_BisimulationEquivalenceMinimizer_getPartitioning(JNIEnv* env, jclass obj)
 {
   jintArray jResult;
 
@@ -1337,19 +1240,19 @@ JNIEXPORT jintArray JNICALL Java_org_supremica_automata_algorithms_minimization_
   int index;
   int *result;
 
+  // Count the number of partitions
   while (qb != NULL)
   {
 	nbrOfPartitions++;
 	qb = qb->q_next;
   }
 
-  length = NBROFSTATES+nbrOfPartitions-1;
-
   // Fill result array
-  result = (int *)malloc(length*sizeof(int));
-
+  length = NBROFSTATES+nbrOfPartitions-1;
+  result = (int *) malloc(length*sizeof(int));
   struct element *el;
-  qb = Q;
+  index = 0;
+  qb = Q; // The first partition
   while (qb != NULL) {
 	el = qb->first;
 	while (el != NULL)
@@ -1362,58 +1265,59 @@ JNIEXPORT jintArray JNICALL Java_org_supremica_automata_algorithms_minimization_
 	qb = qb->q_next;
   }
 
-  jResult = (env)->NewIntArray(length);
-  (env)->SetIntArrayRegion(jResult, 0, length, (jint *)result);
+  jResult = env->NewIntArray(length);
+  env->SetIntArrayRegion(jResult, 0, length, (jint *)result);
 
   // Free memory!
   // QBLOCKS
   struct qblock *q;
-  struct qblock *qold;
-  for (q=Q; q!=NULL; q=qold)
+  struct qblock *qnext;
+  for (q=Q; q!=NULL; q=qnext)
   {
 	// ELEMENTS
 	struct element *el;
-	struct element *elold;
-	for (el=q->first; el!=NULL; el=elold)
+	struct element *elnext;
+	for (el=q->first; el!=NULL; el=elnext)
 	{
 	  // EDGES
 	  int i;
-	  for (i=0; i<MAXREL; i++)
+	  struct edge *ed;
+	  struct edge *ednext;
+	  for (i=0; i<NBROFEVENTS; i++)
 	  {
-		struct edge *ed = el->in_edges[i];
-		if (ed != NULL)
+		//struct edge *ed = el->in_edges[i];
+		for (ed=el->in_edges[i]; ed!=NULL; ed=ednext)
 		{
+		  ednext = ed->in_edges;
+		  /* Why not?
+		  // COUNT
 		  if (ed->cp != NULL)
 			free(ed->cp);
+		  */
 		  free(ed);
 		}
-		else
-		{
-		  break;
-		}
 	  }
-	  elold = el->next;
+	  elnext = el->next;
+	  // COUNT
 	  if (el->cp != NULL)
 		free(el->cp);
 	  free(el);
 	}
-	qold = q->q_next;
+	qnext = q->q_next;
 	free(q);
   }
   // XBLOCKS
   struct xblock *x;
-  struct xblock *xold;
-  for (x=C; x!=NULL; x=xold)
+  struct xblock *xnext;
+  for (x=C; x!=NULL; x=xnext)
   {
-	xold = x->next;
+	xnext = x->next;
 	free(x);
   }
 
   // Reset constants
   E_1_B = NULL;
   Bprime = NULL;
-  rel = 0;
-  Last_rel = 0;
   Iteration = 0;
 
   return jResult;
