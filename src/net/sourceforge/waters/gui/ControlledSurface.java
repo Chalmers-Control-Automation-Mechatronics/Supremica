@@ -117,11 +117,13 @@ public class ControlledSurface
 			EditorObject o = (EditorObject) selectedObjects.remove(0);
 			if (o.getType() == EditorObject.NODE)
 			{
-				delNode((EditorNode) o);
+			    Command deleteNode = new DeleteNodeCommand(this, (EditorNode) o);
+			    root.getUndoInterface().executeCommand(deleteNode);
 			}
 			else if (o.getType() == EditorObject.EDGE)
 			{
-				delEdge((EditorEdge) o);
+			    Command deleteEdge = new DeleteEdgeCommand(this, (EditorEdge) o);
+			    root.getUndoInterface().executeCommand(deleteEdge);
 			}
 			else if (o.getType() == EditorObject.NODEGROUP)
 			{
@@ -869,18 +871,20 @@ public class ControlledSurface
 					EditorObject o2 = getObjectAtPosition(e.getX(), e.getY());
 					if ((o2 != null) && (o2.getType() == EditorObject.NODE))
 					{
-						EditorNode n2 = (EditorNode) o2;
-
+						EditorNode n2 = (EditorNode) o2;						
 						// Add edge
 						if (n1.getType() == EditorObject.NODE)
 						{
 							EditorNode n = (EditorNode) n1;
-							addEdge(n1, n2, 0, 0);
+							Command createEdge = new CreateEdgeCommand(this, n1, n2, 0, 0);
+							root.getUndoInterface().executeCommand(createEdge);
 						}
 						else if (n1.getType() == EditorObject.NODEGROUP)
 						{
 							EditorNodeGroup n = (EditorNodeGroup) n1;
-							addEdge(n, n2, n.getX() + xoff, n.getY() + yoff);
+							Command createEdge = new CreateEdgeCommand(this ,n, n2,
+												   n.getX() + xoff, n.getY() + yoff);
+							root.getUndoInterface().executeCommand(createEdge);
 						}
 					}
 				}

@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.26 2005-07-12 03:56:00 siw4 Exp $
+//# $Id: EditorSurface.java,v 1.27 2005-07-13 01:16:10 siw4 Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -446,28 +446,16 @@ public class EditorSurface
 		return null;
 	}
 
-	public EditorEdge addEdge(EditorObject n1, EditorNode n2, int x, int y)
+	public EditorEdge addEdge(EditorEdge edge)
 	{
-		// Create a new EdgeProxy
-		EdgeProxy ep;
-		if (n1.getType() == EditorObject.NODE)
-		{
-			ep = new EdgeProxy((NodeProxy) ((EditorNode) n1).getProxy(), (NodeProxy) n2.getProxy());
-		}
-		else
-		{
-			ep = new EdgeProxy((NodeProxy) ((EditorNodeGroup) n1).getProxy(), (NodeProxy) n2.getProxy());
-		}
-
-		// Add proxy to graph
-		graph.getEdges().add(ep);
-		
-		EditorEdge e = new EditorEdge(n1, n2, x, y, ep);
-        edges.add(e);
-		addLabelGroup(e);
-        repaint();
-
-		return e;
+	    // Add proxy to graph
+	    if (!graph.getEdges().contains(edge.getProxy())) {
+		graph.getEdges().add(edge.getProxy());
+	    }
+	    edges.add(edge);
+	    addLabelGroup(edge);
+	    repaint();
+	    return edge;
 	}
 
 	public EditorEdge addEdge(EditorObject n1, EditorNode n2, EdgeProxy ep)
