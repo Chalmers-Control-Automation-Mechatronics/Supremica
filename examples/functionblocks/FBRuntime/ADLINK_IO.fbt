@@ -5,6 +5,7 @@
     <EventInputs>
       <Event Name="READ"/>
       <Event Name="WRITE">
+        <With Var="OUTPUT0" />
         <With Var="OUTPUT1" />
         <With Var="OUTPUT2" />
         <With Var="OUTPUT3" />
@@ -33,14 +34,14 @@
         <With Var="OUTPUT26" />
         <With Var="OUTPUT27" />
         <With Var="OUTPUT28" />
-        <With Var="OUTPUT29" />
+        <With Var="OUTPUT19" />
         <With Var="OUTPUT30" />
         <With Var="OUTPUT31" />
-        <With Var="OUTPUT32" />
       </Event>
     </EventInputs>
     <EventOutputs>
       <Event Name="VALUES">
+        <With Var="INPUT0" />
         <With Var="INPUT1" />
         <With Var="INPUT2" />
         <With Var="INPUT3" />
@@ -72,11 +73,11 @@
         <With Var="INPUT29" />
         <With Var="INPUT30" />
         <With Var="INPUT31" />
-        <With Var="INPUT32" />
       </Event>
       <Event Name="CNF"/>
     </EventOutputs>
     <InputVars>
+      <VarDeclaration Name="OUTPUT0" Type="BOOL"/>
       <VarDeclaration Name="OUTPUT1" Type="BOOL"/>
       <VarDeclaration Name="OUTPUT2" Type="BOOL"/>
       <VarDeclaration Name="OUTPUT3" Type="BOOL"/>
@@ -108,9 +109,9 @@
       <VarDeclaration Name="OUTPUT29" Type="BOOL"/>
       <VarDeclaration Name="OUTPUT30" Type="BOOL"/>
       <VarDeclaration Name="OUTPUT31" Type="BOOL"/>
-      <VarDeclaration Name="OUTPUT32" Type="BOOL"/>
     </InputVars>
     <OutputVars>
+      <VarDeclaration Name="INPUT0" Type="BOOL"/>
       <VarDeclaration Name="INPUT1" Type="BOOL"/>
       <VarDeclaration Name="INPUT2" Type="BOOL"/>
       <VarDeclaration Name="INPUT3" Type="BOOL"/>
@@ -142,7 +143,6 @@
       <VarDeclaration Name="INPUT29" Type="BOOL"/>
       <VarDeclaration Name="INPUT30" Type="BOOL"/>
       <VarDeclaration Name="INPUT31" Type="BOOL"/>
-      <VarDeclaration Name="INPUT32" Type="BOOL"/>
     </OutputVars>
   </InterfaceList>
 </FBType>

@@ -67,7 +67,7 @@ public class AdlinkIOThread extends Thread
 	private Variables serviceFBVariables;
 
 	//========================================================================
-	private AdlinkIOThread() {} 
+	private AdlinkIOThread() {}
 
 	public AdlinkIOThread(ServiceFBInstance fb,Variables vars)
 	{
@@ -103,7 +103,7 @@ public class AdlinkIOThread extends Thread
 
 	public synchronized void deactivateService()
 	{
-		//System.out.println("AdlinkIOThread: deactivateService()");		
+		//System.out.println("AdlinkIOThread: deactivateService()");
 		serviceActive = false;
 		notify();
 	}
@@ -121,7 +121,7 @@ public class AdlinkIOThread extends Thread
 				System.err.println("AdlinkIOThread: Interrupted Exception");
 				e.printStackTrace(System.err);
 			}
-			
+
 			if(read)
 			{
 				// read from the Digital I/O card.
@@ -135,25 +135,25 @@ public class AdlinkIOThread extends Thread
 					e.printStackTrace(System.err);
 				}
 
-				
-				
+
+
 				// set data output vars to read values
 				for (int i=0; i<32; i++)
 				{
-					//System.out.println("AdlinkIOThread.run(): Setting var INPUT" + (i+1) + " to " + readValues[i]);
-					((BooleanVariable) serviceFBVariables.getVariable("INPUT" + (i+1))).setValue(new Boolean(readValues[i]));
+					//System.out.println("AdlinkIOThread.run(): Setting var INPUT" + i + " to " + readValues[i]);
+					((BooleanVariable) serviceFBVariables.getVariable("INPUT" + i)).setValue(new Boolean(readValues[i]));
 				}
-				
+
 				// send output event
-				serviceFB.sendEvent("VALUES");				
+				serviceFB.sendEvent("VALUES");
 			}
 			else
 			{
 				// read data input vars to write
 				for (int i=0; i<32; i++)
 				{
-					writeValues[i] = ((BooleanVariable) serviceFBVariables.getVariable("OUTPUT" + (i+1))).getValue().booleanValue();
-					System.out.println("AdlinkIOThread.run(): Writing "+writeValues[i]+" to OUTPUT" + (i+1));
+					writeValues[i] = ((BooleanVariable) serviceFBVariables.getVariable("OUTPUT" + i)).getValue().booleanValue();
+					System.out.println("AdlinkIOThread.run(): Writing "+writeValues[i]+" to OUTPUT" + i);
 				}
 
 				// write to the Digital I/O card.
@@ -166,10 +166,10 @@ public class AdlinkIOThread extends Thread
 					System.err.println("AdlinkIOThread: Cought exception trying to write to Adlink PCI7432 card!");
 					e.printStackTrace(System.err);
 				}
-				
+
 				// send output event
-				serviceFB.sendEvent("CNF");							
+				serviceFB.sendEvent("CNF");
 			}
 		}
-	}   	
+	}
 }
