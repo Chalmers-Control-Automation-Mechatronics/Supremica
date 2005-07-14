@@ -133,6 +133,14 @@ public class CompositeFBType extends FBType
 
 			if (curFromInstance.equals(""))
 			{
+				// maybe constant data specification
+				try
+				{
+					newInstance.getFBInstance(curToInstance).setVariableValue(curToSignal,curFromSignal);
+				}
+				catch (Exception e)
+				{
+				}
 				// internal data input connection
 				newInstance.addInternalDataInputConnection(curFromSignal, curToInstance, curToSignal);
 			}
