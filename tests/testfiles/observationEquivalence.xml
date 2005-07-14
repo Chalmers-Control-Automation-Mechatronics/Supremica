@@ -1,5 +1,32 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <Automata name="Bisimulation">
+<Automaton name="viii.a" type="Plant">
+	<Events>
+		<Event id="a"/>
+		<Event id="b"/>
+		<Event id="c"/>
+		<Event id="d"/>
+		<Event id="tau" epsilon="true"/>
+	</Events>
+	<States>
+		<State id="0" initial="true"/>
+		<State id="1"/>
+		<State id="2"/>
+		<State id="3"/>
+		<State id="4"/>
+		<State id="5"/>
+		<State id="6"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="a"/>
+		<Transition source="1" dest="2" event="b"/>
+		<Transition source="1" dest="3" event="tau"/>
+		<Transition source="3" dest="4" event="c"/>
+		<Transition source="3" dest="5" event="tau"/>
+		<Transition source="1" dest="6" event="d"/>
+		<Transition source="5" dest="6" event="d"/>
+	</Transitions>
+</Automaton>
 <Automaton name="viii.b" type="Plant">
 	<Events>
 		<Event id="a"/>

@@ -70,8 +70,10 @@ public class AutomataMinimizer
 	/** The supplied options. */
 	private MinimizationOptions options;
 
-	/** Largest single automaton considered */
-	int largestAutomatonSize = 0;
+	/** Largest number of states come across. */
+	private int mostStates = 0;
+	/** Largest number of transitions come across. */
+	private int mostTransitions = 0;
 
 	/** Event to automata map, for choosing the next task in compositional minimization. */
 	private EventToAutomataMap eventToAutomataMap;
@@ -198,7 +200,8 @@ public class AutomataMinimizer
 		AutomatonMinimizer.resetTotal();
 
 		// Present largest automaton size
-		logger.verbose("The largest automaton examined had " + largestAutomatonSize + " states.");
+		logger.verbose("The automaton with the most states had " + mostStates + " states.");
+		logger.verbose("The automaton with the most transitions had " + mostTransitions + " transitions.");
 
 		// Return the result of the minimization!
 		return theAutomata.getFirstAutomaton();
@@ -508,10 +511,14 @@ public class AutomataMinimizer
 		synchTimer.stop();
 		logger.debug("Synchronization: " + synchTimer);
 
-		// Examine for largest automaton size
-		if (aut.nbrOfStates() > largestAutomatonSize)
+		// Examine for largest sizes
+		if (aut.nbrOfStates() > mostStates)
 		{
-			largestAutomatonSize = aut.nbrOfStates();
+			mostStates = aut.nbrOfStates();
+		}
+		if (aut.nbrOfTransitions() > mostTransitions)
+		{
+			mostTransitions = aut.nbrOfTransitions();
 		}
 
 		// Is it at all possible to minimize? (It may actually be possible even

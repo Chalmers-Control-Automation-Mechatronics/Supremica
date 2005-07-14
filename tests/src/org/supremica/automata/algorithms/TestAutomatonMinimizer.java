@@ -145,6 +145,13 @@ public class TestAutomatonMinimizer
             Automaton observationMin;
 
             // Test observation equivalence minimization
+            minimizer = new AutomatonMinimizer(theProject.getAutomaton("viii.a"));
+            observationMin = minimizer.getMinimizedAutomaton(options);
+            assertTrue((observationMin.nbrOfStates() == 5) &&
+                       (observationMin.nbrOfTransitions() == 6) &&
+                       (observationMin.getStateWithName("1").nbrOfOutgoingArcs() == 2));
+
+            // Test observation equivalence minimization
             minimizer = new AutomatonMinimizer(theProject.getAutomaton("viii.b"));
             observationMin = minimizer.getMinimizedAutomaton(options);
             assertTrue((observationMin.nbrOfStates() == 5) &&

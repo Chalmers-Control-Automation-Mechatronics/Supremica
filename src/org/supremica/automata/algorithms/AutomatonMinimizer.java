@@ -354,10 +354,10 @@ public class AutomatonMinimizer
         int transitionCount = 0;
         if (options.getAlsoTransitions())
         {
-            doTransitiveClosure(theAutomaton);
+            int addedArcs = epsilonSaturate(theAutomaton, false);
             transitionCount = theAutomaton.nbrOfTransitions();
-            int countArcs = removeRedundantTransitions(theAutomaton);
-            totalArcs += countArcs;
+            int removedArcs = removeRedundantTransitions(theAutomaton);
+            totalArcs += removedArcs-addedArcs;
         }
 
         // Remove from alphabet epsilon events that are never used
@@ -1551,11 +1551,50 @@ public class AutomatonMinimizer
     }
 
     /**
+     * Add tau-transitions to cover for the epsilon events (aka "saturate"). More formally, each
+     * time there is a transition "p =epsilon=> q", after completing the transitive closure (or
+     * "saturation"), there is also a transition "p -epsilon-> q".
+     */
+	public int epsilonSaturate(Automaton aut, boolean addSelfloops)
+	{
+		int count = 0;
+
+        // Add silent event (it's probably already there)
+        LabeledEvent tau = new LabeledEvent("tau");
+        tau.setEpsilon(true);
+        if (!aut.getAlphabet().contains(tau))
+        {
+            aut.getAlphabet().addEvent(tau);
+        }
+
+		// For each state, find epsilon closure and add add transitions
+        for (Iterator<State> fromIt = aut.stateIterator(); fromIt.hasNext();)
+        {
+            State from = fromIt.next();
+
+			// Iterate over states in closure
+            StateSet closure = from.epsilonClosure(addSelfloops);
+			for (Iterator<State> toIt = closure.iterator(); toIt.hasNext(); )
+			{
+				State to = toIt.next();
+				Arc arc = new Arc(from, to, tau);
+            	if (!arc.getFromState().containsOutgoingArc(arc))
+            	{
+            	    aut.addArc(arc);
+            	    count++;
+            	}
+			}
+        }
+
+        return count;
+	}
+
+    /**
      * Add transitions to cover for the epsilon events (aka "saturate"). More formally, each
      * time there is a transition "p =a=> q", after completing the transitive closure (or
      * "saturation"), there is also a transition "p -a-> q".
      */
-    public int doTransitiveClosure(Automaton aut)
+    public int saturate(Automaton aut)
     {
         if (aut == null)
         {
