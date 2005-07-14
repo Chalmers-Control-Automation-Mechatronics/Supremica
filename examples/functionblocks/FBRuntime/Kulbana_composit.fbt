@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="Kulbana_composit" >
+  <VersionInfo  Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2005-07-13" />
+  <InterfaceList>
+    <EventInputs>
+	  <Event Name="INIT" />
+      <Event Name="InPortvakt" />
+      <Event Name="UrPortvakt" />
+      <Event Name="UppMatlyft" />
+      <Event Name="Mat" />
+      <Event Name="UrMatning" />
+      <Event Name="UppHissVan1" />
+      <Event Name="UppHissVan2" />
+      <Event Name="UtVan1" />
+      <Event Name="UtVan2" />
+      <Event Name="UppArmVan1" />
+      <Event Name="UppArmVan2" />
+      <Event Name="ArmHem" />
+    </EventInputs>
+    <EventOutputs>
+	  <Event Name="INITO" />
+      <Event Name="KulaPortvak" />
+      <Event Name="KulaMatlyft" />
+      <Event Name="MatlyftNere" />
+      <Event Name="KulaMatstation" />
+      <Event Name="StorKula" />
+      <Event Name="LitenKula" />
+      <Event Name="KulaHiss" />
+      <Event Name="HissNere" />
+      <Event Name="KulaVan1" />
+      <Event Name="KulaVan2" />
+      <Event Name="PlockaVan1" />
+      <Event Name="PlockaVan2" />
+      <Event Name="ArmVan1" />
+      <Event Name="ArmVan2" />
+      <Event Name="ArmHemma" />
+    </EventOutputs>
+  </InterfaceList>
+  <FBNetwork>
+
+    <FB Name="cycle" Type="E_CYCLE" />
+	<FB NAME="initsplit" Type="E_SPLIT2" />
+	<FB Name="adlink" Type="ADLINK_IO" />
+    <FB Name="pv" Type="PV_model" />
+
+	<EventConnections>
+
+	  <Connection Source="INIT" Destination="initsplit.EI" />
+	  <Connection Source="initsplit.EO1" Destination="INITO" />
+	  <Connection Source="initsplit.EO2" Destination="cycle.START" />
+
+	  <Connection Source="cycle.EO" Destination="adlink.READ" />
+	  <Connection Source="adlink.VALUES" Destination="pv.Values" />
+	  <Connection Source="pv.Write" Destination="adlink.WRITE" />
+
+	  <Connection Source="InPortvakt" Destination="pv.InPortvakt" />
+	  <Connection Source="UrPortvakt" Destination="pv.UrPortvakt" />
+	  <Connection Source="pv.KulaPortvakt" Destination="KulaPortvakt" />
+
+	</EventConnections>
+
+	<DataConnections>
+
+	  <Connection Source="adlink.INPUT0" Destination="pv.KulaPortvakt_sig" />
+  	  <Connection Source="pv.InPortvakt_sig" Destination="adlink.OUTPUT0" />
+	  <Connection Source="pv.UrPortvakt_sig" Destination="adlink.OUTPUT1" />	
+
+	</DataConnections>
+
+  </FBNetwork>
+
+</FBType>

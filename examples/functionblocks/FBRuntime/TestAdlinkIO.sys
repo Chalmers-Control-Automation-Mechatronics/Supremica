@@ -3,18 +3,18 @@
   <VersionInfo  Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2005-06-27" />
   <Device  Name="Test Device" Type="DeviceType_not_used">
     <Resource Name="TestResource" Type="ResourceType_not_used">
-      <FBNetwork>
-        <FB Name="restart" Type="E_RESTART" />
-        <FB Name="cycle" Type="E_CYCLE" />
-        <FB Name="adlink" Type="ADLINK_IO" />
-	<FB Name="rtrig02" Type="E_R_TRIG" />
-	<FB Name="ftrig04" Type="E_F_TRIG" />
-	<FB Name="valuesplit" Type="E_SPLIT2" />		
-	<FB Name="rtrig02split" Type="E_SPLIT2" />		
-	<FB Name="ftrig04split" Type="E_SPLIT2" />		
-	<FB Name="printr02" Type="Print" />		
-	<FB Name="printf04" Type="Print" />							
-	<FB Name="mergerftrig" Type="E_MERGE2" />							
+	  <FBNetwork>
+	    <FB Name="restart" Type="E_RESTART" />
+		<FB Name="cycle" Type="E_CYCLE" />
+		<FB Name="adlink" Type="ADLINK_IO" />
+		<FB Name="rtrig02" Type="E_R_TRIG" />
+		<FB Name="ftrig04" Type="E_F_TRIG" />
+		<FB Name="valuesplit" Type="E_SPLIT2" />		
+		<FB Name="rtrig02split" Type="E_SPLIT2" />		
+		<FB Name="ftrig04split" Type="E_SPLIT2" />		
+		<FB Name="printr02" Type="Print" />		
+		<FB Name="printf04" Type="Print" />							
+		<FB Name="mergerftrig" Type="E_MERGE2" />							
 	
         <EventConnections>
           <Connection Source="restart.COLD" Destination="cycle.START" />

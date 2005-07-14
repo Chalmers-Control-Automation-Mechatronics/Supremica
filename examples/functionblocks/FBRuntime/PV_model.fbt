@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="PV_model" >
+  <VersionInfo  Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2005-07-14" />
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="InPortvakt" />
+      <Event Name="UrPortvakt" />
+      <Event Name="Values">
+	    <With Var="KulaPortvakt_sig" />
+	  </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="KulaPortvak" />
+      <Event Name="Write">
+	    <With Var="InPortvakt_sig" />
+	    <With Var="UrPortvakt_sig" />
+	  </Event>
+    </EventOutputs>
+  </InterfaceList>
+  <BasicFB>
+    <ECC>
+        <ECState Name="Q0" />
+        <ECState Name="Q1">
+		    <ECAction Algorithm="OpenIn" Output="Write" />
+	    </ECState>    
+        <ECState Name="Q2">
+		    <ECAction Algorithm="CloseIn" Output="Write" />
+		    <ECAction Output="KulaPortvakt" />
+	    </ECState>    
+        <ECState Name="Q3">
+		    <ECAction Algorithm="OpenOut" Output="Write" />
+	    </ECState>    
+        <ECState Name="Q4">
+		    <ECAction Algorithm="CloseOut" Output="Write" />
+	    </ECState>    
+
+		<ECTransition Source="Q0" Destination="Q1" Condition="InPortvakt" />
+		<ECTransition Source="Q1" Destination="Q2" Condition="Values AND KulaPortvakt_sig" />
+		<ECTransition Source="Q2" Destination="Q3" Condition="UrPortvakt" />
+		<ECTransition Source="Q3" Destination="Q4" Condition="Values AND NOT KulaPortvakt_sig" />
+		<ECTransition Source="Q4" Destination="Q0" Condition="1" />
+    </ECC>
+    <Algorithm Name="OpenIn">
+        <Other Language="Java" Text=
+		"
+		System.out.println(&#34;Opening Portvakt In.&#34;);
+		InPortvakt_sig := true;
+		" />	
+    </Algorithm>
+    <Algorithm Name="CloseIn">
+        <Other Language="Java" Text=
+		"
+		System.out.println(&#34;Closing Portvakt In.&#34;);
+		InPortvakt_sig := false;
+		" />	
+    </Algorithm>
+    <Algorithm Name="OpenOut">
+        <Other Language="Java" Text=
+		"
+		System.out.println(&#34;Opening Portvakt Out.&#34;);
+		UrPortvakt_sig := true;
+		" />	
+    </Algorithm>
+    <Algorithm Name="CloseOut">
+        <Other Language="Java" Text=
+		"
+		System.out.println(&#34;Closing Portvakt Out.&#34;);
+		UrPortvakt_sig := false;
+		" />	
+    </Algorithm>
+  </BasicFB>
+</FBType>

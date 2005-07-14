@@ -69,7 +69,8 @@ public class ServiceFBInstance extends FBInstance
 	
 	private Interpreter interpreter = new Interpreter();
 
-	private Event currentEvent;
+	private EventQueue eventInputQueue = new EventQueue();
+
 
 	//==========================================================================
 	private ServiceFBInstance() {}
@@ -109,26 +110,32 @@ public class ServiceFBInstance extends FBInstance
 	
 	public void receiveEvent(String eventInput)
 	{
-		if(variables.getVariable(eventInput) != null)
-			if(variables.getVariable(eventInput).getType().equals("EventInput"))
-			{
-				currentEvent = (Event) events.get(eventInput);
-				resource.getScheduler().scheduleFBInstance(this);
-			}
+		synchronized(eventInputQueue)
+		{
+			if(variables.getVariable(eventInput) != null)
+				if(variables.getVariable(eventInput).getType().equals("EventInput"))
+				{
+					eventInputQueue.add((Event) events.get(eventInput));
+					resource.getScheduler().scheduleFBInstance(this);
+				}
+				else
+				{
+					System.err.println("ServiceFBInstance("+getName()+"): No event input " + eventInput);
+					System.exit(0);
+				}
 			else
 			{
-				System.err.println("ServiceFBInstance: No event input " + eventInput);
+				System.err.println("ServiceFBInstance("+getName()+"): No event input " + eventInput);
 				System.exit(0);
 			}
-		else
-		{
-			System.err.println("ServiceFBInstance: No event input " + eventInput);
-			System.exit(0);
 		}
 	}
-
+	
 	public void handleEvent()
 	{
+
+		currentEvent = getNextEvent();
+		
 		// set all InputEvents to false
 		for (Iterator iter = variables.iterator();iter.hasNext();)
 		{
@@ -168,5 +175,10 @@ public class ServiceFBInstance extends FBInstance
 	{
 		return serviceState;
 	}
+	
+	private Event getNextEvent()
+    {
+		return  (Event) eventInputQueue.remove();
+    }
 	
 }
