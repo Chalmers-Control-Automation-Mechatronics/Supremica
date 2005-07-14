@@ -54,6 +54,7 @@ import junit.framework.TestSuite;
 
 import org.supremica.testhelpers.*;
 import org.supremica.automata.*;
+import org.supremica.automata.algorithms.minimization.BisimulationEquivalenceMinimizer;
 import org.supremica.automata.IO.*;
 
 import java.util.*;
@@ -132,6 +133,7 @@ public class TestAutomatonMinimizer
     {
         try
         {
+			// Test
             ProjectBuildFromXml builder = new ProjectBuildFromXml();
             Project theProject = builder.build(TestFiles.getFile(TestFiles.ObservationEquivalence));
             MinimizationOptions options = MinimizationOptions.getDefaultMinimizationOptions();
@@ -139,16 +141,18 @@ public class TestAutomatonMinimizer
             options.setAlsoTransitions(true);
             options.setKeepOriginal(true);
 
+            AutomatonMinimizer minimizer;
+            Automaton observationMin;
+
             // Test observation equivalence minimization
-            AutomatonMinimizer minimizer = new AutomatonMinimizer(theProject.getAutomaton("viii.b"));
-            Automaton observationMin = minimizer.getMinimizedAutomaton(options);
+            minimizer = new AutomatonMinimizer(theProject.getAutomaton("viii.b"));
+            observationMin = minimizer.getMinimizedAutomaton(options);
             assertTrue((observationMin.nbrOfStates() == 5) &&
                        (observationMin.nbrOfTransitions() == 9) &&
                        (observationMin.getStateWithName("0").nbrOfOutgoingArcs() == 3));
 
             // Test a part of the dining philosophers example (observation equivalence minimization)
             minimizer = new AutomatonMinimizer(theProject.getAutomaton("P1F1F2"));
-            //options.setIgnoreMarking(true);
             observationMin = minimizer.getMinimizedAutomaton(options);
             assertTrue(observationMin.nbrOfStates() == 6);
             assertTrue(observationMin.nbrOfTransitions() == 10);
@@ -163,6 +167,13 @@ public class TestAutomatonMinimizer
 
     public void testBisimulationEquivalenceMinimization()
     {
+		// Check if the library with the native methods is ok
+		if (!BisimulationEquivalenceMinimizer.libraryLoaded())
+		{
+			System.err.println("Library BisimulationEquivalence not in library path, test skipped.");
+			return;
+		}
+
         try
         {
             ProjectBuildFromXml builder = new ProjectBuildFromXml();
@@ -190,10 +201,6 @@ public class TestAutomatonMinimizer
             assertTrue((min.nbrOfStates() == 4) &&
                        (min.nbrOfTransitions() == 4) &&
                        (min.getStateWithName("q2.q1.p1").nbrOfOutgoingArcs() == 2));
-        }
-        catch (UnsatisfiedLinkError ex)
-        {
-            System.err.println("The library BisimulationEquivalence is missing.");
         }
         catch (Exception ex)
         {

@@ -39,7 +39,7 @@
  *
  * COMPILING INSTRUCTIONS
  *
- * Note that you probably have to change the folders to include
+ * Note that you probably have to change the folders to include.
  *
  * Compiling on Windows:
  *
@@ -70,10 +70,6 @@
 #define FALSE 0
 #define TRUE 1
 
-#ifndef MAXREL
-# define MAXREL 20 /* Maximum number of relations allowed */
-#endif
-
 ///////////////////
 // Stuff by Hugo //
 ///////////////////
@@ -88,14 +84,14 @@ int NBROFSTATES, NBROFEVENTS, NBROFTRANSITIONS;
 
 
 /**
- * Element node. One for each element in the set
+ * Element node. One for each element (state) in the set
  */
 struct element
-{  
+{
   int index; /* Index of state */
   struct element *next; /* Next element in Q block */
   struct element *prev; /* Previous element in Q block */
-  struct edge *in_edges[MAXREL]; /* Array of edges incident to this element.
+  struct edge **in_edges; /* Array of edges incident to this element.
 									- Each member (in_edges[i]) in the
 									array points to edges in relation
 									'i' incident to this element.
@@ -137,7 +133,7 @@ struct qblock
   struct qblock *q_next; /* Next Q block */
   struct qblock *q_prev; /* Previous Q block */
   struct element *first; /* First element in block */
-  struct xblock *my_x_block[MAXREL]; /* Array of pointers to X
+  struct xblock **my_x_block; /* Array of pointers to X
 										block's to which this
 										block belongs.  Each
 										member (my x block[i])
@@ -146,9 +142,9 @@ struct qblock
 										NULL) */
   struct qblock *q_tmp; /* Associated blocks (Used in step 4) */
   struct qblock *splitl; /* List of splitted Q blocks (step 4) */
-  struct qblock *x_next[MAXREL]; /* Next Q block in this X block
+  struct qblock **x_next; /* Next Q block in this X block
 									(in partition X i) */
-  struct qblock *x_prev[MAXREL]; /* Previous Q block in this X block
+  struct qblock **x_prev; /* Previous Q block in this X block
 									(in partition X_i) */
 };
 
@@ -250,7 +246,8 @@ struct element *make_element_node()
   if (!(el = (struct element *) malloc(sizeof(struct element))))
 	error ("make_element_node: no available memory");
   el->next = el->prev = NULL;
-  for (i = 0 ; i < MAXREL ; i++)
+  el->in_edges = (struct edge**) malloc(NBROFEVENTS*sizeof(struct edge*));
+  for (i=0; i<NBROFEVENTS; i++)
 	el->in_edges[i] = NULL;
   el->my_qblock = NULL;
   el->cp = NULL;
@@ -281,7 +278,10 @@ struct qblock *make_qblock_node()
   qb->q_next = qb->q_prev = qb->q_tmp = NULL;
   qb->splitl = NULL;
   qb->first = NULL;
-  for (i = 0 ; i < MAXREL ; i++) {
+  qb->my_x_block = (struct xblock**) malloc(NBROFEVENTS*sizeof(struct xblock*));
+  qb->x_next = (struct qblock**) malloc(NBROFEVENTS*sizeof(struct qblock*));
+  qb->x_prev= (struct qblock**) malloc(NBROFEVENTS*sizeof(struct qblock*));
+  for (i=0; i<NBROFEVENTS; i++) {
 	qb->x_next[i] = qb->x_prev[i] = NULL;
 	qb->my_x_block[i] = NULL;
   }
@@ -292,7 +292,7 @@ struct xblock *make_xblock_node()
 {
   struct xblock *xb;
   if (!(xb = (struct xblock *) malloc(sizeof(struct xblock))))
-	error("make xblock node: no available memory");
+	error("make_xblock_node: no available memory");
   // xb->relation = NULL;
   xb->relation = -1; // HUGO
   xb->q_first = NULL;
@@ -304,7 +304,7 @@ struct count *make_count_node()
 {
   struct count *cp;
   if (! (cp = (struct count *) malloc(sizeof(struct count))))
-	error("make count node: no available memory");
+	error("make_count_node: no available memory");
   cp->counter = 1;
   return(cp);
 } /* make_count_node */
@@ -473,7 +473,7 @@ int step_1_2()
 									   Q blocks in current X block */
 	error("step_1:No Q block in X block");
   if ((q2 = q1->x_next[rel]) == NULL)
- 	error ("step_l:X block not compound");
+ 	error("step_l:X block not compound");
   /* Choose the smallest of the two first Q blocks to be our refinement block B */
   B = (q1->n_elements < q2->n_elements) ? q1 : q2 ;
   /* Remove B from the X block */
@@ -978,7 +978,7 @@ int step_7()
 int grcp()
 {
   if (Q == NULL)
-	error ("partition: No Q block !");
+	error("partition: No Q block !");
   if (Q -> q_next == NULL)
 	return 0;
 	// If there initially is only one Q block
@@ -1015,7 +1015,7 @@ JNIEXPORT void JNICALL Java_org_supremica_automata_algorithms_minimization_Bisim
   NBROFTRANSITIONS = (int) nbrOfTransitions;
   int NBROFINITIALPARTITIONS = 1 + env->GetArrayLength(initialPartitioning) - nbrOfStates;
 
-  printf("States: %i, events: %i, transitions: %i, partitions: %i\n", NBROFSTATES, NBROFEVENTS, NBROFTRANSITIONS, NBROFINITIALPARTITIONS);
+  //printf("States: %i, events: %i, transitions: %i, partitions: %i\n", NBROFSTATES, NBROFEVENTS, NBROFTRANSITIONS, NBROFINITIALPARTITIONS);
 
   // Assign initial partitioning
   // Get a c-array with the values
@@ -1062,15 +1062,15 @@ JNIEXPORT void JNICALL Java_org_supremica_automata_algorithms_minimization_Bisim
   // Allocate memory for xblocks, one per event
   xblock** xblocks;
   if (!(xblocks = (xblock**) malloc((NBROFEVENTS)*sizeof(xblock*))))
-    error ("make_xblocks: no available memory");
+    error("make_xblocks: no available memory");
   // Allocate memory for elements, one per state
   element** elements;
   if (!(elements = (element**) malloc((NBROFSTATES)*sizeof(element*))))
-    error ("make_elements: no available memory");
+    error("make_elements: no available memory");
   // Allocate memory for counts, one per state-event combo
   count** counts;
   if (!(counts = (count**) malloc((NBROFSTATES*NBROFEVENTS)*sizeof(count*))))
-    error ("make_counts: no available memory");
+    error("make_counts: no available memory");
   for (i=0; i<NBROFSTATES*NBROFEVENTS; i++)
   	counts[i] = NULL;
 
@@ -1100,12 +1100,12 @@ JNIEXPORT void JNICALL Java_org_supremica_automata_algorithms_minimization_Bisim
   pos = 0;
   while ((pos != NBROFSTATES+NBROFINITIALPARTITIONS-1) && ((stateindex = INITIALPARTITIONING[pos++]) != -1))
   {
-	/* Start of a new Q block */
+	// Start of a new Q block
 	qb = make_qblock_node();
 
 	if (xblocks[0]->q_first == NULL)
 	{
-	  /* First Q block */
+	  // First Q block
 	  Q = qbp = qb;
 	  for (i=0 ; i<NBROFEVENTS; i++) {
 		xblocks[i]->q_first = qb;
@@ -1114,9 +1114,9 @@ JNIEXPORT void JNICALL Java_org_supremica_automata_algorithms_minimization_Bisim
 	}
 	else
 	{
-	  /* Put new qblock last in list of Q blocks
-		 and last in list of Q blocks for this
-		 X block */
+	  // Put new qblock last in list of Q blocks
+	  // and last in list of Q blocks for this
+	  // X block
 	  qbp->q_next = qb;
 	  qb->q_prev = qbp;
 	  for (i = 0 ; i < NBROFEVENTS; i++) {
@@ -1137,13 +1137,10 @@ JNIEXPORT void JNICALL Java_org_supremica_automata_algorithms_minimization_Bisim
 	// Put element in symbol table for later use
 	// when scanning edges
 	elements[stateindex] = el;
-	if (stateindex == NBROFSTATES)
-	  error("Input: No more symboltable space");
 
+	// Get rest of elements
 	while ((pos != NBROFSTATES+NBROFINITIALPARTITIONS-1) && ((stateindex = INITIALPARTITIONING[pos++]) != -1))
 	{
-	  // get rest of elements
-
 	  el = make_element_node();
 	  elp->next = el;
 	  el->prev = elp;
@@ -1154,7 +1151,7 @@ JNIEXPORT void JNICALL Java_org_supremica_automata_algorithms_minimization_Bisim
 
 	  elements[stateindex] = el;
 	  if (stateindex==NBROFSTATES)
-		error("Input: No more symboltable space");
+		error("Initialize: Wrong number of states");
 	}
   }
 
@@ -1289,7 +1286,7 @@ JNIEXPORT jintArray JNICALL Java_org_supremica_automata_algorithms_minimization_
 		for (ed=el->in_edges[i]; ed!=NULL; ed=ednext)
 		{
 		  ednext = ed->in_edges;
-		  /* Why not?
+		  /*
 		  // COUNT
 		  if (ed->cp != NULL)
 			free(ed->cp);
@@ -1301,9 +1298,13 @@ JNIEXPORT jintArray JNICALL Java_org_supremica_automata_algorithms_minimization_
 	  // COUNT
 	  if (el->cp != NULL)
 		free(el->cp);
+	  free(el->in_edges);
 	  free(el);
 	}
 	qnext = q->q_next;
+	free(q->my_x_block);
+	free(q->x_next);
+	free(q->x_prev);
 	free(q);
   }
   // XBLOCKS

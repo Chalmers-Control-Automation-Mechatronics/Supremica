@@ -79,10 +79,37 @@ public class BisimulationEquivalenceMinimizer
 {
     private static Logger logger = LoggerFactory.createLogger(BisimulationEquivalenceMinimizer.class);
 
+	/**
+	 * True if native library is available, false otherwise.
+	 */
+	private static boolean libraryLoaded;
+
+    // Load library
+    static
+    {
+		try
+		{
+        	System.loadLibrary("BisimulationEquivalence");
+        	libraryLoaded = true;
+		}
+		catch (UnsatisfiedLinkError ex)
+		{
+			libraryLoaded = false;
+		}
+		catch (Exception ex)
+		{
+			ex.printStackTrace();
+			libraryLoaded = false;
+		}
+    }
+
     /**
      * Minimizes automaton with respect to bisimulation equivalence.
+     *
+     * @param strong If true, minimizes with respect to strong bisimulation equivalence,
+     * if false, minimized with respect to weak bisimulation equivalence.
      */
-    public static void minimize(Automaton aut, boolean useShortNames)
+    public static void minimize(Automaton aut, boolean useShortNames, boolean strong)
         throws UnsatisfiedLinkError
     {
         // Set the indices in the automaton.
@@ -112,11 +139,12 @@ public class BisimulationEquivalenceMinimizer
             {
                 State state = stIt.next();
                 int index = state.getIndex();
-                assert((state.getIndex() >= 0) && (state.getIndex() < aut.nbrOfStates()));
+                assert((index >= 0) && (index < aut.nbrOfStates()));
+                assert(states[index] == null);
                 states[index] = state;
-                if (!state.isAccepting())
+                //logger.info("State: " + state + " id: " + index);
+                if (!state.isAccepting(!strong))
                 {
-                    // Should check the epsilon closure if observation equivalence!!!
                     initialPartitioning[forwIndex++] = index;
                 }
                 else
@@ -131,18 +159,81 @@ public class BisimulationEquivalenceMinimizer
             }
             // This is an array of int, every third int is the index of a
             // from-state, event or to-state respectively...
-            int[] transitions = new int[aut.nbrOfTransitions()*3];
-            int index = 0;
-            for (Iterator<Arc> arcIt = aut.arcIterator(); arcIt.hasNext(); )
+            int[] transitions;
+            int transitionCount = 0;
+            if (strong)
             {
-                Arc arc = arcIt.next();
-                transitions[index++] = arc.getFromState().getIndex();
-                transitions[index++] = arc.getEvent().getIndex();
-                transitions[index++] = arc.getToState().getIndex();
+                // Strong bisimulation equivalence
+                transitions = new int[aut.nbrOfTransitions()*3];
+                int index = 0;
+                for (Iterator<Arc> arcIt = aut.arcIterator(); arcIt.hasNext(); )
+                {
+                    Arc arc = arcIt.next();
+                    transitions[index++] = arc.getFromState().getIndex();
+                    transitions[index++] = arc.getEvent().getIndex();
+                    transitions[index++] = arc.getToState().getIndex();
+                }
+
+                transitionCount = aut.nbrOfTransitions();
+            }
+            else
+            {
+                // Weak bisimulation equivalence
+                // Find out how many transitions there are (after saturation)
+                for (Iterator<State> fromIt = aut.stateIterator(); fromIt.hasNext(); )
+                {
+                    State from = fromIt.next();
+                    for (Iterator<LabeledEvent> evIt = aut.eventIterator(); evIt.hasNext(); )
+                    {
+                        LabeledEvent event = evIt.next();
+                        StateSet nextStates;
+                        if (event.isEpsilon())
+                        {
+                            nextStates = from.epsilonClosure(true);
+                        }
+                        else
+                        {
+                            nextStates = from.nextStates(event, true);
+                        }
+                        for (Iterator<State> toIt = nextStates.iterator(); toIt.hasNext(); )
+                        {
+                            State to = toIt.next();
+                            transitionCount++;
+                        }
+                    }
+                }
+                // Now, do the same thing again, and put the info in the array
+                transitions = new int[transitionCount*3];
+                int index = 0;
+                for (Iterator<State> fromIt = aut.stateIterator(); fromIt.hasNext(); )
+                {
+                    State from = fromIt.next();
+                    for (Iterator<LabeledEvent> evIt = aut.eventIterator(); evIt.hasNext(); )
+                    {
+                        LabeledEvent event = evIt.next();
+                        StateSet nextStates;
+                        if (event.isEpsilon())
+                        {
+                            nextStates = from.epsilonClosure(true);
+                        }
+                        else
+                        {
+                            nextStates = from.nextStates(event, true);
+                        }
+                        for (Iterator<State> toIt = nextStates.iterator(); toIt.hasNext(); )
+                        {
+                            State to = toIt.next();
+                            //logger.info("From: " + from + " ev: " + event + " (" + event.getIndex() + ") to: " + to);
+                            transitions[index++] = from.getIndex();
+                            transitions[index++] = event.getIndex();
+                            transitions[index++] = to.getIndex();
+                        }
+                    }
+                }
             }
 
-            // Initialize native functions
-            initialize(aut.nbrOfStates(), aut.nbrOfEvents(), aut.nbrOfTransitions(),
+            // Initialize
+            initialize(aut.nbrOfStates(), aut.nbrOfEvents(), transitionCount,
                        initialPartitioning, transitions);
         }
 
@@ -194,9 +285,11 @@ public class BisimulationEquivalenceMinimizer
      */
     private static native int[] getPartitioning();
 
-    // Load library
-    static
-    {
-        System.loadLibrary("BisimulationEquivalence");
-    }
+	/**
+	 * Returns true if the necessary native library has been loaded properly.
+	 */
+	public static boolean libraryLoaded()
+	{
+		return libraryLoaded;
+	}
 }

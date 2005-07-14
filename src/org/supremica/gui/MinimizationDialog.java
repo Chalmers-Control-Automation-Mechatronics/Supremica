@@ -52,14 +52,18 @@ package org.supremica.gui;
 import org.supremica.automata.algorithms.MinimizationOptions;
 import org.supremica.automata.algorithms.MinimizationStrategy;
 import org.supremica.automata.algorithms.EquivalenceRelation;
+import org.supremica.automata.algorithms.minimization.BisimulationEquivalenceMinimizer;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import org.supremica.automata.*;
+import org.supremica.log.*;
 
 public class MinimizationDialog
 	implements ActionListener
 {
+    private static Logger logger = LoggerFactory.createLogger(MinimizationDialog.class);
+
 	private JButton okButton;
 	private JButton cancelButton;
 	private MinimizationOptions options;
@@ -182,6 +186,13 @@ public class MinimizationDialog
 			minimizationTypeBox = new JComboBox(EquivalenceRelation.toArray());
 			minimizationTypeBox.addActionListener(this);
 
+			// Disable bisimulation equivalence if library is missing!
+			if (!BisimulationEquivalenceMinimizer.libraryLoaded())
+			{
+				logger.warn("Library BisimulationEquivalence not in path, using less efficient algorithm.");
+				minimizationTypeBox.removeItem(EquivalenceRelation.BisimulationEquivalence);
+			}
+
 			alsoTransitions = new JCheckBox("Also minimize number of transitions");
 			alsoTransitions.setToolTipText("Make sure that the number of the transitions is the minimal number (with respect to observation equivalence))");
 			keepOriginal = new JCheckBox("Keep original");
@@ -193,9 +204,9 @@ public class MinimizationDialog
 			note.setBackground(this.getBackground());
 
 			Box standardBox = Box.createHorizontalBox();
-			standardBox.add(new JLabel("      ")); // Ugly fix to get stuff centered
+			standardBox.add(new JLabel("         ")); // Ugly fix to get stuff centered
 			standardBox.add(minimizationTypeBox);
-			standardBox.add(new JLabel("      ")); // Ugly fix to get stuff centered
+			standardBox.add(new JLabel("         ")); // Ugly fix to get stuff centered
 			Box anotherBox = Box.createVerticalBox();
 			anotherBox.add(alsoTransitions);
 			anotherBox.add(keepOriginal);
@@ -313,7 +324,7 @@ public class MinimizationDialog
 			strategyBox.add(new JLabel("Strategy: "));
 			strategyBox.add(minimizationStrategy);
 			strategyBox.add(new JLabel("     ")); // Ugly fix to get stuff centered
-		
+
 			/*
 			  targetAlphabetSelector = new List(7, true);
 			  for (EventIterator evIt = unionAlphabet.iterator(); evIt.hasNext(); )
@@ -355,7 +366,7 @@ public class MinimizationDialog
 			/*
 			// Add components
 			this.setLayout(new BorderLayout());
-		
+
 			JPanel choicePanel = new JPanel();
 			choicePanel.setLayout(new FlowLayout());
 			//choicePanel.add(advancedBox);

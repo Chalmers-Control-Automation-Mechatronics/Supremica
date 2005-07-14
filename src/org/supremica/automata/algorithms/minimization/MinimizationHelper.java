@@ -61,133 +61,133 @@ import org.supremica.properties.SupremicaProperties;
  */
 public class MinimizationHelper
 {
-	/**
-	 * Merges two states, giving the new state the union of incoming and outgoing transitions,
-	 * if at least one state was accepting, the result is accepting, and similarily for
-	 * initial and forbidden states
-	 *
-	 * @param aut The automaton in which the collapsing is done, both
-	 * states must be in this automaton.
-	 * @param useShortNames If true, a new, short, name is generated
-	 * for the new state instead of concatenating the names of the
-	 * originals.
-	 * @return The resulting state (which belongs to aut).
-	 */
-	public static State mergeStates(Automaton aut, State one, State two, boolean useShortNames)
-	{
-		// Don't merge if equal
-		if (one.equals(two))
-		{
-			return one;
-		}
+    /**
+     * Merges two states, giving the new state the union of incoming and outgoing transitions,
+     * if at least one state was accepting, the result is accepting, and similarily for
+     * initial and forbidden states
+     *
+     * @param aut The automaton in which the collapsing is done, both
+     * states must be in this automaton.
+     * @param useShortNames If true, a new, short, name is generated
+     * for the new state instead of concatenating the names of the
+     * originals.
+     * @return The resulting state (which belongs to aut).
+     */
+    public static State mergeStates(Automaton aut, State one, State two, boolean useShortNames)
+    {
+        // Don't merge if equal
+        if (one.equals(two))
+        {
+            return one;
+        }
 
-		// Make new state
-		State newState;
-		if (useShortNames)
-		{
-			newState = aut.createUniqueState();
-		}
-		else
-		{
-			newState = new State(one.getName() + SupremicaProperties.getStateSeparator() + two.getName());
-		}
-		aut.addState(newState);
+        // Make new state
+        State newState;
+        if (useShortNames)
+        {
+            newState = aut.createUniqueState();
+        }
+        else
+        {
+            newState = new State(one.getName() + SupremicaProperties.getStateSeparator() + two.getName());
+        }
+        aut.addState(newState);
 
-		// Set markings
-		if (one.isAccepting() || two.isAccepting()) // Looks odd but is correct?
-		{
-			newState.setAccepting(true);
-		}
-		if (one.isForbidden() || two.isForbidden())
-		{
-			newState.setForbidden(true);
-		}
-		if (one.isInitial() || two.isInitial())
-		{
-			newState.setInitial(true);
-			aut.setInitialState(newState);
-		}
+        // Set markings
+        if (one.isAccepting() || two.isAccepting()) // Looks odd but is correct?
+        {
+            newState.setAccepting(true);
+        }
+        if (one.isForbidden() || two.isForbidden())
+        {
+            newState.setForbidden(true);
+        }
+        if (one.isInitial() || two.isInitial())
+        {
+            newState.setInitial(true);
+            aut.setInitialState(newState);
+        }
 
-		// Add transitions
-		LinkedList toBeAdded = new LinkedList();
-		for (ArcIterator arcIt = one.outgoingArcsIterator(); arcIt.hasNext(); )
-		{
-			Arc arc = arcIt.nextArc();
-			State toState = arc.getToState();
-			if (toState.equals(one) || toState.equals(two))
-			{
-				toState = newState;
-			}
+        // Add transitions
+        LinkedList toBeAdded = new LinkedList();
+        for (ArcIterator arcIt = one.outgoingArcsIterator(); arcIt.hasNext(); )
+        {
+            Arc arc = arcIt.nextArc();
+            State toState = arc.getToState();
+            if (toState.equals(one) || toState.equals(two))
+            {
+                toState = newState;
+            }
 
-			toBeAdded.add(new Arc(newState, toState, arc.getEvent()));
-		}
-		for (ArcIterator arcIt = two.outgoingArcsIterator(); arcIt.hasNext(); )
-		{
-			Arc arc = arcIt.nextArc();
-			State toState = arc.getToState();
-			if (toState.equals(one) || toState.equals(two))
-			{
-				toState = newState;
-			}
+            toBeAdded.add(new Arc(newState, toState, arc.getEvent()));
+        }
+        for (ArcIterator arcIt = two.outgoingArcsIterator(); arcIt.hasNext(); )
+        {
+            Arc arc = arcIt.nextArc();
+            State toState = arc.getToState();
+            if (toState.equals(one) || toState.equals(two))
+            {
+                toState = newState;
+            }
 
-			toBeAdded.add(new Arc(newState, toState, arc.getEvent()));
-		}
-		for (ArcIterator arcIt = one.incomingArcsIterator(); arcIt.hasNext(); )
-		{
-			Arc arc = arcIt.nextArc();
-			State fromState = arc.getFromState();
-			if (fromState.equals(one) || fromState.equals(two))
-			{
-				fromState = newState;
-			}
+            toBeAdded.add(new Arc(newState, toState, arc.getEvent()));
+        }
+        for (ArcIterator arcIt = one.incomingArcsIterator(); arcIt.hasNext(); )
+        {
+            Arc arc = arcIt.nextArc();
+            State fromState = arc.getFromState();
+            if (fromState.equals(one) || fromState.equals(two))
+            {
+                fromState = newState;
+            }
 
-			toBeAdded.add(new Arc(fromState, newState, arc.getEvent()));
-		}
-		for (ArcIterator arcIt = two.incomingArcsIterator(); arcIt.hasNext(); )
-		{
-			Arc arc = arcIt.nextArc();
-			State fromState = arc.getFromState();
-			if (fromState.equals(one) || fromState.equals(two))
-			{
-				fromState = newState;
-			}
+            toBeAdded.add(new Arc(fromState, newState, arc.getEvent()));
+        }
+        for (ArcIterator arcIt = two.incomingArcsIterator(); arcIt.hasNext(); )
+        {
+            Arc arc = arcIt.nextArc();
+            State fromState = arc.getFromState();
+            if (fromState.equals(one) || fromState.equals(two))
+            {
+                fromState = newState;
+            }
 
-			toBeAdded.add(new Arc(fromState, newState, arc.getEvent()));
-		}
-		// Add the new arcs!
-		while (toBeAdded.size() != 0)
-		{
-			// Add if not already there or epsilon selfloop
-			Arc arc = (Arc) toBeAdded.remove(0);
-			if (arc.getEvent().isEpsilon() && arc.isSelfLoop())
-			{
-				continue;
-			}
-			if (!arc.getFromState().containsOutgoingArc(arc))
-			{
-				aut.addArc(arc);
-			}
-		}
+            toBeAdded.add(new Arc(fromState, newState, arc.getEvent()));
+        }
+        // Add the new arcs!
+        while (toBeAdded.size() != 0)
+        {
+            // Add if not already there or epsilon selfloop
+            Arc arc = (Arc) toBeAdded.remove(0);
+            if (arc.getEvent().isEpsilon() && arc.isSelfLoop())
+            {
+                continue;
+            }
+            if (!arc.getFromState().containsOutgoingArc(arc))
+            {
+                aut.addArc(arc);
+            }
+        }
 
-		// Remove the states
-		aut.removeState(one);
-		aut.removeState(two);
+        // Remove the states
+        aut.removeState(one);
+        aut.removeState(two);
 
-		/*
-		// Adjust the index of the new state (see the "Här blir det fel" discussion in AutomataIndexForm)
-		if (one.getIndex() < two.getIndex())
-		{
-			// Take over the index of state one
-			newState.setIndex(one.getIndex());
-		}
-		else
-		{
-			// Take over the index of state two
-			newState.setIndex(two.getIndex());
-		}
-		*/
+        /*
+        // Adjust the index of the new state (see the "Här blir det fel" discussion in AutomataIndexForm)
+        if (one.getIndex() < two.getIndex())
+        {
+            // Take over the index of state one
+            newState.setIndex(one.getIndex());
+        }
+        else
+        {
+            // Take over the index of state two
+            newState.setIndex(two.getIndex());
+        }
+        */
 
-		// Return the new state
-		return newState;
-	}
+        // Return the new state
+        return newState;
+    }
 }
