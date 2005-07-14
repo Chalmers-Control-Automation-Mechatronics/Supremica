@@ -62,8 +62,7 @@ public class Scheduler
 	private Resource resource;
 	
 	private List scheduledFBInstances = new LinkedList();
-	private List scheduledJobs = Collections.synchronizedList(new LinkedList());
-	//private List finishedJobs = Collections.synchronizedList(new LinkedList());
+	private List scheduledJobs = new LinkedList();
 	
 	private AlgorithmExecutingThread algorithmThread = null;
 	
@@ -79,13 +78,13 @@ public class Scheduler
 	}
 	
 	
-	public int getNumberOfScheduledJobs()
+	public synchronized int getNumberOfScheduledJobs()
 	{
 		return scheduledJobs.size();
 	}
 	
 	
-	public Job getNextScheduledJob()
+	public synchronized Job getNextScheduledJob()
 	{
 		return (Job) scheduledJobs.remove(0);
 	}
@@ -127,7 +126,7 @@ public class Scheduler
 		}
 	}
     
-	public void scheduleJob(Job j)
+	public synchronized void scheduleJob(Job j)
 	{
 		scheduledJobs.add(j);
 		algorithmThread.notifyNewJob();
@@ -135,7 +134,14 @@ public class Scheduler
 
 	public synchronized void scheduleFBInstance(FBInstance fbInst)
 	{
-		scheduledFBInstances.add(fbInst);
+		if (fbInst instanceof ServiceFBInstance)
+		{
+			scheduledFBInstances.add(0,fbInst);
+		}
+		else
+		{
+			scheduledFBInstances.add(fbInst);
+		}
 		notify();
 	}
    

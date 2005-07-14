@@ -90,7 +90,7 @@ else
 
 		serviceState.put("delaying", new Boolean(true));
 
-		//System.out.println("E_DELAY.bsh(" + serviceFB.getName() + "): START event received");
+		System.out.println("E_DELAY.bsh(" + serviceFB.getName() + "): START event received");
 		int delayTime = ((IntegerVariable) serviceVariables.getVariable("DT")).getValue().intValue();
 		serviceState.get("delayThread").setDelayTime(delayTime);	
 		serviceState.get("delayThread").startDelay();
