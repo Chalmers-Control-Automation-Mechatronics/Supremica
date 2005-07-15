@@ -61,7 +61,7 @@
 
 	<DataConnections>
 
-	  <Connection Source="100" Destination="cycle.DT" />	  
+	  <Connection Source="5000" Destination="cycle.DT" />	  
 	  <Connection Source="adlink.INPUT0" Destination="pv.KulaPortvakt_sig" />
   	  <Connection Source="pv.InPortvakt_sig" Destination="adlink.OUTPUT0" />
 	  <Connection Source="pv.UrPortvakt_sig" Destination="adlink.OUTPUT1" />	

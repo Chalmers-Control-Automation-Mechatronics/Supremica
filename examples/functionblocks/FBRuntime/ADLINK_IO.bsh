@@ -72,7 +72,7 @@ else
 
 	if (eventName.equals("READ"))
 	{ 	
-		//System.out.println("ADLINK_IO.bsh(" + serviceFB.getName() + "): READ event received");
+		System.out.println("ADLINK_IO.bsh(" + serviceFB.getName() + "): READ event received");
 		serviceState.get("adlinkIO").readInputs();
 	}
 	else if (eventName.equals("WRITE"))

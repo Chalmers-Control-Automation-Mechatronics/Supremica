@@ -8,13 +8,13 @@
 		<FB Name="cycle" Type="E_CYCLE" />
 		<FB Name="adlink" Type="ADLINK_IO" />
 		<FB Name="rtrig02" Type="E_R_TRIG" />
-		<FB Name="ftrig04" Type="E_F_TRIG" />
+		<FB Name="rtrig04" Type="E_R_TRIG" />
 		<FB Name="valuesplit" Type="E_SPLIT2" />		
 		<FB Name="rtrig02split" Type="E_SPLIT2" />		
-		<FB Name="ftrig04split" Type="E_SPLIT2" />		
+		<FB Name="rtrig04split" Type="E_SPLIT2" />		
 		<FB Name="printr02" Type="Print" />		
 		<FB Name="printf04" Type="Print" />							
-		<FB Name="mergerftrig" Type="E_MERGE2" />							
+		<FB Name="merge" Type="E_MERGE2" />							
 	
         <EventConnections>
           <Connection Source="restart.COLD" Destination="cycle.START" />
@@ -23,26 +23,26 @@
           <Connection Source="adlink.VALUES" Destination="valuesplit.EI" />
 
           <Connection Source="valuesplit.EO1" Destination="rtrig02.EI" />
-          <Connection Source="valuesplit.EO2" Destination="ftrig04.EI" />
+          <Connection Source="valuesplit.EO2" Destination="rtrig04.EI" />
 
           <Connection Source="rtrig02.EO" Destination="rtrig02split.EI" />
-          <Connection Source="ftrig04.EO" Destination="ftrig04split.EI" />
+          <Connection Source="rtrig04.EO" Destination="rtrig04split.EI" />
 
           <Connection Source="rtrig02split.EO1" Destination="printr02.PRINT" />
-          <Connection Source="rtrig02split.EO2" Destination="mergerftrig.EI1" />
+          <Connection Source="rtrig02split.EO2" Destination="merge.EI1" />
 
-          <Connection Source="ftrig04split.EO1" Destination="printf04.PRINT" />
-          <Connection Source="ftrig04split.EO2" Destination="mergerftrig.EI2" />
+          <Connection Source="rtrig04split.EO1" Destination="printf04.PRINT" />
+          <Connection Source="rtrig04split.EO2" Destination="merge.EI2" />
 
-          <Connection Source="mergerftrig.EO" Destination="adlink.WRITE" />
+          <Connection Source="merge.EO" Destination="adlink.WRITE" />
           
         </EventConnections>
         
 	<DataConnections>
           <Connection Source="100" Destination="cycle.DT" />		   
           
-          <Connection Source="adlink.INPUT0" Destination="rtrig02.QI" />		   
-          <Connection Source="adlink.INPUT4" Destination="ftrig04.QI" />
+          <Connection Source="adlink.INPUT2" Destination="rtrig02.QI" />		   
+          <Connection Source="adlink.INPUT4" Destination="rtrig04.QI" />
           
           <Connection Source="adlink.INPUT1" Destination="adlink.OUTPUT2" />       
           
