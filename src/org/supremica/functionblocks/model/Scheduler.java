@@ -60,40 +60,40 @@ import java.util.*;
 public class Scheduler
 {
 	private Resource resource;
-	
+
 	private List scheduledFBInstances = new LinkedList();
 	private List scheduledJobs = new LinkedList();
-	
+
 	private AlgorithmExecutingThread algorithmThread = null;
-	
-	
+
+
 	private Scheduler() {}
-	
-	
+
+
 	public Scheduler(Resource res)
 	{
 		System.out.println("Scheduler(" + res.getName()  + ")");
 		resource = res;
 		algorithmThread = new AlgorithmExecutingThread(this);
 	}
-	
-	
+
+
 	public synchronized int getNumberOfScheduledJobs()
 	{
 		return scheduledJobs.size();
 	}
-	
-	
+
+
 	public synchronized Job getNextScheduledJob()
 	{
 		return (Job) scheduledJobs.remove(0);
 	}
-	
-	
+
+
 	public synchronized FBInstance getNextScheduledFBInstance()
 	{
 		while(scheduledFBInstances.size() == 0)
-		{			
+		{
 			try
 			{
 				wait();
@@ -105,14 +105,14 @@ public class Scheduler
 		}
 		return (FBInstance) scheduledFBInstances.remove(0);
 	}
-	
+
 
 	public void runEvents()
 	{
 		System.out.println("Scheduler.runEvents()");
 
 		// find all E_RESTART COLD connections and queue events on them
-		for (Iterator iter = resource.getFBType("E_RESTART").instanceIterator(); iter.hasNext();) 
+		for (Iterator iter = resource.getFBType("E_RESTART").instanceIterator(); iter.hasNext();)
 		{
 			FBInstance eRestartInstance = (FBInstance) iter.next();
 			eRestartInstance.sendEvent("COLD");
@@ -125,7 +125,7 @@ public class Scheduler
 			//resource.handleConfigurationRequests();
 		}
 	}
-    
+
 	public synchronized void scheduleJob(Job j)
 	{
 		scheduledJobs.add(j);
@@ -134,15 +134,15 @@ public class Scheduler
 
 	public synchronized void scheduleFBInstance(FBInstance fbInst)
 	{
-		if (fbInst instanceof ServiceFBInstance)
-		{
-			scheduledFBInstances.add(0,fbInst);
-		}
-		else
-		{
+		//if (fbInst instanceof ServiceFBInstance)
+		//{
+		//	scheduledFBInstances.add(0,fbInst);
+		//}
+		//else
+		//{
 			scheduledFBInstances.add(fbInst);
-		}
+		//}
 		notify();
 	}
-   
+
 }

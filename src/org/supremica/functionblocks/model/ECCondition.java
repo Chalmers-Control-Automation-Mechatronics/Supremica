@@ -64,7 +64,7 @@ import org.supremica.functionblocks.model.interpreters.st.abstractsyntax.Express
 
 public class ECCondition
 {
-	
+
 	private String condition = "";
 
 	private Expression abstractSyntax = null;
@@ -78,24 +78,24 @@ public class ECCondition
 
 	public void set(String cond)
 	{
-	
+
 		//System.out.println("ECCondition.set(" + cond + ")");
 
 		condition = cond;
-		
+
 		StringReader stringReader = new StringReader(condition);
-		
+
 		Lexer lexer = new Lexer((Reader) stringReader);
 
 		Parser parser = new Parser((Scanner) lexer);
 
-		try 
+		try
 		{
 			abstractSyntax = (Expression) parser.parse().value;
-		} 
-		catch(Exception e) 
+		}
+		catch(Exception e)
 		{
-			
+
 		}
 
 	}
@@ -107,16 +107,19 @@ public class ECCondition
 
 	public Object evaluate(Variables vars)
 	{
-		try 
-		{ 
+
+		System.out.println("Evaluating conddition " + condition + " with vars " + vars.toString());
+
+		try
+		{
 			return (new Evaluator(vars)).evalExpression(abstractSyntax);
-		} 
-		catch(Exception e) 
+		}
+		catch(Exception e)
 		{
 			System.out.println(e.toString());
 			System.exit(0);
 		}
 		return null;
 	}
-	
+
 }

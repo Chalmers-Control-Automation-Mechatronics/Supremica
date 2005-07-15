@@ -64,14 +64,14 @@ public class CompositeFBType extends FBType
 	// map instance names to type names
 	private Map fbInstanceNames = new HashMap();
 
-	// map from event cnt spec to to event cnt spec 
+	// map from event cnt spec to to event cnt spec
 	private Map eventConnectionSpecs = new HashMap();
 	private Map dataConnectionSpecs = new HashMap();
 
 
 	//====================================================================================
 	private CompositeFBType() {}
-	
+
 	public CompositeFBType(String n,Resource r)
 	{
 		System.out.println("CompositeFBType(" + n + "," + r.getName()  + ")");
@@ -80,11 +80,11 @@ public class CompositeFBType extends FBType
 	}
 	//====================================================================================
 
-	public FBInstance createInstance(String name)	
+	public FBInstance createInstance(String name)
 	{
 		System.out.println("CompositeFBType.createInstace(" + name + ")");
-		CompositeFBInstance newInstance = new CompositeFBInstance(name,resource,this);	
-		
+		CompositeFBInstance newInstance = new CompositeFBInstance(name,resource,this);
+
 		// first instantiate all internal instances
 		for (Iterator iter = fbInstanceNames.keySet().iterator(); iter.hasNext();)
 		{
@@ -136,13 +136,16 @@ public class CompositeFBType extends FBType
 				// maybe constant data specification
 				try
 				{
+					System.out.println("---------- Setting variable " + curToSignal + " to " + curFromSignal);
 					newInstance.getFBInstance(curToInstance).setVariableValue(curToSignal,curFromSignal);
 				}
 				catch (Exception e)
 				{
+					System.out.println("---------- Cought exception with " + curFromSignal);
 				}
 				// internal data input connection
-				newInstance.addInternalDataInputConnection(curFromSignal, curToInstance, curToSignal);
+				System.out.println("---------- Setting internal data connection to " + curToInstance +"."+ curToSignal);
+ 				newInstance.addInternalDataInputConnection(curFromSignal, curToInstance, curToSignal);
 			}
 			else if (curToInstance.equals(""))
 			{
@@ -170,12 +173,12 @@ public class CompositeFBType extends FBType
 	{
 		fbInstanceNames.put(instName,typeName);
 	}
-	
+
 	public void addEventConnection(String from, String to)
 	{
 		eventConnectionSpecs.put(from,to);
 	}
-	
+
 	public void addDataConnection(String from, String to)
 	{
 		dataConnectionSpecs.put(from,to);
@@ -189,15 +192,15 @@ public class CompositeFBType extends FBType
 		}
 		return cntSpec.substring(0,cntSpec.indexOf("."));
 	}
-	
+
 	private String getSignalName(String cntSpec)
 	{
 		if (cntSpec.indexOf(".") < 0)
 		{
 			return cntSpec;
 		}
-		
+
 		return cntSpec.substring(cntSpec.indexOf(".")+1,cntSpec.length());
 	}
-	
+
 }

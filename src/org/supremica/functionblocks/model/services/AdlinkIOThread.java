@@ -141,6 +141,7 @@ public class AdlinkIOThread extends Thread
 				for (int i=0; i<32; i++)
 				{
 					//System.out.println("AdlinkIOThread.run(): Setting var INPUT" + i + " to " + readValues[i]);
+					//System.out.println("AdlinkIOThread.run(): Setting var INPUT" + 0 + " to " + readValues[0]);
 					((BooleanVariable) serviceFBVariables.getVariable("INPUT" + i)).setValue(new Boolean(readValues[i]));
 				}
 
@@ -153,7 +154,7 @@ public class AdlinkIOThread extends Thread
 				for (int i=0; i<32; i++)
 				{
 					writeValues[i] = ((BooleanVariable) serviceFBVariables.getVariable("OUTPUT" + i)).getValue().booleanValue();
-					System.out.println("AdlinkIOThread.run(): Writing "+writeValues[i]+" to OUTPUT" + i);
+					//System.out.println("AdlinkIOThread.run(): Writing "+writeValues[i]+" to OUTPUT" + i);
 				}
 
 				// write to the Digital I/O card.

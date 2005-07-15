@@ -41,7 +41,7 @@
 	<DataConnections>
           <Connection Source="100" Destination="cycle.DT" />		   
           
-          <Connection Source="adlink.INPUT2" Destination="rtrig02.QI" />		   
+          <Connection Source="adlink.INPUT0" Destination="rtrig02.QI" />		   
           <Connection Source="adlink.INPUT4" Destination="ftrig04.QI" />
           
           <Connection Source="adlink.INPUT1" Destination="adlink.OUTPUT2" />       

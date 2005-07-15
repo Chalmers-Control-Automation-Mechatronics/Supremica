@@ -10,12 +10,19 @@
 	  </Event>
     </EventInputs>
     <EventOutputs>
-      <Event Name="KulaPortvak" />
+      <Event Name="KulaPortvakt" />
       <Event Name="Write">
 	    <With Var="InPortvakt_sig" />
 	    <With Var="UrPortvakt_sig" />
 	  </Event>
     </EventOutputs>
+    <InputVars>
+	<VarDeclaration Name="KulaPortvakt_sig" Type="BOOL"/>
+    </InputVars>
+    <OutputVars>
+	<VarDeclaration Name="InPortvakt_sig" Type="BOOL"/>
+	<VarDeclaration Name="UrPortvakt_sig" Type="BOOL"/>
+    </OutputVars>
   </InterfaceList>
   <BasicFB>
     <ECC>
@@ -44,28 +51,28 @@
         <Other Language="Java" Text=
 		"
 		System.out.println(&#34;Opening Portvakt In.&#34;);
-		InPortvakt_sig := true;
+		InPortvakt_sig = true;
 		" />	
     </Algorithm>
     <Algorithm Name="CloseIn">
         <Other Language="Java" Text=
 		"
 		System.out.println(&#34;Closing Portvakt In.&#34;);
-		InPortvakt_sig := false;
+		InPortvakt_sig = false;
 		" />	
     </Algorithm>
     <Algorithm Name="OpenOut">
         <Other Language="Java" Text=
 		"
 		System.out.println(&#34;Opening Portvakt Out.&#34;);
-		UrPortvakt_sig := true;
+		UrPortvakt_sig = true;
 		" />	
     </Algorithm>
     <Algorithm Name="CloseOut">
         <Other Language="Java" Text=
 		"
 		System.out.println(&#34;Closing Portvakt Out.&#34;);
-		UrPortvakt_sig := false;
+		UrPortvakt_sig = false;
 		" />	
     </Algorithm>
   </BasicFB>

@@ -814,6 +814,17 @@
 	</java>
 </target>
 
+<target name="run_fbruntime">
+	<java classname="${supremica_basepackage}.apps.FBRuntime" fork="yes">
+		<classpath>
+                        <pathelement location="${build}" />
+			<pathelement location="${dist}/Supremica.jar" />
+			<pathelement location="${dist}/SupremicaLib.jar" />
+			<pathelement path="${java.class.path}" />
+		</classpath>
+	</java>
+</target>
+
 
 <target name="deploy" depends="deployWeb">
 </target>

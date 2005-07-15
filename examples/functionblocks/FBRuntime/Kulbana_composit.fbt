@@ -39,8 +39,8 @@
   <FBNetwork>
 
     <FB Name="cycle" Type="E_CYCLE" />
-	<FB NAME="initsplit" Type="E_SPLIT2" />
-	<FB Name="adlink" Type="ADLINK_IO" />
+    <FB Name="initsplit" Type="E_SPLIT2" />
+    <FB Name="adlink" Type="ADLINK_IO" />
     <FB Name="pv" Type="PV_model" />
 
 	<EventConnections>
@@ -61,6 +61,7 @@
 
 	<DataConnections>
 
+	  <Connection Source="100" Destination="cycle.DT" />	  
 	  <Connection Source="adlink.INPUT0" Destination="pv.KulaPortvakt_sig" />
   	  <Connection Source="pv.InPortvakt_sig" Destination="adlink.OUTPUT0" />
 	  <Connection Source="pv.UrPortvakt_sig" Destination="adlink.OUTPUT1" />	

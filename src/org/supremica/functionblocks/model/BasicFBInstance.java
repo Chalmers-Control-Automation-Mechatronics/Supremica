@@ -171,7 +171,8 @@ public class BasicFBInstance extends FBInstance
 			// set event var to false
 			((BooleanVariable) variables.getVariable(currentEvent.getName())).setValue(false);
 			// repeat the handling of the state if state is changed
-			ECState newECState = updateECC(); 
+			System.out.println();
+                        ECState newECState = updateECC(); 
 			if (newECState != currentECState)
 			{
 				handleNewState(newECState);
