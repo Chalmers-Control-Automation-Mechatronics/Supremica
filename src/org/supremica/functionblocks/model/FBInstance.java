@@ -165,10 +165,6 @@ public abstract class FBInstance extends NamedObject
 		}
 	}
 	
-    public abstract void receiveEvent(String eventInput);
-
-	public abstract void handleEvent();
-
 	public void setVariableValue(String name, String value)
 	{
 		Variable var = variables.getVariable(name);
@@ -200,5 +196,15 @@ public abstract class FBInstance extends NamedObject
 			((BooleanVariable) variables.getVariable(name)).setValue(new Boolean(value));
 		}
 	}
+
+	public String toString()
+	{
+		return getName();
+	}
+
+    public abstract void receiveEvent(String eventInput);
+
+	public abstract void handleEvent();
+
 
 }

@@ -4,15 +4,14 @@
   <Device  Name="Test Device" Type="DeviceType_not_used">
     <Resource Name="TestResource" Type="ResourceType_not_used">
       <FBNetwork>
-
-        <FB Name="restart" Type="E_RESTART" />
-	<FB Name="kulbana" Type="Kulbana_composit" />
+	  
+	    <FB Name="restart" Type="E_RESTART" />
+	    <FB Name="kulbana" Type="Kulbana_composit" />
 	
-	  <EventConnections>
+		<EventConnections>
 	      <Connection Source="restart.COLD" Destination="kulbana.INIT" />
 	      <Connection Source="kulbana.INITO" Destination="kulbana.InPortvakt" />		  
-              <Connection Source="kulbana.KulaPortvakt" Destination="kulbana.UrPortvakt" />		  
-          </EventConnections>
+        </EventConnections>
 
       </FBNetwork>
     </Resource>

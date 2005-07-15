@@ -86,7 +86,7 @@ public class BasicFBType extends FBType
 
 	public FBInstance createInstance(String name)
 	{
-		System.out.println("BasicFBType.createInstace(" + name + ")");
+		System.out.println("BasicFBType.createInstance(" + name + ")");
 		BasicFBInstance newInstance = new BasicFBInstance(name,resource,this);	
 		
 		newInstance.setEvents(events);

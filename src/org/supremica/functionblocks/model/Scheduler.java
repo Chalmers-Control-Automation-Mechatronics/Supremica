@@ -103,6 +103,13 @@ public class Scheduler
 				System.err.println("Scheduler.getNextScheduledFBInstance(): InterruptedException");
 			}
 		}
+
+		System.out.println("Scheduler.getNextScheduledFBInstance(): Getting first instance from the queue ...");
+		for(Iterator iter = scheduledFBInstances.iterator(); iter.hasNext();)
+		{
+			System.out.println("    scheduledFBInstances: " + ((FBInstance) iter.next()).toString());
+		}
+
 		return (FBInstance) scheduledFBInstances.remove(0);
 	}
 
@@ -110,7 +117,7 @@ public class Scheduler
 	public void runEvents()
 	{
 		System.out.println("Scheduler.runEvents()");
-
+		System.out.println("===================================================================================");
 		// find all E_RESTART COLD connections and queue events on them
 		for (Iterator iter = resource.getFBType("E_RESTART").instanceIterator(); iter.hasNext();)
 		{
@@ -120,8 +127,7 @@ public class Scheduler
 
 		while (true)
 		{
-			FBInstance selectedFBInstance = getNextScheduledFBInstance();
-			selectedFBInstance.handleEvent();
+			getNextScheduledFBInstance().handleEvent();
 			//resource.handleConfigurationRequests();
 		}
 	}
@@ -134,14 +140,14 @@ public class Scheduler
 
 	public synchronized void scheduleFBInstance(FBInstance fbInst)
 	{
-		//if (fbInst instanceof ServiceFBInstance)
-		//{
-		//	scheduledFBInstances.add(0,fbInst);
-		//}
-		//else
-		//{
+		if (fbInst instanceof ServiceFBInstance)
+		{
+			scheduledFBInstances.add(0,fbInst);
+		}
+		else
+		{
 			scheduledFBInstances.add(fbInst);
-		//}
+		}
 		notify();
 	}
 

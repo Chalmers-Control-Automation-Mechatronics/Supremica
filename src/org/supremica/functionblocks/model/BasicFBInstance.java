@@ -49,7 +49,6 @@ public class BasicFBInstance extends FBInstance
 
     private ECState currentECState;
     private ECAction currentECAction;
-    private boolean handlingEvent = false;
     private Iterator actionsIterator;
     private int actionsLeft;
 
@@ -79,6 +78,7 @@ public class BasicFBInstance extends FBInstance
 			if(variables.getVariable(eventInput) != null)
 				if(variables.getVariable(eventInput).getType().equals("EventInput"))
 				{
+					System.out.println("BasicFBInstance(" + getName() + ").receiveEvent(" + eventInput + ")");
 					eventInputQueue.add((Event) events.get(eventInput));
 					resource.getScheduler().scheduleFBInstance(this);
 				}
@@ -97,18 +97,10 @@ public class BasicFBInstance extends FBInstance
 	
     public void handleEvent()
     {
-	
-		if(handlingEvent)
-		{
-			resource.getScheduler().scheduleFBInstance(this);
-			return;			
-		}
-
 		currentEvent = getNextEvent();
-		
-		handlingEvent = true;
 
-		//System.out.println("BasicFBInstance(" + getName() + "): handling event " + currentEvent.getName() + " from Ecc state " + currentECState.getName());
+		System.out.println("BasicFBInstance(" + getName() + "): handling event " + currentEvent.getName() + " from ECC state " + currentECState.getName());
+		
 		
 		// set all InputEvents to false
 		for (Iterator iter = variables.iterator();iter.hasNext();)
@@ -130,6 +122,7 @@ public class BasicFBInstance extends FBInstance
 		ECState newECState = updateECC();
 		if (newECState != currentECState)
 		{
+			System.out.println("BasicFBInstance(" + getName() + ").handleEvent(): Handling new state " + newECState.getName());
 			handleNewState(newECState);
 		}
     }
@@ -138,7 +131,6 @@ public class BasicFBInstance extends FBInstance
     {
 		setVariables(theJob.getVariables());
 		sendEvent();
-		handleState();
     }
 
 
@@ -155,24 +147,21 @@ public class BasicFBInstance extends FBInstance
 		actionsLeft = currentECState.getNumberOfActions();
 		// and get the iterator for them
 		actionsIterator = currentECState.actionsIterator();
+		System.out.println("BasicFBInstance(" + getName() + ").handleNewState(): Handling new state " + currentECState.getName() +
+						   " with " + actionsLeft + " actions");
 		handleState();
     }
 	
-    // handles currentState between actions
+    // handles currentECState between actions
     private void handleState()
     {
-		if (actionsLeft > 0 )
-		{
-			handleAction((ECAction) actionsIterator.next());
-		}
-		
 		if (actionsLeft == 0)
 		{
 			// set event var to false
 			((BooleanVariable) variables.getVariable(currentEvent.getName())).setValue(false);
 			// repeat the handling of the state if state is changed
-			System.out.println();
-                        ECState newECState = updateECC(); 
+			System.out.println("BasicFBInstance(" + getName() + ").handleState(): No more actions in state " + currentECState.getName());
+			ECState newECState = updateECC(); 
 			if (newECState != currentECState)
 			{
 				handleNewState(newECState);
@@ -180,12 +169,22 @@ public class BasicFBInstance extends FBInstance
 			else
 			{
 				// we're done with the event
-				//System.out.println("BasicFBInstance: Done with event " + currentEvent.getName() + " and in ECState " + currentECState.getName());
-				handlingEvent = false;
+				System.out.println("BasicFBInstance(" + getName() + ").handleState(): Done with event " + currentEvent.getName() + " and in ECState " + currentECState.getName());
+				// if there are more events on the queue schedule this instance again in the scheduler
+				if(eventInputQueue.size() > 0)
+				{
+					resource.getScheduler().scheduleFBInstance(this);
+				}
 			}
 		}
-    }
 
+		if (actionsLeft > 0)
+		{
+			handleAction((ECAction) actionsIterator.next());
+		}
+		
+    }
+	
     private void handleAction(ECAction action)
     {
 		currentECAction = action;
@@ -197,10 +196,9 @@ public class BasicFBInstance extends FBInstance
 		else if (currentECAction.getAlgorithm() == null && currentECAction.getOutput() != null)
 		{
 			sendEvent();
-			handleState();
 		}
     }
-
+	
     private void sendEvent()
     {
 		if (currentECAction.getOutput() != null)
@@ -212,6 +210,7 @@ public class BasicFBInstance extends FBInstance
 			}
 		}
 		actionsLeft = actionsLeft - 1;
+		handleState();			
     }
 	
 }

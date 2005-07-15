@@ -115,6 +115,7 @@ public class ServiceFBInstance extends FBInstance
 			if(variables.getVariable(eventInput) != null)
 				if(variables.getVariable(eventInput).getType().equals("EventInput"))
 				{
+					System.out.println("ServiceFBInstance(" + getName() + ").receiveEvent(" + eventInput + ")");
 					eventInputQueue.add((Event) events.get(eventInput));
 					resource.getScheduler().scheduleFBInstance(this);
 				}

@@ -101,11 +101,11 @@ public class Variables
 			String curName = (String )iter.next();
 			if(iter.hasNext())
 			{
-				thisVars = thisVars + curName + " " + getVariable(curName).toString() + ",\n";
+				thisVars = thisVars + " " + curName + " " + getVariable(curName).toString() + ",\n";
 			}
 			else
 			{
-				thisVars = thisVars + curName + " " + getVariable(curName).toString() + "]";
+				thisVars = thisVars + " " + curName + " " + getVariable(curName).toString() + " ]\n";
 			}
 		}
 		return thisVars;

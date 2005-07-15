@@ -108,8 +108,8 @@ public class ECCondition
 	public Object evaluate(Variables vars)
 	{
 
-		System.out.println("Evaluating conddition " + condition + " with vars " + vars.toString());
-
+		System.out.println("ECCondition.evaluate(): Evaluating \"" + condition + "\" with vars ...");
+		System.out.print(vars.toString());
 		try
 		{
 			return (new Evaluator(vars)).evalExpression(abstractSyntax);
