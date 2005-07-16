@@ -75,4 +75,15 @@ public class EventQueue
 	{
 		queue.add(e);
 	}
+
+	public String toString()
+	{
+		String queueString = "";
+		for(Iterator iter = queue.iterator(); iter.hasNext();)
+		{
+			queueString = queueString + "    EventQueue: " + ((Event) iter.next()).toString() + "\n";
+		}
+		return queueString;
+	}
+
 }

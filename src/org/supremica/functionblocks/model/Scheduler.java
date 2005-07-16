@@ -104,7 +104,7 @@ public class Scheduler
 			}
 		}
 
-		System.out.println("Scheduler.getNextScheduledFBInstance(): Getting first instance from the queue ...");
+		//System.out.println("Scheduler.getNextScheduledFBInstance(): Getting first instance from the queue ...");
 		for(Iterator iter = scheduledFBInstances.iterator(); iter.hasNext();)
 		{
 			System.out.println("    scheduledFBInstances: " + ((FBInstance) iter.next()).toString());
