@@ -77,7 +77,7 @@ public class AdlinkIOThread extends Thread
 
 		try
 		{
-			//driver = new AdlinkPCI7432();
+			driver = new AdlinkPCI7432();
 		}
 		catch(Exception e)
 		{
@@ -128,7 +128,7 @@ public class AdlinkIOThread extends Thread
 				try
 				{
 					System.out.println("AdlinkIOThread.run(): Reading inputs.");
-					//driver.getSignalArray(readValues);
+					driver.getSignalArray(readValues);
 				}
 				catch(Exception e)
 				{
@@ -161,7 +161,7 @@ public class AdlinkIOThread extends Thread
 				try
 				{
 					System.out.println("AdlinkIOThread.run(): Writing outputs.");
-					//driver.setSignalArray(writeValues);
+					driver.setSignalArray(writeValues);
 				}
 				catch(Exception e)
 				{

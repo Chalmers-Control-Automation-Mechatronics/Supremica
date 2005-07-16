@@ -11,6 +11,7 @@
 		<EventConnections>
 	      <Connection Source="restart.COLD" Destination="kulbana.INIT" />
 	      <Connection Source="kulbana.INITO" Destination="kulbana.InPortvakt" />		  
+	      <Connection Source="kulbana.KulaPortvakt" Destination="kulbana.UrPortvakt" />		  
         </EventConnections>
 
       </FBNetwork>
