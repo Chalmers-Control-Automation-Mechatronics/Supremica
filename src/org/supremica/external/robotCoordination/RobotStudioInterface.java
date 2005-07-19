@@ -1,4 +1,53 @@
-package org.supremica.external.robotCoordination;
+
+/*
+ * Supremica Software License Agreement
+ *
+ * The Supremica software is not in the public domain
+ * However, it is freely available without fee for education,
+ * research, and non-profit purposes.  By obtaining copies of
+ * this and other files that comprise the Supremica software,
+ * you, the Licensee, agree to abide by the following
+ * conditions and understandings with respect to the
+ * copyrighted software:
+ *
+ * The software is copyrighted in the name of Supremica,
+ * and ownership of the software remains with Supremica.
+ *
+ * Permission to use, copy, and modify this software and its
+ * documentation for education, research, and non-profit
+ * purposes is hereby granted to Licensee, provided that the
+ * copyright notice, the original author's names and unit
+ * identification, and this permission notice appear on all
+ * such copies, and that no charge be made for such copies.
+ * Any entity desiring permission to incorporate this software
+ * into commercial products or to use it for commercial
+ * purposes should contact:
+ *
+ * Knut Akesson (KA), knut@supremica.org
+ * Supremica,
+ * Haradsgatan 26A
+ * 431 42 Molndal
+ * SWEDEN
+ *
+ * to discuss license terms. No cost evaluation licenses are
+ * available.
+ *
+ * Licensee may not use the name, logo, or any other symbol
+ * of Supremica nor the names of any of its employees nor
+ * any adaptation thereof in advertising or publicity
+ * pertaining to the software without specific prior written
+ * approval of the Supremica.
+ *
+ * SUPREMICA AND KA MAKES NO REPRESENTATIONS ABOUT THE
+ * SUITABILITY OF THE SOFTWARE FOR ANY PURPOSE.
+ * IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY.
+ *
+ * Supremica or KA shall not be liable for any damages
+ * suffered by Licensee from the use of this software.
+ *
+ * Supremica is owned and represented by KA.
+ */
+ package org.supremica.external.robotCoordination;
 
 import org.supremica.external.comInterfaces.robotstudio_3_1.RobotStudio.*;
 import org.supremica.external.comInterfaces.robotstudio_3_1.RobotStudio.enums.RsKinematicRole;
@@ -12,8 +61,10 @@ import java.util.*;
 import java.io.*;
 
 /**
- * Class collecting the implementations of the robotCoordination-interfaces
+ * Class collecting the implementation of the robotCoordination-interfaces
  * for RobotStudio.
+ *
+ * @author flordal
  */
 public class RobotStudioInterface
 {
@@ -657,11 +708,11 @@ public class RobotStudioInterface
 						target.getAlphabet().addEvent(event);
 						target.addArc(arc);
 					}
-					
+
 					return;
 				}
 				*/
-				
+
 				// The richPath should be used to generate the automata!
 				// Modify zone automata
 				for (int i=0; i< richPath.size(); i++)
@@ -739,10 +790,10 @@ public class RobotStudioInterface
 						rob.addState(firstState);
 						State lastState = rob.getStateWithName(from.getName() + to.getName());
 						lastState.setName(secondLastPos.getName() + lastPos.getName());
-						
+
 						// Set cost for first state, must be int, so it now is the number of milliseconds
 						firstState.setCost((int) (1000*firstPos.getTime()));
-						
+
 						// Modify original arcs
 						LabeledEvent firstEvent = new LabeledEvent(firstPos.getName() + secondPos.getName());
 						rob.getAlphabet().addEvent(firstEvent);
@@ -752,7 +803,7 @@ public class RobotStudioInterface
 						{
 							Arc currArc = arcIt.nextArc();
 						toBeRemoved.add(currArc);
-						
+
 						Arc newArc = new Arc(currArc.getFromState(), firstState, firstEvent);
 						rob.addArc(newArc);
 						}
@@ -762,14 +813,14 @@ public class RobotStudioInterface
 						}
 						LabeledEvent oldEvent = rob.getAlphabet().getEvent(from.getName() + to.getName());
 						rob.getAlphabet().removeEvent(oldEvent);
-						
+
 						// Add sequence
 						State currState = firstState;
 						for (int i=1; i<richPath.size()-1; i++)
 						{
 							RichPosition currPos = (RichPosition) richPath.get(i);
 							RichPosition nextPos = (RichPosition) richPath.get(i+1);
-							
+
 							// Add new arc and stuff
 							State nextState;
 							if (i == richPath.size()-2)
@@ -785,10 +836,10 @@ public class RobotStudioInterface
 							rob.getAlphabet().addEvent(event);
 							Arc arc = new Arc(currState, nextState, event);
 							rob.addArc(arc);
-							
+
 							// Set cost, must be int, so it now is the number of milliseconds
 							nextState.setCost((int) (1000*(nextPos.getTime() - currPos.getTime())));
-							
+
 							currState = nextState;
 						}
 					}
@@ -819,10 +870,10 @@ public class RobotStudioInterface
 						rob.addState(firstState);
 						State lastState =  rob.getStateWithName(to.getName() + from.getName());  //
 						lastState.setName(secondLastPos.getName() + lastPos.getName());
-						
+
 						// Set cost for first state, must be int, so it now is the number of milliseconds
 						firstState.setCost((int) (1000*(firstPos.getTime() - secondPos.getTime()))); //
-						
+
 						// Modify original arcs
 						LabeledEvent firstEvent = new LabeledEvent(firstPos.getName() + secondPos.getName());
 						rob.getAlphabet().addEvent(firstEvent);
@@ -834,7 +885,7 @@ public class RobotStudioInterface
 						{
 							Arc currArc = arcIt.nextArc();
 							toBeRemoved.add(currArc);
-							
+
 							Arc newArc = new Arc(currArc.getFromState(), firstState, firstEvent);
 							rob.addArc(newArc);
 						}
@@ -844,14 +895,14 @@ public class RobotStudioInterface
 						}
 						LabeledEvent oldEvent = rob.getAlphabet().getEvent(to.getName() + from.getName()); //
 						rob.getAlphabet().removeEvent(oldEvent);
-						
+
 						// Add sequence
 						State currState = firstState;
 						for (int i=richPath.size()-2; i>0; i--) //
 						{
 							RichPosition currPos = (RichPosition) richPath.get(i);
 							RichPosition nextPos = (RichPosition) richPath.get(i-1); //
-							
+
 							// Add new arc and stuff
 							State nextState;
 							if (i == 1) //
@@ -867,10 +918,10 @@ public class RobotStudioInterface
 							rob.getAlphabet().addEvent(event);
 							Arc arc = new Arc(currState, nextState, event);
 							rob.addArc(arc);
-							
+
 							// Set cost, must be int, so it now is the number of milliseconds
 							nextState.setCost((int) (1000*(currPos.getTime() - nextPos.getTime()))); //
-							
+
 							currState = nextState;
 						}
 					}

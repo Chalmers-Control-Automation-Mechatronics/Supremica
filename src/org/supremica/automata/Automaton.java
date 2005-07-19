@@ -47,7 +47,7 @@
  *
  * Supremica is owned and represented by KA.
  */
-package org.supremica.automata; 
+package org.supremica.automata;
 
 import org.supremica.util.SupremicaException;
 import java.util.*;
@@ -316,7 +316,7 @@ public class Automaton
 	}
 
 	//  When is the slow and beautiful fixx due? When EXACTLY does the indices "become different"?
-	/** 
+	/**
 	 * Quick and ugly fixx, see bug report
 	 * When working with the state-indices, sometimes, somehow the indices in
 	 * indexStateMap become different from the indices stored in the State:s
@@ -2259,7 +2259,7 @@ public class Automaton
 			return arcIt.hasNext();
 		}
 
-		public LabeledEvent next() 
+		public LabeledEvent next()
 		{
 			Arc nextArc = (Arc) arcIt.next();
 
