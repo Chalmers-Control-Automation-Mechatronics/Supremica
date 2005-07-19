@@ -47,11 +47,12 @@
  *
  * Supremica is owned and represented by KA.
  */
-package org.supremica.automata.algorithms;
+package org.supremica.automata.algorithms.minimization;
 
 import org.supremica.properties.SupremicaProperties;
 import org.supremica.log.*;
 import org.supremica.automata.Alphabet;
+import org.supremica.automata.algorithms.EquivalenceRelation;
 
 public final class MinimizationOptions
 {

@@ -3,6 +3,7 @@ package org.supremica.automata.algorithms;
 import java.util.*;
 import org.supremica.log.*;
 import org.supremica.automata.*;
+import org.supremica.automata.algorithms.minimization.*;
 
 /**
  * simplify a project by removing and transforming the automata

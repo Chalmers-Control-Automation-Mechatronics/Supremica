@@ -996,14 +996,14 @@ public class State
     }
 
     /**
-     * Returns true if an event with the label "label" is enabled by the supervisor.
+     * Returns true if an event with the label "label" is enabled in this state.
      */
     public boolean isEnabled(String label)
     {
         return isEnabled(label, false);
     }
     /**
-     * Returns true if an event with the label "label" is enabled by the supervisor.
+     * Returns true if an event with the label "label" is enabled in this state.
      * If considerEpsilonClosure is true, it can be anywhere in the epsilon closure
      * of this state instead of just in this state.
      */
@@ -1033,14 +1033,14 @@ public class State
         return false;
     }
     /**
-     * Returns true if an event with the label "label" is enabled by the supervisor.
+     * Returns true if an event is enabled in this state.
      */
     public boolean isEnabled(LabeledEvent event)
     {
         return isEnabled(event.getLabel());
     }
     /**
-     * Returns true if an event with the label "label" is enabled by the supervisor.
+     * Returns true if an event s enabled in this state.
      * If considerEpsilonClosure is true, it can be anywhere in the epsilon closure
      * of this state instead of just in this state.
      */

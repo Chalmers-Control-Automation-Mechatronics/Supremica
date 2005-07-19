@@ -51,6 +51,8 @@ package org.supremica.automata.algorithms;
 
 import org.supremica.log.*;
 import org.supremica.automata.*;
+import org.supremica.automata.algorithms.minimization.AutomatonMinimizer;
+import org.supremica.automata.algorithms.minimization.MinimizationOptions;
 
 public class AutomatonSplit
 {

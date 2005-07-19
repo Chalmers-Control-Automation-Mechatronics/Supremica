@@ -47,12 +47,12 @@
  *
  * Supremica is owned and represented by KA.
  */
-package org.supremica.automata.algorithms;
+package org.supremica.automata.algorithms.minimization;
 
 import java.util.*;
 import org.supremica.log.*;
 import org.supremica.automata.*;
-import org.supremica.automata.algorithms.minimization.*;
+import org.supremica.automata.algorithms.*;
 import org.supremica.automata.algorithms.standard.Determinizer;
 import org.supremica.properties.SupremicaProperties;
 import org.supremica.gui.ExecutionDialog;
@@ -220,7 +220,7 @@ public class AutomatonMinimizer
             // RULE D //
             ////////////
 
-            // Adjust marking based on epsilon transitions
+			// Adjust marking based on epsilon transitions
             int countD = ruleD(theAutomaton);
             totalD += countD;
 
@@ -274,7 +274,7 @@ public class AutomatonMinimizer
             throw new Exception("Unknown equivalence relation");
         }
 
-        // Start listening again
+		// Start listening again
         theAutomaton.endTransaction();
 
         if (stopRequested)
@@ -282,20 +282,16 @@ public class AutomatonMinimizer
             return null;
         }
 
-		// Partition...
-		int statesBefore = theAutomaton.nbrOfStates();
-		// Check if the library with the native methods is ok
-		boolean libraryOK = BisimulationEquivalenceMinimizer.libraryLoaded();
 		// Do the partitioning!
-		if (libraryOK)
+		int statesBefore = theAutomaton.nbrOfStates();
+		if (BisimulationEquivalenceMinimizer.libraryLoaded())
 		{
 			// Partition using native methods
-            BisimulationEquivalenceMinimizer.minimize(theAutomaton, useShortNames, false);
+          BisimulationEquivalenceMinimizer.minimize(theAutomaton, useShortNames, false);
 		}
 		else
 		{
 			// Partition using naive methods
-        	// Find the coarsest partitioning
         	EquivalenceClasses equivClasses = new EquivalenceClasses();
         	try
         	{
@@ -321,7 +317,7 @@ public class AutomatonMinimizer
 			theAutomaton = buildAutomaton(equivClasses);
 		}
 
-        if (stopRequested)
+		if (stopRequested)
         {
             return null;
         }
@@ -351,11 +347,9 @@ public class AutomatonMinimizer
         }
 
         // Should we remove redundant transitions to minimize also with respect to transitions?
-        int transitionCount = 0;
         if (options.getAlsoTransitions())
         {
             int addedArcs = epsilonSaturate(theAutomaton, false);
-            transitionCount = theAutomaton.nbrOfTransitions();
             int removedArcs = removeRedundantTransitions(theAutomaton);
             totalArcs += removedArcs-addedArcs;
         }
@@ -363,7 +357,7 @@ public class AutomatonMinimizer
         // Remove from alphabet epsilon events that are never used
         removeUnusedEpsilonEvents(theAutomaton);
 
-        // Message
+       // Message
         int after = theAutomaton.nbrOfStates();
         logger.verbose("There were " + before + " states before and " + after +
                        " states after the minimization. Reduction: " +
@@ -798,7 +792,7 @@ public class AutomatonMinimizer
             }
 
             // Get and remove arbitrary state
-            State one = statesToExamine.remove(); // XXX
+            State one = statesToExamine.remove();
 
             // If there is only one transition out of this state AND it is an epsilon-transition
             // merge this and next state. (This is actually a special case of rule B.)
@@ -807,7 +801,7 @@ public class AutomatonMinimizer
             {
                 // So this arc may be OK, just check that there are no more arcs in the iterator!
                 Arc arc = arcIt.nextArc();
-                State two = arc.getToState(); // XXX
+                State two = arc.getToState(); 
                 boolean arcOK = !arcIt.hasNext() && arc.getEvent().isEpsilon() && !arc.isSelfLoop();
                 boolean markingOK = options.getIgnoreMarking() || (one.hasEqualMarking(two));
                 arcIt = null;
@@ -827,7 +821,7 @@ public class AutomatonMinimizer
                         Arc epsilonArc = it.nextArc();
                         if (epsilonArc.getEvent().isEpsilon())
                         {
-                            statesToExamine.add(epsilonArc.getFromState()); // XXX
+                            statesToExamine.add(epsilonArc.getFromState()); 
                         }
                     }
                     //logger.info("I merged " + one + " and " + two + " since I thought they were OE.");
@@ -860,7 +854,7 @@ public class AutomatonMinimizer
             }
 
             // Get and remove arbitrary state
-            State one = statesToExamine.remove(); // XXX
+            State one = statesToExamine.remove();
 
             // Merge loops in which this state is involved
 
@@ -872,7 +866,7 @@ public class AutomatonMinimizer
             forwardsClosure.remove(one); // Skip self
             while (forwardsClosure.size() != 0)
             {
-                State two = forwardsClosure.remove(); // XXX
+                State two = forwardsClosure.remove();
 
                 if (backwardsClosure.contains(two))
                 {
@@ -962,17 +956,87 @@ public class AutomatonMinimizer
             return -1;
         }
 
-        return total;
+       return total;
     }
 
     /**
-     * Rule A.
+     * Rule A. NOTE! There must be no epsilon-loops in <code>aut</code>.
      *
      * @return the number of states that have been removed or -1 if method didn't complete successfully.
      */
     public int ruleA(Automaton aut)
         throws Exception
-    {
+	{
+        ////////////
+        // RULE A //
+        ////////////
+
+        // Count the removed states
+        int countA = 0;
+
+        // If two states has the same incoming arcs (from the same state(s) and with the same
+        // event(s)) AND if there is an epsilon transition present in both states, the states
+		// can be merged. NOTE! THIS PRESUPPOSES THAT THERE ARE NO EPSILON-LOOPS IN THE AUTOMATON!
+		Hashtable infoHash = new Hashtable((aut.nbrOfStates()*4)/3+1);
+		StateSet statesToExamine = new StateSet(aut.getStateSet());
+
+		loop: while (statesToExamine.size() != 0)
+		{
+			State state = statesToExamine.remove(); 
+
+			// If this state doesn't have an outgoing epsilon-transition, it's not gonna be equivalent
+			// to anything else...
+			boolean check = false;
+			for (Iterator<Arc> arcIt = state.outgoingArcsIterator(); arcIt.hasNext(); ) 
+			{
+				Arc arc = arcIt.next();
+				if (arc.getEvent().isEpsilon())
+				{
+					assert(!arc.isSelfLoop());
+					check = true;
+					continue;
+				}
+			}
+			if (!check)
+			{
+				continue loop;
+			}
+
+			// Find relevant info about the state
+			StateInfoIncoming info = new StateInfoIncoming(state);
+			
+			// Get list of states with same hashcode
+			LinkedList list = (LinkedList) infoHash.get(new Integer(info.hashCode()));
+			if (list == null)
+			{
+				list = new LinkedList();
+				infoHash.put(new Integer(info.hashCode()), list);
+				list.add(info);
+				continue loop;
+			}
+			for (Iterator it = list.iterator(); it.hasNext(); )
+			{
+				StateInfoIncoming old = (StateInfoIncoming) it.next();
+				if (info.equivalentTo(old))
+				{
+					// Merge states!
+					//logger.info("Merging " + old.getState() + " and " + info.getState() + ".");
+					State merge = MinimizationHelper.mergeStates(aut, old.getState(), info.getState(), useShortNames);
+					countA++;
+					old.setState(merge);
+					
+					// There can be no more of this characterization in the list
+					// Get a new state!
+					continue loop;
+				}
+			}
+			list.add(info);
+		}
+
+       return countA;
+    }
+	/*
+	{
         ////////////
         // RULE A //
         ////////////
@@ -992,7 +1056,7 @@ public class AutomatonMinimizer
             }
 
             // Get and remove arbitrary state
-            State one = statesToExamine.remove(); // XXX
+            State one = statesToExamine.remove(); 
 
             // Don't fiddle with the initial state!
             if (one.isInitial())
@@ -1009,7 +1073,7 @@ public class AutomatonMinimizer
             }
             if (arc != null && !it.hasNext())
             {
-                State two = arc.getFromState(); // XXX
+                State two = arc.getFromState(); 
 
                 if ((!one.equals(two)) && arc.getEvent().isEpsilon())
                 {
@@ -1040,7 +1104,7 @@ public class AutomatonMinimizer
                             Arc epsilonArc = arcIt.nextArc();
                             if (epsilonArc.getEvent().isEpsilon())
                             {
-                                statesToExamine.add(epsilonArc.getToState()); // XXX
+                                statesToExamine.add(epsilonArc.getToState()); 
                             }
                         }
                         //logger.info("I merged " + one + " and " + two + " since I thought they were CE");
@@ -1051,10 +1115,11 @@ public class AutomatonMinimizer
         }
 
         return countA;
-    }
+	}
+	*/
 
     /**
-     * Rule A.
+     * Rule AA.
      *
      * @return the number of states that have been removed or -1 if method didn't complete successfully.
      */
@@ -1080,7 +1145,7 @@ public class AutomatonMinimizer
             }
 
             // Get and remove arbitrary state
-            State one = statesToExamine.remove(); // XXX
+            State one = statesToExamine.remove(); 
 
             // Don't fiddle with the initial state!
             if (one.isInitial())
@@ -1108,12 +1173,12 @@ public class AutomatonMinimizer
                 {
                     Arc inArc = inIt.nextArc();
                     assert(!(inArc.getEvent().isEpsilon() && inArc.isSelfLoop())); // No epsilon selfloops!
-                    State fromState = inArc.getFromState(); // XXX
+                    State fromState = inArc.getFromState(); 
 
                     for (ArcIterator outIt = one.outgoingArcsIterator(); outIt.hasNext(); )
                     {
                         Arc arc = outIt.nextArc();
-                        State toState = arc.getToState(); // XXX
+                        State toState = arc.getToState(); 
                         LabeledEvent event = arc.getEvent();
 
                         Arc newArc = new Arc(fromState, toState, event);
@@ -1146,56 +1211,43 @@ public class AutomatonMinimizer
 
         // If two states has the same incoming arcs (from the same state(s) and with the same
         // event(s)) AND if both states have the same enabled events, then they can be merged!
-        boolean change = true;
-        while (change)
-        {
-            if (stopRequested)
-            {
-                return -1;
-            }
+		Hashtable infoHash = new Hashtable((aut.nbrOfStates()*4)/3+1);
+		StateSet statesToExamine = new StateSet(aut.getStateSet());
+		loop: while (statesToExamine.size() != 0)
+		{
+			State state = statesToExamine.remove(); 
 
-            change = false;
-
-            // The marking can never be changed
-            assert(ruleD(aut) == 0);
-
-            Hashtable infoHash = new Hashtable(aut.nbrOfStates()*2+1);
-            StateSet statesToExamine = new StateSet(aut.getStateSet());
-            loop: while (statesToExamine.size() != 0)
-            {
-                State state = statesToExamine.remove(); // XXX
-                StateInfoB info = new StateInfoB(state);
-
-                // Get list of states with same hashcode
-                LinkedList list = (LinkedList) infoHash.get(new Integer(info.hashCode()));
-                if (list == null)
-                {
-                    list = new LinkedList();
-                    infoHash.put(new Integer(info.hashCode()), list);
-                    list.add(info);
-                    continue loop;
-                }
-                for (Iterator it = list.iterator(); it.hasNext(); )
-                {
-                    StateInfoB old = (StateInfoB) it.next();
-                    if (info.equivalentTo(old))
-                    {
-                        // Merge states!
-                        //logger.info("Merging " + old.getState() + " and " + info.getState() + ".");
-                        State merge = MinimizationHelper.mergeStates(aut, old.getState(), info.getState(), useShortNames);
-                        countB++;
-                        old.setState(merge);
-                        change = true;
-
-                        // There can be no more of this characterization in the list
-                        // Get a new state!
-                        continue loop;
-                    }
-                }
-                list.add(info);
-            }
-        }
-
+			// Find relevant info about the state
+			StateInfoB info = new StateInfoB(state);
+			
+			// Get list of states with same hashcode
+			LinkedList list = (LinkedList) infoHash.get(new Integer(info.hashCode()));
+			if (list == null)
+			{
+				list = new LinkedList();
+				infoHash.put(new Integer(info.hashCode()), list);
+				list.add(info);
+				continue loop;
+			}
+			for (Iterator it = list.iterator(); it.hasNext(); )
+			{
+				StateInfoB old = (StateInfoB) it.next();
+				if (info.equivalentTo(old))
+				{
+					// Merge states!
+					//logger.info("Merging " + old.getState() + " and " + info.getState() + ".");
+					State merge = MinimizationHelper.mergeStates(aut, old.getState(), info.getState(), useShortNames);
+					countB++;
+					old.setState(merge);
+					
+					// There can be no more of this characterization in the list
+					// Get a new state!
+					continue loop;
+				}
+			}
+			list.add(info);
+		}
+		
         return countB;
     }
 
@@ -1227,7 +1279,7 @@ public class AutomatonMinimizer
                 return -1;
             }
 
-            State state = (State) it.next(); // XXX
+            State state = (State) it.next(); 
             if ((state.getCost() == State.MAX_COST))
             {
                 // This state can not be accepting if the coreachability worked!
@@ -1272,7 +1324,7 @@ public class AutomatonMinimizer
                     for (ArcIterator arcIt = currState.incomingArcsIterator(); arcIt.hasNext(); )
                     {
                         Arc arc = arcIt.nextArc();
-                        State previous = arc.getFromState(); // XXX
+                        State previous = arc.getFromState(); 
 
                         if (arc.getEvent().isEpsilon())
                         {
@@ -1395,7 +1447,7 @@ public class AutomatonMinimizer
         StateSet markedStates = new StateSet();
         for (StateIterator stateIt = aut.stateIterator(); stateIt.hasNext();)
         {
-            State currState = stateIt.nextState(); // XXX
+            State currState = stateIt.nextState(); 
             if (currState.isAccepting())
             {
                 markedStates.add(currState);
@@ -1408,7 +1460,7 @@ public class AutomatonMinimizer
             StateSet closure = markedStates.remove().backwardsEpsilonClosure();
             for (StateIterator closureIt = closure.iterator(); closureIt.hasNext(); )
             {
-                State state = closureIt.nextState(); // XXX
+                State state = closureIt.nextState(); 
                 if (!state.isAccepting())
                 {
                     state.setAccepting(true);
@@ -1445,7 +1497,7 @@ public class AutomatonMinimizer
                 return -1;
             }
 
-            State state = statesToExamine.remove(); // XXX
+            State state = statesToExamine.remove(); 
 
             // Don't remove the initial state!
             if (state.isInitial())
@@ -1467,7 +1519,7 @@ public class AutomatonMinimizer
                     continue loop;
                 }
                 assert(!arc.isSelfLoop());
-                State toState = arc.getToState(); // XXX
+                State toState = arc.getToState(); 
                 hasMarkedDecessor |= toState.isAccepting();
             }
 
@@ -1482,8 +1534,8 @@ public class AutomatonMinimizer
                     for (ArcIterator inIt = state.incomingArcsIterator(); inIt.hasNext(); )
                     {
                         Arc inArc = inIt.nextArc();
-                        State fromState = inArc.getFromState(); // XXX
-                        State toState = outArc.getToState(); // XXX I STOPPED HERE, IT'S TOO MUCH WORK!
+                        State fromState = inArc.getFromState(); 
+                        State toState = outArc.getToState();
                         Arc newArc = new Arc(fromState, toState, inArc.getEvent());
 
                         aut.addArc(newArc);
@@ -1974,33 +2026,21 @@ public class AutomatonMinimizer
 }
 
 /**
- * Class for characterizing states for their B-properties.
+ * Class for characterizing states based on their ~_incoming-properties, see 
+ * "Conflict Equivalence Minimization" by Flordal et al.
  */
-class StateInfoB
+class StateInfoIncoming
 {
     private State state;
-    private Alphabet enabledEvents;
     private Arclets incomingArcs;
     private boolean isInitial;
-    private boolean isMarked;
 
-    private int hash = 0;
-
-    public StateInfoB(State state)
+    public StateInfoIncoming(State state)
     {
         this.state = state;
-        enabledEvents = state.enabledEvents(true);
-        StateSet backwardsClosure = state.backwardsEpsilonClosure();
+		StateSet backwardsClosure = state.backwardsEpsilonClosure();
         incomingArcs = new Arclets(backwardsClosure.incomingArcsIterator());
         isInitial = backwardsClosure.hasInitialState();
-        isMarked = state.isAccepting();
-
-        /* Rule A
-           this.state = state;
-           incomingArcs = new Arclets(backwardsClosure.incomingArcsIterator());
-           isInitial = backwardsClosure.hasInitialState();
-
-         */
     }
 
     public void setState(State state)
@@ -2013,36 +2053,26 @@ class StateInfoB
         return state;
     }
 
-    public boolean equivalentTo(StateInfoB other)
+    public boolean equivalentTo(StateInfoIncoming other)
     {
         boolean result = true;
-        result &= enabledEvents.equals(other.enabledEvents);
         result &= incomingArcs.equals(other.incomingArcs);
         result &= isInitial == other.isInitial;
-        result &= isMarked == other.isMarked;
 
         return result;
     }
 
     public boolean equals(Object object)
     {
-        StateInfoB other = (StateInfoB) object;
+        StateInfoIncoming other = (StateInfoIncoming) object;
 
         return state.equals(other.state);
-        //return state.getName().equals(other.state.getName());
     }
 
     public int hashCode()
     {
-        if (hash != 0)
-        {
-            return hash;
-        }
-
-        hash = enabledEvents.hashCode();
-        hash = hash * 31 + incomingArcs.hashCode();
-        hash = hash * 23 + (isInitial ? 1231 : 1237);
-        hash = hash * 17 + (isMarked ? 1231 : 1237);
+        int hash = incomingArcs.hashCode();
+        hash = hash * 41 + (isInitial ? 1523 : 1531);
 
         return hash;
     }
@@ -2051,10 +2081,8 @@ class StateInfoB
     {
         String result = "";
         result += "State: " + state;
-        result += "\n\tEnabled: " + enabledEvents;
         result += "\n\tArclets: " + incomingArcs;
         result += "\n\tInitial: " + isInitial;
-        result += "\n\tMarked : " + isMarked;
         return result;
     }
 
@@ -2090,6 +2118,9 @@ class StateInfoB
         }
     }
 
+	/**
+	 * A set of <code>Arclet</code>:s.
+	 */
     class Arclets
     {
         // Why can't I have a TreeSet here!?!?!?
@@ -2139,6 +2170,56 @@ class StateInfoB
 
             return result;
         }
+    }
+}
+
+/**
+ * Class for characterizing states based on their B-properties.
+ */
+class StateInfoB
+	extends StateInfoIncoming
+{
+    private Alphabet enabledEvents;
+    private boolean isMarked;
+
+	// Store hash number to avoid unnecessary calculation
+	private int hash = 0;
+
+    public StateInfoB(State state)
+    {
+		super(state);
+        enabledEvents = state.enabledEvents(true);
+        isMarked = state.isAccepting();
+    }
+
+    public boolean equivalentTo(StateInfoB other)
+    {
+		boolean result = super.equivalentTo(other);
+        result &= enabledEvents.equals(other.enabledEvents);
+        result &= isMarked == other.isMarked;
+
+        return result;
+    }
+
+    public int hashCode()
+    {
+		// If the number hasn't been generated before, do it now!
+        if (hash == 0)
+        {
+			hash = super.hashCode();
+			hash = hash * 37 + enabledEvents.hashCode();
+			hash = hash * 31 + (isMarked ? 1231 : 1237);
+		}
+		
+        return hash;
+    }
+
+    public String toString()
+    {
+        String result = super.toString();
+        result += "\n\tEnabled: " + enabledEvents;
+        result += "\n\tMarked : " + isMarked;
+        return result;
     }
 }
 

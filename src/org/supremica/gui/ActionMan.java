@@ -59,6 +59,7 @@ import java.io.*;
 import org.supremica.properties.SupremicaProperties;
 import org.supremica.automata.templates.*;
 import org.supremica.automata.algorithms.*;
+import org.supremica.automata.algorithms.minimization.*;
 import org.supremica.automata.*;
 import org.supremica.gui.animators.scenebeans.*;
 

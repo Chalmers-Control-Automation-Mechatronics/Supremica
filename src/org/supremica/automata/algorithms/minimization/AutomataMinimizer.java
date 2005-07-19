@@ -47,12 +47,15 @@
  *
  * Supremica is owned and represented by KA.
  */
-package org.supremica.automata.algorithms;
+package org.supremica.automata.algorithms.minimization;
 
 import org.supremica.log.*;
 import org.supremica.automata.*;
+import org.supremica.automata.algorithms.*;
 import org.supremica.gui.*;
 import org.supremica.util.ActionTimer;
+
+import java.util.*;
 
 public class AutomataMinimizer
 	implements Stoppable
@@ -118,6 +121,9 @@ public class AutomataMinimizer
 			executionDialog.initProgressBar(0, theAutomata.size()-1);
 		}
 
+		// Initialize statistics count
+		AutomatonMinimizer.resetTotal();
+
 		// For each event, find the automata that has this event in its alphabet
 		if (options.getMinimizationStrategy() == MinimizationStrategy.AtLeastOneUnique)
 		{
@@ -141,7 +147,7 @@ public class AutomataMinimizer
 			// Perform the minimization, unless of course this is the last step
 			// and it should be skipped...
 			Automaton min;
- 			if (options.getSkipLast() && theAutomata.size() == 2)
+ 			if (options.getSkipLast() && (theAutomata.size() == automata.size()))
 			{
 				// Just synch and hide
 				min = AutomataSynchronizer.synchronizeAutomata(automata);
@@ -197,13 +203,13 @@ public class AutomataMinimizer
 
 		// Print total reduction statistics
 		AutomatonMinimizer.printTotal();
-		AutomatonMinimizer.resetTotal();
 
 		// Present largest automaton size
 		logger.verbose("The automaton with the most states had " + mostStates + " states.");
 		logger.verbose("The automaton with the most transitions had " + mostTransitions + " transitions.");
 
 		// Return the result of the minimization!
+		assert(theAutomata.size() == 1);
 		return theAutomata.getFirstAutomaton();
 	}
 
@@ -243,16 +249,74 @@ public class AutomataMinimizer
 
 		// Which strategy should be used to select the next task?
 		MinimizationStrategy strategy = options.getMinimizationStrategy();
-		if (strategy == MinimizationStrategy.BestPair)
+		if ((strategy == MinimizationStrategy.BestPair) || 
+			(strategy == MinimizationStrategy.MostStatesFirst) ||
+			(strategy == MinimizationStrategy.FewestStatesFirst) ||
+			(strategy == MinimizationStrategy.MostTransitionsFirst) ||
+			(strategy == MinimizationStrategy.FewestTransitionsFirst))
 		{
-			result = new Automata();
-
-			// Get any automaton
-			Automaton autA = theAutomata.getFirstAutomaton();
-			Alphabet alphaA = autA.getAlphabet();
+			Automaton autA = null;
+			if (strategy == MinimizationStrategy.BestPair)
+			{
+				// Get any automaton
+				autA = theAutomata.getFirstAutomaton();
+			}
+			else if (strategy == MinimizationStrategy.MostStatesFirst)
+			{
+				// Find biggest (in states) automaton
+				for (Iterator<Automaton> autIt = theAutomata.iterator(); autIt.hasNext(); )
+				{
+					Automaton aut = autIt.next();
+					
+					if ((autA == null) || (autA.nbrOfStates() < aut.nbrOfStates()))
+					{
+						autA = aut;
+					}
+				}
+			}
+			else if (strategy == MinimizationStrategy.FewestStatesFirst)
+			{
+				// Find smallest (in states) automaton
+				for (Iterator<Automaton> autIt = theAutomata.iterator(); autIt.hasNext(); )
+				{
+					Automaton aut = autIt.next();
+					
+					if ((autA == null) || (aut.nbrOfStates() < autA.nbrOfStates()))
+					{
+						autA = aut;
+					}
+				}
+			}
+			else if (strategy == MinimizationStrategy.MostTransitionsFirst)
+			{
+				// Find biggest (in transitions) automaton
+				for (Iterator<Automaton> autIt = theAutomata.iterator(); autIt.hasNext(); )
+				{
+					Automaton aut = autIt.next();
+					
+					if ((autA == null) || (autA.nbrOfTransitions() < aut.nbrOfTransitions()))
+					{
+						autA = aut;
+					}
+				}
+			}
+			else if (strategy == MinimizationStrategy.FewestTransitionsFirst)
+			{
+				// Find smallest (in transitions) automaton
+				for (Iterator<Automaton> autIt = theAutomata.iterator(); autIt.hasNext(); )
+				{
+					Automaton aut = autIt.next();
+					
+					if ((autA == null) || (aut.nbrOfTransitions() < autA.nbrOfTransitions()))
+					{
+						autA = aut;
+					}
+				}
+			}
 
 			// Find the pair (in which autA is a part) with the highest
 			// "unique to total" (number of events) ratio
+			Alphabet alphaA = autA.getAlphabet();
 			double bestUniqueRatio = 0;
 			double bestCommonRatio = 0;
 			int bestSize = Integer.MAX_VALUE;
@@ -330,6 +394,7 @@ public class AutomataMinimizer
 			}
 
 			// Generate result
+			result = new Automata();
 			result.addAutomaton(autA);
 			result.addAutomaton(bestAutB);
 			if (hideThese == null)

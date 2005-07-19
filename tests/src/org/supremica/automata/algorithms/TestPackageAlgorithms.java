@@ -51,6 +51,7 @@ package org.supremica.automata.algorithms;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+import org.supremica.automata.algorithms.minimization.TestAutomatonMinimizer;
 
 public class TestPackageAlgorithms
 	extends TestCase

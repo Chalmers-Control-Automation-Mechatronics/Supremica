@@ -46,7 +46,7 @@
  *
  *  Supremica is owned and represented by KA.
  */
-package org.supremica.automata.algorithms;
+package org.supremica.automata.algorithms.minimization;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -54,6 +54,7 @@ import junit.framework.TestSuite;
 
 import org.supremica.testhelpers.*;
 import org.supremica.automata.*;
+import org.supremica.automata.algorithms.*;
 import org.supremica.automata.algorithms.minimization.BisimulationEquivalenceMinimizer;
 import org.supremica.automata.IO.*;
 

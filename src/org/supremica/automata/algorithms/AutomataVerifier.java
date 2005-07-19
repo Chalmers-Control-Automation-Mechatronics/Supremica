@@ -63,6 +63,8 @@ import org.supremica.automata.AutomatonIterator;
 import org.supremica.automata.State;
 import org.supremica.automata.Arc;
 import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.algorithms.minimization.MinimizationOptions;
+import org.supremica.automata.algorithms.minimization.AutomataMinimizer;
 import org.supremica.automata.algorithms.standard.Determinizer;
 import org.supremica.util.BDD.*;
 import org.supremica.properties.SupremicaProperties;

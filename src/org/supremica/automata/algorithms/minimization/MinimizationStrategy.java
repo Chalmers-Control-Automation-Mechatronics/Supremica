@@ -47,7 +47,7 @@
  *
  * Supremica is owned and represented by KA.
  */
-package org.supremica.automata.algorithms;
+package org.supremica.automata.algorithms.minimization;
 
 import java.util.*;
 
@@ -58,6 +58,14 @@ public class MinimizationStrategy
 		new MinimizationStrategy("Best pair", true);
 	public static final MinimizationStrategy AtLeastOneUnique = 
 		new MinimizationStrategy("At least one unique", true);
+	public static final MinimizationStrategy MostStatesFirst = 
+		new MinimizationStrategy("Most states first", true);
+	public static final MinimizationStrategy FewestStatesFirst = 
+		new MinimizationStrategy("Fewest states first", true);
+	public static final MinimizationStrategy MostTransitionsFirst = 
+		new MinimizationStrategy("Most transitions first", true);
+	public static final MinimizationStrategy FewestTransitionsFirst = 
+		new MinimizationStrategy("Fewest transitions first", true);
 	public static final MinimizationStrategy Undefined = 
 		new MinimizationStrategy("Undefined", false);
 	private String description = null;

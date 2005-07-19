@@ -49,8 +49,8 @@
  */
 package org.supremica.gui;
 
-import org.supremica.automata.algorithms.MinimizationOptions;
-import org.supremica.automata.algorithms.MinimizationStrategy;
+import org.supremica.automata.algorithms.minimization.MinimizationOptions;
+import org.supremica.automata.algorithms.minimization.MinimizationStrategy;
 import org.supremica.automata.algorithms.EquivalenceRelation;
 import org.supremica.automata.algorithms.minimization.BisimulationEquivalenceMinimizer;
 import java.awt.*;
