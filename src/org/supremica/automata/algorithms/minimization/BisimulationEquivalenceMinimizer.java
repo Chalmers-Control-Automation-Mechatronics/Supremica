@@ -202,6 +202,7 @@ public class BisimulationEquivalenceMinimizer
                         }
                     }
                 }
+				//logger.error("Number of transitions " + transitionCount);
                 // Now, do the same thing again, and put the info in the array
                 transitions = new int[transitionCount*3];
                 int index = 0;

@@ -241,6 +241,7 @@ public class TestAutomatonMinimizer
                 options.setCompositionalMinimization(false);
                 options.setAlsoTransitions(true);
                 options.setKeepOriginal(true);
+				options.setMinimizationStrategy(MinimizationStrategy.MostStatesFirst);
                 Automaton newAutomaton = minimizer.getMinimizedAutomaton(options);
                 min.addAutomaton(newAutomaton);
             }

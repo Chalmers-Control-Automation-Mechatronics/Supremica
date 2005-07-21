@@ -39,7 +39,7 @@
  *
  * COMPILING INSTRUCTIONS
  *
- * Note that you probably have to change the folders to include.
+ * Note that you probably have to change the folders below!
  *
  * Compiling on Windows:
  *

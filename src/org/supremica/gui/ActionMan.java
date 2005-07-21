@@ -1499,6 +1499,7 @@ public class ActionMan
 		// Get the current options and allow the user to change them...
 		VerificationOptions vOptions = new VerificationOptions();
 		MinimizationOptions mOptions = MinimizationOptions.getDefaultVerificationOptions();
+		//MinimizationOptions mOptions = new MinimizationOptions();
 		VerificationDialog verificationDialog = new VerificationDialog(gui.getFrame(), vOptions, mOptions);
 		verificationDialog.show();
 		if (!vOptions.getDialogOK())

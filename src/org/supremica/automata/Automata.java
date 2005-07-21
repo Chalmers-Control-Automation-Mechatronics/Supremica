@@ -53,6 +53,7 @@ import java.util.*;
 import org.supremica.log.*;
 import org.supremica.gui.Gui;
 import javax.swing.JOptionPane;
+import java.awt.Toolkit;
 
 /**
  * An ordered set of Automaton-objects.
@@ -666,19 +667,8 @@ public class Automata
 	 * Returns true if there are no events with alphabetically equal names, i.e.
 	 * lowercase equal.
 	 */
-	public boolean isEventNamesSafe()
+	private boolean isEventNamesSafe(Alphabet unionAlphabet)
 	{
-		// Get the union alphabet (ignoring consistency here)
-		Alphabet unionAlphabet = null;
-		try
-		{
-			unionAlphabet = AlphabetHelpers.getUnionAlphabet(this, false, false);
-		}
-		catch (Exception ex)
-		{
-			logger.error(ex);
-		}
-
 		// Check that there are no spaces in the start or end of event names!
 		for (EventIterator evIt = unionAlphabet.iterator(); evIt.hasNext(); )
 		{
@@ -697,7 +687,7 @@ public class Automata
 	 * Returns true if the system is really several systems, i.e. can be divided into sets of
 	 * automata that have disjoint alphabets.
 	 */
-	public boolean isSeveralSystems()
+	private boolean isSeveralSystems()
 	{
 		Automata autA = new Automata(this.getFirstAutomaton());
 		Alphabet unionAlpha = autA.getUnionAlphabet();
@@ -769,20 +759,8 @@ public class Automata
 	/**
 	 * Returns true if the controllability is consistent through all the automata.
 	 */
-	public boolean isEventEpsilonConsistent()
+	private boolean isEventEpsilonConsistent(Alphabet unionAlphabet)
 	{
-		// Get the union alphabet, ignoring consistency for now
-		Alphabet unionAlphabet = null;
-
-		try
-		{
-			unionAlphabet = AlphabetHelpers.getUnionAlphabet(this, false, false);
-		}
-		catch (Exception ex)
-		{
-			logger.error(ex);
-		}
-
 		// Iterate over the alphabet and examine all automata
 		for (EventIterator evIt = unionAlphabet.iterator(); evIt.hasNext(); )
 		{
@@ -813,9 +791,8 @@ public class Automata
 	 */
 	public boolean isEventControllabilityConsistent()
 	{
-		// Get the union alphabet, ignoring consistency for now
+		// Get the union alphabet (ignoring consistency here)
 		Alphabet unionAlphabet = null;
-
 		try
 		{
 			unionAlphabet = AlphabetHelpers.getUnionAlphabet(this, false, false);
@@ -824,7 +801,14 @@ public class Automata
 		{
 			logger.error(ex);
 		}
-
+		
+		return isEventControllabilityConsistent(unionAlphabet);
+	}
+	/**
+	 * Returns true if the controllability is consistent through all the automata.
+	 */
+	public boolean isEventControllabilityConsistent(Alphabet unionAlphabet)
+	{
 		// Iterate over the alphabet and examine all automata
 		for (EventIterator evIt = unionAlphabet.iterator(); evIt.hasNext(); )
 		{
@@ -1395,9 +1379,20 @@ public class Automata
 			return false;
 		}
 
+		// Get the union alphabet (ignoring consistency here)
+		Alphabet unionAlphabet = null;
+		try
+		{
+			unionAlphabet = AlphabetHelpers.getUnionAlphabet(this, false, false);
+		}
+		catch (Exception ex)
+		{
+			logger.error(ex);
+		}
+
 		// Warns if there are events with equal (lowercase) names.
 		// Always do this check (irritating? well yes... but those are really bad names!)
-		if (!isEventNamesSafe())
+		if (!isEventNamesSafe(unionAlphabet))
 		{
 			// Warning has been written in log window by isEventNamesSafe.
 		}
@@ -1405,12 +1400,12 @@ public class Automata
 		// Examines controllability consistency
 		if (mustBeControllabilityConsistent)
 		{
-			if (!isEventControllabilityConsistent())
+			if (!isEventControllabilityConsistent(unionAlphabet))
 			{
 				return false;
 			}
 
-			if (!isEventEpsilonConsistent())
+			if (!isEventEpsilonConsistent(unionAlphabet))
 			{
 				return false;
 			}

@@ -274,9 +274,6 @@ public class AutomatonMinimizer
             throw new Exception("Unknown equivalence relation");
         }
 
-		// Start listening again
-        theAutomaton.endTransaction();
-
         if (stopRequested)
         {
             return null;
@@ -287,10 +284,11 @@ public class AutomatonMinimizer
 		if (BisimulationEquivalenceMinimizer.libraryLoaded())
 		{
 			// Partition using native methods
-          BisimulationEquivalenceMinimizer.minimize(theAutomaton, useShortNames, false);
+			BisimulationEquivalenceMinimizer.minimize(theAutomaton, useShortNames, false);
 		}
 		else
 		{
+			logger.info("I should not be here!");
 			// Partition using naive methods
         	EquivalenceClasses equivClasses = new EquivalenceClasses();
         	try
@@ -362,6 +360,9 @@ public class AutomatonMinimizer
         logger.verbose("There were " + before + " states before and " + after +
                        " states after the minimization. Reduction: " +
                        Math.round(100*(((double) (before-after))*100/before))/100.0 + "%.");
+
+		// Start listening again
+        theAutomaton.endTransaction();
 
         // Return the result of the minimization!
         return theAutomaton;
@@ -899,22 +900,6 @@ public class AutomatonMinimizer
                 int countArcs = removeRedundantTransitions(aut);
 
                 // Merge conflict equivalent states and stuff...
-                // Rule A
-                int countA = 0;
-                if (options.getUseRuleA())
-                {
-                    countA += ruleA(aut);
-                    totalA += countA;
-                }
-                if (options.getUseRuleA())
-                {
-                    countA += ruleAA(aut);
-                    totalA += countA;
-                }
-                if (countA > 0)
-                {
-                    countArcs += removeRedundantTransitions(aut);
-                }
                 // Rule B
                 int countB = 0;
                 if (options.getUseRuleB())
@@ -923,6 +908,23 @@ public class AutomatonMinimizer
                     totalB += countB;
                 }
                 if (countB > 0)
+                {
+                    countArcs += removeRedundantTransitions(aut);
+                }
+                // Rule A
+                int countA = 0;
+                if (options.getUseRuleA())
+                {
+                    countA += ruleA(aut);
+                    totalA += countA;
+                }
+                // Rule AA
+                if (options.getUseRuleAA())
+                {
+                    countA += ruleAA(aut);
+                    totalA += countA;
+                }
+                if (countA > 0)
                 {
                     countArcs += removeRedundantTransitions(aut);
                 }
@@ -1032,9 +1034,9 @@ public class AutomatonMinimizer
 			}
 			list.add(info);
 		}
-
-       return countA;
-    }
+		
+		return countA;
+    }	
 	/*
 	{
         ////////////
@@ -1169,15 +1171,22 @@ public class AutomatonMinimizer
             if (ok && (one.nbrOfIncomingArcs() == one.nbrOfIncomingEpsilonArcs()))
             {
                 // "Copy" outgoing arcs from one to the previous states.
-                for (ArcIterator inIt = one.incomingArcsIterator(); inIt.hasNext(); )
+                for (Iterator<Arc> inIt = one.incomingArcsIterator(); inIt.hasNext(); )
                 {
-                    Arc inArc = inIt.nextArc();
-                    assert(!(inArc.getEvent().isEpsilon() && inArc.isSelfLoop())); // No epsilon selfloops!
+                    Arc inArc = inIt.next();
+					// Skip selfloops... I though there wouldn't be any!?? 
+					// But they may appear as a result of this rule!!!
+					if (inArc.isSelfLoop())
+						continue;
                     State fromState = inArc.getFromState(); 
-
+					
                     for (ArcIterator outIt = one.outgoingArcsIterator(); outIt.hasNext(); )
                     {
                         Arc arc = outIt.nextArc();
+						// Skip selfloops... I though there wouldn't be any!?? /hguo
+						// But they may appear as a result of this rule!!!
+						if ((arc.getEvent().isEpsilon() && arc.isSelfLoop()))
+							continue;
                         State toState = arc.getToState(); 
                         LabeledEvent event = arc.getEvent();
 
@@ -1589,7 +1598,7 @@ public class AutomatonMinimizer
 
     public static void printTotal()
     {
-        logger.verbose("Totally: A: " + totalA + ", B: " + totalB + ", C: " + totalC + ", D: " + totalD + ", F: " + totalF + ", OE: " + totalOE + ", Arcs: " + totalArcs + ".");
+        logger.verbose("Reduction statistics: A: " + totalA + ", B: " + totalB + ", C: " + totalC + ", D: " + totalD + ", F: " + totalF + ", OE: " + totalOE + ", Arcs: " + totalArcs + ".");
     }
     public static void resetTotal()
     {

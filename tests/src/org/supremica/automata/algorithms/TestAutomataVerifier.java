@@ -54,6 +54,7 @@ import junit.framework.TestSuite;
 
 import org.supremica.testhelpers.*;
 import org.supremica.automata.*;
+import org.supremica.automata.algorithms.minimization.*;
 import org.supremica.automata.IO.*;
 
 public class TestAutomataVerifier
@@ -157,7 +158,22 @@ public class TestAutomataVerifier
 			ProjectBuildFromXml builder = new ProjectBuildFromXml();
 			Project theProject = builder.build(TestFiles.getFile(TestFiles.SimpleManufacturingExample));
 
-			assertTrue(AutomataVerifier.verifyModularNonblocking(theProject));
+			VerificationOptions verificationOptions;
+			SynchronizationOptions synchronizationOptions;
+			MinimizationOptions minimizationOptions;
+			
+			AutomataVerifier verifier;
+
+			verificationOptions = VerificationOptions.getDefaultNonblockingOptions();
+			synchronizationOptions = SynchronizationOptions.getDefaultVerificationOptions();
+			minimizationOptions = MinimizationOptions.getDefaultNonblockingOptions();
+			minimizationOptions.setMinimizationStrategy(MinimizationStrategy.MostStatesFirst);
+			verifier = new AutomataVerifier(theProject, verificationOptions, synchronizationOptions, minimizationOptions);
+			assertTrue(verifier.verify());
+
+			minimizationOptions.setMinimizationStrategy(MinimizationStrategy.FewestTransitionsFirst);
+			verifier = new AutomataVerifier(theProject, verificationOptions, synchronizationOptions, minimizationOptions);
+			assertTrue(verifier.verify());
 		}
 		catch (Exception ex)
 		{

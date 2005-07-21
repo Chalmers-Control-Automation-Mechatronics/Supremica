@@ -152,6 +152,16 @@ public class AutomataMinimizer
 				// Just synch and hide
 				min = AutomataSynchronizer.synchronizeAutomata(automata);
 				min.hide(hideThese);
+
+				// Examine for largest sizes
+				if (min.nbrOfStates() > mostStates)
+				{
+					mostStates = min.nbrOfStates();
+				}
+				if (min.nbrOfTransitions() > mostTransitions)
+				{
+					mostTransitions = min.nbrOfTransitions();
+				}				
 			}
 			else
 			{
@@ -249,17 +259,21 @@ public class AutomataMinimizer
 
 		// Which strategy should be used to select the next task?
 		MinimizationStrategy strategy = options.getMinimizationStrategy();
-		if ((strategy == MinimizationStrategy.BestPair) || 
+		if ((strategy == MinimizationStrategy.RandomOrder) || 
 			(strategy == MinimizationStrategy.MostStatesFirst) ||
 			(strategy == MinimizationStrategy.FewestStatesFirst) ||
 			(strategy == MinimizationStrategy.MostTransitionsFirst) ||
-			(strategy == MinimizationStrategy.FewestTransitionsFirst))
+			(strategy == MinimizationStrategy.FewestTransitionsFirst) ||
+			(strategy == MinimizationStrategy.MostEventsFirst) ||
+			(strategy == MinimizationStrategy.FewestEventsFirst))
 		{
 			Automaton autA = null;
-			if (strategy == MinimizationStrategy.BestPair)
+			if (strategy == MinimizationStrategy.RandomOrder)
 			{
-				// Get any automaton
-				autA = theAutomata.getFirstAutomaton();
+				// Get random automaton
+				//autA = theAutomata.getFirstAutomaton();
+				int i = (int) Math.floor(Math.random()*theAutomata.size());
+				autA = theAutomata.getAutomatonAt(i);
 			}
 			else if (strategy == MinimizationStrategy.MostStatesFirst)
 			{
@@ -313,6 +327,32 @@ public class AutomataMinimizer
 					}
 				}
 			}
+			else if (strategy == MinimizationStrategy.MostEventsFirst)
+			{
+				// Find biggest (in events) automaton
+				for (Iterator<Automaton> autIt = theAutomata.iterator(); autIt.hasNext(); )
+				{
+					Automaton aut = autIt.next();
+					
+					if ((autA == null) || (autA.nbrOfEvents() < aut.nbrOfEvents()))
+					{
+						autA = aut;
+					}
+				}
+			}
+			else if (strategy == MinimizationStrategy.FewestEventsFirst)
+			{
+				// Find smallest (in events) automaton
+				for (Iterator<Automaton> autIt = theAutomata.iterator(); autIt.hasNext(); )
+				{
+					Automaton aut = autIt.next();
+					
+					if ((autA == null) || (aut.nbrOfEvents() < autA.nbrOfEvents()))
+					{
+						autA = aut;
+					}
+				}
+			}
 
 			// Find the pair (in which autA is a part) with the highest
 			// "unique to total" (number of events) ratio
@@ -322,10 +362,15 @@ public class AutomataMinimizer
 			int bestSize = Integer.MAX_VALUE;
 			Automaton bestAutB = null;
 			hideThese = null;
-			for (int i=1; i<theAutomata.size(); i++)
+			for (int i=0; i<theAutomata.size(); i++)
 			{
 				Automaton autB = theAutomata.getAutomatonAt(i);
 				Alphabet alphaB = autB.getAlphabet();
+
+				if (autA == autB)
+				{
+					continue;
+				}
 
 				// If there are no common events, try next automaton
 				int nbrOfCommonEvents = alphaA.nbrOfCommonEvents(alphaB);
@@ -341,22 +386,23 @@ public class AutomataMinimizer
 					continue;
 				}
 
-				// Calculate the alphabet of unique events
+				// Calculate the alphabet of unique events (not just this one line!!)
 				Alphabet uniqueEvents = AlphabetHelpers.union(alphaA, alphaB);
 				// The targetAlphabet should not be removed (although those events may be "unique")!
 				uniqueEvents.minus(options.getTargetAlphabet());
 				// Remove events that are present in other automata
-				for (int j=1; j<theAutomata.size(); j++)
+				for (int j=0; j<theAutomata.size(); j++)
 				{
-					// Skip autB (and autA since we iterate from 1 instead of 0)
-					if (i == j)
+					Automaton autC = theAutomata.getAutomatonAt(j);
+					Alphabet alphaC = autC.getAlphabet();
+
+					// Skip autB and autA since we iterate from 1 instead of 0)
+					if ((i == j) || (autA == autC))
 					{
 						continue;
 					}
 
 					// Remove the events that are present in C, they are not unique to A and B.
-					Automaton autC = theAutomata.getAutomatonAt(j);
-					Alphabet alphaC = autC.getAlphabet();
 					uniqueEvents.minus(alphaC);
 
 					// Early termination

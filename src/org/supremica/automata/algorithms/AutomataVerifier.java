@@ -64,6 +64,7 @@ import org.supremica.automata.State;
 import org.supremica.automata.Arc;
 import org.supremica.automata.LabeledEvent;
 import org.supremica.automata.algorithms.minimization.MinimizationOptions;
+import org.supremica.automata.algorithms.minimization.MinimizationStrategy;
 import org.supremica.automata.algorithms.minimization.AutomataMinimizer;
 import org.supremica.automata.algorithms.standard.Determinizer;
 import org.supremica.util.BDD.*;
@@ -2036,6 +2037,7 @@ public class AutomataVerifier
 		verificationOptions = VerificationOptions.getDefaultNonblockingOptions();
 		synchronizationOptions = SynchronizationOptions.getDefaultVerificationOptions();
 		minimizationOptions = MinimizationOptions.getDefaultNonblockingOptions();
+		minimizationOptions.setMinimizationStrategy(MinimizationStrategy.FewestTransitionsFirst);
 
 		AutomataVerifier verifier = new AutomataVerifier(automata, verificationOptions, synchronizationOptions, minimizationOptions);
 

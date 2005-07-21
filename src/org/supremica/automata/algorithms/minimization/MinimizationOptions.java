@@ -118,7 +118,7 @@ public final class MinimizationOptions
 			 SupremicaProperties.minimizationAlsoTransitions(),
 			 SupremicaProperties.minimizationKeepOriginal(),
 			 SupremicaProperties.minimizationIgnoreMarking(),
-			 MinimizationStrategy.BestPair);
+			 SupremicaProperties.minimizationStrategy());
 	}
 
 	/**
@@ -295,6 +295,7 @@ public final class MinimizationOptions
 		SupremicaProperties.setMinimizationAlsoTransitions(alsoTransitions);
 		SupremicaProperties.setMinimizationKeepOriginal(keepOriginal);
 		SupremicaProperties.setMinimizationIgnoreMarking(ignoreMarking);
+		SupremicaProperties.setMinimizationStrategy(minimizationStrategy);
 	}
 
 	/**
@@ -322,7 +323,7 @@ public final class MinimizationOptions
 		options.setCompositionalMinimization(true);
 		options.setSkipLast(true);
 		options.setTargetAlphabet(new Alphabet()); 
-		options.setMinimizationStrategy(MinimizationStrategy.BestPair);
+		options.setMinimizationStrategy(MinimizationStrategy.FewestTransitionsFirst);
 		return options;
 	}
 

@@ -1033,7 +1033,7 @@ public class State
         return false;
     }
     /**
-     * Returns true if an event is enabled in this state.
+     * Returns true if an event is enabled .
      */
     public boolean isEnabled(LabeledEvent event)
     {

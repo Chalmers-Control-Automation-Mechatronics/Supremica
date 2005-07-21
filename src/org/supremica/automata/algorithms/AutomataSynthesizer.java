@@ -99,11 +99,6 @@ public class AutomataSynthesizer
 		this.maximallyPermissive = synthesizerOptions.getMaximallyPermissive();
 
 		// Some sanity tests (should already have been tested from ActionMan?)
-		if (!theAutomata.isEventControllabilityConsistent())
-		{
-			throw new IllegalArgumentException("The automata are not consistent in " + 
-											   "the controllability of some event.");
-		}
 		if ((synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.Modular) && 
 			!theAutomata.isAllEventsPrioritized())
 		{

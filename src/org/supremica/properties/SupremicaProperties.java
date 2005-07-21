@@ -56,6 +56,7 @@ import org.supremica.automata.algorithms.SynthesisAlgorithm;
 import org.supremica.automata.algorithms.VerificationType;
 import org.supremica.automata.algorithms.VerificationAlgorithm;
 import org.supremica.automata.algorithms.EquivalenceRelation;
+import org.supremica.automata.algorithms.minimization.MinimizationStrategy;
 import org.supremica.util.BDD.Options;
 
 /**
@@ -156,6 +157,7 @@ public final class SupremicaProperties
 	private static final String MINIMIZATION_ALSO_MINIMIZE_TRANSITIONS = "minimizationAlsoMinimizaTransitions";
 	private static final String MINIMIZATION_KEEP_ORIGINAL = "minimizationKeepOriginal";
 	private static final String MINIMIZATION_IGNORE_MARKING = "minimizationIgnoreMarking";
+	private static final String MINIMIZATION_STRATEGY = "minimizationStrategy";
 
 	// BDD Options. note that these mirror the stuff in org.supremica.util.BDD.Options
 	private static final String BDD_SHOW_GROW = "bddShowGrowth";
@@ -316,6 +318,7 @@ public final class SupremicaProperties
 		setProperty(MINIMIZATION_ALSO_MINIMIZE_TRANSITIONS, "true", true);
 		setProperty(MINIMIZATION_KEEP_ORIGINAL, "true", true);
 		setProperty(MINIMIZATION_IGNORE_MARKING, "false", true);
+		setProperty(MINIMIZATION_STRATEGY, MinimizationStrategy.FewestTransitionsFirst.toString(), true);
 		// Simulation stuff
 		setProperty(SIMULATION_IS_EXTERNAL, "false", false);
 		setProperty(SIMULATION_CYCLE_TIME, "100", false);
@@ -1302,6 +1305,14 @@ public final class SupremicaProperties
 	public static void setMinimizationIgnoreMarking(boolean bool)
 	{
 		wp.setProperty(MINIMIZATION_IGNORE_MARKING, toString(bool));
+	}
+	public static MinimizationStrategy minimizationStrategy()
+	{
+		return MinimizationStrategy.toStrategy(wp.getProperty(MINIMIZATION_STRATEGY));
+	}
+	public static void setMinimizationStrategy(MinimizationStrategy strategy)
+	{
+		wp.setProperty(MINIMIZATION_STRATEGY, strategy.toString());
 	}
 
 	// Simulation

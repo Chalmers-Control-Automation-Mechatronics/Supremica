@@ -54,8 +54,8 @@ import java.util.*;
 public class MinimizationStrategy
 {
 	private static Collection collection = new LinkedList();
-	public static final MinimizationStrategy BestPair = 
-		new MinimizationStrategy("Best pair", true);
+	public static final MinimizationStrategy RandomOrder = 
+		new MinimizationStrategy("Random order", true);
 	public static final MinimizationStrategy AtLeastOneUnique = 
 		new MinimizationStrategy("At least one unique", true);
 	public static final MinimizationStrategy MostStatesFirst = 
@@ -66,6 +66,10 @@ public class MinimizationStrategy
 		new MinimizationStrategy("Most transitions first", true);
 	public static final MinimizationStrategy FewestTransitionsFirst = 
 		new MinimizationStrategy("Fewest transitions first", true);
+	public static final MinimizationStrategy MostEventsFirst = 
+		new MinimizationStrategy("Most events first", true);
+	public static final MinimizationStrategy FewestEventsFirst = 
+		new MinimizationStrategy("Fewest events first", true);
 	public static final MinimizationStrategy Undefined = 
 		new MinimizationStrategy("Undefined", false);
 	private String description = null;
