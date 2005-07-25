@@ -7,6 +7,7 @@ import javax.swing.JToolBar;
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
+import javax.swing.undo.UndoableEdit;
 import javax.swing.undo.UndoManager;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
@@ -134,7 +135,7 @@ public class ModuleContainer implements UndoInterface
 		return getEditorPanel().getActiveEditorWindowInterface();
 	}
 
-	public void addUndoable(AbstractUndoableEdit e)
+	public void addUndoable(UndoableEdit e)
 	{
 		mUndoManager.addEdit(e);
 		ide.getActions().editorRedoAction.setEnabled(canRedo());
@@ -144,8 +145,8 @@ public class ModuleContainer implements UndoInterface
 	public void executeCommand(Command c)
 	{
 		c.execute();
-		if (c instanceof AbstractUndoableEdit) {
-			addUndoable((AbstractUndoableEdit)c);
+		if (c instanceof UndoableEdit) {
+			addUndoable((UndoableEdit)c);
 		}
 	}
 

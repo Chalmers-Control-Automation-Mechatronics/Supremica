@@ -3,6 +3,7 @@ package net.sourceforge.waters.gui.command;
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
+import javax.swing.undo.UndoableEdit;
 
 public interface UndoInterface
 {
@@ -11,7 +12,7 @@ public interface UndoInterface
      */
     public void executeCommand(Command c);
 
-    public void addUndoable(AbstractUndoableEdit e);
+    public void addUndoable(UndoableEdit e);
 
     public boolean canRedo();
 

@@ -127,7 +127,8 @@ public class ControlledSurface
 			}
 			else if (o.getType() == EditorObject.NODEGROUP)
 			{
-				delNodeGroup((EditorNodeGroup) o);
+			    Command deleteNodeGroup = new DeleteNodeGroupCommand(this, (EditorNodeGroup) o);
+			    root.getUndoInterface().executeCommand(deleteNodeGroup);			
 			}
 		}
 	}
@@ -274,16 +275,23 @@ public class ControlledSurface
 				// If NODEGROUP is active, we're adding a new group!
 				if (getCommand() == NODEGROUP)
 				{
-					EditorNodeGroup nodeGroup;
+				    //					EditorNodeGroup nodeGroup;
 					if (nodesSnap)
 					{
-						nodeGroup = addNodeGroup(findGrid(e.getX()), findGrid(e.getY()), 0, 0);
+					    //						nodeGroup = addNodeGroup(findGrid(e.getX()), findGrid(e.getY()), 0, 0);
+					    GroupNodeProxy n = new GroupNodeProxy("NodeGroup" + nodeGroups.size());
+					    n.setGeometry(new BoxGeometryProxy(findGrid(e.getX()), findGrid(e.getY()), 0, 0));
+					    newGroup = new EditorNodeGroup(n);
+
 					}
 					else
 					{
-						nodeGroup = addNodeGroup(e.getX(), e.getY(), 0, 0);
+					    //						nodeGroup = addNodeGroup(e.getX(), e.getY(), 0, 0);
+					    GroupNodeProxy n = new GroupNodeProxy("NodeGroup" + nodeGroups.size());
+					    n.setGeometry(new BoxGeometryProxy(e.getX(), e.getY(), 0, 0));
+					    newGroup = new EditorNodeGroup(n);
 					}
-					select(nodeGroup);
+					select(newGroup);
 				}
 			}
 			else
@@ -911,15 +919,24 @@ public class ControlledSurface
 			*/
 
 			// Stop resizing nodegroup
-			if (nodeGroupIsSelected() && (selectedObjects.size() == 1))
+			if (nodeGroupIsSelected() && (selectedObjects.size() == 1) && newGroup == null)
 			{
 				EditorNodeGroup ng = (EditorNodeGroup) selectedObjects.get(0);
 				ng.setResizingFalse();
 
 				if (ng.isEmpty())
 				{
-					delNodeGroup(ng);
+				    Command c = new DeleteNodeGroupCommand(this, ng);
+				    root.getUndoInterface().executeCommand(c);				 
 				}
+			}
+			if (newGroup != null) {
+			    System.out.println("creating Node");
+			    newGroup.setResizingFalse();
+			    Command c = new CreateNodeGroupCommand(this, newGroup);
+			    newGroup = null;
+			    root.getUndoInterface().executeCommand(c);
+			    System.out.println("Finished Node");
 			}
 
 			// Redefine edge if it has been changed

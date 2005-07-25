@@ -4,13 +4,14 @@
 //# PACKAGE: waters.gui
 //# CLASS:   ModuleWindow
 //###########################################################################
-//# $Id: ModuleWindow.java,v 1.12 2005-07-12 03:56:00 siw4 Exp $
+//# $Id: ModuleWindow.java,v 1.13 2005-07-25 02:31:27 siw4 Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
 import javax.swing.*;
 import javax.swing.tree.*;
 import javax.swing.event.*;
+import javax.swing.undo.UndoableEdit;
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
@@ -893,7 +894,7 @@ public class ModuleWindow
 		return module;
 	}
 
-	public void addUndoable(AbstractUndoableEdit e)
+	public void addUndoable(UndoableEdit e)
 	{
 		mUndoManager.addEdit(e);
 	}
@@ -901,8 +902,8 @@ public class ModuleWindow
 	public void executeCommand(Command c)
 	{
 		c.execute();
-		if (c instanceof AbstractUndoableEdit) {
-			addUndoable((AbstractUndoableEdit)c);
+		if (c instanceof UndoableEdit) {
+			addUndoable((UndoableEdit)c);
 		}
 	}
 

@@ -2,11 +2,11 @@ package net.sourceforge.waters.gui.command;
 
 import net.sourceforge.waters.gui.ControlledSurface;
 import net.sourceforge.waters.gui.EditorNode;
-import net.sourceforge.waters.gui.EditorEdge;
+import net.sourceforge.waters.gui.EditorNodeGroup;
+import net.sourceforge.waters.model.module.BoxGeometryProxy;
+import net.sourceforge.waters.model.module.GroupNodeProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 
-import java.util.Collection;
-import java.util.LinkedList;
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
@@ -17,36 +17,27 @@ import javax.swing.undo.CannotUndoException;
  * @author Simon Ware
  */
 
-public class DeleteNodeCommand
+public class CreateNodeGroupCommand
     extends AbstractUndoableEdit
     implements Command
 {
-    private boolean mFirstExecution = true;
+
     /** The ControlledSurface Edited with this Command */
     private final ControlledSurface mSurface;
-    /** The Node Removed by this Command */
-    private final EditorNode mDeleted;
-    /** the Edge Deletion Commands Associated with this Command */
-    private final Collection<DeleteEdgeCommand> mDelEdge = new LinkedList();
+    /** The Node Created by this Command */
+    private final EditorNodeGroup mCreated;
 
     /**
-     * Constructs a new DeleteNodeCommand with the specified surface and
-     * deletes the node specified
+     * Constructs a new CreateNodeCommand with the specified surface and
+     * creates the node in the x,y position specified
      *
      * @param surface the surface edited by this command
-     * @param node the node which is to be removed
+     * @param x,y the position upon which the node is created
      */
-    public DeleteNodeCommand(ControlledSurface surface, EditorNode node)
+    public CreateNodeGroupCommand(ControlledSurface surface, EditorNodeGroup created)
     {
 	mSurface = surface;
-	mDeleted = node;
-	//find all attached edges
-	for (Object o: surface.getEdges()) {
-	    EditorEdge e = (EditorEdge)o;
-	    if ((e.getEndNode() == node) || (e.getStartNode() == node)) {
-		mDelEdge.add(new DeleteEdgeCommand(mSurface, e));
-	    }
-	}
+	mCreated = created;       
     }
 
     /**
@@ -55,18 +46,8 @@ public class DeleteNodeCommand
 
     public void execute()
     {
-	if (mFirstExecution) {
-	    for (DeleteEdgeCommand d : mDelEdge) {
-		d.execute();
-	    }
-	} else {
-	    for (DeleteEdgeCommand d : mDelEdge) {
-		d.redo();
-	    }
-	}
-	mSurface.delNode(mDeleted);
+	mSurface.addNodeGroup(mCreated);
 	mSurface.getEditorInterface().setDisplayed();
-	mFirstExecution = false;
     }
 
     /** 
@@ -90,10 +71,7 @@ public class DeleteNodeCommand
     public void undo() throws CannotUndoException
     {
 	super.undo();
-	mSurface.addNode(mDeleted);
-	for (DeleteEdgeCommand d : mDelEdge) {
-	    d.undo();
-	}
+	mSurface.delNodeGroup(mCreated);
 	mSurface.getEditorInterface().setDisplayed();
     }
 }

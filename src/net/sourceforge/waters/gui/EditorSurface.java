@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.27 2005-07-13 01:16:10 siw4 Exp $
+//# $Id: EditorSurface.java,v 1.28 2005-07-25 02:31:27 siw4 Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -60,6 +60,7 @@ public class EditorSurface
 	protected boolean dragSelect = false;
 	protected EditorShade shade;
 	protected GraphProxy graph;
+    protected EditorNodeGroup newGroup = null;
 	private Rectangle drawnAreaBounds = null;
 	
 	public int getGridSize()
@@ -150,7 +151,7 @@ public class EditorSurface
 
 			for (int j = 0; j < nodeGroups.size(); j++)
 			{
-				EditorNodeGroup n2 = (EditorNodeGroup) nodeGroups.get(j);
+			    EditorNodeGroup n2 = (EditorNodeGroup) nodeGroups.get(j);
 
 				if (n2 == n)
 				{
@@ -185,7 +186,9 @@ public class EditorSurface
 					}
 				}
 			}
-
+			if (newGroup != null) {
+			    newGroup.drawObject(g);
+			}
 			for (int j = 0; j < nodes.size(); j++)
 			{
 				EditorNode n2 = (EditorNode) nodes.get(j);
@@ -392,6 +395,17 @@ public class EditorSurface
 		repaint();
 
 		return g;
+	}
+
+	public EditorNodeGroup addNodeGroup(EditorNodeGroup n)
+	{
+	    if(!graph.getNodes().contains(n.getProxy())) {
+		graph.getNodes().add(n.getProxy());
+	    }
+	    nodeGroups.add(n);
+	    examineCollisions();
+	    repaint();
+	    return n;
 	}
 
 	/*
