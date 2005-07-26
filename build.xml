@@ -234,7 +234,6 @@
 <target name="compile_supremica" depends="startfiles_local_supremica">
 	<javac
 	    debug="true"
-		debuglevel="source,lines"
 		srcdir="${src}"
 		destdir="${build}"
 		classpath="${lib}/${unjared}"
@@ -822,6 +821,8 @@
 			<pathelement location="${dist}/SupremicaLib.jar" />
 			<pathelement path="${java.class.path}" />
 		</classpath>
+                <arg value="Kulbana_composit.sys"/>
+                <arg value="${examples}/functionblocks/FBRuntime"/>
 	</java>
 </target>
 
