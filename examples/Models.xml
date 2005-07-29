@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Automata name="Models" major="0" minor="9">
+<Automaton name="P1" type="Plant">
+	<Events>
+		<Event id="0" label="a"/>
+		<Event id="1" label="b"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" accepting="true"/>
+		<State id="1" name="q1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="0" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="P2" type="Plant">
+	<Events>
+		<Event id="0" label="c"/>
+		<Event id="1" label="d"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" accepting="true"/>
+		<State id="1" name="q1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="0" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="S" type="Specification">
+	<Events>
+		<Event id="0" label="b"/>
+		<Event id="1" label="c"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" accepting="true"/>
+		<State id="1" name="q1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="0" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Sys" type="Specification">
+	<Events>
+		<Event id="0" label="a"/>
+		<Event id="1" label="b"/>
+		<Event id="2" label="c"/>
+		<Event id="3" label="d"/>
+	</Events>
+	<States>
+		<State id="0" name="q0.q0.q0" initial="true" accepting="true"/>
+		<State id="1" name="q0.q0.q1"/>
+		<State id="2" name="q0.q1.q0"/>
+		<State id="3" name="q0.q1.q1"/>
+		<State id="4" name="q1.q0.q0"/>
+		<State id="5" name="q1.q0.q1"/>
+		<State id="6" name="q1.q1.q0"/>
+		<State id="7" name="q1.q1.q1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="4" event="0"/>
+		<Transition source="1" dest="5" event="0"/>
+		<Transition source="1" dest="2" event="2"/>
+		<Transition source="2" dest="6" event="0"/>
+		<Transition source="2" dest="0" event="3"/>
+		<Transition source="3" dest="7" event="0"/>
+		<Transition source="3" dest="1" event="3"/>
+		<Transition source="4" dest="1" event="1"/>
+		<Transition source="5" dest="6" event="2"/>
+		<Transition source="6" dest="3" event="1"/>
+		<Transition source="6" dest="4" event="3"/>
+		<Transition source="7" dest="5" event="3"/>
+	</Transitions>
+</Automaton>
+</Automata>
