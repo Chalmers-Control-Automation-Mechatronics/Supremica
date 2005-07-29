@@ -32,12 +32,12 @@
 		<ECTransition Source="STATE" Destination="INIT" Condition="1" />
     </ECC>
     <Algorithm Name="TestAlg">
-    <Other Language="Java" Text=
-	"invoked = invoked + 1;
-	DO = DI + 1;
-	System.out.println(&#34;TestType.fbt:TestAlg;invoked: &#34; + invoked + &#34; times.&#34;);
-	System.out.println(&#34;TestType.fbt:TestAlg; DO: &#34; + DO + &#34;.&#34;);"
-	/>	
+      <Other Language="Java" Text="
+        invoked = invoked + 1;
+		DO = DI + 1;
+		System.out.println(&#34;TestType.fbt:TestAlg;invoked: &#34; + invoked + &#34; times.&#34;);
+		System.out.println(&#34;TestType.fbt:TestAlg; DO:&#34; + DO + &#34;.&#34;);
+	  " />	
     </Algorithm>
   </BasicFB>
 </FBType>

@@ -95,7 +95,7 @@ public class Variables
 
 	public String toString()
 	{
-		String thisVars = "[";
+		String thisVars = "\n[";
 		for(Iterator iter = variables.keySet().iterator();iter.hasNext();)
 		{
 			String curName = (String )iter.next();

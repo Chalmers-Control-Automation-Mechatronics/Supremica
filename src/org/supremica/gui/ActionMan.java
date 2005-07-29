@@ -3643,34 +3643,35 @@ public class ActionMan
 	{
 		// Automata selectedProject = gui.getselectedProject();
 		Project selectedProject = gui.getSelectedProject();
-
-		if (selectedProject.size() < 1) {
+		
+		if (selectedProject.size() < 2)
+		{
 			JOptionPane.showMessageDialog(
-						      gui.getComponent(),
-						      "At least one automaton must be selected!",
-						      "Alert",
-						      JOptionPane.ERROR_MESSAGE);
-
+										  gui.getComponent(),
+										  "At least two automatons must be selected!",
+										  "Alert",
+										  JOptionPane.ERROR_MESSAGE);
+			
 			return;
 		}
 
-		JFileChooser fileExporter = FileDialogs.getExportFileChooser(FileFormats.FBT);
+		JFileChooser fileExporter = FileDialogs.getExportFileChooser(FileFormats.SYS);
 
 		if (fileExporter.showSaveDialog(gui.getComponent()) == JFileChooser.APPROVE_OPTION)
 		{
-			File currFile = fileExporter.getSelectedFile();
+			File theFile = fileExporter.getSelectedFile();
 
-			if (currFile != null)
+			if (theFile != null)
 			{
 				try
 				{
 					AutomataToIEC61499 exporter = new AutomataToIEC61499(selectedProject);
-					exporter.printSources(currFile);
+					exporter.printSources(theFile);
 				}
 				catch (Exception ex)
 				{
 					logger.error("Exception while generating IEC-61499 Function Block code to file "
-						     + currFile.getAbsolutePath());
+						     + theFile.getAbsolutePath());
 					logger.debug(ex.getMessage());
 					logger.debug(ex.getStackTrace());
 
@@ -3678,8 +3679,8 @@ public class ActionMan
 				}
 
 				logger.info(
-					    "IEC-61499 Function Block file successfully generated at "
-					    + currFile.getAbsolutePath());
+					    "IEC-61499 Function Block System file successfully generated at "
+					    + theFile.getAbsolutePath());
 			}
 		}
 	}

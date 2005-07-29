@@ -65,24 +65,29 @@ public class Job
 
     public Job(BasicFBInstance i, Algorithm a, Variables v)
     {
-	fbInstance = i;
-	theAlgorithm = a;
-	theVariables = v;
+		fbInstance = i;
+		theAlgorithm = a;
+		theVariables = v;
     }
     
     public BasicFBInstance getInstance()
     {
-	return fbInstance;
+		return fbInstance;
     }
     
     public Algorithm getAlgorithm()
     {
-	return theAlgorithm;
+		return theAlgorithm;
     }
 
     public Variables getVariables()
     {
-	return theVariables;
+		return theVariables;
     }
+
+	public String toString()
+	{
+		return "Job: FB Instance " + fbInstance.getName() + ", Alg " + theAlgorithm.getName() + " Vars " + theVariables.toString();
+	}
 
 }

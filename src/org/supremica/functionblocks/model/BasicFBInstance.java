@@ -52,8 +52,7 @@ public class BasicFBInstance extends FBInstance
     private Iterator actionsIterator;
     private int actionsLeft;
 
-	//private boolean handlingEvent;
-
+	private boolean handlingEvent;
 	private boolean queuedInScheduler = false;
 
 	private EventQueue eventInputQueue = new EventQueue();
@@ -72,8 +71,8 @@ public class BasicFBInstance extends FBInstance
 
     private Event getNextEvent()
     {
-		System.out.println("BasicFBInstance(" + getName() + ").getNextEvent(): Getting next event from the queue...");
-		System.out.print("     " + eventInputQueue.toString());
+		//System.out.println("BasicFBInstance(" + getName() + ").getNextEvent(): Getting next event from the queue...");
+		//System.out.print("     " + eventInputQueue.toString());
 		queuedInScheduler = false;
 		return  (Event) eventInputQueue.remove();
     }
@@ -85,11 +84,11 @@ public class BasicFBInstance extends FBInstance
 			if(variables.getVariable(eventInput) != null)
 				if(variables.getVariable(eventInput).getType().equals("EventInput"))
 				{
-					System.out.println("BasicFBInstance(" + getName() + ").receiveEvent(" + eventInput + ")");
+					//System.out.println("BasicFBInstance(" + getName() + ").receiveEvent(" + eventInput + ")");
 					eventInputQueue.add((Event) events.get(eventInput));
 					if (!queuedInScheduler)
 					{
-						System.out.println("BasicFBInstance(" + getName() + ").receiveEvent(" + eventInput + "): Scheduling this FB instance.");
+						//System.out.println("BasicFBInstance(" + getName() + ").receiveEvent(" + eventInput + "): Scheduling this FB instance.");
 						resource.getScheduler().scheduleFBInstance(this);
 						queuedInScheduler = true;
 					}
@@ -118,9 +117,9 @@ public class BasicFBInstance extends FBInstance
 
 		currentEvent = getNextEvent();
 
-		System.out.println("BasicFBInstance(" + getName() + "): handling event " + currentEvent.getName() + " from ECC state " + currentECState.getName());
+		//System.out.println("BasicFBInstance(" + getName() + ").handleEvent(): handling event " + currentEvent.getName() + " from ECC state " + currentECState.getName());
 		
-		//handlingEvent = true;
+		handlingEvent = true;
 
 		// set all InputEvents to false
 		for (Iterator iter = variables.iterator();iter.hasNext();)
@@ -147,28 +146,23 @@ public class BasicFBInstance extends FBInstance
 		}
 		else
 		{
-			System.out.println("BasicFBInstance(" + getName() + ").handleEvent(): Done with event " + currentEvent.getName() + " and in ECState " + currentECState.getName());
+			//System.out.println("BasicFBInstance(" + getName() + ").handleEvent(): Done with event " + currentEvent.getName() + " and in ECState " + currentECState.getName());
 			if(!queuedInScheduler & eventInputQueue.size() > 0)
 			{
-				System.out.println("BasicFBInstance(" + getName() + ").handleEvent(): Scheduling this FB instance.");
+				//System.out.println("BasicFBInstance(" + getName() + ").handleEvent(): Scheduling this FB instance.");
 				resource.getScheduler().scheduleFBInstance(this);
 				queuedInScheduler = true;
 			}
-			//handlingEvent = false;
+			handlingEvent = false;
 		}
     }
 
     public void finishedJob(Job theJob)
     {
+		//System.out.println("BasicFBInstance(" + getName() + ").finishedJob(): Alg " + theJob.getAlgorithm().getName());
 		setVariables(theJob.getVariables());
 		sendEvent();
-    }
-
-
-    private ECState updateECC()
-    {
-		return ((BasicFBType) fbType).getECC().execute(currentECState, variables);
-    }
+   }
 
     // initializes the handling of new state
     private void handleNewState(ECState state)
@@ -190,7 +184,7 @@ public class BasicFBInstance extends FBInstance
 			// set event var to false
 			((BooleanVariable) variables.getVariable(currentEvent.getName())).setValue(false);
 			// repeat the handling of the state if state is changed
-			System.out.println("BasicFBInstance(" + getName() + ").handleState(): No more actions in state " + currentECState.getName());
+			//System.out.println("BasicFBInstance(" + getName() + ").handleState(): No more actions in state " + currentECState.getName());
 			ECState newECState = updateECC();
 			if (newECState != currentECState)
 			{
@@ -199,23 +193,25 @@ public class BasicFBInstance extends FBInstance
 			else
 			{
 				// we're done with the event
-				System.out.println("BasicFBInstance(" + getName() + ").handleState(): Done with event " + currentEvent.getName() + " and in ECState " + currentECState.getName());
-				//handlingEvent = false;
+				//System.out.println("BasicFBInstance(" + getName() + ").handleState(): Done with event " + currentEvent.getName() + " and in ECState " + currentECState.getName());
+				handlingEvent = false;
 				// if there are more events on the queue schedule this instance again in the scheduler
 				if(!queuedInScheduler & eventInputQueue.size() > 0)
 				{
-					System.out.println("BasicFBInstance(" + getName() + ").handleState(): Scheduling this FB instance.");
+					//System.out.println("BasicFBInstance(" + getName() + ").handleState(): Scheduling this FB instance.");
 					resource.getScheduler().scheduleFBInstance(this);
 					queuedInScheduler = true;
 				}
 			}
 		}
-
-		if (actionsLeft > 0)
+		else if (actionsLeft > 0)
 		{
 			handleAction((ECAction) actionsIterator.next());
 		}
-
+		else
+		{
+			System.out.println("BasicFBInstance(" + getName() + ").handleState(): Something wrong with actions, actionsLeft = " + actionsLeft);			
+		}
     }
 
     private void handleAction(ECAction action)
@@ -225,6 +221,7 @@ public class BasicFBInstance extends FBInstance
 		{
 			Variables algVars =  (Variables) variables.clone();
 			resource.getScheduler().scheduleJob(new Job(this, ((BasicFBType) fbType).getAlgorithm(currentECAction.getAlgorithm()), algVars));
+			//System.out.println("BasicFBInstance(" + getName() + ").handleAction(): Queued alg " + currentECAction.getAlgorithm());
 		}
 		else if (currentECAction.getAlgorithm() == null && currentECAction.getOutput() != null)
 		{
@@ -243,7 +240,12 @@ public class BasicFBInstance extends FBInstance
 			}
 		}
 		actionsLeft = actionsLeft - 1;
-		handleState();
+ 		handleState();
+    }
+
+    private ECState updateECC()
+    {
+	return ((BasicFBType) fbType).getECC().execute(currentECState, variables);
     }
 
 }

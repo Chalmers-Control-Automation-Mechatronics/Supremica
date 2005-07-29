@@ -52,9 +52,6 @@ package org.supremica.functionblocks.model;
 public abstract class Algorithm extends NamedObject
 {
 
-    public void execute(Variables variables)
-    {
-	
-    }
-    
+    public abstract void execute(Variables variables);    
+
 }

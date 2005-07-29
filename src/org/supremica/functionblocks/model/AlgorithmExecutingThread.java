@@ -74,6 +74,7 @@ class AlgorithmExecutingThread extends Thread
 		while (true) 
 		{
 			Job currentJob = getNextScheduledJob();
+			//System.out.println("AlgorithmExecutingThread.run(): Executing " + currentJob.getAlgorithm().getName());
 			currentJob.getAlgorithm().execute(currentJob.getVariables());
 			currentJob.getInstance().finishedJob(currentJob);
 		}	

@@ -78,7 +78,7 @@ public class FileFormats
 	public static final FileFormats AUT = new FileFormats(false, true, "AUT", ".aut", "Aldebaran files (*.aut)");
 	public static final FileFormats ST = new FileFormats(false, true, "ST", ".st", "IEC-1131 Structured Text files (*.st)");
 	public static final FileFormats IL = new FileFormats(false, true, "IL", ".il", "IEC-1131 Instruction List files (*.il)");
-	public static final FileFormats FBT = new FileFormats(false, true, "FBT", ".fbt", "IEC-61499 Function Block files (*.fbt)");
+	public static final FileFormats SYS = new FileFormats(false, true, "SYS", ".sys", "IEC-61499 Function Block System files (*.sys)");
 	public static final FileFormats NQC = new FileFormats(false, true, "NQC", ".nqc", "Mindstorm NQC files (*.nqc)");
 	public static final FileFormats C = new FileFormats(false, true, "C", ".c", "C files (*.c)");
 	public static final FileFormats JAVA = new FileFormats(false, true, "JAVA", ".java", "Java files (*.java)");

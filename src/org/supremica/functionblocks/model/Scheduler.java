@@ -104,11 +104,11 @@ public class Scheduler
 			}
 		}
 
-		System.out.println("Scheduler.getNextScheduledFBInstance(): Getting first instance from the queue ...");
-		for(Iterator iter = scheduledFBInstances.iterator(); iter.hasNext();)
-		{
-			System.out.println("    scheduledFBInstances: " + ((FBInstance) iter.next()).toString());
-		}
+		//System.out.println("Scheduler.getNextScheduledFBInstance(): Getting first instance from the queue ...");
+		//for(Iterator iter = scheduledFBInstances.iterator(); iter.hasNext();)
+		//{
+		//	System.out.println("    scheduledFBInstances: " + ((FBInstance) iter.next()).toString());
+		//}
 
 		return (FBInstance) scheduledFBInstances.remove(0);
 	}
@@ -148,11 +148,11 @@ public class Scheduler
 		{
 			scheduledFBInstances.add(fbInst);
 		}
-		System.out.println("Scheduler.scheduleFBInstance("+fbInst.getName()+"): Scheduled instance. Now the queue is ...");
-		for(Iterator iter = scheduledFBInstances.iterator(); iter.hasNext();)
-		{
-			System.out.println("    scheduledFBInstances: " + ((FBInstance) iter.next()).toString());
-		}
+		//System.out.println("Scheduler.scheduleFBInstance("+fbInst.getName()+"): Scheduled instance. Now the queue is ...");
+		//for(Iterator iter = scheduledFBInstances.iterator(); iter.hasNext();)
+		//{
+		//	System.out.println("    scheduledFBInstances: " + ((FBInstance) iter.next()).toString());
+		//}
 
 		notify();
 	}
