@@ -61,7 +61,7 @@ public class Scheduler
 {
 	private Resource resource;
 
-	private List scheduledFBInstances = new LinkedList();
+	private List scheduledFBInstances = Collections.synchronizedList(new LinkedList());
 
 	//private List scheduledJobs = new LinkedList();
 
@@ -104,17 +104,17 @@ public class Scheduler
 				System.err.println("Scheduler.getNextScheduledFBInstance(): InterruptedException");
 			}
 		}
-
+		
 		//System.out.println("Scheduler.getNextScheduledFBInstance(): Getting first instance from the queue ...");
 		//for(Iterator iter = scheduledFBInstances.iterator(); iter.hasNext();)
 		//{
 		//	System.out.println("    scheduledFBInstances: " + ((FBInstance) iter.next()).toString());
 		//}
-
+		
 		return (FBInstance) scheduledFBInstances.remove(0);
 	}
-
-
+	
+	
 	public void runEvents()
 	{
 		System.out.println("Scheduler.runEvents()");
@@ -159,8 +159,7 @@ public class Scheduler
 		//{
 		//	System.out.println("    scheduledFBInstances: " + ((FBInstance) iter.next()).toString());
 		//}
-
-		notify();
-	}
-
+		notifyAll();
+	
+	}	
 }

@@ -69,42 +69,39 @@ public class BasicFBInstance extends FBInstance
     }
 	//================================================================
 
-    private synchronized Event getNextEvent()
+    private Event getNextEvent()
     {
-		//System.out.println("BasicFBInstance(" + getName() + ").getNextEvent(): Getting next event from the queue...");
-		//System.out.print("     " + eventInputQueue.toString());
-		return  (Event) eventInputQueue.remove();
+			//System.out.println("BasicFBInstance(" + getName() + ").getNextEvent(): Getting next event from the queue...");
+			//System.out.print("     " + eventInputQueue.toString());
+			return  (Event) eventInputQueue.remove();
     }
-
-	public void receiveEvent(String eventInput)
+	
+	public synchronized void receiveEvent(String eventInput)
 	{
-		synchronized(eventInputQueue)
-		{
-			if(variables.getVariable(eventInput) != null)
-				if(variables.getVariable(eventInput).getType().equals("EventInput"))
-				{
-					//System.out.println("BasicFBInstance(" + getName() + ").receiveEvent(" + eventInput + ")");
+		if(variables.getVariable(eventInput) != null)
+			if(variables.getVariable(eventInput).getType().equals("EventInput"))
+			{
+				//System.out.println("BasicFBInstance(" + getName() + ").receiveEvent(" + eventInput + ")");
 					eventInputQueue.add((Event) events.get(eventInput));
-					if (!queuedInScheduler && !handlingEvent)
-					{
-						//System.out.println("BasicFBInstance(" + getName() + ").receiveEvent(" + eventInput + "): Scheduling this FB instance.");
-						resource.getScheduler().scheduleFBInstance(this);
-						queuedInScheduler = true;
-					}
-				}
-				else
+				if (!queuedInScheduler && !handlingEvent)
 				{
-					System.out.println("BasicFBInstance(" + getName() + "): No event input " + eventInput);
-					System.exit(0);
+					//System.out.println("BasicFBInstance(" + getName() + ").receiveEvent(" + eventInput + "): Scheduling this FB instance.");
+					resource.getScheduler().scheduleFBInstance(this);
+					queuedInScheduler = true;
 				}
+			}
 			else
 			{
 				System.out.println("BasicFBInstance(" + getName() + "): No event input " + eventInput);
 				System.exit(0);
 			}
-		}
+		else
+		{
+			System.out.println("BasicFBInstance(" + getName() + "): No event input " + eventInput);
+			System.exit(0);
+		}	
     }
-
+	
     public synchronized void handleEvent()
     {
 
@@ -165,7 +162,7 @@ public class BasicFBInstance extends FBInstance
    }
 
     // initializes the handling of new state
-    private synchronized void handleNewState(ECState state)
+    private void handleNewState(ECState state)
     {
 		currentECState = state;
 		// set total number of actions in this state
@@ -175,9 +172,9 @@ public class BasicFBInstance extends FBInstance
 		//System.out.println("BasicFBInstance(" + getName() + ").handleNewState(): Handling new state " + currentECState.getName() + " with " + actionsLeft + " actions");
 		handleState();
     }
-
+	
     // handles currentECState between actions
-    private synchronized void handleState()
+    private void handleState()
     {
 		if (actionsLeft == 0)
 		{
@@ -196,12 +193,12 @@ public class BasicFBInstance extends FBInstance
 				//System.out.println("BasicFBInstance(" + getName() + ").handleState(): Done with event " + currentEvent.getName() + " and in ECState " + currentECState.getName());
 				handlingEvent = false;
 				// if there are more events on the queue schedule this instance again in the scheduler
-				//if(!queuedInScheduler & eventInputQueue.size() > 0)
-				//{
+				if(!queuedInScheduler & eventInputQueue.size() > 0)
+				{
 					//System.out.println("BasicFBInstance(" + getName() + ").handleState(): Scheduling this FB instance.");
-					//resource.getScheduler().scheduleFBInstance(this);
-					//	queuedInScheduler = true;
-					//}
+					resource.getScheduler().scheduleFBInstance(this);
+					queuedInScheduler = true;
+				}
 			}
 		}
 		else if (actionsLeft > 0)
@@ -212,9 +209,10 @@ public class BasicFBInstance extends FBInstance
 		{
 			System.out.println("BasicFBInstance(" + getName() + ").handleState(): Something wrong with actions, actionsLeft = " + actionsLeft);			
 		}
-    }
-
-    private synchronized void handleAction(ECAction action)
+	}
+	
+	
+    private void handleAction(ECAction action)
     {
 		currentECAction = action;
 		if (currentECAction.getAlgorithm() != null)
@@ -229,7 +227,7 @@ public class BasicFBInstance extends FBInstance
 		}
     }
 
-    private synchronized void sendEvent()
+    private void sendEvent()
     {
 		if (currentECAction.getOutput() != null)
 		{
@@ -240,12 +238,12 @@ public class BasicFBInstance extends FBInstance
 			}
 		}
 		actionsLeft = actionsLeft - 1;
- 		handleState();
+		handleState();
     }
-
-    private synchronized ECState updateECC()
+	
+    private ECState updateECC()
     {
-	return ((BasicFBType) fbType).getECC().execute(currentECState, variables);
+		return ((BasicFBType) fbType).getECC().execute(currentECState, variables);
     }
-
+	
 }

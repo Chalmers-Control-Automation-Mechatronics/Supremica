@@ -79,14 +79,14 @@ public class WriterThread extends Thread
 	{
 		outputSignal = output;
 		outputValue = value;
-		notify();
+		notifyAll();
 	}
 
 	public synchronized void deactivateService()
 	{
 		//System.out.println("WriterThread: deactivateService()");		
 		serviceActive = false;
-		notify();
+		notifyAll();
 	}
 
 	public synchronized void run()

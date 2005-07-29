@@ -57,6 +57,7 @@ package org.supremica.functionblocks.model;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Collections;
 
 class AlgorithmExecutingThread extends Thread
 {
@@ -65,7 +66,7 @@ class AlgorithmExecutingThread extends Thread
 
 	private AlgorithmExecutingThread() {}
 	
-	private List scheduledJobs = new LinkedList();
+	private List scheduledJobs = Collections.synchronizedList(new LinkedList());
 
 	public AlgorithmExecutingThread(Scheduler s)
 	{
@@ -101,7 +102,7 @@ class AlgorithmExecutingThread extends Thread
 		}
 		return (Job) scheduledJobs.remove(0);
 	}
-
+	
 	//public synchronized int getNumberOfScheduledJobs()
 	//{
 	//	return scheduledJobs.size();
@@ -109,13 +110,12 @@ class AlgorithmExecutingThread extends Thread
 
 	//public synchronized void notifyNewJob()
 	//{
-	//	notify();
+	//	notifyAll();
 	//}
 
 	public synchronized void scheduleJob(Job j)
 	{
 		scheduledJobs.add(j);
-		notify();
+		notifyAll();
 	}
-
 }

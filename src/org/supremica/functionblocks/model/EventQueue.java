@@ -59,7 +59,7 @@ import java.util.*;
 
 public class EventQueue
 {
-	private LinkedList queue = new LinkedList();
+	private List queue = Collections.synchronizedList(new LinkedList());
 	
 	public int size()
 	{
@@ -68,7 +68,7 @@ public class EventQueue
 	
 	public Event remove()
 	{
-		return (Event) queue.removeFirst();
+		return (Event) queue.remove(0);
 	}
 	
 	public void add(Event e)

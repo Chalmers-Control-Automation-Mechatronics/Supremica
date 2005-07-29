@@ -86,22 +86,22 @@ public class DelayThread extends Thread
 	{
 		//System.out.println("DelayThread: startDelay()");		
 		sendOutput = true;
-		notify();
+		notifyAll();
 	}
 
 	public synchronized void stopDelay()
 	{
 		//System.out.println("DelayThread: stopDelay()");		
 		sendOutput = false;
-		notify();
+		notifyAll();
 	}
 
 	public synchronized void deactivateService()
 	{
 		//System.out.println("DelayThread: deactivateService()");		
 		serviceActive = false;
-		notify();
-		notify();
+		notifyAll();
+		notifyAll();
 	}
 
 	public synchronized void run()

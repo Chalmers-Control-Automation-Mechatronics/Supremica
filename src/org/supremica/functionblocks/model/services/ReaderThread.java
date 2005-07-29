@@ -77,14 +77,14 @@ public class ReaderThread extends Thread
 	public synchronized void readInput(int input)
 	{
 		inputSignal = input;
-		notify();
+		notifyAll();
 	}
 
 	public synchronized void deactivateService()
 	{
 		//System.out.println("ReaderThread: deactivateService()");		
 		serviceActive = false;
-		notify();
+		notifyAll();
 	}
 
 	public synchronized void run()

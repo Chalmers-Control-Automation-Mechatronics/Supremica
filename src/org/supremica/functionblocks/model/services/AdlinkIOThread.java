@@ -93,7 +93,7 @@ public class AdlinkIOThread extends Thread
 	public synchronized void readInputs()
 	{
 		read = true;
-		notify();
+		notifyAll();
 	}
 
 	public synchronized void writeOutputs()
@@ -107,7 +107,7 @@ public class AdlinkIOThread extends Thread
 	{
 		//System.out.println("AdlinkIOThread: deactivateService()");
 		serviceActive = false;
-		notify();
+		notifyAll();
 	}
 
 	public synchronized void run()
