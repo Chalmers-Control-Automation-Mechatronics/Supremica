@@ -73,7 +73,7 @@ public class BasicFBInstance extends FBInstance
     {
 		//System.out.println("BasicFBInstance(" + getName() + ").getNextEvent(): Getting next event from the queue...");
 		//System.out.print("     " + eventInputQueue.toString());
-		queuedInScheduler = false;
+		//queuedInScheduler = false;
 		return  (Event) eventInputQueue.remove();
     }
 
@@ -86,12 +86,12 @@ public class BasicFBInstance extends FBInstance
 				{
 					//System.out.println("BasicFBInstance(" + getName() + ").receiveEvent(" + eventInput + ")");
 					eventInputQueue.add((Event) events.get(eventInput));
-					if (!queuedInScheduler)
-					{
-						//System.out.println("BasicFBInstance(" + getName() + ").receiveEvent(" + eventInput + "): Scheduling this FB instance.");
-						resource.getScheduler().scheduleFBInstance(this);
-						queuedInScheduler = true;
-					}
+					//if (!queuedInScheduler)
+					//{
+					//System.out.println("BasicFBInstance(" + getName() + ").receiveEvent(" + eventInput + "): Scheduling this FB instance.");
+					resource.getScheduler().scheduleFBInstance(this);
+					//queuedInScheduler = true;
+					//}
 				}
 				else
 				{
@@ -109,11 +109,11 @@ public class BasicFBInstance extends FBInstance
     public void handleEvent()
     {
 
-		//if (handlingEvent)
-		//{
-		//	resource.getScheduler().scheduleFBInstance(this);
-		//	return;
-		//}
+		if (handlingEvent)
+		{
+			resource.getScheduler().scheduleFBInstance(this);
+			return;
+		}
 
 		currentEvent = getNextEvent();
 
@@ -147,12 +147,12 @@ public class BasicFBInstance extends FBInstance
 		else
 		{
 			//System.out.println("BasicFBInstance(" + getName() + ").handleEvent(): Done with event " + currentEvent.getName() + " and in ECState " + currentECState.getName());
-			if(!queuedInScheduler & eventInputQueue.size() > 0)
-			{
+			//if(!queuedInScheduler & eventInputQueue.size() > 0)
+			//{
 				//System.out.println("BasicFBInstance(" + getName() + ").handleEvent(): Scheduling this FB instance.");
-				resource.getScheduler().scheduleFBInstance(this);
-				queuedInScheduler = true;
-			}
+			//	resource.getScheduler().scheduleFBInstance(this);
+			//	queuedInScheduler = true;
+			//}
 			handlingEvent = false;
 		}
     }
@@ -196,12 +196,12 @@ public class BasicFBInstance extends FBInstance
 				//System.out.println("BasicFBInstance(" + getName() + ").handleState(): Done with event " + currentEvent.getName() + " and in ECState " + currentECState.getName());
 				handlingEvent = false;
 				// if there are more events on the queue schedule this instance again in the scheduler
-				if(!queuedInScheduler & eventInputQueue.size() > 0)
-				{
+				//if(!queuedInScheduler & eventInputQueue.size() > 0)
+				//{
 					//System.out.println("BasicFBInstance(" + getName() + ").handleState(): Scheduling this FB instance.");
-					resource.getScheduler().scheduleFBInstance(this);
-					queuedInScheduler = true;
-				}
+					//resource.getScheduler().scheduleFBInstance(this);
+					//	queuedInScheduler = true;
+					//}
 			}
 		}
 		else if (actionsLeft > 0)
