@@ -51,6 +51,7 @@ package org.supremica.automata.IO;
 import java.io.*;
 import java.util.*;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
 import org.supremica.log.*;
 import org.supremica.automata.*;
@@ -58,38 +59,48 @@ import org.supremica.util.SupremicaException;
 
 //TODO: Make state variables int
 
-/** This class generates an IEC-61499 function block 
+/** This class generates an IEC-61499 function block
  * implementing the automata in the current project.
- *  
- * <p>Note that the event in the IEC-61499 is not the 
+ *
+ * <p>Note that the event in the IEC-61499 is not the
  * same as an automaton event. That is why the
- * implementation of the interface is done this way. KA 
- * and I are planing several different interfaces so this 
+ * implementation of the interface is done this way. KA
+ * and I are planing several different interfaces so this
  * is only the first one.
- * 
+ *
  * @author Goran Cengic
  * @author cengic@s2.chalmers.se
- */ 
+ */
 public class AutomataToIEC61499
 
 {
-    
+
 	private static Logger logger = LoggerFactory.createLogger(AutomataToIEC61499.class);
 	private Project theProject;
 	private Alphabet allEvents;
-	private boolean comments = false;	
+	private boolean comments = false;
+	private boolean useXmlns = true;
+	private boolean useDoctype = false;
+	private static final String xmlnsLibraryElementString = "xmlns=\"http://www.holobloc.com/xml/LibraryElement\" ";
+
+	DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 	private PrintWriter pw;
 
 	public void commentsOn()
 	{
 		comments = true;
 	}
-	
+
 	public void commentsOff()
 	{
 		comments = false;
 	}
-	
+
+	public void useXmlNameSpace(boolean use)
+	{
+		useXmlns = use;
+	}
+
 	// Constructor
 	public AutomataToIEC61499(Project theProject)
 	{
@@ -103,28 +114,31 @@ public class AutomataToIEC61499
 	{
 
 		pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-		
+		if (useDoctype)
+		{
+			pw.println("<!DOCTYPE FBType SYSTEM \"http://www.holobloc.com/xml/LibraryElement.dtd\">");
+		}
 		if (comments)
 		{
 			pw.println("<!-- This function block was automatically generated from Supremica.");
 			pw.println("     Supremica version: " + org.supremica.Version.version());
 			pw.println("     Time of generation: " + DateFormat.getDateTimeInstance().format(new Date()) + "-->");
 		}
-		
-		pw.println("<FBType xmlns=\"http://www.holobloc.com/xml/LibraryElement\" Name=\"" + theProject.getAutomatonAt(0).getName() + "\" >");
-		pw.println("  <VersionInfo Author=\"Author Name\" Organization=\"Org\" Version=\"1.0\" Date=\"" + DateFormat.getDateTimeInstance().format(new Date()) + "\" />");
+
+		pw.println("<FBType " + (useXmlns ?  xmlnsLibraryElementString : "") + "Name=\"" + theProject.getAutomatonAt(0).getName() + "\" >");
+		pw.println("  <VersionInfo Author=\"Author Name\" Organization=\"Org\" Version=\"1.0\" Date=\"" + dateFormat.format(new Date()) + "\" />");
 
 	}
 
 	/** Makes the fb_interface_list production rule of the standard. */
-	private void printInterfaceList() 
+	private void printInterfaceList()
 	{
 
 		// The event_input_list. This is the same for all FBs of automata.
 		// For now the input events are INIT, RESET and OCURED.
 		// INIT event does the initialization
 		// RESET event makes all of the automata go to their initial state.
-		// OCCURRED event signals a new automaton event to the automata and is thus coupled 
+		// OCCURRED event signals a new automaton event to the automata and is thus coupled
 		// to the input variables that represent the automaton events.
 		pw.println("  <InterfaceList>");
 		pw.println("    <EventInputs>");
@@ -132,13 +146,13 @@ public class AutomataToIEC61499
 		pw.println("      <Event Name=\"RESET\" />");
 		pw.println("      <Event Name=\"OCCURRED\" >");
 		for(Iterator alphIt=allEvents.iterator(); alphIt.hasNext();)
-		{								
+		{
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
 			pw.println("        <With Var=\"EI_" + currEvent.getLabel()+ "\" />");
 		}
 		pw.println("      </Event>");
 		pw.println("    </EventInputs>");
-		
+
 
 
 		// The event_output_list. This is the same for all FBs of automata also.
@@ -147,20 +161,20 @@ public class AutomataToIEC61499
 		pw.println("    <EventOutputs>");
 		pw.println("      <Event Name=\"INITO\" Type=\"INIT_EVENT\" />");
 		pw.println("      <Event Name=\"DONE\" >");
-		for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext();) 
+		for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext();)
 		{
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
 			pw.println("        <With Var=\"EO_" + currEvent.getLabel()+ "\" />");
 		}
 		pw.println("      </Event>");
 		pw.println("    </EventOutputs>");
-		
-		
-		
+
+
+
 		// The input_variable_list. Input variables represent the automaton events and are of the
 		// bool type. Only one should be TRUE when the OCCURRED event happens but if several are TRUE
 		// all of the transitions will take place. The user have to make shure that this is possible!
-		pw.println("    <InputVars>");		
+		pw.println("    <InputVars>");
 		for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext();)
 		{
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
@@ -168,12 +182,12 @@ public class AutomataToIEC61499
 			{
 				pw.println("      <!-- " + currEvent.getLabel() + " -->");
 			}
-			pw.println("      <VarDeclaration Name=\"EI_" + currEvent.getLabel() + "\" Type=\"BOOL\" />"); 
+			pw.println("      <VarDeclaration Name=\"EI_" + currEvent.getLabel() + "\" Type=\"BOOL\" />");
 		}
 		pw.println("    </InputVars>");
 
-		
-		// The output_variable_list. Output variables represent the automaton events that 
+
+		// The output_variable_list. Output variables represent the automaton events that
 		// are enabled after the transition. More than one of tese can be true when the DONE event occurres.
 		pw.println("    <OutputVars>");
 		for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext();)
@@ -185,7 +199,7 @@ public class AutomataToIEC61499
 			}
 			pw.println("      <VarDeclaration Name=\"EO_" + currEvent.getLabel() + "\" Type=\"BOOL\" />");
 		}
-		pw.println("    </OutputVars>");		
+		pw.println("    </OutputVars>");
 
 		pw.println("  </InterfaceList>");
 	}
@@ -197,10 +211,10 @@ public class AutomataToIEC61499
 
 
 	/** Makes the fb_internal_variable_list production rule of the standard. */
-	private void printInternalVariableList() 
+	private void printInternalVariableList()
 	{
 		pw.println("    <InternalVars>");
-		
+
 		// State variables
 		for (Iterator autIt = theProject.iterator(); autIt.hasNext(); )
 		{
@@ -211,7 +225,7 @@ public class AutomataToIEC61499
 			{
 				State currState = (State) stateIt.next();
 				int currStateIndex = currState.getSynchIndex();
-				
+
 				if (comments)
 				{
 					pw.println("      <!-- " + currState.getName() + " -->");
@@ -219,7 +233,7 @@ public class AutomataToIEC61499
 				pw.println("      <VarDeclaration Name=\"Q_" + currStateIndex + "\" Type=\"BOOL\" />");
 			}
 		}
-		
+
 		pw.println("    </InternalVars>");
 	}
 
@@ -227,10 +241,10 @@ public class AutomataToIEC61499
 
 
 	/** Makes the fb_ecc_declaration production rule of the standard. */
-	private void printEccDeclaration() 
+	private void printEccDeclaration()
 	{
-		
-		// Execution Control Chart (ECC) is the same for all function blocks of this type		
+
+		// Execution Control Chart (ECC) is the same for all function blocks of this type
 
 		pw.println("    <ECC>");
 
@@ -250,7 +264,7 @@ public class AutomataToIEC61499
 		pw.println("      <ECState Name=\"COMP_ENABLED\" >");
 		pw.println("        <ECAction Algorithm=\"COMP_ENABLED\" Output=\"DONE\" />");
 		pw.println("      </ECState>");
-		
+
 		// Transitions of the ECC
 		pw.println("      <ECTransition Source=\"START\" Destination=\"INIT\" Condition=\"INIT\" />");
 		pw.println("      <ECTransition Source=\"INIT\" Destination=\"START\" Condition=\"1\" />");
@@ -261,7 +275,7 @@ public class AutomataToIEC61499
 		pw.println("      <ECTransition Source=\"TRANSITION\" Destination=\"COMP_ENABLED\" Condition=\"1\" />");
 
 		pw.println("    </ECC>");
-	
+
 	}
 
 	private void printStartAlgorithm(String name)
@@ -279,11 +293,11 @@ public class AutomataToIEC61499
 	}
 
 	/** Makes the fb_algorithm_declaration production rule of the standard. */
-	private void printAlgorithmDeclarations() 
+	private void printAlgorithmDeclarations()
 		throws Exception
 	{
 
-		
+
 		// INIT algorithm is empty for now. Reserved for future development.
 		// If needed for representation specific initialization for example.
 		printStartAlgorithm("INIT");
@@ -300,7 +314,7 @@ public class AutomataToIEC61499
 			pw.println();
 			pw.println("        <!-- First set all states to FALSE -->");
 		}
-		
+
 		// Set all state variables to FALSE
 		for (Iterator autIt = theProject.iterator(); autIt.hasNext(); )
 		{
@@ -339,15 +353,15 @@ public class AutomataToIEC61499
 
 			pw.println("        Q_" + currAutomaton.getInitialState().getSynchIndex() + " = true;");
 		}
-		
+
 		printEndAlgorithm();
 
 
-		
-		// TRANSITION algorithm makes the transition corresponding to the automaton events that came with the 
+
+		// TRANSITION algorithm makes the transition corresponding to the automaton events that came with the
 		// OCCURED.
 		printStartAlgorithm("TRANSITION");
-						
+
 		if (comments)
 		{
 			pw.println("        <!-- Change state in the automata -->");
@@ -437,8 +451,8 @@ public class AutomataToIEC61499
 			}
 			pw.println("        }");
 		}
-		
-		
+
+
 		printEndAlgorithm();
 
 
@@ -503,7 +517,7 @@ public class AutomataToIEC61499
 			}
 		}
 
-		printEndAlgorithm();		
+		printEndAlgorithm();
 
 	}
 
@@ -523,19 +537,23 @@ public class AutomataToIEC61499
 
 	private void printSyncFB(String sysName)
 	{
-		
+
 		// BeginProgram
 		pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-		
+		if (useDoctype)
+		{
+			pw.println("<!DOCTYPE FBType SYSTEM \"http://www.holobloc.com/xml/LibraryElement.dtd\">");
+		}
+
 		if (comments)
 		{
 			pw.println("<!-- This function block was automatically generated from Supremica.");
 			pw.println("     Supremica version: " + org.supremica.Version.version());
 			pw.println("     Time of generation: " + DateFormat.getDateTimeInstance().format(new Date()) + "-->");
 		}
-		
-		pw.println("<FBType xmlns=\"http://www.holobloc.com/xml/LibraryElement\" Name=\"" + sysName + "_SYNC\" >");
-		pw.println("  <VersionInfo Author=\"Author Name\" Organization=\"Org\" Version=\"1.0\" Date=\"" + DateFormat.getDateTimeInstance().format(new Date()) + "\" />");
+
+		pw.println("<FBType " + (useXmlns ?  xmlnsLibraryElementString : "") + "Name=\"" + sysName + "_SYNC\" >");
+		pw.println("  <VersionInfo Author=\"Author Name\" Organization=\"Org\" Version=\"1.0\" Date=\"" + dateFormat.format(new Date()) + "\" />");
 
 
 		// InterfaceList
@@ -543,21 +561,21 @@ public class AutomataToIEC61499
 		// Only input is ENABLED.
 		pw.println("  <InterfaceList>");
 		pw.println("    <EventInputs>");
-		pw.println("      <Event Name=\"ENABLED\" >"); 
+		pw.println("      <Event Name=\"ENABLED\" >");
 		for(Iterator autIt=theProject.iterator();autIt.hasNext();)
 		{
 			Automaton tmpAut = (Automaton) autIt.next();
 			for(Iterator alphIt=tmpAut.getAlphabet().iterator(); alphIt.hasNext();)
-			{								
+			{
 				LabeledEvent currEvent = (LabeledEvent) alphIt.next();
 				pw.println("        <With Var=\"EI_" + tmpAut.getName() + "_" + currEvent.getLabel()+ "\" />");
 			}
 		}
 		pw.println("      </Event>");
 		pw.println("    </EventInputs>");
-	
 
-		// The event_output_list. 
+
+		// The event_output_list.
 		// The only output event is DONE.
 		pw.println("    <EventOutputs>");
 		pw.println("      <Event Name=\"DONE\" >");
@@ -565,7 +583,7 @@ public class AutomataToIEC61499
 		{
 			Automaton tmpAut = (Automaton) autIt.next();
 			for(Iterator alphIt=tmpAut.getAlphabet().iterator(); alphIt.hasNext();)
-			{								
+			{
 				LabeledEvent currEvent = (LabeledEvent) alphIt.next();
 				pw.println("        <With Var=\"EO_" + tmpAut.getName() + "_" + currEvent.getLabel()+ "\" />");
 			}
@@ -573,9 +591,9 @@ public class AutomataToIEC61499
 		pw.println("      </Event>");
 		pw.println("    </EventOutputs>");
 
-	
+
 		// The input_variable_list.
-		pw.println("    <InputVars>");		
+		pw.println("    <InputVars>");
 		for(Iterator autIt=theProject.iterator();autIt.hasNext();)
 		{
 			Automaton tmpAut = (Automaton) autIt.next();
@@ -586,13 +604,13 @@ public class AutomataToIEC61499
 				{
 					pw.println("      <!-- " + tmpAut.getName() + currEvent.getLabel() + " -->");
 				}
-				pw.println("      <VarDeclaration Name=\"EI_" + tmpAut.getName() + "_" + currEvent.getLabel() + "\" Type=\"BOOL\" />"); 
+				pw.println("      <VarDeclaration Name=\"EI_" + tmpAut.getName() + "_" + currEvent.getLabel() + "\" Type=\"BOOL\" />");
 			}
 		}
 		pw.println("    </InputVars>");
-	
-		
-		// The output_variable_list. 
+
+
+		// The output_variable_list.
 		pw.println("    <OutputVars>");
 		for(Iterator autIt=theProject.iterator();autIt.hasNext();)
 		{
@@ -607,8 +625,8 @@ public class AutomataToIEC61499
 				pw.println("      <VarDeclaration Name=\"EO_" + tmpAut.getName() + "_" + currEvent.getLabel() + "\" Type=\"BOOL\" />");
 			}
 		}
-		pw.println("    </OutputVars>");		
-		
+		pw.println("    </OutputVars>");
+
 		pw.println("  </InterfaceList>");
 
 		printBeginBasicFB();
@@ -630,7 +648,7 @@ public class AutomataToIEC61499
 
 		// SYNC algorithm
 		printStartAlgorithm("SYNC");
-	
+
 		for (Iterator autIt = theProject.iterator(); autIt.hasNext();)
 		{
 			Automaton curAut = (Automaton) autIt.next();
@@ -648,12 +666,12 @@ public class AutomataToIEC61499
 						{
 							pw.print("EI_" + tmpAut.getName() + "_" + tmpEv.getLabel() + " &#38;&#38; ");
 						}
-					}		    
+					}
 				}
 				pw.println("true;");
 			}
 		}
-		
+
 		printEndAlgorithm();
 
 		printEndBasicFB();
@@ -664,14 +682,18 @@ public class AutomataToIEC61499
 
 	private void printSystem(String name)
 	{
-		
+
 		pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-		pw.println("<System xmlns=\"http://www.holobloc.com/xml/LibraryElement\" Name=\"" + name + "\" >");
-		pw.println("  <VersionInfo  Author=\"Author Name\" Organization=\"Org\" Version=\"1.0\" Date=\"" + DateFormat.getDateTimeInstance().format(new Date()) + "\" />");
-		pw.println("  <Device  Name=\"Test Device\" Type=\"DeviceType_not_used\">");
+		if (useDoctype)
+		{
+			pw.println("<!DOCTYPE System SYSTEM \"http://www.holobloc.com/xml/LibraryElement.dtd\">");
+		}
+		pw.println("<System " + (useXmlns ?  xmlnsLibraryElementString : "") + "Name=\"" + name + "\" >");
+		pw.println("  <VersionInfo Author=\"Author Name\" Organization=\"Org\" Version=\"1.0\" Date=\"" + dateFormat.format(new Date()) + "\" />");
+		pw.println("  <Device Name=\"Test Device\" Type=\"DeviceType_not_used\">");
 		pw.println("    <Resource Name=\"Test Resource\" Type=\"ResourceType_not_used\" >");
 		pw.println("      <FBNetwork>");
-		
+
         pw.println("        <FB Name=\"restart\" Type=\"E_RESTART\" />");
         pw.println("        <FB Name=\"merge2\" Type=\"E_MERGE2\" />");
         pw.println("        <FB Name=\"merge\" Type=\"E_MERGE" + theProject.size() + "\" />");
@@ -683,7 +705,7 @@ public class AutomataToIEC61499
 			pw.println("        <FB Name=\"" + curAut.getName()+ "_inst\" Type=\"" + curAut.getName() + "\" />");
 		}
         pw.println("        <FB Name=\"" + name + "_SYNC_inst\" Type=\"" + name + "_SYNC\" />");
-		
+
 
 		// Event Connections
 		pw.println("        <EventConnections>");
@@ -702,15 +724,15 @@ public class AutomataToIEC61499
 			}
 			else if (autIt.hasNext() && !first_model)
 			{
-				pw.println("          <Connection Source=\"" + prevName + "_inst.INITO\" Destination=\"" + curName + "_inst.INIT\" />");				
+				pw.println("          <Connection Source=\"" + prevName + "_inst.INITO\" Destination=\"" + curName + "_inst.INIT\" />");
 			}
 			else if (!autIt.hasNext())
 			{
-				pw.println("          <Connection Source=\"" + prevName + "_inst.INITO\" Destination=\"" + curName + "_inst.INIT\" />");				
-				pw.println("          <Connection Source=\"" + curName + "_inst.INITO\" Destination=\"merge2.EI2\" />");				
+				pw.println("          <Connection Source=\"" + prevName + "_inst.INITO\" Destination=\"" + curName + "_inst.INIT\" />");
+				pw.println("          <Connection Source=\"" + curName + "_inst.INITO\" Destination=\"merge2.EI2\" />");
 			}
 
-			prevName = curAut.getName();			
+			prevName = curAut.getName();
 			first_model = false;
 
 		}
@@ -726,7 +748,7 @@ public class AutomataToIEC61499
 		{
 			Automaton curAut = (Automaton) autIt.next();
 			pw.println("          <Connection Source=\"split.EO" + signal + "\" Destination=\"" + curAut.getName() + "_inst.OCCURRED\" />");
-			signal = signal + 1;			
+			signal = signal + 1;
 		}
 		pw.println("          <Connection Source=\"merge.EO\" Destination=\"merge2.EI1\" />");
 		pw.println("          <Connection Source=\"merge2.EO\" Destination=\"" + name + "_SYNC_inst.ENABLED\" />");
@@ -744,14 +766,14 @@ public class AutomataToIEC61499
 			for (Iterator alphIt = curAut.getAlphabet().iterator(); alphIt.hasNext(); )
 			{
 				LabeledEvent curEv = (LabeledEvent) alphIt.next();
-				String ev = curEv.getLabel(); 
+				String ev = curEv.getLabel();
 				pw.println("          <Connection Source=\"" + name + "_SYNC_inst.EO_" + aut + "_" + ev + "\" Destination=\"" + aut + "_inst.EI_" + ev + "\" />");
 			}
 			for (Iterator alphIt = curAut.getAlphabet().iterator(); alphIt.hasNext(); )
 			{
 				LabeledEvent curEv = (LabeledEvent) alphIt.next();
-				String ev = curEv.getLabel(); 
-				pw.println("          <Connection Source=\"" + aut + "_inst.EO_" + ev + "\" Destination=\"" + name + "_SYNC_inst.EI_" + aut + "_" + ev + "\" />");				
+				String ev = curEv.getLabel();
+				pw.println("          <Connection Source=\"" + aut + "_inst.EO_" + ev + "\" Destination=\"" + name + "_SYNC_inst.EI_" + aut + "_" + ev + "\" />");
 			}
 		}
 		pw.println("        </DataConnections>");
@@ -766,8 +788,12 @@ public class AutomataToIEC61499
 	private void printMerge(int size)
 	{
 		pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-		pw.println("<FBType xmlns=\"http://www.holobloc.com/xml/LibraryElement\" Name=\"E_MERGE" + size + "\" >");
-		pw.println("  <VersionInfo Author=\"Goran Cengic\" Organization=\"Chalmers\" Version=\"1.0\" Date=\"" + DateFormat.getDateTimeInstance().format(new Date()) + "\" />");
+		if (useDoctype)
+		{
+			pw.println("<!DOCTYPE FBType SYSTEM \"http://www.holobloc.com/xml/LibraryElement.dtd\">");
+		}
+		pw.println("<FBType " + (useXmlns ?  xmlnsLibraryElementString : "") + "Name=\"E_MERGE" + size + "\" >");
+		pw.println("  <VersionInfo Author=\"Goran Cengic\" Organization=\"Chalmers\" Version=\"1.0\" Date=\"" + dateFormat.format(new Date()) + "\" />");
 		pw.println("  <InterfaceList>");
 		pw.println("    <EventInputs>");
 		for(int i=1; i<=size; i++)
@@ -796,19 +822,23 @@ public class AutomataToIEC61499
 			{
 				pw.print("EI" + i + " OR ");
 			}
-		}		
+		}
 		pw.println("\" />");
   		pw.println("      <ECTransition Source=\"S1\" Destination=\"S0\" Condition=\"1\" />");
 		pw.println("    </ECC>");
 		pw.println("  </BasicFB>");
 		pw.println("</FBType>");
 	}
-	
+
 	private void printSplit(int size)
 	{
 		pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-		pw.println("<FBType xmlns=\"http://www.holobloc.com/xml/LibraryElement\" Name=\"E_SPLIT" + size + "\" >");
-		pw.println("  <VersionInfo Author=\"Goran Cengic\" Organization=\"Chalmers\" Version=\"1.0\" Date=\"" + DateFormat.getDateTimeInstance().format(new Date()) + "\" />");
+		if (useDoctype)
+		{
+			pw.println("<!DOCTYPE FBType SYSTEM \"http://www.holobloc.com/xml/LibraryElement.dtd\">");
+		}
+		pw.println("<FBType " + (useXmlns ?  xmlnsLibraryElementString : "") + "Name=\"E_SPLIT" + size + "\" >");
+		pw.println("  <VersionInfo Author=\"Goran Cengic\" Organization=\"Chalmers\" Version=\"1.0\" Date=\"" + dateFormat.format(new Date()) + "\" />");
 		pw.println("  <InterfaceList>");
 		pw.println("    <EventInputs>");
 		pw.println("      <Event Name=\"EI\" />");
@@ -839,8 +869,12 @@ public class AutomataToIEC61499
 	private void printRestart()
 	{
 		pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-		pw.println("<FBType xmlns=\"http://www.holobloc.com/xml/LibraryElement\" Name=\"E_RESTART\" >");
-		pw.println("  <VersionInfo Author=\"Goran Cengic\" Organization=\"Chalmers\" Version=\"1.0\" Date=\"" + DateFormat.getDateTimeInstance().format(new Date()) + "\" />");
+		if (useDoctype)
+		{
+			pw.println("<!DOCTYPE FBType SYSTEM \"http://www.holobloc.com/xml/LibraryElement.dtd\">");
+		}
+		pw.println("<FBType " + (useXmlns ?  xmlnsLibraryElementString : "") + "Name=\"E_RESTART\" >");
+		pw.println("  <VersionInfo Author=\"Goran Cengic\" Organization=\"Chalmers\" Version=\"1.0\" Date=\"" + dateFormat.format(new Date()) + "\" />");
 		pw.println("  <InterfaceList>");
 		pw.println("    <EventOutputs>");
 		pw.println("      <Event Name=\"COLD\" />");
@@ -875,40 +909,40 @@ public class AutomataToIEC61499
 		}
 		printEndBasicFB();
 		printEndFB();
-	
+
 		pw.close();
 
 	}
-    
+
 	public void printSources(File file)
-	{	
+	{
 
 		String systemName = file.getName().substring(0,file.getName().length()-4);
 
 		try
 		{
-			
-			// First generate FBs for all models	
+
+			// First generate FBs for all models
 			for (Iterator autIt = theProject.iterator(); autIt.hasNext();)
 			{
 				Project tempProject = new Project();
-			
+
 				tempProject.addAutomaton((Automaton) autIt.next());
 
 				File tmpFile = new File(file.getParent() + "/" + tempProject.getAutomatonAt(0).getName() + ".fbt");
 
 				AutomataToIEC61499 tempToIEC61499 = new AutomataToIEC61499(tempProject);
-				
+
 				tempToIEC61499.setPrintWriter(new PrintWriter(new FileWriter(tmpFile)));
 
 				tempToIEC61499.printSource();
 			}
-			
+
 
 			// Then generate the sync FB
 			File tmpFile = new File(file.getParent() + "/" + systemName + "_SYNC.fbt");
 
-			pw = new PrintWriter(new FileWriter(tmpFile));    
+			pw = new PrintWriter(new FileWriter(tmpFile));
 
 			printSyncFB(systemName);
 
@@ -916,8 +950,8 @@ public class AutomataToIEC61499
 
 
 			// Generate the System application
-			
-			pw = new PrintWriter(new FileWriter(file));    
+
+			pw = new PrintWriter(new FileWriter(file));
 
 			printSystem(systemName);
 
@@ -928,7 +962,7 @@ public class AutomataToIEC61499
 			// merge 2
 			tmpFile = new File(file.getParent() + "/E_MERGE2.fbt");
 
-			pw = new PrintWriter(new FileWriter(tmpFile));    
+			pw = new PrintWriter(new FileWriter(tmpFile));
 
 			printMerge(2);
 
@@ -937,7 +971,7 @@ public class AutomataToIEC61499
 			// merge
 			tmpFile = new File(file.getParent() + "/E_MERGE" + theProject.size() + ".fbt");
 
-			pw = new PrintWriter(new FileWriter(tmpFile));    
+			pw = new PrintWriter(new FileWriter(tmpFile));
 
 			printMerge(theProject.size());
 
@@ -960,11 +994,11 @@ public class AutomataToIEC61499
 			printRestart();
 
 			pw.close();
-			
+
 		}
 		catch (Exception e)
 		{
 			e.printStackTrace(System.err);
-		}		
+		}
 	}
 }

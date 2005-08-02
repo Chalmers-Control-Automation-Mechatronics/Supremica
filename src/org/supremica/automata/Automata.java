@@ -142,7 +142,7 @@ public class Automata
 		{
 			/*
 			// Already here!
-			logger.error("Name conflict, multiple automata with name " + 
+			logger.error("Name conflict, multiple automata with name " +
 						 aut + ", discarding last one added.");
 			*/
 
@@ -158,7 +158,7 @@ public class Automata
 	}
 
 	/**
-	 * Adds all automata in 'automata' to this Automata. Automata with the same name as 
+	 * Adds all automata in 'automata' to this Automata. Automata with the same name as
 	 * already present automata are NOT added.
 	 */
 	public void addAutomata(Automata automata)
@@ -207,7 +207,7 @@ public class Automata
 				automataIterator.hasNext(); )
 		{
 			Automaton a = (Automaton) automataIterator.next();
-			
+
 			removeAutomaton(a.getName());
 		}
 	}
@@ -743,12 +743,12 @@ public class Automata
 		if (autA.size() < this.size())
 		{
 			if (autA.size() > 1)
-				logger.warn("Some of the selected automata share no events with the other " + 
-							"selected automata. For example, the automata " + autA + 
+				logger.warn("Some of the selected automata share no events with the other " +
+							"selected automata. For example, the automata " + autA +
 							" are disconnected from the rest.");
 			else
-				logger.warn("Some of the selected automata share no events with the other " + 
-							"selected automata. For example, the automaton " + 
+				logger.warn("Some of the selected automata share no events with the other " +
+							"selected automata. For example, the automaton " +
 							autA.getFirstAutomaton() + " is disconnected from the rest.");
 			return true;
 		}
@@ -801,7 +801,7 @@ public class Automata
 		{
 			logger.error(ex);
 		}
-		
+
 		return isEventControllabilityConsistent(unionAlphabet);
 	}
 	/**
@@ -901,6 +901,23 @@ public class Automata
 	}
 
 	/**
+	 * When exporting to files some automata names may be illegal.
+	 * In Windows the following characters are illegal in file names: \/:*?"<>|
+	 */
+	public void normalizeAutomataNames()
+	{
+		for (Iterator autIt = iterator(); autIt.hasNext(); )
+		{
+			Automaton currAutomaton = (Automaton) autIt.next();
+			String currAutomatonName = currAutomaton.getName();
+			String newAutomatonName = currAutomatonName.replace("|", "_");
+			newAutomatonName = newAutomatonName.replace("(", "_");
+			newAutomatonName = newAutomatonName.replace(")", "_");
+			renameAutomaton(currAutomaton, newAutomatonName);
+		}
+	}
+
+	/**
 	 * Set the synchronization indicies. The returned alphabet is the union alphabet
 	 * and contains the synchronization index of all the events in this automata.
 	 */
@@ -942,7 +959,7 @@ public class Automata
 		{
 			return new Alphabet();
 		}
-		
+
 		try
 		{
 			// If consistency is important, that has to be said explicitly
@@ -1410,7 +1427,7 @@ public class Automata
 				return false;
 			}
 		}
-		
+
 		/*
 		// Warns if the system has disjoint modules (the system can be divided into at least two sets
 		// of modules whose union alphabets are disjoint)

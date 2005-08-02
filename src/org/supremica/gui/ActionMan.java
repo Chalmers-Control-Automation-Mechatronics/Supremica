@@ -1909,11 +1909,11 @@ public class ActionMan
 				"recommended to display the modular structure for more than " + maxNbrOfStates +
 				" automata.";
 			msg = EncodingHelper.linebreakAdjust(msg);
-			
+
 			Object[] options = { "Continue", "Abort" };
 			int response = JOptionPane.showOptionDialog(ActionMan.gui.getFrame(), msg, "Warning",
-														JOptionPane.YES_NO_OPTION, 
-														JOptionPane.WARNING_MESSAGE, 
+														JOptionPane.YES_NO_OPTION,
+														JOptionPane.WARNING_MESSAGE,
 														null, options, options[1]);
 			if(response == JOptionPane.NO_OPTION)
 			{
@@ -3643,7 +3643,7 @@ public class ActionMan
 	{
 		// Automata selectedProject = gui.getselectedProject();
 		Project selectedProject = gui.getSelectedProject();
-		
+
 		if (selectedProject.size() < 2)
 		{
 			JOptionPane.showMessageDialog(
@@ -3651,7 +3651,7 @@ public class ActionMan
 										  "At least two automatons must be selected!",
 										  "Alert",
 										  JOptionPane.ERROR_MESSAGE);
-			
+
 			return;
 		}
 
@@ -3665,7 +3665,10 @@ public class ActionMan
 			{
 				try
 				{
-					AutomataToIEC61499 exporter = new AutomataToIEC61499(selectedProject);
+					// Make a deep project copy before changing the names
+					Project copyOfSelectedProject = new Project(selectedProject, false);
+					copyOfSelectedProject.normalizeAutomataNames();
+					AutomataToIEC61499 exporter = new AutomataToIEC61499(copyOfSelectedProject);
 					exporter.printSources(theFile);
 				}
 				catch (Exception ex)

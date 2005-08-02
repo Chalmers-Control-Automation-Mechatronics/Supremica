@@ -100,6 +100,19 @@ public class Project
 		setName(otherProject.getName());
 	}
 
+
+	public Project(Project otherProject, boolean shallowCopy)
+	{
+		super(otherProject, shallowCopy);
+
+		theActions = new Actions(otherProject.theActions);
+		theControls = new Controls(otherProject.theControls);
+		theInputSignals = new Signals(otherProject.theInputSignals);
+		theOutputSignals = new Signals(otherProject.theOutputSignals);
+		theTimers = new Timers(otherProject.theTimers);
+
+		setName(otherProject.getName());
+	}
 	public Actions getActions()
 	{
 		return theActions;
