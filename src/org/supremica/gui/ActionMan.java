@@ -162,14 +162,26 @@ public class ActionMan
 	public static void fileNewFromTemplate(Gui gui, TemplateItem item)
 	{
 		// logger.debug("ActionMan.fileNewFromTemplate Start");
-		Automata newAutomata;
+		Project project;
 
 		try
 		{
-			newAutomata = item.createInstance(new VisualProjectFactory());
+			project = item.createInstance(new VisualProjectFactory());
 
-			gui.addProject((Project) newAutomata);
-
+			try
+			{
+				int nbrOfAddedAutomata = gui.addProject(project);
+				
+				gui.info("Successfully added " + nbrOfAddedAutomata + " automata.");
+			}
+			catch (Exception excp)
+			{
+				logger.error("Error adding automata ", excp);
+				logger.debug(excp.getStackTrace());
+				
+				return;
+			}
+			
 			// logger.debug("ActionMan.fileNewFromTemplate");
 		}
 		catch (Exception ex)

@@ -265,4 +265,33 @@ public class TestAutomataVerifier
 			assertTrue(false);
 		}		
 	}
+
+	/*
+	public void testGrande()
+	{
+		try
+		{
+			ProjectBuildFromXml builder = new ProjectBuildFromXml();
+			Project theProject = builder.build(new java.io.File("/users/s2/flordal/AIP_minus_AS3_TU4.xml"));
+
+			VerificationOptions verificationOptions;
+			SynchronizationOptions synchronizationOptions;
+			MinimizationOptions minimizationOptions;
+			
+			AutomataVerifier verifier;
+
+			verificationOptions = VerificationOptions.getDefaultNonblockingOptions();
+			synchronizationOptions = SynchronizationOptions.getDefaultVerificationOptions();
+			minimizationOptions = MinimizationOptions.getDefaultNonblockingOptions();
+			minimizationOptions.setMinimizationStrategy(MinimizationStrategy.FewestTransitionsFirst);
+			verifier = new AutomataVerifier(theProject, verificationOptions, synchronizationOptions, minimizationOptions);
+			assertTrue(verifier.verify());
+		}
+		catch (Exception ex)
+		{
+			ex.printStackTrace();
+			assertTrue(false);			
+		}
+	}
+	*/
 }

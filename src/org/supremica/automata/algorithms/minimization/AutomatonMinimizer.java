@@ -93,6 +93,7 @@ public class AutomatonMinimizer
 
     // Local debug stuff... to be erased when things are stable!
     private static int totalA = 0;
+    private static int totalAA = 0;
     private static int totalB = 0;
     private static int totalC = 0;
     private static int totalD = 0;
@@ -255,9 +256,9 @@ public class AutomatonMinimizer
                     return newAutomaton;
                 }
 
-                //////////////////////
-                // RULES A, B, C, F //
-                //////////////////////
+                //////////////////////////
+                // RULES A, AA, B, C, F //
+                //////////////////////////
 
                 int count = runRules(theAutomaton);
                 if (count > 0)
@@ -314,13 +315,6 @@ public class AutomatonMinimizer
 			// Build the minimized automaton based on the partitioning in equivClasses
 			theAutomaton = buildAutomaton(equivClasses);
 		}
-
-		if (stopRequested)
-        {
-            return null;
-        }
-
-		// Log change
 		int diffSize = statesBefore - theAutomaton.nbrOfStates();
 		totalOE += diffSize;
 		if (diffSize > 0)
@@ -329,12 +323,16 @@ public class AutomatonMinimizer
 						   "respect to observation equivalence.");
 		}
 
-        // Apply rules
+		if (stopRequested)
+        {
+            return null;
+        }
+
         if (equivalenceRelation == EquivalenceRelation.ConflictEquivalence)
         {
-            //////////////////////
-            // RULES A, B, C, F //
-            //////////////////////
+            //////////////////////////
+            // RULES A, AA, B, C, F //
+            //////////////////////////
 
             int count = runRules(theAutomaton);
             if (count > 0)
@@ -898,44 +896,53 @@ public class AutomatonMinimizer
             {
                 // Remove redundant transitions
                 int countArcs = removeRedundantTransitions(aut);
+				int countA = 0;
+                int countAA = 0;
+                int countB = 0;
+                int countC = 0;
+				int countF = 0;
 
                 // Merge conflict equivalent states and stuff...
-                // Rule B
-                int countB = 0;
-                if (options.getUseRuleB())
-                {
-                    countB += ruleB(aut);
-                    totalB += countB;
-                }
-                if (countB > 0)
-                {
-                    countArcs += removeRedundantTransitions(aut);
-                }
-                // Rule A
-                int countA = 0;
+				// Rule A
                 if (options.getUseRuleA())
                 {
-                    countA += ruleA(aut);
-                    totalA += countA;
-                }
-                // Rule AA
-                if (options.getUseRuleAA())
-                {
-                    countA += ruleAA(aut);
+                    countA = ruleA(aut);
                     totalA += countA;
                 }
                 if (countA > 0)
                 {
                     countArcs += removeRedundantTransitions(aut);
                 }
+				// Rule B
+                if (options.getUseRuleB())
+                {
+                    countB = ruleB(aut);
+                    totalB += countB;
+                }
+                if (countB > 0)
+                {
+                    countArcs += removeRedundantTransitions(aut);
+                }
+                // Rule AA
+                if (options.getUseRuleAA())
+                {
+                    countAA = ruleAA(aut);
+                    totalAA += countAA;
+                }
+                if (countAA > 0)
+                {
+                    countArcs += removeRedundantTransitions(aut);
+                }
                 // Rule C
-                int countC = ruleC(aut);
-                totalC += countC;
+				if (true)
+				{
+					countC = ruleC(aut);
+					totalC += countC;
+				}
                 // Rule F
-                int countF = 0;
                 if (options.getUseRuleF())
                 {
-                    countF += ruleF(aut);
+                    countF = ruleF(aut);
                     totalF += countF;
                 }
 
@@ -945,9 +952,9 @@ public class AutomatonMinimizer
                     logger.debug("Removed " + countArcs + " redundant transitions.");
                 }
 
-                logger.debug("Rule A: " + countA + ", rule B: " + countB +
+                logger.debug("Rule A: " + countA + ", rule AA: " + countAA + ", rule B: " + countB +
                              ", rule C: " + countC + ", rule F: " + countF);
-                count = countA+countB+countC+countF;
+                count = countA+countAA+countB+countC+countF;
                 total += count;
             } while (count > 0);
         }
@@ -1133,7 +1140,7 @@ public class AutomatonMinimizer
         ////////////
 
         // Count the removed states
-        int countA = 0;
+        int countAA = 0;
 
         // If there is at least one outgoing epsilon transition AND this is not the initial
         // state AND all incoming transitions are epsilon!
@@ -1196,11 +1203,11 @@ public class AutomatonMinimizer
                 }
 
                 aut.removeState(one);
-                countA++;
+                countAA++;
             }
         }
 
-        return countA;
+        return countAA;
     }
 
     /**
@@ -1598,11 +1605,12 @@ public class AutomatonMinimizer
 
     public static void printTotal()
     {
-        logger.verbose("Reduction statistics: A: " + totalA + ", B: " + totalB + ", C: " + totalC + ", D: " + totalD + ", F: " + totalF + ", OE: " + totalOE + ", Arcs: " + totalArcs + ".");
+        logger.info("Reduction statistics: A: " + totalA + ", AA: " + totalAA + ", B: " + totalB + ", C: " + totalC + ", D: " + totalD + ", F: " + totalF + ", OE: " + totalOE + ", Arcs: " + totalArcs + ".");
     }
     public static void resetTotal()
     {
         totalA = 0;
+        totalAA = 0;
         totalB = 0;
         totalC = 0;
         totalD = 0;

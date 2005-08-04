@@ -121,7 +121,7 @@ public class Options
 													  "Tree SAT",
 													  "Exact (slow!)" };
 	public static final int COUNT_NONE = 0, COUNT_TREE = 1, COUNT_EXACT = 2;
-	public static int count_algo = COUNT_TREE;
+	public static int count_algo = COUNT_EXACT;
 
 	/** the cost function in the FORCE heuristic */
 	public static final String[] FORCE_TYPE_NAMES = {

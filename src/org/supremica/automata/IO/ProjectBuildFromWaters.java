@@ -57,11 +57,12 @@ import net.sourceforge.waters.model.base.DocumentManager;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.des.*;
+import net.sourceforge.waters.xsd.base.EventKind;
 
 
 public class ProjectBuildFromWaters
 {
-	private static Logger logger = LoggerFactory.createLogger(ProjectBuildFromFSM.class);
+	private static Logger logger = LoggerFactory.createLogger(ProjectBuildFromWaters.class);
 	private ProjectFactory theProjectFactory = null;
 	private Project currProject = null;
 
@@ -113,18 +114,45 @@ public class ProjectBuildFromWaters
 			//System.err.println("Automaton: " + currWatersAutomaton.getName());
 			currSupremicaAutomaton.setType(AutomatonType.toType(currWatersAutomaton.getKind()));
 
+			// Termination event
+			EventProxy term = null;
+			boolean multicolored = false;
+
 			// Create states
 			Set currWatersStates = currWatersAutomaton.getStates();
 			for (Iterator stateIt = currWatersStates.iterator(); stateIt.hasNext(); )
 			{
-				StateProxy currWatersState = (StateProxy)stateIt.next();
-
+				StateProxy currWatersState = (StateProxy) stateIt.next();
 				//System.err.println("State: " + currWatersState.getName());
 
-
 				State currSupremicaState = new State(currWatersState.getName());
-				currSupremicaState.setInitial(currWatersState.isInitial());
 
+				// Set attributes
+				// Initial?
+				currSupremicaState.setInitial(currWatersState.isInitial());				
+				// Find marked status (only one type of marking here!!!)
+				for (Iterator evIt = currWatersState.getPropositions().iterator(); evIt.hasNext(); )
+				{
+					EventProxy event = (EventProxy) evIt.next();
+					if (event.getKind() == EventKind.PROPOSITION)
+					{
+						if (!multicolored && (term != null) && !event.equals(term))
+						{
+							multicolored = true;
+						}
+						term = event;
+						currSupremicaState.setAccepting(true);
+						break;
+					}
+				}
+
+				if (multicolored)
+				{
+					//Print warning! Color disappears in conversion!
+					System.out.println("Waters model had multicolored marking, Supremica model treats all markings as the same color.");
+				}					
+
+				// Add to automaton
 				currSupremicaAutomaton.addState(currSupremicaState);
 			}
 

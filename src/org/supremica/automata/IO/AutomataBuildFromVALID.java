@@ -188,8 +188,8 @@ public class AutomataBuildFromVALID
 			element = (Element) i.next();
 
 			// Here we need to examine two files at the same time (for renaming events)
-			Document subDoc = docBuilder.build(new File(filePath + File.separator + 
-								element.getChild("instance").getAttributeValue("module") + ".vmod"));
+			Document subDoc = docBuilder.build(new File(filePath + File.separator +
+                            element.getChild("instance").getAttributeValue("module") + ".vmod"));
 			Element subRoot = subDoc.getRootElement();
 			String dummyVariable = element.getAttributeValue("dummy");
 

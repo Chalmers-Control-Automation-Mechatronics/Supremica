@@ -1428,7 +1428,6 @@ public class Automata
 			}
 		}
 
-		/*
 		// Warns if the system has disjoint modules (the system can be divided into at least two sets
 		// of modules whose union alphabets are disjoint)
 		if (examineStructure)
@@ -1438,7 +1437,6 @@ public class Automata
 				// Warning has been written in the log window by isSeveralSystems.
 			}
 		}
-		*/
 
 		// Examines each automaton for an initial state
 		if (mustHaveInitial)

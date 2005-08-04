@@ -616,19 +616,20 @@ public class BDDAutomata
 	// ------------------------------------------------------------------------------
 	public void count_states(String name, int bdd)
 	{
-		Options.out.println(name + " " + count_states(bdd));
+		String accuracy = (Options.count_algo == Options.COUNT_EXACT) ? "(exactly)" : "(approximately)";
+		Options.out.println(name + " " + count_states(bdd) + " " + accuracy);
 	}
 
 	public double count_states(int bdd)
 	{
 		switch (Options.count_algo)
 		{
-
+			
 		case Options.COUNT_NONE :
 			return 0;
-
+			
 		case Options.COUNT_TREE :
-
+			
 			// the easy way
 			int new_bdd = removeDontCareS(bdd);
 			double states = satCount(new_bdd);
@@ -670,7 +671,6 @@ public class BDDAutomata
 
 		for (int i = 0; i < states.length; i++)
 		{
-
 			// dont know which one is faster in the total recursive run , probably relProd ?
 			int tmp = and(bdd, states[i].bdd_s);
 

@@ -22,9 +22,20 @@ public class TransferLine
 	{
 		this.sanchez_models = sanchez_models;
 		project = new Project();
-		project.setComment("This testcase has some resemblance to the Transfer Line " + 
-						   "example from Wonham's Lecture Notes, the main difference " + 
-						   "being that here, the different cells are not connected.");
+		if (!sanchez_models)
+		{
+			project.setComment("This testcase is based on the Transfer Line " + 
+							   "example from 'Notes on Control of Discrete-Event Systems' " + 
+							   "my W.M Wonham. Here with " + cells + " serially connected, " + 
+							   "identical cells.");
+		}
+		else
+		{
+			project.setComment("This testcase has some resemblance to the Transfer Line " + 
+							   "example from 'Notes on Control of Discrete-Event Systems' " + 
+							   "my W.M Wonham. The main difference being that, strangely " + 
+							   "enough, the different cells are not connected.");
+		}
 
 		// create those shared events between the cells:
 		if (!sanchez_models)

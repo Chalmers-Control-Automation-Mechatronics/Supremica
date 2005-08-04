@@ -423,7 +423,7 @@ class TransferLinePanel
 		panel.add(new JLabel("Buffer 1 capacity: "));
 		panel.add(int_cap1 = new IntegerField("3", 5));
 		panel.add(new JLabel("Buffer 2 capacity: "));
-		panel.add(int_cap2 = new IntegerField("3", 5));
+		panel.add(int_cap2 = new IntegerField("1", 5));
     }
 
     public Project doIt()

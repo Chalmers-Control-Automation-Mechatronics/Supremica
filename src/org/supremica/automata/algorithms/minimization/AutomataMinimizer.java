@@ -54,6 +54,7 @@ import org.supremica.automata.*;
 import org.supremica.automata.algorithms.*;
 import org.supremica.gui.*;
 import org.supremica.util.ActionTimer;
+import org.supremica.properties.SupremicaProperties;
 
 import java.util.*;
 
@@ -211,12 +212,15 @@ public class AutomataMinimizer
 			}
 		}
 
-		// Print total reduction statistics
-		AutomatonMinimizer.printTotal();
-
-		// Present largest automaton size
-		logger.verbose("The automaton with the most states had " + mostStates + " states.");
-		logger.verbose("The automaton with the most transitions had " + mostTransitions + " transitions.");
+		// Print statistics
+		if (SupremicaProperties.verboseMode())
+		{
+			// Print total reduction statistics
+			AutomatonMinimizer.printTotal();
+			// Present largest automaton size
+			logger.info("The automaton with the most states had " + mostStates + " states.");
+			logger.info("The automaton with the most transitions had " + mostTransitions + " transitions.");
+		}
 
 		// Return the result of the minimization!
 		assert(theAutomata.size() == 1);

@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   ModuleWindow
 //###########################################################################
-//# $Id: ModuleWindow.java,v 1.13 2005-07-25 02:31:27 siw4 Exp $
+//# $Id: ModuleWindow.java,v 1.14 2005-08-04 18:41:36 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -170,7 +170,6 @@ public class ModuleWindow
 
 		if (supremica == null)
 		{
-
 			// Initializes some properties
 			org.supremica.apps.Supremica dummySupremica = new org.supremica.apps.Supremica();
 

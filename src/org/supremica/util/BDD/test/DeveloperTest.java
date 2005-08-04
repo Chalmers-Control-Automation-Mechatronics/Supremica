@@ -45,30 +45,29 @@ public class DeveloperTest
 	{
 		int bdd_r = sup.getReachables();
 
-		automata.count_states("Reachable states", bdd_r);
+		automata.count_states("Reachable states:", bdd_r);
 	}
 
 	private void do_coreachability()
 	{
 		int bdd_r = sup.getCoReachables();
-		automata.count_states("CoReachable states", bdd_r);
 
-
+		automata.count_states("Coreachable states:", bdd_r);
 	}
 
 	private void do_under_construction()
 	{
 		// currentlty, we are playing with the synthesis algo:
 		int bdd_safe = sup.getSafeStates(true, true);
-		automata.count_states("safe states", bdd_safe);
+		automata.count_states("Safe states:", bdd_safe);
 
 
 		int bdd_r = sup.getReachables();
 		int tmp = automata.and(bdd_r, bdd_safe);
-		automata.count_states("REACHABLE safe states", tmp);
+		automata.count_states("REACHABLE safe states:", tmp);
 	}
 
-/*
+	/*
 	private void do_deadlock()
 	{
 		System.err.println("UNDER DEVELOPMENT...");
