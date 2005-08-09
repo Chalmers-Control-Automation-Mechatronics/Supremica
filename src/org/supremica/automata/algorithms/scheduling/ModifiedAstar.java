@@ -36,7 +36,7 @@ public class ModifiedAstar {
     private ClosedNodes closedNodes;
     
     /** Hashtable containing the estimated cost for each robot, having states as keys. **/
-    private ArrayList oneProdRelax;
+    private ArrayList<int[]> oneProdRelax;
 
     /** Hashtable containing the estimated cost for each combination of two robots **/
     private Hashtable[] twoProdRelax;
@@ -61,6 +61,9 @@ public class ModifiedAstar {
     private boolean useOneProdRelax;
     
     private boolean consistentHeuristic = false;
+
+    /** Should be set interactively */
+    private boolean visibilityCheck = true;
  
     /** Deprecated */
     public ModifiedAstar(Automaton theAutomaton)
@@ -117,7 +120,7 @@ public class ModifiedAstar {
 	else {
 	    int nrOfPlants = plantAutomata.size();
 	    
-	    oneProdRelax = new ArrayList(nrOfPlants);
+	    oneProdRelax = new ArrayList<int[]>(nrOfPlants);
 	    
 	    if (nrOfPlants > 2) {
 		twoProdRelax = new Hashtable[nrOfPlants * (nrOfPlants - 1) / 2];
@@ -140,6 +143,11 @@ public class ModifiedAstar {
 	    
 	    timer.start();
 	    preprocess1();
+	    if (visibilityCheck) {
+		VisGraphBuilder vgBuilder = new VisGraphBuilder(plantAutomata, oneProdRelax);
+		double[] pt = new double[]{4,5};
+		logger.info("is visible = " + vgBuilder.isVisible(pt));
+	    }
 	    infoStr += "\t1st preprocessing in " + timer.elapsedTime() + " ms\n";	
 
 	    // Tillfälligt bortkommenterat	    
@@ -413,7 +421,7 @@ public class ModifiedAstar {
 	
 	for (int i=0; i<activeAutomataIndex.length; i++) {
 	    //int altEstimate = theNode.getCurrentCosts()[i] + ((Integer)oneProdRelax[i].get(theNode.getState(i))).intValue();
-	    int altEstimate = currCosts[i] + ((int[])oneProdRelax.get(i))[node[activeAutomataIndex[i]]]; 
+	    int altEstimate = currCosts[i] + oneProdRelax.get(i)[node[activeAutomataIndex[i]]]; 
 	    
 	    if (altEstimate > estimate)
 		estimate = altEstimate;
