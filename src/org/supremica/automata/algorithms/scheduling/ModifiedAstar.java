@@ -65,6 +65,8 @@ public class ModifiedAstar {
     /** Should be set interactively */
     private boolean visibilityCheck = true;
  
+    private int accCostIndex, currCostIndex, effCostIndex;
+
     /** Deprecated */
     public ModifiedAstar(Automaton theAutomaton)
     {
@@ -145,8 +147,6 @@ public class ModifiedAstar {
 	    preprocess1();
 	    if (visibilityCheck) {
 		VisGraphBuilder vgBuilder = new VisGraphBuilder(plantAutomata, oneProdRelax);
-		double[] pt = new double[]{4,5};
-		logger.info("is visible = " + vgBuilder.isVisible(pt));
 	    }
 	    infoStr += "\t1st preprocessing in " + timer.elapsedTime() + " ms\n";	
 
@@ -162,10 +162,8 @@ public class ModifiedAstar {
 	    timer.start();
 	    searchCounter = 0;
 	    
-	    activeAutomataIndex = new int[plantAutomata.size()];
-	    for (int i=0; i<activeAutomataIndex.length; i++) {
-		activeAutomataIndex[i] = theAutomata.getAutomatonIndex(plantAutomata.getAutomatonAt(i));
-	    }
+	    initAuxIndices();
+
 	    int[] accNode = scheduleFrom(makeInitialNode());
 
 	    if (accNode == null)
@@ -178,6 +176,17 @@ public class ModifiedAstar {
 	    
 	    return accNode;
 	}
+    }
+
+    private void initAuxIndices() {
+	activeAutomataIndex = new int[plantAutomata.size()];
+	for (int i=0; i<activeAutomataIndex.length; i++) {
+	    activeAutomataIndex[i] = theAutomata.getAutomatonIndex(plantAutomata.getAutomatonAt(i));
+	}
+
+	currCostIndex = 2*theAutomata.size() + AutomataIndexFormHelper.STATE_EXTRA_DATA;
+	accCostIndex = activeAutomataIndex.length;
+	effCostIndex = accCostIndex + 1;
     }
     
     public String printArray(int[] node) {
@@ -340,38 +349,51 @@ public class ModifiedAstar {
     }
 
     private boolean higherCostInAllDirections(int[] currNode, int[] existingNode) {
-	int startIndex = 2*theAutomata.size() + AutomataIndexFormHelper.STATE_EXTRA_DATA;
-	int diff = currNode.length - startIndex - 1 ;
-	int movingStartIndex = startIndex;
-
-	while (movingStartIndex < existingNode.length) {
-	    for (int i=0; i<diff; i++) {
-		if ((currNode[i+startIndex] + currNode[diff+startIndex]) < (existingNode[i+movingStartIndex]+existingNode[diff+movingStartIndex]))
-		    return false;
-	    }
-
-	    movingStartIndex += diff + theAutomata.size() + 1;
+	for (int i=0; i<activeAutomataIndex.length; i++) {
+	    if ((currNode[i+currCostIndex] + currNode[accCostIndex]) < (existingNode[i+currCostIndex]+existingNode[accCostIndex]))
+		return false;
 	}
 
 	return true;
     }
 
     private boolean smallerCostInAllDirections(int[] currNode, int[] existingNode) {
-	int startIndex = 2*theAutomata.size() + AutomataIndexFormHelper.STATE_EXTRA_DATA;
-	int diff = currNode.length - startIndex - 1 ;
-	int movingStartIndex = startIndex;
-
-	while (movingStartIndex < existingNode.length) {
-	    for (int i=0; i<diff; i++) {
-		if ((currNode[i+startIndex] + currNode[diff+startIndex]) > (existingNode[i+movingStartIndex]+existingNode[diff+movingStartIndex]))
-		    return false;
-	    }
-
-	    movingStartIndex += diff + theAutomata.size() + 1;
-	}
-
-	return true;
+	return higherCostInAllDirections(existingNode, currNode);
     }
+
+ //    private boolean higherCostInAllDirections(int[] currNode, int[] existingNode) {
+// // 	int startIndex = 2*theAutomata.size() + AutomataIndexFormHelper.STATE_EXTRA_DATA;
+// // 	int diff = activeAutomataIndex.length; //currNode.length - startIndex - 1 ;
+// // 	int movingStartIndex = startIndex;
+
+// // 	while (movingStartIndex < existingNode.length) {
+// 	    for (int i=0; i<diff; i++) {
+// 		if ((currNode[i+startIndex] + currNode[diff+startIndex]) < (existingNode[i+movingStartIndex]+existingNode[diff+movingStartIndex]))
+// 		    return false;
+// 	    }
+
+// // 	    movingStartIndex += diff + theAutomata.size() + 1;
+// // 	}
+
+// 	return true;
+//     }
+
+//     private boolean smallerCostInAllDirections(int[] currNode, int[] existingNode) {
+// 	int startIndex = 2*theAutomata.size() + AutomataIndexFormHelper.STATE_EXTRA_DATA;
+// 	int diff = activeAutomataIndex.length; //currNode.length - startIndex - 1 ;
+// // 	int movingStartIndex = startIndex;
+
+// // 	while (movingStartIndex < existingNode.length) {
+// 	    for (int i=0; i<diff; i++) {
+// 		if ((currNode[i+startIndex] + currNode[diff+startIndex]) > (existingNode[i+movingStartIndex]+existingNode[diff+movingStartIndex]))
+// 		    return false;
+// 	    }
+
+// // 	    movingStartIndex += diff + theAutomata.size() + 1;
+// // 	}
+
+// 	return true;
+//     }
     
     /**
      * Removes the node purgedNode and all its successors from the closed list. 
