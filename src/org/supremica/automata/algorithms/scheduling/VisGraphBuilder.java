@@ -13,10 +13,10 @@ public class VisGraphBuilder {
 
     private Automata plantAutomata;
     private ArrayList<int[]> oneProdRelax;
-    private ArrayList<double[]> edges;
+    private ArrayList<int[]> edges;
     private Hashtable<Integer, ArrayList<Integer>>[] totalZoneIndices;
-    private double[][] zoneTimes;
-    private double[] goal;
+    private int[][] zoneTimes;
+    private int[] goal;
     private VisibilityChecker checker;
     private static Logger logger = LoggerFactory.createLogger(VisGraphBuilder.class);
 
@@ -25,8 +25,8 @@ public class VisGraphBuilder {
 	this.plantAutomata = plantAutomata;
 	this.oneProdRelax = oneProdRelax;
 
-	edges = new ArrayList<double[]>();
-	goal = new double[plantAutomata.size()];
+	edges = new ArrayList<int[]>();
+	goal = new int[plantAutomata.size()];
 
 	buildVisGraph();
 
@@ -98,29 +98,29 @@ public class VisGraphBuilder {
 	    ArrayList<Integer> r2TimeIndices = totalZoneIndices[1].get(key);
 
 	    if (key == -1) 
-		goal = new double[]{zoneTimes[0][r1TimeIndices.get(0)], zoneTimes[1][r2TimeIndices.get(0)]};
+		goal = new int[]{zoneTimes[0][r1TimeIndices.get(0)], zoneTimes[1][r2TimeIndices.get(0)]};
 	    else if (! (r2TimeIndices == null)) {
-		double[] r1 = new double[r1TimeIndices.size()];
-		double[] r2 = new double[r2TimeIndices.size()];
+		int[] r1 = new int[r1TimeIndices.size()];
+		int[] r2 = new int[r2TimeIndices.size()];
 		for (int i=0; i<r1.length; i++) {
 		    r1[i] = zoneTimes[0][r1TimeIndices.get(i)];
 		    r2[i] = zoneTimes[1][r2TimeIndices.get(i)];
 		}
 		
-		edges.add(new double[]{r1[0], r2[0], r1[1], r2[0]});
-		edges.add(new double[]{r1[0], r2[0], r1[0], r2[1]});
-		edges.add(new double[]{r1[1], r2[1], r1[0], r2[1]});
-		edges.add(new double[]{r1[1], r2[1], r1[1], r2[0]});
+		edges.add(new int[]{r1[0], r2[0], r1[1], r2[0]});
+		edges.add(new int[]{r1[0], r2[0], r1[0], r2[1]});
+		edges.add(new int[]{r1[1], r2[1], r1[0], r2[1]});
+		edges.add(new int[]{r1[1], r2[1], r1[1], r2[0]});
 	    }
 	}
     }
 
     private void extractTimes() {
-	zoneTimes = new double[plantAutomata.size()][];
+	zoneTimes = new int[plantAutomata.size()][];
 
 	for (int i=0; i<plantAutomata.size(); i++) {
 	    int[] relaxationTimes = oneProdRelax.get(i);
-	    double[] automatonZoneTimes = new double[relaxationTimes.length-1];
+	    int[] automatonZoneTimes = new int[relaxationTimes.length-1];
 	    int base = relaxationTimes[0] + plantAutomata.getAutomatonAt(i).getInitialState().getCost();
 	    
 	    for (int j=0; j<automatonZoneTimes.length; j++) {
@@ -170,17 +170,25 @@ public class VisGraphBuilder {
 	}
     }
 
-    public double[] getGoal() {
+    public int[] getGoal() {
 	return goal;
     }
     
-    public ArrayList<double[]> getEdges() {
+    public ArrayList<int[]> getEdges() {
 	return edges;
     }
 
-    public boolean isVisible(double point[]) {
+    public boolean isVisible(int[] point) {
 	checker.setStart(point);
 
 	return checker.isVisible();
+    }
+
+    public double getDistanceToDiag(int[] point) {
+	return checker.getDistanceToDiag(point);
+    }
+
+    public void setStart(int[] point) {
+	checker.setStart(point);
     }
 }

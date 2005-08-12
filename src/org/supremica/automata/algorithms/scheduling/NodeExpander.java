@@ -12,37 +12,37 @@ public class NodeExpander {
     private static Logger logger = LoggerFactory.createLogger(NodeExpander.class);
 
     /** Decides if the expansion of the nodes should be done using the methods of this class or using Supremicas methods */
-    private boolean manualExpansion;
+    protected boolean manualExpansion;
 
     /** Needed to be able to use Supremicas expansion/synchronization methods */
-    private AutomataSynchronizerExecuter onlineSynchronizer;
+    protected AutomataSynchronizerExecuter onlineSynchronizer;
 
     /** Contains maps between states and corresponding indices, in order to compress the used memory and speed up operations */
-//     private AutomataIndexForm indexForm;
+//     protected AutomataIndexForm indexForm;
     
     /** The selected automata to be scheduled */
-    private Automata theAutomata, plantAutomata;
+    protected Automata theAutomata, plantAutomata;
 
     /** The calling class */
-    private ModifiedAstar master;
+    protected Scheduler sched;
 
     /** Maps every event that is specified to the corresponing specification automaton, in order to speed up the expansion */
-    private Hashtable<LabeledEvent, Integer> specEventTable;
+    protected Hashtable<LabeledEvent, Integer> specEventTable;
 
 //     /** Needed for manual expansion */
-//     private int[][][] outgoingEventsTable;
+//     protected int[][][] outgoingEventsTable;
 
 //     /** Needed for manual expansion */
-//     private int[][][] nextStateTable;
+//     protected int[][][] nextStateTable;
 
     /***********************************************************************
      *                Start-up methods                                     *
      ***********************************************************************/
 
-    public NodeExpander(boolean manualExpansion, Automata theAutomata, ModifiedAstar master) {
+    public NodeExpander(boolean manualExpansion, Automata theAutomata, Scheduler sched) {
 	this.manualExpansion = manualExpansion;
 	this.theAutomata = theAutomata;
-	this.master = master;
+	this.sched = sched;
 
 	plantAutomata = theAutomata.getPlantAutomata();
 
@@ -68,7 +68,7 @@ public class NodeExpander {
      *               "manual" technique (adjusted for scheduling)          *
      ***********************************************************************/
 
-    private void initSpecEventTable() {
+    protected void initSpecEventTable() {
 	specEventTable = new Hashtable<LabeledEvent, Integer>();
 
 	for (int i=0; i<theAutomata.size(); i++) {
@@ -96,8 +96,8 @@ public class NodeExpander {
 	    while (arcIt.hasNext()) {
 		LabeledEvent currEvent = arcIt.nextArc().getEvent();
 		Object currSpecIndexObj = specEventTable.get(currEvent);
-		
-		if (currSpecIndexObj == null)
+
+		if (currSpecIndexObj == null) 
 		    children.add(newNode(node, new int[]{i}, new int[]{st.nextState(currEvent).getIndex()}, st.nextState(currEvent).getCost()));
 		else {
 		    int currSpecIndex = ((Integer)currSpecIndexObj).intValue();
@@ -119,6 +119,63 @@ public class NodeExpander {
 	return children;
     }
 
+//     public boolean isEnabled(int[] node, LabeledEvent event) {
+// 	Object currSpecIndexObj = specEventTable.get(event);
+
+// 	if (currSpecIndexObj == null) 
+// 	    return true;
+// 	else {
+// 	    int currSpecIndex = ((Integer)currSpecIndexObj).intValue();
+// 	    StateIterator enabledStatesIt = theAutomata.getAutomatonAt(currSpecIndex).statesThatEnableEventIterator(event.getLabel());
+	    
+// 	    while (enabledStatesIt.hasNext()) {
+// 		State specState = enabledStatesIt.nextState();
+// 		if (node[currSpecIndex] == specState.getIndex()) 
+// 		    return true;
+// 	    }
+// 	}
+	
+// 	return false;
+//     }
+
+//     public int[] expandToGoal(int[] node) {
+// 	Iterator children = expandNodeManually(node, sched.getActiveAutomataIndex()).iterator();
+	
+// 	while(children.hasNext()) {
+// 	    int[] currChild = (int[])children.next();
+// 	}
+
+// 	return null;
+//     }
+  
+//     public int[] expandToGoal(int[] node) {
+// 	if (!sched.isAccepting(node)) {
+// 	    int currCostIndex = sched.getCurrCostIndex();
+// 	    int minCost = node[currCostIndex];
+// 	    int minCostIndex = 0;
+	    
+// 	    for (int i=0; i<sched.getActiveLength(); i++) {
+// 		int automatonIndex = sched.getActiveAutomataIndex()[i];
+// 		int stateIndex = node[automatonIndex];
+// 		State st = theAutomata.getAutomatonAt(automatonIndex).getStateWithIndex(stateIndex);
+// 		LabeledEvent outgoingEvent = st.outgoingArcsIterator().nextArc().getEvent();
+		
+// 		if (isEnabled(node, outgoingEvent)) {
+// 		    int currCost = node[i + currCostIndex];
+		    
+// 		    if (currCost < minCost) {
+// 			minCost = currCost;
+// 			minCostIndex = i;
+// 		    }
+// 		}
+// 	    }
+
+// 	    logger.warn("" + sched.printArray(node) + "   ger  " + minCost + " som min_cost och " + minCostIndex + " som dess index");
+// 	}
+	
+// 	return null;
+//     }
+
     public int[] newNode(int[] node, int[] changedIndices, int[] newStateIndices, int newCost) {
 	int[] nextStateIndices = new int[theAutomata.size() + AutomataIndexFormHelper.STATE_EXTRA_DATA];
 
@@ -127,8 +184,8 @@ public class NodeExpander {
 
 	for (int i=0; i<changedIndices.length; i++)
 	    nextStateIndices[changedIndices[i]] = newStateIndices[i];
-	
-	int[] newCosts = updateCosts(getCosts(node), changedIndices[0], newCost);
+
+	int[] newCosts = sched.updateCosts(getCosts(node), changedIndices[0], newCost);
 
 	return makeNode(nextStateIndices, node, newCosts);
     }
@@ -138,7 +195,7 @@ public class NodeExpander {
      *               "in-built" synchronizer                               *
      ***********************************************************************/
 
-    private void initOnlineSynchronizer() 
+    protected void initOnlineSynchronizer() 
 	{
 		//	Get current options
 		SynchronizationOptions syncOptions = new SynchronizationOptions();
@@ -183,11 +240,11 @@ public class NodeExpander {
 		}
 		
 		if (changedIndex > -1) { // || activeAutomataIndex.length == plantAutomata.size()) {
-		    Integer currKey = master.getKey(nextStateIndex);
+		    Integer currKey = sched.getKey(nextStateIndex);
 		    
 		    if (!childNodes.contains(currKey)) {
  			int newCost = plantAutomata.getAutomatonAt(changedIndex).getStateWithIndex(nextStateIndex[activeAutomataIndex[changedIndex]]).getCost();
- 			int[] newCosts = updateCosts(getCosts(node), changedIndex, newCost);
+ 			int[] newCosts = sched.updateCosts(getCosts(node), changedIndex, newCost);
 			
  			childNodes.put(currKey, makeNode(nextStateIndex, node, newCosts));
 		    }
@@ -223,30 +280,12 @@ public class NodeExpander {
     }
 
     public int[] getCosts(int[] node) {
-	int[] costs = new int[plantAutomata.size() + 1];
 	int startIndex = 2*theAutomata.size() + AutomataIndexFormHelper.STATE_EXTRA_DATA;
+	int[] costs = new int[node.length - startIndex];
 	
 	for (int i=0; i<costs.length; i++)
 	    costs[i] = node[startIndex + i];
 	
 	return costs;
-    }
-    
-    private int[] updateCosts(int[] costs, int changedIndex, int newCost) {
-	int[] newCosts = new int[costs.length];
-	
-	for (int i=0; i<costs.length-1; i++) {
-	    if (i == changedIndex)
-		newCosts[i] = newCost;
-	    else {
-		newCosts[i] = costs[i] - costs[changedIndex]; 
-		if (newCosts[i] < 0)
-		    newCosts[i] = 0;
-	    }
-	}
-	
-	newCosts[newCosts.length-1] = costs[costs.length-1] + costs[changedIndex];
-	
-	return newCosts;
     }
 }
