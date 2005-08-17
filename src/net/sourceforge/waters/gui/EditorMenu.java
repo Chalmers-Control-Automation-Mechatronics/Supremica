@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorMenu
 //###########################################################################
-//# $Id: EditorMenu.java,v 1.13 2005-07-12 03:56:00 siw4 Exp $
+//# $Id: EditorMenu.java,v 1.14 2005-08-17 14:21:01 flordal Exp $
 //###########################################################################
 
 
@@ -227,7 +227,7 @@ public class EditorMenu
 				try
 				{
 					// Print!
-					printJob.print();
+					printJob.print(attributes);
 				}
 				catch (Exception ex)
 				{

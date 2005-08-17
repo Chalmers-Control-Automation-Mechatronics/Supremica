@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.28 2005-07-25 02:31:27 siw4 Exp $
+//# $Id: EditorSurface.java,v 1.29 2005-08-17 14:21:01 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -858,7 +858,7 @@ public class EditorSurface
 		}
 	}
 
- 	public void deselectAll()
+ 	public void unselectAll()
 	{
 		for (int i = 0; i < nodes.size(); i++)
 		{

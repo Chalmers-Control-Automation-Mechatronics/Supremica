@@ -3,7 +3,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorEdge
 //###########################################################################
-//# $Id: EditorEdge.java,v 1.21 2005-05-27 10:28:21 flordal Exp $
+//# $Id: EditorEdge.java,v 1.22 2005-08-17 14:21:01 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -829,8 +829,8 @@ public class EditorEdge
 		}
 		
 		// Find position!
-		int posX = (int) Math.ceil(x2 + Math.sin(theta)*distance);
-		int posY = (int) Math.ceil(y2 + Math.cos(theta)*distance);
+		int posX = (int) Math.round(x2 + Math.sin(theta)*distance);
+		int posY = (int) Math.round(y2 + Math.cos(theta)*distance);
 		
 		// Draw arrow!
 		drawArrow(posX, posY, theta, g2d);
@@ -913,6 +913,7 @@ public class EditorEdge
 	public void drawObject(Graphics g)
 	{
 		Graphics2D g2d = (Graphics2D) g;
+		g2d.setStroke(BASICSTROKE);
 		
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g2d.setColor(getColor());
@@ -1022,7 +1023,7 @@ public class EditorEdge
 				double y2 = endNode.getY();
 				QuadCurve2D.Double curve = getCurve();
 				FlatteningPathIterator it = 
-					new FlatteningPathIterator(curve.getPathIterator(new AffineTransform()), 5.0, 5);
+					new FlatteningPathIterator(curve.getPathIterator(new AffineTransform()), 0.5, 25);
 				while (!it.isDone())
 				{
 					double[] segment = new double[6];

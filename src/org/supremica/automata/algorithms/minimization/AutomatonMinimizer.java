@@ -215,6 +215,7 @@ public class AutomatonMinimizer
                     logger.verbose("Removed " + loopCount + " states involved in silent loops " +
                                    "before running the partitioning.");
                 }
+				totalOE = totalOE + trivialCount + loopCount;
             }
 
             ////////////
@@ -289,7 +290,6 @@ public class AutomatonMinimizer
 		}
 		else
 		{
-			logger.info("I should not be here!");
 			// Partition using naive methods
         	EquivalenceClasses equivClasses = new EquivalenceClasses();
         	try
@@ -323,6 +323,9 @@ public class AutomatonMinimizer
 						   "respect to observation equivalence.");
 		}
 
+        // Don't notify listeners!
+        theAutomaton.beginTransaction();
+
 		if (stopRequested)
         {
             return null;
@@ -353,14 +356,14 @@ public class AutomatonMinimizer
         // Remove from alphabet epsilon events that are never used
         removeUnusedEpsilonEvents(theAutomaton);
 
-       // Message
+		// Start listening again
+        theAutomaton.endTransaction();
+
+		// Message
         int after = theAutomaton.nbrOfStates();
         logger.verbose("There were " + before + " states before and " + after +
                        " states after the minimization. Reduction: " +
                        Math.round(100*(((double) (before-after))*100/before))/100.0 + "%.");
-
-		// Start listening again
-        theAutomaton.endTransaction();
 
         // Return the result of the minimization!
         return theAutomaton;
@@ -1603,9 +1606,13 @@ public class AutomatonMinimizer
         return countF;
     }
 
-    public static void printTotal()
+    public static String getStatistics()
     {
-        logger.info("Reduction statistics: A: " + totalA + ", AA: " + totalAA + ", B: " + totalB + ", C: " + totalC + ", D: " + totalD + ", F: " + totalF + ", OE: " + totalOE + ", Arcs: " + totalArcs + ".");
+		return ("Reduction statistics: A: " + totalA + ", AA: " + totalAA + ", B: " + totalB + ", C: " + totalC + ", D: " + totalD + ", F: " + totalF + ", OE: " + totalOE + ", Arcs: " + totalArcs + ".");
+    }
+    public static String getStatisticsLaTeX()
+    {
+		return(totalB + " & " + totalA + " & " + totalAA + " & " + totalF + " & " + totalC + " & " + totalOE + " & " + totalArcs);
     }
     public static void resetTotal()
     {

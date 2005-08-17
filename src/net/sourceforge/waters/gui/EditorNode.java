@@ -260,8 +260,7 @@ public class EditorNode
 	public void drawObject(Graphics g, java.util.List EventDeclList)
 	{
 		Graphics2D g2d = (Graphics2D) g;
-		Set colours = getColours(EventDeclList);
-		Iterator i = colours.iterator();
+		g2d.setStroke(BASICSTROKE);
 
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g2d.setColor(getColor());
@@ -283,6 +282,8 @@ public class EditorNode
 		}
 
 		// Draw the inside of the node
+		Set colours = getColours(EventDeclList);
+		Iterator i = colours.iterator();
 		if (colours.size() == 0)
 		{
 			// There is no marking!
@@ -295,6 +296,7 @@ public class EditorNode
 			Arc2D.Double a = new Arc2D.Double();
 			double startAngle = 0;
 			double deltaAngle = (double) (360/colours.size());
+
 			while (i.hasNext())
 			{
 				// There are markings but they are fewer than maxDrawnMarkings+1! 
@@ -327,7 +329,7 @@ public class EditorNode
 			drawInitialStateArrow(g2d);
 
 			// Draw line thicker!
-			g2d.setStroke(DOUBLESTROKE);
+			//g2d.setStroke(DOUBLESTROKE);
 		}
 		g2d.drawOval(getX() - RADIUS, getY() - RADIUS, WIDTH, WIDTH);			
 		g2d.setStroke(BASICSTROKE);
@@ -340,6 +342,7 @@ public class EditorNode
 		int borderY = getY() + (int) ((RADIUS+4) * Math.cos(INITARROWANGLE));
 		int outerX = borderX + (int) (INITARROWLENGTH * Math.sin(INITARROWANGLE));
 		int outerY = borderY + (int) (INITARROWLENGTH * Math.cos(INITARROWANGLE));
+		g2d.setStroke(BASICSTROKE);
 		g2d.drawLine(borderX, borderY, outerX, outerY);
 		
 		/*

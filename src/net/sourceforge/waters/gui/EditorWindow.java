@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorWindow
 //###########################################################################
-//# $Id: EditorWindow.java,v 1.17 2005-07-12 03:56:00 siw4 Exp $
+//# $Id: EditorWindow.java,v 1.18 2005-08-17 14:21:01 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -190,7 +190,6 @@ public class EditorWindow
 
 	public void createPDF(File file)
 	{
-
 		int width = surface.getWidth();
 		int height = surface.getHeight();
 		Document document = new Document(new com.lowagie.text.Rectangle(width, height));

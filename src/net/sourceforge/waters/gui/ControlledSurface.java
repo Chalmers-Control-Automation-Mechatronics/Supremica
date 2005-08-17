@@ -43,10 +43,14 @@ public class ControlledSurface
 
 	private boolean hasDragged = false;
 
+	/** List of currently selected EditorObject:s. */
 	private LinkedList selectedObjects = new LinkedList();
+	/** List of EditorObject:s that are to become selected. */
 	private LinkedList toBeSelected = new LinkedList();
-	private LinkedList toBeDeselected = new LinkedList();
+	/** List of EditorObject:s that are to become unselected. */
+	private LinkedList toBeUnselected = new LinkedList();
 
+	/** The currently highlighted EditorObject (under the mouse pointer). */
 	private EditorObject highlightedObject = null;
 
     private DropTarget dropTarget;
@@ -54,12 +58,12 @@ public class ControlledSurface
     
     public String getCommand()
     {
-	return mToolbar.getCommand();
+		return mToolbar.getCommand();
     }
 
     public void setToolbar(ControlledToolbar t)
     {
-	mToolbar = t;
+		mToolbar = t;
     }
 
 
@@ -150,14 +154,14 @@ public class ControlledSurface
 		}
 	}
 
-	private void deselect(EditorObject o)
+	private void unselect(EditorObject o)
 	{
 		if (selectedObjects.contains(o))
 		{
 			selectedObjects.remove(o);
 			o.setSelected(false);
 
-			// Deselect children
+			// Unselect children
 			LinkedList children = getChildren(o);
 			while (children.size() != 0)
 			{
@@ -166,10 +170,10 @@ public class ControlledSurface
 		}
 	}
 
-	public void deselectAll()
+	public void unselectAll()
 	{
 		selectedObjects.clear();
-		super.deselectAll();
+		super.unselectAll();
 	}
 
 	/*
@@ -178,13 +182,13 @@ public class ControlledSurface
 		// Only if SELECT is chosen multiple selection is possible...
 		if (!(T.getPlace() == EditorToolbar.SELECT))
 		{
-			deselectAll();
+			unselectAll();
 		}
 
 		// If object is selected unselect
 		if (selectedObjects.contains(o))
 		{
-			deselect(o);
+			unselect(o);
 		}
 		else
 		{
@@ -258,7 +262,7 @@ public class ControlledSurface
 				// If control is down, we may select multiple things...
 				if (!e.isControlDown())
 				{
-					deselectAll();
+					unselectAll();
 				}
 
 				// If SELECT is active, this means that we're starting a drag-select...
@@ -275,10 +279,10 @@ public class ControlledSurface
 				// If NODEGROUP is active, we're adding a new group!
 				if (getCommand() == NODEGROUP)
 				{
-				    //					EditorNodeGroup nodeGroup;
+				    // EditorNodeGroup nodeGroup;
 					if (nodesSnap)
 					{
-					    //						nodeGroup = addNodeGroup(findGrid(e.getX()), findGrid(e.getY()), 0, 0);
+					    // nodeGroup = addNodeGroup(findGrid(e.getX()), findGrid(e.getY()), 0, 0);
 					    GroupNodeProxy n = new GroupNodeProxy("NodeGroup" + nodeGroups.size());
 					    n.setGeometry(new BoxGeometryProxy(findGrid(e.getX()), findGrid(e.getY()), 0, 0));
 					    newGroup = new EditorNodeGroup(n);
@@ -286,7 +290,7 @@ public class ControlledSurface
 					}
 					else
 					{
-					    //						nodeGroup = addNodeGroup(e.getX(), e.getY(), 0, 0);
+					    // nodeGroup = addNodeGroup(e.getX(), e.getY(), 0, 0);
 					    GroupNodeProxy n = new GroupNodeProxy("NodeGroup" + nodeGroups.size());
 					    n.setGeometry(new BoxGeometryProxy(e.getX(), e.getY(), 0, 0));
 					    newGroup = new EditorNodeGroup(n);
@@ -298,13 +302,13 @@ public class ControlledSurface
 			{
 				// Clicking on something!
 
-				// Should we deselect the currently selected objects?
+				// Should we unselect the currently selected objects?
 				if (!selectedObjects.contains(o))
 				{
 					// If control is down, we may select multiple things...
 					if (!e.isControlDown())
 					{
-						deselectAll();
+						unselectAll();
 					}
 				}
 
@@ -314,13 +318,13 @@ public class ControlledSurface
 				// Only if SELECT is chosen multiple selection is possible...
 				if (!(getCommand() == SELECT))
 				{
-					deselectAll();
+					unselectAll();
 				}
 				
 				// If object is selected prepare to unselect (don't unselect if dragging, though!)
 				if (selectedObjects.contains(o))
 				{
-					toBeDeselected.add(o);
+					toBeUnselected.add(o);
 				}
 				else
 				{
@@ -503,7 +507,7 @@ public class ControlledSurface
 				toBeSelected = getDragSelection();
 
 				// Select all that should be selected...
-				super.deselectAll();
+				super.unselectAll();
 				// These have been selected previously and should still be selected
 				for (int i=0; i<selectedObjects.size(); i++)
 				{
@@ -536,7 +540,7 @@ public class ControlledSurface
 			if (getCommand() == SELECT)
 			{
 				// Don't unselect! We're dragging!
-				toBeDeselected.clear();
+				toBeUnselected.clear();
 
 				// Drag all selected objects
 
@@ -829,9 +833,9 @@ public class ControlledSurface
 		{
 			select((EditorObject) toBeSelected.remove(0));
 		}
-		while (toBeDeselected.size() > 0)
+		while (toBeUnselected.size() > 0)
 		{
-			deselect((EditorObject) toBeDeselected.remove(0));
+			unselect((EditorObject) toBeUnselected.remove(0));
 		}
 
 		if (e.getButton() == MouseEvent.BUTTON1)
@@ -873,7 +877,7 @@ public class ControlledSurface
 				{
 					// This is thus the startingpoint
 					EditorObject n1 = (EditorObject) selectedObjects.get(0);
-					deselect(n1);
+					unselect(n1);
 
 					// This is the targetpoint
 					EditorObject o2 = getObjectAtPosition(e.getX(), e.getY());
@@ -897,7 +901,7 @@ public class ControlledSurface
 					}
 				}
 
-				deselectAll();
+				unselectAll();
 			}
 
 			/*
@@ -1067,8 +1071,12 @@ public class ControlledSurface
 
 		if (e.getButton() == MouseEvent.BUTTON1)
 		{
+			// Singleclick?
 			if (e.getClickCount() == 1)
 			{	
+				// What was clicked?
+				EditorObject o = getObjectAtPosition(e.getX(), e.getY());
+				
 				// Should we add a new node?
 				if (getCommand() == NODE)
 				{
@@ -1086,11 +1094,11 @@ public class ControlledSurface
 						posY = e.getY();
 					}
 					
-					// Is there already a node present?
-					if ((getObjectAtPosition(posX, posY) == null) || (getObjectAtPosition(posX, posY).getType() != EditorObject.NODE))
+					// Make sure there isn't already a node there!
+					if (o == null || o.getType() != EditorObject.NODE)
 					{
-					    Command createNode = new CreateNodeCommand(this, posX, posY);
-					    root.getUndoInterface().executeCommand(createNode);
+						Command createNode = new CreateNodeCommand(this, posX, posY);
+						root.getUndoInterface().executeCommand(createNode);
 						//addLabel(getLastNode(), "", 0, break20);
 						
 						//SimpleNodeProxy np = new SimpleNodeProxy("s" + nodes.size());
@@ -1099,55 +1107,51 @@ public class ControlledSurface
 						//graph.getNodes().add(np);
 					}
 				}
-
-				/** Nonsense?
-				else if (T.getPlace() == EditorToolbar.EDGE)
-				{
-				    EditorObject o = getObjectAtPosition(e.getX(), e.getY());
 				
+				/** Nonsense?
+					else if (T.getPlace() == EditorToolbar.EDGE)
+					{
 					if (o == null)
 					{
-					    deselectAll();
-
-						return;
+					unselectAll();
+					
+					return;
 					}
-				}
 				*/
-
+				
 				// Set clicked node to initial
 				if (getCommand() == INITIAL)
-				{
-					EditorNode n = (EditorNode) getObjectAtPosition(e.getX(), e.getY());
-					
-					if (n == null)
+				{					
+					if (o == null || o.getType() != EditorObject.NODE)
 					{
 						return;
 					}
 					
+					EditorNode n = (EditorNode) o;
 					unsetAllInitial();
 					n.setInitial(true);
 				}
-				EditorObject o = getObjectAtPosition(e.getX(), e.getY());
-				if (getCommand() == SELECT) {
-				    if (o.getType() == EditorObject.LABELGROUP  && edgeIsSelected()) {
-					EditorLabelGroup l = (EditorLabelGroup) o;
-					l.setSelected(true);
-					if (l == null) {
-					    return;
+				
+				// Special stuff for labelgroup clicks? (This is not working properly!)
+				if (getCommand() == SELECT && edgeIsSelected()) 
+				{
+					if (o == null || o.getType() != EditorObject.LABELGROUP)
+					{
+						return;
 					}
 					
+					EditorLabelGroup l = (EditorLabelGroup) o;
+					l.setSelected(true);
 					l.setSelectedLabel(e.getX(), e.getY());
-				    }
 				}
-			}
-				
-			// Double click
+			}				
+			// Doubleclick?
 			else if (e.getClickCount() == 2)
 			{
 				// Change names on double clicking a label, change order when clicking labelgroup!
 				if (getCommand() == SELECT)
 				{
-					/* What's this?
+					/* What's this? No comments?
 					   if (selectedNode != null)
 					   {
 					   if (selectedNode.getPropGroup().wasClicked(e.getX(), e.getY()) && selectedNode.getPropGroup().getVisible())
@@ -1159,20 +1163,14 @@ public class ControlledSurface
 					   }
 					   }
 					*/
-				
+					
+					// What was clicked?
 					EditorObject o = getObjectAtPosition(e.getX(), e.getY());
-					
-					
 					if (o != null)
 					{
 						if (o.getType() == EditorObject.LABEL)
 						{
 							EditorLabel l = (EditorLabel) o;
-							
-							if (l == null)
-							{
-								return;
-							}
 							
 							l.setEditing(true);
 						}
@@ -1180,28 +1178,18 @@ public class ControlledSurface
 						{
 							EditorLabelGroup l = (EditorLabelGroup) o;
 							
-							if (l == null)
-							{
-								return;
-							}
-							
 							l.setSelectedLabel(e.getX(), e.getY());
 						}
 						else if (o.getType() == EditorObject.NODE)
 						{
 							EditorNode n = (EditorNode) o;
 							
-							if (n == null)
-							{
-								return;
-							}
-							
 							n.getPropGroup().setVisible(true);
 						}
 					}
 				}
 			}
-		}
+	}
 		
 		// Repaint is done when you release the mouse button? (But that's before the click?)
 		repaint();

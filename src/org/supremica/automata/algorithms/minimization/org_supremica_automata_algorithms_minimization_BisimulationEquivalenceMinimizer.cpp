@@ -274,13 +274,16 @@ struct qblock *make_qblock_node()
   struct qblock *qb;
   if (! (qb = (struct qblock *) malloc(sizeof(struct qblock))))
 	error ("make_qblock_node: no available memory");
+  if (! (qb->my_x_block = (struct xblock**) malloc(NBROFEVENTS*sizeof(struct xblock*))))
+	error ("make_qblock_node: no available memory");	
+  if (! (qb->x_next = (struct qblock**) malloc(NBROFEVENTS*sizeof(struct qblock*))))
+	error ("make_qblock_node: no available memory");
+  if (! (qb->x_prev= (struct qblock**) malloc(NBROFEVENTS*sizeof(struct qblock*))))
+	error ("make_qblock_node: no available memory");
   qb->n_elements = 0;
   qb->q_next = qb->q_prev = qb->q_tmp = NULL;
   qb->splitl = NULL;
   qb->first = NULL;
-  qb->my_x_block = (struct xblock**) malloc(NBROFEVENTS*sizeof(struct xblock*));
-  qb->x_next = (struct qblock**) malloc(NBROFEVENTS*sizeof(struct qblock*));
-  qb->x_prev= (struct qblock**) malloc(NBROFEVENTS*sizeof(struct qblock*));
   for (i=0; i<NBROFEVENTS; i++) {
 	qb->x_next[i] = qb->x_prev[i] = NULL;
 	qb->my_x_block[i] = NULL;

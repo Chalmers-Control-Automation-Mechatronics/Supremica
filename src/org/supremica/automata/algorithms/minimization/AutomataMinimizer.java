@@ -126,7 +126,7 @@ public class AutomataMinimizer
 		AutomatonMinimizer.resetTotal();
 
 		// For each event, find the automata that has this event in its alphabet
-		if (options.getMinimizationStrategy() == MinimizationStrategy.AtLeastOneUnique)
+		//if (options.getMinimizationStrategy() == MinimizationStrategy.AtLeastOneUnique)
 		{
 			eventToAutomataMap = AlphabetHelpers.buildEventToAutomataMap(theAutomata);
 		}
@@ -176,8 +176,13 @@ public class AutomataMinimizer
 			}
 
 			// Adjust the eventToAutomataMap?
-			if (options.getMinimizationStrategy() == MinimizationStrategy.AtLeastOneUnique)
+			//if (options.getMinimizationStrategy() == MinimizationStrategy.AtLeastOneUnique)
 			{
+				// Remove the hidden events from the map
+				for (EventIterator it = hideThese.iterator(); it.hasNext(); )
+				{
+					eventToAutomataMap.remove(it.nextEvent());
+				}
 				// Remove the examined automata from the map
 				for (EventIterator it = automata.getUnionAlphabet().iterator(); it.hasNext(); )
 				{
@@ -187,7 +192,7 @@ public class AutomataMinimizer
 						aut.removeAutomata(automata);
 					}
 				}
-				// And add the new one!
+				// And add the new automaton!
 				for (EventIterator it = min.getAlphabet().iterator(); it.hasNext(); )
 				{
 					eventToAutomataMap.put(it.nextEvent(), min);
@@ -216,11 +221,12 @@ public class AutomataMinimizer
 		if (SupremicaProperties.verboseMode())
 		{
 			// Print total reduction statistics
-			AutomatonMinimizer.printTotal();
-			// Present largest automaton size
+			logger.info(AutomatonMinimizer.getStatistics());
+			// Print largest automaton size
 			logger.info("The automaton with the most states had " + mostStates + " states.");
 			logger.info("The automaton with the most transitions had " + mostTransitions + " transitions.");
 		}
+		//logger.info(theAutomata.getName() + " & " + nbrOfAutomata + " &  & " + mostStates + " & " + mostTransitions + " & time & block & " + AutomatonMinimizer.getStatisticsLaTeX() + " & \\\\");
 
 		// Return the result of the minimization!
 		assert(theAutomata.size() == 1);
@@ -390,7 +396,13 @@ public class AutomataMinimizer
 					continue;
 				}
 
-				// Calculate the alphabet of unique events (not just this one line!!)
+				// Calculate the alphabet of unique events
+				Automata candidate = new Automata();
+				candidate.addAutomaton(autA);
+				candidate.addAutomaton(autB);
+				Alphabet uniqueEvents = getUniqueEvents(candidate);
+				/*
+				// First find the union of the alphabets
 				Alphabet uniqueEvents = AlphabetHelpers.union(alphaA, alphaB);
 				// The targetAlphabet should not be removed (although those events may be "unique")!
 				uniqueEvents.minus(options.getTargetAlphabet());
@@ -415,6 +427,7 @@ public class AutomataMinimizer
 						break;
 					}
 				}
+				*/
 
 				// Find ratios
 				int nbrOfUniqueEvents = uniqueEvents.size();
@@ -502,14 +515,11 @@ public class AutomataMinimizer
 			if (result != null)
 			{
 				// Which events should be hidden?
-				hideThese = getUniqueEvents(result, theAutomata);
-
-				//logger.info(result);
-				//logger.info(hideThese);
+				hideThese = getUniqueEvents(result);
 			}
 			else
 			{
-				// This must mean that there were only targetAlphabet events left? We should not
+				// This must mean that there were only targetAlphabet events left? It might be a bad idea to
 				// take all of them at once (they may be many!) but I'll do that for now...
 				result = new Automata(theAutomata);
 
@@ -517,13 +527,6 @@ public class AutomataMinimizer
 				hideThese = result.getUnionAlphabet();
 				hideThese.minus(targetAlphabet);
 				assert(hideThese.size() == 0);
-			}
-
-			// Adjust the EventToAutomataMap! (We don't want to recalculate it every time.)
-			// Remove the hidden ones
-			for (EventIterator it = hideThese.iterator(); it.hasNext(); )
-			{
-				eventToAutomataMap.remove(it.nextEvent());
 			}
 		}
 		else
@@ -541,26 +544,26 @@ public class AutomataMinimizer
 	}
 
 	/**
-	 * This method examines how many unique events there are in autA with respect to autB.
-	 * If automata from autA are included in autB, they are ignored.
+	 * This method examines how many unique events there are in autA.
 	 */
-	private Alphabet getUniqueEvents(Automata autA, Automata autB)
+	private Alphabet getUniqueEvents(Automata autA)
 	{
-		/*
-		Automata autNotA = new Automata(autB);
-		autNotA.removeAutomata(autA);
-
-		Alphabet alphaA = autA.getUnionAlphabet();
-		Alphabet alphaNotA = autNotA.getUnionAlphabet();
-		*/
-
+		// The candidates for uniqueness
 		Alphabet unique = autA.getUnionAlphabet();
+		// Which aren't unique?
 		Alphabet toBeRemoved = new Alphabet();
 		for (EventIterator it = unique.iterator(); it.hasNext(); )
 		{
 			LabeledEvent event = it.nextEvent();
 
 			Automata sharers = eventToAutomataMap.get(event);
+
+			// If there are more sharers than there are automata in autA... then something is fishy!
+			if (sharers.size() > autA.size())
+			{
+				toBeRemoved.addEvent(event);
+				continue;
+			}
 
 			for (AutomatonIterator autIt = sharers.iterator(); autIt.hasNext(); )
 			{

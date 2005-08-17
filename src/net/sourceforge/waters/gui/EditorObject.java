@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorObject
 //###########################################################################
-//# $Id: EditorObject.java,v 1.14 2005-07-04 23:06:48 siw4 Exp $
+//# $Id: EditorObject.java,v 1.15 2005-08-17 14:21:01 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -41,8 +41,10 @@ public class EditorObject
 	// Should we draw a shadow on highlighted objects?
 	protected boolean shadow = true;
 
-	// Different pens for drawing
+	// Different pen sizes for drawing
 	public final Stroke BASICSTROKE = new BasicStroke();
+	// This one (hairline) is more apropriate when printing?
+	//public final Stroke BASICSTROKE = new BasicStroke(0.25f); 
 	public final Stroke DOUBLESTROKE = new BasicStroke(2); 	
 	public final Stroke SHADOWSTROKE = new BasicStroke(10, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND); 	
 
