@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorOptions
 //###########################################################################
-//# $Id: EditorOptions.java,v 1.3 2005-02-22 04:12:36 knut Exp $
+//# $Id: EditorOptions.java,v 1.4 2005-08-17 14:59:09 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -40,12 +40,17 @@ public class EditorOptions
 
 		setTitle("Options");
 
-		JLabel Label = new JLabel("Grid");
-		boolean selected = root.getControlledSurface().getShowGrid();
-		JRadioButton Button = new JRadioButton(On, selected);
+		// Main panel
+		JPanel mainPanel = new JPanel();
+		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
 
-		Button.setActionCommand(On);
-		Button.addChangeListener(new ChangeListener()
+		// GRID ON OR OFF
+		JPanel subPanel = new JPanel();
+		JLabel label = new JLabel("Grid");
+		boolean selected = root.getControlledSurface().getShowGrid();
+		JRadioButton button = new JRadioButton(On, selected);
+		button.setActionCommand(On);
+		button.addChangeListener(new ChangeListener()
 		{
 			public void stateChanged(ChangeEvent e)
 			{
@@ -55,36 +60,26 @@ public class EditorOptions
 				r.repaint();
 			}
 		});
-
-		JPanel subPanel = new JPanel();
-		JPanel mainPanel = new JPanel();
-
-		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-		gridShow.add(Button);
-		subPanel.add(Label);
-		subPanel.add(Button);
-
-		Button = new JRadioButton(Off, !selected);
-
-		Button.setActionCommand(Off);
-		gridShow.add(Button);
-		subPanel.add(Button);
+		gridShow.add(button);
+		subPanel.add(label);
+		subPanel.add(button);
+		button = new JRadioButton(Off, !selected);
+		button.setActionCommand(Off);
+		gridShow.add(button);
+		subPanel.add(button);
 		mainPanel.add(subPanel);
 
-		Label = new JLabel("Grid Size");
+		// GRID SIZE
+		subPanel = new JPanel();
+		label = new JLabel("Grid Size");
 		gridSize = new JSlider(GS_MIN, GS_MAX, root.getControlledSurface().getGridSize());
-
 		gridSize.setMajorTickSpacing(4);
 		gridSize.setMinorTickSpacing(4);
-
 		java.text.NumberFormat numberFormat = java.text.NumberFormat.getIntegerInstance();
 		NumberFormatter formatter = new NumberFormatter(numberFormat);
-
 		formatter.setMinimum(new Integer(GS_MIN));
 		formatter.setMaximum(new Integer(GS_MAX));
-
 		textField = new JFormattedTextField(formatter);
-
 		textField.setValue(new Integer(gridSize.getValue()));
 		textField.setColumns(3);    //get some space
 		textField.getActionMap().put("check", new AbstractAction()
@@ -140,20 +135,18 @@ public class EditorOptions
 				}
 			}
 		});
-
-		subPanel = new JPanel();
-
-		subPanel.add(Label);
+		subPanel.add(label);
 		subPanel.add(gridSize);
 		subPanel.add(textField);
 		mainPanel.add(subPanel);
 
-		Label = new JLabel("Control Points move with nodes");
+		// CONTROL POINTS
+		subPanel = new JPanel();
+		label = new JLabel("Control Points move with nodes");
 		selected = root.getControlledSurface().getControlPointsMove();
-		Button = new JRadioButton(On, selected);
-
-		Button.setActionCommand(On);
-		Button.addChangeListener(new ChangeListener()
+		button = new JRadioButton(On, selected);
+		button.setActionCommand(On);
+		button.addChangeListener(new ChangeListener()
 		{
 			public void stateChanged(ChangeEvent e)
 			{
@@ -162,26 +155,22 @@ public class EditorOptions
 				r.getControlledSurface().setControlPointsMove(b.isSelected());
 			}
 		});
-
-		subPanel = new JPanel();
-
-		subPanel.add(Label);
-		subPanel.add(Button);
-		controlPointsMove.add(Button);
-
-		Button = new JRadioButton(Off, !selected);
-
-		Button.setActionCommand(Off);
-		subPanel.add(Button);
-		controlPointsMove.add(Button);
+		subPanel.add(label);
+		subPanel.add(button);
+		controlPointsMove.add(button);
+		button = new JRadioButton(Off, !selected);
+		button.setActionCommand(Off);
+		subPanel.add(button);
+		controlPointsMove.add(button);
 		mainPanel.add(subPanel);
 
-		Label = new JLabel("Nodes snap to grid");
+		// NODES SNAP
+		subPanel = new JPanel();
+		label = new JLabel("Nodes snap to grid");
 		selected = root.getControlledSurface().getNodesSnap();
-		Button = new JRadioButton(On, selected);
-
-		Button.setActionCommand(On);
-		Button.addChangeListener(new ChangeListener()
+		button = new JRadioButton(On, selected);
+		button.setActionCommand(On);
+		button.addChangeListener(new ChangeListener()
 		{
 			public void stateChanged(ChangeEvent e)
 			{
@@ -190,25 +179,42 @@ public class EditorOptions
 				r.getControlledSurface().setNodesSnap(b.isSelected());
 			}
 		});
-
-		subPanel = new JPanel();
-
-		subPanel.add(Label);
-		subPanel.add(Button);
-		nodesSnap.add(Button);
-
-		Button = new JRadioButton(Off, !selected);
-
-		Button.setActionCommand(Off);
-		subPanel.add(Button);
-		nodesSnap.add(Button);
+		subPanel.add(label);
+		subPanel.add(button);
+		nodesSnap.add(button);
+		button = new JRadioButton(Off, !selected);
+		button.setActionCommand(Off);
+		subPanel.add(button);
+		nodesSnap.add(button);
 		mainPanel.add(subPanel);
 
+		// EDGE ARROWS
+		JPanel edgeArrowPanel = new JPanel();
+		JLabel edgeArrowLabel = new JLabel("Edge arrow position");
+		ButtonGroup edgeArrowButtons = new ButtonGroup();
+		JRadioButton inTheMiddle = new JRadioButton("In the middle", !EditorEdge.getArrowAtEnd());
+		JRadioButton atTheEnd = new JRadioButton("At the end", EditorEdge.getArrowAtEnd());
+		edgeArrowButtons.add(inTheMiddle);
+		edgeArrowButtons.add(atTheEnd);
+		edgeArrowPanel.add(edgeArrowLabel);
+		edgeArrowPanel.add(inTheMiddle);
+		edgeArrowPanel.add(atTheEnd);
+		mainPanel.add(edgeArrowPanel);
+		inTheMiddle.addChangeListener(new ChangeListener()
+		{
+			public void stateChanged(ChangeEvent e)
+			{
+				JRadioButton b = (JRadioButton) e.getSource();
+				
+				EditorEdge.setArrowAtEnd(!b.isSelected());
+				r.repaint();
+			}
+		});
+
+		// OK-BUTTON
 		subPanel = new JPanel();
-
-		JButton button = new JButton("OK");
-
-		button.addActionListener(new ActionListener()
+		JButton okButton = new JButton("OK");
+		okButton.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
@@ -223,7 +229,7 @@ public class EditorOptions
 				setVisible(false);
 			}
 		});
-		subPanel.add(button);
+		subPanel.add(okButton);
 		mainPanel.add(subPanel);
 		this.getContentPane().add(mainPanel);
 		this.pack();

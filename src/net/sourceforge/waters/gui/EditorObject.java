@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorObject
 //###########################################################################
-//# $Id: EditorObject.java,v 1.15 2005-08-17 14:21:01 flordal Exp $
+//# $Id: EditorObject.java,v 1.16 2005-08-17 14:59:09 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -42,9 +42,9 @@ public class EditorObject
 	protected boolean shadow = true;
 
 	// Different pen sizes for drawing
-	public final Stroke BASICSTROKE = new BasicStroke();
+	//public final Stroke BASICSTROKE = new BasicStroke();
 	// This one (hairline) is more apropriate when printing?
-	//public final Stroke BASICSTROKE = new BasicStroke(0.25f); 
+	public final Stroke BASICSTROKE = new BasicStroke(0.25f); 
 	public final Stroke DOUBLESTROKE = new BasicStroke(2); 	
 	public final Stroke SHADOWSTROKE = new BasicStroke(10, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND); 	
 

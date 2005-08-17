@@ -3,7 +3,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorEdge
 //###########################################################################
-//# $Id: EditorEdge.java,v 1.22 2005-08-17 14:21:01 flordal Exp $
+//# $Id: EditorEdge.java,v 1.23 2005-08-17 14:59:09 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -1078,5 +1078,14 @@ public class EditorEdge
 			//g2d.draw(target);
 			g2d.fill(target);
 		}
+	}
+
+	public static boolean getArrowAtEnd()
+	{
+		return arrowAtEnd;
+	}
+	public static void setArrowAtEnd(boolean set)
+	{
+		arrowAtEnd = set;
 	}
 }
