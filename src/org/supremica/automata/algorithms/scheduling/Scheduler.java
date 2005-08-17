@@ -28,7 +28,7 @@ public abstract class Scheduler {
     protected ActionTimer timer;
     
     /** Contains "opened" but not yet examined (i.e. not "closed") nodes. */
-    protected ArrayList openList;
+    protected ArrayList<int[]> openList;
     
     /** Contains already examined (i.e. "closed") nodes. */
 //     protected Hashtable<Integer, int[]> closedNodes;
@@ -61,9 +61,11 @@ public abstract class Scheduler {
     
     protected boolean consistentHeuristic = false;
  
-    protected int accCostIndex, currCostIndex;
+    protected int accCostIndex, currCostIndex, parentIndex;
 
     protected String infoStr =  "";
+
+    protected String heuristic = "";
 
     /** Deprecated */
     public Scheduler(Automaton theAutomaton)
@@ -83,6 +85,7 @@ public abstract class Scheduler {
     public Scheduler(Automata theAutomata, String heuristic, boolean manualExpansion, boolean iterativeSearch) throws Exception {
 	this.theAutomata = theAutomata;
 	this.iterativeSearch = iterativeSearch;
+	this.heuristic = heuristic;
 
 	if (heuristic.equals("1-product relax"))
 	    useOneProdRelax = true;
@@ -92,15 +95,13 @@ public abstract class Scheduler {
 
 	    useOneProdRelax = false;
 	}
-	else
-	    throw new Exception("Unknown heuristic");
 
 	init(manualExpansion);
     }
 
     protected void init(boolean manualExpansion) {
 	timer = new ActionTimer();
-	openList = new ArrayList();
+	openList = new ArrayList<int[]>();
 // 	closedNodes = new Hashtable<Integer, int[]>();
 	closedNodes = new ClosedNodes(theAutomata.size() + AutomataIndexFormHelper.STATE_EXTRA_DATA);
 	expander = new NodeExpander(manualExpansion, theAutomata, this);
@@ -178,7 +179,8 @@ public abstract class Scheduler {
 	    activeAutomataIndex[i] = theAutomata.getAutomatonIndex(plantAutomata.getAutomatonAt(i));
 	}
 
-	currCostIndex = 2*theAutomata.size() + AutomataIndexFormHelper.STATE_EXTRA_DATA;
+	parentIndex = theAutomata.size() + AutomataIndexFormHelper.STATE_EXTRA_DATA;
+	currCostIndex = parentIndex + ClosedNodes.CLOSED_NODE_INFO_SIZE;
 	accCostIndex = currCostIndex + activeAutomataIndex.length;
     }
     
@@ -252,9 +254,7 @@ public abstract class Scheduler {
      * 		   	the guy on the closedList.
      */
     protected boolean isOnAList(int[] node) {
-
-	Integer currKey = getKey(node);
-	
+	int currKey = getKey(node);
 	int estimatedCost = calcEstimatedCost(node);
 	int index = -1;
 	
@@ -264,16 +264,13 @@ public abstract class Scheduler {
 	    
 	    int[] openNode = (int[])iter.next();
 	    
-	    if (currKey.equals(getKey(openNode))) {
+	    if (currKey == getKey(openNode)) {
 		if (higherCostInAllDirections(node, openNode))
 		    return true;
 		else if (smallerCostInAllDirections(node, openNode)) {
-		    // 		    openList.set(index, node);
 		    openList.remove(index);
 		    return false;
 		}
-		else
-		    logger.error("banan");
 
 		return false;
 	    }
@@ -283,19 +280,23 @@ public abstract class Scheduler {
 	    if (consistentHeuristic) 
 		return true;
 	    else {
-		int[] closedNode = (int[]) closedNodes.get(currKey);
+		ArrayList<int[]> currClosedNodes = closedNodes.getNodeArray(currKey);
 
-		if (higherCostInAllDirections(node, closedNode))
+		if (higherCostInAllDirections(node, currClosedNodes))
 		    return true;
-		else if (smallerCostInAllDirections(node, closedNode)) {
-		    // 		closedNodes.replaceNode(closedNode, node);
-		    // 		purgeClosedList(closedNode);
-		    // 		closedNodes.remove(closedNode);
-		    // 		return false;
-		}
 		else {
-		    // /		logger.warn("bananskal");
+		    int smallerCostIndex = smallerCostInAllDirectionsIndex(node, currClosedNodes);
+		    if (smallerCostIndex > -1) 
+			closedNodes.removeNode(currKey, smallerCostIndex);
 		}
+// 		    String str = "Dubblettnoder i stängda listan (vilket inte borde ske):\n\t" + printArray(node) + "\n\t" + printArray(closedNode);
+// 		    logger.warn(str);
+
+	// 	else {
+// 		    String str = "Förvirra(n)de dubblettnoder i stängda listan:\n\t" + printArray(node) + ", key = " + getKey(node) + "\n\t" + printArray(closedNode) + ", key " + getKey(node);
+// 		    logger.warn(str);
+// 		    // /		logger.warn("bananskal");
+// 		}
 
 		return false; 
 	    }
@@ -312,13 +313,13 @@ public abstract class Scheduler {
 	int estimatedCost = calcEstimatedCost(node);
 	int counter = 0;
 	Iterator iter = openList.iterator();
-	
+	    
 	while (iter.hasNext()) {
 	    int[] openNode = (int[])iter.next();
-	    
+		
 	    if (estimatedCost <= calcEstimatedCost(openNode)) {
 		openList.add(counter, node);
-// 		logger.info("added " + printArray(node) + " to the open list");
+		// 		logger.info("added " + printArray(node) + " to the open list");
 		return;
 	    }
 	    
@@ -339,6 +340,23 @@ public abstract class Scheduler {
 
     protected boolean smallerCostInAllDirections(int[] currNode, int[] existingNode) {
 	return higherCostInAllDirections(existingNode, currNode);
+    }
+
+    protected boolean higherCostInAllDirections(int[] currNode, ArrayList<int[]> existingNodes) {
+	for (Iterator<int[]> iter = existingNodes.iterator(); iter.hasNext(); )
+	    if (!higherCostInAllDirections(currNode, iter.next()))
+		return false;
+
+	return true;
+    }
+
+    protected int smallerCostInAllDirectionsIndex(int[] currNode, ArrayList<int[]> existingNodes) {
+	for (int i=0; i<existingNodes.size(); i++) {
+	    if (smallerCostInAllDirections(currNode, existingNodes.get(i)))
+		return i;
+	}
+	 
+	return -1;
     }
     
     /**
@@ -376,6 +394,8 @@ public abstract class Scheduler {
 	    else
 		return fNode;
 	}
+	else if (heuristic.equals("brute force"))
+	    return node[accCostIndex];
 	else {
 	    logger.error("2-prod relaxation not implemented yet");
 	    return -1;
@@ -440,13 +460,13 @@ public abstract class Scheduler {
 	return true;
     }
 
-    public Integer getKey(int[] node) {
+    public int getKey(int[] node) {
 	int key = 0;
 	
 	for (int i=0; i<activeAutomataIndex.length; i++)
 	    key += node[activeAutomataIndex[i]]*keyMapping[activeAutomataIndex[i]];
 	
-	return new Integer(key);
+	return key;
     }
     
     protected int[] resetCosts(int[] node) {	
@@ -665,16 +685,33 @@ public abstract class Scheduler {
     }
     
     protected int[] getParent(int[] node) {
-	int addIndex = theAutomata.size() + AutomataIndexFormHelper.STATE_EXTRA_DATA;
+// 	int addIndex = theAutomata.size() + AutomataIndexFormHelper.STATE_EXTRA_DATA;
 	
-	int[] parentIndex = new int[theAutomata.size()];
-	for (int i=0; i<parentIndex.length; i++)
-	    parentIndex[i] = node[i + addIndex];
+// 	int[] parentIndex = new int[theAutomata.size()];
+// 	for (int i=0; i<parentIndex.length; i++)
+// 	    parentIndex[i] = node[i + addIndex];
 	
-	return (int[]) closedNodes.getNode(getKey(parentIndex));
+// 	return (int[]) closedNodes.getNode(getKey(parentIndex));
+	try {
+	    return closedNodes.getNode(node[parentIndex], node[parentIndex+1]);
+	}
+	catch (Exception e) {
+	    e.printStackTrace();
+	    return null;
+	}
     }
     
     public Automaton buildScheduleAutomaton(int[] currNode) {
+	//mkt mkt tillfälligt
+	Iterator iter = closedNodes.values().iterator();
+	logger.error("");
+	logger.error("Closed Nodes (size = " + closedNodes.size() + "):");
+	while(iter.hasNext()) {
+	    int[] node = (int[])iter.next();
+	    if (node[0] == 5 && node[1] == 7)
+		logger.warn(printArray(node));
+	}
+	
 	Automaton scheduleAuto = new Automaton();
 	scheduleAuto.setComment("Schedule");
 	
@@ -723,7 +760,7 @@ public abstract class Scheduler {
 
     public int[] updateCosts(int[] costs, int changedIndex, int newCost) {
 	int[] newCosts = new int[costs.length];
-	
+
 	for (int i=0; i<costs.length-1; i++) {
 	    if (i == changedIndex)
 		newCosts[i] = newCost;
@@ -740,7 +777,7 @@ public abstract class Scheduler {
     }
 
     public int getActiveLength() {
-	return activeAutomataIndex.length;
+	return activeAutomataIndex.length; 
     }
 
     public int getCurrCostIndex() {
@@ -749,5 +786,9 @@ public abstract class Scheduler {
 
     public int[] getActiveAutomataIndex() {
 	return activeAutomataIndex;
+    }
+
+    public ClosedNodes getClosedNodes() {
+	return closedNodes;
     }
 }

@@ -15,6 +15,13 @@ public class ModifiedVGAstar extends ModifiedAstar {
     private VisGraphBuilder vgBuilder;
     protected int effCostIndex;
 
+    //Mkt tillfälligt
+    java.io.BufferedWriter w;
+    int nodeNr = 0; 
+    ArrayList<int[]> logOpenList = new ArrayList<int[]>();
+    ArrayList<int[]> logClosedList = new ArrayList<int[]>();
+    ArrayList<int[]> logDiscardedList = new ArrayList<int[]>();
+
     public ModifiedVGAstar(Automata theAutomata) throws Exception  {
 	super(theAutomata, "1-product relax");
     }
@@ -33,6 +40,16 @@ public class ModifiedVGAstar extends ModifiedAstar {
 	timer.start();
 	vgBuilder = new VisGraphBuilder(plantAutomata, oneProdRelax);
 	infoStr += "\tVisGraph-construction in " + timer.elapsedTime() + " ms\n";
+
+	//Mkt tillfälligt
+	try {
+	    java.io.File fil = new java.io.File("C:\\Documents and Settings\\avenir\\Desktop\\log.txt");
+	    w = new java.io.BufferedWriter(new java.io.FileWriter(fil));
+	    w.write("Closed_Log_List:");
+	    w.newLine();
+	    w.newLine();
+	}
+	catch (Exception e) { e.printStackTrace(); }
     }
 
     protected void initAuxIndices() {
@@ -41,25 +58,128 @@ public class ModifiedVGAstar extends ModifiedAstar {
 	effCostIndex = accCostIndex + 1;
     }
 
-    protected void branch(int[] currNode) {
-	closedNodes.putNode(getKey(currNode), currNode);
+    protected String printNodeSignature(int[] node) {
+	String s = super.printNodeSignature(node) + "; eff = ["; 
 
-	if (vgBuilder.isVisible(getEffCost(currNode))) {
+	for (int i=0; i<getActiveLength()-1; i++) 
+	    s += node[i + effCostIndex] +  " ";
+	s += node[effCostIndex + getActiveLength()-1] + "]";
+
+	return s;
+    }
+
+    protected void branch(int[] currNode) {
+	int key = getKey(currNode);
+	int nodeArrayIndex = closedNodes.putNode(key, currNode);
+
+	if ((!heuristic.equals("brute force")) && vgBuilder.isVisible(getEffCost(currNode))) {
 	    logger.error("visibility discovered at " + searchCounter + " iteration");
-	    goToGoal(currNode);
+	    goToGoal(currNode, key, nodeArrayIndex);
 	}
  	else {	
 	    Iterator childIter = expander.expandNode(currNode, activeAutomataIndex).iterator();
 	    while (childIter.hasNext()) {
   		int[] nextNode = (int[])childIter.next();
 		
-		if (!isOnAList(nextNode))
+		if (!isOnAList(nextNode)) {
+// 		    logger.info("++  " + printArray(nextNode));
+ 		    addToLogFile(nextNode, true);
 		    putOnOpenList(nextNode);
+		}
+		else 
+		    addToLogFile(nextNode, false);
+// 		    logger.info("-- " + printArray(nextNode));
  	    }
 	}
     }
 
-    protected void goToGoal(int[] currNode) {
+    // En mkt tillfällig metod (glöm inte att ta bort variablerna ovan)
+    private void addToLogFile(int[] nextNode, boolean isNew) {
+	try {
+	    if (isNew) {
+//  		logger.info("+ " + printArray(nextNode));
+		logOpenList.add(nextNode);
+	    }
+	    else {
+//  		logger.info("- " + printArray(nextNode));
+		logDiscardedList.add(nextNode);
+	    }
+
+	    int currFromIndex = theAutomata.size() + AutomataIndexFormHelper.STATE_EXTRA_DATA;
+	    int[] currFromNode = new int[]{nextNode[currFromIndex], nextNode[currFromIndex + 1]};
+	    boolean notClosed = true;
+	
+	    for (Iterator<int[]> iter = logClosedList.iterator(); iter.hasNext(); ) {
+		int[] currClosedNode = iter.next();
+		
+		if ((currFromNode[0] == currClosedNode[0]) && (currFromNode[1] == currClosedNode[1]))
+		    notClosed = false;
+	    }
+
+	    if (notClosed) {
+		String str = nodeNr + "> ";
+
+		for (int i=0; i<logOpenList.size(); i++) {
+ 		    int[] currOpenNode = logOpenList.get(i);
+		
+		    if ((currFromNode[0] == currOpenNode[0]) && (currFromNode[1] == currOpenNode[1])) {
+			str += "(q" + currFromNode[0] + "_q" + currFromNode[1] + ") -> ";
+			str += "g = " + currOpenNode[accCostIndex] + " ";
+			str += "Tv = [" + currOpenNode[currCostIndex] + " " + currOpenNode[currCostIndex+1] + "] ";
+			str += "eff = [" + currOpenNode[effCostIndex] + " " + currOpenNode[effCostIndex+1] + "]";
+		    
+			break;
+		    }
+		    else if ((currFromNode[0] == 0) && (currFromNode[1] == 0)) {
+			int[] initial = makeInitialNode();
+			str += "(q0_q0) -> ";
+			str += "g = 0 ";
+			str += "Tv = [" + initial[currCostIndex] + " " + initial[currCostIndex+1] + "] ";
+			str += "eff = [0 0]";
+		    
+			break;
+		    }
+		}
+
+		logClosedList.add(currFromNode);
+	
+		w.write(str);
+		w.newLine();
+
+		nodeNr++;
+
+		if (isAcceptingNode(nextNode) && openList.size() == 1) {
+		    str = nodeNr + "> ";
+		    str += "(q" + nextNode[0] + "_q" + nextNode[1] + ") -> ";
+		    str += "g = " + nextNode[accCostIndex] + " ";
+		    str += "Tv = [" + nextNode[currCostIndex] + " " + nextNode[currCostIndex+1] + "] ";
+		    str += "eff = [" + nextNode[effCostIndex] + " " + nextNode[effCostIndex+1] + "]";
+
+		    w.write(str);
+		    w.newLine();
+
+		    w.newLine();
+		    w.newLine();
+		    w.write("Discarded_Log_List:");
+		    w.newLine();
+		    w.newLine();
+
+		    for (int i=0; i<logDiscardedList.size(); i++) {
+			int[] disc = logDiscardedList.get(i);
+			w.write(printArray(disc));
+			w.newLine();
+		    }
+		    
+		    w.flush();
+		}
+	    }
+	}
+	catch (Exception e) {
+	    logger.error("exception i ModifiedVGAstar: " + e.getMessage());
+	}
+    }
+
+    protected void goToGoal(int[] currNode, int key, int nodeArrayIndex) {
 	double closestDistance = Double.MAX_VALUE;
 	int[] closestChild = new int[currNode.length];
 	Iterator children = expander.expandNode(currNode, activeAutomataIndex).iterator();

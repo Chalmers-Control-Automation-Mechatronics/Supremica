@@ -187,7 +187,16 @@ public class NodeExpander {
 
 	int[] newCosts = sched.updateCosts(getCosts(node), changedIndices[0], newCost);
 
-	return makeNode(nextStateIndices, node, newCosts);
+	//Mkt mkt tillfälligt
+	if (node[0] == 5 && node[1] == 7) {
+	    logger.error("Hittat (q5_g7), parent = (q" + node[7] + "_q" + node[8] + ")");
+	    logger.warn("full id = " + sched.printArray(node));
+	    logger.warn("old costs = " + sched.printArray(getCosts(node)));
+	    logger.warn("changedIndex = " + changedIndices[0]);
+	    logger.warn("new costs = " + sched.printArray(newCosts));
+	}
+
+	return makeNode(nextStateIndices, makeParentNodeKeys(node), newCosts);
     }
 
     /***********************************************************************
@@ -246,7 +255,7 @@ public class NodeExpander {
  			int newCost = plantAutomata.getAutomatonAt(changedIndex).getStateWithIndex(nextStateIndex[activeAutomataIndex[changedIndex]]).getCost();
  			int[] newCosts = sched.updateCosts(getCosts(node), changedIndex, newCost);
 			
- 			childNodes.put(currKey, makeNode(nextStateIndex, node, newCosts));
+ 			childNodes.put(currKey, makeNode(nextStateIndex, makeParentNodeKeys(node), newCosts));
 		    }
 		}
 	    }
@@ -260,21 +269,31 @@ public class NodeExpander {
      *                         Auxiliary methods                           *
      ***********************************************************************/
 
-    public int[] makeNode(int[] stateIndices, int[] parentNode, int[] costs) {
+    private int[] makeParentNodeKeys(int[] node) {
+	if (node == null) 
+	    return new int[]{-1, -1};
+	
+	int key = sched.getKey(node);
+	int nodeArrayIndex = sched.getClosedNodes().getArrayIndexForNode(key, node);
+
+	return new int[]{key, nodeArrayIndex};
+    }
+
+    public int[] makeNode(int[] stateIndices, int[] parentNodeKeys, int[] costs) {
 	int[] newNode = new int[stateIndices.length + theAutomata.size() + costs.length];
 	
 	for (int i=0; i<stateIndices.length; i++)
 	    newNode[i] = stateIndices[i];
-	if (parentNode != null) {
-	    for (int i=0; i<theAutomata.size(); i++)
-		newNode[i + stateIndices.length] = parentNode[i];
+	if (parentNodeKeys != null) {
+	    for (int i=0; i<parentNodeKeys.length; i++)
+		newNode[i + stateIndices.length] = parentNodeKeys[i];
 	}
 	else {
-	    for (int i=0; i<theAutomata.size(); i++)
+	    for (int i=0; i<ClosedNodes.CLOSED_NODE_INFO_SIZE; i++)
 		newNode[i + stateIndices.length] = -1;
 	}
 	for (int i=0; i<costs.length; i++)
-	    newNode[i + stateIndices.length + theAutomata.size()] = costs[i];
+	    newNode[i + stateIndices.length + parentNodeKeys.length] = costs[i];
 	
 	return newNode;
     }

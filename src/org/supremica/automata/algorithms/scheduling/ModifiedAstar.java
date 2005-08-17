@@ -49,8 +49,12 @@ public class ModifiedAstar extends Scheduler {
 	while (childIter.hasNext()) {
 	    int[] nextNode = (int[])childIter.next();
 	    
-	    if (!isOnAList(nextNode))
+	    if (!isOnAList(nextNode)) {
+		logger.info("++  " + printArray(nextNode));
 		putOnOpenList(nextNode);
+	    }
+	    else
+		logger.info("-- " + printArray(nextNode));
 	}
     }
 }

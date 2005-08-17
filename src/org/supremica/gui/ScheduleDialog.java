@@ -15,7 +15,7 @@ public class ScheduleDialog
 {
     private static final long serialVersionUID = 1L;
     private static final String[] optiMethodNames = new String[]{"Modified A*", "Modified VGA*", "Modified IDA*", "Modified SMA*"};
-    private static final String[] heuristicsNames = new String[]{"1-product relax", "2-product relax"};
+    private static final String[] heuristicsNames = new String[]{"1-product relax", "2-product relax", "brute force"};
     private static Logger logger = LoggerFactory.createLogger(ScheduleDialog.class);
     private JComboBox optiMethodsBox, heuristicsBox;
     private JCheckBox nodeExpander, buildAutomaton;
@@ -125,7 +125,7 @@ public class ScheduleDialog
 
 	    ModifiedAstar mastar;
    
-	    if (optiMethodsBox.getSelectedItem().equals("Modified A*")) 
+	    if (optiMethodsBox.getSelectedItem().equals("Modified A*"))
 		mastar = new ModifiedAstar(ActionMan.getGui().getSelectedAutomata(), (String) heuristicsBox.getSelectedItem(), nodeExpander.isSelected(), false);
 	    else if (optiMethodsBox.getSelectedItem().equals("Modified VGA*"))
 		mastar = new ModifiedVGAstar(ActionMan.getGui().getSelectedAutomata(), (String) heuristicsBox.getSelectedItem(), nodeExpander.isSelected(), false);
