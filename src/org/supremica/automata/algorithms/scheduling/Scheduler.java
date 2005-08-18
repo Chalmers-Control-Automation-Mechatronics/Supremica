@@ -67,6 +67,8 @@ public abstract class Scheduler {
 
     protected String heuristic = "";
 
+    protected int[] currOptimalNode = null;
+
     /** Deprecated */
     public Scheduler(Automaton theAutomaton)
     {
@@ -98,6 +100,8 @@ public abstract class Scheduler {
 
 	init(manualExpansion);
     }
+
+    protected abstract int[] makeInitialNode();
 
     protected void init(boolean manualExpansion) {
 	timer = new ActionTimer();
@@ -136,7 +140,7 @@ public abstract class Scheduler {
 	    infoStr += "\t1st preprocessing in " + timer.elapsedTime() + " ms\n";
 
 	    initAuxIndices();
-	}
+	}	
     }
 
     /**
@@ -231,8 +235,8 @@ public abstract class Scheduler {
 	    
 	    currNode = (int[]) openList.remove(0);
 	    
-	    if (isAcceptingNode(currNode)) {
-		logger.warn("nodes in memory = " + closedNodes.size());
+	    if (isOptimalNode(currNode)) {
+		flushLog(currNode);
 		return currNode;
 	    }
 
@@ -242,6 +246,9 @@ public abstract class Scheduler {
 	logger.error("An accepting node could not be found...");
 	return currNode;
     }
+
+    //mkt mkt tillfälligt
+    protected void flushLog(int[] node) {}
     
     protected abstract void branch(int[] currNode);
 	
@@ -310,23 +317,28 @@ public abstract class Scheduler {
      * @param 	node
      */
     protected void putOnOpenList(int[] node) {
-	int estimatedCost = calcEstimatedCost(node);
-	int counter = 0;
-	Iterator iter = openList.iterator();
-	    
-	while (iter.hasNext()) {
-	    int[] openNode = (int[])iter.next();
-		
-	    if (estimatedCost <= calcEstimatedCost(openNode)) {
-		openList.add(counter, node);
-		// 		logger.info("added " + printArray(node) + " to the open list");
-		return;
-	    }
-	    
-	    counter++;
+	if (heuristic.equals("brute force")) {
+	    openList.add(node);
 	}
+	else {
+	    int estimatedCost = calcEstimatedCost(node);
+	    int counter = 0;
+	    Iterator iter = openList.iterator();
+	    
+	    while (iter.hasNext()) {
+		int[] openNode = (int[])iter.next();
+		
+		if (estimatedCost <= calcEstimatedCost(openNode)) {
+		    openList.add(counter, node);
+		    
+		    return;
+		}
+		
+		counter++;
+	    }
 	
-	openList.add(node);
+	    openList.add(node);
+	}
     }
 
     protected boolean higherCostInAllDirections(int[] currNode, int[] existingNode) {
@@ -485,20 +497,6 @@ public abstract class Scheduler {
 	return states;
     }
     
-    protected int[] makeInitialNode() {
-	int[] initialStates = AutomataIndexFormHelper.createState(theAutomata.size());
-	int[] initialCosts = new int[getActiveLength() + 1];
-	
-	for (int i=0; i<theAutomata.size(); i++) 
-	    initialStates[i] = theAutomata.getAutomatonAt(i).getInitialState().getIndex();
-	
-	for (int i=0; i<initialCosts.length-1; i++) 
-	    initialCosts[i] = plantAutomata.getAutomatonAt(i).getInitialState().getCost();
-	initialCosts[initialCosts.length-1] = 0;
-
-	return expander.makeNode(initialStates, null, initialCosts);
-    }
-
     /**
      * Calculates the costs for a one-product relaxation (i.e. as if there
      * would only be one robot in the cell) and stores it in oneProdRelax.
@@ -685,13 +683,6 @@ public abstract class Scheduler {
     }
     
     protected int[] getParent(int[] node) {
-// 	int addIndex = theAutomata.size() + AutomataIndexFormHelper.STATE_EXTRA_DATA;
-	
-// 	int[] parentIndex = new int[theAutomata.size()];
-// 	for (int i=0; i<parentIndex.length; i++)
-// 	    parentIndex[i] = node[i + addIndex];
-	
-// 	return (int[]) closedNodes.getNode(getKey(parentIndex));
 	try {
 	    return closedNodes.getNode(node[parentIndex], node[parentIndex+1]);
 	}
@@ -702,23 +693,13 @@ public abstract class Scheduler {
     }
     
     public Automaton buildScheduleAutomaton(int[] currNode) {
-	//mkt mkt tillfälligt
-	Iterator iter = closedNodes.values().iterator();
-	logger.error("");
-	logger.error("Closed Nodes (size = " + closedNodes.size() + "):");
-	while(iter.hasNext()) {
-	    int[] node = (int[])iter.next();
-	    if (node[0] == 5 && node[1] == 7)
-		logger.warn(printArray(node));
-	}
-	
 	Automaton scheduleAuto = new Automaton();
 	scheduleAuto.setComment("Schedule");
 	
 	State nextState = new State(printNodeSignature(currNode));
 	nextState.setAccepting(true);
 	scheduleAuto.addState(nextState);
-	
+
 	while (hasParent(currNode))
 	    {
 		try
@@ -774,6 +755,24 @@ public abstract class Scheduler {
 	newCosts[newCosts.length-1] = costs[costs.length-1] + costs[changedIndex];
 	
 	return newCosts;
+    }
+
+    public boolean isOptimalNode(int[] node) {
+	if (heuristic.equals("brute force")) {
+	    if (isAcceptingNode(node)) {
+		if (currOptimalNode == null) 
+		    currOptimalNode = node;
+		else if (node[accCostIndex] < currOptimalNode[accCostIndex])
+		    currOptimalNode = node;
+	    }
+	
+	    if (isAcceptingNode(node) && openList.size() == 0)
+		return true;
+	    else 
+		return false;
+	}
+	else 
+	    return isAcceptingNode(node);
     }
 
     public int getActiveLength() {

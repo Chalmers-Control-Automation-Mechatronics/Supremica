@@ -57,4 +57,18 @@ public class ModifiedAstar extends Scheduler {
 		logger.info("-- " + printArray(nextNode));
 	}
     }
+
+    protected int[] makeInitialNode() {
+	int[] initialStates = AutomataIndexFormHelper.createState(theAutomata.size());
+	int[] initialCosts = new int[getActiveLength() + 1];
+	
+	for (int i=0; i<theAutomata.size(); i++) 
+	    initialStates[i] = theAutomata.getAutomatonAt(i).getInitialState().getIndex();
+	
+	for (int i=0; i<initialCosts.length-1; i++) 
+	    initialCosts[i] = plantAutomata.getAutomatonAt(i).getInitialState().getCost();
+	initialCosts[initialCosts.length-1] = 0;
+
+	return expander.makeNode(initialStates, null, initialCosts);
+    }
 }

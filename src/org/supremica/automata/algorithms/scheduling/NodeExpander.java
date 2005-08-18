@@ -108,7 +108,9 @@ public class NodeExpander {
 			if (node[currSpecIndex] == specState.getIndex()) {
 			    int[] changedIndices = new int[]{i, currSpecIndex};
 			    int[] newStateIndices = new int[]{st.nextState(currEvent).getIndex(), specState.nextState(currEvent).getIndex()};
+
 			    children.add(newNode(node, changedIndices, newStateIndices, st.nextState(currEvent).getCost()));
+
 			    break;
 			}
 		    }
@@ -186,15 +188,6 @@ public class NodeExpander {
 	    nextStateIndices[changedIndices[i]] = newStateIndices[i];
 
 	int[] newCosts = sched.updateCosts(getCosts(node), changedIndices[0], newCost);
-
-	//Mkt mkt tillfälligt
-	if (node[0] == 5 && node[1] == 7) {
-	    logger.error("Hittat (q5_g7), parent = (q" + node[7] + "_q" + node[8] + ")");
-	    logger.warn("full id = " + sched.printArray(node));
-	    logger.warn("old costs = " + sched.printArray(getCosts(node)));
-	    logger.warn("changedIndex = " + changedIndices[0]);
-	    logger.warn("new costs = " + sched.printArray(newCosts));
-	}
 
 	return makeNode(nextStateIndices, makeParentNodeKeys(node), newCosts);
     }
@@ -280,18 +273,20 @@ public class NodeExpander {
     }
 
     public int[] makeNode(int[] stateIndices, int[] parentNodeKeys, int[] costs) {
-	int[] newNode = new int[stateIndices.length + theAutomata.size() + costs.length];
+	if (parentNodeKeys == null) {
+	    parentNodeKeys = new int[ClosedNodes.CLOSED_NODE_INFO_SIZE];
+	    for (int i=0; i<parentNodeKeys.length; i++)
+		parentNodeKeys[i] = -1;
+	}
+
+	int[] newNode = new int[stateIndices.length + parentNodeKeys.length + costs.length];
 	
 	for (int i=0; i<stateIndices.length; i++)
 	    newNode[i] = stateIndices[i];
-	if (parentNodeKeys != null) {
-	    for (int i=0; i<parentNodeKeys.length; i++)
-		newNode[i + stateIndices.length] = parentNodeKeys[i];
-	}
-	else {
-	    for (int i=0; i<ClosedNodes.CLOSED_NODE_INFO_SIZE; i++)
-		newNode[i + stateIndices.length] = -1;
-	}
+
+	for (int i=0; i<parentNodeKeys.length; i++)
+	    newNode[i + stateIndices.length] = parentNodeKeys[i];
+
 	for (int i=0; i<costs.length; i++)
 	    newNode[i + stateIndices.length + parentNodeKeys.length] = costs[i];
 	
@@ -299,7 +294,7 @@ public class NodeExpander {
     }
 
     public int[] getCosts(int[] node) {
-	int startIndex = 2*theAutomata.size() + AutomataIndexFormHelper.STATE_EXTRA_DATA;
+	int startIndex = theAutomata.size() + AutomataIndexFormHelper.STATE_EXTRA_DATA + ClosedNodes.CLOSED_NODE_INFO_SIZE;
 	int[] costs = new int[node.length - startIndex];
 	
 	for (int i=0; i<costs.length; i++)
