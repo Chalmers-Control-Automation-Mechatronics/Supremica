@@ -178,10 +178,15 @@ public class VisGraphBuilder {
 	return edges;
     }
 
-    public boolean isVisible(int[] point) {
-	checker.setStart(point);
+    public boolean isVisible(int[] start, int[] goal) {
+	checker.setStart(start);
+	checker.setGoal(goal);
 
 	return checker.isVisible();
+    }
+
+    public boolean isVisible(int[] start) {
+	return isVisible(start, goal);
     }
 
     public double getDistanceToDiag(int[] point) {

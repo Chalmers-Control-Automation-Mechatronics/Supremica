@@ -88,6 +88,11 @@ public class VisibilityChecker {
 	    this.start[i] = start[i]; 
     }
 
+    public void setGoal(int[] goal) {
+	for (int i=0; i<goal.length; i++)
+	    this.goal[i] = goal[i]; 
+    }
+
     public double getDistanceToDiag(int[] point) {
 	double s1 = 0; 
 	double s2 = 0;

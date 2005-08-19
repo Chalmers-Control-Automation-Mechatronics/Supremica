@@ -179,24 +179,7 @@ public class ModifiedVGAstar extends ModifiedAstar {
 	    w.write(str);
 	    w.newLine();
 
-	    w.newLine();
-	    w.newLine();
-	    w.write("The path:");
-	    w.newLine();
-	    str = " -> " + nodeNr;
-	    int ind = nodeNr-1;
-	    int[] parent = getParent(node);
-	    while (ind > 0) {
-		if (logClosedList.get(ind).equals(parent)) {
-		    str = " -> " + ind + str;
-		    parent = getParent(parent);
-		}
-
-		ind--;
-	    }
-	    str = "0" + str;
-	    w.write(str);
-	    w.newLine();
+	    generatePath(node);
 
 	    w.newLine();
 	    w.newLine();
@@ -213,6 +196,121 @@ public class ModifiedVGAstar extends ModifiedAstar {
 	    w.flush();
 	}
 	catch (Exception e) { e.printStackTrace(); }
+    }
+
+    protected void generatePath(int[] node) throws Exception {
+	ArrayList<int[]> keyNodes = new ArrayList<int[]>();
+	int[] latestVisibleNode = node; 
+	int[] currGoalNode = node;
+	keyNodes.add(node);
+
+	String str = " -> " + nodeNr;
+	int ind = nodeNr-1;
+	int[] parent = getParent(node);
+
+	w.newLine();
+	w.newLine();
+	w.write("The path:");
+	w.newLine();
+
+	while (ind >= 0) {
+	    if (logClosedList.get(ind).equals(parent)) {
+		str = ind + str;
+
+		if (ind != 0)
+		    str = " -> " + str;
+		
+		if (ind == 0 || !vgBuilder.isVisible(getEffCost(parent), getEffCost(currGoalNode))) {
+		    for (int i=keyNodes.size()-1; i>=0; i--) {
+			if (vgBuilder.isVisible(getEffCost(parent), getEffCost(keyNodes.get(i)))) {
+			    for (int j=0; j<i; j++)
+				keyNodes.remove(j);
+
+			    break;
+			}
+		    }
+	
+		    if (ind == 0)
+			keyNodes.add(0, parent);
+		    else {
+			keyNodes.add(0, latestVisibleNode);
+			currGoalNode = latestVisibleNode;
+		    }
+		}
+		
+		latestVisibleNode = parent;
+
+		if (ind > 0)
+		    parent = getParent(parent);
+	    }
+
+	    ind--;
+	}
+
+	w.write(str);
+	w.newLine();
+
+	balanceSchedule(keyNodes);
+
+	logger.error("key nodes: ");
+	for (int i=0; i<keyNodes.size(); i++) 
+	    logger.warn(printArray(keyNodes.get(i)));
+    }
+
+    protected void balanceSchedule(ArrayList<int[]> keyNodes) throws Exception {
+	w.newLine();
+	w.newLine();
+
+	for (int i=0; i<keyNodes.size()-1; i++) {
+	    String str = "";
+	    int divisor = 1;
+	    int fastRobotIndex = -1;
+	    int[] currNode = keyNodes.get(i);
+	    int[] costs = getEffCost(currNode);
+	    int[] nextCosts = getEffCost(keyNodes.get(i+1));
+	    int[] delta = new int[]{nextCosts[0] - costs[0], nextCosts[1] - costs[1]};
+
+	    str += printArray(costs) + " ---> " + printArray(nextCosts);
+
+	    if (delta[0] == delta[1])
+		str += ": DIAGONAL MOVEMENT (TOP SPEED); velocity = v1_v2";
+	    else if (delta[0] == 0 || delta [1] == 0)
+		str += ": NO CHANGE (TOP SPEED); velocity = v1_v2";
+	    else {
+		if (delta[0] < delta[1]) 
+		    fastRobotIndex = 0;
+		else 
+		    fastRobotIndex = 1;
+
+		if (Math.IEEEremainder(delta[1 - fastRobotIndex], delta[fastRobotIndex]) == 0) {
+		    delta[fastRobotIndex] = delta[1 - fastRobotIndex]/delta[fastRobotIndex];
+		    delta[1 - fastRobotIndex] = 1;
+		}
+		else {
+		    divisor = delta[fastRobotIndex];
+		    delta[fastRobotIndex] = delta[1 - fastRobotIndex];
+		    delta[1 - fastRobotIndex] = divisor;
+		}
+	    
+// 		int[] currCosts = new int[]{currNode[currCostIndex] * delta[0], currNode[currCostIndex + 1] * delta[1]};
+// 		if (currNode[currCostIndex] > currNode[currCostIndex+1])
+// 		    expander.expand(currNode, new int[]{activeAutomataIndex[1]});
+// 		else 
+// 		    expander.expand(currNode, new int[]{activeAutomataIndex[0]});
+
+		if (fastRobotIndex == 0)
+		    str += ": Slow down for robot_1; velocity = (" + divisor + "/" + delta[0] + "*v1)_v2";
+		else
+		    str += ": Slow down for robot_2; velocity = v1_(" + divisor + "/" + delta[1] + "*v2)";
+
+		logger.error("delta = " + printArray(delta) + "; divisor = " + divisor);
+
+	    }
+
+	    w.write(str);
+	    w.newLine();
+	}
+
     }
 
     protected void goToGoal(int[] currNode, int key, int nodeArrayIndex) {
