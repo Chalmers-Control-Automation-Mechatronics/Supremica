@@ -257,60 +257,156 @@ public class ModifiedVGAstar extends ModifiedAstar {
 	    logger.warn(printArray(keyNodes.get(i)));
     }
 
+    // Postprocessing - skall fixa en jämn hastighet
     protected void balanceSchedule(ArrayList<int[]> keyNodes) throws Exception {
 	w.newLine();
 	w.newLine();
 
+	logger.info(printNodeSignature(makeInitialNode()));
+	w.write("\t" + printNodeSignature(makeInitialNode()));
+	w.newLine();
+	
+	int[] currNode = keyNodes.get(0);
+
 	for (int i=0; i<keyNodes.size()-1; i++) {
 	    String str = "";
-	    int divisor = 1;
-	    int fastRobotIndex = -1;
-	    int[] currNode = keyNodes.get(i);
-	    int[] costs = getEffCost(currNode);
-	    int[] nextCosts = getEffCost(keyNodes.get(i+1));
-	    int[] delta = new int[]{nextCosts[0] - costs[0], nextCosts[1] - costs[1]};
 
-	    str += printArray(costs) + " ---> " + printArray(nextCosts);
+	    int[] currStartNode = keyNodes.get(i);
+	    int[] nextNode = keyNodes.get(i+1);
+	    
+	    int[] delta = new int[]{nextNode[effCostIndex] - currStartNode[effCostIndex], nextNode[effCostIndex+1] - currStartNode[effCostIndex+1]};
 
-	    if (delta[0] == delta[1])
-		str += ": DIAGONAL MOVEMENT (TOP SPEED); velocity = v1_v2";
-	    else if (delta[0] == 0 || delta [1] == 0)
+	    for (int j=accCostIndex; j<currNode.length; j++)
+		currNode[j] = currStartNode[j];
+
+	    str += "[" + currStartNode[effCostIndex] + ", " + currStartNode[effCostIndex+1] + "] ---> [" + nextNode[effCostIndex] + ", " + nextNode[effCostIndex+1] + "]";
+	    
+	    if (delta[0] == 0) {
 		str += ": NO CHANGE (TOP SPEED); velocity = v1_v2";
-	    else {
-		if (delta[0] < delta[1]) 
-		    fastRobotIndex = 0;
-		else 
-		    fastRobotIndex = 1;
+		w.write(str);
 
-		if (Math.IEEEremainder(delta[1 - fastRobotIndex], delta[fastRobotIndex]) == 0) {
-		    delta[fastRobotIndex] = delta[1 - fastRobotIndex]/delta[fastRobotIndex];
-		    delta[1 - fastRobotIndex] = 1;
+		while (currNode[effCostIndex] != nextNode[effCostIndex] || currNode[effCostIndex+1] != nextNode[effCostIndex+1]) {
+		    currNode = (int[]) expander.expandNode(currNode, new int[]{activeAutomataIndex[1]}).iterator().next();
+
+		    logger.info(printNodeSignature(currNode));
+		    w.write("\t" + printNodeSignature(currNode));
+		    w.newLine();
+		}
+	    }
+	    else if (delta[1] == 0) {
+		str += ": NO CHANGE (TOP SPEED); velocity = v1_v2";
+		w.write(str);
+		w.newLine();
+
+		while (currNode[effCostIndex] != nextNode[effCostIndex] || currNode[effCostIndex+1] != nextNode[effCostIndex+1]) {
+		    currNode = (int[]) expander.expandNode(currNode, new int[]{activeAutomataIndex[0]}).iterator().next();
+
+		    logger.info(printNodeSignature(currNode));
+		    w.write("\t" + printNodeSignature(currNode));
+		    w.newLine();
+		}
+	    }
+	    else {
+		int divisor = 1;
+
+		if (delta[0] == delta[1]) {
+		    str += ": DIAGONAL MOVEMENT (TOP SPEED); velocity = v1_v2";
+		    w.write(str);
+		    w.newLine();
+		    
+		    for (int j=0; j<delta.length; j++)
+			delta[j] = 1;
 		}
 		else {
-		    divisor = delta[fastRobotIndex];
-		    delta[fastRobotIndex] = delta[1 - fastRobotIndex];
-		    delta[1 - fastRobotIndex] = divisor;
-		}
+		    int fastRobotIndex = -1;
+
+		    if (delta[0] < delta[1]) 
+			fastRobotIndex = 0;
+		    else 
+			fastRobotIndex = 1;
+
+		    if (Math.IEEEremainder(delta[1 - fastRobotIndex], delta[fastRobotIndex]) == 0) {
+			delta[fastRobotIndex] = delta[1 - fastRobotIndex]/delta[fastRobotIndex];
+			delta[1 - fastRobotIndex] = 1;
+		    }
+		    else {
+			divisor = delta[fastRobotIndex];
+			delta[fastRobotIndex] = delta[1 - fastRobotIndex];
+			delta[1 - fastRobotIndex] = divisor;
+		    }
 	    
-// 		int[] currCosts = new int[]{currNode[currCostIndex] * delta[0], currNode[currCostIndex + 1] * delta[1]};
-// 		if (currNode[currCostIndex] > currNode[currCostIndex+1])
-// 		    expander.expand(currNode, new int[]{activeAutomataIndex[1]});
-// 		else 
-// 		    expander.expand(currNode, new int[]{activeAutomataIndex[0]});
+		    if (fastRobotIndex == 0) {
+			str += ": Slow down for robot_1; velocity = (" + divisor + "/" + delta[0] + "*v1)_v2";
+			w.write(str);
+			w.newLine();
+		    }
+		    else {
+			str += ": Slow down for robot_2; velocity = v1_(" + divisor + "/" + delta[1] + "*v2)";
+			w.write(str);
+			w.newLine();
+		    }
 
-		if (fastRobotIndex == 0)
-		    str += ": Slow down for robot_1; velocity = (" + divisor + "/" + delta[0] + "*v1)_v2";
-		else
-		    str += ": Slow down for robot_2; velocity = v1_(" + divisor + "/" + delta[1] + "*v2)";
+		    //Uppdatering (förskjutning) av effCost som beror på omskalningen av VG-axlarna
+		    for (int j=i+1; j<keyNodes.size(); j++) {
+			int[] keyNode = keyNodes.remove(j);
 
-		logger.error("delta = " + printArray(delta) + "; divisor = " + divisor);
+			for (int k=0; k<delta.length; k++) 
+			    keyNode[effCostIndex + k] += delta[k] - divisor;
+			
+			keyNodes.add(j, keyNode);
+		    }
+		    //Uppdateringen klar
+		
+		    for (int j=0; j<delta.length; j++) 
+			currNode[currCostIndex + j] *= delta[j];
+		}
 
+		double pathTime = 0;
+		while ((pathTime + currStartNode[effCostIndex] != nextNode[effCostIndex]) || (pathTime + currStartNode[effCostIndex+1] != nextNode[effCostIndex+1])) {
+		    int fastestIndex = 0;
+		    if (currNode[currCostIndex] > currNode[currCostIndex+1])
+			fastestIndex = 1;	    
+		    
+		    Iterator childIt = expander.expandNode(currNode, new int[]{activeAutomataIndex[fastestIndex]}).iterator();
+		    //Ifall spec-en blockerar denna (den bästa) riktning (vilket inte borde hända eftersom zonerna borde vara långt borta, väljs en annan väg. 
+		    if (!childIt.hasNext()) {
+			fastestIndex = 1 - fastestIndex;
+			childIt = expander.expandNode(currNode, new int[]{activeAutomataIndex[fastestIndex]}).iterator();
+
+			if (!childIt.hasNext())
+			    throw new Exception("NullPointerException in straight-line-expansion, curr node = " + printArray(currNode));
+		    }
+
+		    int[] child = (int[]) childIt.next();
+		    child[currCostIndex + fastestIndex] *= delta[fastestIndex];
+
+		    currNode = child;
+
+		    pathTime = ((double)(currNode[effCostIndex] - currStartNode[effCostIndex]))/divisor;
+
+		    //utskrift - tillfälligt
+		    double g = ((double)(currNode[accCostIndex] - currStartNode[accCostIndex]))/divisor + currStartNode[accCostIndex];
+		    double[] eff = new double[2];
+		    for (int j=0; j<eff.length; j++) 
+			eff[j] = ((double)(currNode[effCostIndex+j] - currStartNode[effCostIndex+j]))/divisor + currStartNode[effCostIndex+j];
+		    double[] tv = new double[2];
+		    for (int j=0; j<tv.length; j++) 
+			tv[j] = ((double) currNode[currCostIndex+j])/divisor;
+
+		    logger.info(printNodeName(currNode) + "; Tv = [" + tv[0] + " " + tv[1] + "]; g = " + g + "; eff = " + printArray(eff));
+
+		    w.write("\t" + printNodeName(currNode) + "; Tv = [" + tv[0] + " " + tv[1] + "]; g = " + g + "; eff = " + printArray(eff));
+		    w.newLine();
+		}
 	    }
-
-	    w.write(str);
-	    w.newLine();
 	}
 
+	while (!isAcceptingNode(currNode)) {
+	    currNode = (int[]) expander.expandNode(currNode, activeAutomataIndex).iterator().next();
+	    logger.info(printNodeSignature(currNode));
+	    w.write("\t" + printNodeSignature(currNode));
+	    w.newLine();
+	}
     }
 
     protected void goToGoal(int[] currNode, int key, int nodeArrayIndex) {

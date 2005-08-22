@@ -198,6 +198,17 @@ public abstract class Scheduler {
 		
 	return s;
     }
+    
+    public String printArray(double[] array) {
+	String s = "[";
+		
+	for (int i=0; i<array.length-1; i++) {
+	    s += array[i] + " ";
+	}
+	s += array[array.length-1] + "]";
+		
+	return s;
+    }
 	
     protected String printNodeSignature(int[] node) {
 	String s = printNodeName(node) + "; Tv = [";

@@ -106,7 +106,7 @@ public class NodeExpander {
 		    while (enabledStatesIt.hasNext()) {
 			State specState = enabledStatesIt.nextState();
 			if (node[currSpecIndex] == specState.getIndex()) {
-			    int[] changedIndices = new int[]{i, currSpecIndex};
+			    int[] changedIndices = new int[]{activeAutomataIndex[i], currSpecIndex};
 			    int[] newStateIndices = new int[]{st.nextState(currEvent).getIndex(), specState.nextState(currEvent).getIndex()};
 
 			    children.add(newNode(node, changedIndices, newStateIndices, st.nextState(currEvent).getCost()));
