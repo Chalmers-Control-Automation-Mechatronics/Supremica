@@ -25,6 +25,7 @@ public class DeleteEdgeCommand
     private final ControlledSurface mSurface;
     /** The Node Created by this Command */
     private final EditorEdge mDeleted;
+    private final String mDescription = "Edge Deletion";
 
     /**
      * Constructs a new CreateNodeCommand with the specified surface and
@@ -76,6 +77,6 @@ public class DeleteEdgeCommand
 
     public String getPresentationName()
     {
-	return this.getClass().getName();
+	return mDescription;
     }
 }

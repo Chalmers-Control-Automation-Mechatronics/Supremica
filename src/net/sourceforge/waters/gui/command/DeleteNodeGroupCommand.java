@@ -29,6 +29,7 @@ public class DeleteNodeGroupCommand
     private final EditorNodeGroup mDeleted;
     /** the Edge Deletion Commands Associated with this Command */
     private final Collection<DeleteEdgeCommand> mDelEdge = new LinkedList();
+    private final String mDescription = "Group Node Deletion";
 
     /**
      * Constructs a new CreateNodeCommand with the specified surface and
@@ -100,6 +101,6 @@ public class DeleteNodeGroupCommand
 
     public String getPresentationName()
     {
-	return this.getClass().getName();
+	return mDescription;
     }
 }

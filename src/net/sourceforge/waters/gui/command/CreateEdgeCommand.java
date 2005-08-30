@@ -28,6 +28,7 @@ public class CreateEdgeCommand
     private final ControlledSurface mSurface;
     /** The Node Created by this Command */
     private final EditorEdge mCreated;
+    private final String mDescription = "Edge Creation";
 
     /**
      * Constructs a new CreateNodeCommand with the specified surface and
@@ -90,6 +91,6 @@ public class CreateEdgeCommand
 
     public String getPresentationName()
     {
-	return this.getClass().getName();
+	return mDescription;
     }
 }

@@ -28,6 +28,7 @@ public class DeleteNodeCommand
     private final EditorNode mDeleted;
     /** the Edge Deletion Commands Associated with this Command */
     private final Collection<DeleteEdgeCommand> mDelEdge = new LinkedList();
+    private final String mDescription = "Node Deletion";
 
     /**
      * Constructs a new DeleteNodeCommand with the specified surface and
@@ -99,6 +100,6 @@ public class DeleteNodeCommand
 
     public String getPresentationName()
     {
-	return this.getClass().getName();
+	return mDescription;
     }
 }

@@ -28,7 +28,8 @@ public class MoveObjects
     /** The Objects moved by this command */
     private final Collection<EditorObject> mMoved;
     /** The Original Position of the Object */
-    private final Point2D mDisplacement = new Point2D.Double();     
+    private final Point2D mDisplacement = new Point2D.Double();
+    private final String mDescription;
 
     /**
      * Constructs a new CreateNodeCommand with the specified surface and
@@ -42,6 +43,30 @@ public class MoveObjects
 	mSurface = surface;
 	mMoved = new ArrayList(moved);	
 	setDisplacement(displacement);
+	String description = "";
+	if (mMoved.size() > 2) {
+	    description = "Multiple Move";
+	} else if (mMoved.size() == 2) {
+	    for (EditorObject o: mMoved) {
+		if (o.getType() == EditorObject.EDGE) {
+		    description = "Edge reshaping";
+		    break;
+		}
+	    }
+	    if (description.equals("")) {
+		description = "Node Movement";
+	    }
+	} else if (mMoved.size() == 1) {
+	    EditorObject o = mMoved.iterator().next();
+	    if (o.getType() == EditorObject.NODEGROUP) {
+		description = "Group Node Movement";
+	    } else {
+		description = "Label Movement";
+	    }
+	} else {
+	    description = "PointLess";
+	}
+	mDescription = description;
     }
 
     /**
@@ -104,7 +129,7 @@ public class MoveObjects
 
     public String getPresentationName()
     {
-	return this.getClass().getName();
+	return mDescription;
     }
 
     public void setDisplacement(Point2D neo) 

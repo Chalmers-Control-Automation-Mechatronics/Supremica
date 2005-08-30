@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorLabel
 //###########################################################################
-//# $Id: EditorLabel.java,v 1.14 2005-08-30 00:18:45 siw4 Exp $
+//# $Id: EditorLabel.java,v 1.15 2005-08-30 02:16:47 siw4 Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -113,38 +113,38 @@ public class EditorLabel
 
     public Point2D getPosition()
     {
-	return new Point2D.Double(getX(), getY());
+	return new Point2D.Double(geometry.getOffset().getX() + parent.getX(), geometry.getOffset().getY() + parent.getY());
     }
 
 	public int getOffsetX()
 	{
-		return (int) geometry.getOffset().getX();
+	    return (int) geometry.getOffset().getX();
 	}
 
 	public int getOffsetY()
 	{
-		return (int) geometry.getOffset().getY();
+	    return (int) geometry.getOffset().getY();
 	}
 
 	public void drawObject(Graphics g)
 	{
-		if ((text == null) || (parent == null))
+        	if ((text == null) || (parent == null))
 		{
-			return;
+		    return;
 		}
 
 		if ((text.getText().length() == 0) && !editing)
 		{
-			text.setText(backup);
+		    text.setText(backup);
 		}
 
 		if (text.getText().length() == 0)
 		{
-			text.setSize(5, text.getHeight());
+		    text.setSize(5, text.getHeight());
 		}
 		else
 		{
-			text.setSize(text.getPreferredSize());
+		    text.setSize(text.getPreferredSize());
 		}
 
 		label.setForeground(getColor());

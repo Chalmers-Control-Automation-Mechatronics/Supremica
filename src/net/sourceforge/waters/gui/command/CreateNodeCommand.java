@@ -24,7 +24,7 @@ public class CreateNodeCommand
     /** The Node Created by this Command */
     private final EditorNode mCreated;
     /** Description of Command */
-    private final String mDescription = this.getClass().getName();
+    private final String mDescription = "Node Creation";
 
     /**
      * Constructs a new CreateNodeCommand with the specified surface and
@@ -90,6 +90,6 @@ public class CreateNodeCommand
 
     public String getPresentationName()
     {
-	return this.getClass().getName();
+	return mDescription;
     }
 }

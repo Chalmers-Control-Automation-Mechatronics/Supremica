@@ -26,7 +26,7 @@ public class CreateNodeGroupCommand
     private final ControlledSurface mSurface;
     /** The Node Created by this Command */
     private final EditorNodeGroup mCreated;
-
+    private final String mDescription = "Group Node Creation";
     /**
      * Constructs a new CreateNodeCommand with the specified surface and
      * creates the node in the x,y position specified
@@ -77,6 +77,6 @@ public class CreateNodeGroupCommand
 
     public String getPresentationName()
     {
-	return this.getClass().getName();
+	return mDescription;
     }
 }
