@@ -70,10 +70,8 @@ public class MoveObjects
 		}
 	    }
 	    if ((o.getType() != EditorObject.LABELGROUP && o.getType() != EditorObject.LABEL)
-		|| mMoved.size() == 1) {
-	    Point2D p = o.getPosition();
-	    p.setLocation(p.getX() + mDisplacement.getX(), p.getY() + mDisplacement.getY());
-	    o.setPosition(p.getX(), p.getY());		
+		|| mMoved.size() == 1) {	
+		o.setPosition(o.getX() + mDisplacement.getX(), o.getY() + mDisplacement.getY());
 	    }
 	}
 	mSurface.getEditorInterface().setDisplayed();   
@@ -97,10 +95,8 @@ public class MoveObjects
 		}
 	    }
 	    if ((o.getType() != EditorObject.LABELGROUP && o.getType() != EditorObject.LABEL)
-		|| mMoved.size() == 1) {
-	    Point2D p = o.getPosition();
-	    p.setLocation(p.getX() - mDisplacement.getX(), p.getY() - mDisplacement.getY());
-	    o.setPosition(p.getX(), p.getY());
+		|| mMoved.size() == 1) {	  
+		o.setPosition(o.getX() - mDisplacement.getX(), o.getY() - mDisplacement.getY());
 	    }
 	}
 	mSurface.getEditorInterface().setDisplayed();   
