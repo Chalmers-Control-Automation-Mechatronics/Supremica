@@ -18,6 +18,7 @@ import org.supremica.gui.ide.actions.Actions;
 import net.sourceforge.waters.gui.EditorWindowInterface;
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.UndoInterface;
+import net.sourceforge.waters.gui.observer.Observer;
 
 public class ModuleContainer implements UndoInterface
 {
@@ -31,6 +32,7 @@ public class ModuleContainer implements UndoInterface
 	private VisualProject theVisualProject = new VisualProject();
 	private Map componentToPanelMap = new HashMap();
     private final UndoManager mUndoManager = new UndoManager();
+    private final Set<Observer> mObservers = new HashSet<Observer>();
   
 	public ModuleContainer(IDE ide, ModuleProxy module)
 	{
@@ -140,6 +142,7 @@ public class ModuleContainer implements UndoInterface
 		mUndoManager.addEdit(e);
 		ide.getActions().editorRedoAction.setEnabled(canRedo());
 		ide.getActions().editorUndoAction.setEnabled(canUndo());
+		notifyObservers();
 	}
 
 	public void executeCommand(Command c)
@@ -160,11 +163,28 @@ public class ModuleContainer implements UndoInterface
 		return mUndoManager.canUndo();
 	}
 
+	public void clearList()
+	{
+		mUndoManager.discardAllEdits();
+		notifyObservers();
+	}
+
+        public String getRedoPresentationName()
+	{
+		return mUndoManager.getRedoPresentationName();
+	}
+    
+        public String getUndoPresentationName()
+        {
+	    return mUndoManager.getUndoPresentationName();
+	}
+
 	public void redo() throws CannotRedoException
 	{
 		mUndoManager.redo();
 		ide.getActions().editorRedoAction.setEnabled(canRedo());
 		ide.getActions().editorUndoAction.setEnabled(canUndo());
+		notifyObservers();
 	}
 
 	public void undo() throws CannotUndoException
@@ -172,6 +192,24 @@ public class ModuleContainer implements UndoInterface
 		mUndoManager.undo();
 		ide.getActions().editorRedoAction.setEnabled(canRedo());
 		ide.getActions().editorUndoAction.setEnabled(canUndo());
+		notifyObservers();
+	}
+
+	public void attach(Observer o)
+	{
+		mObservers.add(o);
+	}
+	
+	public void detach(Observer o)
+	{
+		mObservers.remove(o);
+	}
+
+	public void notifyObservers()
+	{
+		for (Observer o : mObservers) {
+			o.update();
+		}
 	}
 
 	public void updateAutomata()

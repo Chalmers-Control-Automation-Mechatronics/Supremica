@@ -23,6 +23,8 @@ public class CreateNodeCommand
     private final ControlledSurface mSurface;
     /** The Node Created by this Command */
     private final EditorNode mCreated;
+    /** Description of Command */
+    private final String mDescription = this.getClass().getName();
 
     /**
      * Constructs a new CreateNodeCommand with the specified surface and
@@ -84,5 +86,10 @@ public class CreateNodeCommand
 	super.undo();
 	mSurface.delNode(mCreated);
 	mSurface.getEditorInterface().setDisplayed();
+    }
+
+    public String getPresentationName()
+    {
+	return this.getClass().getName();
     }
 }

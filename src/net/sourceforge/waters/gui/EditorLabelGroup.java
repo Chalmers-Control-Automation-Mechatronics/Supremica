@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorLabelGroup
 //###########################################################################
-//# $Id: EditorLabelGroup.java,v 1.11 2005-07-12 03:56:00 siw4 Exp $
+//# $Id: EditorLabelGroup.java,v 1.12 2005-08-30 00:18:45 siw4 Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -175,10 +175,15 @@ public class EditorLabelGroup
 		return (int) proxy.getGeometry().getOffset().getY();
 	}
 
-	public void moveTo(int x, int y)
+	public void setPosition(double x, double y)
 	{
 		proxy.getGeometry().setOffset(new Point2D.Double(x - (int) parent.getTPointX(), y - (int) parent.getTPointY()));
 	}
+
+    public Point2D getPosition()
+    {
+	return new Point2D.Double(getX(), getY());
+    }
 
 	public void addEvent(IdentifierProxy i)    //put stuff for events from proxy
 	{

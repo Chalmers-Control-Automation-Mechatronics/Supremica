@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorLabel
 //###########################################################################
-//# $Id: EditorLabel.java,v 1.13 2005-03-18 00:58:08 flordal Exp $
+//# $Id: EditorLabel.java,v 1.14 2005-08-30 00:18:45 siw4 Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -99,8 +99,9 @@ public class EditorLabel
 	{
 		return editing;
 	}
+    
 
-	public void moveTo(int x, int y)
+	public void setPosition(double x, double y)
 	{
 		geometry.getOffset().setLocation(x - parent.getX(), y - parent.getY());
 	}
@@ -109,6 +110,11 @@ public class EditorLabel
 	{
 		geometry.getOffset().setLocation(x, y);
 	}
+
+    public Point2D getPosition()
+    {
+	return new Point2D.Double(getX(), getY());
+    }
 
 	public int getOffsetX()
 	{

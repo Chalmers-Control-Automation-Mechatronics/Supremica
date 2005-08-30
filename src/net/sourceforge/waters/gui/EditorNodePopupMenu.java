@@ -98,7 +98,7 @@ class EditorNodePopupMenu
 
 		if (e.getSource() == recallItem)
 		{
-			parent.getLabel(node).setOffset(EditorLabel.DEFAULTOFFSETX, EditorLabel.DEFAULTOFFSETY);
+			parent.getLabel(node).setPosition(EditorLabel.DEFAULTOFFSETX, EditorLabel.DEFAULTOFFSETY);
 		}
 
 		parent.repaint();

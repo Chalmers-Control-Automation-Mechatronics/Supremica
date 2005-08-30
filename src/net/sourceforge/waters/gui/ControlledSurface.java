@@ -30,7 +30,7 @@ public class ControlledSurface
 	public static final String EDGE = "edge";
 	public static final String EVENT = "event";
 
-    private ControlledSurface S;
+        private ControlledSurface S;
 	private ControlledToolbar mToolbar;
 	private EditorOptions options;
 	private EditorNode sNode = null;
@@ -44,14 +44,16 @@ public class ControlledSurface
 	private boolean hasDragged = false;
 
 	/** List of currently selected EditorObject:s. */
-	private LinkedList selectedObjects = new LinkedList();
+	private LinkedList<EditorObject> selectedObjects = new LinkedList<EditorObject>();
 	/** List of EditorObject:s that are to become selected. */
-	private LinkedList toBeSelected = new LinkedList();
+	private LinkedList<EditorObject> toBeSelected = new LinkedList<EditorObject>();
 	/** List of EditorObject:s that are to become unselected. */
-	private LinkedList toBeUnselected = new LinkedList();
+	private LinkedList<EditorObject> toBeDeselected = new LinkedList<EditorObject>();
 
 	/** The currently highlighted EditorObject (under the mouse pointer). */
 	private EditorObject highlightedObject = null;
+
+    private Move move;
 
     private DropTarget dropTarget;
     private DropTargetListener dtListener;
@@ -324,7 +326,7 @@ public class ControlledSurface
 				// If object is selected prepare to unselect (don't unselect if dragging, though!)
 				if (selectedObjects.contains(o))
 				{
-					toBeUnselected.add(o);
+					toBeDeselected.add(o);
 				}
 				else
 				{
@@ -540,7 +542,7 @@ public class ControlledSurface
 			if (getCommand() == SELECT)
 			{
 				// Don't unselect! We're dragging!
-				toBeUnselected.clear();
+				toBeDeselected.clear();
 
 				// Drag all selected objects
 
@@ -548,6 +550,17 @@ public class ControlledSurface
 				if ((dx == 0) && (dy == 0))
 				{
 					return;
+				}
+
+				// is this the start of the move or a continuation of it 
+				if (!selectedObjects.isEmpty()) {
+				    if (move == null) {
+					move = new MoveObjects(this, selectedObjects, new Point2D.Double(dx, dy));
+				    } else {
+					Point2D p = move.getDisplacement();
+					p.setLocation(p.getX() + dx, p.getY() + dy);
+					move.setDisplacement(p);
+				    }
 				}
 
 				/* // Code for preventing nodes from ending up in the same place (but we allow that now)
@@ -583,27 +596,7 @@ public class ControlledSurface
 						int oldy = node.getY();
 
 						// Move
-						node.setX(oldx + dx);
-						node.setY(oldy + dy);
-
-						// Update edges
-						if (controlPointsMove)
-						{
-							for (int i = 0; i < edges.size(); i++)
-							{
-								EditorEdge edge = (EditorEdge) edges.get(i);
-
-								if (edge.getStartNode() == node)
-								{
-									edge.updateControlPoint(oldx, oldy, true);
-								}
-
-								if (edge.getEndNode() == node)
-								{
-									edge.updateControlPoint(oldx, oldy, false);
-								}
-							}
-						}
+						node.setPosition(oldx + dx, oldy + dy);
 					}
 					// Is it a nodegroup?
 					else if (object.getType() == EditorObject.NODEGROUP)
@@ -636,8 +629,8 @@ public class ControlledSurface
 								nodeGroup.moveGroup(e.getX() - xoff, e.getY() - yoff);
 							}
 							*/
-
-							nodeGroup.moveGroup(dx, dy);
+						    nodeGroup.setPosition(nodeGroup.getX()+ dx, nodeGroup.getY() + dy);
+	    
 						}
 
 						/* // Prevent nodegroups from moving onto nodes?
@@ -656,7 +649,7 @@ public class ControlledSurface
 					else if ((object.getType() == EditorObject.EDGE) && (!controlPointsMove || !(nodeIsSelected() || nodeGroupIsSelected())))
 					{
 						EditorEdge edge = (EditorEdge) object;
-  						edge.setTPoint(edge.getTPointX() + dx, edge.getTPointY() + dy);
+  						edge.setPosition(edge.getTPointX() + dx, edge.getTPointY() + dy);
 					}
 
 					// DONT MOVE LABELS IN MULTI MODE, (WITH THE OFFSETS IT'S NO FUN TO TRY TO GET IT RIGHT...)
@@ -693,7 +686,22 @@ public class ControlledSurface
 				// Edge drawing...
 				if (getCommand() == EDGE )
 				{
-					// There should only be one object here, or maybe two, 
+				    // No move?
+				    if ((dx == 0) && (dy == 0))
+				    {
+					return;
+				    }
+				    // is this the start of the move or a continuation of it
+				    if (!selectedObjects.isEmpty()) {
+					if (move == null) {
+					    move = new MoveObjects(this, selectedObjects, new Point2D.Double(dx, dy));
+					} else {
+					    Point2D p = move.getDisplacement();
+					    p.setLocation(p.getX() + dx, p.getY() + dy);
+					    move.setDisplacement(p);
+					}
+				    }
+				    // There should only be one object here, or maybe two, 
 					// a node and it's label or an edge and it's labelgroup...
 					// Let's make it an iterator anyway!
 					for (Iterator it = selectedObjects.iterator(); it.hasNext(); )
@@ -724,7 +732,7 @@ public class ControlledSurface
 							}
 							else // Just move it otherwise
 							{
-								edge.setTPoint(edge.getTPointX() + dx, edge.getTPointY() + dy);
+								edge.setPosition(edge.getTPointX() + dx, edge.getTPointY() + dy);
 							}
 						}
 						
@@ -804,7 +812,7 @@ public class ControlledSurface
 							nodeGroup.moveGroup(e.getX() - xoff, e.getY() - yoff);
 						}
 						*/
-						nodeGroup.moveGroup(dx, dy);
+					    nodeGroup.setPosition(nodeGroup.getX()+ dx, nodeGroup.getY() + dy);
 					}
 					
 					/* // Prevent nodegroups from moving onto nodes?
@@ -824,6 +832,12 @@ public class ControlledSurface
 
 	public void mouseReleased(MouseEvent e)
 	{
+	    if (move != null) {
+		if (move.getDisplacement().distance(0,0) != 0) {
+		    root.getUndoInterface().addUndoable(move);
+		}
+		move = null;
+	    }
 	    System.out.println("ahgha");
 		// This is for triggering the popup 
 		maybeShowPopup(e);
@@ -833,9 +847,9 @@ public class ControlledSurface
 		{
 			select((EditorObject) toBeSelected.remove(0));
 		}
-		while (toBeUnselected.size() > 0)
+		while (toBeDeselected.size() > 0)
 		{
-			unselect((EditorObject) toBeUnselected.remove(0));
+			unselect((EditorObject) toBeDeselected.remove(0));
 		}
 
 		if (e.getButton() == MouseEvent.BUTTON1)
@@ -1131,7 +1145,7 @@ public class ControlledSurface
 					unsetAllInitial();
 					n.setInitial(true);
 				}
-				
+	
 				// Special stuff for labelgroup clicks? (This is not working properly!)
 				if (getCommand() == SELECT && edgeIsSelected()) 
 				{
@@ -1140,6 +1154,7 @@ public class ControlledSurface
 						return;
 					}
 					
+
 					EditorLabelGroup l = (EditorLabelGroup) o;
 					l.setSelected(true);
 					l.setSelectedLabel(e.getX(), e.getY());

@@ -97,4 +97,9 @@ public class DeleteNodeGroupCommand
 	}
 	mSurface.getEditorInterface().setDisplayed();
     }
+
+    public String getPresentationName()
+    {
+	return this.getClass().getName();
+    }
 }

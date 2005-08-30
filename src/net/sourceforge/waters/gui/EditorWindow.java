@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorWindow
 //###########################################################################
-//# $Id: EditorWindow.java,v 1.18 2005-08-17 14:21:01 flordal Exp $
+//# $Id: EditorWindow.java,v 1.19 2005-08-30 00:18:45 siw4 Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -180,6 +180,17 @@ public class EditorWindow
 	public UndoInterface getUndoInterface()
 	{
 		return mUndoInterface;
+	}
+
+	public void setVisible(boolean visible)
+	{
+		super.setVisible(visible);
+		if (visible) {
+			mUndoInterface.attach(menu);
+			menu.update();
+		} else {
+			mUndoInterface.detach(menu);
+		}
 	}
 
 	public void setDisplayed()

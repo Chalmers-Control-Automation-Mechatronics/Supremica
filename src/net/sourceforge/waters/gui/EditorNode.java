@@ -30,10 +30,11 @@ public class EditorNode
 	public static int WIDTH = 12;
 	public static int RADIUS = WIDTH/2;
 	public static double INITARROWANGLE = 3*Math.PI/4 + Math.PI/2; // 135 degrees plus correction
-	public static int INITARROWLENGTH = 15; 
+	public static int INITARROWLENGTH = 15;
 
 	/* Maximum number of colors shown in a node */
 	private static int maxDrawnMarkings = 4;
+        private Collection<EditorEdge> mEdges = new HashSet<EditorEdge>();
 
 	private EditorPropGroup propGroup;
 
@@ -103,6 +104,16 @@ public class EditorNode
 	}
     }
 
+    public void attachEdge(EditorEdge e)
+    {
+	mEdges.add(e);
+    }
+
+    public void detachEdge(EditorEdge e)
+    {
+	mEdges.remove(e);
+    }
+
 	public void setInitial(boolean newinitial)
 	{
 		proxy.setInitial(newinitial);
@@ -154,6 +165,26 @@ public class EditorNode
 		position.setLocation(getX(), newyposition);
 	}
 
+    public void setPosition(double x, double y)
+    {
+	int oldx = getX();
+	int oldy = getY();
+	setX((int)x);
+	setY((int)y);
+	for (EditorEdge e : mEdges) {
+	    if (this == e.getStartNode()) {
+		e.updateControlPoint(oldx, oldy, true);
+	    } else if (this == e.getEndNode()) {
+		e.updateControlPoint(oldx, oldy, false);
+	    }
+	}
+    }
+
+    public Point2D getPosition()
+    {
+	return (Point2D)position;
+    }
+
 	public int getX()
 	{
 		return (int) position.getX();
@@ -162,11 +193,6 @@ public class EditorNode
 	public int getY()
 	{
 		return (int) position.getY();
-	}
-
-	public Point2D.Double getPosition()
-	{
-		return position;
 	}
 
 	/**

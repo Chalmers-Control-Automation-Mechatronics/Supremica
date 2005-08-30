@@ -3,7 +3,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorEdge
 //###########################################################################
-//# $Id: EditorEdge.java,v 1.23 2005-08-17 14:59:09 flordal Exp $
+//# $Id: EditorEdge.java,v 1.24 2005-08-30 00:18:45 siw4 Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -55,7 +55,7 @@ public class EditorEdge
 	private boolean dragC = false;
 
 	private EdgeProxy proxy;
-	private Point2D.Double start;
+	private Point2D start;
 	private static double tearRatio = .8;
 	private static int WIDTHD = 2;
 	private static int WIDTHS = 5;
@@ -68,7 +68,7 @@ public class EditorEdge
 		startNode = iStartNode;
 		endNode = iEndNode;
 		proxy = e;
-		
+		endNode.attachEdge(this);
 		if (startNode.getType() == NODE)
 		{
 			EditorNode s = (EditorNode) startNode;
@@ -76,6 +76,8 @@ public class EditorEdge
 			proxy.setSource((NodeProxy) s.getProxy());
 			
 			start = s.getPosition();
+			
+			s.attachEdge(this);
 		}
 		else
 		{
@@ -84,6 +86,7 @@ public class EditorEdge
 			proxy.setSource((NodeProxy) s.getProxy());
 			
 			start = s.getPosition(x, y, this);
+			
 		}
 		
 		proxy.setTarget((NodeProxy) iEndNode.getProxy());
@@ -146,7 +149,7 @@ public class EditorEdge
 		// Without this call, when the mouse is moved above the handle of one of the _curved_ edges,
 		// the labelgroup on that edge jumps to the side!! Presumably TPoint is not properly set 
 		// before this call...
-		setTPoint(getTPointX(), getTPointY());
+		setPosition(getTPointX(), getTPointY());
 	}
 
 	public double getCPointX()
@@ -170,7 +173,7 @@ public class EditorEdge
 		return (2 * tPoint.getY() - (start.getY() + endNode.getY()) / 2);
 	}
 
-	public Point2D.Double getCPoint()
+	public Point2D getCPoint()
 	{
 		return (new Point2D.Double(getCPointX(), getCPointY()));
 	}
@@ -194,13 +197,13 @@ public class EditorEdge
 	{
 		if (proxy.getSource() == proxy.getTarget())
 		{
-			setTPoint(x, y);
+			setPosition(x, y);
 		}
 		
-		setTPoint(.25 * (start.getX() + 2 * x + endNode.getX()), .25 * (start.getY() + 2 * y + endNode.getY()));
+		setPosition(.25 * (start.getX() + 2 * x + endNode.getX()), .25 * (start.getY() + 2 * y + endNode.getY()));
 	}
 
-	public Point2D.Double getStartPoint()
+	public Point2D getStartPoint()
 	{
 		return start;
 	}
@@ -239,7 +242,7 @@ public class EditorEdge
 		double ox = -1;
 		double oy = -1;
 
-		if (startNode.getType() == NODEGROUP)
+		if (startNode instanceof EditorNodeGroup)
 		{
 			if (newstartNode == startNode)
 			{
@@ -250,17 +253,22 @@ public class EditorEdge
 			EditorNodeGroup s = (EditorNodeGroup) startNode;
 
 			s.removePosition(start);
+		} else {
+		    EditorNode s = (EditorNode)startNode;
+		    s.detachEdge(this);
 		}
 
 		startNode = newstartNode;
 
-		if (startNode.getType() == NODE)
+		if (startNode instanceof EditorNode)
 		{
 			EditorNode s = (EditorNode) startNode;
 
 			start = s.getPosition();
 
 			proxy.setSource((NodeProxy) s.getProxy());
+
+			s.attachEdge(this);
 		}
 		else
 		{
@@ -308,15 +316,15 @@ public class EditorEdge
 			double dx = tx + a * ty;
 			double dy = b * tx + ty;
 
-			setTPoint(dx + endNode.getX(), dy + endNode.getY());
+			setPosition(dx + endNode.getX(), dy + endNode.getY());
 		}
 		else if (isSelfLoop())
 		{
-			setTPoint(start.getX() + 30, start.getY() + 30);
+			setPosition(start.getX() + 30, start.getY() + 30);
 		}
 		else
 		{
-			setTPoint((start.getX() + endNode.getX()) / 2, (start.getY() + endNode.getY()) / 2);
+			setPosition((start.getX() + endNode.getX()) / 2, (start.getY() + endNode.getY()) / 2);
 		}
 
 		dragS = false;
@@ -326,31 +334,32 @@ public class EditorEdge
 
 	public void setEndNode(EditorNode newendNode)
 	{
-		endNode = newendNode;
-
-		if (isSelfLoop())
+	    endNode.detachEdge(this);
+	    endNode = newendNode;
+	    newendNode.attachEdge(this);
+	    if (isSelfLoop())
 		{
-			setTPoint(start.getX() + 30, start.getY() + 30);
+		    setPosition(start.getX() + 30, start.getY() + 30);
 		}
-		else
+	    else
 		{
-			setTPoint((start.getX() + endNode.getX()) / 2, (start.getY() + endNode.getY()) / 2);
+		    setPosition((start.getX() + endNode.getX()) / 2, (start.getY() + endNode.getY()) / 2);
 		}
-
-		dragT = false;
-
-		proxy.setTarget((NodeProxy) endNode.getProxy());
-		proxy.getEndPoint().setPoint(endNode.getPosition());
+	    
+	    dragT = false;
+	    
+	    proxy.setTarget((NodeProxy) endNode.getProxy());
+	    proxy.getEndPoint().setPoint(endNode.getPosition());
 	}
 
 	public EditorObject getStartNode()
 	{
-		return startNode;
+	    return startNode;
 	}
-
-	public EditorNode getEndNode()
-	{
-		return endNode;
+    
+        public EditorNode getEndNode()
+        {
+	    return endNode;
 	}
 
 	public void setDragT(boolean d)
@@ -419,6 +428,11 @@ public class EditorEdge
 		//return tPoint.getY();
 	}
 
+    public Point2D getPosition()
+    {
+	return new Point2D.Double(getTPointX(), getTPointY());
+    }
+
 	/** 
 	 * A synonym for getTPointX()
 	 * Returns the X coordinate of the curve turning point
@@ -440,7 +454,7 @@ public class EditorEdge
 	/**
 	 * Set the screen coordinates of the turning point of the edge.
 	 */
-	public void setTPoint(double x, double y)
+	public void setPosition(double x, double y)
 	{
 		if (isSelfLoop())
 		{
@@ -558,7 +572,7 @@ public class EditorEdge
 		}
 
 		// This is where it sometimes goes wrong... Cx and Cy sometimes becomes NaN...
-		setTPoint(Cx, Cy);
+		setPosition(Cx, Cy);
 	}
 
 	private boolean onLine(double x, double y)
@@ -951,7 +965,7 @@ public class EditorEdge
 			ArrayList a = createTear();
 
 			// Initialize the edge (somehow this strange call does exactly what we want)
-			setTPoint(getTPointX(), getTPointY());
+			setPosition(getTPointX(), getTPointY());
 			
 			// Draw shadow
 			if (shadow && isHighlighted())

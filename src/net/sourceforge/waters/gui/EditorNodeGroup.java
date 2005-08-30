@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorNodeGroup
 //###########################################################################
-//# $Id: EditorNodeGroup.java,v 1.12 2005-03-18 00:58:08 flordal Exp $
+//# $Id: EditorNodeGroup.java,v 1.13 2005-08-30 00:18:45 siw4 Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -108,13 +108,13 @@ public class EditorNodeGroup
 		}
 
 		setCorners();
-	}
+	}   
 
 	//public void moveGroupTo(int x, int y)
-	public void moveGroup(int dx, int dy)
+	public void setPosition(double x, double y)
 	{
-		//int dx = x - (int) bounds.getX();
-		//int dy = y - (int) bounds.getY();
+		int dx = (int)x - (int) bounds.getX();
+		int dy = (int)y - (int) bounds.getY();
 
 		// Move points
 		for (int i = 0; i < points.size(); i++)
@@ -129,6 +129,11 @@ public class EditorNodeGroup
 		bounds.setRect(bounds.getX() + dx, bounds.getY() + dy, bounds.getWidth(), bounds.getHeight());
 		setCorners();
 	}
+
+    public Point2D getPosition()
+    {
+	return new Point2D.Double(getX(),getY());
+    }
 
 	public int getX()
 	{
@@ -202,11 +207,11 @@ public class EditorNodeGroup
 		return p;
 	}
 
-	public void removePosition(Point2D.Double p)
+	public void removePosition(Point2D p)
 	{
 		for (int j = 0; j< points.size(); j++)
 		{
-			Point2D.Double point = (Point2D.Double) points.get(j);
+			Point2D point = (Point2D) points.get(j);
 		}
 
 		int i = points.indexOf(p);

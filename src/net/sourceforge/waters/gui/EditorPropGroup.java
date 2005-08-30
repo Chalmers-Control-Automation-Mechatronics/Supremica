@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorLabelGroup
 //###########################################################################
-//# $Id: EditorPropGroup.java,v 1.4 2005-03-18 00:58:08 flordal Exp $
+//# $Id: EditorPropGroup.java,v 1.5 2005-08-30 00:18:45 siw4 Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -116,12 +116,12 @@ public class EditorPropGroup
 		return panel.isVisible();
 	}
 
-	public void setOffset(int nxoff, int nyoff)
+	public void setOffSet(int nxoff, int nyoff)
 	{
 		offset.setLocation(nxoff, nyoff);
 	}
 
-	public void moveTo(int x, int y)
+	public void setPosition(double x, double y)
 	{
 		offset.setLocation(x - (int) parent.getX(), y - (int) parent.getY());
 	}
@@ -252,6 +252,11 @@ public class EditorPropGroup
 		return panel.getY();
 	}
 
+        public Point2D getPosition()
+        {
+	    return new Point2D.Double(getX(), getY());
+	}
+    
 	public EditorPropGroup(EditorNode par, EditorSurface e)
 	{
 		// This is a... labelgroup!

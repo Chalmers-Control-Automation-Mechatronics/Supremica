@@ -73,4 +73,9 @@ public class DeleteEdgeCommand
 	mSurface.addEdge(mDeleted);
 	mSurface.getEditorInterface().setDisplayed();
     }
+
+    public String getPresentationName()
+    {
+	return this.getClass().getName();
+    }
 }

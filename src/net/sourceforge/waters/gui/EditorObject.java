@@ -4,11 +4,12 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorObject
 //###########################################################################
-//# $Id: EditorObject.java,v 1.16 2005-08-17 14:59:09 flordal Exp $
+//# $Id: EditorObject.java,v 1.17 2005-08-30 00:18:45 siw4 Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
 import java.awt.*;
+import java.awt.geom.Point2D;
 
 /**
  * <p>The super-class for all objects internally stored within an
@@ -16,7 +17,7 @@ import java.awt.*;
  *
  * @author Gian Perrone
  */
-public class EditorObject
+public abstract class EditorObject
 {   
 	protected boolean visible;
 	protected int type = 0;
@@ -173,6 +174,10 @@ public class EditorObject
 		// Return the shadowed variant of the ordinary color of this object
 		return EditorColor.shadow(getColor());
 	}
+
+    abstract public void setPosition(double x, double y);
+
+    abstract public Point2D getPosition();
 
 	public EditorObject()
 	{

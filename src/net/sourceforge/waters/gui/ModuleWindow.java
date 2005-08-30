@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   ModuleWindow
 //###########################################################################
-//# $Id: ModuleWindow.java,v 1.14 2005-08-04 18:41:36 flordal Exp $
+//# $Id: ModuleWindow.java,v 1.15 2005-08-30 00:18:45 siw4 Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -26,8 +26,12 @@ import java.util.ArrayList;
 import java.beans.*;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import java.util.Date;
+import java.util.Set;
+import java.util.HashSet;
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.UndoInterface;
+import net.sourceforge.waters.gui.observer.Observer;
+import net.sourceforge.waters.gui.observer.Subject;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.expr.SimpleExpressionProxy;
@@ -48,6 +52,7 @@ public class ModuleWindow
 	extends JFrame
 	implements ActionListener, FocusListener, UndoInterface
 {
+	private Set<Observer> mObservers = new HashSet();
 	private ModuleProxy module = null;
 	private JFileChooser fileChooser = new JFileChooser(".");
 	private JFileChooser fileSaveChooser = new JFileChooser(".");
@@ -109,7 +114,7 @@ public class ModuleWindow
 			final ProxyMarshaller marshaller = new ModuleMarshaller();
 
 			module = (ModuleProxy) marshaller.unmarshal(wmodf);
-			mUndoManager.discardAllEdits();
+			clearList();
 		}
 		catch (final JAXBException exception)
 		{
@@ -896,6 +901,7 @@ public class ModuleWindow
 	public void addUndoable(UndoableEdit e)
 	{
 		mUndoManager.addEdit(e);
+		notifyObservers();
 	}
 
 	public void executeCommand(Command c)
@@ -916,15 +922,52 @@ public class ModuleWindow
 		return mUndoManager.canUndo();
 	}
 
+	public void clearList()
+	{
+		mUndoManager.discardAllEdits();
+		notifyObservers();
+	}
+
+    public String getRedoPresentationName()
+	{
+		return mUndoManager.getRedoPresentationName();
+	}
+
+    public String getUndoPresentationName()
+	{
+		return mUndoManager.getUndoPresentationName();
+	}
+
 	public void redo() throws CannotRedoException
 	{
 		mUndoManager.redo();
+		notifyObservers();
 	}
 
 	public void undo() throws CannotUndoException
 	{
 		mUndoManager.undo();
+		notifyObservers();
 	}
+
+	public void attach(Observer o)
+	{
+		mObservers.add(o);
+	}
+	
+	public void detach(Observer o)
+	{
+		mObservers.remove(o);
+	}
+
+	public void notifyObservers()
+	{
+		for (Observer o : mObservers) {
+			o.update();
+		}
+	}
+
+	
 
 	public static void main(String[] args)
 	{

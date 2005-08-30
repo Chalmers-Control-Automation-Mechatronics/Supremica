@@ -74,4 +74,9 @@ public class CreateNodeGroupCommand
 	mSurface.delNodeGroup(mCreated);
 	mSurface.getEditorInterface().setDisplayed();
     }
+
+    public String getPresentationName()
+    {
+	return this.getClass().getName();
+    }
 }

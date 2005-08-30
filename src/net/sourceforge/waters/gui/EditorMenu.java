@@ -4,11 +4,13 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorMenu
 //###########################################################################
-//# $Id: EditorMenu.java,v 1.14 2005-08-17 14:21:01 flordal Exp $
+//# $Id: EditorMenu.java,v 1.15 2005-08-30 00:18:45 siw4 Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.gui;
+
+import net.sourceforge.waters.gui.observer.Observer;
 
 import javax.swing.*;
 import java.awt.*;
@@ -31,7 +33,8 @@ import java.util.Locale;
 
 public class EditorMenu
 	extends JMenuBar
-	implements ActionListener
+	implements ActionListener,
+			   Observer
 {
 	public final JMenuItem FileNewMenu;
 	public final JMenuItem PrintMenu;
@@ -185,13 +188,6 @@ public class EditorMenu
 		fileChooser.addChoosableFileFilter(new WmodFileFilter());
 	}
 
-	protected void paintComponent(Graphics g) 
-	{
-		mEditRedo.setEnabled(root.getUndoInterface().canRedo());
-		mEditUndo.setEnabled(root.getUndoInterface().canUndo());
-		super.paintComponent(g);
-	}
-
 	public void actionPerformed(ActionEvent e)
 	{
 		if (e.getSource() == FileNewMenu)
@@ -292,5 +288,12 @@ public class EditorMenu
 			}
 		}
 
+	}
+	public void update()
+	{
+		mEditRedo.setEnabled(root.getUndoInterface().canRedo());
+		mEditUndo.setEnabled(root.getUndoInterface().canUndo());
+		mEditRedo.setText(root.getUndoInterface().getRedoPresentationName());
+		mEditUndo.setText(root.getUndoInterface().getUndoPresentationName());
 	}
 }
