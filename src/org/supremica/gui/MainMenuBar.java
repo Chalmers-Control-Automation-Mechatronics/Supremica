@@ -761,7 +761,7 @@ public class MainMenuBar
 
 	JMenuItem menuToolsCodeGenerationIEC61499 = new JMenuItem();
 
-	menuToolsCodeGenerationIEC61499.setText("IEC-61499 Function Block...");
+	menuToolsCodeGenerationIEC61499.setText("IEC-61499 Function Blocks...");
 	menuToolsCodeGeneration.add(menuToolsCodeGenerationIEC61499);
 	menuToolsCodeGenerationIEC61499.addActionListener(new ActionListener()
 	    {

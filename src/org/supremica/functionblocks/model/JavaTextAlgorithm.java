@@ -69,6 +69,11 @@ public class JavaTextAlgorithm extends Algorithm
 		interpreter = new Interpreter();
 	}
 
+	public String toString()
+	{
+		return algorithmText;
+	}
+
 	public void execute(Variables vars)
 	{
 

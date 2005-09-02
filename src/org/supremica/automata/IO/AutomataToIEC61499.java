@@ -102,10 +102,11 @@ public class AutomataToIEC61499
 	}
 
 	// Constructor
-	public AutomataToIEC61499(Project theProject)
+	public AutomataToIEC61499(Project theProject,boolean comments)
 	{
 		this.theProject = theProject;
 		allEvents = this.theProject.setIndicies();
+		this.comments = comments;
 	}
 
 
@@ -120,9 +121,11 @@ public class AutomataToIEC61499
 		}
 		if (comments)
 		{
-			pw.println("<!-- This function block was automatically generated from Supremica.");
-			pw.println("     Supremica version: " + org.supremica.Version.version());
-			pw.println("     Time of generation: " + DateFormat.getDateTimeInstance().format(new Date()) + "-->");
+			pw.println("<!--");
+			pw.println(" This function block was automatically generated from Supremica.");
+			pw.println(" Supremica version: " + org.supremica.Version.version());
+			pw.println(" Time of generation: " + DateFormat.getDateTimeInstance().format(new Date()));
+			pw.println("-->");
 		}
 
 		pw.println("<FBType " + (useXmlns ?  xmlnsLibraryElementString : "") + "Name=\"" + theProject.getAutomatonAt(0).getName() + "\" >");
@@ -310,9 +313,9 @@ public class AutomataToIEC61499
 
 		if (comments)
 		{
-			pw.println("        <!-- Reset all automata to initial state -->");
+			pw.println("        &#47;* Reset all automata to initial state *&#47;");
 			pw.println();
-			pw.println("        <!-- First set all states to FALSE -->");
+			pw.println("        &#47;* First set all states to FALSE *&#47;");
 		}
 
 		// Set all state variables to FALSE
@@ -334,7 +337,7 @@ public class AutomataToIEC61499
 		if (comments)
 		{
 			pw.println();
-			pw.println("        <!-- Then set the initial states to TRUE -->");
+			pw.println("        &#47;* Then set the initial states to TRUE *&#47;");
 		}
 
 		// Then set the initital states to TRUE
@@ -364,7 +367,7 @@ public class AutomataToIEC61499
 
 		if (comments)
 		{
-			pw.println("        <!-- Change state in the automata -->");
+			pw.println("        &#47;* Change state in the automata *&#47;");
 		}
 
 		// Iterate over all events and make transitions for the enabled events
@@ -376,7 +379,7 @@ public class AutomataToIEC61499
 			if (comments)
 			{
 				pw.println();
-				pw.println("        <!-- Transitions for event \"" + currEvent.getLabel() + "\" -->");
+				pw.println("        &#47;* Transitions for event " + currEvent.getLabel() + " *&#47;");
 			}
 
 			boolean previousCondition = false;
@@ -438,7 +441,7 @@ public class AutomataToIEC61499
 						{
 							if (comments)
 							{
-								pw.println("          <!-- Q_" + currStateIndex + "  has EI_" + currEventIndex + " as self loop, no transition -->");
+								pw.println("          &#47;* Q_" + currStateIndex + "  has EI_" + currEventIndex + " as self loop, no transition *&#47;");
 							}
 						}
 					}
@@ -471,7 +474,7 @@ public class AutomataToIEC61499
 				if (comments)
 				{
 					pw.println();
-					pw.println("        <!-- Enabled condition for event \"" + currEvent.getLabel() + "\" -->");
+					pw.println("        &#47;* Enabled condition for event " + currEvent.getLabel() + " *&#47; &#13;&#10;");
 				}
 
 				boolean previousCondition = false;
@@ -547,9 +550,11 @@ public class AutomataToIEC61499
 
 		if (comments)
 		{
-			pw.println("<!-- This function block was automatically generated from Supremica.");
-			pw.println("     Supremica version: " + org.supremica.Version.version());
-			pw.println("     Time of generation: " + DateFormat.getDateTimeInstance().format(new Date()) + "-->");
+			pw.println("<!--");
+			pw.println(" This function block was automatically generated from Supremica.");
+			pw.println(" Supremica version: " + org.supremica.Version.version());
+			pw.println(" Time of generation: " + DateFormat.getDateTimeInstance().format(new Date()));
+			pw.println("-->");
 		}
 
 		pw.println("<FBType " + (useXmlns ?  xmlnsLibraryElementString : "") + "Name=\"" + sysName + "_SYNC\" >");
@@ -931,7 +936,7 @@ public class AutomataToIEC61499
 
 				File tmpFile = new File(file.getParent() + "/" + tempProject.getAutomatonAt(0).getName() + ".fbt");
 
-				AutomataToIEC61499 tempToIEC61499 = new AutomataToIEC61499(tempProject);
+				AutomataToIEC61499 tempToIEC61499 = new AutomataToIEC61499(tempProject,comments);
 
 				tempToIEC61499.setPrintWriter(new PrintWriter(new FileWriter(tmpFile)));
 

@@ -3658,49 +3658,64 @@ public class ActionMan
 
 		if (selectedProject.size() < 2)
 		{
-			JOptionPane.showMessageDialog(
-										  gui.getComponent(),
+			JOptionPane.showMessageDialog(gui.getComponent(),
 										  "At least two automatons must be selected!",
 										  "Alert",
 										  JOptionPane.ERROR_MESSAGE);
-
 			return;
 		}
-
+		
 		JFileChooser fileExporter = FileDialogs.getExportFileChooser(FileFormats.SYS);
 
 		if (fileExporter.showSaveDialog(gui.getComponent()) == JFileChooser.APPROVE_OPTION)
 		{
 			File theFile = fileExporter.getSelectedFile();
-
+			
 			if (theFile != null)
 			{
 				try
 				{
+					// ask to turn on comments
+					// 0 = yes
+					// 1 = no
+					int comments = JOptionPane.showConfirmDialog(gui.getComponent(),
+																 "Do you want to add comments to the source files?",
+																 "Add comments to the source files?",
+																 JOptionPane.YES_NO_OPTION);
+					
 					// Make a deep project copy before changing the names
 					Project copyOfSelectedProject = new Project(selectedProject, false);
 					copyOfSelectedProject.normalizeAutomataNames();
-					AutomataToIEC61499 exporter = new AutomataToIEC61499(copyOfSelectedProject);
-					exporter.printSources(theFile);
+					if (comments == 0)
+					{
+						//logger.info("Turning comments on.");
+						AutomataToIEC61499 exporter = new AutomataToIEC61499(copyOfSelectedProject,true);
+						exporter.printSources(theFile);
+					}
+					else
+					{
+						//logger.info("Turning comments off.");
+						AutomataToIEC61499 exporter = new AutomataToIEC61499(copyOfSelectedProject,false);
+						exporter.printSources(theFile);
+					}
 				}
 				catch (Exception ex)
 				{
 					logger.error("Exception while generating IEC-61499 Function Block code to file "
-						     + theFile.getAbsolutePath());
+								 + theFile.getAbsolutePath());
 					logger.debug(ex.getMessage());
 					logger.debug(ex.getStackTrace());
-
+					
 					return;
 				}
-
-				logger.info(
-					    "IEC-61499 Function Block System file successfully generated at "
-					    + theFile.getAbsolutePath());
+				
+				logger.info("IEC-61499 Function Block System file successfully generated at "
+							+ theFile.getAbsolutePath());
 			}
 		}
 	}
 
-        // Generate 1131 Structured Text
+	// Generate 1131 Structured Text
 	public static void ProjectTo1131ST(Gui gui)
 	{
 		// Automata selectedProject = gui.getselectedProject();
