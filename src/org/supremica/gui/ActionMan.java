@@ -3676,8 +3676,6 @@ public class ActionMan
 				try
 				{
 					// ask to turn on comments
-					// 0 = yes
-					// 1 = no
 					int comments = JOptionPane.showConfirmDialog(gui.getComponent(),
 																 "Do you want to add comments to the source files?",
 																 "Add comments to the source files?",
@@ -3686,7 +3684,7 @@ public class ActionMan
 					// Make a deep project copy before changing the names
 					Project copyOfSelectedProject = new Project(selectedProject, false);
 					copyOfSelectedProject.normalizeAutomataNames();
-					if (comments == 0)
+					if (comments == JOptionPane.YES_OPTION)
 					{
 						//logger.info("Turning comments on.");
 						AutomataToIEC61499 exporter = new AutomataToIEC61499(copyOfSelectedProject,true);

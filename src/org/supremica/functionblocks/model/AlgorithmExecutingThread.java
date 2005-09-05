@@ -80,8 +80,8 @@ class AlgorithmExecutingThread extends Thread
 		while (true) 
 		{
 			Job currentJob = getNextScheduledJob();
-			System.out.println("AlgorithmExecutingThread.run(): Executing " + currentJob.getAlgorithm().getName() + " with text:");
-			System.out.println(currentJob.getAlgorithm().toString());
+			//System.out.println("AlgorithmExecutingThread.run(): Executing " + currentJob.getAlgorithm().getName() + " with text:");
+			//System.out.println(currentJob.getAlgorithm().toString());
 			currentJob.getAlgorithm().execute(currentJob.getVariables());
 			currentJob.getInstance().finishedJob(currentJob);
 		}	

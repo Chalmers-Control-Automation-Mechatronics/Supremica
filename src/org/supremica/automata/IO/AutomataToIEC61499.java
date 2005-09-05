@@ -473,7 +473,6 @@ public class AutomataToIEC61499
 
 				if (comments)
 				{
-					pw.println();
 					pw.println("        &#47;* Enabled condition for event " + currEvent.getLabel() + " *&#47; &#13;&#10;");
 				}
 
