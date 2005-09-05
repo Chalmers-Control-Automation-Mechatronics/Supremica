@@ -62,38 +62,47 @@ import org.supremica.util.SupremicaException;
 /** This class generates an IEC-61499 function block
  * implementing the automata in the current project.
  *
- * <p>Note that the event in the IEC-61499 is not the
- * same as an automaton event. That is why the
- * implementation of the interface is done this way. KA
- * and I are planing several different interfaces so this
- * is only the first one.
+ * <p>Note that the event in the IEC-61499 is not the same
+ * as an automaton event. That is why the implementation of
+ * the interface is done this way. KA and I are planing
+ * several different interfaces so this is only the first
+ * one.
  *
  * @author Goran Cengic
  * @author cengic@s2.chalmers.se
  */
 public class AutomataToIEC61499
-
 {
 
+	private static final String xmlnsLibraryElementString = "xmlns=\"http://www.holobloc.com/xml/LibraryElement\" ";
 	private static Logger logger = LoggerFactory.createLogger(AutomataToIEC61499.class);
 	private Project theProject;
 	private Alphabet allEvents;
 	private boolean comments = false;
 	private boolean useXmlns = true;
-	private boolean useDoctype = false;
-	private static final String xmlnsLibraryElementString = "xmlns=\"http://www.holobloc.com/xml/LibraryElement\" ";
-
-	DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+	private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 	private PrintWriter pw;
+
+
+	// Constructor
+	public AutomataToIEC61499(Project theProject)
+	{
+		this.theProject = theProject;
+		allEvents = this.theProject.setIndicies();
+	}
+
+	private AutomataToIEC61499(Project theProject,boolean comments, boolean useXmlns)
+	{
+		this.theProject = theProject;
+		allEvents = this.theProject.setIndicies();
+		this.comments = comments;
+		this.useXmlns = useXmlns;
+	}
+
 
 	public void commentsOn()
 	{
 		comments = true;
-	}
-
-	public void commentsOff()
-	{
-		comments = false;
 	}
 
 	public void useXmlNameSpace(boolean use)
@@ -101,21 +110,129 @@ public class AutomataToIEC61499
 		useXmlns = use;
 	}
 
-	// Constructor
-	public AutomataToIEC61499(Project theProject,boolean comments)
+	public void setPrintWriter(PrintWriter pw)
 	{
-		this.theProject = theProject;
-		allEvents = this.theProject.setIndicies();
-		this.comments = comments;
+		this.pw = pw;
 	}
 
+	public void printSources(File file)
+	{
+
+		String systemName = file.getName().substring(0,file.getName().length()-4);
+
+		try
+		{
+
+			// First generate FBs for all models
+			for (Iterator autIt = theProject.iterator(); autIt.hasNext();)
+			{
+				Project tempProject = new Project();
+
+				tempProject.addAutomaton((Automaton) autIt.next());
+
+				File tmpFile = new File(file.getParent() + "/" + tempProject.getAutomatonAt(0).getName() + ".fbt");
+
+				AutomataToIEC61499 tempToIEC61499 = new AutomataToIEC61499(tempProject,comments,useXmlns);
+
+				tempToIEC61499.setPrintWriter(new PrintWriter(new FileWriter(tmpFile)));
+
+				tempToIEC61499.printSource();
+			}
+
+
+			// Then generate the sync FB
+			File tmpFile = new File(file.getParent() + "/" + systemName + "_SYNC.fbt");
+
+			pw = new PrintWriter(new FileWriter(tmpFile));
+
+			printSyncFB(systemName);
+
+			pw.close();
+
+
+			// Generate the System application
+
+			pw = new PrintWriter(new FileWriter(file));
+
+			printSystem(systemName);
+
+			pw.close();
+
+			// Finnally generate the merge2, merge, split and restart blocks
+
+			// merge 2
+			tmpFile = new File(file.getParent() + "/E_MERGE2.fbt");
+
+			pw = new PrintWriter(new FileWriter(tmpFile));
+
+			printMerge(2);
+
+			pw.close();
+
+			// merge
+			tmpFile = new File(file.getParent() + "/E_MERGE" + theProject.size() + ".fbt");
+
+			pw = new PrintWriter(new FileWriter(tmpFile));
+
+			printMerge(theProject.size());
+
+			pw.close();
+
+			// split
+			tmpFile = new File(file.getParent() + "/E_SPLIT" + theProject.size() + ".fbt");
+
+			pw = new PrintWriter(new FileWriter(tmpFile));
+
+			printSplit(theProject.size());
+
+			pw.close();
+
+			// restart
+			tmpFile = new File(file.getParent() + "/E_RESTART.fbt");
+
+			pw = new PrintWriter(new FileWriter(tmpFile));
+
+			printRestart();
+
+			pw.close();
+
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace(System.err);
+		}
+	}
+
+	/** Makes the basic function block type declaration. */
+	public void printSource()
+	{
+
+		printBeginFB();
+		printInterfaceList();
+		printBeginBasicFB();
+		printInternalVariableList();
+		printEccDeclaration();
+		try
+		{
+			printAlgorithmDeclarations();
+		}
+		catch (Exception ex)
+		{
+			logger.error(ex);
+		}
+		printEndBasicFB();
+		printEndFB();
+
+		pw.close();
+
+	}
 
 	/** Makes the beginning of the function block type declaration. */
 	private void printBeginFB()
 	{
 
 		pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-		if (useDoctype)
+		if (!useXmlns)
 		{
 			pw.println("<!DOCTYPE FBType SYSTEM \"http://www.holobloc.com/xml/LibraryElement.dtd\">");
 		}
@@ -329,7 +446,7 @@ public class AutomataToIEC61499
 				State currState = (State) stateIt.next();
 				int currStateIndex = currState.getSynchIndex();
 
-				pw.println("        Q_" + currStateIndex + " = false;");
+				pw.println("        Q_" + currStateIndex + (useXmlns ?  "" : ".value") + " = false;");
 			}
 		}
 
@@ -354,7 +471,7 @@ public class AutomataToIEC61499
 				throw new IllegalStateException(errMessage);
 			}
 
-			pw.println("        Q_" + currAutomaton.getInitialState().getSynchIndex() + " = true;");
+			pw.println("        Q_" + currAutomaton.getInitialState().getSynchIndex() + (useXmlns ?  "" : ".value") + " = true;");
 		}
 
 		printEndAlgorithm();
@@ -384,7 +501,7 @@ public class AutomataToIEC61499
 
 			boolean previousCondition = false;
 
-			pw.println("        if (EI_" + currEvent.getLabel() + " &#38;&#38; EO_" + currEvent.getLabel() + ")");
+			pw.println("        if (EI_" + currEvent.getLabel() + (useXmlns ?  "" : ".value") + " &#38;&#38; EO_" + currEvent.getLabel() + (useXmlns ?  "" : ".value") + ")");
 			pw.println("        {");
 
 			for (Iterator autIt = theProject.iterator(); autIt.hasNext();)
@@ -431,11 +548,11 @@ public class AutomataToIEC61499
 								pw.print("          else if");
 							}
 
-							pw.println(" (Q_" + currStateIndex + ")");
+							pw.println(" (Q_" + currStateIndex + (useXmlns ?  "" : ".value") + ")");
 							pw.println("          {");
 							pw.println("            System.out.println(&#34;" + currAutomaton.getName() + ".fbt:TRANSITION: Changing state from Q_" + currStateIndex + " to Q_" + toStateIndex + " on event " + currEvent.getLabel() + "&#34;);");
-							pw.println("            Q_" + toStateIndex + " = true;");
-							pw.println("            Q_" + currStateIndex + " = false;");
+							pw.println("            Q_" + toStateIndex + (useXmlns ?  "" : ".value") + " = true;");
+							pw.println("            Q_" + currStateIndex + (useXmlns ?  "" : ".value") + " = false;");
 						}
 						else
 						{
@@ -478,7 +595,7 @@ public class AutomataToIEC61499
 
 				boolean previousCondition = false;
 
-				pw.print("        EO_" + currEvent.getLabel() + " = ");
+				pw.print("        EO_" + currEvent.getLabel() + (useXmlns ?  "" : ".value") + " = ");
 
 				for (Iterator autIt = theProject.iterator(); autIt.hasNext(); )
 				{
@@ -505,7 +622,7 @@ public class AutomataToIEC61499
 								previousState = true;
 							}
 
-							pw.print("Q_" + currStateIndex);
+							pw.print("Q_" + currStateIndex + (useXmlns ?  "" : ".value"));
 						}
 
 						if (!previousState)
@@ -542,7 +659,7 @@ public class AutomataToIEC61499
 
 		// BeginProgram
 		pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-		if (useDoctype)
+		if (!useXmlns)
 		{
 			pw.println("<!DOCTYPE FBType SYSTEM \"http://www.holobloc.com/xml/LibraryElement.dtd\">");
 		}
@@ -688,14 +805,14 @@ public class AutomataToIEC61499
 	{
 
 		pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-		if (useDoctype)
+		if (!useXmlns)
 		{
 			pw.println("<!DOCTYPE System SYSTEM \"http://www.holobloc.com/xml/LibraryElement.dtd\">");
 		}
 		pw.println("<System " + (useXmlns ?  xmlnsLibraryElementString : "") + "Name=\"" + name + "\" >");
 		pw.println("  <VersionInfo Author=\"Author Name\" Organization=\"Org\" Version=\"1.0\" Date=\"" + dateFormat.format(new Date()) + "\" />");
-		pw.println("  <Device Name=\"Test Device\" Type=\"DeviceType_not_used\">");
-		pw.println("    <Resource Name=\"Test Resource\" Type=\"ResourceType_not_used\" >");
+		pw.println("  <Device Name=\"Test_Device\" Type=\"DeviceType_not_used\">");
+		pw.println("    <Resource Name=\"Test_Resource\" Type=\"ResourceType_not_used\" >");
 		pw.println("      <FBNetwork>");
 
         pw.println("        <FB Name=\"restart\" Type=\"E_RESTART\" />");
@@ -792,7 +909,7 @@ public class AutomataToIEC61499
 	private void printMerge(int size)
 	{
 		pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-		if (useDoctype)
+		if (!useXmlns)
 		{
 			pw.println("<!DOCTYPE FBType SYSTEM \"http://www.holobloc.com/xml/LibraryElement.dtd\">");
 		}
@@ -837,7 +954,7 @@ public class AutomataToIEC61499
 	private void printSplit(int size)
 	{
 		pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-		if (useDoctype)
+		if (!useXmlns)
 		{
 			pw.println("<!DOCTYPE FBType SYSTEM \"http://www.holobloc.com/xml/LibraryElement.dtd\">");
 		}
@@ -873,7 +990,7 @@ public class AutomataToIEC61499
 	private void printRestart()
 	{
 		pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-		if (useDoctype)
+		if (!useXmlns)
 		{
 			pw.println("<!DOCTYPE FBType SYSTEM \"http://www.holobloc.com/xml/LibraryElement.dtd\">");
 		}
@@ -889,120 +1006,4 @@ public class AutomataToIEC61499
 		pw.println("</FBType>");
 	}
 
-	public void setPrintWriter(PrintWriter pw)
-	{
-		this.pw = pw;
-	}
-
-	/** Makes the basic function block type declaration. */
-	public void printSource()
-	{
-
-		printBeginFB();
-		printInterfaceList();
-		printBeginBasicFB();
-		printInternalVariableList();
-		printEccDeclaration();
-		try
-		{
-			printAlgorithmDeclarations();
-		}
-		catch (Exception ex)
-		{
-			logger.error(ex);
-		}
-		printEndBasicFB();
-		printEndFB();
-
-		pw.close();
-
-	}
-
-	public void printSources(File file)
-	{
-
-		String systemName = file.getName().substring(0,file.getName().length()-4);
-
-		try
-		{
-
-			// First generate FBs for all models
-			for (Iterator autIt = theProject.iterator(); autIt.hasNext();)
-			{
-				Project tempProject = new Project();
-
-				tempProject.addAutomaton((Automaton) autIt.next());
-
-				File tmpFile = new File(file.getParent() + "/" + tempProject.getAutomatonAt(0).getName() + ".fbt");
-
-				AutomataToIEC61499 tempToIEC61499 = new AutomataToIEC61499(tempProject,comments);
-
-				tempToIEC61499.setPrintWriter(new PrintWriter(new FileWriter(tmpFile)));
-
-				tempToIEC61499.printSource();
-			}
-
-
-			// Then generate the sync FB
-			File tmpFile = new File(file.getParent() + "/" + systemName + "_SYNC.fbt");
-
-			pw = new PrintWriter(new FileWriter(tmpFile));
-
-			printSyncFB(systemName);
-
-			pw.close();
-
-
-			// Generate the System application
-
-			pw = new PrintWriter(new FileWriter(file));
-
-			printSystem(systemName);
-
-			pw.close();
-
-			// Finnally generate the merge2, merge, split and restart blocks
-
-			// merge 2
-			tmpFile = new File(file.getParent() + "/E_MERGE2.fbt");
-
-			pw = new PrintWriter(new FileWriter(tmpFile));
-
-			printMerge(2);
-
-			pw.close();
-
-			// merge
-			tmpFile = new File(file.getParent() + "/E_MERGE" + theProject.size() + ".fbt");
-
-			pw = new PrintWriter(new FileWriter(tmpFile));
-
-			printMerge(theProject.size());
-
-			pw.close();
-
-			// split
-			tmpFile = new File(file.getParent() + "/E_SPLIT" + theProject.size() + ".fbt");
-
-			pw = new PrintWriter(new FileWriter(tmpFile));
-
-			printSplit(theProject.size());
-
-			pw.close();
-
-			// restart
-			tmpFile = new File(file.getParent() + "/E_RESTART.fbt");
-
-			pw = new PrintWriter(new FileWriter(tmpFile));
-
-			printRestart();
-
-			pw.close();
-
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace(System.err);
-		}
-	}
 }

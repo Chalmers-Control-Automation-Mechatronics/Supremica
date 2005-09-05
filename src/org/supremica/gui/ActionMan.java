@@ -3613,7 +3613,7 @@ public class ActionMan
 
 		if (!selectedAutomata.isAllEventsPrioritized())
 		{
-			JOptionPane.showMessageDialog(gui.getComponent(), "All events must prioritized in this mode!", "Not supported", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(gui.getComponent(), "All events must be prioritized in this mode!", "Not supported", JOptionPane.ERROR_MESSAGE);
 
 			return;
 		}
@@ -3675,27 +3675,40 @@ public class ActionMan
 			{
 				try
 				{
-					// ask to turn on comments
-					int comments = JOptionPane.showConfirmDialog(gui.getComponent(),
-																 "Do you want to add comments to the source files?",
-																 "Add comments to the source files?",
-																 JOptionPane.YES_NO_OPTION);
-					
 					// Make a deep project copy before changing the names
 					Project copyOfSelectedProject = new Project(selectedProject, false);
 					copyOfSelectedProject.normalizeAutomataNames();
+					AutomataToIEC61499 exporter =  new AutomataToIEC61499(copyOfSelectedProject);
+
+					// ask to turn on comments
+					int comments = 
+						JOptionPane.showConfirmDialog(gui.getComponent(),
+													  "Do you want to add comments to the source files?",
+													  "Add comments...",
+													  JOptionPane.YES_NO_OPTION);
 					if (comments == JOptionPane.YES_OPTION)
 					{
-						//logger.info("Turning comments on.");
-						AutomataToIEC61499 exporter = new AutomataToIEC61499(copyOfSelectedProject,true);
-						exporter.printSources(theFile);
+						exporter.commentsOn();
 					}
-					else
+					
+					//ask to export to FBDK or FBRuntime
+					String[] options = {"FBDK","FBRuntime"};
+					int exportTo = 
+						JOptionPane.showOptionDialog(gui.getComponent(),
+													 "What runtime do you want to generate the code for?",
+													 "Export to...",
+													 JOptionPane.DEFAULT_OPTION,
+													 JOptionPane.QUESTION_MESSAGE,
+													 null,
+													 options,
+													 options[1]);
+					if (exportTo == 0) // FBDK
 					{
-						//logger.info("Turning comments off.");
-						AutomataToIEC61499 exporter = new AutomataToIEC61499(copyOfSelectedProject,false);
-						exporter.printSources(theFile);
+						exporter.useXmlNameSpace(false);
 					}
+					
+					exporter.printSources(theFile);
+					
 				}
 				catch (Exception ex)
 				{
