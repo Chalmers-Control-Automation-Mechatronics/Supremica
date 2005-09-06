@@ -158,6 +158,23 @@ public class AutomataToIEC61499
 
 			pw.close();
 
+			
+			// Generate the Device type and Resource type for FBDK
+			if (!useXmlns)
+			{
+				tmpFile = new File(file.getParent() + "/AutogenDevice.fbt");
+				
+				pw = new PrintWriter(new FileWriter(tmpFile));
+
+				pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+				pw.println("<!DOCTYPE DeviceType SYSTEM \"http://www.holobloc.com/xml/LibraryElement.dtd\">");
+				pw.println("<DeviceType Name=\"AutogenDevice\" >");
+				pw.println("  <VersionInfo Author=\"Automatically Generated\" Organization=\"Chalmers\" Version=\"1.0\" Date=\"" + dateFormat.format(new Date()) + "\" />");
+				pw.println("</DeviceType>");				
+				
+				pw.close();
+			}
+
 			// Finnally generate the merge2, merge, split and restart blocks
 
 			// merge 2
@@ -236,6 +253,7 @@ public class AutomataToIEC61499
 		{
 			pw.println("<!DOCTYPE FBType SYSTEM \"http://www.holobloc.com/xml/LibraryElement.dtd\">");
 		}
+
 		if (comments)
 		{
 			pw.println("<!--");
@@ -246,7 +264,12 @@ public class AutomataToIEC61499
 		}
 
 		pw.println("<FBType " + (useXmlns ?  xmlnsLibraryElementString : "") + "Name=\"" + theProject.getAutomatonAt(0).getName() + "\" >");
-		pw.println("  <VersionInfo Author=\"Author Name\" Organization=\"Org\" Version=\"1.0\" Date=\"" + dateFormat.format(new Date()) + "\" />");
+		pw.println("  <VersionInfo Author=\"Automatically Generated\" Organization=\"Chalmers\" Version=\"1.0\" Date=\"" + dateFormat.format(new Date()) + "\" />");
+
+		if (!useXmlns)
+		{
+			pw.println("  <CompilerInfo header=\"package fb.rt.fbruntime;\" />");			
+		}
 
 	}
 
@@ -674,7 +697,7 @@ public class AutomataToIEC61499
 		}
 
 		pw.println("<FBType " + (useXmlns ?  xmlnsLibraryElementString : "") + "Name=\"" + sysName + "_SYNC\" >");
-		pw.println("  <VersionInfo Author=\"Author Name\" Organization=\"Org\" Version=\"1.0\" Date=\"" + dateFormat.format(new Date()) + "\" />");
+		pw.println("  <VersionInfo Author=\"Automatically Generated\" Organization=\"Chalmers\" Version=\"1.0\" Date=\"" + dateFormat.format(new Date()) + "\" />");
 
 
 		// InterfaceList
@@ -810,9 +833,10 @@ public class AutomataToIEC61499
 			pw.println("<!DOCTYPE System SYSTEM \"http://www.holobloc.com/xml/LibraryElement.dtd\">");
 		}
 		pw.println("<System " + (useXmlns ?  xmlnsLibraryElementString : "") + "Name=\"" + name + "\" >");
-		pw.println("  <VersionInfo Author=\"Author Name\" Organization=\"Org\" Version=\"1.0\" Date=\"" + dateFormat.format(new Date()) + "\" />");
-		pw.println("  <Device Name=\"Test_Device\" Type=\"DeviceType_not_used\">");
-		pw.println("    <Resource Name=\"Test_Resource\" Type=\"ResourceType_not_used\" >");
+		pw.println("  <VersionInfo Author=\"Automatically Generated\" Organization=\"Chalmers\" Version=\"1.0\" Date=\"" + dateFormat.format(new Date()) + "\" />");
+		//pw.println("  <Device Name=\"Test_Device\" Type=\"DeviceType_not_used\">");
+		//pw.println("    <Resource Name=\"Test_Resource\" Type=\"ResourceType_not_used\" >");
+		pw.println("    <Application Name=\"" + name + "\" >");
 		pw.println("      <FBNetwork>");
 
         pw.println("        <FB Name=\"restart\" Type=\"E_RESTART\" />");
@@ -901,8 +925,12 @@ public class AutomataToIEC61499
 
 
 		pw.println("      </FBNetwork>");
-		pw.println("    </Resource>");
-		pw.println("  </Device>");
+		pw.println("    </Application>");
+		//pw.println("    </Resource>");
+		//pw.println("  </Device>");
+
+		pw.println("   <Device Name=\"Test_Device\" Type=\"FRAME_DEVICE\" />");
+
 		pw.println("</System>");
 	}
 

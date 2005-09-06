@@ -354,7 +354,7 @@
 *	A standard compilation followed by packaging
 *	all files into a jar file. 
 -->
-<target name="build" depends="clean_build,compile,jar_supremica,startfiles_supremica">
+<target name="build" depends="clean_build,version,compile,jar_supremica,startfiles_supremica">
 </target>
 
 <!-- Rebuild:

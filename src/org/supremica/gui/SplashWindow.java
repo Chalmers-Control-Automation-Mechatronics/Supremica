@@ -7,7 +7,7 @@ public class SplashWindow
 	extends java.awt.Window
 {
 	private static final long serialVersionUID = 1L;
-	private static ImageIcon splashIcon = new ImageIcon(Supremica.class.getResource("/splash_v1.gif"));
+	private static ImageIcon splashIcon = new ImageIcon(Supremica.class.getResource("/splash.gif"));
 
 	public SplashWindow()
 	{
