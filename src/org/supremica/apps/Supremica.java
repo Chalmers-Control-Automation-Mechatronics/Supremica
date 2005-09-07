@@ -50,6 +50,7 @@
 package org.supremica.apps;
 
 import org.supremica.properties.SupremicaProperties;
+import java.lang.Exception;
 
 public class Supremica
 {
@@ -63,6 +64,7 @@ public class Supremica
 
 	public static void main(String[] args)
 	{
+
 		SupremicaProperties.loadProperties(args);
 
 		//SupremicaWithGui.startSupremica(args);

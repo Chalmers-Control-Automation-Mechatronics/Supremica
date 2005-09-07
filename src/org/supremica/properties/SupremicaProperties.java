@@ -154,7 +154,7 @@ public final class SupremicaProperties
 
 	// Minimization Options
 	private static final String MINIMIZATION_EQUIVALENCE_RELATION = "minimizationEquivalenceRelation";
-	private static final String MINIMIZATION_ALSO_MINIMIZE_TRANSITIONS = "minimizationAlsoMinimizaTransitions";
+	private static final String MINIMIZATION_ALSO_MINIMIZE_TRANSITIONS = "minimizationAlsoMinimizeTransitions";
 	private static final String MINIMIZATION_KEEP_ORIGINAL = "minimizationKeepOriginal";
 	private static final String MINIMIZATION_IGNORE_MARKING = "minimizationIgnoreMarking";
 	private static final String MINIMIZATION_STRATEGY = "minimizationStrategy";
@@ -1378,7 +1378,7 @@ public final class SupremicaProperties
 	// BDD
 
 	/*
-	 * The problem is that we got to copies of BDD Options.
+	 * The problem is that we got two copies of BDD Options.
 	 * This will make sure they are both updated
 	 */
 	public static void updateBDDOptions(boolean from_Options)
@@ -1501,8 +1501,8 @@ public final class SupremicaProperties
 	}
 
 	/**
-	 * Looks for "-p propertyFile", and loads it if it exists.
-	 * Looks also for developer/user tags
+	 * Looks for "-p propertyFile" option, and loads it if it exists.
+	 * Looks also for developer/user options
 	 */
 	public static void loadProperties(String[] args)
 	{
@@ -1520,6 +1520,13 @@ public final class SupremicaProperties
 
 					try
 					{
+						if (!propFile.exists())
+						{
+							System.out.println("Properties file not found: " + propFile.getAbsolutePath());
+							System.out.println("Creating empty properties file: " + propFile.getAbsolutePath());
+							propFile.createNewFile();
+						}
+						
 						setProperties(propFile);
 					}
 					catch (Exception e)

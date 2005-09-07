@@ -2057,6 +2057,13 @@ public class ActionMan
 	{
 		if (SupremicaProperties.fileAllowQuit())
 		{
+			try
+			{
+				SupremicaProperties.saveProperties();
+			}
+			catch(Exception e)
+			{
+			}
 			System.exit(0);
 		}
 		else
@@ -2070,6 +2077,14 @@ public class ActionMan
 	{
 		if (SupremicaProperties.fileAllowQuit())
 		{
+			try
+			{
+				SupremicaProperties.saveProperties();
+			}
+			catch(Exception e)
+			{
+			}
+			
 			System.exit(0);
 		}
 		else
@@ -2203,6 +2218,8 @@ public class ActionMan
 			void openFile(Gui g, File f)
 			{
 				openProjectXMLFile(g, f);
+				SupremicaProperties.setFileOpenPath(f.getParentFile().getAbsolutePath());
+				SupremicaProperties.setFileSavePath(f.getParentFile().getAbsolutePath());
 			}
 		};
 	}
@@ -2378,6 +2395,7 @@ public class ActionMan
 					AutomataToXml exporter = new AutomataToXml(currProject);
 
 					exporter.serialize(currFile.getAbsolutePath());
+					
 				}
 				catch (Exception ex)
 				{
@@ -2421,6 +2439,7 @@ public class ActionMan
 			{
 				gui.getVisualProjectContainer().getActiveProject().setProjectFile(currFile);
 				fileSave(gui);
+				SupremicaProperties.setFileSavePath(currFile.getParentFile().getAbsolutePath());
 			}
 		}
 	}
