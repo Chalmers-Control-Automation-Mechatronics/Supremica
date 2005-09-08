@@ -1,4 +1,3 @@
-
 /*
  *  Supremica Software License Agreement
  *
@@ -2219,7 +2218,6 @@ public class ActionMan
 			{
 				openProjectXMLFile(g, f);
 				SupremicaProperties.setFileOpenPath(f.getParentFile().getAbsolutePath());
-				SupremicaProperties.setFileSavePath(f.getParentFile().getAbsolutePath());
 			}
 		};
 	}

@@ -655,7 +655,7 @@ public abstract class DotViewer
 							AutomataSerializer serializer = getSerializer();
 
 							DotBuilder.getDotBuilder(new DotFileViewer(currFile), null, serializer, dlg.getDotArgument());
-
+							SupremicaProperties.setFileSavePath(currFile.getParentFile().getAbsolutePath());
 
 						}
 						catch (Exception ex)
