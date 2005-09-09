@@ -112,6 +112,7 @@ public abstract class Scheduler {
 
 	plantAutomata = theAutomata.getPlantAutomata();
 		
+	//Borde räcka med plantAutomata.size(), fast då kanske man måste ändra lite på andra ställen också
 	keyMapping = new int[theAutomata.size()];
 	keyMapping[0] = 1;
 	for (int i=1; i<keyMapping.length; i++) {
@@ -271,7 +272,7 @@ public abstract class Scheduler {
      * @return 	true if node is already on the closedList and has an estimated cost not lower than
      * 		   	the guy on the closedList.
      */
-    protected boolean isOnAList(int[] node) {
+    protected boolean isOnAList(int[] node) throws Exception {
 	int currKey = getKey(node);
 	int estimatedCost = calcEstimatedCost(node);
 	int index = -1;
@@ -328,27 +329,33 @@ public abstract class Scheduler {
      * @param 	node
      */
     protected void putOnOpenList(int[] node) {
-	if (heuristic.equals("brute force")) {
-	    openList.add(node);
-	}
-	else {
-	    int estimatedCost = calcEstimatedCost(node);
-	    int counter = 0;
-	    Iterator iter = openList.iterator();
-	    
-	    while (iter.hasNext()) {
-		int[] openNode = (int[])iter.next();
-		
-		if (estimatedCost <= calcEstimatedCost(openNode)) {
-		    openList.add(counter, node);
-		    
-		    return;
-		}
-		
-		counter++;
+	try {
+	    if (heuristic.equals("brute force")) {
+		openList.add(node);
 	    }
+	    else {
+		int estimatedCost = calcEstimatedCost(node);
+		int counter = 0;
+		Iterator iter = openList.iterator();
+	    
+		while (iter.hasNext()) {
+		    int[] openNode = (int[])iter.next();
+		
+		    if (estimatedCost <= calcEstimatedCost(openNode)) {
+			openList.add(counter, node);
+		    
+			return;
+		    }
+		
+		    counter++;
+		}
 	
-	    openList.add(node);
+		openList.add(node);
+	    }
+	}
+	catch (Exception e) {
+	    if (! (e instanceof IndexOutOfBoundsException))
+		e.printStackTrace();
 	}
     }
 
@@ -402,7 +409,7 @@ public abstract class Scheduler {
 // 	}
 //     }
 	
-    protected int calcEstimatedCost(int[] node) {
+    protected int calcEstimatedCost(int[] node) throws Exception {
 	if (useOneProdRelax) {
 // 	    return node[node.length-1] + getOneProdRelaxation(node);
 
@@ -693,13 +700,12 @@ public abstract class Scheduler {
 	return true;
     }
     
-    protected int[] getParent(int[] node) {
+    protected int[] getParent(int[] node) throws Exception {
 	try {
 	    return closedNodes.getNode(node[parentIndex], node[parentIndex+1]);
 	}
 	catch (Exception e) {
-	    e.printStackTrace();
-	    return null;
+	    throw e;
 	}
     }
     
@@ -731,7 +737,7 @@ public abstract class Scheduler {
 		    }
 		catch (Exception ex)
 		    {
-			logger.error("Scheduler::buildScheduleAutomaton() --> Could not find the arc between " + printNodeName(currNode) + " and " + printNodeName(getParent(currNode)));
+			logger.error("Scheduler::buildScheduleAutomaton() --> Could not find the arc between " + printNodeName(currNode) + " and its parent");
 			logger.debug(ex.getStackTrace());
 		    }
 	    }

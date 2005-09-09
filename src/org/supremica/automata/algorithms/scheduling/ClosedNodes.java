@@ -55,7 +55,12 @@ public class ClosedNodes extends Hashtable {
     }
 
     public int[] getNode(int key, int arrayIndex) throws Exception {
-	return getNodeArray(key).get(arrayIndex);
+	try {
+	    return getNodeArray(key).get(arrayIndex);
+	}
+	catch (Exception e) {
+	    throw e;
+	}
     }
 
     public int[] getNode(int key) throws Exception {
@@ -95,6 +100,8 @@ public class ClosedNodes extends Hashtable {
     public void removeNode(int key, int arrayIndex) {
 	ArrayList<int[]> values = getNodeArray(key);
 	
+	int[] banan = values.get(arrayIndex);
+
 	values.remove(arrayIndex);
 	put(key, values);
     }
