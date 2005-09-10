@@ -83,16 +83,21 @@ public class ModifiedVGAstar extends ModifiedAstar {
 
 	    while (childIter.hasNext()) {
   		int[] nextNode = (int[])childIter.next();
-		
-		if (!isOnAList(nextNode)) {
+
+		try {
+		    if (!isOnAList(nextNode)) {
 // 		    logger.info("++  " + printArray(nextNode));
  		    addToLogFile(nextNode, true);
 		    putOnOpenList(nextNode);
+		    }
+		    else 
+			addToLogFile(nextNode, false);
+		    // 		    logger.info("-- " + printArray(nextNode));
 		}
-		else 
-		    addToLogFile(nextNode, false);
-// 		    logger.info("-- " + printArray(nextNode));
- 	    }
+		catch (Exception e) {
+		    e.printStackTrace();
+		}
+	    }
 	}
     }
 
