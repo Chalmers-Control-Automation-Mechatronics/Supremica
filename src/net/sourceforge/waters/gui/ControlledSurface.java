@@ -1254,172 +1254,221 @@ public class ControlledSurface
 
     private class DTListener extends DropTargetAdapter
     {
-	private EditorObject drag = null;
-
-	private void addToNode(EditorNode n, IdentifierProxy i)
-	{
-	    n.addProposition(i);
-	    repaint();
-	}
-
-	private void addToLabel(EditorLabel l, IdentifierProxy i)
-	{
-	    addToNode(l.getParent(), i);
-	}
-
-	private void addToEdge(EditorEdge e, IdentifierProxy ip)
-	{
-	    for (int i = 0; i < events.size(); i++)	{
-		EditorLabelGroup g = (EditorLabelGroup) events.get(i);
-		if (g.getParent() == (EditorObject) e) {
-		    //delEdge(e); // Recursive call!??
-		    addToLabelGroup(g, ip);		 
+		private EditorObject drag = null;
+		
+		private void addToNode(EditorNode n, IdentifierProxy i)
+		{
+			n.addProposition(i);
+			repaint();
 		}
-	    }
-	}
-
-	private void addToLabelGroup(EditorLabelGroup l, IdentifierProxy i)
-	{
-	    l.addEvent(i);
-	}
-
-	private void setDragOver(EditorObject o, int d)
-	{
-	    if (o == null) {
-		return;
-	    }
-	    o.setDragOver(d);
-	    if (o instanceof EditorNode) {
-		for (Object ob : labels) {
-		    EditorLabel l = (EditorLabel)ob;
-		    if (l.getParent() == o) {
-			l.setDragOver(d);
-		    }
-		}	       
-	    } else if (o instanceof EditorLabel) {
-		EditorLabel l = (EditorLabel)o;
-		l.getParent().setDragOver(d);
-	    } else if (o instanceof EditorEdge) {
-		for (Object ob : events) {
-		    EditorLabelGroup l = (EditorLabelGroup)ob;
-		    if (l.getParent() == o) {
-			l.setDragOver(d);
-		    }
+		
+		private void addToLabel(EditorLabel l, IdentifierProxy i)
+		{
+			addToNode(l.getParent(), i);
 		}
-	    } else if (o instanceof EditorLabelGroup) {
-		EditorLabelGroup l = (EditorLabelGroup)o;
-		l.getParent().setDragOver(d);
-	    }
-	}
+		
+		private void addToEdge(EditorEdge e, IdentifierProxy ip)
+		{
+			for (int i = 0; i < events.size(); i++)	
+			{
+				EditorLabelGroup g = (EditorLabelGroup) events.get(i);
+				if (g.getParent() == (EditorObject) e) 
+				{
+					//delEdge(e); // Recursive call!??
+					addToLabelGroup(g, ip);		 
+				}
+			}
+		}
+		
+		private void addToLabelGroup(EditorLabelGroup l, IdentifierProxy i)
+		{
+			l.addEvent(i);
+		}
+		
+		private void setDragOver(EditorObject o, int d)
+		{
+			if (o == null) 
+			{
+				return;
+			}
+			o.setDragOver(d);
+			if (o instanceof EditorNode) 
+			{
+				for (Object ob : labels) 
+				{
+					EditorLabel l = (EditorLabel)ob;
+					if (l.getParent() == o) {
+						l.setDragOver(d);
+					}
+				}	       
+			}
+			else if (o instanceof EditorLabel) 
+			{
+				EditorLabel l = (EditorLabel)o;
+				l.getParent().setDragOver(d);
+			}
+			else if (o instanceof EditorEdge) 
+			{
+				for (Object ob : events) 
+				{
+					EditorLabelGroup l = (EditorLabelGroup)ob;
+					if (l.getParent() == o) 
+					{
+						l.setDragOver(d);
+					}
+				}
+			}
+			else if (o instanceof EditorLabelGroup) 
+			{
+				EditorLabelGroup l = (EditorLabelGroup)o;
+				l.getParent().setDragOver(d);
+			}
+		}
+		
+		public void dragOver(DropTargetDragEvent e)
+		{
+			DataFlavor d = new DataFlavor(IdentifierWithKind.class, "IdentifierWithKind");
+			int operation = DnDConstants.ACTION_MOVE;
+			EditorObject o = null;
+			if (drag != null) 
+			{
+				setDragOver(drag, EditorObject.NOTDRAG);
+			}
+			drag = null;
+			if (e.getTransferable().isDataFlavorSupported(d)) 
+			{
+				try 
+				{
+					IdentifierWithKind i = (IdentifierWithKind)e.getTransferable().getTransferData(d);
+					EventKind ek = i.getKind();
+					IdentifierProxy ip = i.getIdentifier();
+					o = getObjectAtPosition((int)e.getLocation().getX(), (int)e.getLocation().getY());
+					drag = o;
+					/*		   
+					  if (!root.getEventPane().contains(ip)) 
+					  {
+					  e.dropComplete(false);
+					  return;
+					  }
+					*/
+					System.out.println((o != null));
+					if (ek == null) 
+					{
+						if (o instanceof EditorNode) 
+						{
+							operation = DnDConstants.ACTION_COPY;
+						}
+						if (o instanceof EditorEdge) 
+						{
+							operation = DnDConstants.ACTION_COPY;
+						}
+						if (o instanceof EditorLabelGroup) 
+						{
+							operation = DnDConstants.ACTION_COPY;
+						}
+						if (o instanceof EditorLabel) 
+						{
+							operation = DnDConstants.ACTION_COPY;
+						}
+					}
+					else if (ek.equals(EventKind.PROPOSITION)) 
+					{
+						if (o instanceof EditorNode) 
+						{
+							operation = DnDConstants.ACTION_COPY;
+						}
+						if (o instanceof EditorLabel) 
+						{
+							operation = DnDConstants.ACTION_COPY;
+						}
+					}
+					else if (ek.equals(EventKind.CONTROLLABLE) || ek.equals(EventKind.UNCONTROLLABLE)) 
+					{
+						if (o instanceof EditorEdge) 
+						{
+							operation = DnDConstants.ACTION_COPY;
+						}
+						if (o instanceof EditorLabelGroup) 
+						{
+							operation = DnDConstants.ACTION_COPY;
+						}
+					}
+				} catch (Throwable t) 
+				{
+					System.out.println(t);
+				}
+			}
+			System.out.println((o != null));
+			if (o != null) 
+			{
+				if (operation == DnDConstants.ACTION_COPY) 
+				{
+					setDragOver(o, EditorObject.CANDROP);
+				}
+				else 
+				{
+					setDragOver(o, EditorObject.CANTDROP);
+				}
+			}
+			updateHighlighting(e.getLocation());   
+			System.out.println(""+operation);
+			e.getDropTargetContext().getDropTarget().setDefaultActions(operation);
+			e.acceptDrag(operation);
+		}
+		
+		public void drop(DropTargetDropEvent e)
+		{
+			// The right flavor?
+			DataFlavor d = new DataFlavor(IdentifierWithKind.class, "IdentifierWithKind");
+			if (!(e.getTransferable().isDataFlavorSupported(d) && 
+				  e.getDropTargetContext().getDropTarget().getDefaultActions() == DnDConstants.ACTION_COPY))
+			{
+				e.dropComplete(false);
+				return;
+			}
 
-	public void dragOver(DropTargetDragEvent e)
-	{
-	    DataFlavor d = new DataFlavor(IdentifierWithKind.class, "IdentifierWithKind");
-	    int operation = DnDConstants.ACTION_MOVE;
-	    EditorObject o = null;
-	    if (drag != null) {
-		setDragOver(drag, EditorObject.NOTDRAG);
-	    }
-	    drag = null;
-	    if (e.getTransferable().isDataFlavorSupported(d)) {
-		try {
-		    IdentifierWithKind i = (IdentifierWithKind)e.getTransferable().getTransferData(d);
-		    EventKind ek = i.getKind();
-		    IdentifierProxy ip = i.getIdentifier();
-		    o = getObjectAtPosition((int)e.getLocation().getX(), (int)e.getLocation().getY());
-		    drag = o;
-		    /*		    if (!root.getEventPane().contains(ip)) {
-			e.dropComplete(false);
-			return;
-			}*/
-		    System.out.println((o != null));
-		    if (ek == null) {
-			if (o instanceof EditorNode) {
-			    operation = DnDConstants.ACTION_COPY;
+			// Do the stuff!
+			try 
+			{
+				IdentifierWithKind i = (IdentifierWithKind)e.getTransferable().getTransferData(d);	  
+				IdentifierProxy ip = i.getIdentifier();
+				/*		    if (!root.getEventPane().contains(ip)) {
+				  e.dropComplete(false);
+				  return;
+				  }*/
+				EditorObject o = getObjectAtPosition((int)e.getLocation().getX(), (int)e.getLocation().getY());
+				System.out.println("drop onto ?");		    
+				if (o instanceof EditorNode) 
+				{
+					addToNode((EditorNode)o, ip);
+				}
+				else if (o instanceof EditorEdge) 
+				{
+					addToEdge((EditorEdge)o, ip);
+				}
+				else if (o instanceof EditorLabelGroup) 
+				{
+					addToLabelGroup((EditorLabelGroup)o, ip);
+				}
+				else if (o instanceof EditorLabel) 
+				{
+					addToLabel((EditorLabel)o, ip);
+				}
+				else
+				{
+					// Didn't find anything to drop onto!
+					e.dropComplete(false);
+					return;
+				}
+				
+				// It went fine!
+				setDragOver(o, EditorObject.NOTDRAG);					
+				e.dropComplete(true);
 			}
-			if (o instanceof EditorEdge) {
-			    operation = DnDConstants.ACTION_COPY;
+			catch (Throwable t) 
+			{
+				System.out.println(t);
 			}
-			if (o instanceof EditorLabelGroup) {
-			    operation = DnDConstants.ACTION_COPY;
-			}
-			if (o instanceof EditorLabel) {
-			    operation = DnDConstants.ACTION_COPY;
-			}
-		    }
-		    else if (ek.equals(EventKind.PROPOSITION)) {
-			if (o instanceof EditorNode) {
-			    operation = DnDConstants.ACTION_COPY;
-			}
-			if (o instanceof EditorLabel) {
-			    operation = DnDConstants.ACTION_COPY;
-			}
-		    }
-		    else if (ek.equals(EventKind.CONTROLLABLE) || ek.equals(EventKind.UNCONTROLLABLE)) {
-			if (o instanceof EditorEdge) {
-			    operation = DnDConstants.ACTION_COPY;
-			}
-			if (o instanceof EditorLabelGroup) {
- 			    operation = DnDConstants.ACTION_COPY;
-			}
-		    }
-		} catch (Throwable t) {
-		    System.out.println(t);
 		}
-	    }
-	    System.out.println((o != null));
-	    if (o != null) {
-		if (operation == DnDConstants.ACTION_COPY) {
-		    setDragOver(o, EditorObject.CANDROP);
-		} else {
-		    setDragOver(o, EditorObject.CANTDROP);
-		}
-	    }
-	    updateHighlighting(e.getLocation());   
-	    System.out.println(""+operation);
-	    e.getDropTargetContext().getDropTarget().setDefaultActions(operation);
-	    e.acceptDrag(operation);
 	}
-
-	public void drop(DropTargetDropEvent e)
-	{
-	    DataFlavor d = new DataFlavor(IdentifierWithKind.class, "IdentifierWithKind");
-	    if (e.getTransferable().isDataFlavorSupported(d) && 
-		e.getDropTargetContext().getDropTarget().getDefaultActions() == DnDConstants.ACTION_COPY) {
-		try {
-		    IdentifierWithKind i = (IdentifierWithKind)e.getTransferable().getTransferData(d);	  
-		    IdentifierProxy ip = i.getIdentifier();
-		    /*		    if (!root.getEventPane().contains(ip)) {
-			e.dropComplete(false);
-			return;
-			}*/
-		    EditorObject o = getObjectAtPosition((int)e.getLocation().getX(), (int)e.getLocation().getY());
-		    System.out.println("drop onto ?");		    
-		    if (o instanceof EditorNode) {
-			addToNode((EditorNode)o, ip);
-			e.dropComplete(true);
-			return;
-		    }
-		    if (o instanceof EditorEdge) {
-			addToEdge((EditorEdge)o, ip);
-			e.dropComplete(true);
-			return;
-		    }
-		    if (o instanceof EditorLabelGroup) {
-			addToLabelGroup((EditorLabelGroup)o, ip);
-			e.dropComplete(true);
-			return;
-		    }
-		    if (o instanceof EditorLabel) {
-			addToLabel((EditorLabel)o, ip);
-			e.dropComplete(true);
-			return;
-		    }
-		} catch (Throwable t) {
-		    System.out.println(t);
-		}
-	    }
-	    e.dropComplete(false);
-	}
-    }
 }

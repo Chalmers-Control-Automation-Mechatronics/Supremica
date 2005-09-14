@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorObject
 //###########################################################################
-//# $Id: EditorObject.java,v 1.18 2005-09-14 11:21:14 flordal Exp $
+//# $Id: EditorObject.java,v 1.19 2005-09-14 15:16:09 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -28,7 +28,7 @@ public abstract class EditorObject
 	public static int LABEL = 4;
 	public static int LABELGROUP = 5;
 
-    /** is being draggedOver*/
+    /** is not being draggedOver*/
     public static int NOTDRAG = 0;
     /** is being draggedOver and can drop data*/
     public static int CANDROP = 1;
@@ -146,7 +146,7 @@ public abstract class EditorObject
 		else if(getDragOver() == CANDROP)
 		{
 		    return EditorColor.CANDROP;
-		}		
+		}
 		else if(getDragOver() == CANTDROP)
 		{
 		    return EditorColor.CANTDROP;
