@@ -3,7 +3,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorEdge
 //###########################################################################
-//# $Id: EditorEdge.java,v 1.24 2005-08-30 00:18:45 siw4 Exp $
+//# $Id: EditorEdge.java,v 1.25 2005-09-14 11:21:14 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -43,7 +43,7 @@ public class EditorEdge
 	/** Boolean keeping track of whether the edge is a straight line or not. */
 	private boolean straight;
 
-	/** Arrows at end of transition edge (otherwise it will sit in the middle). */
+	/** Arrows at end of edge or in the middle? */
 	private static boolean arrowAtEnd = false;
 
 	// Handles
@@ -625,7 +625,7 @@ public class EditorEdge
 
 		if (getCPointY() == start.getY())
 		{
-			theta = Math.PI / 2;
+			theta = Math.PI / 2.0;
 
 			if (getCPointX() > start.getX())
 			{
@@ -758,7 +758,7 @@ public class EditorEdge
 						   boolean loop, Graphics2D g2d)
 	{
 		double theta;
-		int l = 8;
+		int l = 10;
 		int direction;
 
 		if (y1 >= y2)
@@ -772,7 +772,7 @@ public class EditorEdge
 
 		if (y1 == y2)
 		{
-			theta = Math.PI / 2;
+			theta = Math.PI / 2.0;
 
 			if (x1 < x2)
 			{
@@ -786,7 +786,7 @@ public class EditorEdge
 
 		if (loop)
 		{
-			theta -= Math.PI / 2;
+			theta -= Math.PI / 2.0;
 		}
 		
 		int[] xcoords = new int[3];
@@ -796,10 +796,10 @@ public class EditorEdge
 		// from (posX, posY)
 		xcoords[0] = posX - direction * (int) ((Math.sqrt(Math.pow(l, 2) + Math.pow(l, 2)) / 2) * Math.sin(theta));
 		ycoords[0] = posY - direction * (int) ((Math.sqrt(Math.pow(l, 2) + Math.pow(l, 2)) / 2) * Math.cos(theta));
-		xcoords[1] = xcoords[0] + (int) (l * Math.sin(theta - Math.PI / 6)) * direction;
-		ycoords[1] = ycoords[0] + (int) (l * Math.cos(theta - Math.PI / 6)) * direction;
-		xcoords[2] = xcoords[0] + (int) (l * Math.cos(Math.PI / 2 - (theta + Math.PI / 6))) * direction;
-		ycoords[2] = ycoords[0] + (int) (l * Math.sin(Math.PI / 2 - (theta + Math.PI / 6))) * direction;
+		xcoords[1] = xcoords[0] + (int) (l * Math.sin(theta - Math.PI / 6.0)) * direction;
+		ycoords[1] = ycoords[0] + (int) (l * Math.cos(theta - Math.PI / 6.0)) * direction;
+		xcoords[2] = xcoords[0] + (int) (l * Math.cos(Math.PI / 2.0 - (theta + Math.PI / 6.0))) * direction;
+		ycoords[2] = ycoords[0] + (int) (l * Math.sin(Math.PI / 2.0 - (theta + Math.PI / 6.0))) * direction;
 
 		g2d.fillPolygon(xcoords, ycoords, 3);
 
@@ -825,7 +825,7 @@ public class EditorEdge
 		double theta;
 		if (y1 == y2)
 		{
-			theta = Math.PI / 2;
+			theta = Math.PI / 2.0;
 			
 			if (x1 < x2)
 			{
@@ -858,19 +858,19 @@ public class EditorEdge
 		// The length of the side of the arrow
 		int length = 10;
 		// The angular width of the arrow (half of it actually)
-		double phi = Math.PI / 8;
+		double phi = Math.PI / 8.0;
 		
 		// Arrays of coordinates for the corners
 		int[] xcoords = new int[3];
 		int[] ycoords = new int[3];		
 		
 		// Draw arrow, the first pair of coordinates is the point
-		xcoords[0] = x;// - (int) ((Math.sqrt(Math.pow(length, 2) + Math.pow(length, 2))/2) * Math.sin(theta));
-		ycoords[0] = y;// - (int) ((Math.sqrt(Math.pow(length, 2) + Math.pow(length, 2))/2) * Math.cos(theta));
-		xcoords[1] = xcoords[0] + (int) (length * Math.sin(theta - phi));
-		ycoords[1] = ycoords[0] + (int) (length * Math.cos(theta - phi));
-		xcoords[2] = xcoords[0] + (int) (length * Math.cos(Math.PI / 2 - (theta + phi)));
-		ycoords[2] = ycoords[0] + (int) (length * Math.sin(Math.PI / 2 - (theta + phi)));
+		xcoords[0] = x;
+		ycoords[0] = y;
+		xcoords[1] = xcoords[0] + (int) Math.ceil(length * Math.sin(theta - phi));
+		ycoords[1] = ycoords[0] + (int) Math.ceil(length * Math.cos(theta - phi));
+		xcoords[2] = xcoords[0] + (int) Math.ceil(length * Math.cos(Math.PI / 2.0 - (theta + phi)));
+		ycoords[2] = ycoords[0] + (int) Math.ceil(length * Math.sin(Math.PI / 2.0 - (theta + phi)));
 		
 		// Do the drawing!
 		g2d.fillPolygon(xcoords, ycoords, 3); 

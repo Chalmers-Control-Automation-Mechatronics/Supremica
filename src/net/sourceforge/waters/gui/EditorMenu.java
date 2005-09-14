@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorMenu
 //###########################################################################
-//# $Id: EditorMenu.java,v 1.15 2005-08-30 00:18:45 siw4 Exp $
+//# $Id: EditorMenu.java,v 1.16 2005-09-14 11:21:14 flordal Exp $
 //###########################################################################
 
 
@@ -197,7 +197,7 @@ public class EditorMenu
 
 		if (e.getSource() == FileExitMenu)
 		{
-//			root.dispose();
+			// root.dispose();
 		}
 
 		if (e.getSource() == PrintMenu)

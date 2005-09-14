@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorObject
 //###########################################################################
-//# $Id: EditorObject.java,v 1.17 2005-08-30 00:18:45 siw4 Exp $
+//# $Id: EditorObject.java,v 1.18 2005-09-14 11:21:14 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -27,12 +27,14 @@ public abstract class EditorObject
 	public static int NODEGROUP = 3;
 	public static int LABEL = 4;
 	public static int LABELGROUP = 5;
+
     /** is being draggedOver*/
     public static int NOTDRAG = 0;
     /** is being draggedOver and can drop data*/
     public static int CANDROP = 1;
     /** is being draggedOver but can't drop data*/
     public static int CANTDROP = 2;
+
 	// What status has this object got in the editor window? Determines color.
 	private boolean selected = false;
 	private boolean highlighted = false;
@@ -43,118 +45,128 @@ public abstract class EditorObject
 	protected boolean shadow = true;
 
 	// Different pen sizes for drawing
-	//public final Stroke BASICSTROKE = new BasicStroke();
-	// This one (hairline) is more apropriate when printing?
-	public final Stroke BASICSTROKE = new BasicStroke(0.25f); 
-	public final Stroke DOUBLESTROKE = new BasicStroke(2); 	
-	public final Stroke SHADOWSTROKE = new BasicStroke(10, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND); 	
+	/** Single line width, used as default when painting on screen. */
+	public static final Stroke SINGLESTROKE = new BasicStroke(); 	
+	/** Double line width, used for nodegroup border. */
+	public static final Stroke DOUBLESTROKE = new BasicStroke(2); 	
+	/** Thick line used for drawing shadows. */
+	public static final Stroke SHADOWSTROKE = new BasicStroke(10, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND);
+	/** Used as the basic stroke when printing - "hairline" width. */
+	public static final Stroke THINSTROKE = new BasicStroke(0.25f);		
+	/** The default pen size. Is not {@code final} since it changes when printing. */
+	public static Stroke BASICSTROKE = SINGLESTROKE;
 
-	public void drawObject(Graphics g)
+	public EditorObject()
 	{
-		;
+		selected = false;
 	}
 
-	/* Replaced by hashCode()-methods in extending  classes.
-	public void setHash(int hash)
-	{
-		this.hash = hash;
-	}
-
-	public int getHash()
-	{
-		return hash;
-	}
-	*/
-
-	public int getX()
-	{
-		return 0;
-	}
-	public int getY()
-	{
-		return 0;
-	}
-
+	/**
+	 * Returns the type of this object.
+	 */
 	public int getType()
 	{
 		return type;
 	}
 
+	/**
+	 * Sets the selection status of this object.
+	 */
 	public void setSelected(boolean s)
 	{
 		selected = s;
 	}
-
+	/**
+	 * @return {@code true} if selected, {@code false} otherwise.
+	 */
 	public boolean isSelected()
 	{
 		return selected;
 	}
 
+	/**
+	 * Sets the highlight status of this object.
+	 */
 	public void setHighlighted(boolean s)
 	{
 		highlighted = s;
 	}
-
+	/**
+	 * @return {@code true} if highlighted, {@code false} otherwise.
+	 */
 	public boolean isHighlighted()
 	{
 		return highlighted;
 	}
 
+	/**
+	 * Sets the error status of this object.
+	 */
 	public void setError(boolean s)
 	{
 		error = s;
 	}
-
+	/**
+	 * @return {@code true} if there is an error with this object, {@code false} otherwise.
+	 */
 	public boolean isError()
 	{
 		return error;
 	}
 
+	/**
+	 * Sets the dragover status of this object.
+	 */
     public void setDragOver(int d)
     {
-	mDragOver = d;
+		mDragOver = d;
     }
-    
+	/**
+	 * Returns the dragover status of this object.
+	 */
     public int getDragOver()
     {
-	return mDragOver;
+		return mDragOver;
     }
 
+	/**
+	 * Returns the apropriate color for painting this object.
+	 */
 	public Color getColor()
 	{
 		// In order of importance
-		if (isError())
+		if(isError())
 		{
-			if (getType() == NODE)
+			if(getType() == NODE)
 			{
 				return EditorColor.ERRORCOLOR_NODE;
 			}
 			return EditorColor.ERRORCOLOR;
 		}
-		else if (getDragOver() == CANDROP)
+		else if(getDragOver() == CANDROP)
 		{
 		    return EditorColor.CANDROP;
 		}		
-		else if (getDragOver() == CANTDROP)
+		else if(getDragOver() == CANTDROP)
 		{
 		    return EditorColor.CANTDROP;
 		}
-		else if (isSelected())
+		else if(isSelected())
 		{
 			return EditorColor.SELECTCOLOR;
 		}
-		else if (isHighlighted() && !shadow)
+		else if(isHighlighted() && !shadow)
 		{
 			return EditorColor.HIGHLIGHTCOLOR;
 		}
 		else
 		{
 			// Defaults
-			if (getType() == NODEGROUP)
+			if(getType() == NODEGROUP)
 			{
 				return EditorColor.DEFAULTCOLOR_NODEGROUP;
 			}
-			else if (getType() == LABEL)
+			else if(getType() == LABEL)
 			{
 				return EditorColor.DEFAULTCOLOR_LABEL;
 			}
@@ -162,25 +174,40 @@ public abstract class EditorObject
 		}
 	}		
 
+	/**
+	 * Returns a lighter shade of the color of the object for drawing a "shadow".
+	 */
 	public Color getShadowColor()
 	{
 		// Overrides
-		if (!isSelected() && !isError() && getType() == NODEGROUP)
+		if(!isSelected() && !isError() && getType() == NODEGROUP)
 		{
 			// Unfortunately, the light gray color gives a too weak shadow!
-			return EditorColor.shadow(EditorColor.DEFAULTCOLOR_NODEGROUP.darker().darker());
+			return EditorColor.shadow(getColor().darker().darker().darker());
 		}
 
 		// Return the shadowed variant of the ordinary color of this object
 		return EditorColor.shadow(getColor());
 	}
 
-    abstract public void setPosition(double x, double y);
-
-    abstract public Point2D getPosition();
-
-	public EditorObject()
+	/**
+	 * Changes the default stroke.
+	 */
+	public static void setBasicStroke(Stroke stroke)
 	{
-		selected = false;
+		BASICSTROKE = stroke;
 	}
+
+	public void drawObject(Graphics g)
+	{
+		;
+	}
+
+	public abstract int getX();
+
+	public abstract int getY();
+
+    public abstract void setPosition(double x, double y);
+
+    public abstract Point2D getPosition();
 }

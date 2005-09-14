@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.29 2005-08-17 14:21:01 flordal Exp $
+//# $Id: EditorSurface.java,v 1.30 2005-09-14 11:21:14 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -116,16 +116,28 @@ public class EditorSurface
 		}
 	}
 
+	/**
+	 * Called when printing.
+	 */
 	protected void printComponent(Graphics g)
 	{
+		// Paint using hairline
+		EditorObject.setBasicStroke(EditorObject.THINSTROKE);
 		paintComponent(g, true);
+		EditorObject.setBasicStroke(EditorObject.SINGLESTROKE);
 	}
 
+	/**
+	 * Called when painting.
+	 */
 	protected void paintComponent(Graphics g)
 	{
 		paintComponent(g, false);
 	}
 
+	/**
+	 * Paints the surface on {@code g}.
+	 */
 	private void paintComponent(Graphics g, boolean printing)
 	{
 		// Only paint the grid if we're not printing!
@@ -133,12 +145,14 @@ public class EditorSurface
 		{
 			paintGrid(g);
 		}
-
-		// Don't do anything if there is nothing to do!
-		if (nodes == null)
+		
+		/*
+		// Don't do anything if there is nothing to do!		
+		if ((nodes == null) || (nodes.size() == 0))
 		{
 			return;
 		}
+		*/
 
 		for (int i = 0; i < nodeGroups.size(); i++)
 		{
@@ -296,6 +310,7 @@ public class EditorSurface
 		}
 		
 		/*
+		// Print outline of drawn area (just to test if it's OK)
 		Rectangle rect = getDrawnAreaBounds();
 		g.setColor(Color.PINK);
 		g.drawRect((int) rect.getX(), (int) rect.getY(), (int) rect.getWidth(), (int) rect.getHeight());
@@ -1567,31 +1582,31 @@ public class EditorSurface
 
     public EditorWindowInterface getEditorInterface()
     {
-	return root;
+		return root;
     }
 
     public java.util.List getNodes()
     {
-	return nodes;
+		return nodes;
     }
 
     public java.util.List getNodeGroups()
     {
-	return nodeGroups;
+		return nodeGroups;
     }
 
     public java.util.List getEdges()
     {
-	return edges;
+		return edges;
     }
 
     public java.util.List getLabels()
     {
-	return labels;
+		return labels;
     }
 
     public java.util.List getLabelGroups()
     {
-	return events;
+		return events;
     }
 }
