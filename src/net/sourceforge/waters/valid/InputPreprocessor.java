@@ -1,9 +1,10 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: waters.valid
 //# CLASS:   InputPreprocessor
 //###########################################################################
-//# $Id: InputPreprocessor.java,v 1.1 2005-02-17 01:43:36 knut Exp $
+//# $Id: InputPreprocessor.java,v 1.2 2005-09-15 00:12:21 robi Exp $
 //###########################################################################
 
 
@@ -56,14 +57,31 @@ class InputPreprocessor extends Thread
   public void run()
   {
     try {
+      boolean indoctype = false;
       String line = mReader.readLine();
       while (line != null) {
-	if (line.startsWith("<!DOCTYPE ")) {
-	  // skip line
-	} else {
-	  mWriter.println(line);
-	}
-	line = mReader.readLine();
+        final int start = indoctype ? 0 : line.indexOf("<!DOCTYPE");
+        if (start >= 0) {
+          if (start > 0) {
+            final String output = line.substring(0, start);
+            mWriter.print(output);
+          }
+          final int end = line.indexOf('>', start);
+          indoctype = end < 0;
+          if (!indoctype) {
+            line = line.substring(end + 1);
+            mWriter.println(line);
+            line = mReader.readLine();
+            break;
+          }
+        } else {
+          mWriter.println(line);
+        }
+        line = mReader.readLine();
+      }
+      while (line != null) {
+        mWriter.println(line);
+        line = mReader.readLine();
       }
     } catch (final IOException exception) {
       mException = exception;
@@ -93,11 +111,11 @@ class InputPreprocessor extends Thread
   {
     try {
       if (mReader != null) {
-	mReader.close();
+        mReader.close();
       }
     } catch (final IOException exception) {
       if (mException == null) {
-	mException = exception;
+        mException = exception;
       }
     }
   }
