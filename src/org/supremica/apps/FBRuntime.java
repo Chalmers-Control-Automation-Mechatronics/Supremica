@@ -69,14 +69,14 @@ public class FBRuntime
  
 			// set library directory property
 			File systemFile = new File(systemFileName);
- 			File libraryDirectory = systemFile.getParentFile();
-			if (libraryDirectory == null)
+ 			File libraryPath = systemFile.getParentFile();
+			if (libraryPath == null)
 			{
 				SupremicaProperties.setFBRuntimeLibraryPath(".");
 			}
 			else
 			{
-				SupremicaProperties.setFBRuntimeLibraryPath(libraryDirectory.getAbsolutePath());
+				SupremicaProperties.setFBRuntimeLibraryPath(libraryPath.getAbsolutePath());
 			}
  		}
  		else if (args.length == 2)
