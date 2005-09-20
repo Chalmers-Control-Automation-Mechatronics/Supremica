@@ -127,7 +127,7 @@ public class Loader
     private void loadSystem(org.supremica.functionblocks.xsd.libraryelement.System xmlSystemData)
     {
 		// Loading with Devices and Resources
-		/*
+		
 		if (xmlSystemData.isSetDevice())
 		{
 			org.supremica.functionblocks.xsd.libraryelement.Device theDevice = (org.supremica.functionblocks.xsd.libraryelement.Device) xmlSystemData.getDevice().get(0);
@@ -147,10 +147,11 @@ public class Loader
 				}
 			}
 		}
-		*/
+		
 
 		// Loading of Application element
-		if (xmlSystemData.isSetApplication())
+		/*
+		  if (xmlSystemData.isSetApplication())
 		{
 			// as for now only the first application of the system is loaded
 			org.supremica.functionblocks.xsd.libraryelement.Application theApplication = (org.supremica.functionblocks.xsd.libraryelement.Application) xmlSystemData.getApplication().get(0);
@@ -163,7 +164,8 @@ public class Loader
 				fbNetwork = resource.getFBNetwork(applicationName);
 				constructFBNetwork((org.supremica.functionblocks.xsd.libraryelement.FBNetwork) theApplication.getFBNetwork());
 			}
-		}
+			}
+		*/
 		
     }
 	
