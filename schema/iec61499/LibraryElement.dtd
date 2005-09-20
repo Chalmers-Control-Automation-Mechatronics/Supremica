@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!-- Common elements --> 
+<!ELEMENT Identification EMPTY> 
+<!ATTLIST Identification
+  Standard CDATA #IMPLIED
+  Classification CDATA #IMPLIED
+  ApplicationDomain CDATA #IMPLIED
+  Function CDATA #IMPLIED
+  Type CDATA #IMPLIED
+  Description CDATA #IMPLIED >	
+<!ELEMENT VersionInfo EMPTY> 
+<!ATTLIST VersionInfo
+  Organization CDATA #REQUIRED
+  Version CDATA #REQUIRED
+  Author CDATA #REQUIRED
+  Date CDATA #REQUIRED
+  Remarks CDATA #IMPLIED >	
+<!ELEMENT CompilerInfo (Compiler*)> 
+<!ATTLIST CompilerInfo
+  header CDATA #IMPLIED
+  classdef CDATA #IMPLIED > 
+<!ELEMENT Compiler EMPTY> 
+<!ATTLIST Compiler
+  Language (Java | Cpp | C | Other) #REQUIRED
+  Vendor CDATA #REQUIRED
+  Product CDATA #REQUIRED
+  Version CDATA #REQUIRED >	
+<!ELEMENT FBNetwork (FB*,EventConnections?,DataConnections?,AdapterConnections?)> 
+<!ELEMENT FB (Parameter*)>
+<!ATTLIST FB
+  Name CDATA #REQUIRED
+  Type CDATA #REQUIRED
+  Comment CDATA #IMPLIED
+   x CDATA #IMPLIED
+   y CDATA #IMPLIED >	
+<!ELEMENT EventConnections (Connection+)> 
+<!ELEMENT DataConnections (Connection+)> 
+<!ELEMENT AdapterConnections (Connection+)> 
+<!ELEMENT Connection EMPTY> 
+<!ATTLIST Connection
+  Source CDATA #REQUIRED
+  Destination CDATA #REQUIRED
+  Comment CDATA #IMPLIED
+  dx1 CDATA #IMPLIED
+  dx2 CDATA #IMPLIED
+  dy CDATA #IMPLIED >
+	
+<!-- FBType elements --> 
+<!ELEMENT FBType (Identification?,VersionInfo+,CompilerInfo?,InterfaceList,  (BasicFB | FBNetwork)?, Service?) > 
+<!ATTLIST FBType
+  Name CDATA #REQUIRED
+  Comment CDATA #IMPLIED >	
+<!ELEMENT InterfaceList (EventInputs?,EventOutputs?,InputVars?,OutputVars?,  Sockets?, Plugs?)> 
+<!ELEMENT EventInputs (Event+)> 
+<!ELEMENT EventOutputs (Event+)> 
+<!ELEMENT InputVars (VarDeclaration+)> 
+<!ELEMENT OutputVars (VarDeclaration+)> 
+<!ELEMENT Sockets (AdapterDeclaration+)> 
+<!ELEMENT Plugs (AdapterDeclaration+)> 	
+<!ELEMENT Event (With*)> 
+<!ATTLIST Event
+  Name CDATA #REQUIRED
+  Type CDATA #IMPLIED
+  Comment CDATA #IMPLIED > 
+<!ELEMENT With EMPTY> 
+<!ATTLIST With
+  Var CDATA #REQUIRED >	
+<!ELEMENT VarDeclaration EMPTY> 
+<!ATTLIST VarDeclaration
+  Name CDATA #REQUIRED
+  Type CDATA #REQUIRED
+  ArraySize CDATA #IMPLIED
+  InitialValue CDATA #IMPLIED
+  Comment CDATA #IMPLIED >	
+<!ELEMENT AdapterDeclaration (Parameter*)>
+<!ATTLIST AdapterDeclaration
+   Name CDATA #REQUIRED
+  Type CDATA #REQUIRED
+  Comment CDATA #IMPLIED >	
+<!ELEMENT BasicFB (InternalVars?,ECC?,Algorithm*)> 
+<!ELEMENT InternalVars (VarDeclaration+)> 
+<!ELEMENT ECC (ECState+,ECTransition+) >	
+<!ELEMENT ECState (ECAction*)> 
+<!ATTLIST ECState
+  Name CDATA #REQUIRED
+  Comment CDATA #IMPLIED
+  x CDATA #IMPLIED
+  y CDATA #IMPLIED >	
+<!ELEMENT ECTransition EMPTY> 
+<!ATTLIST ECTransition
+  Source CDATA #REQUIRED
+  Destination CDATA #REQUIRED
+  Condition CDATA #REQUIRED
+  Comment CDATA #IMPLIED
+  x CDATA #IMPLIED
+  y CDATA #IMPLIED >	
+<!ELEMENT ECAction EMPTY> 
+<!ATTLIST ECAction
+  Algorithm CDATA #IMPLIED
+  Output CDATA #IMPLIED >	
+<!ELEMENT Algorithm ((FBD | ST | LD | Other))> 
+<!ATTLIST Algorithm
+  Name CDATA #REQUIRED
+  Comment CDATA #IMPLIED >	
+<!ELEMENT FBD (FB+,DataConnections) >	
+<!ELEMENT ST EMPTY> 
+<!ATTLIST ST
+  Text CDATA #REQUIRED >	
+<!ELEMENT LD (Rung+) > 
+<!ELEMENT Rung EMPTY> 
+<!ATTLIST Rung
+  Output CDATA #REQUIRED
+  Expression CDATA #REQUIRED
+  Comment CDATA #IMPLIED >	
+<!ELEMENT Other EMPTY> 
+<!ATTLIST Other
+  Language CDATA #REQUIRED
+  Text CDATA #REQUIRED >	
+<!ELEMENT Service (ServiceSequence+)> 
+<!ATTLIST Service
+  RightInterface CDATA #REQUIRED
+  LeftInterface CDATA #REQUIRED
+  Comment CDATA #IMPLIED >	
+<!ELEMENT ServiceSequence (ServiceTransaction*)> 
+<!ATTLIST ServiceSequence
+  Name CDATA #REQUIRED
+  Comment CDATA #IMPLIED >	
+<!ELEMENT ServiceTransaction (InputPrimitive?, OutputPrimitive*)>  
+<!ELEMENT InputPrimitive EMPTY> 
+<!ATTLIST InputPrimitive
+  Interface CDATA #REQUIRED
+  Event CDATA #REQUIRED
+  Parameters CDATA #IMPLIED > 
+<!ELEMENT OutputPrimitive EMPTY> 
+<!ATTLIST OutputPrimitive
+  Interface CDATA #REQUIRED
+  Event CDATA #REQUIRED
+  Parameters CDATA #IMPLIED >
+	
+<!-- AdapterType elements --> 
+<!ELEMENT AdapterType (Identification?,VersionInfo+,CompilerInfo?,InterfaceList,Service?)> 
+<!ATTLIST AdapterType
+  Name CDATA #REQUIRED
+  Comment CDATA #IMPLIED >	
+
+<!-- ResourceType elements --> 
+<!ELEMENT ResourceType (Identification?,VersionInfo+, CompilerInfo?, FBTypeName*, VarDeclaration*, FBNetwork)> 
+<!ATTLIST ResourceType
+  Name CDATA #REQUIRED
+  Comment CDATA #IMPLIED > 
+<!ELEMENT FBTypeName EMPTY> 
+<!ATTLIST FBTypeName
+  Name CDATA #REQUIRED >	
+
+<!-- DeviceType elements --> 
+<!ELEMENT DeviceType (Identification?,VersionInfo+, CompilerInfo?, VarDeclaration*, ResourceTypeName*, Resource*, FBNetwork?)> 
+<!ATTLIST DeviceType
+  Name CDATA #REQUIRED
+  Comment CDATA #IMPLIED > 
+<!ELEMENT ResourceTypeName EMPTY> 
+<!ATTLIST ResourceTypeName
+  Name CDATA #REQUIRED > 
+<!ELEMENT Resource (Parameter*,FBNetwork?)>
+<!ATTLIST Resource
+  Name CDATA #REQUIRED
+  Type CDATA #REQUIRED
+  Comment CDATA #IMPLIED
+  x CDATA #IMPLIED
+  y CDATA #IMPLIED >	
+
+<!-- System elements --> 
+<!ELEMENT System (Identification?, VersionInfo+, Application*, Device+,  Mapping*, Segment*, Link*)>
+<!ATTLIST System
+  Name CDATA #REQUIRED
+  Comment CDATA #IMPLIED > 
+<!ELEMENT Application (FBNetwork)> 
+<!ATTLIST Application
+  Name CDATA #REQUIRED
+  Comment CDATA #IMPLIED > 
+<!ELEMENT Mapping EMPTY> 
+<!ATTLIST Mapping
+  From CDATA #REQUIRED
+  To CDATA #REQUIRED > 
+<!ELEMENT Device (Parameter*,Resource*,FBNetwork?)>
+<!ATTLIST Device
+  Name CDATA #REQUIRED
+  Type CDATA #REQUIRED
+  Comment CDATA #IMPLIED
+  x CDATA #IMPLIED
+  y CDATA #IMPLIED > 
+<!ELEMENT DeviceParameters (Connection+)> 
+	
+<!-- SubAppType elements -->
+<!ELEMENT SubAppType (Identification?,VersionInfo+,CompilerInfo?,SubAppInterfaceList, SubAppNetwork?)> <!ATTLIST SubAppType
+  Name CDATA #REQUIRED
+  Comment CDATA #IMPLIED > 
+<!ELEMENT SubAppInterfaceList (SubAppEventInputs?,SubAppEventOutputs?,InputVars?,OutputVars?)> 
+<!ELEMENT SubAppEventInputs (SubAppEvent+)> 
+<!ELEMENT SubAppEventOutputs (SubAppEvent+)> 
+<!ELEMENT SubAppEvent EMPTY> 
+<!ATTLIST SubAppEvent
+  Name CDATA #REQUIRED
+  Type CDATA #IMPLIED
+  Comment CDATA #IMPLIED > 
+<!ELEMENT SubAppNetwork (SubApp*,FB*,EventConnections?,DataConnections?)> 
+<!ELEMENT SubApp EMPTY> 
+<!ATTLIST SubApp
+  Name CDATA #REQUIRED
+  Type CDATA #REQUIRED
+  Comment CDATA #IMPLIED
+   x CDATA #IMPLIED
+   y CDATA #IMPLIED >	
+
+<!-- Network elements -->
+<!ELEMENT Segment (Parameter*)>
+<!ATTLIST Segment
+  Name CDATA #REQUIRED
+  Type CDATA #REQUIRED
+  Comment CDATA #IMPLIED
+  x CDATA #IMPLIED
+  y CDATA #IMPLIED
+  dx1 CDATA #IMPLIED> 
+<!ELEMENT Parameter EMPTY>
+<!ATTLIST Parameter
+  Name CDATA #REQUIRED
+  Value CDATA #REQUIRED
+  Comment CDATA #IMPLIED>
+<!ELEMENT Link (Parameter*)>
+<!ATTLIST Link
+  SegmentName CDATA #REQUIRED
+  CommResource CDATA #REQUIRED
+  Comment CDATA #IMPLIED > 

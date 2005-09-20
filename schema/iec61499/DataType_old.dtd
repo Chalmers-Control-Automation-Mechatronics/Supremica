@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!ELEMENT DataType (Identification?,VersionInfo+,CompilerInfo?,ASN1Tag?,(DirectlyDerivedType |EnumeratedType|SubrangeType|ArrayType|StructuredType))> 
+<!ATTLIST DataType
+  Name CDATA #REQUIRED
+  Comment CDATA #IMPLIED >	
+
+<!ELEMENT Identification EMPTY> 
+<!ATTLIST Identification
+  Standard CDATA #IMPLIED
+  Classification CDATA #IMPLIED
+  ApplicationDomain CDATA #IMPLIED
+  Function CDATA #IMPLIED
+  Type CDATA #IMPLIED
+  Description CDATA #IMPLIED >	
+
+<!ELEMENT VersionInfo EMPTY> 
+<!ATTLIST VersionInfo  
+  Organization CDATA #REQUIRED
+  Version CDATA #REQUIRED
+  Author CDATA #REQUIRED
+  Date CDATA #REQUIRED
+  Remarks CDATA #IMPLIED >	
+
+<!ELEMENT ASN1Tag EMPTY>
+<!ATTLIST ASN1Tag
+  Class (UNIVERSAL | APPLICATION | CONTEXT | PRIVATE) #IMPLIED
+  Number CDATA #REQUIRED >	
+
+<!ELEMENT CompilerInfo (Compiler*)> 
+<!ATTLIST CompilerInfo
+  header CDATA #IMPLIED
+  classdef CDATA #IMPLIED >	
+
+<!ELEMENT Compiler EMPTY> 
+<!ATTLIST Compiler
+  Language (Java | Cpp | C | Other) #REQUIRED
+  Vendor CDATA #REQUIRED
+  Product CDATA #REQUIRED
+  Version CDATA #REQUIRED >	
+
+<!ELEMENT DirectlyDerivedType EMPTY> 
+<!ATTLIST DirectlyDerivedType
+  BaseType (BOOL|SINT|INT|DINT|LINT|USINT|UINT|UDINT|ULINT|REAL|LREAL|TIME |DATE |TIME_OF_DAY|DATE_AND_TIME|STRING|BYTE|WORD|DWORD|LWORD|WSTRING) #REQUIRED
+  InitialValue CDATA #IMPLIED
+  Comment CDATA #IMPLIED >
+	
+<!ELEMENT EnumeratedType (EnumeratedValue+)>
+<!ATTLIST EnumeratedType
+  InitialValue CDATA #IMPLIED >	
+
+<!ELEMENT EnumeratedValue EMPTY>
+<!ATTLIST EnumeratedValue
+  Name CDATA #REQUIRED
+  Comment CDATA #IMPLIED >
+	
+<!ELEMENT SubrangeType (Subrange)> 
+<!ATTLIST SubrangeType
+  BaseType (SINT|INT|DINT|LINT|USINT|UINT|UDINT|ULINT) #REQUIRED
+  InitialValue CDATA #IMPLIED >
+	
+<!ELEMENT Subrange EMPTY> 
+<!ATTLIST Subrange
+  LowerLimit CDATA #REQUIRED
+  UpperLimit CDATA #REQUIRED >
+	
+<!ELEMENT ArrayType (Subrange+)> 
+<!ATTLIST ArrayType
+  BaseType CDATA #REQUIRED
+  InitialValues CDATA #IMPLIED
+  Comment CDATA #IMPLIED >	
+
+<!ELEMENT StructuredType (VarDeclaration|ArrayVarDeclaration|SubrangeVarDeclaration)+> 
+<!ATTLIST StructuredType
+  Comment CDATA #IMPLIED >	
+
+<!ELEMENT VarDeclaration EMPTY > 
+<!ATTLIST VarDeclaration
+  Name CDATA #REQUIRED
+  Type CDATA #REQUIRED
+  Comment CDATA #IMPLIED
+  InitialValue CDATA #IMPLIED >	
+
+<!ELEMENT ArrayVarDeclaration (Subrange+) >
+<!ATTLIST ArrayVarDeclaration
+  Name CDATA #REQUIRED
+  Type CDATA #REQUIRED
+  Comment CDATA #IMPLIED
+  InitialValues CDATA #IMPLIED >
+	
+<!ELEMENT SubrangeVarDeclaration (Subrange?) >
+<!ATTLIST SubrangeVarDeclaration
+  Name CDATA #REQUIRED
+  Type (SINT|INT|DINT|LINT|USINT|UINT|UDINT|ULINT) #REQUIRED
+  Comment CDATA #IMPLIED
+  InitialValue CDATA #IMPLIED >	

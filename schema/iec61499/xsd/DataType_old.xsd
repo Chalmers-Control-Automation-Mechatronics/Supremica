@@ -118,9 +118,7 @@
       <xsd:enumeration value='TIME'/>
       <xsd:enumeration value='DATE'/>
       <xsd:enumeration value='TIME_OF_DAY'/>
-      <xsd:enumeration value='TOD'/>
       <xsd:enumeration value='DATE_AND_TIME'/>
-      <xsd:enumeration value='DT'/>
       <xsd:enumeration value='STRING'/>
       <xsd:enumeration value='BYTE'/>
       <xsd:enumeration value='WORD'/>
@@ -141,7 +139,6 @@
     <xsd:element ref='EnumeratedValue' maxOccurs='unbounded'/>
    </xsd:sequence>
    <xsd:attribute name='InitialValue' type='xsd:string' use='optional'/>
-   <xsd:attribute name='Comment' type='xsd:string' use='optional'/>
   </xsd:complexType>
  </xsd:element>
 
@@ -172,7 +169,6 @@
     </xsd:simpleType>
    </xsd:attribute>
    <xsd:attribute name='InitialValue' type='xsd:int' use='optional'/>
-   <xsd:attribute name='Comment' type='xsd:string' use='optional'/>
   </xsd:complexType>
  </xsd:element>
 
@@ -203,6 +199,7 @@
   <xsd:complexType>
    <xsd:choice maxOccurs='unbounded'>
     <xsd:element ref='VarDeclaration'/>
+    <xsd:element ref='ArrayVarDeclaration'/>
     <xsd:element ref='SubrangeVarDeclaration'/>
    </xsd:choice>
    <xsd:attribute name='Comment' type='xsd:string' use='optional'/>
@@ -213,16 +210,27 @@
   <xsd:complexType>
    <xsd:attribute name='Name' type='xsd:string' use='required'/>
    <xsd:attribute name='Type' type='xsd:string' use='required'/>
-   <xsd:attribute name='ArraySize' type='xsd:string' use='optional'/>
-   <xsd:attribute name='InitialValue' type='xsd:string' use='optional'/>
    <xsd:attribute name='Comment' type='xsd:string' use='optional'/>
+   <xsd:attribute name='InitialValue' type='xsd:string' use='optional'/>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name='ArrayVarDeclaration'>
+  <xsd:complexType>
+   <xsd:sequence>
+    <xsd:element ref='Subrange' maxOccurs='unbounded'/>
+   </xsd:sequence>
+   <xsd:attribute name='Name' type='xsd:string' use='required'/>
+   <xsd:attribute name='Type' type='xsd:string' use='required'/>
+   <xsd:attribute name='Comment' type='xsd:string' use='optional'/>
+   <xsd:attribute name='InitialValues' type='xsd:string' use='optional'/>
   </xsd:complexType>
  </xsd:element>
 
  <xsd:element name='SubrangeVarDeclaration'>
   <xsd:complexType>
    <xsd:sequence>
-    <xsd:element ref='Subrange' maxOccurs='unbounded'/>
+    <xsd:element ref='Subrange' minOccurs='0' maxOccurs='1'/>
    </xsd:sequence>
    <xsd:attribute name='Name' type='xsd:string' use='required'/>
    <xsd:attribute name='Type' use='required'>
@@ -239,8 +247,8 @@
      </xsd:restriction>
     </xsd:simpleType>
    </xsd:attribute>
-   <xsd:attribute name='InitialValue' type='xsd:int' use='optional'/>
    <xsd:attribute name='Comment' type='xsd:string' use='optional'/>
+   <xsd:attribute name='InitialValue' type='xsd:int' use='optional'/>
   </xsd:complexType>
  </xsd:element>
 </xsd:schema>
