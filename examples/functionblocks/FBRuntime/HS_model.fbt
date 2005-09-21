@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="HS_model" >
+  <VersionInfo  Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2005-09-21" />
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="UppHissVan1" />
+      <Event Name="UppHissVan2" />
+
+      <Event Name="Values">
+	    <With Var="HissNere_sig" />
+	    <With Var="KulaHiss_sig" />
+	    <With Var="HissVan1_sig" />
+	    <With Var="KulaVan1_sig" />
+	    <With Var="HissVan2_sig" />
+	    <With Var="KulaVan2_sig" />
+	  </Event>
+    </EventInputs>
+
+    <EventOutputs>
+      <Event Name="KulaHiss" />
+      <Event Name="KulaVan1" />
+      <Event Name="KulaVan2" />
+      <Event Name="HissNere" />
+
+      <Event Name="Write">
+	    <With Var="UppHissVan1_sig" />
+	    <With Var="UppHissVan2_sig" />
+	  </Event>
+    </EventOutputs>
+
+    <InputVars>
+	  <VarDeclaration Name="HissNere_sig" Type="BOOL"/>
+	  <VarDeclaration Name="KulaHiss_sig" Type="BOOL"/>
+	  <VarDeclaration Name="HissVan1_sig" Type="BOOL"/>
+	  <VarDeclaration Name="KulaVan1_sig" Type="BOOL"/>
+	  <VarDeclaration Name="HissVan2_sig" Type="BOOL"/>
+	  <VarDeclaration Name="KulaVan2_sig" Type="BOOL"/>
+    </InputVars>
+
+    <OutputVars>
+	  <VarDeclaration Name="UppHissVan1_sig" Type="BOOL"/>
+	  <VarDeclaration Name="UppHissVan2_sig" Type="BOOL"/>
+	</OutputVars>
+  </InterfaceList>
+</FBType>

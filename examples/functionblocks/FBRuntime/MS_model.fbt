@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="MS_model" >
+  <VersionInfo  Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2005-09-20" />
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="Mat" />
+      <Event Name="UrMatning" />
+
+      <Event Name="Values">
+	    <With Var="KulaMatstation_sig" />
+	    <With Var="StorKula_sig" />
+	    <With Var="LitenKula_sig" />
+	  </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="KulaMatstation" />
+      <Event Name="StorKula" />
+      <Event Name="LitenKula" />
+
+      <Event Name="Write">
+	    <With Var="Mat_sig" />
+	    <With Var="UrMatning_sig" />
+	  </Event>
+    </EventOutputs>
+    <InputVars>
+	  <VarDeclaration Name="KulaMatstation_sig" Type="BOOL"/>
+	  <VarDeclaration Name="StorKula_sig" Type="BOOL"/>
+	  <VarDeclaration Name="LitenKula_sig" Type="BOOL"/>
+    </InputVars>
+    <OutputVars>
+	  <VarDeclaration Name="Mat_sig" Type="BOOL"/>
+	  <VarDeclaration Name="UrMatning_sig" Type="BOOL"/>
+	</OutputVars>
+  </InterfaceList>
+</FBType>

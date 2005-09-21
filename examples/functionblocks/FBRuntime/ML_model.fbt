@@ -4,6 +4,7 @@
   <InterfaceList>
     <EventInputs>
       <Event Name="UppMatlyft" />
+
       <Event Name="Values">
 	    <With Var="MatlyftNere_sig" />
 	    <With Var="KulaMatlyft_sig" />
@@ -11,73 +12,25 @@
 	    <With Var="KulaMatstation_sig" />
 	  </Event>
     </EventInputs>
+
     <EventOutputs>
       <Event Name="KulaMatlyft" />
       <Event Name="MatlyftNere" />
+
       <Event Name="Write">
-	    <With Var="Matlyft_sig" />
+	    <With Var="UppMatlyft_sig" />
 	  </Event>
     </EventOutputs>
+
     <InputVars>
 	  <VarDeclaration Name="MatlyftNere_sig" Type="BOOL"/>
 	  <VarDeclaration Name="KulaMatlyft_sig" Type="BOOL"/>
 	  <VarDeclaration Name="MatlyftUppe_sig" Type="BOOL"/>
 	  <VarDeclaration Name="KulaMatstation_sig" Type="BOOL"/>
     </InputVars>
+
     <OutputVars>
-	  <VarDeclaration Name="Matlyft_sig" Type="BOOL"/>
+	  <VarDeclaration Name="UppMatlyft_sig" Type="BOOL"/>
 	</OutputVars>
   </InterfaceList>
-  <BasicFB>
-    <ECC>
-        <ECState Name="Q0" />
-        <ECState Name="Q1">
-		    <ECAction Algorithm="OpenIn" Output="Write" />
-	    </ECState>    
-        <ECState Name="Q2">
-		    <ECAction Algorithm="CloseIn" Output="Write" />
-		    <ECAction Output="KulaPortvakt" />
-	    </ECState>    
-        <ECState Name="Q3">
-		    <ECAction Algorithm="OpenOut" Output="Write" />
-	    </ECState>    
-        <ECState Name="Q4">
-		    <ECAction Algorithm="CloseOut" Output="Write" />
-	    </ECState>    
-
-		<ECTransition Source="Q0" Destination="Q1" Condition="InPortvakt" />
-		<ECTransition Source="Q1" Destination="Q2" Condition="Values AND KulaPortvakt_sig" />
-		<ECTransition Source="Q2" Destination="Q3" Condition="UrPortvakt" />
-		<ECTransition Source="Q3" Destination="Q4" Condition="Values AND NOT KulaPortvakt_sig" />
-		<ECTransition Source="Q4" Destination="Q0" Condition="1" />
-    </ECC>
-    <Algorithm Name="OpenIn">
-        <Other Language="Java" Text=
-		"
-		System.out.println(&#34;Opening Portvakt In.&#34;);
-		InPortvakt_sig = true;
-		" />	
-    </Algorithm>
-    <Algorithm Name="CloseIn">
-        <Other Language="Java" Text=
-		"
-		System.out.println(&#34;Closing Portvakt In.&#34;);
-		InPortvakt_sig = false;
-		" />	
-    </Algorithm>
-    <Algorithm Name="OpenOut">
-        <Other Language="Java" Text=
-		"
-		System.out.println(&#34;Opening Portvakt Out.&#34;);
-		UrPortvakt_sig = true;
-		" />	
-    </Algorithm>
-    <Algorithm Name="CloseOut">
-        <Other Language="Java" Text=
-		"
-		System.out.println(&#34;Closing Portvakt Out.&#34;);
-		UrPortvakt_sig = false;
-		" />	
-    </Algorithm>
-  </BasicFB>
 </FBType>
