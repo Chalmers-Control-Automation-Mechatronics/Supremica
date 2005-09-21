@@ -6,6 +6,11 @@
       <Event Name="Mat" />
       <Event Name="UrMatning" />
 
+      <Event Name="DelayDone">
+	    <With Var="StorKula_sig" />
+	    <With Var="LitenKula_sig" />
+      </Event>
+
       <Event Name="Values">
 	    <With Var="KulaMatstation_sig" />
 	    <With Var="StorKula_sig" />
@@ -16,6 +21,7 @@
       <Event Name="KulaMatstation" />
       <Event Name="StorKula" />
       <Event Name="LitenKula" />
+      <Event Name="Delay" />
 
       <Event Name="Write">
 	    <With Var="Mat_sig" />
@@ -32,4 +38,78 @@
 	  <VarDeclaration Name="UrMatning_sig" Type="BOOL"/>
 	</OutputVars>
   </InterfaceList>
+  <BasicFB>
+    <InternalVars>
+	  <VarDeclaration Name="StorKula_var" Type="BOOL"/>
+	  <VarDeclaration Name="LitenKula_var" Type="BOOL"/>
+    </InternalVars>
+    <ECC>
+        <ECState Name="Q0" />
+        <ECState Name="Q1">
+		    <ECAction Output="KulaMatstation" />
+	    </ECState>    
+        <ECState Name="Q2" />
+        <ECState Name="Q3">
+		    <ECAction Algorithm="DoMeasuring" Output="Write" />
+		    <ECAction Output="Delay" />
+	    </ECState>    
+        <ECState Name="Q4">
+		    <ECAction Algorithm="StoreResultAndEndMeasuring" Output="Write" />
+	    </ECState>    
+        <ECState Name="Q5">
+		    <ECAction Output="LitenKula" />
+	    </ECState>    
+        <ECState Name="Q6">
+		    <ECAction Output="StorKula" />
+	    </ECState>    
+        <ECState Name="Q7">
+		    <ECAction Algorithm="ExitMeasuringStationOn" Output="Write" />
+	    </ECState>    
+        <ECState Name="Q8">
+		    <ECAction Algorithm="ExitMeasuringStationOff" Output="Write" />
+	    </ECState>    
+
+		<ECTransition Source="Q0" Destination="Q1" Condition="Values AND KulaMatstation_sig" />
+		<ECTransition Source="Q1" Destination="Q2" Condition="1" />
+		<ECTransition Source="Q2" Destination="Q3" Condition="Mat" />
+		<ECTransition Source="Q2" Destination="Q7" Condition="UrMatning" />
+		<ECTransition Source="Q3" Destination="Q4" Condition="DelayDone" />
+		<ECTransition Source="Q4" Destination="Q5" Condition="LitenKula_var" />
+		<ECTransition Source="Q4" Destination="Q6" Condition="StorKula_var" />
+		<ECTransition Source="Q5" Destination="Q2" Condition="1" />
+		<ECTransition Source="Q6" Destination="Q2" Condition="1" />
+		<ECTransition Source="Q7" Destination="Q8" Condition="Values AND NOT KulaMatstation_sig" />
+		<ECTransition Source="Q8" Destination="Q0" Condition="1" />
+    </ECC>
+    <Algorithm Name="DoMeasuring">
+        <Other Language="Java" Text=
+		"
+		System.out.println(&#34;Start measuring.&#34;);
+		Mat_sig = true;
+		" />	
+    </Algorithm>
+    <Algorithm Name="StoreResultAndEndMeasuring">
+        <Other Language="Java" Text=
+		"
+		System.out.println(&#34;Store result and end measuring.&#34;);
+		StorKula_var = StorKula_sig;
+		LitenKula_var = LitenKula_sig;
+		Mat_sig = false;
+		" />	
+    </Algorithm>
+    <Algorithm Name="ExitMeasuringStationOn">
+        <Other Language="Java" Text=
+		"
+		System.out.println(&#34;Exit measuring station ON.&#34;);
+		UrMatning_sig = true;
+		" />	
+    </Algorithm>
+    <Algorithm Name="ExitMeasuringStationOff">
+        <Other Language="Java" Text=
+		"
+		System.out.println(&#34;Exit measuring station OFF.&#34;);
+		UrMatning_sig = false;
+		" />	
+    </Algorithm>
+  </BasicFB>
 </FBType>

@@ -29,17 +29,17 @@
     </EventOutputs>
 
     <InputVars>
-	  <VarDeclaration Name="PlockaVan_sig" Type="BOOL"/>
-	  <VarDeclaration Name="PlockaVan_sig" Type="BOOL"/>
-	  <VarDeclaration Name="PlockaVan_sig" Type="BOOL"/>
-	  <VarDeclaration Name="PlockaVan_sig" Type="BOOL"/>
+	  <VarDeclaration Name="ArmVan1_sig" Type="BOOL"/>
+	  <VarDeclaration Name="ArmVan2_sig" Type="BOOL"/>
+	  <VarDeclaration Name="KulaFast_sig" Type="BOOL"/>
+	  <VarDeclaration Name="ArmHemma_sig" Type="BOOL"/>
     </InputVars>
 
     <OutputVars>
-	  <VarDeclaration Name="UtVan_sig" Type="BOOL"/>
-	  <VarDeclaration Name="UtVan_sig" Type="BOOL"/>
-	  <VarDeclaration Name="UtVan_sig" Type="BOOL"/>
-	  <VarDeclaration Name="UtVan_sig" Type="BOOL"/>
+	  <VarDeclaration Name="UppArmVan1_sig" Type="BOOL"/>
+	  <VarDeclaration Name="UppArmVan2_sig" Type="BOOL"/>
+	  <VarDeclaration Name="VridArmHoger_sig" Type="BOOL"/>
+	  <VarDeclaration Name="Sug_sig" Type="BOOL"/>
 	</OutputVars>
   </InterfaceList>
 </FBType>

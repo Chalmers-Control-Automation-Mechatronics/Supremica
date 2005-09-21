@@ -33,4 +33,41 @@
 	  <VarDeclaration Name="UppMatlyft_sig" Type="BOOL"/>
 	</OutputVars>
   </InterfaceList>
+  <BasicFB>
+    <ECC>
+        <ECState Name="Q0" />
+        <ECState Name="Q1">
+		    <ECAction Output="KulaMatlyft" />
+	    </ECState>    
+        <ECState Name="Q2">
+		    <ECAction Algorithm="LiftUp" Output="Write" />
+	    </ECState>    
+        <ECState Name="Q3">
+		    <ECAction Algorithm="LiftDown" Output="Write" />
+	    </ECState>    
+        <ECState Name="Q4">
+		    <ECAction Output="MatlyftNere" />
+	    </ECState>    
+
+		<ECTransition Source="Q0" Destination="Q1" Condition="Values AND KulaMatlyft_sig" />
+		<ECTransition Source="Q1" Destination="Q2" Condition="UppMatlyft" />
+		<ECTransition Source="Q2" Destination="Q3" Condition="Values AND MatlyftUppe_sig AND NOT KulaMatstation_sig" />
+		<ECTransition Source="Q3" Destination="Q4" Condition="Values AND MatlyftNere_sig AND NOT KulaMatlyft_sig" />
+		<ECTransition Source="Q4" Destination="Q0" Condition="1" />
+    </ECC>
+    <Algorithm Name="LiftUp">
+        <Other Language="Java" Text=
+		"
+		System.out.println(&#34;Lifting ML up.&#34;);
+		UppMatlyft_sig = true;
+		" />	
+    </Algorithm>
+    <Algorithm Name="LiftDown">
+        <Other Language="Java" Text=
+		"
+		System.out.println(&#34;Bringing ML down.&#34;);
+		UppMatlyft_sig = false;
+		" />	
+    </Algorithm>
+  </BasicFB>
 </FBType>

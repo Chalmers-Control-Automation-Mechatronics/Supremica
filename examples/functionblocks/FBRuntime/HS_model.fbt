@@ -7,12 +7,12 @@
       <Event Name="UppHissVan2" />
 
       <Event Name="Values">
-	    <With Var="HissNere_sig" />
 	    <With Var="KulaHiss_sig" />
 	    <With Var="HissVan1_sig" />
 	    <With Var="KulaVan1_sig" />
 	    <With Var="HissVan2_sig" />
 	    <With Var="KulaVan2_sig" />
+	    <With Var="HissNere_sig" />
 	  </Event>
     </EventInputs>
 
@@ -42,4 +42,68 @@
 	  <VarDeclaration Name="UppHissVan2_sig" Type="BOOL"/>
 	</OutputVars>
   </InterfaceList>
+  <BasicFB>
+    <ECC>
+        <ECState Name="Q0" />
+        <ECState Name="Q1">
+		    <ECAction Output="KulaHiss" />
+	    </ECState>    
+        <ECState Name="Q2">
+		    <ECAction Algorithm="UpSecondFloor" Output="Write" />
+	    </ECState>    
+        <ECState Name="Q3">
+		    <ECAction Output="KulaVan2" />
+	    </ECState>    
+        <ECState Name="Q4">
+		    <ECAction Algorithm="DownSecondFloor" Output="Write" />
+	    </ECState>    
+        <ECState Name="Q5">
+		    <ECAction Algorithm="UpFirstFloor" Output="Write" />
+	    </ECState>    
+        <ECState Name="Q6">
+		    <ECAction Output="KulaVan1" />
+	    </ECState>    
+        <ECState Name="Q7">
+		    <ECAction Algorithm="DownFirstFloor" Output="Write" />
+	    </ECState>    
+
+		<ECTransition Source="Q0" Destination="Q1" Condition="Values AND KulaHiss_sig" />
+		<ECTransition Source="Q1" Destination="Q2" Condition="UppHissVan2" />
+		<ECTransition Source="Q1" Destination="Q5" Condition="UppHissVan1" />
+		<ECTransition Source="Q2" Destination="Q3" Condition="Values AND KulaVan2_sig AND HissVan2_sig" />
+		<ECTransition Source="Q3" Destination="Q4" Condition="Values AND NOT KulaVan2_sig AND HissVan2_sig" />
+		<ECTransition Source="Q4" Destination="Q0" Condition="Values AND HissNere_sig" />
+		<ECTransition Source="Q5" Destination="Q6" Condition="Values AND KulaVan1_sig AND HissVan1_sig" />
+		<ECTransition Source="Q6" Destination="Q7" Condition="Values AND NOT KulaVan1_sig AND HissVan1_sig" />
+		<ECTransition Source="Q7" Destination="Q0" Condition="Values AND HissNere_sig" />
+    </ECC>
+    <Algorithm Name="UpSecondFloor">
+        <Other Language="Java" Text=
+		"
+		System.out.println(&#34;Elevator going up to second floor.&#34;);
+		UppHissVan2_sig = true;
+		" />	
+    </Algorithm>
+    <Algorithm Name="DownSecondFloor">
+        <Other Language="Java" Text=
+		"
+		System.out.println(&#34;Elevator going down from second floor.&#34;);
+		UppHissVan2_sig = false;
+		" />	
+    </Algorithm>
+    <Algorithm Name="UpFirstFloor">
+        <Other Language="Java" Text=
+		"
+		System.out.println(&#34;Elevator going up to first floor.&#34;);
+		UppHissVan1_sig = true;
+		" />	
+    </Algorithm>
+    <Algorithm Name="DownFirstFloor">
+        <Other Language="Java" Text=
+		"
+		System.out.println(&#34;Elevator going down from first floor.&#34;);
+		UppHissVan1_sig = false;
+		" />	
+    </Algorithm>
+  </BasicFB>
 </FBType>
