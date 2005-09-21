@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="AR_model" >
+  <VersionInfo  Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2005-09-21" />
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="UppArmVan1" />
+      <Event Name="UppArmVan2" />
+      <Event Name="ArmHem" />
+
+      <Event Name="Values">
+	    <With Var="ArmVan1_sig" />
+	    <With Var="ArmVan2_sig" />
+	    <With Var="KulaFast_sig" />
+	    <With Var="ArmHemma_sig" />
+	  </Event>
+    </EventInputs>
+
+    <EventOutputs>
+      <Event Name="ArmVan1" />
+      <Event Name="ArmVan2" />
+      <Event Name="ArmHemma" />
+
+      <Event Name="Write">
+	    <With Var="UppArmVan1_sig" />
+	    <With Var="UppArmVan2_sig" />
+	    <With Var="VridArmHoger_sig" />
+	    <With Var="Sug_sig" />
+	  </Event>
+    </EventOutputs>
+
+    <InputVars>
+	  <VarDeclaration Name="PlockaVan_sig" Type="BOOL"/>
+	  <VarDeclaration Name="PlockaVan_sig" Type="BOOL"/>
+	  <VarDeclaration Name="PlockaVan_sig" Type="BOOL"/>
+	  <VarDeclaration Name="PlockaVan_sig" Type="BOOL"/>
+    </InputVars>
+
+    <OutputVars>
+	  <VarDeclaration Name="UtVan_sig" Type="BOOL"/>
+	  <VarDeclaration Name="UtVan_sig" Type="BOOL"/>
+	  <VarDeclaration Name="UtVan_sig" Type="BOOL"/>
+	  <VarDeclaration Name="UtVan_sig" Type="BOOL"/>
+	</OutputVars>
+  </InterfaceList>
+</FBType>
