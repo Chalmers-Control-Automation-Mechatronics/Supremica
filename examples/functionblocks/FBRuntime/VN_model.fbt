@@ -6,7 +6,11 @@
       <Event Name="UtVan" />
 
       <Event Name="Values">
+	    <With Var="KulaVan_sig" />
 	    <With Var="PlockaVan_sig" />
+	    <With Var="KulaFast_sig" />
+	    <With Var="ArmVan_sig" />
+	    <With Var="ArmHemma_sig" />
 	  </Event>
     </EventInputs>
 
@@ -15,15 +19,78 @@
 
       <Event Name="Write">
 	    <With Var="UtVan_sig" />
+	    <With Var="LyftVan_sig" />
 	  </Event>
     </EventOutputs>
 
     <InputVars>
+	  <VarDeclaration Name="KulaVan_sig" Type="BOOL"/>
 	  <VarDeclaration Name="PlockaVan_sig" Type="BOOL"/>
+	  <VarDeclaration Name="KulaFast_sig" Type="BOOL"/>
+	  <VarDeclaration Name="ArmVan_sig" Type="BOOL"/>
+	  <VarDeclaration Name="ArmHemma_sig" Type="BOOL"/>
     </InputVars>
 
     <OutputVars>
 	  <VarDeclaration Name="UtVan_sig" Type="BOOL"/>
+	  <VarDeclaration Name="LyftVan_sig" Type="BOOL"/>
 	</OutputVars>
   </InterfaceList>
+  <BasicFB>
+    <ECC>
+        <ECState Name="Q0" />
+        <ECState Name="Q1">
+		    <ECAction Algorithm="ExitFloorOut" Output="Write" />
+	    </ECState>    
+        <ECState Name="Q2">
+		    <ECAction Algorithm="ExitFllorIn" Output="Write" />
+	    </ECState>    
+        <ECState Name="Q3">
+		    <ECAction Algorithm="LiftFloorUp" Output="Write" />
+	    </ECState>    
+        <ECState Name="Q4">
+		    <ECAction Algorithm="LiftFloorDown" Output="Write" />
+	    </ECState>    
+        <ECState Name="Q5">
+		    <ECAction Output="PlockaVan" />
+	    </ECState>    
+
+		<ECTransition Source="Q0" Destination="Q1" Condition="UtVan" />
+		<ECTransition Source="Q0" Destination="Q3" Condition="Values AND ArmVan_sig" />
+		<ECTransition Source="Q0" Destination="Q5" Condition="Values AND PlockaVan_sig AND ArmHemma_sig AND NOT KulaFast_sig" />
+		<ECTransition Source="Q1" Destination="Q2" Condition="Values AND NOT KulaVan_sig" />
+		<ECTransition Source="Q2" Destination="Q0" Condition="1" />
+		<ECTransition Source="Q3" Destination="Q4" Condition="Values AND KulaFast_sig" />
+		<ECTransition Source="Q4" Destination="Q0" Condition="1" />
+		<ECTransition Source="Q5" Destination="Q0" Condition="1" />
+    </ECC>
+    <Algorithm Name="LiftFloorUp">
+        <Other Language="Java" Text=
+		"
+		System.out.println(&#34;Lifting floor up.&#34;);
+		LyftVan_sig = true;
+		" />	
+    </Algorithm>
+    <Algorithm Name="LiftFloorDown">
+        <Other Language="Java" Text=
+		"
+		System.out.println(&#34;Lifting floor down.&#34;);
+		LyftVan_sig = false;
+		" />	
+    </Algorithm>
+    <Algorithm Name="ExitFloorOut">
+        <Other Language="Java" Text=
+		"
+		System.out.println(&#34;Exiting floor out.&#34;);
+		UtVan_sig = true;
+		" />	
+    </Algorithm>
+    <Algorithm Name="ExitFloorIn">
+        <Other Language="Java" Text=
+		"
+		System.out.println(&#34;Exiting floor in.&#34;);
+		UtVan_sig = false;
+		" />	
+    </Algorithm>
+  </BasicFB>
 </FBType>

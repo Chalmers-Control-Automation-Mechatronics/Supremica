@@ -12,7 +12,7 @@
       <Event Name="EO" />
     </EventOutputs>
     <InputVars>
-      <VarDeclaration Name="DT" Type="INT" InitialValue="3000" />
+      <VarDeclaration Name="DT" Type="INT" InitialValue="500" />
     </InputVars>
   </InterfaceList>
 </FBType>
