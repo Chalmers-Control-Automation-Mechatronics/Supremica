@@ -43,7 +43,7 @@
 		    <ECAction Algorithm="ExitFloorOut" Output="Write" />
 	    </ECState>    
         <ECState Name="Q2">
-		    <ECAction Algorithm="ExitFllorIn" Output="Write" />
+		    <ECAction Algorithm="ExitFloorIn" Output="Write" />
 	    </ECState>    
         <ECState Name="Q3">
 		    <ECAction Algorithm="LiftFloorUp" Output="Write" />
@@ -57,7 +57,8 @@
 
 		<ECTransition Source="Q0" Destination="Q1" Condition="UtVan" />
 		<ECTransition Source="Q0" Destination="Q3" Condition="Values AND ArmVan_sig" />
-		<ECTransition Source="Q0" Destination="Q5" Condition="Values AND PlockaVan_sig AND ArmHemma_sig AND NOT KulaFast_sig" />
+		<!--ECTransition Source="Q0" Destination="Q5" Condition="Values AND PlockaVan_sig AND ArmHemma_sig AND NOT KulaFast_sig" /-->
+		<ECTransition Source="Q0" Destination="Q5" Condition="Values AND PlockaVan_sig AND ArmHemma_sig" />
 		<ECTransition Source="Q1" Destination="Q2" Condition="Values AND NOT KulaVan_sig" />
 		<ECTransition Source="Q2" Destination="Q0" Condition="1" />
 		<ECTransition Source="Q3" Destination="Q4" Condition="Values AND KulaFast_sig" />

@@ -96,26 +96,26 @@
 	  <Connection Source="Mat" Destination="ms.Mat" />
 	  <Connection Source="UrMatning" Destination="ms.UrMatning" />
 	  <Connection Source="msdelay.EO" Destination="ms.DelayDone" />
-	  <Connection Source="ml.KulaMatstation" Destination="KulaMatstation" />
-	  <Connection Source="ml.StorKula" Destination="StorKula" />
-	  <Connection Source="ml.LitenKula" Destination="LitenKula" />
-	  <Connection Source="ml.Delay" Destination="msdelay.START" />
+	  <Connection Source="ms.KulaMatstation" Destination="KulaMatstation" />
+	  <Connection Source="ms.StorKula" Destination="StorKula" />
+	  <Connection Source="ms.LitenKula" Destination="LitenKula" />
+	  <Connection Source="ms.Delay" Destination="msdelay.START" />
 
 	  <!-- Hiss -->
-	  <Connection Source="UppHissVan1" Destination="hs.Mat" />
-	  <Connection Source="UppHissVan2" Destination="hs.UrMatning" />
-	  <Connection Source="ms.KulaHiss" Destination="KulaHiss" />
-	  <Connection Source="ms.KulaVan1" Destination="KulaVan1" />
-	  <Connection Source="ms.KulaVan2" Destination="KulaVan2" />
-	  <Connection Source="ms.HissNere" Destination="HissNere" />
+	  <Connection Source="UppHissVan1" Destination="hs.UppHissVan1" />
+	  <Connection Source="UppHissVan2" Destination="hs.UppHissVan2" />
+	  <Connection Source="hs.KulaHiss" Destination="KulaHiss" />
+	  <Connection Source="hs.KulaVan1" Destination="KulaVan1" />
+	  <Connection Source="hs.KulaVan2" Destination="KulaVan2" />
+	  <Connection Source="hs.HissNere" Destination="HissNere" />
 
 	  <!-- Vaning 1 -->
 	  <Connection Source="UtVan1" Destination="vn1.UtVan" />
-	  <Connection Source="vn1.PlockaVan1" Destination="PlockaVan1" />
+	  <Connection Source="vn1.PlockaVan" Destination="PlockaVan1" />
 
 	  <!-- Vaning 2 -->
 	  <Connection Source="UtVan2" Destination="vn2.UtVan" />
-	  <Connection Source="vn2.PlockaVan2" Destination="PlockaVan2" />
+	  <Connection Source="vn2.PlockaVan" Destination="PlockaVan2" />
 
 	  <!-- Arm -->
 	  <Connection Source="UppArmVan1" Destination="ar.UppArmVan1" />
@@ -137,57 +137,57 @@
 	  <Connection Source="pv.UrPortvakt_sig" Destination="adlink.OUTPUT1" />	
 
 	  <!-- Matlyft signals -->	
-	  <Connection Source="adlink.INPUT" Destination="ml.MatlyftNere_sig" />
-	  <Connection Source="adlink.INPUT" Destination="ml.KulaMatlyft_sig" />
-	  <Connection Source="adlink.INPUT" Destination="ml.MatlyftUppe_sig" />
-	  <Connection Source="adlink.INPUT" Destination="ml.KulaMatstation_sig" />
- 	  <Connection Source="ml.UppMatlyft_sig" Destination="adlink.OUTPUT" />
+	  <Connection Source="adlink.INPUT1" Destination="ml.MatlyftNere_sig" />
+	  <Connection Source="adlink.INPUT2" Destination="ml.KulaMatlyft_sig" />
+	  <Connection Source="adlink.INPUT3" Destination="ml.MatlyftUppe_sig" />
+	  <Connection Source="adlink.INPUT4" Destination="ml.KulaMatstation_sig" />
+ 	  <Connection Source="ml.UppMatlyft_sig" Destination="adlink.OUTPUT2" />
 
 	  <!-- Matstation signals -->	
-	  <Connection Source="adlink.INPUT" Destination="ms.KulaMatstation_sig" />
-	  <Connection Source="adlink.INPUT" Destination="ms.StorKula_sig" />
-	  <Connection Source="adlink.INPUT" Destination="ms.LitenKula_sig" />
- 	  <Connection Source="ms.Mat_sig" Destination="adlink.OUTPUT" />
- 	  <Connection Source="ms.UrMatning_sig" Destination="adlink.OUTPUT" />
- 	  <Connection Source="200" Destination="msdelay.DT" />
+	  <Connection Source="adlink.INPUT4" Destination="ms.KulaMatstation_sig" />
+	  <Connection Source="adlink.INPUT5" Destination="ms.StorKula_sig" />
+	  <Connection Source="adlink.INPUT6" Destination="ms.LitenKula_sig" />
+ 	  <Connection Source="ms.Mat_sig" Destination="adlink.OUTPUT4" />
+ 	  <Connection Source="ms.UrMatning_sig" Destination="adlink.OUTPUT3" />
+ 	  <Connection Source="300" Destination="msdelay.DT" />
 
 	  <!-- Hiss signal -->
-	  <Connection Source="adlink.INPUT" Destination="hs.HissNere_sig" />
-	  <Connection Source="adlink.INPUT" Destination="hs.KulaHiss_sig" />
-	  <Connection Source="adlink.INPUT" Destination="hs.HissVan1_sig" />
-	  <Connection Source="adlink.INPUT" Destination="hs.KulaVan1_sig" />
-	  <Connection Source="adlink.INPUT" Destination="hs.HissVan2_sig" />
-	  <Connection Source="adlink.INPUT" Destination="hs.KulaVan2_sig" />
- 	  <Connection Source="hs.UppHissVan1_sig" Destination="adlink.OUTPUT" />
- 	  <Connection Source="hs.UppHissVan2_sig" Destination="adlink.OUTPUT" />
-
+	  <Connection Source="adlink.INPUT7" Destination="hs.HissNere_sig" />
+	  <Connection Source="adlink.INPUT10" Destination="hs.KulaHiss_sig" />
+	  <Connection Source="adlink.INPUT11" Destination="hs.HissVan1_sig" />
+	  <Connection Source="adlink.INPUT12" Destination="hs.KulaVan1_sig" />
+	  <Connection Source="adlink.INPUT14" Destination="hs.HissVan2_sig" />
+	  <Connection Source="adlink.INPUT15" Destination="hs.KulaVan2_sig" />
+ 	  <Connection Source="hs.UppHissVan1_sig" Destination="adlink.OUTPUT5" />
+ 	  <Connection Source="hs.UppHissVan2_sig" Destination="adlink.OUTPUT6" />
+ 	  
 	  <!-- Vaning 1 signals -->	
-	  <Connection Source="adlink.INPUT" Destination="vn1.KulaVan_sig" />
-	  <Connection Source="adlink.INPUT" Destination="vn1.PlockaVan_sig" />
-	  <Connection Source="adlink.INPUT" Destination="vn1.KulaFast_sig" />
-	  <Connection Source="adlink.INPUT" Destination="vn1.ArmVan_sig" />
-	  <Connection Source="adlink.INPUT" Destination="vn1.ArmHemma_sig" />
- 	  <Connection Source="vn1.UtVan_sig" Destination="adlink.OUTPUT" />
- 	  <Connection Source="vn1.LyftVan_sig" Destination="adlink.OUTPUT" />
+	  <Connection Source="adlink.INPUT12" Destination="vn1.KulaVan_sig" />
+	  <Connection Source="adlink.INPUT13" Destination="vn1.PlockaVan_sig" />
+	  <Connection Source="adlink.INPUT22" Destination="vn1.KulaFast_sig" />
+	  <Connection Source="adlink.INPUT20" Destination="vn1.ArmVan_sig" />
+	  <Connection Source="adlink.INPUT17" Destination="vn1.ArmHemma_sig" />
+ 	  <Connection Source="vn1.UtVan_sig" Destination="adlink.OUTPUT7" />
+ 	  <Connection Source="vn1.LyftVan_sig" Destination="adlink.OUTPUT10" />
 
 	  <!-- Vaning 2 signals -->	
-	  <Connection Source="adlink.INPUT" Destination="vn2.KulaVan_sig" />
-	  <Connection Source="adlink.INPUT" Destination="vn2.PlockaVan_sig" />
-	  <Connection Source="adlink.INPUT" Destination="vn2.KulaFast_sig" />
-	  <Connection Source="adlink.INPUT" Destination="vn2.ArmVan_sig" />
-	  <Connection Source="adlink.INPUT" Destination="vn2.ArmHemma_sig" />
- 	  <Connection Source="vn2.UtVan_sig" Destination="adlink.OUTPUT" />
- 	  <Connection Source="vn2.LyftVan_sig" Destination="adlink.OUTPUT" />
+	  <Connection Source="adlink.INPUT15" Destination="vn2.KulaVan_sig" />
+	  <Connection Source="adlink.INPUT16" Destination="vn2.PlockaVan_sig" />
+	  <Connection Source="adlink.INPUT22" Destination="vn2.KulaFast_sig" />
+	  <Connection Source="adlink.INPUT21" Destination="vn2.ArmVan_sig" />
+	  <Connection Source="adlink.INPUT17" Destination="vn2.ArmHemma_sig" />
+ 	  <Connection Source="vn2.UtVan_sig" Destination="adlink.OUTPUT11" />
+ 	  <Connection Source="vn2.LyftVan_sig" Destination="adlink.OUTPUT12" />
 
 	  <!-- Arm signals -->
-	  <Connection Source="adlink.INPUT" Destination="ar.ArmVan1_sig" />
-	  <Connection Source="adlink.INPUT" Destination="ar.ArmVan2_sig" />
-	  <Connection Source="adlink.INPUT" Destination="ar.KulaFast_sig" />
-	  <Connection Source="adlink.INPUT" Destination="ar.ArmHemma_sig" />
- 	  <Connection Source="ar.UppArmVan1_sig" Destination="adlink.OUTPUT" />
- 	  <Connection Source="ar.UppArmVan2_sig" Destination="adlink.OUTPUT" />
- 	  <Connection Source="ar.VridArmHoger_sig" Destination="adlink.OUTPUT" />
- 	  <Connection Source="ar.Sug_sig" Destination="adlink.OUTPUT" />
+	  <Connection Source="adlink.INPUT20" Destination="ar.ArmVan1_sig" />
+	  <Connection Source="adlink.INPUT21" Destination="ar.ArmVan2_sig" />
+	  <Connection Source="adlink.INPUT22" Destination="ar.KulaFast_sig" />
+	  <Connection Source="adlink.INPUT17" Destination="ar.ArmHemma_sig" />
+ 	  <Connection Source="ar.UppArmVan1_sig" Destination="adlink.OUTPUT13" />
+ 	  <Connection Source="ar.UppArmVan2_sig" Destination="adlink.OUTPUT14" />
+ 	  <Connection Source="ar.VridArmHoger_sig" Destination="adlink.OUTPUT15" />
+ 	  <Connection Source="ar.Sug_sig" Destination="adlink.OUTPUT16" />
 
 
 	</DataConnections>

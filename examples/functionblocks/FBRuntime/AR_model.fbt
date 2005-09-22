@@ -46,62 +46,75 @@
     <ECC>
         <ECState Name="Q0" />
         <ECState Name="Q1">
-		    <ECAction Algorithm="TurnOn" />
 		    <ECAction Algorithm="UpFirstFloor" Output="Write" />
 	    </ECState>    
-        <ECState Name="Q2">
-		    <ECAction Algorithm="SuckBallOn" Output="Write" />
-	    </ECState>    
+	<ECState Name="Q2">
+		    <ECAction Algorithm="TurnOn" Output="Write" />
+	</ECState>
         <ECState Name="Q3">
-		    <ECAction Output="ArmVan1" />
-	    </ECState>    
+		    <ECAction Algorithm="SuckBallOn" Output="Write" />
+	</ECState>    
         <ECState Name="Q4">
-		    <ECAction Algorithm="TurnOff" />
-		    <ECAction Algorithm="DownFirstFloor" Output="Write" />
-	    </ECState>    
+		    <ECAction Output="ArmVan1" />
+	 </ECState>    
         <ECState Name="Q5">
-		    <ECAction Algorithm="SuckBallOff" Output="Write" />
-	    </ECState>    
-
+		    <ECAction Algorithm="TurnOff" Output="Write"/>
+	</ECState>    
         <ECState Name="Q6">
-		    <ECAction Output="ArmHemma" />
-	    </ECState>    
+		    <ECAction Algorithm="DownFirstFloor" Output="Write" />
+	</ECState>    
         <ECState Name="Q7">
-		    <ECAction Algorithm="TurnOn" />
+		    <ECAction Algorithm="SuckBallOff" Output="Write" />
+	</ECState>    
+        <ECState Name="Q8">
+		    <ECAction Output="ArmHemma" />
+	</ECState>
+	    	    
+        <ECState Name="Q9">
 		    <ECAction Algorithm="UpSecondFloor" Output="Write" />
 	    </ECState>    
-        <ECState Name="Q8">
-		    <ECAction Algorithm="SuckBallOn" Output="Write" />
-	    </ECState>    
-        <ECState Name="Q9">
-		    <ECAction Output="ArmVan2" />
-	    </ECState>    
-        <ECState Name="Q10">
-		    <ECAction Algorithm="TurnOff" />
-		    <ECAction Algorithm="DownSecondFloor" Output="Write" />
-	    </ECState>    
+	<ECState Name="Q10">
+		    <ECAction Algorithm="TurnOn" Output="Write" />
+	</ECState>
         <ECState Name="Q11">
-		    <ECAction Algorithm="SuckBallOff" Output="Write" />
-	    </ECState>    
+		    <ECAction Algorithm="SuckBallOn" Output="Write" />
+	</ECState>    
         <ECState Name="Q12">
+		    <ECAction Output="ArmVan2" />
+	 </ECState>    
+        <ECState Name="Q13">
+		    <ECAction Algorithm="TurnOff" Output="Write"/>
+	</ECState>    
+        <ECState Name="Q14">
+		    <ECAction Algorithm="DownSecondFloor" Output="Write" />
+	</ECState>    
+        <ECState Name="Q15">
+		    <ECAction Algorithm="SuckBallOff" Output="Write" />
+	</ECState>    
+        <ECState Name="Q16">
 		    <ECAction Output="ArmHemma" />
-	    </ECState>    
+	</ECState>
 
 		<ECTransition Source="Q0" Destination="Q1" Condition="UppArmVan1" />
-		<ECTransition Source="Q1" Destination="Q2" Condition="Values AND ArmVan1_sig" />
-		<ECTransition Source="Q2" Destination="Q3" Condition="Values AND KulaFast_sig" />
-		<ECTransition Source="Q3" Destination="Q4" Condition="ArmHem" />
-		<ECTransition Source="Q4" Destination="Q5" Condition="Values AND ArmHemma_sig" />
-		<ECTransition Source="Q5" Destination="Q6" Condition="Values AND NOT KulaFast_sig" />
-		<ECTransition Source="Q6" Destination="Q0" Condition="1" />
+		<ECTransition Source="Q1" Destination="Q2" Condition="Values AND NOT ArmHemma_sig" />
+		<ECTransition Source="Q2" Destination="Q3" Condition="Values AND ArmVan1_sig" />
+		<ECTransition Source="Q3" Destination="Q4" Condition="Values AND KulaFast_sig" />
+		<ECTransition Source="Q4" Destination="Q5" Condition="ArmHem" />
+		<ECTransition Source="Q5" Destination="Q6" Condition="Values AND NOT ArmVan1_sig" />
+		<ECTransition Source="Q6" Destination="Q7" Condition="Values AND ArmHemma_sig" />
+		<ECTransition Source="Q7" Destination="Q8" Condition="Values AND NOT KulaFast_sig" />
+		<ECTransition Source="Q8" Destination="Q0" Condition="1" />
 
-		<ECTransition Source="Q0" Destination="Q7" Condition="UppArmVan2" />
-		<ECTransition Source="Q7" Destination="Q8" Condition="Values AND ArmVan2_sig" />
-		<ECTransition Source="Q8" Destination="Q9" Condition="Values AND KulaFast_sig" />
-		<ECTransition Source="Q9" Destination="Q10" Condition="ArmHem" />
-		<ECTransition Source="Q10" Destination="Q11" Condition="Values AND ArmHemma_sig" />
-		<ECTransition Source="Q11" Destination="Q12" Condition="Values AND NOT KulaFast_sig" />
-		<ECTransition Source="Q12" Destination="Q0" Condition="1" />
+		<ECTransition Source="Q0" Destination="Q9" Condition="UppArmVan2" />
+		<ECTransition Source="Q9" Destination="Q10" Condition="Values AND NOT ArmHemma_sig" />
+		<ECTransition Source="Q10" Destination="Q11" Condition="Values AND ArmVan2_sig" />
+		<ECTransition Source="Q11" Destination="Q12" Condition="Values AND KulaFast_sig" />
+		<ECTransition Source="Q12" Destination="Q13" Condition="ArmHem" />
+		<ECTransition Source="Q13" Destination="Q14" Condition="Values AND NOT ArmVan2_sig" />
+		<ECTransition Source="Q14" Destination="Q15" Condition="Values AND ArmHemma_sig" />
+		<ECTransition Source="Q15" Destination="Q16" Condition="Values AND NOT KulaFast_sig" />
+		<ECTransition Source="Q16" Destination="Q0" Condition="1" />
+
     </ECC>
     <Algorithm Name="TurnOn">
         <Other Language="Java" Text=
@@ -135,6 +148,7 @@
         <Other Language="Java" Text=
 		"
 		System.out.println(&#34;Arm going up to second floor.&#34;);
+		UppArmVan1_sig = true;
 		UppArmVan2_sig = true;
 		" />	
     </Algorithm>
@@ -142,6 +156,7 @@
         <Other Language="Java" Text=
 		"
 		System.out.println(&#34;Arm going down from second floor.&#34;);
+		UppArmVan1_sig = false;
 		UppArmVan2_sig = false;
 		" />	
     </Algorithm>

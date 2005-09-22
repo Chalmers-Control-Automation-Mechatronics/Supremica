@@ -74,8 +74,8 @@
 		<ECTransition Source="Q2" Destination="Q3" Condition="Mat" />
 		<ECTransition Source="Q2" Destination="Q7" Condition="UrMatning" />
 		<ECTransition Source="Q3" Destination="Q4" Condition="DelayDone" />
-		<ECTransition Source="Q4" Destination="Q5" Condition="LitenKula_var" />
-		<ECTransition Source="Q4" Destination="Q6" Condition="StorKula_var" />
+		<ECTransition Source="Q4" Destination="Q5" Condition="Values AND LitenKula_var" />
+		<ECTransition Source="Q4" Destination="Q6" Condition="Values AND StorKula_var" />
 		<ECTransition Source="Q5" Destination="Q2" Condition="1" />
 		<ECTransition Source="Q6" Destination="Q2" Condition="1" />
 		<ECTransition Source="Q7" Destination="Q8" Condition="Values AND NOT KulaMatstation_sig" />

@@ -126,6 +126,9 @@ public class CompositeFBType extends FBType
 			String curFrom = (String) iter.next();
 			String curTo = (String) dataConnectionSpecs.get(curFrom);
 
+            //Turn hash key curFrom:curTo to only curFrom
+ 		    curFrom = curFrom.substring(0,curFrom.indexOf(':'));
+
 			String curFromInstance = getInstanceName(curFrom);
 			String curFromSignal = getSignalName(curFrom);
 			String curToInstance = getInstanceName(curTo);
@@ -182,7 +185,8 @@ public class CompositeFBType extends FBType
 
 	public void addDataConnection(String from, String to)
 	{
-		dataConnectionSpecs.put(from,to);
+		// Hash key "from:to" needed for; one data out to multiple data in
+		dataConnectionSpecs.put(from+":"+to,to);
 	}
 
 	private String getInstanceName(String cntSpec)

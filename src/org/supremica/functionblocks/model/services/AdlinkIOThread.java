@@ -65,7 +65,7 @@ public class AdlinkIOThread extends Thread
 	private boolean serviceActive = true;
 	private ServiceFBInstance serviceFB;
 	private Variables serviceFBVariables;
-	
+
 	private int readCount = 0;
 
 	//========================================================================
@@ -79,7 +79,7 @@ public class AdlinkIOThread extends Thread
 
 		try
 		{
-			//driver = new AdlinkPCI7432();
+			driver = new AdlinkPCI7432();
 		}
 		catch(Exception e)
 		{
@@ -129,8 +129,8 @@ public class AdlinkIOThread extends Thread
 				// read from the Digital I/O card.
 				try
 				{
-					System.out.println("AdlinkIOThread.run(): Reading inputs.");
-					//driver.getSignalArray(readValues);
+					//System.out.println("AdlinkIOThread.run(): Reading inputs.");
+					driver.getSignalArray(readValues);
 				}
 				catch(Exception e)
 				{
@@ -145,14 +145,14 @@ public class AdlinkIOThread extends Thread
 				{
 					//System.out.println("AdlinkIOThread.run(): Setting var INPUT" + i + " to " + readValues[i]);
 					((BooleanVariable) serviceFBVariables.getVariable("INPUT" + i)).setValue(new Boolean(readValues[i]));
-					if (readCount % 5 == 0)
+					/*if (readCount % 5 == 0)
 					{
 						((BooleanVariable) serviceFBVariables.getVariable("INPUT0")).setValue(new Boolean(true));
 					}
 					else if (readCount % 9 == 0)
 					{
 						((BooleanVariable) serviceFBVariables.getVariable("INPUT0")).setValue(new Boolean(false));
-					}
+					}*/
 				}
 
 				// send output event
@@ -170,8 +170,8 @@ public class AdlinkIOThread extends Thread
 				// write to the Digital I/O card.
 				try
 				{
-					System.out.println("AdlinkIOThread.run(): Writing outputs.");
-					//driver.setSignalArray(writeValues);
+					//System.out.println("AdlinkIOThread.run(): Writing outputs.");
+					driver.setSignalArray(writeValues);
 				}
 				catch(Exception e)
 				{

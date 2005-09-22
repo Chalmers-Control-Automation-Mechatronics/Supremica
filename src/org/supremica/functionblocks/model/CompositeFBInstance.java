@@ -70,10 +70,10 @@ public class CompositeFBInstance extends FBInstance
 	// the same for internal data connection
 	private Map internalDataInputConnections = new HashMap();
 	private Map internalDataOutputConnections = new HashMap();
-	
+
 	//================================================================
     private CompositeFBInstance() {}
-	
+
     public CompositeFBInstance(String n, Resource r, CompositeFBType t)
     {
 		setName(n);
@@ -83,13 +83,13 @@ public class CompositeFBInstance extends FBInstance
 	//================================================================
 
 
-	//=================================================================================================	
+	//=================================================================================================
 	// following methods are used during the creation of the instance
 
 	public void addFBInstance(String instName,String typeName)
 	{
 		fbInstances.put(instName,resource.getFBType(typeName).createInstance(getName()+"."+instName));
-	}	
+	}
 
 	public FBInstance getFBInstance(String instName)
 	{
@@ -129,6 +129,7 @@ public class CompositeFBInstance extends FBInstance
 
 	public void addDataConnection(String fromInstance,String fromData, String toInstance, String toData)
 	{
+		System.out.println(fromInstance+"."+fromData+":"+toInstance+"."+toData);
 		Connection newConnection = new Connection(getFBInstance(fromInstance), fromData);
 		getFBInstance(toInstance).addDataInputConnection(toData, newConnection);
 	}
@@ -141,25 +142,25 @@ public class CompositeFBInstance extends FBInstance
 		Connection internalCnt = (Connection) internalEventOutputConnections.get(output);
 		internalCnt.getFBInstance().addEventOutputConnection(internalCnt.getSignalName(),cnt);
     }
-    
+
     public void addDataInputConnection(String input, Connection cnt)
-    {	
+    {
 		Connection internalCnt = (Connection) internalDataInputConnections.get(input);
-		internalCnt.getFBInstance().addDataInputConnection(internalCnt.getSignalName(),cnt);	
+		internalCnt.getFBInstance().addDataInputConnection(internalCnt.getSignalName(),cnt);
     }
 
 	public void receiveEvent(String eventInput)
 	{
 		Connection internalCnt = (Connection) internalEventInputConnections.get(eventInput);
-		internalCnt.getFBInstance().receiveEvent(internalCnt.getSignalName());		
+		internalCnt.getFBInstance().receiveEvent(internalCnt.getSignalName());
 	}
 
 	public Variable getDataOutput(String dataOutput)
     {
 		Connection internalCnt = (Connection) internalDataOutputConnections.get(dataOutput);
-		return internalCnt.getFBInstance().getDataOutput(internalCnt.getSignalName());	
+		return internalCnt.getFBInstance().getDataOutput(internalCnt.getSignalName());
     }
-	
+
 	public void setVariableValue(String name, String value)
 	{
 
@@ -169,7 +170,7 @@ public class CompositeFBInstance extends FBInstance
 			System.exit(1);
 		}
 
-		Connection internalCnt = (Connection) internalDataInputConnections.get(name);		
+		Connection internalCnt = (Connection) internalDataInputConnections.get(name);
 		internalCnt.getFBInstance().setVariableValue(internalCnt.getSignalName(),value);
 	}
 

@@ -7,6 +7,7 @@
 
     <FB Name="restart" Type="E_RESTART" />
     <FB Name="merge" Type="E_MERGE2" />
+    <FB Name="merge2" Type="E_MERGE2" />
     <FB Name="splitStor" Type="E_SPLIT2" />
     <FB Name="splitLiten" Type="E_SPLIT2" />
 	<FB Name="kulbana" Type="Kulbana_composit" />
@@ -20,7 +21,8 @@
 	  <EventConnections>
 	      <Connection Source="restart.COLD" Destination="merge.EI1" />
 		  <Connection Source="merge.EO" Destination="kulbana.INIT" />
-		  <Connection Source="kulbana.INITO" Destination="kulbana.InPortvakt" />
+		  <Connection Source="kulbana.INITO" Destination="merge2.EI1" />
+		  <Connection Source="merge2.EO" Destination="kulbana.InPortvakt" />
 		  <Connection Source="kulbana.KulaPortvakt" Destination="kulbana.UrPortvakt" />
 
 		  <Connection Source="kulbana.KulaMatlyft" Destination="matlyft.KulaMatlyft" />
@@ -58,7 +60,7 @@
   		  <Connection Source="arm.UppArmVan2" Destination="kulbana.UppArmVan2" />
   		  <Connection Source="arm.ArmHem" Destination="kulbana.ArmHem" />
 
-  		  <Connection Source="kulbana.ArmHemma" Destination="merge.EI2" />
+  		  <Connection Source="kulbana.ArmHemma" Destination="merge2.EI2" />
 		  
           </EventConnections>
 
