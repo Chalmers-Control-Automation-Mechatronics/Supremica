@@ -64,13 +64,13 @@
 
 	  <!-- Values split -->
 	  <Connection Source="adlink.VALUES" Destination="split7.EI" />
-	  <Connection Source="split.EO1" Destination="pv.Values" />
-	  <Connection Source="split.EO2" Destination="ml.Values" />
-	  <Connection Source="split.EO3" Destination="ms.Values" />
-	  <Connection Source="split.EO4" Destination="hs.Values" />
-	  <Connection Source="split.EO5" Destination="vn1.Values" />
-	  <Connection Source="split.EO6" Destination="vn2.Values" />
-	  <Connection Source="split.EO7" Destination="ar.Values" />
+	  <Connection Source="split7.EO1" Destination="pv.Values" />
+	  <Connection Source="split7.EO2" Destination="ml.Values" />
+	  <Connection Source="split7.EO3" Destination="ms.Values" />
+	  <Connection Source="split7.EO4" Destination="hs.Values" />
+	  <Connection Source="split7.EO5" Destination="vn1.Values" />
+	  <Connection Source="split7.EO6" Destination="vn2.Values" />
+	  <Connection Source="split7.EO7" Destination="ar.Values" />
 
 	  <!-- Write merge -->
 	  <Connection Source="pv.Write" Destination="merge7.EI1" />
@@ -89,7 +89,7 @@
 
 	  <!-- Matlyft -->
 	  <Connection Source="UppMatlyft" Destination="ml.UppMatlyft" />
-	  <Connection Source="ml.KulaMatlyft" Destination="KulaLyft" />
+	  <Connection Source="ml.KulaMatlyft" Destination="KulaMatlyft" />
 	  <Connection Source="ml.MatlyftNere" Destination="MatlyftNere" />
 
 	  <!-- Matstation -->
@@ -120,7 +120,7 @@
 	  <!-- Arm -->
 	  <Connection Source="UppArmVan1" Destination="ar.UppArmVan1" />
 	  <Connection Source="UppArmVan2" Destination="ar.UppArmVan2" />
-	  <Connection Source="ArmHem" Destination="ar.ArmHemma" />
+	  <Connection Source="ArmHem" Destination="ar.ArmHem" />
 	  <Connection Source="ar.ArmVan1" Destination="ArmVan1" />
 	  <Connection Source="ar.ArmVan2" Destination="ArmVan2" />
 	  <Connection Source="ar.ArmHemma" Destination="ArmHemma" />
