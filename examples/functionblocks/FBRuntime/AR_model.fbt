@@ -9,7 +9,9 @@
 
       <Event Name="Values">
 	    <With Var="ArmVan1_sig" />
+	    <With Var="KulaVan1_sig" />
 	    <With Var="ArmVan2_sig" />
+	    <With Var="KulaVan2_sig" />
 	    <With Var="KulaFast_sig" />
 	    <With Var="ArmHemma_sig" />
 	  </Event>
@@ -30,7 +32,9 @@
 
     <InputVars>
 	  <VarDeclaration Name="ArmVan1_sig" Type="BOOL"/>
+	  <VarDeclaration Name="KulaVan1_sig" Type="BOOL"/>
 	  <VarDeclaration Name="ArmVan2_sig" Type="BOOL"/>
+	  <VarDeclaration Name="KulaVan2_sig" Type="BOOL"/>
 	  <VarDeclaration Name="KulaFast_sig" Type="BOOL"/>
 	  <VarDeclaration Name="ArmHemma_sig" Type="BOOL"/>
     </InputVars>
@@ -110,7 +114,7 @@
 		<ECTransition Source="Q10" Destination="Q11" Condition="Values AND ArmVan2_sig" />
 		<ECTransition Source="Q11" Destination="Q12" Condition="Values AND KulaFast_sig" />
 		<ECTransition Source="Q12" Destination="Q13" Condition="ArmHem" />
-		<ECTransition Source="Q13" Destination="Q14" Condition="Values AND NOT ArmVan2_sig" />
+		<ECTransition Source="Q13" Destination="Q14" Condition="Values AND NOT KulaVan2_sig" />
 		<ECTransition Source="Q14" Destination="Q15" Condition="Values AND ArmHemma_sig" />
 		<ECTransition Source="Q15" Destination="Q16" Condition="Values AND NOT KulaFast_sig" />
 		<ECTransition Source="Q16" Destination="Q0" Condition="1" />

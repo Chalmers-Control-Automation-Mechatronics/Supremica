@@ -62,7 +62,7 @@
 		<ECTransition Source="Q1" Destination="Q2" Condition="Values AND NOT KulaVan_sig" />
 		<ECTransition Source="Q2" Destination="Q0" Condition="1" />
 		<ECTransition Source="Q3" Destination="Q4" Condition="Values AND KulaFast_sig" />
-		<ECTransition Source="Q4" Destination="Q0" Condition="1" />
+		<ECTransition Source="Q4" Destination="Q0" Condition="Values AND NOT KulaVan_sig" />
 		<ECTransition Source="Q5" Destination="Q0" Condition="1" />
     </ECC>
     <Algorithm Name="LiftFloorUp">

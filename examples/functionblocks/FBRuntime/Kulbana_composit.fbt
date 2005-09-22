@@ -48,7 +48,6 @@
     <FB Name="pv" Type="PV_model" />
     <FB Name="ml" Type="ML_model" />
     <FB Name="ms" Type="MS_model" />
-    <FB Name="msdelay" Type="E_DELAY" />
     <FB Name="hs" Type="HS_model" />
     <FB Name="vn1" Type="VN_model" />
     <FB Name="vn2" Type="VN_model" />
@@ -95,11 +94,9 @@
 	  <!-- Matstation -->
 	  <Connection Source="Mat" Destination="ms.Mat" />
 	  <Connection Source="UrMatning" Destination="ms.UrMatning" />
-	  <Connection Source="msdelay.EO" Destination="ms.DelayDone" />
 	  <Connection Source="ms.KulaMatstation" Destination="KulaMatstation" />
 	  <Connection Source="ms.StorKula" Destination="StorKula" />
 	  <Connection Source="ms.LitenKula" Destination="LitenKula" />
-	  <Connection Source="ms.Delay" Destination="msdelay.START" />
 
 	  <!-- Hiss -->
 	  <Connection Source="UppHissVan1" Destination="hs.UppHissVan1" />
@@ -129,7 +126,7 @@
 
 	<DataConnections>
 
-	  <!--Connection Source="500" Destination="cycle.DT" /-->
+	  <Connection Source="200" Destination="cycle.DT" />
 
 	  <!-- Portvakt signals -->	
 	  <Connection Source="adlink.INPUT0" Destination="pv.KulaPortvakt_sig" />
@@ -149,7 +146,6 @@
 	  <Connection Source="adlink.INPUT6" Destination="ms.LitenKula_sig" />
  	  <Connection Source="ms.Mat_sig" Destination="adlink.OUTPUT4" />
  	  <Connection Source="ms.UrMatning_sig" Destination="adlink.OUTPUT3" />
- 	  <Connection Source="300" Destination="msdelay.DT" />
 
 	  <!-- Hiss signal -->
 	  <Connection Source="adlink.INPUT7" Destination="hs.HissNere_sig" />
@@ -181,7 +177,9 @@
 
 	  <!-- Arm signals -->
 	  <Connection Source="adlink.INPUT20" Destination="ar.ArmVan1_sig" />
+	  <Connection Source="adlink.INPUT13" Destination="ar.KulaVan1_sig" />
 	  <Connection Source="adlink.INPUT21" Destination="ar.ArmVan2_sig" />
+	  <Connection Source="adlink.INPUT16" Destination="ar.KulaVan2_sig" />
 	  <Connection Source="adlink.INPUT22" Destination="ar.KulaFast_sig" />
 	  <Connection Source="adlink.INPUT17" Destination="ar.ArmHemma_sig" />
  	  <Connection Source="ar.UppArmVan1_sig" Destination="adlink.OUTPUT13" />

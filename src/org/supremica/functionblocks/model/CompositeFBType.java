@@ -138,17 +138,18 @@ public class CompositeFBType extends FBType
 			{
 				// TODO: Too ugly solution!
 				// maybe constant data specification
-				//try
-				//{
-				//	System.out.println("---------- Setting variable " + curToSignal + " to " + curFromSignal);
-				//	newInstance.getFBInstance(curToInstance).setVariableValue(curToSignal,curFromSignal);
-				//}
-				//catch (Exception e)
-				//{
-				//	System.out.println("---------- Cought exception with " + curFromSignal);
-				//}
+				try
+				{
+					System.out.println("---------- Setting variable " + curToSignal + " to " + curFromSignal);
+					newInstance.getFBInstance(curToInstance).setVariableValue(curToSignal,curFromSignal);
+
+				}
+				catch (Exception e)
+				{
+					System.out.println("---------- Cought exception with " + curFromSignal);
+				}
 				// internal data input connection
-				//System.out.println("---------- Setting internal data connection to " + curToInstance +"."+ curToSignal);
+				System.out.println("---------- Setting internal data connection to " + curToInstance +"."+ curToSignal);
  				newInstance.addInternalDataInputConnection(curFromSignal, curToInstance, curToSignal);
 			}
 			else if (curToInstance.equals(""))

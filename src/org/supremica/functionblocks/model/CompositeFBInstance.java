@@ -129,7 +129,7 @@ public class CompositeFBInstance extends FBInstance
 
 	public void addDataConnection(String fromInstance,String fromData, String toInstance, String toData)
 	{
-		System.out.println(fromInstance+"."+fromData+":"+toInstance+"."+toData);
+		//System.out.println(fromInstance+"."+fromData+":"+toInstance+"."+toData);
 		Connection newConnection = new Connection(getFBInstance(fromInstance), fromData);
 		getFBInstance(toInstance).addDataInputConnection(toData, newConnection);
 	}

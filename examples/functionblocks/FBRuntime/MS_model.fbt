@@ -6,11 +6,6 @@
       <Event Name="Mat" />
       <Event Name="UrMatning" />
 
-      <Event Name="DelayDone">
-	    <With Var="StorKula_sig" />
-	    <With Var="LitenKula_sig" />
-      </Event>
-
       <Event Name="Values">
 	    <With Var="KulaMatstation_sig" />
 	    <With Var="StorKula_sig" />
@@ -21,7 +16,6 @@
       <Event Name="KulaMatstation" />
       <Event Name="StorKula" />
       <Event Name="LitenKula" />
-      <Event Name="Delay" />
 
       <Event Name="Write">
 	    <With Var="Mat_sig" />
@@ -51,7 +45,6 @@
         <ECState Name="Q2" />
         <ECState Name="Q3">
 		    <ECAction Algorithm="DoMeasuring" Output="Write" />
-		    <ECAction Output="Delay" />
 	    </ECState>    
         <ECState Name="Q4">
 		    <ECAction Algorithm="StoreResultAndEndMeasuring" Output="Write" />
@@ -73,9 +66,9 @@
 		<ECTransition Source="Q1" Destination="Q2" Condition="1" />
 		<ECTransition Source="Q2" Destination="Q3" Condition="Mat" />
 		<ECTransition Source="Q2" Destination="Q7" Condition="UrMatning" />
-		<ECTransition Source="Q3" Destination="Q4" Condition="DelayDone" />
-		<ECTransition Source="Q4" Destination="Q5" Condition="Values AND LitenKula_var" />
-		<ECTransition Source="Q4" Destination="Q6" Condition="Values AND StorKula_var" />
+		<ECTransition Source="Q3" Destination="Q4" Condition="Values AND (StorKula_sig OR LitenKula_sig)" />
+		<ECTransition Source="Q4" Destination="Q5" Condition="LitenKula_var" />
+		<ECTransition Source="Q4" Destination="Q6" Condition="StorKula_var" />
 		<ECTransition Source="Q5" Destination="Q2" Condition="1" />
 		<ECTransition Source="Q6" Destination="Q2" Condition="1" />
 		<ECTransition Source="Q7" Destination="Q8" Condition="Values AND NOT KulaMatstation_sig" />
@@ -94,6 +87,7 @@
 		System.out.println(&#34;Store result and end measuring.&#34;);
 		StorKula_var = StorKula_sig;
 		LitenKula_var = LitenKula_sig;
+		System.out.println(&#34;StorKula=&#34; + StorKula_var + &#34; LitenKula=&#34; + LitenKula_var);
 		Mat_sig = false;
 		" />	
     </Algorithm>
