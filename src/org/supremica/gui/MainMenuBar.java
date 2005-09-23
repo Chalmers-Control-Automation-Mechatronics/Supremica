@@ -496,10 +496,8 @@ public class MainMenuBar
 	    menuProject.addSeparator();
 	}
 
-
 	if (SupremicaProperties.includeAnimator())
 	{
-
 	    // Project.Animator
 	    JMenuItem menuProjectAnimator = new JMenuItem();
 

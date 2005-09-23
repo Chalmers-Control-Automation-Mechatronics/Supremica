@@ -1087,7 +1087,7 @@ public class Automata
 	public void clear()
 	{
 		/*
-		ArrayList theAutomataCopy = new ArrayList(theAutomata);
+		ArrayList theAutomataCopy = new ArrayList(theAutomat)a;
 
 		for (Iterator autIt = theAutomataCopy.iterator(); autIt.hasNext(); )
 		{
@@ -1394,6 +1394,11 @@ public class Automata
 		{
 			// This is InsaNe
 			return false;
+		}
+		else if (size() > 500)
+		{
+			logger.warn("Skipping sanity...");
+			return true;
 		}
 
 		// Get the union alphabet (ignoring consistency here)

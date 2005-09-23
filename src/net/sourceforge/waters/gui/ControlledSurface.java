@@ -689,17 +689,21 @@ public class ControlledSurface
 				    // No move?
 				    if ((dx == 0) && (dy == 0))
 				    {
-					return;
+						return;
 				    }
 				    // is this the start of the move or a continuation of it
-				    if (!selectedObjects.isEmpty()) {
-					if (move == null) {
-					    move = new MoveObjects(this, selectedObjects, new Point2D.Double(dx, dy));
-					} else {
-					    Point2D p = move.getDisplacement();
-					    p.setLocation(p.getX() + dx, p.getY() + dy);
-					    move.setDisplacement(p);
-					}
+				    if (!selectedObjects.isEmpty())
+					{
+						if (move == null) 
+						{
+							move = new MoveObjects(this, selectedObjects, new Point2D.Double(dx, dy));
+						} 
+						else 
+						{
+							Point2D p = move.getDisplacement();
+							p.setLocation(p.getX() + dx, p.getY() + dy);
+							move.setDisplacement(p);
+						}
 				    }
 				    // There should only be one object here, or maybe two, 
 					// a node and it's label or an edge and it's labelgroup...

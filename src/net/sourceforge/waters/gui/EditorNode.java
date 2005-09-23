@@ -371,48 +371,10 @@ public class EditorNode
 		g2d.setStroke(BASICSTROKE);
 		g2d.drawLine(borderX, borderY, outerX, outerY);
 		
-		/*
-		// Draw triangle
-		int height = 8; // Triangle height
-		int[] xcoords = new int[3];
-		int[] ycoords = new int[3];
-		//xcoords[0] = borderX;
-		//ycoords[0] = borderY;
-		xcoords[0] = getX() + (int) ((RADIUS+1) * Math.sin(INITARROWANGLE));
-		ycoords[0] = getY() + (int) ((RADIUS+1) * Math.cos(INITARROWANGLE));
-		xcoords[1] = xcoords[0] + (int) (height * Math.sin(INITARROWANGLE - Math.PI / 6));
-		ycoords[1] = ycoords[0] + (int) (height * Math.cos(INITARROWANGLE - Math.PI / 6));
-		xcoords[2] = xcoords[0] + (int) (height * Math.cos(Math.PI / 2 - (INITARROWANGLE + Math.PI / 6)));
-		ycoords[2] = ycoords[0] + (int) (height * Math.sin(Math.PI / 2 - (INITARROWANGLE + Math.PI / 6)));
-		g2d.fillPolygon(xcoords, ycoords, 3);
-		*/
-
-		// The angle and the point (the rest of the code is copied from EditorEdge!)
+		// Draw arrow
 		double theta = INITARROWANGLE;
 		int x = (int) Math.ceil(getX() + Math.sin(theta)*EditorNode.RADIUS);
 		int y = (int) Math.ceil(getY() + Math.cos(theta)*EditorNode.RADIUS);
-
-		// From EditorEdge
-		{
-			// The length of the side of the arrow
-			int length = 10;
-			// The angular width of the arrow (half of it actually)
-			double phi = Math.PI / 8.0;
-			
-			// Arrays of coordinates for the corners
-			int[] xcoords = new int[3];
-			int[] ycoords = new int[3];		
-			
-			// Draw arrow, the first pair of coordinates is the point
-			xcoords[0] = x;
-			ycoords[0] = y;
-			xcoords[1] = xcoords[0] + (int) Math.ceil(length * Math.sin(theta - phi));
-			ycoords[1] = ycoords[0] + (int) Math.ceil(length * Math.cos(theta - phi));
-			xcoords[2] = xcoords[0] + (int) Math.ceil(length * Math.cos(Math.PI / 2.0 - (theta + phi)));
-			ycoords[2] = ycoords[0] + (int) Math.ceil(length * Math.sin(Math.PI / 2.0 - (theta + phi)));
-			
-			// Do the drawing!
-			g2d.fillPolygon(xcoords, ycoords, 3); 
-		}
+		EditorEdge.drawArrow(x, y, theta, g2d);
 	}
 }

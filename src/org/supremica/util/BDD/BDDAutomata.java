@@ -623,8 +623,7 @@ public class BDDAutomata
 	public double count_states(int bdd)
 	{
 		switch (Options.count_algo)
-		{
-			
+		{			
 		case Options.COUNT_NONE :
 			return 0;
 			
@@ -633,7 +632,7 @@ public class BDDAutomata
 			// the easy way
 			int new_bdd = removeDontCareS(bdd);
 			double states = satCount(new_bdd);
-
+			
 			// System.out.println("states= " + states + ", div = 2^" + (2 * size_states + size_events));
 			if (states != -1)
 			{
@@ -653,7 +652,7 @@ public class BDDAutomata
 
 			return c.get();
 		}
-
+		
 		return 0;    // just in case :)
 	}
 

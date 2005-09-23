@@ -261,19 +261,22 @@ public class ExampleTemplates
 		//String prefix = extraPrefix + "/ManufacturingExamples/";
 		String prefix = extraPrefix + "/OtherExamples/";
 
-		thisGroup.addItem(new TemplateItem("Flexible Manufacturing System (incomplete)", prefix + "flexibleManufacturingSystem.xml"));
-		thisGroup.addItem(new TemplateItem("Robot Assembly Cell", prefix + "robotAssemblyCell.xml"));
-		thisGroup.addItem(new TemplateItem("Flexible Manufacuring Cell", prefix + "flexibleManufacturingCell.xml"));
 		thisGroup.addItem(new TemplateItem("Automated Guided Vehicles", prefix + "agv.xml"));
 		//thisGroup.addItem(new TemplateItem("Automated Guided Vehicle, immediate events", prefix + "agvImmediate.xml"));
-		thisGroup.addItem(new TemplateItem("Circular Table", prefix + "circularTable.xml"));
-		thisGroup.addItem(new TemplateItem("Rotation Table", prefix + "rotationTable.xml"));
+		thisGroup.addItem(new TemplateItem("Dosing Unit", prefix + "dosingUnit.xml"));
 		thisGroup.addItem(new TemplateItem("Welding Robots", prefix + "weldingRobots.xml"));
 		thisGroup.addItem(new TemplateItem("Simple Manufacturing Example", prefix + "simpleManufacturingExample.xml"));
 		thisGroup.addItem(new TemplateItem("Parallel Manufacturing Example", prefix + "parallelManufacturingExample.xml"));
-		thisGroup.addItem(new TemplateItem("Dosing Unit", prefix + "dosingUnit.xml"));
+		thisGroup.addItem(new TemplateItem("Robot Assembly Cell", prefix + "robotAssemblyCell.xml"));
+		thisGroup.addItem(new TemplateItem("Flexible Production Cell", prefix + "flexibleManufacturingCell.xml"));
+		thisGroup.addItem(new TemplateItem("Circular Table", prefix + "circularTable.xml"));
+		thisGroup.addItem(new TemplateItem("Rotation Table", prefix + "rotationTable.xml"));
 		thisGroup.addItem(new TemplateItem("Machine Buffer Machine", prefix + "machineBufferMachine.xml"));
 		thisGroup.addItem(new TemplateItem("Tank Process", prefix + "tankProcess.xml"));
+		thisGroup.addItem(new TemplateItem("Flexible Manufacturing System (incomplete)", prefix + "flexibleManufacturingSystem.xml"));
+
+		prefix = extraPrefix + "/ManufacturingExamples/";
+		thisGroup.addItem(new TemplateItem("Intertwined Product Cycles", prefix + "IntertwinedProductCycles.xml"));
     }
     
     private void initializeGames()

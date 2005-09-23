@@ -97,7 +97,7 @@
 		<Transition source="a1" dest="a3" event="2"/>
 		<Transition source="a2" dest="a1" event="3"/>
 		<Transition source="a3" dest="a1" event="4"/>
-		<Transition source="a4" dest="a2" event="5"/>
+		<Transition source="a4" dest="a4" event="5"/>
 	</Transitions>
 </Automaton>
 <Automaton name="Empty-full-empty cycle" type="Specification">

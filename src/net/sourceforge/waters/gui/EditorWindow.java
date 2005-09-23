@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorWindow
 //###########################################################################
-//# $Id: EditorWindow.java,v 1.19 2005-08-30 00:18:45 siw4 Exp $
+//# $Id: EditorWindow.java,v 1.20 2005-09-23 14:33:18 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -104,7 +104,8 @@ public class EditorWindow
 		final int eventswidth = events.getSize().width;
 		final int separatorwidth = splitwidth - surfacewidth - eventswidth;
 		final int halfwidth = (splitwidth - separatorwidth) >> 1;
-		if (halfwidth > 0) {
+		if (halfwidth > 0) 
+		{
 			final int prefeventswidth = events.getPreferredSize().width;
 			final int setwidth = Math.min(prefeventswidth, halfwidth);
 			final int divider = splitwidth - setwidth - separatorwidth;

@@ -1,4 +1,3 @@
-
 /*
  *  Supremica Software License Agreement
  *
@@ -154,10 +153,10 @@ public class AlphabetAnalyzer
 
 		while (eventMapIt.hasNext())
 		{
-			Set currSet = (Set) eventMapIt.next();
+			Automata currSet = (Automata) eventMapIt.next();
 
-			inLeft = currSet.contains(leftAut);
-			inRight = currSet.contains(rightAut);
+			inLeft = currSet.containsAutomaton(leftAut);
+			inRight = currSet.containsAutomaton(rightAut);
 
 			if (inLeft && inRight)
 			{
