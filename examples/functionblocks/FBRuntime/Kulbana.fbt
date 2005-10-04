@@ -3,6 +3,7 @@
   <VersionInfo  Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2005-06-12" />
   <InterfaceList>
     <EventInputs>
+	  <Event Name="INIT" />
       <Event Name="InPortvakt" />
       <Event Name="UrPortvakt" />
       <Event Name="UppMatlyft" />
@@ -17,6 +18,7 @@
       <Event Name="ArmHem" />
     </EventInputs>
     <EventOutputs>
+	  <Event Name="INITO" />
       <Event Name="KulaPortvak" />
       <Event Name="KulaMatlyft" />
       <Event Name="MatlyftNere" />
@@ -39,7 +41,10 @@
         <VarDeclaration Name="liten_kula" Type="INT" InitialValue="0" />
     </InternalVars>
     <ECC>
+        <ECState Name="START" />
         <ECState Name="INIT" />
+		    <ECAction Output="INITO" />
+	    </ECState>    
         <ECState Name="STATE1">
 		    <ECAction Algorithm="PrintKulaPortvakt" Output="KulaPortvakt" />
 	    </ECState>    
@@ -84,44 +89,47 @@
 	    </ECState>    
 
 
-		<ECTransition Source="INIT" Destination="STATE1" Condition="InPortvakt" />
-		<ECTransition Source="STATE1" Destination="INIT" Condition="1" />
+		<ECTransition Source="START" Destination="INIT" Condition="INIT" />
+		<ECTransition Source="INIT" Destination="START" Condition="1" />
 
-		<ECTransition Source="INIT" Destination="STATE2" Condition="UrPortvakt" />
-		<ECTransition Source="STATE2" Destination="INIT" Condition="1" />
+		<ECTransition Source="START" Destination="STATE1" Condition="InPortvakt" />
+		<ECTransition Source="STATE1" Destination="START" Condition="1" />
 
-		<ECTransition Source="INIT" Destination="STATE3" Condition="UppMatlyft" />
-		<ECTransition Source="STATE3" Destination="INIT" Condition="1" />
+		<ECTransition Source="START" Destination="STATE2" Condition="UrPortvakt" />
+		<ECTransition Source="STATE2" Destination="START" Condition="1" />
 
-		<ECTransition Source="INIT" Destination="STATE4" Condition="Mat AND (liten_kula MOD 3 = 0)" />
-		<ECTransition Source="STATE4" Destination="INIT" Condition="1" />
+		<ECTransition Source="START" Destination="STATE3" Condition="UppMatlyft" />
+		<ECTransition Source="STATE3" Destination="START" Condition="1" />
 
-		<ECTransition Source="INIT" Destination="STATE5" Condition="Mat AND (liten_kula MOD 3 &gt; 0)" />
-		<ECTransition Source="STATE5" Destination="INIT" Condition="1" />
+		<ECTransition Source="START" Destination="STATE4" Condition="Mat AND (liten_kula MOD 3 = 0)" />
+		<ECTransition Source="STATE4" Destination="START" Condition="1" />
 
-		<ECTransition Source="INIT" Destination="STATE6" Condition="UrMatning" />
-		<ECTransition Source="STATE6" Destination="INIT" Condition="1" />
+		<ECTransition Source="START" Destination="STATE5" Condition="Mat AND (liten_kula MOD 3 &gt; 0)" />
+		<ECTransition Source="STATE5" Destination="START" Condition="1" />
 
-		<ECTransition Source="INIT" Destination="STATE7" Condition="UppHissVan1" />
-		<ECTransition Source="STATE7" Destination="INIT" Condition="1" />
+		<ECTransition Source="START" Destination="STATE6" Condition="UrMatning" />
+		<ECTransition Source="STATE6" Destination="START" Condition="1" />
 
-		<ECTransition Source="INIT" Destination="STATE8" Condition="UppHissVan2" />
-		<ECTransition Source="STATE8" Destination="INIT" Condition="1" />
+		<ECTransition Source="START" Destination="STATE7" Condition="UppHissVan1" />
+		<ECTransition Source="STATE7" Destination="START" Condition="1" />
 
-		<ECTransition Source="INIT" Destination="STATE9" Condition="UtVan1" />
-		<ECTransition Source="STATE9" Destination="INIT" Condition="1" />
+		<ECTransition Source="START" Destination="STATE8" Condition="UppHissVan2" />
+		<ECTransition Source="STATE8" Destination="START" Condition="1" />
 
-		<ECTransition Source="INIT" Destination="STATE10" Condition="UtVan2" />
-		<ECTransition Source="STATE10" Destination="INIT" Condition="1" />
+		<ECTransition Source="START" Destination="STATE9" Condition="UtVan1" />
+		<ECTransition Source="STATE9" Destination="START" Condition="1" />
 
-		<ECTransition Source="INIT" Destination="STATE11" Condition="UppArmVan1" />
-		<ECTransition Source="STATE11" Destination="INIT" Condition="1" />
+		<ECTransition Source="START" Destination="STATE10" Condition="UtVan2" />
+		<ECTransition Source="STATE10" Destination="START" Condition="1" />
 
-		<ECTransition Source="INIT" Destination="STATE12" Condition="UppArmVan2" />
-		<ECTransition Source="STATE12" Destination="INIT" Condition="1" />
+		<ECTransition Source="START" Destination="STATE11" Condition="UppArmVan1" />
+		<ECTransition Source="STATE11" Destination="START" Condition="1" />
 
-		<ECTransition Source="INIT" Destination="STATE13" Condition="ArmHem" />
-		<ECTransition Source="STATE13" Destination="INIT" Condition="1" />
+		<ECTransition Source="START" Destination="STATE12" Condition="UppArmVan2" />
+		<ECTransition Source="STATE12" Destination="START" Condition="1" />
+
+		<ECTransition Source="START" Destination="STATE13" Condition="ArmHem" />
+		<ECTransition Source="STATE13" Destination="START" Condition="1" />
 
 
     </ECC>

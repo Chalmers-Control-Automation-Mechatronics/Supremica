@@ -6,7 +6,6 @@
       <FBNetwork>
 
     <FB Name="restart" Type="E_RESTART" />
-    <FB Name="merge" Type="E_MERGE2" />
     <FB Name="merge2" Type="E_MERGE2" />
     <FB Name="splitStor" Type="E_SPLIT2" />
     <FB Name="splitLiten" Type="E_SPLIT2" />
@@ -19,8 +18,7 @@
 	<FB Name="arm" Type="Arm" />
 	
 	  <EventConnections>
-	      <Connection Source="restart.COLD" Destination="merge.EI1" />
-		  <Connection Source="merge.EO" Destination="kulbana.INIT" />
+	      <Connection Source="restart.COLD" Destination="kulbana.INIT" />
 		  <Connection Source="kulbana.INITO" Destination="merge2.EI1" />
 		  <Connection Source="merge2.EO" Destination="kulbana.InPortvakt" />
 		  <Connection Source="kulbana.KulaPortvakt" Destination="kulbana.UrPortvakt" />
