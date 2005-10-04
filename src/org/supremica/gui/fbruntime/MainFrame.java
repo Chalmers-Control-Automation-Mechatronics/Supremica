@@ -42,18 +42,23 @@
  */
 package org.supremica.gui.fbruntime;
 
-import javax.swing.JFrame;
-import com.nwoods.jgo.JGoView;
+import java.awt.*;
+import javax.swing.*;
+import javax.swing.border.*;
+
+import com.nwoods.jgo.*;
 
 
 public class MainFrame extends JFrame {
 
-    private javax.swing.JButton jButton1;
-    private javax.swing.JMenu jMenu1;
-    private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JTextPane jTextPane1;
-    private javax.swing.JToolBar jToolBar1;
-    
+    private JMenuBar theMenuBar;
+    private JMenu fileMenu;
+    private JToolBar theToolBar;
+    private JButton newButton;
+    private JTextPane statusLine;
+	private JSplitPane horizontalSplit;
+	private JSplitPane verticalSplit;
+
 
     /** Creates new form FBRuntimeMainFrame */
     public MainFrame() {
@@ -64,31 +69,47 @@ public class MainFrame extends JFrame {
      * initialize the form.
      */
     private void initComponents() {
-        jToolBar1 = new javax.swing.JToolBar();
-        jButton1 = new javax.swing.JButton();
-        jTextPane1 = new javax.swing.JTextPane();
-        jMenuBar1 = new javax.swing.JMenuBar();
-        jMenu1 = new javax.swing.JMenu();
 
+		// Frame settings
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("FBRuntime");
-        setFont(new java.awt.Font("Arial", 0, 12));
+        //setFont(new java.awt.Font("Arial", 0, 12));
         setName("mainFrame");
-        jButton1.setText("jButton1");
-        jToolBar1.add(jButton1);
+		setPreferredSize(new Dimension(800,600));
 
-        getContentPane().add(jToolBar1, java.awt.BorderLayout.NORTH);
 
-        jTextPane1.setBackground(javax.swing.UIManager.getDefaults().getColor("Button.background"));
-        jTextPane1.setBorder(new javax.swing.border.BevelBorder(javax.swing.border.BevelBorder.LOWERED));
-        jTextPane1.setText("Status Bar");
-        getContentPane().add(jTextPane1, java.awt.BorderLayout.SOUTH);
+		// MenuBar and menus
+        theMenuBar = new JMenuBar();
+        fileMenu = new JMenu();
+        fileMenu.setText("File");
+        //jMenu1.setFont(new java.awt.Font("Arial", 1, 12));
+        theMenuBar.add(fileMenu);
+        setJMenuBar(theMenuBar);
 
-        jMenu1.setText("Menu");
-        jMenu1.setFont(new java.awt.Font("Arial", 1, 12));
-        jMenuBar1.add(jMenu1);
+		
+		// ToolBar
+        theToolBar = new JToolBar();
+        newButton = new JButton();
+        newButton.setText("New");
+        theToolBar.add(newButton);
+        getContentPane().add(theToolBar, BorderLayout.NORTH);
+		
 
-        setJMenuBar(jMenuBar1);
+		// StatusLine
+        statusLine = new JTextPane();
+        statusLine.setBackground(UIManager.getDefaults().getColor("Button.background"));
+        statusLine.setBorder(new BevelBorder(BevelBorder.LOWERED));
+        statusLine.setText("Status Bar");
+        getContentPane().add(statusLine, BorderLayout.SOUTH);
+
+		
+		// Split Pnaes
+		horizontalSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+		verticalSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+		verticalSplit.setTopComponent(horizontalSplit);
+        getContentPane().add(verticalSplit, BorderLayout.CENTER);
+		
+
 
         pack();
     }
