@@ -46,7 +46,7 @@ import javax.swing.JFrame;
 import com.nwoods.jgo.JGoView;
 
 
-public class FBRuntimeMainFrame extends JFrame {
+public class MainFrame extends JFrame {
 
     private javax.swing.JButton jButton1;
     private javax.swing.JMenu jMenu1;
@@ -56,7 +56,7 @@ public class FBRuntimeMainFrame extends JFrame {
     
 
     /** Creates new form FBRuntimeMainFrame */
-    public FBRuntimeMainFrame() {
+    public MainFrame() {
         initComponents();
     }
     
@@ -99,7 +99,7 @@ public class FBRuntimeMainFrame extends JFrame {
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new FBRuntimeGUI().setVisible(true);
+                new MainFrame().setVisible(true);
             }
         });
     }
