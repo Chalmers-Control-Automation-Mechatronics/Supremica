@@ -42,6 +42,9 @@
  */
 package org.supremica.gui.fbruntime;
 
+import org.supremica.properties.SupremicaProperties;
+import org.supremica.log.*;
+
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.*;
@@ -51,18 +54,30 @@ import com.nwoods.jgo.*;
 
 public class MainFrame extends JFrame {
 
+	static
+	{
+		SupremicaProperties.setLogToConsole(false);
+		SupremicaProperties.setLogToGUI(true);
+	}
+
+	private Logger logger = LoggerFactory.createLogger(MainFrame.class);
+	private LogDisplay theLogDisplay = LogDisplay.getInstance();
+
     private JMenuBar theMenuBar;
     private JMenu fileMenu;
+	private JMenuItem fileExit;
     private JToolBar theToolBar;
     private JButton newButton;
-    private JTextPane statusLine;
+    //private JTextPane statusLine;
 	private JSplitPane horizontalSplit;
 	private JSplitPane verticalSplit;
 
 
-    /** Creates new form FBRuntimeMainFrame */
     public MainFrame() {
         initComponents();
+		setVisible(true);
+		setExtendedState(JFrame.MAXIMIZED_BOTH);
+		logger.info("Blah");
     }
     
     /** This method is called from within the constructor to
@@ -71,18 +86,18 @@ public class MainFrame extends JFrame {
     private void initComponents() {
 
 		// Frame settings
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setTitle("FBRuntime");
-        //setFont(new java.awt.Font("Arial", 0, 12));
         setName("mainFrame");
 		setPreferredSize(new Dimension(800,600));
 
 
 		// MenuBar and menus
         theMenuBar = new JMenuBar();
-        fileMenu = new JMenu();
-        fileMenu.setText("File");
-        //jMenu1.setFont(new java.awt.Font("Arial", 1, 12));
+        fileMenu = new JMenu("File");
+		fileExit = new JMenuItem("Exit");
+		fileMenu.add(fileExit);
+
         theMenuBar.add(fileMenu);
         setJMenuBar(theMenuBar);
 
@@ -96,33 +111,27 @@ public class MainFrame extends JFrame {
 		
 
 		// StatusLine
-        statusLine = new JTextPane();
-        statusLine.setBackground(UIManager.getDefaults().getColor("Button.background"));
-        statusLine.setBorder(new BevelBorder(BevelBorder.LOWERED));
-        statusLine.setText("Status Bar");
-        getContentPane().add(statusLine, BorderLayout.SOUTH);
+        //statusLine = new JTextPane();
+        //statusLine.setBackground(UIManager.getDefaults().getColor("Button.background"));
+        //statusLine.setBorder(new BevelBorder(BevelBorder.LOWERED));
+        //statusLine.setText("Status Bar");
+        //getContentPane().add(statusLine, BorderLayout.SOUTH);
 
 		
-		// Split Pnaes
+		// Split Panes
 		horizontalSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		verticalSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 		verticalSplit.setTopComponent(horizontalSplit);
+		verticalSplit.setBottomComponent(theLogDisplay.getComponent());
         getContentPane().add(verticalSplit, BorderLayout.CENTER);
-		
-
 
         pack();
     }
     
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new MainFrame().setVisible(true);
-            }
-        });
+
+    public static void main(String args[])
+	{
+		new MainFrame();
     }
-        
+	
 }

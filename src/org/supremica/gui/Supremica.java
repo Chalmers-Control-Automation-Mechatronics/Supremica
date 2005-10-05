@@ -71,7 +71,7 @@ public class Supremica
 	implements TableModelListener, Gui, VisualProjectContainerListener
 {
 	private static final long serialVersionUID = 1L;
-	private static Logger logger = LoggerFactory.createLogger(Supremica.class);
+	private Logger logger = LoggerFactory.createLogger(Supremica.class);
 	private LogDisplay theLogDisplay = LogDisplay.getInstance();
 	private JPanel contentPane;
 	private MainMenuBar menuBar = new MainMenuBar(this);

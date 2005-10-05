@@ -63,9 +63,6 @@ public class SupremicaWithGui
 		SupremicaProperties.setLogToGUI(true);
 	}
 
-	private static Logger logger = LoggerFactory.createLogger(org.supremica.gui.Supremica.class);
-	private final static InterfaceManager interfaceManager = InterfaceManager.getInstance();
-
 	private SupremicaWithGui() {}
 
 	public static org.supremica.gui.Supremica startSupremica()
