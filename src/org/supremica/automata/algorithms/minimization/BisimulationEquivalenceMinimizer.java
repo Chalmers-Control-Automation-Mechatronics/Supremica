@@ -84,9 +84,9 @@ public class BisimulationEquivalenceMinimizer
 	 */
 	private static boolean libraryLoaded;
 
-    // Load library
     static
     {
+		// Load library
 		try
 		{
         	System.loadLibrary("BisimulationEquivalence");
@@ -100,6 +100,12 @@ public class BisimulationEquivalenceMinimizer
 		{
 			ex.printStackTrace();
 			libraryLoaded = false;
+		}
+
+		// Unsuccessfull?
+		if (!libraryLoaded)
+		{
+			logger.info("Library BisimulationEquivalence not found, using java methods.");
 		}
     }
 

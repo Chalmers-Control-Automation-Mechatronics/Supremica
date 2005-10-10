@@ -68,7 +68,6 @@ public class ControlledSurface
 		mToolbar = t;
     }
 
-
 	public void setOptionsVisible(boolean v)
 	{
 		options.setVisible(v);
@@ -102,12 +101,14 @@ public class ControlledSurface
 		}
 	}
 
-	public void keyTyped(KeyEvent e)
+ 	public void keyTyped(KeyEvent e)
 	{
 		;
 	}
 
-	/** Handle the key released event from the text field. */
+	/** 
+	 * Handle the key released event from the text field. 
+	 */
 	public void keyReleased(KeyEvent e)
 	{
 		;
@@ -432,6 +433,44 @@ public class ControlledSurface
 				return;
 			}
 
+			// DragSelect!
+			if (dragSelect)
+			{
+				dragNowX = e.getX();
+				dragNowY = e.getY();
+
+				toBeSelected = getDragSelection();
+
+				// Select all that should be selected...
+				super.unselectAll();
+				// These have been selected previously and should still be selected
+				for (int i=0; i<selectedObjects.size(); i++)
+				{
+					EditorObject o = (EditorObject) selectedObjects.get(i);
+					o.setSelected(true);
+					LinkedList children = getChildren(o);
+					while (children.size() != 0)
+					{
+						((EditorObject) children.remove(0)).setSelected(true);
+					}
+				}
+				// These are in the current drag selection!
+				for (int i=0; i<toBeSelected.size(); i++)
+				{
+					EditorObject o = (EditorObject) toBeSelected.get(i);
+					o.setSelected(true);
+					LinkedList children = getChildren(o);
+					while (children.size() != 0)
+					{
+						((EditorObject) children.remove(0)).setSelected(true);
+					}
+				}
+
+				repaint(false);
+
+				return;
+			}
+
 			// Find the distances that the mouse has dragged (for moving and stuff)
 			int dx = 0;
 			int dy = 0;
@@ -500,44 +539,6 @@ public class ControlledSurface
 			lastX += dx;
 			lastY += dy;
 
-			// DragSelect!
-			if (dragSelect)
-			{
-				dragNowX = e.getX();
-				dragNowY = e.getY();
-
-				toBeSelected = getDragSelection();
-
-				// Select all that should be selected...
-				super.unselectAll();
-				// These have been selected previously and should still be selected
-				for (int i=0; i<selectedObjects.size(); i++)
-				{
-					EditorObject o = (EditorObject) selectedObjects.get(i);
-					o.setSelected(true);
-					LinkedList children = getChildren(o);
-					while (children.size() != 0)
-					{
-						((EditorObject) children.remove(0)).setSelected(true);
-					}
-				}
-				// These are in the current drag selection!
-				for (int i=0; i<toBeSelected.size(); i++)
-				{
-					EditorObject o = (EditorObject) toBeSelected.get(i);
-					o.setSelected(true);
-					LinkedList children = getChildren(o);
-					while (children.size() != 0)
-					{
-						((EditorObject) children.remove(0)).setSelected(true);
-					}
-				}
-
-				repaint(false);
-
-				return;
-			}
-
 			// Multiple selection?
 			if (getCommand() == SELECT)
 			{
@@ -553,13 +554,17 @@ public class ControlledSurface
 				}
 
 				// is this the start of the move or a continuation of it 
-				if (!selectedObjects.isEmpty()) {
-				    if (move == null) {
-					move = new MoveObjects(this, selectedObjects, new Point2D.Double(dx, dy));
-				    } else {
-					Point2D p = move.getDisplacement();
-					p.setLocation(p.getX() + dx, p.getY() + dy);
-					move.setDisplacement(p);
+				if (!selectedObjects.isEmpty()) 
+				{
+				    if (move == null) 
+					{
+						move = new MoveObjects(this, selectedObjects, new Point2D.Double(dx, dy));
+				    } 
+					else 
+					{
+						Point2D p = move.getDisplacement();
+						p.setLocation(p.getX() + dx, p.getY() + dy);
+						move.setDisplacement(p);
 				    }
 				}
 
@@ -650,9 +655,9 @@ public class ControlledSurface
 					{
 						EditorEdge edge = (EditorEdge) object;
   						edge.setPosition(edge.getTPointX() + dx, edge.getTPointY() + dy);
-					}
+					}					
 
-					// DONT MOVE LABELS IN MULTI MODE, (WITH THE OFFSETS IT'S NO FUN TO TRY TO GET IT RIGHT...)
+					// DONT MOVE LABELS IN MULTI MODE, (IT'S NO FUN TO TRY TO GET THE OFFSETS RIGHT...)
 					if (selectedObjects.size() == 1)
 					{
 						// Is it a label?
@@ -668,7 +673,7 @@ public class ControlledSurface
 						else if (object.getType() == EditorObject.LABELGROUP) // Don't move
 						{
 							EditorLabelGroup labelGroup = (EditorLabelGroup) object;
-
+							
 							//labelGroup.moveTo(labelGroup.getX() + dx, labelGroup.getY() + dy);
 							//labelGroup.setX(labelGroup.getX() + dx);
 							//labelGroup.setY(labelGroup.getY() + dy);

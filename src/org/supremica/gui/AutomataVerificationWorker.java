@@ -225,10 +225,12 @@ public class AutomataVerificationWorker
 			if (verificationSuccess)
 			{
 				JOptionPane.showMessageDialog(workbench.getFrame(), successMessage, "Good news", JOptionPane.INFORMATION_MESSAGE);
+				logger.info(successMessage);
 			}
 			else
 			{
 				JOptionPane.showMessageDialog(workbench.getFrame(), failureMessage, "Bad news", JOptionPane.INFORMATION_MESSAGE);
+				logger.info(failureMessage);
 			}
 
 			automataVerifier.displayInfo();

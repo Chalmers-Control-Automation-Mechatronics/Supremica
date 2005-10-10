@@ -3,7 +3,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorEdge
 //###########################################################################
-//# $Id: EditorEdge.java,v 1.26 2005-09-23 14:33:18 flordal Exp $
+//# $Id: EditorEdge.java,v 1.27 2005-10-10 12:23:09 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -253,7 +253,9 @@ public class EditorEdge
 			EditorNodeGroup s = (EditorNodeGroup) startNode;
 
 			s.removePosition(start);
-		} else {
+		} 
+		else 
+		{
 		    EditorNode s = (EditorNode)startNode;
 		    s.detachEdge(this);
 		}
@@ -500,8 +502,8 @@ public class EditorEdge
 	{
 		if (isSelfLoop())
 		{
-			tPoint.setLocation(tPoint.getX() + (endNode.getX() - (int) ox) / 2, tPoint.getY() + (endNode.getY() - (int) oy) / 2);
-
+			tPoint.setLocation(tPoint.getX() + (endNode.getX() - (int) ox), tPoint.getY() + (endNode.getY() - (int) oy));
+			
 			return;
 		}
 

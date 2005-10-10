@@ -306,7 +306,9 @@ public class AutomataMinimizer
 						(strategy == MinimizationStrategy.MostEventsFirst &&
 						 autA.nbrOfEvents() < aut.nbrOfEvents()) ||
 						(strategy == MinimizationStrategy.FewestEventsFirst &&
-						 autA.nbrOfEvents() > aut.nbrOfEvents()))
+						 //autA.nbrOfEvents() > aut.nbrOfEvents()))
+						 (autA.nbrOfTransitions() + 3*autA.nbrOfEpsilonTransitions()) > 
+						 (aut.nbrOfTransitions() + 3*aut.nbrOfEpsilonTransitions())))
 					{
 						autA = aut;
 					}						

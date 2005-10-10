@@ -65,10 +65,14 @@ public final class ExecutionDialog
 	private static final long serialVersionUID = 1L;
 	private List threadsToStop;
 	private JPanel contentPanel = null;
-	private JLabel operationLabel = null;
+
+	/** The header of the operation. */
+	private JLabel operationHeader = null;
+	/** The subheader of the operation */ 
+	private JLabel operationSubheader = null;
+
 	private JPanel infoPanel = null;
 	private JPanel progressPanel = null;
-	private JLabel operationHeader = null;
 	private JLabel infoValue = null;
 	private JProgressBar progressBar = null;
 	private JPanel currCenterPanel = null;
@@ -101,12 +105,12 @@ public final class ExecutionDialog
 		setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
 
 		JPanel operationPanel = new JPanel(new GridLayout(2, 1));
-		operationLabel = new JLabel();
-		operationLabel.setHorizontalAlignment(JLabel.LEFT);
-		operationPanel.add(operationLabel);
 		operationHeader = new JLabel();
-		operationHeader.setHorizontalAlignment(JLabel.CENTER);
+		operationHeader.setHorizontalAlignment(JLabel.LEFT);
 		operationPanel.add(operationHeader);
+		operationSubheader = new JLabel();
+		operationSubheader.setHorizontalAlignment(JLabel.CENTER);
+		operationPanel.add(operationSubheader);
 
 		// We have two panels that we switch between, infoPanel and progressPanel
 
@@ -165,6 +169,9 @@ public final class ExecutionDialog
 		threadsToStop.add(threadToStop);
 	}
 
+	/**
+	 * Sets the mode of the dialog. 
+	 */
 	public void setMode(ExecutionDialogMode mode)
 	{
 		currentMode = mode;
@@ -172,6 +179,14 @@ public final class ExecutionDialog
 		updateMode();
 	}
 
+	/**
+	 * Changes the subheader to the supplied string.
+	 */
+	public void setSubheader(String string)
+	{
+		operationSubheader.setText(string);
+	}
+   
 	/**
 	 * This must be called before changing mode to a progressMode.
 	 */
@@ -187,6 +202,10 @@ public final class ExecutionDialog
 		update();
 	}
 
+	/**
+	 * Sets value of progress bar. The value is shown as % of completion 
+	 * (with respect to the initialized min and max ).
+	 */
 	public void setProgress(int progressValue)
 	{
 		this.progressValue = progressValue;
@@ -242,8 +261,8 @@ public final class ExecutionDialog
 			}
 
 			// Update the dialog with the current mode
-			operationLabel.setText(currentMode.getId());
-			operationHeader.setText(currentMode.getText());
+			operationHeader.setText(currentMode.getId());
+			operationSubheader.setText(currentMode.getText());
 
 			if (currentMode.showValue())
 			{
@@ -261,72 +280,72 @@ public final class ExecutionDialog
 			/*
 			if (currentMode == ExecutionDialogMode.synchronizing)
 			{
-					operationLabel.setText(currentMode.getId());    // "Synchronizing...");
-					operationHeader.setText(currentMode.getText());    // "Number of states:");
+					operationHeader.setText(currentMode.getId());    // "Synchronizing...");
+					operationSubheader.setText(currentMode.getText());    // "Number of states:");
 					contentPanel.add(infoPanel, BorderLayout.CENTER);
 
 					currCenterPanel = infoPanel;
 			}
 			else if (currentMode == ExecutionDialogMode.verifying)
 			{
-					operationLabel.setText(currentMode.getId());    // "Verifying...");
-					operationHeader.setText(currentMode.getText());    // "Number of states:");
+					operationHeader.setText(currentMode.getId());    // "Verifying...");
+					operationSubheader.setText(currentMode.getText());    // "Number of states:");
 					contentPanel.add(infoPanel, BorderLayout.CENTER);
 
 					currCenterPanel = infoPanel;
 			}
 			else if (currentMode == ExecutionDialogMode.synthesizing)
 			{
-					operationLabel.setText(currentMode.getId());    // "Synthesizing...");
-					operationHeader.setText(currentMode.getText());    // "Number of states:");
+					operationHeader.setText(currentMode.getId());    // "Synthesizing...");
+					operationSubheader.setText(currentMode.getText());    // "Number of states:");
 					contentPanel.add(infoPanel, BorderLayout.CENTER);
 
 					currCenterPanel = infoPanel;
 			}
 			else if (currentMode == ExecutionDialogMode.buildingStates)
 			{
-					operationLabel.setText(currentMode.getId());    // "Building states...");
-					operationHeader.setText(currentMode.getText());    // "");
+					operationHeader.setText(currentMode.getId());    // "Building states...");
+					operationSubheader.setText(currentMode.getText());    // "");
 					contentPanel.add(progressPanel, BorderLayout.CENTER);
 
 					currCenterPanel = progressPanel;
 			}
 			else if (currentMode == ExecutionDialogMode.buildingTransitions)
 			{
-					operationLabel.setText(currentMode.getId());    // "Building transitions...");
-					operationHeader.setText(currentMode.getText());    // "");
+					operationHeader.setText(currentMode.getId());    // "Building transitions...");
+					operationSubheader.setText(currentMode.getText());    // "");
 					contentPanel.add(progressPanel, BorderLayout.CENTER);
 
 					currCenterPanel = progressPanel;
 			}
 			else if (currentMode == ExecutionDialogMode.matchingStates)
 			{
-					operationLabel.setText(currentMode.getId());    // "Matching states...");
-					operationHeader.setText(currentMode.getText());    // "");
+					operationHeader.setText(currentMode.getId());    // "Matching states...");
+					operationSubheader.setText(currentMode.getText());    // "");
 					contentPanel.add(progressPanel, BorderLayout.CENTER);
 
 					currCenterPanel = progressPanel;
 			}
 			else if (currentMode == ExecutionDialogMode.verifyingNonblocking)
 			{
-					operationLabel.setText(currentMode.getId());    // "Verifying nonblocking...");
-					operationHeader.setText(currentMode.getText());    // "");
+					operationHeader.setText(currentMode.getId());    // "Verifying nonblocking...");
+					operationSubheader.setText(currentMode.getText());    // "");
 					contentPanel.add(progressPanel, BorderLayout.CENTER);
 
 					currCenterPanel = progressPanel;
 			}
 			else if (currentMode == ExecutionDialogMode.verifyingMutualNonblockingFirstRun)
 			{
-					operationLabel.setText(currentMode.getId());    // "Verifying mutual nonblocking...");
-					operationHeader.setText(currentMode.getText());    // "");
+					operationHeader.setText(currentMode.getId());    // "Verifying mutual nonblocking...");
+					operationSubheader.setText(currentMode.getText());    // "");
 					contentPanel.add(progressPanel, BorderLayout.CENTER);
 
 					currCenterPanel = progressPanel;
 			}
 			else if (currentMode == ExecutionDialogMode.verifyingMutualNonblockingSecondRun)
 			{
-					operationLabel.setText(currentMode.getId());    // "Verifying mutual nonblocking...");
-					operationHeader.setText(currentMode.getText());    // "");
+					operationHeader.setText(currentMode.getId());    // "Verifying mutual nonblocking...");
+					operationSubheader.setText(currentMode.getText());    // "");
 					contentPanel.add(progressPanel, BorderLayout.CENTER);
 
 					currCenterPanel = progressPanel;
@@ -336,7 +355,7 @@ public final class ExecutionDialog
 			/*
 			 * This is what it should look like - let the mode keep track of itself
 			 *
-			 * operationLabel.setText(currentMode.getId());    // "Matching states...");
+			 * operationHeader.setText(currentMode.getId());    // "Matching states...");
 			 * contentPanel.add(progressPanel, BorderLayout.CENTER);
 			 *
 			 * currCenterPanel = infoPanel;

@@ -167,19 +167,23 @@ public class EditorNode
 
     public void setPosition(double x, double y)
     {
-	int oldx = getX();
-	int oldy = getY();
-	setX((int)x);
-	setY((int)y);
-	for (EditorEdge e : mEdges) {
-	    if (this == e.getStartNode()) {
-		e.updateControlPoint(oldx, oldy, true);
-	    } else if (this == e.getEndNode()) {
-		e.updateControlPoint(oldx, oldy, false);
-	    }
-	}
+		int oldx = getX();
+		int oldy = getY();
+		setX((int)x);
+		setY((int)y);
+		for (EditorEdge e : mEdges) 
+		{
+			if (this == e.getStartNode()) 
+			{
+				e.updateControlPoint(oldx, oldy, true);
+			} 
+			else if (this == e.getEndNode()) 
+			{
+				e.updateControlPoint(oldx, oldy, false);
+			}
+		}
     }
-
+	
     public Point2D getPosition()
     {
 	return (Point2D)position;
