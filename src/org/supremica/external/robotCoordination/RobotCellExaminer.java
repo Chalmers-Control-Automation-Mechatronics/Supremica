@@ -1,6 +1,7 @@
 package org.supremica.external.robotCoordination;
 
-import java.awt.*;
+import java.awt.FlowLayout;
+import java.awt.Frame;
 import java.awt.event.*;
 import java.io.*;
 import javax.swing.*;
@@ -13,7 +14,7 @@ import org.supremica.external.robotCoordination.RobotStudioInterface;
 public class RobotCellExaminer
     extends JDialog
 {
-	private static final long serialVersionUID = 1L;
+	// private static final long serialVersionUID = 1L;
 	private static Logger logger = LoggerFactory.createLogger(RobotCellExaminer.class);
 	private Frame owner = null;
 	private JPanel contentPane = null;
@@ -72,6 +73,7 @@ public class RobotCellExaminer
 		});
 		contentPane.add(openButton);
 
+		/*
 		JButton spanButton = new JButton("Generate spans");
 		spanButton.addActionListener(new ActionListener()
 		{
@@ -101,6 +103,7 @@ public class RobotCellExaminer
 			}
 		});
 		contentPane.add(collisionButton);
+		*/
 
 		// Demo button (only if demo file exists)
 		File file = new File(DEMOSTATION_FILENAME);
@@ -130,6 +133,35 @@ public class RobotCellExaminer
 			contentPane.add(demoButton);
 		}
 
+		// Box strategy demo button 
+		JButton demoButton = new JButton("Box strategy demo");
+		demoButton.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					// Is there an open file?
+					if (cell == null || !cell.isOpen())
+					{
+						// Open file if it exists...
+						File file = new File(DEMOSTATION_FILENAME);
+						if (file.exists())
+						{
+							openCell(file, RobotSimulatorType.RobotStudio);
+							
+						}
+						else
+						{
+							logger.error("File " + file + " does not exist.");
+							return;
+						}						
+					}
+
+					//Run the demo!
+					boxStrategy(cell);
+				}
+			});
+		contentPane.add(demoButton);
+		
 		pack();
 		init();
 	}
@@ -186,7 +218,7 @@ public class RobotCellExaminer
 		try
 		{
 			// For each robot, generate spans
-			LinkedList robots = cell.getRobots();
+			List<Robot> robots = cell.getRobots();
 			for (Iterator robotIt = robots.iterator(); robotIt.hasNext(); )
 			{
 				Robot robot = (Robot) robotIt.next();
@@ -196,7 +228,7 @@ public class RobotCellExaminer
 				robot.start();
 
 				// Generate span for each "path", i.e. unique pair of positions
-				LinkedList positions = robot.getPositions();
+				List<Position> positions = robot.getPositions();
 				for (int i = 0; i < positions.size(); i++)
 				{
 					Position from = (Position) positions.get(i);
@@ -236,7 +268,7 @@ public class RobotCellExaminer
 		try
 		{
 			// Intersect spans of robots, pairwise
-			LinkedList robots = cell.getRobots();
+			List<Robot> robots = cell.getRobots();
 
 			for (int i = 0; i < robots.size(); i++)
 			{
@@ -293,7 +325,7 @@ public class RobotCellExaminer
 		try
 		{
 			// For each robot
-			LinkedList robots = cell.getRobots();
+			List<Robot> robots = cell.getRobots();
 			for (Iterator robotIt = robots.iterator(); robotIt.hasNext(); )
 			{
 				Robot robot = (Robot) robotIt.next();
@@ -302,7 +334,7 @@ public class RobotCellExaminer
 				robot.start();
 
 				// Examine collisions for each "path", i.e. unique pair of positions
-				LinkedList positions = robot.getPositions();
+				List<Position> positions = robot.getPositions();
 				for (int i = 0; i < positions.size(); i++)
 				{
 					Position from = (Position) positions.get(i);
@@ -326,5 +358,47 @@ public class RobotCellExaminer
 		{
 			logger.error("Error when simulating for collisions. " + ex);
 		}
+	}
+
+	/**
+	 * Does the box strategy stuff. 
+	 */
+	private void boxStrategy(RobotCell cell)
+	{
+		/*
+		List<Robot> robots = cell.getRobots();
+		
+		// For every robot...
+		for (Iterator<Robot> robIt = robots.iterator(); it.hasNext(); )
+		{
+			Robot robot = robIt.next();
+
+			// List of boxes that should be examined
+			List<Box> boxesToExamine = new LinkedList<Box>();
+			// List of the boxes that the robot is occupying
+			List<Box> boxesOccupied = new LinkedList<Box>();
+
+			// Get base coords and build first box
+			Coordinate base = robot.getBaseCoordinates();
+			Box box = cell.createBox(base);
+
+			// Start loop!
+			while (boxesToExamine.size() != 0)
+			{
+				Box box = boxesToExamine.remove(0);
+			}
+		}
+
+			// Special box inside the robot
+			if (Robot.collidesWith(box))
+			{
+				boxesToExamine.add(box);
+			}
+			else
+			{
+				logger.error("Base coordinate box is not inside robot.");
+				return;
+			}
+		*/
 	}
 }

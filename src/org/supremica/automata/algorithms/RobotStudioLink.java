@@ -908,7 +908,6 @@ End Sub
 	private static void createBox(double tx, double ty, double tz, double rx, double ry, double rz, double wx, double wy, double wz, String name)
 		throws Exception
 	{
-
 		// Create a new IEntity
 		IPart mutexPart = activeStation.getParts().item(var(mutexPartName));
 		Transform transform = new Transform();
