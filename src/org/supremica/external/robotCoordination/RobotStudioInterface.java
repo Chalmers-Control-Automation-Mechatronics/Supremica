@@ -170,6 +170,10 @@ public class RobotStudioInterface
 			}
 		}
 
+		/////////////////////////////////
+		// RobotCell INTERFACE METHODS //
+		/////////////////////////////////
+
 		/**
 		 * Initializes RobotStudio
 		 */
@@ -224,10 +228,6 @@ public class RobotStudioInterface
 			}
 		}
 
-		/////////////////////////////////
-		// RobotCell INTERFACE METHODS //
-		/////////////////////////////////
-
 		/**
 		 * Opens station in the RobotStudio environment
 		 */
@@ -239,7 +239,7 @@ public class RobotStudioInterface
 			station = Station.getStationFromUnknown(iStation);
 
 			// Build robot automata
-			LinkedList robots = getRobots();
+			List<Robot> robots = getRobots();
 			robotAutomata = buildRobotAutomata(robots);
 		}
 
@@ -265,7 +265,7 @@ public class RobotStudioInterface
 		/**
 		 * Returns a linked list of Robot objects.
 		 */
-		public LinkedList getRobots()
+		public List<Robot> getRobots()
 			throws Exception
 		{
 			LinkedList list = getMechanismsWithRole(RsKinematicRole.rsKinematicRoleRobot);
@@ -332,7 +332,7 @@ public class RobotStudioInterface
 		/**
 		 * Generates the structure of the robot automata models. NOTE: Not the complete models!
 		 */
-		public Automata buildRobotAutomata(LinkedList robots)
+		public Automata buildRobotAutomata(List<Robot> robots)
 			throws Exception
 		{
 			Automata robotAut = new Automata();
@@ -354,7 +354,7 @@ public class RobotStudioInterface
 				marked.setAccepting(true);
 				aut.addState(marked);
 				marked.setCost(0);
-				LinkedList posList = robot.getPositions();
+				List<Position> posList = robot.getPositions();
 				for (int i=0; i < posList.size(); i++)
 				{
 					for (int j=0; j < posList.size(); j++)
@@ -455,7 +455,7 @@ public class RobotStudioInterface
 				robotAut.addAutomaton(aut);
 
 				// ONE AUTOMATON PER TARGET //
-				LinkedList positions = robot.getPositions();
+				List<Position> positions = robot.getPositions();
 				// Skip home position (i=1...)
 				for (int i=1; i<positions.size(); i++)
 				{
@@ -1658,7 +1658,9 @@ public class RobotStudioInterface
 		}
     }
 
-    // Implementation of the Robot interface for use against RobotStudio.
+    /**
+	 * Implementation of the Robot interface for use against RobotStudio.
+	 */
     private static class RSRobot
 		implements Robot
     {
@@ -1682,8 +1684,11 @@ public class RobotStudioInterface
 			}
 		}
 
-		// Robot interface methods
-		public LinkedList getPositions()
+		/////////////////////////////
+		// Robot interface methods //
+		/////////////////////////////
+
+		public List<Position> getPositions()
 			throws Exception
 		{
 			LinkedList list = new LinkedList();

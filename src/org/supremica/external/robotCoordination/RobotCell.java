@@ -19,7 +19,7 @@ public interface RobotCell
 	/**
 	 * Returns linked list of Robot objects.
 	 */
-	public LinkedList getRobots()
+	public List<Robot> getRobots()
 		throws Exception;
 
 	/**

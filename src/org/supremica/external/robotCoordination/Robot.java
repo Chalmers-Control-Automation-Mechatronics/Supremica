@@ -7,7 +7,7 @@ public interface Robot
 	/**
 	 * Returns list of the positions for this robot.
 	 */
-	public LinkedList getPositions()
+	public List<Position> getPositions()
 		throws Exception;
 
 	/**
@@ -23,31 +23,31 @@ public interface Robot
 		throws Exception;
 
 	/**
-	 * Hides span in smulation environment (just for esthetics)
+	 * Hides span in simulation environment (just for esthetics)
 	 */
 	public void hideSpan()
 		throws Exception;
-
+	
 	/**
 	 * Returns the name of the robot.
 	 */
 	public String getName()
 		throws Exception;
-
+	
 	/**
 	 * Initialization of robot, before simulations start.
 	 */
 	public void start()
 		throws Exception;
-
+	
 	/**
 	 * Finalization of robot, after completed simulation.
 	 */
 	public void stop()
 		throws Exception;
-
+	
 	/**
-	 * Moves the robot to position.
+	 * Jumps the robot to position.
 	 */
 	public void jumpToPosition(Position position)
 		throws Exception;
