@@ -29,7 +29,7 @@ public interface RobotCell
 			throws Exception;
 
 	/**
-	 * Intersects spans of robots robotA and robotB, generating
+	 * Intersects spans of robots robotA and robotB,	    //	    return generating
 	 * zone volumes.
 	 */
 	public void intersectSpans(Robot robotA, Robot robotB)

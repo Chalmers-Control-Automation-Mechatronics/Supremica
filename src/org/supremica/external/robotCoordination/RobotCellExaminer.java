@@ -9,7 +9,7 @@ import java.util.*;
 import org.supremica.log.*;
 import org.supremica.gui.*;
 import org.supremica.automata.*;
-import org.supremica.external.robotCoordination.RobotStudioInterface;
+import org.supremica.external.robotCoordination.robotstudioApp.RSRobotCell;
 
 public class RobotCellExaminer
     extends JDialog
@@ -28,7 +28,7 @@ public class RobotCellExaminer
 
 	// Demo file
 	// final String DEMOSTATION_FILENAME = "C:/temp/RobSuprTestStation/RobSuprTest.stn";
-	final String DEMOSTATION_FILENAME = "C:/temp/DomStations/DemoSafe.stn";
+	final String DEMOSTATION_FILENAME = "C:\\jobb\\RobotStudio-files\\DomStations\\DemoSafe.stn";
 
 	/**
 	 * Dialog for manipulating the simulation environment.
@@ -190,7 +190,7 @@ public class RobotCellExaminer
 			// properly installed...
 
 			// Open cell
-			cell = new RobotStudioInterface.RSRobotCell(file);
+			cell = new RSRobotCell(file);
 		}
 		else
 		{
