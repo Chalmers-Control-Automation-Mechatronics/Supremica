@@ -2,6 +2,8 @@ package org.supremica.external.robotCoordination;
 
 import java.util.*;
 import org.supremica.automata.*;
+import java.awt.Color;
+import org.supremica.external.robotCoordination.robotstudioApp.Box;
 
 public interface RobotCell
 {
@@ -52,5 +54,11 @@ public interface RobotCell
 	 * Generates robot automata from earlier simulations.
 	 */
 	public Automata generateRobotAutomata()
+		throws Exception;
+
+	/**
+	 * Creates a box.
+	 */
+	public Box createBox(Coordinate coordinate, Color color, double transparency)
 		throws Exception;
 }

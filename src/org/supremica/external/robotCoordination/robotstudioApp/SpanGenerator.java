@@ -68,13 +68,18 @@ public class SpanGenerator
      */
     private RsUnitsUtility ruu = new RsUnitsUtility();
 
-    // The size of the box surrounding the tooltip
+    /** The size of the box surrounding the tooltip. */
     private static final double BOXSIZE = 0.12;             // [m]
+    /** The length of the cylinder surrounding the upper arm. */
     private static final double CYLINDERLENGTH = 1.1;       // [m]
+    /** The radius of the cylinder surrounding the upper arm. */
     private static final double CYLINDERRADIUS = 0.06;      // [m]
-    private static final double STEPSIZE = BOXSIZE * 3 / 4; // [m]
-    // The MARGIN that should be added to all sides
+
+    /** The margin that should be added to all sides of all ojbects. */
     private static final double MARGIN = 0.05;              // [m]
+
+    /** The length of a step. */
+    private static final double STEPSIZE = BOXSIZE * 3 / 4; // [m]
 
     private Transform oldTransform;
     private Part temp;

@@ -10,6 +10,7 @@ import org.supremica.log.*;
 import org.supremica.gui.*;
 import org.supremica.automata.*;
 import org.supremica.external.robotCoordination.robotstudioApp.RSRobotCell;
+import java.awt.Color;
 
 public class RobotCellExaminer
     extends JDialog
@@ -27,8 +28,8 @@ public class RobotCellExaminer
 	private Automata robotAutomata;
 
 	// Demo file
-	// final String DEMOSTATION_FILENAME = "C:/temp/RobSuprTestStation/RobSuprTest.stn";
-	final String DEMOSTATION_FILENAME = "C:\\jobb\\RobotStudio-files\\DomStations\\DemoSafe.stn";
+	//final String DEMOSTATION_FILENAME = "C:/temp/RobSuprTestStation/RobSuprTest.stn";
+	final String DEMOSTATION_FILENAME = "C:/temp/DomStations/DemoSafe.stn";
 
 	/**
 	 * Dialog for manipulating the simulation environment.
@@ -105,49 +106,51 @@ public class RobotCellExaminer
 		contentPane.add(collisionButton);
 		*/
 
-		// Demo button (only if demo file exists)
+		// Span generation demo button
 		File file = new File(DEMOSTATION_FILENAME);
-		if (file.exists())
-		{
-			JButton demoButton = new JButton("Run demo (RobotStudio)");
-			demoButton.addActionListener(new ActionListener()
+		JButton demoButton = new JButton("Span generation demo");
+		demoButton.addActionListener(new ActionListener()
 			{
-					public void actionPerformed(ActionEvent e)
+				public void actionPerformed(ActionEvent e)
+				{
+					// If there is an open file, don't do this!
+					if (cell == null || !cell.isOpen())
 					{
-						// Open file if it exists...
+						// Open demo file if it exists...
 						File file = new File(DEMOSTATION_FILENAME);
 						if (file.exists())
 						{
 							openCell(file, RobotSimulatorType.RobotStudio);
-							generateSpans();
-							intersectSpans();
-							generateAutomata();
-							examineCollisions();
 						}
 						else
 						{
 							logger.error("File " + file + " does not exist.");
 						}
 					}
+						
+					// Do the stuff
+					generateSpans();
+					intersectSpans();
+					generateAutomata();
+					examineCollisions();
+				}
 			});
-			contentPane.add(demoButton);
-		}
-
+		contentPane.add(demoButton);
+		
 		// Box strategy demo button 
-		JButton demoButton = new JButton("Box strategy demo");
+		demoButton = new JButton("Box strategy demo");
 		demoButton.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
 				{
-					// Is there an open file?
+					// If there is an open file, don't do this!
 					if (cell == null || !cell.isOpen())
 					{
-						// Open file if it exists...
+						// Open demo file if it exists...
 						File file = new File(DEMOSTATION_FILENAME);
 						if (file.exists())
 						{
-							openCell(file, RobotSimulatorType.RobotStudio);
-							
+							openCell(file, RobotSimulatorType.RobotStudio);							
 						}
 						else
 						{
@@ -205,7 +208,7 @@ public class RobotCellExaminer
 	}
 
 	/**
-	 * Generates zones
+	 * Generates spans
 	 */
 	private void generateSpans()
 	{
@@ -366,8 +369,27 @@ public class RobotCellExaminer
 	private void boxStrategy(RobotCell cell)
 	{
 		/*
+		// Colors
+		final Color RED = Color.RED;
+		final Color BLACK = Color.BLACK;
+		// Transparency
+		final double TRANSPARENCY = 0.25;
+
+		// Hashtable
+		// The first boolean says if a robot has already been inside this box at some time
+		// The second boolean says if the box has already been examined for the current robot
+		final int BITS = 2;
+		final int OCCUPIED = 1;
+		final int CHECKED = 2;
+		//Hashtable<Coordinate, boolean[BITS]> matrix = new Hashtable(1000);
+		Hashtable<Coordinate, byte> matrix = new Hashtable(1000);
+
+		// Get the robots
 		List<Robot> robots = cell.getRobots();
 		
+		// List of boxes where collisions may occur
+		List<Box> zoneBoxes = new LinkedList<Box>();
+
 		// For every robot...
 		for (Iterator<Robot> robIt = robots.iterator(); it.hasNext(); )
 		{
@@ -375,30 +397,148 @@ public class RobotCellExaminer
 
 			// List of boxes that should be examined
 			List<Box> boxesToExamine = new LinkedList<Box>();
-			// List of the boxes that the robot is occupying
-			List<Box> boxesOccupied = new LinkedList<Box>();
+			// List of the boxes that have already been examined (for resetting the matrix)
+			List<Box> boxesExamined = new LinkedList<Box>();
+			// List of the boxes on "the surface"
+			List<Box> surfaceBoxes = new LinkedList<Box>();
 
 			// Get base coords and build first box
 			Coordinate base = robot.getBaseCoordinates();
-			Box box = cell.createBox(base);
+			Box startBox = cell.createBox(base.x, base.y, base.z, RED, TRANSPARENCY);
+			boxesToExamine.add(startBox);
 
 			// Start loop!
 			while (boxesToExamine.size() != 0)
 			{
+				// Get the stats for this box
 				Box box = boxesToExamine.remove(0);
-			}
-		}
+				boolean[] stats;
+				if (!matrix.containsKey(box))
+				{
+					stats = new boolean[BITS];
+					stats[OCCUPIED] = false;
+					stats[CHECKED] = true;
+					matrix.put(box, stats);
+				}
+				else
+				{
+					stats = matrix.get(box);
+					if (stats[CHECKED])
+					{
+						// Already checked this one...
+						continue;
+					}					
+				}
+				boxesExamined.add(box);
 
-			// Special box inside the robot
-			if (Robot.collidesWith(box))
-			{
-				boxesToExamine.add(box);
+				// Inside robot?
+				if (robot.collidesWith(box))
+				{
+					// Remove from simulation environment
+					box.delete();
+
+					// Has someone else collided with this one?
+					if (stats[OCCUPIED])
+					{
+						zoneBoxes.add(box);
+					}
+					else
+					{
+						stats[OCCUPIED] = true;
+					}
+
+					int x = box.getX();
+					int y = box.getY();
+					int z = box.getZ();
+
+					int newX;
+					int newY;
+					int newZ;
+					Coordinate newCoord;
+					Box newBox;
+
+					// Up
+					newCoord = new Coordinate(x,y,z+1);
+					newBox = cell.createBox(newCoord, RED, TRANSPARENCY);
+					boxesToExamine.add(newBox);
+					// Down
+					newCoord = new Coordinate(x,y,z-1);
+					newBox = cell.createBox(newCoord, RED, TRANSPARENCY);
+					boxesToExamine.add(newBox);
+					// Left
+					newCoord = new Coordinate(x,y+1,z);
+					newBox = cell.createBox(newCoord, RED, TRANSPARENCY);
+					boxesToExamine.add(newBox);
+					// Right
+					newCoord = new Coordinate(x,y-1,z);
+					newBox = cell.createBox(newCoord, RED, TRANSPARENCY);
+					boxesToExamine.add(newBox);
+					// Forward
+					newCoord = new Coordinate(x+1,y,z);
+					newBox = cell.createBox(newCoord, RED, TRANSPARENCY);
+					boxesToExamine.add(newBox);
+					// Back
+					newCoord = new Coordinate(x-1,y,z);
+					newBox = cell.createBox(newCoord, RED, TRANSPARENCY);
+					boxesToExamine.add(newBox);
+				}
+				else
+				{
+					// This box is a "surfacebox"
+					surfaceBoxes.add(box);
+				}
 			}
-			else
+
+			// Didn't find anything? The base coordinate box was outside?
+			if (boxesExamined.size() == 1)
 			{
 				logger.error("Base coordinate box is not inside robot.");
 				return;
 			}
+
+			// DO THE SPAN-STUFF HERE!!!
+
+			// Clear CHECKED-status from the examined boxes before examinining next robot!
+			while (boxesExamined.size() != 0)
+			{
+				Box box = boxesExamined.remove(0);
+				boolean[] stats = matrix.get(box);
+				stats[CHECKED] = false;
+			}
+
+			// It's over for this robot. Remove the "surfaceboxes"
+			while (surfaceBoxes.size() != 0)
+			{
+				Box box = surfaceBoxes.remove(0);
+				matrix.remove(box);
+				// box.delete();
+			}
+		}
 		*/
+	}
+
+	private class Coordinate
+	{
+		protected int x; 
+		protected int y; 
+		protected int z;
+
+		Coordinate(int x, int y, int z)
+		{
+			this.x = x;
+			this.y = y;
+			this.z = z;
+		}
+
+		public int hashCode()
+		{
+			return x + 229*y + 3571*z;
+		}
+
+		public boolean equals(Object obj)
+		{
+			Coordinate other = (Coordinate) obj;
+			return (x == other.x) && (y == other.y) && (z == other.z);
+		}
 	}
 }

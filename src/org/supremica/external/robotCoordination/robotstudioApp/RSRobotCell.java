@@ -60,6 +60,7 @@ import org.supremica.automata.*;
 import org.supremica.external.robotCoordination.*;
 import java.util.*;
 import java.io.*;
+import java.awt.Color;
 
 /**
  * Implementation of the RobotCell interface for use against RobotStudio.
@@ -68,21 +69,21 @@ public class RSRobotCell
     implements RobotCell, DAppEvents
 {
     private static Logger logger = LoggerFactory.createLogger(RSRobotCell.class);
-
+	
     // Initialize jacoZoom
     static
     {
     	com.inzoom.comjni.Dll.runRoyaltyFree(643622874);
     }
     // Constants
- 
+	
     /** The name of the IPart containing the mutex zones. */
     final static String ZONEPART_NAME = "MutexZones";
-
+	
     final static String ZONEENTITY_BASENAME = "MutexZone";
     final static String FREESTATE_NAME = "Free";
     final static String BOOKEDSTATE_NAME = "Booked";
-
+	
     /** The suffix of the Part containing the spans. */
     final static String SPAN_SUFFIX = "_Span";
     final static String SPANS_SUFFIX = SPAN_SUFFIX + "s";
@@ -131,97 +132,98 @@ public class RSRobotCell
 
     // Tillfälligt (i varje fall på det här stället)
     //AK
-    public void tempAvenirs() throws Exception {
-	List<Robot> robots = getRobots();
-	    
-	for (int i=0; i<robots.size(); i++) {
-	    logger.error("robot.name = " + robots.get(i).getName());
-	    Coordinate base = robots.get(i).getBaseCoordinates();
-	    logger.warn("X = " + base.getX() + "; Y = " + base.getY() + "; Z = " + base.getZ());
-	}
-
-	//	    IPosition pos = new IPosition();
-	//	    IPart part = IPart.CreateLine(new Coordinate(0,0,0), new Coordinate(1,1,1));
-	//	    logger.warn("station.parts.count = " + station.getParts().getCount());
-	// 	    createBox(new Coordinate(1,1,1), new Color(), 0.5);
+    public void tempAvenirs() throws Exception 
+	{
+		List<Robot> robots = getRobots();
+		
+		for (int i=0; i<robots.size(); i++) {
+			logger.error("robot.name = " + robots.get(i).getName());
+			Coordinate base = robots.get(i).getBaseCoordinates();
+			logger.warn("X = " + base.getX() + "; Y = " + base.getY() + "; Z = " + base.getZ());
+		}
+		
+		//	    IPosition pos = new IPosition();
+		//	    IPart part = IPart.CreateLine(new Coordinate(0,0,0), new Coordinate(1,1,1));
+		//	    logger.warn("station.parts.count = " + station.getParts().getCount());
+		// 	    createBox(new Coordinate(1,1,1), new Color(), 0.5);
     }
-
+	
     public RSRobotCell(File file)
     {
-	try
-	    {
-		init();
-		openStation(file);
-		station.setBackgroundColor(RS_WHITE);
-		station.setFloorVisible(false);
-
-		//AK
-		tempAvenirs();
-
-		// Array of LinkedLists, later containing PathWithCost objects
-		robotCosts = new LinkedList[getMechanismsWithRole(RsKinematicRole.rsKinematicRoleRobot).size()];
-
-		for (int i = 0;
-		     i < getMechanismsWithRole(RsKinematicRole.rsKinematicRoleRobot).size();
-		     i++)
-		    {
-			robotCosts[i] = new LinkedList();
-		    }
-
 		try
+	    {
+			init();
+			openStation(file);
+			station.setBackgroundColor(RS_WHITE);
+			station.setFloorVisible(false);
+			
+			//AK
+			tempAvenirs();
+			
+			// Array of LinkedLists, later containing PathWithCost objects
+			robotCosts = new LinkedList[getMechanismsWithRole(RsKinematicRole.rsKinematicRoleRobot).size()];
+			
+			for (int i = 0;
+				 i < getMechanismsWithRole(RsKinematicRole.rsKinematicRoleRobot).size();
+				 i++)
 		    {
-			// Already got a zones part?
-			zones = Part.getPartFromUnknown(station.getParts().item(var(ZONEPART_NAME)));
+				robotCosts[i] = new LinkedList();
 		    }
-		catch (Exception ex)
+			
+			try
 		    {
-			// No such part?
-			zones = Part.getPartFromUnknown(station.getParts().add());
-			zones.setName(ZONEPART_NAME);
+				// Already got a zones part?
+				zones = Part.getPartFromUnknown(station.getParts().item(var(ZONEPART_NAME)));
+		    }
+			catch (Exception ex)
+		    {
+				// No such part?
+				zones = Part.getPartFromUnknown(station.getParts().add());
+				zones.setName(ZONEPART_NAME);
 		    }
 	    }
-	catch (Exception e)
+		catch (Exception e)
 	    {
-		logger.error("Error when initializing RobotStudio interface. " + e);
-		e.printStackTrace();
+			logger.error("Error when initializing RobotStudio interface. " + e);
+			e.printStackTrace();
 	    }
     }
-
+	
     /////////////////////////////////
     // RobotCell INTERFACE METHODS //
     /////////////////////////////////
-
+		
     /**
      * Initializes RobotStudio
      */
 	public void init()
-	    throws Exception
+		throws Exception
     {
-	// Create an instance of RobotStudio.Application.
-	if (applicationIsRunning())
+		// Create an instance of RobotStudio.Application.
+		if (applicationIsRunning())
 	    {
-		logger.info("RobotStudio already started.");
-		app.setVisible(true);    // It's nice to see what is happening
+			logger.info("RobotStudio already started.");
+			app.setVisible(true);    // It's nice to see what is happening
 	    }
-	else
+		else
 	    {
-		logger.info("Starting RobotStudio...");
-
-		app = new Application();
-
-		app.addDAppEventsListener(this);
-		app.setVisible(true);    // It's nice to see what is happening
-
-		logger.info("RobotStudio started.");
+			logger.info("Starting RobotStudio...");
+			
+			app = new Application();
+			
+			app.addDAppEventsListener(this);
+			app.setVisible(true);    // It's nice to see what is happening
+			
+			logger.info("RobotStudio started.");
 	    }
-
-	// Some declarations
-	RS_WHITE = new Variant(new SafeArray(new int[]{ 255, 255, 255 }), false);
-	RS_RED = new Variant(new SafeArray(new int[]{ 255, 0, 0 }), false);
-	RS_GREEN = new Variant(new SafeArray(new int[]{ 0, 255, 0 }), false);
-	RS_BLUE = new Variant(new SafeArray(new int[]{ 0, 0, 255 }), false);
+		
+		// Some declarations
+		RS_WHITE = new Variant(new SafeArray(new int[]{ 255, 255, 255 }), false);
+		RS_RED = new Variant(new SafeArray(new int[]{ 255, 0, 0 }), false);
+		RS_GREEN = new Variant(new SafeArray(new int[]{ 0, 255, 0 }), false);
+		RS_BLUE = new Variant(new SafeArray(new int[]{ 0, 0, 255 }), false);
     }
-
+	
     /**
      * Returns true if an application is already running, false otherwise.
      * if quit() worked as it should, we could simply check if (app == null).
@@ -230,319 +232,321 @@ public class RSRobotCell
      */
     private boolean applicationIsRunning()
     {
-	// Try if it is possible to get any info from app, if not, either app
-	// is null or not running!
-	try
+		// Try if it is possible to get any info from app, if not, either app
+		// is null or not running!
+		try
 	    {
-		// Try a simple method, if there is no exception,
-		// there is!
-		app.getVisible();
-		return true;
+			// Try a simple method, if there is no exception,
+			// there is!
+			app.getVisible();
+			return true;
 	    }
-	catch (Exception ex)
+		catch (Exception ex)
 	    {
-		// Something is wrong!
-		return false;
+			// Something is wrong!
+			return false;
 	    }
     }
-
+	
     /**
      * Opens station in the RobotStudio environment
      */
     public void openStation(File file)
-	throws Exception
+		throws Exception
     {
-	String stationName = file.getAbsolutePath();
-	IStation iStation = app.getWorkspace().openStation(stationName, var(true), var(false));
-	station = Station.getStationFromUnknown(iStation);
-
-	// Build robot automata
-	List<Robot> robots = getRobots();
-	robotAutomata = buildRobotAutomata(robots);
+		String stationName = file.getAbsolutePath();
+		IStation iStation = app.getWorkspace().openStation(stationName, var(true), var(false));
+		station = Station.getStationFromUnknown(iStation);
+		
+		// Build robot automata
+		List<Robot> robots = getRobots();
+		robotAutomata = buildRobotAutomata(robots);
     }
-
+	
     /**
      * Examine if there is an open station.
      */
     public boolean isOpen()
     {
-	try
+		try
 	    {
-		// See if there is an active station, if there is no exception,
-		// there is!
-		app.getActiveStation();
-		return true;
+			// See if there is an active station, if there is no exception,
+			// there is!
+			app.getActiveStation();
+			return true;
 	    }
-	catch (Exception ex)
+		catch (Exception ex)
 	    {
-		// Something is wrong!
-		return false;
+			// Something is wrong!
+			return false;
 	    }
     }
-
+	
     /**
      * Returns a linked list of Robot objects.
      */
     public List<Robot> getRobots()
-	throws Exception
+		throws Exception
     {
-	LinkedList list = getMechanismsWithRole(RsKinematicRole.rsKinematicRoleRobot);
-
-	// Transform into a list of Robot objects instead
-	for (Iterator mechanismIt = list.iterator();
-	     mechanismIt.hasNext(); )
+		LinkedList list = getMechanismsWithRole(RsKinematicRole.rsKinematicRoleRobot);
+		
+		// Transform into a list of Robot objects instead
+		for (Iterator mechanismIt = list.iterator();
+			 mechanismIt.hasNext(); )
 	    {
-		IMechanism mech = (IMechanism) mechanismIt.next();
-		Mechanism mechanism = Mechanism.getMechanismFromUnknown(mech);
-		Robot robot = new RSRobot(mechanism, station);
-
-		list.set(list.indexOf(mech), robot);
+			IMechanism mech = (IMechanism) mechanismIt.next();
+			Mechanism mechanism = Mechanism.getMechanismFromUnknown(mech);
+			Robot robot = new RSRobot(mechanism, station);
+			
+			list.set(list.indexOf(mech), robot);
 	    }
-
-	return list;
+		
+		return list;
     }
-
-    // 	public Box createBox(Coordinate coord, Color color, double transparency) {
-    // 	    logger.info("skapar box");
-    // 	    Box currBox =  new Box(coord, color, transparency);
-    // 	    logger.info("box skapat");
-    // 	    return currBox;
-    // 	}
-
+	
+	public Box createBox(Coordinate coord, Color color, double transparency) 
+	{
+		logger.info("skapar box");
+		//Box currBox =  new Box(coord, color, transparency);
+		Box newBox = null;
+		logger.info("box skapat");
+		return newBox;
+	}
+	
     public Automata generateZoneAutomata()
-	throws Exception
+		throws Exception
     {
-	/*
-	  Automata result = new Automata();
-
-	  // Create new automata
-	  for (int i = 1; i <= zones.getEntities().getCount(); i++)
-	  {
-	  // Create new automaton
-	  String zoneName = zones.getEntities().item(var(i)).getName();
-	  Automaton aut = new Automaton(zoneName);
-
-	  aut.setType(AutomatonType.Specification);
-
-	  // Add two states, Free and Booked
-	  State state = aut.createAndAddUniqueState(null);
-
-	  state.setName(FREESTATE_NAME);
-	  state.setAccepting(true);
-	  aut.setInitialState(state);
-
-	  state = aut.createAndAddUniqueState(null);
-
-	  state.setName(BOOKEDSTATE_NAME);
-
-	  // Add automaton
-	  result.addAutomaton(new Automaton(zoneName));
-	  }
-
-	  /*
-	  // Find the robot paths that determine booking and unbooking
-	  LinkedList list = getRobots();
-	  for (Iterator listIt = list.iterator(); listIt.hasNext(); )
-	  {
-	  Mechanism mech = ((RSRobot) listIt.next()).getRobotStudioMechanism();
-	  IPaths paths = mech.getPaths();
-
-	  // Yada, yada...
-	  }
-	  return result;
-	*/
-	return zoneAutomata;
+		/*
+		  Automata result = new Automata();
+		  
+		  // Create new automata
+		  for (int i = 1; i <= zones.getEntities().getCount(); i++)
+		  {
+		  // Create new automaton
+		  String zoneName = zones.getEntities().item(var(i)).getName();
+		  Automaton aut = new Automaton(zoneName);
+		  
+		  aut.setType(AutomatonType.Specification);
+		  
+		  // Add two states, Free and Booked
+		  State state = aut.createAndAddUniqueState(null);
+		  
+		  state.setName(FREESTATE_NAME);
+		  state.setAccepting(true);
+		  aut.setInitialState(state);
+		  
+		  state = aut.createAndAddUniqueState(null);
+		  
+		  state.setName(BOOKEDSTATE_NAME);
+		  
+		  // Add automaton
+		  result.addAutomaton(new Automaton(zoneName));
+		  }
+		  
+		  /*
+		  // Find the robot paths that determine booking and unbooking
+		  LinkedList list = getRobots();
+		  for (Iterator listIt = list.iterator(); listIt.hasNext(); )
+		  {
+		  Mechanism mech = ((RSRobot) listIt.next()).getRobotStudioMechanism();
+		  IPaths paths = mech.getPaths();
+		  
+		  // Yada, yada...
+		  }
+		  return result;
+		*/
+		return zoneAutomata;
     }
-
+	
     /**
      * Generates the structure of the robot automata models. NOTE: Not the complete models!
      */
     public Automata buildRobotAutomata(List<Robot> robots)
-	throws Exception
+		throws Exception
     {
-	Automata robotAut = new Automata();
-
-	// Iterate over the robots...
-	for (Iterator robotIt = robots.iterator(); robotIt.hasNext();)
-	    {
-		Robot robot = (Robot) robotIt.next();
-
-		// ONE AUTOMATON FOR THE ROBOT ITSELF //
-		Automaton aut = new Automaton(robot.getName());
-		aut.setType(AutomatonType.Plant);
-		// Build the states...
-		State initial = new State(STARTSTATE_NAME);
-		initial.setInitial(true);
-		aut.addState(initial);
-		initial.setCost(0);
-		State marked = new State(FINISHSTATE_NAME);
-		marked.setAccepting(true);
-		aut.addState(marked);
-		marked.setCost(0);
-		List<org.supremica.external.robotCoordination.Position> posList = robot.getPositions();
-		for (int i=0; i < posList.size(); i++)
-		    {
-			for (int j=0; j < posList.size(); j++)
-			    {
-				if (i != j)
-				    {
-					State state = new State(((org.supremica.external.robotCoordination.Position) posList.get(i)).getName() +
-								((org.supremica.external.robotCoordination.Position) posList.get(j)).getName());
-					aut.addState(state);
-					state.setCost(0);
-				    }
-			    }
-		    }
-		// Build transitions...
-		for (StateIterator stateIt = aut.stateIterator(); stateIt.hasNext();)
-		    {
-			State fromState = stateIt.nextState();
-			// Initial?
-			if (fromState.getName().equals(STARTSTATE_NAME))
-			    {
-				// Skip the 0:th element here... its assumed to be the home state
-				for (int i=1; i < posList.size(); i++)
-				    {
-					// Create new arc...
-					String name = ((org.supremica.external.robotCoordination.Position) posList.get(0)).getName() +
-					    ((org.supremica.external.robotCoordination.Position) posList.get(i)).getName();
-					State toState = aut.getStateWithName(name);
-					LabeledEvent event = new LabeledEvent(name);
-					if (!aut.getAlphabet().contains(event))
-					    {
-						aut.getAlphabet().addEvent(event);
-					    }
-
-					Arc arc = new Arc(fromState, toState, event);
-					aut.addArc(arc);
-				    }
-			    }
-			else if (fromState.getName().equals(FINISHSTATE_NAME))
-			    {
-				// No outgoing from final state...
-			    }
-			else
-			    {
-				String fromPos = null;
-				// Skip the 0:th element here... its assumed to be the home state
-				for (int i=0; i < posList.size(); i++)
-				    {
-					if (fromState.getName().endsWith(((org.supremica.external.robotCoordination.Position) posList.get(i)).getName()))
-					    {
-						// Just to make sure there is no ambiguity
-						if (fromPos != null)
-						    {
-							throw new Exception("Error in RSRobotCell.java, ambigous position names");
-						    }
-						fromPos = ((org.supremica.external.robotCoordination.Position) posList.get(i)).getName();
-
-						// Create arc for each possible target position
-						for (int j=0; j < posList.size(); j++)
-						    {
-							if (i != j)
-							    {
-								// Create new arc...
-								String name = ((org.supremica.external.robotCoordination.Position) posList.get(i)).getName() +
-								    ((org.supremica.external.robotCoordination.Position) posList.get(j)).getName();
-								State toState = aut.getStateWithName(name);
-
-								// Special treatment if were dealing with the home position
-								if (i==0)
-								    {
-									name = FINISHEVENT_NAME;
-									toState = aut.getStateWithName(FINISHSTATE_NAME);
-								    }
-
-								// Create event
-								LabeledEvent event = new LabeledEvent(name);
-								if (!aut.getAlphabet().contains(event))
-								    {
-									aut.getAlphabet().addEvent(event);
-								    }
-
-								// Add arc
-								Arc arc = new Arc(fromState, toState, event);
-								aut.addArc(arc);
-
-								// Only once if this was the home position (ugly hack... whatever)
-								if (i==0)
-								    {
-									break;
-								    }
-							    }
-						    }
-					    }
-				    }
-			    }
-		    }
-		aut.setComment("This automaton is not ready generated!");
-		// Add automaton
-		robotAut.addAutomaton(aut);
-
-		// ONE AUTOMATON PER TARGET //
-		List<org.supremica.external.robotCoordination.Position> positions = robot.getPositions();
-		// Skip home position (i=1...)
-		for (int i=1; i<positions.size(); i++)
-		    {
-			org.supremica.external.robotCoordination.Position pos = (org.supremica.external.robotCoordination.Position) positions.get(i);
-
-			aut = new Automaton(robot.getName() + UNDERSCORE + pos.getName());
-			State notVisited = new State("0");
-			notVisited.setInitial(true);
-			State visited = new State("1");
-			visited.setAccepting(true);
-			aut.addState(notVisited);
-			aut.addState(visited);
+		Automata robotAut = new Automata();
+		
+		// Iterate over the robots...
+		for (Iterator robotIt = robots.iterator(); robotIt.hasNext();)
+		{
+			Robot robot = (Robot) robotIt.next();
+			
+			// ONE AUTOMATON FOR THE ROBOT ITSELF //
+			Automaton aut = new Automaton(robot.getName());
 			aut.setType(AutomatonType.Plant);
-
+			// Build the states...
+			State initial = new State(STARTSTATE_NAME);
+			initial.setInitial(true);
+			aut.addState(initial);
+			initial.setCost(0);
+			State marked = new State(FINISHSTATE_NAME);
+			marked.setAccepting(true);
+			aut.addState(marked);
+			marked.setCost(0);
+			List<org.supremica.external.robotCoordination.Position> posList = robot.getPositions();
+			for (int i=0; i < posList.size(); i++)
+			{
+				for (int j=0; j < posList.size(); j++)
+				{
+					if (i != j)
+					{
+						State state = new State(((org.supremica.external.robotCoordination.Position) posList.get(i)).getName() +
+												((org.supremica.external.robotCoordination.Position) posList.get(j)).getName());
+						aut.addState(state);
+						state.setCost(0);
+					}
+				}
+			}
+			// Build transitions...
+			for (StateIterator stateIt = aut.stateIterator(); stateIt.hasNext();)
+			{
+				State fromState = stateIt.nextState();
+				// Initial?
+				if (fromState.getName().equals(STARTSTATE_NAME))
+				{
+					// Skip the 0:th element here... its assumed to be the home state
+					for (int i=1; i < posList.size(); i++)
+					{
+						// Create new arc...
+						String name = ((org.supremica.external.robotCoordination.Position) posList.get(0)).getName() +
+							((org.supremica.external.robotCoordination.Position) posList.get(i)).getName();
+						State toState = aut.getStateWithName(name);
+						LabeledEvent event = new LabeledEvent(name);
+						if (!aut.getAlphabet().contains(event))
+						{
+							aut.getAlphabet().addEvent(event);
+						}
+						
+						Arc arc = new Arc(fromState, toState, event);
+						aut.addArc(arc);
+					}
+				}
+				else if (fromState.getName().equals(FINISHSTATE_NAME))
+				{
+					// No outgoing from final state...
+				}
+				else
+				{
+					String fromPos = null;
+					// Skip the 0:th element here... its assumed to be the home state
+					for (int i=0; i < posList.size(); i++)
+					{
+						if (fromState.getName().endsWith(((org.supremica.external.robotCoordination.Position) posList.get(i)).getName()))
+						{
+							// Just to make sure there is no ambiguity
+							if (fromPos != null)
+							{
+								throw new Exception("Error in RSRobotCell.java, ambigous position names");
+							}
+							fromPos = ((org.supremica.external.robotCoordination.Position) posList.get(i)).getName();
+							
+							// Create arc for each possible target position
+							for (int j=0; j < posList.size(); j++)
+							{
+								if (i != j)
+								{
+									// Create new arc...
+									String name = ((org.supremica.external.robotCoordination.Position) posList.get(i)).getName() +
+										((org.supremica.external.robotCoordination.Position) posList.get(j)).getName();
+									State toState = aut.getStateWithName(name);
+									
+									// Special treatment if were dealing with the home position
+									if (i==0)
+									{
+										name = FINISHEVENT_NAME;
+										toState = aut.getStateWithName(FINISHSTATE_NAME);
+									}
+									
+									// Create event
+									LabeledEvent event = new LabeledEvent(name);
+									if (!aut.getAlphabet().contains(event))
+									{
+										aut.getAlphabet().addEvent(event);
+									}
+									
+									// Add arc
+									Arc arc = new Arc(fromState, toState, event);
+									aut.addArc(arc);
+									
+									// Only once if this was the home position (ugly hack... whatever)
+									if (i==0)
+									{
+										break;
+									}
+								}
+							}
+						}
+				    }
+				}
+			}
+			aut.setComment("This automaton is not ready generated!");
+			// Add automaton
+			robotAut.addAutomaton(aut);
+			
+			// ONE AUTOMATON PER TARGET //
+			List<org.supremica.external.robotCoordination.Position> positions = robot.getPositions();
+			// Skip home position (i=1...)
+			for (int i=1; i<positions.size(); i++)
+			{
+				org.supremica.external.robotCoordination.Position pos = (org.supremica.external.robotCoordination.Position) positions.get(i);
+				
+				aut = new Automaton(robot.getName() + UNDERSCORE + pos.getName());
+				State notVisited = new State("0");
+				notVisited.setInitial(true);
+				State visited = new State("1");
+				visited.setAccepting(true);
+				aut.addState(notVisited);
+				aut.addState(visited);
+				aut.setType(AutomatonType.Plant);
+				
+				/*
+				// Add transitions
+				for (int j=0; j<positions.size(); j++)
+				{
+				if (i==j)
+				{
+				continue;
+				}
+				
+				// Create event
+				String name = ((Position) positions.get(j)).getName() + pos.getName();
+				LabeledEvent event = new LabeledEvent(name);
+				if (!aut.getAlphabet().contains(event)) // Is always true?
+				{
+				aut.getAlphabet().addEvent(event);
+				}
+				
+				// Add arc
+				Arc arc = new Arc(notVisited, visited, event);
+				aut.addArc(arc);
+				}
+				*/
+				
+				aut.setComment("This automaton is not ready generated!");
+				robotAut.addAutomaton(aut);
+			}
+			
 			/*
-			// Add transitions
-			for (int j=0; j<positions.size(); j++)
-			{
-			if (i==j)
-			{
-			continue;
-			}
-
-			// Create event
-			String name = ((Position) positions.get(j)).getName() + pos.getName();
-			LabeledEvent event = new LabeledEvent(name);
-			if (!aut.getAlphabet().contains(event)) // Is always true?
-			{
-			aut.getAlphabet().addEvent(event);
-			}
-
-			// Add arc
-			Arc arc = new Arc(notVisited, visited, event);
-			aut.addArc(arc);
-			}
-			*/
-
+			// ONE AUTOMATON FOR THE SEQUENCE LENGTH //
+			aut = new Automaton(robot.getName() + "_seq");
+			aut.setType(AutomatonType.Plant);
 			aut.setComment("This automaton is not ready generated!");
 			robotAut.addAutomaton(aut);
-		    }
-
-		/*
-		// ONE AUTOMATON FOR THE SEQUENCE LENGTH //
-		aut = new Automaton(robot.getName() + "_seq");
-		aut.setType(AutomatonType.Plant);
-		aut.setComment("This automaton is not ready generated!");
-		robotAut.addAutomaton(aut);
-		*/
-	    }
-
-	return robotAut;
+			*/
+		}
+		
+		return robotAut;
     }
-
+	
     /**
      * Adds part to activeStation and returns it. If there already was
      * a part with the same name, it is returned instead.
      */
     static Part addPart(String name)
     {
-	Part part = null;
-
-	try
+		Part part = null;
+		
+		try
 	    {
 		try
 		    {
