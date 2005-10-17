@@ -18,7 +18,7 @@ public class ScheduleDialog
     private static final String[] heuristicsNames = new String[]{"1-product relax", "2-product relax", "brute force"};
     private static Logger logger = LoggerFactory.createLogger(ScheduleDialog.class);
     private JComboBox optiMethodsBox, heuristicsBox;
-    private JCheckBox nodeExpander, buildAutomaton;
+    private JCheckBox nodeExpander, buildAutomaton, vgDrawer;
     private int memoryCapacity;
     private JTextField memoryCapacityField;
 
@@ -60,6 +60,7 @@ public class ScheduleDialog
 	
 	nodeExpander = new JCheckBox("use AK's node expander", true);
 	buildAutomaton = new JCheckBox("build schedule", true); 
+	vgDrawer = new JCheckBox("Draw Visibility Graph", false);
 
 	memoryCapacityField = new JTextField("300", 10);
 	
@@ -80,6 +81,7 @@ public class ScheduleDialog
 	smaPanel.add(new JLabel("Nr of nodes in memory (SMA*)"));
 	smaPanel.add(memoryCapacityField);
 
+
 // 	JPanel expanderPanel = new JPanel();
 // 	expanderPanel.add(nodeExpander);
 
@@ -91,10 +93,11 @@ public class ScheduleDialog
 	algorithmPanel.add(heuristicsPanel);
 
 	JPanel specPanel = new JPanel();
-	specPanel.setLayout(new GridLayout(2,1));
+	specPanel.setLayout(new GridLayout(3, 1));
 	specPanel.add(nodeExpander);
 	specPanel.add(buildAutomaton);
-	specPanel.add(smaPanel);
+	specPanel.add(vgDrawer);
+	//	specPanel.add(smaPanel);
 
 	JTabbedPane tabbedPane = new JTabbedPane();
 	tabbedPane.addTab("Algorithms", algorithmPanel);
@@ -128,7 +131,7 @@ public class ScheduleDialog
 	    if (optiMethodsBox.getSelectedItem().equals("Modified A*"))
 		mastar = new ModifiedAstar(ActionMan.getGui().getSelectedAutomata(), (String) heuristicsBox.getSelectedItem(), nodeExpander.isSelected(), false);
 	    else if (optiMethodsBox.getSelectedItem().equals("Modified VGA*"))
-		mastar = new ModifiedVGAstar(ActionMan.getGui().getSelectedAutomata(), (String) heuristicsBox.getSelectedItem(), nodeExpander.isSelected(), false);
+		mastar = new ModifiedVGAstar(ActionMan.getGui().getSelectedAutomata(), (String) heuristicsBox.getSelectedItem(), nodeExpander.isSelected(), vgDrawer.isSelected(), false);
 	    else if (optiMethodsBox.getSelectedItem().equals("Modified IDA*"))
 		throw new Exception("IMA* not implemented yet...");
 // 		mastar = new ModifiedAstar(ActionMan.getGui().getSelectedAutomata(), (String) heuristicsBox.getSelectedItem(), nodeExpander.isSelected(), true);	

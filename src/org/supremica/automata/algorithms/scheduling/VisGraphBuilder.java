@@ -115,6 +115,10 @@ public class VisGraphBuilder {
 	}
     }
 
+    public void drawVisGraph() {
+	logger.error("VisGraphBuilder.drawVisGraph() not implemented.........................");
+    }
+
     private void extractTimes() {
 	zoneTimes = new int[plantAutomata.size()][];
 

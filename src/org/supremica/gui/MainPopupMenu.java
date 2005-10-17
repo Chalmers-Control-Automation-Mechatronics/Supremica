@@ -366,7 +366,7 @@ class MainPopupMenu
 
 			JMenuItem automataScheduler = new SupremicaMenuItem(new ScheduleAction());
 			expMenu.add(automataScheduler);
-
+			
 			JMenuItem mMd, mMmc, mSp;
 
 			expMenu.addSeparator();

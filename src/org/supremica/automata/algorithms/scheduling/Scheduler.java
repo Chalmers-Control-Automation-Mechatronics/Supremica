@@ -167,7 +167,7 @@ public abstract class Scheduler {
 
 	    int[] accNode = scheduleFrom(makeInitialNode());
 	    if (accNode == null)
-		throw new RuntimeException("no marked state found");
+		throw new RuntimeException("no marked state found, nr of iteration = " + searchCounter); 
 
 	    infoStr += "\tA*-iterations: " + searchCounter + " in time: " + timer.elapsedTime() + " ms.\n";
 // 	    infoStr += "\t\t"+ printNodeSignature(accNode);
@@ -236,6 +236,12 @@ public abstract class Scheduler {
     }
 
     protected int[] scheduleFrom(int[] initNode) {
+	try {
+	    // Tillfälligt
+	    java.io.File tempFile = new java.io.File("C:\\Documents and Settings\\Avenir\\Skrivbord\\tempfil.txt");
+	    java.io.BufferedWriter w = new java.io.BufferedWriter(new java.io.FileWriter(tempFile));
+
+
 	int[] currNode = new int[initNode.length];
 	
 	openList.clear();
@@ -244,10 +250,27 @@ public abstract class Scheduler {
 
 	while(!openList.isEmpty()) {
 	    searchCounter++;
+
+	    // Tillfälligt (debug)
+	    if (searchCounter > 50000) {
+		w.flush();
+		w.close();
+		return null;
+	    }
 	    
 	    currNode = (int[]) openList.remove(0);
+	   
+	    //Tillfälligt
+	    if (currNode[parentIndex] > 0)
+		w.write(searchCounter + ">>   " + printNodeSignature(currNode) + "; f = " + calcEstimatedCost(currNode));
+	    else 
+		w.write(searchCounter + ">>   " + printNodeSignature(currNode) + "; f = INF");
+	    w.newLine();
+	    
 	    
 	    if (isOptimalNode(currNode)) {
+		w.flush();
+		w.close();
 		flushLog(currNode);
 		return currNode;
 	    }
@@ -257,6 +280,8 @@ public abstract class Scheduler {
 
 	logger.error("An accepting node could not be found...");
 	return currNode;
+	}
+	catch (Exception e) { e.printStackTrace(); return null; }
     }
 
     //mkt mkt tillfälligt

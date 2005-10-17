@@ -34,6 +34,13 @@ public class ModifiedVGAstar extends ModifiedAstar {
 	super(theAutomata, heuristic, manualExpansion, iterativeSearch);
     }
 
+    public ModifiedVGAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean drawVisGraph, boolean iterativeSearch) throws Exception {
+	super(theAutomata, heuristic, manualExpansion, iterativeSearch);
+
+	if (drawVisGraph)
+	    vgBuilder.drawVisGraph();
+    }
+
     protected void init(boolean manualExpansion) {
 	super.init(manualExpansion);
 
