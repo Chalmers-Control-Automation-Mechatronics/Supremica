@@ -3,7 +3,6 @@ package org.supremica.external.robotCoordination;
 import java.util.*;
 import org.supremica.automata.*;
 import java.awt.Color;
-import org.supremica.external.robotCoordination.robotstudioApp.Box;
 
 public interface RobotCell
 {

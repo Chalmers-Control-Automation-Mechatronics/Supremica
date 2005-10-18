@@ -121,6 +121,7 @@ public final class SupremicaProperties
 	private static final String FILE_ALLOW_IMPORT = "fileAllowImport";
 	private static final String FILE_ALLOW_EXPORT = "fileAllowExport";
 	private static final String FILE_ALLOW_QUIT = "fileAllowQuit";
+        private static final String FILE_RSDEMO_OPEN_PATH = "fileRSDemoOpenPath";
 
 	// General properties
 	private static final String GENERAL_STATE_SEPARATOR = "stateSeparator";
@@ -715,6 +716,18 @@ public final class SupremicaProperties
 		File theFile = new File(wp.getProperty(FILE_SAVE_PATH));
 
 		return theFile.getAbsolutePath();
+	}
+
+	public static String getFileRSDemoOpenPath()
+	{
+		File theFile = new File(wp.getProperty(FILE_RSDEMO_OPEN_PATH));
+
+		return theFile.getAbsolutePath();
+	}
+
+	public static void setFileRSDemoOpenPath(String path)
+	{
+		wp.setProperty(FILE_RSDEMO_OPEN_PATH, path);
 	}
 
 	public static void setFileSavePath(String path)

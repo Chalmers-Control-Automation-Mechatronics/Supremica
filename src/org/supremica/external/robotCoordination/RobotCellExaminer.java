@@ -9,6 +9,7 @@ import java.util.*;
 import org.supremica.log.*;
 import org.supremica.gui.*;
 import org.supremica.automata.*;
+import org.supremica.properties.*;
 import org.supremica.external.robotCoordination.robotstudioApp.RSRobotCell;
 import java.awt.Color;
 
@@ -29,7 +30,8 @@ public class RobotCellExaminer
 
 	// Demo file
 	//final String DEMOSTATION_FILENAME = "C:/temp/RobSuprTestStation/RobSuprTest.stn";
-	final String DEMOSTATION_FILENAME = "C:/temp/DomStations/DemoSafe.stn";
+// 	final String DEMOSTATION_FILENAME = "C:/temp/DomStations/DemoSafe.stn";
+    String DEMOSTATION_FILENAME = "DemoSafe.stn";
 
 	/**
 	 * Dialog for manipulating the simulation environment.
@@ -38,6 +40,11 @@ public class RobotCellExaminer
 	{
 		super(owner, "Robot cell examiner", false);
 		this.owner = owner;
+
+		if (SupremicaProperties.getFileRSDemoOpenPath() != "")
+		    DEMOSTATION_FILENAME = SupremicaProperties.getFileRSDemoOpenPath() + File.separator + DEMOSTATION_FILENAME;
+		else
+		    DEMOSTATION_FILENAME = "C:\\temp\\DomStationsm" + File.separator + DEMOSTATION_FILENAME;
 
 		contentPane = (JPanel) getContentPane();
 		contentPane.setLayout(new FlowLayout());

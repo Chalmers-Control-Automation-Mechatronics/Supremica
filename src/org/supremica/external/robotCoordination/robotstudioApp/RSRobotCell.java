@@ -123,6 +123,10 @@ public class RSRobotCell
     /** The active RobotStudio station. */
     static Part zones;
 
+    /** The Box Factory */
+    RSBoxFactory boxFactory = null;
+    final static double[] boxDimenstions = new double[]{0.5, 0.5, 0.5};
+
     /** Generated automata */
     private Automata robotAutomata = new Automata();
     private Automata zoneAutomata = new Automata();
@@ -143,10 +147,10 @@ public class RSRobotCell
 	    logger.warn("X = " + base.getX() + "; Y = " + base.getY() + "; Z = " + base.getZ());
 	}
 
-	BoxFactory boxfactory = new BoxFactory(0.5,0.5,0.5);
-	boxfactory.createBox(new RSCoordinate(0,0,0), RS_BLUE, 0);
-	boxfactory.createBox(new RSCoordinate(1,1,1), RS_GREEN, 0);
-	boxfactory.createBox(new RSCoordinate(1,0,0), RS_RED, 0);
+	createBox(new RSCoordinate(0,0,0), Color.blue, 0);
+	createBox(new RSCoordinate(1,1,1), Color.green, 0);
+	createBox(new RSCoordinate(1,0,0), Color.cyan, 0);
+	createBox(new RSCoordinate(0,0,1), Color.lightGray, 0);
     }
 	
     public RSRobotCell(File file)
@@ -305,11 +309,14 @@ public class RSRobotCell
 		return list;
     }
 
-//     public Box createBox(Coordinate coord, Variant color, double transparency) 
-// 	throws Exception
-//     {
-// 	return BoxFactory.createBox(coord, color, transparency);
-//     }
+    public synchronized Box createBox(Coordinate coord, Color color, double transparency) 
+	throws Exception
+    {
+	if (boxFactory == null)
+	    boxFactory = new RSBoxFactory(boxDimenstions);
+
+	return boxFactory.createBox(coord, color, transparency);
+    }
 
     public Automata generateZoneAutomata()
 		throws Exception
