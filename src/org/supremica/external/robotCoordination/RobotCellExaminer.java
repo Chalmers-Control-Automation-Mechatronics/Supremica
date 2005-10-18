@@ -7,6 +7,7 @@ import java.io.*;
 import javax.swing.*;
 import java.util.*;
 import org.supremica.log.*;
+
 import org.supremica.gui.*;
 import org.supremica.automata.*;
 import org.supremica.properties.*;
@@ -41,11 +42,11 @@ public class RobotCellExaminer
 		super(owner, "Robot cell examiner", false);
 		this.owner = owner;
 
-		if (SupremicaProperties.getFileRSDemoOpenPath() != "")
+		if (false && (SupremicaProperties.getFileRSDemoOpenPath() != ""))
 		    DEMOSTATION_FILENAME = SupremicaProperties.getFileRSDemoOpenPath() + File.separator + DEMOSTATION_FILENAME;
 		else
-		    DEMOSTATION_FILENAME = "C:\\temp\\DomStationsm" + File.separator + DEMOSTATION_FILENAME;
-
+		    DEMOSTATION_FILENAME = "C:\\temp\\DomStations" + File.separator + DEMOSTATION_FILENAME;
+		
 		contentPane = (JPanel) getContentPane();
 		contentPane.setLayout(new FlowLayout());
 
@@ -59,19 +60,7 @@ public class RobotCellExaminer
 				if (fileOpener.showOpenDialog(null) == JFileChooser.APPROVE_OPTION)
 				{
 					File file = fileOpener.getSelectedFile();
-					String cellName = file.getAbsolutePath();
-
-					// Choose simulator based on file type...
-					if (cellName.endsWith(".stn"))
-					{
-						openCell(file, RobotSimulatorType.RobotStudio);
-					}
-					else
-					{
-						logger.error("The file " + cellName + " is not a robot station or is " +
-									 "not of a type supported by Supremica.");
-						return;
-					}
+					openCell(file);
 				}
 				else
 				{
@@ -125,17 +114,10 @@ public class RobotCellExaminer
 					{
 						// Open demo file if it exists...
 						File file = new File(DEMOSTATION_FILENAME);
-						if (file.exists())
-						{
-							openCell(file, RobotSimulatorType.RobotStudio);
-						}
-						else
-						{
-							logger.error("File " + file + " does not exist.");
-						}
+						openCell(file);
 					}
 						
-					// Do the stuff
+					// Run the demo!
 					generateSpans();
 					intersectSpans();
 					generateAutomata();
@@ -155,15 +137,7 @@ public class RobotCellExaminer
 					{
 						// Open demo file if it exists...
 						File file = new File(DEMOSTATION_FILENAME);
-						if (file.exists())
-						{
-							openCell(file, RobotSimulatorType.RobotStudio);							
-						}
-						else
-						{
-							logger.error("File " + file + " does not exist.");
-							return;
-						}						
+						openCell(file);
 					}
 
 					//Run the demo!
@@ -190,26 +164,36 @@ public class RobotCellExaminer
 	/**
 	 * Initiates simulation environment and opens cell with certain name.
 	 */
-	private void openCell(File file, RobotSimulatorType simType)
-	{
-		// Which simulation software is used?
-		// This is the only "application specific" part of this class!
-		if (simType == RobotSimulatorType.RobotStudio)
+    private void openCell(File file)
+    {
+		if (!file.exists())
 		{
+			logger.error("File " + file + " does not exist.");
+			return;
+		}
+		
+		String cellName = file.getAbsolutePath();
+
+		// Choose simulator based on file type...
+		if (cellName.endsWith(".stn"))
+		{
+			// A RobotStudio station!
 			// Here, it would be a good thing to examine if RobotStudio is
 			// properly installed...
-
+			
 			// Open cell
 			cell = new RSRobotCell(file);
 		}
 		else
 		{
-			logger.error("Unknown robot simulation environment specified.");
+			logger.error("The file " + cellName + " is not a robot station or is " +
+						 "not of a type supported by Supremica.");
+			return;
 		}
-
+		
 		// Set the project name based on the file name...
 		ActionMan.getGui().getVisualProjectContainer().getActiveProject().setName(file.getName());
-
+		
 		// Initialize
 		init();
 	}
@@ -523,30 +507,5 @@ public class RobotCellExaminer
 			}
 		}
 		*/
-	}
-
-	private class Coordinate
-	{
-		protected int x; 
-		protected int y; 
-		protected int z;
-
-		Coordinate(int x, int y, int z)
-		{
-			this.x = x;
-			this.y = y;
-			this.z = z;
-		}
-
-		public int hashCode()
-		{
-			return x + 229*y + 3571*z;
-		}
-
-		public boolean equals(Object obj)
-		{
-			Coordinate other = (Coordinate) obj;
-			return (x == other.x) && (y == other.y) && (z == other.z);
-		}
 	}
 }

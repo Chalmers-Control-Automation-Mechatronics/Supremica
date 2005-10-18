@@ -22,39 +22,40 @@ public class RSBoxFactory
 
     private static int boxIndex = 0;
     
-    public RSBoxFactory(double[] boxDimensions) {
-	this.dx = boxDimensions[0];
-	this.dy = boxDimensions[1];
-	this.dz = boxDimensions[2];
+    public RSBoxFactory(double[] boxDimensions) 
+	{
+		this.dx = boxDimensions[0];
+		this.dy = boxDimensions[1];
+		this.dz = boxDimensions[2];
     }
 
     public synchronized Box createBox(Coordinate coord, Color color, double transparency) 
-	throws ComJniException
-    {
-	Variant varColor = new Variant(new SafeArray(new int[]{color.getRed(), color.getGreen(), color.getBlue()}), false);
-
-	Transform trans = new Transform();
-	trans.setX(coord.getX()); 
-	trans.setY(coord.getY()); 
-	trans.setZ(coord.getZ());
-	
-	// Lägg till en numrering på boxarna
-	String boxName = "Box_" + boxIndex++;
-	Part part = RSRobotCell.addPart(boxName);
-	
-	part.createSolidBox(trans, dx, dy, dz);
-	part.setColor(varColor);
-	part.setRelativeTransparency((float) transparency);
-
-	return new RSBox(boxName, coord, color, transparency);
+		throws ComJniException
+	{
+		Variant varColor = new Variant(new SafeArray(new int[]{color.getRed(), color.getGreen(), color.getBlue()}), false);
+		
+		Transform trans = new Transform();
+		trans.setX(coord.getX()); 
+		trans.setY(coord.getY()); 
+		trans.setZ(coord.getZ());
+		
+		// Lägg till en numrering på boxarna
+		String boxName = "Box_" + boxIndex++;
+		Part part = RSRobotCell.addPart(boxName);
+		
+		part.createSolidBox(trans, dx, dy, dz);
+		part.setColor(varColor);
+		part.setRelativeTransparency((float) transparency);
+		
+		return new RSBox(boxName, coord, color, transparency);
     }
     
     public Box createBox(Coordinate coord) 
-	throws ComJniException
+		throws ComJniException
     {
-	return createBox(coord, Color.BLUE, 0.5);
+		return createBox(coord, Color.BLUE, 0.5);
     }
-
+	
     public void setDx(double dx) { this.dx = dx; }
     public void setDy(double dy) { this.dy = dy; }
     public void setDz(double dz) { this.dz = dz; }

@@ -2,8 +2,8 @@ package org.supremica.external.robotCoordination;
 
 import java.awt.Color;
 
-public interface BoxFactory {
-    
+public interface BoxFactory 
+{
     /**
      * Creates a box with given coordinates, color and transparency.
      */
