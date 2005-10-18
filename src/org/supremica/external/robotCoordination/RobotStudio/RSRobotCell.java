@@ -170,7 +170,7 @@ public class RSRobotCell
 			station.setFloorVisible(false);
 			
 			//AK
-			tempAvenirs();
+			//tempAvenirs();
 			
 			// Array of LinkedLists, later containing PathWithCost objects
 			robotCosts = new LinkedList[getMechanismsWithRole(RsKinematicRole.rsKinematicRoleRobot).size()];
@@ -419,8 +419,8 @@ public class RSRobotCell
 				{
 					if (i != j)
 					{
-						State state = new State(((org.supremica.external.robotCoordination.Position) posList.get(i)).getName() +
-												((org.supremica.external.robotCoordination.Position) posList.get(j)).getName());
+						State state = new State((posList.get(i)).getName() +
+												(posList.get(j)).getName());
 						aut.addState(state);
 						state.setCost(0);
 					}
@@ -437,8 +437,8 @@ public class RSRobotCell
 					for (int i=1; i < posList.size(); i++)
 					{
 						// Create new arc...
-						String name = ((org.supremica.external.robotCoordination.Position) posList.get(0)).getName() +
-							((org.supremica.external.robotCoordination.Position) posList.get(i)).getName();
+						String name = (posList.get(0)).getName() +
+							(posList.get(i)).getName();
 						State toState = aut.getStateWithName(name);
 						LabeledEvent event = new LabeledEvent(name);
 						if (!aut.getAlphabet().contains(event))
@@ -460,14 +460,14 @@ public class RSRobotCell
 					// Skip the 0:th element here... its assumed to be the home state
 					for (int i=0; i < posList.size(); i++)
 					{
-						if (fromState.getName().endsWith(((org.supremica.external.robotCoordination.Position) posList.get(i)).getName()))
+						if (fromState.getName().endsWith((posList.get(i)).getName()))
 						{
 							// Just to make sure there is no ambiguity
 							if (fromPos != null)
 							{
 								throw new Exception("Error in RSRobotCell.java, ambigous position names");
 							}
-							fromPos = ((org.supremica.external.robotCoordination.Position) posList.get(i)).getName();
+							fromPos = (posList.get(i)).getName();
 							
 							// Create arc for each possible target position
 							for (int j=0; j < posList.size(); j++)
@@ -475,8 +475,8 @@ public class RSRobotCell
 								if (i != j)
 								{
 									// Create new arc...
-									String name = ((org.supremica.external.robotCoordination.Position) posList.get(i)).getName() +
-										((org.supremica.external.robotCoordination.Position) posList.get(j)).getName();
+									String name = (posList.get(i)).getName() +
+										(posList.get(j)).getName();
 									State toState = aut.getStateWithName(name);
 									
 									// Special treatment if were dealing with the home position
@@ -517,7 +517,7 @@ public class RSRobotCell
 			// Skip home position (i=1...)
 			for (int i=1; i<positions.size(); i++)
 			{
-				org.supremica.external.robotCoordination.Position pos = (org.supremica.external.robotCoordination.Position) positions.get(i);
+				org.supremica.external.robotCoordination.Position pos = positions.get(i);
 				
 				aut = new Automaton(robot.getName() + UNDERSCORE + pos.getName());
 				State notVisited = new State("0");
@@ -731,7 +731,7 @@ public class RSRobotCell
 		sim.removeDSimulationEventsListener(simulationListener);
 
 		// Get the result, a list of collision times + info!
-		LinkedList richPath = mechanismListener.getRichPath();
+		LinkedList<RichPosition> richPath = mechanismListener.getRichPath();
 
 		// Stop the mechanismlistener
 		mechanism.remove_MechanismEventsListener(mechanismListener);
@@ -757,29 +757,29 @@ public class RSRobotCell
 		// does not always put the final state (representing the reaching of the last
 		// target of the path) last.
 		// Rearrange start
-		while (!((org.supremica.external.robotCoordination.Position) richPath.getFirst()).getName().equals(STARTPOSITION_NAME))
-		    {
+		while (!(richPath.getFirst()).getName().equals(STARTPOSITION_NAME))
+		{
 			logger.warn("Removing " + (RichPosition) richPath.getFirst());
 			richPath.removeFirst();
-		    }
+		}
 		// Rearrange finish
 		int index = 0;
-		while (!((org.supremica.external.robotCoordination.Position) richPath.get(++index)).getName().equals(FINISHPOSITION_NAME));
+		while (!(richPath.get(++index).getName().equals(FINISHPOSITION_NAME)));
 		if (index<richPath.size()-1)
-		    {
-			assert(((RichPosition) richPath.get(index)).getTime() >= ((RichPosition) richPath.getLast()).getTime());
+		{
+			assert(richPath.get(index).getTime() >= (richPath.getLast()).getTime());
 			logger.warn("Moving finish from pos " + index + " to last.");
-			RichPosition realFinish = (RichPosition) richPath.get(index);
+			RichPosition realFinish = richPath.get(index);
 			richPath.remove(index);
 			richPath.addLast(realFinish);
-		    }
+		}
 		// Change names
 		String fromName = fromTarget.getName();
 		String toName = toTarget.getName();
 		fromName = fromName.substring(0,fromName.length()-2); // Last two are ":1"
 		toName = toName.substring(0,toName.length()-2);       // Last two are ":1"
-		((RichPosition) richPath.getFirst()).setName(fromName);
-		((RichPosition) richPath.getLast()).setName(toName);
+		richPath.getFirst().setName(fromName);
+		richPath.getLast().setName(toName);
 
 		// Print richPath
 		/*
@@ -797,8 +797,8 @@ public class RSRobotCell
 		if (!to.getName().equals(robot.getHomePosition().getName()))
 		{
 		Automaton target = robotAutomata.getAutomaton(robot.getName() + UNDERSCORE + to.getName());
-		Position fromPos = (Position) richPath.get(0);
-		Position toPos = (Position) richPath.get(1);
+		Position fromPos = richPath.get(0);
+		Position toPos = richPath.get(1);
 		LabeledEvent event = new LabeledEvent(fromPos.getName() + toPos.getName());
 		Arc arc = new Arc(target.getStateWithName("0"), target.getStateWithName("1"), event);
 		target.getAlphabet().addEvent(event);
@@ -813,7 +813,7 @@ public class RSRobotCell
 		// Modify zone automata
 		for (int i=0; i< richPath.size(); i++)
 		    {
-			RichPosition currPos = (RichPosition) richPath.get(i);
+			RichPosition currPos = richPath.get(i);
 
 			// On the border of entering or exiting a zone?
 			String inZone = currPos.getEnterZone();
@@ -833,15 +833,15 @@ public class RSRobotCell
 				String prevPos;
 				if (inZone != null)
 				    {
-					nextPos = ((RichPosition) richPath.get(i+1)).getName();
-					prevPos = ((RichPosition) richPath.get(i-1)).getName();
+					nextPos = richPath.get(i+1).getName();
+					prevPos = richPath.get(i-1).getName();
 				    }
 				else
 				    {
 					// Other way around...
 					inZone = outZone;
-					nextPos = ((RichPosition) richPath.get(i-1)).getName();
-					prevPos = ((RichPosition) richPath.get(i+1)).getName();
+					nextPos = richPath.get(i-1).getName();
+					prevPos = richPath.get(i+1).getName();
 				    }
 
 				Automaton zone = zoneAutomata.getAutomaton(inZone);
@@ -871,10 +871,10 @@ public class RSRobotCell
 		{
 		    // MODIFY ROBOT AUTOMATON ITSELF
 		    Automaton rob = robotAutomata.getAutomaton(robot.getName());
-		    RichPosition firstPos = (RichPosition) richPath.get(0);
-		    org.supremica.external.robotCoordination.Position secondPos = (org.supremica.external.robotCoordination.Position) richPath.get(1);
-		    org.supremica.external.robotCoordination.Position secondLastPos = (org.supremica.external.robotCoordination.Position) richPath.get(richPath.size()-2);
-		    org.supremica.external.robotCoordination.Position lastPos = (org.supremica.external.robotCoordination.Position) richPath.get(richPath.size()-1);
+		    RichPosition firstPos = richPath.get(0);
+		    org.supremica.external.robotCoordination.Position secondPos = richPath.get(1);
+		    org.supremica.external.robotCoordination.Position secondLastPos = richPath.get(richPath.size()-2);
+		    org.supremica.external.robotCoordination.Position lastPos = richPath.get(richPath.size()-1);
 		    //assert(richPath.size() > 2);
 		    assert(from.getName().equals(firstPos.getName()));
 		    assert(to.getName().equals(lastPos.getName()));
@@ -914,8 +914,8 @@ public class RSRobotCell
 			    State currState = firstState;
 			    for (int i=1; i<richPath.size()-1; i++)
 				{
-				    RichPosition currPos = (RichPosition) richPath.get(i);
-				    RichPosition nextPos = (RichPosition) richPath.get(i+1);
+				    RichPosition currPos = richPath.get(i);
+				    RichPosition nextPos = richPath.get(i+1);
 
 				    // Add new arc and stuff
 				    State nextState;
@@ -954,10 +954,10 @@ public class RSRobotCell
 		{
 		    // MODIFY ROBOT AUTOMATON ITSELF
 		    Automaton rob = robotAutomata.getAutomaton(robot.getName());
-		    org.supremica.external.robotCoordination.Position lastPos = (org.supremica.external.robotCoordination.Position) richPath.get(0);				     //
-		    org.supremica.external.robotCoordination.Position secondLastPos = (org.supremica.external.robotCoordination.Position) richPath.get(1);             //
-		    RichPosition secondPos = (RichPosition) richPath.get(richPath.size()-2); //
-		    RichPosition firstPos = (RichPosition) richPath.get(richPath.size()-1);  //
+		    org.supremica.external.robotCoordination.Position lastPos = richPath.get(0); //
+		    org.supremica.external.robotCoordination.Position secondLastPos = richPath.get(1); //
+		    RichPosition secondPos = richPath.get(richPath.size()-2); //
+		    RichPosition firstPos = richPath.get(richPath.size()-1);  //
 
 		    // Only if there was at least one collision
 		    if (richPath.size() > 2)
@@ -996,8 +996,8 @@ public class RSRobotCell
 			    State currState = firstState;
 			    for (int i=richPath.size()-2; i>0; i--) //
 				{
-				    RichPosition currPos = (RichPosition) richPath.get(i);
-				    RichPosition nextPos = (RichPosition) richPath.get(i-1); //
+				    RichPosition currPos = richPath.get(i);
+				    RichPosition nextPos = richPath.get(i-1); //
 
 				    // Add new arc and stuff
 				    State nextState;

@@ -31,7 +31,7 @@ public class RobotCellExaminer
 
 	// Demo file
 	//final String DEMOSTATION_FILENAME = "C:/temp/RobSuprTestStation/RobSuprTest.stn";
-// 	final String DEMOSTATION_FILENAME = "C:/temp/DomStations/DemoSafe.stn";
+	// 	final String DEMOSTATION_FILENAME = "C:/temp/DomStations/DemoSafe.stn";
     String DEMOSTATION_FILENAME = "DemoSafe.stn";
 
 	/**
@@ -410,20 +410,20 @@ public class RobotCellExaminer
 			// Start loop!
 			while (boxesToExamine.size() != 0)
 			{
-			 	// Get the stats for this box
+			 	// Get the status for this box
 				Box box = boxesToExamine.remove(0);
-				Status stats;
+				Status status;
 				if (!matrix.containsKey(box))
 				{
-					stats = new Status();
-					stats.occupied = false;
-					stats.checked = true;
-					matrix.put(box.getCoordinate(), stats);
+					status = new Status();
+					status.occupied = false;
+					status.checked = true;
+					matrix.put(box.getCoordinate(), status);
 				}
 				else
 				{
-					stats = matrix.get(box.getCoordinate());
-					if (stats.checked)
+					status = matrix.get(box.getCoordinate());
+					if (status.checked)
 				 	{
 					 	// Already checked this one...
 						continue;
@@ -439,14 +439,11 @@ public class RobotCellExaminer
 					box.delete();
 
 					// Has someone else collided with this one?
-					if (stats.occupied)
+					if (status.occupied)
 					{
 						zoneBoxes.add(box);
 					}
-					else
-					{
-						stats.occupied = true;
-					}
+					status.occupied = true;
 
 					Coordinate coord = box.getCoordinate();
 					int x = coord.getX();
@@ -461,27 +458,27 @@ public class RobotCellExaminer
 
 					// Up
 					newCoord = new Coordinate(x,y,z+1);
-					newBox = cell.createBox(newCoord, RED, TRANSPARENCY);
+					newBox = cell.createBox(newCoord, ORANGE, TRANSPARENCY);
 					boxesToExamine.add(newBox);
 					// Down
 					newCoord = new Coordinate(x,y,z-1);
-					newBox = cell.createBox(newCoord, RED, TRANSPARENCY);
+					newBox = cell.createBox(newCoord, ORANGE, TRANSPARENCY);
 					boxesToExamine.add(newBox);
 					// Left
 					newCoord = new Coordinate(x,y+1,z);
-					newBox = cell.createBox(newCoord, RED, TRANSPARENCY);
+					newBox = cell.createBox(newCoord, ORANGE, TRANSPARENCY);
 					boxesToExamine.add(newBox);
 					// Right
 					newCoord = new Coordinate(x,y-1,z);
-					newBox = cell.createBox(newCoord, RED, TRANSPARENCY);
+					newBox = cell.createBox(newCoord, ORANGE, TRANSPARENCY);
 					boxesToExamine.add(newBox);
 					// Forward
 					newCoord = new Coordinate(x+1,y,z);
-					newBox = cell.createBox(newCoord, RED, TRANSPARENCY);
+					newBox = cell.createBox(newCoord, ORANGE, TRANSPARENCY);
 					boxesToExamine.add(newBox);
 					// Back
 					newCoord = new Coordinate(x-1,y,z);
-					newBox = cell.createBox(newCoord, RED, TRANSPARENCY);
+					newBox = cell.createBox(newCoord, ORANGE, TRANSPARENCY);
 					boxesToExamine.add(newBox);
 				}
 				else
@@ -498,18 +495,55 @@ public class RobotCellExaminer
 				logger.error("Base coordinate box is not inside robot.");
 				return;
 			}
-
-			// DO THE SPAN-STUFF HERE!!!
 			
+			// DO THE SPAN-STUFF HERE!!!
+			/*
+			Set collisionSet = new Set();
+			for (Iterator<Box> boxIt = surfaceBoxes.iterator(); boxIt.hasNext(); )
+			{
+				collisionSet.add(boxIt.next());
+			}
+			*/
 
-			// Clear CHECKED-status from the examined boxes before examinining next robot!
+			// Push boxes for each "path", i.e. unique pair of positions
+			List<Position> positions = robot.getPositions();
+			// The first loop must start with the home position, since the 
+			// surfaceboxes always should be pushed "outwards"
+			Position home = robot.getHomePosition();
+			int homeIndex = positions.indexOf(home);
+			if (homeIndex != 0)
+			{
+				Position temp = positions.get(0);
+				positions.set(0, home);
+				positions.set(homeIndex, temp);
+			}
+			robot.jumpToPosition(home);
+			// Now the paths, two nested loops of positions...
+			for (int i = 0; i < positions.size(); i++)
+			{
+				Position from = (Position) positions.get(i);
+				
+				for (int j = i + 1; j < positions.size(); j++)
+				{
+					Position to = (Position) positions.get(j);
+					
+					// Generate span!
+					logger.info("Pushing boxes moving from " + from + " to " + to + " for " + robot + ".");
+					//robot.pushBoxes(from, to);
+				}
+			}
+			// Finalize
+			robot.jumpToPosition(home);
+			robot.stop();			
+			
+			// Clear checked-status from the examined boxes before examining next robot!
 			while (boxesExamined.size() != 0)
 			{
 				Box box = boxesExamined.remove(0);
-				Status stats = matrix.get(box.getCoordinate());
-				stats.checked = false;
+				Status status = matrix.get(box.getCoordinate());
+				status.checked = false;
 			}
-
+			
 			// It's over for this robot. Remove the "surfaceboxes"
 			while (surfaceBoxes.size() != 0)
 			{
