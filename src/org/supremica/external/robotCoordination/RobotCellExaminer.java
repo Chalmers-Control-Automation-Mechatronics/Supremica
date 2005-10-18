@@ -377,8 +377,8 @@ public class RobotCellExaminer
 
 		// Discretization parameters
 		double dx = 0.1;
-		double dy = 0.1;
-		double dz = 0.1;
+		double dy = 0.5;
+		double dz = 1.0;
 		cell.setBoxDimensions(new double[] {dx,dy,dz});
 
 		// Hashtable
@@ -408,6 +408,7 @@ public class RobotCellExaminer
 			Coordinate base = robot.getBaseCoordinates();
 			Box startBox = cell.createBox(base, ORANGE, TRANSPARENCY);
 			boxesToExamine.add(startBox);
+			logger.info("Robot: " + robot + ", base: " + base);
 
 			// Start loop!
 			while (boxesToExamine.size() != 0)

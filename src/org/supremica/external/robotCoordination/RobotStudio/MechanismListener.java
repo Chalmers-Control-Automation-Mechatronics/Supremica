@@ -151,7 +151,7 @@ public class MechanismListener
      * @return true if robot and object are intersecting at their current
      * position, false otherwise
      */
-    private boolean entityCollidesWith(IMechanism robot, IEntity object)
+    private static boolean entityCollidesWith(IMechanism robot, IEntity object)
 		throws Exception
     {
 		// Get the collision sets, containing two sets for entities

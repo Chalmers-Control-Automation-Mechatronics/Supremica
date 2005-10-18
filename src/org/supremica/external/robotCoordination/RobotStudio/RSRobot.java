@@ -73,48 +73,52 @@ public class RSRobot
     private Mechanism mechanism;
     private Station station;
     private Part spans;
-
+	
     public RSRobot(Mechanism mechanism, Station station)
     {
-	this.mechanism = mechanism;
-	this.station = station;
-
-	try
+		this.mechanism = mechanism;
+		this.station = station;
+		
+		try
 	    {
-		spans = RSRobotCell.addPart(getName() + RSRobotCell.SPANS_SUFFIX);
+			spans = RSRobotCell.addPart(getName() + RSRobotCell.SPANS_SUFFIX);
 	    }
-	catch (Exception ex)
-	    {
-		logger.error("Error in RSRobot.java." + ex);
-	    }
+		catch (Exception ex)
+		{
+			logger.error("Error in RSRobot.java." + ex);
+		}
     }
-
+	
     /////////////////////////////
     // Robot interface methods //
     /////////////////////////////
-
+		
 	public List<org.supremica.external.robotCoordination.Position> getPositions()
-	    throws Exception
+		throws Exception
     {
-	LinkedList list = new LinkedList();
+		LinkedList list = new LinkedList();
 	    
-	// Get targets from RobotStudio, tranform into list of Target:s.
-	ITargets robotTargets = mechanism.getWorkObjects().item(Converter.var(1)).getTargets();    // takes the targets from Elements
-	int nbrOfTargets = robotTargets.getCount();
+		// Get targets from RobotStudio, tranform into list of Target:s.
+		ITargets robotTargets = mechanism.getWorkObjects().item(Converter.var(1)).getTargets();    // takes the targets from Elements
+		int nbrOfTargets = robotTargets.getCount();
 	    
-	for (int i = 1; i <= nbrOfTargets; i++)
+		for (int i = 1; i <= nbrOfTargets; i++)
 	    {
-		list.add(new RSPosition(robotTargets.item(Converter.var(i))));
+			list.add(new RSPosition(robotTargets.item(Converter.var(i))));
 	    }
 	    
-	return list;
+		return list;
     }
-
-    //AK - TODO
-    public boolean collidesWith(Box box) {
-	return true;
+	
+	/**
+	 * Examines if this robot collides with the given box in the current position.
+	 */
+    public boolean collidesWith(Box box) 
+	{
+		//return MechanismListener.entityCollidesWith(mechanism, ((RSBox) box).getEntity());
+		return true;
     }
-
+	
     public Coordinate getBaseCoordinates() throws Exception {
 	    return Converter.toCoordinate(mechanism.getTransform().getX(), mechanism.getTransform().getY(), mechanism.getTransform().getZ());
     }

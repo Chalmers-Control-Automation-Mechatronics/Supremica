@@ -15,23 +15,40 @@ public class RSBox
     extends Box 
 {
     public RSBox(String name, Coordinate coord, Color color, double transparency) 
-		throws ComJniException
+		throws Exception
     {
 		super(name, coord, color, transparency);
+		setColor(color);
+		setTransparency(transparency);
     }
 	
     public void delete() 
 		throws Exception
     {
-		RSRobotCell.station.getParts().item(Converter.var(name)).delete();
+		getEntity().delete();
     }
 
 	public void setColor(Color color)
 		throws Exception
 	{
 		Variant varColor = new Variant(new SafeArray(new int[]{color.getRed(), color.getGreen(), color.getBlue()}), false);
-		RSRobotCell.station.getParts().item(Converter.var(name)).setColor(varColor);
+		getEntity().setColor(varColor);
 
 		this.color = color;
+	}
+
+	public void setTransparency(double transparency)
+		throws Exception
+	{
+		getEntity().setRelativeTransparency((float) transparency);
+
+		this.transparency = transparency;
+	}
+
+	protected IEntity getEntity()
+		throws Exception
+	{
+		IPart boxPart = RSRobotCell.station.getParts().item(Converter.var(RSRobotCell.BOXPART_NAME));
+		return boxPart.getEntities().item(Converter.var(name));
 	}
 }

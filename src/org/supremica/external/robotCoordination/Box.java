@@ -14,7 +14,7 @@ public abstract class Box {
     protected String name;
 	
     public Box(String name, Coordinate coord, Color color, double transparency) 
-		throws ComJniException
+		throws Exception
     {
 		this.name = name;
 		this.coord = coord;
@@ -27,4 +27,6 @@ public abstract class Box {
     public abstract void delete() throws Exception;
 
 	public abstract void setColor(Color color) throws Exception;
+
+	public abstract void setTransparency(double transparency) throws Exception;
 }

@@ -78,7 +78,8 @@ public class RSRobotCell
     // Constants
 	
     /** The name of the IPart containing the mutex zones. */
-    final static String ZONEPART_NAME = "MutexZones";
+    final static String ZONEPART_NAME = "Mutex_Zones";
+    final static String BOXPART_NAME = "Box_Set";
 	
     final static String ZONEENTITY_BASENAME = "MutexZone";
     final static String FREESTATE_NAME = "Free";
@@ -142,7 +143,7 @@ public class RSRobotCell
 			station.setBackgroundColor(RS_WHITE);
 			station.setFloorVisible(false);
 
-			boxSet = addPart("BOX_SET");
+			boxSet = addPart(BOXPART_NAME);
 			
 			// Array of LinkedLists, later containing PathWithCost objects
 			robotCosts = new LinkedList[getMechanismsWithRole(RsKinematicRole.rsKinematicRoleRobot).size()];
@@ -300,14 +301,10 @@ public class RSRobotCell
 		trans.setY(rsPoint[1]); 
 		trans.setZ(rsPoint[2]);
 		
-		// Lägg till en numrering på boxarna
 		String boxName = "Box_" + coord;
-// 		Part part = addPart(boxName);
 		
 		IEntity currBox = boxSet.createSolidBox(trans, boxDimensions[0], boxDimensions[1], boxDimensions[2]);
 		currBox.setName(boxName);
-		boxSet.setColor(varColor);
-		boxSet.setRelativeTransparency((float) transparency);
 		
 		return new RSBox(boxName, coord, color, transparency);
     }
@@ -1129,67 +1126,67 @@ public class RSRobotCell
 
     public void quit()
     {
-	// This is fatal, cause this has never ever happened
-	// and I'd like to know if it ever does! (Magnus said it should!)
-	logger.fatal("RobotStudio is shutting down. Please tell Hugo " + "if, when and how you got this message!");
-
-	// clean();
+		// This is fatal, cause this has never ever happened
+		// and I'd like to know if it ever does! (Magnus said it should!)
+		logger.fatal("RobotStudio is shutting down. Please tell Hugo " + "if, when and how you got this message!");
+		
+		// clean();
     }
 
     public int stationBeforeOpen(String Path, boolean[] Cancel)
     {
-	//logger.info("Station being opened...");
-	return 0;
+		//logger.info("Station being opened...");
+		return 0;
     }
-
-    public int stationAfterOpen(org.supremica.external.comInterfaces.robotstudio_3_1.RobotStudio.Station Station)
+	
+    public int stationAfterOpen(org.supremica.external.comInterfaces.robotstudio_3_1.RobotStudio.Station station)
     {
-	logger.info("Station opened.");
-
-	return 0;
+		logger.info("Station opened.");
+		
+		return 0;
     }
-
-    public int stationBeforeSave(org.supremica.external.comInterfaces.robotstudio_3_1.RobotStudio.Station Station, boolean[] Cancel)
+	
+    public int stationBeforeSave(org.supremica.external.comInterfaces.robotstudio_3_1.RobotStudio.Station station, boolean[] Cancel)
     {
-	//logger.info("Station being saved...");
-	return 0;
+		//logger.info("Station being saved...");
+		return 0;
     }
-
-    public int stationAfterSave(org.supremica.external.comInterfaces.robotstudio_3_1.RobotStudio.Station Station)
+	
+    public int stationAfterSave(org.supremica.external.comInterfaces.robotstudio_3_1.RobotStudio.Station station)
     {
-	logger.info("Station saved...");
-
-	return 0;
+		logger.info("Station saved...");
+		
+		return 0;
     }
-
+	
     public int libraryBeforeOpen(String FileName, boolean[] Cancel)
     {
-	//logger.info("Library being opened...");
-	return 0;
+		//logger.info("Library being opened...");
+		return 0;
     }
-
-    public int libraryAfterOpen(org.supremica.external.comInterfaces.robotstudio_3_1.RobotStudio.RsObject RsObject)
+	
+    public int libraryAfterOpen(org.supremica.external.comInterfaces.robotstudio_3_1.RobotStudio.RsObject rsObject)
     {
-	//logger.info("Library opened.");
-	return 0;
+		//logger.info("Library opened.");
+		return 0;
     }
-
-    public int libraryBeforeSave(org.supremica.external.comInterfaces.robotstudio_3_1.RobotStudio.RsObject RsObject, boolean[] Cancel)
+	
+    public int libraryBeforeSave(org.supremica.external.comInterfaces.robotstudio_3_1.RobotStudio.RsObject rsObject, boolean[] Cancel)
     {
-	//logger.info("Library being saved...");
-	return 0;
+		//logger.info("Library being saved...");
+		return 0;
     }
-
-    public int libraryAfterSave(org.supremica.external.comInterfaces.robotstudio_3_1.RobotStudio.RsObject RsObject)
+	
+    public int libraryAfterSave(org.supremica.external.comInterfaces.robotstudio_3_1.RobotStudio.RsObject rsObject)
     {
-	//logger.info("Library saved.");
-	return 0;
+		//logger.info("Library saved.");
+		return 0;
     }
-
+	
     public int started()
     {
-	logger.info("RobotStudio started.");
-
-	return 0;
+		logger.info("RobotStudio started.");
+		
+		return 0;
     }
 }
