@@ -23,14 +23,14 @@ public class RSBox
     public void delete() 
 		throws Exception
     {
-		RSRobotCell.station.getParts().item(RSRobotCell.var(name)).delete();
+		RSRobotCell.station.getParts().item(Converter.var(name)).delete();
     }
 
 	public void setColor(Color color)
 		throws Exception
 	{
 		Variant varColor = new Variant(new SafeArray(new int[]{color.getRed(), color.getGreen(), color.getBlue()}), false);
-		RSRobotCell.station.getParts().item(RSRobotCell.var(name)).setColor(varColor);
+		RSRobotCell.station.getParts().item(Converter.var(name)).setColor(varColor);
 
 		this.color = color;
 	}

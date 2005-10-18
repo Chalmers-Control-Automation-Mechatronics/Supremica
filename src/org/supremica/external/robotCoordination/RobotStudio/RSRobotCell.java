@@ -125,7 +125,7 @@ public class RSRobotCell
 
     /** The Box Factory */
 //      RSBoxFactory boxFactory = null;
-    final static double[] boxDimensions = new double[]{0.5, 0.5, 0.5};
+    final static double[] boxDimensions = new double[]{0.01, 0.01, 0.01};
 
     /** Generated automata */
     private Automata robotAutomata = new Automata();
@@ -185,7 +185,7 @@ public class RSRobotCell
 			try
 		    {
 				// Already got a zones part?
-				zones = Part.getPartFromUnknown(station.getParts().item(var(ZONEPART_NAME)));
+				zones = Part.getPartFromUnknown(station.getParts().item(Converter.var(ZONEPART_NAME)));
 		    }
 			catch (Exception ex)
 		    {
@@ -267,7 +267,7 @@ public class RSRobotCell
 		throws Exception
     {
 		String stationName = file.getAbsolutePath();
-		IStation iStation = app.getWorkspace().openStation(stationName, var(true), var(false));
+		IStation iStation = app.getWorkspace().openStation(stationName, Converter.var(true), Converter.var(false));
 		station = Station.getStationFromUnknown(iStation);
 		
 		// Build robot automata
@@ -320,11 +320,13 @@ public class RSRobotCell
 		throws Exception
     {
 		Variant varColor = new Variant(new SafeArray(new int[]{color.getRed(), color.getGreen(), color.getBlue()}), false);
+
+		double[] rsPoint = Converter.toRSPoint(coord);
 		
 		Transform trans = new Transform();
-		trans.setX(coord.getX()); 
-		trans.setY(coord.getY()); 
-		trans.setZ(coord.getZ());
+		trans.setX(rsPoint[0]); 
+		trans.setY(rsPoint[1]); 
+		trans.setZ(rsPoint[2]);
 		
 		// Lägg till en numrering på boxarna
 		String boxName = "Box_" + coord.getX() + "_" + coord.getY() + "_" + coord.getZ();
@@ -335,11 +337,6 @@ public class RSRobotCell
 		part.setRelativeTransparency((float) transparency);
 		
 		return new RSBox(boxName, coord, color, transparency);
-
-// 		if (boxFactory == null)
-// 			boxFactory = new RSBoxFactory(boxDimensions);
-		
-// 		return boxFactory.createBox(coord, color, transparency);
     }
 	
     public Automata generateZoneAutomata()
@@ -352,7 +349,7 @@ public class RSRobotCell
 		  for (int i = 1; i <= zones.getEntities().getCount(); i++)
 		  {
 		  // Create new automaton
-		  String zoneName = zones.getEntities().item(var(i)).getName();
+		  String zoneName = zones.getEntities().item(Converter.var(i)).getName();
 		  Automaton aut = new Automaton(zoneName);
 		  
 		  aut.setType(AutomatonType.Specification);
@@ -580,7 +577,7 @@ public class RSRobotCell
 		try
 		    {
 			// If there already is one, get it!
-			part = Part.getPartFromUnknown(station.getParts().item(RSRobotCell.var(name)));
+			part = Part.getPartFromUnknown(station.getParts().item(Converter.var(name)));
 		    }
 		catch (ComJniException ex)
 		    {
@@ -630,25 +627,40 @@ public class RSRobotCell
 	return robotAutomata;
     }
 
+	public double[] getBoxDimensions() { 
+		return boxDimensions; 
+	}
+
+	public void setBoxDimensions(double[] dims) 
+		throws Exception
+	{
+		if (boxDimensions.length != dims.length)
+			throw new Exception("Inconsistent dimensions in RSRobotCell.setBoxDimensions()");
+
+		for (int i=0; i<dims.length; i++)
+			boxDimensions[i] = dims[i];
+	}
+		
+
     /**
      * Finds the index of a robot.
      */
     public int getRobotIndex(String robotName)
-	throws Exception
+		throws Exception
     {
-	LinkedList robots = getMechanismsWithRole(RsKinematicRole.rsKinematicRoleRobot);
-
-	for (int i = 0; i < robots.size(); i++)
-	    {
-		if (((IMechanism) robots.get(i)).getName().equals(robotName))
-		    {
-			return i;
-		    }
-	    }
-
-	logger.error(robotName + " not present in cell?");
-
-	return 0;
+		LinkedList robots = getMechanismsWithRole(RsKinematicRole.rsKinematicRoleRobot);
+		
+		for (int i = 0; i < robots.size(); i++)
+			{
+				if (((IMechanism) robots.get(i)).getName().equals(robotName))
+					{
+						return i;
+					}
+			}
+		
+		logger.error(robotName + " not present in cell?");
+		
+		return 0;
     }
 
     /**
@@ -659,7 +671,7 @@ public class RSRobotCell
     {
 	for (int i = 1; i <= zones.getEntities().getCount(); i++)
 	    {
-		if (zones.getEntities().item(var(i)).getName().equals(zoneName))
+		if (zones.getEntities().item(Converter.var(i)).getName().equals(zoneName))
 		    {
 			return i;
 		    }
@@ -692,9 +704,9 @@ public class RSRobotCell
 		Path path = Path.getPathFromUnknown(mechanism.getPaths().add());
 		path.setName(from.getName() + to.getName());
 		path.insert(fromTarget);
-		path.getTargetRefs().item(var(1)).setMotionType(1);    // Linear motion
+		path.getTargetRefs().item(Converter.var(1)).setMotionType(1);    // Linear motion
 		path.insert(toTarget);
-		path.getTargetRefs().item(var(2)).setMotionType(1);    // Linear motion
+		path.getTargetRefs().item(Converter.var(2)).setMotionType(1);    // Linear motion
 
 		// Redefine robot program...
 		IABBS4Procedure mainProcedure = ((RSRobot) robot).getMainProcedure();
@@ -702,7 +714,7 @@ public class RSRobotCell
 		     k <= mainProcedure.getProcedureCalls().getCount();
 		     k++)
 		    {
-			mainProcedure.getProcedureCalls().item(var(k)).delete();
+			mainProcedure.getProcedureCalls().item(Converter.var(k)).delete();
 		    }
 		// Add path as only procedure in main
 		path.syncToVirtualController(PATHSMODULE_NAME);    // Generate procedure from path
@@ -711,7 +723,7 @@ public class RSRobotCell
 		mainProcedure.getProcedureCalls().add(path.getProcedure());
 
 		// Add SimulationListener (for detecting when simulation is finished)
-		ISimulation simulation = station.getSimulations().item(var(1));
+		ISimulation simulation = station.getSimulations().item(Converter.var(1));
 		Simulation sim = Simulation.getSimulationFromUnknown(simulation);
 		SimulationListener simulationListener = new SimulationListener();
 		sim.addDSimulationEventsListener(simulationListener);
@@ -739,9 +751,9 @@ public class RSRobotCell
 
 		// Rearrange the path (in RobotStudio) so that the to-Target is last,
 		// after viapoints that may have been added during the simulation!
-		path.getTargetRefs().item(var(2)).delete();
+		path.getTargetRefs().item(Converter.var(2)).delete();
 		path.insert(toTarget);
-		path.getTargetRefs().item(var(path.getTargetRefs().getCount())).setMotionType(1);
+		path.getTargetRefs().item(Converter.var(path.getTargetRefs().getCount())).setMotionType(1);
 
 		// Print richPath
 		/*
@@ -1061,9 +1073,9 @@ public class RSRobotCell
 
 	for (int i = 1; i <= mechanismCount; i++)
 	    {
-		if (mechanisms.item(var(i)).getKinematicRole() == kinematicRole)
+		if (mechanisms.item(Converter.var(i)).getKinematicRole() == kinematicRole)
 		    {
-			list.add(mechanisms.item(var(i)));
+			list.add(mechanisms.item(Converter.var(i)));
 		    }
 	    }
 
@@ -1078,16 +1090,16 @@ public class RSRobotCell
 	throws Exception
     {
 	// Get the parts containing the spans
-	IPart spansA = station.getParts().item(var(robotA.getName() + SPANS_SUFFIX));
-	IPart spansB = station.getParts().item(var(robotB.getName() + SPANS_SUFFIX));
+	IPart spansA = station.getParts().item(Converter.var(robotA.getName() + SPANS_SUFFIX));
+	IPart spansB = station.getParts().item(Converter.var(robotB.getName() + SPANS_SUFFIX));
 
 	// Iterate over all spans in robotA and robotB and intersect...
 	for (int a = 1; a <= spansA.getEntities().getCount(); a++)
 	    {
 		for (int b = 1; b <= spansB.getEntities().getCount(); b++)
 		    {
-			IEntity spanA = spansA.getEntities().item(var(a));
-			IEntity spanB = spansB.getEntities().item(var(b));
+			IEntity spanA = spansA.getEntities().item(Converter.var(a));
+			IEntity spanB = spansB.getEntities().item(Converter.var(b));
 
 			try
 			    {
@@ -1098,11 +1110,11 @@ public class RSRobotCell
 
 				for (int m = 1; m <= intersections.getCount(); m++)
 				    {
-					//intersections.item(var(m)).setName(spanA.getName() + spanB.getName() + "_" + m);
+					//intersections.item(Converter.var(m)).setName(spanA.getName() + spanB.getName() + "_" + m);
 					String zoneName = "Zone" + zoneNbr++;
-					intersections.item(var(m)).setName(zoneName);
+					intersections.item(Converter.var(m)).setName(zoneName);
 					zones.setTransform(parent.getTransform());
-					zones.addEntity(intersections.item(var(m)));
+					zones.addEntity(intersections.item(Converter.var(m)));
 
 					// Add new automaton
 					Automaton aut = new Automaton(zoneName);
@@ -1206,35 +1218,5 @@ public class RSRobotCell
 	logger.info("RobotStudio started.");
 
 	return 0;
-    }
-
-    /**
-     * Typecast i into Variant, for convenience! (Variant is something like
-     * VB:s counterpart of java's Object.)
-     */
-    static Variant var(int i)
-	throws Exception
-    {
-	return new Variant(i);
-    }
-
-    /**
-     * Typecast i into Variant, for convenience! (Variant is something like
-     * VB:s counterpart of java's Object.)
-     */
-    static Variant var(boolean i)
-	throws Exception
-    {
-	return new Variant(i);
-    }
-
-    /**
-     * Typecast i into Variant, for convenience! (Variant is something like
-     * VB:s counterpart of java's Object.)
-     */
-    static Variant var(String i)
-	throws Exception
-    {
-	return new Variant(i);
     }
 }

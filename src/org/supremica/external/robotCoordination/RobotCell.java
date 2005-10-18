@@ -60,4 +60,9 @@ public interface RobotCell
 	 */
 	public Box createBox(Coordinate coordinate, Color color, double transparency)
 		throws Exception;
+
+	public void setBoxDimensions(double[] dims)
+		throws Exception;
+
+	public double[] getBoxDimensions();
 }

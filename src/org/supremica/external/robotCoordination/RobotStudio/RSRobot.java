@@ -99,12 +99,12 @@ public class RSRobot
 	LinkedList list = new LinkedList();
 	    
 	// Get targets from RobotStudio, tranform into list of Target:s.
-	ITargets robotTargets = mechanism.getWorkObjects().item(RSRobotCell.var(1)).getTargets();    // takes the targets from Elements
+	ITargets robotTargets = mechanism.getWorkObjects().item(Converter.var(1)).getTargets();    // takes the targets from Elements
 	int nbrOfTargets = robotTargets.getCount();
 	    
 	for (int i = 1; i <= nbrOfTargets; i++)
 	    {
-		list.add(new RSPosition(robotTargets.item(RSRobotCell.var(i))));
+		list.add(new RSPosition(robotTargets.item(Converter.var(i))));
 	    }
 	    
 	return list;
@@ -115,19 +115,16 @@ public class RSRobot
 	return true;
     }
 
-    //AK
     public Coordinate getBaseCoordinates() throws Exception {
-	    // return new Coordinate(mechanism.getTransform().getX(), mechanism.getTransform().getY(), mechanism.getTransform().getZ());
-	// return new RSCoordinate(mechanism.getTransform().getPosition());
-		return new Coordinate(0,0,0);
+	    return Converter.toCoordinate(mechanism.getTransform().getX(), mechanism.getTransform().getY(), mechanism.getTransform().getZ());
     }
 	
     public org.supremica.external.robotCoordination.Position getHomePosition()
 	throws Exception
     {
-	ITargets robotTargets = mechanism.getWorkObjects().item(RSRobotCell.var(1)).getTargets();    // takes the targets from Elements
+	ITargets robotTargets = mechanism.getWorkObjects().item(Converter.var(1)).getTargets();    // takes the targets from Elements
 
-	return new RSPosition(robotTargets.item(RSRobotCell.var(1)));
+	return new RSPosition(robotTargets.item(Converter.var(1)));
     }
 
     public void generateSpan(org.supremica.external.robotCoordination.Position from, org.supremica.external.robotCoordination.Position to)
@@ -144,9 +141,9 @@ public class RSRobot
 
 	path.setName(from.getName() + to.getName());
 	path.insert(fromTarget);
-	path.getTargetRefs().item(RSRobotCell.var(1)).setMotionType(1);    // Linear motion
+	path.getTargetRefs().item(Converter.var(1)).setMotionType(1);    // Linear motion
 	path.insert(toTarget);
-	path.getTargetRefs().item(RSRobotCell.var(2)).setMotionType(1);    // Linear motion
+	path.getTargetRefs().item(Converter.var(2)).setMotionType(1);    // Linear motion
 
 	// Redefine robot program...
 	IABBS4Procedure mainProcedure = getMainProcedure();
@@ -154,7 +151,7 @@ public class RSRobot
 	for (int k = 1; k <= mainProcedure.getProcedureCalls().getCount();
 	     k++)
 	    {
-		mainProcedure.getProcedureCalls().item(RSRobotCell.var(k)).delete();
+		mainProcedure.getProcedureCalls().item(Converter.var(k)).delete();
 	    }
 
 	// Add path as only procedure in main
@@ -167,7 +164,7 @@ public class RSRobot
 
 	// Generate span for this path
 	// Start simulation listener
-	ISimulation simulation = mechanism.getParent().getSimulations().item(RSRobotCell.var(1));
+	ISimulation simulation = mechanism.getParent().getSimulations().item(Converter.var(1));
 	Simulation sim = Simulation.getSimulationFromUnknown(simulation);
 	SpanGenerator spanGenerator = new SpanGenerator(this, path.getName());
 
@@ -336,11 +333,11 @@ public class RSRobot
 
 	for (int i = 1; i <= modules.getCount(); i++)
 	    {
-		IABBS4Procedures procedures = modules.item(RSRobotCell.var(i)).getProcedures();
+		IABBS4Procedures procedures = modules.item(Converter.var(i)).getProcedures();
 
 		for (int j = 1; j <= procedures.getCount(); j++)
 		    {
-			IABBS4Procedure procedure = procedures.item(RSRobotCell.var(j));
+			IABBS4Procedure procedure = procedures.item(Converter.var(j));
 
 			if (procedure.getName().equals("main"))
 			    {

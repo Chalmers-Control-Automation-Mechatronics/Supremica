@@ -107,7 +107,7 @@ public class SpanGenerator
 	spanEntities = temp.getEntities();
 
 	// Create first cover
-	tool0 = theRobot.getRobotStudioMechanism().getToolFrames().item(RSRobotCell.var("tool0"));
+	tool0 = theRobot.getRobotStudioMechanism().getToolFrames().item(Converter.var("tool0"));
 	oldTransform = transformCopy(tool0.getTransform());
 
 	//createSpanEntity(oldTransform);
@@ -160,7 +160,7 @@ public class SpanGenerator
 		// Only if there are at least two spanEntities
 		if (spanEntities.getCount() >= 2)
 		    {
-			unionEntity = spanEntities.item(RSRobotCell.var(2));
+			unionEntity = spanEntities.item(Converter.var(2));
 			IPart oldPart = null;
 			boolean shutup = false;
 
@@ -168,10 +168,10 @@ public class SpanGenerator
 			    {
 				IPart part = unionEntity.getParent();
 
-				//logger.info("Joining " + unionEntity.getName() + " and " + spanEntities.item(RSRobotCell.var(1)).getName());
+				//logger.info("Joining " + unionEntity.getName() + " and " + spanEntities.item(Converter.var(1)).getName());
 				try
 				    {
-					unionEntity = unionEntity.join(spanEntities.item(RSRobotCell.var(1)), false);
+					unionEntity = unionEntity.join(spanEntities.item(Converter.var(1)), false);
 				    }
 				catch (Exception ex)
 				    {
@@ -197,7 +197,7 @@ public class SpanGenerator
 		else
 		    {
 			// Only one spanEntity
-			unionEntity = spanEntities.item(RSRobotCell.var(1));
+			unionEntity = spanEntities.item(Converter.var(1));
 		    }
 
 		//spans.delete();
@@ -264,7 +264,7 @@ public class SpanGenerator
 	boxTransform = ruu.uCSToWCS(boxTransform);
 
 	// Calculate cylinder transform
-	IPart upperArm = theRobot.getRobotStudioMechanism().getLinks().item(RSRobotCell.var("Link4")).getParts().item(RSRobotCell.var(1));
+	IPart upperArm = theRobot.getRobotStudioMechanism().getLinks().item(Converter.var("Link4")).getParts().item(Converter.var(1));
 
 	RSRobotCell.station.setUCS(upperArm);
 

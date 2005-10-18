@@ -100,30 +100,30 @@ public class MechanismListener
     {
 		try
 	    {
-			this.theCell = theCell;
-			this.path = path;
-			this.mechanism = mechanism;
-			
-			// pathcosts = new CreateXml.PathWithCosts(path.getName());
-			// pathcosts.insertCost(new Integer(0));
+		this.theCell = theCell;
+		this.path = path;
+		this.mechanism = mechanism;
+
+		// pathcosts = new CreateXml.PathWithCosts(path.getName());
+		// pathcosts.insertCost(new Integer(0));
 	    }
-		catch (Exception e)
+	catch (Exception e)
 	    {
-			logger.error("Error initializing mechanism");
-			
-			return;
+		logger.error("Error initializing mechanism");
+
+		return;
 	    }
-		
-		// Try to find zones that the robot is currently inside
-		// ("already colliding with")
-		try
+
+	// Try to find zones that the robot is currently inside
+	// ("already colliding with")
+	try
 	    {
-			for (int j = 1; j <= RSRobotCell.zones.getEntities().getCount(); j++)
+		for (int j = 1; j <= RSRobotCell.zones.getEntities().getCount(); j++)
 		    {
-				IEntity zone = RSRobotCell.zones.getEntities().item(RSRobotCell.var(j));
-				String zoneName = zone.getName();
-				
-				if (entityCollidesWith(mechanism, zone))
+			IEntity zone = RSRobotCell.zones.getEntities().item(Converter.var(j));
+			String zoneName = zone.getName();
+
+			if (entityCollidesWith(mechanism, zone))
 			    {
 					objectsColliding.add(new Collider(zoneName));
 			    }
@@ -133,7 +133,8 @@ public class MechanismListener
 			for (ListIterator it = objectsColliding.listIterator();
 				 it.hasNext(); )
 		    {
-				logger.info(mechanism.getName() + " is already inside the zone " + ((Collider) it.next()).getName() + " at target " + path.getTargetRefs().item(RSRobotCell.var(1)).getName() + ".");
+
+			logger.info(mechanism.getName() + " is already inside the zone " + ((Collider) it.next()).getName() + " at target " + path.getTargetRefs().item(Converter.var(1)).getName() + ".");		
 		    }
 	    }
 		catch (Exception e)
@@ -455,6 +456,7 @@ public class MechanismListener
     private synchronized ITarget createTargetAtTCP(String targetName)
 		throws Exception
     {
+
 		// Create a new target
 		IMechanism mechanism = controller.getMechanism();
 		ITarget newTarget = mechanism.getWorkObjects().item(RSRobotCell.var(1)).getTargets().add();
@@ -467,6 +469,7 @@ public class MechanismListener
 		int nbr = 1;
 		
 		while (!ok)
+			
 	    {
 			try
 		    {
