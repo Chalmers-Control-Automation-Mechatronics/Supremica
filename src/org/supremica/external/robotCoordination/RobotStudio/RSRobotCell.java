@@ -595,10 +595,10 @@ public class RSRobotCell
 		    }
 	    }
 	catch (Exception ex)
-	    {
+	{
 		logger.error("Error! " + ex);
-	    }
-
+	}
+		
 	return part;
     }
 
@@ -1087,64 +1087,64 @@ public class RSRobotCell
      * Puts them into the part called ZONEPART_NAME and then deletes the spans.
      */
     public void intersectSpans(Robot robotA, Robot robotB)
-	throws Exception
+		throws Exception
     {
-	// Get the parts containing the spans
-	IPart spansA = station.getParts().item(Converter.var(robotA.getName() + SPANS_SUFFIX));
-	IPart spansB = station.getParts().item(Converter.var(robotB.getName() + SPANS_SUFFIX));
-
-	// Iterate over all spans in robotA and robotB and intersect...
-	for (int a = 1; a <= spansA.getEntities().getCount(); a++)
+		// Get the parts containing the spans
+		IPart spansA = station.getParts().item(Converter.var(robotA.getName() + SPANS_SUFFIX));
+		IPart spansB = station.getParts().item(Converter.var(robotB.getName() + SPANS_SUFFIX));
+		
+		// Iterate over all spans in robotA and robotB and intersect...
+		for (int a = 1; a <= spansA.getEntities().getCount(); a++)
 	    {
-		for (int b = 1; b <= spansB.getEntities().getCount(); b++)
+			for (int b = 1; b <= spansB.getEntities().getCount(); b++)
 		    {
-			IEntity spanA = spansA.getEntities().item(Converter.var(a));
-			IEntity spanB = spansB.getEntities().item(Converter.var(b));
+				IEntity spanA = spansA.getEntities().item(Converter.var(a));
+				IEntity spanB = spansB.getEntities().item(Converter.var(b));
 
-			try
+				try
 			    {
-				// Note that the intersection between two objects can give
-				// more than one object! The boolean is for keeping / not keeping original
-				IEntities intersections = spanA.intersect(spanB, true);
-				IPart parent = intersections.getParent();
-
-				for (int m = 1; m <= intersections.getCount(); m++)
+					// Note that the intersection between two objects can give
+					// more than one object! The boolean is for keeping / not keeping original
+					IEntities intersections = spanA.intersect(spanB, true);
+					IPart parent = intersections.getParent();
+					
+					for (int m = 1; m <= intersections.getCount(); m++)
 				    {
-					//intersections.item(Converter.var(m)).setName(spanA.getName() + spanB.getName() + "_" + m);
-					String zoneName = "Zone" + zoneNbr++;
-					intersections.item(Converter.var(m)).setName(zoneName);
-					zones.setTransform(parent.getTransform());
-					zones.addEntity(intersections.item(Converter.var(m)));
-
-					// Add new automaton
-					Automaton aut = new Automaton(zoneName);
-					aut.setType(AutomatonType.Specification);
-
-					// Add two states, Free and Booked
-					State state = new State(FREESTATE_NAME);
-					state.setAccepting(true);
-					state.setInitial(true);
-					aut.addState(state);
-					// aut.setInitialState(state);
-					state = new State(BOOKEDSTATE_NAME);
-					aut.addState(state);
-
-					// Add automaton
-					zoneAutomata.addAutomaton(aut);
+						//intersections.item(Converter.var(m)).setName(spanA.getName() + spanB.getName() + "_" + m);
+						String zoneName = "Zone" + zoneNbr++;
+						intersections.item(Converter.var(m)).setName(zoneName);
+						zones.setTransform(parent.getTransform());
+						zones.addEntity(intersections.item(Converter.var(m)));
+						
+						// Add new automaton
+						Automaton aut = new Automaton(zoneName);
+						aut.setType(AutomatonType.Specification);
+						
+						// Add two states, Free and Booked
+						State state = new State(FREESTATE_NAME);
+						state.setAccepting(true);
+						state.setInitial(true);
+						aut.addState(state);
+						// aut.setInitialState(state);
+						state = new State(BOOKEDSTATE_NAME);
+						aut.addState(state);
+						
+						// Add automaton
+						zoneAutomata.addAutomaton(aut);
 				    }
-
-				// Delete this span
-				parent.delete();
+					
+					// Delete this span
+					parent.delete();
 			    }
-			catch (Exception e)
+				catch (Exception e)
 			    {
-				// Either the spans were disjoint or there was an error. Whatever.
-				//logger.info(spanA.getName() + " and " + spanB.getName() + " are disjoint.");
+					// Either the spans were disjoint or there was an error. Whatever.
+					//logger.info(spanA.getName() + " and " + spanB.getName() + " are disjoint.");
 			    }
 		    }
 	    }
     }
-
+	
     //////////////////////////////////
     // DAppEvents interface methods //
     //////////////////////////////////

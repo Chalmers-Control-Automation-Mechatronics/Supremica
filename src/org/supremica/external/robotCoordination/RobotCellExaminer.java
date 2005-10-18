@@ -373,16 +373,18 @@ public class RobotCellExaminer
 		final Color GREEN = Color.GREEN;
 		final Color BLACK = Color.BLACK;
 		// Transparency
-		final double TRANSPARENCY = 0.25;
+		final double TRANSPARENCY = 0.1;
+
+		// Discretization parameters
+		double dx = 0.1;
+		double dy = 0.1;
+		double dz = 0.1;
+		cell.setBoxDimensions(new double[] {dx,dy,dz});
 
 		// Hashtable
 		// The first boolean says if a robot has already been inside this box at some time
 		// The second boolean says if the box has already been examined for the current robot
-		//final int BITS = 2;
-		//final int OCCUPIED = 1;
-		//final int CHECKED = 2;
 		Hashtable<Coordinate, Status> matrix = new Hashtable(1000);
-		//Hashtable<Coordinate, byte> matrix = new Hashtable(1000);
 
 		// Get the robots
 		List<Robot> robots = cell.getRobots();

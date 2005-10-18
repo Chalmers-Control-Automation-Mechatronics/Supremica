@@ -456,10 +456,9 @@ public class MechanismListener
     private synchronized ITarget createTargetAtTCP(String targetName)
 		throws Exception
     {
-
 		// Create a new target
 		IMechanism mechanism = controller.getMechanism();
-		ITarget newTarget = mechanism.getWorkObjects().item(RSRobotCell.var(1)).getTargets().add();
+		ITarget newTarget = mechanism.getWorkObjects().item(Converter.var(1)).getTargets().add();
 		IToolFrame toolFrame = mechanism.getActiveToolFrame();
 		
 		newTarget.setTransform(toolFrame.getTransform());
