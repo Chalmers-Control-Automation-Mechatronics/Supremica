@@ -39,13 +39,14 @@ public class RSBoxFactory
 	trans.setZ(coord.getZ());
 	
 	// Lägg till en numrering på boxarna
-	Part part = RSRobotCell.addPart("Box_" + boxIndex++);
+	String boxName = "Box_" + boxIndex++;
+	Part part = RSRobotCell.addPart(boxName);
 	
 	part.createSolidBox(trans, dx, dy, dz);
 	part.setColor(varColor);
 	part.setRelativeTransparency((float) transparency);
 
-	return new Box(coord, color, transparency);
+	return new RSBox(boxName, coord, color, transparency);
     }
     
     public Box createBox(Coordinate coord) 

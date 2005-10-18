@@ -5,6 +5,11 @@ import java.util.*;
 public interface Robot
 {
     /**
+     * Returns true if the robot collides with a given box.
+     */
+    public boolean collidesWith(Box box);
+    
+    /**
      * Generates span for a pair of positions.
      */
     public void generateSpan(Position from, Position to)

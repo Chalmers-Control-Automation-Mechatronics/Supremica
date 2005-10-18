@@ -110,6 +110,11 @@ public class RSRobot
 	return list;
     }
 
+    //AK - TODO
+    public boolean collidesWith(Box box) {
+	return true;
+    }
+
     //AK
     public Coordinate getBaseCoordinates() throws Exception {
 	//	    return new Coordinate(mechanism.getTransform().getX(), mechanism.getTransform().getY(), mechanism.getTransform().getZ());

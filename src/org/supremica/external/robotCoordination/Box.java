@@ -21,6 +21,8 @@ public abstract class Box {
 	this.color = color;
 	this.transparency = transparency;
     }
+    
+    public Coordinate getCoordinate() { return coord; }
 
     public abstract void delete() throws Exception;
 }
