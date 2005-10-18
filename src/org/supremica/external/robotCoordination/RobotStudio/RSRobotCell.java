@@ -123,9 +123,8 @@ public class RSRobotCell
     /** The active RobotStudio station. */
     static Part zones;
 
-    /** The Box Factory */
-//      RSBoxFactory boxFactory = null;
     final static double[] boxDimensions = new double[]{0.01, 0.01, 0.01};
+	static Part boxSet;
 
     /** Generated automata */
     private Automata robotAutomata = new Automata();
@@ -134,32 +133,6 @@ public class RSRobotCell
     // Running number of added zones
     private int zoneNbr = 1;
 
-    // Tillfälligt (i varje fall på det här stället)
-    //AK
-    public void tempAvenirs() 
-		throws Exception 
-    {
-		List<Robot> robots = getRobots();
-	    
-		for (int i=0; i<robots.size(); i++) 
-		{
-			logger.error("robot.name = " + robots.get(i).getName());
-			Coordinate base = robots.get(i).getBaseCoordinates();
-			logger.warn("X = " + base.getX() + "; Y = " + base.getY() + "; Z = " + base.getZ());
-		}
-		
-		logger.info("skapar boxar.....");
-		Box blueBox = createBox(new Coordinate(0,0,0), Color.blue, 0.0);
-		createBox(new Coordinate(1,1,1), Color.green, 0.0);
-		createBox(new Coordinate(1,0,0), Color.cyan, 0.0);
-		createBox(new Coordinate(0,0,1), Color.lightGray, 0.0);
-		logger.info("boxar skapade.....");
-		
-		logger.info("raderar boxar......");
-		blueBox.delete();
-		logger.info("boxar raderade.....");
-    }
-	
     public RSRobotCell(File file)
     {
 		try
@@ -168,9 +141,8 @@ public class RSRobotCell
 			openStation(file);
 			station.setBackgroundColor(RS_WHITE);
 			station.setFloorVisible(false);
-			
-			//AK
-			//tempAvenirs();
+
+			boxSet = addPart("BOX_SET");
 			
 			// Array of LinkedLists, later containing PathWithCost objects
 			robotCosts = new LinkedList[getMechanismsWithRole(RsKinematicRole.rsKinematicRoleRobot).size()];
@@ -329,12 +301,13 @@ public class RSRobotCell
 		trans.setZ(rsPoint[2]);
 		
 		// Lägg till en numrering på boxarna
-		String boxName = "Box_" + coord.getX() + "_" + coord.getY() + "_" + coord.getZ();
-		Part part = addPart(boxName);
+		String boxName = "Box_" + coord;
+// 		Part part = addPart(boxName);
 		
-		part.createSolidBox(trans, boxDimensions[0], boxDimensions[1], boxDimensions[2]);
-		part.setColor(varColor);
-		part.setRelativeTransparency((float) transparency);
+		IEntity currBox = boxSet.createSolidBox(trans, boxDimensions[0], boxDimensions[1], boxDimensions[2]);
+		currBox.setName(boxName);
+		boxSet.setColor(varColor);
+		boxSet.setRelativeTransparency((float) transparency);
 		
 		return new RSBox(boxName, coord, color, transparency);
     }
