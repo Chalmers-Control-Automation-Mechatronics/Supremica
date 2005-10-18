@@ -132,20 +132,21 @@ public class RSRobotCell
 
     // Tillfälligt (i varje fall på det här stället)
     //AK
-    public void tempAvenirs() throws Exception 
-	{
-		List<Robot> robots = getRobots();
-		
-		for (int i=0; i<robots.size(); i++) {
-			logger.error("robot.name = " + robots.get(i).getName());
-			Coordinate base = robots.get(i).getBaseCoordinates();
-			logger.warn("X = " + base.getX() + "; Y = " + base.getY() + "; Z = " + base.getZ());
-		}
-		
-		//	    IPosition pos = new IPosition();
-		//	    IPart part = IPart.CreateLine(new Coordinate(0,0,0), new Coordinate(1,1,1));
-		//	    logger.warn("station.parts.count = " + station.getParts().getCount());
-		// 	    createBox(new Coordinate(1,1,1), new Color(), 0.5);
+    public void tempAvenirs() 
+	throws Exception 
+    {
+	List<Robot> robots = getRobots();
+	    
+	for (int i=0; i<robots.size(); i++) {
+	    logger.error("robot.name = " + robots.get(i).getName());
+	    Coordinate base = robots.get(i).getBaseCoordinates();
+	    logger.warn("X = " + base.getX() + "; Y = " + base.getY() + "; Z = " + base.getZ());
+	}
+
+	BoxFactory boxfactory = new BoxFactory(0.5,0.5,0.5);
+	boxfactory.createBox(new RSCoordinate(0,0,0), RS_BLUE, 0);
+	boxfactory.createBox(new RSCoordinate(1,1,1), RS_GREEN, 0);
+	boxfactory.createBox(new RSCoordinate(1,0,0), RS_RED, 0);
     }
 	
     public RSRobotCell(File file)
@@ -303,16 +304,13 @@ public class RSRobotCell
 		
 		return list;
     }
-	
-	public Box createBox(Coordinate coord, Color color, double transparency) 
-	{
-		logger.info("skapar box");
-		//Box currBox =  new Box(coord, color, transparency);
-		Box newBox = null;
-		logger.info("box skapat");
-		return newBox;
-	}
-	
+
+//     public Box createBox(Coordinate coord, Variant color, double transparency) 
+// 	throws Exception
+//     {
+// 	return BoxFactory.createBox(coord, color, transparency);
+//     }
+
     public Automata generateZoneAutomata()
 		throws Exception
     {
@@ -555,7 +553,7 @@ public class RSRobotCell
 		    }
 		catch (ComJniException ex)
 		    {
-			// If there was none, create it!(jag gissar att bolagsverket vill se en underskrift, vilket kanske gör det något krångligare att använda mejl)
+			// If there was none, create it!
 			if (ex.ErrorCode == HResult.E_FAIL)
 			    {    // No such item, construct one!
 				part = Part.getPartFromUnknown(station.getParts().add());
