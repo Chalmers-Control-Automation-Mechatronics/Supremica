@@ -42,7 +42,7 @@ public class RobotCellExaminer
 		super(owner, "Robot cell examiner", false);
 		this.owner = owner;
 
-		if (false && (SupremicaProperties.getFileRSDemoOpenPath() != ""))
+		if (SupremicaProperties.getFileRSDemoOpenPath() != null)
 		    DEMOSTATION_FILENAME = SupremicaProperties.getFileRSDemoOpenPath() + File.separator + DEMOSTATION_FILENAME;
 		else
 		    DEMOSTATION_FILENAME = "C:\\temp\\DomStations" + File.separator + DEMOSTATION_FILENAME;

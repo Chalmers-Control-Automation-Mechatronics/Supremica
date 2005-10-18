@@ -124,8 +124,8 @@ public class RSRobotCell
     static Part zones;
 
     /** The Box Factory */
-    RSBoxFactory boxFactory = null;
-    final static double[] boxDimenstions = new double[]{0.5, 0.5, 0.5};
+//      RSBoxFactory boxFactory = null;
+    final static double[] boxDimensions = new double[]{0.5, 0.5, 0.5};
 
     /** Generated automata */
     private Automata robotAutomata = new Automata();
@@ -319,10 +319,27 @@ public class RSRobotCell
     public synchronized Box createBox(Coordinate coord, Color color, double transparency) 
 		throws Exception
     {
-		if (boxFactory == null)
-			boxFactory = new RSBoxFactory(boxDimenstions);
+		Variant varColor = new Variant(new SafeArray(new int[]{color.getRed(), color.getGreen(), color.getBlue()}), false);
 		
-		return boxFactory.createBox(coord, color, transparency);
+		Transform trans = new Transform();
+		trans.setX(coord.getX()); 
+		trans.setY(coord.getY()); 
+		trans.setZ(coord.getZ());
+		
+		// Lägg till en numrering på boxarna
+		String boxName = "Box_" + coord.getX() + "_" + coord.getY() + "_" + coord.getZ();
+		Part part = addPart(boxName);
+		
+		part.createSolidBox(trans, boxDimensions[0], boxDimensions[1], boxDimensions[2]);
+		part.setColor(varColor);
+		part.setRelativeTransparency((float) transparency);
+		
+		return new RSBox(boxName, coord, color, transparency);
+
+// 		if (boxFactory == null)
+// 			boxFactory = new RSBoxFactory(boxDimensions);
+		
+// 		return boxFactory.createBox(coord, color, transparency);
     }
 	
     public Automata generateZoneAutomata()
