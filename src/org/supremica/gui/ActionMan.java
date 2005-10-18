@@ -66,15 +66,17 @@ import org.supremica.gui.animators.scenebeans.*;
 import org.supremica.gui.automataExplorer.AutomataExplorer;
 import org.supremica.gui.simulator.SimulatorExecuter;
 import org.supremica.external.robotCoordination.*;
-import org.supremica.external.robotCoordinationABB.*;
 import org.supremica.external.shoefactory.plantBuilder.*;
 import org.supremica.external.shoefactory.Configurator.*;
 import org.supremica.log.*;
 import org.supremica.automata.IO.*;
-//import org.supremica.automata.algorithms.RobotStudioLink;
 import org.supremica.gui.useractions.*;
 import org.supremica.gui.texteditor.TextFrame;
 import org.swixml.SwingEngine;
+
+// Robot coordination junk
+//import org.supremica.external.robotCoordinationABB.*;
+//import org.supremica.automata.algorithms.RobotStudioLink;
 
 // -- MF -- Abstract class to save on duplicate code
 // -- From this class is instantiated anonymous classes that implement the openFile properly
@@ -2179,24 +2181,6 @@ public class ActionMan
 		};
 	}
 
-	/**
-	 * What is this!?!?? Wasn't the friggin' point of this whole thing to AVOID having
-	 * application specific import functions?!? Why is there a fileImportRobotCoordination
-	 * AND a fileImportRobotCoordinationABB????? GRRRRRrrrrRRRR!! /hguo
-	 */
-
-	// File.Import.FromRobotCoordinationABB (format representing RobotStudio station)
-	public static void fileImportRobotCoordinationABB(Gui gui)
-	{
-		new FileImporter(FileDialogs.getXMLFileImporter(), gui)    // anonymous class
-		{
-			void openFile(Gui g, File f)
-			{
-				importRobotCoordinationFileABB(g, f);
-			}
-		};
-	}
-
 	// Aldebaran format, a simple format for specifying des
 	public static void fileImportAut(Gui gui)
 	{
@@ -2548,15 +2532,6 @@ public class ActionMan
 		}
 	}
 
-	// File.Import.FromRobotCoordinationABB
-	public static void importRobotCoordinationFileABB(Gui gui, File file)
-	{
-
-		// logger.info("Importing " + file.getAbsolutePath() + " ...");
-		gui.info("Importing " + file.getAbsolutePath() + " ...");
-		ConvertToAutomata.conversionToAutomata(file);
-	}
-
 	// Automata.AlphabetNormalize action performed
 	public static void normalizeAlphabet_actionPerformed(Gui gui)
 	{
@@ -2806,10 +2781,8 @@ public class ActionMan
 		}
 	}
 
-	/**
-	 * Just a test...
-	 */
 	/*
+	// Hugo's test for controlling a train simulator from Supremica.
 	public static void trainSimulator(Gui gui)
 	{
 			Thread thread = new Thread(new Runnable()
@@ -2946,6 +2919,31 @@ public class ActionMan
 	}
 	*/
 
+	/* // DOMENICO STUFF
+	// File.Import.FromRobotCoordinationABB
+	public static void importRobotCoordinationFileABB(Gui gui, File file)
+	{
+		// logger.info("Importing " + file.getAbsolutePath() + " ...");
+		gui.info("Importing " + file.getAbsolutePath() + " ...");
+		ConvertToAutomata.conversionToAutomata(file);
+	}
+
+	// What is this!?!?? Wasn't the friggin' point of this whole thing to AVOID having
+	// application specific import functions?!? Why is there a fileImportRobotCoordination
+	// AND a fileImportRobotCoordinationABB????? I'm so upset! GRRRRRrrrrRRRR!! /hguo
+	//
+	// File.Import.FromRobotCoordinationABB (format representing RobotStudio station)
+	public static void fileImportRobotCoordinationABB(Gui gui)
+	{
+		new FileImporter(FileDialogs.getXMLFileImporter(), gui)    // anonymous class
+		{
+			void openFile(Gui g, File f)
+			{
+				importRobotCoordinationFileABB(g, f);
+			}
+		};
+	}
+
 	// CoordinationABB of robots in Robot Studio
 	public static void createPathsInRS(Gui gui)
 	{
@@ -3039,8 +3037,12 @@ public class ActionMan
 
 		thread.start();
 	}
+	*/
 
-	// TestCases... - open the test cases dialog, and add the result to the current set of automata public static void testCases(Gui gui)
+	/**
+	 * TestCases... - open the test cases dialog, and add the result to
+	 * the current set of automata public static void testCases(Gui gui)
+	 */
 	public static void testCases(Gui gui)
 		throws Exception
 	{
@@ -3050,15 +3052,17 @@ public class ActionMan
 
 		//Project project = testCasesDialog.getProject();
 
-/*
+		/*
 				if (project != null)
 				{
 						gui.addProject(project);
 				}
-*/
+		*/
 	}
 
-	// Animations
+	/**
+	 * Animations
+	 */
 	public static void animator(Gui gui, AnimationItem item)
 	{
 		try
@@ -3074,7 +3078,9 @@ public class ActionMan
 		}
 	}
 
-	// Generate SattLine SFCs
+	/**
+	 * Generate SattLine SFCs
+	 */
 	public static void AutomataToSattLineSFC(Gui gui)
 	{
 		Project selectedProject = gui.getSelectedProject();
@@ -3144,7 +3150,9 @@ public class ActionMan
 		}
 	}
 
-	// Generate SattLine SFCs for the Ball Process
+	/**
+	 * Generate SattLine SFCs for the Ball Process
+	 */
 	public static void AutomataToSattLineSFCForBallProcess(Gui gui)
 	{
 		Project selectedProject = gui.getSelectedProject();
@@ -3214,7 +3222,9 @@ public class ActionMan
 		}
 	}
 
-	// Generate ABB Control Builder SFCs
+	/**
+	 * Generate ABB Control Builder SFCs
+	 */
 	public static void AutomataToControlBuilderSFC(Gui gui)
 	{
 		Project selectedProject = gui.getSelectedProject();

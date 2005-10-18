@@ -54,7 +54,7 @@ package org.supremica.automata.algorithms;
   java -classpath .;c:\programs\supremica\build;c:\programs\supremica\lib/unjared RobotStudioLink
 */
 import org.supremica.util.SupremicaException;
-import org.supremica.external.robotCoordinationABB.CreateXml;
+//import org.supremica.external.robotCoordinationABB.CreateXml;
 import org.supremica.external.comInterfaces.robotstudio_3_1.RobotStudio.*;
 import org.supremica.external.comInterfaces.robotstudio_3_1.RobotStudio.enums.RsKinematicRole;
 import org.supremica.automata.*;
@@ -91,7 +91,7 @@ public class RobotStudioLink
 	/** The RobotStudio application. */
 	private static Application app = null;
 
-	/** The active RopbotStudio station. */
+	/** The active RobotStudio station. */
 	private static IStation activeStation = null;
 
 	/** The name of the current active station. */
@@ -181,7 +181,6 @@ End Sub
 */
 	public static void pathSplittingTest()
 	{
-
 		//IPath path = activeStation.getPaths().item(var("I1A1"));
 	}
 
@@ -2265,6 +2264,7 @@ End Sub
 		}
 	}
 
+	/*
 	// used by CreateXml
 	public static void configureCreateXml()
 	{
@@ -2277,78 +2277,5 @@ End Sub
 
 		CreateXml.configureStation(activeStation);
 	}
+	*/
 }
-
-/*  FROM VB!
-
-Dim WithEvents sim As Simulation
-Dim mech As Mechanism
-Dim coll As New RsCollection
-Dim joinedEnt As Entity
-Dim wristoldpos As New Transform
-Dim j4oldpos As New Transform
-
-Sub Init()
-	Set sim = ActiveStation.Simulations(1)
-	Set mech = ActiveStation.ActiveMechanism
-	wristoldpos.x = 0
-	wristoldpos.y = 0
-	wristoldpos.z = 0
-	coll.Clear
-End Sub
-
-
-
-Private Sub sim_Stop()
-'joine the created entities
-Set joinedEnt = coll(1)
-Dim i As Integer
-Dim ent As Entity
-For i = 2 To coll.Count
-	On Error Resume Next
-	Set ent = joinedEnt.Join(coll(i), False)
-	Set joinedEnt = ent
-Next i
-'set new name
-joinedEnt.Parent.Name = mech.Name & "_volume"
-
-
-End Sub
-
-Private Sub sim_Tick(ByVal Time As Double)
-	'create a box around the wrist, use the attached toolframe 'b'
-	Dim trans As New Transform
-	Dim xdiff, ydiff, zdiff, dist As Double
-	Set trans = mech.ToolFrames("b").Transform
-	xdiff = (wristoldpos.x - trans.x) * (wristoldpos.x - trans.x)
-	ydiff = (wristoldpos.y - trans.y) * (wristoldpos.y - trans.y)
-	zdiff = (wristoldpos.z - trans.z) * (wristoldpos.z - trans.z)
-	dist = Sqr(xdiff + ydiff + zdiff)
-		If dist > 0.05 Then
-		Call coll.Add(ActiveStation.Parts.Add.CreateSolidBox(trans, 0.1, 0.1, 0.1))
-		wristoldpos.Position = trans.Position
-	 End If
-
-	' create a cylinder around upper arm, use the attached toolframe 'a' but compare with the jointaxis
-	Set trans = mech.ToolFrames("a").Transform
-	Dim axisPos As New Position
-	Set axisPos = mech.Joints(4).JointAxis.Position
-
-	xdiff = (j4oldpos.x - axisPos.x) * (j4oldpos.x - axisPos.x)
-	ydiff = (j4oldpos.y - axisPos.y) * (j4oldpos.y - axisPos.y)
-	zdiff = (j4oldpos.z - axisPos.z) * (j4oldpos.z - axisPos.z)
-	dist = Sqr(xdiff + ydiff + zdiff)
-		If dist > 0.04 Then
-		Call coll.Add(ActiveStation.Parts.Add.CreateSolidCylinder(trans, 0.04, 0.6))
-		j4oldpos.Position = axisPos
-	 End If
-
-End Sub
-
-
-
-
-
-
-
-*/

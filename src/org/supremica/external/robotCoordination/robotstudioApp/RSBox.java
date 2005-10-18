@@ -1,4 +1,4 @@
-package org.supremica.external.robotCoordination.robotstudioApp;  
+package org.supremica.external.robotCoordination.RobotStudio;  
 
 import org.supremica.external.comInterfaces.robotstudio_3_1.RobotStudio.*;
 import com.inzoom.comjni.ComJniException;
@@ -12,14 +12,14 @@ public class RSBox
     extends Box 
 {
     public RSBox(String name, Coordinate coord, Color color, double transparency) 
-	throws ComJniException
+		throws ComJniException
     {
-	super(name, coord, color, transparency);
+		super(name, coord, color, transparency);
     }
-
+	
     public void delete() 
-	throws Exception
+		throws Exception
     {
-	RSRobotCell.station.getParts().item(RSRobotCell.var(name)).delete();
+		RSRobotCell.station.getParts().item(RSRobotCell.var(name)).delete();
     }
 }

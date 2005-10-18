@@ -211,17 +211,17 @@ public class MainMenuBar
 	    // File.SaveAs
 	    JMenuItem menuFileSaveAs = new SupremicaMenuItem(ActionMan.saveAsAction); 
 	    menuFile.add(menuFileSaveAs);
-
+		
 	    separatorNeeded = true;
 	}
-
+	
 	if (separatorNeeded)
 	{
 	    menuFile.addSeparator();
-
+		
 	    separatorNeeded = false;
 	}
-
+	
 	if (SupremicaProperties.fileAllowImport())
 	{
 	    // File.Import
@@ -229,79 +229,77 @@ public class MainMenuBar
 		menuFileImport.setMnemonic(KeyEvent.VK_I);
 		menuFileImport.setToolTipText("Import file");
 	    menuFile.add(menuFileImport);
-
+		
 	    // File.Import.UMDES
 	    JMenuItem menuFileImportUMDES = new JMenuItem("From UMDES...");
 	    menuFileImport.add(menuFileImportUMDES);
 	    menuFileImportUMDES.addActionListener(new ActionListener()
-		{
-		    public void actionPerformed(ActionEvent e)
-		    {
-			ActionMan.fileImportUMDES(ActionMan.getGui());
-		    }
-		});
-
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					ActionMan.fileImportUMDES(ActionMan.getGui());
+				}
+			});
+		
 	    // File.Import.Valid
 	    JMenuItem menuFileImportValid = new JMenuItem("From VALID...");
 	    menuFileImport.add(menuFileImportValid);
 	    menuFileImportValid.addActionListener(new ActionListener()
-		{
-		    public void actionPerformed(ActionEvent e)
-		    {
-			ActionMan.fileImportValid(ActionMan.getGui());
-		    }
-		});
-
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					ActionMan.fileImportValid(ActionMan.getGui());
+				}
+			});
+		
 		/*
 	    // File.Import.HYB
 	    JMenuItem menuFileImportHYB = new JMenuItem("From HYB...");
 	    menuFileImport.add(menuFileImportHYB);
 	    menuFileImportHYB.addActionListener(new ActionListener()
 		{
-		    public void actionPerformed(ActionEvent e)
-		    {
-			ActionMan.fileImportHYB(ActionMan.getGui());
-		    }
+		public void actionPerformed(ActionEvent e)
+		{
+		ActionMan.fileImportHYB(ActionMan.getGui());
+		}
 		});
 		*/
-
-	    // /* WHAT'S THE DIFFERENCE BETWEEN THESE TWO? THERE IS NO DOCUMENTATION!!! AAAAARGH!!
-	    if (SupremicaProperties.generalUseRobotCoordination() || true)
-	    {
+		
 		//File.Import.RobotCoordination
 		JMenuItem menuFileImportRobotCoordination = new JMenuItem("From Robot Coordinator...");
 		menuFileImport.add(menuFileImportRobotCoordination);
 		menuFileImportRobotCoordination.addActionListener(new ActionListener()
 		    {
-			public void actionPerformed(ActionEvent e)
-			{
-			    ActionMan.fileImportRobotCoordination(ActionMan.getGui());
-			}
+				public void actionPerformed(ActionEvent e)
+				{
+					ActionMan.fileImportRobotCoordination(ActionMan.getGui());
+				}
 		    });
-	    }
-
-	    // if (SupremicaProperties.generalUseRobotCoordinationABB())
-	    if (SupremicaProperties.generalUseRobotCoordination())
-	    {
-		// File.Import.RobotCoordinationABB
-		JMenuItem menuFileImportRobotCoordinationABB = new JMenuItem("From Robot Coordinator ABB...");
-		menuFileImport.add(menuFileImportRobotCoordinationABB);
-		menuFileImportRobotCoordinationABB.addActionListener(new ActionListener()
-		    {
-			public void actionPerformed(ActionEvent e)
-			{
-			    ActionMan.fileImportRobotCoordinationABB(ActionMan.getGui());
-			}
-		    });
-	    }
-	    // */
-
-	    separatorNeeded = true;
 	}
-
+	
+	/*
+	// if (SupremicaProperties.generalUseRobotCoordinationABB())
+	if (SupremicaProperties.generalUseRobotCoordination())
+	{
+	// File.Import.RobotCoordinationABB
+	JMenuItem menuFileImportRobotCoordinationABB = new JMenuItem("From Robot Coordinator ABB...");
+	menuFileImport.add(menuFileImportRobotCoordinationABB);
+	menuFileImportRobotCoordinationABB.addActionListener(new ActionListener()
+	{
+	public void actionPerformed(ActionEvent e)
+	{
+	ActionMan.fileImportRobotCoordinationABB(ActionMan.getGui());
+	}
+	});
+	}
+	
+	separatorNeeded = true;
+	}
+	*/
+	
 	if (false && SupremicaProperties.fileAllowExport())
 	{
-
+		
 	    // File.Export
 	    JMenu menuFileExport = new JMenu("Export");
 	    menuFile.add(menuFileExport);

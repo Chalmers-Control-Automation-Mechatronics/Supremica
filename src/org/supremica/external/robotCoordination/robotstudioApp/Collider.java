@@ -47,7 +47,7 @@
  * Supremica is owned and represented by KA.
  */
 
-package org.supremica.external.robotCoordination.robotstudioApp;
+package org.supremica.external.robotCoordination.RobotStudio;
 
 /**
  * Object for keeping track of the collisions with an object

@@ -47,7 +47,7 @@
  * Supremica is owned and represented by KA.
  */
 
-package org.supremica.external.robotCoordination.robotstudioApp;
+package org.supremica.external.robotCoordination.RobotStudio;
 
 import org.supremica.external.comInterfaces.robotstudio_3_1.RobotStudio.DSimulationEventsAdapter;
 import org.supremica.log.*;

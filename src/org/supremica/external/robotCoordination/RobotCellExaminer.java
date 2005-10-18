@@ -10,7 +10,7 @@ import org.supremica.log.*;
 import org.supremica.gui.*;
 import org.supremica.automata.*;
 import org.supremica.properties.*;
-import org.supremica.external.robotCoordination.robotstudioApp.RSRobotCell;
+import org.supremica.external.robotCoordination.RobotStudio.RSRobotCell;
 import java.awt.Color;
 
 public class RobotCellExaminer
@@ -69,7 +69,7 @@ public class RobotCellExaminer
 					else
 					{
 						logger.error("The file " + cellName + " is not a robot station or is " +
-									 "not a of a type supported by Supremica.");
+									 "not of a type supported by Supremica.");
 						return;
 					}
 				}
@@ -504,6 +504,7 @@ public class RobotCellExaminer
 			}
 
 			// DO THE SPAN-STUFF HERE!!!
+			
 
 			// Clear CHECKED-status from the examined boxes before examinining next robot!
 			while (boxesExamined.size() != 0)
