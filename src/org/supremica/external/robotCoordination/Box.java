@@ -7,16 +7,20 @@ import java.awt.Color;
 /**
  * Representerar en RobotStudio-box.
  */
-public class Box {
-    private Coordinate coord;
-    private Color color;
-    private double transparency;
+public abstract class Box {
+    protected Coordinate coord;
+    protected Color color;
+    protected double transparency;
+    protected String name;
 
-    public Box(Coordinate coord, Color color, double transparency) 
+    public Box(String name, Coordinate coord, Color color, double transparency) 
 	throws ComJniException
     {
+	this.name = name;
 	this.coord = coord;
 	this.color = color;
 	this.transparency = transparency;
     }
+
+    public abstract void delete() throws Exception;
 }
