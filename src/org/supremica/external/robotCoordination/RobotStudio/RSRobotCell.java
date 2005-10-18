@@ -137,26 +137,27 @@ public class RSRobotCell
     // Tillfälligt (i varje fall på det här stället)
     //AK
     public void tempAvenirs() 
-	throws Exception 
+		throws Exception 
     {
-	List<Robot> robots = getRobots();
+		List<Robot> robots = getRobots();
 	    
-	for (int i=0; i<robots.size(); i++) {
-	    logger.error("robot.name = " + robots.get(i).getName());
-	    Coordinate base = robots.get(i).getBaseCoordinates();
-	    logger.warn("X = " + base.getX() + "; Y = " + base.getY() + "; Z = " + base.getZ());
-	}
-
-	logger.info("skapar boxar.....");
-	Box blueBox = createBox(new RSCoordinate(0,0,0), Color.blue, 0);
-	createBox(new RSCoordinate(1,1,1), Color.green, 0);
-	createBox(new RSCoordinate(1,0,0), Color.cyan, 0);
-	createBox(new RSCoordinate(0,0,1), Color.lightGray, 0);
-	logger.info("boxar skapade.....");
-	
-	logger.info("raderar boxar......");
-	blueBox.delete();
-	logger.info("boxar raderade.....");
+		for (int i=0; i<robots.size(); i++) 
+		{
+			logger.error("robot.name = " + robots.get(i).getName());
+			Coordinate base = robots.get(i).getBaseCoordinates();
+			logger.warn("X = " + base.getX() + "; Y = " + base.getY() + "; Z = " + base.getZ());
+		}
+		
+		logger.info("skapar boxar.....");
+		Box blueBox = createBox(new RSCoordinate(0,0,0), Color.blue, 0);
+		createBox(new RSCoordinate(1,1,1), Color.green, 0);
+		createBox(new RSCoordinate(1,0,0), Color.cyan, 0);
+		createBox(new RSCoordinate(0,0,1), Color.lightGray, 0);
+		logger.info("boxar skapade.....");
+		
+		logger.info("raderar boxar......");
+		blueBox.delete();
+		logger.info("boxar raderade.....");
     }
 	
     public RSRobotCell(File file)
@@ -316,14 +317,14 @@ public class RSRobotCell
     }
 
     public synchronized Box createBox(Coordinate coord, Color color, double transparency) 
-	throws Exception
+		throws Exception
     {
-	if (boxFactory == null)
-	    boxFactory = new RSBoxFactory(boxDimenstions);
-
-	return boxFactory.createBox(coord, color, transparency);
+		if (boxFactory == null)
+			boxFactory = new RSBoxFactory(boxDimenstions);
+		
+		return boxFactory.createBox(coord, color, transparency);
     }
-
+	
     public Automata generateZoneAutomata()
 		throws Exception
     {

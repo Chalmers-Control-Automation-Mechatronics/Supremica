@@ -141,7 +141,14 @@ public class RobotCellExaminer
 					}
 
 					//Run the demo!
-					boxStrategy(cell);
+					try
+					{
+						boxStrategy(cell);
+					}
+					catch (Exception ex)
+					{
+						logger.error(ex);
+					}
 				}
 			});
 		contentPane.add(demoButton);
@@ -358,8 +365,8 @@ public class RobotCellExaminer
 	 * Does the box strategy stuff. 
 	 */
 	private void boxStrategy(RobotCell cell)
+		throws Exception
 	{
-		/*
 		// Colors
 		final Color RED = Color.RED;
 		final Color BLACK = Color.BLACK;
@@ -369,11 +376,11 @@ public class RobotCellExaminer
 		// Hashtable
 		// The first boolean says if a robot has already been inside this box at some time
 		// The second boolean says if the box has already been examined for the current robot
-		final int BITS = 2;
-		final int OCCUPIED = 1;
-		final int CHECKED = 2;
-		//Hashtable<Coordinate, boolean[BITS]> matrix = new Hashtable(1000);
-		Hashtable<Coordinate, byte> matrix = new Hashtable(1000);
+		//final int BITS = 2;
+		//final int OCCUPIED = 1;
+		//final int CHECKED = 2;
+		Hashtable<Coordinate, Status> matrix = new Hashtable(1000);
+		//Hashtable<Coordinate, byte> matrix = new Hashtable(1000);
 
 		// Get the robots
 		List<Robot> robots = cell.getRobots();
@@ -382,7 +389,7 @@ public class RobotCellExaminer
 		List<Box> zoneBoxes = new LinkedList<Box>();
 
 		// For every robot...
-		for (Iterator<Robot> robIt = robots.iterator(); it.hasNext(); )
+		for (Iterator<Robot> robIt = robots.iterator(); robIt.hasNext(); )
 		{
 			Robot robot = robIt.next();
 
@@ -395,7 +402,7 @@ public class RobotCellExaminer
 
 			// Get base coords and build first box
 			Coordinate base = robot.getBaseCoordinates();
-			Box startBox = cell.createBox(base.x, base.y, base.z, RED, TRANSPARENCY);
+			Box startBox = cell.createBox(base, RED, TRANSPARENCY);
 			boxesToExamine.add(startBox);
 
 			// Start loop!
@@ -403,18 +410,18 @@ public class RobotCellExaminer
 			{
 				// Get the stats for this box
 				Box box = boxesToExamine.remove(0);
-				boolean[] stats;
+				Status stats;
 				if (!matrix.containsKey(box))
 				{
-					stats = new boolean[BITS];
-					stats[OCCUPIED] = false;
-					stats[CHECKED] = true;
-					matrix.put(box, stats);
+					stats = new Status();
+					stats.occupied = false;
+					stats.checked = true;
+					matrix.put(box.getCoordinate(), stats);
 				}
 				else
 				{
-					stats = matrix.get(box);
-					if (stats[CHECKED])
+					stats = matrix.get(box.getCoordinate());
+					if (stats.checked)
 					{
 						// Already checked this one...
 						continue;
@@ -429,18 +436,19 @@ public class RobotCellExaminer
 					box.delete();
 
 					// Has someone else collided with this one?
-					if (stats[OCCUPIED])
+					if (stats.occupied)
 					{
 						zoneBoxes.add(box);
 					}
 					else
 					{
-						stats[OCCUPIED] = true;
+						stats.occupied = true;
 					}
 
-					int x = box.getX();
-					int y = box.getY();
-					int z = box.getZ();
+					Coordinate coord = box.getCoordinate();
+					int x = coord.getX();
+					int y = coord.getY();
+					int z = coord.getZ();
 
 					int newX;
 					int newY;
@@ -494,8 +502,8 @@ public class RobotCellExaminer
 			while (boxesExamined.size() != 0)
 			{
 				Box box = boxesExamined.remove(0);
-				boolean[] stats = matrix.get(box);
-				stats[CHECKED] = false;
+				Status stats = matrix.get(box.getCoordinate());
+				stats.checked = false;
 			}
 
 			// It's over for this robot. Remove the "surfaceboxes"
@@ -503,9 +511,14 @@ public class RobotCellExaminer
 			{
 				Box box = surfaceBoxes.remove(0);
 				matrix.remove(box);
-				// box.delete();
+				box.delete();
 			}
 		}
-		*/
 	}
+}
+
+class Status
+{
+	protected boolean occupied;
+	protected boolean checked;
 }

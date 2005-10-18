@@ -1,6 +1,6 @@
 package org.supremica.external.robotCoordination;
 
-public abstract class Coordinate 
+public class Coordinate 
 {
 	protected int x;
 	protected int y;
@@ -8,11 +8,14 @@ public abstract class Coordinate
 	
 	Coordinate(int x, int y, int z)
 	{
+		this.x = x;
+		this.y = y;
+		this.z = z;
 	}
 	
-	public abstract int getX();
-	public abstract int getY();
-	public abstract int getZ();
+	public int getX() { return x; };
+	public int getY() { return y; };
+	public int getZ() { return z; };
 
 	public int hashCode()
 	{
