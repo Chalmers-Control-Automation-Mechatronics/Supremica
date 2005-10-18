@@ -149,10 +149,10 @@ public class RSRobotCell
 		}
 		
 		logger.info("skapar boxar.....");
-		Box blueBox = createBox(new RSCoordinate(0,0,0), Color.blue, 0);
-		createBox(new RSCoordinate(1,1,1), Color.green, 0);
-		createBox(new RSCoordinate(1,0,0), Color.cyan, 0);
-		createBox(new RSCoordinate(0,0,1), Color.lightGray, 0);
+		Box blueBox = createBox(new Coordinate(0,0,0), Color.blue, 0.0);
+		createBox(new Coordinate(1,1,1), Color.green, 0.0);
+		createBox(new Coordinate(1,0,0), Color.cyan, 0.0);
+		createBox(new Coordinate(0,0,1), Color.lightGray, 0.0);
 		logger.info("boxar skapade.....");
 		
 		logger.info("raderar boxar......");

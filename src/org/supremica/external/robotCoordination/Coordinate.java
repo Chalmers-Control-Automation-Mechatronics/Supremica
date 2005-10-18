@@ -1,12 +1,15 @@
 package org.supremica.external.robotCoordination;
 
+/**
+ * A (discretized) coordinate in the simulation environment.
+ */
 public class Coordinate 
 {
 	protected int x;
 	protected int y;
 	protected int z;
 	
-	Coordinate(int x, int y, int z)
+	public Coordinate(int x, int y, int z)
 	{
 		this.x = x;
 		this.y = y;

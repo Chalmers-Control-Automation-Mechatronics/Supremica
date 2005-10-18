@@ -1,6 +1,6 @@
 package org.supremica.external.robotCoordination;  
 
-import org.supremica.external.comInterfaces.robotstudio_3_1.RobotStudio.*;
+//import org.supremica.external.comInterfaces.robotstudio_3_1.RobotStudio.*;
 import com.inzoom.comjni.ComJniException;
 import java.awt.Color;
 
@@ -21,8 +21,10 @@ public abstract class Box {
 		this.color = color;
 		this.transparency = transparency;
     }
-    
+    	
     public Coordinate getCoordinate() { return coord; }
 
     public abstract void delete() throws Exception;
+
+	public abstract void setColor(Color color) throws Exception;
 }

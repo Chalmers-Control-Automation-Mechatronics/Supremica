@@ -8,7 +8,6 @@ import com.inzoom.comjni.ComJniException;
  * Lagrar en Supremica-koordinat
  */ 
 public class RSCoordinate 
-    implements Coordinate
 {
     private double x,y,z;
     

@@ -369,6 +369,8 @@ public class RobotCellExaminer
 	{
 		// Colors
 		final Color RED = Color.RED;
+		final Color ORANGE = Color.ORANGE;
+		final Color GREEN = Color.GREEN;
 		final Color BLACK = Color.BLACK;
 		// Transparency
 		final double TRANSPARENCY = 0.25;
@@ -402,13 +404,13 @@ public class RobotCellExaminer
 
 			// Get base coords and build first box
 			Coordinate base = robot.getBaseCoordinates();
-			Box startBox = cell.createBox(base, RED, TRANSPARENCY);
+			Box startBox = cell.createBox(base, ORANGE, TRANSPARENCY);
 			boxesToExamine.add(startBox);
 
 			// Start loop!
 			while (boxesToExamine.size() != 0)
 			{
-				// Get the stats for this box
+			 	// Get the stats for this box
 				Box box = boxesToExamine.remove(0);
 				Status stats;
 				if (!matrix.containsKey(box))
@@ -422,10 +424,10 @@ public class RobotCellExaminer
 				{
 					stats = matrix.get(box.getCoordinate());
 					if (stats.checked)
-					{
-						// Already checked this one...
+				 	{
+					 	// Already checked this one...
 						continue;
-					}					
+					}	 				
 				}
 				boxesExamined.add(box);
 
@@ -433,6 +435,7 @@ public class RobotCellExaminer
 				if (robot.collidesWith(box))
 				{
 					// Remove from simulation environment
+					box.setColor(RED);
 					box.delete();
 
 					// Has someone else collided with this one?
@@ -484,6 +487,7 @@ public class RobotCellExaminer
 				else
 				{
 					// This box is a "surfacebox"
+					box.setColor(GREEN);
 					surfaceBoxes.add(box);
 				}
 			}

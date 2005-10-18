@@ -117,8 +117,9 @@ public class RSRobot
 
     //AK
     public Coordinate getBaseCoordinates() throws Exception {
-	//	    return new Coordinate(mechanism.getTransform().getX(), mechanism.getTransform().getY(), mechanism.getTransform().getZ());
-	return new RSCoordinate(mechanism.getTransform().getPosition());
+		//	    return new Coordinate(mechanism.getTransform().getX(), mechanism.getTransform().getY(), mechanism.getTransform().getZ());
+		//return new RSCoordinate(mechanism.getTransform().getPosition());
+		return new Coordinate(0,0,0);
     }
 	
     public org.supremica.external.robotCoordination.Position getHomePosition()
