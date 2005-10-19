@@ -286,7 +286,6 @@ public class State
         }
     }
 
-
     public boolean isMutuallyAccepting()
     {
         // return mutuallyAccepting;

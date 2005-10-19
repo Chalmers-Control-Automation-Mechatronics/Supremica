@@ -29,6 +29,15 @@ public class RobotCellExaminer
 	private Automata zoneAutomata;
 	private Automata robotAutomata;
 
+	// Colors
+	private final Color RED = Color.RED;
+	private final Color ORANGE = Color.ORANGE;
+	private final Color GREEN = Color.GREEN;
+	private final Color BLACK = Color.BLACK;
+	// Transparency
+	private final double TRANSPARENCY = 0.9;
+
+
 	// Demo file
 	//final String DEMOSTATION_FILENAME = "C:/temp/RobSuprTestStation/RobSuprTest.stn";
 	// 	final String DEMOSTATION_FILENAME = "C:/temp/DomStations/DemoSafe.stn";
@@ -147,7 +156,8 @@ public class RobotCellExaminer
 					}
 					catch (Exception ex)
 					{
-						logger.error(ex);
+						logger.error("Error when running boxStrategy: " + ex);
+						logger.warn(ex.getStackTrace());
 					}
 				}
 			});
@@ -367,18 +377,10 @@ public class RobotCellExaminer
 	private void boxStrategy(RobotCell cell)
 		throws Exception
 	{
-		// Colors
-		final Color RED = Color.RED;
-		final Color ORANGE = Color.ORANGE;
-		final Color GREEN = Color.GREEN;
-		final Color BLACK = Color.BLACK;
-		// Transparency
-		final double TRANSPARENCY = 0.1;
-
 		// Discretization parameters
-		double dx = 0.1;
-		double dy = 0.5;
-		double dz = 1.0;
+		double dx = 0.2;
+		double dy = 0.2;
+		double dz = 0.2;
 		cell.setBoxDimensions(new double[] {dx,dy,dz});
 
 		// Hashtable
@@ -398,7 +400,7 @@ public class RobotCellExaminer
 			Robot robot = robIt.next();
 
 			// List of boxes that should be examined
-			List<Box> boxesToExamine = new LinkedList<Box>();
+ 			List<Box> boxesToExamine = new LinkedList<Box>();
 			// List of the boxes that have already been examined (for resetting the matrix)
 			List<Box> boxesExamined = new LinkedList<Box>();
 			// List of the boxes on "the surface"
@@ -415,8 +417,10 @@ public class RobotCellExaminer
 			{
 			 	// Get the status for this box
 				Box box = boxesToExamine.remove(0);
+				logger.warn("Examining " + box.getName());
+				
 				Status status;
-				if (!matrix.containsKey(box))
+				if (!matrix.containsKey(box.getCoordinate()))
 				{
 					status = new Status();
 					status.occupied = false;
@@ -426,13 +430,8 @@ public class RobotCellExaminer
 				else
 				{
 					status = matrix.get(box.getCoordinate());
-					if (status.checked)
-				 	{
-					 	// Already checked this one...
-						continue;
-					}	 				
 				}
-				boxesExamined.add(box);
+ 				boxesExamined.add(box);
 
 				// Inside robot?
 				if (robot.collidesWith(box))
@@ -448,45 +447,37 @@ public class RobotCellExaminer
 					}
 					status.occupied = true;
 
-					Coordinate coord = box.getCoordinate();
+ 					Coordinate coord = box.getCoordinate();
 					int x = coord.getX();
 					int y = coord.getY();
 					int z = coord.getZ();
 
-					int newX;
-					int newY;
-					int newZ;
 					Coordinate newCoord;
 					Box newBox;
+					Status newStatus;
 
 					// Up
 					newCoord = new Coordinate(x,y,z+1);
-					newBox = cell.createBox(newCoord, ORANGE, TRANSPARENCY);
-					boxesToExamine.add(newBox);
+					addBoxToExamine(boxesToExamine, matrix, newCoord);
 					// Down
 					newCoord = new Coordinate(x,y,z-1);
-					newBox = cell.createBox(newCoord, ORANGE, TRANSPARENCY);
-					boxesToExamine.add(newBox);
+					addBoxToExamine(boxesToExamine, matrix, newCoord);
 					// Left
 					newCoord = new Coordinate(x,y+1,z);
-					newBox = cell.createBox(newCoord, ORANGE, TRANSPARENCY);
-					boxesToExamine.add(newBox);
+					addBoxToExamine(boxesToExamine, matrix, newCoord);
 					// Right
 					newCoord = new Coordinate(x,y-1,z);
-					newBox = cell.createBox(newCoord, ORANGE, TRANSPARENCY);
-					boxesToExamine.add(newBox);
+					addBoxToExamine(boxesToExamine, matrix, newCoord);
 					// Forward
 					newCoord = new Coordinate(x+1,y,z);
-					newBox = cell.createBox(newCoord, ORANGE, TRANSPARENCY);
-					boxesToExamine.add(newBox);
+					addBoxToExamine(boxesToExamine, matrix, newCoord);
 					// Back
 					newCoord = new Coordinate(x-1,y,z);
-					newBox = cell.createBox(newCoord, ORANGE, TRANSPARENCY);
-					boxesToExamine.add(newBox);
+					addBoxToExamine(boxesToExamine, matrix, newCoord);
 				}
 				else
 				{
-					// This box is a "surfacebox"
+				 	// This box is a "surfacebox"
 					box.setColor(GREEN);
 					surfaceBoxes.add(box);
 				}
@@ -495,9 +486,9 @@ public class RobotCellExaminer
 			// Didn't find anything? The base coordinate box was outside?
 			if (boxesExamined.size() == 1)
 			{
-				logger.error("Base coordinate box is not inside robot.");
+			 	logger.error("Base coordinate box is not inside robot.");
 				return;
-			}
+			} 
 			
 			// DO THE SPAN-STUFF HERE!!!
 			/*
@@ -506,7 +497,6 @@ public class RobotCellExaminer
 			{
 				collisionSet.add(boxIt.next());
 			}
-			*/
 
 			// Push boxes for each "path", i.e. unique pair of positions
 			List<Position> positions = robot.getPositions();
@@ -538,6 +528,7 @@ public class RobotCellExaminer
 			// Finalize
 			robot.jumpToPosition(home);
 			robot.stop();			
+			*/
 			
 			// Clear checked-status from the examined boxes before examining next robot!
 			while (boxesExamined.size() != 0)
@@ -551,9 +542,29 @@ public class RobotCellExaminer
 			while (surfaceBoxes.size() != 0)
 			{
 				Box box = surfaceBoxes.remove(0);
-				matrix.remove(box);
+				matrix.remove(box.getCoordinate());
 				box.delete();
 			}
+		}
+	}
+
+	private void addBoxToExamine(List<Box> boxesToExamine, 
+								 Hashtable<Coordinate, Status> matrix,  
+								 Coordinate coord)
+		throws Exception
+	{
+		// If the box is already added for this robot, it will have its checked-status
+		// set to true!!
+		if (!matrix.containsKey(coord) || !matrix.get(coord).checked)
+		{
+			Box newBox = cell.createBox(coord, ORANGE, TRANSPARENCY);
+			boxesToExamine.add(boxesToExamine.size(), newBox);
+
+			Status status = new Status();
+			status.occupied = false;
+			status.checked = true;
+			matrix.put(coord, status);
+			
 		}
 	}
 }

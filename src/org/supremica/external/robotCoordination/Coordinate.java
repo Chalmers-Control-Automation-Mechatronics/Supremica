@@ -1,7 +1,10 @@
 package org.supremica.external.robotCoordination;
 
 /**
- * A (discretized) coordinate in the simulation environment.
+ * A (discretized) coordinate in the simulation environment. The discretization
+ * steps dx, dy and dz are specified through the RobotCell interface.
+ *
+ * @see #RobotCell.setBoxDimensions(double[])
  */
 public class Coordinate 
 {
@@ -28,28 +31,17 @@ public class Coordinate
 	public boolean equals(Object obj)
 	{
 		Coordinate other = (Coordinate) obj;
+		return equals(other);
+	}
+
+	public boolean equals(Coordinate other)
+	{
 		return (x == other.x) && (y == other.y) && (z == other.z);
 	}
 
 	public String toString() 
 	{
-		String str = "";
-
-		if (x < 0)
-			str += "n" + Math.abs(x);
-		else
-			str += x;
-
-		if (y < 0)
-			str += "_n" + Math.abs(y);
-		else
-			str += "_" + y;
-
-		if (z < 0)
-			str += "_n" + Math.abs(z);
-		else
-			str += "_" + z;
-
-		return str;
+		String str = x + "_" + y + "_" + z;
+		return str.replace("-", "m"); 
 	}
 }

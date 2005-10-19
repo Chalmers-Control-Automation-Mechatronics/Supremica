@@ -1555,6 +1555,7 @@ public class AutomataVerifier
 	 *
 	 * Does not use the synchHelper!
 	 */
+	/*
 	private boolean modularNonblockingVerification()
 		throws Exception
 	{
@@ -1619,169 +1620,7 @@ public class AutomataVerifier
 		//ActionMan.getGui().addAutomata(restrictedAutomata);
 		return false;
 	}
-
-	/**
-	 * Examines nonblocking modularily... not fully implemented yet!
-	 *
-	 * Does not use the synchHelper.
-	 */
-	private boolean modularNonblockingVerification2()
-		throws Exception
-	{
-		// Is this really a modular system?
-		if (theAutomata.size() == 1)
-		{
-			logger.info("The selected system has only one automaton - using monolithic verification...");
-
-			return monolithicNonblockingVerification();
-		}
-
-		// Ensure individual nonblocking
-		boolean allIndividuallyNonblocking = true;
-		Iterator autIt = theAutomata.iterator();
-		Automaton currAutomaton;
-
-		while (autIt.hasNext())
-		{
-			currAutomaton = (Automaton) autIt.next();
-			allIndividuallyNonblocking = allIndividuallyNonblocking && moduleIsNonblocking(currAutomaton);
-
-			if (stopRequested)
-			{
-				return false;
-			}
-
-			if (!allIndividuallyNonblocking)
-			{
-				logger.error("The automaton " + currAutomaton.toString() + " is individually blocking!");
-				logger.error("Aborting verification...");
-				requestStop();
-
-				return false;
-			}
-		}
-
-		if (allIndividuallyNonblocking)
-		{
-			logger.info("This system has no individually blocking automata!");
-		}
-
-		/*
-		// Preparations for the global nonblocking verification...
-		ExecutionDialog executionDialog = synchHelper.getExecutionDialog();
-		if (executionDialog != null) // The executionDialog might not have been initialized yet! FIXA!
-		{
-				executionDialog.initProgressBar(0, theAutomata.size());
-				executionDialog.setMode(ExecutionDialogMode.verifyingNonblocking);
-		}
-		// We use a copy of theAutomata instead from this point on. This is to spare us the
-		// effort of changing all events to uncontrollable over and over and lets us use the
-		// same helper all the time, EXCEPT for AutomataIndexForm.typeIsPlantTable which we
-		// have to reinitialize between the language inclusion checks!!
-		theAutomata = new Automata(theAutomata, false);
-		synchHelper = new AutomataSynchronizerHelper(theAutomata, synchronizationOptions);
-		// Make all events in all automata in theAutomata as uncontrollable! (All
-		// events in plants should be uncontrollable and the controllability of
-		// the events in the supervisors doesn't matter!)
-		Iterator eventIterator;
-		Iterator automatonIterator = theAutomata.iterator();
-		while (automatonIterator.hasNext())
-		{
-				currAutomaton = (Automaton) automatonIterator.next();
-				// currAutomaton.setType(AutomatonType.Plant);
-				eventIterator = currAutomaton.eventIterator();
-				while (eventIterator.hasNext())
-				{
-						((LabeledEvent) eventIterator.next()).setControllable(false);
-				}
-		}
-		*/
-
-		// Preparations for the global nonblocking verification...
-		java.awt.EventQueue.invokeLater(new Runnable()
-		{
-			public void run()
-			{
-				ExecutionDialog executionDialog = synchHelper.getExecutionDialog();
-
-				executionDialog.initProgressBar(0, theAutomata.size());
-				executionDialog.setMode(ExecutionDialogMode.verifyingNonblocking);
-			}
-		});
-
-		// Ensure global nonblocking...
-		boolean allIncluded = true;
-		boolean automatonIsIncluded;
-		Automata currAutomata = new Automata();
-
-		autIt = theAutomata.iterator();
-
-		while (autIt.hasNext())
-		{
-			currAutomaton = (Automaton) autIt.next();
-
-			currAutomata.addAutomaton(currAutomaton);
-			logger.info("Examining the automaton " + currAutomaton.toString() + ".");
-
-			automatonIsIncluded = modularLanguageinclusionVerification(currAutomata);
-			allIncluded = allIncluded && automatonIsIncluded;
-
-			currAutomata.removeAutomaton(currAutomaton);
-
-			if (stopRequested)
-			{
-				// timer.stop();
-				return false;
-			}
-
-			if (synchHelper.getExecutionDialog() != null)
-			{
-				synchHelper.getExecutionDialog().setProgress(theAutomata.getAutomatonIndex(currAutomaton));
-			}
-
-			if (!automatonIsIncluded)
-			{
-				logger.error("The automaton " + currAutomaton.toString() + " is blocked by some other automaton!");
-			}
-		}
-
-		// timer.stop();
-		return allIncluded && allIndividuallyNonblocking;
-
-		/*
-		// Ensure global nonblocking...
-		boolean allIncluded = true;
-		boolean automatonIsIncluded;
-		autIt = theAutomata.iterator();
-		Automata currAutomata = new Automata();
-		while (autIt.hasNext())
-		{
-				currAutomaton = (Automaton) autIt.next();
-				if (executionDialog != null)
-				{
-						executionDialog.setProgress(theAutomata.getAutomatonIndex(currAutomaton));
-				}
-			currAutomata.addAutomaton(currAutomaton);
-
-				// Perform the behavioural inclusion check!
-				logger.info("Examining the automaton " + currAutomaton.getName() + ".");
-				automatonIsIncluded = behaviouralInclusionVerification(currAutomata, theAutomata);
-				allIncluded = allIncluded && automatonIsIncluded;
-				currAutomata.removeAutomaton(currAutomaton); // Examine one automaton at a time...
-
-				if (stopRequested)
-				{
-						return false;
-				}
-
-				if (!automatonIsIncluded)
-				{
-						logger.error("The automaton " + currAutomaton.getName() + " is blocked by some other automaton!");
-				}
-		}
-		return allIncluded && allIndividuallyNonblocking;
-		*/
-	}
+	*/
 
 	/**
 	 * Incrementally composes and minimizes the automata and examines the end result...
@@ -1806,6 +1645,7 @@ public class AutomataVerifier
 			}
 		});
 
+		// Minimize the system compositionally
 		Automaton result;
 		try
 		{
@@ -1834,7 +1674,7 @@ public class AutomataVerifier
 			return false;
 		}
 
-		// Present result!
+		// Examine the result and return the verdict!
 		return moduleIsNonblocking(result, true);
 	}
 

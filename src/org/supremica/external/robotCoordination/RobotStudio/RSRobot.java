@@ -114,9 +114,11 @@ public class RSRobot
 	 * Examines if this robot collides with the given box in the current position.
 	 */
     public boolean collidesWith(Box box) 
+		throws Exception
 	{
-		//return MechanismListener.entityCollidesWith(mechanism, ((RSBox) box).getEntity());
-		return true;
+		// Please move this method from MechanismListener to somewhere more logical
+		return MechanismListener.entityCollidesWith(mechanism, ((RSBox) box).getEntity());
+		//return true;
     }
 	
     public Coordinate getBaseCoordinates() throws Exception {
@@ -132,67 +134,67 @@ public class RSRobot
     }
 
     public void generateSpan(org.supremica.external.robotCoordination.Position from, org.supremica.external.robotCoordination.Position to)
-	throws Exception
+		throws Exception
     {
-	jumpToPosition(from);
- 
-	// Find targets
-	Target fromTarget = ((RSPosition) from).getRobotStudioTarget();
-	Target toTarget = ((RSPosition) to).getRobotStudioTarget();
-
-	// Create new path for this motion
-	IPath path = mechanism.getPaths().add();
-
-	path.setName(from.getName() + to.getName());
-	path.insert(fromTarget);
-	path.getTargetRefs().item(Converter.var(1)).setMotionType(1);    // Linear motion
-	path.insert(toTarget);
-	path.getTargetRefs().item(Converter.var(2)).setMotionType(1);    // Linear motion
-
-	// Redefine robot program...
-	IABBS4Procedure mainProcedure = getMainProcedure();
-
-	for (int k = 1; k <= mainProcedure.getProcedureCalls().getCount();
-	     k++)
+		jumpToPosition(from);
+		
+		// Find targets
+		Target fromTarget = ((RSPosition) from).getRobotStudioTarget();
+		Target toTarget = ((RSPosition) to).getRobotStudioTarget();
+		
+		// Create new path for this motion
+		IPath path = mechanism.getPaths().add();
+		
+		path.setName(from.getName() + to.getName());
+		path.insert(fromTarget);
+		path.getTargetRefs().item(Converter.var(1)).setMotionType(1);    // Linear motion
+		path.insert(toTarget);
+		path.getTargetRefs().item(Converter.var(2)).setMotionType(1);    // Linear motion
+		
+		// Redefine robot program...
+		IABBS4Procedure mainProcedure = getMainProcedure();
+		
+		for (int k = 1; k <= mainProcedure.getProcedureCalls().getCount();
+			 k++)
 	    {
-		mainProcedure.getProcedureCalls().item(Converter.var(k)).delete();
+			mainProcedure.getProcedureCalls().item(Converter.var(k)).delete();
 	    }
-
-	// Add path as only procedure in main
-	path.syncToVirtualController(RSRobotCell.PATHSMODULE_NAME);    // Generate procedure from path
-	Thread.sleep(1000);    // The synchronization takes a little while...
-
-	IABBS4Procedure proc = path.getProcedure();
-
-	mainProcedure.getProcedureCalls().add(path.getProcedure());
-
-	// Generate span for this path
-	// Start simulation listener
-	ISimulation simulation = mechanism.getParent().getSimulations().item(Converter.var(1));
-	Simulation sim = Simulation.getSimulationFromUnknown(simulation);
-	SpanGenerator spanGenerator = new SpanGenerator(this, path.getName());
-
-	sim.addDSimulationEventsListener(spanGenerator);
-
-	// Start a thread running the simulation in RobotStudio
-	simulation.start();
-
-	// Wait for the simulation to stop
-	spanGenerator.waitForSimulationStop();
-	sim.removeDSimulationEventsListener(spanGenerator);
-	Thread.sleep(1000);
-
-	// Clean up
-	path.delete();
+		
+		// Add path as only procedure in main
+		path.syncToVirtualController(RSRobotCell.PATHSMODULE_NAME);    // Generate procedure from path
+		Thread.sleep(1000);    // The synchronization takes a little while...
+		
+		IABBS4Procedure proc = path.getProcedure();
+		
+		mainProcedure.getProcedureCalls().add(path.getProcedure());
+		
+		// Generate span for this path
+		// Start simulation listener
+		ISimulation simulation = mechanism.getParent().getSimulations().item(Converter.var(1));
+		Simulation sim = Simulation.getSimulationFromUnknown(simulation);
+		SpanGenerator spanGenerator = new SpanGenerator(this, path.getName());
+		
+		sim.addDSimulationEventsListener(spanGenerator);
+		
+		// Start a thread running the simulation in RobotStudio
+		simulation.start();
+		
+		// Wait for the simulation to stop
+		spanGenerator.waitForSimulationStop();
+		sim.removeDSimulationEventsListener(spanGenerator);
+		Thread.sleep(1000);
+		
+		// Clean up
+		path.delete();
     }
-
+	
     public void hideSpan()
-	throws Exception
+		throws Exception
     {
-	//spans.setVisible(false);
-	spans.delete();
+		//spans.setVisible(false);
+		spans.delete();
     }
-
+	
     public String getName()
 	throws Exception
     {

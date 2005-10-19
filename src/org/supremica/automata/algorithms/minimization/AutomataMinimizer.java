@@ -106,6 +106,7 @@ public class AutomataMinimizer
 		throws Exception
 	{
 		this.options = options;
+		//this.options.setMinimizationType(EquivalenceRelation.ObservationEquivalence);
 
 		// Are the options valid?
 		if (!options.isValid())
@@ -115,6 +116,9 @@ public class AutomataMinimizer
 
 		// Size in the beginning
 		int nbrOfAutomata = theAutomata.size();
+		// The number of events in the original alphabet
+		Alphabet globalAlphabet = theAutomata.getUnionAlphabet();
+		int globalAlphabetSize = globalAlphabet.size() - globalAlphabet.nbrOfEpsilonEvents();
 
 		// Initialize execution dialog
 		if (executionDialog != null)
@@ -214,6 +218,13 @@ public class AutomataMinimizer
 			if (executionDialog != null)
 			{
 				executionDialog.setProgress(nbrOfAutomata-theAutomata.size());
+				//if (SupremicaProperties.verboseMode())
+				{
+					Alphabet currentAlphabet = theAutomata.getUnionAlphabet();
+					executionDialog.setSubheader("Events left: " + 
+												 (currentAlphabet.size()-currentAlphabet.nbrOfEpsilonEvents()) + 
+												 " (" + globalAlphabetSize + ")");
+				}
 			}
 		}
 
@@ -282,13 +293,13 @@ public class AutomataMinimizer
 			Automaton autA = null;
 			if (strategy == MinimizationStrategy.RandomOrder)
 			{
-				// Get random automaton
+				// Get autA at random
 				int i = (int) Math.floor(Math.random()*theAutomata.size());
 				autA = theAutomata.getAutomatonAt(i);
 			}
 			else 
 			{
-				// Search among all the automata 
+				// Search among all the automata for the "best" autA...
 				for (Iterator<Automaton> autIt = theAutomata.iterator(); autIt.hasNext(); )
 				{
 					Automaton aut = autIt.next();
@@ -437,6 +448,7 @@ public class AutomataMinimizer
 
 			// Look through the map and find the smallest set of automata
 			EventIterator evIt = eventToAutomataMap.iterator();
+			int bestValue = Integer.MAX_VALUE;
 			while (evIt.hasNext())
 			{
 				LabeledEvent event = evIt.nextEvent();
@@ -455,15 +467,32 @@ public class AutomataMinimizer
 				// Get the automata that have this event in their alphabet
 				Automata automata = eventToAutomataMap.get(event);
 
-				// Take as few automata as possible as the next task
-				if ((result == null) || (automata.size() < result.size()))
+				// Find the best one of the sets!
+				int thisValue = 1;
+				/*
+				// Predict the size of the composition (worst case prediction)
+				for (Iterator<Automaton> it = automata.iterator(); it.hasNext(); )
+				{
+					Automaton aut = it.next();
+					thisValue = thisValue * aut.nbrOfStates();
+				}
+				*/
+				// Just choose the smallest set
+				thisValue = automata.size();
+
+				// Best one yet?
+				if ((result == null) || (thisValue < bestValue))
 				{
 					result = automata;
+					bestValue = thisValue;
+
+					// If there is an automaton that by itself has unique events, choose that one!
+					// This can only happen in the beginning, of course...
 					if (result.size() == 1)
 					{
 						break;
 					}
-				}
+				}				
 			}
 
 			// Did we find an apropriate result?

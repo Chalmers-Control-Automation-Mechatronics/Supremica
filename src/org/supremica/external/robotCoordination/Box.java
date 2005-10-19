@@ -7,19 +7,18 @@ import java.awt.Color;
 /**
  * Represents an abstract box.
  */
-public abstract class Box {
-    protected Coordinate coord;
-    protected Color color;
-    protected double transparency;
+public abstract class Box 
+{
     protected String name;
+    protected Coordinate coord;
 	
     public Box(String name, Coordinate coord, Color color, double transparency) 
 		throws Exception
     {
 		this.name = name;
 		this.coord = coord;
-		this.color = color;
-		this.transparency = transparency;
+		setColor(color);
+		setTransparency(transparency);
     }
     	
     public Coordinate getCoordinate() { return coord; }
@@ -29,4 +28,9 @@ public abstract class Box {
 	public abstract void setColor(Color color) throws Exception;
 
 	public abstract void setTransparency(double transparency) throws Exception;
+
+	public String getName()
+	{
+		return name;
+	}
 }

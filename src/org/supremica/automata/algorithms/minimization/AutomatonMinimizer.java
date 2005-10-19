@@ -1313,7 +1313,7 @@ public class AutomatonMinimizer
                     State currState = statesToModify.remove();
 
                     // Accepting states that by epsilons may reach a block are modified to be
-                    // nonaccepting an exception is made if this is the initial state!
+                    // nonaccepting... 
                     // We might as well exchange the below if-clause with
                     // only one statement, "currState.setAccepting(false);".
                     if (currState.isAccepting())
@@ -1323,23 +1323,21 @@ public class AutomatonMinimizer
                             // We know that the system is blocking!
                             logger.verbose("The system was found to be blocking.");
 
-                            // Do nothing...
+							// Do nothing...
                             //continue;
                         }
 
                         currState.setAccepting(false);
                     }
-
-                    // We won't want to propagate from here
+					
+                    // We won't want to propagate from here, this is now a blocking state!
                     currState.removeOutgoingArcs();
 
                     ////////////////
                     // RULE C.1-3 //
                     ////////////////
 
-                    // This stuff actually NEVER occured in the central lock example,
-                    // perhaps it's not much to hope for?
-                    // Follow all epsilon transitions backwards
+                    // Follow all transitions backwards
                     for (ArcIterator arcIt = currState.incomingArcsIterator(); arcIt.hasNext(); )
                     {
                         Arc arc = arcIt.nextArc();
@@ -1347,8 +1345,12 @@ public class AutomatonMinimizer
 
                         if (arc.getEvent().isEpsilon())
                         {
-                            logger.debug("Rule C.3 came to use.");
-                            statesToModify.add(previous);
+							if (previous.getCost() != State.MAX_COST)
+							{
+								//previous.setCost(State.MAX_COST); // Dangerous, make sure you reset!
+								statesToModify.add(previous);
+								logger.debug("Rule C.3 came to use.");
+							}
                         }
                         else
                         {
@@ -1363,9 +1365,9 @@ public class AutomatonMinimizer
                                 {
                                     if (currArc.getEvent().equals(arc.getEvent()))
                                     {
-                                        logger.debug("Rule C.1 came to use.");
                                         // The arc "currArc" can be removed
                                         toBeRemoved.add(currArc);
+                                        logger.debug("Rule C.1 came to use.");
                                     }
                                     else
                                     {
@@ -1379,8 +1381,13 @@ public class AutomatonMinimizer
                             }
                             if (!fail)
                             {
-                                logger.debug("Rule C.2 came to use.");
-                                statesToModify.add(previous);
+								// This may appear as a result of rule C.3 above!
+								if (previous.getCost() != State.MAX_COST)
+								{
+									//previous.setCost(State.MAX_COST); // Dangerous, make sure you reset!
+									statesToModify.add(previous);
+									logger.debug("Rule C.2 came to use.");
+								}
                             }
                         }
                     }

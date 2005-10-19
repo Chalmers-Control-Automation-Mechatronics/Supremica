@@ -7,7 +7,8 @@ public interface Robot
     /**
      * Returns true if the robot collides with a given box.
      */
-    public boolean collidesWith(Box box);
+    public boolean collidesWith(Box box)
+		throws Exception;
     
     /**
      * Generates span for a pair of positions.

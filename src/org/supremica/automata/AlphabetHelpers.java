@@ -50,9 +50,15 @@
 package org.supremica.automata;
 
 import java.util.*;
+import org.supremica.log.*;
 
+/**
+ * Helper methods for processing alphabets.
+ */
 public class AlphabetHelpers
 {
+	private static Logger logger = LoggerFactory.createLogger(AlphabetHelpers.class);
+
 	public static Alphabet getUnionAlphabet(Automata theAutomata)
 		throws Exception
 	{
@@ -270,7 +276,7 @@ public class AlphabetHelpers
 	/**
 	 * Computes and returns "a1 union a2"
 	 */
-	static public Alphabet union(Alphabet a1, Alphabet a2)
+	public static Alphabet union(Alphabet a1, Alphabet a2)
 	{
 		Alphabet result = new Alphabet(a1);
 
@@ -278,4 +284,28 @@ public class AlphabetHelpers
 
 		return result;
 	}
+
+	/**
+	 * Returns true if there are no events with alphabetically equal names, i.e.
+	 * lowercase equal.
+	 *
+	 * Also warns if there are events that start or end with blank spaces.
+	 */
+	public static boolean isEventNamesSafe(Alphabet alphabet)
+	{
+		// Check that there are no spaces in the start or end of event names!
+		for (Iterator<LabeledEvent> evIt = alphabet.iterator(); evIt.hasNext(); )
+		{
+			LabeledEvent event = evIt.next();
+			if (event.getLabel().startsWith(" ") || event.getLabel().endsWith(" "))
+			{
+				logger.warn("The event " + event + " has spaces in the beginning or end of its label. This is not recommended.");
+			}
+		}
+
+		// Chech that no event names have the same alphabetic value
+		return !alphabet.hasEqualEventNamesIgnoringCase();
+	}
+
+
 }

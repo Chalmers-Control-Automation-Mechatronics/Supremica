@@ -16,12 +16,10 @@ public class RSBox
 {
     public RSBox(String name, Coordinate coord, Color color, double transparency) 
 		throws Exception
-    {
+	{
 		super(name, coord, color, transparency);
-		setColor(color);
-		setTransparency(transparency);
-    }
-	
+	}
+
     public void delete() 
 		throws Exception
     {
@@ -31,18 +29,14 @@ public class RSBox
 	public void setColor(Color color)
 		throws Exception
 	{
-		Variant varColor = new Variant(new SafeArray(new int[]{color.getRed(), color.getGreen(), color.getBlue()}), false);
+		Variant varColor = new Variant(new SafeArray(new int[] {color.getRed(), color.getGreen(), color.getBlue()}), false);
 		getEntity().setColor(varColor);
-
-		this.color = color;
 	}
-
+	
 	public void setTransparency(double transparency)
 		throws Exception
 	{
 		getEntity().setRelativeTransparency((float) transparency);
-
-		this.transparency = transparency;
 	}
 
 	protected IEntity getEntity()

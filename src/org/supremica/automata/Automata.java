@@ -664,26 +664,6 @@ public class Automata
 	}
 
 	/**
-	 * Returns true if there are no events with alphabetically equal names, i.e.
-	 * lowercase equal.
-	 */
-	private boolean isEventNamesSafe(Alphabet unionAlphabet)
-	{
-		// Check that there are no spaces in the start or end of event names!
-		for (EventIterator evIt = unionAlphabet.iterator(); evIt.hasNext(); )
-		{
-			LabeledEvent event = evIt.nextEvent();
-			if (event.getLabel().startsWith(" ") || event.getLabel().endsWith(" "))
-			{
-				logger.warn("The event '" + event.getLabel() + "' has spaces in the beginning or end of its label. This is not recommended.");
-			}
-		}
-
-		// Chech that no event names have the same alphabetic value
-		return !unionAlphabet.hasEqualEventNamesIgnoringCase();
-	}
-
-	/**
 	 * Returns true if the system is really several systems, i.e. can be divided into sets of
 	 * automata that have disjoint alphabets.
 	 */
@@ -1414,7 +1394,7 @@ public class Automata
 
 		// Warns if there are events with equal (lowercase) names.
 		// Always do this check (irritating? well yes... but those are really bad names!)
-		if (!isEventNamesSafe(unionAlphabet))
+		if (!AlphabetHelpers.isEventNamesSafe(unionAlphabet))
 		{
 			// Warning has been written in log window by isEventNamesSafe.
 		}

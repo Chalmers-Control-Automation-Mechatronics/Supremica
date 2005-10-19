@@ -304,9 +304,12 @@ public class RSRobotCell
 		String boxName = "Box_" + coord;
 		
 		IEntity currBox = boxSet.createSolidBox(trans, boxDimensions[0], boxDimensions[1], boxDimensions[2]);
+		currBox.setVisible(false);
 		currBox.setName(boxName);
-		
-		return new RSBox(boxName, coord, color, transparency);
+		Box box = new RSBox(boxName, coord, color, transparency);
+		currBox.setVisible(true);
+
+		return box;
     }
 	
     public Automata generateZoneAutomata()
