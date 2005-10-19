@@ -2798,23 +2798,23 @@ public class ActionMan
 	}
 	*/
 
-	static RobotCellExaminer theRobotCellExaminer = null;
-	public static void showRobotCellExaminer(Gui gui)
+	static CellExaminer theCellExaminer = null;
+	public static void showCellExaminer(Gui gui)
 	{
 		Thread thread = new Thread(new Runnable()
 		{
 			public void run()
 			{
-				if (theRobotCellExaminer == null)
+				if (theCellExaminer == null)
 				{
-					//theRobotCellExaminer = new RobotCellExaminer(ActionMan.getGui().getFrame());
-					theRobotCellExaminer = new RobotCellExaminer(null);
+					//theCellExaminer = new CellExaminer(ActionMan.getGui().getFrame());
+					theCellExaminer = new CellExaminer(null);
 				}
 
-				theRobotCellExaminer.setVisible(true);
+				theCellExaminer.setVisible(true);
 
 				/*
-				RobotCellExaminer examiner = new RobotCellExaminer(ActionMan.getGui().getFrame());
+				CellExaminer examiner = new CellExaminer(ActionMan.getGui().getFrame());
 				examiner.setVisible(true);
 				*/
 			}

@@ -90,7 +90,7 @@ public class Converter {
 	 * Converts a RobotStudio coordinate to a Supremica Coordinate (or Supremica index)
 	 */
 	static Coordinate toCoordinate(double x, double y, double z) {
-		double[] scaling = RSRobotCell.boxDimensions;
+		double[] scaling = RSCell.boxDimensions;
 		
 		x /= scaling[0];
 		y /= scaling[1];
@@ -103,7 +103,7 @@ public class Converter {
 	 * Converts a Supremica Coordinate to a 3D-point in the world frame of RobotStudio
 	 */
 	static double[] toRSPoint(Coordinate coord) {
-		double[] scaling = RSRobotCell.boxDimensions;
+		double[] scaling = RSCell.boxDimensions;
 		double[] pointCoord = new double[3];
 		
 		pointCoord[0] = coord.getX() * scaling[0];

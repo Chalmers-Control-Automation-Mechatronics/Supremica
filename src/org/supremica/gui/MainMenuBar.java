@@ -938,7 +938,7 @@ public class MainMenuBar
 	});
 	*/
 
-	// Tools.RobotCellExaminer
+	// Tools.CellExaminer
 	if (SupremicaProperties.generalUseRobotCoordination())
 	{
 	    menuTools.add(new JSeparator());
@@ -951,7 +951,7 @@ public class MainMenuBar
 		{
 		    public void actionPerformed(ActionEvent e)
 		    {
-			ActionMan.showRobotCellExaminer(ActionMan.getGui());
+			ActionMan.showCellExaminer(ActionMan.getGui());
 		    }
 		});
 	}

@@ -49,7 +49,7 @@
 
 package org.supremica.external.robotCoordination.RobotStudio;
 
-import org.supremica.external.robotCoordination.Position;
+import org.supremica.external.robotCoordination.Configuration;
 import org.supremica.external.comInterfaces.robotstudio_3_1.RobotStudio.Target;
 import org.supremica.external.comInterfaces.robotstudio_3_1.RobotStudio.ITarget;
 import org.supremica.log.*;

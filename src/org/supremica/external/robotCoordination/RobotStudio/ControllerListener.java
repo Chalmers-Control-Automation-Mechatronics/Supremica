@@ -131,7 +131,7 @@ public class ControllerListener
 	// This method works fine... but is quite useless here? Post some info...
 	try
 	    {
-		logger.debug("Starting Virtual Controller for " + RSRobotCell.station.getName() + "...");
+		logger.debug("Starting Virtual Controller for " + RSCell.station.getName() + "...");
 	    }
 	catch (Exception whatever) {}
 
@@ -158,7 +158,7 @@ public class ControllerListener
 
 	try
 	    {
-		logger.debug("Virtual Controller shut down for " + RSRobotCell.station.getName() + ".");
+		logger.debug("Virtual Controller shut down for " + RSCell.station.getName() + ".");
 	    }
 	catch (Exception whatever) {}
 

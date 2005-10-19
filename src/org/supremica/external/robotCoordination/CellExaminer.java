@@ -239,14 +239,14 @@ public class CellExaminer
 				robot.start();
 
 				// Generate span for each "path", i.e. unique pair of positions
-				List<Position> positions = robot.getPositions();
-				for (int i = 0; i < positions.size(); i++)
+				List<Configuration> configurations = robot.getConfigurations();
+				for (int i = 0; i < configurations.size(); i++)
 				{
-					Position from = (Position) positions.get(i);
+					Configuration from = (Configuration) configurations.get(i);
 
-					for (int j = i + 1; j < positions.size(); j++)
+					for (int j = i + 1; j < configurations.size(); j++)
 					{
-						Position to = (Position) positions.get(j);
+						Configuration to = (Configuration) configurations.get(j);
 
 						// Generate span!
 						logger.debug("Generating span from " + from + " to " + to + " for " + robot + ".");
@@ -255,7 +255,7 @@ public class CellExaminer
 				}
 
 				// Finalize
-				robot.jumpToPosition(robot.getHomePosition());
+				robot.jumpToConfiguration(robot.getHomeConfiguration());
 				robot.stop();
 			}
 		}
@@ -344,15 +344,15 @@ public class CellExaminer
 				// Initalize
 				robot.start();
 
-				// Examine collisions for each "path", i.e. unique pair of positions
-				List<Position> positions = robot.getPositions();
-				for (int i = 0; i < positions.size(); i++)
+				// Examine collisions for each "path", i.e. unique pair of configurations
+				List<Configuration> configurations = robot.getConfigurations();
+				for (int i = 0; i < configurations.size(); i++)
 				{
-					Position from = (Position) positions.get(i);
+					Configuration from = (Configuration) configurations.get(i);
 
-					for (int j = i + 1; j < positions.size(); j++)
+					for (int j = i + 1; j < configurations.size(); j++)
 					{
-						Position to = (Position) positions.get(j);
+						Configuration to = (Configuration) configurations.get(j);
 
 						// Examine path for collisions
 						logger.info("Examining the motion from " + from + " to " + to + " for " + robot + ".");
@@ -361,7 +361,7 @@ public class CellExaminer
 				}
 
 				// Finalize
-				robot.jumpToPosition(robot.getHomePosition());
+				robot.jumpToConfiguration(robot.getHomeConfiguration());
 				robot.stop();
 			}
 		}
@@ -498,27 +498,27 @@ public class CellExaminer
 				collisionSet.add(boxIt.next());
 			}
 
-			// Push boxes for each "path", i.e. unique pair of positions
-			List<Position> positions = robot.getPositions();
-			// The first loop must start with the home position, since the 
+			// Push boxes for each "path", i.e. unique pair of configurations
+			List<Configuration> configurations = robot.getConfigurations();
+			// The first loop must start with the home configuration, since the 
 			// surfaceboxes always should be pushed "outwards"
-			Position home = robot.getHomePosition();
-			int homeIndex = positions.indexOf(home);
+			Configuration home = robot.getHomeConfiguration();
+			int homeIndex = configurations.indexOf(home);
 			if (homeIndex != 0)
 			{
-				Position temp = positions.get(0);
-				positions.set(0, home);
-				positions.set(homeIndex, temp);
+				Configuration temp = configurations.get(0);
+				configurations.set(0, home);
+				configurations.set(homeIndex, temp);
 			}
-			robot.jumpToPosition(home);
-			// Now the paths, two nested loops of positions...
-			for (int i = 0; i < positions.size(); i++)
+			robot.jumpToConfiguration(home);
+			// Now the paths, two nested loops of configurations...
+			for (int i = 0; i < configurations.size(); i++)
 			{
-				Position from = (Position) positions.get(i);
+				Configuration from = (Configuration) configurations.get(i);
 				
-				for (int j = i + 1; j < positions.size(); j++)
+				for (int j = i + 1; j < configurations.size(); j++)
 				{
-					Position to = (Position) positions.get(j);
+					Configuration to = (Configuration) configurations.get(j);
 					
 					// Generate span!
 					logger.info("Pushing boxes moving from " + from + " to " + to + " for " + robot + ".");
@@ -526,7 +526,7 @@ public class CellExaminer
 				}
 			}
 			// Finalize
-			robot.jumpToPosition(home);
+			robot.jumpToConfiguration(home);
 			robot.stop();			
 			*/
 			

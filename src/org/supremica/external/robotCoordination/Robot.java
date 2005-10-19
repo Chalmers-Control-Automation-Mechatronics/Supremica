@@ -13,7 +13,7 @@ public interface Robot
     /**
      * Generates span for a pair of positions.
      */
-    public void generateSpan(Position from, Position to)
+    public void generateSpan(Configuration from, Configuration to)
 		throws Exception;
 	
     /** 

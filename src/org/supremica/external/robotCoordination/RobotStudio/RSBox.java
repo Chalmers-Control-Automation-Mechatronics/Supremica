@@ -42,7 +42,7 @@ public class RSBox
 	protected IEntity getEntity()
 		throws Exception
 	{
-		IPart boxPart = RSRobotCell.station.getParts().item(Converter.var(RSRobotCell.BOXPART_NAME));
+		IPart boxPart = RSCell.station.getParts().item(Converter.var(RSCell.BOXPART_NAME));
 		return boxPart.getEntities().item(Converter.var(name));
 	}
 }
