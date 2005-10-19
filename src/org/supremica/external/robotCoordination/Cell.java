@@ -4,7 +4,7 @@ import java.util.*;
 import org.supremica.automata.*;
 import java.awt.Color;
 
-public interface RobotCell
+public interface Cell
 {
 	/**
 	 * Initializes simulation environment.
@@ -40,7 +40,7 @@ public interface RobotCell
 	 * Simulates the path from from to to in robot robot and adds viapoints
 	 * etc.
 	 */
-	public void examineCollisions(Robot robot, Position from, Position to)
+	public void examineCollisions(Robot robot, Configuration from, Configuration to)
 		throws Exception;
 
 	/**

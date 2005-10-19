@@ -81,7 +81,7 @@ public class RSRobot
 		
 		try
 	    {
-			spans = RSRobotCell.addPart(getName() + RSRobotCell.SPANS_SUFFIX);
+			spans = RSCell.addPart(getName() + RSCell.SPANS_SUFFIX);
 	    }
 		catch (Exception ex)
 		{
@@ -93,7 +93,7 @@ public class RSRobot
     // Robot interface methods //
     /////////////////////////////
 		
-	public List<org.supremica.external.robotCoordination.Position> getPositions()
+	public List<Configuration> getConfigurations()
 		throws Exception
     {
 		LinkedList list = new LinkedList();
@@ -104,14 +104,14 @@ public class RSRobot
 	    
 		for (int i = 1; i <= nbrOfTargets; i++)
 	    {
-			list.add(new RSPosition(robotTargets.item(Converter.var(i))));
+			list.add(new RSConfiguration(robotTargets.item(Converter.var(i))));
 	    }
 	    
 		return list;
     }
 	
 	/**
-	 * Examines if this robot collides with the given box in the current position.
+	 * Examines if this robot collides with the given box in the current configuration.
 	 */
     public boolean collidesWith(Box box) 
 		throws Exception
@@ -125,22 +125,22 @@ public class RSRobot
 	    return Converter.toCoordinate(mechanism.getTransform().getX(), mechanism.getTransform().getY(), mechanism.getTransform().getZ());
     }
 	
-    public org.supremica.external.robotCoordination.Position getHomePosition()
+    public Configuration getHomeConfiguration()
 	throws Exception
     {
 	ITargets robotTargets = mechanism.getWorkObjects().item(Converter.var(1)).getTargets();    // takes the targets from Elements
 
-	return new RSPosition(robotTargets.item(Converter.var(1)));
+	return new RSConfiguration(robotTargets.item(Converter.var(1)));
     }
 
-    public void generateSpan(org.supremica.external.robotCoordination.Position from, org.supremica.external.robotCoordination.Position to)
+    public void generateSpan(Configuration from, Configuration to)
 		throws Exception
     {
-		jumpToPosition(from);
+		jumpToConfiguration(from);
 		
 		// Find targets
-		Target fromTarget = ((RSPosition) from).getRobotStudioTarget();
-		Target toTarget = ((RSPosition) to).getRobotStudioTarget();
+		Target fromTarget = ((RSConfiguration) from).getRobotStudioTarget();
+		Target toTarget = ((RSConfiguration) to).getRobotStudioTarget();
 		
 		// Create new path for this motion
 		IPath path = mechanism.getPaths().add();
@@ -161,7 +161,7 @@ public class RSRobot
 	    }
 		
 		// Add path as only procedure in main
-		path.syncToVirtualController(RSRobotCell.PATHSMODULE_NAME);    // Generate procedure from path
+		path.syncToVirtualController(RSCell.PATHSMODULE_NAME);    // Generate procedure from path
 		Thread.sleep(1000);    // The synchronization takes a little while...
 		
 		IABBS4Procedure proc = path.getProcedure();
@@ -217,11 +217,11 @@ public class RSRobot
 	stopController();
     }
 
-    public void jumpToPosition(org.supremica.external.robotCoordination.Position position)
+    public void jumpToConfiguration(Configuration configuration)
 	throws Exception
     {
 	// Find targets
-	Target goal = ((RSPosition) position).getRobotStudioTarget();
+	Target goal = ((RSConfiguration) configuration).getRobotStudioTarget();
 
 	// Jump to the "from"-target
 	mechanism.jumpToTarget(goal);

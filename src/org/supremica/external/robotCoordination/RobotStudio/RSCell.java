@@ -63,12 +63,12 @@ import java.io.*;
 import java.awt.Color;
 
 /**
- * Implementation of the RobotCell interface for use against RobotStudio.
+ * Implementation of the Cell interface for use against RobotStudio.
  */
-public class RSRobotCell
-    implements RobotCell, DAppEvents
+public class RSCell
+    implements Cell, DAppEvents
 {
-    private static Logger logger = LoggerFactory.createLogger(RSRobotCell.class);
+    private static Logger logger = LoggerFactory.createLogger(RSCell.class);
 	
     // Initialize jacoZoom
     static
@@ -93,8 +93,8 @@ public class RSRobotCell
     final static String PATHSMODULE_NAME = "Paths";
 
     /** Automata constants */
-    final static String STARTPOSITION_NAME = "START";
-    final static String FINISHPOSITION_NAME = "FINISH";
+    final static String STARTCONFIGURATION_NAME = "START";
+    final static String FINISHCONFIGURATION_NAME = "FINISH";
 
     /** Automata constants */
     final static String STARTSTATE_NAME = "start";
@@ -134,7 +134,7 @@ public class RSRobotCell
     // Running number of added zones
     private int zoneNbr = 1;
 
-    public RSRobotCell(File file)
+    public RSCell(File file)
     {
 		try
 	    {
@@ -175,7 +175,7 @@ public class RSRobotCell
     }
 	
     /////////////////////////////////
-    // RobotCell INTERFACE METHODS //
+    // Cell INTERFACE METHODS //
     /////////////////////////////////
 		
     /**
@@ -292,8 +292,6 @@ public class RSRobotCell
     public synchronized Box createBox(Coordinate coord, Color color, double transparency) 
 		throws Exception
     {
-		Variant varColor = new Variant(new SafeArray(new int[]{color.getRed(), color.getGreen(), color.getBlue()}), false);
-
 		double[] rsPoint = Converter.toRSPoint(coord);
 		
 		Transform trans = new Transform();
@@ -382,7 +380,7 @@ public class RSRobotCell
 			marked.setAccepting(true);
 			aut.addState(marked);
 			marked.setCost(0);
-			List<org.supremica.external.robotCoordination.Position> posList = robot.getPositions();
+			List<Configuration> posList = robot.getConfigurations();
 			for (int i=0; i < posList.size(); i++)
 			{
 				for (int j=0; j < posList.size(); j++)
@@ -435,11 +433,11 @@ public class RSRobotCell
 							// Just to make sure there is no ambiguity
 							if (fromPos != null)
 							{
-								throw new Exception("Error in RSRobotCell.java, ambigous position names");
+								throw new Exception("Error in RSCell.java, ambigous configuration names");
 							}
 							fromPos = (posList.get(i)).getName();
 							
-							// Create arc for each possible target position
+							// Create arc for each possible target configuration
 							for (int j=0; j < posList.size(); j++)
 							{
 								if (i != j)
@@ -449,7 +447,7 @@ public class RSRobotCell
 										(posList.get(j)).getName();
 									State toState = aut.getStateWithName(name);
 									
-									// Special treatment if were dealing with the home position
+									// Special treatment if were dealing with the home configuration
 									if (i==0)
 									{
 										name = FINISHEVENT_NAME;
@@ -467,7 +465,7 @@ public class RSRobotCell
 									Arc arc = new Arc(fromState, toState, event);
 									aut.addArc(arc);
 									
-									// Only once if this was the home position (ugly hack... whatever)
+									// Only once if this was the home configuration (ugly hack... whatever)
 									if (i==0)
 									{
 										break;
@@ -483,11 +481,11 @@ public class RSRobotCell
 			robotAut.addAutomaton(aut);
 			
 			// ONE AUTOMATON PER TARGET //
-			List<org.supremica.external.robotCoordination.Position> positions = robot.getPositions();
-			// Skip home position (i=1...)
-			for (int i=1; i<positions.size(); i++)
+			List<Configuration> configurations = robot.getConfigurations();
+			// Skip home configuration (i=1...)
+			for (int i=1; i<configurations.size(); i++)
 			{
-				org.supremica.external.robotCoordination.Position pos = positions.get(i);
+				Configuration pos = configurations.get(i);
 				
 				aut = new Automaton(robot.getName() + UNDERSCORE + pos.getName());
 				State notVisited = new State("0");
@@ -500,7 +498,7 @@ public class RSRobotCell
 				
 				/*
 				// Add transitions
-				for (int j=0; j<positions.size(); j++)
+				for (int j=0; j<configurations.size(); j++)
 				{
 				if (i==j)
 				{
@@ -508,7 +506,7 @@ public class RSRobotCell
 				}
 				
 				// Create event
-				String name = ((Position) positions.get(j)).getName() + pos.getName();
+				String name = ((Configuration) configurations.get(j)).getName() + pos.getName();
 				LabeledEvent event = new LabeledEvent(name);
 				if (!aut.getAlphabet().contains(event)) // Is always true?
 				{
@@ -608,7 +606,7 @@ public class RSRobotCell
 		throws Exception
 	{
 		if (boxDimensions.length != dims.length)
-			throw new Exception("Inconsistent dimensions in RSRobotCell.setBoxDimensions()");
+			throw new Exception("Inconsistent dimensions in RSCell.setBoxDimensions()");
 
 		for (int i=0; i<dims.length; i++)
 			boxDimensions[i] = dims[i];
@@ -660,206 +658,206 @@ public class RSRobotCell
      * (that is an entity in the part named ZONEPART_NAME).
      * Each new point found is added to the corresponding path.
      */
-    public void examineCollisions(Robot robot, org.supremica.external.robotCoordination.Position from, org.supremica.external.robotCoordination.Position to)
+    public void examineCollisions(Robot robot, Configuration from, Configuration to)
     {
-	try
+		try
 	    {
-		// Init
-		robot.jumpToPosition(from);
-		Mechanism mechanism = ((RSRobot) robot).getRobotStudioMechanism();
-		station.setActiveMechanism(mechanism);
+			// Init
+			robot.jumpToConfiguration(from);
+			Mechanism mechanism = ((RSRobot) robot).getRobotStudioMechanism();
+			station.setActiveMechanism(mechanism);
+			
+			// Find targets
+			Target fromTarget = ((RSConfiguration) from).getRobotStudioTarget();
+			Target toTarget = ((RSConfiguration) to).getRobotStudioTarget();
 
-		// Find targets
-		Target fromTarget = ((RSPosition) from).getRobotStudioTarget();
-		Target toTarget = ((RSPosition) to).getRobotStudioTarget();
+			// Create new path for this motion
+			Path path = Path.getPathFromUnknown(mechanism.getPaths().add());
+			path.setName(from.getName() + to.getName());
+			path.insert(fromTarget);
+			path.getTargetRefs().item(Converter.var(1)).setMotionType(1);    // Linear motion
+			path.insert(toTarget);
+			path.getTargetRefs().item(Converter.var(2)).setMotionType(1);    // Linear motion
 
-		// Create new path for this motion
-		Path path = Path.getPathFromUnknown(mechanism.getPaths().add());
-		path.setName(from.getName() + to.getName());
-		path.insert(fromTarget);
-		path.getTargetRefs().item(Converter.var(1)).setMotionType(1);    // Linear motion
-		path.insert(toTarget);
-		path.getTargetRefs().item(Converter.var(2)).setMotionType(1);    // Linear motion
-
-		// Redefine robot program...
-		IABBS4Procedure mainProcedure = ((RSRobot) robot).getMainProcedure();
-		for (int k = 1;
-		     k <= mainProcedure.getProcedureCalls().getCount();
-		     k++)
+			// Redefine robot program...
+			IABBS4Procedure mainProcedure = ((RSRobot) robot).getMainProcedure();
+			for (int k = 1;
+				 k <= mainProcedure.getProcedureCalls().getCount();
+				 k++)
 		    {
-			mainProcedure.getProcedureCalls().item(Converter.var(k)).delete();
+				mainProcedure.getProcedureCalls().item(Converter.var(k)).delete();
 		    }
-		// Add path as only procedure in main
-		path.syncToVirtualController(PATHSMODULE_NAME);    // Generate procedure from path
-		Thread.sleep(1000);    // The synchronization takes a little while...
-		IABBS4Procedure proc = path.getProcedure();
-		mainProcedure.getProcedureCalls().add(path.getProcedure());
+			// Add path as only procedure in main
+			path.syncToVirtualController(PATHSMODULE_NAME);    // Generate procedure from path
+			Thread.sleep(1000);    // The synchronization takes a little while...
+			IABBS4Procedure proc = path.getProcedure();
+			mainProcedure.getProcedureCalls().add(path.getProcedure());
 
-		// Add SimulationListener (for detecting when simulation is finished)
-		ISimulation simulation = station.getSimulations().item(Converter.var(1));
-		Simulation sim = Simulation.getSimulationFromUnknown(simulation);
-		SimulationListener simulationListener = new SimulationListener();
-		sim.addDSimulationEventsListener(simulationListener);
+			// Add SimulationListener (for detecting when simulation is finished)
+			ISimulation simulation = station.getSimulations().item(Converter.var(1));
+			Simulation sim = Simulation.getSimulationFromUnknown(simulation);
+			SimulationListener simulationListener = new SimulationListener();
+			sim.addDSimulationEventsListener(simulationListener);
 
-		//Add MechanismListener (for generating targets and detecting collisions)
-		//MechanismListener mechanismListener = new MechanismListener(path,j,i);
-		MechanismListener mechanismListener = new MechanismListener(this, mechanism, path);
-		mechanism.add_MechanismEventsListener(mechanismListener);
-		mechanismListener.setController(mechanism.getController());
+			//Add MechanismListener (for generating targets and detecting collisions)
+			//MechanismListener mechanismListener = new MechanismListener(path,j,i);
+			MechanismListener mechanismListener = new MechanismListener(this, mechanism, path);
+			mechanism.add_MechanismEventsListener(mechanismListener);
+			mechanismListener.setController(mechanism.getController());
+			
+			// Start a thread running the simulation in RobotStudio
+			//nbrOfTimesCollision = 1;
+			simulation.start();
+			
+			// Wait for the simulation to stop
+			simulationListener.waitForSimulationStop();
+			sim.removeDSimulationEventsListener(simulationListener);
 
-		// Start a thread running the simulation in RobotStudio
-		//nbrOfTimesCollision = 1;
-		simulation.start();
+			// Get the result, a list of collision times + info!
+			LinkedList<RichConfiguration> richPath = mechanismListener.getRichPath();
+			
+			// Stop the mechanismlistener
+			mechanism.remove_MechanismEventsListener(mechanismListener);
+			Thread.sleep(1000);
 
-		// Wait for the simulation to stop
-		simulationListener.waitForSimulationStop();
-		sim.removeDSimulationEventsListener(simulationListener);
+			// Rearrange the path (in RobotStudio) so that the to-Target is last,
+			// after viapoints that may have been added during the simulation!
+			path.getTargetRefs().item(Converter.var(2)).delete();
+			path.insert(toTarget);
+			path.getTargetRefs().item(Converter.var(path.getTargetRefs().getCount())).setMotionType(1);
 
-		// Get the result, a list of collision times + info!
-		LinkedList<RichPosition> richPath = mechanismListener.getRichPath();
+			// Print richPath
+			/*
+			  for (Iterator posIt = richPath.iterator(); posIt.hasNext();)
+			  {
+			  logger.info((RichConfiguration) posIt.next());
+			  }
+			*/
 
-		// Stop the mechanismlistener
-		mechanism.remove_MechanismEventsListener(mechanismListener);
-		Thread.sleep(1000);
+			// Rearrange richPath so that the start and finish states are first and last
+			// There is a problem since the current RobotStudio version (3.1) sometimes
+			// adds collisions that are not really there (after strange jumps) and also
+			// does not always put the final state (representing the reaching of the last
+			// target of the path) last.
+			// Rearrange start
+			while (!(richPath.getFirst()).getName().equals(STARTCONFIGURATION_NAME))
+			{
+				logger.warn("Removing " + (RichConfiguration) richPath.getFirst());
+				richPath.removeFirst();
+			}
+			// Rearrange finish
+			int index = 0;
+			while (!(richPath.get(++index).getName().equals(FINISHCONFIGURATION_NAME)));
+			if (index<richPath.size()-1)
+			{
+				assert(richPath.get(index).getTime() >= (richPath.getLast()).getTime());
+				logger.warn("Moving finish from pos " + index + " to last.");
+				RichConfiguration realFinish = richPath.get(index);
+				richPath.remove(index);
+				richPath.addLast(realFinish);
+			}
+			// Change names
+			String fromName = fromTarget.getName();
+			String toName = toTarget.getName();
+			fromName = fromName.substring(0,fromName.length()-2); // Last two are ":1"
+			toName = toName.substring(0,toName.length()-2);       // Last two are ":1"
+			richPath.getFirst().setName(fromName);
+			richPath.getLast().setName(toName);
 
-		// Rearrange the path (in RobotStudio) so that the to-Target is last,
-		// after viapoints that may have been added during the simulation!
-		path.getTargetRefs().item(Converter.var(2)).delete();
-		path.insert(toTarget);
-		path.getTargetRefs().item(Converter.var(path.getTargetRefs().getCount())).setMotionType(1);
-
-		// Print richPath
-		/*
-		  for (Iterator posIt = richPath.iterator(); posIt.hasNext();)
-		  {
-		  logger.info((RichPosition) posIt.next());
-		  }
-		*/
-
-		// Rearrange richPath so that the start and finish states are first and last
-		// There is a problem since the current RobotStudio version (3.1) sometimes
-		// adds collisions that are not really there (after strange jumps) and also
-		// does not always put the final state (representing the reaching of the last
-		// target of the path) last.
-		// Rearrange start
-		while (!(richPath.getFirst()).getName().equals(STARTPOSITION_NAME))
-		{
-			logger.warn("Removing " + (RichPosition) richPath.getFirst());
-			richPath.removeFirst();
-		}
-		// Rearrange finish
-		int index = 0;
-		while (!(richPath.get(++index).getName().equals(FINISHPOSITION_NAME)));
-		if (index<richPath.size()-1)
-		{
-			assert(richPath.get(index).getTime() >= (richPath.getLast()).getTime());
-			logger.warn("Moving finish from pos " + index + " to last.");
-			RichPosition realFinish = richPath.get(index);
-			richPath.remove(index);
-			richPath.addLast(realFinish);
-		}
-		// Change names
-		String fromName = fromTarget.getName();
-		String toName = toTarget.getName();
-		fromName = fromName.substring(0,fromName.length()-2); // Last two are ":1"
-		toName = toName.substring(0,toName.length()-2);       // Last two are ":1"
-		richPath.getFirst().setName(fromName);
-		richPath.getLast().setName(toName);
-
-		// Print richPath
-		/*
-		  for (Iterator posIt = richPath.iterator(); posIt.hasNext();)
-		  {
-		  logger.fatal((RichPosition) posIt.next());
-		  }
-		*/
-
-		/*
-		// If no collisions, not much needs to be done...
-		if (richPath.size() == 2)
-		{
-		// MODIFY ROBOT TARGET AUTOMATON
-		if (!to.getName().equals(robot.getHomePosition().getName()))
-		{
-		Automaton target = robotAutomata.getAutomaton(robot.getName() + UNDERSCORE + to.getName());
-		Position fromPos = richPath.get(0);
-		Position toPos = richPath.get(1);
-		LabeledEvent event = new LabeledEvent(fromPos.getName() + toPos.getName());
-		Arc arc = new Arc(target.getStateWithName("0"), target.getStateWithName("1"), event);
-		target.getAlphabet().addEvent(event);
-		target.addArc(arc);
-		}
-
-		return;
-		}
-		*/
-
-		// The richPath should be used to generate the automata!
-		// Modify zone automata
-		for (int i=0; i< richPath.size(); i++)
+			// Print richPath
+			/*
+			  for (Iterator posIt = richPath.iterator(); posIt.hasNext();)
+			  {
+			  logger.fatal((RichConfiguration) posIt.next());
+			  }
+			*/
+			
+			/*
+			// If no collisions, not much needs to be done...
+			if (richPath.size() == 2)
+			{
+			// MODIFY ROBOT TARGET AUTOMATON
+			if (!to.getName().equals(robot.getHomeConfiguration().getName()))
+			{
+			Automaton target = robotAutomata.getAutomaton(robot.getName() + UNDERSCORE + to.getName());
+			Configuration fromPos = richPath.get(0);
+			Configuration toPos = richPath.get(1);
+			LabeledEvent event = new LabeledEvent(fromPos.getName() + toPos.getName());
+			Arc arc = new Arc(target.getStateWithName("0"), target.getStateWithName("1"), event);
+			target.getAlphabet().addEvent(event);
+			target.addArc(arc);
+			}
+			
+			return;
+			}
+			*/
+			
+			// The richPath should be used to generate the automata!
+			// Modify zone automata
+			for (int i=0; i< richPath.size(); i++)
 		    {
-			RichPosition currPos = richPath.get(i);
-
-			// On the border of entering or exiting a zone?
-			String inZone = currPos.getEnterZone();
-			String outZone = currPos.getLeaveZone();
-
-			// Detect error...
-			if (inZone != null && outZone != null)
+				RichConfiguration currPos = richPath.get(i);
+				
+				// On the border of entering or exiting a zone?
+				String inZone = currPos.getEnterZone();
+				String outZone = currPos.getLeaveZone();
+				
+				// Detect error...
+				if (inZone != null && outZone != null)
 			    {
-				logger.fatal("Exiting and entering zone at the same time detected? " +
-					     "This is impossible, tell Hugo!");
+					logger.fatal("Exiting and entering zone at the same time detected? " +
+								 "This is impossible, tell Hugo!");
 			    }
-
-			// Modify zone automaton
-			if (inZone != null || outZone != null)
+				
+				// Modify zone automaton
+				if (inZone != null || outZone != null)
 			    {
-				String nextPos;
-				String prevPos;
-				if (inZone != null)
+					String nextPos;
+					String prevPos;
+					if (inZone != null)
 				    {
-					nextPos = richPath.get(i+1).getName();
-					prevPos = richPath.get(i-1).getName();
+						nextPos = richPath.get(i+1).getName();
+						prevPos = richPath.get(i-1).getName();
 				    }
-				else
+					else
 				    {
-					// Other way around...
-					inZone = outZone;
-					nextPos = richPath.get(i-1).getName();
-					prevPos = richPath.get(i+1).getName();
+						// Other way around...
+						inZone = outZone;
+						nextPos = richPath.get(i-1).getName();
+						prevPos = richPath.get(i+1).getName();
 				    }
-
-				Automaton zone = zoneAutomata.getAutomaton(inZone);
-				Alphabet zoneAlpha = zone.getAlphabet();
-
-				// Book event
-				LabeledEvent bookEvent = new LabeledEvent(currPos.getName() + nextPos);
-				zoneAlpha.addEvent(bookEvent);
-				Arc arc = new Arc(zone.getStateWithName(FREESTATE_NAME),
-						  zone.getStateWithName(BOOKEDSTATE_NAME),
-						  bookEvent);
-				zone.addArc(arc);
-
-				// Unbook event (other direction)
-				LabeledEvent unbookEvent = new LabeledEvent(currPos.getName() + prevPos);
-				zoneAlpha.addEvent(unbookEvent);
-				arc = new Arc(zone.getStateWithName(BOOKEDSTATE_NAME),
-					      zone.getStateWithName(FREESTATE_NAME),
-					      unbookEvent);
-				zone.addArc(arc);
+					
+					Automaton zone = zoneAutomata.getAutomaton(inZone);
+					Alphabet zoneAlpha = zone.getAlphabet();
+					
+					// Book event
+					LabeledEvent bookEvent = new LabeledEvent(currPos.getName() + nextPos);
+					zoneAlpha.addEvent(bookEvent);
+					Arc arc = new Arc(zone.getStateWithName(FREESTATE_NAME),
+									  zone.getStateWithName(BOOKEDSTATE_NAME),
+									  bookEvent);
+					zone.addArc(arc);
+					
+					// Unbook event (other direction)
+					LabeledEvent unbookEvent = new LabeledEvent(currPos.getName() + prevPos);
+					zoneAlpha.addEvent(unbookEvent);
+					arc = new Arc(zone.getStateWithName(BOOKEDSTATE_NAME),
+								  zone.getStateWithName(FREESTATE_NAME),
+								  unbookEvent);
+					zone.addArc(arc);
 			    }
 		    }
-
+			
 		// Modify Robot Automaton
 
 		// Forward direction
 		{
 		    // MODIFY ROBOT AUTOMATON ITSELF
 		    Automaton rob = robotAutomata.getAutomaton(robot.getName());
-		    RichPosition firstPos = richPath.get(0);
-		    org.supremica.external.robotCoordination.Position secondPos = richPath.get(1);
-		    org.supremica.external.robotCoordination.Position secondLastPos = richPath.get(richPath.size()-2);
-		    org.supremica.external.robotCoordination.Position lastPos = richPath.get(richPath.size()-1);
+		    RichConfiguration firstPos = richPath.get(0);
+		    Configuration secondPos = richPath.get(1);
+		    Configuration secondLastPos = richPath.get(richPath.size()-2);
+		    Configuration lastPos = richPath.get(richPath.size()-1);
 		    //assert(richPath.size() > 2);
 		    assert(from.getName().equals(firstPos.getName()));
 		    assert(to.getName().equals(lastPos.getName()));
@@ -899,8 +897,8 @@ public class RSRobotCell
 			    State currState = firstState;
 			    for (int i=1; i<richPath.size()-1; i++)
 				{
-				    RichPosition currPos = richPath.get(i);
-				    RichPosition nextPos = richPath.get(i+1);
+				    RichConfiguration currPos = richPath.get(i);
+				    RichConfiguration nextPos = richPath.get(i+1);
 
 				    // Add new arc and stuff
 				    State nextState;
@@ -926,7 +924,7 @@ public class RSRobotCell
 			}
 
 		    // MODIFY ROBOT TARGET AUTOMATON
-		    if (!to.getName().equals(robot.getHomePosition().getName()))
+		    if (!to.getName().equals(robot.getHomeConfiguration().getName()))
 			{
 			    Automaton target = robotAutomata.getAutomaton(robot.getName() + UNDERSCORE + to.getName());
 			    LabeledEvent event = new LabeledEvent(secondLastPos.getName() + lastPos.getName());
@@ -939,10 +937,10 @@ public class RSRobotCell
 		{
 		    // MODIFY ROBOT AUTOMATON ITSELF
 		    Automaton rob = robotAutomata.getAutomaton(robot.getName());
-		    org.supremica.external.robotCoordination.Position lastPos = richPath.get(0); //
-		    org.supremica.external.robotCoordination.Position secondLastPos = richPath.get(1); //
-		    RichPosition secondPos = richPath.get(richPath.size()-2); //
-		    RichPosition firstPos = richPath.get(richPath.size()-1);  //
+		    Configuration lastPos = richPath.get(0); //
+		    Configuration secondLastPos = richPath.get(1); //
+		    RichConfiguration secondPos = richPath.get(richPath.size()-2); //
+		    RichConfiguration firstPos = richPath.get(richPath.size()-1);  //
 
 		    // Only if there was at least one collision
 		    if (richPath.size() > 2)
@@ -981,8 +979,8 @@ public class RSRobotCell
 			    State currState = firstState;
 			    for (int i=richPath.size()-2; i>0; i--) //
 				{
-				    RichPosition currPos = richPath.get(i);
-				    RichPosition nextPos = richPath.get(i-1); //
+				    RichConfiguration currPos = richPath.get(i);
+				    RichConfiguration nextPos = richPath.get(i-1); //
 
 				    // Add new arc and stuff
 				    State nextState;
@@ -1008,7 +1006,7 @@ public class RSRobotCell
 			}
 
 		    // MODIFY ROBOT TARGET AUTOMATON
-		    if (!from.getName().equals(robot.getHomePosition().getName())) //
+		    if (!from.getName().equals(robot.getHomeConfiguration().getName())) //
 			{
 			    Automaton target = robotAutomata.getAutomaton(robot.getName() + UNDERSCORE + from.getName()); //
 			    LabeledEvent event = new LabeledEvent(secondLastPos.getName() + lastPos.getName());

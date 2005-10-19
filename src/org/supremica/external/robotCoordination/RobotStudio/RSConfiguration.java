@@ -50,54 +50,64 @@
 package org.supremica.external.robotCoordination.RobotStudio;
 
 import org.supremica.external.robotCoordination.Position;
+import org.supremica.external.comInterfaces.robotstudio_3_1.RobotStudio.Target;
+import org.supremica.external.comInterfaces.robotstudio_3_1.RobotStudio.ITarget;
+import org.supremica.log.*;
 
-public class RichPosition
-    implements Position
+/**
+ * Implementation of the Position-interface for RobotStudio.
+ */
+public class RSConfiguration
+    implements Configuration
 {
-    /** The name of this position */
-    String name;
-    /** The time it took to get here */
-    double timeToPos;
-    /** The name of the zone (if any) just about to be entered */
-    String enterZone = null;
-    /** The name of the zone (if any) just left */
-    String leaveZone = null;
-
-    RichPosition(String name, double timeToPos, String enterZone, String leaveZone)
+    private static Logger logger = LoggerFactory.createLogger(RSConfiguration.class);
+	
+    Target target;
+	
+    public RSConfiguration(ITarget target)
     {
-	this.name = name;
-	this.timeToPos = timeToPos;
-	this.enterZone = enterZone;
-	this.leaveZone = leaveZone;
+		try
+	    {
+			this.target = Target.getTargetFromUnknown(target);
+	    }
+		catch (Exception ex)
+	    {
+			
+			// Was there a problem?
+			System.err.println("Error in constructor RSConfiguration." + ex);
+	    }
     }
 
+    // Other method
     public String toString()
     {
-	return name + " at " + timeToPos + ", enter: " + enterZone + ", leave: " + leaveZone;
+		return "'" + getName() + "'";
     }
+	
+    /**
+     * Returns the RobotStudio target.
+     */
+    public Target getRobotStudioTarget()
+    {
+		return target;
+    }
+	
+    /////////////////////////////////////
+    // Configuration interface methods //
+    /////////////////////////////////////
 
     public String getName()
     {
-	return name;
-    }
-
-    public void setName(String name)
-    {
-	this.name = name;
-    }
-
-    public double getTime()
-    {
-	return timeToPos;
-    }
-
-    public String getEnterZone()
-    {
-	return enterZone;
-    }
-
-    public String getLeaveZone()
-    {
-	return leaveZone;
+		try
+	    {
+			// Return the name (remove the last two characters ":1" since they are ugly)
+			return target.getName().substring(0, target.getName().length() - 2);
+	    }
+		catch (Exception ex)
+	    {
+			System.err.println("Robot has no name? " + ex);
+	    }
+		
+		return "";
     }
 }

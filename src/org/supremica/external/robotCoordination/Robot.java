@@ -23,9 +23,9 @@ public interface Robot
 		throws Exception;
 	
     /**
-     * Returns the home position.
+     * Returns the home configuration.
      */
-    public Position getHomePosition()
+    public Configuration getHomeConfiguration()
 		throws Exception;
 	
     /**
@@ -35,9 +35,9 @@ public interface Robot
 		throws Exception;
 	
     /**
-     * Returns list of the positions for this robot.
+     * Returns list of the configurations for this robot.
      */
-    public List<Position> getPositions()
+    public List<Configuration> getConfigurations()
 		throws Exception;
 	
     /**
@@ -47,9 +47,9 @@ public interface Robot
 		throws Exception;
 	
     /**
-     * Jumps the robot to position.
+     * Jumps the robot to configuration.
      */
-    public void jumpToPosition(Position position)
+    public void jumpToConfiguration(Configuration configuration)
 		throws Exception;
 	
     /**

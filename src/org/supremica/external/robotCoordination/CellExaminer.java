@@ -11,19 +11,19 @@ import org.supremica.log.*;
 import org.supremica.gui.*;
 import org.supremica.automata.*;
 import org.supremica.properties.*;
-import org.supremica.external.robotCoordination.RobotStudio.RSRobotCell;
+import org.supremica.external.robotCoordination.RobotStudio.RSCell;
 import java.awt.Color;
 
-public class RobotCellExaminer
+public class CellExaminer
     extends JDialog
 {
 	// private static final long serialVersionUID = 1L;
-	private static Logger logger = LoggerFactory.createLogger(RobotCellExaminer.class);
+	private static Logger logger = LoggerFactory.createLogger(CellExaminer.class);
 	private Frame owner = null;
 	private JPanel contentPane = null;
 
 	// Robot stuff
-	private RobotCell cell;
+	private Cell cell;
 
 	// Supremica stuff
 	private Automata zoneAutomata;
@@ -46,7 +46,7 @@ public class RobotCellExaminer
 	/**
 	 * Dialog for manipulating the simulation environment.
 	 */
-	public RobotCellExaminer(Frame owner)
+	public CellExaminer(Frame owner)
 	{
 		super(owner, "Robot cell examiner", false);
 		this.owner = owner;
@@ -199,7 +199,7 @@ public class RobotCellExaminer
 			// properly installed...
 			
 			// Open cell
-			cell = new RSRobotCell(file);
+			cell = new RSCell(file);
 		}
 		else
 		{
@@ -374,7 +374,7 @@ public class RobotCellExaminer
 	/**
 	 * Does the box strategy stuff. 
 	 */
-	private void boxStrategy(RobotCell cell)
+	private void boxStrategy(Cell cell)
 		throws Exception
 	{
 		// Discretization parameters
@@ -438,7 +438,7 @@ public class RobotCellExaminer
 				{
 					// Remove from simulation environment
 					box.setColor(RED);
-					box.delete();
+					//box.delete();
 
 					// Has someone else collided with this one?
 					if (status.occupied)
@@ -558,8 +558,9 @@ public class RobotCellExaminer
 		if (!matrix.containsKey(coord) || !matrix.get(coord).checked)
 		{
 			Box newBox = cell.createBox(coord, ORANGE, TRANSPARENCY);
-			boxesToExamine.add(boxesToExamine.size(), newBox);
-
+			//boxesToExamine.add(boxesToExamine.size(), newBox);
+			boxesToExamine.add(newBox);
+			
 			Status status = new Status();
 			status.occupied = false;
 			status.checked = true;
