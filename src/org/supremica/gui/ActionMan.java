@@ -2802,7 +2802,7 @@ public class ActionMan
 	public static void showCellExaminer(Gui gui)
 	{
 		Thread thread = new Thread(new Runnable()
-		{
+			{
 			public void run()
 			{
 				if (theCellExaminer == null)

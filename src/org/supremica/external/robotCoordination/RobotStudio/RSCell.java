@@ -105,6 +105,9 @@ public class RSCell
     /** Via point suffix */
     final static String VIAPOINT_SUFFIX = "vp";
 
+    /** Box names */
+    final static String BOX_PREFIX = "Box_";
+
     /** Colours */
     static Variant RS_WHITE;
     static Variant RS_RED;
@@ -289,6 +292,9 @@ public class RSCell
 		return list;
     }
 
+	/**
+	 * Creates a box in RobotStudio at the supplied coordinates.
+	 */
     public synchronized Box createBox(Coordinate coord, Color color, double transparency) 
 		throws Exception
     {
@@ -299,9 +305,10 @@ public class RSCell
 		trans.setY(rsPoint[1]); 
 		trans.setZ(rsPoint[2]);
 		
-		String boxName = "Box_" + coord;
-		
+		// Create box with nice name
+		String boxName = BOX_PREFIX + coord;
 		IEntity currBox = boxSet.createSolidBox(trans, boxDimensions[0], boxDimensions[1], boxDimensions[2]);
+		// Hide during initiation
 		currBox.setVisible(false);
 		currBox.setName(boxName);
 		Box box = new RSBox(boxName, coord, color, transparency);
@@ -309,6 +316,15 @@ public class RSCell
 
 		return box;
     }
+
+	/**
+	 * Removes the RobotStudio representation of the supplied box.
+	 */
+	public void destroyBox(Coordinate coord)
+		throws Exception
+	{
+		boxSet.getEntities().item(Converter.var(BOX_PREFIX + coord)).delete();
+	}
 	
     public Automata generateZoneAutomata()
 		throws Exception

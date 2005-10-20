@@ -392,62 +392,63 @@ public class CellExaminer
 		List<Robot> robots = cell.getRobots();
 		
 		// List of boxes where collisions may occur
-		List<Box> zoneBoxes = new LinkedList<Box>();
+		List<Coordinate> zoneBoxes = new LinkedList<Coordinate>();
 
 		// For every robot...
 		for (Iterator<Robot> robIt = robots.iterator(); robIt.hasNext(); )
 		{
 			Robot robot = robIt.next();
 
-			// List of boxes that should be examined
- 			List<Box> boxesToExamine = new LinkedList<Box>();
-			// List of the boxes that have already been examined (for resetting the matrix)
-			List<Box> boxesExamined = new LinkedList<Box>();
-			// List of the boxes on "the surface"
-			List<Box> surfaceBoxes = new LinkedList<Box>();
+			// List of coordinates of boxes that should be examined
+ 			List<Coordinate> boxesToExamine = new LinkedList<Coordinate>();
+			// List of the coordinates of boxes that have already been examined 
+			// (for resetting the matrix)
+			List<Coordinate> boxesExamined = new LinkedList<Coordinate>();
+			// List of the coordinates of boxes on "the surface"
+			List<Coordinate> surfaceBoxes = new LinkedList<Coordinate>();
 
 			// Get base coords and build first box
 			Coordinate base = robot.getBaseCoordinates();
-			Box startBox = cell.createBox(base, ORANGE, TRANSPARENCY);
-			boxesToExamine.add(startBox);
-			logger.info("Robot: " + robot + ", base: " + base);
+			boxesToExamine.add(base);
 
 			// Start loop!
 			while (boxesToExamine.size() != 0)
 			{
 			 	// Get the status for this box
-				Box box = boxesToExamine.remove(0);
-				logger.warn("Examining " + box.getName());
+				Coordinate coord = boxesToExamine.remove(0);
+				//logger.warn("Examining coordinate " + coord);
 				
 				Status status;
-				if (!matrix.containsKey(box.getCoordinate()))
+				if (!matrix.containsKey(coord))
 				{
 					status = new Status();
 					status.occupied = false;
 					status.checked = true;
-					matrix.put(box.getCoordinate(), status);
+					matrix.put(coord, status);
 				}
 				else
 				{
-					status = matrix.get(box.getCoordinate());
+					status = matrix.get(coord);
+					// If it's already checked, move on!
+					if (status.checked)
+						continue;
 				}
- 				boxesExamined.add(box);
 
 				// Inside robot?
+				Box box = cell.createBox(coord, ORANGE, TRANSPARENCY);
 				if (robot.collidesWith(box))
 				{
 					// Remove from simulation environment
 					box.setColor(RED);
-					//box.delete();
+					box.delete();
 
 					// Has someone else collided with this one?
 					if (status.occupied)
 					{
-						zoneBoxes.add(box);
+						zoneBoxes.add(coord);
 					}
 					status.occupied = true;
 
- 					Coordinate coord = box.getCoordinate();
 					int x = coord.getX();
 					int y = coord.getY();
 					int z = coord.getZ();
@@ -456,31 +457,33 @@ public class CellExaminer
 					Box newBox;
 					Status newStatus;
 
-					// Up
-					newCoord = new Coordinate(x,y,z+1);
-					addBoxToExamine(boxesToExamine, matrix, newCoord);
 					// Down
 					newCoord = new Coordinate(x,y,z-1);
-					addBoxToExamine(boxesToExamine, matrix, newCoord);
-					// Left
-					newCoord = new Coordinate(x,y+1,z);
-					addBoxToExamine(boxesToExamine, matrix, newCoord);
+					boxesToExamine.add(newCoord);
 					// Right
 					newCoord = new Coordinate(x,y-1,z);
-					addBoxToExamine(boxesToExamine, matrix, newCoord);
-					// Forward
-					newCoord = new Coordinate(x+1,y,z);
-					addBoxToExamine(boxesToExamine, matrix, newCoord);
+					boxesToExamine.add(newCoord);
 					// Back
 					newCoord = new Coordinate(x-1,y,z);
-					addBoxToExamine(boxesToExamine, matrix, newCoord);
+					boxesToExamine.add(newCoord);
+					// Forward
+					newCoord = new Coordinate(x+1,y,z);
+					boxesToExamine.add(newCoord);
+					// Left
+					newCoord = new Coordinate(x,y+1,z);
+					boxesToExamine.add(newCoord);
+					// Up
+					newCoord = new Coordinate(x,y,z+1);
+					boxesToExamine.add(newCoord);
 				}
 				else
 				{
 				 	// This box is a "surfacebox"
 					box.setColor(GREEN);
-					surfaceBoxes.add(box);
+					//box.delete();
+					surfaceBoxes.add(coord);
 				}
+ 				boxesExamined.add(coord);
 			}
 
 			// Didn't find anything? The base coordinate box was outside?
@@ -530,21 +533,21 @@ public class CellExaminer
 			robot.stop();			
 			*/
 			
-			// Clear checked-status from the examined boxes before examining next robot!
-			while (boxesExamined.size() != 0)
-			{
-				Box box = boxesExamined.remove(0);
-				Status status = matrix.get(box.getCoordinate());
-				status.checked = false;
-			}
-			
 			// It's over for this robot. Remove the "surfaceboxes"
 			while (surfaceBoxes.size() != 0)
 			{
-				Box box = surfaceBoxes.remove(0);
-				matrix.remove(box.getCoordinate());
-				box.delete();
+				Coordinate coord = surfaceBoxes.remove(0);
+				matrix.remove(coord);
+				cell.destroyBox(coord);
 			}
+
+			// Clear checked-status from the examined boxes before examining next robot!
+			while (boxesExamined.size() != 0)
+			{
+				Coordinate coord = boxesExamined.remove(0);
+				Status status = matrix.get(coord);
+				status.checked = false;
+			}			
 		}
 	}
 
