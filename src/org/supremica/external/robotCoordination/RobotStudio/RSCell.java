@@ -205,6 +205,9 @@ public class RSCell
 			logger.info("RobotStudio started.");
 	    }
 		
+		// Make sure the Program browser is open, the Object browser takes a lot of processor activit
+		app.setActiveBrowserTab(new Variant("Program"));
+
 		// Some declarations
 		RS_WHITE = new Variant(new SafeArray(new int[]{ 255, 255, 255 }), false);
 		RS_RED = new Variant(new SafeArray(new int[]{ 255, 0, 0 }), false);
@@ -295,7 +298,7 @@ public class RSCell
 	/**
 	 * Creates a box in RobotStudio at the supplied coordinates.
 	 */
-    public synchronized Box createBox(Coordinate coord, Color color, double transparency) 
+    public synchronized Box createBox(Coordinate coord) 
 		throws Exception
     {
 		double[] rsPoint = Converter.toRSPoint(coord);
@@ -311,7 +314,7 @@ public class RSCell
 		// Hide during initiation
 		currBox.setVisible(false);
 		currBox.setName(boxName);
-		Box box = new RSBox(boxName, coord, color, transparency);
+		Box box = new RSBox(boxName, coord);
 		currBox.setVisible(true);
 
 		return box;

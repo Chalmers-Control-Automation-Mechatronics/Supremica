@@ -13,6 +13,7 @@ import org.supremica.automata.*;
 import org.supremica.properties.*;
 import org.supremica.external.robotCoordination.RobotStudio.RSCell;
 import java.awt.Color;
+import org.supremica.util.ActionTimer;
 
 public class CellExaminer
     extends JDialog
@@ -220,6 +221,7 @@ public class CellExaminer
 	 */
 	private void generateSpans()
 	{
+		// Make sure a cell is open!
 		if (cell == null || !cell.isOpen())
 		{
 			logger.error("No cell opened.");
@@ -377,6 +379,13 @@ public class CellExaminer
 	private void boxStrategy(Cell cell)
 		throws Exception
 	{
+		// Make sure a cell is open!
+		if (cell == null || !cell.isOpen())
+		{
+			logger.error("No cell opened.");
+			return;
+		}
+
 		// Discretization parameters
 		double dx = 0.1;
 		double dy = 0.1;
@@ -397,6 +406,9 @@ public class CellExaminer
 		// For every robot...
 		for (Iterator<Robot> robIt = robots.iterator(); robIt.hasNext(); )
 		{
+			ActionTimer timer = new ActionTimer();
+			timer.start();
+
 			Robot robot = robIt.next();
 
 			// List of coordinates of boxes that should be examined
@@ -435,7 +447,9 @@ public class CellExaminer
 				}
 
 				// Inside robot?
-				Box box = cell.createBox(coord, ORANGE, TRANSPARENCY);
+				Box box = cell.createBox(coord);
+				//box.setColor(ORANGE);
+				//box.setTransparency(TRANSPARENCY);
 				if (robot.collidesWith(box))
 				{
 					// Remove from simulation environment
@@ -480,7 +494,7 @@ public class CellExaminer
 				{
 				 	// This box is a "surfacebox"
 					box.setColor(GREEN);
-					//box.delete();
+					box.delete();
 					surfaceBoxes.add(coord);
 				}
  				boxesExamined.add(coord);
@@ -542,11 +556,17 @@ public class CellExaminer
 			}			
 
 			// It's over for this robot. Remove the "surfaceboxes"
+			timer.stop();
+			logger.info("Execution completed for robot " + robot + " after " + timer.toString());
+			logger.info("Amount of surfaceboxes: " + surfaceBoxes.size());
 			while (surfaceBoxes.size() != 0)
 			{
 				Coordinate coord = surfaceBoxes.remove(0);
 				matrix.remove(coord);
-				cell.destroyBox(coord);
+				//cell.destroyBox(coord);
+				Box box = cell.createBox(coord);
+				box.setColor(GREEN);
+				box.setTransparency(TRANSPARENCY);
 			}
 		}
 	}

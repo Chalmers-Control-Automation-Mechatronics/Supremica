@@ -12,13 +12,11 @@ public abstract class Box
     protected String name;
     protected Coordinate coord;
 	
-    public Box(String name, Coordinate coord, Color color, double transparency) 
+    public Box(String name, Coordinate coord) 
 		throws Exception
     {
 		this.name = name;
 		this.coord = coord;
-		setColor(color);
-		setTransparency(transparency);
     }
     	
     public Coordinate getCoordinate() { return coord; }

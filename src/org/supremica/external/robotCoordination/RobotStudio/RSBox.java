@@ -14,10 +14,10 @@ import com.inzoom.comjni.SafeArray;
 public class RSBox 
     extends Box 
 {
-    public RSBox(String name, Coordinate coord, Color color, double transparency) 
+    public RSBox(String name, Coordinate coord) 
 		throws Exception
 	{
-		super(name, coord, color, transparency);
+		super(name, coord);
 	}
 
     public void delete() 

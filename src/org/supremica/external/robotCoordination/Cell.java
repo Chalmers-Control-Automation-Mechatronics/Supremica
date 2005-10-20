@@ -58,7 +58,7 @@ public interface Cell
 	/**
 	 * Creates a box.
 	 */
-	public Box createBox(Coordinate coordinate, Color color, double transparency)
+	public Box createBox(Coordinate coordinate)
 		throws Exception;
 
 	public void destroyBox(Coordinate coordinate)
