@@ -378,9 +378,9 @@ public class CellExaminer
 		throws Exception
 	{
 		// Discretization parameters
-		double dx = 0.2;
-		double dy = 0.2;
-		double dz = 0.2;
+		double dx = 0.1;
+		double dy = 0.1;
+		double dz = 0.1;
 		cell.setBoxDimensions(new double[] {dx,dy,dz});
 
 		// Hashtable
@@ -533,14 +533,6 @@ public class CellExaminer
 			robot.stop();			
 			*/
 			
-			// It's over for this robot. Remove the "surfaceboxes"
-			while (surfaceBoxes.size() != 0)
-			{
-				Coordinate coord = surfaceBoxes.remove(0);
-				matrix.remove(coord);
-				cell.destroyBox(coord);
-			}
-
 			// Clear checked-status from the examined boxes before examining next robot!
 			while (boxesExamined.size() != 0)
 			{
@@ -548,9 +540,18 @@ public class CellExaminer
 				Status status = matrix.get(coord);
 				status.checked = false;
 			}			
+
+			// It's over for this robot. Remove the "surfaceboxes"
+			while (surfaceBoxes.size() != 0)
+			{
+				Coordinate coord = surfaceBoxes.remove(0);
+				matrix.remove(coord);
+				cell.destroyBox(coord);
+			}
 		}
 	}
 
+	/* JUNK
 	private void addBoxToExamine(List<Box> boxesToExamine, 
 								 Hashtable<Coordinate, Status> matrix,  
 								 Coordinate coord)
@@ -571,6 +572,7 @@ public class CellExaminer
 			
 		}
 	}
+	*/
 }
 
 class Status
