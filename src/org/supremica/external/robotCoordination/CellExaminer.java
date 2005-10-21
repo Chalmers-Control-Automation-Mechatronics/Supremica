@@ -407,29 +407,26 @@ public class CellExaminer
 		}
 
 		// Discretization parameters
-		double dx = 0.1;
-		double dy = 0.1;
-		double dz = 0.1;
+		double dx = 0.2;
+		double dy = 0.2;
+		double dz = 0.2;
 		cell.setBoxDimensions(new double[] {dx,dy,dz});
 
-		// Hashtable
-		// The first boolean says if a robot has already been inside this box at some time
-		// The second boolean says if the box has already been examined for the current robot
+		// Hashtable associating coordinates with status of the corresponding box
 		Hashtable<Coordinate, Status> matrix = new Hashtable(1000);
 
-		// Get the robots
-		List<Robot> robots = cell.getRobots();
-		
 		// List of boxes where collisions may occur
 		List<Coordinate> zoneBoxes = new LinkedList<Coordinate>();
 
+		// Get the robots
+		List<Robot> robots = cell.getRobots();
 		// For every robot...
 		for (Iterator<Robot> robIt = robots.iterator(); robIt.hasNext(); )
 		{
+			Robot robot = robIt.next();
+
 			ActionTimer timer = new ActionTimer();
 			timer.start();
-
-			Robot robot = robIt.next();
 
 			// List of coordinates of boxes that should be examined
  			//List<Coordinate> boxesToExamine = new LinkedList<Coordinate>();
