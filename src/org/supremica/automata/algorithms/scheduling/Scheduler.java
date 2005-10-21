@@ -299,26 +299,27 @@ public abstract class Scheduler {
      */
     protected boolean isOnAList(int[] node) throws Exception {
 	int currKey = getKey(node);
-	int estimatedCost = calcEstimatedCost(node);
+	//	int estimatedCost = calcEstimatedCost(node);
 	int index = -1;
 	
-	Iterator iter = openList.iterator();
-	while (iter.hasNext()) {
-	    index++;
+// 	Iterator iter = openList.iterator();
+// 	while (iter.hasNext()) {
+// 	    index++;
 	    
-	    int[] openNode = (int[])iter.next();
+// 	    int[] openNode = (int[])iter.next();
 	    
-	    if (currKey == getKey(openNode)) {
-		if (higherCostInAllDirections(node, openNode))
-		    return true;
-		else if (smallerCostInAllDirections(node, openNode)) {
-		    openList.remove(index);
-		    return false;
-		}
+// 	    if (currKey == getKey(openNode)) {
+// 		if (higherCostInAllDirections(node, openNode))
+// 		    return true;
+// 		else if (smallerCostInAllDirections(node, openNode)) {
+// 		    logger.warn("Byter ut " + printNodeName(openNode));
+// 		    openList.remove(index);
+// 		    return false;
+// 		}
 
-		return false;
-	    }
-	}
+// 		return false;
+// 	    }
+// 	}
 	
 	if (closedNodes.containsKey(currKey)) {
 	    if (consistentHeuristic) 

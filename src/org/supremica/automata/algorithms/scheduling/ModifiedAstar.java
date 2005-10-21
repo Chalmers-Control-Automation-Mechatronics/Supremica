@@ -37,30 +37,36 @@ public class ModifiedAstar extends Scheduler {
     }
 
     protected void branch(int[] currNode) {
-	closedNodes.putNode(getKey(currNode), currNode);
+	try {
+	    if (!isOnAList(currNode)) {
+		closedNodes.putNode(getKey(currNode), currNode);
 
-	// Tillfälligt bortkommenterat
-	// 	    useOneProdRelax = false;
-	// 	    if (activeAutomataIndex.length <= 2 || plantAutomata.size() <= 2)
-	// 		useOneProdRelax = true;
+		// Tillfälligt bortkommenterat
+		// 	    useOneProdRelax = false;
+		// 	    if (activeAutomataIndex.length <= 2 || plantAutomata.size() <= 2)
+		// 		useOneProdRelax = true;
+		
 	
-	
-	Iterator childIter = expander.expandNode(currNode, activeAutomataIndex).iterator();
-	while (childIter.hasNext()) {
-	    int[] nextNode = (int[])childIter.next();
+		Iterator childIter = expander.expandNode(currNode, activeAutomataIndex).iterator();
+		while (childIter.hasNext()) {
+		    int[] nextNode = (int[])childIter.next();
 	    
-	    try {
-		if (!isOnAList(nextNode)) {
-		    // 		logger.info("++  " + printArray(nextNode));
-		    putOnOpenList(nextNode);
+// 	    try {
+//  		    if (!isOnAList(nextNode)) {
+ 			putOnOpenList(nextNode);
+//  		    }
 		}
 	    }
-	    catch (Exception e) {
-		e.printStackTrace();
-	    }
-// 	    else
-// 		logger.info("-- " + printArray(nextNode));
 	}
+	catch (Exception e) {
+	    e.printStackTrace();
+	    
+	    //tillfälligt
+	    System.exit(0);
+	}
+	// 	    else
+	// 		logger.info("-- " + printArray(nextNode));
+//     }
     }
 
     protected int[] makeInitialNode() {
