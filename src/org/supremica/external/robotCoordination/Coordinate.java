@@ -7,6 +7,7 @@ package org.supremica.external.robotCoordination;
  * @see #RobotCell.setBoxDimensions(double[])
  */
 public class Coordinate 
+	implements Comparable<Coordinate>
 {
 	protected int x;
 	protected int y;
@@ -43,5 +44,25 @@ public class Coordinate
 	{
 		String str = x + "_" + y + "_" + z;
 		return str.replace("-", "m"); 
+	}
+
+	public int compareTo(Coordinate other)
+	{
+		if (this.z < other.z)
+			return -1;
+		else if (this.z > other.z)
+			return 1;
+		else
+			if (this.y < other.y)
+				return -1;
+			else if (this.y > other.y)
+				return 1;
+			else
+				if (this.x < other.x)
+					return -1;
+				else if (this.x > other.x)
+					return 1;
+				else
+					return 0;
 	}
 }

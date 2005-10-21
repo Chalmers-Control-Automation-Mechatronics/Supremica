@@ -49,7 +49,7 @@ public class CellExaminer
 	 */
 	public CellExaminer(Frame owner)
 	{
-		super(owner, "Robot cell examiner", false);
+		super(owner, "Cell examiner", false);
 		this.owner = owner;
 
 		if (SupremicaProperties.getFileRSDemoOpenPath() != null)
@@ -128,10 +128,24 @@ public class CellExaminer
 					}
 						
 					// Run the demo!
-					generateSpans();
-					intersectSpans();
-					generateAutomata();
-					examineCollisions();
+					try
+					{
+						ActionTimer timer = new ActionTimer();
+						timer.start();
+
+						generateSpans();
+						intersectSpans();
+						generateAutomata();
+						examineCollisions();
+						
+						timer.stop();
+						logger.info("Execution completed after " + timer.toString());
+					}
+					catch (Exception ex)
+					{
+						logger.error("Error when running span generation demo: " + ex);
+						logger.debug(ex.getStackTrace());
+					}				
 				}
 			});
 		contentPane.add(demoButton);
@@ -153,11 +167,17 @@ public class CellExaminer
 					//Run the demo!
 					try
 					{
+						ActionTimer timer = new ActionTimer();
+						timer.start();
+
 						boxStrategy(cell);
+						
+						timer.stop();
+						logger.info("Execution completed after " + timer.toString());
 					}
 					catch (Exception ex)
 					{
-						logger.error("Error when running boxStrategy: " + ex);
+						logger.error("Error when running box strategy demo: " + ex);
 						logger.warn(ex.getStackTrace());
 					}
 				}
@@ -412,7 +432,8 @@ public class CellExaminer
 			Robot robot = robIt.next();
 
 			// List of coordinates of boxes that should be examined
- 			List<Coordinate> boxesToExamine = new LinkedList<Coordinate>();
+ 			//List<Coordinate> boxesToExamine = new LinkedList<Coordinate>();
+			SortedSet<Coordinate> boxesToExamine = new TreeSet<Coordinate>();
 			// List of the coordinates of boxes that have already been examined 
 			// (for resetting the matrix)
 			List<Coordinate> boxesExamined = new LinkedList<Coordinate>();
@@ -427,8 +448,9 @@ public class CellExaminer
 			while (boxesToExamine.size() != 0)
 			{
 			 	// Get the status for this box
-				Coordinate coord = boxesToExamine.remove(0);
-				//logger.warn("Examining coordinate " + coord);
+				//Coordinate coord = boxesToExamine.remove(0);
+				Coordinate coord = boxesToExamine.first();
+				boxesToExamine.remove(coord);
 				
 				Status status;
 				if (!matrix.containsKey(coord))
@@ -563,10 +585,9 @@ public class CellExaminer
 			{
 				Coordinate coord = surfaceBoxes.remove(0);
 				matrix.remove(coord);
-				//cell.destroyBox(coord);
-				Box box = cell.createBox(coord);
-				box.setColor(GREEN);
-				box.setTransparency(TRANSPARENCY);
+				//Box box = cell.createBox(coord);
+				//box.setColor(GREEN);
+				//box.setTransparency(TRANSPARENCY);
 			}
 		}
 	}
