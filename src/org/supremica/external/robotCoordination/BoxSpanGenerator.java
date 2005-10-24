@@ -12,9 +12,13 @@ class BoxSpanGenerator
 	 * Each time a robot collides with a box, add a layer of boxes,
 	 * but check with the matrix first.
 	 */
-	public void startCollision(Volume volume, Configuration configuration, int time)
+// 	public void startCollision(Volume volume, Configuration configuration, int time)
+	public void startCollision(String name, int time)
 	{
-		assert(volume instanceof Box);
+// 		assert(volume instanceof Box);
+
+		// TODO:
+		// Leta fram boxen med namnet name i boxesToExamine.
 
 		/*
 		Box box = (Box) volume;
@@ -22,7 +26,7 @@ class BoxSpanGenerator
 
 		int x = coord.getX();
 		int y = coord.getY();
-		int z = coord.getZ();
+ 		int z = coord.getZ();
 		
 		Coordinate newCoord;
 		Box newBox;
@@ -52,7 +56,8 @@ class BoxSpanGenerator
 	/**
 	 * Don't care about these.
 	 */
-	public void endCollision(Volume volume, Configuration configuration, int time)
+// 	public void endCollision(Volume volume, Configuration configuration, int time)
+	public void endCollision(String name, int time)
 	{		
 	}
 }

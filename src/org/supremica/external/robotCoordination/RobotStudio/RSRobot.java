@@ -73,6 +73,12 @@ public class RSRobot
     private Mechanism mechanism;
     private Station station;
     private Part spans;
+
+	/** Keeps track of robots current path */
+	private Path activePath = null;
+
+	/** Keeps track of current RobotListener */
+	private RobotListener robotListener;
 	
     public RSRobot(Mechanism mechanism, Station station)
     {
@@ -220,16 +226,16 @@ public class RSRobot
     public void jumpToConfiguration(Configuration configuration)
 	throws Exception
     {
-	// Find targets
-	Target goal = ((RSConfiguration) configuration).getRobotStudioTarget();
-
-	// Jump to the "from"-target
-	mechanism.jumpToTarget(goal);
-
-	// Takes a while?
-	Thread.sleep(1000);
+		// Find targets
+		Target goal = ((RSConfiguration) configuration).getRobotStudioTarget();
+		
+		// Jump to the "from"-target
+		mechanism.jumpToTarget(goal);
+		
+		// Takes a while?
+		Thread.sleep(1000);
     }
-
+	
     // Other methods
     public String toString()
     {
@@ -246,7 +252,7 @@ public class RSRobot
     public Mechanism getRobotStudioMechanism()
 	throws Exception
     {
-	return mechanism;
+		return mechanism;
     }
 
     public void addEntityToSpans(IEntity entity) 
@@ -370,4 +376,67 @@ public class RSRobot
 
 	return getMainProcedure();
     }
+
+	/**
+	 * Adds a new path to robots main procedure.
+	 */
+	public void addLinearPath(Configuration from, Configuration to) 
+		throws Exception
+	{
+		// Find targets
+		Target fromTarget = ((RSConfiguration) from).getRobotStudioTarget();
+		Target toTarget = ((RSConfiguration) to).getRobotStudioTarget();
+		
+		// Create new path for this motion
+		activePath = Path.getPathFromUnknown(mechanism.getPaths().add());
+		activePath.setName(from.getName() + "_" + to.getName());
+		activePath.insert(fromTarget);
+		activePath.getTargetRefs().item(Converter.var(1)).setMotionType(1);    // Linear motion
+		activePath.insert(toTarget);
+		activePath.getTargetRefs().item(Converter.var(2)).setMotionType(1);    // Linear motion
+
+		// Redefine robot program...
+		IABBS4Procedure mainProcedure = getMainProcedure();
+		for (int k = 1;
+			 k <= mainProcedure.getProcedureCalls().getCount();
+			 k++)
+		    {
+				mainProcedure.getProcedureCalls().item(Converter.var(k)).delete();
+		    }
+		
+		// Add path as only procedure in main
+		activePath.syncToVirtualController(RSCell.PATHSMODULE_NAME);    // Generate procedure from path
+		Thread.sleep(1000);    // The synchronization takes a little while...
+		
+		IABBS4Procedure proc = activePath.getProcedure();
+		mainProcedure.getProcedureCalls().add(activePath.getProcedure());
+	}
+
+	public Path getActivePath() 
+	{
+		return activePath;
+	}
+
+	public void setActivePath(Path activePath)
+	{
+		this.activePath = activePath;
+	}
+
+	public void addRobotListener(RobotListener robotListener) 
+		throws Exception
+	{
+		setRobotListener(robotListener);
+
+		mechanism.add_MechanismEventsListener(new MechListener(this));
+	}
+
+	public RobotListener getRobotListener()
+	{
+		return robotListener;
+	}
+
+	public void setRobotListener(RobotListener robotListener)
+	{
+		this.robotListener = robotListener;
+	}
 }

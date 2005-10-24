@@ -8,6 +8,7 @@ import java.awt.Color;
  * Represents an abstract box.
  */
 public abstract class Box 
+	implements Volume
 {
     protected String name;
     protected Coordinate coord;

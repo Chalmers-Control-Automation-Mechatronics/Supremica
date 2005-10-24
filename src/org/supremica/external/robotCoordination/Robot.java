@@ -4,6 +4,9 @@ import java.util.*;
 
 public interface Robot
 {
+	public void addRobotListener(RobotListener listener)
+		throws Exception;
+	
     /**
      * Returns true if the robot collides with a given box.
      */

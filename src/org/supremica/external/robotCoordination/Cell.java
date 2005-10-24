@@ -68,4 +68,11 @@ public interface Cell
 		throws Exception;
 
 	public double[] getBoxDimensions();
+
+	/**
+	 * Runs a simulation for a given robot along a path, 
+	 * specified by its start and end positions.
+	 */
+	public void runSimulation(Robot robot, Configuration from, Configuration to)
+		throws Exception;
 }

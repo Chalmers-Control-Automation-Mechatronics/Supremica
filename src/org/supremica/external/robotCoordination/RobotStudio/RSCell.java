@@ -311,6 +311,7 @@ public class RSCell
 		// Create box with nice name
 		String boxName = BOX_PREFIX + coord;
 		IEntity currBox = boxSet.createSolidBox(trans, boxDimensions[0], boxDimensions[1], boxDimensions[2]);
+
 		// Hide during initiation
 		currBox.setVisible(false);
 		currBox.setName(boxName);
@@ -681,56 +682,65 @@ public class RSCell
     {
 		try
 	    {
-			// Init
-			robot.jumpToConfiguration(from);
-			Mechanism mechanism = ((RSRobot) robot).getRobotStudioMechanism();
-			station.setActiveMechanism(mechanism);
+// 			// Init
+// 			robot.jumpToConfiguration(from);
+// 			Mechanism mechanism = ((RSRobot) robot).getRobotStudioMechanism();
+// 			station.setActiveMechanism(mechanism);
 			
-			// Find targets
-			Target fromTarget = ((RSConfiguration) from).getRobotStudioTarget();
-			Target toTarget = ((RSConfiguration) to).getRobotStudioTarget();
+// 			// Find targets
+// 			Target fromTarget = ((RSConfiguration) from).getRobotStudioTarget();
+// 			Target toTarget = ((RSConfiguration) to).getRobotStudioTarget();
 
-			// Create new path for this motion
-			Path path = Path.getPathFromUnknown(mechanism.getPaths().add());
-			path.setName(from.getName() + to.getName());
-			path.insert(fromTarget);
-			path.getTargetRefs().item(Converter.var(1)).setMotionType(1);    // Linear motion
-			path.insert(toTarget);
-			path.getTargetRefs().item(Converter.var(2)).setMotionType(1);    // Linear motion
+// 			// Create new path for this motion
+// 			Path path = Path.getPathFromUnknown(mechanism.getPaths().add());
+// 			path.setName(from.getName() + to.getName());
+// 			path.insert(fromTarget);
+// 			path.getTargetRefs().item(Converter.var(1)).setMotionType(1);    // Linear motion
+// 			path.insert(toTarget);
+// 			path.getTargetRefs().item(Converter.var(2)).setMotionType(1);    // Linear motion
 
-			// Redefine robot program...
-			IABBS4Procedure mainProcedure = ((RSRobot) robot).getMainProcedure();
-			for (int k = 1;
-				 k <= mainProcedure.getProcedureCalls().getCount();
-				 k++)
-		    {
-				mainProcedure.getProcedureCalls().item(Converter.var(k)).delete();
-		    }
-			// Add path as only procedure in main
-			path.syncToVirtualController(PATHSMODULE_NAME);    // Generate procedure from path
-			Thread.sleep(1000);    // The synchronization takes a little while...
-			IABBS4Procedure proc = path.getProcedure();
-			mainProcedure.getProcedureCalls().add(path.getProcedure());
+// 			// Redefine robot program...
+// 			IABBS4Procedure mainProcedure = ((RSRobot) robot).getMainProcedure();
+// 			for (int k = 1;
+// 				 k <= mainProcedure.getProcedureCalls().getCount();
+// 				 k++)
+// 		    {
+// 				mainProcedure.getProcedureCalls().item(Converter.var(k)).delete();
+// 		    }
+// 			// Add path as only procedure in main
+// 			path.syncToVirtualController(PATHSMODULE_NAME);    // Generate procedure from path
+// 			Thread.sleep(1000);    // The synchronization takes a little while...
+// 			IABBS4Procedure proc = path.getProcedure();
+// 			mainProcedure.getProcedureCalls().add(path.getProcedure());
 
 			// Add SimulationListener (for detecting when simulation is finished)
-			ISimulation simulation = station.getSimulations().item(Converter.var(1));
-			Simulation sim = Simulation.getSimulationFromUnknown(simulation);
-			SimulationListener simulationListener = new SimulationListener();
-			sim.addDSimulationEventsListener(simulationListener);
+			// This is now done in runSimulation(robot, from, to);
+// 			ISimulation simulation = station.getSimulations().item(Converter.var(1));
+// 			Simulation sim = Simulation.getSimulationFromUnknown(simulation);
+// 			SimulationListener simulationListener = new SimulationListener();
+// 			sim.addDSimulationEventsListener(simulationListener);
+
+			Mechanism mechanism = ((RSRobot) robot).getRobotStudioMechanism();
 
 			//Add MechanismListener (for generating targets and detecting collisions)
 			//MechanismListener mechanismListener = new MechanismListener(path,j,i);
-			MechanismListener mechanismListener = new MechanismListener(this, mechanism, path);
+// 			MechanismListener mechanismListener = new MechanismListener(this, mechanism, path);
+
+			MechanismListener mechanismListener = new MechanismListener(this, (RSRobot) robot);
 			mechanism.add_MechanismEventsListener(mechanismListener);
 			mechanismListener.setController(mechanism.getController());
-			
+
 			// Start a thread running the simulation in RobotStudio
 			//nbrOfTimesCollision = 1;
-			simulation.start();
+// 			simulation.start();
 			
 			// Wait for the simulation to stop
-			simulationListener.waitForSimulationStop();
-			sim.removeDSimulationEventsListener(simulationListener);
+// 			simulationListener.waitForSimulationStop();
+// 			sim.removeDSimulationEventsListener(simulationListener);
+
+			runSimulation(robot, from, to);
+
+			Path path = ((RSRobot) robot).getActivePath();
 
 			// Get the result, a list of collision times + info!
 			LinkedList<RichConfiguration> richPath = mechanismListener.getRichPath();
@@ -742,7 +752,7 @@ public class RSCell
 			// Rearrange the path (in RobotStudio) so that the to-Target is last,
 			// after viapoints that may have been added during the simulation!
 			path.getTargetRefs().item(Converter.var(2)).delete();
-			path.insert(toTarget);
+			path.insert(((RSConfiguration) to).getRobotStudioTarget());
 			path.getTargetRefs().item(Converter.var(path.getTargetRefs().getCount())).setMotionType(1);
 
 			// Print richPath
@@ -776,12 +786,14 @@ public class RSCell
 				richPath.addLast(realFinish);
 			}
 			// Change names
-			String fromName = fromTarget.getName();
-			String toName = toTarget.getName();
-			fromName = fromName.substring(0,fromName.length()-2); // Last two are ":1"
-			toName = toName.substring(0,toName.length()-2);       // Last two are ":1"
-			richPath.getFirst().setName(fromName);
-			richPath.getLast().setName(toName);
+// 			String fromName = fromTarget.getName();
+// 			String toName = toTarget.getName();
+// 			fromName = fromName.substring(0,fromName.length()-2); // Last two are ":1"
+// 			toName = toName.substring(0,toName.length()-2);       // Last two are ":1"
+// 			richPath.getFirst().setName(fromName);
+// 			richPath.getLast().setName(toName);
+			richPath.getFirst().setName(from.getName());
+			richPath.getLast().setName(to.getName());
 
 			// Print richPath
 			/*
@@ -1129,11 +1141,58 @@ public class RSCell
 				catch (Exception e)
 			    {
 					// Either the spans were disjoint or there was an error. Whatever.
-					//logger.info(spanA.getName() + " and " + spanB.getName() + " are disjoint.");
+					//logger.info(spanA.getName() + " and " + spanB.getName() + " are dpathisjoint.");
 			    }
 		    }
 	    }
     }
+
+	/**
+	 * Runs a simulation for a given robot along a path, 
+	 * specified by its start and end positions.
+	 */
+	public void runSimulation(Robot robot, Configuration from, Configuration to) 
+		throws Exception
+	{
+		// Create a new linear path between from and to
+		((RSRobot) robot).addLinearPath(from, to);
+		
+		// Tell the station which robot is about to be simulated
+		station.setActiveMechanism(((RSRobot) robot).getRobotStudioMechanism());
+	
+		// Add SimulationListener (for detecting when simulation is finished) and start the simulation
+		SimulationListener simListener = new SimulationListener();
+		
+		ISimulation iSim = station.getSimulations().item(Converter.var(1));
+		Simulation sim = Simulation.getSimulationFromUnknown(iSim);
+
+		sim.addDSimulationEventsListener(simListener);
+		sim.start();
+
+		// Wait for the end of the simulation and clean up
+		simListener.waitForSimulationStop();
+		sim.removeDSimulationEventsListener(simListener);
+	}
+
+// 	/**
+// 	 * Creates a linear path between "from" and "to" configurations. 
+// 	 */
+// 	private Path createLinearPath(Configuration from, Configuration to) 
+// 	{
+// 		// Find targets
+// 		Target fromTarget = ((RSConfiguration) from).getRobotStudioTarget();
+// 		Target toTarget = ((RSConfiguration) to).getRobotStudioTarget();
+		
+// 		// Create new path for this motion
+// 		Path path = Path.getPathFromUnknown(mechanism.getPaths().add());
+// 		path.setName(from.getName() + "_" + to.getName());
+// 		path.insert(fromTarget);
+// 		path.getTargetRefs().item(Converter.var(1)).setMotionType(1);    // Linear motion
+// 		path.insert(toTarget);
+// 		path.getTargetRefs().item(Converter.var(2)).setMotionType(1);    // Linear motion
+
+// 		return path;
+// 	}
 	
     //////////////////////////////////
     // DAppEvents interface methods //

@@ -69,12 +69,14 @@ public class MechanismListener
 {
     private static Logger logger = LoggerFactory.createLogger(MechanismListener.class);
     
-    private IABBS4Controller controller = null;
+    protected IABBS4Controller controller = null;
     private boolean leavingTarget = true;    // targetReached is invoked twice for every Target!
     private boolean controllerStarted = false;    // Used in the wait-method
     private Path path;
     private Mechanism mechanism;
     private RSCell theCell;
+
+	protected RSRobot robot;
 	
     // Domenico stuff
     // Costs for the path in simulation
@@ -95,14 +97,21 @@ public class MechanismListener
     {
 		return posList;
     }
+
+	public MechanismListener(RSRobot robot) 
+	{
+		this.robot = robot;
+	}
 	
-    public MechanismListener(RSCell theCell, Mechanism mechanism, Path path)
+// 	public MechanismListener(RSCell theCell, Mechanism mechanism, Path path)
+	public MechanismListener(RSCell theCell, RSRobot robot)
     {
 		try
 	    {
-		this.theCell = theCell;
-		this.path = path;
-		this.mechanism = mechanism;
+			this.robot = robot;
+			this.theCell = theCell;
+			this.path = robot.getActivePath();
+			this.mechanism = robot.getRobotStudioMechanism();
 
 		// pathcosts = new CreateXml.PathWithCosts(path.getName());
 		// pathcosts.insertCost(new Integer(0));
