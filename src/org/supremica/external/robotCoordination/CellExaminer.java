@@ -468,7 +468,7 @@ public class CellExaminer
 				// Inside robot?
 				Box box = cell.createBox(coord);
 				//box.setColor(ORANGE);
-				//box.setTransparency(TRANSPARENCY);
+				box.setTransparency(TRANSPARENCY);
 				if (robot.collidesWith(box))
 				{
 					// Remove from simulation environment
@@ -513,7 +513,7 @@ public class CellExaminer
 				{
 				 	// This box is a "surfacebox"
 					box.setColor(GREEN);
-					box.delete();
+					//box.delete();
 					surfaceBoxes.add(coord);
 				}
  				boxesExamined.add(coord);
