@@ -13,7 +13,7 @@ public interface RobotListener
      * @param time The time (in milliseconds(?)) for the robot to
      * move to the configuration where the collision started.
      */ 
-    public void collisionStart(Volume volume, int time);
+    public void collisionStart(Volume volume, int time) throws Exception;
 
     /**
      * Called when the robot ends a collision with an object in the
@@ -27,5 +27,5 @@ public interface RobotListener
      * @param time The time (in milliseconds(?)) for the robot to move
      * to the configuration where the collision ended.
      */
-    public void collisionEnd(Volume volume, int time);
+    public void collisionEnd(Volume volume, int time) throws Exception;
 }

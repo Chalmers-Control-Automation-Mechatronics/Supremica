@@ -423,15 +423,20 @@ public class CellExaminer
 		// For every robot...
 		for (Iterator<Robot> robIt = robots.iterator(); robIt.hasNext(); )
 		{
-			Robot robot = robIt.next();
-			Configuration home = robot.getHomeConfiguration();
-			robot.start();
-			robot.jumpToConfiguration(home);
-			//robot.stop();
-			
 			ActionTimer timer = new ActionTimer();
 			timer.start();
 
+			Robot robot = robIt.next();
+			Configuration home = robot.getHomeConfiguration();
+
+			// Initalize robot
+			robot.start();
+			robot.jumpToConfiguration(home);
+			
+			///////////////////////////////////////
+			// BUILD BOXES FOR THE HOME POSITION //
+			///////////////////////////////////////
+			
 			// List of coordinates of boxes that should be examined
  			//List<Coordinate> boxesToExamine = new LinkedList<Coordinate>();
 			SortedSet<Coordinate> boxesToExamine = new TreeSet<Coordinate>();
@@ -440,16 +445,15 @@ public class CellExaminer
 			List<Coordinate> boxesExamined = new LinkedList<Coordinate>();
 			// List of the coordinates of boxes on "the surface"
 			List<Coordinate> surfaceBoxes = new LinkedList<Coordinate>();
-
+			
 			// Get base coords and build first box
 			Coordinate base = robot.getBaseCoordinates();
 			boxesToExamine.add(base);
-
+			
 			// Start loop!
 			while (boxesToExamine.size() != 0)
 			{
 			 	// Get the status for this box
-				//Coordinate coord = boxesToExamine.remove(0);
 				Coordinate coord = boxesToExamine.first();
 				boxesToExamine.remove(coord);
 				
@@ -532,6 +536,10 @@ public class CellExaminer
 				return;
 			} 
 			
+			//////////////////////////////////////////////////////////
+			// BUILD BOXES FOR THE REST OF THE SPAN (FOR ALL PATHS) //
+			//////////////////////////////////////////////////////////
+
 			// Listen to the robot (for collisions - a part of the box span generation!)
 			RobotListener listener = new BoxSpanGenerator(cell, robot, matrix, zoneBoxes, surfaceBoxes);
 			robot.setRobotListener(listener);
@@ -540,21 +548,10 @@ public class CellExaminer
 			List<Configuration> configurations = robot.getConfigurations();
 			// The first loop must start with the home configuration, since the 
 			// surfaceboxes always should be pushed "outwards"
-			assert(home.getName().equals(configurations.get(0).getName()));
-			/*
-			Configuration home = robot.getHomeConfiguration();
-			int homeIndex = configurations.indexOf(home);
-			assert(homeIndex >= 0);
-			if (homeIndex != 0)
+			if (!home.getName().equals(configurations.get(0).getName()))
 			{
-				Configuration temp = configurations.get(0);
-				configurations.set(0, home);
-				configurations.set(homeIndex, temp);
+				throw new Exception("The home target should always be the first target.");
 			}
-			*/
-			// Initialize the robot
-			//robot.start();
-			//robot.jumpToConfiguration(home);
 			// Now the paths, two nested loops of configurations...
 			for (int i = 0; i < configurations.size(); i++)
 			{
@@ -574,45 +571,10 @@ public class CellExaminer
 			robot.jumpToConfiguration(home);
 			robot.stop();		
 
-			/*
-			Set collisionSet = new Set();
-			for (Iterator<Box> boxIt = surfaceBoxes.iterator(); boxIt.hasNext(); )
-			{
-				collisionSet.add(boxIt.next());
-			}
+			//////////////
+			// CLEAN UP //
+			//////////////
 
-			// Push boxes for each "path", i.e. unique pair of configurations
-			List<Configuration> configurations = robot.getConfigurations();
-			// The first loop must start with the home configuration, since the 
-			// surfaceboxes always should be pushed "outwards"
-			Configuration home = robot.getHomeConfiguration();
-			int homeIndex = configurations.indexOf(home);
-			if (homeIndex != 0)
-			{
-				Configuration temp = configurations.get(0);
-				configurations.set(0, home);
-				configurations.set(homeIndex, temp);
-			}
-			robot.jumpToConfiguration(home);
-			// Now the paths, two nested loops of configurations...
-			for (int i = 0; i < configurations.size(); i++)
-			{
-				Configuration from = (Configuration) configurations.get(i);
-				
-				for (int j = i + 1; j < configurations.size(); j++)
-				{
-					Configuration to = (Configuration) configurations.get(j);
-					
-					// Generate span!
-					logger.info("Pushing boxes moving from " + from + " to " + to + " for " + robot + ".");
-					//robot.pushBoxes(from, to);
-				}
-			}
-			// Finalize
-			robot.jumpToConfiguration(home);
-			robot.stop();			
-			*/
-			
 			// Clear checked-status from the examined boxes before examining next robot!
 			while (boxesExamined.size() != 0)
 			{
@@ -622,8 +584,6 @@ public class CellExaminer
 			}			
 			
 			// It's over for this robot. Remove the "surfaceboxes"
-			timer.stop();
-			logger.info("Execution completed for robot " + robot + " after " + timer.toString());
 			logger.info("Amount of surfaceboxes: " + surfaceBoxes.size());
 			logger.info("Amount of spanboxes: " + surfaceBoxes.size());
 			while (surfaceBoxes.size() != 0)
@@ -649,6 +609,8 @@ public class CellExaminer
 				//box.setColor(GREEN);
 				//box.setTransparency(TRANSPARENCY);
 			}
+			timer.stop();
+			logger.info("Execution completed for robot " + robot + " after " + timer + ".");
 		}
 	}
 }

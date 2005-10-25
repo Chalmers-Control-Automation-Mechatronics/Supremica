@@ -83,17 +83,17 @@ public class RSRobot
 	
     public RSRobot(Mechanism mechanism, Station station)
     {
-	this.mechanism = mechanism;
-	this.station = station;
+		this.mechanism = mechanism;
+		this.station = station;
 		
-	try
-	    {
-		spans = RSCell.addPart(getName() + RSCell.SPANS_SUFFIX);
-	    }
-	catch (Exception ex)
-	    {
-		logger.error("Error in RSRobot.java." + ex);
-	    }
+		try
+		{
+			spans = RSCell.addPart(getName() + RSCell.SPANS_SUFFIX);
+		}
+		catch (Exception ex)
+		{
+			logger.error("Error in RSRobot.java." + ex);
+		}
     }
 	
     /////////////////////////////
@@ -101,120 +101,120 @@ public class RSRobot
     /////////////////////////////
 		
 	public List<Configuration> getConfigurations()
-	    throws Exception
+		throws Exception
     {
-	LinkedList list = new LinkedList();
+		LinkedList list = new LinkedList();
 	    
-	// Get targets from RobotStudio, tranform into list of Target:s.
-	ITargets robotTargets = mechanism.getWorkObjects().item(Converter.var(1)).getTargets();    // takes the targets from Elements
-	int nbrOfTargets = robotTargets.getCount();
+		// Get targets from RobotStudio, tranform into list of Target:s.
+		ITargets robotTargets = mechanism.getWorkObjects().item(Converter.var(1)).getTargets();    // takes the targets from Elements
+		int nbrOfTargets = robotTargets.getCount();
 	    
-	for (int i = 1; i <= nbrOfTargets; i++)
+		for (int i = 1; i <= nbrOfTargets; i++)
 	    {
-		list.add(new RSConfiguration(robotTargets.item(Converter.var(i))));
+			list.add(new RSConfiguration(robotTargets.item(Converter.var(i))));
 	    }
 	    
-	return list;
+		return list;
     }
 	
     /**
      * Examines if this robot collides with the given box in the current configuration.
      */
     public boolean collidesWith(Box box) 
-	throws Exception
+		throws Exception
     {
-	// Please move this method from MechanismListener to somewhere more logical
-	return MechanismListener.entityCollidesWith(mechanism, ((RSBox) box).getEntity());
-	//return true;
+		// Please move this method from MechanismListener to somewhere more logical
+		return MechanismListener.entityCollidesWith(mechanism, ((RSBox) box).getEntity());
+		//return true;
     }
 	
     public Coordinate getBaseCoordinates() 
-	throws Exception 
+		throws Exception 
     {
-	return Converter.toCoordinate(mechanism.getTransform().getX(), mechanism.getTransform().getY(), mechanism.getTransform().getZ());
+		return Converter.toCoordinate(mechanism.getTransform().getX(), mechanism.getTransform().getY(), mechanism.getTransform().getZ());
     }
-
+	
     public synchronized Configuration createConfigurationAtTCP()
-	throws Exception 
+		throws Exception 
     {
-	ITargets targets = mechanism.getWorkObjects().item(Converter.var(1)).getTargets();
-	ITarget newTarget = targets.add();
-
-	newTarget.setTransform(mechanism.getActiveToolFrame().getTransform());
-	newTarget.setName(getName() + "_" + RSCell.TARGET_PREFIX + "_" + targets.getCount());
+		ITargets targets = mechanism.getWorkObjects().item(Converter.var(1)).getTargets();
+		ITarget newTarget = targets.add();
 		
-	return new RSConfiguration(newTarget);
+		newTarget.setTransform(mechanism.getActiveToolFrame().getTransform());
+		newTarget.setName(getName() + "_" + RSCell.TARGET_PREFIX + "_" + targets.getCount());
+		
+		return new RSConfiguration(newTarget);
     }
 	
     public Configuration getHomeConfiguration()
-	throws Exception
+		throws Exception
     {
-	// takes the targets from Elements
-	ITargets robotTargets = mechanism.getWorkObjects().item(Converter.var(1)).getTargets();    
+		// takes the targets from Elements
+		ITargets robotTargets = mechanism.getWorkObjects().item(Converter.var(1)).getTargets();    
 		
-	return new RSConfiguration(robotTargets.item(Converter.var(1)));
+		return new RSConfiguration(robotTargets.item(Converter.var(1)));
     }
 	
     public void generateSpan(Configuration from, Configuration to)
-	throws Exception
+		throws Exception
     {
-	jumpToConfiguration(from);
+		jumpToConfiguration(from);
 		
-	// Find targets
-	Target fromTarget = ((RSConfiguration) from).getRobotStudioTarget();
-	Target toTarget = ((RSConfiguration) to).getRobotStudioTarget();
+		// Find targets
+		Target fromTarget = ((RSConfiguration) from).getRobotStudioTarget();
+		Target toTarget = ((RSConfiguration) to).getRobotStudioTarget();
 		
-	// Create new path for this motion
-	IPath path = mechanism.getPaths().add();
+		// Create new path for this motion
+		IPath path = mechanism.getPaths().add();
 		
-	path.setName(from.getName() + to.getName());
-	path.insert(fromTarget);
-	path.getTargetRefs().item(Converter.var(1)).setMotionType(1);    // Linear motion
-	path.insert(toTarget);
-	path.getTargetRefs().item(Converter.var(2)).setMotionType(1);    // Linear motion
+		path.setName(from.getName() + to.getName());
+		path.insert(fromTarget);
+		path.getTargetRefs().item(Converter.var(1)).setMotionType(1);    // Linear motion
+		path.insert(toTarget);
+		path.getTargetRefs().item(Converter.var(2)).setMotionType(1);    // Linear motion
 		
-	// Redefine robot program...
-	IABBS4Procedure mainProcedure = getMainProcedure();
+		// Redefine robot program...
+		IABBS4Procedure mainProcedure = getMainProcedure();
 		
-	for (int k = 1; k <= mainProcedure.getProcedureCalls().getCount();
-	     k++)
+		for (int k = 1; k <= mainProcedure.getProcedureCalls().getCount();
+			 k++)
 	    {
-		mainProcedure.getProcedureCalls().item(Converter.var(k)).delete();
+			mainProcedure.getProcedureCalls().item(Converter.var(k)).delete();
 	    }
 		
-	// Add path as only procedure in main
-	path.syncToVirtualController(RSCell.PATHSMODULE_NAME);    // Generate procedure from path
-	Thread.sleep(1000);    // The synchronization takes a little while...
+		// Add path as only procedure in main
+		path.syncToVirtualController(RSCell.PATHSMODULE_NAME);    // Generate procedure from path
+		Thread.sleep(1000);    // The synchronization takes a little while...
 		
-	IABBS4Procedure proc = path.getProcedure();
+		IABBS4Procedure proc = path.getProcedure();
 		
-	mainProcedure.getProcedureCalls().add(path.getProcedure());
+		mainProcedure.getProcedureCalls().add(path.getProcedure());
 		
-	// Generate span for this path
-	// Start simulation listener
-	ISimulation simulation = mechanism.getParent().getSimulations().item(Converter.var(1));
-	Simulation sim = Simulation.getSimulationFromUnknown(simulation);
-	SpanGenerator spanGenerator = new SpanGenerator(this, path.getName());
+		// Generate span for this path
+		// Start simulation listener
+		ISimulation simulation = mechanism.getParent().getSimulations().item(Converter.var(1));
+		Simulation sim = Simulation.getSimulationFromUnknown(simulation);
+		SpanGenerator spanGenerator = new SpanGenerator(this, path.getName());
 		
-	sim.addDSimulationEventsListener(spanGenerator);
+		sim.addDSimulationEventsListener(spanGenerator);
 		
-	// Start a thread running the simulation in RobotStudio
-	simulation.start();
+		// Start a thread running the simulation in RobotStudio
+		simulation.start();
 		
-	// Wait for the simulation to stop
-	spanGenerator.waitForSimulationStop();
-	sim.removeDSimulationEventsListener(spanGenerator);
-	Thread.sleep(1000);
+		// Wait for the simulation to stop
+		spanGenerator.waitForSimulationStop();
+		sim.removeDSimulationEventsListener(spanGenerator);
+		Thread.sleep(1000);
 		
-	// Clean up
-	path.delete();
+		// Clean up
+		path.delete();
     }
 	
     public void hideSpan()
-	throws Exception
+		throws Exception
     {
-	//spans.setVisible(false);
-	spans.delete();
+		//spans.setVisible(false);
+		spans.delete();
     }
 	
     public String getName()
@@ -286,8 +286,7 @@ public class RSRobot
 		station.setActiveMechanism(mechanism);
 		
 		// Already started?
-		IABBS4Controller controller;
-		
+		IABBS4Controller controller;		
 		try
 	    {
 			controller = mechanism.getController();
@@ -320,7 +319,6 @@ public class RSRobot
     {
 		// The controller should be up and running!
 		IABBS4Controller controller;
-		
 		try
 	    {
 			controller = mechanism.getController();
@@ -333,8 +331,7 @@ public class RSRobot
 		
 		// Add ControllerListener to the mechanism so we can listen to the controller
 		Mechanism mech = Mechanism.getMechanismFromUnknown(mechanism);
-		ControllerListener controllerListener = new ControllerListener(true);
-		
+		ControllerListener controllerListener = new ControllerListener(true);		
 		mech.add_MechanismEventsListener(controllerListener);
 		
 		// Initialize shut down and wait for completion...
@@ -397,57 +394,57 @@ public class RSRobot
      * Adds a new path to robots main procedure.
      */
     public void addLinearPath(Configuration from, Configuration to) 
-	throws Exception
+		throws Exception
     {
-	// Find targets
-	Target fromTarget = ((RSConfiguration) from).getRobotStudioTarget();
-	Target toTarget = ((RSConfiguration) to).getRobotStudioTarget();
+		// Find targets
+		Target fromTarget = ((RSConfiguration) from).getRobotStudioTarget();
+		Target toTarget = ((RSConfiguration) to).getRobotStudioTarget();
 		
-	// Create new path for this motion
-	activePath = Path.getPathFromUnknown(mechanism.getPaths().add());
-	activePath.setName(from.getName() + "_" + to.getName());
-	activePath.insert(fromTarget);
-	activePath.getTargetRefs().item(Converter.var(1)).setMotionType(1);    // Linear motion
-	activePath.insert(toTarget);
-	activePath.getTargetRefs().item(Converter.var(2)).setMotionType(1);    // Linear motion
-
-	// Redefine robot program...
-	IABBS4Procedure mainProcedure = getMainProcedure();
-	for (int k = 1;
-	     k <= mainProcedure.getProcedureCalls().getCount();
-	     k++)
+		// Create new path for this motion
+		activePath = Path.getPathFromUnknown(mechanism.getPaths().add());
+		activePath.setName(from.getName() + "_" + to.getName());
+		activePath.insert(fromTarget);
+		activePath.getTargetRefs().item(Converter.var(1)).setMotionType(1);    // Linear motion
+		activePath.insert(toTarget);
+		activePath.getTargetRefs().item(Converter.var(2)).setMotionType(1);    // Linear motion
+		
+		// Redefine robot program...
+		IABBS4Procedure mainProcedure = getMainProcedure();
+		for (int k = 1;
+			 k <= mainProcedure.getProcedureCalls().getCount();
+			 k++)
 	    {
-		mainProcedure.getProcedureCalls().item(Converter.var(k)).delete();
+			mainProcedure.getProcedureCalls().item(Converter.var(k)).delete();
 	    }
 		
-	// Add path as only procedure in main
-	activePath.syncToVirtualController(RSCell.PATHSMODULE_NAME);    // Generate procedure from path
-	Thread.sleep(1000);    // The synchronization takes a little while...
-	
-	IABBS4Procedure proc = activePath.getProcedure();
-	mainProcedure.getProcedureCalls().add(activePath.getProcedure());
+		// Add path as only procedure in main
+		activePath.syncToVirtualController(RSCell.PATHSMODULE_NAME);    // Generate procedure from path
+		Thread.sleep(1000);    // The synchronization takes a little while...
+		
+		IABBS4Procedure proc = activePath.getProcedure();
+		mainProcedure.getProcedureCalls().add(activePath.getProcedure());
     }
 
     public Path getActivePath() 
     {
-	return activePath;
+		return activePath;
     }
-
+	
     public void setActivePath(Path activePath)
     {
-	this.activePath = activePath;
+		this.activePath = activePath;
     }
 
     public void setRobotListener(RobotListener robotListener) 
 	throws Exception
     {
-	this.robotListener = robotListener;
-
-	mechanism.add_MechanismEventsListener(new MechListener(this));
+		this.robotListener = robotListener;
+		
+		mechanism.add_MechanismEventsListener(new MechListener(this));
     }
-
+	
     public RobotListener getRobotListener()
     {
-	return robotListener;
+		return robotListener;
     }
 }
