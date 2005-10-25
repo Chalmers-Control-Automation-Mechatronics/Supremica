@@ -29,8 +29,8 @@ public interface Box
 // 	this.coord = coord;
 //     }
 
-        	
+	/**
+	 * Returns the coordinate of this box.
+	 */
     public Coordinate getCoordinate();
-
-    public void setCoordinate(Coordinate coord);
 }

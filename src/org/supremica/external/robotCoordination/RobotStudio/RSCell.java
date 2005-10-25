@@ -678,9 +678,10 @@ public class RSCell
     }
 
     /**
-     * For each path try to calculate the points in which each robot intersects a mutex zone
-     * (that is an entity in the part named ZONEPART_NAME).
-     * Each new point found is added to the corresponding path.
+     * For each path try to calculate the points in which each robot
+     * intersects a mutex zone (that is an entity in the part named
+     * ZONEPART_NAME). Each new point found is added to the
+     * corresponding path.
      */
     public void examineCollisions(Robot robot, Configuration from, Configuration to)
     {

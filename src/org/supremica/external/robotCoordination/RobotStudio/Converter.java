@@ -56,7 +56,8 @@ import org.supremica.external.comInterfaces.robotstudio_3_1.RobotStudio.ITransfo
 /**
  * A static class that contains conversion methods between Supremica and RobotStudio.
  */
-public class Converter {
+public class Converter 
+{
     /**
      * Typecast i into Variant, for convenience! (Variant is something like
      * VB:s counterpart of java's Object.)
@@ -66,7 +67,7 @@ public class Converter {
     {
 		return new Variant(i);
     }
-
+	
     /**
      * Typecast i into Variant, for convenience! (Variant is something like
      * VB:s counterpart of java's Object.)
@@ -127,7 +128,7 @@ public class Converter {
 
 		for (int i = 1; i<strCoords.length; i++) 
 		{
-			strCoords[i].replace("m", "-");
+			strCoords[i] = strCoords[i].replace("m", "-");
 			coords[i-1] = (new Integer(strCoords[i])).intValue();
 		}
 		

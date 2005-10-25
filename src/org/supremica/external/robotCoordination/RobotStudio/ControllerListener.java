@@ -69,7 +69,7 @@ public class ControllerListener
      */
     public ControllerListener(boolean isRunning)
     {
-	controllerRunning = isRunning;
+		controllerRunning = isRunning;
     }
 
     /**
@@ -80,24 +80,24 @@ public class ControllerListener
      */
     public synchronized void waitForControllerStart()
     {
-	try
+		try
 	    {
-		while (!controllerRunning)
+			while (!controllerRunning)
 		    {
-			wait();
+				wait();
 		    }
 
-		// Make sure the controller is really started before we return
-		//Thread.sleep(3000);
+			// Make sure the controller is really started before we return
+			//Thread.sleep(3000);
 	    }
-	catch (Exception ex)
+		catch (Exception ex)
 	    {
 
-		//System.out.println("Interrupted! " + ex);
-		logger.error("Interrupted! " + ex);
+			//System.out.println("Interrupted! " + ex);
+			logger.error("Interrupted! " + ex);
 	    }
 
-	return;
+		return;
     }
 
     /**
@@ -105,65 +105,63 @@ public class ControllerListener
      */
     public synchronized void waitForControllerShutDown()
     {
-	try
+		try
 	    {
-		while (controllerRunning)
+			while (controllerRunning)
 		    {
-			wait();
+				wait();
 		    }
 
-		// Make sure the controller is really shut down before we return
-		//Thread.sleep(2500);
+			// Make sure the controller is really shut down before we return
+			//Thread.sleep(2500);
 	    }
-	catch (Exception ex)
+		catch (Exception ex)
 	    {
-
-		//System.out.println("Interrupted! " + ex);
-		logger.error("Interrupted! " + ex);
+			//System.out.println("Interrupted! " + ex);
+			logger.error("Interrupted! " + ex);
 	    }
 
-	return;
+		return;
     }
 
     // Implementation of _Mechanismorg.supremica.external.comInterfaces.robotstudio_3_1.RobotStudioEventsAdapter methods
+
     public int beforeControllerStarted()
     {
-	// This method works fine... but is quite useless here? Post some info...
-	try
+		// This method works fine... but is quite useless here? Post some info...
+		try
 	    {
-		logger.debug("Starting Virtual Controller for " + RSCell.station.getName() + "...");
+			logger.debug("Starting Virtual Controller for " + RSCell.station.getName() + "...");
 	    }
-	catch (Exception whatever) {}
+		catch (Exception whatever) {}
 
-	return 0;
+		return 0;
     }
 
     public int afterControllerStarted()
     {
-
-	// This never happens!? (But since RS3.0 we don't seem to need it!?)
-	controllerRunning = true;
-
-	logger.fatal("AfterControllerStarted. Tell Hugo you got this message!");
-	notify();
-
-	return 0;
+		// This never happens!? (But since RS3.0 we don't seem to need it!?)
+		controllerRunning = true;
+		
+		logger.fatal("AfterControllerStarted. Tell Hugo you got this message!");
+		notify();
+		
+		return 0;
     }
-
+	
     public int afterControllerShutdown()
     {
+		// Works fine?
+		controllerRunning = false;
 
-	// Works fine?
-	controllerRunning = false;
-
-	try
+		try
 	    {
-		logger.debug("Virtual Controller shut down for " + RSCell.station.getName() + ".");
+			logger.debug("Virtual Controller shut down for " + RSCell.station.getName() + ".");
 	    }
-	catch (Exception whatever) {}
+		catch (Exception whatever) {}
 
-	notify();
+		notify();
 
-	return 0;
+		return 0;
     }
 }

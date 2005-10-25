@@ -62,34 +62,34 @@ public class Collider
 
     Collider(String name)
     {
-	this.name = name;
+		this.name = name;
     }
 
     Collider(String name, int nbr)
     {
-	this(name);
+		this(name);
 
-	count = nbr;
+		count = nbr;
     }
 
     Collider(Collider a)
     {
-	this(a.getName(), a.getCount());
+		this(a.getName(), a.getCount());
     }
 
     public synchronized int getCount()
     {
-	return count;
+		return count;
     }
 
     public synchronized void setCount(int nbr)
     {
-	count = nbr;
+		count = nbr;
     }
 
     public String getName()
     {
-	return name;
+		return name;
     }
 }
 

@@ -68,6 +68,15 @@ public class MechListener
 		super(robot);
 		
 		robotListener = robot.getRobotListener();
+
+		try 
+		{
+			controller = robot.getRobotStudioMechanism().getController();
+		}
+		catch (Exception ex)
+		{
+			System.err.println("Robot should be started before adding RobotListener.");
+		}
     }
 	
     ///////////////////////////////////////////////

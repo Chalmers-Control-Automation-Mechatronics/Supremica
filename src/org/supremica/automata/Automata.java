@@ -78,10 +78,10 @@ public class Automata
 	}
 
 	/**
-	 * Copy constructor that also makes a (deep) copy of all the automata
-	 * contained in oldAutomata. Calling this is equal to calling
-	 * Automata(oldAutomata, false)
-	 **/
+	 * Copy constructor that also makes a (deep) copy of all the
+	 * automata contained in oldAutomata. Calling this is equal to
+	 * calling Automata(oldAutomata, false)
+	 */
 	public Automata(Automata oldAutomata)
 	{
 		this(oldAutomata, false);
@@ -89,7 +89,7 @@ public class Automata
 
 	/**
 	 * Construct an Automata object with a single automaton.
-	 **/
+	 */
 	public Automata(Automaton theAutomaton)
 	{
 		this();

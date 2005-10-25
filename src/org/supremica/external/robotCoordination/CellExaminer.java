@@ -12,8 +12,9 @@ import org.supremica.gui.*;
 import org.supremica.automata.*;
 import org.supremica.properties.*;
 import org.supremica.external.robotCoordination.RobotStudio.RSCell;
-import java.awt.Color;
 import org.supremica.util.ActionTimer;
+import java.awt.Toolkit;
+import java.awt.Color;
 
 public class CellExaminer
     extends JDialog
@@ -31,13 +32,13 @@ public class CellExaminer
 	private Automata robotAutomata;
 
 	// Colors
-	private final Color RED = Color.RED;
-	private final Color ORANGE = Color.ORANGE;
-	private final Color GREEN = Color.GREEN;
-	private final Color BLACK = Color.BLACK;
+	static final Color RED = Color.RED;
+	static final Color ORANGE = Color.ORANGE;
+	static final Color GREEN = Color.GREEN;
+	static final Color BLUE = Color.BLUE;
+	static final Color BLACK = Color.BLACK;
 	// Transparency
-	private final double TRANSPARENCY = 0.9;
-
+	static final double TRANSPARENCY = 0.9;
 
 	// Demo file
 	//final String DEMOSTATION_FILENAME = "C:/temp/RobSuprTestStation/RobSuprTest.stn";
@@ -167,13 +168,7 @@ public class CellExaminer
 					//Run the demo!
 					try
 					{
-						ActionTimer timer = new ActionTimer();
-						timer.start();
-
 						boxStrategy(cell);
-						
-						timer.stop();
-						logger.info("Execution completed after " + timer.toString());
 					}
 					catch (Exception ex)
 					{
@@ -406,25 +401,28 @@ public class CellExaminer
 			return;
 		}
 
+		ActionTimer timer = new ActionTimer();
+		timer.start();
+
 		// Discretization parameters
-		double dx = 0.5;
-		double dy = 0.5;
-		double dz = 0.5;
+		double dx = 0.2;
+		double dy = 0.2;
+		double dz = 0.2;
 		cell.setBoxDimensions(new double[] {dx,dy,dz});
 
 		// Hashtable associating coordinates with status of the corresponding box
 		Hashtable<Coordinate, Status> matrix = new Hashtable(1000);
 
 		// List of boxes where collisions may occur
-		List<Coordinate> zoneBoxes = new LinkedList<Coordinate>();
+		List<Coordinate> zoneboxes = new LinkedList<Coordinate>();
 
 		// Get the robots
 		List<Robot> robots = cell.getRobots();
 		// For every robot...
 		for (Iterator<Robot> robIt = robots.iterator(); robIt.hasNext(); )
 		{
-			ActionTimer timer = new ActionTimer();
-			timer.start();
+			ActionTimer robottimer = new ActionTimer();
+			robottimer.start();
 
 			Robot robot = robIt.next();
 			Configuration home = robot.getHomeConfiguration();
@@ -444,7 +442,7 @@ public class CellExaminer
 			// (for resetting the matrix)
 			List<Coordinate> boxesExamined = new LinkedList<Coordinate>();
 			// List of the coordinates of boxes on "the surface"
-			List<Coordinate> surfaceBoxes = new LinkedList<Coordinate>();
+			List<Coordinate> surfaceboxes = new LinkedList<Coordinate>();
 			
 			// Get base coords and build first box
 			Coordinate base = robot.getBaseCoordinates();
@@ -489,7 +487,7 @@ public class CellExaminer
 					// Has someone else collided with this one?
 					if (status.occupied)
 					{
-						zoneBoxes.add(coord);
+						zoneboxes.add(coord);
 					}
 					status.occupied = true;
 
@@ -524,7 +522,7 @@ public class CellExaminer
 				 	// This box is a "surfacebox"
 					box.setColor(GREEN);
 					//box.delete();
-					surfaceBoxes.add(coord);
+					surfaceboxes.add(coord);
 				}
  				boxesExamined.add(coord);
 			}
@@ -541,7 +539,7 @@ public class CellExaminer
 			//////////////////////////////////////////////////////////
 
 			// Listen to the robot (for collisions - a part of the box span generation!)
-			RobotListener listener = new BoxSpanGenerator(cell, robot, matrix, zoneBoxes, surfaceBoxes);
+			RobotListener listener = new BoxSpanGenerator(cell, robot, matrix, zoneboxes, surfaceboxes);
 			robot.setRobotListener(listener);
 			
 			// Push boxes for each "path", i.e. unique pair of configurations
@@ -568,7 +566,9 @@ public class CellExaminer
 				}
 			}
 			// Finalize the robot
+			Thread.sleep(100);
 			robot.jumpToConfiguration(home);
+			Thread.sleep(100);
 			robot.stop();		
 
 			//////////////
@@ -584,11 +584,10 @@ public class CellExaminer
 			}			
 			
 			// It's over for this robot. Remove the "surfaceboxes"
-			logger.info("Amount of surfaceboxes: " + surfaceBoxes.size());
-			logger.info("Amount of spanboxes: " + surfaceBoxes.size());
-			while (surfaceBoxes.size() != 0)
+			int surfaceboxCount = surfaceboxes.size();
+			while (surfaceboxes.size() != 0)
 			{
-				Coordinate coord = surfaceBoxes.remove(0);
+				Coordinate coord = surfaceboxes.remove(0);
 				try
 				{
 					cell.destroyBox(coord);
@@ -596,6 +595,7 @@ public class CellExaminer
 				catch (Exception ex)
 				{
 					// Box already deleted (I hope).
+					surfaceboxCount--;
 				}
 
 				// If the box has been occupied, then it's important to keep the matrix info!
@@ -609,8 +609,27 @@ public class CellExaminer
 				//box.setColor(GREEN);
 				//box.setTransparency(TRANSPARENCY);
 			}
-			timer.stop();
-			logger.info("Execution completed for robot " + robot + " after " + timer + ".");
+			robottimer.stop();
+			logger.info("Execution completed for robot " + robot + " after " + robottimer + ".");
+			logger.info("Amount of surfaceboxes: " + surfaceboxCount);	
 		}
+
+		// Show the result, the zoneboxes!
+		timer.stop();
+		logger.info("Execution completed after " + timer.toString());
+		logger.info("Amount of zoneboxes: " + zoneboxes.size());
+		while (zoneboxes.size() != 0)
+		{
+			Coordinate coord = zoneboxes.remove(0);
+
+			Box box = cell.createBox(coord);
+			box.setColor(BLUE);
+			box.setTransparency(TRANSPARENCY);
+		}
+	}
+
+	public static void beep()
+	{
+		Toolkit.getDefaultToolkit().beep();
 	}
 }
