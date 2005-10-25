@@ -20,10 +20,16 @@ public interface Robot
 		throws Exception;
 	
     /** 
-     * Returnerar Supremica-koordinater för robotens bas 
+     * Returners Supremica coordinates for robots base position.
      */ 
     public Coordinate getBaseCoordinates()
 		throws Exception;
+
+    /**
+     * Creates and returns current TCP-configuration.
+     */
+    public Configuration createConfigurationAtTCP()
+	throws Exception;
 	
     /**
      * Returns the home configuration.
