@@ -424,9 +424,10 @@ public class CellExaminer
 		for (Iterator<Robot> robIt = robots.iterator(); robIt.hasNext(); )
 		{
 			Robot robot = robIt.next();
+			Configuration home = robot.getHomeConfiguration();
 			robot.start();
-			robot.jumpToConfiguration(robot.getConfigurations().get(0));
-			robot.stop();
+			robot.jumpToConfiguration(home);
+			//robot.stop();
 			
 			ActionTimer timer = new ActionTimer();
 			timer.start();
@@ -539,6 +540,7 @@ public class CellExaminer
 			List<Configuration> configurations = robot.getConfigurations();
 			// The first loop must start with the home configuration, since the 
 			// surfaceboxes always should be pushed "outwards"
+			assert(home.getName().equals(configurations.get(0).getName()));
 			/*
 			Configuration home = robot.getHomeConfiguration();
 			int homeIndex = configurations.indexOf(home);
@@ -551,7 +553,7 @@ public class CellExaminer
 			}
 			*/
 			// Initialize the robot
-			robot.start();
+			//robot.start();
 			//robot.jumpToConfiguration(home);
 			// Now the paths, two nested loops of configurations...
 			for (int i = 0; i < configurations.size(); i++)
@@ -564,11 +566,12 @@ public class CellExaminer
 					
 					// Generate span!
 					logger.info("Pushing boxes moving from " + from + " to " + to + " for " + robot + ".");
+					robot.jumpToConfiguration(from);
 					cell.runSimulation(robot, from, to);
 				}
 			}
 			// Finalize the robot
-			robot.jumpToConfiguration(robot.getConfigurations().get(0));
+			robot.jumpToConfiguration(home);
 			robot.stop();		
 
 			/*

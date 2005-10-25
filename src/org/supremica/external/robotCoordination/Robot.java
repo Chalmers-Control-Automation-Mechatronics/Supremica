@@ -4,6 +4,9 @@ import java.util.*;
 
 public interface Robot
 {
+	/**
+	 * Adds a listener fulfilling the RobotListener interface to the Robot.
+	 */
 	public void addRobotListener(RobotListener listener)
 		throws Exception;
 	
