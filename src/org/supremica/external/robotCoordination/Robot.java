@@ -4,29 +4,26 @@ import java.util.*;
 
 public interface Robot
 {
-	/**
-	 * Adds a listener fulfilling the RobotListener interface to the Robot.
-	 */
-	public void addRobotListener(RobotListener listener)
-		throws Exception;
+    public void setRobotListener(RobotListener listener)
+	throws Exception;
 	
     /**
      * Returns true if the robot collides with a given box.
      */
     public boolean collidesWith(Box box)
-		throws Exception;
+	throws Exception;
     
     /**
      * Generates span for a pair of positions.
      */
     public void generateSpan(Configuration from, Configuration to)
-		throws Exception;
+	throws Exception;
 	
     /** 
      * Returners Supremica coordinates for robots base position.
      */ 
     public Coordinate getBaseCoordinates()
-		throws Exception;
+	throws Exception;
 
     /**
      * Creates and returns current TCP-configuration.
@@ -38,41 +35,41 @@ public interface Robot
      * Returns the home configuration.
      */
     public Configuration getHomeConfiguration()
-		throws Exception;
+	throws Exception;
 	
     /**
      * Returns the name of the robot.
      */
     public String getName()
-		throws Exception;
+	throws Exception;
 	
     /**
      * Returns list of the configurations for this robot.
      */
     public List<Configuration> getConfigurations()
-		throws Exception;
+	throws Exception;
 	
     /**
      * Hides span in simulation environment (just for esthetics)
      */
     public void hideSpan()
-		throws Exception;
+	throws Exception;
 	
     /**
      * Jumps the robot to configuration.
      */
     public void jumpToConfiguration(Configuration configuration)
-		throws Exception;
+	throws Exception;
 	
     /**
      * Initialization of robot, before simulations start.
      */
     public void start()
-		throws Exception;
+	throws Exception;
 	
     /**
      * Finalization of robot, after completed simulation.
      */
     public void stop()
-		throws Exception;
+	throws Exception;
 }

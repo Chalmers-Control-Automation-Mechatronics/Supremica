@@ -460,6 +460,9 @@ public class MechanismListener
 		return 0;
     }
 	
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // DEPRECATED.... Use Robot.createConfigurationAtTCP() instead. (Is only used in this class (in 2 places)).
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
      * Create new target where the TCP currently resides.
      * Note that a target can not have a name that is longer

@@ -534,7 +534,7 @@ public class CellExaminer
 			
 			// Listen to the robot (for collisions - a part of the box span generation!)
 			RobotListener listener = new BoxSpanGenerator(cell, robot, matrix, zoneBoxes, surfaceBoxes);
-			robot.addRobotListener(listener);
+			robot.setRobotListener(listener);
 			
 			// Push boxes for each "path", i.e. unique pair of configurations
 			List<Configuration> configurations = robot.getConfigurations();

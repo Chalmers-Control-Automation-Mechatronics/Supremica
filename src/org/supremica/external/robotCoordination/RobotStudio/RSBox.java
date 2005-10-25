@@ -9,40 +9,39 @@ import com.inzoom.comjni.Variant;
 import com.inzoom.comjni.SafeArray;
 
 /**
- * Representerar en RobotStudio-box.
+ * Represents a RobotStudio box.
  */
-public class RSBox 
-    extends Box 
+public class RSBox
+    extends RSVolume
+    implements Box
 {
-    public RSBox(String name, Coordinate coord) 
-		throws Exception
-	{
-		super(name, coord);
-	}
+//     protected String name;
+    protected Coordinate coord;
 
-    public void delete() 
-		throws Exception
+    public RSBox(String name, Coordinate coord) 
+	throws Exception
     {
-		getEntity().delete();
+ 	super(name);
+// 	this.name = name;
+	this.coord = coord;
     }
 
-	public void setColor(Color color)
-		throws Exception
-	{
-		Variant varColor = new Variant(new SafeArray(new int[] {color.getRed(), color.getGreen(), color.getBlue()}), false);
-		getEntity().setColor(varColor);
-	}
-	
-	public void setTransparency(double transparency)
-		throws Exception
-	{
-		getEntity().setRelativeTransparency((float) transparency);
-	}
+    protected IEntity getEntity()
+	throws Exception
+    {
+	IPart boxPart = RSCell.station.getParts().item(Converter.var(RSCell.BOXPART_NAME));
+	return boxPart.getEntities().item(Converter.var(name));
+    }
 
-	protected IEntity getEntity()
-		throws Exception
-	{
-		IPart boxPart = RSCell.station.getParts().item(Converter.var(RSCell.BOXPART_NAME));
-		return boxPart.getEntities().item(Converter.var(name));
-	}
+    public Coordinate getCoordinate() 
+    {
+	return coord;
+    }
+
+    public void setCoordinate(Coordinate coord) 
+    {
+	this.coord = coord;
+    }
+
+
 }

@@ -51,6 +51,7 @@ package org.supremica.external.robotCoordination.RobotStudio;
 
 import com.inzoom.comjni.Variant;
 import org.supremica.external.robotCoordination.*;
+import org.supremica.external.comInterfaces.robotstudio_3_1.RobotStudio.ITransform;
 
 /**
  * A static class that contains conversion methods between Supremica and RobotStudio.
@@ -86,30 +87,48 @@ public class Converter {
 		return new Variant(i);
     }
 
-	/**
-	 * Converts a RobotStudio coordinate to a Supremica Coordinate (or Supremica index)
-	 */
-	static Coordinate toCoordinate(double x, double y, double z) {
-		double[] scaling = RSCell.boxDimensions;
+    /**
+     * Converts a RobotStudio coordinate to a Supremica Coordinate (or Supremica index)
+     */
+    static Coordinate toCoordinate(double x, double y, double z) 
+    {
+	double[] scaling = RSCell.boxDimensions;
 		
-		x /= scaling[0];
-		y /= scaling[1];
-		z /= scaling[2];
+	x /= scaling[0];
+	y /= scaling[1];
+	z /= scaling[2];
 
-		return new Coordinate((int) Math.floor(x), (int) Math.floor(y), (int) Math.floor(z));
-	}
+	return new Coordinate((int) Math.floor(x), (int) Math.floor(y), (int) Math.floor(z));
+    }
 
-	/**
-	 * Converts a Supremica Coordinate to a 3D-point in the world frame of RobotStudio
-	 */
-	static double[] toRSPoint(Coordinate coord) {
-		double[] scaling = RSCell.boxDimensions;
-		double[] pointCoord = new double[3];
-		
-		pointCoord[0] = coord.getX() * scaling[0];
-		pointCoord[1] = coord.getY() * scaling[1];
-		pointCoord[2] = coord.getZ() * scaling[2];
-		
-		return pointCoord;
+    /**
+     * Converts a RobotStudio transform to a Supremica Coordinate (or Supremica index)
+     */
+    static Coordinate toCoordinate(ITransform trans) 
+    {
+	try
+	{
+	    return toCoordinate(trans.getX(), trans.getY(), trans.getZ());
 	}
+	catch (Exception e) 
+	{
+	    e.printStackTrace();
+	    return null;
+	}
+    }
+
+    /**
+     * Converts a Supremica Coordinate to a 3D-point in the world frame of RobotStudio
+     */
+    static double[] toRSPoint(Coordinate coord) 
+    {
+	double[] scaling = RSCell.boxDimensions;
+	double[] pointCoord = new double[3];
+		
+	pointCoord[0] = coord.getX() * scaling[0];
+	pointCoord[1] = coord.getY() * scaling[1];
+	pointCoord[2] = coord.getZ() * scaling[2];
+		
+	return pointCoord;
+    }
 }
