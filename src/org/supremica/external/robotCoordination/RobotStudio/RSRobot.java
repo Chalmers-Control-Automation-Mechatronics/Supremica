@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -127,9 +128,22 @@ public class RSRobot
 		//return true;
     }
 	
-    public Coordinate getBaseCoordinates() throws Exception 
-	{
-	    return Converter.toCoordinate(mechanism.getTransform().getX(), mechanism.getTransform().getY(), mechanism.getTransform().getZ());
+    public Coordinate getBaseCoordinates() 
+	throws Exception 
+    {
+	return Converter.toCoordinate(mechanism.getTransform().getX(), mechanism.getTransform().getY(), mechanism.getTransform().getZ());
+    }
+
+    public synchronized Configuration createConfigurationAtTCP()
+	throws Exception 
+    {
+	ITargets targets = mechanism.getWorkObjects().item(Converter.var(1)).getTargets();
+	ITarget newTarget = targets.add();
+
+	newTarget.setTransform(mechanism.getActiveToolFrame().getTransform());
+	newTarget.setName(getName() + "_" + RSCell.TARGET_PREFIX + "_" + targets.getCount());
+		
+	return new RSConfiguration(newTarget);
     }
 	
     public Configuration getHomeConfiguration()

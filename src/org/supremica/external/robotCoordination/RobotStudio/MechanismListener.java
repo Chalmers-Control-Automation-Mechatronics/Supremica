@@ -70,19 +70,19 @@ public class MechanismListener
     private static Logger logger = LoggerFactory.createLogger(MechanismListener.class);
     
     protected IABBS4Controller controller = null;
-    private boolean leavingTarget = true;    // targetReached is invoked twice for every Target!
-    private boolean controllerStarted = false;    // Used in the wait-method
-    private Path path;
-    private Mechanism mechanism;
-    private RSCell theCell;
+    protected boolean leavingTarget = true;    // targetReached is invoked twice for every Target!
+    protected boolean controllerStarted = false;    // Used in the wait-method
+    protected Path path;
+    protected Mechanism mechanism;
+    protected RSCell theCell;
 
 	protected RSRobot robot;
 	
     // Domenico stuff
     // Costs for the path in simulation
-    //private CreateXml.PathWithCosts pathcosts;
+    //protected CreateXml.PathWithCosts pathcosts;
     // Time for the previous event (either start or end)
-    // private double previousTime = 0;
+    // protected double previousTime = 0;
 	
     // Dynamic list of objects colliding with the robot
     private LinkedList objectsColliding = new LinkedList();

@@ -89,7 +89,7 @@ public class MechListener
 	}
 	catch (Exception ex)
 	{
-	    logger.error("Error in event targetReached. " + ex);
+	    ex.printStackTrace();
 	}
 		
 	return 0;

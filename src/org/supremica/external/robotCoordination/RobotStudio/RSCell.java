@@ -105,6 +105,9 @@ public class RSCell
     /** Via point suffix */
     final static String VIAPOINT_SUFFIX = "vp";
 
+    /** Target prefix */
+    final static String TARGET_PREFIX = "target";
+
     /** Box names */
     final static String BOX_PREFIX = "Box_";
 
