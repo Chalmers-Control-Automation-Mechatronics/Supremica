@@ -55,14 +55,15 @@ import org.supremica.external.comInterfaces.robotstudio_3_1.RobotStudio.ITarget;
 import org.supremica.log.*;
 
 /**
- * Implementation of the Position-interface for RobotStudio.
+ * Implementation of the Configuration-interface for RobotStudio.
  */
 public class RSConfiguration
-    implements Configuration
+    extends Configuration
 {
     private static Logger logger = LoggerFactory.createLogger(RSConfiguration.class);
 	
-    Target target;
+	/** The RobotStudio target. */
+    private Target target;
 	
     public RSConfiguration(ITarget target)
     {
@@ -78,7 +79,6 @@ public class RSConfiguration
 	    }
     }
 
-    // Other method
     public String toString()
     {
 		return "'" + getName() + "'";
@@ -110,4 +110,9 @@ public class RSConfiguration
 		
 		return "";
     }
+
+	public boolean equals(Object other)
+	{
+		return getRobotStudioTarget().equals(((RSConfiguration) other).getRobotStudioTarget());
+	}
 }

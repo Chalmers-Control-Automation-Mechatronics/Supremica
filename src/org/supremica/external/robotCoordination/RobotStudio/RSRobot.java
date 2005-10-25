@@ -218,29 +218,29 @@ public class RSRobot
     }
 	
     public String getName()
-	throws Exception
+		throws Exception
     {
-	return mechanism.getName();
+		return mechanism.getName();
     }
-
+	
     public void start()
-	throws Exception
+		throws Exception
     {
-	// Start controller if not already started
-	startController();
+		// Start controller if not already started
+		startController();
     }
-
+	
     public void stop()
-	throws Exception
+		throws Exception
     {
-	Thread.sleep(1000);
-
-	// Stop controller
-	stopController();
+		Thread.sleep(1000);
+		
+		// Stop controller
+		stopController();
     }
-
+	
     public void jumpToConfiguration(Configuration configuration)
-	throws Exception
+		throws Exception
     {
 		// Find targets
 		Target goal = ((RSConfiguration) configuration).getRobotStudioTarget();
@@ -255,97 +255,97 @@ public class RSRobot
     // Other methods
     public String toString()
     {
-	try
+		try
 	    {
-		return "'" + getName() + "'";
+			return "'" + getName() + "'";
 	    }
-	catch (Exception ex)
+		catch (Exception ex)
 	    {
-		return "''";
+			return "''";
 	    }
     }
-
+	
     public Mechanism getRobotStudioMechanism()
-	throws Exception
+		throws Exception
     {
 		return mechanism;
     }
-
+	
     public void addEntityToSpans(IEntity entity) 
-	throws Exception
+		throws Exception
     {
-	spans.addEntity(entity);
+		spans.addEntity(entity);
     }
-
+	
     /**
      * Starts the IABBS4Controller for robot if it is not already started.
      */
     private IABBS4Controller startController()
-	throws Exception
+		throws Exception
     {
-	station.setActiveMechanism(mechanism);
-
-	// Already started?
-	IABBS4Controller controller;
-
-	try
+		station.setActiveMechanism(mechanism);
+		
+		// Already started?
+		IABBS4Controller controller;
+		
+		try
 	    {
-		controller = mechanism.getController();
-
+			controller = mechanism.getController();
+			
+			return controller;
+	    }
+		catch (Exception e)
+	    {
+			// No controller started for this mechanism. Start one!
+			// Do we have to shut down any controllers that are running?
+	    }
+		
+		// Start virtual controller
+		controller = mechanism.startABBS4Controller(true);
+		
+		// We don't have to wait here? In RS2.0 it was necessary, but in RS3.0,
+		// the above call won't return until the controller has started?
+		// YES IT WILL! Better wait at least a second... ¤#&#@¤#%#!
+		Thread.sleep(1500);
+		
+		// Return the controller
 		return controller;
-	    }
-	catch (Exception e)
-	    {
-		// No controller started for this mechanism. Start one!
-		// Do we have to shut down any controllers that are running?
-	    }
-
-	// Start virtual controller
-	controller = mechanism.startABBS4Controller(true);
-
-	// We don't have to wait here? In RS2.0 it was necessary, but in RS3.0,
-	// the above call won't return until the controller has started?
-	// YES IT WILL! Better wait at least a second... ¤#&#@¤#%#!
-	Thread.sleep(1500);
-
-	// Return the controller
-	return controller;
     }
-
+	
     /**
      * Stops the controller for this mechanism.
      */
     private void stopController()
-	throws Exception
+		throws Exception
     {
-	// The controller should be up and running!
-	IABBS4Controller controller;
-
-	try
+		// The controller should be up and running!
+		IABBS4Controller controller;
+		
+		try
 	    {
-		controller = mechanism.getController();
+			controller = mechanism.getController();
 	    }
-	catch (Exception e)
+		catch (Exception e)
 	    {
-		// No controller started for this mechanism? Strange, but no problem!
+			// No controller started for this mechanism? Strange, but no problem!
+			return;
+	    }
+		
+		// Add ControllerListener to the mechanism so we can listen to the controller
+		Mechanism mech = Mechanism.getMechanismFromUnknown(mechanism);
+		ControllerListener controllerListener = new ControllerListener(true);
+		
+		mech.add_MechanismEventsListener(controllerListener);
+		
+		// Initialize shut down and wait for completion...
+		controller.shutDown();
+		controllerListener.waitForControllerShutDown();
+		
+		// We're ready! Stop listening!
+		mech.remove_MechanismEventsListener(controllerListener);
+		
+		// We're ready!
 		return;
-	    }
-
-	// Add ControllerListener to the mechanism so we can listen to the controller
-	Mechanism mech = Mechanism.getMechanismFromUnknown(mechanism);
-	ControllerListener controllerListener = new ControllerListener(true);
-
-	mech.add_MechanismEventsListener(controllerListener);
-
-	// Initialize shut down and wait for completion...
-	controller.shutDown();
-	controllerListener.waitForControllerShutDown();
-
-	// We're ready! Stop listening!
-	mech.remove_MechanismEventsListener(controllerListener);
-
-	// We're ready!
-	return;
     }
     
 
@@ -353,46 +353,46 @@ public class RSRobot
      * Finds and returns the main procedure of a mechanism program.
      */
     int tries = 0;
-
+	
     protected IABBS4Procedure getMainProcedure()
-	throws Exception
+		throws Exception
     {
-	IABBS4Modules modules = mechanism.getController().getModules();
-
-	for (int i = 1; i <= modules.getCount(); i++)
+		IABBS4Modules modules = mechanism.getController().getModules();
+		
+		for (int i = 1; i <= modules.getCount(); i++)
 	    {
-		IABBS4Procedures procedures = modules.item(Converter.var(i)).getProcedures();
-
-		for (int j = 1; j <= procedures.getCount(); j++)
+			IABBS4Procedures procedures = modules.item(Converter.var(i)).getProcedures();
+			
+			for (int j = 1; j <= procedures.getCount(); j++)
 		    {
-			IABBS4Procedure procedure = procedures.item(Converter.var(j));
-
-			if (procedure.getName().equals("main"))
+				IABBS4Procedure procedure = procedures.item(Converter.var(j));
+				
+				if (procedure.getName().equals("main"))
 			    {
-				if (procedure.getProcedureCalls().getCount() == 0)
+					if (procedure.getProcedureCalls().getCount() == 0)
 				    {
-					logger.info("Main procedure empty");
+						logger.info("Main procedure empty");
 				    }
-
-				return procedure;
+					
+					return procedure;
 			    }
 		    }
 	    }
-
-	// There is no main procedure!!
-	logger.warn("No main procedure found! Trying again...");
-
-	if (tries++ == 10)
+		
+		// There is no main procedure!!
+		logger.warn("No main procedure found! Trying again...");
+		
+		if (tries++ == 10)
 	    {
-		return null;
+			return null;
 	    }
-
-	// Wait a sec and try again...
-	Thread.sleep(500);
-
-	return getMainProcedure();
+		
+		// Wait a sec and try again...
+		Thread.sleep(500);
+		
+		return getMainProcedure();
     }
-
+	
 	/**
 	 * Adds a new path to robots main procedure.
 	 */
@@ -416,9 +416,9 @@ public class RSRobot
 		for (int k = 1;
 			 k <= mainProcedure.getProcedureCalls().getCount();
 			 k++)
-		    {
-				mainProcedure.getProcedureCalls().item(Converter.var(k)).delete();
-		    }
+		{
+			mainProcedure.getProcedureCalls().item(Converter.var(k)).delete();
+		}
 		
 		// Add path as only procedure in main
 		activePath.syncToVirtualController(RSCell.PATHSMODULE_NAME);    // Generate procedure from path
@@ -427,12 +427,12 @@ public class RSRobot
 		IABBS4Procedure proc = activePath.getProcedure();
 		mainProcedure.getProcedureCalls().add(activePath.getProcedure());
 	}
-
+	
 	public Path getActivePath() 
 	{
 		return activePath;
 	}
-
+	
 	public void setActivePath(Path activePath)
 	{
 		this.activePath = activePath;

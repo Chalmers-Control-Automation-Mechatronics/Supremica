@@ -26,8 +26,8 @@ class BoxSpanGenerator
 	 * Each time a robot collides with a box, add a layer of boxes,
 	 * (check with the matrix first).
 	 */
-// 	public void startCollision(Volume volume, Configuration configuration, int time)
-	public void startCollision(String name, int time)
+// 	public void collisionStart(Volume volume, Configuration configuration, int time)
+	public void collisionStart(String name, int time)
 	{
 // 		assert(volume instanceof Box);
 
@@ -95,8 +95,8 @@ class BoxSpanGenerator
 	/**
 	 * Don't care about these right now.
 	 */
-// 	public void endCollision(Volume volume, Configuration configuration, int time)
-	public void endCollision(String name, int time)
+// 	public void collisionEnd(Volume volume, Configuration configuration, int time)
+	public void collisionEnd(String name, int time)
 	{		
 	}
 }

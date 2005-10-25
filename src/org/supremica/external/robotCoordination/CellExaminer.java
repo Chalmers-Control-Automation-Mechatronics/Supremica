@@ -407,9 +407,9 @@ public class CellExaminer
 		}
 
 		// Discretization parameters
-		double dx = 0.2;
-		double dy = 0.2;
-		double dz = 0.2;
+		double dx = 0.5;
+		double dy = 0.5;
+		double dz = 0.5;
 		cell.setBoxDimensions(new double[] {dx,dy,dz});
 
 		// Hashtable associating coordinates with status of the corresponding box
@@ -424,7 +424,10 @@ public class CellExaminer
 		for (Iterator<Robot> robIt = robots.iterator(); robIt.hasNext(); )
 		{
 			Robot robot = robIt.next();
-
+			robot.start();
+			robot.jumpToConfiguration(robot.getConfigurations().get(0));
+			robot.stop();
+			
 			ActionTimer timer = new ActionTimer();
 			timer.start();
 
@@ -536,6 +539,7 @@ public class CellExaminer
 			List<Configuration> configurations = robot.getConfigurations();
 			// The first loop must start with the home configuration, since the 
 			// surfaceboxes always should be pushed "outwards"
+			/*
 			Configuration home = robot.getHomeConfiguration();
 			int homeIndex = configurations.indexOf(home);
 			assert(homeIndex >= 0);
@@ -545,9 +549,10 @@ public class CellExaminer
 				configurations.set(0, home);
 				configurations.set(homeIndex, temp);
 			}
+			*/
 			// Initialize the robot
 			robot.start();
-			robot.jumpToConfiguration(home);
+			//robot.jumpToConfiguration(home);
 			// Now the paths, two nested loops of configurations...
 			for (int i = 0; i < configurations.size(); i++)
 			{
@@ -563,7 +568,7 @@ public class CellExaminer
 				}
 			}
 			// Finalize the robot
-			robot.jumpToConfiguration(home);
+			robot.jumpToConfiguration(robot.getConfigurations().get(0));
 			robot.stop();		
 
 			/*

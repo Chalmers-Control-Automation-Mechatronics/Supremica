@@ -52,7 +52,7 @@ package org.supremica.external.robotCoordination.RobotStudio;
 import org.supremica.external.robotCoordination.Configuration;
 
 public class RichConfiguration
-    implements Configuration
+    extends Configuration
 {
     /** The name of this configuration */
     String name;

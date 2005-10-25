@@ -63,7 +63,7 @@ public class MechListener
     
     public MechListener(RSRobot robot) 
     {
-	super(robot);
+		super(robot);
     }
 
     ///////////////////////////////////////////////
@@ -72,66 +72,66 @@ public class MechListener
     
     public synchronized int targetReached()
     {
-	try
-	{
-	    int time = (int) controller.getMotionTime() * 1000;
-	    
-	    if (!leavingTarget)
-	    {
-		robot.getRobotListener().endCollision(RSCell.FINISHCONFIGURATION_NAME, time);
-	    }
-	    else
-	    {
-		robot.getRobotListener().endCollision(RSCell.STARTCONFIGURATION_NAME, time);
-	    }
+		try
+		{
+			int time = (int) controller.getMotionTime() * 1000;
 			
-	    leavingTarget = !leavingTarget;
-	}
-	catch (Exception ex)
-	{
-	    ex.printStackTrace();
-	}
+			if (!leavingTarget)
+			{
+				robot.getRobotListener().collisionEnd(RSCell.FINISHCONFIGURATION_NAME, time);
+			}
+			else
+			{
+				robot.getRobotListener().collisionEnd(RSCell.STARTCONFIGURATION_NAME, time);
+			}
+			
+			leavingTarget = !leavingTarget;
+		}
+		catch (Exception ex)
+		{
+			ex.printStackTrace();
+		}
 		
-	return 0;
+		return 0;
     }
     
     public synchronized int collisionStart(RsObject collidingObject)
     {
-	try 
-	{
-	    if (collidingObject.getObjectType() == RsObjectType.rsObjectTypeEntity)
-	    {				
-		String name = collidingObject.getName();
-		int time = (int) controller.getMotionTime() * 1000;
+		try 
+		{
+			if (collidingObject.getObjectType() == RsObjectType.rsObjectTypeEntity)
+			{				
+				String name = collidingObject.getName();
+				int time = (int) controller.getMotionTime() * 1000;
+				
+				robot.getRobotListener().collisionStart(name, time);
+			}		
+		}
+		catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
 		
-		robot.getRobotListener().startCollision(name, time);
-	    }		
-	}
-	catch (Exception e) 
-	{
-	    e.printStackTrace();
-	}
-	
-	return 0;
+		return 0;
     }
     
     public synchronized int collisionEnd(RsObject collidingObject)
     {
-	try 
-	{
-	    if (collidingObject.getObjectType() == RsObjectType.rsObjectTypeEntity)
-	    {			
-		String name = collidingObject.getName();
-		int time = (int) controller.getMotionTime() * 1000;
-					
-		robot.getRobotListener().endCollision(name, time);
-	    }		
-	} 
-	catch (Exception e) 
-	{
-	    e.printStackTrace();
-	}
-	
-	return 0;
+		try 
+		{
+			if (collidingObject.getObjectType() == RsObjectType.rsObjectTypeEntity)
+			{			
+				String name = collidingObject.getName();
+				int time = (int) controller.getMotionTime() * 1000;
+				
+				robot.getRobotListener().collisionEnd(name, time);
+			}		
+		} 
+		catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
+		
+		return 0;
     }
 }
