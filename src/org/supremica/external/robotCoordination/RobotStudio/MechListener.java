@@ -143,10 +143,11 @@ public class MechListener
 		
 		if (robotListener instanceof BoxSpanGenerator) 
 		{
-			ITransform trans = ((IEntity)collidingObject).getTransform();
-			Coordinate coord = Converter.toCoordinate(trans);
-			
-			return new RSBox(name, coord);
+			// Convert the name of the object to Coordinate and return a new RSBox
+			return new RSBox(name, Converter.toCoordinate(name));
+
+// 			ITransform trans = ((IEntity)collidingObject).getTransform();
+// 			Coordinate coord = Converter.toCoordinate(trans);
 		}
 		
 		return new RSVolume(name);

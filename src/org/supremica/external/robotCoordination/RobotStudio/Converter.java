@@ -92,13 +92,13 @@ public class Converter {
      */
     static Coordinate toCoordinate(double x, double y, double z) 
     {
-	double[] scaling = RSCell.boxDimensions;
+		double[] scaling = RSCell.boxDimensions;
 		
-	x /= scaling[0];
-	y /= scaling[1];
-	z /= scaling[2];
+		x /= scaling[0];
+		y /= scaling[1];
+		z /= scaling[2];
 
-	return new Coordinate((int) Math.floor(x), (int) Math.floor(y), (int) Math.floor(z));
+		return new Coordinate((int) Math.floor(x), (int) Math.floor(y), (int) Math.floor(z));
     }
 
     /**
@@ -106,29 +106,46 @@ public class Converter {
      */
     static Coordinate toCoordinate(ITransform trans) 
     {
-	try
-	{
-	    return toCoordinate(trans.getX(), trans.getY(), trans.getZ());
-	}
-	catch (Exception e) 
-	{
-	    e.printStackTrace();
-	    return null;
-	}
+		try
+		{
+			return toCoordinate(trans.getX(), trans.getY(), trans.getZ());
+		}
+		catch (Exception e) 
+		{
+			e.printStackTrace();
+			return null;
+		}
     }
+
+	/*
+	 * Converts a coordinate name to a Supremica Coordinate
+	 */
+	static Coordinate toCoordinate(String name) 
+	{
+		String[] strCoords = name.split("_");
+		int[] coords = new int[3];
+
+		for (int i = 1; i<strCoords.length; i++) 
+		{
+			strCoords[i].replace("m", "-");
+			coords[i-1] = (new Integer(strCoords[i])).intValue();
+		}
+		
+		return new Coordinate(coords);
+	}
 
     /**
      * Converts a Supremica Coordinate to a 3D-point in the world frame of RobotStudio
      */
     static double[] toRSPoint(Coordinate coord) 
     {
-	double[] scaling = RSCell.boxDimensions;
-	double[] pointCoord = new double[3];
+		double[] scaling = RSCell.boxDimensions;
+		double[] pointCoord = new double[3];
 		
-	pointCoord[0] = coord.getX() * scaling[0];
-	pointCoord[1] = coord.getY() * scaling[1];
-	pointCoord[2] = coord.getZ() * scaling[2];
+		pointCoord[0] = coord.getX() * scaling[0];
+		pointCoord[1] = coord.getY() * scaling[1];
+		pointCoord[2] = coord.getZ() * scaling[2];
 		
-	return pointCoord;
+		return pointCoord;
     }
 }

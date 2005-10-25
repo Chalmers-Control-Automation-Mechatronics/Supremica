@@ -427,7 +427,7 @@ public class MechanismListener
 	
     public synchronized void setController(IABBS4Controller controller)
     {
-		this.controller = controller;
+	this.controller = controller;
     }
 	
     public synchronized void waitForControllerShutDown()

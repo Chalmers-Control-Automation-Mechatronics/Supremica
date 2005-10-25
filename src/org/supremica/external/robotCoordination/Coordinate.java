@@ -19,6 +19,11 @@ public class Coordinate
 		this.y = y;
 		this.z = z;
 	}
+
+	public Coordinate(int[] coords)
+	{
+		this(coords[0], coords[1], coords[2]);
+	}
 	
 	public int getX() { return x; };
 	public int getY() { return y; };

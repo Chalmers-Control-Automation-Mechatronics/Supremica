@@ -19,28 +19,28 @@ public class RSBox
     protected Coordinate coord;
 
     public RSBox(String name, Coordinate coord) 
-	throws Exception
+		throws Exception
     {
- 	super(name);
-// 	this.name = name;
-	this.coord = coord;
+		super(name);
+		// 	this.name = name;
+		this.coord = coord;
     }
 
     protected IEntity getEntity()
-	throws Exception
+		throws Exception
     {
-	IPart boxPart = RSCell.station.getParts().item(Converter.var(RSCell.BOXPART_NAME));
-	return boxPart.getEntities().item(Converter.var(name));
+		IPart boxPart = RSCell.station.getParts().item(Converter.var(RSCell.BOXPART_NAME));
+		return boxPart.getEntities().item(Converter.var(name));
     }
 
     public Coordinate getCoordinate() 
     {
-	return coord;
+		return coord;
     }
 
     public void setCoordinate(Coordinate coord) 
     {
-	this.coord = coord;
+		this.coord = coord;
     }
 
 

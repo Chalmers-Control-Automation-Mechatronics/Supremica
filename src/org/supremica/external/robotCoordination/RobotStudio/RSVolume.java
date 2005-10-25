@@ -18,37 +18,37 @@ public class RSVolume
 
     public RSVolume(String name)
     {
-	this.name = name;
+		this.name = name;
     }
 
     public void delete() 
-	throws Exception
+		throws Exception
     {
-	getEntity().delete();
+		getEntity().delete();
     }
 
     public void setColor(Color color)
-	throws Exception
+		throws Exception
     {
-	Variant varColor = new Variant(new SafeArray(new int[] {color.getRed(), color.getGreen(), color.getBlue()}), false);
-	getEntity().setColor(varColor);
+		Variant varColor = new Variant(new SafeArray(new int[] {color.getRed(), color.getGreen(), color.getBlue()}), false);
+		getEntity().setColor(varColor);
     }
 	
     public void setTransparency(double transparency)
-	throws Exception
+		throws Exception
     {
-	getEntity().setRelativeTransparency((float) transparency);
+		getEntity().setRelativeTransparency((float) transparency);
     }
 
     public String getName()
     {
-	return name;
+		return name;
     }
 
     protected IEntity getEntity()
-	throws Exception
+		throws Exception
     {
-	IPart volumePart = RSCell.station.getParts().item(Converter.var(RSCell.VOLUMEPART_NAME));
-	return volumePart.getEntities().item(Converter.var(name));
+		IPart volumePart = RSCell.station.getParts().item(Converter.var(RSCell.VOLUMEPART_NAME));
+		return volumePart.getEntities().item(Converter.var(name));
     }
 }
