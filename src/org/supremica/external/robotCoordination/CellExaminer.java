@@ -449,6 +449,8 @@ public class CellExaminer
 				Coordinate coord = boxesToExamine.first();
 				boxesToExamine.remove(coord);
 				
+				// Examine status and set this box as checked (we will
+				// soon check it!)
 				Status status;
 				if (!matrix.containsKey(coord))
 				{
@@ -463,6 +465,7 @@ public class CellExaminer
 					// If it's already checked, move on!
 					if (status.checked)
 						continue;
+					status.checked = true;
 				}
 
 				// Inside robot?
@@ -488,7 +491,6 @@ public class CellExaminer
 
 					Coordinate newCoord;
 					Box newBox;
-					Status newStatus;
 
 					// Down
 					newCoord = new Coordinate(x,y,z-1);
@@ -526,7 +528,44 @@ public class CellExaminer
 				return;
 			} 
 			
-			// DO THE SPAN-STUFF HERE!!!
+			// Listen to the robot (for collisions - a part of the box span generation!)
+			RobotListener listener = new BoxSpanGenerator(cell, robot, matrix, zoneBoxes, surfaceBoxes);
+			robot.addRobotListener(listener);
+			
+			// Push boxes for each "path", i.e. unique pair of configurations
+			List<Configuration> configurations = robot.getConfigurations();
+			// The first loop must start with the home configuration, since the 
+			// surfaceboxes always should be pushed "outwards"
+			Configuration home = robot.getHomeConfiguration();
+			int homeIndex = configurations.indexOf(home);
+			assert(homeIndex >= 0);
+			if (homeIndex != 0)
+			{
+				Configuration temp = configurations.get(0);
+				configurations.set(0, home);
+				configurations.set(homeIndex, temp);
+			}
+			// Initialize the robot
+			robot.start();
+			robot.jumpToConfiguration(home);
+			// Now the paths, two nested loops of configurations...
+			for (int i = 0; i < configurations.size(); i++)
+			{
+				Configuration from = (Configuration) configurations.get(i);
+				
+				for (int j = i + 1; j < configurations.size(); j++)
+				{
+					Configuration to = (Configuration) configurations.get(j);
+					
+					// Generate span!
+					logger.info("Pushing boxes moving from " + from + " to " + to + " for " + robot + ".");
+					cell.runSimulation(robot, from, to);
+				}
+			}
+			// Finalize the robot
+			robot.jumpToConfiguration(home);
+			robot.stop();		
+
 			/*
 			Set collisionSet = new Set();
 			for (Iterator<Box> boxIt = surfaceBoxes.iterator(); boxIt.hasNext(); )
@@ -573,48 +612,35 @@ public class CellExaminer
 				Status status = matrix.get(coord);
 				status.checked = false;
 			}			
-
+			
 			// It's over for this robot. Remove the "surfaceboxes"
 			timer.stop();
 			logger.info("Execution completed for robot " + robot + " after " + timer.toString());
 			logger.info("Amount of surfaceboxes: " + surfaceBoxes.size());
+			logger.info("Amount of spanboxes: " + surfaceBoxes.size());
 			while (surfaceBoxes.size() != 0)
 			{
 				Coordinate coord = surfaceBoxes.remove(0);
-				matrix.remove(coord);
+				try
+				{
+					cell.destroyBox(coord);
+				}
+				catch (Exception ex)
+				{
+					// Box already deleted (I hope).
+				}
+
+				// If the box has been occupied, then it's important to keep the matrix info!
+				Status status = matrix.get(coord);
+				if (status.occupied == false)
+				{
+					matrix.remove(coord);
+				}
+
 				//Box box = cell.createBox(coord);
 				//box.setColor(GREEN);
 				//box.setTransparency(TRANSPARENCY);
 			}
 		}
 	}
-
-	/* JUNK
-	private void addBoxToExamine(List<Box> boxesToExamine, 
-								 Hashtable<Coordinate, Status> matrix,  
-								 Coordinate coord)
-		throws Exception
-	{
-		// If the box is already added for this robot, it will have its checked-status
-		// set to true!!
-		if (!matrix.containsKey(coord) || !matrix.get(coord).checked)
-		{
-			Box newBox = cell.createBox(coord, ORANGE, TRANSPARENCY);
-			//boxesToExamine.add(boxesToExamine.size(), newBox);
-			boxesToExamine.add(newBox);
-			
-			Status status = new Status();
-			status.occupied = false;
-			status.checked = true;
-			matrix.put(coord, status);
-			
-		}
-	}
-	*/
-}
-
-class Status
-{
-	protected boolean occupied;
-	protected boolean checked;
 }

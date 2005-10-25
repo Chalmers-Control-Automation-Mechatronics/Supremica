@@ -127,18 +127,20 @@ public class RSRobot
 		//return true;
     }
 	
-    public Coordinate getBaseCoordinates() throws Exception {
+    public Coordinate getBaseCoordinates() throws Exception 
+	{
 	    return Converter.toCoordinate(mechanism.getTransform().getX(), mechanism.getTransform().getY(), mechanism.getTransform().getZ());
     }
 	
     public Configuration getHomeConfiguration()
-	throws Exception
+		throws Exception
     {
-	ITargets robotTargets = mechanism.getWorkObjects().item(Converter.var(1)).getTargets();    // takes the targets from Elements
-
-	return new RSConfiguration(robotTargets.item(Converter.var(1)));
+		// takes the targets from Elements
+		ITargets robotTargets = mechanism.getWorkObjects().item(Converter.var(1)).getTargets();    
+		
+		return new RSConfiguration(robotTargets.item(Converter.var(1)));
     }
-
+	
     public void generateSpan(Configuration from, Configuration to)
 		throws Exception
     {

@@ -1,60 +1,99 @@
 package org.supremica.external.robotCoordination;
 
+import java.awt.Toolkit;
+import java.util.*;
+
 class BoxSpanGenerator
 	implements RobotListener
 {
-	public BoxSpanGenerator()
+	Cell cell; 
+	Robot robot; 
+	Hashtable<Coordinate, Status> matrix; 
+	List<Coordinate> zoneBoxes; 
+	List<Coordinate> surfaceBoxes;
+	
+	public BoxSpanGenerator(Cell cell, Robot robot, Hashtable<Coordinate, Status> matrix, 
+							List<Coordinate> zoneBoxes, List<Coordinate> surfaceBoxes)
 	{
-
+		this.cell = cell;
+		this.robot = robot;
+		this.matrix = matrix;
+		this.zoneBoxes = zoneBoxes;
+		this.surfaceBoxes = surfaceBoxes;
 	}
 
 	/**
 	 * Each time a robot collides with a box, add a layer of boxes,
-	 * but check with the matrix first.
+	 * (check with the matrix first).
 	 */
 // 	public void startCollision(Volume volume, Configuration configuration, int time)
 	public void startCollision(String name, int time)
 	{
 // 		assert(volume instanceof Box);
 
-		// TODO:
-		// Leta fram boxen med namnet name i boxesToExamine.
-
 		/*
 		Box box = (Box) volume;
-		Coordinate coorde = box.getCoordinate();
+		Coordinate coord = box.getCoordinate();
+		// Don't need this one anymore
+		box.delete();
 
+		// If someone has already collided with this box, this is now a zoneBox!!!
+		Status status = matrix.get(coord);
+		if (status.occupied)
+		{
+			// Beep and add!
+			Toolkit.getDefaultToolkit().beep();
+			zoneBoxes.add(coord);
+		}
+		// No matter what, box has now been occupied
+		status.occupied = true;
+		assert(status.checked = true);
+		status.checked = true;
+
+		// Add new surfaceboxes!
 		int x = coord.getX();
 		int y = coord.getY();
  		int z = coord.getZ();
 		
-		Coordinate newCoord;
+ 		Coordinate newCoord;
 		Box newBox;
 		Status newStatus;
-		
+				
 		// Down
 		newCoord = new Coordinate(x,y,z-1);
-		boxesToExamine.add(newCoord);
+		if (!matrix.containsKey(newCoord))
+		{
+			newStatus = new Status();
+			newStatus.occupied = false;
+			newStatus.checked = true;
+			matrix.put(newCoord, newStatus);
+		}
+		else
+		{
+			newStatus = matrix.get(newCoord);
+			// If it's already checked, move on!
+			if (!newStatus.checked)
+			{
+				Box box = cell.createBox(newCoord);
+				surfaceBoxes.add(box);
+			}
+		}
+
 		// Right
 		newCoord = new Coordinate(x,y-1,z);
-		boxesToExamine.add(newCoord);
 		// Back
 		newCoord = new Coordinate(x-1,y,z);
-		boxesToExamine.add(newCoord);
 		// Forward
 		newCoord = new Coordinate(x+1,y,z);
-		boxesToExamine.add(newCoord);
 		// Left
 		newCoord = new Coordinate(x,y+1,z);
-		boxesToExamine.add(newCoord);
 		// Up
 		newCoord = new Coordinate(x,y,z+1);
-		boxesToExamine.add(newCoord);
 		*/
 	}
 
 	/**
-	 * Don't care about these.
+	 * Don't care about these right now.
 	 */
 // 	public void endCollision(Volume volume, Configuration configuration, int time)
 	public void endCollision(String name, int time)
