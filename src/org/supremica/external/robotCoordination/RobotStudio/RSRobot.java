@@ -75,10 +75,13 @@ public class RSRobot
     private Station station;
     private Part spans;
 
-    /** Keeps track of robots current path */
-    private Path activePath = null;
+	/** The currently running listener. */
+	private MechanismListener mechanismListener = null;
 
-    /** Keeps track of current RobotListener */
+    /** Keeps track of the robot's current path. */
+    private Path activePath = null; // Why is that necessary?
+
+    /** Keeps track of current RobotListener. */
     private RobotListener robotListener;
 	
     public RSRobot(Mechanism mechanism, Station station)
@@ -117,21 +120,20 @@ public class RSRobot
 		return list;
     }
 	
-    /**
-     * Examines if this robot collides with the given box in the current configuration.
-     */
-    public boolean collidesWith(Box box) 
+    public boolean collidesWith(Volume volume) 
 		throws Exception
     {
-		// Please move this method from MechanismListener to somewhere more logical
-		return MechanismListener.entityCollidesWith(mechanism, ((RSBox) box).getEntity());
-		//return true;
+		// Please move this method from MechanismListener to somewhere
+		// more logical... like here?
+		return MechanismListener.entityCollidesWith(mechanism, ((RSVolume) volume).getEntity());
     }
 	
     public Coordinate getBaseCoordinates() 
 		throws Exception 
     {
-		return Converter.toCoordinate(mechanism.getTransform().getX(), mechanism.getTransform().getY(), mechanism.getTransform().getZ());
+		return Converter.toCoordinate(mechanism.getTransform().getX(), 
+									  mechanism.getTransform().getY(), 
+									  mechanism.getTransform().getZ());
     }
 	
     public synchronized Configuration createConfigurationAtTCP()
@@ -242,14 +244,14 @@ public class RSRobot
     public void jumpToConfiguration(Configuration configuration)
 		throws Exception
     {
-	// Find targets
-	Target goal = ((RSConfiguration) configuration).getRobotStudioTarget();
+		// Find targets
+		Target goal = ((RSConfiguration) configuration).getRobotStudioTarget();
 		
-	// Jump to the "from"-target
-	mechanism.jumpToTarget(goal);
+		// Jump to the "from"-target
+		mechanism.jumpToTarget(goal);
 		
-	// Takes a while?
-	Thread.sleep(1000);
+		// Takes a while?
+		Thread.sleep(1000);
     }
 	
     // Other methods
@@ -268,7 +270,7 @@ public class RSRobot
     public Mechanism getRobotStudioMechanism()
 		throws Exception
     {
-	return mechanism;
+		return mechanism;
     }
 	
     public void addEntityToSpans(IEntity entity) 
@@ -436,11 +438,21 @@ public class RSRobot
     }
 
     public void setRobotListener(RobotListener robotListener) 
-	throws Exception
+		throws Exception
     {
 		this.robotListener = robotListener;
 		
-		mechanism.add_MechanismEventsListener(new MechListener(this));
+		// Add or remove listener from mechanism
+		if (robotListener != null)
+		{
+			mechanismListener = new MechListener(this);
+			mechanism.add_MechanismEventsListener(mechanismListener);
+		}
+		else
+		{
+			mechanism.remove_MechanismEventsListener(mechanismListener);
+			mechanismListener = null;
+		}
     }
 	
     public RobotListener getRobotListener()

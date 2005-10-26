@@ -54,10 +54,23 @@ import org.supremica.external.robotCoordination.*;
 import org.supremica.external.comInterfaces.robotstudio_3_1.RobotStudio.ITransform;
 
 /**
- * A static class that contains conversion methods between Supremica and RobotStudio.
+ * A static class that contains conversion methods for conversion
+ * between Supremica and RobotStudio formats.
  */
 public class Converter 
 {
+	/** 
+	 * Offset (times the scaling). With an OFFSET-value of 0.5 and a
+	 * scaling of 1 in all directions, this means that the
+	 * "Supremica"-coordinate <0,0,0> ends up in the
+	 * "RobotStudio"-coordinate <-0.5,-0.5,-0,5>, i.e. offset half a
+	 * box in all directions so that the "Supremica"-coordinate ends
+	 * up in the middle of the box. In general, this is beneficial for
+	 * keeping the amount of boxes low because of the symmetry of the
+	 * robot.
+	 */
+	private static final double OFFSET = 0.5;
+
     /**
      * Typecast i into Variant, for convenience! (Variant is something like
      * VB:s counterpart of java's Object.)
@@ -95,6 +108,10 @@ public class Converter
     {
 		double[] scaling = RSCell.boxDimensions;
 		
+		x += OFFSET * scaling[0];
+		y += OFFSET * scaling[1];
+		z += OFFSET * scaling[2];
+
 		x /= scaling[0];
 		y /= scaling[1];
 		z /= scaling[2];
@@ -118,7 +135,7 @@ public class Converter
 		}
     }
 
-	/*
+	/**
 	 * Converts a coordinate name to a Supremica Coordinate
 	 */
 	static Coordinate toCoordinate(String name) 
@@ -143,9 +160,9 @@ public class Converter
 		double[] scaling = RSCell.boxDimensions;
 		double[] pointCoord = new double[3];
 		
-		pointCoord[0] = coord.getX() * scaling[0];
-		pointCoord[1] = coord.getY() * scaling[1];
-		pointCoord[2] = coord.getZ() * scaling[2];
+		pointCoord[0] = coord.getX() * scaling[0] - OFFSET * scaling[0];
+		pointCoord[1] = coord.getY() * scaling[1] - OFFSET * scaling[1];
+		pointCoord[2] = coord.getZ() * scaling[2] - OFFSET * scaling[2];
 		
 		return pointCoord;
     }

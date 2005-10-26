@@ -389,7 +389,19 @@ public class CellExaminer
 	}
 
 	/**
-	 * Does the box strategy stuff. 
+	 * Does the box strategy stuff. The span of a robot is
+	 * approximated as neighbouring boxes. Which boxes are occupied by
+	 * a robot during its motion is calculated first by starting at a
+	 * known coordinate inside the robot and examining for the
+	 * corresponding box whether it "collides" with the robot or
+	 * not. If it collides, all the neighbouring boxes are exained in
+	 * the same fashion. During this process, only the boxes that are
+	 * found to be entirely outside the robot from the start are saved
+	 * and represented in the simulation environment. After this, the
+	 * robot moves through its entire repertiore of motions and each
+	 * time the robot collides with a box, that box is deleted and a
+	 * part of the "span" while a new layer of boxes is added
+	 * "outside" the removed box.
 	 */
 	private void boxStrategy(Cell cell)
 		throws Exception
@@ -449,7 +461,7 @@ public class CellExaminer
 			boxesToExamine.add(base);
 			
 			// Start loop!
-			while (boxesToExamine.size() != 0)
+			loop: while (boxesToExamine.size() != 0)
 			{
 			 	// Get the status for this box
 				Coordinate coord = boxesToExamine.first();
@@ -470,14 +482,14 @@ public class CellExaminer
 					status = matrix.get(coord);
 					// If it's already checked, move on!
 					if (status.checked)
-						continue;
+						continue loop;
 					status.checked = true;
 				}
-
-				// Inside robot?
 				Box box = cell.createBox(coord);
 				//box.setColor(ORANGE);
 				box.setTransparency(TRANSPARENCY);
+
+				// Inside robot?
 				if (robot.collidesWith(box))
 				{
 					// Remove from simulation environment
@@ -566,9 +578,8 @@ public class CellExaminer
 				}
 			}
 			// Finalize the robot
-			Thread.sleep(100);
 			robot.jumpToConfiguration(home);
-			Thread.sleep(100);
+			cell.runSimulation(robot, home, home);
 			robot.stop();		
 
 			//////////////
@@ -594,12 +605,13 @@ public class CellExaminer
 				}
 				catch (Exception ex)
 				{
-					// Box already deleted (I hope).
+					// Box already deleted during the "pushing" (I hope).
 					surfaceboxCount--;
 				}
 
 				// If the box has been occupied, then it's important to keep the matrix info!
 				Status status = matrix.get(coord);
+				status.checked = false;
 				if (status.occupied == false)
 				{
 					matrix.remove(coord);
@@ -609,10 +621,14 @@ public class CellExaminer
 				//box.setColor(GREEN);
 				//box.setTransparency(TRANSPARENCY);
 			}
+			robot.setRobotListener(null);
 			robottimer.stop();
 			logger.info("Execution completed for robot " + robot + " after " + robottimer + ".");
 			logger.info("Amount of surfaceboxes: " + surfaceboxCount);	
 		}
+
+		// Don't need this one anymore
+		matrix.clear();
 
 		// Show the result, the zoneboxes!
 		timer.stop();
@@ -621,6 +637,8 @@ public class CellExaminer
 		while (zoneboxes.size() != 0)
 		{
 			Coordinate coord = zoneboxes.remove(0);
+			if (zoneboxes.contains(coord))
+				continue;
 
 			Box box = cell.createBox(coord);
 			box.setColor(BLUE);

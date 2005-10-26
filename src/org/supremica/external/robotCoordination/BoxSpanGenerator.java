@@ -46,6 +46,7 @@ public class BoxSpanGenerator
 			logger.warn("Caution! Robot " + robot + " unexpectedly collided with the object " + volume + 
 						". If this is a static object in the cell, more advanced path planning " + 
 						"is needed to avoid that object. This path should not be used!");
+			return;
 		}
 
 		// So, it's a box!
@@ -87,7 +88,8 @@ public class BoxSpanGenerator
 		list.add(new Coordinate(x+1,y,z));
 		// Back
 		list.add(new Coordinate(x-1,y,z));
-		while (list.size() != 0)
+		// Add boxes for these coordinates
+		loop: while (list.size() != 0)
 		{
 			newCoord = list.remove(0);
 
@@ -106,7 +108,7 @@ public class BoxSpanGenerator
 				// If it's already checked, move on!
 				if (newStatus.checked)
 				{
-					continue;
+					continue loop;
 				}
 			}
 			newBox = cell.createBox(newCoord);
