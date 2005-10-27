@@ -905,7 +905,6 @@ int step_5()
 	/* Process next element in B */
   } while ((elb = elb->bprime_next) != NULL);
 
-
   return 0;
 } /* step_5 */
 
@@ -933,16 +932,12 @@ int step_5()
  * (i.e. not only the edges where count becomes zero as written
  * in the article)
  */
-
 int step_7()
 {
-
   struct element *elb,*el_1;
   struct edge *ed;
 
-
   elb = Bprime;
-
 
   do {
 
@@ -970,7 +965,7 @@ int step_7()
 } /* step_7 */
 
 
-/*
+/**
  * grcp
  *
  * This is the actual loop repeating the refinement steps 1 to 7
@@ -989,17 +984,16 @@ int grcp()
 	// Q = X_i ,i.e. , all processes
 	// are bisimulation equivalent
 
-  while (C != NULL) {
-
+  while (C != NULL) 
+  {	
 	Iteration++;
-
+	
 	step_1_2();
 	step_3();
 	step_4();
-	step_5() ;
+	step_5();
 	step_4(); /* step 6 is same as step 4 */
-	step_7();
-
+	step_7();	
   }
   return 0;
 } /* grcp */
@@ -1017,7 +1011,7 @@ JNIEXPORT void JNICALL Java_org_supremica_automata_algorithms_minimization_Bisim
   NBROFEVENTS = (int) nbrOfEvents;
   NBROFTRANSITIONS = (int) nbrOfTransitions;
   int NBROFINITIALPARTITIONS = 1 + env->GetArrayLength(initialPartitioning) - nbrOfStates;
-
+  
   //printf("States: %i, events: %i, transitions: %i, partitions: %i\n", NBROFSTATES, NBROFEVENTS, NBROFTRANSITIONS, NBROFINITIALPARTITIONS);
 
   // Assign initial partitioning
