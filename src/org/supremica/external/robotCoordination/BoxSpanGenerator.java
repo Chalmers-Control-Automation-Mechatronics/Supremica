@@ -15,16 +15,16 @@ public class BoxSpanGenerator
 {
 	private static Logger logger = LoggerFactory.createLogger(BoxSpanGenerator.class);
 
-    Cell cell; 
-    Robot robot; 
-    Hashtable<Coordinate, Status> matrix; 
-    List<Coordinate> zoneboxes; 
+    Cell cell;
+    Robot robot;
+    Hashtable<Coordinate, Status> matrix;
+    List<Coordinate> zoneboxes;
     List<Coordinate> surfaceboxes;
-	
+
 	/**
 	 * The BoxSpanGenerator needs a lot of info from the CellExaminer.
 	 */
-    public BoxSpanGenerator(Cell cell, Robot robot, Hashtable<Coordinate, Status> matrix, 
+    public BoxSpanGenerator(Cell cell, Robot robot, Hashtable<Coordinate, Status> matrix,
 							List<Coordinate> zoneboxes, List<Coordinate> surfaceboxes)
 	{
 		this.cell = cell;
@@ -43,8 +43,9 @@ public class BoxSpanGenerator
     {
 		if (!(volume instanceof Box))
 		{
-			logger.warn("Caution! Robot " + robot + " unexpectedly collided with the object " + volume + 
-						". If this is a static object in the cell, more advanced path planning " + 
+			CellExaminer.beep();
+			logger.warn("Caution! Robot " + robot + " unexpectedly collided with the object " + volume +
+						". If this is a static object in the cell, more advanced path planning " +
 						"is needed to avoid that object. This path should not be used!");
 			return;
 		}
@@ -54,7 +55,7 @@ public class BoxSpanGenerator
 		Coordinate coord = box.getCoordinate();
 		// Don't need this one anymore
 		box.delete();
-		
+
 		// If someone has already collided with this box, this is now a zoneBox!!!
 		Status status = matrix.get(coord);
 		if (status.occupied)
@@ -65,16 +66,16 @@ public class BoxSpanGenerator
 		}
 		// No matter what, box has now been occupied
 		status.occupied = true;
-		
+
 		// Add new surfaceboxes!
 		int x = coord.getX();
 		int y = coord.getY();
 		int z = coord.getZ();
-		
+
 		Coordinate newCoord;
 		Box newBox;
 		Status newStatus;
-		
+
 		List<Coordinate> list = new LinkedList<Coordinate>();
 		// Up
 		list.add(new Coordinate(x,y,z+1));
@@ -115,7 +116,9 @@ public class BoxSpanGenerator
 			newBox.setColor(CellExaminer.BLACK);
 			newBox.setTransparency(CellExaminer.TRANSPARENCY);
 			newStatus.checked = true;
-			surfaceboxes.add(newCoord);	
+			surfaceboxes.add(newCoord);
+
+			CellExaminer.beep();
 		}
 	}
 
@@ -123,6 +126,6 @@ public class BoxSpanGenerator
      * Don't care about these right now.
      */
     public void collisionEnd(Volume volume, int time)
-    {		
+    {
     }
 }

@@ -78,10 +78,10 @@ public class RSRobot
 	/** The currently running listener. */
 	private MechanismListener mechanismListener = null;
 
-    /** Keeps track of the robot's current path. */
-    private Path activePath = null; // Why is that necessary?
+    /** Keeps track of robots current path */
+    private Path activePath = null;
 
-    /** Keeps track of current RobotListener. */
+    /** Keeps track of current RobotListener */
     private RobotListener robotListener;
 	
     public RSRobot(Mechanism mechanism, Station station)
@@ -123,17 +123,14 @@ public class RSRobot
     public boolean collidesWith(Volume volume) 
 		throws Exception
     {
-		// Please move this method from MechanismListener to somewhere
-		// more logical... like here?
+		// Please move this method from MechanismListener to somewhere more logical
 		return MechanismListener.entityCollidesWith(mechanism, ((RSVolume) volume).getEntity());
     }
 	
     public Coordinate getBaseCoordinates() 
 		throws Exception 
     {
-		return Converter.toCoordinate(mechanism.getTransform().getX(), 
-									  mechanism.getTransform().getY(), 
-									  mechanism.getTransform().getZ());
+		return Converter.toCoordinate(mechanism.getTransform().getX(), mechanism.getTransform().getY(), mechanism.getTransform().getZ());
     }
 	
     public synchronized Configuration createConfigurationAtTCP()
@@ -244,14 +241,14 @@ public class RSRobot
     public void jumpToConfiguration(Configuration configuration)
 		throws Exception
     {
-		// Find targets
-		Target goal = ((RSConfiguration) configuration).getRobotStudioTarget();
+	// Find targets
+	Target goal = ((RSConfiguration) configuration).getRobotStudioTarget();
 		
-		// Jump to the "from"-target
-		mechanism.jumpToTarget(goal);
+	// Jump to the "from"-target
+	mechanism.jumpToTarget(goal);
 		
-		// Takes a while?
-		Thread.sleep(1000);
+	// Takes a while?
+	Thread.sleep(1000);
     }
 	
     // Other methods
@@ -270,7 +267,7 @@ public class RSRobot
     public Mechanism getRobotStudioMechanism()
 		throws Exception
     {
-		return mechanism;
+	return mechanism;
     }
 	
     public void addEntityToSpans(IEntity entity) 
@@ -351,9 +348,8 @@ public class RSRobot
     /**
      * Finds and returns the main procedure of a mechanism program.
      */
-    int tries = 0;
-	
-    protected IABBS4Procedure getMainProcedure()
+    int tries = 10;
+	protected IABBS4Procedure getMainProcedure()
 		throws Exception
     {
 		IABBS4Modules modules = mechanism.getController().getModules();
@@ -370,7 +366,8 @@ public class RSRobot
 			    {
 					if (procedure.getProcedureCalls().getCount() == 0)
 				    {
-						logger.info("Main procedure empty");
+						// Fine!
+						//logger.info("Main procedure empty");
 				    }
 					
 					return procedure;
@@ -381,7 +378,7 @@ public class RSRobot
 		// There is no main procedure!!
 		logger.warn("No main procedure found! Trying again...");
 		
-		if (tries++ == 10)
+		if (--tries == 0)
 	    {
 			return null;
 	    }
@@ -453,6 +450,12 @@ public class RSRobot
 			mechanism.remove_MechanismEventsListener(mechanismListener);
 			mechanismListener = null;
 		}
+
+		/*
+		this.robotListener = robotListener;
+		
+		mechanism.add_MechanismEventsListener(new MechListener(this));
+		*/
     }
 	
     public RobotListener getRobotListener()

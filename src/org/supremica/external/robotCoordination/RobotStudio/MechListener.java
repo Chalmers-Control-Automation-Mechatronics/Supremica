@@ -61,11 +61,14 @@ public class MechListener
     extends MechanismListener
 {
     private RSRobot robot;
+    private RobotListener robotListener;
     
     public MechListener(RSRobot robot) 
     {
 		super(robot);
 		
+		robotListener = robot.getRobotListener();
+
 		try 
 		{
 			controller = robot.getRobotStudioMechanism().getController();
@@ -88,7 +91,7 @@ public class MechListener
 			{				
 				int time = (int) controller.getMotionTime() * 1000;
 				
-				robot.getRobotListener().collisionStart(makeVolume(collidingObject), time);
+				robotListener.collisionStart(makeVolume(collidingObject), time);
 			}		
 		}
 		catch (Exception e) 
@@ -107,7 +110,7 @@ public class MechListener
 			{			
 				int time = (int) controller.getMotionTime() * 1000;
 				
-				robot.getRobotListener().collisionEnd(makeVolume(collidingObject), time);
+				robotListener.collisionEnd(makeVolume(collidingObject), time);
 			}		
 		} 
 		catch (Exception e) 
@@ -147,7 +150,7 @@ public class MechListener
     {
 		String name = collidingObject.getName();
 		
-		if (robot.getRobotListener() instanceof BoxSpanGenerator) 
+		if (robotListener instanceof BoxSpanGenerator) 
 		{
 			// Convert the name of the object to Coordinate and return a new RSBox
 			return new RSBox(name, Converter.toCoordinate(name));

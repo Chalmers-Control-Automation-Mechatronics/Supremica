@@ -149,7 +149,7 @@ public class RSCell
 			openStation(file);
 			station.setBackgroundColor(RS_WHITE);
 			station.setFloorVisible(false);
-
+			
 			boxSet = addPart(BOXPART_NAME);
 			
 			// Array of LinkedLists, later containing PathWithCost objects
@@ -181,15 +181,15 @@ public class RSCell
 	    }
     }
 	
-    /////////////////////////////////
-    // Cell INTERFACE METHODS //
-    /////////////////////////////////
+    ////////////////////////////
+    // CELL INTERFACE METHODS //
+    ////////////////////////////
 		
     /**
      * Initializes RobotStudio
      */
-		public void init()
-			throws Exception
+	public void init()
+		throws Exception
     {
 		// Create an instance of RobotStudio.Application.
 		if (applicationIsRunning())
@@ -211,7 +211,7 @@ public class RSCell
 		
 		// Make sure the Program browser is open, the Object browser takes a lot of processor activit
 		app.setActiveBrowserTab(new Variant("Program"));
-
+		
 		// Some declarations
 		RS_WHITE = new Variant(new SafeArray(new int[]{ 255, 255, 255 }), false);
 		RS_RED = new Variant(new SafeArray(new int[]{ 255, 0, 0 }), false);
@@ -298,7 +298,7 @@ public class RSCell
 		
 		return list;
     }
-
+	
     /**
      * Creates a box in RobotStudio at the supplied coordinates.
      */
@@ -315,16 +315,16 @@ public class RSCell
 		// Create box with nice name
 		String boxName = BOX_PREFIX + coord;
 		IEntity currBox = boxSet.createSolidBox(trans, boxDimensions[0], boxDimensions[1], boxDimensions[2]);
-
+		
 		// Hide during initiation
 		currBox.setVisible(false);
 		currBox.setName(boxName);
 		Box box = new RSBox(boxName, coord);
 		currBox.setVisible(true);
-
+		
 		return box;
     }
-
+	
     /**
      * Removes the RobotStudio representation of the supplied box.
      */
@@ -1171,7 +1171,7 @@ public class RSCell
 		ISimulation iSim = station.getSimulations().item(Converter.var(1));
 		Simulation sim = Simulation.getSimulationFromUnknown(iSim);
 		sim.setResolution(0.1);
-		
+
 		sim.addDSimulationEventsListener(simListener);
 		sim.start();
 

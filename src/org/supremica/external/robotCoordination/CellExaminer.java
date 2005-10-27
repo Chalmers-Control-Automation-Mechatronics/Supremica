@@ -57,7 +57,7 @@ public class CellExaminer
 		    DEMOSTATION_FILENAME = SupremicaProperties.getFileRSDemoOpenPath() + File.separator + DEMOSTATION_FILENAME;
 		else
 		    DEMOSTATION_FILENAME = "C:\\temp\\DomStations" + File.separator + DEMOSTATION_FILENAME;
-		
+
 		contentPane = (JPanel) getContentPane();
 		contentPane.setLayout(new FlowLayout());
 
@@ -127,7 +127,7 @@ public class CellExaminer
 						File file = new File(DEMOSTATION_FILENAME);
 						openCell(file);
 					}
-						
+
 					// Run the demo!
 					try
 					{
@@ -138,7 +138,7 @@ public class CellExaminer
 						intersectSpans();
 						generateAutomata();
 						examineCollisions();
-						
+
 						timer.stop();
 						logger.info("Execution completed after " + timer.toString());
 					}
@@ -146,12 +146,12 @@ public class CellExaminer
 					{
 						logger.error("Error when running span generation demo: " + ex);
 						logger.debug(ex.getStackTrace());
-					}				
+					}
 				}
 			});
 		contentPane.add(demoButton);
-		
-		// Box strategy demo button 
+
+		// Box strategy demo button
 		demoButton = new JButton("Box strategy demo");
 		demoButton.addActionListener(new ActionListener()
 			{
@@ -178,7 +178,7 @@ public class CellExaminer
 				}
 			});
 		contentPane.add(demoButton);
-		
+
 		pack();
 		init();
 	}
@@ -204,7 +204,7 @@ public class CellExaminer
 			logger.error("File " + file + " does not exist.");
 			return;
 		}
-		
+
 		String cellName = file.getAbsolutePath();
 
 		// Choose simulator based on file type...
@@ -213,7 +213,7 @@ public class CellExaminer
 			// A RobotStudio station!
 			// Here, it would be a good thing to examine if RobotStudio is
 			// properly installed...
-			
+
 			// Open cell
 			cell = new RSCell(file);
 		}
@@ -223,10 +223,10 @@ public class CellExaminer
 						 "not of a type supported by Supremica.");
 			return;
 		}
-		
+
 		// Set the project name based on the file name...
 		ActionMan.getGui().getVisualProjectContainer().getActiveProject().setName(file.getName());
-		
+
 		// Initialize
 		init();
 	}
@@ -417,9 +417,9 @@ public class CellExaminer
 		timer.start();
 
 		// Discretization parameters
-		double dx = 0.2;
-		double dy = 0.2;
-		double dz = 0.2;
+		double dx = 0.35;
+		double dy = 0.35;
+ 		double dz = 0.35;
 		cell.setBoxDimensions(new double[] {dx,dy,dz});
 
 		// Hashtable associating coordinates with status of the corresponding box
@@ -442,31 +442,31 @@ public class CellExaminer
 			// Initalize robot
 			robot.start();
 			robot.jumpToConfiguration(home);
-			
+
 			///////////////////////////////////////
 			// BUILD BOXES FOR THE HOME POSITION //
 			///////////////////////////////////////
-			
+
 			// List of coordinates of boxes that should be examined
  			//List<Coordinate> boxesToExamine = new LinkedList<Coordinate>();
 			SortedSet<Coordinate> boxesToExamine = new TreeSet<Coordinate>();
-			// List of the coordinates of boxes that have already been examined 
+			// List of the coordinates of boxes that have already been examined
 			// (for resetting the matrix)
 			List<Coordinate> boxesExamined = new LinkedList<Coordinate>();
 			// List of the coordinates of boxes on "the surface"
 			List<Coordinate> surfaceboxes = new LinkedList<Coordinate>();
-			
+
 			// Get base coords and build first box
 			Coordinate base = robot.getBaseCoordinates();
 			boxesToExamine.add(base);
-			
+
 			// Start loop!
 			loop: while (boxesToExamine.size() != 0)
 			{
 			 	// Get the status for this box
 				Coordinate coord = boxesToExamine.first();
 				boxesToExamine.remove(coord);
-				
+
 				// Examine status and set this box as checked (we will
 				// soon check it!)
 				Status status;
@@ -544,8 +544,8 @@ public class CellExaminer
 			{
 			 	logger.error("Base coordinate box is not inside robot.");
 				return;
-			} 
-			
+			}
+
 			//////////////////////////////////////////////////////////
 			// BUILD BOXES FOR THE REST OF THE SPAN (FOR ALL PATHS) //
 			//////////////////////////////////////////////////////////
@@ -553,10 +553,10 @@ public class CellExaminer
 			// Listen to the robot (for collisions - a part of the box span generation!)
 			RobotListener listener = new BoxSpanGenerator(cell, robot, matrix, zoneboxes, surfaceboxes);
 			robot.setRobotListener(listener);
-			
+
 			// Push boxes for each "path", i.e. unique pair of configurations
 			List<Configuration> configurations = robot.getConfigurations();
-			// The first loop must start with the home configuration, since the 
+			// The first loop must start with the home configuration, since the
 			// surfaceboxes always should be pushed "outwards"
 			if (!home.getName().equals(configurations.get(0).getName()))
 			{
@@ -566,11 +566,11 @@ public class CellExaminer
 			for (int i = 0; i < configurations.size(); i++)
 			{
 				Configuration from = (Configuration) configurations.get(i);
-				
+
 				for (int j = i + 1; j < configurations.size(); j++)
 				{
 					Configuration to = (Configuration) configurations.get(j);
-					
+
 					// Generate span!
 					logger.info("Pushing boxes moving from " + from + " to " + to + " for " + robot + ".");
 					robot.jumpToConfiguration(from);
@@ -580,7 +580,7 @@ public class CellExaminer
 			// Finalize the robot
 			robot.jumpToConfiguration(home);
 			cell.runSimulation(robot, home, home);
-			robot.stop();		
+			robot.stop();
 
 			//////////////
 			// CLEAN UP //
@@ -592,8 +592,8 @@ public class CellExaminer
 				Coordinate coord = boxesExamined.remove(0);
 				Status status = matrix.get(coord);
 				status.checked = false;
-			}			
-			
+			}
+
 			// It's over for this robot. Remove the "surfaceboxes"
 			int surfaceboxCount = surfaceboxes.size();
 			while (surfaceboxes.size() != 0)
@@ -624,7 +624,7 @@ public class CellExaminer
 			robot.setRobotListener(null);
 			robottimer.stop();
 			logger.info("Execution completed for robot " + robot + " after " + robottimer + ".");
-			logger.info("Amount of surfaceboxes: " + surfaceboxCount);	
+			logger.info("Amount of surfaceboxes: " + surfaceboxCount);
 		}
 
 		// Don't need this one anymore

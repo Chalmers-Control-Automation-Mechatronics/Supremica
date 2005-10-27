@@ -4,7 +4,7 @@ package org.supremica.external.robotCoordination;
  * A (discretized) coordinate in the simulation environment. The discretization
  * steps dx, dy and dz are specified through the RobotCell interface.
  *
- * @see Cell#setBoxDimensions(double[])
+ * @see #RobotCell.setBoxDimensions(double[])
  */
 public class Coordinate 
 	implements Comparable<Coordinate>
