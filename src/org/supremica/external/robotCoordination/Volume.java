@@ -31,13 +31,16 @@ public interface Volume
 //     }
 
     public void delete() 
-	throws Exception;
+		throws Exception;
 	
     public void setColor(Color color) 
-	throws Exception;
+		throws Exception;
 	
     public void setTransparency(double transparency) 
-	throws Exception;
+		throws Exception;
 	
+    public void setName(String name)
+		throws Exception;
+
     public String getName();
 }

@@ -149,16 +149,36 @@ public class MechListener
 		throws Exception
     {
 		String name = collidingObject.getName();
-		
-		if (robotListener instanceof BoxSpanGenerator) 
-		{
-			// Convert the name of the object to Coordinate and return a new RSBox
-			return new RSBox(name, Converter.toCoordinate(name));
+		Coordinate coordinate;
 
-// 			ITransform trans = ((IEntity)collidingObject).getTransform();
-// 			Coordinate coord = Converter.toCoordinate(trans);
+		// Is the name of the object really a coordinate?
+		try 
+		{
+			coordinate = Converter.toCoordinate(name);
 		}
-		
+		catch (NumberFormatException ex)
+		{
+			coordinate = null;
+		}
+
+		// Was there a coordinate? Then it's a box?
+		if (coordinate != null)
+		{
+			// Return a box!
+			return new RSBox(name, coordinate);
+
+			/*
+			// First a shortcut if it happens to be a particular class
+			// that is listening
+			if (robotListener instanceof BoxSpanGenerator) 
+			{
+				// Convert the name of the object to Coordinate and return a new RSBox
+				return new RSBox(name, coordinate);
+			}
+			*/
+		}
+
+		// Return generic volume object!
 		return new RSVolume(name);
     }
 }

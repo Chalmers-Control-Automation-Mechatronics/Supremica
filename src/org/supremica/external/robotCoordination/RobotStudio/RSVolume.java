@@ -40,6 +40,12 @@ public class RSVolume
 		getEntity().setRelativeTransparency((float) transparency);
     }
 
+    public void setName(String name)
+		throws Exception
+    {
+		getEntity().setName(name);
+    }
+
     public String getName()
     {
 		return name;

@@ -141,8 +141,7 @@ public class MechanismListener
 			// Print the objects already colliding
 			for (ListIterator it = objectsColliding.listIterator();
 				 it.hasNext(); )
-			{
-			
+			{ 	
 				logger.info(mechanism.getName() + " is already inside the zone " + ((Collider) it.next()).getName() + " at target " + path.getTargetRefs().item(Converter.var(1)).getName() + ".");		
 			}
 		}

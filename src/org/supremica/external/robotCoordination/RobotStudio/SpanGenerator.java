@@ -103,7 +103,7 @@ public class SpanGenerator
 		  }
 		*/
 		
-		temp = RSCell.addPart("Temp");
+		temp = RSCell.getPart("Temp");
 		spanEntities = temp.getEntities();
 		
 		// Create first cover

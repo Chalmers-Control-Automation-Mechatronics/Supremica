@@ -16,6 +16,9 @@ import org.supremica.util.ActionTimer;
 import java.awt.Toolkit;
 import java.awt.Color;
 
+/**
+ * GUI and algorithms for examining robot cells.
+ */
 public class CellExaminer
     extends JDialog
 {
@@ -30,6 +33,9 @@ public class CellExaminer
 	// Supremica stuff
 	private Automata zoneAutomata;
 	private Automata robotAutomata;
+
+	/** The prefix of a zone's name. */
+	private static final String ZONE_PREFIX = "Zone_";
 
 	// Colors
 	static final Color RED = Color.RED;
@@ -417,9 +423,9 @@ public class CellExaminer
 		timer.start();
 
 		// Discretization parameters
-		double dx = 0.35;
-		double dy = 0.35;
- 		double dz = 0.35;
+		double dx = 0.25;
+		double dy = 0.25;
+ 		double dz = 0.25;
 		cell.setBoxDimensions(new double[] {dx,dy,dz});
 
 		// Hashtable associating coordinates with status of the corresponding box
@@ -579,7 +585,6 @@ public class CellExaminer
 			}
 			// Finalize the robot
 			robot.jumpToConfiguration(home);
-			cell.runSimulation(robot, home, home);
 			robot.stop();
 
 			//////////////
@@ -631,9 +636,7 @@ public class CellExaminer
 		matrix.clear();
 
 		// Show the result, the zoneboxes!
-		timer.stop();
-		logger.info("Execution completed after " + timer.toString());
-		logger.info("Amount of zoneboxes: " + zoneboxes.size());
+		int zoneCount = 0;
 		while (zoneboxes.size() != 0)
 		{
 			Coordinate coord = zoneboxes.remove(0);
@@ -643,7 +646,52 @@ public class CellExaminer
 			Box box = cell.createBox(coord);
 			box.setColor(BLUE);
 			box.setTransparency(TRANSPARENCY);
+			box.setName(ZONE_PREFIX + ++zoneCount);
 		}
+		timer.stop();
+		logger.info("Execution completed after " + timer.toString());
+		logger.info("Amount of zoneboxes: " + zoneCount);
+
+		/////////////////////////////////////////////
+		// TEST FOR COLLISIONS WITH THE ZONE BOXES //
+		/////////////////////////////////////////////
+
+			/*
+
+		// For every robot...
+		for (Iterator<Robot> robIt = robots.iterator(); robIt.hasNext(); )
+		{
+			Robot robot = robIt.next();
+			Configuration home = robot.getHomeConfiguration();
+
+			// Add a listener to the robot for finding the list of
+			// collisions for every path
+			RobotListener listener = new CollisionListGenerator();
+			robot.setRobotListener(listener);
+			
+			// Try each "path", i.e. unique pair of configurations
+			List<Configuration> configurations = robot.getConfigurations();
+			// Now the paths, two nested loops of configurations...
+			for (int i = 0; i < configurations.size(); i++)
+			{
+				Configuration from = (Configuration) configurations.get(i);
+				
+				for (int j = i + 1; j < configurations.size(); j++)
+				{
+					Configuration to = (Configuration) configurations.get(j);
+					
+					// Generate span!
+					logger.info("Examining the path from " + from + " to " + to + " for " + robot + " for collisions.");
+					robot.jumpToConfiguration(from);
+					cell.runSimulation(robot, from, to);
+				}
+			}
+			// Finalize the robot
+			robot.jumpToConfiguration(home);
+			robot.stop();
+		}
+
+			*/
 	}
 
 	public static void beep()

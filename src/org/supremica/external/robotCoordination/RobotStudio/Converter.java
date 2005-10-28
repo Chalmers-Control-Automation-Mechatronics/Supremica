@@ -136,9 +136,10 @@ public class Converter
     }
 
 	/**
-	 * Converts a coordinate name to a Supremica Coordinate
+	 * Converts a coordinate name to a Supremica Coordinate.
 	 */
 	static Coordinate toCoordinate(String name) 
+		throws Exception
 	{
 		String[] strCoords = name.split("_");
 		int[] coords = new int[3];

@@ -82,7 +82,7 @@ public class RSCell
     final static String BOXPART_NAME = "Box_Set";
     final static String VOLUMEPART_NAME = "Volumes_Set";
 	
-    final static String ZONEENTITY_BASENAME = "MutexZone";
+    final static String ZONEENTITY_BASENAME = "Zone";
     final static String FREESTATE_NAME = "Free";
     final static String BOOKEDSTATE_NAME = "Booked";
 	
@@ -150,18 +150,10 @@ public class RSCell
 			station.setBackgroundColor(RS_WHITE);
 			station.setFloorVisible(false);
 			
-			boxSet = addPart(BOXPART_NAME);
-			
-			// Array of LinkedLists, later containing PathWithCost objects
-			robotCosts = new LinkedList[getMechanismsWithRole(RsKinematicRole.rsKinematicRoleRobot).size()];
-			
-			for (int i = 0;
-				 i < getMechanismsWithRole(RsKinematicRole.rsKinematicRoleRobot).size();
-				 i++)
-		    {
-				robotCosts[i] = new LinkedList();
-		    }
-			
+			boxSet = getPart(BOXPART_NAME);
+			zones = getPart(ZONEPART_NAME);
+
+			/*
 			try
 		    {
 				// Already got a zones part?
@@ -173,7 +165,18 @@ public class RSCell
 				zones = Part.getPartFromUnknown(station.getParts().add());
 				zones.setName(ZONEPART_NAME);
 		    }
-	    }
+			*/
+	
+			// Array of LinkedLists, later containing PathWithCost objects
+			robotCosts = new LinkedList[getMechanismsWithRole(RsKinematicRole.rsKinematicRoleRobot).size()];
+			
+			for (int i = 0;
+				 i < getMechanismsWithRole(RsKinematicRole.rsKinematicRoleRobot).size();
+				 i++)
+		    {
+				robotCosts[i] = new LinkedList();
+		    }
+		}
 		catch (Exception e)
 	    {
 			logger.error("Error when initializing RobotStudio interface. " + e);
@@ -200,16 +203,14 @@ public class RSCell
 		else
 	    {
 			logger.info("Starting RobotStudio...");
-			
-			app = new Application();
-			
+			app = new Application();			
 			app.addDAppEventsListener(this);
 			app.setVisible(true);    // It's nice to see what is happening
-			
 			logger.info("RobotStudio started.");
 	    }
 		
-		// Make sure the Program browser is open, the Object browser takes a lot of processor activit
+		// Make sure the Program browser is open, the Object browser
+		// takes a lot of processor activity
 		app.setActiveBrowserTab(new Variant("Program"));
 		
 		// Some declarations
@@ -563,7 +564,7 @@ public class RSCell
      * Adds part to activeStation and returns it. If there already was
      * a part with the same name, it is returned instead.
      */
-    static Part addPart(String name)
+    static Part getPart(String name)
     {
 		Part part = null;
 		
@@ -578,13 +579,15 @@ public class RSCell
 		    {
 				// If there was none, create it!
 				if (ex.ErrorCode == HResult.E_FAIL)
-			    {    // No such item, construct one!
+			    {    
+					// No such item, construct one!
 					part = Part.getPartFromUnknown(station.getParts().add());
 
 					part.setName(name);
 			    }
 				else
-			    {    //Something is really wrong
+			    {   
+					//Something is really wrong
 					logger.error("Something is wrong! " + ex);
 			    }
 		    }
@@ -1170,7 +1173,7 @@ public class RSCell
 		
 		ISimulation iSim = station.getSimulations().item(Converter.var(1));
 		Simulation sim = Simulation.getSimulationFromUnknown(iSim);
-		sim.setResolution(0.1);
+		sim.setResolution(0.001);
 
 		sim.addDSimulationEventsListener(simListener);
 		sim.start();

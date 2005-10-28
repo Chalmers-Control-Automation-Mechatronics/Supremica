@@ -91,7 +91,7 @@ public class RSRobot
 		
 		try
 		{
-			spans = RSCell.addPart(getName() + RSCell.SPANS_SUFFIX);
+			spans = RSCell.getPart(getName() + RSCell.SPANS_SUFFIX);
 		}
 		catch (Exception ex)
 		{
@@ -241,14 +241,14 @@ public class RSRobot
     public void jumpToConfiguration(Configuration configuration)
 		throws Exception
     {
-	// Find targets
-	Target goal = ((RSConfiguration) configuration).getRobotStudioTarget();
+		// Find targets
+		Target goal = ((RSConfiguration) configuration).getRobotStudioTarget();
 		
-	// Jump to the "from"-target
-	mechanism.jumpToTarget(goal);
+		// Jump to the "from"-target
+		mechanism.jumpToTarget(goal);
 		
-	// Takes a while?
-	Thread.sleep(1000);
+		// Takes a while?
+		//Thread.sleep(1000);
     }
 	
     // Other methods
