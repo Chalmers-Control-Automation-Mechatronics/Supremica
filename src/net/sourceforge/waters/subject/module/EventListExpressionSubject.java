@@ -1,0 +1,116 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters
+//# PACKAGE: net.sourceforge.waters.subject.module
+//# CLASS:   EventListExpressionSubject
+//###########################################################################
+//# $Id: EventListExpressionSubject.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//###########################################################################
+
+package net.sourceforge.waters.subject.module;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
+import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.module.EventListExpressionProxy;
+import net.sourceforge.waters.model.unchecked.Casting;
+import net.sourceforge.waters.subject.base.AbstractSubject;
+import net.sourceforge.waters.subject.base.ArrayListSubject;
+import net.sourceforge.waters.subject.base.ListSubject;
+
+
+/**
+ * The subject implementation of the {@link EventListExpressionProxy} interface.
+ *
+ * @author Robi Malik
+ */
+
+public abstract class EventListExpressionSubject
+  extends ExpressionSubject
+  implements EventListExpressionProxy
+{
+
+  //#########################################################################
+  //# Constructors
+  /**
+   * Creates a new event list expression.
+   * @param eventList The list of events of the new event list expression.
+   */
+  protected EventListExpressionSubject(final Collection<? extends Proxy> eventList)
+  {
+    mEventList = new ArrayListSubject<AbstractSubject>
+      (eventList, AbstractSubject.class);
+    mEventList.setParent(this);
+  }
+
+  /**
+   * Creates a new event list expression using default values.
+   * This constructor creates an event list expression with
+   * an empty list of events.
+   */
+  protected EventListExpressionSubject()
+  {
+    this(emptyProxyList());
+  }
+
+
+  //#########################################################################
+  //# Cloning
+  public EventListExpressionSubject clone()
+  {
+    final EventListExpressionSubject cloned = (EventListExpressionSubject) super.clone();
+    cloned.mEventList = mEventList.clone();
+    cloned.mEventList.setParent(cloned);
+    return cloned;
+  }
+
+
+  //#########################################################################
+  //# Equality
+  public boolean equals(final Object partner)
+  {
+    if (super.equals(partner)) {
+      final EventListExpressionSubject downcast = (EventListExpressionSubject) partner;
+      return
+        mEventList.equals(downcast.mEventList);
+    } else {
+      return false;
+    }
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.module.EventListExpressionProxy
+  public List<Proxy> getEventList()
+  {
+    final List<Proxy> downcast = Casting.toList(mEventList);
+    return Collections.unmodifiableList(downcast);
+  }
+
+
+  //#########################################################################
+  //# Setters
+  /**
+   * Gets the modifiable list of events consituting this event list expression.
+   */
+  public ListSubject<AbstractSubject> getEventListModifiable()
+  {
+    return mEventList;
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private static List<Proxy> emptyProxyList()
+  {
+    return Collections.emptyList();
+  }
+
+
+  //#########################################################################
+  //# Data Members
+  private ListSubject<AbstractSubject> mEventList;
+
+}

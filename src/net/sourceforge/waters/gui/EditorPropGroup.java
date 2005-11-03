@@ -1,44 +1,114 @@
-
+//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: waters.gui
+//# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorLabelGroup
 //###########################################################################
-//# $Id: EditorPropGroup.java,v 1.5 2005-08-30 00:18:45 siw4 Exp $
+//# $Id: EditorPropGroup.java,v 1.6 2005-11-03 01:24:15 robi Exp $
 //###########################################################################
+
+
 package net.sourceforge.waters.gui;
 
-import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.text.*;
-import javax.swing.border.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.geom.*;
 import java.awt.font.*;
-import java.lang.reflect.*;
-import java.util.*;
-import java.beans.*;
+import java.awt.geom.*;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.AbstractAction;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.KeyStroke;
+import javax.swing.border.*;
+import javax.swing.event.*;
+import javax.swing.text.*;
+
+import net.sourceforge.waters.subject.base.AbstractSubject;
+import net.sourceforge.waters.subject.module.EventListExpressionSubject;
+import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.xsd.module.AnchorPosition;
-import net.sourceforge.waters.model.module.*;
-import net.sourceforge.waters.model.expr.IdentifierProxy;
+
 
 public class EditorPropGroup
 	extends EditorObject
 {
-	public static int LEFT = 0;
-	public static int RIGHT = 2;
-	public static int CENTER = 1;
-	public static int TOP = 0;
-	public static int BOTTOM = 2;
-	private int verticalA = 1;
-	private int horizontalA = 1;
-	private int selectedLabel = -1;
-	private final JPanel panel;
-	private final EditorNode parent;
-	private final ArrayList events;
-	private final Point offset;
-	private EventListProxy proxy;
+
+	//#######################################################################
+	//# Constructor
+	public EditorPropGroup(EditorNode par, EditorSurface e)
+	{
+		// This is a... labelgroup!
+		type = LABELGROUP;
+
+		mSubject = par.getSubject().getPropositions();
+		parent = par;
+		mEvents = new ArrayList<JLabel>();
+		panel = new JPanel();
+
+		panel.setVisible(false);
+		panel.setOpaque(false);
+		panel.setLayout(null);
+
+		verticalA = TOP;
+		horizontalA = LEFT;
+		offset = new Point(5, 5);
+
+		final List<AbstractSubject> list = mSubject.getEventListModifiable();
+		for (final AbstractSubject entry : list) {
+			addToPanel(entry);
+		}
+
+		resizePanel();
+		e.add(panel);
+		setPanelLocation();
+
+		panel.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), "up");
+		panel.getActionMap().put("up", new AbstractAction()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				if ((selectedLabel > 0) && (selectedLabel < mEvents.size()))
+				{
+					IdentifierSubject i =
+						(IdentifierSubject) list.get(selectedLabel);
+					list.remove(selectedLabel);
+					list.add(selectedLabel - 1, i);
+					mEvents.clear();
+					panel.removeAll();
+					for (final AbstractSubject entry : list) {
+						addToPanel(entry);
+					}
+					resizePanel();
+					selectedLabel--;
+				}
+			}
+		});
+
+		panel.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), "down");
+		panel.getActionMap().put("down", new AbstractAction()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				if ((selectedLabel >= 0) && (selectedLabel < mEvents.size() - 1))
+				{
+					IdentifierSubject i =
+						(IdentifierSubject) list.get(selectedLabel);
+					list.remove(selectedLabel);
+					list.add(selectedLabel + 1, i);
+					mEvents.clear();
+					panel.removeAll();
+					for (final AbstractSubject entry : list) {
+						addToPanel(entry);
+					}
+					resizePanel();
+					selectedLabel++;
+				}
+			}
+		});
+	}
+
 
 	public void removeFromSurface(EditorSurface e)
 	{
@@ -68,21 +138,14 @@ public class EditorPropGroup
 	{
 		ex -= panel.getX();
 		ey -= panel.getY();
-
 		panel.requestFocus();
-
-		for (int i = 0; i < events.size(); i++)
-		{
-			JLabel l = (JLabel) events.get(i);
-
-			if (l.getBounds().contains(ex, ey))
-			{
+		for (int i = 0; i < mEvents.size(); i++)	{
+			final JLabel label = mEvents.get(i);
+			if (label.getBounds().contains(ex, ey))	{
 				selectedLabel = i;
-
 				return;
 			}
 		}
-
 		selectedLabel = -1;
 	}
 
@@ -92,16 +155,12 @@ public class EditorPropGroup
 		int y = (int) (offset.getY() + parent.getY());    // - ((double)(verticalA / 2) * panel.getHeight()));
 
 		panel.setLocation(x, y);
-
-		for (int i = 0; i < events.size(); i++)
-		{
-			JLabel l = (JLabel) events.get(i);
-
-			l.setForeground(getColor());
-
-			if (i == selectedLabel)
-			{
-				l.setForeground(Color.RED);
+		for (int i = 0; i < mEvents.size(); i++) {
+			final JLabel label = mEvents.get(i);
+			if (i == selectedLabel)	{
+				label.setForeground(Color.RED);
+			} else {
+				label.setForeground(getColor());
 			}
 		}
 	}
@@ -126,29 +185,22 @@ public class EditorPropGroup
 		offset.setLocation(x - (int) parent.getX(), y - (int) parent.getY());
 	}
 
-	public void addEvent(IdentifierProxy i)    //put stuff for events from proxy
+	public void addEvent(final IdentifierSubject ident)
 	{
-		proxy.add(i);
-		addToPanel(i.toString());
+		final List<AbstractSubject> list = mSubject.getEventListModifiable();
+		list.add(ident);
+		addToPanel(ident);
 		resizePanel();
 		panel.getParent().repaint();
 	}
 
-	public void removeEvent(int i)    //put stuff for events from proxy
+	public void removeEvent(final int i)
 	{
-		JLabel l = (JLabel) events.get(i);
-
-		events.remove(i);
-		panel.remove(l);
-
-		for (int j = 0; j < proxy.size(); j++)
-		{
-			if (((IdentifierProxy) proxy.get(j)).toString().equals(l.getText()))
-			{
-				proxy.remove(i);
-			}
-		}
-
+		final JLabel label = mEvents.get(i);
+		mEvents.remove(i);
+		panel.remove(label);
+		final List<AbstractSubject> list = mSubject.getEventListModifiable();
+		list.remove(i);
 		panel.getParent().repaint();
 	}
 
@@ -209,14 +261,14 @@ public class EditorPropGroup
 		}
 	}
 
-	private void addToPanel(String n)
+	private void addToPanel(final AbstractSubject entry)
 	{
-		JLabel l = new JLabel(n);
-
+		final String name = entry.toString();
+		final JLabel l = new JLabel(name);
 		l.setBorder(new EmptyBorder(0, 0, 0, 0));
 		l.setOpaque(false);
 		panel.add(l);
-		events.add(l);
+		mEvents.add(l);
 	}
 
 	private void resizePanel()
@@ -257,82 +309,30 @@ public class EditorPropGroup
 	    return new Point2D.Double(getX(), getY());
 	}
     
-	public EditorPropGroup(EditorNode par, EditorSurface e)
+
+	//#######################################################################
+	//# Overrides for Abstract Base Class EditorObject
+	public EventListExpressionSubject getSubject()
 	{
-		// This is a... labelgroup!
-		type = LABELGROUP;
-
-		proxy = par.getProxy().getPropositions();
-		parent = par;
-		events = new ArrayList();
-		panel = new JPanel();
-
-		panel.setVisible(false);
-		panel.setOpaque(false);
-		panel.setLayout(null);
-
-		verticalA = TOP;
-		horizontalA = LEFT;
-		offset = new Point(5, 5);
-
-		for (int i = 0; i < proxy.size(); i++)
-		{
-			addToPanel(((IdentifierProxy) proxy.get(i)).toString());
-		}
-
-		resizePanel();
-		e.add(panel);
-		setPanelLocation();
-
-		panel.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), "up");
-		panel.getActionMap().put("up", new AbstractAction()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				if ((selectedLabel > 0) && (selectedLabel < events.size()))
-				{
-					IdentifierProxy i = (IdentifierProxy) proxy.get(selectedLabel);
-
-					proxy.remove(selectedLabel);
-					proxy.add(selectedLabel - 1, i);
-					events.clear();
-					panel.removeAll();
-
-					for (int j = 0; j < proxy.size(); j++)
-					{
-						addToPanel(((IdentifierProxy) proxy.get(j)).toString());
-					}
-
-					resizePanel();
-
-					selectedLabel--;
-				}
-			}
-		});
-		panel.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), "down");
-		panel.getActionMap().put("down", new AbstractAction()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				if ((selectedLabel >= 0) && (selectedLabel < events.size() - 1))
-				{
-					IdentifierProxy i = (IdentifierProxy) proxy.get(selectedLabel);
-
-					proxy.remove(selectedLabel);
-					proxy.add(selectedLabel + 1, i);
-					events.clear();
-					panel.removeAll();
-
-					for (int j = 0; j < proxy.size(); j++)
-					{
-						addToPanel(((IdentifierProxy) proxy.get(j)).toString());
-					}
-
-					resizePanel();
-
-					selectedLabel++;
-				}
-			}
-		});
+		return mSubject;
 	}
+
+
+	//#######################################################################
+	//# Data Members
+	private int verticalA = 1;
+	private int horizontalA = 1;
+	private int selectedLabel = -1;
+	private final JPanel panel;
+	private final EditorNode parent;
+	private final List<JLabel> mEvents;
+	private final Point offset;
+	private final EventListExpressionSubject mSubject;
+
+	public static final int LEFT = 0;
+	public static final int RIGHT = 2;
+	public static final int CENTER = 1;
+	public static final int TOP = 0;
+	public static final int BOTTOM = 2;
+
 }

@@ -67,7 +67,7 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="comfort_condition_doors"/>
 <Graph Deterministic="true">
-<EventList>
+<LabelBlock>
 <IndexedIdentifier Name="CLOSEDOOR">
 <SimpleIdentifier Name="DRD"/>
 </IndexedIdentifier>
@@ -101,7 +101,7 @@
 <SimpleIdentifier Name="PSD"/>
 </IndexedIdentifier>
 <SimpleIdentifier Name="timer"/>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="doors_closed">
 <EventList>
@@ -248,7 +248,7 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="comfort_condition_key"/>
 <Graph Deterministic="true">
-<EventList>
+<LabelBlock>
 <IndexedIdentifier Name="CMFT_BACK">
 <SimpleIdentifier Name="CLOSE"/>
 </IndexedIdentifier>
@@ -272,7 +272,7 @@
 <SimpleIdentifier Name="KEY_PLUG"/>
 <SimpleIdentifier Name="KEY_UNPLUG"/>
 <SimpleIdentifier Name="timer"/>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Name="key">
 <PointGeometry>
@@ -364,7 +364,7 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="comfort_control"/>
 <Graph Deterministic="true">
-<EventList>
+<LabelBlock>
 <IndexedIdentifier Name="CMFT_BACK">
 <SimpleIdentifier Name="CLOSE"/>
 </IndexedIdentifier>
@@ -386,7 +386,7 @@
 <SimpleIdentifier Name="STOP"/>
 </IndexedIdentifier>
 <SimpleIdentifier Name="timer"/>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Name="esc_req">
 <PointGeometry>
@@ -601,7 +601,7 @@
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="comfort_function"/>
 <Graph Deterministic="true">
-<EventList>
+<LabelBlock>
 <IndexedIdentifier Name="REQ">
 <SimpleIdentifier Name="CLOSE"/>
 </IndexedIdentifier>
@@ -611,7 +611,7 @@
 <IndexedIdentifier Name="REQ">
 <SimpleIdentifier Name="STOP"/>
 </IndexedIdentifier>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="no_request">
 <EventList>
@@ -674,7 +674,7 @@
 <SimpleIdentifier Name="FUNC"/>
 </IndexedIdentifier>
 <Graph Deterministic="true">
-<EventList>
+<LabelBlock>
 <IndexedIdentifier Name="CMFT_BACK">
 <SimpleIdentifier Name="FUNC"/>
 </IndexedIdentifier>
@@ -696,7 +696,7 @@
 <SimpleIdentifier Name="reset"/>
 <SimpleIdentifier Name="timeout"/>
 <SimpleIdentifier Name="timer"/>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Name="timeout">
 <PointGeometry>
@@ -1110,14 +1110,14 @@
 <SimpleIdentifier Name="DOOR"/>
 </IndexedIdentifier>
 <Graph Deterministic="true">
-<EventList>
+<LabelBlock>
 <IndexedIdentifier Name="CLOSEDOOR">
 <SimpleIdentifier Name="DOOR"/>
 </IndexedIdentifier>
 <IndexedIdentifier Name="OPENDOOR">
 <SimpleIdentifier Name="DOOR"/>
 </IndexedIdentifier>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="closed">
 <EventList>
@@ -1174,7 +1174,7 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="fh"/>
 <Graph Deterministic="true">
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="cmft_start"/>
 <SimpleIdentifier Name="ecefin"/>
 <SimpleIdentifier Name="fh_cond_door_open"/>
@@ -1187,7 +1187,7 @@
 <SimpleIdentifier Name="nocountry"/>
 <SimpleIdentifier Name="read_country"/>
 <SimpleIdentifier Name="usaus"/>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="s">
 <PointGeometry>
@@ -1499,7 +1499,7 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="fh_condition_doors"/>
 <Graph Deterministic="true">
-<EventList>
+<LabelBlock>
 <IndexedIdentifier Name="CLOSEDOOR">
 <SimpleIdentifier Name="DRD"/>
 </IndexedIdentifier>
@@ -1514,7 +1514,7 @@
 <IndexedIdentifier Name="OPENDOOR">
 <SimpleIdentifier Name="PSD"/>
 </IndexedIdentifier>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="doors_closed">
 <EventList>
@@ -1648,7 +1648,7 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="fh_condition_ecefin"/>
 <Graph Deterministic="true">
-<EventList>
+<LabelBlock>
 <IndexedIdentifier Name="CLOSEDOOR">
 <SimpleIdentifier Name="DRD"/>
 </IndexedIdentifier>
@@ -1664,7 +1664,7 @@
 <IndexedIdentifier Name="OPENDOOR">
 <SimpleIdentifier Name="PSD"/>
 </IndexedIdentifier>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Name="radio_door_open">
 <PointGeometry>
@@ -1962,14 +1962,14 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="fh_condition_kl_r"/>
 <Graph Deterministic="true">
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="cmft_start"/>
 <SimpleIdentifier Name="fh_cond_ecefin"/>
 <SimpleIdentifier Name="fh_cond_kl_r"/>
 <SimpleIdentifier Name="KL_50_OFF"/>
 <SimpleIdentifier Name="KL_50_ON"/>
 <SimpleIdentifier Name="KL_R_ON"/>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Name="radio">
 <PointGeometry>
@@ -2074,7 +2074,7 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="fh_sync_cmft"/>
 <Graph Deterministic="true">
-<EventList>
+<LabelBlock>
 <IndexedIdentifier Name="CMFT_BACK">
 <SimpleIdentifier Name="CLOSE"/>
 </IndexedIdentifier>
@@ -2083,7 +2083,7 @@
 </IndexedIdentifier>
 <SimpleIdentifier Name="FH_LOCK"/>
 <SimpleIdentifier Name="FH_UNLOCK"/>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="locked">
 <EventList>
@@ -2150,14 +2150,14 @@
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="lock"/>
 <Graph Deterministic="true">
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="KEY_PLUG"/>
 <SimpleIdentifier Name="KEY_UNPLUG"/>
 <SimpleIdentifier Name="KL_50_OFF"/>
 <SimpleIdentifier Name="KL_50_ON"/>
 <SimpleIdentifier Name="KL_R_OFF"/>
 <SimpleIdentifier Name="KL_R_ON"/>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Name="radio">
 <PointGeometry>
@@ -2268,12 +2268,12 @@
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="readcountry"/>
 <Graph Deterministic="true">
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="ecefin"/>
 <SimpleIdentifier Name="nocountry"/>
 <SimpleIdentifier Name="read_country"/>
 <SimpleIdentifier Name="usaus"/>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="s0">
 <EventList>
@@ -2326,11 +2326,11 @@
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="timer"/>
 <Graph Deterministic="true">
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="reset"/>
 <SimpleIdentifier Name="timeout"/>
 <SimpleIdentifier Name="timer"/>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Name="on">
 <PointGeometry>

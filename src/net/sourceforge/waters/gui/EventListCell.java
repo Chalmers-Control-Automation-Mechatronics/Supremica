@@ -1,76 +1,73 @@
-
+//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: waters.gui
+//# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventListCell
 //###########################################################################
-//# $Id: EventListCell.java,v 1.3 2005-02-21 11:01:59 knut Exp $
+//# $Id: EventListCell.java,v 1.4 2005-11-03 01:24:15 robi Exp $
 //###########################################################################
+
+
 package net.sourceforge.waters.gui;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.io.File;
-import java.io.IOException;
-import javax.xml.bind.JAXBException;
-import net.sourceforge.waters.model.base.*;
-import net.sourceforge.waters.model.module.IdentifiedElementProxy;
-import net.sourceforge.waters.model.base.ProxyMarshaller;
-import net.sourceforge.waters.model.module.ModuleMarshaller;
-import net.sourceforge.waters.model.module.*;
-import java.util.ArrayList;
+import java.awt.Component;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.ListCellRenderer;
+
+import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
+
 
 public class EventListCell
 	extends JLabel
 	implements ListCellRenderer
 {
-	final static ImageIcon controllableIcon = new ImageIcon(EventListCell.class.getResource("/icons/waters/controllable.gif"));
-	final static ImageIcon uncontIcon = new ImageIcon(EventListCell.class.getResource("/icons/waters/uncontrollable.gif"));
-	final static ImageIcon propIcon = new ImageIcon(EventListCell.class.getResource("/icons/waters/proposition.gif"));
-
-	public Component getListCellRendererComponent(JList list, Object value,    // value to display
-			int index,    // cell index
-			boolean isSelected,    // is the cell selected
-			boolean cellHasFocus)    // the list and the cell have the focus
+	//#######################################################################
+	//# Interface javax.swing.ListCellRenderer
+	public Component getListCellRendererComponent(JList list,
+												  Object value,
+												  int index,
+												  boolean isSelected,
+												  boolean cellHasFocus)
 	{
-		String name;
+		final EventDeclProxy decl = (EventDeclProxy) value;
+		final String name = decl.toString();
+		final EventKind kind = decl.getKind();
 		ImageIcon icon = null;
-
-		name = ((EventDeclProxy) value).getNameWithRanges();
-
-		if (((EventDeclProxy) value).getKind().equals(EventKind.CONTROLLABLE))
-		{
+		if (kind.equals(EventKind.CONTROLLABLE)) {
 			icon = controllableIcon;
-		}
-		else if (((EventDeclProxy) value).getKind().equals(EventKind.UNCONTROLLABLE))
-		{
+		} else if (kind.equals(EventKind.UNCONTROLLABLE)) {
 			icon = uncontIcon;
-		}
-		else
-		{
+		} else if (kind.equals(EventKind.PROPOSITION)) {
 			icon = propIcon;
 		}
-
 		setText(name);
 		setIcon(icon);
-
-		if (isSelected)
-		{
+		if (isSelected) {
 			setBackground(list.getSelectionBackground());
 			setForeground(list.getSelectionForeground());
-		}
-		else
-		{
+		} else {
 			setBackground(list.getBackground());
 			setForeground(list.getForeground());
 		}
-
 		setEnabled(list.isEnabled());
 		setFont(list.getFont());
 		setOpaque(true);
-
 		return this;
 	}
+
+
+	//#######################################################################
+	//# Class Constants
+	static final ImageIcon controllableIcon =
+	  new ImageIcon(EventListCell.class.getResource
+			("/icons/waters/controllable.gif"));
+	static final ImageIcon uncontIcon =
+	  new ImageIcon(EventListCell.class.getResource
+			("/icons/waters/uncontrollable.gif"));
+	static final ImageIcon propIcon =
+	  new ImageIcon(EventListCell.class.getResource
+			("/icons/waters/proposition.gif"));
 }

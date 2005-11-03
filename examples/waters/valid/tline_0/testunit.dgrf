@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="testunit" version="1.0" valid="1"
+	hasGeometry="1" width="290" height="108"
+	generatorName="DGE" generatorVersion="2.7.9"
+	creationDate="2002-04-12 07:01:54 GMT" modificationDate="2002-04-12 07:20:52 GMT">
+	<events>
+		<event controllable="0" name="tu_accept.GROUP"/>
+		<event controllable="1" name="tu_load.GROUP"/>
+		<event controllable="0" name="tu_reject.GROUP"/>
+	</events>
+	<nodes>
+		<node>
+			<rendering><point x="198" y="249"/></rendering>
+			<label name="WORKING">
+				<rendering><point x="11" y="5"/></rendering>
+			</label>
+		</node>
+		<node initial="1" marked="1">
+			<rendering><point x="198" y="162"/></rendering>
+			<label name="IDLE">
+				<rendering><point x="11" y="5"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge>
+			<rendering><point x="241" y="201"/></rendering>
+			<source name="WORKING"/>
+			<target name="IDLE"/>
+			<labelGroup>
+				<rendering><point x="5" y="-3"/></rendering>
+				<label name="tu_reject.GROUP"/>
+				<label name="tu_accept.GROUP">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="159" y="201"/></rendering>
+			<source name="IDLE"/>
+			<target name="WORKING"/>
+			<labelGroup>
+				<rendering><point x="-90" y="4"/></rendering>
+				<label name="tu_load.GROUP"/>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

@@ -44,7 +44,7 @@
 <SimpleIdentifier Name="i"/>
 </IndexedIdentifier>
 <Graph>
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="bereitFahrt"/>
 <IndexedIdentifier Name="notAktiv">
 <SimpleIdentifier Name="i"/>
@@ -52,7 +52,7 @@
 <IndexedIdentifier Name="zugAn">
 <SimpleIdentifier Name="i"/>
 </IndexedIdentifier>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="s0">
 <EventList>
@@ -136,10 +136,10 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="abfahrBereitFrei"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="abfahrBereit"/>
 <SimpleIdentifier Name="frei"/>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="s0">
 <EventList>
@@ -201,10 +201,10 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="andConditionAbfahrt"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="abfahrt"/>
 <SimpleIdentifier Name="bereitFahrt"/>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="s0">
 <EventList>
@@ -266,10 +266,10 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="andConditionFrei"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="bereitFahrt"/>
 <SimpleIdentifier Name="frei"/>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="s0">
 <EventList>
@@ -331,7 +331,7 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="bereitFahrtAbort"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="abfahrBereit"/>
 <IndexedIdentifier Name="notAktiv">
 <SimpleIdentifier Name="WH"/>
@@ -339,7 +339,7 @@
 <IndexedIdentifier Name="zugAn">
 <SimpleIdentifier Name="WH"/>
 </IndexedIdentifier>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="s0">
 <EventList>
@@ -421,10 +421,10 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="einstiegBeendet"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="abfahrBereit"/>
 <SimpleIdentifier Name="einstiegBeendet"/>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="s0">
 <EventList>
@@ -486,10 +486,10 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="fastAbfahrt"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="abfahrBereit"/>
 <SimpleIdentifier Name="fastAbfahrt"/>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="s0">
 <EventList>
@@ -551,10 +551,10 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="minAbgelaufen"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="abfahrBereit"/>
 <SimpleIdentifier Name="minAbgelaufen"/>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="s0">
 <EventList>
@@ -616,7 +616,7 @@
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="passagierhalt"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="abfahrBereit"/>
 <SimpleIdentifier Name="ausstiegBeendet"/>
 <IndexedIdentifier Name="notAktiv">
@@ -627,7 +627,7 @@
 <IndexedIdentifier Name="zugAn">
 <SimpleIdentifier Name="PH"/>
 </IndexedIdentifier>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Name="einstieg">
 <EventList>
@@ -747,7 +747,7 @@
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="planhalt"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="bereitFahrt"/>
 <IndexedIdentifier Name="zugAn">
 <SimpleIdentifier Name="PH"/>
@@ -755,7 +755,7 @@
 <IndexedIdentifier Name="zugAn">
 <SimpleIdentifier Name="WH"/>
 </IndexedIdentifier>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="notInPlanhalt">
 <EventList>
@@ -827,7 +827,7 @@
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="wendehalt"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <IndexedIdentifier Name="notAktiv">
 <SimpleIdentifier Name="WH"/>
 </IndexedIdentifier>
@@ -835,7 +835,7 @@
 <IndexedIdentifier Name="zugAn">
 <SimpleIdentifier Name="WH"/>
 </IndexedIdentifier>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Name="wendehaltAktiv">
 <PointGeometry>

@@ -1,11 +1,11 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: waters.junit
+//# PACKAGE: net.sourceforge.waters.junit
 //# CLASS:   JAXBTestCase
 //###########################################################################
-//# $Id: WatersTestCase.java,v 1.1 2005-02-21 03:14:14 robi Exp $
+//# $Id: WatersTestCase.java,v 1.2 2005-11-03 01:24:16 robi Exp $
 //###########################################################################
-
 
 package net.sourceforge.waters.junit;
 
@@ -13,13 +13,13 @@ import java.io.File;
 import junit.framework.TestCase;
 
 
-abstract class WatersTestCase
+public abstract class WatersTestCase
   extends TestCase
 {
 
   //#########################################################################
   //# Constructors
-  WatersTestCase()
+  public WatersTestCase()
   {
     final String inputprop = System.getProperty("waters.test.inputdir");
     final String outputprop = System.getProperty("waters.test.outputdir");
@@ -30,14 +30,30 @@ abstract class WatersTestCase
 
   //#########################################################################
   //# Simple Access
-  File getInputRoot()
+  protected File getInputRoot()
   {
     return mInputRoot;
   }
 
-  File getOutputRoot()
+  protected File getOutputRoot()
   {
     return mOutputRoot;
+  }
+
+  protected File getInputDirectory()
+  {
+    return getInputRoot();
+  }
+
+  protected File getOutputDirectory()
+  {
+    final String packname = getClass().getPackage().getName();
+    final String[] parts = packname.split("\\.");
+    File result = mOutputRoot;
+    for (int i = 3; i < parts.length; i++) {
+      result = new File(result, parts[i]);
+    }
+    return result;
   }
 
 

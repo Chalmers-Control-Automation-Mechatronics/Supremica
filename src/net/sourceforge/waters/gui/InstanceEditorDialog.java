@@ -1,51 +1,46 @@
 //# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: waters.gui
+//# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   InstanceEditorDialog
 //###########################################################################
-//# $Id: InstanceEditorDialog.java,v 1.3 2005-02-20 23:32:54 robi Exp $
+//# $Id: InstanceEditorDialog.java,v 1.4 2005-11-03 01:24:15 robi Exp $
 //###########################################################################
+
+
 package net.sourceforge.waters.gui;
 
-import javax.swing.*;
-import javax.swing.event.*;
-import java.awt.*;
-import java.awt.event.*;
-import javax.xml.bind.JAXBException;
-import net.sourceforge.waters.model.base.*;
-import net.sourceforge.waters.model.module.*;
-import net.sourceforge.waters.model.module.InstanceProxy;
-import net.sourceforge.waters.model.expr.IdentifierProxy;
-import net.sourceforge.waters.model.expr.SimpleIdentifierProxy;
-import net.sourceforge.waters.xsd.base.ComponentKind;
-import net.sourceforge.waters.xsd.module.SimpleComponentType;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.ParseException;
-import net.sourceforge.waters.model.expr.SimpleExpressionProxy;
-import net.sourceforge.waters.model.module.ForeachComponentProxy;
-import net.sourceforge.waters.model.module.EventDeclProxy;
-import net.sourceforge.waters.xsd.base.EventKind;
-import java.util.Vector;
+import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.subject.module.InstanceSubject;
+
 
 public class InstanceEditorDialog
 	extends JDialog
 	implements ActionListener
 {
-	private final JTextField name = new JTextField(16);
-	private final JTextField modName = new JTextField(16);
-	private final JButton okButton = new JButton("OK");
-	ModuleWindow root = null;
-	DefaultListModel data = null;
-	JList dataList = null;
 
+	//#######################################################################
+	//# Constructor
 	public InstanceEditorDialog(ModuleWindow root)
 	{
 		setTitle("Instance Component Editor");
+		mRoot = root;
 
-		this.root = root;
+		// TODO: Change the selection mode for the JList component
+		// (Single selection)
 
-		// TODO: Change the selection mode for the JList component (Single selection)
 		// Center this element on the screen
 		setModal(true);
 		setLocationRelativeTo(null);
@@ -66,14 +61,14 @@ public class InstanceEditorDialog
 
 		b.add(r1);
 		r1.add(new JLabel("Name: "));
-		r1.add(name);
+		r1.add(mNameInput);
 
 		//TODO: Make this a file selector
 		JPanel r2 = new JPanel();
 
 		b.add(r2);
 		r2.add(new JLabel("Module Name: "));
-		r2.add(modName);
+		r2.add(mModuleInput);
 
 		JPanel r3 = new JPanel();
 
@@ -85,40 +80,28 @@ public class InstanceEditorDialog
 		show();
 	}
 
+
+	//#######################################################################
+	//# Interface java.awt.event.ActionListener
 	public void actionPerformed(ActionEvent e)
 	{
 		if ("OK".equals(e.getActionCommand()))
 		{
-			ExpressionParser parser = null;
-			SimpleExpressionProxy expr = null;
-			InstanceProxy ip = null;
-
-			try
-			{
-				if (name.getText().length() != 0)
-				{
-					parser = new ExpressionParser();
-					expr = parser.parse(name.getText(), SimpleExpressionProxy.TYPE_NAME);
-
-					root.logEntry("Instance component name passed validation: " + name.getText());
-				}
-				else
-				{
-					JOptionPane.showMessageDialog(this, "Invalid identifier");
-					root.logEntry("Instance component name was found to be invalid: " + name.getText());
-				}
-			}
-			catch (final ParseException exception)
-			{
-				ErrorWindow.askRevert(exception,  name.getText());
-				root.logEntry("ParseException in component name: " + exception.getMessage());
-
+			final ExpressionParser parser = mRoot.getExpressionParser();
+			final String nameText = mNameInput.getText();
+			IdentifierProxy ident = null;
+			try {
+				ident = parser.parseIdentifier(nameText);
+			} catch (final ParseException exception) {
+				ErrorWindow.askRevert(exception, nameText);
+				mRoot.logEntry("ParseException in instance name: " +
+							   exception.getMessage());
 				return;
 			}
-
-			ip = new InstanceProxy((IdentifierProxy) expr, modName.getText());
-
-			root.addComponent(ip);
+			final String moduleText = mModuleInput.getText();
+			final InstanceSubject inst =
+				new InstanceSubject(ident, moduleText);
+			mRoot.addComponent(inst);
 			dispose();
 		}
 
@@ -127,4 +110,13 @@ public class InstanceEditorDialog
 			dispose();
 		}
 	}
+
+
+	//#######################################################################
+	//# Data Members
+	private final JTextField mNameInput = new JTextField(16);
+	private final JTextField mModuleInput = new JTextField(16);
+	private final JButton okButton = new JButton("OK");
+	private final ModuleWindow mRoot;
+
 }

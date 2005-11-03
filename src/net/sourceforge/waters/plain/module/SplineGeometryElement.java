@@ -1,0 +1,124 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters
+//# PACKAGE: net.sourceforge.waters.plain.module
+//# CLASS:   SplineGeometryElement
+//###########################################################################
+//# $Id: SplineGeometryElement.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//###########################################################################
+
+package net.sourceforge.waters.plain.module;
+
+import java.awt.geom.Point2D;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
+import net.sourceforge.waters.model.base.ProxyVisitor;
+import net.sourceforge.waters.model.base.VisitorException;
+import net.sourceforge.waters.model.module.ModuleProxyVisitor;
+import net.sourceforge.waters.model.module.SplineGeometryProxy;
+import net.sourceforge.waters.plain.base.CloningGeometryListElement;
+import net.sourceforge.waters.plain.base.GeometryElement;
+
+import net.sourceforge.waters.xsd.module.SplineKind;
+
+
+/**
+ * An immutable implementation of the {@link SplineGeometryProxy} interface.
+ *
+ * @author Robi Malik
+ */
+
+public final class SplineGeometryElement
+  extends GeometryElement
+  implements SplineGeometryProxy
+{
+
+  //#########################################################################
+  //# Constructors
+  /**
+   * Creates a new spline geometry.
+   * @param points The list of control points of the new spline geometry.
+   * @param kind The kind of the new spline geometry.
+   */
+  public SplineGeometryElement(final Collection<? extends Point2D> points,
+                               final SplineKind kind)
+  {
+    mPoints = new CloningGeometryListElement<Point2D>(points);
+    mKind = kind;
+  }
+
+  /**
+   * Creates a new spline geometry using default values.
+   * This constructor creates a spline geometry with
+   * an empty list of control points and
+   * the kind set to <CODE>SplineKind.INTERPOLATING</CODE>.
+   */
+  public SplineGeometryElement()
+  {
+    this(emptyPoint2DList(),
+         SplineKind.INTERPOLATING);
+  }
+
+
+  //#########################################################################
+  //# Cloning
+  public SplineGeometryElement clone()
+  {
+    return (SplineGeometryElement) super.clone();
+  }
+
+
+  //#########################################################################
+  //# Equality
+  public boolean equals(final Object partner)
+  {
+    if (super.equals(partner)) {
+      final SplineGeometryElement downcast = (SplineGeometryElement) partner;
+      return
+        mPoints.equals(downcast.mPoints) &&
+        mKind.equals(downcast.mKind);
+    } else {
+      return false;
+    }
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.base.Proxy
+  public Object acceptVisitor(final ProxyVisitor visitor)
+    throws VisitorException
+  {
+    final ModuleProxyVisitor downcast = (ModuleProxyVisitor) visitor;
+    return downcast.visitSplineGeometryProxy(this);
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.module.SplineGeometryProxy
+  public List<Point2D> getPoints()
+  {
+    return mPoints;
+  }
+
+  public SplineKind getKind()
+  {
+    return mKind;
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private static List<Point2D> emptyPoint2DList()
+  {
+    return Collections.emptyList();
+  }
+
+
+  //#########################################################################
+  //# Data Members
+  private final List<Point2D> mPoints;
+  private final SplineKind mKind;
+
+}

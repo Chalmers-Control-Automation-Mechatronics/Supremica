@@ -145,7 +145,7 @@
     <xs:complexContent>
       <xs:extension base="B:ElementType">
         <xs:sequence>
-          <xs:element ref="M:EventAlias" maxOccurs="unbounded">
+          <xs:element ref="M:AbstractEventAlias" maxOccurs="unbounded">
             <xs:annotation><xs:appinfo>
               <jaxb:property name="List"/>
             </xs:appinfo></xs:annotation>
@@ -390,7 +390,7 @@
     <xs:complexContent>
       <xs:extension base="B:ElementType">
         <xs:sequence>
-          <xs:element ref="M:EventList" minOccurs="0">
+          <xs:element ref="M:LabelBlock" minOccurs="0">
             <xs:annotation><xs:appinfo>
               <jaxb:property name="BlockedEvents"/>
             </xs:appinfo></xs:annotation>
@@ -741,33 +741,13 @@
   </xs:complexType>
 </xs:element>
 
-<xs:element name="IntRangeExpression" substitutionGroup="M:SimpleExpression">
-  <xs:complexType>
-    <xs:complexContent>
-      <xs:extension base="M:SimpleExpressionType">
-        <xs:sequence>
-          <xs:group ref="M:ArithmeticExpression">
-            <xs:annotation><xs:appinfo>
-              <jaxb:property name="Lower"/>
-            </xs:appinfo></xs:annotation>
-          </xs:group>
-          <xs:group ref="M:ArithmeticExpression">
-            <xs:annotation><xs:appinfo>
-              <jaxb:property name="Upper"/>
-            </xs:appinfo></xs:annotation>
-          </xs:group>
-        </xs:sequence>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-</xs:element>
-
 <xs:element name="EnumSetExpression" substitutionGroup="M:SimpleExpression">
   <xs:complexType>
     <xs:complexContent>
       <xs:extension base="M:SimpleExpressionType">
         <xs:sequence>
-          <xs:element ref="M:SimpleIdentifier" maxOccurs="unbounded">
+          <xs:element ref="M:SimpleIdentifier"
+                      minOccurs="0" maxOccurs="unbounded">
             <xs:annotation><xs:appinfo>
               <jaxb:property name="Items"/>
             </xs:appinfo></xs:annotation>
@@ -788,7 +768,7 @@
 <xs:group name="RangeExpression">
   <xs:choice>
     <xs:element ref="M:SimpleIdentifier"/>
-    <xs:element ref="M:IntRangeExpression"/>
+    <xs:element ref="M:BinaryExpression"/>
     <xs:element ref="M:EnumSetExpression"/>
   </xs:choice>
 </xs:group>
@@ -808,7 +788,6 @@
     <xs:element ref="M:IntConstant"/>
     <xs:element ref="M:UnaryExpression"/>
     <xs:element ref="M:BinaryExpression"/>
-    <xs:element ref="M:IntRangeExpression"/>
     <xs:element ref="M:EnumSetExpression"/>
   </xs:choice>
 </xs:group>
@@ -835,6 +814,7 @@
     <xs:enumeration value="!="/>
     <xs:enumeration value="&amp;"/>
     <xs:enumeration value="|"/>
+    <xs:enumeration value=".."/>
   </xs:restriction>
 </xs:simpleType>
 

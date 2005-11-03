@@ -1,9 +1,10 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.build.jniglue
 //# CLASS:   TokenTable
 //###########################################################################
-//# $Id: TokenTable.java,v 1.1 2005-02-18 01:30:10 robi Exp $
+//# $Id: TokenTable.java,v 1.2 2005-11-03 01:24:16 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.build.jniglue;
@@ -68,7 +69,7 @@ class TokenTable {
   //# The Token Map
   static Token createToken(final String name)
   {
-    final Token token = (Token) sNameMap.get(name);
+    final Token token = sNameMap.get(name);
     if (token == null) {
       return new IdentifierToken(C_IDENTIFIER, name);
     } else {
@@ -78,14 +79,14 @@ class TokenTable {
 
   static Token getToken(final String name)
   {
-    return (Token) sNameMap.get(name);
+    return sNameMap.get(name);
   }
 
 
   //#########################################################################
   //# Static Initialisation
   static {
-    sNameMap = new HashMap(16);
+    sNameMap = new HashMap<String,Token>(16);
     recordToken(T_PACKAGE);
     recordToken(T_CLASS);
     recordToken(T_ENUM);
@@ -108,6 +109,6 @@ class TokenTable {
 
   //#########################################################################
   //# Static Class Variables
-  private static final Map sNameMap;
+  private static final Map<String,Token> sNameMap;
 
 }

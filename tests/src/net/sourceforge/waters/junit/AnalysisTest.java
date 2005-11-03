@@ -1,11 +1,11 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.junit
 //# CLASS:   AlgorithmsTest
 //###########################################################################
-//# $Id: AnalysisTest.java,v 1.2 2005-02-21 03:14:14 robi Exp $
+//# $Id: AnalysisTest.java,v 1.3 2005-11-03 01:24:16 robi Exp $
 //###########################################################################
-
 
 package net.sourceforge.waters.junit;
 
@@ -16,6 +16,7 @@ import javax.xml.bind.JAXBException;
 import net.sourceforge.waters.model.analysis.ProductDESCopier;
 import net.sourceforge.waters.model.analysis.ProductDESResult;
 import net.sourceforge.waters.model.base.DocumentManager;
+import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.ProxyMarshaller;
 import net.sourceforge.waters.model.base.WatersException;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
@@ -72,7 +73,7 @@ public class AnalysisTest extends WatersTestCase
   {
     mModuleMarshaller = new ModuleMarshaller();
     mDESMarshaller = new ProductDESMarshaller();
-    mDocumentManager = new DocumentManager();
+    mDocumentManager = new DocumentManager<DocumentProxy>();
     mDocumentManager.register(mModuleMarshaller);
     mDocumentManager.register(mDESMarshaller);
     mInputDirectory = new File(getInputRoot(), "handwritten");
@@ -93,7 +94,7 @@ public class AnalysisTest extends WatersTestCase
   //# Data Members
   private ModuleMarshaller mModuleMarshaller;
   private ProductDESMarshaller mDESMarshaller;
-  private DocumentManager mDocumentManager;
+  private DocumentManager<DocumentProxy> mDocumentManager;
   private File mInputDirectory;
   private File mOutputDirectory;
 

@@ -1,3 +1,13 @@
+//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
+//###########################################################################
+//# PROJECT: Waters/Supremica IDE
+//# PACKAGE: org.supremica.gui.ide
+//# CLASS:   EditorComponentsPanel
+//###########################################################################
+//# $Id: EditorComponentsPanel.java,v 1.12 2005-11-03 01:24:16 robi Exp $
+//###########################################################################
+
+
 package org.supremica.gui.ide;
 
 import javax.swing.*;
@@ -6,11 +16,18 @@ import java.util.*;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import org.supremica.gui.WhiteScrollPane;
-import net.sourceforge.waters.model.module.*;
-import net.sourceforge.waters.model.base.*;
+
 import net.sourceforge.waters.gui.ComponentInfo;
 import net.sourceforge.waters.gui.ModuleTreeRenderer;
+import net.sourceforge.waters.subject.module.ForeachSubject;
+import net.sourceforge.waters.subject.module.InstanceSubject;
+import net.sourceforge.waters.subject.module.ModuleSubject;
+import net.sourceforge.waters.subject.module.ParameterBindingSubject;
+import net.sourceforge.waters.subject.module.SimpleComponentSubject;
+import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
+
+import org.supremica.gui.WhiteScrollPane;
+
 
 class EditorComponentsPanel
 	extends WhiteScrollPane
@@ -34,7 +51,7 @@ class EditorComponentsPanel
 	public String getName()
 	{
 		return name;
-//		return moduleContainer.getModuleProxy().getName();
+//		return moduleContainer.getModule().getName();
 	}
 
 
@@ -43,7 +60,7 @@ class EditorComponentsPanel
 		final ArrayList l;
 		DefaultMutableTreeNode treeNode = null;
 
-		ModuleProxy module = moduleContainer.getModuleProxy();
+		final ModuleSubject module = moduleContainer.getModule();
 
 		if (module != null)
 		{
@@ -58,7 +75,7 @@ class EditorComponentsPanel
 
 		for (int i = 0; i < l.size(); i++)
 		{
-			treeNode.add(makeTreeFromComponent((ElementProxy) (l.get(i))));
+			treeNode.add(makeTreeFromComponent(l.get(i)));
 		}
 
 		DefaultMutableTreeNode rootNode = treeNode;
@@ -89,122 +106,73 @@ class EditorComponentsPanel
 		moduleSelectTree.addMouseListener(ml);
 		getViewport().add(moduleSelectTree);
 
-
-/*
-		JButton NewSimpleButton = new JButton("New Simple Component");
-
-		NewSimpleButton.addActionListener(this);
-		NewSimpleButton.setActionCommand("newsimple");
-
-		JButton NewForeachButton = new JButton("New Foreach Component");
-
-		NewForeachButton.addActionListener(this);
-		NewForeachButton.setActionCommand("newforeach");
-
-		JButton DeleteComponentButton = new JButton("Remove Component");
-
-		if (module == null)
-		{
-			NewSimpleButton.setEnabled(false);
-			NewForeachButton.setEnabled(false);
-			DeleteComponentButton.setEnabled(false);
-		}
-
-		JPanel content = new JPanel();
-		Box b = new Box(BoxLayout.PAGE_AXIS);
-
-		b.add(new JScrollPane(moduleSelectTree));
-
-		JPanel buttonpanel = new JPanel();
-
-		buttonpanel.add(NewSimpleButton);
-		buttonpanel.add(NewForeachButton);
-		buttonpanel.add(newInstanceButton = new JButton("New Instance"));
-		buttonpanel.add(newBindingButton = new JButton("New Binding"));
-		buttonpanel.add(DeleteComponentButton);
-		newInstanceButton.setActionCommand("newinstance");
-		newInstanceButton.addActionListener(this);
-		newBindingButton.setActionCommand("newbinding");
-		newBindingButton.addActionListener(this);
-		b.add(buttonpanel);
-		content.add(b);
-		content.setLayout(new GridLayout(1, 1));
-
-		return content;
-*/
 	}
 
 
-	private DefaultMutableTreeNode makeTreeFromComponent(ElementProxy e)
+	private DefaultMutableTreeNode makeTreeFromComponent(final Object e)
 	{
-		if (e instanceof SimpleComponentProxy)
-		{
-			final Object userobject = new ComponentInfo(((IdentifiedElementProxy) e).getName(), e);
-
+		if (e instanceof SimpleComponentSubject) {
+			final SimpleComponentSubject comp = (SimpleComponentSubject) e;
+			final String name = comp.getName();
+			final Object userobject = new ComponentInfo(name, comp);
 			return new DefaultMutableTreeNode(userobject, false);
-		}
-		else if (e instanceof InstanceProxy)
-		{
-			InstanceProxy i = (InstanceProxy) e;
-			String name = "<html><b>Instance </b><i>" + i.getName() + "</i> = <i>" + i.getModuleName() + "</i></html>";
-			final Object userobject = new ComponentInfo(name, e);
-			DefaultMutableTreeNode tmp = new DefaultMutableTreeNode(userobject, true);
-
-			for (int j = 0; j < i.getBindingList().size(); j++)
-			{
-				tmp.add(makeTreeFromComponent((ElementProxy) (i.getBindingList().get(j))));
+		} else if (e instanceof InstanceSubject) {
+			final InstanceSubject inst = (InstanceSubject) e;
+			final String name =
+				"<html><b>Instance </b><i>" + inst.getName() + "</i> = <i>" +
+				inst.getModuleName() + "</i></html>";
+			final Object userobject = new ComponentInfo(name, inst);
+			DefaultMutableTreeNode tmp =
+				new DefaultMutableTreeNode(userobject, true);
+			for (int j = 0; j < inst.getBindingList().size(); j++) {
+				tmp.add(makeTreeFromComponent(inst.getBindingList().get(j)));
 			}
-
 			return tmp;
-		}
-		else if (e instanceof ParameterBindingProxy)
-		{
-			ParameterBindingProxy i = (ParameterBindingProxy) e;
-			String name = "<html><b>Binding: </b><i>" + i.getName() + "</i> = <i>" + i.getExpression().toString() + "</i></html>";
-			final Object userobject = new ComponentInfo(name, e);
-
+		} else if (e instanceof ParameterBindingSubject) {
+			final ParameterBindingSubject binding =
+				(ParameterBindingSubject) e;
+			final String name =
+				"<html><b>Binding: </b><i>" + binding.getName() +
+				"</i> = <i>" + binding.getExpression().toString() +
+				"</i></html>";
+			final Object userobject = new ComponentInfo(name, binding);
 			return new DefaultMutableTreeNode(userobject, false);
-		}
-		else
-		{
-			String name;
-			ForeachProxy v = (ForeachProxy) e;
-			ElementProxy range = v.getRange();
-			ElementProxy guard = v.getGuard();
-
-			name = "<html><b>Foreach </b><i>" + ((NamedProxy) e).getName() + "</i>";
-
-			if (range != null)
-			{
-				name += " <b>in<b> <i>" + range.toString() + "</i>";
+		} else {
+			final ForeachSubject foreach = (ForeachSubject) e;
+			final SimpleExpressionSubject range = foreach.getRange();
+			final SimpleExpressionSubject guard = foreach.getGuard();
+			final StringBuffer buffer = new StringBuffer();
+			buffer.append("<html><b>Foreach </b><i>");
+			buffer.append(foreach.getName());
+			buffer.append("</i> <b>in<b> <i>");
+			buffer.append(range);
+			if (guard != null) {
+				buffer.append(" <b>Where</b> <i>");
+				buffer.append(guard);
+				buffer.append("</i>");
 			}
-
-			if (guard != null)
-			{
-				name += " <b>Where</b> <i>" + guard.toString() + "</i></html>";
+			buffer.append("</html>");
+			final String name = buffer.toString();
+			final Object userobject = new ComponentInfo(name, foreach);
+			final DefaultMutableTreeNode tn =
+				new DefaultMutableTreeNode(userobject, true);
+			for (int i = 0; i < foreach.getBody().size(); i++) {
+				tn.add(makeTreeFromComponent(foreach.getBody().get(i)));
 			}
-
-			final Object userobject = new ComponentInfo(name, e);
-			final DefaultMutableTreeNode tn = new DefaultMutableTreeNode(userobject, true);
-
-			for (int i = 0; i < v.getBody().size(); i++)
-			{
-				tn.add(makeTreeFromComponent((ElementProxy) (v.getBody().get(i))));
-			}
-
 			return tn;
 		}
 	}
+
 
 	private class TreeMouseAdapter
 		extends MouseAdapter
 	{
 		JTree moduleSelectTree;
-		ModuleProxy module;
+		ModuleSubject module;
 
 //		ComponentEditorPanel ed = null;
 
-		public TreeMouseAdapter(ModuleProxy module, JTree moduleSelectTree)
+		public TreeMouseAdapter(ModuleSubject module, JTree moduleSelectTree)
 		{
 			this.module = module;
 			this.moduleSelectTree = moduleSelectTree;
@@ -221,26 +189,18 @@ class EditorComponentsPanel
 				{
 					DefaultMutableTreeNode node = (DefaultMutableTreeNode) moduleSelectTree.getLastSelectedPathComponent();
 
-					if (node == null)
-					{
+					if (node == null) {
 						return;
-					}
-
-					Object nodeInfo = node.getUserObject();
-
-					if (node.isLeaf())
-					{
-						SimpleComponentProxy scp = (SimpleComponentProxy) (((ComponentInfo) nodeInfo).getComponent());
-
-						if (scp != null)
-						{
-//							if (ed == null)
-//							{
-//								ed = new ComponentEditorPanel(moduleContainer, scp);
-//							}
-							EditorPanel editorPanel = moduleContainer.getEditorPanel();
-							editorPanel.setRightComponent(moduleContainer.getComponentEditorPanel(scp));
-							//							ed = new EditorWindow(scp.getName(), module, scp);
+					} else if (node.isLeaf()) {
+						final ComponentInfo compInfo =
+							(ComponentInfo) node.getUserObject();
+						final SimpleComponentSubject comp =
+							(SimpleComponentSubject) compInfo.getComponent();
+						if (comp != null) {
+							final EditorPanel editorPanel =
+								moduleContainer.getEditorPanel();
+							editorPanel.setRightComponent
+								(moduleContainer.getComponentEditorPanel(comp));
 						}
 					}
 				}

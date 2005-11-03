@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   OpenAction
 //###########################################################################
-//# $Id: OpenAction.java,v 1.9 2005-05-11 13:07:55 knut Exp $
+//# $Id: OpenAction.java,v 1.10 2005-11-03 01:24:16 robi Exp $
 //###########################################################################
 
 
@@ -18,18 +18,21 @@ import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.xml.bind.JAXBException;
-import javax.xml.transform.TransformerConfigurationException;
 
-import net.sourceforge.waters.model.module.ModuleMarshaller;
-import net.sourceforge.waters.model.base.ModelException;
+import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.expr.OperatorTable;
+import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
+import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
+import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.ModuleProxy;
-import net.sourceforge.waters.model.base.ProxyMarshaller;
+import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.subject.module.ModuleSubject;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.valid.ValidUnmarshaller;
 
 import org.supremica.gui.FileDialogs;
 import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.ModuleContainer;
-
 
 
 public class OpenAction
@@ -96,15 +99,20 @@ public class OpenAction
 		private void openFileWmod(final File file)
 		{
 			try	{
-				final ProxyMarshaller marshaller = new ModuleMarshaller();
-				final ModuleProxy module =
-					(ModuleProxy) marshaller.unmarshal(file);
+				final ModuleProxyFactory factory =
+					ModuleSubjectFactory.getInstance();
+				final OperatorTable optable =
+					CompilerOperatorTable.getInstance();
+				final ProxyUnmarshaller<ModuleProxy> unmarshaller =
+					new JAXBModuleMarshaller(factory, optable);
+				final ModuleSubject module =
+					(ModuleSubject) unmarshaller.unmarshal(file);
 				installContainer(module);
 			} catch (final JAXBException exception) {
 				showParseError("Could not parse module file", file, exception);
-			} catch (final ModelException exception) {
+			} catch (final WatersUnmarshalException exception) {
 				showParseError("Could not parse module file", file, exception);
-			} catch (final Exception exception) {
+			} catch (final IOException exception) {
 				showParseError("Could not parse module file", file, exception);
 			}
 		}
@@ -140,22 +148,22 @@ public class OpenAction
 		private void openFileVmod(final File file)
 		{
 			try {
-				final ValidUnmarshaller unmarshaller = new ValidUnmarshaller();
-				final ModuleProxy module = (ModuleProxy) unmarshaller.unmarshal(file);
+				final ModuleProxyFactory factory =
+					ModuleSubjectFactory.getInstance();
+				final OperatorTable optable =
+					CompilerOperatorTable.getInstance();
+				final ProxyUnmarshaller<ModuleProxy> unmarshaller =
+					new ValidUnmarshaller(factory, optable);
+				final ModuleSubject module =
+					(ModuleSubject) unmarshaller.unmarshal(file);
 				installContainer(module);
-			} catch (final IOException exception) {
-				showParseError
-					("Error importing from VALID module", file, exception);
 			} catch (final JAXBException exception) {
 				showParseError
 					("Error importing from VALID module", file, exception);
-			} catch (final ModelException exception) {
+			} catch (final WatersUnmarshalException exception) {
 				showParseError
 					("Error importing from VALID module", file, exception);
-			} catch (final TransformerConfigurationException exception) {
-				showParseError
-					("Error importing from VALID module", file, exception);
-			} catch (final Exception exception) {
+			} catch (final IOException exception) {
 				showParseError
 					("Error importing from VALID module", file, exception);
 			}
@@ -165,9 +173,10 @@ public class OpenAction
 
 		//###################################################################
 		//# Auxiliary Methods
-		private void installContainer(final ModuleProxy module)
+		private void installContainer(final ModuleSubject module)
 		{
-			ModuleContainer moduleContainer = new ModuleContainer(ide.getIDE(), module);
+			final ModuleContainer moduleContainer =
+				new ModuleContainer(ide.getIDE(), module);
 			ide.add(moduleContainer);
 			ide.setActive(moduleContainer);
 		}

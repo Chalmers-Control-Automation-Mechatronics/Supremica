@@ -25,13 +25,13 @@
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="counterobserver"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="counter"/>
 <SimpleIdentifier Name="counter_equals_12"/>
 <SimpleIdentifier Name="counter_less_than_12"/>
 <SimpleIdentifier Name="repeat"/>
 <SimpleIdentifier Name="reset"/>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="s0">
 <EventList>
@@ -110,11 +110,11 @@
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="operatorobserver"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="operator_input"/>
 <SimpleIdentifier Name="repeat"/>
 <SimpleIdentifier Name="stop"/>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="s0">
 <EventList>
@@ -163,7 +163,7 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="recoverysupervisor"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="counter"/>
 <SimpleIdentifier Name="done_recover"/>
 <SimpleIdentifier Name="done_scan"/>
@@ -180,7 +180,7 @@
 <SimpleIdentifier Name="stop"/>
 <SimpleIdentifier Name="turn"/>
 <SimpleIdentifier Name="vacuum"/>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="s0">
 <EventList>
@@ -349,13 +349,13 @@
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="scanobserver"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="done_recover"/>
 <SimpleIdentifier Name="done_scan"/>
 <SimpleIdentifier Name="error_scan"/>
 <SimpleIdentifier Name="recover"/>
 <SimpleIdentifier Name="scan"/>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="s0">
 <EventList>
@@ -431,7 +431,7 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="scansupervisor"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="counter"/>
 <SimpleIdentifier Name="counter_equals_12"/>
 <SimpleIdentifier Name="counter_less_than_12"/>
@@ -446,7 +446,7 @@
 <SimpleIdentifier Name="scan"/>
 <SimpleIdentifier Name="stop"/>
 <SimpleIdentifier Name="turn"/>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="s0">
 <PointGeometry>
@@ -611,13 +611,13 @@
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="turnobserver"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="done_recover"/>
 <SimpleIdentifier Name="done_turn"/>
 <SimpleIdentifier Name="error_turn"/>
 <SimpleIdentifier Name="recover"/>
 <SimpleIdentifier Name="turn"/>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="s0">
 <EventList>
@@ -693,13 +693,13 @@
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="vacuumobserver"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="done_recover"/>
 <SimpleIdentifier Name="done_vacuum"/>
 <SimpleIdentifier Name="error_vacuum"/>
 <SimpleIdentifier Name="recover"/>
 <SimpleIdentifier Name="vacuum"/>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="s0">
 <EventList>
@@ -775,7 +775,7 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="vacuumsupervisor"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="counter"/>
 <SimpleIdentifier Name="counter_equals_12"/>
 <SimpleIdentifier Name="counter_less_than_12"/>
@@ -790,7 +790,7 @@
 <SimpleIdentifier Name="stop"/>
 <SimpleIdentifier Name="turn"/>
 <SimpleIdentifier Name="vacuum"/>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="s0">
 <PointGeometry>

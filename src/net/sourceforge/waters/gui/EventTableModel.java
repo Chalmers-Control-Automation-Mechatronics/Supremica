@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EventTableModel
 //###########################################################################
-//# $Id: EventTableModel.java,v 1.7 2005-07-07 03:24:12 siw4 Exp $
+//# $Id: EventTableModel.java,v 1.8 2005-11-03 01:24:15 robi Exp $
 //###########################################################################
 
 
@@ -23,15 +23,18 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
-import net.sourceforge.waters.model.expr.IdentifierProxy;
+import net.sourceforge.waters.model.base.IndexedList;
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
-import net.sourceforge.waters.model.module.EventDeclProxy;
-import net.sourceforge.waters.model.module.EventParameterProxy;
+import net.sourceforge.waters.model.module.EventListExpressionProxy;
 import net.sourceforge.waters.model.module.ForeachEventProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
-import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
-import net.sourceforge.waters.model.module.ParameterProxy;
+import net.sourceforge.waters.subject.module.EventDeclSubject;
+import net.sourceforge.waters.subject.module.EventParameterSubject;
+import net.sourceforge.waters.subject.module.IdentifierSubject;
+import net.sourceforge.waters.subject.module.ModuleSubject;
+import net.sourceforge.waters.subject.module.ParameterSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 
@@ -48,7 +51,9 @@ class EventTableModel
 
 	//#######################################################################
 	//# Constructors
-	EventTableModel(final GraphProxy graph, final ModuleProxy module, final JTable table)
+	EventTableModel(final GraphProxy graph,
+					final ModuleSubject module,
+					final JTable table)
 	{
 		mTable = table;
 		mGraph = graph;
@@ -82,7 +87,7 @@ class EventTableModel
 			return ImageIcon.class;
 
 		case 1 :
-			return IdentifierProxy.class;
+			return IdentifierSubject.class;
 
 		default :
 			throw new ArrayIndexOutOfBoundsException
@@ -99,7 +104,7 @@ class EventTableModel
 		{
 
 		case 0 :
-			final IdentifierProxy ident = entry.getName();
+			final IdentifierSubject ident = entry.getName();
 			final EventKind kind = guessEventKind(ident);
 
 			return getIcon(kind);
@@ -131,8 +136,8 @@ class EventTableModel
 			return;
 
 		case 1 :
-			final IdentifierProxy ident = (IdentifierProxy) value;
-			final IdentifierProxy old = getEvent(row);
+			final IdentifierSubject ident = (IdentifierSubject) value;
+			final IdentifierSubject old = getEvent(row);
 			if (ident == null) {
 				mEvents.remove(row);
 				fireTableRowsDeleted(row, row);
@@ -153,7 +158,7 @@ class EventTableModel
 
 	//#######################################################################
 	//# More Specific Access
-	IdentifierProxy getEvent(final int row)
+	IdentifierSubject getEvent(final int row)
 	{
 		final EventEntry entry = (EventEntry) mEvents.get(row);
 
@@ -173,7 +178,7 @@ class EventTableModel
 
 	String getToolTipText(final int row)
 	{
-		final IdentifierProxy event = getEvent(row);
+		final IdentifierSubject event = getEvent(row);
 		final String name = event.toString();
 		final int len = name.length();
 		final StringBuffer buffer = new StringBuffer(len + 22);
@@ -198,32 +203,25 @@ class EventTableModel
 
 	//#######################################################################
 	//# Auxiliary Methods
-	private List collectEvents()
+	private List<EventEntry> collectEvents()
 	{
-		final Collection collected = new TreeSet();
-		final Collection blocked = mGraph.getBlockedEvents();
+		final Collection<IdentifierSubject> collected =
+			new TreeSet<IdentifierSubject>();
+		final EventListExpressionProxy blocked = mGraph.getBlockedEvents();
 		collectEvents(collected, blocked);
-
-		final Collection nodes = mGraph.getNodes();
-		final Iterator nodeiter = nodes.iterator();
-		while (nodeiter.hasNext()) {
-			final NodeProxy node = (NodeProxy) nodeiter.next();
-			final List props = node.getPropositions();
+		final Collection<NodeProxy> nodes = mGraph.getNodes();
+		for (final NodeProxy node : nodes) {
+			final EventListExpressionProxy props = node.getPropositions();
 			collectEvents(collected, props);
 		}
-
-		final Collection edges = mGraph.getEdges();
-		final Iterator edgeiter = edges.iterator();
-		while (edgeiter.hasNext()) {
-			final EdgeProxy edge = (EdgeProxy) edgeiter.next();
-			final Collection labels = edge.getLabelBlock();
+		final Collection<EdgeProxy> edges = mGraph.getEdges();
+		for (final EdgeProxy edge : edges) {
+			final EventListExpressionProxy labels = edge.getLabelBlock();
 			collectEvents(collected, labels);
 		}
-
-		final List result = new ArrayList(collected.size());
-		final Iterator iter = collected.iterator();
-		while (iter.hasNext()) {
-			final IdentifierProxy ident = (IdentifierProxy) iter.next();
+		final List<EventEntry> result =
+			new ArrayList<EventEntry>(collected.size());
+		for (final IdentifierSubject ident : collected) {
 			final EventEntry entry = new EventEntry(ident);
 			result.add(entry);
 		}
@@ -231,18 +229,23 @@ class EventTableModel
 	}
 
 
-
-	private void collectEvents(final Collection dest, final Collection source)
+	private void collectEvents(final Collection<IdentifierSubject> dest,
+							   final EventListExpressionProxy source)
 	{
-		final Iterator iter = source.iterator();
-		while (iter.hasNext()) {
-			final Object entry = iter.next();
-			if (entry instanceof ForeachEventProxy) {
-				final ForeachEventProxy foreach = (ForeachEventProxy) entry;
-				final List body = foreach.getBody();
+		collectEvents(dest, source.getEventList());
+	}
+
+
+	private void collectEvents(final Collection<IdentifierSubject> dest,
+							   final List<? extends Proxy> source)
+	{
+		for (final Proxy proxy : source) {
+			if (proxy instanceof ForeachEventProxy) {
+				final ForeachEventProxy foreach = (ForeachEventProxy) proxy;
+				final List<Proxy> body = foreach.getBody();
 				collectEvents(dest, body);
 			} else {
-				final IdentifierProxy ident = (IdentifierProxy) entry;
+				final IdentifierSubject ident = (IdentifierSubject) proxy;
 				dest.add(ident);
 			}
 		}
@@ -250,30 +253,26 @@ class EventTableModel
 
 
 
-	private EventKind guessEventKind(final IdentifierProxy ident)
+	private EventKind guessEventKind(final IdentifierSubject ident)
 	{
 		if (ident == null) {
 			return null;
 		}
-
 		final String name = ident.getName();
-		final EventDeclProxy decl = mModule.getEventDeclaration(name);
-
-		if (decl != null)
-		{
+		final IndexedList<EventDeclSubject> decls =
+			mModule.getEventDeclListModifiable();
+		final EventDeclSubject decl = decls.get(name);
+		if (decl != null) {
 			return decl.getKind();
 		}
-
-		final ParameterProxy param = mModule.getParameter(name);
-
-		if ((param != null) && (param instanceof EventParameterProxy))
-		{
-			final EventParameterProxy eparam = (EventParameterProxy) param;
-			final EventDeclProxy edecl = eparam.getEventDecl();
-
+		final IndexedList<ParameterSubject> params =
+			mModule.getParameterListModifiable();
+		final ParameterSubject param = params.get(name);
+		if (param != null && param instanceof EventParameterSubject) {
+			final EventParameterSubject eparam = (EventParameterSubject) param;
+			final EventDeclSubject edecl = eparam.getEventDecl();
 			return edecl.getKind();
 		}
-
 		return null;
 	}
 
@@ -302,7 +301,7 @@ class EventTableModel
 		}
 	}
 
-	public IdentifierWithKind createIdentifierWithKind(IdentifierProxy ip_)
+	public IdentifierWithKind createIdentifierWithKind(IdentifierSubject ip_)
 	{
 		return new IdentifierWithKind(ip_, guessEventKind(ip_));
 	}
@@ -321,7 +320,7 @@ class EventTableModel
 		}
 
 
-		private EventEntry(final IdentifierProxy name)
+		private EventEntry(final IdentifierSubject name)
 		{
 			mName = name;
 		}
@@ -339,7 +338,7 @@ class EventTableModel
 
 		//###################################################################
 		//# Simple Access
-		private IdentifierProxy getName()
+		private IdentifierSubject getName()
 		{
 			return mName;
 		}
@@ -348,7 +347,7 @@ class EventTableModel
 
 		//###################################################################
 		//# Data Members
-		private final IdentifierProxy mName;
+		private final IdentifierSubject mName;
 
 	}
 
@@ -379,8 +378,8 @@ class EventTableModel
 	//#####################################################################
 	//# Data Members
 	private final GraphProxy mGraph;
-	private final ModuleProxy mModule;
-	private final List mEvents;
+	private final ModuleSubject mModule;
+	private final List<EventEntry> mEvents;
 	private final JTable mTable;
 
 }

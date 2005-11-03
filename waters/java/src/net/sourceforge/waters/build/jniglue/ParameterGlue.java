@@ -1,9 +1,10 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.build.jniglue
 //# CLASS:   ParameterGlue
 //###########################################################################
-//# $Id: ParameterGlue.java,v 1.1 2005-02-18 01:30:10 robi Exp $
+//# $Id: ParameterGlue.java,v 1.2 2005-11-03 01:24:16 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.build.jniglue;
@@ -71,7 +72,7 @@ class ParameterGlue implements WritableGlue {
 
   //#########################################################################
   //# Calculating Dependencies
-  void collectUsedGlue(final Set used)
+  void collectUsedGlue(final Set<ClassGlue> used)
   {
     mType.collectUsedGlue(used);
   }

@@ -609,7 +609,7 @@ class GeneralPanel
 	{
 		// Sanity check...
 		String newSeparatorString = stateSeparator.getText();
-		if (newSeparatorString.contains("q"))
+		if (newSeparatorString.indexOf('q') >= 0)
 		{
 			JOptionPane.showMessageDialog(null, "'" + newSeparatorString + 
 										  "' is not an appropriate state separator string.\n" + 

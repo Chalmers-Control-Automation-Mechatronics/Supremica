@@ -1,115 +1,89 @@
-
+//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: waters.gui
+//# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ParameterListCell
 //###########################################################################
-//# $Id: ParameterListCell.java,v 1.3 2005-03-04 09:20:13 knut Exp $
+//# $Id: ParameterListCell.java,v 1.4 2005-11-03 01:24:15 robi Exp $
 //###########################################################################
+
+
 package net.sourceforge.waters.gui;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.io.File;
-import java.io.IOException;
-import javax.xml.bind.JAXBException;
-import net.sourceforge.waters.model.base.*;
-import net.sourceforge.waters.model.module.IdentifiedElementProxy;
-import net.sourceforge.waters.model.base.ProxyMarshaller;
-import net.sourceforge.waters.model.module.ModuleMarshaller;
-import net.sourceforge.waters.model.module.*;
-import java.util.ArrayList;
+import java.awt.Component;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.ListCellRenderer;
+
+import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.model.module.EventParameterProxy;
+import net.sourceforge.waters.model.module.IntParameterProxy;
+import net.sourceforge.waters.model.module.ParameterProxy;
+import net.sourceforge.waters.model.module.RangeParameterProxy;
+import net.sourceforge.waters.model.module.SimpleParameterProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
+
 
 public class ParameterListCell
 	extends JLabel
 	implements ListCellRenderer
 {
-	final static ImageIcon controllableIcon = new ImageIcon(EventListCell.class.getResource("/icons/waters/controllable.gif"));
-	final static ImageIcon uncontIcon = new ImageIcon(EventListCell.class.getResource("/icons/waters/uncontrollable.gif"));
-	final static ImageIcon propIcon = new ImageIcon(EventListCell.class.getResource("/icons/waters/proposition.gif"));
-	final static ImageIcon intIcon = new ImageIcon(EventListCell.class.getResource("/icons/waters/intparam.gif"));
-	final static ImageIcon rangeIcon = new ImageIcon(EventListCell.class.getResource("/icons/waters/rangeparam.gif"));
 
-	public Component getListCellRendererComponent(JList list, Object value,    // value to display
-			int index,    // cell index
-			boolean isSelected,    // is the cell selected
-			boolean cellHasFocus)    // the list and the cell have the focus
+	//#######################################################################
+	//# Interface javax.swing.ListCellRenderer
+	public Component getListCellRendererComponent(JList list,
+												  Object value,
+												  int index,
+												  boolean isSelected,
+												  boolean cellHasFocus)
 	{
-		EventDeclProxy event;
 		ImageIcon icon = null;
-		String name = null;
-
-		if (value instanceof EventParameterProxy)
-		{
-			event = ((EventParameterProxy) value).getEventDecl();
-			name = "<html>" + (((EventParameterProxy) value).getEventDecl()).getNameWithRanges();
-
-			if (((EventParameterProxy) value).isRequired())
-			{
-				name += " <i>(Required)</i>";
+		final StringBuffer buffer = new StringBuffer("<html>");
+		if (value instanceof EventParameterProxy) {
+			final EventParameterProxy param = (EventParameterProxy) value;
+			final EventDeclProxy decl = param.getEventDecl();
+			buffer.append(decl.toString());
+			final EventKind kind = decl.getKind();
+			if (kind.equals(EventKind.CONTROLLABLE)) {
+				icon = IconLoader.ICON_CONTROLLABLE;
+			} else if (kind.equals(EventKind.UNCONTROLLABLE)) {
+				icon = IconLoader.ICON_UNCONTROLLABLE;
+			} else if (kind.equals(EventKind.PROPOSITION)) {
+				icon = IconLoader.ICON_PROPOSITION;
 			}
-
-			name += "</html>";
-
-			if (event.getKind().equals(EventKind.CONTROLLABLE))
-			{
-				icon = controllableIcon;
+		} else if (value instanceof SimpleParameterProxy) {
+			final SimpleParameterProxy param = (SimpleParameterProxy) value;
+			buffer.append(param.getName());
+			buffer.append(" - <i>Default value:</i> ");
+			buffer.append(param.getDefaultValue());
+			if (value instanceof IntParameterProxy) {
+				icon = IconLoader.ICON_INTPARAM;
+			} else if (value instanceof RangeParameterProxy) {
+				icon = IconLoader.ICON_RANGEPARAM;
 			}
-			else if (event.getKind().equals(EventKind.UNCONTROLLABLE))
-			{
-				icon = uncontIcon;
-			}
-			else
-			{
-				icon = propIcon;
-			}
-
-			setText(name);
-			setIcon(icon);
+		} else {
+			throw new ClassCastException("Can't render parameter of class " +
+										 value.getClass().getName() + "!");
 		}
-
-		if (value instanceof SimpleParameterProxy)
-		{
-			name = "<html>" + ((SimpleParameterProxy) value).getName();
-			name += " - <i>Default value:</i> " + ((SimpleParameterProxy) value).getDefault().toString();
-
-			if (((SimpleParameterProxy) value).isRequired())
-			{
-				name += " <i>(Required)</i>";
-			}
-
-			name += "</html>";
-
-			// TODO:  Add required and default fields
-			setText(name);
-
-			if (value instanceof IntParameterProxy)
-			{
-				setIcon(intIcon);
-			}
-			else
-			{
-				setIcon(rangeIcon);
-			}
+		final ParameterProxy param = (ParameterProxy) value;
+		if (param.isRequired()) {
+			buffer.append(" <i>(Required)</i>");
 		}
-
-		if (isSelected)
-		{
+		buffer.append("</html>");
+		setText(buffer.toString());
+		setIcon(icon);
+		if (isSelected) {
 			setBackground(list.getSelectionBackground());
 			setForeground(list.getSelectionForeground());
-		}
-		else
-		{
+		} else {
 			setBackground(list.getBackground());
 			setForeground(list.getForeground());
 		}
-
 		setEnabled(list.isEnabled());
 		setFont(list.getFont());
 		setOpaque(true);
-
 		return this;
 	}
+
 }

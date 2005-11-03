@@ -299,6 +299,7 @@
 	<javac
 		srcdir="${testssrc}"
 		destdir="${testsbuild}"
+                excludes="net/sourceforge/waters/junit/**/*.java"
 		includeJavaRuntime="yes"
 		deprecation="false"
 		verbose="false"

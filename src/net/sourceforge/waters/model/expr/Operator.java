@@ -1,9 +1,10 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.waters.model.expr
 //# CLASS:   Operator
 //###########################################################################
-//# $Id: Operator.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: Operator.java,v 1.2 2005-11-03 01:24:16 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.expr;
@@ -22,10 +23,22 @@ package net.sourceforge.waters.model.expr;
  * @author Robi Malik
  */
 
-interface Operator {
+public interface Operator {
 
+  //#########################################################################
+  //# Simple Access Methods
   public String getName();
 
   public int getPriority();
+
+
+  //#########################################################################
+  //# Class Constants
+  public static final int TYPE_INT = 1;
+  public static final int TYPE_ATOM = 2;
+  public static final int TYPE_RANGE = 4;
+  public static final int TYPE_NAME = 8;
+  public static final int TYPE_ANY =
+    TYPE_INT | TYPE_ATOM | TYPE_RANGE | TYPE_NAME;
 
 }

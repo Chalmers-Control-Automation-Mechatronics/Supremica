@@ -9,10 +9,10 @@
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="exit_norock"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="enter"/>
 <SimpleIdentifier Name="exit"/>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="exit">
 <PointGeometry>

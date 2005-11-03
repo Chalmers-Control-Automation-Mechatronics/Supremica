@@ -1,10 +1,10 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: waters.valid
+//# PACKAGE: net.sourceforge.waters.valid
 //# CLASS:   InputPreprocessor
 //###########################################################################
-//# $Id: InputPreprocessor.java,v 1.2 2005-09-15 00:12:21 robi Exp $
+//# $Id: InputPreprocessor.java,v 1.3 2005-11-03 01:24:16 robi Exp $
 //###########################################################################
 
 

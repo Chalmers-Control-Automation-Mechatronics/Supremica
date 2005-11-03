@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="init" version="1.0" valid="1"
+	hasGeometry="1" width="218" height="108"
+	generatorName="DGE" generatorVersion="2.7.9"
+	creationDate="2002-04-12 07:01:54 GMT" modificationDate="2002-04-12 07:42:07 GMT">
+	<events>
+		<event controllable="0" name="tu_accept.0"/>
+		<event controllable="1" name="tu_load.0"/>
+	</events>
+	<nodes>
+		<node>
+			<rendering><point x="214" y="249"/></rendering>
+			<label name="WORKING">
+				<rendering><point x="11" y="5"/></rendering>
+			</label>
+		</node>
+		<node initial="1" marked="1">
+			<rendering><point x="214" y="162"/></rendering>
+			<label name="IDLE">
+				<rendering><point x="11" y="5"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge>
+			<rendering><point x="176" y="201"/></rendering>
+			<source name="IDLE"/>
+			<target name="WORKING"/>
+			<labelGroup>
+				<rendering><point x="-57" y="5"/></rendering>
+				<label name="tu_load.0"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="256" y="203"/></rendering>
+			<source name="WORKING"/>
+			<target name="IDLE"/>
+			<labelGroup>
+				<rendering><point x="5" y="3"/></rendering>
+				<label name="tu_accept.0"/>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

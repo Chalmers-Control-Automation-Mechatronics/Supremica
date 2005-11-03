@@ -1,49 +1,54 @@
-
+//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: waters.gui
+//# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ComponentInfo
 //###########################################################################
-//# $Id: ComponentInfo.java,v 1.2 2005-02-18 03:09:06 knut Exp $
+//# $Id: ComponentInfo.java,v 1.3 2005-11-03 01:24:15 robi Exp $
 //###########################################################################
+
+
 package net.sourceforge.waters.gui;
 
-import javax.swing.*;
-import javax.swing.tree.*;
-import javax.swing.event.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
-import javax.xml.bind.JAXBException;
-import net.sourceforge.waters.model.base.*;
-import net.sourceforge.waters.model.module.*;
-import java.util.ArrayList;
-import java.beans.*;
-import net.sourceforge.waters.xsd.base.ComponentKind;
+import net.sourceforge.waters.subject.base.AbstractSubject;
+
 
 public class ComponentInfo
 {
-	ElementProxy e;
-	String name;
 
-	public ComponentInfo(String name, ElementProxy e)
+	//#######################################################################
+	//# Constructors
+	public ComponentInfo(final String name, final AbstractSubject subject)
 	{
-		this.e = e;
-		this.name = name;
+		mName = name;
+		mSubject = subject;
 	}
 
+
+	//#######################################################################
+	//# Overrides for baseclass java.lang.Object
 	public String toString()
 	{
-		return name;
+		return mName;
 	}
 
-	public ElementProxy getComponent()
+
+	//#######################################################################
+	//# Simple Access Methods
+	public AbstractSubject getComponent()
 	{
-		return e;
+		return mSubject;
 	}
 
 	public String getName()
 	{
-		return name;
+		return mName;
 	}
+
+
+	//#######################################################################
+	//# Data Members
+	private final AbstractSubject mSubject;
+	private final String mName;
+
 }

@@ -13,46 +13,46 @@
 </ConstantAliasList>
 <EventDeclList>
 <EventDecl Kind="UNCONTROLLABLE" Name="L_at_X5">
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
-</IntRangeExpression>
+</BinaryExpression>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="L_at_X6">
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
-</IntRangeExpression>
+</BinaryExpression>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="L_at_X7">
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
-</IntRangeExpression>
+</BinaryExpression>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="L_at_X8">
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="2"/>
 <IntConstant Value="2"/>
-</IntRangeExpression>
+</BinaryExpression>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="L_drop_B2">
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="2"/>
 <IntConstant Value="2"/>
-</IntRangeExpression>
+</BinaryExpression>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="L_down">
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
-</IntRangeExpression>
+</BinaryExpression>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="L_up">
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
-</IntRangeExpression>
+</BinaryExpression>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="L_pickS">
 <EnumSetExpression>
@@ -62,10 +62,10 @@
 <SimpleIdentifier Name="S3"/>
 <SimpleIdentifier Name="S4"/>
 </EnumSetExpression>
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
-</IntRangeExpression>
+</BinaryExpression>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="T_X1"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="T_X2"/>
@@ -76,10 +76,10 @@
 <EventDecl Kind="UNCONTROLLABLE" Name="T_X7"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="T_X8"/>
 <EventDecl Kind="CONTROLLABLE" Name="L_mag_on">
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
-</IntRangeExpression>
+</BinaryExpression>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="LED_on">
 <EnumSetExpression>
@@ -90,108 +90,108 @@
 </EnumSetExpression>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="LS_off_B1">
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="2"/>
 <IntConstant Value="2"/>
-</IntRangeExpression>
+</BinaryExpression>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="L_back">
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
-</IntRangeExpression>
+</BinaryExpression>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="TL_X1">
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="1"/>
-</IntRangeExpression>
+</BinaryExpression>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="TL_Y1">
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
-</IntRangeExpression>
+</BinaryExpression>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="TL_Y2">
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
-</IntRangeExpression>
+</BinaryExpression>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="TL_X8">
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="2"/>
 <IntConstant Value="2"/>
-</IntRangeExpression>
+</BinaryExpression>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="TL_Y3">
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
-</IntRangeExpression>
+</BinaryExpression>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="LS_on_B1">
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
-</IntRangeExpression>
+</BinaryExpression>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="LS_on_B2">
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="1"/>
-</IntRangeExpression>
+</BinaryExpression>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="TL_Z1">
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
-</IntRangeExpression>
+</BinaryExpression>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="TL_Z2">
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
-</IntRangeExpression>
+</BinaryExpression>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="LS1_off_B2">
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="1"/>
-</IntRangeExpression>
+</BinaryExpression>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="L_right">
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
-</IntRangeExpression>
+</BinaryExpression>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="init_done"/>
 <EventDecl Kind="CONTROLLABLE" Name="B1_stop"/>
 <EventDecl Kind="CONTROLLABLE" Name="L_mX1">
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="1"/>
-</IntRangeExpression>
+</BinaryExpression>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="L_mag_off">
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
-</IntRangeExpression>
+</BinaryExpression>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="L_mX2">
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
-</IntRangeExpression>
+</BinaryExpression>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="L_mX3">
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
-</IntRangeExpression>
+</BinaryExpression>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="L_dropS">
 <EnumSetExpression>
@@ -201,66 +201,66 @@
 <SimpleIdentifier Name="S3"/>
 <SimpleIdentifier Name="S4"/>
 </EnumSetExpression>
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
-</IntRangeExpression>
+</BinaryExpression>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="L_mX4">
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
-</IntRangeExpression>
+</BinaryExpression>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="L_mX5">
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
-</IntRangeExpression>
+</BinaryExpression>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="L_mX6">
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
-</IntRangeExpression>
+</BinaryExpression>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="L_mY1">
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
-</IntRangeExpression>
+</BinaryExpression>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="L_mX7">
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
-</IntRangeExpression>
+</BinaryExpression>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="L_mY2">
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
-</IntRangeExpression>
+</BinaryExpression>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="L_mX8">
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="2"/>
 <IntConstant Value="2"/>
-</IntRangeExpression>
+</BinaryExpression>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="L_mY3">
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
-</IntRangeExpression>
+</BinaryExpression>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="init"/>
 <EventDecl Kind="CONTROLLABLE" Name="B1_start"/>
 <EventDecl Kind="CONTROLLABLE" Name="L_forward">
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
-</IntRangeExpression>
+</BinaryExpression>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="LED_off">
 <EnumSetExpression>
@@ -271,16 +271,16 @@
 </EnumSetExpression>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="L_left">
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
-</IntRangeExpression>
+</BinaryExpression>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="L_pick_B1">
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="1"/>
-</IntRangeExpression>
+</BinaryExpression>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="LS_on">
 <EnumSetExpression>
@@ -291,16 +291,16 @@
 </EnumSetExpression>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="L_at_X1">
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="1"/>
-</IntRangeExpression>
+</BinaryExpression>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="L_at_X2">
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
-</IntRangeExpression>
+</BinaryExpression>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="LS_off">
 <EnumSetExpression>
@@ -311,16 +311,16 @@
 </EnumSetExpression>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="L_at_X3">
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
-</IntRangeExpression>
+</BinaryExpression>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="L_at_X4">
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
-</IntRangeExpression>
+</BinaryExpression>
 </EventDecl>
 <EventDecl Kind="PROPOSITION" Name=":omega"/>
 </EventDeclList>
@@ -328,7 +328,7 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="belt"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="B1_start"/>
 <SimpleIdentifier Name="B1_stop"/>
 <SimpleIdentifier Name="init_done"/>
@@ -341,7 +341,7 @@
 <IndexedIdentifier Name="LS_on_B1">
 <IntConstant Value="2"/>
 </IndexedIdentifier>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Name="belt_stopped">
 <PointGeometry>
@@ -616,7 +616,7 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="belt_drop"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <IndexedIdentifier Name="L_drop_B2">
 <IntConstant Value="2"/>
 </IndexedIdentifier>
@@ -626,7 +626,7 @@
 <IndexedIdentifier Name="LS_on_B2">
 <IntConstant Value="1"/>
 </IndexedIdentifier>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="start">
 <PointGeometry>
@@ -738,7 +738,7 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="belt_pick"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <IndexedIdentifier Name="L_pick_B1">
 <IntConstant Value="1"/>
 </IndexedIdentifier>
@@ -748,7 +748,7 @@
 <IndexedIdentifier Name="LS_on_B1">
 <IntConstant Value="2"/>
 </IndexedIdentifier>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="start">
 <PointGeometry>
@@ -865,7 +865,7 @@
 <SimpleIdentifier Name="ST"/>
 </IndexedIdentifier>
 <Graph>
-<EventList>
+<LabelBlock>
 <IndexedIdentifier Name="L_dropS">
 <SimpleIdentifier Name="ST"/>
 <IntConstant Value="1"/>
@@ -888,7 +888,7 @@
 <IndexedIdentifier Name="LS_on">
 <SimpleIdentifier Name="ST"/>
 </IndexedIdentifier>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Name="part_dropped">
 <PointGeometry>
@@ -1100,7 +1100,7 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="init"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="init"/>
 <SimpleIdentifier Name="init_done"/>
 <IndexedIdentifier Name="L_drop_B2">
@@ -1146,7 +1146,7 @@
 <SimpleIdentifier Name="S"/>
 <IntConstant Value="2"/>
 </IndexedIdentifier>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="s1">
 <PointGeometry>
@@ -1250,7 +1250,7 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="init_L1X1"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="init"/>
 <SimpleIdentifier Name="init_done"/>
 <IndexedIdentifier Name="L_left">
@@ -1259,7 +1259,7 @@
 <IndexedIdentifier Name="TL_X1">
 <IntConstant Value="1"/>
 </IndexedIdentifier>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="start">
 <PointGeometry>
@@ -1392,7 +1392,7 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="init_L2X8"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="init"/>
 <SimpleIdentifier Name="init_done"/>
 <IndexedIdentifier Name="L_right">
@@ -1401,7 +1401,7 @@
 <IndexedIdentifier Name="TL_X8">
 <IntConstant Value="2"/>
 </IndexedIdentifier>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="start">
 <PointGeometry>
@@ -1532,17 +1532,17 @@
 </Graph>
 </SimpleComponent>
 <ForeachComponent Name="i">
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
-</IntRangeExpression>
+</BinaryExpression>
 <ComponentList>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="init_LZ1">
 <SimpleIdentifier Name="i"/>
 </IndexedIdentifier>
 <Graph>
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="init"/>
 <SimpleIdentifier Name="init_done"/>
 <IndexedIdentifier Name="L_up">
@@ -1551,7 +1551,7 @@
 <IndexedIdentifier Name="TL_Z1">
 <SimpleIdentifier Name="i"/>
 </IndexedIdentifier>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="start">
 <PointGeometry>
@@ -1684,17 +1684,17 @@
 </ComponentList>
 </ForeachComponent>
 <ForeachComponent Name="i">
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
-</IntRangeExpression>
+</BinaryExpression>
 <ComponentList>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="init_Y">
 <SimpleIdentifier Name="i"/>
 </IndexedIdentifier>
 <Graph>
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="init"/>
 <SimpleIdentifier Name="init_done"/>
 <IndexedIdentifier Name="L_back">
@@ -1718,7 +1718,7 @@
 <IndexedIdentifier Name="TL_Y3">
 <SimpleIdentifier Name="i"/>
 </IndexedIdentifier>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="start">
 <PointGeometry>
@@ -2010,7 +2010,7 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="magnet_L1"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="init_done"/>
 <IndexedIdentifier Name="L_at_X1">
 <IntConstant Value="1"/>
@@ -2048,7 +2048,7 @@
 <IndexedIdentifier Name="TL_Y3">
 <IntConstant Value="1"/>
 </IndexedIdentifier>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Name="X6Y1">
 <EventList>
@@ -2923,7 +2923,7 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="magnet_L2"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="init_done"/>
 <IndexedIdentifier Name="L_at_X2">
 <IntConstant Value="2"/>
@@ -2961,7 +2961,7 @@
 <IndexedIdentifier Name="TL_Y3">
 <IntConstant Value="2"/>
 </IndexedIdentifier>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="L2_UK">
 <PointGeometry>
@@ -3828,17 +3828,17 @@
 </Graph>
 </SimpleComponent>
 <ForeachComponent Name="i">
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
-</IntRangeExpression>
+</BinaryExpression>
 <ComponentList>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="magnet">
 <SimpleIdentifier Name="i"/>
 </IndexedIdentifier>
 <Graph>
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="init_done"/>
 <IndexedIdentifier Name="L_mag_off">
 <SimpleIdentifier Name="i"/>
@@ -3846,7 +3846,7 @@
 <IndexedIdentifier Name="L_mag_on">
 <SimpleIdentifier Name="i"/>
 </IndexedIdentifier>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Name="mag_off">
 <EventList>
@@ -3951,7 +3951,7 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="observer_L1x"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="init_done"/>
 <IndexedIdentifier Name="L_at_X1">
 <IntConstant Value="1"/>
@@ -3987,7 +3987,7 @@
 <SimpleIdentifier Name="T_X5"/>
 <SimpleIdentifier Name="T_X6"/>
 <SimpleIdentifier Name="T_X7"/>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Name="L1_X5fromX6">
 <PointGeometry>
@@ -5015,7 +5015,7 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="observer_L2x"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="init_done"/>
 <IndexedIdentifier Name="L_at_X2">
 <IntConstant Value="2"/>
@@ -5051,7 +5051,7 @@
 <SimpleIdentifier Name="T_X6"/>
 <SimpleIdentifier Name="T_X7"/>
 <SimpleIdentifier Name="T_X8"/>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="start">
 <PointGeometry>
@@ -6079,7 +6079,7 @@
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="plant_move_L1x"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="init"/>
 <SimpleIdentifier Name="init_done"/>
 <IndexedIdentifier Name="L_at_X1">
@@ -6130,7 +6130,7 @@
 <IndexedIdentifier Name="L_right">
 <IntConstant Value="1"/>
 </IndexedIdentifier>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Name="L_leave_Xi5f">
 <PointGeometry>
@@ -7250,7 +7250,7 @@
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="plant_move_L2x"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="init"/>
 <SimpleIdentifier Name="init_done"/>
 <IndexedIdentifier Name="L_at_X2">
@@ -7301,7 +7301,7 @@
 <IndexedIdentifier Name="L_right">
 <IntConstant Value="2"/>
 </IndexedIdentifier>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Name="L_leave_Xi5f">
 <PointGeometry>
@@ -8419,17 +8419,17 @@
 </Graph>
 </SimpleComponent>
 <ForeachComponent Name="i">
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
-</IntRangeExpression>
+</BinaryExpression>
 <ComponentList>
 <SimpleComponent Kind="PLANT">
 <IndexedIdentifier Name="plant_move_Ly">
 <SimpleIdentifier Name="i"/>
 </IndexedIdentifier>
 <Graph>
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="init"/>
 <IndexedIdentifier Name="L_back">
 <SimpleIdentifier Name="i"/>
@@ -8446,7 +8446,7 @@
 <IndexedIdentifier Name="TL_Y3">
 <SimpleIdentifier Name="i"/>
 </IndexedIdentifier>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="start">
 <PointGeometry>
@@ -8827,17 +8827,17 @@
 </ComponentList>
 </ForeachComponent>
 <ForeachComponent Name="i">
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
-</IntRangeExpression>
+</BinaryExpression>
 <ComponentList>
 <SimpleComponent Kind="PLANT">
 <IndexedIdentifier Name="plant_move_Lz">
 <SimpleIdentifier Name="i"/>
 </IndexedIdentifier>
 <Graph>
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="init"/>
 <SimpleIdentifier Name="init_done"/>
 <IndexedIdentifier Name="L_down">
@@ -8852,7 +8852,7 @@
 <IndexedIdentifier Name="TL_Z2">
 <SimpleIdentifier Name="i"/>
 </IndexedIdentifier>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="start">
 <PointGeometry>
@@ -9069,7 +9069,7 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="safety2L1"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="init_done"/>
 <IndexedIdentifier Name="L_at_X1">
 <IntConstant Value="1"/>
@@ -9116,7 +9116,7 @@
 <IndexedIdentifier Name="L_right">
 <IntConstant Value="1"/>
 </IndexedIdentifier>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Name="X6X7">
 <PointGeometry>
@@ -10303,7 +10303,7 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="safety2L2"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="init_done"/>
 <IndexedIdentifier Name="L_at_X1">
 <IntConstant Value="1"/>
@@ -10350,7 +10350,7 @@
 <IndexedIdentifier Name="L_right">
 <IntConstant Value="1"/>
 </IndexedIdentifier>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Name="X6X7">
 <PointGeometry>
@@ -11544,17 +11544,17 @@
 </Graph>
 </SimpleComponent>
 <ForeachComponent Name="i">
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
-</IntRangeExpression>
+</BinaryExpression>
 <ComponentList>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="spec_move_Ly">
 <SimpleIdentifier Name="i"/>
 </IndexedIdentifier>
 <Graph>
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="init"/>
 <SimpleIdentifier Name="init_done"/>
 <IndexedIdentifier Name="L_back">
@@ -11581,7 +11581,7 @@
 <IndexedIdentifier Name="TL_Y3">
 <SimpleIdentifier Name="i"/>
 </IndexedIdentifier>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Name="L_leave_Y2h">
 <PointGeometry>
@@ -12129,17 +12129,17 @@
 </ComponentList>
 </ForeachComponent>
 <ForeachComponent Name="i">
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
-</IntRangeExpression>
+</BinaryExpression>
 <ComponentList>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="spec_move_Lz">
 <SimpleIdentifier Name="i"/>
 </IndexedIdentifier>
 <Graph>
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="init"/>
 <SimpleIdentifier Name="init_done"/>
 <IndexedIdentifier Name="L_back">
@@ -12227,7 +12227,7 @@
 <IndexedIdentifier Name="TL_Z2">
 <SimpleIdentifier Name="i"/>
 </IndexedIdentifier>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="start">
 <PointGeometry>
@@ -12612,7 +12612,7 @@
 <SimpleIdentifier Name="ST"/>
 </IndexedIdentifier>
 <Graph>
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="init_done"/>
 <IndexedIdentifier Name="LED_off">
 <SimpleIdentifier Name="ST"/>
@@ -12626,7 +12626,7 @@
 <IndexedIdentifier Name="LS_on">
 <SimpleIdentifier Name="ST"/>
 </IndexedIdentifier>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="S_start">
 <PointGeometry>

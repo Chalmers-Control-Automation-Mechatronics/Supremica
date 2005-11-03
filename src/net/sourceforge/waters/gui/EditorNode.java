@@ -1,95 +1,110 @@
+//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
+//###########################################################################
+//# PROJECT: Waters
+//# PACKAGE: net.sourceforge.waters.gui
+//# CLASS:   EditorNode
+//###########################################################################
+//# $Id: EditorNode.java,v 1.21 2005-11-03 01:24:15 robi Exp $
+//###########################################################################
+
+
 package net.sourceforge.waters.gui;
 
 import java.awt.*;
-import java.awt.geom.*;
-import java.util.*;
+import java.awt.geom.Arc2D;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import javax.swing.*;
-import java.io.File;
-import java.io.IOException;
-import javax.xml.bind.JAXBException;
-import net.sourceforge.waters.model.base.*;
-import net.sourceforge.waters.model.module.*;
-import net.sourceforge.waters.model.expr.*;
+
+import net.sourceforge.waters.model.base.DuplicateNameException;
+import net.sourceforge.waters.model.base.IndexedList;
+import net.sourceforge.waters.subject.base.AbstractSubject;
+import net.sourceforge.waters.subject.base.ModelChangeEvent;
+import net.sourceforge.waters.subject.base.ModelObserver;
+import net.sourceforge.waters.subject.module.ColorGeometrySubject;
+import net.sourceforge.waters.subject.module.EventDeclSubject;
+import net.sourceforge.waters.subject.module.EventListExpressionSubject;
+import net.sourceforge.waters.subject.module.IdentifierSubject;
+import net.sourceforge.waters.subject.module.ModuleSubject;
+import net.sourceforge.waters.subject.module.PointGeometrySubject;
+import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 import net.sourceforge.waters.xsd.module.AnchorPosition;
 
+
 /** 
-x * <p>The internal editor representation of node objects.</p>
+ * <p>The internal editor representation of node objects.</p>
  *
  * <p>Nodes store geometry and {@link EditorShade} information.</p>
  *
  * @author Gian Perrone
  */
 public class EditorNode
-	extends EditorObject
+    extends EditorObject
+    implements ModelObserver
 {
-	protected int hash = 0;
-	protected Point2D.Double position;
-	private SimpleNodeProxy proxy;
 
-	// Constants
-	public static int WIDTH = 12;
-	public static int RADIUS = WIDTH/2;
-	public static double INITARROWANGLE = 3*Math.PI/4 + Math.PI/2; // 135 degrees plus correction
-	public static int INITARROWLENGTH = 15;
-
-	/* Maximum number of colors shown in a node */
-	private static int maxDrawnMarkings = 4;
-        private Collection<EditorEdge> mEdges = new HashSet<EditorEdge>();
-
-	private EditorPropGroup propGroup;
-
-	/*
-	public EditorNode(int x, int y, EditorShade s, SimpleNodeProxy np, EditorSurface e)
+	//########################################################################
+	//# Constructor
+	public EditorNode(final int x, final int y,
+					  final SimpleNodeSubject subject,
+					  final EditorSurface surface)
 	{
-		// This is a node
-		type = NODE;
-
-		shade = s;
-		proxy = np;
-
-		// Set position
-		position = new Point2D.Double(x, y);
-		proxy.setPointGeometry(new PointGeometryProxy(position));
-
-		// Not initial by default
-		proxy.setInitial(false);
-
-		propGroup = new EditorPropGroup(this, e);
-	}
-	*/
-
-	public EditorNode(int x, int y, SimpleNodeProxy np, EditorSurface e)
-	{
-		this(np, e);
-
-		// Override position
-		position = new Point2D.Double(x, y);
-		proxy.setPointGeometry(new PointGeometryProxy(position));
+		this(subject, surface, new Point2D.Double(x, y));
 	}
 
-	public EditorNode(SimpleNodeProxy np, EditorSurface e)
+	public EditorNode(final SimpleNodeSubject subject,
+					  final EditorSurface surface)
+	{
+		this(subject, surface, null);
+	}
+
+	private EditorNode(final SimpleNodeSubject subject,
+					   final EditorSurface surface,
+					   final Point2D altpos)
 	{
 		// This is a node
 		type = NODE;
 
 		// Variables
-		proxy = np;
+		mSubject = subject;
 
 		// Find position
-		if (proxy.getPointGeometry() == null)
-		{
-			position = new Point2D.Double(1000, 1000);
-			proxy.setPointGeometry(new PointGeometryProxy(position));
+		PointGeometrySubject geo = mSubject.getPointGeometry();
+		Point2D position;
+		if (altpos != null) {
+			position = altpos;
+		} else if (geo != null) {
+			position = geo.getPoint();
+		} else {
+			position = new Point(1000, 1000);
 		}
-		else
-		{
-			position = new Point2D.Double(proxy.getPointGeometry().getPoint().getX(), 
-										  proxy.getPointGeometry().getPoint().getY());
-			proxy.getPointGeometry().setPoint(position);
+		if (geo == null) {
+			geo = new PointGeometrySubject(position);
+			mSubject.setPointGeometry(geo);
+		} else if (altpos != null) {
+			geo.setPoint(position);
+		}
+		if (position instanceof Point2D.Double) {
+			mPosition = (Point2D.Double) position;
+		} else {
+			final double x = position.getX();
+			final double y = position.getY();
+			mPosition = new Point2D.Double(x, y);
 		}
 
 		// Init propositions
-		propGroup = new EditorPropGroup(this, e);
+		propGroup = new EditorPropGroup(this, surface);
+		mSubject.addModelObserver(this);
+		mModule = (ModuleSubject) mSubject.getDocument();
+		if (mModule != null) {
+			mModule.getEventDeclListModifiable().addModelObserver(this);
+		}
+		updateColors();
 	}
 
 	public EditorPropGroup getPropGroup()
@@ -97,36 +112,36 @@ public class EditorNode
 		return propGroup;
 	}
 
-    public void addProposition(IdentifierProxy i)
+    public void addProposition(IdentifierSubject ident)
     {
-	if (!proxy.getPropositions().contains(i)) {
-	    proxy.getPropositions().add(i);
-	}
+		final EventListExpressionSubject props = mSubject.getPropositions();
+		final List<AbstractSubject> list = props.getEventListModifiable();
+		list.add(ident);
     }
 
     public void attachEdge(EditorEdge e)
     {
-	mEdges.add(e);
+		mEdges.add(e);
     }
 
     public void detachEdge(EditorEdge e)
     {
-	mEdges.remove(e);
+		mEdges.remove(e);
     }
 
 	public void setInitial(boolean newinitial)
 	{
-		proxy.setInitial(newinitial);
+		mSubject.setInitial(newinitial);
 	}
 
 	public int hashCode()
 	{
-		return proxy.hashCode();
+		return mSubject.hashCode();
 	}
 
 	public boolean isInitial()
 	{
-		return proxy.isInitial();
+		return mSubject.isInitial();
 	}
 
 	public boolean setName(String n, JComponent c)
@@ -138,7 +153,7 @@ public class EditorNode
 
 		try
 		{
-			proxy.setName(n);
+			mSubject.setName(n);
 		}
 		catch (final DuplicateNameException e)
 		{
@@ -152,33 +167,29 @@ public class EditorNode
 
 	public String getName()
 	{
-		return proxy.getName();
+		return mSubject.getName();
 	}
 
 	public void setX(int newxposition)
 	{
-		position.setLocation(newxposition, getY());
+	    setPosition(newxposition, getY());
 	}
 
 	public void setY(int newyposition)
 	{
-		position.setLocation(getX(), newyposition);
+	    setPosition(getX(), newyposition);
 	}
 
     public void setPosition(double x, double y)
     {
 		int oldx = getX();
 		int oldy = getY();
-		setX((int)x);
-		setY((int)y);
-		for (EditorEdge e : mEdges) 
-		{
-			if (this == e.getStartNode()) 
-			{
+		mPosition.setLocation(x, y);
+		mSubject.getPointGeometry().setPoint(mPosition);
+		for (EditorEdge e : mEdges) {
+			if (this == e.getStartNode()) {
 				e.updateControlPoint(oldx, oldy, true);
-			} 
-			else if (this == e.getEndNode()) 
-			{
+			} else if (this == e.getEndNode()) {
 				e.updateControlPoint(oldx, oldy, false);
 			}
 		}
@@ -186,21 +197,22 @@ public class EditorNode
 	
     public Point2D getPosition()
     {
-	return (Point2D)position;
+	return (Point2D)mPosition;
     }
 
 	public int getX()
 	{
-		return (int) position.getX();
+		return (int) mPosition.getX();
 	}
 
 	public int getY()
 	{
-		return (int) position.getY();
+		return (int) mPosition.getY();
 	}
 
 	/**
-	 * Returns true if the position (x, y) is above the drawn node (approximately).
+	 * Returns true if the position (x, y) is above the drawn node
+	 * (approximately).
 	 */
 	public boolean wasClicked(int x, int y)
 	{
@@ -211,54 +223,37 @@ public class EditorNode
 				(y <= (getY() + RADIUS)));
 	}
 
-	public Set getColours(java.util.List eventDeclList)
+	public void updateColors()
 	{
-		Set s = new HashSet();
-
-		for (int i = 0; i < proxy.getPropositions().size(); i++)
-		{
-			String n = ((IdentifierProxy) proxy.getPropositions().get(i)).getName();
-
-			for (int j = 0; j < eventDeclList.size(); j++)
-			{
-				if (((EventDeclProxy) eventDeclList.get(j)).getName().equals(n))
-				{
-					EventDeclProxy e = (EventDeclProxy) eventDeclList.get(j);
-					ColorGeometryProxy c = e.getColorGeometry();
-
-					if (c == null)
-					{
-						c = new ColorGeometryProxy(EditorColor.DEFAULTMARKINGCOLOR);
-
-						e.setColorGeometry(c);
-					}
-
-					if (c.getColorSet().isEmpty())
-					{
-						c.getColorSet().add(EditorColor.DEFAULTMARKINGCOLOR);
-					}
-
-					Iterator iterator = c.getColorSet().iterator();
-
-					while (iterator.hasNext())
-					{
-						s.add(iterator.next());
-					}
+		mColors.clear();
+		if (mModule != null) {
+			final IndexedList<EventDeclSubject> decls =
+				mModule.getEventDeclListModifiable();
+			final EventListExpressionSubject props =
+				mSubject.getPropositions();
+			final List<AbstractSubject> list = props.getEventListModifiable();
+			for (final AbstractSubject prop : list) {
+				// BUG: ForeachEventSubject not supported!
+				final IdentifierSubject ident = (IdentifierSubject) prop;
+				final String name = ident.getName();
+				final EventDeclSubject decl = decls.get(name);
+				if (decl == null) {
+					mColors.add(EditorColor.DEFAULTMARKINGCOLOR);
+					continue;
 				}
+				final ColorGeometrySubject geo = decl.getColorGeometry();
+				if (geo == null) {
+					mColors.add(EditorColor.DEFAULTMARKINGCOLOR);
+					continue;
+				}
+				mColors.addAll(geo.getColorSet());
 			}
 		}
-
-		return s;
 	}
 
-	public SimpleNodeProxy getProxy()
+	public SimpleNodeSubject getSubject()
 	{
-		return proxy;
-	}
-
-	public void setProxy(SimpleNodeProxy snp)
-	{
-		proxy = snp;
+		return mSubject;
 	}
 
 	public int radius()
@@ -287,7 +282,7 @@ public class EditorNode
 		return new Rectangle2D.Double(getX() - RADIUS, getY() - RADIUS, WIDTH, WIDTH);
 	}
 
-	public void drawObject(Graphics g, java.util.List EventDeclList)
+	public void drawObject(Graphics g)
 	{
 		Graphics2D g2d = (Graphics2D) g;
 		g2d.setStroke(BASICSTROKE);
@@ -311,32 +306,28 @@ public class EditorNode
 			g2d.setStroke(BASICSTROKE);
 		}
 
-		// Draw the inside of the node
-		Set colours = getColours(EventDeclList);
-		Iterator i = colours.iterator();
-		if (colours.size() == 0)
+		// Draw the inside of the node	  
+		if (mColors.size() == 0)
 		{
 			// There is no marking!
 			// Draw the background white!
 			g2d.setColor(Color.WHITE);
 			g2d.fillOval(getX() - RADIUS, getY() - RADIUS, WIDTH, WIDTH);
 		}
-		else if (colours.size() <= maxDrawnMarkings)
+		else if (mColors.size() <= maxDrawnMarkings)
 		{
 			Arc2D.Double a = new Arc2D.Double();
 			double startAngle = 0;
-			double deltaAngle = (double) (360/colours.size());
-
-			while (i.hasNext())
-			{
-				// There are markings but they are fewer than maxDrawnMarkings+1! 
+			double deltaAngle = (double) (360/mColors.size());
+			for (final Color color : mColors) {
+				// There are markings but they are fewer than
+				// maxDrawnMarkings+1! 
 				// Draw nice colored pies!!
-				a.setArcByCenter(getX(), getY(), RADIUS, startAngle, deltaAngle, Arc2D.PIE);
+				a.setArcByCenter(getX(), getY(), RADIUS,
+								 startAngle, deltaAngle, Arc2D.PIE);
 				startAngle += deltaAngle;
-				
-				g2d.setColor((Color) i.next());
+				g2d.setColor(color);
 				g2d.fill(a);
-				//g2d.draw(a);
 			}
 		}
 		else
@@ -381,4 +372,55 @@ public class EditorNode
 		int y = (int) Math.ceil(getY() + Math.cos(theta)*EditorNode.RADIUS);
 		EditorEdge.drawArrow(x, y, theta, g2d);
 	}
+
+    public void modelChanged(final ModelChangeEvent event)
+    {
+		switch (event.getKind()) {
+		case ModelChangeEvent.ITEM_ADDED:
+			if (event.getValue() == mSubject) {
+				mModule = (ModuleSubject) mSubject.getDocument();
+				mModule.getEventDeclListModifiable().addModelObserver(this);
+				updateColors();
+			} else if (event.getValue() instanceof IdentifierSubject) {
+				updateColors();
+			}
+			break;
+		case ModelChangeEvent.ITEM_REMOVED:
+			if (event.getValue() == mSubject) {
+				mModule.getEventDeclListModifiable().removeModelObserver(this);
+				mModule = null;
+				updateColors();
+			} else if (event.getValue() instanceof IdentifierSubject) {
+				updateColors();
+			}
+			break;
+		case ModelChangeEvent.GEOMETRY_CHANGED:
+			if (event.getSource() instanceof ColorGeometrySubject) {
+				updateColors();
+			}
+			break;
+		}
+    }
+
+
+	//########################################################################
+	//# Data Members
+	protected int hash = 0;
+	private final SimpleNodeSubject mSubject;
+	private final Point2D.Double mPosition;
+	private final Collection<EditorEdge> mEdges = new HashSet<EditorEdge>();
+    private final Set<Color> mColors = new HashSet<Color>();
+	private ModuleSubject mModule;
+	private EditorPropGroup propGroup;
+
+	// Constants
+	public static final int WIDTH = 12;
+	public static final int RADIUS = WIDTH/2;
+	public static final double INITARROWANGLE =
+		3*Math.PI/4 + Math.PI/2; // 135 degrees plus correction
+	public static final int INITARROWLENGTH = 15;
+
+	// Maximum number of colors shown in a node
+	private static final int maxDrawnMarkings = 4;
+
 }

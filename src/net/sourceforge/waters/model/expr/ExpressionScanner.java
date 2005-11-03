@@ -1,10 +1,10 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: waters.model.expr
+//# PACKAGE: net.sourceforge.waters.model.expr
 //# CLASS:   ExpressionScanner
 //###########################################################################
-//# $Id: ExpressionScanner.java,v 1.3 2005-02-20 23:08:50 robi Exp $
+//# $Id: ExpressionScanner.java,v 1.4 2005-11-03 01:24:16 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.expr;
@@ -20,24 +20,21 @@ import java.util.Map;
  * The expression scanner analyses a stream of characters and converts
  * it to tokens for the parser.</P>
  *
- * <P>In addition to the package-local scanning functionality,
- * this class provides a few methods that can be used to check
- * whether a character can be used in a Waters expression.</P>
- *
  * @author Robi Malik
  */
 
-public class ExpressionScanner {
+class ExpressionScanner {
 
   //#########################################################################
   //# Constructors
-  ExpressionScanner()
+  ExpressionScanner(final OperatorTable optable)
   {
-    this(null);
+    this(optable, null);
   }
 
-  ExpressionScanner(final Reader reader)
+  ExpressionScanner(final OperatorTable optable, final Reader reader)
   {
+    mOperatorTable = optable;
     mTokenText = new StringBuffer();
     setInputStream(reader);
   }
@@ -76,6 +73,121 @@ public class ExpressionScanner {
   int getPosition()
   {
     return mPosition;
+  }
+
+
+  //#########################################################################
+  //# Character Classes
+  /**
+   * Checks whether a character is whitespace.
+   * @param  ch          The character to be checked.
+   * @return <CODE>true</CODE> if the given character can be used as
+   *         whitespace in a Waters expression.
+   */
+  boolean isWhitespace(final int ch)
+  {
+    return ch == ' ' || ch == '\t';
+  }
+
+  /**
+   * Checks whether a character represents a digit.
+   * @param  ch          The character to be checked.
+   * @return <CODE>true</CODE> if the given character can be used as
+   *         a digit in a Waters expression.
+   */
+  boolean isDigit(final int ch)
+  {
+    return ch >= '0' && ch <= '9';
+  }
+
+  /**
+   * Checks whether a character represents an identifier start.
+   * @param  ch          The character to be checked.
+   * @return <CODE>true</CODE> if the given character can be used as the
+   *         first character of a Waters identifier.
+   */
+  boolean isIdentifierStart(final int ch)
+  {
+    return
+      ch >= 'a' && ch <= 'z' ||
+      ch >= 'A' && ch <= 'Z' ||
+      ch == '_' ||
+      ch == ':';
+  }
+
+  /**
+   * Checks whether a character represents an identifier character.
+   * @param  ch          The character to be checked.
+   * @return <CODE>true</CODE> if the given character can be used in
+   *         a Waters identifier.
+   */
+  boolean isIdentifierCharacter(final int ch)
+  {
+    return isIdentifierStart(ch) || isDigit(ch);
+  }
+
+  /**
+   * Checks whether a character represents an operator character.
+   * @param  ch          The character to be checked.
+   * @return <CODE>true</CODE> if the given character can be used in
+   *         a Waters operator.
+   */
+  boolean isOperatorCharacter(final int ch)
+  {
+    return ch >= 0 && mOperatorTable.isOperatorCharacter((char) ch);
+  }
+
+  /**
+   * Checks whether a character represents a separator character.
+   * @param  ch          The character to be checked.
+   * @return <CODE>true</CODE> if the given character can be used as a
+   *         special, or separator, character in a Waters expression.
+   */
+  boolean isSeparatorCharacter(final int ch)
+  {
+    final Integer character = new Integer(ch);
+    return SEPARATORS.containsKey(character);
+    
+  }
+
+  /**
+   * Checks whether a character is an expression character.
+   * @param  ch          The character to be checked.
+   * @return <CODE>true</CODE> if the given character can occur
+   *         somewhere in a syntactically correct expression.
+   */
+  boolean isExpressionCharacter(final int ch)
+  {
+    return
+      isWhitespace(ch) ||
+      isDigit(ch) ||
+      isIdentifierCharacter(ch) ||
+      isOperatorCharacter(ch) ||
+      isSeparatorCharacter(ch);
+  }
+
+  /**
+   * Checks whether a string qualifies as a Waters identifier. Strings that
+   * pass this test can be used as the name of a valid {@link
+   * net.sourceforge.waters.model.module.SimpleIdentifierProxy
+   * SimpleIdentifierProxy}, or as names of any Waters elements that are
+   * identified by strings rather than identifiers.
+   * @param  word        The string to be examined.
+   * @return <CODE>true</CODE> if the given string is a valid identifier.
+   */
+  boolean isWatersIdentifier(final String word)
+  {
+    final int len = word.length();
+    if (len == 0 || !isIdentifierStart(word.charAt(0))) {
+      return false;
+    } else {
+      for (int index = 1; index < len; index++) {
+        if (!isIdentifierCharacter(word.charAt(index))) {
+          return false;
+        }
+      }
+      return true;
+    }
   }
 
 
@@ -153,21 +265,21 @@ public class ExpressionScanner {
       mTokenText.append((char) ch);
       token = createOperatorToken();
       if (token == null) {
-	putback(ch);
-	mTokenText.deleteCharAt(1);
-	token = createOperatorToken();
-	if (token == null) {
-	  throw new ParseException
-	    ("Unknown operator '" + mTokenText + "' or '" +
-	     mTokenText + (char) ch + "'!", mTokenStart);
-	}
+        putback(ch);
+        mTokenText.deleteCharAt(1);
+        token = createOperatorToken();
+        if (token == null) {
+          throw new ParseException
+            ("Unknown operator '" + mTokenText + "' or '" +
+             mTokenText + (char) ch + "'!", mTokenStart);
+        }
       }
     } else {
       putback(ch);
       token = createOperatorToken();
       if (token == null) {
-	throw new ParseException
-	  ("Unknown operator '" + mTokenText + "'!", mTokenStart);
+        throw new ParseException
+          ("Unknown operator '" + mTokenText + "'!", mTokenStart);
       }
     }
     mNextToken = token;
@@ -196,7 +308,7 @@ public class ExpressionScanner {
       mPutbackCharacter = ch;
     } else {
       throw new IllegalStateException
-	("Trying to put back more than one character!");
+        ("Trying to put back more than one character!");
     }
   }
 
@@ -206,19 +318,17 @@ public class ExpressionScanner {
   private Token createSeparatorToken(final int ch)
   {
     final Integer character = new Integer(ch);
-    final SeparatorTokenCreator creator =
-      (SeparatorTokenCreator) sSeparatorTokens.get(character);
+    final SeparatorTokenCreator creator = SEPARATORS.get(character);
     return creator.createToken(mTokenStart);
   }
 
   private Token createOperatorToken()
   {
     final String text = mTokenText.toString();
-    final OperatorTable.Entry entry = OperatorTable.getOperatorEntry(text);
-    if (entry == null) {
-      return null;
+    if (mOperatorTable.contains(text)) {
+      return new OperatorToken(text, mTokenStart);
     } else {
-      return new OperatorToken(text, mTokenStart, entry);
+      return null;
     }
   }
 
@@ -245,124 +355,11 @@ public class ExpressionScanner {
 
 
   //#########################################################################
-  //# Character Classes
-  /**
-   * Checks whether a character is whitespace.
-   * @param  ch          The character to be checked.
-   * @return <CODE>true</CODE> if the given character can be used as
-   *         whitespace in a Waters expression.
-   */
-  public static boolean isWhitespace(final int ch)
-  {
-    return ch == ' ' || ch == '\t';
-  }
-
-  /**
-   * Checks whether a character represents a digit.
-   * @param  ch          The character to be checked.
-   * @return <CODE>true</CODE> if the given character can be used as
-   *         a digit in a Waters expression.
-   */
-  public static boolean isDigit(final int ch)
-  {
-    return ch >= '0' && ch <= '9';
-  }
-
-  /**
-   * Checks whether a character represents an identifier start.
-   * @param  ch          The character to be checked.
-   * @return <CODE>true</CODE> if the given character can be used as the
-   *         first character of a Waters identifier.
-   */
-  public static boolean isIdentifierStart(final int ch)
-  {
-    return
-      ch >= 'a' && ch <= 'z' ||
-      ch >= 'A' && ch <= 'Z' ||
-      ch == '_' ||
-      ch == ':';
-  }
-
-  /**
-   * Checks whether a character represents an identifier character.
-   * @param  ch          The character to be checked.
-   * @return <CODE>true</CODE> if the given character can be used in
-   *         a Waters identifier.
-   */
-  public static boolean isIdentifierCharacter(final int ch)
-  {
-    return isIdentifierStart(ch) || isDigit(ch);
-  }
-
-  /**
-   * Checks whether a character represents an operator character.
-   * @param  ch          The character to be checked.
-   * @return <CODE>true</CODE> if the given character can be used in
-   *         a Waters operator.
-   */
-  public static boolean isOperatorCharacter(final int ch)
-  {
-    return ch >= 0 && OperatorTable.isOperatorCharacter((char) ch);
-  }
-
-  /**
-   * Checks whether a character represents a separator character.
-   * @param  ch          The character to be checked.
-   * @return <CODE>true</CODE> if the given character can be used as a
-   *         special, or separator, character in a Waters expression.
-   */
-  public static boolean isSeparatorCharacter(final int ch)
-  {
-    final Integer character = new Integer(ch);
-    return sSeparatorTokens.containsKey(character);
-    
-  }
-
-  /**
-   * Checks whether a character is an expression character.
-   * @param  ch          The character to be checked.
-   * @return <CODE>true</CODE> if the given character can occur
-   *         somewhere in a syntactically correct expression.
-   */
-  public static boolean isExpressionCharacter(final int ch)
-  {
-    return
-      isWhitespace(ch) ||
-      isDigit(ch) ||
-      isIdentifierCharacter(ch) ||
-      isOperatorCharacter(ch) ||
-      isSeparatorCharacter(ch);
-  }
-
-  /**
-   * Checks whether a string qualifies as a Waters identifier.
-   * Strings that pass this test can be used as the name of a valid
-   * {@link SimpleIdentifierProxy}, or as names of any Waters elements that
-   * are identified by strings rather than identifiers.
-   * @param  word        The string to be examined.
-   * @return <CODE>true</CODE> if the given string is a valid identifier.
-   */
-  public static boolean isWatersIdentifier(final String word)
-  {
-    final int len = word.length();
-    if (len == 0 || !isIdentifierStart(word.charAt(0))) {
-      return false;
-    } else {
-      for (int index = 1; index < len; index++) {
-	if (!isIdentifierCharacter(word.charAt(index))) {
-	  return false;
-	}
-      }
-      return true;
-    }
-  }
-
-
-  //#########################################################################
   //# Initialising the Separator Token Map
-  private static Map createSeparatorTokenMap()
+  private static Map<Integer,SeparatorTokenCreator> createSeparatorTokenMap()
   {
-    final Map map = new HashMap(16);
+    final Map<Integer,SeparatorTokenCreator> map =
+      new HashMap<Integer,SeparatorTokenCreator>(16);
     storeSeparatorTokenCreator(map, '(', Token.OPENBR);
     storeSeparatorTokenCreator(map, ')', Token.CLOSEBR);
     storeSeparatorTokenCreator(map, '[', Token.OPENSQ);
@@ -374,12 +371,13 @@ public class ExpressionScanner {
     return map;
   }
 
-  private static void storeSeparatorTokenCreator(final Map map,
-						 final int ch,
-						 final int type)
+  private static void storeSeparatorTokenCreator
+    (final Map<Integer,SeparatorTokenCreator> map,
+     final int character,
+     final int type)
   {
-    final Integer character = new Integer(ch);
-    final String name = ch == -1 ? null : Character.toString((char) ch);
+    final String name =
+      character == -1 ? null : Character.toString((char) character);
     final SeparatorTokenCreator creator =
       new SeparatorTokenCreator(type, name);
     map.put(character, creator);
@@ -388,33 +386,28 @@ public class ExpressionScanner {
 
   //#########################################################################
   //# Local Class OperatorToken
-  private static class OperatorToken extends Token
+  private class OperatorToken extends Token
   {
     //#######################################################################
     //# Constructors
-    private OperatorToken(final String text,
-			  final int pos,
-			  final OperatorTable.Entry entry)
+    private OperatorToken(final String text, final int pos)
     {
       super(Token.OPERATOR, text, pos);
-      mOperatorEntry = entry;
     }
 
     //#######################################################################
     //# Specialised Access Methods
     UnaryOperator getUnaryOperator()
     {
-      return mOperatorEntry.getUnaryOperator();
+      final String text = getText();
+      return mOperatorTable.getUnaryOperator(text);
     }
 
     BinaryOperator getBinaryOperator()
     {
-      return mOperatorEntry.getBinaryOperator();
+      final String text = getText();
+      return mOperatorTable.getBinaryOperator(text);
     }
-
-    //#######################################################################
-    //# Data Members
-    private final OperatorTable.Entry mOperatorEntry;
   }
 
 
@@ -446,6 +439,7 @@ public class ExpressionScanner {
   
   //#########################################################################
   //# Data Members
+  private final OperatorTable mOperatorTable;
   private final StringBuffer mTokenText;
 
   private Reader mInputStream;
@@ -457,6 +451,7 @@ public class ExpressionScanner {
 
   //#########################################################################
   //# Static Class Variables
-  private static final Map sSeparatorTokens = createSeparatorTokenMap();
+  private static final Map<Integer,SeparatorTokenCreator> SEPARATORS =
+    createSeparatorTokenMap();
 
 }

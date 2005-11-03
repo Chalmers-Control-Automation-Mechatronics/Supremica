@@ -1,9 +1,10 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.build.jniglue
 //# CLASS:   ClassGlue
 //###########################################################################
-//# $Id: ClassGlueCollection.java,v 1.1 2005-02-18 01:30:10 robi Exp $
+//# $Id: ClassGlueCollection.java,v 1.2 2005-11-03 01:24:16 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.build.jniglue;
@@ -23,16 +24,16 @@ class ClassGlueCollection implements FileWritableGlue {
 
   //#########################################################################
   //# Constructors
-  ClassGlueCollection(final Collection classes)
+  ClassGlueCollection(final Collection<ClassGlue> classes)
   {
-    final Collection copy = new ArrayList(classes);
+    final Collection<ClassGlue> copy = new ArrayList<ClassGlue>(classes);
     mClasses = Collections.unmodifiableCollection(copy);
   }
 
 
   //#########################################################################
   //# Simple Access
-  Collection getClasses()
+  Collection<ClassGlue> getClasses()
   {
     return mClasses;
   }
@@ -43,19 +44,16 @@ class ClassGlueCollection implements FileWritableGlue {
   void collectSignatures()
   {
     if (mNames == null) {
-      mNames = new TreeSet();
-      final Map signatures = new TreeMap();
-      final Iterator iter1 = mClasses.iterator();
-      while (iter1.hasNext()) {
-	final ClassGlue glue = (ClassGlue) iter1.next();
-	glue.collectSignatures(mNames, signatures);
+      mNames = new TreeSet<String>();
+      final Map<String,TypeSignature> signatures =
+	new TreeMap<String,TypeSignature>();
+      for (final ClassGlue glue : mClasses) {
+        glue.collectSignatures(mNames, signatures);
       }
       mSignatures = signatures.values();
       int sigcode = 0;
-      final Iterator iter2 = mSignatures.iterator();
-      while (iter2.hasNext()) {
-	final TypeSignature sig = (TypeSignature) iter2.next();
-	sig.setCode(sigcode++);
+      for (final TypeSignature sig : mSignatures) {
+        sig.setCode(sigcode++);
       }      
     }
   }
@@ -98,7 +96,7 @@ class ClassGlueCollection implements FileWritableGlue {
     //#######################################################################
     //# Overrides for abstract baseclass
     //# net.sourceforge.waters.build.jniglue.StringProcessorForeach
-    Collection getStringCollection()
+    Collection<String> getStringCollection()
     {
       collectSignatures();
       return mNames;
@@ -115,7 +113,7 @@ class ClassGlueCollection implements FileWritableGlue {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.build.jniglue.ProcessorForeach
-    public Iterator getIterator()
+    public Iterator<TypeSignature> getIterator()
     {
       collectSignatures();
       return mSignatures.iterator();
@@ -126,8 +124,8 @@ class ClassGlueCollection implements FileWritableGlue {
 
   //#########################################################################
   //# Data Members
-  private final Collection mClasses;
-  private Set mNames;
-  private Collection mSignatures;
+  private final Collection<ClassGlue> mClasses;
+  private Set<String> mNames;
+  private Collection<TypeSignature> mSignatures;
 
 }

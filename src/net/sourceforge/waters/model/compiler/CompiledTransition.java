@@ -1,9 +1,10 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: waters.model.compiler
+//# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   CompiledTransition
 //###########################################################################
-//# $Id: CompiledTransition.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: CompiledTransition.java,v 1.2 2005-11-03 01:24:15 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;

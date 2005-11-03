@@ -1,9 +1,10 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.waters.samples.algorithms
 //# CLASS:   AdjacencyMap
 //###########################################################################
-//# $Id: AdjacencyMap.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: AdjacencyMap.java,v 1.2 2005-11-03 01:24:16 robi Exp $
 //###########################################################################
 
 
@@ -12,7 +13,6 @@ package net.sourceforge.waters.samples.algorithms;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
@@ -38,39 +38,38 @@ public class AdjacencyMap {
     addTransitions(aut.getTransitions());
   }
 
-  public AdjacencyMap(final Collection states)
+  public AdjacencyMap(final Collection<StateProxy> states)
   {
     this(states, BOTH);
   }
 
-  public AdjacencyMap(final Collection states, final int modes)
+  public AdjacencyMap(final Collection<StateProxy> states, final int modes)
   {
-    mAdjacencyMap = new IdentityHashMap(states.size());
+    mAdjacencyMap = new IdentityHashMap<StateProxy,Entry>(states.size());
     mModes = modes;
   }
 
 
   //#########################################################################
   //# Access Methods
-  public void addTransitions(final Collection transitions)
+  public void addTransitions(final Collection<TransitionProxy> transitions)
   {
-    final Iterator iter = transitions.iterator();
-    while (iter.hasNext()) {
-      final TransitionProxy trans = (TransitionProxy) iter.next();
+    for (final TransitionProxy trans : transitions) {
       if ((mModes & EXITING) != 0) {
-	final StateProxy source = trans.getSource();
-	final Entry sourceentry = getEntry(source);
-	sourceentry.addExitingTransition(trans);
+        final StateProxy source = trans.getSource();
+        final Entry sourceentry = getEntry(source);
+        sourceentry.addExitingTransition(trans);
       }
       if ((mModes & ENTERING) != 0) {
-	final StateProxy target = trans.getTarget();
-	final Entry targetentry = getEntry(target);
-	targetentry.addEnteringTransition(trans);
+        final StateProxy target = trans.getTarget();
+        final Entry targetentry = getEntry(target);
+        targetentry.addEnteringTransition(trans);
       }
     }
   }
 
-  public Collection getEnteringTransitions(final StateProxy state)
+  public Collection<TransitionProxy>
+    getEnteringTransitions(final StateProxy state)
   {
     if ((mModes & ENTERING) != 0) {
       final Entry entry = getEntry(state);
@@ -80,7 +79,8 @@ public class AdjacencyMap {
     }
   }
 
-  public Collection getExitingTransitions(final StateProxy state)
+  public Collection<TransitionProxy>
+    getExitingTransitions(final StateProxy state)
   {
     if ((mModes & EXITING) != 0) {
       final Entry entry = getEntry(state);
@@ -90,18 +90,30 @@ public class AdjacencyMap {
     }
   }
 
-  public Set getEligibleEvents(final StateProxy state)
+  public Set<EventProxy> getEligibleEvents(final StateProxy state)
   {
-    final Collection transitions = getExitingTransitions(state);
-    final Iterator iter = transitions.iterator();
+    final Collection<TransitionProxy> transitions =
+      getExitingTransitions(state);
     final int numtrans = transitions.size();
-    final Set elig = new HashSet(numtrans);
-    while (iter.hasNext()) {
-      final TransitionProxy trans = (TransitionProxy) iter.next();
+    final Set<EventProxy> elig = new HashSet<EventProxy>(numtrans);
+    for (final TransitionProxy trans : transitions) {
       final EventProxy event = trans.getEvent();
       elig.add(event);
     }
     return elig;
+  }
+
+  public StateProxy getSuccessorState(final StateProxy state,
+                                      final EventProxy event)
+  {
+    final Collection<TransitionProxy> transitions =
+      getExitingTransitions(state);
+    for (final TransitionProxy trans : transitions) {
+      if (trans.getEvent() == event) {
+        return trans.getTarget();
+      }
+    }
+    return null;
   }
 
 
@@ -109,7 +121,7 @@ public class AdjacencyMap {
   //# Auxiliary Methods
   private Entry getEntry(final StateProxy state)
   {
-    Entry entry = (Entry) mAdjacencyMap.get(state);
+    Entry entry = mAdjacencyMap.get(state);
     if (entry == null) {
       entry = new Entry();
       mAdjacencyMap.put(state, entry);
@@ -126,18 +138,18 @@ public class AdjacencyMap {
     //# Constructors
     private Entry()
     {
-      mEnteringTransitions = new LinkedList();
-      mExitingTransitions = new LinkedList();
+      mEnteringTransitions = new LinkedList<TransitionProxy>();
+      mExitingTransitions = new LinkedList<TransitionProxy>();
     }
 
     //#######################################################################
     //# Simple Access
-    private Collection getEnteringTransitions()
+    private Collection<TransitionProxy> getEnteringTransitions()
     {
       return mEnteringTransitions;
     }
 
-    private Collection getExitingTransitions()
+    private Collection<TransitionProxy> getExitingTransitions()
     {
       return mExitingTransitions;
     }
@@ -154,8 +166,8 @@ public class AdjacencyMap {
 
     //#######################################################################
     //# Data Members
-    final Collection mEnteringTransitions;
-    final Collection mExitingTransitions;
+    final Collection<TransitionProxy> mEnteringTransitions;
+    final Collection<TransitionProxy> mExitingTransitions;
   }
 
 
@@ -168,7 +180,7 @@ public class AdjacencyMap {
 
   //#########################################################################
   //# Data Members
-  private final Map mAdjacencyMap;
+  private final Map<StateProxy,Entry> mAdjacencyMap;
   private final int mModes;
 
 }

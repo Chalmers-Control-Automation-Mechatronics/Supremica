@@ -1,0 +1,137 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters
+//# PACKAGE: net.sourceforge.waters.model.module
+//# CLASS:   ModuleProxyVisitor
+//###########################################################################
+//# $Id: ModuleProxyVisitor.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//###########################################################################
+
+package net.sourceforge.waters.model.module;
+
+import net.sourceforge.waters.model.base.ProxyVisitor;
+import net.sourceforge.waters.model.base.VisitorException;
+
+
+public interface ModuleProxyVisitor
+  extends ProxyVisitor
+{
+
+  public Object visitAliasProxy(AliasProxy proxy)
+    throws VisitorException;
+
+  public Object visitBinaryExpressionProxy(BinaryExpressionProxy proxy)
+    throws VisitorException;
+
+  public Object visitBoxGeometryProxy(BoxGeometryProxy proxy)
+    throws VisitorException;
+
+  public Object visitColorGeometryProxy(ColorGeometryProxy proxy)
+    throws VisitorException;
+
+  public Object visitComponentProxy(ComponentProxy proxy)
+    throws VisitorException;
+
+  public Object visitEdgeProxy(EdgeProxy proxy)
+    throws VisitorException;
+
+  public Object visitEnumSetExpressionProxy(EnumSetExpressionProxy proxy)
+    throws VisitorException;
+
+  public Object visitEventDeclProxy(EventDeclProxy proxy)
+    throws VisitorException;
+
+  public Object visitEventListExpressionProxy(EventListExpressionProxy proxy)
+    throws VisitorException;
+
+  public Object visitEventParameterProxy(EventParameterProxy proxy)
+    throws VisitorException;
+
+  public Object visitExpressionProxy(ExpressionProxy proxy)
+    throws VisitorException;
+
+  public Object visitForeachComponentProxy(ForeachComponentProxy proxy)
+    throws VisitorException;
+
+  public Object visitForeachEventAliasProxy(ForeachEventAliasProxy proxy)
+    throws VisitorException;
+
+  public Object visitForeachEventProxy(ForeachEventProxy proxy)
+    throws VisitorException;
+
+  public Object visitForeachProxy(ForeachProxy proxy)
+    throws VisitorException;
+
+  public Object visitGraphProxy(GraphProxy proxy)
+    throws VisitorException;
+
+  public Object visitGroupNodeProxy(GroupNodeProxy proxy)
+    throws VisitorException;
+
+  public Object visitIdentifiedProxy(IdentifiedProxy proxy)
+    throws VisitorException;
+
+  public Object visitIdentifierProxy(IdentifierProxy proxy)
+    throws VisitorException;
+
+  public Object visitIndexedIdentifierProxy(IndexedIdentifierProxy proxy)
+    throws VisitorException;
+
+  public Object visitInstanceProxy(InstanceProxy proxy)
+    throws VisitorException;
+
+  public Object visitIntConstantProxy(IntConstantProxy proxy)
+    throws VisitorException;
+
+  public Object visitIntParameterProxy(IntParameterProxy proxy)
+    throws VisitorException;
+
+  public Object visitLabelBlockProxy(LabelBlockProxy proxy)
+    throws VisitorException;
+
+  public Object visitLabelGeometryProxy(LabelGeometryProxy proxy)
+    throws VisitorException;
+
+  public Object visitModuleProxy(ModuleProxy proxy)
+    throws VisitorException;
+
+  public Object visitNodeProxy(NodeProxy proxy)
+    throws VisitorException;
+
+  public Object visitParameterBindingProxy(ParameterBindingProxy proxy)
+    throws VisitorException;
+
+  public Object visitParameterProxy(ParameterProxy proxy)
+    throws VisitorException;
+
+  public Object visitPlainEventListProxy(PlainEventListProxy proxy)
+    throws VisitorException;
+
+  public Object visitPointGeometryProxy(PointGeometryProxy proxy)
+    throws VisitorException;
+
+  public Object visitRangeParameterProxy(RangeParameterProxy proxy)
+    throws VisitorException;
+
+  public Object visitSimpleComponentProxy(SimpleComponentProxy proxy)
+    throws VisitorException;
+
+  public Object visitSimpleExpressionProxy(SimpleExpressionProxy proxy)
+    throws VisitorException;
+
+  public Object visitSimpleIdentifierProxy(SimpleIdentifierProxy proxy)
+    throws VisitorException;
+
+  public Object visitSimpleNodeProxy(SimpleNodeProxy proxy)
+    throws VisitorException;
+
+  public Object visitSimpleParameterProxy(SimpleParameterProxy proxy)
+    throws VisitorException;
+
+  public Object visitSplineGeometryProxy(SplineGeometryProxy proxy)
+    throws VisitorException;
+
+  public Object visitUnaryExpressionProxy(UnaryExpressionProxy proxy)
+    throws VisitorException;
+
+}

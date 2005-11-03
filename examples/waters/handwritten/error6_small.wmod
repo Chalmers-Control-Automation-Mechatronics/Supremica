@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Module xmlns="http://waters.sourceforge.net/xsd/module" Name="error4_small">
+<EventDeclList>
+<EventDecl Name="start1" Kind="CONTROLLABLE"/>
+<EventDecl Name="finish1" Kind="UNCONTROLLABLE"/>
+<EventDecl Name="start2" Kind="CONTROLLABLE" Observable="false"/>
+</EventDeclList>
+<ComponentList>
+<Instance ModuleName="buffer_sf1">
+<SimpleIdentifier Name="buffer"/>
+<ParameterBinding Name="start_before">
+<SimpleIdentifier Name="start1"/>
+</ParameterBinding>
+<ParameterBinding Name="finish_before">
+<SimpleIdentifier Name="finish1"/>
+</ParameterBinding>
+<ParameterBinding Name="start_after">
+<SimpleIdentifier Name="start2"/>
+</ParameterBinding>
+</Instance>
+</ComponentList>
+</Module>

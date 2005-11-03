@@ -3,10 +3,10 @@
 <ConstantAliasList>
 <ConstantAlias>
 <SimpleIdentifier Name="MACHS"/>
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
-</IntRangeExpression>
+</BinaryExpression>
 </ConstantAlias>
 </ConstantAliasList>
 <EventDeclList>
@@ -49,7 +49,7 @@ its parameter.
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="mach"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <IndexedIdentifier Name="break">
 <SimpleIdentifier Name="MACH"/>
 </IndexedIdentifier>
@@ -62,7 +62,7 @@ its parameter.
 <IndexedIdentifier Name="start">
 <SimpleIdentifier Name="MACH"/>
 </IndexedIdentifier>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Name="working">
 <PointGeometry>
@@ -147,7 +147,7 @@ its parameter.
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="buffer"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <IndexedIdentifier Name="finish">
 <IntConstant Value="1"/>
 </IndexedIdentifier>
@@ -157,7 +157,7 @@ its parameter.
 <IndexedIdentifier Name="start">
 <IntConstant Value="2"/>
 </IndexedIdentifier>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Name="full">
 <PointGeometry>
@@ -225,7 +225,7 @@ its parameter.
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="repair"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <IndexedIdentifier Name="break">
 <IntConstant Value="2"/>
 </IndexedIdentifier>
@@ -235,7 +235,7 @@ its parameter.
 <IndexedIdentifier Name="repair">
 <IntConstant Value="2"/>
 </IndexedIdentifier>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Name="m1" Initial="true">
 <EventList>

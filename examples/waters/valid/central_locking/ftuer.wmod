@@ -130,7 +130,7 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="ftuer"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <IndexedIdentifier Name="async">
 <SimpleIdentifier Name="TUER"/>
 </IndexedIdentifier>
@@ -178,7 +178,7 @@
 <IndexedIdentifier Name="timeout">
 <SimpleIdentifier Name="TUER"/>
 </IndexedIdentifier>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Name="cs3">
 <PointGeometry>
@@ -952,14 +952,14 @@
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="mer"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <IndexedIdentifier Name="MER_an">
 <SimpleIdentifier Name="TUER"/>
 </IndexedIdentifier>
 <IndexedIdentifier Name="MER_aus">
 <SimpleIdentifier Name="TUER"/>
 </IndexedIdentifier>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="IDLE">
 <EventList>
@@ -1014,7 +1014,7 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="merguard"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <IndexedIdentifier Name="MER_an">
 <SimpleIdentifier Name="TUER"/>
 </IndexedIdentifier>
@@ -1039,7 +1039,7 @@
 <IndexedIdentifier Name="stop_ZS">
 <SimpleIdentifier Name="TUER"/>
 </IndexedIdentifier>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="IDLE">
 <EventList>
@@ -1122,7 +1122,7 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="mvrguard"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <IndexedIdentifier Name="MVR_an">
 <SimpleIdentifier Name="TUER"/>
 </IndexedIdentifier>
@@ -1147,7 +1147,7 @@
 <IndexedIdentifier Name="stop_ZS">
 <SimpleIdentifier Name="TUER"/>
 </IndexedIdentifier>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="IDLE">
 <EventList>
@@ -1230,7 +1230,7 @@
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="mvrstzv"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <IndexedIdentifier Name="MVR_an">
 <SimpleIdentifier Name="TUER"/>
 </IndexedIdentifier>
@@ -1240,7 +1240,7 @@
 <IndexedIdentifier Name="STZV">
 <SimpleIdentifier Name="TUER"/>
 </IndexedIdentifier>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="IDLE">
 <EventList>
@@ -1308,7 +1308,7 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="sync"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <IndexedIdentifier Name="async">
 <SimpleIdentifier Name="TUER"/>
 </IndexedIdentifier>
@@ -1330,7 +1330,7 @@
 <IndexedIdentifier Name="tuer_zu">
 <SimpleIdentifier Name="TUER"/>
 </IndexedIdentifier>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Name="AUF">
 <PointGeometry>
@@ -1596,14 +1596,14 @@
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="tklemme"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <IndexedIdentifier Name="tuer_auf">
 <SimpleIdentifier Name="TUER"/>
 </IndexedIdentifier>
 <IndexedIdentifier Name="tuer_zu">
 <SimpleIdentifier Name="TUER"/>
 </IndexedIdentifier>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="AUF">
 <PointGeometry>
@@ -1658,7 +1658,7 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="tmotor1"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <IndexedIdentifier Name="MER_an">
 <SimpleIdentifier Name="TUER"/>
 </IndexedIdentifier>
@@ -1708,7 +1708,7 @@
 <IndexedIdentifier Name="timeout">
 <SimpleIdentifier Name="TUER"/>
 </IndexedIdentifier>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Name="er1">
 <PointGeometry>
@@ -2173,7 +2173,7 @@
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="ttimer"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <IndexedIdentifier Name="reset">
 <SimpleIdentifier Name="TUER"/>
 </IndexedIdentifier>
@@ -2192,7 +2192,7 @@
 <IndexedIdentifier Name="timeout">
 <SimpleIdentifier Name="TUER"/>
 </IndexedIdentifier>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="IDLE">
 <EventList>
@@ -2259,7 +2259,7 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="ttimguard"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <IndexedIdentifier Name="reset">
 <SimpleIdentifier Name="TUER"/>
 </IndexedIdentifier>
@@ -2296,7 +2296,7 @@
 <IndexedIdentifier Name="timeout">
 <SimpleIdentifier Name="TUER"/>
 </IndexedIdentifier>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="IDLE">
 <EventList>
@@ -2398,7 +2398,7 @@
 <SimpleIdentifier Name="FT"/>
 </IndexedIdentifier>
 <Graph>
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="CS_ok"/>
 <SimpleIdentifier Name="done_ER"/>
 <IndexedIdentifier Name="done_SER">
@@ -2413,7 +2413,7 @@
 </IndexedIdentifier>
 <SimpleIdentifier Name="soft_VR"/>
 <SimpleIdentifier Name="soft_ZS"/>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Name="CS">
 <PointGeometry>

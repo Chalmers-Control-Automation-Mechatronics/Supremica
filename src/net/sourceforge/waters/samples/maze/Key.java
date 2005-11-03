@@ -1,9 +1,10 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: waters.samples.maze
+//# PACKAGE: net.sourceforge.waters.samples.maze
 //# CLASS:   Key
 //###########################################################################
-//# $Id: Key.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: Key.java,v 1.2 2005-11-03 01:24:16 robi Exp $
 //###########################################################################
 
 
@@ -22,8 +23,8 @@ class Key
   Key(final String name)
   {
     mName = name;
-    mLocations = new LinkedList();
-    mLocks = new LinkedList();
+    mLocations = new LinkedList<Square>();
+    mLocks = new LinkedList<Square>();
   }
 
 
@@ -34,12 +35,12 @@ class Key
     return mName;
   }
 
-  Collection getLocations()
+  Collection<Square> getLocations()
   {
     return Collections.unmodifiableCollection(mLocations);
   }
 
-  Collection getLocks()
+  Collection<Square> getLocks()
   {
     return Collections.unmodifiableCollection(mLocks);
   }
@@ -58,7 +59,7 @@ class Key
   //#########################################################################
   //# Data Members
   private final String mName;
-  private final Collection mLocations;
-  private final Collection mLocks;
+  private final Collection<Square> mLocations;
+  private final Collection<Square> mLocks;
 
 }

@@ -5,7 +5,7 @@
   <EventParameter Name="start_before" Kind="CONTROLLABLE"/>
   <EventParameter Name="start_after" Kind="CONTROLLABLE"/>
   <EventParameter Name="finish_before" Kind="UNCONTROLLABLE"/>
-  <EventParameter Name="@omega" Kind="PROPOSITION"/>
+  <EventParameter Name="@omega" Kind="PROPOSITION" Required="false"/>
 </ParameterList>
 <ComponentList>
 <SimpleComponent Kind="SPEC">

@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EventListCell
 //###########################################################################
-//# $Id: SimpleExpressionCell.java,v 1.6 2005-02-22 18:28:46 robi Exp $
+//# $Id: SimpleExpressionCell.java,v 1.7 2005-11-03 01:24:15 robi Exp $
 //###########################################################################
 
 
@@ -28,9 +28,9 @@ import javax.swing.text.JTextComponent;
 import javax.swing.text.Keymap;
 
 import net.sourceforge.waters.model.expr.ExpressionParser;
-import net.sourceforge.waters.model.expr.ExpressionScanner;
-import net.sourceforge.waters.model.expr.SimpleExpressionProxy;
+import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.ParseException;
+import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 
 
 
@@ -40,29 +40,32 @@ public class SimpleExpressionCell
 
 	//#######################################################################
 	//# Constructors
-	public SimpleExpressionCell()
+	public SimpleExpressionCell(final ExpressionParser parser)
 	{
-		this(SimpleExpressionProxy.TYPE_ANY);
+		this(Operator.TYPE_ANY, parser);
 	}
 
 
-	public SimpleExpressionCell(final int mask)
+	public SimpleExpressionCell(final int mask,
+								final ExpressionParser parser)
 	{
-		this(null, mask);
+		this(null, mask, parser);
 	}
 
 
-	public SimpleExpressionCell(final SimpleExpressionProxy expr)
+	public SimpleExpressionCell(final SimpleExpressionSubject expr,
+								final ExpressionParser parser)
 	{
-		this(expr, SimpleExpressionProxy.TYPE_ANY);
+		this(expr, Operator.TYPE_ANY, parser);
 	}
 
 
-	public SimpleExpressionCell(final SimpleExpressionProxy expr,
-								final int mask)
+	public SimpleExpressionCell(final SimpleExpressionSubject expr,
+								final int mask,
+								final ExpressionParser parser)
 	{
 		mTypeMask = mask;
-		mParser = new ExpressionParser();
+		mParser = parser;
 		mFilter = new SimpleExpressionFilter();
 		mVerifier = new SimpleExpressionVerifier();
 
@@ -221,7 +224,7 @@ public class SimpleExpressionCell
 
 	//#######################################################################
 	//# Local Class SimpleExpressionFilter
-	private static class SimpleExpressionFilter extends DocumentFilter
+	private class SimpleExpressionFilter extends DocumentFilter
 	{
 
 		//###################################################################
@@ -265,7 +268,7 @@ public class SimpleExpressionCell
 				final StringBuffer buffer = new StringBuffer(len);
 				for (int i = 0; i < len; i++) {
 					final char ch = text.charAt(i);
-					if (ExpressionScanner.isExpressionCharacter(ch)) {
+					if (mParser.isExpressionCharacter(ch)) {
 						buffer.append(ch);
 					}
 				}

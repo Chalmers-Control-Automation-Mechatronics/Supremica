@@ -1,6 +1,6 @@
 ##############################################################################
 # Sample build.properties file for Waters
-# $Id: build.properties.sample,v 1.2 2005-05-08 03:20:39 robi Exp $
+# $Id: build.properties.sample,v 1.3 2005-11-03 01:24:16 robi Exp $
 ##############################################################################
 # Rename this file as build.properties and edit the file names below
 # to match your system.
@@ -38,7 +38,7 @@ junit.jar = /research/lib/apache-ant-1.6.2/lib/junit.jar
 ##############################################################################
 # JAVADOC LINKS
 
-java14.api.url = http://www.scms.waikato.ac.nz/help/reference/j2sdk1.4.2/api/
+java.api.url = http://www.scms.waikato.ac.nz/help/reference/j2sdk1.5/api/
 jaxme.api.url = http://ws.apache.org/jaxme/apidocs/
 junit.api.url = http://junit.sourceforge.net/javadoc/
 

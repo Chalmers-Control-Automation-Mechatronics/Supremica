@@ -1,9 +1,9 @@
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: waters.model.expr
+//# PACKAGE: net.sourceforge.waters.model.expr
 //# CLASS:   ParseException
 //###########################################################################
-//# $Id: ParseException.java,v 1.3 2005-02-20 23:08:50 robi Exp $
+//# $Id: ParseException.java,v 1.4 2005-11-03 01:24:16 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.expr;
@@ -13,8 +13,8 @@ import net.sourceforge.waters.model.base.WatersException;
 
 /**
  * Thrown when parsing of an expression string has failed.
- * These expection are thrown by the {@link ExpressionParser} and
- * {@link ExpressionScanner}. In addition to an error message, they
+ * These expection are thrown by the {@link ExpressionParser}.
+ * In addition to an error message, they
  * contain information about the location of the error in the
  * string that was originally parsed.
  *

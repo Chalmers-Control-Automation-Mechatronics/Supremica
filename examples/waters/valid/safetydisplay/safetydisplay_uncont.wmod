@@ -2,23 +2,23 @@
 <Module Name="safetydisplay_uncont" xmlns="http://waters.sourceforge.net/xsd/module">
 <EventDeclList>
 <EventDecl Kind="CONTROLLABLE" Name="displayon">
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="3"/>
-</IntRangeExpression>
+</BinaryExpression>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="displayoff"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="switchoff">
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="3"/>
-</IntRangeExpression>
+</BinaryExpression>
 </EventDecl>
 <EventDecl Kind="UNCONTROLLABLE" Name="switchon">
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="3"/>
-</IntRangeExpression>
+</BinaryExpression>
 </EventDecl>
 <EventDecl Kind="PROPOSITION" Name=":omega"/>
 </EventDeclList>
@@ -26,7 +26,7 @@
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="display"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="displayoff"/>
 <IndexedIdentifier Name="displayon">
 <IntConstant Value="1"/>
@@ -37,7 +37,7 @@
 <IndexedIdentifier Name="displayon">
 <IntConstant Value="3"/>
 </IndexedIdentifier>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="s0">
 <EventList>
@@ -145,7 +145,7 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="displaypriorityuncontrollable"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="displayoff"/>
 <IndexedIdentifier Name="displayon">
 <IntConstant Value="1"/>
@@ -174,7 +174,7 @@
 <IndexedIdentifier Name="switchon">
 <IntConstant Value="3"/>
 </IndexedIdentifier>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="on123">
 <EventList>
@@ -654,24 +654,24 @@
 </Graph>
 </SimpleComponent>
 <ForeachComponent Name="i">
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="3"/>
-</IntRangeExpression>
+</BinaryExpression>
 <ComponentList>
 <SimpleComponent Kind="PLANT">
 <IndexedIdentifier Name="door">
 <SimpleIdentifier Name="i"/>
 </IndexedIdentifier>
 <Graph>
-<EventList>
+<LabelBlock>
 <IndexedIdentifier Name="switchoff">
 <SimpleIdentifier Name="i"/>
 </IndexedIdentifier>
 <IndexedIdentifier Name="switchon">
 <SimpleIdentifier Name="i"/>
 </IndexedIdentifier>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="init">
 <PointGeometry>

@@ -1,59 +1,59 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="tline_1" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ConstantAliasList>
-        <ConstantAlias>
-            <SimpleIdentifier Name="GROUPS"/>
-            <IntRangeExpression>
-                <IntConstant Value="1"/>
-                <IntConstant Value="1"/>
-            </IntRangeExpression>
-        </ConstantAlias>
-    </ConstantAliasList>
-    <EventDeclList>
-        <EventDecl Kind="UNCONTROLLABLE" Name="tu_reject">
-            <IntRangeExpression>
-                <IntConstant Value="1"/>
-                <IntConstant Value="1"/>
-            </IntRangeExpression>
-        </EventDecl>
-        <EventDecl Kind="CONTROLLABLE" Name="tu_load">
-            <IntRangeExpression>
-                <IntConstant Value="0"/>
-                <IntConstant Value="1"/>
-            </IntRangeExpression>
-        </EventDecl>
-        <EventDecl Kind="UNCONTROLLABLE" Name="tu_accept">
-            <IntRangeExpression>
-                <IntConstant Value="0"/>
-                <IntConstant Value="1"/>
-            </IntRangeExpression>
-        </EventDecl>
-        <EventDecl Kind="UNCONTROLLABLE" Name="machine_unload">
-            <IntRangeExpression>
-                <IntConstant Value="1"/>
-                <IntConstant Value="1"/>
-            </IntRangeExpression>
-        </EventDecl>
-        <EventDecl Kind="CONTROLLABLE" Name="machine_load">
-            <IntRangeExpression>
-                <IntConstant Value="1"/>
-                <IntConstant Value="1"/>
-            </IntRangeExpression>
-        </EventDecl>
-        <EventDecl Kind="PROPOSITION" Name=":omega"/>
+<ConstantAliasList>
+<ConstantAlias>
+<SimpleIdentifier Name="GROUPS"/>
+<BinaryExpression Operator="..">
+<IntConstant Value="1"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</ConstantAlias>
+</ConstantAliasList>
+<EventDeclList>
+<EventDecl Kind="UNCONTROLLABLE" Name="tu_reject">
+<BinaryExpression Operator="..">
+<IntConstant Value="1"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="tu_load">
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="tu_accept">
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="machine_unload">
+<BinaryExpression Operator="..">
+<IntConstant Value="1"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="machine_load">
+<BinaryExpression Operator="..">
+<IntConstant Value="1"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</EventDecl>
+<EventDecl Kind="PROPOSITION" Name=":omega"/>
 </EventDeclList>
 <ComponentList>
 <ForeachComponent Name="GROUP">
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="1"/>
-</IntRangeExpression>
+</BinaryExpression>
 <ComponentList>
 <ForeachComponent Name="PREV">
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="0"/>
 <IntConstant Value="0"/>
-</IntRangeExpression>
+</BinaryExpression>
 <ComponentList>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="b1sup1_1">
@@ -61,7 +61,7 @@
 <SimpleIdentifier Name="PREV"/>
 </IndexedIdentifier>
 <Graph Deterministic="true">
-<EventList>
+<LabelBlock>
 <IndexedIdentifier Name="tu_accept">
 <SimpleIdentifier Name="GROUP"/>
 </IndexedIdentifier>
@@ -71,7 +71,7 @@
 <IndexedIdentifier Name="tu_load">
 <SimpleIdentifier Name="PREV"/>
 </IndexedIdentifier>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="EMPTY">
 <EventList>
@@ -238,16 +238,16 @@
 </ComponentList>
 </ForeachComponent>
 <ForeachComponent Name="GROUP">
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="1"/>
-</IntRangeExpression>
+</BinaryExpression>
 <ComponentList>
 <ForeachComponent Name="PREV">
-<IntRangeExpression>
+<BinaryExpression Operator="..">
 <IntConstant Value="0"/>
 <IntConstant Value="0"/>
-</IntRangeExpression>
+</BinaryExpression>
 <ComponentList>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="b1sup2_1">
@@ -255,7 +255,7 @@
 <SimpleIdentifier Name="PREV"/>
 </IndexedIdentifier>
 <Graph Deterministic="true">
-<EventList>
+<LabelBlock>
 <IndexedIdentifier Name="machine_load">
 <SimpleIdentifier Name="GROUP"/>
 </IndexedIdentifier>
@@ -265,7 +265,7 @@
 <IndexedIdentifier Name="tu_reject">
 <SimpleIdentifier Name="GROUP"/>
 </IndexedIdentifier>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="EMPTY">
 <EventList>
@@ -406,7 +406,7 @@
 <SimpleIdentifier Name="GROUP"/>
 </IndexedIdentifier>
 <Graph Deterministic="true">
-<EventList>
+<LabelBlock>
 <IndexedIdentifier Name="machine_load">
 <SimpleIdentifier Name="GROUP"/>
 </IndexedIdentifier>
@@ -416,7 +416,7 @@
 <IndexedIdentifier Name="tu_load">
 <SimpleIdentifier Name="GROUP"/>
 </IndexedIdentifier>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="EMPTY">
 <EventList>
@@ -486,14 +486,14 @@
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="init"/>
 <Graph Deterministic="true">
-<EventList>
+<LabelBlock>
 <IndexedIdentifier Name="tu_accept">
 <IntConstant Value="0"/>
 </IndexedIdentifier>
 <IndexedIdentifier Name="tu_load">
 <IntConstant Value="0"/>
 </IndexedIdentifier>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Name="WORKING">
 <PointGeometry>
@@ -553,14 +553,14 @@
 <SimpleIdentifier Name="GROUP"/>
 </IndexedIdentifier>
 <Graph Deterministic="true">
-<EventList>
+<LabelBlock>
 <IndexedIdentifier Name="machine_load">
 <SimpleIdentifier Name="GROUP"/>
 </IndexedIdentifier>
 <IndexedIdentifier Name="machine_unload">
 <SimpleIdentifier Name="GROUP"/>
 </IndexedIdentifier>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Name="WORKING">
 <PointGeometry>
@@ -622,7 +622,7 @@
 <SimpleIdentifier Name="GROUP"/>
 </IndexedIdentifier>
 <Graph Deterministic="true">
-<EventList>
+<LabelBlock>
 <IndexedIdentifier Name="tu_accept">
 <SimpleIdentifier Name="GROUP"/>
 </IndexedIdentifier>
@@ -632,7 +632,7 @@
 <IndexedIdentifier Name="tu_reject">
 <SimpleIdentifier Name="GROUP"/>
 </IndexedIdentifier>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Name="WORKING">
 <PointGeometry>

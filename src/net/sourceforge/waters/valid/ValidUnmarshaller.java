@@ -1,10 +1,10 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: waters.valid
+//# PACKAGE: net.sourceforge.waters.valid
 //# CLASS:   ValidUnmarshaller
 //###########################################################################
-//# $Id: ValidUnmarshaller.java,v 1.3 2005-07-08 01:05:34 robi Exp $
+//# $Id: ValidUnmarshaller.java,v 1.4 2005-11-03 01:24:16 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.valid;
@@ -20,85 +20,90 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerConfigurationException;
 
-import net.sourceforge.waters.model.base.ModelException;
-import net.sourceforge.waters.model.base.ProxyMarshaller;
+import net.sourceforge.waters.model.expr.OperatorTable;
+import net.sourceforge.waters.model.marshaller.JAXBDocumentImporter;
+import net.sourceforge.waters.model.marshaller.JAXBModuleImporter;
+import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
+import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.ModuleProxy;
+import net.sourceforge.waters.model.module.ModuleProxyFactory;
+
 import net.sourceforge.waters.xsd.module.ModuleType;
 
 
 public class ValidUnmarshaller
-  implements ProxyMarshaller<ModuleProxy>
+  implements ProxyUnmarshaller<ModuleProxy>
 {
 
   //#########################################################################
   //# Constructor
-  public ValidUnmarshaller()
+  public ValidUnmarshaller(final ModuleProxyFactory factory,
+                           final OperatorTable optable)
     throws JAXBException
   {
     final JAXBContext context =
       JAXBContext.newInstance("net.sourceforge.waters.xsd.module");
     mUnmarshaller = context.createUnmarshaller();
     mUnmarshaller.setValidating(false);
+    mImporter = new JAXBModuleImporter(factory, optable);
   }
 
 
   //#########################################################################
   //# Access Methods
   public ModuleProxy unmarshal(File filename)
-    throws IOException, JAXBException, ModelException,
-           TransformerConfigurationException
+    throws WatersUnmarshalException, IOException
   {
-    final String name = filename.toString();
-    if (name.endsWith(".vprj")) {
-      final int len = name.length();
-      final String newname = name.substring(0, len - 5) + "_main.vmod";
-      filename = new File(newname);
+    try {
+      final String name = filename.toString();
+      if (name.endsWith(".vprj")) {
+        final int len = name.length();
+        final String newname = name.substring(0, len - 5) + "_main.vmod";
+        filename = new File(newname);
+      }
+      final ValidTransformer transformer = new ValidTransformer(filename);
+      final Source source = transformer.getSource();
+      transformer.start();
+      final ModuleType module = (ModuleType) mUnmarshaller.unmarshal(source);
+      final ModuleProxy modproxy = mImporter.importDocument(module, null);
+      return modproxy;
+    } catch (final JAXBException exception) {
+      throw new WatersUnmarshalException(exception);
+    } catch (final TransformerConfigurationException exception) {
+      throw new WatersUnmarshalException(exception);
     }
-
-    final ValidTransformer transformer = new ValidTransformer(filename);
-    final Source source = transformer.getSource();
-    transformer.start();
-    final ModuleType module = (ModuleType) mUnmarshaller.unmarshal(source);
-    final ModuleProxy modproxy = new ModuleProxy(module, filename);
-    return modproxy;
   }
 
-  public void marshal(final ModuleProxy docproxy,
-                      final File filename)
+  public Class<ModuleProxy> getDocumentClass()
   {
-    throw new UnsupportedOperationException
-      ("Marshalling of VALID files is not supported!");
+    return ModuleProxy.class;
   }
 
   public String getDefaultExtension()
   {
-    return null;
+    return EXT_VMOD;
   }
 
   public Collection<String> getSupportedExtensions()
   {
-    return EXTENSIONS_UNMOD;
-  }
-
-  public Collection<Class> getMarshalledClasses()
-  {
-    return Collections.emptyList();
+    return EXTENSIONS;
   }
 
 
   //#########################################################################
   //# Data Members
   private final Unmarshaller mUnmarshaller;
+  private final JAXBDocumentImporter<ModuleProxy,ModuleType> mImporter;
 
-  private static final Collection<String> EXTENSIONS = new LinkedList();
-  private static final Collection<String> EXTENSIONS_UNMOD =
-    Collections.unmodifiableCollection(EXTENSIONS);
+  private static final Collection<String> EXTENSIONS;
   private static final String EXT_VMOD = ".vmod";
   private static final String EXT_VPRJ = ".vprj";
 
   static {
-    EXTENSIONS.add(EXT_VMOD);
-    EXTENSIONS.add(EXT_VPRJ);
+    final Collection<String> exts = new LinkedList<String>();
+    exts.add(EXT_VMOD);
+    exts.add(EXT_VPRJ);
+    EXTENSIONS = Collections.unmodifiableCollection(exts);
   }
 
 }

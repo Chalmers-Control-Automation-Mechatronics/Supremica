@@ -1,9 +1,10 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: waters.model.compiler
+//# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   CompilerContext
 //###########################################################################
-//# $Id: CompilerContext.java,v 1.2 2005-03-03 02:16:50 robi Exp $
+//# $Id: CompilerContext.java,v 1.3 2005-11-03 01:24:15 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -13,51 +14,43 @@ import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sourceforge.waters.model.expr.Context;
-import net.sourceforge.waters.model.expr.DuplicateIdentifierException;
-import net.sourceforge.waters.model.expr.UndefinedIdentifierException;
+import net.sourceforge.waters.model.expr.EvalException;
+import net.sourceforge.waters.model.expr.IndexValue;
 import net.sourceforge.waters.model.expr.Value;
 import net.sourceforge.waters.model.module.ModuleProxy;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 
 
-class CompilerContext implements Context
+class CompilerContext
 {
 
   //#########################################################################
   //# Constructors
-  public CompilerContext(final ModuleProxy module)
+  CompilerContext(final ModuleProxy module)
   {
     this(module, null);
   }
 
-  public CompilerContext(final ModuleProxy module,
-			 final String prefix)
+  CompilerContext(final ModuleProxy module, final String prefix)
   {
     final File location = module.getLocation();
     mPrefix = prefix;
     mPath = (location == null ? null : location.getParentFile());
-    mSymbolTable = new HashMap();
+    mSymbolTable = new HashMap<String,Value>();
   }
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.expr.Context
-  public Value get(final String name)
+  //# Accessing the Symbol Table
+  void add(final CompiledEventDecl decl)
+    throws DuplicateIdentifierException
   {
-    return (Value) mSymbolTable.get(name);
+    final String name = decl.getName();
+    final EventValue value = decl.getValue();
+    add(name, value);
   }
 
-  public Value find(final String name)
-    throws UndefinedIdentifierException
-  {
-    final Value value = get(name);
-    if (value == null) {
-      throw new UndefinedIdentifierException(name);
-    }
-    return value;
-  }
-
-  public void set(final String name, final Value value)
+  void add(final String name, final Value value)
     throws DuplicateIdentifierException
   {
     if (mSymbolTable.containsKey(name)) {
@@ -67,14 +60,59 @@ class CompilerContext implements Context
     }
   }
 
-  public void unset(final String name)
+  Value get(final String name)
+  {
+    return mSymbolTable.get(name);
+  }
+
+  Value find(final String name)
+    throws UndefinedIdentifierException
+  {
+    final Value value = mSymbolTable.get(name);
+    if (value == null) {
+      throw new UndefinedIdentifierException(name);
+    } else {
+      return value;
+    }
+  }
+
+  Value find(final String name,
+                     final List<IndexValue> indexValues,
+                     final List<SimpleExpressionProxy> indexExpressions)
+    throws EvalException
+  {
+    Value value = mSymbolTable.get(name);
+    if (value == null) {
+      throw new UndefinedIdentifierException(name);
+    } else {
+      int pos = 0;
+      for (final IndexValue index : indexValues) {
+        if (value instanceof ArrayValue) {
+          try {
+            final ArrayValue array = (ArrayValue) value;
+            value = array.find(index);
+            pos++;
+          } catch (final EvalException exception) {
+            final SimpleExpressionProxy expr = indexExpressions.get(pos);
+            exception.provideLocation(expr);
+            throw exception;
+          }
+        } else {
+          throw new IndexOutOfRangeException(value);
+        }
+      }
+    }
+    return value;
+  }
+
+  void unset(final String name)
   {
     mSymbolTable.remove(name);
   }
 
 
   //#########################################################################
-  //# Extension to Context Interface for Compiler
+  //# Accessing the Prefix
   String getPrefixedName(final String name)
   {
     return mPrefix == null ? name : mPrefix + "." + name;
@@ -90,6 +128,6 @@ class CompilerContext implements Context
   //# Data Members
   private final String mPrefix;
   private final File mPath;
-  private final Map mSymbolTable;
+  private final Map<String,Value> mSymbolTable;
 
 }

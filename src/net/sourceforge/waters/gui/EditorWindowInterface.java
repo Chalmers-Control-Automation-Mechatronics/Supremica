@@ -4,23 +4,25 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorWindow
 //###########################################################################
-//# $Id: EditorWindowInterface.java,v 1.4 2005-07-12 03:56:00 siw4 Exp $
+//# $Id: EditorWindowInterface.java,v 1.5 2005-11-03 01:24:15 robi Exp $
 //###########################################################################
+
+
 package net.sourceforge.waters.gui;
 
-import java.util.List;
-import net.sourceforge.waters.model.expr.IdentifierProxy;
-import net.sourceforge.waters.gui.command.UndoInterface;
-import javax.swing.JFrame;
 import java.io.File;
+import java.util.List;
+import javax.swing.JFrame;
 
+import net.sourceforge.waters.gui.command.UndoInterface;
+import net.sourceforge.waters.subject.module.IdentifierSubject;
 
 
 public interface EditorWindowInterface
 {
-	public IdentifierProxy getBuffer();
+	public IdentifierSubject getBuffer();
 
-	public void setBuffer(IdentifierProxy i);
+	public void setBuffer(IdentifierSubject ident);
 
 	public boolean isSaved();
 
@@ -40,7 +42,7 @@ public interface EditorWindowInterface
 
 	public void setDisplayed();
 
-	void copyAsWMFToClipboard();
-	void createPDF(File f);
+	public void copyAsWMFToClipboard();
 
+	public void createPDF(File f);
 }

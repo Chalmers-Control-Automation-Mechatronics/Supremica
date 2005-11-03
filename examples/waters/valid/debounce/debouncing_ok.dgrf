@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<!DOCTYPE graph PUBLIC "vgraph"
+		       "vgraph.dtd">
 <graph name="debouncing_ok" version="1.0" valid="1"
 	hasGeometry="1" width="200" height="277"
 	generatorName="DGE" generatorVersion="2.7.8"

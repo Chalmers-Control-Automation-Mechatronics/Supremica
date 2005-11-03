@@ -35,7 +35,7 @@ class EditorEventsPanel
 
 		DefaultListModel data = new DefaultListModel();
 
-		ModuleProxy module = moduleContainer.getModuleProxy();
+		ModuleProxy module = moduleContainer.getModule();
 
 		if (module != null)
 		{

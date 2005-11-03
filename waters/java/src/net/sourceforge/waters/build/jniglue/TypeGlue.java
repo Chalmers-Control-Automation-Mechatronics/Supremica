@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.build.jniglue
 //# CLASS:   TypeGlue
 //###########################################################################
-//# $Id: TypeGlue.java,v 1.1 2005-02-18 01:30:10 robi Exp $
+//# $Id: TypeGlue.java,v 1.2 2005-11-03 01:24:16 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.build.jniglue;
@@ -11,7 +11,7 @@ package net.sourceforge.waters.build.jniglue;
 import java.util.Set;
 
 
-abstract class TypeGlue implements Comparable, WritableGlue {
+abstract class TypeGlue implements Comparable<TypeGlue>, WritableGlue {
 
   //#########################################################################
   //# Simple Access
@@ -43,7 +43,7 @@ abstract class TypeGlue implements Comparable, WritableGlue {
 
   //#########################################################################
   //# Calculating Dependencies
-  abstract void collectUsedGlue(final Set used);
+  abstract void collectUsedGlue(final Set<ClassGlue> used);
 
 
   //#########################################################################

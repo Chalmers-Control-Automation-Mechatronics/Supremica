@@ -1,16 +1,17 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: waters.samples.maze
+//# PACKAGE: net.sourceforge.waters.samples.maze
 //# CLASS:   KeyRing
 //###########################################################################
-//# $Id: KeyRing.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: KeyRing.java,v 1.2 2005-11-03 01:24:16 robi Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.samples.maze;
 
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 
@@ -21,37 +22,42 @@ class KeyRing
   //# Constructors
   KeyRing()
   {
-    mMap = new HashMap();
+    mMap = new HashMap<String,Key>();
   }
 
 
   //#########################################################################
   //# Accessing the Map
+  void clear()
+  {
+    mMap.clear();
+  }
+
   void add(final Square square)
   {
     final String name = square.getKeyName();
     if (name != null) {
-      Key key = (Key) mMap.get(name);
+      Key key = mMap.get(name);
       if (key == null) {
-	key = new Key(name);
-	mMap.put(name, key);
+        key = new Key(name);
+        mMap.put(name, key);
       }
       if (square instanceof SquareKey) {
-	key.addLocation(square);
+        key.addLocation(square);
       } else {
-	key.addLock(square);
+        key.addLock(square);
       }
     }
   }
 
-  Iterator iterator()
+  Collection<Key> getKeys()
   {
-    return mMap.values().iterator();
+    return mMap.values();
   }
 
 
   //#########################################################################
   //# Data Members
-  private final Map mMap;
+  private final Map<String,Key> mMap;
 
 }

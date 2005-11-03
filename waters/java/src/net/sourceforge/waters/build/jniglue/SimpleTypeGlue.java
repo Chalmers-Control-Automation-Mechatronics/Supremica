@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.build.jniglue
 //# CLASS:   SimpleTypeGlue
 //###########################################################################
-//# $Id: SimpleTypeGlue.java,v 1.1 2005-02-18 01:30:10 robi Exp $
+//# $Id: SimpleTypeGlue.java,v 1.2 2005-11-03 01:24:16 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.build.jniglue;
@@ -79,16 +79,13 @@ class SimpleTypeGlue extends TypeGlue {
 
   //#########################################################################
   //# Interface java.lang.Comparable
-  public int compareTo(final Object partner)
+  public int compareTo(final TypeGlue partner)
   {
     if (partner instanceof SimpleTypeGlue) {
       final SimpleTypeGlue simpletype = (SimpleTypeGlue) partner;
       return mCode - simpletype.mCode;
-    } else if (partner instanceof TypeGlue) {
-      return -1;
     } else {
-      throw new ClassCastException
-	("Unknown type to compare to: " + partner.getClass().getName() + "!");
+      return -1;
     }
   }
 
@@ -161,7 +158,7 @@ class SimpleTypeGlue extends TypeGlue {
 
   //#########################################################################
   //# Calculating Dependencies
-  void collectUsedGlue(final Set used)
+  void collectUsedGlue(final Set<ClassGlue> used)
   {
   }
 

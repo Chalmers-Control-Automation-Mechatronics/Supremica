@@ -1,11 +1,11 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: waters.samples.maze
+//# PACKAGE: net.sourceforge.waters.samples.maze
 //# CLASS:   Square
 //###########################################################################
-//# $Id: Square.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: Square.java,v 1.2 2005-11-03 01:24:16 robi Exp $
 //###########################################################################
-
 
 package net.sourceforge.waters.samples.maze;
 
@@ -24,7 +24,8 @@ abstract class Square
   Square(final Point pos)
   {
     mPosition = pos;
-    mActions = new HashMap();
+    mActions = new HashMap<Integer,Collection<Action>>();
+    mIsReachable = true;
     mCanGetRock = true;
   }
 
@@ -42,6 +43,16 @@ abstract class Square
   String getKeyName()
   {
     return null;
+  }
+
+  boolean isReachable()
+  {
+    return mIsReachable;
+  }
+
+  void setReachable(final boolean reachable)
+  {
+    mIsReachable = reachable;
   }
 
   boolean canGetRock()
@@ -79,31 +90,30 @@ abstract class Square
 
   //#########################################################################
   //# Action Recording
-  Collection getActionKinds()
+  Collection<Integer> getActionKinds()
   {
     return mActions.keySet();
   }
 
-  Collection getActions(final int kind)
+  Collection<Action> getActions(final int kind)
   {
-    final Integer key = new Integer(kind);
-    Collection list = (Collection) mActions.get(key);
+    Collection<Action> list = mActions.get(kind);
     if (list == null) {
-      list = new LinkedList();
-      mActions.put(key, list);
+      list = new LinkedList<Action>();
+      mActions.put(kind, list);
     }
     return list;
   }
 
   void addAction(final int kind, final Action action)
   {
-    final Collection list = getActions(kind);
+    final Collection<Action> list = getActions(kind);
     list.add(action);
   }
 
-  void addActions(final int kind, final Collection actions)
+  void addActions(final int kind, final Collection<Action> actions)
   {
-    final Collection list = getActions(kind);
+    final Collection<Action> list = getActions(kind);
     list.addAll(actions);
   }
 
@@ -123,7 +133,8 @@ abstract class Square
   //#########################################################################
   //# Data Members
   private final Point mPosition;
-  private final Map mActions;
+  private final Map<Integer,Collection<Action>> mActions;
+  private boolean mIsReachable;
   private boolean mCanGetRock;
 
 
@@ -153,7 +164,7 @@ abstract class Square
     "exit_norock",
     null,
     "door_norock",
-    "gate_norock",
+    "door_norock",
     "key_norock"
   };
 

@@ -1,53 +1,50 @@
 //# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: waters.gui
+//# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventParameterEditorDialog
 //###########################################################################
-//# $Id: SimpleParameterEditorDialog.java,v 1.3 2005-02-20 23:32:54 robi Exp $
+//# $Id: SimpleParameterEditorDialog.java,v 1.4 2005-11-03 01:24:15 robi Exp $
 //###########################################################################
+
+
 package net.sourceforge.waters.gui;
 
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import javax.swing.*;
 import javax.swing.event.*;
-import java.awt.*;
-import java.awt.event.*;
-import javax.xml.bind.JAXBException;
-import net.sourceforge.waters.model.base.*;
-import net.sourceforge.waters.model.module.*;
-import net.sourceforge.waters.model.expr.IdentifierProxy;
-import net.sourceforge.waters.model.expr.SimpleIdentifierProxy;
-import net.sourceforge.waters.xsd.base.ComponentKind;
-import net.sourceforge.waters.xsd.module.SimpleComponentType;
+
+import net.sourceforge.waters.model.base.DuplicateNameException;
+import net.sourceforge.waters.model.base.IndexedList;
 import net.sourceforge.waters.model.expr.ExpressionParser;
+import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.ParseException;
-import net.sourceforge.waters.model.expr.SimpleExpressionProxy;
-import net.sourceforge.waters.model.module.ForeachComponentProxy;
-import net.sourceforge.waters.model.module.EventDeclProxy;
-import net.sourceforge.waters.xsd.base.EventKind;
-import java.util.Vector;
+import net.sourceforge.waters.subject.module.IntParameterSubject;
+import net.sourceforge.waters.subject.module.ModuleSubject;
+import net.sourceforge.waters.subject.module.ParameterSubject;
+import net.sourceforge.waters.subject.module.RangeParameterSubject;
+import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
+
 
 public class SimpleParameterEditorDialog
 	extends JDialog
 	implements ActionListener, ItemListener
 {
-	private final JTextField name = new JTextField(16);
-	private final JButton okButton = new JButton("OK");
-	private ButtonGroup group = new ButtonGroup();
-	private ModuleWindow root = null;
-	private DefaultListModel data = null;
-	private JList dataList = null;
-	private JCheckBox requiredBox = null;
-	private boolean isRequired = false;
-	private final JTextField defaultText = new JTextField(16);
 
-	public SimpleParameterEditorDialog(ModuleWindow root)
+	//#######################################################################
+	//# Constructor
+	public SimpleParameterEditorDialog(final ModuleWindow root)
 	{
 		setTitle("Simple Parameter Editor");
+		mRoot = root;
 
-		this.root = root;
+		// TODO: Change the selection mode for the JList component
+		// (Single selection)
 
-		// TODO: Change the selection mode for the JList component (Single selection)
 		// Center this element on the screen
 		setModal(true);
 		setLocationRelativeTo(null);
@@ -62,7 +59,7 @@ public class SimpleParameterEditorDialog
 
 		b.add(r1);
 		r1.add(new JLabel("Name: "));
-		r1.add(name);
+		r1.add(mNameInput);
 
 		JPanel r2 = new JPanel();
 
@@ -74,12 +71,12 @@ public class SimpleParameterEditorDialog
 
 		b.add(r3);
 		r3.add(new JLabel("Default Value: "));
-		r3.add(defaultText);
+		r3.add(mDefaultInput);
 
 		JRadioButton integerButton, rangeButton;
 
-		group.add(integerButton = new JRadioButton("Integer Expression"));
-		group.add(rangeButton = new JRadioButton("Range"));
+		mTypeGroup.add(integerButton = new JRadioButton("Integer Expression"));
+		mTypeGroup.add(rangeButton = new JRadioButton("Range"));
 		integerButton.setSelected(true);
 		integerButton.setActionCommand("integer");
 		rangeButton.setActionCommand("range");
@@ -106,86 +103,73 @@ public class SimpleParameterEditorDialog
 		show();
 	}
 
+
+	//#######################################################################
+	//# Interface java.awt.event.ActionListener
 	public void actionPerformed(ActionEvent e)
 	{
-		if ("okbutton".equals(e.getActionCommand()))
-		{
-			ExpressionParser parser = null;
-			SimpleExpressionProxy expr = null;
-
-			try
-			{
-				if (name.getText().length() != 0)
-				{
-					parser = new ExpressionParser();
-					expr = parser.parse(name.getText(), SimpleExpressionProxy.TYPE_NAME);
-
-					root.logEntry("Event name passed validation: " + name.getText());
-				}
-				else
-				{
-					JOptionPane.showMessageDialog(this, "Invalid identifier");
-					root.logEntry("Event name was found to be invalid: " + name.getText());
-				}
+		if ("okbutton".equals(e.getActionCommand())) {
+			final ExpressionParser parser = mRoot.getExpressionParser();
+			final String nameText = mNameInput.getText();
+			try {
+				parser.parseSimpleIdentifier(nameText);
+			} catch (final ParseException exception) {
+				ErrorWindow.askRevert(exception, nameText);
+				mRoot.logEntry("ParseException in event name: " +
+							   exception.getMessage());
+				return;
 			}
-			catch (final ParseException exception)
-			{
-				ErrorWindow.askRevert(exception,  name.getText());
-				root.logEntry("ParseException in event name: " + exception.getMessage());
-
+			SimpleExpressionSubject defaultExpr = null;
+			int mask = 0;
+			final String defaultText = mDefaultInput.getText();
+			final String key = mTypeGroup.getSelection().getActionCommand();
+			if (key.equals("integer"))	{
+				mask = Operator.TYPE_INT;
+			} else if (key.equals("range")) {
+				mask = Operator.TYPE_RANGE;
+			} else {
+				throw new IllegalStateException
+					("Parameter type not selected!");
+			}
+			try {
+				defaultExpr =
+					(SimpleExpressionSubject) parser.parse(defaultText, mask);
+			} catch (final ParseException exception) {
+				ErrorWindow.askRevert(exception, defaultText);
+				mRoot.logEntry("ParseException in default value: " +
+							   exception.getMessage());
 				return;
 			}
 
-			try
-			{
-				parser = new ExpressionParser();
-
-				if (defaultText.getText().length() != 0)
-				{
-					if (group.getSelection().getActionCommand().equals("integer"))
-					{
-						expr = parser.parse(defaultText.getText(), SimpleExpressionProxy.TYPE_INT);
-					}
-
-					if (group.getSelection().getActionCommand().equals("range"))
-					{
-						expr = parser.parse(defaultText.getText(), SimpleExpressionProxy.TYPE_RANGE);
-					}
-				}
-				else
-				{
-					JOptionPane.showMessageDialog(this, "Parameter must have a default value!");
-					root.logEntry("Parameter must have a default value!");
-
-					return;
-				}
+			ParameterSubject param;
+			switch (mask) {
+			case Operator.TYPE_INT:
+				param = new IntParameterSubject
+					(nameText, mIsRequired, defaultExpr);
+				break;
+			case Operator.TYPE_RANGE:
+				param = new RangeParameterSubject
+					(nameText, mIsRequired, defaultExpr);
+				break;
+			default:
+				throw new IllegalStateException
+					("Unexpected type mask " + mask + "!");
 			}
-			catch (final ParseException exception)
-			{
-				ErrorWindow.askRevert(exception,  defaultText.getText());
-				root.logEntry("ParseException in event range: " + exception.getMessage());
 
+			try	{
+				final ModuleSubject module = mRoot.getModuleSubject();
+				final IndexedList<ParameterSubject> params =
+					module.getParameterListModifiable();
+				params.insert(param);
+			} catch (final DuplicateNameException exception) {
+				JOptionPane.showMessageDialog(this, "Duplicate parameter");
+				mRoot.logEntry("DuplicateNameException: " +
+							   exception.getMessage());
 				return;
 			}
 
-			SimpleParameterProxy sp = null;
-
-			if (group.getSelection().getActionCommand().equals("integer"))
-			{
-				sp = new IntParameterProxy(name.getText(), null, isRequired);
-
-				((IntParameterProxy) sp).setDefault(expr);
-			}
-
-			if (group.getSelection().getActionCommand().equals("range"))
-			{
-				sp = new RangeParameterProxy(name.getText(), null, isRequired);
-
-				((RangeParameterProxy) sp).setDefault(expr);
-			}
-
-			root.getModuleProxy().getParameterList().add(sp);
-			root.getParameterDataList().add(root.getParameterDataList().getSize(), sp);
+			final DefaultListModel paramData = mRoot.getParameterDataList();
+			paramData.addElement(param);
 			dispose();
 		}
 
@@ -195,13 +179,29 @@ public class SimpleParameterEditorDialog
 		}
 	}
 
-	public void itemStateChanged(ItemEvent e)
-	{
-		Object source = e.getItemSelectable();
 
-		if (source == requiredBox)
-		{
-			isRequired = !isRequired;
+	//#######################################################################
+	//# Interface java.awt.event.ItemListener
+	public void itemStateChanged(final ItemEvent event)
+	{
+		final Object source = event.getItemSelectable();
+		if (source == requiredBox) {
+			mIsRequired = !mIsRequired;
 		}
 	}
+
+
+	//#######################################################################
+	//# Data Members
+	private final JTextField mNameInput = new JTextField(16);
+	private final JTextField mDefaultInput = new JTextField(16);
+	private final JButton okButton = new JButton("OK");
+	private final ButtonGroup mTypeGroup = new ButtonGroup();
+	private final ModuleWindow mRoot;
+
+	private DefaultListModel data = null;
+	private JList dataList = null;
+	private JCheckBox requiredBox = null;
+	private boolean mIsRequired = false;
+
 }

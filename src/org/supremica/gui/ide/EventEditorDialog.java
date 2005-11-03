@@ -1,46 +1,50 @@
 //# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: waters.gui
+//# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EventEditorDialog
 //###########################################################################
-//# $Id: EventEditorDialog.java,v 1.3 2005-03-24 10:08:54 torda Exp $
+//# $Id: EventEditorDialog.java,v 1.4 2005-11-03 01:24:16 robi Exp $
 //###########################################################################
+
+
 package org.supremica.gui.ide;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.*;
+
 import net.sourceforge.waters.gui.ErrorWindow;
+import net.sourceforge.waters.model.base.DuplicateNameException;
+import net.sourceforge.waters.model.base.IndexedCollection;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.ParseException;
-import net.sourceforge.waters.model.expr.SimpleExpressionProxy;
-import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.model.expr.Operator;
+import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.subject.module.EventDeclSubject;
+import net.sourceforge.waters.subject.module.ModuleSubject;
+import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
+
 import org.supremica.log.*;
+
 
 public class EventEditorDialog
 	extends JDialog
 	implements ActionListener
 {
-	private static final long serialVersionUID = 1L;
-
-	private static Logger logger = LoggerFactory.createLogger(EventEditorDialog.class);
-
-	private final JTextField name = new JTextField(16);
-	private final JButton okButton = new JButton("OK");
-	private ButtonGroup group = new ButtonGroup();
-	IDE ide = null;
-	DefaultListModel data = null;
-	JList dataList = null;
 
 	public EventEditorDialog(IDE ide)
 	{
 		setTitle("Events Editor");
-
 		this.ide = ide;
 
-		// TODO: Change the selection mode for the JList component (Single selection)
+		// TODO: Change the selection mode for the JList component
+		// (Single selection)
+
 		// Center this element on the screen
 		setModal(true);
 		setLocationRelativeTo(null);
@@ -55,7 +59,7 @@ public class EventEditorDialog
 
 		b.add(r1);
 		r1.add(new JLabel("Name: "));
-		r1.add(name);
+		r1.add(mName);
 
 		JRadioButton controllable, uncontrollable, proposition;
 
@@ -81,8 +85,8 @@ public class EventEditorDialog
 		r2.setLayout(new GridLayout(1, 2));
 		b.add(r2);
 
-		data = new DefaultListModel();
-		dataList = new JList(data);
+		mData = new DefaultListModel();
+		dataList = new JList(mData);
 
 		r2.add(new JScrollPane(dataList));
 
@@ -123,92 +127,64 @@ public class EventEditorDialog
 
 	public void actionPerformed(ActionEvent e)
 	{
-		EventDeclProxy event = null;
-
 		if ("okbutton".equals(e.getActionCommand()))
 		{
 
-			// addEvent(...);
+			final String key = group.getSelection().getActionCommand();
 			EventKind eventkind = null;
-
-			if (group.getSelection().getActionCommand().equals("controllable"))
-			{
+			if (key.equals("controllable"))	{
 				eventkind = EventKind.CONTROLLABLE;
-			}
-
-			if (group.getSelection().getActionCommand().equals("uncontrollable"))
-			{
+			} else if (key.equals("uncontrollable")) {
 				eventkind = EventKind.UNCONTROLLABLE;
-			}
-
-			if (group.getSelection().getActionCommand().equals("proposition"))
-			{
+			} else if (key.equals("proposition")) {
 				eventkind = EventKind.PROPOSITION;
+			} else {
+				throw new IllegalStateException("Event kind not selected!");
 			}
 
-			ExpressionParser parser = null;
-
-			try
-			{
-				if (name.getText().length() != 0)
-				{
-					parser = new ExpressionParser();
-
-					SimpleExpressionProxy expr = parser.parse(name.getText(), SimpleExpressionProxy.TYPE_NAME);
-					logger.debug("Event name passed validation: " + name.getText());
-					//ide.logEntry("Event name passed validation: " + name.getText());
-				}
-				else
-				{
-					JOptionPane.showMessageDialog(this, "Invalid identifier");
-					logger.debug("Event name was found to be invalid: " + name.getText());
-					//ide.logEntry("Event name was found to be invalid: " + name.getText());
-				}
-			}
-			catch (final ParseException exception)
-			{
-				logger.error("ParseException in event name: " + exception.getMessage(), exception);
-				ErrorWindow.askRevert(exception,  name.getText());
-				//ide.logEntry("ParseException in event name: " + exception.getMessage());
-
+			final ModuleContainer root = ide.getActiveModuleContainer();
+			final ExpressionParser parser = root.getExpressionParser();
+			final String text = mName.getText();
+			try	{
+				IdentifierProxy ident = parser.parseSimpleIdentifier(text);
+			} catch (final ParseException exception) {
+				logger.error("ParseException in event name: " +
+							 exception.getMessage(), exception);
+				ErrorWindow.askRevert(exception, text);
 				return;
 			}
-
-			event = new EventDeclProxy(name.getText(), eventkind);
-
-			for (int i = 0; i < data.getSize(); i++)
-			{
-				try
-				{
-					parser = new ExpressionParser();
-
-					SimpleExpressionProxy expr = parser.parse((String) data.get(i), SimpleExpressionProxy.TYPE_RANGE);
-
-					event.getRanges().add(expr);
-				}
-				catch (final ParseException exception)
-				{
-					ErrorWindow.askRevert(exception,  (String) data.get(i));
-					//ide.logEntry("ParseException in event range: " + exception.getMessage());
-					logger.error("ParseException in event range: " + exception.getMessage(), exception);
+			final int numranges = mData.getSize();
+			final List<SimpleExpressionSubject> ranges =
+				new ArrayList<SimpleExpressionSubject>(numranges);
+			for (int i = 0; i < numranges; i++) {
+				final String rtext = (String) mData.get(i);
+				try {
+					final SimpleExpressionSubject expr =
+						(SimpleExpressionSubject)
+						parser.parse(rtext, Operator.TYPE_RANGE);
+					ranges.add(expr);
+				} catch (final ParseException exception) {
+					ErrorWindow.askRevert(exception, rtext);
+					logger.error("ParseException in event range: " +
+								 exception.getMessage(), exception);
 					return;
 				}
 			}
-
+			final EventDeclSubject decl =
+				new EventDeclSubject(text, eventkind, false, ranges, null);
 			try
 			{
-				ide.getActiveModuleContainer().getModuleProxy().insertEventDeclaration(event);
-			}
-			catch (final net.sourceforge.waters.model.base.DuplicateNameException exn)
-			{
-				logger.debug("DuplicateNameException: " + exn.getMessage());
-				//ide.logEntry("DuplicateNameException: " + exn.getMessage());
+				final ModuleSubject module = root.getModule();
+				final IndexedCollection<EventDeclSubject> decls =
+					module.getEventDeclListModifiable();
+				decls.insert(decl);
+			} catch (final DuplicateNameException exception) {
+				logger.debug("DuplicateNameException: " +
+							 exception.getMessage());
 				JOptionPane.showMessageDialog(this, "Duplicate event");
-
 				return;
 			}
-
-			data.add(data.getSize(), event);
+			mData.addElement(decl);
 			dispose();
 		}
 
@@ -219,43 +195,26 @@ public class EventEditorDialog
 
 		if ("add".equals(e.getActionCommand()))
 		{
-			String range = JOptionPane.showInputDialog("Please enter a range:");
-			int index = dataList.getSelectedIndex();
-
-			if ((index == -1) && (data.getSize() != 0))
-			{
-				index = data.getSize() - 1;
+			final String text =
+				JOptionPane.showInputDialog("Please enter a range:");
+		    int index = dataList.getSelectedIndex();
+			if (index == -1 && mData.getSize() != 0) {
+				index = mData.getSize() - 1;
 			}
-
-			ExpressionParser parser = null;
-
-			try
-			{
-				if (range.length() != 0)
-				{
-					parser = new ExpressionParser();
-
-					SimpleExpressionProxy expr = parser.parse(range, SimpleExpressionProxy.TYPE_RANGE);
-
-					logger.debug("Event range passed validation: " + range);
-				}
-				else
-				{
-					JOptionPane.showMessageDialog(this, "Invalid range");
-					logger.debug("Event range was found to be invalid: " + range);
-				}
+			final ModuleContainer root = ide.getActiveModuleContainer();
+			final ExpressionParser parser = root.getExpressionParser();
+			try {
+				final SimpleExpressionProxy range =
+					parser.parse(text, Operator.TYPE_RANGE);
+				mData.add(index + 1, range);
 			}
 			catch (final ParseException exception)
 			{
-				ErrorWindow.askRevert(exception, range);
-				//ide.logEntry("ParseException in event range: " + exception.getMessage());
-				logger.error("ParseException in event range: " + exception.getMessage(), exception);
-
+				ErrorWindow.askRevert(exception, text);
+				logger.error("ParseException in event range: " +
+							 exception.getMessage(), exception);
 				return;
 			}
-
-			data.add(index + 1, range);
-
 			//TODO: Finish prompting for input etc.
 		}
 
@@ -263,31 +222,45 @@ public class EventEditorDialog
 		{
 			int index = dataList.getSelectedIndex();
 
-			data.remove(index);
+			mData.remove(index);
 		}
 
 		if ("up".equals(e.getActionCommand()))
 		{
 			int index = dataList.getSelectedIndex();
-			Object o = data.get(index);
+			Object o = mData.get(index);
 
 			if (index != 0)
 			{
-				data.remove(index);
-				data.add(index - 1, o);
+				mData.remove(index);
+				mData.add(index - 1, o);
 			}
 		}
 
 		if ("down".equals(e.getActionCommand()))
 		{
 			int index = dataList.getSelectedIndex();
-			Object o = data.get(index);
+			Object o = mData.get(index);
 
-			if (index < data.size() - 1)
+			if (index < mData.size() - 1)
 			{
-				data.remove(index);
-				data.add(index + 1, o);
+				mData.remove(index);
+				mData.add(index + 1, o);
 			}
 		}
 	}
+
+ 
+	//#######################################################################
+	//# Data Members
+	private final JTextField mName = new JTextField(16);
+	private final JButton okButton = new JButton("OK");
+	private ButtonGroup group = new ButtonGroup();
+	IDE ide = null;
+	DefaultListModel mData = null;
+	JList dataList = null;
+
+	private static final long serialVersionUID = 1L;
+	private static final Logger logger =
+		LoggerFactory.createLogger(EventEditorDialog.class);
 }

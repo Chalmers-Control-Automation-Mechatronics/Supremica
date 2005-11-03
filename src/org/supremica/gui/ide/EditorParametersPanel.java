@@ -33,7 +33,7 @@ class EditorParametersPanel
 
 	private void createContentPane()
 	{
-		ModuleProxy module = moduleContainer.getModuleProxy();
+		ModuleProxy module = moduleContainer.getModule();
 		DefaultListModel paramData = new DefaultListModel();
 
 		if (module != null)

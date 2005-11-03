@@ -1,25 +1,36 @@
+//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: waters.gui
+//# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorEdge
 //###########################################################################
-//# $Id: EditorEdge.java,v 1.27 2005-10-10 12:23:09 flordal Exp $
+//# $Id: EditorEdge.java,v 1.28 2005-11-03 01:24:15 robi Exp $
 //###########################################################################
+
 package net.sourceforge.waters.gui;
 
-import java.util.*;
-import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.geom.*;
-import net.sourceforge.waters.model.module.*;
-import net.sourceforge.waters.model.module.NodeProxy;
-import net.sourceforge.waters.model.base.ElementProxy;
-import net.sourceforge.waters.model.module.NodeProxy;
+
+import net.sourceforge.waters.subject.base.ModelChangeEvent;
+import net.sourceforge.waters.subject.base.ModelObserver;
+import net.sourceforge.waters.subject.module.EdgeSubject;
+import net.sourceforge.waters.subject.module.NodeSubject;
+import net.sourceforge.waters.subject.module.PointGeometrySubject;
+import net.sourceforge.waters.subject.module.SplineGeometrySubject;
+
+import net.sourceforge.waters.xsd.module.SplineKind;
+
 
 /** 
  * <p>The editor's internal representation of edges.</p>
  *
- * <p>This represents edges within the graph of the component.  It currently supports
- *  Bezier-curve geometry, with a single control point only.</p>
+ * <p>This represents edges within the graph of the component. It currently
+ * supports Bezier-curve geometry, with a single control point only.</p>
  *
  * <p>The turning point of a curve is the point where the curve intersects
  * the line which is perpendicular to the line between the source
@@ -30,7 +41,8 @@ import net.sourceforge.waters.model.module.NodeProxy;
  * @author Simon Ware
  */
 public class EditorEdge
-	extends EditorObject
+    extends EditorObject
+    implements ModelObserver
 {
 	/** The start can be either a node or a nodegroup. */
 	private EditorObject startNode; 
@@ -54,26 +66,26 @@ public class EditorEdge
 	private Rectangle2D.Double center = new Rectangle2D.Double();
 	private boolean dragC = false;
 
-	private EdgeProxy proxy;
+	private EdgeSubject subject;
 	private Point2D start;
 	private static double tearRatio = .8;
 	private static int WIDTHD = 2;
 	private static int WIDTHS = 5;
 
-	public EditorEdge(EditorObject iStartNode, EditorNode iEndNode, int x, int y, EdgeProxy e)
+	public EditorEdge(EditorObject iStartNode, EditorNode iEndNode, int x, int y, EdgeSubject e)
 	{
 		// This is an edge
 		type = EDGE;
 
 		startNode = iStartNode;
 		endNode = iEndNode;
-		proxy = e;
+		subject = e;
 		endNode.attachEdge(this);
 		if (startNode.getType() == NODE)
 		{
 			EditorNode s = (EditorNode) startNode;
 			
-			proxy.setSource((NodeProxy) s.getProxy());
+			subject.setSource((NodeSubject) s.getSubject());
 			
 			start = s.getPosition();
 			
@@ -83,20 +95,18 @@ public class EditorEdge
 		{
 			EditorNodeGroup s = (EditorNodeGroup) startNode;
 			
-			proxy.setSource((NodeProxy) s.getProxy());
+			subject.setSource((NodeSubject) s.getSubject());
 			
 			start = s.getPosition(x, y, this);
 			
 		}
 		
-		proxy.setTarget((NodeProxy) iEndNode.getProxy());
-		proxy.setStartPoint(new PointGeometryProxy(start));
-		proxy.setEndPoint(new PointGeometryProxy(endNode.getPosition()));
-		proxy.getStartPoint().setPoint(start);
-		proxy.getEndPoint().setPoint(endNode.getPosition());
+		subject.setTarget((NodeSubject) iEndNode.getSubject());
+		subject.setStartPoint(new PointGeometrySubject(start));
+		subject.setEndPoint(new PointGeometrySubject(endNode.getPosition()));
 
 		// Create new geometry if there is none
-		if (proxy.getGeometry() == null)
+		if (subject.getGeometry() == null)
 		{
 			if (!isSelfLoop())
 			{
@@ -130,32 +140,38 @@ public class EditorEdge
 			ArrayList l = new ArrayList(1);
 
 			l.add(tPoint);
-			proxy.setGeometry(new SplineGeometryProxy(l));
+			subject.setGeometry
+				(new SplineGeometrySubject(l, SplineKind.INTERPOLATING));
 		}
 		else
 		{
-			tPoint = new Point2D.Double(((Point2D) proxy.getGeometry().getPoints().get(0)).getX(), ((Point2D) proxy.getGeometry().getPoints().get(0)).getY());
-
-			proxy.getGeometry().getPoints().remove(0);
-			proxy.getGeometry().getPoints().add(tPoint);
-
-			if (onLine(tPoint.getX(), tPoint.getY()))
-			{
+			final SplineGeometrySubject geo = subject.getGeometry();
+			final List<Point2D> points = geo.getPointsModifiable();
+			final Point2D point0 = points.get(0);
+			final double x0 = point0.getX();
+			final double y0 = point0.getY();
+			if (point0 instanceof Point2D.Double) {
+				tPoint = (Point2D.Double) point0;
+			} else {
+				tPoint = new Point2D.Double(x0, y0);
+			}
+			if (onLine(x0, y0)) {
 				straight = true;
 			}
 		}
 
-		// Initialize the edge (somehow this strange call does exactly what we want)
-		// Without this call, when the mouse is moved above the handle of one of the _curved_ edges,
-		// the labelgroup on that edge jumps to the side!! Presumably TPoint is not properly set 
-		// before this call...
+		// Initialize the edge (somehow this strange call does exactly what
+		// we want) Without this call, when the mouse is moved above the
+		// handle of one of the _curved_ edges, the labelgroup on that edge
+		// jumps to the side!! Presumably TPoint is not properly set before
+		// this call...
 		setPosition(getTPointX(), getTPointY());
 	}
 
 	public double getCPointX()
 	{
 		double result;
-		if (proxy.getSource() == proxy.getTarget())
+		if (subject.getSource() == subject.getTarget())
 		{
 			return tPoint.getX();
 		}
@@ -165,7 +181,7 @@ public class EditorEdge
 
 	public double getCPointY()
 	{
-		if (proxy.getSource() == proxy.getTarget())
+		if (subject.getSource() == subject.getTarget())
 		{
 			return tPoint.getY();
 		}
@@ -195,7 +211,7 @@ public class EditorEdge
 
 	public void setCPoint(double x, double y)
 	{
-		if (proxy.getSource() == proxy.getTarget())
+		if (subject.getSource() == subject.getTarget())
 		{
 			setPosition(x, y);
 		}
@@ -268,7 +284,7 @@ public class EditorEdge
 
 			start = s.getPosition();
 
-			proxy.setSource((NodeProxy) s.getProxy());
+			subject.setSource(s.getSubject());
 
 			s.attachEdge(this);
 		}
@@ -278,7 +294,7 @@ public class EditorEdge
 
 			start = s.getPosition(x, y, this);
 
-			proxy.setSource((NodeProxy) s.getProxy());
+			subject.setSource(s.getSubject());
 		}
 
 		if (ox != -1)
@@ -331,7 +347,7 @@ public class EditorEdge
 
 		dragS = false;
 
-		proxy.getStartPoint().setPoint(start);
+		subject.getStartPoint().setPoint(start);
 	}
 
 	public void setEndNode(EditorNode newendNode)
@@ -350,8 +366,8 @@ public class EditorEdge
 	    
 	    dragT = false;
 	    
-	    proxy.setTarget((NodeProxy) endNode.getProxy());
-	    proxy.getEndPoint().setPoint(endNode.getPosition());
+	    subject.setTarget(endNode.getSubject());
+	    subject.getEndPoint().setPoint(endNode.getPosition());
 	}
 
 	public EditorObject getStartNode()
@@ -485,7 +501,7 @@ public class EditorEdge
 
 	public int hashCode()
 	{
-		return proxy.hashCode(); 
+		return subject.hashCode(); 
 	}
 
 	/**
@@ -917,9 +933,9 @@ public class EditorEdge
 		//  }
 	}
 
-	public EdgeProxy getProxy()
+	public EdgeSubject getSubject()
 	{
-		return proxy;
+		return subject;
 	}
 	
 	public QuadCurve2D.Double getCurve()
@@ -1107,4 +1123,12 @@ public class EditorEdge
 	{
 		arrowAtEnd = set;
 	}
+
+
+	//#######################################################################
+	//# Interface net.sourceforge.waters.subject.base.ModelObserver
+	public void modelChanged(final ModelChangeEvent event)
+	{
+	}
+
 }

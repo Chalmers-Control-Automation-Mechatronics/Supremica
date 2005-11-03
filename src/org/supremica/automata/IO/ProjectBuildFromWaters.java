@@ -1,4 +1,4 @@
-
+//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
 /*
  *  Supremica Software License Agreement
  *
@@ -50,14 +50,16 @@
 package org.supremica.automata.IO;
 
 import java.util.*;
+
+import net.sourceforge.waters.model.compiler.ModuleCompiler;
+import net.sourceforge.waters.model.des.*;
+import net.sourceforge.waters.model.marshaller.DocumentManager;
+import net.sourceforge.waters.model.module.ModuleProxy;
+import net.sourceforge.waters.plain.des.ProductDESElementFactory;
+import net.sourceforge.waters.xsd.base.EventKind;
+
 import org.supremica.automata.*;
 import org.supremica.log.*;
-import net.sourceforge.waters.model.base.DocumentManager;
-//import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.compiler.ModuleCompiler;
-import net.sourceforge.waters.model.module.ModuleProxy;
-import net.sourceforge.waters.model.des.*;
-import net.sourceforge.waters.xsd.base.EventKind;
 
 
 public class ProjectBuildFromWaters
@@ -85,8 +87,11 @@ public class ProjectBuildFromWaters
 		Project currProject = theProjectFactory.getProject();
 		currProject.setName(module.getName());
 
+		final ProductDESProxyFactory factory =
+			ProductDESElementFactory.getInstance();
 		DocumentManager mDocumentManager = new DocumentManager();
-		ModuleCompiler compiler = new ModuleCompiler(module, mDocumentManager);
+		ModuleCompiler compiler =
+			new ModuleCompiler(mDocumentManager, factory, module);
 
 		ProductDESProxy des = null;
  		try

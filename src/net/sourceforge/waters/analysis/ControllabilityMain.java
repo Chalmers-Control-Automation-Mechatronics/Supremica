@@ -1,9 +1,10 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ControllabilityChecker
 //###########################################################################
-//# $Id: ControllabilityMain.java,v 1.1 2005-05-08 00:24:31 robi Exp $
+//# $Id: ControllabilityMain.java,v 1.2 2005-11-03 01:24:15 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis;
@@ -12,16 +13,21 @@ import java.io.File;
 import java.util.Iterator;
 import java.util.List;
 
-import net.sourceforge.waters.model.base.DocumentManager;
 import net.sourceforge.waters.model.base.DocumentProxy;
-import net.sourceforge.waters.model.base.ProxyMarshaller;
+import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.ProductDESMarshaller;
 import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.module.ModuleMarshaller;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.expr.OperatorTable;
+import net.sourceforge.waters.model.marshaller.DocumentManager;
+import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
+import net.sourceforge.waters.model.marshaller.JAXBProductDESMarshaller;
 import net.sourceforge.waters.model.module.ModuleProxy;
+import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.valid.ValidUnmarshaller;
+import net.sourceforge.waters.plain.des.ProductDESElementFactory;
+import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 
 /**
@@ -80,50 +86,59 @@ public class ControllabilityMain
   {
     try {
 
-      final ValidUnmarshaller validMarshaller = new ValidUnmarshaller();
-      final ProxyMarshaller desMarshaller = new ProductDESMarshaller();
-      final ProxyMarshaller moduleMarshaller = new ModuleMarshaller();
-      final DocumentManager docManager = new DocumentManager();
-      docManager.register(desMarshaller);
-      docManager.register(moduleMarshaller);
-      docManager.register(validMarshaller);
+      final ModuleProxyFactory moduleFactory =
+        ModuleElementFactory.getInstance();
+      final ProductDESProxyFactory desFactory =
+        ProductDESElementFactory.getInstance();
+      final OperatorTable optable = CompilerOperatorTable.getInstance();
+      final ValidUnmarshaller importer =
+        new ValidUnmarshaller(moduleFactory, optable);
+      final JAXBModuleMarshaller moduleMarshaller =
+        new JAXBModuleMarshaller(moduleFactory, optable);
+      final JAXBProductDESMarshaller desMarshaller =
+        new JAXBProductDESMarshaller(desFactory);
+      final DocumentManager<DocumentProxy> docManager =
+        new DocumentManager<DocumentProxy>();
+      docManager.registerUnmarshaller(desMarshaller);
+      docManager.registerUnmarshaller(moduleMarshaller);
+      docManager.registerUnmarshaller(importer);
       
       for (int i = 0; i < args.length; i++) {
-	final String name = args[i];
-	final File filename = new File(name);
-	final DocumentProxy doc = docManager.load(filename);
-	ProductDESProxy des = null;
-	if (doc instanceof ProductDESProxy) {
-	  des = (ProductDESProxy) doc;
-	} else {
-	  final ModuleProxy module = (ModuleProxy) doc;
-	  final ModuleCompiler compiler =
-	    new ModuleCompiler(module, docManager);
-	  des = compiler.compile();
-	}
-	final ControllabilityChecker checker =
-	  new ControllabilityChecker(des);
-	System.out.print(des.getName() + " ... ");
-	System.out.flush();
-	final boolean result = checker.run();
-	if (result) {
-	  System.out.println("controllable");
-	} else {
-	  System.out.println("NOT controllable");
-	  System.out.println("Counterexample:");
-	  final List counterex = checker.getCounterExample();
-	  final Iterator iter = counterex.iterator();
-	  while (iter.hasNext()) {
-	    final EventProxy event = (EventProxy) iter.next();
-	    System.out.println("  " + event.getName());
-	  }
-	}
+        final String name = args[i];
+        final File filename = new File(name);
+        final DocumentProxy doc = docManager.load(filename);
+        ProductDESProxy des = null;
+        if (doc instanceof ProductDESProxy) {
+          des = (ProductDESProxy) doc;
+        } else {
+          final ModuleProxy module = (ModuleProxy) doc;
+          final ModuleCompiler compiler =
+            new ModuleCompiler(docManager, desFactory, module);
+          des = compiler.compile();
+        }
+        final ControllabilityChecker checker =
+          new ControllabilityChecker(des);
+        System.out.print(des.getName() + " ... ");
+        System.out.flush();
+        final boolean result = checker.run();
+        if (result) {
+          System.out.println("controllable");
+        } else {
+          System.out.println("NOT controllable");
+          System.out.println("Counterexample:");
+          final List counterex = checker.getCounterExample();
+          final Iterator iter = counterex.iterator();
+          while (iter.hasNext()) {
+            final EventProxy event = (EventProxy) iter.next();
+            System.out.println("  " + event.getName());
+          }
+        }
       }
 
     } catch (final Throwable exception) {
       System.err.println("FATAL ERROR !!!");
       System.err.println(exception.getClass().getName() +
-			 " caught in main()!");
+                         " caught in main()!");
       exception.printStackTrace(System.err);
     }
   }

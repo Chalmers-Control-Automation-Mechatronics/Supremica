@@ -1,41 +1,42 @@
 //# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: waters.gui
+//# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorWindow
 //###########################################################################
-//# $Id: EditorWindow.java,v 1.20 2005-09-23 14:33:18 flordal Exp $
+//# $Id: EditorWindow.java,v 1.21 2005-11-03 01:24:15 robi Exp $
 //###########################################################################
+
+
 package net.sourceforge.waters.gui;
 
+import com.lowagie.text.*;
+import com.lowagie.text.pdf.*;
+
+import java.awt.*;
+import java.awt.dnd.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.geom.Rectangle2D;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
 import javax.swing.*;
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
-import java.awt.*;
-import java.awt.dnd.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
-import java.awt.event.MouseListener;
-import java.io.File;
-import java.io.IOException;
-import javax.xml.bind.JAXBException;
+
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.UndoInterface;
-import net.sourceforge.waters.model.module.IdentifiedElementProxy;
-import net.sourceforge.waters.model.base.ProxyMarshaller;
-import net.sourceforge.waters.model.module.ModuleMarshaller;
-import net.sourceforge.waters.model.module.*;
-import java.util.ArrayList;
-import net.sourceforge.waters.model.expr.IdentifierProxy;
-import org.supremica.gui.GraphicsToClipboard;
-import java.awt.geom.Rectangle2D;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import net.sourceforge.waters.model.expr.ExpressionParser;
+import net.sourceforge.waters.subject.module.IdentifierSubject;
+import net.sourceforge.waters.subject.module.ModuleSubject;
+import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 
-import com.lowagie.text.*;
-import com.lowagie.text.pdf.*;
+import org.supremica.gui.GraphicsToClipboard;
 
 
 
@@ -43,20 +44,16 @@ public class EditorWindow
 	extends JFrame
 	implements EditorWindowInterface
 {
-	private EditorToolbar toolbar;
-	private ControlledSurface surface;
-	private EditorEvents events;
-	private EditorMenu menu;
-	private SimpleComponentProxy element = null;
-	private ModuleProxy module = null;
-	private boolean isSaved = false;
-	private GraphicsToClipboard toClipboard = null;
-	private final UndoInterface mUndoInterface;
 
-	public EditorWindow(String title, ModuleProxy module, SimpleComponentProxy element, UndoInterface undoInterface)
+	//#######################################################################
+	//# Constructor
+	public EditorWindow(final String title,
+						final ModuleSubject module,
+						final SimpleComponentSubject subject,
+						final ModuleWindow root,
+						final UndoInterface undoInterface)
 	{
 		mUndoInterface = undoInterface;
-	    System.out.println("ahgha");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setTitle(title);
 
@@ -66,7 +63,8 @@ public class EditorWindow
 		surface.setPreferredSize(new Dimension(500, 500));
 		surface.setMinimumSize(new Dimension(0, 0));
 
-		events = new EditorEvents(module, element);
+		final ExpressionParser parser = root.getExpressionParser();
+		mEventPane = new EditorEvents(module, subject, parser);
 		menu = new EditorMenu(surface, this);
 
 		final Container panel = getContentPane();
@@ -82,7 +80,7 @@ public class EditorWindow
 		panel.add(toolbar);
 
 		final JScrollPane scrollsurface = new JScrollPane(surface);
-		final JScrollPane scrollevents = new JScrollPane(events);
+		final JScrollPane scrollevents = new JScrollPane(mEventPane);
 		final JViewport viewevents = scrollevents.getViewport();
 		final JSplitPane split = new JSplitPane
 			(JSplitPane.HORIZONTAL_SPLIT, scrollsurface, scrollevents);
@@ -101,38 +99,34 @@ public class EditorWindow
 		// at its preferred size.
 		final int splitwidth = split.getSize().width;
 		final int surfacewidth = surface.getSize().width;
-		final int eventswidth = events.getSize().width;
+		final int eventswidth = mEventPane.getSize().width;
 		final int separatorwidth = splitwidth - surfacewidth - eventswidth;
 		final int halfwidth = (splitwidth - separatorwidth) >> 1;
-		if (halfwidth > 0) 
-		{
-			final int prefeventswidth = events.getPreferredSize().width;
+		if (halfwidth > 0) {
+			final int prefeventswidth = mEventPane.getPreferredSize().width;
 			final int setwidth = Math.min(prefeventswidth, halfwidth);
 			final int divider = splitwidth - setwidth - separatorwidth;
 			split.setDividerLocation(divider);
 		}
 
-		setVisible(true);
-
-		this.module = module;
-		this.element = element;
-
-		if ((element != null) && (module != null))
-		{
-			surface.loadElement(module, element);
+		mModule = module;
+		mSubject = subject;
+		if (mSubject != null && mModule != null) {
+			surface.loadElement(mModule, mSubject);
 		}
-
 		surface.createOptions(this);
+
+		setVisible(true);
 	}
 
-	public IdentifierProxy getBuffer()
+	public IdentifierSubject getBuffer()
 	{
-		return events.getBuffer();
+		return mEventPane.getBuffer();
 	}
 
-	public void setBuffer(IdentifierProxy i)
+	public void setBuffer(final IdentifierSubject ident)
 	{
-		events.setBuffer(i);
+		mEventPane.setBuffer(ident);
 	}
 
 	public boolean isSaved()
@@ -147,7 +141,7 @@ public class EditorWindow
 
 	public java.util.List getEventDeclList()
 	{
-		return module.getEventDeclList();
+		return mModule.getEventDeclList();
 	}
 
 	public JFrame getFrame()
@@ -162,7 +156,7 @@ public class EditorWindow
 
 	public EditorEvents getEventPane()
 	{
-		return events;
+		return mEventPane;
 	}
 
 	public void copyAsWMFToClipboard()
@@ -234,4 +228,18 @@ public class EditorWindow
 
 		document.close();
 	}
+
+
+	//#######################################################################
+	//# Data Members
+	private EditorToolbar toolbar;
+	private ControlledSurface surface;
+	private EditorMenu menu;
+	private final EditorEvents mEventPane;
+	private final SimpleComponentSubject mSubject;
+	private final ModuleSubject mModule;
+	private boolean isSaved = false;
+	private GraphicsToClipboard toClipboard = null;
+	private final UndoInterface mUndoInterface;
+
 }

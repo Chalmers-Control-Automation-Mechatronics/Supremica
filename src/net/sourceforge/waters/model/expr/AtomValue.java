@@ -1,58 +1,18 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: waters.model.expr
+//# PACKAGE: net.sourceforge.waters.model.expr
 //# CLASS:   AtomValue
 //###########################################################################
-//# $Id: AtomValue.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: AtomValue.java,v 1.2 2005-11-03 01:24:16 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.expr;
 
 
-public class AtomValue implements Value
+public interface AtomValue extends IndexValue
 {
 
-  //#########################################################################
-  //# Constructors
-  public AtomValue(final String name)
-  {
-    mName = name;
-  }
-
-
-  //#########################################################################
-  //# Getters
-  String getName()
-  {
-    return mName;
-  }
-
-
-  //#########################################################################
-  //# Equals and Hashcode
-  public String toString()
-  {
-    return mName;
-  }
-
-  public int hashCode()
-  {
-    return mName.hashCode();
-  }
-
-  public boolean equals(final Object partner)
-  {
-    if (partner != null && getClass() == partner.getClass()) {
-      final AtomValue value = (AtomValue) partner;
-      return mName.equals(value.mName);
-    } else {
-      return false;
-    }    
-  }
-
-
-  //#########################################################################
-  //# Data Members
-  private final String mName;
+  public String getName();
 
 }

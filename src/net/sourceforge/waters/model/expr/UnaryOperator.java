@@ -1,16 +1,13 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.model.expr
 //# CLASS:   UnaryOperator
 //###########################################################################
-//# $Id: UnaryOperator.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: UnaryOperator.java,v 1.2 2005-11-03 01:24:16 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.expr;
-
-import net.sourceforge.waters.model.base.ModelException;
-import net.sourceforge.waters.model.base.ProxyFactory;
-import net.sourceforge.waters.xsd.module.ExpressionType;
 
 
 /**
@@ -21,14 +18,17 @@ import net.sourceforge.waters.xsd.module.ExpressionType;
  * @author Robi Malik
  */
 
-interface UnaryOperator extends Operator {
+public interface UnaryOperator extends Operator {
 
-  public UnaryExpressionProxy createProxy(ExpressionType expr,
-					  ProxyFactory factory)
-    throws ModelException;
-
-  public UnaryExpressionProxy createExpression(SimpleExpressionProxy subterm);
-
+  //#########################################################################
+  //# Simple Access Methods
   public int getArgTypes();
+
+
+  //#########################################################################
+  //# Evaluation
+  public int getReturnTypes(int argType);
+
+  public Value eval(Value arg) throws EvalException;
 
 }

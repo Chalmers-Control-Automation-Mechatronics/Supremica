@@ -1,19 +1,32 @@
+//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
+//###########################################################################
+//# PROJECT: Waters/Supremica IDE
+//# PACKAGE: org.supremica.gui.ide
+//# CLASS:   ComponentEditorPanel
+//###########################################################################
+//# $Id: ComponentEditorPanel.java,v 1.18 2005-11-03 01:24:16 robi Exp $
+//###########################################################################
+
 package org.supremica.gui.ide;
 
 import javax.swing.*;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 import java.awt.*;
 import java.io.File;
-import net.sourceforge.waters.model.module.*;
-import net.sourceforge.waters.model.expr.IdentifierProxy;
-import org.supremica.gui.GraphicsToClipboard;
-import net.sourceforge.waters.gui.EditorToolbar;
+
 import net.sourceforge.waters.gui.ControlledSurface;
 import net.sourceforge.waters.gui.ControlledToolbar;
-import net.sourceforge.waters.gui.EditorMenu;
 import net.sourceforge.waters.gui.EditorEvents;
+import net.sourceforge.waters.gui.EditorMenu;
+import net.sourceforge.waters.gui.EditorToolbar;
 import net.sourceforge.waters.gui.EditorWindowInterface;
 import net.sourceforge.waters.gui.command.UndoInterface;
+import net.sourceforge.waters.model.expr.ExpressionParser;
+import net.sourceforge.waters.subject.module.IdentifierSubject;
+import net.sourceforge.waters.subject.module.ModuleSubject;
+import net.sourceforge.waters.subject.module.SimpleComponentSubject;
+
+import org.supremica.gui.GraphicsToClipboard;
 
 
 
@@ -28,17 +41,18 @@ public class ComponentEditorPanel
 	private ControlledSurface surface;
 	private EditorEvents events;
 	private EditorMenu menu;
-	private SimpleComponentProxy element = null;
-	private ModuleProxy module = null;
+	private SimpleComponentSubject element = null;
+	private ModuleSubject module = null;
 	private boolean isSaved = false;
 	private GraphicsToClipboard toClipboard = null;
 
-	public ComponentEditorPanel(ModuleContainer moduleContainer, SimpleComponentProxy element)
+	public ComponentEditorPanel(final ModuleContainer moduleContainer,
+								final SimpleComponentSubject element)
 	{
 		//setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		//setTitle(title);
 		this.moduleContainer = moduleContainer;
-		this.module = moduleContainer.getModuleProxy();
+		this.module = moduleContainer.getModule();
 		toolbar = new EditorToolbar();
 		if (moduleContainer.getIDE().getToolBar() instanceof ControlledToolbar) {
 		    surface = new ControlledSurface(this, (ControlledToolbar)moduleContainer.getIDE().getToolBar());
@@ -49,7 +63,8 @@ public class ComponentEditorPanel
 		surface.setPreferredSize(IDEDimensions.rightEditorPreferredSize);
 		surface.setMinimumSize(IDEDimensions.rightEditorMinimumSize);
 
-		events = new EditorEvents(module, element);
+		final ExpressionParser parser = moduleContainer.getExpressionParser();
+		events = new EditorEvents(module, element, parser);
 		menu = new EditorMenu(surface, this);
 
 		// final Container panel = getContentPane();
@@ -99,14 +114,14 @@ public class ComponentEditorPanel
 		surface.createOptions(this);
 	}
 
-	public IdentifierProxy getBuffer()
+	public IdentifierSubject getBuffer()
 	{
 		return events.getBuffer();
 	}
 
-	public void setBuffer(IdentifierProxy i)
+	public void setBuffer(final IdentifierSubject ident)
 	{
-		events.setBuffer(i);
+		events.setBuffer(ident);
 	}
 
 	public boolean isSaved()

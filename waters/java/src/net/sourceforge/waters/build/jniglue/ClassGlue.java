@@ -1,9 +1,10 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.build.jniglue
 //# CLASS:   ClassGlue
 //###########################################################################
-//# $Id: ClassGlue.java,v 1.1 2005-02-18 01:30:10 robi Exp $
+//# $Id: ClassGlue.java,v 1.2 2005-11-03 01:24:16 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.build.jniglue;
@@ -22,18 +23,18 @@ abstract class ClassGlue implements Comparable, FileWritableGlue {
   //#########################################################################
   //# Constructors
   ClassGlue(final String packname,
-	    final String classname,
-	    final ClassGlue baseclass,
-	    final ErrorReporter reporter)
+            final String classname,
+            final ClassGlue baseclass,
+            final ErrorReporter reporter)
   {
     this(packname, classname, baseclass, null, reporter);
   }
 
   ClassGlue(final String packname,
-	    final String classname,
-	    final ClassGlue baseclass,
-	    final ClassModifier mod,
-	    final ErrorReporter reporter)
+            final String classname,
+            final ClassGlue baseclass,
+            final ClassModifier mod,
+            final ErrorReporter reporter)
   {
     mPackName = packname;
     mClassName = classname;
@@ -41,8 +42,8 @@ abstract class ClassGlue implements Comparable, FileWritableGlue {
     if (mBaseClass != null) {
       mBaseClass.mNumSubclasses++;
     }
-    mMethods = new TreeSet();
-    mFields = new TreeSet();
+    mMethods = new TreeSet<MethodGlue>();
+    mFields = new TreeSet<FieldGlue>();
     mModifier = mod;
     mNeedsGlue = false;
     mCppClassName = null;
@@ -92,10 +93,10 @@ abstract class ClassGlue implements Comparable, FileWritableGlue {
   {
     if (mCppClassName == null) {
       if (mClassName.endsWith("Proxy")) {
-	final int len = mClassName.length();
-	mCppClassName = mClassName.substring(0, len - 5) + "Glue";
+        final int len = mClassName.length();
+        mCppClassName = mClassName.substring(0, len - 5) + "Glue";
       } else {
-	mCppClassName = mClassName + "Glue";
+        mCppClassName = mClassName + "Glue";
       }
     }
     return mCppClassName;
@@ -180,16 +181,13 @@ abstract class ClassGlue implements Comparable, FileWritableGlue {
 
   //#########################################################################
   //# Calculating Type Signatures
-  void collectSignatures(final Set names, final Map signatures)
+  void collectSignatures(final Set<String> names,
+			 final Map<String,TypeSignature> signatures)
   {
-    final Iterator methoditer = mMethods.iterator();
-    while (methoditer.hasNext()) {
-      final MethodGlue method = (MethodGlue) methoditer.next();
+    for (final MethodGlue method : mMethods) {
       method.collectSignatures(names, signatures);
     }
-    final Iterator fielditer = mFields.iterator();
-    while (fielditer.hasNext()) {
-      final FieldGlue field = (FieldGlue) fielditer.next();
+    for (final FieldGlue field : mFields) {
       field.collectSignatures(names, signatures);
     }
   }
@@ -209,10 +207,10 @@ abstract class ClassGlue implements Comparable, FileWritableGlue {
     context.registerProcessorVariable("CPPCLASSNAME", cppnameproc);
     if (mBaseClass != null) {
       final ProcessorVariable basenameproc =
-	new DefaultProcessorVariable(mBaseClass.getClassName());
+        new DefaultProcessorVariable(mBaseClass.getClassName());
       context.registerProcessorVariable("BASECLASSNAME", basenameproc);
       final ProcessorVariable cppbasenameproc =
-	new DefaultProcessorVariable(mBaseClass.getCppClassName());
+        new DefaultProcessorVariable(mBaseClass.getCppClassName());
       context.registerProcessorVariable("CPPBASECLASSNAME", cppbasenameproc);
     }
     final ProcessorVariable spcproc =
@@ -318,35 +316,35 @@ abstract class ClassGlue implements Comparable, FileWritableGlue {
   private void computeMethodIndexes()
   {
     if (mMethodList == null) {
-      mMethodList = new ArrayList(mMethods);
-      mFieldList = new ArrayList(mFields);
+      mMethodList = new ArrayList<MethodGlue>(mMethods);
+      mFieldList = new ArrayList<FieldGlue>(mFields);
       mNumConstructors = 0;
-      mResultingGlue = new TreeSet();
-      mUsedGlue = new TreeSet();
+      mResultingGlue = new TreeSet<ClassGlue>();
+      mUsedGlue = new TreeSet<ClassGlue>();
       final int nummethods = mMethodList.size();
       int nextcode = 0;
       if (mBaseClass != null) {
-	nextcode += mBaseClass.getNumberOfMethods();
+        nextcode += mBaseClass.getNumberOfMethods();
       }
       MethodGlue prev = null;
       for (int i = 0; i < nummethods; i++) {
-	final MethodGlue method = (MethodGlue) mMethodList.get(i);
-	method.setMethodNumber(nextcode++);
-	if (i > 0 &&
-	    prev.getCppMethodName().equals(method.getCppMethodName())) {
-	  final int prevcode = prev.getMethodCodeSuffix();
-	  if (prev.getMethodCodeSuffix() < 0) {
-	    prev.setMethodCodeSuffix(0);
-	    method.setMethodCodeSuffix(1);
-	  } else {
-	    method.setMethodCodeSuffix(prevcode + 1);
-	  }
-	}
-	prev = method;
-	if (method instanceof ConstructorGlue) {
-	  mNumConstructors++;
-	}
-	method.collectUsedGlue(mResultingGlue, mUsedGlue);
+        final MethodGlue method = mMethodList.get(i);
+        method.setMethodNumber(nextcode++);
+        if (i > 0 &&
+            prev.getCppMethodName().equals(method.getCppMethodName())) {
+          final int prevcode = prev.getMethodCodeSuffix();
+          if (prev.getMethodCodeSuffix() < 0) {
+            prev.setMethodCodeSuffix(0);
+            method.setMethodCodeSuffix(1);
+          } else {
+            method.setMethodCodeSuffix(prevcode + 1);
+          }
+        }
+        prev = method;
+        if (method instanceof ConstructorGlue) {
+          mNumConstructors++;
+        }
+        method.collectUsedGlue(mResultingGlue, mUsedGlue);
       }
     }
   }
@@ -360,9 +358,9 @@ abstract class ClassGlue implements Comparable, FileWritableGlue {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.build.jniglue.ProcessorForeach
-    public Iterator getIterator()
+    public Iterator<MethodGlue> getIterator()
     {
-      final List list = mMethodList.subList(0, mNumConstructors);
+      final List<MethodGlue> list = mMethodList.subList(0, mNumConstructors);
       return list.iterator();
     }
 
@@ -377,10 +375,10 @@ abstract class ClassGlue implements Comparable, FileWritableGlue {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.build.jniglue.ProcessorForeach
-    public Iterator getIterator()
+    public Iterator<MethodGlue> getIterator()
     {
-      final List list =
-	mMethodList.subList(mNumConstructors, mMethodList.size());
+      final List<MethodGlue> list =
+        mMethodList.subList(mNumConstructors, mMethodList.size());
       return list.iterator();
     }
 
@@ -392,17 +390,17 @@ abstract class ClassGlue implements Comparable, FileWritableGlue {
   private final String mPackName;
   private final String mClassName;
   private final ClassGlue mBaseClass;
-  private final Set mMethods;
-  private final Set mFields;
+  private final Set<MethodGlue> mMethods;
+  private final Set<FieldGlue> mFields;
   private final Class mJavaClass;
   private ClassModifier mModifier;
   private boolean mNeedsGlue;
   private String mCppClassName;
-  private List mMethodList;
-  private List mFieldList;
+  private List<MethodGlue> mMethodList;
+  private List<FieldGlue> mFieldList;
   private int mNumSubclasses;
   private int mNumConstructors;
-  private Set mResultingGlue;
-  private Set mUsedGlue;
+  private Set<ClassGlue> mResultingGlue;
+  private Set<ClassGlue> mUsedGlue;
    
 }

@@ -1,9 +1,10 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.build.jniglue
 //# CLASS:   TemplateContext
 //###########################################################################
-//# $Id: TemplateContext.java,v 1.1 2005-02-18 01:30:10 robi Exp $
+//# $Id: TemplateContext.java,v 1.2 2005-11-03 01:24:16 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.build.jniglue;
@@ -24,7 +25,7 @@ class TemplateContext {
   TemplateContext(final TemplateContext parent)
   {
     mParent = parent;
-    mProcessors = new HashMap();
+    mProcessors = new HashMap<TemplateProcessorKey,Object>();
   }
 
 
@@ -67,7 +68,7 @@ class TemplateContext {
   //#########################################################################
   //# Registering Processors
   void registerProcessorVariable(final String name,
-				 final ProcessorVariable processor)
+                                 final ProcessorVariable processor)
   {
     final TemplateProcessorKey key =
       new TemplateProcessorKey(TemplateProcessorKey.K_VARIABLE, name);
@@ -75,7 +76,7 @@ class TemplateContext {
   }
 
   void registerProcessorForeach(final String name,
-				final ProcessorForeach processor)
+                                final ProcessorForeach processor)
   {
     final TemplateProcessorKey key =
       new TemplateProcessorKey(TemplateProcessorKey.K_FOREACH, name);
@@ -83,7 +84,7 @@ class TemplateContext {
   }
 
   void registerProcessorConditional(final String name,
-				    final ProcessorConditional processor)
+                                    final ProcessorConditional processor)
   {
     final TemplateProcessorKey key =
       new TemplateProcessorKey(TemplateProcessorKey.K_CONDITIONAL, name);
@@ -94,6 +95,6 @@ class TemplateContext {
   //#########################################################################
   //# Data Members
   private final TemplateContext mParent;
-  private final Map mProcessors;
+  private final Map<TemplateProcessorKey,Object> mProcessors;
 
 }

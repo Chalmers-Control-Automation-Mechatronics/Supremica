@@ -1,10 +1,10 @@
-
+//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: waters.gui
 //# CLASS:   EditorToolbar
 //###########################################################################
-//# $Id: EditorToolbar.java,v 1.7 2005-07-06 01:00:13 siw4 Exp $
+//# $Id: EditorToolbar.java,v 1.8 2005-11-03 01:24:15 robi Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -40,7 +40,6 @@ public class EditorToolbar
 		createButton(ControlledSurface.NODEGROUP, "Create Group Nodes", false);
 		createButton(ControlledSurface.INITIAL, "Set Initial Nodes", false);
 		createButton(ControlledSurface.EDGE, "Create Edges", false);
-		createButton(ControlledSurface.EVENT, "Drag Events", false);
 	}
 
 	//#########################################################################

@@ -1,52 +1,53 @@
 //# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: waters.gui
+//# PACKAGE: net.sourceforge.waters.waters.gui
 //# CLASS:   EventParameterEditorDialog
 //###########################################################################
-//# $Id: EventParameterEditorDialog.java,v 1.3 2005-02-20 23:32:54 robi Exp $
+//# $Id: EventParameterEditorDialog.java,v 1.4 2005-11-03 01:24:15 robi Exp $
 //###########################################################################
+
+
 package net.sourceforge.waters.gui;
 
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.*;
 import javax.swing.event.*;
-import java.awt.*;
-import java.awt.event.*;
-import javax.xml.bind.JAXBException;
-import net.sourceforge.waters.model.base.*;
-import net.sourceforge.waters.model.module.*;
-import net.sourceforge.waters.model.expr.IdentifierProxy;
-import net.sourceforge.waters.model.expr.SimpleIdentifierProxy;
-import net.sourceforge.waters.xsd.base.ComponentKind;
-import net.sourceforge.waters.xsd.module.SimpleComponentType;
+
+import net.sourceforge.waters.model.base.DuplicateNameException;
+import net.sourceforge.waters.model.base.IndexedList;
 import net.sourceforge.waters.model.expr.ExpressionParser;
+import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.ParseException;
-import net.sourceforge.waters.model.expr.SimpleExpressionProxy;
-import net.sourceforge.waters.model.module.ForeachComponentProxy;
-import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.subject.module.EventDeclSubject;
+import net.sourceforge.waters.subject.module.EventParameterSubject;
+import net.sourceforge.waters.subject.module.ModuleSubject;
+import net.sourceforge.waters.subject.module.ParameterSubject;
+import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
-import java.util.Vector;
+
 
 public class EventParameterEditorDialog
 	extends JDialog
 	implements ActionListener, ItemListener
 {
-	private final JTextField name = new JTextField(16);
-	private final JButton okButton = new JButton("OK");
-	private ButtonGroup group = new ButtonGroup();
-	private ModuleWindow root = null;
-	private DefaultListModel data = null;
-	private JList dataList = null;
-	private JCheckBox requiredBox = null;
-	private boolean isRequired = false;
 
+	//#######################################################################
+	//# Constructor
 	public EventParameterEditorDialog(ModuleWindow root)
 	{
 		setTitle("Event Parameter Editor");
+		mRoot = root;
 
-		this.root = root;
+		// TODO: Change the selection mode for the JList component
+		// (Single selection)
 
-		// TODO: Change the selection mode for the JList component (Single selection)
 		// Center this element on the screen
 		setModal(true);
 		setLocationRelativeTo(null);
@@ -61,7 +62,7 @@ public class EventParameterEditorDialog
 
 		b.add(r1);
 		r1.add(new JLabel("Name: "));
-		r1.add(name);
+		r1.add(mNameInput);
 
 		JRadioButton controllable, uncontrollable, proposition;
 
@@ -87,10 +88,10 @@ public class EventParameterEditorDialog
 		r2.setLayout(new GridLayout(1, 2));
 		b.add(r2);
 
-		data = new DefaultListModel();
-		dataList = new JList(data);
+		mData = new DefaultListModel();
+		mDataList = new JList(mData);
 
-		r2.add(new JScrollPane(dataList));
+		r2.add(new JScrollPane(mDataList));
 
 		JPanel buttonBox = new JPanel();
 
@@ -133,94 +134,71 @@ public class EventParameterEditorDialog
 		show();
 	}
 
+
+	//#######################################################################
+	//# Interface java.awt.event.ActionListener
 	public void actionPerformed(ActionEvent e)
 	{
-		EventDeclProxy event = null;
-		EventParameterProxy eventParam = null;
-
-		if ("okbutton".equals(e.getActionCommand()))
-		{
-
-			// addEvent(...);
+		if ("okbutton".equals(e.getActionCommand())) {
+			final String key = group.getSelection().getActionCommand();
 			EventKind eventkind = null;
-
-			if (group.getSelection().getActionCommand().equals("controllable"))
-			{
+			if (key.equals("controllable"))	{
 				eventkind = EventKind.CONTROLLABLE;
-			}
-
-			if (group.getSelection().getActionCommand().equals("uncontrollable"))
-			{
+			} else if (key.equals("uncontrollable")) {
 				eventkind = EventKind.UNCONTROLLABLE;
-			}
-
-			if (group.getSelection().getActionCommand().equals("proposition"))
-			{
+			} else if (key.equals("proposition")) {
 				eventkind = EventKind.PROPOSITION;
+			} else {
+				throw new IllegalStateException("Event kind not selected!");
 			}
 
-			ExpressionParser parser = null;
-
-			try
-			{
-				if (name.getText().length() != 0)
-				{
-					parser = new ExpressionParser();
-
-					SimpleExpressionProxy expr = parser.parse(name.getText(), SimpleExpressionProxy.TYPE_NAME);
-
-					root.logEntry("Event name passed validation: " + name.getText());
-				}
-				else
-				{
-					JOptionPane.showMessageDialog(this, "Invalid identifier");
-					root.logEntry("Event name was found to be invalid: " + name.getText());
-				}
-			}
-			catch (final ParseException exception)
-			{
-				ErrorWindow.askRevert(exception, name.getText());
-				root.logEntry("ParseException in event name: " + exception.getMessage());
-
+			final ExpressionParser parser = mRoot.getExpressionParser();
+			final String nameText = mNameInput.getText();
+			try {
+				parser.parseSimpleIdentifier(nameText);
+			} catch (final ParseException exception) {
+				ErrorWindow.askRevert(exception, nameText);
+				mRoot.logEntry("ParseException in event name: " +
+							   exception.getMessage());
 				return;
 			}
 
-			event = new EventDeclProxy(name.getText(), eventkind);
-
-			for (int i = 0; i < data.getSize(); i++)
-			{
-				try
-				{
-					parser = new ExpressionParser();
-
-					SimpleExpressionProxy expr = parser.parse((String) data.get(i), SimpleExpressionProxy.TYPE_RANGE);
-
-					event.getRanges().add(expr);
-				}
-				catch (final ParseException exception)
-				{
-					ErrorWindow.askRevert(exception, (String) data.get(i));
-					root.logEntry("ParseException in event range: " + exception.getMessage());
-
+			final int numranges = mData.getSize();
+			final List<SimpleExpressionSubject> ranges =
+				new ArrayList<SimpleExpressionSubject>(numranges);
+			for (int i = 0; i < numranges; i++)	{
+				final String text = (String) mData.get(i);
+				try	{
+					final SimpleExpressionSubject range =
+						(SimpleExpressionSubject)
+						parser.parse(text, Operator.TYPE_RANGE);
+					ranges.add(range);
+				} catch (final ParseException exception) {
+					ErrorWindow.askRevert(exception, text);
+					mRoot.logEntry("ParseException in event range: " +
+								   exception.getMessage());
 					return;
 				}
 			}
 
-			eventParam = new EventParameterProxy(event, isRequired);
-
-			try
-			{
-				root.getModuleProxy().getParameterList().add(eventParam);
-			}
-			catch (final Exception exn)
-			{
-				root.logEntry("Exception: " + exn.getMessage());
-				JOptionPane.showMessageDialog(this, "Error with parameter event");
-
+			final EventDeclSubject decl =
+				new EventDeclSubject(nameText, eventkind, false, ranges, null);
+			final EventParameterSubject param =
+				new EventParameterSubject(nameText, mIsRequired, decl);
+			try	{
+				final ModuleSubject module = mRoot.getModuleSubject();
+				final IndexedList<ParameterSubject> params =
+					module.getParameterListModifiable();
+				params.insert(param);
+			} catch (final DuplicateNameException exception) {
+				JOptionPane.showMessageDialog(this, "Duplicate parameter");
+				mRoot.logEntry("DuplicateNameException: " +
+							   exception.getMessage());
 				return;
 			}
 
-			root.getParameterDataList().add(root.getParameterDataList().getSize(), eventParam);
+			final DefaultListModel paramData = mRoot.getParameterDataList();
+			paramData.addElement(param);
 			dispose();
 		}
 
@@ -231,84 +209,74 @@ public class EventParameterEditorDialog
 
 		if ("add".equals(e.getActionCommand()))
 		{
-			String range = JOptionPane.showInputDialog("Please enter a range:");
-			int index = dataList.getSelectedIndex();
-
-			if ((index == -1) && (data.getSize() != 0))
-			{
-				index = data.getSize() - 1;
+			final String text =
+				JOptionPane.showInputDialog("Please enter a range:");
+			final int numranges = mData.getSize();
+			int index = mDataList.getSelectedIndex();
+			if (index == -1 && numranges != 0) {
+				index = numranges - 1;
 			}
-
-			ExpressionParser parser = null;
-
-			try
-			{
-				if (range.length() != 0)
-				{
-					parser = new ExpressionParser();
-
-					SimpleExpressionProxy expr = parser.parse(range, SimpleExpressionProxy.TYPE_RANGE);
-
-					root.logEntry("Event range passed validation: " + range);
-				}
-				else
-				{
-					JOptionPane.showMessageDialog(this, "Invalid range");
-					root.logEntry("Event range was found to be invalid: " + range);
-				}
-			}
-			catch (final ParseException exception)
-			{
-				ErrorWindow.askRevert(exception,  range);
-				root.logEntry("ParseException in event range: " + exception.getMessage());
-
+			final ExpressionParser parser = mRoot.getExpressionParser();
+			try {
+				parser.parse(text, Operator.TYPE_RANGE);
+			} catch (final ParseException exception) {
+				ErrorWindow.askRevert(exception, text);
+				mRoot.logEntry("ParseException in event range: " +
+							   exception.getMessage());
 				return;
 			}
-
-			data.add(index + 1, range);
-
+			mData.add(index + 1, text);
 			//TODO: Finish prompting for input etc.
 		}
 
 		if ("remove".equals(e.getActionCommand()))
 		{
-			int index = dataList.getSelectedIndex();
-
-			data.remove(index);
+			int index = mDataList.getSelectedIndex();
+			mData.remove(index);
 		}
 
 		if ("up".equals(e.getActionCommand()))
 		{
-			int index = dataList.getSelectedIndex();
-			Object o = data.get(index);
-
-			if (index != 0)
-			{
-				data.remove(index);
-				data.add(index - 1, o);
+			final int index = mDataList.getSelectedIndex();
+			if (index != 0) {
+				final Object o = mData.get(index);
+				mData.remove(index);
+				mData.add(index - 1, o);
 			}
 		}
 
 		if ("down".equals(e.getActionCommand()))
 		{
-			int index = dataList.getSelectedIndex();
-			Object o = data.get(index);
-
-			if (index < data.size() - 1)
-			{
-				data.remove(index);
-				data.add(index + 1, o);
+			final int index = mDataList.getSelectedIndex();
+			if (index < mData.size() - 1) {
+				final Object o = mData.get(index);
+				mData.remove(index);
+				mData.add(index + 1, o);
 			}
 		}
 	}
 
-	public void itemStateChanged(ItemEvent e)
-	{
-		Object source = e.getItemSelectable();
 
-		if (source == requiredBox)
-		{
-			isRequired = !isRequired;
+	//#######################################################################
+	//# Interface java.awt.event.ItemListener
+	public void itemStateChanged(final ItemEvent event)
+	{
+		final Object source = event.getItemSelectable();
+		if (source == requiredBox) {
+			mIsRequired = !mIsRequired;
 		}
 	}
+
+
+	//#######################################################################
+	//# Data Members
+	private final JTextField mNameInput = new JTextField(16);
+	private final JButton okButton = new JButton("OK");
+	private final ButtonGroup group = new ButtonGroup();
+	private final ModuleWindow mRoot;
+	private final DefaultListModel mData;
+	private JList mDataList = null;
+	private JCheckBox requiredBox = null;
+	private boolean mIsRequired = false;
+
 }

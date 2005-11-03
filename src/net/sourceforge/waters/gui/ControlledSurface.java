@@ -1,63 +1,43 @@
+//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
+//###########################################################################
+//# PROJECT: Waters
+//# PACKAGE: net.sourceforge.waters.gui
+//# CLASS:   ControlledSurface
+//###########################################################################
+//# $Id: ControlledSurface.java,v 1.40 2005-11-03 01:24:15 robi Exp $
+//###########################################################################
  
 package net.sourceforge.waters.gui;
 
-import java.lang.*;
-import javax.swing.*;
 import java.awt.*;
-import java.awt.geom.*;
-import java.awt.event.*;
 import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.*;
+import java.awt.event.*;
+import java.awt.geom.*;
 import java.io.File;
 import java.io.IOException;
-import javax.xml.bind.JAXBException;
-import net.sourceforge.waters.gui.command.*;
-import net.sourceforge.waters.model.base.*;
-import net.sourceforge.waters.model.module.*;
-import net.sourceforge.waters.model.expr.*;
-import net.sourceforge.waters.xsd.base.EventKind;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
+import javax.swing.*;
+
+import net.sourceforge.waters.gui.command.*;
+import net.sourceforge.waters.model.expr.*;
+import net.sourceforge.waters.model.module.*;
+import net.sourceforge.waters.subject.module.BoxGeometrySubject;
+import net.sourceforge.waters.subject.module.GroupNodeSubject;
+import net.sourceforge.waters.subject.module.IdentifierSubject;
+import net.sourceforge.waters.subject.module.PlainEventListSubject;
+import net.sourceforge.waters.xsd.base.EventKind;
+
 
 public class ControlledSurface
 	extends EditorSurface
 	implements MouseMotionListener, MouseListener, KeyListener
 {
-	public static final String SELECT = "select";
-	public static final String NODE = "node";
-	public static final String NODEGROUP = "nodegroup";
-	public static final String INITIAL = "initial";
-	public static final String EDGE = "edge";
-	public static final String EVENT = "event";
 
-        private ControlledSurface S;
-	private ControlledToolbar mToolbar;
-	private EditorOptions options;
-	private EditorNode sNode = null;
-	private int lastX = 0;
-	private int lastY = 0;
-	private int xoff = 0;
-	private int yoff = 0;
-	private boolean controlPointsMove = true;
-	private boolean nodesSnap = true;
-
-	private boolean hasDragged = false;
-
-	/** List of currently selected EditorObject:s. */
-	private LinkedList<EditorObject> selectedObjects = new LinkedList<EditorObject>();
-	/** List of EditorObject:s that are to become selected. */
-	private LinkedList<EditorObject> toBeSelected = new LinkedList<EditorObject>();
-	/** List of EditorObject:s that are to become unselected. */
-	private LinkedList<EditorObject> toBeDeselected = new LinkedList<EditorObject>();
-
-	/** The currently highlighted EditorObject (under the mouse pointer). */
-	private EditorObject highlightedObject = null;
-
-    private Move move;
-
-    private DropTarget dropTarget;
-    private DropTargetListener dtListener;
-    
     public String getCommand()
     {
 		return mToolbar.getCommand();
@@ -282,20 +262,24 @@ public class ControlledSurface
 				// If NODEGROUP is active, we're adding a new group!
 				if (getCommand() == NODEGROUP)
 				{
+				    Collection<NodeProxy> ic = Collections.emptyList();       
 				    // EditorNodeGroup nodeGroup;
 					if (nodesSnap)
 					{
+					    BoxGeometrySubject g = new BoxGeometrySubject(new Rectangle2D.Double(findGrid(e.getX()),
+													       findGrid(e.getY()), 0, 0));
 					    // nodeGroup = addNodeGroup(findGrid(e.getX()), findGrid(e.getY()), 0, 0);
-					    GroupNodeProxy n = new GroupNodeProxy("NodeGroup" + nodeGroups.size());
-					    n.setGeometry(new BoxGeometryProxy(findGrid(e.getX()), findGrid(e.getY()), 0, 0));
+					    GroupNodeSubject n = new GroupNodeSubject("NodeGroup" + nodeGroups.size(),
+										      new PlainEventListSubject(), ic, g);	
 					    newGroup = new EditorNodeGroup(n);
-
 					}
 					else
 					{
+					    BoxGeometrySubject g = new BoxGeometrySubject(new Rectangle2D.Double(e.getX(),
+														 e.getY(), 0, 0));
 					    // nodeGroup = addNodeGroup(e.getX(), e.getY(), 0, 0);
-					    GroupNodeProxy n = new GroupNodeProxy("NodeGroup" + nodeGroups.size());
-					    n.setGeometry(new BoxGeometryProxy(e.getX(), e.getY(), 0, 0));
+					    GroupNodeSubject n = new GroupNodeSubject("NodeGroup" + nodeGroups.size(),
+										      new PlainEventListSubject(), ic, g);   	
 					    newGroup = new EditorNodeGroup(n);
 					}
 					select(newGroup);
@@ -475,22 +459,21 @@ public class ControlledSurface
 			int dx = 0;
 			int dy = 0;
 			// Are we using snap?
-			if ((nodeIsSelected() || nodeGroupIsSelected()) && nodesSnap)
-				//if (nodesSnap)
-			{
+			if (getCommand() != EDGE &&
+				(nodeIsSelected() || nodeGroupIsSelected()) &&
+				nodesSnap) {
 				lastX = findGrid(lastX);
 				lastY = findGrid(lastY);
 				
 				int currX = findGrid(e.getX());
 				int currY = findGrid(e.getY());
 				
-				// If the first selected node or nodegroup is not correctly aligned already, we need
-				// a modifyer to get it on the grid again...
+				// If the first selected node or nodegroup is not correctly
+				// aligned already, we need a modifier to get it on the
+				// grid again...
 				int modX = 0;
 				int modY = 0;
-				for (Iterator it = selectedObjects.iterator(); it.hasNext(); )
-				{
-					EditorObject o = (EditorObject) it.next();
+				for (final EditorObject o : selectedObjects) {
 					if ((o.getType() == EditorObject.NODE)
 						|| (o.getType() == EditorObject.NODEGROUP))
 					{
@@ -501,43 +484,48 @@ public class ControlledSurface
 
 				dx = currX - lastX + modX;
 				dy = currY - lastY + modY;
-
-				/*
-				while (dx + gridSize < e.getX())
-				{
-					dx += gridSize;
-				}
-				
-				// Which one is closer?
-				if (e.getX() - dx > (dx + gridSize) - e.getX())
-				{
-					dx += gridSize;
-				}
-				
-				while (dy + gridSize < e.getY())
-				{
-					dy += gridSize;
-				}
-				
-				// Which one is closer?
-				if (e.getY() - dy > (dy + gridSize) - e.getY())
-				{
-					dy += gridSize;
-				}
-
-				// So the actual delta values are...
-				dx -= lastX;
-				dy -= lastY;
-				*/
-			}
-			else
-			{
+			} else {
 				dx = e.getX() - lastX;
 				dy = e.getY() - lastY;
 			}
 			// Update position
 			lastX += dx;
 			lastY += dy;
+
+			// DragSelect!
+			if (dragSelect)
+			{
+				dragNowX = e.getX();
+				dragNowY = e.getY();
+
+				toBeSelected = getDragSelection();
+
+				// Select all that should be selected...
+				super.unselectAll();
+				// These have been selected previously and should still be
+				// selected
+				for (final EditorObject o : selectedObjects) {
+					o.setSelected(true);
+					LinkedList children = getChildren(o);
+					while (children.size() != 0)
+					{
+						((EditorObject) children.remove(0)).setSelected(true);
+					}
+				}
+				// These are in the current drag selection!
+				for (final EditorObject o : toBeSelected) {
+					o.setSelected(true);
+					LinkedList children = getChildren(o);
+					while (children.size() != 0)
+					{
+						((EditorObject) children.remove(0)).setSelected(true);
+					}
+				}
+
+				repaint(false);
+
+				return;
+			}
 
 			// Multiple selection?
 			if (getCommand() == SELECT)
@@ -697,14 +685,10 @@ public class ControlledSurface
 						return;
 				    }
 				    // is this the start of the move or a continuation of it
-				    if (!selectedObjects.isEmpty())
-					{
-						if (move == null) 
-						{
+				    if (!selectedObjects.isEmpty()) {
+						if (move == null) {
 							move = new MoveObjects(this, selectedObjects, new Point2D.Double(dx, dy));
-						} 
-						else 
-						{
+						} else {
 							Point2D p = move.getDisplacement();
 							p.setLocation(p.getX() + dx, p.getY() + dy);
 							move.setDisplacement(p);
@@ -713,47 +697,25 @@ public class ControlledSurface
 				    // There should only be one object here, or maybe two, 
 					// a node and it's label or an edge and it's labelgroup...
 					// Let's make it an iterator anyway!
-					for (Iterator it = selectedObjects.iterator(); it.hasNext(); )
-					{
-						// Which object is it?
-						EditorObject object = (EditorObject) it.next();
-
-						// If an edge is selected, you can drag!
-						if (object.getType() == EditorObject.EDGE)
-						{
+					for (final EditorObject object : selectedObjects) {
+						if (object.getType() == EditorObject.EDGE) {
+							// If an edge is selected, you can drag!
 							assert(selectedObjects.size() <= 2);
-
 							EditorEdge edge = (EditorEdge) object;
-							
-							if (edge.getDragS())
-							{
+							if (edge.getDragS()) {
 								edge.setSource(e.getX(), e.getY());
-							}
-							/*
-							else if (edge.getDragC())
-							{
-								edge.setTPoint(e.getX(), e.getY());
-							}
-							*/
-							else if (edge.getDragT())
-							{
+							} else if (edge.getDragT())	{
 								edge.setTarget(e.getX(), e.getY());
-							}
-							else // Just move it otherwise
-							{
+							} else {
 								edge.setPosition(edge.getTPointX() + dx, edge.getTPointY() + dy);
 							}
-						}
-						
-						// If clicking on a node or nodegroup, draw a new edge!
-						if (object.getType() == EditorObject.NODE)
-						{
+						} else if (object.getType() == EditorObject.NODE) {
+							// If clicking on a node or nodegroup, draw a
+							// new edge!
 							assert(selectedObjects.size() <= 2);
-
 							EditorNode node = (EditorNode) object;
-							
-							int[] dat = {node.getX(), node.getY(), e.getX(), e.getY()};
-							
+							int[] dat = {node.getX(), node.getY(),
+										 e.getX(), e.getY()};
 							// Draw line!
 							if ((lines != null) && (lines.size() > 0))
 							{
@@ -763,17 +725,12 @@ public class ControlledSurface
 							{
 								lines.add(dat);
 							}
-						}
-						else if (object.getType() == EditorObject.NODEGROUP)
-						{
+						} else if (object.getType() == EditorObject.NODEGROUP) {
 							assert(selectedObjects.size() == 1);
-
 							EditorNodeGroup nodeGroup = (EditorNodeGroup) object;
-							
 							// Find point on the border of the group from where the line is drawn...
 							Point2D.Double p = nodeGroup.setOnBounds(nodeGroup.getX() + xoff, nodeGroup.getY() + yoff);
 							int[] dat = {(int) p.getX(), (int) p.getY(), e.getX(), e.getY()};
-							
 							// Draw line!
 							if ((lines != null) && (lines.size() > 0))
 							{
@@ -842,12 +799,12 @@ public class ControlledSurface
 	public void mouseReleased(MouseEvent e)
 	{
 	    if (move != null) {
-		if (move.getDisplacement().distance(0,0) != 0) {
-		    root.getUndoInterface().addUndoable(move);
-		}
-		move = null;
+			if (move.getDisplacement().distance(0,0) != 0) {
+				root.getUndoInterface().addUndoable(move);
+			}
+			move = null;
 	    }
-	    System.out.println("ahgha");
+
 		// This is for triggering the popup 
 		maybeShowPopup(e);
 
@@ -958,12 +915,10 @@ public class ControlledSurface
 				}
 			}
 			if (newGroup != null) {
-			    System.out.println("creating Node");
 			    newGroup.setResizingFalse();
 			    Command c = new CreateNodeGroupCommand(this, newGroup);
 			    newGroup = null;
 			    root.getUndoInterface().executeCommand(c);
-			    System.out.println("Finished Node");
 			}
 
 			// Redefine edge if it has been changed
@@ -1261,223 +1216,217 @@ public class ControlledSurface
 					    dtListener);
 	}
 
+
     private class DTListener extends DropTargetAdapter
     {
-		private EditorObject drag = null;
-		
-		private void addToNode(EditorNode n, IdentifierProxy i)
-		{
-			n.addProposition(i);
-			repaint();
-		}
-		
-		private void addToLabel(EditorLabel l, IdentifierProxy i)
-		{
-			addToNode(l.getParent(), i);
-		}
-		
-		private void addToEdge(EditorEdge e, IdentifierProxy ip)
-		{
-			for (int i = 0; i < events.size(); i++)	
-			{
-				EditorLabelGroup g = (EditorLabelGroup) events.get(i);
-				if (g.getParent() == (EditorObject) e) 
-				{
-					//delEdge(e); // Recursive call!??
-					addToLabelGroup(g, ip);		 
-				}
-			}
-		}
-		
-		private void addToLabelGroup(EditorLabelGroup l, IdentifierProxy i)
-		{
-			l.addEvent(i);
-		}
-		
+
+		//###################################################################
+		//# Interface java.awt.dnd.DropTargetAdapter
 		private void setDragOver(EditorObject o, int d)
 		{
-			if (o == null) 
-			{
+			if (o == null) {
 				return;
 			}
 			o.setDragOver(d);
-			if (o instanceof EditorNode) 
-			{
-				for (Object ob : labels) 
-				{
+			if (o instanceof EditorNode) {
+				for (Object ob : labels) {
 					EditorLabel l = (EditorLabel)ob;
 					if (l.getParent() == o) {
 						l.setDragOver(d);
 					}
 				}	       
-			}
-			else if (o instanceof EditorLabel) 
-			{
+			} else if (o instanceof EditorLabel) {
 				EditorLabel l = (EditorLabel)o;
 				l.getParent().setDragOver(d);
-			}
-			else if (o instanceof EditorEdge) 
-			{
-				for (Object ob : events) 
-				{
+			} else if (o instanceof EditorEdge) {
+				for (Object ob : events) {
 					EditorLabelGroup l = (EditorLabelGroup)ob;
-					if (l.getParent() == o) 
-					{
+					if (l.getParent() == o) {
 						l.setDragOver(d);
 					}
 				}
-			}
-			else if (o instanceof EditorLabelGroup) 
-			{
+			} else if (o instanceof EditorLabelGroup) {
 				EditorLabelGroup l = (EditorLabelGroup)o;
 				l.getParent().setDragOver(d);
 			}
 		}
 		
-		public void dragOver(DropTargetDragEvent e)
+		public void dragOver(final DropTargetDragEvent e)
 		{
-			DataFlavor d = new DataFlavor(IdentifierWithKind.class, "IdentifierWithKind");
 			int operation = DnDConstants.ACTION_MOVE;
 			EditorObject o = null;
-			if (drag != null) 
-			{
-				setDragOver(drag, EditorObject.NOTDRAG);
+			if (mDrag != null) {
+				setDragOver(mDrag, EditorObject.NOTDRAG);
 			}
-			drag = null;
-			if (e.getTransferable().isDataFlavorSupported(d)) 
-			{
-				try 
-				{
-					IdentifierWithKind i = (IdentifierWithKind)e.getTransferable().getTransferData(d);
-					EventKind ek = i.getKind();
-					IdentifierProxy ip = i.getIdentifier();
-					o = getObjectAtPosition((int)e.getLocation().getX(), (int)e.getLocation().getY());
-					drag = o;
-					/*		   
-					  if (!root.getEventPane().contains(ip)) 
-					  {
-					  e.dropComplete(false);
-					  return;
-					  }
-					*/
-					System.out.println((o != null));
-					if (ek == null) 
-					{
-						if (o instanceof EditorNode) 
-						{
-							operation = DnDConstants.ACTION_COPY;
-						}
-						if (o instanceof EditorEdge) 
-						{
-							operation = DnDConstants.ACTION_COPY;
-						}
-						if (o instanceof EditorLabelGroup) 
-						{
-							operation = DnDConstants.ACTION_COPY;
-						}
-						if (o instanceof EditorLabel) 
-						{
-							operation = DnDConstants.ACTION_COPY;
-						}
+			mDrag = null;
+			try {
+				final IdentifierWithKind i = (IdentifierWithKind)
+					e.getTransferable().getTransferData(FLAVOUR);
+				final EventKind ek = i.getKind();
+				final IdentifierSubject ip = i.getIdentifier();
+				o = getObjectAtPosition((int) e.getLocation().getX(),
+										(int) e.getLocation().getY());
+				mDrag = o;
+				if (ek == null) {
+					if (o instanceof EditorNode) {
+						operation = DnDConstants.ACTION_COPY;
+					} else if (o instanceof EditorEdge) {
+						operation = DnDConstants.ACTION_COPY;
+					} else if (o instanceof EditorLabelGroup) {
+						operation = DnDConstants.ACTION_COPY;
+					} else if (o instanceof EditorLabel) {
+						operation = DnDConstants.ACTION_COPY;
 					}
-					else if (ek.equals(EventKind.PROPOSITION)) 
-					{
-						if (o instanceof EditorNode) 
-						{
-							operation = DnDConstants.ACTION_COPY;
-						}
-						if (o instanceof EditorLabel) 
-						{
-							operation = DnDConstants.ACTION_COPY;
-						}
+				} else if (ek.equals(EventKind.PROPOSITION)) {
+					if (o instanceof EditorNode) {
+						operation = DnDConstants.ACTION_COPY;
+					} else if (o instanceof EditorLabel) {
+						operation = DnDConstants.ACTION_COPY;
 					}
-					else if (ek.equals(EventKind.CONTROLLABLE) || ek.equals(EventKind.UNCONTROLLABLE)) 
-					{
-						if (o instanceof EditorEdge) 
-						{
-							operation = DnDConstants.ACTION_COPY;
-						}
-						if (o instanceof EditorLabelGroup) 
-						{
-							operation = DnDConstants.ACTION_COPY;
-						}
+				} else if (ek.equals(EventKind.CONTROLLABLE) ||
+						   ek.equals(EventKind.UNCONTROLLABLE)) {
+					if (o instanceof EditorEdge) {
+						operation = DnDConstants.ACTION_COPY;
+					} else if (o instanceof EditorLabelGroup) {
+						operation = DnDConstants.ACTION_COPY;
 					}
-				} catch (Throwable t) 
-				{
-					System.out.println(t);
 				}
+			} catch (final UnsupportedFlavorException exception) {
+				throw new IllegalArgumentException(exception);
+			} catch (final IOException exception) {
+				throw new IllegalArgumentException(exception);
 			}
-			System.out.println((o != null));
-			if (o != null) 
-			{
-				if (operation == DnDConstants.ACTION_COPY) 
-				{
+			if (o != null) {
+				if (operation == DnDConstants.ACTION_COPY) {
 					setDragOver(o, EditorObject.CANDROP);
-				}
-				else 
-				{
+				} else {
 					setDragOver(o, EditorObject.CANTDROP);
 				}
 			}
 			updateHighlighting(e.getLocation());   
-			System.out.println(""+operation);
-			e.getDropTargetContext().getDropTarget().setDefaultActions(operation);
+			e.getDropTargetContext().getDropTarget().
+				setDefaultActions(operation);
 			e.acceptDrag(operation);
 		}
-		
-		public void drop(DropTargetDropEvent e)
-		{
-			// The right flavor?
-			DataFlavor d = new DataFlavor(IdentifierWithKind.class, "IdentifierWithKind");
-			if (!(e.getTransferable().isDataFlavorSupported(d) && 
-				  e.getDropTargetContext().getDropTarget().getDefaultActions() == DnDConstants.ACTION_COPY))
-			{
-				e.dropComplete(false);
-				return;
-			}
 
-			// Do the stuff!
-			try 
-			{
-				IdentifierWithKind i = (IdentifierWithKind)e.getTransferable().getTransferData(d);	  
-				IdentifierProxy ip = i.getIdentifier();
-				/*		    if (!root.getEventPane().contains(ip)) {
-				  e.dropComplete(false);
-				  return;
-				  }*/
-				EditorObject o = getObjectAtPosition((int)e.getLocation().getX(), (int)e.getLocation().getY());
-				System.out.println("drop onto ?");		    
-				if (o instanceof EditorNode) 
-				{
-					addToNode((EditorNode)o, ip);
+
+		public void drop(final DropTargetDropEvent e)
+		{
+			try {
+				if (e.getDropTargetContext().getDropTarget().
+					getDefaultActions() == DnDConstants.ACTION_COPY) {
+					final IdentifierWithKind i = (IdentifierWithKind)
+						e.getTransferable().getTransferData(FLAVOUR);
+					final IdentifierSubject ip = i.getIdentifier();
+					final EditorObject o =
+						getObjectAtPosition((int) e.getLocation().getX(),
+											(int) e.getLocation().getY());
+					if (o instanceof EditorNode) {
+						addToNode((EditorNode) o, ip);
+						e.dropComplete(true);
+						return;
+					} else if (o instanceof EditorEdge) {
+						addToEdge((EditorEdge) o, ip);
+						e.dropComplete(true);
+						return;
+					} else if (o instanceof EditorLabelGroup) {
+						addToLabelGroup((EditorLabelGroup) o, ip);
+						e.dropComplete(true);
+						return;
+					} else if (o instanceof EditorLabel) {
+						addToLabel((EditorLabel) o, ip);
+						e.dropComplete(true);
+						return;
+					}
 				}
-				else if (o instanceof EditorEdge) 
-				{
-					addToEdge((EditorEdge)o, ip);
-				}
-				else if (o instanceof EditorLabelGroup) 
-				{
-					addToLabelGroup((EditorLabelGroup)o, ip);
-				}
-				else if (o instanceof EditorLabel) 
-				{
-					addToLabel((EditorLabel)o, ip);
-				}
-				else
-				{
-					// Didn't find anything to drop onto!
-					e.dropComplete(false);
-					return;
-				}
-				
-				// It went fine!
-				setDragOver(o, EditorObject.NOTDRAG);					
-				e.dropComplete(true);
+			} catch (final UnsupportedFlavorException exception) {
+				throw new IllegalArgumentException(exception);
+			} catch (final IOException exception) {
+				throw new IllegalArgumentException(exception);
 			}
-			catch (Throwable t) 
-			{
-				System.out.println(t);
+			e.dropComplete(false);
+		}
+
+
+		//###################################################################
+		//# Auxiliary Methods
+		private void addToNode(EditorNode n, IdentifierSubject i)
+		{
+			final IdentifierSubject cloned = i.clone();
+			n.addProposition(cloned);
+			repaint();
+		}
+
+		private void addToLabel(EditorLabel l, IdentifierSubject i)
+		{
+			addToNode(l.getParent(), i);
+		}
+
+		private void addToEdge(EditorEdge e, IdentifierSubject ip)
+		{
+			for (int i = 0; i < events.size(); i++)	{
+				EditorLabelGroup g = (EditorLabelGroup) events.get(i);
+				if (g.getParent() == (EditorObject) e) {
+					addToLabelGroup(g, ip);		 
+				}
 			}
 		}
+
+		private void addToLabelGroup(EditorLabelGroup l, IdentifierSubject i)
+		{
+			final IdentifierSubject cloned = i.clone();
+			l.addEvent(cloned);
+		}
+
+
+		//###################################################################
+		//# Data Members
+		private EditorObject mDrag = null;
+
 	}
+
+
+    //#######################################################################
+	//# Data Members
+	private ControlledSurface S;
+	private ControlledToolbar mToolbar;
+	private EditorOptions options;
+	private EditorNode sNode = null;
+	private int lastX = 0;
+	private int lastY = 0;
+	private int xoff = 0;
+	private int yoff = 0;
+	private boolean controlPointsMove = true;
+	private boolean nodesSnap = true;
+
+	private boolean hasDragged = false;
+
+	/** List of currently selected EditorObject:s. */
+	private LinkedList<EditorObject> selectedObjects = new LinkedList<EditorObject>();
+	/** List of EditorObject:s that are to become selected. */
+	private LinkedList<EditorObject> toBeSelected = new LinkedList<EditorObject>();
+	/** List of EditorObject:s that are to become unselected. */
+	private LinkedList<EditorObject> toBeDeselected = new LinkedList<EditorObject>();
+
+	/** The currently highlighted EditorObject (under the mouse pointer). */
+	private EditorObject highlightedObject = null;
+
+    private Move move;
+
+    private DropTarget dropTarget;
+    private DropTargetListener dtListener;
+
+
+    //#######################################################################
+	//# Class Constants
+	public static final String SELECT = "select";
+	public static final String NODE = "node";
+	public static final String NODEGROUP = "nodegroup";
+	public static final String INITIAL = "initial";
+	public static final String EDGE = "edge";
+	public static final String EVENT = "event";
+
+	private static final DataFlavor FLAVOUR =
+		new DataFlavor(IdentifierWithKind.class, "IdentifierWithKind");
+    
 }

@@ -1,17 +1,31 @@
+//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
+//###########################################################################
+//# PROJECT: Waters
+//# PACKAGE: net.sourceforge.waters.gui.command
+//# CLASS:   CreateEdgeCommand
+//###########################################################################
+//# $Id: CreateEdgeCommand.java,v 1.4 2005-11-03 01:24:15 robi Exp $
+//###########################################################################
+
+
 package net.sourceforge.waters.gui.command;
+
+import java.util.Collection;
+import java.util.Collections;
+import javax.swing.undo.AbstractUndoableEdit;
+import javax.swing.undo.CannotRedoException;
+import javax.swing.undo.CannotUndoException;
 
 import net.sourceforge.waters.gui.ControlledSurface;
 import net.sourceforge.waters.gui.EditorEdge;
 import net.sourceforge.waters.gui.EditorNode;
 import net.sourceforge.waters.gui.EditorNodeGroup;
 import net.sourceforge.waters.gui.EditorObject;
-import net.sourceforge.waters.model.module.SimpleNodeProxy;
-import net.sourceforge.waters.model.module.NodeProxy;
-import net.sourceforge.waters.model.module.EdgeProxy;
+import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.subject.module.EdgeSubject;
+import net.sourceforge.waters.subject.module.LabelBlockSubject;
+import net.sourceforge.waters.subject.module.NodeSubject;
 
-import javax.swing.undo.AbstractUndoableEdit;
-import javax.swing.undo.CannotRedoException;
-import javax.swing.undo.CannotUndoException;
 
 /**
  * the Command for Creation of nodes
@@ -24,44 +38,40 @@ public class CreateEdgeCommand
     implements Command
 {
 
-    /** The ControlledSurface Edited with this Command */
-    private final ControlledSurface mSurface;
-    /** The Node Created by this Command */
-    private final EditorEdge mCreated;
-    private final String mDescription = "Edge Creation";
-
+	//#######################################################################
+	//# Constructor
     /**
      * Constructs a new CreateNodeCommand with the specified surface and
-     * creates the node in the x,y position specified
-     *
+     * creates the node in the x,y position specified.
      * @param surface the surface edited by this command
-     * @param x,y the position upon which the node is created
+     * @param x the position upon which the node is created
+     * @param y the position upon which the node is created
      */
-    public CreateEdgeCommand(ControlledSurface surface, EditorObject source, EditorNode target, int x, int y)
+    public CreateEdgeCommand(final ControlledSurface surface,
+							 final EditorObject source,
+							 final EditorNode target,
+							 final int x,
+							 final int y)
     {
-	mSurface = surface;
-	// Find a unique name!
-	// Create a new EdgeProxy
-	EdgeProxy ep;
-	if (source.getType() == EditorObject.NODE)
-	    {
-		ep = new EdgeProxy((NodeProxy) ((EditorNode) source).getProxy(), (NodeProxy) target.getProxy());
-	    }
-	else
-	    {
-		ep = new EdgeProxy((NodeProxy) ((EditorNodeGroup) source).getProxy(), (NodeProxy) target.getProxy());
-	    }
-	mCreated = new EditorEdge(source, target, x, y, ep);
+		mSurface = surface;
+		final NodeSubject sourceSubject = (NodeSubject) source.getSubject();
+		final NodeSubject targetSubject = (NodeSubject) target.getSubject(); 
+		final Collection<Proxy> empty = Collections.emptyList();
+		final LabelBlockSubject labelBlock =
+			new LabelBlockSubject(empty, null);
+		final EdgeSubject edgeSubject =
+			new EdgeSubject(sourceSubject, targetSubject, labelBlock,
+							null, null, null);
+		mCreated = new EditorEdge(source, target, x, y, edgeSubject);
     }
 
     /**
      * Executes the Creation of the Node
      */
-
     public void execute()
     {
-	mSurface.addEdge(mCreated);
-	mSurface.getEditorInterface().setDisplayed();
+		mSurface.addEdge(mCreated);
+		mSurface.getEditorInterface().setDisplayed();
     }
 
     /** 
@@ -69,11 +79,10 @@ public class CreateEdgeCommand
      *
      * @throws CannotRedoException if CanRedo returns false
      */
-    
     public void redo() throws CannotRedoException
     {
-	super.redo();
-	execute();
+		super.redo();
+		execute();
     }
 
     /** 
@@ -81,16 +90,25 @@ public class CreateEdgeCommand
      *
      * @throws CannotUndoException if CanUndo returns false
      */    
-
     public void undo() throws CannotUndoException
     {
-	super.undo();
-	mSurface.delEdge(mCreated);
-	mSurface.getEditorInterface().setDisplayed();
+		super.undo();
+		mSurface.delEdge(mCreated);
+		mSurface.getEditorInterface().setDisplayed();
     }
 
     public String getPresentationName()
     {
-	return mDescription;
+		return mDescription;
     }
+
+
+	//#######################################################################
+	//# Data Members
+    /** The ControlledSurface Edited with this Command */
+    private final ControlledSurface mSurface;
+    /** The Node Created by this Command */
+    private final EditorEdge mCreated;
+    private final String mDescription = "Edge Creation";
+
 }

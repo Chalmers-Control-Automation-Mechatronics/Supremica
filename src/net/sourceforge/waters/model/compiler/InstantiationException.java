@@ -1,10 +1,10 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: waters.model.base
+//# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   InstantiationException
 //###########################################################################
-//# $Id: InstantiationException.java,v 1.2 2005-03-03 02:33:40 robi Exp $
+//# $Id: InstantiationException.java,v 1.3 2005-11-03 01:24:15 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;

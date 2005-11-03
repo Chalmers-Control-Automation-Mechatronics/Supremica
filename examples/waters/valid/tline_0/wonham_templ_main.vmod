@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE module PUBLIC "module" "module.dtd">
+
+<module name="wonham_templ_main"
+        legacy="1"
+        arity="0"
+        generatorName="VALID-II"
+        generatorVersion="2.8b5"
+        version="1.0"
+        creationDate="2002-04-12 09:01:10 GMT+02:00"
+        modificationDate="2002-04-17 08:38:29 GMT+02:00">
+<interface/>
+<definitions>
+<typeDefinition name="GROUPS" expression="{1}"/>
+</definitions>
+<local>
+<event name="tu_reject"
+       controllable="0"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..1}">
+<alias old="tu_reject.$_0" new="tu_reject[$_0]"/>
+</foreach-alias>
+<event name="tu_load"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{0..1}">
+<alias old="tu_load.$_0" new="tu_load[$_0]"/>
+</foreach-alias>
+<event name="tu_accept"
+       controllable="0"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{0..1}">
+<alias old="tu_accept.$_0" new="tu_accept[$_0]"/>
+</foreach-alias>
+<event name="machine_unload"
+       controllable="0"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..1}">
+<alias old="machine_unload.$_0" new="machine_unload[$_0]"/>
+</foreach-alias>
+<event name="machine_load"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..1}">
+<alias old="machine_load.$_0" new="machine_load[$_0]"/>
+</foreach-alias>
+</local>
+<parts>
+<foreach-instance dummy="GROUP" range="$GROUPS">
+<instance name="machine[$GROUP]" module="machine_plant">
+<nameParam name="machine_load" value="machine_load[$GROUP]"/>
+<nameParam name="machine_unload" value="machine_unload[$GROUP]"/>
+</instance>
+</foreach-instance>
+<foreach-instance dummy="GROUP" range="$GROUPS">
+<instance name="testunit[$GROUP]" module="testunit_plant">
+<nameParam name="tu_load" value="tu_load[$GROUP]"/>
+<nameParam name="tu_accept" value="tu_accept[$GROUP]"/>
+<nameParam name="tu_reject" value="tu_reject[$GROUP]"/>
+</instance>
+</foreach-instance>
+<component graph="init" kind="plant"/>
+<foreach-instance dummy="GROUP" range="$GROUPS">
+<instance name="b2sup[$GROUP]" module="b2sup_spec">
+<nameParam name="machine_load" value="machine_load[$GROUP]"/>
+<nameParam name="tu_load" value="tu_load[$GROUP]"/>
+<nameParam name="machine_unload" value="machine_unload[$GROUP]"/>
+</instance>
+</foreach-instance>
+<foreach-instance dummy="_0" range="{}">
+<instance name="b1sup1[$_0]" module="b1sup1_spec">
+<nameParam name="tu_load" value="tu_load[PREV]"/>
+<nameParam name="tu_accept_PREV" value="tu_accept[PREV]"/>
+<nameParam name="tu_accept_GROUP" value="tu_accept[GROUP]"/>
+</instance>
+</foreach-instance>
+<foreach-instance dummy="_0" range="{}">
+<instance name="b1sup2[$_0]" module="b1sup2_spec">
+<nameParam name="machine_load" value="machine_load[GROUP]"/>
+<nameParam name="tu_accept" value="tu_accept[PREV]"/>
+<nameParam name="tu_reject" value="tu_reject[GROUP]"/>
+</instance>
+</foreach-instance>
+</parts>
+</module>

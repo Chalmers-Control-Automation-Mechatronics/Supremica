@@ -1,0 +1,131 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters
+//# PACKAGE: net.sourceforge.waters.plain.module
+//# CLASS:   InstanceElement
+//###########################################################################
+//# $Id: InstanceElement.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//###########################################################################
+
+package net.sourceforge.waters.plain.module;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
+import net.sourceforge.waters.model.base.ProxyVisitor;
+import net.sourceforge.waters.model.base.VisitorException;
+import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.InstanceProxy;
+import net.sourceforge.waters.model.module.ModuleProxyVisitor;
+import net.sourceforge.waters.model.module.ParameterBindingProxy;
+
+
+/**
+ * An immutable implementation of the {@link InstanceProxy} interface.
+ *
+ * @author Robi Malik
+ */
+
+public final class InstanceElement
+  extends ComponentElement
+  implements InstanceProxy
+{
+
+  //#########################################################################
+  //# Constructors
+  /**
+   * Creates a new instance.
+   * @param identifier The identifier defining the name of the new instance.
+   * @param moduleName The module name of the new instance.
+   * @param bindingList The binding list of the new instance.
+   */
+  public InstanceElement(final IdentifierProxy identifier,
+                         final String moduleName,
+                         final Collection<? extends ParameterBindingProxy> bindingList)
+  {
+    super(identifier);
+    mModuleName = moduleName;
+    final List<ParameterBindingProxy> bindingListModifiable =
+      new ArrayList<ParameterBindingProxy>(bindingList);
+    mBindingList =
+      Collections.unmodifiableList(bindingListModifiable);
+  }
+
+  /**
+   * Creates a new instance using default values.
+   * This constructor creates an instance with
+   * an empty binding list.
+   * @param identifier The identifier defining the name of the new instance.
+   * @param moduleName The module name of the new instance.
+   */
+  public InstanceElement(final IdentifierProxy identifier,
+                         final String moduleName)
+  {
+    this(identifier,
+         moduleName,
+         emptyParameterBindingProxyList());
+  }
+
+
+  //#########################################################################
+  //# Cloning
+  public InstanceElement clone()
+  {
+    return (InstanceElement) super.clone();
+  }
+
+
+  //#########################################################################
+  //# Equality
+  public boolean equals(final Object partner)
+  {
+    if (super.equals(partner)) {
+      final InstanceElement downcast = (InstanceElement) partner;
+      return
+        mModuleName.equals(downcast.mModuleName) &&
+        mBindingList.equals(downcast.mBindingList);
+    } else {
+      return false;
+    }
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.base.Proxy
+  public Object acceptVisitor(final ProxyVisitor visitor)
+    throws VisitorException
+  {
+    final ModuleProxyVisitor downcast = (ModuleProxyVisitor) visitor;
+    return downcast.visitInstanceProxy(this);
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.module.InstanceProxy
+  public String getModuleName()
+  {
+    return mModuleName;
+  }
+
+  public List<ParameterBindingProxy> getBindingList()
+  {
+    return mBindingList;
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private static List<ParameterBindingProxy> emptyParameterBindingProxyList()
+  {
+    return Collections.emptyList();
+  }
+
+
+  //#########################################################################
+  //# Data Members
+  private final String mModuleName;
+  private final List<ParameterBindingProxy> mBindingList;
+
+}

@@ -1,3 +1,12 @@
+//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
+//###########################################################################
+//# PROJECT: Waters
+//# PACKAGE: net.sourceforge.waters.gui
+//# CLASS:   EditorLabel
+//###########################################################################
+//# $Id: EditorNodePopupMenu.java,v 1.6 2005-11-03 01:24:15 robi Exp $
+//###########################################################################
+
 
 package net.sourceforge.waters.gui;
 
@@ -89,16 +98,17 @@ class EditorNodePopupMenu
 
 		if (e.getSource() == initialItem)
 		{
-			if (!node.getProxy().isInitial())
+			if (!node.getSubject().isInitial())
 			{
 				parent.unsetAllInitial();
-				node.getProxy().setInitial(true);
+				node.getSubject().setInitial(true);
 			}
 		}
 
-		if (e.getSource() == recallItem)
-		{
-			parent.getLabel(node).setPosition(EditorLabel.DEFAULTOFFSETX, EditorLabel.DEFAULTOFFSETY);
+		if (e.getSource() == recallItem) {
+			final EditorLabel label = parent.getLabel(node);
+			label.setOffset(EditorLabel.DEFAULTOFFSETX,
+							EditorLabel.DEFAULTOFFSETY);
 		}
 
 		parent.repaint();

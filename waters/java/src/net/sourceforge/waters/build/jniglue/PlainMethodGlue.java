@@ -1,9 +1,10 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.build.jniglue
 //# CLASS:   PlainMethodGlue
 //###########################################################################
-//# $Id: PlainMethodGlue.java,v 1.1 2005-02-18 01:30:10 robi Exp $
+//# $Id: PlainMethodGlue.java,v 1.2 2005-11-03 01:24:16 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.build.jniglue;
@@ -19,15 +20,15 @@ class PlainMethodGlue extends MethodGlue {
   //#########################################################################
   //# Constructors
   PlainMethodGlue(final TypeGlue returntype,
-		  final String name)
+                  final String name)
   {
     mReturnType = returntype;
     mMethodName = name;
   }
 
   PlainMethodGlue(final TypeGlue returntype,
-		  final String name,
-		  final List parameters)
+                  final String name,
+                  final List<ParameterGlue> parameters)
   {
     super(parameters);
     mReturnType = returntype;
@@ -86,21 +87,22 @@ class PlainMethodGlue extends MethodGlue {
       final Class methodtype = method.getReturnType();
       final Class gluetype = getJavaType();
       if (gluetype != null && gluetype != methodtype) {
-	reporter.reportError
-	  ("Method " + mMethodName + "() in class " + javaclass.getName() +
-	   " does not have return type " + gluetype.getName() + "!");
+        reporter.reportError
+          ("Method " + mMethodName + "() in class " + javaclass.getName() +
+           " does not have return type " + gluetype.getName() + "!");
       }
     } catch (final NoSuchMethodException exception) {
       reporter.reportError
-	("Can't find method " + mMethodName + "() in class " +
-	 javaclass.getName() + "!");
+        ("Can't find method " + mMethodName + "() in class " +
+         javaclass.getName() + "!");
     }
   }
 
 
   //#########################################################################
   //# Calculating Type Signatures
-  void collectSignatures(final Set names, final Map signatures)
+  void collectSignatures(final Set<String> names,
+			 final Map<String,TypeSignature> signatures)
   {
     super.collectSignatures(names, signatures);
     names.add(mMethodName);

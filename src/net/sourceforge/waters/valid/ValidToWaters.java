@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.valid
 //# CLASS:   ValidToWaters
 //###########################################################################
-//# $Id: ValidToWaters.java,v 1.2 2005-09-15 00:12:21 robi Exp $
+//# $Id: ValidToWaters.java,v 1.3 2005-11-03 01:24:16 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.valid;
@@ -14,10 +14,13 @@ import java.io.File;
 import java.io.IOException;
 import javax.xml.bind.JAXBException;
 
-import net.sourceforge.waters.model.base.DocumentManager;
-import net.sourceforge.waters.model.module.ModuleMarshaller;
+import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.expr.OperatorTable;
+import net.sourceforge.waters.model.marshaller.DocumentManager;
+import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 import net.sourceforge.waters.model.module.ModuleProxy;
-import net.sourceforge.waters.valid.ValidUnmarshaller;
+import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 
 /**
@@ -65,8 +68,12 @@ public class ValidToWaters
   public static void main(final String[] args)
   {
     try {
-      final ValidUnmarshaller unmarshaller = new ValidUnmarshaller();
-      final ModuleMarshaller marshaller = new ModuleMarshaller();
+      final ModuleProxyFactory factory = ModuleElementFactory.getInstance();
+      final OperatorTable optable = CompilerOperatorTable.getInstance();
+      final ValidUnmarshaller unmarshaller =
+        new ValidUnmarshaller(factory, optable);
+      final JAXBModuleMarshaller marshaller =
+        new JAXBModuleMarshaller(factory, optable);
       final String ext = marshaller.getDefaultExtension();
       for (int i = 0; i < args.length; i++) {
 	final String validName = args[i];

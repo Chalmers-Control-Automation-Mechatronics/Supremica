@@ -1,9 +1,9 @@
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: waters.model.expr
+//# PACKAGE: net.sourceforge.waters.model.expr
 //# CLASS:   Token
 //###########################################################################
-//# $Id: Token.java,v 1.2 2005-06-02 12:18:03 flordal Exp $
+//# $Id: Token.java,v 1.3 2005-11-03 01:24:16 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.expr;

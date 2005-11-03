@@ -1,0 +1,803 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters
+//# PACKAGE: net.sourceforge.waters.subject.module
+//# CLASS:   ModuleSubjectFactory
+//###########################################################################
+//# $Id: ModuleSubjectFactory.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//###########################################################################
+
+package net.sourceforge.waters.subject.module;
+
+import java.awt.Color;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.io.File;
+import java.util.Collection;
+
+import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.expr.BinaryOperator;
+import net.sourceforge.waters.model.expr.UnaryOperator;
+import net.sourceforge.waters.model.module.AliasProxy;
+import net.sourceforge.waters.model.module.BoxGeometryProxy;
+import net.sourceforge.waters.model.module.ColorGeometryProxy;
+import net.sourceforge.waters.model.module.EdgeProxy;
+import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.model.module.EventListExpressionProxy;
+import net.sourceforge.waters.model.module.ExpressionProxy;
+import net.sourceforge.waters.model.module.GraphProxy;
+import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.LabelBlockProxy;
+import net.sourceforge.waters.model.module.LabelGeometryProxy;
+import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.model.module.NodeProxy;
+import net.sourceforge.waters.model.module.ParameterBindingProxy;
+import net.sourceforge.waters.model.module.ParameterProxy;
+import net.sourceforge.waters.model.module.PointGeometryProxy;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
+import net.sourceforge.waters.model.module.SplineGeometryProxy;
+
+import net.sourceforge.waters.xsd.base.ComponentKind;
+import net.sourceforge.waters.xsd.base.EventKind;
+import net.sourceforge.waters.xsd.module.AnchorPosition;
+import net.sourceforge.waters.xsd.module.SplineKind;
+
+
+public class ModuleSubjectFactory
+  implements ModuleProxyFactory
+{
+
+  //#########################################################################
+  //# Static Class Methods
+  public static ModuleSubjectFactory getInstance()
+  {
+    return INSTANCE;
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.module.ModuleProxyFactory
+  /**
+   * Creates a new alias.
+   * @param identifier The identifier defining the name of the new alias.
+   * @param expression The expression of the new alias.
+   */
+  public AliasSubject createAliasProxy
+      (final IdentifierProxy identifier,
+       final ExpressionProxy expression)
+  {
+    return new AliasSubject(identifier,
+                            expression);
+  }
+
+  /**
+   * Creates a new binary expression.
+   * @param operator The operator of the new binary expression.
+   * @param left The left subterm of the new binary expression.
+   * @param right The right subterm of the new binary expression.
+   */
+  public BinaryExpressionSubject createBinaryExpressionProxy
+      (final BinaryOperator operator,
+       final SimpleExpressionProxy left,
+       final SimpleExpressionProxy right)
+  {
+    return new BinaryExpressionSubject(operator,
+                                       left,
+                                       right);
+  }
+
+  /**
+   * Creates a new box geometry.
+   * @param rectangle The rectangle of the new box geometry.
+   */
+  public BoxGeometrySubject createBoxGeometryProxy
+      (final Rectangle2D rectangle)
+  {
+    return new BoxGeometrySubject(rectangle);
+  }
+
+  /**
+   * Creates a new color geometry.
+   * @param colorSet The colour set of the new color geometry.
+   */
+  public ColorGeometrySubject createColorGeometryProxy
+      (final Collection<? extends Color> colorSet)
+  {
+    return new ColorGeometrySubject(colorSet);
+  }
+
+  /**
+   * Creates a new color geometry using default values.
+   * This method creates a color geometry with
+   * an empty colour set.
+   */
+  public ColorGeometrySubject createColorGeometryProxy()
+  {
+    return new ColorGeometrySubject();
+  }
+
+  /**
+   * Creates a new edge.
+   * @param source The source node of the new edge.
+   * @param target The target node of the new edge.
+   * @param labelBlock The label block of the new edge.
+   * @param geometry The rendering information of the new edge, or <CODE>null</CODE>.
+   * @param startPoint The rendering information for the start point of the new edge, or <CODE>null</CODE>.
+   * @param endPoint The rendering information for the end point of the new edge, or <CODE>null</CODE>.
+   */
+  public EdgeSubject createEdgeProxy
+      (final NodeProxy source,
+       final NodeProxy target,
+       final LabelBlockProxy labelBlock,
+       final SplineGeometryProxy geometry,
+       final PointGeometryProxy startPoint,
+       final PointGeometryProxy endPoint)
+  {
+    return new EdgeSubject(source,
+                           target,
+                           labelBlock,
+                           geometry,
+                           startPoint,
+                           endPoint);
+  }
+
+  /**
+   * Creates a new edge using default values.
+   * This method creates an edge with
+   * the rendering information set to <CODE>null</CODE>,
+   * the rendering information for the start point set to <CODE>null</CODE>, and
+   * the rendering information for the end point set to <CODE>null</CODE>.
+   * @param source The source node of the new edge.
+   * @param target The target node of the new edge.
+   * @param labelBlock The label block of the new edge.
+   */
+  public EdgeSubject createEdgeProxy
+      (final NodeProxy source,
+       final NodeProxy target,
+       final LabelBlockProxy labelBlock)
+  {
+    return new EdgeSubject(source,
+                           target,
+                           labelBlock);
+  }
+
+  /**
+   * Creates a new enumerated range.
+   * @param items The list of items of the new enumerated range.
+   */
+  public EnumSetExpressionSubject createEnumSetExpressionProxy
+      (final Collection<? extends SimpleIdentifierProxy> items)
+  {
+    return new EnumSetExpressionSubject(items);
+  }
+
+  /**
+   * Creates a new enumerated range using default values.
+   * This method creates an enumerated range with
+   * an empty list of items.
+   */
+  public EnumSetExpressionSubject createEnumSetExpressionProxy()
+  {
+    return new EnumSetExpressionSubject();
+  }
+
+  /**
+   * Creates a new event declaration.
+   * @param name The name of the new event declaration.
+   * @param kind The kind of the new event declaration.
+   * @param observable The observability status of the new event declaration.
+   * @param ranges The list of index ranges of the new event declaration.
+   * @param colorGeometry The color information of the new event declaration, or <CODE>null</CODE>.
+   */
+  public EventDeclSubject createEventDeclProxy
+      (final String name,
+       final EventKind kind,
+       final boolean observable,
+       final Collection<? extends SimpleExpressionProxy> ranges,
+       final ColorGeometryProxy colorGeometry)
+  {
+    return new EventDeclSubject(name,
+                                kind,
+                                observable,
+                                ranges,
+                                colorGeometry);
+  }
+
+  /**
+   * Creates a new event declaration using default values.
+   * This method creates an event declaration with
+   * the observability status set to <CODE>true</CODE>,
+   * an empty list of index ranges, and
+   * the color information set to <CODE>null</CODE>.
+   * @param name The name of the new event declaration.
+   * @param kind The kind of the new event declaration.
+   */
+  public EventDeclSubject createEventDeclProxy
+      (final String name,
+       final EventKind kind)
+  {
+    return new EventDeclSubject(name,
+                                kind);
+  }
+
+  /**
+   * Creates a new event parameter.
+   * @param name The name of the new event parameter.
+   * @param required The required status of the new event parameter.
+   * @param eventDecl The event declaration of the new event parameter.
+   */
+  public EventParameterSubject createEventParameterProxy
+      (final String name,
+       final boolean required,
+       final EventDeclProxy eventDecl)
+  {
+    return new EventParameterSubject(name,
+                                     required,
+                                     eventDecl);
+  }
+
+  /**
+   * Creates a new event parameter using default values.
+   * This method creates an event parameter with
+   * the required status set to <CODE>true</CODE>.
+   * @param name The name of the new event parameter.
+   * @param eventDecl The event declaration of the new event parameter.
+   */
+  public EventParameterSubject createEventParameterProxy
+      (final String name,
+       final EventDeclProxy eventDecl)
+  {
+    return new EventParameterSubject(name,
+                                     eventDecl);
+  }
+
+  /**
+   * Creates a new foreach construct for module components.
+   * @param name The name of the new foreach construct for module components.
+   * @param range The range of the new foreach construct for module components.
+   * @param guard The guard of the new foreach construct for module components, or <CODE>null</CODE>.
+   * @param body The body of the new foreach construct for module components.
+   */
+  public ForeachComponentSubject createForeachComponentProxy
+      (final String name,
+       final SimpleExpressionProxy range,
+       final SimpleExpressionProxy guard,
+       final Collection<? extends Proxy> body)
+  {
+    return new ForeachComponentSubject(name,
+                                       range,
+                                       guard,
+                                       body);
+  }
+
+  /**
+   * Creates a new foreach construct for module components using default values.
+   * This method creates a foreach construct for module components with
+   * the guard set to <CODE>null</CODE> and
+   * an empty body.
+   * @param name The name of the new foreach construct for module components.
+   * @param range The range of the new foreach construct for module components.
+   */
+  public ForeachComponentSubject createForeachComponentProxy
+      (final String name,
+       final SimpleExpressionProxy range)
+  {
+    return new ForeachComponentSubject(name,
+                                       range);
+  }
+
+  /**
+   * Creates a new foreach construct for aliases.
+   * @param name The name of the new foreach construct for aliases.
+   * @param range The range of the new foreach construct for aliases.
+   * @param guard The guard of the new foreach construct for aliases, or <CODE>null</CODE>.
+   * @param body The body of the new foreach construct for aliases.
+   */
+  public ForeachEventAliasSubject createForeachEventAliasProxy
+      (final String name,
+       final SimpleExpressionProxy range,
+       final SimpleExpressionProxy guard,
+       final Collection<? extends Proxy> body)
+  {
+    return new ForeachEventAliasSubject(name,
+                                        range,
+                                        guard,
+                                        body);
+  }
+
+  /**
+   * Creates a new foreach construct for aliases using default values.
+   * This method creates a foreach construct for aliases with
+   * the guard set to <CODE>null</CODE> and
+   * an empty body.
+   * @param name The name of the new foreach construct for aliases.
+   * @param range The range of the new foreach construct for aliases.
+   */
+  public ForeachEventAliasSubject createForeachEventAliasProxy
+      (final String name,
+       final SimpleExpressionProxy range)
+  {
+    return new ForeachEventAliasSubject(name,
+                                        range);
+  }
+
+  /**
+   * Creates a new foreach construct for events.
+   * @param name The name of the new foreach construct for events.
+   * @param range The range of the new foreach construct for events.
+   * @param guard The guard of the new foreach construct for events, or <CODE>null</CODE>.
+   * @param body The body of the new foreach construct for events.
+   */
+  public ForeachEventSubject createForeachEventProxy
+      (final String name,
+       final SimpleExpressionProxy range,
+       final SimpleExpressionProxy guard,
+       final Collection<? extends Proxy> body)
+  {
+    return new ForeachEventSubject(name,
+                                   range,
+                                   guard,
+                                   body);
+  }
+
+  /**
+   * Creates a new foreach construct for events using default values.
+   * This method creates a foreach construct for events with
+   * the guard set to <CODE>null</CODE> and
+   * an empty body.
+   * @param name The name of the new foreach construct for events.
+   * @param range The range of the new foreach construct for events.
+   */
+  public ForeachEventSubject createForeachEventProxy
+      (final String name,
+       final SimpleExpressionProxy range)
+  {
+    return new ForeachEventSubject(name,
+                                   range);
+  }
+
+  /**
+   * Creates a new graph.
+   * @param deterministic The determinism status of the new graph.
+   * @param blockedEvents The list of blocked events of the new graph.
+   * @param nodes The set of nodes of the new graph.
+   * @param edges The list of edges of the new graph.
+   */
+  public GraphSubject createGraphProxy
+      (final boolean deterministic,
+       final LabelBlockProxy blockedEvents,
+       final Collection<? extends NodeProxy> nodes,
+       final Collection<? extends EdgeProxy> edges)
+  {
+    return new GraphSubject(deterministic,
+                            blockedEvents,
+                            nodes,
+                            edges);
+  }
+
+  /**
+   * Creates a new graph using default values.
+   * This method creates a graph with
+   * the determinism status set to <CODE>true</CODE>,
+   * an empty set of nodes, and
+   * an empty list of edges.
+   * @param blockedEvents The list of blocked events of the new graph.
+   */
+  public GraphSubject createGraphProxy
+      (final LabelBlockProxy blockedEvents)
+  {
+    return new GraphSubject(blockedEvents);
+  }
+
+  /**
+   * Creates a new group node.
+   * @param name The name of the new group node.
+   * @param propositions The list of propositions of the new group node.
+   * @param immediateChildNodes The set of immediate child nodes of the new group node.
+   * @param geometry The geometric information of the new group node, or <CODE>null</CODE>.
+   */
+  public GroupNodeSubject createGroupNodeProxy
+      (final String name,
+       final EventListExpressionProxy propositions,
+       final Collection<? extends NodeProxy> immediateChildNodes,
+       final BoxGeometryProxy geometry)
+  {
+    return new GroupNodeSubject(name,
+                                propositions,
+                                immediateChildNodes,
+                                geometry);
+  }
+
+  /**
+   * Creates a new group node using default values.
+   * This method creates a group node with
+   * an empty set of immediate child nodes and
+   * the geometric information set to <CODE>null</CODE>.
+   * @param name The name of the new group node.
+   * @param propositions The list of propositions of the new group node.
+   */
+  public GroupNodeSubject createGroupNodeProxy
+      (final String name,
+       final EventListExpressionProxy propositions)
+  {
+    return new GroupNodeSubject(name,
+                                propositions);
+  }
+
+  /**
+   * Creates a new indexed identifier.
+   * @param name The name of the new indexed identifier.
+   * @param indexes The list of array indexes of the new indexed identifier.
+   */
+  public IndexedIdentifierSubject createIndexedIdentifierProxy
+      (final String name,
+       final Collection<? extends SimpleExpressionProxy> indexes)
+  {
+    return new IndexedIdentifierSubject(name,
+                                        indexes);
+  }
+
+  /**
+   * Creates a new indexed identifier using default values.
+   * This method creates an indexed identifier with
+   * an empty list of array indexes.
+   * @param name The name of the new indexed identifier.
+   */
+  public IndexedIdentifierSubject createIndexedIdentifierProxy
+      (final String name)
+  {
+    return new IndexedIdentifierSubject(name);
+  }
+
+  /**
+   * Creates a new instance.
+   * @param identifier The identifier defining the name of the new instance.
+   * @param moduleName The module name of the new instance.
+   * @param bindingList The binding list of the new instance.
+   */
+  public InstanceSubject createInstanceProxy
+      (final IdentifierProxy identifier,
+       final String moduleName,
+       final Collection<? extends ParameterBindingProxy> bindingList)
+  {
+    return new InstanceSubject(identifier,
+                               moduleName,
+                               bindingList);
+  }
+
+  /**
+   * Creates a new instance using default values.
+   * This method creates an instance with
+   * an empty binding list.
+   * @param identifier The identifier defining the name of the new instance.
+   * @param moduleName The module name of the new instance.
+   */
+  public InstanceSubject createInstanceProxy
+      (final IdentifierProxy identifier,
+       final String moduleName)
+  {
+    return new InstanceSubject(identifier,
+                               moduleName);
+  }
+
+  /**
+   * Creates a new integer constant.
+   * @param value The integer value of the new integer constant.
+   */
+  public IntConstantSubject createIntConstantProxy
+      (final int value)
+  {
+    return new IntConstantSubject(value);
+  }
+
+  /**
+   * Creates a new integer parameter.
+   * @param name The name of the new integer parameter.
+   * @param required The required status of the new integer parameter.
+   * @param defaultValue The default value of the new integer parameter.
+   */
+  public IntParameterSubject createIntParameterProxy
+      (final String name,
+       final boolean required,
+       final SimpleExpressionProxy defaultValue)
+  {
+    return new IntParameterSubject(name,
+                                   required,
+                                   defaultValue);
+  }
+
+  /**
+   * Creates a new integer parameter using default values.
+   * This method creates an integer parameter with
+   * the required status set to <CODE>true</CODE>.
+   * @param name The name of the new integer parameter.
+   * @param defaultValue The default value of the new integer parameter.
+   */
+  public IntParameterSubject createIntParameterProxy
+      (final String name,
+       final SimpleExpressionProxy defaultValue)
+  {
+    return new IntParameterSubject(name,
+                                   defaultValue);
+  }
+
+  /**
+   * Creates a new label block.
+   * @param eventList The list of events of the new label block.
+   * @param geometry The geometry of the new label block, or <CODE>null</CODE>.
+   */
+  public LabelBlockSubject createLabelBlockProxy
+      (final Collection<? extends Proxy> eventList,
+       final LabelGeometryProxy geometry)
+  {
+    return new LabelBlockSubject(eventList,
+                                 geometry);
+  }
+
+  /**
+   * Creates a new label block using default values.
+   * This method creates a label block with
+   * an empty list of events and
+   * the geometry set to <CODE>null</CODE>.
+   */
+  public LabelBlockSubject createLabelBlockProxy()
+  {
+    return new LabelBlockSubject();
+  }
+
+  /**
+   * Creates a new label geometry.
+   * @param offset The offset of the new label geometry.
+   * @param anchor The anchor position of the new label geometry.
+   */
+  public LabelGeometrySubject createLabelGeometryProxy
+      (final Point2D offset,
+       final AnchorPosition anchor)
+  {
+    return new LabelGeometrySubject(offset,
+                                    anchor);
+  }
+
+  /**
+   * Creates a new label geometry using default values.
+   * This method creates a label geometry with
+   * the anchor position set to <CODE>AnchorPosition.NW</CODE>.
+   * @param offset The offset of the new label geometry.
+   */
+  public LabelGeometrySubject createLabelGeometryProxy
+      (final Point2D offset)
+  {
+    return new LabelGeometrySubject(offset);
+  }
+
+  /**
+   * Creates a new module.
+   * @param name The name of the new module.
+   * @param location The location of the new module.
+   * @param parameterList The parameter list of the new module.
+   * @param constantAliasList The constant definition list of the new module.
+   * @param eventDeclList The event declaration list of the new module.
+   * @param eventAliasList The event alias list of the new module.
+   * @param componentList The component list of the new module.
+   */
+  public ModuleSubject createModuleProxy
+      (final String name,
+       final File location,
+       final Collection<? extends ParameterProxy> parameterList,
+       final Collection<? extends AliasProxy> constantAliasList,
+       final Collection<? extends EventDeclProxy> eventDeclList,
+       final Collection<? extends Proxy> eventAliasList,
+       final Collection<? extends Proxy> componentList)
+  {
+    return new ModuleSubject(name,
+                             location,
+                             parameterList,
+                             constantAliasList,
+                             eventDeclList,
+                             eventAliasList,
+                             componentList);
+  }
+
+  /**
+   * Creates a new module using default values.
+   * This method creates a module with
+   * an empty parameter list,
+   * an empty constant definition list,
+   * an empty event declaration list,
+   * an empty event alias list, and
+   * an empty component list.
+   * @param name The name of the new module.
+   * @param location The location of the new module.
+   */
+  public ModuleSubject createModuleProxy
+      (final String name,
+       final File location)
+  {
+    return new ModuleSubject(name,
+                             location);
+  }
+
+  /**
+   * Creates a new parameter binding.
+   * @param name The name of the new parameter binding.
+   * @param expression The expression of the new parameter binding.
+   */
+  public ParameterBindingSubject createParameterBindingProxy
+      (final String name,
+       final ExpressionProxy expression)
+  {
+    return new ParameterBindingSubject(name,
+                                       expression);
+  }
+
+  /**
+   * Creates a new plain event list.
+   * @param eventList The list of events of the new plain event list.
+   */
+  public PlainEventListSubject createPlainEventListProxy
+      (final Collection<? extends Proxy> eventList)
+  {
+    return new PlainEventListSubject(eventList);
+  }
+
+  /**
+   * Creates a new plain event list using default values.
+   * This method creates a plain event list with
+   * an empty list of events.
+   */
+  public PlainEventListSubject createPlainEventListProxy()
+  {
+    return new PlainEventListSubject();
+  }
+
+  /**
+   * Creates a new point geometry.
+   * @param point The point of the new point geometry.
+   */
+  public PointGeometrySubject createPointGeometryProxy
+      (final Point2D point)
+  {
+    return new PointGeometrySubject(point);
+  }
+
+  /**
+   * Creates a new range parameter.
+   * @param name The name of the new range parameter.
+   * @param required The required status of the new range parameter.
+   * @param defaultValue The default value of the new range parameter.
+   */
+  public RangeParameterSubject createRangeParameterProxy
+      (final String name,
+       final boolean required,
+       final SimpleExpressionProxy defaultValue)
+  {
+    return new RangeParameterSubject(name,
+                                     required,
+                                     defaultValue);
+  }
+
+  /**
+   * Creates a new range parameter using default values.
+   * This method creates a range parameter with
+   * the required status set to <CODE>true</CODE>.
+   * @param name The name of the new range parameter.
+   * @param defaultValue The default value of the new range parameter.
+   */
+  public RangeParameterSubject createRangeParameterProxy
+      (final String name,
+       final SimpleExpressionProxy defaultValue)
+  {
+    return new RangeParameterSubject(name,
+                                     defaultValue);
+  }
+
+  /**
+   * Creates a new simple component.
+   * @param identifier The identifier defining the name of the new simple component.
+   * @param kind The kind of the new simple component.
+   * @param graph The graph of the new simple component.
+   */
+  public SimpleComponentSubject createSimpleComponentProxy
+      (final IdentifierProxy identifier,
+       final ComponentKind kind,
+       final GraphProxy graph)
+  {
+    return new SimpleComponentSubject(identifier,
+                                      kind,
+                                      graph);
+  }
+
+  /**
+   * Creates a new simple identifier.
+   * @param name The name of the new simple identifier.
+   */
+  public SimpleIdentifierSubject createSimpleIdentifierProxy
+      (final String name)
+  {
+    return new SimpleIdentifierSubject(name);
+  }
+
+  /**
+   * Creates a new simple node.
+   * @param name The name of the new simple node.
+   * @param propositions The list of propositions of the new simple node.
+   * @param initial The initial status of the new simple node.
+   * @param pointGeometry The geometric position of the new simple node, or <CODE>null</CODE>.
+   * @param labelGeometry The geometric position of the label of the new simple node, or <CODE>null</CODE>.
+   */
+  public SimpleNodeSubject createSimpleNodeProxy
+      (final String name,
+       final EventListExpressionProxy propositions,
+       final boolean initial,
+       final PointGeometryProxy pointGeometry,
+       final LabelGeometryProxy labelGeometry)
+  {
+    return new SimpleNodeSubject(name,
+                                 propositions,
+                                 initial,
+                                 pointGeometry,
+                                 labelGeometry);
+  }
+
+  /**
+   * Creates a new simple node using default values.
+   * This method creates a simple node with
+   * the initial status set to <CODE>false</CODE>,
+   * the geometric position set to <CODE>null</CODE>, and
+   * the geometric position of the label set to <CODE>null</CODE>.
+   * @param name The name of the new simple node.
+   * @param propositions The list of propositions of the new simple node.
+   */
+  public SimpleNodeSubject createSimpleNodeProxy
+      (final String name,
+       final EventListExpressionProxy propositions)
+  {
+    return new SimpleNodeSubject(name,
+                                 propositions);
+  }
+
+  /**
+   * Creates a new spline geometry.
+   * @param points The list of control points of the new spline geometry.
+   * @param kind The kind of the new spline geometry.
+   */
+  public SplineGeometrySubject createSplineGeometryProxy
+      (final Collection<? extends Point2D> points,
+       final SplineKind kind)
+  {
+    return new SplineGeometrySubject(points,
+                                     kind);
+  }
+
+  /**
+   * Creates a new spline geometry using default values.
+   * This method creates a spline geometry with
+   * an empty list of control points and
+   * the kind set to <CODE>SplineKind.INTERPOLATING</CODE>.
+   */
+  public SplineGeometrySubject createSplineGeometryProxy()
+  {
+    return new SplineGeometrySubject();
+  }
+
+  /**
+   * Creates a new unary expression.
+   * @param operator The operator of the new unary expression.
+   * @param subTerm The subterm of the new unary expression.
+   */
+  public UnaryExpressionSubject createUnaryExpressionProxy
+      (final UnaryOperator operator,
+       final SimpleExpressionProxy subTerm)
+  {
+    return new UnaryExpressionSubject(operator,
+                                      subTerm);
+  }
+
+
+  //#########################################################################
+  //# Data Members
+  private static final ModuleSubjectFactory INSTANCE =
+    new ModuleSubjectFactory();
+
+}

@@ -3,13 +3,15 @@
 //# PACKAGE: waters.samples.maze
 //# CLASS:   Action
 //###########################################################################
-//# $Id: Action.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: Action.java,v 1.2 2005-11-03 01:24:16 robi Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.samples.maze;
 
 import java.awt.Point;
+
+import net.sourceforge.waters.xsd.base.EventKind;
 
 
 class Action
@@ -60,6 +62,11 @@ class Action
     result.append('_');
     result.append(mTarget.y);
     return result.toString();
+  }
+
+  boolean isEscapeAction()
+  {
+    return mKind == ESCAPE;
   }
 
   static String getTemplateName(final int kind)

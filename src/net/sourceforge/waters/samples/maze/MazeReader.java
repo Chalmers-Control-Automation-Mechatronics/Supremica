@@ -1,9 +1,10 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: waters.samples.maze
+//# PACKAGE: net.sourceforge.waters.samples.maze
 //# CLASS:   MazeReader
 //###########################################################################
-//# $Id: MazeReader.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: MazeReader.java,v 1.2 2005-11-03 01:24:16 robi Exp $
 //###########################################################################
 
 
@@ -18,7 +19,6 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 
@@ -30,7 +30,7 @@ class MazeReader
   MazeReader()
   {
     SquareCreator creator;
-    mSquareCreatorMap = new HashMap(16);
+    mSquareCreatorMap = new HashMap<String,SquareCreator>(16);
     creator = new SimpleSquareCreator() {
 	Square createSquare(final Point pos) {return new SquareFree(pos);}
       };
@@ -88,16 +88,14 @@ class MazeReader
       mMinY = Integer.MAX_VALUE;
       mLastChar = 0;
       mLineNo = 1;
-      mSquares = new HashMap();
+      mSquares = new HashMap<Point,Square>();
       while (hasMoreSquares()) {
 	final String description = nextSquare();
 	final Square square = parseSquare(description);
       }
-      final Collection squares = mSquares.values();
+      final Collection<Square> squares = mSquares.values();
       if (mMinX < 0 || mMinY < 0) {
-	final Iterator iter = squares.iterator();
-	while (iter.hasNext()) {
-	  final Square square = (Square) iter.next();
+	for (final Square square : squares) {
 	  final Point pos = square.getPosition();
 	  pos.x -= mMinX;
 	  pos.y -= mMinY;
@@ -197,7 +195,8 @@ class MazeReader
       throw createSyntaxError("Duplicate square at " + x + "/" + y);
     }
     final Square square = creator.getSquare(pos, key);
-    mSquares.put(pos.clone(), square);
+    final Point clonedpos = new Point(pos.x, pos.y);
+    mSquares.put(clonedpos, square);
     return square;
   }
 
@@ -262,7 +261,7 @@ class MazeReader
   private SquareCreator getSquareCreator(final String kind)
     throws MazeSyntaxException
   {
-    final SquareCreator creator = (SquareCreator) mSquareCreatorMap.get(kind);
+    final SquareCreator creator = mSquareCreatorMap.get(kind);
     if (creator == null) {
       throw createSyntaxError("Unknown square type '" + kind + "'");
     }
@@ -278,9 +277,9 @@ class MazeReader
   private char mLastChar;
   private File mFile;
   private int mLineNo;
-  private Map mSquares;
+  private Map<Point,Square> mSquares;
 
-  private final Map mSquareCreatorMap;
+  private final Map<String,SquareCreator> mSquareCreatorMap;
 
 
   //#########################################################################
@@ -304,7 +303,8 @@ class MazeReader
       if (key == null) {
 	return createSquare(pos);
       } else {
-	throw createSyntaxError("Unexpected key specification '(" + key + ")");
+	throw createSyntaxError
+	  ("Unexpected key specification '(" + key + ")");
       }
     }
   }

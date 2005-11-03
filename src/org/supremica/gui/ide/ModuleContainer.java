@@ -1,59 +1,82 @@
+//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
+//###########################################################################
+//# PROJECT: Waters
+//# PACKAGE: org.supremica.gui.ide
+//# CLASS:   ModuleContainer
+//###########################################################################
+//# $Id: ModuleContainer.java,v 1.19 2005-11-03 01:24:16 robi Exp $
+//###########################################################################
+
+
 package org.supremica.gui.ide;
 
-import java.util.*;
 import java.awt.Component;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
 import javax.swing.JFrame;
 import javax.swing.JToolBar;
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
-import javax.swing.undo.UndoableEdit;
 import javax.swing.undo.UndoManager;
-import net.sourceforge.waters.model.module.ModuleProxy;
-import net.sourceforge.waters.model.module.SimpleComponentProxy;
-import org.supremica.automata.IO.ProjectBuildFromWaters;
-import org.supremica.gui.VisualProject;
-import org.supremica.automata.Project;
-import org.supremica.gui.ide.actions.Actions;
+import javax.swing.undo.UndoableEdit;
+
 import net.sourceforge.waters.gui.EditorWindowInterface;
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.observer.Observer;
+import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.expr.ExpressionParser;
+import net.sourceforge.waters.model.expr.OperatorTable;
+import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.subject.module.ModuleSubject;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
+import net.sourceforge.waters.subject.module.SimpleComponentSubject;
+
+import org.supremica.automata.IO.ProjectBuildFromWaters;
+import org.supremica.automata.Project;
+import org.supremica.gui.VisualProject;
+import org.supremica.gui.ide.actions.Actions;
+
 
 public class ModuleContainer implements UndoInterface
 {
-	private IDE ide;
-	private final ModuleProxy module;
 
-	private EditorPanel editorPanel = null;
-	private AnalyzerPanel analyzerPanel = null;
-	private SimulatorPanel simulatorPanel = null;
-	private Component selectedComponent = null;
-	private VisualProject theVisualProject = new VisualProject();
-	private Map componentToPanelMap = new HashMap();
-    private final UndoManager mUndoManager = new UndoManager();
-    private final Set<Observer> mObservers = new HashSet<Observer>();
-  
-	public ModuleContainer(IDE ide, ModuleProxy module)
+	//#######################################################################
+	//# Constructor
+	public ModuleContainer(final IDE ide, final ModuleSubject module)
 	{
-		this.ide = ide;
-		this.module = module;
+		mIDE = ide;
+		mModule = module;
+		final ModuleProxyFactory factory = ModuleSubjectFactory.getInstance();
+		final OperatorTable optable = CompilerOperatorTable.getInstance();
+		mExpressionParser = new ExpressionParser(factory, optable);
 		setSelectedComponent(getEditorPanel());
 	}
     
-        public IDE getIDE() 
-        {
-	    return ide;
+
+	//#######################################################################
+	//# Simple Access
+	public IDE getIDE() 
+	{
+	    return mIDE;
 	}
 
 	public String getName()
 	{
-		return module.getName();
+		return mModule.getName();
 	}
 
-	public ModuleProxy getModuleProxy()
+	public ModuleSubject getModule()
 	{
-		return module;
+		return mModule;
+	}
+
+	public ExpressionParser getExpressionParser()
+	{
+		return mExpressionParser;
 	}
 
 	public JToolBar getEditorToolBar(JToolBar mainToolBar)
@@ -68,7 +91,7 @@ public class ModuleContainer implements UndoInterface
 
 	public Actions getActions()
 	{
-		return ide.getActions();
+		return mIDE.getActions();
 	}
 
 	public EditorPanel getEditorPanel()
@@ -98,40 +121,44 @@ public class ModuleContainer implements UndoInterface
 		return simulatorPanel;
 	}
 
-	public ComponentEditorPanel getComponentEditorPanel(SimpleComponentProxy scp)
+	public ComponentEditorPanel getComponentEditorPanel
+		(final SimpleComponentSubject scp)
 	{
-		if (scp == null)
-		{
+		if (scp == null) {
 			return null;
+		} else {
+			ComponentEditorPanel panel = mComponentToPanelMap.get(scp);
+			if (panel == null) {
+				panel =	new ComponentEditorPanel(this, scp);
+				mComponentToPanelMap.put(scp, panel);
+			}
+			return panel;
 		}
-		if (!componentToPanelMap.containsKey(scp))
-		{
-			ComponentEditorPanel newPanel = new ComponentEditorPanel(this, scp);
-			componentToPanelMap.put(scp, newPanel);
-		}
-		return (ComponentEditorPanel)componentToPanelMap.get(scp);
 	}
 
 	public void setSelectedComponent(Component selectedComponent)
 	{
-		this.selectedComponent = selectedComponent;
+		mSelectedComponent = selectedComponent;
 	}
 
 	public Component getSelectedComponent()
 	{
-		return selectedComponent;
+		return mSelectedComponent;
 	}
 
 	public JFrame getFrame()
 	{
-		return ide.getFrame();
+		return mIDE.getFrame();
 	}
 
 	public VisualProject getVisualProject()
 	{
-		return theVisualProject;
+		return mVisualProject;
 	}
 
+
+	//#######################################################################
+	//# Undo & Redo
 	public EditorWindowInterface getActiveEditorWindowInterface()
 	{
 		return getEditorPanel().getActiveEditorWindowInterface();
@@ -140,8 +167,8 @@ public class ModuleContainer implements UndoInterface
 	public void addUndoable(UndoableEdit e)
 	{
 		mUndoManager.addEdit(e);
-		ide.getActions().editorRedoAction.setEnabled(canRedo());
-		ide.getActions().editorUndoAction.setEnabled(canUndo());
+		mIDE.getActions().editorRedoAction.setEnabled(canRedo());
+		mIDE.getActions().editorUndoAction.setEnabled(canUndo());
 		notifyObservers();
 	}
 
@@ -169,57 +196,76 @@ public class ModuleContainer implements UndoInterface
 		notifyObservers();
 	}
 
-        public String getRedoPresentationName()
+	public String getRedoPresentationName()
 	{
 		return mUndoManager.getRedoPresentationName();
 	}
     
-        public String getUndoPresentationName()
-        {
+	public String getUndoPresentationName()
+	{
 	    return mUndoManager.getUndoPresentationName();
 	}
 
 	public void redo() throws CannotRedoException
 	{
 		mUndoManager.redo();
-		ide.getActions().editorRedoAction.setEnabled(canRedo());
-		ide.getActions().editorUndoAction.setEnabled(canUndo());
+		mIDE.getActions().editorRedoAction.setEnabled(canRedo());
+		mIDE.getActions().editorUndoAction.setEnabled(canUndo());
 		notifyObservers();
 	}
 
 	public void undo() throws CannotUndoException
 	{
 		mUndoManager.undo();
-		ide.getActions().editorRedoAction.setEnabled(canRedo());
-		ide.getActions().editorUndoAction.setEnabled(canUndo());
+		mIDE.getActions().editorRedoAction.setEnabled(canRedo());
+		mIDE.getActions().editorUndoAction.setEnabled(canUndo());
 		notifyObservers();
 	}
 
-	public void attach(Observer o)
+
+	//#######################################################################
+	//# Observer Support
+	public void attach(final Observer o)
 	{
 		mObservers.add(o);
 	}
 	
-	public void detach(Observer o)
+	public void detach(final Observer o)
 	{
 		mObservers.remove(o);
 	}
 
 	public void notifyObservers()
 	{
-		for (Observer o : mObservers) {
+		for (final Observer o : mObservers) {
 			o.update();
 		}
 	}
 
 	public void updateAutomata()
 	{
-		ModuleProxy currModule = getModuleProxy();
 		ProjectBuildFromWaters builder = new ProjectBuildFromWaters();
-		Project supremicaProject = builder.build(currModule);
-		theVisualProject.clear();
-		theVisualProject.addAutomata(supremicaProject);
+		Project supremicaProject = builder.build(mModule);
+		mVisualProject.clear();
+		mVisualProject.addAutomata(supremicaProject);
 	}
 
 
+	//#######################################################################
+	//# Data Members
+	private final IDE mIDE;
+	private final ModuleSubject mModule;
+	private final ExpressionParser mExpressionParser;
+	private final UndoManager mUndoManager = new UndoManager();
+    private final Collection<Observer> mObservers = new LinkedList<Observer>();
+	private final Map<SimpleComponentSubject,ComponentEditorPanel>
+		mComponentToPanelMap =
+		new HashMap<SimpleComponentSubject,ComponentEditorPanel>();
+
+	private EditorPanel editorPanel = null;
+	private AnalyzerPanel analyzerPanel = null;
+	private SimulatorPanel simulatorPanel = null;
+	private Component mSelectedComponent = null;
+	private VisualProject mVisualProject = new VisualProject();
+ 
 }

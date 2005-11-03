@@ -1,9 +1,10 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.waters.samples.algorithms
 //# CLASS:   ConflictEquiv
 //###########################################################################
-//# $Id: ConflictEquiv.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: ConflictEquiv.java,v 1.2 2005-11-03 01:24:16 robi Exp $
 //###########################################################################
 
 
@@ -21,9 +22,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.sourceforge.waters.model.base.DuplicateNameException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
@@ -33,157 +34,145 @@ public class ConflictEquiv {
 
   //#########################################################################
   //# Invocation
-  public static AutomatonProxy reduce(final AutomatonProxy aut)
-    throws DuplicateNameException
+  public static AutomatonProxy reduce(final AutomatonProxy aut,
+                                      final ProductDESProxyFactory factory)
   {
     final String name = aut.getName();
-    return reduce(aut, name);
+    return reduce(aut, name, factory);
   }
 
   public static AutomatonProxy reduce(final AutomatonProxy aut,
-				      final String resultname)
-    throws DuplicateNameException
+                                      final String resultname,
+                                      final ProductDESProxyFactory factory)
   {
-    final ConflictEquiv solver = new ConflictEquiv(aut, resultname);
+    final ConflictEquiv solver = new ConflictEquiv(aut, resultname, factory);
     return solver.run();
   }
 
 
   //#########################################################################
   //# Constructors
-  private ConflictEquiv(final AutomatonProxy aut, final String resultname)
+  private ConflictEquiv(final AutomatonProxy aut,
+                        final String resultname,
+                        final ProductDESProxyFactory factory)
   {
     final Collection states = aut.getStates();
     final int numstates = states.size();
     mAutomaton = aut;
     mResultName = resultname;
     mAdjacency = new AdjacencyMap(aut);
-    mStateMap = new IdentityHashMap(numstates);
+    mStateMap = new IdentityHashMap<StateProxy,Integer>(numstates);
+    mFactory = factory;
   }
 
 
   //#########################################################################
   //# Workhorse Methods
   private AutomatonProxy run()
-    throws DuplicateNameException
   {
-    final Collection states0 = mAutomaton.getStates();
-    final List states = new ArrayList(states0);
+    final Collection<StateProxy> states0 = mAutomaton.getStates();
+    final List<StateProxy> states = new ArrayList<StateProxy>(states0);
     final int orignumstates = states.size();
     Collections.sort(states);
 
     int code = 0;
     int numstates = orignumstates;
-    final Iterator iter1 = states.iterator();
-    while (iter1.hasNext()) {
-      final Object state = iter1.next();
-      final Integer entry = new Integer(code++);
+    for (final StateProxy state : states) {
+      final int entry = code++;
       mStateMap.put(state, entry);
     }
 
     int step = 0;
     while (true) {
-      final Map infomap = new HashMap(orignumstates);
-      final Iterator iter2 = states.iterator();
-      while (iter2.hasNext()) {
-	final StateProxy state = (StateProxy) iter2.next();
-	final boolean initial = state.isInitial();
-	final Collection incoming = mAdjacency.getEnteringTransitions(state);
-	final Set demi = createDemiTransitions(incoming);
-	final Set elig = mAdjacency.getEligibleEvents(state);
-	final Collection props = state.getPropositions();
-	elig.addAll(props);
-	final StateInfo newinfo = new StateInfo(initial, demi, elig);
-	StateInfo info = (StateInfo) infomap.get(newinfo);
-	if (info == null) {
-	  info = newinfo;
-	  infomap.put(info, info);
-	}
-	info.addState(state);
+      final Map<StateInfo,StateInfo> infomap =
+	new HashMap<StateInfo,StateInfo>(orignumstates);
+      for (final StateProxy state : states) {
+        final boolean initial = state.isInitial();
+        final Collection<TransitionProxy> incoming =
+	  mAdjacency.getEnteringTransitions(state);
+        final Set<DemiTransition> demi = createDemiTransitions(incoming);
+        final Set<EventProxy> elig = mAdjacency.getEligibleEvents(state);
+        final Collection<EventProxy> props = state.getPropositions();
+        elig.addAll(props);
+        final StateInfo newinfo = new StateInfo(initial, demi, elig);
+        StateInfo info = infomap.get(newinfo);
+        if (info == null) {
+          info = newinfo;
+          infomap.put(info, info);
+        }
+        info.addState(state);
       }
 
-      final Set reducedstates = infomap.keySet();
+      final Set<StateInfo> reducedstates = infomap.keySet();
       final int newnumstates = reducedstates.size();
       if (newnumstates == numstates) {
-	break;
+        break;
       }
       step++;
       numstates = newnumstates;
 
       code = 0;
-      final Iterator iter3 = reducedstates.iterator();
-      while (iter3.hasNext()) {
-	final Integer entry = new Integer(code++);
-	final StateInfo info = (StateInfo) iter3.next();
-	final Collection infostates = info.getStates();
-	final Iterator iter4 = infostates.iterator();
-	while (iter4.hasNext()) {
-	  final Object state = iter4.next();
-	  mStateMap.put(state, entry);
-	}
+      for (final StateInfo info : reducedstates) {
+        final int entry = code++;
+        final Collection<StateProxy> infostates = info.getStates();
+	for (final StateProxy state : infostates) {
+          mStateMap.put(state, entry);
+        }
       }
     }
 
     final ComponentKind kind = mAutomaton.getKind();
-    final AutomatonProxy result = new AutomatonProxy(mResultName, kind);
     final DemiState[] demistates = new DemiState[numstates];
     for (code = 0; code < numstates; code++) {
       demistates[code] = new DemiState(code);
     }
-    final Iterator iter5 = states.iterator();
-    while (iter5.hasNext()) {
-      final StateProxy state = (StateProxy) iter5.next();
-      final Integer entry = (Integer) mStateMap.get(state);
-      code = entry.intValue();
+    for (final StateProxy state : states) {
+      code = mStateMap.get(state);
       demistates[code].includeState(state);
     }
     final StateProxy[] newstates = new StateProxy[numstates];
+    final Collection<StateProxy> resultstates = new LinkedList<StateProxy>();
     for (code = 0; code < numstates; code++) {
-      final StateProxy state = demistates[code].createState();
+      final StateProxy state = demistates[code].createState(mFactory);
       newstates[code] = state;
-      result.addState(state);
+      resultstates.add(state);
     }
-    final Collection transitions = mAutomaton.getTransitions();
-    final Set newtransitions = new HashSet();
-    final Iterator iter6 = transitions.iterator();
-    while (iter6.hasNext()) {
-      final TransitionProxy oldtrans = (TransitionProxy) iter6.next();
+    final Collection<TransitionProxy> transitions =
+      mAutomaton.getTransitions();
+    final Set<TransitionProxy> resulttrans = new HashSet<TransitionProxy>();
+    for (final TransitionProxy oldtrans : transitions) {
       final StateProxy oldsource = oldtrans.getSource();
-      final Integer oldsourcecodeentry = (Integer) mStateMap.get(oldsource);
-      final int oldsourcecode = oldsourcecodeentry.intValue();
+      final int oldsourcecode = mStateMap.get(oldsource);
       final StateProxy newsource = newstates[oldsourcecode];
       final StateProxy oldtarget = oldtrans.getTarget();
-      final Integer oldtargetcodeentry = (Integer) mStateMap.get(oldtarget);
-      final int oldtargetcode = oldtargetcodeentry.intValue();
+      final int oldtargetcode = mStateMap.get(oldtarget);
       final StateProxy newtarget = newstates[oldtargetcode];
       final EventProxy event = oldtrans.getEvent();
       final TransitionProxy newtrans =
-	new TransitionProxy(newsource, newtarget, event);
-      if (newtransitions.add(newtrans)) {
-	result.addTransition(newtrans);
-      }
+        mFactory.createTransitionProxy(newsource, event, newtarget);
+      resulttrans.add(newtrans);
     }
+    final Collection<EventProxy> events = mAutomaton.getEvents();
 
     System.err.println
       ("B Reduction in " + step + " steps: " +
        states.size() + " >> " + numstates + " states, " +
-       transitions.size() + " >> " + newtransitions.size() + " transitions");
+       transitions.size() + " >> " + resulttrans.size() + " transitions");
 
-    return result;
+    return mFactory.createAutomatonProxy
+      (mResultName, kind, events, resultstates, resulttrans);
   }
 
 
-  private Set createDemiTransitions(final Collection transitions)
+  private Set<DemiTransition> createDemiTransitions
+    (final Collection<TransitionProxy> transitions)
   {
     final int numtrans = transitions.size();
-    final Set result = new HashSet(numtrans);
-    final Iterator iter = transitions.iterator();
-    while (iter.hasNext()) {
-      final TransitionProxy trans = (TransitionProxy) iter.next();
+    final Set<DemiTransition> result = new HashSet<DemiTransition>(numtrans);
+    for (final TransitionProxy trans : transitions) {
       final StateProxy source = trans.getSource();
       final EventProxy event = trans.getEvent();
-      final Integer entry = (Integer) mStateMap.get(source);
-      final int code = entry.intValue();
+      final int code = mStateMap.get(source);
       final DemiTransition demi = new DemiTransition(code, event);
       result.add(demi);
     }
@@ -198,13 +187,13 @@ public class ConflictEquiv {
     //#######################################################################
     //# Constructors
     private StateInfo(final boolean initial,
-		      final Set incoming,
-		      final Set elig)
+                      final Set<DemiTransition> incoming,
+                      final Set<EventProxy> elig)
     {
       mIsInitial = initial;
       mIncoming = incoming;
       mElig = elig;
-      mStates = new LinkedList();
+      mStates = new LinkedList<StateProxy>();
     }
 
     //#######################################################################
@@ -212,27 +201,27 @@ public class ConflictEquiv {
     public boolean equals(final Object partner)
     {
       if (partner != null && getClass() == partner.getClass()) {
-	final StateInfo info = (StateInfo) partner;
-	return
-	  mIsInitial == info.mIsInitial &&
-	  mIncoming.equals(info.mIncoming) &&
-	  mElig.equals(info.mElig);
+        final StateInfo info = (StateInfo) partner;
+        return
+          mIsInitial == info.mIsInitial &&
+          mIncoming.equals(info.mIncoming) &&
+          mElig.equals(info.mElig);
       } else {
-	return false;
+        return false;
       }
     }
 
     public int hashCode()
     {
       return
-	mIncoming.hashCode() +
-	5 * mElig.hashCode() +
-	(mIsInitial ? 25 : 0);
+        mIncoming.hashCode() +
+        5 * mElig.hashCode() +
+        (mIsInitial ? 25 : 0);
     }
 
     //#######################################################################
     //# Simple Access
-    private Collection getStates()
+    private Collection<StateProxy> getStates()
     {
       return mStates;
     }
@@ -245,9 +234,9 @@ public class ConflictEquiv {
     //#######################################################################
     //# Data Members
     private final boolean mIsInitial;
-    private final Set mIncoming;
-    private final Set mElig;
-    private final Collection mStates;
+    private final Set<DemiTransition> mIncoming;
+    private final Set<EventProxy> mElig;
+    private final Collection<StateProxy> mStates;
 
   }
 
@@ -269,10 +258,10 @@ public class ConflictEquiv {
     public boolean equals(final Object partner)
     {
       if (partner != null && partner.getClass() == getClass()) {
-	final DemiTransition trans = (DemiTransition) partner;
-	return mSource == trans.mSource && mEvent == trans.mEvent;
+        final DemiTransition trans = (DemiTransition) partner;
+        return mSource == trans.mSource && mEvent == trans.mEvent;
       } else {
-	return false;
+        return false;
       }
     }
 
@@ -299,7 +288,7 @@ public class ConflictEquiv {
       mCode = code;
       mName = new StringBuffer();
       mInitial = false;
-      mPropositions = new LinkedList();
+      mPropositions = new LinkedList<EventProxy>();
     }
 
     //#######################################################################
@@ -307,18 +296,18 @@ public class ConflictEquiv {
     private void includeState(final StateProxy state)
     {
       if (mName != null) {
-	final String name = state.getName();
-	if (mName.length() + name.length() > 12 || name.indexOf(":") >= 0) {
-	  mName = null;
-	} else {
-	  if (mName.length() > 0) {
-	    mName.append(':');
-	  }
-	  mName.append(name);
-	}
+        final String name = state.getName();
+        if (mName.length() + name.length() > 12 || name.indexOf(":") >= 0) {
+          mName = null;
+        } else {
+          if (mName.length() > 0) {
+            mName.append(':');
+          }
+          mName.append(name);
+        }
       }
       if (state.isInitial()) {
-	mInitial = true;
+        mInitial = true;
       }
       mPropositions.addAll(state.getPropositions());
     }
@@ -328,15 +317,15 @@ public class ConflictEquiv {
     private String getName()
     {
       if (mName == null) {
-	return ":c" + mCode;
+        return ":c" + mCode;
       } else {
-	return mName.toString();
+        return mName.toString();
       }
     }
 
-    private StateProxy createState()
+    private StateProxy createState(final ProductDESProxyFactory factory)
     {
-      return new StateProxy(getName(), mInitial, mPropositions);
+      return factory.createStateProxy(getName(), mInitial, mPropositions);
     }
 
     //#######################################################################
@@ -344,7 +333,7 @@ public class ConflictEquiv {
     private final int mCode;
     private StringBuffer mName;
     private boolean mInitial;
-    private Collection mPropositions;
+    private Collection<EventProxy> mPropositions;
   }
 
 
@@ -353,7 +342,8 @@ public class ConflictEquiv {
   private final AutomatonProxy mAutomaton;
   private final String mResultName;
   private final AdjacencyMap mAdjacency;
-  private final Map mStateMap;
+  private final Map<StateProxy,Integer> mStateMap;
+  private final ProductDESProxyFactory mFactory;
 
 }
 

@@ -1,14 +1,14 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.build.jniglue
 //# CLASS:   TemplateFragmentSequence
 //###########################################################################
-//# $Id: TemplateFragmentSequence.java,v 1.1 2005-02-18 01:30:10 robi Exp $
+//# $Id: TemplateFragmentSequence.java,v 1.2 2005-11-03 01:24:16 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.build.jniglue;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -20,7 +20,7 @@ class TemplateFragmentSequence extends TemplateFragment {
   TemplateFragmentSequence()
   {
     super(-1);
-    mBody = new LinkedList();
+    mBody = new LinkedList<TemplateFragment>();
   }
 
 
@@ -36,9 +36,7 @@ class TemplateFragmentSequence extends TemplateFragment {
   //# Code Generation
   void writeCppGlue(final CppGlueWriter writer, final TemplateContext context)
   {
-    final Iterator iter = mBody.iterator();
-    while (iter.hasNext()) {
-      final TemplateFragment fragment = (TemplateFragment) iter.next();
+    for (final TemplateFragment fragment : mBody) {
       fragment.writeCppGlue(writer, context);
     }
   }
@@ -46,6 +44,6 @@ class TemplateFragmentSequence extends TemplateFragment {
 
   //#########################################################################
   //# Data Members
-  private final List mBody;
+  private final List<TemplateFragment> mBody;
 
 }

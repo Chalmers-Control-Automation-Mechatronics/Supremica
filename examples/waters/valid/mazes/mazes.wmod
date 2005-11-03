@@ -14,11 +14,11 @@
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="door_norock"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="enter"/>
 <SimpleIdentifier Name="exit"/>
 <SimpleIdentifier Name="unlock"/>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Name="hero">
 <PointGeometry>
@@ -82,13 +82,13 @@
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="door_rock"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="clear"/>
 <SimpleIdentifier Name="crush"/>
 <SimpleIdentifier Name="enter"/>
 <SimpleIdentifier Name="exit"/>
 <SimpleIdentifier Name="unlock"/>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Name="free">
 <PointGeometry>
@@ -184,11 +184,11 @@
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="exit_norock"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="enter"/>
 <SimpleIdentifier Name="escape"/>
 <SimpleIdentifier Name="exit"/>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Name="gone">
 <PointGeometry>
@@ -222,13 +222,13 @@
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="exit_rock"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="clear"/>
 <SimpleIdentifier Name="crush"/>
 <SimpleIdentifier Name="enter"/>
 <SimpleIdentifier Name="escape"/>
 <SimpleIdentifier Name="exit"/>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Name="gone">
 <PointGeometry>
@@ -332,10 +332,10 @@
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="free_norock"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="enter"/>
 <SimpleIdentifier Name="exit"/>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Name="hero">
 <PointGeometry>
@@ -383,12 +383,12 @@
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="free_rock"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="clear"/>
 <SimpleIdentifier Name="crush"/>
 <SimpleIdentifier Name="enter"/>
 <SimpleIdentifier Name="exit"/>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="free">
 <PointGeometry>
@@ -460,11 +460,11 @@
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="gate_norock"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="enter"/>
 <SimpleIdentifier Name="exit"/>
 <SimpleIdentifier Name="unlock"/>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="gate">
 <PointGeometry>
@@ -544,13 +544,13 @@
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="gate_rock"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="clear"/>
 <SimpleIdentifier Name="crush"/>
 <SimpleIdentifier Name="enter"/>
 <SimpleIdentifier Name="exit"/>
 <SimpleIdentifier Name="unlock"/>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Name="free">
 <PointGeometry>
@@ -654,10 +654,10 @@
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="hero_norock"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="enter"/>
 <SimpleIdentifier Name="exit"/>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Name="free">
 <PointGeometry>
@@ -705,12 +705,12 @@
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="hero_rock"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="clear"/>
 <SimpleIdentifier Name="crush"/>
 <SimpleIdentifier Name="enter"/>
 <SimpleIdentifier Name="exit"/>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Name="free">
 <PointGeometry>
@@ -782,11 +782,11 @@
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="key_norock"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="enter"/>
 <SimpleIdentifier Name="exit"/>
 <SimpleIdentifier Name="pickup"/>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Name="hero">
 <PointGeometry>
@@ -850,13 +850,13 @@
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="key_rock"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="clear"/>
 <SimpleIdentifier Name="crush"/>
 <SimpleIdentifier Name="enter"/>
 <SimpleIdentifier Name="exit"/>
 <SimpleIdentifier Name="pickup"/>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Name="free">
 <PointGeometry>
@@ -952,12 +952,12 @@
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="rock"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="clear"/>
 <SimpleIdentifier Name="crush"/>
 <SimpleIdentifier Name="enter"/>
 <SimpleIdentifier Name="exit"/>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="rock">
 <PointGeometry>

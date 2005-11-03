@@ -1,9 +1,10 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.build.jniglue
 //# CLASS:   FieldGlue
 //###########################################################################
-//# $Id: FieldGlue.java,v 1.1 2005-02-18 01:30:10 robi Exp $
+//# $Id: FieldGlue.java,v 1.2 2005-11-03 01:24:16 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.build.jniglue;
@@ -14,7 +15,7 @@ import java.util.Map;
 import java.util.Set;
 
 
-class FieldGlue implements Comparable, WritableGlue {
+class FieldGlue implements Comparable<FieldGlue>, WritableGlue {
 
   //#########################################################################
   //# Constructors
@@ -46,9 +47,8 @@ class FieldGlue implements Comparable, WritableGlue {
 
   //#########################################################################
   //# Interface java.lang.Comparable
-  public int compareTo(final Object partner)
+  public int compareTo(final FieldGlue field)
   {
-    final FieldGlue field = (FieldGlue) partner;
     return mFieldName.compareTo(field.mFieldName);
   }
 
@@ -80,26 +80,27 @@ class FieldGlue implements Comparable, WritableGlue {
       final Class fieldtype = field.getType();
       final Class gluetype = getJavaType();
       if (gluetype != null && gluetype != fieldtype) {
-	reporter.reportError
-	  ("Field " + mFieldName + " in class " + javaclass.getName() +
-	   " is not of type " + gluetype.getName() + "!");
+        reporter.reportError
+          ("Field " + mFieldName + " in class " + javaclass.getName() +
+           " is not of type " + gluetype.getName() + "!");
       } else if (field.getModifiers() !=
-		 (Modifier.PUBLIC | Modifier.STATIC | Modifier.FINAL)) {
-	reporter.reportError
-	  ("Field " + mFieldName + " in class " + javaclass.getName() +
-	   " is not static final!");
+                 (Modifier.PUBLIC | Modifier.STATIC | Modifier.FINAL)) {
+        reporter.reportError
+          ("Field " + mFieldName + " in class " + javaclass.getName() +
+           " is not static final!");
       }
     } catch (final NoSuchFieldException exception) {
       reporter.reportError
-	("Can't find field " + mFieldName + " in class " +
-	 javaclass.getName() + "!");
+        ("Can't find field " + mFieldName + " in class " +
+         javaclass.getName() + "!");
     }
   }
 
 
   //#########################################################################
   //# Calculating Type Signatures
-  void collectSignatures(final Set names, final Map signatures)
+  void collectSignatures(final Set<String> names,
+                         final Map<String,TypeSignature> signatures)
   {
     if (mTypeSignature != null) {
       throw new IllegalStateException("Second call to collectSignatures()!");

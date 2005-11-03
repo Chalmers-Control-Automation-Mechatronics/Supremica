@@ -1,39 +1,32 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: waters.model.base
+//# PACKAGE: net.sourceforge.waters.model.base
 //# CLASS:   Proxy
 //###########################################################################
-//# $Id: Proxy.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: Proxy.java,v 1.2 2005-11-03 01:24:15 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.base;
 
-import java.io.IOException;
-import javax.xml.bind.JAXBException;
-
-import net.sourceforge.waters.xsd.base.ElementType;
-
-
 /**
- * <P>The common functionality for all Waters elements.</P>
+ * <P>The common interface for all Waters elements.</P>
  *
- * <P>Every implementation of this interface corresponds to a particular
- * type of element in some of the Waters XML files. The interface specifies
- * the common basic functionality of printing and marshalling that needs to
- * be implemented by all classes that represent an element from one of the
- * XML files.</P>
- *
- * <P>Technically, most implementations of this interface are also
- * subclasses of the {@link ElementProxy} class, which provides some
- * additional functionality. In some cases, however, another base class has
- * to be used. Therefore the only guaranteed common functionality for all
- * objects found in a Waters document is that specified in this
- * interface.</P>
- * 
  * @author Robi Malik
  */
 
 public interface Proxy {
+
+  //#########################################################################
+  //# Cloning
+  /**
+   * Creates and returns a copy of this object. This method supports the
+   * general contract of the {@link java.lang.Object#clone() clone()}
+   * method. Its precise semantics differs for different implementations of
+   * the <CODE>Proxy</CODE> interface.
+   */
+  public Proxy clone();
+
 
   //#########################################################################
   //# Comparing
@@ -47,44 +40,15 @@ public interface Proxy {
    * account. This method can be very slow for large structures and is
    * intended for testing purposes only.
    */
-  public boolean equalsWithGeometry(final Object partner);
+  public boolean equalsWithGeometry(Object partner);
 
 
   //#########################################################################
-  //# Printing
+  //# Visitors
   /**
-   * Writes a textual description of this element.
-   * This method is for internal use and should not be called directly.
-   * @param  printer The printer object to which output is to be sent.
-   * @throws IOException if printing failed for some reason.
-   * @see ModelPrinter
+   * Calls a visitor on this object.
    */
-  public void pprint(final ModelPrinter printer) throws IOException;
-
-  /**
-   * Writes a textual description of this element followed by a newline.
-   * This method is for internal use and should not be called directly.
-   * @param  printer The printer object to which output is to be sent.
-   * @throws IOException if printing failed for some reason.
-   * @see ModelPrinter
-   */
-  public void pprintln(final ModelPrinter printer) throws IOException;
-
-
-  //#########################################################################
-  //# Marshalling
-  /**
-   * Creates a new JAXB element representing the contents of this element.
-   * This method is used internally for marshalling and should not
-   * be called directly.
-   * @param  factory The element factory to be used for creating the
-   *                 JAXB element.
-   * @return The created element.
-   * @throws JAXBException to indicate that a fatal error occurred while
-   *                 creating or copying some element.
-   * @see    ProxyMarshaller
-   */
-  public ElementType toJAXB(final ElementFactory factory)
-    throws JAXBException;
+  public Object acceptVisitor(ProxyVisitor visitor)
+    throws VisitorException;
 
 }

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   CompiledEventDecl
 //###########################################################################
-//# $Id: CompiledEventDecl.java,v 1.3 2005-02-28 19:16:18 robi Exp $
+//# $Id: CompiledEventDecl.java,v 1.4 2005-11-03 01:24:15 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -16,11 +16,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
+import net.sourceforge.waters.model.expr.IndexValue;
 import net.sourceforge.waters.model.expr.RangeValue;
-import net.sourceforge.waters.model.expr.Value;
 import net.sourceforge.waters.model.module.ColorGeometryProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 
@@ -38,18 +39,19 @@ class CompiledEventDecl
 
   //#########################################################################
   //# Constructors
-  CompiledEventDecl(final String name,
-		    final EventDeclProxy decl,
-		    final List ranges,
-		    final ModuleCompiler environment)
+  CompiledEventDecl(final String prefixedName,
+                    final EventDeclProxy decl,
+                    final List<RangeValue> ranges)
   {
-    mName = name;
-    mKind = decl.getKind();
-    mIsObservable = decl.isObservable();
-    mRanges = Collections.unmodifiableList(ranges);
-    mGeometry = decl.getColorGeometry();
-    mIndexValueMap = new HashMap();
-    mEnvironment = environment;
+    mPrefixedName = prefixedName;
+    mDecl = decl;
+    mRanges = ranges;
+    int size = 1;
+    for (final RangeValue range : ranges) {
+      size *= range.size();
+    }
+    mIndexValueMap =
+      new HashMap<List<IndexValue>,EventValue>(size);
   }
 
 
@@ -57,71 +59,73 @@ class CompiledEventDecl
   //# Simple Access
   String getName()
   {
-    return mName;
+    return mDecl.getName();
+  }
+
+  String getPrefixedName()
+  {
+    return mPrefixedName;
   }
 
   EventKind getKind()
   {
-    return mKind;
+    return mDecl.getKind();
   }
 
-  List getRanges()
+  boolean isObservable()
+  {
+    return mDecl.isObservable();
+  }
+
+  int getArity()
+  {
+    return mRanges.size();
+  }
+
+  List<RangeValue> getRanges()
   {
     return mRanges;
   }
 
-  RangeValue getRange(int index)
+  RangeValue getRange(final int index)
   {
-    return (RangeValue) mRanges.get(index);
+    return mRanges.get(index);
   }
 
   ColorGeometryProxy getColorGeometry()
   {
-    return mGeometry;
-  }
-
-
-  //#########################################################################
-  //# Value Creation
-  EventValue getValue()
-  {
-    final List empty = Collections.EMPTY_LIST;
-    return getValue(empty);
-  }
-
-  EventValue getValue(final List indexes)
-  {
-    EventValue result = (EventValue) mIndexValueMap.get(indexes);
-    if (result == null) {
-      if (indexes.size() == mRanges.size()) {
-	result = new SingleEventValue(this, indexes);
-      } else {
-	result = new ArrayEventValue(this, indexes);
-      }
-      mIndexValueMap.put(indexes, result);
-    }
-    return result;
-  }
-
-
-  //#########################################################################
-  //# Event Creation
-  EventProxy getEvent(final List indexes)
-  {
-    final String name = getIndexedName(indexes);
-    final EventProxy template = new EventProxy(name, mKind, mIsObservable);
-    return mEnvironment.getEvent(template);
+    return mDecl.getColorGeometry();
   }
 
 
   //#########################################################################
   //# Auxiliary Methods
-  String getIndexedName(final List indexes)
+  EventValue getValue()
   {
-    final StringBuffer buffer = new StringBuffer(mName);
-    final Iterator iter = indexes.iterator();
-    while (iter.hasNext()) {
-      final Value index = (Value) iter.next();
+    final List<IndexValue> empty = Collections.emptyList();
+    return getValue(empty);
+  }
+
+  EventValue getValue(List<? extends IndexValue> indexes)
+  {
+    final List<IndexValue> indexValues =
+      Collections.unmodifiableList(indexes);
+    EventValue result = mIndexValueMap.get(indexValues);
+    if (result == null) {
+      if (indexes.size() < mRanges.size()) {
+	result = new CompiledArrayEventValue(this, indexes);
+      } else {
+	result = new CompiledSingleEventValue(this, indexes);
+      }
+      mIndexValueMap.put(indexValues, result);
+    }
+    return result;
+  }
+
+  String getIndexedName(final List<? extends IndexValue> indexes)
+  {
+    final StringBuffer buffer = new StringBuffer(mPrefixedName);
+    for (final IndexValue index : indexes) {
       buffer.append('[');
       buffer.append(index);
       buffer.append(']');
@@ -129,15 +133,22 @@ class CompiledEventDecl
     return buffer.toString();
   }
 
+  void checkIndex(final int pos, final IndexValue value)
+    throws IndexOutOfRangeException
+  {
+    final RangeValue range = mRanges.get(pos);
+    if (!range.contains(value)) {
+      throw new IndexOutOfRangeException(value, range);
+    }
+  }
+
 
   //#########################################################################
   //# Data Members
-  private final String mName;
-  private final EventKind mKind;
-  private final boolean mIsObservable;
-  private final List mRanges;
-  private final ColorGeometryProxy mGeometry;
-  private final Map mIndexValueMap;
-  private final ModuleCompiler mEnvironment;
+  private final String mPrefixedName;
+  private final EventDeclProxy mDecl;
+  private final List<RangeValue> mRanges;
+  private final Map<List<IndexValue>,EventValue>
+    mIndexValueMap;
 
 }

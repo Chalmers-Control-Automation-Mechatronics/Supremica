@@ -1,9 +1,9 @@
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: waters.model.expr
+//# PACKAGE: net.sourceforge.waters.model.expr
 //# CLASS:   EvalException
 //###########################################################################
-//# $Id: EvalException.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: EvalException.java,v 1.2 2005-11-03 01:24:16 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.expr;
@@ -31,6 +31,15 @@ public class EvalException extends WatersException
   public EvalException(final String message)
   {
     super(message, null);
+  }
+
+  /**
+   * Constructs a new exception with <CODE>null</CODE> as its detail message
+   * and a specified originating expression.
+   */
+  public EvalException(final Proxy location)
+  {
+    mLocation = location;
   }
 
   /**

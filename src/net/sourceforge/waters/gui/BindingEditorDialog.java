@@ -1,49 +1,38 @@
 //# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: waters.gui
+//# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   BindingEditorDialog
 //###########################################################################
-//# $Id: BindingEditorDialog.java,v 1.3 2005-02-20 23:32:54 robi Exp $
+//# $Id: BindingEditorDialog.java,v 1.4 2005-11-03 01:24:15 robi Exp $
 //###########################################################################
+
+
 package net.sourceforge.waters.gui;
 
-import javax.swing.*;
-import javax.swing.event.*;
 import java.awt.*;
 import java.awt.event.*;
-import javax.xml.bind.JAXBException;
-import net.sourceforge.waters.model.base.*;
-import net.sourceforge.waters.model.module.*;
-import net.sourceforge.waters.model.module.InstanceProxy;
-import net.sourceforge.waters.model.expr.IdentifierProxy;
-import net.sourceforge.waters.model.expr.SimpleIdentifierProxy;
-import net.sourceforge.waters.xsd.base.ComponentKind;
-import net.sourceforge.waters.xsd.module.SimpleComponentType;
+import javax.swing.*;
+import javax.swing.event.*;
+
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.ParseException;
-import net.sourceforge.waters.model.expr.SimpleExpressionProxy;
-import net.sourceforge.waters.model.module.ForeachComponentProxy;
-import net.sourceforge.waters.model.module.EventDeclProxy;
-import net.sourceforge.waters.xsd.base.EventKind;
-import java.util.Vector;
+import net.sourceforge.waters.subject.module.ParameterBindingSubject;
+import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
+
 
 public class BindingEditorDialog
 	extends JDialog
 	implements ActionListener
 {
-	private final JTextField name = new JTextField(16);
-	private final JTextField expr = new JTextField(16);
-	private final JButton okButton = new JButton("OK");
-	ModuleWindow root = null;
-	DefaultListModel data = null;
-	JList dataList = null;
 
+	//#######################################################################
+	//# Constructor
 	public BindingEditorDialog(ModuleWindow root)
 	{
 		setTitle("Parameter Binding Editor");
 
-		this.root = root;
+		this.mRoot = root;
 
 		// Center this element on the screen
 		setModal(true);
@@ -65,14 +54,14 @@ public class BindingEditorDialog
 
 		b.add(r1);
 		r1.add(new JLabel("Parameter Name: "));
-		r1.add(name);
+		r1.add(mNameInput);
 
 		//TODO: Make this a file selector
 		JPanel r2 = new JPanel();
 
 		b.add(r2);
 		r2.add(new JLabel("Expression: "));
-		r2.add(expr);
+		r2.add(mExprInput);
 
 		JPanel r3 = new JPanel();
 
@@ -84,45 +73,36 @@ public class BindingEditorDialog
 		show();
 	}
 
-	public void actionPerformed(ActionEvent e)
+
+	//#######################################################################
+	//# Interface java.awt.event.ActionListener
+	public void actionPerformed(final ActionEvent e)
 	{
 		if ("OK".equals(e.getActionCommand()))
 		{
-			ExpressionParser parser = null;
-			SimpleExpressionProxy exp = null;
-			ParameterBindingProxy pb = null;
-
-			try
-			{
-				if (name.getText().length() != 0)
-				{
-					parser = new ExpressionParser();
-					exp = parser.parse(name.getText(), SimpleExpressionProxy.TYPE_NAME);
-
-					root.logEntry("Binding name passed validation: " + name.getText());
-
-					parser = new ExpressionParser();
-					exp = parser.parse(expr.getText());
-
-					root.logEntry("Binding expression passed validation: " + name.getText());
-				}
-				else
-				{
-					JOptionPane.showMessageDialog(this, "Invalid identifier");
-					root.logEntry("Binding name was found to be invalid: " + name.getText());
-				}
-			}
-			catch (final ParseException exception)
-			{
-				ErrorWindow.askRevert(exception,  expr.getText());
-				root.logEntry("ParseException in binding: " + exception.getMessage());
-
+			final ExpressionParser parser = mRoot.getExpressionParser();
+			final String nameText = mNameInput.getText();
+			final String exprText = mExprInput.getText();
+			SimpleExpressionSubject expr = null;
+			try {
+				parser.parseSimpleIdentifier(nameText);
+			} catch (final ParseException exception) {
+				JOptionPane.showMessageDialog(this, "Invalid identifier");
+				mRoot.logEntry
+					("Binding name was found to be invalid: " + nameText);
 				return;
 			}
-
-			pb = new ParameterBindingProxy(name.getText(), exp);
-
-			root.addComponent(pb);
+			try {
+				expr = (SimpleExpressionSubject) parser.parse(exprText);
+			} catch (final ParseException exception) {
+				ErrorWindow.askRevert(exception, exprText);
+				mRoot.logEntry("ParseException in binding: " +
+							   exception.getMessage());
+				return;
+			}
+			final ParameterBindingSubject binding =
+				new ParameterBindingSubject(nameText, expr);
+			mRoot.addComponent(binding);
 			dispose();
 		}
 
@@ -131,4 +111,13 @@ public class BindingEditorDialog
 			dispose();
 		}
 	}
+
+
+	//#######################################################################
+	//# Data Members
+	private final JTextField mNameInput = new JTextField(16);
+	private final JTextField mExprInput = new JTextField(16);
+	private final JButton okButton = new JButton("OK");
+	ModuleWindow mRoot = null;
+
 }

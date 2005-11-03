@@ -1,9 +1,10 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.build.jniglue
 //# CLASS:   MethodGlue
 //###########################################################################
-//# $Id: MethodGlue.java,v 1.1 2005-02-18 01:30:10 robi Exp $
+//# $Id: MethodGlue.java,v 1.2 2005-11-03 01:24:16 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.build.jniglue;
@@ -16,18 +17,19 @@ import java.util.Map;
 import java.util.Set;
 
 
-abstract class MethodGlue implements Comparable, WritableGlue {
+abstract class MethodGlue implements Comparable<MethodGlue>, WritableGlue {
 
   //#########################################################################
   //# Constructors
   MethodGlue()
   {
-    this(new ArrayList(0));
+    this(new ArrayList<ParameterGlue>(0));
   }
 
-  MethodGlue(final List parameters)
+  MethodGlue(final List<ParameterGlue> parameters)
   {
-    final List parcopy = new ArrayList(parameters);
+    final List<ParameterGlue> parcopy =
+      new ArrayList<ParameterGlue>(parameters);
     mParameterList = Collections.unmodifiableList(parcopy);
     mTypeSignature = null;
     mMethodNumber = -1;
@@ -55,9 +57,8 @@ abstract class MethodGlue implements Comparable, WritableGlue {
 
   //#########################################################################
   //# Interface java.lang.Comparable
-  public int compareTo(final Object partner)
+  public int compareTo(final MethodGlue method)
   {
-    final MethodGlue method = (MethodGlue) partner;
     final int result1 =
       getKindComparisonIndex() - method.getKindComparisonIndex();
     if (result1 != 0) {
@@ -67,16 +68,16 @@ abstract class MethodGlue implements Comparable, WritableGlue {
     if (result2 != 0) {
       return result2;
     }
-    final Iterator iter1 = mParameterList.iterator();
-    final Iterator iter2 = method.mParameterList.iterator();
+    final Iterator<ParameterGlue> iter1 = mParameterList.iterator();
+    final Iterator<ParameterGlue> iter2 = method.mParameterList.iterator();
     while (iter1.hasNext() && iter2.hasNext()) {
-      final ParameterGlue param1 = (ParameterGlue) iter1.next();
-      final ParameterGlue param2 = (ParameterGlue) iter2.next();
+      final ParameterGlue param1 = iter1.next();
+      final ParameterGlue param2 = iter2.next();
       final TypeGlue type1 = param1.getType();
       final TypeGlue type2 = param2.getType();
       final int result3 = type1.compareTo(type2);
       if (result3 != 0) {
-	return result3;
+        return result3;
       }
     }
     return (iter1.hasNext() ? 1 : 0) - (iter2.hasNext() ? 1 : 0);
@@ -104,9 +105,9 @@ abstract class MethodGlue implements Comparable, WritableGlue {
       final int arity = mParameterList.size();
       final Class[] result = new Class[arity];
       for (int i = 0; i < arity; i++) {
-	final ParameterGlue param = (ParameterGlue) mParameterList.get(i);
-	final TypeGlue type = param.getType();
-	result[i] = type.getJavaClass();
+        final ParameterGlue param = mParameterList.get(i);
+        final TypeGlue type = param.getType();
+        result[i] = type.getJavaClass();
       }
       return result;
     }
@@ -161,24 +162,23 @@ abstract class MethodGlue implements Comparable, WritableGlue {
 
   //#########################################################################
   //# Calculating Type Signatures
-  void collectSignatures(final Set names, final Map signatures)
+  void collectSignatures(final Set<String> names,
+			 final Map<String,TypeSignature> signatures)
   {
     if (mTypeSignature != null) {
       throw new IllegalStateException("Second call to collectSignatures()!");
     }
 
     final StringBuffer buffer = new StringBuffer();
-    final Iterator iter = mParameterList.iterator();
     buffer.append('(');
-    while (iter.hasNext()) {
-      final ParameterGlue param = (ParameterGlue) iter.next();
+    for (final ParameterGlue param : mParameterList) {
       param.appendTypeSignature(buffer);
     }
     buffer.append(')');
     getReturnType().appendTypeSignature(buffer);
 
     final String signame = buffer.toString();
-    final TypeSignature foundsig = (TypeSignature) signatures.get(signame);
+    final TypeSignature foundsig = signatures.get(signame);
     if (foundsig == null) {
       mTypeSignature = new TypeSignature(signame);
       signatures.put(signame, mTypeSignature);
@@ -190,14 +190,13 @@ abstract class MethodGlue implements Comparable, WritableGlue {
 
   //#########################################################################
   //# Calculating Dependencies
-  void collectUsedGlue(final Set results, final Set used)
+  void collectUsedGlue(final Set<ClassGlue> results,
+		       final Set<ClassGlue> used)
   {
     final TypeGlue returntype = getReturnType();
     returntype.collectUsedGlue(results);
     returntype.collectUsedGlue(used);
-    final Iterator iter = mParameterList.iterator();
-    while (iter.hasNext()) {
-      final ParameterGlue param = (ParameterGlue) iter.next();
+    for (final ParameterGlue param : mParameterList) {
       param.collectUsedGlue(used);
     }
   }
@@ -229,7 +228,7 @@ abstract class MethodGlue implements Comparable, WritableGlue {
 
   //#########################################################################
   //# Data Members
-  private final List mParameterList;
+  private final List<ParameterGlue> mParameterList;
   private TypeSignature mTypeSignature;
   private int mMethodNumber;
   private int mMethodCodeSuffix;

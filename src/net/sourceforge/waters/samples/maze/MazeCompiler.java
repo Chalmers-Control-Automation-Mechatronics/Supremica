@@ -1,10 +1,10 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: waters.samples.maze
+//# PACKAGE: net.sourceforge.waters.samples.maze
 //# CLASS:   MazeCompiler
 //###########################################################################
-//# $Id: MazeCompiler.java,v 1.2 2005-05-08 00:27:15 robi Exp $
+//# $Id: MazeCompiler.java,v 1.3 2005-11-03 01:24:16 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.samples.maze;
@@ -12,67 +12,69 @@ package net.sourceforge.waters.samples.maze;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import javax.xml.bind.JAXBException;
 
 import net.sourceforge.waters.model.base.DuplicateNameException;
-import net.sourceforge.waters.model.base.DocumentProxy;
-import net.sourceforge.waters.model.base.JAXBMarshaller;
-import net.sourceforge.waters.model.base.ModelException;
-import net.sourceforge.waters.model.base.UnexpectedWatersException;
-import net.sourceforge.waters.model.expr.SimpleIdentifierProxy;
+import net.sourceforge.waters.model.base.IndexedSet;
+import net.sourceforge.waters.model.base.IndexedTreeSet;
+import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.expr.OperatorTable;
+import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
+import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
+import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
+import net.sourceforge.waters.model.module.AliasProxy;
+import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
-import net.sourceforge.waters.model.module.EventListProxy;
 import net.sourceforge.waters.model.module.ExpressionProxy;
+import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.InstanceProxy;
+import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
-import net.sourceforge.waters.model.module.ModuleMarshaller;
+import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
+import net.sourceforge.waters.model.module.ParameterProxy;
+import net.sourceforge.waters.model.module.SimpleComponentProxy;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
+import net.sourceforge.waters.model.module.SimpleNodeProxy;
+
+import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 
-public class MazeCompiler
+public class MazeCompiler implements ProxyUnmarshaller<ModuleProxy>
 {
 
   //#########################################################################
   //# Constructors
   public MazeCompiler(final File inputdir,
-                      final File outputdir)
+                      final File outputdir,
+                      final ModuleProxyFactory factory)
     throws JAXBException
   {
-    this(inputdir, outputdir, true, new ModuleMarshaller());
+    this(inputdir, outputdir, factory,
+         new JAXBModuleMarshaller(factory, null));
   }
 
   public MazeCompiler(final File inputdir,
                       final File outputdir,
-                      final boolean bfs)
+                      final ModuleProxyFactory factory,
+                      final JAXBModuleMarshaller marshaller)
     throws JAXBException
-  {
-    this(inputdir, outputdir, bfs, new ModuleMarshaller());
-  }
-
-  public MazeCompiler(final File inputdir,
-                      final File outputdir,
-                      final JAXBMarshaller marshaller)
-  {
-    this(inputdir, outputdir, true, marshaller);
-  }
-
-  public MazeCompiler(final File inputdir,
-                      final File outputdir,
-                      final boolean bfs,
-                      final JAXBMarshaller marshaller)
   {
     mInputDir = inputdir;
     mOutputDir = outputdir;
-    mBFS = bfs;
-    mMarshaller = marshaller;
+    mFactory = factory;
+    mJAXBMarshaller = marshaller;
     mReader = new MazeReader();
-    mCopiedModules = new HashSet(16);
+    mCopiedModules = new HashSet<String>(16);
   }
 
 
@@ -90,112 +92,158 @@ public class MazeCompiler
     mCopiedModules.clear();
   }
 
-  public void setBFS(final boolean bfs)
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.base.ProxyUnmarshaller
+  public ModuleProxy unmarshal(final File inputfile)
+    throws WatersUnmarshalException, IOException
   {
-    mBFS = bfs;
+    final String pathname = inputfile.toString();
+    final int start1 = pathname.lastIndexOf(File.separatorChar);
+    final int start2 = start1 < 0 ? 0 : start1 + 1;
+    final int stop1 = pathname.lastIndexOf('.');
+    final int stop2 = stop1 < 0 ? pathname.length() : stop1;
+    final String name = pathname.substring(start2, stop2);
+    final Maze maze = mReader.load(inputfile, name);
+    maze.createActions();
+    return createModule(maze);
+  }
+
+  public Class<ModuleProxy> getDocumentClass()
+  {
+    return ModuleProxy.class;
+  }
+
+  public String getDefaultExtension()
+  {
+    return MAZEEXT;
+  }
+
+  public Collection<String> getSupportedExtensions()
+  {
+    return EXTENSIONS;
   }
 
 
   //#########################################################################
   //# Compiling Maze Files
-  public ModuleProxy compile(final String name)
-    throws JAXBException, IOException, ModelException
-  {
-    final String extname = name + MAZEEXT;
-    final File inputfile = new File(mInputDir, extname);
-    final Maze maze = mReader.load(inputfile, name);
-    if (mBFS) {
-      maze.locateRocks();
-    }
-    maze.createActions();
-    return createModule(maze);
-  }
-
   private ModuleProxy createModule(final Maze maze)
-    throws JAXBException, IOException, ModelException
+    throws WatersUnmarshalException, IOException
   {
     final String name = maze.getName();
-    final String extname = name + mMarshaller.getDefaultExtension();
+    final String extname = name + mJAXBMarshaller.getDefaultExtension();
     final File outputfile = new File(mOutputDir, extname);
-    final ModuleProxy module = new ModuleProxy(name, outputfile);
-    final List complist = module.getComponentList();
-    final Collection squares = maze.getSquares();
-    final Iterator iter = squares.iterator();
-    while (iter.hasNext()) {
-      final Square square = (Square) iter.next();
-      final InstanceProxy inst = createInstance(module, square);
-      complist.add(inst);
+    final Collection<Action> escapes = new LinkedList<Action>();
+    final List<Proxy> components = new LinkedList<Proxy>();
+    mEvents = new IndexedTreeSet<EventDeclProxy>();
+    final Collection<Square> squares = maze.getSquares();
+    for (final Square square : squares) {
+      final InstanceProxy inst = createInstance(square, escapes);
+      components.add(inst);
     }
-    return module;
+    if (!escapes.isEmpty()) {
+      final SimpleComponentProxy prop = createProperty(escapes);
+      components.add(prop);
+    }
+    final List<ParameterProxy> parameters = Collections.emptyList();
+    final List<AliasProxy> constants = Collections.emptyList();
+    final List<Proxy> aliases = Collections.emptyList();
+    return mFactory.createModuleProxy
+      (name, outputfile, parameters, constants, mEvents, aliases, components);
   }
 
-  private InstanceProxy createInstance(final ModuleProxy module,
-                                       final Square square)
-    throws JAXBException, IOException, ModelException
+  private InstanceProxy createInstance(final Square square,
+                                       final Collection<Action> escapes)
+    throws WatersUnmarshalException, IOException
   {
     final String templname = square.getTemplateName();
     copyModule(templname);
     final String name = square.getName();
-    final SimpleIdentifierProxy ident = new SimpleIdentifierProxy(name);
-    final InstanceProxy inst = new InstanceProxy(ident, templname);
-    final List bindings = inst.getBindingList();
-    final Iterator iter = square.getActionKinds().iterator();
-    while (iter.hasNext()) {
-      final Integer ikind = (Integer) iter.next();
-      final int kind = ikind.intValue();
+    final SimpleIdentifierProxy ident =
+      mFactory.createSimpleIdentifierProxy(name);
+    final List<ParameterBindingProxy> bindings =
+      new LinkedList<ParameterBindingProxy>();
+    for (final int kind : square.getActionKinds()) {
       final String param = Action.getTemplateName(kind);
-      final Collection actions = square.getActions(kind);
-      final ExpressionProxy value = createEventList(module, actions);
+      final Collection<Action> actions = square.getActions(kind);
+      final ExpressionProxy value = createEventList(actions, escapes);
       final ParameterBindingProxy binding =
-        new ParameterBindingProxy(param, value);
+        mFactory.createParameterBindingProxy(param, value);
       bindings.add(binding);
     }
-    return inst;
+    return mFactory.createInstanceProxy(ident, templname, bindings);
   }
 
-  private ExpressionProxy createEventList(final ModuleProxy module,
-                                          final Collection actions)
+  private SimpleComponentProxy createProperty(final Collection<Action> escapes)
   {
-    final Iterator iter = actions.iterator();
+    final ComponentKind kind = ComponentKind.PROPERTY;
+    final SimpleIdentifierProxy ident =
+      mFactory.createSimpleIdentifierProxy("property");
+    final List<Proxy> empty = Collections.emptyList();
+    final EventListExpressionProxy props =
+      mFactory.createPlainEventListProxy(empty);  
+    final SimpleNodeProxy node =
+      mFactory.createSimpleNodeProxy("q0", props, true, null, null);
+    final List<SimpleNodeProxy> nodes = Collections.singletonList(node);
+    final List<Proxy> blocked = new LinkedList<Proxy>();
+    for (final Action action : escapes) {
+      final ExpressionProxy event = createEvent(action, escapes);
+      blocked.add(event);
+    }
+    final LabelBlockProxy labelBlock =
+      mFactory.createLabelBlockProxy(blocked, null);
+    final List<EdgeProxy> edges = Collections.emptyList();
+    final GraphProxy graph =
+      mFactory.createGraphProxy(true, labelBlock, nodes, edges);
+    return mFactory.createSimpleComponentProxy(ident, kind, graph);
+  }
+
+  private ExpressionProxy createEventList(final Collection<Action> actions,
+                                          final Collection<Action> escapes)
+  {
     if (actions.size() == 1) {
-      final Action action = (Action) iter.next();
-      return createEvent(module, action);
+      final Iterator<Action> iter = actions.iterator();
+      final Action action = iter.next();
+      return createEvent(action, escapes);
     } else {
-      final EventListProxy eventlist = new EventListProxy();
-      while (iter.hasNext()) {
-        final Action action = (Action) iter.next();
-        final ExpressionProxy event = createEvent(module, action);
+      final List<Proxy> eventlist = new LinkedList<Proxy>();
+      for (final Action action : actions) {
+        final ExpressionProxy event = createEvent(action, escapes);
         eventlist.add(event);
       }
-      return new EventListExpressionProxy(eventlist);
+      return mFactory.createPlainEventListProxy(eventlist);
     }
   }
 
-  private ExpressionProxy createEvent(final ModuleProxy module,
-                                      final Action action)
+  private SimpleIdentifierProxy createEvent(final Action action,
+                                            final Collection<Action> escapes)
   {
     final String name = action.getName();
-    if (module.getEventDeclaration(name) == null) {
-      try {
-        final EventDeclProxy decl =
-          new EventDeclProxy(name, EventKind.UNCONTROLLABLE);
-        module.insertEventDeclaration(decl);
-      } catch (final DuplicateNameException exception) {
-        throw new UnexpectedWatersException(exception);
+    if (!mEvents.containsName(name)) {
+      final EventKind kind = EventKind.UNCONTROLLABLE;
+      final List<SimpleExpressionProxy> empty = Collections.emptyList();
+      final EventDeclProxy decl =
+        mFactory.createEventDeclProxy(name, kind, true, empty, null);
+      mEvents.add(decl);
+      if (action.isEscapeAction()) {
+        escapes.add(action);
       }
     }
-    return new SimpleIdentifierProxy(name);
+    return mFactory.createSimpleIdentifierProxy(name);
   }
 
   private void copyModule(final String name)
-    throws JAXBException, IOException, ModelException
+    throws WatersUnmarshalException, IOException
   {
     if (!mCopiedModules.contains(name)) {
-      final String extname = name + mMarshaller.getDefaultExtension();
+      final String extname = name + mJAXBMarshaller.getDefaultExtension();
       final File source = new File(mInputDir, extname);
-      final DocumentProxy module = mMarshaller.unmarshal(source);
       final File target = new File(mOutputDir, extname);
-      mMarshaller.marshal(module, target);
+      try {
+        mJAXBMarshaller.copyXMLFile(source, target);
+      } catch (final JAXBException exception) {
+        throw new WatersUnmarshalException(exception);
+      }
       mCopiedModules.add(name);
     }
   }
@@ -203,13 +251,18 @@ public class MazeCompiler
 
   //#########################################################################
   //# Data Members
-  private boolean mBFS;
   private File mInputDir;
   private File mOutputDir;
 
-  private final JAXBMarshaller mMarshaller;
+  private final ModuleProxyFactory mFactory;
+  private final JAXBModuleMarshaller mJAXBMarshaller;
   private final MazeReader mReader;
-  private final Set mCopiedModules;
+  private final Set<String> mCopiedModules;
+
+  private IndexedSet<EventDeclProxy> mEvents;
 
   private static final String MAZEEXT = ".txt";
+  private static final Collection<String> EXTENSIONS =
+    Collections.singletonList(MAZEEXT);
+
 }

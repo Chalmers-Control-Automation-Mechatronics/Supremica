@@ -9,26 +9,26 @@
 </ParameterList>
 <EventDeclList>
   <EventDecl Name="start" Kind="CONTROLLABLE">
-    <IntRangeExpression>
+    <BinaryExpression Operator="..">
       <IntConstant Value="1"/>
       <SimpleIdentifier Name="n"/>
-    </IntRangeExpression>
+    </BinaryExpression>
     <Comment>This is just to test whether I can have text in here.</Comment>
   </EventDecl>
   <EventDecl Name="finish" Kind="UNCONTROLLABLE">
-    <IntRangeExpression>
+    <BinaryExpression Operator="..">
       <IntConstant Value="1"/>
       <SimpleIdentifier Name="n"/>
-    </IntRangeExpression>
+    </BinaryExpression>
   </EventDecl>
   <EventDecl Name="@omega" Kind="PROPOSITION"/>
 </EventDeclList>
 <ComponentList>
   <ForeachComponent Name="i">
-    <IntRangeExpression>
+    <BinaryExpression Operator="..">
       <IntConstant Value="1"/>
       <SimpleIdentifier Name="n"/>
-    </IntRangeExpression>
+    </BinaryExpression>
     <ComponentList>
       <Instance ModuleName="machine">
         <IndexedIdentifier Name="machine">
@@ -51,13 +51,13 @@
     </ComponentList>
   </ForeachComponent>
   <ForeachComponent Name="i">
-    <IntRangeExpression>
+    <BinaryExpression Operator="..">
       <IntConstant Value="1"/>
       <BinaryExpression Operator="-">
         <SimpleIdentifier Name="n"/>
         <IntConstant Value="1"/>
       </BinaryExpression>
-    </IntRangeExpression>
+    </BinaryExpression>
     <ComponentList>
       <Instance ModuleName="buffer_sf1">
         <IndexedIdentifier Name="buffer">

@@ -1,42 +1,48 @@
-
+//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: waters.gui
+//# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.30 2005-09-14 11:21:14 flordal Exp $
+//# $Id: EditorSurface.java,v 1.31 2005-11-03 01:24:15 robi Exp $
 //###########################################################################
+
+
 package net.sourceforge.waters.gui;
 
-import java.awt.print.*;
-import javax.swing.*;
-import javax.swing.text.*;
-import java.util.*;
 import java.awt.*;
 import java.awt.geom.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
+import java.awt.print.PageFormat;
+import java.awt.print.Printable;
 import java.io.File;
 import java.io.IOException;
-import javax.xml.bind.JAXBException;
-import net.sourceforge.waters.model.base.*;
-import net.sourceforge.waters.model.module.*;
-import net.sourceforge.waters.model.expr.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedList;
+import javax.swing.*;
+import javax.swing.text.*;
+
+import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.module.NodeProxy;
+import net.sourceforge.waters.subject.base.AbstractSubject;
+import net.sourceforge.waters.subject.module.*;
 import net.sourceforge.waters.xsd.module.AnchorPosition;
 
-// Printing
-import java.awt.print.Printable;
 
 /**
  * <p>A component which allows for the display of module data.</p>
  *
- * <p>The EditorSurface is a viewer-only component.  It can load components from {@link ModuleProxy} objects
- * and translate them into its internal storage format, which allows for it to be displayed.
- * To provide interactive editing of an EditorSurface, use a {@link ControlledSurface}.</p>
+ * <p>The EditorSurface is a viewer-only component. It can load components
+ * from {@link ModuleSubject} objects and translate them into its internal
+ * storage format, which allows for it to be displayed. To provide
+ * interactive editing of an EditorSurface, use a {@link
+ * ControlledSurface}.</p>
  *
  * @author Gian Perrone
  */
+
 public class EditorSurface
 	extends JComponent
 	implements Printable
@@ -59,7 +65,7 @@ public class EditorSurface
 	protected int dragNowY;
 	protected boolean dragSelect = false;
 	protected EditorShade shade;
-	protected GraphProxy graph;
+	protected GraphSubject graph;
     protected EditorNodeGroup newGroup = null;
 	private Rectangle drawnAreaBounds = null;
 	
@@ -267,7 +273,7 @@ public class EditorSurface
 		{
 			EditorNode n = (EditorNode) nodes.get(i);
 
-			n.drawObject(g, root.getEventDeclList());
+			n.drawObject(g);
 		}
 
 		for (int i = 0; i < labels.size(); i++)
@@ -317,59 +323,45 @@ public class EditorSurface
 		*/
 	}
 
-	public static boolean isSimpleComponentProxy(Object o)
+	public static boolean isSimpleComponentSubject(Object o)
 	{
-		return (o instanceof SimpleComponentProxy);
+		return (o instanceof SimpleComponentSubject);
 	}
 
 	public void addNode(String name, int x, int y)
 	{
-		SimpleNodeProxy np = new SimpleNodeProxy(name);
-
-		EditorNode n = new EditorNode(x, y, np, this);
-
-		addNode(n);
+	    Collection<Proxy> ev = Collections.emptyList();
+	    SimpleNodeSubject np = new SimpleNodeSubject(name, new PlainEventListSubject(ev), false,
+							 new PointGeometrySubject(new Point2D.Double(x, y)), null);
+	    EditorNode n = new EditorNode(x, y, np, this);
+	    addNode(n);
 	}
 
-	public void addNode(SimpleNodeProxy np)
+	public void addNode(SimpleNodeSubject np)
 	{
 		EditorNode n = new EditorNode(np, this);
 
 		addNode(n);
 	}
 
-	public void addNode(EditorNode n)
+	public void addNode(final EditorNode n)
 	{
-	    System.out.println(n.getProxy());
-	    if (!graph.getNodes().contains(n.getProxy())) {
-		graph.getNodes().add(n.getProxy());
-	    }
+		final Collection<NodeSubject> subjects = graph.getNodesModifiable();
+		subjects.add(n.getSubject());
 	    nodes.add(n);
 	    addLabel(n, n.getName());
 	    repaint();
 	    examineCollisions();  
 	}
 
+
 	public void delNode(EditorNode n)
 	{
 		for (int i = edges.size()-1; i >= 0; i--) {
 			EditorEdge e = (EditorEdge) edges.get(i);
-
-			/*
-			try
-			{
-				System.err.println(((EditorNode) e.getStartNode()).getName() + " " + e.getEndNode().getName());
-			}
-			catch (Exception watchMeNotCare)
-			{
-				System.err.println("*** " + e.getEndNode().getName());
-			}
-			*/			
-
 			if ((e.getStartNode() == n) || (e.getEndNode() == n))
 			{
 				delEdge(e);
-				//delNode(n); // Recursive call?
 			}
 		}
 
@@ -380,70 +372,47 @@ public class EditorSurface
 			if (e.getParent() == (EditorObject) n)
 			{
 				delLabel(e);
-				//delNode(n); // Recursive call?
 			}
 		}
 
 		nodes.remove(n);
-		graph.getNodes().remove(n.getProxy());
+		final Collection<NodeSubject> subjects = graph.getNodesModifiable();
+		final NodeSubject subject = n.getSubject();
+		subjects.remove(subject);
+
 		examineCollisions();
 		repaint();
 	}
+
 
 	public EditorNodeGroup addNodeGroup(int x, int y, int w, int h)
 	{
-		GroupNodeProxy n = new GroupNodeProxy("NodeGroup" + nodeGroups.size());
-		n.setGeometry(new BoxGeometryProxy(x, y, w, h));
-
-		return addNodeGroup(n);
+	    Collection<Proxy> ev = Collections.emptyList();
+	    Collection<NodeProxy> ic = Collections.emptyList();
+	    BoxGeometrySubject g = new BoxGeometrySubject(new Rectangle2D.Double(x, y, w, h));
+	    GroupNodeSubject n = new GroupNodeSubject("NodeGroup" + nodeGroups.size(), new PlainEventListSubject(ev), ic, g);     
+	    return addNodeGroup(n);
 	}
 
-	public EditorNodeGroup addNodeGroup(GroupNodeProxy n)
-	{
-		EditorNodeGroup g = new EditorNodeGroup(n);
-		// Add proxy
-		if (!graph.getNodes().contains(n)) {
-		    graph.getNodes().add(n);
-		}
-		nodeGroups.add(g);
-		examineCollisions();
-		repaint();
 
-		return g;
+	public EditorNodeGroup addNodeGroup(GroupNodeSubject subject)
+	{
+		final EditorNodeGroup enode = new EditorNodeGroup(subject);
+		return addNodeGroup(enode);
 	}
 
-	public EditorNodeGroup addNodeGroup(EditorNodeGroup n)
+
+	public EditorNodeGroup addNodeGroup(final EditorNodeGroup enode)
 	{
-	    if(!graph.getNodes().contains(n.getProxy())) {
-		graph.getNodes().add(n.getProxy());
-	    }
-	    nodeGroups.add(n);
+		final Collection<NodeSubject> subjects = graph.getNodesModifiable();
+		final NodeSubject subject = enode.getSubject();
+		subjects.add(subject);
+	    nodeGroups.add(enode);
 	    examineCollisions();
 	    repaint();
-	    return n;
+	    return enode;
 	}
 
-	/*
-	public EditorNodeGroup getLastNodeGroup()
-	{
-		if (!nodeGroups.isEmpty())
-		{
-			return (EditorNodeGroup) nodeGroups.get(nodeGroups.size() - 1);
-		}
-
-		return null;
-	}
-
-	public EditorNode getLastNode()
-	{
-		if (nodes.size() > 0)
-		{
-			return (EditorNode) nodes.get(nodes.size() - 1);
-		}
-
-		return null;
-	}
-	*/
 
 	public EditorNode findNodeByHash(int hash)
 	{
@@ -475,19 +444,17 @@ public class EditorSurface
 		return null;
 	}
 
-	public EditorEdge addEdge(EditorEdge edge)
+	public EditorEdge addEdge(final EditorEdge edge)
 	{
-	    // Add proxy to graph
-	    if (!graph.getEdges().contains(edge.getProxy())) {
-		graph.getEdges().add(edge.getProxy());
-	    }
+		final Collection<EdgeSubject> subjects = graph.getEdgesModifiable();
+		subjects.add(edge.getSubject());
 	    edges.add(edge);
 	    addLabelGroup(edge);
 	    repaint();
 	    return edge;
 	}
 
-	public EditorEdge addEdge(EditorObject n1, EditorNode n2, EdgeProxy ep)
+	public EditorEdge addEdge(EditorObject n1, EditorNode n2, EdgeSubject ep)
 	{
 		int x = n2.getX();
 		int y = n2.getY();
@@ -515,7 +482,6 @@ public class EditorSurface
 			if (g.getParent() == (EditorObject) e)
 			{
 				delLabelGroup(g);
-				//delEdge(e); // Recursive call!??
 			}
 		}
 
@@ -525,21 +491,13 @@ public class EditorSurface
 		}
 
 		edges.remove(e);
-		graph.getEdges().remove(e.getProxy());
+		final EdgeSubject subject = e.getSubject();
+		final Collection<EdgeSubject> subjects = graph.getEdgesModifiable();
+		subjects.remove(subject);
+
 		repaint();
 	}
 
-	/*
-	public EditorEdge getLastEdge()
-	{
-		if (edges.size() > 0)
-		{
-			return (EditorEdge) edges.get(edges.size() - 1);
-		}
-
-		return null;
-	}
-	*/
 
 	public void addLabel(EditorNode o, String label)
 	{
@@ -614,7 +572,10 @@ public class EditorSurface
 		}
 
 		nodeGroups.remove(n);
-		graph.getNodes().remove(n.getProxy());
+		final Collection<NodeSubject> subjects = graph.getNodesModifiable();
+		final NodeSubject subject = n.getSubject();
+		subjects.remove(subject);
+
 		examineCollisions();
 		repaint();
 	}
@@ -933,14 +894,14 @@ public class EditorSurface
 	 * @param module The module to load events from
 	 * @param element The element to read
 	 */
-	public void loadElement(ModuleProxy module, ElementProxy element)
+	public void loadElement(ModuleSubject module, AbstractSubject element)
 	{
 		ArrayList unloadedNodeGroups = new ArrayList();
 		ArrayList unloadedEdges = new ArrayList();
 
-		if (isSimpleComponentProxy(element))
+		if (isSimpleComponentSubject(element))
 		{
-			SimpleComponentProxy cp = (SimpleComponentProxy) element;
+			SimpleComponentSubject cp = (SimpleComponentSubject) element;
 			ArrayList noGeometry = new ArrayList();
 
 			graph = cp.getGraph();
@@ -950,11 +911,11 @@ public class EditorSurface
 
 			while (iter.hasNext())
 			{
-				NodeProxy temp = (NodeProxy) iter.next();
+				NodeSubject temp = (NodeSubject) iter.next();
 
-				if (temp instanceof SimpleNodeProxy)
+				if (temp instanceof SimpleNodeSubject)
 				{
-					SimpleNodeProxy np = (SimpleNodeProxy) temp;
+					SimpleNodeSubject np = (SimpleNodeSubject) temp;
 
 					if (np.getPointGeometry() == null)
 					{
@@ -965,9 +926,9 @@ public class EditorSurface
 						addNode(np);
 					}
 				}
-				else if (temp instanceof GroupNodeProxy)
+				else if (temp instanceof GroupNodeSubject)
 				{
-					GroupNodeProxy gn = (GroupNodeProxy) temp;
+					GroupNodeSubject gn = (GroupNodeSubject) temp;
 
 					if (gn.getGeometry() == null)
 					{
@@ -1051,12 +1012,12 @@ public class EditorSurface
 			{
 				for (int j = 0; (j < size) && (i * size + j < noGeometry.size()); j++)
 				{
-					if (noGeometry.get(i * size + j) instanceof SimpleNodeProxy)
+					if (noGeometry.get(i * size + j) instanceof SimpleNodeSubject)
 					{
-						SimpleNodeProxy np = (SimpleNodeProxy) noGeometry.get(i * size + j);
-						Point2D.Double p = new Point2D.Double(x + (j * gridSize * 4) + EditorNode.WIDTH / 2, y + (i * gridSize * 4) + EditorNode.WIDTH / 2);
-						
-						np.setPointGeometry(new PointGeometryProxy(p));
+						SimpleNodeSubject np = (SimpleNodeSubject) noGeometry.get(i * size + j);
+						Point2D.Double p = new Point2D.Double(x + (j * gridSize * 4) + EditorNode.WIDTH / 2,
+										      y + (i * gridSize * 4) + EditorNode.WIDTH / 2);
+						np.setPointGeometry(new PointGeometrySubject(p));
 						addNode(np);
 					}
 				}
@@ -1065,7 +1026,7 @@ public class EditorSurface
 			java.util.List edges = graph.getEdges();
 			for (int j = 0; j < edges.size(); j++)
 			{
-				EdgeProxy e = (EdgeProxy) edges.get(j);
+				EdgeSubject e = (EdgeSubject) edges.get(j);
 				EditorObject s = null;
 				EditorNode t = null;
 
@@ -1482,7 +1443,7 @@ public class EditorSurface
 		return false;
 	}
 
-	// TODO: This should take a ModuleProxy as a parameter
+	// TODO: This should take a ModuleSubject as a parameter
 	public EditorSurface()
 	{
 		nodes = new ArrayList();
@@ -1610,3 +1571,4 @@ public class EditorSurface
 		return events;
     }
 }
+

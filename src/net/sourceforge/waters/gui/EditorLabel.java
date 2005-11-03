@@ -1,27 +1,36 @@
-
+//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: waters.gui
+//# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorLabel
 //###########################################################################
-//# $Id: EditorLabel.java,v 1.15 2005-08-30 02:16:47 siw4 Exp $
+//# $Id: EditorLabel.java,v 1.16 2005-11-03 01:24:15 robi Exp $
 //###########################################################################
+
+
 package net.sourceforge.waters.gui;
 
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.text.*;
 import javax.swing.border.*;
-import java.awt.*;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.*;
-import java.awt.geom.*;
+import java.awt.geom.Point2D;
 import java.awt.font.*;
 import java.lang.reflect.*;
 import java.beans.*;
-import net.sourceforge.waters.model.module.*;
+
+import net.sourceforge.waters.subject.base.Subject;
+import net.sourceforge.waters.subject.module.LabelGeometrySubject;
+import net.sourceforge.waters.xsd.module.AnchorPosition;
+
 
 /** 
- * <p>Editable label object for representing Events and Node names.</p>
+ * <p>Editable label object for representing event and node names.</p>
  *
  * <p>A label works based on an offset from the central point of
  * the object it is tied to (the center of a node or the control point of
@@ -29,29 +38,17 @@ import net.sourceforge.waters.model.module.*;
  *
  * @author Gian Perrone
  */
+
 public class EditorLabel
 	extends EditorObject
 {
-	private JTextField text;
-	private JLabel label;
-	/*
-	private JLabel labelShadow;
-	*/
-	private String backup = "";
-	private Rectangle boundingRect = new Rectangle();
-	private boolean editing = false;
-	private EditorNode parent = null;
-	private LabelGeometryProxy geometry;
-
-	public static final int DEFAULTOFFSETX = 5;
-	public static final int DEFAULTOFFSETY = 20;
 
 	/** 
 	 * Get the object which this label is attached to
 	 */
 	public EditorNode getParent()
 	{
-		return parent;
+		return mParent;
 	}
 
 	public void removeFromSurface(EditorSurface e)
@@ -76,7 +73,7 @@ public class EditorLabel
 		{
 			if (editing &&!backup.equals(text.getText()))
 			{
-				if (!parent.setName(text.getText(), (JComponent) text.getRootPane()))
+				if (!mParent.setName(text.getText(), (JComponent) text.getRootPane()))
 				{
 					edit = true;
 
@@ -100,35 +97,41 @@ public class EditorLabel
 		return editing;
 	}
     
-
-	public void setPosition(double x, double y)
+	public void setPosition(final double x, final double y)
 	{
-		geometry.getOffset().setLocation(x - parent.getX(), y - parent.getY());
+		final double px = mParent.getX();
+		final double py = mParent.getY();
+		setOffset(x - px, y - py);
 	}
 
-	public void setOffset(int x, int y)
+	public void setOffset(final double x, final double y)
 	{
-		geometry.getOffset().setLocation(x, y);
+		final Point2D offset = new Point2D.Double(x, y);
+		mGeometry.setOffset(offset);
 	}
 
     public Point2D getPosition()
     {
-	return new Point2D.Double(geometry.getOffset().getX() + parent.getX(), geometry.getOffset().getY() + parent.getY());
-    }
+		final double px = mParent.getX();
+		final double py = mParent.getY();
+		final Point2D result = mGeometry.getOffset();
+		result.setLocation(px + result.getX(), py + result.getY());
+		return result;
+	}
 
 	public int getOffsetX()
 	{
-	    return (int) geometry.getOffset().getX();
+	    return (int) mGeometry.getOffset().getX();
 	}
 
 	public int getOffsetY()
 	{
-	    return (int) geometry.getOffset().getY();
+	    return (int) mGeometry.getOffset().getY();
 	}
 
 	public void drawObject(Graphics g)
 	{
-        	if ((text == null) || (parent == null))
+        	if ((text == null) || (mParent == null))
 		{
 		    return;
 		}
@@ -159,8 +162,8 @@ public class EditorLabel
 		}
 		*/
 
-		int xposition = parent.getX() + (int) geometry.getOffset().getX();
-		int yposition = parent.getY() + (int) geometry.getOffset().getY();
+		int xposition = mParent.getX() + (int) mGeometry.getOffset().getX();
+		int yposition = mParent.getY() + (int) mGeometry.getOffset().getY();
 
 		text.setLocation(xposition - 1, yposition - 14);
 		label.setLocation(xposition - 1, yposition - 14);
@@ -234,7 +237,7 @@ public class EditorLabel
 	public void setHighlighted(boolean s)
 	{
 		super.setHighlighted(s);
-		parent.setHighlighted(s);
+		mParent.setHighlighted(s);
 	}
 
 	public EditorLabel(EditorNode par, String t, EditorSurface e)
@@ -253,15 +256,15 @@ public class EditorLabel
 
 		backup = text.getText();
 
-		if (par.getProxy().getLabelGeometry() == null)
+		if (par.getSubject().getLabelGeometry() == null)
 		{
-			geometry = new LabelGeometryProxy(DEFAULTOFFSETX, DEFAULTOFFSETY);
-
-			par.getProxy().setLabelGeometry(geometry);
+			final Point2D point = new Point(DEFAULTOFFSETX, DEFAULTOFFSETY);
+			mGeometry = new LabelGeometrySubject(point, DEFAULTANCHOR);
+			par.getSubject().setLabelGeometry(mGeometry);
 		}
 		else
 		{
-			geometry = par.getProxy().getLabelGeometry();
+			mGeometry = par.getSubject().getLabelGeometry();
 		}
 
 		label = new JLabel(text.getText());
@@ -282,7 +285,7 @@ public class EditorLabel
 		e.add(labelShadow);
 		*/
 
-		parent = par;
+		mParent = par;
 
 		text.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "enter");
 		text.getActionMap().put("enter", new AbstractAction()
@@ -302,4 +305,29 @@ public class EditorLabel
 			}
 		});
 	}
+
+
+	//#######################################################################
+	//# Overrides for Abstract Base Class EditorObject
+	public Subject getSubject()
+	{
+		throw new UnsupportedOperationException
+			("Class EditorLabel has no associated Subject!");
+	}
+
+
+	//########################################################################
+	//# Data Members
+	private JTextField text;
+	private JLabel label;
+	private String backup = "";
+	private Rectangle boundingRect = new Rectangle();
+	private boolean editing = false;
+	private EditorNode mParent = null;
+	private LabelGeometrySubject mGeometry;
+
+    static final int DEFAULTOFFSETX = 5;
+    static final int DEFAULTOFFSETY = 20;
+    static final AnchorPosition DEFAULTANCHOR = AnchorPosition.NW;
+
 }

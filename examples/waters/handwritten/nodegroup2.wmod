@@ -7,9 +7,9 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="nodegroup2"/>
 <Graph>
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="e"/>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="q0"/>
 <SimpleNode Name="q1"/>

@@ -1,9 +1,10 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.build.jniglue
 //# CLASS:   TemplateFileParser
 //###########################################################################
-//# $Id: TemplateFileParser.java,v 1.1 2005-02-18 01:30:10 robi Exp $
+//# $Id: TemplateFileParser.java,v 1.2 2005-11-03 01:24:16 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.build.jniglue;
@@ -26,7 +27,7 @@ class TemplateFileParser extends ErrorReporter {
   {
     super(filename);
     mReader = new FileReader(filename);
-    mFragmentStack = new LinkedList();
+    mFragmentStack = new LinkedList<StackEntry>();
     mCurrentSequence = new Template(filename);
     mCurrentContainer = mCurrentSequence;
     mPutbackCharacter = -2;
@@ -36,7 +37,7 @@ class TemplateFileParser extends ErrorReporter {
   TemplateFileParser(final Reader reader)
   {
     mReader = reader;
-    mFragmentStack = new LinkedList();
+    mFragmentStack = new LinkedList<StackEntry>();
     mCurrentSequence = new Template();
     mCurrentContainer = mCurrentSequence;
     mPutbackCharacter = -2;
@@ -110,7 +111,7 @@ class TemplateFileParser extends ErrorReporter {
           } while (code != -1);
           skipWhiteSpace();
         } else if (secondcode == '=') {
-          skipWhiteSpace(true);	  
+          skipWhiteSpace(true);   
         } else if (secondcode == -1) {
           buffer.append('$');
           putback(secondcode);
@@ -128,15 +129,15 @@ class TemplateFileParser extends ErrorReporter {
     if (!mFragmentStack.isEmpty()) {
       String kind;
       if (mCurrentContainer instanceof TemplateFragmentForeach) {
-	kind = "FOREACH";
+        kind = "FOREACH";
       } else if (mCurrentContainer instanceof TemplateFragmentConditional) {
-	kind = "IF";
+        kind = "IF";
       } else {
-	throw new IllegalStateException("Unexpected container class!");
+        throw new IllegalStateException("Unexpected container class!");
       }
       final ParseException exception =
-	createParseException("No matching $END for $" + kind + " in line " +
-			     mCurrentContainer.getLineNo() + "!");
+        createParseException("No matching $END for $" + kind + " in line " +
+                             mCurrentContainer.getLineNo() + "!");
       reportError(exception);
     }
   }
@@ -290,9 +291,9 @@ class TemplateFileParser extends ErrorReporter {
   {
     if (mCurrentContainer instanceof TemplateFragmentConditional) {
       final TemplateFragmentConditional conditional =
-	(TemplateFragmentConditional) mCurrentContainer;
+        (TemplateFragmentConditional) mCurrentContainer;
       if (conditional.getElse() == null) {
-	return conditional;
+        return conditional;
       }
     }
     throw createParseException("$ELSE without preceeding $IF!");
@@ -333,15 +334,15 @@ class TemplateFileParser extends ErrorReporter {
       switch (code) {
       case ' ':
       case '\t':
-	break;
+        break;
       case '\n':
-	if (!skipnl) {
-	  return;
-	}
-	break;
+        if (!skipnl) {
+          return;
+        }
+        break;
       default:
-	putback(code);
-	return;
+        putback(code);
+        return;
       }
     }
   }
@@ -388,7 +389,7 @@ class TemplateFileParser extends ErrorReporter {
     //#######################################################################
     //# Constructors
     private StackEntry(final TemplateFragmentSequence seq,
-		       final TemplateFragment container)
+                       final TemplateFragment container)
     {
       mSequence = seq;
       mContainer = container;
@@ -417,7 +418,7 @@ class TemplateFileParser extends ErrorReporter {
   //#########################################################################
   //# Data Members
   private final Reader mReader;
-  private final List mFragmentStack;
+  private final List<StackEntry> mFragmentStack;
 
   private TemplateFragmentSequence mCurrentSequence;
   private TemplateFragment mCurrentContainer;

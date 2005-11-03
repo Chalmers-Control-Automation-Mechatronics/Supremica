@@ -1,9 +1,10 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: waters.model.compiler
+//# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   CompiledNode
 //###########################################################################
-//# $Id: CompiledNode.java,v 1.2 2005-02-28 19:16:18 robi Exp $
+//# $Id: CompiledNode.java,v 1.3 2005-11-03 01:24:15 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -11,7 +12,6 @@ package net.sourceforge.waters.model.compiler;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.IdentityHashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 
@@ -33,15 +33,16 @@ class CompiledNode
   {
     mNode = node;
     mState = state;
-    mEdges = new LinkedList();
-    mTransitions = new IdentityHashMap();
+    mEdges = new LinkedList<EdgeProxy>();
+    mTransitions =
+      new IdentityHashMap<EventProxy,Collection<CompiledTransition>>();
   }
 
   CompiledNode(final GroupNodeProxy node)
   {
     mNode = node;
     mState = null;
-    mEdges = new LinkedList();
+    mEdges = new LinkedList<EdgeProxy>();
     mTransitions = null;
   }
 
@@ -58,9 +59,9 @@ class CompiledNode
     return mState;
   }
 
-  Iterator getEdgeIterator()
+  Collection<EdgeProxy> getEdges()
   {
-    return mEdges.iterator();
+    return mEdges;
   }
 
   void addEdge(final EdgeProxy edge)
@@ -68,24 +69,24 @@ class CompiledNode
     mEdges.add(edge);
   }
 
-  Iterator getCompiledTransitionIterator(final EventProxy event)
+  Collection<CompiledTransition> getCompiledTransitions
+    (final EventProxy event)
   {
-    final Collection list = (Collection) mTransitions.get(event);
-    if (list == null) {
-      return Collections.EMPTY_LIST.iterator();
+    Collection<CompiledTransition> result = mTransitions.get(event);
+    if (result == null) {
+      return Collections.emptySet();
     } else {
-      return list.iterator();
+      return result;
     }
   }
 
-  void addTransition(final TransitionProxy trans,
-		     final NodeProxy group)
+  void addTransition(final TransitionProxy trans, final NodeProxy group)
   {
     final CompiledTransition entry = new CompiledTransition(trans, group);
     final EventProxy event = trans.getEvent();
-    Collection list = (Collection) mTransitions.get(event);
+    Collection<CompiledTransition> list = mTransitions.get(event);
     if (list == null) {
-      list = new LinkedList();
+      list = new LinkedList<CompiledTransition>();
       mTransitions.put(event, list);
     }
     list.add(entry);
@@ -108,14 +109,17 @@ class CompiledNode
   private void collectChildNodes()
   {
     if (mChildNodes == null) {
-      mChildNodes = new IdentityHashMap();
-      final Iterator iter = mNode.getChildNodeIterator();
-      while (iter.hasNext()) {
-	final NodeProxy node = (NodeProxy) iter.next();
-	if (mNode != node) {
-	  mChildNodes.put(node, node);
-	}
-      }
+      mChildNodes = new IdentityHashMap<NodeProxy,NodeProxy>();
+      collectChildNodes(mNode);
+    }
+  }
+
+  private void collectChildNodes(final NodeProxy node)
+  {
+    mChildNodes.put(node, node);
+    final Collection<NodeProxy> children = node.getImmediateChildNodes();
+    for (final NodeProxy child : children) {
+      collectChildNodes(child);
     }
   }
 
@@ -124,9 +128,9 @@ class CompiledNode
   //# Data Members
   private final NodeProxy mNode;
   private final StateProxy mState;
-  private final Collection mEdges;
-  private final Map mTransitions;
+  private final Collection<EdgeProxy> mEdges;
+  private final Map<EventProxy,Collection<CompiledTransition>> mTransitions;
 
-  private Map mChildNodes;
+  private Map<NodeProxy,NodeProxy> mChildNodes;
 
 }

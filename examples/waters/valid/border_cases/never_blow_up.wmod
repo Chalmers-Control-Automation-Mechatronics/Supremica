@@ -8,9 +8,9 @@
 <SimpleComponent Kind="SPEC">
 <SimpleIdentifier Name="never_blow_up"/>
 <Graph Deterministic="true">
-<EventList>
+<LabelBlock>
 <SimpleIdentifier Name="blow_up"/>
-</EventList>
+</LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="never">
 <EventList>

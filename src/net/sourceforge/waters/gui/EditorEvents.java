@@ -1,10 +1,10 @@
 //# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: waters.gui
+//# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorEvents
 //###########################################################################
-//# $Id: EditorEvents.java,v 1.16 2005-07-07 03:24:12 siw4 Exp $
+//# $Id: EditorEvents.java,v 1.17 2005-11-03 01:24:15 robi Exp $
 //###########################################################################
 
 
@@ -48,11 +48,13 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
-import net.sourceforge.waters.model.expr.IdentifierProxy;
-import net.sourceforge.waters.model.expr.SimpleExpressionProxy;
-import net.sourceforge.waters.model.module.GraphProxy;
-import net.sourceforge.waters.model.module.ModuleProxy;
-import net.sourceforge.waters.model.module.SimpleComponentProxy;
+import net.sourceforge.waters.model.expr.ExpressionParser;
+import net.sourceforge.waters.model.expr.Operator;
+import net.sourceforge.waters.subject.module.IdentifierSubject;
+import net.sourceforge.waters.subject.module.GraphSubject;
+import net.sourceforge.waters.subject.module.ModuleSubject;
+import net.sourceforge.waters.subject.module.SimpleComponentSubject;
+import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 
 
 
@@ -72,14 +74,16 @@ public class EditorEvents
 
 	//#######################################################################
 	//# Constructors
-	public EditorEvents(final ModuleProxy module,
-						final SimpleComponentProxy comp)
+	public EditorEvents(final ModuleSubject module,
+						final SimpleComponentSubject comp,
+						final ExpressionParser parser)
 	{
-		this(module, comp.getGraph());
+		this(module, comp.getGraph(), parser);
 	}
 
-	public EditorEvents(final ModuleProxy module,
-						final GraphProxy graph)
+	public EditorEvents(final ModuleSubject module,
+						final GraphSubject graph,
+						final ExpressionParser parser)
 	{
 		final TableModel model = new EventTableModel(graph, module, this);
 		final Dimension ispacing = new Dimension(0, 0);
@@ -101,7 +105,7 @@ public class EditorEvents
 		final TableCellRenderer textrenderer1 =
 			new RendererNoFocus(textrenderer0, true);
 		setDefaultRenderer(Object.class, textrenderer1);
-		final TableCellEditor editor = new IdentifierEditor();
+		final TableCellEditor editor = new IdentifierEditor(parser);
 		setDefaultEditor(Object.class, editor);
 
 		setPreferredSizes();
@@ -192,13 +196,13 @@ public class EditorEvents
 	}
 
 
-	public void setBuffer(final IdentifierProxy ident)
+	public void setBuffer(final IdentifierSubject ident)
 	{
 		mBuffer = ident;
 	}
 
 
-	public IdentifierProxy getBuffer()
+	public IdentifierSubject getBuffer()
 	{
 		return null;
 	}
@@ -336,9 +340,9 @@ public class EditorEvents
 
 		//###################################################################
 		//# Constructors
-		private IdentifierEditor()
+		private IdentifierEditor(final ExpressionParser parser)
 		{
-			super(new SimpleExpressionCell(SimpleExpressionProxy.TYPE_NAME));
+			super(new SimpleExpressionCell(Operator.TYPE_NAME, parser));
 		}
 
 
@@ -432,7 +436,7 @@ public class EditorEvents
 
 
 		//###################################################################
-		//# Interface ava.awt.event.ActionListener
+		//# Interface java.awt.event.ActionListener
 		public void actionPerformed(final ActionEvent event)
 		{
 			if (!isEditing()) {
@@ -452,20 +456,20 @@ public class EditorEvents
 
 	}
 
+
+
 	//#######################################################################
 	//# Representation of Transferable
-
-
 	private class IdentifierTransfer implements Transferable
 	{
-		// the IdentifierProxy transferred by this Object
+		// the IdentifierSubject transferred by this Object
 		Object ip_;
 		DataFlavor data_;
 		
 		/**
-		 * creates a new transferable object containing the specified IdentifierProxy
+		 * creates a new transferable object containing the specified IdentifierSubject
 		 *
-		 * @param ip the IdentifierProxy being transferred
+		 * @param ip the IdentifierSubject being transferred
 		 */
 
 		public IdentifierTransfer(Object ip)
@@ -500,13 +504,12 @@ public class EditorEvents
 	{	  		
 		public void dragOver(DragSourceDragEvent e)
 		{
-			System.out.println("MouseMoved");
 			if (e.getTargetActions() == DnDConstants.ACTION_COPY) {
-				
-				e.getDragSourceContext().setCursor(DragSource.DefaultCopyDrop);
-			}
-			else {
-				e.getDragSourceContext().setCursor(DragSource.DefaultCopyNoDrop);
+				e.getDragSourceContext().setCursor
+					(DragSource.DefaultCopyDrop);
+			} else {
+				e.getDragSourceContext().setCursor
+					(DragSource.DefaultCopyNoDrop);
 			}
 		}
 	}
@@ -515,18 +518,17 @@ public class EditorEvents
 	{
 		public void dragGestureRecognized(DragGestureEvent e)
 		{
-			System.out.println("drag recognized");
 			final int row = rowAtPoint(e.getDragOrigin());
 			if (row == -1) {
 				return;
 			}
 			final EventTableModel model = (EventTableModel) getModel();
-			Transferable t = new IdentifierTransfer(model.createIdentifierWithKind(model.getEvent(row)));
+			final Transferable t = new IdentifierTransfer
+				(model.createIdentifierWithKind(model.getEvent(row)));
 			try {
 				e.startDrag(DragSource.DefaultCopyDrop, t);
-				System.out.println("drag started");
-			}catch( InvalidDnDOperationException idoe ) {
-				System.err.println( idoe );
+			} catch (InvalidDnDOperationException idoe) {
+				throw new IllegalArgumentException(idoe);
 			}
 		}
 	}
@@ -535,11 +537,12 @@ public class EditorEvents
 
 	//#######################################################################
 	//# Data Members
-	private IdentifierProxy mBuffer;
+	private IdentifierSubject mBuffer;
 	private DragSource mDragSource;
 	private DragGestureListener mDGListener;
 	private DragSourceListener mDSListener;
 	private int mDragAction = DnDConstants.ACTION_COPY;
+
 
 	//#######################################################################
 	//# Class Constants

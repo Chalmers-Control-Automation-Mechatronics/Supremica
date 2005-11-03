@@ -1,20 +1,20 @@
 package net.sourceforge.waters.gui;
 
-import net.sourceforge.waters.model.expr.IdentifierProxy;
+import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 public class IdentifierWithKind
 {
-    private IdentifierProxy ip_;
+    private IdentifierSubject ip_;
     private EventKind e_;
     
-    public IdentifierWithKind(IdentifierProxy ip, EventKind e)
+    public IdentifierWithKind(IdentifierSubject ip, EventKind e)
     {
 	ip_ = ip;
 	e_ = e;
     }
     
-    public IdentifierProxy getIdentifier()
+    public IdentifierSubject getIdentifier()
     {
 	return ip_;
     }

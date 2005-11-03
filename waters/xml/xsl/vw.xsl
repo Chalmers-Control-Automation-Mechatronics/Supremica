@@ -185,9 +185,9 @@
 <xsl:template match="events[count(./*) = 0]"/>
 
 <xsl:template match="events">
-  <EventList>
+  <LabelBlock>
     <xsl:apply-templates select="*"/>
-  </EventList>
+  </LabelBlock>
 </xsl:template>
 
 <xsl:template match="events/event">
@@ -375,7 +375,10 @@
       <xsl:variable
         name="body"
         select="substring($expr,2,string-length($expr)-2)"/>
-      <IntRangeExpression>
+      <BinaryExpression>
+        <xsl:attribute name="Operator">
+          <xsl:text>..</xsl:text>
+        </xsl:attribute>
         <IntConstant>
           <xsl:attribute name="Value">
             <xsl:value-of select="substring-before($body,'..')"/>
@@ -386,7 +389,7 @@
             <xsl:value-of select="substring-after($body,'..')"/>
           </xsl:attribute>
         </IntConstant>
-      </IntRangeExpression>
+      </BinaryExpression>
     </xsl:when>
     <xsl:when test="starts-with($expr,'{')">
       <xsl:variable
@@ -401,7 +404,10 @@
           </EnumSetExpression>
         </xsl:when>
         <xsl:otherwise>
-          <IntRangeExpression>
+          <BinaryExpression>
+            <xsl:attribute name="Operator">
+              <xsl:text>..</xsl:text>
+            </xsl:attribute>
             <IntConstant>
               <xsl:attribute name="Value">
                 <xsl:value-of select="$body"/>
@@ -412,7 +418,7 @@
                 <xsl:value-of select="$body"/>
               </xsl:attribute>
             </IntConstant>
-          </IntRangeExpression>
+          </BinaryExpression>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:when>

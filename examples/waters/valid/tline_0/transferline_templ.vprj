@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE project PUBLIC "project" "project.dtd">
+
+<project name="transferline_templ"
+         legacy="1"
+         generatorName="VALID-II"
+         generatorVersion="2.8b5"
+         version="1.0"
+         creationDate="2002-04-12 09:01:10 GMT+02:00"
+         modificationDate="2002-04-17 08:37:52 GMT+02:00">
+<uses module="transferline_templ_main"/>
+</project>

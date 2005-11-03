@@ -1,9 +1,10 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.build.jniglue
 //# CLASS:   GlueFileParser
 //###########################################################################
-//# $Id: GlueFileParser.java,v 1.1 2005-02-18 01:30:10 robi Exp $
+//# $Id: GlueFileParser.java,v 1.2 2005-11-03 01:24:16 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.build.jniglue;
@@ -30,7 +31,7 @@ class GlueFileParser extends ErrorReporter {
     super(filename);
     final Reader reader = new FileReader(filename);
     mScanner = new GlueFileScanner(reader);
-    mClasses = new TreeMap();
+    mClasses = new TreeMap<String,ClassGlue>();
     mObjectClass = new ObjectClassGlue(this);
     final String name = mObjectClass.getClassName();
     mClasses.put(name, mObjectClass);
@@ -40,7 +41,7 @@ class GlueFileParser extends ErrorReporter {
   GlueFileParser(final Reader reader)
   {
     mScanner = new GlueFileScanner(reader);
-    mClasses = new TreeMap();
+    mClasses = new TreeMap<String,ClassGlue>();
     mObjectClass = new ObjectClassGlue(this);
     final String name = mObjectClass.getClassName();
     mClasses.put(name, mObjectClass);
@@ -66,7 +67,7 @@ class GlueFileParser extends ErrorReporter {
       reportError(exception);
     }
     if (getNumErrors() == 0) {
-      final Collection values = mClasses.values();
+      final Collection<ClassGlue> values = mClasses.values();
       final ClassGlueCollection result = new ClassGlueCollection(values);
       return result;
     } else {
@@ -89,10 +90,10 @@ class GlueFileParser extends ErrorReporter {
     Token token;
     do {
       try {
-	token = parseBlock();
+        token = parseBlock();
       } catch (final ParseException exception) {
-	reportError(exception);
-	token = recover();
+        reportError(exception);
+        token = recover();
       }
     } while (token.getTokenType() != TokenTable.C_EOF);
   }
@@ -162,20 +163,20 @@ class GlueFileParser extends ErrorReporter {
     if (token.getTokenType() != TokenTable.C_CLOSEBRACE) {
       final TypeGlue type = new ClassTypeGlue(classglue);
       while (true) {
-	requireIdentifier(token);
-	final String itemname = token.getTokenText();
-	final FieldGlue field = new FieldGlue(type, itemname);
-	if (!classglue.addField(field, this)) {
-	  final ParseException exception = createParseException
-	    ("Duplicate item " + field.getFieldName() +
-	     " in enumeration " + classglue.getClassName() + "!");
-	  reportError(exception);
-	}
-	token = nextToken();
-	if (token.getTokenType() != TokenTable.C_COMMA) {
-	  break;
-	}
-	token = nextToken();
+        requireIdentifier(token);
+        final String itemname = token.getTokenText();
+        final FieldGlue field = new FieldGlue(type, itemname);
+        if (!classglue.addField(field, this)) {
+          final ParseException exception = createParseException
+            ("Duplicate item " + field.getFieldName() +
+             " in enumeration " + classglue.getClassName() + "!");
+          reportError(exception);
+        }
+        token = nextToken();
+        if (token.getTokenType() != TokenTable.C_COMMA) {
+          break;
+        }
+        token = nextToken();
       }
       requireToken(token, TokenTable.T_CLOSEBRACE);
     }
@@ -195,7 +196,7 @@ class GlueFileParser extends ErrorReporter {
     ClassGlue classglue = (ClassGlue) mClasses.get(name);
     if (classglue == null) {
       classglue =
-	new PlainClassGlue(mPackageName, name, mObjectClass, mod, this);
+        new PlainClassGlue(mPackageName, name, mObjectClass, mod, this);
       mClasses.put(name, classglue);
     } else if (classglue.getModifier() != null) {
       throw createDuplicateClassException(name);
@@ -207,10 +208,10 @@ class GlueFileParser extends ErrorReporter {
     nextTokenKnown(TokenTable.T_OPENBRACE);
     do {
       try {
-	token = parseMethod(classglue);
+        token = parseMethod(classglue);
       } catch (final ParseException exception) {
-	reportError(exception);
-	token = recover(true);
+        reportError(exception);
+        token = recover(true);
       }
     } while (token.getTokenType() == TokenTable.C_SEMICOLON);
     requireToken(token, TokenTable.T_CLOSEBRACE);
@@ -241,28 +242,28 @@ class GlueFileParser extends ErrorReporter {
   {
     TypeGlue returntype;
     String methodname;
-    List parameters;
+    List<ParameterGlue> parameters;
     MethodGlue method;
     Token token = nextToken();
     if (token.getTokenType() == TokenTable.C_CLOSEBRACE) {
       return token;
     } else if (token.getTokenType() == TokenTable.C_IDENTIFIER &&
-	       token.getTokenText().equals(classglue.getClassName())) {
+               token.getTokenText().equals(classglue.getClassName())) {
       token = nextToken();
       switch (token.getTokenType()) {
       case TokenTable.C_OPENPAREN:
-	parameters = getParameterList();
-	method = new ConstructorGlue(parameters);
-	break;
+        parameters = getParameterList();
+        method = new ConstructorGlue(parameters);
+        break;
       case TokenTable.C_IDENTIFIER:
-	returntype = new ClassTypeGlue(classglue);
-	methodname = token.getTokenText();
-	nextTokenKnown(TokenTable.T_OPENPAREN);
-	parameters = getParameterList();
-	method = new PlainMethodGlue(returntype, methodname, parameters);
-	break;
+        returntype = new ClassTypeGlue(classglue);
+        methodname = token.getTokenText();
+        nextTokenKnown(TokenTable.T_OPENPAREN);
+        parameters = getParameterList();
+        method = new PlainMethodGlue(returntype, methodname, parameters);
+        break;
       default:
-	throw createUnexpectedTokenException(token, "identifier");
+        throw createUnexpectedTokenException(token, "identifier");
       }
     } else {
       returntype = getType(token, false);
@@ -274,29 +275,29 @@ class GlueFileParser extends ErrorReporter {
     }
     if (!classglue.addMethod(method, this)) {
       throw createParseException
-	("Redefinition of method " + method.getMethodName() +
-	 " with same parameter types!");
+        ("Redefinition of method " + method.getMethodName() +
+         " with same parameter types!");
     }
     return nextTokenKnown(TokenTable.T_SEMICOLON);
   }
 
-  private List getParameterList()
+  private List<ParameterGlue> getParameterList()
     throws IOException, ParseException
   {
-    final List parameters = new LinkedList();
+    final List<ParameterGlue> parameters = new LinkedList<ParameterGlue>();
     Token token = nextToken();
     if (token.getTokenType() != TokenTable.C_CLOSEPAREN) {
       while (true) {
-	final TypeGlue paramtype = getType(token, true);
-	token = nextTokenIdentifier();
-	final String paramname = token.getTokenText();
-	final ParameterGlue param = new ParameterGlue(paramname, paramtype);
-	parameters.add(param);
-	token = nextToken();
+        final TypeGlue paramtype = getType(token, true);
+        token = nextTokenIdentifier();
+        final String paramname = token.getTokenText();
+        final ParameterGlue param = new ParameterGlue(paramname, paramtype);
+        parameters.add(param);
+        token = nextToken();
         if (token.getTokenType() != TokenTable.C_COMMA) {
-	  break;
-	}
-	token = nextToken();
+          break;
+        }
+        token = nextToken();
       }
       requireToken(token, TokenTable.T_CLOSEPAREN);
     }
@@ -315,18 +316,18 @@ class GlueFileParser extends ErrorReporter {
       final SimpleTypeToken typetoken = (SimpleTypeToken) token;
       final SimpleTypeGlue type = typetoken.getTypeGlue();
       if (nonvoid && type.isVoid()) {
-	throw createUnexpectedTokenException(token, "non-void type");
+        throw createUnexpectedTokenException(token, "non-void type");
       }
       return type;
     case TokenTable.C_IDENTIFIER:
       final String name = token.getTokenText();
       final ClassGlue classglue = (ClassGlue) mClasses.get(name);
       if (classglue == null) {
-	throw createUndefinedClassException(name);
+        throw createUndefinedClassException(name);
       } else if (!classglue.checkGlueHeaders(useglue)) {
-	throw createClassNeedsGlueException(name);
+        throw createClassNeedsGlueException(name);
       } else {
-	return new ClassTypeGlue(classglue, useglue);
+        return new ClassTypeGlue(classglue, useglue);
       }
     default:
       throw createUnexpectedTokenException(token, "return type");
@@ -366,7 +367,7 @@ class GlueFileParser extends ErrorReporter {
   {
     if (mPackageName == null) {
       throw createParseException
-	("Class declaration without preceding package!");
+        ("Class declaration without preceding package!");
     }
   }
 
@@ -437,18 +438,18 @@ class GlueFileParser extends ErrorReporter {
   {
     do {
       try {
-	final Token token = nextToken();
-	switch (token.getTokenType()) {
-	case TokenTable.C_EOF:
-	case TokenTable.C_SEMICOLON:
-	  return token;
-	case TokenTable.C_CLOSEBRACE:
-	  if (atbrace) {
-	    return token;
-	  }
-	}
+        final Token token = nextToken();
+        switch (token.getTokenType()) {
+        case TokenTable.C_EOF:
+        case TokenTable.C_SEMICOLON:
+          return token;
+        case TokenTable.C_CLOSEBRACE:
+          if (atbrace) {
+            return token;
+          }
+        }
       } catch (final ParseException exception) {
-	reportError(exception);
+        reportError(exception);
       }
     } while (true);
   }
@@ -457,7 +458,7 @@ class GlueFileParser extends ErrorReporter {
   //#########################################################################
   //# Data Members
   private final GlueFileScanner mScanner;
-  private final Map mClasses;
+  private final Map<String,ClassGlue> mClasses;
   private final ClassGlue mObjectClass;
   private String mPackageName;
 

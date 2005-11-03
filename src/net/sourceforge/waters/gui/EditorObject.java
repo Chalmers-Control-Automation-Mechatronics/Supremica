@@ -1,15 +1,21 @@
-
+//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: waters.gui
+//# PACKAGE: wnet.sourceforge.aters.gui
 //# CLASS:   EditorObject
 //###########################################################################
-//# $Id: EditorObject.java,v 1.19 2005-09-14 15:16:09 flordal Exp $
+//# $Id: EditorObject.java,v 1.20 2005-11-03 01:24:15 robi Exp $
+//# $Id: EditorObject.java,v 1.20 2005-11-03 01:24:15 robi Exp $
 //###########################################################################
+
+
 package net.sourceforge.waters.gui;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
+
+import net.sourceforge.waters.subject.base.Subject;
+
 
 /**
  * <p>The super-class for all objects internally stored within an
@@ -200,7 +206,6 @@ public abstract class EditorObject
 
 	public void drawObject(Graphics g)
 	{
-		;
 	}
 
 	public abstract int getX();
@@ -210,4 +215,7 @@ public abstract class EditorObject
     public abstract void setPosition(double x, double y);
 
     public abstract Point2D getPosition();
+
+	public abstract Subject getSubject();
+
 }

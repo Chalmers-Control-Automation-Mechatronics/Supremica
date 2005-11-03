@@ -1,42 +1,65 @@
 //# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: waters.gui
+//# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleWindow
 //###########################################################################
-//# $Id: ModuleWindow.java,v 1.15 2005-08-30 00:18:45 siw4 Exp $
+//# $Id: ModuleWindow.java,v 1.16 2005-11-03 01:24:15 robi Exp $
 //###########################################################################
+
 package net.sourceforge.waters.gui;
 
+import java.awt.*;
+import java.awt.event.*;
+import java.beans.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 import javax.swing.*;
-import javax.swing.tree.*;
 import javax.swing.event.*;
-import javax.swing.undo.UndoableEdit;
+import javax.swing.tree.*;
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
+import javax.swing.undo.UndoableEdit;
 import javax.xml.bind.JAXBException;
-import net.sourceforge.waters.model.base.*;
-import net.sourceforge.waters.model.module.*;
-import java.util.ArrayList;
-import java.beans.*;
-import net.sourceforge.waters.xsd.base.ComponentKind;
-import java.util.Date;
-import java.util.Set;
-import java.util.HashSet;
+
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.observer.Subject;
+import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.ExpressionParser;
+import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.expr.ParseException;
-import net.sourceforge.waters.model.expr.SimpleExpressionProxy;
-import net.sourceforge.waters.model.expr.IdentifierProxy;
-import net.sourceforge.waters.model.expr.SimpleIdentifierProxy;
+import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
+import net.sourceforge.waters.model.marshaller.ProxyMarshaller;
+import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
+import net.sourceforge.waters.model.marshaller.WatersMarshalException;
+import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
+import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.ModuleProxy;
+import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.model.module.ParameterProxy;
+import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
+import net.sourceforge.waters.subject.base.AbstractSubject;
+import net.sourceforge.waters.subject.base.NamedSubject;
+import net.sourceforge.waters.subject.module.ForeachSubject;
+import net.sourceforge.waters.subject.module.InstanceSubject;
+import net.sourceforge.waters.subject.module.ModuleSubject;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
+import net.sourceforge.waters.subject.module.ParameterBindingSubject;
+import net.sourceforge.waters.subject.module.ParameterSubject;
+import net.sourceforge.waters.subject.module.SimpleComponentSubject;
+import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
+import net.sourceforge.waters.xsd.base.ComponentKind;
+
 import org.supremica.automata.IO.ProjectBuildFromWaters;
 import org.supremica.automata.Project;
 
@@ -52,49 +75,19 @@ public class ModuleWindow
 	extends JFrame
 	implements ActionListener, FocusListener, UndoInterface
 {
-	private Set<Observer> mObservers = new HashSet();
-	private ModuleProxy module = null;
-	private JFileChooser fileChooser = new JFileChooser(".");
-	private JFileChooser fileSaveChooser = new JFileChooser(".");
-	private JMenuItem FileNewMenu;
-	private JMenuItem FileOpenMenu;
-	private JMenuItem FileSaveMenu;
-	private JMenuItem FileSaveAsMenu;
-	private JMenuItem FileExitMenu;
-	private JMenuItem analysisExportSupremicaMenu;
-	private JTree ModuleSelectTree = null;
-	private static Languages WLang;
-	private JButton NewSimpleButton;
-	private JButton NewForeachButton;
-	private JButton DeleteComponentButton;
-	private JButton NewEventButton;
-	private JButton DeleteEventButton;
-	private JButton newInstanceButton;
-	private JButton newBindingButton;
-	private JButton newParamButton;
-	private JButton newEventParamButton;
-	private JButton deleteParamButton;
-	private JTabbedPane tabbedPane;
-	private JTextArea debugArea;
-	private JPanel debugPane = null;
-	private String debugText = "";
-	private DefaultMutableTreeNode rootNode = null;
-	private JList dataList = null;
-	private DefaultListModel data = null;
-	private DefaultTreeModel treeModel = null;
-	private boolean modified = true;
-	private JList paramdataList = null;
-	private DefaultListModel paramData = null;
-	private org.supremica.gui.Supremica supremica = null;
-	private final UndoManager mUndoManager = new UndoManager();
 
+	//########################################################################
+	//# Constructor
 	public ModuleWindow(String title)
 	{
 		setTitle(title);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-		module = new ModuleProxy("Unnamed Module", null);
+		module = new ModuleSubject(title, null);
 		debugPane = createDebugPane();
+
+		final ModuleProxyFactory factory = ModuleSubjectFactory.getInstance();
+		final OperatorTable optable = CompilerOperatorTable.getInstance();
+		mExpressionParser = new ExpressionParser(factory, optable);
 
 		constructWindow();
 		pack();
@@ -102,82 +95,81 @@ public class ModuleWindow
 		setVisible(true);
 	}
 
-	/** Load a Waters module into the module viewer.
+	/**
+	 * Load a Waters module into the module viewer.
 	 * @param wmodf The file to load the module from
 	 */
-	public void loadWmodFile(File wmodf)
+	public void loadWmodFile(final File wmodf)
 	{
 		logEntry("Attempting to load: " + wmodf);
-
-		try
-		{
-			final ProxyMarshaller marshaller = new ModuleMarshaller();
-
-			module = (ModuleProxy) marshaller.unmarshal(wmodf);
+		try {
+			final ModuleProxyFactory factory =
+				ModuleSubjectFactory.getInstance();
+			final OperatorTable optable = CompilerOperatorTable.getInstance();
+			final ProxyUnmarshaller<ModuleProxy> unMarshaller =
+				new JAXBModuleMarshaller(factory, optable);
+			module = (ModuleSubject) unMarshaller.unmarshal(wmodf);
 			clearList();
-		}
-		catch (final JAXBException exception)
-		{
-
-			// Something bad happened
-			JOptionPane.showMessageDialog(this, "Error loading module file! (JAXBException)");
-			logEntry("JAXBException - Failed to load: " + wmodf);
-
-			//exception.printStackTrace(System.err);
-		}
-		catch (final ModelException exception)
-		{
-			JOptionPane.showMessageDialog(this, "Error loading module file! (ModelException)");
-			logEntry("ModelException - Failed to load: " + wmodf);
-		}
-		catch (final Exception exception)
-		{
-			JOptionPane.showMessageDialog(this, "Error loading module file! (Exception)");
-			logEntry("ModelException - Failed to load: " + wmodf);
+		} catch (final JAXBException exception) {
+			JOptionPane.showMessageDialog(this,
+										  "Error loading module file:" +
+										  exception.getMessage());
+			logEntry("JAXBException - Failed to load  '" + wmodf + "'!");
+		} catch (final WatersUnmarshalException exception) {
+			JOptionPane.showMessageDialog(this,
+										  "Error loading module file:" +
+										  exception.getMessage());
+			logEntry("WatersUnmarshalException - Failed to load  '" +
+					 wmodf + "'!");
+		} catch (final IOException exception) {
+			JOptionPane.showMessageDialog(this,
+										  "Error loading module file:" +
+										  exception.getMessage());
+			logEntry("IOException - Failed to load  '" + wmodf + "'!");
 		}
 	}
 
 	public void saveWmodFile(File wmodf)
 	{
 		logEntry("Saving module to: " + wmodf);
-
-		try
-		{
-			final ProxyMarshaller marshaller = new ModuleMarshaller();
-
-			module.setLocation(wmodf);
+		try	{
+			final ModuleProxyFactory factory =
+				ModuleSubjectFactory.getInstance();
+			final OperatorTable optable = CompilerOperatorTable.getInstance();
+			final ProxyMarshaller<ModuleProxy> marshaller =
+				new JAXBModuleMarshaller(factory, optable);
 			marshaller.marshal(module, wmodf);
-		}
-		catch (final JAXBException exception)
-		{
-			// Something bad happened
-			JOptionPane.showMessageDialog(this, "Error saving module file! (JAXBException)");
-			logEntry("JAXBException - Failed to save: " + wmodf);
-		}
-		catch (final java.io.IOException exception)
-		{
-			JOptionPane.showMessageDialog(this, "Error saving module file! (IOException)");
-			logEntry("IOException - Failed to save: " + wmodf);
-		}
-		catch (final Exception exception)
-		{
-			JOptionPane.showMessageDialog(this, "Error loading module file! (Exception)");
-			logEntry("ModelException - Failed to load: " + wmodf);
+		} catch (final JAXBException exception) {
+			JOptionPane.showMessageDialog(this,
+										  "Error loading module file:" +
+										  exception.getMessage());
+			logEntry("JAXBException - Failed to load  '" + wmodf + "'!");
+		} catch (final WatersMarshalException exception) {
+			JOptionPane.showMessageDialog(this,
+										  "Error saving module file:" +
+										  exception.getMessage());
+			logEntry("WatersMarshalException - Failed to save  '" +
+					 wmodf + "'!");
+		} catch (final IOException exception) {
+			JOptionPane.showMessageDialog(this,
+										  "Error saving module file:" +
+										  exception.getMessage());
+			logEntry("IOException - Failed to save  '" + wmodf + "'!");
 		}
 	}
 
 	public void exportToSupremica()
 	{
 		//System.err.println("exportToSupremica");
-		ModuleProxy currModule = getModuleProxy();
+		ModuleSubject currModule = getModuleSubject();
 		ProjectBuildFromWaters builder = new ProjectBuildFromWaters();
 		Project supremicaProject = builder.build(currModule);
 
 		if (supremica == null)
 		{
 			// Initializes some properties
-			org.supremica.apps.Supremica dummySupremica = new org.supremica.apps.Supremica();
-
+			org.supremica.apps.Supremica dummySupremica =
+				new org.supremica.apps.Supremica();
 			supremica = org.supremica.apps.SupremicaWithGui.startSupremica();
 		}
 		else
@@ -201,9 +193,8 @@ public class ModuleWindow
 
 		if (module != null)
 		{
-			for (int i = 0; i < module.getEventDeclList().size(); i++)
-			{
-				data.addElement(((EventDeclProxy) (module.getEventDeclList().get(i))));
+			for (final EventDeclProxy event : module.getEventDeclList()) {
+				data.addElement(event);
 			}
 		}
 
@@ -245,12 +236,10 @@ public class ModuleWindow
 
 		if (module != null)
 		{
-			for (int i = 0; i < module.getParameterList().size(); i++)
-			{
-				paramData.addElement(((ParameterProxy) (module.getParameterList().get(i))));
+			for (final ParameterProxy param : module.getParameterList()) {
+				paramData.addElement(param);
 			}
 		}
-
 		paramdataList = new JList(paramData);
 
 		paramdataList.setCellRenderer(new ParameterListCell());
@@ -335,31 +324,32 @@ public class ModuleWindow
 		// TODO - Add logging to file
 	}
 
-	private DefaultMutableTreeNode makeTreeFromComponent(ElementProxy e)
+	private DefaultMutableTreeNode makeTreeFromComponent(AbstractSubject e)
 	{
-		if (e instanceof SimpleComponentProxy)
+		if (e instanceof SimpleComponentSubject)
 		{
-			final Object userobject = new ComponentInfo(((IdentifiedElementProxy) e).getName(), e);
-
+			final SimpleComponentSubject comp = (SimpleComponentSubject) e;
+			final String name = comp.getName();
+			final Object userobject = new ComponentInfo(name, e);
 			return new DefaultMutableTreeNode(userobject, false);
 		}
-		else if (e instanceof InstanceProxy)
+		else if (e instanceof InstanceSubject)
 		{
-			InstanceProxy i = (InstanceProxy) e;
+			InstanceSubject i = (InstanceSubject) e;
 			String name = "<html><b>Instance </b><i>" + i.getName() + "</i> = <i>" + i.getModuleName() + "</i></html>";
 			final Object userobject = new ComponentInfo(name, e);
 			DefaultMutableTreeNode tmp = new DefaultMutableTreeNode(userobject, true);
 
 			for (int j = 0; j < i.getBindingList().size(); j++)
 			{
-				tmp.add(makeTreeFromComponent((ElementProxy) (i.getBindingList().get(j))));
+				tmp.add(makeTreeFromComponent((AbstractSubject) (i.getBindingList().get(j))));
 			}
 
 			return tmp;
 		}
-		else if (e instanceof ParameterBindingProxy)
+		else if (e instanceof ParameterBindingSubject)
 		{
-			ParameterBindingProxy i = (ParameterBindingProxy) e;
+			ParameterBindingSubject i = (ParameterBindingSubject) e;
 			String name = "<html><b>Binding: </b><i>" + i.getName() + "</i> = <i>" + i.getExpression().toString() + "</i></html>";
 			final Object userobject = new ComponentInfo(name, e);
 
@@ -368,11 +358,11 @@ public class ModuleWindow
 		else
 		{
 			String name;
-			ForeachProxy v = (ForeachProxy) e;
-			ElementProxy range = v.getRange();
-			ElementProxy guard = v.getGuard();
+			ForeachSubject v = (ForeachSubject) e;
+			SimpleExpressionSubject range = v.getRange();
+			SimpleExpressionSubject guard = v.getGuard();
 
-			name = "<html><b>Foreach </b><i>" + ((NamedProxy) e).getName() + "</i>";
+			name = "<html><b>Foreach </b><i>" + ((NamedSubject) e).getName() + "</i>";
 
 			if (range != null)
 			{
@@ -389,7 +379,7 @@ public class ModuleWindow
 
 			for (int i = 0; i < v.getBody().size(); i++)
 			{
-				tn.add(makeTreeFromComponent((ElementProxy) (v.getBody().get(i))));
+				tn.add(makeTreeFromComponent((AbstractSubject) (v.getBody().get(i))));
 			}
 
 			return tn;
@@ -414,7 +404,7 @@ public class ModuleWindow
 
 		for (int i = 0; i < l.size(); i++)
 		{
-			treeNode.add(makeTreeFromComponent((ElementProxy) (l.get(i))));
+			treeNode.add(makeTreeFromComponent((AbstractSubject) (l.get(i))));
 		}
 
 		rootNode = treeNode;
@@ -464,11 +454,11 @@ public class ModuleWindow
 
 						if (node.isLeaf())
 						{
-							SimpleComponentProxy scp = (SimpleComponentProxy) (((ComponentInfo) nodeInfo).getComponent());
+							SimpleComponentSubject scp = (SimpleComponentSubject) (((ComponentInfo) nodeInfo).getComponent());
 
 							if (scp != null)
 							{
-								ed = new EditorWindow(scp.getName() + " - Waters Editor", module, scp, ModuleWindow.this);
+								ed = new EditorWindow(scp.getName() + " - Waters Editor", module, scp, ModuleWindow.this, ModuleWindow.this);
 							}
 						}
 					}
@@ -682,7 +672,7 @@ public class ModuleWindow
 
 			if (index != -1)
 			{
-				module.getEventDeclList().remove(data.get(index));
+				module.getEventDeclListModifiable().remove(data.get(index));
 				data.remove(index);
 			}
 
@@ -732,20 +722,18 @@ public class ModuleWindow
 			{
 				try
 				{
-					final ExpressionParser parser = new ExpressionParser();
-					ExpressionProxy ep = parser.parse(modName);
-
-					if (ep instanceof SimpleIdentifierProxy)
-					{
-						module = new ModuleProxy(modName, null);
-
+					final IdentifierProxy ident =
+						mExpressionParser.parseIdentifier(modName);
+					if (ident instanceof SimpleIdentifierProxy) {
+						module = new ModuleSubject(modName, null);
 						constructWindow();
 						logEntry("New module created: " + modName);
 					}
 					else
 					{
-						logEntry("Invalid module identifier: " + modName);
-						JOptionPane.showMessageDialog(this, "Invalid module identifier");
+						logEntry("Invalid module name: " + modName);
+						JOptionPane.showMessageDialog
+							(this, "Invalid module name");
 					}
 				}
 				catch (final ParseException exception)
@@ -809,9 +797,9 @@ public class ModuleWindow
 		}
 	}
 
-	public void addComponent(Object o)
+	public void addComponent(final AbstractSubject o)
 	{
-		logEntry("addComponent: " + ((ElementProxy) o).toString());
+		logEntry("addComponent: " + o);
 
 		if (module != null)
 		{
@@ -837,43 +825,43 @@ public class ModuleWindow
 
 			logEntry("addComponent: Parent: " + parentNode.toString());
 
-			if (ci.getComponent() instanceof ForeachProxy)
+			if (ci.getComponent() instanceof ForeachSubject)
 			{
-				((ForeachProxy) ci.getComponent()).getBody().add(o);
+				((ForeachSubject) ci.getComponent()).getBodyModifiable().add(o);
 			}
 			else
 			{
-				module.getComponentList().add(o);
+				module.getComponentListModifiable().add(o);
 			}
 
-			// We don't want InstanceProxy components having children
-			if (!(ci.getComponent() instanceof ForeachProxy) &&!(o instanceof ParameterBindingProxy))
+			// We don't want InstanceSubject components having children
+			if (!(ci.getComponent() instanceof ForeachSubject) &&!(o instanceof ParameterBindingSubject))
 			{
 				parentNode = rootNode;
 			}
 
-			if (!(ci.getComponent() instanceof InstanceProxy) && (o instanceof ParameterBindingProxy))
+			if (!(ci.getComponent() instanceof InstanceSubject) && (o instanceof ParameterBindingSubject))
 			{
 				return;
 			}
 
 			//constructWindow();
-			DefaultMutableTreeNode newChild = makeTreeFromComponent((ElementProxy) o);
+			DefaultMutableTreeNode newChild = makeTreeFromComponent((AbstractSubject) o);
 
 			treeModel.insertNodeInto(newChild, parentNode, treeModel.getChildCount(parentNode));
 
-			if (o instanceof ForeachProxy)
+			if (o instanceof ForeachSubject)
 			{
 				ModuleSelectTree.expandPath(new TreePath(newChild.getPath()));
 			}
 
-			if ((o instanceof SimpleComponentProxy))
+			if ((o instanceof SimpleComponentSubject))
 			{
-				SimpleComponentProxy scp = (SimpleComponentProxy) o;
+				SimpleComponentSubject scp = (SimpleComponentSubject) o;
 
-				logEntry("Adding SimpleComponentProxy: " + scp.getName());
+				logEntry("Adding SimpleComponentSubject: " + scp.getName());
 
-				EditorWindow ed = new EditorWindow(scp.getName() + " - Waters Editor", module, scp, this);
+				EditorWindow ed = new EditorWindow(scp.getName() + " - Waters Editor", module, scp, this, this);
 			}
 
 			ModuleSelectTree.expandPath(new TreePath(parentNode.getPath()));
@@ -893,7 +881,7 @@ public class ModuleWindow
 		;
 	}
 
-	public ModuleProxy getModuleProxy()
+	public ModuleSubject getModuleSubject()
 	{
 		return module;
 	}
@@ -967,8 +955,17 @@ public class ModuleWindow
 		}
 	}
 
-	
 
+	//########################################################################
+	//# Access the Module
+	public ExpressionParser getExpressionParser()
+	{
+		return mExpressionParser;
+	}
+
+
+	//########################################################################
+	//# Main Routine
 	public static void main(String[] args)
 	{
 		try
@@ -988,5 +985,47 @@ public class ModuleWindow
 		ModuleWindow editor = new ModuleWindow("Waters");
 
 	}
+
+
+	//########################################################################
+	//# Data Members
+	private Set<Observer> mObservers = new HashSet();
+	private ModuleSubject module = null;
+	private JFileChooser fileChooser = new JFileChooser(".");
+	private JFileChooser fileSaveChooser = new JFileChooser(".");
+	private JMenuItem FileNewMenu;
+	private JMenuItem FileOpenMenu;
+	private JMenuItem FileSaveMenu;
+	private JMenuItem FileSaveAsMenu;
+	private JMenuItem FileExitMenu;
+	private JMenuItem analysisExportSupremicaMenu;
+	private JTree ModuleSelectTree = null;
+	private JButton NewSimpleButton;
+	private JButton NewForeachButton;
+	private JButton DeleteComponentButton;
+	private JButton NewEventButton;
+	private JButton DeleteEventButton;
+	private JButton newInstanceButton;
+	private JButton newBindingButton;
+	private JButton newParamButton;
+	private JButton newEventParamButton;
+	private JButton deleteParamButton;
+	private JTabbedPane tabbedPane;
+	private JTextArea debugArea;
+	private JPanel debugPane = null;
+	private String debugText = "";
+	private DefaultMutableTreeNode rootNode = null;
+	private JList dataList = null;
+	private DefaultListModel data = null;
+	private DefaultTreeModel treeModel = null;
+	private boolean modified = true;
+	private JList paramdataList = null;
+	private DefaultListModel paramData = null;
+	private org.supremica.gui.Supremica supremica = null;
+	private ExpressionParser mExpressionParser;
+
+	private final UndoManager mUndoManager = new UndoManager();
+
+	private static Languages WLang;
 
 }

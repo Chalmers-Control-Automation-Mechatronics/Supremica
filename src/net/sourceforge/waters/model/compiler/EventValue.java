@@ -1,30 +1,30 @@
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: waters.model.compiler
+//# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   EventValue
 //###########################################################################
-//# $Id: EventValue.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: EventValue.java,v 1.2 2005-11-03 01:24:15 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
 
 import java.util.Iterator;
+import java.util.List;
 
+import net.sourceforge.waters.model.expr.RangeValue;
 import net.sourceforge.waters.model.expr.Value;
-import net.sourceforge.waters.model.module.ColorGeometryProxy;
-import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 
-interface EventValue extends Value {
+interface EventValue extends Value
+{
 
-  public Iterator getEventIterator();
+  public int getKindMask();
 
-  public EventKind getKind();
+  public boolean isObservable();
 
-  public ColorGeometryProxy getColorGeometry();
+  public Iterator<CompiledSingleEventValue> getEventIterator();
 
-  public void checkParameterType(final EventDeclProxy decl)
-    throws EventKindException;
+  public List<RangeValue> getIndexRanges();
 
 }

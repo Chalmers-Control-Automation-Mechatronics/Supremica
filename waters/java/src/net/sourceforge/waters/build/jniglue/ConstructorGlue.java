@@ -1,9 +1,10 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.build.jniglue
 //# CLASS:   ConstructorGlue
 //###########################################################################
-//# $Id: ConstructorGlue.java,v 1.1 2005-02-18 01:30:10 robi Exp $
+//# $Id: ConstructorGlue.java,v 1.2 2005-11-03 01:24:16 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.build.jniglue;
@@ -20,7 +21,7 @@ class ConstructorGlue extends MethodGlue {
   {
   }
 
-  ConstructorGlue(final List parameters)
+  ConstructorGlue(final List<ParameterGlue> parameters)
   {
     super(parameters);
   }
@@ -58,7 +59,7 @@ class ConstructorGlue extends MethodGlue {
       final Constructor constructor = javaclass.getConstructor(paramtypes);
     } catch (final NoSuchMethodException exception) {
       reporter.reportError
-	("Can't find this constructor in class " + javaclass.getName() + "!");
+        ("Can't find this constructor in class " + javaclass.getName() + "!");
     }
   }
 
