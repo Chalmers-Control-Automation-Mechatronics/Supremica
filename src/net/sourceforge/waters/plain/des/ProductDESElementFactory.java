@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.des;
 //# CLASS:   ProductDESElementFactory
 //###########################################################################
-//# $Id: ProductDESElementFactory.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: ProductDESElementFactory.java,v 1.3 2005-11-03 03:45:57 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.des;
@@ -42,15 +42,6 @@ public class ProductDESElementFactory
   
   //#########################################################################
   //# Factory Methods
-  public ProductDESElement createProductDESProxy
-    (final String name,
-     final File location,
-     final Collection<? extends EventProxy> events,
-     final Collection<? extends AutomatonProxy> automata)
-  {
-    return new ProductDESElement(name, location, events, automata);
-  }
-
   public AutomatonElement createAutomatonProxy
     (final String name,
      final ComponentKind kind,
@@ -61,6 +52,13 @@ public class ProductDESElementFactory
     return new AutomatonElement(name, kind, events, states, transitions);
   }
 
+  public AutomatonElement createAutomatonProxy
+    (final String name,
+     final ComponentKind kind)
+  {
+    return new AutomatonElement(name, kind);
+  }
+
   public EventElement createEventProxy
     (final String name,
      final EventKind kind,
@@ -69,12 +67,44 @@ public class ProductDESElementFactory
     return new EventElement(name, kind, observable);
   }
 
+  public EventElement createEventProxy(final String name, final EventKind kind)
+  {
+    return new EventElement(name, kind);
+  }
+
+  public ProductDESElement createProductDESProxy
+    (final String name,
+     final File location,
+     final Collection<? extends EventProxy> events,
+     final Collection<? extends AutomatonProxy> automata)
+  {
+    return new ProductDESElement(name, location, events, automata);
+  }
+
+  public ProductDESElement createProductDESProxy
+      (final String name,
+       final Collection<? extends EventProxy> events,
+       final Collection<? extends AutomatonProxy> automata)
+  {
+    return new ProductDESElement(name, events, automata);
+  }
+
+  public ProductDESElement createProductDESProxy(final String name)
+  {
+    return new ProductDESElement(name);
+  }
+
   public StateElement createStateProxy
     (final String name,
      final boolean initial,
      final Collection<? extends EventProxy> propositions)
   {
     return new StateElement(name, initial, propositions);
+  }
+
+  public StateElement createStateProxy(final String name)
+  {
+    return new StateElement(name);
   }
 
   public TransitionElement createTransitionProxy

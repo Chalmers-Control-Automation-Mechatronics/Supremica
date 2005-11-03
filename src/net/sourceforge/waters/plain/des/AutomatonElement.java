@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.des
 //# CLASS:   AutomatonElement
 //###########################################################################
-//# $Id: AutomatonElement.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: AutomatonElement.java,v 1.3 2005-11-03 03:45:57 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.des;
@@ -86,12 +86,27 @@ public final class AutomatonElement
     mTransitions = Collections.unmodifiableList(transitionscopy);
   }
 
+  /**
+   * Creates a new automaton using default values.
+   * This constructor creates an automaton with empty lists of events,
+   * states, and transitions.
+   * @param  name         The name to be given to the new automaton.
+   * @param  kind         The kind (<I>plant</I>, <I>specification</I>, etc.)
+   *                      of the new automaton.
+   */
+  AutomatonElement(final String name,
+                   final ComponentKind kind)
+  {
+    this(name,
+         kind,
+         emptyEventProxyList(),
+         emptyStateProxyList(),
+         emptyTransitionProxyList());
+  }
+
 
   //#########################################################################
   //# Interface java.lang.Cloneable
-  /**
-   * Returns a copy of this automaton.
-   */
   public AutomatonElement clone()
   {
     return (AutomatonElement) super.clone();
@@ -164,6 +179,24 @@ public final class AutomatonElement
     } else {
       return false;
     }    
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private static List<EventProxy> emptyEventProxyList()
+  {
+    return Collections.emptyList();
+  }
+
+  private static List<StateProxy> emptyStateProxyList()
+  {
+    return Collections.emptyList();
+  }
+
+  private static List<TransitionProxy> emptyTransitionProxyList()
+  {
+    return Collections.emptyList();
   }
 
 

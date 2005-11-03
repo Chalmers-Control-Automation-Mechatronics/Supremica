@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.des
 //# CLASS:   StateElement
 //###########################################################################
-//# $Id: StateElement.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: StateElement.java,v 1.3 2005-11-03 03:45:57 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.des;
@@ -41,20 +41,6 @@ public final class StateElement
   //#########################################################################
   //# Constructors
   /**
-   * Creates a new state without associated propositions.
-   * @param  name         The name to be given to the new state.
-   * @param  initial      A flag indicating whether the new state is to be
-   *                      an initial state.
-   */
-  StateElement(final String name,
-               final boolean initial)
-  {
-    super(name);
-    mIsInitial = initial;
-    mPropositions = Collections.emptyList();
-  }
-
-  /**
    * Creates a new state.
    * @param  name         The name to be given to the new state.
    * @param  initial      A flag indicating whether the new state is to be
@@ -71,6 +57,17 @@ public final class StateElement
     final List<EventProxy> modifiable =
       new ArrayList<EventProxy>(propositions);
     mPropositions = Collections.unmodifiableList(modifiable);
+  }
+
+  /**
+   * Creates a new state using default values.
+   * This constructor creates a state that is not initial
+   * and has no propositions.
+   * @param  name         The name to be given to the new state.
+   */
+  StateElement(final String name)
+  {
+    this(name, false, emptyEventProxyList());
   }
 
 
@@ -120,6 +117,14 @@ public final class StateElement
     } else {
       return false;
     }    
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private static List<EventProxy> emptyEventProxyList()
+  {
+    return Collections.emptyList();
   }
 
 

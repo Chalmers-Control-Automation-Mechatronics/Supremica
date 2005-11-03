@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.des
 //# CLASS:   EventElement
 //###########################################################################
-//# $Id: EventElement.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: EventElement.java,v 1.3 2005-11-03 03:45:57 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.des;
@@ -35,16 +35,6 @@ public class EventElement
   //#########################################################################
   //# Constructors
   /**
-   * Creates an observable event.
-   * @param  name        The name of the new event.
-   * @param  kind        The kind of the new event.
-   */
-  EventElement(final String name, final EventKind kind)
-  {
-    this(name, kind, true);
-  }
-
-  /**
    * Creates an event.
    * @param  name        The name of the new event.
    * @param  kind        The kind of the new event.
@@ -58,6 +48,16 @@ public class EventElement
     super(name);
     mKind = kind;
     mIsObservable = observable;
+  }
+
+  /**
+   * Creates an observable event.
+   * @param  name        The name of the new event.
+   * @param  kind        The kind of the new event.
+   */
+  EventElement(final String name, final EventKind kind)
+  {
+    this(name, kind, true);
   }
 
 

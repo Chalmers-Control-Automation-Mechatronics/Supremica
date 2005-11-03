@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.des
 //# CLASS:   ProductDESElement
 //###########################################################################
-//# $Id: ProductDESElement.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: ProductDESElement.java,v 1.3 2005-11-03 03:45:57 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.des;
@@ -12,6 +12,7 @@ package net.sourceforge.waters.plain.des;
 import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import net.sourceforge.waters.model.base.DuplicateNameException;
@@ -73,6 +74,47 @@ public class ProductDESElement
     mAutomata = Collections.unmodifiableSet(automatacopy);
   }
 
+  /**
+   * Creates a new product DES using default values.
+   * This constructor creates a product DES with a <CODE>null</CODE> file
+   * location.
+   * @param  name         The name to be given to the new product DES.
+   * @param  events       The event alphabet for the new product DES.
+   * @param  automata     The set of transitions for the new product DES.
+   * @throws DuplicateNameException to indicate that some event or automaton
+   *                      name is used more than once.
+   * @throws NameNotFoundException to indicate that some automaton refers
+   *                      to an with an unknown name.
+   * @throws ItemNotFoundException to indicate that some automaton uses
+   *                      an event object that does not belong
+   *                      to the given set of events.
+   */
+  ProductDESElement(final String name,
+                    final Collection<? extends EventProxy> events,
+                    final Collection<? extends AutomatonProxy> automata)
+  {
+    this(name, null, events, automata);
+  }
+
+
+  /**
+   * Creates a new product DES using default values.
+   * This constructor creates a product DES with a <CODE>null</CODE> file
+   * location, and empty lists of events and automata.
+   * @param  name         The name to be given to the new product DES.
+   * @throws DuplicateNameException to indicate that some event or automaton
+   *                      name is used more than once.
+   * @throws NameNotFoundException to indicate that some automaton refers
+   *                      to an with an unknown name.
+   * @throws ItemNotFoundException to indicate that some automaton uses
+   *                      an event object that does not belong
+   *                      to the given set of events.
+   */
+  ProductDESElement(final String name)
+  {
+    this(name, null, emptyEventProxyList(), emptyAutomatonProxyList());
+  }
+
 
   //#########################################################################
   //# Interface java.lang.Cloneable
@@ -131,6 +173,19 @@ public class ProductDESElement
     } else {
       return false;
     }    
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private static List<EventProxy> emptyEventProxyList()
+  {
+    return Collections.emptyList();
+  }
+
+  private static List<AutomatonProxy> emptyAutomatonProxyList()
+  {
+    return Collections.emptyList();
   }
 
 
