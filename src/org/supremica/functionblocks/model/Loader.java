@@ -50,6 +50,8 @@ package org.supremica.functionblocks.model;
 
 import java.io.File;
 import java.util.Iterator;
+import java.util.List;
+import java.util.LinkedList;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
@@ -60,7 +62,7 @@ import org.supremica.properties.SupremicaProperties;
 
 /**
  * The Loader class uses JAXB to load a FB
- * application into the FBRuntime and then run it.
+ * application into the FBRuntime.
  *
  *
  * Created: Mon Apr  4 10:29:32 2005
@@ -74,12 +76,94 @@ public class Loader
     private Resource resource;
 	private FBNetwork fbNetwork;
 
+	private List libraryPathList = new LinkedList();
+
     private JAXBContext context;
     private Unmarshaller unmarshaller;
 
-    public Loader(Device dev)
+    public Loader(Device device, String systemFileName, String libraryPath)
     {
-		device = dev;
+		this.device = device;
+
+		// determine library base dir
+		String libraryBase = null;
+		File systemFile = new File(systemFileName);
+
+		if (systemFile.getParent() != null)
+		{
+			libraryBase = systemFile.getParent();
+			systemFileName = systemFile.getName();
+		}
+		
+		// convert libraryPath string into list of Files
+		if (libraryPath == null)
+		{
+			if (libraryBase == null)
+			{
+				libraryPathList = null;
+			}
+			else
+			{
+				File libraryBaseFile = new File(libraryBase);
+
+				if (!libraryBaseFile.isDirectory())
+				{
+					java.lang.System.err.println("Loader(" + device.getName() + "): Specified library base is not a directory!:" + libraryBaseFile.getName());
+				}
+				else if (!libraryBaseFile.exists())
+				{
+					java.lang.System.err.println("Loader(" + device.getName() + "): Specified library base does not exist!:" + libraryBaseFile.getName());
+				}
+				else
+				{
+					libraryPathList.add(libraryBaseFile);
+				}
+			}
+		}
+		else // libraryPath is specified by the user
+		{
+			
+			while (true)
+			{
+				File curLibraryDir;
+				
+				if (libraryPath.indexOf(File.pathSeparatorChar) == -1)
+				{
+					curLibraryDir = new File(libraryPath);
+				}
+				else
+				{
+					curLibraryDir = new File(libraryPath.substring(0,libraryPath.indexOf(File.pathSeparatorChar)));
+				}
+				
+				if (!curLibraryDir.isDirectory())
+				{
+					java.lang.System.err.println("Loader(" + device.getName() + "): Specified library path element is not a directory!: " + curLibraryDir.getName());
+				}
+				else if (!curLibraryDir.exists())
+				{
+					java.lang.System.err.println("Loader(" + device.getName() + "): Specified library path element does not exist!: " + curLibraryDir.getName());
+				}
+				else
+				{
+					libraryPathList.add(new File(libraryBase, curLibraryDir.getName()));
+					if (libraryPath.indexOf(File.pathSeparatorChar) == -1)
+					{
+						break;
+					}
+				}
+				
+				libraryPath = libraryPath.substring(libraryPath.indexOf(File.pathSeparatorChar)+1);	
+			}
+
+			//for (Iterator iter = libraryPathList.iterator();iter.hasNext();)
+			//{
+			//	java.lang.System.out.println(iter.next());
+			//}
+			
+		}
+
+		// create unmarshaller
 		try
 		{
 			context = JAXBContext.newInstance("org.supremica.functionblocks.xsd.libraryelement");
@@ -91,43 +175,69 @@ public class Loader
 			java.lang.System.err.println(e);
 			java.lang.System.exit(1);
 		}		
+
+
+		load(systemFileName);
+
     }
 
     public void load(String fileName)
     {
 		
-		File file = new File(fileName);
-		if (file.exists())
+		File file = getFile(fileName);
+
+		try
 		{
-			try
+			Object unmarshalledXmlObject = unmarshaller.unmarshal(file);
+			if (unmarshalledXmlObject instanceof org.supremica.functionblocks.xsd.libraryelement.FBType)
 			{
-				Object unmarshalledXmlObject = unmarshaller.unmarshal(file);
-				if (unmarshalledXmlObject instanceof org.supremica.functionblocks.xsd.libraryelement.FBType)
-				{
-					loadFBType((org.supremica.functionblocks.xsd.libraryelement.FBType) unmarshalledXmlObject);
-				}
-				else if (unmarshalledXmlObject instanceof org.supremica.functionblocks.xsd.libraryelement.System)
-				{
-					loadSystem((org.supremica.functionblocks.xsd.libraryelement.System) unmarshalledXmlObject);
-				}
+				loadFBType((org.supremica.functionblocks.xsd.libraryelement.FBType) unmarshalledXmlObject);
 			}
-			catch (Exception e)
+			else if (unmarshalledXmlObject instanceof org.supremica.functionblocks.xsd.libraryelement.System)
 			{
-				e.printStackTrace(java.lang.System.err);
-				java.lang.System.exit(1);
+				java.lang.System.out.println("Loader.load(): Loading device " + device.getName() + " with " + fileName + " file.");
+				loadSystem((org.supremica.functionblocks.xsd.libraryelement.System) unmarshalledXmlObject);
 			}
 		}
-		else
+		catch (Exception e)
 		{
-			java.lang.System.err.println("Loader.load(" + fileName + "): The file does not exist!");
-			java.lang.System.exit(0);
+			e.printStackTrace(java.lang.System.err);
+			java.lang.System.exit(1);
 		}
     }
 
+	// find the fileName in the libraries and return the corresponding File
+	private File getFile(String fileName)
+	{
+		File theFile = new File(fileName);
+
+		if (libraryPathList != null)
+		{
+			for (Iterator iter = libraryPathList.iterator();iter.hasNext();)
+			{
+				File curLibraryDir = (File) iter.next();
+				theFile = new File(curLibraryDir, fileName);
+				//java.lang.System.out.println("Loader.getFile(" + fileName + "): Looking for file in " + theFile.toString());
+				if (theFile.exists())
+				{
+					break;
+				}
+			}
+		}
+		
+		if (!theFile.exists())
+		{
+			java.lang.System.err.println("Loader.getFile(" + fileName + "): The file does not exist in the specified libraries.");
+			java.lang.System.exit(1);
+		}
+
+		return theFile;
+	}
+	
     private void loadSystem(org.supremica.functionblocks.xsd.libraryelement.System xmlSystemData)
     {
+
 		// Loading with Devices and Resources
-		
 		if (xmlSystemData.isSetDevice())
 		{
 			org.supremica.functionblocks.xsd.libraryelement.Device theDevice = (org.supremica.functionblocks.xsd.libraryelement.Device) xmlSystemData.getDevice().get(0);
@@ -198,7 +308,7 @@ public class Loader
 		// load service FBs
 		else if (xmlFBTypeData.getName().equals("ADLINK_IO"))
 		{
-			resource.addServiceFBType("ADLINK_IO", new File(SupremicaProperties.getFBRuntimeLibraryPath() + "/ADLINK_IO.bsh"));
+			resource.addServiceFBType("ADLINK_IO", getFile("ADLINK_IO.bsh"));
 			
 			ServiceFBType newServiceFBType =  (ServiceFBType) resource.getFBType("ADLINK_IO");
 			
@@ -206,7 +316,7 @@ public class Loader
 		}
 		else if (xmlFBTypeData.getName().equals("IO_READER"))
 		{
-			resource.addServiceFBType("IO_READER", new File(SupremicaProperties.getFBRuntimeLibraryPath() + "/IO_READER.bsh"));
+			resource.addServiceFBType("IO_READER", getFile("IO_READER.bsh"));
 			
 			ServiceFBType newServiceFBType =  (ServiceFBType) resource.getFBType("IO_READER");
 			
@@ -214,7 +324,7 @@ public class Loader
 		}
 		else if (xmlFBTypeData.getName().equals("IO_WRITER"))
 		{
-			resource.addServiceFBType("IO_WRITER", new File(SupremicaProperties.getFBRuntimeLibraryPath() + "/IO_WRITER.bsh"));
+			resource.addServiceFBType("IO_WRITER", getFile("IO_WRITER.bsh"));
 			
 			ServiceFBType newServiceFBType =  (ServiceFBType) resource.getFBType("IO_WRITER");
 			
@@ -222,7 +332,7 @@ public class Loader
 		}
 		else if (xmlFBTypeData.getName().equals("E_DELAY"))
 		{
-			resource.addServiceFBType("E_DELAY", new File(SupremicaProperties.getFBRuntimeLibraryPath() + "/E_DELAY.bsh"));
+			resource.addServiceFBType("E_DELAY", getFile("E_DELAY.bsh"));
 			
 			ServiceFBType newServiceFBType =  (ServiceFBType) resource.getFBType("E_DELAY");
 			
@@ -254,7 +364,7 @@ public class Loader
 				// get and load the FB type
 				if(resource.getFBType(curFB.getType()) == null)
 				{
-					load(SupremicaProperties.getFBRuntimeLibraryPath() + "/" + curFB.getType() + ".fbt");
+					load(curFB.getType() + ".fbt");
 				}
 				fbNetwork.addFBInstance(curFB.getName(),curFB.getType());
 			}
@@ -553,7 +663,7 @@ public class Loader
 				// get and load the FB type
 				if(resource.getFBType(curFB.getType()) == null)
 				{
-					load(SupremicaProperties.getFBRuntimeLibraryPath() + "/" + curFB.getType() + ".fbt");
+					load(curFB.getType() + ".fbt");
 				}
 				newCompositeFBType.addFBInstance(curFB.getName(),curFB.getType());
 			}
@@ -585,6 +695,5 @@ public class Loader
 			}
 		}
     }
-
 
 }

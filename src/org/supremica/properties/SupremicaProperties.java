@@ -215,7 +215,7 @@ public final class SupremicaProperties
 	private static final String GENERAL_USE_ROBOTCOORDINATION = "generalUseRobotCoordination";
 
 	// FBRuntime Options
-	private static final String FB_RUNTIME_LIBRARY_PATH = "fbRuntimeLibraryPath";
+	//private static final String FB_RUNTIME_LIBRARY_PATH = "fbRuntimeLibraryPath";
 
 
 	// Junk
@@ -330,7 +330,7 @@ public final class SupremicaProperties
 		setProperty(SOFTPLC_CYCLE_TIME, "40", true);
 		setProperty(SHOW_ROBOTSTUDIO_LINK, "false", true);
 		setProperty(SHOW_COORDINATION_ABB, "false", true);
-		setProperty(FB_RUNTIME_LIBRARY_PATH, System.getProperty("user.home"), true);
+		//setProperty(FB_RUNTIME_LIBRARY_PATH, "", true);
 
 		softplcInterfaces.add(new org.supremica.gui.SoftplcInterface("org.supremica.softplc.Simulator.BTSim"));
 
@@ -687,17 +687,17 @@ public final class SupremicaProperties
 		wp.load(fileStream);
 	}
 
-	public static String getFBRuntimeLibraryPath()
-	{
-		File theFile = new File(wp.getProperty(FB_RUNTIME_LIBRARY_PATH));
+// 	public static String getFBRuntimeLibraryPath()
+// 	{
+// 		File theFile = new File(wp.getProperty(FB_RUNTIME_LIBRARY_PATH));
 
-		return theFile.getAbsolutePath();
-	}
+// 		return theFile.getAbsolutePath();
+// 	}
 
-	public static void setFBRuntimeLibraryPath(String path)
-	{
-		wp.setProperty(FB_RUNTIME_LIBRARY_PATH, path);
-	}
+// 	public static void setFBRuntimeLibraryPath(String path)
+// 	{
+// 		wp.setProperty(FB_RUNTIME_LIBRARY_PATH, path);
+// 	}
 
 	public static String getFileOpenPath()
 	{

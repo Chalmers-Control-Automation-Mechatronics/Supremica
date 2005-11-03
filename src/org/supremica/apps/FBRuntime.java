@@ -51,9 +51,7 @@
  */
 package org.supremica.apps;
 
-import java.io.File;
 import org.supremica.functionblocks.model.*;
-import org.supremica.properties.SupremicaProperties;
 
 public class FBRuntime
 {
@@ -62,27 +60,17 @@ public class FBRuntime
     {
 
 		String systemFileName;
+		String libraryPath;
 
 		if (args.length == 1)
  		{
-			systemFileName = args[0];	
- 
-			// set library directory property
-			File systemFile = new File(systemFileName);
- 			File libraryPath = systemFile.getParentFile();
-			if (libraryPath == null)
-			{
-				SupremicaProperties.setFBRuntimeLibraryPath(".");
-			}
-			else
-			{
-				SupremicaProperties.setFBRuntimeLibraryPath(libraryPath.getAbsolutePath());
-			}
+			systemFileName = args[0];
+			libraryPath = null;
  		}
  		else if (args.length == 2)
  		{
- 			SupremicaProperties.setFBRuntimeLibraryPath(args[1]);
-			systemFileName = SupremicaProperties.getFBRuntimeLibraryPath() + "/" + args[0];
+			systemFileName = args[0];
+ 			libraryPath = args[1];			
  		}
 		else
 		{
@@ -90,7 +78,7 @@ public class FBRuntime
 			return;
 		}
 		
-		Device theDevice = new Device("FBRuntime Device", systemFileName);
+		Device theDevice = new Device("FBRuntime Device", systemFileName, libraryPath);
 		theDevice.runDevice();
 		
     }

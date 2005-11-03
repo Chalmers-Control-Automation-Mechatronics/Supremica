@@ -54,10 +54,9 @@ package org.supremica.functionblocks.model;
 
 import java.util.*;
 
-public class Device
+public class Device extends NamedObject
 {
 
-    private String name;
     private Resource managementResource;
     private Map resources = new HashMap();
 
@@ -65,13 +64,21 @@ public class Device
 
     private Device() {}
 
-    public Device(String name, String systemFile)
+    public Device(String name, String systemFileName, String libraryPath)
     {
-		System.out.println("Device(" + name + "): Loading device with " + systemFile + " file.");
-		loader = new Loader(this);
-		
-		loader.load(systemFile);
+		setName(name);
+		System.out.println("Device(" + getName() + ", " + systemFileName + ", " + libraryPath + ")");
+		loader = new Loader(this, systemFileName, libraryPath);	
 	}		
+
+    public void runDevice()
+    {
+		System.out.println("Device.runDevice()");
+		for (Iterator iter = resources.keySet().iterator();iter.hasNext();)
+		{
+			getResource((String) iter.next()).runResource();
+		}
+    }
 
     public void addResource(String name)
     {
@@ -83,13 +90,4 @@ public class Device
 		return (Resource) resources.get(name);
     }
 	
-    public void runDevice()
-    {
-		System.out.println("Device.runDevice()");
-		for (Iterator iter = resources.keySet().iterator();iter.hasNext();)
-		{
-			getResource((String) iter.next()).runResource();
-		}
-    }
-
 }
