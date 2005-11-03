@@ -43,8 +43,7 @@ public class BoxSpanGenerator
     {
 		if (!(volume instanceof Box))
 		{
-			CellExaminer.beep();
-			logger.warn("Caution! Robot " + robot + " unexpectedly collided with the object " + volume +
+			logger.warn("Caution! Robot " + robot + " unexpectedly collided with the object" + volume +
 						". If this is a static object in the cell, more advanced path planning " +
 						"is needed to avoid that object. This path should not be used!");
 			return;
@@ -53,6 +52,7 @@ public class BoxSpanGenerator
 		// So, it's a box!
 		Box box = (Box) volume;
 		Coordinate coord = box.getCoordinate();
+		assert(coord != null); // I'm suspecting someone is trying to make a fool out of me...
 		// Don't need this one anymore
 		box.delete();
 

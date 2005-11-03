@@ -35,7 +35,7 @@ public class CellExaminer
 	private Automata robotAutomata;
 
 	/** The prefix of a zone's name. */
-	private static final String ZONE_PREFIX = "Zone_";
+	static final String ZONE_PREFIX = "Zone_";
 
 	// Colors
 	static final Color RED = Color.RED;
@@ -47,9 +47,10 @@ public class CellExaminer
 	static final double TRANSPARENCY = 0.9;
 
 	// Demo file
-	//final String DEMOSTATION_FILENAME = "C:/temp/RobSuprTestStation/RobSuprTest.stn";
-	// 	final String DEMOSTATION_FILENAME = "C:/temp/DomStations/DemoSafe.stn";
-    String DEMOSTATION_FILENAME = "DemoSafe.stn";
+	// final String DEMOSTATION_FILENAME = "C:/temp/RobSuprTestStation/RobSuprTest.stn";
+	// final String DEMOSTATION_FILENAME = "C:/temp/DomStations/DemoSafe.stn";
+	String DEMOSTATION_FILENAME = "DemoSafe.stn";
+    //String DEMOSTATION_FILENAME = "DemoSafeWithZones.stn";
 
 	/**
 	 * Dialog for manipulating the simulation environment.
@@ -367,7 +368,8 @@ public class CellExaminer
 				// Initalize
 				robot.start();
 
-				// Examine collisions for each "path", i.e. unique pair of configurations
+				// Examine collisions for each "path", i.e. unique
+				// pair of configurations
 				List<Configuration> configurations = robot.getConfigurations();
 				for (int i = 0; i < configurations.size(); i++)
 				{
@@ -423,10 +425,14 @@ public class CellExaminer
 		timer.start();
 
 		// Discretization parameters
-		double dx = 0.25;
-		double dy = 0.25;
- 		double dz = 0.25;
+		double dx = 0.2;
+		double dy = 0.2;
+ 		double dz = 0.2;
 		cell.setBoxDimensions(new double[] {dx,dy,dz});
+
+		//////////////////////////
+		// GENERATE THE BOXSPAN //
+		//////////////////////////
 
 		// Hashtable associating coordinates with status of the corresponding box
 		Hashtable<Coordinate, Status> matrix = new Hashtable(1000);
@@ -445,7 +451,7 @@ public class CellExaminer
 			Robot robot = robIt.next();
 			Configuration home = robot.getHomeConfiguration();
 
-			// Initalize robot
+			// Initialize robot
 			robot.start();
 			robot.jumpToConfiguration(home);
 
@@ -466,7 +472,8 @@ public class CellExaminer
 			Coordinate base = robot.getBaseCoordinates();
 			boxesToExamine.add(base);
 
-			// Start loop!
+			// Add neighbouring boxes to boxes that are colliding with the robot
+			// Start loop! 
 			loop: while (boxesToExamine.size() != 0)
 			{
 			 	// Get the status for this box
@@ -584,7 +591,9 @@ public class CellExaminer
 				}
 			}
 			// Finalize the robot
+			robot.setRobotListener(null);
 			robot.jumpToConfiguration(home);
+			cell.runSimulation(robot, home, home);
 			robot.stop();
 
 			//////////////
@@ -626,7 +635,6 @@ public class CellExaminer
 				//box.setColor(GREEN);
 				//box.setTransparency(TRANSPARENCY);
 			}
-			robot.setRobotListener(null);
 			robottimer.stop();
 			logger.info("Execution completed for robot " + robot + " after " + robottimer + ".");
 			logger.info("Amount of surfaceboxes: " + surfaceboxCount);
@@ -635,18 +643,21 @@ public class CellExaminer
 		// Don't need this one anymore
 		matrix.clear();
 
-		// Show the result, the zoneboxes!
-		int zoneCount = 0;
+		// Show the result, the zoneboxes! Create a list with the
+		// zones for the next part of the algorithm...
+		List<Volume> zones = new LinkedList<Volume>();
+ 		int zoneCount = 0;
 		while (zoneboxes.size() != 0)
 		{
-			Coordinate coord = zoneboxes.remove(0);
+		 	Coordinate coord = zoneboxes.remove(0);
 			if (zoneboxes.contains(coord))
-				continue;
+			 	continue;
 
 			Box box = cell.createBox(coord);
 			box.setColor(BLUE);
 			box.setTransparency(TRANSPARENCY);
 			box.setName(ZONE_PREFIX + ++zoneCount);
+			zones.add(box);
 		}
 		timer.stop();
 		logger.info("Execution completed after " + timer.toString());
@@ -656,17 +667,22 @@ public class CellExaminer
 		// TEST FOR COLLISIONS WITH THE ZONE BOXES //
 		/////////////////////////////////////////////
 
-			/*
-
 		// For every robot...
 		for (Iterator<Robot> robIt = robots.iterator(); robIt.hasNext(); )
 		{
+			ActionTimer robottimer = new ActionTimer();
+			robottimer.start();
+
 			Robot robot = robIt.next();
 			Configuration home = robot.getHomeConfiguration();
 
+			// Initialize robot
+			robot.start();
+			robot.jumpToConfiguration(home);
+
 			// Add a listener to the robot for finding the list of
 			// collisions for every path
-			RobotListener listener = new CollisionListGenerator();
+			CollisionListGenerator listener = new CollisionListGenerator(robot, zones);
 			robot.setRobotListener(listener);
 			
 			// Try each "path", i.e. unique pair of configurations
@@ -680,18 +696,33 @@ public class CellExaminer
 				{
 					Configuration to = (Configuration) configurations.get(j);
 					
-					// Generate span!
-					logger.info("Examining the path from " + from + " to " + to + " for " + robot + " for collisions.");
+					// Generate collisionList!
+					logger.info("Examining the path from " + from + " to " + to + 
+								" for robot " + robot + " for collisions.");
 					robot.jumpToConfiguration(from);
+					listener.init();
 					cell.runSimulation(robot, from, to);
+					
+					// Show the list!
+					List<CollisionData> collisionList = listener.getCollisionList();
+					while (collisionList.size() != 0)
+					{
+						CollisionData data = collisionList.remove(0);
+						logger.fatal("Collision: " + data);
+					}
 				}
 			}
 			// Finalize the robot
+			robot.setRobotListener(null);
 			robot.jumpToConfiguration(home);
+			cell.runSimulation(robot, home, home); // jumpToConfiguration does not work properly!
 			robot.stop();
-		}
 
-			*/
+			// Report result
+			robottimer.stop();
+			logger.info("Execution completed for robot " + robot + " after " + robottimer + ".");
+
+		}
 	}
 
 	public static void beep()

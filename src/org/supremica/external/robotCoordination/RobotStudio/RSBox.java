@@ -15,7 +15,6 @@ public class RSBox
     extends RSVolume
     implements Box
 {
-//     protected String name;
     protected Coordinate coord;
 
     public RSBox(String name, Coordinate coord) 
@@ -42,6 +41,4 @@ public class RSBox
     {
 		this.coord = coord;
     }
-
-
 }

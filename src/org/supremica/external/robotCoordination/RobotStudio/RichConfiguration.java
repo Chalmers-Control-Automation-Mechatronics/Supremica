@@ -51,6 +51,11 @@ package org.supremica.external.robotCoordination.RobotStudio;
 
 import org.supremica.external.robotCoordination.Configuration;
 
+/**
+ * This class should be removed asap! Use CollisionData instead.
+ *
+ * @deprecated
+ */
 public class RichConfiguration
     extends Configuration
 {

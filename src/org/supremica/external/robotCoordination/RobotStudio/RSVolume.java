@@ -14,9 +14,10 @@ import com.inzoom.comjni.SafeArray;
 public class RSVolume 
     implements Volume
 {
-    protected String name;
+	String name;
 
     public RSVolume(String name)
+		throws Exception
     {
 		this.name = name;
     }
@@ -44,6 +45,7 @@ public class RSVolume
 		throws Exception
     {
 		getEntity().setName(name);
+		this.name = name;
     }
 
     public String getName()
@@ -57,4 +59,9 @@ public class RSVolume
 		IPart volumePart = RSCell.station.getParts().item(Converter.var(RSCell.VOLUMEPART_NAME));
 		return volumePart.getEntities().item(Converter.var(name));
     }
+
+	public String toString()
+	{
+		return "'" + getName() + "'";
+	}
 }

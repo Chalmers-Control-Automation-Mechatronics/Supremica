@@ -89,7 +89,7 @@ public class MechListener
 		{
 			if (collidingObject.getObjectType() == RsObjectType.rsObjectTypeEntity)
 			{				
-				int time = (int) controller.getMotionTime() * 1000;
+				int time = (int) (controller.getMotionTime() * 1000);
 				
 				robotListener.collisionStart(makeVolume(collidingObject), time);
 			}		
@@ -108,7 +108,7 @@ public class MechListener
 		{
 			if (collidingObject.getObjectType() == RsObjectType.rsObjectTypeEntity)
 			{			
-				int time = (int) controller.getMotionTime() * 1000;
+				int time = (int) (controller.getMotionTime() * 1000);
 				
 				robotListener.collisionEnd(makeVolume(collidingObject), time);
 			}		

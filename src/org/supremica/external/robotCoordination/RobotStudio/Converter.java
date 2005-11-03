@@ -147,7 +147,7 @@ public class Converter
 		for (int i = 1; i<strCoords.length; i++) 
 		{
 			strCoords[i] = strCoords[i].replace("m", "-");
-			coords[i-1] = (new Integer(strCoords[i])).intValue();
+			coords[i-1] = Integer.parseInt(strCoords[i]);
 		}
 		
 		return new Coordinate(coords);

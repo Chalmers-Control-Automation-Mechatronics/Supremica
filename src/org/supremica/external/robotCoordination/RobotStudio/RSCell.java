@@ -318,10 +318,10 @@ public class RSCell
 		IEntity currBox = boxSet.createSolidBox(trans, boxDimensions[0], boxDimensions[1], boxDimensions[2]);
 		
 		// Hide during initiation
-		currBox.setVisible(false);
+		//currBox.setVisible(false);
 		currBox.setName(boxName);
 		Box box = new RSBox(boxName, coord);
-		currBox.setVisible(true);
+		//currBox.setVisible(true);
 		
 		return box;
     }
@@ -688,387 +688,695 @@ public class RSCell
      */
     public void examineCollisions(Robot robot, Configuration from, Configuration to)
     {
-		try
-	    {
-			// 			// Init
-			// 			robot.jumpToConfiguration(from);
-			// 			Mechanism mechanism = ((RSRobot) robot).getRobotStudioMechanism();
-			// 			station.setActiveMechanism(mechanism);
-			
-			// 			// Find targets
-			// 			Target fromTarget = ((RSConfiguration) from).getRobotStudioTarget();
-			// 			Target toTarget = ((RSConfiguration) to).getRobotStudioTarget();
-
-			// 			// Create new path for this motion
-			// 			Path path = Path.getPathFromUnknown(mechanism.getPaths().add());
-			// 			path.setName(from.getName() + to.getName());
-			// 			path.insert(fromTarget);
-			// 			path.getTargetRefs().item(Converter.var(1)).setMotionType(1);    // Linear motion
-			// 			path.insert(toTarget);
-			// 			path.getTargetRefs().item(Converter.var(2)).setMotionType(1);    // Linear motion
-
-			// 			// Redefine robot program...
-			// 			IABBS4Procedure mainProcedure = ((RSRobot) robot).getMainProcedure();
-			// 			for (int k = 1;
-			// 				 k <= mainProcedure.getProcedureCalls().getCount();
-			// 				 k++)
-			// 		    {
-			// 				mainProcedure.getProcedureCalls().item(Converter.var(k)).delete();
-			// 		    }
-			// 			// Add path as only procedure in main
-			// 			path.syncToVirtualController(PATHSMODULE_NAME);    // Generate procedure from path
-			// 			Thread.sleep(1000);    // The synchronization takes a little while...
-			// 			IABBS4Procedure proc = path.getProcedure();
-			// 			mainProcedure.getProcedureCalls().add(path.getProcedure());
-
-			// Add SimulationListener (for detecting when simulation is finished)
-			// This is now done in runSimulation(robot, from, to);
-			// 			ISimulation simulation = station.getSimulations().item(Converter.var(1));
-			// 			Simulation sim = Simulation.getSimulationFromUnknown(simulation);
-			// 			SimulationListener simulationListener = new SimulationListener();
-			// 			sim.addDSimulationEventsListener(simulationListener);
-
-			Mechanism mechanism = ((RSRobot) robot).getRobotStudioMechanism();
-
-			//Add MechanismListener (for generating targets and detecting collisions)
-			//MechanismListener mechanismListener = new MechanismListener(path,j,i);
-			// 			MechanismListener mechanismListener = new MechanismListener(this, mechanism, path);
-
-			MechanismListener mechanismListener = new MechanismListener(this, (RSRobot) robot);
-			mechanism.add_MechanismEventsListener(mechanismListener);
-			mechanismListener.setController(mechanism.getController());
-
-			// Start a thread running the simulation in RobotStudio
-			//nbrOfTimesCollision = 1;
-			// 			simulation.start();
-			
-			// Wait for the simulation to stop
-			// 			simulationListener.waitForSimulationStop();
-			// 			sim.removeDSimulationEventsListener(simulationListener);
-
-			runSimulation(robot, from, to);
-
-			Path path = ((RSRobot) robot).getActivePath();
-
-			// Get the result, a list of collision times + info!
-			LinkedList<RichConfiguration> richPath = mechanismListener.getRichPath();
-			
-			// Stop the mechanismlistener
-			mechanism.remove_MechanismEventsListener(mechanismListener);
-			Thread.sleep(1000);
-
-			// Rearrange the path (in RobotStudio) so that the to-Target is last,
-			// after viapoints that may have been added during the simulation!
-			path.getTargetRefs().item(Converter.var(2)).delete();
-			path.insert(((RSConfiguration) to).getRobotStudioTarget());
-			path.getTargetRefs().item(Converter.var(path.getTargetRefs().getCount())).setMotionType(1);
-
-			// Print richPath
-			/*
-			  for (Iterator posIt = richPath.iterator(); posIt.hasNext();)
-			  {
-			  logger.info((RichConfiguration) posIt.next());
-			  }
-			*/
-
-			// Rearrange richPath so that the start and finish states are first and last
-			// There is a problem since the current RobotStudio version (3.1) sometimes
-			// adds collisions that are not really there (after strange jumps) and also
-			// does not always put the final state (representing the reaching of the last
-			// target of the path) last.
-			// Rearrange start
-			while (!(richPath.getFirst()).getName().equals(STARTCONFIGURATION_NAME))
-		    {
-				logger.warn("Removing " + (RichConfiguration) richPath.getFirst());
-				richPath.removeFirst();
-		    }
-			// Rearrange finish
-			int index = 0;
-			while (!(richPath.get(++index).getName().equals(FINISHCONFIGURATION_NAME)));
-			if (index<richPath.size()-1)
-		    {
-				assert(richPath.get(index).getTime() >= (richPath.getLast()).getTime());
-				logger.warn("Moving finish from pos " + index + " to last.");
-				RichConfiguration realFinish = richPath.get(index);
-				richPath.remove(index);
-				richPath.addLast(realFinish);
-		    }
-			// Change names
-			// 			String fromName = fromTarget.getName();
-			// 			String toName = toTarget.getName();
-			// 			fromName = fromName.substring(0,fromName.length()-2); // Last two are ":1"
-			// 			toName = toName.substring(0,toName.length()-2);       // Last two are ":1"
-			// 			richPath.getFirst().setName(fromName);
-			// 			richPath.getLast().setName(toName);
-			richPath.getFirst().setName(from.getName());
-			richPath.getLast().setName(to.getName());
-
-			// Print richPath
-			/*
-			  for (Iterator posIt = richPath.iterator(); posIt.hasNext();)
-			  {
-			  logger.fatal((RichConfiguration) posIt.next());
-			  }
-			*/
-			
-			/*
-			// If no collisions, not much needs to be done...
-			if (richPath.size() == 2)
+		// Old or new? True or false? 
+		if (false)
+		{
+			try
 			{
-			// MODIFY ROBOT TARGET AUTOMATON
-			if (!to.getName().equals(robot.getHomeConfiguration().getName()))
-			{
-			Automaton target = robotAutomata.getAutomaton(robot.getName() + UNDERSCORE + to.getName());
-			Configuration fromPos = richPath.get(0);
-			Configuration toPos = richPath.get(1);
-			LabeledEvent event = new LabeledEvent(fromPos.getName() + toPos.getName());
-			Arc arc = new Arc(target.getStateWithName("0"), target.getStateWithName("1"), event);
-			target.getAlphabet().addEvent(event);
-			target.addArc(arc);
-			}
+				// Init
+				robot.jumpToConfiguration(from);
+				Mechanism mechanism = ((RSRobot) robot).getRobotStudioMechanism();
+				station.setActiveMechanism(mechanism);
 			
-			return;
-			}
-			*/
+				// Find targets
+				Target fromTarget = ((RSConfiguration) from).getRobotStudioTarget();
+				Target toTarget = ((RSConfiguration) to).getRobotStudioTarget();
 			
-			// The richPath should be used to generate the automata!
-			// Modify zone automata
-			for (int i=0; i< richPath.size(); i++)
-		    {
-				RichConfiguration currPos = richPath.get(i);
-				
-				// On the border of entering or exiting a zone?
-				String inZone = currPos.getEnterZone();
-				String outZone = currPos.getLeaveZone();
-				
-				// Detect error...
-				if (inZone != null && outZone != null)
-			    {
-					logger.fatal("Exiting and entering zone at the same time detected? " +
-								 "This is impossible, tell Hugo!");
-			    }
-				
-				// Modify zone automaton
-				if (inZone != null || outZone != null)
-			    {
-					String nextPos;
-					String prevPos;
-					if (inZone != null)
-				    {
-						nextPos = richPath.get(i+1).getName();
-						prevPos = richPath.get(i-1).getName();
-				    }
-					else
-				    {
-						// Other way around...
-						inZone = outZone;
-						nextPos = richPath.get(i-1).getName();
-						prevPos = richPath.get(i+1).getName();
-				    }
-					
-					Automaton zone = zoneAutomata.getAutomaton(inZone);
-					Alphabet zoneAlpha = zone.getAlphabet();
-					
-					// Book event
-					LabeledEvent bookEvent = new LabeledEvent(currPos.getName() + nextPos);
-					zoneAlpha.addEvent(bookEvent);
-					Arc arc = new Arc(zone.getStateWithName(FREESTATE_NAME),
-									  zone.getStateWithName(BOOKEDSTATE_NAME),
-									  bookEvent);
-					zone.addArc(arc);
-					
-					// Unbook event (other direction)
-					LabeledEvent unbookEvent = new LabeledEvent(currPos.getName() + prevPos);
-					zoneAlpha.addEvent(unbookEvent);
-					arc = new Arc(zone.getStateWithName(BOOKEDSTATE_NAME),
-								  zone.getStateWithName(FREESTATE_NAME),
-								  unbookEvent);
-					zone.addArc(arc);
-			    }
-		    }
+				// Create new path for this motion
+				Path path = Path.getPathFromUnknown(mechanism.getPaths().add());
+				path.setName(from.getName() + to.getName());
+				path.insert(fromTarget);
+				path.getTargetRefs().item(Converter.var(1)).setMotionType(1);    // Linear motion
+				path.insert(toTarget);
+				path.getTargetRefs().item(Converter.var(2)).setMotionType(1);    // Linear motion
 			
-			// Modify Robot Automaton
-
-			// Forward direction
-			{
-				// MODIFY ROBOT AUTOMATON ITSELF
-				Automaton rob = robotAutomata.getAutomaton(robot.getName());
-				RichConfiguration firstPos = richPath.get(0);
-				Configuration secondPos = richPath.get(1);
-				Configuration secondLastPos = richPath.get(richPath.size()-2);
-				Configuration lastPos = richPath.get(richPath.size()-1);
-				//assert(richPath.size() > 2);
-				assert(from.getName().equals(firstPos.getName()));
-				assert(to.getName().equals(lastPos.getName()));
-
-				// Only if there was at least one collision
-				if (richPath.size() > 2)
+				// Redefine robot program...
+				IABBS4Procedure mainProcedure = ((RSRobot) robot).getMainProcedure();
+				for (int k = 1;
+					 k <= mainProcedure.getProcedureCalls().getCount();
+					 k++)
 				{
-					State firstState = new State(firstPos.getName() + secondPos.getName());
-					rob.addState(firstState);
-					State lastState = rob.getStateWithName(from.getName() + to.getName());
-					lastState.setName(secondLastPos.getName() + lastPos.getName());
+					mainProcedure.getProcedureCalls().item(Converter.var(k)).delete();
+				}
+				// Add path as only procedure in main
+				path.syncToVirtualController(PATHSMODULE_NAME);    // Generate procedure from path
+				Thread.sleep(1000);    // The synchronization takes a little while...
+				IABBS4Procedure proc = path.getProcedure();
+				mainProcedure.getProcedureCalls().add(path.getProcedure());
+			
+				// Add SimulationListener (for detecting when simulation is finished)
+				ISimulation simulation = station.getSimulations().item(Converter.var(1));
+				Simulation sim = Simulation.getSimulationFromUnknown(simulation);
+				SimulationListener simulationListener = new SimulationListener();
+				sim.addDSimulationEventsListener(simulationListener);
+			
+				//Add MechanismListener (for generating targets and detecting collisions)
+				//MechanismListener mechanismListener = new MechanismListener(path,j,i);
+				//MechanismListener mechanismListener = new MechanismListener(mechanism, path);
+				MechanismListener mechanismListener = new MechanismListener(this, (RSRobot) robot);
+				mechanism.add_MechanismEventsListener(mechanismListener);
+				mechanismListener.setController(mechanism.getController());
+			
+				// Start a thread running the simulation in RobotStudio
+				//nbrOfTimesCollision = 1;
+				simulation.start();
+			
+				// Wait for the simulation to stop
+				simulationListener.waitForSimulationStop();
+				sim.removeDSimulationEventsListener(simulationListener);
+			
+				// Get the result, a list of collision times + info!
+				LinkedList richPath = mechanismListener.getRichPath();
+			
+				// Stop the mechanismlistener
+				mechanism.remove_MechanismEventsListener(mechanismListener);
+				Thread.sleep(1000);
+			
+				// Rearrange the path (in RobotStudio) so that the to-Target is last,
+				// after viapoints that may have been added during the simulation!
+				path.getTargetRefs().item(Converter.var(2)).delete();
+				path.insert(toTarget);
+				path.getTargetRefs().item(Converter.var(path.getTargetRefs().getCount())).setMotionType(1);
+			
+				// Rearrange richPath so that the start and finish states are first and last
+				// There is a problem since the current RobotStudio version (3.1) sometimes
+				// adds collisions that are not really there (after strange jumps) and also
+				// does not always put the final state (representing the reaching of the last
+				// target of the path) last.
+				// Rearrange start
+				while (!((Configuration) richPath.getFirst()).getName().equals(STARTCONFIGURATION_NAME))
+				{
+					logger.warn("Removing " + (RichConfiguration) richPath.getFirst());
+					richPath.removeFirst();
+				}
+				// Rearrange finish
+				int index = 0;
+				while (!((Configuration) richPath.get(++index)).getName().equals(FINISHCONFIGURATION_NAME));
+				if (index<richPath.size()-1)
+				{
+					assert(((RichConfiguration) richPath.get(index)).getTime() >= ((RichConfiguration) richPath.getLast()).getTime());
+					logger.warn("Moving finish from pos " + index + " to last.");
+					RichConfiguration realFinish = (RichConfiguration) richPath.get(index);
+					richPath.remove(index);
+					richPath.addLast(realFinish);
+				}
+				// Change names
+				String fromName = fromTarget.getName();
+				String toName = toTarget.getName();
+				fromName = fromName.substring(0,fromName.length()-2); // Last two are ":1"
+				toName = toName.substring(0,toName.length()-2);       // Last two are ":1"
+				((RichConfiguration) richPath.getFirst()).setName(fromName);
+				((RichConfiguration) richPath.getLast()).setName(toName);
+			
+				// The richPath should be used to generate the automata!
+				// Modify zone automata
+				for (int i=0; i< richPath.size(); i++)
+				{
+					RichConfiguration currPos = (RichConfiguration) richPath.get(i);
 
-					// Set cost for first state, must be int, so it now is the number of milliseconds
-					firstState.setCost((int) (1000*firstPos.getTime()));
+					// On the border of entering or exiting a zone?
+					String inZone = currPos.getEnterZone();
+					String outZone = currPos.getLeaveZone();
 
-					// Modify original arcs
-					LabeledEvent firstEvent = new LabeledEvent(firstPos.getName() + secondPos.getName());
-					rob.getAlphabet().addEvent(firstEvent);
-					//logger.info("Nbr of incoming: " + lastState.nbrOfIncomingArcs());
-					LinkedList toBeRemoved = new LinkedList();
-					for (ArcIterator arcIt = lastState.incomingArcsIterator(); arcIt.hasNext(); )
+					// Detect error...
+					if (inZone != null && outZone != null)
 					{
-						Arc currArc = arcIt.nextArc();
-						toBeRemoved.add(currArc);
-
-						Arc newArc = new Arc(currArc.getFromState(), firstState, firstEvent);
-						rob.addArc(newArc);
+						logger.fatal("Exiting and entering zone at the same time detected? " +
+									 "This is impossible, tell Hugo!");
 					}
-					while (toBeRemoved.size() > 0)
-					{
-						rob.removeArc(((Arc) toBeRemoved.remove(0)));
-					}
-					LabeledEvent oldEvent = rob.getAlphabet().getEvent(from.getName() + to.getName());
-					rob.getAlphabet().removeEvent(oldEvent);
 
-					// Add sequence
-					State currState = firstState;
-					for (int i=1; i<richPath.size()-1; i++)
+					// Modify zone automaton
+					if (inZone != null || outZone != null)
 					{
-						RichConfiguration currPos = richPath.get(i);
-						RichConfiguration nextPos = richPath.get(i+1);
-
-						// Add new arc and stuff
-						State nextState;
-						if (i == richPath.size()-2)
+						String nextPos;
+						String prevPos;
+						if (inZone != null)
 						{
-							nextState = lastState;
+							nextPos = ((RichConfiguration) richPath.get(i+1)).getName();
+							prevPos = ((RichConfiguration) richPath.get(i-1)).getName();
 						}
 						else
 						{
-							nextState = new State(currPos.getName() + nextPos.getName());
-							rob.addState(nextState);
+							// Other way around...
+							inZone = outZone;
+							nextPos = ((RichConfiguration) richPath.get(i-1)).getName();
+							prevPos = ((RichConfiguration) richPath.get(i+1)).getName();
 						}
-						LabeledEvent event = new LabeledEvent(currPos.getName() + nextPos.getName());
-						rob.getAlphabet().addEvent(event);
-						Arc arc = new Arc(currState, nextState, event);
-						rob.addArc(arc);
 
-						// Set cost, must be int, so it now is the number of milliseconds
-						nextState.setCost((int) (1000*(nextPos.getTime() - currPos.getTime())));
+						Automaton zone = zoneAutomata.getAutomaton(inZone);
+						Alphabet zoneAlpha = zone.getAlphabet();
 
-						currState = nextState;
+						// Book event
+						LabeledEvent bookEvent = new LabeledEvent(currPos.getName() + nextPos);
+						zoneAlpha.addEvent(bookEvent);
+						Arc arc = new Arc(zone.getStateWithName(FREESTATE_NAME),
+										  zone.getStateWithName(BOOKEDSTATE_NAME),
+										  bookEvent);
+						zone.addArc(arc);
+
+						// Unbook event (other direction)
+						LabeledEvent unbookEvent = new LabeledEvent(currPos.getName() + prevPos);
+						zoneAlpha.addEvent(unbookEvent);
+						arc = new Arc(zone.getStateWithName(BOOKEDSTATE_NAME),
+									  zone.getStateWithName(FREESTATE_NAME),
+									  unbookEvent);
+						zone.addArc(arc);
 					}
 				}
 
-				// MODIFY ROBOT TARGET AUTOMATON
-				if (!to.getName().equals(robot.getHomeConfiguration().getName()))
+				// Modify Robot Automaton
+
+				// Forward direction
 				{
-					Automaton target = robotAutomata.getAutomaton(robot.getName() + UNDERSCORE + to.getName());
-					LabeledEvent event = new LabeledEvent(secondLastPos.getName() + lastPos.getName());
-					Arc arc = new Arc(target.getStateWithName("0"), target.getStateWithName("1"), event);
-					target.getAlphabet().addEvent(event);
-					target.addArc(arc);
-				}
-			}
-			// Backwards direction (lines with // in the end have been changed)
-			{
-				// MODIFY ROBOT AUTOMATON ITSELF
-				Automaton rob = robotAutomata.getAutomaton(robot.getName());
-				Configuration lastPos = richPath.get(0); //
-				Configuration secondLastPos = richPath.get(1); //
-				RichConfiguration secondPos = richPath.get(richPath.size()-2); //
-				RichConfiguration firstPos = richPath.get(richPath.size()-1);  //
+					// MODIFY ROBOT AUTOMATON ITSELF
+					Automaton rob = robotAutomata.getAutomaton(robot.getName());
+					RichConfiguration firstPos = (RichConfiguration) richPath.get(0);
+					Configuration secondPos = (Configuration) richPath.get(1);
+					Configuration secondLastPos = (Configuration) richPath.get(richPath.size()-2);
+					Configuration lastPos = (Configuration) richPath.get(richPath.size()-1);
+					//assert(richPath.size() > 2);
+					assert(from.getName().equals(firstPos.getName()));
+					assert(to.getName().equals(lastPos.getName()));
 
-				// Only if there was at least one collision
-				if (richPath.size() > 2)
-				{
-					State firstState = new State(firstPos.getName() + secondPos.getName());
-					rob.addState(firstState);
-					State lastState =  rob.getStateWithName(to.getName() + from.getName());  //
-					lastState.setName(secondLastPos.getName() + lastPos.getName());
-
-					// Set cost for first state, must be int, so it now is the number of milliseconds
-					firstState.setCost((int) (1000*(firstPos.getTime() - secondPos.getTime()))); //
-
-					// Modify original arcs
-					LabeledEvent firstEvent = new LabeledEvent(firstPos.getName() + secondPos.getName());
-					rob.getAlphabet().addEvent(firstEvent);
-					// logger.info("Nbr of incoming: " + lastState.nbrOfIncomingArcs());
-					//ArcIterator arcIt = lastState.incomingArcsIterator();
-					LinkedList toBeRemoved = new LinkedList();
-					//for (Arc currArc = arcIt.nextArc(); arcIt.hasNext(); currArc = arcIt.nextArc())
-					for (ArcIterator arcIt = lastState.incomingArcsIterator(); arcIt.hasNext(); )
+					// Only if there was at least one collision
+					if (richPath.size() > 2)
 					{
-						Arc currArc = arcIt.nextArc();
-						toBeRemoved.add(currArc);
+						State firstState = new State(firstPos.getName() + secondPos.getName());
+						rob.addState(firstState);
+						State lastState = rob.getStateWithName(from.getName() + to.getName());
+						lastState.setName(secondLastPos.getName() + lastPos.getName());
 
-						Arc newArc = new Arc(currArc.getFromState(), firstState, firstEvent);
-						rob.addArc(newArc);
-					}
-					while (toBeRemoved.size() > 0)
-					{
-						rob.removeArc(((Arc) toBeRemoved.remove(0)));
-					}
-					LabeledEvent oldEvent = rob.getAlphabet().getEvent(to.getName() + from.getName()); //
-					rob.getAlphabet().removeEvent(oldEvent);
+						// Set cost for first state, must be int, so it now is the number of milliseconds
+						firstState.setCost((int) (1000*firstPos.getTime()));
 
-					// Add sequence
-					State currState = firstState;
-					for (int i=richPath.size()-2; i>0; i--) //
-					{
-						RichConfiguration currPos = richPath.get(i);
-						RichConfiguration nextPos = richPath.get(i-1); //
-
-						// Add new arc and stuff
-						State nextState;
-						if (i == 1) //
+						// Modify original arcs
+						LabeledEvent firstEvent = new LabeledEvent(firstPos.getName() + secondPos.getName());
+						rob.getAlphabet().addEvent(firstEvent);
+						//logger.info("Nbr of incoming: " + lastState.nbrOfIncomingArcs());
+						LinkedList toBeRemoved = new LinkedList();
+						for (ArcIterator arcIt = lastState.incomingArcsIterator(); arcIt.hasNext(); )
 						{
-							nextState = lastState;
+							Arc currArc = arcIt.nextArc();
+							toBeRemoved.add(currArc);
+
+							Arc newArc = new Arc(currArc.getFromState(), firstState, firstEvent);
+							rob.addArc(newArc);
+						}
+						while (toBeRemoved.size() > 0)
+						{
+							rob.removeArc(((Arc) toBeRemoved.remove(0)));
+						}
+						LabeledEvent oldEvent = rob.getAlphabet().getEvent(from.getName() + to.getName());
+						rob.getAlphabet().removeEvent(oldEvent);
+
+						// Add sequence
+						State currState = firstState;
+						for (int i=1; i<richPath.size()-1; i++)
+						{
+							RichConfiguration currPos = (RichConfiguration) richPath.get(i);
+							RichConfiguration nextPos = (RichConfiguration) richPath.get(i+1);
+
+							// Add new arc and stuff
+							State nextState;
+							if (i == richPath.size()-2)
+							{
+								nextState = lastState;
+							}
+							else
+							{
+								nextState = new State(currPos.getName() + nextPos.getName());
+								rob.addState(nextState);
+							}
+							LabeledEvent event = new LabeledEvent(currPos.getName() + nextPos.getName());
+							rob.getAlphabet().addEvent(event);
+							Arc arc = new Arc(currState, nextState, event);
+							rob.addArc(arc);
+
+							// Set cost, must be int, so it now is the number of milliseconds
+							nextState.setCost((int) (1000*(nextPos.getTime() - currPos.getTime())));
+
+							currState = nextState;
+						}
+					}
+
+					// MODIFY ROBOT TARGET AUTOMATON
+					if (!to.getName().equals(robot.getHomeConfiguration().getName()))
+					{
+						Automaton target = robotAutomata.getAutomaton(robot.getName() + UNDERSCORE + to.getName());
+						LabeledEvent event = new LabeledEvent(secondLastPos.getName() + lastPos.getName());
+						Arc arc = new Arc(target.getStateWithName("0"), target.getStateWithName("1"), event);
+						target.getAlphabet().addEvent(event);
+						target.addArc(arc);
+					}
+				}
+				// Backwards direction (lines with // in the end have been changed)
+				{
+					// MODIFY ROBOT AUTOMATON ITSELF
+					Automaton rob = robotAutomata.getAutomaton(robot.getName());
+					Configuration lastPos = (Configuration) richPath.get(0);				     //
+					Configuration secondLastPos = (Configuration) richPath.get(1);             //
+					RichConfiguration secondPos = (RichConfiguration) richPath.get(richPath.size()-2); //
+					RichConfiguration firstPos = (RichConfiguration) richPath.get(richPath.size()-1);  //
+
+					// Only if there was at least one collision
+					if (richPath.size() > 2)
+					{
+						State firstState = new State(firstPos.getName() + secondPos.getName());
+						rob.addState(firstState);
+						State lastState =  rob.getStateWithName(to.getName() + from.getName());  //
+						lastState.setName(secondLastPos.getName() + lastPos.getName());
+
+						// Set cost for first state, must be int, so it now is the number of milliseconds
+						firstState.setCost((int) (1000*(firstPos.getTime() - secondPos.getTime()))); //
+
+						// Modify original arcs
+						LabeledEvent firstEvent = new LabeledEvent(firstPos.getName() + secondPos.getName());
+						rob.getAlphabet().addEvent(firstEvent);
+						// logger.info("Nbr of incoming: " + lastState.nbrOfIncomingArcs());
+						//ArcIterator arcIt = lastState.incomingArcsIterator();
+						LinkedList toBeRemoved = new LinkedList();
+						//for (Arc currArc = arcIt.nextArc(); arcIt.hasNext(); currArc = arcIt.nextArc())
+						for (ArcIterator arcIt = lastState.incomingArcsIterator(); arcIt.hasNext(); )
+						{
+							Arc currArc = arcIt.nextArc();
+							toBeRemoved.add(currArc);
+
+							Arc newArc = new Arc(currArc.getFromState(), firstState, firstEvent);
+							rob.addArc(newArc);
+						}
+						while (toBeRemoved.size() > 0)
+						{
+							rob.removeArc(((Arc) toBeRemoved.remove(0)));
+						}
+						LabeledEvent oldEvent = rob.getAlphabet().getEvent(to.getName() + from.getName()); //
+						rob.getAlphabet().removeEvent(oldEvent);
+
+						// Add sequence
+						State currState = firstState;
+						for (int i=richPath.size()-2; i>0; i--) //
+						{
+							RichConfiguration currPos = (RichConfiguration) richPath.get(i);
+							RichConfiguration nextPos = (RichConfiguration) richPath.get(i-1); //
+
+							// Add new arc and stuff
+							State nextState;
+							if (i == 1) //
+							{
+								nextState = lastState;
+							}
+							else
+							{
+								nextState = new State(currPos.getName() + nextPos.getName());
+								rob.addState(nextState);
+							}
+							LabeledEvent event = new LabeledEvent(currPos.getName() + nextPos.getName());
+							rob.getAlphabet().addEvent(event);
+							Arc arc = new Arc(currState, nextState, event);
+							rob.addArc(arc);
+
+							// Set cost, must be int, so it now is the number of milliseconds
+							nextState.setCost((int) (1000*(currPos.getTime() - nextPos.getTime()))); //
+
+							currState = nextState;
+						}
+					}
+
+					// MODIFY ROBOT TARGET AUTOMATON
+					if (!from.getName().equals(robot.getHomeConfiguration().getName())) //
+					{
+						Automaton target = robotAutomata.getAutomaton(robot.getName() + UNDERSCORE + from.getName()); //
+						LabeledEvent event = new LabeledEvent(secondLastPos.getName() + lastPos.getName());
+						Arc arc = new Arc(target.getStateWithName("0"), target.getStateWithName("1"), event);
+						target.getAlphabet().addEvent(event);
+						target.addArc(arc);
+					}
+				}
+
+				// Clean up
+				//path.delete();
+			}
+			catch (Exception e)
+			{
+				logger.error("Error when examining collisions. " + e);
+				// e.printStackTrace(System.err);
+
+				return;
+
+				//throw new SupremicaException();
+			}
+
+			logger.debug("Intersection points and times stored");
+		}
+		else
+		{
+			try
+			{
+				// 			// Init
+				robot.jumpToConfiguration(from);
+				// 			Mechanism mechanism = ((RSRobot) robot).getRobotStudioMechanism();
+				// 			station.setActiveMechanism(mechanism);
+			
+				// 			// Find targets
+				// 			Target fromTarget = ((RSConfiguration) from).getRobotStudioTarget();
+				// 			Target toTarget = ((RSConfiguration) to).getRobotStudioTarget();
+
+				// 			// Create new path for this motion
+				// 			Path path = Path.getPathFromUnknown(mechanism.getPaths().add());
+				// 			path.setName(from.getName() + to.getName());
+				// 			path.insert(fromTarget);
+				// 			path.getTargetRefs().item(Converter.var(1)).setMotionType(1);    // Linear motion
+				// 			path.insert(toTarget);
+				// 			path.getTargetRefs().item(Converter.var(2)).setMotionType(1);    // Linear motion
+
+				// 			// Redefine robot program...
+				// 			IABBS4Procedure mainProcedure = ((RSRobot) robot).getMainProcedure();
+				// 			for (int k = 1;
+				// 				 k <= mainProcedure.getProcedureCalls().getCount();
+				// 				 k++)
+				// 		    {				RSCell.nbrOfTimesCollision++;
+				
+
+				// 				mainProcedure.getProcedureCalls().item(Converter.var(k)).delete();
+				// 		    }
+				// 			// Add path as only procedure in main
+				// 			path.syncToVirtualController(PATHSMODULE_NAME);    // Generate procedure from path
+				// 			Thread.sleep(1000);    // The synchronization takes a little while...
+				// 			IABBS4Procedure proc = path.getProcedure();
+				// 			mainProcedure.getProcedureCalls().add(path.getProcedure());
+
+				// Add SimulationListener (for detecting when simulation is finished)
+				// This is now done in runSimulation(robot, from, to);
+				// 			ISimulation simulation = station.getSimulations().item(Converter.var(1));
+				// 			Simulation sim = Simulation.getSimulationFromUnknown(simulation);
+				// 			SimulationListener simulationListener = new SimulationListener();
+				// 			sim.addDSimulationEventsListener(simulationListener);
+
+				Mechanism mechanism = ((RSRobot) robot).getRobotStudioMechanism();
+
+				//Add MechanismListener (for generating targets and detecting collisions)
+				//MechanismListener mechanismListener = new MechanismListener(path,j,i);
+				// 			MechanismListener mechanismListener = new MechanismListener(this, mechanism, path);
+
+				MechanismListener mechanismListener = new MechanismListener(this, (RSRobot) robot);
+				mechanism.add_MechanismEventsListener(mechanismListener);
+				mechanismListener.setController(mechanism.getController());
+
+				// Start a thread running the simulation in RobotStudio
+				//nbrOfTimesCollision = 1;
+				// 			simulation.start();
+			
+				// Wait for the simulation to stop
+				// 			simulationListener.waitForSimulationStop();
+				// 			sim.removeDSimulationEventsListener(simulationListener);
+
+				runSimulation(robot, from, to);
+
+				Path path = ((RSRobot) robot).getActivePath();
+
+				// Get the result, a list of collision times + info!
+				LinkedList<RichConfiguration> richPath = mechanismListener.getRichPath();
+			
+				// Stop the mechanismlistener
+				mechanism.remove_MechanismEventsListener(mechanismListener);
+				Thread.sleep(1000);
+
+				// Rearrange the path (in RobotStudio) so that the to-Target is last,
+				// after viapoints that may have been added during the simulation!
+				path.getTargetRefs().item(Converter.var(2)).delete();
+				path.insert(((RSConfiguration) to).getRobotStudioTarget());
+				path.getTargetRefs().item(Converter.var(path.getTargetRefs().getCount())).setMotionType(1);
+
+				// Rearrange richPath so that the start and finish states are first and last
+				// There is a problem since the current RobotStudio version (3.1) sometimes
+				// adds collisions that are not really there (after strange jumps) and also
+				// does not always put the final state (representing the reaching of the last
+				// target of the path) last.
+				// Rearrange start
+				while (!(richPath.getFirst()).getName().equals(STARTCONFIGURATION_NAME))
+				{
+					logger.warn("Removing " + (RichConfiguration) richPath.getFirst());
+					richPath.removeFirst();
+				}
+				// Rearrange finish
+				int index = 0;
+				while (!(richPath.get(++index).getName().equals(FINISHCONFIGURATION_NAME)));
+				if (index<richPath.size()-1)
+				{
+					assert(richPath.get(index).getTime() >= (richPath.getLast()).getTime());
+					logger.warn("Moving finish from pos " + index + " to last.");
+					RichConfiguration realFinish = richPath.get(index);
+					richPath.remove(index);
+					richPath.addLast(realFinish);
+				}
+				// Change names
+				// 			String fromName = fromTarget.getName();
+				// 			String toName = toTarget.getName();
+				// 			fromName = fromName.substring(0,fromName.length()-2); // Last two are ":1"
+				// 			toName = toName.substring(0,toName.length()-2);       // Last two are ":1"
+				// 			richPath.getFirst().setName(fromName);
+				// 			richPath.getLast().setName(toName);
+				richPath.getFirst().setName(from.getName());
+				richPath.getLast().setName(to.getName());
+			
+				// The richPath should be used to generate the automata!
+				// Modify zone automata
+				for (int i=0; i< richPath.size(); i++)
+				{
+					RichConfiguration currPos = richPath.get(i);
+				
+					// On the border of entering or exiting a zone?
+					String inZone = currPos.getEnterZone();
+					String outZone = currPos.getLeaveZone();
+				
+					// Detect error...
+					if (inZone != null && outZone != null)
+					{
+						logger.fatal("Exiting and entering zone at the same time detected? " +
+									 "This is impossible, tell Hugo!");
+					}
+				
+					// Modify zone automaton
+					if (inZone != null || outZone != null)
+					{
+						String nextPos;
+						String prevPos;
+						if (inZone != null)
+						{
+							nextPos = richPath.get(i+1).getName();
+							prevPos = richPath.get(i-1).getName();
 						}
 						else
 						{
-							nextState = new State(currPos.getName() + nextPos.getName());
-							rob.addState(nextState);
+							// Other way around...
+							inZone = outZone;
+							nextPos = richPath.get(i-1).getName();
+							prevPos = richPath.get(i+1).getName();
 						}
-						LabeledEvent event = new LabeledEvent(currPos.getName() + nextPos.getName());
-						rob.getAlphabet().addEvent(event);
-						Arc arc = new Arc(currState, nextState, event);
-						rob.addArc(arc);
+					
+						Automaton zone = zoneAutomata.getAutomaton(inZone);
+						Alphabet zoneAlpha = zone.getAlphabet();
+					
+						// Book event
+						LabeledEvent bookEvent = new LabeledEvent(currPos.getName() + nextPos);
+						zoneAlpha.addEvent(bookEvent);
+						Arc arc = new Arc(zone.getStateWithName(FREESTATE_NAME),
+										  zone.getStateWithName(BOOKEDSTATE_NAME),
+										  bookEvent);
+						zone.addArc(arc);
+					
+						// Unbook event (other direction)
+						LabeledEvent unbookEvent = new LabeledEvent(currPos.getName() + prevPos);
+						zoneAlpha.addEvent(unbookEvent);
+						arc = new Arc(zone.getStateWithName(BOOKEDSTATE_NAME),
+									  zone.getStateWithName(FREESTATE_NAME),
+									  unbookEvent);
+						zone.addArc(arc);
+					}
+				}
+			
+				// Modify Robot Automaton
 
-						// Set cost, must be int, so it now is the number of milliseconds
-						nextState.setCost((int) (1000*(currPos.getTime() - nextPos.getTime()))); //
+				// Forward direction
+				{
+					// MODIFY ROBOT AUTOMATON ITSELF
+					Automaton rob = robotAutomata.getAutomaton(robot.getName());
+					RichConfiguration firstPos = richPath.get(0);
+					Configuration secondPos = richPath.get(1);
+					Configuration secondLastPos = richPath.get(richPath.size()-2);
+					Configuration lastPos = richPath.get(richPath.size()-1);
+					//assert(richPath.size() > 2);
+					assert(from.getName().equals(firstPos.getName()));
+					assert(to.getName().equals(lastPos.getName()));
 
-						currState = nextState;
+					// Only if there was at least one collision
+					if (richPath.size() > 2)
+					{
+						State firstState = new State(firstPos.getName() + secondPos.getName());
+						rob.addState(firstState);
+						State lastState = rob.getStateWithName(from.getName() + to.getName());
+						lastState.setName(secondLastPos.getName() + lastPos.getName());
+
+						// Set cost for first state, must be int, so it now is the number of milliseconds
+						firstState.setCost((int) (1000*firstPos.getTime()));
+
+						// Modify original arcs
+						LabeledEvent firstEvent = new LabeledEvent(firstPos.getName() + secondPos.getName());
+						rob.getAlphabet().addEvent(firstEvent);
+						//logger.info("Nbr of incoming: " + lastState.nbrOfIncomingArcs());
+						LinkedList toBeRemoved = new LinkedList();
+						for (ArcIterator arcIt = lastState.incomingArcsIterator(); arcIt.hasNext(); )
+						{
+							Arc currArc = arcIt.nextArc();
+							toBeRemoved.add(currArc);
+
+							Arc newArc = new Arc(currArc.getFromState(), firstState, firstEvent);
+							rob.addArc(newArc);
+						}
+						while (toBeRemoved.size() > 0)
+						{
+							rob.removeArc(((Arc) toBeRemoved.remove(0)));
+						}
+						LabeledEvent oldEvent = rob.getAlphabet().getEvent(from.getName() + to.getName());
+						rob.getAlphabet().removeEvent(oldEvent);
+
+						// Add sequence
+						State currState = firstState;
+						for (int i=1; i<richPath.size()-1; i++)
+						{
+							RichConfiguration currPos = richPath.get(i);
+							RichConfiguration nextPos = richPath.get(i+1);
+
+							// Add new arc and stuff
+							State nextState;
+							if (i == richPath.size()-2)
+							{
+								nextState = lastState;
+							}
+							else
+							{
+								nextState = new State(currPos.getName() + nextPos.getName());
+								rob.addState(nextState);
+							}
+							LabeledEvent event = new LabeledEvent(currPos.getName() + nextPos.getName());
+							rob.getAlphabet().addEvent(event);
+							Arc arc = new Arc(currState, nextState, event);
+							rob.addArc(arc);
+
+							// Set cost, must be int, so it now is the number of milliseconds
+							nextState.setCost((int) (1000*(nextPos.getTime() - currPos.getTime())));
+
+							currState = nextState;
+						}
+					}
+
+					// MODIFY ROBOT TARGET AUTOMATON
+					if (!to.getName().equals(robot.getHomeConfiguration().getName()))
+					{
+						Automaton target = robotAutomata.getAutomaton(robot.getName() + UNDERSCORE + to.getName());
+						LabeledEvent event = new LabeledEvent(secondLastPos.getName() + lastPos.getName());
+						Arc arc = new Arc(target.getStateWithName("0"), target.getStateWithName("1"), event);
+						target.getAlphabet().addEvent(event);
+						target.addArc(arc);
+					}
+				}
+				// Backwards direction (lines with // in the end have been changed)
+				{
+					// MODIFY ROBOT AUTOMATON ITSELF
+					Automaton rob = robotAutomata.getAutomaton(robot.getName());
+					Configuration lastPos = richPath.get(0); //
+					Configuration secondLastPos = richPath.get(1); //
+					RichConfiguration secondPos = richPath.get(richPath.size()-2); //
+					RichConfiguration firstPos = richPath.get(richPath.size()-1);  //
+
+					// Only if there was at least one collision
+					if (richPath.size() > 2)
+					{
+						State firstState = new State(firstPos.getName() + secondPos.getName());
+						rob.addState(firstState);
+						State lastState =  rob.getStateWithName(to.getName() + from.getName());  //
+						lastState.setName(secondLastPos.getName() + lastPos.getName());
+
+						// Set cost for first state, must be int, so it now is the number of milliseconds
+						firstState.setCost((int) (1000*(firstPos.getTime() - secondPos.getTime()))); //
+
+						// Modify original arcs
+						LabeledEvent firstEvent = new LabeledEvent(firstPos.getName() + secondPos.getName());
+						rob.getAlphabet().addEvent(firstEvent);
+						// logger.info("Nbr of incoming: " + lastState.nbrOfIncomingArcs());
+						//ArcIterator arcIt = lastState.incomingArcsIterator();
+						LinkedList toBeRemoved = new LinkedList();
+						//for (Arc currArc = arcIt.nextArc(); arcIt.hasNext(); currArc = arcIt.nextArc())
+						for (ArcIterator arcIt = lastState.incomingArcsIterator(); arcIt.hasNext(); )
+						{
+							Arc currArc = arcIt.nextArc();
+							toBeRemoved.add(currArc);
+
+							Arc newArc = new Arc(currArc.getFromState(), firstState, firstEvent);
+							rob.addArc(newArc);
+						}
+						while (toBeRemoved.size() > 0)
+						{
+							rob.removeArc(((Arc) toBeRemoved.remove(0)));
+						}
+						LabeledEvent oldEvent = rob.getAlphabet().getEvent(to.getName() + from.getName()); //
+						rob.getAlphabet().removeEvent(oldEvent);
+
+						// Add sequence
+						State currState = firstState;
+						for (int i=richPath.size()-2; i>0; i--) //
+						{
+							RichConfiguration currPos = richPath.get(i);
+							RichConfiguration nextPos = richPath.get(i-1); //
+
+							// Add new arc and stuff
+							State nextState;
+							if (i == 1) //
+							{
+								nextState = lastState;
+							}
+							else
+							{
+								nextState = new State(currPos.getName() + nextPos.getName());
+								rob.addState(nextState);
+							}
+							LabeledEvent event = new LabeledEvent(currPos.getName() + nextPos.getName());
+							rob.getAlphabet().addEvent(event);
+							Arc arc = new Arc(currState, nextState, event);
+							rob.addArc(arc);
+
+							// Set cost, must be int, so it now is the number of milliseconds
+							nextState.setCost((int) (1000*(currPos.getTime() - nextPos.getTime()))); //
+
+							currState = nextState;
+						}
+					}
+
+					// MODIFY ROBOT TARGET AUTOMATON
+					if (!from.getName().equals(robot.getHomeConfiguration().getName())) //
+					{
+						Automaton target = robotAutomata.getAutomaton(robot.getName() + UNDERSCORE + from.getName()); //
+						LabeledEvent event = new LabeledEvent(secondLastPos.getName() + lastPos.getName());
+						Arc arc = new Arc(target.getStateWithName("0"), target.getStateWithName("1"), event);
+						target.getAlphabet().addEvent(event);
+						target.addArc(arc);
 					}
 				}
 
-				// MODIFY ROBOT TARGET AUTOMATON
-				if (!from.getName().equals(robot.getHomeConfiguration().getName())) //
-				{
-					Automaton target = robotAutomata.getAutomaton(robot.getName() + UNDERSCORE + from.getName()); //
-					LabeledEvent event = new LabeledEvent(secondLastPos.getName() + lastPos.getName());
-					Arc arc = new Arc(target.getStateWithName("0"), target.getStateWithName("1"), event);
-					target.getAlphabet().addEvent(event);
-					target.addArc(arc);
-				}
+				// Clean up
+				//path.delete();
+			}
+			catch (Exception e)
+			{
+				logger.error("Error when examining collisions. " + e);
+				// e.printStackTrace(System.err);
+
+				return;
+
+				//throw new SupremicaException();
 			}
 
-			// Clean up
-			//path.delete();
-	    }
-		catch (Exception e)
-	    {
-			logger.error("Error when examining collisions. " + e);
-			// e.printStackTrace(System.err);
-
-			return;
-
-			//throw new SupremicaException();
-	    }
-
-		logger.debug("Intersection points and times stored");
+			logger.debug("Intersection points and times stored");
+		}
     }
 
     /**
@@ -1157,7 +1465,7 @@ public class RSCell
 
     /**
      * Runs a simulation for a given robot along a path, 
-     * specified by its start and end positions.
+     * specified by its start and end configurations.
      */
     public void runSimulation(Robot robot, Configuration from, Configuration to) 
 		throws Exception
@@ -1173,7 +1481,7 @@ public class RSCell
 		
 		ISimulation iSim = station.getSimulations().item(Converter.var(1));
 		Simulation sim = Simulation.getSimulationFromUnknown(iSim);
-		sim.setResolution(0.001);
+		//sim.setResolution(0.001);
 
 		sim.addDSimulationEventsListener(simListener);
 		sim.start();

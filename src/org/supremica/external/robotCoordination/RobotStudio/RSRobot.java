@@ -244,14 +244,17 @@ public class RSRobot
 		// Find targets
 		Target goal = ((RSConfiguration) configuration).getRobotStudioTarget();
 		
-		// Jump to the "from"-target
+		// Jump to the target
 		mechanism.jumpToTarget(goal);
 		
 		// Takes a while?
 		//Thread.sleep(1000);
     }
 	
-    // Other methods
+	///////////////////
+    // Other methods //
+	///////////////////
+
     public String toString()
     {
 		try
@@ -399,9 +402,21 @@ public class RSRobot
 		Target fromTarget = ((RSConfiguration) from).getRobotStudioTarget();
 		Target toTarget = ((RSConfiguration) to).getRobotStudioTarget();
 		
+		// Path name
+		String pathName = from.getName() + "_" + to.getName();
+
 		// Create new path for this motion
+		try
+		{
+			// If there is already a path with the right name, delete it!
+			mechanism.getPaths().item(Converter.var(pathName)).delete();
+		}
+		catch (Exception hukarz)
+		{
+			// No path has that name, fine!
+		}
 		activePath = Path.getPathFromUnknown(mechanism.getPaths().add());
-		activePath.setName(from.getName() + "_" + to.getName());
+		activePath.setName(pathName);
 		activePath.insert(fromTarget);
 		activePath.getTargetRefs().item(Converter.var(1)).setMotionType(1);    // Linear motion
 		activePath.insert(toTarget);

@@ -295,14 +295,12 @@ public class MechanismListener
 				//String viaPointName = "In" + objectName + "_";
 				//viaPointName = viaPointName + nbrOfTimesCollision;
 				int robotIndex = theCell.getRobotIndex(mechanism.getName());
-				String viaPointName = mechanism.getName().substring(5) + RSCell.VIAPOINT_SUFFIX + RSCell.nbrOfTimesCollision;
+				String viaPointName = mechanism.getName().substring(5) + RSCell.VIAPOINT_SUFFIX + RSCell.nbrOfTimesCollision++;
 				ITarget viaTarget = createTargetAtTCP(viaPointName);
 				
 				// Insert the new target in the path
 				ITargetRef viaTargetRef = path.insert(viaTarget);
 				viaTargetRef.setMotionType(1);
-				
-				RSCell.nbrOfTimesCollision++;
 				
 				// Remember
 				posList.add(new RichConfiguration(viaPointName, time, objectName, null));
@@ -363,14 +361,12 @@ public class MechanismListener
 				//viaPointName = viaPointName + path.getName() + RSCell.nbrOfTimesCollision;
 				//String viaPointName = "Out" + objectName + "_";
 				//viaPointName = viaPointName + RSCell.nbrOfTimesCollision;
-				String viaPointName = mechanism.getName().substring(5) + RSCell.VIAPOINT_SUFFIX + RSCell.nbrOfTimesCollision;
+				String viaPointName = mechanism.getName().substring(5) + RSCell.VIAPOINT_SUFFIX + RSCell.nbrOfTimesCollision++;
 				ITarget viaTarget = createTargetAtTCP(viaPointName);
 				
 				// Insert the new target in the path
 				ITargetRef viaTargetRef = path.insert(viaTarget);
 				viaTargetRef.setMotionType(1);
-				
-				RSCell.nbrOfTimesCollision++;
 				
 				// Remove from the colliding objects list
 				Collider toBeRemoved = getColliderWithName(objectsColliding, objectName);
@@ -462,6 +458,7 @@ public class MechanismListener
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
     // DEPRECATED.... Use Robot.createConfigurationAtTCP() instead. (Is only used in this class (in 2 places)).
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     /**
      * Create new target where the TCP currently resides.
      * Note that a target can not have a name that is longer
@@ -479,10 +476,8 @@ public class MechanismListener
 		
 		// Set a catchy name
 		boolean ok = false;
-		int nbr = 1;
-		
+		int nbr = 1;		
 		while (!ok)
-			
 	    {
 			try
 		    {
