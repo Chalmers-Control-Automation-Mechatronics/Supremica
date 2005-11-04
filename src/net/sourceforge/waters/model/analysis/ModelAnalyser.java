@@ -3,12 +3,13 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   ModelAnalyser
 //###########################################################################
-//# $Id: ModelAnalyser.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: ModelAnalyser.java,v 1.2 2005-11-04 02:21:17 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
 
 import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
 /**
@@ -22,8 +23,10 @@ public abstract class ModelAnalyser
 
   //#########################################################################
   //# Constructors
-  public ModelAnalyser(final ProductDESProxy input)
+  public ModelAnalyser(final ProductDESProxyFactory factory,
+		       final ProductDESProxy input)
   {
+    mFactory = factory;
     mInput = input;
     mResult = null;
   }
@@ -41,6 +44,11 @@ public abstract class ModelAnalyser
 
   //#########################################################################
   //# Simple Acess Methods
+  public ProductDESProxyFactory getFactory()
+  {
+    return mFactory;
+  }
+
   public ProductDESProxy getInput()
   {
     return mInput;
@@ -63,6 +71,7 @@ public abstract class ModelAnalyser
 
   //#########################################################################
   //# Data Members
+  private final ProductDESProxyFactory mFactory;
   private final ProductDESProxy mInput;
   private AnalysisResult mResult;
 

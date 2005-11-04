@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.build.jniglue
 //# CLASS:   TemplateFragmentForeach
 //###########################################################################
-//# $Id: TemplateFragmentForeach.java,v 1.1 2005-02-18 01:30:10 robi Exp $
+//# $Id: TemplateFragmentForeach.java,v 1.2 2005-11-04 02:21:17 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.build.jniglue;
@@ -17,9 +17,10 @@ class TemplateFragmentForeach extends TemplateFragment {
   //# Constructors
   TemplateFragmentForeach(final String name,
 			  final TemplateFragment body,
+			  final int numskipped,
 			  final int lineno)
   {
-    super(lineno);
+    super(numskipped, lineno);
     mName = name;
     mBody = body;
   }
@@ -40,9 +41,10 @@ class TemplateFragmentForeach extends TemplateFragment {
 
   //#########################################################################
   //# Code Generation
-  void writeCppGlue(final CppGlueWriter writer, final TemplateContext context)
+  void writeCppGlue(final CppGlueWriter writer, TemplateContext context)
   {
-    final ProcessorForeach processor = context.getProcessorForeach(mName);
+    final TemplateContext outer = getRelevantContext(context);
+    final ProcessorForeach processor = outer.getProcessorForeach(mName);
     if (processor != null) {
       final Iterator iter = processor.getIterator();
       final int numerrors = writer.getNumErrors();

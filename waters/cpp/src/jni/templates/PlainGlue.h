@@ -5,7 +5,7 @@ $-
 //# PACKAGE: jni.templates
 //# CLASS:   Template for a plain glue class header file
 //###########################################################################
-//# $Id: PlainGlue.h,v 1.1 2005-02-18 01:30:10 robi Exp $
+//# $Id: PlainGlue.h,v 1.2 2005-11-04 02:21:17 robi Exp $
 //###########################################################################
 
 $+
@@ -106,6 +106,7 @@ $IF-HASPLAINMETHODS
   //# Java Methods
 $FOREACH-PLAINMETHOD
   $CPPTYPENAME$ $METHODNAME($FOREACH-ARG$=
+                            $IF-GLUE const $ENDIF$=
                             $GLUETYPENAME$IF-GLUE*$ENDIF$ $ARGNAME $IF-HASNEXT,
   $TSPC       $ $MSPC     $ $ENDIF $ENDFOR) const;
 $IF-GLUE
@@ -113,7 +114,7 @@ $IF-GLUE
   $METHODNAME Glue($FOREACH-ARG$=
                                   $IF-GLUE const $ENDIF$=
                                     $GLUETYPENAME $IF-GLUE*$ENDIF$ $ARGNAME,
-  $IF-ENUM $JSPC $ELSE $GGSPC $ENDIF$=
+  $^IF-ENUM $^JSPC $^ELSE $^GSPC $^ENDIF$=
                $ $MSPC      $     $ENDFOR$=
                                   ClassCache* cache) const;
 $ENDIF

@@ -4,12 +4,13 @@
 #include <jni.h>
 
 #include "jni/cache/ClassCache.h"
-#include "jni/glue/CollectionGlue.h"
 #include "jni/glue/EventGlue.h"
 #include "jni/glue/IteratorGlue.h"
 #include "jni/glue/ModelAnalyserGlue.h"
 #include "jni/glue/ProductDESGlue.h"
 #include "jni/glue/ProductDESResultGlue.h"
+#include "jni/glue/ProductDESProxyFactoryGlue.h"
+#include "jni/glue/SetGlue.h"
 
 #include "waters/base/IntTypes.h"
 #include "waters/des/GlobalAlphabet.h"
@@ -25,7 +26,7 @@ void initGlobalAlphabet(const jni::ProductDESGlue& des, jni::ClassCache* cache)
   uint32 numuncont = 0;
   uint32 numcont = 0;
   
-  const jni::CollectionGlue events = des.getEventsGlue(cache);
+  const jni::SetGlue events = des.getEventsGlue(cache);
   const int numevents = events.size();
   jni::EventGlue* eventarray =
     (jni::EventGlue*) new char[numevents * sizeof(jni::EventGlue)];
@@ -92,9 +93,12 @@ Java_net_sourceforge_waters_model_analysis_ProductDESCopier_callNativeMethod
     jni::ProductDESGlue des = analyser.getInputGlue(&cache);
     jstring name = des.getName();
     waters::initGlobalAlphabet(des, &cache);
-    jni::ProductDESGlue copy(name, &cache);
+    jni::ProductDESProxyFactoryGlue factory = analyser.getFactoryGlue(&cache);
+    jni::ProductDESGlue copy =
+      factory.createProductDESProxyGlue(name, 0, 0, &cache);
     jni::ProductDESResultGlue result(false, &copy, &cache);
-    return result.returnJavaObject();
+    jobject obj = result.returnJavaObject();
+    return obj;
   } catch (jthrowable exception) {
     return 0;
   }

@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.build.jniglue
 //# CLASS:   TemplateFragmentVariable
 //###########################################################################
-//# $Id: TemplateFragmentVariable.java,v 1.1 2005-02-18 01:30:10 robi Exp $
+//# $Id: TemplateFragmentVariable.java,v 1.2 2005-11-04 02:21:17 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.build.jniglue;
@@ -13,9 +13,11 @@ class TemplateFragmentVariable extends TemplateFragment {
 
   //#########################################################################
   //# Constructors
-  TemplateFragmentVariable(final String name, final int lineno)
+  TemplateFragmentVariable(final String name,
+			   final int numskipped,
+			   final int lineno)
   {
-    super(lineno);
+    super(numskipped, lineno);
     mName = name;
   }
 
@@ -30,8 +32,9 @@ class TemplateFragmentVariable extends TemplateFragment {
 
   //#########################################################################
   //# Code Generation
-  void writeCppGlue(final CppGlueWriter writer, final TemplateContext context)
+  void writeCppGlue(final CppGlueWriter writer, TemplateContext context)
   {
+    context = getRelevantContext(context);
     final ProcessorVariable processor = context.getProcessorVariable(mName);
     if (processor != null) {
       final String text = processor.getText();

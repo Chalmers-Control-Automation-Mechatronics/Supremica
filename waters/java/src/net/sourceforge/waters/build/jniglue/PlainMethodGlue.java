@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.build.jniglue
 //# CLASS:   PlainMethodGlue
 //###########################################################################
-//# $Id: PlainMethodGlue.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: PlainMethodGlue.java,v 1.3 2005-11-04 02:21:17 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.build.jniglue;
@@ -84,8 +84,8 @@ class PlainMethodGlue extends MethodGlue {
     try {
       final Class[] paramtypes = getParameterClasses();
       final Method method = javaclass.getMethod(mMethodName, paramtypes);
-      final Class methodtype = method.getReturnType();
-      final Class gluetype = getJavaType();
+      final Class<?> methodtype = method.getReturnType();
+      final Class<?> gluetype = getJavaType();
       if (gluetype != null && gluetype != methodtype) {
         reporter.reportError
           ("Method " + mMethodName + "() in class " + javaclass.getName() +

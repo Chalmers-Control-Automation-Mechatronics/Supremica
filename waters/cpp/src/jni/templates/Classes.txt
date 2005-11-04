@@ -4,7 +4,7 @@
 //# PACKAGE: jni.glue
 //# PURPOSE: List of classes and methods to be converted to C++/JNI code
 //###########################################################################
-//# $Id: Classes.txt,v 1.1 2005-02-18 01:30:10 robi Exp $
+//# $Id: Classes.txt,v 1.2 2005-11-04 02:21:17 robi Exp $
 //###########################################################################
 
 
@@ -33,6 +33,11 @@ glue class Collection {
   glue Iterator iterator();
 }
 
+glue class Set {
+  int size();
+  glue Iterator iterator();
+}
+
 
 //###########################################################################
 package net.sourceforge.waters.xsd.base;
@@ -48,21 +53,30 @@ package net.sourceforge.waters.model.des;
 //###########################################################################
 
 glue class EventProxy {
-  EventProxy(String name, glue EventKind kind);
   String getName();
   glue EventKind getKind();
 }
 
 glue class AutomatonProxy {
-  AutomatonProxy(String name, glue ComponentKind kind);
   String getName();
   glue ComponentKind getKind();
 }
 
 glue class ProductDESProxy {
-  ProductDESProxy(String name);
   String getName();
-  glue Collection getEvents();
+  glue Set getEvents();
+}
+
+glue class ProductDESProxyFactory {
+  glue AutomatonProxy createAutomatonProxy(String name,
+					   glue ComponentKind kind,
+					   glue Collection events,
+					   glue Collection states,
+					   glue Collection transitions);
+  glue EventProxy createEventProxy(String name, glue EventKind kind);
+  glue ProductDESProxy createProductDESProxy(String name,
+					     glue Collection events,
+					     glue Collection automata);
 }
 
 
@@ -71,6 +85,7 @@ package net.sourceforge.waters.model.analysis;
 //###########################################################################
 
 glue class ModelAnalyser {
+  glue ProductDESProxyFactory getFactory();
   glue ProductDESProxy getInput();
 }
 

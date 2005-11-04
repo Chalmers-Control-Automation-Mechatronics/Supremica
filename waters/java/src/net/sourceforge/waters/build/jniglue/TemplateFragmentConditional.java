@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.build.jniglue
 //# CLASS:   TemplateFragmentConditional
 //###########################################################################
-//# $Id: TemplateFragmentConditional.java,v 1.1 2005-02-18 01:30:10 robi Exp $
+//# $Id: TemplateFragmentConditional.java,v 1.2 2005-11-04 02:21:17 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.build.jniglue;
@@ -15,17 +15,19 @@ class TemplateFragmentConditional extends TemplateFragment {
   //# Constructors
   TemplateFragmentConditional(final String name,
 			      final TemplateFragment thenpart,
+			      final int numskipped,
 			      final int lineno)
   {
-    this(name, thenpart, null, lineno);
+    this(name, thenpart, null, numskipped, lineno);
   }
 
   TemplateFragmentConditional(final String name,
 			      final TemplateFragment thenpart,
 			      final TemplateFragment elsepart,
+			      final int numskipped,
 			      final int lineno)
   {
-    super(lineno);
+    super(numskipped, lineno);
     mName = name;
     mThen = thenpart;
     mElse = elsepart;
@@ -57,10 +59,11 @@ class TemplateFragmentConditional extends TemplateFragment {
 
   //#########################################################################
   //# Code Generation
-  void writeCppGlue(final CppGlueWriter writer, final TemplateContext context)
+  void writeCppGlue(final CppGlueWriter writer, TemplateContext context)
   {
+    final TemplateContext outer = getRelevantContext(context);
     final ProcessorConditional processor =
-      context.getProcessorConditional(mName);
+      outer.getProcessorConditional(mName);
     if (processor == null) {
       writer.reportError("Undefined instruction $IF-" + mName, getLineNo());
     } else if (processor.isConditionSatisfied()) {

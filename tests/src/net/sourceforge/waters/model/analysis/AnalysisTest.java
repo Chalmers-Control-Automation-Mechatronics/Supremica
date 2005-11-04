@@ -4,26 +4,31 @@
 //# PACKAGE: net.sourceforge.waters.junit
 //# CLASS:   AlgorithmsTest
 //###########################################################################
-//# $Id: AnalysisTest.java,v 1.3 2005-11-03 01:24:16 robi Exp $
+//# $Id: AnalysisTest.java,v 1.1 2005-11-04 02:21:17 robi Exp $
 //###########################################################################
 
-package net.sourceforge.waters.junit;
+package net.sourceforge.waters.model.analysis;
 
 import java.io.File;
 import java.io.IOException;
 import javax.xml.bind.JAXBException;
 
-import net.sourceforge.waters.model.analysis.ProductDESCopier;
-import net.sourceforge.waters.model.analysis.ProductDESResult;
-import net.sourceforge.waters.model.base.DocumentManager;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.ProxyMarshaller;
 import net.sourceforge.waters.model.base.WatersException;
+import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
-import net.sourceforge.waters.model.des.ProductDESMarshaller;
 import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.module.ModuleMarshaller;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.expr.OperatorTable;
+import net.sourceforge.waters.model.marshaller.DocumentManager;
+import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 import net.sourceforge.waters.model.module.ModuleProxy;
+import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.plain.des.ProductDESElementFactory;
+import net.sourceforge.waters.plain.module.ModuleElementFactory;
+
+import net.sourceforge.waters.junit.WatersTestCase;
 
 
 public class AnalysisTest extends WatersTestCase
@@ -32,7 +37,7 @@ public class AnalysisTest extends WatersTestCase
   //#########################################################################
   //# Test Cases
   public void testCopy_machine()
-    throws IOException, JAXBException, WatersException
+    throws IOException, WatersException
   {
     testCopy("machine");
   }
@@ -41,12 +46,13 @@ public class AnalysisTest extends WatersTestCase
   //#########################################################################
   //# Utilities
   void testCopy(final String modname)
-    throws IOException, JAXBException, WatersException
+    throws IOException, WatersException
   {
     final String inextname = modname + mModuleMarshaller.getDefaultExtension();
     final File infilename = new File(mInputDirectory, inextname);
     final ProductDESProxy des = compile(infilename);
-    final ProductDESCopier copier = new ProductDESCopier(des);
+    final ProductDESCopier copier =
+      new ProductDESCopier(mProductDESFactory, des);
     final ProductDESResult result = (ProductDESResult) copier.run();
     assertTrue("Unexpected result value!", result.getSatisfied() == false);
     final ProductDESProxy copy = result.getProductDES();
@@ -56,12 +62,12 @@ public class AnalysisTest extends WatersTestCase
   }
 
   ProductDESProxy compile(final File infilename)
-    throws JAXBException, WatersException, IOException
+    throws IOException, WatersException
   {
     final ModuleProxy module =
       (ModuleProxy) mModuleMarshaller.unmarshal(infilename);
     final ModuleCompiler compiler =
-      new ModuleCompiler(module, mDocumentManager);
+      new ModuleCompiler(mDocumentManager, mProductDESFactory, module);
     return compiler.compile();
   }
 
@@ -71,31 +77,35 @@ public class AnalysisTest extends WatersTestCase
   protected void setUp()
     throws JAXBException
   {
-    mModuleMarshaller = new ModuleMarshaller();
-    mDESMarshaller = new ProductDESMarshaller();
-    mDocumentManager = new DocumentManager<DocumentProxy>();
-    mDocumentManager.register(mModuleMarshaller);
-    mDocumentManager.register(mDESMarshaller);
     mInputDirectory = new File(getInputRoot(), "handwritten");
-    mOutputDirectory = new File(getOutputRoot(), "analysis");
+    mOutputDirectory = getOutputDirectory();
+    mModuleFactory = ModuleElementFactory.getInstance();
+    mProductDESFactory = ProductDESElementFactory.getInstance();
+    final OperatorTable optable = CompilerOperatorTable.getInstance();
+    mModuleMarshaller = new JAXBModuleMarshaller(mModuleFactory, optable);
+    mDocumentManager = new DocumentManager<DocumentProxy>();
+    mDocumentManager.registerMarshaller(mModuleMarshaller);
+    mDocumentManager.registerUnmarshaller(mModuleMarshaller);
   }
 
   protected void tearDown()
   {
-    mModuleMarshaller = null;
-    mDESMarshaller = null;
-    mDocumentManager = null;
     mInputDirectory = null;
     mOutputDirectory = null;
+    mModuleFactory = null;
+    mProductDESFactory = null;
+    mModuleMarshaller = null;
+    mDocumentManager = null;
   }
 
 
   //#########################################################################
   //# Data Members
-  private ModuleMarshaller mModuleMarshaller;
-  private ProductDESMarshaller mDESMarshaller;
-  private DocumentManager<DocumentProxy> mDocumentManager;
   private File mInputDirectory;
   private File mOutputDirectory;
+  private ModuleProxyFactory mModuleFactory;
+  private ProductDESProxyFactory mProductDESFactory;
+  private JAXBModuleMarshaller mModuleMarshaller;
+  private DocumentManager<DocumentProxy> mDocumentManager;
 
 }

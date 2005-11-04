@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.build.jniglue
 //# CLASS:   TemplateFileParser
 //###########################################################################
-//# $Id: TemplateFileParser.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: TemplateFileParser.java,v 1.3 2005-11-04 02:21:17 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.build.jniglue;
@@ -85,39 +85,51 @@ class TemplateFileParser extends ErrorReporter {
     int code = getNextCharacter();
     while (code != -1) {
       if (code == '$') {
+        int numhats = 0;
         int secondcode = getNextCharacter();
+        while (secondcode == '^') {
+          numhats++;
+          secondcode = getNextCharacter();
+        }
         if (secondcode >= 'A' && secondcode <= 'Z') {
           storeTextFragment(buffer);
           putback(secondcode);
-          parseDollarVar();
+          parseDollarVar(numhats);
           skipWhiteSpace();
           buffer = new StringBuffer();
-        } else if (secondcode == '-') {
-          do {
-            code = getNextCharacter();
-            switch (code) {
-            case -1:
-              putback(code);
-              break;
-            case '$':
-              secondcode = getNextCharacter();
-              if (secondcode == '+') {
-                code = -1;
-              } else {
-                putback(secondcode);
-              }
-              break;
-            }
-          } while (code != -1);
-          skipWhiteSpace();
-        } else if (secondcode == '=') {
-          skipWhiteSpace(true);   
-        } else if (secondcode == -1) {
-          buffer.append('$');
-          putback(secondcode);
         } else {
-          final char ch = (char) secondcode;
-          buffer.append(ch);
+          if (numhats > 0) {
+            final ParseException exception = createParseException
+             ("Reference character '^' cannot be used without variable name!");
+            reportError(exception);
+          }
+          if (secondcode == '-') {
+            do {
+              code = getNextCharacter();
+              switch (code) {
+              case -1:
+                putback(code);
+                break;
+              case '$':
+                secondcode = getNextCharacter();
+                if (secondcode == '+') {
+                  code = -1;
+                } else {
+                  putback(secondcode);
+                }
+                break;
+              }
+            } while (code != -1);
+            skipWhiteSpace();
+          } else if (secondcode == '=') {
+            skipWhiteSpace(true);   
+          } else if (secondcode == -1) {
+            buffer.append('$');
+            putback(secondcode);
+          } else {
+            final char ch = (char) secondcode;
+            buffer.append(ch);
+          }
         }
       } else {
         final char ch = (char) code;
@@ -142,28 +154,28 @@ class TemplateFileParser extends ErrorReporter {
     }
   }
 
-  private void parseDollarVar()
+  private void parseDollarVar(final int numhats)
     throws IOException
   {
     try {
       final String name = parseUpperCaseName();
       if (name.equals("FOREACH")) {
         final String suffix = parseUpperCaseSuffix(name);
-        openForeachFragment(suffix);
+        openForeachFragment(suffix, numhats);
       } else if (name.equals("ENDFOR")) {
         closeForeachFragment();
       } else if (name.equals("IF")) {
         final String suffix = parseUpperCaseSuffix(name);
-        openConditionalFragment(suffix);
+        openConditionalFragment(suffix, numhats);
       } else if (name.equals("ELSEIF")) {
         final String suffix = parseUpperCaseSuffix(name);
-        openConditionalAlternative(suffix);
+        openConditionalAlternative(suffix, numhats);
       } else if (name.equals("ELSE")) {
         openConditionalAlternative();
       } else if (name.equals("ENDIF")) {
         closeConditionalFragment();
       } else {
-        storeVariableFragment(name);
+        storeVariableFragment(name, numhats);
       }
     } catch (final ParseException exception) {
       reportError(exception);
@@ -221,20 +233,20 @@ class TemplateFileParser extends ErrorReporter {
     mCurrentSequence.addFragment(fragment);
   }
 
-  private void storeVariableFragment(final String name)
+  private void storeVariableFragment(final String name, final int numhats)
   {
     final TemplateFragment fragment =
-      new TemplateFragmentVariable(name, mLineNo);
+      new TemplateFragmentVariable(name, numhats, mLineNo);
     mCurrentSequence.addFragment(fragment);
   }
 
-  private void openForeachFragment(final String name)
+  private void openForeachFragment(final String name, final int numhats)
   {
     final TemplateFragmentSequence parent = mCurrentSequence;
     pushCurrentContainer();
     mCurrentSequence = new TemplateFragmentSequence();
     mCurrentContainer =
-      new TemplateFragmentForeach(name, mCurrentSequence, mLineNo);
+      new TemplateFragmentForeach(name, mCurrentSequence, numhats, mLineNo);
     parent.addFragment(mCurrentContainer);
   }
 
@@ -248,13 +260,14 @@ class TemplateFileParser extends ErrorReporter {
     }
   }
 
-  private void openConditionalFragment(final String name)
+  private void openConditionalFragment(final String name, final int numhats)
   {
     final TemplateFragmentSequence parent = mCurrentSequence;
     pushCurrentContainer();
     mCurrentSequence = new TemplateFragmentSequence();
     mCurrentContainer = 
-      new TemplateFragmentConditional(name, mCurrentSequence, mLineNo);
+      new TemplateFragmentConditional(name, mCurrentSequence,
+                                      numhats, mLineNo);
     parent.addFragment(mCurrentContainer);
   }
 
@@ -266,13 +279,14 @@ class TemplateFileParser extends ErrorReporter {
     conditional.setElse(mCurrentSequence);
   }
 
-  private void openConditionalAlternative(final String name)
+  private void openConditionalAlternative(final String name, final int numhats)
     throws ParseException
   {
     final TemplateFragmentConditional conditional = verifyElseParent();
     mCurrentSequence = new TemplateFragmentSequence();
     mCurrentContainer = 
-      new TemplateFragmentConditional(name, mCurrentSequence, mLineNo);
+      new TemplateFragmentConditional(name, mCurrentSequence,
+                                      numhats, mLineNo);
     conditional.setElse(mCurrentContainer);
   }
 

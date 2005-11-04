@@ -1,6 +1,6 @@
 <!-- -*- indent-tabs-mode: nil -*- -->
 
-<project name="waters" default="waters-jar">
+<project name="waters" default="waters">
   <description>
   </description>
 
@@ -94,11 +94,7 @@
     <javac srcdir="${supremica.src}" destdir="${waters.classes}" 
            includes="net/sourceforge/waters/**/*.java"
            excludes="net/sourceforge/waters/gui/**/*.java
-                     net/sourceforge/waters/junit/**/*.java
-                     net/sourceforge/waters/model/oldcompiler/**/*.java
-                     net/sourceforge/waters/model/unchecked/**/*.java
-                     net/sourceforge/waters/newmodel/**/*.java
-                     net/sourceforge/waters/oldmodel/**/*.java"
+                     net/sourceforge/waters/model/unchecked/**/*.java"
            debug="${debug}" debuglevel="${debuglevel}" optimize="${optimize}">
       <classpath>
         <path refid="external-classpath"/>
@@ -114,7 +110,6 @@
         <include name="net/sourceforge/waters/**/*.class"/>
         <exclude name="net/sourceforge/waters/build/**"/>
         <exclude name="net/sourceforge/waters/gui/**"/>
-        <exclude name="net/sourceforge/waters/junit/**"/>
         <exclude name="net/sourceforge/waters/model/unchecked/**"/>
         <exclude name="net/sourceforge/waters/xsd/**"/>
       </fileset>
@@ -132,7 +127,7 @@
   </target>
 
   <target name="jniglue-compile">
-    <javac srcdir="${src}" destdir="${classes}" 
+    <javac srcdir="${src}" destdir="${waters.classes}" 
            includes="net/sourceforge/waters/build/jniglue/*.java"
            debug="${debug}" debuglevel="${debuglevel}" optimize="${optimize}">
       <classpath refid="external-classpath"/>
@@ -171,11 +166,13 @@
     <exec executable="make" dir="${cpp}" failonerror="true"/>
   </target>
 
-  <target name="test-compile" depends="waters-jar">
+  <target name="waters" depends="waters-jar,cpp"
+          description="Build all Waters executables."/>
+
+  <target name="test-compile" depends="waters-jar,cpp">
     <mkdir dir="${test.classes}"/>
     <javac srcdir="${supremica.testsrc}" destdir="${test.classes}" 
            includes="net/sourceforge/waters/**/*.java"
-           excludes="net/sourceforge/waters/junit/**/*.java"
            debug="${debug}" debuglevel="${debuglevel}" optimize="${optimize}">
       <classpath>
         <path refid="external-classpath"/>
@@ -196,6 +193,7 @@
 
   <target name="test" depends="test-jar"
           description="Run the test cases.">
+    <mkdir dir="${logs}/model/analysis"/>
     <mkdir dir="${logs}/model/compiler"/>
     <mkdir dir="${logs}/model/expr"/>
     <mkdir dir="${logs}/plain/des"/>
@@ -216,16 +214,14 @@
             todir="${logs}/model/expr"/>
       <test name="net.sourceforge.waters.model.compiler.CompilerTest"
             todir="${logs}/model/compiler"/>
+      <test name="net.sourceforge.waters.model.analysis.AnalysisTest"
+            todir="${logs}/model/analysis"/>
       <test name="net.sourceforge.waters.valid.ValidTest"
             todir="${logs}/valid"/>
       <test name="net.sourceforge.waters.samples.maze.MazeTest"
             todir="${logs}/samples/maze"/>
       <test name="net.sourceforge.waters.samples.algorithms.AlgorithmsTest"
             todir="${logs}/samples/algorithms"/>
-      <!--
-      <test name="net.sourceforge.waters.junit.AnalysisTest"
-            outfile="logs/analysis/testrun"/>
-      -->
       <classpath>
         <path refid="external-classpath"/>
         <pathelement location="${jaxb.jar}"/>

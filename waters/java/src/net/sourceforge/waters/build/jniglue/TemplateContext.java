@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.build.jniglue
 //# CLASS:   TemplateContext
 //###########################################################################
-//# $Id: TemplateContext.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: TemplateContext.java,v 1.3 2005-11-04 02:21:17 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.build.jniglue;
@@ -26,6 +26,14 @@ class TemplateContext {
   {
     mParent = parent;
     mProcessors = new HashMap<TemplateProcessorKey,Object>();
+  }
+
+
+  //#########################################################################
+  //# Simple Access
+  TemplateContext getParent()
+  {
+    return mParent;
   }
 
 
