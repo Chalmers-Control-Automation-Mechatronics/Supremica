@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.build.jniglue
 //# CLASS:   GlueFileParser
 //###########################################################################
-//# $Id: GlueFileParser.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: GlueFileParser.java,v 1.3 2005-11-05 00:42:14 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.build.jniglue;
@@ -194,9 +194,17 @@ class GlueFileParser extends ErrorReporter {
     token = nextTokenIdentifier();
     final String name = token.getTokenText();
     ClassGlue classglue = (ClassGlue) mClasses.get(name);
+    ClassGlue baseglue = mObjectClass;
+    token = nextToken();
+    if (token.getTokenType() == TokenTable.C_EXTENDS) {
+      token = nextTokenIdentifier();
+      final String basename = token.getTokenText();
+      baseglue = (ClassGlue) mClasses.get(basename);
+      token = nextToken();
+    }
     if (classglue == null) {
       classglue =
-        new PlainClassGlue(mPackageName, name, mObjectClass, mod, this);
+        new PlainClassGlue(mPackageName, name, baseglue, mod, this);
       mClasses.put(name, classglue);
     } else if (classglue.getModifier() != null) {
       throw createDuplicateClassException(name);
@@ -204,8 +212,9 @@ class GlueFileParser extends ErrorReporter {
       throw createClassNeedsGlueException(name);
     } else {
       classglue.setModifier(mod);
+      classglue.setBaseClass(baseglue);
     }
-    nextTokenKnown(TokenTable.T_OPENBRACE);
+    requireToken(token, TokenTable.T_OPENBRACE);
     do {
       try {
         token = parseMethod(classglue);

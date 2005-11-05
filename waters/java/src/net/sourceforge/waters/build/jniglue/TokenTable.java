@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.build.jniglue
 //# CLASS:   TokenTable
 //###########################################################################
-//# $Id: TokenTable.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: TokenTable.java,v 1.3 2005-11-05 00:42:14 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.build.jniglue;
@@ -28,11 +28,12 @@ class TokenTable {
   static final int C_PACKAGE = 8;
   static final int C_CLASS = 9;
   static final int C_ENUM = 10;
-  static final int C_ARG = 11;
-  static final int C_REF = 12;
-  static final int C_GLUE = 13;
-  static final int C_SIMPLETYPE = 14;
-  static final int C_IDENTIFIER = 15;
+  static final int C_EXTENDS = 11;
+  static final int C_ARG = 12;
+  static final int C_REF = 13;
+  static final int C_GLUE = 14;
+  static final int C_SIMPLETYPE = 15;
+  static final int C_IDENTIFIER = 16;
 
   static final Token T_EOF = new Token(C_EOF, null);
   static final Token T_OPENBRACE = new Token(C_OPENBRACE, "{");
@@ -45,6 +46,7 @@ class TokenTable {
   static final Token T_PACKAGE = new Token(C_PACKAGE, "package");
   static final Token T_CLASS = new Token(C_CLASS, "class");
   static final Token T_ENUM = new Token(C_ENUM, "enum");
+  static final Token T_EXTENDS = new Token(C_EXTENDS, "extends");
 
   static final Token T_REF =
     new ClassModifierToken(C_REF, "ref", ClassModifier.M_REF); 
@@ -90,6 +92,7 @@ class TokenTable {
     recordToken(T_PACKAGE);
     recordToken(T_CLASS);
     recordToken(T_ENUM);
+    recordToken(T_EXTENDS);
     recordToken(T_REF);
     recordToken(T_ARG);
     recordToken(T_GLUE);

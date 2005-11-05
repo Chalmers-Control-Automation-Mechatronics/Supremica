@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.build.jniglue
 //# CLASS:   ClassGlue
 //###########################################################################
-//# $Id: ClassGlue.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: ClassGlue.java,v 1.3 2005-11-05 00:42:14 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.build.jniglue;
@@ -116,6 +116,17 @@ abstract class ClassGlue implements Comparable, FileWritableGlue {
   ClassGlue getBaseClass()
   {
     return mBaseClass;
+  }
+
+  void setBaseClass(final ClassGlue baseclass)
+  {
+    if (mBaseClass != null) {
+      mBaseClass.mNumSubclasses--;
+    }
+    mBaseClass = baseclass;
+    if (mBaseClass != null) {
+      mBaseClass.mNumSubclasses++;
+    }
   }
 
   boolean addMethod(final MethodGlue method, final ErrorReporter reporter)
@@ -389,7 +400,7 @@ abstract class ClassGlue implements Comparable, FileWritableGlue {
   //# Data Members
   private final String mPackName;
   private final String mClassName;
-  private final ClassGlue mBaseClass;
+  private ClassGlue mBaseClass;
   private final Set<MethodGlue> mMethods;
   private final Set<FieldGlue> mFields;
   private final Class mJavaClass;
