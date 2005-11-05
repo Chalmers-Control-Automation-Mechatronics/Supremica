@@ -5,7 +5,7 @@ $-
 //# PACKAGE: jni.templates
 //# CLASS:   Template for a plain glue class header file
 //###########################################################################
-//# $Id: PlainGlue.h,v 1.2 2005-11-04 02:21:17 robi Exp $
+//# $Id: PlainGlue.h,v 1.3 2005-11-05 09:47:15 robi Exp $
 //###########################################################################
 
 $+
@@ -100,11 +100,11 @@ $FOREACH-CONSTRUCTOR
            $CSPC       $ $ENDFOR$=
                          ClassCache* cache);
 $ENDFOR
-$IF-HASPLAINMETHODS
+$IF-HASVIRTUALMETHODS
 
   //##########################################################################
-  //# Java Methods
-$FOREACH-PLAINMETHOD
+  //# Java Member Functions
+$FOREACH-VIRTUALMETHOD
   $CPPTYPENAME$ $METHODNAME($FOREACH-ARG$=
                             $IF-GLUE const $ENDIF$=
                             $GLUETYPENAME$IF-GLUE*$ENDIF$ $ARGNAME $IF-HASNEXT,
@@ -117,6 +117,27 @@ $IF-GLUE
   $^IF-ENUM $^JSPC $^ELSE $^GSPC $^ENDIF$=
                $ $MSPC      $     $ENDFOR$=
                                   ClassCache* cache) const;
+$ENDIF
+$ENDFOR
+$ENDIF
+$IF-HASSTATICMETHODS
+
+  //##########################################################################
+  //# Java Static Functions
+$FOREACH-STATICMETHOD
+  static $CPPTYPENAME$ $METHODNAME($FOREACH-ARG$=
+				   $IF-GLUE const $ENDIF$=
+				   $GLUETYPENAME$IF-GLUE*$ENDIF$ $ARGNAME,
+         $TSPC       $ $MSPC     $ $ENDFOR$=
+                                   ClassCache* cache);
+$IF-GLUE
+  static $IF-ENUM $JAVATYPENAME $ELSE $GLUETYPENAME $ENDIF$ $=
+  $METHODNAME Glue($FOREACH-ARG$=
+                                  $IF-GLUE const $ENDIF$=
+                                    $GLUETYPENAME $IF-GLUE*$ENDIF$ $ARGNAME,
+  $^IF-ENUM $^JSPC $^ELSE $^GSPC $^ENDIF$=
+                      $ $MSPC      $     $ENDFOR$=
+                                  ClassCache* cache);
 $ENDIF
 $ENDFOR
 $ENDIF

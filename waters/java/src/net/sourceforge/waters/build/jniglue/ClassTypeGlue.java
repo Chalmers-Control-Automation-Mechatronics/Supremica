@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.build.jniglue
 //# CLASS:   ClassTypeGlue
 //###########################################################################
-//# $Id: ClassTypeGlue.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: ClassTypeGlue.java,v 1.3 2005-11-05 09:47:15 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.build.jniglue;
@@ -86,9 +86,9 @@ class ClassTypeGlue extends TypeGlue {
     buffer.append(';');
   }
 
-  String getJNICall()
+  String getJNICallPart()
   {
-    return "CallObjectMethod";
+    return "Object";
   }
 
   Class getJavaClass()

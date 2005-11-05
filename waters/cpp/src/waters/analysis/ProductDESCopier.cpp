@@ -4,6 +4,7 @@
 #include <jni.h>
 
 #include "jni/cache/ClassCache.h"
+#include "jni/glue/CollectionsGlue.h"
 #include "jni/glue/EventGlue.h"
 #include "jni/glue/IteratorGlue.h"
 #include "jni/glue/ModelAnalyserGlue.h"
@@ -94,8 +95,9 @@ Java_net_sourceforge_waters_model_analysis_ProductDESCopier_callNativeMethod
     jstring name = des.getName();
     waters::initGlobalAlphabet(des, &cache);
     jni::ProductDESProxyFactoryGlue factory = analyser.getFactoryGlue(&cache);
+    jni::SetGlue empty = jni::CollectionsGlue::emptySetGlue(&cache);
     jni::ProductDESGlue copy =
-      factory.createProductDESProxyGlue(name, &cache);
+      factory.createProductDESProxyGlue(name, &empty, &empty, &cache);
     jni::ProductDESResultGlue result(false, &copy, &cache);
     jobject obj = result.returnJavaObject();
     return obj;

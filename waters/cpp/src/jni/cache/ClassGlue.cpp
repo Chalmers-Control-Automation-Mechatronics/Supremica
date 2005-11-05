@@ -4,7 +4,7 @@
 //# PACKAGE: jni.base
 //# CLASS:   ClassGlue
 //###########################################################################
-//# $Id: ClassGlue.cpp,v 1.1 2005-02-18 01:30:10 robi Exp $
+//# $Id: ClassGlue.cpp,v 1.2 2005-11-05 09:47:15 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -80,6 +80,24 @@ getMethodID(waters::uint32 methodcode)
     const char* name = methodinfo->getName();
     const char* signature = methodinfo->getSignature();
     result = mEnvironment->GetMethodID(mJavaClass, name, signature);
+    if (jthrowable exception = mEnvironment->ExceptionOccurred()) {
+      throw exception;
+    }
+    mMethodTable[methodcode] = result;
+  }
+  return result;
+}
+
+
+jmethodID ClassGlue::
+getStaticMethodID(waters::uint32 methodcode)
+{
+  jmethodID result = mMethodTable[methodcode];
+  if (result == 0) {
+    const MethodInfo* methodinfo = mClassInfo->getMethodInfo(methodcode);
+    const char* name = methodinfo->getName();
+    const char* signature = methodinfo->getSignature();
+    result = mEnvironment->GetStaticMethodID(mJavaClass, name, signature);
     if (jthrowable exception = mEnvironment->ExceptionOccurred()) {
       throw exception;
     }

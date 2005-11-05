@@ -4,7 +4,7 @@
 //# PACKAGE: jni.javah
 //# CLASS:   ClassGlue
 //###########################################################################
-//# $Id: ClassGlue.h,v 1.1 2005-02-18 01:30:10 robi Exp $
+//# $Id: ClassGlue.h,v 1.2 2005-11-05 09:47:15 robi Exp $
 //###########################################################################
 
 
@@ -54,6 +54,7 @@ public:
   //# Access
   jclass getJavaClass() const {return mJavaClass;};
   jmethodID getMethodID(waters::uint32 methodcode);
+  jmethodID getStaticMethodID(waters::uint32 methodcode);
   jobject getStaticFinalField(waters::uint32 fieldcode);
   JNIEnv* getEnvironment() const {return mEnvironment;};
 

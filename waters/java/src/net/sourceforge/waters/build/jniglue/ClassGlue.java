@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.build.jniglue
 //# CLASS:   ClassGlue
 //###########################################################################
-//# $Id: ClassGlue.java,v 1.3 2005-11-05 00:42:14 robi Exp $
+//# $Id: ClassGlue.java,v 1.4 2005-11-05 09:47:15 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.build.jniglue;
@@ -51,6 +51,8 @@ abstract class ClassGlue implements Comparable, FileWritableGlue {
     mFieldList = null;
     mNumSubclasses = 0;
     mNumConstructors = -1;
+    mNumStaticMethods = -1;
+    mNumVirtualMethods = -1;
     mJavaClass = loadClass(reporter);
   }
 
@@ -264,9 +266,13 @@ abstract class ClassGlue implements Comparable, FileWritableGlue {
     final ProcessorConditional ifhasconstrproc =
       new DefaultProcessorConditional(mNumConstructors > 0);
     context.registerProcessorConditional("HASCONSTRUCTORS", ifhasconstrproc);
-    final ProcessorConditional ifhasplainproc =
-      new DefaultProcessorConditional(mNumConstructors < mMethodList.size());
-    context.registerProcessorConditional("HASPLAINMETHODS", ifhasplainproc);
+    final ProcessorConditional ifhasvirtualproc =
+      new DefaultProcessorConditional(mNumVirtualMethods > 0);
+    context.registerProcessorConditional
+      ("HASVIRTUALMETHODS", ifhasvirtualproc);
+    final ProcessorConditional ifhasstaticproc =
+      new DefaultProcessorConditional(mNumStaticMethods > 0);
+    context.registerProcessorConditional("HASSTATICMETHODS", ifhasstaticproc);
     final ProcessorConditional ifhasglueresproc =
       new DefaultProcessorConditional(!mResultingGlue.isEmpty());
     context.registerProcessorConditional("HASGLUERESULTS", ifhasglueresproc);
@@ -277,11 +283,12 @@ abstract class ClassGlue implements Comparable, FileWritableGlue {
       new DefaultProcessorForeach(mFields);
     context.registerProcessorForeach("FIELD", foreachfieldproc);
     final ProcessorForeach foreachconstrproc =
-      new ProcessorForeachCONSTRUCTOR();
+      new ProcessorForeachConstructor();
     context.registerProcessorForeach("CONSTRUCTOR", foreachconstrproc);
-    final ProcessorForeach foreachplainproc =
-      new ProcessorForeachPLAINMETHOD();
-    context.registerProcessorForeach("PLAINMETHOD", foreachplainproc);
+    final ProcessorForeach foreachvirtualproc = new ProcessorForeachVirtual();
+    context.registerProcessorForeach("VIRTUALMETHOD", foreachvirtualproc);
+    final ProcessorForeach foreachstaticproc = new ProcessorForeachStatic();
+    context.registerProcessorForeach("STATICMETHOD", foreachstaticproc);
     final ProcessorForeach foreachincproc =
       new DefaultProcessorForeach(mUsedGlue);
     context.registerProcessorForeach("INCLUDEDGLUE", foreachincproc);
@@ -330,6 +337,7 @@ abstract class ClassGlue implements Comparable, FileWritableGlue {
       mMethodList = new ArrayList<MethodGlue>(mMethods);
       mFieldList = new ArrayList<FieldGlue>(mFields);
       mNumConstructors = 0;
+      mNumStaticMethods = 0;
       mResultingGlue = new TreeSet<ClassGlue>();
       mUsedGlue = new TreeSet<ClassGlue>();
       final int nummethods = mMethodList.size();
@@ -354,16 +362,19 @@ abstract class ClassGlue implements Comparable, FileWritableGlue {
         prev = method;
         if (method instanceof ConstructorGlue) {
           mNumConstructors++;
+        } else if (method.isStatic()) {
+          mNumStaticMethods++;
         }
         method.collectUsedGlue(mResultingGlue, mUsedGlue);
       }
+      mNumVirtualMethods = nummethods - mNumConstructors - mNumStaticMethods;
     }
   }
 
 
   //#########################################################################
-  //# Local Class ProcessorForeachCONSTRUCTOR
-  private class ProcessorForeachCONSTRUCTOR
+  //# Local Class ProcessorForeachConstructor
+  private class ProcessorForeachConstructor
     implements ProcessorForeach
   {
 
@@ -379,8 +390,8 @@ abstract class ClassGlue implements Comparable, FileWritableGlue {
 
 
   //#########################################################################
-  //# Local Class ProcessorForeachPLAINMETHOD
-  private class ProcessorForeachPLAINMETHOD
+  //# Local Class ProcessorForeachVirtual
+  private class ProcessorForeachVirtual
     implements ProcessorForeach
   {
 
@@ -389,7 +400,27 @@ abstract class ClassGlue implements Comparable, FileWritableGlue {
     public Iterator<MethodGlue> getIterator()
     {
       final List<MethodGlue> list =
-        mMethodList.subList(mNumConstructors, mMethodList.size());
+        mMethodList.subList(mNumConstructors,
+                            mNumConstructors + mNumVirtualMethods);
+      return list.iterator();
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Local Class ProcessorForeachStatic
+  private class ProcessorForeachStatic
+    implements ProcessorForeach
+  {
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.build.jniglue.ProcessorForeach
+    public Iterator<MethodGlue> getIterator()
+    {
+      final List<MethodGlue> list =
+        mMethodList.subList(mNumConstructors + mNumVirtualMethods,
+                            mMethodList.size());
       return list.iterator();
     }
 
@@ -411,6 +442,8 @@ abstract class ClassGlue implements Comparable, FileWritableGlue {
   private List<FieldGlue> mFieldList;
   private int mNumSubclasses;
   private int mNumConstructors;
+  private int mNumVirtualMethods;
+  private int mNumStaticMethods;
   private Set<ClassGlue> mResultingGlue;
   private Set<ClassGlue> mUsedGlue;
    

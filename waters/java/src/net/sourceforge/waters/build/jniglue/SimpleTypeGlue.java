@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.build.jniglue
 //# CLASS:   SimpleTypeGlue
 //###########################################################################
-//# $Id: SimpleTypeGlue.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: SimpleTypeGlue.java,v 1.3 2005-11-05 09:47:15 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.build.jniglue;
@@ -24,19 +24,19 @@ class SimpleTypeGlue extends TypeGlue {
 
   static final SimpleTypeGlue TYPE_VOID =
     new SimpleTypeGlue(C_VOID, "void", "void", "void",
-		       "V", "CallVoidMethod", void.class);
+		       "V", "Void", void.class);
   static final SimpleTypeGlue TYPE_BOOLEAN =
     new SimpleTypeGlue(C_BOOLEAN, "boolean", "bool", "jboolean",
-		       "Z", "CallBooleanMethod", boolean.class);
+		       "Z", "Boolean", boolean.class);
   static final SimpleTypeGlue TYPE_CHAR =
     new SimpleTypeGlue(C_CHAR, "char", "char", "jchar",
-		       "C", "CallCharMethod", char.class);
+		       "C", "Char", char.class);
   static final SimpleTypeGlue TYPE_INT =
     new SimpleTypeGlue(C_INT, "int", "int", "jint",
-		       "I", "CallIntMethod", int.class);
+		       "I", "Int", int.class);
   static final SimpleTypeGlue TYPE_STRING =
     new SimpleTypeGlue(C_STRING, "String", "jstring", "jstring",
-		       "Ljava/lang/String;", "CallObjectMethod", String.class);
+		       "Ljava/lang/String;", "Object", String.class);
 
 
   //#########################################################################
@@ -54,7 +54,7 @@ class SimpleTypeGlue extends TypeGlue {
     mCppName = cppname;
     mJNIName = jniname;
     mSignature = signature;
-    mJNICall = jnicall;
+    mJNICallPart = jnicall;
     mJavaClass = javaclass;
   }
 
@@ -117,9 +117,9 @@ class SimpleTypeGlue extends TypeGlue {
     buffer.append(mSignature);
   }
 
-  String getJNICall()
+  String getJNICallPart()
   {
-    return mJNICall;
+    return mJNICallPart;
   }
 
   Class getJavaClass()
@@ -170,7 +170,7 @@ class SimpleTypeGlue extends TypeGlue {
   private final String mCppName;
   private final String mJNIName;
   private final String mSignature;
-  private final String mJNICall;
+  private final String mJNICallPart;
   private final Class mJavaClass;
 
 }

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.build.jniglue
 //# CLASS:   ConstructorGlue
 //###########################################################################
-//# $Id: ConstructorGlue.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: ConstructorGlue.java,v 1.3 2005-11-05 09:47:15 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.build.jniglue;
@@ -32,6 +32,11 @@ class ConstructorGlue extends MethodGlue {
   int getKindComparisonIndex()
   {
     return 0;
+  }
+
+  boolean isStatic()
+  {
+    return false;
   }
 
   TypeGlue getReturnType()

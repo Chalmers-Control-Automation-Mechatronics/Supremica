@@ -4,7 +4,7 @@
 //# PACKAGE: jni.glue
 //# PURPOSE: List of classes and methods to be converted to C++/JNI code
 //###########################################################################
-//# $Id: Classes.txt,v 1.4 2005-11-05 00:42:14 robi Exp $
+//# $Id: Classes.txt,v 1.5 2005-11-05 09:47:15 robi Exp $
 //###########################################################################
 
 
@@ -33,7 +33,14 @@ glue class Collection {
   glue Iterator iterator();
 }
 
+glue class List extends Collection {}
+
 glue class Set extends Collection {}
+
+glue class Collections {
+  static glue List emptyList();
+  static glue Set emptySet();
+}
 
 
 //###########################################################################

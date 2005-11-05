@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.build.jniglue
 //# CLASS:   TypeGlue
 //###########################################################################
-//# $Id: TypeGlue.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: TypeGlue.java,v 1.3 2005-11-05 09:47:15 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.build.jniglue;
@@ -23,7 +23,7 @@ abstract class TypeGlue implements Comparable<TypeGlue>, WritableGlue {
 
   abstract void appendTypeSignature(StringBuffer buffer);
 
-  abstract String getJNICall();
+  abstract String getJNICallPart();
 
   abstract Class getJavaClass();
 
@@ -65,9 +65,6 @@ abstract class TypeGlue implements Comparable<TypeGlue>, WritableGlue {
     final ProcessorVariable gluetypeproc =
       new DefaultProcessorVariable(getGlueTypeName());
     context.registerProcessorVariable("GLUETYPENAME", gluetypeproc);
-    final ProcessorVariable jnicallproc =
-      new DefaultProcessorVariable(getJNICall());
-    context.registerProcessorVariable("JNICALLNAME", jnicallproc);
     final ProcessorConditional ifnonvoidproc =
       new DefaultProcessorConditional(!isVoid());
     context.registerProcessorConditional("NONVOID", ifnonvoidproc);

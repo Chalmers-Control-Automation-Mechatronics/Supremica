@@ -5,7 +5,7 @@ $-
 //# PACKAGE: jni.templates
 //# CLASS:   Template for a plain glue class implementation file
 //###########################################################################
-//# $Id: PlainGlue.cpp,v 1.1 2005-02-18 01:30:10 robi Exp $
+//# $Id: PlainGlue.cpp,v 1.2 2005-11-05 09:47:15 robi Exp $
 //###########################################################################
 
 $+
@@ -160,11 +160,11 @@ $ENDFOR
 
 
 $ENDFOR
-$IF-HASPLAINMETHODS
+$IF-HASVIRTUALMETHODS
 //############################################################################
-//# $CPPCLASSNAME: Java Methods
+//# $CPPCLASSNAME: Java Member Functions
 
-$FOREACH-PLAINMETHOD
+$FOREACH-VIRTUALMETHOD
 $CPPTYPENAME$ $CPPCLASSNAME::
 $METHODNAME($FOREACH-ARG$=
             $IF-GLUE const $ENDIF$=
@@ -203,6 +203,58 @@ $MSPC      $     $ENDFOR ClassCache* cache)
   const
 {
   jobject result = $METHODNAME($FOREACH-ARG arg_$ARGNAME $COMMASP $ENDFOR);
+$IF-ENUM
+  return $GLUETYPENAME::toEnum(result, cache);
+$ELSE
+  return $GLUETYPENAME(result, cache);
+$ENDIF
+}  
+  
+
+$ENDIF
+$ENDFOR
+$ENDIF
+$IF-HASSTATICMETHODS
+//############################################################################
+//# $CPPCLASSNAME: Java Static Functions
+
+$FOREACH-STATICMETHOD
+$CPPTYPENAME$ $CPPCLASSNAME::
+$METHODNAME($FOREACH-ARG$=
+            $IF-GLUE const $ENDIF$=
+              $GLUETYPENAME $IF-GLUE*$ENDIF$ arg_$ARGNAME,
+$MSPC     $ $ENDFOR ClassCache* cache)
+{
+  ClassGlue* cls = cache->getClass(CLASS_$CLASSNAME);
+  JNIEnv* env = cls->getEnvironment();
+  jmethodID mid = cls->getStaticMethodID(METHOD_$CLASSNAME_$METHODCODENAME);
+  jclass javaclass = cls->getJavaClass();
+$FOREACH-ARG
+$IF-GLUE
+  jobject obj_$ARGNAME = arg_$ARGNAME->getJavaObject();
+$ENDIF
+$ENDFOR
+  $IF-NONVOID $JNITYPENAME$ result = $IF-STRING(jstring) $ENDIF $ENDIF $=
+    env->$JNICALLNAME(javaclass, mid$=
+      $FOREACH-ARG, $IF-GLUE obj$ELSE arg$ENDIF _$ARGNAME $ENDFOR);
+  if (jthrowable exception = env->ExceptionOccurred()) {
+    throw exception;
+  }
+$IF-NONVOID
+  return result$IF-BOOLEAN$ != JNI_FALSE$ENDIF;
+$ENDIF
+}
+
+
+$IF-GLUE
+$IF-ENUM $JAVATYPENAME $ELSE $GLUETYPENAME $ENDIF$ $=
+$CPPCLASSNAME::
+$METHODNAME Glue($FOREACH-ARG$=
+                 $IF-GLUE const $ENDIF$=
+                   $GLUETYPENAME $IF-GLUE*$ENDIF$ arg_$ARGNAME,
+$MSPC      $     $ENDFOR ClassCache* cache)
+{
+  jobject result = $METHODNAME($FOREACH-ARG arg_$ARGNAME, $ENDFOR cache);
 $IF-ENUM
   return $GLUETYPENAME::toEnum(result, cache);
 $ELSE

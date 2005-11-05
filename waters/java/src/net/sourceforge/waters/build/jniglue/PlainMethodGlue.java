@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.build.jniglue
 //# CLASS:   PlainMethodGlue
 //###########################################################################
-//# $Id: PlainMethodGlue.java,v 1.4 2005-11-05 01:02:23 robi Exp $
+//# $Id: PlainMethodGlue.java,v 1.5 2005-11-05 09:47:15 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.build.jniglue;
@@ -92,6 +92,20 @@ class PlainMethodGlue extends MethodGlue {
     return mReturnType.getJavaClass();
   }
 
+  String getJNICallName()
+  {
+    final StringBuffer buffer = new StringBuffer();
+    buffer.append("Call");
+    if (isStatic()) {
+      buffer.append("Static");
+    }
+    final TypeGlue type = getReturnType();
+    final String part = type.getJNICallPart();
+    buffer.append(part);
+    buffer.append("Method");
+    return buffer.toString();
+  }
+
 
   //#########################################################################
   //# Type Verification
@@ -150,6 +164,9 @@ class PlainMethodGlue extends MethodGlue {
     context.registerProcessorConditional("ISSTATIC", ifstaticproc);
     final ProcessorVariable spcproc = new SpaceProcessor(mMethodName);
     context.registerProcessorVariable("MSPC", spcproc);
+    final ProcessorVariable jnicallproc =
+      new DefaultProcessorVariable(getJNICallName());
+    context.registerProcessorVariable("JNICALLNAME", jnicallproc);
   }
 
 
