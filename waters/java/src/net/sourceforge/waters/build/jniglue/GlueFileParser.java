@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.build.jniglue
 //# CLASS:   GlueFileParser
 //###########################################################################
-//# $Id: GlueFileParser.java,v 1.3 2005-11-05 00:42:14 robi Exp $
+//# $Id: GlueFileParser.java,v 1.4 2005-11-05 01:02:23 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.build.jniglue;
@@ -275,12 +275,17 @@ class GlueFileParser extends ErrorReporter {
         throw createUnexpectedTokenException(token, "identifier");
       }
     } else {
+      final boolean isstatic = (token.getTokenType() == TokenTable.C_STATIC);
+      if (isstatic) {
+        token = nextToken();
+      }
       returntype = getType(token, false);
       token = nextTokenIdentifier();
       methodname = token.getTokenText();
       nextTokenKnown(TokenTable.T_OPENPAREN);
       parameters = getParameterList();
-      method = new PlainMethodGlue(returntype, methodname, parameters);
+      method =
+        new PlainMethodGlue(isstatic, returntype, methodname, parameters);
     }
     if (!classglue.addMethod(method, this)) {
       throw createParseException

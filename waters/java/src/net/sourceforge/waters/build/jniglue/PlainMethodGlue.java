@@ -4,12 +4,13 @@
 //# PACKAGE: net.sourceforge.waters.build.jniglue
 //# CLASS:   PlainMethodGlue
 //###########################################################################
-//# $Id: PlainMethodGlue.java,v 1.3 2005-11-04 02:21:17 robi Exp $
+//# $Id: PlainMethodGlue.java,v 1.4 2005-11-05 01:02:23 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.build.jniglue;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,6 +23,7 @@ class PlainMethodGlue extends MethodGlue {
   PlainMethodGlue(final TypeGlue returntype,
                   final String name)
   {
+    mIsStatic = false;
     mReturnType = returntype;
     mMethodName = name;
   }
@@ -30,7 +32,16 @@ class PlainMethodGlue extends MethodGlue {
                   final String name,
                   final List<ParameterGlue> parameters)
   {
+    this(false, returntype, name, parameters);
+  }
+
+  PlainMethodGlue(final boolean isstatic,
+                  final TypeGlue returntype,
+                  final String name,
+                  final List<ParameterGlue> parameters)
+  {
     super(parameters);
+    mIsStatic = isstatic;
     mReturnType = returntype;
     mMethodName = name;
   }
@@ -58,7 +69,12 @@ class PlainMethodGlue extends MethodGlue {
   //# Simple Access
   int getKindComparisonIndex()
   {
-    return 1;
+    return mIsStatic ? 2 : 1;
+  }
+
+  boolean isStatic()
+  {
+    return mIsStatic;
   }
 
   TypeGlue getReturnType()
@@ -91,6 +107,18 @@ class PlainMethodGlue extends MethodGlue {
           ("Method " + mMethodName + "() in class " + javaclass.getName() +
            " does not have return type " + gluetype.getName() + "!");
       }
+      final boolean isstatic = (method.getModifiers() & Modifier.STATIC) != 0;
+      if (mIsStatic != isstatic) {
+        if (mIsStatic) {
+          reporter.reportError
+            ("Method " + mMethodName + "() in class " + javaclass.getName() +
+             " is not static as expected!");
+        } else {
+          reporter.reportError
+            ("Method " + mMethodName + "() in class " + javaclass.getName() +
+             " is static but should not be!");
+        }
+      }
     } catch (final NoSuchMethodException exception) {
       reporter.reportError
         ("Can't find method " + mMethodName + "() in class " +
@@ -117,6 +145,9 @@ class PlainMethodGlue extends MethodGlue {
     final ProcessorConditional ifconstructorproc =
       new DefaultProcessorConditional(false);
     context.registerProcessorConditional("ISCONSTRUCTOR", ifconstructorproc);
+    final ProcessorConditional ifstaticproc =
+      new DefaultProcessorConditional(mIsStatic);
+    context.registerProcessorConditional("ISSTATIC", ifstaticproc);
     final ProcessorVariable spcproc = new SpaceProcessor(mMethodName);
     context.registerProcessorVariable("MSPC", spcproc);
   }
@@ -124,6 +155,7 @@ class PlainMethodGlue extends MethodGlue {
 
   //#########################################################################
   //# Data Members
+  private final boolean mIsStatic;
   private final TypeGlue mReturnType;
   private final String mMethodName;
 
