@@ -95,12 +95,11 @@ Java_net_sourceforge_waters_model_analysis_ProductDESCopier_callNativeMethod
     jstring name = des.getName();
     waters::initGlobalAlphabet(des, &cache);
     jni::ProductDESProxyFactoryGlue factory = analyser.getFactoryGlue(&cache);
-    jni::SetGlue empty = jni::CollectionsGlue::emptySetGlue(&cache);
+    jni::CollectionGlue empty = jni::CollectionsGlue::emptySetGlue(&cache);
     jni::ProductDESGlue copy =
       factory.createProductDESProxyGlue(name, &empty, &empty, &cache);
     jni::ProductDESResultGlue result(false, &copy, &cache);
-    jobject obj = result.returnJavaObject();
-    return obj;
+    return result.returnJavaObject();
   } catch (jthrowable exception) {
     return 0;
   }

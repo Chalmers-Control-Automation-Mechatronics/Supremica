@@ -1,10 +1,10 @@
 //# This may look like C code, but it really is -*- C++ -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: jni.javah
+//# PACKAGE: jni.cache
 //# CLASS:   ObjectBase
 //###########################################################################
-//# $Id: ObjectBase.h,v 1.1 2005-02-18 01:30:10 robi Exp $
+//# $Id: ObjectBase.h,v 1.2 2005-11-06 09:01:52 robi Exp $
 //###########################################################################
 
 
@@ -28,6 +28,7 @@ namespace jni {
 
 class ClassCache;
 class ClassGlue;
+class ObjectReference;
 
 
 //############################################################################
@@ -38,33 +39,30 @@ class ObjectBase
 {
 public:
   //##########################################################################
-  //# Destructor
-  ~ObjectBase();
-
-  //##########################################################################
   //# Access
-  jobject getJavaObject() const {return mJavaObject;};
-  jobject returnJavaObject();
-  ClassGlue* getClass() const {return mClass;};
+  jobject getJavaObject() const;
+  jobject returnJavaObject() const;
+  ClassGlue* getClass() const;
 
 protected:
   //##########################################################################
-  //# Protected Constructors
+  //# Constructors, Destructors & Co.
   explicit ObjectBase(waters::uint32 classcode, ClassCache* cache);
   explicit ObjectBase(jobject javaobject,
                       waters::uint32 classcode,
                       ClassCache* cache);
+  explicit ObjectBase(const ObjectBase& partner);
+  ~ObjectBase();
+  ObjectBase& operator = (const ObjectBase& Partner);
 
   //##########################################################################
-  //# Access
-  void initJavaObject(jobject javaobject) {mJavaObject = javaobject;};
+  //# Protected Access
+  void initJavaObject(jobject javaobject);
 
 private:
   //##########################################################################
   //# Data Members
-  ClassGlue* mClass;
-  jobject mJavaObject;
-
+  ObjectReference* mObjectReference;
 };
 
 }   /* namespace jni */

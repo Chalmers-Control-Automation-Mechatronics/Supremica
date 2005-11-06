@@ -1,10 +1,10 @@
 //# -*- indent-tabs-mode: nil -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: jni.base
+//# PACKAGE: jni.cache
 //# CLASS:   ObjectBase
 //###########################################################################
-//# $Id: ObjectBase.cpp,v 1.1 2005-02-18 01:30:10 robi Exp $
+//# $Id: ObjectBase.cpp,v 1.2 2005-11-06 09:01:52 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -13,7 +13,7 @@
 
 #include "jni/cache/ClassCache.h"
 #include "jni/cache/ObjectBase.h"
-#include "jni/glue/Glue.h"
+#include "jni/cache/ObjectReference.h"
 
 
 namespace jni {
@@ -24,34 +24,46 @@ namespace jni {
 //###########################################################################
 
 //###########################################################################
-//# ObjectBase: Constructors & Destructors
+//# ObjectBase: Constructors, Destructors & Co.
 
 ObjectBase::
 ObjectBase(waters::uint32 classcode, ClassCache* cache)
 {
-  mClass = cache->getClass(classcode);
+  mObjectReference = new ObjectReference(classcode, cache);
 }
 
 ObjectBase::
 ObjectBase(jobject javaobject, waters::uint32 classcode, ClassCache* cache)
 {
-  if ( (mJavaObject = javaobject) ) {
-    JNIEnv* env = cache->getEnvironment();
-    jclass javaclass = env->GetObjectClass(javaobject);
-    mClass = cache->getClass(javaclass, classcode);
-  } else {
-    cache->throwJavaException
-      (CLASS_NullPointerException, "Trying to create NULL object!");
-  }
+  mObjectReference = new ObjectReference(javaobject, classcode, cache);
+}
+
+ObjectBase::
+ObjectBase(const ObjectBase& partner)
+{
+  mObjectReference = partner.mObjectReference;
+  mObjectReference->addReference();
 }
 
 ObjectBase::
 ~ObjectBase()
 {
-  if (mJavaObject) {
-    JNIEnv* env = mClass->getEnvironment();
-    env->DeleteLocalRef(mJavaObject);
+  if (mObjectReference->removeReference() == 0) {
+    delete mObjectReference;
   }
+}
+
+ObjectBase& ObjectBase::
+operator = (const ObjectBase& partner)
+{
+  if (this != &partner) {
+    if (mObjectReference->removeReference() == 0) {
+      delete mObjectReference;
+    }
+    mObjectReference = partner.mObjectReference;
+    mObjectReference->addReference();
+  }
+  return *this;
 }
 
 
@@ -59,11 +71,30 @@ ObjectBase::
 //# ObjectBase: Access
 
 jobject ObjectBase::
-returnJavaObject()
+getJavaObject()
+  const
 {
-  jobject result = mJavaObject;
-  mJavaObject = 0;
-  return result;
+  return mObjectReference->getJavaObject();
+}
+
+jobject ObjectBase::
+returnJavaObject()
+  const
+{
+  return mObjectReference->returnJavaObject();
+}
+
+ClassGlue* ObjectBase::
+getClass()
+  const
+{
+  return mObjectReference->getClass();
+}
+
+void ObjectBase::
+initJavaObject(jobject javaobject)
+{
+  mObjectReference->initJavaObject(javaobject);
 }
 
 
