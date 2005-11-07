@@ -64,11 +64,11 @@ public class Device extends NamedObject
 
     private Device() {}
 
-    public Device(String name, String systemFileName, String libraryPath)
+    public Device(String name, String systemFileName, String libraryPathBase, String libraryPath)
     {
 		setName(name);
-		System.out.println("Device(" + getName() + ", " + systemFileName + ", " + libraryPath + ")");
-		loader = new Loader(this, systemFileName, libraryPath);	
+		System.out.println("Device(" + getName() + ", " + systemFileName + ", " + libraryPathBase + ", " + libraryPath + ")");
+		loader = new Loader(this, systemFileName, libraryPathBase, libraryPath);	
 	}		
 
     public void runDevice()

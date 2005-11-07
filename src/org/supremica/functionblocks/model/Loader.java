@@ -81,42 +81,32 @@ public class Loader
     private JAXBContext context;
     private Unmarshaller unmarshaller;
 
-    public Loader(Device device, String systemFileName, String libraryPath)
+    public Loader(Device device, String systemFileName, String libraryPathBase, String libraryPath)
     {
 		this.device = device;
 
-		// determine library base dir
-		String libraryBase = null;
-		File systemFile = new File(systemFileName);
-
-		if (systemFile.getParent() != null)
-		{
-			libraryBase = systemFile.getParent();
-			systemFileName = systemFile.getName();
-		}
-		
 		// convert libraryPath string into list of Files
 		if (libraryPath == null)
 		{
-			if (libraryBase == null)
+			if (libraryPathBase == null)
 			{
 				libraryPathList = null;
 			}
 			else
 			{
-				File libraryBaseFile = new File(libraryBase);
+				File libraryPathBaseFile = new File(libraryPathBase);
 
-				if (!libraryBaseFile.isDirectory())
+				if (!libraryPathBaseFile.isDirectory())
 				{
-					java.lang.System.err.println("Loader(" + device.getName() + "): Specified library base is not a directory!:" + libraryBaseFile.getName());
+					java.lang.System.err.println("Loader(" + device.getName() + "): Specified library base is not a directory!: " + libraryPathBaseFile.getName());
 				}
-				else if (!libraryBaseFile.exists())
+				else if (!libraryPathBaseFile.exists())
 				{
-					java.lang.System.err.println("Loader(" + device.getName() + "): Specified library base does not exist!:" + libraryBaseFile.getName());
+					java.lang.System.err.println("Loader(" + device.getName() + "): Specified library base does not exist!: " + libraryPathBaseFile.getName());
 				}
 				else
 				{
-					libraryPathList.add(libraryBaseFile);
+					libraryPathList.add(libraryPathBaseFile);
 				}
 			}
 		}
@@ -129,37 +119,33 @@ public class Loader
 				
 				if (libraryPath.indexOf(File.pathSeparatorChar) == -1)
 				{
-					curLibraryDir = new File(libraryPath);
+					curLibraryDir = new File(libraryPathBase, libraryPath);
 				}
 				else
 				{
-					curLibraryDir = new File(libraryPath.substring(0,libraryPath.indexOf(File.pathSeparatorChar)));
+					curLibraryDir = new File(libraryPathBase, libraryPath.substring(0,libraryPath.indexOf(File.pathSeparatorChar)));
 				}
 				
 				if (!curLibraryDir.isDirectory())
 				{
-					java.lang.System.err.println("Loader(" + device.getName() + "): Specified library path element is not a directory!: " + curLibraryDir.getName());
+					java.lang.System.err.println("Loader(" + device.getName() + "): Specified library path element " + curLibraryDir.getAbsolutePath() + " is not a directory!");
 				}
 				else if (!curLibraryDir.exists())
 				{
-					java.lang.System.err.println("Loader(" + device.getName() + "): Specified library path element does not exist!: " + curLibraryDir.getName());
+					java.lang.System.err.println("Loader(" + device.getName() + "): Specified library path element " + curLibraryDir.getAbsolutePath() + " does not exist!");
 				}
 				else
 				{
-					libraryPathList.add(new File(libraryBase, curLibraryDir.getName()));
-					if (libraryPath.indexOf(File.pathSeparatorChar) == -1)
-					{
-						break;
-					}
+					libraryPathList.add(curLibraryDir);
+				}
+
+				if (libraryPath.indexOf(File.pathSeparatorChar) == -1)
+				{
+					break;
 				}
 				
 				libraryPath = libraryPath.substring(libraryPath.indexOf(File.pathSeparatorChar)+1);	
 			}
-
-			//for (Iterator iter = libraryPathList.iterator();iter.hasNext();)
-			//{
-			//	java.lang.System.out.println(iter.next());
-			//}
 			
 		}
 
@@ -227,7 +213,18 @@ public class Loader
 		
 		if (!theFile.exists())
 		{
-			java.lang.System.err.println("Loader.getFile(" + fileName + "): The file does not exist in the specified libraries.");
+			java.lang.System.err.println("Loader.getFile(" + fileName + "): The file " + fileName + " does not exist in the specified libraries...");
+			if (libraryPathList != null)
+			{
+				for (Iterator iter = libraryPathList.iterator();iter.hasNext();)
+				{
+					java.lang.System.err.println("\t" + ((File) iter.next()).getAbsolutePath() + File.separator);
+				}
+			}
+			else
+			{
+				java.lang.System.err.println("\t.");
+			}
 			java.lang.System.exit(1);
 		}
 
