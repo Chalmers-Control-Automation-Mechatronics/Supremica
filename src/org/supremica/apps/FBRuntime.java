@@ -52,6 +52,7 @@
 package org.supremica.apps;
 
 import org.supremica.functionblocks.model.*;
+import java.io.File;
 
 public class FBRuntime
 {
@@ -59,26 +60,39 @@ public class FBRuntime
     public static void main(String[] args)
     {
 
-		String systemFileName;
-		String libraryPath;
+		String systemFileName = null;
+		String libraryPathBase = null;
+		String libraryPath = null;
 
 		if (args.length == 1)
  		{
 			systemFileName = args[0];
-			libraryPath = null;
  		}
  		else if (args.length == 2)
  		{
 			systemFileName = args[0];
- 			libraryPath = args[1];			
+			if (args[1].contains(File.pathSeparator))
+			{
+				libraryPath = args[1];			
+			}
+			else
+			{
+				libraryPathBase = args[1];
+			}
+ 		}
+ 		else if (args.length == 3)
+ 		{
+			systemFileName = args[0];
+ 			libraryPathBase = args[1];			
+ 			libraryPath = args[2];			
  		}
 		else
 		{
-			System.err.println("Usage: FBRuntime file.sys [libraryPath]");
+			System.err.println("Usage: FBRuntime file.sys [libraryPathBase] [libraryPath]");
 			return;
 		}
 		
-		Device theDevice = new Device("FBRuntime Device", systemFileName, libraryPath);
+		Device theDevice = new Device("FBRuntime Device", systemFileName, libraryPathBase, libraryPath);
 		theDevice.runDevice();
 		
     }
