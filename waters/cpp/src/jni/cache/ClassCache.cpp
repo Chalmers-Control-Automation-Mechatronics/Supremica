@@ -4,7 +4,7 @@
 //# PACKAGE: jni.base
 //# CLASS:   ClassCache
 //###########################################################################
-//# $Id: ClassCache.cpp,v 1.1 2005-02-18 01:30:10 robi Exp $
+//# $Id: ClassCache.cpp,v 1.2 2005-11-07 23:45:47 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -13,6 +13,7 @@
 
 #include "jni/cache/ClassCache.h"
 #include "jni/cache/ClassInfo.h"
+#include "jni/cache/PreJavaException.h"
 #include "jni/glue/Glue.h"
 
 
@@ -155,6 +156,14 @@ throwJavaException(waters::uint32 classcode, const char* msg)
   const ClassGlue* cls = getClass(classcode);
   const jclass javaclass = cls->getJavaClass();
   return mEnvironment->ThrowNew(javaclass, msg);
+}
+
+jint ClassCache::
+throwJavaException(const PreJavaException& pre)
+{
+  waters::uint32 classcode = pre.getClassCode();
+  const char* msg = pre.getMessage();
+  return throwJavaException(classcode, msg);
 }
 
 

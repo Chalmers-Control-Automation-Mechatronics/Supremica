@@ -4,7 +4,7 @@
 //# PACKAGE: jni.javah
 //# CLASS:   ClassCache
 //###########################################################################
-//# $Id: ClassCache.h,v 1.1 2005-02-18 01:30:10 robi Exp $
+//# $Id: ClassCache.h,v 1.2 2005-11-07 23:45:47 robi Exp $
 //###########################################################################
 
 
@@ -29,6 +29,7 @@
 namespace jni {
 
 class ClassInfo;
+class PreJavaException;
 
 
 //###########################################################################
@@ -84,6 +85,7 @@ public:
   //##########################################################################
   //# Exceptions
   jint throwJavaException(waters::uint32 classcode, const char* msg);
+  jint throwJavaException(const PreJavaException& pre);
   
 private:
   //##########################################################################

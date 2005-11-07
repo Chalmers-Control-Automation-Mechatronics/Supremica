@@ -4,7 +4,7 @@
 //# PACKAGE: jni.cache
 //# CLASS:   ObjectBase
 //###########################################################################
-//# $Id: ObjectBase.cpp,v 1.3 2005-11-07 00:47:34 robi Exp $
+//# $Id: ObjectBase.cpp,v 1.4 2005-11-07 23:45:47 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -14,6 +14,7 @@
 #include "jni/cache/ClassCache.h"
 #include "jni/cache/ObjectBase.h"
 #include "jni/cache/ObjectReference.h"
+#include "jni/cache/PreJavaException.h"
 #include "jni/glue/Glue.h"
 
 
@@ -109,12 +110,13 @@ initJavaObject(jobject javaobject)
 //# Error Handling
 
 void ObjectBase::
-checkNonNull(ClassCache* cache)
+checkNonNull()
   const
 {
   if (mObjectReference == 0) {
-    cache->throwJavaException
-      (CLASS_NullPointerException, "Trying to access NULL object!");
+    throw PreJavaException(CLASS_NullPointerException,
+                           "Trying to access NULL object!",
+                           true);
   }
 }
 

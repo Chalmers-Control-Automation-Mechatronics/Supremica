@@ -5,7 +5,7 @@ $-
 //# PACKAGE: jni.templates
 //# CLASS:   Template for a plain glue class implementation file
 //###########################################################################
-//# $Id: PlainGlue.cpp,v 1.3 2005-11-07 00:47:34 robi Exp $
+//# $Id: PlainGlue.cpp,v 1.4 2005-11-07 23:45:47 robi Exp $
 //###########################################################################
 
 $+
@@ -172,6 +172,7 @@ $METHODNAME($FOREACH-ARG$=
 $MSPC     $ $ENDIF $ENDFOR)
   const
 {
+  checkNonNull();
   ClassGlue* cls = getClass();
   JNIEnv* env = cls->getEnvironment();
   jmethodID mid = cls->getMethodID(METHOD_$CLASSNAME_$METHODCODENAME);
@@ -202,7 +203,6 @@ $METHODNAME Glue($FOREACH-ARG$=
 $MSPC      $     $ENDFOR ClassCache* cache)
   const
 {
-  checkNonNull(cache);
   jobject result = $METHODNAME($FOREACH-ARG arg_$ARGNAME $COMMASP $ENDFOR);
 $IF-ENUM
   return $GLUETYPENAME::toEnum(result, cache);

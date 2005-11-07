@@ -4,7 +4,7 @@
 //# PACKAGE: jni.cache
 //# CLASS:   ObjectBase
 //###########################################################################
-//# $Id: ObjectBase.h,v 1.3 2005-11-07 00:47:34 robi Exp $
+//# $Id: ObjectBase.h,v 1.4 2005-11-07 23:45:47 robi Exp $
 //###########################################################################
 
 
@@ -47,7 +47,7 @@ public:
 
   //##########################################################################
   //# Error Handling
-  void checkNonNull(ClassCache* cache) const;
+  void checkNonNull() const;
 
 protected:
   //##########################################################################
@@ -56,9 +56,9 @@ protected:
   explicit ObjectBase(jobject javaobject,
                       waters::uint32 classcode,
                       ClassCache* cache);
-  explicit ObjectBase(const ObjectBase& partner);
+  ObjectBase(const ObjectBase& partner);
   ~ObjectBase();
-  ObjectBase& operator = (const ObjectBase& Partner);
+  ObjectBase& operator= (const ObjectBase& Partner);
 
   //##########################################################################
   //# Protected Access

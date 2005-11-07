@@ -4,6 +4,7 @@
 #include <jni.h>
 
 #include "jni/cache/ClassCache.h"
+#include "jni/cache/PreJavaException.h"
 #include "jni/glue/CollectionsGlue.h"
 #include "jni/glue/EventGlue.h"
 #include "jni/glue/IteratorGlue.h"
@@ -84,17 +85,21 @@ Java_net_sourceforge_waters_model_analysis_ProductDESCopier_callNativeMethod
 {
   try {
     jni::ClassCache cache(env);
-    jni::ProductDESCopierGlue copier(copier, &cache);
-    jni::ProductDESGlue des = copier.getInputGlue(&cache);
-    jstring name = des.getName();
-    waters::initGlobalAlphabet(des, &cache);
-    const jni::EventGlue prop = copier.getPropositionGlue(&cache);
-    jni::ProductDESProxyFactoryGlue factory = copier.getFactoryGlue(&cache);
-    jni::CollectionGlue empty = jni::CollectionsGlue::emptySetGlue(&cache);
-    jni::ProductDESGlue copy =
-      factory.createProductDESProxyGlue(name, &empty, &empty, &cache);
-    jni::ProductDESResultGlue result(false, &copy, &cache);
-    return result.returnJavaObject();
+    try {
+      jni::ProductDESCopierGlue copier(copier, &cache);
+      jni::ProductDESGlue des = copier.getInputGlue(&cache);
+      jstring name = des.getName();
+      waters::initGlobalAlphabet(des, &cache);
+      const jni::EventGlue prop = copier.getPropositionGlue(&cache);
+      jni::ProductDESProxyFactoryGlue factory = copier.getFactoryGlue(&cache);
+      jni::CollectionGlue empty = jni::CollectionsGlue::emptySetGlue(&cache);
+      jni::ProductDESGlue copy =
+	factory.createProductDESProxyGlue(name, &empty, &empty, &cache);
+      jni::ProductDESResultGlue result(false, &copy, &cache);
+      return result.returnJavaObject();
+    } catch (const jni::PreJavaException& pre) {
+      cache.throwJavaException(pre);
+    }
   } catch (jthrowable exception) {
     return 0;
   }
