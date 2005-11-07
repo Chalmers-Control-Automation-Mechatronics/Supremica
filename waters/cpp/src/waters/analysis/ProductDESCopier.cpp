@@ -7,10 +7,10 @@
 #include "jni/glue/CollectionsGlue.h"
 #include "jni/glue/EventGlue.h"
 #include "jni/glue/IteratorGlue.h"
-#include "jni/glue/ModelAnalyserGlue.h"
+#include "jni/glue/ProductDESCopierGlue.h"
 #include "jni/glue/ProductDESGlue.h"
-#include "jni/glue/ProductDESResultGlue.h"
 #include "jni/glue/ProductDESProxyFactoryGlue.h"
+#include "jni/glue/ProductDESResultGlue.h"
 #include "jni/glue/SetGlue.h"
 
 #include "waters/base/IntTypes.h"
@@ -23,7 +23,6 @@ namespace waters {
 
 void initGlobalAlphabet(const jni::ProductDESGlue& des, jni::ClassCache* cache)
 {
-  uint32 numprops = 0;
   uint32 numuncont = 0;
   uint32 numcont = 0;
   
@@ -37,29 +36,24 @@ void initGlobalAlphabet(const jni::ProductDESGlue& des, jni::ClassCache* cache)
     jni::EventGlue* event = &eventarray[i];
     new (event) jni::EventGlue(javaobject, cache);
     switch (event->getKindGlue(cache)) {
-    case jni::EventKind_PROPOSITION:
-      numprops++;
-      break;
     case jni::EventKind_UNCONTROLLABLE:
       numuncont++;
       break;
     case jni::EventKind_CONTROLLABLE:
       numcont++;
       break;
+    default:
+      break;
     }
   }
 
-  GlobalAlphabet alphabet(numprops, numuncont, numcont);
-  CodeIterator propiter = alphabet.propositionIterator();
+  GlobalAlphabet alphabet(numuncont, numcont);
   CodeIterator uncontiter = alphabet.uncontrollableIterator();
   CodeIterator contiter = alphabet.controllableIterator();
   for (int i = 0; i < numevents; i++) {
     const jni::EventGlue* event = &eventarray[i];
     uint32 code;
     switch (event->getKindGlue(cache)) {
-    case jni::EventKind_PROPOSITION:
-      code = propiter.next();
-      break;
     case jni::EventKind_UNCONTROLLABLE:
       code = uncontiter.next();
       break;
@@ -90,11 +84,12 @@ Java_net_sourceforge_waters_model_analysis_ProductDESCopier_callNativeMethod
 {
   try {
     jni::ClassCache cache(env);
-    jni::ModelAnalyserGlue analyser(copier, &cache);
-    jni::ProductDESGlue des = analyser.getInputGlue(&cache);
+    jni::ProductDESCopierGlue copier(copier, &cache);
+    jni::ProductDESGlue des = copier.getInputGlue(&cache);
     jstring name = des.getName();
     waters::initGlobalAlphabet(des, &cache);
-    jni::ProductDESProxyFactoryGlue factory = analyser.getFactoryGlue(&cache);
+    const jni::EventGlue prop = copier.getPropositionGlue(&cache);
+    jni::ProductDESProxyFactoryGlue factory = copier.getFactoryGlue(&cache);
     jni::CollectionGlue empty = jni::CollectionsGlue::emptySetGlue(&cache);
     jni::ProductDESGlue copy =
       factory.createProductDESProxyGlue(name, &empty, &empty, &cache);

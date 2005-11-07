@@ -4,7 +4,7 @@
 //# PACKAGE: jni.glue
 //# PURPOSE: List of classes and methods to be converted to C++/JNI code
 //###########################################################################
-//# $Id: Classes.txt,v 1.5 2005-11-05 09:47:15 robi Exp $
+//# $Id: Classes.txt,v 1.6 2005-11-07 00:47:34 robi Exp $
 //###########################################################################
 
 
@@ -92,6 +92,10 @@ package net.sourceforge.waters.model.analysis;
 glue class ModelAnalyser {
   glue ProductDESProxyFactory getFactory();
   glue ProductDESProxy getInput();
+}
+
+glue class ProductDESCopier extends ModelAnalyser {
+  glue EventProxy getProposition();
 }
 
 glue class ProductDESResult {

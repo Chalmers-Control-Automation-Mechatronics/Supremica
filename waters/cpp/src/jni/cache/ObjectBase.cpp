@@ -4,7 +4,7 @@
 //# PACKAGE: jni.cache
 //# CLASS:   ObjectBase
 //###########################################################################
-//# $Id: ObjectBase.cpp,v 1.2 2005-11-06 09:01:52 robi Exp $
+//# $Id: ObjectBase.cpp,v 1.3 2005-11-07 00:47:34 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -14,6 +14,7 @@
 #include "jni/cache/ClassCache.h"
 #include "jni/cache/ObjectBase.h"
 #include "jni/cache/ObjectReference.h"
+#include "jni/glue/Glue.h"
 
 
 namespace jni {
@@ -35,20 +36,25 @@ ObjectBase(waters::uint32 classcode, ClassCache* cache)
 ObjectBase::
 ObjectBase(jobject javaobject, waters::uint32 classcode, ClassCache* cache)
 {
-  mObjectReference = new ObjectReference(javaobject, classcode, cache);
+  if (javaobject == 0) {
+    mObjectReference = 0;
+  } else {
+    mObjectReference = new ObjectReference(javaobject, classcode, cache);
+  }
 }
 
 ObjectBase::
 ObjectBase(const ObjectBase& partner)
 {
-  mObjectReference = partner.mObjectReference;
-  mObjectReference->addReference();
+  if ( (mObjectReference = partner.mObjectReference) ) {
+    mObjectReference->addReference();
+  }
 }
 
 ObjectBase::
 ~ObjectBase()
 {
-  if (mObjectReference->removeReference() == 0) {
+  if (mObjectReference && mObjectReference->removeReference() == 0) {
     delete mObjectReference;
   }
 }
@@ -57,11 +63,12 @@ ObjectBase& ObjectBase::
 operator = (const ObjectBase& partner)
 {
   if (this != &partner) {
-    if (mObjectReference->removeReference() == 0) {
+    if (mObjectReference && mObjectReference->removeReference() == 0) {
       delete mObjectReference;
     }
-    mObjectReference = partner.mObjectReference;
-    mObjectReference->addReference();
+    if ( (mObjectReference = partner.mObjectReference) ) {
+      mObjectReference->addReference();
+    }
   }
   return *this;
 }
@@ -74,27 +81,41 @@ jobject ObjectBase::
 getJavaObject()
   const
 {
-  return mObjectReference->getJavaObject();
+  return mObjectReference ? mObjectReference->getJavaObject() : 0;
 }
 
 jobject ObjectBase::
 returnJavaObject()
   const
 {
-  return mObjectReference->returnJavaObject();
+  return mObjectReference ? mObjectReference->returnJavaObject() : 0;
 }
 
 ClassGlue* ObjectBase::
 getClass()
   const
 {
-  return mObjectReference->getClass();
+  return mObjectReference ? mObjectReference->getClass() : 0;
 }
 
 void ObjectBase::
 initJavaObject(jobject javaobject)
 {
   mObjectReference->initJavaObject(javaobject);
+}
+  
+
+//############################################################################
+//# Error Handling
+
+void ObjectBase::
+checkNonNull(ClassCache* cache)
+  const
+{
+  if (mObjectReference == 0) {
+    cache->throwJavaException
+      (CLASS_NullPointerException, "Trying to access NULL object!");
+  }
 }
 
 

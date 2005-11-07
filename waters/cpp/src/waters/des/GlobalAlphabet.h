@@ -4,7 +4,7 @@
 //# PACKAGE: waters.base
 //# CLASS:   GlobalAlphabet
 //###########################################################################
-//# $Id: GlobalAlphabet.h,v 1.1 2005-02-18 01:30:10 robi Exp $
+//# $Id: GlobalAlphabet.h,v 1.2 2005-11-07 00:47:34 robi Exp $
 //###########################################################################
 
 
@@ -36,7 +36,7 @@ class GlobalAlphabet
 public:
   //##########################################################################
   //# Constructors & Destructors
-  explicit GlobalAlphabet(uint32 numprops, uint32 numuncont, uint32 numcont);
+  explicit GlobalAlphabet(uint32 numuncont, uint32 numcont);
   ~GlobalAlphabet();
 
   //##########################################################################
@@ -47,10 +47,8 @@ public:
   //# Simple Access
   uint32 getNumEvents() const
     {return mNumEvents;};
-  bool isProposition(uint32 code) const
-    {return code < mFirstUncontrollable;};
   bool isUncontrollable(uint32 code) const
-    {return code >= mFirstUncontrollable && code < mFirstControllable;};
+    {return code < mFirstControllable;};
   bool isControllable(uint32 code) const
     {return code >= mFirstControllable;};
   jstring getEventName(uint32 code) const
@@ -60,17 +58,14 @@ public:
   //# Iterators
   CodeIterator iterator() const
     {return CodeIterator(0, mNumEvents);};
-  CodeIterator propositionIterator() const
-    {return CodeIterator(0, mFirstUncontrollable);};
   CodeIterator uncontrollableIterator() const
-    {return CodeIterator(mFirstUncontrollable, mFirstControllable);};
+    {return CodeIterator(0, mFirstControllable);};
   CodeIterator controllableIterator() const
     {return CodeIterator(mFirstControllable, mNumEvents);};
 
 private:
   //##########################################################################
   //# Data Members
-  const uint32 mFirstUncontrollable;
   const uint32 mFirstControllable;
   const uint32 mNumEvents;
   jstring* mEventNames;

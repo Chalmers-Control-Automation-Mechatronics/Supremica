@@ -4,7 +4,7 @@
 //# PACKAGE: jni.cache
 //# CLASS:   ObjectBase
 //###########################################################################
-//# $Id: ObjectBase.h,v 1.2 2005-11-06 09:01:52 robi Exp $
+//# $Id: ObjectBase.h,v 1.3 2005-11-07 00:47:34 robi Exp $
 //###########################################################################
 
 
@@ -40,9 +40,14 @@ class ObjectBase
 public:
   //##########################################################################
   //# Access
+  bool isNull() const {return mObjectReference == 0;}
   jobject getJavaObject() const;
   jobject returnJavaObject() const;
   ClassGlue* getClass() const;
+
+  //##########################################################################
+  //# Error Handling
+  void checkNonNull(ClassCache* cache) const;
 
 protected:
   //##########################################################################

@@ -4,13 +4,14 @@
 //# PACKAGE: net.sourceforge.waters.junit
 //# CLASS:   AlgorithmsTest
 //###########################################################################
-//# $Id: AnalysisTest.java,v 1.1 2005-11-04 02:21:17 robi Exp $
+//# $Id: AnalysisTest.java,v 1.2 2005-11-07 00:47:34 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import javax.xml.bind.JAXBException;
 
 import net.sourceforge.waters.model.base.DocumentProxy;
@@ -18,6 +19,7 @@ import net.sourceforge.waters.model.base.ProxyMarshaller;
 import net.sourceforge.waters.model.base.WatersException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
+import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.expr.OperatorTable;
@@ -27,8 +29,9 @@ import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
-
 import net.sourceforge.waters.junit.WatersTestCase;
+
+import net.sourceforge.waters.xsd.base.EventKind;
 
 
 public class AnalysisTest extends WatersTestCase
@@ -45,14 +48,15 @@ public class AnalysisTest extends WatersTestCase
 
   //#########################################################################
   //# Utilities
-  void testCopy(final String modname)
+  private void testCopy(final String modname)
     throws IOException, WatersException
   {
     final String inextname = modname + mModuleMarshaller.getDefaultExtension();
     final File infilename = new File(mInputDirectory, inextname);
     final ProductDESProxy des = compile(infilename);
+    final EventProxy prop = findProposition(des);
     final ProductDESCopier copier =
-      new ProductDESCopier(mProductDESFactory, des);
+      new ProductDESCopier(mProductDESFactory, des, prop);
     final ProductDESResult result = (ProductDESResult) copier.run();
     assertTrue("Unexpected result value!", result.getSatisfied() == false);
     final ProductDESProxy copy = result.getProductDES();
@@ -61,7 +65,7 @@ public class AnalysisTest extends WatersTestCase
     assertTrue("Unexpected result name!", desname.equals(copyname));
   }
 
-  ProductDESProxy compile(final File infilename)
+  private ProductDESProxy compile(final File infilename)
     throws IOException, WatersException
   {
     final ModuleProxy module =
@@ -69,6 +73,25 @@ public class AnalysisTest extends WatersTestCase
     final ModuleCompiler compiler =
       new ModuleCompiler(mDocumentManager, mProductDESFactory, module);
     return compiler.compile();
+  }
+
+  private EventProxy findProposition(final ProductDESProxy des)
+  {
+    EventProxy prop = null;
+    final Collection<EventProxy> events = des.getEvents();
+    for (final EventProxy event : events) {
+      final EventKind kind = event.getKind();
+      if (kind.equals(EventKind.PROPOSITION)) {
+        if (prop == null) {
+          prop = event;
+        } else {
+          throw new IllegalArgumentException
+            ("Product DES '" + des.getName() +
+             "' has more than one proposition --- not supported!");
+        }
+      }
+    }
+    return prop;
   }
 
 
