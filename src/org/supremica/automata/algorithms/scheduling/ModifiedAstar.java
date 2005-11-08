@@ -22,19 +22,25 @@ import org.supremica.log.*;
 import org.supremica.automata.*;
 import org.supremica.util.ActionTimer;
 
-public class ModifiedAstar extends Scheduler {
+public class ModifiedAstar 
+	extends AbstractAstar {
 
-    public ModifiedAstar(Automata theAutomata) throws Exception  
+	private static Logger logger = LoggerFactory.createLogger(ModifiedAstar.class);
+
+    public ModifiedAstar(Automata theAutomata) 
+		throws Exception  
 	{
 		super(theAutomata, "1-product relax");
     }
 	
-    public ModifiedAstar(Automata theAutomata, String heuristic) throws Exception 
+    public ModifiedAstar(Automata theAutomata, String heuristic) 
+		throws Exception 
 	{
 		super(theAutomata, heuristic, true, false);
     }
 	
-    public ModifiedAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean iterativeSearch) throws Exception 
+    public ModifiedAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean iterativeSearch) 
+		throws Exception 
 	{
 		super(theAutomata, heuristic, manualExpansion, iterativeSearch);
     }

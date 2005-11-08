@@ -9,8 +9,9 @@ import org.supremica.automata.*;
 /**
  * This class assumes that costs consists of three parts - int[] currCosts, int accCost and int[] effCosts.
  */
-public class ModifiedVGAstar extends ModifiedAstar {
-
+public class ModifiedVGAstar 
+	extends AbstractAstar 
+{
     private static Logger logger = LoggerFactory.createLogger(ModifiedVGAstar.class);
     private VisGraphBuilder vgBuilder;
     protected int effCostIndex;
