@@ -81,12 +81,12 @@ void initGlobalAlphabet(const jni::ProductDESGlue& des, jni::ClassCache* cache)
 
 JNIEXPORT jobject JNICALL 
 Java_net_sourceforge_waters_model_analysis_ProductDESCopier_callNativeMethod
-  (JNIEnv* env, jobject copier)
+  (JNIEnv* env, jobject jcopier)
 {
   try {
     jni::ClassCache cache(env);
     try {
-      jni::ProductDESCopierGlue copier(copier, &cache);
+      jni::ProductDESCopierGlue copier(jcopier, &cache);
       jni::ProductDESGlue des = copier.getInputGlue(&cache);
       jstring name = des.getName();
       waters::initGlobalAlphabet(des, &cache);
