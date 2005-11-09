@@ -1,0 +1,179 @@
+\documentclass{article}
+
+
+\usepackage{amsthm,amsmath,amssymb}
+
+\newtheorem{theorem}{Theorem}
+
+\begin{document}
+\tableofcontents
+\section{Introduction}
+
+\subsection{Background}
+
+\section{Extended Finite Automaton (EFA)}
+An Extended Deterministic Finite Automaton (EFA) is an
+augmentation of a regular finite automaton. The regular automaton
+$A$ is defined as $A=<Q,\Sigma,\delta, q_i,Q_m>$. Let
+$T=\{(q,\sigma)\in Q \times \Sigma: \delta(q,\sigma)!\}$ denote
+the set of transitions in the deterministic automaton $A$ and let
+$\tau_k$, $k=1,...,|T|$ denote the elements (transitions) of $T$.
+
+The automaton $A$ is extended by a set $X=(x_1,...,x_n)$ of $n$
+integer variables $x_{k}$ and by a $|T|$-tuple of function pairs
+$G=\big((g_{\tau_1},a_{\tau_1}),...,
+(g_{\tau_{|T|}},a_{\tau_{|T|}})\big)$, where each pair
+$(g_{\tau_k},a_{\tau_k})$ is associated to the corresponding
+transition $\tau_k$ in $T$. $g_{\tau_k}$ is an evaluation of a
+boolean formula (a guard formula) over $X$ i.e.
+$g_{\tau_k}:{\mathbb{N}}^{n}\rightarrow \{0,1\}$ saying if the
+corresponding transition $\tau_k$ is enabled or not. $a_{\tau_k}$
+is an updating (action) function from ${\mathbb{N}}^{n}$ to
+${\mathbb{N}}^{n}$ of the integer variables $X$.
+
+With the above notations we will formally define an EFA as the
+$8$-tuple $A_{e}=<Q, \Sigma, \delta_{e}, q_i, Q_m, X, G>$, where
+$\delta_{e}: Q \times \Sigma \times X \rightarrow Q\times X $ is
+an extention of the transition function $\delta:Q \times \Sigma
+\rightarrow Q$. $\delta_e$ is defined by means of $\delta$ and the
+elements of $G$ as
+\begin{eqnarray}
+\delta_{e}(q,\sigma,X)=\left\{
+\begin{array}{ll}
+(\delta(q,\sigma),a_{q \sigma}(X)\big)\quad\quad g_{q \sigma}(X)=1\\
+\big(q,X \big)\quad\quad\quad\quad g_{q \sigma}(X)=0
+\end{array}\right.
+\end{eqnarray}
+If the guard formula $g_{q \sigma}$ is undefined then
+$\delta_{e}(q,\sigma,X)$ is undefined.
+
+
+
+\subsection{Synchronous composition of EFA's}
+The synchronous composition of two EFA's $A=<Q^A, \Sigma^A,
+\delta^A, q^A_i, Q^A_m, X, G^A>$ and $B=<Q^B, \Sigma^B, \delta^B,
+q^B_i, Q^B_m, Y, G^B>$ exists if and only if the automata are
+consistent. The consistency condition requires that the action
+functions triggered by a common enabled  event $\sigma\in
+\Sigma_{A}\cap \Sigma_{B}$ in the two automata update common
+variables to the same values, i.e. if the $i^{ith}$ variable in
+$X$ and the $j^{ith}$ variable in $Y$ are the same variable and
+$g_{\alpha \sigma}(X)\wedge g_{\beta \sigma}(Y)=1$ where
+$(\alpha,\beta)\in Q^A\times Q^B$ then $(a_{\alpha \sigma}(X))_i =
+(a_{\beta \sigma}(Y))_j$.
+
+The consistency condition can be verified by inspection. However,
+if the vectors $X$ or $Y$ disable the corresponding guard formula
+($g_{\alpha \sigma}(X)\wedge g_{\beta \sigma}(Y)$) it may happen
+that $a_{\alpha \sigma}(X))_i \neq (a_{\beta \sigma}(Y))_j$ even
+though the two automata are consistent. Therefore it may be a
+time-consuming task to verify the consistency condition by
+inspection. In section \ref{Implementation} we will present
+algorithms that includes a consistency check of the synchronous
+composition of two EFA's. \\
+
+Formally we define the synchronous product $A||B$ of two EFA's
+$A=<Q^A, \Sigma^A, \delta^A, q^A_i, Q^A_m, X, G^A>$ and $B=<Q^B,
+\Sigma^B, \delta^B, q^B_i, Q^B_m, Y, G^B>$ as
+\begin{eqnarray}
+A||B=<Q^A\times Q^B, \Sigma^A \cup \Sigma^B , \delta, q_i,
+Q^A_m\times Q^B_m, X \cup Y, G>.
+\end{eqnarray}
+To define the guard functions, the action functions and the
+transition function for the product we make use of the
+corresponding functions in $A$ and $B$.
+
+The guard functions $g_{q \sigma}(Z)=g_{q \sigma}(X\cup Y)$ are
+defined as
+\begin{eqnarray}
+g_{q \sigma}(Z)=\left\{
+\begin{array}{ll}
+g_{q^A\sigma}(X)\wedge g_{q^B\sigma}(Y) \quad\quad\sigma\in \Sigma^A \cap \Sigma^B\\
+g_{q^A\sigma}(X) \quad\quad\sigma\in \Sigma^A \setminus \Sigma^B\\
+g_{q^B\sigma}(Y) \quad\quad\sigma\in \Sigma^B \setminus \Sigma^A\\
+\textrm{undefined       otherwise}
+\end{array}\right.
+\end{eqnarray}
+If $X\cap Y\neq \emptyset$ we introduce $Y'=Y\setminus X$ and
+$X'=X\setminus Y$ and look at the restrictions of the updating
+functions $a^A_\delta$ and $a^B_\delta$ to the sets $X'$ and $Y'$.
+The updating functions are defined as (if $X\cap Y=\emptyset$ then
+$Y'=Y$ and $X'=X$)
+\begin{eqnarray}
+a_{q \sigma}(Z)=\left\{
+\begin{array}{ll}
+ \big(a^A_{q^A \sigma}(X), a^B_{q^B \sigma}(Y')\big)\quad\quad\sigma\in \Sigma^A \cap \Sigma^B\\
+\big(a^A_{q^A \sigma}(X), Y'\big)\quad\quad\sigma\in \Sigma^A \setminus \Sigma^B\\
+\big(X', a^B_{q^B \sigma}(Y)\big)\quad\quad\sigma\in \Sigma^B \setminus \Sigma^A\\
+\textrm{undefined       otherwise}
+\end{array}\right.
+\end{eqnarray}
+
+
+ The transition function
+$\delta(q,\sigma,Z)=\delta(q^A,q^B,\sigma,X\cup Y)$ is defined
+from $\delta^A$ and $\delta^B$ as
+\begin{eqnarray}
+\delta(q,\sigma,Z)=\left\{
+\begin{array}{ll}
+\big(\delta^A(q^A,\sigma),\delta^B(q^B,\sigma),a_{q \sigma}(Z)\big) \quad\quad \sigma\in \Sigma^A \cap \Sigma^B \quad g_{q \sigma}(Z)=1\\
+\big(\delta^A(q^A,\sigma),q^B,a_{q \sigma}(Z)\big) \quad\quad \sigma\in \Sigma^A \setminus \Sigma^B \quad g_{q \sigma}(Z)=1\\
+\big(q^A,\delta^B(q^B,\sigma),a_{q \sigma}(Z)\big) \quad\quad \sigma\in \Sigma^B \setminus \Sigma^A \quad g_{q \sigma}(Z)=1\\
+\textrm{undefined       otherwise}
+\end{array}\right.
+\end{eqnarray}
+
+\noindent By the above definition of synchronization we now obtain
+the following property
+
+\begin{theorem}
+   Full synchronous composition of EFAs is an associative
+   operation.
+\end{theorem}
+
+\noindent \textbf{Proof}: We show this by considering three
+automata $A, A'$ and $A''$ and showing that $(A\|A')\|A'' =
+A\|(A'\|A'')$.
+
+The 8-tuple representing $(A\|A')\|A''$ is
+
+\begin{center}
+\begin{tabular}{ll}
+  $(A\|A')\|A'' =$ & $\Big \langle (Q \times Q') \times Q'',$\\
+  & $ \big(\Sigma \bigcup \Sigma' \big) \bigcup \Sigma'',$\\
+  & $\delta^{(A\|A')\|A''},$\\
+  & $\big((q_i, q'_i) , q''_i\big),$\\
+  & $(Q_m \times Q_m') \times Q_m'',$\\
+  & $\big(X \bigcup X') \bigcup X'',$\\
+  & $G^{(A\|A')\|A''},$\\
+  & $\big(X_m \bigcup X'_m) \bigcup X''_m \Big \rangle$
+\end{tabular}
+\end{center}
+
+\noindent In order to establish associativity we now have to show
+this for each of the elements in the 8-tuple. For the states, the
+alphabet, the initial state, the marked states and the variables,
+associativity is clear by the laws of set operations. We will now
+in turn deal with the guard/action functions and the transition
+function.
+
+For the guard function $g^{(A\|A')\|A''} : X^c \rightarrow
+\{\mathrm{true}, \mathrm{false}\}$ of the composite automaton we
+have by definition
+
+\begin{equation}
+  g^{(A\|A')\|A''}(X^c) = \big[g(X) \wedge g'(X') \big] \wedge g''(X'') = g(X) \wedge \big[g'(X') \wedge g''(X'')] = g^{A\|(A'\|A'')}(X^c)
+\end{equation}
+
+\noindent Now consider the action function $a^{(A\|A')\|A''} : X^c
+\rightarrow X^c$. Here things get a bit more messy, since we need
+to make sure that each variable is updated at most one time even
+though we might have $X\bigcap X'\bigcap X'' \neq \emptyset$
+
+\section{Implementation of EFA's with hierarchy in Supremica}
+
+\subsection{Supremica}
+
+\subsection{Implementation}\label{Implementation}
+\subsection{Examples}
+\end{document}
