@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBModuleImporter
 //###########################################################################
-//# $Id: JAXBModuleImporter.java,v 1.3 2005-11-07 10:08:46 cengic Exp $
+//# $Id: JAXBModuleImporter.java,v 1.4 2005-11-09 03:18:07 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -660,7 +660,7 @@ public class JAXBModuleImporter
   {
     try {
       final boolean deterministic = element.isDeterministic();
-      final LabelBlockType blockedEventsElement = (LabelBlockType) element.getBlockedEvents();
+      final LabelBlockType blockedEventsElement = element.getBlockedEvents();
       final LabelBlockProxy blockedEvents =
         importLabelBlock(blockedEventsElement);
       mGraphNodeList =

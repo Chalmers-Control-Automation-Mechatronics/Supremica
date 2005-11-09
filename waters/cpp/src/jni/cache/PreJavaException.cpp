@@ -4,7 +4,7 @@
 //# PACKAGE: jni.cache
 //# CLASS:   PreJavaException
 //###########################################################################
-//# $Id: PreJavaException.cpp,v 1.1 2005-11-07 23:45:47 robi Exp $
+//# $Id: PreJavaException.cpp,v 1.2 2005-11-09 03:18:07 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -25,13 +25,6 @@ namespace jni {
 
 //###########################################################################
 //# PreJavaException: Constructors, Destructors & Co.
-
-PreJavaException::
-PreJavaException(waters::uint32 classcode, const char* msg)
-  : mClassCode(classcode)
-{
-  initMessage(msg, false);
-}
 
 PreJavaException::
 PreJavaException(waters::uint32 classcode,
@@ -58,7 +51,7 @@ PreJavaException::
 }
 
 PreJavaException& PreJavaException::
-operator = (const PreJavaException& partner)
+operator=(const PreJavaException& partner)
 {
   if (this != &partner) {
     if (!mStaticString) {

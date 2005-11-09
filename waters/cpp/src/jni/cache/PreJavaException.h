@@ -4,7 +4,7 @@
 //# PACKAGE: jni.javah
 //# CLASS:   PreJavaException
 //###########################################################################
-//# $Id: PreJavaException.h,v 1.1 2005-11-07 23:45:47 robi Exp $
+//# $Id: PreJavaException.h,v 1.2 2005-11-09 03:18:07 robi Exp $
 //###########################################################################
 
 
@@ -38,13 +38,12 @@ class PreJavaException {
 public:
   //#########################################################################
   //# Constructors, Destructors & Co.
-  explicit PreJavaException(waters::uint32 classcode, const char* msg);
   explicit PreJavaException(waters::uint32 classcode,
 			    const char* msg,
-			    bool staticString);
+			    bool staticString = false);
   PreJavaException(const PreJavaException& partner);
   ~PreJavaException();
-  PreJavaException& operator= (const PreJavaException& partner);
+  PreJavaException& operator=(const PreJavaException& partner);
 
   //#########################################################################
   //# Simple Access
