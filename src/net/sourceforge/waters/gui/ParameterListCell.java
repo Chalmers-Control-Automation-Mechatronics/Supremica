@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ParameterListCell
 //###########################################################################
-//# $Id: ParameterListCell.java,v 1.4 2005-11-03 01:24:15 robi Exp $
+//# $Id: ParameterListCell.java,v 1.5 2005-11-09 03:20:56 robi Exp $
 //###########################################################################
 
 
@@ -38,12 +38,14 @@ public class ParameterListCell
 												  boolean isSelected,
 												  boolean cellHasFocus)
 	{
+		final ParameterProxy param = (ParameterProxy) value;
+		final String text = HTMLPrinter.toHTMLString(param);
+		setText(text);
+
 		ImageIcon icon = null;
-		final StringBuffer buffer = new StringBuffer("<html>");
 		if (value instanceof EventParameterProxy) {
-			final EventParameterProxy param = (EventParameterProxy) value;
-			final EventDeclProxy decl = param.getEventDecl();
-			buffer.append(decl.toString());
+			final EventParameterProxy eparam = (EventParameterProxy) param;
+			final EventDeclProxy decl = eparam.getEventDecl();
 			final EventKind kind = decl.getKind();
 			if (kind.equals(EventKind.CONTROLLABLE)) {
 				icon = IconLoader.ICON_CONTROLLABLE;
@@ -52,27 +54,16 @@ public class ParameterListCell
 			} else if (kind.equals(EventKind.PROPOSITION)) {
 				icon = IconLoader.ICON_PROPOSITION;
 			}
-		} else if (value instanceof SimpleParameterProxy) {
-			final SimpleParameterProxy param = (SimpleParameterProxy) value;
-			buffer.append(param.getName());
-			buffer.append(" - <i>Default value:</i> ");
-			buffer.append(param.getDefaultValue());
-			if (value instanceof IntParameterProxy) {
-				icon = IconLoader.ICON_INTPARAM;
-			} else if (value instanceof RangeParameterProxy) {
-				icon = IconLoader.ICON_RANGEPARAM;
-			}
+		} else if (value instanceof IntParameterProxy) {
+			icon = IconLoader.ICON_INTPARAM;
+		} else if (value instanceof RangeParameterProxy) {
+			icon = IconLoader.ICON_RANGEPARAM;
 		} else {
 			throw new ClassCastException("Can't render parameter of class " +
 										 value.getClass().getName() + "!");
 		}
-		final ParameterProxy param = (ParameterProxy) value;
-		if (param.isRequired()) {
-			buffer.append(" <i>(Required)</i>");
-		}
-		buffer.append("</html>");
-		setText(buffer.toString());
 		setIcon(icon);
+
 		if (isSelected) {
 			setBackground(list.getSelectionBackground());
 			setForeground(list.getSelectionForeground());

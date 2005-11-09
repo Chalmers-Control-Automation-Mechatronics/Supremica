@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorComponentsPanel
 //###########################################################################
-//# $Id: EditorComponentsPanel.java,v 1.12 2005-11-03 01:24:16 robi Exp $
+//# $Id: EditorComponentsPanel.java,v 1.13 2005-11-09 03:20:56 robi Exp $
 //###########################################################################
 
 
@@ -18,7 +18,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import net.sourceforge.waters.gui.ComponentInfo;
+import net.sourceforge.waters.gui.HTMLPrinter;
 import net.sourceforge.waters.gui.ModuleTreeRenderer;
+import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.module.ForeachSubject;
 import net.sourceforge.waters.subject.module.InstanceSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
@@ -111,55 +113,36 @@ class EditorComponentsPanel
 
 	private DefaultMutableTreeNode makeTreeFromComponent(final Object e)
 	{
-		if (e instanceof SimpleComponentSubject) {
-			final SimpleComponentSubject comp = (SimpleComponentSubject) e;
-			final String name = comp.getName();
-			final Object userobject = new ComponentInfo(name, comp);
+		final AbstractSubject subject = (AbstractSubject) e;
+		final String text = HTMLPrinter.toHTMLString(subject);
+		final Object userobject = new ComponentInfo(text, subject);
+		if (subject instanceof SimpleComponentSubject) {
 			return new DefaultMutableTreeNode(userobject, false);
-		} else if (e instanceof InstanceSubject) {
-			final InstanceSubject inst = (InstanceSubject) e;
-			final String name =
-				"<html><b>Instance </b><i>" + inst.getName() + "</i> = <i>" +
-				inst.getModuleName() + "</i></html>";
-			final Object userobject = new ComponentInfo(name, inst);
-			DefaultMutableTreeNode tmp =
+		} else if (subject instanceof InstanceSubject) {
+			final InstanceSubject inst = (InstanceSubject) subject;
+			final DefaultMutableTreeNode tmp =
 				new DefaultMutableTreeNode(userobject, true);
-			for (int j = 0; j < inst.getBindingList().size(); j++) {
-				tmp.add(makeTreeFromComponent(inst.getBindingList().get(j)));
+			final List<ParameterBindingSubject> bindings =
+				inst.getBindingListModifiable() ;
+			for (final ParameterBindingSubject binding : bindings) {
+				tmp.add(makeTreeFromComponent(binding));
 			}
 			return tmp;
-		} else if (e instanceof ParameterBindingSubject) {
-			final ParameterBindingSubject binding =
-				(ParameterBindingSubject) e;
-			final String name =
-				"<html><b>Binding: </b><i>" + binding.getName() +
-				"</i> = <i>" + binding.getExpression().toString() +
-				"</i></html>";
-			final Object userobject = new ComponentInfo(name, binding);
+		} else if (subject instanceof ParameterBindingSubject) {
 			return new DefaultMutableTreeNode(userobject, false);
-		} else {
-			final ForeachSubject foreach = (ForeachSubject) e;
-			final SimpleExpressionSubject range = foreach.getRange();
-			final SimpleExpressionSubject guard = foreach.getGuard();
-			final StringBuffer buffer = new StringBuffer();
-			buffer.append("<html><b>Foreach </b><i>");
-			buffer.append(foreach.getName());
-			buffer.append("</i> <b>in<b> <i>");
-			buffer.append(range);
-			if (guard != null) {
-				buffer.append(" <b>Where</b> <i>");
-				buffer.append(guard);
-				buffer.append("</i>");
-			}
-			buffer.append("</html>");
-			final String name = buffer.toString();
-			final Object userobject = new ComponentInfo(name, foreach);
+		} else if (subject instanceof ForeachSubject) {
+			final ForeachSubject foreach = (ForeachSubject) subject;
 			final DefaultMutableTreeNode tn =
 				new DefaultMutableTreeNode(userobject, true);
-			for (int i = 0; i < foreach.getBody().size(); i++) {
-				tn.add(makeTreeFromComponent(foreach.getBody().get(i)));
+			final List<AbstractSubject> body = foreach.getBodyModifiable();
+			for (final AbstractSubject item : body) {
+				tn.add(makeTreeFromComponent(item));
 			}
 			return tn;
+		} else {
+			throw new IllegalArgumentException
+				("Don't know how to make tree from subject of type " +
+				 e.getClass().getName() + "!");
 		}
 	}
 

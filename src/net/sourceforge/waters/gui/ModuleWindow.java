@@ -4,20 +4,21 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleWindow
 //###########################################################################
-//# $Id: ModuleWindow.java,v 1.16 2005-11-03 01:24:15 robi Exp $
+//# $Id: ModuleWindow.java,v 1.17 2005-11-09 03:20:56 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
 
-import java.awt.*;
+import java.awt.GridLayout;
+import java.awt.Dimension;
 import java.awt.event.*;
-import java.beans.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import javax.swing.*;
 import javax.swing.event.*;
@@ -326,63 +327,35 @@ public class ModuleWindow
 
 	private DefaultMutableTreeNode makeTreeFromComponent(AbstractSubject e)
 	{
-		if (e instanceof SimpleComponentSubject)
-		{
-			final SimpleComponentSubject comp = (SimpleComponentSubject) e;
-			final String name = comp.getName();
-			final Object userobject = new ComponentInfo(name, e);
+		final String text = HTMLPrinter.toHTMLString(e);
+		final Object userobject = new ComponentInfo(text, e);
+		if (e instanceof SimpleComponentSubject) {
 			return new DefaultMutableTreeNode(userobject, false);
-		}
-		else if (e instanceof InstanceSubject)
-		{
-			InstanceSubject i = (InstanceSubject) e;
-			String name = "<html><b>Instance </b><i>" + i.getName() + "</i> = <i>" + i.getModuleName() + "</i></html>";
-			final Object userobject = new ComponentInfo(name, e);
-			DefaultMutableTreeNode tmp = new DefaultMutableTreeNode(userobject, true);
-
-			for (int j = 0; j < i.getBindingList().size(); j++)
-			{
-				tmp.add(makeTreeFromComponent((AbstractSubject) (i.getBindingList().get(j))));
+		} else if (e instanceof InstanceSubject) {
+			final InstanceSubject inst = (InstanceSubject) e;
+			final DefaultMutableTreeNode tmp =
+				new DefaultMutableTreeNode(userobject, true);
+			final List<ParameterBindingSubject> bindings =
+				inst.getBindingListModifiable() ;
+			for (final ParameterBindingSubject binding : bindings) {
+				tmp.add(makeTreeFromComponent(binding));
 			}
-
 			return tmp;
-		}
-		else if (e instanceof ParameterBindingSubject)
-		{
-			ParameterBindingSubject i = (ParameterBindingSubject) e;
-			String name = "<html><b>Binding: </b><i>" + i.getName() + "</i> = <i>" + i.getExpression().toString() + "</i></html>";
-			final Object userobject = new ComponentInfo(name, e);
-
+		} else if (e instanceof ParameterBindingSubject) {
 			return new DefaultMutableTreeNode(userobject, false);
-		}
-		else
-		{
-			String name;
-			ForeachSubject v = (ForeachSubject) e;
-			SimpleExpressionSubject range = v.getRange();
-			SimpleExpressionSubject guard = v.getGuard();
-
-			name = "<html><b>Foreach </b><i>" + ((NamedSubject) e).getName() + "</i>";
-
-			if (range != null)
-			{
-				name += " <b>in<b> <i>" + range.toString() + "</i>";
+		} else if (e instanceof ForeachSubject) {
+			final ForeachSubject foreach = (ForeachSubject) e;
+			final DefaultMutableTreeNode tn =
+				new DefaultMutableTreeNode(userobject, true);
+			final List<AbstractSubject> body = foreach.getBodyModifiable();
+			for (final AbstractSubject item : body) {
+				tn.add(makeTreeFromComponent(item));
 			}
-
-			if (guard != null)
-			{
-				name += " <b>Where</b> <i>" + guard.toString() + "</i></html>";
-			}
-
-			final Object userobject = new ComponentInfo(name, e);
-			final DefaultMutableTreeNode tn = new DefaultMutableTreeNode(userobject, true);
-
-			for (int i = 0; i < v.getBody().size(); i++)
-			{
-				tn.add(makeTreeFromComponent((AbstractSubject) (v.getBody().get(i))));
-			}
-
 			return tn;
+		} else {
+			throw new IllegalArgumentException
+				("Don't know how to make tree from subject of type " +
+				 e.getClass().getName() + "!");
 		}
 	}
 

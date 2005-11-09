@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.printer
 //# CLASS:   ProxyPrinter
 //###########################################################################
-//# $Id: ProxyPrinter.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: ProxyPrinter.java,v 1.3 2005-11-09 03:20:56 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.printer;
@@ -246,6 +246,20 @@ public class ProxyPrinter
 
 
   //#########################################################################
+  //# Exception Handling
+  protected void unwrap(final VisitorException exception)
+    throws IOException
+  {
+    final Throwable cause = exception.getCause();
+    if (cause instanceof IOException) {
+      throw (IOException) cause;
+    } else {
+      throw new WatersRuntimeException(cause);
+    }
+  }
+
+
+  //#########################################################################
   //# Indentation
   int setIndent(int indent)
   {
@@ -276,20 +290,6 @@ public class ProxyPrinter
       } catch (final IOException exception) {
         throw wrap(exception);
       }
-    }
-  }
-
-
-  //#########################################################################
-  //# Exception Handling
-  void unwrap(final VisitorException exception)
-    throws IOException
-  {
-    final Throwable cause = exception.getCause();
-    if (cause instanceof IOException) {
-      throw (IOException) cause;
-    } else {
-      throw new WatersRuntimeException(cause);
     }
   }
 
