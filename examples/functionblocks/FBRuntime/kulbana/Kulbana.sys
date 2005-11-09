@@ -9,7 +9,7 @@
     <FB Name="merge2" Type="E_MERGE2" />
     <FB Name="splitStor" Type="E_SPLIT2" />
     <FB Name="splitLiten" Type="E_SPLIT2" />
-	<FB Name="kulbana" Type="Kulbana_composit" />
+	<FB Name="kulbana" Type="Kulbana" />
 	<FB Name="matlyft" Type="KulaMatlyft" />
 	<FB Name="matstation" Type="Matstation" />
 	<FB Name="hiss" Type="Hiss" />
