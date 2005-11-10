@@ -21,7 +21,7 @@ and let $\tau_k$, $k=1,...,|T|$ denote the elements (transitions)
 of $T$.
 
 The automaton $A$ is extended by a set $X=X_1\times ... \times
-X_n$, where $X_k$, $k=1,...,n$, are a finite nonempty subsets of
+X_n$, where $X_k$, $k=1,...,n$, are finite nonempty subsets of
 $\mathbb{Z}$. The set $X$ is the domain of definition of an
 $n$-tuple of integer variables $x=(x_1,...,x_n)$ with initial
 value $x_0=(x_{10},...,x_{n0})$. We also add to $A$ an $|T|$-tuple
@@ -60,56 +60,32 @@ have $T_e=\{(q,\sigma)\in Q \times \Sigma: g_{q\sigma}(x)=1
 
 
 \subsection{Synchronous composition of EFA's}
-The synchronous composition of two EFA's $A=\langle Q^A, \Sigma^A,
-\delta^A, q^A_i, Q^A_m, X^{A}, G^A, X^A_m \rangle$ and $B=\langle
-Q^B, \Sigma^B, \delta^B, q^B_i, Q^B_m, X^{B}, G^B, X^B_m \rangle$
-exists if and only if the automata are consistent. The consistency
-condition requires that the action functions triggered by a common
-enabled event $\sigma\in \Sigma_{A}\cap \Sigma_{B}$ in the two
-automata update common variables to the same values, i.e. if the
-$i^{ith}$ variable in $x^{A}$ and the $j^{ith}$ variable in
-$x^{B}$ are the same variable and $g_{q^A \sigma}(x^{A})\wedge
-g_{q^B \sigma}(x^{B})=1$ where $(q^A,q^B)\in Q^A\times Q^B$ then
-$(a_{q^A \sigma}(x^{A}))_i = (a_{q^B \sigma}(x^{B}))_j$.
 
-The consistency condition can be verified by inspection. However,
-if the vectors $x^{A}$ or $x^{B}$ disable the corresponding guard
-formula ($g_{q^A \sigma}(x^{A})\wedge g_{q^B \sigma}(x^{B})$) it
-may happen that $a_{q^A \sigma}(x^{A}))_i \neq (a_{q^B
-\sigma}(x^{B}))_j$ even though the two automata are consistent.
-Therefore it may be a time-consuming task to verify the
-consistency condition by inspection. In section
-\ref{Implementation} we will present algorithms that includes a
-consistency check of the synchronous
-composition of two EFA's. \\
-
-
-
- Formally we define the synchronous product $A||B$ of two EFA's
-$A=\langle Q^A, \Sigma^A, \delta^A, q^A_i, Q^A_m, X^{A}, G^A,X^A_m
-\rangle$ and $B=\langle Q^B, \Sigma^B, \delta^B, q^B_i, Q^B_m,
-X^{B}, G^B,X^B_m
- \rangle$ as
+Formally we define the synchronous product $A||B$ of two EFA's
 \begin{eqnarray}
-A||B=\langle Q^A\times Q^B, \Sigma^A \cup \Sigma^B , \delta, q_i,
-Q^A_m\times Q^B_m, Z, G, Z_m \rangle.
+A=\langle Q^A, \Sigma^A, \delta^A, q^A_i, Q^A_m, X^{A},
+G^A,x^A_0,X^A_m \rangle
+\end{eqnarray} and \begin{eqnarray} B=\langle Q^B, \Sigma^B, \delta^B, q^B_i,
+Q^B_m, X^{B}, G^B,x^B_0,X^B_m \rangle
+\end{eqnarray} as
+\begin{eqnarray}
+A||B&=&\langle Q^A\times Q^B, \Sigma^A \cup \Sigma^B ,
+\delta^{A||B}, (q^A_i,q^B_i) ,\nonumber\\
+&& Q^A_m\times Q^B_m, X^A \times X^B, G^{A||B},(x^A_0,x^B_0),
+X^A_m \times X^B_m \rangle.
 \end{eqnarray}
-To define the integer variables, the guard functions, the action
-functions and the transition function for the product we make use
-of the corresponding elements in $A$ and $B$.
-
- Let $z^{AB}$ denote the common variables of $x^{A}$ and $x^{B}$, and let $z^A$
-and $z^B$ be the distinct variables of $x^{A}$ and $x^{B}$,
-respectively. We define the integer variables $z$ of the
-synchronous product of $A$ and $B$ as the vector $z=(z^A, z^{AB},
-z^B)$. The guard functions $g_{q \sigma}(z)$ are defined as
+To define the guard functions, the action functions and the
+transition function of the product we make use of the
+corresponding functions in $A$ and $B$. To denote the elements of
+$A||B$ we remove unnecessary  superscripts and write $A||B=\langle
+Q, \Sigma, \delta, q_i, Q_m, X, G ,x_0, X_m \rangle$. The guard
+functions $g_{q \sigma}(x)$ are defined as
 \begin{eqnarray}\label{guard_sync_1}
-g_{q \sigma}(z)=\left\{
+g_{q \sigma}(x)=\left\{
 \begin{array}{ll}
-g_{q^A\sigma}(x^{A})\wedge g_{q^B\sigma}(x^{B}) \textrm{ if }\sigma\in \Sigma^A \cap \Sigma^B\\
-g_{q^A\sigma}(x^{A}) \quad\quad \textrm{ if } \sigma\in \Sigma^A \setminus \Sigma^B\\
-g_{q^B\sigma}(x^{B}) \quad\quad \textrm{ if }
-\sigma\in\Sigma^B\setminus \Sigma^A
+g_{q^A\sigma}(x^{A})\wedge g_{q^B\sigma}(x^{B}) \quad\quad\sigma\in \Sigma^A \cap \Sigma^B\\
+g_{q^A\sigma}(x^{A})\quad\quad\quad\quad\quad\quad\quad\sigma\in \Sigma^A\setminus\Sigma^B\\
+g_{q^B\sigma}(x^{B})\quad\quad\quad\quad\quad\quad\quad\sigma\in\Sigma^B\setminus\Sigma^A
 \end{array}\right.
 \end{eqnarray}
 If any one of the guards functions in the above definition are
@@ -118,23 +94,18 @@ also undefined. To simplify the notation further, we use "dummy"
 guard functions in the following way. If $\sigma\in \Sigma^A
 \setminus \Sigma^B$ we introduce fictional guards functions
 $g_{q^B\sigma}(.)=1$ for $B$ and if $\sigma\in\Sigma^B\setminus
-\Sigma^A$ we set $g_{q^A\sigma}(.)=1$. With this convention we can
-write equation (\ref{guard_sync_1}) as
+\Sigma^A$ we set $g_{q^A\sigma}(.)=1$. Doing this, we can write
+equation (\ref{guard_sync_1}) as
 \begin{eqnarray}
-g_{q \sigma}(z)= g_{q^A\sigma}(x^{A})\wedge g_{q^B\sigma}(x^{B}).
+g_{q \sigma}(x)= g_{q^A\sigma}(x^{A})\wedge g_{q^B\sigma}(x^{B}).
 \end{eqnarray}
-To define the action functions for $A||B$ we look at the
-restrictions of the updating functions $a^A_\delta$ and
-$a^B_\delta$ to the sets $Z^A$ and $Z^B$. The updating functions
-are defined as (if $x^{A}$ and $x^{B}$ have no common variables
-then $z=(x^{A},x^{B})$)
+The updating functions $a_{q \sigma}(x)$ are defined as
 \begin{eqnarray}\label{action_sync_1}
-a_{q \sigma}(z)=\left\{
+a_{q \sigma}(x)=\left\{
 \begin{array}{ll}
- \big(a^A_{q^A \sigma}(x^{A}), a^B_{q^B \sigma}(z^{B})\big)\quad\quad\sigma\in \Sigma^A \cap \Sigma^B\\
-\big(a^A_{q^A \sigma}(x^{A}), z^{B}\big)\quad\quad\quad\sigma\in \Sigma^A \setminus \Sigma^B\\
-\big(z^{A}, a^B_{q^B \sigma}(x^{B})\big)\quad\quad\quad\sigma\in
-\Sigma^B \setminus \Sigma^A
+ \big(a^A_{q^A \sigma}(x^{A}), a^B_{q^B \sigma}(x^{B})\big)\quad\quad\sigma\in \Sigma^A \cap \Sigma^B\\
+\big(a^A_{q^A\sigma}(x^{A}),x^{B}\big)\quad\quad\quad\quad\quad\sigma\in\Sigma^A\setminus\Sigma^B\\
+\big(x^{A},a^B_{q^B\sigma}(x^{B})\big)\quad\quad\quad\quad\quad\sigma\in\Sigma^B\setminus\Sigma^A
 \end{array}\right.
 \end{eqnarray}
 As in the definition of the guard functions the notion of being
@@ -143,26 +114,25 @@ Similar to the "dummy" guard functions we introduce fictional
 action functions. If $\sigma\in \Sigma^A \setminus \Sigma^B$ we
 introduce fictional action functions $a_{q^B\sigma}(x^B)=x^B$ for
 $B$ and if $\sigma\in\Sigma^B\setminus \Sigma^A$ we set
-$a_{q^A\sigma}(x^A)=x^A$. If $x^{A}$ and $x^{B}$ have no common
-variables then equation (\ref{action_sync_1}), that defines the
-action functions of the product, simplifies to
+$a_{q^A\sigma}(x^A)=x^A$. With this convention equation
+(\ref{action_sync_1}) simplifies to
 \begin{eqnarray}
-a_{q \sigma}(z)=
+a_{q \sigma}(x)=
  \big(a^A_{q^A \sigma}(x^{A}), a^B_{q^B \sigma}(x^{B})\big).
 \end{eqnarray}
 
 
  The transition function
-$\delta(q,\sigma,z)$ is defined from $\delta^A$ and $\delta^B$ as
+$\delta(q,\sigma,x)$ is defined from $\delta^A$ and $\delta^B$ as
 \begin{eqnarray}
-\delta(q,\sigma,z)=\left\{
+\delta(q,\sigma,x)=\left\{
 \begin{array}{ll}
-\big(\delta^A(q^A,\sigma),\delta^B(q^B,\sigma),a_{q \sigma}(z)\big) \quad\quad \sigma\in \Sigma^A \cap \Sigma^B \quad g_{q \sigma}(z)=1\\
-\big(\delta^A(q^A,\sigma),q^B,a_{q \sigma}(z)\big) \quad\quad\quad\quad\quad \sigma\in \Sigma^A \setminus \Sigma^B \quad g_{q \sigma}(z)=1\\
-\big(q^A,\delta^B(q^B,\sigma),a_{q \sigma}(z)\big) \quad\quad\quad\quad\quad \sigma\in \Sigma^B \setminus \Sigma^A \quad g_{q \sigma}(z)=1\\
+\big(\delta^A(q^A,\sigma),\delta^B(q^B,\sigma),a_{q \sigma}(x)\big) \quad\quad \sigma\in \Sigma^A \cap \Sigma^B \quad g_{q \sigma}(x)=1\\
+\big(\delta^A(q^A,\sigma),q^B,a_{q \sigma}(x)\big) \quad\quad\quad\quad\quad \sigma\in \Sigma^A \setminus \Sigma^B \quad g_{q \sigma}(x)=1\\
+\big(q^A,\delta^B(q^B,\sigma),a_{q \sigma}(x)\big) \quad\quad\quad\quad\quad \sigma\in \Sigma^B \setminus \Sigma^A \quad g_{q \sigma}(x)=1\\
 \textrm{
 undefined}\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad
-g_{q\sigma}(z)=0
+g_{q\sigma}(x)=0
 \end{array}\right.
 \end{eqnarray}
 
@@ -175,13 +145,13 @@ Moreover, by the above definition of synchronization we now obtain
 the following property
 
 \begin{theorem}
-   Full synchronous composition of EFAs is an associative
+   Full synchronous composition of EFA's is an associative
    operation.
 \end{theorem}
 
 \noindent \textbf{Proof}: To prove the associativity we
 considering three automata $A, A'$ and $A''$, and show that
-$(A\|A')\|A'' = A\|(A'\|A'')$. First, we assume that the three
+$(A\|A')\|A'' = A\|(A'\|A'')$. Here, we assume that the three
 automata have no common variables.
 \newline\newline
 \noindent The 8-tuple representing $(A\|A')\|A''$ is
@@ -205,10 +175,9 @@ associativity is clear by the laws of set operations. We will now
 in turn deal with the guard/action functions and the transition
 function.
 
-The variables for the product are $X^c=(X_m, X'_m , X''_m)$ and
-the number of variables are $n=|X^c|$. For the guard functions
-$g^{(A\|A')\|A''} : {\mathbb{N}}^{n} \rightarrow \{\mathrm{true},
-\mathrm{false}\}$ of the composite automaton we have by definition
+For the guard functions $g^{(A\|A')\|A''} : X^c \rightarrow
+\{\mathrm{true}, \mathrm{false}\}$ of the composite automaton we
+have by definition
 
 \begin{equation}
   g^{(A\|A')\|A''}(X^c) = \big[g(X) \wedge g'(X') \big] \wedge g''(X'') = g(X) \wedge \big[g'(X') \wedge g''(X'')] = g^{A\|(A'\|A'')}(X^c)
@@ -217,7 +186,112 @@ $g^{(A\|A')\|A''} : {\mathbb{N}}^{n} \rightarrow \{\mathrm{true},
 \noindent Now consider the action function $a^{(A\|A')\|A''} : X^c
 \rightarrow X^c$.
 
-klkljkll
+\subsection{Synchronous composition of EFA's with common variables}
+
+The synchronous composition of two EFA's $A=\langle Q^A, \Sigma^A,
+\delta^A, q^A_i, Q^A_m, X^{A}, G^A, X^A_m \rangle$ and $B=\langle
+Q^B, \Sigma^B, \delta^B, q^B_i, Q^B_m, X^{B}, G^B, X^B_m \rangle$
+with common variables exists if and only if the automata are
+consistent. The consistency condition requires that the action
+functions triggered by a common enabled event $\sigma\in
+\Sigma_{A}\cap \Sigma_{B}$ in the two automata update common
+variables to the same values, i.e. if the $i^{ith}$ variable in
+$x^{A}$ and the $j^{ith}$ variable in $x^{B}$ are the same
+variable and $g_{q^A \sigma}(x^{A})\wedge g_{q^B \sigma}(x^{B})=1$
+where $(q^A,q^B)\in Q^A\times Q^B$ then $(a_{q^A \sigma}(x^{A}))_i
+= (a_{q^B \sigma}(x^{B}))_j$.
+
+The consistency condition can be verified by inspection. However,
+if the vectors $x^{A}$ or $x^{B}$ disable the corresponding guard
+formula ($g_{q^A \sigma}(x^{A})\wedge g_{q^B \sigma}(x^{B})$) it
+may happen that $a_{q^A \sigma}(x^{A}))_i \neq (a_{q^B
+\sigma}(x^{B}))_j$ even though the two automata are consistent.
+Therefore it may be a time-consuming task to verify the
+consistency condition by inspection. In section
+\ref{Implementation} we will present algorithms that includes a
+consistency check of the synchronous
+composition of two EFA's. \\
+
+Formally we define the synchronous product $A||B$ of two EFA's
+$A=\langle Q^A, \Sigma^A, \delta^A, q^A_i, Q^A_m, X^{A}, G^A,X^A_m
+\rangle$ and $B=\langle Q^B, \Sigma^B, \delta^B, q^B_i, Q^B_m,
+X^{B}, G^B,X^B_m
+ \rangle$ as
+\begin{eqnarray}
+A||B=\langle Q^A\times Q^B, \Sigma^A \cup \Sigma^B , \delta, q_i,
+Q^A_m\times Q^B_m, Z, G, Z_m \rangle.
+\end{eqnarray}
+To define the integer variables, the guard functions, the action
+functions and the transition function for the product we make use
+of the corresponding elements in $A$ and $B$.
+
+ Let $z^{AB}$ denote the common variables of $x^{A}$ and $x^{B}$, and let $z^A$
+and $z^B$ be the distinct variables of $x^{A}$ and $x^{B}$,
+respectively. We define the integer variables $z$ of the
+synchronous product of $A$ and $B$ as the vector $z=(z^A, z^{AB},
+z^B)$. The guard functions $g_{q \sigma}(z)$ are defined as
+\begin{eqnarray}\label{guard_sync_2}
+g_{q \sigma}(z)=\left\{
+\begin{array}{ll}
+g_{q^A\sigma}(x^{A})\wedge g_{q^B\sigma}(x^{B}) \textrm{ if }\sigma\in \Sigma^A \cap \Sigma^B\\
+g_{q^A\sigma}(x^{A}) \quad\quad \textrm{ if } \sigma\in \Sigma^A \setminus \Sigma^B\\
+g_{q^B\sigma}(x^{B}) \quad\quad \textrm{ if }
+\sigma\in\Sigma^B\setminus \Sigma^A
+\end{array}\right.
+\end{eqnarray}
+If any one of the guards functions in the above definition are
+undefined the guard function for the product $g_{q \sigma}$ is
+also undefined. To simplify the notation further, we use "dummy"
+guard functions in the following way. If $\sigma\in \Sigma^A
+\setminus \Sigma^B$ we introduce fictional guards functions
+$g_{q^B\sigma}(.)=1$ for $B$ and if $\sigma\in\Sigma^B\setminus
+\Sigma^A$ we set $g_{q^A\sigma}(.)=1$. With this convention we can
+write equation (\ref{guard_sync_2}) as
+\begin{eqnarray}
+g_{q \sigma}(z)= g_{q^A\sigma}(x^{A})\wedge g_{q^B\sigma}(x^{B}).
+\end{eqnarray}
+To define the action functions for $A||B$ we look at the
+restrictions of the updating functions $a^A_\delta$ and
+$a^B_\delta$ to the sets $Z^A$ and $Z^B$. The updating functions
+are defined as (if $x^{A}$ and $x^{B}$ have no common variables
+then $z=(x^{A},x^{B})$)
+\begin{eqnarray}\label{action_sync_2}
+a_{q \sigma}(z)=\left\{
+\begin{array}{ll}
+ \big(a^A_{q^A \sigma}(x^{A}), a^B_{q^B \sigma}(z^{B})\big)\quad\quad\sigma\in \Sigma^A \cap \Sigma^B\\
+\big(a^A_{q^A \sigma}(x^{A}), z^{B}\big)\quad\quad\quad\sigma\in \Sigma^A \setminus \Sigma^B\\
+\big(z^{A}, a^B_{q^B \sigma}(x^{B})\big)\quad\quad\quad\sigma\in
+\Sigma^B \setminus \Sigma^A
+\end{array}\right.
+\end{eqnarray}
+As in the definition of the guard functions the notion of being
+undefined is inherited from the action functions of $A$ and $B$.
+Similar to the "dummy" guard functions we introduce fictional
+action functions. If $\sigma\in \Sigma^A \setminus \Sigma^B$ we
+introduce fictional action functions $a_{q^B\sigma}(x^B)=x^B$ for
+$B$ and if $\sigma\in\Sigma^B\setminus \Sigma^A$ we set
+$a_{q^A\sigma}(x^A)=x^A$. If $x^{A}$ and $x^{B}$ have no common
+variables then equation (\ref{action_sync_2}), that defines the
+action functions of the product, simplifies to
+\begin{eqnarray}
+a_{q \sigma}(z)=
+ \big(a^A_{q^A \sigma}(x^{A}), a^B_{q^B \sigma}(x^{B})\big).
+\end{eqnarray}
+
+
+ The transition function
+$\delta(q,\sigma,z)$ is defined from $\delta^A$ and $\delta^B$ as
+\begin{eqnarray}
+\delta(q,\sigma,z)=\left\{
+\begin{array}{ll}
+\big(\delta^A(q^A,\sigma),\delta^B(q^B,\sigma),a_{q \sigma}(z)\big) \quad\quad \sigma\in \Sigma^A \cap \Sigma^B \quad g_{q \sigma}(z)=1\\
+\big(\delta^A(q^A,\sigma),q^B,a_{q \sigma}(z)\big) \quad\quad\quad\quad\quad \sigma\in \Sigma^A \setminus \Sigma^B \quad g_{q \sigma}(z)=1\\
+\big(q^A,\delta^B(q^B,\sigma),a_{q \sigma}(z)\big) \quad\quad\quad\quad\quad \sigma\in \Sigma^B \setminus \Sigma^A \quad g_{q \sigma}(z)=1\\
+\textrm{
+undefined}\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad
+g_{q\sigma}(z)=0
+\end{array}\right.
+\end{eqnarray}
 
 \section{Implementation of EFA's with hierarchy in Supremica}
 
