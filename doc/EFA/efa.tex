@@ -176,7 +176,7 @@ the following property
    operation.
 \end{theorem}
 
-\noindent \textbf{Proof}: To prove this associativity we
+\noindent \textbf{Proof}: To prove the associativity we
 considering three automata $A, A'$ and $A''$, and show that
 $(A\|A')\|A'' = A\|(A'\|A'')$. First, we assume that the three
 automata have no common variables.
@@ -202,9 +202,10 @@ associativity is clear by the laws of set operations. We will now
 in turn deal with the guard/action functions and the transition
 function.
 
-For the guard function $g^{(A\|A')\|A''} : X^c \rightarrow
-\{\mathrm{true}, \mathrm{false}\}$ of the composite automaton we
-have by definition
+The variables for the product are $X^c=(X_m, X'_m , X''_m)$ and
+the number of variables are $n=|X^c|$. For the guard functions
+$g^{(A\|A')\|A''} : {\mathbb{N}}^{n} \rightarrow \{\mathrm{true},
+\mathrm{false}\}$ of the composite automaton we have by definition
 
 \begin{equation}
   g^{(A\|A')\|A''}(X^c) = \big[g(X) \wedge g'(X') \big] \wedge g''(X'') = g(X) \wedge \big[g'(X') \wedge g''(X'')] = g^{A\|(A'\|A'')}(X^c)
