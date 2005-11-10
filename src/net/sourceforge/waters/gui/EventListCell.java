@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventListCell
 //###########################################################################
-//# $Id: EventListCell.java,v 1.5 2005-11-09 03:20:56 robi Exp $
+//# $Id: EventListCell.java,v 1.6 2005-11-10 21:54:42 robi Exp $
 //###########################################################################
 
 
@@ -33,7 +33,7 @@ public class EventListCell
 												  boolean cellHasFocus)
 	{
 		final EventDeclProxy decl = (EventDeclProxy) value;
-		final String text = HTMLPrinter.toHTMLString(decl);
+		final String text = HTMLPrinter.getHTMLString(decl);
 		final EventKind kind = decl.getKind();
 		ImageIcon icon = null;
 		if (kind.equals(EventKind.CONTROLLABLE)) {

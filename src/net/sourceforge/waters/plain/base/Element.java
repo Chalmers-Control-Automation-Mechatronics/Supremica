@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.base
 //# CLASS:   Element
 //###########################################################################
-//# $Id: Element.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: Element.java,v 1.3 2005-11-10 21:54:42 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.base;
@@ -112,7 +112,7 @@ public abstract class Element
   //# Printing
   public String toString()
   {
-    return ProxyPrinter.toString(this);
+    return ProxyPrinter.getPrintString(this);
   }
 
 }

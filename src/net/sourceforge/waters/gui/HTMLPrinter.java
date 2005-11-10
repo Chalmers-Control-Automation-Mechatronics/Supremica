@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   HTMLPrinter
 //###########################################################################
-//# $Id: HTMLPrinter.java,v 1.1 2005-11-09 03:20:56 robi Exp $
+//# $Id: HTMLPrinter.java,v 1.2 2005-11-10 21:54:42 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -37,7 +37,7 @@ public class HTMLPrinter
 
   //#########################################################################
   //# Static Class Methods
-  public static String toHTMLString(final Proxy proxy)
+  public static String getHTMLString(final Proxy proxy)
   {
     try {
       final StringWriter writer = new StringWriter();
@@ -52,6 +52,11 @@ public class HTMLPrinter
 
   //#########################################################################
   //# Constructors
+  public HTMLPrinter()
+  {
+    super();
+  }
+
   public HTMLPrinter(final Writer writer)
   {
     super(writer);

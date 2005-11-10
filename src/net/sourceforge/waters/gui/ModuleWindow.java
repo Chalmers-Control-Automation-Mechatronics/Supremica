@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleWindow
 //###########################################################################
-//# $Id: ModuleWindow.java,v 1.17 2005-11-09 03:20:56 robi Exp $
+//# $Id: ModuleWindow.java,v 1.18 2005-11-10 21:54:42 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -49,6 +49,7 @@ import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.ParameterProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
+import net.sourceforge.waters.model.printer.ProxyPrinter;
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.base.NamedSubject;
 import net.sourceforge.waters.subject.module.ForeachSubject;
@@ -89,6 +90,7 @@ public class ModuleWindow
 		final ModuleProxyFactory factory = ModuleSubjectFactory.getInstance();
 		final OperatorTable optable = CompilerOperatorTable.getInstance();
 		mExpressionParser = new ExpressionParser(factory, optable);
+		mPrinter = new HTMLPrinter();
 
 		constructWindow();
 		pack();
@@ -142,9 +144,9 @@ public class ModuleWindow
 			marshaller.marshal(module, wmodf);
 		} catch (final JAXBException exception) {
 			JOptionPane.showMessageDialog(this,
-										  "Error loading module file:" +
+										  "Error saving module file:" +
 										  exception.getMessage());
-			logEntry("JAXBException - Failed to load  '" + wmodf + "'!");
+			logEntry("JAXBException - Failed to save  '" + wmodf + "'!");
 		} catch (final WatersMarshalException exception) {
 			JOptionPane.showMessageDialog(this,
 										  "Error saving module file:" +
@@ -327,7 +329,7 @@ public class ModuleWindow
 
 	private DefaultMutableTreeNode makeTreeFromComponent(AbstractSubject e)
 	{
-		final String text = HTMLPrinter.toHTMLString(e);
+		final String text = mPrinter.toString(e);
 		final Object userobject = new ComponentInfo(text, e);
 		if (e instanceof SimpleComponentSubject) {
 			return new DefaultMutableTreeNode(userobject, false);
@@ -936,6 +938,11 @@ public class ModuleWindow
 		return mExpressionParser;
 	}
 
+	public ProxyPrinter getPrinter()
+	{
+		return mPrinter;
+	}
+
 
 	//########################################################################
 	//# Main Routine
@@ -994,9 +1001,10 @@ public class ModuleWindow
 	private boolean modified = true;
 	private JList paramdataList = null;
 	private DefaultListModel paramData = null;
-	private org.supremica.gui.Supremica supremica = null;
-	private ExpressionParser mExpressionParser;
 
+	private org.supremica.gui.Supremica supremica = null;
+	private final ExpressionParser mExpressionParser;
+	private final ProxyPrinter mPrinter;
 	private final UndoManager mUndoManager = new UndoManager();
 
 	private static Languages WLang;

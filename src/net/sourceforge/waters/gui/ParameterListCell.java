@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ParameterListCell
 //###########################################################################
-//# $Id: ParameterListCell.java,v 1.5 2005-11-09 03:20:56 robi Exp $
+//# $Id: ParameterListCell.java,v 1.6 2005-11-10 21:54:42 robi Exp $
 //###########################################################################
 
 
@@ -39,7 +39,7 @@ public class ParameterListCell
 												  boolean cellHasFocus)
 	{
 		final ParameterProxy param = (ParameterProxy) value;
-		final String text = HTMLPrinter.toHTMLString(param);
+		final String text = HTMLPrinter.getHTMLString(param);
 		setText(text);
 
 		ImageIcon icon = null;

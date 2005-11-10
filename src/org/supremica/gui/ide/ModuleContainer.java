@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ModuleContainer
 //###########################################################################
-//# $Id: ModuleContainer.java,v 1.19 2005-11-03 01:24:16 robi Exp $
+//# $Id: ModuleContainer.java,v 1.20 2005-11-10 21:54:42 robi Exp $
 //###########################################################################
 
 
@@ -24,6 +24,7 @@ import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
 
 import net.sourceforge.waters.gui.EditorWindowInterface;
+import net.sourceforge.waters.gui.HTMLPrinter;
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.observer.Observer;
@@ -31,6 +32,7 @@ import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.model.printer.ProxyPrinter;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
@@ -53,6 +55,7 @@ public class ModuleContainer implements UndoInterface
 		final ModuleProxyFactory factory = ModuleSubjectFactory.getInstance();
 		final OperatorTable optable = CompilerOperatorTable.getInstance();
 		mExpressionParser = new ExpressionParser(factory, optable);
+		mPrinter = new HTMLPrinter();
 		setSelectedComponent(getEditorPanel());
 	}
     
@@ -77,6 +80,11 @@ public class ModuleContainer implements UndoInterface
 	public ExpressionParser getExpressionParser()
 	{
 		return mExpressionParser;
+	}
+
+	public ProxyPrinter getPrinter()
+	{
+		return mPrinter;
 	}
 
 	public JToolBar getEditorToolBar(JToolBar mainToolBar)
@@ -256,6 +264,7 @@ public class ModuleContainer implements UndoInterface
 	private final IDE mIDE;
 	private final ModuleSubject mModule;
 	private final ExpressionParser mExpressionParser;
+	private final ProxyPrinter mPrinter;
 	private final UndoManager mUndoManager = new UndoManager();
     private final Collection<Observer> mObservers = new LinkedList<Observer>();
 	private final Map<SimpleComponentSubject,ComponentEditorPanel>

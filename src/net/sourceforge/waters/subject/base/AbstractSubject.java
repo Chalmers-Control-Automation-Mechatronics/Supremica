@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   ImmutableSubject
 //###########################################################################
-//# $Id: AbstractSubject.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: AbstractSubject.java,v 1.3 2005-11-10 21:54:42 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;
@@ -158,7 +158,7 @@ public abstract class AbstractSubject
   //# Printing
   public String toString()
   {
-    return ProxyPrinter.toString(this);
+    return ProxyPrinter.getPrintString(this);
   }
 
   public String getShortClassName()

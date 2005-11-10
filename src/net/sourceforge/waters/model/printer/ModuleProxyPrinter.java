@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.printer
 //# CLASS:   ModuleProxyPrinter
 //###########################################################################
-//# $Id: ModuleProxyPrinter.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: ModuleProxyPrinter.java,v 1.3 2005-11-10 21:54:42 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.printer;
@@ -71,6 +71,11 @@ public class ModuleProxyPrinter
 
   //#########################################################################
   //# Constructors
+  public ModuleProxyPrinter()
+  {
+    super();
+  }
+
   public ModuleProxyPrinter(final Writer writer)
   {
     super(writer);

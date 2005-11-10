@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.printer
 //# CLASS:   ProxyPrinter
 //###########################################################################
-//# $Id: ProxyPrinter.java,v 1.3 2005-11-09 03:20:56 robi Exp $
+//# $Id: ProxyPrinter.java,v 1.4 2005-11-10 21:54:42 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.printer;
@@ -32,7 +32,7 @@ public class ProxyPrinter
 
   //#########################################################################
   //# Static Class Methods
-  public static String toString(final Proxy proxy)
+  public static String getPrintString(final Proxy proxy)
   {
     try {
       final StringWriter writer = new StringWriter();
@@ -68,6 +68,11 @@ public class ProxyPrinter
 
   //#########################################################################
   //# Constructors
+  public ProxyPrinter()
+  {
+    this(new StringWriter());
+  }
+
   public ProxyPrinter(final Writer writer)
   {
     this(writer, 2);
@@ -89,6 +94,27 @@ public class ProxyPrinter
       printProxy(proxy);
     } catch (final VisitorException exception) {
       unwrap(exception);
+    }
+  }
+
+  public String toString(final Proxy proxy)
+  {
+    if (mWriter instanceof StringWriter) {
+      try {
+        final StringWriter swriter = (StringWriter) mWriter;
+        final StringBuffer buffer = swriter.getBuffer();
+        final String old = buffer.toString();
+        final int oldlen = old.length();
+        buffer.delete(0, oldlen);
+        pprint(proxy);
+        return buffer.toString();
+      } catch (final IOException exception) {
+        throw new WatersRuntimeException(exception);
+      }      
+    } else {
+      throw new IllegalStateException
+        ("ProxyPrinter must be initialised with a StringWriter " +
+         "to obtain strings!");
     }
   }
 

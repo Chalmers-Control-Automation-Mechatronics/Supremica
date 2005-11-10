@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorComponentsPanel
 //###########################################################################
-//# $Id: EditorComponentsPanel.java,v 1.13 2005-11-09 03:20:56 robi Exp $
+//# $Id: EditorComponentsPanel.java,v 1.14 2005-11-10 21:54:42 robi Exp $
 //###########################################################################
 
 
@@ -18,8 +18,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import net.sourceforge.waters.gui.ComponentInfo;
-import net.sourceforge.waters.gui.HTMLPrinter;
 import net.sourceforge.waters.gui.ModuleTreeRenderer;
+import net.sourceforge.waters.model.printer.ProxyPrinter;
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.module.ForeachSubject;
 import net.sourceforge.waters.subject.module.InstanceSubject;
@@ -114,7 +114,8 @@ class EditorComponentsPanel
 	private DefaultMutableTreeNode makeTreeFromComponent(final Object e)
 	{
 		final AbstractSubject subject = (AbstractSubject) e;
-		final String text = HTMLPrinter.toHTMLString(subject);
+		final ProxyPrinter printer = moduleContainer.getPrinter();
+		final String text = printer.toString(subject);
 		final Object userobject = new ComponentInfo(text, subject);
 		if (subject instanceof SimpleComponentSubject) {
 			return new DefaultMutableTreeNode(userobject, false);
