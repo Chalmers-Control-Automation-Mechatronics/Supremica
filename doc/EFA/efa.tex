@@ -124,8 +124,8 @@ To define the action functions for $A||B$ we look at the
 restrictions of the updating functions $a^A_\delta$ and
 $a^B_\delta$ to the sets $Z^A$ and $Z^B$. The updating functions
 are defined as (if $X^{A}$ and $X^{B}$ have no common variables
-then $Z^A=X^{A}$ and $Z^B=X^{B}$)
-\begin{eqnarray}
+then $Z=(X^{A},X^{B})$)
+\begin{eqnarray}\label{action_sync_1}
 a_{q \sigma}(Z)=\left\{
 \begin{array}{ll}
  \big(a^A_{q^A \sigma}(X^{A}), a^B_{q^B \sigma}(Z^{B})\big)\quad\quad\sigma\in \Sigma^A \cap \Sigma^B\\
@@ -141,8 +141,8 @@ action functions. If $\sigma\in \Sigma^A \setminus \Sigma^B$ we
 introduce fictional action functions $a_{q^B\sigma}(X^B)=X^B$ for
 $B$ and if $\sigma\in\Sigma^B\setminus \Sigma^A$ we set
 $a_{q^A\sigma}(X^A)=X^A$. If $X^{A}$ and $X^{B}$ have no common
-variables then the formula for the action functions of the product
-simplifies to
+variables then equation (\ref{action_sync_1}), that defines the
+action functions of the product, simplifies to
 \begin{eqnarray}
 a_{q \sigma}(Z)=
  \big(a^A_{q^A \sigma}(X^{A}), a^B_{q^B \sigma}(X^{B})\big).
