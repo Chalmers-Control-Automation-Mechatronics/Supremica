@@ -10,7 +10,7 @@
 \section{Introduction}
 
 \subsection{Background}
-
+\newpage
 \section{Extended Finite Automaton (EFA)}
 An Extended Deterministic Finite Automaton (EFA) is an
 augmentation of a regular finite automaton. The regular automaton
@@ -182,9 +182,9 @@ have by definition
 \begin{equation}
   g^{(A\|A')\|A''}(X^c) = \big[g(X) \wedge g'(X') \big] \wedge g''(X'') = g(X) \wedge \big[g'(X') \wedge g''(X'')] = g^{A\|(A'\|A'')}(X^c)
 \end{equation}
-
 \noindent Now consider the action function $a^{(A\|A')\|A''} : X^c
 \rightarrow X^c$.
+\newpage
 \subsection{The translation of an EFA to  a FA}
 To simplify the realization we shall restrict us to quite simple
 action- and guard functions. For the updating functions we assume
@@ -204,7 +204,7 @@ $x_0$ and rename (associate with the corresponding state) all
 enabled events $\sigma$ with $q\sigma$.\\
 - Realize an automata $A_{x_k}$ for each variable $x_k$, with marked "states" $X_{m,k}$ and with as many events as elements in $G$ .\\
 - Synchronize all automata.
-
+\newpage
 \subsection{Synchronous composition of EFA's with common variables}
 
 The synchronous composition of two EFA's $A=\langle Q^A, \Sigma^A,
