@@ -185,25 +185,31 @@ have by definition
 \noindent Now consider the action function $a^{(A\|A')\|A''} : X^c
 \rightarrow X^c$.
 \newpage
-\subsection{The translation of an EFA to  a FA}
+\subsection{The translation of an EFA to  an FA}
 To simplify the realization we shall restrict us to quite simple
 action- and guard functions. For the updating functions we assume
 that $a_{q \sigma}(x)=(a^1_{q \sigma}(x),...,a^n_{q
 \sigma}(x))=(a^1_{q \sigma}(x_1),...,a^n_{q \sigma}(x_n))$. In
 other words, the updating of the variables are independent from
-each other. For the guard functions we assume that they have the
-following form $g_{q \sigma}(x)=g^1_{q \sigma}(x_1)\wedge
-...\wedge g^n_{q \sigma}(x_n)$. These assumptions makes straight
-forward to translate an EFA to a FA.
+each other. For the guard functions we assume that they are given
+in disjunctive normal form $g_{q \sigma}(x)=g^1_{q \sigma}(x)\vee
+...\vee g^j_{q \sigma}(x)$. We shall denote the number of
+components $j$ in such an expression by $|g_{q \sigma}|$. These
+assumptions makes it straight forward to translate an EFA to an
+FA.
 
 Given an extended finite automaton $A=\langle Q, \Sigma, \delta,
 q_i, Q_m, X, G ,x_0, X_m \rangle$ with simple guard and action
-functions, the steps are:\\
+functions, the algorithm can be divided into four steps:\\
 - Form a regular FA, $A'$, from $A$ by removing $G$, $X$, $X_m$,
-$x_0$ and rename (associate with the corresponding state) all
-enabled events $\sigma$ with $q\sigma$.\\
-- Realize an automata $A_{x_k}$ for each variable $x_k$, with marked "states" $X_{m,k}$ and with as many events as elements in $G$ .\\
-- Synchronize all automata.
+$x_0$ and change the names of all enabled events $\sigma$ to
+$q\sigma$ (associate with the corresponding
+state). Divide the event(transition) $q\sigma$ further into $|g_{q \sigma}|$ identical copies $\{(q\sigma)_k\}^{|g_{q \sigma}|}_{k=1}$.\\
+- Realize an automata $A_{x_k}$ for each variable $x_k$, with
+marked "states" $X_{mk}$,
+ initial state $x_{k 0}$ and with as many events the total number of events of type $q\sigma$ in $A'$.\\
+- Synchronize all automata.\\
+- Change back to original event names.
 \newpage
 \subsection{Synchronous composition of EFA's with common variables}
 
