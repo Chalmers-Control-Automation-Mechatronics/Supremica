@@ -198,11 +198,12 @@ forward to translate an EFA to a FA.
 
 Given an extended finite automaton $A=\langle Q, \Sigma, \delta,
 q_i, Q_m, X, G ,x_0, X_m \rangle$ with simple guard and action
-functions:
-
-- \\
-- Realize an automata $A_{x_k}$ for each variable $x_k$.\\
-- Synchronize
+functions, the steps are:\\
+- Form a regular FA, $A'$, from $A$ by removing $G$, $X$, $X_m$,
+$x_0$ and rename (associate with the corresponding state) all
+enabled events $\sigma$ with $q\sigma$.\\
+- Realize an automata $A_{x_k}$ for each variable $x_k$, with marked "states" $X_{m,k}$ and with as many events as elements in $G$ .\\
+- Synchronize all automata.
 
 \subsection{Synchronous composition of EFA's with common variables}
 
