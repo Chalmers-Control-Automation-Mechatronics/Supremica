@@ -11,7 +11,8 @@ public class Milp
 {
 	private static Logger logger = LoggerFactory.createLogger(Milp.class);
 
-	private final String MODEL_FILE_NAME = "C:\\Documents and Settings\\avenir\\Desktop\\temp.mod";
+// 	private final String MODEL_FILE_NAME = "C:\\Documents and Settings\\avenir\\Desktop\\temp.mod";
+	private final String MODEL_FILE_NAME = "C:\\Documents and Settings\\Avenir\\Skrivbord\\temp.mod";
 
 	private Automata theAutomata;
 
@@ -66,9 +67,9 @@ public class Milp
 		
 		// Definitions of sets
 		w.newLine();
-		w.write("set Robots := 1..nrOfRobots;");
+		w.write("set Robots := 0..nrOfRobots;");
 		w.newLine();
-		w.write("set Zones := 1..nrOfZones;");
+		w.write("set Zones := 0..nrOfZones;");
 		w.newLine();
 		w.write("set Tics := 0..maxTic;");
 		w.newLine();
@@ -87,7 +88,7 @@ public class Milp
 
 		// The objective function
 		w.newLine();
-		w.write("minimize makespan: c;");
+m		w.write("minimize makespan: c;");
 		w.newLine();
 		
 		// The precedence constraints
@@ -109,35 +110,103 @@ public class Milp
 
 		// The numbers of robots resp. zones are given
 		w.newLine();
-		w.write("param nrOfRobots := " + nrOfRobots + ";");
+		w.write("param nrOfRobots := " + (nrOfRobots - 1) + ";");
 		w.newLine();
-		w.write("param nrOfZones := " + nrOfZones + ";");
+		w.write("param nrOfZones := " + (nrOfZones - 1) + ";");
 		w.newLine();
 		
 	// 	// This part should be automatized
-// 		String str = "param deltaTime default 0\n";
-// 		for (int i=0; i<nrOfRobots; i++)
-// 		{
-// 			Automaton currRobot = robots.getAutomatonAt(i);
-// 			str += nrOfRobots;
+		int nrOfTics = 0;
+		for (int i=0; i<nrOfRobots; i++)
+		{
+			if (nbrOfStates > nrOfTics)
+				nrOfTics = nbrOfStates;
+		}
 
-// 			for 
-// 		}
-			
-		
-
-		w.write("param maxTic := 5;");
+		// behovs nrOfTics i *.mod-filen?
+		w.write("param maxTic := " + (nrOfTics - 1) + ";");
 		w.newLine();
+
+		String altRouteConstraints = "";
+		String precedenceConstraints = "";
+
+		// The header of the deltaTime-parameter
+		String deltaTime = ":";
+		for (int i=0; i<nrOfTics; i++)
+			deltaTime += "\t" + i;
+		deltaTime += " := ";
 
 		w.newLine();
 		w.write("param deltaTime default 0");
 		w.newLine();
-		w.write(":\t0\t1\t2\t3\t4\t5 :=");
+		w.write(deltaTime);
 		w.newLine();
-		w.write("1\t0\t79\t65\t394\t29\t433");
-		w.newLine();
-		w.write("2\t0\t198\t411\t389\t0\t2 ;");
-		w.newLine();
+		
+		for (int i=0; i<nrOfRobots; i++) 
+		{
+			int currTic = 0;
+			deltaTime = "" + i + "\t0";
+			
+			ArrayList<State> currStates = new ArrayList<State>();
+			ArrayList<State> closedStates = new ArrayList<State>();
+					
+			Automaton currAuto = robots.getAutomatonAt(i);
+			currStates.add(currAuto.getInitialState());
+
+			while (!currStates.isEmpty())
+			{		
+				State currState = currStates.remove(0);				
+				StateIterator nprecedenceConstraintsextStates = currState.nextStatesIterator();
+
+				closedStates.add(0, currState);
+
+				while (nextStates.hasNext())
+				{
+					State nextState = nextStates.next();
+					
+					if (!nextStates.isAccepting())
+					{
+						if (!closedStates.contains(nextState))
+						{
+							deltaTimes += "\t" + nextState.getCost();
+							currTic++;
+						}
+
+						int parentTick = closedStates.size();
+						precedenceConstraints += "time[" + i + ", " + currTic + "] >= time [" + i + ", " + parentTick + "] deltaTime[" + i + ", " +  parentTick + "]";
+						
+					}
+					currStates.add(nextState);
+				}
+
+				deltaTime += "\t" + currState.getCost();
+
+			}
+			
+		}
+
+		String[] deltaTimes = new String[nrOfRobots + 1];
+		deltaTimes[0] = ":\t0";
+		for (int j=0; j<nrOfRobots; j++) 
+		{
+			deltaTimes[j] += j + "\t0";
+		}
+		for (int i=1; i<nrOfTics; i++)
+		{
+			deltaTime[0] += "\t" + i;
+			
+			for (int  j=0; j<nrOfRobots; j++) 
+			{
+				deltaTimes[j] += j + "\t0";
+			}
+		}
+		deltaTimes[0] += " :=";
+// 		w.write(":\t0\t1\t2\t3\t4\t5 :=");
+// 		w.newLine();
+// 		w.write("0\t0\t79\t65\t394\t29\t433");
+// 		w.newLine();
+// 		w.write("1\t0\t198\t411\t389\t0\t2 ;");
+// 		w.newLine();
 
 		w.newLine();
 		w.write("end;");
