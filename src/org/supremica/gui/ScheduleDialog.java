@@ -134,7 +134,7 @@ public class ScheduleDialog
 			else if (optiMethodsBox.getSelectedItem().equals("Modified VGA*"))
 				sched = new ModifiedVGAstar(ActionMan.getGui().getSelectedAutomata(), (String) heuristicsBox.getSelectedItem(), nodeExpander.isSelected(), vgDrawer.isSelected(), false);
 			else if (optiMethodsBox.getSelectedItem().equals("MILP"))
-				sched = new Milp();
+				sched = new Milp(ActionMan.getGui().getSelectedAutomata());
 			else if (optiMethodsBox.getSelectedItem().equals("Modified IDA*"))
 				throw new Exception("IMA* not implemented yet...");
 			// 		sched = new ModifiedAstar(ActionMan.getGui().getSelectedAutomata(), (String) heuristicsBox.getSelectedItem(), nodeExpander.isSelected(), true);	
