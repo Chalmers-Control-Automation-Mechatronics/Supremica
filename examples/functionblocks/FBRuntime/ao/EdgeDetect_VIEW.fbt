@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="EdgeDetect_VIEW" >
+  <VersionInfo Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2005-11-13" />
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="AO_RSP" Type="AO_EVENT" >
+        <With Var="AO_RSP_ARGS" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="AO_REQ" Type="AO_EVENT" >
+        <With Var="AO_REQ_ARGS" />
+      </Event>
+      <Event Name="RISING_EDGE" />
+      <Event Name="FALLING_EDGE" />
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="AO_RSP_ARGS" Type="STRING" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="AO_REQ_ARGS" Type="STRING" />
+    </OutputVars>
+  </InterfaceList>
+  <BasicFB>
+    <InternalVars>
+	<VarDeclaration Name="oldValue" Type="BOOL">
+    </InternalVars>
+    <ECC>
+        <ECState Name="Q0" />
+        <ECState Name="Q1" />
+        <ECState Name="NUL0" />
+        <ECState Name="NUL1" />
+        <ECState Name="SET">
+	    <ECAction Algorithm="LATCH" Output="EO"/>
+	</ECState>    
+	<ECTransition Source="NUL1" Destination="Q1" Condition="1" />
+    </ECC>
+    <Algorithm Name="StoreOldValue">
+	<Other Language="Java" Text="
+	    if (AO_RSP_ARGS.substring(0,AO_RSP_ARGS.indexOf(' ')).equals("NEW_SAMPLE"))
+	    {
+		Boolean newValue = new Boolean(AO_RSP_ARGS.substring(AO_RSP_ARGS.indexOf(' ')).lowerCase());
+	    }
+	" />	
+    </Algorithm>
+  </BasicFB>
+</FBType>

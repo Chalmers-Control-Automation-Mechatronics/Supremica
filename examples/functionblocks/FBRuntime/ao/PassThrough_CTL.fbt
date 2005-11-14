@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="PassThrough_CTL" >
+  <VersionInfo Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2005-11-13" />
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="AO_REQ" Type="AO_EVENT" >
+        <With Var="AO_REQ_ARGS" />
+      </Event>
+      <Event Name="AO_MRSP" Type="AO_EVENT" >
+        <With Var="AO_MRSP_ARGS" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="AO_RSP" Type="AO_EVENT" >
+        <With Var="AO_RSP_ARGS" />
+      </Event>
+      <Event Name="AO_MREQ" Type="AO_EVENT" >
+        <With Var="AO_MREQ_ARGS" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="AO_REQ_ARGS" Type="STRING" />
+      <VarDeclaration Name="AO_MRSP_ARGS" Type="STRING" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="AO_RSP_ARGS" Type="STRING" />
+      <VarDeclaration Name="AO_MREQ_ARGS" Type="STRING" />
+    </OutputVars>
+  </InterfaceList>
+  <BasicFB>
+    <ECC>
+        <ECState Name="INIT" />
+        <ECState Name="Q1">
+		    <ECAction Algorithm="Copy_REQ_ARGS" Output="AO_MREQ"/>
+	</ECState>    
+        <ECState Name="Q2">
+		    <ECAction Algorithm="Copy_MRSP_ARGS" Output="AO_RSP"/>
+	</ECState>    
+	<ECTransition Source="INIT" Destination="Q1" Condition="AO_REQ" />
+	<ECTransition Source="Q1" Destination="INIT" Condition="1" />
+	<ECTransition Source="INIT" Destination="Q2" Condition="AO_MRSP" />
+	<ECTransition Source="Q2" Destination="INIT" Condition="1" />
+    </ECC>
+    <Algorithm Name="Copy_REQ_ARGS">
+      <Other Language="Java" Text="AO_MREQ_ARGS = AO_REQ_ARGS;" />	
+    </Algorithm>
+    <Algorithm Name="Copy_MRSP_ARGS">
+      <Other Language="Java" Text="AO_RSP_ARGS = AO_MRSP_ARGS;" />	
+    </Algorithm>
+  </BasicFB>
+</FBType>

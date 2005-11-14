@@ -42,7 +42,7 @@
     </InternalVars>
     <ECC>
         <ECState Name="START" />
-        <ECState Name="INIT" />
+        <ECState Name="INIT" >
 		    <ECAction Output="INITO" />
 	    </ECState>    
         <ECState Name="STATE1">
