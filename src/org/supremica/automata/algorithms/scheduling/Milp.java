@@ -45,10 +45,9 @@ public class Milp
 		Automata robots = theAutomata.getPlantAutomata(); 
 		Automata zones = theAutomata.getSpecificationAutomata(); 
 
-logger.info("aha");
 		int nrOfRobots = robots.size();
 		int nrOfZones = zones.size();
-		logger.info("oho");
+
 		File modelFile = new File(MODEL_FILE_NAME);
 		if (!modelFile.exists())
 			modelFile.createNewFile();
@@ -64,23 +63,26 @@ logger.info("aha");
 		w.newLine();
 		w.write("param maxTic >= 0;");
 		w.newLine();
-		w.write("param deltaTime{r in Robots, t in Tics};");
-		w.newLine();
-
+		
 		// Definitions of sets
 		w.newLine();
-		w.write("set Robots := 0..nrOfRobots");
+		w.write("set Robots := 1..nrOfRobots;");
 		w.newLine();
-		w.write("set Zones := 0..nrOfZones");
+		w.write("set Zones := 1..nrOfZones;");
 		w.newLine();
-		w.write("set Tics := 0..maxTic");
+		w.write("set Tics := 0..maxTic;");
+		w.newLine();
+
+		// Definitions of parameters, using sets as their input (must be in this order to avoid GLPK-complaints)
+		w.newLine();
+		w.write("param deltaTime{r in Robots, t in Tics};");
 		w.newLine();
 
 		// Definitions of variables
 		w.newLine();
 		w.write("var time{r in Robots, t in Tics} >= 0;");
 		w.newLine();
-		w.write("var c");
+		w.write("var c;");
 		w.newLine();
 
 		// The objective function
@@ -105,20 +107,36 @@ logger.info("aha");
 		w.write("data;");
 		w.newLine();
 
+		// The numbers of robots resp. zones are given
 		w.newLine();
-		w.write("nrOfRobots := " + nrOfRobots + ";");
+		w.write("param nrOfRobots := " + nrOfRobots + ";");
 		w.newLine();
-		w.write("nrOfZones := " + nrOfZones + ";");
+		w.write("param nrOfZones := " + nrOfZones + ";");
 		w.newLine();
 		
-		// This part should be automatized
-		w.write("maxTic := 5;");
+	// 	// This part should be automatized
+// 		String str = "param deltaTime default 0\n";
+// 		for (int i=0; i<nrOfRobots; i++)
+// 		{
+// 			Automaton currRobot = robots.getAutomatonAt(i);
+// 			str += nrOfRobots;
+
+// 			for 
+// 		}
+			
+		
+
+		w.write("param maxTic := 5;");
 		w.newLine();
-		w.write("param deltaTime : 	0	1	2	3	4 	5:=");
+
 		w.newLine();
-		w.write("\t 0	0	79	65	394	29	433");
+		w.write("param deltaTime default 0");
 		w.newLine();
-		w.write("\t 1	0	198	411	389	0	2 ;");
+		w.write(":\t0\t1\t2\t3\t4\t5 :=");
+		w.newLine();
+		w.write("1\t0\t79\t65\t394\t29\t433");
+		w.newLine();
+		w.write("2\t0\t198\t411\t389\t0\t2 ;");
 		w.newLine();
 
 		w.newLine();
