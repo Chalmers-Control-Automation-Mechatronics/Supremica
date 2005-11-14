@@ -193,7 +193,7 @@ that $a_{q \sigma}(x)=(a^1_{q \sigma}(x),...,a^n_{q
 other words, the updating of the variables are independent from
 each other. For the guard functions we assume that they are given
 in disjunctive normal form $g_{q \sigma}(x)=g^1_{q \sigma}(x)\vee
-...\vee g^j_{q \sigma}(x)$. We shall denote the number of
+...\vee g^j_{q \sigma}(x)$. We shall denote the number of "OR"
 components $j$ in such an expression by $|g_{q \sigma}|$. These
 assumptions makes it straight forward to translate an EFA to an
 FA.
@@ -208,7 +208,7 @@ state). Divide the event(transition) $q\sigma$ further into $|g_{q \sigma}|$ ide
 - Realize an automata $A_{x_k}$ for each variable $x_k$, with
 marked "states" $X_{mk}$,
  initial state $x_{k 0}$ and with as many events the total number of events of type $q\sigma$ in $A'$.\\
-- Synchronize all automata.\\
+- Synchronize all automata $A_{x_k}$, $k=1,...,n$ and $A'$.\\
 - Change back to original event names.
 \newpage
 \subsection{Synchronous composition of EFA's with common variables}
