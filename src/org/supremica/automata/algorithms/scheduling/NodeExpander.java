@@ -24,7 +24,7 @@ public class NodeExpander {
     protected Automata theAutomata, plantAutomata;
 
     /** The calling class */
-    protected Scheduler sched;
+    protected AbstractAstar sched;
 
     /** Maps every event that is specified to the corresponing specification automaton, in order to speed up the expansion */
     protected Hashtable<LabeledEvent, Integer> specEventTable;
@@ -39,7 +39,7 @@ public class NodeExpander {
      *                Start-up methods                                     *
      ***********************************************************************/
 
-    public NodeExpander(boolean manualExpansion, Automata theAutomata, Scheduler sched) {
+    public NodeExpander(boolean manualExpansion, Automata theAutomata, AbstractAstar sched) {
 	this.manualExpansion = manualExpansion;
 	this.theAutomata = theAutomata;
 	this.sched = sched;
