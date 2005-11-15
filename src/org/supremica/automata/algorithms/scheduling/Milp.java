@@ -13,7 +13,7 @@ public class Milp
 	private static Logger logger = LoggerFactory.createLogger(Milp.class);
 
 	private final String MODEL_FILE_NAME = "C:\\Documents and Settings\\avenir\\Desktop\\temp.mod";
-// 	private final String MODEL_FILE_NAME = "C:\\Documents and Settings\\Avenir\\Skrivbord\\temp.mod";
+//  	private final String MODEL_FILE_NAME = "C:\\Documents and Settings\\Avenir\\Skrivbord\\temp.mod";
 
 	private Automata theAutomata, robots, zones;
 
@@ -41,6 +41,13 @@ public class Milp
 		return null;
 	}
 
+	/**
+	 * Goes through the supplied automata and synchronizes all specifications 
+	 * that do not represent zones with corresponding robot automata. 
+	 * This assumes that robots and the specifications regulating their behavior 
+	 * have similar roots. For example if robot.name = "ROBOT_A", the specification.name
+	 * should include "ROBOT_A". The resulting robot and zone automata are stored globally.
+	 */
 	private void initAutomata(Automata theAutomata)
 		throws Exception
 	{
