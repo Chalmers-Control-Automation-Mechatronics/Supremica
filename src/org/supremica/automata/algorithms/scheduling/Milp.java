@@ -11,8 +11,8 @@ public class Milp
 {
 	private static Logger logger = LoggerFactory.createLogger(Milp.class);
 
-// 	private final String MODEL_FILE_NAME = "C:\\Documents and Settings\\avenir\\Desktop\\temp.mod";
-	private final String MODEL_FILE_NAME = "C:\\Documents and Settings\\Avenir\\Skrivbord\\temp.mod";
+	private final String MODEL_FILE_NAME = "C:\\Documents and Settings\\avenir\\Desktop\\temp.mod";
+// 	private final String MODEL_FILE_NAME = "C:\\Documents and Settings\\Avenir\\Skrivbord\\temp.mod";
 
 	private Automata theAutomata;
 
@@ -88,7 +88,7 @@ public class Milp
 
 		// The objective function
 		w.newLine();
-m		w.write("minimize makespan: c;");
+		w.write("minimize makespan: c;");
 		w.newLine();
 		
 		// The precedence constraints
@@ -115,92 +115,92 @@ m		w.write("minimize makespan: c;");
 		w.write("param nrOfZones := " + (nrOfZones - 1) + ";");
 		w.newLine();
 		
-	// 	// This part should be automatized
-		int nrOfTics = 0;
-		for (int i=0; i<nrOfRobots; i++)
-		{
-			if (nbrOfStates > nrOfTics)
-				nrOfTics = nbrOfStates;
-		}
+// 	// 	// This part should be automatized
+// 		int nrOfTics = 0;
+// 		for (int i=0; i<nrOfRobots; i++)
+// 		{
+// 			if (nbrOfStates > nrOfTics)
+// 				nrOfTics = nbrOfStates;
+// 		}
 
-		// behovs nrOfTics i *.mod-filen?
-		w.write("param maxTic := " + (nrOfTics - 1) + ";");
-		w.newLine();
+// 		// behovs nrOfTics i *.mod-filen?
+// 		w.write("param maxTic := " + (nrOfTics - 1) + ";");
+// 		w.newLine();
 
-		String altRouteConstraints = "";
-		String precedenceConstraints = "";
+// 		String altRouteConstraints = "";
+// 		String precedenceConstraints = "";
 
-		// The header of the deltaTime-parameter
-		String deltaTime = ":";
-		for (int i=0; i<nrOfTics; i++)
-			deltaTime += "\t" + i;
-		deltaTime += " := ";
+// 		// The header of the deltaTime-parameter
+// 		String deltaTime = ":";
+// 		for (int i=0; i<nrOfTics; i++)
+// 			deltaTime += "\t" + i;
+// 		deltaTime += " := ";
 
-		w.newLine();
-		w.write("param deltaTime default 0");
-		w.newLine();
-		w.write(deltaTime);
-		w.newLine();
+// 		w.newLine();
+// 		w.write("param deltaTime default 0");
+// 		w.newLine();
+// 		w.write(deltaTime);
+// 		w.newLine();
 		
-		for (int i=0; i<nrOfRobots; i++) 
-		{
-			int currTic = 0;
-			deltaTime = "" + i + "\t0";
+// 		for (int i=0; i<nrOfRobots; i++) 
+// 		{
+// 			int currTic = 0;
+// 			deltaTime = "" + i + "\t0";
 			
-			ArrayList<State> currStates = new ArrayList<State>();
-			ArrayList<State> closedStates = new ArrayList<State>();
+// 			ArrayList<State> currStates = new ArrayList<State>();
+// 			ArrayList<State> closedStates = new ArrayList<State>();
 					
-			Automaton currAuto = robots.getAutomatonAt(i);
-			currStates.add(currAuto.getInitialState());
+// 			Automaton currAuto = robots.getAutomatonAt(i);
+// 			currStates.add(currAuto.getInitialState());
 
-			while (!currStates.isEmpty())
-			{		
-				State currState = currStates.remove(0);				
-				StateIterator nprecedenceConstraintsextStates = currState.nextStatesIterator();
+// 			while (!currStates.isEmpty())
+// 			{		
+// 				State currState = currStates.remove(0);				
+// 				StateIterator nprecedenceConstraintsextStates = currState.nextStatesIterator();
 
-				closedStates.add(0, currState);
+// 				closedStates.add(0, currState);
 
-				while (nextStates.hasNext())
-				{
-					State nextState = nextStates.next();
+// 				while (nextStates.hasNext())
+// 				{
+// 					State nextState = nextStates.next();
 					
-					if (!nextStates.isAccepting())
-					{
-						if (!closedStates.contains(nextState))
-						{
-							deltaTimes += "\t" + nextState.getCost();
-							currTic++;
-						}
+// 					if (!nextStates.isAccepting())
+// 					{
+// 						if (!closedStates.contains(nextState))
+// 						{
+// 							deltaTimes += "\t" + nextState.getCost();
+// 							currTic++;
+// 						}
 
-						int parentTick = closedStates.size();
-						precedenceConstraints += "time[" + i + ", " + currTic + "] >= time [" + i + ", " + parentTick + "] deltaTime[" + i + ", " +  parentTick + "]";
+// 						int parentTick = closedStates.size();
+// 						precedenceConstraints += "time[" + i + ", " + currTic + "] >= time [" + i + ", " + parentTick + "] deltaTime[" + i + ", " +  parentTick + "]";
 						
-					}
-					currStates.add(nextState);
-				}
+// 					}
+// 					currStates.add(nextState);
+// 				}
 
-				deltaTime += "\t" + currState.getCost();
+// 				deltaTime += "\t" + currState.getCost();
 
-			}
+// 			}
 			
-		}
+// 		}
 
-		String[] deltaTimes = new String[nrOfRobots + 1];
-		deltaTimes[0] = ":\t0";
-		for (int j=0; j<nrOfRobots; j++) 
-		{
-			deltaTimes[j] += j + "\t0";
-		}
-		for (int i=1; i<nrOfTics; i++)
-		{
-			deltaTime[0] += "\t" + i;
+// 		String[] deltaTimes = new String[nrOfRobots + 1];
+// 		deltaTimes[0] = ":\t0";
+// 		for (int j=0; j<nrOfRobots; j++) 
+// 		{
+// 			deltaTimes[j] += j + "\t0";
+// 		}
+// 		for (int i=1; i<nrOfTics; i++)
+// 		{
+// 			deltaTime[0] += "\t" + i;
 			
-			for (int  j=0; j<nrOfRobots; j++) 
-			{
-				deltaTimes[j] += j + "\t0";
-			}
-		}
-		deltaTimes[0] += " :=";
+// 			for (int  j=0; j<nrOfRobots; j++) 
+// 			{
+// 				deltaTimes[j] += j + "\t0";
+// 			}
+// 		}
+// 		deltaTimes[0] += " :=";
 // 		w.write(":\t0\t1\t2\t3\t4\t5 :=");
 // 		w.newLine();
 // 		w.write("0\t0\t79\t65\t394\t29\t433");
