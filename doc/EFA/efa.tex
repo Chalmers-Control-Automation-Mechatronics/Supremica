@@ -11,9 +11,9 @@
 
 \subsection{Background}
 \newpage
-\section{Finite Automaton (FA) with hierarchy}
+\section{Finite Automata (FA) with hierarchy}
 
-\section{Extended Finite Automaton (EFA)}
+\section{Extended Finite Automata (EFA)}
 The regular deterministic finite automaton $A$ is a $5$-tuple
 \begin{eqnarray}
 A=\langle Q,\Sigma,\delta, q_i,Q_m \rangle\nonumber
@@ -120,12 +120,13 @@ a_{q \sigma}(x)=\left\{
 \big(x^{A},a^B_{q^B\sigma}(x^{B})\big)\quad\quad\quad\quad\quad\sigma\in\Sigma^B\setminus\Sigma^A
 \end{array}\right.
 \end{eqnarray}
-As in the definition of the guard functions the notion of being
-undefined is inherited from the action functions of $A$ and $B$.
-Similar to the "dummy" guard functions we introduce fictional
-action functions. If $\sigma\in \Sigma^A \setminus \Sigma^B$ we
-introduce fictional action functions $a_{q^B\sigma}(x^B)=x^B$ for
-$B$ and if $\sigma\in\Sigma^B\setminus \Sigma^A$ we set
+As in the definition of the guard functions (\ref{guard_sync_1}),
+the notion of being undefined is inherited from the action
+functions of $A$ and $B$. Similar to the "dummy" guard functions
+we introduce fictional action functions. If $\sigma\in \Sigma^A
+\setminus \Sigma^B$ we introduce fictional action functions
+$a_{q^B\sigma}(x^B)=x^B$ for $B$ and if
+$\sigma\in\Sigma^B\setminus \Sigma^A$ we set
 $a_{q^A\sigma}(x^A)=x^A$. With this convention equation
 (\ref{action_sync_1}) simplifies to
 \begin{eqnarray}
@@ -215,11 +216,12 @@ q_i, Q_m, X, G ,x_0, X_m \rangle$ with simple guard and action
 functions, the algorithm can be divided into four steps:\\
 - Form a regular FA, $A'$, from $A$ by removing $G$, $X$, $X_m$,
 $x_0$ and change the names of all enabled events $\sigma$ to
-$q\sigma$ (associate with the corresponding
-state). Divide the event(transition) $q\sigma$ further into $|g_{q \sigma}|$ identical copies $\{(q\sigma)_k\}^{|g_{q \sigma}|}_{k=1}$.\\
+$q\sigma$ i.e. the associate them with the corresponding
+transition.\\
+- Rename the events $q\sigma$ in $A'$ further into $|g_{q \sigma}|$ identical transitions with event names: $\{(q\sigma)_k\}^{|g_{q \sigma}|}_{k=1}$.\\
 - Realize an automata $A_{x_k}$ for each variable $x_k$, with
-marked "states" $X_{mk}$,
- initial state $x_{k 0}$ and with as many events the total number of events of type $q\sigma$ in $A'$.\\
+marked "states" $X_{mk}$, initial state $x_{k 0}$ and with as many events the total number of events in $A'$.
+The transitions correspond to the action functions and they are enabled if the guard formula is true.\\
 - Synchronize all automata $A_{x_k}$, $k=1,...,n$ and $A'$.\\
 - Change back to original event names.
 \newpage
