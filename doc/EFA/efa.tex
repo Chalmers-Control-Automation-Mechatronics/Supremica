@@ -11,21 +11,33 @@
 
 \subsection{Background}
 \newpage
-\section{Extended Finite Automaton (EFA)}
-An Extended Deterministic Finite Automaton (EFA) is an
-augmentation of a regular finite automaton. The regular automaton
-$A$ is defined as $A=\langle Q,\Sigma,\delta, q_i,Q_m \rangle$.
-Let $T=\{(q,\sigma)\in Q \times \Sigma: \delta(q,\sigma)!\}$
-denote the set of transitions in the deterministic automaton $A$
-and let $\tau_k$, $k=1,...,|T|$ denote the elements (transitions)
-of $T$.
+\section{Finite Automaton (FA) with hierarchy}
 
-The automaton $A$ is extended by a set $X=X_1\times ... \times
-X_n$, where $X_k$, $k=1,...,n$, are finite nonempty subsets of
-$\mathbb{Z}$. The set $X$ is the domain of definition of an
-$n$-tuple of integer variables $x=(x_1,...,x_n)$ with initial
-value $x_0=(x_{10},...,x_{n0})$. We also add to $A$ an $|T|$-tuple
-of function pairs $G=\big((g_{\tau_1},a_{\tau_1}),...,
+\section{Extended Finite Automaton (EFA)}
+The regular deterministic finite automaton $A$ is a $5$-tuple
+\begin{eqnarray}
+A=\langle Q,\Sigma,\delta, q_i,Q_m \rangle\nonumber
+\end{eqnarray} where $Q$ is a finite set of states; $\Sigma$ (the alphabet) is a nonempty
+set of events; $\delta$ is the transition function; $q_i$ is the
+initial state and $Q_m \subseteq Q$ is the set of marked states.
+An Extended Deterministic Finite Automaton (EFA) is an
+augmentation of the regular finite automaton with guard and action
+formulas associated to the transitions. The transitions in the EFA
+are enabled if and only if a guard formula is true. Moreover, when
+a transition in an EFA is taken, updating actions of a set of
+finite integer variables may follow. Formally this is done as
+follows.
+
+Given a regular automaton $A=\langle Q,\Sigma,\delta, q_i,Q_m
+\rangle$, let $T=\{(q,\sigma)\in Q \times \Sigma:
+\delta(q,\sigma)!\}$ denote the set of transitions in $A$ and let
+$\tau_k$, $k=1,...,|T|$ denote the elements (transitions) of $T$.
+First, we add to $A$ a set $X=X_1\times ... \times X_n$, where
+$X_k$, $k=1,...,n$, are finite nonempty subsets of $\mathbb{Z}$.
+The set $X$ is the domain of definition of an $n$-tuple of integer
+variables $x=(x_1,...,x_n)$ with initial value
+$x_0=(x_{10},...,x_{n0})$. We also add to $A$ an $|T|$-tuple of
+function pairs $G=\big((g_{\tau_1},a_{\tau_1}),...,
 (g_{\tau_{|T|}},a_{\tau_{|T|}})\big)$, where each pair
 $(g_{\tau_k},a_{\tau_k})$ is associated to the corresponding
 transition $\tau_k$ in $T$. $g_{\tau_k}$ is an evaluation of a
