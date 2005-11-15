@@ -1,0 +1,43 @@
+\documentclass{article}
+
+\usepackage{amsthm,amsmath,amssymb}
+
+\newtheorem{theorem}{Theorem}
+
+\pagestyle{empty}
+
+\begin{document}
+
+\section*{The translation of an EFA to  an FA}
+The main body of theory and algorithms within supervisory control
+theory has been developed for standard finite automata. For the
+extended finite automata to be useful we need to fit them within
+this framework. In other words, in order to do formal analysis
+based on these new automata, what we need is a way to convert EFAs
+into standard FAs.
+
+Fortunately, as it turns out, there is a rather elegant
+transformation of EFAs into FAs based on synchronization. In
+essence, the recipe is as follows:
+
+\begin{enumerate}
+    \item Form a stripped EFA by removing the variables and all
+    guard/action pairs from the EFA. This yields a regular FA.
+    \item Introduce a new unique event for each guard/action pair and
+     relabel the transitions of the stripped automaton correspondingly.
+    \item Introduce \emph{one} automaton $A_{x_k}$ for each variable $x_k$ with
+    the number of states equal to the range of $x_k$.
+
+    \item
+    For the states of the variable automata $A_{x_k}$ that fulfill the guard conditions,
+    add transitions that realize the updating of the variables as specified by the action
+    functions.
+
+    \item Construct the FA-equivalent of the EFA by synchronizing
+    the stripped EFA with all variable automata $A_{x_k}$.
+    \item Change back to original event names.
+\end{enumerate}
+
+
+\noindent Below, an example of how this can be done is given.
+\end{document}
