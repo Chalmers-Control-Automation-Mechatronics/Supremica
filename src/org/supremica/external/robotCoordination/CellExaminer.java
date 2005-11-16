@@ -34,6 +34,14 @@ public class CellExaminer
 	private Automata zoneAutomata;
 	private Automata robotAutomata;
 
+    // Automata constants
+    public final static String STARTSTATE_NAME = "start";
+    public final static String FINISHSTATE_NAME = "finish";
+    public final static String FINISHEVENT_NAME = "fin";
+    public final static String FREESTATE_NAME = "Free";
+    public final static String BOOKEDSTATE_NAME = "Booked";
+    public final static String UNDERSCORE = "_";
+
 	/** The prefix of a zone's name. */
 	static final String ZONE_PREFIX = "Zone_";
 
@@ -152,7 +160,7 @@ public class CellExaminer
 					catch (Exception ex)
 					{
 						logger.error("Error when running span generation demo: " + ex);
-						logger.debug(ex.getStackTrace());
+						logger.warn(ex.getStackTrace());
 					}
 				}
 			});
@@ -425,9 +433,9 @@ public class CellExaminer
 		timer.start();
 
 		// Discretization parameters
-		double dx = 0.2;
-		double dy = 0.2;
- 		double dz = 0.2;
+		double dx = 0.4;
+		double dy = 0.4;
+ 		double dz = 0.4;
 		cell.setBoxDimensions(new double[] {dx,dy,dz});
 
 		//////////////////////////
@@ -667,6 +675,7 @@ public class CellExaminer
 		// TEST FOR COLLISIONS WITH THE ZONE BOXES //
 		/////////////////////////////////////////////
 
+		/*
 		// For every robot...
 		for (Iterator<Robot> robIt = robots.iterator(); robIt.hasNext(); )
 		{
@@ -721,8 +730,208 @@ public class CellExaminer
 			// Report result
 			robottimer.stop();
 			logger.info("Execution completed for robot " + robot + " after " + robottimer + ".");
-
 		}
+		*/
+
+		// Build base automata for the zones
+			zoneAutomata = buildBaseZoneAutomata(zones, robots);
+		robotAutomata = buildBaseRobotAutomata(robots);
+		
+		// Use the old collision detection method (ugly stuff)
+		((RSCell) cell).zoneAutomata = zoneAutomata;
+		((RSCell) cell).robotAutomata = robotAutomata;
+		examineCollisions();
+	}
+
+	/**
+	 * Builds the base structure of the zone automata. A "free"-state
+	 * and for every robot a "booked"-state.
+	 */
+	private static Automata buildBaseZoneAutomata(List<Volume> zones, List<Robot> robots)
+		throws Exception
+	{
+		Automata automata = new Automata();
+
+		// Loop over zones...
+		for (Iterator<Volume> zoneIt = zones.iterator(); zoneIt.hasNext(); )
+		{
+			// Add new automaton
+			Automaton aut = new Automaton(zoneIt.next().getName());
+			aut.setType(AutomatonType.Specification);
+			
+			// Add two states, Free and Booked
+			State state = new State(FREESTATE_NAME);
+			state.setAccepting(true);
+			state.setInitial(true);
+			aut.addState(state);
+			for (Iterator<Robot> robIt = robots.iterator(); robIt.hasNext(); )
+			{
+				state = new State(BOOKEDSTATE_NAME + "_" + robIt.next().getName());
+				aut.addState(state);							
+			}
+			
+			// Add automaton
+			automata.addAutomaton(aut);
+		}		
+
+		return automata;
+	}
+
+	/**
+	 * Builds the base structure of the robot automata. One state for
+	 * every target and every path, with apropriate events connecting
+	 * them.
+	 */
+	private static Automata buildBaseRobotAutomata(List<Robot> robots)
+		throws Exception
+	{
+		Automata automata = new Automata();
+		
+		// Iterate over the robots...
+		for (Iterator<Robot> robotIt = robots.iterator(); robotIt.hasNext();)
+	    {
+			Robot robot = robotIt.next();
+			
+			////////////////////////////////////////
+			// ONE AUTOMATON FOR THE ROBOT ITSELF //
+			////////////////////////////////////////
+
+			Automaton aut = new Automaton(robot.getName());
+			aut.setType(AutomatonType.Plant);
+			// Build the states...
+			State initial = new State(STARTSTATE_NAME);
+			initial.setInitial(true);
+			aut.addState(initial);
+			initial.setCost(0);
+			State marked = new State(FINISHSTATE_NAME);
+			marked.setAccepting(true);
+			aut.addState(marked);
+			marked.setCost(0);
+			List<Configuration> posList = robot.getConfigurations();
+			for (int i=0; i < posList.size(); i++)
+		    {
+				for (int j=0; j < posList.size(); j++)
+			    {
+					if (i != j)
+				    {
+						State state = new State((posList.get(i)).getName() +
+												(posList.get(j)).getName());
+						aut.addState(state);
+						state.setCost(0);
+				    }
+			    }
+		    }
+			// Build transitions...
+			for (StateIterator stateIt = aut.stateIterator(); stateIt.hasNext();)
+		    {
+				State fromState = stateIt.nextState();
+				// Initial?
+				if (fromState.getName().equals(STARTSTATE_NAME))
+			    {
+					// Skip the 0:th element here... its assumed to be the home state
+					for (int i=1; i < posList.size(); i++)
+				    {
+						// Create new arc...
+						String name = (posList.get(0)).getName() +
+							(posList.get(i)).getName();
+						State toState = aut.getStateWithName(name);
+						LabeledEvent event = new LabeledEvent(name);
+						if (!aut.getAlphabet().contains(event))
+					    {
+							aut.getAlphabet().addEvent(event);
+					    }
+						
+						Arc arc = new Arc(fromState, toState, event);
+						aut.addArc(arc);
+				    }
+			    }
+				else if (fromState.getName().equals(FINISHSTATE_NAME))
+			    {
+					// No outgoing from final state...
+			    }
+				else
+			    {
+					String fromPos = null;
+					// Skip the 0:th element here... its assumed to be the home state
+					for (int i=0; i < posList.size(); i++)
+				    {
+						if (fromState.getName().endsWith((posList.get(i)).getName()))
+					    {
+							// Just to make sure there is no ambiguity
+							if (fromPos != null)
+						    {
+								throw new Exception("Error in RSCell.java, ambigous configuration names");
+						    }
+							fromPos = (posList.get(i)).getName();
+							
+							// Create arc for each possible target configuration
+							for (int j=0; j < posList.size(); j++)
+						    {
+								if (i != j)
+							    {
+									// Create new arc...
+									String name = (posList.get(i)).getName() +
+										(posList.get(j)).getName();
+									State toState = aut.getStateWithName(name);
+									
+									// Special treatment if were dealing with the home configuration
+									if (i==0)
+								    {
+										name = FINISHEVENT_NAME;
+										toState = aut.getStateWithName(FINISHSTATE_NAME);
+								    }
+									
+									// Create event
+									LabeledEvent event = new LabeledEvent(name);
+									if (!aut.getAlphabet().contains(event))
+								    {
+										aut.getAlphabet().addEvent(event);
+								    }
+									
+									// Add arc
+									Arc arc = new Arc(fromState, toState, event);
+									aut.addArc(arc);
+									
+									// Only once if this was the home configuration (ugly hack... whatever)
+									if (i==0)
+								    {
+										break;
+								    }
+							    }
+						    }
+					    }
+				    }
+			    }
+		    }
+			aut.setComment("This automaton is not finished!");
+			// Add automaton
+			automata.addAutomaton(aut);
+			
+			//////////////////////////////
+			// ONE AUTOMATON PER TARGET //
+			//////////////////////////////
+
+			List<Configuration> configurations = robot.getConfigurations();
+			// Skip home configuration (i=1...)
+			for (int i=1; i<configurations.size(); i++)
+		    {
+				Configuration pos = configurations.get(i);
+				
+				aut = new Automaton(robot.getName() + UNDERSCORE + pos.getName());
+				State notVisited = new State("0");
+				notVisited.setInitial(true);
+				State visited = new State("1");
+				visited.setAccepting(true);
+				aut.addState(notVisited);
+				aut.addState(visited);
+				aut.setType(AutomatonType.Plant);				
+				
+				aut.setComment("This automaton is not ready generated!");
+				automata.addAutomaton(aut);
+		    }
+		}
+		
+		return automata;
 	}
 
 	public static void beep()

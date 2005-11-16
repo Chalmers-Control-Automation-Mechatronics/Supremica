@@ -112,9 +112,6 @@ public class MechanismListener
 			this.theCell = theCell;
 			this.path = robot.getActivePath();
 			this.mechanism = robot.getRobotStudioMechanism();
-
-			// pathcosts = new CreateXml.PathWithCosts(path.getName());
-			// pathcosts.insertCost(new Integer(0));
 	    }
 		catch (Exception e)
 	    {
@@ -284,16 +281,7 @@ public class MechanismListener
 				objectsColliding.add(data);
 				logger.debug("Start of collision with " + objectName + " at time " + (float) time + ".");
 				
-				// set the cost for the automata
-				// Double realCost = new Double((time - previousTime) * 1000);
-				// pathcosts.insertCost(new Integer(realCost.intValue()));
-				// previousTime = time;
-				
 				// Create a target here!
-				//String viaPointName = "In" + indexZone + "_";
-				//viaPointName = viaPointName + path.getName() + nbrOfTimesCollision;
-				//String viaPointName = "In" + objectName + "_";
-				//viaPointName = viaPointName + nbrOfTimesCollision;
 				int robotIndex = theCell.getRobotIndex(mechanism.getName());
 				String viaPointName = mechanism.getName().substring(5) + RSCell.VIAPOINT_SUFFIX + RSCell.nbrOfTimesCollision++;
 				ITarget viaTarget = createTargetAtTCP(viaPointName);
@@ -312,7 +300,7 @@ public class MechanismListener
 		catch (Exception e)
 	    {
 			logger.error("Error in collisionStart. " + e);
-			e.printStackTrace(System.err);
+			logger.error(e.getStackTrace());
 	    }
 		
 		return 0;
@@ -382,6 +370,7 @@ public class MechanismListener
 		catch (Exception e)
 	    {
 			logger.error("Error in collisionEnd. " + e);
+			logger.error(e.getStackTrace());
 	    }
 		
 		return 0;
@@ -487,7 +476,7 @@ public class MechanismListener
 		    }
 			catch (Exception e)
 		    {
-				if (nbr >= 10)
+				if (nbr >= 25)
 			    {
 					ok = true;
 			    }

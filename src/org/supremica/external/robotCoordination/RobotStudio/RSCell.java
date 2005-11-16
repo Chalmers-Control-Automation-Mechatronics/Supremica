@@ -64,6 +64,8 @@ import java.awt.Color;
 
 /**
  * Implementation of the Cell interface for use against RobotStudio.
+ *
+ * @deprecated
  */
 public class RSCell
     implements Cell, DAppEvents
@@ -83,8 +85,6 @@ public class RSCell
     final static String VOLUMEPART_NAME = "Volumes_Set";
 	
     final static String ZONEENTITY_BASENAME = "Zone";
-    final static String FREESTATE_NAME = "Free";
-    final static String BOOKEDSTATE_NAME = "Booked";
 	
     /** The suffix of the Part containing the spans. */
     final static String SPAN_SUFFIX = "_Span";
@@ -97,11 +97,6 @@ public class RSCell
     final static String STARTCONFIGURATION_NAME = "START";
     final static String FINISHCONFIGURATION_NAME = "FINISH";
 
-    /** Automata constants */
-    final static String STARTSTATE_NAME = "start";
-    final static String FINISHSTATE_NAME = "finish";
-    final static String FINISHEVENT_NAME = "fin";
-    final static String UNDERSCORE = "_";
 
     /** Via point suffix */
     final static String VIAPOINT_SUFFIX = "vp";
@@ -135,8 +130,8 @@ public class RSCell
     static Part boxSet;
 
     /** Generated automata */
-    private Automata robotAutomata = new Automata();
-    private Automata zoneAutomata = new Automata();
+    public Automata robotAutomata = new Automata();
+    public Automata zoneAutomata = new Automata();
 
     // Running number of added zones
     private int zoneNbr = 1;
@@ -382,8 +377,10 @@ public class RSCell
 	
     /**
      * Generates the structure of the robot automata models. NOTE: Not the complete models!
+	 *
+	 * @deprecated
      */
-    public Automata buildRobotAutomata(List<Robot> robots)
+    public static Automata buildRobotAutomata(List<Robot> robots)
 		throws Exception
     {
 		Automata robotAut = new Automata();
@@ -397,11 +394,11 @@ public class RSCell
 			Automaton aut = new Automaton(robot.getName());
 			aut.setType(AutomatonType.Plant);
 			// Build the states...
-			State initial = new State(STARTSTATE_NAME);
+			State initial = new State(CellExaminer.STARTSTATE_NAME);
 			initial.setInitial(true);
 			aut.addState(initial);
 			initial.setCost(0);
-			State marked = new State(FINISHSTATE_NAME);
+			State marked = new State(CellExaminer.FINISHSTATE_NAME);
 			marked.setAccepting(true);
 			aut.addState(marked);
 			marked.setCost(0);
@@ -424,7 +421,7 @@ public class RSCell
 		    {
 				State fromState = stateIt.nextState();
 				// Initial?
-				if (fromState.getName().equals(STARTSTATE_NAME))
+				if (fromState.getName().equals(CellExaminer.STARTSTATE_NAME))
 			    {
 					// Skip the 0:th element here... its assumed to be the home state
 					for (int i=1; i < posList.size(); i++)
@@ -443,7 +440,7 @@ public class RSCell
 						aut.addArc(arc);
 				    }
 			    }
-				else if (fromState.getName().equals(FINISHSTATE_NAME))
+				else if (fromState.getName().equals(CellExaminer.FINISHSTATE_NAME))
 			    {
 					// No outgoing from final state...
 			    }
@@ -475,8 +472,8 @@ public class RSCell
 									// Special treatment if were dealing with the home configuration
 									if (i==0)
 								    {
-										name = FINISHEVENT_NAME;
-										toState = aut.getStateWithName(FINISHSTATE_NAME);
+										name = CellExaminer.FINISHEVENT_NAME;
+										toState = aut.getStateWithName(CellExaminer.FINISHSTATE_NAME);
 								    }
 									
 									// Create event
@@ -501,7 +498,7 @@ public class RSCell
 				    }
 			    }
 		    }
-			aut.setComment("This automaton is not ready generated!");
+			aut.setComment("This automaton is not finished!");
 			// Add automaton
 			robotAut.addAutomaton(aut);
 			
@@ -512,7 +509,7 @@ public class RSCell
 		    {
 				Configuration pos = configurations.get(i);
 				
-				aut = new Automaton(robot.getName() + UNDERSCORE + pos.getName());
+				aut = new Automaton(robot.getName() + CellExaminer.UNDERSCORE + pos.getName());
 				State notVisited = new State("0");
 				notVisited.setInitial(true);
 				State visited = new State("1");
@@ -704,7 +701,7 @@ public class RSCell
 			
 				// Create new path for this motion
 				Path path = Path.getPathFromUnknown(mechanism.getPaths().add());
-				path.setName(from.getName() + to.getName());
+				path.setName(from.getName() + "_" + to.getName());
 				path.insert(fromTarget);
 				path.getTargetRefs().item(Converter.var(1)).setMotionType(1);    // Linear motion
 				path.insert(toTarget);
@@ -712,15 +709,13 @@ public class RSCell
 			
 				// Redefine robot program...
 				IABBS4Procedure mainProcedure = ((RSRobot) robot).getMainProcedure();
-				for (int k = 1;
-					 k <= mainProcedure.getProcedureCalls().getCount();
-					 k++)
+				for (int k = 1; k <= mainProcedure.getProcedureCalls().getCount(); k++)
 				{
 					mainProcedure.getProcedureCalls().item(Converter.var(k)).delete();
 				}
 				// Add path as only procedure in main
 				path.syncToVirtualController(PATHSMODULE_NAME);    // Generate procedure from path
-				Thread.sleep(1000);    // The synchronization takes a little while...
+				Thread.sleep(5000);    // The synchronization takes a little while...
 				IABBS4Procedure proc = path.getProcedure();
 				mainProcedure.getProcedureCalls().add(path.getProcedure());
 			
@@ -829,16 +824,18 @@ public class RSCell
 						// Book event
 						LabeledEvent bookEvent = new LabeledEvent(currPos.getName() + nextPos);
 						zoneAlpha.addEvent(bookEvent);
-						Arc arc = new Arc(zone.getStateWithName(FREESTATE_NAME),
-										  zone.getStateWithName(BOOKEDSTATE_NAME),
+						Arc arc = new Arc(zone.getStateWithName(CellExaminer.FREESTATE_NAME),
+										  zone.getStateWithName(CellExaminer.BOOKEDSTATE_NAME + 
+																CellExaminer.UNDERSCORE + robot.getName()),
 										  bookEvent);
 						zone.addArc(arc);
 
 						// Unbook event (other direction)
 						LabeledEvent unbookEvent = new LabeledEvent(currPos.getName() + prevPos);
 						zoneAlpha.addEvent(unbookEvent);
-						arc = new Arc(zone.getStateWithName(BOOKEDSTATE_NAME),
-									  zone.getStateWithName(FREESTATE_NAME),
+						arc = new Arc(zone.getStateWithName(CellExaminer.BOOKEDSTATE_NAME + 
+															CellExaminer.UNDERSCORE + robot.getName()),
+									  zone.getStateWithName(CellExaminer.FREESTATE_NAME),
 									  unbookEvent);
 						zone.addArc(arc);
 					}
@@ -922,7 +919,8 @@ public class RSCell
 					// MODIFY ROBOT TARGET AUTOMATON
 					if (!to.getName().equals(robot.getHomeConfiguration().getName()))
 					{
-						Automaton target = robotAutomata.getAutomaton(robot.getName() + UNDERSCORE + to.getName());
+						Automaton target = robotAutomata.getAutomaton(robot.getName() + 
+																	  CellExaminer.UNDERSCORE + to.getName());
 						LabeledEvent event = new LabeledEvent(secondLastPos.getName() + lastPos.getName());
 						Arc arc = new Arc(target.getStateWithName("0"), target.getStateWithName("1"), event);
 						target.getAlphabet().addEvent(event);
@@ -1004,7 +1002,9 @@ public class RSCell
 					// MODIFY ROBOT TARGET AUTOMATON
 					if (!from.getName().equals(robot.getHomeConfiguration().getName())) //
 					{
-						Automaton target = robotAutomata.getAutomaton(robot.getName() + UNDERSCORE + from.getName()); //
+						Automaton target = robotAutomata.getAutomaton(robot.getName() + 
+																	  CellExaminer.UNDERSCORE + 
+																	  from.getName()); //
 						LabeledEvent event = new LabeledEvent(secondLastPos.getName() + lastPos.getName());
 						Arc arc = new Arc(target.getStateWithName("0"), target.getStateWithName("1"), event);
 						target.getAlphabet().addEvent(event);
@@ -1179,16 +1179,18 @@ public class RSCell
 						// Book event
 						LabeledEvent bookEvent = new LabeledEvent(currPos.getName() + nextPos);
 						zoneAlpha.addEvent(bookEvent);
-						Arc arc = new Arc(zone.getStateWithName(FREESTATE_NAME),
-										  zone.getStateWithName(BOOKEDSTATE_NAME),
+						Arc arc = new Arc(zone.getStateWithName(CellExaminer.FREESTATE_NAME),
+										  zone.getStateWithName(CellExaminer.BOOKEDSTATE_NAME + 
+																CellExaminer.UNDERSCORE + robot.getName()),
 										  bookEvent);
 						zone.addArc(arc);
 					
 						// Unbook event (other direction)
 						LabeledEvent unbookEvent = new LabeledEvent(currPos.getName() + prevPos);
 						zoneAlpha.addEvent(unbookEvent);
-						arc = new Arc(zone.getStateWithName(BOOKEDSTATE_NAME),
-									  zone.getStateWithName(FREESTATE_NAME),
+						arc = new Arc(zone.getStateWithName(CellExaminer.BOOKEDSTATE_NAME + 
+															CellExaminer.UNDERSCORE + robot.getName()),
+									  zone.getStateWithName(CellExaminer.FREESTATE_NAME),
 									  unbookEvent);
 						zone.addArc(arc);
 					}
@@ -1272,7 +1274,8 @@ public class RSCell
 					// MODIFY ROBOT TARGET AUTOMATON
 					if (!to.getName().equals(robot.getHomeConfiguration().getName()))
 					{
-						Automaton target = robotAutomata.getAutomaton(robot.getName() + UNDERSCORE + to.getName());
+						Automaton target = robotAutomata.getAutomaton(robot.getName() + 
+																	  CellExaminer.UNDERSCORE + to.getName());
 						LabeledEvent event = new LabeledEvent(secondLastPos.getName() + lastPos.getName());
 						Arc arc = new Arc(target.getStateWithName("0"), target.getStateWithName("1"), event);
 						target.getAlphabet().addEvent(event);
@@ -1354,7 +1357,9 @@ public class RSCell
 					// MODIFY ROBOT TARGET AUTOMATON
 					if (!from.getName().equals(robot.getHomeConfiguration().getName())) //
 					{
-						Automaton target = robotAutomata.getAutomaton(robot.getName() + UNDERSCORE + from.getName()); //
+						Automaton target = robotAutomata.getAutomaton(robot.getName() + 
+																	  CellExaminer.UNDERSCORE + 
+																	  from.getName()); //
 						LabeledEvent event = new LabeledEvent(secondLastPos.getName() + lastPos.getName());
 						Arc arc = new Arc(target.getStateWithName("0"), target.getStateWithName("1"), event);
 						target.getAlphabet().addEvent(event);
@@ -1368,11 +1373,9 @@ public class RSCell
 			catch (Exception e)
 			{
 				logger.error("Error when examining collisions. " + e);
-				// e.printStackTrace(System.err);
+				logger.error(e.getStackTrace());
 
 				return;
-
-				//throw new SupremicaException();
 			}
 
 			logger.debug("Intersection points and times stored");
@@ -1439,13 +1442,18 @@ public class RSCell
 						aut.setType(AutomatonType.Specification);
 						
 						// Add two states, Free and Booked
-						State state = new State(FREESTATE_NAME);
+						State state = new State(CellExaminer.FREESTATE_NAME);
 						state.setAccepting(true);
 						state.setInitial(true);
 						aut.addState(state);
 						// aut.setInitialState(state);
-						state = new State(BOOKEDSTATE_NAME);
-						aut.addState(state);
+						List<Robot> robots = getRobots();
+						for (Iterator<Robot> robIt = robots.iterator(); robIt.hasNext(); )
+						{
+							state = new State(CellExaminer.BOOKEDSTATE_NAME + 
+											  CellExaminer.UNDERSCORE + robIt.next().getName());
+							aut.addState(state);							
+						}
 						
 						// Add automaton
 						zoneAutomata.addAutomaton(aut);

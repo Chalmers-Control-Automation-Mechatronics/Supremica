@@ -8,28 +8,6 @@ import java.awt.Color;
  */
 public interface Volume 
 {
-//     protected String name;
-	
-//     public Volume(String name) 
-// 	throws Exception
-//     {
-// 	this.name = name;
-//     }
-
-//     public abstract void delete() 
-// 	throws Exception;
-	
-//     public abstract void setColor(Color color) 
-// 	throws Exception;
-	
-//     public abstract void setTransparency(double transparency) 
-// 	throws Exception;
-	
-//     public String getName()
-//     {
-// 	return name;
-//     }
-
     public void delete() 
 		throws Exception;
 	
