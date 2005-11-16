@@ -12,7 +12,10 @@ public class Milp
 {
 	private static Logger logger = LoggerFactory.createLogger(Milp.class);
 
-	private final String MODEL_FILE_NAME = "C:\\Documents and Settings\\avenir\\Desktop\\temp.mod";
+	// Puts the *.mod file into ~/dist
+	private final String FILE_ROOT = "temp";
+
+// 	private final String MODEL_FILE_NAME = "C:\\Documents and Settings\\avenir\\Desktop\\temp.mod";
 //  	private final String MODEL_FILE_NAME = "C:\\Documents and Settings\\Avenir\\Skrivbord\\temp.mod";
 
 	private Automata theAutomata, robots, zones;
@@ -20,31 +23,175 @@ public class Milp
 	/** int[zone_nr][robot_nr][state_nr] - stores the states that fire booking/unbooking events */
 	private int[][][] bookingTics, unbookingTics;
 
-//  	public native void jniTest();
-	
+	/** Ordered info that allows to build the optimal schedule - stores [robot_index, state_index, state_time] */
+	private TreeSet<int[]> scheduleInfo;
+
+	private int makespan;
+
 	public Milp(Automata theAutomata) 
 		throws Exception
 	{
-		logger.info("In the Milp.java");
-
 		initAutomata(theAutomata);
-logger.info("initAutomattat");
 		initMutexStates();
-logger.info("initMutexat");
 		convertXmlToMod();
-
-		logger.info("Outta Milp.java");
+		logger.info("*.mod created");
+		new GlpkBridge().bridge("temp");
+		logger.info("*.sol created");
+		convertSolToXml();
 	}
 
 	public int[] schedule()
+		throws Exception
 	{
-		return   null;
+		if (scheduleInfo == null)
+			throw new Exception("ScheduleInfo is empty. Something must have gone wrong during optimization.....");
+			
+		return scheduleInfo.last();
 	}
 
 	public Automaton buildScheduleAutomaton(int[] markedNode) 
+		throws Exception
 	{
-		return null;
+		if (scheduleInfo == null)
+			throw new Exception("ScheduleInfo is empty. Something must have gone wrong during optimization.....");
+		
+		Automaton schedule = new Automaton();
+		schedule.setComment("Schedule");
+
+// 		// Tillf 
+// 		int counter = 0;
+
+
+
+
+
+// 		ArrayList<int[]> misplacedInfos = new ArrayList<int[]>();
+// 		int[] activeStates = new int[robots.size()];
+
+// 		State trailState = new State("q" + counter++);
+
+
+		// TILLF - FLUM
+		State trailState = new State("INITIAL");
+		trailState.setInitial(true);
+		schedule.addState(trailState);
+
+		State accState = new State("ACCEPTING");
+		accState.setAccepting(true);
+		schedule.addState(accState);
+
+		LabeledEvent event = new LabeledEvent("42");
+		schedule.getAlphabet().addEvent(event);
+		schedule.addArc(new Arc(trailState, accState, event));
+
+		logger.info("TOTAL CYCLE TIME: " + makespan + ".............................");
+
+		return schedule;
+		
+// 		for (Iterator<int[]> infoIterator = scheduleInfo.iterator(); infoIterator.hasNext(); )
+// 		{
+// 			int[] currInfo = infoIterator.next();
+
+// 			// if the initial state of the current robot has not yet been examined
+// 			if (activeStates[currInfo[0]] == null)
+// 			{
+// 				// if the current state is the initial state of the current robot
+// 				if (robots.getAutomatonAt(currInfo[0]).getInitialState().getIndex() == currInfo[1])
+// 				{
+// 					State newState = new State("q" + counter++);
+// 					newState.setCost(currInfo[2]);
+
+// 					schedule.addState(newState);
+// 					activeStates[currInfo[0]] = 
+
+// 					// if the current state is the first initial state to be examined
+// 					if (trailState == null)
+// 					{
+// 						newState.setInitial(true);
+// 						trailState = newState;
+// 					}
+// 					else
+// 					{
+						
+// 					}
+// 				}
+// 					;// Add the initial state
+// 				else
+// 					misplacedInfos.add(currInfo);
+// 			}
+// 		}
+		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// 		Iterator<int[]> scheduleInfoIterator = scheduleInfo.iterator(); 
+// // 		ArrayList<int[]> equalCostInfos = new ArrayList<int[]>();
+// // 		equalCostInfos.add(scheduleInfoIterator.next());
+// // 		int currentCost = equalCostInfos.get(0)[2];
+// // 		State lastState = null;
+
+// 		ArrayList<int[]> sleepingInfos = new ArrayList<int[]>();
+
+// 		ArrayList<int[]> enabledInfosArray = new ArrayList<int[]>();
+// 		for (int i=0; i<robots.size(); i++)
+// 			int[] enabledInfo = new int[]{i, robots.getAutomatonAt(i).getInitialState().getIndex()};
+
+// 		while(scheduleInfoIterator.hasNext())
+// 		{
+// 			int[] currInfo = scheduleInfoIterator.next();
+			
+// // 			if (infoInArrayList(enabledInfos, currInfo));
+
+// 			for (Iterator enabledInfos = enabledInfosArray.iterator(); enabledInfos.hasNext(); )
+// 			{
+// 				int[] currEnabledInfo = enabledInfos.next();
+				
+// 				if (currEnabledInfo[0] == currInfo[0] && currEnabledInfo[1] == currInfo[1])
+// 				{
+// 					enabledInfos.remove();
+					
+					
+// 				}
+// 			}
+			
+// // 			if (currInfo[2] != currentCost)
+// // 			{
+// // 				currentCost = currInfo[2];
+
+// // 				// process ArrayList
+				
+				
+
+// // 				equalCostInfos.clear();
+// 			}
+
+// // 			equalCostInfos.add(currInfo);
+// 		}
+
+// 		return null;
 	}
+
+// 	private boolean infoInArrayList(ArrayList<int[]> arrayList, int[] info)
+// 	{	
+// 		for (Iterator infos = arrayList.iterator(); infos.hasNext(); )
+// 		{
+// 			int[] currArrayInfo = infos.next();
+
+// 			if (currArrayInfo[0] == info[0] && currArrayInfo[1] == info[1])
+// 				return true;
+// 		}
+// 	}
 
 	/**
 	 * Goes through the supplied automata and synchronizes all specifications 
@@ -344,7 +491,7 @@ logger.info("initMutexat");
 		//	                          The writing part                                    //
 		////////////////////////////////////////////////////////////////////////////////////
 
-		File modelFile = new File(MODEL_FILE_NAME);
+		File modelFile = new File(FILE_ROOT + ".mod");
 		if (!modelFile.exists())
 			modelFile.createNewFile();
 
@@ -407,13 +554,6 @@ logger.info("initMutexat");
 		w.write(mutexConstraints);
 		w.newLine();
 		
-// 		// The precedence constraints
-// 		w.newLine();
-// 		w.write("s.t. precedence{r in Robots, t in Tics: t>0}:");
-// 		w.newLine();
-// 		w.write("\ttime[r,t] >= time[r,t-1] + deltaTime[r,t];");
-// 		w.newLine();
-	
 		// The end of the model-section and the beginning of the data-section
 		w.newLine();
 		w.write("data;");
@@ -430,53 +570,6 @@ logger.info("initMutexat");
 		// Behovs maxTic verkligen???
 		w.write("param maxTic := " + (nrOfTics - 1) + ";");
 		w.newLine();
-
-// 		String altRouteConstraints = "";
-// 		String precedenceConstraints = "";
-
-// 		// The header of the deltaTime-parameter
-// 		String deltaTime = ":";
-// 		for (int i=0; i<nrOfTics; i++)
-// 			deltaTime += "\t" + i;
-// 		deltaTime += " := ";
-
-// 		w.newLine();
-// 		w.write("param deltaTime default 0");
-// 		w.newLine();
-// 		w.write(deltaTime);
-// 		w.newLine();
-
-// 			currStates.add(currAuto.getInitialState());
-
-// 			while (!currStates.isEmpty())
-// 			{		
-// 				State currState = currStates.remove(0);				
-// 				StateIterator nprecedenceConstraintsextStates = currState.nextStatesIterator();
-
-// 				closedStates.add(0, currState);
-
-// 				while (nextStates.hasNext())
-// 				{
-// 					State nextState = nextStates.next();
-					
-// 					if (!nextStates.isAccepting())
-// 					{
-// 						if (!closedStates.contains(nextState))
-// 						{
-// 							deltaTimes += "\t" + nextState.getCost();
-// 							currTic++;
-// 						}
-
-// 						int parentTick = closedStates.size();
-// 						precedenceConstraints += "time[" + i + ", " + currTic + "] >= time [" + i + ", " + parentTick + "] deltaTime[" + i + ", " +  parentTick + "]";
-						
-// 					}
-// 					currStates.add(nextState);
-// 				}
-
-// 				deltaTime += "\t" + currState.getCost();
-
-// 			}
 			
 		w.newLine();
 		w.write(deltaTime);
@@ -487,4 +580,113 @@ logger.info("initMutexat");
 		w.flush();
 	}
 	
+	private void convertSolToXml()
+		throws Exception
+	{
+// 		scheduleInfo = new TreeSet<int[]>(new CostComparator(robots));
+// 		scheduleInfo = new TreeSet[robots.size()];
+// 		for (int i=0; i<scheduleInfo.length; i++)
+// 			scheduleInfo[i] = new TreeSet<int[]>(new CostComparator(robots.getAutomatonAt(i)));
+
+		scheduleInfo = new TreeSet<int[]>(new CostComparator());
+
+		File solutionFile = new File(FILE_ROOT + ".sol");
+
+		if (!solutionFile.isFile())
+			throw new Exception(solutionFile + " was NOT FOUND..........");
+
+		BufferedReader r = new BufferedReader(new FileReader(solutionFile));
+		String str = r.readLine();
+
+		while (str != null)
+		{
+			if (str.indexOf(" time[") > -1)
+			{
+				String strRobotIndex = str.substring(str.indexOf("[") + 1, str.indexOf(",")).trim();
+				String strStateIndex = str.substring(str.indexOf(",") + 1, str.indexOf("]")).trim();
+				String strCost = str.substring(str.indexOf("]") + 1, str.lastIndexOf(" ")).trim();
+
+				int robotIndex = (new Integer(strRobotIndex)).intValue(); 
+				int stateIndex = (new Integer(strStateIndex)).intValue(); 
+				int cost = (new Integer(strCost)).intValue();
+
+				int[] currScheduleInfo = new int[]{robotIndex, stateIndex, cost};
+// 				scheduleInfo[robotIndex].add(currScheduleInfo);
+				scheduleInfo.add(currScheduleInfo);
+			}
+			else if (str.indexOf("c ") >  -1)
+			{
+				String strMakespan = str.substring(str.indexOf("c") + 1).trim();
+				makespan = (new Integer(strMakespan)).intValue();
+			}
+				
+			str = r.readLine();
+		}
+
+
+// 		for (int i=0; i<robots.size(); i++)
+// 		{
+// 			logger.warn("Robot " + i);
+// 			for (Iterator<int[]> iter = scheduleInfo[i].iterator(); iter.hasNext(); )
+// 			{
+// 				int[] temp = iter.next();
+// 				logger.info("tree -> " + temp[0] + " " + temp[1] + " " + temp[2]);
+// 			}
+// 		}
+		for (Iterator<int[]> iter = scheduleInfo.iterator(); iter.hasNext(); )
+		{
+			int[] temp = iter.next();
+			logger.info("tree -> " + temp[0] + " " + temp[1] + " " + temp[2]);
+		}
+	}
+}
+
+class CostComparator 
+	implements Comparator<int[]>
+{
+	/** Helps to put the initial states at the beginning of the schedule in case of ties - initialIndice[robotIndex] = state_index */
+//  	private int[] initialIndices, acceptingIndices;
+// 	private int initialIndex;
+
+// 	public CostComparator(Automaton robot)
+// 	{
+// 		initialIndex = robot.getInitialState().getIndex();
+// 		initialIndices = new int[theAutos.size()];
+
+// 		for (int i=0; i<initialIndices.length; i++)
+// 		{
+// 			initialIndices[i] = theAutos.getAutomatonAt(i).getInitialState().getIndex();
+// 			acceptingIndices[i] = theAutos.getAutomatonAt(i).getInitialState().getIndex();
+// 	}
+	
+	/**
+	 * Comparison is done according to the (time)cost of each stateInfo.
+	 * If the cost is equal, the new state (a) is said to be smaller than the old one (b)
+	 * to increase the comparison (somewhat).
+	 */
+	public int compare(int[] a, int[] b)
+	{
+		if (a[2] == b[2])
+		{
+			if (a[0] == b[0] && a[1] == b[1])
+				return 0;
+// 			else if (b[0] == initialIndex)
+// 				return 1;
+			else
+				return -1;  
+		}
+
+		return a[2] - b[2];
+	}
+
+	/**
+	 * Returns true if b corresponds to an initial state.
+	 */
+// 	private boolean isInitial(int[] b)
+// 	{
+// 	 	if (initialIndices[b[0]] == b[1])
+// 			return true;
+
+// 		return false;
+// 	}
 }

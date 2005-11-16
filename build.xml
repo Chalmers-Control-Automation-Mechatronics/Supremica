@@ -637,6 +637,8 @@
 	<chmod file="${dist}/21100280.LIC" perm="644"/>
 	<copy file="${platform}/win.x86/lib/JavaClipboard.dll" todir="${dist}"/>	
 	<chmod file="${dist}/JavaClipboard.dll" perm="644"/>
+	<copy file="${platform}/win.x86/lib/glpk_bridge.dll" todir="${dist}"/>	
+	<chmod file="${dist}/glpk_bridge.dll" perm="644"/> 
 	<copy file="${platform}/linux.x86/lib/libbuddy.so" todir="${dist}"/>	
 	<chmod file="${dist}/libbuddy.so" perm="644"/>
 	<copy file="${platform}/linux.x86/lib/libBisimulationEquivalence.so" todir="${dist}"/>	
