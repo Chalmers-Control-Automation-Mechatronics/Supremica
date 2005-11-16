@@ -755,8 +755,8 @@ class ButtonPanel
 		/*
 		panel.add(new SynchButton(wb));
 		panel.add(new CompareButton(wb));
-		panel.add(new ContButton(wb));
 		panel.add(new NonblockButton(wb));
+		panel.add(new ContButton(wb));
 		panel.add(new ReachButton(wb));
 		panel.add(new PurgeButton(wb));
 		panel.add(new DoneButton(wb));

@@ -266,4 +266,13 @@ public class LabeledEvent
 		return label.compareTo(((LabeledEvent) event).label);
 	}
 
+	/**
+	 * Ordinary LabeledEvents are not forbidden, but their children
+	 * ForbiddenEvents are. This is overridden in ForbiddenEvent to
+	 * always return true. 
+	 **/
+	public boolean isForbidden()
+	{
+		return false;
+	}
 }

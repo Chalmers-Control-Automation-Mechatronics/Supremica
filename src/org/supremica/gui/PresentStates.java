@@ -16,6 +16,7 @@ import org.supremica.automata.Automata;
 import org.supremica.automata.State;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.algorithms.SearchStates;
+import org.supremica.automata.algorithms.Forbidder;
 import org.supremica.gui.Presenter;
 import org.supremica.gui.VisualProject;
 
@@ -90,16 +91,18 @@ class PresentStatesTable
 		this.searchStates = ss;
 		this.theAutomata = a;
 
-		// This code handles a flaw in the selection model
-		// By default, once a row is selected it cannot be unseleced unless a new row is selected
-		// This is changed so that a selected row is unselected by clicking it again
-		//-- Note, this works only for right-click selection (and it shouldn't really...)
-		//-- For left click the selection has appearently already been effected, so we always deselect
 		addMouseListener(new MouseAdapter()
 		{
 			public void mousePressed(MouseEvent e)
 			{
 				int currRow = rowAtPoint(new Point(e.getX(), e.getY()));
+				
+/*	Why would this be an error? When is this problematic?
+ *		// This code handles a flaw in the selection model
+		// By default, once a row is selected it cannot be unseleced unless a new row is selected
+		// This is changed so that a selected row is unselected by clicking it again
+		//-- Note, this works only for right-click selection (and it shouldn't really...)
+		//-- For left click the selection has appearently already been effected, so we always deselect
 
 				if (currRow < 0)
 				{
@@ -114,7 +117,7 @@ class PresentStatesTable
 				{
 					addRowSelectionInterval(currRow, currRow);
 				}
-
+*/
 				if (e.getClickCount() == 2)
 				{
 					if (theAutomata.size() == 1)
@@ -179,15 +182,18 @@ class PresentStatesTable
 
 class PresentStatesFrame
 	extends JFrame
-	implements SelectionListener    // listens to selection events, en/disables the RouteButton
+	implements SelectionListener    // listens to selection events, en/disables the RouteButton, ForbidButton
 {
 	private static final long serialVersionUID = 1L;
 
 	private static Logger logger = LoggerFactory.createLogger(PresentStatesFrame.class);
 
-//      private RouteButton route_button;
 	private SearchStates search_states;
+	private Automata automata;
 	private VisualProject theVisualProject;
+	private PresentStatesTable table;
+	private ForbidButton forbid_button;
+//      private RouteButton route_button;
 
 	private static void debug(String s)
 	{
@@ -221,6 +227,80 @@ class PresentStatesFrame
 		}
 	}
 
+	private class ForbidButton
+		extends JButton
+	{
+		private static final long serialVersionaUID = 1L; // what's this? necessary for what? //MF
+
+		public ForbidButton()
+		{
+			super("Forbid");
+			setToolTipText("Forbid selected states"); // if none selected, should forbid all?
+			setEnabled(false);
+
+			addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					action(e);
+				}
+			});
+		}
+
+		void action(ActionEvent e)
+		{
+			
+			// Get selected states
+			// Get involved automata
+			// Set mousepointer to timeglass
+			// Instantiate a Forbidder object
+			// Let it do its work
+			// Reset mousepointer
+			
+			/** / For now, iterate over all state
+			Iterator it = search_states.iterator();
+			while(it.hasNext())
+			{
+				// Write out the global state
+				int[] composite_state = (int[])it.next();
+				String name = search_states.toString(composite_state);
+				logger.info(name);
+
+				// Write out each partial state by itself prefixed with automaton name
+				int i = 0; // holds automaton index
+				SearchStates.StateIterator state_it = search_states.getStateIterator(composite_state);
+				while(state_it.hasNext())
+				{
+					Automaton automaton = automata.getAutomatonAt(i++);
+					
+					State state = state_it.getState();
+					logger.info(automaton.getName() + ": " + state.getName());
+					state_it.inc();
+				}
+			}
+			**/
+			
+			/** For now: iterate over the selected composite states
+			int[] selects = table.getSelectedRows();	// holds the indices for all selected rows
+			// Each row is a composite state, loop over all rows/composite states
+			for(int i = 0; i < selects.length; ++i)
+			{
+				int indx = selects[i];	// This is the index for one particular composite state (row)
+				
+				// Loop over all automata -- a is the index for one particular automaton (col)
+				for(int a = 0; a < automata.nbrOfAutomata(); ++a)
+				{
+					Automaton automaton = automata.getAutomatonAt(a);
+					State state = search_states.getState(a, indx);
+					// logger.info(automaton.getName() + ": " + table.getValueAt(indx, a));
+					logger.info(automaton.getName() + ": " + state.getName());
+
+				}
+			}
+			**/ 
+			Forbidder forbidder = new Forbidder(automata, table.getSelectedRows(), search_states, theVisualProject);
+		}
+	}
 /*
 		private class RouteButton
 				extends JButton
@@ -242,6 +322,7 @@ class PresentStatesFrame
 	public PresentStatesFrame(SearchStates ss, Automata a, VisualProject theVisualProject)
 	{
 		this.search_states = ss;
+		this.automata = a;
 		this.theVisualProject = theVisualProject;
 
 		Utility.setupFrame(this, 400, 300);
@@ -249,7 +330,8 @@ class PresentStatesFrame
 
 //              route_button = new RouteButton();
 //              route_button.setEnabled(false);
-		PresentStatesTable table = new PresentStatesTable(ss, a, theVisualProject);
+		forbid_button = new ForbidButton();
+		table = new PresentStatesTable(ss, automata, theVisualProject);
 
 		table.setSelectionListener(this);
 
@@ -257,7 +339,7 @@ class PresentStatesFrame
 
 		// panel.add(new JLabel(ss.numberFound() + " states found"));
 		panel.add(Utility.setDefaultButton(this, new FineButton()));
-
+		panel.add(forbid_button);
 //              panel.add(route_button);
 		Container contentPane = getContentPane();
 
@@ -268,13 +350,13 @@ class PresentStatesFrame
 	// SelectionListener interface implementation
 	public void emptySelection()
 	{
-
+		forbid_button.setEnabled(false);
 //              route_button.setEnabled(false);
 	}
 
 	public void nonEmptySelection()
 	{
-
+		forbid_button.setEnabled(true);
 		// Utility.setDefaultButton(this, route_button);
 //              route_button.setEnabled(false); // enable when implemented
 	}
@@ -322,7 +404,9 @@ public class PresentStates
 
 	public PresentStates(JFrame frame, SearchStates ss, Automata a, VisualProject theVisualProject)
 	{
-		super(ss);
+		super(ss);	// PresentStates is a Presenter, which is a Thread. Calling start() on PresentStates
+					// invokes Presenter::run() which waits for ss to finish, before calling taskStopped()
+					// or taskFinished, depending on whether the user stopped the task (ss) or not.
 
 		this.frame = frame;
 		this.searchs = ss;

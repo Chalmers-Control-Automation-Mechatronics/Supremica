@@ -90,7 +90,7 @@ class InitializedSupervisors
 
 	public InitializedSupervisors() {}
 
-	public boolean isEventEnabled(String supervisor, String event)
+	public boolean isEventEnabled(String supervisor, String event_label)
 	{
 		Automaton currAutomaton = getAutomaton(supervisor);
 
@@ -100,7 +100,8 @@ class InitializedSupervisors
 		}
 
 		State currState = getState(supervisor);
-		boolean isEnabled = currState.isEnabled(event);
+		LabeledEvent event = currAutomaton.getAlphabet().getEvent(event_label);
+		boolean isEnabled = currState.doesDefine(event);
 
 		// System.out.println("isEnabled: " + event + " : " + isEnabled);
 		return isEnabled;

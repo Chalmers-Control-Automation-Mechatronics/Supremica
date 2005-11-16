@@ -119,7 +119,7 @@ public class Automata
 		for (Iterator automataIterator = oldAutomata.iterator();
 				automataIterator.hasNext(); )
 		{
-			addAutomaton(new Automaton((Automaton) automataIterator.next()));
+			addAutomaton(new Automaton((Automaton)automataIterator.next()));
 		}
 	}
 
@@ -1115,6 +1115,28 @@ public class Automata
 		return newName;
 	}
 
+	public String getUniqueEventLabel()
+	{
+		return getUniqueEventLabel("e");
+	}
+	
+	public String getUniqueEventLabel(String prefix)
+	{
+		if(prefix == null)	// clever recursion here :-)
+		{
+			return getUniqueEventLabel();
+		}
+		
+		Alphabet alpha = getUnionAlphabet();
+		StringBuffer buf = new StringBuffer(prefix);
+		int num = 1; // number to append to prefix
+		while(alpha.contains(buf.toString()))
+		{
+			buf.append(num++);
+		}
+		return buf.toString();
+	}
+	
 	public void stateAdded(Automaton aut, State q)
 	{    // Do nothing
 	}
@@ -1159,9 +1181,11 @@ public class Automata
 
 	public void addListener(AutomataListener listener)
 	{
-		AutomataListeners listeners = getListeners();
+		// Semantic Warning: Local "listeners" shadows a field of the same name in "org.supremica.automata.Automata".
+		// AutomataListeners listeners = getListeners();
+		// listeners.addListener(listener);
 
-		listeners.addListener(listener);
+		getListeners().addListener(listener);
 	}
 
 	public long checksum()

@@ -153,8 +153,9 @@ public class Alphabet
 	}
 
 	/**
-	 * Add an event.
-	 */
+	 * Add an event. Thorws exception if the event is null, has null label or 
+	 * is already in the alphabet(!). 
+	 **/
 	public void addEvent(LabeledEvent ev)
 		throws IllegalArgumentException
 	{
@@ -180,7 +181,7 @@ public class Alphabet
 	 * Given an event, returns an "equal" event from this alphabet
 	 * The def of "equal" is an internal matter.
 	 * Use this method instead of fiddling with event ids in user code
-	 * Return null if the event does not exist
+	 * Returns null if the event does not exist
 	 */
 	public LabeledEvent getEvent(LabeledEvent ev)
 		throws IllegalArgumentException

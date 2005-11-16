@@ -67,6 +67,12 @@ public class AutomatonComplement
 
 	public Automaton execute()
 	{
+		// Shorter version //MF
+		theAutomaton.saturateDump();
+		theAutomaton.invertMarking();
+
+/** Long version due to hguo(?)
+
 		Alphabet alphabet = theAutomaton.getAlphabet();
 		State dumpState = null;
 		Iterator stateIterator = theAutomaton.safeStateIterator();
@@ -99,7 +105,7 @@ public class AutomatonComplement
 				{
 					Arc currArc = (Arc) outgoingArcsIterator.next();
 
-					if (currEvent.equals(currArc.getEvent()))    // equalId(((Arc) outgoingArcsIterator.next()).getEventId()))
+					if (currEvent.equals(currArc.getEvent()))
 					{
 						found = true;
 
@@ -114,7 +120,6 @@ public class AutomatonComplement
 						dumpState = theAutomaton.createAndAddUniqueState("dump");
 					}
 
-					// theAutomaton.addArc(new Arc(currState, dumpState, currEvent.getId()));
 					theAutomaton.addArc(new Arc(currState, dumpState, currEvent));
 				}
 			}
@@ -134,7 +139,7 @@ public class AutomatonComplement
 				theAutomaton.addArc(new Arc(dumpState, dumpState, ((LabeledEvent) eventIterator.next())));
 			}
 		}
-
+***/
 		return theAutomaton;
 	}
 }

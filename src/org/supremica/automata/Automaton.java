@@ -131,8 +131,10 @@ public class Automaton
 		alphabet.union(orgAut.getAlphabet());
 
 		type = orgAut.type;
-		name = orgAut.name;
-		comment = orgAut.comment;
+		// name = orgAut.name;			// Aren't name and comment copied by ref here? We need by value!
+		// comment = orgAut.comment;
+		name = new String(orgAut.name == null ? "" : orgAut.name);
+		comment = new String(orgAut.comment == null ? "" : orgAut.comment);
 
 		// Create all states
 		for (StateIterator states = orgAut.stateIterator(); states.hasNext(); )
@@ -601,7 +603,7 @@ public class Automaton
 	/**
 	 * Returns true if this is the null automaton, i.e. this
 	 * automaton does not have an initial state.
-	 */
+	 */ // is this the correct def of "null automaton"? what about empty state-set? //MF
 	public boolean isNullAutomaton()
 	{
 		return !hasInitialState();
@@ -668,7 +670,7 @@ public class Automaton
 	 * Returns a uniquely named (and id'ed) state.
 	 * Add it to the state set
 	 * Passing null or empty prefix sets prefix to 'q'
-	 */
+	 */ //is this one really necessary? clogs the interface. Besides, for exception-safet, one function, one task //MF
 	public State createAndAddUniqueState(String prefix)
 	{
 		State newstate = createUniqueState(prefix);
@@ -783,6 +785,8 @@ public class Automaton
 	 * When adding an arc, both the two states associated with the
 	 * arc _must_ already be contained in the automaton, otherwise the
 	 * behavior is undefined.
+	 *
+	 * What about the event? //MF
 	 */
 	public void addArc(Arc arc)
 		throws IllegalArgumentException
@@ -974,7 +978,7 @@ public class Automaton
 	 * Returns true if the event with label eventLabel is prioritized in this
 	 * automaton. If the event is not included in this automaton or is not
 	 * prioritized then it returns false.
-	 */
+	 */ // should throw exception if the event is not in this alphabet? //MF
 	public boolean isEventPrioritized(String eventLabel)
 		throws IllegalArgumentException
 	{
@@ -1234,7 +1238,7 @@ public class Automaton
 	}
 
 	/**
-	 * Use this iterator instead of stateIterator when you will add or
+	 * Use this iterator instead of stateIterator when you add or
 	 * remove states in this automaton.
 	 */
 	public StateIterator safeStateIterator()
@@ -1327,6 +1331,7 @@ public class Automaton
 			currDependencies.removeAutomaton(currAutomaton);
 		}
 	}
+	/* End interface-specific methods (?) */ //MF
 
 	public EventIterator eventIterator()
 	{
@@ -1489,6 +1494,7 @@ public class Automaton
 		}
 	}
 
+	// Do these really belong here? I think not. Better use a wrapper //MF
 	/**
 	 * Returns the shortest trace from the initial state to toState.
 	 */
@@ -1594,7 +1600,7 @@ public class Automaton
 	}
 
 	/**
-	 * In computeShortestPath the assciatedStates are backwards. I.e. they
+	 * In computeShortestPath the associatedStates are backwards. I.e. they
 	 * point from the to states towards the initial state. After the computation
 	 * we want the arcs in the opposite direction.
 	 */
@@ -1622,6 +1628,7 @@ public class Automaton
 		reverseAssociatedState(currState.getAssociatedState(), currState);
 		currState.setAssociatedState(nextState);
 	}
+	// End path-computing stuff that does not really belong here //MF
 
 	/**
 	 * Backwards extend accepting and mutually accepting states along transitions with safeEvents.
@@ -1741,7 +1748,7 @@ public class Automaton
 	/**
 	 * Makes all mutually accepting or accepting states non-accepting
 	 * and all non-accepting states accepting.
-	 */
+	 */ // and this method is useful for whom? //MF
 	public void invertMarking()
 	{
 		for (StateIterator stateIt = stateIterator(); stateIt.hasNext(); )
@@ -1760,7 +1767,7 @@ public class Automaton
 	}
 
 	/**
-	 * Returns a event on a arc that starts in fromState and ends in toState.
+	 * Returns an event on an arc that starts in fromState and ends in toState.
 	 * If no such event exists, null is returned.
 	 */
 	public LabeledEvent getLabeledEvent(State fromState, State toState)
@@ -1862,6 +1869,7 @@ public class Automaton
 		return null;
 	}
 
+	// What does layout, height, width etc has to do with automaton? this does not belong here! wrap! //MF
 	public boolean hasLayout()
 	{
 		return hasLayout;
@@ -1911,6 +1919,7 @@ public class Automaton
 
 		return true;
 	}
+	// End layout stuff that does not belong in this interface
 
 	public int nbrOfControllableEvents()
 	{
@@ -1945,7 +1954,7 @@ public class Automaton
 	 *
 	 * Shouldn't there really be a CompareAutomata class?
 	 * This class should have methods like areIsomorphic() and languageEqual()
-	 */
+	 */ // yes, definitively there should be a CompareAutomata class //MF
 	public boolean equalAutomaton(Automaton other)
 	{
 		boolean debug = true;
@@ -2067,6 +2076,7 @@ public class Automaton
 		return true;
 	}
 
+	// proxy?? //MF
 	public void setCorrespondingAutomatonProxy(AutomatonProxy correspondingAutomatonProxy)
 	{
 		this.correspondingAutomatonProxy = correspondingAutomatonProxy;
@@ -2081,7 +2091,7 @@ public class Automaton
 	{
 		return correspondingAutomatonProxy;
 	}
-
+	// checksum?? //MF
 	public long checksum()
 	{
 		// Ad-hoc checksum algorithm
@@ -2222,6 +2232,96 @@ public class Automaton
 
 		return 0;
 	}
+
+	// These are unary Automaton operators, they do belong here //MF
+
+	/**
+	 * Saturate the automaton with arcs on events not defined for a state, going to a uniquely named dump state.
+	 * This unary operation makes the automaton "complete" in the computing science sense.
+	 */
+	public boolean saturateDump()
+	{
+		return saturateDump(getAlphabet());
+	}
+
+	/**
+	 * Saturate with dump-state for a certain sub-alphabet.
+	 * Beware, we assume that alpha is a subset of the alphabet of the automaton
+	 */
+	public boolean saturateDump(Alphabet alpha)
+	{
+		boolean done_something = false; // keep track so we don't add dump-states over and over
+
+		State dump = createUniqueState("dump");	// Create uniquely named dump state
+		addState(dump);							// Add it to myself
+		saturate(dump, alpha, dump);		// saturate, else something will always be done
+
+		StateIterator state_it = safeStateIterator();
+		while(state_it.hasNext())
+		{
+			State state = (State)state_it.next(); // Why doesn't a StateIterator return a State?
+			done_something |= saturate(state, alpha, dump);	// saturate to the dump-state
+		}
+
+		if(done_something == false) // need to remove dump state including its self-loop arcs
+		{
+			removeState(dump);
+		}
+
+		return done_something;
+	}
+
+	/**
+	 * Saturate the automaton with self-loops on events not defined for a state.
+	 * This unary operation makes the automaton "complete" in the sense.that all events are defined for all states
+	 */
+	public boolean saturateLoop()
+	{
+		return saturateLoop(getAlphabet());
+	}
+
+	/**
+	 * Saturate with self-loops for a certain sub-alphabet.
+	 * Beware, we assume that alpha is a subset of the alphabet of the automaton
+	 */
+	public boolean saturateLoop(Alphabet alpha)
+	{
+		boolean done_something = false;
+
+		StateIterator state_it = safeStateIterator();
+		while(state_it.hasNext())
+		{
+			State state = (State)state_it.next(); // Why doesn't a StateIterator return a State?
+			done_something |= saturate(state, alpha, state);	// saturate with self-loops
+		}
+
+		return done_something;
+	}
+
+	/**
+	 * Add an arc <from_state, event, to-state> for each event in alpha
+	 * that is not defined in from_state. Returns true if anything added.
+	 * Note that this one costs you
+	 * |Q|x|A|x|T|, where Q is the state-set, A the given alphabet and T the
+	 * transitions from the certain state (plus the ones we're adding while we work!)
+	 * ... at the moment -- there *must* be a better way!
+	 */
+	private boolean saturate(State from_state, Alphabet alpha, State to_state)
+	{
+		boolean done_something = false;
+		EventIterator event_it = alpha.iterator();
+		while(event_it.hasNext())
+		{
+			LabeledEvent event = (LabeledEvent)event_it.next(); // Why doesn't an EventIterator return a LabeledEvent?
+			if(from_state.doesDefine(event) == false) // this event not defined for this state, add it
+			{
+				addArc(new Arc(from_state, to_state, event));
+				done_something = true;
+			}
+		}
+		return done_something;
+	}
+
 
 	public static void main(String[] args)
 	{

@@ -293,15 +293,16 @@ public class JgrafSupervisorDEMO
 		return trEn2;
 	}
 
-	public static boolean moveInitial(String supervisor, String event)
+	public static boolean moveInitial(String supervisor, String event_label)
 	{
 		Gui theGui = ActionMan.getGui();
 		VisualProjectContainer container = theGui.getVisualProjectContainer();
 		Project activeProject = container.getActiveProject();
 		Automaton currAutomaton = activeProject.getAutomaton(supervisor);
+		LabeledEvent event = currAutomaton.getAlphabet().getEvent(event_label);
 		State currState = currAutomaton.getInitialState();
 
-		if (currState.isEnabled(event))
+		if (currState.doesDefine(event))
 		{
 			State nextState = currState.nextState(event);
 

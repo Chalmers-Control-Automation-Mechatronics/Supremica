@@ -483,12 +483,18 @@ public class State
         return id.hashCode();
     }
 
-    public void addIncomingArc(Arc theArc)
+	/**
+	 * Don't do this in public -- only for use by Automaton
+	 **/
+	void addIncomingArc(Arc theArc)
     {
         incomingArcs.addLast(theArc);
     }
 
-    public void addOutgoingArc(Arc theArc)
+	/**
+	 * Don't do this in public -- only for use by Automaton
+	 **/
+	void addOutgoingArc(Arc theArc)
     {
         outgoingArcs.addLast(theArc);
 
@@ -505,12 +511,18 @@ public class State
         theArcSet.addArc(theArc);
     }
 
-    public void removeIncomingArc(Arc theArc)
+	/**
+	 * Don't do this in public -- only for use by Automaton
+	 **/
+	void removeIncomingArc(Arc theArc)
     {
         incomingArcs.remove(theArc);
     }
 
-    public void removeOutgoingArc(Arc theArc)
+	/**
+	 * Don't do this in public -- only for use by Automaton
+	 **/
+	void removeOutgoingArc(Arc theArc)
     {
         outgoingArcs.remove(theArc);
 
@@ -524,7 +536,10 @@ public class State
         }
     }
 
-    protected ArcSet getArcSet(Arc theArc)
+	/**
+	 * Don't do this in public -- only for use by Automaton
+	 **/
+	ArcSet getArcSet(Arc theArc)
     {
         State toState = theArc.getToState();
 
@@ -563,7 +578,7 @@ public class State
     }
 
     /**
-     * Retuns true if there is an outgoing arc from this state that is equal to the
+     * Returns true if there is an outgoing arc from this state that is equal to the
      * supplied arc.
      */
     public boolean containsOutgoingArc(Arc arc)
@@ -580,7 +595,7 @@ public class State
     }
 
     /**
-     * Retuns true if there is an incoming arc from this state that is equal to the
+     * Returns true if there is an incoming arc from this state that is equal to the
      * supplied arc.
      */
     public boolean containsIncomingArc(Arc arc)
@@ -803,13 +818,13 @@ public class State
     }
 
     /**
-     * Follow the label "theEvent" and return the next state (only one if many.
-     * If "theEvent" is not active then return null.
+     * Follow the label "the_label" and return the next state (only one if many).
+     * If "theEvent" is not defined then return null.
      *
      *@param  theEvent Description of the Parameter
      *@return  Description of the Return Value
      */
-    public State nextState(String theEvent)
+    public State nextState(String the_label)
     {
         Iterator outgoingArcsIt = outgoingArcs.iterator();
 
@@ -817,7 +832,7 @@ public class State
         {
             Arc currArc = (Arc) outgoingArcsIt.next();
 
-            if (currArc.getEvent().getLabel().equals(theEvent))
+            if (currArc.getEvent().getLabel().equals(the_label))
             {
                 return currArc.getToState();
             }
@@ -995,63 +1010,44 @@ public class State
     }
 
     /**
-     * Returns true if an event with the label "label" is enabled in this state.
+     * Returns true if this state has an outgoing arc for this event .
      */
-    public boolean isEnabled(String label)
+    public boolean doesDefine(LabeledEvent event)
     {
-        return isEnabled(label, false);
+        return doesDefine(event, false);
     }
     /**
-     * Returns true if an event with the label "label" is enabled in this state.
+     * Returns true if an event is defined in this state. that is, has an outgoing arc for this event
      * If considerEpsilonClosure is true, it can be anywhere in the epsilon closure
      * of this state instead of just in this state.
      */
-    public boolean isEnabled(String label, boolean considerEpsilonClosure)
+    private boolean doesDefine(LabeledEvent event, boolean considerEpsilonClosure)
     {
-        ArcIterator arcIt;
+        ArcIterator arc_it;
         if (considerEpsilonClosure)
         {
-            arcIt = epsilonClosure(true).outgoingArcsIterator();
+            arc_it = epsilonClosure(true).outgoingArcsIterator();
         }
         else
         {
-            arcIt = outgoingArcsIterator();
+            arc_it = outgoingArcsIterator();
         }
 
-        // String eventId = e.getId();
-        while (arcIt.hasNext())
+        while (arc_it.hasNext())
         {
-            Arc currArc = (Arc) arcIt.next();
-
-            if (currArc.getEvent().getLabel().equals(label))
+            Arc curr_arc = (Arc)arc_it.next();
+            if (curr_arc.getEvent().equals(event))
             {
                 return true;
             }
         }
-
         return false;
     }
-    /**
-     * Returns true if an event is enabled .
-     */
-    public boolean isEnabled(LabeledEvent event)
-    {
-        return isEnabled(event.getLabel());
-    }
-    /**
-     * Returns true if an event s enabled in this state.
-     * If considerEpsilonClosure is true, it can be anywhere in the epsilon closure
-     * of this state instead of just in this state.
-     */
-    public boolean isEnabled(LabeledEvent event, boolean considerEpsilonClosure)
-    {
-        return isEnabled(event.getLabel(), considerEpsilonClosure);
-    }
 
     /**
-     * Returns the alphabet of enabled events. Epsilon events are left out.
+     * Returns the alphabet of defined events. Epsilon events are left out.
      */
-    public Alphabet enabledEvents(boolean considerEpsilonClosure)
+    public Alphabet definedEvents(boolean considerEpsilonClosure)
     {
         Alphabet enabled = new Alphabet();
 

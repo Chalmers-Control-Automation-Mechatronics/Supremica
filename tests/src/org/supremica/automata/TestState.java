@@ -98,21 +98,21 @@ public class TestState
 			Project theProject = builder.build(TestFiles.getFile(TestFiles.ObservationEquivalence));
 			Automaton aut = theProject.getAutomaton("P1F1F2");
 			State state = aut.getInitialState();
-			
-			assertTrue(state.enabledEvents(false).size() == 2);
-			assertTrue(state.enabledEvents(true).size() == 2);
+
+			assertTrue(state.definedEvents(false).size() == 2);
+			assertTrue(state.definedEvents(true).size() == 2);
 
 			LabeledEvent event = new LabeledEvent("apa");
 			aut.getAlphabet().addEvent(event);
 			State from = aut.getStateWithName("ready.2.2");
 			State to = aut.getStateWithName("think.0.1");
 			aut.addArc(new Arc(from, to, event));
-			assertTrue(state.enabledEvents(false).size() == 2);
-			assertTrue(state.enabledEvents(true).size() == 3);
+			assertTrue(state.definedEvents(false).size() == 2);
+			assertTrue(state.definedEvents(true).size() == 3);
 
 			LabeledEvent tau = aut.getAlphabet().getEvent("tau");
 			assertTrue(state.nextStates(tau, false).size() == 2);
-			assertTrue(state.nextStates(tau, true).size() == 7);			
+			assertTrue(state.nextStates(tau, true).size() == 7);
 
 			aut.addArc(new Arc(to, from, tau));
 			assertTrue(state.epsilonClosure(true).size() == 7);

@@ -64,11 +64,17 @@ import javax.swing.table.*;
 import javax.swing.event.*;
 import java.util.regex.*;
 import org.supremica.log.*;
-import org.supremica.automata.algorithms.*;
+import org.supremica.automata.algorithms.SearchStates;
+import org.supremica.automata.algorithms.StateMatcher;
+import org.supremica.automata.algorithms.StateMatcherOptions;
+import org.supremica.automata.algorithms.FreeformMatcher;
+import org.supremica.automata.algorithms.FixedformMatcher;
+import org.supremica.automata.algorithms.Forbidder;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.AutomataListener;
 import org.supremica.gui.VisualProject;
+import org.supremica.properties.SupremicaProperties;
 
 // ----------------------------------------------------------------------------------
 // compiler type should be adjustable, but as for now, we only support a single type
@@ -854,7 +860,8 @@ class FreeFormPanel
 
 		x2Box.add(new JLabel("State Separator: "));
 
-		sep_str = new JTextField(".", 30);
+		// sep_str = new JTextField(".", 30);
+		sep_str = new JTextField(SupremicaProperties.getStateSeparator(), 30);
 
 		x2Box.add(sep_str);
 		yBox.add(Box.createVerticalGlue());
@@ -948,8 +955,9 @@ class FindStatesFrame
 	private FindStatesTable table = null;
 	private Automata automata = null;
 	private JTabbedPane tabbedPane = null;
-	private JButton find_button = null;
 	private CancelButton quit_button = null;
+	private JButton find_button = null;
+	private ForbidButton forbid_button = null;
 	private VisualProject theVisualProject = null;
 
 	private static void debug(String s)
@@ -976,8 +984,9 @@ class FindStatesFrame
 
 		JPanel buttonPanel = new JPanel();
 
-		buttonPanel.add(find_button = Utility.setDefaultButton(this, new FindButton()));
 		buttonPanel.add(quit_button = new CancelButton());
+		buttonPanel.add(find_button = Utility.setDefaultButton(this, new FindButton()));
+		buttonPanel.add(forbid_button = new ForbidButton());
 
 		Container contentPane = getContentPane();
 
@@ -1026,7 +1035,39 @@ class FindStatesFrame
 
 		void action(ActionEvent e)
 		{
-			goAhead();
+			goAhead(true); // find and present
+		}
+	}
+	
+	private class ForbidButton
+		extends JButton
+	{
+		private static final long serialVersionaUID = 1L; // what's this? necessary for what? //MF
+
+		public ForbidButton()
+		{
+			super("Forbid");
+			setToolTipText("Forbid found states"); // if none selected, should forbid all?
+
+			addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					action(e);
+				}
+			});
+		}
+
+		void action(ActionEvent e)
+		{
+			// for each automaton
+			//	if its seach criteria is "dont care" ignore it [we do not _have_ to do this but it saves efficiency]
+			//	else
+			// 		search only this automaton according to its criterion
+			// 		self-loop each found state with	the x-event	(a single x-event for each invocation)	
+			
+			// For now we try this
+			goAhead(false);	// find but do not present
 		}
 	}
 
@@ -1057,7 +1098,7 @@ class FindStatesFrame
 		}
 	}
 
-	private void goAhead()
+	private void goAhead(boolean present)
 	{
 		try
 		{
@@ -1079,15 +1120,27 @@ class FindStatesFrame
 					return;
 				}
 
-				ss.start();    // Start the synchronization thread
+				ss.start();    // Start the search thread
 
 				Monitor monitor = new Monitor("Finding states...", "", ss);
 
 				monitor.startMonitor(this, 0, 1000);
 
-				PresentStates present_states = new PresentStates(this, ss, getAutomata(), theVisualProject);
-
-				present_states.start();
+				if(present)
+				{
+					PresentStates present_states = new PresentStates(this, ss, getAutomata(), theVisualProject);
+					present_states.start(); // From the docs: Causes this thread to begin execution; 
+											// the Java Virtual Machine calls the run method of this thread. 
+											// The result is that two threads are running concurrently: the 
+											// current thread (which returns from the call to the start method) 
+											// and the other thread (which executes its run method).
+				}
+				else
+				{
+					ss.join(); // wait for ss to stop
+					Forbidder forbidder = new Forbidder(getAutomata(), ss, theVisualProject);
+					// forbidder.start();	// Should Forbidder be a thread of its own, monitorable/interruptable?
+				}
 			}
 		}
 		catch (Exception ex)

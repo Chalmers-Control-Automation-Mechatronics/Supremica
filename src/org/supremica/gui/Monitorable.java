@@ -7,11 +7,11 @@ package org.supremica.gui;
 
 public interface Monitorable
 {
-	int getProgress();
+	int getProgress(); // return progress in precentage
 
-	String getActivity();
+	String getActivity(); // return activity string
 
-	void stopTask();
+	void stopTask(); // user stopped the task
 
-	boolean wasStopped();
+	boolean wasStopped(); // return whether the task was stopped or completed
 }

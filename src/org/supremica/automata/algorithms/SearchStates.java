@@ -20,6 +20,7 @@ import org.supremica.util.IntArrayVector;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.gui.MonitorableThread;
+import org.supremica.properties.SupremicaProperties;
 
 public class SearchStates
 	extends MonitorableThread
@@ -148,12 +149,14 @@ public class SearchStates
 	}
 
 	// To iterate over the matched states
-	public Iterator iterator()
+	public Iterator iterator() 
 	{
 		return container.iterator();
 	}
 
-	// Given index for an automaton and a composite state, return that state
+	/**
+	 * Given index for an automaton and an index for a composite state, return that state
+	 */
 	public org.supremica.automata.State getState(int automaton, int index)
 	{
 		org.supremica.automata.State[][] states = syncher.getHelper().getIndexFormStateTable();    // should be cached?
@@ -162,18 +165,17 @@ public class SearchStates
 		return states[automaton][composite[automaton]];
 	}
 
-	// iterates over the partial states
+	/**
+	 * Iterator over a composite state, returns the State of the respective Automaton
+	 * External users should create StateIterators only through the getStateIterator method
+	 */
 	public class StateIterator
 	{
 		private org.supremica.automata.State[][] states;
 		private int[] composite;
-		int index;
-
-		// holds the automaton index
-		// ** Note, ctor should be private, but jikes 1.15 emits faulty bytecode then
-		// ** javac and jikes 1.14 ok for private.
-		// ** Do not instantiate, create only through getStateIterator()
-		// Seems to be fixed in jikes 1.16
+		int index;	// holds the automaton index
+		
+		// Private, instantiate only through getStateIterator
 		private StateIterator(org.supremica.automata.State[][] s, int[] c)
 		{
 			states = s;
@@ -214,13 +216,13 @@ public class SearchStates
 		}
 	}
 
+	/**
+	 * External users use this method to create a StateIterator
+	 * 
+	 */
 	public StateIterator getStateIterator(int[] composite_state)
 	{
-
-		//
 		org.supremica.automata.State[][] states = syncher.getHelper().getIndexFormStateTable();
-
-		//
 		return new StateIterator(states, composite_state);
 	}
 
@@ -232,9 +234,14 @@ public class SearchStates
 
 		for (int i = 0; i < states.length; ++i)
 		{
-			str.append(states[i][composite_state[i]].getName());
+			str.append(states[i][composite_state[i]].getName());	
+			str.append(SupremicaProperties.getStateSeparator());
 		}
 
+		// Remove last state separator
+		int idx = str.lastIndexOf(SupremicaProperties.getStateSeparator());
+		str.delete(idx, str.length());
+		
 		return new String(str);
 	}
 

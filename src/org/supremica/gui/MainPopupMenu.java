@@ -44,7 +44,7 @@ class MainPopupMenu
 
 		JMenu viewMenu = new JMenu("View");
 		menuHandler.add(viewMenu, 1);
-		
+
 		if (SupremicaProperties.useDot())
 		{
 			JMenuItem viewItem = new JMenuItem("View automaton");
@@ -348,17 +348,19 @@ class MainPopupMenu
 			JMenu expMenu = new JMenu("Experimental algorithms");
 			menuHandler.add(expMenu, 1);
 
-			// Strictly EXPERIMENTAL
+			/* Strictly EXPERIMENTAL -- removed, of no use any longer(?) //MF
 			JMenuItem automatonDiminisher = new SupremicaMenuItem(new DiminishAction());
 			expMenu.add(automatonDiminisher);
 
 			JMenuItem automatonDeterminizer = new SupremicaMenuItem(new MakeDeterministicAction());
 			expMenu.add(automatonDeterminizer);
+			*/
+			expMenu.add(new SupremicaMenuItem(new SaturateAction()));
 
 			JMenuItem automatonBuildObserver = new SupremicaMenuItem(new BuildObserverAction());
 			expMenu.add(automatonBuildObserver);
 
-			JMenuItem automatonSplit = new SupremicaMenuItem(new SplitAction());			
+			JMenuItem automatonSplit = new SupremicaMenuItem(new SplitAction());
 			expMenu.add(automatonSplit);
 
 			// De följande två Schedule-knapparna borde bli till en inom en viss (snar?) framtid
