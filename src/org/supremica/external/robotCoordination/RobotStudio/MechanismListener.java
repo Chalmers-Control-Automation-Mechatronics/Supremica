@@ -310,13 +310,12 @@ public class MechanismListener
     {
 		try
 	    {
-			// basic information
+			// Basic information
 			String objectName = collidingObject.getName();
 			double time = controller.getMotionTime();
 			
 			// Wasn't this a zone?
 			int indexZone = theCell.getZoneIndex(objectName);
-			
 			if (indexZone <= 0)
 		    {
 				return 0;

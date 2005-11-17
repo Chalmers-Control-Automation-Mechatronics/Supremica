@@ -81,7 +81,8 @@ public class RSCell
 	
     /** The name of the IPart containing the mutex zones. */
     final static String ZONEPART_NAME = "Mutex_Zones";
-    final static String BOXPART_NAME = "Box_Set";
+    //final static String BOXPART_NAME = "Box_Set";
+	final static String BOXPART_NAME = ZONEPART_NAME;
     final static String VOLUMEPART_NAME = "Volumes_Set";
 	
     final static String ZONEENTITY_BASENAME = "Zone";
@@ -126,7 +127,9 @@ public class RSCell
     /** The active RobotStudio station. */
     static Part zones;
 
+	/** The discretization parameters for the box strategy approach. */
     final static double[] boxDimensions = new double[]{0.01, 0.01, 0.01};
+	/** The part storing the boxes. */
     static Part boxSet;
 
     /** Generated automata */
@@ -145,8 +148,8 @@ public class RSCell
 			station.setBackgroundColor(RS_WHITE);
 			station.setFloorVisible(false);
 			
-			boxSet = getPart(BOXPART_NAME);
 			zones = getPart(ZONEPART_NAME);
+			boxSet = getPart(BOXPART_NAME);
 
 			/*
 			try
@@ -516,7 +519,7 @@ public class RSCell
 				visited.setAccepting(true);
 				aut.addState(notVisited);
 				aut.addState(visited);
-				aut.setType(AutomatonType.Plant);
+				aut.setType(AutomatonType.Specification);
 				
 				/*
 				// Add transitions
@@ -686,7 +689,8 @@ public class RSCell
     public void examineCollisions(Robot robot, Configuration from, Configuration to)
     {
 		// Old or new? True or false? 
-		if (false)
+		boolean old = true;
+		if (old)
 		{
 			try
 			{
@@ -701,11 +705,12 @@ public class RSCell
 			
 				// Create new path for this motion
 				Path path = Path.getPathFromUnknown(mechanism.getPaths().add());
-				path.setName(from.getName() + "_" + to.getName());
+				path.setName(from.getName() + CellExaminer.UNDERSCORE + to.getName());
 				path.insert(fromTarget);
 				path.getTargetRefs().item(Converter.var(1)).setMotionType(1);    // Linear motion
 				path.insert(toTarget);
 				path.getTargetRefs().item(Converter.var(2)).setMotionType(1);    // Linear motion
+				((RSRobot) robot).setActivePath(path);
 			
 				// Redefine robot program...
 				IABBS4Procedure mainProcedure = ((RSRobot) robot).getMainProcedure();
@@ -715,10 +720,10 @@ public class RSCell
 				}
 				// Add path as only procedure in main
 				path.syncToVirtualController(PATHSMODULE_NAME);    // Generate procedure from path
-				Thread.sleep(5000);    // The synchronization takes a little while...
+				Thread.sleep(1000);    // The synchronization takes a little while...
 				IABBS4Procedure proc = path.getProcedure();
 				mainProcedure.getProcedureCalls().add(path.getProcedure());
-			
+
 				// Add SimulationListener (for detecting when simulation is finished)
 				ISimulation simulation = station.getSimulations().item(Converter.var(1));
 				Simulation sim = Simulation.getSimulationFromUnknown(simulation);
@@ -733,7 +738,6 @@ public class RSCell
 				mechanismListener.setController(mechanism.getController());
 			
 				// Start a thread running the simulation in RobotStudio
-				//nbrOfTimesCollision = 1;
 				simulation.start();
 			
 				// Wait for the simulation to stop
@@ -841,7 +845,9 @@ public class RSCell
 					}
 				}
 
-				// Modify Robot Automaton
+				////////////////////////////
+				// Modify Robot Automaton //
+				////////////////////////////
 
 				// Forward direction
 				{
@@ -1031,67 +1037,20 @@ public class RSCell
 		{
 			try
 			{
-				// 			// Init
+				// Init
 				robot.jumpToConfiguration(from);
-				// 			Mechanism mechanism = ((RSRobot) robot).getRobotStudioMechanism();
-				// 			station.setActiveMechanism(mechanism);
-			
-				// 			// Find targets
-				// 			Target fromTarget = ((RSConfiguration) from).getRobotStudioTarget();
-				// 			Target toTarget = ((RSConfiguration) to).getRobotStudioTarget();
-
-				// 			// Create new path for this motion
-				// 			Path path = Path.getPathFromUnknown(mechanism.getPaths().add());
-				// 			path.setName(from.getName() + to.getName());
-				// 			path.insert(fromTarget);
-				// 			path.getTargetRefs().item(Converter.var(1)).setMotionType(1);    // Linear motion
-				// 			path.insert(toTarget);
-				// 			path.getTargetRefs().item(Converter.var(2)).setMotionType(1);    // Linear motion
-
-				// 			// Redefine robot program...
-				// 			IABBS4Procedure mainProcedure = ((RSRobot) robot).getMainProcedure();
-				// 			for (int k = 1;
-				// 				 k <= mainProcedure.getProcedureCalls().getCount();
-				// 				 k++)
-				// 		    {				RSCell.nbrOfTimesCollision++;
-				
-
-				// 				mainProcedure.getProcedureCalls().item(Converter.var(k)).delete();
-				// 		    }
-				// 			// Add path as only procedure in main
-				// 			path.syncToVirtualController(PATHSMODULE_NAME);    // Generate procedure from path
-				// 			Thread.sleep(1000);    // The synchronization takes a little while...
-				// 			IABBS4Procedure proc = path.getProcedure();
-				// 			mainProcedure.getProcedureCalls().add(path.getProcedure());
-
-				// Add SimulationListener (for detecting when simulation is finished)
-				// This is now done in runSimulation(robot, from, to);
-				// 			ISimulation simulation = station.getSimulations().item(Converter.var(1));
-				// 			Simulation sim = Simulation.getSimulationFromUnknown(simulation);
-				// 			SimulationListener simulationListener = new SimulationListener();
-				// 			sim.addDSimulationEventsListener(simulationListener);
-
 				Mechanism mechanism = ((RSRobot) robot).getRobotStudioMechanism();
 
-				//Add MechanismListener (for generating targets and detecting collisions)
-				//MechanismListener mechanismListener = new MechanismListener(path,j,i);
-				// 			MechanismListener mechanismListener = new MechanismListener(this, mechanism, path);
+				// THIS IS WHERE THE ERROR OCCURS!!! THE ROBOT HAS NOT
+				// YET GOTTEN THE PATH DEFINED! THAT IS DONE IN runSimulation!!!
 
+				//Add MechanismListener (for generating targets and detecting collisions)
 				MechanismListener mechanismListener = new MechanismListener(this, (RSRobot) robot);
 				mechanism.add_MechanismEventsListener(mechanismListener);
 				mechanismListener.setController(mechanism.getController());
 
 				// Start a thread running the simulation in RobotStudio
-				//nbrOfTimesCollision = 1;
-				// 			simulation.start();
-			
-				// Wait for the simulation to stop
-				// 			simulationListener.waitForSimulationStop();
-				// 			sim.removeDSimulationEventsListener(simulationListener);
-
 				runSimulation(robot, from, to);
-
-				Path path = ((RSRobot) robot).getActivePath();
 
 				// Get the result, a list of collision times + info!
 				LinkedList<RichConfiguration> richPath = mechanismListener.getRichPath();
@@ -1102,6 +1061,7 @@ public class RSCell
 
 				// Rearrange the path (in RobotStudio) so that the to-Target is last,
 				// after viapoints that may have been added during the simulation!
+				Path path = ((RSRobot) robot).getActivePath();
 				path.getTargetRefs().item(Converter.var(2)).delete();
 				path.insert(((RSConfiguration) to).getRobotStudioTarget());
 				path.getTargetRefs().item(Converter.var(path.getTargetRefs().getCount())).setMotionType(1);
@@ -1497,27 +1457,10 @@ public class RSCell
 		// Wait for the end of the simulation and clean up
 		simListener.waitForSimulationStop();
 		sim.removeDSimulationEventsListener(simListener);
+
+		// Delete path...
+		((RSRobot) robot).getActivePath().delete();
     }
-
-    // 	/**
-    // 	 * Creates a linear path between "from" and "to" configurations. 
-    // 	 */
-    // 	private Path createLinearPath(Configuration from, Configuration to) 
-    // 	{
-    // 		// Find targets
-    // 		Target fromTarget = ((RSConfiguration) from).getRobotStudioTarget();
-    // 		Target toTarget = ((RSConfiguration) to).getRobotStudioTarget();
-		
-    // 		// Create new path for this motion
-    // 		Path path = Path.getPathFromUnknown(mechanism.getPaths().add());
-    // 		path.setName(from.getName() + "_" + to.getName());
-    // 		path.insert(fromTarget);
-    // 		path.getTargetRefs().item(Converter.var(1)).setMotionType(1);    // Linear motion
-    // 		path.insert(toTarget);
-    // 		path.getTargetRefs().item(Converter.var(2)).setMotionType(1);    // Linear motion
-
-    // 		return path;
-    // 	}
 	
     //////////////////////////////////
     // DAppEvents interface methods //

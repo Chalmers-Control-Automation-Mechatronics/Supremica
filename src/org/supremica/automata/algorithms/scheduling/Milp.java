@@ -633,11 +633,14 @@ public class Milp
 // 				logger.info("tree -> " + temp[0] + " " + temp[1] + " " + temp[2]);
 // 			}
 // 		}
+
+		/*
 		for (Iterator<int[]> iter = scheduleInfo.iterator(); iter.hasNext(); )
 		{
 			int[] temp = iter.next();
 			logger.info("tree -> " + temp[0] + " " + temp[1] + " " + temp[2]);
 		}
+		*/
 	}
 }
 

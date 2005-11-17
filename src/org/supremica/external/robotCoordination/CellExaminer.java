@@ -734,12 +734,14 @@ public class CellExaminer
 		*/
 
 		// Build base automata for the zones
-			zoneAutomata = buildBaseZoneAutomata(zones, robots);
+		zoneAutomata = buildBaseZoneAutomata(zones, robots);
 		robotAutomata = buildBaseRobotAutomata(robots);
 		
 		// Use the old collision detection method (ugly stuff)
 		((RSCell) cell).zoneAutomata = zoneAutomata;
 		((RSCell) cell).robotAutomata = robotAutomata;
+		ActionMan.getGui().addAutomata(zoneAutomata);
+		ActionMan.getGui().addAutomata(robotAutomata);
 		examineCollisions();
 	}
 
@@ -766,7 +768,7 @@ public class CellExaminer
 			aut.addState(state);
 			for (Iterator<Robot> robIt = robots.iterator(); robIt.hasNext(); )
 			{
-				state = new State(BOOKEDSTATE_NAME + "_" + robIt.next().getName());
+				state = new State(BOOKEDSTATE_NAME + UNDERSCORE + robIt.next().getName());
 				aut.addState(state);							
 			}
 			
@@ -924,7 +926,7 @@ public class CellExaminer
 				visited.setAccepting(true);
 				aut.addState(notVisited);
 				aut.addState(visited);
-				aut.setType(AutomatonType.Plant);				
+				aut.setType(AutomatonType.Specification);				
 				
 				aut.setComment("This automaton is not ready generated!");
 				automata.addAutomaton(aut);

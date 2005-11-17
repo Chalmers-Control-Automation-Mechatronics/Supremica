@@ -356,6 +356,7 @@ public class RSRobot
 		throws Exception
     {
 		IABBS4Modules modules = mechanism.getController().getModules();
+		Thread.sleep(500);
 		
 		for (int i = 1; i <= modules.getCount(); i++)
 	    {
@@ -403,7 +404,7 @@ public class RSRobot
 		Target toTarget = ((RSConfiguration) to).getRobotStudioTarget();
 		
 		// Path name
-		String pathName = from.getName() + "_" + to.getName();
+		String pathName = from.getName() + CellExaminer.UNDERSCORE + to.getName();
 
 		// Create new path for this motion
 		try
@@ -424,16 +425,14 @@ public class RSRobot
 		
 		// Redefine robot program...
 		IABBS4Procedure mainProcedure = getMainProcedure();
-		for (int k = 1;
-			 k <= mainProcedure.getProcedureCalls().getCount();
-			 k++)
+		for (int k = 1; k <= mainProcedure.getProcedureCalls().getCount(); k++)
 	    {
 			mainProcedure.getProcedureCalls().item(Converter.var(k)).delete();
 	    }
 		
 		// Add path as only procedure in main
 		activePath.syncToVirtualController(RSCell.PATHSMODULE_NAME);    // Generate procedure from path
-		Thread.sleep(1000);    // The synchronization takes a little while...
+		Thread.sleep(1500);    // The synchronization takes a little while...
 		
 		IABBS4Procedure proc = activePath.getProcedure();
 		mainProcedure.getProcedureCalls().add(activePath.getProcedure());
