@@ -45,6 +45,10 @@ public abstract class AbstractAstar
     /** The selected automata */
     protected Automata theAutomata, plantAutomata;
     
+	/** 
+	 * Contains the indices of the selected plants, i.e. activeAutomataIndex[0] contains the 
+	 * index of the zeroth plant in the overall Automata, "theAutomata".
+	 */
     protected int[] activeAutomataIndex;
     
     protected int searchCounter;
@@ -76,9 +80,17 @@ public abstract class AbstractAstar
 	/*                                 NEW_TRY_START (051117 - ...)                      */
 	/*************************************************************************************/
 	
-	/** OPEN list is better represented as a tree. The keys are f(n) and the values the int[] representations of the nodes. */
+	/** 
+	 * OPEN list is better represented as a tree. 
+	 * The keys are f(n) and the values the int[] representations of the nodes. 
+	 */
 	protected TreeSet<int[]> openTree;
 
+	/** 
+	 * CLOSED is also better suited than a tree. 
+	 * It is faster to search through than a list and takes less place than a hashtable.
+	 */
+	protected TreeMap<Integer, int[]> closedTree;
 
 	///////////////////////////////////////////////////////////////////////////////////////
 	//                                 NEW_TRY_END (051117 - ...)                        //
@@ -172,6 +184,7 @@ public abstract class AbstractAstar
 			// NEW_TRY_START
 		
 			openTree = new TreeSet<int[]>(new OpenTreeComparator());
+			closedTree = new TreeMap<Integer, int[]>();
 
 			// NEW_TRY_END
 		}	
@@ -288,7 +301,7 @@ public abstract class AbstractAstar
 				searchCounter++;
 
 				currNode = openTree.first();
-
+				
 				if (isAcceptingNode(currNode))
 					return currNode;
 
@@ -296,7 +309,7 @@ public abstract class AbstractAstar
 				if (! succesfullyRemoved)
 					throw new Exception("The node " + printNodeName(currNode) + " was not found on the openTree");
 
-				branch(currNode, true);
+				branch(currNode);
 			}
 
 			// NEW_TRY_END
@@ -781,13 +794,106 @@ public abstract class AbstractAstar
 		return true;
     }
     
-    protected int[] getParent(int[] node) throws Exception {
-		try {
-			return closedNodes.getNode(node[parentIndex], node[parentIndex+1]);
+    protected int[] getParent(int[] node) 
+		throws Exception 
+	{
+		// NEW_TRY_START
+logger.info("in getParent()");
+		// one object of the closedTree may contain several nodes (that all correspond
+		// to the same logical state but different paths). 
+		int[] parentCandidates = closedTree.get(new Integer(node[parentIndex]));
+
+		if (parentCandidates != null) 
+			logger.info("in getParent(), parentCandidates = " + printArray(parentCandidates) + ", key = " + node[parentIndex]);
+		else
+			logger.info("parentCandidates == null, closedTree.size() = " + closedTree.size() + ", key = " + node[parentIndex]);
+		int nrOfCandidates = parentCandidates.length / node.length;
+
+		if (nrOfCandidates == 1)
+			return parentCandidates;
+		// which candidate is the true parent...
+		else
+		{
+			// which plant (robot) fired the transition...
+			int activePlantIndex = -1;
+
+			// which cost is the new cost of the firing state...
+			int newStateCost = -1;
+			
+			// activePlantIndex is found as the index that corresponds to a plant automaton
+			// (in the plantAutomata-collection) and differs between this node and its parent
+			for (int j=0; j<activeAutomataIndex.length; j++)
+			{
+				int currIndex = activeAutomataIndex[j];
+				
+				// This might look strange, but it is not. All parent candidates corresponds to 
+				// the same logical state. In other words, it is enough to do the state indices check
+				// for some of the parent candidates, why not the first.
+				if (node[currIndex] != parentCandidates[currIndex])
+				{
+					activePlantIndex = j;
+					
+					// The new cost (after update) is equal to the cost of the state that is changed
+					// during the transition, i.e. the state corresponding to the firing robot.
+					newStateCost = theAutomata.getAutomatonAt(currIndex).getStateWithIndex(node[currIndex]).getCost();
+					
+					break;
+				}
+			}
+			
+			int[] parentCosts = new int[accCostIndex - currCostIndex + 1];
+
+			// The only thing that differs between the candidates is their cost-vectors
+			// So, find the parent that gives correct cost update for the current state
+			// and return it. Return null if nothing appropriate is found. 
+			for (int i=0; i<nrOfCandidates; i++)
+			{
+				// Retrieving the costs of the current parent candidate
+				for (int j=0; j<parentCosts.length; j++)
+				{
+					parentCosts[j + currCostIndex] = parentCandidates[j + currCostIndex + i*node.length];
+				}
+
+				int[] newCosts = updateCosts(parentCosts, activePlantIndex, newStateCost);
+
+				// If the cost update (that corresponds to the transition from parent candidate to the current node
+				// is equal to the costs of the current node, then the true parent is found.
+				boolean isParent = true;
+				for (int j=0; j<newCosts.length; j++)
+				{
+					if (newCosts[j] != node[j + currCostIndex])
+					{
+						isParent = false;
+						break;
+					}
+				}
+
+				// If the parent was found, return it.
+				if (isParent)
+				{
+					int[] parent = new int[node.length];
+
+					for (int j=0; j<parent.length; j++)
+						parent[j] = parentCandidates[j + i*node.length];
+
+					return parent;
+				}
+			}
+
+			return null;
 		}
-		catch (Exception e) {
-			throw e;
-		}
+		
+		// NEW_TRY_END
+		
+
+// 		try 
+// 		{
+// 			return closedNodes.getNode(node[parentIndex], node[parentIndex+1]);
+// 		}
+// 		catch (Exception e) 
+// 		{
+// 			throw e;
+// 		}
     }
     
     public Automaton buildScheduleAutomaton(int[] currNode) 
@@ -820,7 +926,7 @@ public abstract class AbstractAstar
 		    }
 			catch (Exception ex)
 		    {
-				logger.error("AbstractAstar::buildScheduleAutomaton() --> Could not find the arc between " + printNodeName(currNode) + " and its parent");
+				logger.error("AbstractAstar::buildScheduleAutomaton() --> Could not find the arc between " + printArray(currNode) + " and its parent" + printNodeName(getParent(currNode)));
 				logger.debug(ex.getStackTrace());
 
 				throw ex;
@@ -854,7 +960,10 @@ public abstract class AbstractAstar
 			}
 		}
 	
-		newCosts[newCosts.length-1] = costs[costs.length-1] + costs[changedIndex];
+		// The accumulated cost update
+		newCosts[newCosts.length-2] = costs[costs.length-1] + costs[changedIndex];
+
+		// The f-update
 	
 		return newCosts;
     }
