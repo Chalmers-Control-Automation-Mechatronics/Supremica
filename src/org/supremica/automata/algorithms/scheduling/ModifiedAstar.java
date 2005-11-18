@@ -44,6 +44,38 @@ public class ModifiedAstar
 	{
 		super(theAutomata, heuristic, manualExpansion, iterativeSearch);
     }
+
+	// NEW_TRY_START
+	protected void branch(int[] currNode, boolean newTry) 
+	{
+		if (newTry == true)
+		{
+			try 
+			{
+				if (! isClosed(currNode))
+				{
+					// TODO: Lägg currNode till closedTree på rätt ställe
+				}
+
+				Iterator childIter = expander.expandNode(currNode, activeAutomataIndex).iterator();
+				while (childIter.hasNext()) {
+					int[] nextNode = (int[])childIter.next();
+
+					openTree.add(nextNode);
+				}
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
+	}
+
+	private boolean isClosed(int[] node)
+	{
+		return true;
+	}
+	// NEW_START_END
 	
     protected void branch(int[] currNode) 
 	{
@@ -81,18 +113,36 @@ public class ModifiedAstar
 		//     }
     }
 	
+	/**
+	 * Converts the representation of the initial state to the int[]-representation of a node. 
+	 * int[] node consists of [states.getIndex() AutomataIndexFormHelper-info (-1 0 normally) 
+	 * parentStates.getIndex() states.getCurrentCost() accumulatedCost estimatedCost]. 
+	 * int[] initialNode is thus [initialStates.getIndex() AutomataIndexFormHelper-info 
+	 * null initialStates.getCost() 0 -1].
+	 */
     protected int[] makeInitialNode() 
 	{
 		int[] initialStates = AutomataIndexFormHelper.createState(theAutomata.size());
-		int[] initialCosts = new int[getActiveLength() + 1];
+		int[] initialCosts = new int[getActiveLength() + 2];
+
+		int nrOfPlants = plantAutomata.size(); 
 	
+		// Initial state indices are stored
 		for (int i=0; i<theAutomata.size(); i++) 
 			initialStates[i] = theAutomata.getAutomatonAt(i).getInitialState().getIndex();
 	
-		for (int i=0; i<initialCosts.length-1; i++) 
+		// Initial state costs are stored
+		for (int i=0; i<nrOfPlants; i++) 
 			initialCosts[i] = plantAutomata.getAutomatonAt(i).getInitialState().getCost();
-		initialCosts[initialCosts.length-1] = 0;
 
+		// The initial accumulated cost is zero
+		initialCosts[nrOfPlants] = 0;
+
+		// The initial estimate is set to -1
+		initialCosts[nrOfPlants] = -1;
+
+		// The NodeExpander combines the information, together with the parent-information, 
+		// which is null for the initial state. 
 		return expander.makeNode(initialStates, null, initialCosts);
     }
 }

@@ -64,12 +64,25 @@ public abstract class AbstractAstar
     protected boolean consistentHeuristic = false;
  
     protected int accCostIndex, currCostIndex, parentIndex;
+	public static int ESTIMATE_INDEX;
 
     protected String infoStr =  "";
 
     protected String heuristic = "";
 
     protected int[] currOptimalNode = null;
+
+	/*************************************************************************************/
+	/*                                 NEW_TRY_START (051117 - ...)                      */
+	/*************************************************************************************/
+	
+	/** OPEN list is better represented as a tree. The keys are f(n) and the values the int[] representations of the nodes. */
+	protected TreeSet<int[]> openTree;
+
+
+	///////////////////////////////////////////////////////////////////////////////////////
+	//                                 NEW_TRY_END (051117 - ...)                        //
+	///////////////////////////////////////////////////////////////////////////////////////
 
     /** Deprecated */
     public AbstractAstar(Automaton theAutomaton)
@@ -116,7 +129,8 @@ public abstract class AbstractAstar
 	//                                                                                      //
 	//////////////////////////////////////////////////////////////////////////////////////////
 
-    protected void init(boolean manualExpansion) {
+    protected void init(boolean manualExpansion) 
+	{
 		timer = new ActionTimer();
 		openList = new ArrayList<int[]>();
 		// 	closedNodes = new Hashtable<Integer, int[]>();
@@ -154,6 +168,12 @@ public abstract class AbstractAstar
 			infoStr += "\t1st preprocessing in " + timer.elapsedTime() + " ms\n";
 
 			initAuxIndices();
+
+			// NEW_TRY_START
+		
+			openTree = new TreeSet<int[]>(new OpenTreeComparator());
+
+			// NEW_TRY_END
 		}	
     }
 
@@ -201,6 +221,7 @@ public abstract class AbstractAstar
 		parentIndex = theAutomata.size() + AutomataIndexFormHelper.STATE_EXTRA_DATA;
 		currCostIndex = parentIndex + ClosedNodes.CLOSED_NODE_INFO_SIZE;
 		accCostIndex = currCostIndex + activeAutomataIndex.length;
+		ESTIMATE_INDEX = accCostIndex + 1;
     }
     
     public String printArray(int[] node) {
@@ -251,51 +272,73 @@ public abstract class AbstractAstar
 
     protected int[] scheduleFrom(int[] initNode) {
 		try {
-			// Tillfälligt
-// 			java.io.File tempFile = new java.io.File("C:\\Documents and Settings\\Avenir\\Skrivbord\\tempfil.txt");
-// 			java.io.BufferedWriter w = new java.io.BufferedWriter(new java.io.FileWriter(tempFile));
-
-
 			int[] currNode = new int[initNode.length];
 	
 			openList.clear();
 			closedNodes.clear();
 			openList.add(initNode);
 
-			while(!openList.isEmpty()) {
+			// NEW_TRY_START
+		
+			openTree.clear();
+			openTree.add(initNode);
+
+			while(! openTree.isEmpty())
+			{
 				searchCounter++;
 
-				// Tillfälligt (debug)
-// 				if (searchCounter > 50000) {
-// 					w.flush();
-// 					w.close();
-// 					return null;
-// 				}
-	    
-				currNode = (int[]) openList.remove(0);
-	   
-				//Tillfälligt
-// 				if (currNode[parentIndex] > 0)
-// 					w.write(searchCounter + ">>   " + printNodeSignature(currNode) + "; f = " + calcEstimatedCost(currNode));
-// 				else 
-// 					w.write(searchCounter + ">>   " + printNodeSignature(currNode) + "; f = INF");
-// 				w.newLine();
-	    
-	    
-// 				if (isOptimalNode(currNode)) {
-// 					w.flush();
-// 					w.close();
-// 					flushLog(currNode);
-// 					return currNode;
-// 				}
+				currNode = openTree.first();
 
-				branch(currNode);
+				if (isAcceptingNode(currNode))
+					return currNode;
+
+				boolean succesfullyRemoved =  openTree.remove(currNode);
+				if (! succesfullyRemoved)
+					throw new Exception("The node " + printNodeName(currNode) + " was not found on the openTree");
+
+				branch(currNode, true);
 			}
+
+			// NEW_TRY_END
+
+// 			while(!openList.isEmpty()) {
+// 				searchCounter++;
+
+// 				// Tillfälligt (debug)
+// // 				if (searchCounter > 50000) {
+// // 					w.flush();
+// // 					w.close();
+// // 					return null;
+// // 				}
+	    
+// 				currNode = (int[]) openList.remove(0);
+	   
+// 				//Tillfälligt
+// // 				if (currNode[parentIndex] > 0)
+// // 					w.write(searchCounter + ">>   " + printNodeSignature(currNode) + "; f = " + calcEstimatedCost(currNode));
+// // 				else 
+// // 					w.write(searchCounter + ">>   " + printNodeSignature(currNode) + "; f = INF");
+// // 				w.newLine();
+	    
+	    
+// // 				if (isOptimalNode(currNode)) {
+// // 					w.flush();
+// // 					w.close();
+// // 					flushLog(currNode);
+// // 					return currNode;
+// // 				}
+
+// 				branch(currNode);
+// 			}
 
 			logger.error("An accepting node could not be found...");
 			return currNode;
 		}
-		catch (Exception e) { e.printStackTrace(); return null; }
+		catch (Exception e) 
+		{ 
+			e.printStackTrace(); 
+			return null; 
+		}
     }
 
     //mkt mkt tillfälligt
@@ -372,14 +415,14 @@ public abstract class AbstractAstar
 				openList.add(node);
 			}
 			else {
-				int estimatedCost = calcEstimatedCost(node);
+				node[ESTIMATE_INDEX] = calcEstimatedCost(node);
 				int counter = 0;
 				Iterator iter = openList.iterator();
 	    
 				while (iter.hasNext()) {
 					int[] openNode = (int[])iter.next();
 		
-					if (estimatedCost <= calcEstimatedCost(openNode)) {
+					if (node[ESTIMATE_INDEX] <= openNode[ESTIMATE_INDEX]) {
 						openList.add(counter, node);
 		    
 						return;
@@ -447,7 +490,7 @@ public abstract class AbstractAstar
 	// 	}
 	//     }
 	
-    protected int calcEstimatedCost(int[] node) throws Exception {
+    public int calcEstimatedCost(int[] node) throws Exception {
 		if (useOneProdRelax) {
 			// 	    return node[node.length-1] + getOneProdRelaxation(node);
 
@@ -816,6 +859,7 @@ public abstract class AbstractAstar
 		return newCosts;
     }
 
+	// Vad är detta? Tillfälligt?
     public boolean isOptimalNode(int[] node) {
 		if (heuristic.equals("brute force")) {
 			if (isAcceptingNode(node)) {
