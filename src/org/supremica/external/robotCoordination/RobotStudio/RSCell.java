@@ -594,7 +594,7 @@ public class RSCell
 	    }
 		catch (Exception ex)
 	    {
-			logger.error("Error! " + ex);
+			logger.error("Error when getting part " + name + ". " + ex);
 	    }
 		
 		return part;
@@ -1024,11 +1024,9 @@ public class RSCell
 			catch (Exception e)
 			{
 				logger.error("Error when examining collisions. " + e);
-				// e.printStackTrace(System.err);
+				logger.error(e.getStackTrace());
 
 				return;
-
-				//throw new SupremicaException();
 			}
 
 			logger.debug("Intersection points and times stored");

@@ -433,9 +433,9 @@ public class CellExaminer
 		timer.start();
 
 		// Discretization parameters
-		double dx = 0.4;
-		double dy = 0.4;
- 		double dz = 0.4;
+		double dx = 0.35;
+		double dy = 0.35;
+ 		double dz = 0.35;
 		cell.setBoxDimensions(new double[] {dx,dy,dz});
 
 		//////////////////////////
@@ -670,10 +670,25 @@ public class CellExaminer
 		timer.stop();
 		logger.info("Execution completed after " + timer.toString());
 		logger.info("Amount of zoneboxes: " + zoneCount);
+		
+		//////////////////////
+		// REFINE THE ZONES //
+		//////////////////////
+
+		// Just do it!
 
 		/////////////////////////////////////////////
 		// TEST FOR COLLISIONS WITH THE ZONE BOXES //
 		/////////////////////////////////////////////
+
+		// Use the old collision detection method (ugly stuff)
+		zoneAutomata = buildBaseZoneAutomata(zones, robots);
+		robotAutomata = buildBaseRobotAutomata(robots);
+		((RSCell) cell).zoneAutomata = zoneAutomata;
+		((RSCell) cell).robotAutomata = robotAutomata;
+		ActionMan.getGui().addAutomata(robotAutomata);
+		ActionMan.getGui().addAutomata(zoneAutomata);
+		examineCollisions();
 
 		/*
 		// For every robot...
@@ -732,17 +747,6 @@ public class CellExaminer
 			logger.info("Execution completed for robot " + robot + " after " + robottimer + ".");
 		}
 		*/
-
-		// Build base automata for the zones
-		zoneAutomata = buildBaseZoneAutomata(zones, robots);
-		robotAutomata = buildBaseRobotAutomata(robots);
-		
-		// Use the old collision detection method (ugly stuff)
-		((RSCell) cell).zoneAutomata = zoneAutomata;
-		((RSCell) cell).robotAutomata = robotAutomata;
-		ActionMan.getGui().addAutomata(zoneAutomata);
-		ActionMan.getGui().addAutomata(robotAutomata);
-		examineCollisions();
 	}
 
 	/**
