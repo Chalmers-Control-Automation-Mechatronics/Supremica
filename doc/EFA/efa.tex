@@ -73,7 +73,7 @@ have $T_e=\{(q,\sigma)\in Q \times \Sigma: g_{q\sigma}(x)=1
 
 \subsection{Synchronous composition of EFA's}
 
-Formally we define the synchronous product $A||B$ of two EFA's
+Formally we define the synchronous product $A\|B$ of two EFA's
 \begin{eqnarray}
 A=\langle Q^A, \Sigma^A, \delta^A, q^A_i, Q^A_m, X^{A},
 G^A,x^A_0,X^A_m \rangle
@@ -81,15 +81,15 @@ G^A,x^A_0,X^A_m \rangle
 Q^B_m, X^{B}, G^B,x^B_0,X^B_m \rangle
 \end{eqnarray} as
 \begin{eqnarray}
-A||B&=&\langle Q^A\times Q^B, \Sigma^A \cup \Sigma^B ,
-\delta^{A||B}, (q^A_i,q^B_i) ,\nonumber\\
-&& Q^A_m\times Q^B_m, X^A \times X^B, G^{A||B},(x^A_0,x^B_0),
+A\|B&=&\langle Q^A\times Q^B, \Sigma^A \cup \Sigma^B ,
+\delta^{A\|B}, (q^A_i,q^B_i) ,\nonumber\\
+&& Q^A_m\times Q^B_m, X^A \times X^B, G^{A\|B},(x^A_0,x^B_0),
 X^A_m \times X^B_m \rangle.
 \end{eqnarray}
 To define the guard functions, the action functions and the
 transition function of the product we make use of the
 corresponding functions in $A$ and $B$. To denote the elements of
-$A||B$ we remove unnecessary  superscripts and write $A||B=\langle
+$A\|B$ we remove unnecessary  superscripts and write $A\|B=\langle
 Q, \Sigma, \delta, q_i, Q_m, X, G ,x_0, X_m \rangle$. The guard
 functions $g_{q \sigma}(x)$ are defined as
 \begin{eqnarray}\label{guard_sync_1}
@@ -135,9 +135,9 @@ a_{q \sigma}(x)=
 \end{eqnarray}
 
 
- The transition function $\delta^{A||B}$ is defined from $\delta^A$ and $\delta^B$ as
+ The transition function $\delta^{A\|B}$ is defined from $\delta^A$ and $\delta^B$ as
 \begin{eqnarray}
-\delta^{A||B}(q,\sigma,x)=\left\{
+\delta^{A\|B}(q,\sigma,x)=\left\{
 \begin{array}{ll}
 \big(\delta^A(q^A,\sigma),\delta^B(q^B,\sigma),a_{q \sigma}(x)\big) \quad\quad \sigma\in \Sigma^A \cap \Sigma^B \quad g_{q \sigma}(x)=1\\
 \big(\delta^A(q^A,\sigma),q^B,a_{q \sigma}(x)\big) \quad\quad\quad\quad\quad \sigma\in \Sigma^A \setminus \Sigma^B \quad g_{q \sigma}(x)=1\\
@@ -149,19 +149,54 @@ g_{q\sigma}(x)=0
 \end{eqnarray}
 
 \subsubsection{Properties of the product}
-$(A||B)||C$:
 
+Consider three EFA's $A$, $B$ and $C$. From the definition of the
+synchronization we shall now show that
+ $(A\|B)\|C=A\|(B\|C)$ i.e. we have:
+\begin{theorem}
+   Full synchronous composition of EFA's is an associative
+   operation.
+\end{theorem}
+
+\noindent \textbf{Proof}: We need to prove that $(A\|B)\|C =
+A\|(B\|C)$. Here, we assume that the three automata have no common
+variables.
+\newline\newline
+\noindent The 9-tuple representing $(A\|B)\|C$ is
+\begin{center}
+\begin{tabular}{ll}
+  $(A\|B)\|C =$ & $\Big \langle (Q^{A} \times Q^{B}) \times Q^{C},$\\
+  & $ \big(\Sigma^{A} \bigcup \Sigma^{B} \big) \bigcup \Sigma^{C},$\\
+  & $\delta^{(A\|B)\|C},$\\
+  & $\big((q^{A}_i, q^{B}_i) , q^{C}_i\big),$\\
+  & $(Q^{A}_m \times Q^{B}_m) \times Q^{C}_m,$\\
+  & $\big[[X^{A}, X^{B}], X^{C}]$\\
+  & $G^{(A\|B)\|C},$\\
+  & $\big((x^{A}_0, x^{B}_0) , x^{C}_0\big),$\\
+  & $\big[[X^{A}_m, X^{B}_m], X^{C}_m \big] \Big \rangle$
+\end{tabular}
+\end{center}
+
+\noindent In order to establish associativity we now have to show
+this for each of the elements in the tuple. For the states, the
+alphabet, the initial state, the marked states and the variables,
+associativity is clear by the laws of set operations. We will now
+in turn deal with the guard/action functions and the transition
+function.
+
+For the guard functions and the action functions of the composite
+automaton we have
 \begin{eqnarray}
-g^{(A||B)||C}_{q \sigma}(x)&=& g_{q^{AB}\sigma}(x^{AB})\wedge
+g^{(A\|B)\|C}_{q \sigma}(x)&=& g_{q^{AB}\sigma}(x^{AB})\wedge
 g_{q^C\sigma}(x^{C})\nonumber\\
 &=&g_{q^A\sigma}(x^{A})\wedge g_{q^B\sigma}(x^{B})\wedge
 g_{q^C\sigma}(x^{C})\nonumber\\
 &=& g_{q^{A}\sigma}(x^{A})\wedge g_{q^{BC}\sigma}(x^{BC})\nonumber\\
-&=& g^{A||(B||C)}_{q \sigma}(x)
+&=& g^{A\|(B\|C)}_{q \sigma}(x)
 \end{eqnarray}
-
+and
 \begin{eqnarray}
-a^{(A||B)||C}_{q \sigma}(x)&=&
+a^{(A\|B)\|C}_{q \sigma}(x)&=&
  \big(a_{q^{AB} \sigma}(x^{AB}), a_{q^{C}
  \sigma}(x^{C})\big)\nonumber\\
 &=&\big(a_{q^{A} \sigma}(x^{A}), a_{q^{B}
@@ -169,58 +204,18 @@ a^{(A||B)||C}_{q \sigma}(x)&=&
  \sigma}(x^{C})\big)\nonumber\\
 &=&\big(a_{q^{A} \sigma}(x^{A}), a_{q^{BC}
  \sigma}(x^{BC})\big)\nonumber\\
-&=&a^{A||(B||C)}_{q \sigma}(x)
+&=&a^{A\|(B\|C)}_{q \sigma}(x).
 \end{eqnarray}
+This shows that $G^{(A\|B)\|C}=G^{A\|(B\|C)}$, and since the
+transition function for the standard $FA$ is associative it
+follows that $\delta^{(A\|B)\|C}=\delta^{A\|(B\|C)}$.
+\begin{flushright}$\square$\end{flushright}
 
-The synchronous product $A||B$ of two FSA $A$ and $B$ can be
-extended to $(A||B)_e$ by taking the synchronous product of the
+The synchronous product $A\|B$ of two FSA $A$ and $B$ can be
+extended to $(A\|B)_e$ by taking the synchronous product of the
 extended components  $A_e$ and $B_e$. In other words, the
-operations extension and product commute, $(A||B)_e=A_e||B_e$.
+operations extension and product commute, $(A\|B)_e=A_e\|B_e$.
 
-Moreover, by the above definition of synchronization we now obtain
-the following property
-
-\begin{theorem}
-   Full synchronous composition of EFA's is an associative
-   operation.
-\end{theorem}
-
-\noindent \textbf{Proof}: To prove the associativity we
-considering three automata $A, A'$ and $A''$, and show that
-$(A\|A')\|A'' = A\|(A'\|A'')$. Here, we assume that the three
-automata have no common variables.
-\newline\newline
-\noindent The 8-tuple representing $(A\|A')\|A''$ is
-\begin{center}
-\begin{tabular}{ll}
-  $(A\|A')\|A'' =$ & $\Big \langle (Q \times Q') \times Q'',$\\
-  & $ \big(\Sigma \bigcup \Sigma' \big) \bigcup \Sigma'',$\\
-  & $\delta^{(A\|A')\|A''},$\\
-  & $\big((q_i, q'_i) , q''_i\big),$\\
-  & $(Q_m \times Q_m') \times Q_m'',$\\
-  & $\big[[X, X'], X'']$\\
-  & $G^{(A\|A')\|A''},$\\
-  & $\big[[X_m, X'_m], X''_m \big] \Big \rangle$
-\end{tabular}
-\end{center}
-
-\noindent In order to establish associativity we now have to show
-this for each of the elements in the 8-tuple. For the states, the
-alphabet, the initial state, the marked states and the variables,
-associativity is clear by the laws of set operations. We will now
-in turn deal with the guard/action functions and the transition
-function.
-
-For the guard functions $g^{(A\|A')\|A''} : X^c \rightarrow
-\{\mathrm{true}, \mathrm{false}\}$ of the composite automaton we
-have by definition
-
-\begin{equation}
-  g^{(A\|A')\|A''}(X^c) = \big[g(X) \wedge g'(X') \big] \wedge g''(X'') = g(X) \wedge \big[g'(X') \wedge g''(X'')] = g^{A\|(A'\|A'')}(X^c)
-\end{equation}
-\noindent Now consider the action function $a^{(A\|A')\|A''} : X^c
-\rightarrow X^c$.
-\newpage
 \subsection{The translation of an EFA to  an FA}
 To simplify the realization we shall restrict us to quite simple
 action- and guard functions. For the updating functions we assume
@@ -293,13 +288,13 @@ consistency condition by inspection. In section
 consistency check of the synchronous
 composition of two EFA's. \\
 
-Formally we define the synchronous product $A||B$ of two EFA's
+Formally we define the synchronous product $A\|B$ of two EFA's
 $A=\langle Q^A, \Sigma^A, \delta^A, q^A_i, Q^A_m, X^{A}, G^A,X^A_m
 \rangle$ and $B=\langle Q^B, \Sigma^B, \delta^B, q^B_i, Q^B_m,
 X^{B}, G^B,X^B_m
  \rangle$ as
 \begin{eqnarray}
-A||B=\langle Q^A\times Q^B, \Sigma^A \cup \Sigma^B , \delta, q_i,
+A\|B=\langle Q^A\times Q^B, \Sigma^A \cup \Sigma^B , \delta, q_i,
 Q^A_m\times Q^B_m, Z, G, Z_m \rangle.
 \end{eqnarray}
 To define the integer variables, the guard functions, the action
@@ -331,7 +326,7 @@ write equation (\ref{guard_sync_2}) as
 \begin{eqnarray}
 g_{q \sigma}(z)= g_{q^A\sigma}(x^{A})\wedge g_{q^B\sigma}(x^{B}).
 \end{eqnarray}
-To define the action functions for $A||B$ we look at the
+To define the action functions for $A\|B$ we look at the
 restrictions of the updating functions $a^A_\delta$ and
 $a^B_\delta$ to the sets $Z^A$ and $Z^B$. The updating functions
 are defined as (if $x^{A}$ and $x^{B}$ have no common variables
