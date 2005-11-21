@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="Serializer4Way" >
+  <VersionInfo Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2005-11-21" />
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="AO_REQ_VIEW1" Type="AO_EVENT" >
+        <With Var="AO_REQ_VIEW1_ARGS" />
+      </Event>
+      <Event Name="AO_REQ_VIEW2" Type="AO_EVENT" >
+        <With Var="AO_REQ_VIEW2_ARGS" />
+      </Event>
+      <Event Name="AO_REQ_VIEW3" Type="AO_EVENT" >
+        <With Var="AO_REQ_VIEW3_ARGS" />
+      </Event>
+      <Event Name="AO_REQ_VIEW4" Type="AO_EVENT" >
+        <With Var="AO_REQ_VIEW4_ARGS" />
+      </Event>
+      <Event Name="AO_RSP_CTL" Type="AO_EVENT" >
+        <With Var="AO_RSP_CTL_ARGS" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="AO_RSP_VIEW1" >
+        <With Var="AO_RSP_VIEW1_ARGS" />
+      </Event>
+      <Event Name="AO_RSP_VIEW2" >
+        <With Var="AO_RSP_VIEW2_ARGS" />
+      </Event>
+      <Event Name="AO_RSP_VIEW3" >
+        <With Var="AO_RSP_VIEW3_ARGS" />
+      </Event>
+      <Event Name="AO_RSP_VIEW4" >
+        <With Var="AO_RSP_VIEW4_ARGS" />
+      </Event>
+      <Event Name="AO_REQ_CTL" >
+        <With Var="AO_REQ_CTL_ARGS" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="AO_REQ_VIEW1_ARGS" Type="STRING" />
+      <VarDeclaration Name="AO_REQ_VIEW2_ARGS" Type="STRING" />
+      <VarDeclaration Name="AO_REQ_VIEW3_ARGS" Type="STRING" />
+      <VarDeclaration Name="AO_REQ_VIEW4_ARGS" Type="STRING" />
+      <VarDeclaration Name="AO_RSP_CTL_ARGS" Type="STRING" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="AO_RSP_VIEW1_ARGS" Type="STRING" />
+      <VarDeclaration Name="AO_RSP_VIEW2_ARGS" Type="STRING" />
+      <VarDeclaration Name="AO_RSP_VIEW3_ARGS" Type="STRING" />
+      <VarDeclaration Name="AO_RSP_VIEW4_ARGS" Type="STRING" />
+      <VarDeclaration Name="AO_REQ_CTL_ARGS" Type="STRING" />
+    </OutputVars>
+  </InterfaceList>
+  <BasicFB>
+    <ECC>
+
+	  <!-- View 1 -->
+	  <ECState Name="INIT" />
+	  <ECState Name="VIEW1REQ">
+		<ECAction Algorithm="CopyView1ArgsToCtl" Output="AO_REQ_CTL" />
+	  </ECState>    
+	  <ECState Name="VIEW1RSP">
+		<ECAction Algorithm="CopyCtlArgsToView1" Output="AO_RSP_VIEW1" />
+	  </ECState>    
+	  <ECTransition Source="INIT" Destination="VIEW1REQ" Condition="AO_REQ_VIEW1" />
+	  <ECTransition Source="VIEW1REQ" Destination="VIEW1RSP" Condition="AO_RSP_CTL" />
+	  <ECTransition Source="VIEW1RSP" Destination="INIT" Condition="1" />
+
+	  <!-- View 2 -->
+	  <ECState Name="INIT" />
+	  <ECState Name="VIEW2REQ">
+		<ECAction Algorithm="CopyView2ArgsToCtl" Output="AO_REQ_CTL" />
+	  </ECState>    
+	  <ECState Name="VIEW2RSP">
+		<ECAction Algorithm="CopyCtlArgsToView2" Output="AO_RSP_VIEW2" />
+	  </ECState>    
+	  <ECTransition Source="INIT" Destination="VIEW2REQ" Condition="AO_REQ_VIEW2" />
+	  <ECTransition Source="VIEW2REQ" Destination="VIEW2RSP" Condition="AO_RSP_CTL" />
+	  <ECTransition Source="VIEW2RSP" Destination="INIT" Condition="1" />
+
+	  <!-- View 3 -->
+	  <ECState Name="INIT" />
+	  <ECState Name="VIEW3REQ">
+		<ECAction Algorithm="CopyView3ArgsToCtl" Output="AO_REQ_CTL" />
+	  </ECState>    
+	  <ECState Name="VIEW3RSP">
+		<ECAction Algorithm="CopyCtlArgsToView3" Output="AO_RSP_VIEW3" />
+	  </ECState>    
+	  <ECTransition Source="INIT" Destination="VIEW3REQ" Condition="AO_REQ_VIEW3" />
+	  <ECTransition Source="VIEW3REQ" Destination="VIEW3RSP" Condition="AO_RSP_CTL" />
+	  <ECTransition Source="VIEW3RSP" Destination="INIT" Condition="1" />
+
+	  <!-- View 4 -->
+	  <ECState Name="INIT" />
+	  <ECState Name="VIEW4REQ">
+		<ECAction Algorithm="CopyView4ArgsToCtl" Output="AO_REQ_CTL" />
+	  </ECState>    
+	  <ECState Name="VIEW4RSP">
+		<ECAction Algorithm="CopyCtlArgsToView4" Output="AO_RSP_VIEW4" />
+	  </ECState>    
+	  <ECTransition Source="INIT" Destination="VIEW4REQ" Condition="AO_REQ_VIEW4" />
+	  <ECTransition Source="VIEW4REQ" Destination="VIEW4RSP" Condition="AO_RSP_CTL" />
+	  <ECTransition Source="VIEW4RSP" Destination="INIT" Condition="1" />
+
+	  <!-- Broadcast to all views -->
+	  <ECState Name="INIT" />
+	  <ECState Name="BROADCAST">
+		<ECAction Algorithm="CopyCtlArgsToView1" Output="AO_RSP_VIEW1" />
+		<ECAction Algorithm="CopyCtlArgsToView2" Output="AO_RSP_VIEW2" />
+		<ECAction Algorithm="CopyCtlArgsToView3" Output="AO_RSP_VIEW3" />
+		<ECAction Algorithm="CopyCtlArgsToView4" Output="AO_RSP_VIEW4" />
+	  </ECState>    
+	  <ECTransition Source="INIT" Destination="BROADCAST" Condition="AO_RSP_CTL" />
+	  <ECTransition Source="BROADCAST" Destination="INIT" Condition="1" />
+
+
+    </ECC>
+    <Algorithm Name="CopyView1ArgsToCtl">
+      <Other Language="Java" Text="
+	    AO_REQ_CTL_ARGS = AO_REQ_VIEW1_ARGS;
+	  " />	
+    </Algorithm>
+    <Algorithm Name="CopyCtlArgsToView1">
+      <Other Language="Java" Text="
+	    AO_RSP_VIEW1_ARGS = AO_RSP_CTL_ARGS;
+	  " />	
+    </Algorithm>
+
+    <Algorithm Name="CopyView2ArgsToCtl">
+      <Other Language="Java" Text="
+	    AO_REQ_CTL_ARGS = AO_REQ_VIEW2_ARGS;
+	  " />	
+    </Algorithm>
+    <Algorithm Name="CopyCtlArgsToView2">
+      <Other Language="Java" Text="
+	    AO_RSP_VIEW2_ARGS = AO_RSP_CTL_ARGS;
+	  " />	
+    </Algorithm>
+
+    <Algorithm Name="CopyView3ArgsToCtl">
+      <Other Language="Java" Text="
+	    AO_REQ_CTL_ARGS = AO_REQ_VIEW3_ARGS;
+	  " />	
+    </Algorithm>
+    <Algorithm Name="CopyCtlArgsToView3">
+      <Other Language="Java" Text="
+	    AO_RSP_VIEW3_ARGS = AO_RSP_CTL_ARGS;
+	  " />	
+    </Algorithm>
+
+    <Algorithm Name="CopyView4ArgsToCtl">
+      <Other Language="Java" Text="
+	    AO_REQ_CTL_ARGS = AO_REQ_VIEW4_ARGS;
+	  " />	
+    </Algorithm>
+    <Algorithm Name="CopyCtlArgsToView4">
+      <Other Language="Java" Text="
+	    AO_RSP_VIEW4_ARGS = AO_RSP_CTL_ARGS;
+	  " />	
+    </Algorithm>
+  </BasicFB>
+</FBType>

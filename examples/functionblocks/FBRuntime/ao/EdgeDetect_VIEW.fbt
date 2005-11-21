@@ -22,5 +22,26 @@
     </OutputVars>
   </InterfaceList>
   <FBNetwork>
+
+    <FB Name="rsp_parser" Type="Sensor_MDL_RSP_PARSE" />
+	<FB Name="split" Type="E_SPLIT2" />
+    <FB Name="rising_edge_detector" Type="E_R_TRIG" />
+    <FB Name="falling_edge_detector" Type="E_F_TRIG" />
+	
+	<EventConnections>
+	  <Connection Source="AO_RSP" Destination="rsp_parser.RSP" />
+	  <Connection Source="rsp_parser.NEW_SAMPLE" Destination="split.EI" />
+	  <Connection Source="split.EO1" Destination="rising_edge_detector.EI" />
+	  <Connection Source="split.EO2" Destination="falling_edge_detector.EI" />
+	  <Connection Source="rising_edge_detector.EO" Destination="RISING_EDGE" />
+	  <Connection Source="falling_edge_detector.EO" Destination="FALLING_EDGE" />
+  	</EventConnections>
+
+	<DataConnections>
+	  <Connection Source="AO_RSP_ARGS" Destination="rsp_parser.RSP_ARGS" />
+	  <Connection Source="rsp_parser.NEW_SAMPLE_ARG" Destination="rising_edge_detector.QI" />
+	  <Connection Source="rsp_parser.NEW_SAMPLE_ARG" Destination="falling_edge_detector.QI" />
+	</DataConnections>
+
   </FBNetwork>
 </FBType>
