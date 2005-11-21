@@ -92,6 +92,8 @@ public abstract class AbstractAstar
 	 */
 	protected TreeMap<Integer, int[]> closedTree;
 
+	protected int maxOpenSize = 0;
+
 	///////////////////////////////////////////////////////////////////////////////////////
 	//                                 NEW_TRY_END (051117 - ...)                        //
 	///////////////////////////////////////////////////////////////////////////////////////
@@ -209,6 +211,9 @@ public abstract class AbstractAstar
 			// 		//				infoStr += prep2Info;
 			// 	    }
 	    
+			//Tillf
+			long millis = System.currentTimeMillis();
+
 			timer.start();
 			searchCounter = 0;
 
@@ -216,9 +221,14 @@ public abstract class AbstractAstar
 			if (accNode == null)
 				throw new RuntimeException("no marked state found, nr of iteration = " + searchCounter); 
 
-			infoStr += "\tA*-iterations: " + searchCounter + " in time: " + timer.elapsedTime() + " ms.\n";
+			infoStr += "\tA*-iterations (nr of search calls through the closed tree): " + searchCounter + "\n";
+			infoStr += "\tIn time: " + timer.elapsedTime() + " ms\n";
+			infoStr += "\tMillis-time: " + (System.currentTimeMillis() - millis) + "ms\n";
+			infoStr += "\tThe CLOSED tree contains (at the end) " + closedTree.size() + " elements\n";
+			infoStr += "\tMax{OPEN.size} = " + maxOpenSize + "\n";
 			// 	    infoStr += "\t\t"+ printNodeSignature(accNode);
 			infoStr += "\t\t" + "g = " + accNode[accCostIndex];
+			
 			logger.info(infoStr);
 	    
 			return accNode;
@@ -294,14 +304,22 @@ public abstract class AbstractAstar
 			// NEW_TRY_START
 		
 			openTree.clear();
+			closedTree.clear();
+
 			openTree.add(initNode);
 
 			while(! openTree.isEmpty())
 			{
 				searchCounter++;
 
+				// Tillf ...
+				int currOpenSize = openTree.size();
+				if (currOpenSize > maxOpenSize)
+					maxOpenSize = currOpenSize;
+				// ... fram hit
+
 				currNode = openTree.first();
-				
+
 				if (isAcceptingNode(currNode))
 					return currNode;
 
@@ -798,15 +816,11 @@ public abstract class AbstractAstar
 		throws Exception 
 	{
 		// NEW_TRY_START
-logger.info("in getParent()");
+
 		// one object of the closedTree may contain several nodes (that all correspond
 		// to the same logical state but different paths). 
 		int[] parentCandidates = closedTree.get(new Integer(node[parentIndex]));
 
-		if (parentCandidates != null) 
-			logger.info("in getParent(), parentCandidates = " + printArray(parentCandidates) + ", key = " + node[parentIndex]);
-		else
-			logger.info("parentCandidates == null, closedTree.size() = " + closedTree.size() + ", key = " + node[parentIndex]);
 		int nrOfCandidates = parentCandidates.length / node.length;
 
 		if (nrOfCandidates == 1)
@@ -841,7 +855,7 @@ logger.info("in getParent()");
 				}
 			}
 			
-			int[] parentCosts = new int[accCostIndex - currCostIndex + 1];
+			int[] parentCosts = new int[ESTIMATE_INDEX - currCostIndex + 1];
 
 			// The only thing that differs between the candidates is their cost-vectors
 			// So, find the parent that gives correct cost update for the current state
@@ -899,9 +913,7 @@ logger.info("in getParent()");
     public Automaton buildScheduleAutomaton(int[] currNode) 
 		throws Exception
 	{
-		logger.warn("closedKeySet...");
-		for (Iterator<Integer> keys = closedTree.keySet().iterator(); keys.hasNext(); )
-			logger.info("key = " + keys.next().intValue());
+		timer.start();
 
 		Automaton scheduleAuto = new Automaton();
 		scheduleAuto.setComment("Schedule");
@@ -936,7 +948,9 @@ logger.info("in getParent()");
 				throw ex;
 		    }
 	    }
-	
+		
+		logger.info(timer.elapsedTime() + " ms was needed to build the schedule automaton");
+		
 		return scheduleAuto;
     }
     
@@ -954,7 +968,7 @@ logger.info("in getParent()");
     public int[] updateCosts(int[] costs, int changedIndex, int newCost) {
 		int[] newCosts = new int[costs.length];
 
-		for (int i=0; i<costs.length-1; i++) {
+		for (int i=0; i<costs.length-2; i++) {
 			if (i == changedIndex)
 				newCosts[i] = newCost;
 			else {
@@ -965,9 +979,10 @@ logger.info("in getParent()");
 		}
 	
 		// The accumulated cost update
-		newCosts[newCosts.length-2] = costs[costs.length-1] + costs[changedIndex];
+		newCosts[newCosts.length-2] = costs[costs.length-2] + costs[changedIndex];
 
 		// The f-update
+		newCosts[newCosts.length-1] = costs[costs.length-1];
 	
 		return newCosts;
     }

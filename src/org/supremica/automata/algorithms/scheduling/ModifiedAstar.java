@@ -55,13 +55,20 @@ public class ModifiedAstar
 			// 					// TODO: Lägg currNode till closedTree på rätt ställe
 			// 				}
 						
-			updateClosedTree(currNode);
+			boolean currNodeIsAddedToClosed = updateClosedTree(currNode);
 			
-			Iterator childIter = expander.expandNode(currNode, activeAutomataIndex).iterator();
-			while (childIter.hasNext()) {
-				int[] nextNode = (int[])childIter.next();
-				
-				openTree.add(nextNode);
+			if (currNodeIsAddedToClosed)
+			{
+				Iterator childIter = expander.expandNode(currNode, activeAutomataIndex).iterator();
+				while (childIter.hasNext()) 
+				{
+					int[] nextNode = (int[])childIter.next();
+					
+					// Calculate the estimate function of the expanded node and store it at the appropriate position
+					nextNode[ESTIMATE_INDEX] = calcEstimatedCost(nextNode);
+					
+					openTree.add(nextNode);
+				}
 			}
 		}
 		catch (Exception e)
@@ -79,8 +86,12 @@ public class ModifiedAstar
 	 * closedTree. If there are ties (in some directions one node is better than the other, but in others
 	 * it is worse), this node, as well as all the discovered tie nodes are stored in the closedTree
 	 * (note that all examined nodes that are always worse than "node" are discarded).
+	 * 
+	 * @param int[] node - the new node that might be added to the CLOSED tree.
+	 * @return true, if the new node is added to the CLOSED tree
+	 *         false, otherwise.
 	 */
-	private void updateClosedTree(int[] node)
+	private boolean updateClosedTree(int[] node)
 	{
 		// The nodes corresponding to the same logical state (but different paths from the initial state)
 		// as the new node. They are stored as one int[]-variable in the closedTree.
@@ -124,7 +135,7 @@ public class ModifiedAstar
 				if (newNodeIsAlwaysWorse)
 				{
 					closedTree.put(new Integer(getKey(node)), correspondingClosedNodes);
-					return;
+					return false;
 				}
 				// else if the examined node is neither worse nor better, its index is added to the tieIndices
 				else if (! newNodeIsAlwaysWorse && ! newNodeIsAlwaysBetter)
@@ -152,7 +163,10 @@ public class ModifiedAstar
 
 			closedTree.put(new Integer(getKey(node)), newClosedNode);
 		}
+
+		return true;
 	}
+
 	// NEW_START_END
 		
 //     protected void branch(int[] currNode) 
