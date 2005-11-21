@@ -49,25 +49,24 @@
 
 package org.supremica.functionblocks.model;
 
-import java.lang.String;
 
-public class StringVariable extends Variable
+public class ObjectVariable extends Variable
 {
 	
-	private String value = "";
+	private Object value = null;
 
-	public StringVariable(String type, String s)
+	public ObjectVariable(String type, Object o)
 	{
 		super(type);
-		value=s;
+		value=o;
 	}
 
-	public synchronized void setValue(String v)
+	public synchronized void setValue(Object o)
 	{
-		value = v;
+		value = o;
 	}
 
-	public synchronized String getValue()
+	public synchronized Object getValue()
 	{
 		return value;
 		
@@ -75,12 +74,12 @@ public class StringVariable extends Variable
 
 	public Object clone()
 	{
-		return new StringVariable(getType(),getValue());
+		return new ObjectVariable(getType(),getValue());
 	}
-
+	
 	public String toString()
 	{
-		return getType() + " " + value;
+		return getType() + " " + value.toString();
 	}
 
 }

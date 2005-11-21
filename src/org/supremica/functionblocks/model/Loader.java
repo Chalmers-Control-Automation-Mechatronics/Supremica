@@ -479,6 +479,10 @@ public class Loader
 							newFBType.addVariable(curVar.getName(), new StringVariable("DataInput",""));
 						}
 					}
+					else if (curVar.getType().toLowerCase().equals("object"))
+					{
+						newFBType.addVariable(curVar.getName(), new ObjectVariable("DataInput",null));
+					}
 				}
 			}
 
@@ -531,6 +535,10 @@ public class Loader
 						{
 							newFBType.addVariable(curVar.getName(), new StringVariable("DataOutput",""));
 						}
+					}
+					else if (curVar.getType().toLowerCase().equals("object"))
+					{
+						newFBType.addVariable(curVar.getName(), new ObjectVariable("DataOutput",null));
 					}
 				}
 			}
@@ -591,6 +599,10 @@ public class Loader
 					{
 						newBasicFBType.addVariable(curVar.getName(), new StringVariable("Local",""));
 					}
+				}
+				else if (curVar.getType().toLowerCase().equals("object"))
+				{
+					newBasicFBType.addVariable(curVar.getName(), new ObjectVariable("Local",null));
 				}
 			}
 		}

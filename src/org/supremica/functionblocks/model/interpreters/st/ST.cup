@@ -8,13 +8,13 @@ import java.lang.*;
 
 /* Terminals (tokens returned by the scanner). */
 terminal            OR,XOR,AND;
-terminal	    EQ,NEQ;
+terminal			EQ,NEQ;
 terminal            LESS,LESSEQ,MORE,MOREEQ;
 terminal            PLUS,MINUS;
-terminal	    TIMES,DIV,MOD;
-terminal	    POWER;
-terminal	    UMINUS;  	
-terminal            NOT; 
+terminal			TIMES,DIV,MOD;
+terminal			POWER;
+terminal			UMINUS;  	
+terminal			NOT; 
 terminal            LPAREN, RPAREN;
 terminal String	    STRING;
 terminal Integer    INT;

@@ -111,6 +111,11 @@ public class JavaTextAlgorithm extends Algorithm
 						BooleanVariable tmpVar = (BooleanVariable) vars.getVariable(curName); 
 						interpreter.set(curName,tmpVar.getValue().booleanValue());
 					}
+					else if (curVariable instanceof ObjectVariable)
+					{
+						ObjectVariable tmpVar = (ObjectVariable) vars.getVariable(curName); 
+						interpreter.set(curName,tmpVar.getValue());
+					}
 				}
 				catch (Exception e)
 				{
@@ -169,6 +174,12 @@ public class JavaTextAlgorithm extends Algorithm
 						BooleanVariable tmpVar = (BooleanVariable) vars.getVariable(curName); 
 						boolean tmpValue = ((Boolean) interpreter.get(curName)).booleanValue();
 						((BooleanVariable) vars.getVariable(curName)).setValue(tmpValue);
+					}
+					else if (curVariable instanceof ObjectVariable)
+					{
+						ObjectVariable tmpVar = (ObjectVariable) vars.getVariable(curName); 
+						Object tmpValue = (Object) interpreter.get(curName);
+						((ObjectVariable) vars.getVariable(curName)).setValue(tmpValue);
 					}
 				}
 				catch (Exception e)

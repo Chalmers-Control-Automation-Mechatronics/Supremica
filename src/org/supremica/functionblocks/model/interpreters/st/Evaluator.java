@@ -59,6 +59,7 @@ import org.supremica.functionblocks.model.IntegerVariable;
 import org.supremica.functionblocks.model.DoubleVariable;
 import org.supremica.functionblocks.model.FloatVariable;
 import org.supremica.functionblocks.model.BooleanVariable;
+import org.supremica.functionblocks.model.ObjectVariable;
 
 public class Evaluator {
 
@@ -780,6 +781,10 @@ public class Evaluator {
 			{
 				return ((StringVariable) var).getValue();			
 			}
+			else if (var instanceof ObjectVariable)
+			{
+				return ((ObjectVariable) var).getValue();			
+			}		
 		}
 		else if (e instanceof PrimaryString)
 		{

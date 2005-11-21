@@ -21,27 +21,6 @@
       <VarDeclaration Name="AO_REQ_ARGS" Type="STRING" />
     </OutputVars>
   </InterfaceList>
-  <BasicFB>
-    <InternalVars>
-	<VarDeclaration Name="oldValue" Type="BOOL">
-    </InternalVars>
-    <ECC>
-        <ECState Name="Q0" />
-        <ECState Name="Q1" />
-        <ECState Name="NUL0" />
-        <ECState Name="NUL1" />
-        <ECState Name="SET">
-	    <ECAction Algorithm="LATCH" Output="EO"/>
-	</ECState>    
-	<ECTransition Source="NUL1" Destination="Q1" Condition="1" />
-    </ECC>
-    <Algorithm Name="StoreOldValue">
-	<Other Language="Java" Text="
-	    if (AO_RSP_ARGS.substring(0,AO_RSP_ARGS.indexOf(' ')).equals("NEW_SAMPLE"))
-	    {
-		Boolean newValue = new Boolean(AO_RSP_ARGS.substring(AO_RSP_ARGS.indexOf(' ')).lowerCase());
-	    }
-	" />	
-    </Algorithm>
-  </BasicFB>
+  <FBNetwork>
+  </FBNetwork>
 </FBType>
