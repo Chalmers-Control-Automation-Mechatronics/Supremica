@@ -49,9 +49,8 @@
 /*
  * @author cengic
  */
-package org.supremica.apps;
+package org.supremica.functionblocks.model;
 
-import org.supremica.functionblocks.model.*;
 import java.io.File;
 
 public class FBRuntime
