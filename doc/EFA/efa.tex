@@ -100,14 +100,14 @@ g_{q^A\sigma}(x^{A})\quad\quad\quad\quad\quad\quad\quad\sigma\in \Sigma^A\setmin
 g_{q^B\sigma}(x^{B})\quad\quad\quad\quad\quad\quad\quad\sigma\in\Sigma^B\setminus\Sigma^A
 \end{array}\right.
 \end{eqnarray}
-If any one of the guards functions in the above definition are
+If in any of the three cases, the corresponding guard function is
 undefined the guard function for the product $g_{q \sigma}$ is
-also undefined. To simplify the notation further, we use "dummy"
-guard functions in the following way. If $\sigma\in \Sigma^A
-\setminus \Sigma^B$ we introduce fictional guards functions
-$g_{q^B\sigma}(.)=1$ for $B$ and if $\sigma\in\Sigma^B\setminus
-\Sigma^A$ we set $g_{q^A\sigma}(.)=1$. Doing this, we can write
-equation (\ref{guard_sync_1}) as
+also undefined. To simplify the notation and increase readability,
+we use "dummy" guard functions in the following way. If $\sigma\in
+\Sigma^A \setminus \Sigma^B$ we introduce fictional guards
+functions $g_{q^B\sigma}(.)=1$ for $B$ and if
+$\sigma\in\Sigma^B\setminus \Sigma^A$ we set $g_{q^A\sigma}(.)=1$.
+Doing this, we can write equation (\ref{guard_sync_1}) as
 \begin{eqnarray}
 g_{q \sigma}(x)= g_{q^A\sigma}(x^{A})\wedge g_{q^B\sigma}(x^{B}).
 \end{eqnarray}
@@ -115,9 +115,9 @@ The updating functions $a_{q \sigma}(x)$ are defined as
 \begin{eqnarray}\label{action_sync_1}
 a_{q \sigma}(x)=\left\{
 \begin{array}{ll}
- \big(a^A_{q^A \sigma}(x^{A}), a^B_{q^B \sigma}(x^{B})\big)\quad\quad\sigma\in \Sigma^A \cap \Sigma^B\\
-\big(a^A_{q^A\sigma}(x^{A}),x^{B}\big)\quad\quad\quad\quad\quad\sigma\in\Sigma^A\setminus\Sigma^B\\
-\big(x^{A},a^B_{q^B\sigma}(x^{B})\big)\quad\quad\quad\quad\quad\sigma\in\Sigma^B\setminus\Sigma^A
+ \big(a_{q^A \sigma}(x^{A}), a_{q^B \sigma}(x^{B})\big)\quad\quad\sigma\in \Sigma^A \cap \Sigma^B\\
+\big(a_{q^A\sigma}(x^{A}),x^{B}\big)\quad\quad\quad\quad\quad\sigma\in\Sigma^A\setminus\Sigma^B\\
+\big(x^{A},a_{q^B\sigma}(x^{B})\big)\quad\quad\quad\quad\quad\sigma\in\Sigma^B\setminus\Sigma^A
 \end{array}\right.
 \end{eqnarray}
 As in the definition of the guard functions (\ref{guard_sync_1}),
@@ -131,14 +131,13 @@ $a_{q^A\sigma}(x^A)=x^A$. With this convention equation
 (\ref{action_sync_1}) simplifies to
 \begin{eqnarray}
 a_{q \sigma}(x)=
- \big(a^A_{q^A \sigma}(x^{A}), a^B_{q^B \sigma}(x^{B})\big).
+ \big(a_{q^A \sigma}(x^{A}), a_{q^B \sigma}(x^{B})\big).
 \end{eqnarray}
 
 
- The transition function
-$\delta(q,\sigma,x)$ is defined from $\delta^A$ and $\delta^B$ as
+ The transition function $\delta^{A||B}$ is defined from $\delta^A$ and $\delta^B$ as
 \begin{eqnarray}
-\delta(q,\sigma,x)=\left\{
+\delta^{A||B}(q,\sigma,x)=\left\{
 \begin{array}{ll}
 \big(\delta^A(q^A,\sigma),\delta^B(q^B,\sigma),a_{q \sigma}(x)\big) \quad\quad \sigma\in \Sigma^A \cap \Sigma^B \quad g_{q \sigma}(x)=1\\
 \big(\delta^A(q^A,\sigma),q^B,a_{q \sigma}(x)\big) \quad\quad\quad\quad\quad \sigma\in \Sigma^A \setminus \Sigma^B \quad g_{q \sigma}(x)=1\\
@@ -147,6 +146,30 @@ $\delta(q,\sigma,x)$ is defined from $\delta^A$ and $\delta^B$ as
 undefined}\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad
 g_{q\sigma}(x)=0
 \end{array}\right.
+\end{eqnarray}
+
+\subsubsection{Properties of the product}
+$(A||B)||C$:
+
+\begin{eqnarray}
+g^{(A||B)||C}_{q \sigma}(x)&=& g_{q^{AB}\sigma}(x^{AB})\wedge
+g_{q^C\sigma}(x^{C})\nonumber\\
+&=&g_{q^A\sigma}(x^{A})\wedge g_{q^B\sigma}(x^{B})\wedge
+g_{q^C\sigma}(x^{C})\nonumber\\
+&=& g_{q^{A}\sigma}(x^{A})\wedge g_{q^{BC}\sigma}(x^{BC})\nonumber\\
+&=& g^{A||(B||C)}_{q \sigma}(x)
+\end{eqnarray}
+
+\begin{eqnarray}
+a^{(A||B)||C}_{q \sigma}(x)&=&
+ \big(a_{q^{AB} \sigma}(x^{AB}), a_{q^{C}
+ \sigma}(x^{C})\big)\nonumber\\
+&=&\big(a_{q^{A} \sigma}(x^{A}), a_{q^{B}
+ \sigma}(x^{B}), a_{q^{C}
+ \sigma}(x^{C})\big)\nonumber\\
+&=&\big(a_{q^{A} \sigma}(x^{A}), a_{q^{BC}
+ \sigma}(x^{BC})\big)\nonumber\\
+&=&a^{A||(B||C)}_{q \sigma}(x)
 \end{eqnarray}
 
 The synchronous product $A||B$ of two FSA $A$ and $B$ can be
