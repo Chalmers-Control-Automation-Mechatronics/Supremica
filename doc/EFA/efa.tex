@@ -225,6 +225,25 @@ The transitions correspond to the action functions and they are enabled if the g
 - Synchronize all automata $A_{x_k}$, $k=1,...,n$ and $A'$.\\
 - Change back to original event names.
 \newpage
+\subsection{Translating hierarchical structures to EFA's}
+It is well known that hierarchical structures of states and
+transitions reduce the descriptive complexity of automata models.
+We shall in this section show how the hierarchy in state charts
+can be translated into EFA's.
+
+In what follows, states are represented by boxes and hierarchy is
+illustrated by being inside or outside the boxes. Arrows between
+states represents transitions and are labelled with the lower case
+Greek letters, $\alpha$-$\omega$. An arrow that leaves a box
+applies to all sub-states inside the box. The common way to enter
+a group of states its by the system's history in that group. The
+simplest way of doing this is to enter the most recently visited
+state in the group. Hierarchical structures with quite general
+history functions can easily be translated into EFA's.
+
+
+
+
 \subsection{Synchronous composition of EFA's with common variables}
 
 The synchronous composition of two EFA's $A=\langle Q^A, \Sigma^A,
