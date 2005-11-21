@@ -899,6 +899,10 @@ logger.info("in getParent()");
     public Automaton buildScheduleAutomaton(int[] currNode) 
 		throws Exception
 	{
+		logger.warn("closedKeySet...");
+		for (Iterator<Integer> keys = closedTree.keySet().iterator(); keys.hasNext(); )
+			logger.info("key = " + keys.next().intValue());
+
 		Automaton scheduleAuto = new Automaton();
 		scheduleAuto.setComment("Schedule");
 	
