@@ -35,7 +35,7 @@
 	  <ECState Name="Q2">
 	    <ECAction Algorithm="StoreValue" />
 	  </ECState>    
-	  <ECTransition Source="INIT" Destination="Q1" Condition="AO_REQ AND AO_REQ_ARGS=&#34;CURRENT_VALUE&#34;" />
+	  <ECTransition Source="INIT" Destination="Q1" Condition="AO_REQ AND AO_REQ_ARGS = &#34;CURRENT_VALUE&#34;" />
 	  <ECTransition Source="Q1" Destination="INIT" Condition="1" />
 	  <ECTransition Source="INIT" Destination="Q2" Condition="NEW_SAMPLE" />
 	  <ECTransition Source="Q2" Destination="Q1" Condition="1" />

@@ -3,28 +3,24 @@
   <VersionInfo Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2005-11-21" />
   <InterfaceList>
     <EventInputs>
-      <Event Name="RSP" Type="AO_EVENT" >
-        <With Var="RSP_ARGS" />
+      <Event Name="CURRENT_EVENT" />
+      <Event Name="WRITE" >
+        <With Var="VALUE" />
       </Event>
     </EventInputs>
     <EventOutputs>
-      <Event Name="NEW_SAMPLE" >
-        <With Var="NEW_SAMPLE_ARG" />
+      <Event Name="REQ" Type="AO_EVENT" >
+        <With Var="REQ_ARGS" />
       </Event>
     </EventOutputs>
     <InputVars>
-      <VarDeclaration Name="RSP_ARGS" Type="STRING" />
+      <VarDeclaration Name="VALUE" Type="BOOL" />
     </InputVars>
     <OutputVars>
-      <VarDeclaration Name="NEW_SAMPLE_ARG" Type="BOOL" />
+      <VarDeclaration Name="REQ_ARGS" Type="STRING" />
     </OutputVars>
   </InterfaceList>
   <BasicFB>
-    <InternalVars>
-	  <VarDeclaration Name="returnToInit" Type="BOOL" />
-	  <VarDeclaration Name="cmdArgs" Type="STRING" />
-	  <VarDeclaration Name="cmd1" Type="BOOL" />
-	</InternalVars>
     <ECC>
 	  <ECState Name="INIT" />
 	  <ECState Name="PARSE_CMD">

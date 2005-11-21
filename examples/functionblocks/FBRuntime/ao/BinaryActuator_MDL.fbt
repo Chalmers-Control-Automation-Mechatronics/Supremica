@@ -40,9 +40,9 @@
 	    <ECAction Algorithm="StoreValue" />
 	  </ECState>    
 
-	  <ECTransition Source="INIT" Destination="Q1" Condition="AO_REQ AND AO_REQ_ARGS=&#34;CURRENT_VALUE&#34;" />
+	  <ECTransition Source="INIT" Destination="Q1" Condition="AO_REQ AND AO_REQ_ARGS = &#34;CURRENT_VALUE&#34;" />
 	  <ECTransition Source="Q1" Destination="INIT" Condition="1" />
-	  <ECTransition Source="INIT" Destination="Q2" Condition="AO_REQ AND AO_REQ_ARGS=&#34;WRITE&#34;" />
+	  <ECTransition Source="INIT" Destination="Q2" Condition="AO_REQ AND AO_REQ_ARGS = &#34;WRITE&#34;" />
 	  <ECTransition Source="Q2" Destination="Q3" Condition="WRITE_DONE" />
 	  <ECTransition Source="Q3" Destination="Q1" Condition="1" />
 	</ECC>

@@ -39,8 +39,8 @@
 
 	<DataConnections>
 	  <Connection Source="AO_RSP_ARGS" Destination="rsp_parser.RSP_ARGS" />
-	  <Connection Source="rsp_parser.NEW_SAMPLE_ARG" Destination="rising_edge_detector.QI" />
-	  <Connection Source="rsp_parser.NEW_SAMPLE_ARG" Destination="falling_edge_detector.QI" />
+	  <Connection Source="rsp_parser.VALUE" Destination="rising_edge_detector.QI" />
+	  <Connection Source="rsp_parser.VALUE" Destination="falling_edge_detector.QI" />
 	</DataConnections>
 
   </FBNetwork>
