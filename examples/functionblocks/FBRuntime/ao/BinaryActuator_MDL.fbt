@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="Sensor_MDL" >
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="BinaryActuator_MDL" >
   <VersionInfo Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2005-11-13" />
   <InterfaceList>
     <EventInputs>
       <Event Name="AO_REQ" Type="AO_EVENT" >
         <With Var="AO_REQ_ARGS" />
       </Event>
-      <Event Name="NEW_SAMPLE" >
-        <With Var="VALUE" />
-      </Event>
     </EventInputs>
     <EventOutputs>
       <Event Name="AO_RSP" Type="AO_EVENT" >
         <With Var="AO_RSP_ARGS" />
       </Event>
+      <Event Name="WRITE" >
+        <With Var="VALUE" />
+      </Event>
+      <Event Name="WRITE_DONE" />
     </EventOutputs>
     <InputVars>
       <VarDeclaration Name="AO_REQ_ARGS" Type="STRING" />
@@ -25,31 +26,36 @@
   </InterfaceList>
   <BasicFB>
     <InternalVars>
-        <VarDeclaration Name="curValue" Type="BOOL" />
+      <VarDeclaration Name="curValue" Type="BOOL" />
     </InternalVars>
     <ECC>
-      <ECState Name="INIT" />
-      <ECState Name="Q1">
+	  <ECState Name="INIT" />
+	  <ECState Name="Q1">
 	    <ECAction Algorithm="SendValue" Output="AO_RSP"/>
 	  </ECState>    
 	  <ECState Name="Q2">
+	    <ECAction Algorithm="WriteValue" Output="WRITE" />
+	  </ECState>    
+	  <ECState Name="Q3">
 	    <ECAction Algorithm="StoreValue" />
 	  </ECState>    
+
 	  <ECTransition Source="INIT" Destination="Q1" Condition="AO_REQ AND AO_REQ_ARGS=&#34;CURRENT_VALUE&#34;" />
 	  <ECTransition Source="Q1" Destination="INIT" Condition="1" />
-	  <ECTransition Source="INIT" Destination="Q2" Condition="NEW_SAMPLE" />
-	  <ECTransition Source="Q2" Destination="Q1" Condition="1" />
-    </ECC>
+	  <ECTransition Source="INIT" Destination="Q2" Condition="AO_REQ AND AO_REQ_ARGS=&#34;WRITE&#34;" />
+	  <ECTransition Source="Q2" Destination="Q3" Condition="WRITE_DONE" />
+	  <ECTransition Source="Q3" Destination="Q1" Condition="1" />
+	</ECC>
+
     <Algorithm Name="SendValue">
-      <Other Language="Java" Text="
-	    AO_RSP_ARGS = &#34;SAMPLE &#34; + curValue.toString();
-	  " />	
+      <Other Language="Java" Text="AO_RSP_ARGS = &#34;CURRENT_VALUE&#34; + curValue.toString();" />	
+    </Algorithm>
+    <Algorithm Name="WriteValue">
+      <Other Language="Java" Text="VALUE = new Boolean(AO_REQ_ARGS).booleanValue();" />	
     </Algorithm>
     <Algorithm Name="StoreValue">
-      <Other Language="Java" Text="
-	    curValue = VALUE;
-		AO_RSP_ARGS = &#34;SAMPLE &#34; + curValue.toString();
-      " />	
+      <Other Language="Java" Text="curValue = VALUE;" />	
     </Algorithm>
+
   </BasicFB>
 </FBType>

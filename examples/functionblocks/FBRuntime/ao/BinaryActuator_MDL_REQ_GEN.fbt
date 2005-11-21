@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="Sensor_MDL_RSP_PARSE" >
-  <VersionInfo Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2005-11-18" />
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="BinaryActuator_MDL_REQ_GEN" >
+  <VersionInfo Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2005-11-21" />
   <InterfaceList>
     <EventInputs>
       <Event Name="RSP" Type="AO_EVENT" >
@@ -8,15 +8,15 @@
       </Event>
     </EventInputs>
     <EventOutputs>
-      <Event Name="SAMPLE" >
-        <With Var="SAMPLE_ARG" />
+      <Event Name="NEW_SAMPLE" >
+        <With Var="NEW_SAMPLE_ARG" />
       </Event>
     </EventOutputs>
     <InputVars>
       <VarDeclaration Name="RSP_ARGS" Type="STRING" />
     </InputVars>
     <OutputVars>
-      <VarDeclaration Name="SAMPLE_ARG" Type="BOOL" />
+      <VarDeclaration Name="NEW_SAMPLE_ARG" Type="BOOL" />
     </OutputVars>
   </InterfaceList>
   <BasicFB>
@@ -31,7 +31,7 @@
 		<ECAction Algorithm="ParseCmd" />
 	  </ECState>    
       <ECState Name="PARSE_CMD1_ARGS">
-          <ECAction Algorithm="ParseCmd1Args" Output="SAMPLE" />
+          <ECAction Algorithm="ParseCmd1Args" Output="NEW_SAMPLE" />
 	  </ECState>    
 	  <ECTransition Source="INIT" Destination="PARSE_CMD" Condition="RSP" />
 	  <ECTransition Source="PARSE_CMD" Destination="PARSE_CMD1_ARGS" Condition="cmd1" />
@@ -54,7 +54,7 @@
     </Algorithm>
     <Algorithm Name="ParseCmd1Args">
       <Other Language="Java" Text="
-	    SAMPLE_ARG = (new Boolean(cmdArgs)).booleanValue();
+	    NEW_SAMPLE_ARG = (new Boolean(cmdArgs)).booleanValue();
 	  " />	
     </Algorithm>
   </BasicFB>

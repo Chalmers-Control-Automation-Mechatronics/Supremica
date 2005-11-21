@@ -9,7 +9,7 @@
         <FB Name="splitEO0" Type="E_SPLIT2" />
         <FB Name="splitEO1" Type="E_SPLIT2" />
         <FB Name="ff" Type="E_D_FF" />
-        <FB Name="not" Type="Not" />
+        <FB Name="not" Type="E_NOT" />
         <FB Name="switch" Type="E_SWITCH" />
         <FB Name="prtEO0" Type="Print" />
         <FB Name="prtEO1" Type="Print" />
