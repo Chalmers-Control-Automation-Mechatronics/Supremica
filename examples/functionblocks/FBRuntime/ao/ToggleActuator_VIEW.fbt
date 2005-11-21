@@ -6,13 +6,12 @@
       <Event Name="AO_RSP" Type="AO_EVENT" >
         <With Var="AO_RSP_ARGS" />
       </Event>
+      <Event Name="TOGGLE" />
     </EventInputs>
     <EventOutputs>
       <Event Name="AO_REQ" Type="AO_EVENT" >
         <With Var="AO_REQ_ARGS" />
       </Event>
-      <Event Name="RISING_EDGE" />
-      <Event Name="FALLING_EDGE" />
     </EventOutputs>
     <InputVars>
       <VarDeclaration Name="AO_RSP_ARGS" Type="STRING" />
@@ -29,17 +28,17 @@
 	
 	<EventConnections>
 	  <Connection Source="AO_RSP" Destination="rsp_parser.RSP" />
-	  <Connection Source="rsp_parser.NEW_SAMPLE" Destination="split.EI" />
-	  <Connection Source="split.EO1" Destination="rising_edge_detector.EI" />
-	  <Connection Source="split.EO2" Destination="falling_edge_detector.EI" />
-	  <Connection Source="rising_edge_detector.EO" Destination="RISING_EDGE" />
-	  <Connection Source="falling_edge_detector.EO" Destination="FALLING_EDGE" />
+	  <Connection Source="rsp_parser.CURRENT_VALUE" Destination="not.EI" />
+	  <Connection Source="not.EO" Destination="req_gen.WRITE" />
+	  <Connection Source="req_gen.REQ" Destination="AO_REQ" />
+	  <Connection Source="TOGGLE" Destination="req_gen.CURRENT_VALUE" />
   	</EventConnections>
 
 	<DataConnections>
 	  <Connection Source="AO_RSP_ARGS" Destination="rsp_parser.RSP_ARGS" />
-	  <Connection Source="rsp_parser.NEW_SAMPLE_ARG" Destination="rising_edge_detector.QI" />
-	  <Connection Source="rsp_parser.NEW_SAMPLE_ARG" Destination="falling_edge_detector.QI" />
+	  <Connection Source="rsp_parser.VALUE" Destination="not.A" />
+	  <Connection Source="not.AN" Destination="req_gen.VALUE" />
+	  <Connection Source="req_gen.REQ_ARGS" Destination="AO_REQ_ARGS" />
 	</DataConnections>
 
   </FBNetwork>
