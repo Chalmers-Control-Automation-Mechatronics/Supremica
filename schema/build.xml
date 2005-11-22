@@ -1,4 +1,4 @@
-<project name="waters" default="jar">
+<project name="schema" default="jar">
   <description>
   </description>
 
@@ -18,7 +18,7 @@
     <pathelement path="${jwsdp.classpath}"/>
   </path>
 
-  <target name="gen" description="Generate JAXB classes.">
+  <target name="gen_61499" description="Generate JAXB classes.">
     <taskdef name="xjc" classname="com.sun.tools.xjc.XJCTask">
       <classpath>
         <pathelement path="${jwsdp.classpath}"/>
@@ -35,6 +35,19 @@
     <xjc target="${src}" extension="true" removeOldOutput="yes" package="org.supremica.functionblocks.xsd.libraryelement">
       <schema dir="${xsd_61499}" includes="LibraryElement.xsd"/>
       <produces dir="${src}/org/supremica/functionblocks/xsd/libraryelement"/>
+    </xjc>
+  </target>
+
+
+  <target name="gen_Factory" description="Generate JAXB classes.">
+    <taskdef name="xjc" classname="com.sun.tools.xjc.XJCTask">
+      <classpath>
+        <pathelement path="${jwsdp.classpath}"/>
+      </classpath>
+    </taskdef>
+    <xjc target="" extension="true" removeOldOutput="yes" package="">
+      <schema file="Factory.xsd" />
+      <produces dir="" />
     </xjc>
   </target>
 
