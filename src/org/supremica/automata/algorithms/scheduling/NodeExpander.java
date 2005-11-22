@@ -262,12 +262,15 @@ public class NodeExpander {
      *                         Auxiliary methods                           *
      ***********************************************************************/
 
+	// Ändra detta oxo (ClosedNodes.CLOSED_NODE_INFO...)
     private int[] makeParentNodeKeys(int[] node) {
 		if (node == null) 
 			return new int[]{-1, -1};
 	
 		int key = sched.getKey(node);
-		int nodeArrayIndex = sched.getClosedNodes().getArrayIndexForNode(key, node);
+		
+		// parentNodeKeys kan strax ändras till att vara int och inte int[].
+		int nodeArrayIndex = -1; //sched.getClosedNodes().getArrayIndexForNode(key, node);
 
 		return new int[]{key, nodeArrayIndex};
     }
@@ -279,7 +282,8 @@ public class NodeExpander {
 	 */
     public int[] makeNode(int[] stateIndices, int[] parentNodeKeys, int[] costs) {
 		if (parentNodeKeys == null) {
-			parentNodeKeys = new int[ClosedNodes.CLOSED_NODE_INFO_SIZE];
+			// Ändra detta
+			parentNodeKeys = new int[2]; //new int[ClosedNodes.CLOSED_NODE_INFO_SIZE];
 			for (int i=0; i<parentNodeKeys.length; i++)
 				parentNodeKeys[i] = -1;
 		}
@@ -299,7 +303,8 @@ public class NodeExpander {
     }
 
     public int[] getCosts(int[] node) {
-		int startIndex = theAutomata.size() + AutomataIndexFormHelper.STATE_EXTRA_DATA + ClosedNodes.CLOSED_NODE_INFO_SIZE;
+		// Ändra detta
+		int startIndex = theAutomata.size() + AutomataIndexFormHelper.STATE_EXTRA_DATA + 2; //ClosedNodes.CLOSED_NODE_INFO_SIZE;
 		int[] costs = new int[node.length - startIndex];
 	
 		for (int i=0; i<costs.length; i++)
