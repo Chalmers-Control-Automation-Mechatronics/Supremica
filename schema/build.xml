@@ -11,6 +11,7 @@
   <property name="jar.file" location="${jar}/waters.jar"/>
   <property name="javadoc" location="java/docs"/>
   <property name="xsd_61499" location="iec61499/xsd"/>
+  <property name="xsd_manufacturingTables" location="manufacturingTables/xsd"/>
   <property name="xsl" location="${xml}/xsl"/>
 
 
@@ -39,15 +40,15 @@
   </target>
 
 
-  <target name="gen_Factory" description="Generate JAXB classes.">
+  <target name="gen_ManufacturingTables" description="Generate JAXB classes.">
     <taskdef name="xjc" classname="com.sun.tools.xjc.XJCTask">
       <classpath>
         <pathelement path="${jwsdp.classpath}"/>
       </classpath>
     </taskdef>
-    <xjc target="" extension="true" removeOldOutput="yes" package="">
-      <schema file="Factory.xsd" />
-      <produces dir="" />
+    <xjc target="${src}" extension="true" removeOldOutput="yes" package="org.supremica.manufacturingTables.xsd.factory">
+      <schema dir="${xsd_manufacturingTables}" includes="Factory.xsd"/>
+      <produces dir="${src}/org/supremica/manufacturingTables/xsd/factory"/>
     </xjc>
   </target>
 
