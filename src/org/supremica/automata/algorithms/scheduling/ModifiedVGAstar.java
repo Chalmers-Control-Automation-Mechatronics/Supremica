@@ -63,7 +63,7 @@ public class ModifiedVGAstar
     protected void initAuxIndices() {
 		super.initAuxIndices();
 
-		effCostIndex = accCostIndex + 1;
+		effCostIndex = ACCUMULATED_COST_INDEX + 1;
     }
 
     protected String printNodeSignature(int[] node) {
@@ -143,8 +143,8 @@ public class ModifiedVGAstar
 // 					// 		    if ((currFromNode[0] == currOpenNode[0]) && (currFromNode[1] == currOpenNode[1])) {
 // 					if (currFromNode.equals(currOpenNode)) {
 // 						str += "(q" + currFromNode[0] + "_q" + currFromNode[1] + ") -> ";
-// 						str += "g = " + currOpenNode[accCostIndex] + " ";
-// 						str += "Tv = [" + currOpenNode[currCostIndex] + " " + currOpenNode[currCostIndex+1] + "] ";
+// 						str += "g = " + currOpenNode[ACCUMULATED_COST_INDEX] + " ";
+// 						str += "Tv = [" + currOpenNode[CURRENT_COSTS_INDEX] + " " + currOpenNode[CURRENT_COSTS_INDEX+1] + "] ";
 // 						str += "eff = [" + currOpenNode[effCostIndex] + " " + currOpenNode[effCostIndex+1] + "]";
 
 // 						if (vgBuilder.isVisible(getEffCost(currFromNode)))
@@ -156,8 +156,8 @@ public class ModifiedVGAstar
 // 						// 			int[] initial = makeInitialNode();
 // 						str += "(q0_q0) -> ";
 // 						str += "g = 0 ";
-// 						// 			str += "Tv = [" + initial[currCostIndex] + " " + initial[currCostIndex+1] + "] ";
-// 						str += "Tv = [" + currFromNode[currCostIndex] + " " + currFromNode[currCostIndex+1] + "] ";
+// 						// 			str += "Tv = [" + initial[CURRENT_COSTS_INDEX] + " " + initial[CURRENT_COSTS_INDEX+1] + "] ";
+// 						str += "Tv = [" + currFromNode[CURRENT_COSTS_INDEX] + " " + currFromNode[CURRENT_COSTS_INDEX+1] + "] ";
 // 						str += "eff = [0 0]";
 
 // 						if (vgBuilder.isVisible(getEffCost(currFromNode)))
@@ -185,8 +185,8 @@ public class ModifiedVGAstar
 		try {
 			String str = nodeNr + "> ";
 			str += "(q" + node[0] + "_q" + node[1] + ") -> ";
-			str += "g = " + node[accCostIndex] + " ";
-			str += "Tv = [" + node[currCostIndex] + " " + node[currCostIndex+1] + "] ";
+			str += "g = " + node[ACCUMULATED_COST_INDEX] + " ";
+			str += "Tv = [" + node[CURRENT_COSTS_INDEX] + " " + node[CURRENT_COSTS_INDEX+1] + "] ";
 			str += "eff = [" + node[effCostIndex] + " " + node[effCostIndex+1] + "]";
 
 			w.write(str);
@@ -289,7 +289,7 @@ public class ModifiedVGAstar
 	    
 			int[] delta = new int[]{nextNode[effCostIndex] - currStartNode[effCostIndex], nextNode[effCostIndex+1] - currStartNode[effCostIndex+1]};
 
-			for (int j=accCostIndex; j<currNode.length; j++)
+			for (int j=ACCUMULATED_COST_INDEX; j<currNode.length; j++)
 				currNode[j] = currStartNode[j];
 
 			str += "[" + currStartNode[effCostIndex] + ", " + currStartNode[effCostIndex+1] + "] ---> [" + nextNode[effCostIndex] + ", " + nextNode[effCostIndex+1] + "]";
@@ -371,13 +371,13 @@ public class ModifiedVGAstar
 					//Uppdateringen klar
 		
 					for (int j=0; j<delta.length; j++) 
-						currNode[currCostIndex + j] *= delta[j];
+						currNode[CURRENT_COSTS_INDEX + j] *= delta[j];
 				}
 
 				double pathTime = 0;
 				while ((pathTime + currStartNode[effCostIndex] != nextNode[effCostIndex]) || (pathTime + currStartNode[effCostIndex+1] != nextNode[effCostIndex+1])) {
 					int fastestIndex = 0;
-					if (currNode[currCostIndex] > currNode[currCostIndex+1])
+					if (currNode[CURRENT_COSTS_INDEX] > currNode[CURRENT_COSTS_INDEX+1])
 						fastestIndex = 1;	    
 		    
 					Iterator childIt = expander.expandNode(currNode, new int[]{activeAutomataIndex[fastestIndex]}).iterator();
@@ -391,20 +391,20 @@ public class ModifiedVGAstar
 					}
 
 					int[] child = (int[]) childIt.next();
-					child[currCostIndex + fastestIndex] *= delta[fastestIndex];
+					child[CURRENT_COSTS_INDEX + fastestIndex] *= delta[fastestIndex];
 
 					currNode = child;
 
 					pathTime = ((double)(currNode[effCostIndex] - currStartNode[effCostIndex]))/divisor;
 
 					//utskrift - tillfälligt
-					double g = ((double)(currNode[accCostIndex] - currStartNode[accCostIndex]))/divisor + currStartNode[accCostIndex];
+					double g = ((double)(currNode[ACCUMULATED_COST_INDEX] - currStartNode[ACCUMULATED_COST_INDEX]))/divisor + currStartNode[ACCUMULATED_COST_INDEX];
 					double[] eff = new double[2];
 					for (int j=0; j<eff.length; j++) 
 						eff[j] = ((double)(currNode[effCostIndex+j] - currStartNode[effCostIndex+j]))/divisor + currStartNode[effCostIndex+j];
 					double[] tv = new double[2];
 					for (int j=0; j<tv.length; j++) 
-						tv[j] = ((double) currNode[currCostIndex+j])/divisor;
+						tv[j] = ((double) currNode[CURRENT_COSTS_INDEX+j])/divisor;
 
 					logger.info(printNodeName(currNode) + "; Tv = [" + tv[0] + " " + tv[1] + "]; g = " + g + "; eff = " + printArray(eff));
 

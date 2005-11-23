@@ -45,16 +45,10 @@ public class ModifiedAstar
 		super(theAutomata, heuristic, manualExpansion, iterativeSearch);
     }
 
-	// NEW_TRY_START
 	protected void branch(int[] currNode) 
 	{
 		try 
 		{
-			// 				if (! isClosed(currNode))
-			// 				{
-			// 					// TODO: Lägg currNode till closedTree på rätt ställe
-			// 				}
-						
 			boolean currNodeIsAddedToClosed = updateClosedTree(currNode);
 			
 			if (currNodeIsAddedToClosed)
@@ -76,134 +70,6 @@ public class ModifiedAstar
 			e.printStackTrace();
 		}
 	}
-	
-	/**
-	 * This method puts the node "node" in the right place on the closedTree if the tree does not already
-	 * contain any nodes that correspond to the same logical states than this node. 
-	 * Otherwise, the method compares this node to those already examined. If this node is worse 
-	 * (more expensive in every future direction) that any already examined node, it is discarded. 
-	 * Conversely, if it is better than every examined node, this node is the only one to be stored in the 
-	 * closedTree. If there are ties (in some directions one node is better than the other, but in others
-	 * it is worse), this node, as well as all the discovered tie nodes are stored in the closedTree
-	 * (note that all examined nodes that are always worse than "node" are discarded).
-	 * 
-	 * @param int[] node - the new node that might be added to the CLOSED tree.
-	 * @return true, if the new node is added to the CLOSED tree
-	 *         false, otherwise.
-	 */
-	private boolean updateClosedTree(int[] node)
-	{
-		// The nodes corresponding to the same logical state (but different paths from the initial state)
-		// as the new node. They are stored as one int[]-variable in the closedTree.
-		int[] correspondingClosedNodes = closedTree.remove(new Integer(getKey(node)));
-
-		// If the node (or its logical state collegues) has not yet been put on the closedTree, 
-		// then it is simply added to CLOSED.
-		if (correspondingClosedNodes == null)
-		{
-			closedTree.put(new Integer(getKey(node)), node);
-		}
-		else
-		{
-			// The internal indices of the nodes that can be either better or worse (cheaper or more expensive)
-			// than the current node, depending on the future path ("internal index" meaning the node's number in the 
-			// correspondingClosedNodes-int[]-array).
-			ArrayList<Integer> tieIndices = new ArrayList<Integer>();
-
-			int nodeLength = node.length;
-			int nrOfClosedNodes = correspondingClosedNodes.length / nodeLength;
-
-			// Each "internal" node should be compared to the current node 
-			for (int i=0; i<nrOfClosedNodes; i++)
-			{
-				boolean newNodeIsAlwaysWorse = true;
-				boolean newNodeIsAlwaysBetter = true;
-
-				// The comparison is done for Tv_new[i] + g_new <> Tv_old[i] + g_old (forall i)
-				for (int j=currCostIndex; j<accCostIndex; j++)
-				{
-					int currCostDiff = (node[j] + node[accCostIndex]) - (correspondingClosedNodes[j + i*nodeLength] + correspondingClosedNodes[accCostIndex + i*nodeLength]);
-
-					if (currCostDiff < 0)
-						newNodeIsAlwaysWorse = false;
-					else if (currCostDiff > 0)
-						newNodeIsAlwaysBetter = false;
-				}
-
-				// If the new node is worse than any already examined node in every future direction,
-				// it is thrown away;
-				if (newNodeIsAlwaysWorse)
-				{
-					closedTree.put(new Integer(getKey(node)), correspondingClosedNodes);
-					return false;
-				}
-				// else if the examined node is neither worse nor better, its index is added to the tieIndices
-				else if (! newNodeIsAlwaysWorse && ! newNodeIsAlwaysBetter)
-					tieIndices.add(new Integer(i));					
-			}
-
-			// Only ties (and the new node) are kept for the update of the closedTree. 
-			int[] newClosedNode = new int[(tieIndices.size() + 1)*nodeLength];
-
-			// The tie-nodes (if there are any) are copied to the new closedNode
-			for (int i=0; i<tieIndices.size(); i++)
-			{
-				int currExaminedNodesIndex = tieIndices.get(i).intValue();
-				for (int j=0; j<nodeLength; j++) 
-				{
-					newClosedNode[j + i*nodeLength] = correspondingClosedNodes[j + currExaminedNodesIndex*nodeLength];
-				}
-			}
-			
-			// The latest addition to the node-family (int[] node) is also added to the new closedNode
-			for (int j=0; j<nodeLength; j++)
-			{
-				newClosedNode[j + tieIndices.size()*nodeLength] = node[j];
-			}
-
-			closedTree.put(new Integer(getKey(node)), newClosedNode);
-		}
-
-		return true;
-	}
-
-	// NEW_START_END
-		
-//     protected void branch(int[] currNode) 
-// 	{
-// 		try 
-// 		{
-// 			if (!isOnAList(currNode)) 
-// 			{
-// 				closedNodes.putNode(getKey(currNode), currNode);
-
-// 				// Tillfälligt bortkommenterat
-// 				// 	    useOneProdRelax = false;
-// 				// 	    if (activeAutomataIndex.length <= 2 || plantAutomata.size() <= 2)
-// 				// 		useOneProdRelax = true;
-		
-// 				Iterator childIter = expander.expandNode(currNode, activeAutomataIndex).iterator();
-// 				while (childIter.hasNext()) {
-// 					int[] nextNode = (int[])childIter.next();
-	    
-// 					// 	    try {
-// 					//  		    if (!isOnAList(nextNode)) {
-// 					putOnOpenList(nextNode);
-// 					//  		    }
-// 				}
-// 			}
-// 		}
-// 		catch (Exception e) 
-// 		{
-// 			e.printStackTrace();
-			
-// 			//tillfälligt
-// 			System.exit(0);
-// 		}
-// 		// 	    else
-// 		// 		logger.info("-- " + printArray(nextNode));
-// 		//     }
-//     }
 	
 	/**
 	 * Converts the representation of the initial state to the int[]-representation of a node. 

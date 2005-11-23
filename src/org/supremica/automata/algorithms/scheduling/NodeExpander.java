@@ -152,8 +152,7 @@ public class NodeExpander {
   
 	//     public int[] expandToGoal(int[] node) {
 	// 	if (!sched.isAccepting(node)) {
-	// 	    int currCostIndex = sched.getCurrCostIndex();
-	// 	    int minCost = node[currCostIndex];
+	// 	    int minCost = node[AbstractAstar.CURRENT_COSTS_INDEX];
 	// 	    int minCostIndex = 0;
 	    
 	// 	    for (int i=0; i<sched.getActiveLength(); i++) {
@@ -163,7 +162,7 @@ public class NodeExpander {
 	// 		LabeledEvent outgoingEvent = st.outgoingArcsIterator().nextArc().getEvent();
 		
 	// 		if (isEnabled(node, outgoingEvent)) {
-	// 		    int currCost = node[i + currCostIndex];
+	// 		    int currCost = node[i + AbstractAstar.CURRENT_COSTS_INDEX];
 		    
 	// 		    if (currCost < minCost) {
 	// 			minCost = currCost;
