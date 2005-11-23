@@ -23,12 +23,13 @@
   <BasicFB>
     <ECC>
 	  <ECState Name="INIT" />
-	  <ECState Name="PARSE_CMD">
-		<ECAction Algorithm="ParseCmd" />
+	  <ECState Name="GEN_CURRENT_EVENT">
+		<ECAction Algorithm="GenCurrentEvent" />
 	  </ECState>    
-      <ECState Name="PARSE_CMD1_ARGS">
-          <ECAction Algorithm="ParseCmd1Args" Output="NEW_SAMPLE" />
+	  <ECState Name="GEN_WRITE">
+		<ECAction Algorithm="GenCurrentEvent" />
 	  </ECState>    
+
 	  <ECTransition Source="INIT" Destination="PARSE_CMD" Condition="RSP" />
 	  <ECTransition Source="PARSE_CMD" Destination="PARSE_CMD1_ARGS" Condition="cmd1" />
 	  <ECTransition Source="PARSE_CMD" Destination="INIT" Condition="returnToInit" />
