@@ -917,6 +917,12 @@ public abstract class AbstractAstar
 		return s;
     }
    
+	/**
+	 * Returns true if all the states that this node represents are accepting.
+	 *
+	 * @param int[] node - the current node
+	 * @return boolean isAccepting - true if all the corresponing states are accepting
+	 */
     protected boolean isAcceptingNode(int[] node) {
 		for (int i=0; i<activeAutomataIndex.length; i++) {
 			int index = activeAutomataIndex[i];
@@ -927,6 +933,14 @@ public abstract class AbstractAstar
 		return true;
     }
 
+	/**
+	 * Calculates a key that is used to order the nodes in the closedTree. 
+	 * Every logical state maps uniquely to a key. Note though that the nodes
+	 * corresponding to the same state get identical keys. 
+	 *
+	 * @param int[] node - the current node
+	 * @return int key - the key for the node ordering in the closedTree
+	 */
     public int getKey(int[] node) {
 		int key = 0;
 	
