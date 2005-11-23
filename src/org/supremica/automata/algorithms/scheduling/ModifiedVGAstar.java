@@ -42,7 +42,9 @@ public class ModifiedVGAstar
 			vgBuilder.drawVisGraph();
     }
 
-    protected void init(boolean manualExpansion) {
+    protected void init(boolean manualExpansion) 
+		throws Exception
+	{
 		super.init(manualExpansion);
 
 		timer.start();

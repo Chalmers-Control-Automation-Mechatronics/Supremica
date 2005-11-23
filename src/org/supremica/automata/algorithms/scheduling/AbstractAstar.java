@@ -880,7 +880,7 @@ public abstract class AbstractAstar
 		return s;
     }
 
-	public String printArray(Object[] array) 
+	public String printArray(double[] array) 
 	{
 		String s = "[";
 		
