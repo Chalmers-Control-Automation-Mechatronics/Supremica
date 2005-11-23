@@ -3,7 +3,7 @@
   <VersionInfo Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2005-11-21" />
   <InterfaceList>
     <EventInputs>
-      <Event Name="CURRENT_EVENT" />
+      <Event Name="CURRENT_VALUE" />
       <Event Name="WRITE" >
         <With Var="VALUE" />
       </Event>
@@ -27,31 +27,22 @@
 		<ECAction Algorithm="GenCurrentEvent" />
 	  </ECState>    
 	  <ECState Name="GEN_WRITE">
-		<ECAction Algorithm="GenCurrentEvent" />
+		<ECAction Algorithm="GenWrite" />
 	  </ECState>    
 
-	  <ECTransition Source="INIT" Destination="PARSE_CMD" Condition="RSP" />
-	  <ECTransition Source="PARSE_CMD" Destination="PARSE_CMD1_ARGS" Condition="cmd1" />
-	  <ECTransition Source="PARSE_CMD" Destination="INIT" Condition="returnToInit" />
-	  <ECTransition Source="PARSE_CMD1_ARGS" Destination="INIT" Condition="1" />
+	  <ECTransition Source="INIT" Destination="GEN_CURRENT_EVENT" Condition="CURRENT_EVENT" />
+	  <ECTransition Source="GEN_CURRENT_EVENT" Destination="INIT" Condition="1" />
+	  <ECTransition Source="INIT" Destination="GEN_WRITE" Condition="WRITE" />
+	  <ECTransition Source="GEN_WRITE" Destination="INIT" Condition="1" />
     </ECC>
-    <Algorithm Name="ParseCmd">
+    <Algorithm Name="GenCurrentEvent">
       <Other Language="Java" Text="
-	      cmd = RSP_ARGS.substring(0,RSP_ARGS.indexOf(' '));
-	      if (cmd.toLowerCase().equals(&#34;new_sample&#34;))
-		  {
-		    cmd1 = true;
-			cmdArgs = RSP_ARGS.substring(RSP_ARGS.indexOf('	') + 1);
-		  }
-		  else
-		  {
-		    returnToInit = true;
-		  }
+	    REQ_ARGS = &#34;CURRENT_VALUE&#34;;
 	  " />	
     </Algorithm>
-    <Algorithm Name="ParseCmd1Args">
+    <Algorithm Name="GenWrite">
       <Other Language="Java" Text="
-	    NEW_SAMPLE_ARG = (new Boolean(cmdArgs)).booleanValue();
+	    REQ_ARGS = &#34;WRITE &#34; + VALUE;
 	  " />	
     </Algorithm>
   </BasicFB>
