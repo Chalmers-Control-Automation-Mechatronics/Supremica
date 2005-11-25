@@ -28,27 +28,29 @@
         <VarDeclaration Name="curValue" Type="BOOL" />
     </InternalVars>
     <ECC>
+
       <ECState Name="INIT" />
-      <ECState Name="Q1">
+      <ECState Name="SEND">
 	    <ECAction Algorithm="SendValue" Output="AO_RSP"/>
 	  </ECState>    
-	  <ECState Name="Q2">
+	  <ECState Name="STORE">
 	    <ECAction Algorithm="StoreValue" />
 	  </ECState>    
-	  <ECTransition Source="INIT" Destination="Q1" Condition="AO_REQ AND AO_REQ_ARGS = &#34;CURRENT_VALUE&#34;" />
-	  <ECTransition Source="Q1" Destination="INIT" Condition="1" />
-	  <ECTransition Source="INIT" Destination="Q2" Condition="NEW_SAMPLE" />
-	  <ECTransition Source="Q2" Destination="Q1" Condition="1" />
+
+	  <ECTransition Source="INIT" Destination="SEND" Condition="AO_REQ AND AO_REQ_ARGS = &#34;CURRENT_VALUE&#34;" />
+	  <ECTransition Source="SEND" Destination="INIT" Condition="1" />
+	  <ECTransition Source="INIT" Destination="STORE" Condition="NEW_SAMPLE" />
+	  <ECTransition Source="STORE" Destination="SEND" Condition="1" />
+
     </ECC>
     <Algorithm Name="SendValue">
       <Other Language="Java" Text="
-	    AO_RSP_ARGS = &#34;SAMPLE &#34; + curValue.toString();
+	    AO_RSP_ARGS = &#34;CURRENT_VALUE &#34; + curValue.toString();
 	  " />	
     </Algorithm>
     <Algorithm Name="StoreValue">
       <Other Language="Java" Text="
 	    curValue = VALUE;
-		AO_RSP_ARGS = &#34;SAMPLE &#34; + curValue.toString();
       " />	
     </Algorithm>
   </BasicFB>

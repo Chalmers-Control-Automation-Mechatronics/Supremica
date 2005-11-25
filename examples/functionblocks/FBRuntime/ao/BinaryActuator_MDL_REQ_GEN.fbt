@@ -24,10 +24,10 @@
     <ECC>
 	  <ECState Name="INIT" />
 	  <ECState Name="GEN_CURRENT_EVENT">
-		<ECAction Algorithm="GenCurrentEvent" />
+		<ECAction Algorithm="GenCurrentEvent" Output="REQ" />
 	  </ECState>    
 	  <ECState Name="GEN_WRITE">
-		<ECAction Algorithm="GenWrite" />
+		<ECAction Algorithm="GenWrite" Output="REQ" />
 	  </ECState>    
 
 	  <ECTransition Source="INIT" Destination="GEN_CURRENT_EVENT" Condition="CURRENT_EVENT" />

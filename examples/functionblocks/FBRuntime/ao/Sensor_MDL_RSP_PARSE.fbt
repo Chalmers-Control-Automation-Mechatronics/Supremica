@@ -8,7 +8,7 @@
       </Event>
     </EventInputs>
     <EventOutputs>
-      <Event Name="SAMPLE" >
+      <Event Name="CURRENT_VALUE" >
         <With Var="VALUE" />
       </Event>
     </EventOutputs>
@@ -30,7 +30,7 @@
 		<ECAction Algorithm="ParseCmd" />
 	  </ECState>    
       <ECState Name="PARSE_CMD1_ARGS">
-          <ECAction Algorithm="ParseCmd1Args" Output="SAMPLE" />
+          <ECAction Algorithm="ParseCmd1Args" Output="CURRENT_VALUE" />
 	  </ECState>    
 	  <ECTransition Source="INIT" Destination="PARSE_CMD" Condition="RSP" />
 	  <ECTransition Source="PARSE_CMD" Destination="PARSE_CMD1_ARGS" Condition="cmd = 1" />
@@ -40,7 +40,7 @@
     <Algorithm Name="ParseCmd">
       <Other Language="Java" Text="
 	      cmd = RSP_ARGS.substring(0,RSP_ARGS.indexOf(' '));
-	      if (cmd.toLowerCase().equals(&#34;sample&#34;))
+	      if (cmd.toLowerCase().equals(&#34;current_value&#34;))
 		  {
 		    cmd = 1;
 			cmdArgs = RSP_ARGS.substring(RSP_ARGS.indexOf('	') + 1);
