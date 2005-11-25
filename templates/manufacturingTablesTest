@@ -1,0 +1,3 @@
+#/bin/sh
+
+java -enableassertions org.supremica.manufacturingTables.management.Main  $*
