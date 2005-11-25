@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Automata name=""  major="0"  minor="9" >
+<Automata name="Rotation Table" comment="Another model of the 'Circular Table' of Queiroz and Cury.">
 <Automaton name="arm" type="Plant">
 	<Events>
 		<Event id="0" label="finished_arm" controllable="false"/>
@@ -334,5 +334,4 @@
 	</Controls>
 	<Animation path="/scenebeans/rotationTable/rotationTable.xml"/>
 </Execution>
-
 </Automata>

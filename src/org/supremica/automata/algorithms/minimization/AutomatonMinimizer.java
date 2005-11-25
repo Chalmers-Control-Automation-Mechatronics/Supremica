@@ -1677,6 +1677,7 @@ public class AutomatonMinimizer
      * time there is a transition "p =a=> q", after completing the transitive closure (or
      * "saturation"), there is also a transition "p -a-> q".
      */
+	/*
     public int saturate(Automaton aut)
     {
         if (aut == null)
@@ -1783,6 +1784,7 @@ public class AutomatonMinimizer
 
         return amount;
     }
+	*/
 
     /**
      * Algorithm inspired by "Minimizing the Number of Transitions with Respect to Observation

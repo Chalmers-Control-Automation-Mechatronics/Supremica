@@ -174,12 +174,13 @@ public class ExampleTemplates
 		
 		String prefix = extraPrefix + "/OtherExamples/";
 		
+		thisGroup.addItem(new TemplateItem("Automatic Car Park Gate", prefix + "AutomaticCarParkGate.xml"));
 		thisGroup.addItem(new TemplateItem("Ball Process", prefix + "ballProcess.xml"));
 		thisGroup.addItem(new TemplateItem("Ball Process - Gatekeeper", prefix + "ballProcessGatekeeper.xml"));
-		thisGroup.addItem(new TemplateItem("Telecommunications Network (incomplete)", prefix + "telecommunicationsNetwork.xml"));
-		thisGroup.addItem(new TemplateItem("Automatic Car Park Gate", prefix + "AutomaticCarParkGate.xml"));
+		thisGroup.addItem(new TemplateItem("Car Window Control System", prefix + "big_bmw.xml"));
 		thisGroup.addItem(new TemplateItem("Observation Equivalence Execise", prefix + "ObservationEquivalenceExercise.xml"));
 		thisGroup.addItem(new TemplateItem("Professors, Pen and Paper", prefix + "ProfessorsPenPaper.xml"));
+		thisGroup.addItem(new TemplateItem("Telecommunications Network (incomplete)", prefix + "telecommunicationsNetwork.xml"));
     }
 
     private void initializeAIPExamples()
@@ -203,7 +204,7 @@ public class ExampleTemplates
 		thisGroup.addItem(new TemplateItem("Transport Unit 3", prefix + "System6_system6.xml"));
 		thisGroup.addItem(new TemplateItem("Transport Unit 4", prefix + "System7_system7.xml"));
 		//thisGroup.addItem(new TemplateItem("AIP System 7 - Top TU 4", prefix + "System7_Top_TU4.xml"));
-		thisGroup.addItem(new TemplateItem("Complete system (all the above)", prefix + "All.xml"));
+		thisGroup.addItem(new TemplateItem("\"Complete\" system (all the above)", prefix + "All.xml"));
     }
 
     private void initializeCentralLockExamples()
@@ -258,25 +259,28 @@ public class ExampleTemplates
 		TemplateGroup thisGroup = ManufacturingSystemExamples;
 		allGroups.add(thisGroup);
 
-		//String prefix = extraPrefix + "/ManufacturingExamples/";
-		String prefix = extraPrefix + "/OtherExamples/";
+		String prefix = extraPrefix + "/ManufacturingExamples/";
 
 		thisGroup.addItem(new TemplateItem("Automated Guided Vehicles", prefix + "agv.xml"));
 		//thisGroup.addItem(new TemplateItem("Automated Guided Vehicle, immediate events", prefix + "agvImmediate.xml"));
-		thisGroup.addItem(new TemplateItem("Dosing Unit", prefix + "dosingUnit.xml"));
-		thisGroup.addItem(new TemplateItem("Welding Robots", prefix + "weldingRobots.xml"));
-		thisGroup.addItem(new TemplateItem("Simple Manufacturing Example", prefix + "simpleManufacturingExample.xml"));
-		thisGroup.addItem(new TemplateItem("Parallel Manufacturing Example", prefix + "parallelManufacturingExample.xml"));
-		thisGroup.addItem(new TemplateItem("Robot Assembly Cell", prefix + "robotAssemblyCell.xml"));
-		thisGroup.addItem(new TemplateItem("Flexible Production Cell", prefix + "flexibleManufacturingCell.xml"));
 		thisGroup.addItem(new TemplateItem("Circular Table", prefix + "circularTable.xml"));
-		thisGroup.addItem(new TemplateItem("Rotation Table", prefix + "rotationTable.xml"));
-		thisGroup.addItem(new TemplateItem("Machine Buffer Machine", prefix + "machineBufferMachine.xml"));
-		thisGroup.addItem(new TemplateItem("Tank Process", prefix + "tankProcess.xml"));
+		thisGroup.addItem(new TemplateItem("Circular Table (variant)", prefix + "rotationTable.xml"));
+		thisGroup.addItem(new TemplateItem("Dosing Unit", prefix + "dosingUnit.xml"));
 		thisGroup.addItem(new TemplateItem("Flexible Manufacturing System (incomplete)", prefix + "flexibleManufacturingSystem.xml"));
+		thisGroup.addItem(new TemplateItem("Flexible Production Cell", prefix + "ftechnik.xml"));
+		//thisGroup.addItem(new TemplateItem("Flexible Production Cell - No Collisions", prefix + "ftechnik_nocoll.xml"));
 
-		prefix = extraPrefix + "/ManufacturingExamples/";
+		thisGroup.addItem(new TemplateItem("Flexible Production Cell (variant)", prefix + "flexibleManufacturingCell.xml"));
 		thisGroup.addItem(new TemplateItem("Intertwined Product Cycles", prefix + "IntertwinedProductCycles.xml"));
+		thisGroup.addItem(new TemplateItem("Machine Buffer Machine", prefix + "machineBufferMachine.xml"));
+		thisGroup.addItem(new TemplateItem("Parallel Manufacturing Example", prefix + "parallelManufacturingExample.xml"));
+		thisGroup.addItem(new TemplateItem("Production Cell for Mounting Frames", prefix + "fzelle.xml"));
+		thisGroup.addItem(new TemplateItem("Simple Manufacturing Example", prefix + "simpleManufacturingExample.xml"));
+		thisGroup.addItem(new TemplateItem("Tank Process", prefix + "tankProcess.xml"));
+		thisGroup.addItem(new TemplateItem("Train Testbed", prefix + "tbed_ctct.xml"));
+		thisGroup.addItem(new TemplateItem("Train Testbed (variant)", prefix + "tbed_valid.xml"));
+		thisGroup.addItem(new TemplateItem("Welding Robots", prefix + "weldingRobots.xml"));
+		thisGroup.addItem(new TemplateItem("Robot Assembly Cell", prefix + "robotAssemblyCell.xml"));
     }
     
     private void initializeGames()

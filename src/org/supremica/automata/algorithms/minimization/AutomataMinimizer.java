@@ -79,6 +79,8 @@ public class AutomataMinimizer
 	/** Largest number of transitions come across. */
 	private int mostTransitions = 0;
 
+	private int instanceSize;
+
 	/** Event to automata map, for choosing the next task in compositional minimization. */
 	private EventToAutomataMap eventToAutomataMap;
 
@@ -87,6 +89,7 @@ public class AutomataMinimizer
 	 */
 	public AutomataMinimizer(Automata theAutomata)
 	{
+		instanceSize = theAutomata.nbrOfAutomata();
 		this.theAutomata = theAutomata;
 	}
 
@@ -233,7 +236,7 @@ public class AutomataMinimizer
 		{
 			// Print total reduction statistics
 			logger.info(AutomatonMinimizer.getStatistics());
-			//logger.info(AutomatonMinimizer.getStatisticsLaTeX());
+			//logger.info("& " + instanceSize + " & & " + mostStates + " & " + mostTransitions + " & TIME & true/false & " + AutomatonMinimizer.getStatisticsLaTeX() + " & ALGO \\\\");
 			// Print largest automaton size
 			logger.info("The automaton with the most states had " + mostStates + " states.");
 			logger.info("The automaton with the most transitions had " + mostTransitions + " transitions.");
@@ -246,8 +249,9 @@ public class AutomataMinimizer
 	}
 
 	/**
-	 * Class holding info about what should be done in the next minimization. Which automata and
-	 * which events that can be abstracted to epsilons.
+	 * Class holding info about what should be done in the next
+	 * minimization. Which automata should be composed and which
+	 * events can be hidden.
 	 */
 	private class MinimizationTask
 	{

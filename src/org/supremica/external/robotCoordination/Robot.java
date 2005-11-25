@@ -27,7 +27,7 @@ public interface Robot
 		throws Exception;
 
     /**
-     * Returners Supremica coordinates for robots base position.
+     * Returns Supremica coordinates for robots base position.
      */
     public Coordinate getBaseCoordinates()
 		throws Exception;

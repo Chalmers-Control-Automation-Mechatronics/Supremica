@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Automata name="Intertwined Product Cycles" comment="Example from 'Decentralized Control and Coordination of Discrete-Event Systems with Partial Observation' by F. Lin and M. Wonham. Two types of products are produced in a system with two machines, M1 and M2. The products requite three operations, type 1 products must first visit M1, then in M2 and finally M1 and type 2 products must first visit M2, then M1 and finally M2. The products enter by M1 and M2 respectively, through two infinite buffers and move between the machines through four handlers with 2-place buffers. Each handler and buffer is dedicated to a certain product and a certain direction of movement of that product. The system is uncontrollable (buffer overflow problems) and blocking. Also the maximally permissive controllable supervisor is blocking.">
+<Automaton name="M1" type="Plant">
+	<Events>
+		<Event id="a1" label="getB3"/>
+		<Event id="a2" label="getB4"/>
+		<Event id="c1" label="getB5"/>
+		<Event id="t1" label="getM1H1"/>
+		<Event id="t2" label="getM1H2"/>
+		<Event id="h1" label="outM1" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="empty" initial="true" accepting="true"/>
+		<State id="1" name="fromB3"/>
+		<State id="2" name="fromB4"/>
+		<State id="3" name="fromB5"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="a1"/>
+		<Transition source="0" dest="2" event="a2"/>
+		<Transition source="0" dest="3" event="c1"/>
+		<Transition source="1" dest="0" event="h1"/>
+		<Transition source="2" dest="0" event="t2"/>
+		<Transition source="3" dest="0" event="t1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="M2" type="Plant">
+	<Events>
+		<Event id="a3" label="getB1"/>
+		<Event id="a4" label="getB2"/>
+		<Event id="c2" label="getB6"/>
+		<Event id="t3" label="getM2H3"/>
+		<Event id="t4" label="getM2H4"/>
+		<Event id="h2" label="outM2" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="empty" initial="true" accepting="true"/>
+		<State id="1" name="fromB1"/>
+		<State id="2" name="fromB2"/>
+		<State id="3" name="fromB6"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="a3"/>
+		<Transition source="0" dest="2" event="a4"/>
+		<Transition source="0" dest="3" event="c2"/>
+		<Transition source="1" dest="0" event="t3"/>
+		<Transition source="2" dest="0" event="h2"/>
+		<Transition source="3" dest="0" event="t4"/>
+	</Transitions>
+</Automaton>
+<Automaton name="H1" type="Plant">
+	<Events>
+		<Event id="t1" label="getM1H1"/>
+		<Event id="p1" label="putB1" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="idle" initial="true" accepting="true"/>
+		<State id="1" name="handling"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="t1"/>
+		<Transition source="1" dest="0" event="p1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="H2" type="Plant">
+	<Events>
+		<Event id="t2" label="getM1H2"/>
+		<Event id="p2" label="putB2" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="idle" initial="true" accepting="true"/>
+		<State id="1" name="handling"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="t2"/>
+		<Transition source="1" dest="0" event="p2"/>
+	</Transitions>
+</Automaton>
+<Automaton name="H3" type="Plant">
+	<Events>
+		<Event id="t3" label="getM2H3"/>
+		<Event id="p3" label="putB3" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="idle" initial="true" accepting="true"/>
+		<State id="1" name="handling"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="t3"/>
+		<Transition source="1" dest="0" event="p3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="H4" type="Plant">
+	<Events>
+		<Event id="t4" label="getM2H4"/>
+		<Event id="p4" label="putB4" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="idle" initial="true" accepting="true"/>
+		<State id="1" name="handling"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="t4"/>
+		<Transition source="1" dest="0" event="p4"/>
+	</Transitions>
+</Automaton>
+<Automaton name="B1" type="Specification">
+	<Events>
+		<Event id="p1" label="putB1" controllable="false"/>
+		<Event id="a3" label="getB1"/>
+	</Events>
+	<States>
+		<State id="0" name="0" initial="true" accepting="true"/>
+		<State id="1" name="1"/>
+		<State id="2" name="2"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="p1"/>
+		<Transition source="1" dest="2" event="p1"/>
+		<Transition source="2" dest="1" event="a3"/>
+		<Transition source="1" dest="0" event="a3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="B2" type="Specification">
+	<Events>
+		<Event id="p2" label="putB2" controllable="false"/>
+		<Event id="a4" label="getB2"/>
+	</Events>
+	<States>
+		<State id="0" name="0" initial="true" accepting="true"/>
+		<State id="1" name="1"/>
+		<State id="2" name="2"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="p2"/>
+		<Transition source="1" dest="2" event="p2"/>
+		<Transition source="2" dest="1" event="a4"/>
+		<Transition source="1" dest="0" event="a4"/>
+	</Transitions>
+</Automaton>
+<Automaton name="B3" type="Specification">
+	<Events>
+		<Event id="p3" label="putB3" controllable="false"/>
+		<Event id="a1" label="getB3"/>
+	</Events>
+	<States>
+		<State id="0" name="0" initial="true" accepting="true"/>
+		<State id="1" name="1"/>
+		<State id="2" name="2"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="p3"/>
+		<Transition source="1" dest="2" event="p3"/>
+		<Transition source="2" dest="1" event="a1"/>
+		<Transition source="1" dest="0" event="a1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="B4" type="Specification">
+	<Events>
+		<Event id="p4" label="putB4" controllable="false"/>
+		<Event id="a2" label="getB4"/>
+	</Events>
+	<States>
+		<State id="0" name="0" initial="true" accepting="true"/>
+		<State id="1" name="1"/>
+		<State id="2" name="2"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="p4"/>
+		<Transition source="1" dest="2" event="p4"/>
+		<Transition source="2" dest="1" event="a2"/>
+		<Transition source="1" dest="0" event="a2"/>
+	</Transitions>
+</Automaton>
+<Automaton name="B5" type="Specification">
+	<Events>
+		<Event id="c1" label="getB5"/>
+	</Events>
+	<States>
+		<State id="0" name="0" initial="true" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="c1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="B6" type="Specification">
+	<Events>
+		<Event id="c2" label="getB6"/>
+	</Events>
+	<States>
+		<State id="0" name="0" initial="true" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="c2"/>
+	</Transitions>
+</Automaton>
+</Automata>
