@@ -1,4 +1,6 @@
 build
 dist
 resources
+.project
+.classpath
 

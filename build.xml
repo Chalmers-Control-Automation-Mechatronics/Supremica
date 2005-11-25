@@ -654,6 +654,10 @@
 	<chmod file="${dist}/FBRuntime" perm="755"/>
 	<copy file="${templates}/FBRuntime.cmd" todir="${dist}"/>	
 	<chmod file="${dist}/FBRuntime.cmd" perm="644"/>
+	<copy file="${templates}/manufacturingTablesTest" todir="${dist}"/>	
+	<chmod file="${dist}/manufacturingTablesTest" perm="755"/>
+	<copy file="${templates}/manufacturingTablesTest.cmd" todir="${dist}"/>	
+	<chmod file="${dist}/manufacturingTablesTest.cmd" perm="755"/>
 	<copy file="${templates}/SupremicaProfiling.cmd" todir="${dist}"/>	
 	<chmod file="${dist}/SupremicaProfiling.cmd" perm="644"/>
 	<copy file="${templates}/SupremicaStandard.cmd" todir="${dist}"/>	
