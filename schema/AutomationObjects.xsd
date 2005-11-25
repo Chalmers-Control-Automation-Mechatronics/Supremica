@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsd:schema 
-	targetNamespace="http://www.holobloc.com/xml/LibraryElement"
+	targetNamespace="http://www.supremica.org/xml/AutomationObjects"
 	xmlns="http://www.holobloc.com/xml/LibraryElement"
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" jaxb:version="1.0"
