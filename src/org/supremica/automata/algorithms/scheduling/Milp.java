@@ -27,16 +27,37 @@ public class Milp
 	private TreeSet<int[]> scheduleInfo;
 
 	private int makespan;
+	
+	/** The *.mod file that serves as an input to the Glpk-solver */
+	private File modelFile;
+
+	/** The *.sol file that stores the solution, i.e. the output of the Glpk-solver */
+	private File solutionFile;
 
 	public Milp(Automata theAutomata) 
 		throws Exception
 	{
+		// SÅ SKALL DET VARA NÄR ALLTING ÄR KLART (OM), MEN NU... FÖR ATT UNDERLÄTTA...
+// 		modelFile = File.createTempFile("milp", ".mod");
+// 		modelFile.deleteOnExit();
+
+// 		solutionFile = File.createTempFile("milp", ".sol");
+// 		solutionFile.deleteOnExit();
+
+		// ... SÅ HÄR ISTÄLLET...
+		modelFile = new File("C:\\avenir\\progg\\milp3.mod");
+		solutionFile = new File("C:\\avenir\\progg\\milp3.sol");
+		modelFile.createNewFile();
+		solutionFile.createNewFile();
+
 		initAutomata(theAutomata);
 		initMutexStates();
+
 		convertXmlToMod();
-		logger.info("*.mod created");
-		new GlpkBridge().bridge("temp");
-		logger.info("*.sol created");
+
+		//		new GlpkBridge().bridge("temp");
+		callGlpk();
+
 		convertSolToXml();
 	}
 
@@ -371,11 +392,23 @@ public class Milp
 		// The string containing precedence constraints 
 		String precConstraints = "";
 
+		// The string containing initial (precedence) constraints
+		String initPrecConstraints = "";
+
 		// The string containing mutex constraints
 		String mutexConstraints = "";
 
 		// The string containing mutex variables
 		String mutexVariables = "";
+
+		// The string containg alternative paths constraints
+		String altPathsConstraints = "";
+		
+		// The string containing alternative paths variables
+		String altPathsVariables = "";
+
+		// The string containing the cycle time constraints
+		String cycleTimeConstraints = "";
 		
 		// The string containing times for each state (delta-times)
 		String deltaTime = "param deltaTime default 0\n:";
@@ -416,14 +449,15 @@ public class Milp
 
 				deltaTime += "\t" + currState.getCost();
 				
-				// If the current state has successors, add precedence constraints
+				// If the current state has successors and is not initial, add precedence constraints
+				// If the current state is initial, add an initial (precedence) constraint
 				int nbrOfOutgoingArcs = currState.nbrOfOutgoingArcs();
 				if (nbrOfOutgoingArcs > 0)
 				{
 					if (currState.isInitial())
 					{
-						precConstraints += "initial_" + currRobot.getName() + "_" + currState.getName() + " : ";
-						precConstraints += "time[" + i + ", " + currState.getIndex() + "] >= deltaTime[" + i + ", " + currState.getIndex() + "];\n";
+						initPrecConstraints += "initial_" + currRobot.getName() + "_" + currState.getName() + " : ";
+						initPrecConstraints += "time[" + i + ", " + currState.getIndex() + "] >= deltaTime[" + i + ", " + currState.getIndex() + "];\n";
 					}
 					
 					StateIterator nextStates = currState.nextStateIterator();
@@ -437,13 +471,52 @@ public class Milp
 					}
 					else if (nbrOfOutgoingArcs == 2)
 					{
-						// Implement t1 >= t0 + delta_t0 - M*alt0; t1_prim >= t0 + delta_t0 - M*(1 - alt0);
+						State nextLeftState = nextStates.nextState();
+						State nextRightState = nextStates.nextState();
+
+						String currAltPathsVariable = currRobot.getName() + "_goes_from_" + currState.getName() + "_to_" + nextLeftState.getName();
+								
+						altPathsVariables += "var " + currAltPathsVariable + ", binary;\n";
+
+						altPathsConstraints += "alt_paths_" + currRobot.getName() + "_" + currState.getName() + " : "; 
+						altPathsConstraints += "time[" + i + ", " + nextLeftState.getIndex() + "] >= time[" + i + ", " + currState.getIndex() + "] + deltaTime[" + i + ", "  + nextLeftState.getIndex() + "] - bigM*" + currAltPathsVariable + ";\n";
+
+						altPathsConstraints += "dual_alt_paths_" + currRobot.getName() + "_" + currState.getName() + " : "; 
+						altPathsConstraints += "time[" + i + ", " + nextRightState.getIndex() + "] >= time[" + i + ", " + currState.getIndex() + "] + deltaTime[" + i + ", "  + nextRightState.getIndex() + "] - bigM*(1 - " + currAltPathsVariable + ");\n";
 					}
 					else if (nbrOfOutgoingArcs > 2)
 					{
+						int currAlternative = 0;
+						
+						while (nextStates.hasNext())
+						{
+							String currAltPathsVariable = currRobot.getName() + "_" + currState.getName() + "_path_" + currAlternative;
+							State nextState = nextStates.nextState();
+
+							altPathsVariables += "var " + currAltPathsVariable + ", binary;\n";
+
+							altPathsConstraints += "alt_paths_" + currAltPathsVariable + " : ";
+							altPathsConstraints += "time[" + i + ", " + nextState.getIndex() + "] >= time[" + i + ", " + currState.getIndex() + "] + deltaTime[" + i + ", "  + nextState.getIndex() + "] - bigM*(1 - " + currAltPathsVariable + ");\n";
+
+							currAlternative++;
+						}
+
+						altPathsConstraints += "alt_paths_" + currRobot.getName() + "_" + currState.getName() + "_TOT : ";
+						for (int k=0; k<currAlternative - 1; k++)
+						{
+							altPathsConstraints += currRobot.getName() + "_" + currState.getName() + "_path_" + k + " + ";
+						}
+						altPathsConstraints += currRobot.getName() + "_" + currState.getName() + "_path_" + (currAlternative - 1) + " = 1;\n";
+
 						// Implement t1 >= t0 + delta_t0 - M*alt0; t1_prim >= t0 + delta_t0 - M*alt0_prim; 
 						// t1_prim_prim >= t0 + delta_t0 - M*alt0_prim_prim; alt0 + alt0_prim + alt0_prim_prim = 1;
 					}
+				}
+				else if (currState.isAccepting())
+				{   
+					// If the current state is accepting, a cycle time constaint is added,
+					// ensuring that the makespan is at least as long as the minimum cycle time of this robot
+					cycleTimeConstraints += "cycle_time_" + currRobot.getName() + " : c >= " + "time[" + i + ", " + currState.getIndex() + "];\n";
 				}
 			}
 
@@ -460,25 +533,32 @@ public class Milp
 		}
 
 		// Constructing the mutex constraints
+		// for every zone...
 		for (int i=0; i<bookingTics.length; i++)
 		{
+			// for every robot pair...
 			for (int j1=0; j1<bookingTics[i].length-1; j1++)
 			{
 				for (int j2=j1+1; j2<bookingTics[i].length; j2++)
 				{
+					// updates the variable index if the booking event is repeated;
+					int repeatedBooking = 0;
+
+					// for every path combination that contains the event that books the current zone
 					for (int k1=0; k1<bookingTics[i][j1].length; k1++)
 					{
 						for (int k2=0; k2<bookingTics[i][j2].length; k2++)
 						{
 							if (bookingTics[i][j1][0] != -1 && bookingTics[i][j2][0] != -1)
 							{
-// 								String currMutexVariable = "mutex_Z" + i + "_R" + j1 + "_R" + j2;
-								String currMutexVariable = "r" + j1 + "_books_z" + i + "_before_r" + j2;
+								repeatedBooking++;
+
+								String currMutexVariable = "r" + j1 + "_books_z" + i + "_before_r" + j2 + "_var" + repeatedBooking;
 								
 								mutexVariables += "var " + currMutexVariable + ", binary;\n";
 								
-								mutexConstraints += "mutex_Z" + i + "_R" + j1 + "_R" + j2 + " : time[" + j1 + ", " + bookingTics[i][j1][k1] + "] >= " + "time[" + j2 + ", " + unbookingTics[i][j2][k2] + "] - bigM*" + currMutexVariable + ";\n";
-								mutexConstraints += "dual_mutex_Z" + i + "_R" + j1 + "_R" + j2 + " : time[" + j2 + ", " + bookingTics[i][j2][k2] + "] >= " + "time[" + j1 + ", " + unbookingTics[i][j1][k1] + "] - bigM*(1 - " + currMutexVariable + ");\n";
+								mutexConstraints += "mutex_Z" + i + "_R" + j1 + "_R" + j2 + "_var" + repeatedBooking + " : time[" + j1 + ", " + bookingTics[i][j1][k1] + "] >= " + "time[" + j2 + ", " + unbookingTics[i][j2][k2] + "] - bigM*" + currMutexVariable + ";\n";
+								mutexConstraints += "dual_mutex_Z" + i + "_R" + j1 + "_R" + j2  + "_var" + repeatedBooking + " : time[" + j2 + ", " + bookingTics[i][j2][k2] + "] >= " + "time[" + j1 + ", " + unbookingTics[i][j1][k1] + "] - bigM*(1 - " + currMutexVariable + ");\n";
 							}
 						}
 					}
@@ -491,9 +571,8 @@ public class Milp
 		//	                          The writing part                                    //
 		////////////////////////////////////////////////////////////////////////////////////
 
-		File modelFile = new File(FILE_ROOT + ".mod");
-		if (!modelFile.exists())
-			modelFile.createNewFile();
+// 		if (!modelFile.exists())
+// 			modelFile.createNewFile();
 
 		BufferedWriter w = new BufferedWriter(new FileWriter(modelFile));
 
@@ -523,10 +602,11 @@ public class Milp
 
 		// Definitions of variables
 		w.newLine();
-		w.write("var time{r in Robots, t in Tics} >= 0;");
+		w.write("var time{r in Robots, t in Tics};"); // >= 0;");
 		w.newLine();
 		w.write("var c;");
 		w.newLine();
+		w.write(altPathsVariables);
 		w.write(mutexVariables);
 		w.newLine();
 
@@ -542,13 +622,22 @@ public class Milp
 
 		// The cycle time constraints
 		w.newLine();
-		w.write("cycle_time{r in Robots}: c >= time[r, maxTic];");
-		w.newLine();
+		w.write(cycleTimeConstraints);
+// 		w.write("cycle_time{r in Robots}: c >= time[r, maxTic];");
+// 		w.newLine();
 		
+		// The initial (precedence) constraints
+		w.newLine();
+		w.write(initPrecConstraints);
+
 		// The precedence constraints
 		w.newLine();
 		w.write(precConstraints);
 		
+		// The alternative paths constraints
+		w.newLine();
+		w.write(altPathsConstraints);
+
 		// The mutex constraints
 		w.newLine();
 		w.write(mutexConstraints);
@@ -590,7 +679,7 @@ public class Milp
 
 		scheduleInfo = new TreeSet<int[]>(new CostComparator());
 
-		File solutionFile = new File(FILE_ROOT + ".sol");
+// 		File solutionFile = new File(FILE_ROOT + ".sol");
 
 		if (!solutionFile.isFile())
 			throw new Exception(solutionFile + " was NOT FOUND..........");
@@ -600,15 +689,16 @@ public class Milp
 
 		while (str != null)
 		{
+			// For every solution line containing positive time value...
 			if (str.indexOf(" time[") > -1)
 			{
 				String strRobotIndex = str.substring(str.indexOf("[") + 1, str.indexOf(",")).trim();
 				String strStateIndex = str.substring(str.indexOf(",") + 1, str.indexOf("]")).trim();
-				String strCost = str.substring(str.indexOf("]") + 1, str.lastIndexOf(" ")).trim();
-
+				String strCost = str.substring(str.indexOf("]") + 1).trim(); 
+			
 				int robotIndex = (new Integer(strRobotIndex)).intValue(); 
 				int stateIndex = (new Integer(strStateIndex)).intValue(); 
-				int cost = (new Integer(strCost)).intValue();
+ 				int cost = (new Integer(strCost)).intValue();
 
 				int[] currScheduleInfo = new int[]{robotIndex, stateIndex, cost};
 // 				scheduleInfo[robotIndex].add(currScheduleInfo);
@@ -641,6 +731,33 @@ public class Milp
 			logger.info("tree -> " + temp[0] + " " + temp[1] + " " + temp[2]);
 		}
 		*/
+	}
+
+	private void callGlpk()
+		throws Exception
+	{
+		// Defines the name of the .exe-file as well the arguments (.mod and .sol file names)
+		String[] cmds = new String[5];
+		cmds[0] = "C:\\Program Files\\glpk\\bin\\glpsol.exe";
+		cmds[1] = "-m";
+		cmds[2] = modelFile.getAbsolutePath();
+		cmds[3] = "-o";
+		cmds[4] = solutionFile.getAbsolutePath();
+
+		// Runs the MILP-solver with the arguments defined above
+		Process milpProcess = Runtime.getRuntime().exec(cmds);
+
+		// Listens for the output of MILP (that is the input to this application)...
+		BufferedReader milpEcho = new BufferedReader(new InputStreamReader(new DataInputStream(milpProcess.getInputStream())));
+
+		// ...and prints it to stdout
+		logger.warn("MILP output starts ");
+		String milpEchoStr;
+		while ((milpEchoStr = milpEcho.readLine()) != null)
+		{
+			logger.info(milpEchoStr);
+		}
+		logger.warn("MILP output ends");
 	}
 }
 
