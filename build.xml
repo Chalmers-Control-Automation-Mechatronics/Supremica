@@ -83,10 +83,10 @@
 	<unjar src="${lib}/JGo.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/JGoLayout.jar" dest="${lib}/${unjared}"/>
 	<unjar src="${lib}/antlr.jar" dest="${lib}/${unjared}"/>
-	<unjar src="${lib}/crimson.jar" dest="${lib}/${unjared}"/>
+<!--	<unjar src="${lib}/crimson.jar" dest="${lib}/${unjared}"/>-->
 	<unjar src="${lib}/grappa.jar" dest="${lib}/${unjared}"/>
 	<unjar src="${lib}/help.jar" dest="${lib}/${unjared}"/>
-	<unjar src="${lib}/jaxp.jar" dest="${lib}/${unjared}"/>
+<!--	<unjar src="${lib}/jaxp.jar" dest="${lib}/${unjared}"/>-->
 	<unjar src="${lib}/jdom.jar" dest="${lib}/${unjared}"/>
 	<unjar src="${lib}/jhall.jar" dest="${lib}/${unjared}"/>
 	<unjar src="${lib}/jlfgr-1_0.jar" dest="${lib}/${unjared}"/>
@@ -224,7 +224,7 @@
 		includes="
 			${supremica_basedir}/external/**,
 			${jgrafchart_basedir}/external/**"
-		source="1.4"
+		source="1.5"
 	/>
 </target>
 
@@ -269,7 +269,7 @@
 		nowarn="true"
 		includes="
 			${supremica_basedir}/functionblocks/xsd/**"		
-		source="1.4"
+		source="1.5"
 	/>
 </target>
 
