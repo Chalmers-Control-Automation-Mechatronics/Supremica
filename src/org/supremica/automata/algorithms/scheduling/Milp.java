@@ -344,13 +344,15 @@ public class Milp
 										// If the alternative path is ending in an already examined booking state, 
 										// this path was not really an alternative (since several instances of a state are 
 										// not necessary).
-										if (!bookingStates.contains(candidateBookingState))
-											bookingStates.add(candidateBookingState);
-										else
-										{
-											logger.error(candidateBookingState.getName() + " is ALREADY checked");
-											alternativeBookings--;
-										}
+// 										if (!bookingStates.contains(candidateBookingState))
+// 											bookingStates.add(candidateBookingState);
+// 										else
+// 										{
+// 											logger.error(candidateBookingState.getName() + " is ALREADY checked");
+// 											alternativeBookings--;
+// 										}
+
+										bookingStates.add(candidateBookingState);
 									}
 									else
 										upstreamStates.add(currArc.getFromState());
@@ -751,13 +753,12 @@ public class Milp
 		BufferedReader milpEcho = new BufferedReader(new InputStreamReader(new DataInputStream(milpProcess.getInputStream())));
 
 		// ...and prints it to stdout
-		logger.warn("MILP output starts ");
 		String milpEchoStr;
 		while ((milpEchoStr = milpEcho.readLine()) != null)
 		{
-			logger.info(milpEchoStr);
+			if (milpEchoStr.contains("INTEGER OPTIMAL SOLUTION FOUND") || milpEchoStr.contains("Time") || milpEchoStr.contains("Memory"))
+				logger.info(milpEchoStr);
 		}
-		logger.warn("MILP output ends");
 	}
 }
 
