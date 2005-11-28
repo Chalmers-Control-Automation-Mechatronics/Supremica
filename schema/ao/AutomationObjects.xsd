@@ -46,7 +46,6 @@
    <xsd:sequence>
     <xsd:element ref='Request' minOccurs='0' maxOccurs='unbounded'/>
     <xsd:element ref='Response' minOccurs='0' maxOccurs='unbounded'/>
-    <xsd:element ref='Backend' minOccurs='0' maxOccurs='unbounded'/>
    </xsd:sequence>
   </xsd:complexType>
  </xsd:element>
@@ -70,7 +69,6 @@
    <xsd:attribute name='FBType' type='xsd:string' use='required'/>
    <xsd:attribute name='Comment' type='xsd:string' use='optional'/>
    <xsd:sequence>
-    <xsd:element ref='Frontend' minOccurs='1' maxOccurs='unbounded'/>
     <xsd:element ref='WithController' minOccurs='1' maxOccurs='unbounded'/>
    </xsd:sequence>
   </xsd:complexType>
