@@ -3,21 +3,20 @@
 	targetNamespace="AutomationObjects"
 	xmlns="AutomationObjects"
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-	xmlns:jaxb="http://java.sun.com/xml/ns/jax"b jaxb:version="1.0"
+	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" 
+	jaxb:version="1.0"
 	elementFormDefault="qualified"
 	attributeFormDefault="unqualified"
 	version="1.0">  
 	
-<xsd:annotation>
+  <xsd:annotation>
 	<xsd:appinfo>
 		<jaxb:globalBindings generateIsSetMethod="true"/>
 	</xsd:appinfo>
-</xsd:annotation>
+  </xsd:annotation>
 
  <xsd:element name='AOType'>
   <xsd:complexType>
-   <xsd:attribute name='Name' type='xsd:string' use='required'/>
-   <xsd:attribute name='Comment' type='xsd:string' use='optional'/>
    <xsd:sequence>
     <xsd:element ref='VersionInfo' maxOccurs='unbounded'/>
     <xsd:element ref='Model' minOccurs='1' maxOccurs='unbounded'/>
@@ -25,6 +24,8 @@
     <xsd:element ref='View' minOccurs='0' maxOccurs='unbounded'/>
     <xsd:element ref='Service' minOccurs='0' maxOccurs='unbounded'/>
    </xsd:sequence>
+   <xsd:attribute name='Name' type='xsd:string' use='required'/>
+   <xsd:attribute name='Comment' type='xsd:string' use='optional'/>
   </xsd:complexType>
  </xsd:element>
 
@@ -40,65 +41,65 @@
 
  <xsd:element name='Model'>
   <xsd:complexType>
-   <xsd:attribute name='Name' type='xsd:string' use='required'/>
-   <xsd:attribute name='FBType' type='xsd:string' use='required'/>
-   <xsd:attribute name='Comment' type='xsd:string' use='optional'/>
    <xsd:sequence>
     <xsd:element ref='Request' minOccurs='0' maxOccurs='unbounded'/>
     <xsd:element ref='Response' minOccurs='0' maxOccurs='unbounded'/>
    </xsd:sequence>
+   <xsd:attribute name='Name' type='xsd:string' use='required'/>
+   <xsd:attribute name='FBType' type='xsd:string' use='required'/>
+   <xsd:attribute name='Comment' type='xsd:string' use='optional'/>
   </xsd:complexType>
  </xsd:element>
 
  <xsd:element name='Controller'>
   <xsd:complexType>
-   <xsd:attribute name='Name' type='xsd:string' use='required'/>
-   <xsd:attribute name='FBType' type='xsd:string' use='required'/>
-   <xsd:attribute name='Comment' type='xsd:string' use='optional'/>
    <xsd:sequence>
     <xsd:element ref='Request' minOccurs='0' maxOccurs='unbounded'/>
     <xsd:element ref='Response' minOccurs='0' maxOccurs='unbounded'/>
     <xsd:element ref='WithModel' minOccurs='1' maxOccurs='unbounded'/>
    </xsd:sequence>
+   <xsd:attribute name='Name' type='xsd:string' use='required'/>
+   <xsd:attribute name='FBType' type='xsd:string' use='required'/>
+   <xsd:attribute name='Comment' type='xsd:string' use='optional'/>
   </xsd:complexType>
  </xsd:element>
 
  <xsd:element name='View'>
   <xsd:complexType>
-   <xsd:attribute name='Name' type='xsd:string' use='required'/>
-   <xsd:attribute name='FBType' type='xsd:string' use='required'/>
-   <xsd:attribute name='Comment' type='xsd:string' use='optional'/>
    <xsd:sequence>
     <xsd:element ref='WithController' minOccurs='1' maxOccurs='unbounded'/>
    </xsd:sequence>
+   <xsd:attribute name='Name' type='xsd:string' use='required'/>
+   <xsd:attribute name='FBType' type='xsd:string' use='required'/>
+   <xsd:attribute name='Comment' type='xsd:string' use='optional'/>
   </xsd:complexType>
  </xsd:element>
 
  <xsd:element name='Service'>
   <xsd:complexType>
-   <xsd:attribute name='Name' type='xsd:string' use='required'/>
-   <xsd:attribute name='Comment' type='xsd:string' use='optional'/>
    <xsd:sequence>
     <xsd:element ref='UsesView' minOccurs='1' maxOccurs='unbounded'/>
    </xsd:sequence>
+   <xsd:attribute name='Name' type='xsd:string' use='required'/>
+   <xsd:attribute name='Comment' type='xsd:string' use='optional'/>
   </xsd:complexType>
  </xsd:element>
 
  <xsd:element name='Request'>
   <xsd:complexType>
-   <xsd:attribute name='Name' type='xsd:string' use='required'/>
    <xsd:sequence>
     <xsd:element ref='Argument' minOccurs='0' maxOccurs='unbounded'/>
    </xsd:sequence>
+   <xsd:attribute name='Name' type='xsd:string' use='required'/>
   </xsd:complexType>
  </xsd:element>
 
  <xsd:element name='Response'>
   <xsd:complexType>
-   <xsd:attribute name='Name' type='xsd:string' use='required'/>
    <xsd:sequence>
     <xsd:element ref='Argument' minOccurs='0' maxOccurs='unbounded'/>
    </xsd:sequence>
+   <xsd:attribute name='Name' type='xsd:string' use='required'/>
   </xsd:complexType>
  </xsd:element>
 
