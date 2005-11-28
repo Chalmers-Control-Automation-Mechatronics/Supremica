@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <AOType xmlns="AutomationObjects" Name="Sensor" >
   <VersionInfo Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2005-11-28" />
+
   <ModelType Name="BinaryPassiveSensor" FBType="Sensor_MDL.fbt" >
     <Request Name="CURRENT_VALUE" />
+
 	<Response Name="CURRENT_VALUE">
 	  <Argument Name="VALUE" Type="BOOL" />
 	</Response>
+
 	<Backend>
 	  <EventInputs>
 	    <Event Name="NEW_SAMPLE" >
@@ -14,4 +17,18 @@
 	  </EventInputs>
 	</Backend>
   </ModelType>
+
+  <ControllerType Name="PassThroughController" FBType="PassThrough_CTL" />
+
+  <ViewType Name="EdgeDetectingView" FBType="EdgeDetect_VIEW" >
+    <WithController Name="PassThroughtController">
+
+	<Frontend>
+	  <EventOutputs>
+	    <Event Name="RISING_EDGE" />
+        <Event Name="FALLING_EDGE" />
+	  </EventInputs>
+	</Backend>
+  <ViewType>
+
 </AOType>
