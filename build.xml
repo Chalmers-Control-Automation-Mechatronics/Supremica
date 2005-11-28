@@ -254,10 +254,20 @@
 	/>
 </target>
 
-<!-- Compile:
-*	Reuses existing class files, but recompiles those
-*	source files that have changed.
--->
+<target name="compile_automationobjects_jaxb">
+	<javac
+		srcdir="${src}"
+		destdir="${build}"
+		classpath="${lib}/${unjared}"
+		includeJavaRuntime="yes"
+		deprecation="false"
+		verbose="false"
+		nowarn="true"
+		includes="${supremica_basedir}/automationobjects/xsd/**"		
+		source="1.5"
+	/>
+</target>
+
 <target name="compile_functionblocks_jaxb">
 	<javac
 		srcdir="${src}"
@@ -267,8 +277,7 @@
 		deprecation="false"
 		verbose="false"
 		nowarn="true"
-		includes="
-			${supremica_basedir}/functionblocks/xsd/**"		
+		includes="${supremica_basedir}/functionblocks/xsd/**"		
 		source="1.5"
 	/>
 </target>
@@ -286,8 +295,7 @@
 		deprecation="false"
 		verbose="false"
 		nowarn="true"
-		includes="
-			${supremica_basedir}/manufacturingTables/xsd/**"		
+		includes="${supremica_basedir}/manufacturingTables/xsd/**"		
 		source="1.4"
 	/>
 </target>
@@ -305,8 +313,7 @@
 		deprecation="false"
 		verbose="false"
 		nowarn="true"
-		includes="
-			${supremica_basedir}/automata/algorithms/scheduling/**"		
+		includes="${supremica_basedir}/automata/algorithms/scheduling/**"		
 		source="1.5"
 	/>
 </target>
@@ -571,6 +578,24 @@
 		</fileset>
 	</delete>
 	<unjar src="${lib}/waters_jaxb.jar" dest="${lib}/${unjared}"/>		
+</target>
+
+<target name="jar_automationobjects_jaxb" depends="compile_automationobjects_jaxb">
+	<jar jarfile="${lib}/automationobjects_jaxb.jar"> 
+		<fileset dir="${build}/">
+			<include name="org/supremica/automationobjects/xsd/**"/>
+		</fileset>
+		<fileset dir="${src}/">
+			<include name="**/*.properties"/>
+			<include name="**/*.ser"/>
+		</fileset>
+	</jar>
+	<delete>
+		<fileset dir="${lib}">
+			<include name="org/supremica/automationobjects/xsd/**"/>
+		</fileset>
+	</delete>
+	<unjar src="${lib}/automationobjects_jaxb.jar" dest="${lib}/${unjared}"/>		
 </target>
 
 <target name="jar_functionblocks_jaxb" depends="compile_functionblocks_jaxb">
