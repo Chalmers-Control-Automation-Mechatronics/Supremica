@@ -601,7 +601,6 @@
 <target name="jar_functionblocks_jaxb" depends="compile_functionblocks_jaxb">
 	<jar jarfile="${lib}/functionblocks_jaxb.jar"> 
 		<fileset dir="${build}/">
-			<include name="org/w3/**"/>
 			<include name="org/supremica/functionblocks/xsd/**"/>
 		</fileset>
 		<fileset dir="${src}/">
@@ -611,7 +610,6 @@
 	</jar>
 	<delete>
 		<fileset dir="${lib}">
-			<include name="org/w3/**"/>
 			<include name="org/supremica/functionblocks/xsd/**"/>
 		</fileset>
 	</delete>
