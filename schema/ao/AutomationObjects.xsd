@@ -40,9 +40,9 @@
   <xsd:complexType>
    <xsd:sequence>
     <xsd:element ref='VersionInfo' maxOccurs='unbounded'/>
-    <xsd:element ref='ModelType' minOccurs='1' maxOccurs='unbounded'/>
-    <xsd:element ref='ControllerType' minOccurs='0' maxOccurs='unbounded'/>
-    <xsd:element ref='ViewType' minOccurs='0' maxOccurs='unbounded'/>
+    <xsd:element ref='ModelType' maxOccurs='unbounded'/>
+    <xsd:element ref='ControllerType' maxOccurs='unbounded'/>
+    <xsd:element ref='ViewType' maxOccurs='unbounded'/>
     <xsd:element ref='ServiceType' minOccurs='0' maxOccurs='unbounded'/>
    </xsd:sequence>
    <xsd:attribute name='Name' type='xsd:string' use='required'/>
@@ -66,9 +66,9 @@
  <xsd:element name='ModelType'>
   <xsd:complexType>
    <xsd:sequence>
-    <xsd:element ref='Backend' minOccurs='0' maxOccurs='1'/>
     <xsd:element ref='Request' minOccurs='0' maxOccurs='unbounded'/>
     <xsd:element ref='Response' minOccurs='0' maxOccurs='unbounded'/>
+    <xsd:element ref='Backend' minOccurs='0' maxOccurs='1'/>
    </xsd:sequence>
    <xsd:attribute name='Name' type='xsd:string' use='required'/>
    <xsd:attribute name='FBType' type='xsd:string' use='required'/>
@@ -89,7 +89,7 @@
    <xsd:sequence>
     <xsd:element ref='Request' minOccurs='0' maxOccurs='unbounded'/>
     <xsd:element ref='Response' minOccurs='0' maxOccurs='unbounded'/>
-    <xsd:element ref='WithModel' minOccurs='1' maxOccurs='unbounded'/>
+    <xsd:element ref='WithModel' minOccurs='0' maxOccurs='unbounded'/>
    </xsd:sequence>
    <xsd:attribute name='Name' type='xsd:string' use='required'/>
    <xsd:attribute name='FBType' type='xsd:string' use='required'/>
@@ -100,8 +100,8 @@
  <xsd:element name='ViewType'>
   <xsd:complexType>
    <xsd:sequence>
-    <xsd:element ref='Frontend' minOccurs='0' maxOccurs='1'/>
     <xsd:element ref='WithController' minOccurs='1' maxOccurs='unbounded'/>
+    <xsd:element ref='Frontend' minOccurs='0' maxOccurs='1'/>
    </xsd:sequence>
    <xsd:attribute name='Name' type='xsd:string' use='required'/>
    <xsd:attribute name='FBType' type='xsd:string' use='required'/>
