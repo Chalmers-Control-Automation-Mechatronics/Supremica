@@ -1,32 +1,19 @@
 <project name="schema" default="jar">
-  <description>
-  </description>
-
-  <property file="build.properties"/>                                    
 
   <property name="src" location="../src"/>
   <property name="xsd_iec61499" location="iec61499/xsd"/>
   <property name="xsd_manufacturingTables" location="manufacturingTables/xsd"/>
 
-  <taskdef name="xjc" classname="com.sun.tools.xjc.XJCTask">
-    <classpath>
-      <pathelement path="${jwsdp.classpath}"/>
-    </classpath>
-  </taskdef>
+  <taskdef name="xjc" classname="com.sun.tools.xjc.XJCTask"/>
 
   <target name="gen_ao" description="Generate Automation Objects JAXB classes.">
-    <xjc target="${src}" extension="true" removeOldOutput="yes" package="org.supremica.functionblocks.xsd.datatype">
-      <schema dir="${xsd_iec61499}" includes="DataType.xsd"/>
-      <produces dir="${src}/org/supremica/functionblocks/xsd/datatype"/>
+    <xjc target="${src}" extension="true" removeOldOutput="yes" package="org.supremica.automationobjects.xsd">
+      <schema dir="ao" includes="AutomationObjects.xsd"/>
+      <produces dir="${src}/org/supremica/automationobjects/xsd"/>
     </xjc>
   </target>
 
   <target name="gen_iec61499" description="Generate IEC 61499 JAXB classes.">
-    <taskdef name="xjc" classname="com.sun.tools.xjc.XJCTask">
-      <classpath>
-        <pathelement path="${jwsdp.classpath}"/>
-      </classpath>
-    </taskdef>
     <xjc target="${src}" extension="true" removeOldOutput="yes" package="org.supremica.functionblocks.xsd.datatype">
       <schema dir="${xsd_iec61499}" includes="DataType.xsd"/>
       <produces dir="${src}/org/supremica/functionblocks/xsd/datatype"/>
@@ -42,11 +29,6 @@
   </target>
 
   <target name="gen_ManufacturingTables" description="Generate Manufacturing Tables JAXB classes.">
-    <taskdef name="xjc" classname="com.sun.tools.xjc.XJCTask">
-      <classpath>
-        <pathelement path="${jwsdp.classpath}"/>
-      </classpath>
-    </taskdef>
     <xjc target="${src}" extension="true" removeOldOutput="yes" package="org.supremica.manufacturingTables.xsd.factory">
       <schema dir="${xsd_manufacturingTables}" includes="Factory.xsd"/>
       <produces dir="${src}/org/supremica/manufacturingTables/xsd/factory"/>
