@@ -176,7 +176,7 @@ public class Arc
 		fromState = null;
 		toState = null;
 
-		notifyListeners(ArcListeners.MODE_ARC_REMOVED, this);
+//		notifyListeners(ArcListeners.MODE_ARC_REMOVED, this);
 	}
 
 	// This does not belong here, does it?
