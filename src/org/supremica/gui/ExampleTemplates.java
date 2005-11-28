@@ -25,8 +25,8 @@
  *
  * Knut Akesson (KA), knut@supremica.org
  * Supremica,
- * Haradsgatan 26A
- * 431 42 Molndal
+ * Knarrhogsgatan 10
+ * SE-431 60 MOLNDAL
  * SWEDEN
  *
  * to discuss license terms. No cost evaluation licenses are
@@ -66,22 +66,22 @@ public class ExampleTemplates
     private final TemplateGroup ManufacturingSystemExamples = new TemplateGroup(TemplateTypes.ManufacturingSystemExamples);
     private final TemplateGroup Games = new TemplateGroup(TemplateTypes.Games);
     private final TemplateGroup OtherExamples = new TemplateGroup(TemplateTypes.OtherExample);
-    
+
     //private final TemplateGroup StandardComponents = new TemplateGroup(TemplateTypes.StandardComponent);
     private static final String extraPrefix = "/includeInJarFile";
     private List allGroups = new LinkedList();
-    
+
     private ExampleTemplates()
     {
 		initialize();
     }
-    
+
     private void initialize()
     {
 		initializeCCSBookExamples();
 		initializeCCSBookExercises();
 		initializeCCSCourseAssignments();
-		
+
 		//initializeCCSCourseAssignmentSolutions();
 		initializeCentralLockExamples();
 		initializeAIPExamples();
@@ -90,18 +90,18 @@ public class ExampleTemplates
 		initializeCommunicationSystemExamples();
 		initializeGames();
 		initializeOtherExamples();
-		
+
 		//initializeStandardComponents();
     }
-    
+
     private void initializeCCSBookExamples()
     {
 		TemplateGroup thisGroup = CCSBookExamples;
-		
+
 		allGroups.add(thisGroup);
-		
+
 		String prefix = extraPrefix + "/CCSBookExamples/";
-		
+
 		thisGroup.addItem(new TemplateItem("Chapter 2 - Automaton", prefix + "Ch2_Automaton.xml"));
 		thisGroup.addItem(new TemplateItem("Chapter 2 - Synchronization", prefix + "Ch2_Synchronization.xml"));
 		thisGroup.addItem(new TemplateItem("Chapter 2 - Sub-automata and Refinement", prefix + "Ch2_Sub-automata_and_Refinement.xml"));
@@ -120,15 +120,15 @@ public class ExampleTemplates
 		thisGroup.addItem(new TemplateItem("Chapter 4 - Supervisor Algorithm at Work", prefix + "Ch4_Supervisor_Algorithm_at_Work.xml"));
 		thisGroup.addItem(new TemplateItem("Chapter 4 - Non-Conflicting and Conflicting Supervisors", prefix + "Ch4_Non-Conflicting_and_Conflicting_Supervisors.xml"));
     }
-	
+
     private void initializeCCSBookExercises()
     {
 		TemplateGroup thisGroup = CCSBookExercises;
-		
+
 		allGroups.add(thisGroup);
-		
+
 		String prefix = extraPrefix + "/CCSBookExercises/";
-		
+
 		thisGroup.addItem(new TemplateItem("2.1 - PIN Code Reader", prefix + "Ex2_1.xml"));
 		thisGroup.addItem(new TemplateItem("2.2 - Kanban", prefix + "Ex2_2.xml"));
 		thisGroup.addItem(new TemplateItem("2.6 - Man, Wolf, Goat, Cabbage", prefix + "Ex2_6.xml"));
@@ -139,41 +139,41 @@ public class ExampleTemplates
 		thisGroup.addItem(new TemplateItem("4.5 - Robot & Machine: Put is uncontrollable", prefix + "Ex4_5_b_uncon.xml"));
 		thisGroup.addItem(new TemplateItem("4.6 - Two Machines & a Buffer", prefix + "Ex4_6.xml"));
     }
-	
+
     private void initializeCCSCourseAssignments()
     {
 		TemplateGroup thisGroup = CCSCourseAssignments;
-		
+
 		allGroups.add(thisGroup);
-		
+
 		String prefix = extraPrefix + "/CCSCourseAssignments/";
-		
+
 		thisGroup.addItem(new TemplateItem("FMS Line", prefix + "FMSLine.xml"));
 		thisGroup.addItem(new TemplateItem("Production System", prefix + "ProdSysStudent.xml"));
 		thisGroup.addItem(new TemplateItem("Communication Channel", prefix + "CommunicationChannel.xml"));
     }
-	
+
     private void initializeCCSCourseAssignmentSolutions()
     {
 		TemplateGroup thisGroup = CCSCourseAssignmentSolutions;
-		
+
 		allGroups.add(thisGroup);
-		
+
 		String prefix = extraPrefix + "/CCSCourseAssignments/solutions/";
-		
+
 		thisGroup.addItem(new TemplateItem("FMS Without Feedback", prefix + "FMSLine.xml"));
 		thisGroup.addItem(new TemplateItem("FMS With Feedback", prefix + "FMSLoop.xml"));
 		thisGroup.addItem(new TemplateItem("Communication Channel Specification", prefix + "comm_spec.xml"));
     }
-	
+
     private void initializeOtherExamples()
     {
 		TemplateGroup thisGroup = OtherExamples;
-		
+
 		allGroups.add(thisGroup);
-		
+
 		String prefix = extraPrefix + "/OtherExamples/";
-		
+
 		thisGroup.addItem(new TemplateItem("Automatic Car Park Gate", prefix + "AutomaticCarParkGate.xml"));
 		thisGroup.addItem(new TemplateItem("Ball Process", prefix + "ballProcess.xml"));
 		thisGroup.addItem(new TemplateItem("Ball Process - Gatekeeper", prefix + "ballProcessGatekeeper.xml"));
@@ -186,11 +186,11 @@ public class ExampleTemplates
     private void initializeAIPExamples()
     {
 		TemplateGroup thisGroup = AIPExamples;
-		
+
 		allGroups.add(thisGroup);
-		
+
 		String prefix = extraPrefix + "/OtherExamples/aip/";
-		
+
 		thisGroup.addItem(new TemplateItem("Assembly Station 1", prefix + "System1_system1.xml"));
 		//thisGroup.addItem(new TemplateItem("AIP System 1 - Top AS 1", prefix + "System1_Top_AS1.xml"));
 		thisGroup.addItem(new TemplateItem("Assembly Station 2", prefix + "System2_system2.xml"));
@@ -210,11 +210,11 @@ public class ExampleTemplates
     private void initializeCentralLockExamples()
     {
 		TemplateGroup thisGroup = CentralLockExamples;
-		
+
 		allGroups.add(thisGroup);
-		
+
 		String prefix = extraPrefix + "/OtherExamples/centralLock/";
-		
+
 		thisGroup.addItem(new TemplateItem("Central Lock - 3 Doors", prefix + "verriegel3.xml"));
 		thisGroup.addItem(new TemplateItem("Central Lock - 3 Doors - Uncontrollable", prefix + "verriegel3_uncontrollable.xml"));
 		thisGroup.addItem(new TemplateItem("Central Lock - 3 Doors - Language Inclusion", prefix + "verriegel3_language_inclusion.xml"));
@@ -225,14 +225,14 @@ public class ExampleTemplates
 		thisGroup.addItem(new TemplateItem("Central Lock - 4 Doors - Language Inclusion", prefix + "verriegel4_language_inclusion.xml"));
 		thisGroup.addItem(new TemplateItem("Central Lock - 4 Doors - Language Exclusion", prefix + "verriegel4_language_exclusion.xml"));
     }
-	
+
     private void initializeOperatorSupervisorExamples()
     {
 		TemplateGroup thisGroup = OperatorSupervisorExamples;
 		allGroups.add(thisGroup);
-		
+
 		String prefix = extraPrefix + "/OperatorSupervisor/";
-		
+
 		thisGroup.addItem(new TemplateItem("Warehouse", prefix + "warehouse.xml"));
 		thisGroup.addItem(new TemplateItem("Warehouse k=2", prefix + "warehouse_k2.xml"));
 		thisGroup.addItem(new TemplateItem("Warehouse k=5", prefix + "warehouse_k5.xml"));
@@ -240,20 +240,20 @@ public class ExampleTemplates
 		thisGroup.addItem(new TemplateItem("Warehouse k=10", prefix + "warehouse_k10.xml"));
 		thisGroup.addItem(new TemplateItem("Warehouse k=13", prefix + "warehouse_k13.xml"));
     }
-	
+
     private void initializeCommunicationSystemExamples()
     {
 		TemplateGroup thisGroup = CommunicationSystemExamples;
 		allGroups.add(thisGroup);
-		
+
 		String prefix = extraPrefix + "/CommunicationSystemExamples/";
-		
+
 		thisGroup.addItem(new TemplateItem("Parrow's Protocol", prefix + "ParrowsProtocol.xml"));
 		thisGroup.addItem(new TemplateItem("Alternating Bit Protocol", prefix + "AlternatingBitProtocol1.xml"));
 		thisGroup.addItem(new TemplateItem("Alternating Bit Protocol (variant)", prefix + "AlternatingBitProtocol2.xml"));
 		thisGroup.addItem(new TemplateItem("CSMA/CD Protocol", prefix + "CSMA_CD.xml"));
     }
-	
+
     private void initializeManufacturingSystemExamples()
     {
 		TemplateGroup thisGroup = ManufacturingSystemExamples;
@@ -282,14 +282,14 @@ public class ExampleTemplates
 		thisGroup.addItem(new TemplateItem("Welding Robots", prefix + "weldingRobots.xml"));
 		thisGroup.addItem(new TemplateItem("Robot Assembly Cell", prefix + "robotAssemblyCell.xml"));
     }
-    
+
     private void initializeGames()
     {
 		TemplateGroup thisGroup = Games;
 		allGroups.add(thisGroup);
-		
+
 		String prefix = extraPrefix + "/Games/";
-		
+
 		thisGroup.addItem(new TemplateItem("Wine Merchant's Problem", prefix + "WineMerchant.xml"));
     }
 
@@ -301,17 +301,17 @@ public class ExampleTemplates
       allGroups.add(thisGroup);
       }
     */
-	
+
     public synchronized static ExampleTemplates getInstance()
     {
 		if (templates == null)
 	    {
 			templates = new ExampleTemplates();
 	    }
-		
+
 		return templates;
     }
-	
+
     public Iterator iterator()
     {
 		return allGroups.iterator();

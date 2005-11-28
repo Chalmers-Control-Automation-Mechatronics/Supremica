@@ -25,8 +25,8 @@
  *
  * Knut Akesson (KA), knut@supremica.org
  * Supremica,
- * Haradsgatan 26A
- * 431 42 Molndal
+ * Knarrhogsgatan 10
+ * SE-431 60 MOLNDAL
  * SWEDEN
  *
  * to discuss license terms. No cost evaluation licenses are
@@ -90,9 +90,9 @@ public class AutomataVerificationWorker
 	private static final int MODULAR = 1;
 	private static final int IDD = 2;
 
-	public AutomataVerificationWorker(Gui workbench, Automata theAutomata, 
-									  VerificationOptions verificationOptions, 
-									  SynchronizationOptions synchronizationOptions, 
+	public AutomataVerificationWorker(Gui workbench, Automata theAutomata,
+									  VerificationOptions verificationOptions,
+									  SynchronizationOptions synchronizationOptions,
 									  MinimizationOptions minimizationOptions)
 	{
 		this.workbench = workbench;
@@ -161,7 +161,7 @@ public class AutomataVerificationWorker
 		else
 		{    // Error... this can't happen!
 			requestStop();
-			logger.error("Error in AutomataVerificationWorker. Unavailable option chosen... " + 
+			logger.error("Error in AutomataVerificationWorker. Unavailable option chosen... " +
 						 "this can't happen.\nPlease send bug report to bugs@supremica.org.");
 
 			return;
@@ -176,7 +176,7 @@ public class AutomataVerificationWorker
 		// Initialize the AutomataVerifier
 		try
 		{
-			automataVerifier = new AutomataVerifier(theAutomata, verificationOptions, 
+			automataVerifier = new AutomataVerifier(theAutomata, verificationOptions,
 													synchronizationOptions, minimizationOptions);
 		}
 		catch (Exception ex)

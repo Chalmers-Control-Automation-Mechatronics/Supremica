@@ -25,8 +25,8 @@
  *
  * Knut Akesson (KA), knut@supremica.org
  * Supremica,
- * Haradsgatan 26A
- * 431 42 Molndal
+ * Knarrhogsgatan 10
+ * SE-431 60 MOLNDAL
  * SWEDEN
  *
  * to discuss license terms. No cost evaluation licenses are
@@ -54,23 +54,23 @@ import java.util.*;
 public class MinimizationStrategy
 {
 	private static Collection collection = new LinkedList();
-	public static final MinimizationStrategy RandomOrder = 
+	public static final MinimizationStrategy RandomOrder =
 		new MinimizationStrategy("Random order", true);
-	public static final MinimizationStrategy AtLeastOneUnique = 
+	public static final MinimizationStrategy AtLeastOneUnique =
 		new MinimizationStrategy("At least one unique", true);
-	public static final MinimizationStrategy MostStatesFirst = 
+	public static final MinimizationStrategy MostStatesFirst =
 		new MinimizationStrategy("Most states first", true);
-	public static final MinimizationStrategy FewestStatesFirst = 
+	public static final MinimizationStrategy FewestStatesFirst =
 		new MinimizationStrategy("Fewest states first", true);
-	public static final MinimizationStrategy MostTransitionsFirst = 
+	public static final MinimizationStrategy MostTransitionsFirst =
 		new MinimizationStrategy("Most transitions first", true);
-	public static final MinimizationStrategy FewestTransitionsFirst = 
+	public static final MinimizationStrategy FewestTransitionsFirst =
 		new MinimizationStrategy("Fewest transitions first", true);
-	public static final MinimizationStrategy MostEventsFirst = 
+	public static final MinimizationStrategy MostEventsFirst =
 		new MinimizationStrategy("Most events first", true);
-	public static final MinimizationStrategy FewestEventsFirst = 
+	public static final MinimizationStrategy FewestEventsFirst =
 		new MinimizationStrategy("Fewest events first", true);
-	public static final MinimizationStrategy Undefined = 
+	public static final MinimizationStrategy Undefined =
 		new MinimizationStrategy("Undefined", false);
 	private String description = null;
 
@@ -109,7 +109,7 @@ public class MinimizationStrategy
 				return thisOne;
 			}
 		}
-		
+
 		return Undefined;
 	}
 

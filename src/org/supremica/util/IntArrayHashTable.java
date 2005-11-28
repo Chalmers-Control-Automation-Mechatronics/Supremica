@@ -25,8 +25,8 @@
  *
  * Knut Akesson (KA), knut@supremica.org
  * Supremica,
- * Haradsgatan 26A
- * 431 42 Molndal
+ * Knarrhogsgatan 10
+ * SE-431 60 MOLNDAL
  * SWEDEN
  *
  * to discuss license terms. No cost evaluation licenses are
@@ -464,7 +464,7 @@ public final class IntArrayHashTable
 				throw new NoSuchElementException();
 			}
 			*/
-			
+
 			return nextIntArray();
 		}
 

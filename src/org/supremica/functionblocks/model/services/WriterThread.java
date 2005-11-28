@@ -24,8 +24,8 @@
  *
  * Knut Akesson (KA), knut@supremica.org
  * Supremica,
- * Haradsgatan 26A
- * 431 42 Molndal
+ * Knarrhogsgatan 10
+ * SE-431 60 MOLNDAL
  * SWEDEN
  *
  * to discuss license terms. No cost evaluation licenses are
@@ -65,7 +65,7 @@ public class WriterThread extends Thread
 	private ServiceFBInstance serviceFB;
 
 	//========================================================================
-	private WriterThread() {} 
+	private WriterThread() {}
 
 	public WriterThread(ServiceFBInstance fb)
 	{
@@ -84,7 +84,7 @@ public class WriterThread extends Thread
 
 	public synchronized void deactivateService()
 	{
-		//System.out.println("WriterThread: deactivateService()");		
+		//System.out.println("WriterThread: deactivateService()");
 		serviceActive = false;
 		notifyAll();
 	}
@@ -102,13 +102,13 @@ public class WriterThread extends Thread
 				System.err.println("WriterThread: Interrupted Exception");
 				e.printStackTrace(System.err);
 			}
-			
+
 			// write value to the signal of the Digital I/O card.
-			
+
 
 			// send output event
-			System.out.println("IO_WRITER.bsh(" + serviceFB.getName() + "): Sending CNF event");		
-			serviceFB.sendEvent("CNF");				
+			System.out.println("IO_WRITER.bsh(" + serviceFB.getName() + "): Sending CNF event");
+			serviceFB.sendEvent("CNF");
 		}
-	}   	
+	}
 }

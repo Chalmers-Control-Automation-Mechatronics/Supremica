@@ -24,8 +24,8 @@
  *
  * Knut Akesson (KA), knut@supremica.org
  * Supremica,
- * Haradsgatan 26A
- * 431 42 Molndal
+ * Knarrhogsgatan 10
+ * SE-431 60 MOLNDAL
  * SWEDEN
  *
  * to discuss license terms. No cost evaluation licenses are
@@ -66,7 +66,7 @@ public class ServiceFBInstance extends FBInstance
 	private File serviceScript;
 
 	private Object serviceState;
-	
+
 	private Interpreter interpreter = new Interpreter();
 
 	private EventQueue eventInputQueue = new EventQueue();
@@ -74,7 +74,7 @@ public class ServiceFBInstance extends FBInstance
 
 	//==========================================================================
 	private ServiceFBInstance() {}
-	
+
 	public ServiceFBInstance(String n, Resource r, ServiceFBType t, File script)
 	{
 		setName(n);
@@ -94,11 +94,11 @@ public class ServiceFBInstance extends FBInstance
 			interpreter.set("serviceState", null);
 			interpreter.set("serviceEvent", null);
 			interpreter.set("serviceVariables", variables);
-			
+
 			// evaluate the serviceScript
 			Reader serviceScriptReader = new FileReader(serviceScript);
 			interpreter.eval(serviceScriptReader);
-			
+
 			serviceState = interpreter.get("serviceState");
 			interpreter.set("serviceInitialize", false);
 		}
@@ -107,7 +107,7 @@ public class ServiceFBInstance extends FBInstance
 			System.err.println(e);
 		}
 	}
-	
+
 	public void receiveEvent(String eventInput)
 	{
 		synchronized(eventInputQueue)
@@ -131,12 +131,12 @@ public class ServiceFBInstance extends FBInstance
 			}
 		}
 	}
-	
+
 	public void handleEvent()
 	{
 
 		currentEvent = getNextEvent();
-		
+
 		// set all InputEvents to false
 		for (Iterator iter = variables.iterator();iter.hasNext();)
 		{
@@ -146,23 +146,23 @@ public class ServiceFBInstance extends FBInstance
 				((BooleanVariable) variables.getVariable(curName)).setValue(false);
 			}
 		}
-		// set the corrensponding event var of the input event to TRUE 
+		// set the corrensponding event var of the input event to TRUE
 		((BooleanVariable) variables.getVariable(currentEvent.getName())).setValue(true);
-		
+
 		// get input data values
 		getDataInputs(currentEvent);
-		
+
 		try
 		{
 			interpreter.set("serviceFB", this);
 			interpreter.set("serviceState", serviceState);
 			interpreter.set("serviceEvent", currentEvent);
 			interpreter.set("serviceVariables", variables);
-			
+
 			// evaluate the serviceScript
 			Reader serviceScriptReader = new FileReader(serviceScript);
 			interpreter.eval(serviceScriptReader);
-			
+
 			serviceState = interpreter.get("serviceState");
 			variables = (Variables) interpreter.get("serviceVariables");
 		}
@@ -171,15 +171,15 @@ public class ServiceFBInstance extends FBInstance
 			System.err.println(e);
 		}
 	}
-	
+
 	public Object getServiceState()
 	{
 		return serviceState;
 	}
-	
+
 	private Event getNextEvent()
     {
 		return  (Event) eventInputQueue.remove();
     }
-	
+
 }

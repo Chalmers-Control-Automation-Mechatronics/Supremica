@@ -24,8 +24,8 @@
  *
  * Knut Akesson (KA), knut@supremica.org
  * Supremica,
- * Haradsgatan 26A
- * 431 42 Molndal
+ * Knarrhogsgatan 10
+ * SE-431 60 MOLNDAL
  * SWEDEN
  *
  * to discuss license terms. No cost evaluation licenses are
@@ -104,17 +104,17 @@ public class Scheduler
 				System.err.println("Scheduler.getNextScheduledFBInstance(): InterruptedException");
 			}
 		}
-		
+
 		//System.out.println("Scheduler.getNextScheduledFBInstance(): Getting first instance from the queue ...");
 		//for(Iterator iter = scheduledFBInstances.iterator(); iter.hasNext();)
 		//{
 		//	System.out.println("    scheduledFBInstances: " + ((FBInstance) iter.next()).toString());
 		//}
-		
+
 		return (FBInstance) scheduledFBInstances.remove(0);
 	}
-	
-	
+
+
 	public void runEvents()
 	{
 		System.out.println("Scheduler.runEvents()");
@@ -160,6 +160,6 @@ public class Scheduler
 		//	System.out.println("    scheduledFBInstances: " + ((FBInstance) iter.next()).toString());
 		//}
 		notifyAll();
-	
-	}	
+
+	}
 }

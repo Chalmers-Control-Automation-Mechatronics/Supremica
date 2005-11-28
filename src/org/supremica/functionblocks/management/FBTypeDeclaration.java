@@ -24,8 +24,8 @@
  *
  * Knut Akesson (KA), knut@supremica.org
  * Supremica,
- * Haradsgatan 26A
- * 431 42 Molndal
+ * Knarrhogsgatan 10
+ * SE-431 60 MOLNDAL
  * SWEDEN
  *
  * to discuss license terms. No cost evaluation licenses are
@@ -57,12 +57,12 @@ import java.util.*;
 public class FBTypeDeclaration
 	extends LibraryElement
 {
-	
+
 	private List eventInputDeclarations = new LinkedList();
 	private List eventOutputDeclarations = new LinkedList();
 	private List inputVariableDeclarations = new LinkedList();
 	private List outputVariableDeclarations = new LinkedList();
-	
+
 	public FBTypeDeclaration(String name)
 	{
 		super(name);
@@ -72,7 +72,7 @@ public class FBTypeDeclaration
 	{
 		eventInputDeclarations.add(event);
 	}
-	
+
 	public void addEventOutputDeclaration(EventOutputDeclaration event)
 	{
 		eventOutputDeclarations.add(event);

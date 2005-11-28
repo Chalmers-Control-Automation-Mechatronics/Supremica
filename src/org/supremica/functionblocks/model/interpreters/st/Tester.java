@@ -24,8 +24,8 @@
  *
  * Knut Akesson (KA), knut@supremica.org
  * Supremica,
- * Haradsgatan 26A
- * 431 42 Molndal
+ * Knarrhogsgatan 10
+ * SE-431 60 MOLNDAL
  * SWEDEN
  *
  * to discuss license terms. No cost evaluation licenses are
@@ -61,12 +61,12 @@ import org.supremica.functionblocks.model.ECCondition;
  * Class for testing of the ST interpreter
  * @author Goran Cengic
  */
-public class Tester 
+public class Tester
 {
-	
+
 	public Tester()
 	{
-		
+
 		// Test ST interpreter
 		Variables testVars = new Variables();
 		testVars.addVariable("bvar", new BooleanVariable("Local", true));
@@ -74,10 +74,10 @@ public class Tester
 		testVars.addVariable("dvar", new DoubleVariable("Local", 3.14));
 		testVars.addVariable("fvar", new FloatVariable("Local", 3.18F));
 		testVars.addVariable("svar", new StringVariable("Local", "TestString"));
-		
+
 		System.out.println("Tester(): Testing Expressions:");
 		System.out.println("Testing Primary Expressions:");
-		ECCondition testCond = new ECCondition("TRUE"); 
+		ECCondition testCond = new ECCondition("TRUE");
 		System.out.println("evaluation result: " + testCond.evaluate(testVars));
 		testCond.set("3.18F");
 		System.out.println("evaluation result: " + testCond.evaluate(testVars));

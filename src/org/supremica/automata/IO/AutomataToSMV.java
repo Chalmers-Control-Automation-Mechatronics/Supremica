@@ -25,8 +25,8 @@
  *
  * Knut Akesson (KA), knut@supremica.org
  * Supremica,
- * Haradsgatan 26A
- * 431 42 Molndal
+ * Knarrhogsgatan 10
+ * SE-431 60 MOLNDAL
  * SWEDEN
  *
  * to discuss license terms. No cost evaluation licenses are
@@ -165,7 +165,7 @@ public class AutomataToSMV
 			for (ArcIterator evIt = currState.outgoingArcsIterator(); evIt.hasNext(); )
 			{
 				LabeledEvent currEvent = evIt.nextEvent();
-				
+
 				pw.print("\t\t\t(s.event = e_" + currEvent.getSynchIndex() + ") & ");
 				pw.print("(s.q_" + currAutomatonIndex + " = q_" + currAutomatonIndex + "_" + currState.getSynchIndex() + ") & ");
 				pw.print("TRUE");    // Broadcast synchronization

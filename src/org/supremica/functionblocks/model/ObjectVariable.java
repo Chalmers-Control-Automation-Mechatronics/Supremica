@@ -24,8 +24,8 @@
  *
  * Knut Akesson (KA), knut@supremica.org
  * Supremica,
- * Haradsgatan 26A
- * 431 42 Molndal
+ * Knarrhogsgatan 10
+ * SE-431 60 MOLNDAL
  * SWEDEN
  *
  * to discuss license terms. No cost evaluation licenses are
@@ -52,7 +52,7 @@ package org.supremica.functionblocks.model;
 
 public class ObjectVariable extends Variable
 {
-	
+
 	private Object value = null;
 
 	public ObjectVariable(String type, Object o)
@@ -69,14 +69,14 @@ public class ObjectVariable extends Variable
 	public synchronized Object getValue()
 	{
 		return value;
-		
+
 	}
 
 	public Object clone()
 	{
 		return new ObjectVariable(getType(),getValue());
 	}
-	
+
 	public String toString()
 	{
 		return getType() + " " + value.toString();

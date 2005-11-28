@@ -24,8 +24,8 @@
  *
  * Knut Akesson (KA), knut@supremica.org
  * Supremica,
- * Haradsgatan 26A
- * 431 42 Molndal
+ * Knarrhogsgatan 10
+ * SE-431 60 MOLNDAL
  * SWEDEN
  *
  * to discuss license terms. No cost evaluation licenses are
@@ -59,7 +59,7 @@ public class UnaryExpressionExpression extends UnaryExpression
 	public Expression a;
 
 	private UnaryExpressionExpression() {}
-	
+
 	public UnaryExpressionExpression(Expression aa) {a=aa;}
 
 }

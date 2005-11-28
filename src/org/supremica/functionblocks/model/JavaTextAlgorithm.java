@@ -24,8 +24,8 @@
  *
  * Knut Akesson (KA), knut@supremica.org
  * Supremica,
- * Haradsgatan 26A
- * 431 42 Molndal
+ * Knarrhogsgatan 10
+ * SE-431 60 MOLNDAL
  * SWEDEN
  *
  * to discuss license terms. No cost evaluation licenses are
@@ -88,32 +88,32 @@ public class JavaTextAlgorithm extends Algorithm
 				{
 					if (curVariable instanceof StringVariable)
 					{
-						StringVariable tmpVar = (StringVariable) vars.getVariable(curName); 
+						StringVariable tmpVar = (StringVariable) vars.getVariable(curName);
 						interpreter.set(curName,tmpVar.getValue());
 					}
 					else if (curVariable instanceof IntegerVariable)
 					{
-						IntegerVariable tmpVar = (IntegerVariable) vars.getVariable(curName); 
+						IntegerVariable tmpVar = (IntegerVariable) vars.getVariable(curName);
 						interpreter.set(curName,tmpVar.getValue().intValue());
 					}
 					else if (curVariable instanceof DoubleVariable)
 					{
-						DoubleVariable tmpVar = (DoubleVariable) vars.getVariable(curName); 
+						DoubleVariable tmpVar = (DoubleVariable) vars.getVariable(curName);
 						interpreter.set(curName,tmpVar.getValue().doubleValue());
 					}
 					else if (curVariable instanceof FloatVariable)
 					{
-						FloatVariable tmpVar = (FloatVariable) vars.getVariable(curName); 
+						FloatVariable tmpVar = (FloatVariable) vars.getVariable(curName);
 						interpreter.set(curName,tmpVar.getValue().floatValue());
 					}
 					else if (curVariable instanceof BooleanVariable)
 					{
-						BooleanVariable tmpVar = (BooleanVariable) vars.getVariable(curName); 
+						BooleanVariable tmpVar = (BooleanVariable) vars.getVariable(curName);
 						interpreter.set(curName,tmpVar.getValue().booleanValue());
 					}
 					else if (curVariable instanceof ObjectVariable)
 					{
-						ObjectVariable tmpVar = (ObjectVariable) vars.getVariable(curName); 
+						ObjectVariable tmpVar = (ObjectVariable) vars.getVariable(curName);
 						interpreter.set(curName,tmpVar.getValue());
 					}
 				}
@@ -123,7 +123,7 @@ public class JavaTextAlgorithm extends Algorithm
 				}
 			}
 		}
-		
+
 		//execute algorithm
 
 		try
@@ -135,7 +135,7 @@ public class JavaTextAlgorithm extends Algorithm
 		{
 			System.err.println(e);
 		}
-		
+
 		//get variables
 		for (Iterator iter = vars.iterator();iter.hasNext();)
 		{
@@ -147,37 +147,37 @@ public class JavaTextAlgorithm extends Algorithm
 				{
 					if (curVariable instanceof StringVariable)
 					{
-						StringVariable tmpVar = (StringVariable) vars.getVariable(curName); 
+						StringVariable tmpVar = (StringVariable) vars.getVariable(curName);
 						String tmpValue = (String) interpreter.get(curName);
 						((StringVariable) vars.getVariable(curName)).setValue(tmpValue);
 					}
 					else if (curVariable instanceof IntegerVariable)
 					{
-						IntegerVariable tmpVar = (IntegerVariable) vars.getVariable(curName); 
+						IntegerVariable tmpVar = (IntegerVariable) vars.getVariable(curName);
 						int tmpValue = ((Integer) interpreter.get(curName)).intValue();
 						((IntegerVariable) vars.getVariable(curName)).setValue(tmpValue);
 					}
 					else if (curVariable instanceof DoubleVariable)
 					{
-						DoubleVariable tmpVar = (DoubleVariable) vars.getVariable(curName); 
+						DoubleVariable tmpVar = (DoubleVariable) vars.getVariable(curName);
 						double tmpValue = ((Double) interpreter.get(curName)).doubleValue();
 						((DoubleVariable) vars.getVariable(curName)).setValue(tmpValue);
 					}
 					else if (curVariable instanceof FloatVariable)
 					{
-						FloatVariable tmpVar = (FloatVariable) vars.getVariable(curName); 
+						FloatVariable tmpVar = (FloatVariable) vars.getVariable(curName);
 						float tmpValue = ((Float) interpreter.get(curName)).floatValue();
 						((FloatVariable) vars.getVariable(curName)).setValue(tmpValue);
 					}
 					else if (curVariable instanceof BooleanVariable)
 					{
-						BooleanVariable tmpVar = (BooleanVariable) vars.getVariable(curName); 
+						BooleanVariable tmpVar = (BooleanVariable) vars.getVariable(curName);
 						boolean tmpValue = ((Boolean) interpreter.get(curName)).booleanValue();
 						((BooleanVariable) vars.getVariable(curName)).setValue(tmpValue);
 					}
 					else if (curVariable instanceof ObjectVariable)
 					{
-						ObjectVariable tmpVar = (ObjectVariable) vars.getVariable(curName); 
+						ObjectVariable tmpVar = (ObjectVariable) vars.getVariable(curName);
 						Object tmpValue = (Object) interpreter.get(curName);
 						((ObjectVariable) vars.getVariable(curName)).setValue(tmpValue);
 					}
@@ -188,7 +188,7 @@ public class JavaTextAlgorithm extends Algorithm
 				}
 			}
 		}
-		
+
 	}
-	
+
 }

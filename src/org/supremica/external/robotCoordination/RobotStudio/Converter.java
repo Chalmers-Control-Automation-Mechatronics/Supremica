@@ -24,8 +24,8 @@
  *
  * Knut Akesson (KA), knut@supremica.org
  * Supremica,
- * Haradsgatan 26A
- * 431 42 Molndal
+ * Knarrhogsgatan 10
+ * SE-431 60 MOLNDAL
  * SWEDEN
  *
  * to discuss license terms. No cost evaluation licenses are
@@ -57,9 +57,9 @@ import org.supremica.external.comInterfaces.robotstudio_3_1.RobotStudio.ITransfo
  * A static class that contains conversion methods for conversion
  * between Supremica and RobotStudio formats.
  */
-public class Converter 
+public class Converter
 {
-	/** 
+	/**
 	 * Offset (times the scaling). With an OFFSET-value of 0.5 and a
 	 * scaling of 1 in all directions, this means that the
 	 * "Supremica"-coordinate <0,0,0> ends up in the
@@ -80,7 +80,7 @@ public class Converter
     {
 		return new Variant(i);
     }
-	
+
     /**
      * Typecast i into Variant, for convenience! (Variant is something like
      * VB:s counterpart of java's Object.)
@@ -104,10 +104,10 @@ public class Converter
     /**
      * Converts a RobotStudio coordinate to a Supremica Coordinate (or Supremica index)
      */
-    static Coordinate toCoordinate(double x, double y, double z) 
+    static Coordinate toCoordinate(double x, double y, double z)
     {
 		double[] scaling = RSCell.boxDimensions;
-		
+
 		x += OFFSET * scaling[0];
 		y += OFFSET * scaling[1];
 		z += OFFSET * scaling[2];
@@ -122,13 +122,13 @@ public class Converter
     /**
      * Converts a RobotStudio transform to a Supremica Coordinate (or Supremica index)
      */
-    static Coordinate toCoordinate(ITransform trans) 
+    static Coordinate toCoordinate(ITransform trans)
     {
 		try
 		{
 			return toCoordinate(trans.getX(), trans.getY(), trans.getZ());
 		}
-		catch (Exception e) 
+		catch (Exception e)
 		{
 			e.printStackTrace();
 			return null;
@@ -138,33 +138,33 @@ public class Converter
 	/**
 	 * Converts a coordinate name to a Supremica Coordinate.
 	 */
-	static Coordinate toCoordinate(String name) 
+	static Coordinate toCoordinate(String name)
 		throws Exception
 	{
 		String[] strCoords = name.split("_");
 		int[] coords = new int[3];
 
-		for (int i = 1; i<strCoords.length; i++) 
+		for (int i = 1; i<strCoords.length; i++)
 		{
 			strCoords[i] = strCoords[i].replace("m", "-");
 			coords[i-1] = Integer.parseInt(strCoords[i]);
 		}
-		
+
 		return new Coordinate(coords);
 	}
 
     /**
      * Converts a Supremica Coordinate to a 3D-point in the world frame of RobotStudio
      */
-    static double[] toRSPoint(Coordinate coord) 
+    static double[] toRSPoint(Coordinate coord)
     {
 		double[] scaling = RSCell.boxDimensions;
 		double[] pointCoord = new double[3];
-		
+
 		pointCoord[0] = coord.getX() * scaling[0] - OFFSET * scaling[0];
 		pointCoord[1] = coord.getY() * scaling[1] - OFFSET * scaling[1];
 		pointCoord[2] = coord.getZ() * scaling[2] - OFFSET * scaling[2];
-		
+
 		return pointCoord;
     }
 }

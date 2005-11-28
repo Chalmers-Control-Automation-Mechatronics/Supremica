@@ -25,8 +25,8 @@
  *
  * Knut Akesson (KA), knut@supremica.org
  * Supremica,
- * Haradsgatan 26A
- * 431 42 Molndal
+ * Knarrhogsgatan 10
+ * SE-431 60 MOLNDAL
  * SWEDEN
  *
  * to discuss license terms. No cost evaluation licenses are
@@ -1038,7 +1038,7 @@ class FindStatesFrame
 			goAhead(true); // find and present
 		}
 	}
-	
+
 	private class ForbidButton
 		extends JButton
 	{
@@ -1064,8 +1064,8 @@ class FindStatesFrame
 			//	if its seach criteria is "dont care" ignore it [we do not _have_ to do this but it saves efficiency]
 			//	else
 			// 		search only this automaton according to its criterion
-			// 		self-loop each found state with	the x-event	(a single x-event for each invocation)	
-			
+			// 		self-loop each found state with	the x-event	(a single x-event for each invocation)
+
 			// For now we try this
 			goAhead(false);	// find but do not present
 		}
@@ -1129,10 +1129,10 @@ class FindStatesFrame
 				if(present)
 				{
 					PresentStates present_states = new PresentStates(this, ss, getAutomata(), theVisualProject);
-					present_states.start(); // From the docs: Causes this thread to begin execution; 
-											// the Java Virtual Machine calls the run method of this thread. 
-											// The result is that two threads are running concurrently: the 
-											// current thread (which returns from the call to the start method) 
+					present_states.start(); // From the docs: Causes this thread to begin execution;
+											// the Java Virtual Machine calls the run method of this thread.
+											// The result is that two threads are running concurrently: the
+											// current thread (which returns from the call to the start method)
 											// and the other thread (which executes its run method).
 				}
 				else

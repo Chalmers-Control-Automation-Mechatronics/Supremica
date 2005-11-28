@@ -24,8 +24,8 @@
  *
  * Knut Akesson (KA), knut@supremica.org
  * Supremica,
- * Haradsgatan 26A
- * 431 42 Molndal
+ * Knarrhogsgatan 10
+ * SE-431 60 MOLNDAL
  * SWEDEN
  *
  * to discuss license terms. No cost evaluation licenses are
@@ -73,22 +73,22 @@ public class BasicFBType extends FBType
 	// forbid this kind of instantiation
 	private BasicFBType() {}
 
-	// instantiate BasicFBType of name n in resource r 
+	// instantiate BasicFBType of name n in resource r
 	public BasicFBType(String n,Resource r)
 	{
 		System.out.println("BasicFBType(" + n + "," + r.getName()  + ")");
 		setName(n);
 		resource = r;
 	}
-	
+
 	//==========================================================================
-	
+
 
 	public FBInstance createInstance(String name)
 	{
 		System.out.println("BasicFBType.createInstance(" + name + ")");
-		BasicFBInstance newInstance = new BasicFBInstance(name,resource,this);	
-		
+		BasicFBInstance newInstance = new BasicFBInstance(name,resource,this);
+
 		newInstance.setEvents(events);
 
 		newInstance.setVariables((Variables) variables.clone());

@@ -25,8 +25,8 @@
  *
  * Knut Akesson (KA), knut@supremica.org
  * Supremica,
- * Haradsgatan 26A
- * 431 42 Molndal
+ * Knarrhogsgatan 10
+ * SE-431 60 MOLNDAL
  * SWEDEN
  *
  * to discuss license terms. No cost evaluation licenses are
@@ -87,7 +87,7 @@ public class AutomataSynthesizer
 	// For the optimization...
 	private boolean maximallyPermissive;
 
-	public AutomataSynthesizer(Automata theAutomata, SynchronizationOptions synchronizationOptions, 
+	public AutomataSynthesizer(Automata theAutomata, SynchronizationOptions synchronizationOptions,
 							   SynthesizerOptions synthesizerOptions)
 		throws Exception, IllegalArgumentException
 	{
@@ -99,7 +99,7 @@ public class AutomataSynthesizer
 		this.maximallyPermissive = synthesizerOptions.getMaximallyPermissive();
 
 		// Some sanity tests (should already have been tested from ActionMan?)
-		if ((synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.Modular) && 
+		if ((synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.Modular) &&
 			!theAutomata.isAllEventsPrioritized())
 		{
 			throw new IllegalArgumentException("All events are not prioritized!");
@@ -110,10 +110,10 @@ public class AutomataSynthesizer
 		{
 			SynthesisType typ = synthesizerOptions.getSynthesisType();
 
-			if ((typ != SynthesisType.Both) && (typ != SynthesisType.Controllable) && 
+			if ((typ != SynthesisType.Both) && (typ != SynthesisType.Controllable) &&
 				(typ != SynthesisType.Nonblocking))
 			{
-				throw new IllegalArgumentException("BDD algorithms currently only " + 
+				throw new IllegalArgumentException("BDD algorithms currently only " +
 												   "support supNB+C synthesis.");
 			}
 
@@ -197,7 +197,7 @@ public class AutomataSynthesizer
 
 			result.addAutomata(newSupervisors);    // let the user choose the name later
 		}
-		else if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.BDD)    
+		else if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.BDD)
 		{
 			// BDD synthesis
 			SynthesisType typ = synthesizerOptions.getSynthesisType();
@@ -229,11 +229,11 @@ public class AutomataSynthesizer
 			{
 				// disregard the uc-events of this spec/supervisor
 				Automaton currAutomaton = (Automaton) autIt.next();
-				
+
 				if (currAutomaton.isSupervisor() || currAutomaton.isSpecification())
 				{
 					Alphabet currAlphabet = currAutomaton.getAlphabet();
-					
+
 					disabledUncontrollableEvents.minus(currAlphabet);
 				}
 			}
@@ -291,10 +291,10 @@ public class AutomataSynthesizer
 		throws Exception
 	{
 		// Automata that collects the calculated supervisors
-		Automata modSupervisors = new Automata();    
+		Automata modSupervisors = new Automata();
 
 		// Selector - always start with non-max perm
-		AutomataSelector selector = new AutomataSelector(aut);    
+		AutomataSelector selector = new AutomataSelector(aut);
 
 		// Initialize execution dialog
 		java.awt.EventQueue.invokeLater(new Runnable()
@@ -319,7 +319,7 @@ public class AutomataSynthesizer
 
 			// In the non incremental approach, immediately add all plants that are related
 			// by uncontrollable events. Otherwise this is done incrementally below
-			if (synthesizerOptions.getMaximallyPermissive() && 
+			if (synthesizerOptions.getMaximallyPermissive() &&
 				!synthesizerOptions.getMaximallyPermissiveIncremental())
 			{
 				// Loop until no new uncontrollable events are found
@@ -349,17 +349,17 @@ public class AutomataSynthesizer
 				// Do we care about max perm?
 				if (synthesizerOptions.getMaximallyPermissive())
 				{
-					// As long as uncontrollable events had to be "disabled" by the supervisor that 
+					// As long as uncontrollable events had to be "disabled" by the supervisor that
 					// instead could have been disabled by a plant (right?) repeat the below...
 					// In this maner, we're *guaranteed* max perm
-					while (disabledUncontrollableEvents.size() > 0)    
+					while (disabledUncontrollableEvents.size() > 0)
 					{
-						// Note that in the nonincremental approach, this will add no new plants 
+						// Note that in the nonincremental approach, this will add no new plants
 						// since they are already added!
 						automata = selector.addPlants(disabledUncontrollableEvents);
 
 						// Do monolithic synthesis on this subsystem
-						retval = doMonolithic(automata);    
+						retval = doMonolithic(automata);
 
 						if (stopRequested)
 						{
@@ -369,10 +369,10 @@ public class AutomataSynthesizer
 						disabledUncontrollableEvents = checkMaximallyPermissive(automata, retval.disabledUncontrollableEvents);
 					}
 				}
-				else 
+				else
 				{
 					// We do not care about max perm, but could at least notify
-					if (disabledUncontrollableEvents.size() > 0) 
+					if (disabledUncontrollableEvents.size() > 0)
 					{
 						// Not guranteed to be max perm
 						logger.info("The synthesized supervisor '" + retval.automaton.getComment() +
@@ -386,7 +386,7 @@ public class AutomataSynthesizer
 										"in the supervisor.");
 						}
 					}
-					else  
+					else
 					{
 						// It's max perm in any case
 						logger.info("The synthesized supervisor '" + retval.automaton.getComment() +
@@ -406,7 +406,7 @@ public class AutomataSynthesizer
 
 		// If no spec/sup is in the selected automata, only nonblocking requires work
 		// if we've not seen any spec, do monolithic synthesis on the entire set
-		if (selector.hadSpec() == false)    
+		if (selector.hadSpec() == false)
 		{
 			logger.debug("No spec/sup seen, doing monolithic synthesis on the entire set.");
 
@@ -500,7 +500,7 @@ public class AutomataSynthesizer
 			if (problemEvents.size() > 0)
 			{
 				// Make copy since we will change controllability
-				Automata newAutomata = new Automata(automata);    
+				Automata newAutomata = new Automata(automata);
 
 				// Iterate over all the automata and change
 				// controllability of the problem events
@@ -530,7 +530,7 @@ public class AutomataSynthesizer
 					LabeledEvent currEvent = evIt.nextEvent();
 					sb.append(currEvent + " ");
 				}
-				
+
 				logger.warn(sb.toString() + "are controllable but not observable. This imply that a supremal " +
 							"supervisor may not exist. To guarantee existence of such a supervisor the events " +
 							"will be treated us uncontrollable from the supervisors point of view. However the " +
@@ -554,7 +554,7 @@ public class AutomataSynthesizer
 		threadToStop = syncher;
 		syncher.execute();
 		threadToStop = null;
-		
+
 		if (stopRequested)
 		{
 			return null;
@@ -651,11 +651,11 @@ public class AutomataSynthesizer
 		Automata currAutomata = new Automata();
 		currAutomata.addAutomata(theAutomata);
 		currAutomata.addAutomata(newSupervisors);
-		
+
 		// Remove one of the candidate supervisors in newSupervisors at a time and see
-		// if the behaviour of the rest of the system is included in that supervisor 
+		// if the behaviour of the rest of the system is included in that supervisor
 		// (i.e. the system already behaves like that without the supervisor).
-		
+
 		// Remove the new automata one by one and examine if it had impact on the result.
 		int progress = 0;
 		for (int i = newSupervisors.size() - 1; i >= 0; i--)
@@ -682,8 +682,8 @@ public class AutomataSynthesizer
 			SynchronizationOptions synchronizationOptions;
 			verificationOptions = VerificationOptions.getDefaultControllabilityOptions();
 			synchronizationOptions = SynchronizationOptions.getDefaultVerificationOptions();
-			AutomataVerifier verifier = new AutomataVerifier(currAutomata, verificationOptions, 
-															 synchronizationOptions, null);			
+			AutomataVerifier verifier = new AutomataVerifier(currAutomata, verificationOptions,
+															 synchronizationOptions, null);
 
 			if (stopRequested)
 			{
@@ -691,7 +691,7 @@ public class AutomataSynthesizer
 			}
 
 			// Will the supervisor affect the system at all?
-			logger.verbose("Examining whether the supervisor candidate " + 
+			logger.verbose("Examining whether the supervisor candidate " +
 						   currSupervisor + " is needed.");
 			threadToStop = verifier;
 			// if (AutomataVerifier.verifyModularInclusion(currAutomata, new Automata(currSupervisor)))
@@ -741,7 +741,7 @@ public class AutomataSynthesizer
 			currAutomata.removeAutomaton(newSupervisors.getAutomatonAt(i));
 
 			try
-			{    
+			{
                 // Verify controllability with one automaton removed
 				theVerifier = new AutomataVerifier(currAutomata, syncOptions, theVerificationOptions);
 

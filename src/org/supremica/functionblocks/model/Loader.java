@@ -24,8 +24,8 @@
  *
  * Knut Akesson (KA), knut@supremica.org
  * Supremica,
- * Haradsgatan 26A
- * 431 42 Molndal
+ * Knarrhogsgatan 10
+ * SE-431 60 MOLNDAL
  * SWEDEN
  *
  * to discuss license terms. No cost evaluation licenses are
@@ -112,11 +112,11 @@ public class Loader
 		}
 		else // libraryPath is specified by the user
 		{
-			
+
 			while (true)
 			{
 				File curLibraryDir;
-				
+
 				if (libraryPath.indexOf(File.pathSeparatorChar) == -1)
 				{
 					curLibraryDir = new File(libraryPathBase, libraryPath);
@@ -125,7 +125,7 @@ public class Loader
 				{
 					curLibraryDir = new File(libraryPathBase, libraryPath.substring(0,libraryPath.indexOf(File.pathSeparatorChar)));
 				}
-				
+
 				if (!curLibraryDir.isDirectory())
 				{
 					java.lang.System.err.println("Loader(" + device.getName() + "): Specified library path element " + curLibraryDir.getAbsolutePath() + " is not a directory!");
@@ -143,10 +143,10 @@ public class Loader
 				{
 					break;
 				}
-				
-				libraryPath = libraryPath.substring(libraryPath.indexOf(File.pathSeparatorChar)+1);	
+
+				libraryPath = libraryPath.substring(libraryPath.indexOf(File.pathSeparatorChar)+1);
 			}
-			
+
 		}
 
 		// create unmarshaller
@@ -160,7 +160,7 @@ public class Loader
 		{
 			java.lang.System.err.println(e);
 			java.lang.System.exit(1);
-		}		
+		}
 
 
 		load(systemFileName);
@@ -169,7 +169,7 @@ public class Loader
 
     public void load(String fileName)
     {
-		
+
 		File file = getFile(fileName);
 
 		try
@@ -210,7 +210,7 @@ public class Loader
 				}
 			}
 		}
-		
+
 		if (!theFile.exists())
 		{
 			java.lang.System.err.println("Loader.getFile(" + fileName + "): The file " + fileName + " does not exist in the specified libraries...");
@@ -230,7 +230,7 @@ public class Loader
 
 		return theFile;
 	}
-	
+
     private void loadSystem(org.supremica.functionblocks.xsd.libraryelement.System xmlSystemData)
     {
 
@@ -254,7 +254,7 @@ public class Loader
 				}
 			}
 		}
-		
+
 
 		// Loading of Application element
 		/*
@@ -273,9 +273,9 @@ public class Loader
 			}
 			}
 		*/
-		
+
     }
-	
+
     private void loadFBType(org.supremica.functionblocks.xsd.libraryelement.FBType xmlFBTypeData)
     {
 		if (xmlFBTypeData.isSetFBNetwork())
@@ -283,70 +283,70 @@ public class Loader
 			// load composite FB
 
 			resource.addCompositeFBType(xmlFBTypeData.getName());
-			
+
 			CompositeFBType newCompositeFBType = (CompositeFBType) resource.getFBType(xmlFBTypeData.getName());
-			
+
 			constructFBInterface(xmlFBTypeData,newCompositeFBType);
-			
+
 			constructCompositeFBType((org.supremica.functionblocks.xsd.libraryelement.FBNetwork) xmlFBTypeData.getFBNetwork(),newCompositeFBType);
 		}
 		else if (xmlFBTypeData.isSetBasicFB())
 		{
 			// load  BasicFBType
-			
+
 			resource.addBasicFBType(xmlFBTypeData.getName());
-			
+
 			BasicFBType newBasicFBType = (BasicFBType) resource.getFBType(xmlFBTypeData.getName());
-			
+
 			constructFBInterface(xmlFBTypeData,newBasicFBType);
-			
+
 			constructBasicFBType(xmlFBTypeData,newBasicFBType);
 		}
 		// load service FBs
 		else if (xmlFBTypeData.getName().equals("ADLINK_IO"))
 		{
 			resource.addServiceFBType("ADLINK_IO", getFile("ADLINK_IO.bsh"));
-			
+
 			ServiceFBType newServiceFBType =  (ServiceFBType) resource.getFBType("ADLINK_IO");
-			
+
 			constructFBInterface(xmlFBTypeData,newServiceFBType);
 		}
 		else if (xmlFBTypeData.getName().equals("IO_READER"))
 		{
 			resource.addServiceFBType("IO_READER", getFile("IO_READER.bsh"));
-			
+
 			ServiceFBType newServiceFBType =  (ServiceFBType) resource.getFBType("IO_READER");
-			
+
 			constructFBInterface(xmlFBTypeData,newServiceFBType);
 		}
 		else if (xmlFBTypeData.getName().equals("IO_WRITER"))
 		{
 			resource.addServiceFBType("IO_WRITER", getFile("IO_WRITER.bsh"));
-			
+
 			ServiceFBType newServiceFBType =  (ServiceFBType) resource.getFBType("IO_WRITER");
-			
+
 			constructFBInterface(xmlFBTypeData,newServiceFBType);
 		}
 		else if (xmlFBTypeData.getName().equals("E_DELAY"))
 		{
 			resource.addServiceFBType("E_DELAY", getFile("E_DELAY.bsh"));
-			
+
 			ServiceFBType newServiceFBType =  (ServiceFBType) resource.getFBType("E_DELAY");
-			
+
 			constructFBInterface(xmlFBTypeData,newServiceFBType);
 		}
 		else if (xmlFBTypeData.getName().equals("E_RESTART"))
 		{
 			resource.addBasicFBType("E_RESTART");
-			
+
 			BasicFBType newBasicFBType = (BasicFBType) resource.getFBType("E_RESTART");
-			
+
 			constructFBInterface(xmlFBTypeData,newBasicFBType);
 		}
 		else
 		{
 			java.lang.System.err.println("Loader.loadFBType(): The type " + xmlFBTypeData.getName() + " is not supported yet!");
-			java.lang.System.exit(0);			
+			java.lang.System.exit(0);
 		}
     }
 
@@ -366,7 +366,7 @@ public class Loader
 				fbNetwork.addFBInstance(curFB.getName(),curFB.getType());
 			}
 		}
-		
+
 
 		if (xmlFBNetworkData.isSetEventConnections())
 		{
@@ -377,7 +377,7 @@ public class Loader
 				fbNetwork.addEventConnection(curConn.getSource(), curConn.getDestination());
 			}
 		}
-		
+
 
 		if (xmlFBNetworkData.isSetDataConnections())
 		{
@@ -389,14 +389,14 @@ public class Loader
 			}
 		}
     }
-	
+
 	private void constructFBInterface(org.supremica.functionblocks.xsd.libraryelement.FBType xmlFBTypeData, FBType newFBType)
 	{
-		
+
 		// Build the interface
 		if (xmlFBTypeData.isSetInterfaceList())
 		{
-			
+
 			// event inputs
 			if (xmlFBTypeData.getInterfaceList().isSetEventInputs())
 			{
@@ -677,7 +677,7 @@ public class Loader
 				newCompositeFBType.addFBInstance(curFB.getName(),curFB.getType());
 			}
 		}
-		
+
 
 		if (xmlFBNetworkData.isSetEventConnections())
 		{
@@ -690,7 +690,7 @@ public class Loader
 				newCompositeFBType.addEventConnection(source, dest);
 			}
 		}
-		
+
 
 		if (xmlFBNetworkData.isSetDataConnections())
 		{

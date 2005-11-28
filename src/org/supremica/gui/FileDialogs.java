@@ -1,5 +1,5 @@
 //# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
-//# $Id: FileDialogs.java,v 1.26 2005-02-24 09:04:13 robi Exp $
+//# $Id: FileDialogs.java,v 1.27 2005-11-28 16:52:26 knut Exp $
 
 /*
  * Supremica Software License Agreement
@@ -27,8 +27,8 @@
  *
  * Knut Akesson (KA), knut@supremica.org
  * Supremica,
- * Haradsgatan 26A
- * 431 42 Molndal
+ * Knarrhogsgatan 10
+ * SE-431 60 MOLNDAL
  * SWEDEN
  *
  * to discuss license terms. No cost evaluation licenses are

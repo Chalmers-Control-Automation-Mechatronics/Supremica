@@ -25,8 +25,8 @@
  *
  * Knut Akesson (KA), knut@supremica.org
  * Supremica,
- * Haradsgatan 26A
- * 431 42 Molndal
+ * Knarrhogsgatan 10
+ * SE-431 60 MOLNDAL
  * SWEDEN
  *
  * to discuss license terms. No cost evaluation licenses are
@@ -169,7 +169,7 @@ public class AutomataMinimizer
 				if (min.nbrOfTransitions() > mostTransitions)
 				{
 					mostTransitions = min.nbrOfTransitions();
-				}				
+				}
 			}
 			else
 			{
@@ -224,8 +224,8 @@ public class AutomataMinimizer
 				//if (SupremicaProperties.verboseMode())
 				{
 					Alphabet currentAlphabet = theAutomata.getUnionAlphabet();
-					executionDialog.setSubheader("Events left: " + 
-												 (currentAlphabet.size()-currentAlphabet.nbrOfEpsilonEvents()) + 
+					executionDialog.setSubheader("Events left: " +
+												 (currentAlphabet.size()-currentAlphabet.nbrOfEpsilonEvents()) +
 												 " (" + globalAlphabetSize + ")");
 				}
 			}
@@ -285,7 +285,7 @@ public class AutomataMinimizer
 
 		// Which strategy should be used to select the next task?
 		MinimizationStrategy strategy = options.getMinimizationStrategy();
-		if ((strategy == MinimizationStrategy.RandomOrder) || 
+		if ((strategy == MinimizationStrategy.RandomOrder) ||
 			(strategy == MinimizationStrategy.MostStatesFirst) ||
 			(strategy == MinimizationStrategy.FewestStatesFirst) ||
 			(strategy == MinimizationStrategy.MostTransitionsFirst) ||
@@ -301,16 +301,16 @@ public class AutomataMinimizer
 				int i = (int) Math.floor(Math.random()*theAutomata.size());
 				autA = theAutomata.getAutomatonAt(i);
 			}
-			else 
+			else
 			{
 				// Search among all the automata for the "best" autA...
 				for (Iterator<Automaton> autIt = theAutomata.iterator(); autIt.hasNext(); )
 				{
 					Automaton aut = autIt.next();
-					
+
 					// Which strategy?
-					if ((autA == null) || 
-						(strategy == MinimizationStrategy.MostStatesFirst && 
+					if ((autA == null) ||
+						(strategy == MinimizationStrategy.MostStatesFirst &&
 						 autA.nbrOfStates() < aut.nbrOfStates()) ||
 						(strategy == MinimizationStrategy.FewestStatesFirst &&
 						 autA.nbrOfStates() > aut.nbrOfStates()) ||
@@ -322,11 +322,11 @@ public class AutomataMinimizer
 						 autA.nbrOfEvents() < aut.nbrOfEvents()) ||
 						(strategy == MinimizationStrategy.FewestEventsFirst &&
 						 //autA.nbrOfEvents() > aut.nbrOfEvents()))
-						 (autA.nbrOfTransitions() + 3*autA.nbrOfEpsilonTransitions()) > 
+						 (autA.nbrOfTransitions() + 3*autA.nbrOfEpsilonTransitions()) >
 						 (aut.nbrOfTransitions() + 3*aut.nbrOfEpsilonTransitions())))
 					{
 						autA = aut;
-					}						
+					}
 				}
 			}
 
@@ -334,7 +334,7 @@ public class AutomataMinimizer
 			Automaton bestAutB = null;
 			// The alphabet of unique events (which can be hidden now)
 			hideThese = null;
-			// Find the automaton with the highest "unique to total" (number of events) 
+			// Find the automaton with the highest "unique to total" (number of events)
 			// ratio with respect to autA
 			Alphabet alphaA = autA.getAlphabet();
 			double bestUniqueRatio = 0;
@@ -496,7 +496,7 @@ public class AutomataMinimizer
 					{
 						break;
 					}
-				}				
+				}
 			}
 
 			// Did we find an apropriate result?

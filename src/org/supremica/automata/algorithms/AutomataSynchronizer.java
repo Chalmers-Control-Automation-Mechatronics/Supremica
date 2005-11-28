@@ -25,8 +25,8 @@
  *
  * Knut Akesson (KA), knut@supremica.org
  * Supremica,
- * Haradsgatan 26A
- * 431 42 Molndal
+ * Knarrhogsgatan 10
+ * SE-431 60 MOLNDAL
  * SWEDEN
  *
  * to discuss license terms. No cost evaluation licenses are
@@ -174,7 +174,7 @@ public class AutomataSynchronizer
 	public void clear()
 	{
 		theAutomata = null;
-		synchHelper = null;		
+		synchHelper = null;
 		for (int i = 0; i < synchronizationExecuters.size(); i++)
 		{
 			AutomataSynchronizerExecuter currExec = (AutomataSynchronizerExecuter) synchronizationExecuters.get(i);
@@ -222,7 +222,7 @@ public class AutomataSynchronizer
 		synchronizer.execute();
 		Automaton result = synchronizer.getAutomaton();
 		synchronizer.clear();
-		
+
 		return result;
 	}
 }

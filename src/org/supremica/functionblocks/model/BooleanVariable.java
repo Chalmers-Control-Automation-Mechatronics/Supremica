@@ -24,8 +24,8 @@
  *
  * Knut Akesson (KA), knut@supremica.org
  * Supremica,
- * Haradsgatan 26A
- * 431 42 Molndal
+ * Knarrhogsgatan 10
+ * SE-431 60 MOLNDAL
  * SWEDEN
  *
  * to discuss license terms. No cost evaluation licenses are
@@ -53,7 +53,7 @@ import java.lang.Boolean;
 
 public class BooleanVariable extends Variable
 {
-	
+
 	private Boolean value = new Boolean(false);
 
 	public BooleanVariable(String type, boolean b)
@@ -70,7 +70,7 @@ public class BooleanVariable extends Variable
 	public synchronized Boolean getValue()
 	{
 		return value;
-		
+
 	}
 
 	public Object clone()

@@ -24,8 +24,8 @@
  *
  * Knut Akesson (KA), knut@supremica.org
  * Supremica,
- * Haradsgatan 26A
- * 431 42 Molndal
+ * Knarrhogsgatan 10
+ * SE-431 60 MOLNDAL
  * SWEDEN
  *
  * to discuss license terms. No cost evaluation licenses are
@@ -61,11 +61,11 @@ import java.util.Collections;
 
 class AlgorithmExecutingThread extends Thread
 {
-	
+
 	private Scheduler scheduler = null;
 
 	private AlgorithmExecutingThread() {}
-	
+
 	private List scheduledJobs = Collections.synchronizedList(new LinkedList());
 
 	public AlgorithmExecutingThread(Scheduler s)
@@ -74,23 +74,23 @@ class AlgorithmExecutingThread extends Thread
 		setName("AlgorithmExecuting");
 		start();
 	}
-	
+
 	public void run()
 	{
-		while (true) 
+		while (true)
 		{
 			Job currentJob = getNextScheduledJob();
 			//System.out.println("AlgorithmExecutingThread.run(): Executing " + currentJob.getAlgorithm().getName() + " with text:");
 			//System.out.println(currentJob.getAlgorithm().toString());
 			currentJob.getAlgorithm().execute(currentJob.getVariables());
 			currentJob.getInstance().finishedJob(currentJob);
-		}	
-	}   
-	
+		}
+	}
+
 	public synchronized Job getNextScheduledJob()
 	{
 		while(scheduledJobs.size() == 0)
-		{			
+		{
 			try
 			{
 				wait();
@@ -103,7 +103,7 @@ class AlgorithmExecutingThread extends Thread
 		}
 		return (Job) scheduledJobs.remove(0);
 	}
-	
+
 	//public synchronized int getNumberOfScheduledJobs()
 	//{
 	//	return scheduledJobs.size();

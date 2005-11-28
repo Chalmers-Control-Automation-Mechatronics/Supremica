@@ -24,8 +24,8 @@
  *
  * Knut Akesson (KA), knut@supremica.org
  * Supremica,
- * Haradsgatan 26A
- * 431 42 Molndal
+ * Knarrhogsgatan 10
+ * SE-431 60 MOLNDAL
  * SWEDEN
  *
  * to discuss license terms. No cost evaluation licenses are
@@ -60,17 +60,17 @@ import java.util.*;
 public class EventQueue
 {
 	private List queue = Collections.synchronizedList(new LinkedList());
-	
+
 	public int size()
 	{
 		return queue.size();
 	}
-	
+
 	public Event remove()
 	{
 		return (Event) queue.remove(0);
 	}
-	
+
 	public void add(Event e)
 	{
 		queue.add(e);

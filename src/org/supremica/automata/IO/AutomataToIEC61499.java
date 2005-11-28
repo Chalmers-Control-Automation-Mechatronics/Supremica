@@ -24,8 +24,8 @@
  *
  * Knut Akesson (KA), knut@supremica.org
  * Supremica,
- * Haradsgatan 26A
- * 431 42 Molndal
+ * Knarrhogsgatan 10
+ * SE-431 60 MOLNDAL
  * SWEDEN
  *
  * to discuss license terms. No cost evaluation licenses are
@@ -158,20 +158,20 @@ public class AutomataToIEC61499
 
 			pw.close();
 
-			
+
 			// Generate the Device type and Resource type for FBDK
 			if (!useXmlns)
 			{
 				tmpFile = new File(file.getParent() + "/AutogenDevice.fbt");
-				
+
 				pw = new PrintWriter(new FileWriter(tmpFile));
 
 				pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 				pw.println("<!DOCTYPE DeviceType SYSTEM \"http://www.holobloc.com/xml/LibraryElement.dtd\">");
 				pw.println("<DeviceType Name=\"AutogenDevice\" >");
 				pw.println("  <VersionInfo Author=\"Automatically Generated\" Organization=\"Chalmers\" Version=\"1.0\" Date=\"" + dateFormat.format(new Date()) + "\" />");
-				pw.println("</DeviceType>");				
-				
+				pw.println("</DeviceType>");
+
 				pw.close();
 			}
 
@@ -268,7 +268,7 @@ public class AutomataToIEC61499
 
 		if (!useXmlns)
 		{
-			pw.println("  <CompilerInfo header=\"package fb.rt.fbruntime;\" />");			
+			pw.println("  <CompilerInfo header=\"package fb.rt.fbruntime;\" />");
 		}
 
 	}

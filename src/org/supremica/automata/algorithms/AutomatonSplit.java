@@ -25,8 +25,8 @@
  *
  * Knut Akesson (KA), knut@supremica.org
  * Supremica,
- * Haradsgatan 26A
- * 431 42 Molndal
+ * Knarrhogsgatan 10
+ * SE-431 60 MOLNDAL
  * SWEDEN
  *
  * to discuss license terms. No cost evaluation licenses are
@@ -157,7 +157,7 @@ public class AutomatonSplit
 			return supervisor;
 		}
 
-		Automaton result = supervisor;		
+		Automaton result = supervisor;
 		Automata automataB = new Automata(supervisor);
 		Alphabet parentUnion = parents.getUnionAlphabet();
 
@@ -176,13 +176,13 @@ public class AutomatonSplit
 
 				// Remove one event from the automaton´s alphabet
 				Automaton reduction = removeEvent(result, event);
-				
+
 				// Have we removed something we shouldn't have?
 				Automata automataA = new Automata();
 				automataA.addAutomaton(reduction);
 				automataA.addAutomata(parents);
 				if (AutomataVerifier.verifyModularInclusion(automataA, automataB))
-				{   
+				{
 					// Removing the event didn't make a difference!
 					result = reduction;
 				}
@@ -210,7 +210,7 @@ public class AutomatonSplit
 					automataA.addAutomaton(reduction);
 					automataA.addAutomata(parents);
 					if (AutomataVerifier.verifyInclusion(automataA, automataB))
-					{  
+					{
                         // Removing the event didn't make a difference!
 						result = reduction;
 					}
@@ -225,7 +225,7 @@ public class AutomatonSplit
 
 		// Give the new automaton an appropriate comment
 		result.setComment("red(" + supervisor.getName() + ")");
-		
+
 		// Set the right type
 		result.setType(supervisor.getType());    // should be a supervisor...
 
@@ -255,7 +255,7 @@ public class AutomatonSplit
 
 		// Hide event
 		result.hide(restrictAlphabet);
-	
+
 		// Hiding is enough!!!!!!
 		/*
 		// Minimize

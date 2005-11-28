@@ -24,8 +24,8 @@
  *
  * Knut Akesson (KA), knut@supremica.org
  * Supremica,
- * Haradsgatan 26A
- * 431 42 Molndal
+ * Knarrhogsgatan 10
+ * SE-431 60 MOLNDAL
  * SWEDEN
  *
  * to discuss license terms. No cost evaluation licenses are
@@ -96,9 +96,9 @@ public abstract class FBInstance extends NamedObject
 			System.out.println("FBInstace("+getName()+").addEventOutputConnection(): Warning: Event output "+output+" is already connected!");
 		}
     }
-    
+
     public void addDataInputConnection(String input, Connection cnt)
-    {	
+    {
 		if (dataInputConnections.get(input) == null)
 		{
 			dataInputConnections.put(input, cnt);
@@ -164,7 +164,7 @@ public abstract class FBInstance extends NamedObject
 			toInstance.receiveEvent(outputConnection.getSignalName());
 		}
 	}
-	
+
 	public void setVariableValue(String name, String value)
 	{
 		Variable var = variables.getVariable(name);
@@ -174,7 +174,7 @@ public abstract class FBInstance extends NamedObject
 			System.err.println("ServiceFBInstance.setVariableValue(): No such variable " + name);
 			System.exit(1);
 		}
-		
+
 		if(var instanceof StringVariable)
 		{
 			((StringVariable) variables.getVariable(name)).setValue(value);

@@ -24,8 +24,8 @@
  *
  * Knut Akesson (KA), knut@supremica.org
  * Supremica,
- * Haradsgatan 26A
- * 431 42 Molndal
+ * Knarrhogsgatan 10
+ * SE-431 60 MOLNDAL
  * SWEDEN
  *
  * to discuss license terms. No cost evaluation licenses are
@@ -68,8 +68,8 @@ public class Device extends NamedObject
     {
 		setName(name);
 		System.out.println("Device(" + getName() + ", " + systemFileName + ", " + libraryPathBase + ", " + libraryPath + ")");
-		loader = new Loader(this, systemFileName, libraryPathBase, libraryPath);	
-	}		
+		loader = new Loader(this, systemFileName, libraryPathBase, libraryPath);
+	}
 
     public void runDevice()
     {
@@ -84,10 +84,10 @@ public class Device extends NamedObject
     {
 		resources.put(name,new Resource(name,this));
     }
-	
+
     public Resource getResource(String name)
     {
 		return (Resource) resources.get(name);
     }
-	
+
 }

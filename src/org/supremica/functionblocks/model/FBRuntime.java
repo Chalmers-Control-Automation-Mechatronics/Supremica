@@ -24,8 +24,8 @@
  *
  * Knut Akesson (KA), knut@supremica.org
  * Supremica,
- * Haradsgatan 26A
- * 431 42 Molndal
+ * Knarrhogsgatan 10
+ * SE-431 60 MOLNDAL
  * SWEDEN
  *
  * to discuss license terms. No cost evaluation licenses are
@@ -72,7 +72,7 @@ public class FBRuntime
 			systemFileName = args[0];
 			if (args[1].contains(File.pathSeparator))
 			{
-				libraryPath = args[1];			
+				libraryPath = args[1];
 			}
 			else
 			{
@@ -82,18 +82,18 @@ public class FBRuntime
  		else if (args.length == 3)
  		{
 			systemFileName = args[0];
- 			libraryPathBase = args[1];			
- 			libraryPath = args[2];			
+ 			libraryPathBase = args[1];
+ 			libraryPath = args[2];
  		}
 		else
 		{
 			System.err.println("Usage: FBRuntime file.sys [libraryPathBase] [libraryPath]");
 			return;
 		}
-		
+
 		Device theDevice = new Device("FBRuntime Device", systemFileName, libraryPathBase, libraryPath);
 		theDevice.runDevice();
-		
+
     }
 
 }

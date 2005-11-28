@@ -25,8 +25,8 @@
  *
  * Knut Akesson (KA), knut@supremica.org
  * Supremica,
- * Haradsgatan 26A
- * 431 42 Molndal
+ * Knarrhogsgatan 10
+ * SE-431 60 MOLNDAL
  * SWEDEN
  *
  * to discuss license terms. No cost evaluation licenses are
@@ -82,7 +82,7 @@ public class VerificationDialog
 	/**
 	 * Creates modal dialog box for input of options for verification.
 	 */
-	public VerificationDialog(JFrame parentFrame, VerificationOptions verificationOptions, 
+	public VerificationDialog(JFrame parentFrame, VerificationOptions verificationOptions,
 							  MinimizationOptions minimizationOptions)
 	{
 		dialog = new JDialog(parentFrame, true);    // modal
@@ -209,7 +209,7 @@ public class VerificationDialog
 			setSelectedItem(selected);
 		}
 	}
-	
+
 	private class VerificationDialogStandardPanel
 		extends JPanel
 		implements VerificationPanel, ActionListener
@@ -277,7 +277,7 @@ public class VerificationDialog
 
 			// Change the advanced panel
 			if ((verificationTypeBox.getSelectedItem() == VerificationType.Controllability ||
-				 verificationTypeBox.getSelectedItem() == VerificationType.InverseControllability) && 
+				 verificationTypeBox.getSelectedItem() == VerificationType.InverseControllability) &&
 				(algorithmSelector.getSelectedItem() == VerificationAlgorithm.Modular))
 			{
 				// Show advanced controllability options!
@@ -329,25 +329,25 @@ public class VerificationDialog
 			}
 			else if (verificationTypeBox.getSelectedItem() == VerificationType.MutuallyNonblocking)
 			{
-				note.setText("Note:\n" + "Mutual nonblocking is inherently modular\n" + 
+				note.setText("Note:\n" + "Mutual nonblocking is inherently modular\n" +
 							 "and hence there is no monolithic algoritm.");
 				note.setVisible(true);
 			}
 			else if (verificationTypeBox.getSelectedItem() == VerificationType.LanguageInclusion)
 			{
-				note.setText("Note:\n" + "This verifies whether the language of the unselected\n" + 
-							 "automata is included in the inverse projection of\n" + 
-							 "the language of the selected automata.\n" + 
-							 "  The alphabet of the unselected automata must\n" + 
+				note.setText("Note:\n" + "This verifies whether the language of the unselected\n" +
+							 "automata is included in the inverse projection of\n" +
+							 "the language of the selected automata.\n" +
+							 "  The alphabet of the unselected automata must\n" +
 							 "include the alphabet of the selected automata.");
 				note.setVisible(true);
 			}
 			else if (verificationTypeBox.getSelectedItem() == VerificationType.InverseControllability)
 			{
 				note.setText("Note:\n" + "This verifies whether the controllable events in the\n" +
-							 "supervisor candidate are always accepted by\n" + 
-							 "the plant. That is, the supervisor is considered\n" + 
-							 "to be a controller as in the input/output approach\n" + 
+							 "supervisor candidate are always accepted by\n" +
+							 "the plant. That is, the supervisor is considered\n" +
+							 "to be a controller as in the input/output approach\n" +
 							 "to control of DES presented by Balemi.");
 				note.setVisible(true);
 			}
@@ -410,7 +410,7 @@ public class VerificationDialog
 			ruleB.setSelected(options.getUseRuleB());
 			ruleF.setSelected(options.getUseRuleF());
 		}
-	
+
 		public void regain(MinimizationOptions options)
 		{
 			options.setMinimizationStrategy((MinimizationStrategy) minimizationStrategy.getSelectedItem());

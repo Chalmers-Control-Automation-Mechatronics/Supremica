@@ -25,8 +25,8 @@
  *
  * Knut Akesson (KA), knut@supremica.org
  * Supremica,
- * Haradsgatan 26A
- * 431 42 Molndal
+ * Knarrhogsgatan 10
+ * SE-431 60 MOLNDAL
  * SWEDEN
  *
  * to discuss license terms. No cost evaluation licenses are
@@ -68,7 +68,7 @@ public final class ExecutionDialog
 
 	/** The header of the operation. */
 	private JLabel operationHeader = null;
-	/** The subheader of the operation */ 
+	/** The subheader of the operation */
 	private JLabel operationSubheader = null;
 
 	private JPanel infoPanel = null;
@@ -170,7 +170,7 @@ public final class ExecutionDialog
 	}
 
 	/**
-	 * Sets the mode of the dialog. 
+	 * Sets the mode of the dialog.
 	 */
 	public void setMode(ExecutionDialogMode mode)
 	{
@@ -186,7 +186,7 @@ public final class ExecutionDialog
 	{
 		operationSubheader.setText(string);
 	}
-   
+
 	/**
 	 * This must be called before changing mode to a progressMode.
 	 */
@@ -203,7 +203,7 @@ public final class ExecutionDialog
 	}
 
 	/**
-	 * Sets value of progress bar. The value is shown as % of completion 
+	 * Sets value of progress bar. The value is shown as % of completion
 	 * (with respect to the initialized min and max ).
 	 */
 	public void setProgress(int progressValue)

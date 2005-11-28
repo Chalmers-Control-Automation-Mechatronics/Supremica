@@ -24,8 +24,8 @@
  *
  * Knut Akesson (KA), knut@supremica.org
  * Supremica,
- * Haradsgatan 26A
- * 431 42 Molndal
+ * Knarrhogsgatan 10
+ * SE-431 60 MOLNDAL
  * SWEDEN
  *
  * to discuss license terms. No cost evaluation licenses are
@@ -58,7 +58,7 @@ public class Resource extends NamedObject
 {
 
     private Device device; // device the resource belongs to
-	
+
     private Scheduler scheduler;
     private Map fbTypes = new HashMap();
     private Map fbNetworks = new HashMap();
@@ -69,13 +69,13 @@ public class Resource extends NamedObject
     public Resource(String name, Device d)
     {
 		System.out.println("Resource(" + name + ")");
-		
+
 		setName(name);
 
 		device = d;
-		
+
 		scheduler = new Scheduler(this);
-	
+
     }
 
     void handleConfigurationRequests()
@@ -93,7 +93,7 @@ public class Resource extends NamedObject
     {
 		return scheduler;
     }
-	
+
     public void addFBNetwork(String name)
     {
 		fbNetworks.put(name, new FBNetwork(this));

@@ -25,8 +25,8 @@
  *
  * Knut Akesson (KA), knut@supremica.org
  * Supremica,
- * Haradsgatan 26A
- * 431 42 Molndal
+ * Knarrhogsgatan 10
+ * SE-431 60 MOLNDAL
  * SWEDEN
  *
  * to discuss license terms. No cost evaluation licenses are
@@ -58,7 +58,7 @@ public class CompositeState
 	private static Logger logger = LoggerFactory.createLogger(CompositeState.class);
 
 	/** The indices of the underlying states */
-	
+
 	//private int[] compositeIndices = null;
 
 	/** The costs corresponding to the underlying states */
@@ -99,7 +99,7 @@ public class CompositeState
 	{
 		composingStates = new ArrayList();
 
-		// -2 since the last two indices correspond to something funny, not the nbrs of the underlying states.  
+		// -2 since the last two indices correspond to something funny, not the nbrs of the underlying states.
 		for (int i = 0; i < indices.length - 2; i++)
 		{
 

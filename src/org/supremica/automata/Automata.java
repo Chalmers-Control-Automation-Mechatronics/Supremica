@@ -25,8 +25,8 @@
  *
  * Knut Akesson (KA), knut@supremica.org
  * Supremica,
- * Haradsgatan 26A
- * 431 42 Molndal
+ * Knarrhogsgatan 10
+ * SE-431 60 MOLNDAL
  * SWEDEN
  *
  * to discuss license terms. No cost evaluation licenses are
@@ -1119,14 +1119,14 @@ public class Automata
 	{
 		return getUniqueEventLabel("e");
 	}
-	
+
 	public String getUniqueEventLabel(String prefix)
 	{
 		if(prefix == null)	// clever recursion here :-)
 		{
 			return getUniqueEventLabel();
 		}
-		
+
 		Alphabet alpha = getUnionAlphabet();
 		StringBuffer buf = new StringBuffer(prefix);
 		int num = 1; // number to append to prefix
@@ -1136,7 +1136,7 @@ public class Automata
 		}
 		return buf.toString();
 	}
-	
+
 	public void stateAdded(Automaton aut, State q)
 	{    // Do nothing
 	}

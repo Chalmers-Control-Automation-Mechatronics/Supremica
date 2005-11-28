@@ -24,8 +24,8 @@
  *
  * Knut Akesson (KA), knut@supremica.org
  * Supremica,
- * Haradsgatan 26A
- * 431 42 Molndal
+ * Knarrhogsgatan 10
+ * SE-431 60 MOLNDAL
  * SWEDEN
  *
  * to discuss license terms. No cost evaluation licenses are
@@ -56,7 +56,7 @@ import java.io.File;
 
 public class ServiceFBType extends FBType
 {
-	
+
 	private File serviceScript;
 
 	//====================================================================================
@@ -75,15 +75,15 @@ public class ServiceFBType extends FBType
 	public FBInstance createInstance(String name)
 	{
 		System.out.println("ServiceFBType.createInstace(" + name + ")");
-		ServiceFBInstance newInstance = new ServiceFBInstance(name, resource, this, serviceScript);	
-		
+		ServiceFBInstance newInstance = new ServiceFBInstance(name, resource, this, serviceScript);
+
 		newInstance.setEvents(events);
 		newInstance.setVariables((Variables) variables.clone());
 		newInstance.initialize();
 
 		instances.put(name,newInstance);
-	
+
 		return newInstance;
 	}
-	
+
 }

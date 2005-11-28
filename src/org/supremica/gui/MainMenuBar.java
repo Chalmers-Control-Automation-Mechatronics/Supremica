@@ -25,8 +25,8 @@
  *
  * Knut Akesson (KA), knut@supremica.org
  * Supremica,
- * Haradsgatan 26A
- * 431 42 Molndal
+ * Knarrhogsgatan 10
+ * SE-431 60 MOLNDAL
  * SWEDEN
  *
  * to discuss license terms. No cost evaluation licenses are
@@ -209,19 +209,19 @@ public class MainMenuBar
 	    menuFile.add(menuFileSave);
 
 	    // File.SaveAs
-	    JMenuItem menuFileSaveAs = new SupremicaMenuItem(ActionMan.saveAsAction); 
+	    JMenuItem menuFileSaveAs = new SupremicaMenuItem(ActionMan.saveAsAction);
 	    menuFile.add(menuFileSaveAs);
-		
+
 	    separatorNeeded = true;
 	}
-	
+
 	if (separatorNeeded)
 	{
 	    menuFile.addSeparator();
-		
+
 	    separatorNeeded = false;
 	}
-	
+
 	if (SupremicaProperties.fileAllowImport())
 	{
 	    // File.Import
@@ -229,7 +229,7 @@ public class MainMenuBar
 		menuFileImport.setMnemonic(KeyEvent.VK_I);
 		menuFileImport.setToolTipText("Import file");
 	    menuFile.add(menuFileImport);
-		
+
 	    // File.Import.UMDES
 	    JMenuItem menuFileImportUMDES = new JMenuItem("From UMDES...");
 	    menuFileImport.add(menuFileImportUMDES);
@@ -240,7 +240,7 @@ public class MainMenuBar
 					ActionMan.fileImportUMDES(ActionMan.getGui());
 				}
 			});
-		
+
 	    // File.Import.Valid
 	    JMenuItem menuFileImportValid = new JMenuItem("From VALID...");
 	    menuFileImport.add(menuFileImportValid);
@@ -251,7 +251,7 @@ public class MainMenuBar
 					ActionMan.fileImportValid(ActionMan.getGui());
 				}
 			});
-		
+
 		/*
 	    // File.Import.HYB
 	    JMenuItem menuFileImportHYB = new JMenuItem("From HYB...");
@@ -264,7 +264,7 @@ public class MainMenuBar
 		}
 		});
 		*/
-		
+
 		//File.Import.RobotCoordination
 		JMenuItem menuFileImportRobotCoordination = new JMenuItem("From Robot Coordinator...");
 		menuFileImport.add(menuFileImportRobotCoordination);
@@ -276,7 +276,7 @@ public class MainMenuBar
 				}
 		    });
 	}
-	
+
 	/*
 	// if (SupremicaProperties.generalUseRobotCoordinationABB())
 	if (SupremicaProperties.generalUseRobotCoordination())
@@ -292,14 +292,14 @@ public class MainMenuBar
 	}
 	});
 	}
-	
+
 	separatorNeeded = true;
 	}
 	*/
-	
+
 	if (false && SupremicaProperties.fileAllowExport())
 	{
-		
+
 	    // File.Export
 	    JMenu menuFileExport = new JMenu("Export");
 	    menuFile.add(menuFileExport);
@@ -1080,9 +1080,9 @@ public class MainMenuBar
 	if (SupremicaProperties.showCoordinationABB())
 	{
 	    menuTools.add(new JSeparator());
-	    
+
 	    JMenu menuCoordinationABB = new JMenu();
-	    
+
 	    menuCoordinationABB.setText("CoordinationABB");
 	    menuTools.add(menuCoordinationABB);
 

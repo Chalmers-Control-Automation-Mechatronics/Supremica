@@ -24,8 +24,8 @@
  *
  * Knut Akesson (KA), knut@supremica.org
  * Supremica,
- * Haradsgatan 26A
- * 431 42 Molndal
+ * Knarrhogsgatan 10
+ * SE-431 60 MOLNDAL
  * SWEDEN
  *
  * to discuss license terms. No cost evaluation licenses are
@@ -61,10 +61,10 @@ public class RSConfiguration
     extends Configuration
 {
     private static Logger logger = LoggerFactory.createLogger(RSConfiguration.class);
-	
+
 	/** The RobotStudio target. */
     private Target target;
-	
+
     public RSConfiguration(ITarget target)
     {
 		try
@@ -73,7 +73,7 @@ public class RSConfiguration
 	    }
 		catch (Exception ex)
 	    {
-			
+
 			// Was there a problem?
 			System.err.println("Error in constructor RSConfiguration." + ex);
 	    }
@@ -83,7 +83,7 @@ public class RSConfiguration
     {
 		return "'" + getName() + "'";
     }
-	
+
     /**
      * Returns the RobotStudio target.
      */
@@ -91,7 +91,7 @@ public class RSConfiguration
     {
 		return target;
     }
-	
+
     /////////////////////////////////////
     // Configuration interface methods //
     /////////////////////////////////////
@@ -107,7 +107,7 @@ public class RSConfiguration
 	    {
 			System.err.println("Robot has no name? " + ex);
 	    }
-		
+
 		return "";
     }
 

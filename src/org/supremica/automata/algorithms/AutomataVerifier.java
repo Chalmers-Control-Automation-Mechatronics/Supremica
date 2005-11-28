@@ -25,8 +25,8 @@
  *
  * Knut Akesson (KA), knut@supremica.org
  * Supremica,
- * Haradsgatan 26A
- * 431 42 Molndal
+ * Knarrhogsgatan 10
+ * SE-431 60 MOLNDAL
  * SWEDEN
  *
  * to discuss license terms. No cost evaluation licenses are
@@ -279,7 +279,7 @@ public class AutomataVerifier
 					// We're gonna do some serious synchronization! Initialize a synchronization helper!
 					synchHelper = new AutomataSynchronizerHelper(theAutomata, synchronizationOptions);
 					synchHelper.setExecutionDialog(executionDialog);
-					
+
 					// Work!
 					return monolithicNonblockingVerification();
 				}
@@ -1631,8 +1631,8 @@ public class AutomataVerifier
 		throws Exception
 	{
 		// Make a copy that we can fiddle with
-		Automata theAutomata = new Automata(this.theAutomata); 
-			
+		Automata theAutomata = new Automata(this.theAutomata);
+
 		// Initialize execution dialog
 		java.awt.EventQueue.invokeLater(new Runnable()
 		{
@@ -1918,7 +1918,7 @@ public class AutomataVerifier
 		verificationOptions = VerificationOptions.getDefaultLanguageInclusionOptions();
 		verificationOptions.setInclusionAutomata(automataA);
 		synchronizationOptions = SynchronizationOptions.getDefaultVerificationOptions();
-		
+
 		Automata theAutomata = new Automata();
 		theAutomata.addAutomata(automataA);
 		theAutomata.addAutomata(automataB);

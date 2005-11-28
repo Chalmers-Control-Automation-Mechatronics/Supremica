@@ -24,8 +24,8 @@
  *
  * Knut Akesson (KA), knut@supremica.org
  * Supremica,
- * Haradsgatan 26A
- * 431 42 Molndal
+ * Knarrhogsgatan 10
+ * SE-431 60 MOLNDAL
  * SWEDEN
  *
  * to discuss license terms. No cost evaluation licenses are
@@ -64,7 +64,7 @@ public class FBNetwork
 	private Map fbInstances = new HashMap();
 
 	private FBNetwork() {}
-	
+
 	public FBNetwork(Resource res)
 	{
 		resource = res;
@@ -87,12 +87,12 @@ public class FBNetwork
 
 	public void addEventConnection(String source, String dest)
 	{
-		
+
 		String fromInstance = getInstanceName(source);
 		String fromSignal = getSignalName(source);
 		String toInstance = getInstanceName(dest);
 		String toSignal = getSignalName(dest);
-		
+
 		if (fromInstance.equals(""))
 		{
 			System.err.println("FBNetwork.addEventConnection(): from instance is empty in connection from " + source +" to " + dest);
@@ -103,23 +103,23 @@ public class FBNetwork
 		}
 		else
 		{
-		
+
 			System.out.println("FBNetwork.addEventConnection: From " + source + " to " + dest);
 			Connection newConn = new Connection(getFBInstance(toInstance), toSignal);
 			getFBInstance(fromInstance).addEventOutputConnection(fromSignal, newConn);
-			
+
 		}
 
 	}
 
 	public void addDataConnection(String source, String dest)
 	{
-		
+
 		String fromInstance = getInstanceName(source);
 		String fromSignal = getSignalName(source);
 		String toInstance = getInstanceName(dest);
 		String toSignal = getSignalName(dest);
-		
+
 		if (fromInstance.equals(""))
 		{
 			// Constant specification
@@ -132,9 +132,9 @@ public class FBNetwork
 		}
 		else
 		{
-			System.out.println("FBNetwork.addDataConnection: From " + source + " to " + dest);			
+			System.out.println("FBNetwork.addDataConnection: From " + source + " to " + dest);
 			Connection newConn = new Connection(getFBInstance(fromInstance), fromSignal);
-			getFBInstance(toInstance).addDataInputConnection(toSignal, newConn);			
+			getFBInstance(toInstance).addDataInputConnection(toSignal, newConn);
 		}
 
 	}
@@ -149,15 +149,15 @@ public class FBNetwork
 
 		return cntSpec.substring(0,cntSpec.indexOf("."));
 	}
-	
+
 	private String getSignalName(String cntSpec)
 	{
 		if (cntSpec.indexOf(".") < 0)
 		{
 			return cntSpec;
 		}
-		
+
 		return cntSpec.substring(cntSpec.indexOf(".")+1,cntSpec.length());
 	}
-	
+
 }

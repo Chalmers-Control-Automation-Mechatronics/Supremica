@@ -24,8 +24,8 @@
  *
  * Knut Akesson (KA), knut@supremica.org
  * Supremica,
- * Haradsgatan 26A
- * 431 42 Molndal
+ * Knarrhogsgatan 10
+ * SE-431 60 MOLNDAL
  * SWEDEN
  *
  * to discuss license terms. No cost evaluation licenses are
@@ -53,7 +53,7 @@ import java.lang.Double;
 
 public class DoubleVariable extends Variable
 {
-	
+
 	private Double value = new Double(0.0);
 
 	public DoubleVariable(String type, double d)
@@ -82,5 +82,5 @@ public class DoubleVariable extends Variable
 		return getType() + " " + value.toString();
 	}
 
-    
+
 }

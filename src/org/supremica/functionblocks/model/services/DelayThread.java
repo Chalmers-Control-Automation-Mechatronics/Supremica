@@ -24,8 +24,8 @@
  *
  * Knut Akesson (KA), knut@supremica.org
  * Supremica,
- * Haradsgatan 26A
- * 431 42 Molndal
+ * Knarrhogsgatan 10
+ * SE-431 60 MOLNDAL
  * SWEDEN
  *
  * to discuss license terms. No cost evaluation licenses are
@@ -66,7 +66,7 @@ public class DelayThread extends Thread
 
 
 	//========================================================================
-	private DelayThread() {} 
+	private DelayThread() {}
 
 	public DelayThread(ServiceFBInstance fb)
 	{
@@ -84,21 +84,21 @@ public class DelayThread extends Thread
 
 	public synchronized void startDelay()
 	{
-		//System.out.println("DelayThread: startDelay()");		
+		//System.out.println("DelayThread: startDelay()");
 		sendOutput = true;
 		notifyAll();
 	}
 
 	public synchronized void stopDelay()
 	{
-		//System.out.println("DelayThread: stopDelay()");		
+		//System.out.println("DelayThread: stopDelay()");
 		sendOutput = false;
 		notifyAll();
 	}
 
 	public synchronized void deactivateService()
 	{
-		//System.out.println("DelayThread: deactivateService()");		
+		//System.out.println("DelayThread: deactivateService()");
 		serviceActive = false;
 		notifyAll();
 		notifyAll();
@@ -130,5 +130,5 @@ public class DelayThread extends Thread
 			}
 		}
 		//System.out.println("DelayThread: exiting run()");
-	}   	
+	}
 }

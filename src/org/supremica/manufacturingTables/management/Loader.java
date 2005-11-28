@@ -24,8 +24,8 @@
  *
  * Knut Akesson (KA), knut@supremica.org
  * Supremica,
- * Haradsgatan 26A
- * 431 42 Molndal
+ * Knarrhogsgatan 10
+ * SE-431 60 MOLNDAL
  * SWEDEN
  *
  * to discuss license terms. No cost evaluation licenses are
@@ -76,7 +76,7 @@ public class Loader
     private Unmarshaller u;
 
     public Loader()
-    {	
+    {
 	try
 	    {
 		System.err.println("Entered the Loader constructor.");
@@ -90,7 +90,7 @@ public class Loader
 		System.err.println("validation satt till true");
 
 		// We will allow the Unmarshaller's default
-		// ValidationEventHandler to receive notification of warnings 
+		// ValidationEventHandler to receive notification of warnings
 		// and errors which will be sent to System.out.  The default
 		// ValidationEventHandler will cause the unmarshal operation
 		// to fail with an UnmarshalException after encountering the
@@ -101,7 +101,7 @@ public class Loader
 		je.printStackTrace();
 	    }
     }
-    
+
     public void load(String path, String fileName)
     {
 	try
@@ -135,9 +135,9 @@ public class Loader
 	    }
 	return;
 	//	for (Iterator resIter = theDevice.getResource().iterator();resIter.hasNext();)
-	
+
     }
-    
+
     private void buildPLCProgram(FactoryType factory)
     {
 	System.err.println("<Factory name=\"" + factory.getName() + ">");
@@ -158,10 +158,10 @@ public class Loader
 		    }
 		CellsType cells = currentStation.getCells();
 		System.err.println("   <Cells>");
-		
-		
+
+
 	    }
-	
+
     }
 
     private File getFile(String path, String fileName)

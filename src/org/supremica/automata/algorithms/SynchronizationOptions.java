@@ -25,8 +25,8 @@
  *
  * Knut Akesson (KA), knut@supremica.org
  * Supremica,
- * Haradsgatan 26A
- * 431 42 Molndal
+ * Knarrhogsgatan 10
+ * SE-431 60 MOLNDAL
  * SWEDEN
  *
  * to discuss license terms. No cost evaluation licenses are
@@ -74,7 +74,7 @@ public final class SynchronizationOptions
 
 	/**
 	 * Default constructor
-	 * 
+	 *
 	 * The parametrisized constructor was removed due to unreadable code.
 	 * Use the "getDefault..."-methods in this class instead or when they won't suit you,
 	 * modify the necessary options one by one, starting from default! Much more readable and
@@ -93,14 +93,14 @@ public final class SynchronizationOptions
 
 		this.syncType = SynchronizationType.Prioritized;
 		assert this.syncType != null;
-		
+
 		this.initialHashtableSize = SupremicaProperties.syncInitialHashtableSize();
 		//The following check should ideally be done within SupremicaProperties
 		if (this.initialHashtableSize < 100)
 		{
 //			throw new SupremicaException("Error in SupremicaProperties. The property syncInitialHashtableSize must be at least 100");
 		}
-		
+
 		this.expandHashtable = SupremicaProperties.syncExpandHashtable();
 		this.forbidUnconStates = SupremicaProperties.syncForbidUncontrollableStates();
 		this.expandForbiddenStates = SupremicaProperties.syncExpandForbiddenStates();

@@ -24,8 +24,8 @@
  *
  * Knut Akesson (KA), knut@supremica.org
  * Supremica,
- * Haradsgatan 26A
- * 431 42 Molndal
+ * Knarrhogsgatan 10
+ * SE-431 60 MOLNDAL
  * SWEDEN
  *
  * to discuss license terms. No cost evaluation licenses are
@@ -51,18 +51,18 @@ package org.supremica.functionblocks.model;
 
 public class ECTransition
 {
-	
+
 	private ECState source;
 	private ECState destination;
 	private ECCondition condition;
 
-    
+
 	ECTransition(ECState source, ECState destination, ECCondition condition)
 	{
 		this.source = source;
 		this.destination = destination;
 		this.condition = condition;
-	}   
+	}
 
 	ECState getSource()
 	{
@@ -74,12 +74,12 @@ public class ECTransition
 		return destination;
 	}
 
-	ECCondition getCondition() 
+	ECCondition getCondition()
 	{
 		return condition;
 	}
 
-	void setCondition(ECCondition cond) 
+	void setCondition(ECCondition cond)
 	{
 		this.condition = cond;
 	}
