@@ -1,6 +1,7 @@
 package org.supremica.automata.algorithms.scheduling;
 
 import java.util.*;
+import java.util.regex.*;
 import java.io.*;
 
 import org.supremica.log.*;
@@ -11,12 +12,6 @@ public class Milp
 	implements Scheduler
 {
 	private static Logger logger = LoggerFactory.createLogger(Milp.class);
-
-	// Puts the *.mod file into ~/dist
-	private final String FILE_ROOT = "temp";
-
-// 	private final String MODEL_FILE_NAME = "C:\\Documents and Settings\\avenir\\Desktop\\temp.mod";
-//  	private final String MODEL_FILE_NAME = "C:\\Documents and Settings\\Avenir\\Skrivbord\\temp.mod";
 
 	private Automata theAutomata, robots, zones;
 
@@ -34,6 +29,8 @@ public class Milp
 	/** The *.sol file that stores the solution, i.e. the output of the Glpk-solver */
 	private File solutionFile;
 
+	private Process milpProcess;
+
 	public Milp(Automata theAutomata) 
 		throws Exception
 	{
@@ -45,8 +42,8 @@ public class Milp
 // 		solutionFile.deleteOnExit();
 
 		// ... SÅ HÄR ISTÄLLET...
-		modelFile = new File("C:\\avenir\\progg\\milp3.mod");
-		solutionFile = new File("C:\\avenir\\progg\\milp3.sol");
+		modelFile = new File("C:\\avenir\\progg\\milp.mod");
+		solutionFile = new File("C:\\avenir\\progg\\milp.sol");
 		modelFile.createNewFile();
 		solutionFile.createNewFile();
 
@@ -670,70 +667,163 @@ public class Milp
 		w.write("end;");
 		w.flush();
 	}
-	
+
 	private void convertSolToXml()
 		throws Exception
 	{
-// 		scheduleInfo = new TreeSet<int[]>(new CostComparator(robots));
-// 		scheduleInfo = new TreeSet[robots.size()];
-// 		for (int i=0; i<scheduleInfo.length; i++)
-// 			scheduleInfo[i] = new TreeSet<int[]>(new CostComparator(robots.getAutomatonAt(i)));
+		int[][] optimalTimes = new int[robots.size()][];
 
-		scheduleInfo = new TreeSet<int[]>(new CostComparator());
-
-// 		File solutionFile = new File(FILE_ROOT + ".sol");
-
-		if (!solutionFile.isFile())
-			throw new Exception(solutionFile + " was NOT FOUND..........");
+		for (int i=0; i<optimalTimes.length; i++)
+			optimalTimes[i] = new int[robots.getAutomatonAt(i).nbrOfStates()];
 
 		BufferedReader r = new BufferedReader(new FileReader(solutionFile));
 		String str = r.readLine();
-
+		
+		// Go through the solution file and extract the suggested optimal times for each state
 		while (str != null)
 		{
-			// For every solution line containing positive time value...
 			if (str.indexOf(" time[") > -1)
 			{
 				String strRobotIndex = str.substring(str.indexOf("[") + 1, str.indexOf(",")).trim();
 				String strStateIndex = str.substring(str.indexOf(",") + 1, str.indexOf("]")).trim();
 				String strCost = str.substring(str.indexOf("]") + 1).trim(); 
-			
+				
 				int robotIndex = (new Integer(strRobotIndex)).intValue(); 
 				int stateIndex = (new Integer(strStateIndex)).intValue(); 
  				int cost = (new Integer(strCost)).intValue();
 
-				int[] currScheduleInfo = new int[]{robotIndex, stateIndex, cost};
-// 				scheduleInfo[robotIndex].add(currScheduleInfo);
-				scheduleInfo.add(currScheduleInfo);
+				optimalTimes[robotIndex][stateIndex] = cost;
 			}
-			else if (str.indexOf("c ") >  -1)
-			{
-				String strMakespan = str.substring(str.indexOf("c") + 1).trim();
-				makespan = (new Integer(strMakespan)).intValue();
-			}
-				
+
 			str = r.readLine();
 		}
 
+		// UGLY - why not initialize() in the corresponding constructors?
+		AutomataSynchronizerHelper synchHelper = new AutomataSynchronizerHelper(theAutomata, new SynchronizationOptions());
+		synchHelper.initialize();
+		AutomataSynchronizerExecuter synchronizer = new AutomataSynchronizerExecuter(synchHelper);
+		synchronizer.initialize();
 
-// 		for (int i=0; i<robots.size(); i++)
+		for (int i=0; i<theAutomata.size(); i++)
+			theAutomata.getAutomatonAt(i).remapStateIndices();
+
+		int[] currSynchronizedState = synchHelper.getStateToProcess();
+		str = "";
+		for (int i=0; i<theAutomata.size(); i++)
+			str += currSynchronizedState[i] + " ";
+		logger.info("init_indices = " + str);
+		str = "";
+		for (int i=0; i<theAutomata.size(); i++)
+			str += theAutomata.getAutomatonAt(i).getStateWithIndex(currSynchronizedState[i]).getName() + " ";
+		logger.info("init = " + str);
+
+		int currOptimalTime = Integer.MAX_VALUE;
+		int robotIndex = -1;
+		Arc currOptimalArc = null;
+		for (int i=0; i<theAutomata.size(); i++)
+		{
+			Automaton currRobot = theAutomata.getAutomatonAt(i); 
+
+			if (currRobot.isPlant())
+			{
+				robotIndex++;
+				State currState = currRobot.getStateWithIndex(currSynchronizedState[i]);
+				int currTime = optimalTimes[robotIndex][currSynchronizedState[i]];
+				logger.warn("currSynchronizedState[i] = " + currSynchronizedState[i]);
+				if (currTime <= currOptimalTime)
+				{
+					for (Iterator<Arc> arcs = currState.outgoingArcsIterator(); arcs.hasNext(); )
+					{
+						Arc currArc = arcs.next();
+						
+						if (synchronizer.isEnabled(currArc.getEvent()))
+						{
+							int nextStateIndex = currArc.getToState().getIndex();
+							
+							if (optimalTimes[robotIndex][nextStateIndex] >= optimalTimes[robotIndex][currSynchronizedState[i]])
+							{
+								currOptimalArc = currArc;
+								currOptimalTime = currTime;
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		logger.info("event to add = " + currOptimalArc.getEvent() + " at time " + currOptimalTime);
+		int[] nextSynchronizedState = synchronizer.doTransition(currSynchronizedState, currOptimalArc.getEvent());
+		str = "";
+		for (int i=0; i<theAutomata.size(); i++)
+			str += theAutomata.getAutomatonAt(i).getStateWithIndex(currSynchronizedState[i]).getName() + " ";
+		logger.info("fromState = " + str);
+		str = "";
+		for (int i=0; i<theAutomata.size(); i++)
+			str += theAutomata.getAutomatonAt(i).getStateWithIndex(nextSynchronizedState[i]).getName() + " ";
+		logger.info("toState = " + str);
+	}
+	
+// 	private void convertSolToXml()
+// 		throws Exception
+// 	{
+// // 		scheduleInfo = new TreeSet<int[]>(new CostComparator(robots));
+// // 		scheduleInfo = new TreeSet[robots.size()];
+// // 		for (int i=0; i<scheduleInfo.length; i++)
+// // 			scheduleInfo[i] = new TreeSet<int[]>(new CostComparator(robots.getAutomatonAt(i)));
+
+// 		scheduleInfo = new TreeSet<int[]>(new CostComparator());
+
+// 		if (!solutionFile.isFile())
+// 			throw new Exception(solutionFile + " was NOT FOUND..........");
+
+// 		BufferedReader r = new BufferedReader(new FileReader(solutionFile));
+// 		String str = r.readLine();
+
+// 		while (str != null)
 // 		{
-// 			logger.warn("Robot " + i);
-// 			for (Iterator<int[]> iter = scheduleInfo[i].iterator(); iter.hasNext(); )
+// 			// For every solution line containing positive time value...
+// 			if (str.indexOf(" time[") > -1)
 // 			{
-// 				int[] temp = iter.next();
-// 				logger.info("tree -> " + temp[0] + " " + temp[1] + " " + temp[2]);
+// 				String strRobotIndex = str.substring(str.indexOf("[") + 1, str.indexOf(",")).trim();
+// 				String strStateIndex = str.substring(str.indexOf(",") + 1, str.indexOf("]")).trim();
+// 				String strCost = str.substring(str.indexOf("]") + 1).trim(); 
+			
+// 				int robotIndex = (new Integer(strRobotIndex)).intValue(); 
+// 				int stateIndex = (new Integer(strStateIndex)).intValue(); 
+//  				int cost = (new Integer(strCost)).intValue();
+
+// 				int[] currScheduleInfo = new int[]{robotIndex, stateIndex, cost};
+// // 				scheduleInfo[robotIndex].add(currScheduleInfo);
+// 				scheduleInfo.add(currScheduleInfo);
 // 			}
+// 			else if (str.indexOf("c ") >  -1)
+// 			{
+// 				String strMakespan = str.substring(str.indexOf("c") + 1).trim();
+// 				makespan = (new Integer(strMakespan)).intValue();
+// 			}
+				
+// 			str = r.readLine();
 // 		}
 
-		/*
-		for (Iterator<int[]> iter = scheduleInfo.iterator(); iter.hasNext(); )
-		{
-			int[] temp = iter.next();
-			logger.info("tree -> " + temp[0] + " " + temp[1] + " " + temp[2]);
-		}
-		*/
-	}
+
+// // 		for (int i=0; i<robots.size(); i++)
+// // 		{
+// // 			logger.warn("Robot " + i);
+// // 			for (Iterator<int[]> iter = scheduleInfo[i].iterator(); iter.hasNext(); )
+// // 			{
+// // 				int[] temp = iter.next();
+// // 				logger.info("tree -> " + temp[0] + " " + temp[1] + " " + temp[2]);
+// // 			}
+// // 		}
+
+// 		/*
+// 		for (Iterator<int[]> iter = scheduleInfo.iterator(); iter.hasNext(); )
+// 		{
+// 			int[] temp = iter.next();
+// 			logger.info("tree -> " + temp[0] + " " + temp[1] + " " + temp[2]);
+// 		}
+// 		*/
+// 	}
 
 	private void callGlpk()
 		throws Exception
@@ -747,7 +837,7 @@ public class Milp
 		cmds[4] = solutionFile.getAbsolutePath();
 
 		// Runs the MILP-solver with the arguments defined above
-		Process milpProcess = Runtime.getRuntime().exec(cmds);
+		milpProcess = Runtime.getRuntime().exec(cmds);
 
 		// Listens for the output of MILP (that is the input to this application)...
 		BufferedReader milpEcho = new BufferedReader(new InputStreamReader(new DataInputStream(milpProcess.getInputStream())));
@@ -760,6 +850,12 @@ public class Milp
 				logger.info(milpEchoStr);
 		}
 	}
+
+	// private void killGlpk()
+// 	{
+// 		if (milpProcess != null)
+// 			milpProcess.destroy();
+// 	}
 }
 
 class CostComparator 
