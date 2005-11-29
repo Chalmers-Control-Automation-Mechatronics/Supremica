@@ -969,7 +969,7 @@ End Sub
 		int j = 0;
 		int k = 0;
 		State state = robotAutomaton.getInitialState();
-		LabeledEvent event = state.outgoingArcsIterator().nextEvent();
+		LabeledEvent event = state.outgoingArcsIterator().next().getEvent();
 		State freeState = mutexAutomaton.getStateWithName("Free");
 		State bookedState = mutexAutomaton.getStateWithName("Booked");
 
@@ -988,7 +988,7 @@ End Sub
 			for (; k < j - 1; k++)
 			{
 				state = state.nextState(event);
-				event = state.outgoingArcsIterator().nextEvent();
+				event = state.outgoingArcsIterator().next().getEvent();
 			}
 
 			mutexAutomaton.getAlphabet().addEvent(event);
@@ -1006,7 +1006,7 @@ End Sub
 			for (; k < j; k++)
 			{
 				state = state.nextState(event);
-				event = state.outgoingArcsIterator().nextEvent();
+				event = state.outgoingArcsIterator().next().getEvent();
 			}
 
 			mutexAutomaton.getAlphabet().addEvent(event);
@@ -1372,7 +1372,7 @@ End Sub
 			public void update()
 			{
 					c1.removeAll();
-					for (ArcIterator arcIt=state.outgoingArcsIterator(); arcIt.hasNext();)
+					for (Iterator<Arc> arcIt=state.outgoingArcsIterator(); arcIt.hasNext();)
 					{
 							LabeledEvent event = arcIt.nextEvent();
 							String name;
@@ -1493,10 +1493,10 @@ End Sub
 		{
 			c1.removeAll();
 
-			for (ArcIterator arcIt = state.outgoingArcsIterator();
+			for (Iterator<Arc> arcIt = state.outgoingArcsIterator();
 					arcIt.hasNext(); )
 			{
-				LabeledEvent event = arcIt.nextEvent();
+				LabeledEvent event = arcIt.next().getEvent();
 				String name;
 
 				if (!event.isControllable())
@@ -1520,7 +1520,7 @@ End Sub
 
 				String eventName = c1.getSelectedItem();
 
-				state = state.nextState(state.outgoingArcsIterator().nextEvent());
+				state = state.nextState(state.outgoingArcsIterator().next().getEvent());
 
 				update();
 
@@ -1561,7 +1561,7 @@ End Sub
 			{
 				if (!leavingTarget)
 				{
-					state = state.nextState(state.outgoingArcsIterator().nextEvent());
+					state = state.nextState(state.outgoingArcsIterator().next().getEvent());
 
 					update();
 				}

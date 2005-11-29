@@ -115,10 +115,10 @@ public class AutomatonToFSM
 											 : "0") + "\t" + state.nbrOfOutgoingArcs());
 
 		// Print all outgoing arcs
-		for (ArcIterator arcIt = state.outgoingArcsIterator();
+		for (Iterator<Arc> arcIt = state.outgoingArcsIterator();
 				arcIt.hasNext(); )
 		{
-			Arc currArc = arcIt.nextArc();
+			Arc currArc = arcIt.next();
 			State targetState = currArc.getToState();
 			LabeledEvent currEvent = currArc.getEvent();
 			String label = currEvent.getLabel();

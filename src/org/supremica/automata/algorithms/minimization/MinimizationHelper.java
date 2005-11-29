@@ -110,9 +110,9 @@ public class MinimizationHelper
 
         // Add transitions
         LinkedList toBeAdded = new LinkedList();
-        for (ArcIterator arcIt = one.outgoingArcsIterator(); arcIt.hasNext(); )
+        for (Iterator<Arc> arcIt = one.outgoingArcsIterator(); arcIt.hasNext(); )
         {
-            Arc arc = arcIt.nextArc();
+            Arc arc = arcIt.next();
             State toState = arc.getToState();
             if (toState.equals(one) || toState.equals(two))
             {
@@ -121,9 +121,9 @@ public class MinimizationHelper
 
             toBeAdded.add(new Arc(newState, toState, arc.getEvent()));
         }
-        for (ArcIterator arcIt = two.outgoingArcsIterator(); arcIt.hasNext(); )
+        for (Iterator<Arc> arcIt = two.outgoingArcsIterator(); arcIt.hasNext(); )
         {
-            Arc arc = arcIt.nextArc();
+            Arc arc = arcIt.next();
             State toState = arc.getToState();
             if (toState.equals(one) || toState.equals(two))
             {
@@ -132,9 +132,9 @@ public class MinimizationHelper
 
             toBeAdded.add(new Arc(newState, toState, arc.getEvent()));
         }
-        for (ArcIterator arcIt = one.incomingArcsIterator(); arcIt.hasNext(); )
+        for (Iterator<Arc> arcIt = one.incomingArcsIterator(); arcIt.hasNext(); )
         {
-            Arc arc = arcIt.nextArc();
+            Arc arc = arcIt.next();
             State fromState = arc.getFromState();
             if (fromState.equals(one) || fromState.equals(two))
             {
@@ -143,9 +143,9 @@ public class MinimizationHelper
 
             toBeAdded.add(new Arc(fromState, newState, arc.getEvent()));
         }
-        for (ArcIterator arcIt = two.incomingArcsIterator(); arcIt.hasNext(); )
+        for (Iterator<Arc> arcIt = two.incomingArcsIterator(); arcIt.hasNext(); )
         {
-            Arc arc = arcIt.nextArc();
+            Arc arc = arcIt.next();
             State fromState = arc.getFromState();
             if (fromState.equals(one) || fromState.equals(two))
             {

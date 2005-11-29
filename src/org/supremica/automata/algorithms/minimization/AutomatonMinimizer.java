@@ -143,9 +143,9 @@ public class AutomatonMinimizer
         AutomatonSynthesizer synth = new AutomatonSynthesizer(theAutomaton, synthOptions);
         synth.doReachable(true);
         LinkedList toBeRemoved = new LinkedList();
-        for (StateIterator it = theAutomaton.stateIterator(); it.hasNext(); )
+        for (Iterator<State> it = theAutomaton.stateIterator(); it.hasNext(); )
         {
-            State state = it.nextState();
+            State state = it.next();
             if ((state.getCost() == State.MAX_COST) && !state.isForbidden())
             {
                 logger.verbose("The state " + state + " will be removed since it is not reachable.");
@@ -413,9 +413,9 @@ public class AutomatonMinimizer
     {
         TreeSet sort = new TreeSet();
 
-        for (StateIterator it = aut.stateIterator(); it.hasNext(); )
+        for (Iterator<State> it = aut.stateIterator(); it.hasNext(); )
         {
-            sort.add(new Integer(it.nextState().getIndex()));
+            sort.add(new Integer(it.next().getIndex()));
         }
 
         for (Iterator it = sort.iterator(); it.hasNext(); )
@@ -457,10 +457,10 @@ public class AutomatonMinimizer
         EquivalenceClass ordinaryStates = new EquivalenceClass(); //EqClassFactory.getEqClass();
 
         // Examine each state for which class it fits into
-        StateIterator stateIt = aut.stateIterator();
+        Iterator<State> stateIt = aut.stateIterator();
         while (stateIt.hasNext())
         {
-            State currState = stateIt.nextState();
+            State currState = stateIt.next();
 
             if (currState.isForbidden() && !options.getIgnoreMarking())
             {
@@ -560,13 +560,13 @@ public class AutomatonMinimizer
             // from the EquivalenceClass (from one state only). This is OK, though, since
             // all states in the equivalence class should have the same outgoing transitions
             // (with respect to equivalence classes), otherwise they are not really equivalent!
-            //ArcIterator outgoingArcsIt = currEquivClass.get().outgoingArcsIterator();
+            //Iterator<Arc> outgoingArcsIt = currEquivClass.get().outgoingArcsIterator();
 
             // Since the automaton isn't saturated, we have to loop through all arcs!
-            ArcIterator outgoingArcsIt = currEquivClass.outgoingArcsIterator();
+            Iterator<Arc> outgoingArcsIt = currEquivClass.outgoingArcsIterator();
             while (outgoingArcsIt.hasNext())
             {
-                Arc currArc = outgoingArcsIt.nextArc();
+                Arc currArc = outgoingArcsIt.next();
                 LabeledEvent currEvent = currArc.getEvent();
                 State oldToState = currArc.getToState();
 
@@ -719,11 +719,11 @@ public class AutomatonMinimizer
         // Note, for each state there is only one successor state
         // for this event (determinism)
         // NOOOOOOOOOOOOOOOOO! NOT IT'S NOT DETERMINISTIC!!
-        StateIterator stateIt = eqClass.iterator();
+        Iterator<State> stateIt = eqClass.iterator();
         while (stateIt.hasNext())
         {
-            State currState = stateIt.nextState();
-            State nextState = currState.nextState(e);
+            State currState = stateIt.next();
+            State nextState = currState.next(e);
             EquivalenceClass nextEquivalenceClass = null;
             if (nextState != null)
             {
@@ -739,7 +739,7 @@ public class AutomatonMinimizer
         // from each of the states in this eq-class
         // Note, for each state there may be several successor state
         // for this event (nondeterminism)
-        StateIterator stateIt = eqClass.iterator();
+        Iterator<State> stateIt = eqClass.iterator();
         while (stateIt.hasNext())
         {
             if (stopRequested)
@@ -748,7 +748,7 @@ public class AutomatonMinimizer
                 return newEquivalenceClassHolder;
             }
 
-            State currState = stateIt.nextState();
+            State currState = stateIt.next();
             StateSet nextStates;
             if (e.isEpsilon())
             {
@@ -761,9 +761,9 @@ public class AutomatonMinimizer
                 nextStates = currState.nextStates(e, true);
             }
             EquivalenceClass nextClass = new EquivalenceClass();
-            for (StateIterator nextIt = nextStates.iterator(); nextIt.hasNext(); )
+            for (Iterator<State> nextIt = nextStates.iterator(); nextIt.hasNext(); )
             {
-                State nextState = nextIt.nextState();
+                State nextState = nextIt.next();
                 EquivalenceClass thisNextClass = (EquivalenceClass) nextState.getStateSet();
                 nextClass.union(thisNextClass);
             }
@@ -798,11 +798,11 @@ public class AutomatonMinimizer
 
             // If there is only one transition out of this state AND it is an epsilon-transition
             // merge this and next state. (This is actually a special case of rule B.)
-            ArcIterator arcIt = one.outgoingArcsIterator();
+            Iterator<Arc> arcIt = one.outgoingArcsIterator();
             if (arcIt.hasNext())
             {
                 // So this arc may be OK, just check that there are no more arcs in the iterator!
-                Arc arc = arcIt.nextArc();
+                Arc arc = arcIt.next();
                 State two = arc.getToState();
                 boolean arcOK = !arcIt.hasNext() && arc.getEvent().isEpsilon() && !arc.isSelfLoop();
                 boolean markingOK = options.getIgnoreMarking() || (one.hasEqualMarking(two));
@@ -818,9 +818,9 @@ public class AutomatonMinimizer
                     State state = MinimizationHelper.mergeStates(aut, one, two, useShortNames);
                     statesToExamine.add(state);
                     // Add states that may have changed to stack
-                    for (ArcIterator it = state.incomingArcsIterator(); it.hasNext(); )
+                    for (Iterator<Arc> it = state.incomingArcsIterator(); it.hasNext(); )
                     {
-                        Arc epsilonArc = it.nextArc();
+                        Arc epsilonArc = it.next();
                         if (epsilonArc.getEvent().isEpsilon())
                         {
                             statesToExamine.add(epsilonArc.getFromState());
@@ -1077,11 +1077,11 @@ public class AutomatonMinimizer
             }
 
             // Examine this state
-            ArcIterator it = one.incomingArcsIterator();
+            Iterator<Arc> it = one.incomingArcsIterator();
             Arc arc = null;
             if (it.hasNext())
             {
-                arc = it.nextArc();
+                arc = it.next();
             }
             if (arc != null && !it.hasNext())
             {
@@ -1093,9 +1093,9 @@ public class AutomatonMinimizer
 
                     // Is there at least one epsilon outgoing?
                     boolean ok = false;
-                    for (ArcIterator outIt = one.outgoingArcsIterator(); outIt.hasNext(); )
+                    for (Iterator<Arc> outIt = one.outgoingArcsIterator(); outIt.hasNext(); )
                     {
-                        if (outIt.nextArc().getEvent().isEpsilon())
+                        if (outIt.next().getEvent().isEpsilon())
                         {
                             ok = true;
                             break;
@@ -1111,9 +1111,9 @@ public class AutomatonMinimizer
                         countA++;
                         statesToExamine.add(mergeState);
                         // Add states that may have changed to stack
-                        for (ArcIterator arcIt = mergeState.outgoingArcsIterator(); arcIt.hasNext(); )
+                        for (Iterator<Arc> arcIt = mergeState.outgoingArcsIterator(); arcIt.hasNext(); )
                         {
-                            Arc epsilonArc = arcIt.nextArc();
+                            Arc epsilonArc = arcIt.next();
                             if (epsilonArc.getEvent().isEpsilon())
                             {
                                 statesToExamine.add(epsilonArc.getToState());
@@ -1168,9 +1168,9 @@ public class AutomatonMinimizer
             // Examine this state
             // Is there at least one epsilon outgoing?
             boolean ok = false;
-            for (ArcIterator outIt = one.outgoingArcsIterator(); outIt.hasNext(); )
+            for (Iterator<Arc> outIt = one.outgoingArcsIterator(); outIt.hasNext(); )
             {
-                if (outIt.nextArc().getEvent().isEpsilon())
+                if (outIt.next().getEvent().isEpsilon())
                 {
                     ok = true;
                     break;
@@ -1190,9 +1190,9 @@ public class AutomatonMinimizer
 						continue;
                     State fromState = inArc.getFromState();
 
-                    for (ArcIterator outIt = one.outgoingArcsIterator(); outIt.hasNext(); )
+                    for (Iterator<Arc> outIt = one.outgoingArcsIterator(); outIt.hasNext(); )
                     {
-                        Arc arc = outIt.nextArc();
+                        Arc arc = outIt.next();
 						// Skip selfloops... I though there wouldn't be any!?? /hguo
 						// But they may appear as a result of this rule!!!
 						if ((arc.getEvent().isEpsilon() && arc.isSelfLoop()))
@@ -1338,9 +1338,9 @@ public class AutomatonMinimizer
                     ////////////////
 
                     // Follow all transitions backwards
-                    for (ArcIterator arcIt = currState.incomingArcsIterator(); arcIt.hasNext(); )
+                    for (Iterator<Arc> arcIt = currState.incomingArcsIterator(); arcIt.hasNext(); )
                     {
-                        Arc arc = arcIt.nextArc();
+                        Arc arc = arcIt.next();
                         State previous = arc.getFromState();
 
                         if (arc.getEvent().isEpsilon())
@@ -1354,12 +1354,12 @@ public class AutomatonMinimizer
                         }
                         else
                         {
-                            ArcIterator outIt = previous.outgoingArcsIterator();
+                            Iterator<Arc> outIt = previous.outgoingArcsIterator();
                             boolean fail = false;
                             LinkedList toBeRemoved = new LinkedList();
                             while (outIt.hasNext())
                             {
-                                Arc currArc = outIt.nextArc();
+                                Arc currArc = outIt.next();
 
                                 if (!currArc.getToState().equals(currState))
                                 {
@@ -1403,9 +1403,9 @@ public class AutomatonMinimizer
         // After the above there may be nonreachable parts... make reachable!
         synth.doReachable();
         LinkedList toBeRemoved = new LinkedList();
-        for (StateIterator it = aut.stateIterator(); it.hasNext(); )
+        for (Iterator<State> it = aut.stateIterator(); it.hasNext(); )
         {
-            State state = it.nextState();
+            State state = it.next();
             if ((state.getCost() == State.MAX_COST) && !state.isForbidden())
             {
                 toBeRemoved.add(state);
@@ -1449,15 +1449,15 @@ public class AutomatonMinimizer
         /*
         // States that can reach marked states by epsilon events only can be considered marked
         LinkedList toBeMarked = new LinkedList();
-        for (StateIterator stateIt = aut.suateIterator(); stateIt.hasNext();)
+        for (Iterator<State> stateIt = aut.suateIterator(); stateIt.hasNext();)
         {
-            State currState = stateIt.nextState();
+            State currState = stateIt.next();
             if (!currState.isAccepting())
             {
                 StateSet closure = currState.epsilonClosure();
-                for (StateIterator closureIt = closure.iterator(); closureIt.hasNext(); )
+                for (Iterator<State> closureIt = closure.iterator(); closureIt.hasNext(); )
                 {
-                    State otherState = closureIt.nextState();
+                    State otherState = closureIt.next();
                     if (otherState.isAccepting())
                     {
                         toBeMarked.add(currState);
@@ -1471,9 +1471,9 @@ public class AutomatonMinimizer
         // States that can reach marked states by epsilon events only can be considered marked
         // First find all the marked states, then adjust the states in theit epsilonclosures
         StateSet markedStates = new StateSet();
-        for (StateIterator stateIt = aut.stateIterator(); stateIt.hasNext();)
+        for (Iterator<State> stateIt = aut.stateIterator(); stateIt.hasNext();)
         {
-            State currState = stateIt.nextState();
+            State currState = stateIt.next();
             if (currState.isAccepting())
             {
                 markedStates.add(currState);
@@ -1484,9 +1484,9 @@ public class AutomatonMinimizer
         while (markedStates.size() != 0)
         {
             StateSet closure = markedStates.remove().backwardsEpsilonClosure();
-            for (StateIterator closureIt = closure.iterator(); closureIt.hasNext(); )
+            for (Iterator<State> closureIt = closure.iterator(); closureIt.hasNext(); )
             {
-                State state = closureIt.nextState();
+                State state = closureIt.next();
                 if (!state.isAccepting())
                 {
                     state.setAccepting(true);
@@ -1537,9 +1537,9 @@ public class AutomatonMinimizer
             boolean hasMarkedDecessor = false;
 
             // All outgoing (at least one!) must be epsilon (and maybe have a marked toState)
-            for (ArcIterator outIt = state.outgoingArcsIterator(); outIt.hasNext(); )
+            for (Iterator<Arc> outIt = state.outgoingArcsIterator(); outIt.hasNext(); )
             {
-                Arc arc = outIt.nextArc();
+                Arc arc = outIt.next();
                 if (!arc.getEvent().isEpsilon())
                 {
                     continue loop;
@@ -1553,13 +1553,13 @@ public class AutomatonMinimizer
             if ((state.outgoingArcsIterator().hasNext()) && (!isMarked || hasMarkedDecessor))
             {
                 int arcCount = 0;
-                for (ArcIterator outIt = state.outgoingArcsIterator(); outIt.hasNext(); )
+                for (Iterator<Arc> outIt = state.outgoingArcsIterator(); outIt.hasNext(); )
                 {
-                    Arc outArc = outIt.nextArc();
+                    Arc outArc = outIt.next();
 
-                    for (ArcIterator inIt = state.incomingArcsIterator(); inIt.hasNext(); )
+                    for (Iterator<Arc> inIt = state.incomingArcsIterator(); inIt.hasNext(); )
                     {
-                        Arc inArc = inIt.nextArc();
+                        Arc inArc = inIt.next();
                         State fromState = inArc.getFromState();
                         State toState = outArc.getToState();
                         Arc newArc = new Arc(fromState, toState, inArc.getEvent());
@@ -1591,13 +1591,13 @@ public class AutomatonMinimizer
             // of defined events if we don't consider the epsilon closure...
             if ((state.outgoingArcsIterator().hasNext()) && (state.definedEvents(false).size() == 0))
             {
-                for (ArcIterator outIt = state.outgoingArcsIterator(); outIt.hasNext(); )
+                for (Iterator<Arc> outIt = state.outgoingArcsIterator(); outIt.hasNext(); )
                 {
-                    Arc outArc = outIt.nextArc();
+                    Arc outArc = outIt.next();
 
-                    for (ArcIterator inIt = state.incomingArcsIterator(); inIt.hasNext(); )
+                    for (Iterator<Arc> inIt = state.incomingArcsIterator(); inIt.hasNext(); )
                     {
-                        Arc inArc = inIt.nextArc();
+                        Arc inArc = inIt.next();
                         Arc newArc = new Arc(inArc.getFromState(), outArc.getToState(), inArc.getEvent());
 
                         aut.addArc(newArc);
@@ -1686,7 +1686,7 @@ public class AutomatonMinimizer
         }
 
         // Find epsilon-closure for each state, put this info in each state
-        for (StateIterator stateIt = aut.stateIterator(); stateIt.hasNext();)
+        for (Iterator<State> stateIt = aut.stateIterator(); stateIt.hasNext();)
         {
             if (stopRequested)
             {
@@ -1694,7 +1694,7 @@ public class AutomatonMinimizer
                 return -1;
             }
 
-            State currState = stateIt.nextState();
+            State currState = stateIt.next();
 
             // Find closure, associate it with this state
             StateSet closure = currState.epsilonClosure(true);
@@ -1703,7 +1703,7 @@ public class AutomatonMinimizer
 
         // From each state add transitions that are present in its closure
         LinkedList toBeAdded = new LinkedList();
-        for (StateIterator stateIt = aut.stateIterator(); stateIt.hasNext();)
+        for (Iterator<State> stateIt = aut.stateIterator(); stateIt.hasNext();)
         {
             if (stopRequested)
             {
@@ -1711,15 +1711,15 @@ public class AutomatonMinimizer
                 return -1;
             }
 
-            State currState = stateIt.nextState();
+            State currState = stateIt.next();
             StateSet closure = currState.getStateSet();
 
             // Iterate over outgoing arcs in the closure
-            for (StateIterator closureIt = closure.iterator(); closureIt.hasNext(); )
+            for (Iterator<State> closureIt = closure.iterator(); closureIt.hasNext(); )
             {
-                arcLoop: for (ArcIterator arcIt = closureIt.nextState().outgoingArcsIterator(); arcIt.hasNext(); )
+                arcLoop: for (Iterator<Arc> arcIt = closureIt.next().outgoingArcsIterator(); arcIt.hasNext(); )
                 {
-                    Arc arc = arcIt.nextArc();
+                    Arc arc = arcIt.next();
 
                     // We can safely ignore the closure, we'll get there, don't worry
                     if (arc.getEvent().isEpsilon())
@@ -1737,9 +1737,9 @@ public class AutomatonMinimizer
                     // Where may we end up if we move along this transition?
                     // Anywhere in the epsilon-closure of the toState...
                     StateSet toClosure = arc.getToState().getStateSet();
-                    for (StateIterator toIt = toClosure.iterator(); toIt.hasNext(); )
+                    for (Iterator<State> toIt = toClosure.iterator(); toIt.hasNext(); )
                     {
-                        State toState = toIt.nextState();
+                        State toState = toIt.next();
 
                         // Don't add already existing transitions
                         if (!(currState.equals(arc.getFromState()) && toState.equals(arc.getToState())))
@@ -1803,9 +1803,9 @@ public class AutomatonMinimizer
 
         // Put silent self-loops in a list, remove afterwards
         LinkedList toBeRemoved = new LinkedList();
-        for (ArcIterator arcIt = aut.arcIterator(); arcIt.hasNext(); )
+        for (Iterator<Arc> arcIt = aut.arcIterator(); arcIt.hasNext(); )
         {
-            Arc currArc = arcIt.nextArc();
+            Arc currArc = arcIt.next();
             if (currArc.isSelfLoop() && currArc.getEvent().isEpsilon())
             {
                 toBeRemoved.add(currArc);
@@ -1819,9 +1819,9 @@ public class AutomatonMinimizer
 
         // Put redundant arcs in list, remove after all have been found
         toBeRemoved.clear();
-        for (ArcIterator arcIt = aut.arcIterator(); arcIt.hasNext(); )
+        for (Iterator<Arc> arcIt = aut.arcIterator(); arcIt.hasNext(); )
         {
-            Arc arc = arcIt.nextArc();
+            Arc arc = arcIt.next();
             LabeledEvent event = arc.getEvent();
 
             // Using Elorantas notation... (s1, s2 and (later) s3)
@@ -1830,23 +1830,23 @@ public class AutomatonMinimizer
 
             // Is the criteria fulfilled? (I.e. does there exist a s3 such that either
             // (s1 -a-> s3 and s3 -tau-> s2) or (s1 -tau-> s3 and s3 -a-> s2) holds?)
-            test: for (ArcIterator outIt = s1.outgoingArcsIterator(); outIt.hasNext(); )
+            test: for (Iterator<Arc> outIt = s1.outgoingArcsIterator(); outIt.hasNext(); )
             {
-                Arc firstArc = outIt.nextArc();
+                Arc firstArc = outIt.next();
                 LabeledEvent firstEvent = firstArc.getEvent();
 
                 if (firstEvent.isEpsilon() || firstEvent.equals(event))
                 {
                     State s3 = firstArc.getToState();
 
-                    for (ArcIterator inIt = s2.incomingArcsIterator(); inIt.hasNext(); )
+                    for (Iterator<Arc> inIt = s2.incomingArcsIterator(); inIt.hasNext(); )
                     {
                         if (stopRequested)
                         {
                             return -1;
                         }
 
-                        Arc secondArc = inIt.nextArc();
+                        Arc secondArc = inIt.next();
                         if (s3.equals(secondArc.getFromState()))
                         {
                             LabeledEvent secondEvent = secondArc.getEvent();
@@ -1869,10 +1869,10 @@ public class AutomatonMinimizer
         // Put redundant arcs in list, remove after all have been found
         toBeRemoved.clear();
         int i=0;
-        arcLoop: for (ArcIterator arcIt = aut.arcIterator(); arcIt.hasNext(); )
+        arcLoop: for (Iterator<Arc> arcIt = aut.arcIterator(); arcIt.hasNext(); )
         {
             logger.info("" + ++i);
-            Arc arc = arcIt.nextArc();
+            Arc arc = arcIt.next();
 
             // Using Elorantas notation... (a, s1, s2 and (not exactly) s3)... but not her method...
             LabeledEvent a = arc.getEvent();
@@ -1947,11 +1947,11 @@ public class AutomatonMinimizer
             if (event.isEpsilon())
             {
                 // Does there exist a transition like this?
-                for (ArcIterator arcIt = aut.arcIterator(); arcIt.hasNext(); )
+                for (Iterator<Arc> arcIt = aut.arcIterator(); arcIt.hasNext(); )
                 {
                     // Is this transition associated with the right
                     // event? If so continue the outer loop.
-					Arc arc = arcIt.nextArc();
+					Arc arc = arcIt.next();
 					LabeledEvent arcEvent = arc.getEvent();
                     if (event.equals(arcEvent))
                     {
@@ -2163,11 +2163,11 @@ class StateInfoIncoming
         private TreeMap arclets = new TreeMap();
         //private TreeSet arclets = new TreeSet();
 
-        public Arclets(ArcIterator arcIterator)
+        public Arclets(Iterator<Arc> arcIterator)
         {
             while (arcIterator.hasNext())
             {
-                Arc arc = arcIterator.nextArc();
+                Arc arc = arcIterator.next();
 
                 // Ignore epsilon events
                 if (!arc.getEvent().isEpsilon())

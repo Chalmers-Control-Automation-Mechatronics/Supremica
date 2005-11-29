@@ -282,10 +282,10 @@ public class AutomataBuildFromVALID
 
 						// Modify each arc that has this event (in the good old days nothing like this
 						// was necessary, it was enough to change the label (and leave the id untouched))
-						ArcIterator arcIt = currAutomaton.arcIterator();
+						Iterator<Arc> arcIt = currAutomaton.arcIterator();
 						while (arcIt.hasNext())
 						{
-							Arc currArc = arcIt.nextArc();
+							Arc currArc = arcIt.next();
 
 							if (currArc.getEvent().equals(currEvent))
 							{

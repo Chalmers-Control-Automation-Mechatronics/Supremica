@@ -172,10 +172,10 @@ public class AutomataSSPCExporter
 
 			me.println();
 
-			for (ArcIterator aci = state.outgoingArcsIterator();
-					aci.hasNext(); )
+			for (Iterator<Arc> arcIt = state.outgoingArcsIterator();
+					arcIt.hasNext(); )
 			{
-				Arc arc = (Arc) aci.next();
+				Arc arc = arcIt.next();
 
 				// String tname = arc.getLabel();
 				int tname = getEvent(arc.getLabel());

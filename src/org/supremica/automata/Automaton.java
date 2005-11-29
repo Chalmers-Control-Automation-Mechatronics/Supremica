@@ -137,9 +137,9 @@ public class Automaton
 		comment = new String(orgAut.comment == null ? "" : orgAut.comment);
 
 		// Create all states
-		for (StateIterator states = orgAut.stateIterator(); states.hasNext(); )
+		for (Iterator<State> states = orgAut.stateIterator(); states.hasNext(); )
 		{
-			State orgState = states.nextState();
+			State orgState = states.next();
 			State newState = new State(orgState);
 
 			addState(newState);
@@ -148,16 +148,16 @@ public class Automaton
 		try
 		{
 			// Create all transitions
-			for (StateIterator states = orgAut.stateIterator();
+			for (Iterator<State> states = orgAut.stateIterator();
 					states.hasNext(); )
 			{
 				State orgSourceState = (State) states.next();
 				State newSourceState = getStateWithName(orgSourceState.getName());
 
-				for (ArcIterator outgoingArcs = orgSourceState.safeOutgoingArcsIterator();
+				for (Iterator<Arc> outgoingArcs = orgSourceState.safeOutgoingArcsIterator();
 					 outgoingArcs.hasNext(); )
 				{
-					Arc orgArc = outgoingArcs.nextArc();
+					Arc orgArc = outgoingArcs.next();
 					State orgDestState = orgArc.getToState();
 					State newDestState = getStateWithName(orgDestState.getName());
 					LabeledEvent currEvent = alphabet.getEvent(orgArc.getEvent());
@@ -330,9 +330,9 @@ public class Automaton
 		indexStateMap.clear();
 		//idStateMap.clear();
 
-		for (StateIterator stit = stateIterator(); stit.hasNext(); )
+		for (Iterator<State> stit = stateIterator(); stit.hasNext(); )
 		{
-			State state = stit.nextState();
+			State state = stit.next();
 
 			indexStateMap.put(new Integer(state.getIndex()), state);
 			//idStateMap.put(state.getId(), state);
@@ -394,14 +394,14 @@ public class Automaton
 
 		// We start by computing the set of explicitly
 		// forbidden events
-		for (StateIterator stateIt = stateIterator(); stateIt.hasNext(); )
+		for (Iterator<State> stateIt = stateIterator(); stateIt.hasNext(); )
 		{
-			State currState = stateIt.nextState();
+			State currState = stateIt.next();
 
-			for (ArcIterator arcIt = currState.outgoingArcsIterator();
+			for (Iterator<Arc> arcIt = currState.outgoingArcsIterator();
 					arcIt.hasNext(); )
 			{
-				Arc currArc = arcIt.nextArc();
+				Arc currArc = arcIt.next();
 				State nextState = currArc.getToState();
 
 				if (nextState.isForbidden())
@@ -429,14 +429,14 @@ public class Automaton
 		// forbidden events
 		Alphabet controlInconsistentEvents = new Alphabet();
 
-		for (StateIterator stateIt = stateIterator(); stateIt.hasNext(); )
+		for (Iterator<State> stateIt = stateIterator(); stateIt.hasNext(); )
 		{
-			State currState = stateIt.nextState();
+			State currState = stateIt.next();
 
-			for (ArcIterator arcIt = currState.outgoingArcsIterator();
+			for (Iterator<Arc> arcIt = currState.outgoingArcsIterator();
 					arcIt.hasNext(); )
 			{
-				Arc currArc = arcIt.nextArc();
+				Arc currArc = arcIt.next();
 				State nextState = currArc.getToState();
 
 				if (!nextState.isForbidden())
@@ -473,14 +473,14 @@ public class Automaton
 
 		// We start by computing the set of explicitly
 		// forbidden events
-		for (StateIterator stateIt = stateIterator(); stateIt.hasNext(); )
+		for (Iterator<State> stateIt = stateIterator(); stateIt.hasNext(); )
 		{
-			State currState = stateIt.nextState();
+			State currState = stateIt.next();
 
-			for (ArcIterator arcIt = currState.outgoingArcsIterator();
+			for (Iterator<Arc> arcIt = currState.outgoingArcsIterator();
 					arcIt.hasNext(); )
 			{
-				Arc currArc = arcIt.nextArc();
+				Arc currArc = arcIt.next();
 				State nextState = currArc.getToState();
 
 				if (nextState.isForbidden())
@@ -509,14 +509,14 @@ public class Automaton
 		// forbidden events
 		Alphabet controlInconsistentEvents = new Alphabet();
 
-		for (StateIterator stateIt = stateIterator(); stateIt.hasNext(); )
+		for (Iterator<State> stateIt = stateIterator(); stateIt.hasNext(); )
 		{
-			State currState = stateIt.nextState();
+			State currState = stateIt.next();
 
-			for (ArcIterator arcIt = currState.outgoingArcsIterator();
+			for (Iterator<Arc> arcIt = currState.outgoingArcsIterator();
 					arcIt.hasNext(); )
 			{
-				Arc currArc = arcIt.nextArc();
+				Arc currArc = arcIt.next();
 				State nextState = currArc.getToState();
 
 				if (!nextState.isForbidden())
@@ -687,9 +687,9 @@ public class Automaton
 	 */
 	public boolean hasAcceptingState()
 	{
-		for (StateIterator stateIt = stateIterator(); stateIt.hasNext(); )
+		for (Iterator<State> stateIt = stateIterator(); stateIt.hasNext(); )
 		{
-			State currState = stateIt.nextState();
+			State currState = stateIt.next();
 
 			if (currState.isAccepting())
 			{
@@ -707,9 +707,9 @@ public class Automaton
 	 */
 	public boolean hasNonacceptingState()
 	{
-		for (StateIterator stateIt = stateIterator(); stateIt.hasNext(); )
+		for (Iterator<State> stateIt = stateIterator(); stateIt.hasNext(); )
 		{
-			State currState = stateIt.nextState();
+			State currState = stateIt.next();
 
 			if (!currState.isAccepting())
 			{
@@ -725,9 +725,9 @@ public class Automaton
 	 */
 	public boolean hasSelfLoop()
 	{
-		for (ArcIterator arcIt = theArcs.iterator(); arcIt.hasNext(); )
+		for (Iterator<Arc> arcIt = theArcs.iterator(); arcIt.hasNext(); )
 		{
-			Arc currArc = arcIt.nextArc();
+			Arc currArc = arcIt.next();
 
 			if (currArc.isSelfLoop())
 			{
@@ -823,9 +823,9 @@ public class Automaton
 	{
 		try
 		{
-			for (ArcIterator arcIt = arcSet.iterator(); arcIt.hasNext(); )
+			for (Iterator<Arc> arcIt = arcSet.iterator(); arcIt.hasNext(); )
 			{
-				removeArc(arcIt.nextArc());
+				removeArc(arcIt.next());
 			}
 		}
 		catch (Exception ex)
@@ -904,10 +904,10 @@ public class Automaton
 			throw new IllegalArgumentException("Name must be non-null");
 		}
 
-		for (StateIterator stateIt = stateIterator(); stateIt.hasNext(); )
-		{
-			State currState = stateIt.nextState();
-
+		for (Iterator<State> stateIt = stateIterator(); stateIt.hasNext(); )
+		{	
+			State currState = stateIt.next();
+			
 			if (currState.getName().equals(name))
 			{
 				return currState;
@@ -961,7 +961,7 @@ public class Automaton
 	 * Returns an iterator to all states in this automaton
 	 * that has an event with eventLabel as an outoing event.
 	 */
-	public StateIterator statesThatEnableEventIterator(String eventLabel)
+	public Iterator<State> statesThatEnableEventIterator(String eventLabel)
 		throws IllegalStateException
 	{
 		if (eventLabel == null)
@@ -969,7 +969,7 @@ public class Automaton
 			throw new IllegalArgumentException("EventLabel must be non-null");
 		}
 
-		StateIterator stateIt = new InternalStateIterator(eventLabel, true);
+		Iterator<State> stateIt = new InternalStateIterator(eventLabel, true);
 
 		return stateIt;
 	}
@@ -1018,9 +1018,9 @@ public class Automaton
 	{
 		int amount = 0;
 
-		for (ArcIterator arcIt = theArcs.iterator(); arcIt.hasNext(); )
+		for (Iterator<Arc> arcIt = theArcs.iterator(); arcIt.hasNext(); )
 		{
-			Arc currArc = arcIt.nextArc();
+			Arc currArc = arcIt.next();
 
 			if (currArc.getEvent().isEpsilon())
 			{
@@ -1038,9 +1038,9 @@ public class Automaton
 	{
 		int amount = 0;
 
-		for (ArcIterator arcIt = theArcs.iterator(); arcIt.hasNext(); )
+		for (Iterator<Arc> arcIt = theArcs.iterator(); arcIt.hasNext(); )
 		{
-			Arc currArc = arcIt.nextArc();
+			Arc currArc = arcIt.next();
 
 			if (currArc.isSelfLoop())
 			{
@@ -1058,9 +1058,9 @@ public class Automaton
 	{
 		int amount = 0;
 
-		for (ArcIterator arcIt = theArcs.iterator(); arcIt.hasNext(); )
+		for (Iterator<Arc> arcIt = theArcs.iterator(); arcIt.hasNext(); )
 		{
-			Arc currArc = arcIt.nextArc();
+			Arc currArc = arcIt.next();
 
 			if (currArc.isSelfLoop() && anAlphabet.contains(currArc.getEvent()))
 			{
@@ -1129,9 +1129,9 @@ public class Automaton
 	{
 		int nbrOfForbiddenStates = 0;
 
-		for (StateIterator stateIt = stateIterator(); stateIt.hasNext(); )
+		for (Iterator<State> stateIt = stateIterator(); stateIt.hasNext(); )
 		{
-			State currState = stateIt.nextState();
+			State currState = stateIt.next();
 
 			if (currState.isForbidden())
 			{
@@ -1146,9 +1146,9 @@ public class Automaton
 	{
 		int nbrOfAcceptingAndForbiddenStates = 0;
 
-		for (StateIterator stateIt = stateIterator(); stateIt.hasNext(); )
+		for (Iterator<State> stateIt = stateIterator(); stateIt.hasNext(); )
 		{
-			State currState = stateIt.nextState();
+			State currState = stateIt.next();
 
 			if (currState.isAccepting() && currState.isForbidden())
 			{
@@ -1166,11 +1166,11 @@ public class Automaton
 	{
 		int depth = 0;
 
-		for (StateIterator stateIterator = stateIterator();
+		for (Iterator<State> stateIterator = stateIterator();
 				stateIterator.hasNext(); )
 		{
 			// Measure the shortest trace to the state.
-			State currState = stateIterator.nextState();
+			State currState = stateIterator.next();
 			int stateDepth;
 
 			try
@@ -1200,11 +1200,11 @@ public class Automaton
 	{
 		int depthSum = 0;
 
-		for (StateIterator stateIterator = stateIterator();
+		for (Iterator<State> stateIterator = stateIterator();
 				stateIterator.hasNext(); )
 		{
 			// Measure the shortest trace to the state.
-			State currState = stateIterator.nextState();
+			State currState = stateIterator.next();
 			int stateDepth;
 
 			try
@@ -1232,27 +1232,27 @@ public class Automaton
 		return depthSum;
 	}
 
-	public StateIterator stateIterator()
+	public Iterator<State> stateIterator()
 	{
-		return new StateIterator(theStates.iterator());
+		return theStates.iterator();
 	}
 
 	/**
 	 * Use this iterator instead of stateIterator when you add or
 	 * remove states in this automaton.
 	 */
-	public StateIterator safeStateIterator()
+	public Iterator<State> safeStateIterator()
 	{
-		return new StateIterator((new StateSet(theStates)).iterator());
+		return (new StateSet(theStates)).iterator();
 	}
 
-	public ArcIterator arcIterator()
+	public Iterator<Arc> arcIterator()
 	{
 		return theArcs.iterator();
 	}
 
 	/*
-	public ArcIterator safeArcIterator()
+	public Iterator<Arc> safeIterator<Arc>()
 	{
 		return (new ArcSet(theArcs)).iterator();
 	}
@@ -1370,9 +1370,9 @@ public class Automaton
 	{
 		setStateIndices();
 
-		for (StateIterator stateIt = stateIterator(); stateIt.hasNext(); )
+		for (Iterator<State> stateIt = stateIterator(); stateIt.hasNext(); )
 		{
-			State currState = stateIt.nextState();
+			State currState = stateIt.next();
 
 			currState.setName("q" + currState.getIndex());
 		}
@@ -1405,9 +1405,9 @@ public class Automaton
 	{
 		int i = 0;
 
-		for (StateIterator stateIt = stateIterator(); stateIt.hasNext(); )
+		for (Iterator<State> stateIt = stateIterator(); stateIt.hasNext(); )
 		{
-			State currState = stateIt.nextState();
+			State currState = stateIt.next();
 
 			currState.setIndex(i++);
 		}
@@ -1463,9 +1463,9 @@ public class Automaton
 
 	public void clearVisitedStates()
 	{
-		for (StateIterator stateIt = stateIterator(); stateIt.hasNext(); )
+		for (Iterator<State> stateIt = stateIterator(); stateIt.hasNext(); )
 		{
-			State currState = stateIt.nextState();
+			State currState = stateIt.next();
 
 			currState.setVisited(false);
 		}
@@ -1473,9 +1473,9 @@ public class Automaton
 
 	public void clearSelectedStates()
 	{
-		for (StateIterator stateIt = stateIterator(); stateIt.hasNext(); )
+		for (Iterator<State> stateIt = stateIterator(); stateIt.hasNext(); )
 		{
-			State currState = stateIt.nextState();
+			State currState = stateIt.next();
 
 			currState.setSelected(false);
 		}
@@ -1483,9 +1483,9 @@ public class Automaton
 
 	private void removeAssociatedStateFromUnvisitedStates()
 	{
-		for (StateIterator stateIt = stateIterator(); stateIt.hasNext(); )
+		for (Iterator<State> stateIt = stateIterator(); stateIt.hasNext(); )
 		{
-			State currState = stateIt.nextState();
+			State currState = stateIt.next();
 
 			if (!currState.isVisited())
 			{
@@ -1653,10 +1653,10 @@ public class Automaton
 				// We don't care about forbidden states...
 				if (currState.isMutuallyAccepting())
 				{
-					for (ArcIterator arcIt = currState.incomingArcsIterator();
+					for (Iterator<Arc> arcIt = currState.incomingArcsIterator();
 							arcIt.hasNext(); )
 					{
-						Arc currArc = arcIt.nextArc();
+						Arc currArc = arcIt.next();
 						LabeledEvent arcEvent = currArc.getEvent();
 
 						if (safeEvents.contains(arcEvent.getLabel()))
@@ -1689,9 +1689,9 @@ public class Automaton
 	{
 		beginTransaction();
 
-		for (StateIterator stateIt = stateIterator(); stateIt.hasNext(); )
+		for (Iterator<State> stateIt = stateIterator(); stateIt.hasNext(); )
 		{
-			State currState = stateIt.nextState();
+			State currState = stateIt.next();
 
 			if (keepForbidden)
 			{
@@ -1720,9 +1720,9 @@ public class Automaton
 	{
 		beginTransaction();
 
-		for (StateIterator stateIt = stateIterator(); stateIt.hasNext(); )
+		for (Iterator<State> stateIt = stateIterator(); stateIt.hasNext(); )
 		{
-			State currState = stateIt.nextState();
+			State currState = stateIt.next();
 
 			if (currState.isMutuallyAccepting())
 			{
@@ -1751,9 +1751,9 @@ public class Automaton
 	 */ // and this method is useful for whom? //MF
 	public void invertMarking()
 	{
-		for (StateIterator stateIt = stateIterator(); stateIt.hasNext(); )
+		for (Iterator<State> stateIt = stateIterator(); stateIt.hasNext(); )
 		{
-			State currState = stateIt.nextState();
+			State currState = stateIt.next();
 
 			if (currState.isMutuallyAccepting() || currState.isAccepting())
 			{
@@ -1773,10 +1773,10 @@ public class Automaton
 	public LabeledEvent getLabeledEvent(State fromState, State toState)
 		throws Exception
 	{
-		for (ArcIterator arcIt = fromState.outgoingArcsIterator();
+		for (Iterator<Arc> arcIt = fromState.outgoingArcsIterator();
 				arcIt.hasNext(); )
 		{
-			Arc currArc = arcIt.nextArc();
+			Arc currArc = arcIt.next();
 			State currToState = currArc.getToState();
 
 			if (currToState == toState)
@@ -1822,9 +1822,9 @@ public class Automaton
 		}
 
 		// Modify arcs
-		for (ArcIterator arcIt = aut.arcIterator(); arcIt.hasNext(); )
+		for (Iterator<Arc> arcIt = aut.arcIterator(); arcIt.hasNext(); )
 		{
-			Arc arc = arcIt.nextArc();
+			Arc arc = arcIt.next();
 
 			// Hide this one?
 			if (alpha.contains(arc.getEvent()))
@@ -2097,9 +2097,9 @@ public class Automaton
 		// Ad-hoc checksum algorithm
 		long checksum = 0;
 
-		for (StateIterator sIt = stateIterator(); sIt.hasNext(); )
+		for (Iterator<State> sIt = stateIterator(); sIt.hasNext(); )
 		{
-			State currState = sIt.nextState();
+			State currState = sIt.next();
 			int part2 = 2;
 
 			String name = currState.getName();
@@ -2256,10 +2256,10 @@ public class Automaton
 		addState(dump);							// Add it to myself
 		saturate(dump, alpha, dump);		// saturate, else something will always be done
 
-		StateIterator state_it = safeStateIterator();
+		Iterator<State> state_it = safeStateIterator();
 		while(state_it.hasNext())
 		{
-			State state = (State)state_it.next(); // Why doesn't a StateIterator return a State?
+			State state = (State)state_it.next(); // Why doesn't a Iterator<State> return a State?
 			done_something |= saturate(state, alpha, dump);	// saturate to the dump-state
 		}
 
@@ -2288,10 +2288,10 @@ public class Automaton
 	{
 		boolean done_something = false;
 
-		StateIterator state_it = safeStateIterator();
+		Iterator<State> state_it = safeStateIterator();
 		while(state_it.hasNext())
 		{
-			State state = (State)state_it.next(); // Why doesn't a StateIterator return a State?
+			State state = (State)state_it.next(); // Why doesn't a Iterator<State> return a State?
 			done_something |= saturate(state, alpha, state);	// saturate with self-loops
 		}
 
@@ -2384,17 +2384,15 @@ public class Automaton
 	}
 
 	class InternalStateIterator
-		extends StateIterator
+		implements Iterator<State>
 	{
-		private final ArcIterator arcIt;
+		private final Iterator<Arc> arcIt;
 		private State currState = null;
 		private String eventLabel;
 		private boolean outgoing;
 
 		public InternalStateIterator(String eventLabel, boolean outgoing)
 		{
-			super(null);
-
 			this.eventLabel = eventLabel;
 			this.outgoing = outgoing;
 			this.arcIt = theArcs.iterator();
@@ -2426,7 +2424,7 @@ public class Automaton
 		{
 			while (arcIt.hasNext())
 			{
-				Arc currArc = arcIt.nextArc();
+				Arc currArc = arcIt.next();
 				String currLabel = currArc.getLabel();
 
 				if (eventLabel.equals(currLabel))
@@ -2481,9 +2479,9 @@ public class Automaton
 		sbuf.append("Automaton " + getName() + " = new Automaton(\"" + getName() + "\");");
 		sbuf.append("\t\t{\t\t\t" + getName() + ".setType(AutomatonType." + getType().toString() + ");\n");
 
-		for (StateIterator sit = stateIterator(); sit.hasNext(); )
+		for (Iterator<State> sit = stateIterator(); sit.hasNext(); )
 		{
-			State state = sit.nextState();
+			State state = sit.next();
 
 			sbuf.append("State " + state.getName() + " = new State(\"" + state.getName() + "\");");
 			sbuf.append("\t" + state.getName() + ".setCost(" + state.getCost() + ");");
@@ -2510,9 +2508,9 @@ public class Automaton
 			sbuf.append("\t" + getName() + ".getAlphabet().addEvent(" + ev.getLabel() + ");\n");
 		}
 
-		for (ArcIterator ait = arcIterator(); ait.hasNext(); )
+		for (Iterator<Arc> ait = arcIterator(); ait.hasNext(); )
 		{
-			Arc arc = ait.nextArc();
+			Arc arc = ait.next();
 
 			sbuf.append(getName() + ".addArc(new Arc(" + arc.getFromState().getName() + ", " + arc.getToState().getName() + ", " + arc.getEvent().getLabel() + "));\n");
 		}

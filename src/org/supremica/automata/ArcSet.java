@@ -51,41 +51,26 @@ package org.supremica.automata;
 
 import java.util.*;
 
-/*
-class ArcComparator
-	implements Comparator
-{
-	private int compareArc(Arc a, Arc b)
-	{
-		//return a.toString().compareTo(b.toString());
-		int apa = (a.getFromState().getName() + a.getEvent().getLabel() + a.getToState().getName()).compareTo(b.getFromState().getName() + b.getEvent().getLabel() + b.getToState().getName());
-		return apa;
-	}
-
-	public int compare(Object a, Object b)
-	{
-		return compareArc((Arc) a, (Arc) b);
-	}
-}
-*/
-
+/**
+ * A set of arcs with the same start state and end state.
+ */
 public class ArcSet
 {
 	private State fromState = null;
 	private State toState = null;
 
 	//private List theArcs = null;
-	private Collection theArcs = null;
+	private Collection<Arc> theArcs = null;
 
 	public ArcSet()
 	{
-		theArcs = new LinkedList();
+		theArcs = new LinkedList<Arc>();
 		//theArcs = new TreeSet(new ArcComparator());
 	}
 
 	/**
-	 * In states, outgoing arcs are ordered in sets like this. So all arcs that go to a certain
-	 * state are in the same set.
+	 * In states, outgoing arcs are ordered in sets like this. So all
+	 * arcs that go to a certain state are in the same set.
 	 */
 	public ArcSet(State from, State to)
 	{
@@ -97,7 +82,7 @@ public class ArcSet
 
 	public ArcSet(ArcSet other)
 	{
-		theArcs = new LinkedList(other.theArcs);
+		theArcs = new LinkedList<Arc>(other.theArcs);
 		//this();
 		//this.add(other);
 	}
@@ -114,9 +99,9 @@ public class ArcSet
 
 	public boolean contains(Arc theArc)
 	{
-		for (ArcIterator it = iterator(); it.hasNext(); )
+		for (Iterator<Arc> it = iterator(); it.hasNext(); )
 		{
-			if (theArc.equals(it.nextArc()))
+			if (theArc.equals(it.next()))
 			{
 				return true;
 			}
@@ -126,9 +111,9 @@ public class ArcSet
 
 	private void addAll(ArcSet set)
 	{
-		for (ArcIterator it = set.iterator(); it.hasNext(); )
+		for (Iterator<Arc> it = set.iterator(); it.hasNext(); )
 		{
-			this.addArc(it.nextArc());
+			this.addArc(it.next());
 		}
 	}
 
@@ -146,14 +131,6 @@ public class ArcSet
 		theArcs.remove(theArc);
 	}
 
-	/*
-	public Arc removeArc()
-	{
-	    //return (Arc) theArcs.remove(0);
-		return (Arc) theArcs.remove(iterator().nextArc());
-	}
-	*/
-
 	public void clear()
 	{
 		theArcs.clear();
@@ -164,8 +141,8 @@ public class ArcSet
 		return theArcs.size();
 	}
 
-	public ArcIterator iterator()
+	public Iterator<Arc> iterator()
 	{
-		return new ArcIterator(theArcs.iterator());
+		return theArcs.iterator();
 	}
 }

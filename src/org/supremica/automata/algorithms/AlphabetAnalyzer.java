@@ -242,9 +242,9 @@ public class AlphabetAnalyzer
 			ret.add(currEvent.getLabel());
 		}
 
-		for (ArcIterator ai = a.arcIterator(); ai.hasNext(); )
+		for (Iterator<Arc> ai = a.arcIterator(); ai.hasNext(); )
 		{
-			Arc currArc = ai.nextArc();
+			Arc currArc = ai.next();
 
 //                      currArc.getEvent().extra1 = 1;
 			ret.remove(currArc.getEvent().getLabel());

@@ -74,9 +74,9 @@ public class DiminishAction
 	{
 		boolean didit = false;
 
-		for (StateIterator stit = automaton.stateIterator(); stit.hasNext(); )
+		for (Iterator<State> stit = automaton.stateIterator(); stit.hasNext(); )
 		{
-			State state = stit.nextState();
+			State state = stit.next();
 
 			didit |= diminish(state);
 		}
@@ -90,15 +90,15 @@ public class DiminishAction
 	{
 		logger.debug("State" + "(" + ++statenbr + "): " + state.getName());
 
-		for (ArcIterator ait = state.outgoingArcsIterator(); ait.hasNext(); )
+		for (Iterator<Arc> arcItA = state.outgoingArcsIterator(); arcItA.hasNext(); )
 		{
-			Arc arc = ait.nextArc();
+			Arc arc = arcItA.next();
 			LabeledEvent event = arc.getEvent();
 
-			for (ArcIterator bit = state.outgoingArcsIterator();
-					bit.hasNext(); )
+			for (Iterator<Arc> arcItB = state.outgoingArcsIterator();
+					arcItB.hasNext(); )
 			{
-				if (hiloMatch(event, bit.nextArc().getEvent()))
+				if (hiloMatch(event, arcItB.next().getEvent()))
 				{
 					state.setForbidden(true);
 					logger.debug("Forbidding state " + state.getName());

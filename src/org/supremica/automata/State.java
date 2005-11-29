@@ -92,9 +92,9 @@ public class State
     public int sethelper;
 
     // private StateNode stateNode = null;
-    private LinkedList incomingArcs = new LinkedList();
-    private LinkedList outgoingArcs = new LinkedList();
-    private List outgoingArcSets = new LinkedList();
+    private LinkedList<Arc> incomingArcs = new LinkedList<Arc>();
+    private LinkedList<Arc> outgoingArcs = new LinkedList<Arc>();
+    private List<ArcSet> outgoingArcSets = new LinkedList<ArcSet>();
     private Listeners listeners = null;
 
     /**
@@ -485,7 +485,7 @@ public class State
 
 	/**
 	 * Don't do this in public -- only for use by Automaton
-	 **/
+	 */
 	void addIncomingArc(Arc theArc)
     {
         incomingArcs.addLast(theArc);
@@ -493,7 +493,7 @@ public class State
 
 	/**
 	 * Don't do this in public -- only for use by Automaton
-	 **/
+	 */
 	void addOutgoingArc(Arc theArc)
     {
         outgoingArcs.addLast(theArc);
@@ -513,7 +513,7 @@ public class State
 
 	/**
 	 * Don't do this in public -- only for use by Automaton
-	 **/
+	 */
 	void removeIncomingArc(Arc theArc)
     {
         incomingArcs.remove(theArc);
@@ -521,7 +521,7 @@ public class State
 
 	/**
 	 * Don't do this in public -- only for use by Automaton
-	 **/
+	 */
 	void removeOutgoingArc(Arc theArc)
     {
         outgoingArcs.remove(theArc);
@@ -538,7 +538,7 @@ public class State
 
 	/**
 	 * Don't do this in public -- only for use by Automaton
-	 **/
+	 */
 	ArcSet getArcSet(Arc theArc)
     {
         State toState = theArc.getToState();
@@ -559,9 +559,9 @@ public class State
         return null;
     }
 
-    public ArcIterator outgoingArcsIterator()
+    public Iterator<Arc> outgoingArcsIterator()
     {
-        return new ArcIterator(outgoingArcs.iterator());
+        return outgoingArcs.iterator();
     }
 
     public Iterator outgoingArcSetIterator()
@@ -572,9 +572,9 @@ public class State
     /**
      * Use this iterator when you're planning to fiddle with the arcs.
      */
-    public ArcIterator safeOutgoingArcsIterator()
+    public Iterator<Arc> safeOutgoingArcsIterator()
     {
-        return new ArcIterator(((LinkedList) outgoingArcs.clone()).iterator());
+        return ((LinkedList<Arc>) outgoingArcs.clone()).iterator();
     }
 
     /**
@@ -611,15 +611,15 @@ public class State
         return false;
     }
 
-    public ArcIterator incomingArcsIterator()
+    public Iterator<Arc> incomingArcsIterator()
     {
-        return new ArcIterator(incomingArcs.iterator());
+        return incomingArcs.iterator();
     }
 
-    public StateIterator nextStateIterator()
+    public Iterator<State> nextStateIterator()
     {
         StateSet nextStates = new StateSet();
-        ArcIterator arcIt = outgoingArcsIterator();
+        Iterator<Arc> arcIt = outgoingArcsIterator();
 
         while (arcIt.hasNext())
         {
@@ -629,10 +629,10 @@ public class State
         return nextStates.iterator();
     }
 
-    public StateIterator previousStateIterator()
+    public Iterator<State> previousStateIterator()
     {
         StateSet previousStates = new StateSet();
-        ArcIterator arcIt = incomingArcsIterator();
+        Iterator<Arc> arcIt = incomingArcsIterator();
 
         while (arcIt.hasNext())
         {
@@ -646,10 +646,10 @@ public class State
      * StateIterator for the states that can reach this state in one transition
      * along the event event.
      */
-    public StateIterator previousStateIterator(LabeledEvent event)
+    public Iterator<State> previousStateIterator(LabeledEvent event)
     {
         StateSet previousStates = new StateSet();
-        ArcIterator arcIt = incomingArcsIterator();
+        Iterator<Arc> arcIt = incomingArcsIterator();
 
         while (arcIt.hasNext())
         {
@@ -671,9 +671,9 @@ public class State
     public int nbrOfIncomingEpsilonArcs()
     {
         int count = 0;
-        for (ArcIterator it = incomingArcsIterator(); it.hasNext(); )
+        for (Iterator<Arc> it = incomingArcsIterator(); it.hasNext(); )
         {
-            if (it.nextEvent().isEpsilon())
+            if (it.next().getEvent().isEpsilon())
             {
                 count++;
             }
@@ -898,7 +898,7 @@ public class State
         assert(!theEvent.isEpsilon()); // See above!
 
         // Do the stuff
-        ArcIterator outgoingArcsIt;
+        Iterator<Arc> outgoingArcsIt;
         if (considerEpsilonClosure)
         {
             outgoingArcsIt = epsilonClosure(true).outgoingArcsIterator();
@@ -909,7 +909,7 @@ public class State
         }
         while (outgoingArcsIt.hasNext())
         {
-            Arc currArc = outgoingArcsIt.nextArc();
+            Arc currArc = outgoingArcsIt.next();
             if (currArc.getEvent().equals(theEvent))
             {
                 if (considerEpsilonClosure)
@@ -960,9 +960,9 @@ public class State
         {
             State currState = (State) statesToExamine.removeFirst();
 
-            for (ArcIterator arcIt = currState.outgoingArcsIterator(); arcIt.hasNext(); )
+            for (Iterator<Arc> arcIt = currState.outgoingArcsIterator(); arcIt.hasNext(); )
             {
-                Arc currArc = arcIt.nextArc();
+                Arc currArc = arcIt.next();
                 State state = currArc.getToState();
 
                 if (currArc.getEvent().isEpsilon() && !currArc.isSelfLoop() &&
@@ -992,9 +992,9 @@ public class State
         {
             State currState = (State) statesToExamine.removeFirst();
 
-            for (ArcIterator arcIt = currState.incomingArcsIterator(); arcIt.hasNext(); )
+            for (Iterator<Arc> arcIt = currState.incomingArcsIterator(); arcIt.hasNext(); )
             {
-                Arc currArc = arcIt.nextArc();
+                Arc currArc = arcIt.next();
                 State state = currArc.getFromState();
 
                 if (currArc.getEvent().isEpsilon() && !currArc.isSelfLoop() &&
@@ -1023,7 +1023,7 @@ public class State
      */
     private boolean doesDefine(LabeledEvent event, boolean considerEpsilonClosure)
     {
-        ArcIterator arc_it;
+        Iterator<Arc> arc_it;
         if (considerEpsilonClosure)
         {
             arc_it = epsilonClosure(true).outgoingArcsIterator();
@@ -1051,7 +1051,7 @@ public class State
     {
         Alphabet enabled = new Alphabet();
 
-        ArcIterator arcIt;
+        Iterator<Arc> arcIt;
         if (considerEpsilonClosure)
         {
             arcIt = epsilonClosure(true).outgoingArcsIterator();
@@ -1062,7 +1062,7 @@ public class State
         }
         while (arcIt.hasNext())
         {
-            LabeledEvent event = arcIt.nextEvent();
+            LabeledEvent event = arcIt.next().getEvent();
             if (!enabled.contains(event) && !event.isEpsilon())
             {
                 enabled.addEvent(event);

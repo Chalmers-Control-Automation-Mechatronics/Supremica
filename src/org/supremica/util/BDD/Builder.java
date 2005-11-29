@@ -92,9 +92,9 @@ public class Builder
 			}
 
 			// Insert states:
-			for (StateIterator sit = s_a.stateIterator(); sit.hasNext(); )
+			for (Iterator<org.supremica.automata.State> sit = s_a.stateIterator(); sit.hasNext(); )
 			{
-				org.supremica.automata.State s_st = (org.supremica.automata.State) sit.next();
+				org.supremica.automata.State s_st = sit.next();
 				String name = s_st.getName();
 
 				//String name_id = s_st.getId(); // Sorry, this is private info!
@@ -116,9 +116,10 @@ public class Builder
 				a.addState(name, name_id, initial, marked, forbidden);
 
 				// add arcs
-				for(ArcIterator ait = s_st.outgoingArcsIterator(); ait.hasNext(); )
+				for(Iterator<org.supremica.automata.Arc> ait = s_st.outgoingArcsIterator(); 
+					ait.hasNext(); )
 				{
-					org.supremica.automata.Arc arc = (org.supremica.automata.Arc) ait.next();
+					org.supremica.automata.Arc arc = ait.next();
 					org.supremica.automata.State s_to = arc.getToState();
 					org.supremica.automata.LabeledEvent event = arc.getEvent();
 

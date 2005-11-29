@@ -420,9 +420,9 @@ public class RSCell
 			    }
 		    }
 			// Build transitions...
-			for (StateIterator stateIt = aut.stateIterator(); stateIt.hasNext();)
+			for (Iterator<State> stateIt = aut.stateIterator(); stateIt.hasNext();)
 		    {
-				State fromState = stateIt.nextState();
+				State fromState = stateIt.next();
 				// Initial?
 				if (fromState.getName().equals(CellExaminer.STARTSTATE_NAME))
 			    {
@@ -877,9 +877,9 @@ public class RSCell
 						rob.getAlphabet().addEvent(firstEvent);
 						//logger.info("Nbr of incoming: " + lastState.nbrOfIncomingArcs());
 						LinkedList toBeRemoved = new LinkedList();
-						for (ArcIterator arcIt = lastState.incomingArcsIterator(); arcIt.hasNext(); )
+						for (Iterator<Arc> arcIt = lastState.incomingArcsIterator(); arcIt.hasNext(); )
 						{
-							Arc currArc = arcIt.nextArc();
+							Arc currArc = arcIt.next();
 							toBeRemoved.add(currArc);
 
 							Arc newArc = new Arc(currArc.getFromState(), firstState, firstEvent);
@@ -957,12 +957,11 @@ public class RSCell
 						LabeledEvent firstEvent = new LabeledEvent(firstPos.getName() + secondPos.getName());
 						rob.getAlphabet().addEvent(firstEvent);
 						// logger.info("Nbr of incoming: " + lastState.nbrOfIncomingArcs());
-						//ArcIterator arcIt = lastState.incomingArcsIterator();
 						LinkedList toBeRemoved = new LinkedList();
-						//for (Arc currArc = arcIt.nextArc(); arcIt.hasNext(); currArc = arcIt.nextArc())
-						for (ArcIterator arcIt = lastState.incomingArcsIterator(); arcIt.hasNext(); )
+						//for (Arc currArc = arcIt.next(); arcIt.hasNext(); currArc = arcIt.next())
+						for (Iterator<Arc> arcIt = lastState.incomingArcsIterator(); arcIt.hasNext(); )
 						{
-							Arc currArc = arcIt.nextArc();
+							Arc currArc = arcIt.next();
 							toBeRemoved.add(currArc);
 
 							Arc newArc = new Arc(currArc.getFromState(), firstState, firstEvent);
@@ -1184,9 +1183,9 @@ public class RSCell
 						rob.getAlphabet().addEvent(firstEvent);
 						//logger.info("Nbr of incoming: " + lastState.nbrOfIncomingArcs());
 						LinkedList toBeRemoved = new LinkedList();
-						for (ArcIterator arcIt = lastState.incomingArcsIterator(); arcIt.hasNext(); )
+						for (Iterator<Arc> arcIt = lastState.incomingArcsIterator(); arcIt.hasNext(); )
 						{
-							Arc currArc = arcIt.nextArc();
+							Arc currArc = arcIt.next();
 							toBeRemoved.add(currArc);
 
 							Arc newArc = new Arc(currArc.getFromState(), firstState, firstEvent);
@@ -1264,12 +1263,12 @@ public class RSCell
 						LabeledEvent firstEvent = new LabeledEvent(firstPos.getName() + secondPos.getName());
 						rob.getAlphabet().addEvent(firstEvent);
 						// logger.info("Nbr of incoming: " + lastState.nbrOfIncomingArcs());
-						//ArcIterator arcIt = lastState.incomingArcsIterator();
+						//Iterator<Arc> arcIt = lastState.incomingArcsIterator();
 						LinkedList toBeRemoved = new LinkedList();
-						//for (Arc currArc = arcIt.nextArc(); arcIt.hasNext(); currArc = arcIt.nextArc())
-						for (ArcIterator arcIt = lastState.incomingArcsIterator(); arcIt.hasNext(); )
+						//for (Arc currArc = arcIt.next(); arcIt.hasNext(); currArc = arcIt.next())
+						for (Iterator<Arc> arcIt = lastState.incomingArcsIterator(); arcIt.hasNext(); )
 						{
-							Arc currArc = arcIt.nextArc();
+							Arc currArc = arcIt.next();
 							toBeRemoved.add(currArc);
 
 							Arc newArc = new Arc(currArc.getFromState(), firstState, firstEvent);

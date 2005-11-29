@@ -92,20 +92,20 @@ public class NodeExpander
 			int stateIndex = node[automatonIndex];
 
 			State st = theAutomata.getAutomatonAt(automatonIndex).getStateWithIndex(stateIndex);
-			ArcIterator arcIt = st.outgoingArcsIterator();
+			Iterator<Arc> arcIt = st.outgoingArcsIterator();
 
 			while (arcIt.hasNext()) {
-				LabeledEvent currEvent = arcIt.nextArc().getEvent();
+				LabeledEvent currEvent = arcIt.next().getEvent();
 				Object currSpecIndexObj = specEventTable.get(currEvent);
 
 				if (currSpecIndexObj == null) 
 					children.add(newNode(node, new int[]{i}, new int[]{st.nextState(currEvent).getIndex()}, st.nextState(currEvent).getCost()));
 				else {
 					int currSpecIndex = ((Integer)currSpecIndexObj).intValue();
-					StateIterator enabledStatesIt = theAutomata.getAutomatonAt(currSpecIndex).statesThatEnableEventIterator(currEvent.getLabel());
+					Iterator<State> enabledStatesIt = theAutomata.getAutomatonAt(currSpecIndex).statesThatEnableEventIterator(currEvent.getLabel());
 
 					while (enabledStatesIt.hasNext()) {
-						State specState = enabledStatesIt.nextState();
+						State specState = enabledStatesIt.next();
 						if (node[currSpecIndex] == specState.getIndex()) {
 							int[] changedIndices = new int[]{activeAutomataIndex[i], currSpecIndex};
 							int[] newStateIndices = new int[]{st.nextState(currEvent).getIndex(), specState.nextState(currEvent).getIndex()};

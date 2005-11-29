@@ -427,9 +427,9 @@ public abstract class AbstractAstar
 			// of operations, described by the current automaton. 
 			State markedState = null;
 
-			for (StateIterator stateIt = theAuto.stateIterator(); stateIt.hasNext(); )
+			for (Iterator<State> stateIt = theAuto.stateIterator(); stateIt.hasNext(); )
 			{
-				markedState = stateIt.nextState();
+				markedState = stateIt.next();
 		
 				if (markedState.isAccepting())
 					break;
@@ -455,11 +455,11 @@ public abstract class AbstractAstar
 		
 				while (!estList.isEmpty()) 
 				{
-					ArcIterator incomingArcIterator = ((State)estList.remove(0)).incomingArcsIterator();
+					Iterator<Arc> incomingArcIterator = ((State)estList.remove(0)).incomingArcsIterator();
 		    
 					while (incomingArcIterator.hasNext()) 
 					{
-						Arc currArc = incomingArcIterator.nextArc();
+						Arc currArc = incomingArcIterator.next();
 						State currState = currArc.getFromState();
 						State nextState = currArc.getToState();
 

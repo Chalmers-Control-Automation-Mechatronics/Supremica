@@ -315,9 +315,9 @@ public class Determinizer
 
 		StateSet stateset = new StateSet();
 
-		for (ArcIterator it = state.outgoingArcsIterator(); it.hasNext(); )
+		for (Iterator<Arc> it = state.outgoingArcsIterator(); it.hasNext(); )
 		{
-			Arc arc = it.nextArc();
+			Arc arc = it.next();
 
 			if (arc.getEvent().isEqual(event))
 			{
@@ -342,9 +342,9 @@ public class Determinizer
 		StateSet closure = new StateSet();
 
 		/* StateSet. */
-		for (StateIterator stateit = states.iterator(); stateit.hasNext(); )
+		for (Iterator<State> stateit = states.iterator(); stateit.hasNext(); )
 		{
-			closure.union(epsilonClosure(stateit.nextState()));
+			closure.union(epsilonClosure(stateit.next()));
 		}
 
 		debugPrint("(eCSS) return closure" + closure.toString() + ")", false);
@@ -411,9 +411,9 @@ public class Determinizer
 		StateSet stateset = new StateSet();    // empty set
 
 		// Iterate over the states and create the union of their respective closures
-		for (StateIterator it = states.iterator(); it.hasNext(); )
+		for (Iterator<State> it = states.iterator(); it.hasNext(); )
 		{
-			stateset.union(epsilonTransition(it.nextState()));
+			stateset.union(epsilonTransition(it.next()));
 		}
 
 		debugPrint("(eTSS) return " + stateset.toString() + ")", false);
@@ -428,11 +428,11 @@ public class Determinizer
 
 		StateSet stateset = new StateSet();
 
-		for (ArcIterator it = state.outgoingArcsIterator(); it.hasNext(); )
+		for (Iterator<Arc> it = state.outgoingArcsIterator(); it.hasNext(); )
 		{
 			try
 			{
-				Arc arc = it.nextArc();
+				Arc arc = it.next();
 
 				if (epsilonTester.isThisEpsilon(arc.getEvent()))    // automaton.getEvent(arc).isEpsilon())
 				{
@@ -458,10 +458,10 @@ public class Determinizer
 	// Walk the state of the automaton, and null out its stateclass (helps the GC)
 	public void cleanUp()
 	{
-		for (StateIterator stateit = automaton.stateIterator();
+		for (Iterator<State> stateit = automaton.stateIterator();
 				stateit.hasNext(); )
 		{
-			State state = stateit.nextState();
+			State state = stateit.next();
 
 			state.setStateSet(null);
 		}

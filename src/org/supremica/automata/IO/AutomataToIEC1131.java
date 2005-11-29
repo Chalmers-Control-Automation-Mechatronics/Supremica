@@ -495,10 +495,10 @@ public class AutomataToIEC1131
 
 			boolean previousState = false;
 
-			for (StateIterator stateIt = currAutomaton.statesThatEnableEventIterator(currEvent.getLabel());
+			for (Iterator<State> stateIt = currAutomaton.statesThatEnableEventIterator(currEvent.getLabel());
 			     stateIt.hasNext(); )
 			{
-			    State currState = stateIt.nextState();
+			    State currState = stateIt.next();
 			    int currStateIndex = currState.getSynchIndex();
 
 			    if (previousState)

@@ -323,10 +323,10 @@ public final class AutomataIndexForm
 
 			int maxIndex = 0;
 
-			for (StateIterator stateIt = currAutomaton.stateIterator();
+			for (Iterator<State> stateIt = currAutomaton.stateIterator();
 					stateIt.hasNext(); )
 			{
-				State currState = stateIt.nextState();
+				State currState = stateIt.next();
 				int currIndex = currState.getIndex();
 
 				stateTable[currAutomatonIndex][currIndex] = currState;

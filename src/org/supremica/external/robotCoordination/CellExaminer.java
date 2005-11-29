@@ -828,9 +828,9 @@ public class CellExaminer
 			    }
 		    }
 			// Build transitions...
-			for (StateIterator stateIt = aut.stateIterator(); stateIt.hasNext();)
+			for (Iterator<State> stateIt = aut.stateIterator(); stateIt.hasNext();)
 		    {
-				State fromState = stateIt.nextState();
+				State fromState = stateIt.next();
 				// Initial?
 				if (fromState.getName().equals(STARTSTATE_NAME))
 			    {

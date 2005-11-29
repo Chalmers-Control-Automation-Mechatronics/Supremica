@@ -112,10 +112,10 @@ public class AutomataToSMV
 
 			pw.print("\tq_" + currAutomatonIndex + " : {");
 
-			for (StateIterator stateIt = currAutomaton.stateIterator();
+			for (Iterator<State> stateIt = currAutomaton.stateIterator();
 					stateIt.hasNext(); )
 			{
-				State currState = stateIt.nextState();
+				State currState = stateIt.next();
 				int currStateIndex = currState.getSynchIndex();
 
 				pw.print("q_" + currAutomatonIndex + "_" + currStateIndex);
@@ -157,14 +157,14 @@ public class AutomataToSMV
 		pw.println("\tnext(s.q_" + currAutomaton.getSynchIndex() + ") :=");
 		pw.println("\t\tcase");
 
-		for (StateIterator stateIt = currAutomaton.stateIterator();
+		for (Iterator<State> stateIt = currAutomaton.stateIterator();
 				stateIt.hasNext(); )
 		{
-			State currState = stateIt.nextState();
+			State currState = stateIt.next();
 
-			for (ArcIterator evIt = currState.outgoingArcsIterator(); evIt.hasNext(); )
+			for (Iterator<Arc> evIt = currState.outgoingArcsIterator(); evIt.hasNext(); )
 			{
-				LabeledEvent currEvent = evIt.nextEvent();
+				LabeledEvent currEvent = evIt.next().getEvent();
 
 				pw.print("\t\t\t(s.event = e_" + currEvent.getSynchIndex() + ") & ");
 				pw.print("(s.q_" + currAutomatonIndex + " = q_" + currAutomatonIndex + "_" + currState.getSynchIndex() + ") & ");
@@ -438,10 +438,10 @@ public class AutomataToSMV
 			boolean hasAcceptingState = false;
 			boolean hasPreviousTerm = false;
 
-			for (StateIterator stateIt = currAutomaton.stateIterator();
+			for (Iterator<State> stateIt = currAutomaton.stateIterator();
 					stateIt.hasNext(); )
 			{
-				State currState = stateIt.nextState();
+				State currState = stateIt.next();
 
 				if (currState.isAccepting() &&!currState.isForbidden())
 				{
@@ -487,10 +487,10 @@ public class AutomataToSMV
 			Automaton currAutomaton = (Automaton) autIt.next();
 			int currAutomatonIndex = currAutomaton.getSynchIndex();
 
-			for (StateIterator stateIt = currAutomaton.stateIterator();
+			for (Iterator<State> stateIt = currAutomaton.stateIterator();
 					stateIt.hasNext(); )
 			{
-				State currState = stateIt.nextState();
+				State currState = stateIt.next();
 				int currStateIndex = currState.getSynchIndex();
 
 				if (hasPreviousTerm)
@@ -522,10 +522,10 @@ public class AutomataToSMV
 			Automaton currAutomaton = (Automaton) autIt.next();
 			int currAutomatonIndex = currAutomaton.getSynchIndex();
 
-			for (StateIterator stateIt = currAutomaton.stateIterator();
+			for (Iterator<State> stateIt = currAutomaton.stateIterator();
 					stateIt.hasNext(); )
 			{
-				State currState = stateIt.nextState();
+				State currState = stateIt.next();
 				int currStateIndex = currState.getSynchIndex();
 
 				if (currState.isForbidden())

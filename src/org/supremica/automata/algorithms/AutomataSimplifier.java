@@ -103,9 +103,9 @@ public class AutomataSimplifier
 		boolean changed = false;
 		Vector toRemove = new Vector();
 
-		for (ArcIterator ai = a.arcIterator(); ai.hasNext(); )
+		for (Iterator<Arc> ai = a.arcIterator(); ai.hasNext(); )
 		{
-			Arc arc = ai.nextArc();
+			Arc arc = ai.next();
 
 			if (events.contains(arc.getLabel()))
 			{

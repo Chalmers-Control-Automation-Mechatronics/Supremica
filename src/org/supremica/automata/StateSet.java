@@ -15,20 +15,20 @@ import org.supremica.properties.SupremicaProperties;
 
 public class StateSet
 {
-	private TreeSet theSet = null;
-	private HashMap nameToStateMap = null;
+	private TreeSet<State> theSet = null;
+	//private HashMap<String,State> nameToStateMap = null;
 	private State singleStateRepresentation = null;
 
 	// Private constructor for cloning
-	private StateSet(TreeSet setimpl)
+	private StateSet(TreeSet<State> setimpl)
 	{
-		this.theSet = new TreeSet(setimpl);
+		this.theSet = new TreeSet<State>(setimpl);
 	}
 
 	// Create an empty set
 	public StateSet()
 	{
-		theSet = new TreeSet(new State.StateComparator());
+		theSet = new TreeSet<State>(new State.StateComparator());
 	}
 
 	/**
@@ -38,13 +38,15 @@ public class StateSet
 	{
 		this();
 
-		for (StateIterator stateIt = aut.stateIterator(); stateIt.hasNext(); )
+		for (Iterator<State> stateIt = aut.stateIterator(); stateIt.hasNext(); )
 		{
-			this.add(stateIt.nextState());
+			this.add(stateIt.next());
 		}
 	}
 
-	// Shallow copy (should it be deep?)
+	/**
+	 * Shallow copy (should it be deep?)
+	 */
 	public StateSet(StateSet ss)
 	{
 		this(ss.theSet);
@@ -132,19 +134,19 @@ public class StateSet
 		return theSet.isEmpty();
 	}
 
-	public StateIterator iterator()
+	public Iterator<State> iterator()
 	{
-		return new StateIterator(theSet.iterator());
+		return theSet.iterator();
 	}
 
-	public ArcIterator outgoingArcsIterator()
+	public Iterator<Arc> outgoingArcsIterator()
 	{
-		return new ArcIterator(new StateSetArcIterator(this, true));
+		return new StateSetArcIterator(this, true);
 	}
 
-	public ArcIterator incomingArcsIterator()
+	public Iterator<Arc> incomingArcsIterator()
 	{
-		return new ArcIterator(new StateSetArcIterator(this, false));
+		return new StateSetArcIterator(this, false);
 	}
 
 	public boolean remove(State state)
@@ -156,9 +158,9 @@ public class StateSet
 	public void remove(StateSet set)
 	{
 		modified();
-		for (StateIterator it = set.iterator(); it.hasNext(); )
+		for (Iterator<State> it = set.iterator(); it.hasNext(); )
 		{
-			theSet.remove(it.nextState());
+			theSet.remove(it.next());
 		}
 	}
 
@@ -230,12 +232,12 @@ public class StateSet
 	{
 		StateSet prevStates = new StateSet();
 
-		for (StateIterator stateIt = iterator(); stateIt.hasNext(); )
+		for (Iterator<State> stateIt = iterator(); stateIt.hasNext(); )
 		{
-			for (StateIterator prevIt = stateIt.nextState().previousStateIterator(event); 
+			for (Iterator<State> prevIt = stateIt.next().previousStateIterator(event); 
 				 prevIt.hasNext(); )
 			{
-				prevStates.add(prevIt.nextState());
+				prevStates.add(prevIt.next());
 			}
 		}
 
@@ -253,9 +255,9 @@ public class StateSet
 		StateSet nextStates = new StateSet();
 
 		// Find nextStatesSet of each state
-		for (StateIterator stateIt = iterator(); stateIt.hasNext(); )
+		for (Iterator<State> stateIt = iterator(); stateIt.hasNext(); )
 		{
-			State state = stateIt.nextState();
+			State state = stateIt.next();
 			nextStates.add(state.nextStates(event, considerEpsilonClosure));
 		}
 
@@ -283,9 +285,9 @@ public class StateSet
 		{
 			State currState = (State) statesToExamine.remove();
 
-			for (ArcIterator arcIt = currState.outgoingArcsIterator(); arcIt.hasNext(); )
+			for (Iterator<Arc> arcIt = currState.outgoingArcsIterator(); arcIt.hasNext(); )
 			{
-				Arc currArc = arcIt.nextArc();
+				Arc currArc = arcIt.next();
 				State state = currArc.getToState();
 				
 				if (currArc.getEvent().isEpsilon() && !currArc.isSelfLoop() && 
@@ -375,11 +377,11 @@ public class StateSet
 	 */
 	public void update()
 	{
-		StateIterator stateIt = iterator();
+		Iterator<State> stateIt = iterator();
 
 		while (stateIt.hasNext())
 		{
-			State currState = stateIt.nextState();
+			State currState = stateIt.next();
 
 			currState.setStateSet(this);
 		}
@@ -454,10 +456,10 @@ public class StateSet
 	}
 
 	private class StateSetArcIterator
-		implements Iterator
+		implements Iterator<Arc>
 	{
-		private StateIterator stateIterator = null;
-		private ArcIterator arcIterator = null;
+		private Iterator<State> stateIterator = null;
+		private Iterator<Arc> arcIterator = null;
 		private boolean outgoing;
 
 		public StateSetArcIterator(StateSet stateSet, boolean outgoing)
@@ -468,14 +470,14 @@ public class StateSet
 			// Find a state that has at least one outgoing/incoming arcs
 			while (stateIterator.hasNext())
 			{
-				ArcIterator arcIt;
+				Iterator<Arc> arcIt;
 				if (outgoing)
 				{
-					arcIt = stateIterator.nextState().outgoingArcsIterator();
+					arcIt = stateIterator.next().outgoingArcsIterator();
 				}
 				else
 				{
-					arcIt = stateIterator.nextState().incomingArcsIterator();
+					arcIt = stateIterator.next().incomingArcsIterator();
 				}
 				
 				// If there are arcs in this iterator, we're done!
@@ -497,7 +499,7 @@ public class StateSet
 			return arcIterator.hasNext();
 		}
 		
-		public Object next()
+		public Arc next()
 			throws NoSuchElementException
 		{
 			return nextArc();
@@ -506,7 +508,7 @@ public class StateSet
 		public Arc nextArc()
 			throws NoSuchElementException
 		{
-			Arc arc = arcIterator.nextArc();
+			Arc arc = arcIterator.next();
 			
 			// Jump to the next state?
 			if (!arcIterator.hasNext())
@@ -514,14 +516,14 @@ public class StateSet
 				// Find a state that has outgoing arcs
 				while (stateIterator.hasNext())
 				{
-					ArcIterator arcIt;
+					Iterator<Arc> arcIt;
 					if (outgoing)
 					{
-						arcIt = stateIterator.nextState().outgoingArcsIterator();
+						arcIt = stateIterator.next().outgoingArcsIterator();
 					}
 					else
 					{
-						arcIt = stateIterator.nextState().incomingArcsIterator();
+						arcIt = stateIterator.next().incomingArcsIterator();
 					}
 
 					// If there are arcs in this iterator, we're done!

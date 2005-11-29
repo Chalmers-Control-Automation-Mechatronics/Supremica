@@ -51,6 +51,7 @@ package org.supremica.automata.algorithms;
 
 import org.supremica.automata.*;
 import org.supremica.log.*;
+import java.util.Iterator;
 
 /**
  * This class is a result of a project in the course Evolutionary Computation,
@@ -136,12 +137,12 @@ public class GeneticAlgorithms
 		}
 
 		// Percentage of transitions with common events in autA
-		ArcIterator arcIterator = autA.arcIterator();
+		Iterator<Arc> arcIterator = autA.arcIterator();
 		int commonTransitionsA = 0;
 
 		while (arcIterator.hasNext())
 		{
-			if (alphabetIntersection.contains(arcIterator.nextEvent()))
+			if (alphabetIntersection.contains(arcIterator.next().getEvent()))
 			{
 				commonTransitionsA++;
 			}
@@ -166,7 +167,7 @@ public class GeneticAlgorithms
 
 		while (arcIterator.hasNext())
 		{
-			if (alphabetIntersection.contains(arcIterator.nextEvent()))
+			if (alphabetIntersection.contains(arcIterator.next().getEvent()))
 			{
 				commonTransitionsB++;
 			}

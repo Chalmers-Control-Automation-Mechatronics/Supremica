@@ -436,9 +436,9 @@ public class MutuallyNonblockingVerifier
 				{
 						Automaton copy = new Automaton(currSynchAutomaton);
 						// Remove all arcs wich are not safe events
-						for (ArcIterator arcIt = copy.safeArcIterator(); arcIt.hasNext();)
+						for (Iterator<Arc> arcIt = copy.safeArcIterator(); arcIt.hasNext();)
 						{
-										Arc currArc = arcIt.nextArc();
+										Arc currArc = arcIt.next();
 										if (!uniqueEvents.contains(currArc.getEvent()))
 										{
 												copy.removeArc(currArc);
@@ -691,9 +691,9 @@ public class MutuallyNonblockingVerifier
 
 		// Remove all arcs wich are not safe events
 		LinkedList toBeRemoved = new LinkedList();
-		for (ArcIterator arcIt = automatonCopy.arcIterator(); arcIt.hasNext(); )
+		for (Iterator<Arc> arcIt = automatonCopy.arcIterator(); arcIt.hasNext(); )
 		{
-			Arc currArc = arcIt.nextArc();
+			Arc currArc = arcIt.next();
 
 			if (!safeEvents.contains(currArc.getEvent()))
 			{
@@ -717,10 +717,10 @@ public class MutuallyNonblockingVerifier
 		// If we have blocks, display a (maybe local...) trace that leads to a block!
 		if (result == true)
 		{
-			for (StateIterator stateIt = automatonCopy.stateIterator();
+			for (Iterator<State> stateIt = automatonCopy.stateIterator();
 					stateIt.hasNext(); )
 			{
-				State currState = stateIt.nextState();
+				State currState = stateIt.next();
 
 				if (currState.isAccepting())
 				{
@@ -767,9 +767,9 @@ public class MutuallyNonblockingVerifier
 		// Find percentage unique/total transitions
 		int nbrOfUnique = 0;
 
-		for (ArcIterator arcIt = automaton.arcIterator(); arcIt.hasNext(); )
+		for (Iterator<Arc> arcIt = automaton.arcIterator(); arcIt.hasNext(); )
 		{
-			if (alpha.contains(arcIt.nextArc().getEvent()))
+			if (alpha.contains(arcIt.next().getEvent()))
 			{
 				nbrOfUnique++;
 			}
@@ -781,18 +781,18 @@ public class MutuallyNonblockingVerifier
 
 		//logger.warn("Percentage unique: " + ((double) 100*nbrOfUnique)/automaton.nbrOfTransitions());
 		// Loop over states
-		for (StateIterator stateIt = automaton.safeStateIterator();
+		for (Iterator<State> stateIt = automaton.safeStateIterator();
 				stateIt.hasNext(); )
 		{
-			State currState = stateIt.nextState();
+			State currState = stateIt.next();
 
 			// Loop over outgoing arcs
 			StateSet states = new StateSet();
 
-			for (ArcIterator arcIt = currState.safeOutgoingArcsIterator();
+			for (Iterator<Arc> arcIt = currState.safeOutgoingArcsIterator();
 					arcIt.hasNext(); )
 			{
-				Arc currArc = arcIt.nextArc();
+				Arc currArc = arcIt.next();
 
 				// Is this a transition with a unique event?
 				if (alpha.contains(currArc.getEvent()))
@@ -831,7 +831,7 @@ public class MutuallyNonblockingVerifier
 			// Is there only one outgoing arc left and is it with an unique event?
 			if (currState.nbrOfOutgoingArcs() == 1)
 			{
-				Arc currArc = currState.outgoingArcsIterator().nextArc();
+				Arc currArc = currState.outgoingArcsIterator().next();
 
 				// Is that transition a unique event?
 				if (alpha.contains(currArc.getEvent()))
@@ -843,14 +843,14 @@ public class MutuallyNonblockingVerifier
 					// logger.info("Merging states " + currArc.getFromState() + " and " + currArc.getToState());
 					State toState = currArc.getToState();
 
-					for (ArcIterator arcIt = currState.incomingArcsIterator();
+					for (Iterator<Arc> arcIt = currState.incomingArcsIterator();
 							arcIt.hasNext(); )
 					{
-						Arc arc = arcIt.nextArc();
+						Arc arc = arcIt.next();
 
 						automaton.addArc(new Arc(arc.getFromState(), toState, arc.getEvent()));
 
-						// arcIt.nextArc().setToState(toState);
+						// arcIt.next().setToState(toState);
 					}
 
 					// Don't leave the automaton without initial state!
@@ -919,11 +919,11 @@ public class MutuallyNonblockingVerifier
 		// Remove blocking states from automatonCopy...
 		boolean statesRemoved = false;
 
-		for (StateIterator stateIt = theAutomaton.stateIterator();
+		for (Iterator<State> stateIt = theAutomaton.stateIterator();
 				stateIt.hasNext(); )
 		{
 			// Get the state in the copy that has the same name
-			State currState = automatonCopy.getStateWithName(stateIt.nextState().getName());
+			State currState = automatonCopy.getStateWithName(stateIt.next().getName());
 
 			if (!currState.isMutuallyAccepting())
 			{
@@ -1201,9 +1201,9 @@ public class MutuallyNonblockingVerifier
 		boolean noValue = true;
 
 		// Give score to interesting events
-		for (ArcIterator arcIt = theAutomaton.arcIterator(); arcIt.hasNext(); )
+		for (Iterator<Arc> arcIt = theAutomaton.arcIterator(); arcIt.hasNext(); )
 		{
-			Arc currArc = arcIt.nextArc();
+			Arc currArc = arcIt.next();
 
 			// Self-loops are not interesting
 			if (currArc.isSelfLoop())
@@ -1298,10 +1298,10 @@ public class MutuallyNonblockingVerifier
 	{
 		int count = 0;
 
-		for (StateIterator stateIt = theAutomaton.stateIterator();
+		for (Iterator<State> stateIt = theAutomaton.stateIterator();
 				stateIt.hasNext(); )
 		{
-			State currState = stateIt.nextState();
+			State currState = stateIt.next();
 
 			assert(false); // The names are used below to identify composed names... see **** 
 			//currState.setName(count++ + "_");
@@ -1319,10 +1319,10 @@ public class MutuallyNonblockingVerifier
 		allAccepting.execute();
 
 		// Check to see if the corresponding states in currSynchautomaton are accepting
-		for (StateIterator stateIt = currSynchautomaton.stateIterator();
+		for (Iterator<State> stateIt = currSynchautomaton.stateIterator();
 				stateIt.hasNext(); )
 		{
-			State currState = stateIt.nextState();
+			State currState = stateIt.next();
 
 			if (!currState.isMutuallyAccepting())
 			{

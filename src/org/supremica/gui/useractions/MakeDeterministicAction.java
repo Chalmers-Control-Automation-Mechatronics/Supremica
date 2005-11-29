@@ -74,10 +74,10 @@ public class MakeDeterministicAction
 		boolean doit = false;
 
 		// Find nondeterminisms and add epsilon events
-		for (StateIterator stit = automaton.safeStateIterator();
+		for (Iterator<State> stit = automaton.safeStateIterator();
 				stit.hasNext(); )
 		{
-			State state = stit.nextState();
+			State state = stit.next();
 
 			doit |= epsilonize(state, automaton);
 		}
@@ -119,12 +119,12 @@ public class MakeDeterministicAction
 		HashMap arcset = new HashMap();
 
 		// Initialize arc iterator
-		ArcIterator arcit = state.safeOutgoingArcsIterator();
+		Iterator<Arc> arcit = state.safeOutgoingArcsIterator();
 
 		/* Why treat the first arc differently?
 		if(arcit.hasNext())
 		{
-				Arc arc = arcit.nextArc();
+				Arc arc = arcit.next();
 				if (arc.getEvent().isEpsilon())
 				{
 						found = true;
@@ -137,7 +137,7 @@ public class MakeDeterministicAction
 		// Iterate over the remaining arcs and add epsilon events for nondeterministic arcs
 		while (arcit.hasNext())
 		{
-			Arc arc = arcit.nextArc();
+			Arc arc = arcit.next();
 
 			// Is this already an epsilon transition?
 			if (arc.getEvent().isEpsilon())

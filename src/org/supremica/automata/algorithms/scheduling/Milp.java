@@ -289,12 +289,12 @@ public class Milp
 		{
 			State initial = zones.getAutomatonAt(i).getInitialState();
 
-			ArcIterator bookingArcs = initial.outgoingArcsIterator();
+			Iterator<Arc> bookingArcs = initial.outgoingArcsIterator();
 
 			while (bookingArcs.hasNext())
 			{
-				Arc bookingArc = bookingArcs.nextArc();
-				Arc unbookingArc = initial.nextState(bookingArc.getEvent()).outgoingArcsIterator().nextArc();
+				Arc bookingArc = bookingArcs.next();
+				Arc unbookingArc = initial.nextState(bookingArc.getEvent()).outgoingArcsIterator().next();
 		
 				// The robot set is searched for the states from which the above book/unbook events can be fired
 				for (int j=0; j<robots.size(); j++)
@@ -307,9 +307,9 @@ public class Milp
 					if (currRobot.getAlphabet().contains(unbookingArc.getEvent()))
 					{
 						// States that can lead directly to unbooking-events are found
-						for (ArcIterator robotArcs = currRobot.arcIterator(); robotArcs.hasNext(); )
+						for (Iterator<Arc> robotArcs = currRobot.arcIterator(); robotArcs.hasNext(); )
 						{
-							Arc currArc = robotArcs.nextArc();
+							Arc currArc = robotArcs.next();
 
 							if (unbookingArc.getLabel().equals(currArc.getLabel()))
 								unbookingStates.add(currArc.getFromState());
@@ -333,9 +333,9 @@ public class Milp
 								// Every roadsplit is an alternative. 
 								alternativeBookings += (currState.nbrOfIncomingArcs() - 1);
 						
-								for (ArcIterator incomingArcs = currState.incomingArcsIterator(); incomingArcs.hasNext(); )
+								for (Iterator<Arc> incomingArcs = currState.incomingArcsIterator(); incomingArcs.hasNext(); )
 								{
-									Arc currArc = incomingArcs.nextArc();
+									Arc currArc = incomingArcs.next();
 									
 									if (bookingArc.getLabel().equals(currArc.getLabel()))
 									{
@@ -462,19 +462,19 @@ public class Milp
 						initPrecConstraints += "time[" + i + ", " + currState.getIndex() + "] >= deltaTime[" + i + ", " + currState.getIndex() + "];\n";
 					}
 					
-					StateIterator nextStates = currState.nextStateIterator();
+					Iterator<State> nextStates = currState.nextStateIterator();
 					
 					if (nbrOfOutgoingArcs == 1) 
 					{
-						State nextState = nextStates.nextState();
+						State nextState = nextStates.next();
 						
 						precConstraints += "prec_" + currRobot.getName() + "_" + currState.getName() + "_" + nextState.getName() + " : ";
 						precConstraints += "time[" + i + ", " + nextState.getIndex() + "] >= time[" + i + ", " + currState.getIndex() + "] + deltaTime[" + i + ", " + nextState.getIndex() + "];\n";
 					}
 					else if (nbrOfOutgoingArcs == 2)
 					{
-						State nextLeftState = nextStates.nextState();
-						State nextRightState = nextStates.nextState();
+						State nextLeftState = nextStates.next();
+						State nextRightState = nextStates.next();
 
 						String currAltPathsVariable = currRobot.getName() + "_goes_from_" + currState.getName() + "_to_" + nextLeftState.getName();
 								
@@ -493,7 +493,7 @@ public class Milp
 						while (nextStates.hasNext())
 						{
 							String currAltPathsVariable = currRobot.getName() + "_" + currState.getName() + "_path_" + currAlternative;
-							State nextState = nextStates.nextState();
+							State nextState = nextStates.next();
 
 							altPathsVariables += "var " + currAltPathsVariable + ", binary;\n";
 

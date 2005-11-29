@@ -126,9 +126,9 @@ public class OnlineBDDSupervisor
 			org.supremica.automata.StateSet ss1 = sm.getStateSet();
 			org.supremica.util.BDD.StateSet ss2 = sb.getStates();
 
-			for (StateIterator si = ss1.iterator(); si.hasNext(); )
+			for (Iterator<org.supremica.automata.State> si = ss1.iterator(); si.hasNext(); )
 			{
-				org.supremica.automata.State state1 = si.nextState();
+				org.supremica.automata.State state1 = si.next();
 				org.supremica.util.BDD.State state2 = ss2.getByName(state1.getName());
 
 				smap.put(state1, state2);

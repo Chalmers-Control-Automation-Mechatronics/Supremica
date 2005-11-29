@@ -261,7 +261,7 @@ public class AutomatonSynthesizer
 
 		// Forbid the states with MAX_COST set
 		boolean didSomething = false;
-		for (StateIterator stateIt = theAutomaton.stateIterator(); stateIt.hasNext(); )
+		for (Iterator<State> stateIt = theAutomaton.stateIterator(); stateIt.hasNext(); )
 		{
 			State currState = (State) stateIt.next();
 
@@ -627,9 +627,9 @@ public class AutomatonSynthesizer
 			// Is this a forbidden state (so all incoming from nonforbidden states should be disabled)
 			if (currState.getCost() == State.MAX_COST)
 			{
-				for (ArcIterator evIt = currState.incomingArcsIterator(); evIt.hasNext(); )
+				for (Iterator<Arc> evIt = currState.incomingArcsIterator(); evIt.hasNext(); )
 				{
-					LabeledEvent currEvent = evIt.nextEvent();
+					LabeledEvent currEvent = evIt.next().getEvent();
 
 					if (!currEvent.isControllable())
 					{
@@ -653,12 +653,12 @@ public class AutomatonSynthesizer
 
 	public void purge()
 	{
-		List stateList = new LinkedList();
+		List<State> stateList = new LinkedList<State>();
 
-		for (StateIterator stateIt = theAutomaton.stateIterator();
+		for (Iterator<State> stateIt = theAutomaton.stateIterator();
 				stateIt.hasNext(); )
 		{
-			State currState = stateIt.nextState();
+			State currState = stateIt.next();
 
 			if (currState.getCost() == State.MAX_COST)
 			{
@@ -666,9 +666,9 @@ public class AutomatonSynthesizer
 			}
 		}
 
-		for (Iterator stateIt = stateList.iterator(); stateIt.hasNext(); )
+		for (Iterator<State> stateIt = stateList.iterator(); stateIt.hasNext(); )
 		{
-			State currState = (State) stateIt.next();
+			State currState = stateIt.next();
 
 			theAutomaton.removeState(currState);
 		}

@@ -159,10 +159,10 @@ public class VisGraphBuilder {
 			State currState = theAuto.getInitialState();
 	    
 			while (!currState.isAccepting()) {
-				ArcIterator it = currState.outgoingArcsIterator();
+				Iterator<Arc> it = currState.outgoingArcsIterator();
 		
 				while (it.hasNext()) {
-					Arc arc = it.nextArc();
+					Arc arc = it.next();
 					String label = arc.getLabel();
 					int zoneNr = -1;
 		    
