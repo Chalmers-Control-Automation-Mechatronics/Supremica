@@ -145,10 +145,10 @@ public class AutomatonToFSM
 		{
 			pw.println("EVENTS");
 
-			for (EventIterator evIt = eventsNotOnTransitions.iterator();
+			for (Iterator<LabeledEvent> evIt = eventsNotOnTransitions.iterator();
 					evIt.hasNext(); )
 			{
-				LabeledEvent currEvent = evIt.nextEvent();
+				LabeledEvent currEvent = evIt.next();
 
 				pw.println(currEvent.getLabel() + "\t" + (currEvent.isControllable()
 														  ? "c"

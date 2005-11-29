@@ -134,9 +134,9 @@ public class TestProjectBuildFromFSM
 				assertTrue(currAutomaton.nbrOfEpsilonEvents() == 0);
 				assertTrue(currAlphabet.nbrOfEvents() == 5);
 				assertTrue(currAutomaton.equalAutomaton(currAutomaton));
-				for (EventIterator alphIt = currAlphabet.iterator(); alphIt.hasNext();)
+				for (Iterator<LabeledEvent> alphIt = currAlphabet.iterator(); alphIt.hasNext();)
 				{
-					LabeledEvent currEvent = alphIt.nextEvent();
+					LabeledEvent currEvent = alphIt.next();
 					String currLabel = currEvent.getLabel();
 					assertTrue(currLabel != null);
 					if (currLabel.equals("take"))
@@ -236,9 +236,9 @@ public class TestProjectBuildFromFSM
 				assertTrue(currAutomaton.nbrOfEpsilonEvents() == 0);
 				assertTrue(currAlphabet.nbrOfEvents() == 5);
 				assertTrue(currAutomaton.equalAutomaton(currAutomaton));
-				for (EventIterator alphIt = currAlphabet.iterator(); alphIt.hasNext();)
+				for (Iterator<LabeledEvent> alphIt = currAlphabet.iterator(); alphIt.hasNext();)
 				{
-					LabeledEvent currEvent = alphIt.nextEvent();
+					LabeledEvent currEvent = alphIt.next();
 					String currLabel = currEvent.getLabel();
 					assertTrue(currLabel != null);
 					if (currLabel.equals("put1"))

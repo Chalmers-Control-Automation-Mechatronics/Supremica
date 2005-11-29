@@ -8,7 +8,8 @@ import org.supremica.automata.algorithms.AutomataSynchronizerExecuter;
 import org.supremica.automata.algorithms.AutomataSynchronizerHelper;
 import org.supremica.automata.algorithms.SynchronizationOptions;
 
-public class NodeExpander {
+public class NodeExpander 
+{
     private static Logger logger = LoggerFactory.createLogger(NodeExpander.class);
 
     /** Decides if the expansion of the nodes should be done using the methods of this class or using Supremicas methods */
@@ -75,10 +76,10 @@ public class NodeExpander {
 			Automaton theAuto = theAutomata.getAutomatonAt(i);
 	    
 			if (theAuto.isSpecification()) {
-				EventIterator eventIt = theAuto.getAlphabet().iterator();
+				Iterator<LabeledEvent> eventIt = theAuto.getAlphabet().iterator();
 
 				while(eventIt.hasNext()) 
-					specEventTable.put(eventIt.nextEvent(), i);
+					specEventTable.put(eventIt.next(), i);
 			}
 		}
     }

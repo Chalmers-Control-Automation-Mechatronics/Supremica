@@ -18,7 +18,6 @@ import org.supremica.automata.State;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.AutomatonType;
-import org.supremica.automata.AutomatonIterator;
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.ForbiddenEvent;
 import org.supremica.automata.algorithms.SearchStates;

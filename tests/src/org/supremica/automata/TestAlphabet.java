@@ -54,6 +54,7 @@ import junit.framework.TestSuite;
 import org.supremica.automata.IO.*;
 import org.supremica.testhelpers.*;
 import org.supremica.automata.algorithms.AutomataSynchronizer;
+import java.util.Iterator;
 
 public class TestAlphabet
 	extends TestCase
@@ -145,9 +146,9 @@ public class TestAlphabet
 		alph1.setIndicies();
 		int minIndex = 0;
 		int maxIndex = alph1.size() - 1;
-		for (EventIterator evIt = alph1.iterator(); evIt.hasNext(); )
+		for (Iterator<LabeledEvent> evIt = alph1.iterator(); evIt.hasNext(); )
 		{
-			LabeledEvent currEvent = evIt.nextEvent();
+			LabeledEvent currEvent = evIt.next();
 			int currIndex = currEvent.getSynchIndex();
 			assertTrue(currIndex >= minIndex);
 			assertTrue(currIndex <= maxIndex);

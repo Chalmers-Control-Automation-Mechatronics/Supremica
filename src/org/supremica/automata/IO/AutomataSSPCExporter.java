@@ -189,9 +189,9 @@ public class AutomataSSPCExporter
 
 		// dump uncontrollable list
 		int count = 0;
-		for (EventIterator ei = a.eventIterator(); ei.hasNext(); )
+		for (Iterator<LabeledEvent> ei = a.eventIterator(); ei.hasNext(); )
 		{
-			LabeledEvent le = (LabeledEvent) ei.next();
+			LabeledEvent le = ei.next();
 
 			if (!le.isControllable())
 			{

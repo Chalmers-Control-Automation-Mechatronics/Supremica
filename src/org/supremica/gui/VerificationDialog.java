@@ -54,6 +54,7 @@ import org.supremica.automata.algorithms.VerificationType;
 import org.supremica.automata.algorithms.VerificationAlgorithm;
 import org.supremica.automata.algorithms.minimization.MinimizationOptions;
 import org.supremica.automata.algorithms.minimization.MinimizationStrategy;
+import org.supremica.automata.algorithms.EquivalenceRelation;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -243,7 +244,6 @@ public class VerificationDialog
 
 			// NEW TRY
 			this.setLayout(new GridLayout(2, 1));
-
 			JPanel choicePanel = new JPanel();
 
 			choicePanel.setLayout(new FlowLayout());
@@ -413,6 +413,8 @@ public class VerificationDialog
 
 		public void regain(MinimizationOptions options)
 		{
+			options.setMinimizationType(EquivalenceRelation.ConflictEquivalence);
+			
 			options.setMinimizationStrategy((MinimizationStrategy) minimizationStrategy.getSelectedItem());
 			options.setUseRuleA(ruleA.isSelected());
 			options.setUseRuleA(ruleAA.isSelected());

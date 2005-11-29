@@ -486,10 +486,10 @@ public class AutomataSynthesizer
 			Alphabet unionAlphabet = AlphabetHelpers.getUnionAlphabet(automata);
 			Alphabet problemEvents = new Alphabet();
 
-			for (EventIterator evIt = unionAlphabet.iterator();
+			for (Iterator<LabeledEvent> evIt = unionAlphabet.iterator();
 					evIt.hasNext(); )
 			{
-				LabeledEvent currEvent = evIt.nextEvent();
+				LabeledEvent currEvent = evIt.next();
 
 				if (currEvent.isControllable() &&!currEvent.isObservable())
 				{
@@ -510,10 +510,10 @@ public class AutomataSynthesizer
 					Alphabet currAlphabet = currAutomaton.getAlphabet();
 
 					// Iterator over the problem events
-					for (EventIterator evIt = problemEvents.iterator();
+					for (Iterator<LabeledEvent> evIt = problemEvents.iterator();
 							evIt.hasNext(); )
 					{
-						LabeledEvent currEvent = evIt.nextEvent();
+						LabeledEvent currEvent = evIt.next();
 
 						if (currAlphabet.contains(currEvent.getLabel()))
 						{
@@ -525,9 +525,9 @@ public class AutomataSynthesizer
 				}
 
 				StringBuffer sb = new StringBuffer();
-				for (EventIterator evIt = problemEvents.iterator(); evIt.hasNext(); )
+				for (Iterator<LabeledEvent> evIt = problemEvents.iterator(); evIt.hasNext(); )
 				{
-					LabeledEvent currEvent = evIt.nextEvent();
+					LabeledEvent currEvent = evIt.next();
 					sb.append(currEvent + " ");
 				}
 

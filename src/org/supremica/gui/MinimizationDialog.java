@@ -58,6 +58,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import org.supremica.automata.*;
 import org.supremica.log.*;
+import java.util.Iterator;
 
 public class MinimizationDialog
 	implements ActionListener
@@ -340,9 +341,9 @@ public class MinimizationDialog
 			*/
 
 			DefaultListModel list = new DefaultListModel();
-			for (EventIterator evIt = unionAlphabet.iterator(); evIt.hasNext(); )
+			for (Iterator<LabeledEvent> evIt = unionAlphabet.iterator(); evIt.hasNext(); )
 			{
-				LabeledEvent event = evIt.nextEvent();
+				LabeledEvent event = evIt.next();
 
 				// Only non-epsilon events!
 				if (!event.isEpsilon())

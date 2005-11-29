@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.31 2005-11-03 01:24:15 robi Exp $
+//# $Id: EditorSurface.java,v 1.32 2005-11-29 12:13:24 flordal Exp $
 //###########################################################################
 
 
@@ -1102,6 +1102,7 @@ public class EditorSurface
 		int width = (int) area.getWidth();
 		int height = (int) area.getHeight();
 
+		/* Why was this the way it was? We want the bounds to be tight, right?
 		if (width < 500)
 		{
 			width = 500;
@@ -1111,6 +1112,7 @@ public class EditorSurface
 		{
 			height = 500;
 		}
+		*/
 
 		setPreferredSize(new Dimension(width + gridSize * 10, height + gridSize * 10));
 	}
@@ -1473,7 +1475,7 @@ public class EditorSurface
 		{
 			g2d = (Graphics2D) g;
 
-			// Translate the origin to be (0,0) at the margin
+			// Translate the origin so that (0,0) is in the upper left corner of the printable area
 			g2d.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
 
 			/*

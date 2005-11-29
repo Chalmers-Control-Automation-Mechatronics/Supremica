@@ -186,23 +186,23 @@ public class AutomataMinimizer
 			//if (options.getMinimizationStrategy() == MinimizationStrategy.AtLeastOneUnique)
 			{
 				// Remove the hidden events from the map
-				for (EventIterator it = hideThese.iterator(); it.hasNext(); )
+				for (Iterator<LabeledEvent> it = hideThese.iterator(); it.hasNext(); )
 				{
-					eventToAutomataMap.remove(it.nextEvent());
+					eventToAutomataMap.remove(it.next());
 				}
 				// Remove the examined automata from the map
-				for (EventIterator it = automata.getUnionAlphabet().iterator(); it.hasNext(); )
+				for (Iterator<LabeledEvent> it = automata.getUnionAlphabet().iterator(); it.hasNext(); )
 				{
-					Automata aut = eventToAutomataMap.get(it.nextEvent());
+					Automata aut = eventToAutomataMap.get(it.next());
 					if (aut != null)
 					{
 						aut.removeAutomata(automata);
 					}
 				}
 				// And add the new automaton!
-				for (EventIterator it = min.getAlphabet().iterator(); it.hasNext(); )
+				for (Iterator<LabeledEvent> it = min.getAlphabet().iterator(); it.hasNext(); )
 				{
-					eventToAutomataMap.put(it.nextEvent(), min);
+					eventToAutomataMap.insert(it.next(), min);
 				}
 			}
 
@@ -232,11 +232,11 @@ public class AutomataMinimizer
 		}
 
 		// Print statistics
-		if (SupremicaProperties.verboseMode())
+		//if (SupremicaProperties.verboseMode())
 		{
 			// Print total reduction statistics
-			logger.info(AutomatonMinimizer.getStatistics());
-			//logger.info("& " + instanceSize + " & & " + mostStates + " & " + mostTransitions + " & TIME & true/false & " + AutomatonMinimizer.getStatisticsLaTeX() + " & ALGO \\\\");
+			//logger.info(AutomatonMinimizer.getStatistics());
+			logger.info("& " + instanceSize + " & & " + mostStates + " & " + mostTransitions + " & TIME & true/false & " + AutomatonMinimizer.getStatisticsLaTeX() + " & ALGO \\\\");
 			// Print largest automaton size
 			logger.info("The automaton with the most states had " + mostStates + " states.");
 			logger.info("The automaton with the most transitions had " + mostTransitions + " transitions.");
@@ -451,11 +451,11 @@ public class AutomataMinimizer
 			result = null;
 
 			// Look through the map and find the smallest set of automata
-			EventIterator evIt = eventToAutomataMap.iterator();
+			Iterator<LabeledEvent> evIt = eventToAutomataMap.eventIterator();
 			int bestValue = Integer.MAX_VALUE;
 			while (evIt.hasNext())
 			{
-				LabeledEvent event = evIt.nextEvent();
+				LabeledEvent event = evIt.next();
 
 				if (stopRequested)
 				{
@@ -540,9 +540,9 @@ public class AutomataMinimizer
 		Alphabet unique = autA.getUnionAlphabet();
 		// Which aren't unique?
 		Alphabet toBeRemoved = new Alphabet();
-		for (EventIterator it = unique.iterator(); it.hasNext(); )
+		for (Iterator<LabeledEvent> it = unique.iterator(); it.hasNext(); )
 		{
-			LabeledEvent event = it.nextEvent();
+			LabeledEvent event = it.next();
 
 			Automata sharers = eventToAutomataMap.get(event);
 
@@ -553,10 +553,10 @@ public class AutomataMinimizer
 				continue;
 			}
 
-			for (AutomatonIterator autIt = sharers.iterator(); autIt.hasNext(); )
+			for (Iterator<Automaton> autIt = sharers.iterator(); autIt.hasNext(); )
 			{
 				// If there is an automaton here that is not in autA, this event is not unique to autA...
-				if (!autA.containsAutomaton(autIt.nextAutomaton()))
+				if (!autA.containsAutomaton(autIt.next()))
 				{
 					toBeRemoved.addEvent(event);
 					break;

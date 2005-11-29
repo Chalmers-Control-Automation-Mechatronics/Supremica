@@ -55,13 +55,13 @@ import org.supremica.gui.*;
 
 // For the automata selection methods
 import java.util.ArrayList;
+import java.util.Iterator;
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.Arc;
 import org.supremica.automata.AutomataIndexForm;
 import org.supremica.automata.AutomataIndexFormHelper;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.Automata;
-import org.supremica.automata.AutomatonIterator;
 import org.supremica.automata.AutomatonType;
 import org.supremica.automata.CompositeState;
 import org.supremica.automata.LabeledEvent;
@@ -226,10 +226,10 @@ public final class AutomataSynchronizerExecuter
 
 		int i = 0;
 
-		for (AutomatonIterator autIt = automataToBeSelected.iterator();
+		for (Iterator<Automaton> autIt = automataToBeSelected.iterator();
 				autIt.hasNext(); )
 		{
-			automataIndices[i++] = autIt.nextAutomaton().getIndex();
+			automataIndices[i++] = autIt.next().getIndex();
 		}
 
 		helper.selectAutomata(automataIndices);

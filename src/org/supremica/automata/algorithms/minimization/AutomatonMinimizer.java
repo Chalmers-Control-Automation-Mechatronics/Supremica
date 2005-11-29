@@ -1939,9 +1939,9 @@ public class AutomatonMinimizer
 
         // Put them in a list, remove afterwards
         LinkedList toBeRemoved = new LinkedList();
-        loop: for (EventIterator evIt = alpha.iterator(); evIt.hasNext(); )
+        loop: for (Iterator<LabeledEvent> evIt = alpha.iterator(); evIt.hasNext(); )
         {
-            LabeledEvent event = evIt.nextEvent();
+            LabeledEvent event = evIt.next();
 
             // Epsilon?
             if (event.isEpsilon())
@@ -1949,8 +1949,11 @@ public class AutomatonMinimizer
                 // Does there exist a transition like this?
                 for (ArcIterator arcIt = aut.arcIterator(); arcIt.hasNext(); )
                 {
-                    // Is this transition of the right event? If so continue the outer loop.
-                    if (event.equals(arcIt.nextArc().getEvent()))
+                    // Is this transition associated with the right
+                    // event? If so continue the outer loop.
+					Arc arc = arcIt.nextArc();
+					LabeledEvent arcEvent = arc.getEvent();
+                    if (event.equals(arcEvent))
                     {
                         continue loop;
                     }

@@ -1333,7 +1333,7 @@ public class Automaton
 	}
 	/* End interface-specific methods (?) */ //MF
 
-	public EventIterator eventIterator()
+	public Iterator<LabeledEvent> eventIterator()
 	{
 		return alphabet.iterator();
 	}
@@ -2309,10 +2309,10 @@ public class Automaton
 	private boolean saturate(State from_state, Alphabet alpha, State to_state)
 	{
 		boolean done_something = false;
-		EventIterator event_it = alpha.iterator();
+		Iterator<LabeledEvent> event_it = alpha.iterator();
 		while(event_it.hasNext())
 		{
-			LabeledEvent event = (LabeledEvent)event_it.next(); // Why doesn't an EventIterator return a LabeledEvent?
+			LabeledEvent event = event_it.next();
 			if(from_state.doesDefine(event) == false) // this event not defined for this state, add it
 			{
 				addArc(new Arc(from_state, to_state, event));
@@ -2343,14 +2343,12 @@ public class Automaton
 	}
 
 	class InternalEventIterator
-		extends EventIterator
+		implements Iterator<LabeledEvent>
 	{
 		private final Iterator arcIt;
 
 		public InternalEventIterator(Iterator arcIt)
 		{
-			super(null);
-
 			this.arcIt = arcIt;
 		}
 
@@ -2504,9 +2502,9 @@ public class Automaton
 			sbuf.append("\n");
 		}
 
-		for (EventIterator eit = getAlphabet().iterator(); eit.hasNext(); )
+		for (Iterator<LabeledEvent> eit = getAlphabet().iterator(); eit.hasNext(); )
 		{
-			LabeledEvent ev = eit.nextEvent();
+			LabeledEvent ev = eit.next();
 
 			sbuf.append("LabeledEvent " + ev.getLabel() + " = new LabeledEvent(\"" + ev.getLabel() + "\");");
 			sbuf.append("\t" + getName() + ".getAlphabet().addEvent(" + ev.getLabel() + ");\n");

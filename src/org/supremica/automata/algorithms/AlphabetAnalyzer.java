@@ -89,11 +89,11 @@ public class AlphabetAnalyzer
 		//Set eventSet = eventToAutomataMap.keySet();
 		//Iterator eventIt = eventSet.iterator();
 
-		EventIterator eventIt = eventToAutomataMap.eventIterator();
+		Iterator<LabeledEvent> eventIt = eventToAutomataMap.eventIterator();
 		while (eventIt.hasNext())
 		{
 			//LabeledEvent currEvent = (LabeledEvent) eventIt.next();
-			LabeledEvent currEvent = eventIt.nextEvent();
+			LabeledEvent currEvent = eventIt.next();
 
 			if (isUnsynchronizedEvent(currEvent))
 			{
@@ -235,9 +235,9 @@ public class AlphabetAnalyzer
 		HashSet ret = new HashSet();
 		Alphabet alfa = a.getAlphabet();
 
-		for (EventIterator evIt = alfa.iterator(); evIt.hasNext(); )
+		for (Iterator<LabeledEvent> evIt = alfa.iterator(); evIt.hasNext(); )
 		{
-			LabeledEvent currEvent = evIt.nextEvent();
+			LabeledEvent currEvent = evIt.next();
 
 			ret.add(currEvent.getLabel());
 		}

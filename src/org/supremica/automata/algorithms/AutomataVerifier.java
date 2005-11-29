@@ -57,9 +57,7 @@ import org.supremica.automata.Alphabet;
 import org.supremica.automata.AlphabetHelpers;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
-import org.supremica.automata.EventIterator;
 import org.supremica.automata.EventToAutomataMap;
-import org.supremica.automata.AutomatonIterator;
 import org.supremica.automata.State;
 import org.supremica.automata.Arc;
 import org.supremica.automata.LabeledEvent;
@@ -392,9 +390,9 @@ public class AutomataVerifier
 		/*
 		// Make sure the alphabets have the right relation
 		Automata exclusionAutomata = new Automata();
-		for (AutomatonIterator autIt = theAutomata.iterator(); autIt.hasNext();)
+		for (Iterator<Automaton> autIt = theAutomata.iterator(); autIt.hasNext();)
 		{
-			Automaton currAut = autIt.nextAutomaton();
+			Automaton currAut = autIt.next();
 			if (!inclusionAutomata.containsAutomaton(currAut))
 			{
 				exclusionAutomata.addAutomaton(currAut);
@@ -467,10 +465,10 @@ public class AutomataVerifier
 
 		// Iterate over supervisors/specifications
 		loop:
-		for (AutomatonIterator supIt = theAutomata.iterator();
+		for (Iterator<Automaton> supIt = theAutomata.iterator();
 				supIt.hasNext(); )
 		{
-			Automaton currSupervisorAutomaton = supIt.nextAutomaton();
+			Automaton currSupervisorAutomaton = supIt.next();
 
 			// To enable the overriding the AutomatonType of automata we use typeIsSupSpecTable!
 			// if ((currSupervisorAutomaton.getType() == AutomatonType.Supervisor) || (currSupervisorAutomaton.getType() == AutomatonType.Specification))
@@ -482,10 +480,10 @@ public class AutomataVerifier
 
 				// Examine uncontrollable events in currSupervisorAutomaton
 				// and select plants containing these events
-				for (EventIterator eventIt = currSupervisorAutomaton.eventIterator();
+				for (Iterator<LabeledEvent> eventIt = currSupervisorAutomaton.eventIterator();
 						eventIt.hasNext(); )
 				{
-					LabeledEvent currEvent = eventIt.nextEvent();
+					LabeledEvent currEvent = eventIt.next();
 
 					// To enable overriding the controllability status of events!
 					//if (!currEvent.isControllable())
@@ -658,10 +656,10 @@ public class AutomataVerifier
 			int[] automataIndices = new int[selectedAutomata.size()];
 			int i = 0;
 
-			for (AutomatonIterator autIt = selectedAutomata.iterator();
+			for (Iterator<Automaton> autIt = selectedAutomata.iterator();
 					autIt.hasNext(); )
 			{
-				automataIndices[i++] = autIt.nextAutomaton().getIndex();
+				automataIndices[i++] = autIt.next().getIndex();
 			}
 
 			if (SupremicaProperties.verboseMode())
@@ -857,10 +855,9 @@ public class AutomataVerifier
 		double[] arraySortValue = new double[amountOfUnselected];
 		int count = 0;
 
-		for (AutomatonIterator autIt = theAutomata.iterator();
-				autIt.hasNext(); )
+		for (Iterator<Automaton> autIt = theAutomata.iterator(); autIt.hasNext(); )
 		{
-			currAutomaton = autIt.nextAutomaton();
+			currAutomaton = autIt.next();
 
 			// Is this automaton interesting?
 			if (selectedAutomata.containsAutomaton(currAutomaton))

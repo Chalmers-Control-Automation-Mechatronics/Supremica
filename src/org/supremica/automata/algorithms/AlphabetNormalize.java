@@ -69,10 +69,10 @@ public class AlphabetNormalize
 
 		Alphabet theAlphabet = theAutomaton.getAlphabet();
 
-		for (EventIterator eventIt = theAlphabet.iterator();
+		for (Iterator<LabeledEvent> eventIt = theAlphabet.iterator();
 				eventIt.hasNext(); )
 		{
-			LabeledEvent currEvent = eventIt.nextEvent();
+			LabeledEvent currEvent = eventIt.next();
 			LinkedList currList = (LinkedList) labelMap.get(currEvent.getLabel());
 
 			if (currList == null)

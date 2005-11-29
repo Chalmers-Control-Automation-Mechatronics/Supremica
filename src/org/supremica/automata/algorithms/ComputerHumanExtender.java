@@ -51,6 +51,7 @@ package org.supremica.automata.algorithms;
 
 import org.supremica.automata.*;
 import org.supremica.log.*;
+import java.util.Iterator;
 
 public class ComputerHumanExtender
 {
@@ -115,9 +116,9 @@ public class ComputerHumanExtender
 		operatorResetEvents = new Alphabet();
 		operatorIncreaseEvents = new Alphabet();
 
-		for (EventIterator evIt = theAlphabet.iterator(); evIt.hasNext(); )
+		for (Iterator<LabeledEvent> evIt = theAlphabet.iterator(); evIt.hasNext(); )
 		{
-			LabeledEvent currEvent = evIt.nextEvent();
+			LabeledEvent currEvent = evIt.next();
 
 			if (currEvent.isImmediate())
 			{
@@ -253,12 +254,12 @@ public class ComputerHumanExtender
 				if (ik < k)
 				{
 					// Add all operator to the next upper level (in this case the current level)
-					for (EventIterator evIt = operatorIncreaseEvents.iterator();
+					for (Iterator<LabeledEvent> evIt = operatorIncreaseEvents.iterator();
 							evIt.hasNext(); )
 					{
 
 						// System.err.println("added operator arc");
-						LabeledEvent currEvent = evIt.nextEvent();
+						LabeledEvent currEvent = evIt.next();
 						Arc newArc = new Arc(newState, prevUpperState, currEvent);
 
 						newAutomaton.addArc(newArc);
@@ -289,11 +290,11 @@ public class ComputerHumanExtender
 					State higherMState = higherMStates[ik];
 
 					// Add all operator reset events to the corresponding level in m+1
-					for (EventIterator evIt = operatorResetEvents.iterator();
+					for (Iterator<LabeledEvent> evIt = operatorResetEvents.iterator();
 							evIt.hasNext(); )
 					{
 						// System.err.println("added operator arc");
-						LabeledEvent currEvent = evIt.nextEvent();
+						LabeledEvent currEvent = evIt.next();
 						Arc newArc = new Arc(newState, higherMState, currEvent);
 
 						newAutomaton.addArc(newArc);
@@ -302,10 +303,10 @@ public class ComputerHumanExtender
 				else if (im == m)
 				{
 					// Add all operator reset events to the initial state
-					for (EventIterator evIt = operatorResetEvents.iterator();
+					for (Iterator<LabeledEvent> evIt = operatorResetEvents.iterator();
 							evIt.hasNext(); )
 					{
-						LabeledEvent currEvent = evIt.nextEvent();
+						LabeledEvent currEvent = evIt.next();
 						Arc newArc = new Arc(newState, initialState, currEvent);
 
 						newAutomaton.addArc(newArc);

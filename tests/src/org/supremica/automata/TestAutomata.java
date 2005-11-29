@@ -113,9 +113,9 @@ public class TestAutomata
 				Alphabet currAlphabet = currAutomaton.getAlphabet();
 				int minIndex = 0;
 				int maxIndex = unionAlphabet.size() - 1;
-				for (EventIterator evIt = currAlphabet.iterator(); evIt.hasNext(); )
+				for (Iterator<LabeledEvent> evIt = currAlphabet.iterator(); evIt.hasNext(); )
 				{
-					LabeledEvent currEvent = evIt.nextEvent();
+					LabeledEvent currEvent = evIt.next();
 					int currIndex = currEvent.getSynchIndex();
 					//System.err.println(currIndex);
 					assertTrue(currIndex >= minIndex);

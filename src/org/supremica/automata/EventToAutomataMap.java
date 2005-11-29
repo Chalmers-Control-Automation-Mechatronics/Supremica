@@ -55,7 +55,7 @@ import java.util.*;
  * Map for mapping LabeledEvent:s to Automata-objects.
  */
 public class EventToAutomataMap
-	extends HashMap
+	extends HashMap<LabeledEvent,Automata>
 {
 	/*
 	public void insert(LabeledEvent ev, Automaton aut)
@@ -76,23 +76,18 @@ public class EventToAutomataMap
 	/**
 	 * Get the Automata that the LabeledEvent ev is associated with.
 	 */
+	/*
 	public Automata get(LabeledEvent ev)
 	{
-		return (Automata) super.get(ev);
+		return super.get(ev);
 	}
+	*/
 
 	/**
-	 * Override of the original method.
+	 * Inserts Automaton aut in the Automata that is found using the
+	 * LabeledEvent ev as a key in the map. Creates new Automata if there is none.
 	 */
-	public Object put(Object key, Object val)
-	{
-		return put((LabeledEvent) key, (Automaton) val);
-	}
-
-	/**
-	 * Put Automaton aut in the Automata that is found using the LabeledEvent ev as a key in the map.
-	 */
-	public Automata put(LabeledEvent ev, Automaton aut)
+	public Automata insert(LabeledEvent ev, Automaton aut)
 	{
 		Automata automata = get(ev);
 		if (automata == null)
@@ -116,16 +111,18 @@ public class EventToAutomataMap
 	/**
 	 * Iterate over the events, that is the keys in this map.
 	 */
-    public EventIterator eventIterator()
+    public Iterator<LabeledEvent> eventIterator()
     {
-        return new EventIterator(keySet().iterator());
+        return keySet().iterator();
     }
 
 	/**
 	 * Iterate over the events, that is the keys in this map.
 	 */
+	/*
     public EventIterator iterator()
     {
         return eventIterator();
     }
+	*/
 }

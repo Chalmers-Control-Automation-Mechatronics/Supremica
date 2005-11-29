@@ -883,9 +883,9 @@ public class MutuallyNonblockingVerifier
 		// Make sure automataA is not included in automataB (which would make the test really stupid)
 		Automata automataBminusA = new Automata(automataB);
 
-		for (AutomatonIterator autIt = automataA.iterator(); autIt.hasNext(); )
+		for (Iterator<Automaton> autIt = automataA.iterator(); autIt.hasNext(); )
 		{
-			automataBminusA.removeAutomaton(autIt.nextAutomaton().getName());
+			automataBminusA.removeAutomaton(autIt.next().getName());
 		}
 
 		// Nothing left?
@@ -1411,7 +1411,7 @@ class AutomataToEventMap
 		return theEvents.size();
 	}
 
-	public EventIterator eventIterator(Automaton theAutomaton)
+	public Iterator<LabeledEvent> eventIterator(Automaton theAutomaton)
 	{
 		return getEvents(theAutomaton).iterator();
 	}

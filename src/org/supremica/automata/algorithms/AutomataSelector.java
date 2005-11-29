@@ -101,10 +101,10 @@ class AutomataSelector
 
 				//ArrayList eventList = new ArrayList(currSupervisorAutomaton.eventCollection());
 				//while (!eventList.isEmpty())
-				for (EventIterator it = currSupervisorAutomaton.eventIterator(); it.hasNext(); )
+				for (Iterator<LabeledEvent> it = currSupervisorAutomaton.eventIterator(); it.hasNext(); )
 				{
 					//LabeledEvent currEvent = (LabeledEvent) eventList.remove(0);
-					LabeledEvent currEvent = it.nextEvent();
+					LabeledEvent currEvent = it.next();
 
 					// Add plants for uncontrollable events only
 					if (!currEvent.isControllable())

@@ -204,11 +204,10 @@ public class AlphabetHelpers
 			Alphabet currAlphabet = currAutomaton.getAlphabet();
 
 			// Loop over alphabet
-			for (EventIterator eventIt = currAlphabet.iterator(); eventIt.hasNext(); )
+			for (Iterator<LabeledEvent> eventIt = currAlphabet.iterator(); eventIt.hasNext(); )
 			{ 
 				// Insert in map
-				//insertEvent(map, eventIt.nextEvent(), currAutomaton);
-				map.put(eventIt.nextEvent(), currAutomaton);
+				map.insert(eventIt.next(), currAutomaton);
 			}
 		}
 
@@ -239,8 +238,7 @@ public class AlphabetHelpers
 					LabeledEvent currEvent = (LabeledEvent) eventIt.next();
 					if (!currEvent.isControllable())
 					{
-						//insertEvent(map, currEvent, currAutomaton);
-						map.put(currEvent, currAutomaton);
+						map.insert(currEvent, currAutomaton);
 					}
 				}
 			}

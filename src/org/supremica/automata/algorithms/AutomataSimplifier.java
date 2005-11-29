@@ -25,9 +25,9 @@ public class AutomataSimplifier
 		 * Minimize with respect to language equivalence. 
 		 * (Is this really clever? Nope. Use AutomatonMinimizer!)
 		 */
-		for (AutomatonIterator it = org.iterator(); it.hasNext(); )
+		for (Iterator<Automaton> it = org.iterator(); it.hasNext(); )
 		{
-			Automaton a = it.nextAutomaton();
+			Automaton a = it.next();
 			AutomatonMinimizer am = new AutomatonMinimizer(a);
 			Automaton mm = am.getMinimizedAutomaton(MinimizationOptions.getDefaultMinimizationOptions());
 
@@ -41,9 +41,9 @@ public class AutomataSimplifier
 		Vector toRemove = new Vector();    // automata to remove
 		HashSet toDisable = new HashSet();    // events to disable
 
-		for (AutomatonIterator it = ret.iterator(); it.hasNext(); )
+		for (Iterator<Automaton> it = ret.iterator(); it.hasNext(); )
 		{
-			Automaton a = it.nextAutomaton();
+			Automaton a = it.next();
 			StateSet ss = a.getStateSet();
 
 			if (ss.isEmpty())
@@ -83,9 +83,9 @@ public class AutomataSimplifier
 				logger.info("Removing blocked event " + event);
 			}
 
-			for (AutomatonIterator it = ret.iterator(); it.hasNext(); )
+			for (Iterator<Automaton> it = ret.iterator(); it.hasNext(); )
 			{
-				Automaton a = it.nextAutomaton();
+				Automaton a = it.next();
 
 				if (blockEvent(a, toDisable))
 				{

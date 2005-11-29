@@ -69,20 +69,20 @@ public class Alphabet
 	private static Logger logger = LoggerFactory.createLogger(Alphabet.class);
 	private int idIndex = 0;
 	private Listeners listeners = null;
-	private TreeMap theEvents = null;
+	private Map<String,LabeledEvent> theEvents = null;
 
 	public Alphabet()
 	{
-		theEvents = new TreeMap();
+		theEvents = new TreeMap<String,LabeledEvent>();
 	}
 
 	public Alphabet(Alphabet orgAlphabet)
 	{
 		this();
 
-		for (Iterator it = orgAlphabet.iterator(); it.hasNext(); )
+		for (Iterator<LabeledEvent> it = orgAlphabet.iterator(); it.hasNext(); )
 		{
-			LabeledEvent newEvent = new LabeledEvent((LabeledEvent) it.next());
+			LabeledEvent newEvent = new LabeledEvent(it.next());
 
 			theEvents.put(newEvent.getLabel(), newEvent);
 		}
@@ -114,7 +114,7 @@ public class Alphabet
 
 	public void setEvents(TreeMap oldEvents)
 	{
-		theEvents = new TreeMap(oldEvents);
+		theEvents = new TreeMap<String,LabeledEvent>(oldEvents);
 	}
 
 	public Map getEvents()
@@ -127,9 +127,9 @@ public class Alphabet
 	 *
 	 *@return  An iterator
 	 */
-	public EventIterator iterator()
+	public Iterator<LabeledEvent> iterator()
 	{
-		return new EventIterator(theEvents.values().iterator());
+		return theEvents.values().iterator();
 	}
 
 	/**
@@ -137,9 +137,9 @@ public class Alphabet
 	 *
 	 *@return  An iterator
 	 */
-	public EventIterator controllableEventIterator()
+	public Iterator<LabeledEvent> controllableEventIterator()
 	{
-		return new EventIterator(new ControllableEventIterator(theEvents.values().iterator(), true));
+		return new ControllableEventIterator(theEvents.values().iterator(), true);
 	}
 
 	/**
@@ -147,9 +147,9 @@ public class Alphabet
 	 *
 	 *@return  An iterator
 	 */
-	public EventIterator uncontrollableEventIterator()
+	public Iterator<LabeledEvent> uncontrollableEventIterator()
 	{
-		return new EventIterator(new ControllableEventIterator(theEvents.values().iterator(), false));
+		return new ControllableEventIterator(theEvents.values().iterator(), false);
 	}
 
 	/**
@@ -196,7 +196,7 @@ public class Alphabet
 			throw new IllegalArgumentException("getEvent: event label must be non-null");
 		}
 
-		return (LabeledEvent) theEvents.get(ev.getLabel());
+		return theEvents.get(ev.getLabel());
 	}
 
 	/**
@@ -281,7 +281,7 @@ public class Alphabet
 			throw new IllegalArgumentException("Event label must be non-null");
 		}
 
-		return (LabeledEvent) theEvents.get(label);
+		return theEvents.get(label);
 	}
 
 	public LabeledEvent getEventWithIndex(int index)
@@ -460,7 +460,7 @@ public class Alphabet
 	/** Must be called after an event label is modified. */
 	public void rehash()
 	{
-		TreeMap newEvents = new TreeMap();
+		TreeMap newEvents = new TreeMap<String,LabeledEvent>();
 
 		// theEvents = new TreeMap(orgEvents.theEvents);
 		// Deep copy
@@ -477,7 +477,7 @@ public class Alphabet
 	}
 
 	class ControllableEventIterator
-		implements Iterator
+		implements Iterator<LabeledEvent>
 	{
 		private final Iterator theIterator;
 		private final boolean controllableEvents;
@@ -496,7 +496,7 @@ public class Alphabet
 			return nextEvent != null;
 		}
 
-		public Object next()
+		public LabeledEvent next()
 			throws NoSuchElementException
 		{
 			if (nextEvent != null)
@@ -505,7 +505,7 @@ public class Alphabet
 
 				findNextEvent();
 
-				return oldEvent;
+				return (LabeledEvent) oldEvent;
 			}
 			else
 			{

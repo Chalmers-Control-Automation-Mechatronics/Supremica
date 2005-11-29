@@ -345,9 +345,9 @@ public class AutomataToSMV
 		Automata specSupAutomata = theAutomata.getSpecificationAndSupervisorAutomata();
 
 		// Iterate over all uncontrollable events and find conditions for controllability
-		for (EventIterator evIt = allEvents.iterator(); evIt.hasNext(); )
+		for (Iterator<LabeledEvent> evIt = allEvents.iterator(); evIt.hasNext(); )
 		{
-			LabeledEvent currEvent = evIt.nextEvent();
+			LabeledEvent currEvent = evIt.next();
 
 			if (!currEvent.isControllable())
 			{

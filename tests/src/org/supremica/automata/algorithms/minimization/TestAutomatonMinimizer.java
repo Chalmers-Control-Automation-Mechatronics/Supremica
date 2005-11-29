@@ -229,10 +229,10 @@ public class TestAutomatonMinimizer
             Automata key = theProject.getSpecificationAutomata();
 
             // Iterate over tests and minimize each individually
-            AutomatonIterator autIt = tests.iterator();
+            Iterator<Automaton> autIt = tests.iterator();
             while (autIt.hasNext())
             {
-                Automaton currAutomaton = autIt.nextAutomaton();
+                Automaton currAutomaton = autIt.next();
 
                 // Minimize this one
                 AutomatonMinimizer minimizer = new AutomatonMinimizer(currAutomaton);

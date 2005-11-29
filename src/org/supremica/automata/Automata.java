@@ -63,8 +63,8 @@ public class Automata
 	implements AutomatonListener
 {
 	private static Logger logger = LoggerFactory.createLogger(Automata.class);
-	private ArrayList theAutomata;
-	private HashMap nameMap;
+	private ArrayList<Automaton> theAutomata;
+	private HashMap<String,Automaton> nameMap;
 	private String name = null;
 	private String comment = null;
 	private AutomataListeners listeners = null;
@@ -73,8 +73,8 @@ public class Automata
 
 	public Automata()
 	{
-		theAutomata = new ArrayList();
-		nameMap = new HashMap();
+		theAutomata = new ArrayList<Automaton>();
+		nameMap = new HashMap<String,Automaton>();
 	}
 
 	/**
@@ -302,9 +302,9 @@ public class Automata
 		return newHash;
 	}
 
-	public AutomatonIterator iterator()
+	public Iterator<Automaton> iterator()
 	{
-		return new AutomatonIterator(theAutomata.iterator());
+		return theAutomata.iterator();
 	}
 
 	/**
@@ -314,22 +314,21 @@ public class Automata
 	 *
 	 *@see org.supremica.gui.ActionMan
 	 */
-	public AutomatonIterator backwardsIterator()
+	public Iterator<Automaton> backwardsIterator()
 	{
-		ArrayList backwardList = new ArrayList();
-		Iterator forwardIterator = iterator();
-
+		ArrayList<Automaton> backwardList = new ArrayList<Automaton>();
+		Iterator<Automaton> forwardIterator = iterator();
 		while (forwardIterator.hasNext())
 		{
 			backwardList.add(0, forwardIterator.next());
 		}
 
-		return new AutomatonIterator(backwardList.iterator());
+		return backwardList.iterator();
 	}
 
-	public AutomatonIterator plantIterator()
+	public Iterator<Automaton> plantIterator()
 	{
-		return new AutomatonIterator(new AutomatonTypeIterator(AutomatonType.Plant));
+		return new AutomatonTypeIterator(AutomatonType.Plant);
 	}
 
 	/**
@@ -351,9 +350,9 @@ public class Automata
 		return newAutomata;
 	}
 
-	public AutomatonIterator specificationIterator()
+	public Iterator<Automaton> specificationIterator()
 	{
-		return new AutomatonIterator(new AutomatonTypeIterator(AutomatonType.Specification));
+		return new AutomatonTypeIterator(AutomatonType.Specification);
 	}
 
 	/**
@@ -375,9 +374,9 @@ public class Automata
 		return newAutomata;
 	}
 
-	public AutomatonIterator supervisorIterator()
+	public Iterator<Automaton> supervisorIterator()
 	{
-		return new AutomatonIterator(new AutomatonTypeIterator(AutomatonType.Supervisor));
+		return new AutomatonTypeIterator(AutomatonType.Supervisor);
 	}
 
 	/**
@@ -425,9 +424,9 @@ public class Automata
 		return newAutomata;
 	}
 
-	public AutomatonIterator interfaceIterator()
+	public Iterator<Automaton> interfaceIterator()
 	{
-		return new AutomatonIterator(new AutomatonTypeIterator(AutomatonType.Interface));
+		return new AutomatonTypeIterator(AutomatonType.Interface);
 	}
 
 	/**
@@ -676,13 +675,13 @@ public class Automata
 		while (change)
 		{
 			change = false;
-			AutomatonIterator autIt = this.iterator();
-			autIt.nextAutomaton(); // The first is already taken care of
+			Iterator<Automaton> autIt = this.iterator();
+			autIt.next(); // The first is already taken care of
 
 			// Loop and compare alphabets
 			while(autIt.hasNext())
 			{
-				Automaton theAut = autIt.nextAutomaton();
+				Automaton theAut = autIt.next();
 				if (autA.containsAutomaton(theAut))
 				{
 					continue;
@@ -742,14 +741,14 @@ public class Automata
 	private boolean isEventEpsilonConsistent(Alphabet unionAlphabet)
 	{
 		// Iterate over the alphabet and examine all automata
-		for (EventIterator evIt = unionAlphabet.iterator(); evIt.hasNext(); )
+		for (Iterator<LabeledEvent> evIt = unionAlphabet.iterator(); evIt.hasNext(); )
 		{
-			LabeledEvent currEvent = evIt.nextEvent();
+			LabeledEvent currEvent = evIt.next();
 
 			// Examine each automata
-			for (AutomatonIterator autIt = iterator(); autIt.hasNext(); )
+			for (Iterator<Automaton> autIt = iterator(); autIt.hasNext(); )
 			{
-				Alphabet currAlpha = autIt.nextAutomaton().getAlphabet();
+				Alphabet currAlpha = autIt.next().getAlphabet();
 
 				if (currAlpha.contains(currEvent.getLabel()))
 				{
@@ -790,14 +789,14 @@ public class Automata
 	public boolean isEventControllabilityConsistent(Alphabet unionAlphabet)
 	{
 		// Iterate over the alphabet and examine all automata
-		for (EventIterator evIt = unionAlphabet.iterator(); evIt.hasNext(); )
+		for (Iterator<LabeledEvent> evIt = unionAlphabet.iterator(); evIt.hasNext(); )
 		{
-			LabeledEvent currEvent = evIt.nextEvent();
+			LabeledEvent currEvent = evIt.next();
 
 			// Examine each automata
-			for (AutomatonIterator autIt = iterator(); autIt.hasNext(); )
+			for (Iterator<Automaton> autIt = iterator(); autIt.hasNext(); )
 			{
-				Alphabet currAlpha = autIt.nextAutomaton().getAlphabet();
+				Alphabet currAlpha = autIt.next().getAlphabet();
 
 				if (currAlpha.contains(currEvent.getLabel()))
 				{
@@ -870,7 +869,7 @@ public class Automata
 
 	public boolean containsAutomaton(Automaton otherAutomaton)
 	{
-		Automaton thisAutomaton = (Automaton) nameMap.get(otherAutomaton.getName());
+		Automaton thisAutomaton = nameMap.get(otherAutomaton.getName());
 
 		if (thisAutomaton == null)
 		{
@@ -953,12 +952,12 @@ public class Automata
 
 	public Automaton getAutomaton(String name)
 	{
-		return (Automaton) nameMap.get(name);
+		return nameMap.get(name);
 	}
 
 	public Automaton getAutomatonAt(int i)
 	{
-		return (Automaton) theAutomata.get(i);
+		return theAutomata.get(i);
 	}
 
 	public Automaton getFirstAutomaton()
@@ -1237,7 +1236,7 @@ public class Automata
 	}
 
 	class AutomatonTypeIterator
-		implements Iterator
+		implements Iterator<Automaton>
 	{
 		private Iterator autIt;
 		private AutomatonType theType;
@@ -1256,7 +1255,7 @@ public class Automata
 			return theAutomaton != null;
 		}
 
-		public Object next()
+		public Automaton next()
 		{
 			Automaton returnAutomaton = theAutomaton;
 
@@ -1487,10 +1486,10 @@ public class Automata
 		if (mustHaveValidType && (size() > 1))
 		{
 			// All automata must have a defined type, i.e. must not be of type "Undefined".
-			AutomatonIterator autIt = iterator();
+			Iterator<Automaton> autIt = iterator();
 			while (autIt.hasNext())
 			{
-				Automaton currAutomaton = autIt.nextAutomaton();
+				Automaton currAutomaton = autIt.next();
 
 				// Is this Automaton's type AutomatonType.Undefined?
 				if (currAutomaton.getType() == AutomatonType.Undefined)

@@ -53,6 +53,7 @@ import org.supremica.log.*;
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.minimization.AutomatonMinimizer;
 import org.supremica.automata.algorithms.minimization.MinimizationOptions;
+import java.util.Iterator;
 
 public class AutomatonSplit
 {
@@ -77,12 +78,10 @@ public class AutomatonSplit
 
 		try
 		{
-			for (EventIterator evIt = original.eventIterator();
-					evIt.hasNext(); )
+			for (Iterator<LabeledEvent> evIt = original.eventIterator(); evIt.hasNext(); )
 			{
-
 				// Remove one event from A's alphabet
-				LabeledEvent remove = evIt.nextEvent();
+				LabeledEvent remove = evIt.next();
 
 				splitA = removeEvent(original, remove);
 				splitB = reduceAutomaton(new Automaton(original), new Automata(splitA));
@@ -164,9 +163,9 @@ public class AutomatonSplit
 		try
 		{
 			// Remove event and examine if it was redundant
-			for (EventIterator evIt = supervisor.eventIterator(); evIt.hasNext(); )
+			for (Iterator<LabeledEvent> evIt = supervisor.eventIterator(); evIt.hasNext(); )
 			{
-				LabeledEvent event = evIt.nextEvent();
+				LabeledEvent event = evIt.next();
 
 				// Do not remove an event that is local in the supervisor
 				if (!parentUnion.containsEqualEvent(event))

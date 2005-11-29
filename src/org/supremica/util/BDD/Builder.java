@@ -68,9 +68,9 @@ public class Builder
 			a.setType(convertType(s_a.getType()));
 
 			// insert events
-			for (EventIterator ei = s_a.eventIterator(); ei.hasNext(); )
+			for (Iterator<LabeledEvent> ei = s_a.eventIterator(); ei.hasNext(); )
 			{
-				LabeledEvent le = (LabeledEvent) ei.next();
+				LabeledEvent le = ei.next();
 
 				if ((alphabet != null) &&!alphabet.contains(le))
 				{

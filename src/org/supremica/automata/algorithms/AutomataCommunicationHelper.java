@@ -22,9 +22,9 @@ public class AutomataCommunicationHelper
 
 		Collection toSelect = new HashSet();
 
-		for (AutomatonIterator it = selected.iterator(); it.hasNext(); )
+		for (Iterator<Automaton> it = selected.iterator(); it.hasNext(); )
 		{
-			Automaton a = it.nextAutomaton();
+			Automaton a = it.next();
 
 			toSelect.add(a);
 			all.removeAutomaton(a);
@@ -32,9 +32,9 @@ public class AutomataCommunicationHelper
 
 		Alphabet selectedAlphabet = AlphabetHelpers.getUnionAlphabet(selected, false, false);
 
-		for (AutomatonIterator it = all.iterator(); it.hasNext(); )
+		for (Iterator<Automaton> it = all.iterator(); it.hasNext(); )
 		{
-			Automaton a = it.nextAutomaton();
+			Automaton a = it.next();
 			Alphabet alfa = a.getAlphabet();
 
 			if (alfa.overlap(selectedAlphabet))
@@ -63,9 +63,9 @@ public class AutomataCommunicationHelper
 
 		Collection toSelect = new HashSet();
 
-		for (AutomatonIterator it = selected.iterator(); it.hasNext(); )
+		for (Iterator<Automaton> it = selected.iterator(); it.hasNext(); )
 		{
-			Automaton a = it.nextAutomaton();
+			Automaton a = it.next();
 
 			toSelect.add(a);
 			all.removeAutomaton(a);
@@ -77,9 +77,9 @@ public class AutomataCommunicationHelper
 
 			Alphabet selectedAlphabet = AlphabetHelpers.getUnionAlphabet(selected, false, false);
 
-			for (AutomatonIterator it = all.iterator(); it.hasNext(); )
+			for (Iterator<Automaton> it = all.iterator(); it.hasNext(); )
 			{
-				Automaton a = it.nextAutomaton();
+				Automaton a = it.next();
 				Alphabet alfa = a.getAlphabet();
 
 				if (alfa.overlap(selectedAlphabet))
@@ -106,7 +106,7 @@ public class AutomataCommunicationHelper
 	/**
 	 * splits the graph in the largest interacting components.
 	 *
-	 * @return Vector of Automata whose alphabet share no common events
+	 * @return Collection of Automata whose alphabet share no common events
 	 */
 	public static Collection split(Automata all)
 		throws Exception
@@ -119,7 +119,7 @@ public class AutomataCommunicationHelper
 		{
 
 			// get the first automaton:
-			Automaton first = all.iterator().nextAutomaton();
+			Automaton first = all.iterator().next();
 			Automata firstAut = new Automata(first);
 			Automata componentAut = new Automata();
 			Collection component = getMaximalComponent(firstAut, all);

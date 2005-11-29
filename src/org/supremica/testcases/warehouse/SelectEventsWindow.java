@@ -21,7 +21,6 @@ import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.LabeledEvent;
-import org.supremica.automata.EventIterator;
 import org.supremica.gui.treeview.*;
 import org.supremica.gui.Utility;
 
@@ -691,18 +690,18 @@ class SelectOperatorEventsDialog
 
 		if (selectOperatorEvents)
 		{
-			for (EventIterator evIt = alphabet.iterator(); evIt.hasNext(); )
+			for (Iterator<LabeledEvent> evIt = alphabet.iterator(); evIt.hasNext(); )
 			{
-				LabeledEvent currEvent = evIt.nextEvent();
+				LabeledEvent currEvent = evIt.next();
 
 				currEvent.setOperatorIncrease(operatorEvents.contains(currEvent.getLabel()));
 			}
 		}
 		else if (selectUnobservableEvents)
 		{
-			for (EventIterator evIt = alphabet.iterator(); evIt.hasNext(); )
+			for (Iterator<LabeledEvent> evIt = alphabet.iterator(); evIt.hasNext(); )
 			{
-				LabeledEvent currEvent = evIt.nextEvent();
+				LabeledEvent currEvent = evIt.next();
 
 				currEvent.setObservable(!operatorEvents.contains(currEvent.getLabel()));
 			}

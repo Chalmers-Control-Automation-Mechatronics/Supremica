@@ -552,10 +552,10 @@ public class ActionMan
 			{
 				int i = 0;
 
-				for (AutomatonIterator autIt = selectedAutomata.iterator();
+				for (Iterator<Automaton> autIt = selectedAutomata.iterator();
 						autIt.hasNext(); )
 				{
-					theProject.moveAutomaton(autIt.nextAutomaton(), i);
+					theProject.moveAutomaton(autIt.next(), i);
 
 					selectionIndices[index++] = i++;
 				}
@@ -564,10 +564,10 @@ public class ActionMan
 			{
 				int i = theProject.size() - 1;
 
-				for (AutomatonIterator autIt = selectedAutomata.backwardsIterator();
+				for (Iterator<Automaton> autIt = selectedAutomata.backwardsIterator();
 						autIt.hasNext(); )
 				{
-					theProject.moveAutomaton(autIt.nextAutomaton(), i);
+					theProject.moveAutomaton(autIt.next(), i);
 
 					selectionIndices[index++] = i--;
 				}
@@ -1522,7 +1522,6 @@ public class ActionMan
 		{
 			vOptions.setInclusionAutomata(gui.getUnselectedAutomata());
 		}
-
 		SynchronizationOptions sOptions = SynchronizationOptions.getDefaultVerificationOptions();
 
 		// Work!
