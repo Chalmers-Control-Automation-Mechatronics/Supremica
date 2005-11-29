@@ -69,11 +69,10 @@ public class Alphabet
 	private static Logger logger = LoggerFactory.createLogger(Alphabet.class);
 	private int idIndex = 0;
 	private Listeners listeners = null;
-	private Map<String,LabeledEvent> theEvents = null;
+	private Map<String,LabeledEvent> theEvents = new TreeMap<String,LabeledEvent>();
 
 	public Alphabet()
 	{
-		theEvents = new TreeMap<String,LabeledEvent>();
 	}
 
 	public Alphabet(Alphabet orgAlphabet)
@@ -112,7 +111,7 @@ public class Alphabet
 		return size();
 	}
 
-	public void setEvents(TreeMap oldEvents)
+	public void setEvents(Map oldEvents)
 	{
 		theEvents = new TreeMap<String,LabeledEvent>(oldEvents);
 	}
@@ -460,9 +459,8 @@ public class Alphabet
 	/** Must be called after an event label is modified. */
 	public void rehash()
 	{
-		TreeMap newEvents = new TreeMap<String,LabeledEvent>();
+		Map<String,LabeledEvent> newEvents = new TreeMap<String,LabeledEvent>();
 
-		// theEvents = new TreeMap(orgEvents.theEvents);
 		// Deep copy
 		for (Iterator it = iterator(); it.hasNext(); )
 		{

@@ -1035,7 +1035,7 @@ public class State
 
         while (arc_it.hasNext())
         {
-            Arc curr_arc = (Arc)arc_it.next();
+            Arc curr_arc = arc_it.next();
             if (curr_arc.getEvent().equals(event))
             {
                 return true;

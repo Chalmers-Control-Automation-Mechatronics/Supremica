@@ -232,11 +232,11 @@ public class AutomataMinimizer
 		}
 
 		// Print statistics
-		//if (SupremicaProperties.verboseMode())
+		if (SupremicaProperties.verboseMode())
 		{
 			// Print total reduction statistics
-			//logger.info(AutomatonMinimizer.getStatistics());
-			logger.info("& " + instanceSize + " & & " + mostStates + " & " + mostTransitions + " & TIME & true/false & " + AutomatonMinimizer.getStatisticsLaTeX() + " & ALGO \\\\");
+			logger.info(AutomatonMinimizer.getStatistics());
+			//logger.info("& " + instanceSize + " & & " + mostStates + " & " + mostTransitions + " & TIME & true/false & " + AutomatonMinimizer.getStatisticsLaTeX() + " & ALGO \\\\");
 			// Print largest automaton size
 			logger.info("The automaton with the most states had " + mostStates + " states.");
 			logger.info("The automaton with the most transitions had " + mostTransitions + " transitions.");

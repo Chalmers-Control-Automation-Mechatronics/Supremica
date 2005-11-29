@@ -131,7 +131,7 @@ public class TestStateSet
 			Project theProject = builder.build(TestFiles.getFile(TestFiles.CentralLocking3Doors));
 			
 			Automaton aut = theProject.getAutomaton("decoder");
-			StateSet ss = new StateSet(aut);
+			StateSet ss = new StateSet(aut.getStateSet());
 			StateSet ps = ss.previousStates(aut.getAlphabet().getEvent("ER"));
 
 			assertTrue(ps.size() == 5);

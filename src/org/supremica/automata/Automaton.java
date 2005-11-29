@@ -78,7 +78,7 @@ public class Automaton
 	private final StateSet theStates = new StateSet();
 	private int index = -1;
 	//private Map idStateMap;    // Want fast lookup on both id and index (but not name?)
-	private Map indexStateMap;
+	private Map<Integer,State> indexStateMap;
 	private ArcSet theArcs;
 	private State initialState;
 	private boolean isDisabled = false;
@@ -105,7 +105,7 @@ public class Automaton
 	{
 		alphabet = new Alphabet();
 		//idStateMap = new HashMap();
-		indexStateMap = new HashMap();
+		indexStateMap = new HashMap<Integer,State>();
 		theArcs = new ArcSet();
 		masterAutomata = new Automata();
 		slaveAutomata = new Automata();

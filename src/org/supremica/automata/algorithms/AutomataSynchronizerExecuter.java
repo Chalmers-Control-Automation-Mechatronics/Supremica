@@ -1464,7 +1464,7 @@ public final class AutomataSynchronizerExecuter
 	}
 
 	/**
-	 * Changes state along transition of the event with index eventIndex.
+   	 * Changes state along transition of the event with index eventIndex.
 	 * IT IS ASSUMED THAT THE EVENT WITH INDEX eventIndex IS ENABLED!!
 	 */
 	public int[] doTransition(int[] currState, int eventIndex)

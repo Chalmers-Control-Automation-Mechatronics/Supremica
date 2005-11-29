@@ -1138,9 +1138,9 @@ public class AutomatonMinimizer
     public int ruleAA(Automaton aut)
         throws Exception
     {
-        ////////////
-        // RULE A //
-        ////////////
+        /////////////
+        // RULE AA //
+        /////////////
 
         // Count the removed states
         int countAA = 0;

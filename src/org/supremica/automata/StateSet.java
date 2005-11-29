@@ -15,33 +15,16 @@ import org.supremica.properties.SupremicaProperties;
 
 public class StateSet
 {
-	private TreeSet<State> theSet = null;
+	private Set<State> theSet = null;
 	//private HashMap<String,State> nameToStateMap = null;
 	private State singleStateRepresentation = null;
 
-	// Private constructor for cloning
-	private StateSet(TreeSet<State> setimpl)
-	{
-		this.theSet = new TreeSet<State>(setimpl);
-	}
-
-	// Create an empty set
+	/**
+	 * Create an empty set
+	 */
 	public StateSet()
 	{
 		theSet = new TreeSet<State>(new State.StateComparator());
-	}
-
-	/**
-	 * Create a StateSet containing all the states of an automaton
-	 */
-	public StateSet(Automaton aut)
-	{
-		this();
-
-		for (Iterator<State> stateIt = aut.stateIterator(); stateIt.hasNext(); )
-		{
-			this.add(stateIt.next());
-		}
 	}
 
 	/**
@@ -49,12 +32,39 @@ public class StateSet
 	 */
 	public StateSet(StateSet ss)
 	{
-		this(ss.theSet);
+		//this(ss.theSet);
+		this.theSet = new TreeSet<State>(ss.theSet);
 	}
+
+	/**
+	 * Create a StateSet containing all the states of an automaton
+	 */
+	/*
+	public StateSet(Automaton aut)
+	{
+		this();
+
+		for (Iterator<State> stateIt = aut.stateIterator(); stateIt.hasNext(); )
+		{
+			this.add(stateIt.next());
+		}	    
+	}
+	*/
+
+	/**
+	 * Private constructor for cloning
+	 */
+	/*
+	private StateSet(Set<State> set)
+	{
+		this.theSet = new TreeSet<State>(set);
+	}
+	*/
 
 	/**
 	 * Find the union of the two StateSet:s s1 and s2, returning a new StateSet.
 	 */
+	/*
 	public static StateSet union(StateSet s1, StateSet s2)
 	{
 		StateSet ss = new StateSet(s1);
@@ -63,6 +73,7 @@ public class StateSet
 
 		return ss;
 	}
+	*/
 
 	/**
 	 * Intersect the two StateSet:s s1 and s2, returning a new StateSet.
@@ -106,7 +117,7 @@ public class StateSet
 		return theSet.addAll(stateSet.theSet);
 	}
 
-	public boolean add(Collection collection)
+	public boolean add(Collection<State> collection)
 	{
 		modified();
 		return theSet.addAll(collection);
@@ -118,11 +129,13 @@ public class StateSet
 		theSet.clear();
 	}
 
+	/*
 	// Shallow copy (is that what we mean by clone, really?)
 	public Object clone()
 	{
-		return new StateSet(((TreeSet) theSet.clone()));
+		return new StateSet(theSet.clone());
 	}
+	*/
 
 	public boolean contains(State state)
 	{
@@ -500,12 +513,6 @@ public class StateSet
 		}
 		
 		public Arc next()
-			throws NoSuchElementException
-		{
-			return nextArc();
-		}
-		
-		public Arc nextArc()
 			throws NoSuchElementException
 		{
 			Arc arc = arcIterator.next();
