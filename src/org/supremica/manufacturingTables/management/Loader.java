@@ -74,6 +74,10 @@ public class Loader
 {
     private JAXBContext jaxbContext;
     private Unmarshaller u;
+    
+    // variabel för att hålla reda på  tabuleringen, bara för utskriften av XML-koden tills vidare
+    protected int nbrOfBlanks;
+    protected String blanks;
 
     public Loader()
     {
@@ -107,7 +111,7 @@ public class Loader
 	try
 	    {
 		File theFile = getFile(path, fileName);
-		System.err.println("filen inläst");
+	       
 
 		if(theFile!=null)
 		    {
@@ -134,34 +138,228 @@ public class Loader
 		je.printStackTrace();
 	    }
 	return;
-	//	for (Iterator resIter = theDevice.getResource().iterator();resIter.hasNext();)
-
     }
 
     private void buildPLCProgram(FactoryType factory)
     {
-	System.err.println("<Factory name=\"" + factory.getName() + ">");
+	// variabel för att hålla reda på  tabuleringen, bara för utskriften av XML-koden
+	nbrOfBlanks = 0;
+	blanks = "                                                                              ";
+	// Factory
+	System.err.println(blanks.substring(0,nbrOfBlanks) + "<Factory name=\"" + factory.getName() + "\">");
 	if(factory.getDescription()!=null)
 	    {
-		System.err.println("<Description>" + factory.getDescription() + "</Description>");
+		System.err.println(blanks.substring(0,nbrOfBlanks) + "<Description>" + factory.getDescription() + "</Description>");
 	    }
-	StationsType stations = factory.getStations();
-	System.err.println(" <Stations>");
-	List stationsList = stations.getStation();
-	for (Iterator stationIter = stationsList.iterator();stationIter.hasNext();)
+	// Areas
+	nbrOfBlanks++;
+	AreasType areas = factory.getAreas();
+	System.err.println(blanks.substring(0,nbrOfBlanks) + "<Areas>");
+
+	// Nbr of Areas
+	List areaList = areas.getArea();
+	nbrOfBlanks++;
+	for (Iterator areaIter = areaList.iterator();areaIter.hasNext();)
 	    {
-		StationType currentStation = (StationType) stationIter.next();
-		System.err.println("  <Station name=\"" + currentStation.getName() + ">");
-		if(currentStation.getDescription()!=null)
+		AreaType currentArea = (AreaType) areaIter.next();
+		System.err.println(blanks.substring(0,nbrOfBlanks) + "<Area name=\"" + currentArea.getName() + "\">");
+		if(currentArea.getDescription()!=null)
 		    {
-			System.err.println("<Description>" + currentStation.getDescription() + "</Description>");
+			System.err.println(blanks.substring(0,nbrOfBlanks) + "<Description>" + currentArea.getDescription() + "</Description>");
 		    }
-		CellsType cells = currentStation.getCells();
-		System.err.println("   <Cells>");
+		// Cells
+		nbrOfBlanks++;
+		CellsType cells = currentArea.getCells();
+		System.err.println(blanks.substring(0,nbrOfBlanks) + "<Cells>");
 
+		// Nbr of Cells
+		List cellList = cells.getCell();
+		nbrOfBlanks++;
+		for (Iterator cellIter = cellList.iterator();cellIter.hasNext();)
+		    {
+			CellType currentCell = (CellType) cellIter.next();
+			System.err.println(blanks.substring(0,nbrOfBlanks) + "<Cell name=\"" + currentCell.getName() + "\">");
+			nbrOfBlanks++;
+			
+			// Description
+			if(currentCell.getDescription()!=null)
+			    {
+				System.err.println(blanks.substring(0,nbrOfBlanks) + "<Description>" + currentCell.getDescription() + "</Description>");
+			    }
 
+			// Equipment
+			if (currentCell.getEquipment()!=null)
+			    {
+				buildEquipment(currentCell.getEquipment());
+			    }
+
+			// Machines
+			buildMachines(currentCell.getMachines());
+			
+			nbrOfBlanks--;
+			System.err.println(blanks.substring(0,nbrOfBlanks) + "</Cell>");
+		    }
+		nbrOfBlanks--;
+		System.err.println(blanks.substring(0,nbrOfBlanks) + "</Cells>");
+		nbrOfBlanks--;
+		System.err.println(blanks.substring(0,nbrOfBlanks) + "</Area>");
+		
+	    }
+	nbrOfBlanks--;
+	System.err.println(blanks.substring(0,nbrOfBlanks) + "</Areas>");
+	nbrOfBlanks--;
+	System.err.println(blanks.substring(0,nbrOfBlanks) + "</Factory>");
+    }
+    
+    private void buildMachines(MachinesType machines)
+    {
+	System.err.println(blanks.substring(0,nbrOfBlanks) + "<Machines>");
+
+	// Nbr of Machines
+	List machineList = machines.getMachine();
+	nbrOfBlanks++;
+	for (Iterator machineIter = machineList.iterator();machineIter.hasNext();)
+	    {
+		buildMachine((MachineType) machineIter.next());
+	    }
+	nbrOfBlanks--;
+	System.err.println(blanks.substring(0,nbrOfBlanks) + "</Machines>");
+    }
+
+    private void buildMachine(MachineType machine)
+    {
+	System.err.println(blanks.substring(0,nbrOfBlanks) + "<Machine machineType=\"" + machine.getMachineType() + "\" " + "name=\"" + machine.getName() + "\">");
+	nbrOfBlanks++;
+
+	// Description
+	if (machine.getDescription()!=null)
+	    {
+		System.err.println(blanks.substring(0,nbrOfBlanks) + "<Description>" + machine.getDescription() + "</Description>");
+	    }
+	// Variables
+	if (machine.getVariables()!=null)
+	    {
+		VariablesType variables = machine.getVariables();
+		System.err.println(blanks.substring(0,nbrOfBlanks) + "<Variables>");
+		// Nbr of Variables
+		List variableList = variables.getVariable();
+		nbrOfBlanks++;
+		for (Iterator variableIter = variableList.iterator();variableIter.hasNext();)
+		    {
+			// Eftersom det finns en variable-klass borde detta simpletype vara en Variable, men det är en String
+			// I version 2.0 av JAXB kommer man ha möjlighet att sätta mapSimpleTypeDef="true" som förhoppningsvis 
+			// råder bot på detta
+			//Variable currentVariable = (Variable) variableIter.next();
+			String currentVariable = (String) variableIter.next();
+			//System.err.println(blanks.substring(0,nbrOfBlanks) + "<Variable>" + currentVariable.getValue() + "</Variable>");
+			System.err.println(blanks.substring(0,nbrOfBlanks) + "<Variable>" + currentVariable + "</Variable>");
+		    }
+		nbrOfBlanks--;
+		System.err.println(blanks.substring(0,nbrOfBlanks) + "</Variables>");
+	    }
+	
+	// Equipment
+	if (machine.getEquipment()!=null)
+	    {
+		buildEquipment(machine.getEquipment());
 	    }
 
+	nbrOfBlanks--;
+	System.err.println(blanks.substring(0,nbrOfBlanks) + "</Machine>");
+    }
+
+
+
+    private void buildEquipment(EquipmentType equip)
+    {
+	System.err.println(blanks.substring(0,nbrOfBlanks) + "<Equipment>");
+
+	// Nbr of EquipmentEntities
+	List equipList = equip.getEquipmentEntity();
+	nbrOfBlanks++;
+	for (Iterator equipIter = equipList.iterator();equipIter.hasNext();)
+	    {
+		EquipmentEntityType currentEquip = (EquipmentEntityType) equipIter.next();
+		buildEquipmentEntity(currentEquip);
+	    }
+	nbrOfBlanks--;
+	System.err.println(blanks.substring(0,nbrOfBlanks) + "</Equipment>");
+    }
+
+    private void buildEquipmentEntity(EquipmentEntityType equipEnt)
+    {
+	System.err.println(blanks.substring(0,nbrOfBlanks) + "<EquipmentEntity equipmentType=\"" + equipEnt.getEquipmentType() + "\" " + "name=\"" + equipEnt.getName() + "\">");
+	nbrOfBlanks++;
+
+	// Description
+	if (equipEnt.getDescription()!=null)
+	    {
+		System.err.println(blanks.substring(0,nbrOfBlanks) + "<Description>" + equipEnt.getDescription() + "</Description>");
+	    }
+	// States
+	StatesType states = equipEnt.getStates();
+	System.err.println(blanks.substring(0,nbrOfBlanks) + "<States>");
+	// Nbr of States
+	List stateList = states.getState();
+	nbrOfBlanks++;
+	for (Iterator stateIter = stateList.iterator();stateIter.hasNext();)
+	    {
+		// Eftersom det finns en state-klass borde detta simpletype vara ett State, men det är en String
+		// I version 2.0 av JAXB kommer man ha möjlighet att sätta mapSimpleTypeDef="true" som förhoppningsvis 
+		// råder bot på detta
+		//State currentState = (State) stateIter.next();
+		String currentState = (String) stateIter.next();
+		//System.err.println(blanks.substring(0,nbrOfBlanks) + "<State>" + currentState.getValue() + "</State>");
+		System.err.println(blanks.substring(0,nbrOfBlanks) + "<State>" + currentState + "</State>");
+	    }
+	nbrOfBlanks--;
+	System.err.println(blanks.substring(0,nbrOfBlanks) + "</States>");
+
+	// Elements
+	if (equipEnt.getElements()!=null)
+	    {
+		buildElements(equipEnt.getElements());
+	    }
+	
+	// Equipment
+	if (equipEnt.getEquipment()!=null)
+	    {
+		buildEquipment(equipEnt.getEquipment());
+	    }
+
+	nbrOfBlanks--;
+	System.err.println(blanks.substring(0,nbrOfBlanks) + "</EquipmentEntity>");
+    }
+
+    private void buildElements(ElementsType elements)
+    {
+	System.err.println(blanks.substring(0,nbrOfBlanks) + "<Elements>");
+
+	// Nbr of Elements
+	List elementList = elements.getElement();
+	nbrOfBlanks++;
+	for (Iterator elementIter = elementList.iterator();elementIter.hasNext();)
+	    {
+		ElementType currentElement = (ElementType) elementIter.next();
+		buildElement(currentElement);
+	    }
+	nbrOfBlanks--;
+	System.err.println(blanks.substring(0,nbrOfBlanks) + "</Elements>");
+    }
+
+    private void buildElement(ElementType element)
+    {
+	System.err.println(blanks.substring(0,nbrOfBlanks) + "<Element elementType=\"" + element.getElementType() + "\" " + "name=\"" + element.getName() + "\">");
+	nbrOfBlanks++;
+
+	// Description
+	if (element.getDescription()!=null)
+	    {
+		System.err.println(blanks.substring(0,nbrOfBlanks) + "<Description>" + element.getDescription() + "</Description>");
+	    }
+
+	nbrOfBlanks--;
+	System.err.println(blanks.substring(0,nbrOfBlanks) + "</Element>");
     }
 
     private File getFile(String path, String fileName)

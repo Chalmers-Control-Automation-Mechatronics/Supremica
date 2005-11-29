@@ -6,6 +6,7 @@
 	attributeFormDefault="unqualified"
 	version="1.0">  
 
+
  <!-- Definition of simple types ___________________________________-->
  <xs:simpleType name="machineTypeType">
   <xs:restriction base="xs:string">
@@ -53,21 +54,21 @@
   <xs:complexType>
    <xs:sequence>
    <xs:element ref="Description" minOccurs="0" maxOccurs="1"/>
-   <xs:element ref="Stations" minOccurs="1" maxOccurs="1"/>
+   <xs:element ref="Areas" minOccurs="1" maxOccurs="1"/>
    </xs:sequence>  
    <xs:attribute ref="name" use="required"/>
  </xs:complexType>
  </xs:element>
 
- <xs:element name="Stations">
+ <xs:element name="Areas">
   <xs:complexType>
    <xs:sequence>
-   <xs:element ref="Station" minOccurs="1" maxOccurs="unbounded"/>
+   <xs:element ref="Area" minOccurs="1" maxOccurs="unbounded"/>
    </xs:sequence>  
   </xs:complexType>
  </xs:element>
 
- <xs:element name="Station">
+ <xs:element name="Area">
   <xs:complexType>
    <xs:sequence>
    <xs:element ref="Description" minOccurs="0" maxOccurs="1"/>
@@ -89,7 +90,8 @@
   <xs:complexType>
    <xs:sequence>
    <xs:element ref="Description" minOccurs="0" maxOccurs="1"/>
-   <xs:element ref="Variable" minOccurs="0" maxOccurs="unbounded"/>
+   <!-- Variabler skall bara finnas paa maskin-nivaa daer alla anses var semiglobala, d vs laesbara fraan andra maskiner-->
+   <!--xs:element ref="Variable" minOccurs="0" maxOccurs="unbounded"/-->
    <xs:element ref="Equipment" minOccurs="0" maxOccurs="1"/>
    <xs:element ref="Machines" minOccurs="1" maxOccurs="1"/>
    </xs:sequence>  
@@ -109,7 +111,7 @@
   <xs:complexType>
    <xs:sequence>
    <xs:element ref="Description" minOccurs="0" maxOccurs="1"/>
-   <xs:element ref="Variable" minOccurs="0" maxOccurs="unbounded"/>
+   <xs:element ref="Variables" minOccurs="0" maxOccurs="1"/>
    <xs:element ref="Equipment" minOccurs="0" maxOccurs="1"/>
    </xs:sequence>  
    <xs:attribute ref="machineType" use="required"/>
@@ -125,16 +127,32 @@
   </xs:complexType>
  </xs:element>
 
+ <xs:element name="Variables">
+  <xs:complexType>
+   <xs:sequence>
+   <xs:element ref="Variable" minOccurs="1" maxOccurs="unbounded"/>
+   </xs:sequence>  
+  </xs:complexType>
+ </xs:element>
+
  <xs:element name="EquipmentEntity">
   <xs:complexType>
    <xs:sequence>
    <xs:element ref="Description" minOccurs="0" maxOccurs="1"/>
-   <xs:element ref="State" minOccurs="1" maxOccurs="unbounded"/>
+   <xs:element ref="States" minOccurs="1" maxOccurs="1"/>
    <xs:element ref="Elements" minOccurs="0" maxOccurs="1"/>
-   <xs:element ref="EquipmentEntity" minOccurs="0" maxOccurs="unbounded"/>
+   <xs:element ref="Equipment" minOccurs="0" maxOccurs="1"/>
    </xs:sequence>  
    <xs:attribute ref="equipmentType" use="required"/>
    <xs:attribute ref="name" use="required"/>
+  </xs:complexType>
+ </xs:element>
+
+ <xs:element name="States">
+  <xs:complexType>
+   <xs:sequence>
+   <xs:element ref="State" minOccurs="1" maxOccurs="unbounded"/>
+   </xs:sequence>  
   </xs:complexType>
  </xs:element>
 
