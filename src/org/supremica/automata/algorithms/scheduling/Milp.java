@@ -704,33 +704,43 @@ public class Milp
 		AutomataSynchronizerExecuter synchronizer = new AutomataSynchronizerExecuter(synchHelper);
 		synchronizer.initialize();
 
+		// UGLY again
 		for (int i=0; i<theAutomata.size(); i++)
 			theAutomata.getAutomatonAt(i).remapStateIndices();
 
+		// The current synchronized state indices, consisting of as well plant 
+		// as specification indices and used to step through the final graph following the 
+		// time schedule (which is needed to build an automaton-schedule)
 		int[] currSynchronizedState = synchHelper.getStateToProcess();
-		str = "";
-		for (int i=0; i<theAutomata.size(); i++)
-			str += currSynchronizedState[i] + " ";
-		logger.info("init_indices = " + str);
-		str = "";
-		for (int i=0; i<theAutomata.size(); i++)
-			str += theAutomata.getAutomatonAt(i).getStateWithIndex(currSynchronizedState[i]).getName() + " ";
-		logger.info("init = " + str);
 
-		int currOptimalTime = Integer.MAX_VALUE;
-		int robotIndex = -1;
+		// Every robot is checked for possible transitions and the one with smallest time value 
+		// is chosen. 
+		int smallestTime = Integer.MAX_VALUE;
+		// The arc that is to be added to the schedule (i.e. the arc corresponding to the smallest allowed time value) is stored
 		Arc currOptimalArc = null;
+		// The index of a robot in the "robots"-variable. Is increased whenever a plant is found
+		int robotIndex = -1;
+
 		for (int i=0; i<theAutomata.size(); i++)
 		{
 			Automaton currRobot = theAutomata.getAutomatonAt(i); 
 
+			// Since the robots are supposed to fire events, the check for the "smallest time event" 
+			// is only done for the plants
 			if (currRobot.isPlant())
 			{
 				robotIndex++;
+
 				State currState = currRobot.getStateWithIndex(currSynchronizedState[i]);
-				int currTime = optimalTimes[robotIndex][currSynchronizedState[i]];
+				
+				
+ 				int currTime = optimalTimes[robotIndex][currSynchronizedState[i]];
+				logger.info("currState = " + currState.getName());
+				logger.info("currStateIndex = " + currState.getIndex());
+
+
 				logger.warn("currSynchronizedState[i] = " + currSynchronizedState[i]);
-				if (currTime <= currOptimalTime)
+				if (currTime <= smallestTime)
 				{
 					for (Iterator<Arc> arcs = currState.outgoingArcsIterator(); arcs.hasNext(); )
 					{
@@ -740,10 +750,10 @@ public class Milp
 						{
 							int nextStateIndex = currArc.getToState().getIndex();
 							
-							if (optimalTimes[robotIndex][nextStateIndex] >= optimalTimes[robotIndex][currSynchronizedState[i]])
+ 							if (optimalTimes[robotIndex][nextStateIndex] >= currTime)
 							{
 								currOptimalArc = currArc;
-								currOptimalTime = currTime;
+								smallestTime = currTime;
 							}
 						}
 					}
@@ -751,7 +761,7 @@ public class Milp
 			}
 		}
 		
-		logger.info("event to add = " + currOptimalArc.getEvent() + " at time " + currOptimalTime);
+		logger.info("event to add = " + currOptimalArc.getEvent() + " at time " + smallestTime);
 		int[] nextSynchronizedState = synchronizer.doTransition(currSynchronizedState, currOptimalArc.getEvent());
 		str = "";
 		for (int i=0; i<theAutomata.size(); i++)
