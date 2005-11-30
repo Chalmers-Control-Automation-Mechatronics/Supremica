@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AOApplication xmlns="AutomationObjects" Name="Kulbana" >
+  <VersionInfo Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2005-11-30" />
+
+</AOApplication>

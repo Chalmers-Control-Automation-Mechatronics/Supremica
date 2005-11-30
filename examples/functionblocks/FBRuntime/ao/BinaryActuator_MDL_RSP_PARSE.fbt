@@ -8,22 +8,21 @@
       </Event>
     </EventInputs>
     <EventOutputs>
-      <Event Name="NEW_SAMPLE" >
-        <With Var="NEW_SAMPLE_ARG" />
+      <Event Name="CURRENT_VALUE" >
+        <With Var="VALUE" />
       </Event>
     </EventOutputs>
     <InputVars>
       <VarDeclaration Name="RSP_ARGS" Type="STRING" />
     </InputVars>
     <OutputVars>
-      <VarDeclaration Name="NEW_SAMPLE_ARG" Type="BOOL" />
+      <VarDeclaration Name="VALUE" Type="BOOL" />
     </OutputVars>
   </InterfaceList>
   <BasicFB>
     <InternalVars>
-	  <VarDeclaration Name="returnToInit" Type="BOOL" />
 	  <VarDeclaration Name="cmdArgs" Type="STRING" />
-	  <VarDeclaration Name="cmd1" Type="BOOL" />
+	  <VarDeclaration Name="cmd" Type="INT" />
 	</InternalVars>
     <ECC>
 	  <ECState Name="INIT" />
@@ -31,30 +30,31 @@
 		<ECAction Algorithm="ParseCmd" />
 	  </ECState>    
       <ECState Name="PARSE_CMD1_ARGS">
-          <ECAction Algorithm="ParseCmd1Args" Output="NEW_SAMPLE" />
+          <ECAction Algorithm="ParseCmd1Args" Output="CURRENT_VALUE" />
 	  </ECState>    
 	  <ECTransition Source="INIT" Destination="PARSE_CMD" Condition="RSP" />
-	  <ECTransition Source="PARSE_CMD" Destination="PARSE_CMD1_ARGS" Condition="cmd1" />
-	  <ECTransition Source="PARSE_CMD" Destination="INIT" Condition="returnToInit" />
+	  <ECTransition Source="PARSE_CMD" Destination="PARSE_CMD1_ARGS" Condition="cmd = 1" />
+	  <ECTransition Source="PARSE_CMD" Destination="INIT" Condition="cmd = 0" />
 	  <ECTransition Source="PARSE_CMD1_ARGS" Destination="INIT" Condition="1" />
     </ECC>
     <Algorithm Name="ParseCmd">
       <Other Language="Java" Text="
 	      cmd = RSP_ARGS.substring(0,RSP_ARGS.indexOf(' '));
-	      if (cmd.toLowerCase().equals(&#34;new_sample&#34;))
+	      if (cmd.toLowerCase().equals(&#34;current_value&#34;))
 		  {
-		    cmd1 = true;
+		    cmd = 1;
 			cmdArgs = RSP_ARGS.substring(RSP_ARGS.indexOf('	') + 1);
 		  }
 		  else
 		  {
-		    returnToInit = true;
+   		    System.out.println(&#34;Sensor_MDL_RSP_PARSE: ParseCmd algorithm: Unknown command received on RSP_ARGS data input!&#34;);
+		    cmd = 0;
 		  }
 	  " />	
     </Algorithm>
     <Algorithm Name="ParseCmd1Args">
       <Other Language="Java" Text="
-	    NEW_SAMPLE_ARG = (new Boolean(cmdArgs)).booleanValue();
+	    VALUE = (new Boolean(cmdArgs)).booleanValue();
 	  " />	
     </Algorithm>
   </BasicFB>

@@ -4,31 +4,29 @@
 
   <ModelType Name="BinaryPassiveSensor" FBType="Sensor_MDL.fbt" >
     <Request Name="CURRENT_VALUE" />
-
 	<Response Name="CURRENT_VALUE">
 	  <Argument Name="VALUE" Type="BOOL" />
 	</Response>
-
 	<Backend>
 	  <EventInputs>
 	    <Event Name="NEW_SAMPLE" >
           <With Var="VALUE" />
         </Event>
 	  </EventInputs>
+	  <InputVars>
+	    <VarDeclaration Name="VALUE" Type="BOOL" />
+	  </InputVars>
 	</Backend>
   </ModelType>
 
-  <ControllerType Name="PassThroughController" FBType="PassThrough_CTL" />
-
   <ViewType Name="EdgeDetectingView" FBType="EdgeDetect_VIEW" >
-    <WithController Name="PassThroughtController">
-
+    <WithModelType Name="BinaryPassiveSensor"/>
 	<Frontend>
 	  <EventOutputs>
 	    <Event Name="RISING_EDGE" />
         <Event Name="FALLING_EDGE" />
-	  </EventInputs>
-	</Backend>
-  <ViewType>
+	  </EventOutputs>
+	</Frontend>
+  </ViewType>
 
 </AOType>

@@ -8,11 +8,11 @@
 	attributeFormDefault="unqualified"
 	version="1.0">  
 	
-<xsd:annotation>
-	<xsd:appinfo>
-		<jaxb:globalBindings generateIsSetMethod="true"/>
-	</xsd:appinfo>
-</xsd:annotation>
+ <xsd:annotation>
+  <xsd:appinfo>
+	<jaxb:globalBindings generateIsSetMethod="true"/>
+  </xsd:appinfo>
+ </xsd:annotation>
 
  <xsd:element name='Identification'>
   <xsd:complexType>

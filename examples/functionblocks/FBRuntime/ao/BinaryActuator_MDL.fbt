@@ -6,6 +6,7 @@
       <Event Name="AO_REQ" Type="AO_EVENT" >
         <With Var="AO_REQ_ARGS" />
       </Event>
+      <Event Name="WRITE_DONE" />
     </EventInputs>
     <EventOutputs>
       <Event Name="AO_RSP" Type="AO_EVENT" >
@@ -14,7 +15,6 @@
       <Event Name="WRITE" >
         <With Var="VALUE" />
       </Event>
-      <Event Name="WRITE_DONE" />
     </EventOutputs>
     <InputVars>
       <VarDeclaration Name="AO_REQ_ARGS" Type="STRING" />

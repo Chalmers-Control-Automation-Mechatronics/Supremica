@@ -16,279 +16,321 @@
 	</xsd:appinfo>
   </xsd:annotation>
 
- <xsd:element name='VersionInfo'>
+ <xsd:element name="VersionInfo">
   <xsd:complexType>
-   <xsd:attribute name='Organization' type='xsd:string' use='required'/>
-   <xsd:attribute name='Version' type='xsd:string' use='required'/>
-   <xsd:attribute name='Author' type='xsd:string' use='required'/>
-   <xsd:attribute name='Date' type='xsd:string' use='required'/>
-   <xsd:attribute name='Remarks' type='xsd:string' use='optional'/>
+   <xsd:attribute name="Organization" type="xsd:string" use="required"/>
+   <xsd:attribute name="Version" type="xsd:string" use="required"/>
+   <xsd:attribute name="Author" type="xsd:string" use="required"/>
+   <xsd:attribute name="Date" type="xsd:string" use="required"/>
+   <xsd:attribute name="Remarks" type="xsd:string" use="optional"/>
   </xsd:complexType>
  </xsd:element>
 
- <xsd:element name='Application'>
+
+
+
+ <xsd:element name="AOApplication">
   <xsd:complexType>
    <xsd:sequence>
-    <xsd:element ref='AOInstance' minOccurs='0' maxOccurs='unbounded'/>
-    <xsd:element ref='EventConnections' minOccurs='0' maxOccurs='1'/>
-    <xsd:element ref='DataConnections' minOccurs='0' maxOccurs='1'/>
+    <xsd:element ref="AO" minOccurs="0" maxOccurs="unbounded"/>
+    <xsd:element ref="EventConnections" minOccurs="0" maxOccurs="1"/>
+    <xsd:element ref="DataConnections" minOccurs="0" maxOccurs="1"/>
    </xsd:sequence>
   </xsd:complexType>
  </xsd:element>
 
- <xsd:element name='AOType'>
+
+
+
+ <xsd:element name="AOType">
   <xsd:complexType>
    <xsd:sequence>
-    <xsd:element ref='VersionInfo' maxOccurs='unbounded'/>
-    <xsd:element ref='ModelType' maxOccurs='unbounded'/>
-    <xsd:element ref='ControllerType' maxOccurs='unbounded'/>
-    <xsd:element ref='ViewType' maxOccurs='unbounded'/>
-    <xsd:element ref='ServiceType' minOccurs='0' maxOccurs='unbounded'/>
+    <xsd:element ref="VersionInfo" maxOccurs="unbounded"/>
+    <xsd:element ref="ModelType" maxOccurs="unbounded"/>
+    <xsd:element ref="ControllerType" maxOccurs="unbounded"/>
+    <xsd:element ref="ViewType" maxOccurs="unbounded"/>
+    <xsd:element ref="ServiceType" minOccurs="0" maxOccurs="unbounded"/>
    </xsd:sequence>
-   <xsd:attribute name='Name' type='xsd:string' use='required'/>
-   <xsd:attribute name='Comment' type='xsd:string' use='optional'/>
+   <xsd:attribute name="Name" type="xsd:string" use="required"/>
+   <xsd:attribute name="Comment" type="xsd:string" use="optional"/>
   </xsd:complexType>
  </xsd:element>
 
- <xsd:element name='AOInstance'>
+ <xsd:element name="AO">
   <xsd:complexType>
+   <xsd:annotation>
+    <xsd:appinfo>
+     <jaxb:class name="AOComplexType"/>
+    </xsd:appinfo>
+   </xsd:annotation>  
    <xsd:sequence>
-    <xsd:element ref='ServiceInstance' minOccurs='0' maxOccurs='unbounded'/>
-    <xsd:element ref='ViewInstance' minOccurs='0' maxOccurs='unbounded'/>
-    <xsd:element ref='ModelInstance' minOccurs='0' maxOccurs='1'/>
+    <xsd:element ref="Service" minOccurs="0" maxOccurs="unbounded"/>
+    <xsd:element ref="View" minOccurs="0" maxOccurs="unbounded"/>
+    <xsd:element ref="Controller" maxOccurs="1"/>
+    <xsd:element ref="Model" maxOccurs="1"/>
    </xsd:sequence>
-   <xsd:attribute name='Name' type='xsd:string' use='required'/>
-   <xsd:attribute name='Type' type='xsd:string' use='required'/>
-   <xsd:attribute name='Comment' type='xsd:string' use='optional'/>
+   <xsd:attribute name="Name" type="xsd:string" use="required"/>
+   <xsd:attribute name="Type" type="xsd:string" use="required"/>
+   <xsd:attribute name="Comment" type="xsd:string" use="optional"/>
   </xsd:complexType>
  </xsd:element>
 
- <xsd:element name='ModelType'>
+ <xsd:element name="ModelType">
   <xsd:complexType>
    <xsd:sequence>
-    <xsd:element ref='Request' minOccurs='0' maxOccurs='unbounded'/>
-    <xsd:element ref='Response' minOccurs='0' maxOccurs='unbounded'/>
-    <xsd:element ref='Backend' minOccurs='0' maxOccurs='1'/>
+    <xsd:element ref="Request" minOccurs="0" maxOccurs="unbounded"/>
+    <xsd:element ref="Response" minOccurs="0" maxOccurs="unbounded"/>
+    <xsd:element ref="Backend" minOccurs="0" maxOccurs="1"/>
    </xsd:sequence>
-   <xsd:attribute name='Name' type='xsd:string' use='required'/>
-   <xsd:attribute name='FBType' type='xsd:string' use='required'/>
-   <xsd:attribute name='Comment' type='xsd:string' use='optional'/>
+   <xsd:attribute name="Name" type="xsd:string" use="required"/>
+   <xsd:attribute name="FBType" type="xsd:string" use="required"/>
+   <xsd:attribute name="Comment" type="xsd:string" use="optional"/>
   </xsd:complexType>
  </xsd:element>
 
- <xsd:element name='ModelInstance'>
+ <xsd:element name="Model">
   <xsd:complexType>
-   <xsd:attribute name='Name' type='xsd:string' use='required'/>
-   <xsd:attribute name='Type' type='xsd:string' use='required'/>
-   <xsd:attribute name='Comment' type='xsd:string' use='optional'/>
+   <xsd:annotation>
+    <xsd:appinfo>
+     <jaxb:class name="ModelComplexType"/>
+    </xsd:appinfo>
+   </xsd:annotation>  
+   <xsd:attribute name="Name" type="xsd:string" use="required"/>
+   <xsd:attribute name="Type" type="xsd:string" use="required"/>
+   <xsd:attribute name="Comment" type="xsd:string" use="optional"/>
   </xsd:complexType>
  </xsd:element>
 
- <xsd:element name='ControllerType'>
+ <xsd:element name="ControllerType">
   <xsd:complexType>
    <xsd:sequence>
-    <xsd:element ref='Request' minOccurs='0' maxOccurs='unbounded'/>
-    <xsd:element ref='Response' minOccurs='0' maxOccurs='unbounded'/>
-    <xsd:element ref='WithModel' minOccurs='0' maxOccurs='unbounded'/>
+    <xsd:element ref="Request" minOccurs="0" maxOccurs="unbounded"/>
+    <xsd:element ref="Response" minOccurs="0" maxOccurs="unbounded"/>
+    <xsd:element ref="WithModelType" maxOccurs="unbounded"/>
    </xsd:sequence>
-   <xsd:attribute name='Name' type='xsd:string' use='required'/>
-   <xsd:attribute name='FBType' type='xsd:string' use='required'/>
-   <xsd:attribute name='Comment' type='xsd:string' use='optional'/>
+   <xsd:attribute name="Name" type="xsd:string" use="required"/>
+   <xsd:attribute name="FBType" type="xsd:string" use="required"/>
+   <xsd:attribute name="Comment" type="xsd:string" use="optional"/>
   </xsd:complexType>
  </xsd:element>
 
- <xsd:element name='ViewType'>
+ <xsd:element name="Controller">
+  <xsd:complexType>
+   <xsd:annotation>
+    <xsd:appinfo>
+     <jaxb:class name="ControllerComplexType"/>
+    </xsd:appinfo>
+   </xsd:annotation>  
+   <xsd:attribute name="Name" type="xsd:string" use="required"/>
+   <xsd:attribute name="Type" type="xsd:string" use="required"/>
+   <xsd:attribute name="Comment" type="xsd:string" use="optional"/>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name="ViewType">
   <xsd:complexType>
    <xsd:sequence>
-    <xsd:element ref='WithController' minOccurs='1' maxOccurs='unbounded'/>
-    <xsd:element ref='Frontend' minOccurs='0' maxOccurs='1'/>
+    <xsd:element ref="WithControllerType" minOccurs="0" maxOccurs="unbounded"/>
+    <xsd:element ref="WithModelType" minOccurs="0" maxOccurs="unbounded"/>
+    <xsd:element ref="Frontend" minOccurs="0" maxOccurs="1"/>
    </xsd:sequence>
-   <xsd:attribute name='Name' type='xsd:string' use='required'/>
-   <xsd:attribute name='FBType' type='xsd:string' use='required'/>
-   <xsd:attribute name='Comment' type='xsd:string' use='optional'/>
+   <xsd:attribute name="Name" type="xsd:string" use="required"/>
+   <xsd:attribute name="FBType" type="xsd:string" use="required"/>
+   <xsd:attribute name="Comment" type="xsd:string" use="optional"/>
   </xsd:complexType>
  </xsd:element>
 
- <xsd:element name='ViewInstance'>
+ <xsd:element name="View">
   <xsd:complexType>
-   <xsd:attribute name='Name' type='xsd:string' use='required'/>
-   <xsd:attribute name='Type' type='xsd:string' use='required'/>
-   <xsd:attribute name='Comment' type='xsd:string' use='optional'/>
+   <xsd:annotation>
+    <xsd:appinfo>
+     <jaxb:class name="ViewComplexType"/>
+    </xsd:appinfo>
+   </xsd:annotation>  
+   <xsd:attribute name="Name" type="xsd:string" use="required"/>
+   <xsd:attribute name="Type" type="xsd:string" use="required"/>
+   <xsd:attribute name="Comment" type="xsd:string" use="optional"/>
   </xsd:complexType>
  </xsd:element>
 
- <xsd:element name='ServiceType'>
+ <xsd:element name="ServiceType">
   <xsd:complexType>
    <xsd:sequence>
-    <xsd:element ref='UsesView' minOccurs='1' maxOccurs='unbounded'/>
+    <xsd:element ref="View" maxOccurs="unbounded"/>
    </xsd:sequence>
-   <xsd:attribute name='Name' type='xsd:string' use='required'/>
-   <xsd:attribute name='Comment' type='xsd:string' use='optional'/>
+   <xsd:attribute name="Name" type="xsd:string" use="required"/>
+   <xsd:attribute name="Comment" type="xsd:string" use="optional"/>
   </xsd:complexType>
  </xsd:element>
 
- <!--
-   View instance is used only for naming of the view
-   instances of the service instance individually. If not
-   used automatic names will be given based on the name of
-   the service instance.
- -->
- <xsd:element name='ServiceInstance'>
+ <xsd:element name="Service">
+  <xsd:complexType>
+   <xsd:annotation>
+    <xsd:appinfo>
+     <jaxb:class name="ServiceComplexType"/>
+    </xsd:appinfo>
+   </xsd:annotation>  
+   <xsd:attribute name="Name" type="xsd:string" use="required"/>
+   <xsd:attribute name="Type" type="xsd:string" use="required"/>
+   <xsd:attribute name="Comment" type="xsd:string" use="optional"/>
+  </xsd:complexType>
+ </xsd:element>
+
+
+
+
+
+
+ <xsd:element name="Request">
   <xsd:complexType>
    <xsd:sequence>
-    <xsd:element ref='ViewInstance' minOccurs='0' maxOccurs='unbounded'/>
+    <xsd:element ref="Argument" minOccurs="0" maxOccurs="unbounded"/>
    </xsd:sequence>
-   <xsd:attribute name='Name' type='xsd:string' use='required'/>
-   <xsd:attribute name='Type' type='xsd:string' use='required'/>
-   <xsd:attribute name='Comment' type='xsd:string' use='optional'/>
+   <xsd:attribute name="Name" type="xsd:string" use="required"/>
   </xsd:complexType>
  </xsd:element>
 
- <xsd:element name='Request'>
+ <xsd:element name="Response">
   <xsd:complexType>
    <xsd:sequence>
-    <xsd:element ref='Argument' minOccurs='0' maxOccurs='unbounded'/>
+    <xsd:element ref="Argument" minOccurs="0" maxOccurs="unbounded"/>
    </xsd:sequence>
-   <xsd:attribute name='Name' type='xsd:string' use='required'/>
+   <xsd:attribute name="Name" type="xsd:string" use="required"/>
   </xsd:complexType>
  </xsd:element>
 
- <xsd:element name='Response'>
+ <xsd:element name="Argument">
+  <xsd:complexType>
+   <xsd:attribute name="Name" type="xsd:string" use="required"/>
+   <xsd:attribute name="Type" type="xsd:string" use="required"/>
+  </xsd:complexType>
+ </xsd:element>
+
+
+
+
+
+ <xsd:element name="WithModel">
+  <xsd:complexType>
+   <xsd:attribute name="Name" type="xsd:string" use="required"/>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name="WithController">
+  <xsd:complexType>
+   <xsd:attribute name="Name" type="xsd:string" use="required"/>
+  </xsd:complexType>
+ </xsd:element>
+
+
+
+
+ <xsd:element name="Backend">
   <xsd:complexType>
    <xsd:sequence>
-    <xsd:element ref='Argument' minOccurs='0' maxOccurs='unbounded'/>
-   </xsd:sequence>
-   <xsd:attribute name='Name' type='xsd:string' use='required'/>
-  </xsd:complexType>
- </xsd:element>
-
- <xsd:element name='Argument'>
-  <xsd:complexType>
-   <xsd:attribute name='Name' type='xsd:string' use='required'/>
-   <xsd:attribute name='Type' type='xsd:string' use='required'/>
-  </xsd:complexType>
- </xsd:element>
-
- <xsd:element name='WithModel'>
-  <xsd:complexType>
-   <xsd:attribute name='Name' type='xsd:string' use='required'/>
-  </xsd:complexType>
- </xsd:element>
-
- <xsd:element name='WithController'>
-  <xsd:complexType>
-   <xsd:attribute name='Name' type='xsd:string' use='required'/>
-  </xsd:complexType>
- </xsd:element>
-
- <xsd:element name='UsesView'>
-  <xsd:complexType>
-   <xsd:attribute name='Name' type='xsd:string' use='required'/>
-  </xsd:complexType>
- </xsd:element>
-
- <xsd:element name='Backend'>
-  <xsd:complexType>
-   <xsd:sequence>
-    <xsd:element ref='EventInputs' minOccurs='0' maxOccurs='1'/>
-    <xsd:element ref='EventOutputs' minOccurs='0' maxOccurs='1'/>
-    <xsd:element ref='InputVars' minOccurs='0' maxOccurs='1'/>
-    <xsd:element ref='OutputVars' minOccurs='0' maxOccurs='1'/>
-   </xsd:sequence>
-  </xsd:complexType>
- </xsd:element>
-
- <xsd:element name='Frontend'>
-  <xsd:complexType>
-   <xsd:sequence>
-    <xsd:element ref='EventInputs' minOccurs='0' maxOccurs='1'/>
-    <xsd:element ref='EventOutputs' minOccurs='0' maxOccurs='1'/>
-    <xsd:element ref='InputVars' minOccurs='0' maxOccurs='1'/>
-    <xsd:element ref='OutputVars' minOccurs='0' maxOccurs='1'/>
-   </xsd:sequence>
-  </xsd:complexType>
- </xsd:element>
-
- <xsd:element name='EventConnections'>
-  <xsd:complexType>
-   <xsd:sequence>
-    <xsd:element ref='Connection' maxOccurs='unbounded'/>
-   </xsd:sequence>
-  </xsd:complexType>
- </xsd:element>
-
- <xsd:element name='DataConnections'>
-  <xsd:complexType>
-   <xsd:sequence>
-    <xsd:element ref='Connection' maxOccurs='unbounded'/>
-   </xsd:sequence>
-  </xsd:complexType>
- </xsd:element>
-
- <xsd:element name='Connection'>
-  <xsd:complexType>
-   <xsd:attribute name='Source' type='xsd:string' use='required'/>
-   <xsd:attribute name='Destination' type='xsd:string' use='required'/>
-   <xsd:attribute name='Comment' type='xsd:string' use='optional'/>
-  </xsd:complexType>
- </xsd:element>
-
- <xsd:element name='EventInputs'>
-  <xsd:complexType>
-   <xsd:sequence>
-    <xsd:element ref='Event' maxOccurs='unbounded'/>
+    <xsd:element ref="EventInputs" minOccurs="0" maxOccurs="1"/>
+    <xsd:element ref="EventOutputs" minOccurs="0" maxOccurs="1"/>
+    <xsd:element ref="InputVars" minOccurs="0" maxOccurs="1"/>
+    <xsd:element ref="OutputVars" minOccurs="0" maxOccurs="1"/>
    </xsd:sequence>
   </xsd:complexType>
  </xsd:element>
 
- <xsd:element name='EventOutputs'>
+ <xsd:element name="Frontend">
   <xsd:complexType>
    <xsd:sequence>
-    <xsd:element ref='Event' maxOccurs='unbounded'/>
+    <xsd:element ref="EventInputs" minOccurs="0" maxOccurs="1"/>
+    <xsd:element ref="EventOutputs" minOccurs="0" maxOccurs="1"/>
+    <xsd:element ref="InputVars" minOccurs="0" maxOccurs="1"/>
+    <xsd:element ref="OutputVars" minOccurs="0" maxOccurs="1"/>
    </xsd:sequence>
   </xsd:complexType>
  </xsd:element>
 
- <xsd:element name='InputVars'>
+
+
+
+
+ <xsd:element name="EventConnections">
   <xsd:complexType>
    <xsd:sequence>
-    <xsd:element ref='VarDeclaration' maxOccurs='unbounded'/>
+    <xsd:element ref="Connection" maxOccurs="unbounded"/>
    </xsd:sequence>
   </xsd:complexType>
  </xsd:element>
 
- <xsd:element name='OutputVars'>
+ <xsd:element name="DataConnections">
   <xsd:complexType>
    <xsd:sequence>
-    <xsd:element ref='VarDeclaration' maxOccurs='unbounded'/>
+    <xsd:element ref="Connection" maxOccurs="unbounded"/>
    </xsd:sequence>
   </xsd:complexType>
  </xsd:element>
 
- <xsd:element name='Event'>
+ <xsd:element name="Connection">
+  <xsd:complexType>
+   <xsd:attribute name="Source" type="xsd:string" use="required"/>
+   <xsd:attribute name="Destination" type="xsd:string" use="required"/>
+   <xsd:attribute name="Comment" type="xsd:string" use="optional"/>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name="EventInputs">
   <xsd:complexType>
    <xsd:sequence>
-    <xsd:element ref='With' minOccurs='0' maxOccurs='unbounded'/>
+    <xsd:element ref="Event" maxOccurs="unbounded"/>
    </xsd:sequence>
-   <xsd:attribute name='Name' type='xsd:string' use='required'/>
-   <xsd:attribute name='Type' type='xsd:string' use='optional'/>
-   <xsd:attribute name='Comment' type='xsd:string' use='optional'/>
   </xsd:complexType>
  </xsd:element>
 
- <xsd:element name='With'>
+ <xsd:element name="EventOutputs">
   <xsd:complexType>
-   <xsd:attribute name='Var' type='xsd:string' use='required'/>
+   <xsd:sequence>
+    <xsd:element ref="Event" maxOccurs="unbounded"/>
+   </xsd:sequence>
   </xsd:complexType>
  </xsd:element>
 
- <xsd:element name='VarDeclaration'>
+ <xsd:element name="InputVars">
   <xsd:complexType>
-   <xsd:attribute name='Name' type='xsd:string' use='required'/>
-   <xsd:attribute name='Type' type='xsd:string' use='required'/>
-   <xsd:attribute name='ArraySize' type='xsd:int' use='optional'/>
-   <xsd:attribute name='InitialValue' type='xsd:string' use='optional'/>
-   <xsd:attribute name='Comment' type='xsd:string' use='optional'/>
+   <xsd:sequence>
+    <xsd:element ref="VarDeclaration" maxOccurs="unbounded"/>
+   </xsd:sequence>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name="OutputVars">
+  <xsd:complexType>
+   <xsd:sequence>
+    <xsd:element ref="VarDeclaration" maxOccurs="unbounded"/>
+   </xsd:sequence>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name="Event">
+  <xsd:complexType>
+   <xsd:sequence>
+    <xsd:element ref="With" minOccurs="0" maxOccurs="unbounded"/>
+   </xsd:sequence>
+   <xsd:attribute name="Name" type="xsd:string" use="required"/>
+   <xsd:attribute name="Type" type="xsd:string" use="optional"/>
+   <xsd:attribute name="Comment" type="xsd:string" use="optional"/>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name="With">
+  <xsd:complexType>
+   <xsd:attribute name="Var" type="xsd:string" use="required"/>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name="VarDeclaration">
+  <xsd:complexType>
+   <xsd:attribute name="Name" type="xsd:string" use="required"/>
+   <xsd:attribute name="Type" type="xsd:string" use="required"/>
+   <xsd:attribute name="ArraySize" type="xsd:int" use="optional"/>
+   <xsd:attribute name="InitialValue" type="xsd:string" use="optional"/>
+   <xsd:attribute name="Comment" type="xsd:string" use="optional"/>
   </xsd:complexType>
  </xsd:element>
 
