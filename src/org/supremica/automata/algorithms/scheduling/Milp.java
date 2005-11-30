@@ -29,52 +29,159 @@ public class Milp
 	/** The *.sol file that stores the solution, i.e. the output of the Glpk-solver */
 	private File solutionFile;
 
+	/** The optimal times (for each robotstate) that the MILP solver returns */
+	private int[][] optimalTimes = null;
+
 	private Process milpProcess;
 
 	public Milp(Automata theAutomata) 
 		throws Exception
 	{
-		// SÅ SKALL DET VARA NÄR ALLTING ÄR KLART (OM), MEN NU... FÖR ATT UNDERLÄTTA...
-// 		modelFile = File.createTempFile("milp", ".mod");
-// 		modelFile.deleteOnExit();
-
-// 		solutionFile = File.createTempFile("milp", ".sol");
-// 		solutionFile.deleteOnExit();
-
-		// ... SÅ HÄR ISTÄLLET...
-		modelFile = new File("C:\\avenir\\progg\\milp.mod");
-		solutionFile = new File("C:\\avenir\\progg\\milp.sol");
-		modelFile.createNewFile();
-		solutionFile.createNewFile();
-
-		initAutomata(theAutomata);
-		initMutexStates();
-
-		convertXmlToMod();
-
-		//		new GlpkBridge().bridge("temp");
-		callGlpk();
-
-		convertSolToXml();
+		this.theAutomata = theAutomata;
 	}
 
-	public int[] schedule()
+	public void schedule()
 		throws Exception
 	{
-		if (scheduleInfo == null)
-			throw new Exception("ScheduleInfo is empty. Something must have gone wrong during optimization.....");
+		try 
+		{
+			// SÅ SKALL DET VARA NÄR ALLTING ÄR KLART (OM), MEN NU... FÖR ATT UNDERLÄTTA...
+			// 		modelFile = File.createTempFile("milp", ".mod");
+			// 		modelFile.deleteOnExit();
 			
-		return scheduleInfo.last();
+			// 		solutionFile = File.createTempFile("milp", ".sol");
+			// 		solutionFile.deleteOnExit();
+			
+			// ... SÅ HÄR ISTÄLLET...
+			modelFile = new File("C:\\avenir\\progg\\milp.mod");
+			solutionFile = new File("C:\\avenir\\progg\\milp.sol");
+			modelFile.createNewFile();
+			solutionFile.createNewFile();
+
+			initAutomata(theAutomata);
+			initMutexStates();
+
+			convertXmlToMod();
+
+			callGlpk();
+
+			processSolutionFile();
+		}
+		catch (Exception e)
+		{
+			logger.error("Milp::schedule() -> " + e);
+			logger.debug(e.getStackTrace());
+		}
+		// if (scheduleInfo == null)
+// 			throw new Exception("ScheduleInfo is empty. Something must have gone wrong during optimization.....");
+			
+// 		return scheduleInfo.last();
 	}
 
-	public Automaton buildScheduleAutomaton(int[] markedNode) 
+	public Automaton buildScheduleAutomaton() 
 		throws Exception
 	{
-		if (scheduleInfo == null)
-			throw new Exception("ScheduleInfo is empty. Something must have gone wrong during optimization.....");
+// 		if (scheduleInfo == null)
+// 			throw new Exception("ScheduleInfo is empty. Something must have gone wrong during optimization.....");
 		
 		Automaton schedule = new Automaton();
 		schedule.setComment("Schedule");
+
+		// UGLY - why not initialize() in the corresponding constructors?
+		AutomataSynchronizerHelper synchHelper = new AutomataSynchronizerHelper(theAutomata, new SynchronizationOptions());
+		synchHelper.initialize();
+		AutomataSynchronizerExecuter synchronizer = new AutomataSynchronizerExecuter(synchHelper);
+		synchronizer.initialize();
+
+		// UGLY again
+		for (int i=0; i<theAutomata.size(); i++)
+			theAutomata.getAutomatonAt(i).remapStateIndices();
+
+		// The current synchronized state indices, consisting of as well plant 
+		// as specification indices and used to step through the final graph following the 
+		// time schedule (which is needed to build the schedule automaton)
+		int[] currSynchronizedState = synchHelper.getStateToProcess();
+
+		// The first set of state indices correspond to the initial state of the composed automaton.
+		// They are thus used to construct the initial state of the schedule automaton.
+		String initialStateName = "[";
+		for (int i=0; i<theAutomata.size() - 1; i++)
+		{
+			initialStateName += theAutomata.getAutomatonAt(i).getStateWithIndex(currSynchronizedState[i]).getName() + ".";
+		}
+		initialStateName += theAutomata.getAutomatonAt(theAutomata.size()-1).getStateWithIndex(currSynchronizedState[theAutomata.size()-1]).getName() + "]";
+
+		State currScheduleState = new State(initialStateName);
+		currScheduleState.setInitial(true);
+		schedule.addState(currScheduleState);
+
+		// Every robot is checked for possible transitions and the one with smallest time value 
+		// is chosen. 
+		int smallestTime = Integer.MAX_VALUE;
+		// The arc that is to be added to the schedule (i.e. the arc corresponding to the smallest allowed time value) is stored
+		Arc currOptimalArc = null;
+		// The index of a robot in the "robots"-variable. Is increased whenever a plant is found
+		int robotIndex = -1;
+
+		for (int i=0; i<theAutomata.size(); i++)
+		{
+			Automaton currRobot = theAutomata.getAutomatonAt(i); 
+
+			// Since the robots are supposed to fire events, the check for the "smallest time event" 
+			// is only done for the plants
+			if (currRobot.isPlant())
+			{
+				robotIndex++;
+
+				State currState = currRobot.getStateWithIndex(currSynchronizedState[i]);
+				
+				
+ 				int currTime = optimalTimes[robotIndex][currSynchronizedState[i]];
+				logger.info("currState = " + currState.getName());
+				logger.info("currStateIndex = " + currState.getIndex());
+
+
+				logger.warn("currSynchronizedState[i] = " + currSynchronizedState[i]);
+				if (currTime <= smallestTime)
+				{
+					for (Iterator<Arc> arcs = currState.outgoingArcsIterator(); arcs.hasNext(); )
+					{
+						Arc currArc = arcs.next();
+						
+						if (synchronizer.isEnabled(currArc.getEvent()))
+						{
+							int nextStateIndex = currArc.getToState().getIndex();
+							
+							// If the next node has lower time value, then it cannot belong 
+							// to the optimal path, since precedence constraints are not fulfilled
+							// Otherwise, this could be the path
+ 							if (optimalTimes[robotIndex][nextStateIndex] >= currTime)
+							{
+								currOptimalArc = currArc;
+								smallestTime = currTime;
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		if (currScheduleState.isInitial())
+		{
+			currScheduleState.setName(currScheduleState.getName() + "  firing_time = " + smallestTime);
+		}
+
+		logger.info("event to add = " + currOptimalArc.getEvent() + " at time " + smallestTime);
+		String str = "";
+		for (int i=0; i<theAutomata.size(); i++)
+			str += theAutomata.getAutomatonAt(i).getStateWithIndex(currSynchronizedState[i]).getName() + " ";
+		logger.info("fromState = " + str);
+		int[] nextSynchronizedState = synchronizer.doTransition(currSynchronizedState, currOptimalArc.getEvent());
+		str = "";
+		for (int i=0; i<theAutomata.size(); i++)
+			str += theAutomata.getAutomatonAt(i).getStateWithIndex(nextSynchronizedState[i]).getName() + " ";
+		logger.info("toState = " + str);
+
 
 // 		// Tillf 
 // 		int counter = 0;
@@ -90,17 +197,13 @@ public class Milp
 
 
 		// TILLF - FLUM
-		State trailState = new State("INITIAL");
-		trailState.setInitial(true);
-		schedule.addState(trailState);
-
 		State accState = new State("ACCEPTING");
 		accState.setAccepting(true);
 		schedule.addState(accState);
 
 		LabeledEvent event = new LabeledEvent("42");
 		schedule.getAlphabet().addEvent(event);
-		schedule.addArc(new Arc(trailState, accState, event));
+		schedule.addArc(new Arc(currScheduleState, accState, event));
 
 		logger.info("TOTAL CYCLE TIME: " + makespan + ".............................");
 
@@ -668,10 +771,10 @@ public class Milp
 		w.flush();
 	}
 
-	private void convertSolToXml()
+	private void processSolutionFile()
 		throws Exception
 	{
-		int[][] optimalTimes = new int[robots.size()][];
+		optimalTimes = new int[robots.size()][];
 
 		for (int i=0; i<optimalTimes.length; i++)
 			optimalTimes[i] = new int[robots.getAutomatonAt(i).nbrOfStates()];
@@ -697,83 +800,9 @@ public class Milp
 
 			str = r.readLine();
 		}
-
-		// UGLY - why not initialize() in the corresponding constructors?
-		AutomataSynchronizerHelper synchHelper = new AutomataSynchronizerHelper(theAutomata, new SynchronizationOptions());
-		synchHelper.initialize();
-		AutomataSynchronizerExecuter synchronizer = new AutomataSynchronizerExecuter(synchHelper);
-		synchronizer.initialize();
-
-		// UGLY again
-		for (int i=0; i<theAutomata.size(); i++)
-			theAutomata.getAutomatonAt(i).remapStateIndices();
-
-		// The current synchronized state indices, consisting of as well plant 
-		// as specification indices and used to step through the final graph following the 
-		// time schedule (which is needed to build an automaton-schedule)
-		int[] currSynchronizedState = synchHelper.getStateToProcess();
-
-		// Every robot is checked for possible transitions and the one with smallest time value 
-		// is chosen. 
-		int smallestTime = Integer.MAX_VALUE;
-		// The arc that is to be added to the schedule (i.e. the arc corresponding to the smallest allowed time value) is stored
-		Arc currOptimalArc = null;
-		// The index of a robot in the "robots"-variable. Is increased whenever a plant is found
-		int robotIndex = -1;
-
-		for (int i=0; i<theAutomata.size(); i++)
-		{
-			Automaton currRobot = theAutomata.getAutomatonAt(i); 
-
-			// Since the robots are supposed to fire events, the check for the "smallest time event" 
-			// is only done for the plants
-			if (currRobot.isPlant())
-			{
-				robotIndex++;
-
-				State currState = currRobot.getStateWithIndex(currSynchronizedState[i]);
-				
-				
- 				int currTime = optimalTimes[robotIndex][currSynchronizedState[i]];
-				logger.info("currState = " + currState.getName());
-				logger.info("currStateIndex = " + currState.getIndex());
-
-
-				logger.warn("currSynchronizedState[i] = " + currSynchronizedState[i]);
-				if (currTime <= smallestTime)
-				{
-					for (Iterator<Arc> arcs = currState.outgoingArcsIterator(); arcs.hasNext(); )
-					{
-						Arc currArc = arcs.next();
-						
-						if (synchronizer.isEnabled(currArc.getEvent()))
-						{
-							int nextStateIndex = currArc.getToState().getIndex();
-							
- 							if (optimalTimes[robotIndex][nextStateIndex] >= currTime)
-							{
-								currOptimalArc = currArc;
-								smallestTime = currTime;
-							}
-						}
-					}
-				}
-			}
-		}
-		
-		logger.info("event to add = " + currOptimalArc.getEvent() + " at time " + smallestTime);
-		int[] nextSynchronizedState = synchronizer.doTransition(currSynchronizedState, currOptimalArc.getEvent());
-		str = "";
-		for (int i=0; i<theAutomata.size(); i++)
-			str += theAutomata.getAutomatonAt(i).getStateWithIndex(currSynchronizedState[i]).getName() + " ";
-		logger.info("fromState = " + str);
-		str = "";
-		for (int i=0; i<theAutomata.size(); i++)
-			str += theAutomata.getAutomatonAt(i).getStateWithIndex(nextSynchronizedState[i]).getName() + " ";
-		logger.info("toState = " + str);
 	}
 	
-// 	private void convertSolToXml()
+// 	private void processSolutionFile()
 // 		throws Exception
 // 	{
 // // 		scheduleInfo = new TreeSet<int[]>(new CostComparator(robots));

@@ -144,11 +144,11 @@ public class ScheduleDialog
 				throw new Exception("Unknown optimization method");
 
 
-			int[] acceptingNode = sched.schedule();
-			
+			sched.schedule();
+						
 			if (buildAutomaton.isSelected()) 
 			{
-				Automaton schedule = sched.buildScheduleAutomaton(acceptingNode);
+				Automaton schedule = sched.buildScheduleAutomaton();
 				ActionMan.getGui().addAutomaton(schedule);	
 			}
 		}

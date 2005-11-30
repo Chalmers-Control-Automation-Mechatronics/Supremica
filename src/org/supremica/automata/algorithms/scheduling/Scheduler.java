@@ -5,10 +5,10 @@ import org.supremica.automata.Automaton;
 public interface Scheduler
 {
 	/** Returns the representation of a marked state in an optimal schedule automaton. */
-	public int[] schedule()
+	public void schedule()
 		throws Exception;
 
 	/** Builds up an optimal schedule automaton from its marked state representation. */
-	public Automaton buildScheduleAutomaton(int[] node)
+	public Automaton buildScheduleAutomaton()
 		throws Exception;
 }

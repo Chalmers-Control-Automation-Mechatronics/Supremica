@@ -131,6 +131,8 @@ public abstract class AbstractAstar
 	 */
 	private static Logger logger = LoggerFactory.createLogger(AbstractAstar.class);
 
+	/** Stores the accepting node of the resulting schedule (with a reference to the ancestor node. */
+	private int[] acceptingNode = null;
 
 	/****************************************************************************************/
 	/*                                 ABSTRACT METHODS                                     */
@@ -248,7 +250,7 @@ public abstract class AbstractAstar
     /**
      *      Walks through the tree of possible paths in search for the optimal one.
      */
-    public int[] schedule() 
+    public void schedule() 
 		throws Exception
     {
 		if (theAutomata == null) {
@@ -316,7 +318,7 @@ public abstract class AbstractAstar
 			
 			logger.info(infoStr);
 	    
-			return currNode;
+			this.acceptingNode = currNode;
 		}
     }
 
@@ -693,7 +695,7 @@ public abstract class AbstractAstar
 	 * @param int[] currNode - the accepting node that makes it possible to build the schedule backwards
 	 * @return Automaton schedule - the resulting schedule
 	 */
-    public Automaton buildScheduleAutomaton(int[] currNode) 
+    public Automaton buildScheduleAutomaton() 
 		throws Exception
 	{
 		timer.start();
@@ -701,9 +703,11 @@ public abstract class AbstractAstar
 		Automaton scheduleAuto = new Automaton();
 		scheduleAuto.setComment("Schedule");
 	
-		State nextState = new State(printNodeSignature(currNode));
+		State nextState = new State(printNodeSignature(acceptingNode));
 		nextState.setAccepting(true);
 		scheduleAuto.addState(nextState);
+
+		int[] currNode = acceptingNode;
 
 		while (hasParent(currNode))
 	    {
