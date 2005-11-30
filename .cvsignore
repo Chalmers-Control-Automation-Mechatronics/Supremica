@@ -1,6 +1,7 @@
 build
 dist
 resources
+nbproject
 .project
 .classpath
 
