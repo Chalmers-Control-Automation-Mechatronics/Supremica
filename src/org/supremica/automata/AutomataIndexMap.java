@@ -84,7 +84,6 @@ public class AutomataIndexMap
 
 		// The automatonIndex and the stateIndex hashtables are filled
 		int automatonIndex = 0;
-		int stateIndex = 0;
 		for (Iterator<Automaton> autoIter = theAutomata.iterator(); autoIter.hasNext(); )
 		{
 			Automaton currAuto = autoIter.next();
@@ -93,6 +92,7 @@ public class AutomataIndexMap
 			// The automatonIndex hashtable is updated
 			automatonMap.put(currAutoName, new Integer(automatonIndex++));
 
+			int stateIndex = 0;
 			for (Iterator<State> stateIter = currAuto.stateIterator(); stateIter.hasNext(); )
 			{
 				// The stateIndex hashtable is updated

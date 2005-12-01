@@ -45,10 +45,6 @@ public class Milp
 	{
 		try 
 		{
-			//TESTTESTTESTTESTTESTTESTTESTTEST
-			AutomataIndexMap indexMap = new AutomataIndexMap(theAutomata);
-
-
 			// SÅ SKALL DET VARA NÄR ALLTING ÄR KLART (OM), MEN NU... FÖR ATT UNDERLÄTTA...
 			// 		modelFile = File.createTempFile("milp", ".mod");
 			// 		modelFile.deleteOnExit();

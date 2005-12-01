@@ -1,4 +1,3 @@
-
 /*
  *  Supremica Software License Agreement
  *
@@ -209,12 +208,12 @@ public final class AutomataSynchronizerHelper
 		// Build the initial state  (including 2 status fields)
 		int[] initialState = AutomataIndexFormHelper.createState(theAutomata.size());
 
-		Iterator autIt = theAutomata.iterator();
+		Iterator autIt = theAutomata.iterator();		
 		while (autIt.hasNext())
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
 			State currInitialState = currAutomaton.getInitialState();
-			initialState[currAutomaton.getIndex()] = currInitialState.getIndex();
+			initialState[theAutomataIndexForm.getAutomataIndexMap().getAutomatonIndex(currAutomaton)] = theAutomataIndexForm.getAutomataIndexMap().getStateIndex(currAutomaton, currInitialState);
 		}
 
 		// Add state to stack

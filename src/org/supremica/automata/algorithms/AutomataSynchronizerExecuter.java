@@ -229,7 +229,7 @@ public final class AutomataSynchronizerExecuter
 		for (Iterator<Automaton> autIt = automataToBeSelected.iterator();
 				autIt.hasNext(); )
 		{
-			automataIndices[i++] = autIt.next().getIndex();
+			automataIndices[i++] = indexForm.getAutomataIndexMap().getAutomatonIndex(autIt.next()); 
 		}
 
 		helper.selectAutomata(automataIndices);
@@ -254,7 +254,7 @@ public final class AutomataSynchronizerExecuter
 
 		for (int i = 0; i < automataToBeSelected.size(); i++)
 		{
-			automataIndices[i] = ((Automaton) automataToBeSelected.get(i)).getIndex();
+			automataIndices[i] =  indexForm.getAutomataIndexMap().getAutomatonIndex(((Automaton) automataToBeSelected.get(i))); 
 		}
 
 		helper.selectAutomata(automataIndices);

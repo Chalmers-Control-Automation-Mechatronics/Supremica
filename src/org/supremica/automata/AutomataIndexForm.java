@@ -110,6 +110,9 @@ public final class AutomataIndexForm
 	private Automata theAutomata = null;
 	private static Logger logger = LoggerFactory.createLogger(AutomataIndexForm.class);
 
+	/** Handles the mappings between automata/events/states and corresponding indices */
+	private AutomataIndexMap indexMap;
+
 	/**
 	 *@param  theAutomata The automata to be synchronized.
 	 *@param  theAutomaton The synchronized automaton.
@@ -119,6 +122,8 @@ public final class AutomataIndexForm
 		throws Exception
 	{
 		this.theAutomata = theAutomata;
+
+		indexMap = new AutomataIndexMap(theAutomata);
 
 		// Set the indices of the events in theAutomata (this method returns the union alphabet)
 		Alphabet unionAlphabet = theAutomata.setIndicies();
@@ -216,7 +221,7 @@ public final class AutomataIndexForm
 		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
-			int i = currAutomaton.getIndex();
+			int i = indexMap.getAutomatonIndex(currAutomaton);
 			AutomatonType currAutomatonType = currAutomaton.getType();
 
 			typeIsPlantTable[i] = currAutomatonType == AutomatonType.Plant;
@@ -237,7 +242,7 @@ public final class AutomataIndexForm
 	{
 		for (int i = 0, j = 0; i < theAutomata.size(); i++)
 		{
-			typeIsPlantTable[i] = (j < plantAutomata.size()) && (i == plantAutomata.getAutomatonAt(j).getIndex());
+			typeIsPlantTable[i] = (j < plantAutomata.size()) && (i == indexMap.getAutomatonIndex(plantAutomata.getAutomatonAt(j)));
 			typeIsSupSpecTable[i] = !typeIsPlantTable[i];
 
 			if (typeIsPlantTable[i])
@@ -315,7 +320,7 @@ public final class AutomataIndexForm
 		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
-			int currAutomatonIndex = currAutomaton.getIndex();
+			int currAutomatonIndex = indexMap.getAutomatonIndex(currAutomaton);
 			int currNbrOfStates = currAutomaton.nbrOfStates();
 
 			stateTable[currAutomatonIndex] = new State[currNbrOfStates];
@@ -327,7 +332,7 @@ public final class AutomataIndexForm
 					stateIt.hasNext(); )
 			{
 				State currState = stateIt.next();
-				int currIndex = currState.getIndex();
+				int currIndex = indexMap.getStateIndex(currAutomaton, currState);
 
 				stateTable[currAutomatonIndex][currIndex] = currState;
 				stateStatusTable[currAutomatonIndex][currIndex] = AutomataIndexFormHelper.createStatus(currState);
@@ -378,7 +383,7 @@ public final class AutomataIndexForm
 		while (autIt.hasNext())
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
-			int currAutomatonIndex = currAutomaton.getIndex();
+			int currAutomatonIndex = indexMap.getAutomatonIndex(currAutomaton);
 			int currAutomatonNbrOfStates = currAutomaton.nbrOfStates();
 
 			nextStateTable[currAutomatonIndex] = new int[currAutomatonNbrOfStates][];
@@ -399,7 +404,7 @@ public final class AutomataIndexForm
 			while (stateIt.hasNext())
 			{
 				State currState = (State) stateIt.next();
-				int currStateIndex = currState.getIndex();
+				int currStateIndex = indexMap.getStateIndex(currAutomaton, currState);
 
 				nextStateTable[currAutomatonIndex][currStateIndex] = new int[nbrOfEvents];
 				nextStatesTable[currAutomatonIndex][currStateIndex] = new int[nbrOfEvents][];
@@ -434,7 +439,7 @@ public final class AutomataIndexForm
 
 					// Now insert the nextState index into the table
 					State currNextState = currArc.getToState();
-					int currNextStateIndex = currNextState.getIndex();
+					int currNextStateIndex = indexMap.getStateIndex(currAutomaton, currNextState);
 					nextStateTable[currAutomatonIndex][currStateIndex][currEventIndex] = currNextStateIndex;
 
 					/*
@@ -505,7 +510,7 @@ public final class AutomataIndexForm
 					{
 						Arc arc = (Arc) arcIt.next();
 						State currNextState = arc.getToState();
-						int currNextStateIndex = currNextState.getIndex();
+						int currNextStateIndex = indexMap.getStateIndex(currAutomaton, currNextState);
 
 						nextStatesTable[currAutomatonIndex][currStateIndex][i][j++] = currNextStateIndex;
 					}
@@ -545,7 +550,7 @@ public final class AutomataIndexForm
 		while (autIt.hasNext())
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
-			int currAutomatonIndex = currAutomaton.getIndex();
+			int currAutomatonIndex = indexMap.getAutomatonIndex(currAutomaton);
 			int currAutomatonNbrOfStates = currAutomaton.nbrOfStates();
 
 			prevStatesTable[currAutomatonIndex] = new int[currAutomatonNbrOfStates][][];
@@ -557,7 +562,7 @@ public final class AutomataIndexForm
 			while (stateIt.hasNext())
 			{
 				State currState = (State) stateIt.next();
-				int currStateIndex = currState.getIndex();
+				int currStateIndex = indexMap.getStateIndex(currAutomaton, currState);
 
 				prevStatesTable[currAutomatonIndex][currStateIndex] = new int[nbrOfEvents][];
 
@@ -586,7 +591,7 @@ public final class AutomataIndexForm
 
 					// Now insert the prevState index into the table
 					State currPrevState = currArc.getFromState();
-					int currPrevStateIndex = currPrevState.getIndex();
+					int currPrevStateIndex = indexMap.getStateIndex(currAutomaton, currPrevState); 
 					int[] currPreviousStates = prevStatesTable[currAutomatonIndex][currStateIndex][currEventIndex];
 					int nbrOfIncomingArcs = currState.nbrOfIncomingArcs();
 
@@ -736,6 +741,11 @@ public final class AutomataIndexForm
 	public int[] getAutomatonStateMaxIndex()
 	{
 		return automatonStateMaxIndex;
+	}
+
+	public AutomataIndexMap getAutomataIndexMap()
+	{
+		return indexMap;
 	}
 
 	private int[] generateCopy1DIntArray(int[] oldArray)
