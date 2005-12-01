@@ -45,6 +45,10 @@ public class Milp
 	{
 		try 
 		{
+			//TESTTESTTESTTESTTESTTESTTESTTEST
+			AutomataIndexMap indexMap = new AutomataIndexMap(theAutomata);
+
+
 			// SÅ SKALL DET VARA NÄR ALLTING ÄR KLART (OM), MEN NU... FÖR ATT UNDERLÄTTA...
 			// 		modelFile = File.createTempFile("milp", ".mod");
 			// 		modelFile.deleteOnExit();
@@ -87,29 +91,34 @@ public class Milp
 		Automaton schedule = new Automaton();
 		schedule.setComment("Schedule");
 
+		//Testar ...
+		Automata localAutomata = new Automata(theAutomata, false);
+
 		// UGLY - why not initialize() in the corresponding constructors?
-		AutomataSynchronizerHelper synchHelper = new AutomataSynchronizerHelper(theAutomata, new SynchronizationOptions());
+		AutomataSynchronizerHelper synchHelper = new AutomataSynchronizerHelper(localAutomata, new SynchronizationOptions());
 		synchHelper.initialize();
 		AutomataSynchronizerExecuter synchronizer = new AutomataSynchronizerExecuter(synchHelper);
 		synchronizer.initialize();
 
+
 		// UGLY again
-		for (int i=0; i<theAutomata.size(); i++)
-			theAutomata.getAutomatonAt(i).remapStateIndices();
+		for (int i=0; i<localAutomata.size(); i++)
+			localAutomata.getAutomatonAt(i).remapStateIndices();
+
 
 		// The current synchronized state indices, consisting of as well plant 
 		// as specification indices and used to step through the final graph following the 
 		// time schedule (which is needed to build the schedule automaton)
-		int[] currSynchronizedState = synchHelper.getStateToProcess();
+ 		int[] currSynchronizedState = synchHelper.getStateToProcess();
 
 		// The first set of state indices correspond to the initial state of the composed automaton.
 		// They are thus used to construct the initial state of the schedule automaton.
 		String initialStateName = "[";
-		for (int i=0; i<theAutomata.size() - 1; i++)
+		for (int i=0; i<localAutomata.size() - 1; i++)
 		{
-			initialStateName += theAutomata.getAutomatonAt(i).getStateWithIndex(currSynchronizedState[i]).getName() + ".";
+			initialStateName += localAutomata.getAutomatonAt(i).getStateWithIndex(currSynchronizedState[i]).getName() + ".";
 		}
-		initialStateName += theAutomata.getAutomatonAt(theAutomata.size()-1).getStateWithIndex(currSynchronizedState[theAutomata.size()-1]).getName() + "]";
+		initialStateName += localAutomata.getAutomatonAt(localAutomata.size()-1).getStateWithIndex(currSynchronizedState[localAutomata.size()-1]).getName() + "]";
 
 		State currScheduleState = new State(initialStateName);
 		currScheduleState.setInitial(true);
@@ -123,9 +132,9 @@ public class Milp
 		// The index of a robot in the "robots"-variable. Is increased whenever a plant is found
 		int robotIndex = -1;
 
-		for (int i=0; i<theAutomata.size(); i++)
+		for (int i=0; i<localAutomata.size(); i++)
 		{
-			Automaton currRobot = theAutomata.getAutomatonAt(i); 
+			Automaton currRobot = localAutomata.getAutomatonAt(i); 
 
 			// Since the robots are supposed to fire events, the check for the "smallest time event" 
 			// is only done for the plants
@@ -173,13 +182,13 @@ public class Milp
 
 		logger.info("event to add = " + currOptimalArc.getEvent() + " at time " + smallestTime);
 		String str = "";
-		for (int i=0; i<theAutomata.size(); i++)
-			str += theAutomata.getAutomatonAt(i).getStateWithIndex(currSynchronizedState[i]).getName() + " ";
+		for (int i=0; i<localAutomata.size(); i++)
+			str += localAutomata.getAutomatonAt(i).getStateWithIndex(currSynchronizedState[i]).getName() + " ";
 		logger.info("fromState = " + str);
 		int[] nextSynchronizedState = synchronizer.doTransition(currSynchronizedState, currOptimalArc.getEvent());
 		str = "";
-		for (int i=0; i<theAutomata.size(); i++)
-			str += theAutomata.getAutomatonAt(i).getStateWithIndex(nextSynchronizedState[i]).getName() + " ";
+		for (int i=0; i<localAutomata.size(); i++)
+			str += localAutomata.getAutomatonAt(i).getStateWithIndex(nextSynchronizedState[i]).getName() + " ";
 		logger.info("toState = " + str);
 
 
@@ -551,6 +560,8 @@ public class Milp
 
 				deltaTime += "\t" + currState.getCost();
 				
+				logger.info("adding deltaTime[" + i + "," + j + "] -> " + currState.getCost() + "; state index = " + currState.getIndex() + "; state name = " + currState.getName());
+				
 				// If the current state has successors and is not initial, add precedence constraints
 				// If the current state is initial, add an initial (precedence) constraint
 				int nbrOfOutgoingArcs = currState.nbrOfOutgoingArcs();
@@ -895,6 +906,11 @@ public class Milp
 // 		if (milpProcess != null)
 // 			milpProcess.destroy();
 // 	}
+
+	public void requestStop()
+	{
+		
+	}
 }
 
 class CostComparator 

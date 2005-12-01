@@ -241,6 +241,10 @@ public abstract class AbstractAstar
 		ESTIMATE_INDEX = ACCUMULATED_COST_INDEX + 1;
     }
 
+	public void requestStop()
+	{
+	}
+
 
 	/****************************************************************************************/
 	/*                                 THE A*-ALGORITHM                                     */
