@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorNode
 //###########################################################################
-//# $Id: EditorNode.java,v 1.21 2005-11-03 01:24:15 robi Exp $
+//# $Id: EditorNode.java,v 1.22 2005-12-01 00:29:58 siw4 Exp $
 //###########################################################################
 
 
@@ -21,8 +21,14 @@ import java.util.List;
 import java.util.Set;
 import javax.swing.*;
 
+import net.sourceforge.waters.gui.observer.EditorChangedEvent;
+import net.sourceforge.waters.gui.observer.NodeMovedEvent;
+import net.sourceforge.waters.gui.observer.Observer;
+import net.sourceforge.waters.gui.observer.Subject;
+
 import net.sourceforge.waters.model.base.DuplicateNameException;
 import net.sourceforge.waters.model.base.IndexedList;
+import net.sourceforge.waters.model.base.GeometryProxy;
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
@@ -45,7 +51,8 @@ import net.sourceforge.waters.xsd.module.AnchorPosition;
  */
 public class EditorNode
     extends EditorObject
-    implements ModelObserver
+    implements ModelObserver,
+				Subject
 {
 
 	//########################################################################
@@ -119,15 +126,23 @@ public class EditorNode
 		list.add(ident);
     }
 
-    public void attachEdge(EditorEdge e)
+    public void attach(Observer o)
     {
-		mEdges.add(e);
+		mObservers.add(o);
     }
 
-    public void detachEdge(EditorEdge e)
+    public void detach(Observer o)
     {
-		mEdges.remove(e);
+		mObservers.remove(o);
     }
+	
+	public void fireEditorChangedEvent(EditorChangedEvent e)
+	{
+		for (Observer o : mObservers)
+		{
+			o.update(e);
+		}
+	}
 
 	public void setInitial(boolean newinitial)
 	{
@@ -181,23 +196,18 @@ public class EditorNode
 	}
 
     public void setPosition(double x, double y)
-    {
-		int oldx = getX();
-		int oldy = getY();
+    {		
+		GeometryProxy old = new PointGeometrySubject((Point2D)mSubject.getPointGeometry().getPoint().clone());
 		mPosition.setLocation(x, y);
 		mSubject.getPointGeometry().setPoint(mPosition);
-		for (EditorEdge e : mEdges) {
-			if (this == e.getStartNode()) {
-				e.updateControlPoint(oldx, oldy, true);
-			} else if (this == e.getEndNode()) {
-				e.updateControlPoint(oldx, oldy, false);
-			}
-		}
+		fireEditorChangedEvent(new NodeMovedEvent(old,
+												  mSubject.getPointGeometry(),
+												  mSubject));
     }
 	
     public Point2D getPosition()
     {
-	return (Point2D)mPosition;
+		return (Point2D)mPosition;
     }
 
 	public int getX()
@@ -408,7 +418,7 @@ public class EditorNode
 	protected int hash = 0;
 	private final SimpleNodeSubject mSubject;
 	private final Point2D.Double mPosition;
-	private final Collection<EditorEdge> mEdges = new HashSet<EditorEdge>();
+	private final Collection<Observer> mObservers = new HashSet<Observer>();
     private final Set<Color> mColors = new HashSet<Color>();
 	private ModuleSubject mModule;
 	private EditorPropGroup propGroup;

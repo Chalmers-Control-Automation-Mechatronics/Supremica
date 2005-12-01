@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorWindow
 //###########################################################################
-//# $Id: EditorWindow.java,v 1.21 2005-11-03 01:24:15 robi Exp $
+//# $Id: EditorWindow.java,v 1.22 2005-12-01 00:29:58 siw4 Exp $
 //###########################################################################
 
 
@@ -28,6 +28,8 @@ import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
+
+import net.sourceforge.waters.gui.observer.UndoRedoEvent;
 
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.UndoInterface;
@@ -182,7 +184,7 @@ public class EditorWindow
 		super.setVisible(visible);
 		if (visible) {
 			mUndoInterface.attach(menu);
-			menu.update();
+			menu.update(new UndoRedoEvent());
 		} else {
 			mUndoInterface.detach(menu);
 		}

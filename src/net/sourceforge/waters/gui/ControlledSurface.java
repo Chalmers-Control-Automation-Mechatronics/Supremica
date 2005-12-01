@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.40 2005-11-03 01:24:15 robi Exp $
+//# $Id: ControlledSurface.java,v 1.41 2005-12-01 00:29:58 siw4 Exp $
 //###########################################################################
  
 package net.sourceforge.waters.gui;
@@ -729,7 +729,7 @@ public class ControlledSurface
 							assert(selectedObjects.size() == 1);
 							EditorNodeGroup nodeGroup = (EditorNodeGroup) object;
 							// Find point on the border of the group from where the line is drawn...
-							Point2D.Double p = nodeGroup.setOnBounds(nodeGroup.getX() + xoff, nodeGroup.getY() + yoff);
+							Point2D p = nodeGroup.setOnBounds(nodeGroup.getX() + xoff, nodeGroup.getY() + yoff);
 							int[] dat = {(int) p.getX(), (int) p.getY(), e.getX(), e.getY()};
 							// Draw line!
 							if ((lines != null) && (lines.size() > 0))

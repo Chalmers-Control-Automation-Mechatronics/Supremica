@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorNodeGroup
 //###########################################################################
-//# $Id: EditorNodeGroup.java,v 1.14 2005-11-03 01:24:15 robi Exp $
+//# $Id: EditorNodeGroup.java,v 1.15 2005-12-01 00:29:58 siw4 Exp $
 //###########################################################################
 
 
@@ -21,14 +21,23 @@ import java.util.ArrayList;
 import java.util.Collection;
 import javax.swing.*;
 
+import net.sourceforge.waters.model.base.GeometryProxy;
+
+import net.sourceforge.waters.model.module.BoxGeometryProxy;
+
 import net.sourceforge.waters.subject.module.BoxGeometrySubject;
 import net.sourceforge.waters.subject.module.GroupNodeSubject;
 import net.sourceforge.waters.subject.module.NodeSubject;
 import net.sourceforge.waters.xsd.module.AnchorPosition;
 
+import net.sourceforge.waters.gui.observer.EditorChangedEvent;
+import net.sourceforge.waters.gui.observer.NodeMovedEvent;
+import net.sourceforge.waters.gui.observer.Observer;
+import net.sourceforge.waters.gui.observer.Subject;
 
 public class EditorNodeGroup
 	extends EditorObject
+	implements Subject
 {
 
 	public EditorNodeGroup(GroupNodeSubject gn)
@@ -86,20 +95,12 @@ public class EditorNodeGroup
 
 	public void resize(int x, int y)
 	{
+		GeometryProxy old = new BoxGeometrySubject((Rectangle2D)subject.getGeometry().getRectangle().clone());
 		bounds.setFrameFromDiagonal(resizingFrom.getX(), resizingFrom.getY(), x, y);
-
-		for (int i = 0; i < points.size(); i++)
-		{
-			Point2D.Double p = (Point2D.Double) points.get(i);
-			Point2D.Double r = (Point2D.Double) ratios.get(i);
-			double ox = p.getX();
-			double oy = p.getY();
-
-			p.setLocation(bounds.getMinX() + r.getX() * bounds.getWidth(), bounds.getMinY() + r.getY() * bounds.getHeight());
-			((EditorEdge) edges.get(i)).updateControlPoint(ox, oy, true);
-		}
 		setCorners();
 		subject.getGeometry().setRectangle(bounds);
+		fireEditorChangedEvent(new NodeMovedEvent(old, subject.getGeometry(),
+												  subject));
 	}   
 
 	//public void moveGroupTo(int x, int y)
@@ -108,19 +109,15 @@ public class EditorNodeGroup
 		int dx = (int)x - (int) bounds.getX();
 		int dy = (int)y - (int) bounds.getY();
 
-		// Move points
-		for (int i = 0; i < points.size(); i++)
-		{
-			Point2D.Double p = (Point2D.Double) points.get(i);
-
-			p.setLocation(p.getX() + dx, p.getY() + dy);
-			((EditorEdge) edges.get(i)).updateControlPoint(p.getX() - dx, p.getY() - dy, true);
-		}
-
+		GeometryProxy old = new BoxGeometrySubject((Rectangle2D)subject.getGeometry().getRectangle().clone());
+		System.out.println("old1 :" + ((BoxGeometryProxy)old).getRectangle());
 		// Move rect
 		bounds.setRect(bounds.getX() + dx, bounds.getY() + dy, bounds.getWidth(), bounds.getHeight());
 		setCorners();
 		subject.getGeometry().setRectangle(bounds);
+		System.out.println("old2 :" + ((BoxGeometryProxy)old).getRectangle());
+		fireEditorChangedEvent(new NodeMovedEvent(old, subject.getGeometry(),
+												  subject));
 	}
 
     public Point2D getPosition()
@@ -137,8 +134,13 @@ public class EditorNodeGroup
 	{
 		return (int) corners[UPPERLEFT].getCenterY();
 	}
+	
+	public Point2D setOnBounds(Point2D p)
+	{
+		return setOnBounds(p.getX(), p.getY());
+	}
 
-	public Point2D.Double setOnBounds(int x, int y)
+	public Point2D setOnBounds(double x, double y)
 	{
 		Line2D.Double closest = new Line2D.Double(corners[0].getCenterX(), corners[0].getCenterY(),
 							  corners[3].getCenterX(), corners[3].getCenterY());
@@ -190,37 +192,6 @@ public class EditorNodeGroup
 		return (new Point2D.Double(x, y));
 	}
 
-	public Point2D.Double getPosition(int x, int y, EditorEdge e)
-	{
-		Point2D.Double p = setOnBounds(x, y);
-		Point2D.Double r = new Point2D.Double((double) ((p.getX() - bounds.getMinX()) / bounds.getWidth()),
-						      (double) ((p.getY() - bounds.getMinY()) / bounds.getHeight()));
-		points.add(p);
-		ratios.add(r);
-		edges.add(e);
-
-		return p;
-	}
-
-	public void removePosition(Point2D p)
-	{
-		for (int j = 0; j< points.size(); j++)
-		{
-			Point2D point = (Point2D) points.get(j);
-		}
-
-		int i = points.indexOf(p);
-
-		if (i < 0)
-		{
-			// Already removed?
-			return;
-		}
-		points.remove(i);
-		ratios.remove(i);
-		edges.remove(i);
-	}
-
 	public boolean wasClicked(int cX, int cY)
 	{
 		resizing = false;
@@ -257,8 +228,9 @@ public class EditorNodeGroup
 	public void setBounds(Rectangle2D.Double b)
 	{
 		bounds.setRect(b);
+		GeometryProxy old = new BoxGeometrySubject((Rectangle2D)subject.getGeometry().getRectangle().clone());
 		subject.getGeometry().setRectangle(bounds);
-		for (int i = 0; i < points.size(); i++)
+		/*for (int i = 0; i < points.size(); i++)
 		{
 			Point2D.Double p = (Point2D.Double) points.get(i);
 			Point2D.Double r = (Point2D.Double) ratios.get(i);
@@ -267,8 +239,9 @@ public class EditorNodeGroup
 
 			p.setLocation(bounds.getMinX() + r.getX() * bounds.getWidth(), bounds.getMinY() + r.getY() * bounds.getHeight());
 			((EditorEdge) edges.get(i)).updateControlPoint(ox, oy, true);
-		}
-
+		}*/
+		fireEditorChangedEvent(new NodeMovedEvent(old, subject.getGeometry(),
+												  subject));
 		setCorners();
 	}
 
@@ -356,7 +329,24 @@ public class EditorNodeGroup
 				  (int) bounds.getWidth(), (int) bounds.getHeight(), CORNERDIAMETER, CORNERDIAMETER);
 		g2d.setStroke(BASICSTROKE);
 	}
-
+	
+	public void attach(Observer o)
+	{
+		mObservers.add(o);
+	}
+	
+	public void detach(Observer o)
+	{
+		mObservers.remove(o);
+	}
+	
+	public void fireEditorChangedEvent(EditorChangedEvent e)
+	{
+		for (Observer o : mObservers)
+		{
+			o.update(e);
+		}
+	}
 
 	//########################################################################
 	//# Data Members
@@ -364,9 +354,7 @@ public class EditorNodeGroup
 	private Point2D.Double resizingFrom;
 	private Rectangle2D.Double bounds;
 	private Rectangle[] corners = new Rectangle[4];
-	private ArrayList points = new ArrayList();
-	private ArrayList ratios = new ArrayList();
-	private ArrayList edges = new ArrayList();
+	private Collection<Observer> mObservers = new ArrayList<Observer>();
 	private ArrayList immediateChildren = new ArrayList();
 	private GroupNodeSubject subject;
 	private static int UPPERLEFT = 0;

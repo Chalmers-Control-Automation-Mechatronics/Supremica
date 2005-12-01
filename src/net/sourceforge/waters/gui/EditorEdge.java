@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorEdge
 //###########################################################################
-//# $Id: EditorEdge.java,v 1.28 2005-11-03 01:24:15 robi Exp $
+//# $Id: EditorEdge.java,v 1.29 2005-12-01 00:29:58 siw4 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -15,6 +15,15 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.geom.*;
+
+import net.sourceforge.waters.gui.observer.EditorChangedEvent;
+import net.sourceforge.waters.gui.observer.NodeMovedEvent;
+import net.sourceforge.waters.gui.observer.Observer;
+import net.sourceforge.waters.gui.observer.Subject;
+
+import net.sourceforge.waters.model.module.BoxGeometryProxy;
+import net.sourceforge.waters.model.module.PointGeometryProxy;
+import net.sourceforge.waters.model.module.SimpleNodeProxy;
 
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
@@ -42,7 +51,8 @@ import net.sourceforge.waters.xsd.module.SplineKind;
  */
 public class EditorEdge
     extends EditorObject
-    implements ModelObserver
+    implements ModelObserver,
+				Observer
 {
 	/** The start can be either a node or a nodegroup. */
 	private EditorObject startNode; 
@@ -67,7 +77,7 @@ public class EditorEdge
 	private boolean dragC = false;
 
 	private EdgeSubject subject;
-	private Point2D start;
+	//private Point2D start;
 	private static double tearRatio = .8;
 	private static int WIDTHD = 2;
 	private static int WIDTHS = 5;
@@ -76,11 +86,13 @@ public class EditorEdge
 	{
 		// This is an edge
 		type = EDGE;
+		
+		Point2D start = null;
 
 		startNode = iStartNode;
 		endNode = iEndNode;
 		subject = e;
-		endNode.attachEdge(this);
+		endNode.attach(this);
 		if (startNode.getType() == NODE)
 		{
 			EditorNode s = (EditorNode) startNode;
@@ -89,16 +101,17 @@ public class EditorEdge
 			
 			start = s.getPosition();
 			
-			s.attachEdge(this);
+			s.attach(this);
 		}
 		else
 		{
 			EditorNodeGroup s = (EditorNodeGroup) startNode;
 			
 			subject.setSource((NodeSubject) s.getSubject());
+		
+			start = s.setOnBounds(x, y);
 			
-			start = s.getPosition(x, y, this);
-			
+			s.attach(this);
 		}
 		
 		subject.setTarget((NodeSubject) iEndNode.getSubject());
@@ -167,6 +180,79 @@ public class EditorEdge
 		// this call...
 		setPosition(getTPointX(), getTPointY());
 	}
+	
+	public void update(EditorChangedEvent e)
+	{
+		System.out.println("stuff");
+		if (e.getType() == EditorChangedEvent.NODEMOVED)
+		{
+			System.out.println("old start:" + getStartPoint());		
+			NodeMovedEvent n = (NodeMovedEvent)e;
+			boolean start = subject.getSource() == n.getNode();
+			double oldx;
+			double oldy;
+			if (n.getNode() instanceof SimpleNodeProxy)
+			{
+				oldx = ((PointGeometryProxy)n.getOld()).getPoint().getX();
+				oldy = ((PointGeometryProxy)n.getOld()).getPoint().getY();
+				System.out.println(oldx + " " + oldy);
+				if (start)
+				{
+					subject.getStartPoint().setPoint(((PointGeometryProxy)
+													  n.getNew()).getPoint());
+				}
+				else
+				{
+					subject.getEndPoint().setPoint(((PointGeometryProxy)
+												  n.getNew()).getPoint());
+				}
+			}
+			else
+			{
+				Rectangle2D oldR = ((BoxGeometryProxy)n.getOld()).getRectangle();
+				Rectangle2D newR = ((BoxGeometryProxy)n.getNew()).getRectangle();
+				System.out.println("Old Geometry: " + oldR);
+				System.out.println("New Geometry: " + newR);
+				if (start)
+				{
+					oldx = subject.getStartPoint().getPoint().getX();
+					oldy = subject.getStartPoint().getPoint().getY();
+				}
+				else
+				{
+					oldx = subject.getEndPoint().getPoint().getX();
+					oldy = subject.getEndPoint().getPoint().getY();
+				}
+				double dx = newR.getMinX() - oldR.getMinX();
+				double dy = newR.getMinY() - oldR.getMinY();
+				if (!(oldR.getWidth() == newR.getWidth() &&
+					  oldR.getHeight() == newR.getHeight()))
+				{
+					dx = ((oldx - oldR.getMinX()) * (newR.getMaxX() - newR.getMinX()))
+						 / (oldR.getMaxX() - oldR.getMinX());
+					dy = ((oldy - oldR.getMinY()) * (newR.getMaxY() - newR.getMinY()))
+						 / (oldR.getMaxY() - oldR.getMinY());
+				}
+				if (start)
+				{
+					subject.getStartPoint().getPoint().setLocation(newR.getMinX() + dx, newR.getMinY() + dy);
+				}
+				else
+				{
+					subject.getEndPoint().getPoint().setLocation(newR.getMinX() + dx, newR.getMinY() + dy);
+				}
+			}
+			System.out.println("Old TPoint: " + getPosition());
+			updateControlPoint(oldx, oldy, start);
+			System.out.println("New Tpoint: " + getPosition());
+			System.out.println("New Start Point: " + getStartPoint());
+		}
+	}
+	
+	public Point2D getStartPoint()
+	{
+		return subject.getStartPoint().getPoint();
+	}
 
 	public double getCPointX()
 	{
@@ -176,7 +262,7 @@ public class EditorEdge
 			return tPoint.getX();
 		}
 
-		return (2 * tPoint.getX() - (start.getX() + endNode.getX()) / 2);
+		return (2 * tPoint.getX() - (getStartPoint().getX() + endNode.getX()) / 2);
 	}
 
 	public double getCPointY()
@@ -186,7 +272,7 @@ public class EditorEdge
 			return tPoint.getY();
 		}
 
-		return (2 * tPoint.getY() - (start.getY() + endNode.getY()) / 2);
+		return (2 * tPoint.getY() - (getStartPoint().getY() + endNode.getY()) / 2);
 	}
 
 	public Point2D getCPoint()
@@ -216,12 +302,7 @@ public class EditorEdge
 			setPosition(x, y);
 		}
 		
-		setPosition(.25 * (start.getX() + 2 * x + endNode.getX()), .25 * (start.getY() + 2 * y + endNode.getY()));
-	}
-
-	public Point2D getStartPoint()
-	{
-		return start;
+		setPosition(.25 * (getStartPoint().getX() + 2 * x + endNode.getX()), .25 * (getStartPoint().getY() + 2 * y + endNode.getY()));
 	}
 
 	public Rectangle2D.Double getSourceHandle()
@@ -248,7 +329,7 @@ public class EditorEdge
 
 	public void setTarget(int x, int y)
 	{
-		source.setRect(start.getX(), start.getY(), 0, 0);
+		source.setRect(getStartPoint().getX(), getStartPoint().getY(), 0, 0);
 		center.setRect(0, 0, 0, 0);
 		target.setRect(x, y, 0, 0);
 	}
@@ -262,18 +343,18 @@ public class EditorEdge
 		{
 			if (newstartNode == startNode)
 			{
-				ox = start.getX();
-				oy = start.getY();
+				ox = getStartPoint().getX();
+				oy = getStartPoint().getY();
 			}
 
 			EditorNodeGroup s = (EditorNodeGroup) startNode;
 
-			s.removePosition(start);
+			s.detach(this);
 		} 
 		else 
 		{
 		    EditorNode s = (EditorNode)startNode;
-		    s.detachEdge(this);
+		    s.detach(this);
 		}
 
 		startNode = newstartNode;
@@ -282,25 +363,27 @@ public class EditorEdge
 		{
 			EditorNode s = (EditorNode) startNode;
 
-			start = s.getPosition();
+			subject.getStartPoint().setPoint(s.getPosition());
 
 			subject.setSource(s.getSubject());
 
-			s.attachEdge(this);
+			s.attach(this);
 		}
 		else
 		{
 			EditorNodeGroup s = (EditorNodeGroup) startNode;
 
-			start = s.getPosition(x, y, this);
-
+			subject.getStartPoint().setPoint(s.setOnBounds(x, y));
+			
+			s.attach(this);
+			
 			subject.setSource(s.getSubject());
 		}
 
 		if (ox != -1)
 		{
-			double nx = start.getX() - endNode.getX();
-			double ny = start.getY() - endNode.getY();
+			double nx = getStartPoint().getX() - endNode.getX();
+			double ny = getStartPoint().getY() - endNode.getY();
 			double tx = tPoint.getX() - endNode.getX();
 			double ty = tPoint.getY() - endNode.getY();
 
@@ -338,30 +421,31 @@ public class EditorEdge
 		}
 		else if (isSelfLoop())
 		{
-			setPosition(start.getX() + 30, start.getY() + 30);
+			setPosition(getStartPoint().getX() + 30, getStartPoint().getY() + 30);
 		}
 		else
 		{
-			setPosition((start.getX() + endNode.getX()) / 2, (start.getY() + endNode.getY()) / 2);
+			setPosition((getStartPoint().getX() + endNode.getX()) / 2,
+						(getStartPoint().getY() + endNode.getY()) / 2);
 		}
 
-		dragS = false;
-
-		subject.getStartPoint().setPoint(start);
+		dragS = false;		
 	}
 
 	public void setEndNode(EditorNode newendNode)
 	{
-	    endNode.detachEdge(this);
+	    endNode.detach(this);
 	    endNode = newendNode;
-	    newendNode.attachEdge(this);
+	    newendNode.attach(this);
 	    if (isSelfLoop())
 		{
-		    setPosition(start.getX() + 30, start.getY() + 30);
+		    setPosition(getStartPoint().getX() + 30,
+						getStartPoint().getY() + 30);
 		}
 	    else
 		{
-		    setPosition((start.getX() + endNode.getX()) / 2, (start.getY() + endNode.getY()) / 2);
+		    setPosition((getStartPoint().getX() + endNode.getX()) / 2,
+						(getStartPoint().getY() + endNode.getY()) / 2);
 		}
 	    
 	    dragT = false;
@@ -375,8 +459,8 @@ public class EditorEdge
 	    return startNode;
 	}
     
-        public EditorNode getEndNode()
-        {
+    public EditorNode getEndNode()
+    {
 	    return endNode;
 	}
 
@@ -448,7 +532,7 @@ public class EditorEdge
 
     public Point2D getPosition()
     {
-	return new Point2D.Double(getTPointX(), getTPointY());
+		return new Point2D.Double(getTPointX(), getTPointY());
     }
 
 	/** 
@@ -486,7 +570,7 @@ public class EditorEdge
 			{
 				straight = true;
 				
-				tPoint.setLocation((double) ((start.getX() + endNode.getX()) / 2), (double) ((start.getY() + endNode.getY()) / 2));
+				tPoint.setLocation((double) ((getStartPoint().getX() + endNode.getX()) / 2), (double) ((getStartPoint().getY() + endNode.getY()) / 2));
 			}
 			else
 			{
@@ -538,19 +622,19 @@ public class EditorEdge
 			Cy -= endNode.getY();
 			ox -= endNode.getX();
 			oy -= endNode.getY();
-			Newx = (double) (start.getX() - endNode.getX());
-			Newy = (double) (start.getY() - endNode.getY());
+			Newx = (double) (getStartPoint().getX() - endNode.getX());
+			Newy = (double) (getStartPoint().getY() - endNode.getY());
 		}
 		else
 		{
 			//Cx = (.25 * (double)(ox + 2*getCPointX() + (double)start.getX())) - (double)start.getX();
 			//Cy = (.25 * (double)(oy + 2*getCPointY() + (double)start.getY())) - (double)start.getY();
-			Cx -= start.getX();
-			Cy -= start.getY();
-			ox -= start.getX();
-			oy -= start.getY();
-			Newx = endNode.getX() - start.getX();
-			Newy = endNode.getY() - start.getY();
+			Cx -= getStartPoint().getX();
+			Cy -= getStartPoint().getY();
+			ox -= getStartPoint().getX();
+			oy -= getStartPoint().getY();
+			Newx = endNode.getX() - getStartPoint().getX();
+			Newy = endNode.getY() - getStartPoint().getY();
 		}
 
 		// If ox and oy are 0, this becomes 0...
@@ -585,8 +669,8 @@ public class EditorEdge
 		}
 		else
 		{
-			Cx += start.getX();
-			Cy += start.getY();
+			Cx += getStartPoint().getX();
+			Cy += getStartPoint().getY();
 		}
 
 		// This is where it sometimes goes wrong... Cx and Cy sometimes becomes NaN...
@@ -596,19 +680,19 @@ public class EditorEdge
 	private boolean onLine(double x, double y)
 	{
 		// If we're "behind" a node, we're not on the line...
-		if (((start.getX() < x) && (endNode.getX() < x)) || 
-			((start.getY() < y) && (endNode.getY() < y)) || 
-			((start.getX() > x) && (endNode.getX() > x)) || 
-			((start.getY() > y) && (endNode.getY() > y)))
+		if (((getStartPoint().getX() < x) && (endNode.getX() < x)) || 
+			((getStartPoint().getY() < y) && (endNode.getY() < y)) || 
+			((getStartPoint().getX() > x) && (endNode.getX() > x)) || 
+			((getStartPoint().getY() > y) && (endNode.getY() > y)))
 		{
 			return false;
 		}
 
-		Rectangle2D.Double r = new Rectangle2D.Double((double) start.getX(), (double) start.getY(), (double) (endNode.getX() - start.getX()), (double) (endNode.getY() - start.getY()));
+		Rectangle2D.Double r = new Rectangle2D.Double((double) getStartPoint().getX(), (double) getStartPoint().getY(), (double) (endNode.getX() - getStartPoint().getX()), (double) (endNode.getY() - getStartPoint().getY()));
 
 		if (r.contains(x, y))
 		{
-			Line2D.Double l = new Line2D.Double(start.getX(), start.getY(), endNode.getX(), endNode.getY());
+			Line2D.Double l = new Line2D.Double(getStartPoint().getX(), getStartPoint().getY(), endNode.getX(), endNode.getY());
 
 			return (l.intersects(x - 2, y - 2, 4, 4));
 		}
@@ -616,16 +700,16 @@ public class EditorEdge
 		{
 			double m;
 
-			if (start.getX() != endNode.getX())
+			if (getStartPoint().getX() != endNode.getX())
 			{
-				m = (double) (start.getY() - endNode.getY()) / (double) (start.getX() - endNode.getX());
+				m = (double) (getStartPoint().getY() - endNode.getY()) / (double) (getStartPoint().getX() - endNode.getX());
 
-				double t = start.getY() - (m * start.getX());
+				double t = getStartPoint().getY() - (m * getStartPoint().getX());
 
 				return (Math.abs(y - (m * x) - t) <= 2);
 			}
 
-			return (Math.abs((double) (x - start.getX())) <= 2);
+			return (Math.abs((double) (x - getStartPoint().getX())) <= 2);
 		}
 	}
 	
@@ -634,33 +718,33 @@ public class EditorEdge
 	 */
 	protected ArrayList createTear()
 	{
-		double dist = (double) Math.sqrt(Math.pow(getCPointX() - start.getX(), 2) + 
-										 Math.pow(getCPointY() - start.getY(), 2)) * tearRatio;
+		double dist = (double) Math.sqrt(Math.pow(getCPointX() - getStartPoint().getX(), 2) + 
+										 Math.pow(getCPointY() - getStartPoint().getY(), 2)) * tearRatio;
 		double r = dist / 2;
-		double xP = (double) ((getCPointX() - start.getX()) * (1 - (tearRatio / 2))) + start.getX() - r;
-		double yP = (double) ((getCPointY() - start.getY()) * (1 - (tearRatio / 2))) + start.getY() - r;
+		double xP = (double) ((getCPointX() - getStartPoint().getX()) * (1 - (tearRatio / 2))) + getStartPoint().getX() - r;
+		double yP = (double) ((getCPointY() - getStartPoint().getY()) * (1 - (tearRatio / 2))) + getStartPoint().getY() - r;
 		double theta;
 
-		if (getCPointY() == start.getY())
+		if (getCPointY() == getStartPoint().getY())
 		{
 			theta = Math.PI / 2.0;
 
-			if (getCPointX() > start.getX())
+			if (getCPointX() > getStartPoint().getX())
 			{
 				theta += Math.PI;
 			}
 		}
 		else
 		{
-			theta = Math.atan((double) (getCPointX() - start.getX()) / (double) (getCPointY() - start.getY()));
+			theta = Math.atan((double) (getCPointX() - getStartPoint().getX()) / (double) (getCPointY() - getStartPoint().getY()));
 		}
 
-		if (getCPointY() > start.getY())
+		if (getCPointY() > getStartPoint().getY())
 		{
 			theta += Math.PI;
 		}
 
-		Point2D.Double p = new Point2D.Double(start.getX(), start.getY());
+		Point2D.Double p = new Point2D.Double(getStartPoint().getX(), getStartPoint().getY());
 		Arc2D.Double arc = new Arc2D.Double(xP, yP, dist, dist, Math.toDegrees(theta) + 315, (double) 270, Arc2D.OPEN);
 		Line2D.Double l1 = new Line2D.Double(arc.getStartPoint(), p);
 		Line2D.Double l2 = new Line2D.Double(arc.getEndPoint(), p);
@@ -675,8 +759,8 @@ public class EditorEdge
 		a.add(l1);
 		a.add(l2);
 		a.add(r2);
-		findIntersection(source, new Point2D.Double(start.getX(), start.getY()), (Point2D.Double) arc.getStartPoint());
-		findIntersection(target, new Point2D.Double(start.getX(), start.getY()), (Point2D.Double) arc.getEndPoint());
+		findIntersection(source, new Point2D.Double(getStartPoint().getX(), getStartPoint().getY()), (Point2D.Double) arc.getStartPoint());
+		findIntersection(target, new Point2D.Double(getStartPoint().getX(), getStartPoint().getY()), (Point2D.Double) arc.getEndPoint());
 
 		return a;
 	}
@@ -729,7 +813,7 @@ public class EditorEdge
 		int n = 0;
 
 		// The straight line between start and end
-		Line2D.Double l = new Line2D.Double(start.getX(), start.getY(), endNode.getX(), endNode.getY());
+		Line2D.Double l = new Line2D.Double(getStartPoint().getX(), getStartPoint().getY(), endNode.getX(), endNode.getY());
 
   		// The curve that is this edge
 		QuadCurve2D.Double q = getCurve();
@@ -940,7 +1024,7 @@ public class EditorEdge
 	
 	public QuadCurve2D.Double getCurve()
 	{
-		return new QuadCurve2D.Double(start.getX(), start.getY(), 
+		return new QuadCurve2D.Double(getStartPoint().getX(), getStartPoint().getY(), 
  									  getCPointX(), getCPointY(), 
 									  endNode.getX(), endNode.getY());
 	}
@@ -1015,7 +1099,7 @@ public class EditorEdge
 			else
 			{
 				drawArrow(getCPointX(), getCPointY(), 
-						  start.getX(), start.getY(), 
+						  getStartPoint().getX(), getStartPoint().getY(), 
 						  (int) getTPointX(), (int) getTPointY(), 
 						  true, g2d);
 			}
@@ -1037,13 +1121,13 @@ public class EditorEdge
 
 			if (startNode.getType() == NODE)
 			{
-				findIntersection(source, new Point2D.Double(start.getX(), start.getY()), 
+				findIntersection(source, new Point2D.Double(getStartPoint().getX(), getStartPoint().getY()), 
 								 new Point2D.Double((double) getCPointX(), (double) getCPointY()));
 			}
 			else
 			{
-				source.setFrameFromCenter(start.getX(), start.getY(), 
-										  start.getX() + WIDTHD, start.getY() + WIDTHD);
+				source.setFrameFromCenter(getStartPoint().getX(), getStartPoint().getY(), 
+										  getStartPoint().getX() + WIDTHD, getStartPoint().getY() + WIDTHD);
 			}
 			
 			// Draw arrow
@@ -1052,8 +1136,8 @@ public class EditorEdge
 			if (arrowAtEnd)
 			{
 				// Find the (second) last approximation point and use it and the endNode to draw the arrow!
-				double x1 = start.getX();
-				double y1 = start.getY();
+				double x1 = getStartPoint().getX();
+				double y1 = getStartPoint().getY();
 				double x2 = endNode.getX();
 				double y2 = endNode.getY();
 				QuadCurve2D.Double curve = getCurve();
@@ -1078,7 +1162,7 @@ public class EditorEdge
 			}					
 			else	 
 			{
-				drawArrow(start.getX(), start.getY(), 
+				drawArrow(getStartPoint().getX(), getStartPoint().getY(), 
 						  endNode.getX(), endNode.getY(), 
 						  (int) getTPointX(), (int) getTPointY(), 
 						  false, g2d);

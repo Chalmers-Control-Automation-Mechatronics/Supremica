@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ModuleContainer
 //###########################################################################
-//# $Id: ModuleContainer.java,v 1.20 2005-11-10 21:54:42 robi Exp $
+//# $Id: ModuleContainer.java,v 1.21 2005-12-01 00:29:58 siw4 Exp $
 //###########################################################################
 
 
@@ -27,7 +27,9 @@ import net.sourceforge.waters.gui.EditorWindowInterface;
 import net.sourceforge.waters.gui.HTMLPrinter;
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.UndoInterface;
+import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
+import net.sourceforge.waters.gui.observer.UndoRedoEvent;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.OperatorTable;
@@ -177,7 +179,7 @@ public class ModuleContainer implements UndoInterface
 		mUndoManager.addEdit(e);
 		mIDE.getActions().editorRedoAction.setEnabled(canRedo());
 		mIDE.getActions().editorUndoAction.setEnabled(canUndo());
-		notifyObservers();
+		fireEditorChangedEvent(new UndoRedoEvent());
 	}
 
 	public void executeCommand(Command c)
@@ -201,7 +203,7 @@ public class ModuleContainer implements UndoInterface
 	public void clearList()
 	{
 		mUndoManager.discardAllEdits();
-		notifyObservers();
+		fireEditorChangedEvent(new UndoRedoEvent());
 	}
 
 	public String getRedoPresentationName()
@@ -219,7 +221,7 @@ public class ModuleContainer implements UndoInterface
 		mUndoManager.redo();
 		mIDE.getActions().editorRedoAction.setEnabled(canRedo());
 		mIDE.getActions().editorUndoAction.setEnabled(canUndo());
-		notifyObservers();
+		fireEditorChangedEvent(new UndoRedoEvent());
 	}
 
 	public void undo() throws CannotUndoException
@@ -227,7 +229,7 @@ public class ModuleContainer implements UndoInterface
 		mUndoManager.undo();
 		mIDE.getActions().editorRedoAction.setEnabled(canRedo());
 		mIDE.getActions().editorUndoAction.setEnabled(canUndo());
-		notifyObservers();
+		fireEditorChangedEvent(new UndoRedoEvent());
 	}
 
 
@@ -243,10 +245,10 @@ public class ModuleContainer implements UndoInterface
 		mObservers.remove(o);
 	}
 
-	public void notifyObservers()
+	public void fireEditorChangedEvent(EditorChangedEvent e)
 	{
 		for (final Observer o : mObservers) {
-			o.update();
+			o.update(e);
 		}
 	}
 

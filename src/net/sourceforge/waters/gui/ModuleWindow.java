@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleWindow
 //###########################################################################
-//# $Id: ModuleWindow.java,v 1.18 2005-11-10 21:54:42 robi Exp $
+//# $Id: ModuleWindow.java,v 1.19 2005-12-01 00:29:58 siw4 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -34,6 +34,8 @@ import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.observer.Subject;
+import net.sourceforge.waters.gui.observer.EditorChangedEvent;
+import net.sourceforge.waters.gui.observer.UndoRedoEvent;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.OperatorTable;
@@ -864,7 +866,7 @@ public class ModuleWindow
 	public void addUndoable(UndoableEdit e)
 	{
 		mUndoManager.addEdit(e);
-		notifyObservers();
+		fireEditorChangedEvent(new UndoRedoEvent());
 	}
 
 	public void executeCommand(Command c)
@@ -888,7 +890,7 @@ public class ModuleWindow
 	public void clearList()
 	{
 		mUndoManager.discardAllEdits();
-		notifyObservers();
+		fireEditorChangedEvent(new UndoRedoEvent());
 	}
 
     public String getRedoPresentationName()
@@ -904,13 +906,13 @@ public class ModuleWindow
 	public void redo() throws CannotRedoException
 	{
 		mUndoManager.redo();
-		notifyObservers();
+		fireEditorChangedEvent(new UndoRedoEvent());
 	}
 
 	public void undo() throws CannotUndoException
 	{
 		mUndoManager.undo();
-		notifyObservers();
+		fireEditorChangedEvent(new UndoRedoEvent());
 	}
 
 	public void attach(Observer o)
@@ -923,10 +925,10 @@ public class ModuleWindow
 		mObservers.remove(o);
 	}
 
-	public void notifyObservers()
+	public void fireEditorChangedEvent(EditorChangedEvent e)
 	{
 		for (Observer o : mObservers) {
-			o.update();
+			o.update(e);
 		}
 	}
 

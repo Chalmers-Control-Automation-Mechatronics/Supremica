@@ -15,5 +15,5 @@ public interface Observer
     /**
      * called to update the observer when its subject is modified
      */
-    public void update();
+    public void update(EditorChangedEvent e);
 }

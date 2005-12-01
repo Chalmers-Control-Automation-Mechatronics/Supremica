@@ -4,12 +4,13 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorMenu
 //###########################################################################
-//# $Id: EditorMenu.java,v 1.16 2005-09-14 11:21:14 flordal Exp $
+//# $Id: EditorMenu.java,v 1.17 2005-12-01 00:29:58 siw4 Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.gui;
 
+import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
 
 import javax.swing.*;
@@ -289,11 +290,14 @@ public class EditorMenu
 		}
 
 	}
-	public void update()
+	public void update(EditorChangedEvent e)
 	{
-		mEditRedo.setEnabled(root.getUndoInterface().canRedo());
-		mEditUndo.setEnabled(root.getUndoInterface().canUndo());
-		mEditRedo.setText(root.getUndoInterface().getRedoPresentationName());
-		mEditUndo.setText(root.getUndoInterface().getUndoPresentationName());
+		if (e.getType() == EditorChangedEvent.UNDOREDO)
+		{
+			mEditRedo.setEnabled(root.getUndoInterface().canRedo());
+			mEditUndo.setEnabled(root.getUndoInterface().canUndo());
+			mEditRedo.setText(root.getUndoInterface().getRedoPresentationName());
+			mEditUndo.setText(root.getUndoInterface().getUndoPresentationName());
+		}
 	}
 }

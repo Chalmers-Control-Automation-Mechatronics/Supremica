@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.32 2005-11-29 12:13:24 flordal Exp $
+//# $Id: EditorSurface.java,v 1.33 2005-12-01 00:29:58 siw4 Exp $
 //###########################################################################
 
 
@@ -487,8 +487,13 @@ public class EditorSurface
 
 		if (e.getStartNode().getType() == EditorObject.NODEGROUP)
 		{
-			((EditorNodeGroup) e.getStartNode()).removePosition(e.getStartPoint());
+			((EditorNodeGroup) e.getStartNode()).detach(e);
 		}
+		else
+		{
+			((EditorNode) e.getStartNode()).detach(e);
+		}
+		e.getEndNode().detach(e);
 
 		edges.remove(e);
 		final EdgeSubject subject = e.getSubject();

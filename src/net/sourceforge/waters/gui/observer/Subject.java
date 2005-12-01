@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * $Id: Subject.java,v 1.1 2005-08-30 00:26:06 siw4 Exp $
+ * $Id: Subject.java,v 1.2 2005-12-01 00:29:58 siw4 Exp $
  */
 
 package net.sourceforge.waters.gui.observer;
@@ -46,5 +46,5 @@ public interface Subject
     /**
      * notifies all observers of this Subject of a modification
      */
-    public void notifyObservers();
+    public void fireEditorChangedEvent(EditorChangedEvent e);
 }
