@@ -32,7 +32,7 @@ class EditorColor
 	public static Color HIGHLIGHTCOLOR = Color.CYAN; 
 
     /** the color of acceptable drag objects */
-    public static Color CANDROP = Color.BLUE;
+    public static Color CANDROP = (Color.GREEN).darker().darker();
     public static Color CANTDROP = Color.RED;
 
 	/** Invisible color. */

@@ -97,11 +97,28 @@ public class ArcSet
 		return fromState;
 	}
 
+	public boolean isSelfLoop()
+	{
+		return toState.equals(fromState);
+	}
+
 	public boolean contains(Arc theArc)
 	{
 		for (Iterator<Arc> it = iterator(); it.hasNext(); )
 		{
 			if (theArc.equals(it.next()))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public boolean contains(LabeledEvent event)
+	{
+		for (Iterator<Arc> it = iterator(); it.hasNext(); )
+		{
+			if (event.equals(it.next().getEvent()))
 			{
 				return true;
 			}

@@ -621,6 +621,14 @@ public class Alphabet
 	}
 
 	/**
+	 * Returns true if this alphabet is a subset of the specified alphabet.
+	 */
+	public boolean isSubsetOf(Alphabet other)
+	{
+		return (this.nbrOfEvents() == nbrOfCommonEvents(other));
+	}
+
+	/**
 	 * Computes A union B, where A is this alphabet and B is other
 	 *
 	 *@param  other The other alphabet
@@ -851,9 +859,7 @@ public class Alphabet
 	public int nbrOfCommonEvents(Alphabet otherAlphabet)
 	{
 		int nbrOfCommon = 0;
-
-		Iterator<LabeledEvent> eventIterator = iterator();
-		while (eventIterator.hasNext())
+		for (Iterator<LabeledEvent> eventIterator = iterator(); eventIterator.hasNext(); )
 		{
 			LabeledEvent currEvent;
 			currEvent = eventIterator.next();
@@ -869,8 +875,7 @@ public class Alphabet
 
 	public boolean hasCommonEvents(Alphabet otherAlphabet)
 	{
-		Iterator<LabeledEvent> eventIterator = iterator();
-		while (eventIterator.hasNext())
+		for (Iterator<LabeledEvent> eventIterator = iterator(); eventIterator.hasNext(); )
 		{
 			LabeledEvent currEvent;
 			currEvent = eventIterator.next();

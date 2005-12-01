@@ -402,9 +402,9 @@ public class Automaton
 					arcIt.hasNext(); )
 			{
 				Arc currArc = arcIt.next();
-				State nextState = currArc.getToState();
+				State toState = currArc.getToState();
 
-				if (nextState.isForbidden())
+				if (toState.isForbidden())
 				{
 					LabeledEvent currEvent = currArc.getEvent();
 
@@ -437,9 +437,9 @@ public class Automaton
 					arcIt.hasNext(); )
 			{
 				Arc currArc = arcIt.next();
-				State nextState = currArc.getToState();
+				State toState = currArc.getToState();
 
-				if (!nextState.isForbidden())
+				if (!toState.isForbidden())
 				{
 					LabeledEvent currEvent = currArc.getEvent();
 
@@ -481,9 +481,9 @@ public class Automaton
 					arcIt.hasNext(); )
 			{
 				Arc currArc = arcIt.next();
-				State nextState = currArc.getToState();
+				State toState = currArc.getToState();
 
-				if (nextState.isForbidden())
+				if (toState.isForbidden())
 				{
 					LabeledEvent currEvent = currArc.getEvent();
 
@@ -492,7 +492,7 @@ public class Automaton
 						try
 						{
 							explicitlyForbiddenEvents.addEvent(currEvent);
-							eventToStateMap.put(currEvent, nextState);
+							eventToStateMap.put(currEvent, toState);
 						}
 						catch (Exception ex)
 						{
@@ -517,9 +517,9 @@ public class Automaton
 					arcIt.hasNext(); )
 			{
 				Arc currArc = arcIt.next();
-				State nextState = currArc.getToState();
+				State toState = currArc.getToState();
 
-				if (!nextState.isForbidden())
+				if (!toState.isForbidden())
 				{
 					LabeledEvent currEvent = currArc.getEvent();
 
@@ -542,6 +542,51 @@ public class Automaton
 		}
 
 		return controlInconsistentEvents;
+	}
+
+	/**
+	 * An event is redundant if it is self-looped in all states and
+	 *  * The event is controllable or
+	 *  * The event is uncontrollable and the automaton is a spec/sup
+	 *
+	 * Only works for deterministic automata.
+	 *
+	 * @return the Alphabet of redundant events.
+	 */
+	public Alphabet getRedundantEvents()
+	{
+		assert(isDeterministic());
+		
+		Alphabet result = new Alphabet();
+
+		loop: for (Iterator<LabeledEvent> evIt = eventIterator(); evIt.hasNext(); )
+		{
+			LabeledEvent event = evIt.next();
+			for (Iterator<State> stIt = stateIterator(); stIt.hasNext(); )
+			{
+				State state = stIt.next();
+				if (!state.doesDefine(event))
+				{
+					continue loop;
+				}
+				for (Iterator<ArcSet> arcSetIt = state.outgoingArcSetIterator(); arcSetIt.hasNext(); )
+				{
+					ArcSet arcSet = arcSetIt.next();
+					if (arcSet.contains(event) && !arcSet.isSelfLoop())
+					{
+						continue loop;
+					}
+				}
+			}
+			// Only add if the event is defined in all states and is
+			// selflooped in the transition where it is defined.
+			if (!(isPlant() && !event.isControllable()))
+			{
+				result.addEvent(event);
+			}
+		}
+
+		return result;
 	}
 
 	/**
@@ -742,10 +787,9 @@ public class Automaton
 	{
 		HashSet foundEvents = new HashSet();
 
-		for (SupremicaIterator stateIt = new SupremicaIterator(stateIterator());
-				stateIt.isValid(); stateIt.increase())
+		for (Iterator<State> stIt = stateIterator();	stIt.hasNext(); )
 		{
-			State currState = (State) stateIt.get();
+			State currState = stIt.next();
 
 			foundEvents.clear();
 
@@ -904,9 +948,9 @@ public class Automaton
 			throw new IllegalArgumentException("Name must be non-null");
 		}
 
-		for (Iterator<State> stateIt = stateIterator(); stateIt.hasNext(); )
+		for (Iterator<State> stIt = stateIterator(); stIt.hasNext(); )
 		{	
-			State currState = stateIt.next();
+			State currState = stIt.next();
 			
 			if (currState.getName().equals(name))
 			{
@@ -969,9 +1013,9 @@ public class Automaton
 			throw new IllegalArgumentException("EventLabel must be non-null");
 		}
 
-		Iterator<State> stateIt = new InternalStateIterator(eventLabel, true);
+		Iterator<State> stIt = new InternalStateIterator(eventLabel, true);
 
-		return stateIt;
+		return stIt;
 	}
 
 	/**
@@ -1086,11 +1130,9 @@ public class Automaton
 	public int nbrOfAcceptingStates()
 	{
 		int nbrOfAcceptingStates = 0;
-		Iterator stateIt = stateIterator();
-
-		while (stateIt.hasNext())
+		for (Iterator<State> stIt = stateIterator(); stIt.hasNext(); )
 		{
-			State currState = (State) stateIt.next();
+			State currState = stIt.next();
 
 			if (currState.isAccepting())
 			{
@@ -1104,11 +1146,9 @@ public class Automaton
 	public int nbrOfMutuallyAcceptingStates()
 	{
 		int nbrOfAcceptingStates = 0;
-		Iterator stateIt = stateIterator();
-
-		while (stateIt.hasNext())
+		for (Iterator<State> stIt = stateIterator(); stIt.hasNext(); )
 		{
-			State currState = (State) stateIt.next();
+			State currState = stIt.next();
 
 			if (currState.isMutuallyAccepting())
 			{
@@ -1122,11 +1162,9 @@ public class Automaton
 	public int nbrOfMutuallyAcceptingNotForbiddenStates()
 	{
 		int nbrOfAcceptingStates = 0;
-		Iterator stateIt = stateIterator();
-
-		while (stateIt.hasNext())
+		for (Iterator<State> stIt = stateIterator(); stIt.hasNext(); )
 		{
-			State currState = (State) stateIt.next();
+			State currState = (State) stIt.next();
 
 			if (currState.isMutuallyAccepting() &&!currState.isForbidden())
 			{
@@ -1140,10 +1178,9 @@ public class Automaton
 	public int nbrOfForbiddenStates()
 	{
 		int nbrOfForbiddenStates = 0;
-
-		for (Iterator<State> stateIt = stateIterator(); stateIt.hasNext(); )
+		for (Iterator<State> stIt = stateIterator(); stIt.hasNext(); )
 		{
-			State currState = stateIt.next();
+			State currState = stIt.next();
 
 			if (currState.isForbidden())
 			{
@@ -1157,10 +1194,9 @@ public class Automaton
 	public int nbrOfAcceptingAndForbiddenStates()
 	{
 		int nbrOfAcceptingAndForbiddenStates = 0;
-
-		for (Iterator<State> stateIt = stateIterator(); stateIt.hasNext(); )
+		for (Iterator<State> stIt = stateIterator(); stIt.hasNext(); )
 		{
-			State currState = stateIt.next();
+			State currState = stIt.next();
 
 			if (currState.isAccepting() && currState.isForbidden())
 			{
@@ -1177,12 +1213,10 @@ public class Automaton
 	public int depth()
 	{
 		int depth = 0;
-
-		for (Iterator<State> stateIterator = stateIterator();
-				stateIterator.hasNext(); )
+		for (Iterator<State> stIt = stateIterator(); stIt.hasNext(); )
 		{
 			// Measure the shortest trace to the state.
-			State currState = stateIterator.next();
+			State currState = stIt.next();
 			int stateDepth;
 
 			try
@@ -1211,12 +1245,10 @@ public class Automaton
 	public int depthSum(Alphabet anAlphabet)
 	{
 		int depthSum = 0;
-
-		for (Iterator<State> stateIterator = stateIterator();
-				stateIterator.hasNext(); )
+		for (Iterator<State> stIt = stateIterator(); stIt.hasNext(); )
 		{
 			// Measure the shortest trace to the state.
-			State currState = stateIterator.next();
+			State currState = stIt.next();
 			int stateDepth;
 
 			try
@@ -2258,24 +2290,25 @@ public class Automaton
 
 	/**
 	 * Saturate with dump-state for a certain sub-alphabet.
-	 * Beware, we assume that alpha is a subset of the alphabet of the automaton
+	 * We assume that alpha is a subset of the alphabet of the automaton.
 	 */
 	public boolean saturateDump(Alphabet alpha)
 	{
+		assert(alpha.isSubsetOf(getAlphabet()));
+
 		boolean done_something = false; // keep track so we don't add dump-states over and over
 
 		State dump = createUniqueState("dump");	// Create uniquely named dump state
 		addState(dump);							// Add it to myself
-		saturate(dump, alpha, dump);		// saturate, else something will always be done
+		saturate(dump, alpha, dump);		    // saturate, else something will always be done
 
-		Iterator<State> state_it = safeStateIterator();
-		while(state_it.hasNext())
+		for (Iterator<State> state_it = safeStateIterator(); state_it.hasNext(); )
 		{
-			State state = (State)state_it.next(); // Why doesn't a Iterator<State> return a State?
+			State state = state_it.next(); 
 			done_something |= saturate(state, alpha, dump);	// saturate to the dump-state
 		}
 
-		if(done_something == false) // need to remove dump state including its self-loop arcs
+		if (done_something == false) // need to remove dump state including its self-loop arcs
 		{
 			removeState(dump);
 		}

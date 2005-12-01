@@ -37,13 +37,13 @@
  *
  ************************************************************************************************
  *
- * COMPILING INSTRUCTIONS
+ * INSTRUCTIONS FOR COMPILING TO DLL:s
  *
- * Note that you probably have to change the folders below!
+ * Note that you must make sure that your environment variables are right.
  *
  * Compiling on Windows:
  *
- * cl -I"c:\Program Files\Java\jdk1.5.0_04"\include -I"c:\Program Files\Java\jdk1.5.0_04"\include\win32 -I"C:\Program Files\Microsoft Visual Studio .NET 2003\Vc7"\include -LD org_supremica_automata_algorithms_minimization_BisimulationEquivalenceMinimizer.cpp -FeBisimulationEquivalence.dll /link /LIBPATH:"C:\Program Files\Microsoft Visual Studio .NET 2003\Vc7"\lib
+ * cl /w -I%JAVE_HOME%\include -I%JAVA_HOME%\include\win32 -LD org_supremica_automata_algorithms_minimization_BisimulationEquivalenceMinimizer.cpp -FeBisimulationEquivalence.dll 
  *
  * Compiling on Linux:
  *
@@ -53,6 +53,9 @@
  *
  * g++ -c -I /System/Library/Frameworks/JavaVM.framework/Headers/ org_supremica_automata_algorithms_minimization_BisimulationEquivalenceMinimizer.cpp
  * g++ -dynamiclib -install_name BisimulationEquivalenceMinimizer.dylib -o BisimulationEquivalenceMinimizer.dylib org_supremica_automata_algorithms_minimization_BisimulationEquivalenceMinimizer.o
+ *
+ * The finished dll:s should be placed in the folder "Supremica/platform/X.x86/lib" where X is you OS.
+ * "ant initialize" will then place the dll in "Supremica/dist" where it will come to use.
  *
  ************************************************************************************************/
 

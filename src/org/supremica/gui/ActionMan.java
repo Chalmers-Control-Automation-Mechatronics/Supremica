@@ -1861,24 +1861,30 @@ public class ActionMan
 
 			statusStr.append("Status for automaton: " + currAutomaton.getName());
 
-			if ((currAutomaton.getComment() != null) && !currAutomaton.getComment().equals(""))
-			{
-				statusStr.append("\n\tComment: \"" + currAutomaton.getComment() + "\"");
-			}
-
-			statusStr.append("\n\tis deterministic: " + currAutomaton.isDeterministic());
-			statusStr.append("\n\tNumber of states: " + currAutomaton.nbrOfStates());
-			statusStr.append("\n\tNumber of events: " + currAutomaton.nbrOfEvents());
-			statusStr.append("\n\tNumber of transitions: " + currAutomaton.nbrOfTransitions());
-			statusStr.append("\n\tNumber of accepting states: " + currAutomaton.nbrOfAcceptingStates());
+			statusStr.append("\n\tnumber of states: " + currAutomaton.nbrOfStates());
+			statusStr.append("\n\tnumber of events: " + currAutomaton.nbrOfEvents());
+			statusStr.append("\n\tnumber of transitions: " + currAutomaton.nbrOfTransitions());
+			statusStr.append("\n\tnumber of accepting states: " + currAutomaton.nbrOfAcceptingStates());
 			//statusStr.append("\n\tNumber of mutually accepting states: " + currAutomaton.nbrOfMutuallyAcceptingStates());
-			statusStr.append("\n\tNumber of forbidden states: " + currAutomaton.nbrOfForbiddenStates());
+			statusStr.append("\n\tnumber of forbidden states: " + currAutomaton.nbrOfForbiddenStates());
 
 			int acceptingAndForbiddenStates = currAutomaton.nbrOfAcceptingAndForbiddenStates();
-
 			if (acceptingAndForbiddenStates > 0)
 			{
-				statusStr.append("\n\tNumber of accepting and forbidden states: " + acceptingAndForbiddenStates);
+				statusStr.append("\n\tnumber of accepting AND forbidden states: " + acceptingAndForbiddenStates);
+			}
+
+			if (currAutomaton.isDeterministic())
+			{
+				Alphabet redundantEvents = currAutomaton.getRedundantEvents();
+				if (redundantEvents.nbrOfEvents() > 0)
+					statusStr.append("\n\talphabet of redundant events: " + redundantEvents);
+				statusStr.append("\n\tthe automaton is deterministic");
+			}
+
+			if ((currAutomaton.getComment() != null) && !currAutomaton.getComment().equals(""))
+			{
+				statusStr.append("\n\tcomment: \"" + currAutomaton.getComment() + "\"");
 			}
 
 			// logger.info(statusStr.toString());

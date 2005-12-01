@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.41 2005-12-01 00:29:58 siw4 Exp $
+//# $Id: ControlledSurface.java,v 1.42 2005-12-01 16:29:51 flordal Exp $
 //###########################################################################
  
 package net.sourceforge.waters.gui;
@@ -37,7 +37,6 @@ public class ControlledSurface
 	extends EditorSurface
 	implements MouseMotionListener, MouseListener, KeyListener
 {
-
     public String getCommand()
     {
 		return mToolbar.getCommand();
@@ -417,51 +416,12 @@ public class ControlledSurface
 				return;
 			}
 
-			// DragSelect!
-			if (dragSelect)
-			{
-				dragNowX = e.getX();
-				dragNowY = e.getY();
-
-				toBeSelected = getDragSelection();
-
-				// Select all that should be selected...
-				super.unselectAll();
-				// These have been selected previously and should still be selected
-				for (int i=0; i<selectedObjects.size(); i++)
-				{
-					EditorObject o = (EditorObject) selectedObjects.get(i);
-					o.setSelected(true);
-					LinkedList children = getChildren(o);
-					while (children.size() != 0)
-					{
-						((EditorObject) children.remove(0)).setSelected(true);
-					}
-				}
-				// These are in the current drag selection!
-				for (int i=0; i<toBeSelected.size(); i++)
-				{
-					EditorObject o = (EditorObject) toBeSelected.get(i);
-					o.setSelected(true);
-					LinkedList children = getChildren(o);
-					while (children.size() != 0)
-					{
-						((EditorObject) children.remove(0)).setSelected(true);
-					}
-				}
-
-				repaint(false);
-
-				return;
-			}
-
 			// Find the distances that the mouse has dragged (for moving and stuff)
 			int dx = 0;
 			int dy = 0;
 			// Are we using snap?
-			if (getCommand() != EDGE &&
-				(nodeIsSelected() || nodeGroupIsSelected()) &&
-				nodesSnap) {
+			if (getCommand() != EDGE && (nodeIsSelected() || nodeGroupIsSelected()) && nodesSnap) 
+			{
 				lastX = findGrid(lastX);
 				lastY = findGrid(lastY);
 				
@@ -473,9 +433,9 @@ public class ControlledSurface
 				// grid again...
 				int modX = 0;
 				int modY = 0;
-				for (final EditorObject o : selectedObjects) {
-					if ((o.getType() == EditorObject.NODE)
-						|| (o.getType() == EditorObject.NODEGROUP))
+				for (final EditorObject o : selectedObjects) 
+				{
+					if ((o.getType() == EditorObject.NODE) || (o.getType() == EditorObject.NODEGROUP))
 					{
 						modX = findGrid(o.getX()) - o.getX();
 						modY = findGrid(o.getY()) - o.getY();
@@ -484,10 +444,13 @@ public class ControlledSurface
 
 				dx = currX - lastX + modX;
 				dy = currY - lastY + modY;
-			} else {
+			}
+			else 
+			{
 				dx = e.getX() - lastX;
 				dy = e.getY() - lastY;
 			}
+
 			// Update position
 			lastX += dx;
 			lastY += dy;
@@ -503,8 +466,9 @@ public class ControlledSurface
 				// Select all that should be selected...
 				super.unselectAll();
 				// These have been selected previously and should still be
-				// selected
-				for (final EditorObject o : selectedObjects) {
+				// selected no matter what
+				for (final EditorObject o : selectedObjects) 
+				{
 					o.setSelected(true);
 					LinkedList children = getChildren(o);
 					while (children.size() != 0)
@@ -512,8 +476,9 @@ public class ControlledSurface
 						((EditorObject) children.remove(0)).setSelected(true);
 					}
 				}
-				// These are in the current drag selection!
-				for (final EditorObject o : toBeSelected) {
+				// These are in the current drag selection
+				for (final EditorObject o : toBeSelected) 
+				{
 					o.setSelected(true);
 					LinkedList children = getChildren(o);
 					while (children.size() != 0)
@@ -1116,8 +1081,7 @@ public class ControlledSurface
 					if (o == null || o.getType() != EditorObject.LABELGROUP)
 					{
 						return;
-					}
-					
+					}					
 
 					EditorLabelGroup l = (EditorLabelGroup) o;
 					l.setSelected(true);
@@ -1212,14 +1176,12 @@ public class ControlledSurface
 		this.addKeyListener(this);
 		this.requestFocusInWindow();
 		dtListener = new DTListener();
-		dropTarget = new DropTarget(this, 
-					    dtListener);
+		dropTarget = new DropTarget(this, dtListener);
 	}
 
 
     private class DTListener extends DropTargetAdapter
     {
-
 		//###################################################################
 		//# Interface java.awt.dnd.DropTargetAdapter
 		private void setDragOver(EditorObject o, int d)
@@ -1304,11 +1266,9 @@ public class ControlledSurface
 				}
 			}
 			updateHighlighting(e.getLocation());   
-			e.getDropTargetContext().getDropTarget().
-				setDefaultActions(operation);
+			e.getDropTargetContext().getDropTarget().setDefaultActions(operation);
 			e.acceptDrag(operation);
 		}
-
 
 		public void drop(final DropTargetDropEvent e)
 		{
@@ -1321,6 +1281,7 @@ public class ControlledSurface
 					final EditorObject o =
 						getObjectAtPosition((int) e.getLocation().getX(),
 											(int) e.getLocation().getY());
+					setDragOver(o, EditorObject.NOTDRAG);
 					if (o instanceof EditorNode) {
 						addToNode((EditorNode) o, ip);
 						e.dropComplete(true);

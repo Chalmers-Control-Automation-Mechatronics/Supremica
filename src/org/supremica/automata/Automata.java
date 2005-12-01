@@ -999,21 +999,18 @@ public class Automata
 			return false;
 		}
 
-		for (Iterator thisAutIt = iterator(), otherAutIt = other.iterator();
+		for (Iterator<Automaton> thisAutIt = iterator(), otherAutIt = other.iterator();
 				thisAutIt.hasNext() || otherAutIt.hasNext(); )
 		{
-
 			//System.err.println("automata i");
 			if (!thisAutIt.hasNext())
 			{
-
 				//System.err.println("automata i this");
 				return false;
 			}
 
 			if (!otherAutIt.hasNext())
 			{
-
 				//System.err.println("automata i other");
 				return false;
 			}

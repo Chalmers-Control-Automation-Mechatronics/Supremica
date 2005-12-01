@@ -393,9 +393,7 @@ public class StateSet
 	 */
 	public void update()
 	{
-		Iterator<State> stateIt = iterator();
-
-		while (stateIt.hasNext())
+		for (Iterator<State> stateIt = iterator(); stateIt.hasNext(); )
 		{
 			State currState = stateIt.next();
 
@@ -408,9 +406,7 @@ public class StateSet
 	 */
 	public boolean hasInitialState()
 	{
-		Iterator stateIt = iterator();
-
-		while (stateIt.hasNext())
+		for (Iterator stateIt = iterator(); stateIt.hasNext(); )
 		{
 			State currState = (State) stateIt.next();
 
@@ -428,9 +424,7 @@ public class StateSet
 	 */
 	public boolean hasAcceptingState()
 	{
-		Iterator stateIt = iterator();
-
-		while (stateIt.hasNext())
+		for (Iterator stateIt = iterator(); stateIt.hasNext(); )
 		{
 			State currState = (State) stateIt.next();
 
@@ -448,9 +442,7 @@ public class StateSet
 	 */
 	public boolean hasForbiddenState()
 	{
-		Iterator stateIt = iterator();
-
-		while (stateIt.hasNext())
+		for (Iterator stateIt = iterator(); stateIt.hasNext(); )
 		{
 			State currState = (State) stateIt.next();
 

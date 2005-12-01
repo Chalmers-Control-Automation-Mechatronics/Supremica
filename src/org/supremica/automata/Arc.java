@@ -176,11 +176,10 @@ public class Arc
 		fromState = null;
 		toState = null;
 		
-//		Removed notification here because it was extremely costly
-//		when running the AutomatonPurge. Should we really have notifiers
-//		attached to the arcs, isn't it enough if we have it to the automaton?		
+		// Removed notification here because it was extremely costly
+		// when running the AutomatonPurge. Should we really have notifiers
+		// attached to the arcs, isn't it enough if we have it to the automaton?		
 		notifyListeners(ArcListeners.MODE_ARC_REMOVED, this);
-
 	}
 
 	// This does not belong here, does it?

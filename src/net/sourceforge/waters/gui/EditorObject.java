@@ -4,8 +4,8 @@
 //# PACKAGE: wnet.sourceforge.aters.gui
 //# CLASS:   EditorObject
 //###########################################################################
-//# $Id: EditorObject.java,v 1.20 2005-11-03 01:24:15 robi Exp $
-//# $Id: EditorObject.java,v 1.20 2005-11-03 01:24:15 robi Exp $
+//# $Id: EditorObject.java,v 1.21 2005-12-01 16:29:51 flordal Exp $
+//# $Id: EditorObject.java,v 1.21 2005-12-01 16:29:51 flordal Exp $
 //###########################################################################
 
 
@@ -141,43 +141,41 @@ public abstract class EditorObject
 	public Color getColor()
 	{
 		// In order of importance
-		if(isError())
+		if(getDragOver() != NOTDRAG)
+		{
+			if (getDragOver() == CANDROP)
+				return EditorColor.CANDROP;
+			else if(getDragOver() == CANTDROP)
+				return EditorColor.CANTDROP;
+		}
+		else if(isError())
 		{
 			if(getType() == NODE)
 			{
+				// Slightly different color, to distinguish nodes from nodegroups more clearly. Overkill?
 				return EditorColor.ERRORCOLOR_NODE;
 			}
 			return EditorColor.ERRORCOLOR;
-		}
-		else if(getDragOver() == CANDROP)
-		{
-		    return EditorColor.CANDROP;
-		}
-		else if(getDragOver() == CANTDROP)
-		{
-		    return EditorColor.CANTDROP;
 		}
 		else if(isSelected())
 		{
 			return EditorColor.SELECTCOLOR;
 		}
-		else if(isHighlighted() && !shadow)
+		else if(isHighlighted() && !shadow) // With shadows, highlighting is not necessary
 		{
 			return EditorColor.HIGHLIGHTCOLOR;
 		}
-		else
+
+		// Defaults
+		if(getType() == NODEGROUP)
 		{
-			// Defaults
-			if(getType() == NODEGROUP)
-			{
-				return EditorColor.DEFAULTCOLOR_NODEGROUP;
-			}
-			else if(getType() == LABEL)
-			{
-				return EditorColor.DEFAULTCOLOR_LABEL;
-			}
-			return EditorColor.DEFAULTCOLOR;
+			return EditorColor.DEFAULTCOLOR_NODEGROUP;
 		}
+		else if(getType() == LABEL)
+		{
+			return EditorColor.DEFAULTCOLOR_LABEL;
+		}
+		return EditorColor.DEFAULTCOLOR;
 	}		
 
 	/**

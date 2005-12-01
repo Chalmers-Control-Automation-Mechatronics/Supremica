@@ -514,9 +514,7 @@ public class State
 	}
 
 	/**
-
 	 * Don't do this in public -- only for use by Automaton
-
 	 */
 	void removeOutgoingArc(Arc theArc)
 	{
@@ -535,9 +533,7 @@ public class State
 	}
 
 	/**
-
 	 * Don't do this in public -- only for use by Automaton
-
 	 */
 	ArcSet getArcSet(Arc theArc)
 	{
@@ -564,7 +560,7 @@ public class State
 		return outgoingArcs.iterator();
 	}
 
-	public Iterator outgoingArcSetIterator()
+	public Iterator<ArcSet> outgoingArcSetIterator()
 	{
 		return outgoingArcSets.iterator();
 	}
@@ -1037,7 +1033,7 @@ public class State
 		{
 			LabeledEvent event = arcIt.next().getEvent();
 
-			if (!enabled.contains(event) &&!event.isEpsilon())
+			if (!enabled.contains(event) && !event.isEpsilon())
 			{
 				enabled.addEvent(event);
 			}
