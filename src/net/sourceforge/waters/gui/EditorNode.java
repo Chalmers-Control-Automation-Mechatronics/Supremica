@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorNode
 //###########################################################################
-//# $Id: EditorNode.java,v 1.22 2005-12-01 00:29:58 siw4 Exp $
+//# $Id: EditorNode.java,v 1.23 2005-12-01 01:20:14 siw4 Exp $
 //###########################################################################
 
 
@@ -80,29 +80,12 @@ public class EditorNode
 		// Variables
 		mSubject = subject;
 
-		// Find position
-		PointGeometrySubject geo = mSubject.getPointGeometry();
-		Point2D position;
+		if (subject.getPointGeometry() == null) {
+			subject.setPointGeometry(new PointGeometrySubject(new Point2D.Double(1000,1000)));
+		}
 		if (altpos != null) {
-			position = altpos;
-		} else if (geo != null) {
-			position = geo.getPoint();
-		} else {
-			position = new Point(1000, 1000);
-		}
-		if (geo == null) {
-			geo = new PointGeometrySubject(position);
-			mSubject.setPointGeometry(geo);
-		} else if (altpos != null) {
-			geo.setPoint(position);
-		}
-		if (position instanceof Point2D.Double) {
-			mPosition = (Point2D.Double) position;
-		} else {
-			final double x = position.getX();
-			final double y = position.getY();
-			mPosition = new Point2D.Double(x, y);
-		}
+			subject.getPointGeometry().getPoint().setLocation(altpos);			
+		}		
 
 		// Init propositions
 		propGroup = new EditorPropGroup(this, surface);
@@ -198,8 +181,7 @@ public class EditorNode
     public void setPosition(double x, double y)
     {		
 		GeometryProxy old = new PointGeometrySubject((Point2D)mSubject.getPointGeometry().getPoint().clone());
-		mPosition.setLocation(x, y);
-		mSubject.getPointGeometry().setPoint(mPosition);
+		mSubject.getPointGeometry().getPoint().setLocation(x,y);
 		fireEditorChangedEvent(new NodeMovedEvent(old,
 												  mSubject.getPointGeometry(),
 												  mSubject));
@@ -207,17 +189,17 @@ public class EditorNode
 	
     public Point2D getPosition()
     {
-		return (Point2D)mPosition;
+		return mSubject.getPointGeometry().getPoint();
     }
 
 	public int getX()
 	{
-		return (int) mPosition.getX();
+		return (int) getPosition().getX();
 	}
 
 	public int getY()
 	{
-		return (int) mPosition.getY();
+		return (int) getPosition().getY();
 	}
 
 	/**
@@ -417,7 +399,6 @@ public class EditorNode
 	//# Data Members
 	protected int hash = 0;
 	private final SimpleNodeSubject mSubject;
-	private final Point2D.Double mPosition;
 	private final Collection<Observer> mObservers = new HashSet<Observer>();
     private final Set<Color> mColors = new HashSet<Color>();
 	private ModuleSubject mModule;

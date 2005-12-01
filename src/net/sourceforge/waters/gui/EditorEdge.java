@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorEdge
 //###########################################################################
-//# $Id: EditorEdge.java,v 1.29 2005-12-01 00:29:58 siw4 Exp $
+//# $Id: EditorEdge.java,v 1.30 2005-12-01 01:20:14 siw4 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -223,16 +223,10 @@ public class EditorEdge
 					oldx = subject.getEndPoint().getPoint().getX();
 					oldy = subject.getEndPoint().getPoint().getY();
 				}
-				double dx = newR.getMinX() - oldR.getMinX();
-				double dy = newR.getMinY() - oldR.getMinY();
-				if (!(oldR.getWidth() == newR.getWidth() &&
-					  oldR.getHeight() == newR.getHeight()))
-				{
-					dx = ((oldx - oldR.getMinX()) * (newR.getMaxX() - newR.getMinX()))
-						 / (oldR.getMaxX() - oldR.getMinX());
-					dy = ((oldy - oldR.getMinY()) * (newR.getMaxY() - newR.getMinY()))
-						 / (oldR.getMaxY() - oldR.getMinY());
-				}
+				double dx = ((oldx - oldR.getMinX()) * (newR.getMaxX() - newR.getMinX()))
+					 	/ (oldR.getMaxX() - oldR.getMinX());
+				double dy = ((oldy - oldR.getMinY()) * (newR.getMaxY() - newR.getMinY()))
+					 	/ (oldR.getMaxY() - oldR.getMinY());
 				if (start)
 				{
 					subject.getStartPoint().getPoint().setLocation(newR.getMinX() + dx, newR.getMinY() + dy);
