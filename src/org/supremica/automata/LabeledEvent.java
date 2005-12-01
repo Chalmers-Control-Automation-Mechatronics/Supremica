@@ -228,7 +228,7 @@ public class LabeledEvent
 	// The Java people have messed it all up with inheriting equals(Object)
 	public boolean equals(LabeledEvent event)
 	{
-		return getLabel().equals(event.getLabel());
+		return equals(event.getLabel());
 	}
 
 	public boolean equals(String label)
@@ -236,10 +236,12 @@ public class LabeledEvent
 		return this.label.equals(label);
 	}
 
-	public boolean isEqual(LabeledEvent ev)
+	/*
+	public boolean isEqual(LabeledEvent event)
 	{
-		return this.label.equals(ev.label);    // should also check priority & controllability?
+		return equals(event.label);    // should also check priority & controllability?
 	}
+	*/
 
 	public int hashCode()
 	{

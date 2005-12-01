@@ -319,7 +319,7 @@ public class Determinizer
 		{
 			Arc arc = it.next();
 
-			if (arc.getEvent().isEqual(event))
+			if (arc.getEvent().equals(event))
 			{
 				stateset.add(arc.getToState());
 

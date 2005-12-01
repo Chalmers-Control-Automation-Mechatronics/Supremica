@@ -999,21 +999,33 @@ public class Automaton
 		}
 	}
 
+	/** 
+	 * Returns number of states in this automaton.
+	 */
 	public int nbrOfStates()
 	{
 		return theStates.size();
 	}
 
+	/** 
+	 * Returns number of events in this automaton's alphabet.
+	 */
 	public int nbrOfEvents()
 	{
 		return alphabet.size();
 	}
 
+	/** 
+	 * Returns number of transitions in this automaton.
+	 */
 	public int nbrOfTransitions()
 	{
 		return theArcs.size();
 	}
 
+	/** 
+	 * Returns number of transitions in this automaton that are associated with epsilon-events.
+	 */
 	public int nbrOfEpsilonTransitions()
 	{
 		int amount = 0;
