@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorNode
 //###########################################################################
-//# $Id: EditorNode.java,v 1.23 2005-12-01 01:20:14 siw4 Exp $
+//# $Id: EditorNode.java,v 1.24 2005-12-01 16:46:39 flordal Exp $
 //###########################################################################
 
 
@@ -107,6 +107,20 @@ public class EditorNode
 		final EventListExpressionSubject props = mSubject.getPropositions();
 		final List<AbstractSubject> list = props.getEventListModifiable();
 		list.add(ident);
+    }
+
+    public boolean hasPropositions()
+    {
+		final EventListExpressionSubject props = mSubject.getPropositions();
+		final List<AbstractSubject> list = props.getEventListModifiable();
+		return (list.size() != 0);
+    }
+
+    public void clearPropositions()
+    {
+		final EventListExpressionSubject props = mSubject.getPropositions();
+		final List<AbstractSubject> list = props.getEventListModifiable();
+		list.clear();
     }
 
     public void attach(Observer o)
@@ -393,7 +407,6 @@ public class EditorNode
 			break;
 		}
     }
-
 
 	//########################################################################
 	//# Data Members

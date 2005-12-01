@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorLabel
 //###########################################################################
-//# $Id: EditorNodePopupMenu.java,v 1.6 2005-11-03 01:24:15 robi Exp $
+//# $Id: EditorNodePopupMenu.java,v 1.7 2005-12-01 16:46:39 flordal Exp $
 //###########################################################################
 
 
@@ -26,10 +26,10 @@ class EditorNodePopupMenu
 	private EditorNode node;
 	private EditorSurface parent;
 
-	private JMenuItem renameItem;
 	private JMenuItem deleteItem;
 	private JMenuItem initialItem;	
 	private JMenuItem recallItem;	
+	private JMenuItem clearItem;	
 
 	public EditorNodePopupMenu(EditorSurface parent, EditorNode node)
 	{
@@ -45,12 +45,6 @@ class EditorNodePopupMenu
 	private void init()
 	{
 		JMenuItem item;
-		item = new JMenuItem("Rename node");
-		item.addActionListener(this);
-		this.add(item);
-		item.setEnabled(false);
-		item.setToolTipText("Not implemented yet");
-		renameItem = item;
 
 		item = new JMenuItem("Delete node");
 		item.addActionListener(this);
@@ -60,40 +54,44 @@ class EditorNodePopupMenu
 		item = new JMenuItem("Make initial");
 		item.addActionListener(this);
 		this.add(item);
-		initialItem = item;
-
 		// Disable "initial" is node already is initial
 		if (node.isInitial())
 		{
-			initialItem.setEnabled(false);
-			initialItem.setToolTipText("State is already initial");
+			item.setEnabled(false);
+			item.setToolTipText("State is already initial");
 		}
+		initialItem = item;
 
 		item = new JMenuItem("Recall label");
 		item.addActionListener(this);
 		this.add(item);
+		// Disable "recall" if label is in right position (or maybe instead if it is close enough?)
+		if ((parent.getLabel(node).getOffsetX() == EditorLabel.DEFAULTOFFSETX) && 
+			(parent.getLabel(node).getOffsetY() == EditorLabel.DEFAULTOFFSETY))
+		{
+			item.setEnabled(false);
+			item.setToolTipText("Label is already in default position");
+		}
 		recallItem = item;
 
-		// Disable "recall" if label is in right position (or maybe instead if it is close enough?)
-		if ((parent.getLabel(node).getOffsetX() == EditorLabel.DEFAULTOFFSETX) && (parent.getLabel(node).getOffsetY() == EditorLabel.DEFAULTOFFSETY))
+		item = new JMenuItem("Clear marking");
+		item.addActionListener(this);
+		this.add(item);
+		// Disable if there are no propositions
+		if (!node.hasPropositions())
 		{
-			recallItem.setEnabled(false);
-			recallItem.setToolTipText("Label is already in default position");
+			item.setEnabled(false);
+			item.setToolTipText("State has no marking");
+
 		}
+		clearItem = item;
 	}
 
 	public void actionPerformed(ActionEvent e) 
 	{
-		if (e.getSource() == renameItem)
-		{
-			node.setName("Apa", parent);
-			this.hide();
-		}
-
 		if (e.getSource() == deleteItem)
 		{
 			parent.delNode(node);
-			this.hide();
 		}
 
 		if (e.getSource() == initialItem)
@@ -111,6 +109,12 @@ class EditorNodePopupMenu
 							EditorLabel.DEFAULTOFFSETY);
 		}
 
+		if (e.getSource() == clearItem)
+		{
+			node.clearPropositions();
+		}
+
+		this.hide();
 		parent.repaint();
 	}
 }
