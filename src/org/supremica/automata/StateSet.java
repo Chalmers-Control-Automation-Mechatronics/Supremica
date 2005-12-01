@@ -15,7 +15,7 @@ import org.supremica.properties.SupremicaProperties;
 
 public class StateSet
 {
-	private TreeSet<State> theSet = null;
+	private SortedSet<State> theSet = null;
 	//private HashMap<String,State> nameToStateMap = null;
 	private State singleStateRepresentation = null;
 
@@ -78,6 +78,7 @@ public class StateSet
 	/**
 	 * Intersect the two StateSet:s s1 and s2, returning a new StateSet.
 	 */
+	/*
 	public static StateSet intersect(StateSet s1, StateSet s2)
 	{
 		StateSet ss = new StateSet(s1);
@@ -86,14 +87,16 @@ public class StateSet
 
 		return ss;
 	}
+	*/
 
 	/**
 	 * Make me the union of myself and s2.
 	 */
 	public void union(StateSet s2)
 	{
-		modified();
-		theSet.addAll(s2.theSet);
+		add(s2);
+		//modified();
+		//theSet.addAll(s2.theSet);
 	}
 
 	/**
