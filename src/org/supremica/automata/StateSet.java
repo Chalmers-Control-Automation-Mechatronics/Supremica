@@ -15,7 +15,7 @@ import org.supremica.properties.SupremicaProperties;
 
 public class StateSet
 {
-	private Set<State> theSet = null;
+	private TreeSet<State> theSet = null;
 	//private HashMap<String,State> nameToStateMap = null;
 	private State singleStateRepresentation = null;
 
