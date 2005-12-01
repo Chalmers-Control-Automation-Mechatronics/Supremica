@@ -19,7 +19,7 @@
 	</Backend>
   </ModelType>
 
-  <ViewType Name="EdgeDetectingView" FBType="EdgeDetect_VIEW" >
+  <ViewType Name="EdgeDetecting" FBType="EdgeDetect_VIEW" >
     <WithModelType Name="BinaryPassiveSensor"/>
 	<Frontend>
 	  <EventOutputs>

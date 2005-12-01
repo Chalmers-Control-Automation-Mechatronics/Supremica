@@ -2,4 +2,14 @@
 <AOApplication xmlns="AutomationObjects" Name="Kulbana" >
   <VersionInfo Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2005-11-30" />
 
+  <AO Name="DigitalIO" Type="AdlinkIO">
+    <Model Type="SampledIO" />
+    <View Name="direct" Type="Direct" />
+  </AO>
+
+  <AO Name="KulaPortvakt" Type="Sensor">
+    <Model Type="BinaryPassiveSensor" />
+    <View Name="edge" Type="EdgeDetecting" />
+  </AO>
+
 </AOApplication>
