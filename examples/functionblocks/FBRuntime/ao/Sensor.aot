@@ -3,29 +3,28 @@
   <VersionInfo Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2005-11-28" />
 
   <ModelType Name="BinaryPassiveSensor" FBType="Sensor_MDL.fbt" >
-    <Request Name="CURRENT_VALUE" />
-	<Response Name="CURRENT_VALUE">
-	  <Argument Name="VALUE" Type="BOOL" />
-	</Response>
-	<Backend>
-	  <EventInputs>
-	    <Event Name="NEW_SAMPLE" >
-          <With Var="VALUE" />
-        </Event>
-	  </EventInputs>
-	  <InputVars>
-	    <VarDeclaration Name="VALUE" Type="BOOL" />
-	  </InputVars>
-	</Backend>
+   <Frontend>
+    <Transaction Name="CURRENT_VALUE">
+     <Request Argument="" />
+	 <Response Argument="VALUE" Type="BOOL" />
+    </Transaction>
+   </Frontend>
+   <Backend>
+    <Transaction Name="NEW_SAMPLE">
+	 <Response Argument="VALUE" Type="BOOL" />
+	</Transaction>
+   </Backend>
   </ModelType>
 
   <ViewType Name="EdgeDetecting" FBType="EdgeDetect_VIEW" >
-    <WithModelType Name="BinaryPassiveSensor"/>
-	<Frontend>
-	  <EventOutputs>
-	    <Event Name="RISING_EDGE" />
-        <Event Name="FALLING_EDGE" />
-	  </EventOutputs>
+   <WithModelType Name="BinaryPassiveSensor" />
+   <Frontend>
+	 <Transaction Name="RISING_EDGE" />
+	  <Response Argument="" />
+	 </Transaction>
+	 <Transaction Name="FALLING_EDGE" />
+	  <Response Argument="" />
+	 </Transaction>
 	</Frontend>
   </ViewType>
 

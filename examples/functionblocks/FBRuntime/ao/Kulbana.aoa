@@ -2,12 +2,31 @@
 <AOApplication xmlns="AutomationObjects" Name="Kulbana" >
   <VersionInfo Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2005-11-30" />
 
-  <AO Name="DigitalIO" Type="AdlinkIO">
-    <Model Type="SampledIO" />
-    <View Name="direct" Type="Direct" />
-  </AO>
+  <FB Name="restart" Type="E_RESTART">
+  <FB Name="digitalIO" Type="AdlinkIO">
+  <FB Name="cycle" Type="E_CYCLE">
 
   <AO Name="KulaPortvakt" Type="Sensor">
+    <Model Type="BinaryPassiveSensor" />
+    <View Name="edge" Type="EdgeDetecting" />
+  </AO>
+
+  <AO Name="KulaMatlyft" Type="Sensor">
+    <Model Type="BinaryPassiveSensor" />
+    <View Name="edge" Type="EdgeDetecting" />
+  </AO>
+
+  <AO Name="KulaMatstation" Type="Sensor">
+    <Model Type="BinaryPassiveSensor" />
+    <View Name="edge" Type="EdgeDetecting" />
+  </AO>
+
+  <AO Name="MatlyftUppe" Type="Sensor">
+    <Model Type="BinaryPassiveSensor" />
+    <View Name="edge" Type="EdgeDetecting" />
+  </AO>
+
+  <AO Name="MatlyftNere" Type="Sensor">
     <Model Type="BinaryPassiveSensor" />
     <View Name="edge" Type="EdgeDetecting" />
   </AO>

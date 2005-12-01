@@ -333,6 +333,20 @@
   </xsd:complexType>
  </xsd:element>
 
+
+ <xsd:element name='FB'>
+  <xsd:complexType>
+   <xsd:annotation>
+    <xsd:appinfo>
+     <jaxb:class name="FBComplexType"/>
+    </xsd:appinfo>
+   </xsd:annotation>  
+   <xsd:attribute name='Name' type='xsd:string' use='required'/>
+   <xsd:attribute name='Type' type='xsd:string' use='required'/>
+   <xsd:attribute name='Comment' type='xsd:string' use='optional'/>
+  </xsd:complexType>
+ </xsd:element>
+
 </xsd:schema>
 
 
