@@ -57,7 +57,7 @@ public class Arc
 	private LabeledEvent event;
 	private State fromState;
 	private State toState;
-	private ArcListeners listeners = null;
+//	private ArcListeners listeners = null;
 
 	// Internal use for graphical representation -- should be in GraphicalArc?
 	private double outgoingAngle = 0;
