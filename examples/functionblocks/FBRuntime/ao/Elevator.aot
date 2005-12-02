@@ -4,17 +4,18 @@
 
   <ModelType Name="BinaryPassiveSensor" FBType="Sensor_MDL.fbt" >
    <Frontend>
-    <Transaction>
-     <Request Name="CURRENT_VALUE"/>
-	 <Response Name="CURRENT_VALUE">
+    <Transaction Name="CURRENT_VALUE">
+     <Request/>
+	 <Response>
 	  <Argument Name="VALUE" Type="BOOL" />
 	 </Response>
     </Transaction>
    </Frontend>
    <Backend>
-    <Transaction>
-	 <Response  Name="NEW_SAMPLE">
+    <Transaction Name="NEW_SAMPLE">
+	 <Response>
 	  <Argument Name="VALUE" Type="BOOL" />
+	 </Response>
 	</Transaction>
    </Backend>
   </ModelType>
