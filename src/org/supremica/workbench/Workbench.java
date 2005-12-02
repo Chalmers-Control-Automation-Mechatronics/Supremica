@@ -387,7 +387,7 @@ class ContButton
 				if (state.isForbidden())
 				{
 					state.setSelected(false);
-					state_set.add(synth.doControllable(state));
+					state_set.addAll(synth.doControllable(state));
 				}
 			}
 
@@ -668,8 +668,9 @@ class ParamPanel
 		setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Parameters"));
 		setLayout(new VerticalFlowLayout(true, 0));
 		add(show_graph = new JCheckBox("Show graph", true));
-		//add(list_uc = new JCheckBox("List new uncontrollable states", true));
-		//add(list_nb = new JCheckBox("List new non-blocking states", true));
+		// These are not used?
+		// add(list_uc = new JCheckBox("List new uncontrollable states", true));
+		// add(list_nb = new JCheckBox("List new non-blocking states", true));
 		add(add_it = new JCheckBox("Add final result to the project", true));
 		show_graph.addActionListener(new ActionListener()
 		{

@@ -765,7 +765,7 @@ public class AutomatonMinimizer
             {
                 State nextState = nextIt.next();
                 EquivalenceClass thisNextClass = (EquivalenceClass) nextState.getStateSet();
-                nextClass.union(thisNextClass);
+                nextClass.addAll(thisNextClass);
             }
             newEquivalenceClassHolder.addState(currState, nextClass);
         }

@@ -14,8 +14,9 @@ import java.util.*;
 import org.supremica.properties.SupremicaProperties;
 
 public class StateSet
+	extends TreeSet<State>
 {
-	private SortedSet<State> theSet = null;
+	//private SortedSet<State> theSet = null;
 	//private HashMap<String,State> nameToStateMap = null;
 	private State singleStateRepresentation = null;
 
@@ -24,160 +25,44 @@ public class StateSet
 	 */
 	public StateSet()
 	{
-		theSet = new TreeSet<State>(new State.StateComparator());
+		super(new State.StateComparator());
 	}
 
-	/**
-	 * Shallow copy (should it be deep?)
-	 */
-	public StateSet(StateSet ss)
-	{
-		//this(ss.theSet);
-		this.theSet = new TreeSet<State>(ss.theSet);
-	}
-
-	/**
-	 * Create a StateSet containing all the states of an automaton
-	 */
-	/*
-	public StateSet(Automaton aut)
+	public StateSet(Collection<? extends State> collection)
 	{
 		this();
-
-		for (Iterator<State> stateIt = aut.stateIterator(); stateIt.hasNext(); )
-		{
-			this.add(stateIt.next());
-		}	    
-	}
-	*/
-
-	/**
-	 * Private constructor for cloning
-	 */
-	/*
-	private StateSet(Set<State> set)
-	{
-		this.theSet = new TreeSet<State>(set);
-	}
-	*/
-
-	/**
-	 * Find the union of the two StateSet:s s1 and s2, returning a new StateSet.
-	 */
-	/*
-	public static StateSet union(StateSet s1, StateSet s2)
-	{
-		StateSet ss = new StateSet(s1);
-
-		ss.union(s2);
-
-		return ss;
-	}
-	*/
-
-	/**
-	 * Intersect the two StateSet:s s1 and s2, returning a new StateSet.
-	 */
-	/*
-	public static StateSet intersect(StateSet s1, StateSet s2)
-	{
-		StateSet ss = new StateSet(s1);
-
-		ss.intersect(s2);
-
-		return ss;
-	}
-	*/
-
-	/**
-	 * Make me the union of myself and s2.
-	 */
-	public void union(StateSet s2)
-	{
-		add(s2);
-		//modified();
-		//theSet.addAll(s2.theSet);
-	}
-
-	/**
-	 * Make me the intersection of myself and s2.
-	 */
-	public void intersect(StateSet s2)
-	{
-		modified();
-		theSet.retainAll(s2.theSet);
+		super.addAll(collection);
 	}
 
 	public boolean add(State state)
 	{
-		modified();
-		return theSet.add(state);
+		return modified(super.add(state));
 	}
 
-	public boolean add(StateSet stateSet)
+	public boolean addAll(Collection<? extends State> collection)
 	{
-		modified();
-		return theSet.addAll(stateSet.theSet);
-	}
-
-	public boolean add(Collection<State> collection)
-	{
-		modified();
-		return theSet.addAll(collection);
+		return modified(super.addAll(collection));
 	}
 
 	public void clear()
 	{
-		modified();
-		theSet.clear();
+		super.clear();
+		modified(size() != 0);
 	}
 
-	/*
-	// Shallow copy (is that what we mean by clone, really?)
-	public Object clone()
+	public boolean remove(Object object)
 	{
-		return new StateSet(theSet.clone());
-	}
-	*/
-
-	public boolean contains(State state)
-	{
-		return theSet.contains(state);
+		return modified(super.remove(object));
 	}
 
-	public boolean isEmpty()
+	public boolean removeAll(Collection collection)
 	{
-		return theSet.isEmpty();
+		return modified(super.removeAll(collection));
 	}
 
-	public Iterator<State> iterator()
+	public boolean retainAll(Collection collection)
 	{
-		return theSet.iterator();
-	}
-
-	public Iterator<Arc> outgoingArcsIterator()
-	{
-		return new StateSetArcIterator(this, true);
-	}
-
-	public Iterator<Arc> incomingArcsIterator()
-	{
-		return new StateSetArcIterator(this, false);
-	}
-
-	public boolean remove(State state)
-	{
-		modified();
-		return theSet.remove(state);
-	}
-
-	public void remove(StateSet set)
-	{
-		modified();
-		for (Iterator<State> it = set.iterator(); it.hasNext(); )
-		{
-			theSet.remove(it.next());
-		}
+		return modified(super.retainAll(collection));
 	}
 
 	/**
@@ -185,36 +70,21 @@ public class StateSet
 	 */
 	public State remove()
 	{
-		State state = get();
+		State state = super.first();
 		remove(state);
 		return state;
-	}
-
-	public int size()
-	{
-		return theSet.size();
-	}
-
-	public boolean equals(StateSet s2)
-	{
-		if (this == s2)    // avoid testing for self comparison
-		{
-			return true;
-		}
-
-		return theSet.equals(s2.theSet);
 	}
 
 	public boolean equals(Object obj)
 	{
 		StateSet states = (StateSet) obj;
 
-		return equals(states);
-	}
+		if (this == states)    // avoid testing for self comparison
+		{
+			return true;
+		}
 
-	public int hashCode()
-	{
-		return theSet.hashCode();
+		return super.equals(states);
 	}
 
 	public String toString()
@@ -223,11 +93,10 @@ public class StateSet
 
 		buf.append("StateSet[" + size() + "]: {");
 
-		Iterator it = iterator();
-
+		Iterator<State> it = iterator();
 		while (it.hasNext())
 		{
-			State state = (State) it.next();
+			State state = it.next();
 
 			//buf.append(state.getName());
 			buf.append(state);
@@ -238,6 +107,32 @@ public class StateSet
 		buf.append("}");
 
 		return buf.toString();
+	}
+
+	///////////////
+	// EXTENSION //
+	///////////////
+
+	/**
+	 * When this StateSet is modified, it will have a new singleStateRepresentation.
+	 */
+	private boolean modified(boolean change)
+	{
+		if (change)
+		{
+			singleStateRepresentation = null;
+		}
+		return change;
+	}
+
+	public Iterator<Arc> outgoingArcsIterator()
+	{
+		return new StateSetArcIterator(this, true);
+	}
+
+	public Iterator<Arc> incomingArcsIterator()
+	{
+		return new StateSetArcIterator(this, false);
 	}
 
 	/**
@@ -274,7 +169,7 @@ public class StateSet
 		for (Iterator<State> stateIt = iterator(); stateIt.hasNext(); )
 		{
 			State state = stateIt.next();
-			nextStates.add(state.nextStates(event, considerEpsilonClosure));
+			nextStates.addAll(state.nextStates(event, considerEpsilonClosure));
 		}
 
 		return nextStates;
@@ -291,12 +186,12 @@ public class StateSet
 		// Include self?
 		if (includeSelf)
 		{
-			result.add(this);
+			result.addAll(this);
 		}
 
 		// Examine states 
 		StateSet statesToExamine = new StateSet();
-		statesToExamine.add(this);
+		statesToExamine.addAll(this);
 		while (statesToExamine.size() != 0)
 		{
 			State currState = (State) statesToExamine.remove();
@@ -316,14 +211,6 @@ public class StateSet
 		}
 
 		return result;
-	}
-
-	/**
-	 * @return an arbitrary, not yet iterated element. Note, assumes that at least one exists.
-	 */
-	public State get()
-	{
-		return (State) iterator().next();
 	}
 
 	/**
@@ -455,15 +342,7 @@ public class StateSet
 		return false;
 	}
 
-	/**
-	 * When this StateSet is modified, it will have a new singleStateRepresentation.
-	 */
-	private void modified()
-	{
-		singleStateRepresentation = null;
-	}
-
-	private class StateSetArcIterator
+	private static class StateSetArcIterator
 		implements Iterator<Arc>
 	{
 		private Iterator<State> stateIterator = null;

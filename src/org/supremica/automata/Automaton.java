@@ -891,6 +891,9 @@ public class Automaton
 		return theStates.contains(state);
 	}
 
+	/**
+	 * Gets the states in this automaton.
+	 */
 	public StateSet getStateSet()
 	{
 		return theStates;

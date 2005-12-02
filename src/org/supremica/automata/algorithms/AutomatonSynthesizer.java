@@ -219,7 +219,7 @@ public class AutomatonSynthesizer
 	protected boolean synthesizeControllableNonblocking()
 		throws Exception
 	{
-		LinkedList stateList = new LinkedList();
+		LinkedList<State> stateList = new LinkedList<State>();
 
 		logger.debug("AutomatonSynthesizer::synthesizeControllableNonblocking");
 
@@ -438,7 +438,7 @@ public class AutomatonSynthesizer
 	}
 
 	// returns true if uncontrollable states found
-	protected boolean doControllable(LinkedList stateStack)
+	protected boolean doControllable(LinkedList<State> stateStack)
 		throws Exception
 	{
 		logger.debug("AutomatonSynthesizer::doControllable");
@@ -485,7 +485,7 @@ public class AutomatonSynthesizer
 								}
 						}
 */
-			LinkedList newXstates = doControllable(currState);
+			List<State> newXstates = doControllable(currState);
 
 			if (newXstates.size() != 0)
 			{
@@ -501,10 +501,12 @@ public class AutomatonSynthesizer
 		return newUnsafeStates;
 	}
 
-	// This one does for one state
-	public LinkedList doControllable(State currState)
+	/**
+	 * This one does for one state
+	 */
+	public List<State> doControllable(State currState)
 	{
-		LinkedList stateStack = new LinkedList();
+		LinkedList<State> stateStack = new LinkedList<State>();
 		Iterator arcIt = currState.incomingArcsIterator();
 
 		while (arcIt.hasNext())

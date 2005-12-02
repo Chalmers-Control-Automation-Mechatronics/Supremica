@@ -279,7 +279,7 @@ public class Determinizer
 			StateSet ss = eventTransition(state, event);
 
 			// System.out.println("(evCSsE) Performing the union");
-			closure.union(ss);
+			closure.addAll(ss);
 		}
 
 		debugPrint("(evCSsE) return closure " + closure.toString() + ")", false);
@@ -299,7 +299,7 @@ public class Determinizer
 
 		while (eventit.hasNext())
 		{
-			stateset.union(eventTransition(state, (LabeledEvent) eventit.next()));
+			stateset.addAll(eventTransition(state, (LabeledEvent) eventit.next()));
 		}
 
 		debugPrint("(evTSA) return " + stateset.toString() + ")", false);
@@ -344,7 +344,7 @@ public class Determinizer
 		/* StateSet. */
 		for (Iterator<State> stateit = states.iterator(); stateit.hasNext(); )
 		{
-			closure.union(epsilonClosure(stateit.next()));
+			closure.addAll(epsilonClosure(stateit.next()));
 		}
 
 		debugPrint("(eCSS) return closure" + closure.toString() + ")", false);
@@ -387,7 +387,7 @@ public class Determinizer
 				prevsize = nextsize;
 				tempset = epsilonTransition(tempset);    // call eTSS
 
-				closure.union(tempset);
+				closure.addAll(tempset);
 
 				nextsize = closure.size();
 			}
@@ -413,7 +413,7 @@ public class Determinizer
 		// Iterate over the states and create the union of their respective closures
 		for (Iterator<State> it = states.iterator(); it.hasNext(); )
 		{
-			stateset.union(epsilonTransition(it.next()));
+			stateset.addAll(epsilonTransition(it.next()));
 		}
 
 		debugPrint("(eTSS) return " + stateset.toString() + ")", false);
