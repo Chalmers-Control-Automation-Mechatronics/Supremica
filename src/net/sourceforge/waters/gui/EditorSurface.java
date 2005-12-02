@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.33 2005-12-01 00:29:58 siw4 Exp $
+//# $Id: EditorSurface.java,v 1.34 2005-12-02 02:31:04 siw4 Exp $
 //###########################################################################
 
 
@@ -26,6 +26,7 @@ import javax.swing.text.*;
 
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.NodeProxy;
+import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.module.*;
 import net.sourceforge.waters.xsd.module.AnchorPosition;
@@ -68,6 +69,11 @@ public class EditorSurface
 	protected GraphSubject graph;
     protected EditorNodeGroup newGroup = null;
 	private Rectangle drawnAreaBounds = null;
+	
+	public GraphProxy getGraph()
+	{
+		return graph;
+	}
 	
 	public int getGridSize()
 	{

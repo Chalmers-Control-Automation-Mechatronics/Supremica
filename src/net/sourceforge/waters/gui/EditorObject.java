@@ -4,8 +4,8 @@
 //# PACKAGE: wnet.sourceforge.aters.gui
 //# CLASS:   EditorObject
 //###########################################################################
-//# $Id: EditorObject.java,v 1.21 2005-12-01 16:29:51 flordal Exp $
-//# $Id: EditorObject.java,v 1.21 2005-12-01 16:29:51 flordal Exp $
+//# $Id: EditorObject.java,v 1.22 2005-12-02 02:31:04 siw4 Exp $
+//# $Id: EditorObject.java,v 1.22 2005-12-02 02:31:04 siw4 Exp $
 //###########################################################################
 
 
@@ -214,6 +214,5 @@ public abstract class EditorObject
 
     public abstract Point2D getPosition();
 
-	public abstract Subject getSubject();
-
+	public abstract Subject getSubject();		
 }

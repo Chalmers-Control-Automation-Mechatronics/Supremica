@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorMenu
 //###########################################################################
-//# $Id: EditorMenu.java,v 1.17 2005-12-01 00:29:58 siw4 Exp $
+//# $Id: EditorMenu.java,v 1.18 2005-12-02 02:31:04 siw4 Exp $
 //###########################################################################
 
 
@@ -47,6 +47,7 @@ public class EditorMenu
 	public final JMenuItem editDeleteMenu;
 	public final JMenuItem editCopyAsWMFMenu;
 	public final JMenuItem editCreatePDFMenu;
+	public final JMenuItem mEmbedder;
 	EditorWindowInterface root;
 	ControlledSurface surface;
 	JFileChooser fileChooser;
@@ -168,14 +169,19 @@ public class EditorMenu
 		mToolsCreateEvent = menuItem;
 		menu.add(menuItem);
 		menuItem.addActionListener(this);
+		
+		menuItem = new JMenuItem("Run Embedder");
+		mEmbedder = menuItem;
+		menu.add(menuItem);
+		menuItem.addActionListener(this);
+		
 		menu.addSeparator();
 
 		menuItem = new JMenuItem("Options...");
 		menu.add(menuItem);
-
-		ToolsOptionsMenu = menuItem;
-
 		menuItem.addActionListener(this);
+		
+		ToolsOptionsMenu = menuItem;
 
 		menu = new JMenu("Help");
 		this.add(menu);
@@ -267,6 +273,19 @@ public class EditorMenu
 				root.getUndoInterface().redo();
 			}
 			mEditRedo.setEnabled(root.getUndoInterface().canRedo());
+		}
+		
+		if (e.getSource() == mEmbedder)
+		{
+			try {
+				int iterations = Integer.parseInt(JOptionPane.showInputDialog(this, "Input A number of Iterations to Run the Embedder",
+												  new Integer(1000)));
+				SpringEmbedder.run(surface, surface.getGraph() , iterations);
+			}
+			catch(Throwable t)
+			{
+				JOptionPane.showMessageDialog(this, "Input must be an Integer");
+			}												  
 		}
 
 		if (e.getSource() == editCreatePDFMenu)
