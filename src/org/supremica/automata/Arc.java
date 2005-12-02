@@ -233,6 +233,7 @@ public class Arc
 		return endY;
 	}
 
+/*
 	public Listeners getListeners()
 	{
 		if (listeners == null)
@@ -258,6 +259,7 @@ public class Arc
 			listeners.notifyListeners(mode, o);
 		}
 	}
+*/
 
 	public static double angle(int x0, int y0, int x1, int y1)
 	{

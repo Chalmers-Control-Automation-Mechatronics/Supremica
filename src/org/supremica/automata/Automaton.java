@@ -57,7 +57,7 @@ import org.supremica.properties.SupremicaProperties;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 
 public class Automaton
-	implements ArcListener
+//	implements ArcListener
 {
 	private static Logger logger = LoggerFactory.createLogger(Automaton.class);
 	private final Alphabet alphabet;
@@ -844,9 +844,9 @@ public class Automaton
 		arc.getFromState().addOutgoingArc(arc);
 		arc.getToState().addIncomingArc(arc);
 
-		arc.getListeners().addListener(this);
+//		arc.getListeners().addListener(this);
 //		theArcs.addArc(arc);
-		notifyListeners(AutomatonListeners.MODE_ARC_ADDED, arc);
+//		notifyListeners(AutomatonListeners.MODE_ARC_ADDED, arc);
 	}
 
 	public void removeArc(Arc arc)
@@ -859,7 +859,7 @@ public class Automaton
 
 		arc.clear();
 //		theArcs.removeArc(arc);
-		notifyListeners(AutomatonListeners.MODE_ARC_REMOVED, arc);
+//		notifyListeners(AutomatonListeners.MODE_ARC_REMOVED, arc);
 	}
 
 	/*
@@ -2278,12 +2278,14 @@ public class Automaton
 
 	public void updated(Object o) {}
 
+/*
 	public void arcAdded(Arc arc) {}
 
 	public void arcRemoved(Arc arc)
 	{
 		//theArcs.removeArc(arc);
 	}
+*/
 
 	public int hashCode()
 	{
