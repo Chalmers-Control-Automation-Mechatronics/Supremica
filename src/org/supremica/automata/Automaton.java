@@ -79,7 +79,7 @@ public class Automaton
 	private int index = -1;
 	//private Map idStateMap;    // Want fast lookup on both id and index (but not name?)
 	private Map<Integer,State> indexStateMap;
-	private ArcSet theArcs;
+//	private ArcSet theArcs;
 	private State initialState;
 	private boolean isDisabled = false;
 	private AutomatonType type = AutomatonType.Specification;
@@ -106,7 +106,7 @@ public class Automaton
 		alphabet = new Alphabet();
 		//idStateMap = new HashMap();
 		indexStateMap = new HashMap<Integer,State>();
-		theArcs = new ArcSet();
+//		theArcs = new ArcSet();
 		masterAutomata = new Automata();
 		slaveAutomata = new Automata();
 	}
@@ -556,7 +556,7 @@ public class Automaton
 	public Alphabet getRedundantEvents()
 	{
 		assert(isDeterministic());
-		
+
 		Alphabet result = new Alphabet();
 
 		loop: for (Iterator<LabeledEvent> evIt = eventIterator(); evIt.hasNext(); )
@@ -770,7 +770,7 @@ public class Automaton
 	 */
 	public boolean hasSelfLoop()
 	{
-		for (Iterator<Arc> arcIt = theArcs.iterator(); arcIt.hasNext(); )
+		for (Iterator<Arc> arcIt = arcIterator(); arcIt.hasNext(); )
 		{
 			Arc currArc = arcIt.next();
 
@@ -845,7 +845,7 @@ public class Automaton
 		arc.getToState().addIncomingArc(arc);
 
 		arc.getListeners().addListener(this);
-		theArcs.addArc(arc);
+//		theArcs.addArc(arc);
 		notifyListeners(AutomatonListeners.MODE_ARC_ADDED, arc);
 	}
 
@@ -858,7 +858,7 @@ public class Automaton
 		}
 
 		arc.clear();
-		theArcs.removeArc(arc);
+//		theArcs.removeArc(arc);
 		notifyListeners(AutomatonListeners.MODE_ARC_REMOVED, arc);
 	}
 
@@ -895,6 +895,20 @@ public class Automaton
 	{
 		return theStates;
 	}
+
+	public Iterator<Arc> arcIterator()
+	{
+		return theStates.outgoingArcsIterator();
+	}
+
+/*
+	public List<Arc> getArcs()
+	{
+		List<Arc> arcList = new LinkedList<Arc>();
+
+		return Collections.unmodifiableList(arcList);
+	}
+*/
 
 	// Note, searches on id - only call this with states in this automaton
 	/*
@@ -949,9 +963,9 @@ public class Automaton
 		}
 
 		for (Iterator<State> stIt = stateIterator(); stIt.hasNext(); )
-		{	
+		{
 			State currState = stIt.next();
-			
+
 			if (currState.getName().equals(name))
 			{
 				return currState;
@@ -1043,7 +1057,7 @@ public class Automaton
 		}
 	}
 
-	/** 
+	/**
 	 * Returns number of states in this automaton.
 	 */
 	public int nbrOfStates()
@@ -1051,7 +1065,7 @@ public class Automaton
 		return theStates.size();
 	}
 
-	/** 
+	/**
 	 * Returns number of events in this automaton's alphabet.
 	 */
 	public int nbrOfEvents()
@@ -1059,22 +1073,30 @@ public class Automaton
 		return alphabet.size();
 	}
 
-	/** 
+	/**
 	 * Returns number of transitions in this automaton.
 	 */
 	public int nbrOfTransitions()
 	{
-		return theArcs.size();
+		int amount = 0;
+
+		for (Iterator<Arc> arcIt = arcIterator(); arcIt.hasNext(); )
+		{
+			Arc currArc = arcIt.next();
+			amount++;
+		}
+
+		return amount;
 	}
 
-	/** 
+	/**
 	 * Returns number of transitions in this automaton that are associated with epsilon-events.
 	 */
 	public int nbrOfEpsilonTransitions()
 	{
 		int amount = 0;
 
-		for (Iterator<Arc> arcIt = theArcs.iterator(); arcIt.hasNext(); )
+		for (Iterator<Arc> arcIt = arcIterator(); arcIt.hasNext(); )
 		{
 			Arc currArc = arcIt.next();
 
@@ -1094,7 +1116,7 @@ public class Automaton
 	{
 		int amount = 0;
 
-		for (Iterator<Arc> arcIt = theArcs.iterator(); arcIt.hasNext(); )
+		for (Iterator<Arc> arcIt = arcIterator(); arcIt.hasNext(); )
 		{
 			Arc currArc = arcIt.next();
 
@@ -1114,7 +1136,7 @@ public class Automaton
 	{
 		int amount = 0;
 
-		for (Iterator<Arc> arcIt = theArcs.iterator(); arcIt.hasNext(); )
+		for (Iterator<Arc> arcIt = arcIterator(); arcIt.hasNext(); )
 		{
 			Arc currArc = arcIt.next();
 
@@ -1290,10 +1312,12 @@ public class Automaton
 		return (new StateSet(theStates)).iterator();
 	}
 
+/*
 	public Iterator<Arc> arcIterator()
 	{
 		return theArcs.iterator();
 	}
+*/
 
 	/*
 	public Iterator<Arc> safeIterator<Arc>()
@@ -1302,11 +1326,12 @@ public class Automaton
 	}
 	*/
 
+/*
 	public boolean containsArc(Arc arc)
-	{
-		return theArcs.contains(arc);
+	{ // KATODO
+		return false; //theArcs.contains(arc);
 	}
-
+*/
 	/*
 	public EventIterator outgoingEventsIterator(State theState)
 	{
@@ -1884,7 +1909,7 @@ public class Automaton
 		theStates.clear();
 		indexStateMap.clear();
 		theStates.clear();
-		theArcs.clear();
+		//theArcs.clear();
 
 		initialState = null;
 
@@ -2257,7 +2282,7 @@ public class Automaton
 
 	public void arcRemoved(Arc arc)
 	{
-		theArcs.removeArc(arc);
+		//theArcs.removeArc(arc);
 	}
 
 	public int hashCode()
@@ -2304,7 +2329,7 @@ public class Automaton
 
 		for (Iterator<State> state_it = safeStateIterator(); state_it.hasNext(); )
 		{
-			State state = state_it.next(); 
+			State state = state_it.next();
 			done_something |= saturate(state, alpha, dump);	// saturate to the dump-state
 		}
 
@@ -2440,7 +2465,7 @@ public class Automaton
 		{
 			this.eventLabel = eventLabel;
 			this.outgoing = outgoing;
-			this.arcIt = theArcs.iterator();
+			this.arcIt = arcIterator();
 			this.currState = null;
 
 			findNext();
