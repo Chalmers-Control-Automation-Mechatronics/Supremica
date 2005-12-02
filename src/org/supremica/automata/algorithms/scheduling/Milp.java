@@ -77,249 +77,148 @@ public class Milp
 			logger.error("Milp::schedule() -> " + e);
 			logger.debug(e.getStackTrace());
 		}
-		// if (scheduleInfo == null)
-// 			throw new Exception("ScheduleInfo is empty. Something must have gone wrong during optimization.....");
-			
-// 		return scheduleInfo.last();
 	}
 
+	/**
+	 * This method constructs an automaton representing the optimal schedule, using the
+	 * sequence of times (one time value for every state of the involved plant automata) 
+	 * that the MILP-solver has generated. 
+	 *
+	 * @return the automaton representing the optimal schedule, as given by the MILP-solver
+	 */
 	public Automaton buildScheduleAutomaton() 
 		throws Exception
-	{
-// 		if (scheduleInfo == null)
-// 			throw new Exception("ScheduleInfo is empty. Something must have gone wrong during optimization.....");
-		
+	{	
 		Automaton schedule = new Automaton();
 		schedule.setComment("Schedule");
 
-		//Testar ...
-		Automata localAutomata = new Automata(theAutomata, false);
-
 		// UGLY - why not initialize() in the corresponding constructors?
-		AutomataSynchronizerHelper synchHelper = new AutomataSynchronizerHelper(localAutomata, new SynchronizationOptions());
+		AutomataSynchronizerHelper synchHelper = new AutomataSynchronizerHelper(theAutomata, new SynchronizationOptions());
 		synchHelper.initialize();
 		AutomataSynchronizerExecuter synchronizer = new AutomataSynchronizerExecuter(synchHelper);
 		synchronizer.initialize();
 
-
 		// UGLY again
-		for (int i=0; i<localAutomata.size(); i++)
-			localAutomata.getAutomatonAt(i).remapStateIndices();
+		for (int i=0; i<theAutomata.size(); i++)
+			theAutomata.getAutomatonAt(i).remapStateIndices();
 
 
 		// The current synchronized state indices, consisting of as well plant 
 		// as specification indices and used to step through the final graph following the 
 		// time schedule (which is needed to build the schedule automaton)
- 		int[] currSynchronizedState = synchHelper.getStateToProcess();
+ 		int[] currComposedStateIndices = synchHelper.getStateToProcess();
 
 		// The first set of state indices correspond to the initial state of the composed automaton.
 		// They are thus used to construct the initial state of the schedule automaton.
 		String initialStateName = "[";
-		for (int i=0; i<localAutomata.size() - 1; i++)
+		for (int i=0; i<theAutomata.size() - 1; i++)
 		{
-			initialStateName += localAutomata.getAutomatonAt(i).getStateWithIndex(currSynchronizedState[i]).getName() + ".";
+			initialStateName += theAutomata.getAutomatonAt(i).getStateWithIndex(currComposedStateIndices[i]).getName() + ".";
 		}
-		initialStateName += localAutomata.getAutomatonAt(localAutomata.size()-1).getStateWithIndex(currSynchronizedState[localAutomata.size()-1]).getName() + "]";
+		initialStateName += theAutomata.getAutomatonAt(theAutomata.size()-1).getStateWithIndex(currComposedStateIndices[theAutomata.size()-1]).getName() + "]";
 
-		State currScheduleState = new State(initialStateName);
-		currScheduleState.setInitial(true);
-		schedule.addState(currScheduleState);
+		State currScheduledState = new State(initialStateName);
+		currScheduledState.setInitial(true);
+		schedule.addState(currScheduledState);
 
-		// Every robot is checked for possible transitions and the one with smallest time value 
-		// is chosen. 
-		int smallestTime = Integer.MAX_VALUE;
-		// The arc that is to be added to the schedule (i.e. the arc corresponding to the smallest allowed time value) is stored
-		Arc currOptimalArc = null;
-		// The index of a robot in the "robots"-variable. Is increased whenever a plant is found
-		int robotIndex = -1;
-
-		for (int i=0; i<localAutomata.size(); i++)
+		// Walk from the initial state until an accepting (synchronized) state is found
+		// In every step, the cheapest allowed transition is chosen
+		// This is done until an accepting state is found for our schedule
+		while (! currScheduledState.isAccepting())
 		{
-			Automaton currRobot = localAutomata.getAutomatonAt(i); 
+			// Every robot is checked for possible transitions and the one with smallest time value 
+			// is chosen. 
+			int smallestTime = Integer.MAX_VALUE;
 
-			// Since the robots are supposed to fire events, the check for the "smallest time event" 
-			// is only done for the plants
-			if (currRobot.isPlant())
+			// The arc that is to be added to the schedule (i.e. the arc corresponding to the smallest allowed time value) is stored
+			Arc currOptimalArc = null;
+
+			// The index of a robot in the "robots"-variable. Is increased whenever a plant is found
+			int robotIndex = -1;
+
+			// Which automaton fires the "cheapest" transition...
+			for (int i=0; i<theAutomata.size(); i++)
 			{
-				robotIndex++;
+				Automaton currRobot = theAutomata.getAutomatonAt(i); 
 
-				State currState = currRobot.getStateWithIndex(currSynchronizedState[i]);
-				
-				
- 				int currTime = optimalTimes[robotIndex][currSynchronizedState[i]];
-
-				if (currTime <= smallestTime)
+				// Since the robots are supposed to fire events, the check for the "smallest time event" 
+				// is only done for the plants
+				if (currRobot.isPlant())
 				{
-					for (Iterator<Arc> arcs = currState.outgoingArcsIterator(); arcs.hasNext(); )
+					robotIndex++;
+
+					State currState = currRobot.getStateWithIndex(currComposedStateIndices[i]);
+					int currTime = optimalTimes[robotIndex][currComposedStateIndices[i]];
+
+					if (currTime <= smallestTime)
 					{
-						Arc currArc = arcs.next();
-						
-						if (synchronizer.isEnabled(currArc.getEvent()))
+						for (Iterator<Arc> arcs = currState.outgoingArcsIterator(); arcs.hasNext(); )
 						{
-							int nextStateIndex = indexMap.getStateIndex(currRobot, currArc.getToState()); 
-							
-							// If the next node has lower time value, then it cannot belong 
-							// to the optimal path, since precedence constraints are not fulfilled
-							// Otherwise, this could be the path
- 							if (optimalTimes[robotIndex][nextStateIndex] >= currTime)
+							Arc currArc = arcs.next();
+
+							// Is needed to avoid NullPointerException when calling synchronizer.isEnabled()-method
+							synchronizer.getOutgoingEvents(currComposedStateIndices);
+
+							if (synchronizer.isEnabled(currArc.getEvent()))
 							{
-								currOptimalArc = currArc;
-								smallestTime = currTime;
+								int nextStateIndex = indexMap.getStateIndex(currRobot, currArc.getToState()); 
+
+								// If the next node has lower time value, then it cannot belong 
+								// to the optimal path, since precedence constraints are not fulfilled
+								// Otherwise, this could be the path
+								if (optimalTimes[robotIndex][nextStateIndex] >= currTime)
+								{
+									currOptimalArc = currArc;
+									smallestTime = currTime;
+								}
 							}
 						}
 					}
 				}
 			}
+		
+			// Add the transition time to the name of the state-to-be-in-the-schedule
+			currScheduledState.setName(currScheduledState.getName() + ";  firing_time = " + smallestTime);
+
+			// Make a transition (in the synchronizer) to the state that is reachable in one step at cheapest cost
+			// This state will be the next parting point in our walk
+			currComposedStateIndices = synchronizer.doTransition(currComposedStateIndices, currOptimalArc.getEvent());
+	
+			// Update the schedule automaton
+			String nextStateName = "[";
+			for (int i=0; i<theAutomata.size() - 1; i++)
+			{
+				nextStateName += theAutomata.getAutomatonAt(i).getStateWithIndex(currComposedStateIndices[i]).getName() + ".";
+			}
+			nextStateName += theAutomata.getAutomatonAt(theAutomata.size()-1).getStateWithIndex(currComposedStateIndices[theAutomata.size()-1]).getName() + "]";
+		
+			State nextScheduledState = new State(nextStateName);
+			schedule.addState(nextScheduledState);
+			schedule.getAlphabet().addEvent(currOptimalArc.getEvent());
+			schedule.addArc(new Arc(currScheduledState, nextScheduledState, currOptimalArc.getEvent()));
+
+			currScheduledState = nextScheduledState;
+
+			// If all the states that build up the current state are accepting, make the composed state accepting too
+			boolean isAccepting = true;
+			for (int i=0; i<theAutomata.size(); i++)
+			{
+				if (! theAutomata.getAutomatonAt(i).getStateWithIndex(currComposedStateIndices[i]).isAccepting())
+					isAccepting = false;
+			}
+			
+			if (isAccepting)
+			{
+				currScheduledState.setAccepting(true);
+				currScheduledState.setName(currScheduledState.getName() + ";  makespan = " + smallestTime);
+			}
 		}
 		
-		if (currScheduleState.isInitial())
-		{
-			currScheduleState.setName(currScheduleState.getName() + "  firing_time = " + smallestTime);
-		}
-
-		logger.info("event to add = " + currOptimalArc.getEvent() + " at time " + smallestTime);
-		String str = "";
-		for (int i=0; i<localAutomata.size(); i++)
-			str += localAutomata.getAutomatonAt(i).getStateWithIndex(currSynchronizedState[i]).getName() + " ";
-		logger.info("fromState = " + str);
-		int[] nextSynchronizedState = synchronizer.doTransition(currSynchronizedState, currOptimalArc.getEvent());
-		str = "";
-		for (int i=0; i<localAutomata.size(); i++)
-			str += localAutomata.getAutomatonAt(i).getStateWithIndex(nextSynchronizedState[i]).getName() + " ";
-		logger.info("toState = " + str);
-
-
-// 		// Tillf 
-// 		int counter = 0;
-
-
-
-
-
-// 		ArrayList<int[]> misplacedInfos = new ArrayList<int[]>();
-// 		int[] activeStates = new int[robots.size()];
-
-// 		State trailState = new State("q" + counter++);
-
-
-		// TILLF - FLUM
-		State accState = new State("ACCEPTING");
-		accState.setAccepting(true);
-		schedule.addState(accState);
-
-		LabeledEvent event = new LabeledEvent("42");
-		schedule.getAlphabet().addEvent(event);
-		schedule.addArc(new Arc(currScheduleState, accState, event));
-
 		logger.info("TOTAL CYCLE TIME: " + makespan + ".............................");
-
+		
 		return schedule;
-		
-// 		for (Iterator<int[]> infoIterator = scheduleInfo.iterator(); infoIterator.hasNext(); )
-// 		{
-// 			int[] currInfo = infoIterator.next();
-
-// 			// if the initial state of the current robot has not yet been examined
-// 			if (activeStates[currInfo[0]] == null)
-// 			{
-// 				// if the current state is the initial state of the current robot
-// 				if (robots.getAutomatonAt(currInfo[0]).getInitialState().getIndex() == currInfo[1])
-// 				{
-// 					State newState = new State("q" + counter++);
-// 					newState.setCost(currInfo[2]);
-
-// 					schedule.addState(newState);
-// 					activeStates[currInfo[0]] = 
-
-// 					// if the current state is the first initial state to be examined
-// 					if (trailState == null)
-// 					{
-// 						newState.setInitial(true);
-// 						trailState = newState;
-// 					}
-// 					else
-// 					{
-						
-// 					}
-// 				}
-// 					;// Add the initial state
-// 				else
-// 					misplacedInfos.add(currInfo);
-// 			}
-// 		}
-		
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// 		Iterator<int[]> scheduleInfoIterator = scheduleInfo.iterator(); 
-// // 		ArrayList<int[]> equalCostInfos = new ArrayList<int[]>();
-// // 		equalCostInfos.add(scheduleInfoIterator.next());
-// // 		int currentCost = equalCostInfos.get(0)[2];
-// // 		State lastState = null;
-
-// 		ArrayList<int[]> sleepingInfos = new ArrayList<int[]>();
-
-// 		ArrayList<int[]> enabledInfosArray = new ArrayList<int[]>();
-// 		for (int i=0; i<robots.size(); i++)
-// 			int[] enabledInfo = new int[]{i, robots.getAutomatonAt(i).getInitialState().getIndex()};
-
-// 		while(scheduleInfoIterator.hasNext())
-// 		{
-// 			int[] currInfo = scheduleInfoIterator.next();
-			
-// // 			if (infoInArrayList(enabledInfos, currInfo));
-
-// 			for (Iterator enabledInfos = enabledInfosArray.iterator(); enabledInfos.hasNext(); )
-// 			{
-// 				int[] currEnabledInfo = enabledInfos.next();
-				
-// 				if (currEnabledInfo[0] == currInfo[0] && currEnabledInfo[1] == currInfo[1])
-// 				{
-// 					enabledInfos.remove();
-					
-					
-// 				}
-// 			}
-			
-// // 			if (currInfo[2] != currentCost)
-// // 			{
-// // 				currentCost = currInfo[2];
-
-// // 				// process ArrayList
-				
-				
-
-// // 				equalCostInfos.clear();
-// 			}
-
-// // 			equalCostInfos.add(currInfo);
-// 		}
-
-// 		return null;
 	}
-
-// 	private boolean infoInArrayList(ArrayList<int[]> arrayList, int[] info)
-// 	{	
-// 		for (Iterator infos = arrayList.iterator(); infos.hasNext(); )
-// 		{
-// 			int[] currArrayInfo = infos.next();
-
-// 			if (currArrayInfo[0] == info[0] && currArrayInfo[1] == info[1])
-// 				return true;
-// 		}
-// 	}
-
+	
 	/**
 	 * Goes through the supplied automata and synchronizes all specifications 
 	 * that do not represent zones with corresponding robot automata. 
