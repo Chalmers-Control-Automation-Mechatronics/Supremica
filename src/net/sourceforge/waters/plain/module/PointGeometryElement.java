@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   PointGeometryElement
 //###########################################################################
-//# $Id: PointGeometryElement.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: PointGeometryElement.java,v 1.3 2005-12-03 21:30:42 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -37,7 +37,7 @@ public final class PointGeometryElement
    */
   public PointGeometryElement(final Point2D point)
   {
-    mPoint = point;
+    mPoint = (Point2D) point.clone();
   }
 
 
@@ -77,7 +77,7 @@ public final class PointGeometryElement
   //# Interface net.sourceforge.waters.model.module.PointGeometryProxy
   public Point2D getPoint()
   {
-    return mPoint;
+    return (Point2D) mPoint.clone();
   }
 
 

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   IdentifiedSubject
 //###########################################################################
-//# $Id: IdentifiedSubject.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: IdentifiedSubject.java,v 1.3 2005-12-03 21:30:42 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -79,15 +79,15 @@ public abstract class IdentifiedSubject
    */
   public void setIdentifier(final IdentifierSubject identifier)
   {
-    final boolean change = (mIdentifier != identifier);
+    if (mIdentifier == identifier) {
+      return;
+    }
     identifier.setParent(this);
     mIdentifier.setParent(null);
     mIdentifier = identifier;
-    if (change) {
-      final ModelChangeEvent event =
-        ModelChangeEvent.createStateChanged(this);
-      fireModelChanged(event);
-    }
+    final ModelChangeEvent event =
+      ModelChangeEvent.createStateChanged(this);
+    fireModelChanged(event);
   }
 
 

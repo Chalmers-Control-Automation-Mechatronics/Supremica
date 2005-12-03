@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   NodeSubject
 //###########################################################################
-//# $Id: NodeSubject.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: NodeSubject.java,v 1.3 2005-12-03 21:30:42 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -82,15 +82,15 @@ public abstract class NodeSubject
    */
   public void setPropositions(final EventListExpressionSubject propositions)
   {
-    final boolean change = (mPropositions != propositions);
+    if (mPropositions == propositions) {
+      return;
+    }
     propositions.setParent(this);
     mPropositions.setParent(null);
     mPropositions = propositions;
-    if (change) {
-      final ModelChangeEvent event =
-        ModelChangeEvent.createStateChanged(this);
-      fireModelChanged(event);
-    }
+    final ModelChangeEvent event =
+      ModelChangeEvent.createStateChanged(this);
+    fireModelChanged(event);
   }
 
 

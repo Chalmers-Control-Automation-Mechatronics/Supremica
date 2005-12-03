@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   BoxGeometrySubject
 //###########################################################################
-//# $Id: BoxGeometrySubject.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: BoxGeometrySubject.java,v 1.3 2005-12-03 21:30:42 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -38,7 +38,7 @@ public final class BoxGeometrySubject
    */
   public BoxGeometrySubject(final Rectangle2D rectangle)
   {
-    mRectangle = rectangle;
+    mRectangle = (Rectangle2D) rectangle.clone();
   }
 
 
@@ -47,6 +47,7 @@ public final class BoxGeometrySubject
   public BoxGeometrySubject clone()
   {
     final BoxGeometrySubject cloned = (BoxGeometrySubject) super.clone();
+    cloned.mRectangle = (Rectangle2D) mRectangle.clone();
     return cloned;
   }
 
@@ -79,7 +80,7 @@ public final class BoxGeometrySubject
   //# Interface net.sourceforge.waters.model.module.BoxGeometryProxy
   public Rectangle2D getRectangle()
   {
-    return mRectangle;
+    return (Rectangle2D) mRectangle.clone();
   }
 
 
@@ -90,13 +91,13 @@ public final class BoxGeometrySubject
    */
   public void setRectangle(final Rectangle2D rectangle)
   {
-    final boolean change = !mRectangle.equals(rectangle);
-    mRectangle = rectangle;
-    if (change) {
-      final ModelChangeEvent event =
-        ModelChangeEvent.createGeometryChanged(this);
-      fireModelChanged(event);
+    if (mRectangle.equals(rectangle)) {
+      return;
     }
+    mRectangle = (Rectangle2D) rectangle.clone();
+    final ModelChangeEvent event =
+      ModelChangeEvent.createGeometryChanged(this);
+    fireModelChanged(event);
   }
 
 

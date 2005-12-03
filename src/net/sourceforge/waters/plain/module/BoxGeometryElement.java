@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   BoxGeometryElement
 //###########################################################################
-//# $Id: BoxGeometryElement.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: BoxGeometryElement.java,v 1.3 2005-12-03 21:30:42 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -37,7 +37,7 @@ public final class BoxGeometryElement
    */
   public BoxGeometryElement(final Rectangle2D rectangle)
   {
-    mRectangle = rectangle;
+    mRectangle = (Rectangle2D) rectangle.clone();
   }
 
 
@@ -77,7 +77,7 @@ public final class BoxGeometryElement
   //# Interface net.sourceforge.waters.model.module.BoxGeometryProxy
   public Rectangle2D getRectangle()
   {
-    return mRectangle;
+    return (Rectangle2D) mRectangle.clone();
   }
 
 

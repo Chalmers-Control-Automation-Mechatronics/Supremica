@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   IntConstantSubject
 //###########################################################################
-//# $Id: IntConstantSubject.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: IntConstantSubject.java,v 1.3 2005-12-03 21:30:42 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -87,13 +87,13 @@ public final class IntConstantSubject
    */
   public void setValue(final int value)
   {
-    final boolean change = (mValue != value);
-    mValue = value;
-    if (change) {
-      final ModelChangeEvent event =
-        ModelChangeEvent.createStateChanged(this);
-      fireModelChanged(event);
+    if (mValue == value) {
+      return;
     }
+    mValue = value;
+    final ModelChangeEvent event =
+      ModelChangeEvent.createStateChanged(this);
+    fireModelChanged(event);
   }
 
 

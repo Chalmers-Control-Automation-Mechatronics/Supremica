@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   EdgeSubject
 //###########################################################################
-//# $Id: EdgeSubject.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: EdgeSubject.java,v 1.3 2005-12-03 21:30:42 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -222,13 +222,13 @@ public final class EdgeSubject
    */
   public void setSource(final NodeSubject source)
   {
-    final boolean change = (mSource != source);
-    mSource = source;
-    if (change) {
-      final ModelChangeEvent event =
-        ModelChangeEvent.createStateChanged(this);
-      fireModelChanged(event);
+    if (mSource == source) {
+      return;
     }
+    mSource = source;
+    final ModelChangeEvent event =
+      ModelChangeEvent.createStateChanged(this);
+    fireModelChanged(event);
   }
 
   /**
@@ -236,26 +236,26 @@ public final class EdgeSubject
    */
   public void setTarget(final NodeSubject target)
   {
-    final boolean change = (mTarget != target);
-    mTarget = target;
-    if (change) {
-      final ModelChangeEvent event =
-        ModelChangeEvent.createStateChanged(this);
-      fireModelChanged(event);
+    if (mTarget == target) {
+      return;
     }
+    mTarget = target;
+    final ModelChangeEvent event =
+      ModelChangeEvent.createStateChanged(this);
+    fireModelChanged(event);
   }
 
   public void setLabelBlock(final LabelBlockSubject labelBlock)
   {
-    final boolean change = (mLabelBlock != labelBlock);
+    if (mLabelBlock == labelBlock) {
+      return;
+    }
     labelBlock.setParent(this);
     mLabelBlock.setParent(null);
     mLabelBlock = labelBlock;
-    if (change) {
-      final ModelChangeEvent event =
-        ModelChangeEvent.createStateChanged(this);
-      fireModelChanged(event);
-    }
+    final ModelChangeEvent event =
+      ModelChangeEvent.createStateChanged(this);
+    fireModelChanged(event);
   }
 
   /**
@@ -263,7 +263,9 @@ public final class EdgeSubject
    */
   public void setGeometry(final SplineGeometrySubject geometry)
   {
-    final boolean change = (mGeometry != geometry);
+    if (mGeometry == geometry) {
+      return;
+    }
     if (geometry != null) {
       geometry.setParent(this);
     }
@@ -271,11 +273,9 @@ public final class EdgeSubject
       mGeometry.setParent(null);
     }
     mGeometry = geometry;
-    if (change) {
-      final ModelChangeEvent event =
-        ModelChangeEvent.createGeometryChanged(this);
-      fireModelChanged(event);
-    }
+    final ModelChangeEvent event =
+      ModelChangeEvent.createGeometryChanged(this);
+    fireModelChanged(event);
   }
 
   /**
@@ -283,7 +283,9 @@ public final class EdgeSubject
    */
   public void setStartPoint(final PointGeometrySubject startPoint)
   {
-    final boolean change = (mStartPoint != startPoint);
+    if (mStartPoint == startPoint) {
+      return;
+    }
     if (startPoint != null) {
       startPoint.setParent(this);
     }
@@ -291,11 +293,9 @@ public final class EdgeSubject
       mStartPoint.setParent(null);
     }
     mStartPoint = startPoint;
-    if (change) {
-      final ModelChangeEvent event =
-        ModelChangeEvent.createGeometryChanged(this);
-      fireModelChanged(event);
-    }
+    final ModelChangeEvent event =
+      ModelChangeEvent.createGeometryChanged(this);
+    fireModelChanged(event);
   }
 
   /**
@@ -303,7 +303,9 @@ public final class EdgeSubject
    */
   public void setEndPoint(final PointGeometrySubject endPoint)
   {
-    final boolean change = (mEndPoint != endPoint);
+    if (mEndPoint == endPoint) {
+      return;
+    }
     if (endPoint != null) {
       endPoint.setParent(this);
     }
@@ -311,11 +313,9 @@ public final class EdgeSubject
       mEndPoint.setParent(null);
     }
     mEndPoint = endPoint;
-    if (change) {
-      final ModelChangeEvent event =
-        ModelChangeEvent.createGeometryChanged(this);
-      fireModelChanged(event);
-    }
+    final ModelChangeEvent event =
+      ModelChangeEvent.createGeometryChanged(this);
+    fireModelChanged(event);
   }
 
 

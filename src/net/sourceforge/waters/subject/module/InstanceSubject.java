@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   InstanceSubject
 //###########################################################################
-//# $Id: InstanceSubject.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: InstanceSubject.java,v 1.3 2005-12-03 21:30:42 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -128,13 +128,13 @@ public final class InstanceSubject
    */
   public void setModuleName(final String moduleName)
   {
-    final boolean change = !mModuleName.equals(moduleName);
-    mModuleName = moduleName;
-    if (change) {
-      final ModelChangeEvent event =
-        ModelChangeEvent.createStateChanged(this);
-      fireModelChanged(event);
+    if (mModuleName.equals(moduleName)) {
+      return;
     }
+    mModuleName = moduleName;
+    final ModelChangeEvent event =
+      ModelChangeEvent.createStateChanged(this);
+    fireModelChanged(event);
   }
 
   /**

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   GroupNodeSubject
 //###########################################################################
-//# $Id: GroupNodeSubject.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: GroupNodeSubject.java,v 1.3 2005-12-03 21:30:42 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -178,7 +178,9 @@ public final class GroupNodeSubject
    */
   public void setGeometry(final BoxGeometrySubject geometry)
   {
-    final boolean change = (mGeometry != geometry);
+    if (mGeometry == geometry) {
+      return;
+    }
     if (geometry != null) {
       geometry.setParent(this);
     }
@@ -186,11 +188,9 @@ public final class GroupNodeSubject
       mGeometry.setParent(null);
     }
     mGeometry = geometry;
-    if (change) {
-      final ModelChangeEvent event =
-        ModelChangeEvent.createGeometryChanged(this);
-      fireModelChanged(event);
-    }
+    final ModelChangeEvent event =
+      ModelChangeEvent.createGeometryChanged(this);
+    fireModelChanged(event);
   }
 
 

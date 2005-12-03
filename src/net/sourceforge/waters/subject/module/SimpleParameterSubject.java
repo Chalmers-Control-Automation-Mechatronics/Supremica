@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   SimpleParameterSubject
 //###########################################################################
-//# $Id: SimpleParameterSubject.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: SimpleParameterSubject.java,v 1.3 2005-12-03 21:30:42 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -95,15 +95,15 @@ public abstract class SimpleParameterSubject
   //# Setters
   public void setDefaultValue(final SimpleExpressionSubject defaultValue)
   {
-    final boolean change = (mDefaultValue != defaultValue);
+    if (mDefaultValue == defaultValue) {
+      return;
+    }
     defaultValue.setParent(this);
     mDefaultValue.setParent(null);
     mDefaultValue = defaultValue;
-    if (change) {
-      final ModelChangeEvent event =
-        ModelChangeEvent.createStateChanged(this);
-      fireModelChanged(event);
-    }
+    final ModelChangeEvent event =
+      ModelChangeEvent.createStateChanged(this);
+    fireModelChanged(event);
   }
 
 

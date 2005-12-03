@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   ForeachSubject
 //###########################################################################
-//# $Id: ForeachSubject.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: ForeachSubject.java,v 1.3 2005-12-03 21:30:42 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -139,15 +139,15 @@ public abstract class ForeachSubject
    */
   public void setRange(final SimpleExpressionSubject range)
   {
-    final boolean change = (mRange != range);
+    if (mRange == range) {
+      return;
+    }
     range.setParent(this);
     mRange.setParent(null);
     mRange = range;
-    if (change) {
-      final ModelChangeEvent event =
-        ModelChangeEvent.createStateChanged(this);
-      fireModelChanged(event);
-    }
+    final ModelChangeEvent event =
+      ModelChangeEvent.createStateChanged(this);
+    fireModelChanged(event);
   }
 
   /**
@@ -155,7 +155,9 @@ public abstract class ForeachSubject
    */
   public void setGuard(final SimpleExpressionSubject guard)
   {
-    final boolean change = (mGuard != guard);
+    if (mGuard == guard) {
+      return;
+    }
     if (guard != null) {
       guard.setParent(this);
     }
@@ -163,11 +165,9 @@ public abstract class ForeachSubject
       mGuard.setParent(null);
     }
     mGuard = guard;
-    if (change) {
-      final ModelChangeEvent event =
-        ModelChangeEvent.createStateChanged(this);
-      fireModelChanged(event);
-    }
+    final ModelChangeEvent event =
+      ModelChangeEvent.createStateChanged(this);
+    fireModelChanged(event);
   }
 
   /**

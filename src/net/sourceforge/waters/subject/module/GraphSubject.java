@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   GraphSubject
 //###########################################################################
-//# $Id: GraphSubject.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: GraphSubject.java,v 1.3 2005-12-03 21:30:42 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -174,13 +174,13 @@ public final class GraphSubject
    */
   public void setDeterministic(final boolean deterministic)
   {
-    final boolean change = (mIsDeterministic != deterministic);
-    mIsDeterministic = deterministic;
-    if (change) {
-      final ModelChangeEvent event =
-        ModelChangeEvent.createStateChanged(this);
-      fireModelChanged(event);
+    if (mIsDeterministic == deterministic) {
+      return;
     }
+    mIsDeterministic = deterministic;
+    final ModelChangeEvent event =
+      ModelChangeEvent.createStateChanged(this);
+    fireModelChanged(event);
   }
 
   /**
@@ -188,15 +188,15 @@ public final class GraphSubject
    */
   public void setBlockedEvents(final LabelBlockSubject blockedEvents)
   {
-    final boolean change = (mBlockedEvents != blockedEvents);
+    if (mBlockedEvents == blockedEvents) {
+      return;
+    }
     blockedEvents.setParent(this);
     mBlockedEvents.setParent(null);
     mBlockedEvents = blockedEvents;
-    if (change) {
-      final ModelChangeEvent event =
-        ModelChangeEvent.createStateChanged(this);
-      fireModelChanged(event);
-    }
+    final ModelChangeEvent event =
+      ModelChangeEvent.createStateChanged(this);
+    fireModelChanged(event);
   }
 
   /**

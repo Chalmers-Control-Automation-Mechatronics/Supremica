@@ -573,7 +573,10 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
       set refstatus [Java_AttribGetRefStatus $attrib $impl]
       if {[string compare $transformer ""] == 0} {
 	set membertype [Java_AttribGetMemberType $attrib $impl classMap]
-	if {[regexp {Subject$} $membertype all]} {
+        if {[regexp {2D$} $decltype all]} {
+	  Java_WriteLn $stream $umap \
+              "    $membername = ($decltype) $paramname.clone();"
+	} elseif {[regexp {Subject$} $membertype all]} {
 	  Java_WriteLn $stream $umap \
 	      "    $membername = ($membertype) $paramname;"
 	} else {
@@ -758,7 +761,10 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
 		Java_WriteLn $stream $umap \
 		    "    \}"
 	      }
-	    }
+            } elseif {[regexp {2D$} $decltype all]} {
+              Java_WriteLn $stream $umap \
+                  "    cloned.$membername = ($decltype) $membername.clone();"
+            }
 	  } elseif {$iscoll} {
 	    set impltype \
 		[Java_AttribGetImplementationType $attrib $impl classMap]
@@ -951,7 +957,9 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
 	set transformer [Java_AttribGetCollectionTransformerName $attrib $impl]
 	Java_WriteLn $stream $umap "  public $type ${gettername}()"
 	Java_WriteLn $stream $umap "  \{"
-	if {[string compare $transformer ""] == 0 ||
+        if {[regexp {2D$} $type all]} {
+	  Java_WriteLn $stream $umap "    return ($type) $membername.clone();"
+	} elseif {[string compare $transformer ""] == 0 ||
 	    [string compare $impl "plain"] == 0} {
 	  Java_WriteLn $stream $umap "    return $membername;"
 	} else {
@@ -1026,27 +1034,32 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
 	  if {[regexp {^[a-z]} $paramtype all] ||
 	      [regexp {Subject$} $paramtype all]} {
 	    Java_WriteLn $stream $umap \
-		"    final boolean change = ($membername != $paramname);"
+		"    if ($membername == $paramname) \{"
 	  } else {
 	    Java_WriteLn $stream $umap \
-		"    final boolean change = !$membername.equals($paramname);"
+		"    if ($membername.equals($paramname)) \{"
 	  }
+	  Java_WriteLn $stream $umap "      return;"
+	  Java_WriteLn $stream $umap "    \}"
 	  if {$setparent} {
 	    Java_WriteSetParent $stream $umap $paramname $eqstatus "this"
 	    Java_WriteSetParent $stream $umap $membername $eqstatus "null"
 	  }
-	  Java_WriteLn $stream $umap "    $membername = $paramname;"
-	  Java_WriteLn $stream $umap "    if (change) \{"
-	  Java_WriteLn $stream $umap "      final ModelChangeEvent event ="
+          if {[regexp {2D$} $decltype all]} {
+            Java_WriteLn $stream $umap \
+                "    $membername = ($decltype) $paramname.clone();"
+          } else {
+            Java_WriteLn $stream $umap "    $membername = $paramname;"
+          }
+	  Java_WriteLn $stream $umap "    final ModelChangeEvent event ="
 	  if {$geo == 3 || [string compare $eqstatus "geometry"] == 0} {
 	    Java_WriteLn $stream $umap \
-		"        ModelChangeEvent.createGeometryChanged(this);"
+		"      ModelChangeEvent.createGeometryChanged(this);"
 	  } else {
 	    Java_WriteLn $stream $umap \
-		"        ModelChangeEvent.createStateChanged(this);"
+		"      ModelChangeEvent.createStateChanged(this);"
 	  }
-	  Java_WriteLn $stream $umap "      fireModelChanged(event);"
-	  Java_WriteLn $stream $umap "    \}"
+	  Java_WriteLn $stream $umap "    fireModelChanged(event);"
 	}	  
 	Java_WriteLn $stream $umap "  \}"
 	Java_WriteLn $stream $umap ""

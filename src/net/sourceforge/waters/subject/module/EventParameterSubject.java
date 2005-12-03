@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   EventParameterSubject
 //###########################################################################
-//# $Id: EventParameterSubject.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: EventParameterSubject.java,v 1.3 2005-12-03 21:30:42 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -122,15 +122,15 @@ public final class EventParameterSubject
    */
   public void setEventDecl(final EventDeclSubject eventDecl)
   {
-    final boolean change = (mEventDecl != eventDecl);
+    if (mEventDecl == eventDecl) {
+      return;
+    }
     eventDecl.setParent(this);
     mEventDecl.setParent(null);
     mEventDecl = eventDecl;
-    if (change) {
-      final ModelChangeEvent event =
-        ModelChangeEvent.createStateChanged(this);
-      fireModelChanged(event);
-    }
+    final ModelChangeEvent event =
+      ModelChangeEvent.createStateChanged(this);
+    fireModelChanged(event);
   }
 
 

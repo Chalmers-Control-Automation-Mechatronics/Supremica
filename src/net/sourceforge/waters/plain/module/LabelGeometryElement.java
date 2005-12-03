@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   LabelGeometryElement
 //###########################################################################
-//# $Id: LabelGeometryElement.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: LabelGeometryElement.java,v 1.3 2005-12-03 21:30:42 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -41,7 +41,7 @@ public final class LabelGeometryElement
   public LabelGeometryElement(final Point2D offset,
                               final AnchorPosition anchor)
   {
-    mOffset = offset;
+    mOffset = (Point2D) offset.clone();
     mAnchor = anchor;
   }
 
@@ -95,7 +95,7 @@ public final class LabelGeometryElement
   //# Interface net.sourceforge.waters.model.module.LabelGeometryProxy
   public Point2D getOffset()
   {
-    return mOffset;
+    return (Point2D) mOffset.clone();
   }
 
   public AnchorPosition getAnchor()

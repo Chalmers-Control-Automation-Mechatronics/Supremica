@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   SimpleNodeSubject
 //###########################################################################
-//# $Id: SimpleNodeSubject.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: SimpleNodeSubject.java,v 1.3 2005-12-03 21:30:42 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -162,13 +162,13 @@ public final class SimpleNodeSubject
    */
   public void setInitial(final boolean initial)
   {
-    final boolean change = (mIsInitial != initial);
-    mIsInitial = initial;
-    if (change) {
-      final ModelChangeEvent event =
-        ModelChangeEvent.createStateChanged(this);
-      fireModelChanged(event);
+    if (mIsInitial == initial) {
+      return;
     }
+    mIsInitial = initial;
+    final ModelChangeEvent event =
+      ModelChangeEvent.createStateChanged(this);
+    fireModelChanged(event);
   }
 
   /**
@@ -176,7 +176,9 @@ public final class SimpleNodeSubject
    */
   public void setPointGeometry(final PointGeometrySubject pointGeometry)
   {
-    final boolean change = (mPointGeometry != pointGeometry);
+    if (mPointGeometry == pointGeometry) {
+      return;
+    }
     if (pointGeometry != null) {
       pointGeometry.setParent(this);
     }
@@ -184,11 +186,9 @@ public final class SimpleNodeSubject
       mPointGeometry.setParent(null);
     }
     mPointGeometry = pointGeometry;
-    if (change) {
-      final ModelChangeEvent event =
-        ModelChangeEvent.createGeometryChanged(this);
-      fireModelChanged(event);
-    }
+    final ModelChangeEvent event =
+      ModelChangeEvent.createGeometryChanged(this);
+    fireModelChanged(event);
   }
 
   /**
@@ -196,7 +196,9 @@ public final class SimpleNodeSubject
    */
   public void setLabelGeometry(final LabelGeometrySubject labelGeometry)
   {
-    final boolean change = (mLabelGeometry != labelGeometry);
+    if (mLabelGeometry == labelGeometry) {
+      return;
+    }
     if (labelGeometry != null) {
       labelGeometry.setParent(this);
     }
@@ -204,11 +206,9 @@ public final class SimpleNodeSubject
       mLabelGeometry.setParent(null);
     }
     mLabelGeometry = labelGeometry;
-    if (change) {
-      final ModelChangeEvent event =
-        ModelChangeEvent.createGeometryChanged(this);
-      fireModelChanged(event);
-    }
+    final ModelChangeEvent event =
+      ModelChangeEvent.createGeometryChanged(this);
+    fireModelChanged(event);
   }
 
 

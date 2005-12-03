@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   IdentifierSubject
 //###########################################################################
-//# $Id: IdentifierSubject.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: IdentifierSubject.java,v 1.3 2005-12-03 21:30:42 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -79,13 +79,13 @@ public abstract class IdentifierSubject
   //# Setters
   public void setName(final String name)
   {
-    final boolean change = !mName.equals(name);
-    mName = name;
-    if (change) {
-      final ModelChangeEvent event =
-        ModelChangeEvent.createStateChanged(this);
-      fireModelChanged(event);
+    if (mName.equals(name)) {
+      return;
     }
+    mName = name;
+    final ModelChangeEvent event =
+      ModelChangeEvent.createStateChanged(this);
+    fireModelChanged(event);
   }
 
 

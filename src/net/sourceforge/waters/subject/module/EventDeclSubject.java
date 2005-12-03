@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   EventDeclSubject
 //###########################################################################
-//# $Id: EventDeclSubject.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: EventDeclSubject.java,v 1.3 2005-12-03 21:30:42 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -174,13 +174,13 @@ public final class EventDeclSubject
    */
   public void setKind(final EventKind kind)
   {
-    final boolean change = !mKind.equals(kind);
-    mKind = kind;
-    if (change) {
-      final ModelChangeEvent event =
-        ModelChangeEvent.createStateChanged(this);
-      fireModelChanged(event);
+    if (mKind.equals(kind)) {
+      return;
     }
+    mKind = kind;
+    final ModelChangeEvent event =
+      ModelChangeEvent.createStateChanged(this);
+    fireModelChanged(event);
   }
 
   /**
@@ -188,13 +188,13 @@ public final class EventDeclSubject
    */
   public void setObservable(final boolean observable)
   {
-    final boolean change = (mIsObservable != observable);
-    mIsObservable = observable;
-    if (change) {
-      final ModelChangeEvent event =
-        ModelChangeEvent.createStateChanged(this);
-      fireModelChanged(event);
+    if (mIsObservable == observable) {
+      return;
     }
+    mIsObservable = observable;
+    final ModelChangeEvent event =
+      ModelChangeEvent.createStateChanged(this);
+    fireModelChanged(event);
   }
 
   /**
@@ -210,7 +210,9 @@ public final class EventDeclSubject
    */
   public void setColorGeometry(final ColorGeometrySubject colorGeometry)
   {
-    final boolean change = (mColorGeometry != colorGeometry);
+    if (mColorGeometry == colorGeometry) {
+      return;
+    }
     if (colorGeometry != null) {
       colorGeometry.setParent(this);
     }
@@ -218,11 +220,9 @@ public final class EventDeclSubject
       mColorGeometry.setParent(null);
     }
     mColorGeometry = colorGeometry;
-    if (change) {
-      final ModelChangeEvent event =
-        ModelChangeEvent.createGeometryChanged(this);
-      fireModelChanged(event);
-    }
+    final ModelChangeEvent event =
+      ModelChangeEvent.createGeometryChanged(this);
+    fireModelChanged(event);
   }
 
 

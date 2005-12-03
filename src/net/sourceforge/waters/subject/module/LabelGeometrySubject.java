@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   LabelGeometrySubject
 //###########################################################################
-//# $Id: LabelGeometrySubject.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: LabelGeometrySubject.java,v 1.3 2005-12-03 21:30:42 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -42,7 +42,7 @@ public final class LabelGeometrySubject
   public LabelGeometrySubject(final Point2D offset,
                               final AnchorPosition anchor)
   {
-    mOffset = offset;
+    mOffset = (Point2D) offset.clone();
     mAnchor = anchor;
   }
 
@@ -64,6 +64,7 @@ public final class LabelGeometrySubject
   public LabelGeometrySubject clone()
   {
     final LabelGeometrySubject cloned = (LabelGeometrySubject) super.clone();
+    cloned.mOffset = (Point2D) mOffset.clone();
     return cloned;
   }
 
@@ -97,7 +98,7 @@ public final class LabelGeometrySubject
   //# Interface net.sourceforge.waters.model.module.LabelGeometryProxy
   public Point2D getOffset()
   {
-    return mOffset;
+    return (Point2D) mOffset.clone();
   }
 
   public AnchorPosition getAnchor()
@@ -113,13 +114,13 @@ public final class LabelGeometrySubject
    */
   public void setOffset(final Point2D offset)
   {
-    final boolean change = !mOffset.equals(offset);
-    mOffset = offset;
-    if (change) {
-      final ModelChangeEvent event =
-        ModelChangeEvent.createGeometryChanged(this);
-      fireModelChanged(event);
+    if (mOffset.equals(offset)) {
+      return;
     }
+    mOffset = (Point2D) offset.clone();
+    final ModelChangeEvent event =
+      ModelChangeEvent.createGeometryChanged(this);
+    fireModelChanged(event);
   }
 
   /**
@@ -127,13 +128,13 @@ public final class LabelGeometrySubject
    */
   public void setAnchor(final AnchorPosition anchor)
   {
-    final boolean change = !mAnchor.equals(anchor);
-    mAnchor = anchor;
-    if (change) {
-      final ModelChangeEvent event =
-        ModelChangeEvent.createGeometryChanged(this);
-      fireModelChanged(event);
+    if (mAnchor.equals(anchor)) {
+      return;
     }
+    mAnchor = anchor;
+    final ModelChangeEvent event =
+      ModelChangeEvent.createGeometryChanged(this);
+    fireModelChanged(event);
   }
 
 

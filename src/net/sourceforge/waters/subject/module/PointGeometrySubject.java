@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   PointGeometrySubject
 //###########################################################################
-//# $Id: PointGeometrySubject.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: PointGeometrySubject.java,v 1.3 2005-12-03 21:30:42 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -38,7 +38,7 @@ public final class PointGeometrySubject
    */
   public PointGeometrySubject(final Point2D point)
   {
-    mPoint = point;
+    mPoint = (Point2D) point.clone();
   }
 
 
@@ -47,6 +47,7 @@ public final class PointGeometrySubject
   public PointGeometrySubject clone()
   {
     final PointGeometrySubject cloned = (PointGeometrySubject) super.clone();
+    cloned.mPoint = (Point2D) mPoint.clone();
     return cloned;
   }
 
@@ -79,7 +80,7 @@ public final class PointGeometrySubject
   //# Interface net.sourceforge.waters.model.module.PointGeometryProxy
   public Point2D getPoint()
   {
-    return mPoint;
+    return (Point2D) mPoint.clone();
   }
 
 
@@ -90,13 +91,13 @@ public final class PointGeometrySubject
    */
   public void setPoint(final Point2D point)
   {
-    final boolean change = !mPoint.equals(point);
-    mPoint = point;
-    if (change) {
-      final ModelChangeEvent event =
-        ModelChangeEvent.createGeometryChanged(this);
-      fireModelChanged(event);
+    if (mPoint.equals(point)) {
+      return;
     }
+    mPoint = (Point2D) point.clone();
+    final ModelChangeEvent event =
+      ModelChangeEvent.createGeometryChanged(this);
+    fireModelChanged(event);
   }
 
 

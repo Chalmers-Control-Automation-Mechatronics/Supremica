@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   LabelBlockSubject
 //###########################################################################
-//# $Id: LabelBlockSubject.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: LabelBlockSubject.java,v 1.3 2005-12-03 21:30:42 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -113,7 +113,9 @@ public final class LabelBlockSubject
   //# Setters
   public void setGeometry(final LabelGeometrySubject geometry)
   {
-    final boolean change = (mGeometry != geometry);
+    if (mGeometry == geometry) {
+      return;
+    }
     if (geometry != null) {
       geometry.setParent(this);
     }
@@ -121,11 +123,9 @@ public final class LabelBlockSubject
       mGeometry.setParent(null);
     }
     mGeometry = geometry;
-    if (change) {
-      final ModelChangeEvent event =
-        ModelChangeEvent.createGeometryChanged(this);
-      fireModelChanged(event);
-    }
+    final ModelChangeEvent event =
+      ModelChangeEvent.createGeometryChanged(this);
+    fireModelChanged(event);
   }
 
 

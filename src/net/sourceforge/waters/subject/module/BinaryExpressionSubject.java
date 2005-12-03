@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   BinaryExpressionSubject
 //###########################################################################
-//# $Id: BinaryExpressionSubject.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: BinaryExpressionSubject.java,v 1.3 2005-12-03 21:30:42 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -113,13 +113,13 @@ public final class BinaryExpressionSubject
    */
   public void setOperator(final BinaryOperator operator)
   {
-    final boolean change = !mOperator.equals(operator);
-    mOperator = operator;
-    if (change) {
-      final ModelChangeEvent event =
-        ModelChangeEvent.createStateChanged(this);
-      fireModelChanged(event);
+    if (mOperator.equals(operator)) {
+      return;
     }
+    mOperator = operator;
+    final ModelChangeEvent event =
+      ModelChangeEvent.createStateChanged(this);
+    fireModelChanged(event);
   }
 
   /**
@@ -127,15 +127,15 @@ public final class BinaryExpressionSubject
    */
   public void setLeft(final SimpleExpressionSubject left)
   {
-    final boolean change = (mLeft != left);
+    if (mLeft == left) {
+      return;
+    }
     left.setParent(this);
     mLeft.setParent(null);
     mLeft = left;
-    if (change) {
-      final ModelChangeEvent event =
-        ModelChangeEvent.createStateChanged(this);
-      fireModelChanged(event);
-    }
+    final ModelChangeEvent event =
+      ModelChangeEvent.createStateChanged(this);
+    fireModelChanged(event);
   }
 
   /**
@@ -143,15 +143,15 @@ public final class BinaryExpressionSubject
    */
   public void setRight(final SimpleExpressionSubject right)
   {
-    final boolean change = (mRight != right);
+    if (mRight == right) {
+      return;
+    }
     right.setParent(this);
     mRight.setParent(null);
     mRight = right;
-    if (change) {
-      final ModelChangeEvent event =
-        ModelChangeEvent.createStateChanged(this);
-      fireModelChanged(event);
-    }
+    final ModelChangeEvent event =
+      ModelChangeEvent.createStateChanged(this);
+    fireModelChanged(event);
   }
 
 

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   AliasSubject
 //###########################################################################
-//# $Id: AliasSubject.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: AliasSubject.java,v 1.3 2005-12-03 21:30:42 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -92,15 +92,15 @@ public final class AliasSubject
   //# Setters
   public void setExpression(final ExpressionSubject expression)
   {
-    final boolean change = (mExpression != expression);
+    if (mExpression == expression) {
+      return;
+    }
     expression.setParent(this);
     mExpression.setParent(null);
     mExpression = expression;
-    if (change) {
-      final ModelChangeEvent event =
-        ModelChangeEvent.createStateChanged(this);
-      fireModelChanged(event);
-    }
+    final ModelChangeEvent event =
+      ModelChangeEvent.createStateChanged(this);
+    fireModelChanged(event);
   }
 
 

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   SimpleComponentSubject
 //###########################################################################
-//# $Id: SimpleComponentSubject.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: SimpleComponentSubject.java,v 1.3 2005-12-03 21:30:42 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -115,26 +115,26 @@ public final class SimpleComponentSubject
   //# Setters
   public void setKind(final ComponentKind kind)
   {
-    final boolean change = !mKind.equals(kind);
-    mKind = kind;
-    if (change) {
-      final ModelChangeEvent event =
-        ModelChangeEvent.createStateChanged(this);
-      fireModelChanged(event);
+    if (mKind.equals(kind)) {
+      return;
     }
+    mKind = kind;
+    final ModelChangeEvent event =
+      ModelChangeEvent.createStateChanged(this);
+    fireModelChanged(event);
   }
 
   public void setGraph(final GraphSubject graph)
   {
-    final boolean change = (mGraph != graph);
+    if (mGraph == graph) {
+      return;
+    }
     graph.setParent(this);
     mGraph.setParent(null);
     mGraph = graph;
-    if (change) {
-      final ModelChangeEvent event =
-        ModelChangeEvent.createStateChanged(this);
-      fireModelChanged(event);
-    }
+    final ModelChangeEvent event =
+      ModelChangeEvent.createStateChanged(this);
+    fireModelChanged(event);
   }
 
 

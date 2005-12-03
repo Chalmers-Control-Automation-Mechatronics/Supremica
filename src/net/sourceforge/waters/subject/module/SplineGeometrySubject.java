@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   SplineGeometrySubject
 //###########################################################################
-//# $Id: SplineGeometrySubject.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: SplineGeometrySubject.java,v 1.3 2005-12-03 21:30:42 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -131,13 +131,13 @@ public final class SplineGeometrySubject
    */
   public void setKind(final SplineKind kind)
   {
-    final boolean change = !mKind.equals(kind);
-    mKind = kind;
-    if (change) {
-      final ModelChangeEvent event =
-        ModelChangeEvent.createGeometryChanged(this);
-      fireModelChanged(event);
+    if (mKind.equals(kind)) {
+      return;
     }
+    mKind = kind;
+    final ModelChangeEvent event =
+      ModelChangeEvent.createGeometryChanged(this);
+    fireModelChanged(event);
   }
 
 

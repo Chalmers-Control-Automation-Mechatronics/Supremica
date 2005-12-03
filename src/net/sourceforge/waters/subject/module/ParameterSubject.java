@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   ParameterSubject
 //###########################################################################
-//# $Id: ParameterSubject.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: ParameterSubject.java,v 1.3 2005-12-03 21:30:42 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -90,13 +90,13 @@ public abstract class ParameterSubject
    */
   public void setRequired(final boolean required)
   {
-    final boolean change = (mIsRequired != required);
-    mIsRequired = required;
-    if (change) {
-      final ModelChangeEvent event =
-        ModelChangeEvent.createStateChanged(this);
-      fireModelChanged(event);
+    if (mIsRequired == required) {
+      return;
     }
+    mIsRequired = required;
+    final ModelChangeEvent event =
+      ModelChangeEvent.createStateChanged(this);
+    fireModelChanged(event);
   }
 
 
