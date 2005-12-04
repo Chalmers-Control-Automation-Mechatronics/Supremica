@@ -48,17 +48,17 @@ public class Milp
 		try 
 		{
 			// SÅ SKALL DET VARA NÄR ALLTING ÄR KLART (OM), MEN NU... FÖR ATT UNDERLÄTTA...
-			// 		modelFile = File.createTempFile("milp", ".mod");
-			// 		modelFile.deleteOnExit();
+			modelFile = File.createTempFile("milp", ".mod");
+			modelFile.deleteOnExit();
 			
-			// 		solutionFile = File.createTempFile("milp", ".sol");
-			// 		solutionFile.deleteOnExit();
+			solutionFile = File.createTempFile("milp", ".sol");
+			solutionFile.deleteOnExit();
 			
 			// ... SÅ HÄR ISTÄLLET...
-			modelFile = new File("C:\\avenir\\progg\\milp.mod");
-			solutionFile = new File("C:\\avenir\\progg\\milp.sol");
-			modelFile.createNewFile();
-			solutionFile.createNewFile();
+// 			modelFile = new File("C:\\avenir\\progg\\milp.mod");
+// 			solutionFile = new File("C:\\avenir\\progg\\milp.sol");
+// 			modelFile.createNewFile();
+// 			solutionFile.createNewFile();
 
 			indexMap = new AutomataIndexMap(theAutomata);
 
@@ -234,6 +234,8 @@ public class Milp
 		robots = theAutomata.getPlantAutomata(); 
 		zones = theAutomata.getSpecificationAutomata(); 
 
+
+
 		// The robots synchronized with all corresponding specifications (except mutex zone specifications)
 		Automata restrictedRobots = new Automata();
 
@@ -241,29 +243,97 @@ public class Milp
 		{
 			Automaton currRobot = robots.getAutomatonAt(i);
 			String currRobotName = currRobot.getName();
+
+// 			ArrayList<Automaton> toBeSynthesized = new ArrayList<Automaton>();
+			Automata toBeSynthesized = new Automata(currRobot);
+			int[] costs = new int[currRobot.nbrOfStates()];
 			
-			for (int j=0; j<zones.size(); j++)
+			// Store the costs of each of the robots states
+			for (Iterator<State> stateIter = currRobot.stateIterator(); stateIter.hasNext(); )
 			{
-				Automaton currSpec = zones.getAutomatonAt(j);
+				State currState = stateIter.next();
+				int stateIndex = indexMap.getStateIndex(currRobot, currState);
+				costs[stateIndex] = currState.getCost();
+			}
+
+			// Find the specifications that are to be synthesized with the current plant/robot
+			for (Iterator<Automaton> zonesIterator = zones.iterator(); zonesIterator.hasNext(); )
+			{
+				Automaton currSpec = zonesIterator.next();
 				
 				if (currSpec.getName().contains(currRobotName))
 				{
-					Automata toBeSynched = new Automata(currRobot);
-					toBeSynched.addAutomaton(currSpec);
+// 					Automata toBeSynched = new Automata(currRobot);
+// 					toBeSynched.addAutomaton(currSpec);
 
-					currRobot = AutomataSynchronizer.synchronizeAutomata(toBeSynched);
+// 					currRobot = AutomataSynchronizer.synchronizeAutomata(toBeSynched);
 				
-					currRobot.setName(currRobotName);
-					currRobot.setType(AutomatonType.Plant);
+// 					currRobot.setName(currRobotName);
+// 					currRobot.setType(AutomatonType.Plant);
 
-					zones.removeAutomaton(currSpec);
+					toBeSynthesized.addAutomaton(currSpec);
 				}
 			}
-			
-			restrictedRobots.addAutomaton(currRobot);
-		}
 
-		robots = restrictedRobots;
+			// If there are several automata with similar names (one is a plant the other are 
+			// restricting specification), then perform a synthesis
+			if (toBeSynthesized.size() > 1)
+			{
+				SynthesizerOptions synthesizerOptions = new SynthesizerOptions();
+				synthesizerOptions.setSynthesisType(SynthesisType.Both);
+				synthesizerOptions.setSynthesisAlgorithm(SynthesisAlgorithm.Monolithic);
+				synthesizerOptions.setPurge(true);
+				synthesizerOptions.setMaximallyPermissive(true);
+				synthesizerOptions.setMaximallyPermissiveIncremental(true);
+				
+				AutomataSynthesizer synthesizer = new AutomataSynthesizer(toBeSynthesized, SynchronizationOptions.getDefaultSynthesisOptions(), synthesizerOptions);
+
+				Automaton restrictedRobot = synthesizer.execute().getAutomatonAt(0);
+				restrictedRobot.setName(currRobotName);
+				restrictedRobot.setType(AutomatonType.Plant);
+				
+				// Set the state costs for the resulting synthesized automaton in an appropriate way
+				for (Iterator<State> stateIter = restrictedRobot.stateIterator(); stateIter.hasNext(); )
+				{
+					State currState = stateIter.next();
+					String stateName = currState.getName().substring(0, currState.getName().indexOf("."));
+					int stateIndex = indexMap.getStateIndex(restrictedRobot, new State(stateName));
+					
+					currState.setCost(costs[stateIndex]);
+				}
+			
+				// Remove the specifications that have been synthesized
+				for (Iterator<Automaton> toBeSynthesizedIterator = toBeSynthesized.iterator(); toBeSynthesizedIterator.hasNext(); )
+				{
+					Automaton isSynthesized = toBeSynthesizedIterator.next();
+
+					if (isSynthesized.isSpecification())
+						zones.removeAutomaton(isSynthesized);
+				}
+
+				restrictedRobots.addAutomaton(restrictedRobot);
+			}
+		}		
+
+
+		// Normalizes the state and event indices for all the synchronized automata.
+// 		robots.setIndicies();
+
+
+		// Updating the automata variables
+		robots = restrictedRobots;		
+		theAutomata = new Automata(robots);
+		theAutomata.addAutomata(zones);
+		indexMap = new AutomataIndexMap(theAutomata);	
+
+		for (Iterator<Automaton> rit = robots.iterator(); rit.hasNext(); )
+		{
+			Automaton r = rit.next();
+			Iterator<State> stit = r.stateIterator();
+			State st = stit.next();
+			logger.warn("robot " + r.getName() + ", being " + r.getType() + ", has " + r.nbrOfStates() + " states and " + r.nbrOfEvents() + " events");
+			logger.info("state " + st.getName() + " has index = " + indexMap.getStateIndex(r, st) + " and cost = " + st.getCost());
+		}
 	}
 
 	private void initMutexStates()
@@ -347,7 +417,7 @@ public class Milp
 // 											bookingStates.add(candidateBookingState);
 // 										else
 // 										{
-// 											logger.error(candidateBookingState.getName() + " is ALREADY checked");
+// 											");logger.error(candidateBookingState.getName() + " is ALREADY checked");
 // 											alternativeBookings--;
 // 										}
 
@@ -368,7 +438,13 @@ public class Milp
 						unbookingTics[i][j] = new int[unbookingStates.size()];
 
 						if (bookingTics[i][j].length != unbookingTics[i][j].length)
-							throw new Exception("The numbers of book/unbook-states do not correspond. Something is wrong....");
+						{
+							String exceptionStr = "The numbers of book/unbook-states do not correspond. Something is wrong....\n";
+							exceptionStr += "nr_book_states[" + i + "][" + j + "] = " + bookingTics[i][j].length + "\n";
+							exceptionStr += "nr_unbook_states[" + i + "][" + j + "] = " + unbookingTics[i][j].length + "\n";
+
+							throw new Exception(exceptionStr);
+						}
 
 						for (int k=0; k<bookingTics[i][j].length; k++)
 						{
