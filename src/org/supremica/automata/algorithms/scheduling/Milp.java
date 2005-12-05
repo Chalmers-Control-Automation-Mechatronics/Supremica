@@ -62,7 +62,7 @@ public class Milp
 
 			indexMap = new AutomataIndexMap(theAutomata);
 
-			initAutomata(theAutomata);
+			initAutomata();
 			initMutexStates();
 
 			convertXmlToMod();
@@ -70,7 +70,6 @@ public class Milp
 			callGlpk();
 
 			processSolutionFile();
-
 		}
 		catch (Exception e)
 		{
@@ -102,7 +101,6 @@ public class Milp
 		for (int i=0; i<theAutomata.size(); i++)
 			theAutomata.getAutomatonAt(i).remapStateIndices();
 
-
 		// The current synchronized state indices, consisting of as well plant 
 		// as specification indices and used to step through the final graph following the 
 		// time schedule (which is needed to build the schedule automaton)
@@ -120,6 +118,10 @@ public class Milp
 		State currScheduledState = new State(initialStateName);
 		currScheduledState.setInitial(true);
 		schedule.addState(currScheduledState);
+
+		// The times in a schedule should come in a non-decreasing sequence
+		// To avoid mistakes, this value remembers the last time value that was put into the schedule
+		int lastScheduledTime = 0;
 
 		// Walk from the initial state until an accepting (synchronized) state is found
 		// In every step, the cheapest allowed transition is chosen
@@ -150,7 +152,8 @@ public class Milp
 					State currState = currRobot.getStateWithIndex(currComposedStateIndices[i]);
 					int currTime = optimalTimes[robotIndex][currComposedStateIndices[i]];
 
-					if (currTime <= smallestTime)
+					// Choose the smallest time (as long as it is not smaller than the previously scheduled time)... 
+					if (currTime <= smallestTime && currTime >= lastScheduledTime)
 					{
 						for (Iterator<Arc> arcs = currState.outgoingArcsIterator(); arcs.hasNext(); )
 						{
@@ -159,6 +162,7 @@ public class Milp
 							// Is needed to avoid NullPointerException when calling synchronizer.isEnabled()-method
 							synchronizer.getOutgoingEvents(currComposedStateIndices);
 
+							// ... that correspoinds to an enabled transition
 							if (synchronizer.isEnabled(currArc.getEvent()))
 							{
 								int nextStateIndex = indexMap.getStateIndex(currRobot, currArc.getToState()); 
@@ -176,14 +180,17 @@ public class Milp
 					}
 				}
 			}
-		
+
+			// The last value of the scheduled time is updated (it is set to the current time value)
+			lastScheduledTime = smallestTime;
+
 			// Add the transition time to the name of the state-to-be-in-the-schedule
 			currScheduledState.setName(currScheduledState.getName() + ";  firing_time = " + smallestTime);
 
 			// Make a transition (in the synchronizer) to the state that is reachable in one step at cheapest cost
 			// This state will be the next parting point in our walk
 			currComposedStateIndices = synchronizer.doTransition(currComposedStateIndices, currOptimalArc.getEvent());
-	
+
 			// Update the schedule automaton
 			String nextStateName = "[";
 			for (int i=0; i<theAutomata.size() - 1; i++)
@@ -191,7 +198,7 @@ public class Milp
 				nextStateName += theAutomata.getAutomatonAt(i).getStateWithIndex(currComposedStateIndices[i]).getName() + ".";
 			}
 			nextStateName += theAutomata.getAutomatonAt(theAutomata.size()-1).getStateWithIndex(currComposedStateIndices[theAutomata.size()-1]).getName() + "]";
-		
+
 			State nextScheduledState = new State(nextStateName);
 			schedule.addState(nextScheduledState);
 			schedule.getAlphabet().addEvent(currOptimalArc.getEvent());
@@ -206,14 +213,14 @@ public class Milp
 				if (! theAutomata.getAutomatonAt(i).getStateWithIndex(currComposedStateIndices[i]).isAccepting())
 					isAccepting = false;
 			}
-			
+
 			if (isAccepting)
 			{
 				currScheduledState.setAccepting(true);
-				currScheduledState.setName(currScheduledState.getName() + ";  makespan = " + smallestTime);
+				currScheduledState.setName(currScheduledState.getName() + ";  makespan = " + makespan);
 			}
 		}
-		
+
 		logger.info("TOTAL CYCLE TIME: " + makespan + ".............................");
 		
 		return schedule;
@@ -226,15 +233,11 @@ public class Milp
 	 * have similar roots. For example if robot.name = "ROBOT_A", the specification.name
 	 * should include "ROBOT_A". The resulting robot and zone automata are stored globally.
 	 */
-	private void initAutomata(Automata theAutomata)
+	private void initAutomata()
 		throws Exception
 	{
-		this.theAutomata = theAutomata;
-
 		robots = theAutomata.getPlantAutomata(); 
 		zones = theAutomata.getSpecificationAutomata(); 
-
-
 
 		// The robots synchronized with all corresponding specifications (except mutex zone specifications)
 		Automata restrictedRobots = new Automata();
@@ -313,6 +316,10 @@ public class Milp
 
 				restrictedRobots.addAutomaton(restrictedRobot);
 			}
+			else
+			{
+				restrictedRobots.addAutomaton(currRobot);
+			}
 		}		
 
 
@@ -325,15 +332,6 @@ public class Milp
 		theAutomata = new Automata(robots);
 		theAutomata.addAutomata(zones);
 		indexMap = new AutomataIndexMap(theAutomata);	
-
-		for (Iterator<Automaton> rit = robots.iterator(); rit.hasNext(); )
-		{
-			Automaton r = rit.next();
-			Iterator<State> stit = r.stateIterator();
-			State st = stit.next();
-			logger.warn("robot " + r.getName() + ", being " + r.getType() + ", has " + r.nbrOfStates() + " states and " + r.nbrOfEvents() + " events");
-			logger.info("state " + st.getName() + " has index = " + indexMap.getStateIndex(r, st) + " and cost = " + st.getCost());
-		}
 	}
 
 	private void initMutexStates()
@@ -358,29 +356,54 @@ public class Milp
 		{
 			State initial = zones.getAutomatonAt(i).getInitialState();
 
-			Iterator<Arc> bookingArcs = initial.outgoingArcsIterator();
-
-			while (bookingArcs.hasNext())
+			for (Iterator<ArcSet> bookingArcSets = initial.outgoingArcSetIterator(); bookingArcSets.hasNext(); )
 			{
-				Arc bookingArc = bookingArcs.next();
-				Arc unbookingArc = initial.nextState(bookingArc.getEvent()).outgoingArcsIterator().next();
-		
+				Alphabet bookingAlphabet = new Alphabet();
+				Alphabet unbookingAlphabet = new Alphabet();
+
+				ArcSet currBookingArcSet = bookingArcSets.next();
+
+				// Adding booking event for each set of arcs i.e. for each book-state of the zone-specification
+				for (Iterator<Arc> bookingArcs = currBookingArcSet.iterator(); bookingArcs.hasNext(); )
+				{
+					bookingAlphabet.addEvent(bookingArcs.next().getEvent());
+				}
+
+				for (Iterator<ArcSet> unbookingArcSets = currBookingArcSet.getToState().outgoingArcSetIterator(); unbookingArcSets.hasNext(); )
+				{
+					ArcSet currUnbookingArcSet = unbookingArcSets.next();
+
+					if (currUnbookingArcSet.getToState().equals(initial))
+					{
+						for (Iterator<Arc> unbookingArcs = currUnbookingArcSet.iterator(); unbookingArcs.hasNext(); )
+						{
+							unbookingAlphabet.addEvent(unbookingArcs.next().getEvent());
+						}
+
+						break;
+					}
+				}
+
 				// The robot set is searched for the states from which the above book/unbook events can be fired
 				for (int j=0; j<robots.size(); j++)
 				{
 					ArrayList<State> bookingStates = new ArrayList<State>();
 					ArrayList<State> unbookingStates = new ArrayList<State>();
 					Automaton currRobot = robots.getAutomatonAt(j);
+			
 
-					// The following is done only for the robot that contains the corresponding booking-event
-					if (currRobot.getAlphabet().contains(unbookingArc.getEvent()))
+					// The following is done only for the robot that contains the corresponding unbooking-event
+// 					if (currRobot.getAlphabet().contains(unbookingArc.getEvent()))
+					Alphabet currRobotZoneIntersectionAlphabet = AlphabetHelpers.intersect(currRobot.getAlphabet(), unbookingAlphabet);
+					if (currRobotZoneIntersectionAlphabet.nbrOfEvents() > 0)
 					{
 						// States that can lead directly to unbooking-events are found
 						for (Iterator<Arc> robotArcs = currRobot.arcIterator(); robotArcs.hasNext(); )
 						{
 							Arc currArc = robotArcs.next();
 
-							if (unbookingArc.getLabel().equals(currArc.getLabel()))
+// 							if (unbookingArc.getLabel().equals(currArc.getLabel()))
+							if (unbookingAlphabet.contains(currArc.getLabel()))
 								unbookingStates.add(currArc.getFromState());
 						}
 
@@ -406,7 +429,8 @@ public class Milp
 								{
 									Arc currArc = incomingArcs.next();
 									
-									if (bookingArc.getLabel().equals(currArc.getLabel()))
+// 									if (bookingArc.getLabel().equals(currArc.getLabel()))
+									if (bookingAlphabet.contains(currArc.getLabel()))
 									{
 										State candidateBookingState = currArc.getFromState();
 
@@ -517,7 +541,8 @@ public class Milp
 			deltaTimeStr += i;
 			
 			Automaton currRobot = robots.getAutomatonAt(i);
-
+			int currRobotIndex = indexMap.getAutomatonIndex(currRobot);
+			
 			// Each index correspond to a Tic. For each Tic, a deltaTime is added
 // 			for (int j=0; j<currRobot.nbrOfStates(); j++) 
 			int[] deltaTimes = new int[currRobot.nbrOfStates()];
@@ -539,8 +564,8 @@ public class Milp
 				{
 					if (currState.isInitial())
 					{
-						initPrecConstraints += "initial_" + currRobot.getName() + "_" + currState.getName() + " : ";
-						// 						initPrecConstraints += "time[" + i + ", " + indexMap.getStateIndex(currRobot, currState) + "] >= deltaTime[" + i + ", " + indexMap.getStateIndex(currRobot, currState) + "];\n";
+// 						initPrecConstraints += "initial_" + currRobot.getName() + "_" + currState.getName() + " : ";
+						initPrecConstraints += "initial_" + "R" + currRobotIndex + "_" + currStateIndex + " : ";
 						initPrecConstraints += "time[" + i + ", " + currStateIndex + "] >= deltaTime[" + i + ", " + currStateIndex + "];\n";
 					}
 					
@@ -551,7 +576,8 @@ public class Milp
 						State nextState = nextStates.next();
 						int nextStateIndex = indexMap.getStateIndex(currRobot, nextState);
 						
-						precConstraints += "prec_" + currRobot.getName() + "_" + currState.getName() + "_" + nextState.getName() + " : ";
+// 						precConstraints += "prec_" + currRobot.getName() + "_" + currState.getName() + "_" + nextState.getName() + " : ";
+						precConstraints += "prec_" + "R" + currRobotIndex + "_" + currStateIndex + "_" + nextStateIndex + " : ";
 						precConstraints += "time[" + i + ", " + nextStateIndex + "] >= time[" + i + ", " + currStateIndex + "] + deltaTime[" + i + ", " + nextStateIndex + "];\n";
 					}
 					else if (nbrOfOutgoingArcs == 2)
@@ -561,14 +587,14 @@ public class Milp
 						int nextLeftStateIndex = indexMap.getStateIndex(currRobot, nextLeftState);
 						int nextRightStateIndex = indexMap.getStateIndex(currRobot, nextRightState);
 
-						String currAltPathsVariable = currRobot.getName() + "_goes_from_" + currState.getName() + "_to_" + nextLeftState.getName();
+						String currAltPathsVariable = "R" + currRobotIndex + "_goes_from_" + currStateIndex + "_to_" + nextLeftStateIndex;
 								
 						altPathsVariables += "var " + currAltPathsVariable + ", binary;\n";
 
-						altPathsConstraints += "alt_paths_" + currRobot.getName() + "_" + currState.getName() + " : "; 
+						altPathsConstraints += "alt_paths_" + "R" + currRobotIndex + "_" + currStateIndex + " : "; 
 						altPathsConstraints += "time[" + i + ", " + nextLeftStateIndex + "] >= time[" + i + ", " + currStateIndex + "] + deltaTime[" + i + ", "  + nextLeftStateIndex + "] - bigM*" + currAltPathsVariable + ";\n";
 
-						altPathsConstraints += "dual_alt_paths_" + currRobot.getName() + "_" + currState.getName() + " : "; 
+						altPathsConstraints += "dual_alt_paths_" + "R" + currRobotIndex + "_" + currStateIndex + " : "; 
 						altPathsConstraints += "time[" + i + ", " + nextRightStateIndex + "] >= time[" + i + ", " + currStateIndex + "] + deltaTime[" + i + ", "  + nextRightStateIndex + "] - bigM*(1 - " + currAltPathsVariable + ");\n";
 					}
 					else if (nbrOfOutgoingArcs > 2)
@@ -577,7 +603,7 @@ public class Milp
 						
 						while (nextStates.hasNext())
 						{
-							String currAltPathsVariable = currRobot.getName() + "_" + currState.getName() + "_path_" + currAlternative;
+							String currAltPathsVariable = "R" + currRobotIndex + "_" + currStateIndex + "_path_" + currAlternative;
 							State nextState = nextStates.next();
 							int nextStateIndex = indexMap.getStateIndex(currRobot, nextState);
 
@@ -589,12 +615,12 @@ public class Milp
 							currAlternative++;
 						}
 
-						altPathsConstraints += "alt_paths_" + currRobot.getName() + "_" + currState.getName() + "_TOT : ";
+						altPathsConstraints += "alt_paths_" + "R" + currRobotIndex + "_" + currStateIndex + "_TOT : ";
 						for (int k=0; k<currAlternative - 1; k++)
 						{
-							altPathsConstraints += currRobot.getName() + "_" + currState.getName() + "_path_" + k + " + ";
+							altPathsConstraints += "R" + currRobotIndex + "_" + currStateIndex + "_path_" + k + " + ";
 						}
-						altPathsConstraints += currRobot.getName() + "_" + currState.getName() + "_path_" + (currAlternative - 1) + " = 1;\n";
+						altPathsConstraints += "R" + currRobotIndex + "_" + currStateIndex + "_path_" + (currAlternative - 1) + " = 1;\n";
 
 						// Implement t1 >= t0 + delta_t0 - M*alt0; t1_prim >= t0 + delta_t0 - M*alt0_prim; 
 						// t1_prim_prim >= t0 + delta_t0 - M*alt0_prim_prim; alt0 + alt0_prim + alt0_prim_prim = 1;
@@ -604,7 +630,7 @@ public class Milp
 				{   
 					// If the current state is accepting, a cycle time constaint is added,
 					// ensuring that the makespan is at least as long as the minimum cycle time of this robot
-					cycleTimeConstraints += "cycle_time_" + currRobot.getName() + " : c >= " + "time[" + i + ", " + currStateIndex + "];\n";
+					cycleTimeConstraints += "cycle_time_" + "R" + currRobotIndex + " : c >= " + "time[" + i + ", " + currStateIndex + "];\n";
 				}
 			}
 
@@ -770,7 +796,7 @@ public class Milp
 
 		BufferedReader r = new BufferedReader(new FileReader(solutionFile));
 		String str = r.readLine();
-		
+
 		// Go through the solution file and extract the suggested optimal times for each state
 		while (str != null)
 		{
@@ -795,68 +821,6 @@ public class Milp
 			str = r.readLine();
 		}
 	}
-	
-// 	private void processSolutionFile()
-// 		throws Exception
-// 	{
-// // 		scheduleInfo = new TreeSet<int[]>(new CostComparator(robots));
-// // 		scheduleInfo = new TreeSet[robots.size()];
-// // 		for (int i=0; i<scheduleInfo.length; i++)
-// // 			scheduleInfo[i] = new TreeSet<int[]>(new CostComparator(robots.getAutomatonAt(i)));
-
-// 		scheduleInfo = new TreeSet<int[]>(new CostComparator());
-
-// 		if (!solutionFile.isFile())
-// 			throw new Exception(solutionFile + " was NOT FOUND..........");
-
-// 		BufferedReader r = new BufferedReader(new FileReader(solutionFile));
-// 		String str = r.readLine();
-
-// 		while (str != null)
-// 		{
-// 			// For every solution line containing positive time value...
-// 			if (str.indexOf(" time[") > -1)
-// 			{
-// 				String strRobotIndex = str.substring(str.indexOf("[") + 1, str.indexOf(",")).trim();
-// 				String strStateIndex = str.substring(str.indexOf(",") + 1, str.indexOf("]")).trim();
-// 				String strCost = str.substring(str.indexOf("]") + 1).trim(); 
-			
-// 				int robotIndex = (new Integer(strRobotIndex)).intValue(); 
-// 				int stateIndex = (new Integer(strStateIndex)).intValue(); 
-//  				int cost = (new Integer(strCost)).intValue();
-
-// 				int[] currScheduleInfo = new int[]{robotIndex, stateIndex, cost};
-// // 				scheduleInfo[robotIndex].add(currScheduleInfo);
-// 				scheduleInfo.add(currScheduleInfo);
-// 			}
-// 			else if (str.indexOf("c ") >  -1)
-// 			{
-// 				String strMakespan = str.substring(str.indexOf("c") + 1).trim();
-// 				makespan = (new Integer(strMakespan)).intValue();
-// 			}
-				
-// 			str = r.readLine();
-// 		}
-
-
-// // 		for (int i=0; i<robots.size(); i++)
-// // 		{
-// // 			logger.warn("Robot " + i);
-// // 			for (Iterator<int[]> iter = scheduleInfo[i].iterator(); iter.hasNext(); )
-// // 			{
-// // 				int[] temp = iter.next();
-// // 				logger.info("tree -> " + temp[0] + " " + temp[1] + " " + temp[2]);
-// // 			}
-// // 		}
-
-// 		/*
-// 		for (Iterator<int[]> iter = scheduleInfo.iterator(); iter.hasNext(); )
-// 		{
-// 			int[] temp = iter.next();
-// 			logger.info("tree -> " + temp[0] + " " + temp[1] + " " + temp[2]);
-// 		}
-// 		*/
-// 	}
 
 	private void callGlpk()
 		throws Exception
@@ -876,11 +840,16 @@ public class Milp
 		BufferedReader milpEcho = new BufferedReader(new InputStreamReader(new DataInputStream(milpProcess.getInputStream())));
 
 		// ...and prints it to stdout
-		String milpEchoStr;
+		String milpEchoStr = "";
+		String totalMilpEchoStr = "";
 		while ((milpEchoStr = milpEcho.readLine()) != null)
 		{
+			totalMilpEchoStr += milpEchoStr + "\n";
+
 			if (milpEchoStr.contains("INTEGER OPTIMAL SOLUTION FOUND") || milpEchoStr.contains("Time") || milpEchoStr.contains("Memory"))
 				logger.info(milpEchoStr);
+			else if (milpEchoStr.contains("error"))
+				throw new Exception(totalMilpEchoStr);
 		}
 	}
 
