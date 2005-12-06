@@ -17,7 +17,7 @@
                     <!-- Cellen har utrustning (samling av sensorer, actuatorer etc) som aer direkt tillgaenglig i cellen och inte aer del av en maskin-->
                     <Equipment>   
                         <!-- Varje utrustning har tillstaand (tvaa eller fler...) samt egen utrustning eller fysiska komponenter (elements) -->
-                        <EquipmentEntity equipmentType="Actuator" name="150Y1">                        
+                        <EquipmentEntity Type="Actuator" name="150Y1">                        
                             <Description>Valve for pressure air in cell 150</Description>
                             <States>
                                 <State>Blabla></State>
@@ -25,22 +25,22 @@
                             </States>
                             <!-- Element beskriver (styrning av) den fysiska utrustningen paa laegsta nivaa, d v s den nivaa daer kommunikation med kort/omvaerld sker-->
                             <Elements>
-                                <Element elementType="Actuator" name="150F9VY1">
+                                <Element Type="Actuator" name="150F9VY1">
                                     <Description>Monostable pneumatic valve, pressure air cell 150</Description>
                                 </Element>
-                                <Element elementType="Sensor" name="150SP1">
+                                <Element Type="Sensor" name="150SP1">
                                     <Description>Pressure switch, pressure air in cell 150 ok</Description>
                                 </Element>
                             </Elements>
                         </EquipmentEntity>
-                        <EquipmentEntity equipmentType="Sensor" name="150SG1">                        
+                        <EquipmentEntity Type="Sensor" name="150SG1">                        
                             <Description>Proximity sensor, product present in cell 150 </Description>
                             <States>
                                 <State>Blabla></State>
                                 <State>Blabla2></State>
                             </States>
                             <Elements>
-                                <Element elementType="Sensor" name="-----">              <!-- Detta borde kunna vaeljas automatiskt om det inte finns naagon undernivaa?-->
+                                <Element Type="Sensor" name="-----">              <!-- Detta borde kunna vaeljas automatiskt om det inte finns naagon undernivaa?-->
                                     <Description>The part of the virtual sensor that handles the communication with the real sensor</Description>
                                 </Element>
                             </Elements>
@@ -50,37 +50,37 @@
                     <!-- Cellen har ett antal olika maskiner av olika typer (robotar, fixturer etc) -->
                     <Machines>
                         <!-- Maskiner som inte har naagra aatkomliga komponenter, d v s de har egna styrsystem? -->
-                        <Machine machineType="Conveyor" name="CNV415">
+                        <Machine Type="Conveyor" name="CNV415">
                             <Description>Product Carrier</Description>
                         </Machine>
-                        <Machine machineType="Robot" name="3323">
+                        <Machine Type="Robot" name="3323">
                             <Description>Robot, spot welding</Description>
                         </Machine>
-                        <Machine machineType="Robot" name="3324">
+                        <Machine Type="Robot" name="3324">
                             <Description>Robot, spot welding</Description>
                         </Machine>
-                        <Machine machineType="Robot" name="3325">
+                        <Machine Type="Robot" name="3325">
                             <Description>Robot, material handling and spot welding</Description>
                             <Variables>
                                 <Variable>R3325#parts&gt;0</Variable>    
                             </Variables>
                         </Machine>
-                        <Machine machineType="Robot" name="3326">
+                        <Machine Type="Robot" name="3326">
                             <Description>Robot, material handling and spot welding</Description>
                             <Variables>
                                 <Variable>R3326#parts&gt;0</Variable>
                             </Variables>
                         </Machine>
-                        <Machine machineType="Memory" name="150EM">   <!-- Vad aer detta?-->
+                        <Machine Type="Memory" name="150EM">   <!-- Vad aer detta?-->
                             <Description>Escort memory read/write Machine</Description>
                         </Machine>
                         <!-- Maskiner med komponenter och subkomponenter som vi maaste styra -->
-                        <Machine machineType="Fixture" name="150FIX152">
+                        <Machine Type="Fixture" name="150FIX152">
                             <Description>Right fixture </Description>
                             <!-- En maskin har utrustning (samling av sensorer, actuatorer etc) -->
                             <Equipment>   
 			        <!-- Varje utrustning har tillstaand (tvaa eller fler...) samt egen utrustning eller fysiska komponenter (elements) -->
-                                <EquipmentEntity equipmentType="Sensor" name="152SG3">                        
+                                <EquipmentEntity Type="Sensor" name="152SG3">                        
                                     <Description>Proximity sensor part present on fixture </Description>
                                     <States>
                                         <State>on></State>
@@ -88,61 +88,61 @@
                                     </States>
                                     <!-- Element beskriver (styrning av) den fysiska utrustningen paa laegsta nivaa, d v s den nivaa daer kommunikation med kort/omvaerld sker -->
                                     <Elements>
-                                        <Element elementType="Sensor" name="152SG3">     
+                                        <Element Type="Sensor" name="152SG3">     
                                             <Description>The part of the virtual sensor that handles the communication with the real sensor</Description>
                                         </Element>
                                     </Elements>
                                 </EquipmentEntity>
-                                <EquipmentEntity equipmentType="Sensor" name="152SG6">                        
+                                <EquipmentEntity Type="Sensor" name="152SG6">                        
                                     <Description>Proximity sensor part present on fixture </Description>
                                     <States>
                                         <State>on></State>
                                         <State>off></State>
 	                            </States>
                                     <Elements>
-                                        <Element elementType="Sensor" name="152SG6"> 
+                                        <Element Type="Sensor" name="152SG6"> 
                                             <Description>The part of the virtual sensor that handles the communication with the real sensor</Description>
                                         </Element>
                                     </Elements>
                                 </EquipmentEntity>
-                                <EquipmentEntity equipmentType="Actuator" name="152Y14">                        
+                                <EquipmentEntity Type="Actuator" name="152Y14">                        
                                     <Description>ClampGroup</Description>
                                     <States>
                                         <State>open></State>
                                         <State>close></State>
                                     </States>
                                     <Elements>
-                                        <Element elementType="Actuator" name="152Y14Y">
+                                        <Element Type="Actuator" name="152Y14Y">
                                             <Description>Bistable pneumatic valve </Description>
                                         </Element>
                                     </Elements>
                                     <Equipment>
-                                        <EquipmentEntity equipmentType="Actuator" name="152Y14C1">                        
+                                        <EquipmentEntity Type="Actuator" name="152Y14C1">                        
                                             <Description>Cylinder</Description>
                                             <States>
                                                 <State>open></State>
                                                 <State>close></State>
                                             </States>
                                             <Elements>
-                                                <Element elementType="Sensor" name="152Y14ASG1">
+                                                <Element Type="Sensor" name="152Y14ASG1">
                                                     <Description>Proximity sensor clamp 1 open</Description>
                                                 </Element>
-                                                <Element elementType="Sensor" name="152Y14ASG2">
+                                                <Element Type="Sensor" name="152Y14ASG2">
                                                     <Description>Proximity sensor clamp 1 closed</Description>
                                                 </Element>
                                             </Elements>
                                         </EquipmentEntity>
-                                        <EquipmentEntity equipmentType="Actuator" name="152Y14C2">                        
+                                        <EquipmentEntity Type="Actuator" name="152Y14C2">                        
                                             <Description>Cylinder</Description>
                                             <States>
                                                 <State>open></State>
                                                 <State>close></State>
                                             </States>
                                             <Elements>
-                                                <Element elementType="Sensor" name="152Y14BSG1">
+                                                <Element Type="Sensor" name="152Y14BSG1">
                                                     <Description>Proximity sensor clamp 2 open</Description>
                                                 </Element>
-                                                <Element elementType="Sensor" name="152Y14BSG2">
+                                                <Element Type="Sensor" name="152Y14BSG2">
                                                     <Description>Proximity sensor clamp 2 closed</Description>
                                                 </Element>
                                             </Elements>

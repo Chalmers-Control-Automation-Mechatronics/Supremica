@@ -8,7 +8,7 @@
 
 
  <!-- Definition of simple types ___________________________________-->
- <xs:simpleType name="machineTypeType">
+ <xs:simpleType name="machineType">
   <xs:restriction base="xs:string">
     <xs:enumeration value="Conveyor"/>
     <xs:enumeration value="Robot"/>
@@ -19,7 +19,7 @@
   </xs:restriction>
  </xs:simpleType>
 
- <xs:simpleType name="equipmentTypeType">
+ <xs:simpleType name="equipmentType">
   <xs:restriction base="xs:string">
     <xs:enumeration value="Actuator"/>
     <xs:enumeration value="Sensor"/>
@@ -27,13 +27,19 @@
   </xs:restriction>
  </xs:simpleType>
 
- <xs:simpleType name="elementTypeType">
+ <xs:simpleType name="elementType">
   <xs:restriction base="xs:string">
     <xs:enumeration value="Actuator"/>
     <xs:enumeration value="Sensor"/>
     <xs:enumeration value="Other"/>
   </xs:restriction>
  </xs:simpleType>
+
+ <xs:simpleType name="nameType">
+  <xs:restriction base="xs:string">
+  </xs:restriction>
+ </xs:simpleType>
+
 
 
  <!-- Definition of simple elements ________________________________-->
@@ -41,12 +47,6 @@
  <xs:element name="State" type="xs:string"/>
  <xs:element name="Description" type="xs:string"/>
 
-
- <!-- Definition of attributes _____________________________________-->
- <xs:attribute name="name" type="xs:string"/>
- <xs:attribute name="machineType" type="machineTypeType"/>
- <xs:attribute name="equipmentType" type="equipmentTypeType"/>
- <xs:attribute name="elementType" type="elementTypeType"/>
 
 
  <!-- Definition of complex elements _______________________________-->
@@ -56,7 +56,7 @@
    <xs:element ref="Description" minOccurs="0" maxOccurs="1"/>
    <xs:element ref="Areas" minOccurs="1" maxOccurs="1"/>
    </xs:sequence>  
-   <xs:attribute ref="name" use="required"/>
+   <xs:attribute name="name" type="nameType" use="required"/>
  </xs:complexType>
  </xs:element>
 
@@ -74,7 +74,7 @@
    <xs:element ref="Description" minOccurs="0" maxOccurs="1"/>
    <xs:element ref="Cells" minOccurs="1" maxOccurs="1"/>
    </xs:sequence>  
-   <xs:attribute ref="name" use="required"/>
+   <xs:attribute name="name" type="nameType" use="required"/>
   </xs:complexType>
  </xs:element>
 
@@ -95,7 +95,7 @@
    <xs:element ref="Equipment" minOccurs="0" maxOccurs="1"/>
    <xs:element ref="Machines" minOccurs="1" maxOccurs="1"/>
    </xs:sequence>  
-   <xs:attribute ref="name" use="required"/>
+   <xs:attribute name="name" type="nameType" use="required"/>
   </xs:complexType>
  </xs:element>
 
@@ -114,8 +114,8 @@
    <xs:element ref="Variables" minOccurs="0" maxOccurs="1"/>
    <xs:element ref="Equipment" minOccurs="0" maxOccurs="1"/>
    </xs:sequence>  
-   <xs:attribute ref="machineType" use="required"/>
-   <xs:attribute ref="name" use="required"/>
+   <xs:attribute name="Type" type="machineType" use="required"/>
+   <xs:attribute name="name" type="nameType" use="required"/>
   </xs:complexType>
  </xs:element>
 
@@ -143,8 +143,8 @@
    <xs:element ref="Elements" minOccurs="0" maxOccurs="1"/>
    <xs:element ref="Equipment" minOccurs="0" maxOccurs="1"/>
    </xs:sequence>  
-   <xs:attribute ref="equipmentType" use="required"/>
-   <xs:attribute ref="name" use="required"/>
+   <xs:attribute name="Type" type="equipmentType" use="required"/>
+   <xs:attribute name="name" type="nameType" use="required"/>
   </xs:complexType>
  </xs:element>
 
@@ -169,8 +169,8 @@
    <xs:sequence>
    <xs:element ref="Description" minOccurs="0" maxOccurs="1"/>
    </xs:sequence>  
-   <xs:attribute ref="elementType" use="required"/>
-   <xs:attribute ref="name" use="required"/>
+   <xs:attribute name="Type" type="elementType" use="required"/>
+   <xs:attribute name="name" type="nameType" use="required"/>
   </xs:complexType>
  </xs:element>
 

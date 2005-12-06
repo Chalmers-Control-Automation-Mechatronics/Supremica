@@ -66,7 +66,7 @@
    </xsd:annotation>  
    <xsd:sequence>
     <xsd:element ref="Service" minOccurs="0" maxOccurs="unbounded"/>
-    <xsd:element ref="View" minOccurs="0" maxOccurs="unbounded"/>
+    <xsd:element ref="View" maxOccurs="unbounded"/>
     <xsd:element ref="Controller" minOccurs="0" maxOccurs="1"/>
     <xsd:element ref="Model" maxOccurs="1"/>
    </xsd:sequence>

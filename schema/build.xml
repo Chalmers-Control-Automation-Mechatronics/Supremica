@@ -1,10 +1,14 @@
 <project name="schema">
 
+  <property file="build.properties"/>
+
   <property name="src" location="../src"/>
   <property name="xsd_iec61499" location="iec61499/xsd"/>
   <property name="xsd_manufacturingTables" location="manufacturingTables/xsd"/>
 
-  <taskdef name="xjc" classname="com.sun.tools.xjc.XJCTask"/>
+  <taskdef name="xjc" classname="com.sun.tools.xjc.XJCTask">
+	<classpath path="${jwsdp.classpath}"/>
+  </taskdef>
 
   <target name="ao" description="Generate Automation Objects JAXB classes.">
     <xjc target="${src}" extension="true" removeOldOutput="yes" package="org.supremica.automationobjects.xsd">
