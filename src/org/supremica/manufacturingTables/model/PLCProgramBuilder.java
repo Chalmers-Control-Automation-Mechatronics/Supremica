@@ -65,7 +65,7 @@ import java.io.*;
 import javax.xml.bind.*;
 import org.supremica.manufacturingTables.xsd.factory.*;
 import org.supremica.manufacturingTables.management.*;
-import org.supremica.automationobjects.xsd.*;
+//import org.supremica.automationobjects.xsd.*;
 import org.supremica.functionblocks.xsd.libraryelement.*;
 import org.supremica.properties.SupremicaProperties;
 
@@ -76,7 +76,7 @@ public class PLCProgramBuilder
     // Variable to keep track of the indentation, just for now for printing the XML code
     private int nbrOfBlanks;
     private String blanks;
-    private AOApplication aoApplication; 
+    //private AOApplication aoApplication; 
     private org.supremica.automationobjects.xsd.ObjectFactory objFactory; 
 
     public PLCProgramBuilder()
@@ -86,17 +86,17 @@ public class PLCProgramBuilder
     public void buildPLCProgram(FactoryType factory)
     {
 	// Create an Automation Object application using the ObjectFactory
-	objFactory = new org.supremica.automationobjects.xsd.ObjectFactory(); 
-	try
-	    {
-		aoApplication = objFactory.createAOApplication();
-	    }
-	catch (JAXBException je)
-	    {
-		java.lang.System.err.println("Failed to create an AOApplication");
-		je.printStackTrace();
-		return;
-	    }
+	//objFactory = new org.supremica.automationobjects.xsd.ObjectFactory(); 
+	//try
+	//  {
+	//aoApplication = objFactory.createAOApplication();
+	//  }
+	//catch (JAXBException je)
+	//  {
+	//java.lang.System.err.println("Failed to create an AOApplication");
+	//je.printStackTrace();
+	//return;
+	//  }
 
 	// Variable to keep track of the indentation, just for now for printing the XML code
 	nbrOfBlanks = 0;
@@ -104,7 +104,7 @@ public class PLCProgramBuilder
 	
 	// Factory
 	java.lang.System.err.println(blanks.substring(0,nbrOfBlanks) + "<Factory name=\"" + factory.getName() + "\">");
-	aoApplication.setName("Factory" + factory.getName());
+	//aoApplication.setName("Factory" + factory.getName());
 
 	if(factory.getDescription()!=null)
 	    {
