@@ -77,7 +77,7 @@ public class PLCProgramBuilder
     private int nbrOfBlanks;
     private String blanks;
     //private AOApplication aoApplication; 
-    private org.supremica.automationobjects.xsd.ObjectFactory objFactory; 
+    //private org.supremica.automationobjects.xsd.ObjectFactory objFactory; 
 
     public PLCProgramBuilder()
     {
