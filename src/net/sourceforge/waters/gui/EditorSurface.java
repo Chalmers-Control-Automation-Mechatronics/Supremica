@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.34 2005-12-02 02:31:04 siw4 Exp $
+//# $Id: EditorSurface.java,v 1.35 2005-12-06 17:54:35 flordal Exp $
 //###########################################################################
 
 
@@ -1113,7 +1113,7 @@ public class EditorSurface
 		int width = (int) area.getWidth();
 		int height = (int) area.getHeight();
 
-		/* Why was this the way it was? We want the bounds to be tight, right?
+		/* // We want the bounds to be tight, right? Or why was this? 
 		if (width < 500)
 		{
 			width = 500;
@@ -1159,7 +1159,7 @@ public class EditorSurface
 			EditorNode node = (EditorNode) nodes.get(i);
 			
 			x = node.getX();
-			mod = EditorNode.RADIUS + 2 + SPACING;
+			mod = EditorNode.RADIUS + 2 + SPACING; // The 2 is there to compensate for rounding?
 			if (x + mod > maxX)
 			{
 				maxX = x + mod;
@@ -1403,7 +1403,16 @@ public class EditorSurface
 			}
 		}
 
-		drawnAreaBounds = new Rectangle((int) minX, (int) minY, (int) (maxX-minX),(int) (maxY-minY));
+		// Avoid stupid values
+		if ((maxX < minX) || (maxY < minY))
+		{
+			drawnAreaBounds = new Rectangle(0,0,0,0);
+		}
+		else
+		{
+			drawnAreaBounds = new Rectangle((int) minX, (int) minY, (int) (maxX-minX),(int) (maxY-minY));
+		}
+
 		return drawnAreaBounds;
 	}
 

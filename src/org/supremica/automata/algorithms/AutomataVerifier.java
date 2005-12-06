@@ -1746,7 +1746,7 @@ public class AutomataVerifier
 
 		// Examine all guaranteed nonblocking states for incoming arcs
 		State examinedState;
-		Iterator incomingArcIterator;
+		Iterator<Arc> incomingArcIterator;
 		while (statesToExamine.size() > 0)
 		{
 			examinedState = (State) statesToExamine.removeFirst();    // OBS. removeFirst!
@@ -1754,7 +1754,7 @@ public class AutomataVerifier
 
 			while (incomingArcIterator.hasNext())
 			{
-				currState = ((Arc) incomingArcIterator.next()).getFromState();
+				currState = incomingArcIterator.next().getFromState();
 
 				if (!currState.equals(examinedState))    // Self-loops...
 				{

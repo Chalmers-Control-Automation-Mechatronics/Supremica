@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.42 2005-12-01 16:29:51 flordal Exp $
+//# $Id: ControlledSurface.java,v 1.43 2005-12-06 17:54:35 flordal Exp $
 //###########################################################################
  
 package net.sourceforge.waters.gui;
@@ -1107,7 +1107,7 @@ public class ControlledSurface
 					   }
 					*/
 					
-					// What was clicked?
+					// What was clicked? 
 					EditorObject o = getObjectAtPosition(e.getX(), e.getY());
 					if (o != null)
 					{
@@ -1389,5 +1389,4 @@ public class ControlledSurface
 
 	private static final DataFlavor FLAVOUR =
 		new DataFlavor(IdentifierWithKind.class, "IdentifierWithKind");
-    
 }
