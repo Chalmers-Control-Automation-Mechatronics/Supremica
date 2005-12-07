@@ -45,11 +45,6 @@
 <property name="xsl" location="${xml}/xsl"/>
 <property name="logs" location="logs"/>
 
-<!--
-*	If you prefer javac instead of jikes,
-*	just change "jikes" to "modern" on the next line.
-<property name="build.compiler" value="modern"/>
--->
 
 <!-- Enables emacs warning and error mesages. This is equal to calling jikes +E -->
 <!-- Put this in TextPad to get clickable error messages
@@ -214,6 +209,8 @@
 -->
 <target name="compile" depends="compile_supremica,compile_tests_supremica">
 	<javac
+		debug="on"
+		debuglevel="source"
 		srcdir="${src}"
 		destdir="${build}"
 		classpath="${lib}/${unjared}"
@@ -234,7 +231,8 @@
 -->
 <target name="compile_supremica" depends="startfiles_local_supremica">
 	<javac
-	    debug="true"
+		debug="on"
+		debuglevel="source"
 		srcdir="${src}"
 		destdir="${build}"
 		classpath="${lib}/${unjared}"
@@ -270,6 +268,8 @@
 
 <target name="compile_functionblocks_jaxb">
 	<javac
+		debug="on"
+		debuglevel="source"
 		srcdir="${src}"
 		destdir="${build}"
 		classpath="${lib}/${unjared}"
@@ -306,6 +306,8 @@
 -->
 <target name="compile_scheduling">
 	<javac
+		debug="on"
+		debuglevel="source"
 		srcdir="${src}"
 		destdir="${build}"
 		classpath="${lib}/${unjared}"
@@ -324,6 +326,8 @@
 -->
 <target name="compile_tests_supremica">
 	<javac
+		debug="on"
+		debuglevel="source"
 		srcdir="${testssrc}"
 		destdir="${testsbuild}"
                 excludes="net/sourceforge/waters/junit/**/*.java"
@@ -346,6 +350,8 @@
 <!-- 
 <target name="compile_jgrafchart">
 	<javac
+		debug="on"
+		debuglevel="source"
 		srcdir="${src}"
 		destdir="${build}"
 		classpath="${lib}/${unjared}"
@@ -740,6 +746,10 @@
 
 <target name="run_tests" depends="run_tests_supremica"/>
 
+<target name="run_tests_junit" depends="run_tests_supremica_junit">
+</target>
+
+
 <target name="run_tests_supremica" depends="compile_supremica,compile_tests_supremica">
 	<java fork="yes" classname="junit.textui.TestRunner"
 		taskname="junit" failonerror="true">
@@ -752,6 +762,19 @@
 			<pathelement path="${java.class.path}" />
 		</classpath>
 	</java>
+</target>
+
+<target name="run_tests_supremica_junit" depends="compile_supremica,compile_tests_supremica">
+	<junit printsummary="withOutAndErr" fork="true">
+		<formatter type="plain" usefile="false"/>
+		<test name="org.supremica.TestPackageSupremica"/>
+		<classpath>
+			<pathelement location="${build}" />
+			<pathelement location="${testsbuild}" />
+			<pathelement path="${lib}/${unjared}" />
+			<pathelement path="${java.class.path}" />
+		</classpath>
+	</junit>
 </target>
 
 <target name="run_tests_waters" depends="compile_supremica,compile_tests_supremica">

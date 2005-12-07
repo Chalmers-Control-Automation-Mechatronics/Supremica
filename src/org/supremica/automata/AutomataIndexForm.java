@@ -105,6 +105,9 @@ public final class AutomataIndexForm
 	// <automaton> x <event> -> <state[]>
 	private int[][][] enableEventsTable;
 
+	// <event> -> <automaton[]> // Todo: KA
+	private int[][] eventToAutomatonTable;
+
 	// <automaton> -> <max state index in current automaton>
 	private int[] automatonStateMaxIndex;
 	private Automata theAutomata = null;
@@ -153,6 +156,7 @@ public final class AutomataIndexForm
 		generatePrevStatesTransitionIndices(theAutomata, theAutomaton);
 
 		generateEventsTables(theAutomaton);
+		generateEventToAutomatonTable(theAutomata, theAutomaton);
 	}
 
 	public AutomataIndexForm(AutomataIndexForm indexForm)
@@ -181,6 +185,7 @@ public final class AutomataIndexForm
 			automataSize = generateCopy1DIntArray(indexForm.automataSize);
 			enableEventsTable = generateCopy3DIntArray(indexForm.enableEventsTable);
 			automatonStateMaxIndex = generateCopy1DIntArray(indexForm.automatonStateMaxIndex);
+			eventToAutomatonTable = generateCopy2DIntArray(indexForm.eventToAutomatonTable);
 		}
 		else
 		{
@@ -201,6 +206,7 @@ public final class AutomataIndexForm
 			automataSize = indexForm.automataSize;
 			enableEventsTable = indexForm.enableEventsTable;
 			automatonStateMaxIndex = indexForm.automatonStateMaxIndex;
+			eventToAutomatonTable = indexForm.eventToAutomatonTable;
 		}
 	}
 
@@ -642,6 +648,40 @@ public final class AutomataIndexForm
 		}
 	}
 
+	// TODO: KA
+	void generateEventToAutomatonTable(Automata theAutomata, Automaton theAutomaton)
+	{
+		Alphabet theAlphabet = theAutomaton.getAlphabet();
+
+		eventToAutomatonTable = new int[theAlphabet.size()][];
+
+		int nbrOfAutomata = theAutomata.size();
+
+		for (Iterator theAlphabetIt = theAlphabet.iterator();
+				theAlphabetIt.hasNext(); )
+		{
+			LabeledEvent currEvent = (LabeledEvent) theAlphabetIt.next();
+			String currLabel = currEvent.getLabel();
+			int currEventSynchIndex = currEvent.getSynchIndex();
+
+			eventToAutomatonTable[currEventSynchIndex] = new int[nbrOfAutomata + 1];
+
+			int currTablePosition = 0;
+			for (int i = 0; i < nbrOfAutomata; i++)
+			{
+				Automaton currAutomaton = theAutomata.getAutomatonAt(i);
+				Alphabet currAutAlphabet = currAutomaton.getAlphabet();
+
+				if (currAutAlphabet.contains(currLabel))
+				{
+					eventToAutomatonTable[currEventSynchIndex][currTablePosition] = currAutomaton.getSynchIndex();
+					currTablePosition++;
+				}
+			}
+			eventToAutomatonTable[currEventSynchIndex][currTablePosition] = Integer.MAX_VALUE;
+		}
+	}
+
 	public boolean[][] getAlphabetEventsTable()
 	{
 		return alphabetEventsTable;
@@ -725,6 +765,11 @@ public final class AutomataIndexForm
 	public int[][][] getEnableEventsTable()
 	{
 		return enableEventsTable;
+	}
+
+	public int[][] getEventToAutomatonTable()
+	{
+		return eventToAutomatonTable;
 	}
 
 	public Automaton getAutomaton(int index)

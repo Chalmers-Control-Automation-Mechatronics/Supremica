@@ -94,6 +94,7 @@ public final class AutomataSynchronizerExecuter
 	private final boolean[] immediateEventsTable;
 	private final boolean[] epsilonEventsTable; // New! For the nondeterministic case...
 	private int[][] currOutgoingEvents;
+	private int[][] eventToAutomatonTable;
 	private int[] currOutgoingEventsIndex;
 	private int[] automataIndices;
 	private int[] currPlantAutomata;
@@ -192,6 +193,7 @@ public final class AutomataSynchronizerExecuter
 		controllableEventsTable = indexForm.getControllableEventsTable();
 		immediateEventsTable = indexForm.getImmediateEventsTable();
 		epsilonEventsTable = indexForm.getEpsilonEventsTable();
+		eventToAutomatonTable = indexForm.getEventToAutomatonTable();
 
 		// Syncoptions parameters
 		options = synchronizerHelper.getSynchronizationOptions();
@@ -229,7 +231,7 @@ public final class AutomataSynchronizerExecuter
 		for (Iterator<Automaton> autIt = automataToBeSelected.iterator();
 				autIt.hasNext(); )
 		{
-			automataIndices[i++] = indexForm.getAutomataIndexMap().getAutomatonIndex(autIt.next()); 
+			automataIndices[i++] = indexForm.getAutomataIndexMap().getAutomatonIndex(autIt.next());
 		}
 
 		helper.selectAutomata(automataIndices);
@@ -254,7 +256,7 @@ public final class AutomataSynchronizerExecuter
 
 		for (int i = 0; i < automataToBeSelected.size(); i++)
 		{
-			automataIndices[i] =  indexForm.getAutomataIndexMap().getAutomatonIndex(((Automaton) automataToBeSelected.get(i))); 
+			automataIndices[i] =  indexForm.getAutomataIndexMap().getAutomatonIndex(((Automaton) automataToBeSelected.get(i)));
 		}
 
 		helper.selectAutomata(automataIndices);
@@ -315,7 +317,7 @@ public final class AutomataSynchronizerExecuter
 	}
 
 	/**
-	 * Calculates what events are enabled from the state <tt>currState</tt>,
+	 * Calculates which events are enabled from the state <tt>currState</tt>,
 	 * if the state turns out uncontrollable, the boolean controllableState
 	 * is set false.
 	 *
@@ -341,6 +343,9 @@ public final class AutomataSynchronizerExecuter
 
 			currOutgoingEvents[currAutIndex] = outgoingEventsTable[currAutIndex][currSingleStateIndex];
 			currOutgoingEventsIndex[currAutIndex] = 0;
+
+			// logger.debug("oe: aut: " + currAutIndex + " e: " + AutomataIndexFormHelper.dumpState(outgoingEventsTable[currAutIndex][currSingleStateIndex]));
+
 
 			// Find the event with the smallest index.
 			// The last element currOutgoingEvents[currAutIndex]
@@ -376,12 +381,38 @@ public final class AutomataSynchronizerExecuter
 
 			// Check that this event is possible in all automata
 			// that must be ready to execute this event
+//			for (int i = 0; i < nbrOfSelectedAutomata; i++)
+//			{
+//				currAutIndex = automataIndices[i];
+
+			// Above code was replaced to only check those automata that has
+			// the specified event in its alphabet
+			int[] automatonTable = eventToAutomatonTable[currEventIndex];
+
+			if (automatonTable == null)
+			{
+				logger.error("AutomatonTable is null");
+				return;
+			}
+
+			int automatonTableIndex = 0;
+// KA: Commented out
+//			while (automatonTable[automatonTableIndex] < Integer.MAX_VALUE)
+//			{
+//				currAutIndex = automatonTable[automatonTableIndex];
+
 			for (int i = 0; i < nbrOfSelectedAutomata; i++)
 			{
 				currAutIndex = automataIndices[i];
 
+// End of replaced code
+
+				automatonTableIndex++;
+
 				// This is the index of the "next" event in the current automaton
 				currAutEventIndex = currOutgoingEvents[currAutIndex][currOutgoingEventsIndex[currAutIndex]];
+
+				// logger.debug("checking event " + currAutEventIndex + " in aut " + currAutIndex);
 
 				if (syncType == SynchronizationType.Prioritized)
 				{
@@ -471,7 +502,9 @@ public final class AutomataSynchronizerExecuter
 				{
 					currMinEventIndex = currAutEventIndex;
 				}
+				// logger.debug("thisEventOk " + thisEventOk);
 			}
+
 
 			// If everything is ok, or the event is epsilon, it is enabled!
 			// (If the event is epsilon, a lot of the above could have been ignored...)
@@ -479,6 +512,7 @@ public final class AutomataSynchronizerExecuter
 			{
 				if (immediateEventsTable[currEventIndex])
 				{
+					// logger.debug("isImmediate");
 					// Clear out everything else and abort the search for enabled events
 					// If several events that are immediate are found
 					// Then the one with smallest index is chosen.
@@ -608,6 +642,8 @@ public final class AutomataSynchronizerExecuter
 
 			currEnabledEvents[insertionIndex] = Integer.MAX_VALUE;
 		}
+
+		//logger.debug("ee: " + AutomataIndexFormHelper.dumpState(currEnabledEvents));
 	}
 
 	/**
@@ -714,7 +750,6 @@ public final class AutomataSynchronizerExecuter
 					}
 					*/
 
-					// Find new permutations (recursion)
 					addNondeterministicStatePermutations(currState, currEventIndex);
 
 					// Get next enabled event
@@ -791,6 +826,8 @@ public final class AutomataSynchronizerExecuter
 			// Add the current nextState as new state
 			try
 			{
+				logger.debug("ansp ev: " + currEventIndex + " state: " +AutomataIndexFormHelper.dumpState(currState));
+
 				helper.addState(currState, nextState);
 
 				//logger.info("Add state: " + nextState[0] + "." + nextState[1]);

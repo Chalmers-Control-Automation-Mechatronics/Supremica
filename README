@@ -5,8 +5,7 @@ To run Supremica you need a Java2 1.5 compliant JVM.
 All development is done with Sun's JDK2 1.5. You also need
 Ant - the Java build system. Secure shell (SSH) is needed 
 for secure communication with the computers at the Department
-of Signals and Systems. For fastest compiling you should install Jikes, 
-the Java compiler from IBM.
+of Signals and Systems. 
 
 From 2001-09-27 JGrafChart is included. JGrafChart is a Grafcet/SFC 
 modeling tool. JGrafChart is developed by Karl-Erik Arzen, at Lund
@@ -51,7 +50,7 @@ Supremica is following.
 
 2. Compiling
 
-	To compile Supremica you need to have Ant and Jikes installed
+	To compile Supremica you need to have Ant installed
 	See the links at the bottom of the page.
 
 	The first time you compile after a checkout you should write:
@@ -198,9 +197,6 @@ http://java.sun.com/
 
 IBM Java JDK
 http://www.ibm.com/java
-
-Jikes - A fast Java compiler
-http://oss.software.ibm.com/developerworks/opensource/jikes/
 
 JAXB - Java Architecture for XML Binding 
 http://java.sun.com/xml/jaxb/

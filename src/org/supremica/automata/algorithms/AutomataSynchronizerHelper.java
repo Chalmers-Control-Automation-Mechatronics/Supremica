@@ -208,7 +208,7 @@ public final class AutomataSynchronizerHelper
 		// Build the initial state  (including 2 status fields)
 		int[] initialState = AutomataIndexFormHelper.createState(theAutomata.size());
 
-		Iterator autIt = theAutomata.iterator();		
+		Iterator autIt = theAutomata.iterator();
 		while (autIt.hasNext())
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
@@ -356,6 +356,9 @@ public final class AutomataSynchronizerHelper
 	public void addState(int[] fromState, int[] toState)
 		throws Exception
 	{
+		logger.debug("addState state: " +AutomataIndexFormHelper.dumpState(fromState));
+
+
 		if (rememberTrace)
 		{
 			fromStateList.addLast(fromState);
