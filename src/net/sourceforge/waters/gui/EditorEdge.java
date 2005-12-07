@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorEdge
 //###########################################################################
-//# $Id: EditorEdge.java,v 1.31 2005-12-07 01:08:46 siw4 Exp $
+//# $Id: EditorEdge.java,v 1.32 2005-12-07 02:15:16 siw4 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -58,9 +58,6 @@ public class EditorEdge
 	private EditorObject startNode; 
 	/** The end is a node. */
 	private EditorNode endNode;
-
-	/** The control point ("target") */
-	private Point2D.Double tPoint;
 
 	/** Boolean keeping track of whether the edge is a straight line or not. */
 	private boolean straight;
@@ -121,6 +118,7 @@ public class EditorEdge
 		// Create new geometry if there is none
 		if (subject.getGeometry() == null)
 		{
+			Point2D.Double tPoint = null;
 			if (!isSelfLoop())
 			{
 				straight = true;
@@ -163,11 +161,6 @@ public class EditorEdge
 			final Point2D point0 = points.get(0);
 			final double x0 = point0.getX();
 			final double y0 = point0.getY();
-			if (point0 instanceof Point2D.Double) {
-				tPoint = (Point2D.Double) point0;
-			} else {
-				tPoint = new Point2D.Double(x0, y0);
-			}
 			if (onLine(x0, y0)) {
 				straight = true;
 			}
@@ -253,20 +246,20 @@ public class EditorEdge
 		double result;
 		if (subject.getSource() == subject.getTarget())
 		{
-			return tPoint.getX();
+			return getPosition().getX();
 		}
 
-		return (2 * tPoint.getX() - (getStartPoint().getX() + endNode.getX()) / 2);
+		return (2 * getPosition().getX() - (getStartPoint().getX() + endNode.getX()) / 2);
 	}
 
 	public double getCPointY()
 	{
 		if (subject.getSource() == subject.getTarget())
 		{
-			return tPoint.getY();
+			return getPosition().getY();
 		}
 
-		return (2 * tPoint.getY() - (getStartPoint().getY() + endNode.getY()) / 2);
+		return (2 * getPosition().getY() - (getStartPoint().getY() + endNode.getY()) / 2);
 	}
 
 	public Point2D getCPoint()
@@ -276,12 +269,12 @@ public class EditorEdge
 
 	public void setCPointX(double x)
 	{
-		setCPoint(x, tPoint.getY());
+		setCPoint(x, getCPointY());
 	}
 
 	public void setCPointY(double y)
 	{
-		setCPoint(tPoint.getX(), y);
+		setCPoint(getCPointX(), y);
 	}
 
 	public void setCPoint(Point2D.Double p)
@@ -378,8 +371,8 @@ public class EditorEdge
 		{
 			double nx = getStartPoint().getX() - endNode.getX();
 			double ny = getStartPoint().getY() - endNode.getY();
-			double tx = tPoint.getX() - endNode.getX();
-			double ty = tPoint.getY() - endNode.getY();
+			double tx = getPosition().getX() - endNode.getX();
+			double ty = getPosition().getY() - endNode.getY();
 
 			ox -= endNode.getX();
 			oy -= endNode.getY();
@@ -500,7 +493,7 @@ public class EditorEdge
 		}
 		else
 		{
-			return tPoint.getX();
+			return getPosition().getX();
 		}
 
 		//return tPoint.getX();
@@ -518,7 +511,7 @@ public class EditorEdge
 		}
 		else
 		{
-			return tPoint.getY();
+			return getPosition().getY();
 		}
 
 		//return tPoint.getY();
@@ -526,7 +519,7 @@ public class EditorEdge
 
     public Point2D getPosition()
     {
-		return new Point2D.Double(getTPointX(), getTPointY());
+		return subject.getGeometry().getPoints().get(0);
     }
 
 	/** 
@@ -556,7 +549,7 @@ public class EditorEdge
 		{
 			straight = false; 
 			
-			tPoint.setLocation(x, y);
+			subject.getGeometry().getPointsModifiable().set(0, new Point2D.Double(x, y));
 		}
 		else
 		{
@@ -564,17 +557,18 @@ public class EditorEdge
 			{
 				straight = true;
 				
-				tPoint.setLocation((double) ((getStartPoint().getX() + endNode.getX()) / 2), (double) ((getStartPoint().getY() + endNode.getY()) / 2));
+				subject.getGeometry().getPointsModifiable().set(0 , new Point2D.Double(
+				(double) ((getStartPoint().getX() + endNode.getX()) / 2), (double) ((getStartPoint().getY() + endNode.getY()) / 2)));
 			}
 			else
 			{
 				straight = false;
 				
-				tPoint.setLocation(x, y);
+				subject.getGeometry().getPointsModifiable().set(0, new Point2D.Double(x, y));
 			}
 		}
 
-		center.setFrameFromCenter(tPoint.getX(), tPoint.getY(), tPoint.getX() + WIDTHD, tPoint.getY() + WIDTHD);
+		center.setFrameFromCenter(getPosition().getX(), getPosition().getY(), getPosition().getX() + WIDTHD, getPosition().getY() + WIDTHD);
 	}
 
 	public int hashCode()
@@ -596,13 +590,15 @@ public class EditorEdge
 	{
 		if (isSelfLoop())
 		{
-			tPoint.setLocation(tPoint.getX() + (endNode.getX() - (int) ox), tPoint.getY() + (endNode.getY() - (int) oy));
+			subject.getGeometry().getPointsModifiable().set(0 ,
+					new Point2D.Double(getTPointX() + (endNode.getX() - (int) ox),
+					getTPointY() + (endNode.getY() - (int) oy)));
 			
 			return;
 		}
 
-		double Cx = tPoint.getX();
-		double Cy = tPoint.getY();
+		double Cx = getTPointX();
+		double Cy = getTPointY();
 		double Newx;
 		double Newy;
 		double Deltax;
@@ -610,7 +606,7 @@ public class EditorEdge
 
 		if (startN)
 		{
-			//          Cx = (.25 * (double)(ox + 2*getCPointX() + (double)endNode.getX())) - (double)endNode.getX();
+			//  Cx = (.25 * (double)(ox + 2*getCPointX() + (double)endNode.getX())) - (double)endNode.getX();
 			//  Cy = (.25 * (double)(oy + 2*getCPointY() + (double)endNode.getY())) - (double)endNode.getY();
 			Cx -= endNode.getX();
 			Cy -= endNode.getY();
@@ -780,7 +776,7 @@ public class EditorEdge
 	{
 		Rectangle2D.Double r = new Rectangle2D.Double();
 
-		r.setFrameFromCenter(tPoint.getX(), tPoint.getY(), tPoint.getX() + WIDTHS, tPoint.getY() + WIDTHS);
+		r.setFrameFromCenter(getTPointX(), getTPointY(), getTPointX() + WIDTHS, getTPointY() + WIDTHS);
 
 		dragC = r.contains(Cxposition, Cyposition);
 
