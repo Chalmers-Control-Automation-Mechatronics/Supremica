@@ -11,16 +11,21 @@ import org.supremica.automata.algorithms.*;
 public class Milp 
 	implements Scheduler
 {
+
+	/****************************************************************************************/
+	/*                                 VARIABLE SECTION                                     */
+	/****************************************************************************************/
+
+	/** The logger */
 	private static Logger logger = LoggerFactory.createLogger(Milp.class);
 
+	/** The involved automata, plants, zone specifications */
 	private Automata theAutomata, robots, zones;
 
 	/** int[zone_nr][robot_nr][state_nr] - stores the states that fire booking/unbooking events */
 	private int[][][] bookingTics, unbookingTics;
 
-	/** Ordered info that allows to build the optimal schedule - stores [robot_index, state_index, state_time] */
-	private TreeSet<int[]> scheduleInfo;
-
+	/** The optimal cycle time (makespan) */
 	private int makespan;
 	
 	/** The *.mod file that serves as an input to the Glpk-solver */
@@ -32,9 +37,19 @@ public class Milp
 	/** The optimal times (for each robotstate) that the MILP solver returns */
 	private int[][] optimalTimes = null;
 
+	/** Is needed to kill the MILP-solver if necessary */
 	private Process milpProcess;
 	
+	/** The map that assigns an index to each automaton/state/event */
 	private AutomataIndexMap indexMap;
+
+	/** The automaton representing the (resulting) optimal schedule */
+	private Automaton schedule = null;
+
+
+	/****************************************************************************************/
+	/*                                 CONSTUCTORS                                          */
+	/****************************************************************************************/
 
 	public Milp(Automata theAutomata) 
 		throws Exception
@@ -42,33 +57,29 @@ public class Milp
 		this.theAutomata = theAutomata;
 	}
 
+
+	/****************************************************************************************/
+	/*                                 "SCHEDULER"-INTERFACE METHODS                        */
+	/****************************************************************************************/
+
+	/**
+	 * This method converts the selected automata to a MILP-representation, calls the MILP-solver,
+	 * processes and stores the resulting information.
+	 */
 	public void schedule()
 		throws Exception
 	{
 		try 
 		{
-			// SÅ SKALL DET VARA NÄR ALLTING ÄR KLART (OM), MEN NU... FÖR ATT UNDERLÄTTA...
-			modelFile = File.createTempFile("milp", ".mod");
-			modelFile.deleteOnExit();
-			
-			solutionFile = File.createTempFile("milp", ".sol");
-			solutionFile.deleteOnExit();
-			
-			// ... SÅ HÄR ISTÄLLET...
-// 			modelFile = new File("C:\\avenir\\progg\\milp.mod");
-// 			solutionFile = new File("C:\\avenir\\progg\\milp.sol");
-// 			modelFile.createNewFile();
-// 			solutionFile.createNewFile();
+			initialize();
 
-			indexMap = new AutomataIndexMap(theAutomata);
+			// Converts automata to constraints that the MILP-solver takes as input (*.mod file)
+			convertAutomataToMilp();
 
-			initAutomata();
-			initMutexStates();
+			// Calls the MILP-solver
+			callMilpSolver();
 
-			convertXmlToMod();
-
-			callGlpk();
-
+			// Processes the output from the MILP-solver (*.sol file) and tores the optimal times for each state
 			processSolutionFile();
 		}
 		catch (Exception e)
@@ -88,38 +99,19 @@ public class Milp
 	public Automaton buildScheduleAutomaton() 
 		throws Exception
 	{	
-		Automaton schedule = new Automaton();
+		schedule = new Automaton();
 		schedule.setComment("Schedule");
 
-		// UGLY - why not initialize() in the corresponding constructors?
-		AutomataSynchronizerHelper synchHelper = new AutomataSynchronizerHelper(theAutomata, new SynchronizationOptions());
-		synchHelper.initialize();
-		AutomataSynchronizerExecuter synchronizer = new AutomataSynchronizerExecuter(synchHelper);
-		synchronizer.initialize();
-
-		// UGLY again
-		for (int i=0; i<theAutomata.size(); i++)
-		{
-			theAutomata.getAutomatonAt(i).remapStateIndices();
-		}
+		SynchronizationStepper stepper = new SynchronizationStepper(theAutomata);
 
 		// The current synchronized state indices, consisting of as well plant 
 		// as specification indices and used to step through the final graph following the 
 		// time schedule (which is needed to build the schedule automaton)
- 		int[] currComposedStateIndices = synchHelper.getStateToProcess();
+ 		int[] currComposedStateIndices = stepper.getInitialStateIndices();
 
 		// The first set of state indices correspond to the initial state of the composed automaton.
 		// They are thus used to construct the initial state of the schedule automaton.
-		String initialStateName = "[";
-		for (int i=0; i<theAutomata.size() - 1; i++)
-		{
-			initialStateName += theAutomata.getAutomatonAt(i).getStateWithIndex(currComposedStateIndices[i]).getName() + ".";
-		}
-		initialStateName += theAutomata.getAutomatonAt(theAutomata.size()-1).getStateWithIndex(currComposedStateIndices[theAutomata.size()-1]).getName() + "]";
-
-		State currScheduledState = new State(initialStateName);
-		currScheduledState.setInitial(true);
-		schedule.addState(currScheduledState);
+		State currScheduledState = makeScheduleState(currComposedStateIndices, true);
 		
 		// This alphabet is needed to check which events are common to the robots
 		// If several transitions with the same event are enabled simultaneously, naturally
@@ -142,9 +134,6 @@ public class Milp
 		// This is done until an accepting state is found for our schedule
 		while (! currScheduledState.isAccepting())
 		{
-			// Is needed to avoid NullPointerException when calling synchronizer.isEnabled()-method
-			synchronizer.getOutgoingEvents(currComposedStateIndices);
-
 			// Every robot is checked for possible transitions and the one with smallest time value 
 			// is chosen. 
 			int smallestTime = Integer.MAX_VALUE;
@@ -155,7 +144,7 @@ public class Milp
 			// The index of a robot in the "robots"-variable. Is increased whenever a plant is found
 			int robotIndex = -1;
 
-// 			ArrayList<int[]> synchArcsInfo = new ArrayList<int[]>();
+			// Stores the highest firing times for each active synchronizing event
 			Hashtable<LabeledEvent, Integer> synchArcsInfo = new Hashtable<LabeledEvent, Integer>();
 
 			// Which automaton fires the "cheapest" transition...
@@ -181,7 +170,7 @@ public class Milp
 							LabeledEvent currEvent = currArc.getEvent();
 
 							// ... that correspoinds to an enabled transition
-							if (synchronizer.isEnabled(currEvent))
+							if (stepper.isEnabled(currEvent))
 							{
 								int nextStateIndex = indexMap.getStateIndex(currRobot, currArc.getToState()); 
 
@@ -245,18 +234,11 @@ public class Milp
 
 			// Make a transition (in the synchronizer) to the state that is reachable in one step at cheapest cost
 			// This state will be the next parting point in our walk
-			currComposedStateIndices = synchronizer.doTransition(currComposedStateIndices, currOptimalEvent);
+			currComposedStateIndices = stepper.step(currComposedStateIndices, currOptimalEvent);
 
 			// Update the schedule automaton
-			String nextStateName = "[";
-			for (int i=0; i<theAutomata.size() - 1; i++)
-			{
-				nextStateName += theAutomata.getAutomatonAt(i).getStateWithIndex(currComposedStateIndices[i]).getName() + ".";
-			}
-			nextStateName += theAutomata.getAutomatonAt(theAutomata.size()-1).getStateWithIndex(currComposedStateIndices[theAutomata.size()-1]).getName() + "]";
+			State nextScheduledState = makeScheduleState(currComposedStateIndices);
 
-			State nextScheduledState = new State(nextStateName);
-			schedule.addState(nextScheduledState);
 			schedule.getAlphabet().addEvent(currOptimalEvent);
 			schedule.addArc(new Arc(currScheduledState, nextScheduledState, currOptimalEvent));
 
@@ -273,8 +255,7 @@ public class Milp
 			if (isAccepting)
 			{
 			 	if (smallestTime != makespan)
-					logger.error("makespan = " + makespan + "; smallestTime = " + smallestTime);
-// 					throw new Exception("Makespan value does NOT correspond to the cost of the final state of the schedule. Something went wrong...");
+					throw new Exception("Makespan value does NOT correspond to the cost of the final state of the schedule. Something went wrong...");
 
 				currScheduledState.setAccepting(true);
 				currScheduledState.setName(currScheduledState.getName() + ";  makespan = " + makespan);
@@ -285,6 +266,32 @@ public class Milp
 		
 		return schedule;
 	}
+
+
+	/****************************************************************************************/
+	/*                                 INIT METHODS                                         */
+	/****************************************************************************************/
+
+	/**
+	 * Creates the (temporary) *.mod- and *.sol- files that are used to communicate 
+	 * with the MILP-solver (GLPK). The automata are preprocessed (synthes and purge) 
+	 * while the information about the location of booking/unbooking events is collected.
+	 */
+	private void initialize()
+		throws Exception
+	{
+		modelFile = File.createTempFile("milp", ".mod");
+		modelFile.deleteOnExit();
+		
+		solutionFile = File.createTempFile("milp", ".sol");
+		solutionFile.deleteOnExit();
+		
+		indexMap = new AutomataIndexMap(theAutomata);
+		
+		initAutomata();
+		initMutexStates();
+	}
+
 	
 	/**
 	 * Goes through the supplied automata and synchronizes all specifications 
@@ -307,7 +314,6 @@ public class Milp
 			Automaton currRobot = robots.getAutomatonAt(i);
 			String currRobotName = currRobot.getName();
 
-// 			ArrayList<Automaton> toBeSynthesized = new ArrayList<Automaton>();
 			Automata toBeSynthesized = new Automata(currRobot);
 			int[] costs = new int[currRobot.nbrOfStates()];
 			
@@ -320,20 +326,13 @@ public class Milp
 			}
 
 			// Find the specifications that are to be synthesized with the current plant/robot
+			// Their names should contain the name of the plant/robot that they constraint/specify
 			for (Iterator<Automaton> zonesIterator = zones.iterator(); zonesIterator.hasNext(); )
 			{
 				Automaton currSpec = zonesIterator.next();
-				
+
 				if (currSpec.getName().contains(currRobotName))
 				{
-// 					Automata toBeSynched = new Automata(currRobot);
-// 					toBeSynched.addAutomaton(currSpec);
-
-// 					currRobot = AutomataSynchronizer.synchronizeAutomata(toBeSynched);
-				
-// 					currRobot.setName(currRobotName);
-// 					currRobot.setType(AutomatonType.Plant);
-
 					toBeSynthesized.addAutomaton(currSpec);
 				}
 			}
@@ -381,11 +380,6 @@ public class Milp
 				restrictedRobots.addAutomaton(currRobot);
 			}
 		}		
-
-
-		// Normalizes the state and event indices for all the synchronized automata.
-// 		robots.setIndicies();
-
 
 		// Updating the automata variables
 		robots = restrictedRobots;		
@@ -453,7 +447,6 @@ public class Milp
 			
 
 					// The following is done only for the robot that contains the corresponding unbooking-event
-// 					if (currRobot.getAlphabet().contains(unbookingArc.getEvent()))
 					Alphabet currRobotZoneIntersectionAlphabet = AlphabetHelpers.intersect(currRobot.getAlphabet(), unbookingAlphabet);
 					if (currRobotZoneIntersectionAlphabet.nbrOfEvents() > 0)
 					{
@@ -462,7 +455,6 @@ public class Milp
 						{
 							Arc currArc = robotArcs.next();
 
-// 							if (unbookingArc.getLabel().equals(currArc.getLabel()))
 							if (unbookingAlphabet.contains(currArc.getLabel()))
 								unbookingStates.add(currArc.getFromState());
 						}
@@ -488,24 +480,11 @@ public class Milp
 								for (Iterator<Arc> incomingArcs = currState.incomingArcsIterator(); incomingArcs.hasNext(); )
 								{
 									Arc currArc = incomingArcs.next();
-									
-// 									if (bookingArc.getLabel().equals(currArc.getLabel()))
+
+									// If we hit the booking event, then add the state that fires it to the "bookingStates"
 									if (bookingAlphabet.contains(currArc.getLabel()))
 									{
-										State candidateBookingState = currArc.getFromState();
-
-										// If the alternative path is ending in an already examined booking state, 
-										// this path was not really an alternative (since several instances of a state are 
-										// not necessary).
-// 										if (!bookingStates.contains(candidateBookingState))
-// 											bookingStates.add(candidateBookingState);
-// 										else
-// 										{
-// 											");logger.error(candidateBookingState.getName() + " is ALREADY checked");
-// 											alternativeBookings--;
-// 										}
-
-										bookingStates.add(candidateBookingState);
+										bookingStates.add(currArc.getFromState());
 									}
 									else
 										upstreamStates.add(currArc.getFromState());
@@ -544,7 +523,17 @@ public class Milp
 		}
 	}
 
-	private void convertXmlToMod() 
+
+	/****************************************************************************************/
+	/*                                 THE AUTOMATA-MILP-BRIDGE-METHODS                     */
+	/****************************************************************************************/
+
+	/**
+	 * Converts the automata to the MILP-formulation of the optimization problem.
+	 * Precedence, Mutual Exclusion, Cycle Time and Alternative Path constraints are 
+	 * constructed. 
+	 */
+	private void convertAutomataToMilp() 
 		throws Exception
 	{	
 		int nrOfRobots = robots.size();
@@ -591,7 +580,6 @@ public class Milp
 			if (nbrOfStates > nrOfTics)
 				nrOfTics = nbrOfStates;
 		}
-// 		nrOfTics--;
 
 		// Making deltaTime-header
 		for (int i=0; i<nrOfTics; i++)
@@ -608,19 +596,14 @@ public class Milp
 			int currRobotIndex = indexMap.getAutomatonIndex(currRobot);
 			
 			// Each index correspond to a Tic. For each Tic, a deltaTime is added
-// 			for (int j=0; j<currRobot.nbrOfStates(); j++) 
 			int[] deltaTimes = new int[currRobot.nbrOfStates()];
 			for (Iterator<State> stateIter = currRobot.stateIterator(); stateIter.hasNext(); )
 			{
-// 				State currState = currRobot.getStateWithIndex(j);
 				State currState = stateIter.next();
 				int currStateIndex = indexMap.getStateIndex(currRobot, currState);
 
-// 				deltaTimeStr += "\t" + currState.getCost();
 				deltaTimes[currStateIndex] = currState.getCost();
-				
-// 				logger.info("adding deltaTime[" + i + "," + j + "] -> " + currState.getCost() + "; state index = " + indexMap.getStateIndex(currRobot, currState) + "; state name = " + currState.getName() + "...... mapped state index = " + indexMap.getStateIndex(currRobot, currState));
-				
+							
 				// If the current state has successors and is not initial, add precedence constraints
 				// If the current state is initial, add an initial (precedence) constraint
 				int nbrOfOutgoingArcs = currState.nbrOfOutgoingArcs();
@@ -628,22 +611,22 @@ public class Milp
 				{
 					if (currState.isInitial())
 					{
-// 						initPrecConstraints += "initial_" + currRobot.getName() + "_" + currState.getName() + " : ";
 						initPrecConstraints += "initial_" + "R" + currRobotIndex + "_" + currStateIndex + " : ";
 						initPrecConstraints += "time[" + i + ", " + currStateIndex + "] >= deltaTime[" + i + ", " + currStateIndex + "];\n";
 					}
 					
 					Iterator<State> nextStates = currState.nextStateIterator();
 					
+					// If there is only one successor, add a precedence constraint
 					if (nbrOfOutgoingArcs == 1) 
 					{
 						State nextState = nextStates.next();
 						int nextStateIndex = indexMap.getStateIndex(currRobot, nextState);
 						
-// 						precConstraints += "prec_" + currRobot.getName() + "_" + currState.getName() + "_" + nextState.getName() + " : ";
 						precConstraints += "prec_" + "R" + currRobotIndex + "_" + currStateIndex + "_" + nextStateIndex + " : ";
 						precConstraints += "time[" + i + ", " + nextStateIndex + "] >= time[" + i + ", " + currStateIndex + "] + deltaTime[" + i + ", " + nextStateIndex + "];\n";
 					}
+					// If there are two successors, add one alternative-path variable and corresponding constraint
 					else if (nbrOfOutgoingArcs == 2)
 					{
 						State nextLeftState = nextStates.next();
@@ -661,6 +644,7 @@ public class Milp
 						altPathsConstraints += "dual_alt_paths_" + "R" + currRobotIndex + "_" + currStateIndex + " : "; 
 						altPathsConstraints += "time[" + i + ", " + nextRightStateIndex + "] >= time[" + i + ", " + currStateIndex + "] + deltaTime[" + i + ", "  + nextRightStateIndex + "] - bigM*(1 - " + currAltPathsVariable + ");\n";
 					}
+					// If there are several successors, add one alternative-path variable for each successor
 					else if (nbrOfOutgoingArcs > 2)
 					{
 						int currAlternative = 0;
@@ -685,9 +669,6 @@ public class Milp
 							altPathsConstraints += "R" + currRobotIndex + "_" + currStateIndex + "_path_" + k + " + ";
 						}
 						altPathsConstraints += "R" + currRobotIndex + "_" + currStateIndex + "_path_" + (currAlternative - 1) + " = 1;\n";
-
-						// Implement t1 >= t0 + delta_t0 - M*alt0; t1_prim >= t0 + delta_t0 - M*alt0_prim; 
-						// t1_prim_prim >= t0 + delta_t0 - M*alt0_prim_prim; alt0 + alt0_prim + alt0_prim_prim = 1;
 					}
 				}
 				else if (currState.isAccepting())
@@ -751,9 +732,6 @@ public class Milp
 		////////////////////////////////////////////////////////////////////////////////////
 		//	                          The writing part                                    //
 		////////////////////////////////////////////////////////////////////////////////////
-
-// 		if (!modelFile.exists())
-// 			modelFile.createNewFile();
 
 		BufferedWriter w = new BufferedWriter(new FileWriter(modelFile));
 
@@ -886,7 +864,7 @@ public class Milp
 		}
 	}
 
-	private void callGlpk()
+	private void callMilpSolver()
 		throws Exception
 	{
 		// Defines the name of the .exe-file as well the arguments (.mod and .sol file names)
@@ -927,54 +905,27 @@ public class Milp
 	{
 		
 	}
-}
 
-class CostComparator 
-	implements Comparator<int[]>
-{
-	/** Helps to put the initial states at the beginning of the schedule in case of ties - initialIndice[robotIndex] = state_index */
-//  	private int[] initialIndices, acceptingIndices;
-// 	private int initialIndex;
-
-// 	public CostComparator(Automaton robot)
-// 	{
-// 		initialIndex = robot.getInitialState().getIndex();
-// 		initialIndices = new int[theAutos.size()];
-
-// 		for (int i=0; i<initialIndices.length; i++)
-// 		{
-// 			initialIndices[i] = theAutos.getAutomatonAt(i).getInitialState().getIndex();
-// 			acceptingIndices[i] = theAutos.getAutomatonAt(i).getInitialState().getIndex();
-// 	}
-	
-	/**
-	 * Comparison is done according to the (time)cost of each stateInfo.
-	 * If the cost is equal, the new state (a) is said to be smaller than the old one (b)
-	 * to increase the comparison (somewhat).
-	 */
-	public int compare(int[] a, int[] b)
+	private State makeScheduleState(int[] stateIndices, boolean isInitial)
 	{
-		if (a[2] == b[2])
-		{
-			if (a[0] == b[0] && a[1] == b[1])
-				return 0;
-// 			else if (b[0] == initialIndex)
-// 				return 1;
-			else
-				return -1;  
-		}
+		String stateName = "[";
 
-		return a[2] - b[2];
+		for (int i=0; i<theAutomata.size() - 1; i++)
+		{
+			stateName += theAutomata.getAutomatonAt(i).getStateWithIndex(stateIndices[i]).getName() + ".";
+		}
+		stateName += theAutomata.getAutomatonAt(theAutomata.size()-1).getStateWithIndex(stateIndices[theAutomata.size()-1]).getName() + "]";
+		
+		State scheduledState = new State(stateName);
+		
+		scheduledState.setInitial(isInitial);
+		schedule.addState(scheduledState);
+
+		return scheduledState;
 	}
 
-	/**
-	 * Returns true if b corresponds to an initial state.
-	 */
-// 	private boolean isInitial(int[] b)
-// 	{
-// 	 	if (initialIndices[b[0]] == b[1])
-// 			return true;
-
-// 		return false;
-// 	}
+	private State makeScheduleState(int[] stateIndices)
+	{
+		return makeScheduleState(stateIndices, false);
+	}
 }
