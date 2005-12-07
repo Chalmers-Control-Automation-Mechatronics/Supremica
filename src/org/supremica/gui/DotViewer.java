@@ -547,6 +547,56 @@ public abstract class DotViewer
 		currScrollPanel = scrollPanel;
 	}
 
+/*
+	public void createPDF(File file)
+	{
+		int width = surface.getWidth();
+		int height = surface.getHeight();
+		Document document = new Document(new com.lowagie.text.Rectangle(width, height));
+
+		try
+		{
+			PdfWriter writer= PdfWriter.getInstance(document,  new FileOutputStream(file));
+
+			document.addAuthor("Supremica");
+			document.open();
+
+			PdfContentByte cb = writer.getDirectContent();
+			PdfTemplate tp = cb.createTemplate(width, height);
+			Graphics2D g2 = tp.createGraphics(width, height, new DefaultFontMapper());
+			surface.print(g2);
+
+			g2.dispose();
+			cb.addTemplate(tp, 0, 0);
+
+		}
+		catch (DocumentException de)
+		{
+			System.err.println(de.getMessage());
+		}
+		catch (IOException ioe)
+		{
+			System.err.println(ioe.getMessage());
+		}
+
+		document.close();
+	}
+*/
+
+/*
+// Printing using Acrobat Reader
+String osName = System.getProperty("os.name" );
+//FOR WINDOWS 95 AND 98 USE COMMAND.COM
+if(osName.equals("Windows 95") || osName.equals("Windows 98")){
+    Runtime.getRuntime().exec(
+		"command.com /C start acrord32 /p /h" + claim.pdf);
+}
+//FOR WINDOWS NT/XP/2000 USE CMD.EXE
+else {
+    Runtime.getRuntime().exec("cmd.exe start /C acrord32 /p /h" + claim.pdf);
+}
+*/
+
 	public void copyToClipboard()
 	{
 		if (toClipboard == null)

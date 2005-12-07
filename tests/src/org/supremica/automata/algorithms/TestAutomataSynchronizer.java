@@ -91,6 +91,182 @@ public class TestAutomataSynchronizer
 		return suite;
 	}
 
+
+	public void testEx45b_prio()
+	{
+		try
+		{
+
+			ProjectBuildFromXml builder = new ProjectBuildFromXml();
+			Project theProject = builder.build(TestFiles.getFile(TestFiles.Ex4_5_b));
+			assertTrue(theProject.nbrOfAutomata() == 3);
+
+			// Note that (strictly) it is NOT synchronization we're testing
+			// here (since we forbid uncontrollable states)!
+			SynchronizationOptions syncOptions = SynchronizationOptions.getDefaultSynchronizationOptions();
+			syncOptions.setForbidUncontrollableStates(true);
+
+			// Test Prioritized synchronization, although all events are prioritized in this example
+			{
+				AutomataSynchronizer synchronizer = new AutomataSynchronizer(theProject, syncOptions);
+				synchronizer.execute();
+				assertTrue(synchronizer.getNumberOfStates() == 8);
+
+				Automaton theAutomaton = synchronizer.getAutomaton();
+				Alphabet theAlphabet = theAutomaton.getAlphabet();
+				assertTrue("Type", theAutomaton.getType() == AutomatonType.Specification);
+				assertTrue("nbrOfStates", theAutomaton.nbrOfStates() == 8);
+				assertTrue("nbrOfAcceptingStates", theAutomaton.nbrOfAcceptingStates() == 2);
+				assertTrue(theAutomaton.nbrOfForbiddenStates() == 3);
+				assertTrue(theAutomaton.nbrOfTransitions() == 11);
+				assertTrue(theAutomaton.isAllEventsPrioritized());
+				assertTrue(theAutomaton.hasInitialState());
+				assertTrue(!theAutomaton.isNullAutomaton());
+				assertTrue(theAlphabet.nbrOfEvents() == 5);
+				assertTrue(theAlphabet.nbrOfControllableEvents() == 4);
+				assertTrue(theAlphabet.nbrOfPrioritizedEvents() == 5);
+				assertTrue(theAlphabet.nbrOfImmediateEvents() == 0);
+				assertTrue(theAlphabet.nbrOfEpsilonEvents() == 0);
+			}
+
+		}
+		catch (Exception ex)
+		{
+			ex.printStackTrace();
+			assertTrue(false);
+		}
+	}
+
+	public void testEx45_full()
+	{
+		try
+		{
+
+			ProjectBuildFromXml builder = new ProjectBuildFromXml();
+			Project theProject = builder.build(TestFiles.getFile(TestFiles.Ex4_5_b));
+			assertTrue(theProject.nbrOfAutomata() == 3);
+
+			// Note that (strictly) it is NOT synchronization we're testing
+			// here (since we forbid uncontrollable states)!
+			SynchronizationOptions syncOptions = SynchronizationOptions.getDefaultSynchronizationOptions();
+			syncOptions.setForbidUncontrollableStates(true);
+
+			// Test Full synchronization
+			{
+				syncOptions.setSynchronizationType(SynchronizationType.Full);
+				AutomataSynchronizer synchronizer = new AutomataSynchronizer(theProject, syncOptions);
+				synchronizer.execute();
+				assertTrue(synchronizer.getNumberOfStates() == 8);
+				Automaton theAutomaton = synchronizer.getAutomaton();
+				Alphabet theAlphabet = theAutomaton.getAlphabet();
+				assertTrue(theAutomaton.getType() == AutomatonType.Specification);
+				assertTrue(theAutomaton.nbrOfStates() == 8);
+				assertTrue(theAutomaton.nbrOfAcceptingStates() == 2);
+				assertTrue(theAutomaton.nbrOfForbiddenStates() == 3);
+				assertTrue(theAutomaton.nbrOfTransitions() == 11);
+				assertTrue(theAutomaton.isAllEventsPrioritized());
+				assertTrue(theAutomaton.hasInitialState());
+				assertTrue(!theAutomaton.isNullAutomaton());
+				assertTrue(theAlphabet.nbrOfEvents() == 5);
+				assertTrue(theAlphabet.nbrOfControllableEvents() == 4);
+				assertTrue(theAlphabet.nbrOfPrioritizedEvents() == 5);
+				assertTrue(theAlphabet.nbrOfImmediateEvents() == 0);
+				assertTrue(theAlphabet.nbrOfEpsilonEvents() == 0);
+			}
+		}
+		catch (Exception ex)
+		{
+			ex.printStackTrace();
+			assertTrue(false);
+		}
+	}
+
+	public void testEx45_broad()
+	{
+		try
+		{
+
+			ProjectBuildFromXml builder = new ProjectBuildFromXml();
+			Project theProject = builder.build(TestFiles.getFile(TestFiles.Ex4_5_b));
+			assertTrue(theProject.nbrOfAutomata() == 3);
+
+			// Note that (strictly) it is NOT synchronization we're testing
+			// here (since we forbid uncontrollable states)!
+			SynchronizationOptions syncOptions = SynchronizationOptions.getDefaultSynchronizationOptions();
+			syncOptions.setForbidUncontrollableStates(true);
+
+			// Test Broadcast synchronization
+			{
+				syncOptions.setSynchronizationType(SynchronizationType.Broadcast);
+				AutomataSynchronizer synchronizer = new AutomataSynchronizer(theProject, syncOptions);
+				synchronizer.execute();
+				assertTrue(synchronizer.getNumberOfStates() == 12);
+				Automaton theAutomaton = synchronizer.getAutomaton();
+				Alphabet theAlphabet = theAutomaton.getAlphabet();
+				assertTrue(theAutomaton.getType() == AutomatonType.Specification);
+				assertTrue(theAutomaton.nbrOfStates() == 12);
+				assertTrue(theAutomaton.nbrOfAcceptingStates() == 4);
+				assertTrue(theAutomaton.nbrOfForbiddenStates() == 0);
+				assertTrue(theAutomaton.nbrOfTransitions() == 36);
+				assertTrue(theAutomaton.isAllEventsPrioritized());
+				assertTrue(theAutomaton.hasInitialState());
+				assertTrue(!theAutomaton.isNullAutomaton());
+				assertTrue(theAlphabet.nbrOfEvents() == 5);
+				assertTrue(theAlphabet.nbrOfControllableEvents() == 4);
+				assertTrue(theAlphabet.nbrOfPrioritizedEvents() == 5);
+				assertTrue(theAlphabet.nbrOfImmediateEvents() == 0);
+				assertTrue(theAlphabet.nbrOfEpsilonEvents() == 0);
+			}
+
+		}
+		catch (Exception ex)
+		{
+			ex.printStackTrace();
+			assertTrue(false);
+		}
+	}
+
+
+	public void testEx45b_non()
+	{
+		try
+		{
+
+			ProjectBuildFromXml builder = new ProjectBuildFromXml();
+			Project theProject = builder.build(TestFiles.getFile(TestFiles.Ex4_5_b));
+			assertTrue(theProject.nbrOfAutomata() == 3);
+
+			// Note that (strictly) it is NOT synchronization we're testing
+			// here (since we forbid uncontrollable states)!
+			SynchronizationOptions syncOptions = SynchronizationOptions.getDefaultSynchronizationOptions();
+			syncOptions.setForbidUncontrollableStates(true);
+
+			// Test synchronization of nondeterministic automata
+			{
+				theProject = builder.build(TestFiles.getFile(TestFiles.NondeterministicComposition));
+				Automata aut = new Automata();
+				aut.addAutomaton(theProject.getAutomaton("A"));
+				aut.addAutomaton(theProject.getAutomaton("B"));
+				Automaton result = AutomataSynchronizer.synchronizeAutomata(aut);
+				assertTrue(result.nbrOfStates() == 7);
+				assertTrue(result.nbrOfTransitions() == 6);
+
+				aut = new Automata();
+				aut.addAutomaton(theProject.getAutomaton("A2"));
+				aut.addAutomaton(theProject.getAutomaton("B2"));
+				result = AutomataSynchronizer.synchronizeAutomata(aut);
+				assertTrue(result.nbrOfStates() == 4);
+				assertTrue(result.nbrOfTransitions() == 6);
+			}
+		}
+		catch (Exception ex)
+		{
+			ex.printStackTrace();
+			assertTrue(false);
+		}
+	}
+
+/* orginal
 	public void testEx45b()
 	{
 		try
@@ -100,10 +276,10 @@ public class TestAutomataSynchronizer
 			Project theProject = builder.build(TestFiles.getFile(TestFiles.Ex4_5_b));
 			assertTrue(theProject.nbrOfAutomata() == 3);
 
-			// Note that (strictly) it is NOT synchronization we're testing 
+			// Note that (strictly) it is NOT synchronization we're testing
 			// here (since we forbid uncontrollable states)!
 			SynchronizationOptions syncOptions = SynchronizationOptions.getDefaultSynchronizationOptions();
-			syncOptions.setForbidUncontrollableStates(true); 
+			syncOptions.setForbidUncontrollableStates(true);
 
 			// Test Prioritized synchronization, although all events are prioritized in this example
 			{
@@ -112,9 +288,9 @@ public class TestAutomataSynchronizer
 				assertTrue(synchronizer.getNumberOfStates() == 8);
 				Automaton theAutomaton = synchronizer.getAutomaton();
 				Alphabet theAlphabet = theAutomaton.getAlphabet();
-				assertTrue(theAutomaton.getType() == AutomatonType.Specification);
-				assertTrue(theAutomaton.nbrOfStates() == 8);
-				assertTrue(theAutomaton.nbrOfAcceptingStates() == 2);
+				assertTrue("Type", theAutomaton.getType() == AutomatonType.Specification);
+				assertTrue("nbrOfStates", theAutomaton.nbrOfStates() == 8);
+				assertTrue("nbrOfAcceptingStates", theAutomaton.nbrOfAcceptingStates() == 2);
 				assertTrue(theAutomaton.nbrOfForbiddenStates() == 3);
 				assertTrue(theAutomaton.nbrOfTransitions() == 11);
 				assertTrue(theAutomaton.isAllEventsPrioritized());
@@ -197,6 +373,6 @@ public class TestAutomataSynchronizer
 			assertTrue(false);
 		}
 	}
-
+*/
 }
 
