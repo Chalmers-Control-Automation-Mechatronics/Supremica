@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorEdge
 //###########################################################################
-//# $Id: EditorEdge.java,v 1.30 2005-12-01 01:20:14 siw4 Exp $
+//# $Id: EditorEdge.java,v 1.31 2005-12-07 01:08:46 siw4 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -229,11 +229,11 @@ public class EditorEdge
 					 	/ (oldR.getMaxY() - oldR.getMinY());
 				if (start)
 				{
-					subject.getStartPoint().getPoint().setLocation(newR.getMinX() + dx, newR.getMinY() + dy);
+					subject.getStartPoint().setPoint(new Point2D.Double(newR.getMinX() + dx, newR.getMinY() + dy));
 				}
 				else
 				{
-					subject.getEndPoint().getPoint().setLocation(newR.getMinX() + dx, newR.getMinY() + dy);
+					subject.getEndPoint().setPoint(new Point2D.Double(newR.getMinX() + dx, newR.getMinY() + dy));
 				}
 			}
 			System.out.println("Old TPoint: " + getPosition());

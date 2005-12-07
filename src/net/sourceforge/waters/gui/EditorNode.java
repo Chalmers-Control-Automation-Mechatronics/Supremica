@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorNode
 //###########################################################################
-//# $Id: EditorNode.java,v 1.25 2005-12-02 02:31:04 siw4 Exp $
+//# $Id: EditorNode.java,v 1.26 2005-12-07 01:08:46 siw4 Exp $
 //###########################################################################
 
 
@@ -195,7 +195,7 @@ public class EditorNode
     public void setPosition(double x, double y)
     {
 		GeometryProxy old = new PointGeometrySubject((Point2D)mSubject.getPointGeometry().getPoint().clone());
-		mSubject.getPointGeometry().getPoint().setLocation(x,y);
+		mSubject.getPointGeometry().setPoint(new Point2D.Double(x, y));
 		fireEditorChangedEvent(new NodeMovedEvent(old,
 												  mSubject.getPointGeometry(),
 												  mSubject));

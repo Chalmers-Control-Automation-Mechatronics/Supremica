@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.35 2005-12-06 17:54:35 flordal Exp $
+//# $Id: EditorSurface.java,v 1.36 2005-12-07 01:08:46 siw4 Exp $
 //###########################################################################
 
 
@@ -1213,7 +1213,7 @@ public class EditorSurface
 		for (int i = 0; i < nodeGroups.size(); i++)
 		{
 			EditorNodeGroup ng = (EditorNodeGroup) nodeGroups.get(i);
-			Rectangle2D.Double bound = ng.getBounds();
+			Rectangle2D bound = ng.getBounds();
 			x = bound.getX();
 			mod = bound.getWidth() + 2 + SPACING;
 			if (x + mod > maxX)
@@ -1418,8 +1418,8 @@ public class EditorSurface
 
 	public boolean nodeGroupIsColliding(EditorNodeGroup ng)
 	{
-		Rectangle2D.Double r = ng.getBounds();
-		Rectangle2D.Double e = new Rectangle2D.Double();
+		Rectangle2D r = ng.getBounds();
+		Rectangle2D e = new Rectangle2D.Double();
 
 		for (int i = 0; i < nodes.size(); i++)
 		{
@@ -1444,7 +1444,7 @@ public class EditorSurface
 		for (int i = 0; i < nodeGroups.size(); i++)
 		{
 			EditorNodeGroup ng = (EditorNodeGroup) nodeGroups.get(i);
-			Rectangle2D.Double r = ng.getBounds();
+			Rectangle2D r = ng.getBounds();
 
 			if (r.intersects(e) &&!r.contains(e))
 			{

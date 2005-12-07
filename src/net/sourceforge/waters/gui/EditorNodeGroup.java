@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorNodeGroup
 //###########################################################################
-//# $Id: EditorNodeGroup.java,v 1.15 2005-12-01 00:29:58 siw4 Exp $
+//# $Id: EditorNodeGroup.java,v 1.16 2005-12-07 01:08:46 siw4 Exp $
 //###########################################################################
 
 
@@ -54,20 +54,9 @@ public class EditorNodeGroup
 			subject.setGeometry(geo);
 		}
 
-		bounds = new Rectangle2D.Double();
-
-		bounds.setRect(subject.getGeometry().getRectangle());		
-
-		resizing = bounds.isEmpty();
-		resizingFrom = new Point2D.Double(bounds.getMinX(), bounds.getMinY());
+		resizing = getBounds().isEmpty();
+		resizingFrom = new Point2D.Double(getBounds().getMinX(), getBounds().getMinY());
 		setSelected(false);
-
-		for (int i = 0; i < 4; i++)
-		{
-			corners[i] = new Rectangle();
-		}
-
-		setCorners();
 	}
 
 	public int hashCode()
@@ -75,12 +64,19 @@ public class EditorNodeGroup
 		return subject.hashCode();
 	}
 
-	private void setCorners()
+	private Rectangle2D[] getCorners()
 	{
+		Rectangle2D[] corners = new Rectangle2D[4];
+		Rectangle2D bounds = getBounds();
+		for (int i = 0; i < 4; i++)
+		{
+			corners[i] = new Rectangle();
+		}
 		corners[UPPERLEFT].setFrameFromCenter(bounds.getMinX(), bounds.getMinY(), bounds.getMinX() + 2*TOLERANCE, bounds.getMinY() + 2*TOLERANCE);
 		corners[UPPERRIGHT].setFrameFromCenter(bounds.getMaxX(), bounds.getMinY(), bounds.getMaxX() + 2*TOLERANCE, bounds.getMinY() + 2*TOLERANCE);
 		corners[LOWERLEFT].setFrameFromCenter(bounds.getMinX(), bounds.getMaxY(), bounds.getMinX() + 2*TOLERANCE, bounds.getMaxY() + 2*TOLERANCE);
 		corners[LOWERRIGHT].setFrameFromCenter(bounds.getMaxX(), bounds.getMaxY(), bounds.getMaxX() + 2*TOLERANCE, bounds.getMaxY() + 2*TOLERANCE);
+		return corners;
 	}
 
 	public boolean getResizing()
@@ -96,8 +92,8 @@ public class EditorNodeGroup
 	public void resize(int x, int y)
 	{
 		GeometryProxy old = new BoxGeometrySubject((Rectangle2D)subject.getGeometry().getRectangle().clone());
+		Rectangle2D bounds = new Rectangle2D.Double();
 		bounds.setFrameFromDiagonal(resizingFrom.getX(), resizingFrom.getY(), x, y);
-		setCorners();
 		subject.getGeometry().setRectangle(bounds);
 		fireEditorChangedEvent(new NodeMovedEvent(old, subject.getGeometry(),
 												  subject));
@@ -106,6 +102,7 @@ public class EditorNodeGroup
 	//public void moveGroupTo(int x, int y)
 	public void setPosition(double x, double y)
 	{
+		Rectangle2D bounds = getBounds();
 		int dx = (int)x - (int) bounds.getX();
 		int dy = (int)y - (int) bounds.getY();
 
@@ -113,7 +110,6 @@ public class EditorNodeGroup
 		System.out.println("old1 :" + ((BoxGeometryProxy)old).getRectangle());
 		// Move rect
 		bounds.setRect(bounds.getX() + dx, bounds.getY() + dy, bounds.getWidth(), bounds.getHeight());
-		setCorners();
 		subject.getGeometry().setRectangle(bounds);
 		System.out.println("old2 :" + ((BoxGeometryProxy)old).getRectangle());
 		fireEditorChangedEvent(new NodeMovedEvent(old, subject.getGeometry(),
@@ -122,17 +118,17 @@ public class EditorNodeGroup
 
     public Point2D getPosition()
     {
-	return new Point2D.Double(getX(),getY());
+		return new Point2D.Double(getX(), getY());
     }
 
 	public int getX()
 	{
-		return (int) corners[UPPERLEFT].getCenterX();
+		return (int) subject.getGeometry().getRectangle().getMinX();
 	}
 
 	public int getY()
 	{
-		return (int) corners[UPPERLEFT].getCenterY();
+		return (int) subject.getGeometry().getRectangle().getMinY();
 	}
 	
 	public Point2D setOnBounds(Point2D p)
@@ -142,6 +138,7 @@ public class EditorNodeGroup
 
 	public Point2D setOnBounds(double x, double y)
 	{
+		Rectangle2D[] corners = getCorners();
 		Line2D.Double closest = new Line2D.Double(corners[0].getCenterX(), corners[0].getCenterY(),
 							  corners[3].getCenterX(), corners[3].getCenterY());
 
@@ -194,6 +191,7 @@ public class EditorNodeGroup
 
 	public boolean wasClicked(int cX, int cY)
 	{
+		Rectangle2D[] corners = getCorners();
 		resizing = false;
 
 		for (int i = 0; i < 4; i++)
@@ -215,21 +213,20 @@ public class EditorNodeGroup
 			}
 		}
 
-		Rectangle2D.Double innerBounds = new Rectangle2D.Double(bounds.getX() + TOLERANCE, bounds.getY() + TOLERANCE, bounds.getWidth() - 2*TOLERANCE, bounds.getHeight() - 2*TOLERANCE);
+		Rectangle2D.Double innerBounds = new Rectangle2D.Double(getBounds().getX() + TOLERANCE, getBounds().getY() + TOLERANCE, getBounds().getWidth() - 2*TOLERANCE, getBounds().getHeight() - 2*TOLERANCE);
 
-		return (bounds.intersects(cX - TOLERANCE, cY - TOLERANCE, 2*TOLERANCE, 2*TOLERANCE) && !innerBounds.contains(cX, cY, 1, 1));
+		return (getBounds().intersects(cX - TOLERANCE, cY - TOLERANCE, 2*TOLERANCE, 2*TOLERANCE) && !innerBounds.contains(cX, cY, 1, 1));
 	}
 
-	public Rectangle2D.Double getBounds()
+	public Rectangle2D getBounds()
 	{
-		return bounds;
+		return subject.getGeometry().getRectangle();
 	}
 
 	public void setBounds(Rectangle2D.Double b)
 	{
-		bounds.setRect(b);
 		GeometryProxy old = new BoxGeometrySubject((Rectangle2D)subject.getGeometry().getRectangle().clone());
-		subject.getGeometry().setRectangle(bounds);
+		subject.getGeometry().setRectangle(b);
 		/*for (int i = 0; i < points.size(); i++)
 		{
 			Point2D.Double p = (Point2D.Double) points.get(i);
@@ -242,12 +239,11 @@ public class EditorNodeGroup
 		}*/
 		fireEditorChangedEvent(new NodeMovedEvent(old, subject.getGeometry(),
 												  subject));
-		setCorners();
 	}
 
 	public boolean isEmpty()
 	{
-		return bounds.isEmpty();
+		return getBounds().isEmpty();
 	}
 
 	public GroupNodeSubject getSubject()
@@ -297,6 +293,7 @@ public class EditorNodeGroup
 	public void drawObject(Graphics g)
 	{
 		Graphics2D g2d = (Graphics2D) g;
+		Rectangle2D bounds = getBounds();
 
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g2d.setColor(getColor());
@@ -306,6 +303,7 @@ public class EditorNodeGroup
 			// Draw handles
 			for (int i = 0; i < 4; i++)
 			{
+				Rectangle2D[] corners = getCorners();
 				g2d.fillRect((int) corners[i].getCenterX() - HANDLEWIDTH/2, (int) corners[i].getCenterY() - HANDLEWIDTH/2,
 					     HANDLEWIDTH, HANDLEWIDTH);
 			      //g2d.drawOval((int) corners[i].getCenterX() - HANDLEWIDTH/2, (int) corners[i].getCenterY() - HANDLEWIDTH/2,
@@ -352,8 +350,6 @@ public class EditorNodeGroup
 	//# Data Members
 	private boolean resizing;
 	private Point2D.Double resizingFrom;
-	private Rectangle2D.Double bounds;
-	private Rectangle[] corners = new Rectangle[4];
 	private Collection<Observer> mObservers = new ArrayList<Observer>();
 	private ArrayList immediateChildren = new ArrayList();
 	private GroupNodeSubject subject;
