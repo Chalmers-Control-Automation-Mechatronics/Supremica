@@ -38,6 +38,16 @@ public class SpringEmbedder
 				}
 				d.updatePositions(movements);
 			}
+			proxyies.clear();
+			proxyies.addAll(g.getEdges());
+			for (int i = 0; i < iterations/10; i++)
+			{
+				for (Proxy p : proxyies)
+				{
+					movements.put(p, p.acceptVisitor(d));
+				}
+				d.updatePositions(movements);
+			}
 			// most likely going to have to update this when also dealing with nodegroups
 			// makes certain that every thing has a positive position
 			double minx = java.lang.Double.MAX_VALUE;
@@ -91,6 +101,12 @@ public class SpringEmbedder
 				Point2D p = (Point2D)movements.get(n.getSubject());
 				n.setPosition(p.getX(), p.getY());
 			}
+			for (Object o : s.getEdges())
+			{
+				EditorEdge e = (EditorEdge)o;
+				Point2D p = (Point2D)movements.get(e.getSubject());
+				e.setPosition(p.getX(), p.getY());
+			}
 		}
 		catch (Throwable t)
 		{
@@ -103,10 +119,10 @@ public class SpringEmbedder
 	{
 		private final GraphProxy mGraph;
 		private final Map<Proxy, Point2D.Double> mPositions;
-		static public double EDGEATTRACTION = .020;
+		static public double EDGEATTRACTION = .005;
 	    static public double SPRINGCONSTANT = .005;
 		static public double REPULSIONCONST = 10;
-		static public double EDGEREPULSE = .5;
+		static public double EDGEREPULSE = 1;
 		
 		private int nodes = 0;
 		private int edges = 0;
@@ -125,12 +141,12 @@ public class SpringEmbedder
 					mPositions.put(node, p);
 				}
 			}
-			/*for (EdgeProxy e : mGraph.getEdges())
+			for (EdgeProxy e : mGraph.getEdges())
 			{
 				Point2D.Double p = new Point2D.Double();
 				p.setLocation(e.getGeometry().getPoints().get(0));
 				mPositions.put(e, p);
-			}*/
+			}
 		}
 		
 		private Point2D repulsion(Point2D p1, Point2D p2, double constant)
@@ -161,8 +177,11 @@ public class SpringEmbedder
 		{
 			for (Proxy p : mPositions.keySet())
 			{
-				Point2D point = (Point2D)m.get(p);
-				mPositions.get(p).setLocation(point);
+				if (m.get(p) instanceof Point2D)
+				{
+					Point2D point = (Point2D)m.get(p);
+					mPositions.get(p).setLocation(point);
+				}
 			}
 		}
 		
@@ -233,18 +252,18 @@ public class SpringEmbedder
 				}
 			}
 			p = attraction(mPositions.get(edge),
-						   edge.getStartPoint().getPoint(),
+						   mPositions.get(edge.getSource()),
 						   EDGEATTRACTION);
 			dx += p.getX();
 			dy += p.getY();
 			p = attraction(mPositions.get(edge),
-						   edge.getEndPoint().getPoint(),
+						   mPositions.get(edge.getTarget()),
 						   EDGEATTRACTION);
 			dx += p.getX();
 			dy += p.getY();
 			//System.out.println("Edge" + edges + ": " + mPositions.get(edge));
 			p.setLocation(mPositions.get(edge).getX() + dx,
-						  mPositions.get(edge).getX() + dy);
+						  mPositions.get(edge).getY() + dy);
 			return p;
 		}
 	}
