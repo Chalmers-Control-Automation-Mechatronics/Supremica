@@ -99,7 +99,9 @@ public class Milp
 
 		// UGLY again
 		for (int i=0; i<theAutomata.size(); i++)
+		{
 			theAutomata.getAutomatonAt(i).remapStateIndices();
+		}
 
 		// The current synchronized state indices, consisting of as well plant 
 		// as specification indices and used to step through the final graph following the 
@@ -118,25 +120,43 @@ public class Milp
 		State currScheduledState = new State(initialStateName);
 		currScheduledState.setInitial(true);
 		schedule.addState(currScheduledState);
+		
+		// This alphabet is needed to check which events are common to the robots
+		// If several transitions with the same event are enabled simultaneously, naturally
+		// the transition having the greatest time value should be fired
+		Alphabet commonRobotEventsAlphabet = new Alphabet();
+		for (int i=0; i<robots.size() - 1; i++)
+		{
+			Alphabet firstAlphabet = robots.getAutomatonAt(i).getAlphabet();
 
-		// The times in a schedule should come in a non-decreasing sequence
-		// To avoid mistakes, this value remembers the last time value that was put into the schedule
-		int lastScheduledTime = 0;
+			for (int j=i+1; j<robots.size(); j++)
+			{
+				Alphabet secondAlphabet = robots.getAutomatonAt(j).getAlphabet(); 
+
+				commonRobotEventsAlphabet.addEvents(AlphabetHelpers.intersect(firstAlphabet, secondAlphabet));
+			}
+		}
 
 		// Walk from the initial state until an accepting (synchronized) state is found
 		// In every step, the cheapest allowed transition is chosen
 		// This is done until an accepting state is found for our schedule
 		while (! currScheduledState.isAccepting())
 		{
+			// Is needed to avoid NullPointerException when calling synchronizer.isEnabled()-method
+			synchronizer.getOutgoingEvents(currComposedStateIndices);
+
 			// Every robot is checked for possible transitions and the one with smallest time value 
 			// is chosen. 
 			int smallestTime = Integer.MAX_VALUE;
 
-			// The arc that is to be added to the schedule (i.e. the arc corresponding to the smallest allowed time value) is stored
-			Arc currOptimalArc = null;
+			// The event that is next to be fired in the schedule (i.e. the event corresponding to the smallest allowed time value) is stored
+			LabeledEvent currOptimalEvent = null;
 
 			// The index of a robot in the "robots"-variable. Is increased whenever a plant is found
 			int robotIndex = -1;
+
+// 			ArrayList<int[]> synchArcsInfo = new ArrayList<int[]>();
+			Hashtable<LabeledEvent, Integer> synchArcsInfo = new Hashtable<LabeledEvent, Integer>();
 
 			// Which automaton fires the "cheapest" transition...
 			for (int i=0; i<theAutomata.size(); i++)
@@ -153,17 +173,15 @@ public class Milp
 					int currTime = optimalTimes[robotIndex][currComposedStateIndices[i]];
 
 					// Choose the smallest time (as long as it is not smaller than the previously scheduled time)... 
-					if (currTime <= smallestTime && currTime >= lastScheduledTime)
+					if (currTime <= smallestTime)
 					{
 						for (Iterator<Arc> arcs = currState.outgoingArcsIterator(); arcs.hasNext(); )
 						{
 							Arc currArc = arcs.next();
-
-							// Is needed to avoid NullPointerException when calling synchronizer.isEnabled()-method
-							synchronizer.getOutgoingEvents(currComposedStateIndices);
+							LabeledEvent currEvent = currArc.getEvent();
 
 							// ... that correspoinds to an enabled transition
-							if (synchronizer.isEnabled(currArc.getEvent()))
+							if (synchronizer.isEnabled(currEvent))
 							{
 								int nextStateIndex = indexMap.getStateIndex(currRobot, currArc.getToState()); 
 
@@ -172,8 +190,30 @@ public class Milp
 								// Otherwise, this could be the path
 								if (optimalTimes[robotIndex][nextStateIndex] >= currTime)
 								{
-									currOptimalArc = currArc;
-									smallestTime = currTime;
+									// But! Care should be taken with the events common to any pair of robots.
+									// When synched, the slowest robot should fire the synchronizing event. 
+									// If this event is unique for some robot...
+									if (! commonRobotEventsAlphabet.contains(currEvent))
+									{
+										currOptimalEvent = currEvent;
+										smallestTime = currTime;
+									}
+									// ... and if not, the current time is put away to be processed when all
+									// the robots' outgoing events have been processed (for this state).
+									// The highest time value (so far) is stored for every synchronizing event.
+									else
+									{
+										Integer currSynchTime = synchArcsInfo.get(currEvent);
+
+										if (currSynchTime == null)
+										{
+											synchArcsInfo.put(currEvent, new Integer(currTime));
+										}
+										else if (currSynchTime.intValue() < currTime)
+										{
+											synchArcsInfo.put(currEvent, new Integer(currTime));
+										}
+									}
 								}
 							}
 						}
@@ -181,15 +221,31 @@ public class Milp
 				}
 			}
 
-			// The last value of the scheduled time is updated (it is set to the current time value)
-			lastScheduledTime = smallestTime;
-
+			// Here is the check to see if there have been any synchronizing events. If so, and if the 
+			// time of the slowest synchronizing event is smaller than the current optimal time, obviously
+			// an update is needed. 
+			if (synchArcsInfo.size() > 0)
+			{
+				for (Iterator<LabeledEvent> synchEvents = synchArcsInfo.keySet().iterator(); synchEvents.hasNext(); )
+				{
+					LabeledEvent currSynchEvent = synchEvents.next();
+					int currSynchTime = synchArcsInfo.get(currSynchEvent).intValue();
+									
+					if (currSynchTime <= smallestTime)
+					{
+						currOptimalEvent = currSynchEvent;
+						smallestTime = currSynchTime;
+					}
+				}
+			}
+			
 			// Add the transition time to the name of the state-to-be-in-the-schedule
 			currScheduledState.setName(currScheduledState.getName() + ";  firing_time = " + smallestTime);
+			currScheduledState.setCost(smallestTime);
 
 			// Make a transition (in the synchronizer) to the state that is reachable in one step at cheapest cost
 			// This state will be the next parting point in our walk
-			currComposedStateIndices = synchronizer.doTransition(currComposedStateIndices, currOptimalArc.getEvent());
+			currComposedStateIndices = synchronizer.doTransition(currComposedStateIndices, currOptimalEvent);
 
 			// Update the schedule automaton
 			String nextStateName = "[";
@@ -201,8 +257,8 @@ public class Milp
 
 			State nextScheduledState = new State(nextStateName);
 			schedule.addState(nextScheduledState);
-			schedule.getAlphabet().addEvent(currOptimalArc.getEvent());
-			schedule.addArc(new Arc(currScheduledState, nextScheduledState, currOptimalArc.getEvent()));
+			schedule.getAlphabet().addEvent(currOptimalEvent);
+			schedule.addArc(new Arc(currScheduledState, nextScheduledState, currOptimalEvent));
 
 			currScheduledState = nextScheduledState;
 
@@ -216,6 +272,10 @@ public class Milp
 
 			if (isAccepting)
 			{
+			 	if (smallestTime != makespan)
+					logger.error("makespan = " + makespan + "; smallestTime = " + smallestTime);
+// 					throw new Exception("Makespan value does NOT correspond to the cost of the final state of the schedule. Something went wrong...");
+
 				currScheduledState.setAccepting(true);
 				currScheduledState.setName(currScheduledState.getName() + ";  makespan = " + makespan);
 			}
@@ -514,6 +574,10 @@ public class Milp
 		// The string containing times for each state (delta-times)
 		String deltaTimeStr = "param deltaTime default 0\n:";
 
+		// If there is an event that the robots synchronizes on, the fact that they
+		// must fire the event simultaneously should be taken care of
+// 		String synchronizationConstraints = "";
+
 
 		////////////////////////////////////////////////////////////////////////////////////
 		//	                          The constructing part                               //
@@ -631,7 +695,7 @@ public class Milp
 					// If the current state is accepting, a cycle time constaint is added,
 					// ensuring that the makespan is at least as long as the minimum cycle time of this robot
 					cycleTimeConstraints += "cycle_time_" + "R" + currRobotIndex + " : c >= " + "time[" + i + ", " + currStateIndex + "];\n";
-				}
+				}				
 			}
 
 			for (int j=0; j<deltaTimes.length; j++)
