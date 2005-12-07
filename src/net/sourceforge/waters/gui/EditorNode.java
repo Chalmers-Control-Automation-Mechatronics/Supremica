@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorNode
 //###########################################################################
-//# $Id: EditorNode.java,v 1.26 2005-12-07 01:08:46 siw4 Exp $
+//# $Id: EditorNode.java,v 1.27 2005-12-07 03:17:54 siw4 Exp $
 //###########################################################################
 
 
@@ -84,7 +84,7 @@ public class EditorNode
 			subject.setPointGeometry(new PointGeometrySubject(new Point2D.Double(1000,1000)));
 		}
 		if (altpos != null) {
-			subject.getPointGeometry().getPoint().setLocation(altpos);			
+			subject.getPointGeometry().setPoint(altpos);			
 		}		
 
 		// Init propositions

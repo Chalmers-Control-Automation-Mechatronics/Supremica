@@ -38,6 +38,53 @@ public class SpringEmbedder
 				}
 				d.updatePositions(movements);
 			}
+			// most likely going to have to update this when also dealing with nodegroups
+			// makes certain that every thing has a positive position
+			double minx = java.lang.Double.MAX_VALUE;
+			double miny = java.lang.Double.MAX_VALUE;
+			for (Object o : movements.values())
+			{
+				if (o instanceof Point2D)
+				{
+					Point2D p = (Point2D)o;
+					if (p.getX() < minx)
+					{
+						minx = p.getX();
+					}
+					if (p.getY() < miny)
+					{
+						miny = p.getY();
+					}
+				}
+				if (o instanceof Rectangle2D)
+				{
+					Rectangle2D r = (Rectangle2D)o;
+					if (r.getMinX() < minx)
+					{
+						minx = r.getMinX();
+					}
+					if (r.getMinY() < miny)
+					{
+						miny = r.getMinY();
+					}
+				}
+			}
+			double dx = 50 - minx;
+			double dy = 50 - miny;
+			for (Object o : movements.values())
+			{
+				if (o instanceof Point2D)
+				{
+					Point2D p = (Point2D)o;
+					p.setLocation(p.getX() + dx, p.getY() + dy);
+				}
+				if (o instanceof Rectangle2D)
+				{
+					Rectangle2D r = (Rectangle2D)o;
+					r.setFrame(r.getMinX() + dx, r.getMinY() + dy,
+							   r.getHeight(), r.getWidth());
+				}
+			}
 			for (Object o : s.getNodes())
 			{
 				EditorNode n = (EditorNode)o;
