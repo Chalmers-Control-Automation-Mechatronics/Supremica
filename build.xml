@@ -116,6 +116,7 @@
 	<unjar src="${lib}/xsdlib.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/waters_jaxb.jar" dest="${lib}/${unjared}"/>		
 	<unjar src="${lib}/functionblocks_jaxb.jar" dest="${lib}/${unjared}"/>		
+	<unjar src="${lib}/automationobjects_jaxb.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/manufacturingTables_jaxb.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/itext.jar" dest="${lib}/${unjared}"/>		
 	<unjar src="${lib}/java_cup.jar" dest="${lib}/${unjared}"/>	
