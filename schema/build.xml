@@ -10,7 +10,7 @@
 	<classpath path="${jwsdp.classpath}"/>
   </taskdef>
 
-  <target name="ao" description="Generate Automation Objects JAXB classes.">
+  <target name="automationobjects" description="Generate Automation Objects JAXB classes.">
     <xjc target="${src}" extension="true" removeOldOutput="yes" package="org.supremica.automationobjects.xsd">
       <schema dir="ao" includes="AutomationObjects.xsd"/>
       <produces dir="${src}/org/supremica/automationobjects/xsd"/>
