@@ -246,7 +246,8 @@
 			${supremica_basedir}/external/comInterfaces/**,
 			${supremica_basedir}/sattline/**,
 			${supremica_basedir}/supervisor/**,	
-			${supremica_basedir}/functionblocks/xsd/**"	
+			${supremica_basedir}/functionblocks/xsd/**,
+			${supremica_basedir}/automationobjects/xsd/**"	
 		source="1.5"
 		fork="true"
 		memoryMaximumSize="128M"

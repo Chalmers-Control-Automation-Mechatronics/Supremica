@@ -475,12 +475,12 @@
  </xsd:element>
 
  <xsd:element name='System'>
-  <xsd:complexType>
    <xsd:annotation>
     <xsd:appinfo>
      <jaxb:class name="FBSystem"/>
     </xsd:appinfo>
    </xsd:annotation>  
+  <xsd:complexType>
    <xsd:sequence>
     <xsd:element ref='Identification' minOccurs='0' maxOccurs='1'/>
     <xsd:element ref='VersionInfo' maxOccurs='unbounded'/>

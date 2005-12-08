@@ -54,7 +54,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import org.supremica.functionblocks.xsd.datatype.DataType;
-//import org.supremica.functionblocks.xsd.libraryelement.System;
+import org.supremica.functionblocks.xsd.libraryelement.FBSystem;
 import org.supremica.functionblocks.xsd.libraryelement.FBType;
 import javax.xml.bind.JAXBException;
 
@@ -103,7 +103,7 @@ public class FunctionblockViewer
 			}
 			else if ("sys".equalsIgnoreCase(currExtension))
 			{ // LibraryElement:System
-				org.supremica.functionblocks.xsd.libraryelement.System system = (org.supremica.functionblocks.xsd.libraryelement.System)unmarshaller.unmarshal(currFile);
+				FBSystem system = (FBSystem)unmarshaller.unmarshal(currFile);
 				marshaller.marshal(system, System.out);
 			}
 			else if ("fbt".equalsIgnoreCase(currExtension))

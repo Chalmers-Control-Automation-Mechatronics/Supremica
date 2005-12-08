@@ -98,11 +98,11 @@ public class Loader
 
 				if (!libraryPathBaseFile.isDirectory())
 				{
-					java.lang.System.err.println("Loader(" + device.getName() + "): Specified library base is not a directory!: " + libraryPathBaseFile.getName());
+					System.err.println("Loader(" + device.getName() + "): Specified library base is not a directory!: " + libraryPathBaseFile.getName());
 				}
 				else if (!libraryPathBaseFile.exists())
 				{
-					java.lang.System.err.println("Loader(" + device.getName() + "): Specified library base does not exist!: " + libraryPathBaseFile.getName());
+					System.err.println("Loader(" + device.getName() + "): Specified library base does not exist!: " + libraryPathBaseFile.getName());
 				}
 				else
 				{
@@ -128,11 +128,11 @@ public class Loader
 
 				if (!curLibraryDir.isDirectory())
 				{
-					java.lang.System.err.println("Loader(" + device.getName() + "): Specified library path element " + curLibraryDir.getAbsolutePath() + " is not a directory!");
+					System.err.println("Loader(" + device.getName() + "): Specified library path element " + curLibraryDir.getAbsolutePath() + " is not a directory!");
 				}
 				else if (!curLibraryDir.exists())
 				{
-					java.lang.System.err.println("Loader(" + device.getName() + "): Specified library path element " + curLibraryDir.getAbsolutePath() + " does not exist!");
+					System.err.println("Loader(" + device.getName() + "): Specified library path element " + curLibraryDir.getAbsolutePath() + " does not exist!");
 				}
 				else
 				{
@@ -158,8 +158,8 @@ public class Loader
 		}
 		catch (Exception e)
 		{
-			java.lang.System.err.println(e);
-			java.lang.System.exit(1);
+			System.err.println(e);
+			System.exit(1);
 		}
 
 
@@ -181,14 +181,14 @@ public class Loader
 			}
 			else if (unmarshalledXmlObject instanceof FBSystem)
 			{
-				java.lang.System.out.println("Loader.load(): Loading device " + device.getName() + " with " + fileName + " file.");
+				System.out.println("Loader.load(): Loading device " + device.getName() + " with " + fileName + " file.");
 				loadSystem((FBSystem) unmarshalledXmlObject);
 			}
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace(java.lang.System.err);
-			java.lang.System.exit(1);
+			e.printStackTrace(System.err);
+			System.exit(1);
 		}
     }
 
@@ -203,7 +203,7 @@ public class Loader
 			{
 				File curLibraryDir = (File) iter.next();
 				theFile = new File(curLibraryDir, fileName);
-				//java.lang.System.out.println("Loader.getFile(" + fileName + "): Looking for file in " + theFile.toString());
+				//System.out.println("Loader.getFile(" + fileName + "): Looking for file in " + theFile.toString());
 				if (theFile.exists())
 				{
 					break;
@@ -213,19 +213,19 @@ public class Loader
 
 		if (!theFile.exists())
 		{
-			java.lang.System.err.println("Loader.getFile(" + fileName + "): The file " + fileName + " does not exist in the specified libraries...");
+			System.err.println("Loader.getFile(" + fileName + "): The file " + fileName + " does not exist in the specified libraries...");
 			if (libraryPathList != null)
 			{
 				for (Iterator iter = libraryPathList.iterator();iter.hasNext();)
 				{
-					java.lang.System.err.println("\t" + ((File) iter.next()).getAbsolutePath() + File.separator);
+					System.err.println("\t" + ((File) iter.next()).getAbsolutePath() + File.separator);
 				}
 			}
 			else
 			{
-				java.lang.System.err.println("\t.");
+				System.err.println("\t.");
 			}
-			java.lang.System.exit(1);
+			System.exit(1);
 		}
 
 		return theFile;
@@ -345,8 +345,8 @@ public class Loader
 		}
 		else
 		{
-			java.lang.System.err.println("Loader.loadFBType(): The type " + xmlFBTypeData.getName() + " is not supported yet!");
-			java.lang.System.exit(0);
+			System.err.println("Loader.loadFBType(): The type " + xmlFBTypeData.getName() + " is not supported yet!");
+			System.exit(0);
 		}
     }
 
@@ -370,7 +370,7 @@ public class Loader
 
 		if (xmlFBNetworkData.isSetEventConnections())
 		{
-			//java.lang.System.out.println("Event Connections:");
+			//System.out.println("Event Connections:");
 			for (Iterator eventConnIter = xmlFBNetworkData.getEventConnections().getConnection().iterator(); eventConnIter.hasNext();)
 			{
 				org.supremica.functionblocks.xsd.libraryelement.Connection curConn = (org.supremica.functionblocks.xsd.libraryelement.Connection) eventConnIter.next();
@@ -381,7 +381,7 @@ public class Loader
 
 		if (xmlFBNetworkData.isSetDataConnections())
 		{
-			//java.lang.System.out.println("Data Connections:");
+			//System.out.println("Data Connections:");
 			for (Iterator dataConnIter = xmlFBNetworkData.getDataConnections().getConnection().iterator(); dataConnIter.hasNext();)
 			{
 				org.supremica.functionblocks.xsd.libraryelement.Connection curConn = (org.supremica.functionblocks.xsd.libraryelement.Connection) dataConnIter.next();
@@ -681,7 +681,7 @@ public class Loader
 
 		if (xmlFBNetworkData.isSetEventConnections())
 		{
-			//java.lang.System.out.println("Event Connections:");
+			//System.out.println("Event Connections:");
 			for (Iterator eventConnIter = xmlFBNetworkData.getEventConnections().getConnection().iterator(); eventConnIter.hasNext();)
 			{
 				org.supremica.functionblocks.xsd.libraryelement.Connection curConn = (org.supremica.functionblocks.xsd.libraryelement.Connection) eventConnIter.next();
@@ -694,7 +694,7 @@ public class Loader
 
 		if (xmlFBNetworkData.isSetDataConnections())
 		{
-			//java.lang.System.out.println("Data Connections:");
+			//System.out.println("Data Connections:");
 			for (Iterator dataConnIter = xmlFBNetworkData.getDataConnections().getConnection().iterator(); dataConnIter.hasNext();)
 			{
 				org.supremica.functionblocks.xsd.libraryelement.Connection curConn = (org.supremica.functionblocks.xsd.libraryelement.Connection) dataConnIter.next();
