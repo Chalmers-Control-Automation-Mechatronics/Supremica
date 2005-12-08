@@ -752,10 +752,9 @@
 
 
 <target name="run_tests_supremica" depends="compile_supremica,compile_tests_supremica">
-	<java fork="yes" classname="junit.textui.TestRunner"
-		taskname="junit" failonerror="true">
+	<java fork="yes" classname="junit.textui.TestRunner" taskname="junit" failonerror="true">
 		<arg value="org.supremica.TestPackageSupremica"/>
-        <jvmarg value="-Djava.library.path=${dist}"/>
+        	<jvmarg value="-Djava.library.path=${dist}"/>
 		<classpath>	
 			<pathelement location="${build}" />
 			<pathelement location="${testsbuild}" />
