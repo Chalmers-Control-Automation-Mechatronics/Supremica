@@ -58,7 +58,7 @@
  * @version 1.0
  */
 package org.supremica.manufacturingTables.management;
-//import org.supremica.manufacturingTables.model.*;
+import org.supremica.manufacturingTables.model.*;
 import org.supremica.manufacturingTables.xsd.factory.*;
 
 public class Main
@@ -76,8 +76,8 @@ public class Main
 		String fileName = args[0];
 		Loader loader = new Loader();
 		FactoryType factory = (FactoryType) loader.load(path, fileName);
-		//PLCProgramBuilder plcProgramBuilder = new PLCProgramBuilder();
-		//plcProgramBuilder.buildPLCProgram(factory);
+		PLCProgramBuilder plcProgramBuilder = new PLCProgramBuilder();
+		plcProgramBuilder.buildPLCProgram(factory);
 	    }
 	else
 	    {
