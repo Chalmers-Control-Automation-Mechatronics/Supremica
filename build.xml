@@ -120,6 +120,7 @@
 	<unjar src="${lib}/manufacturingTables_jaxb.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/itext.jar" dest="${lib}/${unjared}"/>		
 	<unjar src="${lib}/java_cup.jar" dest="${lib}/${unjared}"/>	
+	<unjar src="${lib}/st_abstract_syntax.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/bsh.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/jgrafchartresources.jar" dest="${resources}"/>	
 
