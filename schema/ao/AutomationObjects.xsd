@@ -26,22 +26,19 @@
   </xsd:complexType>
  </xsd:element>
 
-
 <!--==========================================================================-->
-
 
  <xsd:element name="AOApplication">
   <xsd:complexType>
    <xsd:sequence>
     <xsd:element ref="AO" minOccurs="0" maxOccurs="unbounded"/>
+    <xsd:element ref="Connection" minOccurs="0" maxOccurs="unbounded"/>
    </xsd:sequence>
    <xsd:attribute name="Name" type="xsd:string" use="required"/>
   </xsd:complexType>
  </xsd:element>
 
-
 <!--==========================================================================-->
-
 
  <xsd:element name="AOType">
   <xsd:complexType>
@@ -67,7 +64,7 @@
    <xsd:sequence>
     <xsd:element ref="Service" minOccurs="0" maxOccurs="unbounded"/>
     <xsd:element ref="View" maxOccurs="unbounded"/>
-    <xsd:element ref="Controller" minOccurs="0" maxOccurs="1"/>
+    <xsd:element ref="Controller" minOccurs="0" maxOccurs="unbounded"/>
     <xsd:element ref="Model" maxOccurs="1"/>
    </xsd:sequence>
    <xsd:attribute name="Name" type="xsd:string" use="required"/>
@@ -76,11 +73,7 @@
   </xsd:complexType>
  </xsd:element>
 
- <!--xsd:element name="Connection"-->
-
-
 <!--==========================================================================-->
-
 
  <xsd:element name="ModelType">
   <xsd:complexType>
@@ -182,9 +175,59 @@
   </xsd:complexType>
  </xsd:element>
 
+<!--==========================================================================-->
+
+ <!-- source AO -->
+ <!-- source view AO -->
+ <!-- source transaction of the frontend -->
+ 
+ <!-- dest AO -->
+ <!-- dest model or view -->
+ <!-- dest transaction of the backend or the fornted -->
+
+ <xsd:element name="Connection">
+  <xsd:complexType>
+   <xsd:sequence>
+    <xsd:element ref="Source"/>
+    <xsd:element ref="Destination"/>
+   </xsd:sequence>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name="Source">
+  <xsd:complexType>
+   <xsd:attribute name="AO" type="xsd:string" use="required"/>
+   <xsd:attribute name="View" type="xsd:string" use="required"/>
+   <xsd:attribute name="Transaction" type="xsd:string" use="required"/>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name="Destination">
+  <xsd:complexType>
+   <xsd:choice>
+   </xsd:choice>
+   <xsd:attribute name="AO" type="xsd:string" use="required"/>
+   <xsd:attribute name="Transaction" type="xsd:string" use="required"/>
+  </xsd:complexType>
+ </xsd:element>
 
 <!--==========================================================================-->
 
+ <xsd:element name="Backend">
+  <xsd:complexType>
+   <xsd:sequence>
+    <xsd:element ref="Transaction" maxOccurs="unbounded"/>
+   </xsd:sequence>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name="Frontend">
+  <xsd:complexType>
+   <xsd:sequence>
+    <xsd:element ref="Transaction" maxOccurs="unbounded"/>
+   </xsd:sequence>
+  </xsd:complexType>
+ </xsd:element>
 
  <xsd:element name="Transaction">
   <xsd:complexType>
@@ -195,7 +238,7 @@
    <xsd:attribute name="Name" type="xsd:string" use="required"/>
   </xsd:complexType>
  </xsd:element>
-
+ 
  <xsd:element name="Request">
   <xsd:complexType>
    <xsd:sequence>
@@ -219,9 +262,7 @@
   </xsd:complexType>
  </xsd:element>
 
-
 <!--==========================================================================-->
-
 
  <xsd:element name="WithModelType">
   <xsd:complexType>
@@ -235,27 +276,4 @@
   </xsd:complexType>
  </xsd:element>
 
-
-<!--==========================================================================-->
-
-
- <xsd:element name="Backend">
-  <xsd:complexType>
-   <xsd:sequence>
-    <xsd:element ref="Transaction" maxOccurs="unbounded"/>
-   </xsd:sequence>
-  </xsd:complexType>
- </xsd:element>
-
- <xsd:element name="Frontend">
-  <xsd:complexType>
-   <xsd:sequence>
-    <xsd:element ref="Transaction" maxOccurs="unbounded"/>
-   </xsd:sequence>
-  </xsd:complexType>
- </xsd:element>
-
-
 </xsd:schema>
-
-
