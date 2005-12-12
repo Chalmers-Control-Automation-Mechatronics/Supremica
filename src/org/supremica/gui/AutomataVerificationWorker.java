@@ -198,7 +198,7 @@ public class AutomataVerificationWorker
 		executionDialog.setMode(ExecutionDialogMode.verifying);
 		automataVerifier.setExecutionDialog(executionDialog);
 
-		// Solve the problem (and measure the time)!
+		// Solve the problem and measure the time it takes!
 		ActionTimer timer = new ActionTimer();
 		timer.start();
 		verificationSuccess = automataVerifier.verify();

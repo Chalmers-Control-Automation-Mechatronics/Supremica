@@ -70,6 +70,8 @@ public class MinimizationStrategy
 		new MinimizationStrategy("Most events first", true);
 	public static final MinimizationStrategy FewestEventsFirst =
 		new MinimizationStrategy("Fewest events first", true);
+	public static final MinimizationStrategy Experimental =
+		new MinimizationStrategy("Experimental", true);
 	public static final MinimizationStrategy Undefined =
 		new MinimizationStrategy("Undefined", false);
 	private String description = null;

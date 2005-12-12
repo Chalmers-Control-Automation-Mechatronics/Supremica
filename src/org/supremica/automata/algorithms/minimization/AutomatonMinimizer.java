@@ -1638,7 +1638,7 @@ public class AutomatonMinimizer
      * time there is a transition "p =epsilon=> q", after completing the transitive closure (or
      * "saturation"), there is also a transition "p -epsilon-> q".
      */
-	public int epsilonSaturate(Automaton aut, boolean addSelfloops)
+	public static int epsilonSaturate(Automaton aut, boolean addSelfloops)
 	{
 		int count = 0;
 
@@ -1792,7 +1792,7 @@ public class AutomatonMinimizer
      *
      * @return the number of arcs that have been removed.
      */
-    private int removeRedundantTransitions(Automaton aut)
+    private static int removeRedundantTransitions(Automaton aut)
     {
         // Are there any silent-self-loops? They can be removed!
         // Note! These are not "redundant" by Jaana Elorantas definition, but must be
@@ -1841,11 +1841,6 @@ public class AutomatonMinimizer
 
                     for (Iterator<Arc> inIt = s2.incomingArcsIterator(); inIt.hasNext(); )
                     {
-                        if (stopRequested)
-                        {
-                            return -1;
-                        }
-
                         Arc secondArc = inIt.next();
                         if (s3.equals(secondArc.getFromState()))
                         {
@@ -1933,7 +1928,7 @@ public class AutomatonMinimizer
     /**
      * Removes epsilon events that are never used from alphabet.
      */
-    private void removeUnusedEpsilonEvents(Automaton aut)
+    private static void removeUnusedEpsilonEvents(Automaton aut)
     {
         Alphabet alpha = aut.getAlphabet();
 
@@ -1986,78 +1981,6 @@ public class AutomatonMinimizer
         stopRequested = true;
 
         logger.debug("AutomatonMinimizer requested to stop.");
-    }
-
-    public static void main(String[] args)
-    {
-        logger.setLogToConsole(true);
-
-        Automaton automaton = new Automaton("Minimizer Test");
-        State q0 = new State("q0");
-
-        automaton.addState(q0);
-        automaton.setInitialState(q0);
-
-        State q1 = new State("q1");
-
-        automaton.addState(q1);
-
-        State q2 = new State("q2");
-
-        automaton.addState(q2);
-
-        State q3 = new State("q3");
-
-        automaton.addState(q3);
-
-        State q4 = new State("q4");
-
-        automaton.addState(q4);
-
-        State q5 = new State("q5");
-
-        automaton.addState(q5);
-
-        LabeledEvent a = new LabeledEvent("a");
-
-        automaton.getAlphabet().addEvent(a);
-
-        LabeledEvent b = new LabeledEvent("b");
-
-        automaton.getAlphabet().addEvent(b);
-
-        LabeledEvent c = new LabeledEvent("c");
-
-        automaton.getAlphabet().addEvent(c);
-
-        LabeledEvent d = new LabeledEvent("d");
-
-        automaton.getAlphabet().addEvent(d);
-        automaton.addArc(new Arc(q0, q1, a));
-        automaton.addArc(new Arc(q1, q1, a));
-        automaton.addArc(new Arc(q1, q2, b));
-        automaton.addArc(new Arc(q1, q3, c));
-        automaton.addArc(new Arc(q2, q4, d));
-        automaton.addArc(new Arc(q3, q5, d));
-
-        AutomatonMinimizer minimizer = new AutomatonMinimizer(automaton);
-
-        try
-        {
-            MinimizationOptions options = MinimizationOptions.getDefaultMinimizationOptions();
-            Automaton minauto = minimizer.getMinimizedAutomaton(options);
-            org.supremica.automata.IO.AutomatonToDsx todsx = new org.supremica.automata.IO.AutomatonToDsx(minauto);
-
-            todsx.serialize(new java.io.PrintWriter(System.out));
-        }
-        catch (Exception excp)
-        {
-            logger.error(excp);
-            logger.debug(excp.getStackTrace());
-
-            // excp.printStackTrace();
-            return;
-        }
     }
 }
 

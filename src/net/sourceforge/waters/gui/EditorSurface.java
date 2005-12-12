@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.36 2005-12-07 01:08:46 siw4 Exp $
+//# $Id: EditorSurface.java,v 1.37 2005-12-12 12:03:17 flordal Exp $
 //###########################################################################
 
 
@@ -1113,7 +1113,7 @@ public class EditorSurface
 		int width = (int) area.getWidth();
 		int height = (int) area.getHeight();
 
-		/* // We want the bounds to be tight, right? Or why was this? 
+ 		/* // We want the bounds to be tight, right? Or why was this? 
 		if (width < 500)
 		{
 			width = 500;

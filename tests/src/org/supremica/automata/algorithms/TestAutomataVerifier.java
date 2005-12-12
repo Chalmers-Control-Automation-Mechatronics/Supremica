@@ -56,6 +56,7 @@ import org.supremica.testhelpers.*;
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.minimization.*;
 import org.supremica.automata.IO.*;
+import org.supremica.testcases.Arbiter;
 
 public class TestAutomataVerifier
 	extends TestCase
@@ -174,6 +175,21 @@ public class TestAutomataVerifier
 			minimizationOptions.setMinimizationStrategy(MinimizationStrategy.FewestTransitionsFirst);
 			verifier = new AutomataVerifier(theProject, verificationOptions, synchronizationOptions, minimizationOptions);
 			assertTrue(verifier.verify());
+		}
+		catch (Exception ex)
+		{
+			ex.printStackTrace();
+			assertTrue(false);			
+		}
+
+		// Arbiter example, turned out not to work for some sizes (22,
+		// 24, 32, 33) at one point so it is now a testcase...
+		try
+		{
+			Arbiter arbiter = new Arbiter(22, false);
+			Project theProject = arbiter.getProject();
+
+			assertTrue(AutomataVerifier.verifyModularNonblocking(theProject));
 		}
 		catch (Exception ex)
 		{
