@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EventTableModel
 //###########################################################################
-//# $Id: EventTableModel.java,v 1.8 2005-11-03 01:24:15 robi Exp $
+//# $Id: EventTableModel.java,v 1.9 2005-12-12 20:23:14 siw4 Exp $
 //###########################################################################
 
 
@@ -30,8 +30,13 @@ import net.sourceforge.waters.model.module.EventListExpressionProxy;
 import net.sourceforge.waters.model.module.ForeachEventProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
+import net.sourceforge.waters.subject.base.ListSubject;
+import net.sourceforge.waters.subject.base.ModelObserver;
+import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
+import net.sourceforge.waters.subject.module.EventListExpressionSubject;
 import net.sourceforge.waters.subject.module.EventParameterSubject;
+import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ParameterSubject;
@@ -47,6 +52,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
 
 class EventTableModel
 	extends AbstractTableModel
+	implements ModelObserver
 {  
 
 	//#######################################################################
@@ -55,6 +61,7 @@ class EventTableModel
 					final ModuleSubject module,
 					final JTable table)
 	{
+		((GraphSubject)graph).addModelObserver(this);
 		mTable = table;
 		mGraph = graph;
 		mModule = module;
@@ -62,7 +69,33 @@ class EventTableModel
 		addTableModelListener(new TableHandler());
 	}
 
-
+	public void modelChanged(ModelChangeEvent e)
+	{
+		if(e.getSource() instanceof ListSubject &&
+			e.getSource().getParent() instanceof EventListExpressionSubject)
+		{
+			ListSubject list = (ListSubject)e.getSource();
+			for (Object o: list)
+			{
+				System.out.println(o);
+				boolean alreadyListed = false;
+				for (int i = 0; i < getRowCount(); i++)
+				{
+					System.out.println(i);
+					if (getEvent(i).equals(o))
+					{
+						alreadyListed = true;
+						break;
+					}
+				}
+				if (!alreadyListed)
+				{
+					createEvent();
+					setValueAt(o, 0, 1);
+				}
+			}
+		}
+	}
 
 	//#######################################################################
 	//# Interface javax.swing.TableModel

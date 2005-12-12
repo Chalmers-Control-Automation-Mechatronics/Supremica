@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorLabelGroup
 //###########################################################################
-//# $Id: EditorLabelGroup.java,v 1.13 2005-11-03 01:24:15 robi Exp $
+//# $Id: EditorLabelGroup.java,v 1.14 2005-12-12 20:23:14 siw4 Exp $
 //###########################################################################
 
 
@@ -19,12 +19,18 @@ import java.awt.font.*;
 import java.lang.reflect.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.text.*;
 import javax.swing.border.*;
 
+import net.sourceforge.waters.gui.command.Command;
+import net.sourceforge.waters.gui.command.RemoveEventCommand;
+
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.subject.base.ModelObserver;
+import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.LabelBlockSubject;
@@ -34,6 +40,7 @@ import net.sourceforge.waters.xsd.module.AnchorPosition;
 
 public class EditorLabelGroup
 	extends EditorObject
+	implements ModelObserver
 {
 
 	public void removeFromSurface(EditorSurface e)
@@ -84,14 +91,16 @@ public class EditorLabelGroup
 
     private int getLabelIndexAt(int ex, int ey)
     {
-	for (int i = 0; i < events.size(); i++) {
-	    JLabel l = (JLabel) events.get(i);
+	for (int i = 0; i < panel.getComponentCount(); i++)
+	{
+	    JLabel l = (JLabel) panel.getComponent(i);
 	    
-	    if (l.getBounds().contains(ex, ey)) {
-		return i;	 
+	    if (l.getBounds().contains(ex, ey))
+		{
+			return i;	 
 	    }
 	}
-	return -1;
+		return -1;
     }
 
 	public void setPanelLocation()
@@ -122,9 +131,9 @@ public class EditorLabelGroup
 		}
 		*/
 		
-		for (int i = 0; i < events.size(); i++)
+		for (int i = 0; i < panel.getComponentCount(); i++)
 		{
-			JLabel l = (JLabel) events.get(i);
+			JLabel l = (JLabel) panel.getComponent(i);
 
 			l.setForeground(getColor());
 
@@ -184,20 +193,6 @@ public class EditorLabelGroup
 			addToPanel(ident.toString());
 			resizePanel();
 	    }
-	}
-
-    /**
-	 * Puts stuff for events from subject.
-	 */
-	public void removeEvent(int i)
-	{
-		events.remove(i);
-		panel.remove(i);
-		/*
-		shadowPanel.remove(i);
-		*/
-		final List<AbstractSubject> list = mSubject.getEventListModifiable();
-		list.remove(i);
 	}
 
 	public void setAnchor(String anchor)
@@ -265,7 +260,6 @@ public class EditorLabelGroup
 		l.setOpaque(false);
 		l.setBackground(getShadowColor());
 
-		events.add(l);
 		panel.add(l);
 		/*
 		shadowPanel.add(new JLabel(l.getText()));
@@ -333,14 +327,14 @@ public class EditorLabelGroup
 		}
 	}
 
-	public EditorLabelGroup(EditorEdge par, EditorSurface e)
+	public EditorLabelGroup(EditorEdge par, final EditorSurface e)
 	{
 		// This is a labelgroup
 		type = LABELGROUP;
 
 		mSubject = par.getSubject().getLabelBlock();
+		mSubject.addModelObserver(this);
 		parent = par;
-		events = new ArrayList();
 		panel = new JPanel();
 		/*
 		shadowPanel = new JPanel();
@@ -385,7 +379,7 @@ public class EditorLabelGroup
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				if ((selectedLabel > 0) && (selectedLabel < events.size()))
+				if ((selectedLabel > 0) && (selectedLabel < panel.getComponentCount()))
 				{
 					final List<AbstractSubject> list =
 						mSubject.getEventListModifiable();
@@ -395,17 +389,9 @@ public class EditorLabelGroup
 					list.remove(selectedLabel);
 					list.add(selectedLabel - 1, ident);
 					// Clear all lists
-					events.clear();
-					panel.removeAll();
 					/*
 					shadowPanel.removeAll();
 					*/
-					for (final AbstractSubject subject : list) {
-						final String text = subject.toString();
-						addToPanel(text);
-					}
-					resizePanel();
-					panel.repaint();
 					/*
 					shadowPanel.repaint();
 					*/
@@ -418,7 +404,7 @@ public class EditorLabelGroup
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				if ((selectedLabel >= 0) && (selectedLabel < events.size() - 1))
+				if ((selectedLabel >= 0) && (selectedLabel < panel.getComponentCount() - 1))
 				{
 					final List<AbstractSubject> list =
 						mSubject.getEventListModifiable();
@@ -426,19 +412,10 @@ public class EditorLabelGroup
 						(IdentifierSubject) list.get(selectedLabel);
 					// Remove label and add to new position in list
 					list.remove(selectedLabel);
-					list.add(selectedLabel + 1, ident);
-					// Clear all lists
-					events.clear();
-					panel.removeAll();
+					list.add(selectedLabel + 1, ident);													
 					/*
 					shadowPanel.removeAll();
 					*/
-					for (final AbstractSubject subject : list) {
-						final String text = subject.toString();
-						addToPanel(text);
-					}
-					resizePanel();
-					panel.repaint();
 					/*
 					shadowPanel.repaint();
 					*/
@@ -449,20 +426,30 @@ public class EditorLabelGroup
 		panel.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "delete");
 		panel.getActionMap().put("delete", new AbstractAction()
 		{
-			public void actionPerformed(ActionEvent e)
+			public void actionPerformed(ActionEvent action)
 			{
 				// Is a label selected?
-				if ((selectedLabel >= 0) && (selectedLabel < events.size()))
+				if ((selectedLabel >= 0) && (selectedLabel < panel.getComponentCount()))
 				{
 					// Remove event
-					removeEvent(selectedLabel);
-
-					resizePanel();
-
+					Command removeEvent = new RemoveEventCommand(getSubject(),
+											  			   (IdentifierSubject)getSubject().getEventList().get(selectedLabel));
+					e.getEditorInterface().getUndoInterface().executeCommand(removeEvent);
 					selectedLabel = -1;
 				}
 			}
 		});
+	}
+	
+	public void modelChanged(ModelChangeEvent e)
+	{
+		panel.removeAll();
+		for (final Proxy proxy : mSubject.getEventList())
+		{
+			final String text = proxy.toString();
+			addToPanel(text);
+		}
+		resizePanel();
 	}
 
 
@@ -482,7 +469,7 @@ public class EditorLabelGroup
 	private int horizontalA = 1;
 	private int selectedLabel = -1;
 
-	private final ArrayList events;
+	//private final ArrayList events;
 	/** Holds labels that are shown on EditorSurface. */
 	private final JPanel panel;
 

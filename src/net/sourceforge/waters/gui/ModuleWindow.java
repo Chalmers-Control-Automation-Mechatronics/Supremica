@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleWindow
 //###########################################################################
-//# $Id: ModuleWindow.java,v 1.19 2005-12-01 00:29:58 siw4 Exp $
+//# $Id: ModuleWindow.java,v 1.20 2005-12-12 20:23:14 siw4 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -29,6 +29,18 @@ import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
 import javax.xml.bind.JAXBException;
+
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DragSource;
+import java.awt.dnd.DragGestureEvent;
+import java.awt.dnd.DragGestureListener;
+import java.awt.dnd.DragSourceAdapter;
+import java.awt.dnd.DragSourceDragEvent;
+import java.awt.dnd.DragSourceListener;
+import java.awt.dnd.InvalidDnDOperationException;
 
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.UndoInterface;
@@ -63,6 +75,23 @@ import net.sourceforge.waters.subject.module.ParameterSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 import net.sourceforge.waters.xsd.base.ComponentKind;
+
+import net.sourceforge.waters.subject.module.IdentifierSubject;
+import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
+
+import net.sourceforge.waters.model.base.IndexedList;
+import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.module.EdgeProxy;
+import net.sourceforge.waters.model.module.EventListExpressionProxy;
+import net.sourceforge.waters.model.module.ForeachEventProxy;
+import net.sourceforge.waters.model.module.GraphProxy;
+import net.sourceforge.waters.model.module.NodeProxy;
+import net.sourceforge.waters.subject.module.EventDeclSubject;
+import net.sourceforge.waters.subject.module.EventParameterSubject;
+import net.sourceforge.waters.subject.module.IdentifierSubject;
+import net.sourceforge.waters.subject.module.ModuleSubject;
+import net.sourceforge.waters.subject.module.ParameterSubject;
+import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.supremica.automata.IO.ProjectBuildFromWaters;
 import org.supremica.automata.Project;
@@ -229,6 +258,16 @@ public class ModuleWindow
 
 		p.add(jp);
 		p.setLayout(new GridLayout(1, 1));
+		
+		mDragSource = DragSource.getDefaultDragSource();
+		mDGListener = new DGListener(dataList);
+		mDSListener = new DSListener();
+		
+		// component, action, listener
+		mDragSource.createDefaultDragGestureRecognizer(dataList,
+													  mDragAction,
+													  mDGListener);
+		mDragSource.addDragSourceListener(mDSListener);
 
 		return p;
 	}
@@ -241,7 +280,8 @@ public class ModuleWindow
 
 		if (module != null)
 		{
-			for (final ParameterProxy param : module.getParameterList()) {
+			for (final ParameterProxy param : module.getParameterList())
+			{
 				paramData.addElement(param);
 			}
 		}
@@ -944,6 +984,112 @@ public class ModuleWindow
 	{
 		return mPrinter;
 	}
+	
+	private class IdentifierTransfer implements Transferable
+	{
+		// the IdentifierSubject transferred by this Object
+		Object ip_;
+		DataFlavor data_;
+		
+		/**
+		 * creates a new transferable object containing the specified IdentifierSubject
+		 *
+		 * @param ip the IdentifierSubject being transferred
+		 */
+
+		public IdentifierTransfer(Object ip)
+		{
+			ip_ = ip;
+			data_ = new DataFlavor(ip.getClass(), ip.getClass().getName());
+		}
+		
+		public Object getTransferData(DataFlavor f)
+			throws UnsupportedFlavorException
+		{
+			if (isDataFlavorSupported(f))
+				return ip_;
+			else
+				throw new UnsupportedFlavorException(f);
+		}
+	   
+		public DataFlavor[] getTransferDataFlavors()
+		{
+			DataFlavor[] d = new DataFlavor[1];
+			d[0] = data_;
+			return d;
+		}
+
+		public boolean isDataFlavorSupported(DataFlavor f)
+		{
+			return f.getRepresentationClass().isAssignableFrom(data_.getRepresentationClass());
+		}
+	}
+
+	private class DSListener extends DragSourceAdapter
+	{	  		
+		public void dragOver(DragSourceDragEvent e)
+		{
+			if (e.getTargetActions() == DnDConstants.ACTION_COPY) {
+				e.getDragSourceContext().setCursor
+					(DragSource.DefaultCopyDrop);
+			} else {
+				e.getDragSourceContext().setCursor
+					(DragSource.DefaultCopyNoDrop);
+			}
+		}
+	}
+
+	private class DGListener implements DragGestureListener
+	{
+		final JList mList;
+		
+		public DGListener(JList list)
+		{
+			mList = list;
+		}
+		
+		private EventKind guessEventKind(final IdentifierSubject ident)
+		{		
+			if (ident == null || module == null) {
+				return null;
+			}
+			final String name = ident.getName();
+			final IndexedList<EventDeclSubject> decls =
+				module.getEventDeclListModifiable();
+			final EventDeclSubject decl = decls.get(name);
+			if (decl != null) {
+				return decl.getKind();
+			}
+			final IndexedList<ParameterSubject> params =
+				module.getParameterListModifiable();
+			final ParameterSubject param = params.get(name);
+			if (param != null && param instanceof EventParameterSubject) {
+				final EventParameterSubject eparam = (EventParameterSubject) param;
+				final EventDeclSubject edecl = eparam.getEventDecl();
+				return edecl.getKind();
+			}
+			return null;
+		}
+		
+		public void dragGestureRecognized(DragGestureEvent e)
+		{		
+			final int row = mList.locationToIndex(e.getDragOrigin());
+			System.out.println(row);
+			if (row == -1) {
+				return;
+			}
+			EventDeclProxy ident = (EventDeclProxy)mList.getModel().getElementAt(row);
+			final Transferable t = new IdentifierTransfer
+										(new IdentifierWithKind(
+										new SimpleIdentifierSubject(HTMLPrinter.getHTMLString(ident)),
+										ident.getKind()));
+			try {
+				e.startDrag(DragSource.DefaultCopyDrop, t);
+			} catch (InvalidDnDOperationException idoe) {
+				throw new IllegalArgumentException(idoe);
+			}
+		}
+	}
 
 
 	//########################################################################
@@ -1010,5 +1156,9 @@ public class ModuleWindow
 	private final UndoManager mUndoManager = new UndoManager();
 
 	private static Languages WLang;
-
+	
+	private DragSource mDragSource;
+	private DragGestureListener mDGListener;
+	private DragSourceListener mDSListener;
+	private int mDragAction = DnDConstants.ACTION_COPY;
 }

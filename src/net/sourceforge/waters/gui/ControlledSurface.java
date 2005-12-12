@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.43 2005-12-06 17:54:35 flordal Exp $
+//# $Id: ControlledSurface.java,v 1.44 2005-12-12 20:23:14 siw4 Exp $
 //###########################################################################
  
 package net.sourceforge.waters.gui;
@@ -1314,7 +1314,9 @@ public class ControlledSurface
 		private void addToNode(EditorNode n, IdentifierSubject i)
 		{
 			final IdentifierSubject cloned = i.clone();
-			n.addProposition(cloned);
+			Command addEvent = new AddEventCommand(n.getSubject().getPropositions(),
+												  cloned, 0);
+			root.getUndoInterface().executeCommand(addEvent);
 			repaint();
 		}
 
@@ -1336,7 +1338,10 @@ public class ControlledSurface
 		private void addToLabelGroup(EditorLabelGroup l, IdentifierSubject i)
 		{
 			final IdentifierSubject cloned = i.clone();
-			l.addEvent(cloned);
+			Command addEvent = new AddEventCommand(l.getSubject(),
+												  cloned, 0);
+			root.getUndoInterface().executeCommand(addEvent);
+			repaint();
 		}
 
 

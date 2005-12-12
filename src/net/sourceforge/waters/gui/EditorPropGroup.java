@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorLabelGroup
 //###########################################################################
-//# $Id: EditorPropGroup.java,v 1.6 2005-11-03 01:24:15 robi Exp $
+//# $Id: EditorPropGroup.java,v 1.7 2005-12-12 20:23:14 siw4 Exp $
 //###########################################################################
 
 
@@ -25,6 +25,8 @@ import javax.swing.border.*;
 import javax.swing.event.*;
 import javax.swing.text.*;
 
+import net.sourceforge.waters.subject.base.ModelObserver;
+import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.module.EventListExpressionSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
@@ -33,6 +35,7 @@ import net.sourceforge.waters.xsd.module.AnchorPosition;
 
 public class EditorPropGroup
 	extends EditorObject
+	implements ModelObserver
 {
 
 	//#######################################################################
@@ -43,8 +46,8 @@ public class EditorPropGroup
 		type = LABELGROUP;
 
 		mSubject = par.getSubject().getPropositions();
+		mSubject.addModelObserver(this);
 		parent = par;
-		mEvents = new ArrayList<JLabel>();
 		panel = new JPanel();
 
 		panel.setVisible(false);
@@ -59,8 +62,7 @@ public class EditorPropGroup
 		for (final AbstractSubject entry : list) {
 			addToPanel(entry);
 		}
-
-		resizePanel();
+		
 		e.add(panel);
 		setPanelLocation();
 
@@ -69,18 +71,12 @@ public class EditorPropGroup
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				if ((selectedLabel > 0) && (selectedLabel < mEvents.size()))
+				if ((selectedLabel > 0) && (selectedLabel < list.size()))
 				{
 					IdentifierSubject i =
 						(IdentifierSubject) list.get(selectedLabel);
 					list.remove(selectedLabel);
-					list.add(selectedLabel - 1, i);
-					mEvents.clear();
-					panel.removeAll();
-					for (final AbstractSubject entry : list) {
-						addToPanel(entry);
-					}
-					resizePanel();
+					list.add(selectedLabel - 1, i);					
 					selectedLabel--;
 				}
 			}
@@ -91,18 +87,12 @@ public class EditorPropGroup
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				if ((selectedLabel >= 0) && (selectedLabel < mEvents.size() - 1))
+				if ((selectedLabel >= 0) && (selectedLabel < list.size() - 1))
 				{
 					IdentifierSubject i =
 						(IdentifierSubject) list.get(selectedLabel);
 					list.remove(selectedLabel);
 					list.add(selectedLabel + 1, i);
-					mEvents.clear();
-					panel.removeAll();
-					for (final AbstractSubject entry : list) {
-						addToPanel(entry);
-					}
-					resizePanel();
 					selectedLabel++;
 				}
 			}
@@ -139,8 +129,8 @@ public class EditorPropGroup
 		ex -= panel.getX();
 		ey -= panel.getY();
 		panel.requestFocus();
-		for (int i = 0; i < mEvents.size(); i++)	{
-			final JLabel label = mEvents.get(i);
+		for (int i = 0; i < panel.getComponentCount(); i++)	{
+			final JLabel label = (JLabel)panel.getComponent(i);
 			if (label.getBounds().contains(ex, ey))	{
 				selectedLabel = i;
 				return;
@@ -155,8 +145,8 @@ public class EditorPropGroup
 		int y = (int) (offset.getY() + parent.getY());    // - ((double)(verticalA / 2) * panel.getHeight()));
 
 		panel.setLocation(x, y);
-		for (int i = 0; i < mEvents.size(); i++) {
-			final JLabel label = mEvents.get(i);
+		for (int i = 0; i < panel.getComponentCount(); i++) {
+			final JLabel label = (JLabel)panel.getComponent(i);
 			if (i == selectedLabel)	{
 				label.setForeground(Color.RED);
 			} else {
@@ -191,16 +181,6 @@ public class EditorPropGroup
 		list.add(ident);
 		addToPanel(ident);
 		resizePanel();
-		panel.getParent().repaint();
-	}
-
-	public void removeEvent(final int i)
-	{
-		final JLabel label = mEvents.get(i);
-		mEvents.remove(i);
-		panel.remove(label);
-		final List<AbstractSubject> list = mSubject.getEventListModifiable();
-		list.remove(i);
 		panel.getParent().repaint();
 	}
 
@@ -268,7 +248,6 @@ public class EditorPropGroup
 		l.setBorder(new EmptyBorder(0, 0, 0, 0));
 		l.setOpaque(false);
 		panel.add(l);
-		mEvents.add(l);
 	}
 
 	private void resizePanel()
@@ -316,6 +295,16 @@ public class EditorPropGroup
 	{
 		return mSubject;
 	}
+	
+	public void modelChanged(ModelChangeEvent e)
+	{
+		panel.removeAll();
+		final List<AbstractSubject> list = mSubject.getEventListModifiable();
+		for (final AbstractSubject entry : list) {
+			addToPanel(entry);
+		}
+		resizePanel();
+	}
 
 
 	//#######################################################################
@@ -325,7 +314,6 @@ public class EditorPropGroup
 	private int selectedLabel = -1;
 	private final JPanel panel;
 	private final EditorNode parent;
-	private final List<JLabel> mEvents;
 	private final Point offset;
 	private final EventListExpressionSubject mSubject;
 

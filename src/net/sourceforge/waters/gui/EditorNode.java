@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorNode
 //###########################################################################
-//# $Id: EditorNode.java,v 1.27 2005-12-07 03:17:54 siw4 Exp $
+//# $Id: EditorNode.java,v 1.28 2005-12-12 20:23:14 siw4 Exp $
 //###########################################################################
 
 
@@ -107,6 +107,13 @@ public class EditorNode
 		final EventListExpressionSubject props = mSubject.getPropositions();
 		final List<AbstractSubject> list = props.getEventListModifiable();
 		list.add(ident);
+    }
+	
+	public void removeProposition(IdentifierSubject ident)
+	{
+		final EventListExpressionSubject props = mSubject.getPropositions();
+		final List<AbstractSubject> list = props.getEventListModifiable();
+		list.remove(ident);
     }
 
     public boolean hasPropositions()

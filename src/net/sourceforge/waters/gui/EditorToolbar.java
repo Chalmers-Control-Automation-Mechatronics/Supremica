@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorToolbar
 //###########################################################################
-//# $Id: EditorToolbar.java,v 1.8 2005-11-03 01:24:15 robi Exp $
+//# $Id: EditorToolbar.java,v 1.9 2005-12-12 20:23:14 siw4 Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -136,6 +136,6 @@ public class EditorToolbar
 
     public String getCommand()
     {
-	return mGroup.getSelection().getActionCommand();
+		return mGroup.getSelection().getActionCommand();
     }
 }
