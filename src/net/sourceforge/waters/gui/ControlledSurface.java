@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.45 2005-12-13 01:10:15 siw4 Exp $
+//# $Id: ControlledSurface.java,v 1.46 2005-12-13 02:23:23 siw4 Exp $
 //###########################################################################
  
 package net.sourceforge.waters.gui;
@@ -1203,7 +1203,9 @@ public class ControlledSurface
 				}	       
 			} else if (o instanceof EditorLabel) {
 				EditorLabel l = (EditorLabel)o;
-				l.getParent().setDragOver(d);
+				if (l.getParent() != null) {
+					l.getParent().setDragOver(d);
+				}
 			} else if (o instanceof EditorEdge) {
 				for (Object ob : events) {
 					EditorLabelGroup l = (EditorLabelGroup)ob;
@@ -1213,7 +1215,9 @@ public class ControlledSurface
 				}
 			} else if (o instanceof EditorLabelGroup) {
 				EditorLabelGroup l = (EditorLabelGroup)o;
-				l.getParent().setDragOver(d);
+				if (l.getParent() != null) {
+					l.getParent().setDragOver(d);
+				}
 			}
 		}
 		
@@ -2842,6 +2846,7 @@ public class ControlledSurface
 			EditorNode n = (EditorNode) o;
 			unsetAllInitial();
 			n.setInitial(true);
+			repaint();
 		}
 		
 		public void mouseDragged(MouseEvent e)

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.37 2005-12-12 12:03:17 flordal Exp $
+//# $Id: EditorSurface.java,v 1.38 2005-12-13 02:23:23 siw4 Exp $
 //###########################################################################
 
 
@@ -916,6 +916,8 @@ public class EditorSurface
 			ArrayList noGeometry = new ArrayList();
 
 			graph = cp.getGraph();
+			
+			events.add(new EditorLabelGroup(graph.getBlockedEvents(), this));
 
 			final Collection mNodes = graph.getNodes();
 			final Iterator iter = mNodes.iterator();

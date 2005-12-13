@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorToolbar
 //###########################################################################
-//# $Id: EditorToolbar.java,v 1.10 2005-12-13 01:10:15 siw4 Exp $
+//# $Id: EditorToolbar.java,v 1.11 2005-12-13 02:23:23 siw4 Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -127,10 +127,10 @@ public class EditorToolbar
 		//# Interface java.awt.event.ActionListener
 		public void actionPerformed(final ActionEvent event)
 		{
-			fireEditorChangedEvent(new ToolbarChangedEvent());
 			mLastSelected.showButton();
 			showButton();
 			mLastSelected = this;
+			fireEditorChangedEvent(new ToolbarChangedEvent());
 		}
 
 		//#######################################################################

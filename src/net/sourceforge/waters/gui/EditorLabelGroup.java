@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorLabelGroup
 //###########################################################################
-//# $Id: EditorLabelGroup.java,v 1.14 2005-12-12 20:23:14 siw4 Exp $
+//# $Id: EditorLabelGroup.java,v 1.15 2005-12-13 02:23:23 siw4 Exp $
 //###########################################################################
 
 
@@ -76,7 +76,10 @@ public class EditorLabelGroup
 	public void setHighlighted(boolean s)
 	{
 		super.setHighlighted(s);
-		parent.setHighlighted(s);
+		if (parent != null)
+		{
+			parent.setHighlighted(s);
+		}
 	}
 
 	public void setSelectedLabel(int ex, int ey)
@@ -105,9 +108,13 @@ public class EditorLabelGroup
 
 	public void setPanelLocation()
 	{
-		int x = (int) (mSubject.getGeometry().getOffset().getX() + parent.getTPointX());    // - ((double)(horizontalA / 2) * panel.getWidth()));
-		int y = (int) (mSubject.getGeometry().getOffset().getY() + parent.getTPointY());    // - ((double)(verticalA / 2) * panel.getHeight()));
-
+		int x = (int) (mSubject.getGeometry().getOffset().getX());
+		int y = (int) (mSubject.getGeometry().getOffset().getY());
+		if (parent != null)
+		{
+			x += parent.getTPointX();    // - ((double)(horizontalA / 2) * panel.getWidth()));
+			y += parent.getTPointY();    // - ((double)(verticalA / 2) * panel.getHeight()));
+		}	
 		panel.setLocation(x, y);
 		/*
 		shadowPanel.setLocation(x+2, y+2);
@@ -175,7 +182,14 @@ public class EditorLabelGroup
 
 	public void setPosition(double x, double y)
 	{
-		mSubject.getGeometry().setOffset(new Point2D.Double(x - (int) parent.getTPointX(), y - (int) parent.getTPointY()));
+		if (parent != null)
+		{
+			mSubject.getGeometry().setOffset(new Point2D.Double(x - (int) parent.getTPointX(), y - (int) parent.getTPointY()));
+		}
+		else
+		{
+			mSubject.getGeometry().setOffset(new Point2D.Double(x, y));
+		}
 	}
 
     public Point2D getPosition()
@@ -326,15 +340,22 @@ public class EditorLabelGroup
 		    selectedLabel = -1;
 		}
 	}
-
+	
 	public EditorLabelGroup(EditorEdge par, final EditorSurface e)
 	{
+		this(par.getSubject().getLabelBlock(), e);
+		parent = par;
+	}
+
+	public EditorLabelGroup(LabelBlockSubject label, final EditorSurface e)
+	{
+		
 		// This is a labelgroup
 		type = LABELGROUP;
 
-		mSubject = par.getSubject().getLabelBlock();
+		mSubject = label;
 		mSubject.addModelObserver(this);
-		parent = par;
+		
 		panel = new JPanel();
 		/*
 		shadowPanel = new JPanel();
@@ -463,7 +484,7 @@ public class EditorLabelGroup
 
 	//#######################################################################
 	//# Data Members
-	private final EditorEdge parent;
+	private EditorEdge parent = null;
 	private LabelBlockSubject mSubject;
 	private int verticalA = 1;
 	private int horizontalA = 1;
