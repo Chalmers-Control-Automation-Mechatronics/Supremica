@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorToolbar
 //###########################################################################
-//# $Id: EditorToolbar.java,v 1.9 2005-12-12 20:23:14 siw4 Exp $
+//# $Id: EditorToolbar.java,v 1.10 2005-12-13 01:10:15 siw4 Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -12,6 +12,12 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.Border;
+import java.util.List;
+import java.util.ArrayList;
+
+import net.sourceforge.waters.gui.observer.Observer;
+import net.sourceforge.waters.gui.observer.EditorChangedEvent;
+import net.sourceforge.waters.gui.observer.ToolbarChangedEvent;
 
 /** The primary editor toolbar.
  * The toolbar sits to the left of the editor window and allows for tool selections.
@@ -29,7 +35,7 @@ public class EditorToolbar
 	private ToolButtonListener mLastSelected;
 	//private static final Color SELECTIONCOLOR = new Color(255, 200, 240);
 	private static final Color SELECTIONCOLOR = new Color(255, 0, 240);
-
+	private List<Observer> mObservers = new ArrayList<Observer>();
 	//#########################################################################
 	//# Constructors
 	public EditorToolbar()
@@ -121,6 +127,7 @@ public class EditorToolbar
 		//# Interface java.awt.event.ActionListener
 		public void actionPerformed(final ActionEvent event)
 		{
+			fireEditorChangedEvent(new ToolbarChangedEvent());
 			mLastSelected.showButton();
 			showButton();
 			mLastSelected = this;
@@ -138,4 +145,22 @@ public class EditorToolbar
     {
 		return mGroup.getSelection().getActionCommand();
     }
+	
+	public void attach(Observer o)
+	{
+		mObservers.add(o);
+	}
+	
+	public void detach(Observer o)
+	{
+		mObservers.remove(o);
+	}
+	
+	public void fireEditorChangedEvent(EditorChangedEvent e)
+	{
+		for (Observer o : mObservers)
+		{
+			o.update(e);
+		}
+	}
 }

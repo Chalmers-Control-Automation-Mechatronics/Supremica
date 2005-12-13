@@ -8,15 +8,21 @@ import org.supremica.gui.ide.actions.IDEAction;
 import org.supremica.log.*;
 import net.sourceforge.waters.gui.ControlledToolbar;
 
+import net.sourceforge.waters.gui.observer.Observer;
+import net.sourceforge.waters.gui.observer.EditorChangedEvent;
+import net.sourceforge.waters.gui.observer.ToolbarChangedEvent;
+
 public class IDEToolBar
 	extends JToolBar
-        implements ControlledToolbar
+    implements ControlledToolbar
 {
 	private static Logger logger = LoggerFactory.createLogger(IDEToolBar.class);
 	private static final Insets theInsets = new Insets(0, 0, 0, 0);
     // note do this nicer
     private String command = "";
 
+	private List<Observer> mObservers = new ArrayList<Observer>();
+	
 	private List collection = new LinkedList();
 
 	private IDE ide;
@@ -104,13 +110,32 @@ public class IDEToolBar
 		return collection.size();
 	}
     
-        public String getCommand()
-        {
+    public String getCommand()
+    {
 	    return command;
 	}
     
-        public void setCommand(String c)
-        {
+    public void setCommand(String c)
+    {		
 	    command = c;
+		fireEditorChangedEvent(new ToolbarChangedEvent());
+	}
+	
+		public void attach(Observer o)
+	{
+		mObservers.add(o);
+	}
+	
+	public void detach(Observer o)
+	{
+		mObservers.remove(o);
+	}
+	
+	public void fireEditorChangedEvent(EditorChangedEvent e)
+	{
+		for (Observer o : mObservers)
+		{
+			o.update(e);
+		}
 	}
 }
