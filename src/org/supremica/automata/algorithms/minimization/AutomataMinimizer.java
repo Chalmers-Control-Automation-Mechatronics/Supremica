@@ -284,20 +284,22 @@ public class AutomataMinimizer
 	}
 
 	/**
-	 * Returns the next Automata that is predicted to be the best one to do minimization on next.
+	 * Returns the next Automata that is predicted to be the best one
+	 * to do minimization on next and the Alphabet of events that can
+	 * be hidden.
 	 */
 	private MinimizationTask getNextMinimizationTask()
 	{
 		Automata result;
 		Alphabet hideThese;
 
+		// Target alphabet
+		Alphabet targetAlphabet = options.getTargetAlphabet();
+
 		// Which strategy should be used to select the next task?
 		MinimizationStrategy strategy = options.getMinimizationStrategy();
 		if (strategy == MinimizationStrategy.AtLeastOneUnique)
 		{
-			// Target alphabet
-			Alphabet targetAlphabet = options.getTargetAlphabet();
-
 			// The result so far
 			result = null;
 
@@ -323,8 +325,9 @@ public class AutomataMinimizer
 				Automata automata = eventToAutomataMap.get(event);
 
 				// Find the best one of the sets!
-				int thisValue = 1;
+				int thisValue = automata.size();
 				/*
+				int thisValue = 1;
 				// Predict the size of the composition (worst case prediction)
 				for (Iterator<Automaton> it = automata.iterator(); it.hasNext(); )
 				{
@@ -332,8 +335,6 @@ public class AutomataMinimizer
 					thisValue = thisValue * aut.nbrOfStates();
 				}
 				*/
-				// Just choose the smallest set
-				thisValue = automata.size();
 
 				// Best one yet?
 				if ((result == null) || (thisValue < bestValue))
@@ -355,6 +356,7 @@ public class AutomataMinimizer
 			{
 				// Which events should be hidden?
 				hideThese = getUniqueEvents(result);
+				hideThese.minus(targetAlphabet);
 			}
 			else
 			{
@@ -450,33 +452,7 @@ public class AutomataMinimizer
 				candidate.addAutomaton(autA);
 				candidate.addAutomaton(autB);
 				Alphabet uniqueEvents = getUniqueEvents(candidate);
-				/*
-				// First find the union of the alphabets
-				Alphabet uniqueEvents = AlphabetHelpers.union(alphaA, alphaB);
-				// The targetAlphabet should not be removed (although those events may be "unique")!
-				uniqueEvents.minus(options.getTargetAlphabet());
-				// Remove events that are present in other automata
-				for (int j=0; j<theAutomata.size(); j++)
-				{
-					Automaton autC = theAutomata.getAutomatonAt(j);
-					Alphabet alphaC = autC.getAlphabet();
-
-					// Skip autB and autA since we iterate from 1 instead of 0)
-					if ((i == j) || (autA == autC))
-					{
-						continue;
-					}
-
-					// Remove the events that are present in C, they are not unique to A and B.
-					uniqueEvents.minus(alphaC);
-
-					// Early termination
-					if (uniqueEvents.size() == 0)
-					{
-						break;
-					}
-				}
-				*/
+				uniqueEvents.minus(targetAlphabet); // Ignore events from targetAlphabet!
 
 				// Find ratios
 				int nbrOfUniqueEvents = uniqueEvents.size();
@@ -529,7 +505,12 @@ public class AutomataMinimizer
 		}
 
 		// Remember that we should never hide the events in options.getTargetAlphabet()!!!
-		assert(AlphabetHelpers.intersect(hideThese, options.getTargetAlphabet()).size() == 0);
+		if (!(hideThese.nbrOfCommonEvents(targetAlphabet) == 0))
+		{
+			logger.info(hideThese + " RESP " + targetAlphabet);
+		}
+
+		assert(hideThese.nbrOfCommonEvents(targetAlphabet) == 0);
 
 		// Return result
 		return new MinimizationTask(result, hideThese);
@@ -544,7 +525,7 @@ public class AutomataMinimizer
 		Alphabet unique = autA.getUnionAlphabet();
 		// Which aren't unique?
 		Alphabet toBeRemoved = new Alphabet();
-		for (Iterator<LabeledEvent> it = unique.iterator(); it.hasNext(); )
+		loop: for (Iterator<LabeledEvent> it = unique.iterator(); it.hasNext(); )
 		{
 			LabeledEvent event = it.next();
 			Automata sharers = eventToAutomataMap.get(event);
@@ -553,23 +534,25 @@ public class AutomataMinimizer
 			if (event.isEpsilon())
 			{
 				toBeRemoved.addEvent(event);
-				continue;
+				continue loop;
 			}
 
-			// If there are more sharers than there are automata in autA... then something is fishy!
+			// If there are more sharers than there are automata in
+			// autA... then this event is not unique here
 			if (sharers.size() > autA.size())
 			{
 				toBeRemoved.addEvent(event);
-				continue;
+				continue loop;
 			}
 
 			for (Iterator<Automaton> autIt = sharers.iterator(); autIt.hasNext(); )
 			{
-				// If there is an automaton here that is not in autA, this event is not unique to autA...
+				// If there is an automaton here that is not in autA,
+				// this event is not unique to autA...
 				if (!autA.containsAutomaton(autIt.next()))
 				{
 					toBeRemoved.addEvent(event);
-					break;
+					continue loop;
 				}
 			}
 		}

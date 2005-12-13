@@ -53,8 +53,6 @@ import java.util.*;
 import org.supremica.log.*;
 
 /**
- * Similar to Events, but allows for the fast lookup of an event based on the id.
- *
  * Important note:
  * If an event label is changed after it is inserted in
  * an Events object, then rehash must be called otherwise
