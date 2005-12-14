@@ -184,6 +184,7 @@ public class AutomatonSplit
 				{
 					// Removing the event didn't make a difference!
 					result = reduction;
+					break;
 				}
 				// Toolkit.getDefaultToolkit().beep();
 			}

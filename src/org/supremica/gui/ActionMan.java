@@ -2668,11 +2668,9 @@ public class ActionMan
 	 * This is a part of a project in a course in Evolutionary Computation, FFR105 (2002) at
 	 * Chalmers University of Technology.
 	 *
-	 * To use this you have to set a boolean in GeneticAlgorithms.java.
-	 *
 	 * Writes 16 columns of data and a correct value on each line of an output file
 	 */
-	public static void evoCompSynchTable(Gui gui, boolean append)
+	public static void evoCompSynchTable(boolean append)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
 
@@ -2746,7 +2744,7 @@ public class ActionMan
 		}
 	}
 
-	public static void evoCompPredictSize(Gui gui)
+	public static void evoCompPredictSize()
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
 
@@ -2754,25 +2752,17 @@ public class ActionMan
 		{
 			return;
 		}
+		else if (selectedAutomata.size() != 2)
+		{
+			JOptionPane.showMessageDialog(gui.getComponent(), "Exactly two automata must be selected.", "Info", JOptionPane.INFORMATION_MESSAGE);	
+			return;
+		}
 
 		double predictedSize = GeneticAlgorithms.predictSynchronizationSize(selectedAutomata);
 
 		if (predictedSize > 0.0)
 		{
-			double[] data;
-
-			if (selectedAutomata.size() == 2)
-			{
-				data = GeneticAlgorithms.extractData(selectedAutomata.getAutomatonAt(0), selectedAutomata.getAutomatonAt(1));
-			}
-			else if (selectedAutomata.size() == 1)
-			{
-				data = GeneticAlgorithms.extractData(selectedAutomata.getAutomatonAt(0), selectedAutomata.getAutomatonAt(0));
-			}
-			else
-			{
-				return;
-			}
+			double[] data = GeneticAlgorithms.extractData(selectedAutomata.getAutomatonAt(0), selectedAutomata.getAutomatonAt(1));
 
 			int realSize = GeneticAlgorithms.calculateSynchronizationSize(selectedAutomata);
 			int worstSize = (int) (data[0] * data[1]);
@@ -3997,29 +3987,6 @@ public class ActionMan
 			logger.debug(ex.getStackTrace());
 
 			return;
-		}
-	}
-
-	/**
-	 * Simplify the Supremica project.
-	 */
-	public static void simplifyProject()
-	{
-		try
-		{
-			Project all = gui.getVisualProjectContainer().getActiveProject();
-			Automata new_ = AutomataSimplifier.simplify(all);
-
-			// clear the current automata
-			gui.getVisualProjectContainer().getActiveProject().clear();
-			gui.clearSelection();
-
-			// insert the new project
-			gui.addAutomata(new_);
-		}
-		catch (Exception ex)
-		{
-			logger.error(ex);
 		}
 	}
 

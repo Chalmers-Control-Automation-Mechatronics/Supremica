@@ -102,8 +102,6 @@ public final class SupremicaProperties
 	private static final String GENERAL_LOOKANDFEEL = "generalLookAndFeel";
 //	private static final String GENERAL_USE_SWT = "generalUseSWT";
 
-	//private static final String GENERAL_INCLUDE_ANIMATIONS = "generalIncludeAnimations";
-
 	// WHAT IS RCP!?!?!???! IS THAT INTUITIVELY CLEAR OR HAD IT BEEN A GOOD IDEA TO WRITE
 	// AN ENLIGHTENING COMMENT??!! Grrrrrrr...
 	private static final String GENERAL_USE_RCP = "generalUseRcp";
@@ -218,9 +216,6 @@ public final class SupremicaProperties
 
 
 	// Junk
-	private static final String SHOW_ROBOTSTUDIO_LINK = "showRobotstudioLink"; // Hugo's old stuff
-	private static final String SHOW_COORDINATION_ABB = "showCoordinationABB"; // Domenico's stuff
-	private static final String GENERAL_USE_ROBOTCOORDINATION_ABB = "generalUseRobotCoordinationABB";
 	private static final String SHOW_GENETIC_ALGORITHMS = "showGeneticAlgorithms";
 
 	// What's this for?
@@ -272,11 +267,8 @@ public final class SupremicaProperties
 		setProperty(GENERAL_LOOKANDFEEL, "System", true);
 //		setProperty(GENERAL_USE_SWT, "false", false);
 
-		//setProperty(GENERAL_INCLUDE_ANIMATIONS, "false", true);
 		setProperty(GENERAL_USE_RCP, "false", true);
 		setProperty(GENERAL_USE_RCP, "false", true);
-		setProperty(GENERAL_USE_ROBOTCOORDINATION, "false", true);
-		setProperty(GENERAL_USE_ROBOTCOORDINATION_ABB, "false", true);
 		setProperty(INCLUDE_EDITOR, "false", true);
 		setProperty(INCLUDE_SHOE_FACTORY, "false", true);
 		setProperty(INCLUDE_SOFTPLC, "false", true);
@@ -288,6 +280,8 @@ public final class SupremicaProperties
 		setProperty(LOG_TO_CONSOLE, "false", true);
 		setProperty(LOG_TO_GUI, "false", true);
 		setProperty(ALLOW_SUPERUSER_LOGIN, "true", false);
+		// Robot Coordination
+		setProperty(GENERAL_USE_ROBOTCOORDINATION, "false", true);
 		// General
 		setProperty(GENERAL_STATE_SEPARATOR, ".", true);
 		// Synchronization
@@ -319,16 +313,14 @@ public final class SupremicaProperties
 		setProperty(MINIMIZATION_KEEP_ORIGINAL, "true", true);
 		setProperty(MINIMIZATION_IGNORE_MARKING, "false", true);
 		setProperty(MINIMIZATION_STRATEGY, MinimizationStrategy.FewestTransitionsFirst.toString(), true);
-		// Simulation stuff
+		// Simulation
+		setProperty(INCLUDE_ANIMATOR, "false", true);
 		setProperty(SIMULATION_IS_EXTERNAL, "false", false);
 		setProperty(SIMULATION_CYCLE_TIME, "100", false);
 		// The rest (move to where it belongs if you know where that is!!!)
 		setProperty(GENERAL_USE_SECURITY, "false", false);
-		setProperty(INCLUDE_ANIMATOR, "false", true);
 		setProperty(INCLUDE_USERINTERFACE, "false", true);
 		setProperty(SOFTPLC_CYCLE_TIME, "40", true);
-		setProperty(SHOW_ROBOTSTUDIO_LINK, "false", true);
-		setProperty(SHOW_COORDINATION_ABB, "false", true);
 		//setProperty(FB_RUNTIME_LIBRARY_PATH, "", true);
 
 		softplcInterfaces.add(new org.supremica.gui.SoftplcInterface("org.supremica.softplc.Simulator.BTSim"));
@@ -1468,26 +1460,6 @@ public final class SupremicaProperties
 	public static boolean showGeneticAlgorithms()
 	{
 		return toBoolean(wp.getProperty(SHOW_GENETIC_ALGORITHMS));
-	}
-
-	public static boolean showRobotstudioLink()
-	{
-		return toBoolean(wp.getProperty(SHOW_ROBOTSTUDIO_LINK));
-	}
-
-	public static void setShowRobotstudioLink(boolean show)
-	{
-		wp.setProperty(SHOW_ROBOTSTUDIO_LINK, toString(show));
-	}
-
-	public static boolean showCoordinationABB()
-	{
-		return toBoolean(wp.getProperty(SHOW_COORDINATION_ABB));
-	}
-
-	public static void setShowCoordinationABB(boolean show)
-	{
-		wp.setProperty(SHOW_COORDINATION_ABB, toString(show));
 	}
 
 	private static String toString(boolean b)

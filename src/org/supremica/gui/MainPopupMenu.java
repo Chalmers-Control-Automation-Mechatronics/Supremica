@@ -348,33 +348,21 @@ class MainPopupMenu
 			JMenu expMenu = new JMenu("Experimental algorithms");
 			menuHandler.add(expMenu, 1);
 
-			/* Strictly EXPERIMENTAL -- removed, of no use any longer(?) //MF
-			JMenuItem automatonDiminisher = new SupremicaMenuItem(new DiminishAction());
-			expMenu.add(automatonDiminisher);
-
-			JMenuItem automatonDeterminizer = new SupremicaMenuItem(new MakeDeterministicAction());
-			expMenu.add(automatonDeterminizer);
-			*/
 			expMenu.add(new SupremicaMenuItem(new SaturateAction()));
+			expMenu.add(new SupremicaMenuItem(new BuildObserverAction()));
+			expMenu.add(new SupremicaMenuItem(new SplitAction()));
 
-			JMenuItem automatonBuildObserver = new SupremicaMenuItem(new BuildObserverAction());
-			expMenu.add(automatonBuildObserver);
-
-			JMenuItem automatonSplit = new SupremicaMenuItem(new SplitAction());
-			expMenu.add(automatonSplit);
-
-			// De följande två Schedule-knapparna borde bli till en inom en viss (snar?) framtid
 			expMenu.addSeparator();
 
-			JMenuItem automataScheduler = new SupremicaMenuItem(new ScheduleAction());
-			expMenu.add(automataScheduler);
+			expMenu.add(new SupremicaMenuItem(new ScheduleAction()));
 			
-			JMenuItem mMd, mMmc, mSp;
+			JMenuItem mMd, mMmc, predictCompositionSize;
 
 			expMenu.addSeparator();
-			expMenu.add(mMd = new JMenuItem("Mark dependency set"));
-			expMenu.add(mMmc = new JMenuItem("Mark maximal component"));
-			expMenu.add(mSp = new JMenuItem("Simplify Project"));
+			expMenu.add(mMd = new JMenuItem("Select dependency set"));
+			expMenu.add(mMmc = new JMenuItem("Select maximal component"));
+			expMenu.add(predictCompositionSize = new JMenuItem("Predict composition size"));
+			mMd.setToolTipText("Select the automata that share events with the currently selected automata");
 			mMd.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
@@ -382,6 +370,7 @@ class MainPopupMenu
 					ActionMan.markDependencySet();
 				}
 			});
+			mMmc.setToolTipText("Selects all automata that are directly or indirectly connected to the selected automata");
 			mMmc.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
@@ -389,11 +378,12 @@ class MainPopupMenu
 					ActionMan.markMaximalComponent();
 				}
 			});
-			mSp.addActionListener(new ActionListener()
+			predictCompositionSize.setToolTipText("Predicts the size of the composition of the (two) selected automata");
+			predictCompositionSize.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
 				{
-					ActionMan.simplifyProject();
+					ActionMan.evoCompPredictSize();
 				}
 			});
 
@@ -402,9 +392,6 @@ class MainPopupMenu
 
 			expMenu.addSeparator();
 			expMenu.add(miR = new JMenuItem("BDD/Reachability"));
-			expMenu.add(miCR = new JMenuItem("BDD/CoReachability"));
-			expMenu.add(miXXX = new JMenuItem("BDD/UnderConstructionAlgo"));
-			expMenu.addSeparator();
 			miR.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
@@ -412,6 +399,7 @@ class MainPopupMenu
 					ActionMan.DoBDDReachability();
 				}
 			});
+			expMenu.add(miCR = new JMenuItem("BDD/CoReachability"));
 			miCR.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
@@ -419,6 +407,8 @@ class MainPopupMenu
 					ActionMan.DoBDDCoReachability();
 				}
 			});
+			/*
+			expMenu.add(miXXX = new JMenuItem("BDD/UnderConstructionAlgo"));
 			miXXX.addActionListener(new ActionListener()
 				{
 					public void actionPerformed(ActionEvent e)
@@ -426,6 +416,8 @@ class MainPopupMenu
 						ActionMan.DoBDDUnderConstruction();
 					}
 			});
+			*/
+			expMenu.addSeparator();
 		}
 
 		// ------------------------------------------------------------------

@@ -1213,7 +1213,7 @@ public class MainMenuBar
 		{
 		    public void actionPerformed(ActionEvent e)
 		    {
-			ActionMan.evoCompSynchTable(ActionMan.getGui(), false);
+				ActionMan.evoCompSynchTable(false);
 		    }
 		});
 
@@ -1226,7 +1226,7 @@ public class MainMenuBar
 		{
 		    public void actionPerformed(ActionEvent e)
 		    {
-			ActionMan.evoCompPredictSize(ActionMan.getGui());
+				ActionMan.evoCompPredictSize();
 		    }
 		});
 	}
