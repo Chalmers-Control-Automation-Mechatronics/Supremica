@@ -58,10 +58,15 @@ public class FBRuntime
 
     public static void main(String[] args)
     {
-
+                System.out.println("Number of args: " + args.length);
+                for(int i = 0; i < args.length; i++)
+                {
+                     System.out.println("  arg[" + i + "]: " + args[i] );
+                }
+                
 		String systemFileName = null;
 		String libraryPathBase = null;
-		String libraryPath = null;
+		String libraryPath = "";
 
 		if (args.length == 1)
  		{
@@ -79,15 +84,18 @@ public class FBRuntime
 				libraryPathBase = args[1];
 			}
  		}
- 		else if (args.length == 3)
+ 		else if (args.length >= 3)
  		{
 			systemFileName = args[0];
  			libraryPathBase = args[1];
- 			libraryPath = args[2];
+                        for(int i = 2; i < args.length; i++)
+                        {
+                            libraryPath = libraryPath + File.pathSeparator + args[i];
+                        }   
  		}
 		else
 		{
-			System.err.println("Usage: FBRuntime file.sys [libraryPathBase] [libraryPath]");
+			System.err.println("Usage: FBRuntime file.sys [libraryPathBase] [libraryPathDirectory]...");
 			return;
 		}
 

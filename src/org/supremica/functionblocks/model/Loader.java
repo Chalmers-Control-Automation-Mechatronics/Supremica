@@ -74,9 +74,9 @@ public class Loader
 {
     private Device device;
     private Resource resource;
-	private FBNetwork fbNetwork;
+    private FBNetwork fbNetwork;
 
-	private List libraryPathList = new LinkedList();
+    private List libraryPathList = new LinkedList();
 
     private JAXBContext context;
     private Unmarshaller unmarshaller;
