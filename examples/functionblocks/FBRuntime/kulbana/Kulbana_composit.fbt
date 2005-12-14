@@ -126,7 +126,7 @@
 
 	<DataConnections>
 
-	  <Connection Source="200" Destination="cycle.DT" />
+	  <Connection Source="500" Destination="cycle.DT" />
 
 	  <!-- Portvakt signals -->	
 	  <Connection Source="adlink.INPUT0" Destination="pv.KulaPortvakt_sig" />
