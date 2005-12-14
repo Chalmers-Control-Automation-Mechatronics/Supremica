@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="emptyedge" xmlns="http://waters.sourceforge.net/xsd/module">
+<ComponentList>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="comp"/>
+<Graph Deterministic="true">
+<NodeList>
+<SimpleNode Initial="true" Name="s0"/>
+</NodeList>
+<EdgeList>
+<Edge Source="s0" Target="s0"/>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</Module>
+

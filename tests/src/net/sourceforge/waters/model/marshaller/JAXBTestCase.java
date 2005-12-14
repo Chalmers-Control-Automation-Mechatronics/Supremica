@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBTestCase
 //###########################################################################
-//# $Id: JAXBTestCase.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: JAXBTestCase.java,v 1.3 2005-12-14 13:13:16 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -120,7 +120,7 @@ public abstract class JAXBTestCase<D extends DocumentProxy>
     return proxy1;
   }
 
-  protected void testHandcraft(final D handcrafted)
+  protected void testHandcraft(final String subdirname, final D handcrafted)
     throws Exception
   {
     checkIntegrity(handcrafted);
@@ -128,18 +128,28 @@ public abstract class JAXBTestCase<D extends DocumentProxy>
     final ProxyUnmarshaller<D> unmarshaller = getProxyUnmarshaller();
     final String name = handcrafted.getName();
     final String extname = name + unmarshaller.getDefaultExtension();
-    final File infilename = new File(getInputDirectory(), extname);
+    final File fullindir = new File(getInputDirectory(), subdirname);
+    final File infilename = new File(fullindir, extname);
     final File outfilename = new File(getOutputDirectory(), extname);
     marshaller.marshal(handcrafted, outfilename);
-    final D parsed = unmarshaller.unmarshal(infilename);
+    final D parsed1 = unmarshaller.unmarshal(outfilename);
+    assertTrue("Constructed structure differs from parsed-back!",
+               handcrafted.equals(parsed1));
+    assertTrue("Constructed structure differs from parsed-back!",
+               parsed1.equals(handcrafted));
+    assertTrue("Constructed geometry info differs from parsed-back!",
+               handcrafted.equalsWithGeometry(parsed1));
+    assertTrue("Constructed geometry info differs from parsed-back!",
+               parsed1.equalsWithGeometry(handcrafted));
+    final D parsed2 = unmarshaller.unmarshal(infilename);
     assertTrue("Constructed structure differs from expected in file!",
-               handcrafted.equals(parsed));
+               handcrafted.equals(parsed2));
     assertTrue("Constructed structure differs from expected in file!",
-               parsed.equals(handcrafted));
+               parsed2.equals(handcrafted));
     assertTrue("Constructed geometry info differs from expected in file!",
-               handcrafted.equalsWithGeometry(parsed));
+               handcrafted.equalsWithGeometry(parsed2));
     assertTrue("Constructed geometry info differs from expected in file!",
-               parsed.equalsWithGeometry(handcrafted));
+               parsed2.equalsWithGeometry(handcrafted));
   }
 
   protected D testClone(final String name)

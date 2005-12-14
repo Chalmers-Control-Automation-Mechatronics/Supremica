@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBModuleExporter
 //###########################################################################
-//# $Id: JAXBModuleExporter.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: JAXBModuleExporter.java,v 1.3 2005-12-14 13:13:15 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -207,6 +207,19 @@ public class JAXBModuleExporter
     try {
       final EdgeType element = mFactory.createEdge();
       copyEdgeProxy(proxy, element);
+      return element;
+    } catch (final JAXBException exception) {
+      throw wrap(exception);
+    }
+  }
+
+  public PointGeometryType visitEndPointGeometryProxy
+      (final PointGeometryProxy proxy)
+    throws VisitorException
+  {
+    try {
+      final PointGeometryType element = mFactory.createEndPointGeometry();
+      copyPointGeometryProxy(proxy, element);
       return element;
     } catch (final JAXBException exception) {
       throw wrap(exception);
@@ -576,6 +589,19 @@ public class JAXBModuleExporter
     }
   }
 
+  public PointGeometryType visitStartPointGeometryProxy
+      (final PointGeometryProxy proxy)
+    throws VisitorException
+  {
+    try {
+      final PointGeometryType element = mFactory.createStartPointGeometry();
+      copyPointGeometryProxy(proxy, element);
+      return element;
+    } catch (final JAXBException exception) {
+      throw wrap(exception);
+    }
+  }
+
   public UnaryExpressionType visitUnaryExpressionProxy
       (final UnaryExpressionProxy proxy)
     throws VisitorException
@@ -685,9 +711,11 @@ public class JAXBModuleExporter
     final NodeProxy targetProxy = proxy.getTarget();
     element.setTarget(targetProxy.getName());
     final LabelBlockProxy labelBlockProxy = proxy.getLabelBlock();
-    final LabelBlockType labelBlockElement =
-      visitLabelBlockProxy(labelBlockProxy);
-    element.setLabelBlock(labelBlockElement);
+    if (!labelBlockProxy.getEventList().isEmpty()) {
+      final LabelBlockType labelBlockElement =
+        visitLabelBlockProxy(labelBlockProxy);
+      element.setLabelBlock(labelBlockElement);
+    }
     final SplineGeometryProxy geometryProxy = proxy.getGeometry();
     if (geometryProxy != null) {
       final SplineGeometryType geometryElement =
@@ -697,13 +725,13 @@ public class JAXBModuleExporter
     final PointGeometryProxy startPointProxy = proxy.getStartPoint();
     if (startPointProxy != null) {
       final PointGeometryType startPointElement =
-        visitPointGeometryProxy(startPointProxy);
+        visitStartPointGeometryProxy(startPointProxy);
       element.setStartPointGeometry(startPointElement);
     }
     final PointGeometryProxy endPointProxy = proxy.getEndPoint();
     if (endPointProxy != null) {
       final PointGeometryType endPointElement =
-        visitPointGeometryProxy(endPointProxy);
+        visitEndPointGeometryProxy(endPointProxy);
       element.setEndPointGeometry(endPointElement);
     }
   }
