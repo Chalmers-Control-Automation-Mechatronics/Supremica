@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.38 2005-12-13 02:23:23 siw4 Exp $
+//# $Id: EditorSurface.java,v 1.39 2005-12-14 03:09:47 siw4 Exp $
 //###########################################################################
 
 
@@ -28,6 +28,8 @@ import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.subject.base.AbstractSubject;
+import net.sourceforge.waters.subject.base.ModelChangeEvent;
+import net.sourceforge.waters.subject.base.ModelObserver;
 import net.sourceforge.waters.subject.module.*;
 import net.sourceforge.waters.xsd.module.AnchorPosition;
 
@@ -46,7 +48,8 @@ import net.sourceforge.waters.xsd.module.AnchorPosition;
 
 public class EditorSurface
 	extends JComponent
-	implements Printable
+	implements Printable,
+			   ModelObserver
 {
 	protected boolean showGrid = true;
 	protected EditorWindowInterface root;
@@ -69,6 +72,11 @@ public class EditorSurface
 	protected GraphSubject graph;
     protected EditorNodeGroup newGroup = null;
 	private Rectangle drawnAreaBounds = null;
+	
+	public void modelChanged(ModelChangeEvent e)
+	{
+		repaint();
+	}
 	
 	public GraphProxy getGraph()
 	{
@@ -915,7 +923,12 @@ public class EditorSurface
 			SimpleComponentSubject cp = (SimpleComponentSubject) element;
 			ArrayList noGeometry = new ArrayList();
 
+			if (graph != null)
+			{
+				graph.removeModelObserver(this);
+			}
 			graph = cp.getGraph();
+			graph.addModelObserver(this);
 			
 			events.add(new EditorLabelGroup(graph.getBlockedEvents(), this));
 
@@ -1470,6 +1483,7 @@ public class EditorSurface
 	// TODO: This should take a ModuleSubject as a parameter
 	public EditorSurface()
 	{
+		
 		nodes = new ArrayList();
 		nodeGroups = new ArrayList();
 		edges = new ArrayList();

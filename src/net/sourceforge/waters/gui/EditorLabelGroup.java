@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorLabelGroup
 //###########################################################################
-//# $Id: EditorLabelGroup.java,v 1.15 2005-12-13 02:23:23 siw4 Exp $
+//# $Id: EditorLabelGroup.java,v 1.16 2005-12-14 03:09:47 siw4 Exp $
 //###########################################################################
 
 
@@ -382,7 +382,7 @@ public class EditorLabelGroup
 		horizontalA = LEFT;
 
 		setAnchor(mSubject.getGeometry().getAnchor().getValue());
-
+		panel.removeAll();
 		for (final Proxy proxy : mSubject.getEventList())
 		{
 			final String text = proxy.toString();

@@ -121,7 +121,8 @@ public class SpringEmbedder
 		private final Map<Proxy, Point2D.Double> mPositions;
 		static public double EDGEATTRACTION = .005;
 	    static public double SPRINGCONSTANT = .005;
-		static public double REPULSIONCONST = 10;
+		static public double REPULSIONCONST = 40;
+		static public double REPULSIONCONST2 = 10;
 		static public double EDGEREPULSE = 1;
 		
 		private int nodes = 0;
@@ -246,7 +247,19 @@ public class SpringEmbedder
 				{
 					p = repulsion(mPositions.get(edge),
 								  mPositions.get(e),
-								  EDGEREPULSE);
+								  REPULSIONCONST2);
+					dx += p.getX();
+					dy += p.getY();
+				}
+			}
+			for (NodeProxy n : mGraph.getNodes())
+			{
+				if (n instanceof SimpleNodeProxy)
+				{
+					SimpleNodeProxy node = (SimpleNodeProxy)n;
+					p = repulsion(mPositions.get(edge),
+										  mPositions.get(node),
+										  EDGEREPULSE);
 					dx += p.getX();
 					dy += p.getY();
 				}

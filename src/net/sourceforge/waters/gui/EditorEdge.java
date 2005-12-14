@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorEdge
 //###########################################################################
-//# $Id: EditorEdge.java,v 1.32 2005-12-07 02:15:16 siw4 Exp $
+//# $Id: EditorEdge.java,v 1.33 2005-12-14 03:09:47 siw4 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -369,42 +369,7 @@ public class EditorEdge
 
 		if (ox != -1)
 		{
-			double nx = getStartPoint().getX() - endNode.getX();
-			double ny = getStartPoint().getY() - endNode.getY();
-			double tx = getPosition().getX() - endNode.getX();
-			double ty = getPosition().getY() - endNode.getY();
-
-			ox -= endNode.getX();
-			oy -= endNode.getY();
-
-			if (ox * nx < 0)
-			{
-				ox = ox * -1;
-				tx = tx * -1;
-			}
-
-			if (oy * ny < 0)
-			{
-				oy = oy * -1;
-				ty = ty * -1;
-			}
-
-			if (ox == 0)
-			{
-				ox = 1;
-			}
-
-			if (oy == 0)
-			{
-				oy = 1;
-			}
-
-			double a = (nx - ox) / oy;
-			double b = (ny - oy) / ox;
-			double dx = tx + a * ty;
-			double dy = b * tx + ty;
-
-			setPosition(dx + endNode.getX(), dy + endNode.getY());
+			updateControlPoint(ox, oy, true);
 		}
 		else if (isSelfLoop())
 		{
@@ -1017,6 +982,14 @@ public class EditorEdge
 		return new QuadCurve2D.Double(getStartPoint().getX(), getStartPoint().getY(), 
  									  getCPointX(), getCPointY(), 
 									  endNode.getX(), endNode.getY());
+	}
+	
+	public void setSelected(boolean s)
+	{
+		super.setSelected(s);
+		System.out.println(getStartPoint());
+		System.out.println(subject.getStartPoint().getPoint());
+		System.out.println(subject.getEndPoint().getPoint());
 	}
 	
 	public void drawObject(Graphics g)

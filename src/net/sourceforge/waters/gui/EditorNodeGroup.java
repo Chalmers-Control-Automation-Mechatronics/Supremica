@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorNodeGroup
 //###########################################################################
-//# $Id: EditorNodeGroup.java,v 1.16 2005-12-07 01:08:46 siw4 Exp $
+//# $Id: EditorNodeGroup.java,v 1.17 2005-12-14 03:09:47 siw4 Exp $
 //###########################################################################
 
 
@@ -138,6 +138,8 @@ public class EditorNodeGroup
 
 	public Point2D setOnBounds(double x, double y)
 	{
+		System.out.println("start");
+		System.out.println(x + "," + y);
 		Rectangle2D[] corners = getCorners();
 		Line2D.Double closest = new Line2D.Double(corners[0].getCenterX(), corners[0].getCenterY(),
 							  corners[3].getCenterX(), corners[3].getCenterY());
@@ -152,14 +154,26 @@ public class EditorNodeGroup
 				closest = l;
 			}
 		}
-
+		System.out.println(closest.getP1());
+		System.out.println(closest.getP2());
 		if (closest.getX1() == closest.getX2())
 		{
 			x = (int) closest.getX1();
-
-			if (closest.ptLineDist(x, y) > .2)
+			int y1;
+			int y2;
+			if (closest.getY1() < closest.getY2())
 			{
-				if (Math.abs(closest.getY1() - y) < (closest.getY2() - y))
+				y1 = (int)closest.getY1();
+				y2 = (int)closest.getY2();
+			}
+			else
+			{
+				y1 = (int)closest.getY2();
+				y2 = (int)closest.getY1();
+			}
+			if (y < y1 || y > y2)
+			{
+				if (Math.abs(closest.getY1() - y) < Math.abs(closest.getY2() - y))
 				{
 					y = (int) closest.getY1();
 				}
@@ -172,10 +186,21 @@ public class EditorNodeGroup
 		else
 		{
 			y = (int) closest.getY1();
-
-			if (closest.ptLineDist(x, y) > .2)
+			int x1;
+			int x2;
+			if (closest.getX1() < closest.getX2())
 			{
-				if (Math.abs(closest.getX1() - x) < (closest.getX2() - x))
+				x1 = (int)closest.getX1();
+				x2 = (int)closest.getX2();
+			}
+			else
+			{
+				x1 = (int)closest.getX2();
+				x2 = (int)closest.getX1();
+			}
+			if (x < x1 || x > x2)
+			{
+				if (Math.abs(closest.getX1() - x) < Math.abs(closest.getX2() - x))
 				{
 					x = (int) closest.getX1();
 				}
@@ -185,7 +210,7 @@ public class EditorNodeGroup
 				}
 			}
 		}
-
+		System.out.println(x + "," + y);
 		return (new Point2D.Double(x, y));
 	}
 

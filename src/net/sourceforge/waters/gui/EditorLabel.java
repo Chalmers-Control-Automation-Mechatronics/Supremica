@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorLabel
 //###########################################################################
-//# $Id: EditorLabel.java,v 1.16 2005-11-03 01:24:15 robi Exp $
+//# $Id: EditorLabel.java,v 1.17 2005-12-14 03:09:47 siw4 Exp $
 //###########################################################################
 
 
@@ -24,6 +24,8 @@ import java.awt.font.*;
 import java.lang.reflect.*;
 import java.beans.*;
 
+import net.sourceforge.waters.subject.base.ModelChangeEvent;
+import net.sourceforge.waters.subject.base.ModelObserver;
 import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.module.LabelGeometrySubject;
 import net.sourceforge.waters.xsd.module.AnchorPosition;
@@ -41,6 +43,7 @@ import net.sourceforge.waters.xsd.module.AnchorPosition;
 
 public class EditorLabel
 	extends EditorObject
+	implements ModelObserver
 {
 
 	/** 
@@ -49,6 +52,12 @@ public class EditorLabel
 	public EditorNode getParent()
 	{
 		return mParent;
+	}
+	
+	public void modelChanged(ModelChangeEvent e)
+	{
+		text.setText(getParent().getName());
+		label.setText(getParent().getName());
 	}
 
 	public void removeFromSurface(EditorSurface e)
@@ -80,6 +89,7 @@ public class EditorLabel
 					text.requestFocus();
 					text.selectAll();
 				}
+				
 			}
 		}
 
@@ -242,6 +252,7 @@ public class EditorLabel
 
 	public EditorLabel(EditorNode par, String t, EditorSurface e)
 	{
+		par.getSubject().addModelObserver(this);
 		// This is a label
 		type = LABEL;
 

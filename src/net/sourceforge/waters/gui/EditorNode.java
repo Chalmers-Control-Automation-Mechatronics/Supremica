@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorNode
 //###########################################################################
-//# $Id: EditorNode.java,v 1.28 2005-12-12 20:23:14 siw4 Exp $
+//# $Id: EditorNode.java,v 1.29 2005-12-14 03:09:47 siw4 Exp $
 //###########################################################################
 
 
@@ -20,6 +20,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.swing.*;
+import javax.swing.undo.UndoableEdit;
+
+import net.sourceforge.waters.gui.command.ChangeNameCommand;
+import net.sourceforge.waters.gui.command.UndoInterface;
 
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.NodeMovedEvent;
@@ -74,6 +78,8 @@ public class EditorNode
 					   final EditorSurface surface,
 					   final Point2D altpos)
 	{
+		mUndo = surface.getEditorInterface().getUndoInterface();
+		
 		// This is a node
 		type = NODE;
 
@@ -169,10 +175,11 @@ public class EditorNode
 		{
 			return false;
 		}
+		UndoableEdit u = new ChangeNameCommand(getName(), n, getSubject()); 
 
 		try
 		{
-			mSubject.setName(n);
+			mSubject.setName(n);			
 		}
 		catch (final DuplicateNameException e)
 		{
@@ -180,7 +187,7 @@ public class EditorNode
 
 			return false;
 		}
-
+		mUndo.addUndoable(u);
 		return true;
 	}
 
@@ -421,6 +428,7 @@ public class EditorNode
 	private final SimpleNodeSubject mSubject;
 	private final Collection<Observer> mObservers = new HashSet<Observer>();
     private final Set<Color> mColors = new HashSet<Color>();
+	private final UndoInterface mUndo;
 	private ModuleSubject mModule;
 	private EditorPropGroup propGroup;
 
