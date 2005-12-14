@@ -46,35 +46,35 @@ import java.util.*;
 
 public class BasicFBInstance extends FBInstance
 {
-
-    private ECState currentECState;
-    private ECAction currentECAction;
-    private Iterator actionsIterator;
-    private int actionsLeft;
-
+	
+	private ECState currentECState;
+	private ECAction currentECAction;
+	private Iterator actionsIterator;
+	private int actionsLeft;
+		
 	private boolean handlingEvent;
 	private boolean queuedInScheduler = false;
-
+		
 	private EventQueue eventInputQueue = new EventQueue();
-
+		
 	//================================================================
-    private BasicFBInstance() {}
+	private BasicFBInstance() {}
 
-    public BasicFBInstance(String n, Resource r, BasicFBType t)
-    {
+	public BasicFBInstance(String n, Resource r, BasicFBType t)
+	{
 		setName(n);
 		resource = r;
 		fbType = t;
 		currentECState = ((BasicFBType) fbType).getECC().getInitialState();
-    }
+	}
 	//================================================================
 
-    private Event getNextEvent()
-    {
-			//System.out.println("BasicFBInstance(" + getName() + ").getNextEvent(): Getting next event from the queue...");
-			//System.out.print("     " + eventInputQueue.toString());
-			return  (Event) eventInputQueue.remove();
-    }
+	private Event getNextEvent()
+	{
+		//System.out.println("BasicFBInstance(" + getName() + ").getNextEvent(): Getting next event from the queue...");
+		//System.out.print("     " + eventInputQueue.toString());
+		return  (Event) eventInputQueue.remove();
+	}
 	
 	public synchronized void receiveEvent(String eventInput)
 	{
@@ -82,7 +82,7 @@ public class BasicFBInstance extends FBInstance
 			if(variables.getVariable(eventInput).getType().equals("EventInput"))
 			{
 				//System.out.println("BasicFBInstance(" + getName() + ").receiveEvent(" + eventInput + ")");
-					eventInputQueue.add((Event) events.get(eventInput));
+				eventInputQueue.add((Event) events.get(eventInput));
 				if (!queuedInScheduler && !handlingEvent)
 				{
 					//System.out.println("BasicFBInstance(" + getName() + ").receiveEvent(" + eventInput + "): Scheduling this FB instance.");
@@ -100,70 +100,66 @@ public class BasicFBInstance extends FBInstance
 			System.out.println("BasicFBInstance(" + getName() + "): No event input " + eventInput);
 			System.exit(0);
 		}	
-    }
-	
-    public synchronized void handleEvent()
-    {
-
-		//if (handlingEvent)
-		//{
-		//	resource.getScheduler().scheduleFBInstance(this);
-		//	return;
-		//}
-
-		currentEvent = getNextEvent();
-
-		//System.out.println("BasicFBInstance(" + getName() + ").handleEvent(): handling event " + currentEvent.getName() + " from ECC state " + currentECState.getName());
-
+	}
+		
+	public synchronized void handleEvent()
+	{
+				
 		queuedInScheduler = false;
 		handlingEvent = true;
 
-		// set all InputEvents to false
-		for (Iterator iter = variables.iterator();iter.hasNext();)
+		// step through the event queue until there's change in ECC state
+		ECState newECState = null;		
+		do 
 		{
-			String curName = (String) iter.next();
-			if (((Variable) variables.getVariable(curName)).getType().equals("EventInput"))
+			currentEvent = getNextEvent();
+				
+			//System.out.println("BasicFBInstance(" + getName() + ").handleEvent(): handling event " + currentEvent.getName() + " from ECC state " + currentECState.getName());
+				
+			// set all InputEvents to false
+			for (Iterator iter = variables.iterator();iter.hasNext();)
 			{
-				((BooleanVariable) variables.getVariable(curName)).setValue(false);
+				String curName = (String) iter.next();
+				if (((Variable) variables.getVariable(curName)).getType().equals("EventInput"))
+				{
+					((BooleanVariable) variables.getVariable(curName)).setValue(false);
+				}
 			}
+				
+			// set the corrensponding event var of the input event to TRUE
+			((BooleanVariable) variables.getVariable(currentEvent.getName())).setValue(true);
+				
+			// get input data values
+			getDataInputs(currentEvent);
+				
+			// and execute the ecc
+			newECState = updateECC();
 		}
-
-		// set the corrensponding event var of the input event to TRUE
-		((BooleanVariable) variables.getVariable(currentEvent.getName())).setValue(true);
-
-		// get input data values
-		getDataInputs(currentEvent);
-
-		// and execute the ecc
-		ECState newECState = updateECC();
-		if (newECState != currentECState)
+		while (newECState == currentECState);
+		
+		//System.out.println("BasicFBInstance(" + getName() + ").handleEvent(): Handling new state " + newECState.getName());
+		handleNewState(newECState);
+		
+		//System.out.println("BasicFBInstance(" + getName() + ").handleEvent(): Done with event " + currentEvent.getName() + " and in ECState " + currentECState.getName());
+		if(!queuedInScheduler & eventInputQueue.size() > 0)
 		{
-			//System.out.println("BasicFBInstance(" + getName() + ").handleEvent(): Handling new state " + newECState.getName());
-			handleNewState(newECState);
+			//System.out.println("BasicFBInstance(" + getName() + ").handleEvent(): Scheduling this FB instance.");
+			resource.getScheduler().scheduleFBInstance(this);
+			queuedInScheduler = true;
 		}
-		else
-		{
-			//System.out.println("BasicFBInstance(" + getName() + ").handleEvent(): Done with event " + currentEvent.getName() + " and in ECState " + currentECState.getName());
-			if(!queuedInScheduler & eventInputQueue.size() > 0)
-			{
-				//System.out.println("BasicFBInstance(" + getName() + ").handleEvent(): Scheduling this FB instance.");
-				resource.getScheduler().scheduleFBInstance(this);
-				queuedInScheduler = true;
-			}
-			handlingEvent = false;
-		}
-    }
-
-    public synchronized void finishedJob(Job theJob)
-    {
+		handlingEvent = false;
+	}
+	
+	public synchronized void finishedJob(Job theJob)
+	{
 		//System.out.println("BasicFBInstance(" + getName() + ").finishedJob(): Alg " + theJob.getAlgorithm().getName());
 		setVariables(theJob.getVariables());
 		sendEvent();
-   }
+	}
 
-    // initializes the handling of new state
-    private void handleNewState(ECState state)
-    {
+	// initializes the handling of new state
+	private void handleNewState(ECState state)
+	{
 		currentECState = state;
 		// set total number of actions in this state
 		actionsLeft = currentECState.getNumberOfActions();
@@ -171,11 +167,11 @@ public class BasicFBInstance extends FBInstance
 		actionsIterator = currentECState.actionsIterator();
 		//System.out.println("BasicFBInstance(" + getName() + ").handleNewState(): Handling new state " + currentECState.getName() + " with " + actionsLeft + " actions");
 		handleState();
-    }
+	}
 	
-    // handles currentECState between actions
-    private void handleState()
-    {
+	// handles currentECState between actions
+	private void handleState()
+	{
 		if (actionsLeft == 0)
 		{
 			// set event var to false
@@ -212,8 +208,8 @@ public class BasicFBInstance extends FBInstance
 	}
 	
 	
-    private void handleAction(ECAction action)
-    {
+	private void handleAction(ECAction action)
+	{
 		currentECAction = action;
 		if (currentECAction.getAlgorithm() != null)
 		{
@@ -225,10 +221,10 @@ public class BasicFBInstance extends FBInstance
 		{
 			sendEvent();
 		}
-    }
+	}
 
-    private void sendEvent()
-    {
+	private void sendEvent()
+	{
 		if (currentECAction.getOutput() != null)
 		{
 			Connection outputConnection = (Connection) eventOutputConnections.get(currentECAction.getOutput());
@@ -239,11 +235,11 @@ public class BasicFBInstance extends FBInstance
 		}
 		actionsLeft = actionsLeft - 1;
 		handleState();
-    }
+	}
 	
-    private ECState updateECC()
-    {
+	private ECState updateECC()
+	{
 		return ((BasicFBType) fbType).getECC().execute(currentECState, variables);
-    }
-	
+	}
+		
 }
