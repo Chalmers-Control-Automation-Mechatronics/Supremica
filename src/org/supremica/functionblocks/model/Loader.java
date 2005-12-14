@@ -83,626 +83,626 @@ public class Loader
 
     public Loader(Device device, String systemFileName, String libraryPathBase, String libraryPath)
     {
-		this.device = device;
+	this.device = device;
 
-		// convert libraryPath string into list of Files
-		if (libraryPath == null)
+	// convert libraryPath string into list of Files
+	if (libraryPath == null)
+	{
+	    if (libraryPathBase == null)
+	    {
+		libraryPathList = null;
+	    }
+	    else
+	    {
+		File libraryPathBaseFile = new File(libraryPathBase);
+
+		if (!libraryPathBaseFile.isDirectory())
 		{
-			if (libraryPathBase == null)
-			{
-				libraryPathList = null;
-			}
-			else
-			{
-				File libraryPathBaseFile = new File(libraryPathBase);
-
-				if (!libraryPathBaseFile.isDirectory())
-				{
-					System.err.println("Loader(" + device.getName() + "): Specified library base is not a directory!: " + libraryPathBaseFile.getName());
-				}
-				else if (!libraryPathBaseFile.exists())
-				{
-					System.err.println("Loader(" + device.getName() + "): Specified library base does not exist!: " + libraryPathBaseFile.getName());
-				}
-				else
-				{
-					libraryPathList.add(libraryPathBaseFile);
-				}
-			}
+		    System.err.println("Loader(" + device.getName() + "): Specified library base is not a directory!: " + libraryPathBaseFile.getName());
 		}
-		else // libraryPath is specified by the user
+		else if (!libraryPathBaseFile.exists())
 		{
+		    System.err.println("Loader(" + device.getName() + "): Specified library base does not exist!: " + libraryPathBaseFile.getName());
+		}
+		else
+		{
+		    libraryPathList.add(libraryPathBaseFile);
+		}
+	    }
+	}
+	else // libraryPath is specified by the user
+	{
 
-			while (true)
-			{
-				File curLibraryDir;
+	    while (true)
+	    {
+		File curLibraryDir;
 
-				if (libraryPath.indexOf(File.pathSeparatorChar) == -1)
-				{
-					curLibraryDir = new File(libraryPathBase, libraryPath);
-				}
-				else
-				{
-					curLibraryDir = new File(libraryPathBase, libraryPath.substring(0,libraryPath.indexOf(File.pathSeparatorChar)));
-				}
-
-				if (!curLibraryDir.isDirectory())
-				{
-					System.err.println("Loader(" + device.getName() + "): Specified library path element " + curLibraryDir.getAbsolutePath() + " is not a directory!");
-				}
-				else if (!curLibraryDir.exists())
-				{
-					System.err.println("Loader(" + device.getName() + "): Specified library path element " + curLibraryDir.getAbsolutePath() + " does not exist!");
-				}
-				else
-				{
-					libraryPathList.add(curLibraryDir);
-				}
-
-				if (libraryPath.indexOf(File.pathSeparatorChar) == -1)
-				{
-					break;
-				}
-
-				libraryPath = libraryPath.substring(libraryPath.indexOf(File.pathSeparatorChar)+1);
-			}
-
+		if (libraryPath.indexOf(File.pathSeparatorChar) == -1)
+		{
+		    curLibraryDir = new File(libraryPathBase, libraryPath);
+		}
+		else
+		{
+		    curLibraryDir = new File(libraryPathBase, libraryPath.substring(0,libraryPath.indexOf(File.pathSeparatorChar)));
 		}
 
-		// create unmarshaller
-		try
+		if (!curLibraryDir.isDirectory())
 		{
-			context = JAXBContext.newInstance("org.supremica.functionblocks.xsd.libraryelement");
-			unmarshaller = context.createUnmarshaller();
-			unmarshaller.setValidating(false);
+		    System.err.println("Loader(" + device.getName() + "): Specified library path element " + curLibraryDir.getAbsolutePath() + " is not a directory!");
 		}
-		catch (Exception e)
+		else if (!curLibraryDir.exists())
 		{
-			System.err.println(e);
-			System.exit(1);
+		    System.err.println("Loader(" + device.getName() + "): Specified library path element " + curLibraryDir.getAbsolutePath() + " does not exist!");
+		}
+		else
+		{
+		    libraryPathList.add(curLibraryDir);
 		}
 
+		if (libraryPath.indexOf(File.pathSeparatorChar) == -1)
+		{
+		    break;
+		}
 
-		load(systemFileName);
+		libraryPath = libraryPath.substring(libraryPath.indexOf(File.pathSeparatorChar)+1);
+	    }
+
+	}
+
+	// create unmarshaller
+	try
+	{
+	    context = JAXBContext.newInstance("org.supremica.functionblocks.xsd.libraryelement");
+	    unmarshaller = context.createUnmarshaller();
+	    unmarshaller.setValidating(false);
+	}
+	catch (Exception e)
+	{
+	    System.err.println(e);
+	    System.exit(1);
+	}
+
+
+	load(systemFileName);
 
     }
 
     public void load(String fileName)
     {
 
-		File file = getFile(fileName);
+	File file = getFile(fileName);
 
-		try
-		{
-			Object unmarshalledXmlObject = unmarshaller.unmarshal(file);
-			if (unmarshalledXmlObject instanceof org.supremica.functionblocks.xsd.libraryelement.FBType)
-			{
-				loadFBType((org.supremica.functionblocks.xsd.libraryelement.FBType) unmarshalledXmlObject);
-			}
-			else if (unmarshalledXmlObject instanceof FBSystem)
-			{
-				System.out.println("Loader.load(): Loading device " + device.getName() + " with " + fileName + " file.");
-				loadSystem((FBSystem) unmarshalledXmlObject);
-			}
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace(System.err);
-			System.exit(1);
-		}
+	try
+	{
+	    Object unmarshalledXmlObject = unmarshaller.unmarshal(file);
+	    if (unmarshalledXmlObject instanceof org.supremica.functionblocks.xsd.libraryelement.FBType)
+	    {
+		loadFBType((org.supremica.functionblocks.xsd.libraryelement.FBType) unmarshalledXmlObject);
+	    }
+	    else if (unmarshalledXmlObject instanceof FBSystem)
+	    {
+		System.out.println("Loader.load(): Loading device " + device.getName() + " with " + fileName + " file.");
+		loadSystem((FBSystem) unmarshalledXmlObject);
+	    }
+	}
+	catch (Exception e)
+	{
+	    e.printStackTrace(System.err);
+	    System.exit(1);
+	}
     }
 
-	// find the fileName in the libraries and return the corresponding File
-	private File getFile(String fileName)
+    // find the fileName in the libraries and return the corresponding File
+    private File getFile(String fileName)
+    {
+	File theFile = new File(fileName);
+
+	if (libraryPathList != null)
 	{
-		File theFile = new File(fileName);
-
-		if (libraryPathList != null)
+	    for (Iterator iter = libraryPathList.iterator();iter.hasNext();)
+	    {
+		File curLibraryDir = (File) iter.next();
+		theFile = new File(curLibraryDir, fileName);
+		//System.out.println("Loader.getFile(" + fileName + "): Looking for file in " + theFile.toString());
+		if (theFile.exists())
 		{
-			for (Iterator iter = libraryPathList.iterator();iter.hasNext();)
-			{
-				File curLibraryDir = (File) iter.next();
-				theFile = new File(curLibraryDir, fileName);
-				//System.out.println("Loader.getFile(" + fileName + "): Looking for file in " + theFile.toString());
-				if (theFile.exists())
-				{
-					break;
-				}
-			}
+		    break;
 		}
-
-		if (!theFile.exists())
-		{
-			System.err.println("Loader.getFile(" + fileName + "): The file " + fileName + " does not exist in the specified libraries...");
-			if (libraryPathList != null)
-			{
-				for (Iterator iter = libraryPathList.iterator();iter.hasNext();)
-				{
-					System.err.println("\t" + ((File) iter.next()).getAbsolutePath() + File.separator);
-				}
-			}
-			else
-			{
-				System.err.println("\t.");
-			}
-			System.exit(1);
-		}
-
-		return theFile;
+	    }
 	}
+
+	if (!theFile.exists())
+	{
+	    System.err.println("Loader.getFile(" + fileName + "): The file " + fileName + " does not exist in the specified libraries...");
+	    if (libraryPathList != null)
+	    {
+		for (Iterator iter = libraryPathList.iterator();iter.hasNext();)
+		{
+		    System.err.println("\t" + ((File) iter.next()).getAbsolutePath() + File.separator);
+		}
+	    }
+	    else
+	    {
+		System.err.println("\t.");
+	    }
+	    System.exit(1);
+	}
+
+	return theFile;
+    }
 
     private void loadSystem(FBSystem xmlSystemData)
     {
 
-		// Loading with Devices and Resources
-		if (xmlSystemData.isSetDevice())
+	// Loading with Devices and Resources
+	if (xmlSystemData.isSetDevice())
+	{
+	    org.supremica.functionblocks.xsd.libraryelement.Device theDevice = (org.supremica.functionblocks.xsd.libraryelement.Device) xmlSystemData.getDevice().get(0);
+	    if(theDevice.isSetResource())
+	    {
+		for (Iterator resIter = theDevice.getResource().iterator();resIter.hasNext();)
 		{
-			org.supremica.functionblocks.xsd.libraryelement.Device theDevice = (org.supremica.functionblocks.xsd.libraryelement.Device) xmlSystemData.getDevice().get(0);
-			if(theDevice.isSetResource())
-			{
-				for (Iterator resIter = theDevice.getResource().iterator();resIter.hasNext();)
-				{
-					org.supremica.functionblocks.xsd.libraryelement.Resource curXmlResource = (org.supremica.functionblocks.xsd.libraryelement.Resource) resIter.next();
-					device.addResource(curXmlResource.getName());
-					resource = device.getResource(curXmlResource.getName());
-					if (curXmlResource.isSetFBNetwork())
-					{
-						resource.addFBNetwork("FBNetwork");
-						fbNetwork = resource.getFBNetwork("FBNetwork");
-						constructFBNetwork((org.supremica.functionblocks.xsd.libraryelement.FBNetwork) curXmlResource.getFBNetwork());
-					}
-				}
-			}
+		    org.supremica.functionblocks.xsd.libraryelement.Resource curXmlResource = (org.supremica.functionblocks.xsd.libraryelement.Resource) resIter.next();
+		    device.addResource(curXmlResource.getName());
+		    resource = device.getResource(curXmlResource.getName());
+		    if (curXmlResource.isSetFBNetwork())
+		    {
+			resource.addFBNetwork("FBNetwork");
+			fbNetwork = resource.getFBNetwork("FBNetwork");
+			constructFBNetwork((org.supremica.functionblocks.xsd.libraryelement.FBNetwork) curXmlResource.getFBNetwork());
+		    }
 		}
+	    }
+	}
 
 
-		// Loading of Application element
-		/*
-		  if (xmlSystemData.isSetApplication())
-		{
-			// as for now only the first application of the system is loaded
-			org.supremica.functionblocks.xsd.libraryelement.Application theApplication = (org.supremica.functionblocks.xsd.libraryelement.Application) xmlSystemData.getApplication().get(0);
-			String applicationName = (theApplication.isSetName() ? theApplication.getName() : "Unnamed");
-			if(theApplication.isSetFBNetwork())
-			{
-				device.addResource("Resource 1");
-				resource = device.getResource("Resource 1");
-				resource.addFBNetwork(applicationName);
-				fbNetwork = resource.getFBNetwork(applicationName);
-				constructFBNetwork((org.supremica.functionblocks.xsd.libraryelement.FBNetwork) theApplication.getFBNetwork());
-			}
-			}
-		*/
+	// Loading of Application element
+	/*
+	  if (xmlSystemData.isSetApplication())
+	  {
+	  // as for now only the first application of the system is loaded
+	  org.supremica.functionblocks.xsd.libraryelement.Application theApplication = (org.supremica.functionblocks.xsd.libraryelement.Application) xmlSystemData.getApplication().get(0);
+	  String applicationName = (theApplication.isSetName() ? theApplication.getName() : "Unnamed");
+	  if(theApplication.isSetFBNetwork())
+	  {
+	  device.addResource("Resource 1");
+	  resource = device.getResource("Resource 1");
+	  resource.addFBNetwork(applicationName);
+	  fbNetwork = resource.getFBNetwork(applicationName);
+	  constructFBNetwork((org.supremica.functionblocks.xsd.libraryelement.FBNetwork) theApplication.getFBNetwork());
+	  }
+	  }
+	*/
 
     }
 
     private void loadFBType(org.supremica.functionblocks.xsd.libraryelement.FBType xmlFBTypeData)
     {
-		if (xmlFBTypeData.isSetFBNetwork())
-		{
-			// load composite FB
+	if (xmlFBTypeData.isSetFBNetwork())
+	{
+	    // load composite FB
 
-			resource.addCompositeFBType(xmlFBTypeData.getName());
+	    resource.addCompositeFBType(xmlFBTypeData.getName());
 
-			CompositeFBType newCompositeFBType = (CompositeFBType) resource.getFBType(xmlFBTypeData.getName());
+	    CompositeFBType newCompositeFBType = (CompositeFBType) resource.getFBType(xmlFBTypeData.getName());
 
-			constructFBInterface(xmlFBTypeData,newCompositeFBType);
+	    constructFBInterface(xmlFBTypeData,newCompositeFBType);
 
-			constructCompositeFBType((org.supremica.functionblocks.xsd.libraryelement.FBNetwork) xmlFBTypeData.getFBNetwork(),newCompositeFBType);
-		}
-		else if (xmlFBTypeData.isSetBasicFB())
-		{
-			// load  BasicFBType
+	    constructCompositeFBType((org.supremica.functionblocks.xsd.libraryelement.FBNetwork) xmlFBTypeData.getFBNetwork(),newCompositeFBType);
+	}
+	else if (xmlFBTypeData.isSetBasicFB())
+	{
+	    // load  BasicFBType
 
-			resource.addBasicFBType(xmlFBTypeData.getName());
+	    resource.addBasicFBType(xmlFBTypeData.getName());
 
-			BasicFBType newBasicFBType = (BasicFBType) resource.getFBType(xmlFBTypeData.getName());
+	    BasicFBType newBasicFBType = (BasicFBType) resource.getFBType(xmlFBTypeData.getName());
 
-			constructFBInterface(xmlFBTypeData,newBasicFBType);
+	    constructFBInterface(xmlFBTypeData,newBasicFBType);
 
-			constructBasicFBType(xmlFBTypeData,newBasicFBType);
-		}
-		// load service FBs
-		else if (xmlFBTypeData.getName().equals("ADLINK_IO"))
-		{
-			resource.addServiceFBType("ADLINK_IO", getFile("ADLINK_IO.bsh"));
+	    constructBasicFBType(xmlFBTypeData,newBasicFBType);
+	}
+	// load service FBs
+	else if (xmlFBTypeData.getName().equals("ADLINK_IO"))
+	{
+	    resource.addServiceFBType("ADLINK_IO", getFile("ADLINK_IO.bsh"));
 
-			ServiceFBType newServiceFBType =  (ServiceFBType) resource.getFBType("ADLINK_IO");
+	    ServiceFBType newServiceFBType =  (ServiceFBType) resource.getFBType("ADLINK_IO");
 
-			constructFBInterface(xmlFBTypeData,newServiceFBType);
-		}
-		else if (xmlFBTypeData.getName().equals("IO_READER"))
-		{
-			resource.addServiceFBType("IO_READER", getFile("IO_READER.bsh"));
+	    constructFBInterface(xmlFBTypeData,newServiceFBType);
+	}
+	else if (xmlFBTypeData.getName().equals("IO_READER"))
+	{
+	    resource.addServiceFBType("IO_READER", getFile("IO_READER.bsh"));
 
-			ServiceFBType newServiceFBType =  (ServiceFBType) resource.getFBType("IO_READER");
+	    ServiceFBType newServiceFBType =  (ServiceFBType) resource.getFBType("IO_READER");
 
-			constructFBInterface(xmlFBTypeData,newServiceFBType);
-		}
-		else if (xmlFBTypeData.getName().equals("IO_WRITER"))
-		{
-			resource.addServiceFBType("IO_WRITER", getFile("IO_WRITER.bsh"));
+	    constructFBInterface(xmlFBTypeData,newServiceFBType);
+	}
+	else if (xmlFBTypeData.getName().equals("IO_WRITER"))
+	{
+	    resource.addServiceFBType("IO_WRITER", getFile("IO_WRITER.bsh"));
 
-			ServiceFBType newServiceFBType =  (ServiceFBType) resource.getFBType("IO_WRITER");
+	    ServiceFBType newServiceFBType =  (ServiceFBType) resource.getFBType("IO_WRITER");
 
-			constructFBInterface(xmlFBTypeData,newServiceFBType);
-		}
-		else if (xmlFBTypeData.getName().equals("E_DELAY"))
-		{
-			resource.addServiceFBType("E_DELAY", getFile("E_DELAY.bsh"));
+	    constructFBInterface(xmlFBTypeData,newServiceFBType);
+	}
+	else if (xmlFBTypeData.getName().equals("E_DELAY"))
+	{
+	    resource.addServiceFBType("E_DELAY", getFile("E_DELAY.bsh"));
 
-			ServiceFBType newServiceFBType =  (ServiceFBType) resource.getFBType("E_DELAY");
+	    ServiceFBType newServiceFBType =  (ServiceFBType) resource.getFBType("E_DELAY");
 
-			constructFBInterface(xmlFBTypeData,newServiceFBType);
-		}
-		else if (xmlFBTypeData.getName().equals("E_RESTART"))
-		{
-			resource.addBasicFBType("E_RESTART");
+	    constructFBInterface(xmlFBTypeData,newServiceFBType);
+	}
+	else if (xmlFBTypeData.getName().equals("E_RESTART"))
+	{
+	    resource.addBasicFBType("E_RESTART");
 
-			BasicFBType newBasicFBType = (BasicFBType) resource.getFBType("E_RESTART");
+	    BasicFBType newBasicFBType = (BasicFBType) resource.getFBType("E_RESTART");
 
-			constructFBInterface(xmlFBTypeData,newBasicFBType);
-		}
-		else
-		{
-			System.err.println("Loader.loadFBType(): The type " + xmlFBTypeData.getName() + " is not supported yet!");
-			System.exit(0);
-		}
+	    constructFBInterface(xmlFBTypeData,newBasicFBType);
+	}
+	else
+	{
+	    System.err.println("Loader.loadFBType(): The type " + xmlFBTypeData.getName() + " is not supported yet!");
+	    System.exit(0);
+	}
     }
 
 
     private void constructFBNetwork(org.supremica.functionblocks.xsd.libraryelement.FBNetwork xmlFBNetworkData)
     {
-		if (xmlFBNetworkData.isSetFB())
+	if (xmlFBNetworkData.isSetFB())
+	{
+	    for (Iterator fbIter = xmlFBNetworkData.getFB().iterator(); fbIter.hasNext();)
+	    {
+		org.supremica.functionblocks.xsd.libraryelement.FB curFB = (org.supremica.functionblocks.xsd.libraryelement.FB) fbIter.next();
+		// get and load the FB type
+		if(resource.getFBType(curFB.getType()) == null)
 		{
-			for (Iterator fbIter = xmlFBNetworkData.getFB().iterator(); fbIter.hasNext();)
-			{
-				org.supremica.functionblocks.xsd.libraryelement.FB curFB = (org.supremica.functionblocks.xsd.libraryelement.FB) fbIter.next();
-				// get and load the FB type
-				if(resource.getFBType(curFB.getType()) == null)
-				{
-					load(curFB.getType() + ".fbt");
-				}
-				fbNetwork.addFBInstance(curFB.getName(),curFB.getType());
-			}
+		    load(curFB.getType() + ".fbt");
 		}
+		fbNetwork.addFBInstance(curFB.getName(),curFB.getType());
+	    }
+	}
 
 
-		if (xmlFBNetworkData.isSetEventConnections())
-		{
-			//System.out.println("Event Connections:");
-			for (Iterator eventConnIter = xmlFBNetworkData.getEventConnections().getConnection().iterator(); eventConnIter.hasNext();)
-			{
-				org.supremica.functionblocks.xsd.libraryelement.Connection curConn = (org.supremica.functionblocks.xsd.libraryelement.Connection) eventConnIter.next();
-				fbNetwork.addEventConnection(curConn.getSource(), curConn.getDestination());
-			}
-		}
+	if (xmlFBNetworkData.isSetEventConnections())
+	{
+	    //System.out.println("Event Connections:");
+	    for (Iterator eventConnIter = xmlFBNetworkData.getEventConnections().getConnection().iterator(); eventConnIter.hasNext();)
+	    {
+		org.supremica.functionblocks.xsd.libraryelement.Connection curConn = (org.supremica.functionblocks.xsd.libraryelement.Connection) eventConnIter.next();
+		fbNetwork.addEventConnection(curConn.getSource(), curConn.getDestination());
+	    }
+	}
 
 
-		if (xmlFBNetworkData.isSetDataConnections())
-		{
-			//System.out.println("Data Connections:");
-			for (Iterator dataConnIter = xmlFBNetworkData.getDataConnections().getConnection().iterator(); dataConnIter.hasNext();)
-			{
-				org.supremica.functionblocks.xsd.libraryelement.Connection curConn = (org.supremica.functionblocks.xsd.libraryelement.Connection) dataConnIter.next();
-				fbNetwork.addDataConnection(curConn.getSource(), curConn.getDestination());
-			}
-		}
+	if (xmlFBNetworkData.isSetDataConnections())
+	{
+	    //System.out.println("Data Connections:");
+	    for (Iterator dataConnIter = xmlFBNetworkData.getDataConnections().getConnection().iterator(); dataConnIter.hasNext();)
+	    {
+		org.supremica.functionblocks.xsd.libraryelement.Connection curConn = (org.supremica.functionblocks.xsd.libraryelement.Connection) dataConnIter.next();
+		fbNetwork.addDataConnection(curConn.getSource(), curConn.getDestination());
+	    }
+	}
     }
 
-	private void constructFBInterface(org.supremica.functionblocks.xsd.libraryelement.FBType xmlFBTypeData, FBType newFBType)
-	{
-
-		// Build the interface
-		if (xmlFBTypeData.isSetInterfaceList())
-		{
-
-			// event inputs
-			if (xmlFBTypeData.getInterfaceList().isSetEventInputs())
-			{
-				for (Iterator iter = xmlFBTypeData.getInterfaceList().getEventInputs().getEvent().iterator(); iter.hasNext();)
-				{
-					org.supremica.functionblocks.xsd.libraryelement.Event curEvent = (org.supremica.functionblocks.xsd.libraryelement.Event) iter.next();
-					newFBType.addVariable(curEvent.getName(), new BooleanVariable("EventInput",false));
-					// data associations
-					for (Iterator withIter = curEvent.getWith().iterator(); withIter.hasNext();)
-					{
-						org.supremica.functionblocks.xsd.libraryelement.With curWith = (org.supremica.functionblocks.xsd.libraryelement.With) withIter.next();
-						newFBType.addDataAssociation(curEvent.getName(), curWith.getVar());
-					}
-				}
-			}
-
-			// event outputs
-			if (xmlFBTypeData.getInterfaceList().isSetEventOutputs())
-			{
-				for (Iterator iter = xmlFBTypeData.getInterfaceList().getEventOutputs().getEvent().iterator(); iter.hasNext();)
-				{
-					org.supremica.functionblocks.xsd.libraryelement.Event curEvent = (org.supremica.functionblocks.xsd.libraryelement.Event) iter.next();
-					newFBType.addVariable(curEvent.getName(), new BooleanVariable("EventOutput",false));
-					// data associations
-					for (Iterator withIter = curEvent.getWith().iterator(); withIter.hasNext();)
-					{
-						org.supremica.functionblocks.xsd.libraryelement.With curWith = (org.supremica.functionblocks.xsd.libraryelement.With) withIter.next();
-						newFBType.addDataAssociation(curEvent.getName(), curWith.getVar());
-					}
-				}
-			}
-
-			// input data variables
-			if (xmlFBTypeData.getInterfaceList().isSetInputVars())
-			{
-				for (Iterator iter = xmlFBTypeData.getInterfaceList().getInputVars().getVarDeclaration().iterator(); iter.hasNext();)
-				{
-					org.supremica.functionblocks.xsd.libraryelement.VarDeclaration curVar = (org.supremica.functionblocks.xsd.libraryelement.VarDeclaration) iter.next();
-					if (curVar.getType().toLowerCase().equals("int"))
-					{
-						if (curVar.isSetInitialValue())
-						{
-							newFBType.addVariable(curVar.getName(), new IntegerVariable("DataInput",new Integer(curVar.getInitialValue()).intValue()));
-						}
-						else
-						{
-							newFBType.addVariable(curVar.getName(), new IntegerVariable("DataInput",0));
-						}
-					}
-					else if (curVar.getType().toLowerCase().equals("bool"))
-					{
-						if (curVar.isSetInitialValue())
-						{
-							newFBType.addVariable(curVar.getName(), new BooleanVariable("DataInput",new Boolean(curVar.getInitialValue()).booleanValue()));
-						}
-						else
-						{
-							newFBType.addVariable(curVar.getName(), new BooleanVariable("DataInput",false));
-						}
-					}
-					else if (curVar.getType().toLowerCase().equals("real"))
-					{
-						if (curVar.isSetInitialValue())
-						{
-							newFBType.addVariable(curVar.getName(), new DoubleVariable("DataInput",new Double(curVar.getInitialValue()).doubleValue()));
-						}
-						else
-						{
-							newFBType.addVariable(curVar.getName(), new DoubleVariable("DataInput",0.0));
-						}
-					}
-					else if (curVar.getType().toLowerCase().equals("string"))
-					{
-						if (curVar.isSetInitialValue())
-						{
-							newFBType.addVariable(curVar.getName(), new StringVariable("DataInput", curVar.getInitialValue()));
-						}
-						else
-						{
-							newFBType.addVariable(curVar.getName(), new StringVariable("DataInput",""));
-						}
-					}
-					else if (curVar.getType().toLowerCase().equals("object"))
-					{
-						newFBType.addVariable(curVar.getName(), new ObjectVariable("DataInput",null));
-					}
-				}
-			}
-
-			// output data variables
-			if (xmlFBTypeData.getInterfaceList().isSetOutputVars())
-			{
-				for (Iterator iter = xmlFBTypeData.getInterfaceList().getOutputVars().getVarDeclaration().iterator(); iter.hasNext();)
-				{
-					org.supremica.functionblocks.xsd.libraryelement.VarDeclaration curVar = (org.supremica.functionblocks.xsd.libraryelement.VarDeclaration) iter.next();
-					if (curVar.getType().toLowerCase().equals("int"))
-					{
-						if (curVar.isSetInitialValue())
-						{
-							newFBType.addVariable(curVar.getName(), new IntegerVariable("DataOutput",new Integer(curVar.getInitialValue()).intValue()));
-						}
-						else
-						{
-							newFBType.addVariable(curVar.getName(), new IntegerVariable("DataOutput",0));
-						}
-					}
-					else if (curVar.getType().toLowerCase().equals("bool"))
-					{
-						if (curVar.isSetInitialValue())
-						{
-							newFBType.addVariable(curVar.getName(), new BooleanVariable("DataOutput",new Boolean(curVar.getInitialValue()).booleanValue()));
-						}
-						else
-						{
-							newFBType.addVariable(curVar.getName(), new BooleanVariable("DataOutput",false));
-						}
-					}
-					else if (curVar.getType().toLowerCase().equals("real"))
-					{
-						if (curVar.isSetInitialValue())
-						{
-							newFBType.addVariable(curVar.getName(), new DoubleVariable("DataOutput",new Double(curVar.getInitialValue()).doubleValue()));
-						}
-						else
-						{
-							newFBType.addVariable(curVar.getName(), new DoubleVariable("DataOutput",0.0));
-						}
-					}
-					else if (curVar.getType().toLowerCase().equals("string"))
-					{
-						if (curVar.isSetInitialValue())
-						{
-							newFBType.addVariable(curVar.getName(), new StringVariable("DataOutput", curVar.getInitialValue()));
-						}
-						else
-						{
-							newFBType.addVariable(curVar.getName(), new StringVariable("DataOutput",""));
-						}
-					}
-					else if (curVar.getType().toLowerCase().equals("object"))
-					{
-						newFBType.addVariable(curVar.getName(), new ObjectVariable("DataOutput",null));
-					}
-				}
-			}
-		}
-		// End Build the interface
-}
-
-
-	private void constructBasicFBType(org.supremica.functionblocks.xsd.libraryelement.FBType xmlFBTypeData, BasicFBType newBasicFBType)
+    private void constructFBInterface(org.supremica.functionblocks.xsd.libraryelement.FBType xmlFBTypeData, FBType newFBType)
     {
 
-		// Build internal variables
-		if (xmlFBTypeData.getBasicFB().isSetInternalVars())
+	// Build the interface
+	if (xmlFBTypeData.isSetInterfaceList())
+	{
+
+	    // event inputs
+	    if (xmlFBTypeData.getInterfaceList().isSetEventInputs())
+	    {
+		for (Iterator iter = xmlFBTypeData.getInterfaceList().getEventInputs().getEvent().iterator(); iter.hasNext();)
 		{
-			for (Iterator iter = xmlFBTypeData.getBasicFB().getInternalVars().getVarDeclaration().iterator(); iter.hasNext();)
-			{
-				org.supremica.functionblocks.xsd.libraryelement.VarDeclaration curVar = (org.supremica.functionblocks.xsd.libraryelement.VarDeclaration) iter.next();
-				if (curVar.getType().toLowerCase().equals("int"))
-				{
-					if (curVar.isSetInitialValue())
-					{
-						newBasicFBType.addVariable(curVar.getName(), new IntegerVariable("Local",new Integer(curVar.getInitialValue()).intValue()));
-					}
-					else
-					{
-						newBasicFBType.addVariable(curVar.getName(), new IntegerVariable("Local",0));
-					}
-				}
-				else if (curVar.getType().toLowerCase().equals("bool"))
-				{
-					if (curVar.isSetInitialValue())
-					{
-						newBasicFBType.addVariable(curVar.getName(), new BooleanVariable("Local",new Boolean(curVar.getInitialValue()).booleanValue()));
-					}
-					else
-					{
-						newBasicFBType.addVariable(curVar.getName(), new BooleanVariable("Local",false));
-					}
-				}
-				else if (curVar.getType().toLowerCase().equals("real"))
-				{
-					if (curVar.isSetInitialValue())
-					{
-						newBasicFBType.addVariable(curVar.getName(), new DoubleVariable("Local",new Double(curVar.getInitialValue()).doubleValue()));
-					}
-					else
-					{
-						newBasicFBType.addVariable(curVar.getName(), new DoubleVariable("Local",0.0));
-					}
-				}
-				else if (curVar.getType().toLowerCase().equals("string"))
-				{
-					if (curVar.isSetInitialValue())
-					{
-						newBasicFBType.addVariable(curVar.getName(), new StringVariable("Local", curVar.getInitialValue()));
-					}
-					else
-					{
-						newBasicFBType.addVariable(curVar.getName(), new StringVariable("Local",""));
-					}
-				}
-				else if (curVar.getType().toLowerCase().equals("object"))
-				{
-					newBasicFBType.addVariable(curVar.getName(), new ObjectVariable("Local",null));
-				}
-			}
+		    org.supremica.functionblocks.xsd.libraryelement.Event curEvent = (org.supremica.functionblocks.xsd.libraryelement.Event) iter.next();
+		    newFBType.addVariable(curEvent.getName(), new BooleanVariable("EventInput",false));
+		    // data associations
+		    for (Iterator withIter = curEvent.getWith().iterator(); withIter.hasNext();)
+		    {
+			org.supremica.functionblocks.xsd.libraryelement.With curWith = (org.supremica.functionblocks.xsd.libraryelement.With) withIter.next();
+			newFBType.addDataAssociation(curEvent.getName(), curWith.getVar());
+		    }
 		}
-		// End Build internal variables
+	    }
 
-
-		// Build ECC
-		// Build States
-		int curStateNum = 0;
-		for (Iterator iter = xmlFBTypeData.getBasicFB().getECC().getECState().iterator(); iter.hasNext();)
+	    // event outputs
+	    if (xmlFBTypeData.getInterfaceList().isSetEventOutputs())
+	    {
+		for (Iterator iter = xmlFBTypeData.getInterfaceList().getEventOutputs().getEvent().iterator(); iter.hasNext();)
 		{
-			org.supremica.functionblocks.xsd.libraryelement.ECState curState = (org.supremica.functionblocks.xsd.libraryelement.ECState) iter.next();
-			if (curStateNum == 0)
+		    org.supremica.functionblocks.xsd.libraryelement.Event curEvent = (org.supremica.functionblocks.xsd.libraryelement.Event) iter.next();
+		    newFBType.addVariable(curEvent.getName(), new BooleanVariable("EventOutput",false));
+		    // data associations
+		    for (Iterator withIter = curEvent.getWith().iterator(); withIter.hasNext();)
+		    {
+			org.supremica.functionblocks.xsd.libraryelement.With curWith = (org.supremica.functionblocks.xsd.libraryelement.With) withIter.next();
+			newFBType.addDataAssociation(curEvent.getName(), curWith.getVar());
+		    }
+		}
+	    }
+
+	    // input data variables
+	    if (xmlFBTypeData.getInterfaceList().isSetInputVars())
+	    {
+		for (Iterator iter = xmlFBTypeData.getInterfaceList().getInputVars().getVarDeclaration().iterator(); iter.hasNext();)
+		{
+		    org.supremica.functionblocks.xsd.libraryelement.VarDeclaration curVar = (org.supremica.functionblocks.xsd.libraryelement.VarDeclaration) iter.next();
+		    if (curVar.getType().toLowerCase().equals("int"))
+		    {
+			if (curVar.isSetInitialValue())
 			{
-				newBasicFBType.getECC().addInitialState(curState.getName());
-				curStateNum++;
+			    newFBType.addVariable(curVar.getName(), new IntegerVariable("DataInput",new Integer(curVar.getInitialValue()).intValue()));
 			}
 			else
 			{
-				newBasicFBType.getECC().addState(curState.getName());
+			    newFBType.addVariable(curVar.getName(), new IntegerVariable("DataInput",0));
 			}
-			for(Iterator actionIter = curState.getECAction().iterator(); actionIter.hasNext();)
+		    }
+		    else if (curVar.getType().toLowerCase().equals("bool"))
+		    {
+			if (curVar.isSetInitialValue())
 			{
-				org.supremica.functionblocks.xsd.libraryelement.ECAction curAction = (org.supremica.functionblocks.xsd.libraryelement.ECAction) actionIter.next();
-				newBasicFBType.getECC().getState(curState.getName()).addAction(curAction.getAlgorithm(), curAction.getOutput());
-			}
-		}
-		// Build transitions
-		for (Iterator iter = xmlFBTypeData.getBasicFB().getECC().getECTransition().iterator(); iter.hasNext();)
-		{
-			org.supremica.functionblocks.xsd.libraryelement.ECTransition curTrans = (org.supremica.functionblocks.xsd.libraryelement.ECTransition) iter.next();
-			if (curTrans.getCondition().equals("1"))
-			{
-				newBasicFBType.getECC().addTransition(curTrans.getSource(),curTrans.getDestination(),"TRUE");
+			    newFBType.addVariable(curVar.getName(), new BooleanVariable("DataInput",new Boolean(curVar.getInitialValue()).booleanValue()));
 			}
 			else
 			{
-				newBasicFBType.getECC().addTransition(curTrans.getSource(),curTrans.getDestination(), curTrans.getCondition());
+			    newFBType.addVariable(curVar.getName(), new BooleanVariable("DataInput",false));
 			}
-		}
-		// End Build ECC
-
-
-		//Build Algorithms
-		for (Iterator iter = xmlFBTypeData.getBasicFB().getAlgorithm().iterator(); iter.hasNext();)
-		{
-			org.supremica.functionblocks.xsd.libraryelement.Algorithm curAlg = (org.supremica.functionblocks.xsd.libraryelement.Algorithm) iter.next();
-			if (curAlg.isSetOther())
+		    }
+		    else if (curVar.getType().toLowerCase().equals("real"))
+		    {
+			if (curVar.isSetInitialValue())
 			{
-				if (curAlg.getOther().getLanguage().toLowerCase().equals("java"))
-				{
-					newBasicFBType.addAlgorithm(new JavaTextAlgorithm(curAlg.getName(),curAlg.getOther().getText()));
-				}
+			    newFBType.addVariable(curVar.getName(), new DoubleVariable("DataInput",new Double(curVar.getInitialValue()).doubleValue()));
 			}
+			else
+			{
+			    newFBType.addVariable(curVar.getName(), new DoubleVariable("DataInput",0.0));
+			}
+		    }
+		    else if (curVar.getType().toLowerCase().equals("string"))
+		    {
+			if (curVar.isSetInitialValue())
+			{
+			    newFBType.addVariable(curVar.getName(), new StringVariable("DataInput", curVar.getInitialValue()));
+			}
+			else
+			{
+			    newFBType.addVariable(curVar.getName(), new StringVariable("DataInput",""));
+			}
+		    }
+		    else if (curVar.getType().toLowerCase().equals("object"))
+		    {
+			newFBType.addVariable(curVar.getName(), new ObjectVariable("DataInput",null));
+		    }
 		}
-		// End Build Algorithms
+	    }
+
+	    // output data variables
+	    if (xmlFBTypeData.getInterfaceList().isSetOutputVars())
+	    {
+		for (Iterator iter = xmlFBTypeData.getInterfaceList().getOutputVars().getVarDeclaration().iterator(); iter.hasNext();)
+		{
+		    org.supremica.functionblocks.xsd.libraryelement.VarDeclaration curVar = (org.supremica.functionblocks.xsd.libraryelement.VarDeclaration) iter.next();
+		    if (curVar.getType().toLowerCase().equals("int"))
+		    {
+			if (curVar.isSetInitialValue())
+			{
+			    newFBType.addVariable(curVar.getName(), new IntegerVariable("DataOutput",new Integer(curVar.getInitialValue()).intValue()));
+			}
+			else
+			{
+			    newFBType.addVariable(curVar.getName(), new IntegerVariable("DataOutput",0));
+			}
+		    }
+		    else if (curVar.getType().toLowerCase().equals("bool"))
+		    {
+			if (curVar.isSetInitialValue())
+			{
+			    newFBType.addVariable(curVar.getName(), new BooleanVariable("DataOutput",new Boolean(curVar.getInitialValue()).booleanValue()));
+			}
+			else
+			{
+			    newFBType.addVariable(curVar.getName(), new BooleanVariable("DataOutput",false));
+			}
+		    }
+		    else if (curVar.getType().toLowerCase().equals("real"))
+		    {
+			if (curVar.isSetInitialValue())
+			{
+			    newFBType.addVariable(curVar.getName(), new DoubleVariable("DataOutput",new Double(curVar.getInitialValue()).doubleValue()));
+			}
+			else
+			{
+			    newFBType.addVariable(curVar.getName(), new DoubleVariable("DataOutput",0.0));
+			}
+		    }
+		    else if (curVar.getType().toLowerCase().equals("string"))
+		    {
+			if (curVar.isSetInitialValue())
+			{
+			    newFBType.addVariable(curVar.getName(), new StringVariable("DataOutput", curVar.getInitialValue()));
+			}
+			else
+			{
+			    newFBType.addVariable(curVar.getName(), new StringVariable("DataOutput",""));
+			}
+		    }
+		    else if (curVar.getType().toLowerCase().equals("object"))
+		    {
+			newFBType.addVariable(curVar.getName(), new ObjectVariable("DataOutput",null));
+		    }
+		}
+	    }
+	}
+	// End Build the interface
+    }
+
+
+    private void constructBasicFBType(org.supremica.functionblocks.xsd.libraryelement.FBType xmlFBTypeData, BasicFBType newBasicFBType)
+    {
+
+	// Build internal variables
+	if (xmlFBTypeData.getBasicFB().isSetInternalVars())
+	{
+	    for (Iterator iter = xmlFBTypeData.getBasicFB().getInternalVars().getVarDeclaration().iterator(); iter.hasNext();)
+	    {
+		org.supremica.functionblocks.xsd.libraryelement.VarDeclaration curVar = (org.supremica.functionblocks.xsd.libraryelement.VarDeclaration) iter.next();
+		if (curVar.getType().toLowerCase().equals("int"))
+		{
+		    if (curVar.isSetInitialValue())
+		    {
+			newBasicFBType.addVariable(curVar.getName(), new IntegerVariable("Local",new Integer(curVar.getInitialValue()).intValue()));
+		    }
+		    else
+		    {
+			newBasicFBType.addVariable(curVar.getName(), new IntegerVariable("Local",0));
+		    }
+		}
+		else if (curVar.getType().toLowerCase().equals("bool"))
+		{
+		    if (curVar.isSetInitialValue())
+		    {
+			newBasicFBType.addVariable(curVar.getName(), new BooleanVariable("Local",new Boolean(curVar.getInitialValue()).booleanValue()));
+		    }
+		    else
+		    {
+			newBasicFBType.addVariable(curVar.getName(), new BooleanVariable("Local",false));
+		    }
+		}
+		else if (curVar.getType().toLowerCase().equals("real"))
+		{
+		    if (curVar.isSetInitialValue())
+		    {
+			newBasicFBType.addVariable(curVar.getName(), new DoubleVariable("Local",new Double(curVar.getInitialValue()).doubleValue()));
+		    }
+		    else
+		    {
+			newBasicFBType.addVariable(curVar.getName(), new DoubleVariable("Local",0.0));
+		    }
+		}
+		else if (curVar.getType().toLowerCase().equals("string"))
+		{
+		    if (curVar.isSetInitialValue())
+		    {
+			newBasicFBType.addVariable(curVar.getName(), new StringVariable("Local", curVar.getInitialValue()));
+		    }
+		    else
+		    {
+			newBasicFBType.addVariable(curVar.getName(), new StringVariable("Local",""));
+		    }
+		}
+		else if (curVar.getType().toLowerCase().equals("object"))
+		{
+		    newBasicFBType.addVariable(curVar.getName(), new ObjectVariable("Local",null));
+		}
+	    }
+	}
+	// End Build internal variables
+
+
+	// Build ECC
+	// Build States
+	int curStateNum = 0;
+	for (Iterator iter = xmlFBTypeData.getBasicFB().getECC().getECState().iterator(); iter.hasNext();)
+	{
+	    org.supremica.functionblocks.xsd.libraryelement.ECState curState = (org.supremica.functionblocks.xsd.libraryelement.ECState) iter.next();
+	    if (curStateNum == 0)
+	    {
+		newBasicFBType.getECC().addInitialState(curState.getName());
+		curStateNum++;
+	    }
+	    else
+	    {
+		newBasicFBType.getECC().addState(curState.getName());
+	    }
+	    for(Iterator actionIter = curState.getECAction().iterator(); actionIter.hasNext();)
+	    {
+		org.supremica.functionblocks.xsd.libraryelement.ECAction curAction = (org.supremica.functionblocks.xsd.libraryelement.ECAction) actionIter.next();
+		newBasicFBType.getECC().getState(curState.getName()).addAction(curAction.getAlgorithm(), curAction.getOutput());
+	    }
+	}
+	// Build transitions
+	for (Iterator iter = xmlFBTypeData.getBasicFB().getECC().getECTransition().iterator(); iter.hasNext();)
+	{
+	    org.supremica.functionblocks.xsd.libraryelement.ECTransition curTrans = (org.supremica.functionblocks.xsd.libraryelement.ECTransition) iter.next();
+	    if (curTrans.getCondition().equals("1"))
+	    {
+		newBasicFBType.getECC().addTransition(curTrans.getSource(),curTrans.getDestination(),"TRUE");
+	    }
+	    else
+	    {
+		newBasicFBType.getECC().addTransition(curTrans.getSource(),curTrans.getDestination(), curTrans.getCondition());
+	    }
+	}
+	// End Build ECC
+
+
+	//Build Algorithms
+	for (Iterator iter = xmlFBTypeData.getBasicFB().getAlgorithm().iterator(); iter.hasNext();)
+	{
+	    org.supremica.functionblocks.xsd.libraryelement.Algorithm curAlg = (org.supremica.functionblocks.xsd.libraryelement.Algorithm) iter.next();
+	    if (curAlg.isSetOther())
+	    {
+		if (curAlg.getOther().getLanguage().toLowerCase().equals("java"))
+		{
+		    newBasicFBType.addAlgorithm(new JavaTextAlgorithm(curAlg.getName(),curAlg.getOther().getText()));
+		}
+	    }
+	}
+	// End Build Algorithms
 
     }
 
     private void constructCompositeFBType(org.supremica.functionblocks.xsd.libraryelement.FBNetwork xmlFBNetworkData, CompositeFBType newCompositeFBType)
     {
-		if (xmlFBNetworkData.isSetFB())
+	if (xmlFBNetworkData.isSetFB())
+	{
+	    for (Iterator fbIter = xmlFBNetworkData.getFB().iterator(); fbIter.hasNext();)
+	    {
+		org.supremica.functionblocks.xsd.libraryelement.FB curFB = (org.supremica.functionblocks.xsd.libraryelement.FB) fbIter.next();
+		// get and load the FB type
+		if(resource.getFBType(curFB.getType()) == null)
 		{
-			for (Iterator fbIter = xmlFBNetworkData.getFB().iterator(); fbIter.hasNext();)
-			{
-				org.supremica.functionblocks.xsd.libraryelement.FB curFB = (org.supremica.functionblocks.xsd.libraryelement.FB) fbIter.next();
-				// get and load the FB type
-				if(resource.getFBType(curFB.getType()) == null)
-				{
-					load(curFB.getType() + ".fbt");
-				}
-				newCompositeFBType.addFBInstance(curFB.getName(),curFB.getType());
-			}
+		    load(curFB.getType() + ".fbt");
 		}
+		newCompositeFBType.addFBInstance(curFB.getName(),curFB.getType());
+	    }
+	}
 
 
-		if (xmlFBNetworkData.isSetEventConnections())
-		{
-			//System.out.println("Event Connections:");
-			for (Iterator eventConnIter = xmlFBNetworkData.getEventConnections().getConnection().iterator(); eventConnIter.hasNext();)
-			{
-				org.supremica.functionblocks.xsd.libraryelement.Connection curConn = (org.supremica.functionblocks.xsd.libraryelement.Connection) eventConnIter.next();
-				String source = curConn.getSource();
-				String dest = curConn.getDestination();
-				newCompositeFBType.addEventConnection(source, dest);
-			}
-		}
+	if (xmlFBNetworkData.isSetEventConnections())
+	{
+	    //System.out.println("Event Connections:");
+	    for (Iterator eventConnIter = xmlFBNetworkData.getEventConnections().getConnection().iterator(); eventConnIter.hasNext();)
+	    {
+		org.supremica.functionblocks.xsd.libraryelement.Connection curConn = (org.supremica.functionblocks.xsd.libraryelement.Connection) eventConnIter.next();
+		String source = curConn.getSource();
+		String dest = curConn.getDestination();
+		newCompositeFBType.addEventConnection(source, dest);
+	    }
+	}
 
 
-		if (xmlFBNetworkData.isSetDataConnections())
-		{
-			//System.out.println("Data Connections:");
-			for (Iterator dataConnIter = xmlFBNetworkData.getDataConnections().getConnection().iterator(); dataConnIter.hasNext();)
-			{
-				org.supremica.functionblocks.xsd.libraryelement.Connection curConn = (org.supremica.functionblocks.xsd.libraryelement.Connection) dataConnIter.next();
-				String source = curConn.getSource();
-				String dest = curConn.getDestination();
-				newCompositeFBType.addDataConnection(source, dest);
-			}
-		}
+	if (xmlFBNetworkData.isSetDataConnections())
+	{
+	    //System.out.println("Data Connections:");
+	    for (Iterator dataConnIter = xmlFBNetworkData.getDataConnections().getConnection().iterator(); dataConnIter.hasNext();)
+	    {
+		org.supremica.functionblocks.xsd.libraryelement.Connection curConn = (org.supremica.functionblocks.xsd.libraryelement.Connection) dataConnIter.next();
+		String source = curConn.getSource();
+		String dest = curConn.getDestination();
+		newCompositeFBType.addDataConnection(source, dest);
+	    }
+	}
     }
 
 }
