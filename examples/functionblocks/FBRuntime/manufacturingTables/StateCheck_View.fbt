@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<FBType Name="StateCheck_View">
+  <VersionInfo Author="Oscar Ljungkrantz" Date="2005-12-14" Organization="Chalmers" Version="0.1"/>
+ 
+  <InterfaceList>
+  
+    <EventInputs>
+      <Event Name="checkState">
+        <With Var="stateToCheck" />
+        <With Var="alarmType" />
+      </Event>
+      <Event Name="sensorValueReported">
+        <With Var="sensorValue" />
+      </Event>
+    </EventInputs>
+  
+    <EventOutputs>
+      <Event Name="confirmState">
+        <With Var="confirmation" />
+      </Event>
+      <Event Name="alarm">
+        <With Var="theAlarmType" />
+      </Event>
+      <Event Name="askSensorValue" />
+    </EventOutputs>
+ 
+    <InputVars>
+      <VarDeclaration Name="stateToCheck" Type="STRING" />
+      <VarDeclaration Name="alarmType" Type="INT" />
+      <VarDeclaration Name="sensorValue" Type="STRING" />
+    </InputVars>
+
+    <OutputVars>
+      <VarDeclaration Name="confirmation" Type="BOOL" />
+      <VarDeclaration Name="theAlarmType" Type="INT" />
+    </OutputVars>
+      
+  </InterfaceList>
+  
+  <BasicFB>
+    <InternalVars>
+      <VarDeclaration Name="currentStateToCheck" Type="STRING" />
+      <VarDeclaration Name="setAlarm" Type="BOOL" InitialValue="FALSE" />
+      <VarDeclaration Name="currentAlarmType" Type="INT" InitialValue="1" />
+    </InternalVars>
+
+    <ECC>
+      <ECState Name="q0" />
+      <ECState Name="q1">
+        <ECAction Algorithm="AlgCheckState" Output="askSensorValue" />
+      </ECState>
+      <ECState Name="q2">
+        <ECAction Algorithm="AlgCheckStateDone" Output="confirmState" />
+      </ECState>
+      <ECState Name="q3">
+        <ECAction Output="alarm" />
+      </ECState>
+ 
+      <ECTransition Source="q0" Destination="q1" Condition="checkState" />
+      <ECTransition Source="q1" Destination="q2" Condition="sensorValueReported" />
+      <ECTransition Source="q2" Destination="q3" Condition="setAlarm" />
+      <ECTransition Source="q2" Destination="q0" Condition="NOT setAlarm" />
+      <ECTransition Source="q3" Destination="q0" Condition="1" />
+	
+    </ECC>
+
+    <Algorithm Name="AlgCheckState">
+       <Other Language="Java" Text=
+		"
+		currentStateToCheck = stateToCheck;
+		currentAlarmType = alarmType;
+		" />	
+    </Algorithm>
+    <Algorithm Name="AlgCheckStateDone">
+       <Other Language="Java" Text=
+		"
+		if (sensorValue == currentStateToCheck)
+		{
+			confirmation = TRUE;
+			setAlarm = FALSE;
+		}
+		else
+		{
+			confirmation = FALSE;
+			setAlarm = TRUE;
+			theAlarmType = currentAlarmType;
+		}
+		" />	
+    </Algorithm>
+  
+  </BasicFB>
+
+</FBType>
+

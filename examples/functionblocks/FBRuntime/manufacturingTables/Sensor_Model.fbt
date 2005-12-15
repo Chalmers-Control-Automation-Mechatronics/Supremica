@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<FBType Name="Sensor_Model">
+  <VersionInfo Author="Oscar Ljungkrantz" Date="2005-12-13" Organization="Chalmers" Version="0.1"/>
+ 
+  <InterfaceList>
+  
+    <EventInputs>
+      <Event Name="askState" />
+      <Event Name="HWValueReported">
+        <With Var="HWValue" />
+      </Event>
+    </EventInputs>
+  
+    <EventOutputs>
+      <Event Name="reportState">
+        <With Var="currentState" />
+      </Event>
+      <Event Name="askHWValue" />
+    </EventOutputs>
+ 
+    <InputVars>
+      <VarDeclaration Name="HWValue" Type="STRING" />
+    </InputVars>
+
+    <OutputVars>
+      <VarDeclaration Name="currentState" Type="STRING" />
+    </OutputVars>
+      
+  </InterfaceList>
+  
+  <BasicFB>
+    <!--InternalVars>
+      <VarDeclaration Name="" Type="" InitialValue="" />
+    </InternalVars-->
+
+    <ECC>
+      <ECState Name="q0" />
+      <ECState Name="q1">
+        <ECAction Output="askHWValue" />
+      </ECState>
+      <ECState Name="q2">
+        <ECAction Algorithm="AlgStateReceived" Output="reportState" />
+      </ECState>
+ 
+      <ECTransition Source="q0" Destination="q1" Condition="askState" />
+      <ECTransition Source="q0" Destination="q2" Condition="HWValueReported" />
+      <ECTransition Source="q1" Destination="q0" Condition="1" />
+      <ECTransition Source="q2" Destination="q0" Condition="1" />
+	
+    </ECC>
+
+    <Algorithm Name="AlgStateReceived">
+        <Other Language="Java" Text= "currentState = HWValue;" />	
+    </Algorithm>
+  
+  </BasicFB>
+
+</FBType>
+

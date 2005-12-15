@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<FBType Name="StateRequest_View">
+  <VersionInfo Author="Oscar Ljungkrantz" Date="2005-12-14" Organization="Chalmers" Version="0.1"/>
+ 
+  <InterfaceList>
+  
+    <EventInputs>
+      <Event Name="requestState" />
+      <Event Name="sensorValueReported">
+        <With Var="sensorValue" />
+      </Event>
+    </EventInputs>
+  
+    <EventOutputs>
+      <Event Name="reportState">
+        <With Var="currentState" />
+      </Event>
+      <Event Name="askSensorValue" />
+    </EventOutputs>
+ 
+    <InputVars>
+      <VarDeclaration Name="sensorValue" Type="STRING" />
+    </InputVars>
+
+    <OutputVars>
+      <VarDeclaration Name="currentState" Type="STRING" />
+    </OutputVars>
+      
+  </InterfaceList>
+  
+  <BasicFB>
+    <!--InternalVars>
+      <VarDeclaration Name="" Type="" InitialValue="" />
+    </InternalVars-->
+
+    <ECC>
+      <ECState Name="q0" />
+      <ECState Name="q1">
+        <ECAction Output="askSensorValue" />
+      </ECState>
+      <ECState Name="q2">
+        <ECAction Algorithm="AlgRequestStateDone" Output="reportState" />
+      </ECState>
+ 
+      <ECTransition Source="q0" Destination="q1" Condition="requestState" />
+      <ECTransition Source="q1" Destination="q2" Condition="sensorValueReported" />
+      <ECTransition Source="q2" Destination="q0" Condition="1" />
+	
+    </ECC>
+
+    <Algorithm Name="AlgRequestStateDone">
+        <Other Language="Java" Text= "currentState = sensorValue;" />	
+    </Algorithm>
+  
+  </BasicFB>
+
+</FBType>
+

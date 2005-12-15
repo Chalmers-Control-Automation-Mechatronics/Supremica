@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<FBType Name="Actuator_StateOrder_subView">
+  <VersionInfo Author="Oscar Ljungkrantz" Date="2005-12-14" Organization="Chalmers" Version="0.1"/>
+ 
+  <InterfaceList>
+  
+    <EventInputs>
+      <Event Name="orderState">
+        <With Var="orderedState" />
+        <With Var="alarmType" />
+      </Event>
+      <Event Name="sensorValueReported">
+        <With Var="sensorValue" />
+      </Event>
+      <Event Name="timePassed" />
+    </EventInputs>
+  
+    <EventOutputs>
+      <Event Name="confirmState">
+        <With Var="confirmation" />
+      </Event>
+      <Event Name="alarm">
+        <With Var="theAlarmType" />
+      </Event>
+      <Event Name="orderActuator">
+        <With Var="actuatorValue" />
+      </Event>
+      <Event Name="askSensorValue" />
+      <Event Name="startTimer">
+        <With Var="delayTime" />
+      </Event>
+      <Event Name="stopTimer" />
+      <Event Name="setOperationStatus">
+        <With Var="isIdle" />
+      </Event>
+    </EventOutputs>
+ 
+    <InputVars>
+      <VarDeclaration Name="orderedState" Type="STRING" />
+      <VarDeclaration Name="alarmType" Type="INT" />
+      <VarDeclaration Name="sensorValue" Type="STRING" />
+    </InputVars>
+
+    <OutputVars>
+      <VarDeclaration Name="confirmation" Type="BOOL" />
+      <VarDeclaration Name="actuatorValue" Type="STRING" />
+      <VarDeclaration Name="delayTime" Type="TIME" />
+      <VarDeclaration Name="theAlarmType" Type="INT" />
+      <VarDeclaration Name="isIdle" Type="BOOL" />
+    </OutputVars>
+      
+  </InterfaceList>
+  
+  <BasicFB>
+    <InternalVars>
+      <VarDeclaration Name="currentOrderedState" Type="STRING" />
+      <VarDeclaration Name="currentAlarmType" Type="INT" InitialValue="1" />
+      <VarDeclaration Name="time" Type="TIME" InitialValue="T#1h" />
+      <VarDeclaration Name="operating" Type="BOOL" InitialValue="FALSE" />
+    </InternalVars>
+
+    <ECC>
+      <ECState Name="q0" />
+      <ECState Name="q1">
+        <ECAction Algorithm="AlgOrderState" Output="orderActuator" />
+        <ECAction Algorithm="AlgTimer" Output="startTimer" />
+        <ECAction Algorithm="AlgIsOperating" Output="setOperationStatus" />
+        <ECAction Output="askSensorValue" />
+      </ECState>
+      <ECState Name="q2">
+        <ECAction Algorithm="AlgOrderStateDone" Output="confirmState" />
+        <ECAction Output="stopTimer" />
+        <ECAction Algorithm="AlgIsNotOperating" Output="setOperationStatus" />
+      </ECState>
+      <ECState Name="q3">
+        <ECAction Algorithm="AlgTimePassed" Output="confirmState" />
+        <ECAction Algorithm="AlgAlarm" Output="alarm" />
+      </ECState>
+ 
+      <ECTransition Source="q0" Destination="q1" Condition="orderState" />
+      <ECTransition Source="q1" Destination="q0" Condition="1" />
+      <ECTransition Source="q0" Destination="q2" Condition="sensorValueReported AND operating AND sensorValue = currentOrderedState" />
+      <ECTransition Source="q2" Destination="q0" Condition="1" />
+      <ECTransition Source="q0" Destination="q3" Condition="timePassed AND operating" />
+      <ECTransition Source="q3" Destination="q0" Condition="1" />
+	
+    </ECC>
+
+    <Algorithm Name="AlgOrderState">
+       <Other Language="Java" Text=
+		"
+		currentOrderedState = orderedState;
+		currentAlarmType = alarmType;
+		actuatorValue = currentOrderedState;
+		" />	
+    </Algorithm>
+    <Algorithm Name="AlgTimer">
+       <Other Language="Java" Text=
+		"
+		delayTime = time;
+		" />	
+    </Algorithm>
+    <Algorithm Name="IsOperating">
+       <Other Language="Java" Text=
+		"
+		isIdle = FALSE;
+		operating = TRUE;
+		" />	
+    </Algorithm>
+    <Algorithm Name="AlgOrderStateDone">
+       <Other Language="Java" Text=
+		"
+		confirmation = TRUE;
+		" />	
+    </Algorithm>
+    <Algorithm Name="AlgIsNotOperating">
+       <Other Language="Java" Text=
+		"
+		isIdle = TRUE;
+		operating = FALSE;
+		" />	
+    </Algorithm>
+    <Algorithm Name="AlgTimePassed">
+       <Other Language="Java" Text=
+		"
+		confirmation = FALSE;
+		" />	
+    </Algorithm>
+    <Algorithm Name="AlgAlarm">
+       <Other Language="Java" Text=
+		"
+		theAlarmType = currentAlarmType;
+		" />	
+    </Algorithm>
+  
+  </BasicFB>
+
+</FBType>
+

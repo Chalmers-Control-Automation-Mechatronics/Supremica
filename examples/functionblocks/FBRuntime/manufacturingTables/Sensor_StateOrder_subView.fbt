@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<FBType Name="Sensor_StateOrder_subView">
+  <VersionInfo Author="Oscar Ljungkrantz" Date="2005-12-14" Organization="Chalmers" Version="0.1"/>
+ 
+  <InterfaceList>
+  
+    <EventInputs>
+      <Event Name="orderState">
+        <With Var="orderedState" />
+        <With Var="alarmType" />
+	<!-- In a sensor the time is an input instead of a property (local variable) as in the actuator -->
+        <With Var="time" />
+      </Event>
+      <Event Name="sensorValueReported">
+        <With Var="sensorValue" />
+      </Event>
+      <Event Name="timePassed" />
+    </EventInputs>
+  
+    <EventOutputs>
+      <Event Name="confirmState">
+        <With Var="confirmation" />
+      </Event>
+      <Event Name="alarm">
+        <With Var="theAlarmType" />
+      </Event>
+      <!--__Not needed for a sensor__ Event Name="orderActuator">
+        <With Var="actuatorValue" />
+      </Event-->
+      <Event Name="askSensorValue" />
+      <Event Name="startTimer">
+        <With Var="delayTime" />
+      </Event>
+      <Event Name="stopTimer" />
+      <!--__Not needed for a sensor__ Event Name="setOperationStatus">
+        <With Var="isIdle" />
+      </Event-->
+    </EventOutputs>
+ 
+    <InputVars>
+      <VarDeclaration Name="orderedState" Type="STRING" />
+      <VarDeclaration Name="alarmType" Type="INT" />
+      <VarDeclaration Name="time" Type="TIME" />
+      <VarDeclaration Name="sensorValue" Type="STRING" />
+    </InputVars>
+
+    <OutputVars>
+      <VarDeclaration Name="confirmation" Type="BOOL" />
+      <!--__Not needed for a sensor__ VarDeclaration Name="actuatorValue" Type="STRING" /-->
+      <VarDeclaration Name="delayTime" Type="TIME" />
+      <VarDeclaration Name="theAlarmType" Type="INT" />
+      <!--__Not needed for a sensor__ VarDeclaration Name="isIdle" Type="BOOL" /-->
+    </OutputVars>
+      
+  </InterfaceList>
+  
+  <BasicFB>
+    <InternalVars>
+      <VarDeclaration Name="currentOrderedState" Type="STRING" />
+      <VarDeclaration Name="currentAlarmType" Type="INT" InitialValue="1" />
+      <VarDeclaration Name="operating" Type="BOOL" InitialValue="FALSE" />
+    </InternalVars>
+
+    <ECC>
+      <ECState Name="q0" />
+      <ECState Name="q1">
+        <!-- In a sensor you can ask the value of the sensor directly -->	 
+        <ECAction Algorithm="AlgOrderState" Output="askSensorValue" />
+        <ECAction Algorithm="AlgTimer" Output="startTimer" />
+        <!--__Not needed for a sensor__ ECAction Algorithm="AlgIsOperating" Output="setOperationStatus" /-->
+        <!--__Not needed (since it is stated above) for a sensor__ ECAction Output="askSensorValue" /-->
+      </ECState>
+      <ECState Name="q2">
+        <ECAction Algorithm="AlgOrderStateDone" Output="confirmState" />
+        <ECAction Output="stopTimer" />
+        <!--__Not needed for a sensor__ ECAction Algorithm="AlgIsNotOperating" Output="setOperationStatus" /-->
+      </ECState>
+      <ECState Name="q3">
+        <ECAction Algorithm="AlgTimePassed" Output="confirmState" />
+        <ECAction Algorithm="AlgAlarm" Output="alarm" />
+      </ECState>
+ 
+      <ECTransition Source="q0" Destination="q1" Condition="orderState" />
+      <ECTransition Source="q1" Destination="q0" Condition="1" />
+      <ECTransition Source="q0" Destination="q2" Condition="sensorValueReported AND operating AND sensorValue = currentOrderedState" />
+      <ECTransition Source="q2" Destination="q0" Condition="1" />
+      <ECTransition Source="q0" Destination="q3" Condition="timePassed AND operating" />
+      <ECTransition Source="q3" Destination="q0" Condition="1" />
+	
+    </ECC>
+
+    <Algorithm Name="AlgOrderState">
+       <Other Language="Java" Text=
+		"
+		currentOrderedState = orderedState;
+		currentAlarmType = alarmType;
+		operating = TRUE;
+		" />	
+    </Algorithm>
+    <Algorithm Name="AlgTimer">
+       <Other Language="Java" Text=
+		"
+		delayTime = time;
+		" />	
+    </Algorithm>
+    <!--__Not needed for a sensor__ Algorithm Name="IsOperating">
+       <Other Language="Java" Text=
+		"
+		isIdle = FALSE;
+		operating = TRUE;
+		" />	
+    </Algorithm-->
+    <Algorithm Name="AlgOrderStateDone">
+       <Other Language="Java" Text=
+		"
+		confirmation = TRUE;
+		operating = FALSE;
+		" />	
+    </Algorithm>
+    <!--__Not needed for a sensor__ Algorithm Name="AlgIsNotOperating">
+       <Other Language="Java" Text=
+		"
+		isIdle = TRUE;
+		operating = FALSE;
+		" />	
+    </Algorithm-->
+    <Algorithm Name="AlgTimePassed">
+       <Other Language="Java" Text=
+		"
+		confirmation = FALSE;
+		" />	
+    </Algorithm>
+    <Algorithm Name="AlgAlarm">
+       <Other Language="Java" Text=
+		"
+		theAlarmType = currentAlarmType;
+		" />	
+    </Algorithm>
+  
+  </BasicFB>
+
+</FBType>
+

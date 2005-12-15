@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<FBType Name="Sensor_StateOrder_View">
+  <VersionInfo Author="Oscar Ljungkrantz" Date="2005-12-15" Organization="Chalmers" Version="0.1"/>
+ 
+  <InterfaceList>
+  
+    <EventInputs>
+      <Event Name="orderState">
+        <With Var="orderedState" />
+        <With Var="alarmType" />
+        <With Var="time" />
+      </Event>
+      <Event Name="sensorValueReported">
+        <With Var="sensorValue" />
+      </Event>
+    </EventInputs>
+  
+    <EventOutputs>
+      <Event Name="confirmState">
+        <With Var="confirmation" />
+      </Event>
+      <Event Name="alarm">
+        <With Var="theAlarmType" />
+      </Event>
+      <Event Name="askSensorValue" />
+    </EventOutputs>
+ 
+    <InputVars>
+      <VarDeclaration Name="orderedState" Type="STRING" />
+      <VarDeclaration Name="alarmType" Type="INT" />
+      <VarDeclaration Name="time" Type="TIME" />
+      <VarDeclaration Name="sensorValue" Type="STRING" />
+    </InputVars>
+
+    <OutputVars>
+      <VarDeclaration Name="confirmation" Type="BOOL" />
+      <VarDeclaration Name="theAlarmType" Type="INT" />
+    </OutputVars>
+      
+  </InterfaceList>
+
+  <FBNetwork>
+
+    <FB Name="timer" Type="E_DELAY" />
+    <FB Name="subView" Type="Sensor_StateOrder_subView" />
+
+      <EventConnections>
+	
+	<!-- Connections from this View to subView -->
+        <Connection Source="orderState" Destination="subView.orderState" />
+        <Connection Source="sensorValueReported" Destination="subView.sensorValueReported" />
+	<!-- Connections from subView to this View -->
+        <Connection Source="subView.confirmState" Destination="confirmState" />
+        <Connection Source="subView.askSensorValue" Destination="askSensorValue" />
+        <Connection Source="subView.alarm" Destination="alarm" />
+	<!-- Connections from subView to timer -->
+        <Connection Source="subView.startTimer" Destination="timer.START" />
+        <Connection Source="subView.stopTimer" Destination="timer.STOP" />
+	<!-- Connections from timer to subView -->
+        <Connection Source="timer.EO" Destination="subView.timePassed" />
+
+      </EventConnections>
+
+      <DataConnections>
+
+	<!-- Connections from this View to subView -->
+        <Connection Source="orderedState" Destination="subView.orderedState" />
+        <Connection Source="alarmType" Destination="subView.alarmType" />
+        <Connection Source="time" Destination="subView.time" />
+        <Connection Source="sensorValue" Destination="subView.sensorValue" />
+	<!-- Connections from subView to this View -->
+        <Connection Source="subView.confirmation" Destination="confirmation" />
+        <Connection Source="subView.theAlarmType" Destination="theAlarmType" />
+	<!-- Connections from subView to timer -->
+        <Connection Source="subView.delayTime" Destination="timer.DT" />
+
+      </DataConnections>
+
+  </FBNetwork>
+
+</FBType>
+
