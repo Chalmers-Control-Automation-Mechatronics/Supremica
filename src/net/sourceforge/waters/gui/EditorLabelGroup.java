@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorLabelGroup
 //###########################################################################
-//# $Id: EditorLabelGroup.java,v 1.16 2005-12-14 03:09:47 siw4 Exp $
+//# $Id: EditorLabelGroup.java,v 1.17 2005-12-15 21:57:57 siw4 Exp $
 //###########################################################################
 
 
@@ -27,6 +27,8 @@ import javax.swing.border.*;
 
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.RemoveEventCommand;
+import net.sourceforge.waters.gui.command.ReorganizeListCommand;
+import net.sourceforge.waters.gui.command.UndoInterface;
 
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.subject.base.ModelObserver;
@@ -88,21 +90,28 @@ public class EditorLabelGroup
 		ey -= panel.getY();
 
 		panel.requestFocus();
-
-		selectedLabel = getLabelIndexAt(ex, ey);
+		int index = getLabelIndexAt(ex, ey);
+		if (index != -1)
+		{
+			selectedLabel = (IdentifierSubject)mSubject.getEventList().get(index);
+		}
+		else
+		{
+			selectedLabel = null;
+		}
 	}
 
     private int getLabelIndexAt(int ex, int ey)
     {
-	for (int i = 0; i < panel.getComponentCount(); i++)
-	{
-	    JLabel l = (JLabel) panel.getComponent(i);
-	    
-	    if (l.getBounds().contains(ex, ey))
+		for (int i = 0; i < panel.getComponentCount(); i++)
 		{
-			return i;	 
-	    }
-	}
+			JLabel l = (JLabel) panel.getComponent(i);
+			
+			if (l.getBounds().contains(ex, ey))
+			{
+				return i;	 
+			}
+		}
 		return -1;
     }
 
@@ -137,14 +146,14 @@ public class EditorLabelGroup
 			shadowPanel.setVisible(false);
 		}
 		*/
-		
+		int index = mSubject.getEventList().indexOf(selectedLabel);
 		for (int i = 0; i < panel.getComponentCount(); i++)
 		{
 			JLabel l = (JLabel) panel.getComponent(i);
 
 			l.setForeground(getColor());
 
-			if (i == selectedLabel)
+			if (i == index)
 			{
 				l.setForeground(Color.RED);
 			}
@@ -337,7 +346,7 @@ public class EditorLabelGroup
 	{
 		super.setSelected(s);
 		if (!s) {
-		    selectedLabel = -1;
+		    selectedLabel = null;
 		}
 	}
 	
@@ -349,7 +358,7 @@ public class EditorLabelGroup
 
 	public EditorLabelGroup(LabelBlockSubject label, final EditorSurface e)
 	{
-		
+		mUndo = e.getEditorInterface().getUndoInterface();
 		// This is a labelgroup
 		type = LABELGROUP;
 
@@ -400,23 +409,19 @@ public class EditorLabelGroup
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				if ((selectedLabel > 0) && (selectedLabel < panel.getComponentCount()))
+				int index = mSubject.getEventList().indexOf(selectedLabel);
+				if ((index > 0) && (index < panel.getComponentCount()))
 				{
-					final List<AbstractSubject> list =
-						mSubject.getEventListModifiable();
-					final IdentifierSubject ident =
-						(IdentifierSubject) list.get(selectedLabel);
-					// Remove label and add to new position in list
-					list.remove(selectedLabel);
-					list.add(selectedLabel - 1, ident);
+					Command reorganize = new ReorganizeListCommand(mSubject,
+													selectedLabel, index - 1);
+					mUndo.executeCommand(reorganize);
 					// Clear all lists
 					/*
 					shadowPanel.removeAll();
 					*/
 					/*
 					shadowPanel.repaint();
-					*/
-					selectedLabel--;
+					*/					
 				}
 			}
 		});
@@ -425,22 +430,18 @@ public class EditorLabelGroup
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				if ((selectedLabel >= 0) && (selectedLabel < panel.getComponentCount() - 1))
+				int index = mSubject.getEventList().indexOf(selectedLabel);
+				if ((index >= 0) && (index < panel.getComponentCount() - 1))
 				{
-					final List<AbstractSubject> list =
-						mSubject.getEventListModifiable();
-					final IdentifierSubject ident =
-						(IdentifierSubject) list.get(selectedLabel);
-					// Remove label and add to new position in list
-					list.remove(selectedLabel);
-					list.add(selectedLabel + 1, ident);													
+					Command reorganize = new ReorganizeListCommand(mSubject,
+													selectedLabel, index + 1);
+					mUndo.executeCommand(reorganize);																		
 					/*
 					shadowPanel.removeAll();
 					*/
 					/*
 					shadowPanel.repaint();
-					*/
-					selectedLabel++;
+					*/					
 				}
 			}
 		});
@@ -450,13 +451,13 @@ public class EditorLabelGroup
 			public void actionPerformed(ActionEvent action)
 			{
 				// Is a label selected?
-				if ((selectedLabel >= 0) && (selectedLabel < panel.getComponentCount()))
+				int index = mSubject.getEventList().indexOf(selectedLabel);
+				if ((index >= 0) && (index < panel.getComponentCount()))
 				{
 					// Remove event
 					Command removeEvent = new RemoveEventCommand(getSubject(),
-											  			   (IdentifierSubject)getSubject().getEventList().get(selectedLabel));
-					e.getEditorInterface().getUndoInterface().executeCommand(removeEvent);
-					selectedLabel = -1;
+											  			  		selectedLabel);
+					mUndo.executeCommand(removeEvent);					
 				}
 			}
 		});
@@ -488,7 +489,8 @@ public class EditorLabelGroup
 	private LabelBlockSubject mSubject;
 	private int verticalA = 1;
 	private int horizontalA = 1;
-	private int selectedLabel = -1;
+	private IdentifierSubject selectedLabel = null;
+	private final UndoInterface mUndo; 
 
 	//private final ArrayList events;
 	/** Holds labels that are shown on EditorSurface. */
