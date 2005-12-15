@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventEditorDialog
 //###########################################################################
-//# $Id: EventEditorDialog.java,v 1.4 2005-11-03 01:24:15 robi Exp $
+//# $Id: EventEditorDialog.java,v 1.5 2005-12-15 18:21:27 robi Exp $
 //###########################################################################
 
 
@@ -176,7 +176,7 @@ public class EventEditorDialog
 			}
 
 			final EventDeclSubject decl =
-				new EventDeclSubject(nameText, eventkind, false, ranges, null);
+				new EventDeclSubject(nameText, eventkind, true, ranges, null);
 			try	{
 				final ModuleSubject module = mRoot.getModuleSubject();
 				final IndexedList<EventDeclSubject> decls =

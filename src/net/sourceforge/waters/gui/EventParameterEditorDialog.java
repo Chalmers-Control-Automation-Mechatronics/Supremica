@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.waters.gui
 //# CLASS:   EventParameterEditorDialog
 //###########################################################################
-//# $Id: EventParameterEditorDialog.java,v 1.4 2005-11-03 01:24:15 robi Exp $
+//# $Id: EventParameterEditorDialog.java,v 1.5 2005-12-15 18:21:27 robi Exp $
 //###########################################################################
 
 
@@ -182,7 +182,7 @@ public class EventParameterEditorDialog
 			}
 
 			final EventDeclSubject decl =
-				new EventDeclSubject(nameText, eventkind, false, ranges, null);
+				new EventDeclSubject(nameText, eventkind, true, ranges, null);
 			final EventParameterSubject param =
 				new EventParameterSubject(nameText, mIsRequired, decl);
 			try	{
