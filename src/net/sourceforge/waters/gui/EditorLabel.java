@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorLabel
 //###########################################################################
-//# $Id: EditorLabel.java,v 1.19 2005-12-14 17:28:41 robi Exp $
+//# $Id: EditorLabel.java,v 1.20 2005-12-15 18:07:20 robi Exp $
 //###########################################################################
 
 
@@ -54,13 +54,15 @@ public class EditorLabel
 		return mParent;
 	}
 	
-	public void modelChanged(ModelChangeEvent e)
+	public void modelChanged(ModelChangeEvent event)
 	{
-		final String name = getParent().getName();
-		if (editing) {
-			text.setText(name);
-		} else {
-			label.setText(name);
+		if (event.getKind() == ModelChangeEvent.NAME_CHANGED) {
+			final String name = getParent().getName();
+			if (editing) {
+				text.setText(name);
+			} else {
+				label.setText(name);
+			}
 		}
 	}
 
