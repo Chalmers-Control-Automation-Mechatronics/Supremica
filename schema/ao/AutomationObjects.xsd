@@ -58,7 +58,7 @@
   <xsd:complexType>
    <xsd:annotation>
     <xsd:appinfo>
-     <jaxb:class name="AOInternalType"/>
+     <jaxb:class name="AOComplexType"/>
     </xsd:appinfo>
    </xsd:annotation>  
    <xsd:sequence>
@@ -92,7 +92,7 @@
   <xsd:complexType>
    <xsd:annotation>
     <xsd:appinfo>
-     <jaxb:class name="ModelInternalType"/>
+     <jaxb:class name="ModelComplexType"/>
     </xsd:appinfo>
    </xsd:annotation>  
    <xsd:attribute name="Type" type="xsd:string" use="required"/>
@@ -117,7 +117,7 @@
   <xsd:complexType>
    <xsd:annotation>
     <xsd:appinfo>
-     <jaxb:class name="ControllerInternalType"/>
+     <jaxb:class name="ControllerComplexType"/>
     </xsd:appinfo>
    </xsd:annotation>  
    <xsd:attribute name="Type" type="xsd:string" use="required"/>
@@ -143,7 +143,7 @@
   <xsd:complexType>
    <xsd:annotation>
     <xsd:appinfo>
-     <jaxb:class name="ViewInternalType"/>
+     <jaxb:class name="ViewComplexType"/>
     </xsd:appinfo>
    </xsd:annotation>  
    <xsd:attribute name="Name" type="xsd:string" use="required"/>
@@ -166,7 +166,7 @@
   <xsd:complexType>
    <xsd:annotation>
     <xsd:appinfo>
-     <jaxb:class name="ServiceInternalType"/>
+     <jaxb:class name="ServiceComplexType"/>
     </xsd:appinfo>
    </xsd:annotation>  
    <xsd:attribute name="Name" type="xsd:string" use="required"/>

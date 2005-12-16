@@ -19,7 +19,7 @@
 	</classpath>
   </taskdef>
 
-  <target name="den_automationobjects" description="Generate Automation Objects JAXB classes.">
+  <target name="gen_automationobjects" description="Generate Automation Objects JAXB classes.">
     <xjc target="${src}" extension="true" removeOldOutput="yes" package="org.supremica.automationobjects.xsd">
       <schema dir="ao" includes="AutomationObjects.xsd"/>
       <produces dir="${src}/org/supremica/automationobjects/xsd"/>
