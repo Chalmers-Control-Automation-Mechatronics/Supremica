@@ -59,9 +59,7 @@ public class AdapterConnections
 {
 	List connections = new LinkedList();
 
-	private AdapterConnections()
-	{
-	}
+	private AdapterConnections() {}
 
 	public Iterator connectionIterator()
 	{

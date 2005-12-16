@@ -3,21 +3,30 @@
   <property file="build.properties"/>
 
   <property name="src" location="../src"/>
+  <property name="lib" location="../lib"/>
   <property name="xsd_iec61499" location="iec61499/xsd"/>
   <property name="xsd_manufacturingTables" location="manufacturingTables/xsd"/>
 
   <taskdef name="xjc" classname="com.sun.tools.xjc.XJCTask">
-	<classpath path="${jwsdp.classpath}"/>
+	<classpath>
+      <pathelement location="${lib}/jaxb-xjc.jar" />
+	  <pathelement location="${lib}/jaxb-api.jar" />
+	  <pathelement location="${lib}/jaxb-impl.jar" />
+	  <pathelement location="${lib}/jaxb-libs.jar" />
+	  <pathelement location="${lib}/jaxp.jar" />
+	  <pathelement location="${lib}/relaxngDatatype.jar" />
+	  <pathelement location="${lib}/xsdlib.jar" />
+	</classpath>
   </taskdef>
 
-  <target name="automationobjects" description="Generate Automation Objects JAXB classes.">
+  <target name="den_automationobjects" description="Generate Automation Objects JAXB classes.">
     <xjc target="${src}" extension="true" removeOldOutput="yes" package="org.supremica.automationobjects.xsd">
       <schema dir="ao" includes="AutomationObjects.xsd"/>
       <produces dir="${src}/org/supremica/automationobjects/xsd"/>
     </xjc>
   </target>
 
-  <target name="iec61499" description="Generate IEC 61499 JAXB classes.">
+  <target name="gen_iec61499" description="Generate IEC 61499 JAXB classes.">
     <xjc target="${src}" extension="true" removeOldOutput="yes" package="org.supremica.functionblocks.xsd.datatype">
       <schema dir="${xsd_iec61499}" includes="DataType.xsd"/>
       <produces dir="${src}/org/supremica/functionblocks/xsd/datatype"/>

@@ -62,61 +62,61 @@ import java.util.Collections;
 class AlgorithmExecutingThread extends Thread
 {
 
-	private Scheduler scheduler = null;
+    private Scheduler scheduler = null;
 
-	private AlgorithmExecutingThread() {}
+    private AlgorithmExecutingThread() {}
 
-	private List scheduledJobs = Collections.synchronizedList(new LinkedList());
+    private List scheduledJobs = Collections.synchronizedList(new LinkedList());
 
-	public AlgorithmExecutingThread(Scheduler s)
+    public AlgorithmExecutingThread(Scheduler s)
+    {
+	scheduler = s;
+	setName("AlgorithmExecuting");
+	start();
+    }
+
+    public void run()
+    {
+	while (true)
 	{
-		scheduler = s;
-		setName("AlgorithmExecuting");
-		start();
+	    Job currentJob = getNextScheduledJob();
+	    //System.out.println("AlgorithmExecutingThread.run(): Executing " + currentJob.getAlgorithm().getName() + " with text:");
+	    //System.out.println(currentJob.getAlgorithm().toString());
+	    currentJob.getAlgorithm().execute(currentJob.getVariables());
+	    currentJob.getInstance().finishedJob(currentJob);
 	}
+    }   
 
-	public void run()
+    public synchronized Job getNextScheduledJob()
+    {
+	while(scheduledJobs.size() == 0)
 	{
-		while (true)
-		{
-			Job currentJob = getNextScheduledJob();
-			//System.out.println("AlgorithmExecutingThread.run(): Executing " + currentJob.getAlgorithm().getName() + " with text:");
-			//System.out.println(currentJob.getAlgorithm().toString());
-			currentJob.getAlgorithm().execute(currentJob.getVariables());
-			currentJob.getInstance().finishedJob(currentJob);
-		}
+	    try
+	    {
+		wait();
+	    }
+	    catch(InterruptedException e)
+	    {
+		System.err.println("AlgorithmExecutingThread: InterruptedException");
+		e.printStackTrace(System.err);
+	    }
 	}
+	return (Job) scheduledJobs.remove(0);
+    }
 
-	public synchronized Job getNextScheduledJob()
-	{
-		while(scheduledJobs.size() == 0)
-		{
-			try
-			{
-				wait();
-			}
-			catch(InterruptedException e)
-			{
-				System.err.println("AlgorithmExecutingThread: InterruptedException");
-				e.printStackTrace(System.err);
-			}
-		}
-		return (Job) scheduledJobs.remove(0);
-	}
+    //public synchronized int getNumberOfScheduledJobs()
+    //{
+    //	return scheduledJobs.size();
+    //}
 
-	//public synchronized int getNumberOfScheduledJobs()
-	//{
-	//	return scheduledJobs.size();
-	//}
+    //public synchronized void notifyNewJob()
+    //{
+    //	notifyAll();
+    //}
 
-	//public synchronized void notifyNewJob()
-	//{
-	//	notifyAll();
-	//}
-
-	public synchronized void scheduleJob(Job j)
-	{
-		scheduledJobs.add(j);
-		notifyAll();
-	}
+    public synchronized void scheduleJob(Job j)
+    {
+	scheduledJobs.add(j);
+	notifyAll();
+    }
 }

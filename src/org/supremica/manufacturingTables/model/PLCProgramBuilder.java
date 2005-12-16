@@ -299,7 +299,7 @@ public class PLCProgramBuilder
 	org.supremica.functionblocks.xsd.libraryelement.ObjectFactory objFactory = new  org.supremica.functionblocks.xsd.libraryelement.ObjectFactory();
 	try
 	    {
-		FBTypeType FB = objFactory.createFBType();
+			JaxbFBType FB = objFactory.createJaxbFBType();
 		FB.setName(equipEnt.getType() + " " + equipEnt.getName());
 		// Check if it is a sensor EquipmentEntity
 		if (equipEnt.getType().compareTo("Sensor") == 0)
@@ -307,7 +307,7 @@ public class PLCProgramBuilder
 			//java.lang.System.err.println("This is a sensor!");
 			InterfaceListType interfaceList = objFactory.createInterfaceList();
 			EventInputsType eventInputs = objFactory.createEventInputs();
-			EventType eventREQ = objFactory.createEvent();
+			JaxbEvent eventREQ = objFactory.createJaxbEvent();
 			eventREQ.setName("REQ");
 			// there is no setEvent method in EventInputs but the getEvent method returns the actual list
 			eventInputs.getEvent().add(eventREQ);

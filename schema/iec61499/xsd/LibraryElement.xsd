@@ -64,6 +64,11 @@
  </xsd:element>
 
  <xsd:element name='FBNetwork'>
+  <xsd:annotation>
+   <xsd:appinfo>
+    <jaxb:class name="JaxbFBNetwork"/>
+   </xsd:appinfo>
+  </xsd:annotation>  
   <xsd:complexType>
    <xsd:sequence>
     <xsd:element ref='FB' minOccurs='0' maxOccurs='unbounded'/>
@@ -76,11 +81,6 @@
 
  <xsd:element name='FB'>
   <xsd:complexType>
-   <xsd:annotation>
-   <xsd:appinfo>
-     <jaxb:class name="FBInternalType"/>
-   </xsd:appinfo>
-   </xsd:annotation>  
    <xsd:sequence>
     <xsd:element ref='Parameter' minOccurs='0' maxOccurs='unbounded'/>
    </xsd:sequence>
@@ -117,6 +117,11 @@
  </xsd:element>
 
  <xsd:element name='Connection'>
+  <xsd:annotation>
+   <xsd:appinfo>
+    <jaxb:class name="JaxbConnection"/>
+   </xsd:appinfo>
+  </xsd:annotation>  
   <xsd:complexType>
    <xsd:attribute name='Source' type='xsd:string' use='required'/>
    <xsd:attribute name='Destination' type='xsd:string' use='required'/>
@@ -128,6 +133,11 @@
  </xsd:element>
 
  <xsd:element name='FBType'>
+   <xsd:annotation>
+   <xsd:appinfo>
+     <jaxb:class name="JaxbFBType"/>
+   </xsd:appinfo>
+   </xsd:annotation>  
   <xsd:complexType>
    <xsd:sequence>
     <xsd:element ref='Identification' minOccurs='0' maxOccurs='1'/>
@@ -207,6 +217,11 @@
  </xsd:element>
 
  <xsd:element name='Event'>
+  <xsd:annotation>
+   <xsd:appinfo>
+    <jaxb:class name="JaxbEvent"/>
+   </xsd:appinfo>
+  </xsd:annotation>  
   <xsd:complexType>
    <xsd:sequence>
     <xsd:element ref='With' minOccurs='0' maxOccurs='unbounded'/>
@@ -272,6 +287,11 @@
  </xsd:element>
 
  <xsd:element name='ECState'>
+  <xsd:annotation>
+   <xsd:appinfo>
+    <jaxb:class name="JaxbECState"/>
+   </xsd:appinfo>
+  </xsd:annotation>  
   <xsd:complexType>
    <xsd:sequence>
     <xsd:element ref='ECAction' minOccurs='0' maxOccurs='unbounded'/>
@@ -284,6 +304,11 @@
  </xsd:element>
 
  <xsd:element name='ECTransition'>
+  <xsd:annotation>
+   <xsd:appinfo>
+    <jaxb:class name="JaxbECTransition"/>
+   </xsd:appinfo>
+  </xsd:annotation>  
   <xsd:complexType>
    <xsd:attribute name='Source' type='xsd:string' use='required'/>
    <xsd:attribute name='Destination' type='xsd:string' use='required'/>
@@ -295,6 +320,11 @@
  </xsd:element>
 
  <xsd:element name='ECAction'>
+  <xsd:annotation>
+   <xsd:appinfo>
+    <jaxb:class name="JaxbECAction"/>
+   </xsd:appinfo>
+  </xsd:annotation>  
   <xsd:complexType>
    <xsd:attribute name='Algorithm' type='xsd:string' use='optional'/>
    <xsd:attribute name='Output' type='xsd:string' use='optional'/>
@@ -302,6 +332,11 @@
  </xsd:element>
 
  <xsd:element name='Algorithm'>
+  <xsd:annotation>
+   <xsd:appinfo>
+    <jaxb:class name="JaxbAlgorithm"/>
+   </xsd:appinfo>
+  </xsd:annotation>  
   <xsd:complexType>
    <xsd:choice>
     <xsd:element ref='FBD'/>
@@ -413,6 +448,11 @@
  </xsd:element>
 
  <xsd:element name='ResourceType'>
+  <xsd:annotation>
+   <xsd:appinfo>
+    <jaxb:class name="JaxbResourceType"/>
+   </xsd:appinfo>
+  </xsd:annotation>
   <xsd:complexType>
    <xsd:sequence>
     <xsd:element ref='Identification' minOccurs='0' maxOccurs='1'/>
@@ -434,6 +474,11 @@
  </xsd:element>
 
  <xsd:element name='DeviceType'>
+  <xsd:annotation>
+   <xsd:appinfo>
+    <jaxb:class name="JaxbDeviceType"/>
+   </xsd:appinfo>
+  </xsd:annotation>
   <xsd:complexType>
    <xsd:sequence>
     <xsd:element ref='Identification' minOccurs='0' maxOccurs='1'/>
@@ -456,12 +501,12 @@
  </xsd:element>
 
  <xsd:element name='Resource'>
-  <xsd:complexType>
   <xsd:annotation>
    <xsd:appinfo>
-    <jaxb:class name="ResourceInternalType"/>
+    <jaxb:class name="JaxbResource"/>
    </xsd:appinfo>
   </xsd:annotation>  
+  <xsd:complexType>
    <xsd:sequence>
     <xsd:element ref='Parameter' minOccurs='0' maxOccurs='unbounded'/>
     <xsd:element ref='FBNetwork' minOccurs='0' maxOccurs='1'/>
@@ -477,7 +522,7 @@
  <xsd:element name='System'>
    <xsd:annotation>
     <xsd:appinfo>
-     <jaxb:class name="FBSystem"/>
+     <jaxb:class name="JaxbSystem"/>
     </xsd:appinfo>
    </xsd:annotation>  
   <xsd:complexType>
@@ -513,12 +558,12 @@
  </xsd:element>
 
  <xsd:element name='Device'>
-  <xsd:complexType>
   <xsd:annotation>
    <xsd:appinfo>
-    <jaxb:class name="DeviceInternalType"/>
+    <jaxb:class name="JaxbDevice"/>
    </xsd:appinfo>
-  </xsd:annotation>
+  </xsd:annotation>  
+  <xsd:complexType>
    <xsd:sequence>
     <xsd:element ref='Parameter' minOccurs='0' maxOccurs='unbounded'/>
     <xsd:element ref='Resource' minOccurs='0' maxOccurs='unbounded'/>
@@ -541,6 +586,11 @@
  </xsd:element>
 
  <xsd:element name='SubAppType'>
+  <xsd:annotation>
+   <xsd:appinfo>
+    <jaxb:class name="JaxbSubAppType"/>
+   </xsd:appinfo>
+  </xsd:annotation>
   <xsd:complexType>
    <xsd:sequence>
     <xsd:element ref='Identification' minOccurs='0' maxOccurs='1'/>
@@ -601,12 +651,12 @@
  </xsd:element>
 
  <xsd:element name='SubApp'>
-  <xsd:complexType>
   <xsd:annotation>
    <xsd:appinfo>
-    <jaxb:class name="SubAppInternalType"/>
+    <jaxb:class name="JaxbSubApp"/>
    </xsd:appinfo>
-  </xsd:annotation>
+  </xsd:annotation>  
+  <xsd:complexType>
    <xsd:attribute name='Name' type='xsd:string' use='required'/>
    <xsd:attribute name='Type' type='xsd:string' use='required'/>
    <xsd:attribute name='Comment' type='xsd:string' use='optional'/>
