@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorEvents
 //###########################################################################
-//# $Id: EditorEvents.java,v 1.17 2005-11-03 01:24:15 robi Exp $
+//# $Id: EditorEvents.java,v 1.18 2005-12-16 00:26:39 siw4 Exp $
 //###########################################################################
 
 
@@ -194,20 +194,6 @@ public class EditorEvents
 			comp.requestFocus();
 		}
 	}
-
-
-	public void setBuffer(final IdentifierSubject ident)
-	{
-		mBuffer = ident;
-	}
-
-
-	public IdentifierSubject getBuffer()
-	{
-		return null;
-	}
-
-
 
 	//#######################################################################
 	//# Calculating Column Widths
@@ -408,11 +394,10 @@ public class EditorEvents
 			} else if (event.getValueIsAdjusting()) {
 				// Ignore extra messages ...
 			} else if (selmodel.isSelectionEmpty()) {
-				mBuffer = null;
+				;
 			} else {
 				final EventTableModel model = (EventTableModel) getModel();
-				final int row = selmodel.getMinSelectionIndex();
-				mBuffer = model.getEvent(row);
+				final int row = selmodel.getMinSelectionIndex();				
 			}
 		}
 
@@ -537,7 +522,6 @@ public class EditorEvents
 
 	//#######################################################################
 	//# Data Members
-	private IdentifierSubject mBuffer;
 	private DragSource mDragSource;
 	private DragGestureListener mDGListener;
 	private DragSourceListener mDSListener;

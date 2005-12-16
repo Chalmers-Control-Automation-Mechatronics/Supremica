@@ -26,27 +26,41 @@ public class SpringEmbedder
 		Map<Proxy, Object> movements = new IdentityHashMap<Proxy, Object>();
 		Collection<Proxy> proxyies = new ArrayList<Proxy>();
 		proxyies.addAll(g.getNodes());
+		double max = 0;
 		//proxyies.addAll(g.getEdges());
 		try
 		{
 			DisplacementCalculator d = new DisplacementCalculator(g);
-			for (int i = 0; i < iterations; i++)
+			while(true)
 			{			
 				for (Proxy p : proxyies)
 				{
-					movements.put(p, p.acceptVisitor(d));
+					if (p instanceof SimpleNodeProxy)
+					{
+						movements.put(p, p.acceptVisitor(d));
+					}
 				}
-				d.updatePositions(movements);
+				max = d.updatePositions(movements);
+				System.out.println(max);
+				if (max < .01)
+				{
+					break;
+				}
 			}
 			proxyies.clear();
 			proxyies.addAll(g.getEdges());
-			for (int i = 0; i < iterations/10; i++)
+			while(true)
 			{
 				for (Proxy p : proxyies)
 				{
 					movements.put(p, p.acceptVisitor(d));
 				}
-				d.updatePositions(movements);
+				max = d.updatePositions(movements);
+				System.out.println(max);
+				if (max < .01)
+				{
+					break;
+				}
 			}
 			// most likely going to have to update this when also dealing with nodegroups
 			// makes certain that every thing has a positive position
@@ -174,16 +188,22 @@ public class SpringEmbedder
 			return new Point2D.Double(-dx*constant, -dy*constant);
 		}
 		
-		public void updatePositions(Map<? extends Proxy, ? extends Object> m )
+		public double updatePositions(Map<? extends Proxy, ? extends Object> m )
 		{
+			double max = 0;
 			for (Proxy p : mPositions.keySet())
 			{
 				if (m.get(p) instanceof Point2D)
-				{
+				{					
 					Point2D point = (Point2D)m.get(p);
+					if (max < point.distance(mPositions.get(p)))
+					{
+						max = point.distance(mPositions.get(p));
+					}
 					mPositions.get(p).setLocation(point);
 				}
 			}
+			return max;
 		}
 		
 		public Object visitSimpleNodeProxy(final SimpleNodeProxy node)
@@ -247,23 +267,11 @@ public class SpringEmbedder
 				{
 					p = repulsion(mPositions.get(edge),
 								  mPositions.get(e),
-								  REPULSIONCONST2);
+								  EDGEREPULSE);
 					dx += p.getX();
 					dy += p.getY();
 				}
-			}
-			for (NodeProxy n : mGraph.getNodes())
-			{
-				if (n instanceof SimpleNodeProxy)
-				{
-					SimpleNodeProxy node = (SimpleNodeProxy)n;
-					p = repulsion(mPositions.get(edge),
-										  mPositions.get(node),
-										  EDGEREPULSE);
-					dx += p.getX();
-					dy += p.getY();
-				}
-			}
+			}			
 			p = attraction(mPositions.get(edge),
 						   mPositions.get(edge.getSource()),
 						   EDGEATTRACTION);
@@ -274,6 +282,19 @@ public class SpringEmbedder
 						   EDGEATTRACTION);
 			dx += p.getX();
 			dy += p.getY();
+			if (edge.getSource() == edge.getTarget())
+			{
+				p = repulsion(mPositions.get(edge),
+						   	  mPositions.get(edge.getSource()),
+							  REPULSIONCONST2);
+							  dx += p.getX();
+							  dy += p.getY();
+				p = repulsion(mPositions.get(edge),
+						   	  mPositions.get(edge.getTarget()),
+							  REPULSIONCONST2);
+							  dx += p.getX();
+							  dy += p.getY();
+			}
 			//System.out.println("Edge" + edges + ": " + mPositions.get(edge));
 			p.setLocation(mPositions.get(edge).getX() + dx,
 						  mPositions.get(edge).getY() + dy);

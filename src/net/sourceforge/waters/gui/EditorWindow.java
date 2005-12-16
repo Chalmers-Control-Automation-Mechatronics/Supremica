@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorWindow
 //###########################################################################
-//# $Id: EditorWindow.java,v 1.22 2005-12-01 00:29:58 siw4 Exp $
+//# $Id: EditorWindow.java,v 1.23 2005-12-16 00:26:39 siw4 Exp $
 //###########################################################################
 
 
@@ -119,16 +119,6 @@ public class EditorWindow
 		surface.createOptions(this);
 
 		setVisible(true);
-	}
-
-	public IdentifierSubject getBuffer()
-	{
-		return mEventPane.getBuffer();
-	}
-
-	public void setBuffer(final IdentifierSubject ident)
-	{
-		mEventPane.setBuffer(ident);
 	}
 
 	public boolean isSaved()

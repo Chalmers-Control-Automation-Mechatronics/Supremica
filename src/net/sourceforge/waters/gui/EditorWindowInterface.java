@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorWindow
 //###########################################################################
-//# $Id: EditorWindowInterface.java,v 1.5 2005-11-03 01:24:15 robi Exp $
+//# $Id: EditorWindowInterface.java,v 1.6 2005-12-16 00:26:39 siw4 Exp $
 //###########################################################################
 
 
@@ -20,10 +20,6 @@ import net.sourceforge.waters.subject.module.IdentifierSubject;
 
 public interface EditorWindowInterface
 {
-	public IdentifierSubject getBuffer();
-
-	public void setBuffer(IdentifierSubject ident);
-
 	public boolean isSaved();
 
 	public void setSaved(boolean s);

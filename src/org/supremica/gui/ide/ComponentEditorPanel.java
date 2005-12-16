@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ComponentEditorPanel
 //###########################################################################
-//# $Id: ComponentEditorPanel.java,v 1.18 2005-11-03 01:24:16 robi Exp $
+//# $Id: ComponentEditorPanel.java,v 1.19 2005-12-16 00:26:39 siw4 Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -112,16 +112,6 @@ public class ComponentEditorPanel
 		}
 
 		surface.createOptions(this);
-	}
-
-	public IdentifierSubject getBuffer()
-	{
-		return events.getBuffer();
-	}
-
-	public void setBuffer(final IdentifierSubject ident)
-	{
-		events.setBuffer(ident);
 	}
 
 	public boolean isSaved()
