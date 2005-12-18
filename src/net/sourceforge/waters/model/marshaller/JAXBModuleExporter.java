@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBModuleExporter
 //###########################################################################
-//# $Id: JAXBModuleExporter.java,v 1.3 2005-12-14 13:13:15 robi Exp $
+//# $Id: JAXBModuleExporter.java,v 1.4 2005-12-18 21:11:32 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -372,6 +372,19 @@ public class JAXBModuleExporter
     try {
       final IndexedIdentifierType element = mFactory.createIndexedIdentifier();
       copyIndexedIdentifierProxy(proxy, element);
+      return element;
+    } catch (final JAXBException exception) {
+      throw wrap(exception);
+    }
+  }
+
+  public PointGeometryType visitInitialArrowGeometryProxy
+      (final PointGeometryProxy proxy)
+    throws VisitorException
+  {
+    try {
+      final PointGeometryType element = mFactory.createInitialArrowGeometry();
+      copyPointGeometryProxy(proxy, element);
       return element;
     } catch (final JAXBException exception) {
       throw wrap(exception);
@@ -1155,6 +1168,13 @@ public class JAXBModuleExporter
       final PointGeometryType pointGeometryElement =
         visitPointGeometryProxy(pointGeometryProxy);
       element.setPointGeometry(pointGeometryElement);
+    }
+    final PointGeometryProxy arrowGeometryProxy =
+      proxy.getInitialArrowGeometry();
+    if (arrowGeometryProxy != null) {
+      final PointGeometryType arrowGeometryElement =
+        visitInitialArrowGeometryProxy(arrowGeometryProxy);
+      element.setInitialArrowGeometry(arrowGeometryElement);
     }
     final LabelGeometryProxy labelGeometryProxy = proxy.getLabelGeometry();
     if (labelGeometryProxy != null) {

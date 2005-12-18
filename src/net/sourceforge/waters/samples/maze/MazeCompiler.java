@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.samples.maze
 //# CLASS:   MazeCompiler
 //###########################################################################
-//# $Id: MazeCompiler.java,v 1.3 2005-11-03 01:24:16 robi Exp $
+//# $Id: MazeCompiler.java,v 1.4 2005-12-18 21:11:32 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.samples.maze;
@@ -183,7 +183,7 @@ public class MazeCompiler implements ProxyUnmarshaller<ModuleProxy>
     final EventListExpressionProxy props =
       mFactory.createPlainEventListProxy(empty);  
     final SimpleNodeProxy node =
-      mFactory.createSimpleNodeProxy("q0", props, true, null, null);
+      mFactory.createSimpleNodeProxy("q0", props, true, null, null, null);
     final List<SimpleNodeProxy> nodes = Collections.singletonList(node);
     final List<Proxy> blocked = new LinkedList<Proxy>();
     for (final Action action : escapes) {

@@ -459,6 +459,7 @@
       <xs:extension base="M:NodeType">
         <xs:sequence>
           <xs:element ref="M:PointGeometry" minOccurs="0"/>
+          <xs:element ref="M:InitialArrowGeometry" minOccurs="0"/>
           <xs:element ref="M:LabelGeometry" minOccurs="0"/>
         </xs:sequence>
         <xs:attribute name="Initial" type="xs:boolean" default="false"/>
@@ -538,6 +539,7 @@
 
 <xs:element name="PointGeometry" type="M:PointGeometryType"/>
 <xs:element name="StartPointGeometry" type="M:PointGeometryType"/>
+<xs:element name="InitialArrowGeometry" type="M:PointGeometryType"/>
 <xs:element name="EndPointGeometry" type="M:PointGeometryType"/>
 
 <xs:element name="BoxGeometry">

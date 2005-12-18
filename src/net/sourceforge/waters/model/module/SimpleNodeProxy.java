@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   SimpleNodeProxy
 //###########################################################################
-//# $Id: SimpleNodeProxy.java,v 1.5 2005-11-03 01:24:16 robi Exp $
+//# $Id: SimpleNodeProxy.java,v 1.6 2005-12-18 21:11:32 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
@@ -55,6 +55,17 @@ public interface SimpleNodeProxy extends NodeProxy {
    *         center of the circle representing this node in a graph.
    */
   public PointGeometryProxy getPointGeometry();
+
+  /**
+   * Gets the position of the initial state arrow of this node. Initial
+   * nodes can be rendered using a small arrow pointing against the node.
+   * This attribute defines the relative position of the start point of
+   * that arrow. It only make sense for initial nodes and should be
+   * <CODE>null</CODE> in all other cases.
+   * @return A {@link PointGeometryProxy} identifying the start point
+   *         of the initial state arrow relative to the centre of the node.
+   */
+  public PointGeometryProxy getInitialArrowGeometry();
 
   /**
    * Gets the geometric position of the label of this node.

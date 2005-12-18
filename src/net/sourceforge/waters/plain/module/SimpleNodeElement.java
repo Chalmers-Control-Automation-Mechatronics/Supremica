@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   SimpleNodeElement
 //###########################################################################
-//# $Id: SimpleNodeElement.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: SimpleNodeElement.java,v 1.3 2005-12-18 21:11:32 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -42,17 +42,20 @@ public final class SimpleNodeElement
    * @param propositions The list of propositions of the new simple node.
    * @param initial The initial status of the new simple node.
    * @param pointGeometry The geometric position of the new simple node, or <CODE>null</CODE>.
+   * @param initialArrowGeometry The position of the initial state arrow of the new simple node, or <CODE>null</CODE>.
    * @param labelGeometry The geometric position of the label of the new simple node, or <CODE>null</CODE>.
    */
   public SimpleNodeElement(final String name,
                            final EventListExpressionProxy propositions,
                            final boolean initial,
                            final PointGeometryProxy pointGeometry,
+                           final PointGeometryProxy initialArrowGeometry,
                            final LabelGeometryProxy labelGeometry)
   {
     super(name, propositions);
     mIsInitial = initial;
     mPointGeometry = pointGeometry;
+    mInitialArrowGeometry = initialArrowGeometry;
     mLabelGeometry = labelGeometry;
   }
 
@@ -60,7 +63,8 @@ public final class SimpleNodeElement
    * Creates a new simple node using default values.
    * This constructor creates a simple node with
    * the initial status set to <CODE>false</CODE>,
-   * the geometric position set to <CODE>null</CODE>, and
+   * the geometric position set to <CODE>null</CODE>,
+   * the position of the initial state arrow set to <CODE>null</CODE>, and
    * the geometric position of the label set to <CODE>null</CODE>.
    * @param name The name of the new simple node.
    * @param propositions The list of propositions of the new simple node.
@@ -71,6 +75,7 @@ public final class SimpleNodeElement
     this(name,
          propositions,
          false,
+         null,
          null,
          null);
   }
@@ -104,6 +109,7 @@ public final class SimpleNodeElement
       return
         (mIsInitial == downcast.mIsInitial) &&
         Geometry.equalGeometry(mPointGeometry, downcast.mPointGeometry) &&
+        Geometry.equalGeometry(mInitialArrowGeometry, downcast.mInitialArrowGeometry) &&
         Geometry.equalGeometry(mLabelGeometry, downcast.mLabelGeometry);
     } else {
       return false;
@@ -133,6 +139,11 @@ public final class SimpleNodeElement
     return mPointGeometry;
   }
 
+  public PointGeometryProxy getInitialArrowGeometry()
+  {
+    return mInitialArrowGeometry;
+  }
+
   public LabelGeometryProxy getLabelGeometry()
   {
     return mLabelGeometry;
@@ -151,6 +162,7 @@ public final class SimpleNodeElement
   //# Data Members
   private final boolean mIsInitial;
   private final PointGeometryProxy mPointGeometry;
+  private final PointGeometryProxy mInitialArrowGeometry;
   private final LabelGeometryProxy mLabelGeometry;
 
 }

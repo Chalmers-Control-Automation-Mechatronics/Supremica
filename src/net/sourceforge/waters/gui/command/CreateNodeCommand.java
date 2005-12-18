@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.command
 //# CLASS:   CreateNodeCommand
 //###########################################################################
-//# $Id: CreateNodeCommand.java,v 1.4 2005-11-03 01:24:15 robi Exp $
+//# $Id: CreateNodeCommand.java,v 1.5 2005-12-18 21:11:32 robi Exp $
 //###########################################################################
 
 
@@ -65,8 +65,7 @@ public class CreateNodeCommand
 		final Collection<Proxy> empty = Collections.emptyList();
 		final EventListExpressionSubject props =
 			new PlainEventListSubject(empty);
-		final SimpleNodeSubject node =
-			new SimpleNodeSubject(name, props, false, null, null);
+		final SimpleNodeSubject node = new SimpleNodeSubject(name, props);
 		mCreated = new EditorNode(x, y, node, surface);       
     }
 

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   SimpleNodeSubject
 //###########################################################################
-//# $Id: SimpleNodeSubject.java,v 1.3 2005-12-03 21:30:42 robi Exp $
+//# $Id: SimpleNodeSubject.java,v 1.4 2005-12-18 21:11:32 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -43,12 +43,14 @@ public final class SimpleNodeSubject
    * @param propositions The list of propositions of the new simple node.
    * @param initial The initial status of the new simple node.
    * @param pointGeometry The geometric position of the new simple node, or <CODE>null</CODE>.
+   * @param initialArrowGeometry The position of the initial state arrow of the new simple node, or <CODE>null</CODE>.
    * @param labelGeometry The geometric position of the label of the new simple node, or <CODE>null</CODE>.
    */
   public SimpleNodeSubject(final String name,
                            final EventListExpressionProxy propositions,
                            final boolean initial,
                            final PointGeometryProxy pointGeometry,
+                           final PointGeometryProxy initialArrowGeometry,
                            final LabelGeometryProxy labelGeometry)
   {
     super(name, propositions);
@@ -56,6 +58,10 @@ public final class SimpleNodeSubject
     mPointGeometry = (PointGeometrySubject) pointGeometry;
     if (mPointGeometry != null) {
       mPointGeometry.setParent(this);
+    }
+    mInitialArrowGeometry = (PointGeometrySubject) initialArrowGeometry;
+    if (mInitialArrowGeometry != null) {
+      mInitialArrowGeometry.setParent(this);
     }
     mLabelGeometry = (LabelGeometrySubject) labelGeometry;
     if (mLabelGeometry != null) {
@@ -67,7 +73,8 @@ public final class SimpleNodeSubject
    * Creates a new simple node using default values.
    * This constructor creates a simple node with
    * the initial status set to <CODE>false</CODE>,
-   * the geometric position set to <CODE>null</CODE>, and
+   * the geometric position set to <CODE>null</CODE>,
+   * the position of the initial state arrow set to <CODE>null</CODE>, and
    * the geometric position of the label set to <CODE>null</CODE>.
    * @param name The name of the new simple node.
    * @param propositions The list of propositions of the new simple node.
@@ -78,6 +85,7 @@ public final class SimpleNodeSubject
     this(name,
          propositions,
          false,
+         null,
          null,
          null);
   }
@@ -91,6 +99,10 @@ public final class SimpleNodeSubject
     if (mPointGeometry != null) {
       cloned.mPointGeometry = mPointGeometry.clone();
       cloned.mPointGeometry.setParent(cloned);
+    }
+    if (mInitialArrowGeometry != null) {
+      cloned.mInitialArrowGeometry = mInitialArrowGeometry.clone();
+      cloned.mInitialArrowGeometry.setParent(cloned);
     }
     if (mLabelGeometry != null) {
       cloned.mLabelGeometry = mLabelGeometry.clone();
@@ -120,6 +132,7 @@ public final class SimpleNodeSubject
       return
         (mIsInitial == downcast.mIsInitial) &&
         Geometry.equalGeometry(mPointGeometry, downcast.mPointGeometry) &&
+        Geometry.equalGeometry(mInitialArrowGeometry, downcast.mInitialArrowGeometry) &&
         Geometry.equalGeometry(mLabelGeometry, downcast.mLabelGeometry);
     } else {
       return false;
@@ -147,6 +160,11 @@ public final class SimpleNodeSubject
   public PointGeometrySubject getPointGeometry()
   {
     return mPointGeometry;
+  }
+
+  public PointGeometrySubject getInitialArrowGeometry()
+  {
+    return mInitialArrowGeometry;
   }
 
   public LabelGeometrySubject getLabelGeometry()
@@ -192,6 +210,26 @@ public final class SimpleNodeSubject
   }
 
   /**
+   * Sets the position of the initial state arrow of this node.
+   */
+  public void setInitialArrowGeometry(final PointGeometrySubject initialArrowGeometry)
+  {
+    if (mInitialArrowGeometry == initialArrowGeometry) {
+      return;
+    }
+    if (initialArrowGeometry != null) {
+      initialArrowGeometry.setParent(this);
+    }
+    if (mInitialArrowGeometry != null) {
+      mInitialArrowGeometry.setParent(null);
+    }
+    mInitialArrowGeometry = initialArrowGeometry;
+    final ModelChangeEvent event =
+      ModelChangeEvent.createGeometryChanged(this);
+    fireModelChanged(event);
+  }
+
+  /**
    * Sets the geometric position of the label of this node.
    */
   public void setLabelGeometry(final LabelGeometrySubject labelGeometry)
@@ -224,6 +262,7 @@ public final class SimpleNodeSubject
   //# Data Members
   private boolean mIsInitial;
   private PointGeometrySubject mPointGeometry;
+  private PointGeometrySubject mInitialArrowGeometry;
   private LabelGeometrySubject mLabelGeometry;
 
 }

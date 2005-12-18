@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.39 2005-12-14 03:09:47 siw4 Exp $
+//# $Id: EditorSurface.java,v 1.40 2005-12-18 21:11:32 robi Exp $
 //###########################################################################
 
 
@@ -345,8 +345,13 @@ public class EditorSurface
 	public void addNode(String name, int x, int y)
 	{
 	    Collection<Proxy> ev = Collections.emptyList();
-	    SimpleNodeSubject np = new SimpleNodeSubject(name, new PlainEventListSubject(ev), false,
-							 new PointGeometrySubject(new Point2D.Double(x, y)), null);
+	    SimpleNodeSubject np = new SimpleNodeSubject
+			(name,
+			 new PlainEventListSubject(ev),
+			 false,
+			 new PointGeometrySubject(new Point2D.Double(x, y)),
+			 null,
+			 null);
 	    EditorNode n = new EditorNode(x, y, np, this);
 	    addNode(n);
 	}

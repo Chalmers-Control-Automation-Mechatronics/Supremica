@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   ModuleElementFactory
 //###########################################################################
-//# $Id: ModuleElementFactory.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: ModuleElementFactory.java,v 1.3 2005-12-18 21:11:32 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -724,6 +724,7 @@ public class ModuleElementFactory
    * @param propositions The list of propositions of the new simple node.
    * @param initial The initial status of the new simple node.
    * @param pointGeometry The geometric position of the new simple node, or <CODE>null</CODE>.
+   * @param initialArrowGeometry The position of the initial state arrow of the new simple node, or <CODE>null</CODE>.
    * @param labelGeometry The geometric position of the label of the new simple node, or <CODE>null</CODE>.
    */
   public SimpleNodeElement createSimpleNodeProxy
@@ -731,12 +732,14 @@ public class ModuleElementFactory
        final EventListExpressionProxy propositions,
        final boolean initial,
        final PointGeometryProxy pointGeometry,
+       final PointGeometryProxy initialArrowGeometry,
        final LabelGeometryProxy labelGeometry)
   {
     return new SimpleNodeElement(name,
                                  propositions,
                                  initial,
                                  pointGeometry,
+                                 initialArrowGeometry,
                                  labelGeometry);
   }
 
@@ -744,7 +747,8 @@ public class ModuleElementFactory
    * Creates a new simple node using default values.
    * This method creates a simple node with
    * the initial status set to <CODE>false</CODE>,
-   * the geometric position set to <CODE>null</CODE>, and
+   * the geometric position set to <CODE>null</CODE>,
+   * the position of the initial state arrow set to <CODE>null</CODE>, and
    * the geometric position of the label set to <CODE>null</CODE>.
    * @param name The name of the new simple node.
    * @param propositions The list of propositions of the new simple node.

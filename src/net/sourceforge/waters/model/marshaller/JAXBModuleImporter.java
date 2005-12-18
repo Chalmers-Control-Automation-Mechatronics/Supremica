@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBModuleImporter
 //###########################################################################
-//# $Id: JAXBModuleImporter.java,v 1.4 2005-11-09 03:18:07 robi Exp $
+//# $Id: JAXBModuleImporter.java,v 1.5 2005-12-18 21:11:32 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -907,6 +907,10 @@ public class JAXBModuleImporter
     final PointGeometryType pointGeometryElement = element.getPointGeometry();
     final PointGeometryProxy pointGeometry =
       importPointGeometry(pointGeometryElement);
+    final PointGeometryType arrowGeometryElement =
+      element.getInitialArrowGeometry();
+    final PointGeometryProxy arrowGeometry =
+      importPointGeometry(arrowGeometryElement);
     final LabelGeometryType labelGeometryElement = element.getLabelGeometry();
     final LabelGeometryProxy labelGeometry =
       importLabelGeometry(labelGeometryElement);
@@ -914,6 +918,7 @@ public class JAXBModuleImporter
                                           propositions,
                                           initial,
                                           pointGeometry,
+                                          arrowGeometry,
                                           labelGeometry);
   }
 
