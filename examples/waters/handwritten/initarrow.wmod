@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="initarrow" xmlns="http://waters.sourceforge.net/xsd/module">
+<ComponentList>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="comp"/>
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="s0">
+<PointGeometry>
+<Point X="48" Y="48"/>
+</PointGeometry>
+<InitialArrowGeometry>
+<Point X="16" Y="-16"/>
+</InitialArrowGeometry>
+</SimpleNode>
+</NodeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</Module>
+
