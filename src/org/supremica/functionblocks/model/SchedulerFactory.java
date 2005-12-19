@@ -24,8 +24,8 @@
  *
  * Knut Akesson (KA), knut@supremica.org
  * Supremica,
- * Knarrhogsgatan 10
- * SE-431 60 MOLNDAL
+ * Haradsgatan 26A
+ * 431 42 Molndal
  * SWEDEN
  *
  * to discuss license terms. No cost evaluation licenses are
@@ -46,33 +46,23 @@
  *
  * Supremica is owned and represented by KA.
  */
-
-/*
- * Created on Jan 11, 2005
- */
-/**
- * @author Goran Cengic
- */
 package org.supremica.functionblocks.model;
 
-class EventHandlingThread extends Thread
+/**
+ * Describe class SchedulerFactory here.
+ *
+ *
+ * Created: Sun Dec 18 18:52:07 2005
+ *
+ * @author Goran Cengic
+ * @version 1.0
+ */
+public class SchedulerFactory 
 {
 
-    private Resource resource = null;
-    private Scheduler scheduler = null;
-
-    private EventHandlingThread() {}
-
-    public EventHandlingThread(Resource r,Scheduler s)
-    {
-        resource = r;
-	scheduler = s;
-    }
-
-    public void run()
-    {
-	while (true)
+	static public Scheduler getScheduler(Resource res,int numberOfEventThreads, int numberOfAlgorithmThreads)
 	{
+		return new Scheduler(res, numberOfEventThreads, numberOfAlgorithmThreads);
 	}
-    }
+
 }
