@@ -74,7 +74,7 @@ public class Resource extends NamedObject
 
 		device = d;
 
-		scheduler = new Scheduler(this);
+		scheduler = SchedulerFactory.getScheduler(this,5,5);
 
     }
 
@@ -83,10 +83,10 @@ public class Resource extends NamedObject
 		System.out.println("Resource.handleConfigurationRequests()");
     }
 
-    void runResource()
+    void run()
     {
-		System.out.println("Resource.runResource()");
-		scheduler.runEvents();
+		System.out.println("Resource.run()");
+		scheduler.run();
     }
 
     Scheduler getScheduler()

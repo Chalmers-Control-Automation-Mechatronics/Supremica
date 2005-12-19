@@ -71,12 +71,12 @@ public class Device extends NamedObject
 		loader = new Loader(this, systemFileName, libraryPathBase, libraryPath);
 	}
 
-    public void runDevice()
+    public void run()
     {
 		System.out.println("Device.runDevice()");
 		for (Iterator iter = resources.keySet().iterator();iter.hasNext();)
 		{
-			getResource((String) iter.next()).runResource();
+			getResource((String) iter.next()).run();
 		}
     }
 

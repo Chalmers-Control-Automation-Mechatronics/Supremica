@@ -6,6 +6,7 @@
       <Event Name="KulaMatstation" />
       <Event Name="Storkula" />
       <Event Name="Litenkula" />
+	  <Event Name="HissNere" />
     </EventInputs>
     <EventOutputs>
       <Event Name="Mat" />
@@ -14,16 +15,18 @@
   </InterfaceList>
   <BasicFB>
     <ECC>
-        <ECState Name="INIT" />
-        <ECState Name="STATE1">
-	  	<ECAction Output="Mat" />
-	</ECState>
-        <ECState Name="STATE2">
-	    	<ECAction Output="Urmatning" />
-	</ECState>
-	<ECTransition Source="INIT" Destination="STATE1" Condition="KulaMatstation" />
-	<ECTransition Source="STATE1" Destination="STATE2" Condition="Storkula OR Litenkula" />
-	<ECTransition Source="STATE2" Destination="INIT" Condition="1" />
+      <ECState Name="INIT" />
+      <ECState Name="STATE1">
+	    <ECAction Output="Mat" />
+	  </ECState>
+      <ECState Name="STATE2">
+	   	<ECAction Output="Urmatning" />
+	  </ECState>
+      <ECState Name="STATE3"/>
+	  <ECTransition Source="INIT" Destination="STATE1" Condition="KulaMatstation" />
+	  <ECTransition Source="STATE1" Destination="STATE2" Condition="Storkula OR Litenkula" />
+	  <ECTransition Source="STATE2" Destination="STATE3" Condition="HissNere" />
+	  <ECTransition Source="STATE3" Destination="INIT" Condition="1" />
     </ECC>
   </BasicFB>
 </FBType>

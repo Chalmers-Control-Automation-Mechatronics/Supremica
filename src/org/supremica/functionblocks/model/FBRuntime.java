@@ -58,57 +58,57 @@ public class FBRuntime
 
     public static void main(String[] args)
     {
-	//System.out.println("Number of args: " + args.length);
-	//for(int i = 0; i < args.length; i++)
-	//{
-	//    System.out.println("  arg[" + i + "]: " + args[i] );
-	//}
+		//System.out.println("Number of args: " + args.length);
+		//for(int i = 0; i < args.length; i++)
+		//{
+		//    System.out.println("  arg[" + i + "]: " + args[i] );
+		//}
                 
-	String systemFileName = null;
-	String libraryPathBase = null;
-	String libraryPath = null;
+		String systemFileName = null;
+		String libraryPathBase = null;
+		String libraryPath = null;
 
-	if (args.length == 1)
-	{
-	    systemFileName = args[0];
-	}
-	else if (args.length == 2)
-	{
-	    systemFileName = args[0];
-	    if (args[1].contains(File.pathSeparator))
-	    {
-		libraryPath = args[1];
-	    }
-	    else
-	    {
-		libraryPathBase = args[1];
-	    }
-	}
-	else if (args.length >= 3)
-	{
-	    systemFileName = args[0];
-	    libraryPathBase = args[1];
-	    for(int i = 2; i < args.length; i++)
-	    {
-		if (libraryPath == null)
+		if (args.length == 1)
 		{
-		    libraryPath = args[i];
+			systemFileName = args[0];
+		}
+		else if (args.length == 2)
+		{
+			systemFileName = args[0];
+			if (args[1].contains(File.pathSeparator))
+			{
+				libraryPath = args[1];
+			}
+			else
+			{
+				libraryPathBase = args[1];
+			}
+		}
+		else if (args.length >= 3)
+		{
+			systemFileName = args[0];
+			libraryPathBase = args[1];
+			for(int i = 2; i < args.length; i++)
+			{
+				if (libraryPath == null)
+				{
+					libraryPath = args[i];
+				}
+				else
+				{
+					libraryPath = libraryPath + File.pathSeparator + args[i];
+				}
+			}   
 		}
 		else
 		{
-		    libraryPath = libraryPath + File.pathSeparator + args[i];
+			System.err.println("Usage: FBRuntime file.sys [libraryPathBase] [libraryPathDirectory]...");
+			return;
 		}
-	    }   
-	}
-	else
-	{
-	    System.err.println("Usage: FBRuntime file.sys [libraryPathBase] [libraryPathDirectory]...");
-	    return;
-	}
 
-	Device theDevice = new Device("FBRuntime Device", systemFileName, libraryPathBase, libraryPath);
-	theDevice.runDevice();
-
+		Device theDevice = new Device("FBRuntime Device", systemFileName, libraryPathBase, libraryPath);
+		theDevice.run();
+		//System.out.println("FBRuntime.main(): Returning.");
     }
 
 }

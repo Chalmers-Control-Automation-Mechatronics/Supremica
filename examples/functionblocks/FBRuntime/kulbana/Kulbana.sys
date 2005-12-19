@@ -9,6 +9,7 @@
     <FB Name="merge2" Type="E_MERGE2" />
     <FB Name="splitStor" Type="E_SPLIT2" />
     <FB Name="splitLiten" Type="E_SPLIT2" />
+    <FB Name="splitHissNere" Type="E_SPLIT2" />
 	<FB Name="kulbana" Type="Kulbana" />
 	<FB Name="matlyft" Type="KulaMatlyft" />
 	<FB Name="matstation" Type="Matstation" />
@@ -29,18 +30,20 @@
 
   		  <Connection Source="kulbana.StorKula" Destination="splitStor.EI" />
   		  <Connection Source="kulbana.LitenKula" Destination="splitLiten.EI" />
+  		  <Connection Source="kulbana.HissNere" Destination="splitHissNere.EI" />
 
 
   		  <Connection Source="kulbana.KulaMatstation" Destination="matstation.KulaMatstation" />
   		  <Connection Source="splitStor.EO1" Destination="matstation.Storkula" />
   		  <Connection Source="splitLiten.EO1" Destination="matstation.Litenkula" />
+  		  <Connection Source="splitHissNere.EO1" Destination="matstation.HissNere" />
   		  <Connection Source="matstation.Mat" Destination="kulbana.Mat" />
   		  <Connection Source="matstation.Urmatning" Destination="kulbana.UrMatning" />
 
   		  <Connection Source="splitStor.EO2" Destination="hiss.StorKula" />
   		  <Connection Source="splitLiten.EO2" Destination="hiss.LitenKula" />
   		  <Connection Source="kulbana.KulaHiss" Destination="hiss.KulaHiss" />
-  		  <Connection Source="kulbana.HissNere" Destination="hiss.HissNere" />
+  		  <Connection Source="splitHissNere.EO2" Destination="hiss.HissNere" />
   		  <Connection Source="hiss.UppHissVan1" Destination="kulbana.UppHissVan1" />
   		  <Connection Source="hiss.UppHissVan2" Destination="kulbana.UppHissVan2" />
 

@@ -55,9 +55,6 @@
  */
 package org.supremica.functionblocks.model;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Collections;
 
 class AlgorithmExecutingThread extends Thread
 {
@@ -66,57 +63,22 @@ class AlgorithmExecutingThread extends Thread
 
     private AlgorithmExecutingThread() {}
 
-    private List scheduledJobs = Collections.synchronizedList(new LinkedList());
-
-    public AlgorithmExecutingThread(Scheduler s)
+    public AlgorithmExecutingThread(String name, Scheduler s)
     {
-	scheduler = s;
-	setName("AlgorithmExecuting");
-	start();
+		scheduler = s;
+		setName(name);
+		start();
     }
 
     public void run()
     {
-	while (true)
-	{
-	    Job currentJob = getNextScheduledJob();
-	    //System.out.println("AlgorithmExecutingThread.run(): Executing " + currentJob.getAlgorithm().getName() + " with text:");
-	    //System.out.println(currentJob.getAlgorithm().toString());
-	    currentJob.getAlgorithm().execute(currentJob.getVariables());
-	    currentJob.getInstance().finishedJob(currentJob);
-	}
+		while (true)
+		{
+			Job currentJob = scheduler.getNextScheduledJob();
+			//System.out.println("AlgorithmExecutingThread.run(): Executing " + currentJob.getAlgorithm().getName() + " with text:");
+			//System.out.println(currentJob.getAlgorithm().toString());
+			currentJob.getAlgorithm().execute(currentJob.getVariables());
+			currentJob.getInstance().finishedJob(currentJob);
+		}
     }   
-
-    public synchronized Job getNextScheduledJob()
-    {
-	while(scheduledJobs.size() == 0)
-	{
-	    try
-	    {
-		wait();
-	    }
-	    catch(InterruptedException e)
-	    {
-		System.err.println("AlgorithmExecutingThread: InterruptedException");
-		e.printStackTrace(System.err);
-	    }
-	}
-	return (Job) scheduledJobs.remove(0);
-    }
-
-    //public synchronized int getNumberOfScheduledJobs()
-    //{
-    //	return scheduledJobs.size();
-    //}
-
-    //public synchronized void notifyNewJob()
-    //{
-    //	notifyAll();
-    //}
-
-    public synchronized void scheduleJob(Job j)
-    {
-	scheduledJobs.add(j);
-	notifyAll();
-    }
 }

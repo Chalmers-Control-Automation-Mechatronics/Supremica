@@ -69,13 +69,6 @@ public class BasicFBInstance extends FBInstance
 	}
 	//================================================================
 
-	private Event getNextEvent()
-	{
-		//System.out.println("BasicFBInstance(" + getName() + ").getNextEvent(): Getting next event from the queue...");
-		//System.out.print("     " + eventInputQueue.toString());
-		return  (Event) eventInputQueue.remove();
-	}
-	
 	public synchronized void receiveEvent(String eventInput)
 	{
 		if(variables.getVariable(eventInput) != null)
@@ -135,11 +128,14 @@ public class BasicFBInstance extends FBInstance
 			// and execute the ecc
 			newECState = updateECC();
 		}
-		while (newECState == currentECState);
+		while (newECState == currentECState & eventInputQueue.size() > 0);
 		
 		//System.out.println("BasicFBInstance(" + getName() + ").handleEvent(): Handling new state " + newECState.getName());
-		handleNewState(newECState);
-		
+		if (newECState != currentECState)
+		{
+			handleNewState(newECState);
+		}
+
 		//System.out.println("BasicFBInstance(" + getName() + ").handleEvent(): Done with event " + currentEvent.getName() + " and in ECState " + currentECState.getName());
 		if(!queuedInScheduler & eventInputQueue.size() > 0)
 		{
@@ -156,6 +152,14 @@ public class BasicFBInstance extends FBInstance
 		setVariables(theJob.getVariables());
 		sendEvent();
 	}
+
+	private Event getNextEvent()
+	{
+		//System.out.println("BasicFBInstance(" + getName() + ").getNextEvent(): Getting next event from the queue...");
+		//System.out.print("     " + eventInputQueue.toString());
+		return  (Event) eventInputQueue.remove();
+	}
+	
 
 	// initializes the handling of new state
 	private void handleNewState(ECState state)
