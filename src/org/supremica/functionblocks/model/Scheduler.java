@@ -69,11 +69,10 @@ public class Scheduler
 
 	private List algorithmThreads = new LinkedList();
 
+	private boolean doExit = false;
 
-	private long timer = (long) 0;
-
-	private final int totalFBInstanceRuns = 1000;
-	private int curFBInstanceRuns = 0;
+	//private final int totalFBInstanceRuns = 2;
+	//private int curFBInstanceRuns = 0;
 
 	private Scheduler() {}
 
@@ -94,7 +93,7 @@ public class Scheduler
 		}
 	}
 
-	public void run()
+	public synchronized void run()
 	{
 		System.out.println("Scheduler.run()");
 		System.out.println("===================================================================================");
@@ -104,20 +103,54 @@ public class Scheduler
 			FBInstance eRestartInstance = (FBInstance) iter.next();
 			eRestartInstance.sendEvent("COLD");
 		}
-		timer = System.nanoTime();
-	}
+		while(!doExit)
+		{
+			try
+			{
+				//System.out.println("Thread " + Thread.currentThread().getName() + " waiting.");
+				wait();
+			}
+			catch(InterruptedException e)
+			{
+				System.err.println("Scheduler.run(): InterruptedException");
+			}
+		}
 
+		boolean runningThreads = true;
+		while (runningThreads)
+		{
+			try
+			{
+				//System.out.println("Thread " + Thread.currentThread().getName() + " waiting 1000.");
+				wait(100);
+			}
+			catch(InterruptedException e)
+			{
+				System.err.println("Scheduler.run(): InterruptedException");
+			}
+			
+			for (Iterator iter = algorithmThreads.iterator(); iter.hasNext();)
+			{
+				AlgorithmExecutingThread curThread = (AlgorithmExecutingThread) iter.next();
+				runningThreads = runningThreads & curThread.getState().equals(Thread.State.WAITING);	
+			}			
+			runningThreads = !runningThreads;
+		}
+	}
+	
+	public synchronized void exit()
+	{
+		doExit = true;
+		notifyAll();
+	}
 
 	public synchronized FBInstance getNextScheduledFBInstance()
 	{
 		while(scheduledFBInstances.size() == 0)
 		{
-			if (scheduledJobs.size() > 0)
-			{
-				notifyAll();
-			}
 			try
 			{
+				//System.out.println("Thread " + Thread.currentThread().getName() + " waiting.");
 				wait();
 			}
 			catch(InterruptedException e)
@@ -132,20 +165,21 @@ public class Scheduler
 		//	System.out.println("    scheduledFBInstances: " + ((FBInstance) iter.next()).toString());
 		//}
 
-		if (scheduledFBInstances.size() >= eventThreads.size())
+		//if (curFBInstanceRuns < totalFBInstanceRuns)
+		//{
+		//	curFBInstanceRuns++;
+		//}
+		//else
+		//{
+		//	System.exit(0);
+		//}
+		FBInstance curFBInstance = (FBInstance) scheduledFBInstances.remove(0);
+		if (curFBInstance.fbType.getName().equals("E_STOP"))
 		{
-			notifyAll();
+			exit();
+			curFBInstance = getNextScheduledFBInstance();
 		}
-		
-		if (curFBInstanceRuns < totalFBInstanceRuns)
-		{
-			curFBInstanceRuns++;
-		}
-		else
-		{
-			System.exit(0);
-		}
-		return (FBInstance) scheduledFBInstances.remove(0);
+		return curFBInstance;
 	}
 
 	public synchronized void scheduleFBInstance(FBInstance fbInst)
@@ -171,12 +205,9 @@ public class Scheduler
     {
 		while(scheduledJobs.size() == 0)
 		{
-			if (scheduledFBInstances.size() > 0)
-			{
-				notifyAll();
-			}
 			try
 			{
+				//System.out.println("Thread " + Thread.currentThread().getName() + " waiting.");
 				wait();
 			}
 			catch(InterruptedException e)
@@ -186,10 +217,6 @@ public class Scheduler
 			}
 		}
 		
-		if (scheduledJobs.size() >= algorithmThreads.size())
-		{
-			notifyAll();
-		}
 		return (Job) scheduledJobs.remove(0);
     }
 
@@ -198,5 +225,4 @@ public class Scheduler
 		scheduledJobs.add(j);
 		notifyAll();
     }
-
 }

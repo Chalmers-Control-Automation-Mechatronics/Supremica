@@ -58,18 +58,18 @@ public class ECAction
 
     public ECAction(String alg, String out)
     {
-	algorithm = alg;
-	outputEventName = out;
+		algorithm = alg;
+		outputEventName = out;
     }
 
     public String getAlgorithm()
     {
-	return algorithm;
+		return algorithm;
     }
 
     public String getOutput()
     {
-	return outputEventName;
+		return outputEventName;
     }
 
 }

@@ -78,6 +78,7 @@ class AlgorithmExecutingThread extends Thread
 			//System.out.println("AlgorithmExecutingThread.run(): Executing " + currentJob.getAlgorithm().getName() + " with text:");
 			//System.out.println(currentJob.getAlgorithm().toString());
 			currentJob.getAlgorithm().execute(currentJob.getVariables());
+			System.out.println("Timer: " + System.nanoTime());
 			currentJob.getInstance().finishedJob(currentJob);
 		}
     }   

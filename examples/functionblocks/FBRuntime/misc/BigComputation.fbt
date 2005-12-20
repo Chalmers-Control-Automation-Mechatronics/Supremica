@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="BigComputation" >
+  <VersionInfo Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2005-12-19" />
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="EI" />
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="EO" />
+    </EventOutputs>
+  </InterfaceList>
+  <BasicFB>
+    <ECC>
+        <ECState Name="INIT" />
+        <ECState Name="STATE">
+		    <ECAction Algorithm="TestAlg" Output="EO"/>
+	    </ECState>    
+		<ECTransition Source="INIT" Destination="STATE" Condition="EI" />
+		<ECTransition Source="STATE" Destination="INIT" Condition="1" />
+    </ECC>
+    <Algorithm Name="TestAlg">
+    <Other Language="Java" Text=
+	"
+	for (long i = 0; i &#60; 1000;)
+	{
+	   i++;
+	}
+	System.out.println(&#34;TestAlg: done.&#34;);
+	"
+	/>	
+    </Algorithm>
+  </BasicFB>
+</FBType>

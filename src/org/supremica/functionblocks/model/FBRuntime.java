@@ -108,7 +108,8 @@ public class FBRuntime
 
 		Device theDevice = new Device("FBRuntime Device", systemFileName, libraryPathBase, libraryPath);
 		theDevice.run();
-		//System.out.println("FBRuntime.main(): Returning.");
+		System.out.println("FBRuntime.main(): Exiting.");
+		System.exit(0);
     }
 
 }

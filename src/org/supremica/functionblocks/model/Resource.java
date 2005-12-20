@@ -74,7 +74,7 @@ public class Resource extends NamedObject
 
 		device = d;
 
-		scheduler = SchedulerFactory.getScheduler(this,5,5);
+		scheduler = SchedulerFactory.getScheduler(this,10,10);
 
     }
 

@@ -19,10 +19,16 @@
 	</classpath>
   </taskdef>
 
-  <target name="gen_automationobjects" description="Generate Automation Objects JAXB classes.">
-    <xjc target="${src}" extension="true" removeOldOutput="yes" package="org.supremica.automationobjects.xsd">
+  <target name="gen_automation_objects" description="Generate Automation Objects JAXB classes.">
+    <xjc target="${src}" extension="true" removeOldOutput="yes" package="org.supremica.automationobjects.xsd.libraryelement">
       <schema dir="ao" includes="AutomationObjects.xsd"/>
-      <produces dir="${src}/org/supremica/automationobjects/xsd"/>
+      <produces dir="${src}/org/supremica/automationobjects/xsd/libraryelement"/>
+    </xjc>
+  </target>
+  <target name="gen_implementation_mapping" description="Generate Implementation Mapping JAXB classes.">
+    <xjc target="${src}" extension="true" removeOldOutput="yes" package="org.supremica.automationobjects.xsd.implementationmapping">
+      <schema dir="ao" includes="ImplementationMapping.xsd"/>
+      <produces dir="${src}/org/supremica/automationobjects/xsd/implementationmapping"/>
     </xjc>
   </target>
 

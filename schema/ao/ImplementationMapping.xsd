@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema 
+	targetNamespace="ImplementationMapping"
+	xmlns="ImplementationMapping"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" 
+	jaxb:version="1.0"
+	elementFormDefault="qualified"
+	attributeFormDefault="unqualified"
+	version="1.0">  
+	
+  <xsd:annotation>
+	<xsd:appinfo>
+		<jaxb:globalBindings generateIsSetMethod="true"/>
+	</xsd:appinfo>
+  </xsd:annotation>
+
+ <xsd:element name="VersionInfo">
+  <xsd:complexType>
+   <xsd:attribute name="Organization" type="xsd:string" use="required"/>
+   <xsd:attribute name="Version" type="xsd:string" use="required"/>
+   <xsd:attribute name="Author" type="xsd:string" use="required"/>
+   <xsd:attribute name="Date" type="xsd:string" use="required"/>
+   <xsd:attribute name="Remarks" type="xsd:string" use="optional"/>
+  </xsd:complexType>
+ </xsd:element>
+
+<!--==========================================================================-->
+
+ <xsd:element name="Implementation">
+  <xsd:complexType>
+   <xsd:sequence>
+    <xsd:element ref="VersionInfo" maxOccurs="unbounded"/>
+    <xsd:element ref="AOType" maxOccurs="unbounded"/>
+   </xsd:sequence>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name="AOType">
+  <xsd:complexType>
+   <xsd:sequence>
+    <xsd:element ref="ModelType" maxOccurs="unbounded"/>
+    <xsd:element ref="ControllerType" minOccurs="0" maxOccurs="unbounded"/>
+    <xsd:element ref="ViewType" minOccurs="0" maxOccurs="unbounded"/>
+   </xsd:sequence>
+   <xsd:attribute name="Name" type="xsd:string" use="required"/>
+  </xsd:complexType>
+ </xsd:element>
+
+<!--==========================================================================-->
+
+ <xsd:element name="ModelType">
+  <xsd:complexType>
+   <xsd:choice>
+    <xsd:element ref="FunctionBlockType" minOccurs="0" maxOccurs="1"/>
+   </xsd:choice>
+   <xsd:attribute name="Name" type="xsd:string" use="required"/>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name="ControllerType">
+  <xsd:complexType>
+   <xsd:choice>
+    <xsd:element ref="FunctionBlockType" minOccurs="0" maxOccurs="1"/>
+   </xsd:choice>
+   <xsd:attribute name="Name" type="xsd:string" use="required"/>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name="ViewType">
+  <xsd:complexType>
+   <xsd:choice>
+    <xsd:element ref="FunctionBlockType" minOccurs="0" maxOccurs="1"/>
+   </xsd:choice>
+   <xsd:attribute name="Name" type="xsd:string" use="required"/>
+  </xsd:complexType>
+ </xsd:element>
+
+<!--==========================================================================-->
+
+ <xsd:element name="FunctionBlockType">
+  <xsd:complexType>
+   <xsd:sequence>
+    <xsd:element ref="Frontend" maxOccurs="1"/>
+    <xsd:element ref="Backend" maxOccurs="1"/>
+   </xsd:sequence>
+   <xsd:attribute name="Name" type="xsd:string" use="required"/>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name="Backend">
+  <xsd:complexType>
+   <xsd:sequence>
+    <xsd:element ref="Transaction" maxOccurs="unbounded"/>
+   </xsd:sequence>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name="Frontend">
+  <xsd:complexType>
+   <xsd:sequence>
+    <xsd:element ref="Transaction" maxOccurs="unbounded"/>
+   </xsd:sequence>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name="Transaction">
+  <xsd:complexType>
+   <xsd:sequence>
+    <xsd:element ref="Request" minOccurs="0" maxOccurs="unbounded"/>
+    <xsd:element ref="Response" minOccurs="0" maxOccurs="unbounded"/>
+   </xsd:sequence>
+   <xsd:attribute name="Name" type="xsd:string" use="required"/>
+  </xsd:complexType>
+ </xsd:element>
+ 
+ <xsd:element name="Request">
+  <xsd:complexType>
+   <xsd:sequence>
+    <xsd:element ref="Argument" minOccurs="0" maxOccurs="unbounded"/>
+   </xsd:sequence>
+   <xsd:attribute name="EventName" type="xsd:string" use="required"/>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name="Response">
+  <xsd:complexType>
+   <xsd:sequence>
+    <xsd:element ref="Argument" minOccurs="0" maxOccurs="unbounded"/>
+   </xsd:sequence>
+   <xsd:attribute name="EventName" type="xsd:string" use="required"/>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name="Argument">
+  <xsd:complexType>
+   <xsd:attribute name="Name" type="xsd:string" use="required"/>
+   <xsd:attribute name="DataName" type="xsd:string" use="required"/>
+  </xsd:complexType>
+ </xsd:element>
+
+</xsd:schema>

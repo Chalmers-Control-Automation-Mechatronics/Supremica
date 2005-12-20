@@ -80,5 +80,4 @@ public class EventExecutingThread extends Thread
 			scheduler.getNextScheduledFBInstance().handleEvent();
 		}
 	}
-	
 }

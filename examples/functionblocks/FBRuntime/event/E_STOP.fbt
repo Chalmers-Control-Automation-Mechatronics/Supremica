@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="E_STOP" >
+  <VersionInfo Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2005-12-19" />
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="STOP" />
+    </EventInputs>
+  </InterfaceList>
+</FBType>

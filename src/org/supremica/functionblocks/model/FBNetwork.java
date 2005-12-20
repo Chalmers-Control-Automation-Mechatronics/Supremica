@@ -72,14 +72,22 @@ public class FBNetwork
 
 	public void addFBInstance(String instName,String typeName)
 	{
-		fbInstances.put(instName,resource.getFBType(typeName).createInstance(instName));
+		if (resource.getFBType(typeName) != null)
+		{
+			fbInstances.put(instName,resource.getFBType(typeName).createInstance(instName));
+		}
+		else
+		{
+			System.err.println("FBNetwork.addFBInstance(" + instName + "): No FB type " + typeName + " in resource.");
+			System.exit(1);			
+		}
 	}
 
 	public FBInstance getFBInstance(String name)
 	{
 		if (fbInstances.get(name) == null)
 		{
-			System.err.println("FBNetwork.getFBInstance(" + name+ "): No such FB instance " + name);
+			System.err.println("FBNetwork.getFBInstance(" + name + "): No such FB instance " + name);
 			System.exit(1);
 		}
 		return (FBInstance) fbInstances.get(name);

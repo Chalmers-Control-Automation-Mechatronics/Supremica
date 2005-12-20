@@ -342,6 +342,14 @@ public class Loader
 
 			constructFBInterface(xmlFBTypeData,newBasicFBType);
 		}
+		else if (xmlFBTypeData.getName().equals("E_STOP"))
+		{
+			resource.addBasicFBType("E_STOP");
+
+			BasicFBType newBasicFBType = (BasicFBType) resource.getFBType("E_STOP");
+
+			constructFBInterface(xmlFBTypeData,newBasicFBType);
+		}
 		else
 		{
 			System.err.println("Loader.loadFBType(): The type " + xmlFBTypeData.getName() + " is not supported yet!");
@@ -360,7 +368,18 @@ public class Loader
 				// get and load the FB type
 				if(resource.getFBType(curFB.getType()) == null)
 				{
-					load(curFB.getType() + ".fbt");
+					if (curFB.getType().startsWith("E_SPLIT"))
+					{
+						constructSplitType((new Integer(curFB.getType().substring(7))).intValue());
+					}
+					else if (curFB.getType().startsWith("E_MERGE"))
+					{
+						constructMergeType((new Integer(curFB.getType().substring(7))).intValue());
+					}
+					else
+					{
+						load(curFB.getType() + ".fbt");
+					}
 				}
 				fbNetwork.addFBInstance(curFB.getName(),curFB.getType());
 			}
@@ -703,4 +722,58 @@ public class Loader
 			}
 		}
     }
+
+	private void constructMergeType(int size)
+	{
+		resource.addBasicFBType("E_MERGE" + size);
+		
+		BasicFBType newBasicFBType = (BasicFBType) resource.getFBType("E_MERGE" + size);	
+
+		for(int i=1; i<=size; i++)
+		{
+			newBasicFBType.addVariable("EI" + i, new BooleanVariable("EventInput",false));
+		}
+		newBasicFBType.addVariable("EO", new BooleanVariable("EventInput",false));
+
+		newBasicFBType.getECC().addInitialState("S0");
+		newBasicFBType.getECC().addState("S1");
+		newBasicFBType.getECC().getState("S1").addAction(null, "EO");
+		String condition = "";
+		for(int i=1; i<=size; i++)
+		{
+			if (i==size)
+			{
+				condition = condition + "EI" + i;
+			}
+			else
+			{
+				condition = condition + "EI" + i + " OR ";
+			}
+		}
+		newBasicFBType.getECC().addTransition("S0","S1",condition);
+		newBasicFBType.getECC().addTransition("S1","S0","TRUE");
+	}
+
+	private void constructSplitType(int size)
+	{
+		resource.addBasicFBType("E_SPLIT" + size);
+		
+		BasicFBType newBasicFBType = (BasicFBType) resource.getFBType("E_SPLIT" + size);
+		
+		newBasicFBType.addVariable("EI", new BooleanVariable("EventInput",false));
+
+		for(int i=1; i<=size; i++)
+		{
+			newBasicFBType.addVariable("EO" + i, new BooleanVariable("EventInput",false));
+		}
+
+		newBasicFBType.getECC().addInitialState("S0");
+		newBasicFBType.getECC().addState("S1");
+		for(int i=1; i<=size; i++)
+		{
+			newBasicFBType.getECC().getState("S0").addAction(null, "EO" + i);
+		}
+		newBasicFBType.getECC().addTransition("S0","S1","EI");
+		newBasicFBType.getECC().addTransition("S1","S0","TRUE");
+	}
 }
