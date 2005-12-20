@@ -47,7 +47,6 @@
     <xsd:element ref="ModelType" maxOccurs="unbounded"/>
     <xsd:element ref="ControllerType" minOccurs="0" maxOccurs="unbounded"/>
     <xsd:element ref="ViewType" minOccurs="0" maxOccurs="unbounded"/>
-    <xsd:element ref="ServiceType" minOccurs="0" maxOccurs="unbounded"/>
    </xsd:sequence>
    <xsd:attribute name="Name" type="xsd:string" use="required"/>
    <xsd:attribute name="Comment" type="xsd:string" use="optional"/>
@@ -70,7 +69,6 @@
    <xsd:sequence>
     <xsd:element ref="Frontend" minOccurs="0" maxOccurs="1"/>
     <xsd:element ref="Backend" minOccurs="0" maxOccurs="1"/>
-    <xsd:element ref="WithModelType" maxOccurs="unbounded"/>
    </xsd:sequence>
    <xsd:attribute name="Name" type="xsd:string" use="required"/>
    <xsd:attribute name="Comment" type="xsd:string" use="optional"/>
@@ -82,35 +80,9 @@
    <xsd:sequence>
     <xsd:element ref="Frontend" minOccurs="0" maxOccurs="1"/>
     <xsd:element ref="Backend" minOccurs="0" maxOccurs="1"/>
-    <xsd:choice>
-     <xsd:element ref="WithControllerType" minOccurs="0" maxOccurs="unbounded"/>
-     <xsd:element ref="WithModelType" minOccurs="0" maxOccurs="unbounded"/>
-	</xsd:choice>
    </xsd:sequence>
    <xsd:attribute name="Name" type="xsd:string" use="required"/>
    <xsd:attribute name="Comment" type="xsd:string" use="optional"/>
-  </xsd:complexType>
- </xsd:element>
-
- <xsd:element name="ServiceType">
-  <xsd:complexType>
-   <xsd:sequence>
-    <xsd:element ref="View" maxOccurs="unbounded"/>
-   </xsd:sequence>
-   <xsd:attribute name="Name" type="xsd:string" use="required"/>
-   <xsd:attribute name="Comment" type="xsd:string" use="optional"/>
-  </xsd:complexType>
- </xsd:element>
-
- <xsd:element name="WithModelType">
-  <xsd:complexType>
-   <xsd:attribute name="Name" type="xsd:string" use="required"/>
-  </xsd:complexType>
- </xsd:element>
-
- <xsd:element name="WithControllerType">
-  <xsd:complexType>
-   <xsd:attribute name="Name" type="xsd:string" use="required"/>
   </xsd:complexType>
  </xsd:element>
 
@@ -124,23 +96,10 @@
     </xsd:appinfo>
    </xsd:annotation>  
    <xsd:sequence>
-    <xsd:element ref="Service" minOccurs="0" maxOccurs="unbounded"/>
     <xsd:element ref="View" maxOccurs="unbounded"/>
-    <xsd:element ref="Model" maxOccurs="1"/>
+    <xsd:element ref="Controller" minOccurs="0" maxOccurs="unbounded"/>
+    <xsd:element ref="Model" minOccurs="0" maxOccurs="1"/>
    </xsd:sequence>
-   <xsd:attribute name="Name" type="xsd:string" use="required"/>
-   <xsd:attribute name="Type" type="xsd:string" use="required"/>
-   <xsd:attribute name="Comment" type="xsd:string" use="optional"/>
-  </xsd:complexType>
- </xsd:element>
-
- <xsd:element name="Service">
-  <xsd:complexType>
-   <xsd:annotation>
-    <xsd:appinfo>
-     <jaxb:class name="ServiceComplexType"/>
-    </xsd:appinfo>
-   </xsd:annotation>  
    <xsd:attribute name="Name" type="xsd:string" use="required"/>
    <xsd:attribute name="Type" type="xsd:string" use="required"/>
    <xsd:attribute name="Comment" type="xsd:string" use="optional"/>
@@ -153,10 +112,42 @@
     <xsd:appinfo>
      <jaxb:class name="ViewComplexType"/>
     </xsd:appinfo>
-   </xsd:annotation>  
+   </xsd:annotation>
+   <xsd:choice>
+    <xsd:element ref="WithController" minOccurs="0" maxOccurs="unbounded"/>
+    <xsd:element ref="WithModel" minOccurs="0" maxOccurs="unbounded"/>
+   </xsd:chioce>
    <xsd:attribute name="Name" type="xsd:string" use="required"/>
    <xsd:attribute name="Type" type="xsd:string" use="required"/>
    <xsd:attribute name="Comment" type="xsd:string" use="optional"/>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name="Controller">
+  <xsd:complexType>
+   <xsd:annotation>
+    <xsd:appinfo>
+     <jaxb:class name="ControllerComplexType"/>
+    </xsd:appinfo>
+   </xsd:annotation>
+   <xsd:sequence>
+    <xsd:element ref="WithModel" minOccurs="0" maxOccurs="unbounded"/>
+   </xsd:sequence>
+   <xsd:attribute name="Name" type="xsd:string" use="required"/>
+   <xsd:attribute name="Type" type="xsd:string" use="required"/>
+   <xsd:attribute name="Comment" type="xsd:string" use="optional"/>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name="WithModel">
+  <xsd:complexType>
+   <xsd:attribute name="Name" type="xsd:string" use="required"/>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name="WithController">
+  <xsd:complexType>
+   <xsd:attribute name="Name" type="xsd:string" use="required"/>
   </xsd:complexType>
  </xsd:element>
 
