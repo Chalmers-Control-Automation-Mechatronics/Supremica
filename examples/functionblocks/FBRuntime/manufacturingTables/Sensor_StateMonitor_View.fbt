@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<FBType Name="Sensor_StateMonitor_View">
+  <VersionInfo Author="Oscar Ljungkrantz" Date="2005-12-15" Organization="Chalmers" Version="0.1"/>
+ 
+  <InterfaceList>
+  
+    <EventInputs>
+      <Event Name="monitorState">
+        <With Var="on" />
+        <With Var="alarmType" />
+      </Event>
+    </EventInputs>
+  
+    <EventOutputs>
+      <Event Name="monitorSensor">
+        <With Var="monitorOn" />
+        <With Var="theAlarmType" />
+      </Event>
+    </EventOutputs>
+ 
+    <InputVars>
+      <VarDeclaration Name="on" Type="BOOL" />
+      <VarDeclaration Name="alarmType" Type="INT" />
+    </InputVars>
+
+    <OutputVars>
+      <VarDeclaration Name="monitorOn" Type="BOOL" />
+      <VarDeclaration Name="theAlarmType" Type="INT" />
+    </OutputVars>
+      
+  </InterfaceList>
+  
+  <BasicFB>
+ 
+    <ECC>
+      <ECState Name="q0" />
+      <ECState Name="q1">
+        <ECAction Algorithm="AlgMonitorState" Output="monitorSensor" />
+     </ECState>
+ 
+      <ECTransition Source="q0" Destination="q1" Condition="monitorState" />
+      <ECTransition Source="q1" Destination="q0" Condition="1" />
+	
+    </ECC>
+
+    <Algorithm Name="AlgMonitorState">
+       <Other Language="Java" Text=
+		"
+		monitorOn = on;
+		theAlarmType = alarmType;
+		" />	
+    </Algorithm>
+  
+  </BasicFB>
+
+</FBType>
+

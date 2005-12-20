@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<FBType Name="StateMonitor_Controller">
+  <VersionInfo Author="Oscar Ljungkrantz" Date="2005-12-19" Organization="Chalmers" Version="0.1"/>
+ 
+  <InterfaceList>
+  
+    <EventInputs>
+      <Event Name="monitor">
+        <With Var="monitorOn" />
+        <With Var="alarmType" />
+      </Event>
+      <Event Name="sensorValueReported">
+        <With Var="sensorValue" />
+      </Event>
+    </EventInputs>
+  
+    <EventOutputs>
+      <Event Name="alarm">
+        <With Var="theAlarmType" />
+      </Event>
+      <Event Name="askSensorValue" />
+    </EventOutputs>
+ 
+    <InputVars>
+      <VarDeclaration Name="monitorOn" Type="BOOL" />
+      <VarDeclaration Name="alarmType" Type="INT" />
+      <VarDeclaration Name="sensorValue" Type="STRING" />
+    </InputVars>
+
+    <OutputVars>
+      <VarDeclaration Name="theAlarmType" Type="INT" />
+    </OutputVars>
+      
+  </InterfaceList>
+  
+  <BasicFB>
+    <InternalVars>
+      <VarDeclaration Name="currentMonitorOn" Type="BOOL" InitialValue="FALSE" />
+      <VarDeclaration Name="currentAlarmType" Type="INT" InitialValue="1" />
+      <VarDeclaration Name="currentState" Type="STRING" />
+   </InternalVars>
+
+    <ECC>
+      <ECState Name="q0" />
+      <ECState Name="q1">
+        <ECAction Algorithm="AlgMonitor" />
+      </ECState>
+      <ECState Name="q2">
+        <ECAction Algorithm="AlgRecordState" />
+      </ECState>
+      <ECState Name="q3">
+        <ECAction Algorithm="AlgAlarm" Output="alarm" />
+      </ECState>
+ 
+      <ECTransition Source="q0" Destination="q1" Condition="monitor" />
+      <ECTransition Source="q1" Destination="q0" Condition="1" />
+      <ECTransition Source="q0" Destination="q2" Condition="sensorValueReported AND NOT currentMonitorOn" />
+      <ECTransition Source="q2" Destination="q0" Condition="1" />
+      <ECTransition Source="q0" Destination="q3" Condition="sensorValueReported AND currentMonitorOn AND sensorValue != currentState" />
+      <ECTransition Source="q3" Destination="q0" Condition="1" />
+	
+    </ECC>
+
+    <Algorithm Name="AlgMonitor">
+       <Other Language="Java" Text=
+		"
+		currentMonitorOn = monitorOn;
+		currentAlarmType = alarmType;
+		" />	
+    </Algorithm>
+    <Algorithm Name="AlgRecordState">
+       <Other Language="Java" Text=
+		"
+		currentState = sensorValue;
+		" />	
+    </Algorithm>
+    <Algorithm Name="AlgAlarm">
+       <Other Language="Java" Text=
+		"
+		theAlarmType = currentAlarmType;
+		" />	
+    </Algorithm>
+  
+  </BasicFB>
+
+</FBType>
+
