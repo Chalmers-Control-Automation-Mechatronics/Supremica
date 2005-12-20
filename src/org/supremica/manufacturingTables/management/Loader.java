@@ -80,12 +80,12 @@ public class Loader
 	try
 	    {
 		jaxbContext = JAXBContext.newInstance("org.supremica.manufacturingTables.xsd.factory");
-		//java.lang.System.err.println("jaxbcontext skapat");
+		//System.err.println("jaxbcontext created");
 		u = jaxbContext.createUnmarshaller();
-		//java.lang.System.err.println("unmarshaller skapat");
+		//System.err.println("unmarshaller created");
 		// enable validation
 		u.setValidating( true );
-		//java.lang.System.err.println("validation satt till true");
+		System.err.println("validation is set to true");
 
 		// We will allow the Unmarshaller's default
 		// ValidationEventHandler to receive notification of warnings
@@ -105,7 +105,6 @@ public class Loader
 	try
 	    {
 		File theFile = getFile(path, fileName);
-	       
 
 		if(theFile!=null)
 		    {

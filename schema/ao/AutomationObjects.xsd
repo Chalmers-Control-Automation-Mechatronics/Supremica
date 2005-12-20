@@ -116,7 +116,7 @@
    <xsd:sequence>
     <xsd:element ref="WithController" minOccurs="0" maxOccurs="unbounded"/>
     <xsd:element ref="WithModel" minOccurs="0" maxOccurs="unbounded"/>
-   </xsd:sequemce>
+   </xsd:sequence>
    <xsd:attribute name="Name" type="xsd:string" use="required"/>
    <xsd:attribute name="Type" type="xsd:string" use="required"/>
    <xsd:attribute name="Comment" type="xsd:string" use="optional"/>

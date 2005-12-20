@@ -65,6 +65,7 @@ import java.io.*;
 import javax.xml.bind.*;
 import org.supremica.manufacturingTables.xsd.factory.*;
 import org.supremica.functionblocks.xsd.libraryelement.*;
+import org.supremica.automationobjects.xsd.libraryelement.*;
 import org.supremica.properties.SupremicaProperties;
 
 
@@ -77,7 +78,8 @@ public class XMLCreator
     {
 	try
 	    {
-		jaxbContext = JAXBContext.newInstance("org.supremica.functionblocks.xsd.libraryelement");
+		//jaxbContext = JAXBContext.newInstance("org.supremica.functionblocks.xsd.libraryelement");
+		jaxbContext = JAXBContext.newInstance("org.supremica.automationobjects.xsd.libraryelement");
 		marshaller = jaxbContext.createMarshaller();
 		//You can tell the Marshaller to format the resulting XML data with line breaks and indentation. The following statement turns this output format property on -- line breaks and indentation will appear in the output format: 
 		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,new Boolean(true));
@@ -88,7 +90,7 @@ public class XMLCreator
 	    }
     }
     
-    public void createFBXMLFile(Object o, String path, String fileName)
+    public void createXMLFile(Object o, String path, String fileName)
     {
 	try
 	    {

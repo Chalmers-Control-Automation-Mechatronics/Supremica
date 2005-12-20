@@ -76,7 +76,7 @@ public class Main
 		String fileName = args[0];
 		Loader loader = new Loader();
 		FactoryType factory = (FactoryType) loader.load(path, fileName);
-		AutomationObjectsPLCProgramBuilder plcProgramBuilder = new PLCProgramBuilder();
+		AutomationObjectsPLCProgramBuilder plcProgramBuilder = new AutomationObjectsPLCProgramBuilder();
 		plcProgramBuilder.buildPLCProgram(factory);
 	    }
 	else
