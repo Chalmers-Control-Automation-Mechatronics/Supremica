@@ -113,10 +113,10 @@
      <jaxb:class name="ViewComplexType"/>
     </xsd:appinfo>
    </xsd:annotation>
-   <xsd:choice>
+   <xsd:sequence>
     <xsd:element ref="WithController" minOccurs="0" maxOccurs="unbounded"/>
     <xsd:element ref="WithModel" minOccurs="0" maxOccurs="unbounded"/>
-   </xsd:chioce>
+   </xsd:sequemce>
    <xsd:attribute name="Name" type="xsd:string" use="required"/>
    <xsd:attribute name="Type" type="xsd:string" use="required"/>
    <xsd:attribute name="Comment" type="xsd:string" use="optional"/>
@@ -130,20 +130,13 @@
      <jaxb:class name="ControllerComplexType"/>
     </xsd:appinfo>
    </xsd:annotation>
-   <xsd:sequence>
-    <xsd:element ref="WithModel" minOccurs="0" maxOccurs="unbounded"/>
-   </xsd:sequence>
    <xsd:attribute name="Name" type="xsd:string" use="required"/>
    <xsd:attribute name="Type" type="xsd:string" use="required"/>
    <xsd:attribute name="Comment" type="xsd:string" use="optional"/>
   </xsd:complexType>
  </xsd:element>
 
- <xsd:element name="WithModel">
-  <xsd:complexType>
-   <xsd:attribute name="Name" type="xsd:string" use="required"/>
-  </xsd:complexType>
- </xsd:element>
+ <xsd:element name="WithModel"/>
 
  <xsd:element name="WithController">
   <xsd:complexType>
