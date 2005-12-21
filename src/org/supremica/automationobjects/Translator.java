@@ -48,6 +48,9 @@
  */
 package org.supremica.automationobjects;
 
+import  org.supremica.automationobjects.xsd.*;
+import  org.supremica.functionblocks.xsd.libraryelement.*;
+
 /**
  * Describe class Translator here.
  *
@@ -60,9 +63,10 @@ package org.supremica.automationobjects;
 public class Translator 
 {
 
-	public Translator()
-	{
 
+
+	public static void main(String[] args)
+	{
 	}
 
 }

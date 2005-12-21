@@ -8,12 +8,6 @@
   <property name="xsd_manufacturingTables" location="manufacturingTables/xsd"/>
 
   <taskdef name="xjc" classname="com.sun.tools.xjc.XJCTask">
-   <classpath>
-    <pathelement path="${jwsdp.classpath}"/>
-   </classpath>
-  </taskdef>
-
-  <!--taskdef name="xjc" classname="com.sun.tools.xjc.XJCTask">
 	<classpath>
           <pathelement location="${lib}/jaxb-xjc.jar" />
 	  <pathelement location="${lib}/jaxb-api.jar" />
@@ -23,7 +17,7 @@
 	  <pathelement location="${lib}/relaxngDatatype.jar" />
 	  <pathelement location="${lib}/xsdlib.jar" />
 	</classpath>
-  </taskdef-->
+  </taskdef>
 
   <target name="gen_automation_objects" description="Generate Automation Objects JAXB classes.">
     <xjc target="${src}" extension="true" removeOldOutput="yes" package="org.supremica.automationobjects.xsd.libraryelement">
