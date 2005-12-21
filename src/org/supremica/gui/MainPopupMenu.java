@@ -264,7 +264,6 @@ class MainPopupMenu
 		}
 
 		JMenuItem alphabetAnalyzerItem = new JMenuItem("Analyze alphabets");
-
 		menuHandler.add(alphabetAnalyzerItem, 2);
 		alphabetAnalyzerItem.addActionListener(new ActionListener()
 		{
@@ -324,7 +323,6 @@ class MainPopupMenu
 		// menuHandler.add(saveAsItem, 1);
 		if (SupremicaProperties.fileAllowExport())
 		{
-
 			// This is how it would be done with an export command object
 			// JMenuItem exportItem = new SupremicaMenuItem(ActionMan.exportItem);
 			// menuHandler.add(exportItem, 1);
@@ -378,7 +376,7 @@ class MainPopupMenu
 					ActionMan.markMaximalComponent();
 				}
 			});
-			predictCompositionSize.setToolTipText("Predicts the size of the composition of the (two) selected automata");
+			predictCompositionSize.setToolTipText("Predicts the size of the composition of two selected automata");
 			predictCompositionSize.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
@@ -389,7 +387,7 @@ class MainPopupMenu
 
 			// BDD crap, sorry for the compressed lines... /Arash
 			JMenuItem miR, miCR, miXXX;
-
+			
 			expMenu.addSeparator();
 			expMenu.add(miR = new JMenuItem("BDD/Reachability"));
 			miR.addActionListener(new ActionListener()
