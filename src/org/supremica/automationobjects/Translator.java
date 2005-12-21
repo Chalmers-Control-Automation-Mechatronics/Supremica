@@ -48,7 +48,7 @@
  */
 package org.supremica.automationobjects;
 
-import  org.supremica.automationobjects.xsd.*;
+import  org.supremica.automationobjects.xsd.libraryelement.*;
 import  org.supremica.functionblocks.xsd.libraryelement.*;
 
 /**
