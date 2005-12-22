@@ -152,6 +152,22 @@ public class TestAutomataVerifier
 		}
 	}
 
+	public void testMonolithicBlocking()
+	{
+		try
+		{
+			ProjectBuildFromXml builder = new ProjectBuildFromXml();
+			Project theProject = builder.build(TestFiles.getFile(TestFiles.AutomaticCarParkGate));
+
+			assertTrue(!AutomataVerifier.verifyMonolithicNonblocking(theProject));
+		}
+		catch (Exception ex)
+		{
+			ex.printStackTrace();
+			assertTrue(false);			
+		}
+	}
+
 	public void testModularNonblocking()
 	{
 		try
@@ -175,6 +191,10 @@ public class TestAutomataVerifier
 			minimizationOptions.setMinimizationStrategy(MinimizationStrategy.FewestTransitionsFirst);
 			verifier = new AutomataVerifier(theProject, verificationOptions, synchronizationOptions, minimizationOptions);
 			assertTrue(verifier.verify());
+
+			minimizationOptions.setMinimizationStrategy(MinimizationStrategy.AtLeastOneUnique);
+			verifier = new AutomataVerifier(theProject, verificationOptions, synchronizationOptions, minimizationOptions);
+			assertTrue(verifier.verify());
 		}
 		catch (Exception ex)
 		{
@@ -190,22 +210,6 @@ public class TestAutomataVerifier
 			Project theProject = arbiter.getProject();
 
 			assertTrue(AutomataVerifier.verifyModularNonblocking(theProject));
-		}
-		catch (Exception ex)
-		{
-			ex.printStackTrace();
-			assertTrue(false);			
-		}
-	}
-
-	public void testMonolithicBlocking()
-	{
-		try
-		{
-			ProjectBuildFromXml builder = new ProjectBuildFromXml();
-			Project theProject = builder.build(TestFiles.getFile(TestFiles.AutomaticCarParkGate));
-
-			assertTrue(!AutomataVerifier.verifyMonolithicNonblocking(theProject));
 		}
 		catch (Exception ex)
 		{

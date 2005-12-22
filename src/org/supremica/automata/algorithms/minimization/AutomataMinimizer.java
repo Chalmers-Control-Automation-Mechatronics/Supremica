@@ -367,7 +367,6 @@ public class AutomataMinimizer
 				// Just in case... but it should be empty?
 				hideThese = result.getUnionAlphabet();
 				hideThese.minus(targetAlphabet);
-				assert(hideThese.size() == 0);
 			}
 		}
 		else if (strategy != MinimizationStrategy.Undefined)
@@ -505,12 +504,8 @@ public class AutomataMinimizer
 		}
 
 		// Remember that we should never hide the events in options.getTargetAlphabet()!!!
-		if (!(hideThese.nbrOfCommonEvents(targetAlphabet) == 0))
-		{
-			logger.info(hideThese + " RESP " + targetAlphabet);
-		}
-
 		assert(hideThese.nbrOfCommonEvents(targetAlphabet) == 0);
+		//assert(hideThese.nbrOfEpsilonEvents() == 0);
 
 		// Return result
 		return new MinimizationTask(result, hideThese);
@@ -530,8 +525,10 @@ public class AutomataMinimizer
 			LabeledEvent event = it.next();
 			Automata sharers = eventToAutomataMap.get(event);
 
-			// Epsilon events are not counted
+			// Epsilon events are not counted as unique
 			/*
+			// Why can't I do this!!!???!? Incredibly strange... 
+			// maybe because of the way Automaton.hide works?
 			if (event.isEpsilon())
 			{
 				toBeRemoved.addEvent(event);
@@ -559,6 +556,9 @@ public class AutomataMinimizer
 			}
 		}
 		unique.minus(toBeRemoved);
+
+		//assert(toBeRemoved.nbrOfEpsilonEvents() == 0);
+		//assert(unique.nbrOfEpsilonEvents() == 0);
 
 		return unique;
 	}

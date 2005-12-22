@@ -166,7 +166,7 @@ public class Alphabet
 			throw new IllegalArgumentException("addEvent: event label mist be non-null");
 		}
 
-		if (theEvents.containsKey(ev.getLabel()))
+		if (contains(ev))
 		{
 			throw new IllegalArgumentException("getEvent: event is already in the alphabet ");
 		}
@@ -224,7 +224,7 @@ public class Alphabet
 		removeEvent(ev.getLabel());
 	}
 
-	public void removeEvent(String label)
+	private void removeEvent(String label)
 		throws IllegalArgumentException
 	{
 		if (!contains(label))
@@ -544,11 +544,11 @@ public class Alphabet
 		{
 			LabeledEvent currEvent = alphIt.next();
 
-			if (contains(currEvent.getLabel()))
+			if (contains(currEvent))
 			{
 				try
 				{
-					removeEvent(currEvent.getLabel());
+					removeEvent(currEvent);
 
 					//  Quick check if this alphabet is almost empty
 					if ((this.size() == 1) && !other.contains(this.iterator().next()))
@@ -583,7 +583,7 @@ public class Alphabet
 		{
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
 
-			if (!other.contains(currEvent.getLabel()))
+			if (!other.contains(currEvent))
 			{
 				removeList.add(currEvent);
 			}
@@ -609,7 +609,7 @@ public class Alphabet
 		{
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
 
-			if (other.contains(currEvent.getLabel()))
+			if (other.contains(currEvent))
 			{
 				return true;
 			}
@@ -637,7 +637,7 @@ public class Alphabet
 		{
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
 
-			if (!contains(currEvent.getLabel()))
+			if (!contains(currEvent))
 			{
 				LabeledEvent newEvent = new LabeledEvent(currEvent);
 
@@ -750,7 +750,7 @@ public class Alphabet
 	 */
 	public boolean containsEqualEvent(LabeledEvent otherEvent)
 	{
-		return contains(otherEvent.getLabel());
+		return contains(otherEvent);
 	}
 
 	/**
@@ -789,21 +789,18 @@ public class Alphabet
 	{
 		if (nbrOfEvents() != other.nbrOfEvents())
 		{
-
 			//System.err.println("equalAlphabet::non equal nbr of events");
 			return false;
 		}
 
 		if (nbrOfControllableEvents() != other.nbrOfControllableEvents())
 		{
-
 			//System.err.println("equalAlphabet::non equal nbr of controllable events");
 			return false;
 		}
 
 		if (nbrOfPrioritizedEvents() != other.nbrOfPrioritizedEvents())
 		{
-
 			//System.err.println("equalAlphabet::non equal nbr of prioritized events");
 			return false;
 		}
@@ -815,14 +812,12 @@ public class Alphabet
 
 		if (nbrOfImmediateEvents() != other.nbrOfImmediateEvents())
 		{
-
 			//System.err.println("equalAlphabet::non equal nbr of immediate events");
 			return false;
 		}
 
 		if (nbrOfEpsilonEvents() != other.nbrOfEpsilonEvents())
 		{
-
 			//System.err.println("equalAlphabet::non equal nbr of epsilon events");
 			return false;
 		}

@@ -129,9 +129,9 @@ public class AutomatonToFSM
 																						? "o"
 																						: "uo"));
 
-			if (eventsNotOnTransitions.contains(label))
+			if (eventsNotOnTransitions.contains(currEvent))
 			{
-				eventsNotOnTransitions.removeEvent(label);
+				eventsNotOnTransitions.removeEvent(currEvent);
 			}
 		}
 

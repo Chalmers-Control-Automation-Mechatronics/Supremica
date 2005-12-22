@@ -1871,18 +1871,16 @@ public class Automaton
 			return;
 		}
 
-		Automaton aut = this;
-
 		// Remove the hidden events from alphabet
-		aut.getAlphabet().minus(alpha);
+		getAlphabet().minus(alpha);
 
 		// Get/create silent event tau
-		LabeledEvent tau = aut.getAlphabet().getEvent("tau");
+		LabeledEvent tau = getAlphabet().getEvent("tau");
 		if (tau == null)
 		{
 			tau = new LabeledEvent("tau");
 			tau.setEpsilon(true);
-			aut.getAlphabet().addEvent(tau);
+			getAlphabet().addEvent(tau);
 		}
 		else
 		{
@@ -1894,7 +1892,7 @@ public class Automaton
 		}
 
 		// Modify arcs
-		for (Iterator<Arc> arcIt = aut.arcIterator(); arcIt.hasNext(); )
+		for (Iterator<Arc> arcIt = arcIterator(); arcIt.hasNext(); )
 		{
 			Arc arc = arcIt.next();
 
