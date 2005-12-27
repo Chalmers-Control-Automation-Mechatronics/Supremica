@@ -67,46 +67,54 @@ public class FBRuntime
 		String systemFileName = null;
 		String libraryPathBase = null;
 		String libraryPath = null;
+		int threads = 1;
 
-		if (args.length == 1)
+		if (args.length == 0)
 		{
-			systemFileName = args[0];
-		}
-		else if (args.length == 2)
-		{
-			systemFileName = args[0];
-			if (args[1].contains(File.pathSeparator))
-			{
-				libraryPath = args[1];
-			}
-			else
-			{
-				libraryPathBase = args[1];
-			}
-		}
-		else if (args.length >= 3)
-		{
-			systemFileName = args[0];
-			libraryPathBase = args[1];
-			for(int i = 2; i < args.length; i++)
-			{
-				if (libraryPath == null)
-				{
-					libraryPath = args[i];
-				}
-				else
-				{
-					libraryPath = libraryPath + File.pathSeparator + args[i];
-				}
-			}   
-		}
-		else
-		{
-			System.err.println("Usage: FBRuntime file.sys [libraryPathBase] [libraryPathDirectory]...");
+			System.err.println("Usage: FBRuntime [-t num] [-lb libraryPathBase] [-lp libraryDirectory]... file.sys");
 			return;
 		}
 
-		Device theDevice = new Device("FBRuntime Device", systemFileName, libraryPathBase, libraryPath);
+		for (int i = 0; i < args.length; i++)
+		{
+			if (args[i].equals("-t"))
+			{
+				if (i + 1 < args.length)
+				{
+					threads =  new Integer(args[i + 1]).intValue();
+				}
+			}
+			if (args[i].equals("-lb"))
+			{
+				if (i + 1 < args.length)
+				{
+					libraryPathBase = args[i + 1];
+				}
+			}
+			if (args[i].equals("-lp"))
+			{
+				if (i + 1 < args.length)
+				{
+					if (libraryPath == null)
+					{
+						libraryPath = args[i + 1];
+					}
+					else
+					{
+						libraryPath = libraryPath + File.pathSeparator + args[i + 1];
+					}
+				}
+			}
+			if (i == args.length-1)
+			{
+				systemFileName = args[i];
+			}
+			
+		}
+				
+		System.out.println(systemFileName + " , " + libraryPathBase + " , " + libraryPath + " , " + threads);
+
+		Device theDevice = new Device("FBRuntime Device", systemFileName, libraryPathBase, libraryPath, threads);
 		theDevice.run();
 		System.out.println("FBRuntime.main(): Exiting.");
 		System.exit(0);

@@ -62,10 +62,13 @@ public class Device extends NamedObject
 
     private Loader loader;
 
+	private int threads;
+
     private Device() {}
 
-    public Device(String name, String systemFileName, String libraryPathBase, String libraryPath)
+    public Device(String name, String systemFileName, String libraryPathBase, String libraryPath, int threads)
     {
+		this.threads = threads;
 		setName(name);
 		System.out.println("Device(" + getName() + ", " + systemFileName + ", " + libraryPathBase + ", " + libraryPath + ")");
 		loader = new Loader(this, systemFileName, libraryPathBase, libraryPath);
@@ -82,7 +85,7 @@ public class Device extends NamedObject
 
     public void addResource(String name)
     {
-		resources.put(name,new Resource(name,this));
+		resources.put(name,new Resource(name,this,threads));
     }
 
     public Resource getResource(String name)

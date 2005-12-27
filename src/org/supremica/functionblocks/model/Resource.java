@@ -66,7 +66,7 @@ public class Resource extends NamedObject
 
     private Resource() {}
 
-    public Resource(String name, Device d)
+    public Resource(String name, Device d, int threads)
     {
 		System.out.println("Resource(" + name + ")");
 
@@ -74,7 +74,7 @@ public class Resource extends NamedObject
 
 		device = d;
 
-		scheduler = SchedulerFactory.getScheduler(this,10,10);
+		scheduler = SchedulerFactory.getScheduler(this,threads,threads);
 
     }
 

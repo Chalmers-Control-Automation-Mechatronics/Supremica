@@ -224,6 +224,8 @@ public class Loader
 			{
 				System.err.println("\t.");
 			}
+			System.err.println();
+			System.err.println("Usage: FBRuntime [-t num] [-lb libraryPathBase] [-lp libraryDirectory]... file.sys");
 			System.exit(1);
 		}
 
