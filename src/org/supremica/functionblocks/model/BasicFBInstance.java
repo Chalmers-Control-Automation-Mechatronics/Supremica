@@ -57,6 +57,14 @@ public class BasicFBInstance extends FBInstance
 		
 	private EventQueue eventInputQueue = new EventQueue();
 		
+	long eventTime = 0;
+	long algorithmTime = 0;
+	long totalTime = 0;
+	long finishTime = 0;
+
+	static long allTime = 0;
+	static int count = 0;
+
 	//================================================================
 	private BasicFBInstance() {}
 
@@ -71,6 +79,9 @@ public class BasicFBInstance extends FBInstance
 
 	public synchronized void receiveEvent(String eventInput)
 	{
+
+		eventTime = System.nanoTime();
+
 		if(variables.getVariable(eventInput) != null)
 			if(variables.getVariable(eventInput).getType().equals("EventInput"))
 			{
@@ -92,12 +103,12 @@ public class BasicFBInstance extends FBInstance
 		{
 			System.out.println("BasicFBInstance(" + getName() + "): No event input " + eventInput);
 			System.exit(0);
-		}	
+		}
 	}
 		
 	public synchronized void handleEvent()
 	{
-				
+
 		queuedInScheduler = false;
 		handlingEvent = true;
 
@@ -134,6 +145,7 @@ public class BasicFBInstance extends FBInstance
 		if (newECState != currentECState)
 		{
 			handleNewState(newECState);
+			//newECState = updateECC();
 		}
 
 		//System.out.println("BasicFBInstance(" + getName() + ").handleEvent(): Done with event " + currentEvent.getName() + " and in ECState " + currentECState.getName());
@@ -148,6 +160,7 @@ public class BasicFBInstance extends FBInstance
 	
 	public synchronized void finishedJob(Job theJob)
 	{
+
 		//System.out.println("BasicFBInstance(" + getName() + ").finishedJob(): Alg " + theJob.getAlgorithm().getName());
 		setVariables(theJob.getVariables());
 		sendEvent();
@@ -182,7 +195,6 @@ public class BasicFBInstance extends FBInstance
 			((BooleanVariable) variables.getVariable(currentEvent.getName())).setValue(false);
 			// repeat the handling of the state if state is changed
 			//System.out.println("BasicFBInstance(" + getName() + ").handleState(): No more actions in state " + currentECState.getName());
-			ECState newECState = updateECC();
 			if (newECState != currentECState)
 			{
 				handleNewState(newECState);
@@ -207,7 +219,7 @@ public class BasicFBInstance extends FBInstance
 		}
 		else
 		{
-			System.out.println("BasicFBInstance(" + getName() + ").handleState(): Something wrong with actions, actionsLeft = " + actionsLeft);			
+			System.out.println("BasicFBInstance(" + getName() + ").handleState(): Something is wrong with actions, actionsLeft =" + actionsLeft);			
 		}
 	}
 	

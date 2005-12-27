@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<System xmlns="http://www.holobloc.com/xml/LibraryElement" Name="Test Big Computation ser 30" >
+  <VersionInfo  Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2005-12-23" />
+  <Device  Name="Test Device" Type="DeviceType_not_used">
+    <Resource Name="Test Resource" Type="ResourceType_not_used">
+      <FBNetwork>
+        <FB Name="restart" Type="E_RESTART" />
+        <FB Name="stop" Type="E_STOP" />
+        <FB Name="big1" Type="BigComputation" />
+        <FB Name="big2" Type="BigComputation" />
+        <FB Name="big3" Type="BigComputation" />
+        <FB Name="big4" Type="BigComputation" />
+        <FB Name="big5" Type="BigComputation" />
+        <FB Name="big6" Type="BigComputation" />
+        <FB Name="big7" Type="BigComputation" />
+        <FB Name="big8" Type="BigComputation" />
+        <FB Name="big9" Type="BigComputation" />
+        <FB Name="big10" Type="BigComputation" />
+        <FB Name="big11" Type="BigComputation" />
+        <FB Name="big12" Type="BigComputation" />
+        <FB Name="big13" Type="BigComputation" />
+        <FB Name="big14" Type="BigComputation" />
+        <FB Name="big15" Type="BigComputation" />
+        <FB Name="big16" Type="BigComputation" />
+        <FB Name="big17" Type="BigComputation" />
+        <FB Name="big18" Type="BigComputation" />
+        <FB Name="big19" Type="BigComputation" />
+        <FB Name="big20" Type="BigComputation" />
+        <FB Name="big21" Type="BigComputation" />
+        <FB Name="big22" Type="BigComputation" />
+        <FB Name="big23" Type="BigComputation" />
+        <FB Name="big24" Type="BigComputation" />
+        <FB Name="big25" Type="BigComputation" />
+        <FB Name="big26" Type="BigComputation" />
+        <FB Name="big27" Type="BigComputation" />
+        <FB Name="big28" Type="BigComputation" />
+        <FB Name="big29" Type="BigComputation" />
+        <FB Name="big30" Type="BigComputation" />
+        <EventConnections>
+          <Connection Source="restart.COLD" Destination="big1.EI" />
+          <Connection Source="big1.EO"  Destination="big2.EI" />
+          <Connection Source="big2.EO"  Destination="big3.EI" />
+          <Connection Source="big3.EO"  Destination="big4.EI" />
+          <Connection Source="big4.EO"  Destination="big5.EI" />
+          <Connection Source="big5.EO"  Destination="big6.EI" />
+          <Connection Source="big6.EO"  Destination="big7.EI" />
+          <Connection Source="big7.EO"  Destination="big8.EI" />
+          <Connection Source="big8.EO"  Destination="big9.EI" />
+          <Connection Source="big9.EO"  Destination="big10.EI" />
+          <Connection Source="big10.EO"  Destination="big11.EI" />
+          <Connection Source="big11.EO"  Destination="big12.EI" />
+          <Connection Source="big12.EO"  Destination="big13.EI" />
+          <Connection Source="big13.EO"  Destination="big14.EI" />
+          <Connection Source="big14.EO"  Destination="big15.EI" />
+          <Connection Source="big15.EO"  Destination="big16.EI" />
+          <Connection Source="big16.EO"  Destination="big17.EI" />
+          <Connection Source="big17.EO"  Destination="big18.EI" />
+          <Connection Source="big18.EO"  Destination="big19.EI" />
+          <Connection Source="big19.EO"  Destination="big20.EI" />
+          <Connection Source="big20.EO"  Destination="big21.EI" />
+          <Connection Source="big21.EO"  Destination="big22.EI" />
+          <Connection Source="big22.EO"  Destination="big23.EI" />
+          <Connection Source="big23.EO"  Destination="big24.EI" />
+          <Connection Source="big24.EO"  Destination="big25.EI" />
+          <Connection Source="big25.EO"  Destination="big26.EI" />
+          <Connection Source="big26.EO"  Destination="big27.EI" />
+          <Connection Source="big27.EO"  Destination="big28.EI" />
+          <Connection Source="big28.EO"  Destination="big29.EI" />
+          <Connection Source="big29.EO"  Destination="big30.EI" />
+          <Connection Source="big30.EO"  Destination="stop.STOP" />
+        </EventConnections>
+      </FBNetwork>
+    </Resource>
+  </Device>
+</System>

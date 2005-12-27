@@ -75,11 +75,31 @@ class AlgorithmExecutingThread extends Thread
 		while (true)
 		{
 			Job currentJob = scheduler.getNextScheduledJob();
+			BasicFBInstance currentFBInstance = currentJob.getInstance();
+
 			//System.out.println("AlgorithmExecutingThread.run(): Executing " + currentJob.getAlgorithm().getName() + " with text:");
 			//System.out.println(currentJob.getAlgorithm().toString());
+
+			currentFBInstance.eventTime = (System.nanoTime() - currentFBInstance.eventTime)/1000000;
+			currentFBInstance.algorithmTime = System.nanoTime();
+
+			//-----------------------------------------------------------------
 			currentJob.getAlgorithm().execute(currentJob.getVariables());
-			System.out.println("Timer: " + System.nanoTime());
 			currentJob.getInstance().finishedJob(currentJob);
+			//-----------------------------------------------------------------
+
+			currentFBInstance.algorithmTime = (System.nanoTime() - currentFBInstance.algorithmTime)/1000000;
+			currentFBInstance.finishTime = (System.nanoTime()-Scheduler.startTime)/1000000;
+			currentFBInstance.totalTime = currentFBInstance.eventTime + currentFBInstance.algorithmTime;
+
+			BasicFBInstance.allTime = BasicFBInstance.allTime + currentFBInstance.totalTime;
+			BasicFBInstance.count++;
+
+			System.out.println("Block times for instance " + currentFBInstance.getName() + " :" );
+			System.out.println("\t t_CON = " + currentFBInstance.eventTime + " ms" );
+			System.out.println("\t t_ALG = " + currentFBInstance.algorithmTime + " ms" );
+			System.out.println("\t t_TOT = " + currentFBInstance.totalTime + " ms" );
+			System.out.println("\t t_FIN = " + currentFBInstance.finishTime + " ms" );
 		}
     }   
 }

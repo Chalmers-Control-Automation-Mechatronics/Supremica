@@ -71,6 +71,8 @@ public class Scheduler
 
 	private boolean doExit = false;
 
+	static long startTime = 0;
+
 	//private final int totalFBInstanceRuns = 2;
 	//private int curFBInstanceRuns = 0;
 
@@ -79,7 +81,7 @@ public class Scheduler
 
 	public Scheduler(Resource res, int numberOfEventThreads, int numberOfAlgorithmThreads)
 	{
-		System.out.println("Scheduler(" + res.getName()  + ")");
+		System.out.println("Scheduler(" + res.getName()  + "): Event Threads: " + numberOfEventThreads +", Algorithm Threads: " + numberOfAlgorithmThreads);
 		resource = res;
 
 		for (int i=1; i <= numberOfEventThreads; i++)
@@ -103,6 +105,9 @@ public class Scheduler
 			FBInstance eRestartInstance = (FBInstance) iter.next();
 			eRestartInstance.sendEvent("COLD");
 		}
+		
+		startTime = System.nanoTime();
+		
 		while(!doExit)
 		{
 			try
@@ -116,6 +121,7 @@ public class Scheduler
 			}
 		}
 
+		// wait for all algorithm threads to finish before exiting
 		boolean runningThreads = true;
 		while (runningThreads)
 		{
@@ -136,6 +142,9 @@ public class Scheduler
 			}			
 			runningThreads = !runningThreads;
 		}
+
+		System.out.println("Average time per FB = " + (BasicFBInstance.allTime/BasicFBInstance.count) + " ms");
+
 	}
 	
 	public synchronized void exit()

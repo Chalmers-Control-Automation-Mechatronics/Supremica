@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<System xmlns="http://www.holobloc.com/xml/LibraryElement" Name="Test Big Computation par 50" >
+  <VersionInfo  Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2005-12-19" />
+  <Device  Name="Test Device" Type="DeviceType_not_used">
+    <Resource Name="Test Resource" Type="ResourceType_not_used">
+      <FBNetwork>
+        <FB Name="restart" Type="E_RESTART" />
+        <FB Name="stop" Type="E_STOP" />
+        <FB Name="split" Type="E_SPLIT50" />
+        <FB Name="big1" Type="BigComputation" />
+        <FB Name="big2" Type="BigComputation" />
+        <FB Name="big3" Type="BigComputation" />
+        <FB Name="big4" Type="BigComputation" />
+        <FB Name="big5" Type="BigComputation" />
+        <FB Name="big6" Type="BigComputation" />
+        <FB Name="big7" Type="BigComputation" />
+        <FB Name="big8" Type="BigComputation" />
+        <FB Name="big9" Type="BigComputation" />
+        <FB Name="big10" Type="BigComputation" />
+        <FB Name="big11" Type="BigComputation" />
+        <FB Name="big12" Type="BigComputation" />
+        <FB Name="big13" Type="BigComputation" />
+        <FB Name="big14" Type="BigComputation" />
+        <FB Name="big15" Type="BigComputation" />
+        <FB Name="big16" Type="BigComputation" />
+        <FB Name="big17" Type="BigComputation" />
+        <FB Name="big18" Type="BigComputation" />
+        <FB Name="big19" Type="BigComputation" />
+        <FB Name="big20" Type="BigComputation" />
+        <FB Name="big21" Type="BigComputation" />
+        <FB Name="big22" Type="BigComputation" />
+        <FB Name="big23" Type="BigComputation" />
+        <FB Name="big24" Type="BigComputation" />
+        <FB Name="big25" Type="BigComputation" />
+        <FB Name="big26" Type="BigComputation" />
+        <FB Name="big27" Type="BigComputation" />
+        <FB Name="big28" Type="BigComputation" />
+        <FB Name="big29" Type="BigComputation" />
+        <FB Name="big30" Type="BigComputation" />
+        <FB Name="big31" Type="BigComputation" />
+        <FB Name="big32" Type="BigComputation" />
+        <FB Name="big33" Type="BigComputation" />
+        <FB Name="big34" Type="BigComputation" />
+        <FB Name="big35" Type="BigComputation" />
+        <FB Name="big36" Type="BigComputation" />
+        <FB Name="big37" Type="BigComputation" />
+        <FB Name="big38" Type="BigComputation" />
+        <FB Name="big39" Type="BigComputation" />
+        <FB Name="big40" Type="BigComputation" />
+        <FB Name="big41" Type="BigComputation" />
+        <FB Name="big42" Type="BigComputation" />
+        <FB Name="big43" Type="BigComputation" />
+        <FB Name="big44" Type="BigComputation" />
+        <FB Name="big45" Type="BigComputation" />
+        <FB Name="big46" Type="BigComputation" />
+        <FB Name="big47" Type="BigComputation" />
+        <FB Name="big48" Type="BigComputation" />
+        <FB Name="big49" Type="BigComputation" />
+        <FB Name="big50" Type="BigComputation" />
+        <EventConnections>
+          <Connection Source="restart.COLD" Destination="split.EI" />
+          <Connection Source="split.EO1" Destination="big1.EI" />
+          <Connection Source="split.EO2"  Destination="big2.EI" />
+          <Connection Source="split.EO3"  Destination="big3.EI" />
+          <Connection Source="split.EO4"  Destination="big4.EI" />
+          <Connection Source="split.EO5"  Destination="big5.EI" />
+          <Connection Source="split.EO6"  Destination="big6.EI" />
+          <Connection Source="split.EO7"  Destination="big7.EI" />
+          <Connection Source="split.EO8"  Destination="big8.EI" />
+          <Connection Source="split.EO9"  Destination="big9.EI" />
+          <Connection Source="split.EO10"  Destination="big10.EI" />
+          <Connection Source="split.EO11"  Destination="big11.EI" />
+          <Connection Source="split.EO12"  Destination="big12.EI" />
+          <Connection Source="split.EO13"  Destination="big13.EI" />
+          <Connection Source="split.EO14"  Destination="big14.EI" />
+          <Connection Source="split.EO15"  Destination="big15.EI" />
+          <Connection Source="split.EO16"  Destination="big16.EI" />
+          <Connection Source="split.EO17"  Destination="big17.EI" />
+          <Connection Source="split.EO18"  Destination="big18.EI" />
+          <Connection Source="split.EO19"  Destination="big19.EI" />
+          <Connection Source="split.EO20"  Destination="big20.EI" />
+          <Connection Source="split.EO21"  Destination="big21.EI" />
+          <Connection Source="split.EO22"  Destination="big22.EI" />
+          <Connection Source="split.EO23"  Destination="big23.EI" />
+          <Connection Source="split.EO24"  Destination="big24.EI" />
+          <Connection Source="split.EO25"  Destination="big25.EI" />
+          <Connection Source="split.EO26"  Destination="big26.EI" />
+          <Connection Source="split.EO27"  Destination="big27.EI" />
+          <Connection Source="split.EO28"  Destination="big28.EI" />
+          <Connection Source="split.EO29"  Destination="big29.EI" />
+          <Connection Source="split.EO30"  Destination="big30.EI" />
+          <Connection Source="split.EO31"  Destination="big31.EI" />
+          <Connection Source="split.EO32"  Destination="big32.EI" />
+          <Connection Source="split.EO33"  Destination="big33.EI" />
+          <Connection Source="split.EO34"  Destination="big34.EI" />
+          <Connection Source="split.EO35"  Destination="big35.EI" />
+          <Connection Source="split.EO36"  Destination="big36.EI" />
+          <Connection Source="split.EO37"  Destination="big37.EI" />
+          <Connection Source="split.EO38"  Destination="big38.EI" />
+          <Connection Source="split.EO39"  Destination="big39.EI" />
+          <Connection Source="split.EO40"  Destination="big40.EI" />
+          <Connection Source="split.EO41"  Destination="big41.EI" />
+          <Connection Source="split.EO42"  Destination="big42.EI" />
+          <Connection Source="split.EO43"  Destination="big43.EI" />
+          <Connection Source="split.EO44"  Destination="big44.EI" />
+          <Connection Source="split.EO45"  Destination="big45.EI" />
+          <Connection Source="split.EO46"  Destination="big46.EI" />
+          <Connection Source="split.EO47"  Destination="big47.EI" />
+          <Connection Source="split.EO48"  Destination="big48.EI" />
+          <Connection Source="split.EO49"  Destination="big49.EI" />
+          <Connection Source="split.EO50"  Destination="big50.EI" />
+
+          <Connection Source="big50.EO"  Destination="stop.STOP" />
+
+        </EventConnections>
+      </FBNetwork>
+    </Resource>
+  </Device>
+</System>
