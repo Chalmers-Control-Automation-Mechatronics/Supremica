@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<System xmlns="http://www.holobloc.com/xml/LibraryElement" Name="SimultaneousEvents" >
+  <VersionInfo  Author="Oscar" Organization="Chalmers" Version="1.0" Date="2005-12-22" />
+  <Device  Name="Test Device" Type="DeviceType_not_used">
+    <Resource Name="TestResource" Type="ResourceType_not_used">
+      <FBNetwork>
+
+       <FB Name="restart" Type="E_RESTART" />
+       <FB Name="cycle1" Type="E_CYCLE" />
+       <FB Name="cycle2" Type="E_CYCLE" />
+       <!--FB Name="delay" Type="E_DELAY" /-->
+       <FB Name="merge2EO" Type="E_MERGE2" />
+       <!--FB Name="merge2EO" Type="MERGE2_WITH_QUEUE" /-->
+       <FB Name="split2WARM" Type="E_SPLIT2" />
+       <FB Name="split2STOP" Type="E_SPLIT2" />
+       <FB Name="counter" Type="Counter" />
+	
+         <EventConnections>
+           <Connection Source="restart.COLD" Destination="split2WARM.EI" />
+           <Connection Source="split2WARM.EO1" Destination="cycle1.START" />
+           <Connection Source="split2WARM.EO2" Destination="cycle2.START" />
+
+           <Connection Source="restart.STOP" Destination="split2STOP.EI" />
+           <Connection Source="split2STOP.EO1" Destination="cycle1.STOP" />
+           <Connection Source="split2STOP.EO2" Destination="cycle2.STOP" />
+
+           <Connection Source="cycle1.EO" Destination="merge2EO.EI1" />
+           <Connection Source="cycle2.EO" Destination="merge2EO.EI2" />
+
+           <!--Connection Source="cycle1.EO" Destination="merge2EO.EI1" />
+           <Connection Source="cycle2.EO" Destination="delay.START" />
+           <Connection Source="delay.EO" Destination="merge2EO.EI2" /-->
+
+           <Connection Source="merge2EO.EO" Destination="counter.increaseCounter" />
+          </EventConnections>
+
+	 <DataConnections>
+	  <Connection Source="1000" Destination="cycle1.DT" />
+	  <Connection Source="1000" Destination="cycle2.DT" />
+	  <!--Connection Source="1" Destination="delay.DT" /-->
+	 </DataConnections>
+
+      </FBNetwork>
+    </Resource>
+  </Device>
+</System>

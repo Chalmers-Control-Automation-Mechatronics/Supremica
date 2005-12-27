@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<FBType  xmlns="http://www.holobloc.com/xml/LibraryElement" Name="Counter">
+  <VersionInfo Author="Oscar Ljungkrantz" Date="2005-12-27" Organization="Chalmers" Version="0.1"/>
+ 
+  <InterfaceList>
+  
+    <EventInputs>
+      <Event Name="increaseCounter">
+      </Event>
+    </EventInputs>
+  
+  </InterfaceList>
+  
+  <BasicFB>
+    <InternalVars>
+      <VarDeclaration Name="value" Type="INT" InitialValue="0" />
+      <VarDeclaration Name="streng" Type="WSTRING" InitialValue="litetesttext" />
+    </InternalVars>
+
+    <ECC>
+      <ECState Name="q0">
+      </ECState>
+      <ECState Name="q1">
+        <ECAction Algorithm="AlgCount" />
+      </ECState>
+      <ECState Name="q2">
+        <ECAction Algorithm="AlgCount" />
+      </ECState>
+ 
+      <ECTransition Source="q0" Destination="q1" Condition="increaseCounter" />
+      <ECTransition Source="q1" Destination="q2" Condition="increaseCounter" />
+      <ECTransition Source="q1" Destination="q0" Condition="NOT increaseCounter" />
+      <ECTransition Source="q2" Destination="q1" Condition="increaseCounter" />
+      <ECTransition Source="q2" Destination="q0" Condition="NOT increaseCounter" />
+	
+    </ECC>
+
+    <Algorithm Name="AlgCount">
+       <Other Language="Java" Text=
+		"
+		value++;
+		System.out.println(&#34;Value: &#34; + value);
+		" />	
+    </Algorithm>
+    <!--Algorithm Name="AlgCount" Comment="Normally executed algorithm" >
+     <ST Text="System.out.println();" />
+    </Algorithm-->
+
+  
+  </BasicFB>
+
+</FBType>
+

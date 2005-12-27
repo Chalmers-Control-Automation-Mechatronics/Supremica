@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="MERGE2_WITH_QUEUE" >
+  <VersionInfo Author="Oscar Ljungkrantz" Organization="Chalmers" Version="1.0" Date="2005-12-27" />
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="EI1" />
+      <Event Name="EI2" />
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="EO" />
+    </EventOutputs>
+  </InterfaceList>
+  <BasicFB>
+    <ECC>
+        <ECState Name="S0" />
+        <ECState Name="S1">
+          <ECAction Output="EO" />
+        </ECState>    
+        <!--ECState Name="S2">
+          <ECAction Output="EO" />
+          <ECAction Output="EO" />
+        </ECState-->    
+
+	<ECTransition Source="S0" Destination="S1" Condition="EI1 OR EI2" />
+	<ECTransition Source="S1" Destination="S0" Condition="1" />
+
+	<!--ECTransition Source="S0" Destination="S1" Condition="(EI1 AND NOT EI2) OR (EI2 AND NOT EI1)" />
+	<ECTransition Source="S0" Destination="S2" Condition="EI1 AND EI2" />
+	<ECTransition Source="S1" Destination="S2" Condition="EI1 AND EI2" />
+	<ECTransition Source="S1" Destination="S1" Condition="(EI1 AND NOT EI2) OR (EI2 AND NOT EI1)" />
+	<ECTransition Source="S1" Destination="S0" Condition="NOT EI1 AND NOT EI2" />
+	<ECTransition Source="S2" Destination="S2" Condition="EI1 AND EI2" />
+	<ECTransition Source="S2" Destination="S1" Condition="(EI1 AND NOT EI2) OR (EI2 AND NOT EI1)" />
+	<ECTransition Source="S2" Destination="S0" Condition="NOT EI1 AND NOT EI2" /-->
+    </ECC>
+  </BasicFB>
+</FBType>
