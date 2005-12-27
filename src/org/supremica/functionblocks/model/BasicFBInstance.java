@@ -77,7 +77,7 @@ public class BasicFBInstance extends FBInstance
 	}
 	//================================================================
 
-	public synchronized void receiveEvent(String eventInput)
+	public void receiveEvent(String eventInput)
 	{
 
 		eventTime = System.nanoTime();
@@ -86,14 +86,18 @@ public class BasicFBInstance extends FBInstance
 			if(variables.getVariable(eventInput).getType().equals("EventInput"))
 			{
 				//System.out.println("BasicFBInstance(" + getName() + ").receiveEvent(" + eventInput + ")");
+
 				eventInputQueue.add((Event) events.get(eventInput));
+
+				//System.out.println("BasicFBInstance(" + getName() + ").receiveEvent(" + eventInput + "): Event Input Queue size = " + eventInputQueue.size());
 				
-				if (!queuedInScheduler && !handlingEvent)
+
+				if (!queuedInScheduler & !handlingEvent)
 				{
-					//System.out.println("BasicFBInstance(" + getName() + ").receiveEvent(" + eventInput + "): Scheduling this FB instance.");
-					resource.getScheduler().scheduleFBInstance(this);
 					synchronized(queuedInScheduler)
 					{
+						//System.out.println("BasicFBInstance(" + getName() + ").receiveEvent(" + eventInput + "): Scheduling this FB instance.");
+						resource.getScheduler().scheduleFBInstance(this);
 						queuedInScheduler = true;
 					}
 				}
@@ -110,17 +114,15 @@ public class BasicFBInstance extends FBInstance
 		}
 	}
 		
-	public synchronized void handleEvent()
+	public void handleEvent()
 	{
 
 		synchronized (queuedInScheduler)
 		{
 			queuedInScheduler = false;
 		}
-		synchronized (handlingEvent)
-		{
-			handlingEvent = true;
-		}
+		
+		handlingEvent = true;
 		
 		// step through the event queue until there's change in ECC state
 		ECState newECState = null;		
@@ -156,24 +158,25 @@ public class BasicFBInstance extends FBInstance
 		{
 			handleNewState(newECState);
 		}
+		else
+		{
 
-		//System.out.println("BasicFBInstance(" + getName() + ").handleEvent(): Done with event " + currentEvent.getName() + " and in ECState " + currentECState.getName());
-		if(!queuedInScheduler & eventInputQueue.size() > 0)
-		{
-			//System.out.println("BasicFBInstance(" + getName() + ").handleEvent(): Scheduling this FB instance.");
-			resource.getScheduler().scheduleFBInstance(this);
-			synchronized(queuedInScheduler)
+			if(!queuedInScheduler & eventInputQueue.size() > 0)
 			{
-				queuedInScheduler = true;
+				synchronized(queuedInScheduler)
+				{
+					//System.out.println("BasicFBInstance(" + getName() + ").handleState(): Scheduling this FB instance.");
+					resource.getScheduler().scheduleFBInstance(this);
+					queuedInScheduler = true;
+				}
 			}
-		}
-		synchronized(handlingEvent)
-		{
+			
 			handlingEvent = false;
+			
 		}
 	}
 	
-	public synchronized void finishedJob(Job theJob)
+	public void finishedJob(Job theJob)
 	{
 
 		//System.out.println("BasicFBInstance(" + getName() + ").finishedJob(): Alg " + theJob.getAlgorithm().getName());
@@ -215,6 +218,21 @@ public class BasicFBInstance extends FBInstance
 			{
 				handleNewState(newECState);
 			}
+			else
+			{
+				//System.out.println("BasicFBInstance(" + getName() + ").handleState(): Done with event " + currentEvent.getName() + " and in ECState " + currentECState.getName());
+				if(!queuedInScheduler & eventInputQueue.size() > 0)
+				{
+					synchronized(queuedInScheduler)
+					{
+						//System.out.println("BasicFBInstance(" + getName() + ").handleState(): Scheduling this FB instance.");
+						resource.getScheduler().scheduleFBInstance(this);
+						queuedInScheduler = true;
+					}
+				}
+
+				handlingEvent = false;
+			}
  		}
 		else if (actionsLeft > 0)
 		{
@@ -236,7 +254,7 @@ public class BasicFBInstance extends FBInstance
 			resource.getScheduler().scheduleJob(new Job(this, ((BasicFBType) fbType).getAlgorithm(currentECAction.getAlgorithm()), algVars));
 			//System.out.println("BasicFBInstance(" + getName() + ").handleAction(): Queued alg " + currentECAction.getAlgorithm());
 		}
-		else if (currentECAction.getAlgorithm() == null && currentECAction.getOutput() != null)
+		else if (currentECAction.getAlgorithm() == null & currentECAction.getOutput() != null)
 		{
 			sendEvent();
 		}
