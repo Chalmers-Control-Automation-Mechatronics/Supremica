@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<AOApplication Name="FactoryVolvo Torslanda" xmlns="AutomationObjects">
+    <AO Name="Sensor_150SG1" Type="Sensor.aot">
+        <View Name="StateRequest_View" Type="StateRequest_View.fbt"/>
+        <View Name="StateCheck_View" Type="StateCheck_View.fbt"/>
+        <View Name="Sensor_StateOrder_View" Type="Sensor_StateOrder_View.fbt"/>
+        <View Name="StateMonitor_View" Type="Sensor_StateMonitor_View.fbt"/>
+        <Controller Name="StateMonitor_Controller" Type="StateMonitor_Controller.fbt"/>
+        <Model Type="Sensor_Model.fbt"/>
+    </AO>
+    <AO Name="Sensor_152SG3" Type="Sensor.aot">
+        <View Name="StateRequest_View" Type="StateRequest_View.fbt"/>
+        <View Name="StateCheck_View" Type="StateCheck_View.fbt"/>
+        <View Name="Sensor_StateOrder_View" Type="Sensor_StateOrder_View.fbt"/>
+        <View Name="StateMonitor_View" Type="Sensor_StateMonitor_View.fbt"/>
+        <Controller Name="StateMonitor_Controller" Type="StateMonitor_Controller.fbt"/>
+        <Model Type="Sensor_Model.fbt"/>
+    </AO>
+    <AO Name="Sensor_152SG6" Type="Sensor.aot">
+        <View Name="StateRequest_View" Type="StateRequest_View.fbt"/>
+        <View Name="StateCheck_View" Type="StateCheck_View.fbt"/>
+        <View Name="Sensor_StateOrder_View" Type="Sensor_StateOrder_View.fbt"/>
+        <View Name="StateMonitor_View" Type="Sensor_StateMonitor_View.fbt"/>
+        <Controller Name="StateMonitor_Controller" Type="StateMonitor_Controller.fbt"/>
+        <Model Type="Sensor_Model.fbt"/>
+    </AO>
+</AOApplication>
+

@@ -3,19 +3,23 @@
   <VersionInfo Author="Oscar Ljungkrantz" Organization="Chalmers" Version="1.0" Date="2005-12-19" />
 
 
-  <ModelType Name="Sensor_Model" FBType="Sensor_Model.fbt" >
+  <ModelType Name="Sensor_Model">
 
-   <Request Name="askState">
-   </Request>
-   <Response Name="reportState">
-    <Argument Name="currentState" Type="STRING" />
-   </Response>
+   <Frontend>
+    <Transaction Name="askSensorValue">
+     <Request>
+     </Request>
+     <Response>
+      <Argument Name="currentState" Type="STRING" />
+     </Response>
+    </Transaction>
+   </Frontend>
 
    <Backend>
-    <Transaction Name="I/O connection">
-     <Request Name="askHWValue">
+    <Transaction Name="askHWValue">
+     <Request>
      </Request>
-     <Response Name="HWValueReported">
+     <Response>
       <Argument Name="HWValue" Type="STRING" />
      </Response>
     </Transaction>
@@ -24,143 +28,148 @@
   </ModelType>
 
 
-  <ControllerType Name="StateMonitor_Controller" FBType="StateMonitor_Controller.fbt" >
+  <ControllerType Name="StateMonitor_Controller">
 
-   <Request Name="monitor">
-    <Argument Name="monitorOn" Type="BOOL" />
-    <Argument Name="alarmType" Type="INT" />
-   </Request>
-   <Response Name="askSensorValue">
-   </Response>
-   <Response Name="alarm">
-    <Argument Name="theAlarmType" Type="INT" />
-   </Response>
 
-   <WithModelType Name="Sensor_Model" />
+   <Frontend>
+    <Transaction Name="monitor">
+     <Request>
+      <Argument Name="monitorOn" Type="BOOL" />
+      <Argument Name="alarmType" Type="INT" />
+     </Request>
+    </Transaction>
+   </Frontend>
+
+   <Backend>
+    <Transaction Name="askSensorValue">
+     <Request>
+     </Request>
+     <Response>
+      <Argument Name="sensorValue" Type="STRING" />
+     </Response>
+    </Transaction>
+    <Transaction Name="alarm">
+     <Request>
+      <Argument Name="theAlarmType" Type="INT" />
+     </Request>
+    </Transaction>
+   </Backend>
+
 
   </ControllerType>
 
 
-  <ViewType Name="StateRequest_View" FBType="StateRequest_View.fbt" >
-
-   <WithModelType Name="Sensor_Model" />
-
-   <Backend>
-    <Transaction Name="askSensor">
-     <Request Name="askSensorValue">
-     </Request>
-     <Response Name="sensorValueReported">
-      <Argument Name="sensorValue" Type="STRING" />
-     </Response>
-    </Transaction>
-   </Backend>
+  <ViewType Name="StateRequest_View">
 
    <Frontend>
     <Transaction Name="requestState">
-     <Request Name="requestState">
+     <Request>
      </Request>
-     <Response Name="reportState">
+     <Response>
       <Argument Name="currentState" Type="STRING" />
      </Response>
     </Transaction>
    </Frontend>
 
-  </ViewType>
-
-
-  <ViewType Name="StateCheck_View" FBType="StateCheck_View.fbt" >
-
-   <WithModelType Name="Sensor_Model" />
-
    <Backend>
-    <Transaction Name="askSensor">
-     <Request Name="askSensorValue">
+    <Transaction Name="askSensorValue">
+     <Request>
      </Request>
-     <Response Name="sensorValueReported">
+     <Response>
       <Argument Name="sensorValue" Type="STRING" />
      </Response>
     </Transaction>
-    <Transaction Name="alarm">
-     <Request Name="alarm">
-      <Argument Name="theAlarmType" Type="INT" />
-     </Request>
-    </Transaction>
    </Backend>
+
+  </ViewType>
+
+
+  <ViewType Name="StateCheck_View">
 
    <Frontend>
     <Transaction Name="checkState">
-     <Request Name="checkState">
+     <Request>
       <Argument Name="stateToCheck" Type="STRING" />
       <Argument Name="alarmType" Type="INT" />
      </Request>
-     <Response Name="confirmState">
+     <Response>
       <Argument Name="confirmation" Type="BOOL" />
      </Response>
     </Transaction>
    </Frontend>
 
-  </ViewType>
-
-
-  <ViewType Name="StateOrder_View" FBType="StateOrder_View.fbt" >
-
-   <WithModelType Name="Sensor_Model" />
-
    <Backend>
-    <Transaction Name="askSensor">
-     <Request Name="askSensorValue">
+    <Transaction Name="askSensorValue">
+     <Request>
      </Request>
-     <Response Name="sensorValueReported">
+     <Response>
       <Argument Name="sensorValue" Type="STRING" />
      </Response>
     </Transaction>
     <Transaction Name="alarm">
-     <Request Name="alarm">
+     <Request>
       <Argument Name="theAlarmType" Type="INT" />
      </Request>
     </Transaction>
    </Backend>
 
+  </ViewType>
+
+
+  <ViewType Name="StateOrder_View">
+
    <Frontend>
     <Transaction Name="orderState">
-     <Request Name="orderState">
+     <Request>
       <Argument Name="orderedState" Type="STRING" />
       <Argument Name="alarmType" Type="INT" />
       <Argument Name="time" Type="TIME" />
      </Request>
-     <Response Name="confirmState">
+     <Response>
       <Argument Name="confirmation" Type="BOOL" />
      </Response>
     </Transaction>
    </Frontend>
 
-  </ViewType>
-
-
-  <ViewType Name="StateMonitor_View" FBType="StateMonitor_View.fbt" >
-
-   <WithControllerType Name="StateMonitor_Controller" />
-
    <Backend>
-    <Transaction Name="monitorSensor">
-     <Request Name="monitorSensor">
-      <Argument Name="monitorOn" Type="BOOL" />
+    <Transaction Name="askSensorValue">
+     <Request>
+     </Request>
+     <Response>
+      <Argument Name="sensorValue" Type="STRING" />
+     </Response>
+    </Transaction>
+    <Transaction Name="alarm">
+     <Request>
       <Argument Name="theAlarmType" Type="INT" />
      </Request>
     </Transaction>
    </Backend>
 
+  </ViewType>
+
+
+  <ViewType Name="StateMonitor_View">
+
    <Frontend>
     <Transaction Name="monitorState">
-     <Request Name="monitorState">
+     <Request>
       <Argument Name="on" Type="BOOL" />
       <Argument Name="alarmType" Type="INT" />
      </Request>
     </Transaction>
    </Frontend>
 
-  </ViewType>
+   <Backend>
+    <Transaction Name="monitor">
+     <Request>
+      <Argument Name="monitorOn" Type="BOOL" />
+      <Argument Name="theAlarmType" Type="INT" />
+     </Request>
+    </Transaction>
+   </Backend>
 
+  </ViewType>
 
 
 </AOType>
