@@ -144,6 +144,7 @@ public class Scheduler
 		}
 
 		System.out.println("Average time per FB = " + (BasicFBInstance.allTime/BasicFBInstance.count) + " ms");
+		System.out.println("Average event time per FB = " + (BasicFBInstance.allEventTime/BasicFBInstance.count) + " ms");
 
 	}
 	

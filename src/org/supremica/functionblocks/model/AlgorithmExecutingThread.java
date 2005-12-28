@@ -93,6 +93,7 @@ class AlgorithmExecutingThread extends Thread
 			currentFBInstance.totalTime = currentFBInstance.eventTime + currentFBInstance.algorithmTime;
 
 			BasicFBInstance.allTime = BasicFBInstance.allTime + currentFBInstance.totalTime;
+			BasicFBInstance.allEventTime = BasicFBInstance.allEventTime + currentFBInstance.eventTime;
 			BasicFBInstance.count++;
 
 			System.out.println("Block times for instance " + currentFBInstance.getName() + " :" );

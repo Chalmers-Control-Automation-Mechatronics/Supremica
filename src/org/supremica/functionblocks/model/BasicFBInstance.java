@@ -63,6 +63,7 @@ public class BasicFBInstance extends FBInstance
 	long finishTime = 0;
 
 	static long allTime = 0;
+	static long allEventTime = 0;
 	static int count = 0;
 
 	//================================================================
