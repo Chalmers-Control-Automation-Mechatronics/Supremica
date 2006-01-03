@@ -127,12 +127,11 @@ public class Automaton
 	public Automaton(Automaton orgAut)
 	{
 		this();
+		beginTransaction();
 
 		alphabet.union(orgAut.getAlphabet());
 
 		type = orgAut.type;
-		// name = orgAut.name;			// Aren't name and comment copied by ref here? We need by value!
-		// comment = orgAut.comment;
 		name = new String(orgAut.name == null ? "" : orgAut.name);
 		comment = new String(orgAut.comment == null ? "" : orgAut.comment);
 
@@ -145,16 +144,17 @@ public class Automaton
 			addState(newState);
 		}
 
+		// Create all transitions
+		/*
 		try
 		{
-			// Create all transitions
 			for (Iterator<State> states = orgAut.stateIterator();
 					states.hasNext(); )
 			{
 				State orgSourceState = (State) states.next();
 				State newSourceState = getStateWithName(orgSourceState.getName());
 
-				for (Iterator<Arc> outgoingArcs = orgSourceState.safeOutgoingArcsIterator();
+				for (Iterator<Arc> outgoingArcs = orgSourceState.outgoingArcsIterator();
 					 outgoingArcs.hasNext(); )
 				{
 					Arc orgArc = outgoingArcs.next();
@@ -169,11 +169,26 @@ public class Automaton
 		}
 		catch (Exception ex)
 		{
-//			logger.error(ex);
 			logger.error("Error while copying transitions", ex);
 			//ex.printStackTrace();
 			logger.debug(ex.getStackTrace());
 		}
+		*/
+		for (Iterator<Arc> arcIt = orgAut.arcIterator(); arcIt.hasNext(); )
+		{
+			Arc arc = arcIt.next();
+			// We can use indices which is much faster, since the indices can not have changed!
+			//State fromState = getStateWithName(arc.getFromState().getName());
+			//State toState = getStateWithName(arc.getToState().getName());
+			State fromState = getStateWithIndex(arc.getFromState().getIndex());
+			State toState = getStateWithIndex(arc.getToState().getIndex());
+			LabeledEvent event = alphabet.getEvent(arc.getEvent());
+			Arc newArc = new Arc(fromState, toState, event);
+			
+			addArc(newArc);
+		}
+
+		endTransaction();
 	}
 
 	/**

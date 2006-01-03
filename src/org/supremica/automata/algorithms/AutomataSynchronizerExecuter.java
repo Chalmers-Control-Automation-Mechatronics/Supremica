@@ -595,7 +595,6 @@ public final class AutomataSynchronizerExecuter
 
 		if (coExecute)
 		{
-
 			// In co-execution mode, an enabledEvents-method in another executer
 			// follows the automaton we're suspecting has uncontrollable states.
 			int insertionIndex = 0;
@@ -1137,8 +1136,7 @@ public final class AutomataSynchronizerExecuter
 			else
 			{
 				// theAutomaton.setType(AutomatonType.Undefined);
-				// Changed the default type to specification
-				theAutomaton.setType(AutomatonType.Specification);
+				theAutomaton.setType(AutomatonType.Plant);
 			}
 
 			return true;
@@ -1148,11 +1146,6 @@ public final class AutomataSynchronizerExecuter
 			throw new SupremicaException("Out of memory. Try to increase the JVM heap.");    // why not throw new SupremicaException(ex)?
 		}
 	}
-
-
-
-
-
 
 
 	/**
@@ -1262,15 +1255,6 @@ public final class AutomataSynchronizerExecuter
 			addNextArcPermutation(currState, nextState, currEventIndex, nextIndex);
 		}
 	}
-
-
-
-
-
-
-
-
-
 
 
 	private String printTypeIsPlantTable()

@@ -139,6 +139,7 @@ public final class SupremicaProperties
 	private static final String VERIFY_ONE_EVENT_AT_A_TIME = "verifyOneEventAtATime";
 	private static final String VERIFY_SKIP_UNCONTROLLABILITY_CHECK = "skipUncontrollabilityCheck";
 	private static final String VERIFY_NBR_OF_ATTEMPTS = "nbrOfAttempts";
+	private static final String VERIFY_SHOW_BAD_TRACE = "showBadTrace";
 
 	// Synthesizer Options
 	private static final String SYNTHESIS_SYNTHESIS_TYPE = "synthesisSynthesisType";
@@ -297,8 +298,9 @@ public final class SupremicaProperties
 		setProperty(VERIFY_EXCLUSION_STATE_LIMIT, "1000", true);
 		setProperty(VERIFY_REACHABILITY_STATE_LIMIT, "1000", true);
 		setProperty(VERIFY_ONE_EVENT_AT_A_TIME, "false", true);
-		setProperty(VERIFY_SKIP_UNCONTROLLABILITY_CHECK, "false", true);
+		setProperty(VERIFY_SKIP_UNCONTROLLABILITY_CHECK, "false", true);	
 		setProperty(VERIFY_NBR_OF_ATTEMPTS, "5", true);
+		setProperty(VERIFY_SHOW_BAD_TRACE, "false", true);
 		// Synthesis
 		setProperty(SYNTHESIS_SYNTHESIS_TYPE, SynthesisType.Both.toString(), true);
 		setProperty(SYNTHESIS_ALGORITHM_TYPE, SynthesisAlgorithm.Monolithic.toString(), true);
@@ -1222,6 +1224,14 @@ public final class SupremicaProperties
 	public static void setVerifyNbrOfAttempts(int nbr)
 	{
 		wp.setProperty(VERIFY_NBR_OF_ATTEMPTS, toString(nbr));
+	}
+	public static boolean verifyShowBadTrace()
+	{
+		return toBoolean(wp.getProperty(VERIFY_SHOW_BAD_TRACE));
+	}
+	public static void setVerifyShowBadTrace(boolean bool)
+	{
+		wp.setProperty(VERIFY_SHOW_BAD_TRACE, toString(bool));
 	}
 
 	// Synthesis...

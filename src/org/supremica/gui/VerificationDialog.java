@@ -219,6 +219,7 @@ public class VerificationDialog
 
 		private JComboBox verificationTypeBox;
 		private AlgorithmSelector algorithmSelector;
+		private JCheckBox showTrace;
 		private JTextArea note;
 
 		//private JTextArea note;// = new JTextArea("Bananas...");
@@ -234,34 +235,38 @@ public class VerificationDialog
 			algorithmSelector = new AlgorithmSelector();
 			algorithmSelector.addActionListener(this);
 
+			showTrace = new JCheckBox("Show trace to bad states");
+			showTrace.addActionListener(this);
+
 			note = new JTextArea("Note:\n" + "Currently, modular nonblocking\n" + "verification is not supported.");
 			note.setBackground(this.getBackground());
 
-			Box standardBox = Box.createVerticalBox();
+			Box box = Box.createVerticalBox();
 
-			standardBox.add(verificationTypeBox);
-			standardBox.add(algorithmSelector);
+			JPanel panel = new JPanel();
+			Box algoBox = Box.createVerticalBox();
+			algoBox.add(verificationTypeBox);
+			algoBox.add(algorithmSelector);
+			panel.add(algoBox);
+			box.add(panel);
 
-			// NEW TRY
-			this.setLayout(new GridLayout(2, 1));
-			JPanel choicePanel = new JPanel();
+			panel = new JPanel();
+			panel.add(showTrace);
+			box.add(panel);
 
-			choicePanel.setLayout(new FlowLayout());
-			choicePanel.add(standardBox);
-			this.add(choicePanel);
-
-			JPanel notePanel = new JPanel();
-
-			notePanel.setLayout(new FlowLayout());
-			notePanel.add(note);
+			panel = new JPanel();
+			panel.add(note);
 			note.setVisible(false);
-			this.add(notePanel);
+			box.add(panel);
+
+			this.add(box);
 		}
 
 		public void update(VerificationOptions verificationOptions)
 		{
 			verificationTypeBox.setSelectedItem(verificationOptions.getVerificationType());
 			algorithmSelector.setSelectedItem(verificationOptions.getAlgorithmType());
+			showTrace.setSelected(verificationOptions.showBadTrace());
 			updatePanel();
 			updateNote();
 		}
@@ -310,6 +315,21 @@ public class VerificationDialog
 			{
 				// Allow all
 				algorithmSelector.allowAll();
+			}
+
+			if (verificationTypeBox.getSelectedItem() == VerificationType.Nonblocking &&
+				algorithmSelector.getSelectedItem() == VerificationAlgorithm.Monolithic ||
+				(verificationTypeBox.getSelectedItem() == VerificationType.Controllability || 
+				 verificationTypeBox.getSelectedItem() == VerificationType.InverseControllability || 
+				 verificationTypeBox.getSelectedItem() == VerificationType.LanguageInclusion) &&
+				algorithmSelector.getSelectedItem() == VerificationAlgorithm.Modular)
+			{
+				showTrace.setEnabled(true);
+			}
+			else
+			{
+				//showTrace.setSelected(false); 
+				showTrace.setEnabled(false);
 			}
 		}
 
@@ -361,6 +381,7 @@ public class VerificationDialog
 		{
 			verificationOptions.setVerificationType((VerificationType) verificationTypeBox.getSelectedItem());
 			verificationOptions.setAlgorithmType((VerificationAlgorithm) algorithmSelector.getSelectedItem());
+			verificationOptions.setShowBadTrace(showTrace.isSelected());
 		}
 
 		public void actionPerformed(ActionEvent e)

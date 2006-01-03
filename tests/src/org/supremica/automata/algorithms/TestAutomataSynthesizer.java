@@ -91,46 +91,6 @@ public class TestAutomataSynthesizer
 		return suite;
 	}
 
-	public void testEx45b()
-	{
-		try
-		{
-
-			ProjectBuildFromXml builder = new ProjectBuildFromXml();
-			Project theProject = builder.build(TestFiles.getFile(TestFiles.Ex4_5_b));
-			assertTrue(theProject.nbrOfAutomata() == 3);
-			SynchronizationOptions syncOptions = new SynchronizationOptions();
-
-			// Test Prioritized synchronization, although all events are prioritized in this example
-			{
-				AutomataSynchronizer synchronizer = new AutomataSynchronizer(theProject, syncOptions);
-				synchronizer.execute();
-				assertTrue(synchronizer.getNumberOfStates() == 8);
-				Automaton theAutomaton = synchronizer.getAutomaton();
-				Alphabet theAlphabet = theAutomaton.getAlphabet();
-				assertTrue(theAutomaton.getType() == AutomatonType.Specification);
-				assertTrue(theAutomaton.nbrOfStates() == 8);
-				assertTrue(theAutomaton.nbrOfAcceptingStates() == 2);
-				assertTrue(theAutomaton.nbrOfForbiddenStates() == 3);
-				assertTrue(theAutomaton.nbrOfTransitions() == 11);
-				assertTrue(theAutomaton.isAllEventsPrioritized());
-				assertTrue(theAutomaton.hasInitialState());
-				assertTrue(!theAutomaton.isNullAutomaton());
-				assertTrue(theAlphabet.nbrOfEvents() == 5);
-				assertTrue(theAlphabet.nbrOfControllableEvents() == 4);
-				assertTrue(theAlphabet.nbrOfPrioritizedEvents() == 5);
-				assertTrue(theAlphabet.nbrOfImmediateEvents() == 0);
-				assertTrue(theAlphabet.nbrOfEpsilonEvents() == 0);
-			}
-
-		}
-		catch (Exception ex)
-		{
-			ex.printStackTrace();
-			assertTrue(false);
-		}
-	}
-
 	public void testAGV()
 	{
 		try

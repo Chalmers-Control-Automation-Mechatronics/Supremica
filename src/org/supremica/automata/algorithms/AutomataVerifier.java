@@ -517,13 +517,12 @@ public class AutomataVerifier
 								if (selectedAutomata.size() > 1)
 								{
 									// Check module
-									allModulesControllable = allModulesControllable && moduleIsControllable(selectedAutomata);
+									allModulesControllable &= moduleIsControllable(selectedAutomata);
 
 									// Stop if uncontrollable
 									if (!allModulesControllable)
 									{
-										logger.verbose("Uncontrollable state found.");
-
+										//logger.verbose("Uncontrollable state found.");
 										break loop;
 									}
 
@@ -545,15 +544,13 @@ public class AutomataVerifier
 
 					if (selectedAutomata.size() > 1)
 					{
-
 						// Check module
-						allModulesControllable = allModulesControllable && moduleIsControllable(selectedAutomata);
+						allModulesControllable &= moduleIsControllable(selectedAutomata);
 
 						// Stop if uncontrollable
 						if (!allModulesControllable)
 						{
-							logger.verbose("Uncontrollable state found.");
-
+							//logger.verbose("Uncontrollable state found.");
 							break loop;
 						}
 					}
@@ -586,8 +583,6 @@ public class AutomataVerifier
 	 *@exception  Exception Description of the Exception
 	 *@see  AutomataSynchronizerExecuter
 	 */
-
-	//private boolean moduleIsControllable(ArrayList selectedAutomata)
 	private boolean moduleIsControllable(Automata selectedAutomata)
 		throws Exception
 	{
@@ -687,6 +682,8 @@ public class AutomataVerifier
 			int[] similarAutomata = findSimilarAutomata(theAutomata, selectedAutomata);
 			if (similarAutomata == null)
 			{
+				// This never happens?
+
 				// There are no similar automata, this module must be uncontrollable
 				if (SupremicaProperties.verboseMode())
 				{
@@ -705,9 +702,7 @@ public class AutomataVerifier
 			// Make nbrOfAttempts attempts on prooving controllability and
 			// uncontrollability alternatingly and then give up
 			int nbrOfAttempts = verificationOptions.getNbrOfAttempts();
-
 			stateAmount = 1;
-
 			for (attempt = 1; attempt <= nbrOfAttempts; attempt++)
 			{
 				logger.debug("Attempt number " + attempt + ".");
@@ -717,20 +712,12 @@ public class AutomataVerifier
 				{
 					// Try to find more similarities
 					int[] moreSimilarAutomata = findSimilarAutomata(theAutomata, selectedAutomata);
-
-					if (moreSimilarAutomata == null)
-					{
-						// There were no more automata to add this is monolithically uncontrollable!
-						return false;
-					}
-
-					int[] newSimilarAutomata = new int[similarAutomata.length + moreSimilarAutomata.length];
-
 					if (moreSimilarAutomata != null)
 					{
+						int[] newSimilarAutomata = new int[similarAutomata.length + moreSimilarAutomata.length];
 						if (SupremicaProperties.verboseMode())
 						{
-							logger.info("All similar automata are already added, " + "trying to add some more...");
+							logger.info("All similar automata are already added, trying to add some more...");
 						}
 
 						System.arraycopy(similarAutomata, 0, newSimilarAutomata, 0, similarAutomata.length);
@@ -745,11 +732,17 @@ public class AutomataVerifier
 							logger.info("All similar automata are already added, " +
 										"no chance for controllability.");
 
+							// CAN'T BE DONE... TRACE NOT REMEMBERED... 							
+							/*
 							// Print the uncontrollable state(s)...
 							synchHelper.printUncontrollableStates();
 
 							// Print event trace reaching uncontrollable state
-							// synchHelper.displayTrace();  // CAN'T BE DONE... TRACE NOT REMEMBERED... FIXA!
+							if (verificationOptions.showBadTrace())
+							{
+								synchHelper.displayTrace();  
+							}
+							*/
 						}
 
 						return false;
@@ -777,10 +770,12 @@ public class AutomataVerifier
 						if (findUncontrollableStates(automataIndices))
 						{
 							// Uncontrollable state found!
-							if (SupremicaProperties.verboseMode())
+							if (SupremicaProperties.verboseMode() || verificationOptions.showBadTrace())
 							{    // Print the uncontrollable state(s)...
 								uncontrollabilityCheckHelper.printUncontrollableStates();
-
+							}
+							if (verificationOptions.showBadTrace())
+							{
 								// Print event trace reaching uncontrollable state
 								uncontrollabilityCheckHelper.displayTrace();
 							}
@@ -868,7 +863,6 @@ public class AutomataVerifier
 			// This line is the essence of it all...
 			arraySortValue[count] = compareAlphabets(currAutomaton.getAlphabet(), synchAlphabet);
 
-			// arraySortValue[count] = compareAlphabets(synchAlphabet, currAutomaton.getAlphabet());
 			// Did we get a value?
 			if (arraySortValue[count] > 0)
 			{
@@ -1460,6 +1454,9 @@ public class AutomataVerifier
 			return moduleIsNonblocking(theAutomata.getFirstAutomaton());
 		}
 
+		Automaton theAutomaton = AutomataSynchronizer.synchronizeAutomata(synchHelper);
+
+		/*
 		// Otherwise we must synchronize...
 		synchHelper.setExhaustiveSearch(false);
 		synchHelper.initialize();
@@ -1494,6 +1491,7 @@ public class AutomataVerifier
 				requestStop();
 				theAutomaton = null;
 
+
 				return false;
 			}
 		}
@@ -1504,9 +1502,11 @@ public class AutomataVerifier
 
 			throw ex;
 		}
+		*/
 
-		// Now its just a matter of examining the states (and we can do that destructively!)
-		return moduleIsNonblocking(theAutomaton, true);
+		// Now its just a matter of examining the states (and we can
+		// do that destructively unless we want to find traces)
+		return moduleIsNonblocking(theAutomaton, !verificationOptions.showBadTrace());
 	}
 
 	/**
@@ -1774,9 +1774,9 @@ public class AutomataVerifier
 				currState = (State) stateIterator.next();
 
 				logger.info("Blocking state: " + currState.getName());
-
+				
 				// If we did a copy of theAutomata before we destroyed it we could display the trace...
-				if (!destructive)
+				if (!destructive && verificationOptions.showBadTrace())
 				{
 					String trace = (original.getTrace(original.getStateWithName(currState.getName()))).toString();
 					if (!trace.equals(""))
@@ -1786,7 +1786,12 @@ public class AutomataVerifier
 					else
 					{
 						logger.info("The initial state is blocking!");
+					}
 				}
+
+				if (stopRequested)
+				{
+					break;
 				}
 			}
 		}

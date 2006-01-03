@@ -66,22 +66,40 @@ public class AutomataSynchronizer
 	// For stopping execution
 	private boolean stopRequested = false;
 
-	public AutomataSynchronizer(Automata theAutomata, SynchronizationOptions syncOptions)
+	public AutomataSynchronizer(Automata automata, SynchronizationOptions options)
 		throws Exception
 	{
-		this.theAutomata = theAutomata;
-		this.syncOptions = syncOptions;
-		synchHelper = new AutomataSynchronizerHelper(theAutomata, syncOptions);
+		this.theAutomata = automata;
+		this.syncOptions = options;
+		synchHelper = new AutomataSynchronizerHelper(automata, options);
 
+		initialize();
+	}
+
+	/**
+	 * Creates an AutomataSynchronizer based on an already existing helper.
+	 */
+	public AutomataSynchronizer(AutomataSynchronizerHelper helper)
+		throws Exception
+	{
+		this.theAutomata = helper.getAutomata();
+		this.syncOptions = helper.getSynchronizationOptions();
+		synchHelper = helper;
+
+		initialize();
+	}
+
+	/**
+	 * Initializes the AutomataSynchronizerExecuter:s based on the AutomataSynchronizerHelper.
+	 */
+	private void initialize() 
+	{
 		// Allocate and initialize the synchronizationExecuters
 		int nbrOfExecuters = syncOptions.getNbrOfExecuters();
-
 		synchronizationExecuters = new ArrayList(nbrOfExecuters);
-
 		for (int i = 0; i < nbrOfExecuters; i++)
 		{
 			AutomataSynchronizerExecuter currSynchronizationExecuter = new AutomataSynchronizerExecuter(synchHelper);
-
 			synchronizationExecuters.add(currSynchronizationExecuter);
 		}
 	}
@@ -107,7 +125,6 @@ public class AutomataSynchronizer
 			comment.append(currAutomaton.getName());
 			comment.append(syncOptions.getAutomatonNameSeparator());
 		}
-
 		comment.delete(comment.length() - syncOptions.getAutomatonNameSeparator().length(), comment.length());
 		synchHelper.addState(initialState);
 		synchHelper.addComment(comment.toString());
@@ -200,12 +217,11 @@ public class AutomataSynchronizer
 	 * @param theAutomata the Automata to be synchronized.
 	 * @return Automaton representing the synchronous composition.
 	 */
-	public static Automaton synchronizeAutomata(Automata theAutomata)
+	public static Automaton synchronizeAutomata(Automata automata)
 		throws Exception
 	{
 		SynchronizationOptions options = SynchronizationOptions.getDefaultSynchronizationOptions();
-
-		return synchronizeAutomata(theAutomata, options);
+		return synchronizeAutomata(automata, options);
 	}
 
 	/**
@@ -215,10 +231,24 @@ public class AutomataSynchronizer
 	 * @param options the SynchronizationOptions that should be used.
 	 * @return Automaton representing the synchronous composition.
 	 */
-	public static Automaton synchronizeAutomata(Automata theAutomata, SynchronizationOptions options)
+	public static Automaton synchronizeAutomata(Automata automata, SynchronizationOptions options)
 		throws Exception
 	{
-		AutomataSynchronizer synchronizer = new AutomataSynchronizer(theAutomata, options);
+		AutomataSynchronizerHelper helper = new AutomataSynchronizerHelper(automata, options);
+		return synchronizeAutomata(helper);
+	}
+
+	/**
+	 * Method for synchronizing Automata based on an already existing AutomataSynchronizerHelper.
+	 * The helper includes the options and the automata to be composed!
+	 *
+	 * @param helper the AutomataSynchronizerHelper to be used.
+	 * @return Automaton representing the synchronous composition.
+	 */
+	public static Automaton synchronizeAutomata(AutomataSynchronizerHelper helper)
+		throws Exception
+	{
+		AutomataSynchronizer synchronizer = new AutomataSynchronizer(helper);
 		synchronizer.execute();
 		Automaton result = synchronizer.getAutomaton();
 		synchronizer.clear();

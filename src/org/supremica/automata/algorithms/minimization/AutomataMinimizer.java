@@ -109,29 +109,12 @@ public class AutomataMinimizer
 		throws Exception
 	{
 		this.options = options;
-		//this.options.setMinimizationType(EquivalenceRelation.ObservationEquivalence);
 
 		// Are the options valid?
 		if (!options.isValid())
 		{
 			return null;
 		}
-
-		// Size in the beginning
-		int nbrOfAutomata = theAutomata.size();
-		/*
-		// The number of events in the original alphabet
-		Alphabet globalAlphabet = null;
-		int globalAlphabetSize = 0;
-		int currentAlphabetSize = 0;
-		if (SupremicaProperties.verboseMode())
-		{
-			// It takes a loong time to get the union alphabet if it's a big Automata
-			globalAlphabet = theAutomata.getUnionAlphabet();
-			globalAlphabetSize = globalAlphabet.size() - globalAlphabet.nbrOfEpsilonEvents();
-			currentAlphabetSize = globalAlphabetSize;
-		}
-		*/
 
 		// Initialize execution dialog
 		if (executionDialog != null)
@@ -144,7 +127,11 @@ public class AutomataMinimizer
 
 		// For each event, find the automata that has this event in its alphabet
 		eventToAutomataMap = AlphabetHelpers.buildEventToAutomataMap(theAutomata);
-		int globalAlphabetSize = eventToAutomataMap.size();
+
+		// Sizes in the beginning
+		int nbrOfAutomata = theAutomata.size();
+		int globalAlphabetSize = eventToAutomataMap.size() - options.getTargetAlphabet().size(); // Includes epsilon?
+		// Current alphabet size...
 		int currentAlphabetSize = globalAlphabetSize;
 
 		// As long as there are at least two automata, compose and minimize!

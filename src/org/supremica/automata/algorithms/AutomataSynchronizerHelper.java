@@ -140,7 +140,7 @@ public final class AutomataSynchronizerHelper
 		theStates = new IntArrayHashTable(syncOptions.getInitialHashtableSize(),
 										  syncOptions.expandHashtable());
 		theAutomaton = new Automaton();
-//		executerRendezvous = new Rendezvous(syncOptions.getNbrOfExecuters(), new ExecuterRendezvous());
+		// executerRendezvous = new Rendezvous(syncOptions.getNbrOfExecuters(), new ExecuterRendezvous());
 
 		// Calculate the automataIndexForm (a more efficient representation of an automata)
 		try

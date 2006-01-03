@@ -55,6 +55,8 @@ import org.supremica.automata.Automata;
 public final class VerificationOptions
 {
 	private boolean dialogOK = false;
+
+	// Options
 	private VerificationType verificationType;
 	private VerificationAlgorithm algorithmType;
 	private int exclusionStateLimit;
@@ -62,6 +64,8 @@ public final class VerificationOptions
 	private boolean oneEventAtATime;
 	private boolean skipUncontrollabilityCheck;
 	private int nbrOfAttempts;
+	private boolean showBadTrace;
+
 	private Automata inclusionAutomata = null;
 
 	/**
@@ -69,7 +73,7 @@ public final class VerificationOptions
 	 */
 	public VerificationOptions()
 	{
-		this(SupremicaProperties.verifyVerificationType(), SupremicaProperties.verifyAlgorithmType(), SupremicaProperties.verifyExclusionStateLimit(), SupremicaProperties.verifyReachabilityStateLimit(), SupremicaProperties.verifyOneEventAtATime(), SupremicaProperties.verifySkipUncontrollabilityCheck(), SupremicaProperties.verifyNbrOfAttempts());
+		this(SupremicaProperties.verifyVerificationType(), SupremicaProperties.verifyAlgorithmType(), SupremicaProperties.verifyExclusionStateLimit(), SupremicaProperties.verifyReachabilityStateLimit(), SupremicaProperties.verifyOneEventAtATime(), SupremicaProperties.verifySkipUncontrollabilityCheck(), SupremicaProperties.verifyNbrOfAttempts(), SupremicaProperties.verifyShowBadTrace());
 	}
 
 	/**
@@ -78,7 +82,7 @@ public final class VerificationOptions
 	 * modify the necessary options one by one, starting from default! Much more readable and
 	 * also more practical when adding new options.
 	 */
-	private VerificationOptions(VerificationType verificationType, VerificationAlgorithm algorithmType, int exclusionStateLimit, int reachabilityStateLimit, boolean oneEventAtATime, boolean skipUncontrollabilityCheck, int nbrOfAttempts)
+	private VerificationOptions(VerificationType verificationType, VerificationAlgorithm algorithmType, int exclusionStateLimit, int reachabilityStateLimit, boolean oneEventAtATime, boolean skipUncontrollabilityCheck, int nbrOfAttempts, boolean showBadTrace)
 	{
 		this.verificationType = verificationType;
 		this.algorithmType = algorithmType;
@@ -87,6 +91,7 @@ public final class VerificationOptions
 		this.oneEventAtATime = oneEventAtATime;
 		this.skipUncontrollabilityCheck = skipUncontrollabilityCheck;
 		this.nbrOfAttempts = nbrOfAttempts;
+		this.showBadTrace = showBadTrace;
 	}
 
 	public void setDialogOK(boolean bool)
@@ -169,6 +174,16 @@ public final class VerificationOptions
 		return nbrOfAttempts;
 	}
 
+	public void setShowBadTrace(boolean bool)
+	{
+		showBadTrace = bool;
+	}
+
+	public boolean showBadTrace()
+	{
+		return showBadTrace;
+	}
+
 	public void setInclusionAutomata(Automata aut)
 	{
 		inclusionAutomata = aut;
@@ -191,6 +206,7 @@ public final class VerificationOptions
 		SupremicaProperties.setVerifyOneEventAtATime(oneEventAtATime);
 		SupremicaProperties.setVerifySkipUncontrollabilityCheck(skipUncontrollabilityCheck);
 		SupremicaProperties.setVerifyNbrOfAttempts(nbrOfAttempts);
+		SupremicaProperties.setVerifyShowBadTrace(showBadTrace);
 	}
 
 	/**
