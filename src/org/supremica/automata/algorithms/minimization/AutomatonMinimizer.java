@@ -181,6 +181,8 @@ public class AutomatonMinimizer
 
 	        // Start listening again
 	        theAutomaton.endTransaction();
+
+			// Finished!
             return theAutomaton;
         }
         else if (equivalenceRelation == EquivalenceRelation.LanguageEquivalence)
@@ -192,6 +194,7 @@ public class AutomatonMinimizer
                 Determinizer determinizer = new Determinizer(theAutomaton);
                 determinizer.execute();
                 theAutomaton = determinizer.getNewAutomaton();
+				theAutomaton.beginTransaction();
             }
 
             // Now we're ready for partitioning!
@@ -290,7 +293,7 @@ public class AutomatonMinimizer
 		}
 		else
 		{
-			// Partition using naive methods
+			// Partition using naive methods (pun intended)
         	EquivalenceClasses equivClasses = new EquivalenceClasses();
         	try
         	{
@@ -314,6 +317,7 @@ public class AutomatonMinimizer
 
 			// Build the minimized automaton based on the partitioning in equivClasses
 			theAutomaton = buildAutomaton(equivClasses);
+			theAutomaton.beginTransaction();
 		}
 		int diffSize = statesBefore - theAutomaton.nbrOfStates();
 		totalOE += diffSize;
@@ -322,9 +326,6 @@ public class AutomatonMinimizer
 			logger.verbose("Removed " + diffSize + " states based on partitioning with " +
 						   "respect to observation equivalence.");
 		}
-
-        // Don't notify listeners!
-        theAutomaton.beginTransaction();
 
 		if (stopRequested)
         {
@@ -356,14 +357,17 @@ public class AutomatonMinimizer
         // Remove from alphabet epsilon events that are never used
         removeUnusedEpsilonEvents(theAutomaton);
 
+		// Message
+		if (SupremicaProperties.verboseMode())
+		{
+			int after = theAutomaton.nbrOfStates();
+			logger.info("There were " + before + " states before and " + after +
+						" states after the minimization. Reduction: " +
+						Math.round(100*(((double) (before-after))*100/before))/100.0 + "%.");
+		}
+
 		// Start listening again
         theAutomaton.endTransaction();
-
-		// Message
-        int after = theAutomaton.nbrOfStates();
-        logger.verbose("There were " + before + " states before and " + after +
-                       " states after the minimization. Reduction: " +
-                       Math.round(100*(((double) (before-after))*100/before))/100.0 + "%.");
 
         // Return the result of the minimization!
         return theAutomaton;
@@ -515,6 +519,8 @@ public class AutomatonMinimizer
         throws Exception
     {
         Automaton newAutomaton = new Automaton();
+		// Don't listen to this!
+		newAutomaton.beginTransaction();
 
         newAutomaton.setType(theAutomaton.getType());
         newAutomaton.getAlphabet().union(theAutomaton.getAlphabet()); // Odd... but it works.
@@ -588,6 +594,9 @@ public class AutomatonMinimizer
 
         // Give the automaton an appropriate comment
         newAutomaton.setComment("min(" + theAutomaton.getName() + ")");
+
+		// Start listening again
+		newAutomaton.endTransaction();
 
         // Return the new automaton!
         return newAutomaton;
@@ -1469,7 +1478,7 @@ public class AutomatonMinimizer
         */
 
         // States that can reach marked states by epsilon events only can be considered marked
-        // First find all the marked states, then adjust the states in theit epsilonclosures
+        // First find all the marked states, then adjust the states in the backwardsEpsilonclosures
         StateSet markedStates = new StateSet();
         for (Iterator<State> stateIt = aut.stateIterator(); stateIt.hasNext();)
         {
