@@ -50,38 +50,42 @@
 package org.supremica.automata.algorithms.minimization;
 
 import java.util.*;
+import org.supremica.automata.*;
 
 public class MinimizationStrategy
 {
+	private static final int MAXIMIZE = 0;
+	private static final int MINIMIZE = 1;
+	private static final int SPECIAL = 2;
+
 	private static Collection collection = new LinkedList();
-	public static final MinimizationStrategy RandomOrder =
-		new MinimizationStrategy("Random order", true);
-	public static final MinimizationStrategy AtLeastOneUnique =
-		new MinimizationStrategy("At least one unique", true);
-	public static final MinimizationStrategy MostStatesFirst =
-		new MinimizationStrategy("Most states first", true);
+	public static final MinimizationStrategy AtLeastOneLocal =
+		new MinimizationStrategy("At least one local", true, SPECIAL);
 	public static final MinimizationStrategy FewestStatesFirst =
-		new MinimizationStrategy("Fewest states first", true);
-	public static final MinimizationStrategy MostTransitionsFirst =
-		new MinimizationStrategy("Most transitions first", true);
+		new MinimizationStrategy("Pair automaton with fewest states", true, MINIMIZE);
+	public static final MinimizationStrategy MostStatesFirst =
+		new MinimizationStrategy("Pair automaton with most states", true, MAXIMIZE);
 	public static final MinimizationStrategy FewestTransitionsFirst =
-		new MinimizationStrategy("Fewest transitions first", true);
-	public static final MinimizationStrategy MostEventsFirst =
-		new MinimizationStrategy("Most events first", true);
+		new MinimizationStrategy("Pair automaton with fewest transitions", true, MINIMIZE);
+	public static final MinimizationStrategy MostTransitionsFirst =
+		new MinimizationStrategy("Pair automaton with most transitions", true, MAXIMIZE);
 	public static final MinimizationStrategy FewestEventsFirst =
-		new MinimizationStrategy("Fewest events first", true);
-	public static final MinimizationStrategy Experimental =
-		new MinimizationStrategy("Experimental", true);
+		new MinimizationStrategy("Pair automaton with fewest events", true, MINIMIZE);
+	public static final MinimizationStrategy MostEventsFirst =
+		new MinimizationStrategy("Pair automaton with most events", true, MAXIMIZE);
+	public static final MinimizationStrategy ExperimentalMin =
+		new MinimizationStrategy("Experimental min", true, MINIMIZE);
+	public static final MinimizationStrategy ExperimentalMax =
+		new MinimizationStrategy("Experimental max", true, MAXIMIZE);
+	public static final MinimizationStrategy RandomFirst =
+		new MinimizationStrategy("Pair random automaton", true, MAXIMIZE);
 	public static final MinimizationStrategy Undefined =
-		new MinimizationStrategy("Undefined", false);
+		new MinimizationStrategy("Undefined", false, SPECIAL);
+
 	private String description = null;
+	private int maximize;
 
-	private MinimizationStrategy(String description)
-	{
-		this(description, true);
-	}
-
-	private MinimizationStrategy(String description, boolean selectable)
+	private MinimizationStrategy(String description, boolean selectable, int maximize)
 	{
 		if (selectable)
 		{
@@ -89,6 +93,7 @@ public class MinimizationStrategy
 		}
 
 		this.description = description;
+		this.maximize = maximize;
 	}
 
 	public static Iterator iterator()
@@ -118,5 +123,49 @@ public class MinimizationStrategy
 	public static Object[] toArray()
 	{
 		return collection.toArray();
+	}
+
+	/**
+	 * Return the value of automata in this strategy.
+	 */ 
+	public int value(Automaton aut)
+		throws Exception
+	{
+		if (this == MostStatesFirst || this == FewestStatesFirst)
+			return aut.nbrOfStates();
+		else if (this == MostTransitionsFirst || this == FewestTransitionsFirst) 
+			return aut.nbrOfTransitions();
+		else if (this == MostEventsFirst || this == FewestEventsFirst)
+			return aut.nbrOfEvents();
+		else if (this == ExperimentalMax || this == ExperimentalMin)
+			return aut.nbrOfTransitions() + 1*aut.nbrOfEpsilonTransitions();
+		else if (this == RandomFirst)
+			return (int) (Math.random()*10000.0);
+		else 
+			throw new Exception("Unknown strategy.");
+	}
+
+    /**
+     * Maximization criteria?
+     */
+	public boolean maximize()
+	{
+		return maximize == MAXIMIZE;
+	}
+
+    /**
+     * Minimization criteria?
+     */
+	public boolean minimize()
+	{
+		return maximize == MINIMIZE;
+	}
+
+    /**
+     * Special strategy? Does not return values.
+     */
+	public boolean isSpecial()
+	{
+		return maximize == SPECIAL;
 	}
 }

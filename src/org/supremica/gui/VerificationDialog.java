@@ -54,6 +54,7 @@ import org.supremica.automata.algorithms.VerificationType;
 import org.supremica.automata.algorithms.VerificationAlgorithm;
 import org.supremica.automata.algorithms.minimization.MinimizationOptions;
 import org.supremica.automata.algorithms.minimization.MinimizationStrategy;
+import org.supremica.automata.algorithms.minimization.MinimizationHeuristic;
 import org.supremica.automata.algorithms.EquivalenceRelation;
 import java.awt.*;
 import java.awt.event.*;
@@ -241,25 +242,25 @@ public class VerificationDialog
 			note = new JTextArea("Note:\n" + "Currently, modular nonblocking\n" + "verification is not supported.");
 			note.setBackground(this.getBackground());
 
-			Box box = Box.createVerticalBox();
+			Box mainBox = Box.createVerticalBox();
 
 			JPanel panel = new JPanel();
 			Box algoBox = Box.createVerticalBox();
 			algoBox.add(verificationTypeBox);
 			algoBox.add(algorithmSelector);
 			panel.add(algoBox);
-			box.add(panel);
+			mainBox.add(panel);
 
 			panel = new JPanel();
 			panel.add(showTrace);
-			box.add(panel);
+			mainBox.add(panel);
 
 			panel = new JPanel();
 			panel.add(note);
 			note.setVisible(false);
-			box.add(panel);
+			mainBox.add(panel);
 
-			this.add(box);
+			this.add(mainBox);
 		}
 
 		public void update(VerificationOptions verificationOptions)
@@ -276,7 +277,7 @@ public class VerificationDialog
 		 */
 		private void updatePanel()
 		{
-			// Some kind of ugly stuff goes on here, the "advanced panel" is supposed to be the one
+			// Some ugly stuff goes on here, the "advanced panel" is supposed to be the one
 			// with index 1.
 			int advancedTabIndex = 1;
 
@@ -398,6 +399,7 @@ public class VerificationDialog
 		private static final long serialVersionUID = 1L;
 
 		JComboBox minimizationStrategy;
+		JComboBox minimizationHeuristic;
 		JCheckBox ruleA;
 		JCheckBox ruleAA;
 		JCheckBox ruleB;
@@ -406,26 +408,45 @@ public class VerificationDialog
 		public VerificationDialogAdvancedPanelModularNonblocking()
 		{
 			minimizationStrategy = new JComboBox(MinimizationStrategy.toArray());
-			Box strategyBox = Box.createHorizontalBox();
-			strategyBox.add(new JLabel("      ")); // Ugly fix to get stuff centered
-			strategyBox.add(new JLabel("Minimization strategy: "));
-			strategyBox.add(minimizationStrategy);
-			strategyBox.add(new JLabel("      ")); // Ugly fix to get stuff centered
-			this.add(strategyBox);
-
+			minimizationHeuristic = new JComboBox(MinimizationHeuristic.toArray());
 			ruleA = new JCheckBox("Rule A");
 			ruleAA = new JCheckBox("Rule AA");
 			ruleB = new JCheckBox("Rule B");
 			ruleF = new JCheckBox("Rule F");
-			this.add(ruleA);
-			this.add(ruleAA);
-			this.add(ruleB);
-			this.add(ruleF);
+
+			// Create layout!
+			Box mainBox = Box.createVerticalBox();
+
+			JPanel panel = new JPanel();
+			Box strategyBox = Box.createHorizontalBox();
+			strategyBox.add(new JLabel("Minimization strategy: "));
+			strategyBox.add(minimizationStrategy);
+			panel.add(strategyBox);
+			mainBox.add(panel);
+
+			panel = new JPanel();
+			Box heuristicBox = Box.createHorizontalBox();
+			heuristicBox.add(new JLabel("Minimization heuristic: "));
+			heuristicBox.add(minimizationHeuristic);
+			panel.add(heuristicBox);
+			mainBox.add(panel);
+
+			panel = new JPanel();
+			panel.add(new JLabel("Rules to use: "));
+			panel.add(ruleA);
+			panel.add(ruleAA);
+			panel.add(ruleB);
+			panel.add(ruleF);
+			mainBox.add(panel);
+
+			// Add components
+			this.add(mainBox);
 		}
 
 		public void update(MinimizationOptions options)
 		{
 			minimizationStrategy.setSelectedItem(options.getMinimizationStrategy());
+			minimizationHeuristic.setSelectedItem(options.getMinimizationHeuristic());
 			ruleA.setSelected(options.getUseRuleA());
 			ruleAA.setSelected(options.getUseRuleAA());
 			ruleB.setSelected(options.getUseRuleB());
@@ -437,6 +458,7 @@ public class VerificationDialog
 			options.setMinimizationType(EquivalenceRelation.ConflictEquivalence);
 			
 			options.setMinimizationStrategy((MinimizationStrategy) minimizationStrategy.getSelectedItem());
+			options.setMinimizationHeuristic((MinimizationHeuristic) minimizationHeuristic.getSelectedItem());
 			options.setUseRuleA(ruleA.isSelected());
 			options.setUseRuleA(ruleAA.isSelected());
 			options.setUseRuleB(ruleB.isSelected());

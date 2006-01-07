@@ -185,14 +185,17 @@ public class TestAutomataVerifier
 			synchronizationOptions = SynchronizationOptions.getDefaultVerificationOptions();
 			minimizationOptions = MinimizationOptions.getDefaultNonblockingOptions();
 			minimizationOptions.setMinimizationStrategy(MinimizationStrategy.MostStatesFirst);
+			minimizationOptions.setMinimizationHeuristic(MinimizationHeuristic.MostLocal);
 			verifier = new AutomataVerifier(theProject, verificationOptions, synchronizationOptions, minimizationOptions);
 			assertTrue(verifier.verify());
 
 			minimizationOptions.setMinimizationStrategy(MinimizationStrategy.FewestTransitionsFirst);
+			minimizationOptions.setMinimizationHeuristic(MinimizationHeuristic.MostLocal);
 			verifier = new AutomataVerifier(theProject, verificationOptions, synchronizationOptions, minimizationOptions);
 			assertTrue(verifier.verify());
 
-			minimizationOptions.setMinimizationStrategy(MinimizationStrategy.AtLeastOneUnique);
+			minimizationOptions.setMinimizationStrategy(MinimizationStrategy.AtLeastOneLocal);
+			minimizationOptions.setMinimizationHeuristic(MinimizationHeuristic.FewestAutomata);
 			verifier = new AutomataVerifier(theProject, verificationOptions, synchronizationOptions, minimizationOptions);
 			assertTrue(verifier.verify());
 		}

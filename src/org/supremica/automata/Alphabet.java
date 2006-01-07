@@ -537,8 +537,9 @@ public class Alphabet
 	 * Computes A \ B (difference) where A is this alphabet and B is other
 	 *
 	 *@param  other The other alphabet
+	 *@returns the modified self.
 	 */
-	public void minus(Alphabet other)
+	public Alphabet minus(Alphabet other)
 	{
 		for (Iterator<LabeledEvent> alphIt = other.iterator(); alphIt.hasNext(); )
 		{
@@ -553,11 +554,11 @@ public class Alphabet
 					//  Quick check if this alphabet is almost empty
 					if ((this.size() == 1) && !other.contains(this.iterator().next()))
 					{
-						return;
+						return this;
 					}
 					else if (this.size() == 0)
 					{
-						return;
+						return this;
 					}
 				}
 				catch (Exception ex)
@@ -568,6 +569,8 @@ public class Alphabet
 				}
 			}
 		}
+
+		return this;
 	}
 
 	/**

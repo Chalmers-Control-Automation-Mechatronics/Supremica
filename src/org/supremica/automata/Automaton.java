@@ -60,7 +60,6 @@ public class Automaton
 //	implements ArcListener
 {
 	private static Logger logger = LoggerFactory.createLogger(Automaton.class);
-	private final Alphabet alphabet;
 
 	/**
 	 * The name of the automaton.
@@ -76,10 +75,11 @@ public class Automaton
 
 	// private List theStates = new LinkedList();
 	private final StateSet theStates = new StateSet();
-	private int index = -1;
+	private final Alphabet alphabet;
 	//private Map idStateMap;    // Want fast lookup on both id and index (but not name?)
+	private int index = -1;
 	private Map<Integer,State> indexStateMap;
-//	private ArcSet theArcs;
+	//private ArcSet theArcs;
 	private State initialState;
 	private boolean isDisabled = false;
 	private AutomatonType type = AutomatonType.Specification;
@@ -873,8 +873,8 @@ public class Automaton
 		}
 
 		arc.clear();
-//		theArcs.removeArc(arc);
-//		notifyListeners(AutomatonListeners.MODE_ARC_REMOVED, arc);
+		//theArcs.removeArc(arc);
+		//notifyListeners(AutomatonListeners.MODE_ARC_REMOVED, arc);
 	}
 
 	/*
@@ -1046,7 +1046,6 @@ public class Automaton
 		}
 
 		Iterator<State> stIt = new InternalStateIterator(eventLabel, true);
-
 		return stIt;
 	}
 
@@ -1096,12 +1095,22 @@ public class Automaton
 	 */
 	public int nbrOfTransitions()
 	{
+		/*
 		int amount = 0;
-
 		for (Iterator<Arc> arcIt = arcIterator(); arcIt.hasNext(); )
 		{
 			Arc currArc = arcIt.next();
 			amount++;
+		}
+
+		return amount;
+		*/
+
+		// Calculate the sum of the outgoing arcs in the states
+		int amount = 0;
+		for (Iterator<State> stIt = stateIterator(); stIt.hasNext(); )
+		{
+			amount += stIt.next().nbrOfOutgoingArcs();
 		}
 
 		return amount;

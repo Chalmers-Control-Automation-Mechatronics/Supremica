@@ -94,6 +94,10 @@ public final class MinimizationOptions
 	 */
 	private MinimizationStrategy minimizationStrategy;
 	/**
+	 * Which heuristic should be used.
+	 */
+	private MinimizationHeuristic minimizationHeuristic;
+	/**
 	 * The target alphabet, the events that are not in this alphabet will be hidden in the
 	 * final result.
 	 */
@@ -118,7 +122,8 @@ public final class MinimizationOptions
 			 SupremicaProperties.minimizationAlsoTransitions(),
 			 SupremicaProperties.minimizationKeepOriginal(),
 			 SupremicaProperties.minimizationIgnoreMarking(),
-			 SupremicaProperties.minimizationStrategy());
+			 SupremicaProperties.minimizationStrategy(),
+			 SupremicaProperties.minimizationHeuristic());
 	}
 
 	/**
@@ -127,13 +132,15 @@ public final class MinimizationOptions
 	 * modify the options that you want to change.
 	 */
 	private MinimizationOptions(EquivalenceRelation equivalenceRelation, boolean alsoTransitions,
-							   boolean keepOriginal, boolean ignoreMarking, MinimizationStrategy strategy)
+								boolean keepOriginal, boolean ignoreMarking, MinimizationStrategy strategy,
+								MinimizationHeuristic heuristic)
 	{
 		this.equivalenceRelation = equivalenceRelation;
 		this.alsoTransitions = alsoTransitions;
 		this.keepOriginal = keepOriginal;
 		this.ignoreMarking = ignoreMarking;
 		this.minimizationStrategy = strategy;
+		this.minimizationHeuristic = heuristic;
 	}
 
 	public boolean isValid()
@@ -172,6 +179,14 @@ public final class MinimizationOptions
 		if (targetAlphabet != null && targetAlphabet.nbrOfEpsilonEvents() != 0)
 		{
 			String message = "There should not be epsilon events in the target alphabet.";  // (But it's not dangerous or anything...)
+			return message;
+		}
+
+		if (minimizationStrategy != MinimizationStrategy.AtLeastOneLocal && 
+			(minimizationHeuristic == MinimizationHeuristic.FewestAutomata || 
+			 minimizationHeuristic == MinimizationHeuristic.MostAutomata))
+		{
+			String message = "Inapropriate choice of minimization heuristic.";
 			return message;
 		}
 
@@ -241,6 +256,15 @@ public final class MinimizationOptions
 		return minimizationStrategy;
 	}
 
+	public void setMinimizationHeuristic(MinimizationHeuristic heuristic)
+	{
+		minimizationHeuristic = heuristic;
+	}
+	public MinimizationHeuristic getMinimizationHeuristic()
+	{
+		return minimizationHeuristic;
+	}
+
 	public void setSkipLast(boolean bool)
 	{
 		skipLast = bool;
@@ -302,6 +326,7 @@ public final class MinimizationOptions
 		SupremicaProperties.setMinimizationKeepOriginal(keepOriginal);
 		SupremicaProperties.setMinimizationIgnoreMarking(ignoreMarking);
 		SupremicaProperties.setMinimizationStrategy(minimizationStrategy);
+		SupremicaProperties.setMinimizationHeuristic(minimizationHeuristic);
 	}
 
 	/**
@@ -330,6 +355,7 @@ public final class MinimizationOptions
 		options.setSkipLast(true);
 		options.setTargetAlphabet(new Alphabet());
 		options.setMinimizationStrategy(MinimizationStrategy.FewestTransitionsFirst);
+		options.setMinimizationHeuristic(MinimizationHeuristic.MostLocal);
 		return options;
 	}
 
