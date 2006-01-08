@@ -61,24 +61,26 @@ public class MinimizationHeuristic
 	private static Collection collection = new LinkedList();
 	public static final MinimizationHeuristic MostLocal =
 		new MinimizationHeuristic("Highest local ratio", true, MAXIMIZE);
+	public static final MinimizationHeuristic MostCommon =
+		new MinimizationHeuristic("Highest common ratio", true, MAXIMIZE);
 	public static final MinimizationHeuristic LeastExtension =
 		new MinimizationHeuristic("Least extension of alphabet", true, MINIMIZE);
-	public static final MinimizationHeuristic MostStates =
-		new MinimizationHeuristic("Most states", true, MAXIMIZE);
-	public static final MinimizationHeuristic FewestStates =
-		new MinimizationHeuristic("Fewest states", true, MINIMIZE);
-	public static final MinimizationHeuristic MostEvents =
-		new MinimizationHeuristic("Most events", true, MAXIMIZE);
-	public static final MinimizationHeuristic FewestEvents =
-		new MinimizationHeuristic("Fewest events", true, MINIMIZE);
-	public static final MinimizationHeuristic MostTransitions =
-		new MinimizationHeuristic("Most transitions", true, MAXIMIZE);
 	public static final MinimizationHeuristic FewestTransitions =
 		new MinimizationHeuristic("Fewest transitions", true, MINIMIZE);
-	public static final MinimizationHeuristic MostAutomata =
-		new MinimizationHeuristic("Most automata", true, MAXIMIZE);
+	public static final MinimizationHeuristic FewestStates =
+		new MinimizationHeuristic("Fewest states", true, MINIMIZE);
+	public static final MinimizationHeuristic FewestEvents =
+		new MinimizationHeuristic("Fewest events", true, MINIMIZE);
 	public static final MinimizationHeuristic FewestAutomata =
 		new MinimizationHeuristic("Fewest automata", true, MINIMIZE);
+	public static final MinimizationHeuristic MostTransitions =
+		new MinimizationHeuristic("Most transitions", true, MAXIMIZE);
+	public static final MinimizationHeuristic MostStates =
+		new MinimizationHeuristic("Most states", true, MAXIMIZE);
+	public static final MinimizationHeuristic MostEvents =
+		new MinimizationHeuristic("Most events", true, MAXIMIZE);
+	public static final MinimizationHeuristic MostAutomata =
+		new MinimizationHeuristic("Most automata", true, MAXIMIZE);
 	public static final MinimizationHeuristic Random =
 		new MinimizationHeuristic("Random order", true, MAXIMIZE);
 	public static final MinimizationHeuristic Undefined =
@@ -141,7 +143,33 @@ public class MinimizationHeuristic
 			localEvents.minus(targetAlphabet);
 			int nbrOfLocalEvents = localEvents.size();
 			int unionAlphabetSize = selection.getUnionAlphabet().size();
-			return (int) (10000 * ((double) nbrOfLocalEvents)/((double) unionAlphabetSize));
+			//System.err.println(" Value: " + (int) (1000 * ((double) nbrOfLocalEvents)/((double) unionAlphabetSize)) +  " aut: " + selection);
+			return (int) (1000 * ((double) nbrOfLocalEvents)/((double) unionAlphabetSize));
+		}
+		else if (this == MostCommon)
+		{
+			int unionAlphabetSize = selection.getUnionAlphabet().size();
+			Automaton smallest = null;
+			for (Iterator<Automaton> autIt = selection.iterator(); autIt.hasNext(); )
+			{
+				Automaton aut = autIt.next();
+				if (smallest == null || aut.getAlphabet().size() < smallest.getAlphabet().size())
+				{
+					smallest = aut;
+				}
+			}
+			Alphabet common = new Alphabet(smallest.getAlphabet());
+			for (Iterator<Automaton> autIt = selection.iterator(); autIt.hasNext(); )
+			{
+				Automaton aut = autIt.next();
+				if (aut == smallest)
+				{
+					continue;
+				}
+				common.intersect(aut.getAlphabet());
+			}
+			int nbrOfCommonEvents = common.size();
+			return (int) (1000 * ((double) nbrOfCommonEvents)/((double) unionAlphabetSize));
 		}
 		else if (this == LeastExtension)
 		{
@@ -157,7 +185,7 @@ public class MinimizationHeuristic
 			}
 			return (int) (1000 * ((double) unionAlphabetSize)/((double) largestAlphabetSize));
 		}
-		if (this == MostStates || this == FewestStates)
+		else if (this == MostStates || this == FewestStates)
 		{
 			// Prod
 			int value = 1;
@@ -185,10 +213,8 @@ public class MinimizationHeuristic
 		{
 			return (int) (Math.random()*10000.0);
 		}
-		else
-		{
-			throw new Exception("Unknown heuristic.");
-		}
+
+		throw new Exception("Unknown heuristic.");
 	}
 
     /**

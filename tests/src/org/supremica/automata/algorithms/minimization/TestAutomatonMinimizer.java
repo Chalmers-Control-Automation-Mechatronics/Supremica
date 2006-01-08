@@ -252,8 +252,6 @@ public class TestAutomatonMinimizer
                 Automaton currMin = min.getAutomatonAt(i);
                 Automaton currKey = key.getAutomatonAt(i);
 
-                // System.err.println(currMin + " vs. " + currKey);
-
                 assertTrue(currMin.nbrOfStates() == currKey.nbrOfStates());
                 assertTrue(currMin.getAlphabet().equals(currKey.getAlphabet()));
                 assertTrue(currMin.nbrOfTransitions() == currKey.nbrOfTransitions());

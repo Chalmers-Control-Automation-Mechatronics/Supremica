@@ -61,24 +61,24 @@ public class MinimizationStrategy
 	private static Collection collection = new LinkedList();
 	public static final MinimizationStrategy AtLeastOneLocal =
 		new MinimizationStrategy("At least one local", true, SPECIAL);
-	public static final MinimizationStrategy FewestStatesFirst =
-		new MinimizationStrategy("Pair automaton with fewest states", true, MINIMIZE);
-	public static final MinimizationStrategy MostStatesFirst =
-		new MinimizationStrategy("Pair automaton with most states", true, MAXIMIZE);
 	public static final MinimizationStrategy FewestTransitionsFirst =
-		new MinimizationStrategy("Pair automaton with fewest transitions", true, MINIMIZE);
-	public static final MinimizationStrategy MostTransitionsFirst =
-		new MinimizationStrategy("Pair automaton with most transitions", true, MAXIMIZE);
+		new MinimizationStrategy("Pair with fewest transition automaton", true, MINIMIZE);
+	public static final MinimizationStrategy FewestStatesFirst =
+		new MinimizationStrategy("Pair with fewest states automaton", true, MINIMIZE);
 	public static final MinimizationStrategy FewestEventsFirst =
-		new MinimizationStrategy("Pair automaton with fewest events", true, MINIMIZE);
+		new MinimizationStrategy("Pair with fewest events automaton", true, MINIMIZE);
+	public static final MinimizationStrategy MostTransitionsFirst =
+		new MinimizationStrategy("Pair with most transitions automaton", true, MAXIMIZE);
+	public static final MinimizationStrategy MostStatesFirst =
+		new MinimizationStrategy("Pair with most states automaton", true, MAXIMIZE);
 	public static final MinimizationStrategy MostEventsFirst =
-		new MinimizationStrategy("Pair automaton with most events", true, MAXIMIZE);
+		new MinimizationStrategy("Pair with most events automaton", true, MAXIMIZE);
+	public static final MinimizationStrategy RandomFirst =
+		new MinimizationStrategy("Pair with random automaton", true, MAXIMIZE);
 	public static final MinimizationStrategy ExperimentalMin =
 		new MinimizationStrategy("Experimental min", true, MINIMIZE);
 	public static final MinimizationStrategy ExperimentalMax =
 		new MinimizationStrategy("Experimental max", true, MAXIMIZE);
-	public static final MinimizationStrategy RandomFirst =
-		new MinimizationStrategy("Pair random automaton", true, MAXIMIZE);
 	public static final MinimizationStrategy Undefined =
 		new MinimizationStrategy("Undefined", false, SPECIAL);
 
