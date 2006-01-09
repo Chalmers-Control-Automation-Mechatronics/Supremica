@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EventTableModel
 //###########################################################################
-//# $Id: EventTableModel.java,v 1.9 2005-12-12 20:23:14 siw4 Exp $
+//# $Id: EventTableModel.java,v 1.10 2006-01-09 23:52:56 siw4 Exp $
 //###########################################################################
 
 
@@ -396,7 +396,15 @@ class EventTableModel
 		{
 			public int compare (Object o1, Object o2)
 			{
-				return o1.toString().compareTo(o2.toString());
+				if (o1.toString() == "")
+				{
+					return 1;
+				}
+				if (o2.toString() == "")
+				{
+					return -1;
+				}				
+				return o1.toString().compareToIgnoreCase(o2.toString());
 			}
 
 			public boolean equals(Object o)

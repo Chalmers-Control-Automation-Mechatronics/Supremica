@@ -1,6 +1,6 @@
 package net.sourceforge.waters.gui.command;
 
-import net.sourceforge.waters.gui.EditorSurface;
+import net.sourceforge.waters.gui.ControlledSurface;
 import net.sourceforge.waters.gui.EditorNode;
 import net.sourceforge.waters.gui.EditorEdge;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
@@ -23,7 +23,7 @@ public class DeleteNodeCommand
 {
     private boolean mFirstExecution = true;
     /** The ControlledSurface Edited with this Command */
-    private final EditorSurface mSurface;
+    private final ControlledSurface mSurface;
     /** The Node Removed by this Command */
     private final EditorNode mDeleted;
     /** the Edge Deletion Commands Associated with this Command */
@@ -37,7 +37,7 @@ public class DeleteNodeCommand
      * @param surface the surface edited by this command
      * @param node the node which is to be removed
      */
-    public DeleteNodeCommand(EditorSurface surface, EditorNode node)
+    public DeleteNodeCommand(ControlledSurface surface, EditorNode node)
     {
 		mSurface = surface;
 		mDeleted = node;
@@ -66,6 +66,7 @@ public class DeleteNodeCommand
 	    }
 	}
 	mSurface.delNode(mDeleted);
+	mSurface.unselectAll();
 	mSurface.getEditorInterface().setDisplayed();
 	mFirstExecution = false;
     }
@@ -95,6 +96,8 @@ public class DeleteNodeCommand
 		for (DeleteEdgeCommand d : mDelEdge) {
 			d.undo();
 		}
+		mSurface.unselectAll();
+		mSurface.select(mDeleted);
 		mSurface.getEditorInterface().setDisplayed();
     }
 

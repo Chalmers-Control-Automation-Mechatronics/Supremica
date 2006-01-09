@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.command
 //# CLASS:   MoveEdgeCommand
 //###########################################################################
-//# $Id: MoveEdgeCommand.java,v 1.1 2006-01-09 02:21:09 siw4 Exp $
+//# $Id: MoveEdgeCommand.java,v 1.2 2006-01-09 23:52:56 siw4 Exp $
 //###########################################################################
 
 
@@ -113,7 +113,7 @@ public class MoveEdgeCommand
 		super.undo();
 		if (mSource)
 		{
-			mEdge.setStartNode(mOld, (int)mOPos.getX(), (int)mOPos.getX());
+			mEdge.setStartNode(mOld, (int)mOPos.getX(), (int)mOPos.getY());
 		}
 		else
 		{

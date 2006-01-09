@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.49 2006-01-09 02:21:09 siw4 Exp $
+//# $Id: ControlledSurface.java,v 1.50 2006-01-09 23:52:56 siw4 Exp $
 //###########################################################################
  
 package net.sourceforge.waters.gui;
@@ -122,7 +122,7 @@ public class ControlledSurface
 		}
 	}
 
-	private void select(EditorObject o)
+	public void select(EditorObject o)
 	{
 		if (!selectedObjects.contains(o))
 		{

@@ -47,6 +47,8 @@ public class CreateNodeGroupCommand
     public void execute()
     {
 	mSurface.addNodeGroup(mCreated);
+	mSurface.unselectAll();
+	mSurface.select(mCreated);	
 	mSurface.getEditorInterface().setDisplayed();
     }
 
@@ -72,6 +74,7 @@ public class CreateNodeGroupCommand
     {
 	super.undo();
 	mSurface.delNodeGroup(mCreated);
+	mSurface.unselectAll();
 	mSurface.getEditorInterface().setDisplayed();
     }
 

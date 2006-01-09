@@ -17,12 +17,12 @@ class EditorEdgePopupMenu
 	implements ActionListener
 {
 	private EditorEdge edge;
-	private EditorSurface parent;
+	private ControlledSurface parent;
 
 	private JMenuItem deleteItem;
 	private JMenuItem recallItem;	
 
-	public EditorEdgePopupMenu(EditorSurface parent, EditorEdge edge)
+	public EditorEdgePopupMenu(ControlledSurface parent, EditorEdge edge)
 	{
 		this.parent = parent;
 		this.edge = edge;

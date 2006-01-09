@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorLabelGroup
 //###########################################################################
-//# $Id: EditorLabelGroup.java,v 1.17 2005-12-15 21:57:57 siw4 Exp $
+//# $Id: EditorLabelGroup.java,v 1.18 2006-01-09 23:52:56 siw4 Exp $
 //###########################################################################
 
 
@@ -92,6 +92,19 @@ public class EditorLabelGroup
 		panel.requestFocus();
 		int index = getLabelIndexAt(ex, ey);
 		if (index != -1)
+		{
+			selectedLabel = (IdentifierSubject)mSubject.getEventList().get(index);
+		}
+		else
+		{
+			selectedLabel = null;
+		}
+	}
+	
+	public void setSelectedLabel(int index)
+	{
+		panel.requestFocus();
+		if (index >= 0 && index < mSubject.getEventList().size())
 		{
 			selectedLabel = (IdentifierSubject)mSubject.getEventList().get(index);
 		}
@@ -356,9 +369,9 @@ public class EditorLabelGroup
 		parent = par;
 	}
 
-	public EditorLabelGroup(LabelBlockSubject label, final EditorSurface e)
+	public EditorLabelGroup(LabelBlockSubject label, final EditorSurface surface)
 	{
-		mUndo = e.getEditorInterface().getUndoInterface();
+		mUndo = surface.getEditorInterface().getUndoInterface();
 		// This is a labelgroup
 		type = LABELGROUP;
 
@@ -401,76 +414,84 @@ public class EditorLabelGroup
 		/*
 		e.add(shadowPanel);
 		*/
-		e.add(panel);
+		surface.add(panel);
 		setPanelLocation();
-
-		panel.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), "up");
-		panel.getActionMap().put("up", new AbstractAction()
+		if (surface instanceof ControlledSurface)
 		{
-			public void actionPerformed(ActionEvent e)
+			final ControlledSurface s = (ControlledSurface)surface;
+			panel.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), "up");
+			panel.getActionMap().put("up", new AbstractAction()
 			{
-				int index = mSubject.getEventList().indexOf(selectedLabel);
-				if ((index > 0) && (index < panel.getComponentCount()))
+				public void actionPerformed(ActionEvent e)
 				{
-					Command reorganize = new ReorganizeListCommand(mSubject,
-													selectedLabel, index - 1);
-					mUndo.executeCommand(reorganize);
-					// Clear all lists
-					/*
-					shadowPanel.removeAll();
-					*/
-					/*
-					shadowPanel.repaint();
-					*/					
+					int index = mSubject.getEventList().indexOf(selectedLabel);
+					if ((index > 0) && (index < panel.getComponentCount()))
+					{
+						Command reorganize = new ReorganizeListCommand(s,
+														EditorLabelGroup.this,
+														selectedLabel,
+														index - 1);
+						mUndo.executeCommand(reorganize);
+						// Clear all lists
+						/*
+						shadowPanel.removeAll();
+						*/
+						/*
+						shadowPanel.repaint();
+						*/					
+					}
 				}
-			}
-		});
-		panel.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), "down");
-		panel.getActionMap().put("down", new AbstractAction()
-		{
-			public void actionPerformed(ActionEvent e)
+			});
+			panel.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), "down");
+			panel.getActionMap().put("down", new AbstractAction()
 			{
-				int index = mSubject.getEventList().indexOf(selectedLabel);
-				if ((index >= 0) && (index < panel.getComponentCount() - 1))
+				public void actionPerformed(ActionEvent e)
 				{
-					Command reorganize = new ReorganizeListCommand(mSubject,
-													selectedLabel, index + 1);
-					mUndo.executeCommand(reorganize);																		
-					/*
-					shadowPanel.removeAll();
-					*/
-					/*
-					shadowPanel.repaint();
-					*/					
+					int index = mSubject.getEventList().indexOf(selectedLabel);
+					if ((index >= 0) && (index < panel.getComponentCount() - 1))
+					{
+						Command reorganize = new ReorganizeListCommand(s, 
+														EditorLabelGroup.this,
+														selectedLabel, index + 1);
+						mUndo.executeCommand(reorganize);																		
+						/*
+						shadowPanel.removeAll();
+						*/
+						/*
+						shadowPanel.repaint();
+						*/					
+					}
 				}
-			}
-		});
-		panel.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "delete");
-		panel.getActionMap().put("delete", new AbstractAction()
-		{
-			public void actionPerformed(ActionEvent action)
+			});
+			panel.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "delete");
+			panel.getActionMap().put("delete", new AbstractAction()
 			{
-				// Is a label selected?
-				int index = mSubject.getEventList().indexOf(selectedLabel);
-				if ((index >= 0) && (index < panel.getComponentCount()))
+				public void actionPerformed(ActionEvent action)
 				{
-					// Remove event
-					Command removeEvent = new RemoveEventCommand(getSubject(),
-											  			  		selectedLabel);
-					mUndo.executeCommand(removeEvent);					
+					// Is a label selected?
+					int index = mSubject.getEventList().indexOf(selectedLabel);
+					if ((index >= 0) && (index < panel.getComponentCount()))
+					{
+						// Remove event
+						Command removeEvent = new RemoveEventCommand(s,
+																	EditorLabelGroup.this,
+																	selectedLabel);
+						mUndo.executeCommand(removeEvent);					
+					}
 				}
-			}
-		});
+			});
+		}
 	}
 	
 	public void modelChanged(ModelChangeEvent e)
 	{
 		panel.removeAll();
+		
 		for (final Proxy proxy : mSubject.getEventList())
 		{
 			final String text = proxy.toString();
 			addToPanel(text);
-		}
+		}		
 		resizePanel();
 	}
 

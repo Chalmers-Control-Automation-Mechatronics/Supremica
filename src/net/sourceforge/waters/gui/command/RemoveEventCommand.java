@@ -4,6 +4,9 @@ import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
+import net.sourceforge.waters.gui.ControlledSurface;
+import net.sourceforge.waters.gui.EditorLabelGroup;
+
 import net.sourceforge.waters.subject.module.EventListExpressionSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
 
@@ -11,22 +14,28 @@ public class RemoveEventCommand
 	extends AbstractUndoableEdit
 	implements Command
 {
+	private final ControlledSurface mSurface;
+	private final EditorLabelGroup mGroup;
 	private final EventListExpressionSubject mList;
 	private final IdentifierSubject mIdentifier;
 	private final int mPosition;
 	private final String mDescription = "Remove Event";
 	
-	public RemoveEventCommand(EventListExpressionSubject list,
+	public RemoveEventCommand(ControlledSurface surface,
+							  EditorLabelGroup group,
 							  IdentifierSubject identifier)						   
 	{
-		mList = list;
+		mSurface = surface;
+		mGroup = group;
+		mList = group.getSubject();
 		mIdentifier = identifier;
-		mPosition = list.getEventList().indexOf(mIdentifier);
+		mPosition = mList.getEventList().indexOf(mIdentifier);
 	}
 	
 	public void execute()
 	{
 		mList.getEventListModifiable().remove(mIdentifier);
+		mSurface.select(mGroup);
 	}
 	
 	/** 
@@ -49,6 +58,8 @@ public class RemoveEventCommand
     {
 		super.undo();
 		mList.getEventListModifiable().add(mPosition, mIdentifier);
+		mSurface.select(mGroup);
+		mGroup.setSelectedLabel(mPosition);
     }
 
     public String getPresentationName()

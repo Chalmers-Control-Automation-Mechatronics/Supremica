@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorLabel
 //###########################################################################
-//# $Id: EditorNodePopupMenu.java,v 1.8 2006-01-09 00:25:33 siw4 Exp $
+//# $Id: EditorNodePopupMenu.java,v 1.9 2006-01-09 23:52:56 siw4 Exp $
 //###########################################################################
 
 
@@ -26,14 +26,14 @@ class EditorNodePopupMenu
 	implements ActionListener
 {
 	private EditorNode node;
-	private EditorSurface parent;
+	private ControlledSurface parent;
 
 	private JMenuItem deleteItem;
 	private JMenuItem initialItem;	
 	private JMenuItem recallItem;	
 	private JMenuItem clearItem;	
 
-	public EditorNodePopupMenu(EditorSurface parent, EditorNode node)
+	public EditorNodePopupMenu(ControlledSurface parent, EditorNode node)
 	{
 		this.parent = parent;
 		this.node = node;

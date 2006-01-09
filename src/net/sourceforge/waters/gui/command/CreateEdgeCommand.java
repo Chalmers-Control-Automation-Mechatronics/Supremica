@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.command
 //# CLASS:   CreateEdgeCommand
 //###########################################################################
-//# $Id: CreateEdgeCommand.java,v 1.4 2005-11-03 01:24:15 robi Exp $
+//# $Id: CreateEdgeCommand.java,v 1.5 2006-01-09 23:52:56 siw4 Exp $
 //###########################################################################
 
 
@@ -71,6 +71,8 @@ public class CreateEdgeCommand
     public void execute()
     {
 		mSurface.addEdge(mCreated);
+		mSurface.unselectAll();
+		mSurface.select(mCreated);
 		mSurface.getEditorInterface().setDisplayed();
     }
 
@@ -94,6 +96,7 @@ public class CreateEdgeCommand
     {
 		super.undo();
 		mSurface.delEdge(mCreated);
+		mSurface.unselectAll();
 		mSurface.getEditorInterface().setDisplayed();
     }
 

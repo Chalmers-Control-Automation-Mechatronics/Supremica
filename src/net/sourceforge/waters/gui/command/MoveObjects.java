@@ -65,7 +65,7 @@ public class MoveObjects
 	    }
 	} else {
 	    description = "PointLess";
-	}
+	}	
 	mDescription = description;
     }
 
@@ -86,18 +86,23 @@ public class MoveObjects
     public void redo() throws CannotRedoException
     {
 	super.redo();
+	mSurface.unselectAll();
 	for (EditorObject o : mMoved) {
-	    if (o.getType() == EditorObject.NODEGROUP) {
-		EditorNodeGroup ng = (EditorNodeGroup) o;
-		if (ng.getResizing()) {
-		    ng.resize((int)(ng.getX() + mDisplacement.getX()), (int)(ng.getY() + mDisplacement.getY()));
-		    continue;
+		if (mDescription != "Edge reshaping" || o.getType() != EditorObject.EDGE)
+		{
+			if (o.getType() == EditorObject.NODEGROUP) {
+			EditorNodeGroup ng = (EditorNodeGroup) o;
+			if (ng.getResizing()) {
+				ng.resize((int)(ng.getX() + mDisplacement.getX()), (int)(ng.getY() + mDisplacement.getY()));
+				continue;
+			}
+			}
+			if ((o.getType() != EditorObject.LABELGROUP && o.getType() != EditorObject.LABEL)
+			|| mMoved.size() == 1) {	
+			o.setPosition(o.getX() + mDisplacement.getX(), o.getY() + mDisplacement.getY());
+			}
 		}
-	    }
-	    if ((o.getType() != EditorObject.LABELGROUP && o.getType() != EditorObject.LABEL)
-		|| mMoved.size() == 1) {	
-		o.setPosition(o.getX() + mDisplacement.getX(), o.getY() + mDisplacement.getY());
-	    }
+		mSurface.select(o);		
 	}
 	mSurface.getEditorInterface().setDisplayed();   
     }
@@ -111,18 +116,23 @@ public class MoveObjects
     public void undo() throws CannotUndoException
     {
 	super.undo();
+	mSurface.unselectAll();
 	for (EditorObject o : mMoved) {
-	    if (o.getType() == EditorObject.NODEGROUP) {
-		EditorNodeGroup ng = (EditorNodeGroup) o;
-		if (ng.getResizing()) {
-		    ng.resize((int)(ng.getX() - mDisplacement.getX()), (int)(ng.getY() - mDisplacement.getY()));
-		    continue;
+		if (mDescription != "Edge reshaping" || o.getType() != EditorObject.EDGE)
+		{
+			if (o.getType() == EditorObject.NODEGROUP) {
+			EditorNodeGroup ng = (EditorNodeGroup) o;
+			if (ng.getResizing()) {
+				ng.resize((int)(ng.getX() - mDisplacement.getX()), (int)(ng.getY() - mDisplacement.getY()));
+				continue;
+			}
+			}
+			if ((o.getType() != EditorObject.LABELGROUP && o.getType() != EditorObject.LABEL)
+			|| mMoved.size() == 1) {	  
+			o.setPosition(o.getX() - mDisplacement.getX(), o.getY() - mDisplacement.getY());	
+			}
 		}
-	    }
-	    if ((o.getType() != EditorObject.LABELGROUP && o.getType() != EditorObject.LABEL)
-		|| mMoved.size() == 1) {	  
-		o.setPosition(o.getX() - mDisplacement.getX(), o.getY() - mDisplacement.getY());
-	    }
+		mSurface.select(o);
 	}
 	mSurface.getEditorInterface().setDisplayed();   
     }

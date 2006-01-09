@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.command
 //# CLASS:   CreateNodeCommand
 //###########################################################################
-//# $Id: CreateNodeCommand.java,v 1.5 2005-12-18 21:11:32 robi Exp $
+//# $Id: CreateNodeCommand.java,v 1.6 2006-01-09 23:52:56 siw4 Exp $
 //###########################################################################
 
 
@@ -75,6 +75,8 @@ public class CreateNodeCommand
     public void execute()
     {
 		mSurface.addNode(mCreated);
+		mSurface.unselectAll();
+		mSurface.select(mCreated);
 		mSurface.getEditorInterface().setDisplayed();
     }
 
@@ -100,6 +102,7 @@ public class CreateNodeCommand
     {
 		super.undo();
 		mSurface.delNode(mCreated);
+		mSurface.unselectAll();		
 		mSurface.getEditorInterface().setDisplayed();
     }
 

@@ -1,6 +1,6 @@
 package net.sourceforge.waters.gui.command;
 
-import net.sourceforge.waters.gui.EditorSurface;
+import net.sourceforge.waters.gui.ControlledSurface;
 import net.sourceforge.waters.gui.EditorEdge;
 import net.sourceforge.waters.gui.EditorNode;
 import net.sourceforge.waters.gui.EditorObject;
@@ -21,8 +21,8 @@ public class DeleteEdgeCommand
     implements Command
 {
 
-    /** The EditorSurface Edited with this Command */
-    private final EditorSurface mSurface;
+    /** The ControlledSurface Edited with this Command */
+    private final ControlledSurface mSurface;
     /** The Node Created by this Command */
     private final EditorEdge mDeleted;
     private final String mDescription = "Edge Deletion";
@@ -34,7 +34,7 @@ public class DeleteEdgeCommand
      * @param surface the surface edited by this command
      * @param x,y the position upon which the node is created
      */
-    public DeleteEdgeCommand(EditorSurface surface, EditorEdge edge)
+    public DeleteEdgeCommand(ControlledSurface surface, EditorEdge edge)
     {
 	mSurface = surface;
 	mDeleted = edge;
@@ -47,6 +47,7 @@ public class DeleteEdgeCommand
     public void execute()
     {
 	mSurface.delEdge(mDeleted);
+	mSurface.unselectAll();
 	mSurface.getEditorInterface().setDisplayed();
     }
 
@@ -72,6 +73,8 @@ public class DeleteEdgeCommand
     {
 	super.undo();
 	mSurface.addEdge(mDeleted);
+	mSurface.unselectAll();
+	mSurface.select(mDeleted);
 	mSurface.getEditorInterface().setDisplayed();
     }
 

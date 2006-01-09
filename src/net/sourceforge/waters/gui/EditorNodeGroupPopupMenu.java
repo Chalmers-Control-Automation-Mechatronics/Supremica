@@ -17,14 +17,14 @@ class EditorNodeGroupPopupMenu
 	implements ActionListener
 {
 	private EditorNodeGroup nodegroup;
-	private EditorSurface parent;
+	private ControlledSurface parent;
 
 	private JMenuItem renameItem;
 	private JMenuItem deleteItem;
 	//private JCheckBox initialBox;
 	private JMenuItem initialItem;	
 
-	public EditorNodeGroupPopupMenu(EditorSurface parent, EditorNodeGroup nodegroup)
+	public EditorNodeGroupPopupMenu(ControlledSurface parent, EditorNodeGroup nodegroup)
 	{
 		this.parent = parent;
 		this.nodegroup = nodegroup;

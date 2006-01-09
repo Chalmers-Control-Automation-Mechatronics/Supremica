@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorNodeGroup
 //###########################################################################
-//# $Id: EditorNodeGroup.java,v 1.17 2005-12-14 03:09:47 siw4 Exp $
+//# $Id: EditorNodeGroup.java,v 1.18 2006-01-09 23:52:56 siw4 Exp $
 //###########################################################################
 
 
@@ -55,7 +55,7 @@ public class EditorNodeGroup
 		}
 
 		resizing = getBounds().isEmpty();
-		resizingFrom = new Point2D.Double(getBounds().getMinX(), getBounds().getMinY());
+		resizingFrom = 0;
 		setSelected(false);
 	}
 
@@ -66,9 +66,9 @@ public class EditorNodeGroup
 
 	private Rectangle2D[] getCorners()
 	{
-		Rectangle2D[] corners = new Rectangle2D[4];
+		Rectangle2D[] corners = new Rectangle2D[8];
 		Rectangle2D bounds = getBounds();
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < corners.length; i++)
 		{
 			corners[i] = new Rectangle();
 		}
@@ -76,6 +76,10 @@ public class EditorNodeGroup
 		corners[UPPERRIGHT].setFrameFromCenter(bounds.getMaxX(), bounds.getMinY(), bounds.getMaxX() + 2*TOLERANCE, bounds.getMinY() + 2*TOLERANCE);
 		corners[LOWERLEFT].setFrameFromCenter(bounds.getMinX(), bounds.getMaxY(), bounds.getMinX() + 2*TOLERANCE, bounds.getMaxY() + 2*TOLERANCE);
 		corners[LOWERRIGHT].setFrameFromCenter(bounds.getMaxX(), bounds.getMaxY(), bounds.getMaxX() + 2*TOLERANCE, bounds.getMaxY() + 2*TOLERANCE);
+		corners[UPPERMIDDLE].setFrameFromCenter(bounds.getCenterX(), bounds.getMinY(), bounds.getCenterX() + 2*TOLERANCE, bounds.getMinY() + 2*TOLERANCE);
+		corners[MIDDLERIGHT].setFrameFromCenter(bounds.getMaxX(), bounds.getCenterY(), bounds.getMaxX() + 2*TOLERANCE, bounds.getCenterY() + 2*TOLERANCE);
+		corners[LOWERMIDDLE].setFrameFromCenter(bounds.getCenterX(), bounds.getMaxY(), bounds.getCenterX() + 2*TOLERANCE, bounds.getMaxY() + 2*TOLERANCE);
+		corners[MIDDLELEFT].setFrameFromCenter(bounds.getMinX(), bounds.getCenterY(), bounds.getMinX() + 2*TOLERANCE, bounds.getCenterY() + 2*TOLERANCE);
 		return corners;
 	}
 
@@ -86,14 +90,39 @@ public class EditorNodeGroup
 
 	public void setResizingFalse()
 	{
-		resizing = false;
+		resizing = false;		
 	}
 
 	public void resize(int x, int y)
 	{
 		GeometryProxy old = new BoxGeometrySubject((Rectangle2D)subject.getGeometry().getRectangle().clone());
 		Rectangle2D bounds = new Rectangle2D.Double();
-		bounds.setFrameFromDiagonal(resizingFrom.getX(), resizingFrom.getY(), x, y);
+		Rectangle2D[] corners = getCorners();
+		Point2D point = new Point2D.Double();
+		if (resizingFrom % 2 == 0)
+		{
+			point.setLocation(corners[resizingFrom].getCenterX(),
+							  corners[resizingFrom].getCenterY());
+		}
+		else
+		{
+			int i = resizingFrom + 1;
+			if (i >= 8)
+			{
+				i -= 8;
+			}
+			point.setLocation(corners[resizingFrom - 1].getCenterX(),
+							  corners[resizingFrom - 1].getCenterY());
+			if (resizingFrom % 4 == 1)
+			{
+				x = (int)corners[i].getCenterX();
+			}
+			else
+			{
+				y = (int)corners[i].getCenterY();
+			}
+		}
+		bounds.setFrameFromDiagonal(point.getX(), point.getY(), x, y);
 		subject.getGeometry().setRectangle(bounds);
 		fireEditorChangedEvent(new NodeMovedEvent(old, subject.getGeometry(),
 												  subject));
@@ -142,12 +171,12 @@ public class EditorNodeGroup
 		System.out.println(x + "," + y);
 		Rectangle2D[] corners = getCorners();
 		Line2D.Double closest = new Line2D.Double(corners[0].getCenterX(), corners[0].getCenterY(),
-							  corners[3].getCenterX(), corners[3].getCenterY());
+							  corners[6].getCenterX(), corners[6].getCenterY());
 
-		for (int i = 1; i < 4; i++)
+		for (int i = 2; i < corners.length; i += 2)
 		{
 			Line2D.Double l = new Line2D.Double(corners[i].getCenterX(), corners[i].getCenterY(),
-							    corners[i - 1].getCenterX(), corners[i - 1].getCenterY());
+							    corners[i - 2].getCenterX(), corners[i - 2].getCenterY());
 
 			if (closest.ptLineDist(x, y) > l.ptLineDist(x, y))
 			{
@@ -219,20 +248,20 @@ public class EditorNodeGroup
 		Rectangle2D[] corners = getCorners();
 		resizing = false;
 
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < corners.length; i++)
 		{
 			if (corners[i].contains(cX, cY))
 			{
 				resizing = true;
 
-				int h = i - 2;
+				int h = i - corners.length/2;
 
 				if (h < 0)
 				{
-					h += 4;
+					h += corners.length;
 				}
 
-				resizingFrom.setLocation(corners[h].getCenterX(), corners[h].getCenterY());
+				resizingFrom = h;
 
 				break;
 			}
@@ -325,10 +354,10 @@ public class EditorNodeGroup
 
 		if (isSelected())
 		{
+			Rectangle2D[] corners = getCorners();
 			// Draw handles
-			for (int i = 0; i < 4; i++)
-			{
-				Rectangle2D[] corners = getCorners();
+			for (int i = 0; i < corners.length; i++)
+			{				
 				g2d.fillRect((int) corners[i].getCenterX() - HANDLEWIDTH/2, (int) corners[i].getCenterY() - HANDLEWIDTH/2,
 					     HANDLEWIDTH, HANDLEWIDTH);
 			      //g2d.drawOval((int) corners[i].getCenterX() - HANDLEWIDTH/2, (int) corners[i].getCenterY() - HANDLEWIDTH/2,
@@ -374,16 +403,19 @@ public class EditorNodeGroup
 	//########################################################################
 	//# Data Members
 	private boolean resizing;
-	private Point2D.Double resizingFrom;
+	private int resizingFrom = -1;
 	private Collection<Observer> mObservers = new ArrayList<Observer>();
 	private ArrayList immediateChildren = new ArrayList();
 	private GroupNodeSubject subject;
 	private static int UPPERLEFT = 0;
-	private static int UPPERRIGHT = 1;
-	private static int LOWERRIGHT = 2;
-	private static int LOWERLEFT = 3;
+	private static int UPPERMIDDLE = 1;
+	private static int UPPERRIGHT = 2;
+	private static int MIDDLERIGHT = 3;
+	private static int LOWERRIGHT = 4;
+	private static int LOWERMIDDLE = 5;
+	private static int LOWERLEFT = 6;
+	private static int MIDDLELEFT = 7;
 	private static int CORNERDIAMETER = 15;
 	private static int TOLERANCE = 4;
 	private static int HANDLEWIDTH = 4;
-
 }

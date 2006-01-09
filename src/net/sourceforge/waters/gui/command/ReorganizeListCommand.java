@@ -6,6 +6,9 @@ import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
+import net.sourceforge.waters.gui.ControlledSurface;
+import net.sourceforge.waters.gui.EditorLabelGroup;
+
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.module.EventListExpressionSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
@@ -14,19 +17,24 @@ public class ReorganizeListCommand
 	extends AbstractUndoableEdit
 	implements Command
 {
+	private final ControlledSurface mSurface;
+	private final EditorLabelGroup mGroup;
 	private final EventListExpressionSubject mList;
 	private final IdentifierSubject mIdentifier;
 	private final int mPosition;
 	private final int mNewPosition;
 	private final String mDescription = "Move Event";
 	
-	public ReorganizeListCommand(EventListExpressionSubject list,
-							  	 IdentifierSubject identifier,
+	public ReorganizeListCommand(ControlledSurface surface,
+								 EditorLabelGroup group,								 
+								 IdentifierSubject identifier,
 								 int newPosition)
 	{
-		mList = list;
+		mSurface = surface;
+		mGroup = group;
+		mList = group.getSubject();
 		mIdentifier = identifier;
-		mPosition = list.getEventList().indexOf(mIdentifier);
+		mPosition = mList.getEventList().indexOf(mIdentifier);
 		mNewPosition = newPosition;
 	}
 	
@@ -37,6 +45,8 @@ public class ReorganizeListCommand
 		// Remove label and add to new position in list
 		list.remove(mIdentifier);
 		list.add(mNewPosition, mIdentifier);
+		mSurface.select(mGroup);
+		mGroup.setSelectedLabel(mNewPosition);
 	}
 	
 	/** 
@@ -63,6 +73,8 @@ public class ReorganizeListCommand
 		// Remove label and add to new position in list
 		list.remove(mIdentifier);
 		list.add(mPosition, mIdentifier);
+		mSurface.select(mGroup);
+		mGroup.setSelectedLabel(mPosition);
     }
 
     public String getPresentationName()
