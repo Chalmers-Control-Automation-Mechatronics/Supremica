@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorLabel
 //###########################################################################
-//# $Id: EditorNodePopupMenu.java,v 1.7 2005-12-01 16:46:39 flordal Exp $
+//# $Id: EditorNodePopupMenu.java,v 1.8 2006-01-09 00:25:33 siw4 Exp $
 //###########################################################################
 
 
@@ -15,6 +15,8 @@ import java.awt.event.*;
 import javax.swing.*;
 import org.supremica.util.VPopupMenu;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
+import net.sourceforge.waters.gui.command.Command;
+import net.sourceforge.waters.gui.command.DeleteNodeCommand;
 
 /**
  * Popup for editing attributes of a node.
@@ -91,7 +93,8 @@ class EditorNodePopupMenu
 	{
 		if (e.getSource() == deleteItem)
 		{
-			parent.delNode(node);
+			Command deleteNode = new DeleteNodeCommand(parent, node);
+			parent.getEditorInterface().getUndoInterface().executeCommand(deleteNode);
 		}
 
 		if (e.getSource() == initialItem)

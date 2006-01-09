@@ -1,6 +1,6 @@
 package net.sourceforge.waters.gui.command;
 
-import net.sourceforge.waters.gui.ControlledSurface;
+import net.sourceforge.waters.gui.EditorSurface;
 import net.sourceforge.waters.gui.EditorEdge;
 import net.sourceforge.waters.gui.EditorNode;
 import net.sourceforge.waters.gui.EditorNodeGroup;
@@ -23,8 +23,8 @@ public class DeleteNodeGroupCommand
     implements Command
 {
     private boolean mFirstExecution = true;
-    /** The ControlledSurface Edited with this Command */
-    private final ControlledSurface mSurface;
+    /** The EditorSurface Edited with this Command */
+    private final EditorSurface mSurface;
     /** The Node Created by this Command */
     private final EditorNodeGroup mDeleted;
     /** the Edge Deletion Commands Associated with this Command */
@@ -38,7 +38,7 @@ public class DeleteNodeGroupCommand
      * @param surface the surface edited by this command
      * @param x,y the position upon which the node is created
      */
-    public DeleteNodeGroupCommand(ControlledSurface surface, EditorNodeGroup nodeGroup)
+    public DeleteNodeGroupCommand(EditorSurface surface, EditorNodeGroup nodeGroup)
     {
 	mSurface = surface;
 	// Find a unique name!

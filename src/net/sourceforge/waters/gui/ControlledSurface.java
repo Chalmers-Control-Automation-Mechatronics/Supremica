@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.47 2005-12-16 00:26:39 siw4 Exp $
+//# $Id: ControlledSurface.java,v 1.48 2006-01-09 00:25:33 siw4 Exp $
 //###########################################################################
  
 package net.sourceforge.waters.gui;
@@ -2279,7 +2279,7 @@ public class ControlledSurface
 					return;
 				}
 				// is this the start of the move or a continuation of it
-				if (!selectedObjects.isEmpty()) {
+				if (!selectedObjects.isEmpty() && edgeIsSelected()) {
 					if (move == null) {
 						move = new MoveObjects(ControlledSurface.this, selectedObjects, new Point2D.Double(dx, dy));
 					} else {

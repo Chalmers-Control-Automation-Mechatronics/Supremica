@@ -6,6 +6,8 @@ import java.awt.event.*;
 import javax.swing.*;
 import org.supremica.util.VPopupMenu;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
+import net.sourceforge.waters.gui.command.Command;
+import net.sourceforge.waters.gui.command.DeleteEdgeCommand;
 
 /**
  * Popup for editing attributes of a node.
@@ -57,7 +59,8 @@ class EditorEdgePopupMenu
 	{
 		if (e.getSource() == deleteItem)
 		{
-			parent.delEdge(edge);
+			Command deleteEdge = new DeleteEdgeCommand(parent, edge);
+			parent.getEditorInterface().getUndoInterface().executeCommand(deleteEdge);
 			this.hide();
 		}
 

@@ -1,6 +1,6 @@
 package net.sourceforge.waters.gui.command;
 
-import net.sourceforge.waters.gui.ControlledSurface;
+import net.sourceforge.waters.gui.EditorSurface;
 import net.sourceforge.waters.gui.EditorNode;
 import net.sourceforge.waters.gui.EditorEdge;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
@@ -23,7 +23,7 @@ public class DeleteNodeCommand
 {
     private boolean mFirstExecution = true;
     /** The ControlledSurface Edited with this Command */
-    private final ControlledSurface mSurface;
+    private final EditorSurface mSurface;
     /** The Node Removed by this Command */
     private final EditorNode mDeleted;
     /** the Edge Deletion Commands Associated with this Command */
@@ -37,17 +37,17 @@ public class DeleteNodeCommand
      * @param surface the surface edited by this command
      * @param node the node which is to be removed
      */
-    public DeleteNodeCommand(ControlledSurface surface, EditorNode node)
+    public DeleteNodeCommand(EditorSurface surface, EditorNode node)
     {
-	mSurface = surface;
-	mDeleted = node;
-	//find all attached edges
-	for (Object o: surface.getEdges()) {
-	    EditorEdge e = (EditorEdge)o;
-	    if ((e.getEndNode() == node) || (e.getStartNode() == node)) {
-		mDelEdge.add(new DeleteEdgeCommand(mSurface, e));
-	    }
-	}
+		mSurface = surface;
+		mDeleted = node;
+		//find all attached edges
+		for (Object o: surface.getEdges()) {
+			EditorEdge e = (EditorEdge)o;
+			if ((e.getEndNode() == node) || (e.getStartNode() == node)) {
+				mDelEdge.add(new DeleteEdgeCommand(mSurface, e));
+			}
+		}
     }
 
     /**
@@ -90,12 +90,12 @@ public class DeleteNodeCommand
 
     public void undo() throws CannotUndoException
     {
-	super.undo();
-	mSurface.addNode(mDeleted);
-	for (DeleteEdgeCommand d : mDelEdge) {
-	    d.undo();
-	}
-	mSurface.getEditorInterface().setDisplayed();
+		super.undo();
+		mSurface.addNode(mDeleted);
+		for (DeleteEdgeCommand d : mDelEdge) {
+			d.undo();
+		}
+		mSurface.getEditorInterface().setDisplayed();
     }
 
     public String getPresentationName()

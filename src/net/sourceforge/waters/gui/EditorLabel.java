@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorLabel
 //###########################################################################
-//# $Id: EditorLabel.java,v 1.20 2005-12-15 18:07:20 robi Exp $
+//# $Id: EditorLabel.java,v 1.21 2006-01-09 00:25:33 siw4 Exp $
 //###########################################################################
 
 
@@ -232,12 +232,12 @@ public class EditorLabel
 
 	public int getX()
 	{
-		return (int) text.getBounds().getCenterX();
+		return (int) mParent.getX() + getOffsetX();
 	}
 
 	public int getY()
 	{
-		return (int) text.getBounds().getCenterY();
+		return (int) mParent.getY() + getOffsetY();
 	}
 
 	public int getHeight()

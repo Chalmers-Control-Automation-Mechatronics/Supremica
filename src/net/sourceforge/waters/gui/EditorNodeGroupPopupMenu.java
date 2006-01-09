@@ -6,6 +6,8 @@ import java.awt.event.*;
 import javax.swing.*;
 import org.supremica.util.VPopupMenu;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
+import net.sourceforge.waters.gui.command.Command;
+import net.sourceforge.waters.gui.command.DeleteNodeGroupCommand;
 
 /**
  * Popup for editing attributes of a node.
@@ -47,7 +49,8 @@ class EditorNodeGroupPopupMenu
 	{
 		if (e.getSource() == deleteItem)
 		{
-			parent.delNodeGroup(nodegroup);
+			Command deleteNodeGroup = new DeleteNodeGroupCommand(parent, nodegroup);
+			parent.getEditorInterface().getUndoInterface().executeCommand(deleteNodeGroup);		
 			this.hide();
 		}
 
