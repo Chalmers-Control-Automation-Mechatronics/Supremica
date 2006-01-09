@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.48 2006-01-09 00:25:33 siw4 Exp $
+//# $Id: ControlledSurface.java,v 1.49 2006-01-09 02:21:09 siw4 Exp $
 //###########################################################################
  
 package net.sourceforge.waters.gui;
@@ -1458,23 +1458,12 @@ public class ControlledSurface
 
 					if (n != null)
 					{
-						if (n.getType() == EditorObject.NODE)
+						if (edge.getDragS() || (edge.getDragT() && n.getType() == EditorObject.NODE))
 						{
-							if (edge.getDragT() && (n != edge.getEndNode()))
-							{
-								edge.setEndNode((EditorNode) n);
-							}
-							else if (edge.getDragS() && (n != edge.getStartNode()))
-							{
-								edge.setStartNode(n, e.getX(), e.getY());
-							}
-						}
-						else if (n.getType() == EditorObject.NODEGROUP)
-						{
-							if (edge.getDragS())
-							{
-								edge.setStartNode(n, e.getX(), e.getY());
-							}
+							Command moveEdge = new MoveEdgeCommand(edge, n,
+																   edge.getDragS(),
+																   e.getX(), e.getY());
+							root.getUndoInterface().executeCommand(moveEdge);
 						}
 					}
 
@@ -1591,15 +1580,34 @@ public class ControlledSurface
 				// is this the start of the move or a continuation of it 
 				if (!selectedObjects.isEmpty()) 
 				{
-					if (move == null) 
+					boolean createMove = true;
+					if (edgeIsSelected() && selectedObjects.size() <= 2)
 					{
-						move = new MoveObjects(ControlledSurface.this, selectedObjects, new Point2D.Double(dx, dy));
-					} 
-					else 
+						for (EditorObject object : selectedObjects)
+						{
+							if (object.getType() == EditorObject.EDGE)
+							{
+								EditorEdge edge = (EditorEdge) object;
+								if (!edge.getDragC())
+								{
+									createMove = false;
+								}
+								break;
+							}
+						}
+					}
+					if (createMove)
 					{
-						Point2D p = move.getDisplacement();
-						p.setLocation(p.getX() + dx, p.getY() + dy);
-						move.setDisplacement(p);
+						if (move == null) 
+						{
+							move = new MoveObjects(ControlledSurface.this, selectedObjects, new Point2D.Double(dx, dy));
+						} 
+						else 
+						{
+							Point2D p = move.getDisplacement();
+							p.setLocation(p.getX() + dx, p.getY() + dy);
+							move.setDisplacement(p);
+						}
 					}
 				}
 
@@ -2181,23 +2189,12 @@ public class ControlledSurface
 
 					if (n != null)
 					{
-						if (n.getType() == EditorObject.NODE)
+						if (edge.getDragS() || (edge.getDragT() && n.getType() == EditorObject.NODE))
 						{
-							if (edge.getDragT() && (n != edge.getEndNode()))
-							{
-								edge.setEndNode((EditorNode) n);
-							}
-							else if (edge.getDragS() && (n != edge.getStartNode()))
-							{
-								edge.setStartNode(n, e.getX(), e.getY());
-							}
-						}
-						else if (n.getType() == EditorObject.NODEGROUP)
-						{
-							if (edge.getDragS())
-							{
-								edge.setStartNode(n, e.getX(), e.getY());
-							}
+							Command moveEdge = new MoveEdgeCommand(edge, n,
+																   edge.getDragS(),
+																   e.getX(), e.getY());
+							root.getUndoInterface().executeCommand(moveEdge);
 						}
 					}
 
@@ -2279,13 +2276,22 @@ public class ControlledSurface
 					return;
 				}
 				// is this the start of the move or a continuation of it
-				if (!selectedObjects.isEmpty() && edgeIsSelected()) {
-					if (move == null) {
-						move = new MoveObjects(ControlledSurface.this, selectedObjects, new Point2D.Double(dx, dy));
-					} else {
-						Point2D p = move.getDisplacement();
-						p.setLocation(p.getX() + dx, p.getY() + dy);
-						move.setDisplacement(p);
+				if (!selectedObjects.isEmpty()) {
+					for (final EditorObject object : selectedObjects) {
+						if (object.getType() == EditorObject.EDGE) {
+							EditorEdge edge = (EditorEdge) object;
+							if (edge.getDragC())
+							{
+								if (move == null) {
+									move = new MoveObjects(ControlledSurface.this, selectedObjects, new Point2D.Double(dx, dy));
+								} else {
+									Point2D p = move.getDisplacement();
+									p.setLocation(p.getX() + dx, p.getY() + dy);
+									move.setDisplacement(p);
+								}
+							}
+							break;
+						}
 					}
 				}
 				// There should only be one object here, or maybe two, 
