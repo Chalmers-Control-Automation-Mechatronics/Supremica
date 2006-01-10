@@ -1,0 +1,413 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Automata name="AGV" major="0" minor="9" comment="Example from J.O. Moody and P.J. Antsaklis, 'Supervisory Control of Discrete Event Systems Using Petri Nets', p.120. The last specification 'ZoneX' was not included in the original model and it introduces a new zone at the input station (the leftmost one in the animation figure). Without 'ZoneX' the system is nonblocking, with 'ZoneX' the system is blocking. The system is not controllable. Modular controllability synthesis works fine here and just so happens to return a modular supervisor that is also nonblocking (in both cases).">
+<Automaton name="Input1" type="Plant">
+	<Events>
+		<Event id="0" label="e10" controllable="false"/>
+		<Event id="1" label="e11" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" accepting="true"/>
+		<State id="1" name="q1" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="0" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Input3" type="Plant">
+	<Events>
+		<Event id="0" label="e30" controllable="false"/>
+		<Event id="1" label="e31" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" accepting="true"/>
+		<State id="1" name="q1" initial="true" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="0" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Output" type="Plant">
+	<Events>
+		<Event id="0" label="e20" controllable="false"/>
+		<Event id="1" label="e21" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" accepting="true"/>
+		<State id="1" name="q1" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="0" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Seq1" type="Plant">
+	<Events>
+		<Event id="0" label="c1"/>
+		<Event id="1" label="c2"/>
+		<Event id="2" label="e10" controllable="false"/>
+		<Event id="3" label="u10" controllable="false"/>
+		<Event id="4" label="u11" controllable="false"/>
+		<Event id="5" label="w23" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="p2" initial="true" accepting="true"/>
+		<State id="1" name="q1" accepting="true"/>
+		<State id="2" name="q2" accepting="true"/>
+		<State id="3" name="q3" accepting="true"/>
+		<State id="4" name="q4" accepting="true"/>
+		<State id="5" name="q5" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="1" dest="2" event="0"/>
+		<Transition source="2" dest="3" event="3"/>
+		<Transition source="3" dest="4" event="5"/>
+		<Transition source="4" dest="5" event="1"/>
+		<Transition source="5" dest="0" event="4"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Seq2" type="Plant">
+	<Events>
+		<Event id="0" label="c3"/>
+		<Event id="1" label="c4"/>
+		<Event id="2" label="e30" controllable="false"/>
+		<Event id="3" label="u20" controllable="false"/>
+		<Event id="4" label="u21" controllable="false"/>
+		<Event id="5" label="u22" controllable="false"/>
+		<Event id="6" label="u23" controllable="false"/>
+		<Event id="7" label="u24" controllable="false"/>
+		<Event id="8" label="u25" controllable="false"/>
+		<Event id="9" label="u26" controllable="false"/>
+		<Event id="10" label="u27" controllable="false"/>
+		<Event id="11" label="u28" controllable="false"/>
+		<Event id="12" label="u29" controllable="false"/>
+		<Event id="13" label="w32" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="p4" accepting="true"/>
+		<State id="1" name="q1" accepting="true"/>
+		<State id="2" name="q10" accepting="true"/>
+		<State id="3" name="q11" accepting="true"/>
+		<State id="4" name="q12" accepting="true"/>
+		<State id="5" name="q13" accepting="true"/>
+		<State id="6" name="q2" accepting="true"/>
+		<State id="7" name="q3" accepting="true"/>
+		<State id="8" name="q4" accepting="true"/>
+		<State id="9" name="q5" accepting="true"/>
+		<State id="10" name="q6" accepting="true"/>
+		<State id="11" name="q7" accepting="true"/>
+		<State id="12" name="q8" initial="true" accepting="true"/>
+		<State id="13" name="q9" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="1" dest="6" event="0"/>
+		<Transition source="2" dest="3" event="4"/>
+		<Transition source="3" dest="4" event="5"/>
+		<Transition source="4" dest="5" event="6"/>
+		<Transition source="5" dest="0" event="7"/>
+		<Transition source="6" dest="7" event="8"/>
+		<Transition source="7" dest="8" event="9"/>
+		<Transition source="8" dest="9" event="10"/>
+		<Transition source="9" dest="10" event="11"/>
+		<Transition source="10" dest="11" event="12"/>
+		<Transition source="11" dest="12" event="13"/>
+		<Transition source="12" dest="13" event="1"/>
+		<Transition source="13" dest="2" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Seq3" type="Plant">
+	<Events>
+		<Event id="0" label="c5"/>
+		<Event id="1" label="c6"/>
+		<Event id="2" label="u30" controllable="false"/>
+		<Event id="3" label="u31" controllable="false"/>
+		<Event id="4" label="w14" controllable="false"/>
+		<Event id="5" label="w22" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" accepting="true"/>
+		<State id="1" name="q1" accepting="true"/>
+		<State id="2" name="q2" initial="true" accepting="true"/>
+		<State id="3" name="q3" accepting="true"/>
+		<State id="4" name="q4" accepting="true"/>
+		<State id="5" name="q5" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="4"/>
+		<Transition source="1" dest="2" event="0"/>
+		<Transition source="2" dest="3" event="2"/>
+		<Transition source="3" dest="4" event="5"/>
+		<Transition source="4" dest="5" event="1"/>
+		<Transition source="5" dest="0" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Seq4" type="Plant">
+	<Events>
+		<Event id="0" label="c7"/>
+		<Event id="1" label="c8"/>
+		<Event id="2" label="u40" controllable="false"/>
+		<Event id="3" label="u41" controllable="false"/>
+		<Event id="4" label="u42" controllable="false"/>
+		<Event id="5" label="u43" controllable="false"/>
+		<Event id="6" label="u44" controllable="false"/>
+		<Event id="7" label="u45" controllable="false"/>
+		<Event id="8" label="w15" controllable="false"/>
+		<Event id="9" label="w31" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="p4" accepting="true"/>
+		<State id="1" name="q1" initial="true" accepting="true"/>
+		<State id="2" name="q11" accepting="true"/>
+		<State id="3" name="q12" accepting="true"/>
+		<State id="4" name="q2" accepting="true"/>
+		<State id="5" name="q3" accepting="true"/>
+		<State id="6" name="q4" accepting="true"/>
+		<State id="7" name="q7" accepting="true"/>
+		<State id="8" name="q8" accepting="true"/>
+		<State id="9" name="q9" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="8"/>
+		<Transition source="1" dest="4" event="0"/>
+		<Transition source="2" dest="3" event="6"/>
+		<Transition source="3" dest="0" event="7"/>
+		<Transition source="4" dest="5" event="2"/>
+		<Transition source="5" dest="6" event="3"/>
+		<Transition source="6" dest="7" event="4"/>
+		<Transition source="7" dest="8" event="9"/>
+		<Transition source="8" dest="9" event="1"/>
+		<Transition source="9" dest="2" event="5"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Seq5" type="Plant">
+	<Events>
+		<Event id="0" label="c10"/>
+		<Event id="1" label="c9"/>
+		<Event id="2" label="e20" controllable="false"/>
+		<Event id="3" label="u50" controllable="false"/>
+		<Event id="4" label="u51" controllable="false"/>
+		<Event id="5" label="u52" controllable="false"/>
+		<Event id="6" label="u53" controllable="false"/>
+		<Event id="7" label="w13" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="p4" accepting="true"/>
+		<State id="1" name="q1" accepting="true"/>
+		<State id="2" name="q11" accepting="true"/>
+		<State id="3" name="q2" accepting="true"/>
+		<State id="4" name="q4" accepting="true"/>
+		<State id="5" name="q7" accepting="true"/>
+		<State id="6" name="q8" initial="true" accepting="true"/>
+		<State id="7" name="q9" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="7"/>
+		<Transition source="1" dest="3" event="1"/>
+		<Transition source="2" dest="0" event="4"/>
+		<Transition source="3" dest="4" event="5"/>
+		<Transition source="4" dest="5" event="6"/>
+		<Transition source="5" dest="6" event="2"/>
+		<Transition source="6" dest="7" event="0"/>
+		<Transition source="7" dest="2" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="WS1a" type="Plant">
+	<Events>
+		<Event id="0" label="w11" controllable="false"/>
+		<Event id="1" label="w12" controllable="false"/>
+		<Event id="2" label="w13" controllable="false"/>
+		<Event id="3" label="w14" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" accepting="true"/>
+		<State id="1" name="q1" accepting="true"/>
+		<State id="2" name="q2" accepting="true"/>
+		<State id="3" name="q3" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="2" event="1"/>
+		<Transition source="2" dest="3" event="2"/>
+		<Transition source="3" dest="0" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="WS1b" type="Plant">
+	<Events>
+		<Event id="0" label="w11" controllable="false"/>
+		<Event id="1" label="w12" controllable="false"/>
+		<Event id="2" label="w13" controllable="false"/>
+		<Event id="3" label="w15" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" accepting="true"/>
+		<State id="1" name="q1" accepting="true"/>
+		<State id="2" name="q2" accepting="true"/>
+		<State id="3" name="q3" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="2" event="1"/>
+		<Transition source="2" dest="3" event="2"/>
+		<Transition source="3" dest="0" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="WS2" type="Plant">
+	<Events>
+		<Event id="0" label="w21" controllable="false"/>
+		<Event id="1" label="w22" controllable="false"/>
+		<Event id="2" label="w23" controllable="false"/>
+		<Event id="3" label="w24" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" accepting="true"/>
+		<State id="1" name="q1" accepting="true"/>
+		<State id="2" name="q2" accepting="true"/>
+		<State id="3" name="q3" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="2" event="1"/>
+		<Transition source="2" dest="3" event="2"/>
+		<Transition source="3" dest="0" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="WS3" type="Plant">
+	<Events>
+		<Event id="0" label="w31" controllable="false"/>
+		<Event id="1" label="w32" controllable="false"/>
+		<Event id="2" label="w33" controllable="false"/>
+		<Event id="3" label="w34" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" accepting="true"/>
+		<State id="1" name="q1" accepting="true"/>
+		<State id="2" name="q2" accepting="true"/>
+		<State id="3" name="q3" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="2" event="1"/>
+		<Transition source="2" dest="3" event="2"/>
+		<Transition source="3" dest="0" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Zone1" type="Specification">
+	<Events>
+		<Event id="0" label="c1"/>
+		<Event id="1" label="c2"/>
+		<Event id="2" label="c3"/>
+		<Event id="3" label="u10" controllable="false"/>
+		<Event id="4" label="u11" controllable="false"/>
+		<Event id="5" label="u23" controllable="false"/>
+		<Event id="6" label="u24" controllable="false"/>
+		<Event id="7" label="u25" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" accepting="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2"/>
+		<State id="3" name="q3"/>
+		<State id="4" name="q4"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="2" event="5"/>
+		<Transition source="0" dest="3" event="2"/>
+		<Transition source="0" dest="4" event="0"/>
+		<Transition source="1" dest="0" event="4"/>
+		<Transition source="2" dest="0" event="6"/>
+		<Transition source="3" dest="0" event="7"/>
+		<Transition source="4" dest="0" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Zone2" type="Specification">
+	<Events>
+		<Event id="0" label="c5"/>
+		<Event id="1" label="c6"/>
+		<Event id="2" label="u21" controllable="false"/>
+		<Event id="3" label="u22" controllable="false"/>
+		<Event id="4" label="u26" controllable="false"/>
+		<Event id="5" label="u27" controllable="false"/>
+		<Event id="6" label="u30" controllable="false"/>
+		<Event id="7" label="u31" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="q0"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2"/>
+		<State id="3" name="q3"/>
+		<State id="4" name="q4" initial="true" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="2" event="2"/>
+		<Transition source="0" dest="3" event="4"/>
+		<Transition source="0" dest="4" event="0"/>
+		<Transition source="1" dest="0" event="7"/>
+		<Transition source="2" dest="0" event="3"/>
+		<Transition source="3" dest="0" event="5"/>
+		<Transition source="4" dest="0" event="6"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Zone3" type="Specification">
+	<Events>
+		<Event id="0" label="c4"/>
+		<Event id="1" label="c7"/>
+		<Event id="2" label="u20" controllable="false"/>
+		<Event id="3" label="u28" controllable="false"/>
+		<Event id="4" label="u29" controllable="false"/>
+		<Event id="5" label="u40" controllable="false"/>
+		<Event id="6" label="u44" controllable="false"/>
+		<Event id="7" label="u45" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" accepting="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2"/>
+		<State id="3" name="q3"/>
+		<State id="4" name="q4"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="0" dest="2" event="3"/>
+		<Transition source="0" dest="3" event="6"/>
+		<Transition source="0" dest="4" event="1"/>
+		<Transition source="1" dest="0" event="2"/>
+		<Transition source="2" dest="0" event="4"/>
+		<Transition source="3" dest="0" event="7"/>
+		<Transition source="4" dest="0" event="5"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Zone4" type="Specification">
+	<Events>
+		<Event id="0" label="c8"/>
+		<Event id="1" label="c9"/>
+		<Event id="2" label="u41" controllable="false"/>
+		<Event id="3" label="u42" controllable="false"/>
+		<Event id="4" label="u43" controllable="false"/>
+		<Event id="5" label="u50" controllable="false"/>
+		<Event id="6" label="u51" controllable="false"/>
+		<Event id="7" label="u52" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" accepting="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2"/>
+		<State id="3" name="q3"/>
+		<State id="4" name="q4"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="0" dest="2" event="2"/>
+		<Transition source="0" dest="3" event="5"/>
+		<Transition source="0" dest="4" event="1"/>
+		<Transition source="1" dest="0" event="4"/>
+		<Transition source="2" dest="0" event="3"/>
+		<Transition source="3" dest="0" event="6"/>
+		<Transition source="4" dest="0" event="7"/>
+	</Transitions>
+</Automaton>
+</Automata>

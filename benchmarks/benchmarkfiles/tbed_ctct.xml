@@ -1,0 +1,3439 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Automata name="tbed_ctct" major="0" minor="9">
+<Automaton name="crane2" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e20" controllable="false"/>
+		<Event id="2" label="e25"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="1" dest="0" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="cp_rs8" type="Specification">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e11"/>
+		<Event id="2" label="e122" controllable="false"/>
+		<Event id="3" label="e124" controllable="false"/>
+		<Event id="4" label="e21"/>
+		<Event id="5" label="e52" controllable="false"/>
+		<Event id="6" label="e54" controllable="false"/>
+		<Event id="7" label="e82" controllable="false"/>
+		<Event id="8" label="e84" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1" accepting="true"/>
+		<State id="2" name="s2" accepting="true"/>
+		<State id="3" name="s3" accepting="true"/>
+		<State id="4" name="s4" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="0" event="5"/>
+		<Transition source="0" dest="0" event="6"/>
+		<Transition source="0" dest="1" event="7"/>
+		<Transition source="0" dest="2" event="8"/>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="1" dest="1" event="1"/>
+		<Transition source="1" dest="1" event="4"/>
+		<Transition source="1" dest="0" event="5"/>
+		<Transition source="1" dest="1" event="6"/>
+		<Transition source="1" dest="1" event="7"/>
+		<Transition source="1" dest="1" event="8"/>
+		<Transition source="1" dest="1" event="2"/>
+		<Transition source="1" dest="3" event="3"/>
+		<Transition source="2" dest="2" event="1"/>
+		<Transition source="2" dest="2" event="4"/>
+		<Transition source="2" dest="2" event="5"/>
+		<Transition source="2" dest="0" event="6"/>
+		<Transition source="2" dest="2" event="7"/>
+		<Transition source="2" dest="2" event="8"/>
+		<Transition source="2" dest="4" event="2"/>
+		<Transition source="2" dest="2" event="3"/>
+		<Transition source="3" dest="3" event="1"/>
+		<Transition source="3" dest="0" event="5"/>
+		<Transition source="3" dest="3" event="6"/>
+		<Transition source="3" dest="3" event="7"/>
+		<Transition source="3" dest="3" event="8"/>
+		<Transition source="3" dest="3" event="2"/>
+		<Transition source="3" dest="3" event="3"/>
+		<Transition source="4" dest="4" event="4"/>
+		<Transition source="4" dest="4" event="5"/>
+		<Transition source="4" dest="0" event="6"/>
+		<Transition source="4" dest="4" event="7"/>
+		<Transition source="4" dest="4" event="8"/>
+		<Transition source="4" dest="4" event="2"/>
+		<Transition source="4" dest="4" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="cp_19_20" type="Specification">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e11"/>
+		<Event id="2" label="e192" controllable="false"/>
+		<Event id="3" label="e194" controllable="false"/>
+		<Event id="4" label="e202" controllable="false"/>
+		<Event id="5" label="e204" controllable="false"/>
+		<Event id="6" label="e21"/>
+		<Event id="7" label="e212" controllable="false"/>
+		<Event id="8" label="e214" controllable="false"/>
+		<Event id="9" label="e32" controllable="false"/>
+		<Event id="10" label="e34" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s10"/>
+		<State id="3" name="s2"/>
+		<State id="4" name="s3"/>
+		<State id="5" name="s4"/>
+		<State id="6" name="s5"/>
+		<State id="7" name="s6"/>
+		<State id="8" name="s7"/>
+		<State id="9" name="s8"/>
+		<State id="10" name="s9"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="0" event="6"/>
+		<Transition source="0" dest="0" event="9"/>
+		<Transition source="0" dest="0" event="10"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="3" event="3"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="0" event="5"/>
+		<Transition source="0" dest="0" event="7"/>
+		<Transition source="0" dest="0" event="8"/>
+		<Transition source="1" dest="1" event="1"/>
+		<Transition source="1" dest="1" event="6"/>
+		<Transition source="1" dest="1" event="9"/>
+		<Transition source="1" dest="4" event="10"/>
+		<Transition source="1" dest="1" event="2"/>
+		<Transition source="1" dest="1" event="3"/>
+		<Transition source="1" dest="5" event="4"/>
+		<Transition source="1" dest="1" event="5"/>
+		<Transition source="1" dest="1" event="7"/>
+		<Transition source="1" dest="1" event="8"/>
+		<Transition source="2" dest="2" event="6"/>
+		<Transition source="2" dest="2" event="9"/>
+		<Transition source="2" dest="2" event="10"/>
+		<Transition source="2" dest="2" event="2"/>
+		<Transition source="2" dest="2" event="3"/>
+		<Transition source="2" dest="2" event="4"/>
+		<Transition source="2" dest="2" event="5"/>
+		<Transition source="2" dest="2" event="7"/>
+		<Transition source="2" dest="1" event="8"/>
+		<Transition source="3" dest="3" event="1"/>
+		<Transition source="3" dest="3" event="6"/>
+		<Transition source="3" dest="6" event="9"/>
+		<Transition source="3" dest="3" event="10"/>
+		<Transition source="3" dest="3" event="2"/>
+		<Transition source="3" dest="3" event="3"/>
+		<Transition source="3" dest="3" event="4"/>
+		<Transition source="3" dest="7" event="5"/>
+		<Transition source="3" dest="3" event="7"/>
+		<Transition source="4" dest="4" event="1"/>
+		<Transition source="4" dest="4" event="9"/>
+		<Transition source="4" dest="4" event="10"/>
+		<Transition source="4" dest="4" event="2"/>
+		<Transition source="4" dest="4" event="3"/>
+		<Transition source="4" dest="8" event="4"/>
+		<Transition source="4" dest="4" event="5"/>
+		<Transition source="4" dest="4" event="7"/>
+		<Transition source="4" dest="4" event="8"/>
+		<Transition source="5" dest="5" event="1"/>
+		<Transition source="5" dest="5" event="6"/>
+		<Transition source="5" dest="5" event="9"/>
+		<Transition source="5" dest="8" event="10"/>
+		<Transition source="5" dest="5" event="2"/>
+		<Transition source="5" dest="5" event="3"/>
+		<Transition source="5" dest="5" event="4"/>
+		<Transition source="5" dest="5" event="5"/>
+		<Transition source="5" dest="0" event="7"/>
+		<Transition source="5" dest="5" event="8"/>
+		<Transition source="6" dest="6" event="6"/>
+		<Transition source="6" dest="6" event="9"/>
+		<Transition source="6" dest="6" event="10"/>
+		<Transition source="6" dest="6" event="2"/>
+		<Transition source="6" dest="6" event="3"/>
+		<Transition source="6" dest="6" event="4"/>
+		<Transition source="6" dest="9" event="5"/>
+		<Transition source="6" dest="6" event="7"/>
+		<Transition source="7" dest="7" event="1"/>
+		<Transition source="7" dest="7" event="6"/>
+		<Transition source="7" dest="9" event="9"/>
+		<Transition source="7" dest="7" event="10"/>
+		<Transition source="7" dest="7" event="2"/>
+		<Transition source="7" dest="7" event="3"/>
+		<Transition source="7" dest="7" event="4"/>
+		<Transition source="7" dest="7" event="5"/>
+		<Transition source="7" dest="7" event="7"/>
+		<Transition source="7" dest="0" event="8"/>
+		<Transition source="8" dest="8" event="1"/>
+		<Transition source="8" dest="8" event="6"/>
+		<Transition source="8" dest="8" event="9"/>
+		<Transition source="8" dest="8" event="10"/>
+		<Transition source="8" dest="8" event="2"/>
+		<Transition source="8" dest="10" event="3"/>
+		<Transition source="8" dest="8" event="4"/>
+		<Transition source="8" dest="8" event="5"/>
+		<Transition source="8" dest="0" event="7"/>
+		<Transition source="8" dest="8" event="8"/>
+		<Transition source="9" dest="9" event="1"/>
+		<Transition source="9" dest="9" event="6"/>
+		<Transition source="9" dest="9" event="9"/>
+		<Transition source="9" dest="9" event="10"/>
+		<Transition source="9" dest="2" event="2"/>
+		<Transition source="9" dest="9" event="3"/>
+		<Transition source="9" dest="9" event="4"/>
+		<Transition source="9" dest="9" event="5"/>
+		<Transition source="9" dest="9" event="7"/>
+		<Transition source="9" dest="0" event="8"/>
+		<Transition source="10" dest="10" event="1"/>
+		<Transition source="10" dest="10" event="9"/>
+		<Transition source="10" dest="10" event="10"/>
+		<Transition source="10" dest="10" event="2"/>
+		<Transition source="10" dest="10" event="3"/>
+		<Transition source="10" dest="10" event="4"/>
+		<Transition source="10" dest="10" event="5"/>
+		<Transition source="10" dest="3" event="7"/>
+		<Transition source="10" dest="10" event="8"/>
+	</Transitions>
+</Automaton>
+<Automaton name="cp_rs27" type="Specification">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e11"/>
+		<Event id="2" label="e112" controllable="false"/>
+		<Event id="3" label="e114" controllable="false"/>
+		<Event id="4" label="e21"/>
+		<Event id="5" label="e272" controllable="false"/>
+		<Event id="6" label="e274" controllable="false"/>
+		<Event id="7" label="e42" controllable="false"/>
+		<Event id="8" label="e44" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1" accepting="true"/>
+		<State id="2" name="s2" accepting="true"/>
+		<State id="3" name="s3" accepting="true"/>
+		<State id="4" name="s4" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="0" event="7"/>
+		<Transition source="0" dest="0" event="8"/>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="0" dest="1" event="5"/>
+		<Transition source="0" dest="2" event="6"/>
+		<Transition source="1" dest="1" event="1"/>
+		<Transition source="1" dest="1" event="4"/>
+		<Transition source="1" dest="1" event="7"/>
+		<Transition source="1" dest="3" event="8"/>
+		<Transition source="1" dest="0" event="2"/>
+		<Transition source="1" dest="1" event="3"/>
+		<Transition source="1" dest="1" event="5"/>
+		<Transition source="1" dest="1" event="6"/>
+		<Transition source="2" dest="2" event="1"/>
+		<Transition source="2" dest="2" event="4"/>
+		<Transition source="2" dest="4" event="7"/>
+		<Transition source="2" dest="2" event="8"/>
+		<Transition source="2" dest="2" event="2"/>
+		<Transition source="2" dest="0" event="3"/>
+		<Transition source="2" dest="2" event="5"/>
+		<Transition source="2" dest="2" event="6"/>
+		<Transition source="3" dest="3" event="1"/>
+		<Transition source="3" dest="3" event="7"/>
+		<Transition source="3" dest="3" event="8"/>
+		<Transition source="3" dest="0" event="2"/>
+		<Transition source="3" dest="3" event="3"/>
+		<Transition source="3" dest="3" event="5"/>
+		<Transition source="3" dest="3" event="6"/>
+		<Transition source="4" dest="4" event="4"/>
+		<Transition source="4" dest="4" event="7"/>
+		<Transition source="4" dest="4" event="8"/>
+		<Transition source="4" dest="4" event="2"/>
+		<Transition source="4" dest="0" event="3"/>
+		<Transition source="4" dest="4" event="5"/>
+		<Transition source="4" dest="4" event="6"/>
+	</Transitions>
+</Automaton>
+<Automaton name="ms_sw7t2" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e104" controllable="false"/>
+		<Event id="2" label="e124" controllable="false"/>
+		<Event id="3" label="e128" controllable="false"/>
+		<Event id="4" label="e77"/>
+		<Event id="5" label="e79"/>
+		<Event id="6" label="e84" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+		<State id="3" name="s3"/>
+		<State id="4" name="s4"/>
+		<State id="5" name="s5"/>
+		<State id="6" name="s6"/>
+		<State id="7" name="s7"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="4" event="4"/>
+		<Transition source="0" dest="0" event="5"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="1" dest="5" event="4"/>
+		<Transition source="1" dest="1" event="5"/>
+		<Transition source="1" dest="2" event="3"/>
+		<Transition source="2" dest="3" event="4"/>
+		<Transition source="2" dest="2" event="5"/>
+		<Transition source="2" dest="0" event="1"/>
+		<Transition source="2" dest="2" event="3"/>
+		<Transition source="3" dest="3" event="4"/>
+		<Transition source="3" dest="7" event="5"/>
+		<Transition source="3" dest="4" event="6"/>
+		<Transition source="3" dest="4" event="1"/>
+		<Transition source="3" dest="3" event="3"/>
+		<Transition source="4" dest="4" event="4"/>
+		<Transition source="4" dest="0" event="5"/>
+		<Transition source="4" dest="5" event="2"/>
+		<Transition source="4" dest="4" event="3"/>
+		<Transition source="5" dest="5" event="4"/>
+		<Transition source="5" dest="1" event="5"/>
+		<Transition source="5" dest="6" event="3"/>
+		<Transition source="6" dest="6" event="4"/>
+		<Transition source="6" dest="7" event="5"/>
+		<Transition source="6" dest="4" event="6"/>
+		<Transition source="6" dest="6" event="3"/>
+		<Transition source="7" dest="3" event="4"/>
+		<Transition source="7" dest="7" event="5"/>
+		<Transition source="7" dest="0" event="6"/>
+		<Transition source="7" dest="0" event="1"/>
+		<Transition source="7" dest="7" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="rs3" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e32" controllable="false"/>
+		<Event id="2" label="e34" controllable="false"/>
+		<Event id="3" label="e38" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="1" dest="0" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="rs24" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e242" controllable="false"/>
+		<Event id="2" label="e244" controllable="false"/>
+		<Event id="3" label="e248" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="1" dest="0" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="cp_1_0" type="Specification">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e11"/>
+		<Event id="2" label="e12" controllable="false"/>
+		<Event id="3" label="e14" controllable="false"/>
+		<Event id="4" label="e2" controllable="false"/>
+		<Event id="5" label="e21"/>
+		<Event id="6" label="e22" controllable="false"/>
+		<Event id="7" label="e24" controllable="false"/>
+		<Event id="8" label="e32" controllable="false"/>
+		<Event id="9" label="e34" controllable="false"/>
+		<Event id="10" label="e4" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s10"/>
+		<State id="3" name="s2"/>
+		<State id="4" name="s3" accepting="true"/>
+		<State id="5" name="s4"/>
+		<State id="6" name="s5"/>
+		<State id="7" name="s6"/>
+		<State id="8" name="s7"/>
+		<State id="9" name="s8"/>
+		<State id="10" name="s9"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="4"/>
+		<Transition source="0" dest="0" event="10"/>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="0" dest="0" event="5"/>
+		<Transition source="0" dest="0" event="7"/>
+		<Transition source="0" dest="0" event="8"/>
+		<Transition source="0" dest="3" event="9"/>
+		<Transition source="1" dest="1" event="4"/>
+		<Transition source="1" dest="1" event="10"/>
+		<Transition source="1" dest="1" event="1"/>
+		<Transition source="1" dest="1" event="2"/>
+		<Transition source="1" dest="1" event="3"/>
+		<Transition source="1" dest="1" event="5"/>
+		<Transition source="1" dest="4" event="6"/>
+		<Transition source="1" dest="1" event="7"/>
+		<Transition source="1" dest="1" event="8"/>
+		<Transition source="1" dest="5" event="9"/>
+		<Transition source="2" dest="2" event="4"/>
+		<Transition source="2" dest="2" event="10"/>
+		<Transition source="2" dest="2" event="2"/>
+		<Transition source="2" dest="2" event="3"/>
+		<Transition source="2" dest="2" event="5"/>
+		<Transition source="2" dest="2" event="6"/>
+		<Transition source="2" dest="0" event="7"/>
+		<Transition source="2" dest="2" event="8"/>
+		<Transition source="2" dest="2" event="9"/>
+		<Transition source="3" dest="5" event="4"/>
+		<Transition source="3" dest="3" event="10"/>
+		<Transition source="3" dest="3" event="1"/>
+		<Transition source="3" dest="3" event="2"/>
+		<Transition source="3" dest="3" event="3"/>
+		<Transition source="3" dest="3" event="7"/>
+		<Transition source="3" dest="3" event="8"/>
+		<Transition source="3" dest="3" event="9"/>
+		<Transition source="4" dest="4" event="4"/>
+		<Transition source="4" dest="4" event="10"/>
+		<Transition source="4" dest="4" event="1"/>
+		<Transition source="4" dest="0" event="2"/>
+		<Transition source="4" dest="6" event="3"/>
+		<Transition source="4" dest="4" event="5"/>
+		<Transition source="4" dest="4" event="6"/>
+		<Transition source="4" dest="4" event="7"/>
+		<Transition source="4" dest="4" event="8"/>
+		<Transition source="4" dest="4" event="9"/>
+		<Transition source="5" dest="5" event="4"/>
+		<Transition source="5" dest="5" event="10"/>
+		<Transition source="5" dest="5" event="1"/>
+		<Transition source="5" dest="5" event="2"/>
+		<Transition source="5" dest="7" event="3"/>
+		<Transition source="5" dest="5" event="5"/>
+		<Transition source="5" dest="4" event="6"/>
+		<Transition source="5" dest="5" event="7"/>
+		<Transition source="5" dest="5" event="8"/>
+		<Transition source="5" dest="5" event="9"/>
+		<Transition source="6" dest="6" event="4"/>
+		<Transition source="6" dest="8" event="10"/>
+		<Transition source="6" dest="6" event="1"/>
+		<Transition source="6" dest="6" event="2"/>
+		<Transition source="6" dest="6" event="3"/>
+		<Transition source="6" dest="6" event="5"/>
+		<Transition source="6" dest="6" event="6"/>
+		<Transition source="6" dest="9" event="8"/>
+		<Transition source="6" dest="6" event="9"/>
+		<Transition source="7" dest="7" event="4"/>
+		<Transition source="7" dest="7" event="10"/>
+		<Transition source="7" dest="7" event="1"/>
+		<Transition source="7" dest="7" event="2"/>
+		<Transition source="7" dest="7" event="3"/>
+		<Transition source="7" dest="6" event="6"/>
+		<Transition source="7" dest="7" event="7"/>
+		<Transition source="7" dest="7" event="8"/>
+		<Transition source="7" dest="7" event="9"/>
+		<Transition source="8" dest="8" event="4"/>
+		<Transition source="8" dest="8" event="10"/>
+		<Transition source="8" dest="8" event="1"/>
+		<Transition source="8" dest="8" event="2"/>
+		<Transition source="8" dest="8" event="3"/>
+		<Transition source="8" dest="8" event="5"/>
+		<Transition source="8" dest="8" event="6"/>
+		<Transition source="8" dest="4" event="7"/>
+		<Transition source="8" dest="10" event="8"/>
+		<Transition source="8" dest="8" event="9"/>
+		<Transition source="9" dest="9" event="4"/>
+		<Transition source="9" dest="10" event="10"/>
+		<Transition source="9" dest="9" event="2"/>
+		<Transition source="9" dest="9" event="3"/>
+		<Transition source="9" dest="9" event="5"/>
+		<Transition source="9" dest="9" event="6"/>
+		<Transition source="9" dest="9" event="8"/>
+		<Transition source="9" dest="9" event="9"/>
+		<Transition source="10" dest="10" event="4"/>
+		<Transition source="10" dest="10" event="10"/>
+		<Transition source="10" dest="10" event="1"/>
+		<Transition source="10" dest="2" event="2"/>
+		<Transition source="10" dest="10" event="3"/>
+		<Transition source="10" dest="10" event="5"/>
+		<Transition source="10" dest="10" event="6"/>
+		<Transition source="10" dest="4" event="7"/>
+		<Transition source="10" dest="10" event="8"/>
+		<Transition source="10" dest="10" event="9"/>
+	</Transitions>
+</Automaton>
+<Automaton name="srt2_sw5" type="Specification">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e21"/>
+		<Event id="2" label="e53"/>
+		<Event id="3" label="e57"/>
+		<Event id="4" label="e59"/>
+		<Event id="5" label="e74" controllable="false"/>
+		<Event id="6" label="e84" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1" accepting="true"/>
+		<State id="2" name="s2" accepting="true"/>
+		<State id="3" name="s3" accepting="true"/>
+		<State id="4" name="s4" accepting="true"/>
+		<State id="5" name="s5" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="0" event="5"/>
+		<Transition source="0" dest="1" event="6"/>
+		<Transition source="1" dest="2" event="2"/>
+		<Transition source="1" dest="1" event="3"/>
+		<Transition source="1" dest="1" event="4"/>
+		<Transition source="1" dest="1" event="5"/>
+		<Transition source="1" dest="1" event="6"/>
+		<Transition source="2" dest="3" event="3"/>
+		<Transition source="2" dest="2" event="5"/>
+		<Transition source="2" dest="2" event="6"/>
+		<Transition source="3" dest="3" event="1"/>
+		<Transition source="3" dest="3" event="3"/>
+		<Transition source="3" dest="3" event="4"/>
+		<Transition source="3" dest="4" event="5"/>
+		<Transition source="3" dest="3" event="6"/>
+		<Transition source="4" dest="5" event="2"/>
+		<Transition source="4" dest="4" event="3"/>
+		<Transition source="4" dest="4" event="4"/>
+		<Transition source="4" dest="4" event="5"/>
+		<Transition source="4" dest="4" event="6"/>
+		<Transition source="5" dest="0" event="4"/>
+		<Transition source="5" dest="5" event="5"/>
+		<Transition source="5" dest="5" event="6"/>
+	</Transitions>
+</Automaton>
+<Automaton name="rs8" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e82" controllable="false"/>
+		<Event id="2" label="e84" controllable="false"/>
+		<Event id="3" label="e88" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="1" dest="0" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="sens_it1" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e102" controllable="false"/>
+		<Event id="2" label="e112" controllable="false"/>
+		<Event id="3" label="e12" controllable="false"/>
+		<Event id="4" label="e122" controllable="false"/>
+		<Event id="5" label="e132" controllable="false"/>
+		<Event id="6" label="e142" controllable="false"/>
+		<Event id="7" label="e152" controllable="false"/>
+		<Event id="8" label="e162" controllable="false"/>
+		<Event id="9" label="e192" controllable="false"/>
+		<Event id="10" label="e2" controllable="false"/>
+		<Event id="11" label="e202" controllable="false"/>
+		<Event id="12" label="e212" controllable="false"/>
+		<Event id="13" label="e22" controllable="false"/>
+		<Event id="14" label="e222" controllable="false"/>
+		<Event id="15" label="e232" controllable="false"/>
+		<Event id="16" label="e242" controllable="false"/>
+		<Event id="17" label="e252" controllable="false"/>
+		<Event id="18" label="e262" controllable="false"/>
+		<Event id="19" label="e272" controllable="false"/>
+		<Event id="20" label="e32" controllable="false"/>
+		<Event id="21" label="e42" controllable="false"/>
+		<Event id="22" label="e52" controllable="false"/>
+		<Event id="23" label="e62" controllable="false"/>
+		<Event id="24" label="e72" controllable="false"/>
+		<Event id="25" label="e82" controllable="false"/>
+		<Event id="26" label="e92" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s10"/>
+		<State id="3" name="s11"/>
+		<State id="4" name="s12"/>
+		<State id="5" name="s13"/>
+		<State id="6" name="s14"/>
+		<State id="7" name="s15"/>
+		<State id="8" name="s16"/>
+		<State id="9" name="s17"/>
+		<State id="10" name="s18"/>
+		<State id="11" name="s19"/>
+		<State id="12" name="s2"/>
+		<State id="13" name="s20"/>
+		<State id="14" name="s21"/>
+		<State id="15" name="s22"/>
+		<State id="16" name="s3"/>
+		<State id="17" name="s4"/>
+		<State id="18" name="s5"/>
+		<State id="19" name="s6"/>
+		<State id="20" name="s7"/>
+		<State id="21" name="s8"/>
+		<State id="22" name="s9"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="4" event="10"/>
+		<Transition source="1" dest="12" event="6"/>
+		<Transition source="2" dest="0" event="3"/>
+		<Transition source="2" dest="7" event="9"/>
+		<Transition source="3" dest="1" event="8"/>
+		<Transition source="4" dest="5" event="13"/>
+		<Transition source="5" dest="14" event="21"/>
+		<Transition source="6" dest="21" event="24"/>
+		<Transition source="7" dest="8" event="11"/>
+		<Transition source="8" dest="9" event="12"/>
+		<Transition source="9" dest="10" event="14"/>
+		<Transition source="10" dest="15" event="15"/>
+		<Transition source="11" dest="13" event="18"/>
+		<Transition source="12" dest="16" event="4"/>
+		<Transition source="13" dest="1" event="17"/>
+		<Transition source="14" dest="6" event="23"/>
+		<Transition source="14" dest="18" event="19"/>
+		<Transition source="15" dest="11" event="16"/>
+		<Transition source="16" dest="21" event="25"/>
+		<Transition source="16" dest="17" event="1"/>
+		<Transition source="17" dest="18" event="26"/>
+		<Transition source="18" dest="19" event="2"/>
+		<Transition source="19" dest="20" event="5"/>
+		<Transition source="20" dest="3" event="7"/>
+		<Transition source="21" dest="22" event="22"/>
+		<Transition source="22" dest="2" event="20"/>
+	</Transitions>
+</Automaton>
+<Automaton name="srt1_sw3" type="Specification">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e11"/>
+		<Event id="2" label="e300" controllable="false"/>
+		<Event id="3" label="e302" controllable="false"/>
+		<Event id="4" label="e307"/>
+		<Event id="5" label="e309"/>
+		<Event id="6" label="e31"/>
+		<Event id="7" label="e32" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1" accepting="true"/>
+		<State id="2" name="s2" accepting="true"/>
+		<State id="3" name="s3" accepting="true"/>
+		<State id="4" name="s4" accepting="true"/>
+		<State id="5" name="s5" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="1" event="7"/>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="0" event="5"/>
+		<Transition source="1" dest="2" event="6"/>
+		<Transition source="1" dest="1" event="7"/>
+		<Transition source="1" dest="1" event="2"/>
+		<Transition source="1" dest="0" event="3"/>
+		<Transition source="1" dest="1" event="4"/>
+		<Transition source="1" dest="1" event="5"/>
+		<Transition source="2" dest="2" event="7"/>
+		<Transition source="2" dest="3" event="2"/>
+		<Transition source="2" dest="2" event="3"/>
+		<Transition source="2" dest="2" event="4"/>
+		<Transition source="3" dest="3" event="1"/>
+		<Transition source="3" dest="4" event="7"/>
+		<Transition source="3" dest="3" event="2"/>
+		<Transition source="3" dest="3" event="3"/>
+		<Transition source="3" dest="3" event="4"/>
+		<Transition source="3" dest="3" event="5"/>
+		<Transition source="4" dest="5" event="6"/>
+		<Transition source="4" dest="4" event="7"/>
+		<Transition source="4" dest="4" event="2"/>
+		<Transition source="4" dest="4" event="3"/>
+		<Transition source="4" dest="4" event="4"/>
+		<Transition source="4" dest="4" event="5"/>
+		<Transition source="5" dest="5" event="7"/>
+		<Transition source="5" dest="5" event="2"/>
+		<Transition source="5" dest="0" event="3"/>
+		<Transition source="5" dest="5" event="5"/>
+	</Transitions>
+</Automaton>
+<Automaton name="srt1_sw8" type="Specification">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e11"/>
+		<Event id="2" label="e162" controllable="false"/>
+		<Event id="3" label="e252" controllable="false"/>
+		<Event id="4" label="e800" controllable="false"/>
+		<Event id="5" label="e802" controllable="false"/>
+		<Event id="6" label="e807"/>
+		<Event id="7" label="e809"/>
+		<Event id="8" label="e81"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1" accepting="true"/>
+		<State id="2" name="s2" accepting="true"/>
+		<State id="3" name="s3" accepting="true"/>
+		<State id="4" name="s4" accepting="true"/>
+		<State id="5" name="s5" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="0" event="5"/>
+		<Transition source="0" dest="0" event="6"/>
+		<Transition source="0" dest="0" event="7"/>
+		<Transition source="1" dest="2" event="8"/>
+		<Transition source="1" dest="1" event="2"/>
+		<Transition source="1" dest="1" event="3"/>
+		<Transition source="1" dest="1" event="4"/>
+		<Transition source="1" dest="0" event="5"/>
+		<Transition source="1" dest="1" event="6"/>
+		<Transition source="1" dest="1" event="7"/>
+		<Transition source="2" dest="2" event="2"/>
+		<Transition source="2" dest="2" event="3"/>
+		<Transition source="2" dest="3" event="4"/>
+		<Transition source="2" dest="2" event="5"/>
+		<Transition source="2" dest="2" event="6"/>
+		<Transition source="3" dest="3" event="1"/>
+		<Transition source="3" dest="3" event="2"/>
+		<Transition source="3" dest="4" event="3"/>
+		<Transition source="3" dest="3" event="4"/>
+		<Transition source="3" dest="3" event="5"/>
+		<Transition source="3" dest="3" event="6"/>
+		<Transition source="3" dest="3" event="7"/>
+		<Transition source="4" dest="5" event="8"/>
+		<Transition source="4" dest="4" event="2"/>
+		<Transition source="4" dest="4" event="3"/>
+		<Transition source="4" dest="4" event="4"/>
+		<Transition source="4" dest="4" event="5"/>
+		<Transition source="4" dest="4" event="6"/>
+		<Transition source="4" dest="4" event="7"/>
+		<Transition source="5" dest="5" event="2"/>
+		<Transition source="5" dest="5" event="3"/>
+		<Transition source="5" dest="5" event="4"/>
+		<Transition source="5" dest="0" event="5"/>
+		<Transition source="5" dest="5" event="7"/>
+	</Transitions>
+</Automaton>
+<Automaton name="rs4" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e42" controllable="false"/>
+		<Event id="2" label="e44" controllable="false"/>
+		<Event id="3" label="e48" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="1" dest="0" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="ms_sw8t1" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e112" controllable="false"/>
+		<Event id="2" label="e142" controllable="false"/>
+		<Event id="3" label="e162" controllable="false"/>
+		<Event id="4" label="e192" controllable="false"/>
+		<Event id="5" label="e252" controllable="false"/>
+		<Event id="6" label="e800" controllable="false"/>
+		<Event id="7" label="e802" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+		<State id="3" name="s3"/>
+		<State id="4" name="s4"/>
+		<State id="5" name="s5"/>
+		<State id="6" name="s6"/>
+		<State id="7" name="s7"/>
+		<State id="8" name="s8"/>
+		<State id="9" name="s9"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="2" event="1"/>
+		<Transition source="0" dest="3" event="4"/>
+		<Transition source="0" dest="0" event="6"/>
+		<Transition source="0" dest="7" event="7"/>
+		<Transition source="1" dest="0" event="2"/>
+		<Transition source="1" dest="1" event="6"/>
+		<Transition source="1" dest="6" event="7"/>
+		<Transition source="2" dest="1" event="3"/>
+		<Transition source="2" dest="2" event="6"/>
+		<Transition source="2" dest="5" event="7"/>
+		<Transition source="3" dest="4" event="5"/>
+		<Transition source="3" dest="3" event="6"/>
+		<Transition source="3" dest="8" event="7"/>
+		<Transition source="4" dest="4" event="6"/>
+		<Transition source="4" dest="9" event="7"/>
+		<Transition source="5" dest="6" event="3"/>
+		<Transition source="5" dest="2" event="6"/>
+		<Transition source="5" dest="5" event="7"/>
+		<Transition source="6" dest="1" event="6"/>
+		<Transition source="6" dest="6" event="7"/>
+		<Transition source="7" dest="5" event="1"/>
+		<Transition source="7" dest="8" event="4"/>
+		<Transition source="7" dest="0" event="6"/>
+		<Transition source="7" dest="7" event="7"/>
+		<Transition source="8" dest="9" event="5"/>
+		<Transition source="8" dest="3" event="6"/>
+		<Transition source="8" dest="8" event="7"/>
+		<Transition source="9" dest="7" event="2"/>
+		<Transition source="9" dest="4" event="6"/>
+		<Transition source="9" dest="9" event="7"/>
+	</Transitions>
+</Automaton>
+<Automaton name="srt2_sw6" type="Specification">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e21"/>
+		<Event id="2" label="e63"/>
+		<Event id="3" label="e67"/>
+		<Event id="4" label="e69"/>
+		<Event id="5" label="e94" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1" accepting="true"/>
+		<State id="2" name="s2" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="1" event="5"/>
+		<Transition source="1" dest="2" event="2"/>
+		<Transition source="1" dest="1" event="3"/>
+		<Transition source="1" dest="1" event="4"/>
+		<Transition source="1" dest="1" event="5"/>
+		<Transition source="2" dest="0" event="4"/>
+		<Transition source="2" dest="2" event="5"/>
+	</Transitions>
+</Automaton>
+<Automaton name="srt1_sw4" type="Specification">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e11"/>
+		<Event id="2" label="e41"/>
+		<Event id="3" label="e42" controllable="false"/>
+		<Event id="4" label="e47"/>
+		<Event id="5" label="e49"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1" accepting="true"/>
+		<State id="2" name="s2" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="0" event="5"/>
+		<Transition source="1" dest="2" event="2"/>
+		<Transition source="1" dest="1" event="3"/>
+		<Transition source="1" dest="1" event="4"/>
+		<Transition source="1" dest="1" event="5"/>
+		<Transition source="2" dest="2" event="3"/>
+		<Transition source="2" dest="0" event="4"/>
+	</Transitions>
+</Automaton>
+<Automaton name="rs7" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e72" controllable="false"/>
+		<Event id="2" label="e74" controllable="false"/>
+		<Event id="3" label="e78" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="1" dest="0" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="rs15" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e152" controllable="false"/>
+		<Event id="2" label="e154" controllable="false"/>
+		<Event id="3" label="e158" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="1" dest="0" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="cp_2_4" type="Specification">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e11"/>
+		<Event id="2" label="e2" controllable="false"/>
+		<Event id="3" label="e21"/>
+		<Event id="4" label="e22" controllable="false"/>
+		<Event id="5" label="e24" controllable="false"/>
+		<Event id="6" label="e272" controllable="false"/>
+		<Event id="7" label="e274" controllable="false"/>
+		<Event id="8" label="e4" controllable="false"/>
+		<Event id="9" label="e62" controllable="false"/>
+		<Event id="10" label="e64" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1" accepting="true"/>
+		<State id="2" name="s2" accepting="true"/>
+		<State id="3" name="s3" accepting="true"/>
+		<State id="4" name="s4" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="0" event="8"/>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="0" dest="1" event="4"/>
+		<Transition source="0" dest="2" event="5"/>
+		<Transition source="0" dest="0" event="9"/>
+		<Transition source="0" dest="0" event="10"/>
+		<Transition source="0" dest="0" event="6"/>
+		<Transition source="0" dest="0" event="7"/>
+		<Transition source="1" dest="1" event="2"/>
+		<Transition source="1" dest="3" event="8"/>
+		<Transition source="1" dest="1" event="1"/>
+		<Transition source="1" dest="1" event="3"/>
+		<Transition source="1" dest="1" event="4"/>
+		<Transition source="1" dest="1" event="5"/>
+		<Transition source="1" dest="0" event="9"/>
+		<Transition source="1" dest="1" event="10"/>
+		<Transition source="1" dest="0" event="6"/>
+		<Transition source="1" dest="1" event="7"/>
+		<Transition source="2" dest="4" event="2"/>
+		<Transition source="2" dest="2" event="8"/>
+		<Transition source="2" dest="2" event="1"/>
+		<Transition source="2" dest="2" event="3"/>
+		<Transition source="2" dest="2" event="4"/>
+		<Transition source="2" dest="2" event="5"/>
+		<Transition source="2" dest="2" event="9"/>
+		<Transition source="2" dest="0" event="10"/>
+		<Transition source="2" dest="2" event="6"/>
+		<Transition source="2" dest="0" event="7"/>
+		<Transition source="3" dest="3" event="2"/>
+		<Transition source="3" dest="3" event="8"/>
+		<Transition source="3" dest="3" event="1"/>
+		<Transition source="3" dest="3" event="4"/>
+		<Transition source="3" dest="3" event="5"/>
+		<Transition source="3" dest="0" event="9"/>
+		<Transition source="3" dest="3" event="10"/>
+		<Transition source="3" dest="0" event="6"/>
+		<Transition source="3" dest="3" event="7"/>
+		<Transition source="4" dest="4" event="2"/>
+		<Transition source="4" dest="4" event="8"/>
+		<Transition source="4" dest="4" event="3"/>
+		<Transition source="4" dest="4" event="4"/>
+		<Transition source="4" dest="4" event="5"/>
+		<Transition source="4" dest="4" event="9"/>
+		<Transition source="4" dest="0" event="10"/>
+		<Transition source="4" dest="4" event="6"/>
+		<Transition source="4" dest="0" event="7"/>
+	</Transitions>
+</Automaton>
+<Automaton name="cp_6_7" type="Specification">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e11"/>
+		<Event id="2" label="e21"/>
+		<Event id="3" label="e42" controllable="false"/>
+		<Event id="4" label="e44" controllable="false"/>
+		<Event id="5" label="e52" controllable="false"/>
+		<Event id="6" label="e54" controllable="false"/>
+		<Event id="7" label="e62" controllable="false"/>
+		<Event id="8" label="e64" controllable="false"/>
+		<Event id="9" label="e72" controllable="false"/>
+		<Event id="10" label="e74" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s10"/>
+		<State id="3" name="s2"/>
+		<State id="4" name="s3"/>
+		<State id="5" name="s4"/>
+		<State id="6" name="s5"/>
+		<State id="7" name="s6"/>
+		<State id="8" name="s7"/>
+		<State id="9" name="s8"/>
+		<State id="10" name="s9"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="0" event="5"/>
+		<Transition source="0" dest="0" event="6"/>
+		<Transition source="0" dest="1" event="7"/>
+		<Transition source="0" dest="3" event="8"/>
+		<Transition source="0" dest="0" event="9"/>
+		<Transition source="0" dest="0" event="10"/>
+		<Transition source="1" dest="1" event="1"/>
+		<Transition source="1" dest="1" event="2"/>
+		<Transition source="1" dest="1" event="3"/>
+		<Transition source="1" dest="4" event="4"/>
+		<Transition source="1" dest="1" event="6"/>
+		<Transition source="1" dest="1" event="7"/>
+		<Transition source="1" dest="1" event="8"/>
+		<Transition source="1" dest="5" event="9"/>
+		<Transition source="1" dest="1" event="10"/>
+		<Transition source="2" dest="2" event="2"/>
+		<Transition source="2" dest="2" event="3"/>
+		<Transition source="2" dest="2" event="4"/>
+		<Transition source="2" dest="2" event="5"/>
+		<Transition source="2" dest="1" event="6"/>
+		<Transition source="2" dest="2" event="7"/>
+		<Transition source="2" dest="2" event="8"/>
+		<Transition source="2" dest="2" event="9"/>
+		<Transition source="2" dest="2" event="10"/>
+		<Transition source="3" dest="3" event="1"/>
+		<Transition source="3" dest="3" event="2"/>
+		<Transition source="3" dest="6" event="3"/>
+		<Transition source="3" dest="3" event="4"/>
+		<Transition source="3" dest="3" event="5"/>
+		<Transition source="3" dest="3" event="7"/>
+		<Transition source="3" dest="3" event="8"/>
+		<Transition source="3" dest="3" event="9"/>
+		<Transition source="3" dest="7" event="10"/>
+		<Transition source="4" dest="4" event="1"/>
+		<Transition source="4" dest="4" event="3"/>
+		<Transition source="4" dest="4" event="4"/>
+		<Transition source="4" dest="4" event="6"/>
+		<Transition source="4" dest="4" event="7"/>
+		<Transition source="4" dest="4" event="8"/>
+		<Transition source="4" dest="8" event="9"/>
+		<Transition source="4" dest="4" event="10"/>
+		<Transition source="5" dest="5" event="1"/>
+		<Transition source="5" dest="5" event="2"/>
+		<Transition source="5" dest="5" event="3"/>
+		<Transition source="5" dest="8" event="4"/>
+		<Transition source="5" dest="0" event="5"/>
+		<Transition source="5" dest="5" event="6"/>
+		<Transition source="5" dest="5" event="7"/>
+		<Transition source="5" dest="5" event="8"/>
+		<Transition source="5" dest="5" event="9"/>
+		<Transition source="5" dest="5" event="10"/>
+		<Transition source="6" dest="6" event="2"/>
+		<Transition source="6" dest="6" event="3"/>
+		<Transition source="6" dest="6" event="4"/>
+		<Transition source="6" dest="6" event="5"/>
+		<Transition source="6" dest="6" event="7"/>
+		<Transition source="6" dest="6" event="8"/>
+		<Transition source="6" dest="6" event="9"/>
+		<Transition source="6" dest="9" event="10"/>
+		<Transition source="7" dest="7" event="1"/>
+		<Transition source="7" dest="7" event="2"/>
+		<Transition source="7" dest="9" event="3"/>
+		<Transition source="7" dest="7" event="4"/>
+		<Transition source="7" dest="7" event="5"/>
+		<Transition source="7" dest="0" event="6"/>
+		<Transition source="7" dest="7" event="7"/>
+		<Transition source="7" dest="7" event="8"/>
+		<Transition source="7" dest="7" event="9"/>
+		<Transition source="7" dest="7" event="10"/>
+		<Transition source="8" dest="8" event="1"/>
+		<Transition source="8" dest="8" event="2"/>
+		<Transition source="8" dest="8" event="3"/>
+		<Transition source="8" dest="8" event="4"/>
+		<Transition source="8" dest="0" event="5"/>
+		<Transition source="8" dest="8" event="6"/>
+		<Transition source="8" dest="8" event="7"/>
+		<Transition source="8" dest="10" event="8"/>
+		<Transition source="8" dest="8" event="9"/>
+		<Transition source="8" dest="8" event="10"/>
+		<Transition source="9" dest="9" event="1"/>
+		<Transition source="9" dest="9" event="2"/>
+		<Transition source="9" dest="9" event="3"/>
+		<Transition source="9" dest="9" event="4"/>
+		<Transition source="9" dest="9" event="5"/>
+		<Transition source="9" dest="0" event="6"/>
+		<Transition source="9" dest="2" event="7"/>
+		<Transition source="9" dest="9" event="8"/>
+		<Transition source="9" dest="9" event="9"/>
+		<Transition source="9" dest="9" event="10"/>
+		<Transition source="10" dest="10" event="1"/>
+		<Transition source="10" dest="10" event="3"/>
+		<Transition source="10" dest="3" event="5"/>
+		<Transition source="10" dest="10" event="6"/>
+		<Transition source="10" dest="10" event="7"/>
+		<Transition source="10" dest="10" event="8"/>
+		<Transition source="10" dest="10" event="9"/>
+		<Transition source="10" dest="10" event="10"/>
+	</Transitions>
+</Automaton>
+<Automaton name="ms_sw4t1" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e272" controllable="false"/>
+		<Event id="2" label="e42" controllable="false"/>
+		<Event id="3" label="e47"/>
+		<Event id="4" label="e48" controllable="false"/>
+		<Event id="5" label="e49"/>
+		<Event id="6" label="e62" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+		<State id="3" name="s3"/>
+		<State id="4" name="s4"/>
+		<State id="5" name="s5"/>
+		<State id="6" name="s6"/>
+		<State id="7" name="s7"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="4" event="3"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="0" event="5"/>
+		<Transition source="1" dest="5" event="3"/>
+		<Transition source="1" dest="2" event="4"/>
+		<Transition source="1" dest="1" event="5"/>
+		<Transition source="2" dest="3" event="3"/>
+		<Transition source="2" dest="2" event="4"/>
+		<Transition source="2" dest="2" event="5"/>
+		<Transition source="2" dest="0" event="6"/>
+		<Transition source="3" dest="3" event="3"/>
+		<Transition source="3" dest="3" event="4"/>
+		<Transition source="3" dest="7" event="5"/>
+		<Transition source="3" dest="4" event="6"/>
+		<Transition source="3" dest="4" event="1"/>
+		<Transition source="4" dest="5" event="2"/>
+		<Transition source="4" dest="4" event="3"/>
+		<Transition source="4" dest="4" event="4"/>
+		<Transition source="4" dest="0" event="5"/>
+		<Transition source="5" dest="5" event="3"/>
+		<Transition source="5" dest="6" event="4"/>
+		<Transition source="5" dest="1" event="5"/>
+		<Transition source="6" dest="6" event="3"/>
+		<Transition source="6" dest="6" event="4"/>
+		<Transition source="6" dest="7" event="5"/>
+		<Transition source="6" dest="4" event="1"/>
+		<Transition source="7" dest="3" event="3"/>
+		<Transition source="7" dest="7" event="4"/>
+		<Transition source="7" dest="7" event="5"/>
+		<Transition source="7" dest="0" event="6"/>
+		<Transition source="7" dest="0" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="ms_sw7t1" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e102" controllable="false"/>
+		<Event id="2" label="e122" controllable="false"/>
+		<Event id="3" label="e128" controllable="false"/>
+		<Event id="4" label="e77"/>
+		<Event id="5" label="e79"/>
+		<Event id="6" label="e82" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+		<State id="3" name="s3"/>
+		<State id="4" name="s4"/>
+		<State id="5" name="s5"/>
+		<State id="6" name="s6"/>
+		<State id="7" name="s7"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="4" event="4"/>
+		<Transition source="0" dest="0" event="5"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="1" dest="5" event="4"/>
+		<Transition source="1" dest="1" event="5"/>
+		<Transition source="1" dest="2" event="3"/>
+		<Transition source="2" dest="3" event="4"/>
+		<Transition source="2" dest="2" event="5"/>
+		<Transition source="2" dest="0" event="1"/>
+		<Transition source="2" dest="2" event="3"/>
+		<Transition source="3" dest="3" event="4"/>
+		<Transition source="3" dest="7" event="5"/>
+		<Transition source="3" dest="4" event="6"/>
+		<Transition source="3" dest="4" event="1"/>
+		<Transition source="3" dest="3" event="3"/>
+		<Transition source="4" dest="4" event="4"/>
+		<Transition source="4" dest="0" event="5"/>
+		<Transition source="4" dest="5" event="2"/>
+		<Transition source="4" dest="4" event="3"/>
+		<Transition source="5" dest="5" event="4"/>
+		<Transition source="5" dest="1" event="5"/>
+		<Transition source="5" dest="6" event="3"/>
+		<Transition source="6" dest="6" event="4"/>
+		<Transition source="6" dest="7" event="5"/>
+		<Transition source="6" dest="4" event="6"/>
+		<Transition source="6" dest="6" event="3"/>
+		<Transition source="7" dest="3" event="4"/>
+		<Transition source="7" dest="7" event="5"/>
+		<Transition source="7" dest="0" event="6"/>
+		<Transition source="7" dest="0" event="1"/>
+		<Transition source="7" dest="7" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="crane3" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e30" controllable="false"/>
+		<Event id="2" label="e35"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="1" dest="0" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="srt2_sw4" type="Specification">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e21"/>
+		<Event id="2" label="e43"/>
+		<Event id="3" label="e44" controllable="false"/>
+		<Event id="4" label="e47"/>
+		<Event id="5" label="e49"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1" accepting="true"/>
+		<State id="2" name="s2" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="0" event="5"/>
+		<Transition source="1" dest="2" event="2"/>
+		<Transition source="1" dest="1" event="3"/>
+		<Transition source="1" dest="1" event="4"/>
+		<Transition source="1" dest="1" event="5"/>
+		<Transition source="2" dest="2" event="3"/>
+		<Transition source="2" dest="0" event="5"/>
+	</Transitions>
+</Automaton>
+<Automaton name="ms_sw5t2" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e194" controllable="false"/>
+		<Event id="2" label="e274" controllable="false"/>
+		<Event id="3" label="e54" controllable="false"/>
+		<Event id="4" label="e57"/>
+		<Event id="5" label="e59"/>
+		<Event id="6" label="e74" controllable="false"/>
+		<Event id="7" label="e84" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+		<State id="3" name="s3"/>
+		<State id="4" name="s4"/>
+		<State id="5" name="s5"/>
+		<State id="6" name="s6"/>
+		<State id="7" name="s7"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="4" event="4"/>
+		<Transition source="0" dest="0" event="5"/>
+		<Transition source="0" dest="1" event="7"/>
+		<Transition source="1" dest="5" event="4"/>
+		<Transition source="1" dest="1" event="5"/>
+		<Transition source="2" dest="6" event="4"/>
+		<Transition source="2" dest="2" event="5"/>
+		<Transition source="2" dest="3" event="6"/>
+		<Transition source="2" dest="0" event="1"/>
+		<Transition source="2" dest="0" event="2"/>
+		<Transition source="3" dest="2" event="3"/>
+		<Transition source="3" dest="7" event="4"/>
+		<Transition source="3" dest="3" event="5"/>
+		<Transition source="4" dest="4" event="4"/>
+		<Transition source="4" dest="0" event="5"/>
+		<Transition source="4" dest="5" event="7"/>
+		<Transition source="5" dest="6" event="3"/>
+		<Transition source="5" dest="5" event="4"/>
+		<Transition source="5" dest="1" event="5"/>
+		<Transition source="6" dest="6" event="4"/>
+		<Transition source="6" dest="2" event="5"/>
+		<Transition source="6" dest="7" event="6"/>
+		<Transition source="6" dest="4" event="1"/>
+		<Transition source="6" dest="4" event="2"/>
+		<Transition source="7" dest="7" event="4"/>
+		<Transition source="7" dest="3" event="5"/>
+	</Transitions>
+</Automaton>
+<Automaton name="rs9" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e92" controllable="false"/>
+		<Event id="2" label="e94" controllable="false"/>
+		<Event id="3" label="e98" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="1" dest="0" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="rs21" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e212" controllable="false"/>
+		<Event id="2" label="e214" controllable="false"/>
+		<Event id="3" label="e218" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="1" dest="0" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="rs16" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e162" controllable="false"/>
+		<Event id="2" label="e164" controllable="false"/>
+		<Event id="3" label="e168" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="1" dest="0" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="sw8" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e800" controllable="false"/>
+		<Event id="2" label="e802" controllable="false"/>
+		<Event id="3" label="e807"/>
+		<Event id="4" label="e809"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="0" dest="2" event="4"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="2" dest="0" event="2"/>
+	</Transitions>
+</Automaton>
+<Automaton name="req_sw6" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e61"/>
+		<Event id="2" label="e63"/>
+		<Event id="3" label="e67"/>
+		<Event id="4" label="e69"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="1" dest="2" event="1"/>
+		<Transition source="1" dest="2" event="2"/>
+		<Transition source="1" dest="0" event="3"/>
+		<Transition source="1" dest="0" event="4"/>
+		<Transition source="2" dest="1" event="3"/>
+		<Transition source="2" dest="1" event="4"/>
+	</Transitions>
+</Automaton>
+<Automaton name="rs10" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e102" controllable="false"/>
+		<Event id="2" label="e104" controllable="false"/>
+		<Event id="3" label="e108" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="1" dest="0" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="train1" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e11"/>
+		<Event id="2" label="e16" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="0" event="2"/>
+	</Transitions>
+</Automaton>
+<Automaton name="train2" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e21"/>
+		<Event id="2" label="e26" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="0" event="2"/>
+	</Transitions>
+</Automaton>
+<Automaton name="cp_21_22" type="Specification">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e11"/>
+		<Event id="2" label="e202" controllable="false"/>
+		<Event id="3" label="e204" controllable="false"/>
+		<Event id="4" label="e21"/>
+		<Event id="5" label="e212" controllable="false"/>
+		<Event id="6" label="e214" controllable="false"/>
+		<Event id="7" label="e232" controllable="false"/>
+		<Event id="8" label="e234" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1" accepting="true"/>
+		<State id="2" name="s2" accepting="true"/>
+		<State id="3" name="s3" accepting="true"/>
+		<State id="4" name="s4" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="0" dest="1" event="5"/>
+		<Transition source="0" dest="2" event="6"/>
+		<Transition source="0" dest="0" event="7"/>
+		<Transition source="0" dest="0" event="8"/>
+		<Transition source="1" dest="1" event="1"/>
+		<Transition source="1" dest="1" event="4"/>
+		<Transition source="1" dest="1" event="2"/>
+		<Transition source="1" dest="3" event="3"/>
+		<Transition source="1" dest="1" event="5"/>
+		<Transition source="1" dest="1" event="6"/>
+		<Transition source="1" dest="0" event="7"/>
+		<Transition source="1" dest="1" event="8"/>
+		<Transition source="2" dest="2" event="1"/>
+		<Transition source="2" dest="2" event="4"/>
+		<Transition source="2" dest="4" event="2"/>
+		<Transition source="2" dest="2" event="3"/>
+		<Transition source="2" dest="2" event="5"/>
+		<Transition source="2" dest="2" event="6"/>
+		<Transition source="2" dest="2" event="7"/>
+		<Transition source="2" dest="0" event="8"/>
+		<Transition source="3" dest="3" event="1"/>
+		<Transition source="3" dest="3" event="2"/>
+		<Transition source="3" dest="3" event="3"/>
+		<Transition source="3" dest="3" event="5"/>
+		<Transition source="3" dest="3" event="6"/>
+		<Transition source="3" dest="0" event="7"/>
+		<Transition source="3" dest="3" event="8"/>
+		<Transition source="4" dest="4" event="4"/>
+		<Transition source="4" dest="4" event="2"/>
+		<Transition source="4" dest="4" event="3"/>
+		<Transition source="4" dest="4" event="5"/>
+		<Transition source="4" dest="4" event="6"/>
+		<Transition source="4" dest="4" event="7"/>
+		<Transition source="4" dest="0" event="8"/>
+	</Transitions>
+</Automaton>
+<Automaton name="s_crane2" type="Specification">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e11"/>
+		<Event id="2" label="e20" controllable="false"/>
+		<Event id="3" label="e21"/>
+		<Event id="4" label="e22" controllable="false"/>
+		<Event id="5" label="e24" controllable="false"/>
+		<Event id="6" label="e25"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="0" dest="1" event="4"/>
+		<Transition source="0" dest="2" event="5"/>
+		<Transition source="1" dest="0" event="2"/>
+		<Transition source="1" dest="1" event="3"/>
+		<Transition source="1" dest="1" event="4"/>
+		<Transition source="1" dest="1" event="5"/>
+		<Transition source="1" dest="1" event="6"/>
+		<Transition source="2" dest="2" event="1"/>
+		<Transition source="2" dest="0" event="2"/>
+		<Transition source="2" dest="2" event="4"/>
+		<Transition source="2" dest="2" event="5"/>
+		<Transition source="2" dest="2" event="6"/>
+	</Transitions>
+</Automaton>
+<Automaton name="srt2_sw8_fix1" type="Specification">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e164" controllable="false"/>
+		<Event id="2" label="e21"/>
+		<Event id="3" label="e254" controllable="false"/>
+		<Event id="4" label="e800" controllable="false"/>
+		<Event id="5" label="e802" controllable="false"/>
+		<Event id="6" label="e807"/>
+		<Event id="7" label="e809"/>
+		<Event id="8" label="e83"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+		<State id="3" name="s3"/>
+		<State id="4" name="s4"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="2" event="3"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="0" event="5"/>
+		<Transition source="0" dest="0" event="6"/>
+		<Transition source="0" dest="0" event="7"/>
+		<Transition source="1" dest="3" event="8"/>
+		<Transition source="1" dest="1" event="1"/>
+		<Transition source="1" dest="1" event="3"/>
+		<Transition source="1" dest="1" event="4"/>
+		<Transition source="1" dest="1" event="5"/>
+		<Transition source="1" dest="1" event="6"/>
+		<Transition source="1" dest="1" event="7"/>
+		<Transition source="2" dest="4" event="8"/>
+		<Transition source="2" dest="2" event="1"/>
+		<Transition source="2" dest="2" event="3"/>
+		<Transition source="2" dest="2" event="4"/>
+		<Transition source="2" dest="2" event="5"/>
+		<Transition source="2" dest="2" event="6"/>
+		<Transition source="2" dest="2" event="7"/>
+		<Transition source="3" dest="3" event="1"/>
+		<Transition source="3" dest="3" event="3"/>
+		<Transition source="3" dest="0" event="4"/>
+		<Transition source="3" dest="3" event="5"/>
+		<Transition source="3" dest="3" event="6"/>
+		<Transition source="4" dest="4" event="1"/>
+		<Transition source="4" dest="4" event="3"/>
+		<Transition source="4" dest="4" event="4"/>
+		<Transition source="4" dest="0" event="5"/>
+		<Transition source="4" dest="4" event="7"/>
+	</Transitions>
+</Automaton>
+<Automaton name="cp_23_24" type="Specification">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e11"/>
+		<Event id="2" label="e21"/>
+		<Event id="3" label="e222" controllable="false"/>
+		<Event id="4" label="e224" controllable="false"/>
+		<Event id="5" label="e232" controllable="false"/>
+		<Event id="6" label="e234" controllable="false"/>
+		<Event id="7" label="e262" controllable="false"/>
+		<Event id="8" label="e264" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1" accepting="true"/>
+		<State id="2" name="s2" accepting="true"/>
+		<State id="3" name="s3" accepting="true"/>
+		<State id="4" name="s4" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="1" event="5"/>
+		<Transition source="0" dest="2" event="6"/>
+		<Transition source="0" dest="0" event="7"/>
+		<Transition source="0" dest="0" event="8"/>
+		<Transition source="1" dest="1" event="1"/>
+		<Transition source="1" dest="1" event="2"/>
+		<Transition source="1" dest="1" event="3"/>
+		<Transition source="1" dest="3" event="4"/>
+		<Transition source="1" dest="1" event="5"/>
+		<Transition source="1" dest="1" event="6"/>
+		<Transition source="1" dest="0" event="7"/>
+		<Transition source="1" dest="1" event="8"/>
+		<Transition source="2" dest="2" event="1"/>
+		<Transition source="2" dest="2" event="2"/>
+		<Transition source="2" dest="4" event="3"/>
+		<Transition source="2" dest="2" event="4"/>
+		<Transition source="2" dest="2" event="5"/>
+		<Transition source="2" dest="2" event="6"/>
+		<Transition source="2" dest="2" event="7"/>
+		<Transition source="2" dest="0" event="8"/>
+		<Transition source="3" dest="3" event="1"/>
+		<Transition source="3" dest="3" event="3"/>
+		<Transition source="3" dest="3" event="4"/>
+		<Transition source="3" dest="3" event="5"/>
+		<Transition source="3" dest="3" event="6"/>
+		<Transition source="3" dest="0" event="7"/>
+		<Transition source="3" dest="3" event="8"/>
+		<Transition source="4" dest="4" event="2"/>
+		<Transition source="4" dest="4" event="3"/>
+		<Transition source="4" dest="4" event="4"/>
+		<Transition source="4" dest="4" event="5"/>
+		<Transition source="4" dest="4" event="6"/>
+		<Transition source="4" dest="4" event="7"/>
+		<Transition source="4" dest="0" event="8"/>
+	</Transitions>
+</Automaton>
+<Automaton name="s_crane3" type="Specification">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e11"/>
+		<Event id="2" label="e21"/>
+		<Event id="3" label="e212" controllable="false"/>
+		<Event id="4" label="e214" controllable="false"/>
+		<Event id="5" label="e30" controllable="false"/>
+		<Event id="6" label="e35"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="0" event="5"/>
+		<Transition source="0" dest="2" event="3"/>
+		<Transition source="0" dest="1" event="4"/>
+		<Transition source="1" dest="1" event="1"/>
+		<Transition source="1" dest="0" event="5"/>
+		<Transition source="1" dest="1" event="6"/>
+		<Transition source="1" dest="1" event="3"/>
+		<Transition source="1" dest="1" event="4"/>
+		<Transition source="2" dest="2" event="2"/>
+		<Transition source="2" dest="0" event="5"/>
+		<Transition source="2" dest="2" event="6"/>
+		<Transition source="2" dest="2" event="3"/>
+		<Transition source="2" dest="2" event="4"/>
+	</Transitions>
+</Automaton>
+<Automaton name="sens_it2" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e104" controllable="false"/>
+		<Event id="2" label="e114" controllable="false"/>
+		<Event id="3" label="e124" controllable="false"/>
+		<Event id="4" label="e134" controllable="false"/>
+		<Event id="5" label="e14" controllable="false"/>
+		<Event id="6" label="e144" controllable="false"/>
+		<Event id="7" label="e154" controllable="false"/>
+		<Event id="8" label="e164" controllable="false"/>
+		<Event id="9" label="e194" controllable="false"/>
+		<Event id="10" label="e204" controllable="false"/>
+		<Event id="11" label="e214" controllable="false"/>
+		<Event id="12" label="e224" controllable="false"/>
+		<Event id="13" label="e234" controllable="false"/>
+		<Event id="14" label="e24" controllable="false"/>
+		<Event id="15" label="e244" controllable="false"/>
+		<Event id="16" label="e254" controllable="false"/>
+		<Event id="17" label="e264" controllable="false"/>
+		<Event id="18" label="e274" controllable="false"/>
+		<Event id="19" label="e34" controllable="false"/>
+		<Event id="20" label="e4" controllable="false"/>
+		<Event id="21" label="e44" controllable="false"/>
+		<Event id="22" label="e54" controllable="false"/>
+		<Event id="23" label="e64" controllable="false"/>
+		<Event id="24" label="e74" controllable="false"/>
+		<Event id="25" label="e84" controllable="false"/>
+		<Event id="26" label="e94" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s10"/>
+		<State id="3" name="s11"/>
+		<State id="4" name="s12"/>
+		<State id="5" name="s13"/>
+		<State id="6" name="s14"/>
+		<State id="7" name="s15"/>
+		<State id="8" name="s16"/>
+		<State id="9" name="s17"/>
+		<State id="10" name="s18"/>
+		<State id="11" name="s19"/>
+		<State id="12" name="s2"/>
+		<State id="13" name="s20"/>
+		<State id="14" name="s21"/>
+		<State id="15" name="s22"/>
+		<State id="16" name="s3"/>
+		<State id="17" name="s4"/>
+		<State id="18" name="s5"/>
+		<State id="19" name="s6"/>
+		<State id="20" name="s7"/>
+		<State id="21" name="s8"/>
+		<State id="22" name="s9"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="8"/>
+		<Transition source="1" dest="12" event="6"/>
+		<Transition source="2" dest="3" event="5"/>
+		<Transition source="2" dest="7" event="9"/>
+		<Transition source="3" dest="4" event="20"/>
+		<Transition source="4" dest="5" event="14"/>
+		<Transition source="5" dest="14" event="21"/>
+		<Transition source="6" dest="21" event="24"/>
+		<Transition source="7" dest="8" event="10"/>
+		<Transition source="8" dest="9" event="11"/>
+		<Transition source="9" dest="10" event="12"/>
+		<Transition source="10" dest="15" event="13"/>
+		<Transition source="11" dest="13" event="17"/>
+		<Transition source="12" dest="16" event="3"/>
+		<Transition source="13" dest="1" event="16"/>
+		<Transition source="14" dest="6" event="23"/>
+		<Transition source="14" dest="18" event="18"/>
+		<Transition source="15" dest="11" event="15"/>
+		<Transition source="16" dest="21" event="25"/>
+		<Transition source="16" dest="17" event="1"/>
+		<Transition source="17" dest="18" event="26"/>
+		<Transition source="18" dest="19" event="2"/>
+		<Transition source="19" dest="20" event="4"/>
+		<Transition source="20" dest="0" event="7"/>
+		<Transition source="21" dest="22" event="22"/>
+		<Transition source="22" dest="2" event="19"/>
+	</Transitions>
+</Automaton>
+<Automaton name="t1_sen" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e102" controllable="false"/>
+		<Event id="2" label="e11"/>
+		<Event id="3" label="e112" controllable="false"/>
+		<Event id="4" label="e12" controllable="false"/>
+		<Event id="5" label="e122" controllable="false"/>
+		<Event id="6" label="e132" controllable="false"/>
+		<Event id="7" label="e142" controllable="false"/>
+		<Event id="8" label="e152" controllable="false"/>
+		<Event id="9" label="e16" controllable="false"/>
+		<Event id="10" label="e162" controllable="false"/>
+		<Event id="11" label="e192" controllable="false"/>
+		<Event id="12" label="e2" controllable="false"/>
+		<Event id="13" label="e202" controllable="false"/>
+		<Event id="14" label="e212" controllable="false"/>
+		<Event id="15" label="e22" controllable="false"/>
+		<Event id="16" label="e222" controllable="false"/>
+		<Event id="17" label="e232" controllable="false"/>
+		<Event id="18" label="e242" controllable="false"/>
+		<Event id="19" label="e252" controllable="false"/>
+		<Event id="20" label="e262" controllable="false"/>
+		<Event id="21" label="e272" controllable="false"/>
+		<Event id="22" label="e32" controllable="false"/>
+		<Event id="23" label="e42" controllable="false"/>
+		<Event id="24" label="e52" controllable="false"/>
+		<Event id="25" label="e62" controllable="false"/>
+		<Event id="26" label="e72" controllable="false"/>
+		<Event id="27" label="e82" controllable="false"/>
+		<Event id="28" label="e92" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="1" dest="2" event="12"/>
+		<Transition source="1" dest="2" event="4"/>
+		<Transition source="1" dest="0" event="9"/>
+		<Transition source="1" dest="2" event="15"/>
+		<Transition source="1" dest="2" event="22"/>
+		<Transition source="1" dest="2" event="23"/>
+		<Transition source="1" dest="2" event="24"/>
+		<Transition source="1" dest="2" event="25"/>
+		<Transition source="1" dest="2" event="26"/>
+		<Transition source="1" dest="2" event="27"/>
+		<Transition source="1" dest="2" event="28"/>
+		<Transition source="1" dest="2" event="1"/>
+		<Transition source="1" dest="2" event="3"/>
+		<Transition source="1" dest="2" event="5"/>
+		<Transition source="1" dest="2" event="6"/>
+		<Transition source="1" dest="2" event="7"/>
+		<Transition source="1" dest="2" event="8"/>
+		<Transition source="1" dest="2" event="10"/>
+		<Transition source="1" dest="2" event="11"/>
+		<Transition source="1" dest="2" event="13"/>
+		<Transition source="1" dest="2" event="14"/>
+		<Transition source="1" dest="2" event="16"/>
+		<Transition source="1" dest="2" event="17"/>
+		<Transition source="1" dest="2" event="18"/>
+		<Transition source="1" dest="2" event="19"/>
+		<Transition source="1" dest="2" event="20"/>
+		<Transition source="1" dest="2" event="21"/>
+		<Transition source="2" dest="0" event="9"/>
+	</Transitions>
+</Automaton>
+<Automaton name="rs19" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e192" controllable="false"/>
+		<Event id="2" label="e194" controllable="false"/>
+		<Event id="3" label="e198" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="1" dest="0" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="rs25" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e252" controllable="false"/>
+		<Event id="2" label="e254" controllable="false"/>
+		<Event id="3" label="e258" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="1" dest="0" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="rs6" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e62" controllable="false"/>
+		<Event id="2" label="e64" controllable="false"/>
+		<Event id="3" label="e68" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="1" dest="0" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="srt1_sw5" type="Specification">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e11"/>
+		<Event id="2" label="e21"/>
+		<Event id="3" label="e51"/>
+		<Event id="4" label="e57"/>
+		<Event id="5" label="e59"/>
+		<Event id="6" label="e82" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1" accepting="true"/>
+		<State id="2" name="s2" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="0" event="5"/>
+		<Transition source="0" dest="1" event="6"/>
+		<Transition source="1" dest="2" event="3"/>
+		<Transition source="1" dest="1" event="4"/>
+		<Transition source="1" dest="1" event="5"/>
+		<Transition source="1" dest="1" event="6"/>
+		<Transition source="2" dest="0" event="4"/>
+		<Transition source="2" dest="2" event="6"/>
+	</Transitions>
+</Automaton>
+<Automaton name="rs5" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e52" controllable="false"/>
+		<Event id="2" label="e54" controllable="false"/>
+		<Event id="3" label="e58" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="1" dest="0" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="cp_15_16" type="Specification">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e11"/>
+		<Event id="2" label="e132" controllable="false"/>
+		<Event id="3" label="e134" controllable="false"/>
+		<Event id="4" label="e142" controllable="false"/>
+		<Event id="5" label="e144" controllable="false"/>
+		<Event id="6" label="e152" controllable="false"/>
+		<Event id="7" label="e154" controllable="false"/>
+		<Event id="8" label="e21"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1" accepting="true"/>
+		<State id="2" name="s2" accepting="true"/>
+		<State id="3" name="s3" accepting="true"/>
+		<State id="4" name="s4" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="0" event="8"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="2" event="5"/>
+		<Transition source="0" dest="0" event="6"/>
+		<Transition source="0" dest="0" event="7"/>
+		<Transition source="1" dest="1" event="8"/>
+		<Transition source="1" dest="1" event="2"/>
+		<Transition source="1" dest="1" event="3"/>
+		<Transition source="1" dest="1" event="4"/>
+		<Transition source="1" dest="2" event="5"/>
+		<Transition source="1" dest="1" event="6"/>
+		<Transition source="1" dest="1" event="7"/>
+		<Transition source="2" dest="2" event="1"/>
+		<Transition source="2" dest="2" event="8"/>
+		<Transition source="2" dest="2" event="2"/>
+		<Transition source="2" dest="2" event="3"/>
+		<Transition source="2" dest="2" event="4"/>
+		<Transition source="2" dest="2" event="5"/>
+		<Transition source="2" dest="3" event="6"/>
+		<Transition source="2" dest="0" event="7"/>
+		<Transition source="3" dest="3" event="1"/>
+		<Transition source="3" dest="3" event="8"/>
+		<Transition source="3" dest="3" event="2"/>
+		<Transition source="3" dest="4" event="3"/>
+		<Transition source="3" dest="2" event="4"/>
+		<Transition source="3" dest="3" event="5"/>
+		<Transition source="3" dest="3" event="6"/>
+		<Transition source="3" dest="3" event="7"/>
+		<Transition source="4" dest="4" event="1"/>
+		<Transition source="4" dest="4" event="2"/>
+		<Transition source="4" dest="4" event="3"/>
+		<Transition source="4" dest="2" event="4"/>
+		<Transition source="4" dest="4" event="5"/>
+		<Transition source="4" dest="4" event="6"/>
+		<Transition source="4" dest="4" event="7"/>
+	</Transitions>
+</Automaton>
+<Automaton name="ms_sw5t1" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e192" controllable="false"/>
+		<Event id="2" label="e272" controllable="false"/>
+		<Event id="3" label="e52" controllable="false"/>
+		<Event id="4" label="e57"/>
+		<Event id="5" label="e59"/>
+		<Event id="6" label="e72" controllable="false"/>
+		<Event id="7" label="e82" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+		<State id="3" name="s3"/>
+		<State id="4" name="s4"/>
+		<State id="5" name="s5"/>
+		<State id="6" name="s6"/>
+		<State id="7" name="s7"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="6" event="4"/>
+		<Transition source="0" dest="0" event="5"/>
+		<Transition source="0" dest="3" event="6"/>
+		<Transition source="0" dest="2" event="1"/>
+		<Transition source="0" dest="2" event="2"/>
+		<Transition source="1" dest="5" event="4"/>
+		<Transition source="1" dest="1" event="5"/>
+		<Transition source="2" dest="4" event="4"/>
+		<Transition source="2" dest="2" event="5"/>
+		<Transition source="2" dest="1" event="7"/>
+		<Transition source="3" dest="0" event="3"/>
+		<Transition source="3" dest="7" event="4"/>
+		<Transition source="3" dest="3" event="5"/>
+		<Transition source="4" dest="4" event="4"/>
+		<Transition source="4" dest="2" event="5"/>
+		<Transition source="4" dest="5" event="7"/>
+		<Transition source="5" dest="6" event="3"/>
+		<Transition source="5" dest="5" event="4"/>
+		<Transition source="5" dest="1" event="5"/>
+		<Transition source="6" dest="6" event="4"/>
+		<Transition source="6" dest="0" event="5"/>
+		<Transition source="6" dest="7" event="6"/>
+		<Transition source="6" dest="4" event="1"/>
+		<Transition source="6" dest="4" event="2"/>
+		<Transition source="7" dest="7" event="4"/>
+		<Transition source="7" dest="3" event="5"/>
+	</Transitions>
+</Automaton>
+<Automaton name="cp_11_13" type="Specification">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e11"/>
+		<Event id="2" label="e152" controllable="false"/>
+		<Event id="3" label="e154" controllable="false"/>
+		<Event id="4" label="e21"/>
+		<Event id="5" label="e272" controllable="false"/>
+		<Event id="6" label="e274" controllable="false"/>
+		<Event id="7" label="e61"/>
+		<Event id="8" label="e63"/>
+		<Event id="9" label="e92" controllable="false"/>
+		<Event id="10" label="e94" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1" accepting="true"/>
+		<State id="2" name="s2" accepting="true"/>
+		<State id="3" name="s3" accepting="true"/>
+		<State id="4" name="s4" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="0" event="7"/>
+		<Transition source="0" dest="0" event="8"/>
+		<Transition source="0" dest="1" event="9"/>
+		<Transition source="0" dest="2" event="10"/>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="0" dest="1" event="5"/>
+		<Transition source="0" dest="2" event="6"/>
+		<Transition source="1" dest="1" event="1"/>
+		<Transition source="1" dest="1" event="4"/>
+		<Transition source="1" dest="1" event="7"/>
+		<Transition source="1" dest="1" event="8"/>
+		<Transition source="1" dest="1" event="9"/>
+		<Transition source="1" dest="3" event="10"/>
+		<Transition source="1" dest="0" event="2"/>
+		<Transition source="1" dest="1" event="3"/>
+		<Transition source="1" dest="1" event="5"/>
+		<Transition source="1" dest="3" event="6"/>
+		<Transition source="2" dest="2" event="1"/>
+		<Transition source="2" dest="2" event="4"/>
+		<Transition source="2" dest="2" event="7"/>
+		<Transition source="2" dest="2" event="8"/>
+		<Transition source="2" dest="4" event="9"/>
+		<Transition source="2" dest="2" event="10"/>
+		<Transition source="2" dest="2" event="2"/>
+		<Transition source="2" dest="0" event="3"/>
+		<Transition source="2" dest="4" event="5"/>
+		<Transition source="2" dest="2" event="6"/>
+		<Transition source="3" dest="3" event="1"/>
+		<Transition source="3" dest="3" event="7"/>
+		<Transition source="3" dest="3" event="9"/>
+		<Transition source="3" dest="3" event="10"/>
+		<Transition source="3" dest="2" event="2"/>
+		<Transition source="3" dest="3" event="3"/>
+		<Transition source="3" dest="3" event="5"/>
+		<Transition source="3" dest="3" event="6"/>
+		<Transition source="4" dest="4" event="4"/>
+		<Transition source="4" dest="4" event="8"/>
+		<Transition source="4" dest="4" event="9"/>
+		<Transition source="4" dest="4" event="10"/>
+		<Transition source="4" dest="4" event="2"/>
+		<Transition source="4" dest="1" event="3"/>
+		<Transition source="4" dest="4" event="5"/>
+		<Transition source="4" dest="4" event="6"/>
+	</Transitions>
+</Automaton>
+<Automaton name="rs23" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e232" controllable="false"/>
+		<Event id="2" label="e234" controllable="false"/>
+		<Event id="3" label="e238" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="1" dest="0" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="req_sw8" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e807"/>
+		<Event id="2" label="e809"/>
+		<Event id="3" label="e81"/>
+		<Event id="4" label="e83"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="0" dest="1" event="4"/>
+		<Transition source="1" dest="2" event="3"/>
+		<Transition source="1" dest="2" event="4"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="1" dest="0" event="2"/>
+		<Transition source="2" dest="1" event="1"/>
+		<Transition source="2" dest="1" event="2"/>
+	</Transitions>
+</Automaton>
+<Automaton name="req_sw5" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e51"/>
+		<Event id="2" label="e53"/>
+		<Event id="3" label="e57"/>
+		<Event id="4" label="e59"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="1" dest="2" event="1"/>
+		<Transition source="1" dest="2" event="2"/>
+		<Transition source="1" dest="0" event="3"/>
+		<Transition source="1" dest="0" event="4"/>
+		<Transition source="2" dest="1" event="3"/>
+		<Transition source="2" dest="1" event="4"/>
+	</Transitions>
+</Automaton>
+<Automaton name="rs12" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e122" controllable="false"/>
+		<Event id="2" label="e124" controllable="false"/>
+		<Event id="3" label="e128" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="1" dest="0" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="cp_3_5_fix1" type="Specification">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e11"/>
+		<Event id="2" label="e12" controllable="false"/>
+		<Event id="3" label="e14" controllable="false"/>
+		<Event id="4" label="e192" controllable="false"/>
+		<Event id="5" label="e194" controllable="false"/>
+		<Event id="6" label="e21"/>
+		<Event id="7" label="e51"/>
+		<Event id="8" label="e53"/>
+		<Event id="9" label="e72" controllable="false"/>
+		<Event id="10" label="e74" controllable="false"/>
+		<Event id="11" label="e82" controllable="false"/>
+		<Event id="12" label="e84" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1" accepting="true"/>
+		<State id="2" name="s2" accepting="true"/>
+		<State id="3" name="s3" accepting="true"/>
+		<State id="4" name="s4" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="0" dest="0" event="6"/>
+		<Transition source="0" dest="0" event="7"/>
+		<Transition source="0" dest="0" event="8"/>
+		<Transition source="0" dest="1" event="9"/>
+		<Transition source="0" dest="2" event="10"/>
+		<Transition source="0" dest="1" event="11"/>
+		<Transition source="0" dest="2" event="12"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="0" event="5"/>
+		<Transition source="1" dest="1" event="1"/>
+		<Transition source="1" dest="0" event="2"/>
+		<Transition source="1" dest="1" event="3"/>
+		<Transition source="1" dest="1" event="6"/>
+		<Transition source="1" dest="1" event="7"/>
+		<Transition source="1" dest="1" event="8"/>
+		<Transition source="1" dest="1" event="9"/>
+		<Transition source="1" dest="3" event="10"/>
+		<Transition source="1" dest="1" event="11"/>
+		<Transition source="1" dest="3" event="12"/>
+		<Transition source="1" dest="0" event="4"/>
+		<Transition source="1" dest="1" event="5"/>
+		<Transition source="2" dest="2" event="1"/>
+		<Transition source="2" dest="2" event="2"/>
+		<Transition source="2" dest="0" event="3"/>
+		<Transition source="2" dest="2" event="6"/>
+		<Transition source="2" dest="2" event="7"/>
+		<Transition source="2" dest="2" event="8"/>
+		<Transition source="2" dest="4" event="9"/>
+		<Transition source="2" dest="2" event="10"/>
+		<Transition source="2" dest="4" event="11"/>
+		<Transition source="2" dest="2" event="12"/>
+		<Transition source="2" dest="2" event="4"/>
+		<Transition source="2" dest="0" event="5"/>
+		<Transition source="3" dest="3" event="1"/>
+		<Transition source="3" dest="2" event="2"/>
+		<Transition source="3" dest="3" event="3"/>
+		<Transition source="3" dest="3" event="7"/>
+		<Transition source="3" dest="3" event="9"/>
+		<Transition source="3" dest="3" event="10"/>
+		<Transition source="3" dest="3" event="11"/>
+		<Transition source="3" dest="3" event="12"/>
+		<Transition source="3" dest="2" event="4"/>
+		<Transition source="3" dest="3" event="5"/>
+		<Transition source="4" dest="4" event="2"/>
+		<Transition source="4" dest="1" event="3"/>
+		<Transition source="4" dest="4" event="6"/>
+		<Transition source="4" dest="4" event="8"/>
+		<Transition source="4" dest="4" event="9"/>
+		<Transition source="4" dest="4" event="10"/>
+		<Transition source="4" dest="4" event="11"/>
+		<Transition source="4" dest="4" event="12"/>
+		<Transition source="4" dest="4" event="4"/>
+		<Transition source="4" dest="1" event="5"/>
+	</Transitions>
+</Automaton>
+<Automaton name="ms_sw6t2" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e114" controllable="false"/>
+		<Event id="2" label="e274" controllable="false"/>
+		<Event id="3" label="e67"/>
+		<Event id="4" label="e69"/>
+		<Event id="5" label="e94" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+		<State id="3" name="s3"/>
+		<State id="4" name="s4"/>
+		<State id="5" name="s5"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="3" event="3"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="1" event="5"/>
+		<Transition source="0" dest="2" event="2"/>
+		<Transition source="1" dest="4" event="3"/>
+		<Transition source="1" dest="1" event="4"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="2" dest="5" event="3"/>
+		<Transition source="2" dest="2" event="4"/>
+		<Transition source="3" dest="3" event="3"/>
+		<Transition source="3" dest="0" event="4"/>
+		<Transition source="3" dest="4" event="5"/>
+		<Transition source="3" dest="5" event="2"/>
+		<Transition source="4" dest="4" event="3"/>
+		<Transition source="4" dest="1" event="4"/>
+		<Transition source="5" dest="5" event="3"/>
+		<Transition source="5" dest="2" event="4"/>
+		<Transition source="5" dest="3" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="ms_sw6t1" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e112" controllable="false"/>
+		<Event id="2" label="e272" controllable="false"/>
+		<Event id="3" label="e67"/>
+		<Event id="4" label="e69"/>
+		<Event id="5" label="e92" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+		<State id="3" name="s3"/>
+		<State id="4" name="s4"/>
+		<State id="5" name="s5"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="3" event="3"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="1" event="5"/>
+		<Transition source="0" dest="2" event="2"/>
+		<Transition source="1" dest="4" event="3"/>
+		<Transition source="1" dest="1" event="4"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="2" dest="5" event="3"/>
+		<Transition source="2" dest="2" event="4"/>
+		<Transition source="3" dest="3" event="3"/>
+		<Transition source="3" dest="0" event="4"/>
+		<Transition source="3" dest="4" event="5"/>
+		<Transition source="3" dest="5" event="2"/>
+		<Transition source="4" dest="4" event="3"/>
+		<Transition source="4" dest="1" event="4"/>
+		<Transition source="5" dest="5" event="3"/>
+		<Transition source="5" dest="2" event="4"/>
+		<Transition source="5" dest="3" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="rs1" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e12" controllable="false"/>
+		<Event id="2" label="e14" controllable="false"/>
+		<Event id="3" label="e18" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="1" dest="0" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="rs26" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e262" controllable="false"/>
+		<Event id="2" label="e264" controllable="false"/>
+		<Event id="3" label="e268" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="1" dest="0" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="srt2_sw7" type="Specification">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e124" controllable="false"/>
+		<Event id="2" label="e144" controllable="false"/>
+		<Event id="3" label="e21"/>
+		<Event id="4" label="e73"/>
+		<Event id="5" label="e77"/>
+		<Event id="6" label="e79"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+		<State id="3" name="s3"/>
+		<State id="4" name="s4"/>
+		<State id="5" name="s5"/>
+		<State id="6" name="s6"/>
+		<State id="7" name="s7"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="0" dest="0" event="5"/>
+		<Transition source="0" dest="0" event="6"/>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="1" dest="1" event="3"/>
+		<Transition source="1" dest="1" event="5"/>
+		<Transition source="1" dest="1" event="6"/>
+		<Transition source="1" dest="2" event="1"/>
+		<Transition source="1" dest="1" event="2"/>
+		<Transition source="2" dest="3" event="4"/>
+		<Transition source="2" dest="2" event="5"/>
+		<Transition source="2" dest="2" event="6"/>
+		<Transition source="2" dest="2" event="1"/>
+		<Transition source="2" dest="2" event="2"/>
+		<Transition source="3" dest="4" event="6"/>
+		<Transition source="3" dest="3" event="1"/>
+		<Transition source="3" dest="3" event="2"/>
+		<Transition source="4" dest="4" event="3"/>
+		<Transition source="4" dest="4" event="5"/>
+		<Transition source="4" dest="4" event="6"/>
+		<Transition source="4" dest="4" event="1"/>
+		<Transition source="4" dest="5" event="2"/>
+		<Transition source="5" dest="5" event="3"/>
+		<Transition source="5" dest="5" event="5"/>
+		<Transition source="5" dest="5" event="6"/>
+		<Transition source="5" dest="6" event="1"/>
+		<Transition source="5" dest="5" event="2"/>
+		<Transition source="6" dest="7" event="4"/>
+		<Transition source="6" dest="6" event="5"/>
+		<Transition source="6" dest="6" event="6"/>
+		<Transition source="6" dest="6" event="1"/>
+		<Transition source="6" dest="6" event="2"/>
+		<Transition source="7" dest="0" event="5"/>
+		<Transition source="7" dest="7" event="1"/>
+		<Transition source="7" dest="7" event="2"/>
+	</Transitions>
+</Automaton>
+<Automaton name="ms_sw8t2" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e114" controllable="false"/>
+		<Event id="2" label="e144" controllable="false"/>
+		<Event id="3" label="e164" controllable="false"/>
+		<Event id="4" label="e194" controllable="false"/>
+		<Event id="5" label="e254" controllable="false"/>
+		<Event id="6" label="e800" controllable="false"/>
+		<Event id="7" label="e802" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+		<State id="3" name="s3"/>
+		<State id="4" name="s4"/>
+		<State id="5" name="s5"/>
+		<State id="6" name="s6"/>
+		<State id="7" name="s7"/>
+		<State id="8" name="s8"/>
+		<State id="9" name="s9"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="0" dest="5" event="7"/>
+		<Transition source="0" dest="0" event="6"/>
+		<Transition source="1" dest="2" event="2"/>
+		<Transition source="1" dest="6" event="7"/>
+		<Transition source="1" dest="1" event="6"/>
+		<Transition source="2" dest="3" event="4"/>
+		<Transition source="2" dest="0" event="1"/>
+		<Transition source="2" dest="7" event="7"/>
+		<Transition source="2" dest="2" event="6"/>
+		<Transition source="3" dest="4" event="5"/>
+		<Transition source="3" dest="8" event="7"/>
+		<Transition source="3" dest="3" event="6"/>
+		<Transition source="4" dest="9" event="7"/>
+		<Transition source="4" dest="4" event="6"/>
+		<Transition source="5" dest="6" event="3"/>
+		<Transition source="5" dest="0" event="6"/>
+		<Transition source="5" dest="5" event="7"/>
+		<Transition source="6" dest="1" event="6"/>
+		<Transition source="6" dest="6" event="7"/>
+		<Transition source="7" dest="8" event="4"/>
+		<Transition source="7" dest="5" event="1"/>
+		<Transition source="7" dest="2" event="6"/>
+		<Transition source="7" dest="7" event="7"/>
+		<Transition source="8" dest="9" event="5"/>
+		<Transition source="8" dest="3" event="6"/>
+		<Transition source="8" dest="8" event="7"/>
+		<Transition source="9" dest="7" event="2"/>
+		<Transition source="9" dest="4" event="6"/>
+		<Transition source="9" dest="9" event="7"/>
+	</Transitions>
+</Automaton>
+<Automaton name="rs2" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e22" controllable="false"/>
+		<Event id="2" label="e24" controllable="false"/>
+		<Event id="3" label="e28" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="1" dest="0" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="req_sw7" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e71"/>
+		<Event id="2" label="e73"/>
+		<Event id="3" label="e77"/>
+		<Event id="4" label="e79"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="1" dest="2" event="1"/>
+		<Transition source="1" dest="2" event="2"/>
+		<Transition source="1" dest="0" event="3"/>
+		<Transition source="1" dest="0" event="4"/>
+		<Transition source="2" dest="1" event="3"/>
+		<Transition source="2" dest="1" event="4"/>
+	</Transitions>
+</Automaton>
+<Automaton name="rs14" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e142" controllable="false"/>
+		<Event id="2" label="e144" controllable="false"/>
+		<Event id="3" label="e148" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="1" dest="0" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="cp_9_10" type="Specification">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e102" controllable="false"/>
+		<Event id="2" label="e104" controllable="false"/>
+		<Event id="3" label="e11"/>
+		<Event id="4" label="e112" controllable="false"/>
+		<Event id="5" label="e114" controllable="false"/>
+		<Event id="6" label="e122" controllable="false"/>
+		<Event id="7" label="e124" controllable="false"/>
+		<Event id="8" label="e21"/>
+		<Event id="9" label="e92" controllable="false"/>
+		<Event id="10" label="e94" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s10"/>
+		<State id="3" name="s2"/>
+		<State id="4" name="s3"/>
+		<State id="5" name="s4"/>
+		<State id="6" name="s5"/>
+		<State id="7" name="s6"/>
+		<State id="8" name="s7"/>
+		<State id="9" name="s8"/>
+		<State id="10" name="s9"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="0" dest="0" event="8"/>
+		<Transition source="0" dest="0" event="9"/>
+		<Transition source="0" dest="0" event="10"/>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="3" event="2"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="0" event="5"/>
+		<Transition source="0" dest="0" event="6"/>
+		<Transition source="0" dest="0" event="7"/>
+		<Transition source="1" dest="1" event="3"/>
+		<Transition source="1" dest="1" event="8"/>
+		<Transition source="1" dest="5" event="9"/>
+		<Transition source="1" dest="1" event="10"/>
+		<Transition source="1" dest="1" event="1"/>
+		<Transition source="1" dest="1" event="2"/>
+		<Transition source="1" dest="1" event="5"/>
+		<Transition source="1" dest="1" event="6"/>
+		<Transition source="1" dest="4" event="7"/>
+		<Transition source="2" dest="2" event="8"/>
+		<Transition source="2" dest="2" event="9"/>
+		<Transition source="2" dest="2" event="10"/>
+		<Transition source="2" dest="2" event="1"/>
+		<Transition source="2" dest="2" event="2"/>
+		<Transition source="2" dest="2" event="4"/>
+		<Transition source="2" dest="1" event="5"/>
+		<Transition source="2" dest="2" event="6"/>
+		<Transition source="2" dest="2" event="7"/>
+		<Transition source="3" dest="3" event="3"/>
+		<Transition source="3" dest="3" event="8"/>
+		<Transition source="3" dest="3" event="9"/>
+		<Transition source="3" dest="6" event="10"/>
+		<Transition source="3" dest="3" event="1"/>
+		<Transition source="3" dest="3" event="2"/>
+		<Transition source="3" dest="3" event="4"/>
+		<Transition source="3" dest="7" event="6"/>
+		<Transition source="3" dest="3" event="7"/>
+		<Transition source="4" dest="4" event="3"/>
+		<Transition source="4" dest="8" event="9"/>
+		<Transition source="4" dest="4" event="10"/>
+		<Transition source="4" dest="4" event="1"/>
+		<Transition source="4" dest="4" event="2"/>
+		<Transition source="4" dest="4" event="5"/>
+		<Transition source="4" dest="4" event="6"/>
+		<Transition source="4" dest="4" event="7"/>
+		<Transition source="5" dest="5" event="3"/>
+		<Transition source="5" dest="5" event="8"/>
+		<Transition source="5" dest="5" event="9"/>
+		<Transition source="5" dest="5" event="10"/>
+		<Transition source="5" dest="5" event="1"/>
+		<Transition source="5" dest="5" event="2"/>
+		<Transition source="5" dest="0" event="4"/>
+		<Transition source="5" dest="5" event="5"/>
+		<Transition source="5" dest="5" event="6"/>
+		<Transition source="5" dest="8" event="7"/>
+		<Transition source="6" dest="6" event="3"/>
+		<Transition source="6" dest="6" event="8"/>
+		<Transition source="6" dest="6" event="9"/>
+		<Transition source="6" dest="6" event="10"/>
+		<Transition source="6" dest="6" event="1"/>
+		<Transition source="6" dest="6" event="2"/>
+		<Transition source="6" dest="6" event="4"/>
+		<Transition source="6" dest="0" event="5"/>
+		<Transition source="6" dest="9" event="6"/>
+		<Transition source="6" dest="6" event="7"/>
+		<Transition source="7" dest="7" event="8"/>
+		<Transition source="7" dest="7" event="9"/>
+		<Transition source="7" dest="9" event="10"/>
+		<Transition source="7" dest="7" event="1"/>
+		<Transition source="7" dest="7" event="2"/>
+		<Transition source="7" dest="7" event="4"/>
+		<Transition source="7" dest="7" event="6"/>
+		<Transition source="7" dest="7" event="7"/>
+		<Transition source="8" dest="8" event="3"/>
+		<Transition source="8" dest="8" event="8"/>
+		<Transition source="8" dest="8" event="9"/>
+		<Transition source="8" dest="8" event="10"/>
+		<Transition source="8" dest="8" event="1"/>
+		<Transition source="8" dest="10" event="2"/>
+		<Transition source="8" dest="0" event="4"/>
+		<Transition source="8" dest="8" event="5"/>
+		<Transition source="8" dest="8" event="6"/>
+		<Transition source="8" dest="8" event="7"/>
+		<Transition source="9" dest="9" event="3"/>
+		<Transition source="9" dest="9" event="8"/>
+		<Transition source="9" dest="9" event="9"/>
+		<Transition source="9" dest="9" event="10"/>
+		<Transition source="9" dest="2" event="1"/>
+		<Transition source="9" dest="9" event="2"/>
+		<Transition source="9" dest="9" event="4"/>
+		<Transition source="9" dest="0" event="5"/>
+		<Transition source="9" dest="9" event="6"/>
+		<Transition source="9" dest="9" event="7"/>
+		<Transition source="10" dest="10" event="3"/>
+		<Transition source="10" dest="10" event="9"/>
+		<Transition source="10" dest="10" event="10"/>
+		<Transition source="10" dest="10" event="1"/>
+		<Transition source="10" dest="10" event="2"/>
+		<Transition source="10" dest="3" event="4"/>
+		<Transition source="10" dest="10" event="5"/>
+		<Transition source="10" dest="10" event="6"/>
+	</Transitions>
+</Automaton>
+<Automaton name="srt1_sw6" type="Specification">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e11"/>
+		<Event id="2" label="e272" controllable="false"/>
+		<Event id="3" label="e61"/>
+		<Event id="4" label="e67"/>
+		<Event id="5" label="e69"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1" accepting="true"/>
+		<State id="2" name="s2" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="0" event="5"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="1" dest="2" event="3"/>
+		<Transition source="1" dest="1" event="4"/>
+		<Transition source="1" dest="1" event="5"/>
+		<Transition source="1" dest="1" event="2"/>
+		<Transition source="2" dest="0" event="4"/>
+		<Transition source="2" dest="2" event="2"/>
+	</Transitions>
+</Automaton>
+<Automaton name="cp_12_14" type="Specification">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e102" controllable="false"/>
+		<Event id="2" label="e104" controllable="false"/>
+		<Event id="3" label="e11"/>
+		<Event id="4" label="e162" controllable="false"/>
+		<Event id="5" label="e164" controllable="false"/>
+		<Event id="6" label="e21"/>
+		<Event id="7" label="e252" controllable="false"/>
+		<Event id="8" label="e254" controllable="false"/>
+		<Event id="9" label="e81"/>
+		<Event id="10" label="e82" controllable="false"/>
+		<Event id="11" label="e83"/>
+		<Event id="12" label="e84" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1" accepting="true"/>
+		<State id="2" name="s2" accepting="true"/>
+		<State id="3" name="s3" accepting="true"/>
+		<State id="4" name="s4" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="0" dest="0" event="6"/>
+		<Transition source="0" dest="0" event="9"/>
+		<Transition source="0" dest="0" event="10"/>
+		<Transition source="0" dest="0" event="11"/>
+		<Transition source="0" dest="0" event="12"/>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="1" event="4"/>
+		<Transition source="0" dest="2" event="5"/>
+		<Transition source="0" dest="1" event="7"/>
+		<Transition source="0" dest="2" event="8"/>
+		<Transition source="1" dest="1" event="3"/>
+		<Transition source="1" dest="1" event="6"/>
+		<Transition source="1" dest="1" event="9"/>
+		<Transition source="1" dest="0" event="10"/>
+		<Transition source="1" dest="1" event="11"/>
+		<Transition source="1" dest="1" event="12"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="1" dest="0" event="2"/>
+		<Transition source="1" dest="1" event="4"/>
+		<Transition source="1" dest="3" event="5"/>
+		<Transition source="1" dest="1" event="7"/>
+		<Transition source="1" dest="3" event="8"/>
+		<Transition source="2" dest="2" event="3"/>
+		<Transition source="2" dest="2" event="6"/>
+		<Transition source="2" dest="2" event="9"/>
+		<Transition source="2" dest="2" event="10"/>
+		<Transition source="2" dest="2" event="11"/>
+		<Transition source="2" dest="0" event="12"/>
+		<Transition source="2" dest="2" event="1"/>
+		<Transition source="2" dest="0" event="2"/>
+		<Transition source="2" dest="4" event="4"/>
+		<Transition source="2" dest="2" event="5"/>
+		<Transition source="2" dest="4" event="7"/>
+		<Transition source="2" dest="2" event="8"/>
+		<Transition source="3" dest="3" event="3"/>
+		<Transition source="3" dest="3" event="9"/>
+		<Transition source="3" dest="2" event="10"/>
+		<Transition source="3" dest="3" event="12"/>
+		<Transition source="3" dest="2" event="1"/>
+		<Transition source="3" dest="3" event="2"/>
+		<Transition source="3" dest="3" event="4"/>
+		<Transition source="3" dest="3" event="5"/>
+		<Transition source="3" dest="3" event="7"/>
+		<Transition source="3" dest="3" event="8"/>
+		<Transition source="4" dest="4" event="6"/>
+		<Transition source="4" dest="4" event="10"/>
+		<Transition source="4" dest="4" event="11"/>
+		<Transition source="4" dest="1" event="12"/>
+		<Transition source="4" dest="4" event="1"/>
+		<Transition source="4" dest="1" event="2"/>
+		<Transition source="4" dest="4" event="4"/>
+		<Transition source="4" dest="4" event="5"/>
+		<Transition source="4" dest="4" event="7"/>
+		<Transition source="4" dest="4" event="8"/>
+	</Transitions>
+</Automaton>
+<Automaton name="rs27" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e272" controllable="false"/>
+		<Event id="2" label="e274" controllable="false"/>
+		<Event id="3" label="e278" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="1" dest="0" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="crane1" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e10" controllable="false"/>
+		<Event id="2" label="e15"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="1" dest="0" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="rs13" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e132" controllable="false"/>
+		<Event id="2" label="e134" controllable="false"/>
+		<Event id="3" label="e138" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="1" dest="0" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="sw3" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e300" controllable="false"/>
+		<Event id="2" label="e302" controllable="false"/>
+		<Event id="3" label="e307"/>
+		<Event id="4" label="e309"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="0" dest="2" event="4"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="2" dest="0" event="2"/>
+	</Transitions>
+</Automaton>
+<Automaton name="srt2_sw3" type="Specification">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e21"/>
+		<Event id="2" label="e300" controllable="false"/>
+		<Event id="3" label="e302" controllable="false"/>
+		<Event id="4" label="e307"/>
+		<Event id="5" label="e309"/>
+		<Event id="6" label="e33"/>
+		<Event id="7" label="e34" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1" accepting="true"/>
+		<State id="2" name="s2" accepting="true"/>
+		<State id="3" name="s3" accepting="true"/>
+		<State id="4" name="s4" accepting="true"/>
+		<State id="5" name="s5" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="1" event="7"/>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="0" event="5"/>
+		<Transition source="1" dest="2" event="6"/>
+		<Transition source="1" dest="1" event="7"/>
+		<Transition source="1" dest="0" event="2"/>
+		<Transition source="1" dest="1" event="3"/>
+		<Transition source="1" dest="1" event="4"/>
+		<Transition source="1" dest="1" event="5"/>
+		<Transition source="2" dest="2" event="7"/>
+		<Transition source="2" dest="2" event="2"/>
+		<Transition source="2" dest="3" event="3"/>
+		<Transition source="2" dest="2" event="5"/>
+		<Transition source="3" dest="3" event="1"/>
+		<Transition source="3" dest="4" event="7"/>
+		<Transition source="3" dest="3" event="2"/>
+		<Transition source="3" dest="3" event="3"/>
+		<Transition source="3" dest="3" event="4"/>
+		<Transition source="3" dest="3" event="5"/>
+		<Transition source="4" dest="5" event="6"/>
+		<Transition source="4" dest="4" event="7"/>
+		<Transition source="4" dest="4" event="2"/>
+		<Transition source="4" dest="4" event="3"/>
+		<Transition source="4" dest="4" event="4"/>
+		<Transition source="4" dest="4" event="5"/>
+		<Transition source="5" dest="5" event="7"/>
+		<Transition source="5" dest="0" event="2"/>
+		<Transition source="5" dest="5" event="3"/>
+		<Transition source="5" dest="5" event="4"/>
+	</Transitions>
+</Automaton>
+<Automaton name="ms_sw3t2" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e14" controllable="false"/>
+		<Event id="2" label="e194" controllable="false"/>
+		<Event id="3" label="e300" controllable="false"/>
+		<Event id="4" label="e302" controllable="false"/>
+		<Event id="5" label="e34" controllable="false"/>
+		<Event id="6" label="e38" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+		<State id="3" name="s3"/>
+		<State id="4" name="s4"/>
+		<State id="5" name="s5"/>
+		<State id="6" name="s6"/>
+		<State id="7" name="s7"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="4" event="3"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="1" event="5"/>
+		<Transition source="0" dest="0" event="6"/>
+		<Transition source="1" dest="5" event="3"/>
+		<Transition source="1" dest="1" event="4"/>
+		<Transition source="1" dest="2" event="6"/>
+		<Transition source="2" dest="3" event="3"/>
+		<Transition source="2" dest="2" event="4"/>
+		<Transition source="2" dest="0" event="1"/>
+		<Transition source="2" dest="2" event="6"/>
+		<Transition source="3" dest="3" event="3"/>
+		<Transition source="3" dest="7" event="4"/>
+		<Transition source="3" dest="4" event="2"/>
+		<Transition source="3" dest="4" event="1"/>
+		<Transition source="3" dest="3" event="6"/>
+		<Transition source="4" dest="4" event="3"/>
+		<Transition source="4" dest="0" event="4"/>
+		<Transition source="4" dest="5" event="5"/>
+		<Transition source="4" dest="4" event="6"/>
+		<Transition source="5" dest="5" event="3"/>
+		<Transition source="5" dest="1" event="4"/>
+		<Transition source="5" dest="6" event="6"/>
+		<Transition source="6" dest="6" event="3"/>
+		<Transition source="6" dest="7" event="4"/>
+		<Transition source="6" dest="4" event="2"/>
+		<Transition source="6" dest="6" event="6"/>
+		<Transition source="7" dest="3" event="3"/>
+		<Transition source="7" dest="7" event="4"/>
+		<Transition source="7" dest="0" event="2"/>
+		<Transition source="7" dest="0" event="1"/>
+		<Transition source="7" dest="7" event="6"/>
+	</Transitions>
+</Automaton>
+<Automaton name="rs20" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e202" controllable="false"/>
+		<Event id="2" label="e204" controllable="false"/>
+		<Event id="3" label="e208" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="1" dest="0" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="s_crane1" type="Specification">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e10" controllable="false"/>
+		<Event id="2" label="e11"/>
+		<Event id="3" label="e132" controllable="false"/>
+		<Event id="4" label="e134" controllable="false"/>
+		<Event id="5" label="e15"/>
+		<Event id="6" label="e21"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="0" event="6"/>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="0" dest="2" event="4"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="1" dest="1" event="5"/>
+		<Transition source="1" dest="1" event="6"/>
+		<Transition source="1" dest="1" event="3"/>
+		<Transition source="1" dest="1" event="4"/>
+		<Transition source="2" dest="0" event="1"/>
+		<Transition source="2" dest="2" event="2"/>
+		<Transition source="2" dest="2" event="5"/>
+		<Transition source="2" dest="2" event="3"/>
+		<Transition source="2" dest="2" event="4"/>
+	</Transitions>
+</Automaton>
+<Automaton name="srt1_sw7" type="Specification">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e122" controllable="false"/>
+		<Event id="2" label="e21"/>
+		<Event id="3" label="e71"/>
+		<Event id="4" label="e77"/>
+		<Event id="5" label="e79"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1" accepting="true"/>
+		<State id="2" name="s2" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="0" event="5"/>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="2" event="3"/>
+		<Transition source="1" dest="1" event="4"/>
+		<Transition source="1" dest="1" event="5"/>
+		<Transition source="1" dest="1" event="1"/>
+		<Transition source="2" dest="0" event="4"/>
+		<Transition source="2" dest="2" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="rs0" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e2" controllable="false"/>
+		<Event id="2" label="e4" controllable="false"/>
+		<Event id="3" label="e8" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="1" dest="0" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="ms_sw4t2" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e274" controllable="false"/>
+		<Event id="2" label="e44" controllable="false"/>
+		<Event id="3" label="e47"/>
+		<Event id="4" label="e48" controllable="false"/>
+		<Event id="5" label="e49"/>
+		<Event id="6" label="e64" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+		<State id="3" name="s3"/>
+		<State id="4" name="s4"/>
+		<State id="5" name="s5"/>
+		<State id="6" name="s6"/>
+		<State id="7" name="s7"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="4" event="3"/>
+		<Transition source="0" dest="0" event="5"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="1" dest="5" event="3"/>
+		<Transition source="1" dest="1" event="5"/>
+		<Transition source="1" dest="2" event="4"/>
+		<Transition source="2" dest="3" event="3"/>
+		<Transition source="2" dest="2" event="5"/>
+		<Transition source="2" dest="0" event="6"/>
+		<Transition source="2" dest="2" event="4"/>
+		<Transition source="3" dest="3" event="3"/>
+		<Transition source="3" dest="7" event="5"/>
+		<Transition source="3" dest="4" event="1"/>
+		<Transition source="3" dest="4" event="6"/>
+		<Transition source="3" dest="3" event="4"/>
+		<Transition source="4" dest="4" event="3"/>
+		<Transition source="4" dest="0" event="5"/>
+		<Transition source="4" dest="5" event="2"/>
+		<Transition source="4" dest="4" event="4"/>
+		<Transition source="5" dest="5" event="3"/>
+		<Transition source="5" dest="1" event="5"/>
+		<Transition source="5" dest="6" event="4"/>
+		<Transition source="6" dest="6" event="3"/>
+		<Transition source="6" dest="7" event="5"/>
+		<Transition source="6" dest="4" event="1"/>
+		<Transition source="6" dest="6" event="4"/>
+		<Transition source="7" dest="3" event="3"/>
+		<Transition source="7" dest="7" event="5"/>
+		<Transition source="7" dest="0" event="1"/>
+		<Transition source="7" dest="0" event="6"/>
+		<Transition source="7" dest="7" event="4"/>
+	</Transitions>
+</Automaton>
+<Automaton name="req_sw4" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e41"/>
+		<Event id="2" label="e43"/>
+		<Event id="3" label="e47"/>
+		<Event id="4" label="e49"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="1" dest="2" event="1"/>
+		<Transition source="1" dest="2" event="2"/>
+		<Transition source="1" dest="0" event="3"/>
+		<Transition source="1" dest="0" event="4"/>
+		<Transition source="2" dest="1" event="3"/>
+		<Transition source="2" dest="1" event="4"/>
+	</Transitions>
+</Automaton>
+<Automaton name="ms_sw3t1" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e12" controllable="false"/>
+		<Event id="2" label="e192" controllable="false"/>
+		<Event id="3" label="e300" controllable="false"/>
+		<Event id="4" label="e302" controllable="false"/>
+		<Event id="5" label="e32" controllable="false"/>
+		<Event id="6" label="e38" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+		<State id="3" name="s3"/>
+		<State id="4" name="s4"/>
+		<State id="5" name="s5"/>
+		<State id="6" name="s6"/>
+		<State id="7" name="s7"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="5"/>
+		<Transition source="0" dest="0" event="6"/>
+		<Transition source="0" dest="4" event="3"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="1" dest="2" event="6"/>
+		<Transition source="1" dest="5" event="3"/>
+		<Transition source="1" dest="1" event="4"/>
+		<Transition source="2" dest="0" event="1"/>
+		<Transition source="2" dest="2" event="6"/>
+		<Transition source="2" dest="3" event="3"/>
+		<Transition source="2" dest="2" event="4"/>
+		<Transition source="3" dest="4" event="1"/>
+		<Transition source="3" dest="3" event="6"/>
+		<Transition source="3" dest="4" event="2"/>
+		<Transition source="3" dest="3" event="3"/>
+		<Transition source="3" dest="7" event="4"/>
+		<Transition source="4" dest="5" event="5"/>
+		<Transition source="4" dest="4" event="6"/>
+		<Transition source="4" dest="4" event="3"/>
+		<Transition source="4" dest="0" event="4"/>
+		<Transition source="5" dest="6" event="6"/>
+		<Transition source="5" dest="5" event="3"/>
+		<Transition source="5" dest="1" event="4"/>
+		<Transition source="6" dest="6" event="6"/>
+		<Transition source="6" dest="4" event="2"/>
+		<Transition source="6" dest="6" event="3"/>
+		<Transition source="6" dest="7" event="4"/>
+		<Transition source="7" dest="0" event="1"/>
+		<Transition source="7" dest="7" event="6"/>
+		<Transition source="7" dest="0" event="2"/>
+		<Transition source="7" dest="3" event="3"/>
+		<Transition source="7" dest="7" event="4"/>
+	</Transitions>
+</Automaton>
+<Automaton name="cp_25_26" type="Specification">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e11"/>
+		<Event id="2" label="e142" controllable="false"/>
+		<Event id="3" label="e144" controllable="false"/>
+		<Event id="4" label="e21"/>
+		<Event id="5" label="e242" controllable="false"/>
+		<Event id="6" label="e244" controllable="false"/>
+		<Event id="7" label="e262" controllable="false"/>
+		<Event id="8" label="e264" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1" accepting="true"/>
+		<State id="2" name="s2" accepting="true"/>
+		<State id="3" name="s3" accepting="true"/>
+		<State id="4" name="s4" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="0" dest="0" event="5"/>
+		<Transition source="0" dest="0" event="6"/>
+		<Transition source="0" dest="1" event="7"/>
+		<Transition source="0" dest="2" event="8"/>
+		<Transition source="1" dest="1" event="1"/>
+		<Transition source="1" dest="1" event="4"/>
+		<Transition source="1" dest="0" event="2"/>
+		<Transition source="1" dest="1" event="3"/>
+		<Transition source="1" dest="1" event="5"/>
+		<Transition source="1" dest="3" event="6"/>
+		<Transition source="1" dest="1" event="7"/>
+		<Transition source="1" dest="1" event="8"/>
+		<Transition source="2" dest="2" event="1"/>
+		<Transition source="2" dest="2" event="4"/>
+		<Transition source="2" dest="2" event="2"/>
+		<Transition source="2" dest="0" event="3"/>
+		<Transition source="2" dest="4" event="5"/>
+		<Transition source="2" dest="2" event="6"/>
+		<Transition source="2" dest="2" event="7"/>
+		<Transition source="2" dest="2" event="8"/>
+		<Transition source="3" dest="3" event="1"/>
+		<Transition source="3" dest="0" event="2"/>
+		<Transition source="3" dest="3" event="3"/>
+		<Transition source="3" dest="3" event="5"/>
+		<Transition source="3" dest="3" event="6"/>
+		<Transition source="3" dest="3" event="7"/>
+		<Transition source="3" dest="3" event="8"/>
+		<Transition source="4" dest="4" event="4"/>
+		<Transition source="4" dest="4" event="2"/>
+		<Transition source="4" dest="0" event="3"/>
+		<Transition source="4" dest="4" event="5"/>
+		<Transition source="4" dest="4" event="6"/>
+		<Transition source="4" dest="4" event="7"/>
+		<Transition source="4" dest="4" event="8"/>
+	</Transitions>
+</Automaton>
+<Automaton name="req_sw3" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e307"/>
+		<Event id="2" label="e309"/>
+		<Event id="3" label="e31"/>
+		<Event id="4" label="e33"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="0" dest="1" event="4"/>
+		<Transition source="1" dest="2" event="3"/>
+		<Transition source="1" dest="2" event="4"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="1" dest="0" event="2"/>
+		<Transition source="2" dest="1" event="1"/>
+		<Transition source="2" dest="1" event="2"/>
+	</Transitions>
+</Automaton>
+<Automaton name="rs22" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e222" controllable="false"/>
+		<Event id="2" label="e224" controllable="false"/>
+		<Event id="3" label="e228" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="1" dest="0" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="t2_sen" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e104" controllable="false"/>
+		<Event id="2" label="e114" controllable="false"/>
+		<Event id="3" label="e124" controllable="false"/>
+		<Event id="4" label="e134" controllable="false"/>
+		<Event id="5" label="e14" controllable="false"/>
+		<Event id="6" label="e144" controllable="false"/>
+		<Event id="7" label="e154" controllable="false"/>
+		<Event id="8" label="e164" controllable="false"/>
+		<Event id="9" label="e194" controllable="false"/>
+		<Event id="10" label="e204" controllable="false"/>
+		<Event id="11" label="e21"/>
+		<Event id="12" label="e214" controllable="false"/>
+		<Event id="13" label="e224" controllable="false"/>
+		<Event id="14" label="e234" controllable="false"/>
+		<Event id="15" label="e24" controllable="false"/>
+		<Event id="16" label="e244" controllable="false"/>
+		<Event id="17" label="e254" controllable="false"/>
+		<Event id="18" label="e26" controllable="false"/>
+		<Event id="19" label="e264" controllable="false"/>
+		<Event id="20" label="e274" controllable="false"/>
+		<Event id="21" label="e34" controllable="false"/>
+		<Event id="22" label="e4" controllable="false"/>
+		<Event id="23" label="e44" controllable="false"/>
+		<Event id="24" label="e54" controllable="false"/>
+		<Event id="25" label="e64" controllable="false"/>
+		<Event id="26" label="e74" controllable="false"/>
+		<Event id="27" label="e84" controllable="false"/>
+		<Event id="28" label="e94" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="11"/>
+		<Transition source="1" dest="2" event="22"/>
+		<Transition source="1" dest="2" event="5"/>
+		<Transition source="1" dest="2" event="15"/>
+		<Transition source="1" dest="0" event="18"/>
+		<Transition source="1" dest="2" event="21"/>
+		<Transition source="1" dest="2" event="23"/>
+		<Transition source="1" dest="2" event="24"/>
+		<Transition source="1" dest="2" event="25"/>
+		<Transition source="1" dest="2" event="26"/>
+		<Transition source="1" dest="2" event="27"/>
+		<Transition source="1" dest="2" event="28"/>
+		<Transition source="1" dest="2" event="1"/>
+		<Transition source="1" dest="2" event="2"/>
+		<Transition source="1" dest="2" event="3"/>
+		<Transition source="1" dest="2" event="4"/>
+		<Transition source="1" dest="2" event="6"/>
+		<Transition source="1" dest="2" event="7"/>
+		<Transition source="1" dest="2" event="8"/>
+		<Transition source="1" dest="2" event="9"/>
+		<Transition source="1" dest="2" event="10"/>
+		<Transition source="1" dest="2" event="12"/>
+		<Transition source="1" dest="2" event="13"/>
+		<Transition source="1" dest="2" event="14"/>
+		<Transition source="1" dest="2" event="16"/>
+		<Transition source="1" dest="2" event="17"/>
+		<Transition source="1" dest="2" event="19"/>
+		<Transition source="1" dest="2" event="20"/>
+		<Transition source="2" dest="0" event="18"/>
+	</Transitions>
+</Automaton>
+<Automaton name="rs11" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="e112" controllable="false"/>
+		<Event id="2" label="e114" controllable="false"/>
+		<Event id="3" label="e118" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="1" dest="0" event="3"/>
+	</Transitions>
+</Automaton>
+</Automata>

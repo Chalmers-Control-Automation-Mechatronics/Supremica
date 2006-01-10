@@ -1,0 +1,2624 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Automata name="verriegel4" major="0" minor="9" comment="A large model of a car's central locking system, which originally was developed as a case study within the BMBF project KORSYS. This is an extension of the original three door central locking model including four doors. The system is controllable and nonblocking. If the automaton 'noreset' is removed, the system is blocking.">
+<Automaton name="wspcount" type="Specification">
+	<Events>
+		<Event id="0" label="ER"/>
+		<Event id="1" label="SER"/>
+		<Event id="2" label="SERFS"/>
+		<Event id="3" label="TAST"/>
+		<Event id="4" label="WSP"/>
+		<Event id="5" label="ZS"/>
+		<Event id="6" label="autom_VR"/>
+		<Event id="7" label="ctr_ge_max.WSP" controllable="false"/>
+		<Event id="8" label="ctr_lt_max.WSP" controllable="false"/>
+		<Event id="9" label="inc_ctr.WSP"/>
+		<Event id="10" label="timeout.WSP" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="CNT"/>
+		<State id="1" name="COOL" initial="true" accepting="true"/>
+		<State id="2" name="TST"/>
+		<State id="3" name="WSP"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="2" event="9"/>
+		<Transition source="0" dest="1" event="10"/>
+		<Transition source="0" dest="0" event="7"/>
+		<Transition source="0" dest="0" event="8"/>
+		<Transition source="1" dest="1" event="7"/>
+		<Transition source="1" dest="1" event="8"/>
+		<Transition source="1" dest="1" event="10"/>
+		<Transition source="1" dest="0" event="0"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="1" dest="0" event="2"/>
+		<Transition source="1" dest="0" event="5"/>
+		<Transition source="1" dest="0" event="3"/>
+		<Transition source="1" dest="0" event="6"/>
+		<Transition source="2" dest="1" event="8"/>
+		<Transition source="2" dest="1" event="10"/>
+		<Transition source="2" dest="3" event="7"/>
+		<Transition source="3" dest="1" event="10"/>
+		<Transition source="3" dest="3" event="4"/>
+	</Transitions>
+</Automaton>
+<Automaton name="automvr4" type="Specification">
+	<Events>
+		<Event id="0" label="ER"/>
+		<Event id="1" label="SER"/>
+		<Event id="2" label="SERFS"/>
+		<Event id="3" label="TAST"/>
+		<Event id="4" label="WSP"/>
+		<Event id="5" label="ZS"/>
+		<Event id="6" label="autom_VR"/>
+		<Event id="7" label="reset.FS"/>
+		<Event id="8" label="soft_CS"/>
+		<Event id="9" label="soft_ER"/>
+		<Event id="10" label="soft_SER.FT"/>
+		<Event id="11" label="soft_VR"/>
+		<Event id="12" label="soft_ZS"/>
+		<Event id="13" label="time.FS"/>
+		<Event id="14" label="timeout.FS" controllable="false"/>
+		<Event id="15" label="tuer_auf.BH" controllable="false"/>
+		<Event id="16" label="tuer_auf.BT" controllable="false"/>
+		<Event id="17" label="tuer_auf.FH" controllable="false"/>
+		<Event id="18" label="tuer_auf.FT" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="AU1"/>
+		<State id="1" name="AU2"/>
+		<State id="2" name="AU3"/>
+		<State id="3" name="ER" accepting="true"/>
+		<State id="4" name="FS"/>
+		<State id="5" name="VR" initial="true" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="3" event="0"/>
+		<Transition source="0" dest="3" event="1"/>
+		<Transition source="0" dest="3" event="5"/>
+		<Transition source="0" dest="3" event="3"/>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="0" event="7"/>
+		<Transition source="0" dest="0" event="14"/>
+		<Transition source="0" dest="1" event="13"/>
+		<Transition source="0" dest="3" event="8"/>
+		<Transition source="0" dest="3" event="15"/>
+		<Transition source="0" dest="3" event="16"/>
+		<Transition source="0" dest="3" event="17"/>
+		<Transition source="0" dest="3" event="18"/>
+		<Transition source="1" dest="3" event="0"/>
+		<Transition source="1" dest="3" event="1"/>
+		<Transition source="1" dest="3" event="5"/>
+		<Transition source="1" dest="3" event="3"/>
+		<Transition source="1" dest="2" event="14"/>
+		<Transition source="1" dest="1" event="2"/>
+		<Transition source="1" dest="3" event="8"/>
+		<Transition source="1" dest="3" event="15"/>
+		<Transition source="1" dest="3" event="16"/>
+		<Transition source="1" dest="3" event="17"/>
+		<Transition source="1" dest="3" event="18"/>
+		<Transition source="2" dest="3" event="0"/>
+		<Transition source="2" dest="3" event="1"/>
+		<Transition source="2" dest="3" event="5"/>
+		<Transition source="2" dest="3" event="3"/>
+		<Transition source="2" dest="5" event="6"/>
+		<Transition source="2" dest="2" event="2"/>
+		<Transition source="2" dest="3" event="8"/>
+		<Transition source="2" dest="3" event="15"/>
+		<Transition source="2" dest="3" event="16"/>
+		<Transition source="2" dest="3" event="17"/>
+		<Transition source="2" dest="3" event="18"/>
+		<Transition source="3" dest="5" event="11"/>
+		<Transition source="3" dest="5" event="12"/>
+		<Transition source="3" dest="3" event="0"/>
+		<Transition source="3" dest="3" event="1"/>
+		<Transition source="3" dest="3" event="5"/>
+		<Transition source="3" dest="3" event="3"/>
+		<Transition source="3" dest="3" event="4"/>
+		<Transition source="3" dest="3" event="9"/>
+		<Transition source="3" dest="3" event="10"/>
+		<Transition source="3" dest="3" event="7"/>
+		<Transition source="3" dest="3" event="14"/>
+		<Transition source="3" dest="3" event="8"/>
+		<Transition source="3" dest="3" event="15"/>
+		<Transition source="3" dest="3" event="16"/>
+		<Transition source="3" dest="3" event="17"/>
+		<Transition source="3" dest="3" event="18"/>
+		<Transition source="4" dest="5" event="4"/>
+		<Transition source="4" dest="5" event="0"/>
+		<Transition source="4" dest="5" event="1"/>
+		<Transition source="4" dest="5" event="5"/>
+		<Transition source="4" dest="5" event="3"/>
+		<Transition source="4" dest="0" event="9"/>
+		<Transition source="4" dest="0" event="10"/>
+		<Transition source="4" dest="4" event="7"/>
+		<Transition source="4" dest="4" event="14"/>
+		<Transition source="4" dest="3" event="8"/>
+		<Transition source="4" dest="3" event="15"/>
+		<Transition source="4" dest="3" event="16"/>
+		<Transition source="4" dest="3" event="17"/>
+		<Transition source="4" dest="3" event="18"/>
+		<Transition source="5" dest="5" event="0"/>
+		<Transition source="5" dest="5" event="1"/>
+		<Transition source="5" dest="5" event="5"/>
+		<Transition source="5" dest="5" event="3"/>
+		<Transition source="5" dest="5" event="4"/>
+		<Transition source="5" dest="5" event="11"/>
+		<Transition source="5" dest="5" event="12"/>
+		<Transition source="5" dest="5" event="7"/>
+		<Transition source="5" dest="5" event="14"/>
+		<Transition source="5" dest="3" event="9"/>
+		<Transition source="5" dest="3" event="10"/>
+		<Transition source="5" dest="4" event="2"/>
+		<Transition source="5" dest="3" event="8"/>
+		<Transition source="5" dest="3" event="15"/>
+		<Transition source="5" dest="3" event="16"/>
+		<Transition source="5" dest="3" event="17"/>
+		<Transition source="5" dest="3" event="18"/>
+	</Transitions>
+</Automaton>
+<Automaton name="eingabe_er" type="Specification">
+	<Events>
+		<Event id="0" label="CS_ok"/>
+		<Event id="1" label="ER"/>
+		<Event id="2" label="ER_BT" controllable="false"/>
+		<Event id="3" label="ER_FS" controllable="false"/>
+		<Event id="4" label="ER_FT" controllable="false"/>
+		<Event id="5" label="ER_HK" controllable="false"/>
+		<Event id="6" label="TASTVR" controllable="false"/>
+		<Event id="7" label="VR_BT" controllable="false"/>
+		<Event id="8" label="VR_FS" controllable="false"/>
+		<Event id="9" label="VR_FT" controllable="false"/>
+		<Event id="10" label="VR_HK" controllable="false"/>
+		<Event id="11" label="WSP"/>
+		<Event id="12" label="soft_CS"/>
+	</Events>
+	<States>
+		<State id="0" name="C1"/>
+		<State id="1" name="C2"/>
+		<State id="2" name="ER"/>
+		<State id="3" name="IN" initial="true" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="0" dest="0" event="9"/>
+		<Transition source="0" dest="0" event="7"/>
+		<Transition source="0" dest="0" event="10"/>
+		<Transition source="0" dest="0" event="8"/>
+		<Transition source="0" dest="0" event="6"/>
+		<Transition source="0" dest="1" event="4"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="1" event="5"/>
+		<Transition source="1" dest="3" event="0"/>
+		<Transition source="1" dest="1" event="4"/>
+		<Transition source="1" dest="1" event="2"/>
+		<Transition source="1" dest="1" event="5"/>
+		<Transition source="1" dest="1" event="3"/>
+		<Transition source="1" dest="1" event="9"/>
+		<Transition source="1" dest="1" event="7"/>
+		<Transition source="1" dest="1" event="10"/>
+		<Transition source="1" dest="1" event="8"/>
+		<Transition source="1" dest="1" event="6"/>
+		<Transition source="2" dest="3" event="4"/>
+		<Transition source="2" dest="3" event="3"/>
+		<Transition source="2" dest="3" event="9"/>
+		<Transition source="2" dest="3" event="7"/>
+		<Transition source="2" dest="3" event="10"/>
+		<Transition source="2" dest="3" event="8"/>
+		<Transition source="2" dest="3" event="6"/>
+		<Transition source="2" dest="3" event="1"/>
+		<Transition source="2" dest="3" event="11"/>
+		<Transition source="2" dest="0" event="12"/>
+		<Transition source="2" dest="2" event="2"/>
+		<Transition source="2" dest="2" event="5"/>
+		<Transition source="3" dest="3" event="11"/>
+		<Transition source="3" dest="3" event="4"/>
+		<Transition source="3" dest="3" event="3"/>
+		<Transition source="3" dest="3" event="9"/>
+		<Transition source="3" dest="3" event="7"/>
+		<Transition source="3" dest="3" event="10"/>
+		<Transition source="3" dest="3" event="8"/>
+		<Transition source="3" dest="3" event="6"/>
+		<Transition source="3" dest="0" event="12"/>
+		<Transition source="3" dest="2" event="2"/>
+		<Transition source="3" dest="2" event="5"/>
+	</Transitions>
+</Automaton>
+<Automaton name="eingabe_fs" type="Specification">
+	<Events>
+		<Event id="0" label="CS_ok"/>
+		<Event id="1" label="ER_BT" controllable="false"/>
+		<Event id="2" label="ER_FS" controllable="false"/>
+		<Event id="3" label="ER_FT" controllable="false"/>
+		<Event id="4" label="ER_HK" controllable="false"/>
+		<Event id="5" label="SERFS"/>
+		<Event id="6" label="TASTVR" controllable="false"/>
+		<Event id="7" label="VR_BT" controllable="false"/>
+		<Event id="8" label="VR_FS" controllable="false"/>
+		<Event id="9" label="VR_FT" controllable="false"/>
+		<Event id="10" label="VR_HK" controllable="false"/>
+		<Event id="11" label="WSP"/>
+		<Event id="12" label="soft_CS"/>
+	</Events>
+	<States>
+		<State id="0" name="FS"/>
+		<State id="1" name="IN" initial="true" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="1" event="4"/>
+		<Transition source="0" dest="1" event="6"/>
+		<Transition source="0" dest="1" event="9"/>
+		<Transition source="0" dest="1" event="7"/>
+		<Transition source="0" dest="1" event="10"/>
+		<Transition source="0" dest="1" event="8"/>
+		<Transition source="0" dest="1" event="5"/>
+		<Transition source="0" dest="1" event="11"/>
+		<Transition source="0" dest="1" event="12"/>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="0" event="2"/>
+		<Transition source="1" dest="1" event="11"/>
+		<Transition source="1" dest="1" event="12"/>
+		<Transition source="1" dest="1" event="0"/>
+		<Transition source="1" dest="1" event="3"/>
+		<Transition source="1" dest="1" event="1"/>
+		<Transition source="1" dest="1" event="4"/>
+		<Transition source="1" dest="1" event="6"/>
+		<Transition source="1" dest="1" event="9"/>
+		<Transition source="1" dest="1" event="7"/>
+		<Transition source="1" dest="1" event="10"/>
+		<Transition source="1" dest="1" event="8"/>
+	</Transitions>
+</Automaton>
+<Automaton name="crash" type="Specification">
+	<Events>
+		<Event id="0" label="CS" controllable="false"/>
+		<Event id="1" label="CS_ok"/>
+		<Event id="2" label="done_ZS"/>
+		<Event id="3" label="soft_CS"/>
+		<Event id="4" label="soft_ER"/>
+		<Event id="5" label="soft_SER.FT"/>
+		<Event id="6" label="soft_VR"/>
+		<Event id="7" label="zuendung_an" controllable="false"/>
+		<Event id="8" label="zuendung_aus" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="CS1"/>
+		<State id="1" name="CS1a"/>
+		<State id="2" name="CS2"/>
+		<State id="3" name="CS2a"/>
+		<State id="4" name="IN" initial="true" accepting="true"/>
+		<State id="5" name="RUN"/>
+		<State id="6" name="XX"/>
+		<State id="7" name="ZS" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="2" event="3"/>
+		<Transition source="0" dest="1" event="8"/>
+		<Transition source="0" dest="0" event="0"/>
+		<Transition source="1" dest="1" event="0"/>
+		<Transition source="1" dest="0" event="7"/>
+		<Transition source="1" dest="3" event="3"/>
+		<Transition source="2" dest="2" event="0"/>
+		<Transition source="2" dest="3" event="8"/>
+		<Transition source="2" dest="5" event="1"/>
+		<Transition source="3" dest="2" event="7"/>
+		<Transition source="3" dest="4" event="1"/>
+		<Transition source="3" dest="3" event="0"/>
+		<Transition source="4" dest="7" event="2"/>
+		<Transition source="4" dest="4" event="4"/>
+		<Transition source="4" dest="4" event="5"/>
+		<Transition source="4" dest="4" event="6"/>
+		<Transition source="4" dest="4" event="0"/>
+		<Transition source="4" dest="5" event="7"/>
+		<Transition source="5" dest="6" event="2"/>
+		<Transition source="5" dest="4" event="8"/>
+		<Transition source="5" dest="0" event="0"/>
+		<Transition source="5" dest="5" event="4"/>
+		<Transition source="5" dest="5" event="5"/>
+		<Transition source="5" dest="5" event="6"/>
+		<Transition source="6" dest="7" event="8"/>
+		<Transition source="6" dest="6" event="2"/>
+		<Transition source="6" dest="6" event="0"/>
+		<Transition source="6" dest="5" event="4"/>
+		<Transition source="6" dest="5" event="5"/>
+		<Transition source="6" dest="5" event="6"/>
+		<Transition source="7" dest="7" event="2"/>
+		<Transition source="7" dest="7" event="0"/>
+		<Transition source="7" dest="6" event="7"/>
+		<Transition source="7" dest="4" event="4"/>
+		<Transition source="7" dest="4" event="5"/>
+		<Transition source="7" dest="4" event="6"/>
+	</Transitions>
+</Automaton>
+<Automaton name="decoder" type="Specification">
+	<Events>
+		<Event id="0" label="ER"/>
+		<Event id="1" label="SER"/>
+		<Event id="2" label="SERFS"/>
+		<Event id="3" label="TAST"/>
+		<Event id="4" label="ZS"/>
+		<Event id="5" label="ZSA"/>
+		<Event id="6" label="ZSI"/>
+		<Event id="7" label="autom_VR"/>
+		<Event id="8" label="is_cod_er"/>
+		<Event id="9" label="is_cod_ser"/>
+		<Event id="10" label="soft_CS"/>
+		<Event id="11" label="soft_ER"/>
+		<Event id="12" label="soft_SER.FT"/>
+		<Event id="13" label="soft_VR"/>
+		<Event id="14" label="soft_ZS"/>
+	</Events>
+	<States>
+		<State id="0" name="COD"/>
+		<State id="1" name="ER" accepting="true"/>
+		<State id="2" name="IN" initial="true"/>
+		<State id="3" name="RQER"/>
+		<State id="4" name="RQSER"/>
+		<State id="5" name="RQVR"/>
+		<State id="6" name="RQZS"/>
+		<State id="7" name="SER" accepting="true"/>
+		<State id="8" name="TSTZS"/>
+		<State id="9" name="VR" accepting="true"/>
+		<State id="10" name="ZS" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="3" event="8"/>
+		<Transition source="0" dest="4" event="9"/>
+		<Transition source="0" dest="1" event="10"/>
+		<Transition source="1" dest="3" event="0"/>
+		<Transition source="1" dest="3" event="1"/>
+		<Transition source="1" dest="3" event="2"/>
+		<Transition source="1" dest="8" event="4"/>
+		<Transition source="1" dest="5" event="3"/>
+		<Transition source="1" dest="5" event="7"/>
+		<Transition source="1" dest="1" event="10"/>
+		<Transition source="2" dest="3" event="0"/>
+		<Transition source="2" dest="0" event="1"/>
+		<Transition source="2" dest="0" event="2"/>
+		<Transition source="2" dest="8" event="4"/>
+		<Transition source="2" dest="5" event="3"/>
+		<Transition source="2" dest="1" event="10"/>
+		<Transition source="3" dest="1" event="11"/>
+		<Transition source="3" dest="1" event="10"/>
+		<Transition source="4" dest="7" event="12"/>
+		<Transition source="4" dest="1" event="10"/>
+		<Transition source="5" dest="9" event="13"/>
+		<Transition source="5" dest="1" event="10"/>
+		<Transition source="6" dest="10" event="14"/>
+		<Transition source="6" dest="1" event="10"/>
+		<Transition source="7" dest="3" event="0"/>
+		<Transition source="7" dest="3" event="1"/>
+		<Transition source="7" dest="3" event="2"/>
+		<Transition source="7" dest="3" event="3"/>
+		<Transition source="7" dest="8" event="4"/>
+		<Transition source="7" dest="5" event="7"/>
+		<Transition source="7" dest="1" event="10"/>
+		<Transition source="8" dest="6" event="5"/>
+		<Transition source="8" dest="5" event="6"/>
+		<Transition source="8" dest="1" event="10"/>
+		<Transition source="9" dest="3" event="0"/>
+		<Transition source="9" dest="3" event="3"/>
+		<Transition source="9" dest="0" event="1"/>
+		<Transition source="9" dest="0" event="2"/>
+		<Transition source="9" dest="8" event="4"/>
+		<Transition source="9" dest="1" event="10"/>
+		<Transition source="10" dest="3" event="0"/>
+		<Transition source="10" dest="0" event="1"/>
+		<Transition source="10" dest="0" event="2"/>
+		<Transition source="10" dest="6" event="4"/>
+		<Transition source="10" dest="6" event="3"/>
+		<Transition source="10" dest="1" event="10"/>
+	</Transitions>
+</Automaton>
+<Automaton name="keine_wsp" type="Specification">
+	<Events>
+		<Event id="0" label="ER"/>
+		<Event id="1" label="ER_BT" controllable="false"/>
+		<Event id="2" label="ER_FS" controllable="false"/>
+		<Event id="3" label="ER_FT" controllable="false"/>
+		<Event id="4" label="ER_HK" controllable="false"/>
+		<Event id="5" label="SER"/>
+		<Event id="6" label="SERFS"/>
+		<Event id="7" label="TAST"/>
+		<Event id="8" label="TASTVR" controllable="false"/>
+		<Event id="9" label="VR_BT" controllable="false"/>
+		<Event id="10" label="VR_FS" controllable="false"/>
+		<Event id="11" label="VR_FT" controllable="false"/>
+		<Event id="12" label="VR_HK" controllable="false"/>
+		<Event id="13" label="WSP"/>
+		<Event id="14" label="ZS"/>
+		<Event id="15" label="soft_CS"/>
+	</Events>
+	<States>
+		<State id="0" name="IDLE" initial="true" accepting="true"/>
+		<State id="1" name="WSP"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="0" dest="1" event="4"/>
+		<Transition source="0" dest="1" event="9"/>
+		<Transition source="0" dest="1" event="10"/>
+		<Transition source="0" dest="1" event="11"/>
+		<Transition source="0" dest="1" event="12"/>
+		<Transition source="0" dest="1" event="8"/>
+		<Transition source="0" dest="0" event="15"/>
+		<Transition source="1" dest="1" event="1"/>
+		<Transition source="1" dest="1" event="2"/>
+		<Transition source="1" dest="1" event="3"/>
+		<Transition source="1" dest="1" event="4"/>
+		<Transition source="1" dest="1" event="9"/>
+		<Transition source="1" dest="1" event="10"/>
+		<Transition source="1" dest="1" event="11"/>
+		<Transition source="1" dest="1" event="12"/>
+		<Transition source="1" dest="1" event="8"/>
+		<Transition source="1" dest="0" event="0"/>
+		<Transition source="1" dest="0" event="5"/>
+		<Transition source="1" dest="0" event="6"/>
+		<Transition source="1" dest="0" event="7"/>
+		<Transition source="1" dest="0" event="14"/>
+		<Transition source="1" dest="0" event="15"/>
+		<Transition source="1" dest="0" event="13"/>
+	</Transitions>
+</Automaton>
+<Automaton name="zsi" type="Specification">
+	<Events>
+		<Event id="0" label="ZSA"/>
+		<Event id="1" label="ZSI"/>
+		<Event id="2" label="tuer_auf.BT" controllable="false"/>
+		<Event id="3" label="tuer_auf.FT" controllable="false"/>
+		<Event id="4" label="tuer_zu.BT" controllable="false"/>
+		<Event id="5" label="tuer_zu.FT" controllable="false"/>
+		<Event id="6" label="zuendung_an" controllable="false"/>
+		<Event id="7" label="zuendung_aus" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="AN0"/>
+		<State id="1" name="AN1"/>
+		<State id="2" name="AN2"/>
+		<State id="3" name="AUS0" accepting="true"/>
+		<State id="4" name="AUS1"/>
+		<State id="5" name="AUS2" initial="true"/>
+		<State id="6" name="ZU"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="6" event="7"/>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="1" dest="4" event="7"/>
+		<Transition source="1" dest="1" event="1"/>
+		<Transition source="1" dest="2" event="3"/>
+		<Transition source="1" dest="2" event="2"/>
+		<Transition source="1" dest="0" event="5"/>
+		<Transition source="1" dest="0" event="4"/>
+		<Transition source="2" dest="5" event="7"/>
+		<Transition source="2" dest="1" event="5"/>
+		<Transition source="2" dest="1" event="4"/>
+		<Transition source="2" dest="2" event="1"/>
+		<Transition source="3" dest="4" event="3"/>
+		<Transition source="3" dest="4" event="2"/>
+		<Transition source="3" dest="3" event="0"/>
+		<Transition source="3" dest="0" event="6"/>
+		<Transition source="4" dest="5" event="3"/>
+		<Transition source="4" dest="5" event="2"/>
+		<Transition source="4" dest="4" event="0"/>
+		<Transition source="4" dest="3" event="5"/>
+		<Transition source="4" dest="3" event="4"/>
+		<Transition source="4" dest="1" event="6"/>
+		<Transition source="5" dest="5" event="0"/>
+		<Transition source="5" dest="4" event="5"/>
+		<Transition source="5" dest="4" event="4"/>
+		<Transition source="5" dest="2" event="6"/>
+		<Transition source="6" dest="6" event="1"/>
+		<Transition source="6" dest="4" event="3"/>
+		<Transition source="6" dest="4" event="2"/>
+		<Transition source="6" dest="0" event="6"/>
+	</Transitions>
+</Automaton>
+<Automaton name="cod_ser" type="Plant">
+	<Events>
+		<Event id="0" label="cod_er" controllable="false"/>
+		<Event id="1" label="cod_ser" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="ER" initial="true" accepting="true"/>
+		<State id="1" name="SER"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="0" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="eingabe_ser" type="Specification">
+	<Events>
+		<Event id="0" label="CS_ok"/>
+		<Event id="1" label="ER_BT" controllable="false"/>
+		<Event id="2" label="ER_FS" controllable="false"/>
+		<Event id="3" label="ER_FT" controllable="false"/>
+		<Event id="4" label="ER_HK" controllable="false"/>
+		<Event id="5" label="SER"/>
+		<Event id="6" label="TASTVR" controllable="false"/>
+		<Event id="7" label="VR_BT" controllable="false"/>
+		<Event id="8" label="VR_FS" controllable="false"/>
+		<Event id="9" label="VR_FT" controllable="false"/>
+		<Event id="10" label="VR_HK" controllable="false"/>
+		<Event id="11" label="WSP"/>
+		<Event id="12" label="soft_CS"/>
+	</Events>
+	<States>
+		<State id="0" name="IN" initial="true" accepting="true"/>
+		<State id="1" name="VR"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="11"/>
+		<Transition source="0" dest="0" event="12"/>
+		<Transition source="0" dest="0" event="0"/>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="0" event="6"/>
+		<Transition source="0" dest="0" event="9"/>
+		<Transition source="0" dest="0" event="7"/>
+		<Transition source="0" dest="0" event="10"/>
+		<Transition source="0" dest="0" event="8"/>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="1" dest="0" event="5"/>
+		<Transition source="1" dest="0" event="11"/>
+		<Transition source="1" dest="0" event="12"/>
+		<Transition source="1" dest="0" event="0"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="1" dest="0" event="4"/>
+		<Transition source="1" dest="0" event="2"/>
+		<Transition source="1" dest="0" event="6"/>
+		<Transition source="1" dest="0" event="9"/>
+		<Transition source="1" dest="0" event="7"/>
+		<Transition source="1" dest="0" event="10"/>
+		<Transition source="1" dest="0" event="8"/>
+		<Transition source="1" dest="1" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="eingabe_vr" type="Specification">
+	<Events>
+		<Event id="0" label="CS_ok"/>
+		<Event id="1" label="ER_BT" controllable="false"/>
+		<Event id="2" label="ER_FS" controllable="false"/>
+		<Event id="3" label="ER_FT" controllable="false"/>
+		<Event id="4" label="ER_HK" controllable="false"/>
+		<Event id="5" label="TAST"/>
+		<Event id="6" label="TASTVR" controllable="false"/>
+		<Event id="7" label="VR_BT" controllable="false"/>
+		<Event id="8" label="VR_FS" controllable="false"/>
+		<Event id="9" label="VR_FT" controllable="false"/>
+		<Event id="10" label="VR_HK" controllable="false"/>
+		<Event id="11" label="WSP"/>
+		<Event id="12" label="soft_CS"/>
+	</Events>
+	<States>
+		<State id="0" name="IN" initial="true" accepting="true"/>
+		<State id="1" name="VR"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="11"/>
+		<Transition source="0" dest="0" event="12"/>
+		<Transition source="0" dest="0" event="0"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="0" event="9"/>
+		<Transition source="0" dest="0" event="7"/>
+		<Transition source="0" dest="0" event="10"/>
+		<Transition source="0" dest="0" event="8"/>
+		<Transition source="0" dest="1" event="6"/>
+		<Transition source="1" dest="0" event="3"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="1" dest="0" event="4"/>
+		<Transition source="1" dest="0" event="2"/>
+		<Transition source="1" dest="0" event="9"/>
+		<Transition source="1" dest="0" event="7"/>
+		<Transition source="1" dest="0" event="10"/>
+		<Transition source="1" dest="0" event="8"/>
+		<Transition source="1" dest="0" event="5"/>
+		<Transition source="1" dest="0" event="11"/>
+		<Transition source="1" dest="0" event="12"/>
+		<Transition source="1" dest="0" event="0"/>
+		<Transition source="1" dest="1" event="6"/>
+	</Transitions>
+</Automaton>
+<Automaton name="check_cod_ser" type="Specification">
+	<Events>
+		<Event id="0" label="cod_er" controllable="false"/>
+		<Event id="1" label="cod_ser" controllable="false"/>
+		<Event id="2" label="is_cod_er"/>
+		<Event id="3" label="is_cod_ser"/>
+	</Events>
+	<States>
+		<State id="0" name="ER" initial="true" accepting="true"/>
+		<State id="1" name="SER"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="0" event="0"/>
+		<Transition source="1" dest="1" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="zuendung" type="Plant">
+	<Events>
+		<Event id="0" label="zuendung_an" controllable="false"/>
+		<Event id="1" label="zuendung_aus" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="AN"/>
+		<State id="1" name="AUS" initial="true" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="0" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="kein_zs" type="Specification">
+	<Events>
+		<Event id="0" label="ZS"/>
+		<Event id="1" label="kein_ZS"/>
+		<Event id="2" label="tuer_auf.FT" controllable="false"/>
+		<Event id="3" label="tuer_zu.FT" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="AUF" initial="true"/>
+		<State id="1" name="ZU" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="1" dest="0" event="2"/>
+		<Transition source="1" dest="1" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="warten" type="Specification">
+	<Events>
+		<Event id="0" label="CS_ok"/>
+		<Event id="1" label="ER"/>
+		<Event id="2" label="SER"/>
+		<Event id="3" label="SERFS"/>
+		<Event id="4" label="TAST"/>
+		<Event id="5" label="ZS"/>
+		<Event id="6" label="autom_VR"/>
+		<Event id="7" label="done_ER"/>
+		<Event id="8" label="done_SER.FT"/>
+		<Event id="9" label="done_VR"/>
+		<Event id="10" label="done_ZS"/>
+		<Event id="11" label="soft_CS"/>
+		<Event id="12" label="soft_ER"/>
+		<Event id="13" label="soft_SER.FT"/>
+		<Event id="14" label="soft_VR"/>
+		<Event id="15" label="soft_ZS"/>
+	</Events>
+	<States>
+		<State id="0" name="IDLE" initial="true" accepting="true"/>
+		<State id="1" name="RUN"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="0" dest="0" event="5"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="0" event="6"/>
+		<Transition source="0" dest="1" event="12"/>
+		<Transition source="0" dest="1" event="13"/>
+		<Transition source="0" dest="1" event="14"/>
+		<Transition source="0" dest="1" event="15"/>
+		<Transition source="0" dest="1" event="11"/>
+		<Transition source="1" dest="0" event="7"/>
+		<Transition source="1" dest="0" event="8"/>
+		<Transition source="1" dest="0" event="9"/>
+		<Transition source="1" dest="0" event="10"/>
+		<Transition source="1" dest="0" event="0"/>
+		<Transition source="1" dest="1" event="11"/>
+	</Transitions>
+</Automaton>
+<Automaton name="wsptime" type="Specification">
+	<Events>
+		<Event id="0" label="ER"/>
+		<Event id="1" label="SER"/>
+		<Event id="2" label="SERFS"/>
+		<Event id="3" label="TAST"/>
+		<Event id="4" label="ZS"/>
+		<Event id="5" label="autom_VR"/>
+		<Event id="6" label="reset_ctr.WSP"/>
+		<Event id="7" label="time.WSP"/>
+		<Event id="8" label="timeout.WSP" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="IN" initial="true" accepting="true"/>
+		<State id="1" name="RESET"/>
+		<State id="2" name="RUN"/>
+		<State id="3" name="TIME"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="3" event="0"/>
+		<Transition source="0" dest="3" event="1"/>
+		<Transition source="0" dest="3" event="2"/>
+		<Transition source="0" dest="3" event="4"/>
+		<Transition source="0" dest="3" event="3"/>
+		<Transition source="0" dest="3" event="5"/>
+		<Transition source="1" dest="0" event="6"/>
+		<Transition source="2" dest="2" event="0"/>
+		<Transition source="2" dest="2" event="1"/>
+		<Transition source="2" dest="2" event="2"/>
+		<Transition source="2" dest="2" event="3"/>
+		<Transition source="2" dest="2" event="4"/>
+		<Transition source="2" dest="2" event="5"/>
+		<Transition source="2" dest="1" event="8"/>
+		<Transition source="3" dest="2" event="7"/>
+	</Transitions>
+</Automaton>
+<Automaton name="eingabe_zs" type="Specification">
+	<Events>
+		<Event id="0" label="CS_ok"/>
+		<Event id="1" label="ER_BT" controllable="false"/>
+		<Event id="2" label="ER_FS" controllable="false"/>
+		<Event id="3" label="ER_FT" controllable="false"/>
+		<Event id="4" label="ER_HK" controllable="false"/>
+		<Event id="5" label="TASTVR" controllable="false"/>
+		<Event id="6" label="VR_BT" controllable="false"/>
+		<Event id="7" label="VR_FS" controllable="false"/>
+		<Event id="8" label="VR_FT" controllable="false"/>
+		<Event id="9" label="VR_HK" controllable="false"/>
+		<Event id="10" label="WSP"/>
+		<Event id="11" label="ZS"/>
+		<Event id="12" label="kein_ZS"/>
+		<Event id="13" label="soft_CS"/>
+	</Events>
+	<States>
+		<State id="0" name="IN" initial="true" accepting="true"/>
+		<State id="1" name="VR"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="8"/>
+		<Transition source="0" dest="1" event="6"/>
+		<Transition source="0" dest="1" event="9"/>
+		<Transition source="0" dest="1" event="7"/>
+		<Transition source="0" dest="0" event="10"/>
+		<Transition source="0" dest="0" event="13"/>
+		<Transition source="0" dest="0" event="0"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="0" event="5"/>
+		<Transition source="1" dest="1" event="8"/>
+		<Transition source="1" dest="1" event="6"/>
+		<Transition source="1" dest="1" event="9"/>
+		<Transition source="1" dest="1" event="7"/>
+		<Transition source="1" dest="0" event="11"/>
+		<Transition source="1" dest="0" event="10"/>
+		<Transition source="1" dest="0" event="12"/>
+		<Transition source="1" dest="0" event="13"/>
+		<Transition source="1" dest="0" event="0"/>
+		<Transition source="1" dest="0" event="3"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="1" dest="0" event="4"/>
+		<Transition source="1" dest="0" event="2"/>
+		<Transition source="1" dest="0" event="5"/>
+	</Transitions>
+</Automaton>
+<Automaton name="mer.FT" type="Plant">
+	<Events>
+		<Event id="0" label="MER_an.FT"/>
+		<Event id="1" label="MER_aus.FT"/>
+	</Events>
+	<States>
+		<State id="0" name="IDLE" initial="true" accepting="true"/>
+		<State id="1" name="RUN"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="0" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="mer.BT" type="Plant">
+	<Events>
+		<Event id="0" label="MER_an.BT"/>
+		<Event id="1" label="MER_aus.BT"/>
+	</Events>
+	<States>
+		<State id="0" name="IDLE" initial="true" accepting="true"/>
+		<State id="1" name="RUN"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="0" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="mer.FH" type="Plant">
+	<Events>
+		<Event id="0" label="MER_an.FH"/>
+		<Event id="1" label="MER_aus.FH"/>
+	</Events>
+	<States>
+		<State id="0" name="IDLE" initial="true" accepting="true"/>
+		<State id="1" name="RUN"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="0" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="mer.BH" type="Plant">
+	<Events>
+		<Event id="0" label="MER_an.BH"/>
+		<Event id="1" label="MER_aus.BH"/>
+	</Events>
+	<States>
+		<State id="0" name="IDLE" initial="true" accepting="true"/>
+		<State id="1" name="RUN"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="0" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="noreset.WSP" type="Specification">
+	<Events>
+		<Event id="0" label="reset.WSP"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+	</States>
+	<Transitions>
+	</Transitions>
+</Automaton>
+<Automaton name="ircount.WSP" type="Plant">
+	<Events>
+		<Event id="0" label="ctr_ge_max.WSP" controllable="false"/>
+		<Event id="1" label="ctr_lt_max.WSP" controllable="false"/>
+		<Event id="2" label="inc_ctr.WSP"/>
+		<Event id="3" label="reset_ctr.WSP"/>
+	</Events>
+	<States>
+		<State id="0" name="IN" initial="true" accepting="true"/>
+		<State id="1" name="RUN"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="1" dest="0" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="nftuer.BT" type="Specification">
+	<Events>
+		<Event id="0" label="CS_ok"/>
+		<Event id="1" label="async.BT"/>
+		<Event id="2" label="done_ER"/>
+		<Event id="3" label="done_SER.FT"/>
+		<Event id="4" label="done_VR"/>
+		<Event id="5" label="done_ZS"/>
+		<Event id="6" label="reset.BT"/>
+		<Event id="7" label="soft_CS"/>
+		<Event id="8" label="soft_ER"/>
+		<Event id="9" label="soft_SER.FT"/>
+		<Event id="10" label="soft_VR"/>
+		<Event id="11" label="soft_ZS"/>
+		<Event id="12" label="start_ER.BT"/>
+		<Event id="13" label="start_VR.BT"/>
+		<Event id="14" label="start_ZS.BT"/>
+		<Event id="15" label="stop_ER.BT"/>
+		<Event id="16" label="stop_VR.BT"/>
+		<Event id="17" label="stop_ZS.BT"/>
+		<Event id="18" label="sync.BT"/>
+		<Event id="19" label="time_W.BT"/>
+		<Event id="20" label="timeout.BT" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="ER" accepting="true"/>
+		<State id="1" name="IN" initial="true"/>
+		<State id="2" name="VR" accepting="true"/>
+		<State id="3" name="ZS" accepting="true"/>
+		<State id="4" name="cs1"/>
+		<State id="5" name="cs2"/>
+		<State id="6" name="cs3"/>
+		<State id="7" name="er1"/>
+		<State id="8" name="er2"/>
+		<State id="9" name="er3"/>
+		<State id="10" name="vr1"/>
+		<State id="11" name="vr2"/>
+		<State id="12" name="vr3"/>
+		<State id="13" name="vr4"/>
+		<State id="14" name="vr5"/>
+		<State id="15" name="vr6"/>
+		<State id="16" name="vr7"/>
+		<State id="17" name="vr8"/>
+		<State id="18" name="zs1"/>
+		<State id="19" name="zs2"/>
+		<State id="20" name="zs3"/>
+		<State id="21" name="zs4"/>
+		<State id="22" name="zs5"/>
+		<State id="23" name="zs6"/>
+		<State id="24" name="zs7"/>
+		<State id="25" name="zs8"/>
+		<State id="26" name="zs9"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="4" event="7"/>
+		<Transition source="0" dest="14" event="10"/>
+		<Transition source="0" dest="22" event="11"/>
+		<Transition source="0" dest="9" event="8"/>
+		<Transition source="1" dest="4" event="7"/>
+		<Transition source="1" dest="7" event="8"/>
+		<Transition source="1" dest="10" event="10"/>
+		<Transition source="1" dest="10" event="9"/>
+		<Transition source="1" dest="18" event="11"/>
+		<Transition source="2" dest="4" event="7"/>
+		<Transition source="2" dest="17" event="10"/>
+		<Transition source="2" dest="17" event="9"/>
+		<Transition source="2" dest="26" event="11"/>
+		<Transition source="2" dest="7" event="8"/>
+		<Transition source="3" dest="4" event="7"/>
+		<Transition source="3" dest="25" event="11"/>
+		<Transition source="3" dest="7" event="8"/>
+		<Transition source="3" dest="10" event="10"/>
+		<Transition source="3" dest="10" event="9"/>
+		<Transition source="4" dest="4" event="6"/>
+		<Transition source="4" dest="4" event="20"/>
+		<Transition source="4" dest="5" event="12"/>
+		<Transition source="5" dest="5" event="20"/>
+		<Transition source="5" dest="6" event="15"/>
+		<Transition source="6" dest="0" event="0"/>
+		<Transition source="7" dest="4" event="7"/>
+		<Transition source="7" dest="8" event="12"/>
+		<Transition source="8" dest="4" event="7"/>
+		<Transition source="8" dest="8" event="6"/>
+		<Transition source="8" dest="8" event="20"/>
+		<Transition source="8" dest="9" event="15"/>
+		<Transition source="9" dest="4" event="7"/>
+		<Transition source="9" dest="0" event="2"/>
+		<Transition source="10" dest="4" event="7"/>
+		<Transition source="10" dest="11" event="12"/>
+		<Transition source="11" dest="4" event="7"/>
+		<Transition source="11" dest="12" event="15"/>
+		<Transition source="11" dest="11" event="6"/>
+		<Transition source="11" dest="11" event="20"/>
+		<Transition source="12" dest="13" event="19"/>
+		<Transition source="12" dest="4" event="7"/>
+		<Transition source="13" dest="4" event="7"/>
+		<Transition source="13" dest="14" event="20"/>
+		<Transition source="14" dest="4" event="7"/>
+		<Transition source="14" dest="15" event="13"/>
+		<Transition source="15" dest="4" event="7"/>
+		<Transition source="15" dest="15" event="6"/>
+		<Transition source="15" dest="15" event="20"/>
+		<Transition source="15" dest="16" event="16"/>
+		<Transition source="16" dest="4" event="7"/>
+		<Transition source="16" dest="2" event="4"/>
+		<Transition source="16" dest="2" event="3"/>
+		<Transition source="17" dest="4" event="7"/>
+		<Transition source="17" dest="10" event="1"/>
+		<Transition source="17" dest="16" event="18"/>
+		<Transition source="18" dest="4" event="7"/>
+		<Transition source="18" dest="19" event="12"/>
+		<Transition source="19" dest="4" event="7"/>
+		<Transition source="19" dest="20" event="15"/>
+		<Transition source="19" dest="19" event="6"/>
+		<Transition source="19" dest="19" event="20"/>
+		<Transition source="20" dest="4" event="7"/>
+		<Transition source="20" dest="21" event="19"/>
+		<Transition source="21" dest="4" event="7"/>
+		<Transition source="21" dest="22" event="20"/>
+		<Transition source="22" dest="4" event="7"/>
+		<Transition source="22" dest="23" event="14"/>
+		<Transition source="23" dest="23" event="6"/>
+		<Transition source="23" dest="23" event="20"/>
+		<Transition source="23" dest="24" event="17"/>
+		<Transition source="23" dest="4" event="7"/>
+		<Transition source="24" dest="4" event="7"/>
+		<Transition source="24" dest="3" event="5"/>
+		<Transition source="25" dest="4" event="7"/>
+		<Transition source="25" dest="24" event="18"/>
+		<Transition source="25" dest="18" event="1"/>
+		<Transition source="26" dest="4" event="7"/>
+		<Transition source="26" dest="22" event="18"/>
+		<Transition source="26" dest="18" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="nftuer.FH" type="Specification">
+	<Events>
+		<Event id="0" label="CS_ok"/>
+		<Event id="1" label="async.FH"/>
+		<Event id="2" label="done_ER"/>
+		<Event id="3" label="done_SER.FT"/>
+		<Event id="4" label="done_VR"/>
+		<Event id="5" label="done_ZS"/>
+		<Event id="6" label="reset.FH"/>
+		<Event id="7" label="soft_CS"/>
+		<Event id="8" label="soft_ER"/>
+		<Event id="9" label="soft_SER.FT"/>
+		<Event id="10" label="soft_VR"/>
+		<Event id="11" label="soft_ZS"/>
+		<Event id="12" label="start_ER.FH"/>
+		<Event id="13" label="start_VR.FH"/>
+		<Event id="14" label="start_ZS.FH"/>
+		<Event id="15" label="stop_ER.FH"/>
+		<Event id="16" label="stop_VR.FH"/>
+		<Event id="17" label="stop_ZS.FH"/>
+		<Event id="18" label="sync.FH"/>
+		<Event id="19" label="time_W.FH"/>
+		<Event id="20" label="timeout.FH" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="ER" accepting="true"/>
+		<State id="1" name="IN" initial="true"/>
+		<State id="2" name="VR" accepting="true"/>
+		<State id="3" name="ZS" accepting="true"/>
+		<State id="4" name="cs1"/>
+		<State id="5" name="cs2"/>
+		<State id="6" name="cs3"/>
+		<State id="7" name="er1"/>
+		<State id="8" name="er2"/>
+		<State id="9" name="er3"/>
+		<State id="10" name="vr1"/>
+		<State id="11" name="vr2"/>
+		<State id="12" name="vr3"/>
+		<State id="13" name="vr4"/>
+		<State id="14" name="vr5"/>
+		<State id="15" name="vr6"/>
+		<State id="16" name="vr7"/>
+		<State id="17" name="vr8"/>
+		<State id="18" name="zs1"/>
+		<State id="19" name="zs2"/>
+		<State id="20" name="zs3"/>
+		<State id="21" name="zs4"/>
+		<State id="22" name="zs5"/>
+		<State id="23" name="zs6"/>
+		<State id="24" name="zs7"/>
+		<State id="25" name="zs8"/>
+		<State id="26" name="zs9"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="4" event="7"/>
+		<Transition source="0" dest="14" event="10"/>
+		<Transition source="0" dest="22" event="11"/>
+		<Transition source="0" dest="9" event="8"/>
+		<Transition source="1" dest="4" event="7"/>
+		<Transition source="1" dest="7" event="8"/>
+		<Transition source="1" dest="10" event="10"/>
+		<Transition source="1" dest="10" event="9"/>
+		<Transition source="1" dest="18" event="11"/>
+		<Transition source="2" dest="4" event="7"/>
+		<Transition source="2" dest="17" event="10"/>
+		<Transition source="2" dest="17" event="9"/>
+		<Transition source="2" dest="26" event="11"/>
+		<Transition source="2" dest="7" event="8"/>
+		<Transition source="3" dest="4" event="7"/>
+		<Transition source="3" dest="25" event="11"/>
+		<Transition source="3" dest="7" event="8"/>
+		<Transition source="3" dest="10" event="10"/>
+		<Transition source="3" dest="10" event="9"/>
+		<Transition source="4" dest="4" event="6"/>
+		<Transition source="4" dest="4" event="20"/>
+		<Transition source="4" dest="5" event="12"/>
+		<Transition source="5" dest="5" event="20"/>
+		<Transition source="5" dest="6" event="15"/>
+		<Transition source="6" dest="0" event="0"/>
+		<Transition source="7" dest="4" event="7"/>
+		<Transition source="7" dest="8" event="12"/>
+		<Transition source="8" dest="4" event="7"/>
+		<Transition source="8" dest="8" event="6"/>
+		<Transition source="8" dest="8" event="20"/>
+		<Transition source="8" dest="9" event="15"/>
+		<Transition source="9" dest="4" event="7"/>
+		<Transition source="9" dest="0" event="2"/>
+		<Transition source="10" dest="4" event="7"/>
+		<Transition source="10" dest="11" event="12"/>
+		<Transition source="11" dest="4" event="7"/>
+		<Transition source="11" dest="12" event="15"/>
+		<Transition source="11" dest="11" event="6"/>
+		<Transition source="11" dest="11" event="20"/>
+		<Transition source="12" dest="13" event="19"/>
+		<Transition source="12" dest="4" event="7"/>
+		<Transition source="13" dest="4" event="7"/>
+		<Transition source="13" dest="14" event="20"/>
+		<Transition source="14" dest="4" event="7"/>
+		<Transition source="14" dest="15" event="13"/>
+		<Transition source="15" dest="4" event="7"/>
+		<Transition source="15" dest="15" event="6"/>
+		<Transition source="15" dest="15" event="20"/>
+		<Transition source="15" dest="16" event="16"/>
+		<Transition source="16" dest="4" event="7"/>
+		<Transition source="16" dest="2" event="4"/>
+		<Transition source="16" dest="2" event="3"/>
+		<Transition source="17" dest="4" event="7"/>
+		<Transition source="17" dest="10" event="1"/>
+		<Transition source="17" dest="16" event="18"/>
+		<Transition source="18" dest="4" event="7"/>
+		<Transition source="18" dest="19" event="12"/>
+		<Transition source="19" dest="4" event="7"/>
+		<Transition source="19" dest="20" event="15"/>
+		<Transition source="19" dest="19" event="6"/>
+		<Transition source="19" dest="19" event="20"/>
+		<Transition source="20" dest="4" event="7"/>
+		<Transition source="20" dest="21" event="19"/>
+		<Transition source="21" dest="4" event="7"/>
+		<Transition source="21" dest="22" event="20"/>
+		<Transition source="22" dest="4" event="7"/>
+		<Transition source="22" dest="23" event="14"/>
+		<Transition source="23" dest="23" event="6"/>
+		<Transition source="23" dest="23" event="20"/>
+		<Transition source="23" dest="24" event="17"/>
+		<Transition source="23" dest="4" event="7"/>
+		<Transition source="24" dest="4" event="7"/>
+		<Transition source="24" dest="3" event="5"/>
+		<Transition source="25" dest="4" event="7"/>
+		<Transition source="25" dest="24" event="18"/>
+		<Transition source="25" dest="18" event="1"/>
+		<Transition source="26" dest="4" event="7"/>
+		<Transition source="26" dest="22" event="18"/>
+		<Transition source="26" dest="18" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="nftuer.BH" type="Specification">
+	<Events>
+		<Event id="0" label="CS_ok"/>
+		<Event id="1" label="async.BH"/>
+		<Event id="2" label="done_ER"/>
+		<Event id="3" label="done_SER.FT"/>
+		<Event id="4" label="done_VR"/>
+		<Event id="5" label="done_ZS"/>
+		<Event id="6" label="reset.BH"/>
+		<Event id="7" label="soft_CS"/>
+		<Event id="8" label="soft_ER"/>
+		<Event id="9" label="soft_SER.FT"/>
+		<Event id="10" label="soft_VR"/>
+		<Event id="11" label="soft_ZS"/>
+		<Event id="12" label="start_ER.BH"/>
+		<Event id="13" label="start_VR.BH"/>
+		<Event id="14" label="start_ZS.BH"/>
+		<Event id="15" label="stop_ER.BH"/>
+		<Event id="16" label="stop_VR.BH"/>
+		<Event id="17" label="stop_ZS.BH"/>
+		<Event id="18" label="sync.BH"/>
+		<Event id="19" label="time_W.BH"/>
+		<Event id="20" label="timeout.BH" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="ER" accepting="true"/>
+		<State id="1" name="IN" initial="true"/>
+		<State id="2" name="VR" accepting="true"/>
+		<State id="3" name="ZS" accepting="true"/>
+		<State id="4" name="cs1"/>
+		<State id="5" name="cs2"/>
+		<State id="6" name="cs3"/>
+		<State id="7" name="er1"/>
+		<State id="8" name="er2"/>
+		<State id="9" name="er3"/>
+		<State id="10" name="vr1"/>
+		<State id="11" name="vr2"/>
+		<State id="12" name="vr3"/>
+		<State id="13" name="vr4"/>
+		<State id="14" name="vr5"/>
+		<State id="15" name="vr6"/>
+		<State id="16" name="vr7"/>
+		<State id="17" name="vr8"/>
+		<State id="18" name="zs1"/>
+		<State id="19" name="zs2"/>
+		<State id="20" name="zs3"/>
+		<State id="21" name="zs4"/>
+		<State id="22" name="zs5"/>
+		<State id="23" name="zs6"/>
+		<State id="24" name="zs7"/>
+		<State id="25" name="zs8"/>
+		<State id="26" name="zs9"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="4" event="7"/>
+		<Transition source="0" dest="14" event="10"/>
+		<Transition source="0" dest="22" event="11"/>
+		<Transition source="0" dest="9" event="8"/>
+		<Transition source="1" dest="4" event="7"/>
+		<Transition source="1" dest="7" event="8"/>
+		<Transition source="1" dest="10" event="10"/>
+		<Transition source="1" dest="10" event="9"/>
+		<Transition source="1" dest="18" event="11"/>
+		<Transition source="2" dest="4" event="7"/>
+		<Transition source="2" dest="17" event="10"/>
+		<Transition source="2" dest="17" event="9"/>
+		<Transition source="2" dest="26" event="11"/>
+		<Transition source="2" dest="7" event="8"/>
+		<Transition source="3" dest="4" event="7"/>
+		<Transition source="3" dest="25" event="11"/>
+		<Transition source="3" dest="7" event="8"/>
+		<Transition source="3" dest="10" event="10"/>
+		<Transition source="3" dest="10" event="9"/>
+		<Transition source="4" dest="4" event="6"/>
+		<Transition source="4" dest="4" event="20"/>
+		<Transition source="4" dest="5" event="12"/>
+		<Transition source="5" dest="5" event="20"/>
+		<Transition source="5" dest="6" event="15"/>
+		<Transition source="6" dest="0" event="0"/>
+		<Transition source="7" dest="4" event="7"/>
+		<Transition source="7" dest="8" event="12"/>
+		<Transition source="8" dest="4" event="7"/>
+		<Transition source="8" dest="8" event="6"/>
+		<Transition source="8" dest="8" event="20"/>
+		<Transition source="8" dest="9" event="15"/>
+		<Transition source="9" dest="4" event="7"/>
+		<Transition source="9" dest="0" event="2"/>
+		<Transition source="10" dest="4" event="7"/>
+		<Transition source="10" dest="11" event="12"/>
+		<Transition source="11" dest="4" event="7"/>
+		<Transition source="11" dest="12" event="15"/>
+		<Transition source="11" dest="11" event="6"/>
+		<Transition source="11" dest="11" event="20"/>
+		<Transition source="12" dest="13" event="19"/>
+		<Transition source="12" dest="4" event="7"/>
+		<Transition source="13" dest="4" event="7"/>
+		<Transition source="13" dest="14" event="20"/>
+		<Transition source="14" dest="4" event="7"/>
+		<Transition source="14" dest="15" event="13"/>
+		<Transition source="15" dest="4" event="7"/>
+		<Transition source="15" dest="15" event="6"/>
+		<Transition source="15" dest="15" event="20"/>
+		<Transition source="15" dest="16" event="16"/>
+		<Transition source="16" dest="4" event="7"/>
+		<Transition source="16" dest="2" event="4"/>
+		<Transition source="16" dest="2" event="3"/>
+		<Transition source="17" dest="4" event="7"/>
+		<Transition source="17" dest="10" event="1"/>
+		<Transition source="17" dest="16" event="18"/>
+		<Transition source="18" dest="4" event="7"/>
+		<Transition source="18" dest="19" event="12"/>
+		<Transition source="19" dest="4" event="7"/>
+		<Transition source="19" dest="20" event="15"/>
+		<Transition source="19" dest="19" event="6"/>
+		<Transition source="19" dest="19" event="20"/>
+		<Transition source="20" dest="4" event="7"/>
+		<Transition source="20" dest="21" event="19"/>
+		<Transition source="21" dest="4" event="7"/>
+		<Transition source="21" dest="22" event="20"/>
+		<Transition source="22" dest="4" event="7"/>
+		<Transition source="22" dest="23" event="14"/>
+		<Transition source="23" dest="23" event="6"/>
+		<Transition source="23" dest="23" event="20"/>
+		<Transition source="23" dest="24" event="17"/>
+		<Transition source="23" dest="4" event="7"/>
+		<Transition source="24" dest="4" event="7"/>
+		<Transition source="24" dest="3" event="5"/>
+		<Transition source="25" dest="4" event="7"/>
+		<Transition source="25" dest="24" event="18"/>
+		<Transition source="25" dest="18" event="1"/>
+		<Transition source="26" dest="4" event="7"/>
+		<Transition source="26" dest="22" event="18"/>
+		<Transition source="26" dest="18" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="ttimguard.FT" type="Specification">
+	<Events>
+		<Event id="0" label="reset.FT"/>
+		<Event id="1" label="start_ER.FT"/>
+		<Event id="2" label="start_VR.FT"/>
+		<Event id="3" label="start_ZS.FT"/>
+		<Event id="4" label="stop_ER.FT"/>
+		<Event id="5" label="stop_VR.FT"/>
+		<Event id="6" label="stop_ZS.FT"/>
+		<Event id="7" label="time_ER.FT"/>
+		<Event id="8" label="time_VR.FT"/>
+		<Event id="9" label="time_W.FT"/>
+		<Event id="10" label="time_ZS.FT"/>
+		<Event id="11" label="timeout.FT" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="IDLE" initial="true" accepting="true"/>
+		<State id="1" name="RUN"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="9"/>
+		<Transition source="0" dest="1" event="7"/>
+		<Transition source="0" dest="1" event="8"/>
+		<Transition source="0" dest="1" event="10"/>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="0" event="5"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="0" dest="0" event="6"/>
+		<Transition source="1" dest="0" event="11"/>
+		<Transition source="1" dest="0" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="ttimguard.BT" type="Specification">
+	<Events>
+		<Event id="0" label="reset.BT"/>
+		<Event id="1" label="start_ER.BT"/>
+		<Event id="2" label="start_VR.BT"/>
+		<Event id="3" label="start_ZS.BT"/>
+		<Event id="4" label="stop_ER.BT"/>
+		<Event id="5" label="stop_VR.BT"/>
+		<Event id="6" label="stop_ZS.BT"/>
+		<Event id="7" label="time_ER.BT"/>
+		<Event id="8" label="time_VR.BT"/>
+		<Event id="9" label="time_W.BT"/>
+		<Event id="10" label="time_ZS.BT"/>
+		<Event id="11" label="timeout.BT" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="IDLE" initial="true" accepting="true"/>
+		<State id="1" name="RUN"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="9"/>
+		<Transition source="0" dest="1" event="7"/>
+		<Transition source="0" dest="1" event="8"/>
+		<Transition source="0" dest="1" event="10"/>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="0" event="5"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="0" dest="0" event="6"/>
+		<Transition source="1" dest="0" event="11"/>
+		<Transition source="1" dest="0" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="ttimguard.FH" type="Specification">
+	<Events>
+		<Event id="0" label="reset.FH"/>
+		<Event id="1" label="start_ER.FH"/>
+		<Event id="2" label="start_VR.FH"/>
+		<Event id="3" label="start_ZS.FH"/>
+		<Event id="4" label="stop_ER.FH"/>
+		<Event id="5" label="stop_VR.FH"/>
+		<Event id="6" label="stop_ZS.FH"/>
+		<Event id="7" label="time_ER.FH"/>
+		<Event id="8" label="time_VR.FH"/>
+		<Event id="9" label="time_W.FH"/>
+		<Event id="10" label="time_ZS.FH"/>
+		<Event id="11" label="timeout.FH" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="IDLE" initial="true" accepting="true"/>
+		<State id="1" name="RUN"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="9"/>
+		<Transition source="0" dest="1" event="7"/>
+		<Transition source="0" dest="1" event="8"/>
+		<Transition source="0" dest="1" event="10"/>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="0" event="5"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="0" dest="0" event="6"/>
+		<Transition source="1" dest="0" event="11"/>
+		<Transition source="1" dest="0" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="ttimguard.BH" type="Specification">
+	<Events>
+		<Event id="0" label="reset.BH"/>
+		<Event id="1" label="start_ER.BH"/>
+		<Event id="2" label="start_VR.BH"/>
+		<Event id="3" label="start_ZS.BH"/>
+		<Event id="4" label="stop_ER.BH"/>
+		<Event id="5" label="stop_VR.BH"/>
+		<Event id="6" label="stop_ZS.BH"/>
+		<Event id="7" label="time_ER.BH"/>
+		<Event id="8" label="time_VR.BH"/>
+		<Event id="9" label="time_W.BH"/>
+		<Event id="10" label="time_ZS.BH"/>
+		<Event id="11" label="timeout.BH" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="IDLE" initial="true" accepting="true"/>
+		<State id="1" name="RUN"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="9"/>
+		<Transition source="0" dest="1" event="7"/>
+		<Transition source="0" dest="1" event="8"/>
+		<Transition source="0" dest="1" event="10"/>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="0" event="5"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="0" dest="0" event="6"/>
+		<Transition source="1" dest="0" event="11"/>
+		<Transition source="1" dest="0" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="tklemme.FT" type="Plant">
+	<Events>
+		<Event id="0" label="tuer_auf.FT" controllable="false"/>
+		<Event id="1" label="tuer_zu.FT" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="AUF" initial="true"/>
+		<State id="1" name="ZU" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="0" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="tklemme.BT" type="Plant">
+	<Events>
+		<Event id="0" label="tuer_auf.BT" controllable="false"/>
+		<Event id="1" label="tuer_zu.BT" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="AUF" initial="true"/>
+		<State id="1" name="ZU" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="0" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="tklemme.FH" type="Plant">
+	<Events>
+		<Event id="0" label="tuer_auf.FH" controllable="false"/>
+		<Event id="1" label="tuer_zu.FH" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="AUF" initial="true"/>
+		<State id="1" name="ZU" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="0" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="tklemme.BH" type="Plant">
+	<Events>
+		<Event id="0" label="tuer_auf.BH" controllable="false"/>
+		<Event id="1" label="tuer_zu.BH" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="AUF" initial="true"/>
+		<State id="1" name="ZU" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="0" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="mvr.FH" type="Plant">
+	<Events>
+		<Event id="0" label="MVR_an.FH"/>
+		<Event id="1" label="MVR_aus.FH"/>
+	</Events>
+	<States>
+		<State id="0" name="IDLE" initial="true" accepting="true"/>
+		<State id="1" name="RUN"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="0" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="mvr.BH" type="Plant">
+	<Events>
+		<Event id="0" label="MVR_an.BH"/>
+		<Event id="1" label="MVR_aus.BH"/>
+	</Events>
+	<States>
+		<State id="0" name="IDLE" initial="true" accepting="true"/>
+		<State id="1" name="RUN"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="0" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="mzs.FH" type="Plant">
+	<Events>
+		<Event id="0" label="MZS_an.FH"/>
+		<Event id="1" label="MZS_aus.FH"/>
+	</Events>
+	<States>
+		<State id="0" name="IDLE" initial="true" accepting="true"/>
+		<State id="1" name="RUN"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="0" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="mzs.BH" type="Plant">
+	<Events>
+		<Event id="0" label="MZS_an.BH"/>
+		<Event id="1" label="MZS_aus.BH"/>
+	</Events>
+	<States>
+		<State id="0" name="IDLE" initial="true" accepting="true"/>
+		<State id="1" name="RUN"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="0" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="sync.FT" type="Specification">
+	<Events>
+		<Event id="0" label="async.FT"/>
+		<Event id="1" label="start_VR.FT"/>
+		<Event id="2" label="start_ZS.FT"/>
+		<Event id="3" label="stop_ER.FT"/>
+		<Event id="4" label="sync.FT"/>
+		<Event id="5" label="tuer_auf.FT" controllable="false"/>
+		<Event id="6" label="tuer_zu.FT" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="ASY" initial="true"/>
+		<State id="1" name="AUF"/>
+		<State id="2" name="AZU"/>
+		<State id="3" name="VR" accepting="true"/>
+		<State id="4" name="ZU" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="0" event="0"/>
+		<Transition source="0" dest="2" event="6"/>
+		<Transition source="1" dest="1" event="4"/>
+		<Transition source="1" dest="1" event="3"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="1" dest="0" event="2"/>
+		<Transition source="1" dest="4" event="6"/>
+		<Transition source="2" dest="0" event="5"/>
+		<Transition source="2" dest="2" event="0"/>
+		<Transition source="2" dest="2" event="1"/>
+		<Transition source="2" dest="2" event="2"/>
+		<Transition source="2" dest="4" event="3"/>
+		<Transition source="3" dest="3" event="1"/>
+		<Transition source="3" dest="3" event="2"/>
+		<Transition source="3" dest="3" event="4"/>
+		<Transition source="3" dest="0" event="5"/>
+		<Transition source="3" dest="4" event="3"/>
+		<Transition source="4" dest="1" event="5"/>
+		<Transition source="4" dest="3" event="1"/>
+		<Transition source="4" dest="3" event="2"/>
+		<Transition source="4" dest="4" event="4"/>
+		<Transition source="4" dest="4" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="sync.BT" type="Specification">
+	<Events>
+		<Event id="0" label="async.BT"/>
+		<Event id="1" label="start_VR.BT"/>
+		<Event id="2" label="start_ZS.BT"/>
+		<Event id="3" label="stop_ER.BT"/>
+		<Event id="4" label="sync.BT"/>
+		<Event id="5" label="tuer_auf.BT" controllable="false"/>
+		<Event id="6" label="tuer_zu.BT" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="ASY" initial="true"/>
+		<State id="1" name="AUF"/>
+		<State id="2" name="AZU"/>
+		<State id="3" name="VR" accepting="true"/>
+		<State id="4" name="ZU" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="0" event="0"/>
+		<Transition source="0" dest="2" event="6"/>
+		<Transition source="1" dest="1" event="4"/>
+		<Transition source="1" dest="1" event="3"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="1" dest="0" event="2"/>
+		<Transition source="1" dest="4" event="6"/>
+		<Transition source="2" dest="0" event="5"/>
+		<Transition source="2" dest="2" event="0"/>
+		<Transition source="2" dest="2" event="1"/>
+		<Transition source="2" dest="2" event="2"/>
+		<Transition source="2" dest="4" event="3"/>
+		<Transition source="3" dest="3" event="1"/>
+		<Transition source="3" dest="3" event="2"/>
+		<Transition source="3" dest="3" event="4"/>
+		<Transition source="3" dest="0" event="5"/>
+		<Transition source="3" dest="4" event="3"/>
+		<Transition source="4" dest="1" event="5"/>
+		<Transition source="4" dest="3" event="1"/>
+		<Transition source="4" dest="3" event="2"/>
+		<Transition source="4" dest="4" event="4"/>
+		<Transition source="4" dest="4" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="sync.FH" type="Specification">
+	<Events>
+		<Event id="0" label="async.FH"/>
+		<Event id="1" label="start_VR.FH"/>
+		<Event id="2" label="start_ZS.FH"/>
+		<Event id="3" label="stop_ER.FH"/>
+		<Event id="4" label="sync.FH"/>
+		<Event id="5" label="tuer_auf.FH" controllable="false"/>
+		<Event id="6" label="tuer_zu.FH" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="ASY" initial="true"/>
+		<State id="1" name="AUF"/>
+		<State id="2" name="AZU"/>
+		<State id="3" name="VR" accepting="true"/>
+		<State id="4" name="ZU" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="0" event="0"/>
+		<Transition source="0" dest="2" event="6"/>
+		<Transition source="1" dest="1" event="4"/>
+		<Transition source="1" dest="1" event="3"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="1" dest="0" event="2"/>
+		<Transition source="1" dest="4" event="6"/>
+		<Transition source="2" dest="0" event="5"/>
+		<Transition source="2" dest="2" event="0"/>
+		<Transition source="2" dest="2" event="1"/>
+		<Transition source="2" dest="2" event="2"/>
+		<Transition source="2" dest="4" event="3"/>
+		<Transition source="3" dest="3" event="1"/>
+		<Transition source="3" dest="3" event="2"/>
+		<Transition source="3" dest="3" event="4"/>
+		<Transition source="3" dest="0" event="5"/>
+		<Transition source="3" dest="4" event="3"/>
+		<Transition source="4" dest="1" event="5"/>
+		<Transition source="4" dest="3" event="1"/>
+		<Transition source="4" dest="3" event="2"/>
+		<Transition source="4" dest="4" event="4"/>
+		<Transition source="4" dest="4" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="sync.BH" type="Specification">
+	<Events>
+		<Event id="0" label="async.BH"/>
+		<Event id="1" label="start_VR.BH"/>
+		<Event id="2" label="start_ZS.BH"/>
+		<Event id="3" label="stop_ER.BH"/>
+		<Event id="4" label="sync.BH"/>
+		<Event id="5" label="tuer_auf.BH" controllable="false"/>
+		<Event id="6" label="tuer_zu.BH" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="ASY" initial="true"/>
+		<State id="1" name="AUF"/>
+		<State id="2" name="AZU"/>
+		<State id="3" name="VR" accepting="true"/>
+		<State id="4" name="ZU" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="0" event="0"/>
+		<Transition source="0" dest="2" event="6"/>
+		<Transition source="1" dest="1" event="4"/>
+		<Transition source="1" dest="1" event="3"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="1" dest="0" event="2"/>
+		<Transition source="1" dest="4" event="6"/>
+		<Transition source="2" dest="0" event="5"/>
+		<Transition source="2" dest="2" event="0"/>
+		<Transition source="2" dest="2" event="1"/>
+		<Transition source="2" dest="2" event="2"/>
+		<Transition source="2" dest="4" event="3"/>
+		<Transition source="3" dest="3" event="1"/>
+		<Transition source="3" dest="3" event="2"/>
+		<Transition source="3" dest="3" event="4"/>
+		<Transition source="3" dest="0" event="5"/>
+		<Transition source="3" dest="4" event="3"/>
+		<Transition source="4" dest="1" event="5"/>
+		<Transition source="4" dest="3" event="1"/>
+		<Transition source="4" dest="3" event="2"/>
+		<Transition source="4" dest="4" event="4"/>
+		<Transition source="4" dest="4" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="ftuer.FT" type="Specification">
+	<Events>
+		<Event id="0" label="CS_ok"/>
+		<Event id="1" label="async.FT"/>
+		<Event id="2" label="done_ER"/>
+		<Event id="3" label="done_SER.FT"/>
+		<Event id="4" label="done_VR"/>
+		<Event id="5" label="done_ZS"/>
+		<Event id="6" label="reset.FT"/>
+		<Event id="7" label="soft_CS"/>
+		<Event id="8" label="soft_ER"/>
+		<Event id="9" label="soft_SER.FT"/>
+		<Event id="10" label="soft_VR"/>
+		<Event id="11" label="soft_ZS"/>
+		<Event id="12" label="start_ER.FT"/>
+		<Event id="13" label="start_VR.FT"/>
+		<Event id="14" label="start_ZS.FT"/>
+		<Event id="15" label="stop_ER.FT"/>
+		<Event id="16" label="stop_VR.FT"/>
+		<Event id="17" label="stop_ZS.FT"/>
+		<Event id="18" label="sync.FT"/>
+		<Event id="19" label="time_W.FT"/>
+		<Event id="20" label="timeout.FT" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="ER" accepting="true"/>
+		<State id="1" name="IN" initial="true"/>
+		<State id="2" name="VR" accepting="true"/>
+		<State id="3" name="ZS" accepting="true"/>
+		<State id="4" name="cs1"/>
+		<State id="5" name="cs2"/>
+		<State id="6" name="cs3"/>
+		<State id="7" name="er1"/>
+		<State id="8" name="er2"/>
+		<State id="9" name="er3"/>
+		<State id="10" name="vr1"/>
+		<State id="11" name="vr2"/>
+		<State id="12" name="vr3"/>
+		<State id="13" name="vr4"/>
+		<State id="14" name="vr5"/>
+		<State id="15" name="vr6"/>
+		<State id="16" name="vr7"/>
+		<State id="17" name="vr8"/>
+		<State id="18" name="zs1"/>
+		<State id="19" name="zs2"/>
+		<State id="20" name="zs3"/>
+		<State id="21" name="zs4"/>
+		<State id="22" name="zs5"/>
+		<State id="23" name="zs6"/>
+		<State id="24" name="zs7"/>
+		<State id="25" name="zs8"/>
+		<State id="26" name="zs9"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="9" event="8"/>
+		<Transition source="0" dest="9" event="9"/>
+		<Transition source="0" dest="14" event="10"/>
+		<Transition source="0" dest="22" event="11"/>
+		<Transition source="0" dest="4" event="7"/>
+		<Transition source="1" dest="4" event="7"/>
+		<Transition source="1" dest="10" event="10"/>
+		<Transition source="1" dest="7" event="8"/>
+		<Transition source="1" dest="7" event="9"/>
+		<Transition source="1" dest="18" event="11"/>
+		<Transition source="2" dest="17" event="10"/>
+		<Transition source="2" dest="26" event="11"/>
+		<Transition source="2" dest="7" event="8"/>
+		<Transition source="2" dest="7" event="9"/>
+		<Transition source="2" dest="4" event="7"/>
+		<Transition source="3" dest="10" event="10"/>
+		<Transition source="3" dest="7" event="8"/>
+		<Transition source="3" dest="7" event="9"/>
+		<Transition source="3" dest="25" event="11"/>
+		<Transition source="3" dest="4" event="7"/>
+		<Transition source="4" dest="5" event="12"/>
+		<Transition source="4" dest="4" event="6"/>
+		<Transition source="4" dest="4" event="20"/>
+		<Transition source="5" dest="5" event="20"/>
+		<Transition source="5" dest="6" event="15"/>
+		<Transition source="6" dest="0" event="0"/>
+		<Transition source="7" dest="8" event="12"/>
+		<Transition source="7" dest="4" event="7"/>
+		<Transition source="8" dest="9" event="15"/>
+		<Transition source="8" dest="8" event="6"/>
+		<Transition source="8" dest="8" event="20"/>
+		<Transition source="8" dest="4" event="7"/>
+		<Transition source="9" dest="0" event="2"/>
+		<Transition source="9" dest="0" event="3"/>
+		<Transition source="9" dest="4" event="7"/>
+		<Transition source="10" dest="11" event="12"/>
+		<Transition source="10" dest="4" event="7"/>
+		<Transition source="11" dest="11" event="6"/>
+		<Transition source="11" dest="11" event="20"/>
+		<Transition source="11" dest="12" event="15"/>
+		<Transition source="11" dest="4" event="7"/>
+		<Transition source="12" dest="13" event="19"/>
+		<Transition source="12" dest="4" event="7"/>
+		<Transition source="13" dest="14" event="20"/>
+		<Transition source="13" dest="4" event="7"/>
+		<Transition source="14" dest="15" event="13"/>
+		<Transition source="14" dest="4" event="7"/>
+		<Transition source="15" dest="15" event="6"/>
+		<Transition source="15" dest="15" event="20"/>
+		<Transition source="15" dest="16" event="16"/>
+		<Transition source="15" dest="4" event="7"/>
+		<Transition source="16" dest="2" event="4"/>
+		<Transition source="16" dest="4" event="7"/>
+		<Transition source="17" dest="16" event="18"/>
+		<Transition source="17" dest="10" event="1"/>
+		<Transition source="17" dest="4" event="7"/>
+		<Transition source="18" dest="19" event="12"/>
+		<Transition source="18" dest="4" event="7"/>
+		<Transition source="19" dest="19" event="6"/>
+		<Transition source="19" dest="19" event="20"/>
+		<Transition source="19" dest="20" event="15"/>
+		<Transition source="19" dest="4" event="7"/>
+		<Transition source="20" dest="21" event="19"/>
+		<Transition source="20" dest="4" event="7"/>
+		<Transition source="21" dest="22" event="20"/>
+		<Transition source="21" dest="4" event="7"/>
+		<Transition source="22" dest="23" event="14"/>
+		<Transition source="22" dest="4" event="7"/>
+		<Transition source="23" dest="24" event="17"/>
+		<Transition source="23" dest="23" event="6"/>
+		<Transition source="23" dest="23" event="20"/>
+		<Transition source="23" dest="4" event="7"/>
+		<Transition source="24" dest="3" event="5"/>
+		<Transition source="24" dest="4" event="7"/>
+		<Transition source="25" dest="24" event="18"/>
+		<Transition source="25" dest="18" event="1"/>
+		<Transition source="25" dest="4" event="7"/>
+		<Transition source="26" dest="22" event="18"/>
+		<Transition source="26" dest="18" event="1"/>
+		<Transition source="26" dest="4" event="7"/>
+	</Transitions>
+</Automaton>
+<Automaton name="timer.WSP" type="Plant">
+	<Events>
+		<Event id="0" label="reset.WSP"/>
+		<Event id="1" label="time.WSP"/>
+		<Event id="2" label="timeout.WSP" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="IDLE" initial="true" accepting="true"/>
+		<State id="1" name="RUN"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="0" event="2"/>
+		<Transition source="1" dest="0" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="timer.FS" type="Plant">
+	<Events>
+		<Event id="0" label="reset.FS"/>
+		<Event id="1" label="time.FS"/>
+		<Event id="2" label="timeout.FS" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="IDLE" initial="true" accepting="true"/>
+		<State id="1" name="RUN"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="0" event="2"/>
+		<Transition source="1" dest="0" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="tmotor1.FT" type="Specification">
+	<Events>
+		<Event id="0" label="MER_an.FT"/>
+		<Event id="1" label="MER_aus.FT"/>
+		<Event id="2" label="MVR_an.FT"/>
+		<Event id="3" label="MVR_aus.FT"/>
+		<Event id="4" label="STZV.FT" controllable="false"/>
+		<Event id="5" label="reset.FT"/>
+		<Event id="6" label="soft_CS"/>
+		<Event id="7" label="start_ER.FT"/>
+		<Event id="8" label="start_VR.FT"/>
+		<Event id="9" label="start_ZS.FT"/>
+		<Event id="10" label="stop_ER.FT"/>
+		<Event id="11" label="stop_VR.FT"/>
+		<Event id="12" label="stop_ZS.FT"/>
+		<Event id="13" label="time_ER.FT"/>
+		<Event id="14" label="time_VR.FT"/>
+		<Event id="15" label="time_ZS.FT"/>
+		<Event id="16" label="timeout.FT" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="IN" initial="true" accepting="true"/>
+		<State id="1" name="er1"/>
+		<State id="2" name="er2"/>
+		<State id="3" name="er3"/>
+		<State id="4" name="er4"/>
+		<State id="5" name="vr1"/>
+		<State id="6" name="vr2"/>
+		<State id="7" name="vr3"/>
+		<State id="8" name="vr4"/>
+		<State id="9" name="vr5"/>
+		<State id="10" name="zs1"/>
+		<State id="11" name="zs2"/>
+		<State id="12" name="zs3"/>
+		<State id="13" name="zs4"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="6"/>
+		<Transition source="0" dest="5" event="8"/>
+		<Transition source="0" dest="1" event="7"/>
+		<Transition source="0" dest="10" event="9"/>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="0" dest="0" event="5"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="0" event="16"/>
+		<Transition source="1" dest="2" event="13"/>
+		<Transition source="1" dest="0" event="6"/>
+		<Transition source="2" dest="0" event="6"/>
+		<Transition source="2" dest="3" event="0"/>
+		<Transition source="2" dest="4" event="16"/>
+		<Transition source="3" dest="0" event="6"/>
+		<Transition source="3" dest="4" event="16"/>
+		<Transition source="4" dest="0" event="6"/>
+		<Transition source="4" dest="4" event="1"/>
+		<Transition source="4" dest="0" event="10"/>
+		<Transition source="5" dest="0" event="6"/>
+		<Transition source="5" dest="6" event="14"/>
+		<Transition source="6" dest="0" event="6"/>
+		<Transition source="6" dest="7" event="2"/>
+		<Transition source="6" dest="9" event="16"/>
+		<Transition source="7" dest="8" event="4"/>
+		<Transition source="7" dest="8" event="16"/>
+		<Transition source="7" dest="0" event="6"/>
+		<Transition source="8" dest="0" event="6"/>
+		<Transition source="8" dest="8" event="4"/>
+		<Transition source="8" dest="8" event="16"/>
+		<Transition source="8" dest="9" event="3"/>
+		<Transition source="9" dest="0" event="6"/>
+		<Transition source="9" dest="9" event="5"/>
+		<Transition source="9" dest="9" event="16"/>
+		<Transition source="9" dest="0" event="11"/>
+		<Transition source="10" dest="11" event="15"/>
+		<Transition source="10" dest="0" event="6"/>
+		<Transition source="11" dest="0" event="6"/>
+		<Transition source="11" dest="13" event="16"/>
+		<Transition source="11" dest="12" event="2"/>
+		<Transition source="12" dest="0" event="6"/>
+		<Transition source="12" dest="13" event="16"/>
+		<Transition source="12" dest="12" event="4"/>
+		<Transition source="13" dest="0" event="6"/>
+		<Transition source="13" dest="13" event="3"/>
+		<Transition source="13" dest="13" event="4"/>
+		<Transition source="13" dest="0" event="12"/>
+	</Transitions>
+</Automaton>
+<Automaton name="tmotor1.BT" type="Specification">
+	<Events>
+		<Event id="0" label="MER_an.BT"/>
+		<Event id="1" label="MER_aus.BT"/>
+		<Event id="2" label="MVR_an.BT"/>
+		<Event id="3" label="MVR_aus.BT"/>
+		<Event id="4" label="STZV.BT" controllable="false"/>
+		<Event id="5" label="reset.BT"/>
+		<Event id="6" label="soft_CS"/>
+		<Event id="7" label="start_ER.BT"/>
+		<Event id="8" label="start_VR.BT"/>
+		<Event id="9" label="start_ZS.BT"/>
+		<Event id="10" label="stop_ER.BT"/>
+		<Event id="11" label="stop_VR.BT"/>
+		<Event id="12" label="stop_ZS.BT"/>
+		<Event id="13" label="time_ER.BT"/>
+		<Event id="14" label="time_VR.BT"/>
+		<Event id="15" label="time_ZS.BT"/>
+		<Event id="16" label="timeout.BT" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="IN" initial="true" accepting="true"/>
+		<State id="1" name="er1"/>
+		<State id="2" name="er2"/>
+		<State id="3" name="er3"/>
+		<State id="4" name="er4"/>
+		<State id="5" name="vr1"/>
+		<State id="6" name="vr2"/>
+		<State id="7" name="vr3"/>
+		<State id="8" name="vr4"/>
+		<State id="9" name="vr5"/>
+		<State id="10" name="zs1"/>
+		<State id="11" name="zs2"/>
+		<State id="12" name="zs3"/>
+		<State id="13" name="zs4"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="6"/>
+		<Transition source="0" dest="5" event="8"/>
+		<Transition source="0" dest="1" event="7"/>
+		<Transition source="0" dest="10" event="9"/>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="0" dest="0" event="5"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="0" event="16"/>
+		<Transition source="1" dest="2" event="13"/>
+		<Transition source="1" dest="0" event="6"/>
+		<Transition source="2" dest="0" event="6"/>
+		<Transition source="2" dest="3" event="0"/>
+		<Transition source="2" dest="4" event="16"/>
+		<Transition source="3" dest="0" event="6"/>
+		<Transition source="3" dest="4" event="16"/>
+		<Transition source="4" dest="0" event="6"/>
+		<Transition source="4" dest="4" event="1"/>
+		<Transition source="4" dest="0" event="10"/>
+		<Transition source="5" dest="0" event="6"/>
+		<Transition source="5" dest="6" event="14"/>
+		<Transition source="6" dest="0" event="6"/>
+		<Transition source="6" dest="7" event="2"/>
+		<Transition source="6" dest="9" event="16"/>
+		<Transition source="7" dest="8" event="4"/>
+		<Transition source="7" dest="8" event="16"/>
+		<Transition source="7" dest="0" event="6"/>
+		<Transition source="8" dest="0" event="6"/>
+		<Transition source="8" dest="8" event="4"/>
+		<Transition source="8" dest="8" event="16"/>
+		<Transition source="8" dest="9" event="3"/>
+		<Transition source="9" dest="0" event="6"/>
+		<Transition source="9" dest="9" event="5"/>
+		<Transition source="9" dest="9" event="16"/>
+		<Transition source="9" dest="0" event="11"/>
+		<Transition source="10" dest="11" event="15"/>
+		<Transition source="10" dest="0" event="6"/>
+		<Transition source="11" dest="0" event="6"/>
+		<Transition source="11" dest="13" event="16"/>
+		<Transition source="11" dest="12" event="2"/>
+		<Transition source="12" dest="0" event="6"/>
+		<Transition source="12" dest="13" event="16"/>
+		<Transition source="12" dest="12" event="4"/>
+		<Transition source="13" dest="0" event="6"/>
+		<Transition source="13" dest="13" event="3"/>
+		<Transition source="13" dest="13" event="4"/>
+		<Transition source="13" dest="0" event="12"/>
+	</Transitions>
+</Automaton>
+<Automaton name="tmotor2.FH" type="Specification">
+	<Events>
+		<Event id="0" label="MER_an.FH"/>
+		<Event id="1" label="MER_aus.FH"/>
+		<Event id="2" label="MVR_an.FH"/>
+		<Event id="3" label="MVR_aus.FH"/>
+		<Event id="4" label="MZS_an.FH"/>
+		<Event id="5" label="MZS_aus.FH"/>
+		<Event id="6" label="reset.FH"/>
+		<Event id="7" label="soft_CS"/>
+		<Event id="8" label="start_ER.FH"/>
+		<Event id="9" label="start_VR.FH"/>
+		<Event id="10" label="start_ZS.FH"/>
+		<Event id="11" label="stop_ER.FH"/>
+		<Event id="12" label="stop_VR.FH"/>
+		<Event id="13" label="stop_ZS.FH"/>
+		<Event id="14" label="time_ER.FH"/>
+		<Event id="15" label="time_VR.FH"/>
+		<Event id="16" label="time_ZS.FH"/>
+		<Event id="17" label="timeout.FH" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="IN" initial="true" accepting="true"/>
+		<State id="1" name="er1"/>
+		<State id="2" name="er2"/>
+		<State id="3" name="er3"/>
+		<State id="4" name="er4"/>
+		<State id="5" name="vr1"/>
+		<State id="6" name="vr2"/>
+		<State id="7" name="vr3"/>
+		<State id="8" name="vr4"/>
+		<State id="9" name="zs1"/>
+		<State id="10" name="zs2"/>
+		<State id="11" name="zs3a"/>
+		<State id="12" name="zs3b"/>
+		<State id="13" name="zs4"/>
+		<State id="14" name="zs5"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="9" event="10"/>
+		<Transition source="0" dest="1" event="8"/>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="0" dest="0" event="5"/>
+		<Transition source="0" dest="0" event="6"/>
+		<Transition source="0" dest="0" event="17"/>
+		<Transition source="0" dest="5" event="9"/>
+		<Transition source="0" dest="0" event="7"/>
+		<Transition source="1" dest="0" event="7"/>
+		<Transition source="1" dest="2" event="14"/>
+		<Transition source="2" dest="4" event="17"/>
+		<Transition source="2" dest="3" event="0"/>
+		<Transition source="2" dest="0" event="7"/>
+		<Transition source="3" dest="4" event="17"/>
+		<Transition source="3" dest="0" event="7"/>
+		<Transition source="4" dest="0" event="7"/>
+		<Transition source="4" dest="4" event="1"/>
+		<Transition source="4" dest="0" event="11"/>
+		<Transition source="5" dest="6" event="15"/>
+		<Transition source="5" dest="0" event="7"/>
+		<Transition source="6" dest="8" event="17"/>
+		<Transition source="6" dest="7" event="2"/>
+		<Transition source="6" dest="0" event="7"/>
+		<Transition source="7" dest="0" event="7"/>
+		<Transition source="7" dest="8" event="17"/>
+		<Transition source="8" dest="0" event="7"/>
+		<Transition source="8" dest="0" event="12"/>
+		<Transition source="8" dest="8" event="3"/>
+		<Transition source="9" dest="0" event="7"/>
+		<Transition source="9" dest="10" event="16"/>
+		<Transition source="10" dest="14" event="17"/>
+		<Transition source="10" dest="11" event="4"/>
+		<Transition source="10" dest="12" event="2"/>
+		<Transition source="10" dest="0" event="7"/>
+		<Transition source="11" dest="14" event="17"/>
+		<Transition source="11" dest="13" event="2"/>
+		<Transition source="11" dest="0" event="7"/>
+		<Transition source="12" dest="14" event="17"/>
+		<Transition source="12" dest="13" event="4"/>
+		<Transition source="12" dest="0" event="7"/>
+		<Transition source="13" dest="14" event="17"/>
+		<Transition source="13" dest="0" event="7"/>
+		<Transition source="14" dest="0" event="7"/>
+		<Transition source="14" dest="14" event="3"/>
+		<Transition source="14" dest="14" event="5"/>
+		<Transition source="14" dest="0" event="13"/>
+	</Transitions>
+</Automaton>
+<Automaton name="tmotor2.BH" type="Specification">
+	<Events>
+		<Event id="0" label="MER_an.BH"/>
+		<Event id="1" label="MER_aus.BH"/>
+		<Event id="2" label="MVR_an.BH"/>
+		<Event id="3" label="MVR_aus.BH"/>
+		<Event id="4" label="MZS_an.BH"/>
+		<Event id="5" label="MZS_aus.BH"/>
+		<Event id="6" label="reset.BH"/>
+		<Event id="7" label="soft_CS"/>
+		<Event id="8" label="start_ER.BH"/>
+		<Event id="9" label="start_VR.BH"/>
+		<Event id="10" label="start_ZS.BH"/>
+		<Event id="11" label="stop_ER.BH"/>
+		<Event id="12" label="stop_VR.BH"/>
+		<Event id="13" label="stop_ZS.BH"/>
+		<Event id="14" label="time_ER.BH"/>
+		<Event id="15" label="time_VR.BH"/>
+		<Event id="16" label="time_ZS.BH"/>
+		<Event id="17" label="timeout.BH" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="IN" initial="true" accepting="true"/>
+		<State id="1" name="er1"/>
+		<State id="2" name="er2"/>
+		<State id="3" name="er3"/>
+		<State id="4" name="er4"/>
+		<State id="5" name="vr1"/>
+		<State id="6" name="vr2"/>
+		<State id="7" name="vr3"/>
+		<State id="8" name="vr4"/>
+		<State id="9" name="zs1"/>
+		<State id="10" name="zs2"/>
+		<State id="11" name="zs3a"/>
+		<State id="12" name="zs3b"/>
+		<State id="13" name="zs4"/>
+		<State id="14" name="zs5"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="9" event="10"/>
+		<Transition source="0" dest="1" event="8"/>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="0" dest="0" event="5"/>
+		<Transition source="0" dest="0" event="6"/>
+		<Transition source="0" dest="0" event="17"/>
+		<Transition source="0" dest="5" event="9"/>
+		<Transition source="0" dest="0" event="7"/>
+		<Transition source="1" dest="0" event="7"/>
+		<Transition source="1" dest="2" event="14"/>
+		<Transition source="2" dest="4" event="17"/>
+		<Transition source="2" dest="3" event="0"/>
+		<Transition source="2" dest="0" event="7"/>
+		<Transition source="3" dest="4" event="17"/>
+		<Transition source="3" dest="0" event="7"/>
+		<Transition source="4" dest="0" event="7"/>
+		<Transition source="4" dest="4" event="1"/>
+		<Transition source="4" dest="0" event="11"/>
+		<Transition source="5" dest="6" event="15"/>
+		<Transition source="5" dest="0" event="7"/>
+		<Transition source="6" dest="8" event="17"/>
+		<Transition source="6" dest="7" event="2"/>
+		<Transition source="6" dest="0" event="7"/>
+		<Transition source="7" dest="0" event="7"/>
+		<Transition source="7" dest="8" event="17"/>
+		<Transition source="8" dest="0" event="7"/>
+		<Transition source="8" dest="0" event="12"/>
+		<Transition source="8" dest="8" event="3"/>
+		<Transition source="9" dest="0" event="7"/>
+		<Transition source="9" dest="10" event="16"/>
+		<Transition source="10" dest="14" event="17"/>
+		<Transition source="10" dest="11" event="4"/>
+		<Transition source="10" dest="12" event="2"/>
+		<Transition source="10" dest="0" event="7"/>
+		<Transition source="11" dest="14" event="17"/>
+		<Transition source="11" dest="13" event="2"/>
+		<Transition source="11" dest="0" event="7"/>
+		<Transition source="12" dest="14" event="17"/>
+		<Transition source="12" dest="13" event="4"/>
+		<Transition source="12" dest="0" event="7"/>
+		<Transition source="13" dest="14" event="17"/>
+		<Transition source="13" dest="0" event="7"/>
+		<Transition source="14" dest="0" event="7"/>
+		<Transition source="14" dest="14" event="3"/>
+		<Transition source="14" dest="14" event="5"/>
+		<Transition source="14" dest="0" event="13"/>
+	</Transitions>
+</Automaton>
+<Automaton name="ttimer.FT" type="Plant">
+	<Events>
+		<Event id="0" label="reset.FT"/>
+		<Event id="1" label="time_ER.FT"/>
+		<Event id="2" label="time_VR.FT"/>
+		<Event id="3" label="time_W.FT"/>
+		<Event id="4" label="time_ZS.FT"/>
+		<Event id="5" label="timeout.FT" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="IDLE" initial="true" accepting="true"/>
+		<State id="1" name="RUN"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="1" event="4"/>
+		<Transition source="1" dest="0" event="0"/>
+		<Transition source="1" dest="0" event="5"/>
+	</Transitions>
+</Automaton>
+<Automaton name="ttimer.BT" type="Plant">
+	<Events>
+		<Event id="0" label="reset.BT"/>
+		<Event id="1" label="time_ER.BT"/>
+		<Event id="2" label="time_VR.BT"/>
+		<Event id="3" label="time_W.BT"/>
+		<Event id="4" label="time_ZS.BT"/>
+		<Event id="5" label="timeout.BT" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="IDLE" initial="true" accepting="true"/>
+		<State id="1" name="RUN"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="1" event="4"/>
+		<Transition source="1" dest="0" event="0"/>
+		<Transition source="1" dest="0" event="5"/>
+	</Transitions>
+</Automaton>
+<Automaton name="ttimer.FH" type="Plant">
+	<Events>
+		<Event id="0" label="reset.FH"/>
+		<Event id="1" label="time_ER.FH"/>
+		<Event id="2" label="time_VR.FH"/>
+		<Event id="3" label="time_W.FH"/>
+		<Event id="4" label="time_ZS.FH"/>
+		<Event id="5" label="timeout.FH" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="IDLE" initial="true" accepting="true"/>
+		<State id="1" name="RUN"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="1" event="4"/>
+		<Transition source="1" dest="0" event="0"/>
+		<Transition source="1" dest="0" event="5"/>
+	</Transitions>
+</Automaton>
+<Automaton name="ttimer.BH" type="Plant">
+	<Events>
+		<Event id="0" label="reset.BH"/>
+		<Event id="1" label="time_ER.BH"/>
+		<Event id="2" label="time_VR.BH"/>
+		<Event id="3" label="time_W.BH"/>
+		<Event id="4" label="time_ZS.BH"/>
+		<Event id="5" label="timeout.BH" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="IDLE" initial="true" accepting="true"/>
+		<State id="1" name="RUN"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="1" event="4"/>
+		<Transition source="1" dest="0" event="0"/>
+		<Transition source="1" dest="0" event="5"/>
+	</Transitions>
+</Automaton>
+<Automaton name="mvrguard.FT" type="Specification">
+	<Events>
+		<Event id="0" label="MVR_an.FT"/>
+		<Event id="1" label="MVR_aus.FT"/>
+		<Event id="2" label="start_ER.FT"/>
+		<Event id="3" label="start_VR.FT"/>
+		<Event id="4" label="start_ZS.FT"/>
+		<Event id="5" label="stop_ER.FT"/>
+		<Event id="6" label="stop_VR.FT"/>
+		<Event id="7" label="stop_ZS.FT"/>
+	</Events>
+	<States>
+		<State id="0" name="IDLE" initial="true" accepting="true"/>
+		<State id="1" name="RUN"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="0" event="5"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="0" dest="0" event="6"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="0" event="7"/>
+		<Transition source="1" dest="0" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="mvrguard.BT" type="Specification">
+	<Events>
+		<Event id="0" label="MVR_an.BT"/>
+		<Event id="1" label="MVR_aus.BT"/>
+		<Event id="2" label="start_ER.BT"/>
+		<Event id="3" label="start_VR.BT"/>
+		<Event id="4" label="start_ZS.BT"/>
+		<Event id="5" label="stop_ER.BT"/>
+		<Event id="6" label="stop_VR.BT"/>
+		<Event id="7" label="stop_ZS.BT"/>
+	</Events>
+	<States>
+		<State id="0" name="IDLE" initial="true" accepting="true"/>
+		<State id="1" name="RUN"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="0" event="5"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="0" dest="0" event="6"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="0" event="7"/>
+		<Transition source="1" dest="0" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="mvrguard.FH" type="Specification">
+	<Events>
+		<Event id="0" label="MVR_an.FH"/>
+		<Event id="1" label="MVR_aus.FH"/>
+		<Event id="2" label="start_ER.FH"/>
+		<Event id="3" label="start_VR.FH"/>
+		<Event id="4" label="start_ZS.FH"/>
+		<Event id="5" label="stop_ER.FH"/>
+		<Event id="6" label="stop_VR.FH"/>
+		<Event id="7" label="stop_ZS.FH"/>
+	</Events>
+	<States>
+		<State id="0" name="IDLE" initial="true" accepting="true"/>
+		<State id="1" name="RUN"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="0" event="5"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="0" dest="0" event="6"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="0" event="7"/>
+		<Transition source="1" dest="0" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="mvrguard.BH" type="Specification">
+	<Events>
+		<Event id="0" label="MVR_an.BH"/>
+		<Event id="1" label="MVR_aus.BH"/>
+		<Event id="2" label="start_ER.BH"/>
+		<Event id="3" label="start_VR.BH"/>
+		<Event id="4" label="start_ZS.BH"/>
+		<Event id="5" label="stop_ER.BH"/>
+		<Event id="6" label="stop_VR.BH"/>
+		<Event id="7" label="stop_ZS.BH"/>
+	</Events>
+	<States>
+		<State id="0" name="IDLE" initial="true" accepting="true"/>
+		<State id="1" name="RUN"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="0" event="5"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="0" dest="0" event="6"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="0" event="7"/>
+		<Transition source="1" dest="0" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="mvrstzv.FT" type="Plant">
+	<Events>
+		<Event id="0" label="MVR_an.FT"/>
+		<Event id="1" label="MVR_aus.FT"/>
+		<Event id="2" label="STZV.FT" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="IDLE" initial="true" accepting="true"/>
+		<State id="1" name="RUN"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="1" dest="1" event="2"/>
+	</Transitions>
+</Automaton>
+<Automaton name="mvrstzv.BT" type="Plant">
+	<Events>
+		<Event id="0" label="MVR_an.BT"/>
+		<Event id="1" label="MVR_aus.BT"/>
+		<Event id="2" label="STZV.BT" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="IDLE" initial="true" accepting="true"/>
+		<State id="1" name="RUN"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="1" dest="1" event="2"/>
+	</Transitions>
+</Automaton>
+<Automaton name="mzsguard.FH" type="Specification">
+	<Events>
+		<Event id="0" label="MZS_an.FH"/>
+		<Event id="1" label="MZS_aus.FH"/>
+		<Event id="2" label="start_ER.FH"/>
+		<Event id="3" label="start_VR.FH"/>
+		<Event id="4" label="start_ZS.FH"/>
+		<Event id="5" label="stop_ER.FH"/>
+		<Event id="6" label="stop_VR.FH"/>
+		<Event id="7" label="stop_ZS.FH"/>
+	</Events>
+	<States>
+		<State id="0" name="IDLE" initial="true" accepting="true"/>
+		<State id="1" name="RUN"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="0" event="5"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="0" dest="0" event="6"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="0" event="7"/>
+		<Transition source="1" dest="0" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="mzsguard.BH" type="Specification">
+	<Events>
+		<Event id="0" label="MZS_an.BH"/>
+		<Event id="1" label="MZS_aus.BH"/>
+		<Event id="2" label="start_ER.BH"/>
+		<Event id="3" label="start_VR.BH"/>
+		<Event id="4" label="start_ZS.BH"/>
+		<Event id="5" label="stop_ER.BH"/>
+		<Event id="6" label="stop_VR.BH"/>
+		<Event id="7" label="stop_ZS.BH"/>
+	</Events>
+	<States>
+		<State id="0" name="IDLE" initial="true" accepting="true"/>
+		<State id="1" name="RUN"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="0" event="5"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="0" dest="0" event="6"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="0" event="7"/>
+		<Transition source="1" dest="0" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="merguard.FT" type="Specification">
+	<Events>
+		<Event id="0" label="MER_an.FT"/>
+		<Event id="1" label="MER_aus.FT"/>
+		<Event id="2" label="start_ER.FT"/>
+		<Event id="3" label="start_VR.FT"/>
+		<Event id="4" label="start_ZS.FT"/>
+		<Event id="5" label="stop_ER.FT"/>
+		<Event id="6" label="stop_VR.FT"/>
+		<Event id="7" label="stop_ZS.FT"/>
+	</Events>
+	<States>
+		<State id="0" name="IDLE" initial="true" accepting="true"/>
+		<State id="1" name="RUN"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="0" event="5"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="0" dest="0" event="6"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="0" event="7"/>
+		<Transition source="1" dest="0" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="merguard.BT" type="Specification">
+	<Events>
+		<Event id="0" label="MER_an.BT"/>
+		<Event id="1" label="MER_aus.BT"/>
+		<Event id="2" label="start_ER.BT"/>
+		<Event id="3" label="start_VR.BT"/>
+		<Event id="4" label="start_ZS.BT"/>
+		<Event id="5" label="stop_ER.BT"/>
+		<Event id="6" label="stop_VR.BT"/>
+		<Event id="7" label="stop_ZS.BT"/>
+	</Events>
+	<States>
+		<State id="0" name="IDLE" initial="true" accepting="true"/>
+		<State id="1" name="RUN"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="0" event="5"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="0" dest="0" event="6"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="0" event="7"/>
+		<Transition source="1" dest="0" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="merguard.FH" type="Specification">
+	<Events>
+		<Event id="0" label="MER_an.FH"/>
+		<Event id="1" label="MER_aus.FH"/>
+		<Event id="2" label="start_ER.FH"/>
+		<Event id="3" label="start_VR.FH"/>
+		<Event id="4" label="start_ZS.FH"/>
+		<Event id="5" label="stop_ER.FH"/>
+		<Event id="6" label="stop_VR.FH"/>
+		<Event id="7" label="stop_ZS.FH"/>
+	</Events>
+	<States>
+		<State id="0" name="IDLE" initial="true" accepting="true"/>
+		<State id="1" name="RUN"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="0" event="5"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="0" dest="0" event="6"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="0" event="7"/>
+		<Transition source="1" dest="0" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="merguard.BH" type="Specification">
+	<Events>
+		<Event id="0" label="MER_an.BH"/>
+		<Event id="1" label="MER_aus.BH"/>
+		<Event id="2" label="start_ER.BH"/>
+		<Event id="3" label="start_VR.BH"/>
+		<Event id="4" label="start_ZS.BH"/>
+		<Event id="5" label="stop_ER.BH"/>
+		<Event id="6" label="stop_VR.BH"/>
+		<Event id="7" label="stop_ZS.BH"/>
+	</Events>
+	<States>
+		<State id="0" name="IDLE" initial="true" accepting="true"/>
+		<State id="1" name="RUN"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="0" event="5"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="0" dest="0" event="6"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="0" event="7"/>
+		<Transition source="1" dest="0" event="1"/>
+	</Transitions>
+</Automaton>
+</Automata>

@@ -6,10 +6,12 @@
 
 <property name="src" value="src"/>
 <property name="testssrc" value="tests/src"/>
+<property name="benchmarkssrc" value="benchmarks/src"/>
 <property name="runtimesoftplcsrc" value="runtime/softplc/src"/>
 <property name="build" value="build"/>
 <property name="platform" value="platform"/>
 <property name="testsbuild" value="tests/build"/>
+<property name="benchmarksbuild" value="benchmarks/build"/>
 <property name="runtimesoftplcbuild" value="runtime/softplc/build"/>
 <property name="dist"  value="dist"/>
 <property name="doc" value="doc"/>
@@ -142,9 +144,10 @@
 <target name="clean_build">
 	<delete dir="${build}"/>
 	<mkdir dir="${build}"/>
-
 	<delete dir="${testsbuild}"/>
 	<mkdir dir="${testsbuild}"/>
+	<delete dir="${benchmarksbuild}"/>
+	<mkdir dir="${benchmarksbuild}"/>
 </target>
 
 
@@ -333,6 +336,29 @@
 		srcdir="${testssrc}"
 		destdir="${testsbuild}"
                 excludes="net/sourceforge/waters/junit/**/*.java"
+		includeJavaRuntime="yes"
+		deprecation="false"
+		verbose="false"
+		source="1.5"
+		>
+		<classpath>	
+			<pathelement location="${build}" />
+			<pathelement path="${lib}/${unjared}" />
+		</classpath>
+	</javac>
+</target>
+
+<!-- Compile Supremica Benchmarks
+*	Reuses existing class files, but recompiles those
+*	source files that have changed.
+-->
+<target name="compile_benchmarks_supremica">
+	<javac
+		debug="on"
+		debuglevel="source"
+		srcdir="${benchmarkssrc}"
+		destdir="${benchmarksbuild}"
+        excludes="net/sourceforge/waters/junit/**/*.java"
 		includeJavaRuntime="yes"
 		deprecation="false"
 		verbose="false"
@@ -748,13 +774,27 @@
 
 <target name="doc" depends="doc_supremica"/>
 
+<target name="run_benchmarks" depends="run_benchmarks_supremica"/>
+
+<target name="run_benchmarks_supremica" depends="compile_supremica,compile_benchmarks_supremica">
+	<java fork="yes" classname="junit.textui.TestRunner" taskname="junit" failonerror="true" maxmemory="256M">
+		<arg value="org.supremica.BenchmarkPackageSupremica"/>
+        	<jvmarg value="-Djava.library.path=${dist}"/>
+		<classpath>	
+			<pathelement location="${build}" />
+			<pathelement location="${benchmarksbuild}" />
+			<pathelement path="${lib}/${unjared}" />
+			<pathelement path="${java.class.path}" />
+		</classpath>
+	</java>
+</target>
+
 <target name="run_tests" depends="run_tests_supremica"/>
 
 <target name="run_tests_junit" depends="run_tests_supremica_junit">
 </target>
 
 <target name="run_tests_supremica" depends="compile_supremica,compile_tests_supremica">
-<!--	<java fork="yes" classname="junit.textui.TestRunner" taskname="junit" failonerror="true" maxmemory="750m"> -->
 	<java fork="yes" classname="junit.textui.TestRunner" taskname="junit" failonerror="true">
 		<arg value="org.supremica.TestPackageSupremica"/>
         	<jvmarg value="-Djava.library.path=${dist}"/>

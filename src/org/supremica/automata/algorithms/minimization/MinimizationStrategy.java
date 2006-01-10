@@ -54,40 +54,38 @@ import org.supremica.automata.*;
 
 public class MinimizationStrategy
 {
-	private static final int MAXIMIZE = 0;
-	private static final int MINIMIZE = 1;
-	private static final int SPECIAL = 2;
+	private enum Type {MAXIMIZE, MINIMIZE, SPECIAL}
 
 	private static Collection collection = new LinkedList();
 	public static final MinimizationStrategy AtLeastOneLocal =
-		new MinimizationStrategy("At least one local", true, SPECIAL);
+		new MinimizationStrategy("At least one local", true, Type.SPECIAL);
 	public static final MinimizationStrategy AtLeastOneLocalMaxThree =
-		new MinimizationStrategy("At least one local, max three", true, SPECIAL);
+		new MinimizationStrategy("At least one local, max three", true, Type.SPECIAL);
 	public static final MinimizationStrategy FewestTransitionsFirst =
-		new MinimizationStrategy("Pair with fewest transition automaton", true, MINIMIZE);
+		new MinimizationStrategy("Pair with fewest transition automaton", true, Type.MINIMIZE);
 	public static final MinimizationStrategy FewestStatesFirst =
-		new MinimizationStrategy("Pair with fewest states automaton", true, MINIMIZE);
+		new MinimizationStrategy("Pair with fewest states automaton", true, Type.MINIMIZE);
 	public static final MinimizationStrategy FewestEventsFirst =
-		new MinimizationStrategy("Pair with fewest events automaton", true, MINIMIZE);
+		new MinimizationStrategy("Pair with fewest events automaton", true, Type.MINIMIZE);
 	public static final MinimizationStrategy MostTransitionsFirst =
-		new MinimizationStrategy("Pair with most transitions automaton", true, MAXIMIZE);
+		new MinimizationStrategy("Pair with most transitions automaton", true, Type.MAXIMIZE);
 	public static final MinimizationStrategy MostStatesFirst =
-		new MinimizationStrategy("Pair with most states automaton", true, MAXIMIZE);
+		new MinimizationStrategy("Pair with most states automaton", true, Type.MAXIMIZE);
 	public static final MinimizationStrategy MostEventsFirst =
-		new MinimizationStrategy("Pair with most events automaton", true, MAXIMIZE);
+		new MinimizationStrategy("Pair with most events automaton", true, Type.MAXIMIZE);
 	public static final MinimizationStrategy RandomFirst =
-		new MinimizationStrategy("Pair with random automaton", true, MAXIMIZE);
+		new MinimizationStrategy("Pair with random automaton", true, Type.MAXIMIZE);
 	public static final MinimizationStrategy ExperimentalMin =
-		new MinimizationStrategy("Experimental min", true, MINIMIZE);
+		new MinimizationStrategy("Experimental min", true, Type.MINIMIZE);
 	public static final MinimizationStrategy ExperimentalMax =
-		new MinimizationStrategy("Experimental max", true, MAXIMIZE);
+		new MinimizationStrategy("Experimental max", true, Type.MAXIMIZE);
 	public static final MinimizationStrategy Undefined =
-		new MinimizationStrategy("Undefined", false, SPECIAL);
+		new MinimizationStrategy("Undefined", false, Type.SPECIAL);
 
 	private String description = null;
-	private int maximize;
+	private Type type;
 
-	private MinimizationStrategy(String description, boolean selectable, int maximize)
+	private MinimizationStrategy(String description, boolean selectable, Type type)
 	{
 		if (selectable)
 		{
@@ -95,7 +93,7 @@ public class MinimizationStrategy
 		}
 
 		this.description = description;
-		this.maximize = maximize;
+		this.type = type;
 	}
 
 	public static Iterator iterator()
@@ -152,7 +150,7 @@ public class MinimizationStrategy
      */
 	public boolean maximize()
 	{
-		return maximize == MAXIMIZE;
+		return type == Type.MAXIMIZE;
 	}
 
     /**
@@ -160,7 +158,7 @@ public class MinimizationStrategy
      */
 	public boolean minimize()
 	{
-		return maximize == MINIMIZE;
+		return type == Type.MINIMIZE;
 	}
 
     /**
@@ -168,6 +166,6 @@ public class MinimizationStrategy
      */
 	public boolean isSpecial()
 	{
-		return maximize == SPECIAL;
+		return type == Type.SPECIAL;
 	}
 }

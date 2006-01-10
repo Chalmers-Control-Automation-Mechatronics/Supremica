@@ -142,7 +142,7 @@ public class AutomatonMinimizer
         SynthesizerOptions synthOptions = SynthesizerOptions.getDefaultSynthesizerOptions();
         AutomatonSynthesizer synth = new AutomatonSynthesizer(theAutomaton, synthOptions);
         synth.doReachable(true);
-        LinkedList toBeRemoved = new LinkedList();
+        final LinkedList toBeRemoved = new LinkedList();
         for (Iterator<State> it = theAutomaton.stateIterator(); it.hasNext(); )
         {
             State state = it.next();
@@ -1000,7 +1000,6 @@ public class AutomatonMinimizer
 		// can be merged. NOTE! THIS PRESUPPOSES THAT THERE ARE NO EPSILON-LOOPS IN THE AUTOMATON!
 		Hashtable infoHash = new Hashtable((aut.nbrOfStates()*4)/3+1);
 		StateSet statesToExamine = new StateSet(aut.getStateSet());
-
 		loop: while (statesToExamine.size() != 0)
 		{
 			State state = statesToExamine.remove();
@@ -1015,7 +1014,7 @@ public class AutomatonMinimizer
 				{
 					assert(!arc.isSelfLoop());
 					check = true;
-					continue;
+					break;
 				}
 			}
 			if (!check)
@@ -1053,6 +1052,7 @@ public class AutomatonMinimizer
 			}
 			list.add(info);
 		}
+		infoHash.clear();
 
 		return countA;
     }
@@ -1275,6 +1275,7 @@ public class AutomatonMinimizer
 			}
 			list.add(info);
 		}
+		infoHash.clear();
 
         return countB;
     }
@@ -1365,7 +1366,7 @@ public class AutomatonMinimizer
                         {
                             Iterator<Arc> outIt = previous.outgoingArcsIterator();
                             boolean fail = false;
-                            LinkedList toBeRemoved = new LinkedList();
+                            final LinkedList toBeRemoved = new LinkedList();
                             while (outIt.hasNext())
                             {
                                 Arc currArc = outIt.next();
@@ -1411,7 +1412,7 @@ public class AutomatonMinimizer
         }
         // After the above there may be nonreachable parts... make reachable!
         synth.doReachable();
-        LinkedList toBeRemoved = new LinkedList();
+        final LinkedList toBeRemoved = new LinkedList();
         for (Iterator<State> it = aut.stateIterator(); it.hasNext(); )
         {
             State state = it.next();
@@ -1811,7 +1812,7 @@ public class AutomatonMinimizer
         int count = 0;
 
         // Put silent self-loops in a list, remove afterwards
-        LinkedList toBeRemoved = new LinkedList();
+        final LinkedList toBeRemoved = new LinkedList();
         for (Iterator<Arc> arcIt = aut.arcIterator(); arcIt.hasNext(); )
         {
             Arc currArc = arcIt.next();
@@ -1942,7 +1943,7 @@ public class AutomatonMinimizer
         Alphabet alpha = aut.getAlphabet();
 
         // Put them in a list, remove afterwards
-        LinkedList toBeRemoved = new LinkedList();
+        final LinkedList toBeRemoved = new LinkedList();
         loop: for (Iterator<LabeledEvent> evIt = alpha.iterator(); evIt.hasNext(); )
         {
             LabeledEvent event = evIt.next();
@@ -2058,6 +2059,7 @@ class StateInfoIncoming
      * Class describing "half" arcs, i.e. only one state and the event.
      */
     class Arclet
+		implements Comparable<Arclet>
     {
         private State state;
         private LabeledEvent event;
@@ -2067,6 +2069,23 @@ class StateInfoIncoming
             state = arc.getFromState();
             event = arc.getEvent();
         }
+
+		public int compareTo(Arclet other)
+		{
+			// Should compare the labels instead of the indices?
+			if (this.state.getIndex() < other.state.getIndex())
+			{
+				return -1;
+			}
+			else if (this.state.getIndex() > other.state.getIndex())
+			{
+				return 1;
+			}
+			else
+			{
+				return this.event.compareTo(other.event);
+			}
+		}
 
         public boolean equals(Object obj)
         {
@@ -2090,9 +2109,10 @@ class StateInfoIncoming
 	 * A set of <code>Arclet</code>:s.
 	 */
     class Arclets
+		extends TreeSet<Arclet>
     {
         // Why can't I have a TreeSet here!?!?!?
-        private TreeMap arclets = new TreeMap();
+        //private TreeMap arclets = new TreeMap();
         //private TreeSet arclets = new TreeSet();
 
         public Arclets(Iterator<Arc> arcIterator)
@@ -2105,20 +2125,10 @@ class StateInfoIncoming
                 if (!arc.getEvent().isEpsilon())
                 {
                     Arclet arclet = new Arclet(arc);
-                    arclets.put("" + arclet.hashCode(), arclet);
+                    add(arclet);
                     //arclets.add(arclet);
                 }
             }
-        }
-
-        public boolean equals(Object obj)
-        {
-            return arclets.equals(((Arclets) obj).arclets);
-        }
-
-        public int hashCode()
-        {
-            return arclets.hashCode();
         }
 
         public String toString()
@@ -2126,10 +2136,10 @@ class StateInfoIncoming
             String result = "";
 
             //Iterator it = arclets.iterator();
-            Iterator it = arclets.values().iterator();
+            Iterator<Arclet> it = iterator();
             while (it.hasNext())
             {
-                result += (Arclet) it.next();
+                result += it.next();
                 if (it.hasNext())
                 {
                     result += ", ";

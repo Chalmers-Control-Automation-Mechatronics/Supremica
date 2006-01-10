@@ -1,0 +1,649 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Automata name="bmw_fh" major="0" minor="9">
+<Automaton name="timer" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="reset"/>
+		<Event id="2" label="timeout" controllable="false"/>
+		<Event id="3" label="timer"/>
+	</Events>
+	<States>
+		<State id="0" name="off" initial="true" accepting="true"/>
+		<State id="1" name="on"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="1" dest="0" event="2"/>
+	</Transitions>
+</Automaton>
+<Automaton name="comfort_condition_doors" type="Specification">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="CLOSEDOOR[DRD]" controllable="false"/>
+		<Event id="2" label="CLOSEDOOR[PSD]" controllable="false"/>
+		<Event id="3" label="CMFT_BACK[CLOSE]"/>
+		<Event id="4" label="CMFT_BACK[OPEN]"/>
+		<Event id="5" label="CMFT_FRONT[CLOSE]"/>
+		<Event id="6" label="CMFT_FRONT[OPEN]"/>
+		<Event id="7" label="CMFT_ROOF[CLOSE]"/>
+		<Event id="8" label="CMFT_ROOF[OPEN]"/>
+		<Event id="9" label="OPENDOOR[DRD]" controllable="false"/>
+		<Event id="10" label="OPENDOOR[PSD]" controllable="false"/>
+		<Event id="11" label="cmft_cond_doors"/>
+		<Event id="12" label="cmft_start"/>
+		<Event id="13" label="timer"/>
+	</Events>
+	<States>
+		<State id="0" name="door_open"/>
+		<State id="1" name="doors_closed" initial="true" accepting="true"/>
+		<State id="2" name="doors_open"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="11"/>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="2" event="9"/>
+		<Transition source="0" dest="2" event="10"/>
+		<Transition source="1" dest="0" event="9"/>
+		<Transition source="1" dest="0" event="10"/>
+		<Transition source="1" dest="1" event="12"/>
+		<Transition source="1" dest="1" event="4"/>
+		<Transition source="1" dest="1" event="8"/>
+		<Transition source="1" dest="1" event="6"/>
+		<Transition source="1" dest="1" event="3"/>
+		<Transition source="1" dest="1" event="7"/>
+		<Transition source="1" dest="1" event="5"/>
+		<Transition source="1" dest="1" event="13"/>
+		<Transition source="2" dest="0" event="1"/>
+		<Transition source="2" dest="0" event="2"/>
+		<Transition source="2" dest="2" event="11"/>
+	</Transitions>
+</Automaton>
+<Automaton name="comfort_function" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="REQ[CLOSE]" controllable="false"/>
+		<Event id="2" label="REQ[OPEN]" controllable="false"/>
+		<Event id="3" label="REQ[STOP]" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="no_request" initial="true" accepting="true"/>
+		<State id="1" name="request"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="1" dest="0" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="comfort_control" type="Specification">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="CMFT_BACK[CLOSE]"/>
+		<Event id="2" label="CMFT_BACK[OPEN]"/>
+		<Event id="3" label="CMFT_STOP"/>
+		<Event id="4" label="FH_UNLOCK"/>
+		<Event id="5" label="REQ[CLOSE]" controllable="false"/>
+		<Event id="6" label="REQ[OPEN]" controllable="false"/>
+		<Event id="7" label="REQ[STOP]" controllable="false"/>
+		<Event id="8" label="cmft_cond_doors"/>
+		<Event id="9" label="cmft_cond_key"/>
+		<Event id="10" label="cmft_start"/>
+		<Event id="11" label="timer"/>
+	</Events>
+	<States>
+		<State id="0" name="cmft"/>
+		<State id="1" name="esc"/>
+		<State id="2" name="esc_req"/>
+		<State id="3" name="off" initial="true" accepting="true"/>
+		<State id="4" name="request"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="7"/>
+		<Transition source="0" dest="1" event="8"/>
+		<Transition source="0" dest="1" event="9"/>
+		<Transition source="0" dest="0" event="11"/>
+		<Transition source="1" dest="1" event="7"/>
+		<Transition source="1" dest="3" event="3"/>
+		<Transition source="1" dest="2" event="6"/>
+		<Transition source="1" dest="2" event="5"/>
+		<Transition source="2" dest="1" event="7"/>
+		<Transition source="2" dest="1" event="8"/>
+		<Transition source="2" dest="1" event="9"/>
+		<Transition source="2" dest="4" event="3"/>
+		<Transition source="3" dest="3" event="4"/>
+		<Transition source="3" dest="3" event="7"/>
+		<Transition source="3" dest="4" event="5"/>
+		<Transition source="3" dest="4" event="6"/>
+		<Transition source="4" dest="3" event="7"/>
+		<Transition source="4" dest="3" event="8"/>
+		<Transition source="4" dest="3" event="9"/>
+		<Transition source="4" dest="0" event="2"/>
+		<Transition source="4" dest="0" event="1"/>
+		<Transition source="4" dest="4" event="11"/>
+		<Transition source="4" dest="4" event="10"/>
+	</Transitions>
+</Automaton>
+<Automaton name="comfort[CLOSE]" type="Specification">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="CMFT_BACK[CLOSE]"/>
+		<Event id="2" label="CMFT_FRONT[CLOSE]"/>
+		<Event id="3" label="CMFT_ROOF[CLOSE]"/>
+		<Event id="4" label="REQ[CLOSE]" controllable="false"/>
+		<Event id="5" label="REQ[STOP]" controllable="false"/>
+		<Event id="6" label="cmft_cond_doors"/>
+		<Event id="7" label="cmft_cond_key"/>
+		<Event id="8" label="cmft_start"/>
+		<Event id="9" label="reset"/>
+		<Event id="10" label="timeout" controllable="false"/>
+		<Event id="11" label="timer"/>
+	</Events>
+	<States>
+		<State id="0" name="back"/>
+		<State id="1" name="front"/>
+		<State id="2" name="init" initial="true" accepting="true"/>
+		<State id="3" name="request"/>
+		<State id="4" name="roof"/>
+		<State id="5" name="start"/>
+		<State id="6" name="timeout"/>
+		<State id="7" name="timeout_front"/>
+		<State id="8" name="timeout_roof"/>
+		<State id="9" name="timer"/>
+		<State id="10" name="timer_front"/>
+		<State id="11" name="timer_roof"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="2" event="5"/>
+		<Transition source="0" dest="2" event="6"/>
+		<Transition source="0" dest="2" event="7"/>
+		<Transition source="0" dest="10" event="11"/>
+		<Transition source="1" dest="11" event="11"/>
+		<Transition source="1" dest="2" event="5"/>
+		<Transition source="1" dest="2" event="6"/>
+		<Transition source="1" dest="2" event="7"/>
+		<Transition source="2" dest="3" event="4"/>
+		<Transition source="2" dest="2" event="10"/>
+		<Transition source="2" dest="2" event="9"/>
+		<Transition source="2" dest="2" event="11"/>
+		<Transition source="2" dest="2" event="5"/>
+		<Transition source="2" dest="2" event="6"/>
+		<Transition source="2" dest="2" event="7"/>
+		<Transition source="2" dest="2" event="8"/>
+		<Transition source="3" dest="9" event="11"/>
+		<Transition source="3" dest="3" event="10"/>
+		<Transition source="3" dest="3" event="9"/>
+		<Transition source="3" dest="2" event="5"/>
+		<Transition source="3" dest="2" event="6"/>
+		<Transition source="3" dest="2" event="7"/>
+		<Transition source="4" dest="2" event="5"/>
+		<Transition source="4" dest="2" event="6"/>
+		<Transition source="4" dest="2" event="7"/>
+		<Transition source="5" dest="0" event="1"/>
+		<Transition source="5" dest="2" event="5"/>
+		<Transition source="5" dest="2" event="6"/>
+		<Transition source="5" dest="2" event="7"/>
+		<Transition source="6" dest="5" event="8"/>
+		<Transition source="6" dest="2" event="5"/>
+		<Transition source="6" dest="2" event="6"/>
+		<Transition source="6" dest="2" event="7"/>
+		<Transition source="7" dest="2" event="5"/>
+		<Transition source="7" dest="2" event="6"/>
+		<Transition source="7" dest="2" event="7"/>
+		<Transition source="7" dest="1" event="2"/>
+		<Transition source="8" dest="4" event="3"/>
+		<Transition source="8" dest="2" event="5"/>
+		<Transition source="8" dest="2" event="6"/>
+		<Transition source="8" dest="2" event="7"/>
+		<Transition source="9" dest="2" event="5"/>
+		<Transition source="9" dest="2" event="6"/>
+		<Transition source="9" dest="2" event="7"/>
+		<Transition source="9" dest="6" event="10"/>
+		<Transition source="10" dest="7" event="10"/>
+		<Transition source="10" dest="2" event="5"/>
+		<Transition source="10" dest="2" event="6"/>
+		<Transition source="10" dest="2" event="7"/>
+		<Transition source="11" dest="2" event="5"/>
+		<Transition source="11" dest="2" event="6"/>
+		<Transition source="11" dest="2" event="7"/>
+		<Transition source="11" dest="8" event="10"/>
+	</Transitions>
+</Automaton>
+<Automaton name="fh_sync_cmft" type="Specification">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="CMFT_BACK[CLOSE]"/>
+		<Event id="2" label="CMFT_BACK[OPEN]"/>
+		<Event id="3" label="FH_LOCK"/>
+		<Event id="4" label="FH_UNLOCK"/>
+		<Event id="5" label="roof_manual_close"/>
+		<Event id="6" label="roof_manual_open"/>
+		<Event id="7" label="window_manual_close[FRONT][LEFT]"/>
+		<Event id="8" label="window_manual_close[FRONT][RIGHT]"/>
+		<Event id="9" label="window_manual_close[REAR][LEFT]"/>
+		<Event id="10" label="window_manual_close[REAR][RIGHT]"/>
+		<Event id="11" label="window_manual_open[FRONT][LEFT]"/>
+		<Event id="12" label="window_manual_open[FRONT][RIGHT]"/>
+		<Event id="13" label="window_manual_open[REAR][LEFT]"/>
+		<Event id="14" label="window_manual_open[REAR][RIGHT]"/>
+	</Events>
+	<States>
+		<State id="0" name="locked" initial="true" accepting="true"/>
+		<State id="1" name="unlocked" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="1" event="4"/>
+		<Transition source="1" dest="0" event="3"/>
+		<Transition source="1" dest="1" event="5"/>
+		<Transition source="1" dest="1" event="6"/>
+		<Transition source="1" dest="1" event="12"/>
+		<Transition source="1" dest="1" event="13"/>
+		<Transition source="1" dest="1" event="14"/>
+		<Transition source="1" dest="1" event="9"/>
+		<Transition source="1" dest="1" event="10"/>
+		<Transition source="1" dest="1" event="11"/>
+		<Transition source="1" dest="1" event="7"/>
+		<Transition source="1" dest="1" event="8"/>
+	</Transitions>
+</Automaton>
+<Automaton name="comfort[OPEN]" type="Specification">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="CMFT_BACK[OPEN]"/>
+		<Event id="2" label="CMFT_FRONT[OPEN]"/>
+		<Event id="3" label="CMFT_ROOF[OPEN]"/>
+		<Event id="4" label="REQ[OPEN]" controllable="false"/>
+		<Event id="5" label="REQ[STOP]" controllable="false"/>
+		<Event id="6" label="cmft_cond_doors"/>
+		<Event id="7" label="cmft_cond_key"/>
+		<Event id="8" label="cmft_start"/>
+		<Event id="9" label="reset"/>
+		<Event id="10" label="timeout" controllable="false"/>
+		<Event id="11" label="timer"/>
+	</Events>
+	<States>
+		<State id="0" name="back"/>
+		<State id="1" name="front"/>
+		<State id="2" name="init" initial="true" accepting="true"/>
+		<State id="3" name="request"/>
+		<State id="4" name="roof"/>
+		<State id="5" name="start"/>
+		<State id="6" name="timeout"/>
+		<State id="7" name="timeout_front"/>
+		<State id="8" name="timeout_roof"/>
+		<State id="9" name="timer"/>
+		<State id="10" name="timer_front"/>
+		<State id="11" name="timer_roof"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="2" event="5"/>
+		<Transition source="0" dest="2" event="6"/>
+		<Transition source="0" dest="2" event="7"/>
+		<Transition source="0" dest="10" event="11"/>
+		<Transition source="1" dest="11" event="11"/>
+		<Transition source="1" dest="2" event="5"/>
+		<Transition source="1" dest="2" event="6"/>
+		<Transition source="1" dest="2" event="7"/>
+		<Transition source="2" dest="3" event="4"/>
+		<Transition source="2" dest="2" event="10"/>
+		<Transition source="2" dest="2" event="9"/>
+		<Transition source="2" dest="2" event="11"/>
+		<Transition source="2" dest="2" event="5"/>
+		<Transition source="2" dest="2" event="6"/>
+		<Transition source="2" dest="2" event="7"/>
+		<Transition source="2" dest="2" event="8"/>
+		<Transition source="3" dest="9" event="11"/>
+		<Transition source="3" dest="3" event="10"/>
+		<Transition source="3" dest="3" event="9"/>
+		<Transition source="3" dest="2" event="5"/>
+		<Transition source="3" dest="2" event="6"/>
+		<Transition source="3" dest="2" event="7"/>
+		<Transition source="4" dest="2" event="5"/>
+		<Transition source="4" dest="2" event="6"/>
+		<Transition source="4" dest="2" event="7"/>
+		<Transition source="5" dest="0" event="1"/>
+		<Transition source="5" dest="2" event="5"/>
+		<Transition source="5" dest="2" event="6"/>
+		<Transition source="5" dest="2" event="7"/>
+		<Transition source="6" dest="5" event="8"/>
+		<Transition source="6" dest="2" event="5"/>
+		<Transition source="6" dest="2" event="6"/>
+		<Transition source="6" dest="2" event="7"/>
+		<Transition source="7" dest="2" event="5"/>
+		<Transition source="7" dest="2" event="6"/>
+		<Transition source="7" dest="2" event="7"/>
+		<Transition source="7" dest="1" event="2"/>
+		<Transition source="8" dest="4" event="3"/>
+		<Transition source="8" dest="2" event="5"/>
+		<Transition source="8" dest="2" event="6"/>
+		<Transition source="8" dest="2" event="7"/>
+		<Transition source="9" dest="2" event="5"/>
+		<Transition source="9" dest="2" event="6"/>
+		<Transition source="9" dest="2" event="7"/>
+		<Transition source="9" dest="6" event="10"/>
+		<Transition source="10" dest="7" event="10"/>
+		<Transition source="10" dest="2" event="5"/>
+		<Transition source="10" dest="2" event="6"/>
+		<Transition source="10" dest="2" event="7"/>
+		<Transition source="11" dest="2" event="5"/>
+		<Transition source="11" dest="2" event="6"/>
+		<Transition source="11" dest="2" event="7"/>
+		<Transition source="11" dest="8" event="10"/>
+	</Transitions>
+</Automaton>
+<Automaton name="fh_condition_ecefin" type="Specification">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="CLOSEDOOR[DRD]" controllable="false"/>
+		<Event id="2" label="CLOSEDOOR[PSD]" controllable="false"/>
+		<Event id="3" label="KL_R_OFF" controllable="false"/>
+		<Event id="4" label="KL_R_ON" controllable="false"/>
+		<Event id="5" label="OPENDOOR[DRD]" controllable="false"/>
+		<Event id="6" label="OPENDOOR[PSD]" controllable="false"/>
+		<Event id="7" label="fh_cond_ecefin"/>
+	</Events>
+	<States>
+		<State id="0" name="ecefin"/>
+		<State id="1" name="no_radio_door_open"/>
+		<State id="2" name="no_radio_doors_closed" initial="true" accepting="true"/>
+		<State id="3" name="no_radio_doors_open"/>
+		<State id="4" name="radio_door_open"/>
+		<State id="5" name="radio_doors_closed"/>
+		<State id="6" name="radio_doors_open"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="5"/>
+		<Transition source="0" dest="1" event="6"/>
+		<Transition source="0" dest="0" event="7"/>
+		<Transition source="0" dest="5" event="4"/>
+		<Transition source="1" dest="3" event="5"/>
+		<Transition source="1" dest="3" event="6"/>
+		<Transition source="1" dest="4" event="4"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="1" dest="0" event="2"/>
+		<Transition source="2" dest="1" event="5"/>
+		<Transition source="2" dest="1" event="6"/>
+		<Transition source="2" dest="5" event="4"/>
+		<Transition source="3" dest="1" event="1"/>
+		<Transition source="3" dest="1" event="2"/>
+		<Transition source="3" dest="6" event="4"/>
+		<Transition source="4" dest="1" event="3"/>
+		<Transition source="4" dest="6" event="5"/>
+		<Transition source="4" dest="6" event="6"/>
+		<Transition source="4" dest="5" event="1"/>
+		<Transition source="4" dest="5" event="2"/>
+		<Transition source="5" dest="4" event="5"/>
+		<Transition source="5" dest="4" event="6"/>
+		<Transition source="5" dest="2" event="3"/>
+		<Transition source="6" dest="3" event="3"/>
+		<Transition source="6" dest="4" event="1"/>
+		<Transition source="6" dest="4" event="2"/>
+	</Transitions>
+</Automaton>
+<Automaton name="fh" type="Specification">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="FH_LOCK"/>
+		<Event id="2" label="FH_UNLOCK"/>
+		<Event id="3" label="KL_50_ON" controllable="false"/>
+		<Event id="4" label="cmft_start"/>
+		<Event id="5" label="ecefin" controllable="false"/>
+		<Event id="6" label="fh_cond_door_open"/>
+		<Event id="7" label="fh_cond_doors_closed"/>
+		<Event id="8" label="fh_cond_ecefin"/>
+		<Event id="9" label="fh_cond_kl_r"/>
+		<Event id="10" label="nocountry" controllable="false"/>
+		<Event id="11" label="read_country"/>
+		<Event id="12" label="roof_manual_close"/>
+		<Event id="13" label="roof_manual_open"/>
+		<Event id="14" label="usaus" controllable="false"/>
+		<Event id="15" label="window_manual_close[FRONT][LEFT]"/>
+		<Event id="16" label="window_manual_close[FRONT][RIGHT]"/>
+		<Event id="17" label="window_manual_close[REAR][LEFT]"/>
+		<Event id="18" label="window_manual_close[REAR][RIGHT]"/>
+		<Event id="19" label="window_manual_open[FRONT][LEFT]"/>
+		<Event id="20" label="window_manual_open[FRONT][RIGHT]"/>
+		<Event id="21" label="window_manual_open[REAR][LEFT]"/>
+		<Event id="22" label="window_manual_open[REAR][RIGHT]"/>
+	</Events>
+	<States>
+		<State id="0" name="s" initial="true"/>
+		<State id="1" name="s0" accepting="true"/>
+		<State id="2" name="s1"/>
+		<State id="3" name="s2" accepting="true"/>
+		<State id="4" name="s3"/>
+		<State id="5" name="s5" accepting="true"/>
+		<State id="6" name="s6"/>
+		<State id="7" name="s7"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="10"/>
+		<Transition source="0" dest="3" event="5"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="0" dest="0" event="11"/>
+		<Transition source="0" dest="5" event="14"/>
+		<Transition source="1" dest="1" event="1"/>
+		<Transition source="1" dest="1" event="4"/>
+		<Transition source="1" dest="1" event="3"/>
+		<Transition source="1" dest="2" event="9"/>
+		<Transition source="2" dest="1" event="3"/>
+		<Transition source="2" dest="1" event="4"/>
+		<Transition source="2" dest="2" event="2"/>
+		<Transition source="2" dest="2" event="19"/>
+		<Transition source="2" dest="2" event="20"/>
+		<Transition source="2" dest="2" event="21"/>
+		<Transition source="2" dest="2" event="22"/>
+		<Transition source="2" dest="2" event="15"/>
+		<Transition source="2" dest="2" event="16"/>
+		<Transition source="2" dest="2" event="17"/>
+		<Transition source="2" dest="2" event="18"/>
+		<Transition source="2" dest="2" event="13"/>
+		<Transition source="2" dest="2" event="12"/>
+		<Transition source="3" dest="4" event="9"/>
+		<Transition source="3" dest="3" event="1"/>
+		<Transition source="3" dest="3" event="3"/>
+		<Transition source="3" dest="3" event="4"/>
+		<Transition source="4" dest="4" event="2"/>
+		<Transition source="4" dest="4" event="15"/>
+		<Transition source="4" dest="4" event="16"/>
+		<Transition source="4" dest="4" event="17"/>
+		<Transition source="4" dest="4" event="18"/>
+		<Transition source="4" dest="4" event="19"/>
+		<Transition source="4" dest="4" event="20"/>
+		<Transition source="4" dest="4" event="21"/>
+		<Transition source="4" dest="4" event="22"/>
+		<Transition source="4" dest="4" event="12"/>
+		<Transition source="4" dest="4" event="13"/>
+		<Transition source="4" dest="3" event="3"/>
+		<Transition source="4" dest="3" event="4"/>
+		<Transition source="4" dest="3" event="8"/>
+		<Transition source="5" dest="6" event="9"/>
+		<Transition source="5" dest="5" event="1"/>
+		<Transition source="5" dest="5" event="3"/>
+		<Transition source="5" dest="5" event="4"/>
+		<Transition source="6" dest="6" event="2"/>
+		<Transition source="6" dest="6" event="15"/>
+		<Transition source="6" dest="6" event="16"/>
+		<Transition source="6" dest="6" event="18"/>
+		<Transition source="6" dest="6" event="17"/>
+		<Transition source="6" dest="6" event="19"/>
+		<Transition source="6" dest="6" event="20"/>
+		<Transition source="6" dest="6" event="21"/>
+		<Transition source="6" dest="6" event="22"/>
+		<Transition source="6" dest="6" event="12"/>
+		<Transition source="6" dest="6" event="13"/>
+		<Transition source="6" dest="7" event="6"/>
+		<Transition source="6" dest="5" event="3"/>
+		<Transition source="6" dest="5" event="4"/>
+		<Transition source="7" dest="6" event="7"/>
+		<Transition source="7" dest="7" event="1"/>
+		<Transition source="7" dest="5" event="3"/>
+		<Transition source="7" dest="5" event="4"/>
+	</Transitions>
+</Automaton>
+<Automaton name="fh_condition_kl_r" type="Specification">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="KL_50_OFF" controllable="false"/>
+		<Event id="2" label="KL_50_ON" controllable="false"/>
+		<Event id="3" label="KL_R_ON" controllable="false"/>
+		<Event id="4" label="cmft_start"/>
+		<Event id="5" label="fh_cond_ecefin"/>
+		<Event id="6" label="fh_cond_kl_r"/>
+	</Events>
+	<States>
+		<State id="0" name="no_radio" initial="true" accepting="true"/>
+		<State id="1" name="radio"/>
+		<State id="2" name="starter"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="1" dest="0" event="4"/>
+		<Transition source="1" dest="0" event="5"/>
+		<Transition source="1" dest="2" event="2"/>
+		<Transition source="1" dest="1" event="6"/>
+		<Transition source="1" dest="1" event="3"/>
+		<Transition source="2" dest="1" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="lock" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="KEY_PLUG" controllable="false"/>
+		<Event id="2" label="KEY_UNPLUG" controllable="false"/>
+		<Event id="3" label="KL_50_OFF" controllable="false"/>
+		<Event id="4" label="KL_50_ON" controllable="false"/>
+		<Event id="5" label="KL_R_OFF" controllable="false"/>
+		<Event id="6" label="KL_R_ON" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="key"/>
+		<State id="1" name="no_key" initial="true" accepting="true"/>
+		<State id="2" name="radio"/>
+		<State id="3" name="starter"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="2" event="6"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="2" dest="0" event="5"/>
+		<Transition source="2" dest="3" event="4"/>
+		<Transition source="3" dest="2" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="fh_condition_doors" type="Specification">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="CLOSEDOOR[DRD]" controllable="false"/>
+		<Event id="2" label="CLOSEDOOR[PSD]" controllable="false"/>
+		<Event id="3" label="OPENDOOR[DRD]" controllable="false"/>
+		<Event id="4" label="OPENDOOR[PSD]" controllable="false"/>
+		<Event id="5" label="fh_cond_door_open"/>
+		<Event id="6" label="fh_cond_doors_closed"/>
+	</Events>
+	<States>
+		<State id="0" name="door_open"/>
+		<State id="1" name="doors_closed" initial="true" accepting="true"/>
+		<State id="2" name="doors_open"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="5"/>
+		<Transition source="0" dest="2" event="4"/>
+		<Transition source="0" dest="2" event="3"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="0" event="4"/>
+		<Transition source="1" dest="0" event="3"/>
+		<Transition source="1" dest="1" event="6"/>
+		<Transition source="2" dest="0" event="2"/>
+		<Transition source="2" dest="0" event="1"/>
+		<Transition source="2" dest="2" event="5"/>
+	</Transitions>
+</Automaton>
+<Automaton name="comfort_condition_key" type="Specification">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="CMFT_BACK[CLOSE]"/>
+		<Event id="2" label="CMFT_BACK[OPEN]"/>
+		<Event id="3" label="CMFT_FRONT[CLOSE]"/>
+		<Event id="4" label="CMFT_FRONT[OPEN]"/>
+		<Event id="5" label="CMFT_ROOF[CLOSE]"/>
+		<Event id="6" label="CMFT_ROOF[OPEN]"/>
+		<Event id="7" label="KEY_PLUG" controllable="false"/>
+		<Event id="8" label="KEY_UNPLUG" controllable="false"/>
+		<Event id="9" label="cmft_cond_key"/>
+		<Event id="10" label="cmft_start"/>
+		<Event id="11" label="timer"/>
+	</Events>
+	<States>
+		<State id="0" name="key"/>
+		<State id="1" name="no_key" initial="true" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="9"/>
+		<Transition source="0" dest="1" event="8"/>
+		<Transition source="1" dest="0" event="7"/>
+		<Transition source="1" dest="1" event="10"/>
+		<Transition source="1" dest="1" event="2"/>
+		<Transition source="1" dest="1" event="6"/>
+		<Transition source="1" dest="1" event="4"/>
+		<Transition source="1" dest="1" event="1"/>
+		<Transition source="1" dest="1" event="5"/>
+		<Transition source="1" dest="1" event="3"/>
+		<Transition source="1" dest="1" event="11"/>
+	</Transitions>
+</Automaton>
+<Automaton name="readcountry" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="ecefin" controllable="false"/>
+		<Event id="2" label="nocountry" controllable="false"/>
+		<Event id="3" label="read_country"/>
+		<Event id="4" label="usaus" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="1" dest="0" event="2"/>
+		<Transition source="1" dest="0" event="4"/>
+	</Transitions>
+</Automaton>
+<Automaton name="doors[DRD]" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="CLOSEDOOR[DRD]" controllable="false"/>
+		<Event id="2" label="OPENDOOR[DRD]" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="closed" initial="true" accepting="true"/>
+		<State id="1" name="open"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="1" dest="0" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="doors[PSD]" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="CLOSEDOOR[PSD]" controllable="false"/>
+		<Event id="2" label="OPENDOOR[PSD]" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="closed" initial="true" accepting="true"/>
+		<State id="1" name="open"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="1" dest="0" event="1"/>
+	</Transitions>
+</Automaton>
+</Automata>

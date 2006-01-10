@@ -54,42 +54,40 @@ import org.supremica.automata.*;
 
 public class MinimizationHeuristic
 {
-	private static final int MAXIMIZE = 0;
-	private static final int MINIMIZE = 1;
-	private static final int SPECIAL = 2;
+	private enum Type {MAXIMIZE, MINIMIZE, SPECIAL}
 
 	private static Collection collection = new LinkedList();
 	public static final MinimizationHeuristic MostLocal =
-		new MinimizationHeuristic("Highest local ratio", true, MAXIMIZE);
+		new MinimizationHeuristic("Highest local ratio", true, Type.MAXIMIZE);
 	public static final MinimizationHeuristic MostCommon =
-		new MinimizationHeuristic("Highest common ratio", true, MAXIMIZE);
+		new MinimizationHeuristic("Highest common ratio", true, Type.MAXIMIZE);
 	public static final MinimizationHeuristic LeastExtension =
-		new MinimizationHeuristic("Least extension of alphabet", true, MINIMIZE);
+		new MinimizationHeuristic("Least extension of alphabet", true, Type.MINIMIZE);
 	public static final MinimizationHeuristic FewestTransitions =
-		new MinimizationHeuristic("Fewest transitions", true, MINIMIZE);
+		new MinimizationHeuristic("Fewest transitions", true, Type.MINIMIZE);
 	public static final MinimizationHeuristic FewestStates =
-		new MinimizationHeuristic("Fewest states", true, MINIMIZE);
+		new MinimizationHeuristic("Fewest states", true, Type.MINIMIZE);
 	public static final MinimizationHeuristic FewestEvents =
-		new MinimizationHeuristic("Fewest events", true, MINIMIZE);
+		new MinimizationHeuristic("Fewest events", true, Type.MINIMIZE);
 	public static final MinimizationHeuristic FewestAutomata =
-		new MinimizationHeuristic("Fewest automata", true, MINIMIZE);
+		new MinimizationHeuristic("Fewest automata", true, Type.MINIMIZE);
 	public static final MinimizationHeuristic MostTransitions =
-		new MinimizationHeuristic("Most transitions", true, MAXIMIZE);
+		new MinimizationHeuristic("Most transitions", true, Type.MAXIMIZE);
 	public static final MinimizationHeuristic MostStates =
-		new MinimizationHeuristic("Most states", true, MAXIMIZE);
+		new MinimizationHeuristic("Most states", true, Type.MAXIMIZE);
 	public static final MinimizationHeuristic MostEvents =
-		new MinimizationHeuristic("Most events", true, MAXIMIZE);
+		new MinimizationHeuristic("Most events", true, Type.MAXIMIZE);
 	public static final MinimizationHeuristic MostAutomata =
-		new MinimizationHeuristic("Most automata", true, MAXIMIZE);
+		new MinimizationHeuristic("Most automata", true, Type.MAXIMIZE);
 	public static final MinimizationHeuristic Random =
-		new MinimizationHeuristic("Random order", true, MAXIMIZE);
+		new MinimizationHeuristic("Random order", true, Type.MAXIMIZE);
 	public static final MinimizationHeuristic Undefined =
-		new MinimizationHeuristic("Undefined", false, SPECIAL);
+		new MinimizationHeuristic("Undefined", false, Type.SPECIAL);
 
 	private String description = null;
-	private int maximize;
+	private Type type;
 
-	private MinimizationHeuristic(String description, boolean selectable, int maximize)
+	private MinimizationHeuristic(String description, boolean selectable, Type type)
 	{
 		if (selectable)
 		{
@@ -97,7 +95,7 @@ public class MinimizationHeuristic
 		}
 
 		this.description = description;
-		this.maximize = maximize;
+		this.type = type;
 	}
 
 	public static Iterator iterator()
@@ -225,7 +223,7 @@ public class MinimizationHeuristic
      */
 	public boolean maximize()
 	{
-		return maximize == MAXIMIZE;
+		return type == Type.MAXIMIZE;
 	}
 
     /**
@@ -233,6 +231,14 @@ public class MinimizationHeuristic
      */
 	public boolean minimize()
 	{
-		return maximize == MINIMIZE;
+		return type == Type.MINIMIZE;
+	}
+
+    /**
+     * Minimization criteria?
+     */
+	public boolean isSpecial()
+	{
+		return type == Type.SPECIAL;
 	}
 }

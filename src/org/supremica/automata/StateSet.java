@@ -25,7 +25,8 @@ public class StateSet
 	 */
 	public StateSet()
 	{
-		super(new State.StateComparator());
+		super(); // State implements Comparable!
+		//super(new State.StateComparator());
 	}
 
 	public StateSet(Collection<? extends State> collection)

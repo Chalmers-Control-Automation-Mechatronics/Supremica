@@ -52,10 +52,6 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-// For the benchmarks
-import java.io.File;
-import org.supremica.util.ActionTimer;
-
 import org.supremica.testhelpers.*;
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.minimization.*;
@@ -172,72 +168,6 @@ public class TestAutomataVerifier
 		}
 	}
 
-	public void benchmarkModularNonblocking()
-	{
-		// Init options and verifier
-		VerificationOptions vOptions;
-		SynchronizationOptions sOptions;
-		MinimizationOptions mOptions;
-		vOptions = VerificationOptions.getDefaultNonblockingOptions();
-		sOptions = SynchronizationOptions.getDefaultVerificationOptions();
-		mOptions = MinimizationOptions.getDefaultNonblockingOptions();
-		mOptions.setMinimizationStrategy(MinimizationStrategy.FewestTransitionsFirst);
-		//mOptions.setMinimizationStrategy(MinimizationStrategy.AtLeastOneLocalMaxThree);
-		mOptions.setMinimizationHeuristic(MinimizationHeuristic.MostLocal);
-		
-		System.out.println("");
-		System.out.println("!!!!!!!!!!!!!!!!!!!!! BENCHMARK TESTS !!!!!!!!!!!!!!!!!!!!!!");
-		System.out.println("Strategy: " + mOptions.getMinimizationStrategy());
-		System.out.println("Heuristic: " + mOptions.getMinimizationHeuristic());
-
-		ProjectBuildFromXml builder = new ProjectBuildFromXml();
-		Project theProject;
-		AutomataVerifier verifier;
-		
-		// Benchmark path
-		String prefix = "/users/s2/flordal/benchmark/";
-		String[] test = 
-		{
-			"arbiter128", "arbiter256", "arbiter512",
-			"transfer128", "transfer256", "transfer512",
-			"philo256", "philo512", "philo1024",
-
-			"verriegel3", "verriegel3b",
-			"verriegel4", "verriegel4b",
-			"agv", "agvb", 
-			"IPS",
-			"SMS", "PMS",
-			"bmw_fh", "big_bmw",
-			"tbed_valid", "tbed_ctct", 
-			"fzelle",
-			"ftechnik", "ftechnik_nocoll",
-
-			"AIP_minus_AS3_TU4"
-		};
-		
-		// Run tests
-		System.out.println("");
-		for (int i=0; i<test.length; i++)
-		{
-			try
-			{
-				System.out.println("");
-				System.out.println("-------------- CURRENT BENCHMARK: " + test[i] + " -----------------");
-				theProject = builder.build(new File(prefix + test[i] + ".xml"));
-				verifier = new AutomataVerifier(theProject, vOptions, sOptions, mOptions);
-				ActionTimer timer = new ActionTimer();
-				timer.start();
-				boolean nonblocking = verifier.verify();
-				timer.stop();
-				System.out.println("Time: " + timer + ", Blocking: " + !nonblocking);
-			}
-			catch (Throwable ex)
-			{
-				System.out.println("Failed! " + ex);
-			}
-		}
-	}
-		
 	public void testModularNonblocking()
 	{
 		try

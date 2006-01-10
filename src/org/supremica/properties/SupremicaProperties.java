@@ -317,7 +317,7 @@ public final class SupremicaProperties
 		setProperty(MINIMIZATION_KEEP_ORIGINAL, "true", true);
 		setProperty(MINIMIZATION_IGNORE_MARKING, "false", true);
 		setProperty(MINIMIZATION_STRATEGY, MinimizationStrategy.FewestTransitionsFirst.toString(), true);
-		setProperty(MINIMIZATION_HEURISTIC, MinimizationHeuristic.FewestTransitions.toString(), true);
+		setProperty(MINIMIZATION_HEURISTIC, MinimizationHeuristic.MostLocal.toString(), true);
 		// Simulation
 		setProperty(INCLUDE_ANIMATOR, "false", true);
 		setProperty(SIMULATION_IS_EXTERNAL, "false", false);
