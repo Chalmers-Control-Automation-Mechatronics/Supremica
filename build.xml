@@ -692,7 +692,7 @@
 	<copy file="${templates}/SupremicaProfiling.cmd" todir="${dist}"/>	
 	<chmod file="${dist}/SupremicaProfiling.cmd" perm="644"/>
 	<copy file="${templates}/SupremicaProfiling" todir="${dist}"/>	
-	<chmod file="${dist}/SupremicaProfiling" perm="644"/>
+	<chmod file="${dist}/SupremicaProfiling" perm="755"/>
 	<copy file="${templates}/SupremicaStandard.cmd" todir="${dist}"/>	
 	<chmod file="${dist}/SupremicaStandard.cmd" perm="644"/>
 	<copy file="${templates}/SupremicaApplet.html" todir="${dist}"/>	
