@@ -1,0 +1,4 @@
+#/bin/sh
+env LD_LIBRARY_PATH=. java -agentpath:/usr/local/netbeans/profiler1/lib/deployed/jdk15/linux/libprofilerinterface.so=/usr/local/netbeans/profiler1/lib,5140 -Xms500M -Xmx500M -cp Supremica.jar:SupremicaLib.jar -enableassertions org.supremica.apps.Supremica -p SupremicaProperties.cfg $*
+
+
