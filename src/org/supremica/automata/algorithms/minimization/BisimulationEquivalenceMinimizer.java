@@ -65,13 +65,8 @@ import org.supremica.log.*;
  *
  * Then write the code and place it in a c-file.
  *
- * On linux, compile the c-file with (something like)
- *
- * cc -shared -fPIC -I$JAVA_HOME/include -I$JAVA_HOME/include/linux org_supremica_automata_algorithms_minimization_BisimulationEquivalenceMinimizer.c -o ~/Supremica/dist/libBisimulationEquivalence.so
- *
- * or rather...
- *
- * cc -shared -fPIC -I$JAVA_HOME/include -I$JAVA_HOME/include/linux org_supremica_automata_algorithms_minimization_BisimulationEquivalenceMinimizer.c -o ~/Supremica/platform/linux.x86/lib/libBisimulationEquivalence.so
+ * See org_supremica_automata_algorithms_minimization_BisimulationEquivalenceMinimizer.cpp 
+ * for further compilation instructions.
  *
  * @author flordal
  */
@@ -148,7 +143,7 @@ public class BisimulationEquivalenceMinimizer
                 assert((index >= 0) && (index < aut.nbrOfStates()));
                 assert(states[index] == null);
                 states[index] = state;
-                //logger.info("State: " + state + " id: " + index);
+				// Put accepting states at the front of the list and other at the back...
                 if (!state.isAccepting(!strong))
                 {
                     initialPartitioning[forwIndex++] = index;
@@ -157,7 +152,7 @@ public class BisimulationEquivalenceMinimizer
                 {
                     initialPartitioning[backIndex--] = index;
                 }
-
+				// When they meet, put a -1
                 if (forwIndex == backIndex)
                 {
                     initialPartitioning[forwIndex] = -1;
@@ -201,11 +196,14 @@ public class BisimulationEquivalenceMinimizer
                         {
                             nextStates = from.nextStates(event, true);
                         }
+						/*
                         for (Iterator<State> toIt = nextStates.iterator(); toIt.hasNext(); )
                         {
                             State to = toIt.next();
                             transitionCount++;
                         }
+						*/
+						transitionCount += nextStates.size();
                     }
                 }
                 // Now, do the same thing again, and put the info in the array
@@ -241,6 +239,8 @@ public class BisimulationEquivalenceMinimizer
             // Initialize
             initialize(aut.nbrOfStates(), aut.nbrOfEvents(), transitionCount,
                        initialPartitioning, transitions);
+			initialPartitioning = null;
+			transitions = null;
         }
 
         // Do the partitioning
@@ -251,18 +251,18 @@ public class BisimulationEquivalenceMinimizer
         State blob = null;
         for (int i=0; i<part.length; i++)
         {
+            // Merge states in partitions (the partitions are separated by -1)!
             if (part[i] != -1)
             {
                 //logger.info("part[" + i + "] = " + part[i] + ", " + states[part[i]].getName());
                 if (blob == null)
                 {
-                    blob = states[part[i]];
+                    blob = states[part[i]]; 
                 }
                 else
                 {
-                    State state = states[part[i]];
-                    //logger.info("Merging " + blob + " and " + state);
-                    blob = MinimizationHelper.mergeStates(aut, blob, state, useShortNames);
+                    //logger.info("Merging " + blob + " and " + states[part[i]]);
+                    blob = MinimizationHelper.mergeStates(aut, blob, states[part[i]], useShortNames);
                 }
             }
             else
@@ -270,9 +270,8 @@ public class BisimulationEquivalenceMinimizer
                 // Prepare for new blob
                 blob = null;
             }
-
-            // Merge states in partition!
         }
+		part = null;
     }
 
     /**

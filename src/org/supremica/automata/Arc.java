@@ -176,14 +176,16 @@ public class Arc
 		fromState = null;
 		toState = null;
 
-
 		// Removed notification here because it was extremely costly
 		// when running the AutomatonPurge. Should we really have notifiers
 		// attached to the arcs, isn't it enough if we have it to the automaton?
 
 		// Later: Hmm - This can be removed because then the arcset in the automaton will
 		// not be updated and thus an error might occur.
-//		notifyListeners(ArcListeners.MODE_ARC_REMOVED, this);
+
+		// Hugo: What do you mean? Can you or can't you remove it!?
+
+		// notifyListeners(ArcListeners.MODE_ARC_REMOVED, this);
 
 	}
 

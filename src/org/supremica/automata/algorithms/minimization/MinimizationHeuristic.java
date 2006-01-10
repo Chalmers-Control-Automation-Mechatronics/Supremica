@@ -187,11 +187,14 @@ public class MinimizationHeuristic
 		}
 		else if (this == MostStates || this == FewestStates)
 		{
+			/*
 			// Prod
 			int value = 1;
 			for (Iterator<Automaton> autIt = selection.iterator(); autIt.hasNext(); )
 				value *= autIt.next().nbrOfStates();
 			return value;
+			*/
+			return selection.getAutomatonAt(1).nbrOfStates();
 		}
 		else if (this == MostEvents || this == FewestEvents) 
 		{

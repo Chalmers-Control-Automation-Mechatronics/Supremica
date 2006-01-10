@@ -354,8 +354,8 @@ public final class MinimizationOptions
 		options.setCompositionalMinimization(true);
 		options.setSkipLast(true);
 		options.setTargetAlphabet(new Alphabet());
-		options.setMinimizationStrategy(MinimizationStrategy.FewestTransitionsFirst);
-		options.setMinimizationHeuristic(MinimizationHeuristic.MostLocal);
+		//options.setMinimizationStrategy(MinimizationStrategy.FewestTransitionsFirst);
+		//options.setMinimizationHeuristic(MinimizationHeuristic.MostLocal);
 		return options;
 	}
 

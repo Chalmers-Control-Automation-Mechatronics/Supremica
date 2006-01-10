@@ -61,6 +61,8 @@ public class MinimizationStrategy
 	private static Collection collection = new LinkedList();
 	public static final MinimizationStrategy AtLeastOneLocal =
 		new MinimizationStrategy("At least one local", true, SPECIAL);
+	public static final MinimizationStrategy AtLeastOneLocalMaxThree =
+		new MinimizationStrategy("At least one local, max three", true, SPECIAL);
 	public static final MinimizationStrategy FewestTransitionsFirst =
 		new MinimizationStrategy("Pair with fewest transition automaton", true, MINIMIZE);
 	public static final MinimizationStrategy FewestStatesFirst =

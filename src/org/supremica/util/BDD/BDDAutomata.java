@@ -616,11 +616,11 @@ public class BDDAutomata
 	// ------------------------------------------------------------------------------
 	public void count_states(String name, int bdd)
 	{
-		String accuracy = (Options.count_algo == Options.COUNT_EXACT) ? "(exactly)" : "(approximately)";
+		String accuracy = (Options.count_algo == Options.COUNT_EXACT) ? "(exactly)" : "(estimated)";
 		Options.out.println(name + " " + count_states(bdd) + " " + accuracy);
 	}
 
-	public double count_states(int bdd)
+	public long count_states(int bdd)
 	{
 		switch (Options.count_algo)
 		{			
@@ -641,7 +641,7 @@ public class BDDAutomata
 
 			deref(new_bdd);
 
-			return states;
+			return (long) states;
 
 		case Options.COUNT_EXACT :
 

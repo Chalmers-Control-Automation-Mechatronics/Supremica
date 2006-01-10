@@ -178,6 +178,8 @@ public class AutomataMinimizer
 
 			timer.stop();
 
+			//logger.info("Aut: " + automata + " hide: " + hideThese);
+
 			if (stopRequested)
 			{
 				return null;
@@ -186,7 +188,7 @@ public class AutomataMinimizer
 			// Perform the minimization, unless of course this is the last step
 			// and it should be skipped...
 			Automaton min;
- 			if (options.getSkipLast() && (theAutomata.size() == automata.size()))
+ 			if (options.getSkipLast() && (theAutomata.size() <= automata.size()+1))
 			{
 				// Just synch and hide
 				min = AutomataSynchronizer.synchronizeAutomata(automata);
@@ -254,7 +256,7 @@ public class AutomataMinimizer
 			}
 		}
 
-		logger.info("Timer time: " + timer);
+		//logger.info("Timer time: " + timer);
 
 		// Print statistics
 		if (SupremicaProperties.verboseMode())
@@ -327,7 +329,8 @@ public class AutomataMinimizer
 			MinimizationHeuristic heuristic = heuristicList.get(heuristicIndex);
 
 			// Try to find a nice task
-			if (strategy == MinimizationStrategy.AtLeastOneLocal)
+			if (strategy == MinimizationStrategy.AtLeastOneLocal ||
+				strategy == MinimizationStrategy.AtLeastOneLocalMaxThree)
 			{
 				// Look through the map and find the best set of automata
 				int bestValue = (heuristic.maximize() ? Integer.MIN_VALUE : Integer.MAX_VALUE);
@@ -356,6 +359,11 @@ public class AutomataMinimizer
 					{
 						taskAutomata = selection;
 						break strategyLoop;
+					}
+
+					if (strategy == MinimizationStrategy.AtLeastOneLocalMaxThree && selection.size() > 3)
+					{
+						continue loop;
 					}
 					
 					/////////////////
@@ -448,142 +456,145 @@ public class AutomataMinimizer
 				// Got a result?
 				assert(bestAutomaton != null);
 
-				/////////////////
-				// SECOND STEP //
-				/////////////////
-											
-				// Search among all automata
-				
-				bestValue = (heuristic.maximize() ? Integer.MIN_VALUE : Integer.MAX_VALUE);
-				loop: for (int j=0; j<theAutomata.size(); j++)
+				if (true)
 				{
-					Automaton aut = theAutomata.getAutomatonAt(j);
-
-					// Skip self
-					if (bestAutomaton == aut)
-					{
-						continue loop;
-					}
+					/////////////////
+					// SECOND STEP //
+					/////////////////
 					
-					// Now we have a candidate
-					Automata selection = new Automata(); //selection.clear();
-					selection.addAutomaton(bestAutomaton);
-					selection.addAutomaton(aut);
+					// Search among all automata
 					
-					// Evaluate selection
-					int thisValue = heuristic.value(selection, eventToAutomataMap, targetAlphabet);
-					//logger.info("Value: " + thisValue + " aut " + selection);
-					// Maximize or minimize?
-					if ((heuristic.maximize() && thisValue > bestValue) ||
-						(heuristic.minimize() && thisValue < bestValue))
+					bestValue = (heuristic.maximize() ? Integer.MIN_VALUE : Integer.MAX_VALUE);
+					loop: for (int j=0; j<theAutomata.size(); j++)
 					{
-						bestValue = thisValue;
-						taskAutomata = selection;
-						continue loop;
-					}
-					else if (bestValue == thisValue)
-					{
-						// Use lower priority heuristic to make a decision!
-						for (int i = heuristicIndex+1; i<heuristicList.size(); i++)
+						Automaton aut = theAutomata.getAutomatonAt(j);
+						
+						// Skip self
+						if (bestAutomaton == aut)
 						{
-							MinimizationHeuristic nextHeuristic = heuristicList.get(i);
-							int nextHeuristicBest = nextHeuristic.value(taskAutomata, eventToAutomataMap, 
-																	targetAlphabet);
-							int nextHeuristicThis = nextHeuristic.value(selection, eventToAutomataMap, 
-																	targetAlphabet);
-							if ((nextHeuristic.maximize() && nextHeuristicThis > nextHeuristicBest) ||
-								(nextHeuristic.minimize() && nextHeuristicThis < nextHeuristicBest))
+							continue loop;
+						}
+						
+						// Now we have a candidate
+						Automata selection = new Automata(); //selection.clear();
+						selection.addAutomaton(bestAutomaton);
+						selection.addAutomaton(aut);
+						
+						// Evaluate selection
+						int thisValue = heuristic.value(selection, eventToAutomataMap, targetAlphabet);
+						//logger.info("Value: " + thisValue + " aut " + selection);
+						// Maximize or minimize?
+						if ((heuristic.maximize() && thisValue > bestValue) ||
+							(heuristic.minimize() && thisValue < bestValue))
+						{
+							bestValue = thisValue;
+							taskAutomata = selection;
+							continue loop;
+						}
+						else if (bestValue == thisValue)
+						{
+							// Use lower priority heuristic to make a decision!
+							for (int i = heuristicIndex+1; i<heuristicList.size(); i++)
 							{
-								taskAutomata = selection;
-								continue loop;
+								MinimizationHeuristic nextHeuristic = heuristicList.get(i);
+								int nextHeuristicBest = nextHeuristic.value(taskAutomata, eventToAutomataMap, 
+																			targetAlphabet);
+								int nextHeuristicThis = nextHeuristic.value(selection, eventToAutomataMap, 
+																			targetAlphabet);
+								if ((nextHeuristic.maximize() && nextHeuristicThis > nextHeuristicBest) ||
+									(nextHeuristic.minimize() && nextHeuristicThis < nextHeuristicBest))
+								{
+									taskAutomata = selection;
+									continue loop;
+								}
 							}
 						}
+						
+						selection.clear();
+						selection = null;
 					}
-
-					selection.clear();
-					selection = null;
 				}
-				
-				/*
-				// Find the automaton with the highest "local to total" (number of events)
-				// ratio with respect to bestAutomaton
-				Alphabet alphaA = bestAutomaton.getAlphabet();
-				double bestLocalRatio = 0;
-				double bestCommonRatio = 0;
-				int bestSize = Integer.MAX_VALUE;
-				// Search among all automata
-				for (int j=0; j<theAutomata.size(); j++)
-				{
-					Automaton aut = theAutomata.getAutomatonAt(j);
-					Alphabet alpha = aut.getAlphabet();
-					// We have a new candidate!
-		 			Automata candidate = new Automata();
-					candidate.addAutomaton(bestAutomaton);
-					candidate.addAutomaton(aut);
-					
-					// Skip self
-					if (bestAutomaton == aut)
+				else
+				{				
+					// Find the automaton with the highest "local to total" (number of events)
+					// ratio with respect to bestAutomaton
+					Alphabet alphaA = bestAutomaton.getAlphabet();
+					double bestLocalRatio = 0;
+					double bestCommonRatio = 0;
+					int bestSize = Integer.MAX_VALUE;
+					// Search among all automata
+					for (int j=0; j<theAutomata.size(); j++)
 					{
-						continue;
-					}
-					
-					// If there are no common events, try next automaton
-					int nbrOfCommonEvents = alphaA.nbrOfCommonEvents(alpha);
-					if (nbrOfCommonEvents == 0)
-					{
-						if ((bestLocalRatio == 0) && (bestCommonRatio == 0) &&
-							(aut.nbrOfStates() < bestSize))
+						Automaton aut = theAutomata.getAutomatonAt(j);
+						Alphabet alpha = aut.getAlphabet();
+						// We have a new candidate!
+						Automata candidate = new Automata();
+						candidate.addAutomaton(bestAutomaton);
+						candidate.addAutomaton(aut);
+						
+						// Skip self
+						if (bestAutomaton == aut)
 						{
-					        taskAutomata = candidate;
-							bestSize = aut.nbrOfStates();
+							continue;
+						}
+						
+						// If there are no common events, try next automaton
+						int nbrOfCommonEvents = alphaA.nbrOfCommonEvents(alpha);
+						if (nbrOfCommonEvents == 0)
+						{
+							if ((bestLocalRatio == 0) && (bestCommonRatio == 0) &&
+								(aut.nbrOfStates() < bestSize))
+							{
+								taskAutomata = candidate;
+								bestSize = aut.nbrOfStates();
+								hideThese = null;
+							}
+							continue;
+						}
+						
+						// Calculate the alphabet of local events
+						Alphabet localEvents = MinimizationHelper.getLocalEvents(candidate, eventToAutomataMap);
+						localEvents.minus(targetAlphabet); // Ignore events from targetAlphabet!
+						
+						// Find ratios
+						int nbrOfLocalEvents = localEvents.size();
+						int unionAlphabetSize = alphaA.size() + alpha.size() - nbrOfCommonEvents;
+						double thisLocalRatio = ((double) nbrOfLocalEvents)/((double) unionAlphabetSize);
+						double thisCommonRatio = ((double) nbrOfCommonEvents)/((double) unionAlphabetSize);
+						
+						// Improvement?
+						if (thisLocalRatio > bestLocalRatio)
+						{
+							taskAutomata = candidate;
+							bestLocalRatio = thisLocalRatio;
+							hideThese = localEvents;
+						}
+						else if ((bestLocalRatio == 0) && (thisCommonRatio > bestCommonRatio))
+						{
+							taskAutomata = candidate;
+							bestCommonRatio = thisCommonRatio;
 							hideThese = null;
 						}
-						continue;
 					}
-					
-					// Calculate the alphabet of local events
-					Alphabet localEvents = MinimizationHelper.getLocalEvents(candidate, eventToAutomataMap);
-					localEvents.minus(targetAlphabet); // Ignore events from targetAlphabet!
-					
-					// Find ratios
-					int nbrOfLocalEvents = localEvents.size();
-					int unionAlphabetSize = alphaA.size() + alpha.size() - nbrOfCommonEvents;
-					double thisLocalRatio = ((double) nbrOfLocalEvents)/((double) unionAlphabetSize);
-					double thisCommonRatio = ((double) nbrOfCommonEvents)/((double) unionAlphabetSize);
-					
-					// Improvement?
-					if (thisLocalRatio > bestLocalRatio)
+
+					if (stopRequested)
 					{
-					    taskAutomata = candidate;
-						bestLocalRatio = thisLocalRatio;
-						hideThese = localEvents;
+						return null;
 					}
-					else if ((bestLocalRatio == 0) && (thisCommonRatio > bestCommonRatio))
+					
+					// Generate result
+					if (hideThese == null)
 					{
-					    taskAutomata = candidate;
-						bestCommonRatio = thisCommonRatio;
-						hideThese = null;
+						hideThese = new Alphabet();
+					}
+					
+					// Was the system disjoint?
+					if (!((bestLocalRatio > 0) || (bestCommonRatio > 0)))
+					{
+						logger.warn("The system has disjoint parts. Preferrably, they should " +
+									"be treated separately if possible.");
 					}
 				}
-				
-				if (stopRequested)
-				{
-					return null;
-				}
-				
-				// Generate result
-				if (hideThese == null)
-				{
-					hideThese = new Alphabet();
-				}
-				
-				// Was the system disjoint?
-				if (!((bestLocalRatio > 0) || (bestCommonRatio > 0)))
-				{
-					logger.warn("The system has disjoint parts. Preferrably, they should " +
-								"be treated separately if possible.");
-				}
-				*/
 			}
 			else
 			{

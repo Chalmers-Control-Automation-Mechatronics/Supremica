@@ -857,10 +857,7 @@ public class Alphabet
 		int nbrOfCommon = 0;
 		for (Iterator<LabeledEvent> eventIterator = iterator(); eventIterator.hasNext(); )
 		{
-			LabeledEvent currEvent;
-			currEvent = eventIterator.next();
-
-			if (otherAlphabet.contains(currEvent))
+			if (otherAlphabet.contains(eventIterator.next()))
 			{
 				nbrOfCommon++;
 			}
@@ -873,10 +870,7 @@ public class Alphabet
 	{
 		for (Iterator<LabeledEvent> eventIterator = iterator(); eventIterator.hasNext(); )
 		{
-			LabeledEvent currEvent;
-			currEvent = eventIterator.next();
-
-			if (otherAlphabet.contains(currEvent))
+			if (otherAlphabet.contains(eventIterator.next()))
 			{
 				return true;
 			}

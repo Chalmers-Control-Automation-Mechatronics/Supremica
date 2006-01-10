@@ -751,8 +751,8 @@
 <target name="run_tests_junit" depends="run_tests_supremica_junit">
 </target>
 
-
 <target name="run_tests_supremica" depends="compile_supremica,compile_tests_supremica">
+<!--	<java fork="yes" classname="junit.textui.TestRunner" taskname="junit" failonerror="true" maxmemory="750m"> -->
 	<java fork="yes" classname="junit.textui.TestRunner" taskname="junit" failonerror="true">
 		<arg value="org.supremica.TestPackageSupremica"/>
         	<jvmarg value="-Djava.library.path=${dist}"/>
