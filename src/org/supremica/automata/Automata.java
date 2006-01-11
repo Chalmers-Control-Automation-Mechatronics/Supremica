@@ -1020,7 +1020,6 @@ public class Automata
 
 			if (!thisAutomaton.equalAutomaton(otherAutomaton))
 			{
-
 				//System.err.println("unequal automaton");
 				return false;
 			}
@@ -1185,7 +1184,8 @@ public class Automata
 	}
 
 	public long checksum()
-	{    // Ad-hoc checksum algorithm
+	{    
+		// Ad-hoc checksum algorithm
 		long checksum = 53562951413L;
 
 		for (Iterator aIt = iterator(); aIt.hasNext(); )

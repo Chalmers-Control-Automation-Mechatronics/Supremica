@@ -825,7 +825,7 @@ public final class AutomataSynchronizerExecuter
 			// Add the current nextState as new state
 			try
 			{
-				logger.debug("ansp ev: " + currEventIndex + " state: " +AutomataIndexFormHelper.dumpState(currState));
+				//logger.debug("ansp ev: " + currEventIndex + " state: " +AutomataIndexFormHelper.dumpState(currState));
 
 				helper.addState(currState, nextState);
 

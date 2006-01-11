@@ -171,8 +171,19 @@ public class AutomataMinimizer
 		{
 			timer.start();
 
+			/*
+			MinimizationTask oldTask = getNextMinimizationTask(false);
+			MinimizationTask newTask = getNextMinimizationTask(true);
+			logger.info("Equals: " + oldTask.equals(newTask));
+			if (!oldTask.equals(newTask))
+			{
+				logger.info("Old: " + oldTask);
+				logger.info("New: " + newTask);
+			}
+			*/
+
 			// Get next automata to minimize
-			MinimizationTask task = getNextMinimizationTask();
+			MinimizationTask task = getNextMinimizationTask(false);
 			Automata selection = task.getAutomata();
 			Alphabet hideThese = task.getEventsToHide();
 
@@ -295,6 +306,23 @@ public class AutomataMinimizer
 		{
 			return eventsToHide;
 		}
+
+		public boolean equals(MinimizationTask other)
+		{
+			if (automata.equalAutomata(other.automata))
+			{
+				return eventsToHide.toString().equals(other.eventsToHide.toString());
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		public String toString()
+		{
+			return automata + ", " + eventsToHide;
+		}
 	}
 
 	/**
@@ -302,7 +330,7 @@ public class AutomataMinimizer
 	 * to do minimization on next and the Alphabet of events that can
 	 * be hidden.
 	 */
-	private MinimizationTask getNextMinimizationTask()
+	private MinimizationTask getNextMinimizationTask(boolean newAlgo)
 		throws Exception
 	{
 		Automata taskAutomata = null;
@@ -329,7 +357,8 @@ public class AutomataMinimizer
 				strategy == MinimizationStrategy.AtLeastOneLocalMaxThree)
 			{
 				// Look through the map and find the best set of automata
-				int bestValue = (heuristic.maximize() ? Integer.MIN_VALUE : Integer.MAX_VALUE);
+				double bestValue = (heuristic.maximize() ? 
+									Double.NEGATIVE_INFINITY : Double.POSITIVE_INFINITY);
 				loop: for (Iterator<LabeledEvent> evIt = eventToAutomataMap.eventIterator(); evIt.hasNext(); )
 				{
 					LabeledEvent event = evIt.next();
@@ -367,7 +396,7 @@ public class AutomataMinimizer
 					/////////////////
 				
 					// Evaluate selection
-					int thisValue = heuristic.value(selection, eventToAutomataMap, targetAlphabet);
+					double thisValue = heuristic.value(selection, eventToAutomataMap, targetAlphabet);
 					// Maximize or minimize?
 					if ((heuristic.maximize() && thisValue > bestValue) ||
 						(heuristic.minimize() && thisValue < bestValue))
@@ -383,9 +412,9 @@ public class AutomataMinimizer
 						for (int i = heuristicIndex+1; i<heuristicList.size(); i++)
 						{
 							MinimizationHeuristic nextHeuristic = heuristicList.get(i);
-							int nextHeuristicBest = nextHeuristic.value(taskAutomata, eventToAutomataMap, 
+							double nextHeuristicBest = nextHeuristic.value(taskAutomata, eventToAutomataMap, 
 																	targetAlphabet);
-							int nextHeuristicThis = nextHeuristic.value(selection, eventToAutomataMap, 
+							double nextHeuristicThis = nextHeuristic.value(selection, eventToAutomataMap, 
 																	targetAlphabet);
 							if ((nextHeuristic.maximize() && nextHeuristicThis > nextHeuristicBest) ||
 								(nextHeuristic.minimize() && nextHeuristicThis < nextHeuristicBest))
@@ -453,7 +482,7 @@ public class AutomataMinimizer
 				// Got a result?
 				assert(bestAutomaton != null);
 
-				if (false)
+				if (newAlgo)
 				{
 					/////////////////
 					// SECOND STEP //
@@ -461,7 +490,8 @@ public class AutomataMinimizer
 					
 					// Search among all automata
 					assert(!heuristic.isSpecial());
-					bestValue = (heuristic.maximize() ? Integer.MIN_VALUE : Integer.MAX_VALUE);
+					double bestValueBob = (heuristic.maximize() ? 
+										   Double.NEGATIVE_INFINITY : Double.POSITIVE_INFINITY);
 					loop: for (int j=0; j<theAutomata.size(); j++)
 					{
 						Automaton aut = theAutomata.getAutomatonAt(j);
@@ -478,27 +508,27 @@ public class AutomataMinimizer
 						selection.addAutomaton(aut);
 						
 						// Evaluate selection
-						int thisValue = heuristic.value(selection, eventToAutomataMap, targetAlphabet);
-						//logger.info("Value: " + thisValue + " aut " + selection);
+						double thisValue = heuristic.value(selection, eventToAutomataMap, targetAlphabet);
+						//logger.info("Value: " + thisValue + " best: " + bestValueBob + " aut " + selection);
 						// Maximize or minimize?
-						if ((heuristic.maximize() && thisValue > bestValue) ||
-							(heuristic.minimize() && thisValue < bestValue))
+						if ((heuristic.maximize() && thisValue > bestValueBob) ||
+							(heuristic.minimize() && thisValue < bestValueBob))
 						{
-							bestValue = thisValue;
+							bestValueBob = thisValue;
 							taskAutomata = selection;
 							continue loop;
 						}
-						else if (bestValue == thisValue)
-						//else if (bestValue == Integer.MIN_VALUE)
+						//else if (bestValueBob == thisValue)
+						else if (bestValueBob == 0.0)
 						{
 							// Use lower priority heuristic to make a decision!
 							for (int i = heuristicIndex+1; i<heuristicList.size(); i++)
 							{
 								MinimizationHeuristic nextHeuristic = heuristicList.get(i);
-								int nextHeuristicBest = nextHeuristic.value(taskAutomata, eventToAutomataMap, 
-																			targetAlphabet);
-								int nextHeuristicThis = nextHeuristic.value(selection, eventToAutomataMap, 
-																			targetAlphabet);
+								double nextHeuristicBest = nextHeuristic.value(taskAutomata, eventToAutomataMap,
+																			   targetAlphabet);
+								double nextHeuristicThis = nextHeuristic.value(selection, eventToAutomataMap, 
+																			   targetAlphabet);
 								if ((nextHeuristic.maximize() && nextHeuristicThis > nextHeuristicBest) ||
 									(nextHeuristic.minimize() && nextHeuristicThis < nextHeuristicBest))
 								{
@@ -507,7 +537,30 @@ public class AutomataMinimizer
 								}
 							}
 						}
-						
+
+						/*
+						{
+							// Calculate the alphabet of local events
+							Alphabet alphaA = selection.getAutomatonAt(0).getAlphabet();
+							Alphabet alpha = selection.getAutomatonAt(1).getAlphabet();
+							int nbrOfCommonEvents = alphaA.nbrOfCommonEvents(alpha);
+							Alphabet localEvents = MinimizationHelper.getLocalEvents(selection, eventToAutomataMap);
+							localEvents.minus(targetAlphabet); // Ignore events from targetAlphabet!
+							
+							// Find ratios
+							int nbrOfLocalEvents = localEvents.size();
+							int unionAlphabetSize = alphaA.size() + alpha.size() - nbrOfCommonEvents;
+							double thisLocalRatio = ((double) nbrOfLocalEvents)/((double) unionAlphabetSize);
+							double thisCommonRatio = ((double) nbrOfCommonEvents)/((double) unionAlphabetSize);
+							
+							logger.info("Local: " + thisValue + " or " + thisLocalRatio);
+							logger.info("Common: " + heuristicList.get(1).value(selection, eventToAutomataMap, 
+																				targetAlphabet) + " or " + thisCommonRatio);
+							logger.info("States: " + heuristicList.get(2).value(selection, eventToAutomataMap, 
+																				targetAlphabet) + " or " + selection.getAutomatonAt(1).nbrOfStates());
+						}
+						*/
+
 						selection.clear();
 						selection = null;
 					}

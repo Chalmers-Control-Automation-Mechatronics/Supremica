@@ -2047,123 +2047,66 @@ public class Automaton
 	 * that the two automata generates the same language.
 	 *
 	 * Shouldn't there really be a CompareAutomata class?
-	 * This class should have methods like areIsomorphic() and languageEqual()
+	 * This class should have methods like isIsomorphic() and languageEqual()
 	 */ // yes, definitively there should be a CompareAutomata class //MF
 	public boolean equalAutomaton(Automaton other)
 	{
-		boolean debug = true;
-
 		// Should type, name, comment really be considered?
-		if (getType() != other.getType())
-		{
-			if (debug)
-			{
-				System.err.println("equalAutomaton::non equal type");
-			}
-
-			return false;
-		}
-
 		if (!getName().equals(other.getName()))
 		{
-			if (debug)
-			{
-
-				// System.err.println(getName() + " " + other.getName());
-				System.err.println("equalAutomaton::non equal name");
-			}
-
+			logger.debug("equalAutomaton::non equal name");
 			return false;
 		}
-
+		if (getType() != other.getType())
+		{
+			logger.debug("equalAutomaton::non equal type");
+			return false;
+		}
 		if (!getComment().equals(other.getComment()))
 		{
-			if (debug)
-			{
-				System.err.println("equalAutomaton::non equal comment");
-			}
-
+			logger.debug("equalAutomaton::non equal comment");
 			return false;
 		}
 
 		// The following stuff seems useful to consider
 		if (hasAcceptingState() != other.hasAcceptingState())
 		{
-			if (debug)
-			{
-				System.err.println("equalAutomaton::non equal accepting state");
-			}
-
+			logger.debug("equalAutomaton::non equal accepting state");
 			return false;
 		}
-
 		if (hasSelfLoop() != other.hasSelfLoop())
 		{
-			if (debug)
-			{
-				System.err.println("equalAutomaton::non equal has self loop");
-			}
-
+			logger.debug("equalAutomaton::non equal has self loop");
 			return false;
 		}
-
 		if (isDeterministic() != other.isDeterministic())
 		{
-			if (debug)
-			{
-				System.err.println("equalAutomaton::non equal is deterministic");
-			}
-
+			logger.debug("equalAutomaton::non equal is deterministic");
 			return false;
 		}
-
 		if (isAllEventsPrioritized() != other.isAllEventsPrioritized())
 		{
-			if (debug)
-			{
-				System.err.println("equalAutomaton::non equal is all events prioritized");
-			}
-
+			logger.debug("equalAutomaton::non equal is all events prioritized");
 			return false;
 		}
-
 		if (nbrOfAcceptingStates() != other.nbrOfAcceptingStates())
 		{
-			if (debug)
-			{
-				System.err.println("equalAutomaton::non equal name nbr of accepting states");
-			}
-
+			logger.debug("equalAutomaton::non equal name nbr of accepting states");
 			return false;
 		}
-
 		if (nbrOfForbiddenStates() != other.nbrOfForbiddenStates())
 		{
-			if (debug)
-			{
-				System.err.println("equalAutomaton::non equal nbr of forbidden states");
-			}
-
+			logger.debug("equalAutomaton::non equal nbr of forbidden states");
 			return false;
 		}
-
 		if (nbrOfAcceptingAndForbiddenStates() != other.nbrOfAcceptingAndForbiddenStates())
 		{
-			if (debug)
-			{
-				System.err.println("equalAutomaton::non equal name nbr of accepting and forbidden states");
-			}
-
+			logger.debug("equalAutomaton::non equal name nbr of accepting and forbidden states");			
 			return false;
 		}
-
 		if (!alphabet.equalAlphabet(other.alphabet))
 		{
-			if (debug)
-			{
-				System.err.println("equalAutomaton::non equal alphabet");
-			}
-
+			logger.debug("equalAutomaton::non equal alphabet");			
 			return false;
 		}
 

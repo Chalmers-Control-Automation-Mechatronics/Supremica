@@ -356,8 +356,7 @@ public final class AutomataSynchronizerHelper
 	public void addState(int[] fromState, int[] toState)
 		throws Exception
 	{
-		logger.debug("addState state: " +AutomataIndexFormHelper.dumpState(fromState));
-
+		//logger.debug("addState state: " +AutomataIndexFormHelper.dumpState(fromState));
 
 		if (rememberTrace)
 		{

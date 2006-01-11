@@ -142,7 +142,7 @@ public class AutomatonMinimizer
         SynthesizerOptions synthOptions = SynthesizerOptions.getDefaultSynthesizerOptions();
         AutomatonSynthesizer synth = new AutomatonSynthesizer(theAutomaton, synthOptions);
         synth.doReachable(true);
-        final LinkedList toBeRemoved = new LinkedList();
+        LinkedList toBeRemoved = new LinkedList();
         for (Iterator<State> it = theAutomaton.stateIterator(); it.hasNext(); )
         {
             State state = it.next();
@@ -1366,7 +1366,7 @@ public class AutomatonMinimizer
                         {
                             Iterator<Arc> outIt = previous.outgoingArcsIterator();
                             boolean fail = false;
-                            final LinkedList toBeRemoved = new LinkedList();
+                            LinkedList toBeRemoved = new LinkedList();
                             while (outIt.hasNext())
                             {
                                 Arc currArc = outIt.next();
@@ -1412,7 +1412,7 @@ public class AutomatonMinimizer
         }
         // After the above there may be nonreachable parts... make reachable!
         synth.doReachable();
-        final LinkedList toBeRemoved = new LinkedList();
+        LinkedList toBeRemoved = new LinkedList();
         for (Iterator<State> it = aut.stateIterator(); it.hasNext(); )
         {
             State state = it.next();
@@ -1812,7 +1812,7 @@ public class AutomatonMinimizer
         int count = 0;
 
         // Put silent self-loops in a list, remove afterwards
-        final LinkedList toBeRemoved = new LinkedList();
+        LinkedList toBeRemoved = new LinkedList();
         for (Iterator<Arc> arcIt = aut.arcIterator(); arcIt.hasNext(); )
         {
             Arc currArc = arcIt.next();
@@ -1943,7 +1943,7 @@ public class AutomatonMinimizer
         Alphabet alpha = aut.getAlphabet();
 
         // Put them in a list, remove afterwards
-        final LinkedList toBeRemoved = new LinkedList();
+        LinkedList toBeRemoved = new LinkedList();
         loop: for (Iterator<LabeledEvent> evIt = alpha.iterator(); evIt.hasNext(); )
         {
             LabeledEvent event = evIt.next();

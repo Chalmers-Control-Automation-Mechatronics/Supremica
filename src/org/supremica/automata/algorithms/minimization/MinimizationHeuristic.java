@@ -132,7 +132,7 @@ public class MinimizationHeuristic
 	 *
 	 * @param eventToAutomataMap is a map from all (global) events to all (global) automata.
 	 */ 
-	public int value(Automata selection, EventToAutomataMap eventToAutomataMap, Alphabet targetAlphabet)
+	public double value(Automata selection, EventToAutomataMap eventToAutomataMap, Alphabet targetAlphabet)
 		throws Exception
 	{
 		if (this == MostLocal)
@@ -142,7 +142,7 @@ public class MinimizationHeuristic
 			int nbrOfLocalEvents = localEvents.size();
 			int unionAlphabetSize = selection.getUnionAlphabet().size();
 			//System.err.println(" Value: " + (int) (1000 * ((double) nbrOfLocalEvents)/((double) unionAlphabetSize)) +  " aut: " + selection);
-			return (int) (1000 * ((double) nbrOfLocalEvents)/((double) unionAlphabetSize));
+			return ((double) nbrOfLocalEvents)/((double) unionAlphabetSize);
 		}
 		else if (this == MostCommon)
 		{
@@ -167,7 +167,7 @@ public class MinimizationHeuristic
 				common.intersect(aut.getAlphabet());
 			}
 			int nbrOfCommonEvents = common.size();
-			return (int) (1000 * ((double) nbrOfCommonEvents)/((double) unionAlphabetSize));
+			return ((double) nbrOfCommonEvents)/((double) unionAlphabetSize);
 		}
 		else if (this == LeastExtension)
 		{
@@ -181,7 +181,7 @@ public class MinimizationHeuristic
 					largestAlphabetSize = size;
 				}
 			}
-			return (int) (1000 * ((double) unionAlphabetSize)/((double) largestAlphabetSize));
+			return ((double) unionAlphabetSize)/((double) largestAlphabetSize);
 		}
 		else if (this == MostStates || this == FewestStates)
 		{
@@ -212,7 +212,7 @@ public class MinimizationHeuristic
 		}
 		else if (this == Random)
 		{
-			return (int) (Math.random()*10000.0);
+			return Math.random();
 		}
 
 		throw new Exception("Unknown heuristic.");

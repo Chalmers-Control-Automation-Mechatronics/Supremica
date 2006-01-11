@@ -804,6 +804,9 @@
 			<pathelement path="${lib}/${unjared}" />
 			<pathelement path="${java.class.path}" />
 		</classpath>
+		<assertions>
+			 <enable/>
+		</assertions>
 	</java>
 </target>
 
