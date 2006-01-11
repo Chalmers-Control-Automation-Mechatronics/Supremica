@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleWindow
 //###########################################################################
-//# $Id: ModuleWindow.java,v 1.20 2005-12-12 20:23:14 siw4 Exp $
+//# $Id: ModuleWindow.java,v 1.21 2006-01-11 02:34:54 siw4 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -1081,7 +1081,7 @@ public class ModuleWindow
 			EventDeclProxy ident = (EventDeclProxy)mList.getModel().getElementAt(row);
 			final Transferable t = new IdentifierTransfer
 										(new IdentifierWithKind(
-										new SimpleIdentifierSubject(HTMLPrinter.getHTMLString(ident)),
+										new SimpleIdentifierSubject(ident.getName()),
 										ident.getKind()));
 			try {
 				e.startDrag(DragSource.DefaultCopyDrop, t);

@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EventTableModel
 //###########################################################################
-//# $Id: EventTableModel.java,v 1.11 2006-01-11 00:00:18 siw4 Exp $
+//# $Id: EventTableModel.java,v 1.12 2006-01-11 02:34:54 siw4 Exp $
 //###########################################################################
 
 
@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.ListIterator;
 import java.util.List;
 import java.util.TreeSet;
 import javax.swing.ImageIcon;
@@ -64,11 +65,12 @@ class EventTableModel
 					final JTable table)
 	{
 		((GraphSubject)graph).addModelObserver(this);
+		addTableModelListener(new TableHandler());
 		mTable = table;
 		mGraph = graph;
 		mModule = module;
 		mEvents = collectEvents();
-		addTableModelListener(new TableHandler());
+		fireTableChanged(new TableModelEvent(this));
 	}
 
 	public void modelChanged(ModelChangeEvent e)
@@ -178,21 +180,24 @@ class EventTableModel
 			} else if (old == null || !old.equals(ident)) {
 				if (old != null)
 				{
-					for (AbstractSubject a : mGraph.getBlockedEvents().getEventListModifiable())
+					ListIterator<AbstractSubject> li = mGraph.getBlockedEvents().getEventListModifiable().listIterator();
+					while(li.hasNext())
 					{
-						if (((IdentifierSubject)a).getName().equals(old.getName()))
+						AbstractSubject a = li.next();
+						if (a.equals(old))
 						{
-							((IdentifierSubject)a).setName(ident.getName());
+							li.set(ident.clone());
 						}
 					}
 					for (EdgeSubject e : mGraph.getEdgesModifiable())
 					{
-						for (AbstractSubject a : e.getLabelBlock().getEventListModifiable())
+						li = e.getLabelBlock().getEventListModifiable().listIterator();
+						while(li.hasNext())
 						{
-							System.out.println(((IdentifierSubject)a).getName() + " : " + old.getName());
-							if (((IdentifierSubject)a).getName().equals(old.getName()))
+							AbstractSubject a = li.next();
+							if (a.equals(old))
 							{
-								((IdentifierSubject)a).setName(ident.getName());
+								li.set(ident.clone());
 							}
 						}
 					}
@@ -410,8 +415,22 @@ class EventTableModel
 	{
 		public void tableChanged(TableModelEvent e)
 		{
-			Collections.sort(mEvents, new StringComparator());
-			mTable.repaint();
+			Collections.sort(mEvents, new StringComparator());			
+			Iterator<EventEntry> i = mEvents.iterator();
+			if (i.hasNext())
+			{
+				IdentifierSubject previous = i.next().getName();				
+				while (i.hasNext())
+				{
+					IdentifierSubject current = i.next().getName();
+					if (previous.equals(current))
+					{
+						i.remove();
+					}
+					previous = current;
+				}
+			}
+			mTable.repaint();			
 		}
 
 		private class StringComparator implements Comparator
