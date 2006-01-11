@@ -359,8 +359,7 @@ public class AutomataMinimizer
 				strategy == MinimizationStrategy.AtLeastOneLocalMaxThree)
 			{
 				// Look through the map and find the best set of automata
-				double bestValue = (heuristic.maximize() ? 
-									Double.NEGATIVE_INFINITY : Double.POSITIVE_INFINITY);
+				double bestValue = heuristic.worstValue();
 				loop: for (Iterator<LabeledEvent> evIt = eventToAutomataMap.eventIterator(); evIt.hasNext(); )
 				{
 					LabeledEvent event = evIt.next();
@@ -451,7 +450,7 @@ public class AutomataMinimizer
 				// Choose the "best" automaton...
 				Automaton bestAutomaton = null;
 				{
-					int bestValue = (strategy.maximize() ? Integer.MIN_VALUE : Integer.MAX_VALUE);
+					int bestValue = strategy.worstValue();
 					// Search among all the automata for the best one according to the current strategy...
 					assert(!strategy.isSpecial());
 					loop: for (Iterator<Automaton> autIt = theAutomata.iterator(); autIt.hasNext(); )
@@ -506,8 +505,7 @@ public class AutomataMinimizer
 				{					
 					// Search among all automata
 					assert(!heuristic.isSpecial());
-					double bestValue = (heuristic.maximize() ? 
-										   Double.NEGATIVE_INFINITY : Double.POSITIVE_INFINITY);
+					double bestValue = heuristic.worstValue();
 					loop: for (int j=0; j<theAutomata.size(); j++)
 					{
 						Automaton aut = theAutomata.getAutomatonAt(j);
@@ -577,10 +575,10 @@ public class AutomataMinimizer
 					{
 						Automaton aut = theAutomata.getAutomatonAt(j);
 						Alphabet alpha = aut.getAlphabet();
-						// We have a new candidate!
-						Automata candidate = new Automata();
-						candidate.addAutomaton(bestAutomaton);
-						candidate.addAutomaton(aut);
+						// We have a new cndidate!
+						Automata selection = new Automata();
+						selection.addAutomaton(bestAutomaton);
+						selection.addAutomaton(aut);
 						
 						// Skip self
 						if (bestAutomaton == aut)
@@ -589,13 +587,15 @@ public class AutomataMinimizer
 						}
 						
 						// If there are no common events, try next automaton
-						int nbrOfCommonEvents = alphaA.nbrOfCommonEvents(alpha);
+						//int nbrOfCommonEvents = alphaA.nbrOfCommonEvents(alpha);
+						Alphabet commonEvents = MinimizationHelper.getCommonEvents(selection, eventToAutomataMap);
+						int nbrOfCommonEvents = commonEvents.size();
 						if (nbrOfCommonEvents == 0)
 						{
 							if ((bestLocalRatio == 0) && (bestCommonRatio == 0) &&
 								(aut.nbrOfStates() < bestSize))
 							{
-								taskAutomata = candidate;
+								taskAutomata = selection;
 								bestSize = aut.nbrOfStates();
 								hideThese = null;
 							}
@@ -603,7 +603,7 @@ public class AutomataMinimizer
 						}
 						
 						// Calculate the alphabet of local events
-						Alphabet localEvents = MinimizationHelper.getLocalEvents(candidate, eventToAutomataMap);
+						Alphabet localEvents = MinimizationHelper.getLocalEvents(selection, eventToAutomataMap);
 						localEvents.minus(targetAlphabet); // Ignore events from targetAlphabet!
 						
 						// Find ratios
@@ -615,13 +615,13 @@ public class AutomataMinimizer
 						// Improvement?
 						if (thisLocalRatio > bestLocalRatio)
 						{
-							taskAutomata = candidate;
+							taskAutomata = selection;
 							bestLocalRatio = thisLocalRatio;
 							hideThese = localEvents;
 						}
 						else if ((bestLocalRatio == 0) && (thisCommonRatio > bestCommonRatio))
 						{
-							taskAutomata = candidate;
+							taskAutomata = selection;
 							bestCommonRatio = thisCommonRatio;
 							hideThese = null;
 						}

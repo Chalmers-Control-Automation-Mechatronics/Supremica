@@ -171,7 +171,6 @@ public class MinimizationHeuristic
 			return ((double) nbrOfCommonEvents)/((double) unionAlphabetSize);
 			*/
 			Alphabet commonEvents = MinimizationHelper.getCommonEvents(selection, eventToAutomataMap);
-			commonEvents.minus(targetAlphabet);
 			int nbrOfCommonEvents = commonEvents.size();
 			int unionAlphabetSize = selection.getUnionAlphabet().size();
 			return ((double) nbrOfCommonEvents)/((double) unionAlphabetSize);
@@ -252,5 +251,13 @@ public class MinimizationHeuristic
 	public boolean isSpecial()
 	{
 		return type == Type.SPECIAL;
+	}
+
+	/**
+	 * The initial value for improvement comparisons.
+	 */
+	public double worstValue()
+	{
+		return (maximize() ? Double.NEGATIVE_INFINITY : Double.POSITIVE_INFINITY);
 	}
 }

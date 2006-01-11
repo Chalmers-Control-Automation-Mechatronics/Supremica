@@ -168,4 +168,12 @@ public class MinimizationStrategy
 	{
 		return type == Type.SPECIAL;
 	}
+
+	/**
+	 * The initial value for improvement comparisons.
+	 */
+	public int worstValue()
+	{
+		return (maximize() ? Integer.MIN_VALUE : Integer.MAX_VALUE);
+	}
 }

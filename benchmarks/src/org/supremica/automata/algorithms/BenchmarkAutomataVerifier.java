@@ -126,7 +126,7 @@ public class BenchmarkAutomataVerifier
 		// Instantiated model benchmarks //
 		///////////////////////////////////
 
-		if (true)
+		if (false)
 		{
 			// Arbiter
 			Arbiter arbiter = new Arbiter(128, false);
