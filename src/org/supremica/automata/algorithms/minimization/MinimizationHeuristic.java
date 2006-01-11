@@ -146,6 +146,7 @@ public class MinimizationHeuristic
 		}
 		else if (this == MostCommon)
 		{
+			/*
 			int unionAlphabetSize = selection.getUnionAlphabet().size();
 			Automaton smallest = null;
 			for (Iterator<Automaton> autIt = selection.iterator(); autIt.hasNext(); )
@@ -167,6 +168,12 @@ public class MinimizationHeuristic
 				common.intersect(aut.getAlphabet());
 			}
 			int nbrOfCommonEvents = common.size();
+			return ((double) nbrOfCommonEvents)/((double) unionAlphabetSize);
+			*/
+			Alphabet commonEvents = MinimizationHelper.getCommonEvents(selection, eventToAutomataMap);
+			commonEvents.minus(targetAlphabet);
+			int nbrOfCommonEvents = commonEvents.size();
+			int unionAlphabetSize = selection.getUnionAlphabet().size();
 			return ((double) nbrOfCommonEvents)/((double) unionAlphabetSize);
 		}
 		else if (this == LeastExtension)
@@ -190,9 +197,14 @@ public class MinimizationHeuristic
 			int value = 1;
 			for (Iterator<Automaton> autIt = selection.iterator(); autIt.hasNext(); )
 				value *= autIt.next().nbrOfStates();
-			return value;
+			return value;			
 			*/
-			return selection.getAutomatonAt(1).nbrOfStates();
+			// Least squares
+			int value = 0;
+			for (Iterator<Automaton> autIt = selection.iterator(); autIt.hasNext(); )
+				value += Math.pow(autIt.next().nbrOfStates(), 2);
+			return value;			
+			//return selection.getAutomatonAt(1).nbrOfStates();
 		}
 		else if (this == MostEvents || this == FewestEvents) 
 		{

@@ -47,7 +47,7 @@ public class ModifiedVGAstar
 	{
 		super.init(manualExpansion);
 
-		timer.start();
+		timer.restart();
 		vgBuilder = new VisGraphBuilder(plantAutomata, oneProdRelax);
 		infoStr += "\tVisGraph-construction in " + timer.elapsedTime() + " ms\n";
 

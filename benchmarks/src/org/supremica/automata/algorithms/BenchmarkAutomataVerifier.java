@@ -94,11 +94,25 @@ public class BenchmarkAutomataVerifier
 		vOptions = VerificationOptions.getDefaultNonblockingOptions();
 		sOptions = SynchronizationOptions.getDefaultVerificationOptions();
 		mOptions = MinimizationOptions.getDefaultNonblockingOptions();
+		// Strategy
 		mOptions.setMinimizationStrategy(MinimizationStrategy.FewestTransitionsFirst);
 		//mOptions.setMinimizationStrategy(MinimizationStrategy.AtLeastOneLocalMaxThree);
+		//mOptions.setMinimizationStrategy(MinimizationStrategy.AtLeastOneLocal);
+		//mOptions.setMinimizationStrategy(MinimizationStrategy.AtLeastOneLocalMaxThree);
+		//mOptions.setMinimizationStrategy(MinimizationStrategy.FewestTransitionsFirst);
+		//mOptions.setMinimizationStrategy(MinimizationStrategy.MostStatesFirst);
+		//mOptions.setMinimizationStrategy(MinimizationStrategy.FewestStatesFirst);
+		//mOptions.setMinimizationStrategy(MinimizationStrategy.FewestEventsFirst);
+		//mOptions.setMinimizationStrategy(MinimizationStrategy.RandomFirst);
+		// Heuristic
 		mOptions.setMinimizationHeuristic(MinimizationHeuristic.MostLocal);
-		
-
+		//mOptions.setMinimizationHeuristic(MinimizationHeuristic.MostCommon);
+		//mOptions.setMinimizationHeuristic(MinimizationHeuristic.FewestTransitions);
+		//mOptions.setMinimizationHeuristic(MinimizationHeuristic.FewestStates);
+		//mOptions.setMinimizationHeuristic(MinimizationHeuristic.FewestEvents);
+		//mOptions.setMinimizationHeuristic(MinimizationHeuristic.LeastExtension);
+		//mOptions.setMinimizationHeuristic(MinimizationHeuristic.Random);
+	   
 
 		System.out.println("");
 		System.out.println("BENCHMARKING MODULAR NONBLOCKING VERIFICATION ALGORITHMS");
@@ -112,7 +126,7 @@ public class BenchmarkAutomataVerifier
 		// Instantiated model benchmarks //
 		///////////////////////////////////
 
-		if (false)
+		if (true)
 		{
 			// Arbiter
 			Arbiter arbiter = new Arbiter(128, false);

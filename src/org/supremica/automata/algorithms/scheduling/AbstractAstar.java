@@ -82,7 +82,8 @@ public abstract class AbstractAstar
 	/** Counts the number of iterations */
     protected int iterationCounter;
 
-    /** Starts ticking when the search/walk through the nodes is started. Shows the duration of the scheduling. */
+    /** Starts ticking when the search/walk through the nodes is
+	 * started. Shows the duration of the scheduling. */
     protected ActionTimer timer;
 
     /** Handles the expansion of nodes - either manually or using Supremicas methods */
@@ -195,7 +196,8 @@ public abstract class AbstractAstar
 		//Borde räcka med plantAutomata.size(), fast då kanske man måste ändra lite på andra ställen också
 		keyMapping = new int[theAutomata.size()];
 		keyMapping[0] = 1;
-		for (int i=1; i<keyMapping.length; i++) {
+		for (int i=1; i<keyMapping.length; i++) 
+		{
 			keyMapping[i] = keyMapping[i-1] * (theAutomata.getAutomatonAt(i-1).nbrOfStates() + 1);
 		}
 	
@@ -203,7 +205,8 @@ public abstract class AbstractAstar
 	
 		if (theAutomata == null)
 			return;
-		else {
+		else 
+		{
 			int nrOfPlants = plantAutomata.size();
 	    
 			oneProdRelax = new int[nrOfPlants][];
@@ -216,7 +219,7 @@ public abstract class AbstractAstar
 
 			infoStr = "Processing times:\n";
 	    
-			timer.start();
+			timer.restart();
 			preprocess1();
 			infoStr += "\t1st preprocessing in " + timer.elapsedTime() + " ms\n";
 
@@ -260,8 +263,9 @@ public abstract class AbstractAstar
 		if (theAutomata == null) {
 			throw new Exception("Choose several automata to schedule...");
 		}
-		else {
-			timer.start();
+		else 
+		{
+			timer.restart();
 			iterationCounter = 0;
 
 			int[] currNode = makeInitialNode();
@@ -277,7 +281,7 @@ public abstract class AbstractAstar
 			/** 
 				Tillfälligt bortkommenterat (väntar på att 2-prod relaxeringen skall implementeras utan buggar)
 				if (plantAutomata.size() > 2) {
-				timer.start();
+				timer.restart();
 				//				String prep2Info = preprocess2();
 				preprocess2();
 				infoStr += "\t2nd preprocessing in " + timer.elapsedTime() + " ms\n";
@@ -702,7 +706,7 @@ public abstract class AbstractAstar
     public Automaton buildScheduleAutomaton() 
 		throws Exception
 	{
-		timer.start();
+		timer.restart();
 
 		Automaton scheduleAuto = new Automaton();
 		scheduleAuto.setComment("Schedule");

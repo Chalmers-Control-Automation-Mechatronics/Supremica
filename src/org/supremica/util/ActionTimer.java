@@ -63,12 +63,21 @@ public class ActionTimer
 	public ActionTimer() {}
 
 	/**
-	 * Starts the timer.
+	 * Restarts the timer.
 	 */
-	public void start()
+	public void restart()
 	{
 		stopDate = null;
 		startDate = new Date();
+	}
+
+	/**
+	 * Resets the timer.
+	 */
+	public void reset()
+	{
+		startDate = null;
+		stopDate = null;
 	}
 
 	/**
@@ -77,6 +86,25 @@ public class ActionTimer
 	public void stop()
 	{
 		stopDate = new Date();
+	}
+
+	/**
+	 * Makes the timer resume ticking time "from where it last
+	 * stopped". Starts from 0 if it hasn't been started before.
+	 */
+	public void start()
+	{
+		// Not started yet?
+		if (startDate == null)
+		{
+			restart();
+		}
+		else
+		{
+			// Shift "startDate" as long as the timer has been turned off
+			startDate.setTime(startDate.getTime() + ((new Date()).getTime()-stopDate.getTime()));
+			stopDate = null;
+		}
 	}
 
 	/**
@@ -138,11 +166,5 @@ public class ActionTimer
 		}
 
 		return sbuf.toString();
-	}
-
-	public void clear()
-	{
-		startDate = null;
-		stopDate = null;
 	}
 }
