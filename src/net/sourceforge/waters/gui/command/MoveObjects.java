@@ -88,7 +88,7 @@ public class MoveObjects
 	super.redo();
 	mSurface.unselectAll();
 	for (EditorObject o : mMoved) {
-		if (mDescription != "Edge reshaping" || o.getType() != EditorObject.EDGE)
+		if (mDescription.equals("Edge reshaping") || o.getType() != EditorObject.EDGE)
 		{
 			if (o.getType() == EditorObject.NODEGROUP) {
 			EditorNodeGroup ng = (EditorNodeGroup) o;
@@ -115,26 +115,26 @@ public class MoveObjects
 
     public void undo() throws CannotUndoException
     {
-	super.undo();
-	mSurface.unselectAll();
-	for (EditorObject o : mMoved) {
-		if (mDescription != "Edge reshaping" || o.getType() != EditorObject.EDGE)
-		{
-			if (o.getType() == EditorObject.NODEGROUP) {
-			EditorNodeGroup ng = (EditorNodeGroup) o;
-			if (ng.getResizing()) {
-				ng.resize((int)(ng.getX() - mDisplacement.getX()), (int)(ng.getY() - mDisplacement.getY()));
-				continue;
+		super.undo();
+		mSurface.unselectAll();
+		for (EditorObject o : mMoved) {
+			if (mDescription.equals("Edge reshaping") || o.getType() != EditorObject.EDGE)
+			{
+				if (o.getType() == EditorObject.NODEGROUP) {
+				EditorNodeGroup ng = (EditorNodeGroup) o;
+				if (ng.getResizing()) {
+					ng.resize((int)(ng.getX() - mDisplacement.getX()), (int)(ng.getY() - mDisplacement.getY()));
+					continue;
+				}
+				}
+				if ((o.getType() != EditorObject.LABELGROUP && o.getType() != EditorObject.LABEL)
+				|| mMoved.size() == 1) {	  
+				o.setPosition(o.getX() - mDisplacement.getX(), o.getY() - mDisplacement.getY());	
+				}
 			}
-			}
-			if ((o.getType() != EditorObject.LABELGROUP && o.getType() != EditorObject.LABEL)
-			|| mMoved.size() == 1) {	  
-			o.setPosition(o.getX() - mDisplacement.getX(), o.getY() - mDisplacement.getY());	
-			}
+			mSurface.select(o);
 		}
-		mSurface.select(o);
-	}
-	mSurface.getEditorInterface().setDisplayed();   
+		mSurface.getEditorInterface().setDisplayed();  
     }
 
     public String getPresentationName()

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorLabelGroup
 //###########################################################################
-//# $Id: EditorLabelGroup.java,v 1.18 2006-01-09 23:52:56 siw4 Exp $
+//# $Id: EditorLabelGroup.java,v 1.19 2006-01-11 00:00:18 siw4 Exp $
 //###########################################################################
 
 
@@ -86,9 +86,6 @@ public class EditorLabelGroup
 
 	public void setSelectedLabel(int ex, int ey)
 	{
-		ex -= panel.getX();
-		ey -= panel.getY();
-
 		panel.requestFocus();
 		int index = getLabelIndexAt(ex, ey);
 		if (index != -1)
@@ -114,8 +111,10 @@ public class EditorLabelGroup
 		}
 	}
 
-    private int getLabelIndexAt(int ex, int ey)
+    public int getLabelIndexAt(int ex, int ey)
     {
+		ex -= panel.getX();
+		ey -= panel.getY();		
 		for (int i = 0; i < panel.getComponentCount(); i++)
 		{
 			JLabel l = (JLabel) panel.getComponent(i);
@@ -124,7 +123,7 @@ public class EditorLabelGroup
 			{
 				return i;	 
 			}
-		}
+		}		
 		return -1;
     }
 

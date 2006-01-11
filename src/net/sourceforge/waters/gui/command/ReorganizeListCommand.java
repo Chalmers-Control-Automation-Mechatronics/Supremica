@@ -45,8 +45,10 @@ public class ReorganizeListCommand
 		// Remove label and add to new position in list
 		list.remove(mIdentifier);
 		list.add(mNewPosition, mIdentifier);
+		mSurface.unselectAll();
 		mSurface.select(mGroup);
 		mGroup.setSelectedLabel(mNewPosition);
+		mSurface.getEditorInterface().setDisplayed();
 	}
 	
 	/** 
@@ -73,8 +75,10 @@ public class ReorganizeListCommand
 		// Remove label and add to new position in list
 		list.remove(mIdentifier);
 		list.add(mPosition, mIdentifier);
+		mSurface.unselectAll();
 		mSurface.select(mGroup);
 		mGroup.setSelectedLabel(mPosition);
+		mSurface.getEditorInterface().setDisplayed();
     }
 
     public String getPresentationName()

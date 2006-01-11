@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EventTableModel
 //###########################################################################
-//# $Id: EventTableModel.java,v 1.10 2006-01-09 23:52:56 siw4 Exp $
+//# $Id: EventTableModel.java,v 1.11 2006-01-11 00:00:18 siw4 Exp $
 //###########################################################################
 
 
@@ -30,9 +30,11 @@ import net.sourceforge.waters.model.module.EventListExpressionProxy;
 import net.sourceforge.waters.model.module.ForeachEventProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
+import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.ModelObserver;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
+import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.subject.module.EventListExpressionSubject;
 import net.sourceforge.waters.subject.module.EventParameterSubject;
@@ -57,7 +59,7 @@ class EventTableModel
 
 	//#######################################################################
 	//# Constructors
-	EventTableModel(final GraphProxy graph,
+	EventTableModel(final GraphSubject graph,
 					final ModuleSubject module,
 					final JTable table)
 	{
@@ -90,8 +92,7 @@ class EventTableModel
 				}
 				if (!alreadyListed)
 				{
-					createEvent();
-					setValueAt(o, 0, 1);
+					setValueAt(o, createEvent(), 1);
 				}
 			}
 		}
@@ -169,12 +170,33 @@ class EventTableModel
 			return;
 
 		case 1 :
-			final IdentifierSubject ident = (IdentifierSubject) value;
+			final IdentifierSubject ident = ((IdentifierSubject) value).clone();
 			final IdentifierSubject old = getEvent(row);
 			if (ident == null) {
 				mEvents.remove(row);
 				fireTableRowsDeleted(row, row);
 			} else if (old == null || !old.equals(ident)) {
+				if (old != null)
+				{
+					for (AbstractSubject a : mGraph.getBlockedEvents().getEventListModifiable())
+					{
+						if (((IdentifierSubject)a).getName().equals(old.getName()))
+						{
+							((IdentifierSubject)a).setName(ident.getName());
+						}
+					}
+					for (EdgeSubject e : mGraph.getEdgesModifiable())
+					{
+						for (AbstractSubject a : e.getLabelBlock().getEventListModifiable())
+						{
+							System.out.println(((IdentifierSubject)a).getName() + " : " + old.getName());
+							if (((IdentifierSubject)a).getName().equals(old.getName()))
+							{
+								((IdentifierSubject)a).setName(ident.getName());
+							}
+						}
+					}
+				}
 				final EventEntry entry = new EventEntry(ident);
 				mEvents.set(row, entry);
 				fireTableRowsUpdated(row, row);
@@ -279,7 +301,7 @@ class EventTableModel
 				collectEvents(dest, body);
 			} else {
 				final IdentifierSubject ident = (IdentifierSubject) proxy;
-				dest.add(ident);
+				dest.add(ident.clone());
 			}
 		}
 	}
@@ -418,7 +440,7 @@ class EventTableModel
 
 	//#####################################################################
 	//# Data Members
-	private final GraphProxy mGraph;
+	private final GraphSubject mGraph;
 	private final ModuleSubject mModule;
 	private final List<EventEntry> mEvents;
 	private final JTable mTable;

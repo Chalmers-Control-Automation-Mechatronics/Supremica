@@ -35,7 +35,9 @@ public class RemoveEventCommand
 	public void execute()
 	{
 		mList.getEventListModifiable().remove(mIdentifier);
+		mSurface.unselectAll();
 		mSurface.select(mGroup);
+		mSurface.getEditorInterface().setDisplayed();
 	}
 	
 	/** 
@@ -58,8 +60,10 @@ public class RemoveEventCommand
     {
 		super.undo();
 		mList.getEventListModifiable().add(mPosition, mIdentifier);
+		mSurface.unselectAll();
 		mSurface.select(mGroup);
 		mGroup.setSelectedLabel(mPosition);
+		mSurface.getEditorInterface().setDisplayed();
     }
 
     public String getPresentationName()

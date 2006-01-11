@@ -57,19 +57,19 @@ public class DeleteNodeGroupCommand
 
     public void execute()
     {
-	if (mFirstExecution) {
-	    for (DeleteEdgeCommand d : mDelEdge) {
-		d.execute();
-	    }
-	} else {
-	    for (DeleteEdgeCommand d : mDelEdge) {
-		d.redo();
-	    }
-	}
-	mSurface.delNodeGroup(mDeleted);
-	mSurface.unselectAll();
-	mSurface.getEditorInterface().setDisplayed();
-	mFirstExecution = false;
+		if (mFirstExecution) {
+			for (DeleteEdgeCommand d : mDelEdge) {
+			d.execute();
+			}
+		} else {
+			for (DeleteEdgeCommand d : mDelEdge) {
+			d.redo();
+			}
+		}
+		mSurface.delNodeGroup(mDeleted);
+		mSurface.unselectAll();
+		mSurface.getEditorInterface().setDisplayed();
+		mFirstExecution = false;
     }
 
     /** 

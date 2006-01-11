@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.50 2006-01-09 23:52:56 siw4 Exp $
+//# $Id: ControlledSurface.java,v 1.51 2006-01-11 00:00:18 siw4 Exp $
 //###########################################################################
  
 package net.sourceforge.waters.gui;
@@ -1109,11 +1109,11 @@ public class ControlledSurface
 						e.dropComplete(true);
 						return;
 					} else if (o instanceof EditorEdge) {
-						addToEdge((EditorEdge) o, ip);
+						addToEdge((EditorEdge) o, ip, e);
 						e.dropComplete(true);
 						return;
 					} else if (o instanceof EditorLabelGroup) {
-						addToLabelGroup((EditorLabelGroup) o, ip);
+						addToLabelGroup((EditorLabelGroup) o, ip, e);
 						e.dropComplete(true);
 						return;
 					} else if (o instanceof EditorLabel) {
@@ -1136,7 +1136,8 @@ public class ControlledSurface
 		private void addToNode(EditorNode n, IdentifierSubject i)
 		{
 			final IdentifierSubject cloned = i.clone();
-			Command addEvent = new AddEventCommand(n.getSubject().getPropositions(),
+			Command addEvent = new AddEventCommand(ControlledSurface.this, n,
+												  n.getSubject().getPropositions(),
 												  cloned, 0);
 			root.getUndoInterface().executeCommand(addEvent);
 			repaint();
@@ -1147,21 +1148,28 @@ public class ControlledSurface
 			addToNode(l.getParent(), i);
 		}
 
-		private void addToEdge(EditorEdge e, IdentifierSubject ip)
+		private void addToEdge(EditorEdge edge, IdentifierSubject ip, final DropTargetDropEvent e)
 		{
 			for (int i = 0; i < events.size(); i++)	{
 				EditorLabelGroup g = (EditorLabelGroup) events.get(i);
-				if (g.getParent() == (EditorObject) e) {
-					addToLabelGroup(g, ip);	
+				if (g.getParent() == (EditorObject) edge) {
+					addToLabelGroup(g, ip, e);	
 				}
 			}
 		}
 
-		private void addToLabelGroup(EditorLabelGroup l, IdentifierSubject i)
+		private void addToLabelGroup(EditorLabelGroup l, IdentifierSubject i, final DropTargetDropEvent e)
 		{
 			final IdentifierSubject cloned = i.clone();
-			Command addEvent = new AddEventCommand(l.getSubject(),
-												  cloned, 0);
+			int pos = l.getLabelIndexAt((int)e.getLocation().getX(),
+										(int)e.getLocation().getY());
+			if (pos == -1)
+			{
+				pos = 0;
+			}
+			Command addEvent = new AddEventCommand(ControlledSurface.this, l,
+												  l.getSubject(),
+												  cloned, pos);
 			root.getUndoInterface().executeCommand(addEvent);
 			repaint();
 		}
