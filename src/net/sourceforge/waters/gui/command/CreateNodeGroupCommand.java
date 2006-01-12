@@ -18,7 +18,6 @@ import javax.swing.undo.CannotUndoException;
  */
 
 public class CreateNodeGroupCommand
-    extends AbstractUndoableEdit
     implements Command
 {
 
@@ -53,33 +52,18 @@ public class CreateNodeGroupCommand
     }
 
     /** 
-     * Redoes the Command
-     *
-     * @throws CannotRedoException if CanRedo returns false
-     */
-    
-    public void redo() throws CannotRedoException
-    {
-	super.redo();
-	execute();
-    }
-
-    /** 
      * Undoes the Command
-     *
-     * @throws CannotUndoException if CanUndo returns false
      */    
 
-    public void undo() throws CannotUndoException
-    {
-	super.undo();
-	mSurface.delNodeGroup(mCreated);
-	mSurface.unselectAll();
-	mSurface.getEditorInterface().setDisplayed();
+    public void undo()
+    {	
+		mSurface.delNodeGroup(mCreated);
+		mSurface.unselectAll();
+		mSurface.getEditorInterface().setDisplayed();
     }
 
-    public String getPresentationName()
+    public String getName()
     {
-	return mDescription;
+		return mDescription;
     }
 }

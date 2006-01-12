@@ -12,7 +12,6 @@ import net.sourceforge.waters.subject.module.EventListExpressionSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
 
 public class AddEventCommand
-	extends AbstractUndoableEdit
 	implements Command
 {
 	private final ControlledSurface mSurface;
@@ -47,30 +46,17 @@ public class AddEventCommand
 		mSurface.getEditorInterface().setDisplayed();
 	}
 	
-	/** 
-     * Redoes the Command
-     *
-     * @throws CannotRedoException if CanRedo returns false
-     */
-    public void redo() throws CannotRedoException
-    {
-		super.redo();
-		execute();
-    }
-
     /** 
      * Undoes the Command
      *
-     * @throws CannotUndoException if CanUndo returns false
      */    
-    public void undo() throws CannotUndoException
+    public void undo()
     {
-		super.undo();
 		mList.getEventListModifiable().remove(mIdentifier);
 		mSurface.getEditorInterface().setDisplayed();
     }
 
-    public String getPresentationName()
+    public String getName()
     {
 		return mDescription;
     }

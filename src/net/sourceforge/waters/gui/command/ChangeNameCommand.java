@@ -7,7 +7,6 @@ import javax.swing.undo.CannotUndoException;
 import net.sourceforge.waters.subject.base.NamedSubject;
 
 public class ChangeNameCommand
-	extends AbstractUndoableEdit
 	implements Command
 {
 	private final NamedSubject mNamed;
@@ -38,24 +37,10 @@ public class ChangeNameCommand
 	}
 	
 	/** 
-     * Redoes the Command
-     *
-     * @throws CannotRedoException if CanRedo returns false
-     */
-    public void redo() throws CannotRedoException
-    {
-		super.redo();
-		execute();
-    }
-
-    /** 
      * Undoes the Command
-     *
-     * @throws CannotUndoException if CanUndo returns false
      */    
-    public void undo() throws CannotUndoException
+    public void undo()
     {
-		super.undo();
 		try
 		{
 			mNamed.setName(mOld);
@@ -67,7 +52,7 @@ public class ChangeNameCommand
 		}
     }
 
-    public String getPresentationName()
+    public String getName()
     {
 		return mDescription;
     }

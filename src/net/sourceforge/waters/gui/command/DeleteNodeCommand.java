@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
+import javax.swing.undo.CompoundEdit;
 
 /**
  * the Command for Creation of nodes
@@ -17,17 +18,15 @@ import javax.swing.undo.CannotUndoException;
  * @author Simon Ware
  */
 
-public class DeleteNodeCommand
-    extends AbstractUndoableEdit
+public class DeleteNodeCommand 
     implements Command
 {
-    private boolean mFirstExecution = true;
     /** The ControlledSurface Edited with this Command */
     private final ControlledSurface mSurface;
     /** The Node Removed by this Command */
     private final EditorNode mDeleted;
     /** the Edge Deletion Commands Associated with this Command */
-    private final Collection<DeleteEdgeCommand> mDelEdge = new LinkedList();
+    private final CompoundCommand mCommands = new CompoundCommand();
     private final String mDescription = "Node Deletion";
 
     /**
@@ -45,9 +44,10 @@ public class DeleteNodeCommand
 		for (Object o: surface.getEdges()) {
 			EditorEdge e = (EditorEdge)o;
 			if ((e.getEndNode() == node) || (e.getStartNode() == node)) {
-				mDelEdge.add(new DeleteEdgeCommand(mSurface, e));
+				mCommands.addCommand(new DeleteEdgeCommand(mSurface, e));
 			}
 		}
+		mCommands.end();
     }
 
     /**
@@ -56,53 +56,27 @@ public class DeleteNodeCommand
 
     public void execute()
     {
-	if (mFirstExecution) {
-	    for (DeleteEdgeCommand d : mDelEdge) {
-		d.execute();
-	    }
-	} else {
-	    for (DeleteEdgeCommand d : mDelEdge) {
-		d.redo();
-	    }
-	}
-	mSurface.delNode(mDeleted);
-	mSurface.unselectAll();
-	mSurface.getEditorInterface().setDisplayed();
-	mFirstExecution = false;
-    }
-
-    /** 
-     * Redoes the Command
-     *
-     * @throws CannotRedoException if CanRedo returns false
-     */
-    
-    public void redo() throws CannotRedoException
-    {
-	super.redo();
-	execute();
+		mCommands.execute();
+		mSurface.delNode(mDeleted);
+		mSurface.unselectAll();
+		mSurface.getEditorInterface().setDisplayed();
     }
 
     /** 
      * Undoes the Command
-     *
-     * @throws CannotUndoException if CanUndo returns false
      */    
 
-    public void undo() throws CannotUndoException
+    public void undo()
     {
-		super.undo();
 		mSurface.addNode(mDeleted);
-		for (DeleteEdgeCommand d : mDelEdge) {
-			d.undo();
-		}
+		mCommands.undo();
 		mSurface.unselectAll();
 		mSurface.select(mDeleted);
 		mSurface.getEditorInterface().setDisplayed();
     }
 
-    public String getPresentationName()
+    public String getName()
     {
-	return mDescription;
+		return mDescription;
     }
 }

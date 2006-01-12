@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.command
 //# CLASS:   CreateEdgeCommand
 //###########################################################################
-//# $Id: CreateEdgeCommand.java,v 1.5 2006-01-09 23:52:56 siw4 Exp $
+//# $Id: CreateEdgeCommand.java,v 1.6 2006-01-12 21:51:53 siw4 Exp $
 //###########################################################################
 
 
@@ -34,7 +34,6 @@ import net.sourceforge.waters.subject.module.NodeSubject;
  */
 
 public class CreateEdgeCommand
-    extends AbstractUndoableEdit
     implements Command
 {
 
@@ -77,30 +76,16 @@ public class CreateEdgeCommand
     }
 
     /** 
-     * Redoes the Command
-     *
-     * @throws CannotRedoException if CanRedo returns false
-     */
-    public void redo() throws CannotRedoException
-    {
-		super.redo();
-		execute();
-    }
-
-    /** 
      * Undoes the Command
-     *
-     * @throws CannotUndoException if CanUndo returns false
-     */    
-    public void undo() throws CannotUndoException
+     */
+    public void undo()
     {
-		super.undo();
 		mSurface.delEdge(mCreated);
 		mSurface.unselectAll();
 		mSurface.getEditorInterface().setDisplayed();
     }
 
-    public String getPresentationName()
+    public String getName()
     {
 		return mDescription;
     }

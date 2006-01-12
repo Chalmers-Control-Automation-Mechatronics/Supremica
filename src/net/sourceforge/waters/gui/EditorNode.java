@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorNode
 //###########################################################################
-//# $Id: EditorNode.java,v 1.29 2005-12-14 03:09:47 siw4 Exp $
+//# $Id: EditorNode.java,v 1.30 2006-01-12 21:51:53 siw4 Exp $
 //###########################################################################
 
 
@@ -22,7 +22,9 @@ import java.util.Set;
 import javax.swing.*;
 import javax.swing.undo.UndoableEdit;
 
+import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.ChangeNameCommand;
+import net.sourceforge.waters.gui.command.UndoableCommand;
 import net.sourceforge.waters.gui.command.UndoInterface;
 
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
@@ -175,7 +177,7 @@ public class EditorNode
 		{
 			return false;
 		}
-		UndoableEdit u = new ChangeNameCommand(getName(), n, getSubject()); 
+		Command u = new ChangeNameCommand(getName(), n, getSubject()); 
 
 		try
 		{
@@ -187,7 +189,7 @@ public class EditorNode
 
 			return false;
 		}
-		mUndo.addUndoable(u);
+		mUndo.addUndoable(new UndoableCommand(u));
 		return true;
 	}
 

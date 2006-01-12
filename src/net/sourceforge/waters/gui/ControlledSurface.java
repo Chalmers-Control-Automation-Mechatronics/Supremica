@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.51 2006-01-11 00:00:18 siw4 Exp $
+//# $Id: ControlledSurface.java,v 1.52 2006-01-12 21:51:53 siw4 Exp $
 //###########################################################################
  
 package net.sourceforge.waters.gui;
@@ -1409,7 +1409,7 @@ public class ControlledSurface
 		{
 			if (move != null) {
 				if (move.getDisplacement().distance(0,0) != 0) {
-					root.getUndoInterface().addUndoable(move);
+					root.getUndoInterface().addUndoable(new UndoableCommand(move));
 				}
 				move = null;
 			}
@@ -1468,7 +1468,8 @@ public class ControlledSurface
 					{
 						if (edge.getDragS() || (edge.getDragT() && n.getType() == EditorObject.NODE))
 						{
-							Command moveEdge = new MoveEdgeCommand(edge, n,
+							Command moveEdge = new MoveEdgeCommand(ControlledSurface.this,
+																   edge, n,
 																   edge.getDragS(),
 																   e.getX(), e.getY());
 							root.getUndoInterface().executeCommand(moveEdge);
@@ -1907,7 +1908,7 @@ public class ControlledSurface
 		{
 			if (move != null) {
 				if (move.getDisplacement().distance(0,0) != 0) {
-					root.getUndoInterface().addUndoable(move);
+					root.getUndoInterface().addUndoable(new UndoableCommand(move));
 				}
 				move = null;
 			}
@@ -2125,7 +2126,7 @@ public class ControlledSurface
 		{
 			if (move != null) {
 				if (move.getDisplacement().distance(0,0) != 0) {
-					root.getUndoInterface().addUndoable(move);
+					root.getUndoInterface().addUndoable(new UndoableCommand(move));
 				}
 				move = null;
 			}
@@ -2199,7 +2200,8 @@ public class ControlledSurface
 					{
 						if (edge.getDragS() || (edge.getDragT() && n.getType() == EditorObject.NODE))
 						{
-							Command moveEdge = new MoveEdgeCommand(edge, n,
+							Command moveEdge = new MoveEdgeCommand(ControlledSurface.this,
+																   edge, n,
 																   edge.getDragS(),
 																   e.getX(), e.getY());
 							root.getUndoInterface().executeCommand(moveEdge);
@@ -2473,7 +2475,7 @@ public class ControlledSurface
 		{
 			if (move != null) {
 				if (move.getDisplacement().distance(0,0) != 0) {
-					root.getUndoInterface().addUndoable(move);
+					root.getUndoInterface().addUndoable(new UndoableCommand(move));
 				}
 				move = null;
 			}

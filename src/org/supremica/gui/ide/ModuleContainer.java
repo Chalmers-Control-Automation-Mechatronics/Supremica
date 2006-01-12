@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ModuleContainer
 //###########################################################################
-//# $Id: ModuleContainer.java,v 1.21 2005-12-01 00:29:58 siw4 Exp $
+//# $Id: ModuleContainer.java,v 1.22 2006-01-12 21:51:53 siw4 Exp $
 //###########################################################################
 
 
@@ -26,6 +26,7 @@ import javax.swing.undo.UndoableEdit;
 import net.sourceforge.waters.gui.EditorWindowInterface;
 import net.sourceforge.waters.gui.HTMLPrinter;
 import net.sourceforge.waters.gui.command.Command;
+import net.sourceforge.waters.gui.command.UndoableCommand;
 import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
@@ -185,9 +186,9 @@ public class ModuleContainer implements UndoInterface
 	public void executeCommand(Command c)
 	{
 		c.execute();
-		if (c instanceof UndoableEdit) {
-			addUndoable((UndoableEdit)c);
-		}
+		//if (c instanceof UndoableEdit) {
+		addUndoable(new UndoableCommand(c));
+		//}
 	}
 
 	public boolean canRedo()

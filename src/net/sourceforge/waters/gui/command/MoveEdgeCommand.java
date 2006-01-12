@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.command
 //# CLASS:   MoveEdgeCommand
 //###########################################################################
-//# $Id: MoveEdgeCommand.java,v 1.2 2006-01-09 23:52:56 siw4 Exp $
+//# $Id: MoveEdgeCommand.java,v 1.3 2006-01-12 21:51:53 siw4 Exp $
 //###########################################################################
 
 
@@ -38,7 +38,6 @@ import net.sourceforge.waters.subject.module.NodeSubject;
  */
 
 public class MoveEdgeCommand
-    extends AbstractUndoableEdit
     implements Command
 {
 
@@ -51,12 +50,14 @@ public class MoveEdgeCommand
      * @param x the position upon which the node is created
      * @param y the position upon which the node is created
      */
-    public MoveEdgeCommand(final EditorEdge edge,
+    public MoveEdgeCommand(final ControlledSurface surface,
+						   final EditorEdge edge,
 						   final EditorObject neo,
 						   boolean source,
 						   int x,
 						   int y)
     {
+		mSurface = surface;
 		mEdge = edge;
 		mNew = neo;
 		mSource = source;
@@ -90,27 +91,16 @@ public class MoveEdgeCommand
 		{
 			mEdge.setEndNode((EditorNode)mNew);
 		}
-    }
-
-    /** 
-     * Redoes the Command
-     *
-     * @throws CannotRedoException if CanRedo returns false
-     */
-    public void redo() throws CannotRedoException
-    {
-		super.redo();
-		execute();
+		mSurface.unselectAll();
+		mSurface.select(mEdge);
+		mSurface.getEditorInterface().setDisplayed();
     }
 
     /** 
      * Undoes the Command
-     *
-     * @throws CannotUndoException if CanUndo returns false
      */    
-    public void undo() throws CannotUndoException
+    public void undo()
     {
-		super.undo();
 		if (mSource)
 		{
 			mEdge.setStartNode(mOld, (int)mOPos.getX(), (int)mOPos.getY());
@@ -120,9 +110,12 @@ public class MoveEdgeCommand
 			mEdge.setEndNode((EditorNode)mOld);
 		}
 		mEdge.setPosition(mOTPoint.getX(), mOTPoint.getY());
+		mSurface.unselectAll();
+		mSurface.select(mEdge);
+		mSurface.getEditorInterface().setDisplayed();
     }
 
-    public String getPresentationName()
+    public String getName()
     {
 		return mDescription;
     }
@@ -130,6 +123,7 @@ public class MoveEdgeCommand
 
 	//#######################################################################
 	//# Data Members
+	private final ControlledSurface mSurface;
 	private final EditorEdge mEdge;
 	private final EditorObject mOld;
 	private final EditorObject mNew;

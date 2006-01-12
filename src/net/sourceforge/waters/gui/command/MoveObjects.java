@@ -19,8 +19,7 @@ import javax.swing.undo.CannotUndoException;
  */
 
 public class MoveObjects
-    extends Move
-    implements Command
+    implements Move
 {
 
     /** The ControlledSurface Edited with this Command */
@@ -69,53 +68,35 @@ public class MoveObjects
 	mDescription = description;
     }
 
-    /**
-     * Executes the Creation of the Node
-     */
-
     public void execute()
-    {    
-    }
-
-    /** 
-     * Redoes the Command
-     *
-     * @throws CannotRedoException if CanRedo returns false
-     */
-    
-    public void redo() throws CannotRedoException
     {
-	super.redo();
-	mSurface.unselectAll();
-	for (EditorObject o : mMoved) {
-		if (mDescription.equals("Edge reshaping") || o.getType() != EditorObject.EDGE)
-		{
-			if (o.getType() == EditorObject.NODEGROUP) {
-			EditorNodeGroup ng = (EditorNodeGroup) o;
-			if (ng.getResizing()) {
-				ng.resize((int)(ng.getX() + mDisplacement.getX()), (int)(ng.getY() + mDisplacement.getY()));
-				continue;
+		mSurface.unselectAll();
+		for (EditorObject o : mMoved) {
+			if (mDescription.equals("Edge reshaping") || o.getType() != EditorObject.EDGE)
+			{
+				if (o.getType() == EditorObject.NODEGROUP) {
+				EditorNodeGroup ng = (EditorNodeGroup) o;
+				if (ng.getResizing()) {
+					ng.resize((int)(ng.getX() + mDisplacement.getX()), (int)(ng.getY() + mDisplacement.getY()));
+					continue;
+				}
+				}
+				if ((o.getType() != EditorObject.LABELGROUP && o.getType() != EditorObject.LABEL)
+				|| mMoved.size() == 1) {	
+				o.setPosition(o.getX() + mDisplacement.getX(), o.getY() + mDisplacement.getY());
+				}
 			}
-			}
-			if ((o.getType() != EditorObject.LABELGROUP && o.getType() != EditorObject.LABEL)
-			|| mMoved.size() == 1) {	
-			o.setPosition(o.getX() + mDisplacement.getX(), o.getY() + mDisplacement.getY());
-			}
+			mSurface.select(o);		
 		}
-		mSurface.select(o);		
-	}
-	mSurface.getEditorInterface().setDisplayed();   
+		mSurface.getEditorInterface().setDisplayed();
     }
 
     /** 
      * Undoes the Command
-     *
-     * @throws CannotUndoException if CanUndo returns false
      */    
 
-    public void undo() throws CannotUndoException
+    public void undo()
     {
-		super.undo();
 		mSurface.unselectAll();
 		for (EditorObject o : mMoved) {
 			if (mDescription.equals("Edge reshaping") || o.getType() != EditorObject.EDGE)
@@ -137,7 +118,7 @@ public class MoveObjects
 		mSurface.getEditorInterface().setDisplayed();  
     }
 
-    public String getPresentationName()
+    public String getName()
     {
 	return mDescription;
     }

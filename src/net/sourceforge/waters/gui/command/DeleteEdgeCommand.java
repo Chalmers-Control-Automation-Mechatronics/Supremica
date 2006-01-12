@@ -17,7 +17,6 @@ import javax.swing.undo.CannotUndoException;
  */
 
 public class DeleteEdgeCommand
-    extends AbstractUndoableEdit
     implements Command
 {
 
@@ -52,33 +51,18 @@ public class DeleteEdgeCommand
     }
 
     /** 
-     * Redoes the Command
-     *
-     * @throws CannotRedoException if CanRedo returns false
-     */
-    
-    public void redo() throws CannotRedoException
-    {
-	super.redo();
-	execute();
-    }
-
-    /** 
      * Undoes the Command
-     *
-     * @throws CannotUndoException if CanUndo returns false
      */    
 
-    public void undo() throws CannotUndoException
+    public void undo()
     {
-	super.undo();
 	mSurface.addEdge(mDeleted);
 	mSurface.unselectAll();
 	mSurface.select(mDeleted);
 	mSurface.getEditorInterface().setDisplayed();
     }
 
-    public String getPresentationName()
+    public String getName()
     {
 	return mDescription;
     }
