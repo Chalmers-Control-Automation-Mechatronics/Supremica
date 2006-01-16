@@ -7,6 +7,7 @@ import java.io.*;
 import org.supremica.log.*;
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.*;
+import org.supremica.util.ActionTimer;
 
 public class Milp 
 	implements Scheduler
@@ -46,6 +47,8 @@ public class Milp
 	/** The automaton representing the (resulting) optimal schedule */
 	private Automaton schedule = null;
 
+	/** The timer */
+	ActionTimer timer = new ActionTimer();
 
 	/****************************************************************************************/
 	/*                                 CONSTUCTORS                                          */
@@ -99,6 +102,8 @@ public class Milp
 	public Automaton buildScheduleAutomaton() 
 		throws Exception
 	{	
+		timer.restart();
+
 		schedule = new Automaton();
 		schedule.setComment("Schedule");
 
@@ -177,7 +182,7 @@ public class Milp
 								// If the next node has lower time value, then it cannot belong 
 								// to the optimal path, since precedence constraints are not fulfilled
 								// Otherwise, this could be the path
-								if (optimalTimes[robotIndex][nextStateIndex] >= currTime)
+								if (optimalTimes[robotIndex][nextStateIndex] >= currTime + currRobot.getStateWithIndex(nextStateIndex).getCost())
 								{
 									// But! Care should be taken with the events common to any pair of robots.
 									// When synched, the slowest robot should fire the synchronizing event. 
@@ -227,7 +232,7 @@ public class Milp
 					}
 				}
 			}
-			
+
 			// Add the transition time to the name of the state-to-be-in-the-schedule
 			currScheduledState.setName(currScheduledState.getName() + ";  firing_time = " + smallestTime);
 			currScheduledState.setCost(smallestTime);
@@ -239,7 +244,10 @@ public class Milp
 			// Update the schedule automaton
 			State nextScheduledState = makeScheduleState(currComposedStateIndices);
 
-			schedule.getAlphabet().addEvent(currOptimalEvent);
+			if (! schedule.getAlphabet().contains(currOptimalEvent))
+			{
+				schedule.getAlphabet().addEvent(currOptimalEvent);
+			}
 			schedule.addArc(new Arc(currScheduledState, nextScheduledState, currOptimalEvent));
 
 			currScheduledState = nextScheduledState;
@@ -262,7 +270,8 @@ public class Milp
 			}
 		}
 
-		logger.info("TOTAL CYCLE TIME: " + makespan + ".............................");
+		logger.info("OPTIMAL MAKESPAN: " + makespan + ".............................");
+		logger.info("Time to build the schedule: " + timer.elapsedTime() + "ms ");
 		
 		return schedule;
 	}
@@ -388,7 +397,100 @@ public class Milp
 		indexMap = new AutomataIndexMap(theAutomata);	
 	}
 
-	private void initMutexStates()
+	private void initMutexStates() 
+		throws Exception 
+	{
+		bookingTics = new int[zones.size()][robots.size()][1];
+		unbookingTics = new int[zones.size()][robots.size()][1];
+
+		// Initializing all book/unbook-state indices to -1. 
+		// The ones that remain -1 at the output of this method correspond 
+		// to non-conflicting robot-zone-pairs. 
+		for (int i=0; i<zones.size(); i++)
+		{
+			for (int j=0; j<robots.size(); j++) 
+			{
+				bookingTics[i][j][0] = -1;
+				unbookingTics[i][j][0] = -1;
+			}
+		}
+
+		for (int i=0; i<zones.size(); i++)
+		{
+			Automaton currZone = zones.getAutomatonAt(i);
+// 			ArrayList[] bookUnbookStatePairIndices = new ArrayList[robots.size()];
+
+			for (int j=0; j<robots.size(); j++)
+			{
+				Automaton currRobot = robots.getAutomatonAt(j);
+
+// 				Alphabet commonAlphabet = AlphabetHelpers.intersect(currRobot.getAlphabet(), currZone.getAlphabet());
+				Alphabet bookingAlphabet = AlphabetHelpers.intersect(currRobot.getAlphabet(), currZone.getInitialState().definedEvents(false));
+
+				if (bookingAlphabet.size() > 0)
+				{
+					Alphabet unbookingAlphabet = AlphabetHelpers.minus(AlphabetHelpers.intersect(currRobot.getAlphabet(), currZone.getAlphabet()), bookingAlphabet);
+// 					bookUnbookStatePairIndices[j] = new ArrayList<int[]>();
+
+					ArrayList<State> bookingStates = new ArrayList<State>();
+					ArrayList<State> unbookingStates = new ArrayList<State>();
+					
+					for (Iterator<State> stateIter = currRobot.stateIterator(); stateIter.hasNext(); )
+					{
+						State currState = stateIter.next();
+						
+						Alphabet currStatesBookingAlphabet = AlphabetHelpers.intersect(currState.definedEvents(false), bookingAlphabet);
+						for (Iterator<LabeledEvent> currBookingEventsIter = currStatesBookingAlphabet.iterator(); currBookingEventsIter.hasNext(); )
+						{
+// 							bookingStates.add(new int[]{indexMap.getStateIndex(currRobot, currState), indexMap.getEventIndex(currBookingEventsIter.next())});
+							ArrayList<State> possibleUnbookingStates = new ArrayList<State>();
+
+							possibleUnbookingStates.add(currState.nextState(currBookingEventsIter.next()));
+
+							while (possibleUnbookingStates.size() > 0)
+							{
+								State currPossibleUnbookingState = possibleUnbookingStates.remove(0);
+							
+								for (Iterator<Arc> outgoingArcsIter = currPossibleUnbookingState.outgoingArcsIterator(); outgoingArcsIter.hasNext(); )
+								{
+									Arc currArc = outgoingArcsIter.next();
+
+									if (unbookingAlphabet.contains(currArc.getEvent()))
+									{
+										bookingStates.add(currState);
+										unbookingStates.add(currPossibleUnbookingState);
+									}
+									else 
+									{
+										possibleUnbookingStates.add(currArc.getToState());
+									}
+								}
+							}
+						}
+					}
+
+					if (bookingStates.size() != unbookingStates.size())
+					{
+						String exceptionStr = "The numbers of book/unbook-states do not correspond. Something is wrong....\n";
+						exceptionStr += "nr_book_states[" + i + "][" + j + "] = " + bookingStates.size() + "\n";
+						exceptionStr += "nr_unbook_states[" + i + "][" + j + "] = " + unbookingStates.size() + "\n";
+						
+						throw new Exception(exceptionStr);
+					}
+					
+					bookingTics[i][j] = new int[bookingStates.size()];
+					unbookingTics[i][j] = new int[unbookingStates.size()];
+					for (int k=0; k<bookingStates.size(); k++)
+					{
+						bookingTics[i][j][k] = indexMap.getStateIndex(currRobot, bookingStates.get(k)); 
+						unbookingTics[i][j][k] = indexMap.getStateIndex(currRobot, unbookingStates.get(k)); 
+					}
+				}
+			}
+		}
+	}
+	
+	private void initMutexStates2()
 		throws Exception
 	{
 		bookingTics = new int[zones.size()][robots.size()][1];
@@ -455,7 +557,7 @@ public class Milp
 						{
 							Arc currArc = robotArcs.next();
 
-							if (unbookingAlphabet.contains(currArc.getLabel()))
+							if (currRobotZoneIntersectionAlphabet.contains(currArc.getLabel()))
 								unbookingStates.add(currArc.getFromState());
 						}
 
@@ -521,6 +623,39 @@ public class Milp
 				}			
 			}
 		}
+
+		// tillf 
+		for (int i=0; i<bookingTics.length; i++)
+		{
+			logger.warn("zone " + i);
+			String bStr = "";
+			String uStr = "";
+
+			for (int j=0; j<bookingTics[i].length; j++)
+			{
+				for (int k=0; k<bookingTics[i][j].length; k++)
+				{
+					bStr += "R" + j + "_ST" + bookingTics[i][j][k] + "  ";
+					uStr += "R" + j + "_ST" + unbookingTics[i][j][k] + "  ";
+				}
+			}
+
+			logger.info("booking = " + bStr);
+			logger.info("unbooking = " + uStr);
+		}
+
+		// test
+		for (int i=0; i<robots.size(); i++) 
+		{
+			Automaton currRobot = robots.getAutomatonAt(i);
+			State currState = currRobot.getInitialState();
+			ArrayList<State> arcsToProcess = new ArrayList<State>();
+
+			for (Iterator<Arc> outgoingArcs = currState.outgoingArcsIterator(); outgoingArcs.hasNext(); )
+			{
+				
+			}
+		}
 	}
 
 
@@ -536,6 +671,8 @@ public class Milp
 	private void convertAutomataToMilp() 
 		throws Exception
 	{	
+		timer.restart(); 
+
 		int nrOfRobots = robots.size();
 		int nrOfZones = zones.size();
 
@@ -562,10 +699,6 @@ public class Milp
 		
 		// The string containing times for each state (delta-times)
 		String deltaTimeStr = "param deltaTime default 0\n:";
-
-		// If there is an event that the robots synchronizes on, the fact that they
-		// must fire the event simultaneously should be taken care of
-// 		String synchronizationConstraints = "";
 
 
 		////////////////////////////////////////////////////////////////////////////////////
@@ -594,20 +727,21 @@ public class Milp
 			
 			Automaton currRobot = robots.getAutomatonAt(i);
 			int currRobotIndex = indexMap.getAutomatonIndex(currRobot);
-			
+		
 			// Each index correspond to a Tic. For each Tic, a deltaTime is added
 			int[] deltaTimes = new int[currRobot.nbrOfStates()];
 			for (Iterator<State> stateIter = currRobot.stateIterator(); stateIter.hasNext(); )
 			{
 				State currState = stateIter.next();
+
 				int currStateIndex = indexMap.getStateIndex(currRobot, currState);
 
 				deltaTimes[currStateIndex] = currState.getCost();
-							
+
 				// If the current state has successors and is not initial, add precedence constraints
 				// If the current state is initial, add an initial (precedence) constraint
-				int nbrOfOutgoingArcs = currState.nbrOfOutgoingArcs();
-				if (nbrOfOutgoingArcs > 0)
+				int nbrOfOutgoingArcSets = currState.nbrOfOutgoingArcSets();
+				if (nbrOfOutgoingArcSets > 0)
 				{
 					if (currState.isInitial())
 					{
@@ -618,7 +752,7 @@ public class Milp
 					Iterator<State> nextStates = currState.nextStateIterator();
 					
 					// If there is only one successor, add a precedence constraint
-					if (nbrOfOutgoingArcs == 1) 
+					if (nbrOfOutgoingArcSets == 1) 
 					{
 						State nextState = nextStates.next();
 						int nextStateIndex = indexMap.getStateIndex(currRobot, nextState);
@@ -627,7 +761,7 @@ public class Milp
 						precConstraints += "time[" + i + ", " + nextStateIndex + "] >= time[" + i + ", " + currStateIndex + "] + deltaTime[" + i + ", " + nextStateIndex + "];\n";
 					}
 					// If there are two successors, add one alternative-path variable and corresponding constraint
-					else if (nbrOfOutgoingArcs == 2)
+					else if (nbrOfOutgoingArcSets == 2)
 					{
 						State nextLeftState = nextStates.next();
 						State nextRightState = nextStates.next();
@@ -635,7 +769,7 @@ public class Milp
 						int nextRightStateIndex = indexMap.getStateIndex(currRobot, nextRightState);
 
 						String currAltPathsVariable = "R" + currRobotIndex + "_goes_from_" + currStateIndex + "_to_" + nextLeftStateIndex;
-								
+
 						altPathsVariables += "var " + currAltPathsVariable + ", binary;\n";
 
 						altPathsConstraints += "alt_paths_" + "R" + currRobotIndex + "_" + currStateIndex + " : "; 
@@ -645,7 +779,7 @@ public class Milp
 						altPathsConstraints += "time[" + i + ", " + nextRightStateIndex + "] >= time[" + i + ", " + currStateIndex + "] + deltaTime[" + i + ", "  + nextRightStateIndex + "] - bigM*(1 - " + currAltPathsVariable + ");\n";
 					}
 					// If there are several successors, add one alternative-path variable for each successor
-					else if (nbrOfOutgoingArcs > 2)
+					else if (nbrOfOutgoingArcSets > 2)
 					{
 						int currAlternative = 0;
 						
@@ -680,13 +814,17 @@ public class Milp
 			}
 
 			for (int j=0; j<deltaTimes.length; j++)
+			{
 				deltaTimeStr += "\t" + deltaTimes[j];
+			}
 
 			// If the number of states of the current automaton is less 
 			// than max_nr_of_states, the deltaTime-matrix is filled with points 
 			// i.e zeros. 
 			for (int j=currRobot.nbrOfStates(); j<nrOfTics; j++)
+			{
 				deltaTimeStr += "\t.";
+			}
 
 			if (i == nrOfRobots - 1)
 				deltaTimeStr += ";";
@@ -727,7 +865,6 @@ public class Milp
 				}
 			}
 		}
-
 
 		////////////////////////////////////////////////////////////////////////////////////
 		//	                          The writing part                                    //
@@ -826,6 +963,8 @@ public class Milp
 		w.newLine();
 		w.write("end;");
 		w.flush();
+
+		logger.info("Time to set up the optimization problem: " + timer.elapsedTime() + "ms");
 	}
 
 	private void processSolutionFile()
