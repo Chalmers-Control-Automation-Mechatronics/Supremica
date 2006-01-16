@@ -47,6 +47,14 @@ public class Milp
 	/** The automaton representing the (resulting) optimal schedule */
 	private Automaton schedule = null;
 
+	/** 
+	 * Contains the boolean expressions that control the path alternatives, 
+	 * indicated by the first states of each alt. path. It is needed to ensure
+	 * that all alternative times but one are set close to -INF by the 
+	 * MILP solver, even if they would interfere with the mutex constraints.
+	 */
+	private Hashtable<State,String> pathCutTable = null;
+
 	/** The timer */
 	ActionTimer timer = new ActionTimer();
 
@@ -296,6 +304,7 @@ public class Milp
 		solutionFile.deleteOnExit();
 		
 		indexMap = new AutomataIndexMap(theAutomata);
+		pathCutTable = new Hashtable<State,String>();
 		
 		initAutomata();
 		initMutexStates();
@@ -775,8 +784,12 @@ public class Milp
 						altPathsConstraints += "alt_paths_" + "R" + currRobotIndex + "_" + currStateIndex + " : "; 
 						altPathsConstraints += "time[" + i + ", " + nextLeftStateIndex + "] >= time[" + i + ", " + currStateIndex + "] + deltaTime[" + i + ", "  + nextLeftStateIndex + "] - bigM*" + currAltPathsVariable + ";\n";
 
+						pathCutTable.put(nextLeftState, currAltPathsVariable);
+
 						altPathsConstraints += "dual_alt_paths_" + "R" + currRobotIndex + "_" + currStateIndex + " : "; 
 						altPathsConstraints += "time[" + i + ", " + nextRightStateIndex + "] >= time[" + i + ", " + currStateIndex + "] + deltaTime[" + i + ", "  + nextRightStateIndex + "] - bigM*(1 - " + currAltPathsVariable + ");\n";
+
+						pathCutTable.put(nextRightState, "(1 - " + currAltPathsVariable + ")");
 					}
 					// If there are several successors, add one alternative-path variable for each successor
 					else if (nbrOfOutgoingArcSets > 2)
@@ -793,6 +806,8 @@ public class Milp
 
 							altPathsConstraints += "alt_paths_" + currAltPathsVariable + " : ";
 							altPathsConstraints += "time[" + i + ", " + nextStateIndex + "] >= time[" + i + ", " + currStateIndex + "] + deltaTime[" + i + ", "  + nextStateIndex + "] - bigM*(1 - " + currAltPathsVariable + ");\n";
+
+							pathCutTable.put(nextState, "(1 - " + currAltPathsVariable + ")");
 
 							currAlternative++;
 						}
@@ -857,8 +872,23 @@ public class Milp
 								
 								mutexVariables += "var " + currMutexVariable + ", binary;\n";
 								
-								mutexConstraints += "mutex_Z" + i + "_R" + j1 + "_R" + j2 + "_var" + repeatedBooking + " : time[" + j1 + ", " + bookingTics[i][j1][k1] + "] >= " + "time[" + j2 + ", " + unbookingTics[i][j2][k2] + "] - bigM*" + currMutexVariable + ";\n";
-								mutexConstraints += "dual_mutex_Z" + i + "_R" + j1 + "_R" + j2  + "_var" + repeatedBooking + " : time[" + j2 + ", " + bookingTics[i][j2][k2] + "] >= " + "time[" + j1 + ", " + unbookingTics[i][j1][k1] + "] - bigM*(1 - " + currMutexVariable + ");\n";
+								mutexConstraints += "mutex_Z" + i + "_R" + j1 + "_R" + j2 + "_var" + repeatedBooking + " : time[" + j1 + ", " + bookingTics[i][j1][k1] + "] >= " + "time[" + j2 + ", " + unbookingTics[i][j2][k2] + "] - bigM*" + currMutexVariable;
+								String pathCutEnsurance = pathCutTable.get(robots.getAutomatonAt(j1).getStateWithIndex(k1));
+								if (pathCutEnsurance != null)
+								{
+									logger.warn("adding path cut ensurance to " + bookingTics[i][j1][k1] + " for robot " + robots.getAutomatonAt(j1).getName());
+									logger.info("index = " + indexMap.getStateIndex(robots.getAutomatonAt(j1), robots.getAutomatonAt(j1).getStateWithIndex(k1)));
+									mutexConstraints += " - bigM*" + pathCutEnsurance;
+								}
+								mutexConstraints += ";\n";
+
+								mutexConstraints += "dual_mutex_Z" + i + "_R" + j1 + "_R" + j2  + "_var" + repeatedBooking + " : time[" + j2 + ", " + bookingTics[i][j2][k2] + "] >= " + "time[" + j1 + ", " + unbookingTics[i][j1][k1] + "] - bigM*(1 - " + currMutexVariable + ")";
+								pathCutEnsurance = pathCutTable.get(robots.getAutomatonAt(j2).getStateWithIndex(k2));
+								if (pathCutEnsurance != null)
+								{ 
+									mutexConstraints += " - bigM*" + pathCutEnsurance;
+								}
+								mutexConstraints += ";\n";
 							}
 						}
 					}
