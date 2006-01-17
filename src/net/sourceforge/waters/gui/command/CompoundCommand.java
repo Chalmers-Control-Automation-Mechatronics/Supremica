@@ -54,6 +54,18 @@ public class CompoundCommand
 		}
 	}
 	
+	public boolean isSignificant()
+	{
+		for (Command c : mCommands)
+		{
+			if (c.isSignificant())
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	public String getName()
 	{
 		return mDescription;
