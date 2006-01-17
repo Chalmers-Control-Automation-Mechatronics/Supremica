@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorLabelGroup
 //###########################################################################
-//# $Id: EditorPropGroup.java,v 1.7 2005-12-12 20:23:14 siw4 Exp $
+//# $Id: EditorPropGroup.java,v 1.8 2006-01-17 02:00:07 siw4 Exp $
 //###########################################################################
 
 
@@ -150,7 +150,7 @@ public class EditorPropGroup
 			if (i == selectedLabel)	{
 				label.setForeground(Color.RED);
 			} else {
-				label.setForeground(getColor());
+				label.setForeground(getColor(true));
 			}
 		}
 	}

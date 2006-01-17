@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorNode
 //###########################################################################
-//# $Id: EditorNode.java,v 1.30 2006-01-12 21:51:53 siw4 Exp $
+//# $Id: EditorNode.java,v 1.31 2006-01-17 02:00:07 siw4 Exp $
 //###########################################################################
 
 
@@ -304,16 +304,16 @@ public class EditorNode
 		return new Rectangle2D.Double(getX() - RADIUS, getY() - RADIUS, WIDTH, WIDTH);
 	}
 
-	public void drawObject(Graphics g)
+	public void drawObject(Graphics g, boolean selected)
 	{
 		Graphics2D g2d = (Graphics2D) g;
 		g2d.setStroke(BASICSTROKE);
 
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		g2d.setColor(getColor());
+		g2d.setColor(getColor(selected));
 
 		propGroup.setPanelLocation();
-		if (!isSelected())
+		if (selected)
 		{
 			propGroup.setVisible(false);
 		}
@@ -322,9 +322,9 @@ public class EditorNode
 		if (shadow && isHighlighted())
 		{
 			g2d.setStroke(SHADOWSTROKE); 
-			g2d.setColor(getShadowColor());				
+			g2d.setColor(getShadowColor(selected));				
 			g2d.drawOval(getX() - RADIUS, getY() - RADIUS, WIDTH, WIDTH);			
-			g2d.setColor(getColor());
+			g2d.setColor(getColor(selected));
 			g2d.setStroke(BASICSTROKE);
 		}
 
@@ -365,7 +365,7 @@ public class EditorNode
 		}		
 
 		// Draw the border of the node
-		g2d.setColor(getColor());
+		g2d.setColor(getColor(selected));
 		if (isInitial())
 		{
 			// Draw initial state arrow

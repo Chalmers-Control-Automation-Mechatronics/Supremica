@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorNodeGroup
 //###########################################################################
-//# $Id: EditorNodeGroup.java,v 1.18 2006-01-09 23:52:56 siw4 Exp $
+//# $Id: EditorNodeGroup.java,v 1.19 2006-01-17 02:00:07 siw4 Exp $
 //###########################################################################
 
 
@@ -56,7 +56,6 @@ public class EditorNodeGroup
 
 		resizing = getBounds().isEmpty();
 		resizingFrom = 0;
-		setSelected(false);
 	}
 
 	public int hashCode()
@@ -329,30 +328,15 @@ public class EditorNodeGroup
 		return true;
 	}
 
-	public void setSelected(boolean s)
-	{
-		super.setSelected(s);
-
-		/*
-		if (s == true)
-		{
-			for (int i = 0; i < immediateChildren.size(); i++)
-			{
-				((EditorObject) immediateChildren.get(i)).setSelected();
-			}
-		}
-		*/
-	}
-
-	public void drawObject(Graphics g)
+	public void drawObject(Graphics g, boolean selected)
 	{
 		Graphics2D g2d = (Graphics2D) g;
 		Rectangle2D bounds = getBounds();
 
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		g2d.setColor(getColor());
+		g2d.setColor(getColor(selected));
 
-		if (isSelected())
+		if (selected)
 		{
 			Rectangle2D[] corners = getCorners();
 			// Draw handles
@@ -369,10 +353,10 @@ public class EditorNodeGroup
 		if (shadow && isHighlighted())
 		{
 			g2d.setStroke(SHADOWSTROKE);
-			g2d.setColor(getShadowColor());
+			g2d.setColor(getShadowColor(selected));
 			g2d.drawRoundRect((int) bounds.getX(), (int) bounds.getY(),
 					  (int) bounds.getWidth(), (int) bounds.getHeight(), CORNERDIAMETER, CORNERDIAMETER);
-			g2d.setColor(getColor());
+			g2d.setColor(getColor(selected));
 			g2d.setStroke(BASICSTROKE);
 		}
 

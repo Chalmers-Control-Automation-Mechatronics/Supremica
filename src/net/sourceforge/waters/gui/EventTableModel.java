@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EventTableModel
 //###########################################################################
-//# $Id: EventTableModel.java,v 1.12 2006-01-11 02:34:54 siw4 Exp $
+//# $Id: EventTableModel.java,v 1.13 2006-01-17 02:00:07 siw4 Exp $
 //###########################################################################
 
 
@@ -160,6 +160,35 @@ class EventTableModel
 		return column == 1;
 	}
 
+	public void setIdentifierAt(final IdentifierSubject value,
+								final int row,
+								final int column)
+	{
+		switch (column)
+		{
+
+		case 0 :
+			return;
+
+		case 1 :
+			final IdentifierSubject ident = value.clone();
+			final IdentifierSubject old = getEvent(row);
+			if (ident == null)
+			{
+				mEvents.remove(row);
+				fireTableRowsDeleted(row, row);
+			} else if (old == null || !old.equals(ident)) {
+				final EventEntry entry = new EventEntry(ident);
+				mEvents.set(row, entry);
+				fireTableRowsUpdated(row, row);
+			}
+			return;
+
+		default :
+			throw new ArrayIndexOutOfBoundsException
+				("Bad column number for event table model!");
+		}
+	}
 
 	public void setValueAt(final Object value,
 						   final int row,

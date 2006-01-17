@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.52 2006-01-12 21:51:53 siw4 Exp $
+//# $Id: ControlledSurface.java,v 1.53 2006-01-17 02:00:07 siw4 Exp $
 //###########################################################################
  
 package net.sourceforge.waters.gui;
@@ -17,6 +17,8 @@ import java.awt.event.*;
 import java.awt.geom.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -126,15 +128,57 @@ public class ControlledSurface
 	{
 		if (!selectedObjects.contains(o))
 		{
-			selectedObjects.add(o);
-			o.setSelected(true);
-
-			// Select children
-			LinkedList children = getChildren(o);
-			while (children.size() != 0)
+			if (o.getType() == EditorObject.NODE)
 			{
-				//((EditorObject) children.remove(0)).setSelected(true);
-				select((EditorObject) children.remove(0));
+				Iterator<EditorObject> i = selectedObjects.iterator();
+				while (i.hasNext())
+				{
+					EditorObject o2 = i.next();
+					if (o2 instanceof EditorLabel)
+					{
+						if (((EditorLabel)o2).getParent() == o)
+						{
+							i.remove();
+						}
+					}
+				}
+				selectedObjects.add(o);
+			}
+			if (o.getType() == EditorObject.EDGE)
+			{
+				Iterator<EditorObject> i = selectedObjects.iterator();
+				while (i.hasNext())
+				{
+					EditorObject o2 = i.next();
+					if (o2 instanceof EditorLabelGroup)
+					{
+						if (((EditorLabelGroup)o2).getParent() == o)
+						{
+							i.remove();
+						}
+					}
+				}
+				selectedObjects.add(o);
+			}
+			if (o.getType() == EditorObject.LABEL)
+			{
+				EditorLabel l = (EditorLabel)o;
+				if (!selectedObjects.contains(l.getParent()))
+				{
+					selectedObjects.add(o);
+				}
+			}
+			if (o.getType() == EditorObject.LABELGROUP)
+			{
+				EditorLabelGroup l = (EditorLabelGroup)o;
+				if (!selectedObjects.contains(l.getParent()))
+				{
+					selectedObjects.add(o);
+				}
+			}
+			if (o.getType() == EditorObject.NODEGROUP)
+			{
+				selectedObjects.add(o);
 			}
 		}
 	}
@@ -143,22 +187,18 @@ public class ControlledSurface
 	{
 		if (selectedObjects.contains(o))
 		{
-			selectedObjects.remove(o);
-			o.setSelected(false);
-
-			// Unselect children
-			LinkedList children = getChildren(o);
-			while (children.size() != 0)
-			{
-				((EditorObject) children.remove(0)).setSelected(false);
-			}
+			selectedObjects.remove(o);			
 		}
 	}
 
 	public void unselectAll()
 	{
 		selectedObjects.clear();
-		super.unselectAll();
+	}
+	
+	public boolean isSelected(EditorObject o)
+	{
+		return selectedObjects.contains(o);
 	}
 
 	/*
@@ -229,139 +269,6 @@ public class ControlledSurface
 		return (x+gridSize/2)/gridSize*gridSize;
 	}
 
-   	public void mousePressed(MouseEvent e)
-	{
-		// This is for triggering the popup 
-		maybeShowPopup(e);
-
-		if (e.getButton() == MouseEvent.BUTTON1)
-		{
-			lastX = e.getX();
-			lastY = e.getY();
-
-			EditorObject o = getObjectAtPosition(e.getX(), e.getY());
-			if (o == null)
-			{
-				// Clicking on whitespace!
-
-				// If control is down, we may select multiple things...
-				if (!e.isControlDown())
-				{
-					unselectAll();
-				}
-
-				// If SELECT is active, this means that we're starting a drag-select...
-				if (getCommand() == SELECT)
-				{
-					// Start of drag-select?
-					dragStartX = e.getX();
-					dragStartY = e.getY();
-					dragNowX = dragStartX;
-					dragNowY = dragStartY;
-					dragSelect = true;
-				}
-
-				// If NODEGROUP is active, we're adding a new group!
-				if (getCommand() == NODEGROUP)
-				{
-				    Collection<NodeProxy> ic = Collections.emptyList();       
-				    // EditorNodeGroup nodeGroup;
-					if (nodesSnap)
-					{
-					    BoxGeometrySubject g = new BoxGeometrySubject(new Rectangle2D.Double(findGrid(e.getX()),
-													       findGrid(e.getY()), 0, 0));
-					    // nodeGroup = addNodeGroup(findGrid(e.getX()), findGrid(e.getY()), 0, 0);
-					    GroupNodeSubject n = new GroupNodeSubject("NodeGroup" + nodeGroups.size(),
-										      new PlainEventListSubject(), ic, g);	
-					    newGroup = new EditorNodeGroup(n);
-					}
-					else
-					{
-					    BoxGeometrySubject g = new BoxGeometrySubject(new Rectangle2D.Double(e.getX(),
-														 e.getY(), 0, 0));
-					    // nodeGroup = addNodeGroup(e.getX(), e.getY(), 0, 0);
-					    GroupNodeSubject n = new GroupNodeSubject("NodeGroup" + nodeGroups.size(),
-										      new PlainEventListSubject(), ic, g);   	
-					    newGroup = new EditorNodeGroup(n);
-					}
-					select(newGroup);
-				}
-			}
-			else
-			{
-				// Clicking on something!
-
-				// Should we unselect the currently selected objects?
-				if (!selectedObjects.contains(o))
-				{
-					// If control is down, we may select multiple things...
-					if (!e.isControlDown())
-					{
-						unselectAll();
-					}
-				}
-
-				// Select stuff!
-				//selectChange(o);
-
-				// Only if SELECT is chosen multiple selection is possible...
-				if (!(getCommand() == SELECT))
-				{
-					unselectAll();
-				}
-				
-				// If object is selected prepare to unselect (don't unselect if dragging, though!)
-				if (selectedObjects.contains(o))
-				{
-					toBeDeselected.add(o);
-				}
-				else
-				{
-					select(o);
-				}	   
-
-				/*
-				if (o.getType() == EditorObject.EDGE)
-				{
-					EditorEdge edge = (EditorEdge) o;
-					if (edge.wasClicked(e.getX(), e.getY()))
-					{
-						return;
-					}
-				}
-				*/
-				
-				// Find offset values if a label or group was clicked
-				if (o.getType() == EditorObject.LABELGROUP)
-				{
-					xoff = e.getX() - ((EditorLabelGroup) o).getX();
-					yoff = e.getY() - ((EditorLabelGroup) o).getY();
-				}
-				else if (o.getType() == EditorObject.LABEL)
-				{
-					xoff = e.getX() - ((EditorLabel) o).getX();
-					yoff = e.getY() - ((EditorLabel) o).getY();
-				}
-				else if (o.getType() == EditorObject.NODEGROUP)
-				{
-					// We need this offset to place new edges
-					xoff = e.getX() - ((EditorNodeGroup) o).getX();
-					yoff = e.getY() - ((EditorNodeGroup) o).getY();
-				}
-			}
-		}
-		else if (e.getButton() == MouseEvent.BUTTON2)
-		{
-			System.out.println("Button 2!");
-		}
-		else if (e.getButton() == MouseEvent.BUTTON3)
-		{
-
-		}
-
-		repaint(false);
-	}
-
 	private void maybeShowPopup(MouseEvent e)
 	{
 		if (e.isPopupTrigger())
@@ -404,366 +311,6 @@ public class ControlledSurface
 		return true;
 	}
 
-	public void mouseDragged(MouseEvent e)
-	{
-		//if (e.getButton() == MouseEvent.BUTTON1) // Why not?
-		{
-			hasDragged = true;
-
-			// If we're not in a nice mode, let's end it right here and right now
-			if ((getCommand() != SELECT) &&
-				(getCommand() != NODE) &&
-				(getCommand() != EDGE) &&
-				(getCommand() != NODEGROUP))
-			{
-				return;
-			}
-
-			// Find the distances that the mouse has dragged (for moving and stuff)
-			int dx = 0;
-			int dy = 0;
-			// Are we using snap?
-			if (getCommand() != EDGE && (nodeIsSelected() || nodeGroupIsSelected()) && nodesSnap) 
-			{
-				lastX = findGrid(lastX);
-				lastY = findGrid(lastY);
-				
-				int currX = findGrid(e.getX());
-				int currY = findGrid(e.getY());
-				
-				// If the first selected node or nodegroup is not correctly
-				// aligned already, we need a modifier to get it on the
-				// grid again...
-				int modX = 0;
-				int modY = 0;
-				for (final EditorObject o : selectedObjects) 
-				{
-					if ((o.getType() == EditorObject.NODE) || (o.getType() == EditorObject.NODEGROUP))
-					{
-						modX = findGrid(o.getX()) - o.getX();
-						modY = findGrid(o.getY()) - o.getY();
-					}
-				}
-
-				dx = currX - lastX + modX;
-				dy = currY - lastY + modY;
-			}
-			else 
-			{
-				dx = e.getX() - lastX;
-				dy = e.getY() - lastY;
-			}
-
-			// Update position
-			lastX += dx;
-			lastY += dy;
-
-			// DragSelect!
-			if (dragSelect)
-			{
-				dragNowX = e.getX();
-				dragNowY = e.getY();
-
-				toBeSelected = getDragSelection();
-
-				// Select all that should be selected...
-				super.unselectAll();
-				// These have been selected previously and should still be
-				// selected no matter what
-				for (final EditorObject o : selectedObjects) 
-				{
-					o.setSelected(true);
-					LinkedList children = getChildren(o);
-					while (children.size() != 0)
-					{
-						((EditorObject) children.remove(0)).setSelected(true);
-					}
-				}
-				// These are in the current drag selection
-				for (final EditorObject o : toBeSelected) 
-				{
-					o.setSelected(true);
-					LinkedList children = getChildren(o);
-					while (children.size() != 0)
-					{
-						((EditorObject) children.remove(0)).setSelected(true);
-					}
-				}
-
-				repaint(false);
-
-				return;
-			}
-
-			// Multiple selection?
-			if (getCommand() == SELECT)
-			{
-				// Don't unselect! We're dragging!
-				toBeDeselected.clear();
-
-				// Drag all selected objects
-
-				// No move?
-				if ((dx == 0) && (dy == 0))
-				{
-					return;
-				}
-
-				// is this the start of the move or a continuation of it 
-				if (!selectedObjects.isEmpty()) 
-				{
-				    if (move == null) 
-					{
-						move = new MoveObjects(this, selectedObjects, new Point2D.Double(dx, dy));
-				    } 
-					else 
-					{
-						Point2D p = move.getDisplacement();
-						p.setLocation(p.getX() + dx, p.getY() + dy);
-						move.setDisplacement(p);
-				    }
-				}
-
-				/* // Code for preventing nodes from ending up in the same place (but we allow that now)
-				  for (int i = 0; i < nodes.size(); i++)
-				  {
-				  if (((EditorNode) nodes.get(i)).getPosition().distance(dx, dy) < selectedNode.getWidth() && ((EditorNode) nodes.get(i)) != selectedNode)
-				  {
-				  return;
-				  }
-				  }
-
-				  for (int i = 0; i < nodeGroups.size(); i++)
-				  {
-				  if (((EditorNodeGroup) nodeGroups.get(i)).getBounds().intersects(new Rectangle(dx - EditorNode.WIDTH / 2, dy - EditorNode.WIDTH / 2, EditorNode.WIDTH, EditorNode.WIDTH)) &&!((EditorNodeGroup) nodeGroups.get(i)).getBounds().contains(new Rectangle(dx - EditorNode.WIDTH / 2, dy - EditorNode.WIDTH / 2, EditorNode.WIDTH, EditorNode.WIDTH)))
-				  {
-				  return;
-				  }
-				  }
-				*/
-
-				// Move every selected object!
-				for (Iterator it = selectedObjects.iterator(); it.hasNext(); )
-				{
-					EditorObject object = (EditorObject) it.next();
-
-					// Is it a node?
-					if (object.getType() == EditorObject.NODE)
-					{
-						EditorNode node = (EditorNode) object;
-
-						// Where did it use to be?
-						int oldx = node.getX();
-						int oldy = node.getY();
-
-						// Move
-						node.setPosition(oldx + dx, oldy + dy);
-					}
-					// Is it a nodegroup?
-					else if (object.getType() == EditorObject.NODEGROUP)
-					{
-						EditorNodeGroup nodeGroup = (EditorNodeGroup) object;
-
-						//Rectangle2D.Double b = new Rectangle2D.Double();
-						//b.setRect(nodeGroup.getBounds());
-
-						if (nodeGroup.getResizing() && (selectedObjects.size() == 1))
-						{
-							if (nodesSnap)
-							{
-								nodeGroup.resize(findGrid(e.getX()), findGrid(e.getY()));
-							}
-							else
-							{
-								nodeGroup.resize(e.getX(), e.getY());
-							}
-						}
-						else
-						{
-							/*
-							if (nodesSnap)
-							{
-								nodeGroup.moveGroup(Math.round((e.getX() - xoff) / gridSize) * gridSize, Math.round((e.getY() - yoff) / gridSize) * gridSize);
-							}
-							else
-							{
-								nodeGroup.moveGroup(e.getX() - xoff, e.getY() - yoff);
-							}
-							*/
-						    nodeGroup.setPosition(nodeGroup.getX()+ dx, nodeGroup.getY() + dy);
-	    
-						}
-
-						/* // Prevent nodegroups from moving onto nodes?
-						   if (intersectsRectangle(nodeGroup.getBounds()))
-						   {
-						   nodeGroup.setBounds(b);
-						   }
-						*/
-
-						/*
-						EditorNodeGroup nodeGroup = (EditorNodeGroup) object;
-						nodeGroup.moveGroup(nodeGroup.getX() + dx, nodeGroup.getY() + dy);
-						*/
-					}
-					// Is it an edge?
-					else if ((object.getType() == EditorObject.EDGE) && (!controlPointsMove || !(nodeIsSelected() || nodeGroupIsSelected())))
-					{
-						EditorEdge edge = (EditorEdge) object;
-  						edge.setPosition(edge.getTPointX() + dx, edge.getTPointY() + dy);
-					}					
-
-					// DONT MOVE LABELS IN MULTI MODE, (IT'S NO FUN TO TRY TO GET THE OFFSETS RIGHT...)
-					if (selectedObjects.size() == 1)
-					{
-						// Is it a label?
-						if (object.getType() == EditorObject.LABEL) // Don't move!
-						{
-							EditorLabel label = (EditorLabel) object;
-							//label.moveTo(label.getX() + dx, label.getY() + dy);
-							//label.setX(label.getX() + dx);
-							//label.setY(label.getY() + dy);
-							label.setOffset(label.getOffsetX() + dx, label.getOffsetY() + dy);
-						}
-						// Is it a labelgroup?
-						else if (object.getType() == EditorObject.LABELGROUP) // Don't move
-						{
-							EditorLabelGroup labelGroup = (EditorLabelGroup) object;
-							
-							//labelGroup.moveTo(labelGroup.getX() + dx, labelGroup.getY() + dy);
-							//labelGroup.setX(labelGroup.getX() + dx);
-							//labelGroup.setY(labelGroup.getY() + dy);
-							labelGroup.setOffset(labelGroup.getOffsetX() + dx, labelGroup.getOffsetY() + dy);
-						}
-					}
-				}
-
-				examineCollisions();
-			}
-			else
-			{
-				// Single selection! (Multiple selection is only allowed in SELECT-mode.)
-				
-				// Edge drawing...
-				if (getCommand() == EDGE )
-				{
-				    // No move?
-				    if ((dx == 0) && (dy == 0))
-				    {
-						return;
-				    }
-				    // is this the start of the move or a continuation of it
-				    if (!selectedObjects.isEmpty()) {
-						if (move == null) {
-							move = new MoveObjects(this, selectedObjects, new Point2D.Double(dx, dy));
-						} else {
-							Point2D p = move.getDisplacement();
-							p.setLocation(p.getX() + dx, p.getY() + dy);
-							move.setDisplacement(p);
-						}
-				    }
-				    // There should only be one object here, or maybe two, 
-					// a node and it's label or an edge and it's labelgroup...
-					// Let's make it an iterator anyway!
-					for (final EditorObject object : selectedObjects) {
-						if (object.getType() == EditorObject.EDGE) {
-							// If an edge is selected, you can drag!
-							assert(selectedObjects.size() <= 2);
-							EditorEdge edge = (EditorEdge) object;
-							if (edge.getDragS()) {
-								edge.setSource(e.getX(), e.getY());
-							} else if (edge.getDragT())	{
-								edge.setTarget(e.getX(), e.getY());
-							} else {
-								edge.setPosition(edge.getTPointX() + dx, edge.getTPointY() + dy);
-							}
-						} else if (object.getType() == EditorObject.NODE) {
-							// If clicking on a node or nodegroup, draw a
-							// new edge!
-							assert(selectedObjects.size() <= 2);
-							EditorNode node = (EditorNode) object;
-							int[] dat = {node.getX(), node.getY(),
-										 e.getX(), e.getY()};
-							// Draw line!
-							if ((lines != null) && (lines.size() > 0))
-							{
-								lines.set(0, dat);
-							}
-							else
-							{
-								lines.add(dat);
-							}
-						} else if (object.getType() == EditorObject.NODEGROUP) {
-							assert(selectedObjects.size() == 1);
-							EditorNodeGroup nodeGroup = (EditorNodeGroup) object;
-							// Find point on the border of the group from where the line is drawn...
-							Point2D p = nodeGroup.setOnBounds(nodeGroup.getX() + xoff, nodeGroup.getY() + yoff);
-							int[] dat = {(int) p.getX(), (int) p.getY(), e.getX(), e.getY()};
-							// Draw line!
-							if ((lines != null) && (lines.size() > 0))
-							{
-								lines.set(0, dat);
-							}
-							else
-							{
-								lines.add(dat);
-							}
-						}
-					}
-				
-					// Update highlighting!
-					//updateHighlighting(e);
-				}
-
-				// Are we resizing a nodegroup?
-				if (nodeGroupIsSelected() && ((getCommand() == NODEGROUP) || (getCommand() == SELECT)))
-				{
-					EditorNodeGroup nodeGroup = (EditorNodeGroup) selectedObjects.get(0);
-
-					//Rectangle2D.Double b = new Rectangle2D.Double();
-					//b.setRect(nodeGroup.getBounds());
-
-					if (nodeGroup.getResizing())
-					{
-						if (nodesSnap)
-						{
-							nodeGroup.resize(findGrid(e.getX()), findGrid(e.getY()));
-						}
-						else
-						{
-							nodeGroup.resize(e.getX(), e.getY());
-						}
-					}
-					else
-					{
-						/*
-						if (nodesSnap)
-						{
-							nodeGroup.moveGroup(Math.round((e.getX() - xoff) / gridSize) * gridSize, Math.round((e.getY() - yoff) / gridSize) * gridSize);
-						}
-						else
-						{
-							nodeGroup.moveGroup(e.getX() - xoff, e.getY() - yoff);
-						}
-						*/
-					    nodeGroup.setPosition(nodeGroup.getX()+ dx, nodeGroup.getY() + dy);
-					}
-					
-					/* // Prevent nodegroups from moving onto nodes?
-					if (intersectsRectangle(nodeGroup.getBounds()))
-					{
-						nodeGroup.setBounds(b);
-					}
-					*/
-					
-					examineCollisions();
-				}
-			}
-		}
-
-		repaint(false);
-	}
-	
 	/**
 	 * Updates highlighting based on the current location of the mouse pointer.
 	 */
@@ -823,136 +370,6 @@ public class ControlledSurface
 	public void mouseExited(MouseEvent e)
 	{
 		;
-	}
-
-	public void mouseClicked(MouseEvent e)
-	{
-		this.requestFocusInWindow();
-
-		if (e.getButton() == MouseEvent.BUTTON1)
-		{
-			// Singleclick?
-			if (e.getClickCount() == 1)
-			{	
-				// What was clicked?
-				EditorObject o = getObjectAtPosition(e.getX(), e.getY());
-				
-				// Should we add a new node?
-				if (getCommand() == NODE)
-				{
-					int posX;
-					int posY;
-					
-					if (nodesSnap)
-					{
-						posX = findGrid(e.getX());
-						posY = findGrid(e.getY());
-					}
-					else
-					{
-						posX = e.getX();
-						posY = e.getY();
-					}
-					
-					// Make sure there isn't already a node there!
-					if (o == null || o.getType() != EditorObject.NODE)
-					{
-						Command createNode = new CreateNodeCommand(this, posX, posY);
-						root.getUndoInterface().executeCommand(createNode);
-						//addLabel(getLastNode(), "", 0, break20);
-						
-						//SimpleNodeProxy np = new SimpleNodeProxy("s" + nodes.size());
-						//PointGeometryProxy gp = new PointGeometryProxy(posX,posY);
-						//np.setPointGeometry(gp);
-						//graph.getNodes().add(np);
-					}
-				}
-				
-				/** Nonsense?
-					else if (T.getPlace() == EditorToolbar.EDGE)
-					{
-					if (o == null)
-					{
-					unselectAll();
-					
-					return;
-					}
-				*/
-				
-				// Set clicked node to initial
-				if (getCommand() == INITIAL)
-				{					
-					if (o == null || o.getType() != EditorObject.NODE)
-					{
-						return;
-					}
-					
-					EditorNode n = (EditorNode) o;
-					unsetAllInitial();
-					n.setInitial(true);
-				}
-	
-				// Special stuff for labelgroup clicks? (This is not working properly!)
-				if (getCommand() == SELECT && edgeIsSelected()) 
-				{
-					if (o == null || o.getType() != EditorObject.LABELGROUP)
-					{
-						return;
-					}					
-
-					EditorLabelGroup l = (EditorLabelGroup) o;
-					l.setSelected(true);
-					l.setSelectedLabel(e.getX(), e.getY());
-				}
-			}				
-			// Doubleclick?
-			else if (e.getClickCount() == 2)
-			{
-				// Change names on double clicking a label, change order when clicking labelgroup!
-				if (getCommand() == SELECT)
-				{
-					/* What's this? No comments?
-					   if (selectedNode != null)
-					   {
-					   if (selectedNode.getPropGroup().wasClicked(e.getX(), e.getY()) && selectedNode.getPropGroup().getVisible())
-					   {
-					   EditorPropGroup p = selectedNode.getPropGroup();
-					   
-					   p.setSelectedLabel(e.getX(), e.getY());
-					   repaint();
-					   }
-					   }
-					*/
-					
-					// What was clicked? 
-					EditorObject o = getObjectAtPosition(e.getX(), e.getY());
-					if (o != null)
-					{
-						if (o.getType() == EditorObject.LABEL)
-						{
-							EditorLabel l = (EditorLabel) o;
-							
-							l.setEditing(true);
-						}
-						else if (o.getType() == EditorObject.LABELGROUP)
-						{
-							EditorLabelGroup l = (EditorLabelGroup) o;
-							
-							l.setSelectedLabel(e.getX(), e.getY());
-						}
-						else if (o.getType() == EditorObject.NODE)
-						{
-							EditorNode n = (EditorNode) o;
-							
-							n.getPropGroup().setVisible(true);
-						}
-					}
-				}
-			}
-		}
-		
-		// Repaint is done when you release the mouse button? (But that's before the click?)
-		repaint();
 	}
 
 	public void createOptions(EditorWindowInterface root)
@@ -1228,6 +645,7 @@ public class ControlledSurface
 		extends MouseAdapter
 		implements MouseMotionListener
 	{
+		private List<EditorObject> previouslySelected = new ArrayList<EditorObject>();
 		
 		public void mouseClicked(MouseEvent e)
 		{
@@ -1242,15 +660,9 @@ public class ControlledSurface
 					EditorObject o = getObjectAtPosition(e.getX(), e.getY());
 					
 					// Special stuff for labelgroup clicks? (This is not working properly!)
-					if (getCommand() == SELECT && edgeIsSelected()) 
+					if (isSelected(o) && o != null && o.getType() != EditorObject.LABELGROUP) 
 					{
-						if (o == null || o.getType() != EditorObject.LABELGROUP)
-						{
-							return;
-						}					
-	
 						EditorLabelGroup l = (EditorLabelGroup) o;
-						l.setSelected(true);
 						l.setSelectedLabel(e.getX(), e.getY());
 					}
 				}				
@@ -1321,6 +733,8 @@ public class ControlledSurface
 	
 					// If SELECT is active, this means that we're starting a drag-select...
 					// Start of drag-select?
+					previouslySelected.clear();
+					previouslySelected.addAll(selectedObjects);
 					dragStartX = e.getX();
 					dragStartY = e.getY();
 					dragNowX = dragStartX;
@@ -1332,28 +746,26 @@ public class ControlledSurface
 					// Clicking on something!
 	
 					// Should we unselect the currently selected objects?
-					if (!selectedObjects.contains(o))
+					if (!isSelected(o))
 					{
 						// If control is down, we may select multiple things...
 						if (!e.isControlDown())
 						{
 							unselectAll();
 						}
-					}
-	
-					// Select stuff!
-					//selectChange(o);						
-					
-					// If object is selected prepare to unselect (don't unselect if dragging, though!)
-					if (selectedObjects.contains(o))
-					{
-						toBeDeselected.add(o);
+						select(o);
 					}
 					else
 					{
-						select(o);
-					}	   
-	
+						if (e.isControlDown())
+						{
+							unselect(o);
+						}
+					}
+					
+					// Select stuff!
+					//selectChange(o);						
+					
 					/*
 					if (o.getType() == EditorObject.EDGE)
 					{
@@ -1417,16 +829,6 @@ public class ControlledSurface
 			// This is for triggering the popup 
 			maybeShowPopup(e);
 	
-			// Make the temporary selection definite
-			while (toBeSelected.size() > 0)
-			{
-				select((EditorObject) toBeSelected.remove(0));
-			}
-			while (toBeDeselected.size() > 0)
-			{
-				unselect((EditorObject) toBeDeselected.remove(0));
-			}
-	
 			if (e.getButton() == MouseEvent.BUTTON1)
 			{
 				// Stop resizing nodegroup
@@ -1489,6 +891,7 @@ public class ControlledSurface
 	
 			dragSelect = false;
 			hasDragged = false;
+			previouslySelected.clear();
 		}
 		
 		public void mouseDragged(MouseEvent e)
@@ -1545,27 +948,17 @@ public class ControlledSurface
 					toBeSelected = getDragSelection();
 	
 					// Select all that should be selected...
-					ControlledSurface.super.unselectAll();
+					unselectAll();
 					// These have been selected previously and should still be
 					// selected no matter what
-					for (final EditorObject o : selectedObjects) 
+					for (final EditorObject o : previouslySelected) 
 					{
-						o.setSelected(true);
-						LinkedList children = getChildren(o);
-						while (children.size() != 0)
-						{
-							((EditorObject) children.remove(0)).setSelected(true);
-						}
+						select(o);
 					}
 					// These are in the current drag selection
 					for (final EditorObject o : toBeSelected) 
 					{
-						o.setSelected(true);
-						LinkedList children = getChildren(o);
-						while (children.size() != 0)
-						{
-							((EditorObject) children.remove(0)).setSelected(true);
-						}
+						select(o);
 					}
 	
 					repaint(false);
@@ -1574,9 +967,6 @@ public class ControlledSurface
 				}
 	
 				// Multiple selection?
-			
-				// Don't unselect! We're dragging!
-				toBeDeselected.clear();
 
 				// Drag all selected objects
 
@@ -1628,7 +1018,7 @@ public class ControlledSurface
 				  return;
 				  }
 				  }
-
+                                      
 				  for (int i = 0; i < nodeGroups.size(); i++)
 				  {
 				  if (((EditorNodeGroup) nodeGroups.get(i)).getBounds().intersects(new Rectangle(dx - EditorNode.WIDTH / 2, dy - EditorNode.WIDTH / 2, EditorNode.WIDTH, EditorNode.WIDTH)) &&!((EditorNodeGroup) nodeGroups.get(i)).getBounds().contains(new Rectangle(dx - EditorNode.WIDTH / 2, dy - EditorNode.WIDTH / 2, EditorNode.WIDTH, EditorNode.WIDTH)))
@@ -1848,31 +1238,26 @@ public class ControlledSurface
 					// Clicking on something!
 	
 					// Should we unselect the currently selected objects?
-					if (!selectedObjects.contains(o))
+					if (!isSelected(o))
 					{
 						// If control is down, we may select multiple things...
 						if (!e.isControlDown())
 						{
 							unselectAll();
 						}
+						select(o);
+					}
+					else
+					{
+						if (e.isControlDown())
+						{
+							unselect(o);
+						}
 					}
 	
 					// Select stuff!
 					//selectChange(o);
 	
-					unselectAll();
-					
-					
-					// If object is selected prepare to unselect (don't unselect if dragging, though!)
-					if (selectedObjects.contains(o))
-					{
-						toBeDeselected.add(o);
-					}
-					else
-					{
-						select(o);
-					}
-					
 					// Find offset values if a label or group was clicked
 					if (o.getType() == EditorObject.LABELGROUP)
 					{
@@ -1915,17 +1300,7 @@ public class ControlledSurface
 	
 			// This is for triggering the popup 
 			maybeShowPopup(e);
-	
-			// Make the temporary selection definite
-			while (toBeSelected.size() > 0)
-			{
-				select((EditorObject) toBeSelected.remove(0));
-			}
-			while (toBeDeselected.size() > 0)
-			{
-				unselect((EditorObject) toBeDeselected.remove(0));
-			}
-	
+			
 			if (e.getButton() == MouseEvent.BUTTON1)
 			{
 				lines.clear();
@@ -1981,46 +1356,36 @@ public class ControlledSurface
 				// Update position
 				lastX += dx;
 				lastY += dy;
-	
-				// DragSelect!
-				if (dragSelect)
+				if (!selectedObjects.isEmpty())
 				{
-					dragNowX = e.getX();
-					dragNowY = e.getY();
-	
-					toBeSelected = getDragSelection();
-	
-					// Select all that should be selected...
-					ControlledSurface.super.unselectAll();
-					// These have been selected previously and should still be
-					// selected no matter what
-					for (final EditorObject o : selectedObjects) 
+					if (move == null) 
 					{
-						o.setSelected(true);
-						LinkedList children = getChildren(o);
-						while (children.size() != 0)
+						move = new MoveObjects(ControlledSurface.this, selectedObjects, new Point2D.Double(dx, dy));
+					} 
+					else 
+					{
+						Point2D p = move.getDisplacement();
+						p.setLocation(p.getX() + dx, p.getY() + dy);
+						move.setDisplacement(p);
+					}
+					for (Iterator it = selectedObjects.iterator(); it.hasNext(); )
+					{
+						EditorObject object = (EditorObject) it.next();
+	
+						// Is it a node?
+						if (object.getType() == EditorObject.NODE)
 						{
-							((EditorObject) children.remove(0)).setSelected(true);
+							EditorNode node = (EditorNode) object;
+	
+							// Where did it use to be?
+							int oldx = node.getX();
+							int oldy = node.getY();
+	
+							// Move
+							node.setPosition(oldx + dx, oldy + dy);
 						}
 					}
-					// These are in the current drag selection
-					for (final EditorObject o : toBeSelected) 
-					{
-						o.setSelected(true);
-						LinkedList children = getChildren(o);
-						while (children.size() != 0)
-						{
-							((EditorObject) children.remove(0)).setSelected(true);
-						}
-					}
-	
-					repaint(false);
-	
-					return;
 				}
-	
-				// Multiple selection?
-				// Single selection! (Multiple selection is only allowed in SELECT-mode.)								
 			}
 	
 			repaint(false);
@@ -2059,26 +1424,22 @@ public class ControlledSurface
 					// Clicking on something!
 	
 					// Should we unselect the currently selected objects?
-					if (!selectedObjects.contains(o))
+					if (!isSelected(o))
 					{
 						// If control is down, we may select multiple things...
 						if (!e.isControlDown())
 						{
 							unselectAll();
 						}
-					}
-	
-					unselectAll();
-					
-					// If object is selected prepare to unselect (don't unselect if dragging, though!)
-					if (selectedObjects.contains(o))
-					{
-						toBeDeselected.add(o);
+						select(o);
 					}
 					else
 					{
-						select(o);
-					}	   
+						if (e.isControlDown())
+						{
+							unselect(o);
+						}
+					}
 	
 					/*
 					if (o.getType() == EditorObject.EDGE)
@@ -2133,16 +1494,6 @@ public class ControlledSurface
 	
 			// This is for triggering the popup 
 			maybeShowPopup(e);
-	
-			// Make the temporary selection definite
-			while (toBeSelected.size() > 0)
-			{
-				select((EditorObject) toBeSelected.remove(0));
-			}
-			while (toBeDeselected.size() > 0)
-			{
-				unselect((EditorObject) toBeDeselected.remove(0));
-			}
 	
 			if (e.getButton() == MouseEvent.BUTTON1)
 			{
@@ -2239,43 +1590,6 @@ public class ControlledSurface
 				// Update position
 				lastX += dx;
 				lastY += dy;
-	
-				// DragSelect!
-				if (dragSelect)
-				{
-					dragNowX = e.getX();
-					dragNowY = e.getY();
-	
-					toBeSelected = getDragSelection();
-	
-					// Select all that should be selected...
-					ControlledSurface.super.unselectAll();
-					// These have been selected previously and should still be
-					// selected no matter what
-					for (final EditorObject o : selectedObjects) 
-					{
-						o.setSelected(true);
-						LinkedList children = getChildren(o);
-						while (children.size() != 0)
-						{
-							((EditorObject) children.remove(0)).setSelected(true);
-						}
-					}
-					// These are in the current drag selection
-					for (final EditorObject o : toBeSelected) 
-					{
-						o.setSelected(true);
-						LinkedList children = getChildren(o);
-						while (children.size() != 0)
-						{
-							((EditorObject) children.remove(0)).setSelected(true);
-						}
-					}
-	
-					repaint(false);
-	
-					return;
-				}
 	
 				// Single selection! (Multiple selection is only allowed in SELECT-mode.)
 				
@@ -2419,25 +1733,21 @@ public class ControlledSurface
 					// Clicking on something!
 	
 					// Should we unselect the currently selected objects?
-					if (!selectedObjects.contains(o))
+					if (!isSelected(o))
 					{
 						// If control is down, we may select multiple things...
 						if (!e.isControlDown())
 						{
 							unselectAll();
 						}
-					}
-	
-					unselectAll();					
-					
-					// If object is selected prepare to unselect (don't unselect if dragging, though!)
-					if (selectedObjects.contains(o))
-					{
-						toBeDeselected.add(o);
+						select(o);
 					}
 					else
 					{
-						select(o);
+						if (e.isControlDown())
+						{
+							unselect(o);
+						}
 					}	   
 	
 					// Find offset values if a label or group was clicked
@@ -2482,16 +1792,6 @@ public class ControlledSurface
 	
 			// This is for triggering the popup 
 			maybeShowPopup(e);
-	
-			// Make the temporary selection definite
-			while (toBeSelected.size() > 0)
-			{
-				select((EditorObject) toBeSelected.remove(0));
-			}
-			while (toBeDeselected.size() > 0)
-			{
-				unselect((EditorObject) toBeDeselected.remove(0));
-			}
 	
 			if (e.getButton() == MouseEvent.BUTTON1)
 			{
@@ -2569,42 +1869,7 @@ public class ControlledSurface
 				lastY += dy;
 	
 				// DragSelect!
-				if (dragSelect)
-				{
-					dragNowX = e.getX();
-					dragNowY = e.getY();
-	
-					toBeSelected = getDragSelection();
-	
-					// Select all that should be selected...
-					ControlledSurface.super.unselectAll();
-					// These have been selected previously and should still be
-					// selected no matter what
-					for (final EditorObject o : selectedObjects) 
-					{
-						o.setSelected(true);
-						LinkedList children = getChildren(o);
-						while (children.size() != 0)
-						{
-							((EditorObject) children.remove(0)).setSelected(true);
-						}
-					}
-					// These are in the current drag selection
-					for (final EditorObject o : toBeSelected) 
-					{
-						o.setSelected(true);
-						LinkedList children = getChildren(o);
-						while (children.size() != 0)
-						{
-							((EditorObject) children.remove(0)).setSelected(true);
-						}
-					}
-	
-					repaint(false);
-	
-					return;
-				}
-	
+					
 				// Single selection! (Multiple selection is only allowed in SELECT-mode.)
 				
 				// Are we resizing a nodegroup?
@@ -2701,16 +1966,13 @@ public class ControlledSurface
 	private int yoff = 0;
 	private boolean controlPointsMove = true;
 	private boolean nodesSnap = true;
-
-	private boolean hasDragged = false;
+	private boolean hasDragged =false;
 
 	/** List of currently selected EditorObject:s. */
 	private LinkedList<EditorObject> selectedObjects = new LinkedList<EditorObject>();
 	/** List of EditorObject:s that are to become selected. */
 	private LinkedList<EditorObject> toBeSelected = new LinkedList<EditorObject>();
-	/** List of EditorObject:s that are to become unselected. */
-	private LinkedList<EditorObject> toBeDeselected = new LinkedList<EditorObject>();
-
+	
 	/** The currently highlighted EditorObject (under the mouse pointer). */
 	private EditorObject highlightedObject = null;
 

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorEdge
 //###########################################################################
-//# $Id: EditorEdge.java,v 1.33 2005-12-14 03:09:47 siw4 Exp $
+//# $Id: EditorEdge.java,v 1.34 2006-01-17 02:00:07 siw4 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -984,21 +984,13 @@ public class EditorEdge
 									  endNode.getX(), endNode.getY());
 	}
 	
-	public void setSelected(boolean s)
-	{
-		super.setSelected(s);
-		System.out.println(getStartPoint());
-		System.out.println(subject.getStartPoint().getPoint());
-		System.out.println(subject.getEndPoint().getPoint());
-	}
-	
-	public void drawObject(Graphics g)
+	public void drawObject(Graphics g, boolean selected)
 	{
 		Graphics2D g2d = (Graphics2D) g;
 		g2d.setStroke(BASICSTROKE);
 		
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		g2d.setColor(getColor());
+		g2d.setColor(getColor(selected));
 		
 		if (source.isEmpty() && (dragT || dragS))
 		{
@@ -1011,9 +1003,9 @@ public class EditorEdge
 			if (shadow && isHighlighted())
 			{
 				g2d.setStroke(SHADOWSTROKE);
-				g2d.setColor(getShadowColor());
+				g2d.setColor(getShadowColor(selected));
 				g2d.drawLine(x1, y1, x2, y2);
-				g2d.setColor(getColor());
+				g2d.setColor(getColor(selected));
 				g2d.setStroke(BASICSTROKE);
 			}
 
@@ -1039,11 +1031,11 @@ public class EditorEdge
 			if (shadow && isHighlighted())
 			{
 				g2d.setStroke(SHADOWSTROKE);
-				g2d.setColor(getShadowColor());				
+				g2d.setColor(getShadowColor(selected));
 				g2d.draw((Arc2D.Double) a.get(0));
 				g2d.draw((Line2D.Double) a.get(1));
 				g2d.draw((Line2D.Double) a.get(2));
-				g2d.setColor(getColor());
+				g2d.setColor(getColor(selected));
 				g2d.setStroke(BASICSTROKE);
 			}
 
@@ -1073,9 +1065,9 @@ public class EditorEdge
 			if (shadow && isHighlighted())
 			{
 				g2d.setStroke(SHADOWSTROKE);
-				g2d.setColor(getShadowColor());				
+				g2d.setColor(getShadowColor(selected));	
 				g2d.draw(getCurve()); 
-				g2d.setColor(getColor());
+				g2d.setColor(getColor(selected));
 				g2d.setStroke(BASICSTROKE);
 			}
 
@@ -1153,7 +1145,7 @@ public class EditorEdge
 			*/
 		}
 		
-		if (isSelected())
+		if (selected)
 		{
 			//g2d.draw(source);
 			g2d.fill(source);

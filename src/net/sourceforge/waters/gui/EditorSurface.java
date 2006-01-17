@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.40 2005-12-18 21:11:32 robi Exp $
+//# $Id: EditorSurface.java,v 1.41 2006-01-17 02:00:07 siw4 Exp $
 //###########################################################################
 
 
@@ -76,6 +76,11 @@ public class EditorSurface
 	public void modelChanged(ModelChangeEvent e)
 	{
 		repaint();
+	}
+	
+	public boolean isSelected(EditorObject o)
+	{
+		return false;
 	}
 	
 	public GraphProxy getGraph()
@@ -178,7 +183,7 @@ public class EditorSurface
 		{
 			EditorNodeGroup n = (EditorNodeGroup) nodeGroups.get(i);
 
-			n.drawObject(g);
+			n.drawObject(g, isSelected(n));
 
 			ArrayList groups = new ArrayList();
 			ArrayList children = new ArrayList();
@@ -221,7 +226,7 @@ public class EditorSurface
 				}
 			}
 			if (newGroup != null) {
-			    newGroup.drawObject(g);
+			    newGroup.drawObject(g, isSelected(newGroup));
 			}
 			for (int j = 0; j < nodes.size(); j++)
 			{
@@ -264,7 +269,7 @@ public class EditorSurface
 		{
 			EditorEdge edge = (EditorEdge) edges.get(i);
 
-			edge.drawObject(g);
+			edge.drawObject(g, isSelected(edge));
 
 			/*
 			QuadCurve2D.Double curve = edge.getCurve();
@@ -287,28 +292,28 @@ public class EditorSurface
 		{
 			EditorNode n = (EditorNode) nodes.get(i);
 
-			n.drawObject(g);
+			n.drawObject(g, isSelected(n));
 		}
 
 		for (int i = 0; i < labels.size(); i++)
 		{
 			EditorLabel l = (EditorLabel) labels.get(i);
 
-			l.drawObject(g);
+			l.drawObject(g, isSelected(l) || isSelected(l.getParent()));
 		}
 
 		for (int i = 0; i < events.size(); i++)
 		{
 			EditorLabelGroup l = (EditorLabelGroup) events.get(i);
 
-			l.setPanelLocation();
+			l.setPanelLocation(isSelected(l) || isSelected(l.getParent()));
 
 			// Why is this done here? Why are labelgroups treated differently?
 			// Draw shadow
 			if (l.shadow && l.isHighlighted())
 			{
 				Rectangle bounds = l.getBounds();
-				g.setColor(l.getShadowColor());
+				g.setColor(l.getShadowColor(isSelected(l) || isSelected(l.getParent())));
 				int adjust = 2; // The bounds are too tight!
 				g.fillRoundRect((int) bounds.getX()-adjust, (int) bounds.getY()-adjust, 
 								(int) bounds.getWidth()+2*adjust, (int) bounds.getHeight()+2*adjust, 
@@ -858,51 +863,7 @@ public class EditorSurface
 		}
 	}
 
- 	public void unselectAll()
-	{
-		for (int i = 0; i < nodes.size(); i++)
-		{
-			EditorNode n = (EditorNode) nodes.get(i);
-
-			n.setSelected(false);
-			nodes.set(i, n);
-		}
-
-		for (int i = 0; i < edges.size(); i++)
-		{
-			EditorEdge e = (EditorEdge) edges.get(i);
-
-			e.setSelected(false);
-			edges.set(i, e);
-		}
-
-		for (int i = 0; i < labels.size(); i++)
-		{
-			EditorLabel l = (EditorLabel) labels.get(i);
-
-			l.setSelected(false);
-			l.setEditing(false);
-			labels.set(i, l);
-		}
-
-		for (int i = 0; i < events.size(); i++)
-		{
-			EditorLabelGroup g = (EditorLabelGroup) events.get(i);
-
-			g.setSelected(false);
-			events.set(i, g);
-		}
-
-		for (int i = 0; i < nodeGroups.size(); i++)
-		{
-			EditorNodeGroup n = (EditorNodeGroup) nodeGroups.get(i);
-
-			n.setSelected(false);
-			nodeGroups.set(i, n);
-		}
-	}
-
-	public void unsetAllInitial()
+ 	public void unsetAllInitial()
 	{
 		for (int i = 0; i < nodes.size(); i++)
 		{

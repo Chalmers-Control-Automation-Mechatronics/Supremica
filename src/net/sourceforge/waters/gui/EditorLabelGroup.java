@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorLabelGroup
 //###########################################################################
-//# $Id: EditorLabelGroup.java,v 1.19 2006-01-11 00:00:18 siw4 Exp $
+//# $Id: EditorLabelGroup.java,v 1.20 2006-01-17 02:00:07 siw4 Exp $
 //###########################################################################
 
 
@@ -127,7 +127,7 @@ public class EditorLabelGroup
 		return -1;
     }
 
-	public void setPanelLocation()
+	public void setPanelLocation(boolean selected)
 	{
 		int x = (int) (mSubject.getGeometry().getOffset().getX());
 		int y = (int) (mSubject.getGeometry().getOffset().getY());
@@ -150,7 +150,7 @@ public class EditorLabelGroup
 			for (int i = 0; i < shadowPanel.getComponentCount(); i++)
 			{
 				JComponent c = (JComponent) shadowPanel.getComponent(i);
-				c.setForeground(getShadowColor());
+				c.setForeground(getShadowColor(selected));
 			}
 		}
 		else
@@ -163,7 +163,7 @@ public class EditorLabelGroup
 		{
 			JLabel l = (JLabel) panel.getComponent(i);
 
-			l.setForeground(getColor());
+			l.setForeground(getColor(selected));
 
 			if (i == index)
 			{
@@ -175,7 +175,7 @@ public class EditorLabelGroup
 			if (isHighlighted())
 			{
 				//l.setOpaque(true);
-				l.setBackground(getShadowColor());
+				l.setBackground(getShadowColor(selected));
 			}
 			else
 			{
@@ -293,7 +293,7 @@ public class EditorLabelGroup
 
 		l.setBorder(new EmptyBorder(0, 0, 0, 0));
 		l.setOpaque(false);
-		l.setBackground(getShadowColor());
+		l.setBackground(getShadowColor(false));
 
 		panel.add(l);
 		/*
@@ -354,14 +354,6 @@ public class EditorLabelGroup
 		return panel.getHeight();
 	}
 
-	public void setSelected(boolean s)
-	{
-		super.setSelected(s);
-		if (!s) {
-		    selectedLabel = null;
-		}
-	}
-	
 	public EditorLabelGroup(EditorEdge par, final EditorSurface e)
 	{
 		this(par.getSubject().getLabelBlock(), e);
@@ -414,7 +406,7 @@ public class EditorLabelGroup
 		e.add(shadowPanel);
 		*/
 		surface.add(panel);
-		setPanelLocation();
+		setPanelLocation(false);
 		if (surface instanceof ControlledSurface)
 		{
 			final ControlledSurface s = (ControlledSurface)surface;

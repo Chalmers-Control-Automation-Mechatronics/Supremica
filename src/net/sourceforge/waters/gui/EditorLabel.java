@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorLabel
 //###########################################################################
-//# $Id: EditorLabel.java,v 1.21 2006-01-09 00:25:33 siw4 Exp $
+//# $Id: EditorLabel.java,v 1.22 2006-01-17 02:00:07 siw4 Exp $
 //###########################################################################
 
 
@@ -145,7 +145,7 @@ public class EditorLabel
 	    return (int) mGeometry.getOffset().getY();
 	}
 
-	public void drawObject(Graphics g)
+	public void drawObject(Graphics g, boolean selected)
 	{
         	if ((text == null) || (mParent == null))
 		{
@@ -166,11 +166,11 @@ public class EditorLabel
 		    text.setSize(text.getPreferredSize());
 		}
 
-		label.setForeground(getColor());
+		label.setForeground(getColor(selected));
 		/*
 		if (shadow && isHighlighted())
 		{
-			labelShadow.setForeground(getShadowColor());
+			labelShadow.setForeground(getShadowColor(selected));
 		}
 		else
 		{
@@ -198,11 +198,11 @@ public class EditorLabel
 		if (shadow && isHighlighted())
 		{
 			Graphics2D g2d = (Graphics2D) g;
-			g2d.setColor(getShadowColor());				
+			g2d.setColor(getShadowColor(selected));				
 			g2d.fillRoundRect((int) boundingRect.getX(), (int) boundingRect.getY(), 
 							  (int) boundingRect.getWidth(), (int) boundingRect.getHeight(),
 							  20, 20);
-			g2d.setColor(getColor());
+			g2d.setColor(getColor(selected));
 		}
 
 		/*
@@ -211,10 +211,10 @@ public class EditorLabel
 		{
 			Graphics2D g2d = (Graphics2D) g;
 			g2d.setStroke(SHADOWSTROKE); 
-			g2d.setColor(getShadowColor());				
+			g2d.setColor(getShadowColor(selected));				
 			g2d.drawLine((int) boundingRect.getX(), (int) (boundingRect.getY()+boundingRect.getHeight()), 
 						 (int) (boundingRect.getX()+boundingRect.getWidth()), (int) (boundingRect.getY()+boundingRect.getHeight()));			
-			g2d.setColor(getColor());
+			g2d.setColor(getColor(selected));
 			g2d.setStroke(BASICSTROKE);
 		}
 		*/

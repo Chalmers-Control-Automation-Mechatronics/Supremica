@@ -4,8 +4,8 @@
 //# PACKAGE: wnet.sourceforge.aters.gui
 //# CLASS:   EditorObject
 //###########################################################################
-//# $Id: EditorObject.java,v 1.22 2005-12-02 02:31:04 siw4 Exp $
-//# $Id: EditorObject.java,v 1.22 2005-12-02 02:31:04 siw4 Exp $
+//# $Id: EditorObject.java,v 1.23 2006-01-17 02:00:07 siw4 Exp $
+//# $Id: EditorObject.java,v 1.23 2006-01-17 02:00:07 siw4 Exp $
 //###########################################################################
 
 
@@ -42,7 +42,6 @@ public abstract class EditorObject
     public static int CANTDROP = 2;
 
 	// What status has this object got in the editor window? Determines color.
-	private boolean selected = false;
 	private boolean highlighted = false;
 	private boolean error = false;
     private int mDragOver = NOTDRAG;
@@ -64,7 +63,6 @@ public abstract class EditorObject
 
 	public EditorObject()
 	{
-		selected = false;
 	}
 
 	/**
@@ -73,21 +71,6 @@ public abstract class EditorObject
 	public int getType()
 	{
 		return type;
-	}
-
-	/**
-	 * Sets the selection status of this object.
-	 */
-	public void setSelected(boolean s)
-	{
-		selected = s;
-	}
-	/**
-	 * @return {@code true} if selected, {@code false} otherwise.
-	 */
-	public boolean isSelected()
-	{
-		return selected;
 	}
 
 	/**
@@ -138,7 +121,7 @@ public abstract class EditorObject
 	/**
 	 * Returns the apropriate color for painting this object.
 	 */
-	public Color getColor()
+	public Color getColor(boolean selected)
 	{
 		// In order of importance
 		if(getDragOver() != NOTDRAG)
@@ -157,7 +140,7 @@ public abstract class EditorObject
 			}
 			return EditorColor.ERRORCOLOR;
 		}
-		else if(isSelected())
+		else if(selected)
 		{
 			return EditorColor.SELECTCOLOR;
 		}
@@ -181,17 +164,17 @@ public abstract class EditorObject
 	/**
 	 * Returns a lighter shade of the color of the object for drawing a "shadow".
 	 */
-	public Color getShadowColor()
+	public Color getShadowColor(boolean selected)
 	{
 		// Overrides
-		if(!isSelected() && !isError() && getType() == NODEGROUP)
+		if(selected && !isError() && getType() == NODEGROUP)
 		{
 			// Unfortunately, the light gray color gives a too weak shadow!
-			return EditorColor.shadow(getColor().darker().darker().darker());
+			return EditorColor.shadow(getColor(selected).darker().darker().darker());
 		}
 
 		// Return the shadowed variant of the ordinary color of this object
-		return EditorColor.shadow(getColor());
+		return EditorColor.shadow(getColor(selected));
 	}
 
 	/**
@@ -202,7 +185,7 @@ public abstract class EditorObject
 		BASICSTROKE = stroke;
 	}
 
-	public void drawObject(Graphics g)
+	public void drawObject(Graphics g, boolean selected)
 	{
 	}
 
