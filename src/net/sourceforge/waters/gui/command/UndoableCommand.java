@@ -37,6 +37,11 @@ public class UndoableCommand
 		super.undo();
 		mCommand.undo();
     }
+	
+	public boolean isSignificant()
+	{
+		return mCommand.isSignificant();
+	}
 
     public String getPresentationName()
     {
