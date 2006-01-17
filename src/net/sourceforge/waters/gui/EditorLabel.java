@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorLabel
 //###########################################################################
-//# $Id: EditorLabel.java,v 1.22 2006-01-17 02:00:07 siw4 Exp $
+//# $Id: EditorLabel.java,v 1.23 2006-01-17 21:13:50 siw4 Exp $
 //###########################################################################
 
 
@@ -18,6 +18,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.geom.Rectangle2D;
 import java.awt.event.*;
 import java.awt.geom.Point2D;
 import java.awt.font.*;
@@ -248,6 +249,11 @@ public class EditorLabel
 	public int getWidth()
 	{
 		return text.getWidth();
+	}
+	
+	public Rectangle2D getBounds()
+	{
+		return text.getBounds();
 	}
 
 	public void setHighlighted(boolean s)

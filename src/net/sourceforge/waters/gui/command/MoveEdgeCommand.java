@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.command
 //# CLASS:   MoveEdgeCommand
 //###########################################################################
-//# $Id: MoveEdgeCommand.java,v 1.3 2006-01-12 21:51:53 siw4 Exp $
+//# $Id: MoveEdgeCommand.java,v 1.4 2006-01-17 21:13:50 siw4 Exp $
 //###########################################################################
 
 
@@ -91,8 +91,6 @@ public class MoveEdgeCommand
 		{
 			mEdge.setEndNode((EditorNode)mNew);
 		}
-		mSurface.unselectAll();
-		mSurface.select(mEdge);
 		mSurface.getEditorInterface().setDisplayed();
     }
 
@@ -110,10 +108,13 @@ public class MoveEdgeCommand
 			mEdge.setEndNode((EditorNode)mOld);
 		}
 		mEdge.setPosition(mOTPoint.getX(), mOTPoint.getY());
-		mSurface.unselectAll();
-		mSurface.select(mEdge);
 		mSurface.getEditorInterface().setDisplayed();
     }
+	
+	public boolean isSignificant()
+	{
+		return true;
+	}
 
     public String getName()
     {

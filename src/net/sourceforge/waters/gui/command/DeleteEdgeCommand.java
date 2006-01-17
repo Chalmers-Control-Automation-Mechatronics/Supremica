@@ -46,7 +46,6 @@ public class DeleteEdgeCommand
     public void execute()
     {
 	mSurface.delEdge(mDeleted);
-	mSurface.unselectAll();
 	mSurface.getEditorInterface().setDisplayed();
     }
 
@@ -57,11 +56,14 @@ public class DeleteEdgeCommand
     public void undo()
     {
 	mSurface.addEdge(mDeleted);
-	mSurface.unselectAll();
-	mSurface.select(mDeleted);
 	mSurface.getEditorInterface().setDisplayed();
     }
 
+	public boolean isSignificant()
+	{
+		return true;
+	}
+	
     public String getName()
     {
 	return mDescription;

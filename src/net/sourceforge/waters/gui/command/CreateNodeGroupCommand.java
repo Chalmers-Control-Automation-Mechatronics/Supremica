@@ -45,10 +45,8 @@ public class CreateNodeGroupCommand
 
     public void execute()
     {
-	mSurface.addNodeGroup(mCreated);
-	mSurface.unselectAll();
-	mSurface.select(mCreated);	
-	mSurface.getEditorInterface().setDisplayed();
+		mSurface.addNodeGroup(mCreated);
+		mSurface.getEditorInterface().setDisplayed();
     }
 
     /** 
@@ -58,9 +56,13 @@ public class CreateNodeGroupCommand
     public void undo()
     {	
 		mSurface.delNodeGroup(mCreated);
-		mSurface.unselectAll();
 		mSurface.getEditorInterface().setDisplayed();
     }
+	
+	public boolean isSignificant()
+	{
+		return true;
+	}
 
     public String getName()
     {

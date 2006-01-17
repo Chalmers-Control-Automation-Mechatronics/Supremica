@@ -39,38 +39,40 @@ public class MoveObjects
      */
     public MoveObjects(ControlledSurface surface, Collection<? extends EditorObject> moved, Point2D displacement)
     {
-	mSurface = surface;
-	mMoved = new ArrayList(moved);	
-	setDisplacement(displacement);
-	String description = "";
-	if (mMoved.size() > 2) {
-	    description = "Multiple Move";
-	} else if (mMoved.size() == 2) {
-	    for (EditorObject o: mMoved) {
-		if (o.getType() == EditorObject.EDGE) {
-		    description = "Edge reshaping";
-		    break;
+		mSurface = surface;
+		mMoved = new ArrayList(moved);	
+		setDisplacement(displacement);
+		boolean node = false;
+		boolean edge = false;
+		for (EditorObject o: mMoved)
+		{
+			if (o.getType() == EditorObject.EDGE)
+			{
+				edge = true;
+			}
+			if (o.getType() == EditorObject.NODE ||
+				o.getType() == EditorObject.NODEGROUP)
+			{
+				node = true;
+				break;
+			}
 		}
-	    }
-	    if (description.equals("")) {
-		description = "Node Movement";
-	    }
-	} else if (mMoved.size() == 1) {
-	    EditorObject o = mMoved.iterator().next();
-	    if (o.getType() == EditorObject.NODEGROUP) {
-		description = "Group Node Movement";
-	    } else {
-		description = "Label Movement";
-	    }
-	} else {
-	    description = "PointLess";
-	}	
-	mDescription = description;
+		if (node)
+		{
+			mDescription = "Node Movement";
+		}
+		else if (edge)
+		{
+			mDescription = "Edge Reshaping";
+		}
+		else
+		{
+			mDescription = "Label Movement";
+		}
     }
 
     public void execute()
     {
-		mSurface.unselectAll();
 		for (EditorObject o : mMoved) {
 			if (mDescription.equals("Edge reshaping") || o.getType() != EditorObject.EDGE)
 			{
@@ -82,11 +84,11 @@ public class MoveObjects
 				}
 				}
 				if ((o.getType() != EditorObject.LABELGROUP && o.getType() != EditorObject.LABEL)
-				|| mMoved.size() == 1) {	
-				o.setPosition(o.getX() + mDisplacement.getX(), o.getY() + mDisplacement.getY());
+				|| mDescription.equals("Label Movement"))
+				{
+					o.setPosition(o.getX() + mDisplacement.getX(), o.getY() + mDisplacement.getY());
 				}
 			}
-			mSurface.select(o);		
 		}
 		mSurface.getEditorInterface().setDisplayed();
     }
@@ -97,7 +99,6 @@ public class MoveObjects
 
     public void undo()
     {
-		mSurface.unselectAll();
 		for (EditorObject o : mMoved) {
 			if (mDescription.equals("Edge reshaping") || o.getType() != EditorObject.EDGE)
 			{
@@ -109,14 +110,18 @@ public class MoveObjects
 				}
 				}
 				if ((o.getType() != EditorObject.LABELGROUP && o.getType() != EditorObject.LABEL)
-				|| mMoved.size() == 1) {	  
+				|| mDescription.equals("Label Movement")) {	  
 				o.setPosition(o.getX() - mDisplacement.getX(), o.getY() - mDisplacement.getY());	
 				}
 			}
-			mSurface.select(o);
 		}
 		mSurface.getEditorInterface().setDisplayed();  
     }
+	
+	public boolean isSignificant()
+	{
+		return true;
+	}
 
     public String getName()
     {

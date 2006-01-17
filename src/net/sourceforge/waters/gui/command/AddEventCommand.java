@@ -37,8 +37,6 @@ public class AddEventCommand
 	public void execute()
 	{
 		mList.getEventListModifiable().add(mPosition, mIdentifier);
-		mSurface.unselectAll();
-		mSurface.select(mObject);
 		if (mObject instanceof EditorLabelGroup)
 		{
 			((EditorLabelGroup) mObject).setSelectedLabel(mPosition);
@@ -55,6 +53,11 @@ public class AddEventCommand
 		mList.getEventListModifiable().remove(mIdentifier);
 		mSurface.getEditorInterface().setDisplayed();
     }
+	
+	public boolean isSignificant()
+	{
+		return true;
+	}
 
     public String getName()
     {

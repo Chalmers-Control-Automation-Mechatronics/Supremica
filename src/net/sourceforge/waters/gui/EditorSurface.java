@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.41 2006-01-17 02:00:07 siw4 Exp $
+//# $Id: EditorSurface.java,v 1.42 2006-01-17 21:13:50 siw4 Exp $
 //###########################################################################
 
 
@@ -825,6 +825,26 @@ public class EditorSurface
 			if (bounds.contains(e.getSourceHandle()) && bounds.contains(e.getCenterHandle()) && bounds.contains(e.getTargetHandle()))
 			{
 				selection.add(e);
+			}
+		}
+		
+		for (int i = 0; i < labels.size(); i++)
+		{
+			EditorLabel l = (EditorLabel) labels.get(i);
+			
+			if (bounds.contains(l.getBounds()))
+			{
+				selection.add(l);
+			}
+		}
+		
+		for (int i = 0; i < events.size(); i++)
+		{
+			EditorLabelGroup l = (EditorLabelGroup) events.get(i);
+			
+			if (bounds.contains(l.getBounds()))
+			{
+				selection.add(l);
 			}
 		}
 		

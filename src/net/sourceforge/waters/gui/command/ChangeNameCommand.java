@@ -51,6 +51,11 @@ public class ChangeNameCommand
 			t.printStackTrace();
 		}
     }
+	
+	public boolean isSignificant()
+	{
+		return true;
+	}
 
     public String getName()
     {

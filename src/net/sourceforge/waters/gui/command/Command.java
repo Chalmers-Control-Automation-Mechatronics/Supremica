@@ -7,4 +7,6 @@ public interface Command
 	public void undo();
 	
 	public String getName();
+	
+	public boolean isSignificant();
 }

@@ -58,7 +58,6 @@ public class DeleteNodeCommand
     {
 		mCommands.execute();
 		mSurface.delNode(mDeleted);
-		mSurface.unselectAll();
 		mSurface.getEditorInterface().setDisplayed();
     }
 
@@ -70,11 +69,14 @@ public class DeleteNodeCommand
     {
 		mSurface.addNode(mDeleted);
 		mCommands.undo();
-		mSurface.unselectAll();
-		mSurface.select(mDeleted);
 		mSurface.getEditorInterface().setDisplayed();
     }
 
+	public boolean isSignificant()
+	{
+		return true;
+	}
+	
     public String getName()
     {
 		return mDescription;

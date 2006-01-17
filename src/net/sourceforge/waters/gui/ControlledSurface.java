@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.53 2006-01-17 02:00:07 siw4 Exp $
+//# $Id: ControlledSurface.java,v 1.54 2006-01-17 21:13:50 siw4 Exp $
 //###########################################################################
  
 package net.sourceforge.waters.gui;
@@ -183,7 +183,7 @@ public class ControlledSurface
 		}
 	}
 
-	private void unselect(EditorObject o)
+	public void unselect(EditorObject o)
 	{
 		if (selectedObjects.contains(o))
 		{
@@ -645,8 +645,6 @@ public class ControlledSurface
 		extends MouseAdapter
 		implements MouseMotionListener
 	{
-		private List<EditorObject> previouslySelected = new ArrayList<EditorObject>();
-		
 		public void mouseClicked(MouseEvent e)
 		{
 			requestFocusInWindow();
@@ -657,14 +655,7 @@ public class ControlledSurface
 				if (e.getClickCount() == 1)
 				{	
 					// What was clicked?
-					EditorObject o = getObjectAtPosition(e.getX(), e.getY());
-					
-					// Special stuff for labelgroup clicks? (This is not working properly!)
-					if (isSelected(o) && o != null && o.getType() != EditorObject.LABELGROUP) 
-					{
-						EditorLabelGroup l = (EditorLabelGroup) o;
-						l.setSelectedLabel(e.getX(), e.getY());
-					}
+					//EditorObject o = getObjectAtPosition(e.getX(), e.getY());
 				}				
 				// Doubleclick?
 				else if (e.getClickCount() == 2)
@@ -714,13 +705,21 @@ public class ControlledSurface
 		{
 			// This is for triggering the popup 
 			maybeShowPopup(e);
-	
+			previouslySelected.clear();
+			previouslySelected.addAll(selectedObjects);
+			
 			if (e.getButton() == MouseEvent.BUTTON1)
 			{
 				lastX = e.getX();
 				lastY = e.getY();
 	
 				EditorObject o = getObjectAtPosition(e.getX(), e.getY());
+				// Special stuff for labelgroup clicks? (This is not working properly!)
+				if (isSelected(o) && o != null && o.getType() == EditorObject.LABELGROUP) 
+				{
+					EditorLabelGroup l = (EditorLabelGroup) o;
+					l.setSelectedLabel(e.getX(), e.getY());
+				}
 				if (o == null)
 				{
 					// Clicking on whitespace!
@@ -728,13 +727,14 @@ public class ControlledSurface
 					// If control is down, we may select multiple things...
 					if (!e.isControlDown())
 					{
-						unselectAll();
+						UnSelectCommand unselect = new UnSelectCommand(ControlledSurface.this, selectedObjects);;
+						root.getUndoInterface().executeCommand(unselect);
 					}
 	
 					// If SELECT is active, this means that we're starting a drag-select...
 					// Start of drag-select?
-					previouslySelected.clear();
-					previouslySelected.addAll(selectedObjects);
+					System.out.println(previouslySelected.size());					
+					System.out.println(previouslySelected.size());
 					dragStartX = e.getX();
 					dragStartY = e.getY();
 					dragNowX = dragStartX;
@@ -751,15 +751,19 @@ public class ControlledSurface
 						// If control is down, we may select multiple things...
 						if (!e.isControlDown())
 						{
-							unselectAll();
+							UnSelectCommand unselect = new UnSelectCommand(ControlledSurface.this, selectedObjects);;
+							root.getUndoInterface().executeCommand(unselect);
+
 						}
-						select(o);
+						SelectCommand select = new SelectCommand(ControlledSurface.this, o);
+						root.getUndoInterface().executeCommand(select);
 					}
 					else
 					{
 						if (e.isControlDown())
 						{
-							unselect(o);
+							UnSelectCommand unselect = new UnSelectCommand(ControlledSurface.this, o);
+							root.getUndoInterface().executeCommand(unselect);
 						}
 					}
 					
@@ -819,6 +823,10 @@ public class ControlledSurface
 		
 		public void mouseReleased(MouseEvent e)
 		{
+			Command unselect = new UnSelectCommand(ControlledSurface.this, previouslySelected);
+			Command select = new SelectCommand(ControlledSurface.this, selectedObjects);
+			root.getUndoInterface().executeCommand(unselect);
+			root.getUndoInterface().executeCommand(select);
 			if (move != null) {
 				if (move.getDisplacement().distance(0,0) != 0) {
 					root.getUndoInterface().addUndoable(new UndoableCommand(move));
@@ -851,7 +859,7 @@ public class ControlledSurface
 				}
 	
 				// Redefine edge if it has been changed
-				if (edgeIsSelected() && (selectedObjects.size() <= 2))
+				if (edgeIsSelected() && (selectedObjects.size() == 1))
 				{
 					EditorObject obj = (EditorObject) selectedObjects.get(0);
 					EditorEdge edge;
@@ -948,18 +956,16 @@ public class ControlledSurface
 					toBeSelected = getDragSelection();
 	
 					// Select all that should be selected...
-					unselectAll();
+					System.out.println(previouslySelected.size());
+					UnSelectCommand unselect = new UnSelectCommand(ControlledSurface.this, selectedObjects);
+					unselect.execute();
 					// These have been selected previously and should still be
-					// selected no matter what
-					for (final EditorObject o : previouslySelected) 
-					{
-						select(o);
-					}
+					// selected no matter what					
+					SelectCommand select = new SelectCommand(ControlledSurface.this, previouslySelected); 		
+					select.execute();
 					// These are in the current drag selection
-					for (final EditorObject o : toBeSelected) 
-					{
-						select(o);
-					}
+					select = new SelectCommand(ControlledSurface.this, toBeSelected);
+					select.execute();
 	
 					repaint(false);
 	
@@ -1111,7 +1117,8 @@ public class ControlledSurface
 					}					
 
 					// DONT MOVE LABELS IN MULTI MODE, (IT'S NO FUN TO TRY TO GET THE OFFSETS RIGHT...)
-					if (selectedObjects.size() == 1)
+					if (!edgeIsSelected() && !nodeGroupIsSelected()
+						&& !nodeIsSelected())
 					{
 						// Is it a label?
 						if (object.getType() == EditorObject.LABEL) // Don't move!
@@ -1173,7 +1180,7 @@ public class ControlledSurface
 						{
 						if (o == null)
 						{
-						unselectAll();
+						UnSelectCommand unselect = new UnSelectCommand(ControlledSurface.this, selectedObjects);;
 						
 						return;
 						}
@@ -1208,7 +1215,8 @@ public class ControlledSurface
 					// If control is down, we may select multiple things...
 					if (!e.isControlDown())
 					{
-						unselectAll();
+						UnSelectCommand unselect = new UnSelectCommand(ControlledSurface.this, selectedObjects);;
+						root.getUndoInterface().executeCommand(unselect);
 						int posX;
 						int posY;
 						
@@ -1243,15 +1251,18 @@ public class ControlledSurface
 						// If control is down, we may select multiple things...
 						if (!e.isControlDown())
 						{
-							unselectAll();
+							UnSelectCommand unselect = new UnSelectCommand(ControlledSurface.this, selectedObjects);;
+							root.getUndoInterface().executeCommand(unselect);
 						}
-						select(o);
+						SelectCommand select = new SelectCommand(ControlledSurface.this, o);
+						root.getUndoInterface().executeCommand(select);
 					}
 					else
 					{
 						if (e.isControlDown())
 						{
-							unselect(o);
+							UnSelectCommand unselect = new UnSelectCommand(ControlledSurface.this, o);
+							root.getUndoInterface().executeCommand(unselect);
 						}
 					}
 	
@@ -1416,7 +1427,8 @@ public class ControlledSurface
 				{
 					if (!e.isControlDown())
 					{
-						unselectAll();
+						UnSelectCommand unselect = new UnSelectCommand(ControlledSurface.this, selectedObjects);;
+						root.getUndoInterface().executeCommand(unselect);
 					}
 				}
 				else
@@ -1429,15 +1441,18 @@ public class ControlledSurface
 						// If control is down, we may select multiple things...
 						if (!e.isControlDown())
 						{
-							unselectAll();
+							UnSelectCommand unselect = new UnSelectCommand(ControlledSurface.this, selectedObjects);;
+							root.getUndoInterface().executeCommand(unselect);
 						}
-						select(o);
+						SelectCommand select = new SelectCommand(ControlledSurface.this, o);
+						root.getUndoInterface().executeCommand(select);
 					}
 					else
 					{
 						if (e.isControlDown())
 						{
-							unselect(o);
+							UnSelectCommand unselect = new UnSelectCommand(ControlledSurface.this, o);
+							root.getUndoInterface().executeCommand(unselect);
 						}
 					}
 	
@@ -1504,7 +1519,8 @@ public class ControlledSurface
 					{
 						// This is thus the startingpoint
 						EditorObject n1 = (EditorObject) selectedObjects.get(0);
-						unselect(n1);
+						UnSelectCommand unselect = new UnSelectCommand(ControlledSurface.this, n1);
+						root.getUndoInterface().executeCommand(unselect);
 	
 						// This is the targetpoint
 						EditorObject o2 = getObjectAtPosition(e.getX(), e.getY());
@@ -1528,11 +1544,12 @@ public class ControlledSurface
 						}
 					}
 	
-					unselectAll();
+					UnSelectCommand unselect = new UnSelectCommand(ControlledSurface.this, selectedObjects);;
+					root.getUndoInterface().executeCommand(unselect);
 				}	
 	
 				
-				if (edgeIsSelected() && (selectedObjects.size() <= 2))
+				if (edgeIsSelected() && (selectedObjects.size() == 1))
 				{
 					EditorObject obj = (EditorObject) selectedObjects.get(0);
 					EditorEdge edge;
@@ -1701,7 +1718,8 @@ public class ControlledSurface
 					// If control is down, we may select multiple things...
 					if (!e.isControlDown())
 					{
-						unselectAll();
+						UnSelectCommand unselect = new UnSelectCommand(ControlledSurface.this, selectedObjects);;
+						root.getUndoInterface().executeCommand(unselect);
 					}
 					
 					// If NODEGROUP is active, we're adding a new group!
@@ -1726,7 +1744,8 @@ public class ControlledSurface
 											  new PlainEventListSubject(), ic, g);   	
 						newGroup = new EditorNodeGroup(n);
 					}
-					select(newGroup);
+					SelectCommand select = new SelectCommand(ControlledSurface.this, newGroup);
+					root.getUndoInterface().executeCommand(select);
 				}
 				else
 				{
@@ -1738,15 +1757,18 @@ public class ControlledSurface
 						// If control is down, we may select multiple things...
 						if (!e.isControlDown())
 						{
-							unselectAll();
+							UnSelectCommand unselect = new UnSelectCommand(ControlledSurface.this, selectedObjects);;
+							root.getUndoInterface().executeCommand(unselect);
 						}
-						select(o);
+						SelectCommand select = new SelectCommand(ControlledSurface.this, o);
+						root.getUndoInterface().executeCommand(select);
 					}
 					else
 					{
 						if (e.isControlDown())
 						{
-							unselect(o);
+							UnSelectCommand unselect = new UnSelectCommand(ControlledSurface.this, o);
+							root.getUndoInterface().executeCommand(unselect);
 						}
 					}	   
 	
@@ -1973,6 +1995,7 @@ public class ControlledSurface
 	/** List of EditorObject:s that are to become selected. */
 	private LinkedList<EditorObject> toBeSelected = new LinkedList<EditorObject>();
 	
+	private List<EditorObject> previouslySelected = new ArrayList<EditorObject>();
 	/** The currently highlighted EditorObject (under the mouse pointer). */
 	private EditorObject highlightedObject = null;
 

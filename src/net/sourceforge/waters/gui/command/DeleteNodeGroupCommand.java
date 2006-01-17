@@ -58,7 +58,6 @@ public class DeleteNodeGroupCommand
     {
 		mCommands.execute();
 		mSurface.delNodeGroup(mDeleted);
-		mSurface.unselectAll();
 		mSurface.getEditorInterface().setDisplayed();
     }
 
@@ -66,12 +65,15 @@ public class DeleteNodeGroupCommand
      * Undoes the Command
      */    
 
+	public boolean isSignificant()
+	{
+		return true;
+	}
+	 
     public void undo()
     {
 		mSurface.addNodeGroup(mDeleted);
 		mCommands.undo();
-		mSurface.unselectAll();
-		mSurface.select(mDeleted);
 		mSurface.getEditorInterface().setDisplayed();
     }
 
