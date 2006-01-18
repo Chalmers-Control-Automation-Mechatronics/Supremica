@@ -1,6 +1,10 @@
 package net.sourceforge.waters.gui.command;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.IdentityHashMap;
+import java.util.ArrayList;
 
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
@@ -16,36 +20,58 @@ import net.sourceforge.waters.subject.module.IdentifierSubject;
 public class ReorganizeListCommand
 	implements Command
 {
-	private final ControlledSurface mSurface;
-	private final EditorLabelGroup mGroup;
 	private final EventListExpressionSubject mList;
-	private final IdentifierSubject mIdentifier;
-	private final int mPosition;
+	private final List<AbstractSubject> mIdentifiers;
+	private final IdentityHashMap<AbstractSubject, Integer> mIndexs;
 	private final int mNewPosition;
 	private final String mDescription = "Move Event";
 	
-	public ReorganizeListCommand(ControlledSurface surface,
-								 EditorLabelGroup group,								 
-								 IdentifierSubject identifier,
+	public ReorganizeListCommand(EventListExpressionSubject group,								 
+								 List<? extends AbstractSubject> identifiers,
 								 int newPosition)
-	{
-		mSurface = surface;
-		mGroup = group;
-		mList = group.getSubject();
-		mIdentifier = identifier;
-		mPosition = mList.getEventList().indexOf(mIdentifier);
+	{		
+		mList = group;
+		mIdentifiers = new ArrayList<AbstractSubject>(identifiers.size());
+		mIdentifiers.addAll(identifiers);
+		Collections.sort(mIdentifiers, new Comparator<AbstractSubject>()
+		{
+			public int compare(AbstractSubject a1, AbstractSubject a2)
+			{
+				return (mList.getEventList().indexOf(a1) -
+						mList.getEventList().indexOf(a2));
+			}
+			
+			public boolean equals(Object o)
+			{
+				return o == this;
+			}
+		});
+		mIndexs = new IdentityHashMap<AbstractSubject, Integer>();
+		for (AbstractSubject a : identifiers)
+		{
+			int index = mList.getEventList().indexOf(a);
+			mIndexs.put(a, new Integer(index));
+		}
 		mNewPosition = newPosition;
 	}
 	
 	public void execute()
-	{
+	{		
 		final List<AbstractSubject> list =
-						mList.getEventListModifiable();		
-		// Remove label and add to new position in list
-		list.remove(mIdentifier);
-		list.add(mNewPosition, mIdentifier);
-		mGroup.setSelectedLabel(mNewPosition);
-		mSurface.getEditorInterface().setDisplayed();
+						mList.getEventListModifiable();
+		list.removeAll(mIdentifiers);
+		int i = 0;
+		for (AbstractSubject a : mIdentifiers)
+		{
+			int index = mNewPosition + i;
+			if (index > list.size())
+			{
+				index = list.size();
+			}
+			list.add(index, a);
+			i++;
+		}
+		// Remove label and add to new position in list				
 	}
 	
     /** 
@@ -56,10 +82,11 @@ public class ReorganizeListCommand
 		final List<AbstractSubject> list =
 						mList.getEventListModifiable();		
 		// Remove label and add to new position in list
-		list.remove(mIdentifier);
-		list.add(mPosition, mIdentifier);
-		mGroup.setSelectedLabel(mPosition);
-		mSurface.getEditorInterface().setDisplayed();
+		list.removeAll(mIdentifiers);
+		for (AbstractSubject a : mIdentifiers)
+		{
+			list.add(mIndexs.get(a).intValue(), a);
+		}
     }
 	
 		

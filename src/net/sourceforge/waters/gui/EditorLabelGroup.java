@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorLabelGroup
 //###########################################################################
-//# $Id: EditorLabelGroup.java,v 1.20 2006-01-17 02:00:07 siw4 Exp $
+//# $Id: EditorLabelGroup.java,v 1.21 2006-01-18 22:08:54 siw4 Exp $
 //###########################################################################
 
 
@@ -28,6 +28,7 @@ import javax.swing.border.*;
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.RemoveEventCommand;
 import net.sourceforge.waters.gui.command.ReorganizeListCommand;
+import net.sourceforge.waters.gui.command.CompoundCommand;
 import net.sourceforge.waters.gui.command.UndoInterface;
 
 import net.sourceforge.waters.model.base.Proxy;
@@ -69,7 +70,60 @@ public class EditorLabelGroup
 
 		return (r.contains(ex, ey));
 	}
+	
+	public Command upCommand()
+	{
+		int index = getSubject().getEventList().size();
+		for (IdentifierSubject i : mSelectedLabels)
+		{
+			int index2 = getSubject().getEventList().indexOf(i);
+			if (index2 < index)
+			{
+				index = index2;
+			}			
+		}
+		if (index > 0)
+		{
+			index--;
+		}
+		return new ReorganizeListCommand(getSubject(), mSelectedLabels, index);
+	}
+	
+	public Command downCommand()
+	{
+		int index = 0;
+		for (IdentifierSubject i : mSelectedLabels)
+		{
+			int index2 = getSubject().getEventList().indexOf(i);
+			if (index2 > index)
+			{
+				index = index2;
+			}			
+		}
+		if (index < getSubject().getEventList().size() - 1)
+		{
+			index++;
+		}
+		return new ReorganizeListCommand(getSubject(), mSelectedLabels, index);
+	}
+	
+	public Command deleteSelected()
+	{
+		CompoundCommand command = new CompoundCommand();
+		for (IdentifierSubject i : mSelectedLabels)
+		{
+			command.addCommand(new RemoveEventCommand(getSubject(), i));
+		}
+		unSelectAll();
+		command.end();
+		return command;
+	}
 
+	public boolean hasSelected()
+	{
+		return (!mSelectedLabels.isEmpty());
+	}
+	
 	public Rectangle getBounds()
 	{
 		return panel.getBounds();
@@ -84,37 +138,94 @@ public class EditorLabelGroup
 		}
 	}
 
-	public void setSelectedLabel(int ex, int ey)
+	public void selectLabel(int ex, int ey)
 	{
-		panel.requestFocus();
 		int index = getLabelIndexAt(ex, ey);
-		if (index != -1)
+		selectLabel(index);
+	}
+	
+	public void selectLabel(int index)
+	{
+		if (index >= 0 && index < mSubject.getEventList().size())
 		{
-			selectedLabel = (IdentifierSubject)mSubject.getEventList().get(index);
-		}
-		else
+			selectLabel((IdentifierSubject)mSubject.getEventList().get(index));
+		}		
+	}
+	
+	public void selectLabel(IdentifierSubject subject)
+	{
+		if (subject != null && !mSelectedLabels.contains(subject))
 		{
-			selectedLabel = null;
+			mSelectedLabels.add(subject);
 		}
 	}
 	
-	public void setSelectedLabel(int index)
+	public void toggleLabel(int ex, int ey)
 	{
-		panel.requestFocus();
+		int index = getLabelIndexAt(ex, ey);
+		toggleLabel(index);
+	}
+	
+	public void toggleLabel(int index)
+	{
 		if (index >= 0 && index < mSubject.getEventList().size())
 		{
-			selectedLabel = (IdentifierSubject)mSubject.getEventList().get(index);
+			toggleLabel((IdentifierSubject)mSubject.getEventList().get(index));
+		}		
+	}
+	
+	public void toggleLabel(IdentifierSubject subject)
+	{
+		if (mSelectedLabels.contains(subject))
+		{
+			unSelectLabel(subject);
 		}
 		else
 		{
-			selectedLabel = null;
+			selectLabel(subject);
+		}
+	}
+	
+	public void unSelectLabel(int ex, int ey)
+	{
+		int index = getLabelIndexAt(ex, ey);
+		unSelectLabel(index);
+	}
+	
+	public void unSelectLabel(int index)
+	{
+		if (index >= 0 && index < mSubject.getEventList().size())
+		{
+			unSelectLabel((IdentifierSubject)mSubject.getEventList().get(index));
+		}		
+	}
+	
+	public void unSelectLabel(IdentifierSubject subject)
+	{
+		if (subject != null)
+		{
+			mSelectedLabels.remove(subject);
+		}
+	}
+	
+	public void unSelectAll()
+	{
+		mSelectedLabels.clear();
+	}
+	
+	public void selectAll()
+	{
+		unSelectAll();
+		for (Proxy p : getSubject().getEventList())
+		{
+			mSelectedLabels.add((IdentifierSubject)p);
 		}
 	}
 
     public int getLabelIndexAt(int ex, int ey)
     {
 		ex -= panel.getX();
-		ey -= panel.getY();		
+		ey -= panel.getY();
 		for (int i = 0; i < panel.getComponentCount(); i++)
 		{
 			JLabel l = (JLabel) panel.getComponent(i);
@@ -158,14 +269,13 @@ public class EditorLabelGroup
 			shadowPanel.setVisible(false);
 		}
 		*/
-		int index = mSubject.getEventList().indexOf(selectedLabel);
 		for (int i = 0; i < panel.getComponentCount(); i++)
 		{
 			JLabel l = (JLabel) panel.getComponent(i);
 
 			l.setForeground(getColor(selected));
 
-			if (i == index)
+			if (mSelectedLabels.contains(getSubject().getEventList().get(i)))
 			{
 				l.setForeground(Color.RED);
 			}
@@ -407,71 +517,6 @@ public class EditorLabelGroup
 		*/
 		surface.add(panel);
 		setPanelLocation(false);
-		if (surface instanceof ControlledSurface)
-		{
-			final ControlledSurface s = (ControlledSurface)surface;
-			panel.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), "up");
-			panel.getActionMap().put("up", new AbstractAction()
-			{
-				public void actionPerformed(ActionEvent e)
-				{
-					int index = mSubject.getEventList().indexOf(selectedLabel);
-					if ((index > 0) && (index < panel.getComponentCount()))
-					{
-						Command reorganize = new ReorganizeListCommand(s,
-														EditorLabelGroup.this,
-														selectedLabel,
-														index - 1);
-						mUndo.executeCommand(reorganize);
-						// Clear all lists
-						/*
-						shadowPanel.removeAll();
-						*/
-						/*
-						shadowPanel.repaint();
-						*/					
-					}
-				}
-			});
-			panel.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), "down");
-			panel.getActionMap().put("down", new AbstractAction()
-			{
-				public void actionPerformed(ActionEvent e)
-				{
-					int index = mSubject.getEventList().indexOf(selectedLabel);
-					if ((index >= 0) && (index < panel.getComponentCount() - 1))
-					{
-						Command reorganize = new ReorganizeListCommand(s, 
-														EditorLabelGroup.this,
-														selectedLabel, index + 1);
-						mUndo.executeCommand(reorganize);																		
-						/*
-						shadowPanel.removeAll();
-						*/
-						/*
-						shadowPanel.repaint();
-						*/					
-					}
-				}
-			});
-			panel.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "delete");
-			panel.getActionMap().put("delete", new AbstractAction()
-			{
-				public void actionPerformed(ActionEvent action)
-				{
-					// Is a label selected?
-					int index = mSubject.getEventList().indexOf(selectedLabel);
-					if ((index >= 0) && (index < panel.getComponentCount()))
-					{
-						// Remove event
-						Command removeEvent = new RemoveEventCommand(s,
-																	EditorLabelGroup.this,
-																	selectedLabel);
-						mUndo.executeCommand(removeEvent);					
-					}
-				}
-			});
-		}
 	}
 	
 	public void modelChanged(ModelChangeEvent e)
@@ -501,7 +546,7 @@ public class EditorLabelGroup
 	private LabelBlockSubject mSubject;
 	private int verticalA = 1;
 	private int horizontalA = 1;
-	private IdentifierSubject selectedLabel = null;
+	private List<IdentifierSubject> mSelectedLabels = new ArrayList<IdentifierSubject>();
 	private final UndoInterface mUndo; 
 
 	//private final ArrayList events;

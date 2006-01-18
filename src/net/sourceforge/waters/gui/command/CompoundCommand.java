@@ -25,7 +25,7 @@ public class CompoundCommand
 	
 	public boolean addCommand(Command c)
 	{
-		if (mInProgress)
+		if (mInProgress && c != null)
 		{
 			mCommands.add(c);
 			return true;

@@ -13,20 +13,15 @@ import net.sourceforge.waters.subject.module.IdentifierSubject;
 public class RemoveEventCommand
 	implements Command
 {
-	private final ControlledSurface mSurface;
-	private final EditorLabelGroup mGroup;
 	private final EventListExpressionSubject mList;
 	private final IdentifierSubject mIdentifier;
 	private final int mPosition;
 	private final String mDescription = "Remove Event";
 	
-	public RemoveEventCommand(ControlledSurface surface,
-							  EditorLabelGroup group,
+	public RemoveEventCommand(EventListExpressionSubject group,
 							  IdentifierSubject identifier)						   
 	{
-		mSurface = surface;
-		mGroup = group;
-		mList = group.getSubject();
+		mList = group;
 		mIdentifier = identifier;
 		mPosition = mList.getEventList().indexOf(mIdentifier);
 	}
@@ -34,7 +29,6 @@ public class RemoveEventCommand
 	public void execute()
 	{
 		mList.getEventListModifiable().remove(mIdentifier);
-		mSurface.getEditorInterface().setDisplayed();
 	}
 
     /** 
@@ -43,8 +37,6 @@ public class RemoveEventCommand
     public void undo()
     {
 		mList.getEventListModifiable().add(mPosition, mIdentifier);
-		mGroup.setSelectedLabel(mPosition);
-		mSurface.getEditorInterface().setDisplayed();
     }
 	
 	public boolean isSignificant()

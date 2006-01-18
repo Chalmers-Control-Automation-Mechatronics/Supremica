@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.54 2006-01-17 21:13:50 siw4 Exp $
+//# $Id: ControlledSurface.java,v 1.55 2006-01-18 22:08:54 siw4 Exp $
 //###########################################################################
  
 package net.sourceforge.waters.gui;
@@ -40,7 +40,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
 
 public class ControlledSurface
 	extends EditorSurface
-	implements Observer, KeyListener//,MouseMotionListener, MouseListener
+	implements Observer//, KeyListener//,MouseMotionListener, MouseListener
 {
     public String getCommand()
     {
@@ -77,51 +77,41 @@ public class ControlledSurface
 		controlPointsMove = c;
 	}
 
-	public void keyPressed(KeyEvent e)
-	{
-		if ((e.getKeyCode() == KeyEvent.VK_BACK_SPACE) || (e.getKeyCode() == KeyEvent.VK_DELETE))
-		{
-			deleteSelected();
-		}
-	}
-
- 	public void keyTyped(KeyEvent e)
-	{
-		;
-	}
-
-	/** 
-	 * Handle the key released event from the text field. 
-	 */
-	public void keyReleased(KeyEvent e)
-	{
-		;
-	}
-
 	/**
 	 * Deletes all selected objects.
 	 */
 	public void deleteSelected()
 	{
+		CompoundCommand compound = new CompoundCommand("Deletion");
 		while (selectedObjects.size() != 0)
 		{
-			EditorObject o = (EditorObject) selectedObjects.remove(0);
+			EditorObject o = (EditorObject) selectedObjects.remove(0);			
 			if (o.getType() == EditorObject.NODE)
 			{
 			    Command deleteNode = new DeleteNodeCommand(this, (EditorNode) o);
-			    root.getUndoInterface().executeCommand(deleteNode);
+			    compound.addCommand(deleteNode);
 			}
 			else if (o.getType() == EditorObject.EDGE)
 			{
 			    Command deleteEdge = new DeleteEdgeCommand(this, (EditorEdge) o);
-			    root.getUndoInterface().executeCommand(deleteEdge);
+			    compound.addCommand(deleteEdge);
 			}
 			else if (o.getType() == EditorObject.NODEGROUP)
 			{
 			    Command deleteNodeGroup = new DeleteNodeGroupCommand(this, (EditorNodeGroup) o);
-			    root.getUndoInterface().executeCommand(deleteNodeGroup);			
+			    compound.addCommand(deleteNodeGroup);			
+			}
+			if (o.getType() == EditorObject.LABELGROUP)
+			{
+				EditorLabelGroup l = (EditorLabelGroup)o;
+				if (!l.hasSelected())
+				{
+					l.selectAll();
+				}
+				compound.addCommand(l.deleteSelected());
 			}
 		}
+		root.getUndoInterface().executeCommand(compound);
 	}
 
 	public void select(EditorObject o)
@@ -138,7 +128,8 @@ public class ControlledSurface
 					{
 						if (((EditorLabel)o2).getParent() == o)
 						{
-							i.remove();
+							unselect(o2);
+							break;
 						}
 					}
 				}
@@ -152,9 +143,10 @@ public class ControlledSurface
 					EditorObject o2 = i.next();
 					if (o2 instanceof EditorLabelGroup)
 					{
-						if (((EditorLabelGroup)o2).getParent() == o)
+						if (((EditorLabel)o2).getParent() == o)
 						{
-							i.remove();
+							unselect(o2);
+							break;
 						}
 					}
 				}
@@ -187,13 +179,20 @@ public class ControlledSurface
 	{
 		if (selectedObjects.contains(o))
 		{
-			selectedObjects.remove(o);			
+			if (o instanceof EditorLabelGroup)
+			{
+				((EditorLabelGroup)o).unSelectAll();
+			}
+			selectedObjects.remove(o);
 		}
 	}
 
 	public void unselectAll()
 	{
-		selectedObjects.clear();
+		while (selectedObjects.size() > 0)
+		{
+			unselect(selectedObjects.get(0));
+		}
 	}
 	
 	public boolean isSelected(EditorObject o)
@@ -408,7 +407,7 @@ public class ControlledSurface
 		t.attach(this);
 		this.addMouseListener(new SelectListener());
 		this.addMouseMotionListener(new SelectListener());
-		this.addKeyListener(this);
+		this.addKeyListener(new KeySpy());
 		this.requestFocusInWindow();
 		dtListener = new DTListener();
 		dropTarget = new DropTarget(this, dtListener);
@@ -655,7 +654,23 @@ public class ControlledSurface
 				if (e.getClickCount() == 1)
 				{	
 					// What was clicked?
-					//EditorObject o = getObjectAtPosition(e.getX(), e.getY());
+					EditorObject o = getObjectAtPosition(e.getX(), e.getY());
+					// Special stuff for labelgroup clicks? (This is not working properly!)
+					if (isSelected(o) && o != null &&
+						previouslySelected.contains(o) &&
+						o.getType() == EditorObject.LABELGROUP)
+					{
+						EditorLabelGroup l = (EditorLabelGroup) o;
+						if (e.isControlDown())
+						{
+							l.toggleLabel(e.getX(), e.getY());
+						}
+						else
+						{
+							l.unSelectAll();
+							l.selectLabel(e.getX(), e.getY());
+						}
+					}
 				}				
 				// Doubleclick?
 				else if (e.getClickCount() == 2)
@@ -688,7 +703,7 @@ public class ControlledSurface
 						{
 							EditorLabelGroup l = (EditorLabelGroup) o;
 							
-							l.setSelectedLabel(e.getX(), e.getY());
+							l.selectLabel(e.getX(), e.getY());
 						}
 						else if (o.getType() == EditorObject.NODE)
 						{
@@ -713,13 +728,7 @@ public class ControlledSurface
 				lastX = e.getX();
 				lastY = e.getY();
 	
-				EditorObject o = getObjectAtPosition(e.getX(), e.getY());
-				// Special stuff for labelgroup clicks? (This is not working properly!)
-				if (isSelected(o) && o != null && o.getType() == EditorObject.LABELGROUP) 
-				{
-					EditorLabelGroup l = (EditorLabelGroup) o;
-					l.setSelectedLabel(e.getX(), e.getY());
-				}
+				EditorObject o = getObjectAtPosition(e.getX(), e.getY());				
 				if (o == null)
 				{
 					// Clicking on whitespace!
@@ -727,14 +736,13 @@ public class ControlledSurface
 					// If control is down, we may select multiple things...
 					if (!e.isControlDown())
 					{
+						previouslySelected.clear();
 						UnSelectCommand unselect = new UnSelectCommand(ControlledSurface.this, selectedObjects);;
 						root.getUndoInterface().executeCommand(unselect);
 					}
 	
 					// If SELECT is active, this means that we're starting a drag-select...
 					// Start of drag-select?
-					System.out.println(previouslySelected.size());					
-					System.out.println(previouslySelected.size());
 					dragStartX = e.getX();
 					dragStartY = e.getY();
 					dragNowX = dragStartX;
@@ -762,8 +770,12 @@ public class ControlledSurface
 					{
 						if (e.isControlDown())
 						{
-							UnSelectCommand unselect = new UnSelectCommand(ControlledSurface.this, o);
-							root.getUndoInterface().executeCommand(unselect);
+							if (o.getType() != EditorObject.LABELGROUP || 
+								!((EditorLabelGroup)o).hasSelected())
+							{
+								UnSelectCommand unselect = new UnSelectCommand(ControlledSurface.this, o);
+								root.getUndoInterface().executeCommand(unselect);
+							}
 						}
 					}
 					
@@ -823,10 +835,13 @@ public class ControlledSurface
 		
 		public void mouseReleased(MouseEvent e)
 		{
-			Command unselect = new UnSelectCommand(ControlledSurface.this, previouslySelected);
-			Command select = new SelectCommand(ControlledSurface.this, selectedObjects);
-			root.getUndoInterface().executeCommand(unselect);
-			root.getUndoInterface().executeCommand(select);
+			if (hasDragged)
+			{
+				Command unselect = new UnSelectCommand(ControlledSurface.this, previouslySelected);
+				Command select = new SelectCommand(ControlledSurface.this, selectedObjects);
+				root.getUndoInterface().executeCommand(unselect);
+				root.getUndoInterface().executeCommand(select);
+			}
 			if (move != null) {
 				if (move.getDisplacement().distance(0,0) != 0) {
 					root.getUndoInterface().addUndoable(new UndoableCommand(move));
@@ -899,7 +914,6 @@ public class ControlledSurface
 	
 			dragSelect = false;
 			hasDragged = false;
-			previouslySelected.clear();
 		}
 		
 		public void mouseDragged(MouseEvent e)
@@ -1974,6 +1988,48 @@ public class ControlledSurface
 		public void mouseMoved(MouseEvent e)
 		{
 			updateHighlighting(e.getPoint());
+		}
+	}
+	
+	private class KeySpy
+		extends KeyAdapter
+	{	
+		public void keyPressed(KeyEvent e)
+		{
+			if ((e.getKeyCode() == KeyEvent.VK_BACK_SPACE) || (e.getKeyCode() == KeyEvent.VK_DELETE))
+			{
+				deleteSelected();
+			}
+			if (e.getKeyCode() == KeyEvent.VK_UP || e.getKeyCode() == KeyEvent.VK_KP_UP)
+			{
+				CompoundCommand upMove = new CompoundCommand("Move Event");
+				for (EditorObject o : selectedObjects)
+				{
+					if (o instanceof EditorLabelGroup)
+					{
+						EditorLabelGroup l = (EditorLabelGroup)o;
+						Command c = l.upCommand();
+						upMove.addCommand(c);
+					}					
+				}
+				upMove.end();
+				root.getUndoInterface().executeCommand(upMove);
+			}
+			if (e.getKeyCode() == KeyEvent.VK_DOWN || e.getKeyCode() == KeyEvent.VK_KP_DOWN)
+			{
+				CompoundCommand downMove = new CompoundCommand("Move Event");
+				for (EditorObject o : selectedObjects)
+				{
+					if (o instanceof EditorLabelGroup)
+					{
+						EditorLabelGroup l = (EditorLabelGroup)o;
+						Command c = l.downCommand();
+						downMove.addCommand(c);
+					}					
+				}
+				downMove.end();
+				root.getUndoInterface().executeCommand(downMove);
+			}
 		}
 	}
     //#######################################################################

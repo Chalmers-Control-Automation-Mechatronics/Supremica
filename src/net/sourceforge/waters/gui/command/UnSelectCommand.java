@@ -33,6 +33,7 @@ public class UnSelectCommand
 		{
 			mSurface.unselect(o);
 		}
+		mSurface.getEditorInterface().setDisplayed();
 	}
 	
 	public void undo()
@@ -41,6 +42,7 @@ public class UnSelectCommand
 		{
 			mSurface.select(o);
 		}
+		mSurface.getEditorInterface().setDisplayed();
 	}
 	
 	public boolean isSignificant()
