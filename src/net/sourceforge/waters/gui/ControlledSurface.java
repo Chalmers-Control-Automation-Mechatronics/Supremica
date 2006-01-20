@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.57 2006-01-20 01:38:34 siw4 Exp $
+//# $Id: ControlledSurface.java,v 1.58 2006-01-20 02:27:23 siw4 Exp $
 //###########################################################################
  
 package net.sourceforge.waters.gui;
@@ -83,9 +83,14 @@ public class ControlledSurface
 	public void deleteSelected()
 	{
 		CompoundCommand compound = new CompoundCommand("Deletion");
-		while (selectedObjects.size() != 0)
+		CompoundCommand deselection = new CompoundCommand("Deselection");
+		for (EditorObject o : selectedObjects)
 		{
-			EditorObject o = (EditorObject) selectedObjects.remove(0);			
+			if (o.getType() != EditorObject.LABELGROUP || !((EditorLabelGroup)o).hasSelected())
+			{
+				Command unselect = new UnSelectCommand(this, o);
+				deselection.addCommand(unselect);
+			}
 			if (o.getType() == EditorObject.NODE)
 			{
 			    Command deleteNode = new DeleteNodeCommand(this, (EditorNode) o);
@@ -124,6 +129,7 @@ public class ControlledSurface
 			}
 		}
 		root.getUndoInterface().addUndoable(new UndoableCommand(compound));
+		root.getUndoInterface().executeCommand(deselection);
 	}
 	
 	public boolean hasSelectedLabel()
