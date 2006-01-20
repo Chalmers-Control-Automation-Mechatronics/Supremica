@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorLabelGroup
 //###########################################################################
-//# $Id: EditorLabelGroup.java,v 1.23 2006-01-20 01:38:34 siw4 Exp $
+//# $Id: EditorLabelGroup.java,v 1.24 2006-01-20 02:34:58 siw4 Exp $
 //###########################################################################
 
 
@@ -105,7 +105,7 @@ public class EditorLabelGroup
 		}
 		if (index < getSubject().getEventList().size() - 1)
 		{
-			index++;
+			index = index + 2 - mSelectedLabels.size();
 		}
 		return new ReorganizeListCommand(getSubject(), mSelectedLabels, index);
 	}
