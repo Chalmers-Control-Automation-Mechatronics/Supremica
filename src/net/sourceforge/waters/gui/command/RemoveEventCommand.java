@@ -23,7 +23,7 @@ public class RemoveEventCommand
 	{
 		mList = group;
 		mIdentifier = identifier;
-		mPosition = mList.getEventList().indexOf(mIdentifier);
+		mPosition = mList.getEventListModifiable().indexOf(mIdentifier);
 	}
 	
 	public void execute()
@@ -36,7 +36,12 @@ public class RemoveEventCommand
      */    
     public void undo()
     {
-		mList.getEventListModifiable().add(mPosition, mIdentifier);
+		int pos = mPosition;
+		if (pos > mList.getEventListModifiable().size())
+		{
+			pos = mList.getEventListModifiable().size();
+		}
+		mList.getEventListModifiable().add(pos, mIdentifier);
     }
 	
 	public boolean isSignificant()

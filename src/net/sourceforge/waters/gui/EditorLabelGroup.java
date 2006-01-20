@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorLabelGroup
 //###########################################################################
-//# $Id: EditorLabelGroup.java,v 1.22 2006-01-20 00:03:27 siw4 Exp $
+//# $Id: EditorLabelGroup.java,v 1.23 2006-01-20 01:38:34 siw4 Exp $
 //###########################################################################
 
 
@@ -18,6 +18,8 @@ import java.awt.geom.Point2D;
 import java.awt.font.*;
 import java.lang.reflect.*;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import javax.swing.*;
@@ -110,13 +112,46 @@ public class EditorLabelGroup
 	
 	public Command deleteSelected()
 	{
-		CompoundCommand command = new CompoundCommand();
-		command.addCommand(new UnSelectLabelCommand(this, mSelectedLabels));
-		for (IdentifierSubject i : mSelectedLabels)
+		CompoundCommand c = deleteLabels(mSelectedLabels);
+		c.addCommand(new UnSelectLabelCommand(this, mSelectedLabels));
+		c.end();
+		return c;
+	}
+	
+	public Command deleteAll()
+	{
+		List<IdentifierSubject> labels = new ArrayList(getSubject().getEventList().size());
+		for (Proxy a : getSubject().getEventList())
 		{
+			labels.add((IdentifierSubject)a);
+		}
+		CompoundCommand c = deleteLabels(labels);
+		c.addCommand(new UnSelectLabelCommand(this, mSelectedLabels));
+		c.end();
+		return c;
+	}
+	
+	private CompoundCommand deleteLabels(List<? extends IdentifierSubject> labels)
+	{
+		//to make certain deletions are made in the correct order
+		Collections.sort(labels, new Comparator<AbstractSubject>()
+		{
+			public int compare(AbstractSubject a1, AbstractSubject a2)
+			{
+				return (getSubject().getEventListModifiable().indexOf(a2) -
+						getSubject().getEventListModifiable().indexOf(a1));
+			}
+			
+			public boolean equals(Object o)
+			{
+				return o == this;
+			}
+		});
+		CompoundCommand command = new CompoundCommand();
+		for (IdentifierSubject i : labels)
+		{			
 			command.addCommand(new RemoveEventCommand(getSubject(), i));
 		}		
-		command.end();
 		return command;
 	}
 

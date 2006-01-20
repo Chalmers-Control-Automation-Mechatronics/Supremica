@@ -37,8 +37,8 @@ public class ReorganizeListCommand
 		{
 			public int compare(AbstractSubject a1, AbstractSubject a2)
 			{
-				return (mList.getEventList().indexOf(a1) -
-						mList.getEventList().indexOf(a2));
+				return (mList.getEventListModifiable().indexOf(a1) -
+						mList.getEventListModifiable().indexOf(a2));
 			}
 			
 			public boolean equals(Object o)

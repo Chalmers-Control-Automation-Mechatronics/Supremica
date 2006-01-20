@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.56 2006-01-20 00:03:27 siw4 Exp $
+//# $Id: ControlledSurface.java,v 1.57 2006-01-20 01:38:34 siw4 Exp $
 //###########################################################################
  
 package net.sourceforge.waters.gui;
@@ -89,29 +89,41 @@ public class ControlledSurface
 			if (o.getType() == EditorObject.NODE)
 			{
 			    Command deleteNode = new DeleteNodeCommand(this, (EditorNode) o);
-			    compound.addCommand(deleteNode);
+				deleteNode.execute();
+				compound.addCommand(deleteNode);
 			}
 			else if (o.getType() == EditorObject.EDGE)
 			{
-			    Command deleteEdge = new DeleteEdgeCommand(this, (EditorEdge) o);
-			    compound.addCommand(deleteEdge);
+				if (edges.contains(o))
+				{
+					Command deleteEdge = new DeleteEdgeCommand(this, (EditorEdge) o);
+					deleteEdge.execute();
+					compound.addCommand(deleteEdge);
+				}
 			}
 			else if (o.getType() == EditorObject.NODEGROUP)
 			{
 			    Command deleteNodeGroup = new DeleteNodeGroupCommand(this, (EditorNodeGroup) o);
+				deleteNodeGroup.execute();
 			    compound.addCommand(deleteNodeGroup);			
 			}
 			if (o.getType() == EditorObject.LABELGROUP)
 			{
 				EditorLabelGroup l = (EditorLabelGroup)o;
+				Command c;
 				if (!l.hasSelected())
 				{
-					l.selectAll();
+					c = l.deleteAll();
 				}
-				compound.addCommand(l.deleteSelected());
+				else 
+				{
+					c = l.deleteSelected();
+				}
+				c.execute();
+				compound.addCommand(c);
 			}
 		}
-		root.getUndoInterface().executeCommand(compound);
+		root.getUndoInterface().addUndoable(new UndoableCommand(compound));
 	}
 	
 	public boolean hasSelectedLabel()
@@ -140,7 +152,8 @@ public class ControlledSurface
 					{
 						if (((EditorLabel)o2).getParent() == o)
 						{
-							unselect(o2);
+							Command c = new UnSelectCommand(this, o2);
+							root.getUndoInterface().executeCommand(c);
 							break;
 						}
 					}
@@ -157,7 +170,8 @@ public class ControlledSurface
 					{
 						if (((EditorLabelGroup)o2).getParent() == o)
 						{
-							unselect(o2);
+							Command c = new UnSelectCommand(this, o2);
+							root.getUndoInterface().executeCommand(c);
 							break;
 						}
 					}
