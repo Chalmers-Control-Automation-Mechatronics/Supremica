@@ -205,6 +205,7 @@ public class ExampleTemplates
 		thisGroup.addItem(new TemplateItem("Transport Unit 4", prefix + "System7_system7.xml"));
 		//thisGroup.addItem(new TemplateItem("AIP System 7 - Top TU 4", prefix + "System7_Top_TU4.xml"));
 		thisGroup.addItem(new TemplateItem("\"Complete\" system (all the above)", prefix + "All.xml"));
+		thisGroup.addItem(new TemplateItem("Largest coherent part", prefix + "LargestCoherentPart.xml"));
     }
 
     private void initializeCentralLockExamples()

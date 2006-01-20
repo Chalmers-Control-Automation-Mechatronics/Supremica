@@ -204,15 +204,21 @@ public class TestAutomataVerifier
 			ex.printStackTrace();
 			assertTrue(false);			
 		}
+	}
 
+	public void testModularNonblockingArbiter()
+	{
 		// Arbiter example, turned out not to work for some sizes (22,
 		// 24, 32, 33) at one point so it is now a testcase...
 		try
 		{
-			Arbiter arbiter = new Arbiter(22, false);
-			Project theProject = arbiter.getProject();
-
-			assertTrue(AutomataVerifier.verifyModularNonblocking(theProject));
+			for (int i=22; i<=22; i++)
+			{
+				Arbiter arbiter = new Arbiter(i, false);
+				Project theProject = arbiter.getProject();
+				
+				assertTrue(AutomataVerifier.verifyModularNonblocking(theProject));
+			}
 		}
 		catch (Exception ex)
 		{

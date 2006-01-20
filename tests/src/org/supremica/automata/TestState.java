@@ -99,16 +99,16 @@ public class TestState
 			Automaton aut = theProject.getAutomaton("P1F1F2");
 			State state = aut.getInitialState();
 
-			assertTrue(state.definedEvents(false).size() == 2);
-			assertTrue(state.definedEvents(true).size() == 2);
+			assertTrue(state.activeEvents(false).size() == 2);
+			assertTrue(state.activeEvents(true).size() == 2);
 
 			LabeledEvent event = new LabeledEvent("apa");
 			aut.getAlphabet().addEvent(event);
 			State from = aut.getStateWithName("ready.2.2");
 			State to = aut.getStateWithName("think.0.1");
 			aut.addArc(new Arc(from, to, event));
-			assertTrue(state.definedEvents(false).size() == 2);
-			assertTrue(state.definedEvents(true).size() == 3);
+			assertTrue(state.activeEvents(false).size() == 2);
+			assertTrue(state.activeEvents(true).size() == 3);
 
 			LabeledEvent tau = aut.getAlphabet().getEvent("tau");
 			assertTrue(state.nextStates(tau, false).size() == 2);

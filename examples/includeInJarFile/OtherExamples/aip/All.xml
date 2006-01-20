@@ -179,7 +179,6 @@
 		<Event id="6" label="PalletRlsd.TU1"/>
 		<Event id="7" label="QPalletAtCL.TU1"/>
 		<Event id="8" label="QPalletAtEL.TU1"/>
-		<Event id="9" label="QStnUp.AS1"/>
 		<Event id="10" label="StnDwn.AS1" controllable="false"/>
 		<Event id="11" label="StnUp.AS1" controllable="false"/>
 		<Event id="12" label="TrnsfCplToCL.TU1"/>
@@ -199,21 +198,17 @@
 		<Transition source="0" dest="2" event="4"/>
 		<Transition source="0" dest="1" event="1"/>
 		<Transition source="0" dest="0" event="8"/>
-		<Transition source="0" dest="0" event="9"/>
 		<Transition source="0" dest="0" event="11"/>
 		<Transition source="0" dest="0" event="10"/>
 		<Transition source="1" dest="2" event="12"/>
-		<Transition source="1" dest="1" event="9"/>
 		<Transition source="1" dest="1" event="11"/>
 		<Transition source="1" dest="1" event="10"/>
 		<Transition source="1" dest="1" event="14"/>
 		<Transition source="2" dest="3" event="0"/>
 		<Transition source="2" dest="2" event="7"/>
-		<Transition source="2" dest="2" event="9"/>
 		<Transition source="2" dest="2" event="11"/>
 		<Transition source="2" dest="2" event="10"/>
 		<Transition source="2" dest="0" event="3"/>
-		<Transition source="3" dest="3" event="9"/>
 		<Transition source="3" dest="5" event="10"/>
 		<Transition source="3" dest="4" event="11"/>
 		<Transition source="4" dest="0" event="6"/>
@@ -221,12 +216,10 @@
 		<Transition source="4" dest="5" event="5"/>
 		<Transition source="4" dest="4" event="2"/>
 		<Transition source="4" dest="4" event="15"/>
-		<Transition source="4" dest="4" event="9"/>
 		<Transition source="4" dest="4" event="11"/>
 		<Transition source="4" dest="4" event="10"/>
 		<Transition source="5" dest="0" event="6"/>
 		<Transition source="5" dest="5" event="2"/>
-		<Transition source="5" dest="5" event="9"/>
 		<Transition source="5" dest="5" event="11"/>
 		<Transition source="5" dest="5" event="10"/>
 	</Transitions>
@@ -242,7 +235,6 @@
 		<Event id="6" label="PalletRlsd.TU2"/>
 		<Event id="7" label="QPalletAtCL.TU2"/>
 		<Event id="8" label="QPalletAtEL.TU2"/>
-		<Event id="9" label="QStnUp.AS2"/>
 		<Event id="10" label="StnDwn.AS2" controllable="false"/>
 		<Event id="11" label="StnUp.AS2" controllable="false"/>
 		<Event id="12" label="TrnsfCplToCL.TU2"/>
@@ -262,33 +254,27 @@
 		<Transition source="0" dest="2" event="4"/>
 		<Transition source="0" dest="1" event="1"/>
 		<Transition source="0" dest="0" event="8"/>
-		<Transition source="0" dest="0" event="9"/>
 		<Transition source="0" dest="0" event="11"/>
 		<Transition source="0" dest="0" event="10"/>
 		<Transition source="1" dest="2" event="12"/>
-		<Transition source="1" dest="1" event="9"/>
 		<Transition source="1" dest="1" event="11"/>
 		<Transition source="1" dest="1" event="10"/>
 		<Transition source="1" dest="1" event="14"/>
 		<Transition source="2" dest="2" event="7"/>
-		<Transition source="2" dest="2" event="9"/>
 		<Transition source="2" dest="2" event="11"/>
 		<Transition source="2" dest="2" event="10"/>
 		<Transition source="2" dest="3" event="0"/>
 		<Transition source="2" dest="0" event="3"/>
 		<Transition source="3" dest="5" event="10"/>
 		<Transition source="3" dest="4" event="11"/>
-		<Transition source="3" dest="3" event="9"/>
 		<Transition source="4" dest="5" event="5"/>
 		<Transition source="4" dest="4" event="2"/>
 		<Transition source="4" dest="4" event="15"/>
-		<Transition source="4" dest="4" event="9"/>
 		<Transition source="4" dest="4" event="11"/>
 		<Transition source="4" dest="4" event="10"/>
 		<Transition source="4" dest="0" event="6"/>
 		<Transition source="4" dest="0" event="13"/>
 		<Transition source="5" dest="5" event="2"/>
-		<Transition source="5" dest="5" event="9"/>
 		<Transition source="5" dest="5" event="11"/>
 		<Transition source="5" dest="5" event="10"/>
 		<Transition source="5" dest="0" event="6"/>

@@ -547,7 +547,6 @@ public class AutomatonMinimizer
                     currState.setName("q" + stateNumber++);
                 }
             }
-            newAutomaton.addState(currState);
         }
 
         // Build all transitions
@@ -597,7 +596,7 @@ public class AutomatonMinimizer
 
 		// Start listening again
 		newAutomaton.endTransaction();
-
+		
         // Return the new automaton!
         return newAutomaton;
     }
@@ -1238,7 +1237,7 @@ public class AutomatonMinimizer
         int countB = 0;
 
         // If two states have the same incoming arcs (from the same state(s) and with the same
-        // event(s)) AND if both states have the same events defined, then they can be merged!
+        // event(s)) AND if both states have the same events active, then they can be merged!
 		Hashtable infoHash = new Hashtable((aut.nbrOfStates()*4)/3+1);
 		StateSet statesToExamine = new StateSet(aut.getStateSet());
 		loop: while (statesToExamine.size() != 0)
@@ -1598,8 +1597,8 @@ public class AutomatonMinimizer
 
             /*
             // All outgoing (at least one!) must be epsilon, i.e. there should be no events in the alphabet
-            // of defined events if we don't consider the epsilon closure...
-            if ((state.outgoingArcsIterator().hasNext()) && (state.definedEvents(false).size() == 0))
+            // of active events if we don't consider the epsilon closure...
+            if ((state.outgoingArcsIterator().hasNext()) && (state.activeEvents(false).size() == 0))
             {
                 for (Iterator<Arc> outIt = state.outgoingArcsIterator(); outIt.hasNext(); )
                 {
@@ -1630,6 +1629,10 @@ public class AutomatonMinimizer
     public static String getStatisticsLaTeX()
     {
 		return(totalB + " & " + totalA + " & " + totalAA + " & " + totalF + " & " + totalC + " & " + totalOE + " & " + totalArcs);
+    }
+    public static String getWodesStatisticsLaTeX()
+    {
+		return(totalB + " & " + totalA + " & " + totalC + " & " + (totalAA + totalF) + " & " + totalOE + " & " + totalArcs);
     }
     public static void resetTotal()
     {
@@ -2157,7 +2160,7 @@ class StateInfoIncoming
 class StateInfoB
 	extends StateInfoIncoming
 {
-    private Alphabet definedEvents;
+    private Alphabet activeEvents;
     private boolean isMarked;
 
 	// Store hash number to avoid unnecessary calculation
@@ -2166,14 +2169,14 @@ class StateInfoB
     public StateInfoB(State state)
     {
 		super(state);
-        definedEvents = state.definedEvents(true);
+        activeEvents = state.activeEvents(true);
         isMarked = state.isAccepting();
     }
 
     public boolean equivalentTo(StateInfoB other)
     {
 		boolean result = super.equivalentTo(other);
-        result &= definedEvents.equals(other.definedEvents);
+        result &= activeEvents.equals(other.activeEvents);
         result &= isMarked == other.isMarked;
 
         return result;
@@ -2185,7 +2188,7 @@ class StateInfoB
         if (hash == 0)
         {
 			hash = super.hashCode();
-			hash = hash * 37 + definedEvents.hashCode();
+			hash = hash * 37 + activeEvents.hashCode();
 			hash = hash * 31 + (isMarked ? 1231 : 1237);
 		}
 
@@ -2195,7 +2198,7 @@ class StateInfoB
     public String toString()
     {
         String result = super.toString();
-        result += "\n\tDefined: " + definedEvents;
+        result += "\n\tActive: " + activeEvents;
         result += "\n\tMarked : " + isMarked;
         return result;
     }

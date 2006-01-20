@@ -434,7 +434,7 @@ public class Milp
 				Automaton currRobot = robots.getAutomatonAt(j);
 
 // 				Alphabet commonAlphabet = AlphabetHelpers.intersect(currRobot.getAlphabet(), currZone.getAlphabet());
-				Alphabet bookingAlphabet = AlphabetHelpers.intersect(currRobot.getAlphabet(), currZone.getInitialState().definedEvents(false));
+				Alphabet bookingAlphabet = AlphabetHelpers.intersect(currRobot.getAlphabet(), currZone.getInitialState().activeEvents(false));
 
 				if (bookingAlphabet.size() > 0)
 				{
@@ -448,7 +448,7 @@ public class Milp
 					{
 						State currState = stateIter.next();
 						
-						Alphabet currStatesBookingAlphabet = AlphabetHelpers.intersect(currState.definedEvents(false), bookingAlphabet);
+						Alphabet currStatesBookingAlphabet = AlphabetHelpers.intersect(currState.activeEvents(false), bookingAlphabet);
 						for (Iterator<LabeledEvent> currBookingEventsIter = currStatesBookingAlphabet.iterator(); currBookingEventsIter.hasNext(); )
 						{
 // 							bookingStates.add(new int[]{indexMap.getStateIndex(currRobot, currState), indexMap.getEventIndex(currBookingEventsIter.next())});

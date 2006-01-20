@@ -2362,6 +2362,50 @@ public class Automaton
 		return done_something;
 	}
 
+	/**
+	 * Returns the alphabet of obviously "inadequate" events (there
+	 * may (but rarely are) be more). With "adequate" as defined in
+	 * "On the set of certain conflicts of a given language" by Robi
+	 * Malik.
+	 *  An inadequate event is, for example, one that is
+	 * self-looped in all states of an automaton. Controllable
+	 * inadequate events can always be removed from the alphabet,
+	 * uncontrollable self-looped events can safely be removed from
+	 * specification/supervisors and from plants IF the event is
+	 * present in some other plant of the system.
+	 */
+	public Alphabet getInadequateEvents()
+	{
+		Alphabet inadequate = new Alphabet();
+
+		// For all events...
+		eventLoop: for (Iterator<LabeledEvent> evIt = eventIterator(); evIt.hasNext(); )
+		{
+			LabeledEvent event = evIt.next();
+			if (isPlant() && !event.isControllable())
+			{
+				continue eventLoop;
+			}
+			// ... and all states ...
+			stateLoop: for (Iterator<State> stIt = stateIterator(); stIt.hasNext(); )
+			{
+				State state = stIt.next();
+				// ... there must be a self-loop ...
+				for (Iterator<Arc> arcIt = state.outgoingArcsIterator(); arcIt.hasNext(); )
+				{
+					Arc arc = arcIt.next();
+					if (arc.isSelfLoop() && arc.getEvent().equals(event))
+					{
+						continue stateLoop;
+					}
+				}
+				// ... or the event is NOT inadequate!
+				continue eventLoop;
+			}
+			inadequate.addEvent(event);
+		}
+		return inadequate;
+	}
 
 	public static void main(String[] args)
 	{

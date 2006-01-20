@@ -202,7 +202,7 @@ public class AutomataMinimizer
 			// Perform the minimization, unless of course this is the last step
 			// and it should be skipped...
 			Automaton min;
- 			if (options.getSkipLast() && (theAutomata.size() <= selection.size()+1))
+ 			if (options.getSkipLast() && (theAutomata.size() == selection.size()))
 			{
 				// Just synch and hide
 				min = AutomataSynchronizer.synchronizeAutomata(selection);
@@ -265,7 +265,7 @@ public class AutomataMinimizer
 											 " (" + globalAlphabetSize + ")");
 			}
 		}
-
+ 
 		// Print statistics
 		if (SupremicaProperties.verboseMode())
 		{

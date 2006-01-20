@@ -130,22 +130,18 @@ public class ActionTimer
 
 	public String toString()
 	{
+		// Calculate time
 		long time = elapsedTime();    // time is in millisecs
 		int hrs = (int) (time / (60 * 60 * 1000.0));
-
 		time = time - hrs * (60 * 60 * 1000);
-
 		int mins = (int) (time / (60 * 1000.0));
-
 		time = time - mins * (60 * 1000);
-
 		int secs = (int) (time / (1000.0));
-
 		time = time - secs * 1000;
-
 		int millis = (int) time;
-		StringBuffer sbuf = new StringBuffer();
 
+		// Produce message
+		StringBuffer sbuf = new StringBuffer();
 		if (hrs != 0)
 		{
 			//sbuf.append(hrs + hours + mins + minutes + secs + seconds + millis + milliseconds);

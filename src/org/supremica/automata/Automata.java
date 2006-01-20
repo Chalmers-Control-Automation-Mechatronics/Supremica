@@ -1401,6 +1401,22 @@ public class Automata
 			return true;
 		}
 
+		// Examine if there are inadequate events...
+		for (Iterator<Automaton> autIt = iterator(); autIt.hasNext(); )
+		{
+			Automaton aut = autIt.next();
+			Alphabet inadequate = aut.getInadequateEvents();
+			if (inadequate.size() > 0)
+			{
+				if (inadequate.size() == 1)
+					logger.warn("In " + aut + ", the event " + inadequate + 
+								" is selflooped in all states.");
+				else
+					logger.warn("In " + aut + ", the events " + inadequate + 
+								" are selflooped in all states.");
+			}
+		}
+
 		// Get the union alphabet (ignoring consistency here)
 		Alphabet unionAlphabet = null;
 		try
@@ -1449,8 +1465,7 @@ public class Automata
 			// All automata must have initial states.
 			// There is another method for this, Automata.hasInitialState(),
 			// but it doesn't tell which automaton breaks the test...
-			Iterator autIt = iterator();
-
+			Iterator<Automaton> autIt = iterator();
 			while (autIt.hasNext())
 			{
 				Automaton currAutomaton = (Automaton) autIt.next();

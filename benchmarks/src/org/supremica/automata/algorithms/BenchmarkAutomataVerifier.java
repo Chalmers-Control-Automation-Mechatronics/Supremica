@@ -116,8 +116,8 @@ public class BenchmarkAutomataVerifier
 
 		System.out.println("");
 		System.out.println("BENCHMARKING MODULAR NONBLOCKING VERIFICATION ALGORITHMS");
-		System.out.println("Strategy: " + mOptions.getMinimizationStrategy());
-		System.out.println("Heuristic: " + mOptions.getMinimizationHeuristic());
+		System.out.println("Primary 1:st stage heuristic: " + mOptions.getMinimizationStrategy());
+		System.out.println("Primary 2:nd stage heuristic: " + mOptions.getMinimizationHeuristic());
 
 		ProjectBuildFromXml builder = new ProjectBuildFromXml();
 		Project theProject;
@@ -128,6 +128,16 @@ public class BenchmarkAutomataVerifier
 
 		if (false)
 		{
+			// Dining philosophers
+			DiningPhilosophers philo = new DiningPhilosophers(256, true, true, false, false, false, false);
+			theProject = philo.getProject();
+			benchmarkNonblocking("256philo", theProject, vOptions, sOptions, mOptions);
+			philo = new DiningPhilosophers(512, true, true, false, false, false, false);
+			theProject = philo.getProject();
+			benchmarkNonblocking("512philo", theProject, vOptions, sOptions, mOptions);
+			philo = new DiningPhilosophers(1024, true, true, false, false, false, false);
+			theProject = philo.getProject();
+			benchmarkNonblocking("1024philo", theProject, vOptions, sOptions, mOptions);
 			// Arbiter
 			Arbiter arbiter = new Arbiter(128, false);
 			theProject = arbiter.getProject();
@@ -148,16 +158,6 @@ public class BenchmarkAutomataVerifier
 			line = new TransferLine(512, 3, 1, false);
 			theProject = line.getProject();
 			benchmarkNonblocking("512transfer", theProject, vOptions, sOptions, mOptions);		
-			// Dining philosophers
-			DiningPhilosophers philo = new DiningPhilosophers(256, true, true, false, false, false, false);
-			theProject = philo.getProject();
-			benchmarkNonblocking("256philo", theProject, vOptions, sOptions, mOptions);
-			philo = new DiningPhilosophers(512, true, true, false, false, false, false);
-			theProject = philo.getProject();
-			benchmarkNonblocking("512philo", theProject, vOptions, sOptions, mOptions);
-			philo = new DiningPhilosophers(1024, true, true, false, false, false, false);
-			theProject = philo.getProject();
-			benchmarkNonblocking("1024philo", theProject, vOptions, sOptions, mOptions);
 		}
 
 		///////////////////////////////////
@@ -179,7 +179,8 @@ public class BenchmarkAutomataVerifier
 			"tbed_valid", "tbed_ctct", 
 			"fzelle",
 			"ftechnik", "ftechnik_nocoll",
-			"AIP_minus_AS3_TU4"
+			"AIP_minus_AS3_TU4",
+			"profisafe_i4"
 		};		
 	   
 		// Run tests
@@ -219,10 +220,17 @@ public class BenchmarkAutomataVerifier
 			System.out.println("CURRENT BENCHMARK: " + name);
 			AutomataVerifier verifier = new AutomataVerifier(theProject, vOptions, sOptions, mOptions);
 			ActionTimer timer = new ActionTimer();
+			//System.out.println("Verifying...");
+			// Run the benchmark!
 			timer.start();
 			boolean nonblocking = verifier.verify();
 			timer.stop();
 			System.out.println("TIME: " + timer + ", BLOCKING: " + !nonblocking);
+			// Garbage collect now!
+			System.runFinalization();
+			System.gc();
+			//System.out.println("Running garbage collector...");
+			Thread.sleep(10000);
 		}
 		catch (Throwable ex)
 		{
