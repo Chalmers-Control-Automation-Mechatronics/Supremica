@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorLabelGroup
 //###########################################################################
-//# $Id: EditorLabelGroup.java,v 1.21 2006-01-18 22:08:54 siw4 Exp $
+//# $Id: EditorLabelGroup.java,v 1.22 2006-01-20 00:03:27 siw4 Exp $
 //###########################################################################
 
 
@@ -28,6 +28,7 @@ import javax.swing.border.*;
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.RemoveEventCommand;
 import net.sourceforge.waters.gui.command.ReorganizeListCommand;
+import net.sourceforge.waters.gui.command.UnSelectLabelCommand;
 import net.sourceforge.waters.gui.command.CompoundCommand;
 import net.sourceforge.waters.gui.command.UndoInterface;
 
@@ -110,11 +111,11 @@ public class EditorLabelGroup
 	public Command deleteSelected()
 	{
 		CompoundCommand command = new CompoundCommand();
+		command.addCommand(new UnSelectLabelCommand(this, mSelectedLabels));
 		for (IdentifierSubject i : mSelectedLabels)
 		{
 			command.addCommand(new RemoveEventCommand(getSubject(), i));
-		}
-		unSelectAll();
+		}		
 		command.end();
 		return command;
 	}
@@ -138,40 +139,12 @@ public class EditorLabelGroup
 		}
 	}
 
-	public void selectLabel(int ex, int ey)
-	{
-		int index = getLabelIndexAt(ex, ey);
-		selectLabel(index);
-	}
-	
-	public void selectLabel(int index)
-	{
-		if (index >= 0 && index < mSubject.getEventList().size())
-		{
-			selectLabel((IdentifierSubject)mSubject.getEventList().get(index));
-		}		
-	}
-	
 	public void selectLabel(IdentifierSubject subject)
 	{
 		if (subject != null && !mSelectedLabels.contains(subject))
 		{
 			mSelectedLabels.add(subject);
 		}
-	}
-	
-	public void toggleLabel(int ex, int ey)
-	{
-		int index = getLabelIndexAt(ex, ey);
-		toggleLabel(index);
-	}
-	
-	public void toggleLabel(int index)
-	{
-		if (index >= 0 && index < mSubject.getEventList().size())
-		{
-			toggleLabel((IdentifierSubject)mSubject.getEventList().get(index));
-		}		
 	}
 	
 	public void toggleLabel(IdentifierSubject subject)
@@ -185,21 +158,7 @@ public class EditorLabelGroup
 			selectLabel(subject);
 		}
 	}
-	
-	public void unSelectLabel(int ex, int ey)
-	{
-		int index = getLabelIndexAt(ex, ey);
-		unSelectLabel(index);
-	}
-	
-	public void unSelectLabel(int index)
-	{
-		if (index >= 0 && index < mSubject.getEventList().size())
-		{
-			unSelectLabel((IdentifierSubject)mSubject.getEventList().get(index));
-		}		
-	}
-	
+
 	public void unSelectLabel(IdentifierSubject subject)
 	{
 		if (subject != null)
@@ -222,7 +181,12 @@ public class EditorLabelGroup
 		}
 	}
 
-    public int getLabelIndexAt(int ex, int ey)
+	public List<IdentifierSubject> getSelected()
+	{
+		return new ArrayList(mSelectedLabels);
+	}	
+	
+    public IdentifierSubject getLabelAt(int ex, int ey)
     {
 		ex -= panel.getX();
 		ey -= panel.getY();
@@ -232,10 +196,10 @@ public class EditorLabelGroup
 			
 			if (l.getBounds().contains(ex, ey))
 			{
-				return i;	 
+				return (IdentifierSubject)getSubject().getEventList().get(i);
 			}
 		}		
-		return -1;
+		return null;
     }
 
 	public void setPanelLocation(boolean selected)
@@ -472,6 +436,7 @@ public class EditorLabelGroup
 
 	public EditorLabelGroup(LabelBlockSubject label, final EditorSurface surface)
 	{
+		
 		mUndo = surface.getEditorInterface().getUndoInterface();
 		// This is a labelgroup
 		type = LABELGROUP;

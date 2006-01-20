@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.55 2006-01-18 22:08:54 siw4 Exp $
+//# $Id: ControlledSurface.java,v 1.56 2006-01-20 00:03:27 siw4 Exp $
 //###########################################################################
  
 package net.sourceforge.waters.gui;
@@ -113,6 +113,18 @@ public class ControlledSurface
 		}
 		root.getUndoInterface().executeCommand(compound);
 	}
+	
+	public boolean hasSelectedLabel()
+	{
+		for (EditorObject o : selectedObjects)
+		{
+			if (o instanceof EditorLabelGroup && ((EditorLabelGroup)o).hasSelected())
+			{
+				return true;
+			}
+		}
+		return false;
+	}
 
 	public void select(EditorObject o)
 	{
@@ -143,7 +155,7 @@ public class ControlledSurface
 					EditorObject o2 = i.next();
 					if (o2 instanceof EditorLabelGroup)
 					{
-						if (((EditorLabel)o2).getParent() == o)
+						if (((EditorLabelGroup)o2).getParent() == o)
 						{
 							unselect(o2);
 							break;
@@ -181,7 +193,9 @@ public class ControlledSurface
 		{
 			if (o instanceof EditorLabelGroup)
 			{
-				((EditorLabelGroup)o).unSelectAll();
+				EditorLabelGroup l = (EditorLabelGroup)o;
+				Command c = new UnSelectLabelCommand(l, l.getSelected());
+				root.getUndoInterface().executeCommand(c);
 			}
 			selectedObjects.remove(o);
 		}
@@ -360,16 +374,6 @@ public class ControlledSurface
 			repaint(false);
 		}
     }
-
-	public void mouseEntered(MouseEvent e)
-	{
-		;
-	}
-
-	public void mouseExited(MouseEvent e)
-	{
-		;
-	}
 
 	public void createOptions(EditorWindowInterface root)
 	{
@@ -577,8 +581,8 @@ public class ControlledSurface
 		private void addToLabelGroup(EditorLabelGroup l, IdentifierSubject i, final DropTargetDropEvent e)
 		{
 			final IdentifierSubject cloned = i.clone();
-			int pos = l.getLabelIndexAt((int)e.getLocation().getX(),
-										(int)e.getLocation().getY());
+			int pos = 0; /*l.getLabelIndexAt((int)e.getLocation().getX(),
+										(int)e.getLocation().getY());*/
 			if (pos == -1)
 			{
 				pos = 0;
@@ -659,17 +663,21 @@ public class ControlledSurface
 					if (isSelected(o) && o != null &&
 						previouslySelected.contains(o) &&
 						o.getType() == EditorObject.LABELGROUP)
-					{
+					{						
 						EditorLabelGroup l = (EditorLabelGroup) o;
+						Command c;
 						if (e.isControlDown())
 						{
-							l.toggleLabel(e.getX(), e.getY());
+							c = new ToggleLabelCommand(l, l.getLabelAt(e.getX(), e.getY()));
 						}
 						else
 						{
-							l.unSelectAll();
-							l.selectLabel(e.getX(), e.getY());
+							c = new CompoundCommand();
+							((CompoundCommand)c).addCommand(new UnSelectLabelCommand(l, l.getSelected()));
+							((CompoundCommand)c).addCommand(new SelectLabelCommand(l, l.getLabelAt(e.getX(), e.getY())));
+							((CompoundCommand)c).end();
 						}
+						root.getUndoInterface().executeCommand(c);
 					}
 				}				
 				// Doubleclick?
@@ -702,8 +710,11 @@ public class ControlledSurface
 						else if (o.getType() == EditorObject.LABELGROUP)
 						{
 							EditorLabelGroup l = (EditorLabelGroup) o;
-							
-							l.selectLabel(e.getX(), e.getY());
+							CompoundCommand c = new CompoundCommand();
+							c.addCommand(new UnSelectLabelCommand(l, l.getSelected()));
+							c.addCommand(new SelectLabelCommand(l, l.getLabelAt(e.getX(), e.getY())));
+							c.end();
+							root.getUndoInterface().executeCommand(c);
 						}
 						else if (o.getType() == EditorObject.NODE)
 						{
@@ -771,7 +782,7 @@ public class ControlledSurface
 						if (e.isControlDown())
 						{
 							if (o.getType() != EditorObject.LABELGROUP || 
-								!((EditorLabelGroup)o).hasSelected())
+								!hasSelectedLabel())
 							{
 								UnSelectCommand unselect = new UnSelectCommand(ControlledSurface.this, o);
 								root.getUndoInterface().executeCommand(unselect);
