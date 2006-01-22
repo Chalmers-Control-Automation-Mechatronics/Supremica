@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   NamedSubject
 //###########################################################################
-//# $Id: NamedSubject.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: NamedSubject.java,v 1.3 2006-01-22 21:26:33 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;
@@ -91,15 +91,17 @@ public abstract class NamedSubject
   public void setName(final String name)
     throws DuplicateNameException, ItemNotFoundException
   {
-    final Subject parent = getParent();
-    if (parent instanceof IndexedCollection) {
-      final IndexedCollection collection = (IndexedCollection) parent;
-      collection.reinsert(this, name);
+    if (!mName.equals(name)) {
+      final Subject parent = getParent();
+      if (parent instanceof IndexedCollection) {
+        final IndexedCollection collection = (IndexedCollection) parent;
+        collection.reinsert(this, name);
+      }
+      final ModelChangeEvent event =
+        ModelChangeEvent.createNameChanged(this, mName);
+      mName = name;
+      fireModelChanged(event);
     }
-    final ModelChangeEvent event =
-      ModelChangeEvent.createNameChanged(this, mName);
-    mName = name;
-    fireModelChanged(event);
   }
 
 
