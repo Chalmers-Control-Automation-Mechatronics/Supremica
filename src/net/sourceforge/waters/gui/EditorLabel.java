@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorLabel
 //###########################################################################
-//# $Id: EditorLabel.java,v 1.25 2006-01-23 03:30:08 robi Exp $
+//# $Id: EditorLabel.java,v 1.26 2006-01-23 23:32:34 siw4 Exp $
 //###########################################################################
 
 
@@ -241,6 +241,7 @@ public class EditorLabel
 			mGeometry = par.getSubject().getLabelGeometry();
 		}
 		label.setOpaque(false);
+		//label.setBorder(new EmptyBorder(label.getBorder().getBorderInsets(label)));
 		e.add(label);
 		/*
 		labelShadow = new JLabel(text.getText());

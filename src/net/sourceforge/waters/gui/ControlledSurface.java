@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.60 2006-01-23 02:44:09 siw4 Exp $
+//# $Id: ControlledSurface.java,v 1.61 2006-01-23 23:32:34 siw4 Exp $
 //###########################################################################
  
 package net.sourceforge.waters.gui;
@@ -211,16 +211,7 @@ public class ControlledSurface
 
 	public void unselect(EditorObject o)
 	{
-		if (selectedObjects.contains(o))
-		{
-			if (o instanceof EditorLabelGroup)
-			{
-				EditorLabelGroup l = (EditorLabelGroup)o;
-				Command c = new UnSelectLabelCommand(l, l.getSelected());
-				root.getUndoInterface().executeCommand(c);
-			}
-			selectedObjects.remove(o);
-		}
+		selectedObjects.remove(o);
 	}
 
 	public void unselectAll()
@@ -2096,10 +2087,17 @@ public class ControlledSurface
 			setText(label.getParent().getName());
 			setLocation(label.getX(), label.getY());
 			setSize(getPreferredSize());
-			setOpaque(false);
 			setBorder(new EmptyBorder(getBorder().getBorderInsets(this)));
+			setOpaque(false);
 			addFocusListener(new NameEditSpy());
 			addActionListener(new NameEditSpy());
+			addKeyListener(new KeyAdapter()
+			{
+				public void keyPressed(KeyEvent e)
+				{
+					setSize(getPreferredSize());					
+				}
+			});
 			getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "enter");
 			getActionMap().put("enter", new AbstractAction()
 			{

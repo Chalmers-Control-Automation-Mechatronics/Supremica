@@ -100,7 +100,6 @@ public class MoveObjects
 				o.setPosition(o.getX() + mDisplacement.getX(), o.getY() + mDisplacement.getY());
 			}
 		}
-		mSurface.getEditorInterface().setDisplayed();
     }
 
     /** 
