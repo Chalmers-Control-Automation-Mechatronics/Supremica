@@ -4,11 +4,16 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EventTableModel
 //###########################################################################
-//# $Id: EventTableModel.java,v 1.13 2006-01-17 02:00:07 siw4 Exp $
+//# $Id: EventTableModel.java,v 1.14 2006-01-23 02:06:23 siw4 Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.gui;
+
+import net.sourceforge.waters.gui.command.Command;
+import net.sourceforge.waters.gui.command.CompoundCommand;
+import net.sourceforge.waters.gui.command.AddEventCommand;
+import net.sourceforge.waters.gui.command.RemoveEventCommand;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -62,7 +67,7 @@ class EventTableModel
 	//# Constructors
 	EventTableModel(final GraphSubject graph,
 					final ModuleSubject module,
-					final JTable table)
+					final EditorEvents table)
 	{
 		((GraphSubject)graph).addModelObserver(this);
 		addTableModelListener(new TableHandler());
@@ -81,11 +86,9 @@ class EventTableModel
 			ListSubject list = (ListSubject)e.getSource();
 			for (Object o: list)
 			{
-				System.out.println(o);
 				boolean alreadyListed = false;
 				for (int i = 0; i < getRowCount(); i++)
 				{
-					System.out.println(i);
 					if (getEvent(i).equals(o))
 					{
 						alreadyListed = true;
@@ -94,7 +97,7 @@ class EventTableModel
 				}
 				if (!alreadyListed)
 				{
-					setValueAt(o, createEvent(), 1);
+					addIdentifier((IdentifierSubject)o);
 				}
 			}
 		}
@@ -160,33 +163,39 @@ class EventTableModel
 		return column == 1;
 	}
 
-	public void setIdentifierAt(final IdentifierSubject value,
-								final int row,
-								final int column)
+	public void addIdentifier(final IdentifierSubject value)							  
 	{
-		switch (column)
+		final IdentifierSubject ident = value.clone();
+		if (ident != null)
 		{
-
-		case 0 :
-			return;
-
-		case 1 :
-			final IdentifierSubject ident = value.clone();
-			final IdentifierSubject old = getEvent(row);
-			if (ident == null)
+			int row;
+			if (mEvents.get(mEvents.size()-1).getName() == null)
 			{
+				row = mEvents.size()-1;
+			}
+			else
+			{
+				row = createEvent();
+			}
+			final EventEntry entry = new EventEntry(ident);
+			mEvents.set(row, entry);
+			fireTableRowsUpdated(row, row);
+		}
+		return;
+	}
+	
+	public void removeIdentifier(final IdentifierSubject value)
+	{
+		//note this could be made into a binary search
+		for (EventEntry e : mEvents)
+		{
+			if (e.getName().equals(value))
+			{
+				int row = mEvents.indexOf(e);
 				mEvents.remove(row);
 				fireTableRowsDeleted(row, row);
-			} else if (old == null || !old.equals(ident)) {
-				final EventEntry entry = new EventEntry(ident);
-				mEvents.set(row, entry);
-				fireTableRowsUpdated(row, row);
+				break;
 			}
-			return;
-
-		default :
-			throw new ArrayIndexOutOfBoundsException
-				("Bad column number for event table model!");
 		}
 	}
 
@@ -204,36 +213,22 @@ class EventTableModel
 			final IdentifierSubject ident = ((IdentifierSubject) value).clone();
 			final IdentifierSubject old = getEvent(row);
 			if (ident == null) {
-				mEvents.remove(row);
-				fireTableRowsDeleted(row, row);
+				Command c = new RemoveFromTableCommand(this, old);
+				mTable.getEditorInterface().getUndoInterface().executeCommand(c);
 			} else if (old == null || !old.equals(ident)) {
 				if (old != null)
 				{
-					ListIterator<AbstractSubject> li = mGraph.getBlockedEvents().getEventListModifiable().listIterator();
-					while(li.hasNext())
-					{
-						AbstractSubject a = li.next();
-						if (a.equals(old))
-						{
-							li.set(ident.clone());
-						}
-					}
-					for (EdgeSubject e : mGraph.getEdgesModifiable())
-					{
-						li = e.getLabelBlock().getEventListModifiable().listIterator();
-						while(li.hasNext())
-						{
-							AbstractSubject a = li.next();
-							if (a.equals(old))
-							{
-								li.set(ident.clone());
-							}
-						}
-					}
+					Command c = new ChangeEventNameCommand(mGraph,
+														   this,
+														   old,
+														   ident);
+					mTable.getEditorInterface().getUndoInterface().executeCommand(c);
 				}
-				final EventEntry entry = new EventEntry(ident);
-				mEvents.set(row, entry);
-				fireTableRowsUpdated(row, row);
+				else
+				{
+					Command c = new AddToTableCommand(this, ident);
+					mTable.getEditorInterface().getUndoInterface().executeCommand(c);
+				}
 			}
 			return;
 
@@ -483,14 +478,192 @@ class EventTableModel
 			}
 		}
 	}
+	
+	private class ChangeEventNameCommand
+		implements Command
+	{
+		public ChangeEventNameCommand(final GraphSubject graph,
+									  final EventTableModel model,
+									  final IdentifierSubject old,
+									  final IdentifierSubject neo)
+		{
+			mGraph = graph;
+			mOld = old;
+			mNew = neo;
+			mModel = model;
+			mCommands = new CompoundCommand();
+			boolean alreadyhas = false;
+			for (int i = 0; i < mModel.getRowCount(); i++)
+			{
+				if (mModel.getEvent(i).equals(mNew))
+				{
+					alreadyhas = true;
+					break;
+				}
+			}
+			if (!alreadyhas)
+			{
+				System.out.println("Doesn't have already");
+				mCommands.addCommand(new AddToTableCommand(mModel, mNew));
+			}
+			if (old != null)
+			{			
+				mCommands.addCommand(new RemoveFromTableCommand(mModel,	mOld));
+				addCommandsFromList(mGraph.getBlockedEvents());
+				for (EdgeSubject e : mGraph.getEdgesModifiable())
+				{
+					addCommandsFromList(e.getLabelBlock());
+				}
+			}
+			mCommands.end();
+		}
+		
+		private void addCommandsFromList(EventListExpressionSubject list)
+		{
+			ListIterator<AbstractSubject> li = list.getEventListModifiable().listIterator();
+			boolean removal = false;
+			boolean add = true;
+			int index = 0;
+			while(li.hasNext())
+			{
+				AbstractSubject a = li.next();
+				if (a.equals(mNew))
+				{
+					add = false;
+				}
+				if (a.equals(mOld))
+				{
+					mCommands.addCommand(new RemoveEventCommand(list, a));
+					removal = true;
+					index = li.nextIndex() - 1;
+				}
+			}
+			if (add && removal)
+			{
+				mCommands.addCommand(new AddEventCommand(list, mNew, index));
+			}
+		}
+		
+		/**
+		 * Executes the Creation of the Node
+		 */
+	
+		public void execute()
+		{
+			mCommands.execute();
+		}
+	
+		/** 
+		 * Undoes the Command
+		 */    
+	
+		public void undo()
+		{
+			mCommands.undo();
+		}
+	
+		public boolean isSignificant()
+		{
+			return true;
+		}
+		
+		public String getName()
+		{
+			return mDescription;
+		}
+		
+		private final GraphSubject mGraph;
+		private final IdentifierSubject mOld;
+		private final IdentifierSubject mNew;
+		private final EventTableModel mModel;
+		private final CompoundCommand mCommands;
+		private final static String mDescription = "Change Event Name";
+	}
 
-
+	private class AddToTableCommand
+		implements Command
+	{
+		private final EventTableModel mModel;
+		private final IdentifierSubject mIdentifier;
+		private final String mDescription = "Add Event";
+		
+		public AddToTableCommand(EventTableModel model,
+								 IdentifierSubject identifier)
+		{
+			mModel = model;
+			mIdentifier = identifier;
+		}
+		
+		public void execute()
+		{
+			mModel.addIdentifier(mIdentifier);
+		}
+		
+		/** 
+		 * Undoes the Command
+		 *
+		 */    
+		public void undo()
+		{
+			System.out.println("Undo addition" + mModel.getRowCount());
+			mModel.removeIdentifier(mIdentifier);
+			System.out.println("Undo addition" + mModel.getRowCount());
+		}
+		
+		public boolean isSignificant()
+		{
+			return true;
+		}
+	
+		public String getName()
+		{
+			return mDescription;
+		}
+	}
+	
+	private class RemoveFromTableCommand
+		implements Command
+	{
+		private final EventTableModel mModel;
+		private final IdentifierSubject mIdentifier;
+		private final String mDescription = "Add Event";
+		
+		public RemoveFromTableCommand(EventTableModel model,
+									  IdentifierSubject identifier)
+		{
+			mModel = model;
+			mIdentifier = identifier;
+		}
+		
+		public void execute()
+		{
+			mModel.removeIdentifier(mIdentifier);
+		}
+		
+		/** 
+		 * Undoes the Command
+		 *
+		 */    
+		public void undo()
+		{
+			mModel.addIdentifier(mIdentifier);
+		}
+		
+		public boolean isSignificant()
+		{
+			return true;
+		}
+	
+		public String getName()
+		{
+			return mDescription;
+		}
+	}
 
 	//#####################################################################
 	//# Data Members
 	private final GraphSubject mGraph;
 	private final ModuleSubject mModule;
 	private final List<EventEntry> mEvents;
-	private final JTable mTable;
-
+	private final EditorEvents mTable;
 }

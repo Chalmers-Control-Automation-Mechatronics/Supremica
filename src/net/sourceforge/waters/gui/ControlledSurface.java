@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.58 2006-01-20 02:27:23 siw4 Exp $
+//# $Id: ControlledSurface.java,v 1.59 2006-01-23 02:06:23 siw4 Exp $
 //###########################################################################
  
 package net.sourceforge.waters.gui;
@@ -24,7 +24,9 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 
+import net.sourceforge.waters.model.base.DuplicateNameException;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.ToolbarChangedEvent;
@@ -576,9 +578,8 @@ public class ControlledSurface
 		private void addToNode(EditorNode n, IdentifierSubject i)
 		{
 			final IdentifierSubject cloned = i.clone();
-			Command addEvent = new AddEventCommand(ControlledSurface.this, n,
-												  n.getSubject().getPropositions(),
-												  cloned, 0);
+			Command addEvent = new AddEventCommand(n.getSubject().getPropositions(),
+												   cloned, 0);
 			root.getUndoInterface().executeCommand(addEvent);
 			repaint();
 		}
@@ -607,8 +608,7 @@ public class ControlledSurface
 			{
 				pos = 0;
 			}
-			Command addEvent = new AddEventCommand(ControlledSurface.this, l,
-												  l.getSubject(),
+			Command addEvent = new AddEventCommand(l.getSubject(),
 												  cloned, pos);
 			root.getUndoInterface().executeCommand(addEvent);
 			repaint();
@@ -724,8 +724,11 @@ public class ControlledSurface
 						if (o.getType() == EditorObject.LABEL)
 						{
 							EditorLabel l = (EditorLabel) o;
-							
 							l.setEditing(true);
+							JTextField text = new NameEditField(l);
+							ControlledSurface.this.add(text);
+							text.setVisible(true);
+							text.requestFocus();
 						}
 						else if (o.getType() == EditorObject.LABELGROUP)
 						{
@@ -2033,33 +2036,159 @@ public class ControlledSurface
 			}
 			if (e.getKeyCode() == KeyEvent.VK_UP || e.getKeyCode() == KeyEvent.VK_KP_UP)
 			{
+				boolean hasMoved = false;
 				CompoundCommand upMove = new CompoundCommand("Move Event");
 				for (EditorObject o : selectedObjects)
 				{
 					if (o instanceof EditorLabelGroup)
 					{
 						EditorLabelGroup l = (EditorLabelGroup)o;
-						Command c = l.upCommand();
-						upMove.addCommand(c);
+						if (l.hasSelected())
+						{
+							hasMoved = true;
+							Command c = l.upCommand();
+							upMove.addCommand(c);
+						}
 					}					
 				}
 				upMove.end();
-				root.getUndoInterface().executeCommand(upMove);
+				if (hasMoved)
+				{
+					e.consume();
+					root.getUndoInterface().executeCommand(upMove);
+				}
 			}
 			if (e.getKeyCode() == KeyEvent.VK_DOWN || e.getKeyCode() == KeyEvent.VK_KP_DOWN)
 			{
+				boolean hasMoved = false;
 				CompoundCommand downMove = new CompoundCommand("Move Event");
 				for (EditorObject o : selectedObjects)
 				{
 					if (o instanceof EditorLabelGroup)
 					{
 						EditorLabelGroup l = (EditorLabelGroup)o;
-						Command c = l.downCommand();
-						downMove.addCommand(c);
+						if (l.hasSelected())
+						{
+							hasMoved = true;
+							Command c = l.downCommand();
+							downMove.addCommand(c);
+						}
 					}					
 				}
 				downMove.end();
-				root.getUndoInterface().executeCommand(downMove);
+				if (hasMoved)
+				{
+					e.consume();
+					root.getUndoInterface().executeCommand(downMove);
+				}
+			}
+		}
+	}
+	
+	private class NameEditField
+		extends JTextField
+	{
+		EditorLabel mLabel;
+		
+		public NameEditField(EditorLabel label)
+		{
+			mLabel = label;
+			setText(label.getParent().getName());
+			setLocation(label.getX(), label.getY());
+			setSize(getPreferredSize());
+			setOpaque(false);
+			setBorder(new EmptyBorder(getBorder().getBorderInsets(this)));
+			addFocusListener(new NameEditSpy());
+			addActionListener(new NameEditSpy());
+			getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "enter");
+			getActionMap().put("enter", new AbstractAction()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					reName();
+				}
+			});
+			getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "escape");
+			getActionMap().put("escape", new AbstractAction()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					setText(mLabel.getParent().getName());
+					reName();
+				}
+			});
+		}
+		
+		private void reName()
+		{
+			if (!getText().equals(mLabel.getParent().getName()))
+			{
+				System.out.println(getText() + ":" + mLabel.getParent().getName());
+				System.out.println(!getText().equals(mLabel.getParent().getName()));
+				try
+				{
+					Command u = new ChangeNameCommand(mLabel.getParent().getName(),
+												  getText(),
+												  mLabel.getParent().getSubject());
+					u.execute();
+					ControlledSurface.this.remove(NameEditField.this);
+					mLabel.setEditing(false);
+					root.getUndoInterface().addUndoable(new UndoableCommand(u));
+				}
+				catch (final DuplicateNameException d)
+				{						
+					JOptionPane.showMessageDialog(ControlledSurface.this,
+												 d.getMessage());
+					selectAll();
+					setVisible(true);
+					requestFocus();
+				}
+			}
+			else
+			{
+				ControlledSurface.this.remove(NameEditField.this);
+				mLabel.setEditing(false);
+			}
+		}
+	
+		private class NameEditSpy
+			extends FocusAdapter
+			implements ActionListener
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				System.out.println("action performed" + e.getActionCommand());
+			/*	if (getText() != mLabel.getParent().getName())
+				{
+					try
+					{
+						Command u = new ChangeNameCommand(mLabel.getParent().getName(),
+													  getText(),
+													  mLabel.getParent().getSubject());
+						u.execute();
+						ControlledSurface.this.remove(NameEditField.this);
+						mLabel.setEditing(false);
+						root.getUndoInterface().addUndoable(new UndoableCommand(u));
+					}
+					catch (final DuplicateNameException d)
+					{						
+						setVisible(false);
+						ControlledSurface.this.remove(NameEditField.this);
+						JOptionPane.showMessageDialog(ControlledSurface.this
+													  , d.getMessage());
+						JTextField text = new NameEditField(mLabel);
+						ControlledSurface.this.add(text);
+						text.setText(getText());
+						text.selectAll();
+						text.setVisible(true);
+						text.requestFocus();						
+					}
+				}*/
+			}
+			
+			public void focusLost(FocusEvent e)
+			{
+				reName();
 			}
 		}
 	}

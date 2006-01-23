@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorEvents
 //###########################################################################
-//# $Id: EditorEvents.java,v 1.18 2005-12-16 00:26:39 siw4 Exp $
+//# $Id: EditorEvents.java,v 1.19 2006-01-23 02:06:23 siw4 Exp $
 //###########################################################################
 
 
@@ -76,18 +76,22 @@ public class EditorEvents
 	//# Constructors
 	public EditorEvents(final ModuleSubject module,
 						final SimpleComponentSubject comp,
-						final ExpressionParser parser)
+						final ExpressionParser parser,
+						final EditorWindowInterface window)
 	{
-		this(module, comp.getGraph(), parser);
+		this(module, comp.getGraph(), parser, window);
 	}
 
 	public EditorEvents(final ModuleSubject module,
 						final GraphSubject graph,
-						final ExpressionParser parser)
+						final ExpressionParser parser,
+						final EditorWindowInterface window)
 	{
 		final TableModel model = new EventTableModel(graph, module, this);
 		final Dimension ispacing = new Dimension(0, 0);
-
+		
+		root = window;
+		
 		setModel(model);
 		setTableHeader(null);
 		setRowHeight(22);
@@ -518,7 +522,10 @@ public class EditorEvents
 		}
 	}
 		
-
+	public EditorWindowInterface getEditorInterface()
+	{
+		return root;
+	}
 
 	//#######################################################################
 	//# Data Members
@@ -526,6 +533,7 @@ public class EditorEvents
 	private DragGestureListener mDGListener;
 	private DragSourceListener mDSListener;
 	private int mDragAction = DnDConstants.ACTION_COPY;
+	private final EditorWindowInterface root;
 
 
 	//#######################################################################
@@ -541,6 +549,6 @@ public class EditorEvents
 		KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.SHIFT_MASK);
 
 	private static final String ACTNAME_DOWN = "EditorEvents.DOWN";
-	private static final String ACTNAME_UP = "EditorEvents.UP";	
+	private static final String ACTNAME_UP = "EditorEvents.UP";		
 
 }

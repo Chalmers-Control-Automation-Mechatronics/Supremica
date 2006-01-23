@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorWindow
 //###########################################################################
-//# $Id: EditorWindow.java,v 1.23 2005-12-16 00:26:39 siw4 Exp $
+//# $Id: EditorWindow.java,v 1.24 2006-01-23 02:06:23 siw4 Exp $
 //###########################################################################
 
 
@@ -66,7 +66,7 @@ public class EditorWindow
 		surface.setMinimumSize(new Dimension(0, 0));
 
 		final ExpressionParser parser = root.getExpressionParser();
-		mEventPane = new EditorEvents(module, subject, parser);
+		mEventPane = new EditorEvents(module, subject, parser, this);
 		menu = new EditorMenu(surface, this);
 
 		final Container panel = getContentPane();

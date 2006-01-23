@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorLabel
 //###########################################################################
-//# $Id: EditorLabel.java,v 1.23 2006-01-17 21:13:50 siw4 Exp $
+//# $Id: EditorLabel.java,v 1.24 2006-01-23 02:06:23 siw4 Exp $
 //###########################################################################
 
 
@@ -59,17 +59,12 @@ public class EditorLabel
 	{
 		if (event.getKind() == ModelChangeEvent.NAME_CHANGED) {
 			final String name = getParent().getName();
-			if (editing) {
-				text.setText(name);
-			} else {
-				label.setText(name);
-			}
+			label.setText(name);
 		}
 	}
 
 	public void removeFromSurface(EditorSurface e)
 	{
-		e.remove(text);
 		/*
 		e.remove(labelShadow);
 		*/
@@ -78,31 +73,8 @@ public class EditorLabel
 
 	public void setEditing(boolean edit)
 	{
-		if (edit)
-		{
-			backup = text.getText();
-
-			text.requestFocus();
-			text.selectAll();
-		}
-		else
-		{
-			if (editing &&!backup.equals(text.getText()))
-			{
-				if (!mParent.setName(text.getText(), (JComponent) text.getRootPane()))
-				{
-					edit = true;
-
-					text.requestFocus();
-					text.selectAll();
-				}
-				
-			}
-		}
-
 		editing = edit;
 
-		text.setVisible(edit);
 		label.setVisible(!edit);
 		/*
 		labelShadow.setVisible(!edit);
@@ -148,23 +120,9 @@ public class EditorLabel
 
 	public void drawObject(Graphics g, boolean selected)
 	{
-        	if ((text == null) || (mParent == null))
+        if (mParent == null)
 		{
 		    return;
-		}
-
-		if ((text.getText().length() == 0) && !editing)
-		{
-		    text.setText(backup);
-		}
-
-		if (text.getText().length() == 0)
-		{
-		    text.setSize(5, text.getHeight());
-		}
-		else
-		{
-		    text.setSize(text.getPreferredSize());
 		}
 
 		label.setForeground(getColor(selected));
@@ -182,10 +140,7 @@ public class EditorLabel
 		int xposition = mParent.getX() + (int) mGeometry.getOffset().getX();
 		int yposition = mParent.getY() + (int) mGeometry.getOffset().getY();
 
-		text.setLocation(xposition - 1, yposition - 14);
-		label.setLocation(xposition - 1, yposition - 14);
-		label.setText(text.getText());
-		label.setFont(text.getFont());
+		label.setLocation(xposition, yposition);
 		label.setSize(label.getPreferredSize());
 
 		/*
@@ -193,7 +148,7 @@ public class EditorLabel
 		labelShadow.setText(text.getText());
 		labelShadow.setSize(labelShadow.getPreferredSize());
 		*/
-		boundingRect.setRect(xposition - 1, yposition - 14, text.getWidth(), text.getHeight());
+		boundingRect.setRect(xposition, yposition, label.getWidth(), label.getHeight());
 
 		// Draw shadow as background?
 		if (shadow && isHighlighted())
@@ -243,17 +198,17 @@ public class EditorLabel
 
 	public int getHeight()
 	{
-		return text.getHeight();
+		return label.getHeight();
 	}
 
 	public int getWidth()
 	{
-		return text.getWidth();
+		return label.getWidth();
 	}
 	
 	public Rectangle2D getBounds()
 	{
-		return text.getBounds();
+		return label.getBounds();
 	}
 
 	public void setHighlighted(boolean s)
@@ -270,14 +225,12 @@ public class EditorLabel
 
 		if (par.getName() == null)
 		{
-			text = new JTextField(t);
+			label = new JLabel(t);
 		}
 		else
 		{
-			text = new JTextField(par.getName());
+			label = new JLabel(par.getName());
 		}
-
-		backup = text.getText();
 
 		if (par.getSubject().getLabelGeometry() == null)
 		{
@@ -290,15 +243,8 @@ public class EditorLabel
 			mGeometry = par.getSubject().getLabelGeometry();
 		}
 
-		label = new JLabel(text.getText());
-		
-		text.setOpaque(false);
 		label.setOpaque(false);
-		text.setBorder(new EmptyBorder(text.getBorder().getBorderInsets(text)));
-		label.setBorder(new EmptyBorder(text.getBorder().getBorderInsets(text)));
-		text.setVisible(false);
-		text.setForeground(EditorColor.DEFAULTCOLOR);
-		e.add(text);
+		label.setBorder(new EmptyBorder(label.getBorder().getBorderInsets(label)));
 		e.add(label);
 
 		/*
@@ -309,24 +255,6 @@ public class EditorLabel
 		*/
 
 		mParent = par;
-
-		text.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "enter");
-		text.getActionMap().put("enter", new AbstractAction()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				setEditing(false);
-			}
-		});
-		text.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "escape");
-		text.getActionMap().put("escape", new AbstractAction()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				text.setText(backup);
-				setEditing(false);
-			}
-		});
 	}
 
 
@@ -341,9 +269,7 @@ public class EditorLabel
 
 	//########################################################################
 	//# Data Members
-	private JTextField text;
 	private JLabel label;
-	private String backup = "";
 	private Rectangle boundingRect = new Rectangle();
 	private boolean editing = false;
 	private EditorNode mParent = null;

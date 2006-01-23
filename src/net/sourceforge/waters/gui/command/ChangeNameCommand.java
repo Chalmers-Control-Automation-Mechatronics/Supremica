@@ -25,15 +25,7 @@ public class ChangeNameCommand
 	
 	public void execute()
 	{
-		try
-		{
-			mNamed.setName(mNew);
-		}
-		catch (Throwable t)
-		{
-			System.out.println("This Shouldn't happen");
-			t.printStackTrace();
-		}
+		mNamed.setName(mNew);
 	}
 	
 	/** 
@@ -47,7 +39,7 @@ public class ChangeNameCommand
 		}
 		catch (Throwable t)
 		{
-			System.out.println("This Shouldn't happen");
+			System.out.println("This Shouldn't have been added to the undoManager");
 			t.printStackTrace();
 		}
     }

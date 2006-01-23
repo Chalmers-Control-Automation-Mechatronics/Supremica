@@ -7,22 +7,22 @@ import javax.swing.undo.CannotUndoException;
 import net.sourceforge.waters.gui.ControlledSurface;
 import net.sourceforge.waters.gui.EditorLabelGroup;
 
+import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.module.EventListExpressionSubject;
-import net.sourceforge.waters.subject.module.IdentifierSubject;
 
 public class RemoveEventCommand
 	implements Command
 {
 	private final EventListExpressionSubject mList;
-	private final IdentifierSubject mIdentifier;
+	private final AbstractSubject mIdentifier;
 	private final int mPosition;
 	private final String mDescription = "Remove Event";
 	
 	public RemoveEventCommand(EventListExpressionSubject group,
-							  IdentifierSubject identifier)						   
+							  AbstractSubject identifier) 
 	{
 		mList = group;
-		mIdentifier = identifier;
+		mIdentifier = identifier.clone();
 		mPosition = mList.getEventListModifiable().indexOf(mIdentifier);
 	}
 	

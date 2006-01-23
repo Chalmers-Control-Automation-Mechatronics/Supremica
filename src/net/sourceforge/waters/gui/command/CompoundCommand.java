@@ -2,6 +2,7 @@ package net.sourceforge.waters.gui.command;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 
 public class CompoundCommand
 	implements Command
@@ -48,9 +49,10 @@ public class CompoundCommand
 	
 	public void undo()
 	{
-		for (Command c : mCommands)
+		ListIterator<Command> li = mCommands.listIterator(mCommands.size());
+		while(li.hasPrevious())
 		{
-			c.undo();
+			li.previous().undo();
 		}
 	}
 	

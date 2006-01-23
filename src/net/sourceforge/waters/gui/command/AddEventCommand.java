@@ -8,29 +8,23 @@ import net.sourceforge.waters.gui.ControlledSurface;
 import net.sourceforge.waters.gui.EditorObject;
 import net.sourceforge.waters.gui.EditorLabelGroup;
 
+import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.module.EventListExpressionSubject;
-import net.sourceforge.waters.subject.module.IdentifierSubject;
 
 public class AddEventCommand
 	implements Command
 {
-	private final ControlledSurface mSurface;
-	private final EditorObject mObject;
 	private final EventListExpressionSubject mList;
-	private final IdentifierSubject mIdentifier;
+	private final AbstractSubject mIdentifier;
 	private final int mPosition;
 	private final String mDescription = "Add Event";
 	
-	public AddEventCommand(ControlledSurface surface,
-						   EditorObject object,
-						   EventListExpressionSubject list,
-						   IdentifierSubject identifier,
+	public AddEventCommand(EventListExpressionSubject list,
+						   AbstractSubject identifier,
 						   int position)
 	{
-		mSurface = surface;
-		mObject = object;
 		mList = list;
-		mIdentifier = identifier;
+		mIdentifier = identifier.clone();
 		mPosition = position;
 	}
 	

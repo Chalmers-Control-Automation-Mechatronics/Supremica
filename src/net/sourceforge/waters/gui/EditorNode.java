@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorNode
 //###########################################################################
-//# $Id: EditorNode.java,v 1.31 2006-01-17 02:00:07 siw4 Exp $
+//# $Id: EditorNode.java,v 1.32 2006-01-23 02:06:23 siw4 Exp $
 //###########################################################################
 
 
@@ -177,7 +177,6 @@ public class EditorNode
 		{
 			return false;
 		}
-		Command u = new ChangeNameCommand(getName(), n, getSubject()); 
 
 		try
 		{
@@ -188,8 +187,7 @@ public class EditorNode
 			JOptionPane.showMessageDialog(c, e.getMessage());
 
 			return false;
-		}
-		mUndo.addUndoable(new UndoableCommand(u));
+		}		
 		return true;
 	}
 
