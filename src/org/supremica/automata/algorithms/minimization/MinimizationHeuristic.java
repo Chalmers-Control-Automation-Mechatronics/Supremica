@@ -196,14 +196,13 @@ public class MinimizationHeuristic
 			int value = 1;
 			for (Iterator<Automaton> autIt = selection.iterator(); autIt.hasNext(); )
 				value *= autIt.next().nbrOfStates();
-			return value;			
 			*/
 			// Least squares
 			int value = 0;
 			for (Iterator<Automaton> autIt = selection.iterator(); autIt.hasNext(); )
 				value += Math.pow(autIt.next().nbrOfStates(), 2);
+
 			return value;			
-			//return selection.getAutomatonAt(1).nbrOfStates();
 		}
 		else if (this == MostEvents || this == FewestEvents) 
 		{
@@ -211,10 +210,17 @@ public class MinimizationHeuristic
 		}
 		else if (this == MostTransitions || this == FewestTransitions) 
 		{
+			/*
 			// Prod
 			int value = 1;
 			for (Iterator<Automaton> autIt = selection.iterator(); autIt.hasNext(); )
 				value *= autIt.next().nbrOfTransitions();
+			*/
+			// Least squares
+			int value = 0;
+			for (Iterator<Automaton> autIt = selection.iterator(); autIt.hasNext(); )
+				value += Math.pow(autIt.next().nbrOfTransitions(), 2);
+
 			return value;
 		}
 		else if (this == MostAutomata || this == FewestAutomata)

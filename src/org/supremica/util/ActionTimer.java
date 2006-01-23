@@ -51,28 +51,30 @@ package org.supremica.util;
 
 import java.util.Date;
 
+/**
+ * Simulates a "stopwatch" with four buttons - start (resume), stop, reset and
+ * restart. 
+ *   * Start resumes a stopped timer.
+ *   * Stop interrupts the timer.
+ *   * Reset sets the timer to 0 and stops the timer.
+ *   * Restart resets the timer and starts it again.
+ */
 public class ActionTimer
 {
-	private final static String hours = " hours ";
-	private final static String minutes = " minutes ";
-	private final static String seconds = " seconds ";
+	private final static String hours = " hours";
+	private final static String minutes = " minutes";
+	private final static String seconds = " seconds";
 	private final static String milliseconds = " milliseconds";
 	private Date startDate = null;
 	private Date stopDate = null;
 
+	/**
+	 * Creates a new timer set to 0.
+	 */
 	public ActionTimer() {}
 
 	/**
-	 * Restarts the timer.
-	 */
-	public void restart()
-	{
-		stopDate = null;
-		startDate = new Date();
-	}
-
-	/**
-	 * Resets the timer.
+	 * Resets the timer to 0 and stops the timer.
 	 */
 	public void reset()
 	{
@@ -81,7 +83,7 @@ public class ActionTimer
 	}
 
 	/**
-	 * Stops the timer.
+	 * Interrupts the timer. Start resumes the counting, reset sets the time to 0.
 	 */
 	public void stop()
 	{
@@ -89,7 +91,7 @@ public class ActionTimer
 	}
 
 	/**
-	 * Makes the timer resume ticking time "from where it last
+	 * Makes the timer resume ticking "from where it last
 	 * stopped". Starts from 0 if it hasn't been started before.
 	 */
 	public void start()
@@ -97,7 +99,8 @@ public class ActionTimer
 		// Not started yet?
 		if (startDate == null)
 		{
-			restart();
+			startDate = new Date();
+			stopDate = null;
 		}
 		else
 		{
@@ -108,11 +111,20 @@ public class ActionTimer
 	}
 
 	/**
+	 * Restarts the timer from 0.
+	 */
+	public void restart()
+	{
+		reset();
+		start();
+	}
+
+	/**
 	 * Returns the elapsed time in milliseconds between last start and last stop call.
 	 * If stop is not called before this method then the time since last call
 	 * to start is returned
 	 */
-	public long elapsedTime()
+	private long elapsedTime()
 		throws IllegalStateException
 	{
 		if (startDate == null)
@@ -128,6 +140,9 @@ public class ActionTimer
 		return stopDate.getTime() - startDate.getTime();
 	}
 
+	/**
+	 * Returns a nice, readable string presenting the currently elapsed time.
+	 */
 	public String toString()
 	{
 		// Calculate time
@@ -145,16 +160,16 @@ public class ActionTimer
 		if (hrs != 0)
 		{
 			//sbuf.append(hrs + hours + mins + minutes + secs + seconds + millis + milliseconds);
-			sbuf.append(hrs + hours + mins + minutes);
+			sbuf.append(hrs + hours + " " + mins + minutes);
 		}
 		else if (mins != 0)
 		{
 			//sbuf.append(mins + minutes + secs + seconds + millis + milliseconds);
-			sbuf.append(mins + minutes + secs + seconds);
+			sbuf.append(mins + minutes + " " + secs + seconds);
 		}
 		else if (secs != 0)
 		{
-			sbuf.append(secs + seconds + millis + milliseconds);
+			sbuf.append(secs + seconds + " " + millis + milliseconds);
 		}
 		else
 		{

@@ -268,7 +268,7 @@ public class AutomatonMinimizer
                 if (count > 0)
                 {
                     logger.verbose("Removed " + count + " states based on conflict equivalence " +
-                                   "before running partitioning.");
+                                   "before running the partitioning.");
                 }
             }
 
@@ -673,7 +673,8 @@ public class AutomatonMinimizer
      * Partitions equivClass by the event e.
      * @return true if a partitioning was made, false otherwise.
      */
-    private boolean partition(EquivalenceClasses equivClasses, EquivalenceClass equivClass, LabeledEvent e)
+    private boolean partition(EquivalenceClasses equivClasses, 
+							  EquivalenceClass equivClass, LabeledEvent e)
     {
         // "Split" class on event 'e', i.e. based on where the 'e'-transitions lead
         EquivalenceClassHolder newEquivClassHolder = split(equivClass, e);
@@ -760,7 +761,8 @@ public class AutomatonMinimizer
             StateSet nextStates;
             if (e.isEpsilon())
             {
-                // Find the states that can be reached by epsilons, i.e. the epsilonclosure of currState
+                // Find the states that can be reached by epsilons,
+                // i.e. the epsilonclosure of currState
                 nextStates = currState.epsilonClosure(true);
             }
             else
@@ -784,7 +786,8 @@ public class AutomatonMinimizer
     /**
      * Merges all "single-outgoing-epsilon-transition-states".
      *
-     * @return Number of states that have been removed by merging or -1 if method didn't complete successfully.
+     * @return Number of states that have been removed by merging or
+     * -1 if method didn't complete successfully.
      */
     public int mergeTriviallyObservationEquivalentStates(Automaton aut)
     {

@@ -149,8 +149,8 @@ public class AutomataMinimizer
 		heuristicList = new LinkedList<MinimizationHeuristic>();
 		heuristicList.add(MinimizationHeuristic.MostLocal);
 		heuristicList.add(MinimizationHeuristic.MostCommon);
-		heuristicList.add(MinimizationHeuristic.FewestTransitions);
-		//heuristicList.add(MinimizationHeuristic.FewestStates);
+		//heuristicList.add(MinimizationHeuristic.FewestTransitions);
+		heuristicList.add(MinimizationHeuristic.FewestStates);
 		//heuristicList.add(MinimizationHeuristic.FewestEvents);
 		//heuristicList.add(MinimizationHeuristic.LeastExtension);
 		//heuristicList.add(MinimizationHeuristic.Random);
@@ -188,7 +188,7 @@ public class AutomataMinimizer
 			*/
 
 			// Get next automata to minimize
-			MinimizationTask task = getNextMinimizationTask(false);
+			MinimizationTask task = getNextMinimizationTask(true);
 			Automata selection = task.getAutomata();
 			Alphabet hideThese = task.getEventsToHide();
 
@@ -222,6 +222,20 @@ public class AutomataMinimizer
 			{
 				// Compose and minimize!
 				min = monolithicMinimization(selection, hideThese);
+			}
+
+			// Early termination
+			if (false && options.getMinimizationType() == EquivalenceRelation.ConflictEquivalence)
+			{
+				// If blocking, we can early terminate!
+				if (min.nbrOfStates() == 1 && !min.getInitialState().isAccepting())
+				{
+					// Return a one state blocking automaton (min for example)
+					logger.info("Early termination!");
+					min.hide(new Alphabet(min.getAlphabet()));
+					theAutomata = new Automata(min);
+					continue;
+				}
 			}
 
 			if (stopRequested)
@@ -276,11 +290,16 @@ public class AutomataMinimizer
 			logger.info("The automaton with the most transitions had " + mostTransitions + " transitions.");
 		}
 		//logger.info("Timer time: " + timer);
-		//logger.info(theAutomata.getName() + " & " + initialNbrOfAutomata + " & & " + mostStates + " & " + mostTransitions + " & TIME & true/false & " + AutomatonMinimizer.getStatisticsLaTeX() + " & ALGO \\\\");
+		//logger.info(theAutomata.getName() + " & " + initialNbrOfAutomata + " & & " + mostStates + " & " + mostTransitions + " & TIME & true/false & " + AutomatonMinimizer.getWodesStatisticsLaTeX() + " & ALGO \\\\");
 
 		// Return the result of the minimization!
 		assert(theAutomata.size() == 1);
 		return theAutomata.getFirstAutomaton();
+	}
+
+	public String getStatisticsLine()
+	{
+		return "\\texttt{NAME} & " + initialNbrOfAutomata + " & SIZE & " + mostStates + " & " + mostTransitions + " & TIME & BLOCK & " + AutomatonMinimizer.getWodesStatisticsLaTeX() + " & ALGO1 & ALGO2 \\\\";
 	}
 
 	/**
@@ -387,7 +406,8 @@ public class AutomataMinimizer
 						break strategyLoop;
 					}
 
-					if (strategy == MinimizationStrategy.AtLeastOneLocalMaxThree && selection.size() > 4)
+					if (strategy == MinimizationStrategy.AtLeastOneLocalMaxThree && 
+						selection.size() > 3)
 					{
 						continue loop;
 					}
@@ -725,7 +745,7 @@ public class AutomataMinimizer
 
 		// Is it at all possible to minimize? (It may actually be possible even
 		// if there are no epsilons)
-		//if (aut.nbrOfEpsilonTransitions() > 0)
+		if (aut.nbrOfEpsilonTransitions() > 0)
 		{
 			AutomatonMinimizer minimizer = new AutomatonMinimizer(aut);
 			minimizer.useShortStateNames(useShortStateNames);

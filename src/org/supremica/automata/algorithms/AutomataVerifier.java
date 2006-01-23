@@ -1455,6 +1455,7 @@ public class AutomataVerifier
 			return moduleIsNonblocking(theAutomata.getFirstAutomaton());
 		}
 
+		// Otherwise we must synchronize!
 		Automaton theAutomaton = AutomataSynchronizer.synchronizeAutomata(synchHelper);
 
 		/*
@@ -1620,6 +1621,13 @@ public class AutomataVerifier
 	}
 	*/
 
+	// JUNK
+	private static String message = "";
+	public String getTheMessage()
+	{
+		return message;
+	}
+
 	/**
 	 * Incrementally composes and minimizes the automata and examines the end result...
 	 *
@@ -1647,6 +1655,9 @@ public class AutomataVerifier
 		Automaton result;
 		try
 		{
+			// JUNK
+			message = "";
+			
 			// Minimizer
 		 	AutomataMinimizer minimizer = new AutomataMinimizer(theAutomata);
 			threadToStop = minimizer;
@@ -1657,7 +1668,17 @@ public class AutomataVerifier
 
 			// Minimize!
 			result = minimizer.getCompositionalMinimization(minimizationOptions);
+			
+			// Something went wrong?
+			if (result == null)
+			{
+				requestStop();
+				return false;
+			}
 			threadToStop = null;
+
+			// JUNK
+			message = minimizer.getStatisticsLine();
 		}
 		catch (Exception ex)
 		{
@@ -1671,7 +1692,7 @@ public class AutomataVerifier
 		{
 			return false;
 		}
-
+		
 		// Examine the result and return the verdict!
 		return moduleIsNonblocking(result, true);
 	}
@@ -1717,9 +1738,8 @@ public class AutomataVerifier
 	private boolean moduleIsNonblocking(Automaton original, boolean destructive)
 		throws Exception
 	{
-		Automaton aut;
-
 		// Should we save the original by creating a copy that we can destroy?
+		Automaton aut;
 		if (destructive)
 		{
 			aut = original;
@@ -1769,11 +1789,11 @@ public class AutomataVerifier
 		// Present result (if in verbose mode)
 		if (SupremicaProperties.verboseMode())
 		{
+			// Show all blocking states? They can be many!
 			stateIterator = aut.stateIterator();
 			while (stateIterator.hasNext())
 			{
 				currState = (State) stateIterator.next();
-
 				logger.info("Blocking state: " + currState.getName());
 				
 				// If we did a copy of theAutomata before we destroyed it we could display the trace...
@@ -1792,7 +1812,7 @@ public class AutomataVerifier
 
 				if (stopRequested)
 				{
-					break;
+					return false;
 				}
 			}
 		}

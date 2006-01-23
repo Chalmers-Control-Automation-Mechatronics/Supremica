@@ -191,6 +191,10 @@ struct element *E_1_B = NULL; /* Pointer to edges incident
 								 to B * (calculated in step 3) */
 struct element *Bprime = NULL;
 
+xblock** xblocks;
+element** elements;
+count** counts;
+
 /* copy of elements in block B.
    Points directly on first element
    in B, i.e. no copy of Q block
@@ -1060,15 +1064,15 @@ JNIEXPORT void JNICALL Java_org_supremica_automata_algorithms_minimization_Bisim
   int pos;
 
   // Allocate memory for xblocks, one per event
-  xblock** xblocks;
+  //xblock** xblocks;
   if (!(xblocks = (xblock**) malloc((NBROFEVENTS)*sizeof(xblock*))))
     error("make_xblocks: no available memory");
   // Allocate memory for elements, one per state
-  element** elements;
+  //element** elements;
   if (!(elements = (element**) malloc((NBROFSTATES)*sizeof(element*))))
     error("make_elements: no available memory");
   // Allocate memory for counts, one per state-event combo
-  count** counts;
+  //count** counts;
   if (!(counts = (count**) malloc((NBROFSTATES*NBROFEVENTS)*sizeof(count*))))
     error("make_counts: no available memory");
   for (i=0; i<NBROFSTATES*NBROFEVENTS; i++)
@@ -1189,7 +1193,7 @@ JNIEXPORT void JNICALL Java_org_supremica_automata_algorithms_minimization_Bisim
   }
 
 	/*
-  // DEBUG
+	// DEBUG
 	for (i=0; i<NBROFSTATES; i++)
 	{
 		printf("State: %i (%i)", i, NBROFSTATES);
@@ -1264,6 +1268,7 @@ JNIEXPORT jintArray JNICALL Java_org_supremica_automata_algorithms_minimization_
 
   jResult = env->NewIntArray(length);
   env->SetIntArrayRegion(jResult, 0, length, (jint *)result);
+  free(result);
 
   // Free memory!
   // QBLOCKS
@@ -1307,6 +1312,8 @@ JNIEXPORT jintArray JNICALL Java_org_supremica_automata_algorithms_minimization_
 	free(q->x_prev);
 	free(q);
   }
+  free(elements);
+  free(counts);
   // XBLOCKS
   struct xblock *x;
   struct xblock *xnext;
@@ -1315,6 +1322,7 @@ JNIEXPORT jintArray JNICALL Java_org_supremica_automata_algorithms_minimization_
 	xnext = x->next;
 	free(x);
   }
+  free(xblocks);
 
   // Reset constants
   E_1_B = NULL;
