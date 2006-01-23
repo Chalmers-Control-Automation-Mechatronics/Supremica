@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.42 2006-01-17 21:13:50 siw4 Exp $
+//# $Id: EditorSurface.java,v 1.43 2006-01-23 23:47:46 siw4 Exp $
 //###########################################################################
 
 
@@ -224,10 +224,7 @@ public class EditorSurface
 						groups.add(n2);
 					}
 				}
-			}
-			if (newGroup != null) {
-			    newGroup.drawObject(g, isSelected(newGroup));
-			}
+			}			
 			for (int j = 0; j < nodes.size(); j++)
 			{
 				EditorNode n2 = (EditorNode) nodes.get(j);
@@ -252,7 +249,7 @@ public class EditorSurface
 						children.add(n2);
 					}
 				}
-			}
+			}			
 
 			children.addAll(groups);
 			boolean ok = n.setChildNodes(children, (JComponent) this);
@@ -264,6 +261,10 @@ public class EditorSurface
 				break;
 			}
 		}
+		
+		if (newGroup != null) {
+			    newGroup.drawObject(g, isSelected(newGroup));
+			}
 
 		for (int i = 0; i < edges.size(); i++)
 		{
