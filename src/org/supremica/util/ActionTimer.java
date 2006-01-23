@@ -124,7 +124,7 @@ public class ActionTimer
 	 * If stop is not called before this method then the time since last call
 	 * to start is returned
 	 */
-	private long elapsedTime()
+	public long elapsedTime()
 		throws IllegalStateException
 	{
 		if (startDate == null)
