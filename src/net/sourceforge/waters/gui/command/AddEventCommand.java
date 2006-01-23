@@ -39,7 +39,7 @@ public class AddEventCommand
      */    
     public void undo()
     {
-		mList.getEventListModifiable().remove(mIdentifier);		
+		mList.getEventListModifiable().remove(mIdentifier);
     }
 	
 	public boolean isSignificant()

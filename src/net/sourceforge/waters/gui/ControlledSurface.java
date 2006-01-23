@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.59 2006-01-23 02:06:23 siw4 Exp $
+//# $Id: ControlledSurface.java,v 1.60 2006-01-23 02:44:09 siw4 Exp $
 //###########################################################################
  
 package net.sourceforge.waters.gui;
@@ -1034,14 +1034,14 @@ public class ControlledSurface
 				if (!selectedObjects.isEmpty()) 
 				{
 					boolean createMove = true;
-					if (edgeIsSelected() && selectedObjects.size() <= 2)
+					if (edgeIsSelected() && selectedObjects.size() == 1)
 					{
 						for (EditorObject object : selectedObjects)
 						{
 							if (object.getType() == EditorObject.EDGE)
 							{
 								EditorEdge edge = (EditorEdge) object;
-								if (!edge.getDragC())
+								if (edge.getDragT() || edge.getDragS())
 								{
 									createMove = false;
 								}
@@ -1669,7 +1669,7 @@ public class ControlledSurface
 					for (final EditorObject object : selectedObjects) {
 						if (object.getType() == EditorObject.EDGE) {
 							EditorEdge edge = (EditorEdge) object;
-							if (edge.getDragC())
+							if (!(edge.getDragT() || edge.getDragS()))
 							{
 								if (move == null) {
 									move = new MoveObjects(ControlledSurface.this, selectedObjects, new Point2D.Double(dx, dy));

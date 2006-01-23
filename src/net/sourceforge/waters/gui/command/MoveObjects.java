@@ -73,21 +73,31 @@ public class MoveObjects
 
     public void execute()
     {
-		for (EditorObject o : mMoved) {
-			if (mDescription.equals("Edge reshaping") || o.getType() != EditorObject.EDGE)
+		for (EditorObject o : mMoved)
+		{
+			if (o.getType() == EditorObject.NODEGROUP)
 			{
-				if (o.getType() == EditorObject.NODEGROUP) {
 				EditorNodeGroup ng = (EditorNodeGroup) o;
-				if (ng.getResizing()) {
+				if (ng.getResizing())
+				{
 					ng.resize((int)(ng.getX() + mDisplacement.getX()), (int)(ng.getY() + mDisplacement.getY()));
 					continue;
 				}
-				}
-				if ((o.getType() != EditorObject.LABELGROUP && o.getType() != EditorObject.LABEL)
-				|| mDescription.equals("Label Movement"))
-				{
-					o.setPosition(o.getX() + mDisplacement.getX(), o.getY() + mDisplacement.getY());
-				}
+			}
+			if ((o.getType() == EditorObject.LABELGROUP || o.getType() == EditorObject.LABEL)
+				&& mDescription.equals("Label Movement"))
+			{
+				o.setPosition(o.getX() + mDisplacement.getX(), o.getY() + mDisplacement.getY());
+			}
+			if (o.getType() == EditorObject.EDGE 
+				&& mDescription.equals("Edge Reshaping"))
+			{
+				o.setPosition(o.getX() + mDisplacement.getX(), o.getY() + mDisplacement.getY());
+			}
+			if (o.getType() == EditorObject.NODE 
+				&& mDescription.equals("Node Movement"))
+			{
+				o.setPosition(o.getX() + mDisplacement.getX(), o.getY() + mDisplacement.getY());
 			}
 		}
 		mSurface.getEditorInterface().setDisplayed();
@@ -99,20 +109,31 @@ public class MoveObjects
 
     public void undo()
     {
-		for (EditorObject o : mMoved) {
-			if (mDescription.equals("Edge reshaping") || o.getType() != EditorObject.EDGE)
+		for (EditorObject o : mMoved)
+		{
+			if (o.getType() == EditorObject.NODEGROUP)
 			{
-				if (o.getType() == EditorObject.NODEGROUP) {
 				EditorNodeGroup ng = (EditorNodeGroup) o;
-				if (ng.getResizing()) {
+				if (ng.getResizing())
+				{
 					ng.resize((int)(ng.getX() - mDisplacement.getX()), (int)(ng.getY() - mDisplacement.getY()));
 					continue;
 				}
-				}
-				if ((o.getType() != EditorObject.LABELGROUP && o.getType() != EditorObject.LABEL)
-				|| mDescription.equals("Label Movement")) {	  
-				o.setPosition(o.getX() - mDisplacement.getX(), o.getY() - mDisplacement.getY());	
-				}
+			}
+			if ((o.getType() == EditorObject.LABELGROUP || o.getType() == EditorObject.LABEL)
+				&& mDescription.equals("Label Movement"))
+			{
+				o.setPosition(o.getX() - mDisplacement.getX(), o.getY() - mDisplacement.getY());
+			}
+			if (o.getType() == EditorObject.EDGE 
+				&& mDescription.equals("Edge Reshaping"))
+			{
+				o.setPosition(o.getX() - mDisplacement.getX(), o.getY() - mDisplacement.getY());
+			}
+			if (o.getType() == EditorObject.NODE 
+				&& mDescription.equals("Node Movement"))
+			{
+				o.setPosition(o.getX() - mDisplacement.getX(), o.getY() - mDisplacement.getY());
 			}
 		}
 		mSurface.getEditorInterface().setDisplayed();  
