@@ -27,7 +27,7 @@ public class Milp
 	private int[][][] bookingTics, unbookingTics;
 
 	/** The optimal cycle time (makespan) */
-	private int makespan;
+	private double makespan;
 	
 	/** The *.mod file that serves as an input to the Glpk-solver */
 	private File modelFile;
@@ -36,7 +36,7 @@ public class Milp
 	private File solutionFile;
 
 	/** The optimal times (for each robotstate) that the MILP solver returns */
-	private int[][] optimalTimes = null;
+	private double[][] optimalTimes = null;
 
 	/** Is needed to kill the MILP-solver if necessary */
 	private Process milpProcess;
@@ -149,7 +149,7 @@ public class Milp
 		{
 			// Every robot is checked for possible transitions and the one with smallest time value 
 			// is chosen. 
-			int smallestTime = Integer.MAX_VALUE;
+			double smallestTime = Double.MAX_VALUE;
 
 			// The event that is next to be fired in the schedule (i.e. the event corresponding to the smallest allowed time value) is stored
 			LabeledEvent currOptimalEvent = null;
@@ -158,7 +158,7 @@ public class Milp
 			int robotIndex = -1;
 
 			// Stores the highest firing times for each active synchronizing event
-			Hashtable<LabeledEvent, Integer> synchArcsInfo = new Hashtable<LabeledEvent, Integer>();
+			Hashtable<LabeledEvent, Double> synchArcsInfo = new Hashtable<LabeledEvent, Double>();
 
 			// Which automaton fires the "cheapest" transition...
 			for (int i=0; i<theAutomata.size(); i++)
@@ -172,7 +172,7 @@ public class Milp
 					robotIndex++;
 
 					State currState = currRobot.getStateWithIndex(currComposedStateIndices[i]);
-					int currTime = optimalTimes[robotIndex][currComposedStateIndices[i]];
+					double currTime = optimalTimes[robotIndex][currComposedStateIndices[i]];
 
 					// Choose the smallest time (as long as it is not smaller than the previously scheduled time)... 
 					if (currTime <= smallestTime)
@@ -205,15 +205,15 @@ public class Milp
 									// The highest time value (so far) is stored for every synchronizing event.
 									else
 									{
-										Integer currSynchTime = synchArcsInfo.get(currEvent);
+										Double currSynchTime = synchArcsInfo.get(currEvent);
 
 										if (currSynchTime == null)
 										{
-											synchArcsInfo.put(currEvent, new Integer(currTime));
+											synchArcsInfo.put(currEvent, new Double(currTime));
 										}
 										else if (currSynchTime.intValue() < currTime)
 										{
-											synchArcsInfo.put(currEvent, new Integer(currTime));
+											synchArcsInfo.put(currEvent, new Double(currTime));
 										}
 									}
 								}
@@ -231,7 +231,7 @@ public class Milp
 				for (Iterator<LabeledEvent> synchEvents = synchArcsInfo.keySet().iterator(); synchEvents.hasNext(); )
 				{
 					LabeledEvent currSynchEvent = synchEvents.next();
-					int currSynchTime = synchArcsInfo.get(currSynchEvent).intValue();
+					double currSynchTime = synchArcsInfo.get(currSynchEvent).doubleValue();
 									
 					if (currSynchTime <= smallestTime)
 					{
@@ -243,7 +243,7 @@ public class Milp
 
 			// Add the transition time to the name of the state-to-be-in-the-schedule
 			currScheduledState.setName(currScheduledState.getName() + ";  firing_time = " + smallestTime);
-			currScheduledState.setCost(smallestTime);
+			//			currScheduledState.setCost(smallestTime);
 
 			// Make a transition (in the synchronizer) to the state that is reachable in one step at cheapest cost
 			// This state will be the next parting point in our walk
@@ -271,8 +271,8 @@ public class Milp
 			if (isAccepting)
 			{
 			 	if (smallestTime != makespan)
-					throw new Exception("Makespan value does NOT correspond to the cost of the final state of the schedule. Something went wrong...");
-
+					throw new Exception("Makespan value does NOT correspond to the cost of the final state of the schedule (sched_time = " + smallestTime + "; makespan = " + makespan + "). Something went wrong...");
+				
 				currScheduledState.setAccepting(true);
 				currScheduledState.setName(currScheduledState.getName() + ";  makespan = " + makespan);
 			}
@@ -378,7 +378,8 @@ public class Milp
 					State currState = stateIter.next();
 					String stateName = currState.getName().substring(0, currState.getName().indexOf("."));
 					int stateIndex = indexMap.getStateIndex(restrictedRobot, new State(stateName));
-					
+
+					currState.setIndex(stateIndex);
 					currState.setCost(costs[stateIndex]);
 				}
 			
@@ -390,6 +391,8 @@ public class Milp
 					if (isSynthesized.isSpecification())
 						zones.removeAutomaton(isSynthesized);
 				}
+
+				restrictedRobot.remapStateIndices();
 
 				restrictedRobots.addAutomaton(restrictedRobot);
 			}
@@ -434,7 +437,7 @@ public class Milp
 				Automaton currRobot = robots.getAutomatonAt(j);
 
 // 				Alphabet commonAlphabet = AlphabetHelpers.intersect(currRobot.getAlphabet(), currZone.getAlphabet());
-				Alphabet bookingAlphabet = AlphabetHelpers.intersect(currRobot.getAlphabet(), currZone.getInitialState().activeEvents(false));
+				Alphabet bookingAlphabet = AlphabetHelpers.intersect(currRobot.getAlphabet(), currZone.getInitialState().definedEvents(false));
 
 				if (bookingAlphabet.size() > 0)
 				{
@@ -448,7 +451,7 @@ public class Milp
 					{
 						State currState = stateIter.next();
 						
-						Alphabet currStatesBookingAlphabet = AlphabetHelpers.intersect(currState.activeEvents(false), bookingAlphabet);
+						Alphabet currStatesBookingAlphabet = AlphabetHelpers.intersect(currState.definedEvents(false), bookingAlphabet);
 						for (Iterator<LabeledEvent> currBookingEventsIter = currStatesBookingAlphabet.iterator(); currBookingEventsIter.hasNext(); )
 						{
 // 							bookingStates.add(new int[]{indexMap.getStateIndex(currRobot, currState), indexMap.getEventIndex(currBookingEventsIter.next())});
@@ -630,39 +633,6 @@ public class Milp
 						break;
 					}
 				}			
-			}
-		}
-
-		// tillf 
-		for (int i=0; i<bookingTics.length; i++)
-		{
-			logger.warn("zone " + i);
-			String bStr = "";
-			String uStr = "";
-
-			for (int j=0; j<bookingTics[i].length; j++)
-			{
-				for (int k=0; k<bookingTics[i][j].length; k++)
-				{
-					bStr += "R" + j + "_ST" + bookingTics[i][j][k] + "  ";
-					uStr += "R" + j + "_ST" + unbookingTics[i][j][k] + "  ";
-				}
-			}
-
-			logger.info("booking = " + bStr);
-			logger.info("unbooking = " + uStr);
-		}
-
-		// test
-		for (int i=0; i<robots.size(); i++) 
-		{
-			Automaton currRobot = robots.getAutomatonAt(i);
-			State currState = currRobot.getInitialState();
-			ArrayList<State> arcsToProcess = new ArrayList<State>();
-
-			for (Iterator<Arc> outgoingArcs = currState.outgoingArcsIterator(); outgoingArcs.hasNext(); )
-			{
-				
 			}
 		}
 	}
@@ -849,6 +819,10 @@ public class Milp
 
 		// Constructing the mutex constraints
 		// for every zone...
+
+		// The safety buffer
+		double epsilon = 0.1;
+
 		for (int i=0; i<bookingTics.length; i++)
 		{
 			// for every robot pair...
@@ -872,17 +846,15 @@ public class Milp
 								
 								mutexVariables += "var " + currMutexVariable + ", binary;\n";
 								
-								mutexConstraints += "mutex_Z" + i + "_R" + j1 + "_R" + j2 + "_var" + repeatedBooking + " : time[" + j1 + ", " + bookingTics[i][j1][k1] + "] >= " + "time[" + j2 + ", " + unbookingTics[i][j2][k2] + "] - bigM*" + currMutexVariable;
+								mutexConstraints += "mutex_Z" + i + "_R" + j1 + "_R" + j2 + "_var" + repeatedBooking + " : time[" + j1 + ", " + bookingTics[i][j1][k1] + "] >= " + "time[" + j2 + ", " + unbookingTics[i][j2][k2] + "] - bigM*" + currMutexVariable + " + " + epsilon;
+								
 								String pathCutEnsurance = pathCutTable.get(robots.getAutomatonAt(j1).getStateWithIndex(k1));
 								if (pathCutEnsurance != null)
 								{
-									logger.warn("adding path cut ensurance to " + bookingTics[i][j1][k1] + " for robot " + robots.getAutomatonAt(j1).getName());
-									logger.info("index = " + indexMap.getStateIndex(robots.getAutomatonAt(j1), robots.getAutomatonAt(j1).getStateWithIndex(k1)));
 									mutexConstraints += " - bigM*" + pathCutEnsurance;
 								}
 								mutexConstraints += ";\n";
-
-								mutexConstraints += "dual_mutex_Z" + i + "_R" + j1 + "_R" + j2  + "_var" + repeatedBooking + " : time[" + j2 + ", " + bookingTics[i][j2][k2] + "] >= " + "time[" + j1 + ", " + unbookingTics[i][j1][k1] + "] - bigM*(1 - " + currMutexVariable + ")";
+								mutexConstraints += "dual_mutex_Z" + i + "_R" + j1 + "_R" + j2  + "_var" + repeatedBooking + " : time[" + j2 + ", " + bookingTics[i][j2][k2] + "] >= " + "time[" + j1 + ", " + unbookingTics[i][j1][k1] + "] - bigM*(1 - " + currMutexVariable + ")" + " + " + epsilon;
 								pathCutEnsurance = pathCutTable.get(robots.getAutomatonAt(j2).getStateWithIndex(k2));
 								if (pathCutEnsurance != null)
 								{ 
@@ -1000,10 +972,22 @@ public class Milp
 	private void processSolutionFile()
 		throws Exception
 	{
-		optimalTimes = new int[robots.size()][];
+		// tillf...
+// 		for (int i=0; i<robots.size(); i++)
+// 		{
+// 			logger.warn("Robot = " + robots.getAutomatonAt(i).getName() + "; index = " + indexMap.getAutomatonIndex(robots.getAutomatonAt(i)));
+// 			for (Iterator<State> stir = robots.getAutomatonAt(i).stateIterator(); stir.hasNext(); )
+// 			{
+// 				State s = stir.next();
+// 				logger.info("State = " + s.getName() + "; index = " + indexMap.getStateIndex(robots.getAutomatonAt(i), s));
+// 			}
+// 		}
+		//...
+
+		optimalTimes = new double[robots.size()][];
 
 		for (int i=0; i<optimalTimes.length; i++)
-			optimalTimes[i] = new int[robots.getAutomatonAt(i).nbrOfStates()];
+			optimalTimes[i] = new double[robots.getAutomatonAt(i).nbrOfStates()];
 
 		BufferedReader r = new BufferedReader(new FileReader(solutionFile));
 		String str = r.readLine();
@@ -1016,17 +1000,17 @@ public class Milp
 				String strRobotIndex = str.substring(str.indexOf("[") + 1, str.indexOf(",")).trim();
 				String strStateIndex = str.substring(str.indexOf(",") + 1, str.indexOf("]")).trim();
 				String strCost = str.substring(str.indexOf("]") + 1).trim(); 
-				
+		
 				int robotIndex = (new Integer(strRobotIndex)).intValue(); 
 				int stateIndex = (new Integer(strStateIndex)).intValue(); 
- 				int cost = (new Integer(strCost)).intValue();
+ 				double cost = (new Double(strCost)).doubleValue();
 
 				optimalTimes[robotIndex][stateIndex] = cost;
 			}
 			else if (str.indexOf("c ") >  -1)
 			{
 				String strMakespan = str.substring(str.indexOf("c") + 1).trim();
-				makespan = (new Integer(strMakespan)).intValue();
+				makespan = (new Double(strMakespan)).doubleValue();
 			}
 
 			str = r.readLine();
