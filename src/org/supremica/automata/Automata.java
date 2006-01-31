@@ -771,15 +771,7 @@ public class Automata
 	public boolean isEventControllabilityConsistent()
 	{
 		// Get the union alphabet (ignoring consistency here)
-		Alphabet unionAlphabet = null;
-		try
-		{
-			unionAlphabet = AlphabetHelpers.getUnionAlphabet(this, false, false);
-		}
-		catch (Exception ex)
-		{
-			logger.error(ex);
-		}
+		Alphabet unionAlphabet = getUnionAlphabet();
 
 		return isEventControllabilityConsistent(unionAlphabet);
 	}
@@ -902,17 +894,8 @@ public class Automata
 	 */
 	public Alphabet setIndicies()
 	{
-		// Get the union alphabet
-		Alphabet theAlphabet;
-		try
-		{
-			// Why "this, false, false"?!? Shouldn't it be "this, true, true"?  /hugo
-			theAlphabet = AlphabetHelpers.getUnionAlphabet(this, false, false);
-		}
-		catch (Exception ex)
-		{
-			throw new RuntimeException(ex);
-		}
+		// Get the union alphabet (ignoring consistency)
+		Alphabet theAlphabet = getUnionAlphabet();
 
 		// Adjust the indices of the alphabet
 		theAlphabet.setIndicies();
@@ -934,6 +917,7 @@ public class Automata
 	 */
 	public Alphabet getUnionAlphabet()
 	{
+		/*
 		if (size() == 0)
 		{
 			return new Alphabet();
@@ -948,6 +932,15 @@ public class Automata
 		{
 			throw new RuntimeException(ex);
 		}
+		*/
+		
+		// Add all alphabets to a new one...
+		Alphabet unionAlphabet = new Alphabet();
+		for (Iterator<Automaton> autIt = iterator(); autIt.hasNext(); )
+		{
+			unionAlphabet.union(autIt.next().getAlphabet());
+		}
+		return unionAlphabet;
 	}
 
 	public Automaton getAutomaton(String name)
@@ -1386,7 +1379,8 @@ public class Automata
 	 *
 	 * This method was originally in gui.ActionMan (to handle the gui-stuff conveniently).
 	 */
-	public boolean sanityCheck(Gui gui, int minSize, boolean mustHaveInitial, boolean mustHaveValidType,
+	public boolean sanityCheck(Gui gui, int minSize, 
+							   boolean mustHaveInitial, boolean mustHaveValidType,
 							   boolean mustBeControllabilityConsistent, boolean examineStructure)
 	{
 		// Is this automata empty? If so, just bail out.
@@ -1418,15 +1412,7 @@ public class Automata
 		}
 
 		// Get the union alphabet (ignoring consistency here)
-		Alphabet unionAlphabet = null;
-		try
-		{
-			unionAlphabet = AlphabetHelpers.getUnionAlphabet(this, false, false);
-		}
-		catch (Exception ex)
-		{
-			logger.error(ex);
-		}
+		Alphabet unionAlphabet = getUnionAlphabet();
 
 		// Warns if there are events with equal (lowercase) names.
 		// Always do this check (irritating? well yes... but those are really bad names!)

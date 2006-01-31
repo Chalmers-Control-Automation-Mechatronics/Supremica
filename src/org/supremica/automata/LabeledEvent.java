@@ -55,9 +55,10 @@ import net.sourceforge.waters.model.des.EventProxy;
 public class LabeledEvent
 	implements Comparable
 {
-	// The label is what shows in the dot-figures, this is the
-	// global identifier of an event, appearing in the alphabet
+	/** The label is what shows in the dot-figures, this is the
+	 * global identifier of an event, appearing in the alphabet. */
 	private String label = "";
+
 	private boolean controllable = true;
 	private boolean prioritized = true;
 	private boolean observable = true;

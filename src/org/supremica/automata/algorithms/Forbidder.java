@@ -195,7 +195,7 @@ public class Forbidder
 		// Get automaton
 		Automaton automaton = the_automata[a];
 		// Add the event - beware, adding an existig event throws exception
-		if(automaton.getAlphabet().includes(x_event) == false)
+		if(automaton.getAlphabet().contains(x_event) == false)
 		{
 			automaton.getAlphabet().addEvent(x_event);
 		}

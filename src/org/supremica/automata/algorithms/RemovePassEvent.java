@@ -123,7 +123,7 @@ public class RemovePassEvent
 
 		if (theAlphabet.contains(ComputerHumanExtender.passEvent))
 		{
-			LabeledEvent passEvent = theAlphabet.getEvent(ComputerHumanExtender.passEvent);
+			LabeledEvent passEvent = theAlphabet.getEvent(ComputerHumanExtender.passEvent.getLabel());
 
 			theAlphabet.removeEvent(passEvent);
 		}

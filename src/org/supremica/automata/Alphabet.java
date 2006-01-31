@@ -109,10 +109,12 @@ public class Alphabet
 		return size();
 	}
 
+	/*
 	public void setEvents(Map oldEvents)
 	{
 		theEvents = new TreeMap<String,LabeledEvent>(oldEvents);
 	}
+	*/
 
 	public Map getEvents()
 	{
@@ -152,7 +154,7 @@ public class Alphabet
 	/**
 	 * Add an event. Thorws exception if the event is null, has null label or 
 	 * is already in the alphabet(!). 
-	 **/
+	 */
 	public void addEvent(LabeledEvent ev)
 		throws IllegalArgumentException
 	{
@@ -175,29 +177,7 @@ public class Alphabet
 	}
 
 	/**
-	 * Given an event, returns an "equal" event from this alphabet
-	 * The def of "equal" is an internal matter.
-	 * Use this method instead of fiddling with event ids in user code
-	 * Returns null if the event does not exist
-	 */
-	public LabeledEvent getEvent(LabeledEvent ev)
-		throws IllegalArgumentException
-	{
-		if (ev == null)
-		{
-			throw new IllegalArgumentException("getEvent: event must be non-null");
-		}
-
-		if (ev.getLabel() == null)
-		{
-			throw new IllegalArgumentException("getEvent: event label must be non-null");
-		}
-
-		return theEvents.get(ev.getLabel());
-	}
-
-	/**
-	 * Adds all events in another Events to this Events.
+	 * Adds all events in another Alphabet to this Alphabet.
 	 * Makes sure they are not already included!
 	 */
 	public void addEvents(Alphabet otherEvents)
@@ -213,13 +193,18 @@ public class Alphabet
 		}
 	}
 
+	/**
+	 * Removes the LabeledEvent ev from the alphabet.
+	 */
 	public void removeEvent(LabeledEvent ev)
 		throws IllegalArgumentException
 	{
+		/*
 		if (!includes(ev))
 		{
 			throw new IllegalArgumentException("The event is not included in this alphabet");
 		}
+		*/
 
 		removeEvent(ev.getLabel());
 	}
@@ -234,6 +219,19 @@ public class Alphabet
 
 		theEvents.remove(label);
 	}
+
+	/**
+	 * True, if the event is in the set already, false otherwise.
+	 *
+	 *@param  theEvent Description of the Parameter
+	 *@return  Description of the Return Value
+	 */
+	/*
+	public boolean containsEvent(LabeledEvent theEvent)
+	{
+		return theEvents.containsValue(theEvent);
+	}
+	*/
 
 	/**
 	 * True, if there exists an event with the same label, false otherwise.
@@ -261,6 +259,25 @@ public class Alphabet
 
 		return theEvents.containsKey(label);
 	}
+
+	/**
+	 * Given an event, returns an "equal" event from this alphabet
+	 * The def of "equal" is an internal matter.
+	 * Use this method instead of fiddling with event ids in user code
+	 * Returns null if the event does not exist
+	 */
+	/*
+	public LabeledEvent getEvent(LabeledEvent ev)
+		throws IllegalArgumentException
+	{
+		if (ev == null)
+		{
+			throw new IllegalArgumentException("getEvent: event must be non-null");
+		}
+
+		return theEvents.getEvent(ev.getLabel());
+	}
+	*/
 
 	/**
 	 * Return the event with the given label.
@@ -297,6 +314,9 @@ public class Alphabet
 		throw new IllegalArgumentException("No event with index '" + index + "' exists");
 	}
 
+	/**
+	 * Returns the number of controllable events.
+	 */
 	public int nbrOfControllableEvents()
 	{
 		int nbrOfFoundEvents = 0;
@@ -304,7 +324,6 @@ public class Alphabet
 		for (Iterator<LabeledEvent> evIt = iterator(); evIt.hasNext(); )
 		{
 			LabeledEvent currEvent = evIt.next();
-
 			if (currEvent.isControllable())
 			{
 				nbrOfFoundEvents++;
@@ -314,6 +333,9 @@ public class Alphabet
 		return nbrOfFoundEvents;
 	}
 
+	/**
+	 * Returns the number of uncontrollable events.
+	 */
 	public int nbrOfUncontrollableEvents()
 	{
 		int nbrOfFoundEvents = 0;
@@ -321,7 +343,6 @@ public class Alphabet
 		for (Iterator<LabeledEvent> evIt = iterator(); evIt.hasNext(); )
 		{
 			LabeledEvent currEvent = evIt.next();
-
 			if (!currEvent.isControllable())
 			{
 				nbrOfFoundEvents++;
@@ -352,6 +373,9 @@ public class Alphabet
 		return nbrOfFoundEvents;
 	}
 
+	/**
+	 * Returns the number of prioritized events.
+	 */
 	public int nbrOfPrioritizedEvents()
 	{
 		int nbrOfFoundEvents = 0;
@@ -369,6 +393,9 @@ public class Alphabet
 		return nbrOfFoundEvents;
 	}
 
+	/**
+	 * Returns the number of immediate events.
+	 */
 	public int nbrOfImmediateEvents()
 	{
 		int nbrOfFoundEvents = 0;
@@ -386,6 +413,9 @@ public class Alphabet
 		return nbrOfFoundEvents;
 	}
 
+	/**
+	 * Returns the number of epsilon events.
+	 */
 	public int nbrOfEpsilonEvents()
 	{
 		int nbrOfFoundEvents = 0;
@@ -401,17 +431,6 @@ public class Alphabet
 		}
 
 		return nbrOfFoundEvents;
-	}
-
-	/**
-	 * True, if the event is in the set already, false otherwise.
-	 *
-	 *@param  theEvent Description of the Parameter
-	 *@return  Description of the Return Value
-	 */
-	public boolean includes(LabeledEvent theEvent)
-	{
-		return theEvents.containsValue(theEvent);
 	}
 
 	public String toDebugString()
@@ -454,7 +473,9 @@ public class Alphabet
 		return theEvents.values();
 	}
 
-	/** Must be called after an event label is modified. */
+	/** 
+	 * Must be called after an event label is modified. 
+	 */
 	public void rehash()
 	{
 		Map<String,LabeledEvent> newEvents = new TreeMap<String,LabeledEvent>();
@@ -636,6 +657,7 @@ public class Alphabet
 	 */
 	public void union(Alphabet other)
 	{
+		/*
 		for (Iterator alphIt = other.iterator(); alphIt.hasNext(); )
 		{
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
@@ -650,12 +672,16 @@ public class Alphabet
 					addEvent(newEvent);
 				}
 				catch (Exception ex)
-				{    // This should be impossible
+				{    
+                    // This should be impossible
 					logger.error("Alphabet.union. Trying to add an existing event. " + ex);
 					logger.debug(ex.getStackTrace());
 				}
 			}
 		}
+		*/
+		
+		theEvents.putAll(other.theEvents);
 	}
 
 	/**
@@ -707,7 +733,7 @@ public class Alphabet
 		for (Iterator<LabeledEvent> evIt = iterator(); evIt.hasNext(); )
 		{
 			LabeledEvent currEvent = evIt.next();
-			LabeledEvent otherEvent = otherAlphabet.getEvent(currEvent);
+			LabeledEvent otherEvent = otherAlphabet.getEvent(currEvent.getLabel());
 
 			if (otherEvent == null)
 			{
@@ -767,7 +793,7 @@ public class Alphabet
 			throw new IllegalArgumentException();
 		}
 
-		LabeledEvent thisEvent = getEvent(otherEvent);
+		LabeledEvent thisEvent = getEvent(otherEvent.getLabel());
 
 		return thisEvent.isPrioritized();
 	}
@@ -783,7 +809,7 @@ public class Alphabet
 			throw new IllegalArgumentException();
 		}
 
-		LabeledEvent thisEvent = getEvent(otherEvent);
+		LabeledEvent thisEvent = getEvent(otherEvent.getLabel());
 
 		return thisEvent.isControllable();
 	}

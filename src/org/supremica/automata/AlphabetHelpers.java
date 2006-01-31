@@ -78,7 +78,7 @@ public class AlphabetHelpers
 			eventsSet.add(currAlphabet);
 		}
 
-		return getUnionAlphabet(eventsSet, /* "a", */ requireConsistentControllability, requireConsistentImmediate);
+		return getUnionAlphabet(eventsSet, requireConsistentControllability, requireConsistentImmediate);
 	}
 
 	public static Alphabet getUnionAlphabet(EventsSet alphas)
@@ -126,7 +126,6 @@ public class AlphabetHelpers
 			// Iterate over all alphabets, and find those alphabets that
 			// contain an event with currEvent.getLabel
 			Iterator alphabetIt = alphabets.iterator();
-
 			while (alphabetIt.hasNext())
 			{
 				Alphabet currAlphabet = (Alphabet) alphabetIt.next();
@@ -172,10 +171,9 @@ public class AlphabetHelpers
 				tmpEvents.addAll((Collection) ((Alphabet) eventsSetIt.next()).values());
 			}
 
-			// Add all events to an Events object
+			// Add all events to an Alphabet
 			Iterator eventIt = tmpEvents.iterator();
 			Alphabet theEvents = new Alphabet();
-
 			while (eventIt.hasNext())
 			{
 				theEvents.addEvent((LabeledEvent) eventIt.next());

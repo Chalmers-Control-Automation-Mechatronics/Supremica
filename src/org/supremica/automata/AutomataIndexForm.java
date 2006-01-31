@@ -435,8 +435,9 @@ public final class AutomataIndexForm
 					Arc currArc = (Arc) outgoingArcsIt.next();
 
 					// Get the event from the automaton
-					LabeledEvent currEvent = currArc.getEvent();    // currAlphabet.getEventWithId(eventId);
-					LabeledEvent theEvent = theAlphabet.getEvent(currEvent);
+					LabeledEvent currEvent = currArc.getEvent();
+					// currAlphabet.getEventWithId(eventId)
+					LabeledEvent theEvent = theAlphabet.getEvent(currEvent.getLabel());
 					int currEventIndex = theEvent.getSynchIndex();
 
 					// Sort

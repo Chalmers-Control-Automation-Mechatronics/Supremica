@@ -53,12 +53,15 @@ class Philosopher
 	{
 		if (inited)
 		{
+			// getEvent(\([^()]*\))
+			// getEvent(\1.getLabel())
+
 			// The only thing that may need to be changed is the controllability
 			Alphabet alpha = philo.getAlphabet();
-			alpha.getEvent(events[L_TAKE]).setControllable(l_take);
-			alpha.getEvent(events[R_TAKE]).setControllable(r_take);
-			alpha.getEvent(events[L_PUT]).setControllable(l_put);
-			alpha.getEvent(events[R_PUT]).setControllable(r_put);
+			alpha.getEvent(events[L_TAKE].getLabel()).setControllable(l_take);
+			alpha.getEvent(events[R_TAKE].getLabel()).setControllable(r_take);
+			alpha.getEvent(events[L_PUT].getLabel()).setControllable(l_put);
+			alpha.getEvent(events[R_PUT].getLabel()).setControllable(r_put);
 
 			return;
 		}
@@ -132,10 +135,10 @@ class Philosopher
 //              alpha.getEventWithId("R_take").setLabel("take" + id + LABEL_SEP + r_fork);
 //              alpha.getEventWithId("L_put").setLabel("put" + id + LABEL_SEP + l_fork);
 //              alpha.getEventWithId("R_put").setLabel("put" + id + LABEL_SEP + r_fork);
-		alpha.getEvent(events[L_TAKE]).setLabel("take" + id + LABEL_SEP + l_fork);
-		alpha.getEvent(events[R_TAKE]).setLabel("take" + id + LABEL_SEP + r_fork);
-		alpha.getEvent(events[L_PUT]).setLabel("put" + id + LABEL_SEP + l_fork);
-		alpha.getEvent(events[R_PUT]).setLabel("put" + id + LABEL_SEP + r_fork);
+		alpha.getEvent(events[L_TAKE].getLabel()).setLabel("take" + id + LABEL_SEP + l_fork);
+		alpha.getEvent(events[R_TAKE].getLabel()).setLabel("take" + id + LABEL_SEP + r_fork);
+		alpha.getEvent(events[L_PUT].getLabel()).setLabel("put" + id + LABEL_SEP + l_fork);
+		alpha.getEvent(events[R_PUT].getLabel()).setLabel("put" + id + LABEL_SEP + r_fork);
 
 		// must rehash since we've changed the label (that's the way it works (unfortunately))
 		alpha.rehash();
@@ -190,11 +193,11 @@ class EatingPhilosopher
 		{
 			// The only thing that may need to be changed is the controllability
 			Alphabet alpha = philo.getAlphabet();
-			alpha.getEvent(events[L_TAKE]).setControllable(l_take);
-			alpha.getEvent(events[R_TAKE]).setControllable(r_take);
-			alpha.getEvent(events[L_PUT]).setControllable(l_put);
-			alpha.getEvent(events[R_PUT]).setControllable(r_put);
-			alpha.getEvent(events[START_EATING]).setControllable(true);
+			alpha.getEvent(events[L_TAKE].getLabel()).setControllable(l_take);
+			alpha.getEvent(events[R_TAKE].getLabel()).setControllable(r_take);
+			alpha.getEvent(events[L_PUT].getLabel()).setControllable(l_put);
+			alpha.getEvent(events[R_PUT].getLabel()).setControllable(r_put);
+			alpha.getEvent(events[START_EATING].getLabel()).setControllable(true);
 
 			return;
 		}
@@ -269,11 +272,11 @@ class EatingPhilosopher
 //              alpha.getEventWithId("L_put").setLabel("put" + id + LABEL_SEP + l_fork);
 //              alpha.getEventWithId("R_put").setLabel("put" + id + LABEL_SEP + r_fork);
 //              alpha.getEventWithId("Start_eating").setLabel("startEating" + id);
-		alpha.getEvent(events[L_TAKE]).setLabel("take" + id + LABEL_SEP + l_fork);
-		alpha.getEvent(events[R_TAKE]).setLabel("take" + id + LABEL_SEP + r_fork);
-		alpha.getEvent(events[L_PUT]).setLabel("put" + id + LABEL_SEP + l_fork);
-		alpha.getEvent(events[R_PUT]).setLabel("put" + id + LABEL_SEP + r_fork);
-		alpha.getEvent(events[START_EATING]).setLabel("startEating" + id);
+		alpha.getEvent(events[L_TAKE].getLabel()).setLabel("take" + id + LABEL_SEP + l_fork);
+		alpha.getEvent(events[R_TAKE].getLabel()).setLabel("take" + id + LABEL_SEP + r_fork);
+		alpha.getEvent(events[L_PUT].getLabel()).setLabel("put" + id + LABEL_SEP + l_fork);
+		alpha.getEvent(events[R_PUT].getLabel()).setLabel("put" + id + LABEL_SEP + r_fork);
+		alpha.getEvent(events[START_EATING].getLabel()).setLabel("startEating" + id);
 
 		// must rehash since we've changed the label (that's the way it works)
 		alpha.rehash();
@@ -285,11 +288,11 @@ class EatingPhilosopher
 		throws Exception
 	{
 		Alphabet alpha = currPhil.getAlphabet();
-		LabeledEvent lTake = alpha.getEvent(events[L_TAKE]);
-		LabeledEvent rTake = alpha.getEvent(events[R_TAKE]);
-		LabeledEvent lPut = alpha.getEvent(events[L_PUT]);
-		LabeledEvent rPut = alpha.getEvent(events[R_PUT]);
-		LabeledEvent startEating = alpha.getEvent(events[START_EATING]);
+		LabeledEvent lTake = alpha.getEvent(events[L_TAKE].getLabel());
+		LabeledEvent rTake = alpha.getEvent(events[R_TAKE].getLabel());
+		LabeledEvent lPut = alpha.getEvent(events[L_PUT].getLabel());
+		LabeledEvent rPut = alpha.getEvent(events[R_PUT].getLabel());
+		LabeledEvent startEating = alpha.getEvent(events[START_EATING].getLabel());
 
 //              Actions currActions = project.getActions();
 //              Controls currControls = project.getControls();
@@ -377,10 +380,10 @@ class Chopstick
 		{
 			// The only thing that may need to be changed is the controllability
 			Alphabet alpha = fork.getAlphabet();
-			alpha.getEvent(events[L_TAKE]).setControllable(l_take);
-			alpha.getEvent(events[R_TAKE]).setControllable(r_take);
-			alpha.getEvent(events[L_PUT]).setControllable(l_put);
-			alpha.getEvent(events[R_PUT]).setControllable(r_put);
+			alpha.getEvent(events[L_TAKE].getLabel()).setControllable(l_take);
+			alpha.getEvent(events[R_TAKE].getLabel()).setControllable(r_take);
+			alpha.getEvent(events[L_PUT].getLabel()).setControllable(l_put);
+			alpha.getEvent(events[R_PUT].getLabel()).setControllable(r_put);
 			return;
 		}
 
@@ -428,10 +431,10 @@ class Chopstick
 //              alpha.getEventWithId("R_up").setLabel("take" + r_philo + LABEL_SEP + id);
 //              alpha.getEventWithId("L_dn").setLabel("put" + l_philo + LABEL_SEP + id);
 //              alpha.getEventWithId("R_dn").setLabel("put" + r_philo + LABEL_SEP + id);
-		alpha.getEvent(events[L_TAKE]).setLabel("take" + l_philo + LABEL_SEP + id);
-		alpha.getEvent(events[R_TAKE]).setLabel("take" + r_philo + LABEL_SEP + id);
-		alpha.getEvent(events[L_PUT]).setLabel("put" + l_philo + LABEL_SEP + id);
-		alpha.getEvent(events[R_PUT]).setLabel("put" + r_philo + LABEL_SEP + id);
+		alpha.getEvent(events[L_TAKE].getLabel()).setLabel("take" + l_philo + LABEL_SEP + id);
+		alpha.getEvent(events[R_TAKE].getLabel()).setLabel("take" + r_philo + LABEL_SEP + id);
+		alpha.getEvent(events[L_PUT].getLabel()).setLabel("put" + l_philo + LABEL_SEP + id);
+		alpha.getEvent(events[R_PUT].getLabel()).setLabel("put" + r_philo + LABEL_SEP + id);
 
 		// must rehash since we've changed the label (that's the way it works)
 		alpha.rehash();
@@ -476,10 +479,10 @@ class MemoryChopstick
 		{
 			// The only thing that may need to be changed is the controllability
 			Alphabet alpha = fork.getAlphabet();
-			alpha.getEvent(events[L_TAKE]).setControllable(l_take);
-			alpha.getEvent(events[R_TAKE]).setControllable(r_take);
-			alpha.getEvent(events[L_PUT]).setControllable(l_put);
-			alpha.getEvent(events[R_PUT]).setControllable(r_put);
+			alpha.getEvent(events[L_TAKE].getLabel()).setControllable(l_take);
+			alpha.getEvent(events[R_TAKE].getLabel()).setControllable(r_take);
+			alpha.getEvent(events[L_PUT].getLabel()).setControllable(l_put);
+			alpha.getEvent(events[R_PUT].getLabel()).setControllable(r_put);
 			return;
 		}
 
@@ -527,10 +530,10 @@ class MemoryChopstick
 //              alpha.getEventWithId("R_up").setLabel("take" + r_philo + LABEL_SEP + id);
 //              alpha.getEventWithId("L_dn").setLabel("put" + l_philo + LABEL_SEP + id);
 //              alpha.getEventWithId("R_dn").setLabel("put" + r_philo + LABEL_SEP + id);
-		alpha.getEvent(events[L_TAKE]).setLabel("take" + l_philo + LABEL_SEP + id);
-		alpha.getEvent(events[R_TAKE]).setLabel("take" + r_philo + LABEL_SEP + id);
-		alpha.getEvent(events[L_PUT]).setLabel("put" + l_philo + LABEL_SEP + id);
-		alpha.getEvent(events[R_PUT]).setLabel("put" + r_philo + LABEL_SEP + id);
+		alpha.getEvent(events[L_TAKE].getLabel()).setLabel("take" + l_philo + LABEL_SEP + id);
+		alpha.getEvent(events[R_TAKE].getLabel()).setLabel("take" + r_philo + LABEL_SEP + id);
+		alpha.getEvent(events[L_PUT].getLabel()).setLabel("put" + l_philo + LABEL_SEP + id);
+		alpha.getEvent(events[R_PUT].getLabel()).setLabel("put" + r_philo + LABEL_SEP + id);
 
 		// must rehash since we've changed the label (that's the way it works)
 		alpha.rehash();

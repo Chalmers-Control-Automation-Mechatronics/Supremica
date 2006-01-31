@@ -182,7 +182,7 @@ public class Automaton
 			//State toState = getStateWithName(arc.getToState().getName());
 			State fromState = getStateWithIndex(arc.getFromState().getIndex());
 			State toState = getStateWithIndex(arc.getToState().getIndex());
-			LabeledEvent event = alphabet.getEvent(arc.getEvent());
+			LabeledEvent event = alphabet.getEvent(arc.getEvent().getLabel());
 			Arc newArc = new Arc(fromState, toState, event);
 			
 			addArc(newArc);
@@ -394,14 +394,13 @@ public class Automaton
 	}
 
 	/**
-	 * Returns a list of control inconsisten events among the
-	 * given states are consistent.
-	 * We have an inconsistency if an event is explicitly
-	 * removed in one state and explicitly enabled in another.
-	 * To represent the explicitly removed events they must
-	 * exist from the state but they are assumed to end in
-	 * an forbidden state.
-	 * The states in stateset must be contained in the current automaton.
+	 * Returns a list of control inconsisten events among the given
+	 * states are consistent.  We have an inconsistency if an event is
+	 * explicitly disabled in one state and explicitly enabled in
+	 * another.  To represent the explicitly disabled events they must
+	 * exist from the state but they are assumed to end in an
+	 * forbidden state.  The states in stateset must be contained in
+	 * the current automaton.
 	 */
 	public Alphabet getControlInconsistentEvents(StateSet stateset)
 	{
@@ -423,7 +422,7 @@ public class Automaton
 				{
 					LabeledEvent currEvent = currArc.getEvent();
 
-					if (!explicitlyForbiddenEvents.includes(currEvent))
+					if (!explicitlyForbiddenEvents.contains(currEvent))
 					{
 						try
 						{
@@ -458,7 +457,7 @@ public class Automaton
 				{
 					LabeledEvent currEvent = currArc.getEvent();
 
-					if (explicitlyForbiddenEvents.includes(currEvent))
+					if (explicitlyForbiddenEvents.contains(currEvent))
 					{
 						try
 						{
@@ -477,9 +476,9 @@ public class Automaton
 	}
 
 	/**
-	 * Sets an explicitly allowed arc (event) to point
-	 * to a forbidden state if that events is involved
-	 * in a control inconsistency. See getControlInconsistentEvents.
+	 * Sets an explicitly allowed arc (event) to point to a forbidden
+	 * state if that events is involved in a control
+	 * inconsistency. See getControlInconsistentEvents.
 	 */
 	public Alphabet resolveControlInconsistencies(StateSet stateset)
 	{
@@ -502,7 +501,7 @@ public class Automaton
 				{
 					LabeledEvent currEvent = currArc.getEvent();
 
-					if (!explicitlyForbiddenEvents.includes(currEvent))
+					if (!explicitlyForbiddenEvents.contains(currEvent))
 					{
 						try
 						{
@@ -538,7 +537,7 @@ public class Automaton
 				{
 					LabeledEvent currEvent = currArc.getEvent();
 
-					if (explicitlyForbiddenEvents.includes(currEvent))
+					if (explicitlyForbiddenEvents.contains(currEvent))
 					{
 						try
 						{

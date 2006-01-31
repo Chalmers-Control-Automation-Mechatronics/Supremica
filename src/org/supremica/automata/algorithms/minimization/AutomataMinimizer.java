@@ -415,7 +415,7 @@ public class AutomataMinimizer
 					/////////////////
 					// SECOND STEP //
 					/////////////////
-				
+					
 					// Evaluate selection
 					double thisValue = heuristic.value(selection, eventToAutomataMap, targetAlphabet);
 					// Maximize or minimize?
@@ -434,10 +434,12 @@ public class AutomataMinimizer
 						for (int i = heuristicIndex+1; i<heuristicList.size(); i++)
 						{
 							MinimizationHeuristic nextHeuristic = heuristicList.get(i);
-							double nextHeuristicBest = nextHeuristic.value(taskAutomata, eventToAutomataMap, 
-																	targetAlphabet);
-							double nextHeuristicThis = nextHeuristic.value(selection, eventToAutomataMap, 
-																	targetAlphabet);
+							double nextHeuristicBest = nextHeuristic.value(taskAutomata, 
+																		   eventToAutomataMap, 
+																		   targetAlphabet);
+							double nextHeuristicThis = nextHeuristic.value(selection, 
+																		   eventToAutomataMap, 
+																		   targetAlphabet);
 							if ((nextHeuristic.maximize() && nextHeuristicThis > nextHeuristicBest) ||
 								(nextHeuristic.minimize() && nextHeuristicThis < nextHeuristicBest))
 							{

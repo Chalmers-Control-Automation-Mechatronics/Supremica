@@ -205,7 +205,7 @@ public class AutomataExtender
 
 					// LabeledEvent currEvent = orgAlphabet.getEventWithId(orgArc.getEventId());
 					// BIG WARNING, Red Flag here, may be broken...
-					LabeledEvent currEvent = newAlphabet.getEvent(orgArc.getEvent());    // newAlphabet.getEventWithId(orgArc.getEventId());
+					LabeledEvent currEvent = newAlphabet.getEvent(orgArc.getEvent().getLabel());    
 
 					if (i < k)
 					{
@@ -260,7 +260,7 @@ public class AutomataExtender
 								// WARNING Red Flag, may be broken...
 								// Do we know this event id (currEvent.getId() + "_c") exists? What if not?
 								// It does, it was created above and added to newAlphabet
-								LabeledEvent cEvent = newAlphabet.getEvent(new LabeledEvent());    // newAlphabet.getEventWithId(currEvent.getId() + "_c");
+								LabeledEvent cEvent = newAlphabet.getEvent(new LabeledEvent().getLabel());
 								Arc newArc = new Arc(newSourceState, newDestState, cEvent);
 
 								newAut.addArc(newArc);

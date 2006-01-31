@@ -145,17 +145,14 @@ public class Determinizer
 			// Note that the getSingleStateRepresentation call ALWAYS returns a new representation
 			// i.e. (if you look at the implementation ni StateSet) it never reuses the same
 			// representation, the local singleStateRepresentation is never null!! (I think.)
-
 			StateSet Q1 = openStateSets.get();    // This is vanNoords T
 			State T = newAutomaton.addStateChecked(Q1.getSingleStateRepresentation());
 
 			// for each event not to be disregarded, calc the closure, create the arc
-			/* Alphabet */
-			Iterator it = automaton.getAlphabet().iterator();
+			Iterator<LabeledEvent> it = automaton.getAlphabet().iterator();
 			while (it.hasNext())
 			{
-				LabeledEvent e = (LabeledEvent) it.next();
-
+				LabeledEvent e = it.next();
 				if (!epsilonTester.isThisEpsilon(e))
 				{
 					// From this set, via this event, calc the reached state

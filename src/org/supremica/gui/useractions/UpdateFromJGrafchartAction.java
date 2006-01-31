@@ -500,7 +500,7 @@ public class UpdateFromJGrafchartAction
 					}
 					else
 					{
-						currEvent = theAlphabet.getEvent(currEvent);
+						currEvent = theAlphabet.getEvent(currEvent.getLabel());
 					}
 
 					Arc newArc = new Arc(precedingState, succeedingState, currEvent);
