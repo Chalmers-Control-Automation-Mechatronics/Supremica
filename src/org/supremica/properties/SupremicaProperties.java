@@ -122,7 +122,8 @@ public final class SupremicaProperties
 	private static final String FILE_RSDEMO_OPEN_PATH = "fileRSDemoOpenPath";
 
 	// General properties
-	private static final String GENERAL_STATE_SEPARATOR = "stateSeparator";
+	private static final String GENERAL_STATE_SEPARATOR = "generalStateSeparator";
+	private static final String GENERAL_SILENT_EVENT_NAME = "generalSilentEventName";
 
 	// Synchronization Options
 	private static final String SYNC_FORBID_UNCON_STATES = "syncForbidUncontrollableStates";
@@ -287,6 +288,7 @@ public final class SupremicaProperties
 		setProperty(GENERAL_USE_ROBOTCOORDINATION, "false", true);
 		// General
 		setProperty(GENERAL_STATE_SEPARATOR, ".", true);
+		setProperty(GENERAL_SILENT_EVENT_NAME, "tau", false);
 		// Synchronization
 		setProperty(SYNC_FORBID_UNCON_STATES, "true", true);
 		setProperty(SYNC_EXPAND_FORBIDDEN_STATES, "true", true);
@@ -965,6 +967,14 @@ public final class SupremicaProperties
 	public static void setStateSeparator(String command)
 	{
 		wp.setProperty(GENERAL_STATE_SEPARATOR, command);
+	}
+	public static String getSilentEventName()
+	{
+		return wp.getProperty(GENERAL_SILENT_EVENT_NAME);
+	}
+	public static void setSilentEventName(String command)
+	{
+		wp.setProperty(GENERAL_SILENT_EVENT_NAME, command);
 	}
 	public static String getDotExecuteCommand()
 	{

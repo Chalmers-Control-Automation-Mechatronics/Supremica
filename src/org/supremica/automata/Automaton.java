@@ -1898,10 +1898,11 @@ public class Automaton
 		getAlphabet().minus(alpha);
 
 		// Get/create silent event tau
-		LabeledEvent tau = getAlphabet().getEvent("tau");
+		String silentName = SupremicaProperties.getSilentEventName();
+		LabeledEvent tau = getAlphabet().getEvent(silentName);
 		if (tau == null)
 		{
-			tau = new LabeledEvent("tau");
+			tau = new LabeledEvent(silentName);
 			tau.setEpsilon(true);
 			getAlphabet().addEvent(tau);
 		}
@@ -1909,7 +1910,7 @@ public class Automaton
 		{
 			if (!tau.isEpsilon())
 			{
-				logger.error("The event name 'tau' is reserved and must be unobservable!");
+				logger.error("The event name " + silentName + " is reserved and must be unobservable!");
 				return;
 			}
 		}

@@ -1659,9 +1659,9 @@ public class AutomatonMinimizer
 		int count = 0;
 
         // Add silent event (it's probably already there)
-        LabeledEvent tau = new LabeledEvent("tau");
+        LabeledEvent tau = new LabeledEvent(SupremicaProperties.getSilentEventName());
         tau.setEpsilon(true);
-        if (!aut.getAlphabet().contains(tau))
+        if (!aut.getAlphabet().contains(tau.getLabel()))
         {
             aut.getAlphabet().addEvent(tau);
         }
@@ -1767,7 +1767,7 @@ public class AutomatonMinimizer
             }
 
             // Add silent self-loop
-            LabeledEvent tau = new LabeledEvent("tau");
+            LabeledEvent tau = new LabeledEvent(SupremicaProperties.getSilentEventName());
             tau.setEpsilon(true);
             if (!aut.getAlphabet().contains(tau))
             {

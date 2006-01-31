@@ -188,7 +188,7 @@ public class AutomataMinimizer
 			*/
 
 			// Get next automata to minimize
-			MinimizationTask task = getNextMinimizationTask(true);
+			MinimizationTask task = getNextMinimizationTask(false);
 			Automata selection = task.getAutomata();
 			Alphabet hideThese = task.getEventsToHide();
 
