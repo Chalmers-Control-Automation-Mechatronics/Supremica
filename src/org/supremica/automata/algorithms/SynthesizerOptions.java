@@ -110,7 +110,16 @@ public final class SynthesizerOptions
 			return "Unknown synthesis type.";
 		}
 
-		if (synthesisAlgorithm == SynthesisAlgorithm.Unknown)
+		if (synthesisAlgorithm == SynthesisAlgorithm.BDD)
+		{
+			if ((synthesisType != SynthesisType.Both) && 
+				(synthesisType != SynthesisType.Controllable) &&
+				(synthesisType != SynthesisType.Nonblocking))
+			{
+				return("BDD algorithms currently only support supNB+C synthesis.");
+			}
+		}
+		else if (synthesisAlgorithm == SynthesisAlgorithm.Unknown)
 		{
 			return "Unknown synthesis algorithm.";
 		}

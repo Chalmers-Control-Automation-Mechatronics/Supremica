@@ -123,7 +123,10 @@ public final class SupremicaProperties
 
 	// General properties
 	private static final String GENERAL_STATE_SEPARATOR = "generalStateSeparator";
+	private static final String GENERAL_STATELABEL_SEPARATOR = "generalStatelabelSeparator";
 	private static final String GENERAL_SILENT_EVENT_NAME = "generalSilentEventName";
+	private static final String GENERAL_SILENT_CONTROLLABLE_EVENT_NAME = "generalSilentControllableEventName";
+	private static final String GENERAL_SILENT_UNCONTROLLABLE_EVENT_NAME = "generalSilentUncontrollableEventName";
 
 	// Synchronization Options
 	private static final String SYNC_FORBID_UNCON_STATES = "syncForbidUncontrollableStates";
@@ -288,7 +291,10 @@ public final class SupremicaProperties
 		setProperty(GENERAL_USE_ROBOTCOORDINATION, "false", true);
 		// General
 		setProperty(GENERAL_STATE_SEPARATOR, ".", true);
+		setProperty(GENERAL_STATELABEL_SEPARATOR, ",", false);
 		setProperty(GENERAL_SILENT_EVENT_NAME, "tau", false);
+		setProperty(GENERAL_SILENT_CONTROLLABLE_EVENT_NAME, "tau_c", false);
+		setProperty(GENERAL_SILENT_UNCONTROLLABLE_EVENT_NAME, "tau_u", false);
 		// Synchronization
 		setProperty(SYNC_FORBID_UNCON_STATES, "true", true);
 		setProperty(SYNC_EXPAND_FORBIDDEN_STATES, "true", true);
@@ -968,6 +974,14 @@ public final class SupremicaProperties
 	{
 		wp.setProperty(GENERAL_STATE_SEPARATOR, command);
 	}
+	public static String getStatelabelSeparator()
+	{
+		return wp.getProperty(GENERAL_STATELABEL_SEPARATOR);
+	}
+	public static void setStatelabelSeparator(String command)
+	{
+		wp.setProperty(GENERAL_STATELABEL_SEPARATOR, command);
+	}
 	public static String getSilentEventName()
 	{
 		return wp.getProperty(GENERAL_SILENT_EVENT_NAME);
@@ -975,6 +989,22 @@ public final class SupremicaProperties
 	public static void setSilentEventName(String command)
 	{
 		wp.setProperty(GENERAL_SILENT_EVENT_NAME, command);
+	}
+	public static String getSilentControllableEventName()
+	{
+		return wp.getProperty(GENERAL_SILENT_CONTROLLABLE_EVENT_NAME);
+	}
+	public static void setSilentControllableEventName(String command)
+	{
+		wp.setProperty(GENERAL_SILENT_CONTROLLABLE_EVENT_NAME, command);
+	}
+	public static String getSilentUncontrollableEventName()
+	{
+		return wp.getProperty(GENERAL_SILENT_UNCONTROLLABLE_EVENT_NAME);
+	}
+	public static void setSilentUncontrollableEventName(String command)
+	{
+		wp.setProperty(GENERAL_SILENT_UNCONTROLLABLE_EVENT_NAME, command);
 	}
 	public static String getDotExecuteCommand()
 	{

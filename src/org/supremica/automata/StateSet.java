@@ -25,8 +25,9 @@ public class StateSet
 	 */
 	public StateSet()
 	{
-		super(); // State implements Comparable!
+		// State implements Comparable!
 		//super(new State.StateComparator());
+		super(); 
 	}
 
 	public StateSet(Collection<? extends State> collection)
@@ -92,7 +93,8 @@ public class StateSet
 	{
 		StringBuffer buf = new StringBuffer();
 
-		buf.append("StateSet[" + size() + "]: {");
+		//buf.append("StateSet[" + size() + "]: ");
+		buf.append("{");
 
 		Iterator<State> it = iterator();
 		while (it.hasNext())
@@ -137,16 +139,24 @@ public class StateSet
 	}
 
 	/**
-	 * Returns the state set that can reach some state in the current state set in a transition
-	 * associated with event.
+	 * Returns the state set that can reach some state in the current
+	 * state set in a transition associated with event.
 	 */
 	public StateSet previousStates(LabeledEvent event)
+	{
+		return previousStates(event.getLabel());
+	}
+	/**
+	 * Returns the state set that can reach some state in the current
+	 * state set in a transition associated with an event labeled eventLabel.
+	 */
+	public StateSet previousStates(String eventLabel)
 	{
 		StateSet prevStates = new StateSet();
 
 		for (Iterator<State> stateIt = iterator(); stateIt.hasNext(); )
 		{
-			for (Iterator<State> prevIt = stateIt.next().previousStateIterator(event); 
+			for (Iterator<State> prevIt = stateIt.next().previousStateIterator(eventLabel); 
 				 prevIt.hasNext(); )
 			{
 				prevStates.add(prevIt.next());
@@ -155,12 +165,13 @@ public class StateSet
 
 		return prevStates;
 	}
-
+	
 	/**
-	 * Returns the set of states that can be reached from the current state set by transitions
-	 * associated with "event".
-	 * @param considerEpsilonClosure If true, the epsilon closure before and after "event" is also condidered,
-	 * if false, only one step along transitions with event "event" is considered.
+	 * Returns the set of states that can be reached from the current
+	 * state set by transitions associated with "event".
+	 * @param considerEpsilonClosure If true, the epsilon closure
+	 * before and after "event" is also condidered, if false, only one
+	 * step along transitions with event "event" is considered.
 	 */
 	public StateSet nextStates(LabeledEvent event, boolean considerEpsilonClosure)
 	{
@@ -215,8 +226,9 @@ public class StateSet
 	}
 
 	/**
-	 * Returns a single state representation of this StateSet. Either by constructing a new one
-	 * or by returning a previously constructed one.
+	 * Returns a single state representation of this StateSet. Either
+	 * by constructing a new one or by returning a previously
+	 * constructed one.
 	 */
 	public State getSingleStateRepresentation()
 	{

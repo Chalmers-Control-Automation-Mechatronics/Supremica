@@ -76,9 +76,6 @@ public final class AutomataSynchronizerHelper
 	private IntArrayList statesToProcess;
 	private int nbrOfStatesToProcess = 0;
 
-//      private int totalNbrOfStates = 0;
-//      private int nbrOfUncontrollableStates = 0;
-//      private int nbrOfDeadlockedStates = 0;
 	// Two locks are used to limit the access the statesToProcess
 	private final Object gettingFromStatesToProcessLock = new Object();
 	private final Object addingToStatesToProcessLock = gettingFromStatesToProcessLock;
@@ -100,9 +97,7 @@ public final class AutomataSynchronizerHelper
 	private boolean rememberTrace = false;
 	private boolean coExecute = false;
 
-	//private AutomataOnlineSynchronizer coExecuter = null;
 	private AutomataSynchronizerExecuter coExecuter = null;
-//	private Rendezvous executerRendezvous = null;
 
 	/* Used by AutomataControllabillityCheck.
 	 * Causes the synchronization to stop as soon as an uncontrollable
@@ -140,7 +135,6 @@ public final class AutomataSynchronizerHelper
 		theStates = new IntArrayHashTable(syncOptions.getInitialHashtableSize(),
 										  syncOptions.expandHashtable());
 		theAutomaton = new Automaton();
-		// executerRendezvous = new Rendezvous(syncOptions.getNbrOfExecuters(), new ExecuterRendezvous());
 
 		// Calculate the automataIndexForm (a more efficient representation of an automata)
 		try
@@ -174,7 +168,6 @@ public final class AutomataSynchronizerHelper
 		statesToProcess = new IntArrayList();
 		nbrOfStatesToProcess = 0;
 		theStates = new IntArrayHashTable(syncOptions.getInitialHashtableSize(), syncOptions.expandHashtable());
-//		executerRendezvous = orgHelper.getExecuterRendezvous();
 	}
 
 	public void clear()
@@ -188,9 +181,6 @@ public final class AutomataSynchronizerHelper
 		exhaustiveSearch = false;
 		rememberUncontrollable = false;
 		expandEventsUsingPriority = false;
-
-		// Should be an external option?!? FIXA!
-		// Is there anything else that needs to be cleared?...
 	}
 
 	/**
@@ -402,7 +392,6 @@ public final class AutomataSynchronizerHelper
 			addStatus(newState);
 			addStateToProcess(newState);
 
-			// helperData.incrNbrOfAddedStates();
 			helperData.nbrOfAddedStates++;
 		}
 		else if (rememberTrace && (fromStateList.size() != 0))
@@ -411,7 +400,6 @@ public final class AutomataSynchronizerHelper
 		}
 
 		helperData.nbrOfCheckedStates++;
-
 		if ((executionDialog != null) && (helperData.nbrOfCheckedStates % 2000 == 0))
 		{
 			executionDialog.setValue((int) helperData.nbrOfAddedStates);

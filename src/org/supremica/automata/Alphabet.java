@@ -63,6 +63,7 @@ import org.supremica.log.*;
  *@see  org.supremica.automata.AlphabetHelpers
  */
 public class Alphabet
+	implements Iterable<LabeledEvent>
 {
 	private static Logger logger = LoggerFactory.createLogger(Alphabet.class);
 	private int idIndex = 0;

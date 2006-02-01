@@ -167,6 +167,16 @@ public final class MinimizationOptions
 			}
 		}
 
+		if (equivalenceRelation == EquivalenceRelation.SupervisionEquivalence)
+		{
+			if (skipLast)
+			{
+				String message = "Invalid minimization options chosen. Supervision equivalence " +
+					"implies that the last step can not be skipped.";
+				return message;
+			}
+		}
+
 		if (compositionalMinimization)
 		{
 			if (targetAlphabet == null)
@@ -330,7 +340,8 @@ public final class MinimizationOptions
 	}
 
 	/**
-	 * Returns the default options for minimization - this is with respect to observation equivalence.
+	 * Returns the default options for minimization - this is with
+	 * respect to observation equivalence.
 	 */
 	public static MinimizationOptions getDefaultMinimizationOptions()
 	{
@@ -343,19 +354,18 @@ public final class MinimizationOptions
 	}
 
 	/**
-	 * Returns the default options for nonblocking verification - this is with respect to conflict equivalence.
+	 * Returns the default options for nonblocking verification - this
+	 * is with respect to conflict equivalence.
 	 */
 	public static MinimizationOptions getDefaultNonblockingOptions()
 	{
 		MinimizationOptions options = MinimizationOptions.getDefaultMinimizationOptions();
 		options.setMinimizationType(EquivalenceRelation.ConflictEquivalence);
-		options.setAlsoTransitions(false);
+		options.setAlsoTransitions(true);
 		options.setKeepOriginal(false);
 		options.setCompositionalMinimization(true);
 		options.setSkipLast(true);
 		options.setTargetAlphabet(new Alphabet());
-		//options.setMinimizationStrategy(MinimizationStrategy.FewestTransitionsFirst);
-		//options.setMinimizationHeuristic(MinimizationHeuristic.MostLocal);
 		return options;
 	}
 
@@ -365,5 +375,21 @@ public final class MinimizationOptions
 	public static MinimizationOptions getDefaultVerificationOptions()
 	{
 		return getDefaultNonblockingOptions();
+	}
+
+	/**
+	 * Returns the default options for nonblocking verification - this
+	 * is with respect to conflict equivalence.
+	 */
+	public static MinimizationOptions getDefaultSynthesisOptions()
+	{
+		MinimizationOptions options = MinimizationOptions.getDefaultMinimizationOptions();
+		options.setMinimizationType(EquivalenceRelation.SupervisionEquivalence);
+		options.setAlsoTransitions(true);
+		options.setKeepOriginal(false);
+		options.setCompositionalMinimization(true);
+		options.setSkipLast(false);
+		options.setTargetAlphabet(new Alphabet());
+		return options;
 	}
 }

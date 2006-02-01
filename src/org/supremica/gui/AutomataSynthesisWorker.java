@@ -170,7 +170,7 @@ public class AutomataSynthesisWorker
 			}
 		});
 
-		// How did it go?
+		// Present result
 		if (!stopRequested)
 		{
 			logger.info("Execution completed after " + timer.toString());

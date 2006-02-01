@@ -57,7 +57,7 @@ import org.supremica.properties.SupremicaProperties;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 
 public class Automaton
-//	implements ArcListener
+	implements Iterable<State>
 {
 	private static Logger logger = LoggerFactory.createLogger(Automaton.class);
 
@@ -353,6 +353,24 @@ public class Automaton
 			//idStateMap.put(state.getId(), state);
 		}
 	}
+
+	/**
+	 * Logs a sorted list of the state indices.
+	 */
+    private void checkStateIndices()
+    {
+        TreeSet sort = new TreeSet();
+
+        for (Iterator<State> it = stateIterator(); it.hasNext(); )
+        {
+            sort.add(new Integer(it.next().getIndex()));
+        }
+
+        for (Iterator it = sort.iterator(); it.hasNext(); )
+        {
+            logger.error(it.next().toString());
+        }
+    }
 
 	/**
 	 * Adds a state to this automaton. If this is supposed to be the initial state, make
@@ -1324,9 +1342,20 @@ public class Automaton
 		return depthSum;
 	}
 
+	/**
+	 * Returns an iterator over the states.
+	 */
 	public Iterator<State> stateIterator()
 	{
 		return theStates.iterator();
+	}
+
+	/**
+	 * Returns the state iterator.
+	 */
+	public Iterator<State> iterator()
+	{
+		return stateIterator();
 	}
 
 	/**
@@ -1886,7 +1915,7 @@ public class Automaton
 	/**
 	 * Hides (makes epsilon) the supplied events.
 	 */
-	public void hide(Alphabet alpha)
+	public void hide(Alphabet alpha, boolean preserveControllability)
 	{
 		// Don't hide nothing!
 		if ((alpha == null) || (alpha.size() == 0))
@@ -1897,33 +1926,93 @@ public class Automaton
 		// Remove the hidden events from alphabet
 		getAlphabet().minus(alpha);
 
-		// Get/create silent event tau
-		String silentName = SupremicaProperties.getSilentEventName();
-		LabeledEvent tau = getAlphabet().getEvent(silentName);
-		if (tau == null)
+		// Do we care about controllability?
+		if (!preserveControllability)
 		{
-			tau = new LabeledEvent(silentName);
-			tau.setEpsilon(true);
-			getAlphabet().addEvent(tau);
+			// Get/create silent event tau
+			String silentName = SupremicaProperties.getSilentEventName();
+			LabeledEvent tau = getAlphabet().getEvent(silentName);
+			if (tau == null)
+			{
+				tau = new LabeledEvent(silentName);
+				tau.setEpsilon(true);
+				getAlphabet().addEvent(tau);
+			}
+			else
+			{
+				if (!tau.isEpsilon())
+				{
+					logger.error("The event name " + silentName + 
+								 " is reserved and must be unobservable!");
+					return;
+				}
+			}
+			
+			// Modify arcs
+			for (Iterator<Arc> arcIt = arcIterator(); arcIt.hasNext(); )
+			{
+				Arc arc = arcIt.next();
+				
+				// Hide this one?
+				if (alpha.contains(arc.getEvent()))
+				{
+					arc.setEvent(tau);
+				}
+			}
 		}
 		else
 		{
-			if (!tau.isEpsilon())
+			// Get/create silent events tau_c and tau_u
+			String silentCName = SupremicaProperties.getSilentControllableEventName();
+			String silentUName = SupremicaProperties.getSilentUncontrollableEventName();
+			LabeledEvent tau_c = getAlphabet().getEvent(silentCName);
+			LabeledEvent tau_u = getAlphabet().getEvent(silentUName);
+			if (tau_c == null)
 			{
-				logger.error("The event name " + silentName + " is reserved and must be unobservable!");
-				return;
+				tau_c = new LabeledEvent(silentCName);
+				tau_c.setEpsilon(true);
+				tau_c.setControllable(true);
+				getAlphabet().addEvent(tau_c);
 			}
-		}
-
-		// Modify arcs
-		for (Iterator<Arc> arcIt = arcIterator(); arcIt.hasNext(); )
-		{
-			Arc arc = arcIt.next();
-
-			// Hide this one?
-			if (alpha.contains(arc.getEvent()))
+			else
 			{
-				arc.setEvent(tau);
+				if (!tau_c.isEpsilon() || !tau_c.isControllable())
+				{
+					logger.error("The event name " + silentCName + 
+								 " is reserved and must be controllable and unobservable!");
+					return;
+				}
+			}
+			if (tau_u == null)
+			{
+				tau_u = new LabeledEvent(silentUName);
+				tau_u.setEpsilon(true);
+				tau_u.setControllable(false);
+				getAlphabet().addEvent(tau_u);
+			}
+			else
+			{
+				if (!tau_u.isEpsilon() || tau_u.isControllable())
+				{
+					logger.error("The event name " + silentUName + 
+								 " is reserved and must be uncontrollable and unobservable!");
+					return;
+				}
+			}
+			
+			// Modify arcs
+			for (Iterator<Arc> arcIt = arcIterator(); arcIt.hasNext(); )
+			{
+				Arc arc = arcIt.next();
+				
+				// Hide this one?
+				if (alpha.contains(arc.getEvent()))
+				{
+					if (arc.getEvent().isControllable())
+						arc.setEvent(tau_c);
+					else
+						arc.setEvent(tau_u);
+				}
 			}
 		}
 	}
@@ -2273,10 +2362,14 @@ public class Automaton
 	}
 
 	// These are unary Automaton operators, they do belong here //MF
+	// So move them somewhere else! That's how things get done around here... :o) //Hugo
 
 	/**
-	 * Saturate the automaton with arcs on events not defined for a state, going to a uniquely named dump state.
-	 * This unary operation makes the automaton "complete" in the computing science sense.
+	 * Saturate the automaton with arcs on events not defined for a
+	 * state, going to a uniquely named dump state.
+	 *
+	 * This unary operation makes the automaton "complete" in the
+	 * computer science sense.
 	 */
 	public boolean saturateDump()
 	{
@@ -2293,9 +2386,11 @@ public class Automaton
 
 		boolean done_something = false; // keep track so we don't add dump-states over and over
 
-		State dump = createUniqueState("dump");	// Create uniquely named dump state
-		addState(dump);							// Add it to myself
-		saturate(dump, alpha, dump);		    // saturate, else something will always be done
+		// Create uniquely named dump state
+		State dump = createUniqueState("dump");	
+		addState(dump);							
+		// saturate, else something will always be done
+		saturate(dump, alpha, dump);
 
 		for (Iterator<State> state_it = safeStateIterator(); state_it.hasNext(); )
 		{
@@ -2303,7 +2398,8 @@ public class Automaton
 			done_something |= saturate(state, alpha, dump);	// saturate to the dump-state
 		}
 
-		if (done_something == false) // need to remove dump state including its self-loop arcs
+		// Need to remove dump state including its self-loop arcs?
+		if (done_something == false) 
 		{
 			removeState(dump);
 		}
@@ -2312,8 +2408,10 @@ public class Automaton
 	}
 
 	/**
-	 * Saturate the automaton with self-loops on events not defined for a state.
-	 * This unary operation makes the automaton "complete" in the sense.that all events are defined for all states
+	 * Saturate the automaton with self-loops on events not defined
+	 * for a state.  This unary operation makes the automaton
+	 * "complete" in the sense.that all events are defined for all
+	 * states
 	 */
 	public boolean saturateLoop()
 	{
@@ -2321,8 +2419,9 @@ public class Automaton
 	}
 
 	/**
-	 * Saturate with self-loops for a certain sub-alphabet.
-	 * Beware, we assume that alpha is a subset of the alphabet of the automaton
+	 * Saturate with self-loops for a certain sub-alphabet.  Beware,
+	 * we assume that alpha is a subset of the alphabet of the
+	 * automaton
 	 */
 	public boolean saturateLoop(Alphabet alpha)
 	{
@@ -2339,11 +2438,13 @@ public class Automaton
 	}
 
 	/**
-	 * Add an arc <from_state, event, to-state> for each event in alpha
-	 * that is not defined in from_state. Returns true if anything added.
-	 * Note that this one costs you
-	 * |Q|x|A|x|T|, where Q is the state-set, A the given alphabet and T the
-	 * transitions from the certain state (plus the ones we're adding while we work!)
+	 * Add an arc <from_state, event, to-state> for each event in
+	 * alpha that is not defined in from_state. Returns true if
+	 * anything added. 
+	 *
+	 * Note that this one costs you |Q|x|A|x|T|, where Q is the
+	 * state-set, A the given alphabet and T the transitions from the
+	 * certain state (plus the ones we're adding while we work!)
 	 * ... at the moment -- there *must* be a better way!
 	 */
 	private boolean saturate(State from_state, Alphabet alpha, State to_state)
@@ -2367,12 +2468,13 @@ public class Automaton
 	 * may (but rarely are) be more). With "adequate" as defined in
 	 * "On the set of certain conflicts of a given language" by Robi
 	 * Malik.
-	 *  An inadequate event is, for example, one that is
-	 * self-looped in all states of an automaton. Controllable
-	 * inadequate events can always be removed from the alphabet,
-	 * uncontrollable self-looped events can safely be removed from
-	 * specification/supervisors and from plants IF the event is
-	 * present in some other plant of the system.
+	 *
+	 * An inadequate event is, for example, one that is self-looped in
+	 * all states of an automaton. Controllable inadequate events can
+	 * always be removed from the alphabet, uncontrollable self-looped
+	 * events can safely be removed from specification/supervisors and
+	 * from plants IF the event is present in some other plant of the
+	 * system.
 	 */
 	public Alphabet getInadequateEvents()
 	{

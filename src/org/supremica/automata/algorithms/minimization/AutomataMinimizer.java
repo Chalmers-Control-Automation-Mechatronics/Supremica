@@ -161,6 +161,12 @@ public class AutomataMinimizer
 		// Initialize statistics count
 		AutomatonMinimizer.resetTotal();
 
+		// Special pre-minimization stuff
+		if (options.getMinimizationType() == EquivalenceRelation.SupervisionEquivalence)
+		{
+			MinimizationHelper.plantify(theAutomata);
+		}
+
 		// For each event, find the automata that has this event in its alphabet
 		eventToAutomataMap = AlphabetHelpers.buildEventToAutomataMap(theAutomata);
 
@@ -206,7 +212,8 @@ public class AutomataMinimizer
 			{
 				// Just synch and hide
 				min = AutomataSynchronizer.synchronizeAutomata(selection);
-				min.hide(hideThese);
+				boolean preserveControllability = options.getMinimizationType() == EquivalenceRelation.SupervisionEquivalence;
+				min.hide(hideThese, preserveControllability);
 
 				// Examine for largest sizes
 				if (min.nbrOfStates() > mostStates)
@@ -232,7 +239,7 @@ public class AutomataMinimizer
 				{
 					// Return a one state blocking automaton (min for example)
 					logger.info("Early termination!");
-					min.hide(new Alphabet(min.getAlphabet()));
+					min.hide(new Alphabet(min.getAlphabet()), false);
 					theAutomata = new Automata(min);
 					continue;
 				}
@@ -702,8 +709,8 @@ public class AutomataMinimizer
 	private Automaton monolithicMinimization(Automata automata, Alphabet hideThese)
 		throws Exception
 	{
-		// We don't really care about the state names, keep them short!
-		boolean useShortStateNames = true;
+		// Do we care about state names?
+		boolean useShortStateNames = options.getMinimizationType() != EquivalenceRelation.SupervisionEquivalence;
 
 		// Synchronize, or if there's just one automaton, just find it
 		Automaton aut;
@@ -733,7 +740,8 @@ public class AutomataMinimizer
 		}
 
 		// Hide the events!
-		aut.hide(hideThese);
+		boolean preserveControllability = options.getMinimizationType() == EquivalenceRelation.SupervisionEquivalence;
+		aut.hide(hideThese, preserveControllability);
 
 		// Examine for largest sizes
 		if (aut.nbrOfStates() > mostStates)

@@ -3,24 +3,21 @@ package org.supremica.automata;
 import java.util.*;
 
 public class StateSets
+	implements Iterable<StateSet>
 {
-	private HashSet stateSets;
-
-	// Private constructor for cloning
-	private StateSets(HashSet hashset)
-	{
-		stateSets = new HashSet(hashset);
-	}
+	private HashSet<StateSet> stateSets;
 
 	public StateSets()
 	{
 		stateSets = new HashSet();
 	}
 
-	// Shallow copy (should it be deep?)
+	/**
+	 * Shallow copy.
+	 */
 	public StateSets(StateSets ss)
 	{
-		this(ss.stateSets);
+		stateSets = new HashSet<StateSet>(ss.stateSets);
 	}
 
 	public boolean add(StateSet set)
@@ -30,14 +27,10 @@ public class StateSets
 
 	public void add(StateSets sets)
 	{
-		Iterator setIt = sets.iterator();
-
-		while (setIt.hasNext())
+		for (StateSet set : sets)
 		{
-			StateSet stateSet = (StateSet) setIt.next();
-
-			stateSet.update();
-			stateSets.add(stateSet);
+			set.update();
+			stateSets.add(set);
 		}
 	}
 
@@ -70,9 +63,9 @@ public class StateSets
 
 	public void update()
 	{
-		for (Iterator setIt = iterator(); setIt.hasNext(); )
+		for (StateSet set : stateSets)
 		{
-			((StateSet) setIt.next()).update();
+			set.update();
 		}
 	}
 
@@ -129,7 +122,7 @@ public class StateSets
 		return stateSets.isEmpty();
 	}
 
-	public Iterator iterator()
+	public Iterator<StateSet> iterator()
 	{
 		return stateSets.iterator();
 	}

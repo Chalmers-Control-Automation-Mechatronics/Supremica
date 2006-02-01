@@ -112,7 +112,7 @@ public class TestAutomatonMinimizer
             hide.addEvent(alpha.getEvent("End1"));
             hide.addEvent(alpha.getEvent("End2"));
             hide = AlphabetHelpers.minus(alpha, hide);
-            synch.hide(hide);
+            synch.hide(hide, false);
 
             MinimizationOptions options = MinimizationOptions.getDefaultMinimizationOptions();
             options.setMinimizationType(EquivalenceRelation.LanguageEquivalence);
@@ -200,7 +200,7 @@ public class TestAutomatonMinimizer
             min = minimizer.getMinimizedAutomaton(options);
             assertTrue((min.nbrOfStates() == 3) &&
                        (min.nbrOfTransitions() == 3) &&
-                       (min.getStateWithName("2.0.1").nbrOfOutgoingArcs() == 2));
+                       (min.getStateWithName("2,0,1").nbrOfOutgoingArcs() == 2));
 
             //System.err.println("Westin");
             // Test bisimulation equivalence minimization
@@ -208,7 +208,7 @@ public class TestAutomatonMinimizer
             min = minimizer.getMinimizedAutomaton(options);
             assertTrue((min.nbrOfStates() == 4) &&
                        (min.nbrOfTransitions() == 4) &&
-                       (min.getStateWithName("q2.q1.p1").nbrOfOutgoingArcs() == 2));
+                       (min.getStateWithName("q2,q1,p1").nbrOfOutgoingArcs() == 2));
         }
         catch (Exception ex)
         {

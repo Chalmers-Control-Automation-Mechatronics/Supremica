@@ -89,7 +89,7 @@ class EventHiderDialog
 			}
 
 			// Do the hiding
-			newAutomaton.hide(alpha);
+			newAutomaton.hide(alpha, false);
 
 			// Set appropriate comment
 			newAutomaton.setComment(automaton.getName() + "//" +

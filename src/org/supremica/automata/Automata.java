@@ -60,7 +60,7 @@ import java.awt.Toolkit;
  * @see Automaton
  */
 public class Automata
-	implements AutomatonListener
+	implements AutomatonListener, Iterable<Automaton>
 {
 	private static Logger logger = LoggerFactory.createLogger(Automata.class);
 	private ArrayList<Automaton> theAutomata;

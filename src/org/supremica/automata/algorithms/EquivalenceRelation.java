@@ -60,6 +60,9 @@ public class EquivalenceRelation
 	/** Conflict equivalence. */
 	public static final EquivalenceRelation ConflictEquivalence =
 		new EquivalenceRelation("Conflict equivalence", true);
+	/** Supervision equivalence. */
+	public static final EquivalenceRelation SupervisionEquivalence =
+		new EquivalenceRelation("Supervision equivalence", true);
 	/** Observation equivalence (aka Weak bisimulation equivalence). */
 	public static final EquivalenceRelation ObservationEquivalence =
 		new EquivalenceRelation("Observation equivalence", true);

@@ -53,6 +53,7 @@ import java.util.*;
 import org.supremica.log.*;
 import org.supremica.gui.*;
 import org.supremica.automata.*;
+import org.supremica.automata.algorithms.minimization.*;
 
 // This one is used for doMonolithic to return two values
 class MonolithicReturnValue
@@ -105,22 +106,6 @@ public class AutomataSynthesizer
 			throw new IllegalArgumentException("All events are not prioritized!");
 		}
 
-		// evil BDD code inserted here by Arash
-		if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.BDD)
-		{
-			SynthesisType typ = synthesizerOptions.getSynthesisType();
-
-			if ((typ != SynthesisType.Both) && (typ != SynthesisType.Controllable) &&
-				(typ != SynthesisType.Nonblocking))
-			{
-				throw new IllegalArgumentException("BDD algorithms currently only " +
-												   "support supNB+C synthesis.");
-			}
-
-			// now, Do BDD Specific initialization here and skip the other stuff
-			return;
-		}
-
 		// initialization stuff that do need extra computation and thus ignored when
 		// doing BDD computation...
 		SynthesisType synthesisType = synthesizerOptions.getSynthesisType();
@@ -134,18 +119,6 @@ public class AutomataSynthesizer
 			synchHelper = new AutomataSynchronizerHelper(theAutomata, synchronizationOptions);
 
 			eventToAutomataMap = AlphabetHelpers.buildUncontrollableEventToPlantsMap(theAutomata);
-
-			/*
-			// Build the initial state
-			// Shouldn't this be done in Automata.java? Is initialState used at all here? Nope? /hugo
-			Iterator autIt = theAutomata.iterator();
-			while (autIt.hasNext())
-			{
-					currAutomaton = (Automaton) autIt.next();
-					currInitialState = currAutomaton.getInitialState();
-					initialState[currAutomaton.getIndex()] = currInitialState.getIndex();
-			}
-			*/
 		}
 		catch (Exception e)
 		{
@@ -171,7 +144,7 @@ public class AutomataSynthesizer
 				return new Automata();
 			}
 
-			result.addAutomaton(retval.automaton);    // let the user choose the name later
+			result.addAutomaton(retval.automaton); 
 		}
 		else if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.Monolithic)
 		{
@@ -183,19 +156,62 @@ public class AutomataSynthesizer
 				return new Automata();
 			}
 
-			result.addAutomaton(retval.automaton);    // let the user choose the name later
+			result.addAutomaton(retval.automaton); 
 		}
 		else if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.Modular)
 		{
-			// Modular synthesis
-			Automata newSupervisors = doModular(theAutomata);
+			SynthesisType type = synthesizerOptions.getSynthesisType();
 
-			if (stopRequested)
+			// What type of synthesis are we talking about?
+			if (type == SynthesisType.Controllable)
 			{
-				return new Automata();
+				// Modular (controllability) synthesis
+				Automata newSupervisors = doModular(theAutomata);
+				
+				if (stopRequested)
+				{
+					return new Automata();
+				}
+				
+				result.addAutomata(newSupervisors); 
 			}
+			else if ((type == SynthesisType.Nonblocking) ||
+					 (type == SynthesisType.Both))
+			{
+				// Use supervision equivalence minimization!
 
-			result.addAutomata(newSupervisors);    // let the user choose the name later
+				// Prepare for synthesis
+				// Make a copy
+				theAutomata = new Automata(theAutomata);
+				if (type == SynthesisType.Nonblocking)
+				{
+					// Only nonblocking? Then everything should be considered controllable!
+					for (Automaton automaton : theAutomata)
+					{
+						for (LabeledEvent event : automaton.getAlphabet())
+						{
+							event.setControllable(true);
+						}
+					}
+				}
+				else if (type == SynthesisType.Both)
+				{
+					// Nonblocking and controllable. Plantify the specifications and supervisors!
+					MinimizationHelper.plantify(theAutomata);
+				}
+
+				// Do the stuff!
+				AutomataMinimizer minimizer = new AutomataMinimizer(theAutomata);
+				minimizer.setExecutionDialog(executionDialog);
+				MinimizationOptions options = MinimizationOptions.getDefaultSynthesisOptions();
+				Automaton min = minimizer.getCompositionalMinimization(options);
+				min.setComment("sup(" + min.getName() + ")");
+				min.setName(null);
+
+				// Present result
+				logger.info("The states that are reachable in the maximally permissive, controllable and nonblocking supervisor are: " + min.getStateSet() + ".");
+				result.addAutomaton(min);
+			}
 		}
 		else if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.BDD)
 		{
@@ -454,16 +470,21 @@ public class AutomataSynthesizer
 		return modSupervisors;
 	}
 
-	// se the real implementation below
+	/**
+	 * This method synchronizes the given automata, and calculates
+	 * the forbidden states. Uses the ordinary synthesis algorithm.
+	 */
 	private MonolithicReturnValue doMonolithic(Automata automata)
 		throws Exception
 	{
-		return doMonolithic(automata, false);    // <-- NOT single fixpoint as default for now (under development)
+		return doMonolithic(automata, false);
 	}
-
-	// This is the engine, synchronizes the given automata, and calcs the forbidden states
+	/**
+	 * This method synchronizes the given automata, and calculates
+	 * the forbidden states.
+	 */
 	private MonolithicReturnValue doMonolithic(Automata automata, boolean singleFixpoint)
-		throws Exception    // simply throws everything upwards
+		throws Exception
 	{
 		logger.debug("AutomataSynthesizer::doMonolithic");
 
@@ -531,7 +552,7 @@ public class AutomataSynthesizer
 					sb.append(currEvent + " ");
 				}
 
-				logger.warn(sb.toString() + "are controllable but not observable. This imply that a supremal " +
+				logger.warn(sb.toString() + "are controllable but not observable. This implies that a supremal" +
 							"supervisor may not exist. To guarantee existence of such a supervisor the events " +
 							"will be treated us uncontrollable from the supervisors point of view. However the " +
 							"supervisor does not have to be maximally permissive.");
@@ -551,6 +572,7 @@ public class AutomataSynthesizer
 		}
 
 		AutomataSynchronizer syncher = new AutomataSynchronizer(automata, synchronizationOptions);
+		syncher.getHelper().setExecutionDialog(executionDialog);
 		threadToStop = syncher;
 		syncher.execute();
 		threadToStop = null;

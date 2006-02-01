@@ -254,7 +254,7 @@ public class AutomatonSplit
 		restrictAlphabet.addEvent(event);
 
 		// Hide event
-		result.hide(restrictAlphabet);
+		result.hide(restrictAlphabet, false);
 
 		// Hiding is enough!!!!!!
 		/*

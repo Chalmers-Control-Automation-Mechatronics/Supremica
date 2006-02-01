@@ -458,13 +458,13 @@ class NonblockButton
 
 			synth.initializeAcceptingStates();
 
-			LinkedList list = synth.doCoreachable();    // returns non-coreachable states
+			StateSet states = synth.doCoreachable(); // returns non-coreachable states
 
 			wb.automaton.clearSelectedStates();
 
-			for (Iterator it = list.iterator(); it.hasNext(); )
+			for (Iterator<State> it = states.iterator(); it.hasNext(); )
 			{
-				State state = (State) it.next();
+				State state = it.next();
 
 				state.setForbidden(true);
 				state.setSelected(true);

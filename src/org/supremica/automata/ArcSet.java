@@ -55,6 +55,7 @@ import java.util.*;
  * A set of arcs with the same start state and end state.
  */
 public class ArcSet
+	implements Iterable<Arc>
 {
 	private State fromState = null;
 	private State toState = null;
