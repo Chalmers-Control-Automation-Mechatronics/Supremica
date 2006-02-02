@@ -84,8 +84,9 @@ public class ArcSet
 	public ArcSet(ArcSet other)
 	{
 		theArcs = new LinkedList<Arc>(other.theArcs);
-		//this();
-		//this.add(other);
+		
+		fromState = other.fromState;
+		toState = other.toState;
 	}
 
 	public State getToState()
@@ -105,14 +106,7 @@ public class ArcSet
 
 	public boolean contains(Arc theArc)
 	{
-		for (Iterator<Arc> it = iterator(); it.hasNext(); )
-		{
-			if (theArc.equals(it.next()))
-			{
-				return true;
-			}
-		}
-		return false;
+		return theArcs.contains(theArc);
 	}
 
 	public boolean contains(LabeledEvent event)
@@ -135,12 +129,10 @@ public class ArcSet
 		}
 	}
 
-	public void add(Object obj)
-	{
-		addArc((Arc) obj);
-	}
 	public void addArc(Arc theArc)
 	{
+		assert(theArc.getFromState().equals(fromState));
+		assert(theArc.getToState().equals(toState));
 		theArcs.add(theArc);
 	}
 

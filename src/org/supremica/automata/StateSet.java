@@ -20,9 +20,6 @@ public class StateSet
 	//private HashMap<String,State> nameToStateMap = null;
 	private State singleStateRepresentation = null;
 
-	/**
-	 * Create an empty set
-	 */
 	public StateSet()
 	{
 		// State implements Comparable!
@@ -32,8 +29,7 @@ public class StateSet
 
 	public StateSet(Collection<? extends State> collection)
 	{
-		this();
-		super.addAll(collection);
+		super(collection);
 	}
 
 	public boolean add(State state)
@@ -48,8 +44,8 @@ public class StateSet
 
 	public void clear()
 	{
-		super.clear();
 		modified(size() != 0);
+		super.clear();
 	}
 
 	public boolean remove(Object object)
@@ -67,27 +63,20 @@ public class StateSet
 		return modified(super.retainAll(collection));
 	}
 
-	/**
-	 * Removes and returns an arbitrary state from the set.
-	 */
-	public State remove()
-	{
-		State state = super.first();
-		remove(state);
-		return state;
-	}
-
+	/*
 	public boolean equals(Object obj)
 	{
 		StateSet states = (StateSet) obj;
 
-		if (this == states)    // avoid testing for self comparison
+		// avoid testing for self comparison
+		if (this == states)    
 		{
 			return true;
 		}
 
 		return super.equals(states);
 	}
+	*/
 
 	public String toString()
 	{
@@ -117,7 +106,17 @@ public class StateSet
 	///////////////
 
 	/**
-	 * When this StateSet is modified, it will have a new singleStateRepresentation.
+	 * Removes and returns an arbitrary state from the set.
+	 */
+	public State remove()
+	{
+		State state = super.first();
+		remove(state);
+		return state;
+	}
+
+	/**
+	 * When this StateSet is modified, it will need a new singleStateRepresentation.
 	 */
 	private boolean modified(boolean change)
 	{
