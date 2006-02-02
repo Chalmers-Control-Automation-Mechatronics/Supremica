@@ -281,7 +281,7 @@ public class AutomataMinimizer
 			if (executionDialog != null)
 			{
 				executionDialog.setProgress(initialNbrOfAutomata-theAutomata.size());
-				currentAlphabetSize -= hideThese.size();
+				currentAlphabetSize -= hideThese.size()-hideThese.nbrOfEpsilonEvents();
 				executionDialog.setSubheader("Events left: " + currentAlphabetSize +
 											 " (" + globalAlphabetSize + ")");
 			}

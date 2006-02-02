@@ -129,7 +129,8 @@ public class Automaton
 		this();
 		beginTransaction();
 
-		alphabet.union(orgAut.getAlphabet());
+		// Deep copy of alphabet...
+		alphabet.union(new Alphabet(orgAut.getAlphabet()));
 
 		type = orgAut.type;
 		name = new String(orgAut.name == null ? "" : orgAut.name);

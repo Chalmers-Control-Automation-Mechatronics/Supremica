@@ -184,9 +184,14 @@ public class AutomatonMinimizer
         }
 		else if (equivalenceRelation == EquivalenceRelation.SupervisionEquivalence)
 		{
-			// "Half-synthesis"
+			//////////////////////
+			// "Half-synthesis" //
+			//////////////////////
+
 			//logger.info("Half-synthesis on " + theAutomaton);
-			// Coreachability is strange, forbidden and MAX_COST coincides?
+
+			//Coreachability is strange, forbidden and MAX_COST
+			//coincides? Why!? I'll ignore forbidden states for now.
 			if (theAutomaton.nbrOfForbiddenStates() > 0)
 			{
 				logger.warn("Supervision equivalence does not cope with previously forbidden states.");
@@ -256,6 +261,7 @@ public class AutomatonMinimizer
 						State state = blockingStates.remove();
 						blob = MinimizationHelper.mergeStates(theAutomaton, blob, state, false);
 					}
+					blob.setName("dump");
 					outerChange = true;
 				}
 			}
