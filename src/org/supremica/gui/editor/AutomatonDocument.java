@@ -136,7 +136,7 @@ public class AutomatonDocument
 		return ll;
 	}
 
-	public JGoLink newLink(StateNode from, StateNode to, ArcSet theArcSet)
+	public JGoLink newLink(StateNode from, StateNode to, MultiArc theMultiArc)
 	{
 		JGoLabeledLink ll = new JGoLabeledLink(from.getPort(), to.getPort());
 
@@ -145,7 +145,7 @@ public class AutomatonDocument
 
 		try
 		{
-			labels = new Labels(this, theArcSet);
+			labels = new Labels(this, theMultiArc);
 		}
 		catch (Exception ex)
 		{
@@ -296,15 +296,15 @@ public class AutomatonDocument
 		{
 			State fromState = (State) stateIt.next();
 			StateNode fromStateNode = (StateNode) stateToStateNodeMap.get(fromState);
-			Iterator arcSetIt = fromState.outgoingArcSetIterator();
+			Iterator arcSetIt = fromState.outgoingMultiArcIterator();
 
 			while (arcSetIt.hasNext())
 			{
-				ArcSet currArcSet = (ArcSet) arcSetIt.next();
-				State toState = currArcSet.getToState();
+				MultiArc currMultiArc = (MultiArc) arcSetIt.next();
+				State toState = currMultiArc.getToState();
 				StateNode toStateNode = (StateNode) stateToStateNodeMap.get(toState);
 
-				newLink(fromStateNode, toStateNode, currArcSet);
+				newLink(fromStateNode, toStateNode, currMultiArc);
 			}
 		}
 

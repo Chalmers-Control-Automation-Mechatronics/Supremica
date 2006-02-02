@@ -601,10 +601,10 @@ public class Automaton
 				{
 					continue loop;
 				}
-				for (Iterator<ArcSet> arcSetIt = state.outgoingArcSetIterator(); arcSetIt.hasNext(); )
+				for (Iterator<MultiArc> multiArcIt = state.outgoingMultiArcIterator(); multiArcIt.hasNext(); )
 				{
-					ArcSet arcSet = arcSetIt.next();
-					if (arcSet.contains(event) && !arcSet.isSelfLoop())
+					MultiArc multiArc = multiArcIt.next();
+					if (multiArc.contains(event) && !multiArc.isSelfLoop())
 					{
 						continue loop;
 					}

@@ -524,26 +524,26 @@ public class Milp
 		{
 			State initial = zones.getAutomatonAt(i).getInitialState();
 
-			for (Iterator<ArcSet> bookingArcSets = initial.outgoingArcSetIterator(); bookingArcSets.hasNext(); )
+			for (Iterator<MultiArc> bookingMultiArcs = initial.outgoingMultiArcIterator(); bookingMultiArcs.hasNext(); )
 			{
 				Alphabet bookingAlphabet = new Alphabet();
 				Alphabet unbookingAlphabet = new Alphabet();
 
-				ArcSet currBookingArcSet = bookingArcSets.next();
+				MultiArc currBookingMultiArc = bookingMultiArcs.next();
 
 				// Adding booking event for each set of arcs i.e. for each book-state of the zone-specification
-				for (Iterator<Arc> bookingArcs = currBookingArcSet.iterator(); bookingArcs.hasNext(); )
+				for (Iterator<Arc> bookingArcs = currBookingMultiArc.iterator(); bookingArcs.hasNext(); )
 				{
 					bookingAlphabet.addEvent(bookingArcs.next().getEvent());
 				}
 
-				for (Iterator<ArcSet> unbookingArcSets = currBookingArcSet.getToState().outgoingArcSetIterator(); unbookingArcSets.hasNext(); )
+				for (Iterator<MultiArc> unbookingMultiArcs = currBookingMultiArc.getToState().outgoingMultiArcIterator(); unbookingMultiArcs.hasNext(); )
 				{
-					ArcSet currUnbookingArcSet = unbookingArcSets.next();
+					MultiArc currUnbookingMultiArc = unbookingMultiArcs.next();
 
-					if (currUnbookingArcSet.getToState().equals(initial))
+					if (currUnbookingMultiArc.getToState().equals(initial))
 					{
-						for (Iterator<Arc> unbookingArcs = currUnbookingArcSet.iterator(); unbookingArcs.hasNext(); )
+						for (Iterator<Arc> unbookingArcs = currUnbookingMultiArc.iterator(); unbookingArcs.hasNext(); )
 						{
 							unbookingAlphabet.addEvent(unbookingArcs.next().getEvent());
 						}
@@ -719,8 +719,8 @@ public class Milp
 
 				// If the current state has successors and is not initial, add precedence constraints
 				// If the current state is initial, add an initial (precedence) constraint
-				int nbrOfOutgoingArcSets = currState.nbrOfOutgoingArcSets();
-				if (nbrOfOutgoingArcSets > 0)
+				int nbrOfOutgoingMultiArcs = currState.nbrOfOutgoingMultiArcs();
+				if (nbrOfOutgoingMultiArcs > 0)
 				{
 					if (currState.isInitial())
 					{
@@ -731,7 +731,7 @@ public class Milp
 					Iterator<State> nextStates = currState.nextStateIterator();
 					
 					// If there is only one successor, add a precedence constraint
-					if (nbrOfOutgoingArcSets == 1) 
+					if (nbrOfOutgoingMultiArcs == 1) 
 					{
 						State nextState = nextStates.next();
 						int nextStateIndex = indexMap.getStateIndex(currRobot, nextState);
@@ -740,7 +740,7 @@ public class Milp
 						precConstraints += "time[" + i + ", " + nextStateIndex + "] >= time[" + i + ", " + currStateIndex + "] + deltaTime[" + i + ", " + nextStateIndex + "];\n";
 					}
 					// If there are two successors, add one alternative-path variable and corresponding constraint
-					else if (nbrOfOutgoingArcSets == 2)
+					else if (nbrOfOutgoingMultiArcs == 2)
 					{
 						State nextLeftState = nextStates.next();
 						State nextRightState = nextStates.next();
@@ -762,7 +762,7 @@ public class Milp
 						pathCutTable.put(nextRightState, "(1 - " + currAltPathsVariable + ")");
 					}
 					// If there are several successors, add one alternative-path variable for each successor
-					else if (nbrOfOutgoingArcSets > 2)
+					else if (nbrOfOutgoingMultiArcs > 2)
 					{
 						int currAlternative = 0;
 						

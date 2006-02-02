@@ -52,33 +52,95 @@ package org.supremica.automata;
 import java.util.*;
 
 /**
- * A collection of arcs with the same start state and end state.
+ * A set of arcs with the same start state and end state.
  */
-/*
-public class ArcSet
-	extends TreeSet<Arc>
+public class MultiArc
+	extends ArcSet
+	implements Comparable<MultiArc>
 {
-	public ArcSet()
+	private State fromState;
+	private State toState;
+
+	/**
+	 * In states, outgoing arcs are ordered in sets like this. So all
+	 * arcs that go to a certain state are in the same set.
+	 */
+	public MultiArc(State from, State to)
 	{
-		super();
+		super(new Arc.EventComparator());
+		fromState = from;
+		toState = to;
 	}
 
-	public ArcSet(Comparator<? super Arc> c)
+	public MultiArc(MultiArc other)
 	{
-		super(c);
-	}
-}
-*/
-public class ArcSet
-	extends LinkedList<Arc>
-{
-	public ArcSet()
-	{
-		super();
+		this(other.fromState, other.toState);
 	}
 
-	public ArcSet(Comparator<? super Arc> c)
+	public boolean add(Arc arc)
 	{
-		super();
+		assert(arc.getFromState().equals(fromState));
+		assert(arc.getToState().equals(toState));
+		return super.add(arc);
+	}
+
+	///////////////
+	// EXTENSION //
+	///////////////
+
+	public State getToState()
+	{
+		return toState;
+	}
+
+	public State getFromState()
+	{
+		return fromState;
+	}
+
+	public Alphabet getEvents()
+	{
+		Alphabet alpha = new Alphabet();
+		for (Arc arc : this)
+		{
+			alpha.addEvent(arc.getEvent());
+		}
+		return alpha;
+	}
+	
+	public boolean isSelfLoop()
+	{
+		return toState.equals(fromState);
+	}
+
+	public boolean contains(LabeledEvent event)
+	{
+		for (Arc arc : this)
+		{
+			if (event.equals(arc.getEvent()))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Compares this arc to another arc. The toState is compared first,
+	 * then the fromState.
+	 *
+	 * Note! This comparison disregards the alphabets on the multiarcs!
+	 */
+	public int compareTo(MultiArc other)
+	{
+		int compare = this.getToState().compareTo(other.getToState());
+		if (compare != 0)
+		{
+			return compare;
+		}
+		else
+		{
+			return this.getFromState().compareTo(other.getFromState());
+		}
 	}
 }

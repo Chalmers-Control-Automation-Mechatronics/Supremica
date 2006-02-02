@@ -52,7 +52,7 @@ package org.supremica.automata.IO;
 import java.io.*;
 import java.util.*;
 import org.supremica.automata.Arc;
-import org.supremica.automata.ArcSet;
+import org.supremica.automata.MultiArc;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.State;
 import org.supremica.automata.LabeledEvent;
@@ -269,7 +269,7 @@ public class AutomatonToDot
 			pw.println("\"" + getStateColor(sourceState) + "]; ");
 
 
-			for (Iterator arcSets = sourceState.outgoingArcSetIterator();
+			for (Iterator arcSets = sourceState.outgoingMultiArcIterator();
 					arcSets.hasNext(); )
 			{
 				boolean is_ctrl = true;
@@ -278,7 +278,7 @@ public class AutomatonToDot
 				boolean is_eps = false;
 				boolean is_obs = false;
 				boolean is_prop = false;
-				ArcSet currArcSet = (ArcSet) arcSets.next();
+				MultiArc currArcSet = (MultiArc) arcSets.next();
 				State fromState = currArcSet.getFromState();
 				State toState = currArcSet.getToState();
 

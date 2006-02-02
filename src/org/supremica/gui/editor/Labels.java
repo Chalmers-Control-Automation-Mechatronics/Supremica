@@ -54,21 +54,21 @@ import com.nwoods.jgo.*;
 import java.awt.Rectangle;
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.Arc;
-import org.supremica.automata.ArcSet;
+import org.supremica.automata.MultiArc;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.LabeledEvent;
 
 public class Labels
 	extends JGoArea
 {
-	private ArcSet theArcSet = null;
+	private MultiArc theMultiArc = null;
 	private AutomatonDocument doc = null;
 
-	public Labels(AutomatonDocument doc, ArcSet theArcSet)
+	public Labels(AutomatonDocument doc, MultiArc theMultiArc)
 		throws Exception
 	{
 		this.doc = doc;
-		this.theArcSet = theArcSet;
+		this.theMultiArc = theMultiArc;
 
 		updateArcs();
 	}
@@ -86,7 +86,7 @@ public class Labels
 		Automaton theAutomaton = doc.getAutomaton();
 		Alphabet theAlphabet = theAutomaton.getAlphabet();
 
-		for (Iterator arcIt = theArcSet.iterator(); arcIt.hasNext(); )
+		for (Iterator arcIt = theMultiArc.iterator(); arcIt.hasNext(); )
 		{
 			Arc currArc = (Arc) arcIt.next();
 

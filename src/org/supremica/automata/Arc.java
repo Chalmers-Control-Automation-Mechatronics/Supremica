@@ -50,8 +50,10 @@
 package org.supremica.automata;
 
 import org.supremica.log.*;
+import java.util.Comparator;
 
 public class Arc
+	implements Comparable<Arc>
 {
 	private static Logger logger = LoggerFactory.createLogger(Arc.class);
 	private LabeledEvent event;
@@ -186,7 +188,6 @@ public class Arc
 		// Hugo: What do you mean? Can you or can't you remove it!?
 
 		// notifyListeners(ArcListeners.MODE_ARC_REMOVED, this);
-
 	}
 
 	// This does not belong here, does it?
@@ -342,9 +343,9 @@ public class Arc
 	}
 
 	/**
-	 *      Initializes the array of firingAutomata
+	 * Initializes the array of firingAutomata
 	 *
-	 *      @param size
+	 * @param size
 	 */
 	private void initFiringAutomata(int size)
 	{
@@ -353,6 +354,43 @@ public class Arc
 		for (int i = 0; i < size; i++)
 		{
 			firingAutomata[i] = false;
+		}
+	}
+	
+	/**
+	 * Compares this arc to another arc. The event is compared first,
+	 * then the toState and last the fromState.
+	 */
+	public int compareTo(Arc other)
+	{
+		int compare = this.event.compareTo(other.event);
+		if (compare != 0)
+		{
+			return compare;
+		}
+		else
+		{
+			compare = this.toState.compareTo(other.toState);
+			if (compare != 0)
+			{
+				return compare;
+			}
+			else
+			{
+				return this.fromState.compareTo(other.fromState);
+			}
+		}
+	}
+
+	/**
+	 * Comparator for comparing two arcs based on their events alone.
+	 */
+	public static class EventComparator
+		implements Comparator<Arc>
+	{
+		public int compare(Arc one, Arc two)
+		{
+			return one.getEvent().compareTo(two.getEvent());
 		}
 	}
 }

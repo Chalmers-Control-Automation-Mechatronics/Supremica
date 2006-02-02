@@ -2164,6 +2164,9 @@ class StateInfoIncoming
             event = arc.getEvent();
         }
 
+		/**
+		 * Compares the state indices first and then the events.
+		 */
 		public int compareTo(Arclet other)
 		{
 			// Should compare the labels instead of the indices?
