@@ -1,77 +1,78 @@
 Supremica Properties with possible values
 
-Property                              Values			Default     ExtMod
+Property                              Values            Default     ExtMod
 -------------------------------------------------------------------------
-xmlRpcActive						true, false			false		y
-xmlRpcPort							<port nr>			9112		y
-dotUse								true, false			true		y
-dotExecuteCommand					<file name>			dot			y
-dotMaxNbrOfStatesWithoutWarning		<num>				40			y
-dotLeftToRight						true, false			false		y
-dotWithStateLabels					true, false			false		y
-dotWithCircles						true, false			false		y
-dotUseColors						true, false			true		y
-dotUseMultiLabels					true, false			true		y
-dotAutomaticUpdate					true, false			true		y
-includeEditor						true, false			false		y
-includeBoundedUnconTools			true, false			false		y
-verboseMode							true, false			false		y
-superuserIdentity					<id>				ESS030		n
-allowSuperUserLogin					true, false			true		n
-generalRedirectStdout				true, false			true		y
-generalRedirectStderr				true, false			true		y
-generalLookAndFeel					<string>			System		y
-generalIncludeAnimations					-- not used ? --
-generalUseRcp						true, false			false		y
+xmlRpcActive                        true, false         false       y
+xmlRpcPort                          <port nr>           9112        y
+xmlRpcFilter                        <IP adress>         127.0.0.1   y
+dotUse                              true, false         true        y
+dotExecuteCommand                   <file name>         dot         y
+dotMaxNbrOfStatesWithoutWarning     <num>               40          y
+dotLeftToRight                      true, false         false       y
+dotWithStateLabels                  true, false         false       y
+dotWithCircles                      true, false         false       y
+dotUseColors                        true, false         true        y
+dotUseMultiLabels                   true, false         true        y
+dotAutomaticUpdate                  true, false         true        y
+includeEditor                       true, false         false       y
+includeBoundedUnconTools            true, false         false       y
+verboseMode                         true, false         false       y
+superuserIdentity                   <id>                ESS030      n
+allowSuperUserLogin                 true, false         true        n
+generalRedirectStdout               true, false         true        y
+generalRedirectStderr               true, false         true        y
+generalLookAndFeel                  <string>            System      y
+generalIncludeAnimations                    -- not used ? --
+generalUseRcp                       true, false         false       y
 
 // Logging options
-logToConsole						true, false			false		y
-logToGUI							true, false			false		y
+logToConsole                        true, false         false       y
+logToGUI                            true, false         false       y
 
 // File Options
-fileOpenPath						<path>				user.home	y
-fileSavePath						<path>				user.home	y
-FileAllowOpen						true, false			true		y
-FileAllowSave						true, false			true		y
-FileAllowImport						true, false			true		y
-FileAllowExport						true, false			true		y
-FileAllowQuit						true, false			true		y
+fileOpenPath                        <path>              user.home   y
+fileSavePath                        <path>              user.home   y
+FileAllowOpen                       true, false         true        y
+FileAllowSave                       true, false         true        y
+FileAllowImport                     true, false         true        y
+FileAllowExport                     true, false         true        y
+FileAllowQuit                       true, false         true        y
 
 // Synchronization Options
-syncForbidUncontrollableStates		true, false			true		y
-syncExpandUncontrollableStates		true, false			true		y
-syncInitialHashtableSize			<int>				16383		y
-syncExpandHashtable					true, false			true		y
-synchNbrOfExecuters					<int>				1			y
+syncForbidUncontrollableStates      true, false         true        y
+syncExpandUncontrollableStates      true, false         true        y
+syncInitialHashtableSize            <int>               16383       y
+syncExpandHashtable                 true, false         true        y
+synchNbrOfExecuters                 <int>               1           y
 
 // Verification Options
-verifyVerificationType				Controllability		Controllability
-									Nonblocking						y
-									MutuallyNonblocking 
-									LanguageInclusion
-verifyAlgorithmType					Monolithic			Modular		y
-									Modular
-									BDD
-									IDD
-verifyExclusionStateLimit			<int>				1000		y
-verifyReachabilityStateLimit		<int>				1000		y
-verifyOneEventAtATime				true, false			false		y
-skipUncontrollabilityCheck			true, false			false		y
+verifyVerificationType              Controllability     Controllability
+                                    Nonblocking                     y
+                                    MutuallyNonblocking 
+                                    LanguageInclusion
+verifyAlgorithmType                 Monolithic          Modular     y
+                                    Modular
+                                    BDD
+                                    IDD
+verifyExclusionStateLimit           <int>               1000        y
+verifyReachabilityStateLimit        <int>               1000        y
+verifyOneEventAtATime               true, false         false       y
+skipUncontrollabilityCheck          true, false         false       y
 
 // Synthesizer Options
-synthesisSynthesisType				Controllable		Both		y
-									Nonblocking 
-									Both
-synthesisAlgorithmType				Monolithic			Monolithic	y
-									Modular
-									IDD
-synthesisPurge						true, false			false		y
-synthesisOptimize					true, false			false		y
-synthesisMaximallyPermissive		true, false			true		y
-GeneralUseSecurity					true, false			false		n
+synthesisSynthesisType              Controllable        Both        y
+                                    Nonblocking 
+                                    Both
+synthesisAlgorithmType              Monolithic          Monolithic  y
+                                    Modular
+                                    IDD
+synthesisPurge                      true, false         false       y
+synthesisOptimize                   true, false         false       y
+synthesisMaximallyPermissive        true, false         true        y
+GeneralUseSecurity                  true, false         false       n
 
 // BDD Options
-bddShowGrowth						
+bddShowGrowth                       
 bddAlterPCG
 bddTraceOn
 bddDebugOn
@@ -83,14 +84,14 @@ bddNBOptimistic
 
 
 // Animator Options
-includeAnimator						true, false			false		y
+includeAnimator                     true, false         false       y
 
 // SoftPLC Options
-softplcCycleTime					<int>				40			y
+softplcCycleTime                    <int>               40          y
 
 // Special Menu Options
-showGeneticAlgorithms				true, false			true		n
-showRobotstudioLink					true, false			true		n
+showGeneticAlgorithms               true, false         true        n
+showRobotstudioLink                 true, false         true        n
 
 // ActiveXBridge
-useActiveXBridge					true, false			true		n
+useActiveXBridge                    true, false         true        n

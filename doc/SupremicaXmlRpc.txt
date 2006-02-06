@@ -1,0 +1,32 @@
+Documentation of Supremicas XML-RPC interface.
+----------------------------------------------
+These are set in Supremica\dist\SupremicaProperties.cfg
+* Default xmlRpcPort=9112 
+* Default xmlRpcFilter=127.0.0.1
+* Default xmlRpcActive=false
+
+* Available functions:
+Vector getAutomataIdentities(); 
+// returns (a vector with) the names of the automata in the active project, no exception thrown
+int deleteAutomaton(String name); 
+// returns 0 if all is ok, else throws XmlRpcException 
+int removeAutomata(Vector automataIdentities); 
+// similiar to deleteAutomaton except for a number of automata
+int renameAutomaton(String name, String newname); 
+// works similar to deleteAutomaton() but only renames
+String getAutomaton(String name); 
+// returns the requested automaton as a serialized (and "escaped") string (XML-file), throws XmlRpcException if automaton does not exist
+String getAutomata(Vector automataIdentities); 
+// similar to getAutomaton, except for a number of automata.
+int addAutomaton(String name, String automatonXmlEncoding); 
+// adds an automaton encoded as a string (XML-file), throws XmlRpcException if error, otherwise returns 0
+int addAutomata(String automataXmlEncoding);
+// similiar to addAutomaton, except for a number of automata
+
+* Notes
+- Why is it "deleteAutomaton" but "removeAutomata"? No-one knows, historical accident. Should have the same prefix (delete/remove) for both, but note that DescoGui uses both, so don't change either. Should add a "deleteAutomata"(?)
+
+-----------------------------------------------
+Revision history:
+created by MF, 2006-02-06
+updated by MF, 2006-02-06
