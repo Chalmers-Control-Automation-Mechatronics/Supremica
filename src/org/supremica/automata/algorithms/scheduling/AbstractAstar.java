@@ -300,6 +300,8 @@ public abstract class AbstractAstar
 				
 				// Removes the first node on OPEN. If it is accepting, the search is completed
 				currNode = openTree.first();
+
+				logger.info("currently opened node = " + printArray(currNode) + "; est_cost = " + currNode[ESTIMATE_INDEX]);
 				
 				if (isAcceptingNode(currNode))
 					break;
@@ -423,6 +425,7 @@ public abstract class AbstractAstar
     /**
      * Calculates the costs for a one-product relaxation (i.e. as if there
      * would only be one robot in the cell) and stores it in oneProdRelax.
+	 * It is equal to the minimal remaining time from each state to the marked state.
      */	
     protected void preprocess1() 
 		throws Exception
@@ -483,7 +486,10 @@ public abstract class AbstractAstar
 							int newRemainingCost = nextState.getCost() + oneProdRelax[i][nextState.getIndex()];
 
 							if (newRemainingCost < oneProdRelax[i][currState.getIndex()])
+							{
 								oneProdRelax[i][currState.getIndex()] = newRemainingCost;
+								estList.add(currState);
+							}
 						}
 					}
 				}
@@ -722,7 +728,7 @@ public abstract class AbstractAstar
 			try
 		    {
 				int[] parent = getParent(currNode);
-				State currState = new State(printNodeSignature(parent));
+				State currState = new State(printNodeSignature(parent) + "; firing time = " + currNode[ACCUMULATED_COST_INDEX]);
 				LabeledEvent event = findCurrentEvent(parent, currNode);
 			
 				if (!hasParent(parent))
