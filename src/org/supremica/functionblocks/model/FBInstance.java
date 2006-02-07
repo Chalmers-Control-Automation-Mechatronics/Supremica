@@ -120,10 +120,9 @@ public abstract class FBInstance extends NamedObject
 		return (Variable) variables.getVariable(dataOutput);
     }
 
-
+	// Get the data variables associated with this event and put them in variables attribute
     public void getDataInputs(Event event)
     {
-		// get the data variables associated with this event and put them in variables attribute
 		for (Iterator iter = event.withIterator();iter.hasNext();)
 		{
 			String curName = (String) iter.next();
@@ -155,9 +154,9 @@ public abstract class FBInstance extends NamedObject
 		}
     }
 
-	public void sendEvent(String outputEventName)
+	public void sendEvent(String eventOutput)
 	{
-		Connection outputConnection = (Connection) eventOutputConnections.get(outputEventName);
+		Connection outputConnection = (Connection) eventOutputConnections.get(eventOutput);
 		if (outputConnection != null)
 		{
 			FBInstance toInstance = outputConnection.getFBInstance();
