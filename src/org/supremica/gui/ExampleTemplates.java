@@ -267,21 +267,22 @@ public class ExampleTemplates
 		thisGroup.addItem(new TemplateItem("Circular Table", prefix + "circularTable.xml"));
 		thisGroup.addItem(new TemplateItem("Circular Table (variant)", prefix + "rotationTable.xml"));
 		thisGroup.addItem(new TemplateItem("Dosing Unit", prefix + "dosingUnit.xml"));
+		thisGroup.addItem(new TemplateItem("Flexible Manufacturing System", prefix + "FlexibleManufacturingSystem.xml"));
 		thisGroup.addItem(new TemplateItem("Flexible Manufacturing System (incomplete)", prefix + "flexibleManufacturingSystem.xml"));
 		thisGroup.addItem(new TemplateItem("Flexible Production Cell", prefix + "ftechnik.xml"));
 		//thisGroup.addItem(new TemplateItem("Flexible Production Cell - No Collisions", prefix + "ftechnik_nocoll.xml"));
 
-		thisGroup.addItem(new TemplateItem("Flexible Production Cell (variant)", prefix + "flexibleManufacturingCell.xml"));
+		thisGroup.addItem(new TemplateItem("Flexible Production Cell (variant)", prefix + "FlexibleProductionCell.xml"));
 		thisGroup.addItem(new TemplateItem("Intertwined Product Cycles", prefix + "IntertwinedProductCycles.xml"));
 		thisGroup.addItem(new TemplateItem("Machine Buffer Machine", prefix + "machineBufferMachine.xml"));
 		thisGroup.addItem(new TemplateItem("Parallel Manufacturing Example", prefix + "parallelManufacturingExample.xml"));
 		thisGroup.addItem(new TemplateItem("Production Cell for Mounting Frames", prefix + "fzelle.xml"));
+		thisGroup.addItem(new TemplateItem("Robot Assembly Cell", prefix + "robotAssemblyCell.xml"));
 		thisGroup.addItem(new TemplateItem("Simple Manufacturing Example", prefix + "simpleManufacturingExample.xml"));
 		thisGroup.addItem(new TemplateItem("Tank Process", prefix + "tankProcess.xml"));
 		thisGroup.addItem(new TemplateItem("Train Testbed", prefix + "tbed_ctct.xml"));
 		thisGroup.addItem(new TemplateItem("Train Testbed (variant)", prefix + "tbed_valid.xml"));
 		thisGroup.addItem(new TemplateItem("Welding Robots", prefix + "weldingRobots.xml"));
-		thisGroup.addItem(new TemplateItem("Robot Assembly Cell", prefix + "robotAssemblyCell.xml"));
     }
 
     private void initializeGames()

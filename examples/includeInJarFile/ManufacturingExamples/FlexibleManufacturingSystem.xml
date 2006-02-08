@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Automata name="Maching-Buffer-Machine" comment="Adapted from 'Multitasking Supervisory Control of Discrete Event Systems' by M.H. de Queiroz, J.E.R. Cury and W.M. Wonham (originally, the example appears to come from 'Applications of Petri Nets in Manufacturing Systems, Modeling, Control and Performance Analysis' by A.A. Desrochers and R.Y. Al-Jaar?). The original example has multi-colored marking, here, only the reversibility-marking is included. The system consists of a mill (M), a lathe (L), a painting device (P) and an assembly machine (A) connected by a robot (R), a conveyor (C3) and a set of one-place buffers (B3, B4, B5, B6, B7, B8). New products enter the cell on two additional conveyors (C1 and C2) with a one-place buffer each (B1 and B2). The flow of products in the cell is mainly directed by the robot and the buffer specifications. C1 supplies blocks and C2 supplies pegs, the end products are blocks with attached conical pegs (A) and blocks with cylindrical painted pegs (B). The blocks go through the mill and the pegs go through the lathe to be shaped and for cylindrical pegs also through the painting device.">
+<Automaton name="C1" type="Plant">
+	<Events>
+		<Event id="l" label="i_C1"/>
+		<Event id="u" label="o_C1" controllable="false"/>
+	</Events>
+	<States>
+		<State id="e" initial="true" accepting="true"/>
+		<State id="f"/>
+	</States>
+	<Transitions>
+		<Transition source="e" dest="f" event="l"/>
+		<Transition source="f" dest="e" event="u"/>
+	</Transitions>
+</Automaton>
+<Automaton name="B1" type="Specification">
+	<Events>
+		<Event id="l" label="o_C1" controllable="false"/>
+		<Event id="u" label="u_B1"/>
+	</Events>
+	<States>
+		<State id="e" initial="true" accepting="true"/>
+		<State id="f"/>
+	</States>
+	<Transitions>
+		<Transition source="e" dest="f" event="l"/>
+		<Transition source="f" dest="e" event="u"/>
+	</Transitions>
+</Automaton>
+<Automaton name="C2" type="Plant">
+	<Events>
+		<Event id="l" label="i_C2"/>
+		<Event id="u" label="o_C2" controllable="false"/>
+	</Events>
+	<States>
+		<State id="e" initial="true" accepting="true"/>
+		<State id="f"/>
+	</States>
+	<Transitions>
+		<Transition source="e" dest="f" event="l"/>
+		<Transition source="f" dest="e" event="u"/>
+	</Transitions>
+</Automaton>
+<Automaton name="B2" type="Specification">
+	<Events>
+		<Event id="l" label="o_C2" controllable="false"/>
+		<Event id="u" label="u_B2"/>
+	</Events>
+	<States>
+		<State id="e" initial="true" accepting="true"/>
+		<State id="f"/>
+	</States>
+	<Transitions>
+		<Transition source="e" dest="f" event="l"/>
+		<Transition source="f" dest="e" event="u"/>
+	</Transitions>
+</Automaton>
+<Automaton name="R" type="Plant">
+	<Events>
+		<Event id="u_B1"/>
+		<Event id="u_B2"/>
+		<Event id="u_B3"/>
+		<Event id="u_B4A"/>
+		<Event id="u_B4B"/>
+		<Event id="l_B3" controllable="false"/>
+		<Event id="l_B4" controllable="false"/>
+		<Event id="l_B5" controllable="false"/>
+		<Event id="l_B6" controllable="false"/>
+		<Event id="l_B7" controllable="false"/>
+	</Events>
+	<States>
+		<State id="i" initial="true" accepting="true"/>
+		<State id="m_b1"/>
+		<State id="m_p1"/>
+		<State id="m_b2"/>
+		<State id="m_p2A"/>
+		<State id="m_p2B"/>
+	</States>
+	<Transitions>
+		<Transition source="i" dest="m_b1" event="u_B1"/>
+		<Transition source="i" dest="m_p1" event="u_B2"/>
+		<Transition source="i" dest="m_b2" event="u_B3"/>
+		<Transition source="i" dest="m_p2A" event="u_B4A"/>
+		<Transition source="i" dest="m_p2B" event="u_B4B"/>
+		<Transition source="m_b1" dest="i" event="l_B3"/>
+		<Transition source="m_p1" dest="i" event="l_B4"/>
+		<Transition source="m_b2" dest="i" event="l_B5"/>
+		<Transition source="m_p2A" dest="i" event="l_B6"/>
+		<Transition source="m_p2B" dest="i" event="l_B7"/>
+	</Transitions>
+</Automaton>
+<Automaton name="B3" type="Specification">
+	<Events>
+		<Event id="l1" label="l_B3" controllable="false"/>
+		<Event id="u1" label="s_M"/>
+		<Event id="l2" label="f_M" controllable="false"/>
+		<Event id="u2" label="u_B3"/>
+	</Events>
+	<States>
+		<State id="e" initial="true" accepting="true"/>
+		<State id="f1"/>
+		<State id="f2"/>
+	</States>
+	<Transitions>
+		<Transition source="e" dest="f1" event="l1"/>
+		<Transition source="f1" dest="e" event="u1"/>
+		<Transition source="e" dest="f2" event="l2"/>
+		<Transition source="f2" dest="e" event="u2"/>
+	</Transitions>
+</Automaton>
+<Automaton name="M" type="Plant">
+	<Events>
+		<Event id="s" label="s_M"/>
+		<Event id="f" label="f_M" controllable="false"/>
+	</Events>
+	<States>
+		<State id="i" initial="true" accepting="true"/>
+		<State id="w"/>
+	</States>
+	<Transitions>
+		<Transition source="i" dest="w" event="s"/>
+		<Transition source="w" dest="i" event="f"/>
+	</Transitions>
+</Automaton>
+<Automaton name="B4" type="Specification">
+	<Events>
+		<Event id="l_B4" controllable="false"/>
+		<Event id="s_LA"/>
+		<Event id="s_LB"/>
+		<Event id="f_LA" controllable="false"/>
+		<Event id="f_LB" controllable="false"/>
+		<Event id="u_B4A"/>
+		<Event id="u_B4B"/>
+	</Events>
+	<States>
+		<State id="e" initial="true" accepting="true"/>
+		<State id="f"/>
+		<State id="fa"/>
+		<State id="fb"/>
+	</States>
+	<Transitions>
+		<Transition source="e" dest="f" event="l_B4"/>
+		<Transition source="f" dest="e" event="s_LA"/>
+		<Transition source="f" dest="e" event="s_LB"/>
+		<Transition source="e" dest="fa" event="f_LA"/>
+		<Transition source="e" dest="fb" event="f_LB"/>
+		<Transition source="fa" dest="e" event="u_B4A"/>
+		<Transition source="fb" dest="e" event="u_B4B"/>
+	</Transitions>
+</Automaton>
+<Automaton name="L" type="Plant">
+	<Events>
+		<Event id="sa" label="s_LA"/>
+		<Event id="fa" label="f_LA" controllable="false"/>
+		<Event id="sb" label="s_LB"/>
+		<Event id="fb" label="f_LB" controllable="false"/>
+	</Events>
+	<States>
+		<State id="i" initial="true" accepting="true"/>
+		<State id="wa"/>
+		<State id="wb"/>
+	</States>
+	<Transitions>
+		<Transition source="i" dest="wa" event="sa"/>
+		<Transition source="i" dest="wb" event="sb"/>
+		<Transition source="wa" dest="i" event="fa"/>
+		<Transition source="wb" dest="i" event="fb"/>
+	</Transitions>
+</Automaton>
+<Automaton name="B5" type="Specification">
+	<Events>
+		<Event id="l" label="l_B5" controllable="false"/>
+		<Event id="u" label="u_B5"/>
+	</Events>
+	<States>
+		<State id="e" initial="true" accepting="true"/>
+		<State id="f"/>
+	</States>
+	<Transitions>
+		<Transition source="e" dest="f" event="l"/>
+		<Transition source="f" dest="e" event="u"/>
+	</Transitions>
+</Automaton>
+<Automaton name="B6" type="Specification">
+	<Events>
+		<Event id="l" label="l_B6" controllable="false"/>
+		<Event id="u" label="u_B6"/>
+	</Events>
+	<States>
+		<State id="e" initial="true" accepting="true"/>
+		<State id="f"/>
+	</States>
+	<Transitions>
+		<Transition source="e" dest="f" event="l"/>
+		<Transition source="f" dest="e" event="u"/>
+	</Transitions>
+</Automaton>
+<Automaton name="B7" type="Specification">
+	<Events>
+		<Event id="l_B7" controllable="false"/>
+		<Event id="u_B7"/>
+		<Event id="o_C3" controllable="false"/>
+		<Event id="i_C3"/>
+	</Events>
+	<States>
+		<State id="e" initial="true" accepting="true"/>
+		<State id="f1"/>
+		<State id="f2"/>
+	</States>
+	<Transitions>
+		<Transition source="e" dest="f1" event="l_B7"/>
+		<Transition source="e" dest="f2" event="o_C3"/>
+		<Transition source="f1" dest="e" event="i_C3"/>
+		<Transition source="f2" dest="e" event="u_B7"/>
+	</Transitions>
+</Automaton>
+<Automaton name="C3" type="Plant">
+	<Events>
+		<Event id="i_C3"/>
+		<Event id="l_B8" controllable="false"/>
+		<Event id="u_B8"/>
+		<Event id="o_C3" controllable="false"/>
+	</Events>
+	<States>
+		<State id="e" initial="true" accepting="true"/>
+		<State id="f1"/>
+		<State id="f2"/>
+	</States>
+	<Transitions>
+		<Transition source="e" dest="f1" event="i_C3"/>
+		<Transition source="e" dest="f2" event="u_B8"/>
+		<Transition source="f1" dest="e" event="l_B8"/>
+		<Transition source="f2" dest="e" event="o_C3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="B8" type="Specification">
+	<Events>
+		<Event id="l_B8" controllable="false"/>
+		<Event id="s_P"/>
+		<Event id="f_P" controllable="false"/>
+		<Event id="u_B8"/>
+	</Events>
+	<States>
+		<State id="e" initial="true" accepting="true"/>
+		<State id="f1"/>
+		<State id="f2"/>
+	</States>
+	<Transitions>
+		<Transition source="e" dest="f1" event="l_B8"/>
+		<Transition source="e" dest="f2" event="f_P"/>
+		<Transition source="f1" dest="e" event="s_P"/>
+		<Transition source="f2" dest="e" event="u_B8"/>
+	</Transitions>
+</Automaton>
+<Automaton name="P" type="Plant">
+	<Events>
+		<Event id="s" label="s_P"/>
+		<Event id="f" label="f_P" controllable="false"/>
+	</Events>
+	<States>
+		<State id="i" initial="true" accepting="true"/>
+		<State id="w"/>
+	</States>
+	<Transitions>
+		<Transition source="i" dest="w" event="s"/>
+		<Transition source="w" dest="i" event="f"/>
+	</Transitions>
+</Automaton>
+<Automaton name="A" type="Plant">
+	<Events>
+		<Event id="u_B5"/>
+		<Event id="u_B6"/>
+		<Event id="u_B7"/>
+		<Event id="f_A" controllable="false"/>
+		<Event id="f_B" controllable="false"/>
+	</Events>
+	<States>
+		<State id="i" initial="true" accepting="true"/>
+		<State id="w"/>
+		<State id="wA"/>
+		<State id="wB"/>
+	</States>
+	<Transitions>
+		<Transition source="i" dest="w" event="u_B5"/>
+		<Transition source="w" dest="wA" event="u_B6"/>
+		<Transition source="w" dest="wB" event="u_B7"/>
+		<Transition source="wA" dest="i" event="f_A"/>
+		<Transition source="wB" dest="i" event="f_B"/>
+	</Transitions>
+</Automaton>
+</Automata>

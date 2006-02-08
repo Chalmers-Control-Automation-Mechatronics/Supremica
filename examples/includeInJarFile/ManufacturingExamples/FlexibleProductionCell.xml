@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Automata name="Flexible production cell" comment="From 'Task Description of a Flexible Production Cell with Real Time Properties' by A. Lotzenbeyer and R. Muhlfeld."> 
-<!-- Should be Lötzenbeyer and Mühlfeld of course... -->
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Automata name="Flexible production cell" comment="From 'Task Description of a Flexible Production Cell with Real Time Properties' by A. Lötzenbeyer and R. Mühlfeld."> 
  <Automaton name="Product A" type="Specification">
   <Events>
    <Event id="p1.b_seg1" label="p1.b_seg1" controllable="true" prioritized="true" />

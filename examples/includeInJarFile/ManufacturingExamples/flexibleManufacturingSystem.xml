@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<Automata name="FlexibleManufacturingSystem" comment="Example from 'Smart TCT: An Efficient Algorithm for Supervisory Control Design' by Z. Zhang. But... something is seriously wrong with this system... check the modular structure.">
+<Automata name="FlexibleManufacturingSystem" comment="Example from 'Smart TCT: An Efficient Algorithm for Supervisory Control Design' by Z. Zhang. But... something is seriously wrong with this system... check the modular structure. Originally, the example comes from 'Applications of Petri Nets in Manufacturing Systems, Modeling, Control and Performance Analysis' by A.A. Desrochers and R.Y Al-Jaar.">
 <Automaton name="blocks_on_conveyor4" type="Specification">
 	<Events>
 		<Event id="0" label="r1_p_bl_c4"/>

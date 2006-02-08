@@ -54,6 +54,7 @@ import org.supremica.log.*;
 import org.supremica.gui.*;
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.minimization.*;
+import org.supremica.properties.SupremicaProperties;
 
 // This one is used for doMonolithic to return two values
 class MonolithicReturnValue
@@ -209,7 +210,12 @@ public class AutomataSynthesizer
 				min.setName(null);
 
 				// Present result
-				logger.info("The states that are reachable in the maximally permissive, controllable and nonblocking supervisor are: " + min.getStateSet() + ".");
+				if (SupremicaProperties.verboseMode() && (min.nbrOfStates() < 1000))
+				{
+					// This may not be true if more advanced simplification rules have been used!
+					logger.info("The states that are reachable in the maximally permissive, " 
+								+ "controllable and nonblocking supervisor are: " + min.getStateSet() + ".");
+				}
 				result.addAutomaton(min);
 			}
 		}

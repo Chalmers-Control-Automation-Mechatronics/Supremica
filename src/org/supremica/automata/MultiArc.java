@@ -126,7 +126,7 @@ public class MultiArc
 	}
 
 	/**
-	 * Compares this arc to another arc. The toState is compared first,
+	 * Compares this multiarc to another multiarc. The toState is compared first,
 	 * then the fromState.
 	 *
 	 * Note! This comparison disregards the alphabets on the multiarcs!
