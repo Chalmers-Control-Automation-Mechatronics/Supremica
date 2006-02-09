@@ -49,9 +49,11 @@
 
 package org.supremica.functionblocks.model;
 
+import bsh.Interpreter;
+
 public abstract class Algorithm extends NamedObject
 {
 
-    public abstract void execute(Variables variables);
+    public abstract void execute(Variables variables,Interpreter interpreter);
 
 }

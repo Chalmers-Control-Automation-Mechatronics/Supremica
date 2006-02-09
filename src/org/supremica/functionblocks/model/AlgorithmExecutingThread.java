@@ -55,9 +55,13 @@
  */
 package org.supremica.functionblocks.model;
 
+import bsh.Interpreter;
+
 
 class AlgorithmExecutingThread extends Thread
 {
+
+	private Interpreter interpreter = new Interpreter();
 
     private Scheduler scheduler = null;
 
@@ -84,7 +88,7 @@ class AlgorithmExecutingThread extends Thread
 			currentFBInstance.algorithmTime = System.nanoTime();
 
 			//-----------------------------------------------------------------
-			currentJob.getAlgorithm().execute(currentJob.getVariables());
+			currentJob.getAlgorithm().execute(currentJob.getVariables(),interpreter);
 			currentJob.getInstance().finishedJob(currentJob);
 			//-----------------------------------------------------------------
 

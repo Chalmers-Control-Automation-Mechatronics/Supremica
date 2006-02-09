@@ -58,15 +58,12 @@ import java.io.StringReader;
 public class JavaTextAlgorithm extends Algorithm
 {
 
-	private Interpreter interpreter;
-
 	private String algorithmText;
 
 	public JavaTextAlgorithm(String n, String algText)
 	{
 		setName(n);
 		algorithmText = algText;
-		interpreter = new Interpreter();
 	}
 
 	public String toString()
@@ -74,7 +71,7 @@ public class JavaTextAlgorithm extends Algorithm
 		return algorithmText;
 	}
 
-	public void execute(Variables vars)
+	public void execute(Variables vars, Interpreter interpreter)
 	{
 
 		//set variables
