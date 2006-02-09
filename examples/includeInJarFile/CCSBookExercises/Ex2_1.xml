@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Automata name="Ex2_1">
+<Automata name="Ex2_1" comment="A model of a PIN code reader that accepts the code 5521.">
 <Automaton name="PIN Code Reader" type="Undefined">
 	<Events>
 		<Event id="0"/>

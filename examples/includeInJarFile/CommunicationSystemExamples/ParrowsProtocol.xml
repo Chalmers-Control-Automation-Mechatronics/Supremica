@@ -59,8 +59,8 @@
 	<Events>
 		<Event id="in"/>
 		<Event id="out"/>
-		<Event id="tau_0" epsilon="true"/>
-		<Event id="tau_1" epsilon="true"/>
+		<Event id="tau_0" label="tau_ok" epsilon="true"/>
+		<Event id="tau_1" label="tau_lost" epsilon="true"/>
 		<Event id="timeout"/>
 	</Events>
 	<States>
