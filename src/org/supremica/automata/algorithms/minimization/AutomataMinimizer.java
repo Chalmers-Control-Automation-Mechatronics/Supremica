@@ -232,9 +232,10 @@ public class AutomataMinimizer
 			}
 
 			// Early termination
-			if (false && options.getMinimizationType() == EquivalenceRelation.ConflictEquivalence)
+			if ((options.getMinimizationType() == EquivalenceRelation.ConflictEquivalence) ||
+				(options.getMinimizationType() == EquivalenceRelation.SupervisionEquivalence))
 			{
-				// If blocking, we can early terminate!
+				// If initial state is blocking, we can early terminate!
 				if (min.nbrOfStates() == 1 && !min.getInitialState().isAccepting())
 				{
 					// Return a one state blocking automaton (min for example)

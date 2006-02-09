@@ -153,6 +153,8 @@ public class AutomataMinimizationWorker
 					threadsToStop.add(minimizer);
 					Automaton newAutomaton = minimizer.getMinimizedAutomaton(options);
 					threadsToStop.remove(minimizer);
+					newAutomaton.setComment("min(" + newAutomaton.getName() + ")");
+					newAutomaton.setName(null);
 
 					if (stopRequested)
 					{

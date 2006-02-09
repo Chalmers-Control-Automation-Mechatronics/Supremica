@@ -262,6 +262,7 @@ public class AutomatonMinimizer
 						blob = MinimizationHelper.mergeStates(theAutomaton, blob, state, false);
 					}
 					blob.setName("dump");
+					blob.setAccepting(false);
 					outerChange = true;
 				}
 			}

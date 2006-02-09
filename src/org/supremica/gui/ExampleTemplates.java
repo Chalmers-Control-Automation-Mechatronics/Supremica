@@ -268,7 +268,7 @@ public class ExampleTemplates
 		thisGroup.addItem(new TemplateItem("Circular Table (variant)", prefix + "rotationTable.xml"));
 		thisGroup.addItem(new TemplateItem("Dosing Unit", prefix + "dosingUnit.xml"));
 		thisGroup.addItem(new TemplateItem("Flexible Manufacturing System", prefix + "FlexibleManufacturingSystem.xml"));
-		thisGroup.addItem(new TemplateItem("Flexible Manufacturing System (incomplete)", prefix + "flexibleManufacturingSystem.xml"));
+		thisGroup.addItem(new TemplateItem("Flexible Manufacturing System (variant, incomplete)", prefix + "flexibleManufacturingSystem.xml"));
 		thisGroup.addItem(new TemplateItem("Flexible Production Cell", prefix + "ftechnik.xml"));
 		//thisGroup.addItem(new TemplateItem("Flexible Production Cell - No Collisions", prefix + "ftechnik_nocoll.xml"));
 
