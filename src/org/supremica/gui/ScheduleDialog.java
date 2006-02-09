@@ -13,8 +13,13 @@ import org.supremica.automata.algorithms.scheduling.*;
 public class ScheduleDialog
 	extends JDialog
 {
+	private static final String MODIFIED_A_STAR = "Modified A*";
+	private static final String MODIFIED_VGA_STAR = "Modified VGA*";
+	private static final String MILP = "MILP";
+	private static final String VIS_GRAPH = "Visibility Graph";
+
     private static final long serialVersionUID = 1L;
-    private static final String[] optiMethodNames = new String[]{"Modified A*", "Modified VGA*", "MILP", "Modified IDA*", "Modified SMA*"};
+    private static final String[] optiMethodNames = new String[]{MODIFIED_A_STAR, MODIFIED_VGA_STAR, MILP, VIS_GRAPH}; //, "Modified IDA*", "Modified SMA*"};
     private static final String[] heuristicsNames = new String[]{"1-product relax", "2-product relax", "brute force"};
     private static Logger logger = LoggerFactory.createLogger(ScheduleDialog.class);
     private JComboBox optiMethodsBox, heuristicsBox;
@@ -129,17 +134,27 @@ public class ScheduleDialog
 			
 			Scheduler sched;
 			
-			if (optiMethodsBox.getSelectedItem().equals("Modified A*"))
+			if (optiMethodsBox.getSelectedItem().equals(MODIFIED_A_STAR))
+			{
 				sched = new ModifiedAstar(ActionMan.getGui().getSelectedAutomata(), (String) heuristicsBox.getSelectedItem(), nodeExpander.isSelected(), false);
-			else if (optiMethodsBox.getSelectedItem().equals("Modified VGA*"))
+			}
+			else if (optiMethodsBox.getSelectedItem().equals(MODIFIED_VGA_STAR))
+			{
 				sched = new ModifiedVGAstar(ActionMan.getGui().getSelectedAutomata(), (String) heuristicsBox.getSelectedItem(), nodeExpander.isSelected(), vgDrawer.isSelected(), false);
-			else if (optiMethodsBox.getSelectedItem().equals("MILP"))
+			}
+			else if (optiMethodsBox.getSelectedItem().equals(MILP))
+			{
 				sched = new Milp(ActionMan.getGui().getSelectedAutomata());
-			else if (optiMethodsBox.getSelectedItem().equals("Modified IDA*"))
-				throw new Exception("IMA* not implemented yet...");
-			// 		sched = new ModifiedAstar(ActionMan.getGui().getSelectedAutomata(), (String) heuristicsBox.getSelectedItem(), nodeExpander.isSelected(), true);	
-			else if (optiMethodsBox.getSelectedItem().equals("Modified SMA*"))
-				throw new Exception("SMA* not implemented yet...");
+			}
+			else if (optiMethodsBox.getSelectedItem().equals(VIS_GRAPH))
+			{
+				sched = new VisGraphScheduler(ActionMan.getGui().getSelectedAutomata());
+			}
+// 			else if (optiMethodsBox.getSelectedItem().equals("Modified IDA*"))
+// 				throw new Exception("IMA* not implemented yet...");
+// 			// 		sched = new ModifiedAstar(ActionMan.getGui().getSelectedAutomata(), (String) heuristicsBox.getSelectedItem(), nodeExpander.isSelected(), true);	
+// 			else if (optiMethodsBox.getSelectedItem().equals("Modified SMA*"))
+// 				throw new Exception("SMA* not implemented yet...");
 			else 
 				throw new Exception("Unknown optimization method");
 
