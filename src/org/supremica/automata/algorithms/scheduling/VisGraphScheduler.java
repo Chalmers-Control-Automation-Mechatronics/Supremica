@@ -6,6 +6,7 @@ import java.awt.*;
 
 import org.supremica.log.*;
 import org.supremica.automata.*;
+import org.supremica.gui.VisGraphDrawer;
 
 public class VisGraphScheduler 
 	implements Scheduler
@@ -100,7 +101,7 @@ public class VisGraphScheduler
 			goalTimes[i] = currTime;
 
 			Enumeration<Integer> keys = zoneBoundaryTimes[i].keys();
-			while (keys.hasMoreElements())
+			while (keys.hasMoreElements()) 
 			{
 				String str = "";
 				Integer key = keys.nextElement();
@@ -117,34 +118,13 @@ public class VisGraphScheduler
 
 	private void drawVisibilityGraph(int height, int width)
 	{
-		new Drawer("New visibility graph");
+		VisGraphDrawer drawer = new VisGraphDrawer(450, 450);
 
-// 		JFrame graph = new JFrame("Visibility Graph");
+		for (int j=0; j<zones.size(); j++)
+		{
+			drawer.addZone(zoneBoundaryTimes[0].get(new Integer(j)), zoneBoundaryTimes[1].get(new Integer(j)), goalTimes, zones.getAutomatonAt(j).getName());
+		}
 
-// 		graph.setSize(height, width);
-// 		graph.setBackground(Color.GREEN);
-
-// 		graph.setVisible(true);
-
-// 		Graphics g = graph.getGraphics();
-// 		g.drawLine(50,50,250,250);
-	}
-}
-
-class Drawer extends JFrame
-{
-	Drawer(String label)
-	{
-		super(label);
-
-		setSize(500,500);
-		setVisible(true);
-	}
-
-	public void paint(Graphics g)
-	{
-		setBackground(Color.WHITE);
-		g.drawLine(50,50,250,250);
-		g.drawLine(0,0,20,100);
+		drawer.addGoal(goalTimes, goalTimes);
 	}
 }
