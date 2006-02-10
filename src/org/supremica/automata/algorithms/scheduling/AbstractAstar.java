@@ -225,7 +225,7 @@ public abstract class AbstractAstar
 
 			initAuxIndices();
 
-			openTree = new TreeSet<int[]>(new OpenTreeComparator());
+			openTree = new TreeSet<int[]>(new OpenTreeComparator(ESTIMATE_INDEX));
 			closedTree = new TreeMap<Integer, int[]>();
 		}	
     }
@@ -301,8 +301,6 @@ public abstract class AbstractAstar
 				// Removes the first node on OPEN. If it is accepting, the search is completed
 				currNode = openTree.first();
 
-				logger.info("currently opened node = " + printArray(currNode) + "; est_cost = " + currNode[ESTIMATE_INDEX]);
-				
 				if (isAcceptingNode(currNode))
 					break;
 				

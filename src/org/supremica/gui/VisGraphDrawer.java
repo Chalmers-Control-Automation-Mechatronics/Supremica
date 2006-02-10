@@ -4,16 +4,23 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 
+import org.supremica.log.*;
+
 public class VisGraphDrawer
 	extends JFrame
 {
+	/** The logger */
+	private static Logger logger = LoggerFactory.createLogger(VisGraphDrawer.class);
+	
 	private static final int OFFSET = 50;
 	private final int DRAWABLE_AREA;
+	private final int FLETCH_SPREAD = 5;
 	
-	private ArrayList<Polygon> zones = new ArrayList<Polygon>();
-	private ArrayList<String> zoneNames = new ArrayList<String>();
+	private ArrayList<GraphicalZone> zones = new ArrayList<GraphicalZone>();
+	private ArrayList<int[]> paths = new ArrayList<int[]>();
 
-	private int[] goalCoords = null; 
+	private double[] xyRange = new double[2];
+	private String[] robotNames;
 
 	public VisGraphDrawer(int width, int height)
 	{
@@ -25,11 +32,22 @@ public class VisGraphDrawer
 		setVisible(true);
 	}
 
+	public VisGraphDrawer(int width, int height, String[] robotNames)
+	{
+		this(width, height);
+
+		this.robotNames = new String[robotNames.length];
+		for (int i=0; i<robotNames.length; i++)
+		{
+			this.robotNames[i] = robotNames[i];
+		}
+	}
+
 	public void paint(Graphics g)
 	{
 		setBackground(Color.WHITE);
+		g.setColor(Color.BLACK);
 		
-		int FLETCH_SPREAD = 5;
 		//Coordinate axes (x)
 		g.drawLine(OFFSET, getHeight() - OFFSET, getWidth() - OFFSET, getHeight() - OFFSET);
 		g.drawLine(getWidth() - OFFSET, getHeight() - OFFSET, getWidth() - OFFSET - FLETCH_SPREAD, getHeight() - OFFSET - FLETCH_SPREAD); 
@@ -40,66 +58,181 @@ public class VisGraphDrawer
 		g.drawLine(OFFSET, OFFSET, OFFSET - FLETCH_SPREAD, OFFSET + FLETCH_SPREAD);
 		g.drawLine(OFFSET, OFFSET, OFFSET + FLETCH_SPREAD, OFFSET + FLETCH_SPREAD);
 
+		//The names of the coordinate axis
+		if (robotNames != null)
+		{
+			g.drawString(robotNames[0], getWidth() - OFFSET + FLETCH_SPREAD, getHeight() - OFFSET - FLETCH_SPREAD);
+			g.drawString(robotNames[1], OFFSET + FLETCH_SPREAD, OFFSET - FLETCH_SPREAD);
+		}
+
+		//The goal cross
+		int xLimitPixel = getWidth() - 2 * OFFSET;
+		int yLimitPixel = 2 * OFFSET;
+		
+		g.drawLine(xLimitPixel, getHeight() - OFFSET - FLETCH_SPREAD, xLimitPixel, getHeight() - OFFSET + FLETCH_SPREAD);
+		g.drawLine(OFFSET - FLETCH_SPREAD, yLimitPixel, OFFSET + FLETCH_SPREAD, yLimitPixel);
+		g.drawLine(xLimitPixel - FLETCH_SPREAD, yLimitPixel + FLETCH_SPREAD, xLimitPixel + FLETCH_SPREAD, yLimitPixel - FLETCH_SPREAD);
+		g.drawLine(xLimitPixel - FLETCH_SPREAD, yLimitPixel - FLETCH_SPREAD, xLimitPixel + FLETCH_SPREAD, yLimitPixel + FLETCH_SPREAD);
+
+		//The goal coordinates
+		g.drawString("" + xyRange[0], xLimitPixel - 2 * FLETCH_SPREAD, getHeight() - OFFSET + 4 * FLETCH_SPREAD);
+		g.drawString("" + xyRange[1], OFFSET - 7 * FLETCH_SPREAD, yLimitPixel);		
+
+		//Zone graphics
 		for (int i=0; i<zones.size(); i++)
 		{
+			GraphicalZone currZone = zones.get(i);
+
 			//Zones
 			g.setColor(Color.RED);
-			g.fillPolygon(zones.get(i));
+			g.fillPolygon(currZone);
 
 			//Their names
 			g.setColor(Color.BLACK);
-			Rectangle rect = zones.get(i).getBounds();
-			int x = (int) Math.round(rect.getX());
-			int y = (int) Math.round(rect.getY());
-			g.drawString(zoneNames.get(i), x + 5, y + 15);
+			g.drawString(currZone.getName(), currZone.getXPixels()[0] + FLETCH_SPREAD, currZone.getYPixels()[0] - FLETCH_SPREAD);
 
 			//Coordinate marqueurs
-			g.drawLine(x, getHeight() - OFFSET - FLETCH_SPREAD, x, getHeight() - OFFSET + FLETCH_SPREAD);
-			g.drawLine(OFFSET - FLETCH_SPREAD, y, OFFSET + FLETCH_SPREAD, y);
-			g.drawLine(x + (int)rect.getWidth(), getHeight() - OFFSET - FLETCH_SPREAD, x + (int)rect.getWidth(), getHeight() - OFFSET + FLETCH_SPREAD);
-			g.drawLine(OFFSET - FLETCH_SPREAD, y + (int)rect.getHeight(), OFFSET + FLETCH_SPREAD, y + (int)rect.getHeight());
+			g.drawLine(currZone.getXPixels()[0], getHeight() - OFFSET - FLETCH_SPREAD, currZone.getXPixels()[0], getHeight() - OFFSET + FLETCH_SPREAD);
+			g.drawLine(OFFSET - FLETCH_SPREAD, currZone.getYPixels()[0], OFFSET + FLETCH_SPREAD, currZone.getYPixels()[0]);
+			g.drawLine(currZone.getXPixels()[1], getHeight() - OFFSET - FLETCH_SPREAD, currZone.getXPixels()[1], getHeight() - OFFSET + FLETCH_SPREAD);
+			g.drawLine(OFFSET - FLETCH_SPREAD, currZone.getYPixels()[1], OFFSET + FLETCH_SPREAD, currZone.getYPixels()[1]);
+
+			//Coordinate values
+			g.drawString("" + currZone.getXCoords()[0], currZone.getXPixels()[0] - 2 * FLETCH_SPREAD, getHeight() - OFFSET + 4 * FLETCH_SPREAD);
+			g.drawString("" + currZone.getXCoords()[1], currZone.getXPixels()[1] - 2 * FLETCH_SPREAD, getHeight() - OFFSET + 4 * FLETCH_SPREAD);
+			g.drawString("" + currZone.getYCoords()[0], OFFSET - 7 * FLETCH_SPREAD, currZone.getYPixels()[0]);
+			g.drawString("" + currZone.getYCoords()[1], OFFSET - 7 * FLETCH_SPREAD, currZone.getYPixels()[1]);
 		}
 
-		if (goalCoords != null)
+		//Optimal paths
+		for (int i=0; i<paths.size(); i++)
 		{
-			g.drawLine(goalCoords[0], getHeight() - OFFSET - FLETCH_SPREAD, goalCoords[0], getHeight() - OFFSET + FLETCH_SPREAD);
-			g.drawLine(OFFSET - FLETCH_SPREAD, goalCoords[1], OFFSET + FLETCH_SPREAD, goalCoords[1]);
-			g.drawLine(goalCoords[0] - 5, goalCoords[1] + 5, goalCoords[0] + 5, goalCoords[1] - 5);
-			g.drawLine(goalCoords[0] - 5, goalCoords[1] - 5, goalCoords[0] + 5, goalCoords[1] + 5);
+			int[] currPath = paths.get(i);
+
+			g.setColor(Color.BLUE);
+			//g.setFont(Font.BOLD); //PLAIN
+			g.drawLine(currPath[0], currPath[1], currPath[2], currPath[3]);
 		}
 	}
 
-	private int toXPixels(double x, double xTot)
+	public void addZone(double[] xCoords, double[] yCoords, String zoneName)
+		throws Exception 
 	{
-		return (int) Math.round(x / xTot * DRAWABLE_AREA) + OFFSET;
-	}
-
-	private int toYPixels(double y, double yTot)
-	{
-		return getHeight() - (int) Math.round(y /yTot * DRAWABLE_AREA) - OFFSET;
-	}
-
-	public void addZone(double[] xCoords, double[] yCoords, double[] xyTots, String zoneName)
-	{
-		if (xCoords != null && yCoords != null) 
+		try 
 		{
-			Polygon zone = new Polygon();
-			
-			zone.addPoint(toXPixels(xCoords[0], xyTots[0]), toYPixels(yCoords[0], xyTots[1]));
-			zone.addPoint(toXPixels(xCoords[0], xyTots[0]), toYPixels(yCoords[1], xyTots[1]));
-			zone.addPoint(toXPixels(xCoords[1], xyTots[0]), toYPixels(yCoords[1], xyTots[1]));
-			zone.addPoint(toXPixels(xCoords[1], xyTots[0]), toYPixels(yCoords[0], xyTots[1]));
-			
-			zones.add(zone);
-			zoneNames.add(zoneName);
+			if (xCoords != null && yCoords != null) 
+			{
+				zones.add(new GraphicalZone(xCoords, yCoords, zoneName, this));
+			}
+		}
+		catch (Exception ex) 
+		{
+			logger.error("Exception in VisGraphDrawer.addZone() ---> " + ex.getMessage());
+			throw ex;
 		}
 	}
 
-	public void addGoal(double[] goalTimes, double[] xyTots)
+	public void addPath(double[] pathStart, double[] pathEnd)
+		throws Exception
 	{
-		goalCoords = new int[goalTimes.length];
+		try 
+		{
+			int[] path = new int[pathStart.length + pathEnd.length];
+			
+			path[0] = toXPixels(pathStart[0]);
+			path[1] = toYPixels(pathStart[1]);
+			path[2] = toXPixels(pathEnd[0]);
+			path[3] = toYPixels(pathEnd[1]);
+			
+			paths.add(path);
+		}
+		catch (Exception ex) 
+		{
+			logger.error("Exception in VisGraphDrawer.addPath() ---> " + ex.getMessage());
+			throw ex;
+		}
+	}
 
-	    goalCoords[0] = toXPixels(goalTimes[0], xyTots[0]);
-	    goalCoords[1] = toXPixels(goalTimes[1], xyTots[1]);
+	public int toXPixels(double x)
+	{
+		return (int) Math.round(x / xyRange[0] * DRAWABLE_AREA) + OFFSET;
+	}
+
+	public int toYPixels(double y)
+	{
+		return getHeight() - (int) Math.round(y / xyRange[1] * DRAWABLE_AREA) - OFFSET;
+	}
+
+	public double[] getXYRange() 
+	{
+		return xyRange;
+	}
+
+	public void setXYRange(double[] xyRange)
+	{
+		this.xyRange[0] = xyRange[0];
+		this.xyRange[1] = xyRange[1];
+	}
+}
+
+class GraphicalZone 
+	extends Polygon
+{
+	private double[] xCoords = new double[2];
+	private double[] yCoords = new double[2];
+	private int[] xPixels = new int[2];
+	private int[] yPixels = new int[2];
+	private String name = "";
+
+	GraphicalZone()
+	{
+		super();
+	}
+
+	GraphicalZone(double[] xCoords, double[] yCoords, String name, VisGraphDrawer drawer)
+	{
+		this();
+
+		xPixels[0] = drawer.toXPixels(xCoords[0]);
+		xPixels[1] = drawer.toXPixels(xCoords[1]);
+		yPixels[0] = drawer.toYPixels(yCoords[0]);
+		yPixels[1] = drawer.toYPixels(yCoords[1]);
+
+		this.xCoords[0] = xCoords[0];
+		this.xCoords[1] = xCoords[1];
+		this.yCoords[0] = yCoords[0];
+		this.yCoords[1] = yCoords[1];
+
+		this.name = name;
+
+		addPoint(xPixels[0], yPixels[0]);
+		addPoint(xPixels[0], yPixels[1]);
+		addPoint(xPixels[1], yPixels[1]);
+		addPoint(xPixels[1], yPixels[0]);
+	}
+
+	public double[] getXCoords()
+	{
+		return xCoords;
+	}
+	
+	public double[] getYCoords()
+	{
+		return yCoords;
+	}
+
+	public int[] getXPixels()
+	{
+		return xPixels;
+	}
+	
+	public int[] getYPixels()
+	{
+		return yPixels;
+	}
+
+	public String getName() 
+	{
+		return name;
 	}
 }

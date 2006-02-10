@@ -148,7 +148,8 @@ public class ScheduleDialog
 			}
 			else if (optiMethodsBox.getSelectedItem().equals(VIS_GRAPH))
 			{
-				sched = new VisGraphScheduler(ActionMan.getGui().getSelectedAutomata());
+				sched = new VisGraphScheduler(ActionMan.getGui().getSelectedAutomata(), vgDrawer.isSelected());
+				buildAutomaton.setSelected(false);
 			}
 // 			else if (optiMethodsBox.getSelectedItem().equals("Modified IDA*"))
 // 				throw new Exception("IMA* not implemented yet...");
