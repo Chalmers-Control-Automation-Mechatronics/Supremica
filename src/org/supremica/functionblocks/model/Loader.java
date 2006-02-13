@@ -674,7 +674,7 @@ public class Loader
 			{
 				if (curAlg.getOther().getLanguage().toLowerCase().equals("java"))
 				{
-					newBasicFBType.addAlgorithm(new JavaTextAlgorithm(curAlg.getName(),curAlg.getOther().getText()));
+					newBasicFBType.addAlgorithm(new JavaAlgorithm(curAlg.getName(),curAlg.getOther().getText()));
 				}
 			}
 		}

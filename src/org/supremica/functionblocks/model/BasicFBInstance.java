@@ -208,7 +208,8 @@ public class BasicFBInstance extends FBInstance
 	// handles currentECState between actions
 	private void handleState()
 	{
-		if (actionsLeft == 0)
+		//if (actionsLeft == 0)
+		if (!actionsIterator.hasNext())
 		{
 			// set event var to false
 			((BooleanVariable) variables.getVariable(currentEvent.getName())).setValue(false);
@@ -235,7 +236,8 @@ public class BasicFBInstance extends FBInstance
 				handlingEvent = false;
 			}
  		}
-		else if (actionsLeft > 0)
+		//else if (actionsLeft > 0)
+		else if (actionsIterator.hasNext())
 		{
 			handleAction((ECAction) actionsIterator.next());
 		}
