@@ -244,10 +244,10 @@ public class BasicFBInstance extends FBInstance
 		{
 			handleAction((ECAction) actionsIterator.next());
 		}
-		else
-		{
-			System.out.println("BasicFBInstance(" + getName() + ").handleState(): Something is wrong with actions!");			
-		}
+		//else
+		//{
+		//	System.out.println("BasicFBInstance(" + getName() + ").handleState(): Something is wrong with actions!");			
+		//}
 	}
 	
 	
