@@ -19,10 +19,10 @@ public class VisGraphBuilder {
 	 */
     private int[][] oneProdRelax;
 
-    private ArrayList<int[]> edges;
+    private ArrayList<double[]> edges;
     private Hashtable<Integer, ArrayList<Integer>>[] totalZoneIndices;
-    private int[][] zoneTimes;
-    private int[] goal;
+    private double[][] zoneTimes;
+    private double[] goal;
     private VisibilityChecker checker;
     private static Logger logger = LoggerFactory.createLogger(VisGraphBuilder.class);
 
@@ -38,8 +38,8 @@ public class VisGraphBuilder {
 			}
 		}
 
-		edges = new ArrayList<int[]>();
-		goal = new int[plantAutomata.size()];
+		edges = new ArrayList<double[]>();
+		goal = new double[plantAutomata.size()];
 
 		buildVisGraph();
 
@@ -111,19 +111,19 @@ public class VisGraphBuilder {
 			ArrayList<Integer> r2TimeIndices = totalZoneIndices[1].get(key);
 
 			if (key == -1) 
-				goal = new int[]{zoneTimes[0][r1TimeIndices.get(0)], zoneTimes[1][r2TimeIndices.get(0)]};
+				goal = new double[]{zoneTimes[0][r1TimeIndices.get(0)], zoneTimes[1][r2TimeIndices.get(0)]};
 			else if (! (r2TimeIndices == null)) {
-				int[] r1 = new int[r1TimeIndices.size()];
-				int[] r2 = new int[r2TimeIndices.size()];
+				double[] r1 = new double[r1TimeIndices.size()];
+				double[] r2 = new double[r2TimeIndices.size()];
 				for (int i=0; i<r1.length; i++) {
 					r1[i] = zoneTimes[0][r1TimeIndices.get(i)];
 					r2[i] = zoneTimes[1][r2TimeIndices.get(i)];
 				}
 		
-				edges.add(new int[]{r1[0], r2[0], r1[1], r2[0]});
-				edges.add(new int[]{r1[0], r2[0], r1[0], r2[1]});
-				edges.add(new int[]{r1[1], r2[1], r1[0], r2[1]});
-				edges.add(new int[]{r1[1], r2[1], r1[1], r2[0]});
+				edges.add(new double[]{r1[0], r2[0], r1[1], r2[0]});
+				edges.add(new double[]{r1[0], r2[0], r1[0], r2[1]});
+				edges.add(new double[]{r1[1], r2[1], r1[0], r2[1]});
+				edges.add(new double[]{r1[1], r2[1], r1[1], r2[0]});
 			}
 		}
     }
@@ -133,12 +133,12 @@ public class VisGraphBuilder {
     }
 
     private void extractTimes() {
-		zoneTimes = new int[plantAutomata.size()][];
+		zoneTimes = new double[plantAutomata.size()][];
 
 		for (int i=0; i<plantAutomata.size(); i++) {
 			int[] relaxationTimes = oneProdRelax[i];
-			int[] automatonZoneTimes = new int[relaxationTimes.length-1];
-			int base = relaxationTimes[0] + plantAutomata.getAutomatonAt(i).getInitialState().getCost();
+			double[] automatonZoneTimes = new double[relaxationTimes.length-1];
+			double base = relaxationTimes[0] + plantAutomata.getAutomatonAt(i).getInitialState().getCost();
 	    
 			for (int j=0; j<automatonZoneTimes.length; j++) {
 				automatonZoneTimes[j] = base - relaxationTimes[j];
@@ -159,11 +159,11 @@ public class VisGraphBuilder {
 			State currState = theAuto.getInitialState();
 	    
 			while (!currState.isAccepting()) {
-				Iterator<Arc> it = currState.outgoingArcsIterator();
+				Iterator<Arc> outgoingArcsIter = currState.outgoingArcsIterator();
 		
-				while (it.hasNext()) {
-					Arc arc = it.next();
-					String label = arc.getLabel();
+				while (outgoingArcsIter.hasNext()) {
+					Arc outgoingArc = outgoingArcsIter.next();
+					String label = outgoingArc.getLabel();
 					int zoneNr = -1;
 		    
 					if (label.contains("b"))
@@ -178,7 +178,7 @@ public class VisGraphBuilder {
 					localZoneIndices.add(counter);
 					zoneIndices.put(zoneNr, localZoneIndices);
 		    
-					currState = arc.getToState();
+					currState = outgoingArc.getToState();
 					counter++;
 				}
 			}
@@ -187,30 +187,30 @@ public class VisGraphBuilder {
 		}
     }
 
-    public int[] getGoal() {
+    public double[] getGoal() {
 		return goal;
     }
     
-    public ArrayList<int[]> getEdges() {
+    public ArrayList<double[]> getEdges() {
 		return edges;
     }
 
-    public boolean isVisible(int[] start, int[] goal) {
+    public boolean isVisible(double[] start, double[] goal) {
 		checker.setStart(start);
 		checker.setGoal(goal);
 
 		return checker.isVisible();
     }
 
-    public boolean isVisible(int[] start) {
+    public boolean isVisible(double[] start) {
 		return isVisible(start, goal);
     }
 
-    public double getDistanceToDiag(int[] point) {
+    public double getDistanceToDiag(double[] point) {
 		return checker.getDistanceToDiag(point);
     }
 
-    public void setStart(int[] point) {
+    public void setStart(double[] point) {
 		checker.setStart(point);
     }
 }

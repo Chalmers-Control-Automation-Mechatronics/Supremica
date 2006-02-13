@@ -494,10 +494,10 @@ public class ModifiedVGAstar
 		return newCosts;
     }
 
-    private int[] getEffCost(int[] node) {
+    private double[] getEffCost(int[] node) {
 		int activeLength = getActiveLength();
 
-		int[] effCost = new int[activeLength];
+		double[] effCost = new double[activeLength];
 
 		for (int i=0; i<activeLength; i++)
 			effCost[i] = node[i + effCostIndex];
