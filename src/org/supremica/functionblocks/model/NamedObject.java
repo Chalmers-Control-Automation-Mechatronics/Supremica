@@ -52,7 +52,7 @@ package org.supremica.functionblocks.model;
 /**
  * @author Cengic
  */
-public class NamedObject extends ManagedObject
+public class NamedObject
 {
 
 	private String name = "Unnamed";
