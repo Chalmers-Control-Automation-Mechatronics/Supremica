@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   ImmutableSubject
 //###########################################################################
-//# $Id: AbstractSubject.java,v 1.3 2005-11-10 21:54:42 robi Exp $
+//# $Id: AbstractSubject.java,v 1.4 2006-02-13 21:30:52 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;
@@ -22,7 +22,7 @@ import net.sourceforge.waters.model.printer.ProxyPrinter;
  * <P>This is the abstract base class of all immutable Waters elements in
  * the <I>subject</I> implementation. It provides the basic functionality
  * to access the parent. The listeners are implemented in two different
- * ways in the subclasses {@link AbstractSubject} and {@link
+ * ways in the subclasses {@link ImmutableSubject} and {@link
  * MutableSubject}.
  * 
  * @author Robi Malik
