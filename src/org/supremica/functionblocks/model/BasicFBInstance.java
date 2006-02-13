@@ -50,7 +50,7 @@ public class BasicFBInstance extends FBInstance
 	private ECState currentECState;
 	private ECAction currentECAction;
 	private Iterator actionsIterator;
-	private int actionsLeft;
+	//private int actionsLeft;
 		
 	private Boolean handlingEvent = new Boolean(false);
 	private Boolean queuedInScheduler = new Boolean(false);
@@ -197,11 +197,14 @@ public class BasicFBInstance extends FBInstance
 	private void handleNewState(ECState state)
 	{
 		currentECState = state;
+
+		// obsolete
 		// set total number of actions in this state
-		actionsLeft = currentECState.getNumberOfActions();
+		//actionsLeft = currentECState.getNumberOfActions();
+
 		// and get the iterator for them
 		actionsIterator = currentECState.actionsIterator();
-		//System.out.println("BasicFBInstance(" + getName() + ").handleNewState(): Handling new state " + currentECState.getName() + " with " + actionsLeft + " actions");
+		//System.out.println("BasicFBInstance(" + getName() + ").handleNewState(): Handling new state " + currentECState.getName() + " with " + currentECState.getNumberOfActions() + " actions");
 		handleState();
 	}
 	
@@ -243,7 +246,7 @@ public class BasicFBInstance extends FBInstance
 		}
 		else
 		{
-			System.out.println("BasicFBInstance(" + getName() + ").handleState(): Something is wrong with actions, actionsLeft =" + actionsLeft);			
+			System.out.println("BasicFBInstance(" + getName() + ").handleState(): Something is wrong with actions!");			
 		}
 	}
 	
@@ -273,7 +276,7 @@ public class BasicFBInstance extends FBInstance
 				outputConnection.getFBInstance().receiveEvent(outputConnection.getSignalName());
 			}
 		}
-		actionsLeft = actionsLeft - 1;
+		//actionsLeft = actionsLeft - 1;
 		handleState();
 	}
 	

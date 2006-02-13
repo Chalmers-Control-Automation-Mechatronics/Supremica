@@ -112,7 +112,7 @@ public class FBRuntime
 			
 		}
 				
-		System.out.println(systemFileName + " , " + libraryPathBase + " , " + libraryPath + " , " + threads);
+		System.out.println("Input arguments: system file name: " + systemFileName + " , library path base: " + libraryPathBase + " , library path: " + libraryPath + " , number of threads: " + threads);
 
 		Device theDevice = new Device("FBRuntime Device", systemFileName, libraryPathBase, libraryPath, threads);
 		theDevice.run();
