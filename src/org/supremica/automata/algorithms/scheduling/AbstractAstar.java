@@ -28,9 +28,12 @@ public abstract class AbstractAstar
 	/*                                 VARIABLE SECTION                                     */
 	/****************************************************************************************/
 
+	private int tillf = 0;
 
   	/** The indices of important parameters, that help to find them in the int[]-representions of nodes. */
 	public static int ESTIMATE_INDEX, ACCUMULATED_COST_INDEX, CURRENT_COSTS_INDEX, PARENT_INDEX;
+
+	private static final String VISIBILITY_GRAPH = "visibility graph";
        
     /** 
 	 * Contains promising search tree nodes, i.e. nodes that might lie on the optimal path. 
@@ -69,6 +72,15 @@ public abstract class AbstractAstar
 
     /** Hashtable containing the estimated cost for each combination of two robots **/
     protected Hashtable[] twoProdRelax;
+
+	/** 
+	 * Hashtable containing the estimated cost for a given time configuration 
+	 * (as returned by the visibility graph)
+	 */
+	protected Hashtable<String, Integer> visGraphRelax = null;
+
+	/** The Visibility Graphs, used for relaxation. Can handle two robots at a time */
+	protected Hashtable<String, VisGraphScheduler> visibilityGraphs = null;
     
     /** The selected automata */
     protected Automata theAutomata, plantAutomata;
@@ -149,7 +161,8 @@ public abstract class AbstractAstar
 	/****************************************************************************************/
 
  
-    public AbstractAstar(Automata theAutomata) throws Exception  
+    public AbstractAstar(Automata theAutomata) 
+		throws Exception  
 	{
 		this(theAutomata, "1-product relax");
     }
@@ -168,7 +181,7 @@ public abstract class AbstractAstar
 		
 		if (heuristic.equals("1-product relax"))
 			useOneProdRelax = true;
-		else if (heuristic.equals("2-product relax")) {
+		else if(heuristic.equals("2-product relax")) {
 			if (theAutomata.getPlantAutomata().size() < 3)
 				throw new Exception("2-product relax cannot be used for two or less products");
 			
@@ -210,18 +223,31 @@ public abstract class AbstractAstar
 			int nrOfPlants = plantAutomata.size();
 	    
 			oneProdRelax = new int[nrOfPlants][];
-	    
-			if (nrOfPlants > 2) {
-				twoProdRelax = new Hashtable[nrOfPlants * (nrOfPlants - 1) / 2];
-				for (int i=0; i<twoProdRelax.length; i++)
-					twoProdRelax[i] = new Hashtable();
+
+			if (heuristic.equals(VISIBILITY_GRAPH))
+			{
+				visGraphRelax = new Hashtable<String, Integer>();
 			}
+	    
+// 			if (nrOfPlants > 2) 
+// 			{
+// 				twoProdRelax = new Hashtable[nrOfPlants * (nrOfPlants - 1) / 2];
+// 				for (int i=0; i<twoProdRelax.length; i++)
+// 					twoProdRelax[i] = new Hashtable();
+// 			}
 
 			infoStr = "Processing times:\n";
 	    
 			timer.restart();
 			preprocess1();
 			infoStr += "\t1st preprocessing in " + timer.elapsedTime() + " ms\n";
+
+			if (heuristic.equals(VISIBILITY_GRAPH))
+			{
+				timer.restart();
+				preprocessVisibilityGraphs();
+				infoStr += "\tvisibility graphs calculated in " + timer.elapsedTime() + "ms\n";
+			}		
 
 			initAuxIndices();
 
@@ -252,7 +278,6 @@ public abstract class AbstractAstar
 	/****************************************************************************************/
 	/*                                 THE A*-ALGORITHM                                     */
 	/****************************************************************************************/
-
 
     /**
      *      Walks through the tree of possible paths in search for the optimal one.
@@ -420,6 +445,10 @@ public abstract class AbstractAstar
 		return true;
 	}
 
+	/****************************************************************************************/
+	/*                                 HEURISTICS                                           */
+	/****************************************************************************************/
+
     /**
      * Calculates the costs for a one-product relaxation (i.e. as if there
      * would only be one robot in the cell) and stores it in oneProdRelax.
@@ -494,6 +523,31 @@ public abstract class AbstractAstar
 			}				
 		}
     }
+
+	protected void preprocessVisibilityGraphs()
+		throws Exception
+	{
+		visibilityGraphs = new Hashtable<String, VisGraphScheduler>();
+
+		for (int i=0; i<plantAutomata.size() - 1; i++)
+		{
+			for (int j=i+1; j<plantAutomata.size(); j++)
+			{
+				String key = "";
+				Automata automataPair = new Automata();
+
+				Automaton currAuto = plantAutomata.getAutomatonAt(i);
+				automataPair.addAutomaton(currAuto);
+				key += currAuto.getName() + "_";
+				
+				currAuto = plantAutomata.getAutomatonAt(j);
+				automataPair.addAutomaton(currAuto);
+				key += currAuto.getName();				
+
+				visibilityGraphs.put(key, new VisGraphScheduler(automataPair, theAutomata.getSpecificationAutomata(), false));
+			}
+		}
+	}
 
 	//     protected void preprocess2() {
 	// 	for (int i=0; i<plantAutomata.size()-1; i++) {
@@ -645,7 +699,9 @@ public abstract class AbstractAstar
 	 * @param int[] node - the node, whose estimated cost we want to know
 	 * @return int totalEstimatedCost - f(n) = g(n) + h(n)
 	 */
-    public int calcEstimatedCost(int[] node) throws Exception {
+    public int calcEstimatedCost(int[] node) 
+		throws Exception 
+	{
 		if (useOneProdRelax) {
 			// 	    return node[node.length-1] + getOneProdRelaxation(node);
 
@@ -662,6 +718,57 @@ public abstract class AbstractAstar
 		}
 		else if (heuristic.equals("brute force"))
 			return node[ACCUMULATED_COST_INDEX];
+		else if (heuristic.equals(VISIBILITY_GRAPH))
+		{
+			
+			int[] effTimePoint = new int[plantAutomata.size()];
+			String timePointKey = "";
+
+			// Calculate the visibility graph time coordinate, corresponding to the current node
+			for (int i=0; i<plantAutomata.size(); i++)
+			{
+				State initState = plantAutomata.getAutomatonAt(i).getInitialState();
+				int totalCycleTime = oneProdRelax[i][initState.getIndex()] + initState.getCost();
+				int remainingCycleTime = oneProdRelax[i][node[activeAutomataIndex[i]]] + node[CURRENT_COSTS_INDEX + i];
+
+				effTimePoint[i] = totalCycleTime - remainingCycleTime;
+				timePointKey += effTimePoint[i] + "_";
+			}
+
+			Integer previousVisibilityRelaxation = visGraphRelax.get(timePointKey);
+			if (previousVisibilityRelaxation == null)
+			{
+				double visibilityRelaxation = -1;
+				
+				for (int i=0; i<plantAutomata.size() - 1; i++)
+				{
+					for (int j=i+1; j<plantAutomata.size(); j++)
+					{
+						String visibilityGraphsKey = plantAutomata.getAutomatonAt(i).getName() + "_" + plantAutomata.getAutomatonAt(j).getName();
+						VisGraphScheduler relaxScheduler = visibilityGraphs.get(visibilityGraphsKey);
+						
+						if (relaxScheduler == null)
+						{
+							throw new Exception("The visibility graph scheduler NOT initialized for " + visibilityGraphsKey);
+						}
+						
+						double currVisibilityRelaxation = relaxScheduler.scheduleFrom(new double[]{effTimePoint[i], effTimePoint[j]});
+						
+						if (visibilityRelaxation < currVisibilityRelaxation)
+							visibilityRelaxation = currVisibilityRelaxation;
+					}
+				}
+
+				//tillfälligt så här fullt
+				int estimatedCost = (int) Math.round(visibilityRelaxation);
+				visGraphRelax.put(timePointKey, estimatedCost);
+				return estimatedCost + node[ACCUMULATED_COST_INDEX];
+			}
+			else
+			{
+				return previousVisibilityRelaxation.intValue() + node[ACCUMULATED_COST_INDEX];
+			}
+		}
 		else {
 			logger.error("2-prod relaxation not implemented yet");
 			return -1;

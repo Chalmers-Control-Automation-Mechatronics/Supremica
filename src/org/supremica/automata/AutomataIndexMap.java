@@ -133,14 +133,37 @@ public class AutomataIndexMap
 	}
 
 	/**
-	 * Returns the index corresponding to the current event, as stored in the 
-	 * event index hashtable.
+	 * Returns the index corresponding to the current state, as stored in the 
+	 * state index hashtable.
 	 *
-	 * @param the event, whose index is requested
-	 * @return the index of this event.
+	 * @parame the automaton, containing the state 
+	 * @param the state, whose index is requested
+	 * @return the index of this state.
 	 */
 	public int getStateIndex(Automaton automaton, State state)
 	{
 		return stateMap.get(automaton.getName() + "_" + state.getName()).intValue();
 	}
+
+	/**
+	 * Calculates and returns the (unique) index corresponding to the synchronization of the 
+	 * current states, using the indices stored in the state index hashtable.
+	 *
+	 * @param the automata containing the states, that need a common index
+	 * @param the states, whose index is requested
+	 * @return the index of this event.
+	 */
+// 	public int getStateIndex(Automata automata, State[] states)
+// 	{
+// 		int index = 0;
+// 		int multiplier = 1;
+		
+// 		for (int i=0; i<automata.length; i++)
+// 		{
+// 			index += stateMap.get(automata.getAutomatonAt(i).getName() + "_" + state.getName()).intValue() * multiplier;
+// 			multiplier *= automata.getAutomatonAt(i).nbrOfStates();
+// 		}
+	
+// 		return index;
+// 	}
 }

@@ -7,7 +7,7 @@ import org.supremica.automata.*;
 
 
 /**
- * This class assumes that costs consists of three parts - int[] currCosts, int accCost and int[] effCosts.
+ * This class assumes that costs consist of three parts - int[] currCosts, int accCost and int[] effCosts.
  */
 public class ModifiedVGAstar 
 	extends AbstractAstar 

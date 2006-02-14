@@ -20,7 +20,7 @@ public class ScheduleDialog
 
     private static final long serialVersionUID = 1L;
     private static final String[] optiMethodNames = new String[]{MODIFIED_A_STAR, MODIFIED_VGA_STAR, MILP, VIS_GRAPH}; //, "Modified IDA*", "Modified SMA*"};
-    private static final String[] heuristicsNames = new String[]{"1-product relax", "2-product relax", "brute force"};
+    private static final String[] heuristicsNames = new String[]{"1-product relax", "visibility graph", "brute force"}; //"2-product relax",
     private static Logger logger = LoggerFactory.createLogger(ScheduleDialog.class);
     private JComboBox optiMethodsBox, heuristicsBox;
     private JCheckBox nodeExpander, buildAutomaton, vgDrawer;

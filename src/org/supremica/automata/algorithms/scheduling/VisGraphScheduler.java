@@ -38,16 +38,34 @@ public class VisGraphScheduler
 	private TreeSet<double[]> openTree;
 	private TreeMap<Double, double[]> closedTree;
 
+	/** To draw or not to draw - this is the question... */
 	private boolean toDrawVisibilityGraph;
 
 	private ActionTimer timer = new ActionTimer();
 
+	/** The index mapping handler */
+	private AutomataIndexMap indexMap;
+
 	public VisGraphScheduler(Automata theAutomata, boolean toDrawVisibilityGraph)
+		throws Exception
+	{
+		this(theAutomata.getPlantAutomata(), theAutomata.getSpecificationAutomata(), toDrawVisibilityGraph);
+	}
+
+	public VisGraphScheduler(Automata robots, Automata zones, boolean toDrawVisibilityGraph)
+		throws Exception
 	{
 		this.toDrawVisibilityGraph = toDrawVisibilityGraph;
 
-		robots = theAutomata.getPlantAutomata();
-		zones = theAutomata.getSpecificationAutomata();
+		this.robots = robots;
+		this.zones = zones;
+
+		timer.restart();
+
+		extractGraphTimes();
+		init();
+
+		//		logger.info("Preprocessing in " + timer.elapsedTime() + "ms");
 	}
 
 	public void schedule()
@@ -55,15 +73,11 @@ public class VisGraphScheduler
 	{
 		timer.restart();
 
-		extractGraphTimes();
-		init();
-		
-		logger.info("Preprocessing in " + timer.elapsedTime() + "ms");
-
-		timer.restart();
+		openTree.clear();
+		closedTree.clear();
 
 		// Consists of [self_index, parent_index, g-value, f-value]
-		double[] currNode = new double[]{0, -1, 0, calcDistance(vertices.get(0), vertices.get(vertices.size() - 1))};
+		double[] currNode = new double[]{0, -1, 0, vertices.get(0)[robots.size()]};
 		openTree.add(currNode);
 
 		while (! openTree.isEmpty())
@@ -72,23 +86,59 @@ public class VisGraphScheduler
 
 			if (isAcceptingNode(currNode))
 			{
-				logger.info("OPTIMAL SOLUTION.......... " + currNode[F_INDEX] + " in time " + timer.elapsedTime() + "ms");
+// 				logger.info("OPTIMAL SOLUTION.......... " + currNode[G_INDEX] + " in time " + timer.elapsedTime() + "ms");
 				closedTree.put(new Double(currNode[SELF_INDEX]), currNode);
 				break;
 			}
 
 			openTree.remove(currNode);
-				
+
 			branch(currNode);
 		}
-
 		
 		if (toDrawVisibilityGraph)
 		{
 			timer.restart();
 			drawVisibilityGraph(500, 500);
-			logger.info("The visibility graph painted in " + timer.elapsedTime() + "ms");
+// 			logger.info("The visibility graph painted in " + timer.elapsedTime() + "ms");
 		}
+	}
+
+	/**
+	 * This method allows to set the starting point, from which the scheduling is done. 
+	 * 
+	 * @param - the time coordinates of the starting point
+	 * @return - the minimal makespan
+	 */
+	public double scheduleFrom(double[] fromTimes)
+		throws Exception
+	{
+		double distanceToGoal = calcDistance(fromTimes, goalTimes);
+
+		if (distanceToGoal == 0)
+		{
+			return 0;
+		}
+		
+		// Removes the previous start vertex
+		vertices.remove(0);
+
+		// Initializes the new start vertex
+		double[] newStartVertex = new double[fromTimes.length + 1];
+		for (int i=0; i<fromTimes.length; i++)
+		{
+			newStartVertex[i] = fromTimes[i];
+		}
+		newStartVertex[newStartVertex.length - 1] = distanceToGoal;
+
+		// Adds the new start vertex to the vertices-collection
+		vertices.add(0, newStartVertex);
+		
+		// ... and off we go... 
+		schedule();
+
+		// The optimal solution is returned
+		return closedTree.get(new Double(vertices.size() - 1))[G_INDEX];
 	}
 
 	public Automaton buildScheduleAutomaton()
@@ -111,7 +161,7 @@ public class VisGraphScheduler
 		{
 			// ... then add the children of the current vertice to the open list
 			ArrayList<Integer> visibleVerticeIndices = visibilityChecker.getVisibleIndices(vertices.get((int) currNode[SELF_INDEX]), vertices);
-			
+
 			for (int i=0; i<visibleVerticeIndices.size(); i++)
 			{
 				int newSelfIndex = visibleVerticeIndices.get(i).intValue();
@@ -188,6 +238,7 @@ public class VisGraphScheduler
 	/** Now works only for two robots */
 	private void init()
 	{
+		indexMap = new AutomataIndexMap(robots);
 		ArrayList<double[]> edges = new ArrayList<double[]>();
 
 		vertices.add(new double[]{0, 0, Math.max(goalTimes[0], goalTimes[1])});
