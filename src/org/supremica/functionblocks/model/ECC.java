@@ -53,8 +53,6 @@ public class ECC
 
 	private ECState initialState = null;
 
-	
-
 	ECC()
 	{
 		//System.out.println("ECC(): Creating empty ECC");
@@ -71,7 +69,6 @@ public class ECC
 		return initialState;
 	}
 
-
 	void addState(String state)
 	{
 		ecStates.put(state,new ECState(state));
@@ -87,12 +84,12 @@ public class ECC
 		ecTransitions.add(new ECTransition(getState(source), getState(dest), new ECCondition(cond)));
 	}
 
+	// returns new state if transition clears, otherwise null
 	ECState execute(ECState currentECState, Variables vars)
 	{
 
 		// find all transitions that have currentECState in their source
 		List ecTransitionsWithSameSource = new LinkedList();
-
 		for(Iterator iter = ecTransitions.iterator();iter.hasNext();)
 		{
 			ECTransition temp = (ECTransition) iter.next();
@@ -102,6 +99,7 @@ public class ECC
 			}
 		}
 		
+
 		// evalute all of their conditions and remove the ones that can not be taken
 		if(ecTransitionsWithSameSource.size()>0)
 		{
@@ -141,6 +139,6 @@ public class ECC
 		}
 		
 		// didn't find any transitions that could be taken
-		return currentECState;
+		return null;
 	}	
 }

@@ -82,6 +82,11 @@ public abstract class FBType extends NamedObject
 
 	public abstract FBInstance createInstance(String name);
 
+	public Event getEvent(String name)
+	{
+		return (Event) events.get(name);
+	}
+	
 	public Iterator instanceIterator()
 	{
 		return instances.values().iterator();

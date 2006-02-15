@@ -108,33 +108,33 @@ public class ServiceFBInstance extends FBInstance
 		}
 	}
 
-	public void receiveEvent(String eventInput)
+	public synchronized void receiveEvent(String eventInput)
 	{
-		synchronized(eventInputQueue)
-		{
-			if(variables.getVariable(eventInput) != null)
-				if(variables.getVariable(eventInput).getType().equals("EventInput"))
-				{
-					//System.out.println("ServiceFBInstance(" + getName() + ").receiveEvent(" + eventInput + ")");
-					eventInputQueue.add((Event) events.get(eventInput));
-					resource.getScheduler().scheduleFBInstance(this);
-				}
-				else
-				{
-					System.err.println("ServiceFBInstance("+getName()+"): No event input " + eventInput);
-					System.exit(0);
-				}
+		if(variables.getVariable(eventInput) != null)
+			if(variables.getVariable(eventInput).getType().equals("EventInput"))
+			{
+				//System.out.println("ServiceFBInstance(" + getName() + ").receiveEvent(" + eventInput + ")");
+				Event newEvent = (Event) fbType.getEvent(eventInput).clone();
+				getDataInputs(newEvent);
+				eventInputQueue.add(newEvent);
+
+				resource.getScheduler().scheduleFBInstance(this);
+			}
 			else
 			{
 				System.err.println("ServiceFBInstance("+getName()+"): No event input " + eventInput);
 				System.exit(0);
 			}
+		else
+		{
+			System.err.println("ServiceFBInstance("+getName()+"): No event input " + eventInput);
+			System.exit(0);
 		}
 	}
-
-	public void handleEvent()
+	
+	public synchronized void handleEvent()
 	{
-
+		
 		currentEvent = getNextEvent();
 
 		// set all InputEvents to false
@@ -149,9 +149,17 @@ public class ServiceFBInstance extends FBInstance
 		// set the corrensponding event var of the input event to TRUE
 		((BooleanVariable) variables.getVariable(currentEvent.getName())).setValue(true);
 
-		// get input data values
-		getDataInputs(currentEvent);
-
+		// copy data inputs from the event queue to variables
+		for (Iterator iter = currentEvent.withIterator();iter.hasNext();)
+		{
+			String curName = (String) iter.next();
+			Variable curVar = (Variable) currentEvent.getWithDataVariable(curName);
+			if (curVar != null)
+			{
+				variables.addVariable(curName, curVar);
+			}
+		}
+		
 		try
 		{
 			interpreter.set("serviceFB", this);
@@ -181,5 +189,4 @@ public class ServiceFBInstance extends FBInstance
     {
 		return  (Event) eventInputQueue.remove();
     }
-
 }

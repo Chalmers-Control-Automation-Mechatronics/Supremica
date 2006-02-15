@@ -49,13 +49,15 @@
 
 package org.supremica.functionblocks.model;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Iterator;
 
 public class Event extends NamedObject
 {
-	private List withData = new LinkedList();
+
+	// maps with data name to buffered variable
+	private Map withData = new HashMap();
 
 	private Event() {}
 
@@ -66,16 +68,37 @@ public class Event extends NamedObject
 
 	public void addWithData(String dataVarName)
 	{
-		withData.add(dataVarName);
+		withData.put(dataVarName,null);
+	}
+
+	public void addWithDataVariable(String name, Variable dataVar)
+	{
+		withData.put(name,dataVar);
+	}
+
+	public Variable getWithDataVariable(String name)
+	{
+		return (Variable) withData.get(name);
 	}
 
 	public Iterator withIterator()
 	{
-		return withData.iterator();
+		return withData.keySet().iterator();
+	}
+
+	public Object clone()
+	{
+		Event newEvent = new Event(getName());
+		for (Iterator iter = withIterator(); iter.hasNext();)
+		{
+			newEvent.addWithData((String) iter.next());
+		}
+		return newEvent;
 	}
 
 	public String toString()
 	{
+
 		return getName();
 	}
 }

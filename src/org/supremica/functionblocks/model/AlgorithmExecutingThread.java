@@ -100,11 +100,11 @@ class AlgorithmExecutingThread extends Thread
 			BasicFBInstance.allEventTime = BasicFBInstance.allEventTime + currentFBInstance.eventTime;
 			BasicFBInstance.count++;
 
-			System.out.println("Block times for instance " + currentFBInstance.getName() + " :" );
-			System.out.println("\t t_CON = " + currentFBInstance.eventTime + " ms" );
-			System.out.println("\t t_ALG = " + currentFBInstance.algorithmTime + " ms" );
-			System.out.println("\t t_TOT = " + currentFBInstance.totalTime + " ms" );
-			System.out.println("\t t_FIN = " + currentFBInstance.finishTime + " ms" );
+			//System.out.println("Block times for instance " + currentFBInstance.getName() + " :" );
+			//System.out.println("\t t_CON = " + currentFBInstance.eventTime + " ms" );
+			//System.out.println("\t t_ALG = " + currentFBInstance.algorithmTime + " ms" );
+			//System.out.println("\t t_TOT = " + currentFBInstance.totalTime + " ms" );
+			//System.out.println("\t t_FIN = " + currentFBInstance.finishTime + " ms" );
 		}
     }   
 }

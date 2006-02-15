@@ -77,7 +77,6 @@ public class ServiceFBType extends FBType
 		System.out.println("ServiceFBType.createInstace(" + name + ")");
 		ServiceFBInstance newInstance = new ServiceFBInstance(name, resource, this, serviceScript);
 
-		newInstance.setEvents(events);
 		newInstance.setVariables((Variables) variables.clone());
 		newInstance.initialize();
 

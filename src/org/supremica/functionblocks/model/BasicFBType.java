@@ -89,8 +89,6 @@ public class BasicFBType extends FBType
 		System.out.println("BasicFBType.createInstance(" + name + ")");
 		BasicFBInstance newInstance = new BasicFBInstance(name,resource,this);
 
-		newInstance.setEvents(events);
-
 		newInstance.setVariables((Variables) variables.clone());
 
 		instances.put(name,newInstance);

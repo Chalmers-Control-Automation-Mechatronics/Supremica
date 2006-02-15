@@ -57,11 +57,60 @@ import java.util.Iterator;
 public class Variables
 {
 
-	private Map variables = new HashMap();
+	private Map<String,Variable> variables = Collections.synchronizedMap(new HashMap<String,Variable>());
 
 	public void addVariable(String name, Variable var)
 	{
-		variables.put(name,var);
+		Variable tmpVar = variables.get(name);
+		if (tmpVar != null)
+		{
+			if(tmpVar instanceof StringVariable)
+			{
+				if (!(var instanceof StringVariable))
+				{
+					System.err.println("Variables.addVariable(): Replacing variable is not of the same value type as exsiting one!");
+					System.exit(1);
+				}
+			}
+			else if(tmpVar instanceof IntegerVariable)
+			{
+				if (!(var instanceof IntegerVariable))
+				{
+					System.err.println("Variables.addVariable(): Replacing variable is not of the same value type as exsiting one!");
+					System.exit(1);
+				}
+			}
+			else if(tmpVar instanceof DoubleVariable)
+			{
+				if (!(var instanceof DoubleVariable))
+				{
+					System.err.println("Variables.addVariable(): Replacing variable is not of the same value type as exsiting one!");
+					System.exit(1);
+				}
+			}
+			else if(tmpVar instanceof FloatVariable)
+			{
+				if (!(var instanceof FloatVariable))
+				{
+					System.err.println("Variables.addVariable(): Replacing variable is not of the same value type as exsiting one!");
+					System.exit(1);
+				}
+			}
+			else if(tmpVar instanceof BooleanVariable)
+			{
+				if (!(var instanceof BooleanVariable))
+				{
+					System.err.println("Variables.addVariable(): Replacing variable is not of the same value type as exsiting one!");
+					System.exit(1);
+				}
+			}
+			
+			variables.put(name,var);
+		}
+		else
+		{
+			variables.put(name,var);
+		}
 	}
 
 	public Variable getVariable(String name)

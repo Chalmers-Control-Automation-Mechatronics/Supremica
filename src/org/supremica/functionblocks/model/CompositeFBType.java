@@ -137,19 +137,19 @@ public class CompositeFBType extends FBType
 			if (curFromInstance.equals(""))
 			{
 				// TODO: Too ugly solution!
-				// maybe constant data specification
+				// do i t like this since it maybe constant data specification for composite data input
 				try
 				{
-					System.out.println("---------- Setting variable " + curToSignal + " to " + curFromSignal);
+					//System.out.println("---------- Setting variable " + curToSignal + " to " + curFromSignal);
 					newInstance.getFBInstance(curToInstance).setVariableValue(curToSignal,curFromSignal);
 
 				}
 				catch (Exception e)
 				{
-					System.out.println("---------- Cought exception with " + curFromSignal);
+					//System.out.println("---------- Cought exception with " + curFromSignal);
 				}
 				// internal data input connection
-				System.out.println("---------- Setting internal data connection to " + curToInstance +"."+ curToSignal);
+				//System.out.println("---------- Setting internal data connection to " + curToInstance +"."+ curToSignal);
  				newInstance.addInternalDataInputConnection(curFromSignal, curToInstance, curToSignal);
 			}
 			else if (curToInstance.equals(""))
@@ -164,8 +164,6 @@ public class CompositeFBType extends FBType
 			}
 
 		}
-
-		newInstance.setEvents(events);
 
 		newInstance.setVariables((Variables) variables.clone());
 

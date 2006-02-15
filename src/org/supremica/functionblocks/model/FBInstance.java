@@ -60,8 +60,6 @@ public abstract class FBInstance extends NamedObject
 	Resource resource;
 	// type of this instance
 	FBType fbType;
-	// maps event names to event classes representing them
-	Map events;
 	Map eventOutputConnections = new HashMap();
 	Map dataInputConnections = new HashMap();
 	// instance's variables
@@ -77,12 +75,6 @@ public abstract class FBInstance extends NamedObject
     public void addVariable(String name, Variable var)
     {
 		variables.addVariable(name,var);
-    }
-
-
-    public void setEvents(Map i)
-    {
-		events = i;
     }
 
     public void addEventOutputConnection(String output, Connection cnt)
@@ -129,27 +121,10 @@ public abstract class FBInstance extends NamedObject
 			Connection curConnection  = (Connection) dataInputConnections.get(curName);
 			if (curConnection != null)
 			{
-				Variable outputVar = curConnection.getFBInstance().getDataOutput(curConnection.getSignalName());
-				if(outputVar instanceof StringVariable)
-				{
-					((StringVariable) variables.getVariable(curName)).setValue(((StringVariable) outputVar).getValue());
-				}
-				else if(outputVar instanceof IntegerVariable)
-				{
-					((IntegerVariable) variables.getVariable(curName)).setValue(((IntegerVariable) outputVar).getValue().intValue());
-				}
-				else if(outputVar instanceof DoubleVariable)
-				{
-					((DoubleVariable) variables.getVariable(curName)).setValue(((DoubleVariable) outputVar).getValue().doubleValue());
-				}
-				else if(outputVar instanceof FloatVariable)
-				{
-					((FloatVariable) variables.getVariable(curName)).setValue(((FloatVariable) outputVar).getValue().floatValue());
-				}
-				else if(outputVar instanceof BooleanVariable)
-				{
-					((BooleanVariable) variables.getVariable(curName)).setValue(((BooleanVariable) outputVar).getValue().booleanValue());
-				}
+				Variable inputVar = (Variable) curConnection.getFBInstance().getDataOutput(curConnection.getSignalName()).clone();
+				inputVar.setType("DataInput");
+				event.addWithDataVariable(curName, inputVar);
+				//System.out.println("FBInstance("+getName()+").getDataInputs("+event.getName()+"): " + curName +","+inputVar.toString());
 			}
 		}
     }
