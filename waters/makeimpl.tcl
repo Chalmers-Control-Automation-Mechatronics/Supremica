@@ -1051,11 +1051,18 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
           } else {
             Java_WriteLn $stream $umap "    $membername = $paramname;"
           }
-	  Java_WriteLn $stream $umap "    final ModelChangeEvent event ="
-	  if {$geo == 3 || [string compare $eqstatus "geometry"] == 0} {
+	  if {$geo == 3} {
 	    Java_WriteLn $stream $umap \
-		"      ModelChangeEvent.createGeometryChanged(this);"
+		"    final Subject source = getParent();"
+            Java_WriteLn $stream $umap "    final ModelChangeEvent event ="
+	    Java_WriteLn $stream $umap \
+		"      ModelChangeEvent.createGeometryChanged(source, this);"
+	  } elseif {[string compare $eqstatus "geometry"] == 0} {
+            Java_WriteLn $stream $umap "    final ModelChangeEvent event ="
+	    Java_WriteLn $stream $umap \
+            "      ModelChangeEvent.createGeometryChanged(this, $membername);"
 	  } else {
+            Java_WriteLn $stream $umap "    final ModelChangeEvent event ="
 	    Java_WriteLn $stream $umap \
 		"      ModelChangeEvent.createStateChanged(this);"
 	  }

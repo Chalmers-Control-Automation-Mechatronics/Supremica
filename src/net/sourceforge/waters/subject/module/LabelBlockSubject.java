@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   LabelBlockSubject
 //###########################################################################
-//# $Id: LabelBlockSubject.java,v 1.3 2005-12-03 21:30:42 robi Exp $
+//# $Id: LabelBlockSubject.java,v 1.4 2006-02-16 04:06:18 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -124,7 +124,7 @@ public final class LabelBlockSubject
     }
     mGeometry = geometry;
     final ModelChangeEvent event =
-      ModelChangeEvent.createGeometryChanged(this);
+      ModelChangeEvent.createGeometryChanged(this, mGeometry);
     fireModelChanged(event);
   }
 

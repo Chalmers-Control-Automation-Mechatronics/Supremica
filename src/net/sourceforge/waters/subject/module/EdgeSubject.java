@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   EdgeSubject
 //###########################################################################
-//# $Id: EdgeSubject.java,v 1.3 2005-12-03 21:30:42 robi Exp $
+//# $Id: EdgeSubject.java,v 1.4 2006-02-16 04:06:18 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -274,7 +274,7 @@ public final class EdgeSubject
     }
     mGeometry = geometry;
     final ModelChangeEvent event =
-      ModelChangeEvent.createGeometryChanged(this);
+      ModelChangeEvent.createGeometryChanged(this, mGeometry);
     fireModelChanged(event);
   }
 
@@ -294,7 +294,7 @@ public final class EdgeSubject
     }
     mStartPoint = startPoint;
     final ModelChangeEvent event =
-      ModelChangeEvent.createGeometryChanged(this);
+      ModelChangeEvent.createGeometryChanged(this, mStartPoint);
     fireModelChanged(event);
   }
 
@@ -314,7 +314,7 @@ public final class EdgeSubject
     }
     mEndPoint = endPoint;
     final ModelChangeEvent event =
-      ModelChangeEvent.createGeometryChanged(this);
+      ModelChangeEvent.createGeometryChanged(this, mEndPoint);
     fireModelChanged(event);
   }
 

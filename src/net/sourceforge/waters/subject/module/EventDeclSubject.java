@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   EventDeclSubject
 //###########################################################################
-//# $Id: EventDeclSubject.java,v 1.3 2005-12-03 21:30:42 robi Exp $
+//# $Id: EventDeclSubject.java,v 1.4 2006-02-16 04:06:18 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -221,7 +221,7 @@ public final class EventDeclSubject
     }
     mColorGeometry = colorGeometry;
     final ModelChangeEvent event =
-      ModelChangeEvent.createGeometryChanged(this);
+      ModelChangeEvent.createGeometryChanged(this, mColorGeometry);
     fireModelChanged(event);
   }
 

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   ArrayListSubject
 //###########################################################################
-//# $Id: ArrayListSubject.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: ArrayListSubject.java,v 1.3 2006-02-16 04:06:18 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;
@@ -259,7 +259,7 @@ public class ArrayListSubject<P extends ProxySubject>
   {
     final ModelChangeEvent event =
       ModelChangeEvent.createItemAdded(this, proxy);
-    proxy.fireModelChanged(event);
+    fireModelChanged(event);
   }
 
   private void afterRemove(final P proxy)
@@ -267,7 +267,6 @@ public class ArrayListSubject<P extends ProxySubject>
     proxy.setParent(null);
     final ModelChangeEvent event =
       ModelChangeEvent.createItemRemoved(this, proxy);
-    proxy.fireModelChanged(event);
     fireModelChanged(event);
   }
 

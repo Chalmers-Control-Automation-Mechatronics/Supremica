@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   IndexedHashSetSubject
 //###########################################################################
-//# $Id: IndexedHashSetSubject.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: IndexedHashSetSubject.java,v 1.3 2006-02-16 04:06:18 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;
@@ -446,7 +446,7 @@ public class IndexedHashSetSubject<P extends NamedSubject>
   {
     final ModelChangeEvent event =
       ModelChangeEvent.createItemAdded(this, proxy);
-    proxy.fireModelChanged(event);
+    fireModelChanged(event);
   }
 
   private void afterRemove(final P proxy)
@@ -454,7 +454,6 @@ public class IndexedHashSetSubject<P extends NamedSubject>
     proxy.setParent(null);
     final ModelChangeEvent event =
       ModelChangeEvent.createItemRemoved(this, proxy);
-    proxy.fireModelChanged(event);
     fireModelChanged(event);
   }
 

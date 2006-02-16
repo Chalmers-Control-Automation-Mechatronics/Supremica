@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   SplineGeometrySubject
 //###########################################################################
-//# $Id: SplineGeometrySubject.java,v 1.3 2005-12-03 21:30:42 robi Exp $
+//# $Id: SplineGeometrySubject.java,v 1.4 2006-02-16 04:06:18 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -23,6 +23,7 @@ import net.sourceforge.waters.subject.base.CloningGeometryListSubject;
 import net.sourceforge.waters.subject.base.GeometrySubject;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.SimpleListSubject;
+import net.sourceforge.waters.subject.base.Subject;
 
 import net.sourceforge.waters.xsd.module.SplineKind;
 
@@ -135,8 +136,9 @@ public final class SplineGeometrySubject
       return;
     }
     mKind = kind;
+    final Subject source = getParent();
     final ModelChangeEvent event =
-      ModelChangeEvent.createGeometryChanged(this);
+      ModelChangeEvent.createGeometryChanged(source, this);
     fireModelChanged(event);
   }
 

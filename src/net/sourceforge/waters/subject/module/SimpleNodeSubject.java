@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   SimpleNodeSubject
 //###########################################################################
-//# $Id: SimpleNodeSubject.java,v 1.4 2005-12-18 21:11:32 robi Exp $
+//# $Id: SimpleNodeSubject.java,v 1.5 2006-02-16 04:06:18 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -205,7 +205,7 @@ public final class SimpleNodeSubject
     }
     mPointGeometry = pointGeometry;
     final ModelChangeEvent event =
-      ModelChangeEvent.createGeometryChanged(this);
+      ModelChangeEvent.createGeometryChanged(this, mPointGeometry);
     fireModelChanged(event);
   }
 
@@ -225,7 +225,7 @@ public final class SimpleNodeSubject
     }
     mInitialArrowGeometry = initialArrowGeometry;
     final ModelChangeEvent event =
-      ModelChangeEvent.createGeometryChanged(this);
+      ModelChangeEvent.createGeometryChanged(this, mInitialArrowGeometry);
     fireModelChanged(event);
   }
 
@@ -245,7 +245,7 @@ public final class SimpleNodeSubject
     }
     mLabelGeometry = labelGeometry;
     final ModelChangeEvent event =
-      ModelChangeEvent.createGeometryChanged(this);
+      ModelChangeEvent.createGeometryChanged(this, mLabelGeometry);
     fireModelChanged(event);
   }
 

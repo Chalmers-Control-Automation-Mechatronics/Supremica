@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   LabelGeometrySubject
 //###########################################################################
-//# $Id: LabelGeometrySubject.java,v 1.3 2005-12-03 21:30:42 robi Exp $
+//# $Id: LabelGeometrySubject.java,v 1.4 2006-02-16 04:06:18 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -17,6 +17,7 @@ import net.sourceforge.waters.model.module.LabelGeometryProxy;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.subject.base.GeometrySubject;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
+import net.sourceforge.waters.subject.base.Subject;
 
 import net.sourceforge.waters.xsd.module.AnchorPosition;
 
@@ -118,8 +119,9 @@ public final class LabelGeometrySubject
       return;
     }
     mOffset = (Point2D) offset.clone();
+    final Subject source = getParent();
     final ModelChangeEvent event =
-      ModelChangeEvent.createGeometryChanged(this);
+      ModelChangeEvent.createGeometryChanged(source, this);
     fireModelChanged(event);
   }
 
@@ -132,8 +134,9 @@ public final class LabelGeometrySubject
       return;
     }
     mAnchor = anchor;
+    final Subject source = getParent();
     final ModelChangeEvent event =
-      ModelChangeEvent.createGeometryChanged(this);
+      ModelChangeEvent.createGeometryChanged(source, this);
     fireModelChanged(event);
   }
 

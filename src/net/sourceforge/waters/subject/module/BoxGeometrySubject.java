@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   BoxGeometrySubject
 //###########################################################################
-//# $Id: BoxGeometrySubject.java,v 1.3 2005-12-03 21:30:42 robi Exp $
+//# $Id: BoxGeometrySubject.java,v 1.4 2006-02-16 04:06:18 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -17,6 +17,7 @@ import net.sourceforge.waters.model.module.BoxGeometryProxy;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.subject.base.GeometrySubject;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
+import net.sourceforge.waters.subject.base.Subject;
 
 
 /**
@@ -95,8 +96,9 @@ public final class BoxGeometrySubject
       return;
     }
     mRectangle = (Rectangle2D) rectangle.clone();
+    final Subject source = getParent();
     final ModelChangeEvent event =
-      ModelChangeEvent.createGeometryChanged(this);
+      ModelChangeEvent.createGeometryChanged(source, this);
     fireModelChanged(event);
   }
 
