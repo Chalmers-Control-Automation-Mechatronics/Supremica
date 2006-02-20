@@ -4,11 +4,12 @@
 //# PACKAGE: net.sourceforge.waters.junit
 //# CLASS:   AlgorithmsTest
 //###########################################################################
-//# $Id: AnalysisTest.java,v 1.2 2005-11-07 00:47:34 robi Exp $
+//# $Id: AnalysisTest.java,v 1.3 2006-02-20 22:20:22 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
 
+import java.net.URI;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
@@ -68,8 +69,9 @@ public class AnalysisTest extends WatersTestCase
   private ProductDESProxy compile(final File infilename)
     throws IOException, WatersException
   {
+    final URI uri = infilename.toURI();
     final ModuleProxy module =
-      (ModuleProxy) mModuleMarshaller.unmarshal(infilename);
+      (ModuleProxy) mModuleMarshaller.unmarshal(uri);
     final ModuleCompiler compiler =
       new ModuleCompiler(mDocumentManager, mProductDESFactory, module);
     return compiler.compile();

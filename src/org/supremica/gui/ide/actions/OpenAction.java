@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   OpenAction
 //###########################################################################
-//# $Id: OpenAction.java,v 1.10 2005-11-03 01:24:16 robi Exp $
+//# $Id: OpenAction.java,v 1.11 2006-02-20 22:20:22 robi Exp $
 //###########################################################################
 
 
@@ -14,6 +14,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.io.File;
+import java.net.URI;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
@@ -105,8 +106,9 @@ public class OpenAction
 					CompilerOperatorTable.getInstance();
 				final ProxyUnmarshaller<ModuleProxy> unmarshaller =
 					new JAXBModuleMarshaller(factory, optable);
+				final URI uri = file.toURI();
 				final ModuleSubject module =
-					(ModuleSubject) unmarshaller.unmarshal(file);
+					(ModuleSubject) unmarshaller.unmarshal(uri);
 				installContainer(module);
 			} catch (final JAXBException exception) {
 				showParseError("Could not parse module file", file, exception);
@@ -154,8 +156,9 @@ public class OpenAction
 					CompilerOperatorTable.getInstance();
 				final ProxyUnmarshaller<ModuleProxy> unmarshaller =
 					new ValidUnmarshaller(factory, optable);
+				final URI uri = file.toURI();
 				final ModuleSubject module =
-					(ModuleSubject) unmarshaller.unmarshal(file);
+					(ModuleSubject) unmarshaller.unmarshal(uri);
 				installContainer(module);
 			} catch (final JAXBException exception) {
 				showParseError

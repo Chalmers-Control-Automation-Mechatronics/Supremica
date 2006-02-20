@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   DocumentManager
 //###########################################################################
-//# $Id: DocumentManager.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: DocumentManager.java,v 1.3 2006-02-20 22:20:21 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -12,6 +12,8 @@ package net.sourceforge.waters.model.marshaller;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -71,14 +73,90 @@ public class DocumentManager<D extends DocumentProxy> {
       new HashMap<Class<? extends D>,List<ProxyUnmarshaller<? extends D>>>(4);
     mExtensionUnmarshallerMap =
       new HashMap<String,ProxyUnmarshaller<? extends D>>(4);
-    mDocumentCache = new HashMap<File,D>(32);
+    mDocumentCache = new HashMap<URI,D>(32);
   }
 
 
   //#########################################################################
   //# Accessing Documents
   /**
-   * Loads a document.
+   * Loads a document relative to a URI.
+   * This methods loads a document with a given name and location,
+   * automatically computing the file extension from the expected class.
+   * @param  uri          The URI to be used to resolve the name.
+   * @param  name         The name of the file without extension.
+   *                      The extension is determined automatically using
+   *                      a {@link ProxyMarshaller}.
+   * @param  clazz        The desired class of the document to be loaded.
+   *                      This is used to identify an appropriate
+   *                      {@link ProxyMarshaller}.
+   * @return The loaded document. This may just a cached copy,
+   *         or it may actually be retrieved by reading an external file.
+   * @throws WatersUnmarshalException to indicate that parsing the input file
+   *                      has failed for some reason.
+   * @throws IOException  to indicate that the input file could not be
+   *                      opened or read.
+   * @throws IllegalArgumentException to indicate that no registered
+   *                      {@link ProxyMarshaller} for the given class was
+   *                      found.
+   */
+  public <DD extends D> DD load
+    (final URI uri, final String name, final Class<DD> clazz)
+    throws WatersUnmarshalException, IOException
+  {
+    final Collection<ProxyUnmarshaller<? extends DD>> unmarshallers =
+      findProxyUnmarshallers(clazz);
+    for (final ProxyUnmarshaller<? extends DD> unmarshaller : unmarshallers) {
+      final String extname = name + unmarshaller.getDefaultExtension();
+      final URI resolved = resolve(uri, extname);
+      final D cached = mDocumentCache.get(resolved);
+      if (cached != null) {
+        return clazz.cast(cached);
+      }
+      final DD loaded = unmarshaller.unmarshal(resolved);
+      mDocumentCache.put(resolved, loaded);
+      return loaded;
+    }
+    throw new FileNotFoundException
+      ("Can't find file for " + clazz.getName() + " named '" + name +
+       "' relative to '" + uri + "'!");
+  }
+
+  /**
+   * Loads a document from a URI.
+   * This methods loads a document from a given file name, guessing the
+   * expected class from the file name extension.
+   * @param  uri          A URI specifiying the location of the document
+   *                      to be retrieved.
+   * @return The loaded document. This may be just a cached copy,
+   *         or it may actually be retrieved by reading an external file.
+   * @throws WatersUnmarshalException to indicate that parsing the input file
+   *                      has failed for some reason.
+   * @throws IOException  to indicate that the input file could not be
+   *                      opened or read.
+   */
+  public D load(final URI uri)
+    throws WatersUnmarshalException, IOException
+  {
+    final D cached = mDocumentCache.get(uri);
+    if (cached != null) {
+      return cached;
+    }
+    final String path = uri.getPath();
+    final int dotpos = path.lastIndexOf(".");
+    final String extension = dotpos >= 0 ? path.substring(dotpos) : "";
+    final ProxyUnmarshaller<? extends D> unmarshaller =
+      mExtensionUnmarshallerMap.get(extension);
+    if (unmarshaller == null) {
+      throw new BadFileTypeException(uri);
+    }
+    final D loaded = unmarshaller.unmarshal(uri);
+    mDocumentCache.put(uri, loaded);
+    return loaded;
+  }
+
+  /**
+   * Loads a document from a file.
    * This methods loads a document with a given name and location,
    * automatically computing the file extension from the expected class.
    * @param  path         The directory containing the file to be loaded.
@@ -95,7 +173,8 @@ public class DocumentManager<D extends DocumentProxy> {
    * @throws IOException  to indicate that the input file could not be
    *                      opened or read.
    * @throws IllegalArgumentException to indicate that no registered
-   *                      {@link ProxyMarshaller} for the given class was found.
+   *                      {@link ProxyMarshaller} for the given class was
+   *                      found.
    */
   public <DD extends D> DD load
     (final File path, final String name, final Class<DD> clazz)
@@ -106,13 +185,14 @@ public class DocumentManager<D extends DocumentProxy> {
     for (final ProxyUnmarshaller<? extends DD> unmarshaller : unmarshallers) {
       final String extname = name + unmarshaller.getDefaultExtension();
       final File filename = new File(path, extname);
-      final D cached = mDocumentCache.get(filename);
+      final URI uri = filename.toURI();
+      final D cached = mDocumentCache.get(uri);
       if (cached != null) {
         return clazz.cast(cached);
       }
       if (filename.canRead()) {
-        final DD loaded = unmarshaller.unmarshal(filename);
-        mDocumentCache.put(filename, loaded);
+        final DD loaded = unmarshaller.unmarshal(uri);
+        mDocumentCache.put(uri, loaded);
         return loaded;
       }
     }
@@ -122,36 +202,22 @@ public class DocumentManager<D extends DocumentProxy> {
   }
 
   /**
-   * Loads a document.
+   * Loads a document from a file.
    * This methods loads a document from a given file name, guessing the
    * expected class from the file name extension.
-   * @param  filename     The complete path name identifying the file to
-   *                      be loaded.
-   * @return The loaded document. This may just a cached copy,
+   * @param  filename     The absolute path of the file to be loaded.
+   * @return The loaded document. This may be just a cached copy,
    *         or it may actually be retrieved by reading an external file.
    * @throws WatersUnmarshalException to indicate that parsing the input file
    *                      has failed for some reason.
    * @throws IOException  to indicate that the input file could not be
    *                      opened or read.
    */
-   public D load(final File filename)
+  public D load(final File filename)
     throws WatersUnmarshalException, IOException
   {
-    final D cached = mDocumentCache.get(filename);
-    if (cached != null) {
-      return cached;
-    }
-    final String stringname = filename.toString();
-    final int dotpos = stringname.lastIndexOf(".");
-    final String extension = dotpos >= 0 ? stringname.substring(dotpos) : "";
-    final ProxyUnmarshaller<? extends D> unmarshaller =
-      mExtensionUnmarshallerMap.get(extension);
-    if (unmarshaller == null) {
-      throw new BadFileTypeException(filename);
-    }
-    final D loaded = unmarshaller.unmarshal(filename);
-    mDocumentCache.put(filename, loaded);
-    return loaded;
+    final URI uri = filename.toURI();
+    return load(uri);
   }
 
 
@@ -255,6 +321,30 @@ public class DocumentManager<D extends DocumentProxy> {
 
 
   //#########################################################################
+  //# Auxiliary Methods
+  private static URI resolve(final URI base, final String tailname)
+    throws WatersUnmarshalException
+  {
+    if (base != null) {
+      return base.resolve(tailname);
+    } else {
+      try {
+        final URI result = new URI(tailname);
+        if (result.isAbsolute()) {
+          return result;
+        } else {
+          throw new WatersUnmarshalException
+            ("Trying to load from relative location '" + tailname +
+             "' without known path!");
+        }
+      } catch (final URISyntaxException exception) {
+        throw new WatersUnmarshalException(exception);
+      }
+    }
+  }
+
+
+  //#########################################################################
   //# Data Members
   private final Map<Class<? extends D>,ProxyMarshaller<? extends D>>
     mClassMarshallerMap;
@@ -262,6 +352,6 @@ public class DocumentManager<D extends DocumentProxy> {
     mClassUnmarshallerMap;
   private final Map<String,ProxyUnmarshaller<? extends D>>
     mExtensionUnmarshallerMap;
-  private final Map<File,D> mDocumentCache;
+  private final Map<URI,D> mDocumentCache;
 
 }

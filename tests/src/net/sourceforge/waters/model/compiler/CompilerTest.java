@@ -4,13 +4,14 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   JAXBTestCase
 //###########################################################################
-//# $Id: CompilerTest.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: CompilerTest.java,v 1.3 2006-02-20 22:20:22 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.JAXBException;
@@ -292,7 +293,8 @@ public class CompilerTest
   void compile(final File infilename, final File outfilename)
     throws IOException, WatersException
   {
-    final ModuleProxy module = mModuleMarshaller.unmarshal(infilename);
+    final URI uri = infilename.toURI();
+    final ModuleProxy module = mModuleMarshaller.unmarshal(uri);
     final ProductDESProxy des = compile(module);
     mProductDESMarshaller.marshal(des, outfilename);
   }
@@ -308,8 +310,10 @@ public class CompilerTest
   void compare(final File filename1, final File filename2)
     throws IOException, WatersUnmarshalException
   {
-    final DocumentProxy proxy1 = mProductDESMarshaller.unmarshal(filename1);
-    final DocumentProxy proxy2 = mProductDESMarshaller.unmarshal(filename2);
+    final URI uri1 = filename1.toURI();
+    final URI uri2 = filename2.toURI();
+    final DocumentProxy proxy1 = mProductDESMarshaller.unmarshal(uri1);
+    final DocumentProxy proxy2 = mProductDESMarshaller.unmarshal(uri2);
     assertEquals("Unexpected result!", proxy1, proxy2);
   }
 

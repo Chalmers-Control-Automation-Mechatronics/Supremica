@@ -236,7 +236,7 @@ proc Java_InitClassMap {classMapName} {
   set attribName \
       [Java_AttribCreate "String" "Name" "required" "owned" "" "name"]
   set attribLocation \
-      [Java_AttribCreate "File" "Location" "ignored" "owned" "" \
+      [Java_AttribCreate "URI" "Location" "ignored" "owned" "" \
            "file system location"]
   set classMap(Proxy) \
       [Java_ClassCreateAbstract "Proxy" "proxy" "" "" ""]
@@ -1414,6 +1414,7 @@ proc Java_CollectGlobalImports {importMapName} {
 
   set importMap(File) "java.io"
   set importMap(Writer) "java.io"
+  set importMap(URI) "java.net"
   set importMap(ArrayList) "java.util"
   set importMap(Collection) "java.util"
   set importMap(Collections) "java.util"

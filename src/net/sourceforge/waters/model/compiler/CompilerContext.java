@@ -4,12 +4,12 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   CompilerContext
 //###########################################################################
-//# $Id: CompilerContext.java,v 1.3 2005-11-03 01:24:15 robi Exp $
+//# $Id: CompilerContext.java,v 1.4 2006-02-20 22:20:21 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
 
-import java.io.File;
+import java.net.URI;
 import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,9 +33,8 @@ class CompilerContext
 
   CompilerContext(final ModuleProxy module, final String prefix)
   {
-    final File location = module.getLocation();
+    mURI = module.getLocation();
     mPrefix = prefix;
-    mPath = (location == null ? null : location.getParentFile());
     mSymbolTable = new HashMap<String,Value>();
   }
 
@@ -77,8 +76,8 @@ class CompilerContext
   }
 
   Value find(final String name,
-                     final List<IndexValue> indexValues,
-                     final List<SimpleExpressionProxy> indexExpressions)
+             final List<IndexValue> indexValues,
+             final List<SimpleExpressionProxy> indexExpressions)
     throws EvalException
   {
     Value value = mSymbolTable.get(name);
@@ -118,16 +117,16 @@ class CompilerContext
     return mPrefix == null ? name : mPrefix + "." + name;
   }
 
-  File getPath()
+  URI getURI()
   {
-    return mPath;
+    return mURI;
   }
 
 
   //#########################################################################
   //# Data Members
   private final String mPrefix;
-  private final File mPath;
+  private final URI mURI;
   private final Map<String,Value> mSymbolTable;
 
 }

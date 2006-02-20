@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   ModuleElementFactory
 //###########################################################################
-//# $Id: ModuleElementFactory.java,v 1.3 2005-12-18 21:11:32 robi Exp $
+//# $Id: ModuleElementFactory.java,v 1.4 2006-02-20 22:20:22 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -12,7 +12,7 @@ package net.sourceforge.waters.plain.module;
 import java.awt.Color;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.io.File;
+import java.net.URI;
 import java.util.Collection;
 
 import net.sourceforge.waters.model.base.Proxy;
@@ -583,7 +583,7 @@ public class ModuleElementFactory
    */
   public ModuleElement createModuleProxy
       (final String name,
-       final File location,
+       final URI location,
        final Collection<? extends ParameterProxy> parameterList,
        final Collection<? extends AliasProxy> constantAliasList,
        final Collection<? extends EventDeclProxy> eventDeclList,
@@ -612,7 +612,7 @@ public class ModuleElementFactory
    */
   public ModuleElement createModuleProxy
       (final String name,
-       final File location)
+       final URI location)
   {
     return new ModuleElement(name,
                              location);

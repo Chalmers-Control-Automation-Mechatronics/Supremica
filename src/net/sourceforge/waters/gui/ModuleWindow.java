@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleWindow
 //###########################################################################
-//# $Id: ModuleWindow.java,v 1.22 2006-01-12 21:51:53 siw4 Exp $
+//# $Id: ModuleWindow.java,v 1.23 2006-02-20 22:20:21 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -15,6 +15,7 @@ import java.awt.event.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -143,7 +144,8 @@ public class ModuleWindow
 			final OperatorTable optable = CompilerOperatorTable.getInstance();
 			final ProxyUnmarshaller<ModuleProxy> unMarshaller =
 				new JAXBModuleMarshaller(factory, optable);
-			module = (ModuleSubject) unMarshaller.unmarshal(wmodf);
+			final URI uri = wmodf.toURI();
+			module = (ModuleSubject) unMarshaller.unmarshal(uri);
 			clearList();
 		} catch (final JAXBException exception) {
 			JOptionPane.showMessageDialog(this,

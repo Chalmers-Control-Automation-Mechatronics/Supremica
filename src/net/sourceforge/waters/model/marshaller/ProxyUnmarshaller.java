@@ -4,13 +4,13 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   ProxyMarshaller
 //###########################################################################
-//# $Id: ProxyUnmarshaller.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: ProxyUnmarshaller.java,v 1.3 2006-02-20 22:20:21 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
 
-import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.util.Collection;
 
 import net.sourceforge.waters.model.base.DocumentProxy;
@@ -31,14 +31,15 @@ public interface ProxyUnmarshaller<D extends DocumentProxy>
   //# Access Methods
   /**
    * Loads a document from a file.
-   * @param  filename The name of the file to be loaded.
+   * @param  uri      A URI specifiying the location of the document
+   *                  to be retrieved.
    * @return The loaded document.
    * @throws WatersUnmarshalException to indicate that parsing the input file
    *                  has failed for some reason.
    * @throws IOException to indicate that the input file could not be
    *                  opened or read.
    */
-  public D unmarshal(File filename)
+  public D unmarshal(URI uri)
     throws WatersUnmarshalException, IOException;
 
 

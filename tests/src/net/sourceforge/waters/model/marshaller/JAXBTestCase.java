@@ -4,11 +4,12 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBTestCase
 //###########################################################################
-//# $Id: JAXBTestCase.java,v 1.3 2005-12-14 13:13:16 robi Exp $
+//# $Id: JAXBTestCase.java,v 1.4 2006-02-20 22:20:22 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
 
+import java.net.URI;
 import java.io.File;
 import java.io.IOException;
 
@@ -60,7 +61,8 @@ public abstract class JAXBTestCase<D extends DocumentProxy>
     throws Exception
   {
     final ProxyUnmarshaller<D> unmarshaller = getProxyUnmarshaller();
-    final D proxy = unmarshaller.unmarshal(filename);
+    final URI uri = filename.toURI();
+    final D proxy = unmarshaller.unmarshal(uri);
     checkIntegrity(proxy);
     final ProxyPrinter printer = getPrinter();
     printer.pprint(proxy);
@@ -106,9 +108,11 @@ public abstract class JAXBTestCase<D extends DocumentProxy>
   {
     final ProxyMarshaller<D> marshaller = getProxyMarshaller();
     final ProxyUnmarshaller<D> unmarshaller = getProxyUnmarshaller();
-    final D proxy1 = unmarshaller.unmarshal(infilename);
+    final URI inuri = infilename.toURI();
+    final D proxy1 = unmarshaller.unmarshal(inuri);
     marshaller.marshal(proxy1, outfilename);
-    final D proxy2 = unmarshaller.unmarshal(outfilename);
+    final URI outuri = outfilename.toURI();
+    final D proxy2 = unmarshaller.unmarshal(outuri);
     assertTrue("Structure changed after marshalling!",
                proxy1.equals(proxy2));
     assertTrue("Structure changed after marshalling!",
@@ -131,8 +135,10 @@ public abstract class JAXBTestCase<D extends DocumentProxy>
     final File fullindir = new File(getInputDirectory(), subdirname);
     final File infilename = new File(fullindir, extname);
     final File outfilename = new File(getOutputDirectory(), extname);
+    final URI inuri = infilename.toURI();
+    final URI outuri = outfilename.toURI();
     marshaller.marshal(handcrafted, outfilename);
-    final D parsed1 = unmarshaller.unmarshal(outfilename);
+    final D parsed1 = unmarshaller.unmarshal(outuri);
     assertTrue("Constructed structure differs from parsed-back!",
                handcrafted.equals(parsed1));
     assertTrue("Constructed structure differs from parsed-back!",
@@ -141,7 +147,7 @@ public abstract class JAXBTestCase<D extends DocumentProxy>
                handcrafted.equalsWithGeometry(parsed1));
     assertTrue("Constructed geometry info differs from parsed-back!",
                parsed1.equalsWithGeometry(handcrafted));
-    final D parsed2 = unmarshaller.unmarshal(infilename);
+    final D parsed2 = unmarshaller.unmarshal(inuri);
     assertTrue("Constructed structure differs from expected in file!",
                handcrafted.equals(parsed2));
     assertTrue("Constructed structure differs from expected in file!",
@@ -188,7 +194,8 @@ public abstract class JAXBTestCase<D extends DocumentProxy>
     throws Exception
   {
     final ProxyUnmarshaller<D> unmarshaller = getProxyUnmarshaller();
-    final D proxy = unmarshaller.unmarshal(filename);
+    final URI uri = filename.toURI();
+    final D proxy = unmarshaller.unmarshal(uri);
     final DocumentProxy cloneddoc = proxy.clone();
     final Class<D> clazz = unmarshaller.getDocumentClass();
     final D cloned = clazz.cast(cloneddoc);

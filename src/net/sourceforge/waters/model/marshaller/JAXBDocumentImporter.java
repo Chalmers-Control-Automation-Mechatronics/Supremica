@@ -4,12 +4,12 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBDocumentImporter
 //###########################################################################
-//# $Id: JAXBDocumentImporter.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: JAXBDocumentImporter.java,v 1.3 2006-02-20 22:20:21 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
 
-import java.io.File;
+import java.net.URI;
 
 import net.sourceforge.waters.model.base.DocumentProxy;
 
@@ -23,6 +23,6 @@ public abstract class JAXBDocumentImporter
 
   //#########################################################################
   //# Invocation
-  public abstract D importDocument(final T element, final File location);
+  public abstract D importDocument(final T element, final URI uri);
 
 }

@@ -4,12 +4,13 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   WatersUnmarshalException
 //###########################################################################
-//# $Id: WatersUnmarshalException.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: WatersUnmarshalException.java,v 1.3 2006-02-20 22:20:21 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
 
 import java.io.File;
+import java.net.URI;
 
 import net.sourceforge.waters.model.base.WatersException;
 
@@ -58,6 +59,25 @@ public class WatersUnmarshalException extends WatersException {
                                   final Throwable cause) 
   {
     super(message, cause);
+  }
+
+  /**
+   * Constructs a new exception indicating that the specified URI
+   * cannot be accessed.
+   */
+  public WatersUnmarshalException(final URI uri)
+  {
+    this("Failed to open '" + uri + "'!");
+  }
+
+  /**
+   * Constructs a new exception indicating that the specified URI
+   * cannot be accessed, with a specified cause.
+   */
+  public WatersUnmarshalException(final URI uri, final Throwable cause)
+  {
+    super("Failed to open '" + uri + "'" +
+          (cause == null ? "!" : ": " + cause));
   }
 
   /**

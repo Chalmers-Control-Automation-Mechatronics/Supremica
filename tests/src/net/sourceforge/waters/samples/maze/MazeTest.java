@@ -4,13 +4,14 @@
 //# PACKAGE: net.sourceforge.waters.samples.maze
 //# CLASS:   MazeTest
 //###########################################################################
-//# $Id: MazeTest.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: MazeTest.java,v 1.3 2006-02-20 22:20:22 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.samples.maze;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import javax.xml.bind.JAXBException;
 
 import net.sourceforge.waters.model.base.DocumentProxy;
@@ -104,17 +105,19 @@ public class MazeTest extends WatersTestCase
   {
     final String extname = name + mMazeCompiler.getDefaultExtension();
     final File filename = new File(mInputDirectory, extname);
-    final ModuleProxy module = mMazeCompiler.unmarshal(filename);
-    final File outmodulefile = module.getLocation();
+    final URI uri = filename.toURI();
+    final ModuleProxy module = mMazeCompiler.unmarshal(uri);
+    final File outmodulefile = module.getFileLocation();
+    final URI outmoduleuri = outmodulefile.toURI();
     mModuleMarshaller.marshal(module, outmodulefile);
     final ModuleProxy read =
-      (ModuleProxy) mModuleMarshaller.unmarshal(outmodulefile);
+      (ModuleProxy) mModuleMarshaller.unmarshal(outmoduleuri);
     assertTrue("Module changed after reading back in!",
                module.equalsWithGeometry(read));
     final ModuleCompiler compiler =
       new ModuleCompiler(mDocumentManager, mProductDESFactory, module);
     final ProductDESProxy des = compiler.compile();
-    final File outdesfile = des.getLocation();
+    final File outdesfile = des.getFileLocation();
     mProductDESMarshaller.marshal(des, outdesfile);
   }
 

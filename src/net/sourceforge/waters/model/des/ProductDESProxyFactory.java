@@ -4,12 +4,12 @@
 //# PACKAGE: net.sourceforge.waters.model.des
 //# CLASS:   ProductDESProxyFactory
 //###########################################################################
-//# $Id: ProductDESProxyFactory.java,v 1.3 2005-11-03 03:45:57 robi Exp $
+//# $Id: ProductDESProxyFactory.java,v 1.4 2006-02-20 22:20:21 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.des;
 
-import java.io.File;
+import java.net.URI;
 import java.util.Collection;
 
 import net.sourceforge.waters.xsd.base.ComponentKind;
@@ -77,7 +77,7 @@ public interface ProductDESProxyFactory
    */
   public ProductDESProxy createProductDESProxy
       (String name,
-       File location,
+       URI location,
        Collection<? extends EventProxy> events,
        Collection<? extends AutomatonProxy> automata);
 

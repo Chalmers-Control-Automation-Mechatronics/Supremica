@@ -4,12 +4,13 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller;
 //# CLASS:   BadFileTypeException
 //###########################################################################
-//# $Id: BadFileTypeException.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: BadFileTypeException.java,v 1.3 2006-02-20 22:20:21 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
 
 import java.io.File;
+import java.net.URI;
 
 
 public class BadFileTypeException extends WatersUnmarshalException {
@@ -47,6 +48,15 @@ public class BadFileTypeException extends WatersUnmarshalException {
   public BadFileTypeException(final Throwable cause)
   {
     super(cause);
+  }
+
+  /**
+   * Constructs a new exception indicating that the type of the contents
+   * of the given URI canbnot be determined.
+   */
+  public BadFileTypeException(final URI uri)
+  {
+    this("Can't determine contents type for '" + uri + "'!");
   }
 
   /**

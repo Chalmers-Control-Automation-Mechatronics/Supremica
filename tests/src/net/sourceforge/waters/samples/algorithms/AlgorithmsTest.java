@@ -4,13 +4,14 @@
 //# PACKAGE: net.sourceforge.waters.samples.algorithms
 //# CLASS:   AlgorithmsTest
 //###########################################################################
-//# $Id: AlgorithmsTest.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: AlgorithmsTest.java,v 1.3 2006-02-20 22:20:22 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.samples.algorithms;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -152,8 +153,8 @@ public class AlgorithmsTest extends WatersTestCase
   {
     final String inextname = modname + mModuleMarshaller.getDefaultExtension();
     final File infilename = new File(mWatersInputDirectory, inextname);
-    final ModuleProxy module =
-      (ModuleProxy) mModuleMarshaller.unmarshal(infilename);
+    final URI uri = infilename.toURI();
+    final ModuleProxy module = (ModuleProxy) mModuleMarshaller.unmarshal(uri);
     return compile(module);
   }
 
@@ -165,7 +166,8 @@ public class AlgorithmsTest extends WatersTestCase
     final String inextname = modname + "_main.vmod";
     final File indirname = new File(mValidInputDirectory, subdirname);
     final File infilename = new File(indirname, inextname);
-    final ModuleProxy module = mValidUnmarshaller.unmarshal(infilename);
+    final URI uri = infilename.toURI();
+    final ModuleProxy module = mValidUnmarshaller.unmarshal(uri);
     return compile(module);
   }
 
@@ -276,9 +278,11 @@ public class AlgorithmsTest extends WatersTestCase
   {
     final String name = aut.getName();
     final String filename = eliminateStrangeCharacters(name);
-    final String extname = filename + mProductDESMarshaller.getDefaultExtension();
+    final String extname =
+      filename + mProductDESMarshaller.getDefaultExtension();
     final File testfilename = new File(mWatersInputDirectory, extname);
-    return mProductDESMarshaller.unmarshal(testfilename);
+    final URI uri = testfilename.toURI();
+    return mProductDESMarshaller.unmarshal(uri);
   }
 
   private ProductDESProxy getExpectedValid(final String subdirname,
@@ -291,7 +295,8 @@ public class AlgorithmsTest extends WatersTestCase
       filename + mProductDESMarshaller.getDefaultExtension();
     final File indirname = new File(mValidInputDirectory, subdirname);
     final File testfilename = new File(indirname, extname);
-    return mProductDESMarshaller.unmarshal(testfilename);
+    final URI uri = testfilename.toURI();
+    return mProductDESMarshaller.unmarshal(uri);
   }
 
   private void testExpected(final AutomatonProxy aut,

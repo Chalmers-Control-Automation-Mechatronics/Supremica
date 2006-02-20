@@ -4,22 +4,22 @@
 //# PACKAGE: net.sourceforge.waters.valid
 //# CLASS:   InputPreprocessor
 //###########################################################################
-//# $Id: InputPreprocessor.java,v 1.3 2005-11-03 01:24:16 robi Exp $
+//# $Id: InputPreprocessor.java,v 1.4 2006-02-20 22:20:22 robi Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.valid;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.io.PrintWriter;
+import java.net.URI;
+import java.net.URL;
 import javax.xml.transform.Source;
 import javax.xml.transform.sax.SAXSource;
 import org.xml.sax.InputSource;
@@ -30,10 +30,11 @@ class InputPreprocessor extends Thread
 
   //#########################################################################
   //# Constructor
-  InputPreprocessor(final File filename)
+  InputPreprocessor(final URI uri)
     throws IOException
   {
-    final InputStream finput = new FileInputStream(filename);
+    final URL url = uri.toURL();
+    final InputStream finput = url.openStream();
     try {
       final PipedOutputStream poutput = new PipedOutputStream();
       final PipedInputStream pinput = new PipedInputStream(poutput);

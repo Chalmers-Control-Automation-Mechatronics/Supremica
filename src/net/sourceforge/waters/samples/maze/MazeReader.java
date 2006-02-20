@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.samples.maze
 //# CLASS:   MazeReader
 //###########################################################################
-//# $Id: MazeReader.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: MazeReader.java,v 1.3 2006-02-20 22:20:22 robi Exp $
 //###########################################################################
 
 
@@ -13,10 +13,12 @@ package net.sourceforge.waters.samples.maze;
 import java.awt.Point;
 import java.io.BufferedReader;
 import java.io.EOFException;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
+import java.net.URL;
+import java.net.URI;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -67,16 +69,17 @@ class MazeReader
 
   //#########################################################################
   //# Parsing Maze Files
-  Maze load(final File file, final String name) throws IOException
+  Maze load(final URI uri, final String name) throws IOException
   {
-    mFile = file;
-    final Reader raw = new FileReader(file);
+    mURL = uri.toURL();
+    final InputStream stream = mURL.openStream();
+    final Reader raw = new InputStreamReader(stream);
     final Reader reader = new BufferedReader(raw);
     try {
       return load(reader, name);
     } finally {
       reader.close();
-      mFile = null;
+      mURL = null;
     }
   }
 
@@ -246,9 +249,9 @@ class MazeReader
     final StringBuffer buffer = new StringBuffer(msg);
     buffer.append(" in line ");
     buffer.append(mLineNo);
-    if (mFile != null) {
+    if (mURL != null) {
       buffer.append(" of '");
-      buffer.append(mFile.toString());
+      buffer.append(mURL.toString());
       buffer.append("'");
     }
     buffer.append(".");
@@ -275,7 +278,7 @@ class MazeReader
   private int mMinX;
   private int mMinY;
   private char mLastChar;
-  private File mFile;
+  private URL mURL;
   private int mLineNo;
   private Map<Point,Square> mSquares;
 

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.valid
 //# CLASS:   ValidToWaters
 //###########################################################################
-//# $Id: ValidToWaters.java,v 1.3 2005-11-03 01:24:16 robi Exp $
+//# $Id: ValidToWaters.java,v 1.4 2006-02-20 22:20:22 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.valid;
@@ -12,6 +12,7 @@ package net.sourceforge.waters.valid;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import javax.xml.bind.JAXBException;
 
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
@@ -80,7 +81,8 @@ public class ValidToWaters
 	System.out.print(validName + " ...");
 	System.out.flush();
 	final File validFile = new File(validName);
-	final ModuleProxy module = unmarshaller.unmarshal(validFile);
+        final URI validURI = validFile.toURI();
+	final ModuleProxy module = unmarshaller.unmarshal(validURI);
 	String watersName;
 	if (validName.endsWith("_main.vmod")) {
 	  final int len = validName.length() - 10;

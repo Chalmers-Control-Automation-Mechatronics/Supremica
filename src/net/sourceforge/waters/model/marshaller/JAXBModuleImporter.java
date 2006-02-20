@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBModuleImporter
 //###########################################################################
-//# $Id: JAXBModuleImporter.java,v 1.5 2005-12-18 21:11:32 robi Exp $
+//# $Id: JAXBModuleImporter.java,v 1.6 2006-02-20 22:20:21 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -12,7 +12,7 @@ package net.sourceforge.waters.model.marshaller;
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.io.File;
+import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -459,9 +459,9 @@ public class JAXBModuleImporter
   }
 
   public ModuleProxy importDocument(final ModuleType element,
-                                    final File location)
+                                    final URI uri)
   {
-    return importModule(element, location);
+    return importModule(element, uri);
   }
 
 
@@ -789,7 +789,7 @@ public class JAXBModuleImporter
   }
 
   private ModuleProxy importModule(final ModuleType element,
-                                   final File location)
+                                   final URI uri)
   {
     final String name = element.getName();
     final List<ParameterProxy> parameterList =
@@ -805,7 +805,7 @@ public class JAXBModuleImporter
     final List<Proxy> componentList = new LinkedList<Proxy>();
     mModuleComponentListHandler.fromJAXB(this, element, componentList);
     return mFactory.createModuleProxy(name,
-                                      location,
+                                      uri,
                                       parameterList,
                                       constantAliasList,
                                       eventDeclList,

@@ -4,12 +4,12 @@
 //# PACKAGE: net.sourceforge.waters.plain.des
 //# CLASS:   ProductDESElement
 //###########################################################################
-//# $Id: ProductDESElement.java,v 1.3 2005-11-03 03:45:57 robi Exp $
+//# $Id: ProductDESElement.java,v 1.4 2006-02-20 22:20:22 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.des;
 
-import java.io.File;
+import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -46,7 +46,7 @@ public class ProductDESElement
   /**
    * Creates a new product DES.
    * @param  name         The name to be given to the new product DES.
-   * @param  location     The file name to be associated with the new
+   * @param  location     The URI to be associated with the new
    *                      document, or <CODE>null</CODE>.
    * @param  events       The event alphabet for the new product DES.
    * @param  automata     The set of transitions for the new product DES.
@@ -59,7 +59,7 @@ public class ProductDESElement
    *                      to the given set of events.
    */
   ProductDESElement(final String name,
-                    final File location,
+                    final URI location,
                     final Collection<? extends EventProxy> events,
                     final Collection<? extends AutomatonProxy> automata)
   {

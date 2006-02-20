@@ -4,13 +4,13 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.2 2005-11-03 01:24:15 robi Exp $
+//# $Id: ModuleCompiler.java,v 1.3 2006-02-20 22:20:21 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
 
-import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.IdentityHashMap;
@@ -100,15 +100,14 @@ public class ModuleCompiler
   {
     try {
       final String name = mModule.getName();
-      final File moduleLocation = mModule.getLocation();
-      File desLocation = null;
+      final URI moduleLocation = mModule.getLocation();
+      URI desLocation = null;
       if (moduleLocation != null) {
         try {
           final ProxyMarshaller<ProductDESProxy> marshaller =
             mDocumentManager.findProxyMarshaller(ProductDESProxy.class);
-          final File dir = moduleLocation.getParentFile();
           final String ext = marshaller.getDefaultExtension();
-          desLocation = new File(dir, name + ext);
+          desLocation = moduleLocation.resolve(name + ext);
         } catch (final IllegalArgumentException exception) {
           // No marshaller --- O.K.
         }
@@ -424,10 +423,10 @@ public class ModuleCompiler
       final List<ParameterBindingProxy> bindings = proxy.getBindingList();
       mParameterMap = new TreeMap<String,CompiledParameterBinding>();
       visitCollection(bindings);
-      final File path = mContext.getPath();
+      final URI uri = mContext.getURI();
       final String filename = proxy.getModuleName();
       final ModuleProxy module =
-        mDocumentManager.load(path, filename, ModuleProxy.class);
+        mDocumentManager.load(uri, filename, ModuleProxy.class);
       mContext = new CompilerContext(module, fullName);
       visitModuleProxy(module);
       return null;

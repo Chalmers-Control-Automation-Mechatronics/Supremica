@@ -4,13 +4,14 @@
 //# PACKAGE: net.sourceforge.waters.samples.maze
 //# CLASS:   MazeCompiler
 //###########################################################################
-//# $Id: MazeCompiler.java,v 1.4 2005-12-18 21:11:32 robi Exp $
+//# $Id: MazeCompiler.java,v 1.5 2006-02-20 22:20:22 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.samples.maze;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -95,16 +96,16 @@ public class MazeCompiler implements ProxyUnmarshaller<ModuleProxy>
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.base.ProxyUnmarshaller
-  public ModuleProxy unmarshal(final File inputfile)
+  public ModuleProxy unmarshal(final URI uri)
     throws WatersUnmarshalException, IOException
   {
-    final String pathname = inputfile.toString();
+    final String pathname = uri.getPath();
     final int start1 = pathname.lastIndexOf(File.separatorChar);
     final int start2 = start1 < 0 ? 0 : start1 + 1;
     final int stop1 = pathname.lastIndexOf('.');
     final int stop2 = stop1 < 0 ? pathname.length() : stop1;
     final String name = pathname.substring(start2, stop2);
-    final Maze maze = mReader.load(inputfile, name);
+    final Maze maze = mReader.load(uri, name);
     maze.createActions();
     return createModule(maze);
   }
@@ -133,6 +134,7 @@ public class MazeCompiler implements ProxyUnmarshaller<ModuleProxy>
     final String name = maze.getName();
     final String extname = name + mJAXBMarshaller.getDefaultExtension();
     final File outputfile = new File(mOutputDir, extname);
+    final URI uri = outputfile.toURI();
     final Collection<Action> escapes = new LinkedList<Action>();
     final List<Proxy> components = new LinkedList<Proxy>();
     mEvents = new IndexedTreeSet<EventDeclProxy>();
@@ -149,7 +151,7 @@ public class MazeCompiler implements ProxyUnmarshaller<ModuleProxy>
     final List<AliasProxy> constants = Collections.emptyList();
     final List<Proxy> aliases = Collections.emptyList();
     return mFactory.createModuleProxy
-      (name, outputfile, parameters, constants, mEvents, aliases, components);
+      (name, uri, parameters, constants, mEvents, aliases, components);
   }
 
   private InstanceProxy createInstance(final Square square,

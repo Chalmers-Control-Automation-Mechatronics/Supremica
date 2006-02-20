@@ -4,12 +4,12 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBProductDESImporter
 //###########################################################################
-//# $Id: JAXBProductDESImporter.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: JAXBProductDESImporter.java,v 1.3 2006-02-20 22:20:21 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
 
-import java.io.File;
+import java.net.URI;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -69,9 +69,9 @@ class JAXBProductDESImporter
   }
 
   public ProductDESProxy importDocument(final ProductDESType element,
-                                        final File location)
+                                        final URI uri)
   {
-    return importProductDES(element, location);
+    return importProductDES(element, uri);
   }
 
 
@@ -83,7 +83,7 @@ class JAXBProductDESImporter
   }
 
   private ProductDESProxy importProductDES(final ProductDESType element,
-                                           final File location)
+                                           final URI uri)
   {
     try {
       final String name = element.getName();
@@ -97,7 +97,7 @@ class JAXBProductDESImporter
         (ProductDESProxy.class, name, "automaton");
       mProductDESAutomataListHandler.fromJAXBChecked(this, element, automata);
       return mFactory.createProductDESProxy
-        (name, location, mProductDESEvents, automata);
+        (name, uri, mProductDESEvents, automata);
     } finally {
       mProductDESEvents = null;
       mProductDESEventRefImporter = null;

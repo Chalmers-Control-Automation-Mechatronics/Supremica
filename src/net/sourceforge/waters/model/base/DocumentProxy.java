@@ -2,14 +2,16 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.model.base
-//# CLASS:   Proxy
+//# CLASS:   DocumentProxy
 //###########################################################################
-//# $Id: DocumentProxy.java,v 1.2 2005-11-03 01:24:15 robi Exp $
+//# $Id: DocumentProxy.java,v 1.3 2006-02-20 22:20:21 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.base;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URI;
 
 
 /**
@@ -35,12 +37,19 @@ public interface DocumentProxy
   //#########################################################################
   //# Getters and Setters
   /**
-   * Gets the file name associated with this document.
+   * Gets the URL associated with this document.
    */
-  public File getLocation();
+  public URI getLocation();
+  /**
+   * Gets the file name associated with this document.
+   * @return The file name used for reading and writing this document.
+   * @throws MalformedURLException to indicate that this document is not
+   *                            associated with a writable file.
+   */
+  public File getFileLocation() throws MalformedURLException;
   /**
    * Sets the file name associated with this document to a new value.
    */
-  public void setLocation(File location);
+  public void setLocation(URI location);
 
 }

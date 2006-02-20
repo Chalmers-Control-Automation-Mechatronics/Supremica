@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleProxyFactory
 //###########################################################################
-//# $Id: ModuleProxyFactory.java,v 1.3 2005-12-18 21:11:32 robi Exp $
+//# $Id: ModuleProxyFactory.java,v 1.4 2006-02-20 22:20:21 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
@@ -12,7 +12,7 @@ package net.sourceforge.waters.model.module;
 import java.awt.Color;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.io.File;
+import java.net.URI;
 import java.util.Collection;
 
 import net.sourceforge.waters.model.base.Proxy;
@@ -404,7 +404,7 @@ public interface ModuleProxyFactory
    */
   public ModuleProxy createModuleProxy
       (String name,
-       File location,
+       URI location,
        Collection<? extends ParameterProxy> parameterList,
        Collection<? extends AliasProxy> constantAliasList,
        Collection<? extends EventDeclProxy> eventDeclList,
@@ -424,7 +424,7 @@ public interface ModuleProxyFactory
    */
   public ModuleProxy createModuleProxy
       (String name,
-       File location);
+       URI location);
 
   /**
    * Creates a new parameter binding.

@@ -1,19 +1,20 @@
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: waters.valid
+//# PACKAGE: net.sourceforge.waters.valid
 //# CLASS:   ValidTransformer
 //###########################################################################
-//# $Id: ValidTransformer.java,v 1.1 2005-02-17 01:43:36 knut Exp $
+//# $Id: ValidTransformer.java,v 1.2 2006-02-20 22:20:22 robi Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.valid;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
@@ -33,11 +34,12 @@ class ValidTransformer
 
   //#########################################################################
   //# Constructor
-  ValidTransformer(final File vmodfile)
-    throws IOException, TransformerConfigurationException
+  ValidTransformer(final URI vmodfile)
+    throws IOException,
+	   TransformerConfigurationException
   {
     // Get the directory and open the input file
-    mPath = vmodfile.getParentFile();
+    mPath = vmodfile;
 
     // Create an XSL transformer
     final ClassLoader loader = currentThread().getContextClassLoader();
@@ -85,8 +87,8 @@ class ValidTransformer
     throws TransformerException
   {
     try {
-      final File filename = new File(mPath, href);
-      final InputPreprocessor preprocessor = new InputPreprocessor(filename);
+      final URI uri = mPath.resolve(href);
+      final InputPreprocessor preprocessor = new InputPreprocessor(uri);
       preprocessor.start();
       return preprocessor.getSource();
     } catch (final IOException exception) {
@@ -126,7 +128,7 @@ class ValidTransformer
 
   //#########################################################################
   //# Data Members
-  private final File mPath;
+  private final URI mPath;
   private final Transformer mTransformer;
   private final InputPreprocessor mPreprocessor;
   private final PipedOutputStream mOutPipe;

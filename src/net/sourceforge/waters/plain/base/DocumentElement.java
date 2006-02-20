@@ -3,12 +3,15 @@
 //# PACKAGE: net.sourceforge.waters.plain.base
 //# CLASS:   DocumentElement
 //###########################################################################
-//# $Id: DocumentElement.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: DocumentElement.java,v 1.3 2006-02-20 22:20:21 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.base;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
 
 import net.sourceforge.waters.model.base.DocumentProxy;
 
@@ -37,7 +40,7 @@ public abstract class DocumentElement
    * @param  name        The name of the new element.
    */
   protected DocumentElement(final String name,
-			    final File location)
+			    final URI location)
   {
     super(name);
     mLocation = location;
@@ -66,12 +69,25 @@ public abstract class DocumentElement
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.base.DocumentElement
-  public File getLocation()
+  public URI getLocation()
   {
     return mLocation;
   }
 
-  public void setLocation(File location)
+  public File getFileLocation() throws MalformedURLException
+  {
+    final URL url = mLocation.toURL();
+    final String proto = url.getProtocol();
+    if (proto.equals("file")) {
+      final String path = mLocation.getPath();
+      return new File(path);
+    } else {
+      throw new MalformedURLException
+        ("Location '" + url + "' does not represent a writable file!");
+    }
+  }
+
+  public void setLocation(final URI location)
   {
     mLocation = location;
   }
@@ -79,6 +95,6 @@ public abstract class DocumentElement
 
   //#########################################################################
   //# Data Members
-  private File mLocation;
+  private URI mLocation;
 
 }

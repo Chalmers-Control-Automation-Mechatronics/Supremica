@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBMarshaller
 //###########################################################################
-//# $Id: JAXBMarshaller.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: JAXBMarshaller.java,v 1.3 2006-02-20 22:20:21 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -14,6 +14,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URL;
+import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
 import javax.xml.bind.JAXBContext;
@@ -71,24 +73,26 @@ public abstract class JAXBMarshaller
   //# and net.sourceforge.waters.model.marshaller.ProxyUnmarshaller
   /**
    * Load a document from a file.
-   * @param  filename The name of the file to be loaded.
+   * @param  uri      A URI specifiying the location of the document
+   *                  to be retrieved.
    * @return The loaded document.
    * @throws WatersUnmarshalException to indicate that reading the XML file
    *                  has failed for some reason.
    */
-  public D unmarshal(final File filename)
+  public D unmarshal(final URI uri)
     throws WatersUnmarshalException, IOException
   {
     try {
-      final Object unmarshalled = mJAXBUnmarshaller.unmarshal(filename);
+      final URL url = uri.toURL();
+      final Object unmarshalled = mJAXBUnmarshaller.unmarshal(url);
       final Class<T> clazz = getElementClass();
       final T doc = clazz.cast(unmarshalled);
-      final D docproxy = mImporter.importDocument(doc, filename);
+      final D docproxy = mImporter.importDocument(doc, uri);
       return docproxy;
     } catch (final JAXBException exception) {
-      throw new WatersUnmarshalException(filename, exception);
+      throw new WatersUnmarshalException(uri, exception);
     } catch (final ModelException exception) {
-      throw new WatersUnmarshalException(filename, exception);
+      throw new WatersUnmarshalException(uri, exception);
     }
   }
 

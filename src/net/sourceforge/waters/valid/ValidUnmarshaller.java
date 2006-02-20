@@ -4,13 +4,14 @@
 //# PACKAGE: net.sourceforge.waters.valid
 //# CLASS:   ValidUnmarshaller
 //###########################################################################
-//# $Id: ValidUnmarshaller.java,v 1.4 2005-11-03 01:24:16 robi Exp $
+//# $Id: ValidUnmarshaller.java,v 1.5 2006-02-20 22:20:22 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.valid;
 
-import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -51,26 +52,28 @@ public class ValidUnmarshaller
 
   //#########################################################################
   //# Access Methods
-  public ModuleProxy unmarshal(File filename)
+  public ModuleProxy unmarshal(URI uri)
     throws WatersUnmarshalException, IOException
   {
     try {
-      final String name = filename.toString();
+      final String name = uri.toString();
       if (name.endsWith(".vprj")) {
         final int len = name.length();
         final String newname = name.substring(0, len - 5) + "_main.vmod";
-        filename = new File(newname);
+        uri = new URI(newname);
       }
-      final ValidTransformer transformer = new ValidTransformer(filename);
+      final ValidTransformer transformer = new ValidTransformer(uri);
       final Source source = transformer.getSource();
       transformer.start();
       final ModuleType module = (ModuleType) mUnmarshaller.unmarshal(source);
       final ModuleProxy modproxy = mImporter.importDocument(module, null);
       return modproxy;
     } catch (final JAXBException exception) {
-      throw new WatersUnmarshalException(exception);
+      throw new WatersUnmarshalException(uri, exception);
     } catch (final TransformerConfigurationException exception) {
-      throw new WatersUnmarshalException(exception);
+      throw new WatersUnmarshalException(uri, exception);
+    } catch (final URISyntaxException exception) {
+      throw new WatersUnmarshalException(uri, exception);
     }
   }
 

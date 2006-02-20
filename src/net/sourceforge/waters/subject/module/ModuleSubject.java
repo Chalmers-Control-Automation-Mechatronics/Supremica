@@ -4,12 +4,12 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   ModuleSubject
 //###########################################################################
-//# $Id: ModuleSubject.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: ModuleSubject.java,v 1.3 2006-02-20 22:20:22 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
 
-import java.io.File;
+import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -56,7 +56,7 @@ public final class ModuleSubject
    * @param componentList The component list of the new module.
    */
   public ModuleSubject(final String name,
-                       final File location,
+                       final URI location,
                        final Collection<? extends ParameterProxy> parameterList,
                        final Collection<? extends AliasProxy> constantAliasList,
                        final Collection<? extends EventDeclProxy> eventDeclList,
@@ -93,7 +93,7 @@ public final class ModuleSubject
    * @param location The location of the new module.
    */
   public ModuleSubject(final String name,
-                       final File location)
+                       final URI location)
   {
     this(name,
          location,
