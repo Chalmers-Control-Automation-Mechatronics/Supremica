@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   GeometrySubject
 //###########################################################################
-//# $Id: GeometrySubject.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: GeometrySubject.java,v 1.3 2006-02-20 01:02:03 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;
@@ -51,8 +51,9 @@ public abstract class GeometrySubject
   //# Convenience Methods
   protected void fireStateChanged()
   {
+    final Subject source = getParent();
     final ModelChangeEvent event =
-      ModelChangeEvent.createGeometryChanged(this);
+      ModelChangeEvent.createGeometryChanged(source, this);
     fireModelChanged(event);
   }
 

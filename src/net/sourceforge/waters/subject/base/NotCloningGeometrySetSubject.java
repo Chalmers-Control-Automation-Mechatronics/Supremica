@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   NotCloningGeometrySetSubject
 //###########################################################################
-//# $Id: NotCloningGeometrySetSubject.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: NotCloningGeometrySetSubject.java,v 1.3 2006-02-20 01:02:03 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;
@@ -200,8 +200,10 @@ public class NotCloningGeometrySetSubject<E>
   //# Auxiliary Methods
   private void fireGeometryChange()
   {
+    final Subject source = mParent != null ? mParent.getParent() : null;
     final ModelChangeEvent event =
-      ModelChangeEvent.createGeometryChanged(this);
+      ModelChangeEvent.createGeometryChanged(source,
+                                             (GeometrySubject) mParent);
     fireModelChanged(event);
   }
 

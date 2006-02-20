@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   CloningGeometryListSubject
 //###########################################################################
-//# $Id: CloningGeometryListSubject.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: CloningGeometryListSubject.java,v 1.3 2006-02-20 01:02:03 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;
@@ -236,8 +236,10 @@ public class CloningGeometryListSubject<E extends Cloneable>
 
   private void fireGeometryChange()
   {
+    final Subject source = mParent != null ? mParent.getParent() : null;
     final ModelChangeEvent event =
-      ModelChangeEvent.createGeometryChanged(this);
+      ModelChangeEvent.createGeometryChanged(source,
+                                             (GeometrySubject) mParent);
     fireModelChanged(event);
   }
 
