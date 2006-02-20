@@ -166,12 +166,16 @@ public class BasicFBInstance extends FBInstance
 		else
 		{
 
+			// this is probably never used
+			/*
 			if(!queuedInScheduler & eventInputQueue.size() > 0)
 			{
 				//System.out.println("BasicFBInstance(" + getName() + ").handleState(): Scheduling this FB instance.");
 				resource.getScheduler().scheduleFBInstance(this);
 				queuedInScheduler = true;
 			}
+			*/
+
 			handlingEvent = false;
 			
 		}
