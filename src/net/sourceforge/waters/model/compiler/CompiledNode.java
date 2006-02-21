@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   CompiledNode
 //###########################################################################
-//# $Id: CompiledNode.java,v 1.3 2005-11-03 01:24:15 robi Exp $
+//# $Id: CompiledNode.java,v 1.4 2006-02-21 21:50:40 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -92,34 +92,34 @@ class CompiledNode
     list.add(entry);
   }
 
-  boolean hasChildNode(final NodeProxy node)
+  boolean hasProperChildNode(final NodeProxy node)
   {
-    collectChildNodes();
-    return mChildNodes.containsKey(node);
+    collectProperChildNodes();
+    return mProperChildNodes.containsKey(node);
   }
 
-  void clearChildNodes()
+  void clearProperChildNodes()
   {
-    mChildNodes = null;
+    mProperChildNodes = null;
   }
 
 
   //#########################################################################
   //# Auxiliary Methods
-  private void collectChildNodes()
+  private void collectProperChildNodes()
   {
-    if (mChildNodes == null) {
-      mChildNodes = new IdentityHashMap<NodeProxy,NodeProxy>();
-      collectChildNodes(mNode);
+    if (mProperChildNodes == null) {
+      mProperChildNodes = new IdentityHashMap<NodeProxy,NodeProxy>();
+      collectProperChildNodes(mNode);
     }
   }
 
-  private void collectChildNodes(final NodeProxy node)
+  private void collectProperChildNodes(final NodeProxy node)
   {
-    mChildNodes.put(node, node);
     final Collection<NodeProxy> children = node.getImmediateChildNodes();
     for (final NodeProxy child : children) {
-      collectChildNodes(child);
+      mProperChildNodes.put(child, child);
+      collectProperChildNodes(child);
     }
   }
 
@@ -131,6 +131,6 @@ class CompiledNode
   private final Collection<EdgeProxy> mEdges;
   private final Map<EventProxy,Collection<CompiledTransition>> mTransitions;
 
-  private Map<NodeProxy,NodeProxy> mChildNodes;
+  private Map<NodeProxy,NodeProxy> mProperChildNodes;
 
 }

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="markus2" xmlns="http://waters.sourceforge.net/xsd/module">
+<EventDeclList>
+<EventDecl Kind="CONTROLLABLE" Name="a"/>
+</EventDeclList>
+<ComponentList>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="nondet"/>
+<Graph Deterministic="false">
+<NodeList>
+<SimpleNode Initial="true" Name="s0">
+<PointGeometry>
+<Point X="128" Y="144"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s1">
+<PointGeometry>
+<Point X="240" Y="144"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="s0" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="a"/>
+<LabelGeometry Anchor="NW">
+<Point X="-2" Y="-19"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point X="128" Y="144"/>
+</StartPointGeometry>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="184" Y="144"/>
+</SplineGeometry>
+<EndPointGeometry>
+<Point X="240" Y="144"/>
+</EndPointGeometry>
+</Edge>
+<Edge Source="s0" Target="s0">
+<LabelBlock>
+<SimpleIdentifier Name="a"/>
+<LabelGeometry Anchor="NW">
+<Point X="6" Y="-12"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point X="128" Y="144"/>
+</StartPointGeometry>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="140" Y="112"/>
+</SplineGeometry>
+<EndPointGeometry>
+<Point X="128" Y="144"/>
+</EndPointGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</Module>
+

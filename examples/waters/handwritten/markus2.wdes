@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ProductDES Name="markus2" xmlns="http://waters.sourceforge.net/xsd/des">
+<EventList>
+<Event Kind="CONTROLLABLE" Name="a"/>
+</EventList>
+<AutomataList>
+<Automaton Kind="SPEC" Name="nondet">
+<EventRefList>
+<EventRef Name="a"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="s0"/>
+<State Name="s1"/>
+</StateList>
+<TransitionList>
+<Transition Event="a" Source="s0" Target="s0"/>
+<Transition Event="a" Source="s0" Target="s1"/>
+</TransitionList>
+</Automaton>
+</AutomataList>
+</ProductDES>
+

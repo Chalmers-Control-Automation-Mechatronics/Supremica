@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   JAXBTestCase
 //###########################################################################
-//# $Id: CompilerTest.java,v 1.3 2006-02-20 22:20:22 robi Exp $
+//# $Id: CompilerTest.java,v 1.4 2006-02-21 21:50:40 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -140,27 +140,16 @@ public class CompilerTest
     compile("nodegroup2");
   }
 
-  public void testCompile_nodegroup3()
-    throws IOException, WatersException
-  {
-    try {
-      compile("nodegroup3");
-      fail("Expected NondeterminismException not caught!");
-    } catch (final NondeterminismException exception) {
-      final String msg = exception.getMessage();
-      assertTrue("NondeterminismException <" + msg +
-                 "> does not mention culprit 'q0'!",
-                 msg.indexOf("'q0'") >= 0);
-      assertTrue("NondeterminismException <" + msg +
-                 "> does not mention culprit 'e'!",
-                 msg.indexOf("'e'") >= 0);
-    }
-  }
-
   public void testCompile_nodegroup4()
     throws IOException, WatersException
   {
     compile("nodegroup4");
+  }
+
+  public void testCompile_markus2()
+    throws IOException, WatersException
+  {
+    compile("markus2");
   }
 
   public void testCompile_small_factory_2()
@@ -232,6 +221,18 @@ public class CompilerTest
     compileError("error6_small", EventKindException.class, "'start2'");
   }
 
+  public void testCompile_markus1()
+    throws IOException, WatersException
+  {
+    compileError("markus1", NondeterminismException.class, "'s0'", "'a'");
+  }
+
+  public void testCompile_nodegroup3()
+    throws IOException, WatersException
+  {
+    compileError("nodegroup3", NondeterminismException.class, "'q0'", "'e'");
+  }
+
 
   //#########################################################################
   //# Utilities
@@ -239,12 +240,32 @@ public class CompilerTest
                     final Class<? extends WatersException> exclass)
     throws IOException, WatersException
   {
-    compileError(name, exclass, null);
+    final String[] culprits = {};
+    compileError(name, exclass, culprits);
   }
 
   void compileError(final String name,
                     final Class<? extends WatersException> exclass,
                     final String culprit)
+    throws IOException, WatersException
+  {
+    final String[] culprits = {culprit};
+    compileError(name, exclass, culprits);
+  }
+
+  void compileError(final String name,
+                    final Class<? extends WatersException> exclass,
+                    final String culprit1,
+                    final String culprit2)
+    throws IOException, WatersException
+  {
+    final String[] culprits = {culprit1, culprit2};
+    compileError(name, exclass, culprits);
+  }
+
+  void compileError(final String name,
+                    final Class<? extends WatersException> exclass,
+                    final String[] culprits)
     throws IOException, WatersException
   {
     try {
@@ -257,7 +278,8 @@ public class CompilerTest
       fail("Expected " + exclass.getName() + " not caught!");
     } catch (final WatersException exception) {
       if (exception.getClass() == exclass) {
-        if (culprit != null) {
+        for (int i = 0; i < culprits.length; i++) {
+          final String culprit = culprits[i];
           final String msg = exception.getMessage();
           assertTrue("Caught " + exclass.getName() +
                      " as expected, but message '" + msg +
@@ -314,7 +336,7 @@ public class CompilerTest
     final URI uri2 = filename2.toURI();
     final DocumentProxy proxy1 = mProductDESMarshaller.unmarshal(uri1);
     final DocumentProxy proxy2 = mProductDESMarshaller.unmarshal(uri2);
-    assertEquals("Unexpected result!", proxy1, proxy2);
+    assertEquals("Unexpected result!", proxy2, proxy1);
   }
 
 

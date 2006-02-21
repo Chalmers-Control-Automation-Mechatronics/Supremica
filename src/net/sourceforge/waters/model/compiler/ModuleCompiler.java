@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.3 2006-02-20 22:20:21 robi Exp $
+//# $Id: ModuleCompiler.java,v 1.4 2006-02-21 21:50:40 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -539,7 +539,7 @@ public class ModuleCompiler
           createTransitions
             (source, events, target, sourceEntry, deterministic);
         }
-        sourceEntry.clearChildNodes();
+        sourceEntry.clearProperChildNodes();
       }
       final AutomatonProxy aut = mFactory.createAutomatonProxy
         (fullName, kind, mLocalAlphabet, mStates, mTransitions);
@@ -755,7 +755,7 @@ public class ModuleCompiler
             continue;
           }
           final NodeProxy cause = ctrans.getGroup();
-          if (groupEntry.hasChildNode(cause)) {
+          if (groupEntry.hasProperChildNode(cause)) {
             create = false;
             break;
           } else if (deterministic) {
