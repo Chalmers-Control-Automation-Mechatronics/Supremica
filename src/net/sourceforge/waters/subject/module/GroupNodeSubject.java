@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   GroupNodeSubject
 //###########################################################################
-//# $Id: GroupNodeSubject.java,v 1.4 2006-02-16 04:06:18 robi Exp $
+//# $Id: GroupNodeSubject.java,v 1.5 2006-02-22 03:35:07 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -44,7 +44,7 @@ public final class GroupNodeSubject
    * Creates a new group node.
    * @param name The name of the new group node.
    * @param propositions The list of propositions of the new group node.
-   * @param immediateChildNodes The set of immediate child nodes of the new group node.
+   * @param immediateChildNodes The set of immediate child nodes of the new group node, or <CODE>null</CODE> if empty.
    * @param geometry The geometric information of the new group node, or <CODE>null</CODE>.
    */
   public GroupNodeSubject(final String name,
@@ -53,7 +53,11 @@ public final class GroupNodeSubject
                           final BoxGeometryProxy geometry)
   {
     super(name, propositions);
-    mImmediateChildNodes = new ChildNodeSetSubject(immediateChildNodes);
+    if (immediateChildNodes == null) {
+      mImmediateChildNodes = new ChildNodeSetSubject();
+    } else {
+      mImmediateChildNodes = new ChildNodeSetSubject(immediateChildNodes);
+    }
     mImmediateChildNodes.setParent(this);
     mGeometry = (BoxGeometrySubject) geometry;
     if (mGeometry != null) {

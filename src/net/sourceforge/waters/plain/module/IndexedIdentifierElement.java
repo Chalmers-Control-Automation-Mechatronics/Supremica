@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   IndexedIdentifierElement
 //###########################################################################
-//# $Id: IndexedIdentifierElement.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: IndexedIdentifierElement.java,v 1.3 2006-02-22 03:35:07 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -37,16 +37,20 @@ public final class IndexedIdentifierElement
   /**
    * Creates a new indexed identifier.
    * @param name The name of the new indexed identifier.
-   * @param indexes The list of array indexes of the new indexed identifier.
+   * @param indexes The list of array indexes of the new indexed identifier, or <CODE>null</CODE> if empty.
    */
   public IndexedIdentifierElement(final String name,
                                   final Collection<? extends SimpleExpressionProxy> indexes)
   {
     super(name);
-    final List<SimpleExpressionProxy> indexesModifiable =
-      new ArrayList<SimpleExpressionProxy>(indexes);
-    mIndexes =
-      Collections.unmodifiableList(indexesModifiable);
+    if (indexes == null) {
+      mIndexes = Collections.emptyList();
+    } else {
+      final List<SimpleExpressionProxy> indexesModifiable =
+        new ArrayList<SimpleExpressionProxy>(indexes);
+      mIndexes =
+        Collections.unmodifiableList(indexesModifiable);
+    }
   }
 
   /**

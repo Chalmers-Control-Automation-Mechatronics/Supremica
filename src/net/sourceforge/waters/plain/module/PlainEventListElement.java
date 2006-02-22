@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   PlainEventListElement
 //###########################################################################
-//# $Id: PlainEventListElement.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: PlainEventListElement.java,v 1.3 2006-02-22 03:35:07 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -35,7 +35,7 @@ public final class PlainEventListElement
   //# Constructors
   /**
    * Creates a new plain event list.
-   * @param eventList The list of events of the new plain event list.
+   * @param eventList The list of events of the new plain event list, or <CODE>null</CODE> if empty.
    */
   public PlainEventListElement(final Collection<? extends Proxy> eventList)
   {

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   ForeachComponentElement
 //###########################################################################
-//# $Id: ForeachComponentElement.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: ForeachComponentElement.java,v 1.3 2006-02-22 03:35:07 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -39,7 +39,7 @@ public final class ForeachComponentElement
    * @param name The name of the new foreach construct for module components.
    * @param range The range of the new foreach construct for module components.
    * @param guard The guard of the new foreach construct for module components, or <CODE>null</CODE>.
-   * @param body The body of the new foreach construct for module components.
+   * @param body The body of the new foreach construct for module components, or <CODE>null</CODE> if empty.
    */
   public ForeachComponentElement(final String name,
                                  final SimpleExpressionProxy range,

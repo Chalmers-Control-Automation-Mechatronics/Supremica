@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   EventDeclSubject
 //###########################################################################
-//# $Id: EventDeclSubject.java,v 1.4 2006-02-16 04:06:18 robi Exp $
+//# $Id: EventDeclSubject.java,v 1.5 2006-02-22 03:35:07 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -47,7 +47,7 @@ public final class EventDeclSubject
    * @param name The name of the new event declaration.
    * @param kind The kind of the new event declaration.
    * @param observable The observability status of the new event declaration.
-   * @param ranges The list of index ranges of the new event declaration.
+   * @param ranges The list of index ranges of the new event declaration, or <CODE>null</CODE> if empty.
    * @param colorGeometry The color information of the new event declaration, or <CODE>null</CODE>.
    */
   public EventDeclSubject(final String name,
@@ -59,8 +59,12 @@ public final class EventDeclSubject
     super(name);
     mKind = kind;
     mIsObservable = observable;
-    mRanges = new ArrayListSubject<SimpleExpressionSubject>
-      (ranges, SimpleExpressionSubject.class);
+    if (ranges == null) {
+      mRanges = new ArrayListSubject<SimpleExpressionSubject>();
+    } else {
+      mRanges = new ArrayListSubject<SimpleExpressionSubject>
+        (ranges, SimpleExpressionSubject.class);
+    }
     mRanges.setParent(this);
     mColorGeometry = (ColorGeometrySubject) colorGeometry;
     if (mColorGeometry != null) {

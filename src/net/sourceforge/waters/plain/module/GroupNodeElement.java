@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   GroupNodeElement
 //###########################################################################
-//# $Id: GroupNodeElement.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: GroupNodeElement.java,v 1.3 2006-02-22 03:35:07 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -41,7 +41,7 @@ public final class GroupNodeElement
    * Creates a new group node.
    * @param name The name of the new group node.
    * @param propositions The list of propositions of the new group node.
-   * @param immediateChildNodes The set of immediate child nodes of the new group node.
+   * @param immediateChildNodes The set of immediate child nodes of the new group node, or <CODE>null</CODE> if empty.
    * @param geometry The geometric information of the new group node, or <CODE>null</CODE>.
    */
   public GroupNodeElement(final String name,
@@ -50,10 +50,14 @@ public final class GroupNodeElement
                           final BoxGeometryProxy geometry)
   {
     super(name, propositions);
-    final Set<NodeProxy> immediateChildNodesModifiable =
-      new IndexedHashSet<NodeProxy>(immediateChildNodes);
-    mImmediateChildNodes =
-      Collections.unmodifiableSet(immediateChildNodesModifiable);
+    if (immediateChildNodes == null) {
+      mImmediateChildNodes = Collections.emptySet();
+    } else {
+      final Set<NodeProxy> immediateChildNodesModifiable =
+        new IndexedHashSet<NodeProxy>(immediateChildNodes);
+      mImmediateChildNodes =
+        Collections.unmodifiableSet(immediateChildNodesModifiable);
+    }
     mGeometry = geometry;
   }
 

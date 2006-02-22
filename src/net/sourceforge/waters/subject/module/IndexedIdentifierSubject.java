@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   IndexedIdentifierSubject
 //###########################################################################
-//# $Id: IndexedIdentifierSubject.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: IndexedIdentifierSubject.java,v 1.3 2006-02-22 03:35:07 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -39,14 +39,18 @@ public final class IndexedIdentifierSubject
   /**
    * Creates a new indexed identifier.
    * @param name The name of the new indexed identifier.
-   * @param indexes The list of array indexes of the new indexed identifier.
+   * @param indexes The list of array indexes of the new indexed identifier, or <CODE>null</CODE> if empty.
    */
   public IndexedIdentifierSubject(final String name,
                                   final Collection<? extends SimpleExpressionProxy> indexes)
   {
     super(name);
-    mIndexes = new ArrayListSubject<SimpleExpressionSubject>
-      (indexes, SimpleExpressionSubject.class);
+    if (indexes == null) {
+      mIndexes = new ArrayListSubject<SimpleExpressionSubject>();
+    } else {
+      mIndexes = new ArrayListSubject<SimpleExpressionSubject>
+        (indexes, SimpleExpressionSubject.class);
+    }
     mIndexes.setParent(this);
   }
 

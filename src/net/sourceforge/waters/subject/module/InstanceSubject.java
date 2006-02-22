@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   InstanceSubject
 //###########################################################################
-//# $Id: InstanceSubject.java,v 1.3 2005-12-03 21:30:42 robi Exp $
+//# $Id: InstanceSubject.java,v 1.4 2006-02-22 03:35:07 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -42,7 +42,7 @@ public final class InstanceSubject
    * Creates a new instance.
    * @param identifier The identifier defining the name of the new instance.
    * @param moduleName The module name of the new instance.
-   * @param bindingList The binding list of the new instance.
+   * @param bindingList The binding list of the new instance, or <CODE>null</CODE> if empty.
    */
   public InstanceSubject(final IdentifierProxy identifier,
                          final String moduleName,
@@ -50,8 +50,12 @@ public final class InstanceSubject
   {
     super(identifier);
     mModuleName = moduleName;
-    mBindingList = new IndexedArrayListSubject<ParameterBindingSubject>
-      (bindingList, ParameterBindingSubject.class);
+    if (bindingList == null) {
+      mBindingList = new IndexedArrayListSubject<ParameterBindingSubject>();
+    } else {
+      mBindingList = new IndexedArrayListSubject<ParameterBindingSubject>
+        (bindingList, ParameterBindingSubject.class);
+    }
     mBindingList.setParent(this);
   }
 

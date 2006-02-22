@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.des
 //# CLASS:   ProductDESElement
 //###########################################################################
-//# $Id: ProductDESElement.java,v 1.4 2006-02-20 22:20:22 robi Exp $
+//# $Id: ProductDESElement.java,v 1.5 2006-02-22 03:35:07 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.des;
@@ -48,8 +48,10 @@ public class ProductDESElement
    * @param  name         The name to be given to the new product DES.
    * @param  location     The URI to be associated with the new
    *                      document, or <CODE>null</CODE>.
-   * @param  events       The event alphabet for the new product DES.
-   * @param  automata     The set of transitions for the new product DES.
+   * @param  events       The event alphabet for the new product DES,
+   *                      or <CODE>null</CODE> if empty.
+   * @param  automata     The set of automata for the new product DES,
+   *                      or <CODE>null</CODE> if empty.
    * @throws DuplicateNameException to indicate that some event or automaton
    *                      name is used more than once.
    * @throws NameNotFoundException to indicate that some automaton refers
@@ -64,11 +66,14 @@ public class ProductDESElement
                     final Collection<? extends AutomatonProxy> automata)
   {
     super(name, location);
-    final EventSet eventscopy = new EventSet(events);
+    final EventSet eventscopy =
+      events == null ? new EventSet() : new EventSet(events);
     final AutomataSet automatacopy = new AutomataSet(automata.size());
-    for (final AutomatonProxy aut : automata) {
-      eventscopy.checkAllUnique(aut.getEvents());
-      automatacopy.insertUnique(aut);
+    if (automata != null) {
+      for (final AutomatonProxy aut : automata) {
+        eventscopy.checkAllUnique(aut.getEvents());
+        automatacopy.insertUnique(aut);
+      }
     }
     mEvents = Collections.unmodifiableSet(eventscopy);
     mAutomata = Collections.unmodifiableSet(automatacopy);
@@ -79,8 +84,10 @@ public class ProductDESElement
    * This constructor creates a product DES with a <CODE>null</CODE> file
    * location.
    * @param  name         The name to be given to the new product DES.
-   * @param  events       The event alphabet for the new product DES.
-   * @param  automata     The set of transitions for the new product DES.
+   * @param  events       The event alphabet for the new product DES,
+   *                      or <CODE>null</CODE> if empty.
+   * @param  automata     The set of automata for the new product DES,
+   *                      or <CODE>null</CODE> if empty.
    * @throws DuplicateNameException to indicate that some event or automaton
    *                      name is used more than once.
    * @throws NameNotFoundException to indicate that some automaton refers
@@ -194,7 +201,11 @@ public class ProductDESElement
   private class EventSet extends IndexedHashSet<EventProxy> {
 
     //#######################################################################
-    //# Constructor
+    //# Constructors
+    EventSet()
+    {
+    }
+
     EventSet(final Collection<? extends EventProxy> events)
       throws DuplicateNameException
     {

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   EnumSetExpressionElement
 //###########################################################################
-//# $Id: EnumSetExpressionElement.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: EnumSetExpressionElement.java,v 1.3 2006-02-22 03:35:07 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -36,14 +36,18 @@ public final class EnumSetExpressionElement
   //# Constructors
   /**
    * Creates a new enumerated range.
-   * @param items The list of items of the new enumerated range.
+   * @param items The list of items of the new enumerated range, or <CODE>null</CODE> if empty.
    */
   public EnumSetExpressionElement(final Collection<? extends SimpleIdentifierProxy> items)
   {
-    final List<SimpleIdentifierProxy> itemsModifiable =
-      new ArrayList<SimpleIdentifierProxy>(items);
-    mItems =
-      Collections.unmodifiableList(itemsModifiable);
+    if (items == null) {
+      mItems = Collections.emptyList();
+    } else {
+      final List<SimpleIdentifierProxy> itemsModifiable =
+        new ArrayList<SimpleIdentifierProxy>(items);
+      mItems =
+        Collections.unmodifiableList(itemsModifiable);
+    }
   }
 
   /**

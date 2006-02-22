@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   ForeachEventSubject
 //###########################################################################
-//# $Id: ForeachEventSubject.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: ForeachEventSubject.java,v 1.3 2006-02-22 03:35:07 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -39,7 +39,7 @@ public final class ForeachEventSubject
    * @param name The name of the new foreach construct for events.
    * @param range The range of the new foreach construct for events.
    * @param guard The guard of the new foreach construct for events, or <CODE>null</CODE>.
-   * @param body The body of the new foreach construct for events.
+   * @param body The body of the new foreach construct for events, or <CODE>null</CODE> if empty.
    */
   public ForeachEventSubject(final String name,
                              final SimpleExpressionProxy range,

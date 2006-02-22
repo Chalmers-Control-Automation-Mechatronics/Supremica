@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleProxyFactory
 //###########################################################################
-//# $Id: ModuleProxyFactory.java,v 1.4 2006-02-20 22:20:21 robi Exp $
+//# $Id: ModuleProxyFactory.java,v 1.5 2006-02-22 03:35:07 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
@@ -56,7 +56,7 @@ public interface ModuleProxyFactory
 
   /**
    * Creates a new color geometry.
-   * @param colorSet The colour set of the new color geometry.
+   * @param colorSet The colour set of the new color geometry, or <CODE>null</CODE> if empty.
    */
   public ColorGeometryProxy createColorGeometryProxy
       (Collection<? extends Color> colorSet);
@@ -102,7 +102,7 @@ public interface ModuleProxyFactory
 
   /**
    * Creates a new enumerated range.
-   * @param items The list of items of the new enumerated range.
+   * @param items The list of items of the new enumerated range, or <CODE>null</CODE> if empty.
    */
   public EnumSetExpressionProxy createEnumSetExpressionProxy
       (Collection<? extends SimpleIdentifierProxy> items);
@@ -119,7 +119,7 @@ public interface ModuleProxyFactory
    * @param name The name of the new event declaration.
    * @param kind The kind of the new event declaration.
    * @param observable The observability status of the new event declaration.
-   * @param ranges The list of index ranges of the new event declaration.
+   * @param ranges The list of index ranges of the new event declaration, or <CODE>null</CODE> if empty.
    * @param colorGeometry The color information of the new event declaration, or <CODE>null</CODE>.
    */
   public EventDeclProxy createEventDeclProxy
@@ -169,7 +169,7 @@ public interface ModuleProxyFactory
    * @param name The name of the new foreach construct for module components.
    * @param range The range of the new foreach construct for module components.
    * @param guard The guard of the new foreach construct for module components, or <CODE>null</CODE>.
-   * @param body The body of the new foreach construct for module components.
+   * @param body The body of the new foreach construct for module components, or <CODE>null</CODE> if empty.
    */
   public ForeachComponentProxy createForeachComponentProxy
       (String name,
@@ -194,7 +194,7 @@ public interface ModuleProxyFactory
    * @param name The name of the new foreach construct for aliases.
    * @param range The range of the new foreach construct for aliases.
    * @param guard The guard of the new foreach construct for aliases, or <CODE>null</CODE>.
-   * @param body The body of the new foreach construct for aliases.
+   * @param body The body of the new foreach construct for aliases, or <CODE>null</CODE> if empty.
    */
   public ForeachEventAliasProxy createForeachEventAliasProxy
       (String name,
@@ -219,7 +219,7 @@ public interface ModuleProxyFactory
    * @param name The name of the new foreach construct for events.
    * @param range The range of the new foreach construct for events.
    * @param guard The guard of the new foreach construct for events, or <CODE>null</CODE>.
-   * @param body The body of the new foreach construct for events.
+   * @param body The body of the new foreach construct for events, or <CODE>null</CODE> if empty.
    */
   public ForeachEventProxy createForeachEventProxy
       (String name,
@@ -243,8 +243,8 @@ public interface ModuleProxyFactory
    * Creates a new graph.
    * @param deterministic The determinism status of the new graph.
    * @param blockedEvents The list of blocked events of the new graph.
-   * @param nodes The set of nodes of the new graph.
-   * @param edges The list of edges of the new graph.
+   * @param nodes The set of nodes of the new graph, or <CODE>null</CODE> if empty.
+   * @param edges The list of edges of the new graph, or <CODE>null</CODE> if empty.
    */
   public GraphProxy createGraphProxy
       (boolean deterministic,
@@ -267,7 +267,7 @@ public interface ModuleProxyFactory
    * Creates a new group node.
    * @param name The name of the new group node.
    * @param propositions The list of propositions of the new group node.
-   * @param immediateChildNodes The set of immediate child nodes of the new group node.
+   * @param immediateChildNodes The set of immediate child nodes of the new group node, or <CODE>null</CODE> if empty.
    * @param geometry The geometric information of the new group node, or <CODE>null</CODE>.
    */
   public GroupNodeProxy createGroupNodeProxy
@@ -291,7 +291,7 @@ public interface ModuleProxyFactory
   /**
    * Creates a new indexed identifier.
    * @param name The name of the new indexed identifier.
-   * @param indexes The list of array indexes of the new indexed identifier.
+   * @param indexes The list of array indexes of the new indexed identifier, or <CODE>null</CODE> if empty.
    */
   public IndexedIdentifierProxy createIndexedIdentifierProxy
       (String name,
@@ -310,7 +310,7 @@ public interface ModuleProxyFactory
    * Creates a new instance.
    * @param identifier The identifier defining the name of the new instance.
    * @param moduleName The module name of the new instance.
-   * @param bindingList The binding list of the new instance.
+   * @param bindingList The binding list of the new instance, or <CODE>null</CODE> if empty.
    */
   public InstanceProxy createInstanceProxy
       (IdentifierProxy identifier,
@@ -359,7 +359,7 @@ public interface ModuleProxyFactory
 
   /**
    * Creates a new label block.
-   * @param eventList The list of events of the new label block.
+   * @param eventList The list of events of the new label block, or <CODE>null</CODE> if empty.
    * @param geometry The geometry of the new label block, or <CODE>null</CODE>.
    */
   public LabelBlockProxy createLabelBlockProxy
@@ -396,11 +396,11 @@ public interface ModuleProxyFactory
    * Creates a new module.
    * @param name The name of the new module.
    * @param location The location of the new module.
-   * @param parameterList The parameter list of the new module.
-   * @param constantAliasList The constant definition list of the new module.
-   * @param eventDeclList The event declaration list of the new module.
-   * @param eventAliasList The event alias list of the new module.
-   * @param componentList The component list of the new module.
+   * @param parameterList The parameter list of the new module, or <CODE>null</CODE> if empty.
+   * @param constantAliasList The constant definition list of the new module, or <CODE>null</CODE> if empty.
+   * @param eventDeclList The event declaration list of the new module, or <CODE>null</CODE> if empty.
+   * @param eventAliasList The event alias list of the new module, or <CODE>null</CODE> if empty.
+   * @param componentList The component list of the new module, or <CODE>null</CODE> if empty.
    */
   public ModuleProxy createModuleProxy
       (String name,
@@ -437,7 +437,7 @@ public interface ModuleProxyFactory
 
   /**
    * Creates a new plain event list.
-   * @param eventList The list of events of the new plain event list.
+   * @param eventList The list of events of the new plain event list, or <CODE>null</CODE> if empty.
    */
   public PlainEventListProxy createPlainEventListProxy
       (Collection<? extends Proxy> eventList);
@@ -529,7 +529,7 @@ public interface ModuleProxyFactory
 
   /**
    * Creates a new spline geometry.
-   * @param points The list of control points of the new spline geometry.
+   * @param points The list of control points of the new spline geometry, or <CODE>null</CODE> if empty.
    * @param kind The kind of the new spline geometry.
    */
   public SplineGeometryProxy createSplineGeometryProxy

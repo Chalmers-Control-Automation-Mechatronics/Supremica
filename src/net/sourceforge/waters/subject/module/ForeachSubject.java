@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   ForeachSubject
 //###########################################################################
-//# $Id: ForeachSubject.java,v 1.3 2005-12-03 21:30:42 robi Exp $
+//# $Id: ForeachSubject.java,v 1.4 2006-02-22 03:35:07 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -42,7 +42,7 @@ public abstract class ForeachSubject
    * @param name The name of the new foreach construct.
    * @param range The range of the new foreach construct.
    * @param guard The guard of the new foreach construct, or <CODE>null</CODE>.
-   * @param body The body of the new foreach construct.
+   * @param body The body of the new foreach construct, or <CODE>null</CODE> if empty.
    */
   protected ForeachSubject(final String name,
                            final SimpleExpressionProxy range,
@@ -56,8 +56,12 @@ public abstract class ForeachSubject
     if (mGuard != null) {
       mGuard.setParent(this);
     }
-    mBody = new ArrayListSubject<AbstractSubject>
-      (body, AbstractSubject.class);
+    if (body == null) {
+      mBody = new ArrayListSubject<AbstractSubject>();
+    } else {
+      mBody = new ArrayListSubject<AbstractSubject>
+        (body, AbstractSubject.class);
+    }
     mBody.setParent(this);
   }
 

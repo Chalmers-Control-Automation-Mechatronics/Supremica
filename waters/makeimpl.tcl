@@ -590,20 +590,33 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
 	  Java_WriteLn $stream $umap \
 	      "    $membername = new ${impltype}($paramname);"
 	} else {
-	  Java_WriteLn $stream $umap "    final $type ${paramname}Modifiable ="
-	  Java_WriteLn $stream $umap "      new ${impltype}($paramname);"
-	  Java_WriteLn $stream $umap "    $membername ="
+          regsub {^unmodifiable} $transformer "empty" creator
+	  Java_WriteLn $stream $umap "    if ($paramname == null) \{"
 	  Java_WriteLn $stream $umap \
-	      "      Collections.${transformer}(${paramname}Modifiable);";
+              "      $membername = Collections.${creator}();"
+	  Java_WriteLn $stream $umap "    \} else \{"
+	  Java_WriteLn $stream $umap \
+              "      final $type ${paramname}Modifiable ="
+	  Java_WriteLn $stream $umap "        new ${impltype}($paramname);"
+	  Java_WriteLn $stream $umap "      $membername ="
+	  Java_WriteLn $stream $umap \
+	      "        Collections.${transformer}(${paramname}Modifiable);";
+	  Java_WriteLn $stream $umap "    \}"
 	}
       } elseif {[regexp {^.*Subject<(.*Subject)>} $impltype all elemtype]} {
-	Java_WriteLn $stream $umap \
-	    "    $membername = new ${impltype}"
-	Java_WriteLn $stream $umap \
-	    "      ($paramname, $elemtype.class);"
+        Java_WriteLn $stream $umap "    if ($paramname == null) \{"
+	Java_WriteLn $stream $umap "      $membername = new ${impltype}();"
+        Java_WriteLn $stream $umap "    \} else \{"
+	Java_WriteLn $stream $umap "      $membername = new ${impltype}"
+	Java_WriteLn $stream $umap "        ($paramname, $elemtype.class);"
+        Java_WriteLn $stream $umap "    \}"
       } else {
+        Java_WriteLn $stream $umap "    if ($paramname == null) \{"
+	Java_WriteLn $stream $umap "      $membername = new ${impltype}();"
+        Java_WriteLn $stream $umap "    \} else \{"
 	Java_WriteLn $stream $umap \
-	    "    $membername = new ${impltype}($paramname);"
+	    "      $membername = new ${impltype}($paramname);"
+        Java_WriteLn $stream $umap "    \}"
       }
       if {[string compare $impl "plain"] == 0} {
 	# nothing
@@ -2023,10 +2036,13 @@ proc Java_WriteConstructorComment {stream umap impl methodkind
       set name [Java_AttribGetParameterName $attrib $impl]
       set descr [Java_AttribGetEnglishDescription $attrib $impl]
       set eqstatus [Java_AttribGetEqualityStatus $attrib $impl]
+      set transformer [Java_AttribGetCollectionTransformerName $attrib $impl]
       Java_Write $stream $umap \
           "   * @param $name The $descr of the new $short"
-      if {[string compare $eqstatus "geometry"] == 0 ||
-          [string compare $eqstatus "optional"] == 0} {
+      if {[string compare $transformer ""] != 0} {
+        Java_Write $stream $umap ", or <CODE>null</CODE> if empty"
+      } elseif {[string compare $eqstatus "geometry"] == 0 ||
+                [string compare $eqstatus "optional"] == 0} {
         Java_Write $stream $umap ", or <CODE>null</CODE>"
       }
       Java_WriteLn $stream $umap "."

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   ModuleSubject
 //###########################################################################
-//# $Id: ModuleSubject.java,v 1.3 2006-02-20 22:20:22 robi Exp $
+//# $Id: ModuleSubject.java,v 1.4 2006-02-22 03:35:07 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -49,11 +49,11 @@ public final class ModuleSubject
    * Creates a new module.
    * @param name The name of the new module.
    * @param location The location of the new module.
-   * @param parameterList The parameter list of the new module.
-   * @param constantAliasList The constant definition list of the new module.
-   * @param eventDeclList The event declaration list of the new module.
-   * @param eventAliasList The event alias list of the new module.
-   * @param componentList The component list of the new module.
+   * @param parameterList The parameter list of the new module, or <CODE>null</CODE> if empty.
+   * @param constantAliasList The constant definition list of the new module, or <CODE>null</CODE> if empty.
+   * @param eventDeclList The event declaration list of the new module, or <CODE>null</CODE> if empty.
+   * @param eventAliasList The event alias list of the new module, or <CODE>null</CODE> if empty.
+   * @param componentList The component list of the new module, or <CODE>null</CODE> if empty.
    */
   public ModuleSubject(final String name,
                        final URI location,
@@ -64,20 +64,40 @@ public final class ModuleSubject
                        final Collection<? extends Proxy> componentList)
   {
     super(name, location);
-    mParameterList = new IndexedArrayListSubject<ParameterSubject>
-      (parameterList, ParameterSubject.class);
+    if (parameterList == null) {
+      mParameterList = new IndexedArrayListSubject<ParameterSubject>();
+    } else {
+      mParameterList = new IndexedArrayListSubject<ParameterSubject>
+        (parameterList, ParameterSubject.class);
+    }
     mParameterList.setParent(this);
-    mConstantAliasList = new ArrayListSubject<AliasSubject>
-      (constantAliasList, AliasSubject.class);
+    if (constantAliasList == null) {
+      mConstantAliasList = new ArrayListSubject<AliasSubject>();
+    } else {
+      mConstantAliasList = new ArrayListSubject<AliasSubject>
+        (constantAliasList, AliasSubject.class);
+    }
     mConstantAliasList.setParent(this);
-    mEventDeclList = new IndexedArrayListSubject<EventDeclSubject>
-      (eventDeclList, EventDeclSubject.class);
+    if (eventDeclList == null) {
+      mEventDeclList = new IndexedArrayListSubject<EventDeclSubject>();
+    } else {
+      mEventDeclList = new IndexedArrayListSubject<EventDeclSubject>
+        (eventDeclList, EventDeclSubject.class);
+    }
     mEventDeclList.setParent(this);
-    mEventAliasList = new ArrayListSubject<AbstractSubject>
-      (eventAliasList, AbstractSubject.class);
+    if (eventAliasList == null) {
+      mEventAliasList = new ArrayListSubject<AbstractSubject>();
+    } else {
+      mEventAliasList = new ArrayListSubject<AbstractSubject>
+        (eventAliasList, AbstractSubject.class);
+    }
     mEventAliasList.setParent(this);
-    mComponentList = new ArrayListSubject<AbstractSubject>
-      (componentList, AbstractSubject.class);
+    if (componentList == null) {
+      mComponentList = new ArrayListSubject<AbstractSubject>();
+    } else {
+      mComponentList = new ArrayListSubject<AbstractSubject>
+        (componentList, AbstractSubject.class);
+    }
     mComponentList.setParent(this);
   }
 

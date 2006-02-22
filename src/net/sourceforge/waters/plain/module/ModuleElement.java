@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   ModuleElement
 //###########################################################################
-//# $Id: ModuleElement.java,v 1.3 2006-02-20 22:20:22 robi Exp $
+//# $Id: ModuleElement.java,v 1.4 2006-02-22 03:35:07 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -44,11 +44,11 @@ public final class ModuleElement
    * Creates a new module.
    * @param name The name of the new module.
    * @param location The location of the new module.
-   * @param parameterList The parameter list of the new module.
-   * @param constantAliasList The constant definition list of the new module.
-   * @param eventDeclList The event declaration list of the new module.
-   * @param eventAliasList The event alias list of the new module.
-   * @param componentList The component list of the new module.
+   * @param parameterList The parameter list of the new module, or <CODE>null</CODE> if empty.
+   * @param constantAliasList The constant definition list of the new module, or <CODE>null</CODE> if empty.
+   * @param eventDeclList The event declaration list of the new module, or <CODE>null</CODE> if empty.
+   * @param eventAliasList The event alias list of the new module, or <CODE>null</CODE> if empty.
+   * @param componentList The component list of the new module, or <CODE>null</CODE> if empty.
    */
   public ModuleElement(final String name,
                        final URI location,
@@ -59,26 +59,46 @@ public final class ModuleElement
                        final Collection<? extends Proxy> componentList)
   {
     super(name, location);
-    final List<ParameterProxy> parameterListModifiable =
-      new ArrayList<ParameterProxy>(parameterList);
-    mParameterList =
-      Collections.unmodifiableList(parameterListModifiable);
-    final List<AliasProxy> constantAliasListModifiable =
-      new ArrayList<AliasProxy>(constantAliasList);
-    mConstantAliasList =
-      Collections.unmodifiableList(constantAliasListModifiable);
-    final List<EventDeclProxy> eventDeclListModifiable =
-      new ArrayList<EventDeclProxy>(eventDeclList);
-    mEventDeclList =
-      Collections.unmodifiableList(eventDeclListModifiable);
-    final List<Proxy> eventAliasListModifiable =
-      new ArrayList<Proxy>(eventAliasList);
-    mEventAliasList =
-      Collections.unmodifiableList(eventAliasListModifiable);
-    final List<Proxy> componentListModifiable =
-      new ArrayList<Proxy>(componentList);
-    mComponentList =
-      Collections.unmodifiableList(componentListModifiable);
+    if (parameterList == null) {
+      mParameterList = Collections.emptyList();
+    } else {
+      final List<ParameterProxy> parameterListModifiable =
+        new ArrayList<ParameterProxy>(parameterList);
+      mParameterList =
+        Collections.unmodifiableList(parameterListModifiable);
+    }
+    if (constantAliasList == null) {
+      mConstantAliasList = Collections.emptyList();
+    } else {
+      final List<AliasProxy> constantAliasListModifiable =
+        new ArrayList<AliasProxy>(constantAliasList);
+      mConstantAliasList =
+        Collections.unmodifiableList(constantAliasListModifiable);
+    }
+    if (eventDeclList == null) {
+      mEventDeclList = Collections.emptyList();
+    } else {
+      final List<EventDeclProxy> eventDeclListModifiable =
+        new ArrayList<EventDeclProxy>(eventDeclList);
+      mEventDeclList =
+        Collections.unmodifiableList(eventDeclListModifiable);
+    }
+    if (eventAliasList == null) {
+      mEventAliasList = Collections.emptyList();
+    } else {
+      final List<Proxy> eventAliasListModifiable =
+        new ArrayList<Proxy>(eventAliasList);
+      mEventAliasList =
+        Collections.unmodifiableList(eventAliasListModifiable);
+    }
+    if (componentList == null) {
+      mComponentList = Collections.emptyList();
+    } else {
+      final List<Proxy> componentListModifiable =
+        new ArrayList<Proxy>(componentList);
+      mComponentList =
+        Collections.unmodifiableList(componentListModifiable);
+    }
   }
 
   /**

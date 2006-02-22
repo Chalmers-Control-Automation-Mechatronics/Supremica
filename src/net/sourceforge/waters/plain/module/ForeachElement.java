@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   ForeachElement
 //###########################################################################
-//# $Id: ForeachElement.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: ForeachElement.java,v 1.3 2006-02-22 03:35:07 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -38,7 +38,7 @@ public abstract class ForeachElement
    * @param name The name of the new foreach construct.
    * @param range The range of the new foreach construct.
    * @param guard The guard of the new foreach construct, or <CODE>null</CODE>.
-   * @param body The body of the new foreach construct.
+   * @param body The body of the new foreach construct, or <CODE>null</CODE> if empty.
    */
   protected ForeachElement(final String name,
                            final SimpleExpressionProxy range,
@@ -48,10 +48,14 @@ public abstract class ForeachElement
     super(name);
     mRange = range;
     mGuard = guard;
-    final List<Proxy> bodyModifiable =
-      new ArrayList<Proxy>(body);
-    mBody =
-      Collections.unmodifiableList(bodyModifiable);
+    if (body == null) {
+      mBody = Collections.emptyList();
+    } else {
+      final List<Proxy> bodyModifiable =
+        new ArrayList<Proxy>(body);
+      mBody =
+        Collections.unmodifiableList(bodyModifiable);
+    }
   }
 
   /**

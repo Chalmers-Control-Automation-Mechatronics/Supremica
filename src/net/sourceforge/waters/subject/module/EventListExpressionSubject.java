@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   EventListExpressionSubject
 //###########################################################################
-//# $Id: EventListExpressionSubject.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: EventListExpressionSubject.java,v 1.3 2006-02-22 03:35:07 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -36,12 +36,16 @@ public abstract class EventListExpressionSubject
   //# Constructors
   /**
    * Creates a new event list expression.
-   * @param eventList The list of events of the new event list expression.
+   * @param eventList The list of events of the new event list expression, or <CODE>null</CODE> if empty.
    */
   protected EventListExpressionSubject(final Collection<? extends Proxy> eventList)
   {
-    mEventList = new ArrayListSubject<AbstractSubject>
-      (eventList, AbstractSubject.class);
+    if (eventList == null) {
+      mEventList = new ArrayListSubject<AbstractSubject>();
+    } else {
+      mEventList = new ArrayListSubject<AbstractSubject>
+        (eventList, AbstractSubject.class);
+    }
     mEventList.setParent(this);
   }
 

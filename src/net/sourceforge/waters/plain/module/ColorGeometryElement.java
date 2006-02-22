@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   ColorGeometryElement
 //###########################################################################
-//# $Id: ColorGeometryElement.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: ColorGeometryElement.java,v 1.3 2006-02-22 03:35:07 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -37,14 +37,18 @@ public final class ColorGeometryElement
   //# Constructors
   /**
    * Creates a new color geometry.
-   * @param colorSet The colour set of the new color geometry.
+   * @param colorSet The colour set of the new color geometry, or <CODE>null</CODE> if empty.
    */
   public ColorGeometryElement(final Collection<? extends Color> colorSet)
   {
-    final Set<Color> colorSetModifiable =
-      new HashSet<Color>(colorSet);
-    mColorSet =
-      Collections.unmodifiableSet(colorSetModifiable);
+    if (colorSet == null) {
+      mColorSet = Collections.emptySet();
+    } else {
+      final Set<Color> colorSetModifiable =
+        new HashSet<Color>(colorSet);
+      mColorSet =
+        Collections.unmodifiableSet(colorSetModifiable);
+    }
   }
 
   /**

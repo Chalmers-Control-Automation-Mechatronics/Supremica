@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   EventListExpressionElement
 //###########################################################################
-//# $Id: EventListExpressionElement.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: EventListExpressionElement.java,v 1.3 2006-02-22 03:35:07 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -33,14 +33,18 @@ public abstract class EventListExpressionElement
   //# Constructors
   /**
    * Creates a new event list expression.
-   * @param eventList The list of events of the new event list expression.
+   * @param eventList The list of events of the new event list expression, or <CODE>null</CODE> if empty.
    */
   protected EventListExpressionElement(final Collection<? extends Proxy> eventList)
   {
-    final List<Proxy> eventListModifiable =
-      new ArrayList<Proxy>(eventList);
-    mEventList =
-      Collections.unmodifiableList(eventListModifiable);
+    if (eventList == null) {
+      mEventList = Collections.emptyList();
+    } else {
+      final List<Proxy> eventListModifiable =
+        new ArrayList<Proxy>(eventList);
+      mEventList =
+        Collections.unmodifiableList(eventListModifiable);
+    }
   }
 
   /**

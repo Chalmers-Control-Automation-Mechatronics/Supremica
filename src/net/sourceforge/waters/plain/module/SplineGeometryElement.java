@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   SplineGeometryElement
 //###########################################################################
-//# $Id: SplineGeometryElement.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: SplineGeometryElement.java,v 1.3 2006-02-22 03:35:07 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -39,7 +39,7 @@ public final class SplineGeometryElement
   //# Constructors
   /**
    * Creates a new spline geometry.
-   * @param points The list of control points of the new spline geometry.
+   * @param points The list of control points of the new spline geometry, or <CODE>null</CODE> if empty.
    * @param kind The kind of the new spline geometry.
    */
   public SplineGeometryElement(final Collection<? extends Point2D> points,

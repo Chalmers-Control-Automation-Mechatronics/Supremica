@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   GraphSubject
 //###########################################################################
-//# $Id: GraphSubject.java,v 1.3 2005-12-03 21:30:42 robi Exp $
+//# $Id: GraphSubject.java,v 1.4 2006-02-22 03:35:07 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -46,8 +46,8 @@ public final class GraphSubject
    * Creates a new graph.
    * @param deterministic The determinism status of the new graph.
    * @param blockedEvents The list of blocked events of the new graph.
-   * @param nodes The set of nodes of the new graph.
-   * @param edges The list of edges of the new graph.
+   * @param nodes The set of nodes of the new graph, or <CODE>null</CODE> if empty.
+   * @param edges The list of edges of the new graph, or <CODE>null</CODE> if empty.
    */
   public GraphSubject(final boolean deterministic,
                       final LabelBlockProxy blockedEvents,
@@ -57,10 +57,18 @@ public final class GraphSubject
     mIsDeterministic = deterministic;
     mBlockedEvents = (LabelBlockSubject) blockedEvents;
     mBlockedEvents.setParent(this);
-    mNodes = new NodeSetSubject(nodes);
+    if (nodes == null) {
+      mNodes = new NodeSetSubject();
+    } else {
+      mNodes = new NodeSetSubject(nodes);
+    }
     mNodes.setParent(this);
-    mEdges = new ArrayListSubject<EdgeSubject>
-      (edges, EdgeSubject.class);
+    if (edges == null) {
+      mEdges = new ArrayListSubject<EdgeSubject>();
+    } else {
+      mEdges = new ArrayListSubject<EdgeSubject>
+        (edges, EdgeSubject.class);
+    }
     mEdges.setParent(this);
   }
 

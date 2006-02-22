@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   LabelBlockSubject
 //###########################################################################
-//# $Id: LabelBlockSubject.java,v 1.4 2006-02-16 04:06:18 robi Exp $
+//# $Id: LabelBlockSubject.java,v 1.5 2006-02-22 03:35:07 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -38,7 +38,7 @@ public final class LabelBlockSubject
   //# Constructors
   /**
    * Creates a new label block.
-   * @param eventList The list of events of the new label block.
+   * @param eventList The list of events of the new label block, or <CODE>null</CODE> if empty.
    * @param geometry The geometry of the new label block, or <CODE>null</CODE>.
    */
   public LabelBlockSubject(final Collection<? extends Proxy> eventList,

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   GraphElement
 //###########################################################################
-//# $Id: GraphElement.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: GraphElement.java,v 1.3 2006-02-22 03:35:07 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -43,8 +43,8 @@ public final class GraphElement
    * Creates a new graph.
    * @param deterministic The determinism status of the new graph.
    * @param blockedEvents The list of blocked events of the new graph.
-   * @param nodes The set of nodes of the new graph.
-   * @param edges The list of edges of the new graph.
+   * @param nodes The set of nodes of the new graph, or <CODE>null</CODE> if empty.
+   * @param edges The list of edges of the new graph, or <CODE>null</CODE> if empty.
    */
   public GraphElement(final boolean deterministic,
                       final LabelBlockProxy blockedEvents,
@@ -53,14 +53,22 @@ public final class GraphElement
   {
     mIsDeterministic = deterministic;
     mBlockedEvents = blockedEvents;
-    final Set<NodeProxy> nodesModifiable =
-      new NodeSetElement(nodes);
-    mNodes =
-      Collections.unmodifiableSet(nodesModifiable);
-    final List<EdgeProxy> edgesModifiable =
-      new ArrayList<EdgeProxy>(edges);
-    mEdges =
-      Collections.unmodifiableList(edgesModifiable);
+    if (nodes == null) {
+      mNodes = Collections.emptySet();
+    } else {
+      final Set<NodeProxy> nodesModifiable =
+        new NodeSetElement(nodes);
+      mNodes =
+        Collections.unmodifiableSet(nodesModifiable);
+    }
+    if (edges == null) {
+      mEdges = Collections.emptyList();
+    } else {
+      final List<EdgeProxy> edgesModifiable =
+        new ArrayList<EdgeProxy>(edges);
+      mEdges =
+        Collections.unmodifiableList(edgesModifiable);
+    }
   }
 
   /**

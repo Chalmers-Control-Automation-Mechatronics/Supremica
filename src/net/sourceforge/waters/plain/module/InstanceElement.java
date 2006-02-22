@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   InstanceElement
 //###########################################################################
-//# $Id: InstanceElement.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: InstanceElement.java,v 1.3 2006-02-22 03:35:07 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -39,7 +39,7 @@ public final class InstanceElement
    * Creates a new instance.
    * @param identifier The identifier defining the name of the new instance.
    * @param moduleName The module name of the new instance.
-   * @param bindingList The binding list of the new instance.
+   * @param bindingList The binding list of the new instance, or <CODE>null</CODE> if empty.
    */
   public InstanceElement(final IdentifierProxy identifier,
                          final String moduleName,
@@ -47,10 +47,14 @@ public final class InstanceElement
   {
     super(identifier);
     mModuleName = moduleName;
-    final List<ParameterBindingProxy> bindingListModifiable =
-      new ArrayList<ParameterBindingProxy>(bindingList);
-    mBindingList =
-      Collections.unmodifiableList(bindingListModifiable);
+    if (bindingList == null) {
+      mBindingList = Collections.emptyList();
+    } else {
+      final List<ParameterBindingProxy> bindingListModifiable =
+        new ArrayList<ParameterBindingProxy>(bindingList);
+      mBindingList =
+        Collections.unmodifiableList(bindingListModifiable);
+    }
   }
 
   /**

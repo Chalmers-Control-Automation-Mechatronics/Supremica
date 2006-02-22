@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.des
 //# CLASS:   ProductDESProxyFactory
 //###########################################################################
-//# $Id: ProductDESProxyFactory.java,v 1.4 2006-02-20 22:20:21 robi Exp $
+//# $Id: ProductDESProxyFactory.java,v 1.5 2006-02-22 03:35:07 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.des;
@@ -23,9 +23,12 @@ public interface ProductDESProxyFactory
    * @param name         The name of the new automaton.
    * @param kind         The kind (<I>plant</I>, <I>specification</I>, etc.)
    *                     of the new automaton.
-   * @param events       The event alphabet of the new automaton.
-   * @param states       The list of states of the new automaton.
-   * @param transitions  The list of transitions of the new automaton.
+   * @param events       The event alphabet of the new automaton,
+   *                     or <CODE>null</CODE> if empty.
+   * @param states       The list of states of the new automaton,
+   *                     or <CODE>null</CODE> if empty.
+   * @param transitions  The list of transitions of the new automaton,
+   *                     or <CODE>null</CODE> if empty.
    */
   public AutomatonProxy createAutomatonProxy
       (String name,
@@ -72,8 +75,10 @@ public interface ProductDESProxyFactory
    * @param name         The name of the new product DES.
    * @param location     The file location of the new product DES,
    *                     or <CODE>null</CODE>.
-   * @param events       The event alphabet of the new product DES.
-   * @param automata     The list of automata of the new product DES.
+   * @param events       The event alphabet of the new product DES,
+   *                     or <CODE>null</CODE> if empty.
+   * @param automata     The list of automata of the new product DES,
+   *                     or <CODE>null</CODE> if empty.
    */
   public ProductDESProxy createProductDESProxy
       (String name,
@@ -85,8 +90,10 @@ public interface ProductDESProxyFactory
    * Creates a new product DES using default values.
    * This method creates a product DES with a <CODE>null</CODE> file location.
    * @param name         The name of the new product DES.
-   * @param events       The event alphabet of the new product DES.
-   * @param automata     The list of automata of the new product DES.
+   * @param events       The event alphabet of the new product DES,
+   *                     or <CODE>null</CODE> if empty.
+   * @param automata     The list of automata of the new product DES,
+   *                     or <CODE>null</CODE> if empty.
    */
   public ProductDESProxy createProductDESProxy
       (String name,
@@ -106,7 +113,8 @@ public interface ProductDESProxyFactory
    * Creates a new state.
    * @param name         The name of the new state.
    * @param initial      The initial status of the new state.
-   * @param propositions The list of propositions of the new state.
+   * @param propositions The list of propositions of the new state,
+   *                     or <CODE>null</CODE> if empty.
    */
   public StateProxy createStateProxy
       (String name,

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   SplineGeometrySubject
 //###########################################################################
-//# $Id: SplineGeometrySubject.java,v 1.4 2006-02-16 04:06:18 robi Exp $
+//# $Id: SplineGeometrySubject.java,v 1.5 2006-02-22 03:35:07 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -43,13 +43,17 @@ public final class SplineGeometrySubject
   //# Constructors
   /**
    * Creates a new spline geometry.
-   * @param points The list of control points of the new spline geometry.
+   * @param points The list of control points of the new spline geometry, or <CODE>null</CODE> if empty.
    * @param kind The kind of the new spline geometry.
    */
   public SplineGeometrySubject(final Collection<? extends Point2D> points,
                                final SplineKind kind)
   {
-    mPoints = new CloningGeometryListSubject<Point2D>(points);
+    if (points == null) {
+      mPoints = new CloningGeometryListSubject<Point2D>();
+    } else {
+      mPoints = new CloningGeometryListSubject<Point2D>(points);
+    }
     mPoints.setParent(this);
     mKind = kind;
   }

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleTest
 //###########################################################################
-//# $Id: ModuleTest.java,v 1.4 2005-12-18 21:11:32 robi Exp $
+//# $Id: ModuleTest.java,v 1.5 2006-02-22 03:35:07 robi Exp $
 //###########################################################################
 
 
@@ -204,9 +204,8 @@ public abstract class ModuleTest extends JAXBTestCase<ModuleProxy>
     final String compname = "comp";
     final String modname = "emptyedge";
 
-    final List<Proxy> proxyList = Collections.emptyList();
     final EventListExpressionProxy props =
-      factory.createPlainEventListProxy(proxyList);
+      factory.createPlainEventListProxy(null);
     final SimpleNodeProxy node =
       factory.createSimpleNodeProxy("s0", props, true, null, null, null);
     final LabelBlockProxy labelblock = factory.createLabelBlockProxy();
@@ -221,13 +220,10 @@ public abstract class ModuleTest extends JAXBTestCase<ModuleProxy>
     final SimpleComponentProxy comp =
       factory.createSimpleComponentProxy(compident, ComponentKind.SPEC, graph);
 
-    final List<ParameterProxy> paramList = Collections.emptyList();
-    final List<AliasProxy> aliasList = Collections.emptyList();
-    final List<EventDeclProxy> eventList = Collections.emptyList();
     final List<SimpleComponentProxy> compList =
       Collections.singletonList(comp);
     final ModuleProxy module = factory.createModuleProxy
-      (modname, null, paramList, aliasList, eventList, proxyList, compList);
+      (modname, null, null, null, null, null, compList);
 
     testHandcraft("handwritten", module);
   }
@@ -241,9 +237,8 @@ public abstract class ModuleTest extends JAXBTestCase<ModuleProxy>
     final String compname = "comp";
     final String modname = "initarrow";
 
-    final List<Proxy> proxyList = Collections.emptyList();
     final EventListExpressionProxy props =
-      factory.createPlainEventListProxy(proxyList);
+      factory.createPlainEventListProxy(null);
     final Point2D point = new Point(48, 48);
     final PointGeometryProxy pointgeo =
       factory.createPointGeometryProxy(point);
@@ -255,21 +250,17 @@ public abstract class ModuleTest extends JAXBTestCase<ModuleProxy>
                                     pointgeo, arrowgeo, null);
     final LabelBlockProxy blocked = factory.createLabelBlockProxy();
     final List<SimpleNodeProxy> nodes = Collections.singletonList(node);
-    final List<EdgeProxy> edges = Collections.emptyList();
     final GraphProxy graph =
-      factory.createGraphProxy(true, blocked, nodes, edges);
+      factory.createGraphProxy(true, blocked, nodes, null);
     final IdentifierProxy compident =
       factory.createSimpleIdentifierProxy(compname);
     final SimpleComponentProxy comp =
       factory.createSimpleComponentProxy(compident, ComponentKind.SPEC, graph);
 
-    final List<ParameterProxy> paramList = Collections.emptyList();
-    final List<AliasProxy> aliasList = Collections.emptyList();
-    final List<EventDeclProxy> eventList = Collections.emptyList();
     final List<SimpleComponentProxy> compList =
       Collections.singletonList(comp);
     final ModuleProxy module = factory.createModuleProxy
-      (modname, null, paramList, aliasList, eventList, proxyList, compList);
+      (modname, null, null, null, null, null, compList);
 
     testHandcraft("handwritten", module);
   }
@@ -287,16 +278,15 @@ public abstract class ModuleTest extends JAXBTestCase<ModuleProxy>
     final EventDeclProxy decl = factory.createEventDeclProxy
       (eventname, EventKind.CONTROLLABLE);
 
-    final List<Proxy> proxyList = Collections.emptyList();
     final EventListExpressionProxy nprops =
-      factory.createPlainEventListProxy(proxyList);
+      factory.createPlainEventListProxy(null);
     final Point2D point = new Point(50, 50);
     final PointGeometryProxy pointgeo =
       factory.createPointGeometryProxy(point);
     final SimpleNodeProxy node =
       factory.createSimpleNodeProxy("s0", nprops, true, pointgeo, null, null);
     final EventListExpressionProxy gprops =
-      factory.createPlainEventListProxy(proxyList);
+      factory.createPlainEventListProxy(null);
     final Rectangle2D rect = new Rectangle(0, 0, 100, 100);
     final BoxGeometryProxy boxgeo = factory.createBoxGeometryProxy(rect);
     final List<SimpleNodeProxy> children = Collections.singletonList(node);
@@ -327,13 +317,11 @@ public abstract class ModuleTest extends JAXBTestCase<ModuleProxy>
     final SimpleComponentProxy comp =
       factory.createSimpleComponentProxy(compident, ComponentKind.SPEC, graph);
 
-    final List<ParameterProxy> paramList = Collections.emptyList();
-    final List<AliasProxy> aliasList = Collections.emptyList();
     final List<EventDeclProxy> eventList = Collections.singletonList(decl);
     final List<SimpleComponentProxy> compList =
       Collections.singletonList(comp);
     final ModuleProxy module = factory.createModuleProxy
-      (modname, null, paramList, aliasList, eventList, proxyList, compList);
+      (modname, null, null, null, eventList, null, compList);
 
     testHandcraft("handwritten", module);
   }

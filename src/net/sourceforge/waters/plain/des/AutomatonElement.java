@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.des
 //# CLASS:   AutomatonElement
 //###########################################################################
-//# $Id: AutomatonElement.java,v 1.3 2005-11-03 03:45:57 robi Exp $
+//# $Id: AutomatonElement.java,v 1.4 2006-02-22 03:35:07 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.des;
@@ -52,9 +52,12 @@ public final class AutomatonElement
    * @param  name         The name to be given to the new automaton.
    * @param  kind         The kind (<I>plant</I>, <I>specification</I>, etc.)
    *                      of the new automaton.
-   * @param  events       The event alphabet for the new automaton.
-   * @param  states       The state set for the new automaton.
-   * @param  transitions  The list of transitions for the new automaton.
+   * @param  events       The event alphabet for the new automaton,
+   *                      or <CODE>null</CODE> if empty.
+   * @param  states       The state set for the new automaton,
+   *                      or <CODE>null</CODE> if empty.
+   * @param  transitions  The list of transitions for the new automaton,
+   *                      or <CODE>null</CODE> if empty.
    * @throws DuplicateNameException to indicate that some state or event
    *                      name is used more than once.
    * @throws NameNotFoundException to indicate that some transition refers
@@ -70,15 +73,19 @@ public final class AutomatonElement
                    final Collection<? extends TransitionProxy> transitions)
   {
     super(name);
-    final EventSet eventscopy = new EventSet(events);
-    final StateSet statescopy = new StateSet(states);
+    final EventSet eventscopy =
+      events == null ? new EventSet() : new EventSet(events);
+    final StateSet statescopy =
+      states == null ? new StateSet() : new StateSet(states);
     final List<TransitionProxy> transitionscopy =
       new ArrayList<TransitionProxy>(transitions.size());
-    for (final TransitionProxy trans : transitions) {
-      statescopy.checkUnique(trans.getSource());
-      eventscopy.checkUnique(trans.getEvent());
-      statescopy.checkUnique(trans.getTarget());
-      transitionscopy.add(trans);
+    if (transitions != null) {
+      for (final TransitionProxy trans : transitions) {
+        statescopy.checkUnique(trans.getSource());
+        eventscopy.checkUnique(trans.getEvent());
+        statescopy.checkUnique(trans.getTarget());
+        transitionscopy.add(trans);
+      }
     }
     mKind = kind;
     mEvents = Collections.unmodifiableSet(eventscopy);
@@ -205,7 +212,11 @@ public final class AutomatonElement
   private class EventSet extends IndexedHashSet<EventProxy> {
 
     //#######################################################################
-    //# Constructor
+    //# Constructors
+    EventSet()
+    {
+    }
+
     EventSet(final Collection<? extends EventProxy> events)
       throws DuplicateNameException
     {
@@ -243,7 +254,11 @@ public final class AutomatonElement
   private class StateSet extends IndexedHashSet<StateProxy> {
 
     //#######################################################################
-    //# Constructor
+    //# Constructors
+    StateSet()
+    {
+    }
+
     StateSet(final Collection<? extends StateProxy> states)
       throws DuplicateNameException
     {

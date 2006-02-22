@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   LabelBlockElement
 //###########################################################################
-//# $Id: LabelBlockElement.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: LabelBlockElement.java,v 1.3 2006-02-22 03:35:07 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -37,7 +37,7 @@ public final class LabelBlockElement
   //# Constructors
   /**
    * Creates a new label block.
-   * @param eventList The list of events of the new label block.
+   * @param eventList The list of events of the new label block, or <CODE>null</CODE> if empty.
    * @param geometry The geometry of the new label block, or <CODE>null</CODE>.
    */
   public LabelBlockElement(final Collection<? extends Proxy> eventList,

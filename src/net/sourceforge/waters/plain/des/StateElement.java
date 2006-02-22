@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.des
 //# CLASS:   StateElement
 //###########################################################################
-//# $Id: StateElement.java,v 1.3 2005-11-03 03:45:57 robi Exp $
+//# $Id: StateElement.java,v 1.4 2006-02-22 03:35:07 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.des;
@@ -45,7 +45,8 @@ public final class StateElement
    * @param  name         The name to be given to the new state.
    * @param  initial      A flag indicating whether the new state is to be
    *                      an initial state.
-   * @param  propositions The initial list of propositions for the new state.
+   * @param  propositions The initial list of propositions for the new state,
+   *                      or <CODE>null</CODE> if empty.
    *                      Each element should be of type {@link EventElement}.
    */
   StateElement(final String name,
@@ -54,9 +55,13 @@ public final class StateElement
   {
     super(name);
     mIsInitial = initial;
-    final List<EventProxy> modifiable =
-      new ArrayList<EventProxy>(propositions);
-    mPropositions = Collections.unmodifiableList(modifiable);
+    if (propositions == null) {
+      mPropositions = Collections.emptyList();
+    } else {
+      final List<EventProxy> modifiable =
+        new ArrayList<EventProxy>(propositions);
+      mPropositions = Collections.unmodifiableList(modifiable);
+    }
   }
 
   /**
@@ -67,7 +72,7 @@ public final class StateElement
    */
   StateElement(final String name)
   {
-    this(name, false, emptyEventProxyList());
+    this(name, false, null);
   }
 
 
@@ -117,14 +122,6 @@ public final class StateElement
     } else {
       return false;
     }    
-  }
-
-
-  //#########################################################################
-  //# Auxiliary Methods
-  private static List<EventProxy> emptyEventProxyList()
-  {
-    return Collections.emptyList();
   }
 
 

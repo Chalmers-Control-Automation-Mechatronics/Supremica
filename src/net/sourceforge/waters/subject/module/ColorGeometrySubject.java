@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   ColorGeometrySubject
 //###########################################################################
-//# $Id: ColorGeometrySubject.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: ColorGeometrySubject.java,v 1.3 2006-02-22 03:35:07 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -39,11 +39,15 @@ public final class ColorGeometrySubject
   //# Constructors
   /**
    * Creates a new color geometry.
-   * @param colorSet The colour set of the new color geometry.
+   * @param colorSet The colour set of the new color geometry, or <CODE>null</CODE> if empty.
    */
   public ColorGeometrySubject(final Collection<? extends Color> colorSet)
   {
-    mColorSet = new NotCloningGeometrySetSubject<Color>(colorSet);
+    if (colorSet == null) {
+      mColorSet = new NotCloningGeometrySetSubject<Color>();
+    } else {
+      mColorSet = new NotCloningGeometrySetSubject<Color>(colorSet);
+    }
     mColorSet.setParent(this);
   }
 

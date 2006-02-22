@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   EventDeclElement
 //###########################################################################
-//# $Id: EventDeclElement.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: EventDeclElement.java,v 1.3 2006-02-22 03:35:07 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -44,7 +44,7 @@ public final class EventDeclElement
    * @param name The name of the new event declaration.
    * @param kind The kind of the new event declaration.
    * @param observable The observability status of the new event declaration.
-   * @param ranges The list of index ranges of the new event declaration.
+   * @param ranges The list of index ranges of the new event declaration, or <CODE>null</CODE> if empty.
    * @param colorGeometry The color information of the new event declaration, or <CODE>null</CODE>.
    */
   public EventDeclElement(final String name,
@@ -56,10 +56,14 @@ public final class EventDeclElement
     super(name);
     mKind = kind;
     mIsObservable = observable;
-    final List<SimpleExpressionProxy> rangesModifiable =
-      new ArrayList<SimpleExpressionProxy>(ranges);
-    mRanges =
-      Collections.unmodifiableList(rangesModifiable);
+    if (ranges == null) {
+      mRanges = Collections.emptyList();
+    } else {
+      final List<SimpleExpressionProxy> rangesModifiable =
+        new ArrayList<SimpleExpressionProxy>(ranges);
+      mRanges =
+        Collections.unmodifiableList(rangesModifiable);
+    }
     mColorGeometry = colorGeometry;
   }
 
