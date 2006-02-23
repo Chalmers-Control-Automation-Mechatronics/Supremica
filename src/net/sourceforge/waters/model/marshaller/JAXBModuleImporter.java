@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBModuleImporter
 //###########################################################################
-//# $Id: JAXBModuleImporter.java,v 1.6 2006-02-20 22:20:21 robi Exp $
+//# $Id: JAXBModuleImporter.java,v 1.7 2006-02-23 01:52:34 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -765,8 +765,7 @@ public class JAXBModuleImporter
       final LabelGeometryProxy geometry = importLabelGeometry(geometryElement);
       return mFactory.createLabelBlockProxy(eventList, geometry);
     } else {
-      final List<Proxy> eventList = Collections.emptyList();
-      return mFactory.createLabelBlockProxy(eventList, null);
+      return mFactory.createLabelBlockProxy(null, null);
     }
   }
 
