@@ -4,9 +4,11 @@ import java.util.*;
 import java.util.regex.*;
 import java.io.*;
 
-import org.supremica.log.*;
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.*;
+import org.supremica.gui.ActionMan;
+import org.supremica.gui.ScheduleDialog;
+import org.supremica.log.*;
 import org.supremica.util.ActionTimer;
 
 public class Milp 
@@ -56,16 +58,44 @@ public class Milp
 	private Hashtable<State,String> pathCutTable = null;
 
 	/** The timer */
-	ActionTimer timer = new ActionTimer();
+	private ActionTimer timer = new ActionTimer();
+
+	/** This boolean is true if the scheduler-thread should be (is) running */
+	private volatile boolean isRunning = false;
+
+	/** The dialog box that launched this scheduler */
+	private ScheduleDialog gui;
+
+	/** Decides if the schedule should be built */
+	private boolean buildSchedule;
 
 	/****************************************************************************************/
 	/*                                 CONSTUCTORS                                          */
 	/****************************************************************************************/
 
-	public Milp(Automata theAutomata) 
+	public Milp(Automata theAutomata, boolean buildSchedule, ScheduleDialog gui)
 		throws Exception
 	{
 		this.theAutomata = theAutomata;
+		this.buildSchedule = buildSchedule;
+		this.gui = gui;
+
+		Thread milpThread = new Thread(this);
+		isRunning = true;
+		milpThread.start();
+	}
+
+	public void run()
+	{
+		try 
+		{
+			schedule();
+		}
+		catch (Exception ex)
+		{
+			logger.error("Milp::schedule() -> " + ex);
+			logger.debug(ex.getStackTrace());
+		}
 	}
 
 
@@ -80,23 +110,43 @@ public class Milp
 	public void schedule()
 		throws Exception
 	{
-		try 
+		if (isRunning)
 		{
 			initialize();
+		}
 
-			// Converts automata to constraints that the MILP-solver takes as input (*.mod file)
+		// Converts automata to constraints that the MILP-solver takes as input (*.mod file)
+		if (isRunning)
+		{
 			convertAutomataToMilp();
+		}
 
-			// Calls the MILP-solver
+		// Calls the MILP-solver
+		if (isRunning)
+		{
 			callMilpSolver();
+		}
 
-			// Processes the output from the MILP-solver (*.sol file) and tores the optimal times for each state
+		// Processes the output from the MILP-solver (*.sol file) and stores the optimal times for each state
+		if (isRunning)
+		{
 			processSolutionFile();
 		}
-		catch (Exception e)
+
+		// Builds the optimal schedule (if solicited)
+		if (isRunning && buildSchedule)
 		{
-			logger.error("Milp::schedule() -> " + e);
-			logger.debug(e.getStackTrace());
+			buildScheduleAutomaton();
+		}
+
+		if (isRunning)
+		{
+			requestStop(true);
+		}
+		else
+		{
+			logger.warn("Scheduling interrupted");
+			gui.reset();
 		}
 	}
 
@@ -107,7 +157,7 @@ public class Milp
 	 *
 	 * @return the automaton representing the optimal schedule, as given by the MILP-solver
 	 */
-	public Automaton buildScheduleAutomaton() 
+	public void buildScheduleAutomaton() 
 		throws Exception
 	{	
 		timer.restart();
@@ -280,8 +330,8 @@ public class Milp
 
 		logger.info("OPTIMAL MAKESPAN: " + makespan + ".............................");
 		logger.info("Time to build the schedule: " + timer.elapsedTime() + "ms ");
-		
-		return schedule;
+
+		ActionMan.getGui().addAutomaton(schedule);
 	}
 
 
@@ -1020,6 +1070,8 @@ public class Milp
 	private void callMilpSolver()
 		throws Exception
 	{
+		logger.info("The MILP-solver started....");
+
 		// Defines the name of the .exe-file as well the arguments (.mod and .sol file names)
 		String[] cmds = new String[5];
 		cmds[0] = "C:\\Program Files\\glpk\\bin\\glpsol.exe";
@@ -1053,10 +1105,20 @@ public class Milp
 // 		if (milpProcess != null)
 // 			milpProcess.destroy();
 // 	}
-
+	
 	public void requestStop()
 	{
-		
+		requestStop(false);
+	}
+	
+	public void requestStop(boolean disposeGui)
+	{
+		isRunning = false;
+
+		if (disposeGui)
+		{
+			gui.done();
+		}
 	}
 
 	private State makeScheduleState(int[] stateIndices, boolean isInitial)

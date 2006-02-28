@@ -18,8 +18,9 @@ package org.supremica.automata.algorithms.scheduling;
 
 import java.util.*;
 
-import org.supremica.log.*;
 import org.supremica.automata.*;
+import org.supremica.gui.ScheduleDialog;
+import org.supremica.log.*;
 import org.supremica.util.ActionTimer;
 
 public class ModifiedAstar 
@@ -27,22 +28,22 @@ public class ModifiedAstar
 
 	private static Logger logger = LoggerFactory.createLogger(ModifiedAstar.class);
 
-    public ModifiedAstar(Automata theAutomata) 
+    public ModifiedAstar(Automata theAutomata, boolean buildSchedule, ScheduleDialog gui) 
 		throws Exception  
 	{
-		super(theAutomata, "1-product relax");
+		super(theAutomata, "1-product relax", buildSchedule, gui);
     }
 	
-    public ModifiedAstar(Automata theAutomata, String heuristic) 
+    public ModifiedAstar(Automata theAutomata, String heuristic, boolean buildSchedule, ScheduleDialog gui) 
 		throws Exception 
 	{
-		super(theAutomata, heuristic, true, false);
+		super(theAutomata, heuristic, true, false, buildSchedule, gui);
     }
 	
-    public ModifiedAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean iterativeSearch) 
+    public ModifiedAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean iterativeSearch, boolean buildSchedule, ScheduleDialog gui) 
 		throws Exception 
 	{
-		super(theAutomata, heuristic, manualExpansion, iterativeSearch);
+		super(theAutomata, heuristic, manualExpansion, iterativeSearch, buildSchedule, gui);
     }
 
 	protected void branch(int[] currNode) 

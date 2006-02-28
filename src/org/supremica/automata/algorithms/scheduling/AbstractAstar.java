@@ -17,8 +17,10 @@ package org.supremica.automata.algorithms.scheduling;
 
 import java.util.*;
 
-import org.supremica.log.*;
 import org.supremica.automata.*;
+import org.supremica.gui.ActionMan;
+import org.supremica.gui.ScheduleDialog;
+import org.supremica.log.*;
 import org.supremica.util.ActionTimer;
 
 public abstract class AbstractAstar 
@@ -147,6 +149,22 @@ public abstract class AbstractAstar
 	/** Stores the accepting node of the resulting schedule (with a reference to the ancestor node. */
 	private int[] acceptingNode = null;
 
+	/** This boolean is true if the scheduler-thread should be (is) running */
+	private volatile boolean isRunning = false;
+
+	/** The dialog box that launched this scheduler */
+	private ScheduleDialog gui;
+
+	/** Decides if the schedule should be built */
+	private boolean buildSchedule;
+
+	/** 
+	 * If this boolean is true, node expansion is done manually 
+	 * (i.e. not using Supremica's synchronization methods) 
+	 */
+	private boolean manualExpansion;
+
+
 	/****************************************************************************************/
 	/*                                 ABSTRACT METHODS                                     */
 	/****************************************************************************************/
@@ -161,34 +179,43 @@ public abstract class AbstractAstar
 	/****************************************************************************************/
 
  
-    public AbstractAstar(Automata theAutomata) 
+    public AbstractAstar(Automata theAutomata, boolean buildSchedule, ScheduleDialog gui)
 		throws Exception  
 	{
-		this(theAutomata, "1-product relax");
+		this(theAutomata, "1-product relax", buildSchedule, gui);
     }
 
-    public AbstractAstar(Automata theAutomata, String heuristic) throws Exception 
+    public AbstractAstar(Automata theAutomata, String heuristic, boolean buildSchedule, ScheduleDialog gui) 
+		throws Exception 
 	{
-		this(theAutomata, heuristic, true, false);
+		this(theAutomata, heuristic, true, false, buildSchedule, gui);
     }
 
-    public AbstractAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean iterativeSearch) 
+    public AbstractAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean iterativeSearch, boolean buildSchedule, ScheduleDialog gui) 
 		throws Exception 
 	{
 		this.theAutomata = theAutomata;
 		this.iterativeSearch = iterativeSearch;
 		this.heuristic = heuristic;
+		this.buildSchedule = buildSchedule;
+		this.gui = gui;
+		this.manualExpansion = manualExpansion;
 		
 		if (heuristic.equals("1-product relax"))
 			useOneProdRelax = true;
-		else if(heuristic.equals("2-product relax")) {
+		else if(heuristic.equals("2-product relax")) 
+		{
 			if (theAutomata.getPlantAutomata().size() < 3)
+			{
 				throw new Exception("2-product relax cannot be used for two or less products");
-			
+			}
+
 			useOneProdRelax = false;
 		}
 
-		init(manualExpansion);
+		Thread astarThread = new Thread(this);
+		isRunning = true;
+		astarThread.start();
     }
 
 
@@ -196,6 +223,40 @@ public abstract class AbstractAstar
 	/*                                 INIT METHODS                                         */
 	/****************************************************************************************/
 
+	public void run()
+	{
+		try {
+			if (isRunning)
+			{
+				init(manualExpansion);
+			}
+
+			if (isRunning)
+			{
+				schedule();
+			}
+
+			if (isRunning && buildSchedule)
+			{
+				buildScheduleAutomaton();
+			}
+
+			if (isRunning)
+			{
+				requestStop(true);
+			}
+			else
+			{
+				logger.warn("Scheduling interrupted");
+				gui.reset();
+			}
+		}
+		catch (Exception ex)
+		{
+			logger.error("A_star::schedule() -> " + ex);
+			logger.debug(ex.getStackTrace());
+		}
+	}
 
     protected void init(boolean manualExpansion) 
 		throws Exception
@@ -272,6 +333,17 @@ public abstract class AbstractAstar
 
 	public void requestStop()
 	{
+		requestStop(false);
+	}
+	
+	public void requestStop(boolean disposeGui)
+	{
+		isRunning = false;
+
+		if (disposeGui)
+		{
+			gui.done();
+		}
 	}
 
 
@@ -316,28 +388,35 @@ public abstract class AbstractAstar
 
 			while(! openTree.isEmpty())
 			{
-				iterationCounter++;
+				if (isRunning)
+				{
+					iterationCounter++;
 				
-				// Records the maximum size of the openTree
-				int currOpenSize = openTree.size();
-				if (currOpenSize > maxOpenSize)
-					maxOpenSize = currOpenSize;
+					// Records the maximum size of the openTree
+					int currOpenSize = openTree.size();
+					if (currOpenSize > maxOpenSize)
+						maxOpenSize = currOpenSize;
 				
-				// Removes the first node on OPEN. If it is accepting, the search is completed
-				currNode = openTree.first();
+					// Removes the first node on OPEN. If it is accepting, the search is completed
+					currNode = openTree.first();
 
-				if (isAcceptingNode(currNode))
-					break;
+					if (isAcceptingNode(currNode))
+						break;
 				
-				boolean succesfullyRemoved =  openTree.remove(currNode);
-				if (! succesfullyRemoved)
-					throw new Exception("The node " + printNodeName(currNode) + " was not found on the openTree");
+					boolean succesfullyRemoved =  openTree.remove(currNode);
+					if (! succesfullyRemoved)
+						throw new Exception("The node " + printNodeName(currNode) + " was not found on the openTree");
 				
-				// If the node is not accepting, it goes to the CLOSED tree if there is not a node there already
-				// that represents the same logical state and is better than the current node in all 
-				// "aspects" (lower cost in all directions). If the current node is promising (if it ends up on CLOSED),
-				// its successors are found and put on the OPEN tree. 
-				branch(currNode);
+					// If the node is not accepting, it goes to the CLOSED tree if there is not a node there already
+					// that represents the same logical state and is better than the current node in all 
+					// "aspects" (lower cost in all directions). If the current node is promising (if it ends up on CLOSED),
+					// its successors are found and put on the OPEN tree. 
+					branch(currNode);
+				}
+				else
+				{
+					return;
+				}
 			}
 
 			if (currNode == null || ! isAcceptingNode(currNode))
@@ -814,7 +893,7 @@ public abstract class AbstractAstar
 	 * @param int[] currNode - the accepting node that makes it possible to build the schedule backwards
 	 * @return Automaton schedule - the resulting schedule
 	 */
-    public Automaton buildScheduleAutomaton() 
+    public void buildScheduleAutomaton() 
 		throws Exception
 	{
 		timer.restart();
@@ -832,19 +911,26 @@ public abstract class AbstractAstar
 	    {
 			try
 		    {
-				int[] parent = getParent(currNode);
-				State currState = new State(printNodeSignature(parent) + "; firing time = " + currNode[ACCUMULATED_COST_INDEX]);
-				LabeledEvent event = findCurrentEvent(parent, currNode);
+				if (isRunning)
+				{
+					int[] parent = getParent(currNode);
+					State currState = new State(printNodeSignature(parent) + "; firing time = " + currNode[ACCUMULATED_COST_INDEX]);
+					LabeledEvent event = findCurrentEvent(parent, currNode);
 			
-				if (!hasParent(parent))
-					currState.setInitial(true);
+					if (!hasParent(parent))
+						currState.setInitial(true);
 			
-				scheduleAuto.addState(currState);
-				scheduleAuto.getAlphabet().addEvent(event);
-				scheduleAuto.addArc(new Arc(currState, nextState, event));
+					scheduleAuto.addState(currState);
+					scheduleAuto.getAlphabet().addEvent(event);
+					scheduleAuto.addArc(new Arc(currState, nextState, event));
 			
-				currNode = parent;
-				nextState = currState;
+					currNode = parent;
+					nextState = currState;
+				}
+				else
+				{
+					return;
+				}
 		    }
 			catch (Exception ex)
 		    {
@@ -857,7 +943,7 @@ public abstract class AbstractAstar
 		
 		logger.info("The schedule automaton was built in " + timer.elapsedTime() + " ms");
 		
-		return scheduleAuto;
+		ActionMan.getGui().addAutomaton(scheduleAuto);
     }
    
 	/**

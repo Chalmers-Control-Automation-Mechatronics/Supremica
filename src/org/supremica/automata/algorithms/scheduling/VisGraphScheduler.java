@@ -4,9 +4,10 @@ import java.util.*;
 import javax.swing.*;
 import java.awt.*;
 
-import org.supremica.log.*;
 import org.supremica.automata.*;
+import org.supremica.gui.ScheduleDialog;
 import org.supremica.gui.VisGraphDrawer;
+import org.supremica.log.*;
 import org.supremica.util.ActionTimer;
 
 public class VisGraphScheduler 
@@ -46,26 +47,94 @@ public class VisGraphScheduler
 	/** The index mapping handler */
 	private AutomataIndexMap indexMap;
 
-	public VisGraphScheduler(Automata theAutomata, boolean toDrawVisibilityGraph)
+	/** This boolean is true if the scheduler-thread should be (is) running */
+	private volatile boolean isRunning = false;
+
+	/** The dialog box that launched this scheduler */
+	private ScheduleDialog gui;
+
+	public VisGraphScheduler (Automata robots, Automata zones, boolean toDrawVisibilityGraph)
 		throws Exception
 	{
-		this(theAutomata.getPlantAutomata(), theAutomata.getSpecificationAutomata(), toDrawVisibilityGraph);
+		this(robots, zones, toDrawVisibilityGraph, null);
 	}
 
-	public VisGraphScheduler(Automata robots, Automata zones, boolean toDrawVisibilityGraph)
+	public VisGraphScheduler (Automata theAutomata, boolean toDrawVisibilityGraph, ScheduleDialog gui)
+		throws Exception
+	{
+		this(theAutomata.getPlantAutomata(), theAutomata.getSpecificationAutomata(), toDrawVisibilityGraph, gui);
+	}
+
+	public VisGraphScheduler (Automata robots, Automata zones, boolean toDrawVisibilityGraph, ScheduleDialog gui)
 		throws Exception
 	{
 		this.toDrawVisibilityGraph = toDrawVisibilityGraph;
 
 		this.robots = robots;
 		this.zones = zones;
+		this.gui = gui;
 
-		timer.restart();
+		Thread vgThread = new Thread(this);
+		isRunning = true;
+		vgThread.start();	
+	}
 
-		extractGraphTimes();
-		init();
+	public void run()
+	{
+		try 
+		{
+			if (isRunning)
+			{
+				timer.restart();
+				extractGraphTimes();
 
-		//		logger.info("Preprocessing in " + timer.elapsedTime() + "ms");
+				// If the call came from GUI, print the preprocessing time
+				if (gui != null)
+				{
+					logger.info("Preprocessing in " + timer.elapsedTime() + "ms");
+				}
+			}
+
+			if (isRunning)
+			{
+				init();
+			}
+
+			if (isRunning)
+			{
+				schedule();
+			}
+
+			if (isRunning && toDrawVisibilityGraph)
+			{
+				timer.restart();
+				drawVisibilityGraph(500, 500);
+
+				// If the call came from GUI, print the time needed to draw the graph
+				if (gui != null)
+				{
+					logger.info("The visibility graph painted in " + timer.elapsedTime() + "ms");
+				}
+			}	
+
+			if (gui != null)
+			{
+				if (isRunning)
+				{
+					requestStop(true);
+				}
+				else
+				{
+					logger.warn("Scheduling interrupted");
+					gui.reset();
+				}
+			}
+		}
+		catch (Exception ex)
+		{
+			logger.error("Visibility Graph::schedule() -> " + ex);
+			logger.debug(ex.getStackTrace());
+		}
 	}
 
 	public void schedule()
@@ -82,25 +151,30 @@ public class VisGraphScheduler
 
 		while (! openTree.isEmpty())
 		{
-			currNode = openTree.first();
-
-			if (isAcceptingNode(currNode))
+			if (isRunning)
 			{
-// 				logger.info("OPTIMAL SOLUTION.......... " + currNode[G_INDEX] + " in time " + timer.elapsedTime() + "ms");
-				closedTree.put(new Double(currNode[SELF_INDEX]), currNode);
-				break;
+				currNode = openTree.first();
+
+				if (isAcceptingNode(currNode))
+				{
+					// If the algorithm was called from the GUI, print the optimal time value there
+					if (gui != null)
+					{
+						logger.info("OPTIMAL SOLUTION.......... " + currNode[G_INDEX] + " in time " + timer.elapsedTime() + "ms");
+					}
+
+					closedTree.put(new Double(currNode[SELF_INDEX]), currNode);
+					break;
+				}
+
+				openTree.remove(currNode);
+
+				branch(currNode);
 			}
-
-			openTree.remove(currNode);
-
-			branch(currNode);
-		}
-		
-		if (toDrawVisibilityGraph)
-		{
-			timer.restart();
-			drawVisibilityGraph(500, 500);
-// 			logger.info("The visibility graph painted in " + timer.elapsedTime() + "ms");
+			else
+			{
+				return;
+			}
 		}
 	}
 
@@ -141,15 +215,9 @@ public class VisGraphScheduler
 		return closedTree.get(new Double(vertices.size() - 1))[G_INDEX];
 	}
 
-	public Automaton buildScheduleAutomaton()
+	public void buildScheduleAutomaton()
 		throws Exception
-	{	
-		return null;
-	}
-
-	public void requestStop()
 	{
-		
 	}
 
 	private void branch(double[] currNode)
@@ -202,33 +270,43 @@ public class VisGraphScheduler
 
 			while (! currState.isAccepting())
 			{
-				if (currState.nbrOfOutgoingArcs() > 1)
-					throw new Exception("Visibility Graph cannot handle alternative routing. State " + currState.getName() + " has several outgoing arcs.");
-				currTime += currState.getCost();
-
-				Arc currArc = (Arc) currState.outgoingArcsIterator().next();
-				LabeledEvent currEvent = currArc.getEvent();
-
-				for (int j=0; j<zones.size(); j++)
+				if (isRunning)
 				{
-					Automaton currZone = zones.getAutomatonAt(j);
-
-					if (currZone.getAlphabet().contains(currEvent))
+					if (currState.nbrOfOutgoingArcs() > 1)
 					{
-						if (currZone.getInitialState().activeEvents(false).contains(currEvent))
+						throw new Exception("Visibility Graph cannot handle alternative routing. State " + currState.getName() + " has several outgoing arcs.");
+					}
+
+					currTime += currState.getCost();
+
+					Arc currArc = (Arc) currState.outgoingArcsIterator().next();
+					LabeledEvent currEvent = currArc.getEvent();
+
+					for (int j=0; j<zones.size(); j++)
+					{
+						Automaton currZone = zones.getAutomatonAt(j);
+
+						if (currZone.getAlphabet().contains(currEvent))
 						{
-							zoneBoundaryTimes[i].put(new Integer(j), new double[]{currTime, -1});
-						}
-						else
-						{
-							double[] currTimePair = zoneBoundaryTimes[i].get(new Integer(j));
-							currTimePair[1] = currTime;
-							zoneBoundaryTimes[i].put(new Integer(j), currTimePair);
+							if (currZone.getInitialState().activeEvents(false).contains(currEvent))
+							{
+								zoneBoundaryTimes[i].put(new Integer(j), new double[]{currTime, -1});
+							}
+							else
+							{
+								double[] currTimePair = zoneBoundaryTimes[i].get(new Integer(j));
+								currTimePair[1] = currTime;
+								zoneBoundaryTimes[i].put(new Integer(j), currTimePair);
+							}
 						}
 					}
-				}
 
-				currState = currArc.getToState();
+					currState = currArc.getToState();
+				}
+				else 
+				{
+					return;
+				}
 			}
 
 			goalTimes[i] = currTime;
@@ -282,6 +360,21 @@ public class VisGraphScheduler
 		closedTree = new TreeMap<Double, double[]>();
 	}
 
+	public void requestStop()
+	{
+		requestStop(false);
+	}
+	
+	public void requestStop(boolean disposeGui)
+	{
+		isRunning = false;
+
+		if (disposeGui)
+		{
+			gui.done();
+		}
+	}
+
 	private double calcDistance(double[] start, double[] goal)
 	{
 		return Math.max(goal[0] - start[0], goal[1] - start[1]);
@@ -295,19 +388,33 @@ public class VisGraphScheduler
 		drawer.setXYRange(goalTimes);
 		for (int j=0; j<zones.size(); j++)
 		{
-			drawer.addZone(zoneBoundaryTimes[0].get(new Integer(j)), zoneBoundaryTimes[1].get(new Integer(j)), zones.getAutomatonAt(j).getName());
+			if (isRunning)
+			{
+				drawer.addZone(zoneBoundaryTimes[0].get(new Integer(j)), zoneBoundaryTimes[1].get(new Integer(j)), zones.getAutomatonAt(j).getName());
+			}
+			else
+			{
+				return;
+			}
 		}
 
 		double[] currNode = closedTree.get(new Double(vertices.size() - 1));
 		while (! isInitialNode(currNode))
 		{
-			// The drawing of the optimal solution
-			double[] pathEndVertex = vertices.get((int) currNode[SELF_INDEX]);
+			if (isRunning)
+			{
+				// The drawing of the optimal solution
+				double[] pathEndVertex = vertices.get((int) currNode[SELF_INDEX]);
 
-			currNode = closedTree.get(new Double(currNode[PARENT_INDEX]));
-			double[] pathStartVertex = vertices.get((int) currNode[SELF_INDEX]);
+				currNode = closedTree.get(new Double(currNode[PARENT_INDEX]));
+				double[] pathStartVertex = vertices.get((int) currNode[SELF_INDEX]);
 
-			drawer.addPath(pathStartVertex, pathEndVertex);
+				drawer.addPath(pathStartVertex, pathEndVertex);
+			}
+			else
+			{
+				return;
+			}
 		}
 	}
 

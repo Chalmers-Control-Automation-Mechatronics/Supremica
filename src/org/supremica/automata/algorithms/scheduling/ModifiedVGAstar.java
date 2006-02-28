@@ -2,8 +2,9 @@ package org.supremica.automata.algorithms.scheduling;
 
 import java.util.*;
 
-import org.supremica.log.*;
 import org.supremica.automata.*;
+import org.supremica.gui.ScheduleDialog;
+import org.supremica.log.*;
 
 
 /**
@@ -23,20 +24,28 @@ public class ModifiedVGAstar
     ArrayList<int[]> logClosedList = new ArrayList<int[]>();
     ArrayList<int[]> logDiscardedList = new ArrayList<int[]>();
 
-    public ModifiedVGAstar(Automata theAutomata) throws Exception  {
-		super(theAutomata, "1-product relax");
+    public ModifiedVGAstar(Automata theAutomata, boolean buildSchedule, ScheduleDialog gui) 
+		throws Exception  
+	{
+		super(theAutomata, "1-product relax", buildSchedule, gui);
     }
     
-    public ModifiedVGAstar(Automata theAutomata, String heuristic) throws Exception {
-		super(theAutomata, heuristic, true, false);
+    public ModifiedVGAstar(Automata theAutomata, String heuristic, boolean buildSchedule, ScheduleDialog gui) 
+		throws Exception 
+	{
+		super(theAutomata, heuristic, true, false, buildSchedule, gui);
     }
 
-    public ModifiedVGAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean iterativeSearch) throws Exception {
-		super(theAutomata, heuristic, manualExpansion, iterativeSearch);
+    public ModifiedVGAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean iterativeSearch, boolean buildSchedule, ScheduleDialog gui) 
+		throws Exception 
+	{
+		super(theAutomata, heuristic, manualExpansion, iterativeSearch, buildSchedule, gui);
     }
 
-    public ModifiedVGAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean drawVisGraph, boolean iterativeSearch) throws Exception {
-		super(theAutomata, heuristic, manualExpansion, iterativeSearch);
+    public ModifiedVGAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean drawVisGraph, boolean iterativeSearch, boolean buildSchedule, ScheduleDialog gui) 
+		throws Exception 
+	{
+		super(theAutomata, heuristic, manualExpansion, iterativeSearch, buildSchedule, gui);
 
 		if (drawVisGraph)
 			vgBuilder.drawVisGraph();

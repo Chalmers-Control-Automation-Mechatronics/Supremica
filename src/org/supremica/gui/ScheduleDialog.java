@@ -5,6 +5,7 @@ package org.supremica.gui;
 import javax.swing.*;
 import java.awt.GridLayout;
 import java.awt.BorderLayout;
+import java.awt.event.*;
 
 import org.supremica.log.*;
 import org.supremica.automata.*;
@@ -26,6 +27,10 @@ public class ScheduleDialog
     private JCheckBox nodeExpander, buildAutomaton, vgDrawer;
     private int memoryCapacity;
     private JTextField memoryCapacityField;
+	private JButton okButton, cancelButton;
+
+	Scheduler sched = null;
+	public Thread milpThread = null;
 
     public ScheduleDialog()
     {
@@ -37,25 +42,8 @@ public class ScheduleDialog
 		super(frame, "Schedule Selected Automata", true);
 	
 		/******** Base components of the dialog ***********/
-		JButton okButton = new JButton("Ok");
-	
-		okButton.addActionListener(new java.awt.event.ActionListener()
-			{
-				public void actionPerformed(java.awt.event.ActionEvent e)
-				{
-					doit();
-				}
-			});
-	
-		JButton cancelButton = new JButton("Cancel");
-	
-		cancelButton.addActionListener(new java.awt.event.ActionListener()
-			{
-				public void actionPerformed(java.awt.event.ActionEvent e)
-				{
-					done();
-				}
-			});
+		okButton = new JButton("Schedule");
+		cancelButton = new JButton("Cancel");
 	
 		JLabel optiMethodsLabel = new JLabel("Optimization methods: \t \t");
 		optiMethodsBox = new JComboBox(optiMethodNames);
@@ -65,7 +53,7 @@ public class ScheduleDialog
 	
 		nodeExpander = new JCheckBox("use AK's node expander", true);
 		buildAutomaton = new JCheckBox("build schedule", true); 
-		vgDrawer = new JCheckBox("Draw Visibility Graph", false);
+		vgDrawer = new JCheckBox("Draw Visibility Graph", true);
 
 		memoryCapacityField = new JTextField("300", 10);
 	
@@ -120,6 +108,52 @@ public class ScheduleDialog
 
 		Utility.setDefaultButton(this, okButton);
 		Utility.setupDialog(this, 300, 250);
+
+		/************* Event Handlers ****************/
+		okButton.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					doit();
+				}
+			});
+	
+		cancelButton.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					if (sched != null)
+					{
+						sched.requestStop();
+					}
+					else
+					{
+						done();
+					}
+						
+				}
+			});
+
+		optiMethodsBox.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					if (((String)optiMethodsBox.getSelectedItem()).contains("A*"))
+					{
+						heuristicsBox.setEnabled(true);
+
+// 						heuristicsBox.removeAllItems();
+// 						for (String heuristic : heuristicsNames)
+// 						{
+// 							heuristicsBox.addItem(heuristic);
+// 						}
+					}
+					else
+					{
+						heuristicsBox.setEnabled(false);
+					}
+				}
+			}); 
     }
 
     /**
@@ -130,26 +164,26 @@ public class ScheduleDialog
     {
 		try 
 		{
+			cancelButton.setText("Stop");
+			okButton.setEnabled(false);
+
 			readMemoryCapacity();
-			
-			Scheduler sched;
 			
 			if (optiMethodsBox.getSelectedItem().equals(MODIFIED_A_STAR))
 			{
-				sched = new ModifiedAstar(ActionMan.getGui().getSelectedAutomata(), (String) heuristicsBox.getSelectedItem(), nodeExpander.isSelected(), false);
+				sched = new ModifiedAstar(ActionMan.getGui().getSelectedAutomata(), (String) heuristicsBox.getSelectedItem(), nodeExpander.isSelected(), false, buildAutomaton.isSelected(), this);
 			}
 			else if (optiMethodsBox.getSelectedItem().equals(MODIFIED_VGA_STAR))
 			{
-				sched = new ModifiedVGAstar(ActionMan.getGui().getSelectedAutomata(), (String) heuristicsBox.getSelectedItem(), nodeExpander.isSelected(), vgDrawer.isSelected(), false);
+				sched = new ModifiedVGAstar(ActionMan.getGui().getSelectedAutomata(), (String) heuristicsBox.getSelectedItem(), nodeExpander.isSelected(), vgDrawer.isSelected(), false, buildAutomaton.isSelected(), this);
 			}
 			else if (optiMethodsBox.getSelectedItem().equals(MILP))
 			{
-				sched = new Milp(ActionMan.getGui().getSelectedAutomata());
+				sched = new Milp(ActionMan.getGui().getSelectedAutomata(), buildAutomaton.isSelected(), this);
 			}
 			else if (optiMethodsBox.getSelectedItem().equals(VIS_GRAPH))
 			{
-				sched = new VisGraphScheduler(ActionMan.getGui().getSelectedAutomata(), vgDrawer.isSelected());
-				buildAutomaton.setSelected(false);
+				sched = new VisGraphScheduler(ActionMan.getGui().getSelectedAutomata(), vgDrawer.isSelected(), this);
 			}
 // 			else if (optiMethodsBox.getSelectedItem().equals("Modified IDA*"))
 // 				throw new Exception("IMA* not implemented yet...");
@@ -158,29 +192,18 @@ public class ScheduleDialog
 // 				throw new Exception("SMA* not implemented yet...");
 			else 
 				throw new Exception("Unknown optimization method");
-
-
-			sched.schedule();
-						
-			if (buildAutomaton.isSelected()) 
-			{
-				Automaton schedule = sched.buildScheduleAutomaton();
-				ActionMan.getGui().addAutomaton(schedule);	
-			}
 		}
 		catch (Exception excp) 
 		{
 			logger.error("ScheduleDialog::doit " + excp);
 			logger.debug(excp.getStackTrace());
 		}
-		
-		done();
     }
     
     /**
      *      Terminates the Schedule Dialog.
      */
-    void done()
+    public void done()
     {
 		setVisible(false);
 		dispose();
@@ -190,4 +213,15 @@ public class ScheduleDialog
     void readMemoryCapacity() {
 		memoryCapacity = (int) (new Integer(memoryCapacityField.getText()));
     }
+
+	/**
+	 * Resets the buttons and the scheduler-instance
+	 */
+	public void reset()
+	{
+		cancelButton.setText("Cancel");
+		okButton.setEnabled(true);
+
+		sched = null;
+	}
 }
