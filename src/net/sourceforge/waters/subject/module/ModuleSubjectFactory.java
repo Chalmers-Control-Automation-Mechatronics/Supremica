@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   ModuleSubjectFactory
 //###########################################################################
-//# $Id: ModuleSubjectFactory.java,v 1.5 2006-02-22 03:35:07 robi Exp $
+//# $Id: ModuleSubjectFactory.java,v 1.6 2006-03-02 12:12:49 martin Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -19,6 +19,7 @@ import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.UnaryOperator;
 import net.sourceforge.waters.model.module.AliasProxy;
+import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.BoxGeometryProxy;
 import net.sourceforge.waters.model.module.ColorGeometryProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
@@ -26,6 +27,7 @@ import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
 import net.sourceforge.waters.model.module.ExpressionProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
+import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
@@ -37,6 +39,7 @@ import net.sourceforge.waters.model.module.PointGeometryProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.SplineGeometryProxy;
+import net.sourceforge.waters.model.module.VariableProxy;
 
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
@@ -88,6 +91,16 @@ public class ModuleSubjectFactory
   }
 
   /**
+   * Creates a new boolean constant.
+   * @param value The boolean value of the new boolean constant.
+   */
+  public BooleanConstantSubject createBooleanConstantProxy
+      (final boolean value)
+  {
+    return new BooleanConstantSubject(value);
+  }
+
+  /**
    * Creates a new box geometry.
    * @param rectangle The rectangle of the new box geometry.
    */
@@ -122,6 +135,7 @@ public class ModuleSubjectFactory
    * @param source The source node of the new edge.
    * @param target The target node of the new edge.
    * @param labelBlock The label block of the new edge.
+   * @param guardActionBlock The guard action block of the new edge, or <CODE>null</CODE>.
    * @param geometry The rendering information of the new edge, or <CODE>null</CODE>.
    * @param startPoint The rendering information for the start point of the new edge, or <CODE>null</CODE>.
    * @param endPoint The rendering information for the end point of the new edge, or <CODE>null</CODE>.
@@ -130,6 +144,7 @@ public class ModuleSubjectFactory
       (final NodeProxy source,
        final NodeProxy target,
        final LabelBlockProxy labelBlock,
+       final GuardActionBlockProxy guardActionBlock,
        final SplineGeometryProxy geometry,
        final PointGeometryProxy startPoint,
        final PointGeometryProxy endPoint)
@@ -137,6 +152,7 @@ public class ModuleSubjectFactory
     return new EdgeSubject(source,
                            target,
                            labelBlock,
+                           guardActionBlock,
                            geometry,
                            startPoint,
                            endPoint);
@@ -145,6 +161,7 @@ public class ModuleSubjectFactory
   /**
    * Creates a new edge using default values.
    * This method creates an edge with
+   * the guard action block set to <CODE>null</CODE>,
    * the rendering information set to <CODE>null</CODE>,
    * the rendering information for the start point set to <CODE>null</CODE>, and
    * the rendering information for the end point set to <CODE>null</CODE>.
@@ -426,6 +443,34 @@ public class ModuleSubjectFactory
   }
 
   /**
+   * Creates a new guard action block.
+   * @param guard The guard of the new guard action block, or <CODE>null</CODE>.
+   * @param actionList The action list of the new guard action block.
+   * @param geometry The geometry of the new guard action block, or <CODE>null</CODE>.
+   */
+  public GuardActionBlockSubject createGuardActionBlockProxy
+      (final String guard,
+       final Collection<? extends BinaryExpressionProxy> actionList,
+       final LabelGeometryProxy geometry)
+  {
+    return new GuardActionBlockSubject(guard,
+                                       actionList,
+                                       geometry);
+  }
+
+  /**
+   * Creates a new guard action block using default values.
+   * This method creates a guard action block with
+   * the guard set to <CODE>null</CODE>,
+   * an empty action list, and
+   * the geometry set to <CODE>null</CODE>.
+   */
+  public GuardActionBlockSubject createGuardActionBlockProxy()
+  {
+    return new GuardActionBlockSubject();
+  }
+
+  /**
    * Creates a new indexed identifier.
    * @param name The name of the new indexed identifier.
    * @param indexes The list of array indexes of the new indexed identifier, or <CODE>null</CODE> if empty.
@@ -697,6 +742,27 @@ public class ModuleSubjectFactory
    * @param identifier The identifier defining the name of the new simple component.
    * @param kind The kind of the new simple component.
    * @param graph The graph of the new simple component.
+   * @param variables The variables of the new simple component.
+   */
+  public SimpleComponentSubject createSimpleComponentProxy
+      (final IdentifierProxy identifier,
+       final ComponentKind kind,
+       final GraphProxy graph,
+       final Collection<? extends VariableProxy> variables)
+  {
+    return new SimpleComponentSubject(identifier,
+                                      kind,
+                                      graph,
+                                      variables);
+  }
+
+  /**
+   * Creates a new simple component using default values.
+   * This method creates a simple component with
+   * an empty variables.
+   * @param identifier The identifier defining the name of the new simple component.
+   * @param kind The kind of the new simple component.
+   * @param graph The graph of the new simple component.
    */
   public SimpleComponentSubject createSimpleComponentProxy
       (final IdentifierProxy identifier,
@@ -796,6 +862,22 @@ public class ModuleSubjectFactory
   {
     return new UnaryExpressionSubject(operator,
                                       subTerm);
+  }
+
+  /**
+   * Creates a new variable.
+   * @param name The name of the new variable.
+   * @param type The type of the new variable.
+   * @param initialValue The initial value of the new variable.
+   */
+  public VariableSubject createVariableProxy
+      (final String name,
+       final SimpleExpressionProxy type,
+       final SimpleExpressionProxy initialValue)
+  {
+    return new VariableSubject(name,
+                               type,
+                               initialValue);
   }
 
 

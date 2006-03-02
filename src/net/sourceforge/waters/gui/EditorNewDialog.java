@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorNewDialog
 //###########################################################################
-//# $Id: EditorNewDialog.java,v 1.4 2005-11-03 01:24:15 robi Exp $
+//# $Id: EditorNewDialog.java,v 1.5 2006-03-02 12:12:49 martin Exp $
 //###########################################################################
 
 
@@ -124,6 +124,7 @@ public class EditorNewDialog
 			}
 			final LabelBlockSubject blocked = new LabelBlockSubject();
 			final GraphSubject graph = new GraphSubject(blocked);
+			
 			final SimpleComponentSubject comp =
 				new SimpleComponentSubject(ident, kind, graph);
 			//TODO: Make this create the component

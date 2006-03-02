@@ -100,6 +100,7 @@ public class ProjectBuildFromWaters
 		}
 		catch (Exception ex)
 		{
+			ex.printStackTrace();
 			logger.error("Exception - Failed to compile: " + ex.getMessage(), ex);
 		}
 

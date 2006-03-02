@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBModuleImporter
 //###########################################################################
-//# $Id: JAXBModuleImporter.java,v 1.7 2006-02-23 01:52:34 robi Exp $
+//# $Id: JAXBModuleImporter.java,v 1.8 2006-03-02 12:12:50 martin Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -30,6 +30,11 @@ import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.expr.UnaryOperator;
+//EFA-----------
+import net.sourceforge.waters.model.module.GuardActionBlockProxy;
+import net.sourceforge.waters.model.module.VariableProxy;
+import net.sourceforge.waters.model.module.BooleanConstantProxy;
+//-------------
 import net.sourceforge.waters.model.module.AliasProxy;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.BoxGeometryProxy;
@@ -117,12 +122,14 @@ import net.sourceforge.waters.xsd.module.SimpleParameterType;
 import net.sourceforge.waters.xsd.module.SplineGeometryType;
 import net.sourceforge.waters.xsd.module.SplineKind;
 import net.sourceforge.waters.xsd.module.UnaryExpressionType;
-
-
+//EFA----------------
+import net.sourceforge.waters.xsd.module.GuardActionBlockType;
+import net.sourceforge.waters.xsd.module.VariableType;
+import net.sourceforge.waters.xsd.module.BooleanConstantType;
+//-------------------
 public class JAXBModuleImporter
   extends JAXBDocumentImporter<ModuleProxy,ModuleType>
 {
-
   //#########################################################################
   //# Constructors
   public JAXBModuleImporter(final ModuleProxyFactory factory,
@@ -195,7 +202,41 @@ public class JAXBModuleImporter
       }
     };
     mHandlerMap.put
-      (net.sourceforge.waters.xsd.module.Edge.class, handler);
+    (net.sourceforge.waters.xsd.module.Edge.class, handler);
+    
+    //-------------------------- EFA
+    handler = new ImportHandler() {
+        public GuardActionBlockProxy importElement(final ElementType element)
+        {
+          final GuardActionBlockType downcast = (GuardActionBlockType) element;
+          return importGuardActionBlock(downcast);
+        }
+      };
+      mHandlerMap.put
+        (net.sourceforge.waters.xsd.module.GuardActionBlock.class, handler);
+      
+      handler = new ImportHandler() {
+      public BooleanConstantProxy importElement(final ElementType element)
+      {
+        final BooleanConstantType downcast = (BooleanConstantType) element;
+        return importBooleanConstant(downcast);
+      }
+    };
+    mHandlerMap.put
+      (net.sourceforge.waters.xsd.module.BooleanConstant.class, handler);
+    
+      handler = new ImportHandler() {
+ 			public VariableProxy importElement(final ElementType element) {
+ 				final VariableType downcast = (VariableType) element;
+ 				return importVariable(downcast);
+ 			}
+ 		};
+ 		mHandlerMap.put(net.sourceforge.waters.xsd.module.Variable.class,
+ 				handler);
+     
+     // ---------------------------
+
+    
     handler = new ImportHandler() {
       public EnumSetExpressionProxy importElement(final ElementType element)
       {
@@ -267,17 +308,17 @@ public class JAXBModuleImporter
         return importForeachEvent(downcast);
       }
     };
-    mHandlerMap.put
-      (net.sourceforge.waters.xsd.module.ForeachEvent.class, handler);
-    handler = new ImportHandler() {
-      public GraphProxy importElement(final ElementType element)
-      {
-        final GraphType downcast = (GraphType) element;
-        return importGraph(downcast);
-      }
-    };
-    mHandlerMap.put
-      (net.sourceforge.waters.xsd.module.Graph.class, handler);
+    mHandlerMap.put(net.sourceforge.waters.xsd.module.ForeachEvent.class,
+				handler);
+		handler = new ImportHandler() {
+			public GraphProxy importElement(final ElementType element) {
+				final GraphType downcast = (GraphType) element;
+				return importGraph(downcast);
+			}
+		};
+		mHandlerMap.put(net.sourceforge.waters.xsd.module.Graph.class, handler);
+  
+   
     handler = new ImportHandler() {
       public GroupNodeProxy importElement(final ElementType element)
       {
@@ -323,6 +364,7 @@ public class JAXBModuleImporter
     };
     mHandlerMap.put
       (net.sourceforge.waters.xsd.module.IntParameter.class, handler);
+    
     handler = new ImportHandler() {
       public LabelBlockProxy importElement(final ElementType element)
       {
@@ -332,6 +374,7 @@ public class JAXBModuleImporter
     };
     mHandlerMap.put
       (net.sourceforge.waters.xsd.module.LabelBlock.class, handler);
+    
     handler = new ImportHandler() {
       public LabelGeometryProxy importElement(final ElementType element)
       {
@@ -341,6 +384,8 @@ public class JAXBModuleImporter
     };
     mHandlerMap.put
       (net.sourceforge.waters.xsd.module.LabelGeometry.class, handler);
+    
+    
     handler = new ImportHandler() {
       public ModuleProxy importElement(final ElementType element)
       {
@@ -524,15 +569,60 @@ public class JAXBModuleImporter
       (ExpressionProxy) importElement(expressionElement);
     return mFactory.createAliasProxy(identifier, expression);
   }
+  
+  
+//EFA----------------------
+  private BooleanConstantProxy importBooleanConstant(final BooleanConstantType element)
+  {
+    final boolean value = element.isValue();
+    return mFactory.createBooleanConstantProxy(value);
+  }
 
-  private EdgeProxy importEdge(final EdgeType element)
+  private VariableProxy importVariable(final VariableType element) {
+	    final SimpleExpressionType typeElement = element.getType();
+		final SimpleExpressionProxy type = 
+			(SimpleExpressionProxy) importElement(typeElement);
+		final SimpleExpressionType initialValueElement =
+			element.getInitialValue();
+		final SimpleExpressionProxy initialValue = 
+			(SimpleExpressionProxy) importElement(initialValueElement);
+		final String name = element.getName();
+
+		return mFactory.createVariableProxy(name, type, initialValue);
+	}
+  
+  private GuardActionBlockProxy importGuardActionBlock(
+			final GuardActionBlockType element) {
+		
+	  if(element != null) {
+		  final List<BinaryExpressionProxy> actionList = new LinkedList<BinaryExpressionProxy>();
+		  mGuardActionBlockActionListHandler.fromJAXB(this, element, actionList);
+		  
+		  final String guard = element.getGuard();
+		  
+		  final LabelGeometryProxy geometry = (LabelGeometryProxy) element.getLabelGeometry(); 
+		  return mFactory
+		  .createGuardActionBlockProxy(guard, actionList, geometry);
+	  } else {
+		  return null;
+	  }
+	}
+
+   // ------------------------
+ private EdgeProxy importEdge(final EdgeType element)
   {
     final String sourceName = element.getSource();
     final NodeProxy source = mGraphNodeList.find(sourceName);
     final String targetName = element.getTarget();
     final NodeProxy target = mGraphNodeList.find(targetName);
+
     final LabelBlockType labelBlockElement = element.getLabelBlock();
     final LabelBlockProxy labelBlock = importLabelBlock(labelBlockElement);
+    
+    final GuardActionBlockType guardActionBlockElement = element.getGuardActionBlock();
+    final GuardActionBlockProxy guardActionBlock = importGuardActionBlock(guardActionBlockElement);
+    
+    
     final SplineGeometryType geometryElement = element.getSplineGeometry();
     final SplineGeometryProxy geometry = importSplineGeometry(geometryElement);
     final PointGeometryType startPointElement =
@@ -545,6 +635,7 @@ public class JAXBModuleImporter
     return mFactory.createEdgeProxy(source,
                                     target,
                                     labelBlock,
+                                    guardActionBlock, //EFA---------
                                     geometry,
                                     startPoint,
                                     endPoint);
@@ -655,6 +746,7 @@ public class JAXBModuleImporter
     mForeachEventListHandler.fromJAXB(this, element, body);
     return mFactory.createForeachEventProxy(name, range, guard, body);
   }
+
 
   private GraphProxy importGraph(final GraphType element)
   {
@@ -876,24 +968,25 @@ public class JAXBModuleImporter
     return new Rectangle(x, y, width, height);
   }
 
-  private SimpleComponentProxy importSimpleComponent
-    (final SimpleComponentType element)
-  {
-    final IdentifierType identifierElement = element.getIdentifier();
-    final IdentifierProxy identifier =
-      (IdentifierProxy) importElement(identifierElement);
-    final ComponentKind kind = element.getKind();
-    final GraphType graphElement = element.getGraph();
-    final GraphProxy graph = importGraph(graphElement);
-    return mFactory.createSimpleComponentProxy(identifier, kind, graph);
-  }
+  private SimpleComponentProxy importSimpleComponent(
+			final SimpleComponentType element) {
+		// EFA----------------
+		final List<VariableProxy> variables = new LinkedList<VariableProxy>();
+		mSimpleComponentVariableListHandler.fromJAXB(this, element, variables);
+		// ------------------
+		final IdentifierType identifierElement = element.getIdentifier();
+		final IdentifierProxy identifier = (IdentifierProxy) importElement(identifierElement);
+		final ComponentKind kind = element.getKind();
+		final GraphType graphElement = element.getGraph();
+		final GraphProxy graph = importGraph(graphElement);
+		return mFactory.createSimpleComponentProxy(identifier, kind, graph, variables);
+	}
 
-  private SimpleIdentifierProxy importSimpleIdentifier
-    (final SimpleIdentifierType element)
-  {
-    final String name = element.getName();
-    return mFactory.createSimpleIdentifierProxy(name);
-  }
+	private SimpleIdentifierProxy importSimpleIdentifier(
+			final SimpleIdentifierType element) {
+		final String name = element.getName();
+		return mFactory.createSimpleIdentifierProxy(name);
+	}
 
   private SimpleNodeProxy importSimpleNode(final SimpleNodeType element)
   {
@@ -982,6 +1075,17 @@ public class JAXBModuleImporter
   private static final GraphEdgeListHandler
     mGraphEdgeListHandler =
     new GraphEdgeListHandler();
+//EFA-------------
+  private static final GuardActionBlockActionListHandler
+  mGuardActionBlockActionListHandler =
+  new GuardActionBlockActionListHandler();
+//------------------
+//EFA-------------
+  private static final SimpleComponentVariableListHandler
+  mSimpleComponentVariableListHandler =
+  new SimpleComponentVariableListHandler();
+//------------------
+ 
   private static final GraphNodeListHandler
     mGraphNodeListHandler =
     new GraphNodeListHandler();

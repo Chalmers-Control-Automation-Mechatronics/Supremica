@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.printer
 //# CLASS:   ModuleProxyPrinter
 //###########################################################################
-//# $Id: ModuleProxyPrinter.java,v 1.3 2005-11-10 21:54:42 robi Exp $
+//# $Id: ModuleProxyPrinter.java,v 1.4 2006-03-02 12:12:50 martin Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.printer;
@@ -60,6 +60,10 @@ import net.sourceforge.waters.model.module.SimpleParameterProxy;
 import net.sourceforge.waters.model.module.SplineGeometryProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 
+import net.sourceforge.waters.model.module.VariableProxy;
+import net.sourceforge.waters.model.module.GuardActionBlockProxy;
+import net.sourceforge.waters.model.module.BooleanConstantProxy;
+
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
@@ -89,6 +93,33 @@ public class ModuleProxyPrinter
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+  
+//EFA-------------------
+  public Object visitGuardActionBlockProxy
+  (final GuardActionBlockProxy proxy)
+ throws VisitorException
+  {
+	  //Temporary changes
+	     return null;
+  }
+  
+  public Object visitVariableProxy
+  (final VariableProxy proxy)
+ throws VisitorException
+  {
+	  //Temporary changes
+	    return null;
+  }
+  public Object visitBooleanConstantProxy 
+  (final BooleanConstantProxy proxy)
+  throws VisitorException
+	  {
+	    print(Boolean.toString(proxy.isValue()));
+	    return null;
+   }
+  
+  //------------------
+  
   public Object visitAliasProxy
       (final AliasProxy proxy)
     throws VisitorException
@@ -544,6 +575,7 @@ public class ModuleProxyPrinter
         print('(');
       }
       mAssocBraces = false;
+      print(operator.getName());
       final SimpleExpressionProxy subTerm = proxy.getSubTerm();
       subTerm.acceptVisitor(this);
       if (needBraces) {

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   EdgeElement
 //###########################################################################
-//# $Id: EdgeElement.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: EdgeElement.java,v 1.3 2006-03-02 12:12:49 martin Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -13,6 +13,7 @@ import net.sourceforge.waters.model.base.Geometry;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.EdgeProxy;
+import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.NodeProxy;
@@ -39,6 +40,7 @@ public final class EdgeElement
    * @param source The source node of the new edge.
    * @param target The target node of the new edge.
    * @param labelBlock The label block of the new edge.
+   * @param guardActionBlock The guard action block of the new edge, or <CODE>null</CODE>.
    * @param geometry The rendering information of the new edge, or <CODE>null</CODE>.
    * @param startPoint The rendering information for the start point of the new edge, or <CODE>null</CODE>.
    * @param endPoint The rendering information for the end point of the new edge, or <CODE>null</CODE>.
@@ -46,6 +48,7 @@ public final class EdgeElement
   public EdgeElement(final NodeProxy source,
                      final NodeProxy target,
                      final LabelBlockProxy labelBlock,
+                     final GuardActionBlockProxy guardActionBlock,
                      final SplineGeometryProxy geometry,
                      final PointGeometryProxy startPoint,
                      final PointGeometryProxy endPoint)
@@ -53,6 +56,7 @@ public final class EdgeElement
     mSource = source;
     mTarget = target;
     mLabelBlock = labelBlock;
+    mGuardActionBlock = guardActionBlock;
     mGeometry = geometry;
     mStartPoint = startPoint;
     mEndPoint = endPoint;
@@ -61,6 +65,7 @@ public final class EdgeElement
   /**
    * Creates a new edge using default values.
    * This constructor creates an edge with
+   * the guard action block set to <CODE>null</CODE>,
    * the rendering information set to <CODE>null</CODE>,
    * the rendering information for the start point set to <CODE>null</CODE>, and
    * the rendering information for the end point set to <CODE>null</CODE>.
@@ -75,6 +80,7 @@ public final class EdgeElement
     this(source,
          target,
          labelBlock,
+         null,
          null,
          null,
          null);
@@ -98,7 +104,9 @@ public final class EdgeElement
       return
         mSource.equals(downcast.mSource) &&
         mTarget.equals(downcast.mTarget) &&
-        mLabelBlock.equals(downcast.mLabelBlock);
+        mLabelBlock.equals(downcast.mLabelBlock) &&
+        (mGuardActionBlock == null ? downcast.mGuardActionBlock == null :
+         mGuardActionBlock.equals(downcast.mGuardActionBlock));
     } else {
       return false;
     }
@@ -112,6 +120,7 @@ public final class EdgeElement
         mSource.equals(downcast.mSource) &&
         mTarget.equals(downcast.mTarget) &&
         mLabelBlock.equalsWithGeometry(downcast.mLabelBlock) &&
+        mGuardActionBlock.equalsWithGeometry(downcast.mGuardActionBlock) &&
         Geometry.equalGeometry(mGeometry, downcast.mGeometry) &&
         Geometry.equalGeometry(mStartPoint, downcast.mStartPoint) &&
         Geometry.equalGeometry(mEndPoint, downcast.mEndPoint);
@@ -148,6 +157,11 @@ public final class EdgeElement
     return mLabelBlock;
   }
 
+  public GuardActionBlockProxy getGuardActionBlock()
+  {
+    return mGuardActionBlock;
+  }
+
   public SplineGeometryProxy getGeometry()
   {
     return mGeometry;
@@ -169,6 +183,7 @@ public final class EdgeElement
   private final NodeProxy mSource;
   private final NodeProxy mTarget;
   private final LabelBlockProxy mLabelBlock;
+  private final GuardActionBlockProxy mGuardActionBlock;
   private final SplineGeometryProxy mGeometry;
   private final PointGeometryProxy mStartPoint;
   private final PointGeometryProxy mEndPoint;

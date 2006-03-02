@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   EdgeProxy
 //###########################################################################
-//# $Id: EdgeProxy.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: EdgeProxy.java,v 1.3 2006-03-02 12:12:49 martin Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
@@ -46,8 +46,15 @@ public interface EdgeProxy extends Proxy {
    */
   // @ref
   public NodeProxy getTarget();
-
+  
+  
+  
   public LabelBlockProxy getLabelBlock();
+  
+  // @optional
+  public GuardActionBlockProxy getGuardActionBlock();
+  
+  
 
   /**
    * Gets the rendering information for this edge.

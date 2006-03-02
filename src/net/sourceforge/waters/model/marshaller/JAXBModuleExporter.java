@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBModuleExporter
 //###########################################################################
-//# $Id: JAXBModuleExporter.java,v 1.4 2005-12-18 21:11:32 robi Exp $
+//# $Id: JAXBModuleExporter.java,v 1.5 2006-03-02 12:12:50 martin Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -26,6 +26,11 @@ import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.UnaryOperator;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
+//EFA----------
+import net.sourceforge.waters.model.module.GuardActionBlockProxy;
+import net.sourceforge.waters.model.module.VariableProxy;
+import net.sourceforge.waters.model.module.BooleanConstantProxy;
+//-------------
 import net.sourceforge.waters.model.module.AliasProxy;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.BoxGeometryProxy;
@@ -114,8 +119,11 @@ import net.sourceforge.waters.xsd.module.SimpleNodeType;
 import net.sourceforge.waters.xsd.module.SimpleParameterType;
 import net.sourceforge.waters.xsd.module.SplineGeometryType;
 import net.sourceforge.waters.xsd.module.UnaryExpressionType;
-
-
+//EFA-----------------
+import net.sourceforge.waters.xsd.module.GuardActionBlockType;
+import net.sourceforge.waters.xsd.module.VariableType;
+import net.sourceforge.waters.xsd.module.BooleanConstantType;
+//-----------------------
 public class JAXBModuleExporter
   extends JAXBDocumentExporter<ModuleProxy,ModuleType>
   implements ModuleProxyVisitor
@@ -132,7 +140,44 @@ public class JAXBModuleExporter
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
-  public ElementType visitAliasProxy(final AliasProxy proxy)
+//EFA------------------- 
+  public GuardActionBlockType visitGuardActionBlockProxy(
+			final GuardActionBlockProxy proxy) throws VisitorException {
+		try {
+			final GuardActionBlockType element = mFactory
+					.createGuardActionBlock();
+			copyGuardActionBlockProxy(proxy, element);
+			return element;
+		} catch (final JAXBException exception) {
+			throw wrap(exception);
+		}
+	}
+  public VariableType visitVariableProxy
+       (final VariableProxy proxy)
+    throws VisitorException
+  {
+    try {
+      final VariableType element = mFactory.createVariable();
+      copyVariableProxy(proxy, element);
+      return element;
+    } catch (final JAXBException exception) {
+      throw wrap(exception);
+    }
+  }
+  public BooleanConstantType visitBooleanConstantProxy(
+			final BooleanConstantProxy proxy) throws VisitorException {
+		try {
+			final BooleanConstantType element = mFactory
+					.createBooleanConstant();
+			copyBooleanConstantProxy(proxy, element);
+			return element;
+		} catch (final JAXBException exception) {
+			throw wrap(exception);
+		}
+	}
+  
+  //--------------------------------
+ public ElementType visitAliasProxy(final AliasProxy proxy)
     throws VisitorException
   {
     try {
@@ -213,6 +258,7 @@ public class JAXBModuleExporter
     }
   }
 
+
   public PointGeometryType visitEndPointGeometryProxy
       (final PointGeometryProxy proxy)
     throws VisitorException
@@ -272,7 +318,8 @@ public class JAXBModuleExporter
     }
   }
 
-  public Object visitExpressionProxy
+
+public Object visitExpressionProxy
       (final ExpressionProxy proxy)
     throws VisitorException
   {
@@ -631,6 +678,54 @@ public class JAXBModuleExporter
 
   //#########################################################################
   //# Copying Data
+  
+  // ------------------EFA
+  
+  private void copyGuardActionBlockProxy(final GuardActionBlockProxy proxy,
+			final GuardActionBlockType element) throws VisitorException {
+		try {
+			final List<BinaryExpressionProxy> actionListProxy = proxy
+					.getActionList();
+			mGuardActionBlockActionListHandler.toJAXB(this, actionListProxy,
+					element);
+			copyProxy(proxy, element);
+
+			final String guard = proxy.getGuard();
+			element.setGuard(guard);
+
+			final LabelGeometryProxy geometryProxy = proxy.getGeometry();
+			if (geometryProxy != null) {
+				final LabelGeometryType geometryElement = visitLabelGeometryProxy(geometryProxy);
+				element.setLabelGeometry(geometryElement);
+			}
+		} catch (final JAXBException exception) {
+			throw wrap(exception);
+		}
+	}
+ 
+  
+  private void copyVariableProxy(final VariableProxy proxy,
+			final VariableType element) throws VisitorException {
+		copyProxy(proxy, element);
+		element.setName(proxy.getName());
+		
+		final SimpleExpressionProxy typeProxy = proxy.getType();
+		final SimpleExpressionType typeElement = (SimpleExpressionType)visitSimpleExpressionProxy
+		(typeProxy);
+		element.setType(typeElement);
+		
+		final SimpleExpressionProxy initialValueProxy = proxy.getInitialValue();
+		final SimpleExpressionType initialValueElement = (SimpleExpressionType)visitSimpleExpressionProxy
+		(initialValueProxy);
+		element.setInitialValue(initialValueElement);
+		}
+  private void copyBooleanConstantProxy(final BooleanConstantProxy proxy,
+			final BooleanConstantType element) throws VisitorException {
+		copySimpleExpressionProxy(proxy, element);
+		element.setValue(proxy.isValue());
+	}
+	// ------------------
+
   private void copyAliasProxy
       (final AliasProxy proxy,
        final IdentifiedType element)
@@ -686,7 +781,7 @@ public class JAXBModuleExporter
         final int blue = color.getBlue();
         final ColorType colorElement = createColor(red, green, blue);
         element.setColor(colorElement);
-        // *** BUG *** Can't handle more than one color *** 
+        // *** BUG *** Can't handle more than one color ***
       }
     } catch (final JAXBException exception) {
       throw wrap(exception);
@@ -712,7 +807,7 @@ public class JAXBModuleExporter
       (SimpleExpressionType) expressionProxy.acceptVisitor(this);
     element.setExpression(expressionElement);
   }
-
+  
   private void copyEdgeProxy
       (final EdgeProxy proxy,
        final EdgeType element)
@@ -723,12 +818,25 @@ public class JAXBModuleExporter
     element.setSource(sourceProxy.getName());
     final NodeProxy targetProxy = proxy.getTarget();
     element.setTarget(targetProxy.getName());
+
+    
     final LabelBlockProxy labelBlockProxy = proxy.getLabelBlock();
+
     if (!labelBlockProxy.getEventList().isEmpty()) {
       final LabelBlockType labelBlockElement =
         visitLabelBlockProxy(labelBlockProxy);
       element.setLabelBlock(labelBlockElement);
     }
+    
+    //------------------EFA
+    final GuardActionBlockProxy guardActionBlockProxy = proxy.getGuardActionBlock();
+    if(guardActionBlockProxy != null) {
+    	final GuardActionBlockType guardActionBlockElement =
+    		visitGuardActionBlockProxy(guardActionBlockProxy);
+    	element.setGuardActionBlock(guardActionBlockElement);
+    }
+    //------------------
+    
     final SplineGeometryProxy geometryProxy = proxy.getGeometry();
     if (geometryProxy != null) {
       final SplineGeometryType geometryElement =
@@ -1128,17 +1236,22 @@ public class JAXBModuleExporter
     element.setDefault(defaultValueElement);
   }
 
-  private void copySimpleComponentProxy
-      (final SimpleComponentProxy proxy,
-       final SimpleComponentType element)
-    throws VisitorException
-  {
-    copyComponentProxy(proxy, element);
-    element.setKind(proxy.getKind());
-    final GraphProxy graphProxy = proxy.getGraph();
-    final GraphType graphElement = visitGraphProxy(graphProxy);
-    element.setGraph(graphElement);
-  }
+  private void copySimpleComponentProxy(final SimpleComponentProxy proxy,
+			final SimpleComponentType element) throws VisitorException {
+		try {
+			final List<VariableProxy> variablesProxy = proxy.getVariables();
+			mSimpleComponentVariableListHandler.toJAXB(this, variablesProxy,
+					element);
+
+			copyComponentProxy(proxy, element);
+			element.setKind(proxy.getKind());
+			final GraphProxy graphProxy = proxy.getGraph();
+			final GraphType graphElement = visitGraphProxy(graphProxy);
+			element.setGraph(graphElement);
+		} catch (final JAXBException exception) {
+			throw wrap(exception);
+		}
+	}
 
   private void copySimpleExpressionProxy
       (final SimpleExpressionProxy proxy,
@@ -1313,6 +1426,17 @@ public class JAXBModuleExporter
   private static final GraphEdgeListHandler
     mGraphEdgeListHandler =
     new GraphEdgeListHandler(mFactory);
+  //EFA---------------
+  
+  private static final GuardActionBlockActionListHandler
+  mGuardActionBlockActionListHandler =
+  new GuardActionBlockActionListHandler(mFactory);
+  
+  private static final SimpleComponentVariableListHandler
+  mSimpleComponentVariableListHandler =
+  new SimpleComponentVariableListHandler(mFactory);
+  
+  //--------------------------
   private static final GraphNodeListHandler
     mGraphNodeListHandler =
     new GraphNodeListHandler(mFactory);

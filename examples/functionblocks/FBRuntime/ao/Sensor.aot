@@ -1,37 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<AOType xmlns="AutomationObjects" Name="Sensor" >
-  <VersionInfo Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2005-11-28" />
-
-  <ModelType Name="BinaryPassiveSensor" FBType="Sensor_MDL.fbt" >
-   <Frontend>
-    <Transaction>
-     <Request Name="CURRENT_VALUE"/>
-	 <Response Name="CURRENT_VALUE">
-	  <Argument Name="VALUE" Type="BOOL" />
-	 </Response>
-    </Transaction>
-   </Frontend>
-   <Backend>
-    <Transaction>
-	 <Response  Name="NEW_SAMPLE">
-	  <Argument Name="VALUE" Type="BOOL" />
-	</Transaction>
-   </Backend>
-  </ModelType>
-
-  <ViewType Name="EdgeDetecting">
-   <WithModelType Name="BinaryPassiveSensor" />
-   <Frontend>
-	 <Transaction Name="RISING_EDGE">
-	  <Response/>
-	 </Transaction>
-	 <Transaction Name="FALLING_EDGE">
-	  <Response/>
-	 </Transaction>
-	</Frontend>
-   <Implementation>
-    <FBType Name="EdgeDetect_VIEW"/> 
-   </Implementation>
-  </ViewType>
-
+<AOType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="Sensor_MDL" >
+  <VersionInfo Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2005-11-13" />
 </AOType>

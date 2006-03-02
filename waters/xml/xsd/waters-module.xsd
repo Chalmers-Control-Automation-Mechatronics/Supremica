@@ -9,7 +9,7 @@
   attributeFormDefault="unqualified"
   version="1.0">
 
-<xs:import 
+<xs:import
   namespace="http://waters.sourceforge.net/xsd/base"
   schemaLocation="waters-base.xsd"/>
 
@@ -225,7 +225,7 @@
             <jaxb:property name="Ranges"/>
           </xs:appinfo></xs:annotation>
         </xs:group>
-        <xs:element name="Comment" type="xs:string" minOccurs="0"/> 
+        <xs:element name="Comment" type="xs:string" minOccurs="0"/>
         <xs:element ref="M:ColorGeometry" minOccurs="0"/>
       </xs:sequence>
       <xs:attribute name="Kind" type="B:EventKind" use="required"/>
@@ -328,13 +328,14 @@
       <xs:extension base="M:IdentifiedType">
         <xs:sequence>
           <xs:element ref="M:Graph"/>
+          <xs:element ref="M:VariableList" minOccurs="0"/>
         </xs:sequence>
         <xs:attribute name="Kind" type="B:ComponentKind" use="required"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
 </xs:element>
-      
+
 <xs:element name="Instance" substitutionGroup="M:AbstractComponent">
   <xs:complexType>
     <xs:complexContent>
@@ -381,7 +382,7 @@
   </xs:complexType>
 </xs:element>
 
- 
+
 <!-- ==================================================================== -->
 <!-- Graph                                                                -->
 <!-- ==================================================================== -->
@@ -438,7 +439,7 @@
 </xs:element>
 
 <xs:element name="AbstractNode" abstract="true"/>
-  
+
 <xs:complexType name="NodeType">
   <xs:complexContent>
     <xs:extension base="B:NamedType">
@@ -467,7 +468,7 @@
     </xs:complexContent>
   </xs:complexType>
 </xs:element>
-  
+
 <xs:element name="GroupNode" substitutionGroup="M:AbstractNode">
   <xs:complexType>
     <xs:complexContent>
@@ -484,7 +485,7 @@
     </xs:complexContent>
   </xs:complexType>
 </xs:element>
-  
+
 <xs:element name="NodeRef">
   <xs:complexType>
     <xs:complexContent>
@@ -502,6 +503,7 @@
           <xs:element ref="M:StartPointGeometry" minOccurs="0"/>
           <xs:element ref="M:SplineGeometry" minOccurs="0"/>
           <xs:element ref="M:EndPointGeometry" minOccurs="0"/>
+          <xs:element ref="M:GuardActionBlock" minOccurs="0"/>
         </xs:sequence>
         <xs:attribute name="Source" type="xs:string" use="required"/>
         <xs:attribute name="Target" type="xs:string" use="required"/>
@@ -521,6 +523,91 @@
     </xs:complexContent>
   </xs:complexType>
 </xs:element>
+
+<xs:element name="GuardActionBlock">
+ <xs:complexType>
+  <xs:complexContent>
+    <xs:extension base="B:ElementType">
+      <xs:sequence>
+        <xs:element ref="M:Guard" minOccurs="0"/>
+        <xs:element ref="M:ActionList" minOccurs="0"/>
+        <xs:element ref="M:LabelGeometry" minOccurs="0"/>
+      </xs:sequence>
+    </xs:extension>
+  </xs:complexContent>
+ </xs:complexType>
+</xs:element>
+
+<xs:element name="Guard" type="xs:string"/>
+
+<xs:element name="ActionList">
+ <xs:complexType>
+  <xs:complexContent>
+    <xs:extension base="B:ElementType">
+      <xs:sequence>
+        <xs:element ref="M:BinaryExpression" maxOccurs="unbounded">
+          <xs:annotation><xs:appinfo>
+            <jaxb:property name="List"/>
+          </xs:appinfo></xs:annotation>
+        </xs:element>
+      </xs:sequence>
+    </xs:extension>
+  </xs:complexContent>
+ </xs:complexType>
+</xs:element>
+
+<!-- ==================================================================== -->
+<!-- Variables                                                            -->
+<!-- ==================================================================== -->
+<xs:element name="VariableList">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="B:ElementType">
+        <xs:sequence>
+          <xs:element ref="M:Variable" maxOccurs="unbounded">
+            <xs:annotation><xs:appinfo>
+              <jaxb:property name="List"/>
+            </xs:appinfo></xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="Variable">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="B:NamedType">
+       <xs:sequence>
+        <xs:group ref="M:RangeExpression">
+           <xs:annotation>
+            <xs:appinfo>
+               <jaxb:property name="Type"/>
+            </xs:appinfo>
+           </xs:annotation>
+        </xs:group>    
+        <xs:group ref="M:InitialValue">
+          <xs:annotation>
+            <xs:appinfo>
+               <jaxb:property name="InitialValue"/>
+            </xs:appinfo>
+           </xs:annotation>
+        </xs:group> 
+        <!--Remember to check that InitialValue has the right type.-->
+       </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:group name="InitialValue">
+  <xs:choice>
+    <xs:element ref="M:SimpleIdentifier"/>
+    <xs:element ref="M:IntConstant"/>
+    <xs:element ref="M:BooleanConstant"/> 
+  </xs:choice>
+</xs:group>
 
 
 <!-- ==================================================================== -->
@@ -705,6 +792,16 @@
   </xs:complexType>
 </xs:element>
 
+<xs:element name="BooleanConstant" substitutionGroup="M:SimpleExpression">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="M:SimpleExpressionType">
+        <xs:attribute name="Value" type="xs:boolean" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
 <xs:element name="UnaryExpression" substitutionGroup="M:SimpleExpression">
   <xs:complexType>
     <xs:complexContent>
@@ -780,6 +877,7 @@
   <xs:choice>
     <xs:element ref="M:SimpleIdentifier"/>
     <xs:element ref="M:IntConstant"/>
+    <xs:element ref="M:BooleanConstant"/>
     <xs:element ref="M:UnaryExpression"/>
     <xs:element ref="M:BinaryExpression"/>
   </xs:choice>
@@ -818,6 +916,9 @@
     <xs:enumeration value="&amp;"/>
     <xs:enumeration value="|"/>
     <xs:enumeration value=".."/>
+    <xs:enumeration value="="/>
+    <xs:enumeration value="+="/>
+    <xs:enumeration value="-="/>
   </xs:restriction>
 </xs:simpleType>
 

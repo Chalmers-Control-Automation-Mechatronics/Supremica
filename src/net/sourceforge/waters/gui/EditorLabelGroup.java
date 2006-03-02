@@ -4,12 +4,13 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorLabelGroup
 //###########################################################################
-//# $Id: EditorLabelGroup.java,v 1.24 2006-01-20 02:34:58 siw4 Exp $
+//# $Id: EditorLabelGroup.java,v 1.25 2006-03-02 12:12:49 martin Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.gui;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -49,6 +50,7 @@ public class EditorLabelGroup
 	implements ModelObserver
 {
 
+	protected boolean mSizeChanged;
 	public void removeFromSurface(EditorSurface e)
 	{
 		e.remove(panel);
@@ -409,11 +411,14 @@ public class EditorLabelGroup
 		shadowPanel.add(new JLabel(l.getText()));
 		*/
 	}
-
-	private void resizePanel()
+	protected void resizePanel() {
+		if(parent != null) {
+			parent.resizePanels();
+		}
+	}
+	protected int resizePanel(int width)
 	{
 		int height = 0;
-		int width = 0;
 
 		for (int i = 0; i < panel.getComponentCount(); i++)
 		{
@@ -421,26 +426,20 @@ public class EditorLabelGroup
 			c.setLocation(0, height);
 			c.setSize(c.getPreferredSize());
 
-			/*
-			c = (JComponent) shadowPanel.getComponent(i);
-			c.setLocation(0, height);
-			c.setSize(c.getPreferredSize());
-			*/
-
 			height += c.getHeight();
-
-			if (width < c.getWidth())
-			{
+			
+			if (width < c.getWidth()) {
 				width = c.getWidth();
 			}
 		}
 
-		panel.setSize(width, height);
+		panel.setSize(width + 2, height);
 		/*
 		shadowPanel.setSize(width, height);
 		*/
 
 		panel.repaint();
+		return width;
 	}
 
 	public int getX()
@@ -468,10 +467,9 @@ public class EditorLabelGroup
 		this(par.getSubject().getLabelBlock(), e);
 		parent = par;
 	}
-
+	
 	public EditorLabelGroup(LabelBlockSubject label, final EditorSurface surface)
 	{
-		
 		mUndo = surface.getEditorInterface().getUndoInterface();
 		// This is a labelgroup
 		type = LABELGROUP;
@@ -480,6 +478,7 @@ public class EditorLabelGroup
 		mSubject.addModelObserver(this);
 		
 		panel = new JPanel();
+		panel.setAlignmentX(5);
 		/*
 		shadowPanel = new JPanel();
 		*/
@@ -542,7 +541,7 @@ public class EditorLabelGroup
 
 	//#######################################################################
 	//# Data Members
-	private EditorEdge parent = null;
+	protected EditorEdge parent = null;
 	private LabelBlockSubject mSubject;
 	private int verticalA = 1;
 	private int horizontalA = 1;
@@ -551,7 +550,7 @@ public class EditorLabelGroup
 
 	//private final ArrayList events;
 	/** Holds labels that are shown on EditorSurface. */
-	private final JPanel panel;
+	protected JPanel panel;
 
 	public static final int LEFT = 0;
 	public static final int RIGHT = 2;

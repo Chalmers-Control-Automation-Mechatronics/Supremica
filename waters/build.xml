@@ -194,7 +194,7 @@
   <target name="waters" depends="waters-jar,cpp"
           description="Build all Waters executables."/>
 
-  <target name="test-compile" depends="waters-jar,cpp">
+  <target name="test-compile" depends="waters-jar">
     <mkdir dir="${test.classes}"/>
     <javac srcdir="${supremica.testsrc}" destdir="${test.classes}" 
            includes="net/sourceforge/waters/**/*.java"
@@ -203,6 +203,7 @@
         <path refid="external-classpath"/>
         <pathelement location="${jaxb.jar}"/>
         <pathelement location="${waters.jar}"/>
+        <pathelement location="${junit.jar}"/>
       </classpath>
       <compilerarg value="-Xlint:unchecked"/>
     </javac>
@@ -239,8 +240,10 @@
             todir="${logs}/model/expr"/>
       <test name="net.sourceforge.waters.model.compiler.CompilerTest"
             todir="${logs}/model/compiler"/>
-      <test name="net.sourceforge.waters.model.analysis.AnalysisTest"
+      <!-- C++ dependent test
+    	<test name="net.sourceforge.waters.model.analysis.AnalysisTest"
             todir="${logs}/model/analysis"/>
+      -->
       <test name="net.sourceforge.waters.valid.ValidTest"
             todir="${logs}/valid"/>
       <test name="net.sourceforge.waters.samples.maze.MazeTest"
@@ -252,6 +255,7 @@
         <pathelement location="${jaxb.jar}"/>
         <pathelement location="${waters.jar}"/>
         <pathelement location="${test.jar}"/>
+        <pathelement location="${junit.jar}"/>
       </classpath>
       <sysproperty key="waters.test.inputdir" value="${examples}"/>
       <sysproperty key="waters.test.outputdir" value="${logs}"/>
@@ -306,9 +310,11 @@
     <delete dir="${javadoc}"/>
     <delete dir="${javah.dir}"/>
     <delete dir="${jniglue.outdir}"/>
+    <!--
     <exec executable="make" dir="${cpp}">
       <arg value="clean"/>
     </exec>
+	-->  
   </target>
 
 </project>

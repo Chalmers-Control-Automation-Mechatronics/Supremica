@@ -4,10 +4,15 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   SimpleComponentElement
 //###########################################################################
-//# $Id: SimpleComponentElement.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: SimpleComponentElement.java,v 1.3 2006-03-02 12:12:49 martin Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
@@ -15,6 +20,7 @@ import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
+import net.sourceforge.waters.model.module.VariableProxy;
 
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
@@ -37,14 +43,38 @@ public final class SimpleComponentElement
    * @param identifier The identifier defining the name of the new simple component.
    * @param kind The kind of the new simple component.
    * @param graph The graph of the new simple component.
+   * @param variables The variables of the new simple component.
+   */
+  public SimpleComponentElement(final IdentifierProxy identifier,
+                                final ComponentKind kind,
+                                final GraphProxy graph,
+                                final Collection<? extends VariableProxy> variables)
+  {
+    super(identifier);
+    mKind = kind;
+    mGraph = graph;
+    final List<VariableProxy> variablesModifiable =
+      new ArrayList<VariableProxy>(variables);
+    mVariables =
+      Collections.unmodifiableList(variablesModifiable);
+  }
+
+  /**
+   * Creates a new simple component using default values.
+   * This constructor creates a simple component with
+   * an empty variables.
+   * @param identifier The identifier defining the name of the new simple component.
+   * @param kind The kind of the new simple component.
+   * @param graph The graph of the new simple component.
    */
   public SimpleComponentElement(final IdentifierProxy identifier,
                                 final ComponentKind kind,
                                 final GraphProxy graph)
   {
-    super(identifier);
-    mKind = kind;
-    mGraph = graph;
+    this(identifier,
+         kind,
+         graph,
+         emptyVariableProxyList());
   }
 
 
@@ -64,19 +94,8 @@ public final class SimpleComponentElement
       final SimpleComponentElement downcast = (SimpleComponentElement) partner;
       return
         mKind.equals(downcast.mKind) &&
-        mGraph.equals(downcast.mGraph);
-    } else {
-      return false;
-    }
-  }
-
-  public boolean equalsWithGeometry(final Object partner)
-  {
-    if (super.equalsWithGeometry(partner)) {
-      final SimpleComponentElement downcast = (SimpleComponentElement) partner;
-      return
-        mKind.equals(downcast.mKind) &&
-        mGraph.equalsWithGeometry(downcast.mGraph);
+        mGraph.equals(downcast.mGraph) &&
+        mVariables.equals(downcast.mVariables);
     } else {
       return false;
     }
@@ -105,10 +124,24 @@ public final class SimpleComponentElement
     return mGraph;
   }
 
+  public List<VariableProxy> getVariables()
+  {
+    return mVariables;
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private static List<VariableProxy> emptyVariableProxyList()
+  {
+    return Collections.emptyList();
+  }
+
 
   //#########################################################################
   //# Data Members
   private final ComponentKind mKind;
   private final GraphProxy mGraph;
+  private final List<VariableProxy> mVariables;
 
 }

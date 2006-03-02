@@ -4,13 +4,13 @@
 //# PACKAGE: net.sourceforge.waters.model.decl
 //# CLASS:   SimpleComponentProxy
 //###########################################################################
-//# $Id: SimpleComponentProxy.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: SimpleComponentProxy.java,v 1.3 2006-03-02 12:12:49 martin Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
 
 import net.sourceforge.waters.xsd.base.ComponentKind;
-
+import java.util.List;
 
 /**
  * <P>A component representing a single finite-state machine.</P>
@@ -44,5 +44,7 @@ public interface SimpleComponentProxy extends ComponentProxy {
   public ComponentKind getKind();
 
   public GraphProxy getGraph();
+  
+  public List<VariableProxy> getVariables();
 
 }

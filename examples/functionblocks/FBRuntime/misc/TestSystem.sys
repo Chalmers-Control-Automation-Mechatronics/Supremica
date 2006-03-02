@@ -17,7 +17,7 @@
           <Connection Source="comptest2.EO" Destination="merge.EI1" />
         </EventConnections>
         <DataConnections>
-          <Connection Source="500" Destination="delay.DT" />
+          <Connection Source="300" Destination="delay.DT" />
           <Connection Source="comptest1.DO" Destination="comptest2.DI" />
           <Connection Source="comptest2.DO" Destination="comptest1.DI" />
         </DataConnections>

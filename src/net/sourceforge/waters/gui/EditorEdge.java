@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorEdge
 //###########################################################################
-//# $Id: EditorEdge.java,v 1.34 2006-01-17 02:00:07 siw4 Exp $
+//# $Id: EditorEdge.java,v 1.35 2006-03-02 12:12:49 martin Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -58,7 +58,13 @@ public class EditorEdge
 	private EditorObject startNode; 
 	/** The end is a node. */
 	private EditorNode endNode;
-
+	
+	/** The label block (events) **/
+	private EditorLabelGroup mEditorLabelGroup;
+	
+	/** The guard+action block **/
+	private EditorGuardActionBlock mEditorGuardActionBlock;
+	
 	/** Boolean keeping track of whether the edge is a straight line or not. */
 	private boolean straight;
 
@@ -72,24 +78,24 @@ public class EditorEdge
 	private boolean dragT = false;	
 	private Rectangle2D.Double center = new Rectangle2D.Double();
 	private boolean dragC = false;
-
 	private EdgeSubject subject;
 	//private Point2D start;
 	private static double tearRatio = .8;
 	private static int WIDTHD = 2;
 	private static int WIDTHS = 5;
+	private EditorSurface mParent;
 
-	public EditorEdge(EditorObject iStartNode, EditorNode iEndNode, int x, int y, EdgeSubject e)
+	public EditorEdge(EditorObject iStartNode, EditorNode iEndNode,
+			int x, int y, EdgeSubject e, EditorSurface parent)
 	{
 		// This is an edge
 		type = EDGE;
-		
 		Point2D start = null;
-
 		startNode = iStartNode;
 		endNode = iEndNode;
 		subject = e;
 		endNode.attach(this);
+		mParent = parent;
 		if (startNode.getType() == NODE)
 		{
 			EditorNode s = (EditorNode) startNode;
@@ -1163,11 +1169,51 @@ public class EditorEdge
 		arrowAtEnd = set;
 	}
 
+	public EditorGuardActionBlock getEditorGuardActionBlock() {
+		return mEditorGuardActionBlock;
+	}
+
+	public void setEditorGuardActionBlock(
+			EditorGuardActionBlock editorGuardActionBlock) {
+		mEditorGuardActionBlock = editorGuardActionBlock;
+	}
+
+	public EditorLabelGroup getEditorLabelGroup() {
+		return mEditorLabelGroup;
+	}
+
+	public void setEditorLabelGroup(EditorLabelGroup editorLabelGroup) {
+		mEditorLabelGroup = editorLabelGroup;
+	}
+
 
 	//#######################################################################
 	//# Interface net.sourceforge.waters.subject.base.ModelObserver
 	public void modelChanged(final ModelChangeEvent event)
 	{
+	}
+
+	public void resizePanels() {
+		int panelWidth = 0;
+		int newPanelWidth = 0;
+		if(mEditorGuardActionBlock != null) {
+			newPanelWidth = mEditorGuardActionBlock.resizePanel(panelWidth);
+			panelWidth = newPanelWidth;
+		}
+		if(mEditorLabelGroup != null) {
+			newPanelWidth = mEditorLabelGroup.resizePanel(panelWidth);
+		}
+		if(newPanelWidth > panelWidth && mEditorGuardActionBlock != null) {
+			newPanelWidth = mEditorGuardActionBlock.resizePanel(newPanelWidth);
+		}
+	}
+
+	public EditorSurface getParent() {
+		return mParent;
+	}
+
+	public void setParent(EditorSurface parent) {
+		mParent = parent;
 	}
 
 }

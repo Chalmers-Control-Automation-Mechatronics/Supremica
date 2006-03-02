@@ -4,8 +4,8 @@
 //# PACKAGE: wnet.sourceforge.aters.gui
 //# CLASS:   EditorObject
 //###########################################################################
-//# $Id: EditorObject.java,v 1.23 2006-01-17 02:00:07 siw4 Exp $
-//# $Id: EditorObject.java,v 1.23 2006-01-17 02:00:07 siw4 Exp $
+//# $Id: EditorObject.java,v 1.24 2006-03-02 12:12:49 martin Exp $
+//# $Id: EditorObject.java,v 1.24 2006-03-02 12:12:49 martin Exp $
 //###########################################################################
 
 
@@ -33,6 +33,7 @@ public abstract class EditorObject
 	public static int NODEGROUP = 3;
 	public static int LABEL = 4;
 	public static int LABELGROUP = 5;
+	public static final int GUARDACTIONBLOCK = 6;		
 
     /** is not being draggedOver*/
     public static int NOTDRAG = 0;
@@ -57,7 +58,7 @@ public abstract class EditorObject
 	/** Thick line used for drawing shadows. */
 	public static final Stroke SHADOWSTROKE = new BasicStroke(10, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND);
 	/** Used as the basic stroke when printing - "hairline" width. */
-	public static final Stroke THINSTROKE = new BasicStroke(0.25f);		
+	public static final Stroke THINSTROKE = new BasicStroke(0.25f);
 	/** The default pen size. Is not {@code final} since it changes when printing. */
 	public static Stroke BASICSTROKE = SINGLESTROKE;
 

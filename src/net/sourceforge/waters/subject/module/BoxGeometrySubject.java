@@ -4,7 +4,8 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   BoxGeometrySubject
 //###########################################################################
-//# $Id: BoxGeometrySubject.java,v 1.4 2006-02-16 04:06:18 robi Exp $
+
+//# $Id: BoxGeometrySubject.java,v 1.5 2006-03-02 12:12:49 martin Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;

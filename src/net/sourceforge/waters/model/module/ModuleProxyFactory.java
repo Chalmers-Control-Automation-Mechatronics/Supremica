@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleProxyFactory
 //###########################################################################
-//# $Id: ModuleProxyFactory.java,v 1.5 2006-02-22 03:35:07 robi Exp $
+//# $Id: ModuleProxyFactory.java,v 1.6 2006-03-02 12:12:49 martin Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
@@ -48,6 +48,13 @@ public interface ModuleProxyFactory
        SimpleExpressionProxy right);
 
   /**
+   * Creates a new boolean constant.
+   * @param value The boolean value of the new boolean constant.
+   */
+  public BooleanConstantProxy createBooleanConstantProxy
+      (boolean value);
+
+  /**
    * Creates a new box geometry.
    * @param rectangle The rectangle of the new box geometry.
    */
@@ -73,6 +80,7 @@ public interface ModuleProxyFactory
    * @param source The source node of the new edge.
    * @param target The target node of the new edge.
    * @param labelBlock The label block of the new edge.
+   * @param guardActionBlock The guard action block of the new edge, or <CODE>null</CODE>.
    * @param geometry The rendering information of the new edge, or <CODE>null</CODE>.
    * @param startPoint The rendering information for the start point of the new edge, or <CODE>null</CODE>.
    * @param endPoint The rendering information for the end point of the new edge, or <CODE>null</CODE>.
@@ -81,6 +89,7 @@ public interface ModuleProxyFactory
       (NodeProxy source,
        NodeProxy target,
        LabelBlockProxy labelBlock,
+       GuardActionBlockProxy guardActionBlock,
        SplineGeometryProxy geometry,
        PointGeometryProxy startPoint,
        PointGeometryProxy endPoint);
@@ -88,6 +97,7 @@ public interface ModuleProxyFactory
   /**
    * Creates a new edge using default values.
    * This method creates an edge with
+   * the guard action block set to <CODE>null</CODE>,
    * the rendering information set to <CODE>null</CODE>,
    * the rendering information for the start point set to <CODE>null</CODE>, and
    * the rendering information for the end point set to <CODE>null</CODE>.
@@ -289,6 +299,26 @@ public interface ModuleProxyFactory
        EventListExpressionProxy propositions);
 
   /**
+   * Creates a new guard action block.
+   * @param guard The guard of the new guard action block, or <CODE>null</CODE>.
+   * @param actionList The action list of the new guard action block.
+   * @param geometry The geometry of the new guard action block, or <CODE>null</CODE>.
+   */
+  public GuardActionBlockProxy createGuardActionBlockProxy
+      (String guard,
+       Collection<? extends BinaryExpressionProxy> actionList,
+       LabelGeometryProxy geometry);
+
+  /**
+   * Creates a new guard action block using default values.
+   * This method creates a guard action block with
+   * the guard set to <CODE>null</CODE>,
+   * an empty action list, and
+   * the geometry set to <CODE>null</CODE>.
+   */
+  public GuardActionBlockProxy createGuardActionBlockProxy();
+
+  /**
    * Creates a new indexed identifier.
    * @param name The name of the new indexed identifier.
    * @param indexes The list of array indexes of the new indexed identifier, or <CODE>null</CODE> if empty.
@@ -483,6 +513,21 @@ public interface ModuleProxyFactory
    * @param identifier The identifier defining the name of the new simple component.
    * @param kind The kind of the new simple component.
    * @param graph The graph of the new simple component.
+   * @param variables The variables of the new simple component.
+   */
+  public SimpleComponentProxy createSimpleComponentProxy
+      (IdentifierProxy identifier,
+       ComponentKind kind,
+       GraphProxy graph,
+       Collection<? extends VariableProxy> variables);
+
+  /**
+   * Creates a new simple component using default values.
+   * This method creates a simple component with
+   * an empty variables.
+   * @param identifier The identifier defining the name of the new simple component.
+   * @param kind The kind of the new simple component.
+   * @param graph The graph of the new simple component.
    */
   public SimpleComponentProxy createSimpleComponentProxy
       (IdentifierProxy identifier,
@@ -552,5 +597,16 @@ public interface ModuleProxyFactory
   public UnaryExpressionProxy createUnaryExpressionProxy
       (UnaryOperator operator,
        SimpleExpressionProxy subTerm);
+
+  /**
+   * Creates a new variable.
+   * @param name The name of the new variable.
+   * @param type The type of the new variable.
+   * @param initialValue The initial value of the new variable.
+   */
+  public VariableProxy createVariableProxy
+      (String name,
+       SimpleExpressionProxy type,
+       SimpleExpressionProxy initialValue);
 
 }

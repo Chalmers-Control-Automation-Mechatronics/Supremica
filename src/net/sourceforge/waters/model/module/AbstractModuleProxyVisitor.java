@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   AbstractModuleProxyVisitor
 //###########################################################################
-//# $Id: AbstractModuleProxyVisitor.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: AbstractModuleProxyVisitor.java,v 1.3 2006-03-02 12:12:49 martin Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
@@ -25,6 +25,12 @@ public class AbstractModuleProxyVisitor
   }
 
   public Object visitBinaryExpressionProxy(final BinaryExpressionProxy proxy)
+    throws VisitorException
+  {
+    return visitSimpleExpressionProxy(proxy);
+  }
+
+  public Object visitBooleanConstantProxy(final BooleanConstantProxy proxy)
     throws VisitorException
   {
     return visitSimpleExpressionProxy(proxy);
@@ -118,6 +124,12 @@ public class AbstractModuleProxyVisitor
     throws VisitorException
   {
     return visitNodeProxy(proxy);
+  }
+
+  public Object visitGuardActionBlockProxy(final GuardActionBlockProxy proxy)
+    throws VisitorException
+  {
+    return visitProxy(proxy);
   }
 
   public Object visitIdentifiedProxy(final IdentifiedProxy proxy)
@@ -250,6 +262,12 @@ public class AbstractModuleProxyVisitor
     throws VisitorException
   {
     return visitSimpleExpressionProxy(proxy);
+  }
+
+  public Object visitVariableProxy(final VariableProxy proxy)
+    throws VisitorException
+  {
+    return visitProxy(proxy);
   }
 
 }

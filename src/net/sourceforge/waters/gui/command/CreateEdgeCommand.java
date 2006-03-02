@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.command
 //# CLASS:   CreateEdgeCommand
 //###########################################################################
-//# $Id: CreateEdgeCommand.java,v 1.7 2006-01-17 21:13:50 siw4 Exp $
+//# $Id: CreateEdgeCommand.java,v 1.8 2006-03-02 12:12:50 martin Exp $
 //###########################################################################
 
 
@@ -59,9 +59,8 @@ public class CreateEdgeCommand
 		final LabelBlockSubject labelBlock =
 			new LabelBlockSubject(empty, null);
 		final EdgeSubject edgeSubject =
-			new EdgeSubject(sourceSubject, targetSubject, labelBlock,
-							null, null, null);
-		mCreated = new EditorEdge(source, target, x, y, edgeSubject);
+			new EdgeSubject(sourceSubject, targetSubject, labelBlock);
+		mCreated = new EditorEdge(source, target, x, y, edgeSubject, surface);
     }
 
     /**

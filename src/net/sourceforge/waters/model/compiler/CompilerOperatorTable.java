@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   CompilerOperatorTable
 //###########################################################################
-//# $Id: CompilerOperatorTable.java,v 1.2 2005-11-03 01:24:15 robi Exp $
+//# $Id: CompilerOperatorTable.java,v 1.3 2006-03-02 12:12:50 martin Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -45,6 +45,10 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
     store(new BinaryEqualsOperator());
     store(new BinaryRangeOperator());
     store(new UnaryMinusOperator());
+
+    store(new BinaryIncreaseOperator());
+    store(new BinaryDecreaseOperator());
+    store(new BinaryAssignmentOperator());
   }
 
 
@@ -171,6 +175,105 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
     int eval(final int lhs, final int rhs)
     {
       return lhs + rhs;
+    }
+
+  }
+  
+  private static class BinaryIncreaseOperator extends BinaryIntOperator
+  {
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.Operator
+    public String getName()
+    {
+      return OPNAME_INCREASE;
+    }
+
+    public int getPriority()
+    {
+      return PRIORITY_ASSIGNMENT;
+    }
+
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.BinaryOperator
+    public int getAssociativity()
+    {
+      return BinaryOperator.ASSOC_LEFT;
+    }
+
+
+    //#######################################################################
+    //# Overrides for Abstract Base Class BinaryIntOperator
+    int eval(final int lhs, final int rhs)
+    {
+      return lhs + rhs;
+    }
+
+  }
+  
+  private static class BinaryDecreaseOperator extends BinaryIntOperator
+  {
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.Operator
+    public String getName()
+    {
+      return OPNAME_DECREASE;
+    }
+
+    public int getPriority()
+    {
+      return PRIORITY_ASSIGNMENT;
+    }
+
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.BinaryOperator
+    public int getAssociativity()
+    {
+      return BinaryOperator.ASSOC_LEFT;
+    }
+
+
+    //#######################################################################
+    //# Overrides for Abstract Base Class BinaryIntOperator
+    int eval(final int lhs, final int rhs)
+    {
+      return lhs - rhs;
+    }
+
+  }
+  
+  private static class BinaryAssignmentOperator extends BinaryIntOperator
+  {
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.Operator
+    public String getName()
+    {
+      return OPNAME_ASSIGNMENT;
+    }
+
+    public int getPriority()
+    {
+      return PRIORITY_ASSIGNMENT;
+    }
+
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.BinaryOperator
+    public int getAssociativity()
+    {
+      return BinaryOperator.ASSOC_LEFT;
+    }
+
+
+    //#######################################################################
+    //# Overrides for Abstract Base Class BinaryIntOperator
+    int eval(final int lhs, final int rhs)
+    {
+      return rhs;
     }
 
   }
@@ -361,6 +464,9 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
   private static final String OPNAME_MINUS = "-";
   private static final String OPNAME_PLUS = "+";
   private static final String OPNAME_RANGE = "..";
+  private static final String OPNAME_INCREASE = "+=";
+  private static final String OPNAME_DECREASE = "-=";
+  private static final String OPNAME_ASSIGNMENT = "=";
 
   private static final int PRIORITY_UNARY = 90;
   private static final int PRIORITY_MULT = 80;
@@ -369,6 +475,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
   private static final int PRIORITY_EQUALS = 50;
   private static final int PRIORITY_AND = 40;
   private static final int PRIORITY_OR = 30;
+  private static final int PRIORITY_ASSIGNMENT = 20;
   private static final int PRIORITY_OUTER = OperatorTable.PRIORITY_OUTER;
 
   private static final int OPCHAR_MIN = 32;

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   EdgeSubject
 //###########################################################################
-//# $Id: EdgeSubject.java,v 1.4 2006-02-16 04:06:18 robi Exp $
+//# $Id: EdgeSubject.java,v 1.5 2006-03-02 12:12:49 martin Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -14,6 +14,7 @@ import net.sourceforge.waters.model.base.IndexedSet;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.EdgeProxy;
+import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.NodeProxy;
@@ -41,6 +42,7 @@ public final class EdgeSubject
    * @param source The source node of the new edge.
    * @param target The target node of the new edge.
    * @param labelBlock The label block of the new edge.
+   * @param guardActionBlock The guard action block of the new edge, or <CODE>null</CODE>.
    * @param geometry The rendering information of the new edge, or <CODE>null</CODE>.
    * @param startPoint The rendering information for the start point of the new edge, or <CODE>null</CODE>.
    * @param endPoint The rendering information for the end point of the new edge, or <CODE>null</CODE>.
@@ -48,6 +50,7 @@ public final class EdgeSubject
   public EdgeSubject(final NodeProxy source,
                      final NodeProxy target,
                      final LabelBlockProxy labelBlock,
+                     final GuardActionBlockProxy guardActionBlock,
                      final SplineGeometryProxy geometry,
                      final PointGeometryProxy startPoint,
                      final PointGeometryProxy endPoint)
@@ -56,6 +59,10 @@ public final class EdgeSubject
     mTarget = (NodeSubject) target;
     mLabelBlock = (LabelBlockSubject) labelBlock;
     mLabelBlock.setParent(this);
+    mGuardActionBlock = (GuardActionBlockSubject) guardActionBlock;
+    if (mGuardActionBlock != null) {
+      mGuardActionBlock.setParent(this);
+    }
     mGeometry = (SplineGeometrySubject) geometry;
     if (mGeometry != null) {
       mGeometry.setParent(this);
@@ -73,6 +80,7 @@ public final class EdgeSubject
   /**
    * Creates a new edge using default values.
    * This constructor creates an edge with
+   * the guard action block set to <CODE>null</CODE>,
    * the rendering information set to <CODE>null</CODE>,
    * the rendering information for the start point set to <CODE>null</CODE>, and
    * the rendering information for the end point set to <CODE>null</CODE>.
@@ -89,6 +97,7 @@ public final class EdgeSubject
          labelBlock,
          null,
          null,
+         null,
          null);
   }
 
@@ -100,6 +109,10 @@ public final class EdgeSubject
     final EdgeSubject cloned = (EdgeSubject) super.clone();
     cloned.mLabelBlock = mLabelBlock.clone();
     cloned.mLabelBlock.setParent(cloned);
+    if (mGuardActionBlock != null) {
+      cloned.mGuardActionBlock = mGuardActionBlock.clone();
+      cloned.mGuardActionBlock.setParent(cloned);
+    }
     if (mGeometry != null) {
       cloned.mGeometry = mGeometry.clone();
       cloned.mGeometry.setParent(cloned);
@@ -124,6 +137,10 @@ public final class EdgeSubject
     cloned.mTarget = refmap.find(targetName);
     cloned.mLabelBlock = mLabelBlock.clone();
     cloned.mLabelBlock.setParent(cloned);
+    if (mGuardActionBlock != null) {
+      cloned.mGuardActionBlock = mGuardActionBlock.clone();
+      cloned.mGuardActionBlock.setParent(cloned);
+    }
     if (mGeometry != null) {
       cloned.mGeometry = mGeometry.clone();
       cloned.mGeometry.setParent(cloned);
@@ -149,7 +166,9 @@ public final class EdgeSubject
       return
         mSource.equals(downcast.mSource) &&
         mTarget.equals(downcast.mTarget) &&
-        mLabelBlock.equals(downcast.mLabelBlock);
+        mLabelBlock.equals(downcast.mLabelBlock) &&
+        (mGuardActionBlock == null ? downcast.mGuardActionBlock == null :
+         mGuardActionBlock.equals(downcast.mGuardActionBlock));
     } else {
       return false;
     }
@@ -163,6 +182,7 @@ public final class EdgeSubject
         mSource.equals(downcast.mSource) &&
         mTarget.equals(downcast.mTarget) &&
         mLabelBlock.equalsWithGeometry(downcast.mLabelBlock) &&
+        mGuardActionBlock.equalsWithGeometry(downcast.mGuardActionBlock) &&
         Geometry.equalGeometry(mGeometry, downcast.mGeometry) &&
         Geometry.equalGeometry(mStartPoint, downcast.mStartPoint) &&
         Geometry.equalGeometry(mEndPoint, downcast.mEndPoint);
@@ -197,6 +217,11 @@ public final class EdgeSubject
   public LabelBlockSubject getLabelBlock()
   {
     return mLabelBlock;
+  }
+
+  public GuardActionBlockSubject getGuardActionBlock()
+  {
+    return mGuardActionBlock;
   }
 
   public SplineGeometrySubject getGeometry()
@@ -256,6 +281,23 @@ public final class EdgeSubject
     final ModelChangeEvent event =
       ModelChangeEvent.createStateChanged(this);
     fireModelChanged(event);
+  }
+
+  public void setGuardActionBlock(final GuardActionBlockSubject guardActionBlock)
+  {
+    final boolean change = (mGuardActionBlock != guardActionBlock);
+    if (guardActionBlock != null) {
+      guardActionBlock.setParent(this);
+    }
+    if (mGuardActionBlock != null) {
+      mGuardActionBlock.setParent(null);
+    }
+    mGuardActionBlock = guardActionBlock;
+    if (change) {
+      final ModelChangeEvent event =
+        ModelChangeEvent.createStateChanged(this);
+      fireModelChanged(event);
+    }
   }
 
   /**
@@ -324,6 +366,7 @@ public final class EdgeSubject
   private NodeSubject mSource;
   private NodeSubject mTarget;
   private LabelBlockSubject mLabelBlock;
+  private GuardActionBlockSubject mGuardActionBlock;
   private SplineGeometrySubject mGeometry;
   private PointGeometrySubject mStartPoint;
   private PointGeometrySubject mEndPoint;

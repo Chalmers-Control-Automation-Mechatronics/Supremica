@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleTest
 //###########################################################################
-//# $Id: ModuleTest.java,v 1.5 2006-02-22 03:35:07 robi Exp $
+//# $Id: ModuleTest.java,v 1.6 2006-03-02 12:12:50 martin Exp $
 //###########################################################################
 
 
@@ -304,7 +304,7 @@ public abstract class ModuleTest extends JAXBTestCase<ModuleProxy>
     final Point2D end = new Point(50, 25);
     final PointGeometryProxy endgeo = factory.createPointGeometryProxy(end);
     final EdgeProxy edge = factory.createEdgeProxy
-      (group, group, labelblock, null, startgeo, endgeo);
+      (group, group, labelblock, null, null, startgeo, endgeo);
     final LabelBlockProxy blocked = factory.createLabelBlockProxy();
     final List<NodeProxy> nodes = new LinkedList<NodeProxy>();
     nodes.add(node);

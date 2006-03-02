@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleProxyVisitor
 //###########################################################################
-//# $Id: ModuleProxyVisitor.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: ModuleProxyVisitor.java,v 1.3 2006-03-02 12:12:49 martin Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
@@ -21,6 +21,9 @@ public interface ModuleProxyVisitor
     throws VisitorException;
 
   public Object visitBinaryExpressionProxy(BinaryExpressionProxy proxy)
+    throws VisitorException;
+
+  public Object visitBooleanConstantProxy(BooleanConstantProxy proxy)
     throws VisitorException;
 
   public Object visitBoxGeometryProxy(BoxGeometryProxy proxy)
@@ -66,6 +69,9 @@ public interface ModuleProxyVisitor
     throws VisitorException;
 
   public Object visitGroupNodeProxy(GroupNodeProxy proxy)
+    throws VisitorException;
+
+  public Object visitGuardActionBlockProxy(GuardActionBlockProxy proxy)
     throws VisitorException;
 
   public Object visitIdentifiedProxy(IdentifiedProxy proxy)
@@ -132,6 +138,9 @@ public interface ModuleProxyVisitor
     throws VisitorException;
 
   public Object visitUnaryExpressionProxy(UnaryExpressionProxy proxy)
+    throws VisitorException;
+
+  public Object visitVariableProxy(VariableProxy proxy)
     throws VisitorException;
 
 }

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.43 2006-01-23 23:47:46 siw4 Exp $
+//# $Id: EditorSurface.java,v 1.44 2006-03-02 12:12:49 martin Exp $
 //###########################################################################
 
 
@@ -32,6 +32,7 @@ import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
 import net.sourceforge.waters.subject.module.*;
 import net.sourceforge.waters.xsd.module.AnchorPosition;
+import net.sourceforge.waters.xsd.module.GuardActionBlock;
 
 
 /**
@@ -51,6 +52,7 @@ public class EditorSurface
 	implements Printable,
 			   ModelObserver
 {
+	public static final int panelMarginAdjust = 2; //increase bounds for label & guardAction panels
 	protected boolean showGrid = true;
 	protected EditorWindowInterface root;
 	protected int gridSize = 16;
@@ -63,6 +65,7 @@ public class EditorSurface
 	protected ArrayList lines;
 	protected ArrayList shades;
 	protected ArrayList events;
+	protected ArrayList mGuardActionBlocks;
 	protected int dragStartX;
 	protected int dragStartY;
 	protected int dragNowX;
@@ -321,6 +324,23 @@ public class EditorSurface
 								20, 20);
 			}
 		}
+		
+		for (int i = 0; i < mGuardActionBlocks.size(); i++)
+		{
+
+			EditorGuardActionBlock GA = (EditorGuardActionBlock) mGuardActionBlocks.get(i);
+
+			GA.setPanelLocation();
+
+			if (GA.shadow && GA.isHighlighted())
+			{
+				Rectangle bounds = GA.getBounds();
+				g.setColor(GA.getShadowColor(isSelected(GA) || isSelected(GA.getParent())));
+				g.fillRoundRect((int) bounds.getX()-panelMarginAdjust, (int) bounds.getY()-panelMarginAdjust, 
+								(int) bounds.getWidth()+2*panelMarginAdjust, (int) bounds.getHeight()+2*panelMarginAdjust, 
+								20, 20);
+			}
+		}
 
 		for (int i = 0; i < lines.size(); i++)
 		{ 
@@ -475,6 +495,8 @@ public class EditorSurface
 		subjects.add(edge.getSubject());
 	    edges.add(edge);
 	    addLabelGroup(edge);
+	    addGuardActionBlock(edge);
+	    edge.resizePanels();
 	    repaint();
 	    return edge;
 	}
@@ -489,10 +511,12 @@ public class EditorSurface
 			x = (int) ep.getStartPoint().getPoint().getX();
 			y = (int) ep.getStartPoint().getPoint().getY();
 		}
-		EditorEdge e = new EditorEdge(n1, n2, x, y, ep);
+		EditorEdge e = new EditorEdge(n1, n2, x, y, ep, this);
 
 		edges.add(e);
 		addLabelGroup(e);
+	    addGuardActionBlock(e);
+	    e.resizePanels();
 		repaint();
 
 		return e;
@@ -509,6 +533,13 @@ public class EditorSurface
 				delLabelGroup(g);
 			}
 		}
+		
+		//delete guardActionBlock
+		final EditorGuardActionBlock gA = e.getEditorGuardActionBlock();
+		if(gA != null) {
+			delGuardActionBlock(gA);
+		}
+		
 
 		if (e.getStartNode().getType() == EditorObject.NODEGROUP)
 		{
@@ -535,9 +566,12 @@ public class EditorSurface
 		repaint();
 	}
 
-	public void addLabelGroup(EditorEdge e)
+	public void addLabelGroup(EditorEdge edge)
 	{
-		events.add(new EditorLabelGroup(e, this));
+		EditorLabelGroup labelGroup = 
+			new EditorLabelGroup(edge, this);
+		events.add(labelGroup);
+		edge.setEditorLabelGroup(labelGroup);
 		repaint();
 	}
 
@@ -545,6 +579,16 @@ public class EditorSurface
 	{
 		events.add(g);
 		repaint();
+	}
+
+	public void addGuardActionBlock(EditorEdge edge) {
+		if(edge.getSubject().getGuardActionBlock() != null) {
+			EditorGuardActionBlock guardActionBlock = 
+				new EditorGuardActionBlock(edge, this);
+			mGuardActionBlocks.add(guardActionBlock);
+			edge.setEditorGuardActionBlock(guardActionBlock);
+			repaint();
+		}
 	}
 
 	/*
@@ -629,6 +673,13 @@ public class EditorSurface
 		g.removeFromSurface(this);
 		repaint();
 	}
+	
+	public void delGuardActionBlock(EditorGuardActionBlock gA)
+	{
+		mGuardActionBlocks.remove(gA);
+		gA.removeFromSurface(this);
+		repaint();
+	}
 
 	public void clearAll()
 	{
@@ -647,8 +698,14 @@ public class EditorSurface
 		{
 			((EditorLabelGroup) events.get(i)).removeFromSurface(this);
 		}
+		
+		for (int i = 0; i < mGuardActionBlocks.size(); i++)
+		{
+			((EditorGuardActionBlock) mGuardActionBlocks.get(i)).removeFromSurface(this);
+		}
 
 		events.clear();
+		mGuardActionBlocks.clear();
 		nodeGroups.clear();
 		repaint();
 	}
@@ -728,6 +785,16 @@ public class EditorSurface
 				return (EditorLabelGroup) events.get(i);
 			}
 		}
+
+		for (int i = 0; i < mGuardActionBlocks.size(); i++)
+		{
+			if (((EditorGuardActionBlock) mGuardActionBlocks.get(i)).wasClicked(ex, ey))
+			{
+				return (EditorLabelGroup) mGuardActionBlocks.get(i);
+			}
+		}
+
+		
 
 		return null;
 	}
@@ -884,7 +951,62 @@ public class EditorSurface
 		}
 	}
 
- 	public void unsetAllInitial()
+ 	/* Obsolete? TODO:check and remove
+ 	public void unselectAll()
+	{
+		for (int i = 0; i < nodes.size(); i++)
+		{
+			EditorNode n = (EditorNode) nodes.get(i);
+
+			n.setSelected(false);
+			nodes.set(i, n);
+		}
+
+		for (int i = 0; i < edges.size(); i++)
+		{
+			EditorEdge e = (EditorEdge) edges.get(i);
+
+			e.setSelected(false);
+			edges.set(i, e);
+		}
+
+		for (int i = 0; i < labels.size(); i++)
+		{
+			EditorLabel l = (EditorLabel) labels.get(i);
+
+			l.setSelected(false);
+			l.setEditing(false);
+			labels.set(i, l);
+		}
+
+		for (int i = 0; i < events.size(); i++)
+		{
+			EditorLabelGroup g = (EditorLabelGroup) events.get(i);
+
+			g.setSelected(false);
+			events.set(i, g);
+		}
+
+		for (int i = 0; i < mGuardActionPairs.size(); i++)
+		{
+			EditorGuardActionBlock gA = 
+				(EditorGuardActionBlock) mGuardActionPairs.get(i);
+
+			gA.setSelected(false);
+			mGuardActionPairs.set(i, gA);
+		}
+
+		for (int i = 0; i < nodeGroups.size(); i++)
+		{
+			EditorNodeGroup n = (EditorNodeGroup) nodeGroups.get(i);
+
+			n.setSelected(false);
+			nodeGroups.set(i, n);
+		}
+	}*/
+
+	public void unsetAllInitial()
+
 	{
 		for (int i = 0; i < nodes.size(); i++)
 		{
@@ -1404,8 +1526,39 @@ public class EditorSurface
 				minY = y - mod;
 			}
 		}
+		
+		// Guard Action Blocks
+		for (int i = 0; i < mGuardActionBlocks.size(); i++)
+		{
+			EditorGuardActionBlock gABlock = ((EditorGuardActionBlock) mGuardActionBlocks.get(i));
+			x = gABlock.getX(); // This is not the center!
+			mod = gABlock.getWidth() + SPACING;
+			if (x + mod > maxX)
+			{
+				maxX = x + mod;
+			}
 
-		// Avoid stupid values
+			mod = SPACING;
+			if (x - mod < minX)
+			{
+				minX = x - mod;
+			}
+
+			y = gABlock.getY(); // This is not the center!
+			mod = gABlock.getHeight() + SPACING;
+			if (y + mod > maxY)
+			{
+				maxY = y + mod;
+			}
+
+			mod = SPACING;
+			if (y - mod < minY)
+			{
+				minY = y - mod;
+			}
+		}
+
+		//Avoid stupid values
 		if ((maxX < minX) || (maxY < minY))
 		{
 			drawnAreaBounds = new Rectangle(0,0,0,0);
@@ -1478,6 +1631,7 @@ public class EditorSurface
 		lines = new ArrayList();
 		shades = new ArrayList();
 		events = new ArrayList();
+		mGuardActionBlocks = new ArrayList();
 
 		shades.add(new EditorShade("Default", 255, 255, 255));
 
@@ -1594,6 +1748,11 @@ public class EditorSurface
     public java.util.List getLabelGroups()
     {
 		return events;
+    }
+    
+    public java.util.List getGuardActionBlocks()
+    {
+    	return mGuardActionBlocks;
     }
 }
 

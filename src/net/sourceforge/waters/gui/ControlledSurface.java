@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.61 2006-01-23 23:32:34 siw4 Exp $
+//# $Id: ControlledSurface.java,v 1.62 2006-03-02 12:12:49 martin Exp $
 //###########################################################################
  
 package net.sourceforge.waters.gui;
@@ -323,6 +323,14 @@ public class ControlledSurface
 					EditorEdgePopupMenu popup = new EditorEdgePopupMenu(this, object);
 					popup.show(this, e.getX(), e.getY());
 				}
+				if (o.getType() == EditorObject.LABELGROUP) {
+					EditorLabelGroup object =
+						(EditorLabelGroup) o;
+					
+					EditorLabelBlockPopupMenu popup = new
+						EditorLabelBlockPopupMenu(this, object);
+					popup.show(this, e.getX(), e.getY());
+				}
 			}
 			else
 			{
@@ -489,7 +497,8 @@ public class ControlledSurface
 						operation = DnDConstants.ACTION_COPY;
 					} else if (o instanceof EditorEdge) {
 						operation = DnDConstants.ACTION_COPY;
-					} else if (o instanceof EditorLabelGroup) {
+					} else if (o instanceof EditorLabelGroup && 
+							!(o instanceof EditorGuardActionBlock)) {
 						operation = DnDConstants.ACTION_COPY;
 					} else if (o instanceof EditorLabel) {
 						operation = DnDConstants.ACTION_COPY;
@@ -504,7 +513,8 @@ public class ControlledSurface
 						   ek.equals(EventKind.UNCONTROLLABLE)) {
 					if (o instanceof EditorEdge) {
 						operation = DnDConstants.ACTION_COPY;
-					} else if (o instanceof EditorLabelGroup) {
+					} else if (o instanceof EditorLabelGroup && 
+							!(o instanceof EditorGuardActionBlock)) {
 						operation = DnDConstants.ACTION_COPY;
 					}
 				}
@@ -545,7 +555,8 @@ public class ControlledSurface
 						addToEdge((EditorEdge) o, ip, e);
 						e.dropComplete(true);
 						return;
-					} else if (o instanceof EditorLabelGroup) {
+					} else if (o instanceof EditorLabelGroup && 
+							!(o instanceof EditorGuardActionBlock)) {
 						addToLabelGroup((EditorLabelGroup) o, ip, e);
 						e.dropComplete(true);
 						return;
@@ -721,7 +732,8 @@ public class ControlledSurface
 							text.setVisible(true);
 							text.requestFocus();
 						}
-						else if (o.getType() == EditorObject.LABELGROUP)
+						else if (o.getType() == EditorObject.LABELGROUP &&
+								o.getType() != EditorObject.GUARDACTIONBLOCK)
 						{
 							EditorLabelGroup l = (EditorLabelGroup) o;
 							CompoundCommand c = new CompoundCommand();

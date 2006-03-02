@@ -13,6 +13,9 @@ class EditorColor
 
 	/** The default color of marked (accepting) nodes. */
 	public static Color DEFAULTMARKINGCOLOR = Color.GRAY; 
+	
+	/** The default color of marked (accepting) nodes. */
+	public static Color GUARDACTIONHEADER = Color.GRAY; 
 
 	/** The color of the drag-select area. */
 	public static Color DRAGSELECTCOLOR = new Color(0,0,255,32); 

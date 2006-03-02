@@ -1,143 +1,393 @@
 \documentclass{article}
 
-\usepackage{amsthm,amsmath,amssymb}
+\usepackage{amsthm,amsmath,amssymb, mathrsfs, graphicx,makeidx,multicol}
 
 \newtheorem{theorem}{Theorem}
 
 
 \begin{document}
+\title{Modular Verification Using Extended Finite Automata}
+\author{Markus Sk\"oldstam, Martin Byr\"od}
+%\institute{Signals and Systems}
+\maketitle
 \tableofcontents
 \section{Introduction}
+To formally verify and validate PLC programs one needs a model of the controller.
+There exists various methods to build models of
+controllers,
+\begin{enumerate}
+   \item [1] modelling controllers with Signal Interpreted Petri Nets,
+   \item [2] modelling controllers with SFC,
+   \item [3] building transition systems from existing controllers,
+   \item [4] using SOL and Function Blocks to describe controllers,
+   \item [5] applying algorithms based on modular finite state machines.
 
-\subsection{Background}
-\newpage
-\section{Finite Automata (FA) with hierarchy}
+   \end{enumerate}
+ These models are usually translated to finite state machines
+ or finite automata and validated with different supporting tools. The main difference
+ between them lies in the formalism and the way the behavior of the plant is included.
+ What one would like is a decision table that assists a user in finding
+ the best approach for the application at hand. Here, we present a general framework using
+ extended finite automata that models the plant and the specification.
+ The plant and the specification are then synthesized, resulting in a model of the controller:)
 
-\section{Extended Finite Automata (EFA)}
-The regular deterministic finite automaton $A$ is a $5$-tuple
-\begin{eqnarray}
-A=\langle Q,\Sigma,\delta, q_i,Q_m \rangle\nonumber
-\end{eqnarray} where $Q$ is a finite set of states; $\Sigma$ (the alphabet) is a nonempty
-set of events; $\delta$ is the transition function; $q_i$ is the
-initial state and $Q_m \subseteq Q$ is the set of marked states.
-An Extended Deterministic Finite Automaton (EFA) is an
-augmentation of the regular finite automaton with guard and action
+
+
+\section{The formal definition}
+An Extended Finite Automaton (EFA) is an
+augmentation of the regular automaton with guard and action
 formulas associated to the transitions. The transitions in the EFA
 are enabled if and only if a guard formula is true. Moreover, when
 a transition in an EFA is taken, updating actions of a set of
-finite integer variables may follow. Formally this is done as
-follows.
+variables may follow. The formal definition of an EFA is here
+explained by extending the definition of the regular finite automaton.
+Typically, system behaviours are modelled using deterministic finite-state automata.
+Nondeterminism is used here to support the possibility of having different guards on transitions
+that are triggered by common events. To avoid contradictions when synchronizing
+automata, we do not allow this for the updating actions of variables
+that are shared between automata.\\
 
-Given a regular automaton $A=\langle Q,\Sigma,\delta, q_i,Q_m
-\rangle$, let $T=\{(q,\sigma)\in Q \times \Sigma:
-\delta(q,\sigma)!\}$ denote the set of transitions in $A$ and let
-$\tau_k$, $k=1,...,|T|$ denote the elements (transitions) of $T$.
+The regular finite nondeterministic automaton
+$A$ is a $5$-tuple
+\begin{eqnarray}
+A=\langle Q,\Sigma,\delta, q_i,Q_m \rangle\nonumber
+\end{eqnarray} where $Q$ is a finite set of states; $\Sigma$ (the alphabet) is a nonempty
+set of events; $\delta$ is the transition relation mapping elements of $Q\times\Sigma$ into subsets of $Q$; $q_i$ is the
+initial state and $Q_m \subseteq Q$ is the set of marked states.
+
+
+
+
 First, we add to $A$ a set $X=X_1\times ... \times X_n$, where
-$X_k$, $k=1,...,n$, are finite nonempty subsets of $\mathbb{Z}$.
-The set $X$ is the domain of definition of an $n$-tuple of integer
-variables $x=(x_1,...,x_n)$ with initial value
-$x_0=(x_{10},...,x_{n0})$. We also add to $A$ an $|T|$-tuple of
-function pairs $G=\big((g_{\tau_1},a_{\tau_1}),...,
+$X_k$, $k=1,...,n$, are finite nonempty sets. For instance, $X_k$
+could be any finite subset of $\mathbb{Z}$ or the set of states in  some
+other finite deterministic automaton. The finite set $X$ is the
+domain of definition of an $n$-tuple of variables
+$x=(x_1,...,x_n)$ with initial value $x_0=(x_{10},...,x_{n0})$. If
+a variable corresponds to the set of states in an automaton, we
+shall call it a state variable. The initial value of a state
+variable must equal the initial state of its automaton and we do
+not admit updating actions of a state variable. To tell apart the
+ordinary variables and the state variables we use the subscripts
+$v$ and $s$, respectively. Using this convention we divide the
+domain of definition and the variables into parts, $X=X_v \times
+X_s$ and $x=(x_v,x_s)$.
+
+ Let $T=\{(q,\sigma,p)\in Q \times \Sigma\times Q:
+\delta(q,\sigma)=p\}$ denote the set of transitions in $A$ and let
+$\tau_k$, $k=1,...,|T|$ denote the elements (transitions) of $T$. In the next step we
+ add a $|T|$-tuple of function pairs $G=\big((g_{\tau_1},a_{\tau_1}),...,
 (g_{\tau_{|T|}},a_{\tau_{|T|}})\big)$, where each pair
 $(g_{\tau_k},a_{\tau_k})$ is associated to the corresponding
 transition $\tau_k$ in $T$. $g_{\tau_k}$ is an evaluation of a
 boolean formula (a guard formula) over $X$ i.e. $g_{\tau_k}:X
 \rightarrow \{0,1\}$ saying if the corresponding transition
 $\tau_k$ is enabled or not. $a_{\tau_k}$ is an updating (action)
-function from $X$ to $X$ of the integer variables
-$x=(x_1,...,x_n)$.
+function from $X_v$ to $X_v$ of the ordinary variables $x_v$. To
+indicate the source($q$), event($\sigma$) and target($p$) of a
+function pair we write $(g_{q\sigma p},a_{q\sigma p})$. The guards and
+action formulas are partitioned into subsets $(g_{q\sigma},a_{q\sigma})=\{(g_{q\sigma p},a_{q\sigma p})\in G:
+\delta(q,\sigma)=p\}$ whose elements have the same source and target.
 
-With the above notations we will formally define an EFA as the
+Using the above notations we define an EFA as the
 $9$-tuple $A_{e}=\langle Q, \Sigma, \delta_{e}, q_i, Q_m, X, G
-,x_0, X_m \rangle$, where $X_m$ are the marked integer values of
-the variables $x$ and $\delta_{e}: Q \times \Sigma \times X
+,x_0, X_m \rangle$, where $X_m$ are the marked values of the
+variables $x$ and $\delta_{e}: Q \times \Sigma \times X
 \rightarrow Q\times X $ is a new extended version of the
-transition function $\delta:Q \times \Sigma \rightarrow Q$. The
-extended transition function $\delta_e$ is defined by means of
-$\delta$ and the elements of $G$ as
+transition mapping $\delta:Q \times \Sigma \rightarrow Q$. The
+extended mapping $\delta_e$ is defined by means of
+$\delta$, the subsets $(g_{q\sigma},a_{q\sigma})$ and the variables $x=(x_v, x_s)$ as
 \begin{eqnarray}
 \delta_{e}(q,\sigma,x)=\left\{
 \begin{array}{ll}
-(\delta(q,\sigma),a_{q \sigma}(x)\big)\quad\quad g_{q \sigma}(x)=1\\
-\textrm{undefined} \quad\quad\quad\quad\quad g_{q \sigma}(x)=0
+(\delta(q,\sigma),a_{q \sigma}(x_v),x_s \big)\quad\quad g_{q \sigma}(x)=1\\
+\textrm{undefined  } \quad\quad\quad\quad\quad\quad g_{q
+\sigma}(x)=0
+\end{array}\right..
+\end{eqnarray}
+The meaning of $\delta_{e}(q,\sigma,x)$ is that when scanning
+the symbol $\sigma$ the extended automaton moves to anyone of the
+states $p$ in the set $\delta(q,\sigma)$ whose guard $g_{q
+\sigma p}(x)$ is true. When the transition takes place the variables are
+updated by the action function.
+
+The set of transitions in the extended automaton is
+$T_e=\{(q,\sigma,x,p)\in Q \times \Sigma\times X\times Q:
+\big(\delta(q,\sigma)=p \big)\wedge \big(g_{q
+\sigma p}(x)=1\big)\}$. Notice that two transitions are
+identical if and only if the events, the states and the values
+of all variables are the same. Hence, a transition $(q,\sigma,p)$ in the
+regular automaton $A$ is divided into as many transitions as the number
+of elements in the set $\{x\in X:g_{q
+\sigma p}(x)=1\}$. However, the
+alphabets of the automata are the same and the language of the
+extended automaton is subset of the language of the regular automaton:
+\begin{eqnarray}
+L(A_e)=\{s\in \Sigma^*:
+\delta_e(q_i,s,x_0)!\}\subseteq \{s\in \Sigma^*:
+\delta(q_i,s)!\}=L(A).
+\end{eqnarray}
+In some sense EFA's have small languages and a few number of
+states to the expense of many transitions. This is an important observation
+since it is the main reason why EFA's enable efficient modular algorithms to perform
+verifications of supervisors.
+\subsection{How to use the variables}
+All logical systems can easily be represented by
+EFA models. When using EFA's as a modelling tool it important to understand how to choose the variables.
+A variable $x$ can represent many things, some examples  are: the states that an object can be in,
+ the number of customers in a queue system, the different types of customers in a queue or the time it
+takes for a process to execute different operations. In many applications the variables can be represented by
+ integers or enumeration objects.
+
+\subsubsection{Integer variables}
+
+\subsubsection{Enumeration variables}
+
+
+\section{Translating EFA to FA}
+
+An EFA can be translated into its corresponding FA.
+If $A$ is the translation of $A_e$ we shall use the notation
+$A=trans(A_e)$. When an EFA is "flatten out" the number of states
+increases to $Q \times X_v $. The reason for this is that all the
+actions are removed and translated into events in the regular FA. Notice
+that when $A_e$ only has ordinary variables $X=X_v$. If $A_e$ also has
+state variables the guard conditions on these variables are evaluated. When a variable
+corresponds to the set of states
+in an other automata this is not possible. Therefore its guard conditions are set to
+TRUE when the translation is performed. To simplify the
+algorithm we shall restrict us to quite simple action- and guard
+functions. We shall not compare variables with each other in the guard functions.
+The updating of the variables are assumed to be independent
+from each other. This implies that they can be written as
+tuples of functions of one variable i.e.
+$a_{q \sigma p}(x)=(a^1_{q \sigma p}(x),...,a^n_{q \sigma p}(x))=(a^1_{q
+\sigma p}(x_1),...,a^n_{q \sigma p}(x_n))$. We shall assume that the
+guards are parsed and written in disjunctive normal form $g_{q
+\sigma p}(x)=g_1(x)\vee ...\vee g_j(x)= (g^{1}_{1}(x_1)\wedge
+...\wedge g^{n}_{1}(x_n) )\vee ...\vee (g^{1}_{j}(x_1)\wedge
+...\wedge g^{n}_{j}(x_n) )$.
+
+These assumptions makes it
+straight forward to translate an EFA to an FA. Given an extended
+finite automaton $A_{e}=\langle Q, \Sigma, \delta, q_i, Q_m, X, G
+,x_0, X_m \rangle$ with simple guard and
+action functions, the steps are:\\
+
+
+
+\begin{enumerate}
+   \item [0] In the guard formulas (written in disjunctive normal form) the guards on
+             the state variables are evaluated. If an and-clause belonging to a state variable is
+             FALSE the "OR" component that it belongs to is removed, and if it is TRUE the and-clause
+             is removed. The number of "OR" components in the modified
+             guards will in what follows be denoted by $|g_{q \sigma p}|$.
+
+   \item [1] Form a regular FA, $A'$, from $A_{e}$ by:
+   \begin{enumerate}
+   \item [(i)] removing $G$, $X$, $X_m$, $x_0$ and the alphabet $\Sigma$,
+
+   \item [(ii)] form the alphabet of $A'$ by giving unique names to all events that are enabled in $A_{e}$,
+
+   \item [(iii)] update the transitions by changing the names of the events accordingly.
+
+   \item [(iv)] divide each event in $A'$ into $|g_{q \sigma p}|$ events with unique
+   names,
+   \item [(v)] split the corresponding transition into $|g_{q \sigma p}|$
+transitions using the new event names.
+
+   \end{enumerate}
+
+
+ \item [2]  Realize an automaton $A_{k}$ for each one of the ordinary variables $x_{v}$,
+ with as many events the total number of events in $A'$. The events in $A_k$ are associated
+ to the guard function belonging
+ to the right "OR" component of the guard. The transitions
+correspond to the action functions and they are enabled if the corresponding
+guard function is true.
+ \item [3]  The wanted finite automaton $A$ is formed by synchronizing $A_{k}$, $k=1,...,m$ with $A'$.
+ Here, the index $m$ is the total number of ordinary variables in $A_e$.
+ \item [4] Change the event names of $A$ to the original ones. Add to $A$ the possible events
+ in $A_{e}$ not present in any transitions, so that the two alphabets agree.
+\end{enumerate}
+The number of states in the variable automata equals the range of the corresponding variable.
+In particular, the marked states of a variable automaton are those that correspond to the set
+of marked values of that variable.
+
+In the last two steps  of the algorithm we obtain a monolithic description of $A_e$. To avoid the so called
+ state-space explosion problem, we must investigate the modular automata model obtained in step 2. However,
+ the modular structure in the algorithm does not have the correct alphabet and can therefore not be used to
+ verify specifications against a given plant model. For instance, suppose we have a model of the plant and
+ a specification in EFA form. To analyze the specification against the plant and at the same time
+use the modular structure in the translation algorithm we must translate them simultaneously.
+
+Note that if two EFA's has common variables, we cannot first translate them
+separately into standard FA and then synchronize them. Either this
+has to be done simultaneously or the automata must be synchronized
+on a higher level. The same problem occurs when translating EFA's with
+state variables. However, by synchronizing all automata with
+common variables an EFA with local ordinary variables can be constructed.
+
+
+
+\section{The synchronous product}
+
+The synchronous composition of two EFA's must consider that the automata
+may have both events and variables in common. When synchronizing two automata
+$A_e=\langle Q^A, \Sigma^A, \delta^A_e, q^A_i, Q^A_m,
+X^A, G^{A}, x^{A}_0, X^{A}_m \rangle$ and $B_e=\langle Q^B, \Sigma^B,
+\delta^B_e, q^B_i, Q^B_m, X^B, G^{B}, x^{B}_0, X^{B}_m \rangle$ that have
+common variables one must check that $A_e$ and $B_e$ are
+consistent. First of all, the common variables must have the same
+initial values. Secondly, we require that the action functions
+triggered by a common enabled event $\sigma\in \Sigma_{A}\cap
+\Sigma_{B}$ in the two automata update common variables to the
+same values, i.e. if the $i^{ith}$ variable in $x^{A}$ and the
+$j^{ith}$ variable in $x^{B}$ are the same then $(a_{q^A \sigma}(x^{A}))_i = (a_{q^B
+\sigma}(x^{B}))_j$. However, if the corresponding guard
+formula is false it may happen that $a_{q^A \sigma p^A}(x^{A}))_i \neq (a_{q^B
+\sigma p^B}(x^{B}))_j$ even though the two automata are consistent.
+To avoid such situations we require that action functions of common
+variables are identical.
+
+Before we define the synchronous product we introduce two more
+subscripts, $l$ and $c$. These are to be used for the variables.
+The subscript $l$ indicates local variables and the subscript $c$
+indicates common variables. In particular the subscripts can be
+used together with the subscripts for ordinary variables and state
+variables ($v$  and $s$, respectively). For instance, if we write
+$x_{cv}$, then $x_{cv}$ is a common ordinary variable.
+
+\subsection{Defining the product}\label{defining the product}
+
+Formally we can write the synchronous product $A_e \| B_e$ of two
+EFA's $A_e=\langle Q^A, \Sigma^A, \delta^A_e, q^A_i, Q^A_m, X^A,
+G^{A}, x^{A}_0, X^{A}_m \rangle$ and $B_e=\langle Q^B, \Sigma^B,
+\delta^B_e, q^B_i, Q^B_m, X^B, G^{B}, x^{B}_0, X^{B}_m \rangle$ as
+\begin{eqnarray}
+A_e \| B_e=\langle Q^A\times Q^B, \Sigma^A \cup \Sigma^B ,\nonumber\\
+\delta^{A\|B}_e, (q^{A}_i, q^{B}_i),\nonumber\\
+ Q^A_m\times Q^B_m, X^{A\|B},\nonumber\\
+G^{A\|B}, x^{A\|B}_0, X^{A\|B}_m\rangle.
+\end{eqnarray}
+We need to define the variables, the guard functions, the action
+functions and the transition function of the product. Let $x_{c}$
+denote the common variables of $x^{A}$ and $x^{B}$, and let
+$x^A_l$ and $x^B_l$ be the distinct variables of $x^{A}$ and
+$x^{B}$, respectively. The variables of the product of $A$ and $B$
+can be written as the vector $x^{A\|B}=(x^A_l, x_{c}, x^B_l)$. We
+define the guard functions $g_{q \sigma}(x^{A\|B})$ as
+\begin{eqnarray}\label{guard_sync_2}
+g_{q \sigma}(x^{A\|B})=\left\{
+\begin{array}{ll}
+g_{q^A\sigma}(x^{A})\wedge g_{q^B\sigma}(x^{B}) \textrm{ if }\sigma\in \Sigma^A \cap \Sigma^B\\
+g_{q^A\sigma}(x^{A}) \quad\quad \textrm{ if } \sigma\in \Sigma^A \setminus \Sigma^B\\
+g_{q^B\sigma}(x^{B}) \quad\quad \textrm{ if }
+\sigma\in\Sigma^B\setminus \Sigma^A
 \end{array}\right.
 \end{eqnarray}
-If $(q,\sigma)\notin T$ then $g_{q\sigma}$ is undefined and
-therefore $\delta_{e}(q,\sigma,x)$ is undefined. Notice that for
-the set of transitions $T_e$ in the extended automaton $A_e$ we
-have $T_e=\{(q,\sigma)\in Q \times \Sigma: g_{q\sigma}(x)=1
-\textrm{ for some } x\in X\}\subset \{(q,\sigma)\in Q \times
-\Sigma: g_{q\sigma} \textrm{ is defined } \}\ =T$.
-
-
-
-\subsection{Synchronous composition of EFA's}
-
-Formally we define the synchronous product $A\|B$ of two EFA's
+If any one of the guards functions in the above definition are
+undefined the guard function for the product $g_{q \sigma}$ is
+also undefined. To simplify the notation further, we use "dummy"
+guard functions in the following way. If $\sigma\in \Sigma^A
+\setminus \Sigma^B$ we introduce fictional guards functions
+$g_{q^B\sigma}(.)=1$ for $B$ and if $\sigma\in\Sigma^B\setminus
+\Sigma^A$ we set $g_{q^A\sigma}(.)=1$. With this convention we can
+write equation (\ref{guard_sync_2}) as
 \begin{eqnarray}
-A=\langle Q^A, \Sigma^A, \delta^A, q^A_i, Q^A_m, X^{A},
-G^A,x^A_0,X^A_m \rangle
-\end{eqnarray} and \begin{eqnarray} B=\langle Q^B, \Sigma^B, \delta^B, q^B_i,
-Q^B_m, X^{B}, G^B,x^B_0,X^B_m \rangle
-\end{eqnarray} as
+g_{q \sigma}(x^{A\|B})= g_{q^A\sigma}(x^{A})\wedge
+g_{q^B\sigma}(x^{B}).
+\end{eqnarray}
+By $a^B_{q \sigma}(x^{B}_{vl})$, we mean the restriction of
+$a^B_{q^B \sigma}(x^{B}_{v})$ to the local ordinary variables of
+$B$. The updating functions are defined as (if $x^{A}$ and $x^{B}$
+have no common variables then $x^{A\|B}_v=(x^{A}_v,x^{B}_v)$)
+\begin{eqnarray}\label{action_sync_2}
+a_{q \sigma}(x^{A\|B}_v)=\left\{
+\begin{array}{ll}
+ \big(a^A_{q^A \sigma}(x^{A}_v), a^B_{q^B \sigma}(x^{B}_{vl})\big)\quad\quad\sigma\in \Sigma^A \cap \Sigma^B\\
+\big(a^A_{q^A \sigma}(x^{A}_v), x^{B}_{vl}\big)\quad\quad\quad\quad\sigma\in \Sigma^A \setminus \Sigma^B\\
+\big(x^{A}_{vl}, a^B_{q^B
+\sigma}(x^{B}_v)\big)\quad\quad\quad\quad\sigma\in \Sigma^B
+\setminus \Sigma^A
+\end{array}\right.
+\end{eqnarray}
+As in the definition of the guard functions the notion of being
+undefined is inherited from the action functions of $A$ and $B$.
+Similar to the "dummy" guard functions we introduce fictional
+action functions. If $\sigma\in \Sigma^A \setminus \Sigma^B$ we
+introduce fictional action functions $a_{q^B\sigma}(x^B_v)=x^B_v$
+for $B$ and if $\sigma\in\Sigma^B\setminus \Sigma^A$ we set
+$a_{q^A\sigma}(x^A_v)=x^A_v$. If $x^{A}_v$ and $x^{B}_v$ have no
+common variables then equation (\ref{action_sync_2}), that defines
+the action functions of the product, simplifies to
 \begin{eqnarray}
-A\|B&=&\langle Q^A\times Q^B, \Sigma^A \cup \Sigma^B ,
-\delta^{A\|B}, (q^A_i,q^B_i) ,\nonumber\\
+a_{q \sigma}(x^{A\|B}_v)=
+ \big(a^A_{q^A \sigma}(x^{A}_v), a^B_{q^B \sigma}(x^{B}_v)\big).
+\end{eqnarray}
+
+
+ The transition function
+$\delta^{A\|B}_e$ is defined using the regular transitions
+functions $\delta^A$ and $\delta^B$ together with the guard and
+action functions of the product,
+\begin{eqnarray}
+\delta^{A\|B}_{e}(q,\sigma,x^{A\|B})=\left\{
+\begin{array}{ll}
+\big(\delta^A(q^A,\sigma),\delta^B(q^B,\sigma),a_{q \sigma}(x^{A\|B}_v), x^{A\|B}_s \big) \quad\quad \sigma\in \Sigma^A \cap \Sigma^B \quad g_{q \sigma}(x^{A\|B})=1\\
+\big(\delta^A(q^A,\sigma),q^B,a_{q \sigma}(x^{A\|B}_v), x^{A\|B}_s\big) \quad\quad\quad\quad\quad \sigma\in \Sigma^A \setminus \Sigma^B \quad g_{q \sigma}(x^{A\|B})=1\\
+\big(q^A,\delta^B(q^B,\sigma),a_{q \sigma}(x^{A\|B}_v), x^{A\|B}_s\big) \quad\quad\quad\quad\quad \sigma\in \Sigma^B \setminus \Sigma^A \quad g_{q \sigma}(x^{A\|B})=1\\
+\textrm{
+undefined}\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad
+g_{q\sigma}(x^{A\|B})=0
+\end{array}\right.
+\end{eqnarray}
+
+
+
+
+\subsection{Properties of the product}
+
+
+
+\subsubsection{When the product commutes with the translation algorithm}
+
+The synchronous product $A_e\|B_e$ of two EFA that only have local ordinary
+variables can be translated to $A\|B$ by translating
+$A_e$ and $B_e$ separately into finite automata and then
+synchronizing. In other words, the operations translating into
+$FA$ and product commute, $trans({A\|B}_e) =trans(A_e)\|trans(B_e)$.
+Before we prove this important property we shall look at the formulas
+ for the product when the components have local ordinary variables.
+ They become much easier to read.
+
+In section \ref{defining the product} we defined the synchronous product $A_e\|B_e$
+of two EFA's. Since here, we only consider automata with ordinary local variables,
+the variables for the product simplifies to $x=(x^A,x^B)$. Hence, can write the product as
+\begin{eqnarray}
+A_e\|B_e&=&\langle Q^A\times Q^B, \Sigma^A \cup \Sigma^B ,
+\delta^{A\|B}_e, (q^A_i,q^B_i) ,\nonumber\\
 && Q^A_m\times Q^B_m, X^A \times X^B, G^{A\|B},(x^A_0,x^B_0),
 X^A_m \times X^B_m \rangle.
 \end{eqnarray}
-To define the guard functions, the action functions and the
-transition function of the product we make use of the
-corresponding functions in $A$ and $B$. To denote the elements of
-$A\|B$ we remove unnecessary  superscripts and write $A\|B=\langle
-Q, \Sigma, \delta, q_i, Q_m, X, G ,x_0, X_m \rangle$. The guard
-functions $g_{q \sigma}(x)$ are defined as
-\begin{eqnarray}\label{guard_sync_1}
-g_{q \sigma}(x)=\left\{
-\begin{array}{ll}
-g_{q^A\sigma}(x^{A})\wedge g_{q^B\sigma}(x^{B}) \quad\quad\sigma\in \Sigma^A \cap \Sigma^B\\
-g_{q^A\sigma}(x^{A})\quad\quad\quad\quad\quad\quad\quad\sigma\in \Sigma^A\setminus\Sigma^B\\
-g_{q^B\sigma}(x^{B})\quad\quad\quad\quad\quad\quad\quad\sigma\in\Sigma^B\setminus\Sigma^A
-\end{array}\right.
-\end{eqnarray}
-If in any of the three cases, the corresponding guard function is
-undefined the guard function for the product $g_{q \sigma}$ is
-also undefined. To simplify the notation and increase readability,
-we use "dummy" guard functions in the following way. If $\sigma\in
-\Sigma^A \setminus \Sigma^B$ we introduce fictional guards
-functions $g_{q^B\sigma}(.)=1$ for $B$ and if
-$\sigma\in\Sigma^B\setminus \Sigma^A$ we set $g_{q^A\sigma}(.)=1$.
-Doing this, we can write equation (\ref{guard_sync_1}) as
+Removing unnecessary  superscripts we can write $A_e\|B_e=\langle
+Q, \Sigma, \delta_e, q_i, Q_m, X, G ,x_0, X_m \rangle$. To simplify the
+notation and increase readability, we use "dummy" guard functions
+and fictional action function as in section \ref{defining the product}.
+Doing this, we can write the guard and action formulas for the product as
 \begin{eqnarray}
-g_{q \sigma}(x)= g_{q^A\sigma}(x^{A})\wedge g_{q^B\sigma}(x^{B}).
+g_{q \sigma}(x)= g_{q^A\sigma}(x^{A})\wedge g_{q^B\sigma}(x^{B})
 \end{eqnarray}
-The updating functions $a_{q \sigma}(x)$ are defined as
-\begin{eqnarray}\label{action_sync_1}
-a_{q \sigma}(x)=\left\{
-\begin{array}{ll}
- \big(a_{q^A \sigma}(x^{A}), a_{q^B \sigma}(x^{B})\big)\quad\quad\sigma\in \Sigma^A \cap \Sigma^B\\
-\big(a_{q^A\sigma}(x^{A}),x^{B}\big)\quad\quad\quad\quad\quad\sigma\in\Sigma^A\setminus\Sigma^B\\
-\big(x^{A},a_{q^B\sigma}(x^{B})\big)\quad\quad\quad\quad\quad\sigma\in\Sigma^B\setminus\Sigma^A
-\end{array}\right.
-\end{eqnarray}
-As in the definition of the guard functions (\ref{guard_sync_1}),
-the notion of being undefined is inherited from the action
-functions of $A$ and $B$. Similar to the "dummy" guard functions
-we introduce fictional action functions. If $\sigma\in \Sigma^A
-\setminus \Sigma^B$ we introduce fictional action functions
-$a_{q^B\sigma}(x^B)=x^B$ for $B$ and if
-$\sigma\in\Sigma^B\setminus \Sigma^A$ we set
-$a_{q^A\sigma}(x^A)=x^A$. With this convention equation
-(\ref{action_sync_1}) simplifies to
+and
 \begin{eqnarray}
 a_{q \sigma}(x)=
  \big(a_{q^A \sigma}(x^{A}), a_{q^B \sigma}(x^{B})\big).
 \end{eqnarray}
-
-
- The transition function $\delta^{A\|B}$ is defined from $\delta^A$ and $\delta^B$ as
+The transition function $\delta^{A\|B}_e$ simplifies since we do not have any
+state variables ($\delta^A$ and $\delta^B$ are the transition functions
+for the corresponding regular automata)
 \begin{eqnarray}
-\delta^{A\|B}(q,\sigma,x)=\left\{
+\delta^{A\|B}_e(q,\sigma,x)=\left\{
 \begin{array}{ll}
 \big(\delta^A(q^A,\sigma),\delta^B(q^B,\sigma),a_{q \sigma}(x)\big) \quad\quad \sigma\in \Sigma^A \cap \Sigma^B \quad g_{q \sigma}(x)=1\\
 \big(\delta^A(q^A,\sigma),q^B,a_{q \sigma}(x)\big) \quad\quad\quad\quad\quad \sigma\in \Sigma^A \setminus \Sigma^B \quad g_{q \sigma}(x)=1\\
@@ -148,7 +398,13 @@ g_{q\sigma}(x)=0
 \end{array}\right.
 \end{eqnarray}
 
-\subsubsection{Properties of the product}
+
+\begin{theorem}
+Two automata with no common variables $A_e$ and $B_e$ fulfills
+$trans({A\|B}_e) =trans(A_e)\|trans(B_e)$.
+\end{theorem}
+
+\subsubsection{Associativity}
 
 Consider three EFA's $A$, $B$ and $C$. From the definition of the
 synchronization we shall now show that
@@ -159,8 +415,8 @@ synchronization we shall now show that
 \end{theorem}
 
 \noindent \textbf{Proof}: We need to prove that $(A\|B)\|C =
-A\|(B\|C)$. Here, we assume that the three automata have no common
-variables.
+A\|(B\|C)$. For simplicity, we assume that the three automata have
+no common variables.
 \newline\newline
 \noindent The 9-tuple representing $(A\|B)\|C$ is
 \begin{center}
@@ -211,43 +467,14 @@ transition function for the standard $FA$ is associative it
 follows that $\delta^{(A\|B)\|C}=\delta^{A\|(B\|C)}$.
 \begin{flushright}$\square$\end{flushright}
 
-The synchronous product $A\|B$ of two FSA $A$ and $B$ can be
-extended to $(A\|B)_e$ by taking the synchronous product of the
-extended components  $A_e$ and $B_e$. In other words, the
-operations extension and product commute, $(A\|B)_e=A_e\|B_e$.
 
-\subsection{The translation of an EFA to  an FA}
-To simplify the realization we shall restrict us to quite simple
-action- and guard functions. For the updating functions we assume
-that $a_{q \sigma}(x)=(a^1_{q \sigma}(x),...,a^n_{q
-\sigma}(x))=(a^1_{q \sigma}(x_1),...,a^n_{q \sigma}(x_n))$. In
-other words, the updating of the variables are independent from
-each other. For the guard functions we assume that they are given
-in disjunctive normal form $g_{q \sigma}(x)=g^1_{q \sigma}(x)\vee
-...\vee g^j_{q \sigma}(x)$. We shall denote the number of "OR"
-components $j$ in such an expression by $|g_{q \sigma}|$. These
-assumptions makes it straight forward to translate an EFA to an
-FA.
 
-Given an extended finite automaton $A=\langle Q, \Sigma, \delta,
-q_i, Q_m, X, G ,x_0, X_m \rangle$ with simple guard and action
-functions, the algorithm can be divided into four steps:\\
-- Form a regular FA, $A'$, from $A$ by removing $G$, $X$, $X_m$,
-$x_0$ and change the names of all enabled events $\sigma$ to
-$q\sigma$ i.e. the associate them with the corresponding
-transition.\\
-- Rename the events $q\sigma$ in $A'$ further into $|g_{q \sigma}|$ identical transitions with event names: $\{(q\sigma)_k\}^{|g_{q \sigma}|}_{k=1}$.\\
-- Realize an automata $A_{x_k}$ for each variable $x_k$, with
-marked "states" $X_{mk}$, initial state $x_{k 0}$ and with as many events the total number of events in $A'$.
-The transitions correspond to the action functions and they are enabled if the guard formula is true.\\
-- Synchronize all automata $A_{x_k}$, $k=1,...,n$ and $A'$.\\
-- Change back to original event names.
-\newpage
-\subsection{Translating hierarchical structures to EFA's}
-It is well known that hierarchical structures of states and
-transitions reduce the descriptive complexity of automata models.
-We shall in this section show how the hierarchy in state charts
-can be translated into EFA's.
+
+\section{Translating hierarchical structures to EFA's} It is well
+known that hierarchical structures of states and transitions
+reduce the descriptive complexity of automata models. We shall in
+this section show how the hierarchy in state charts can be
+translated into EFA's.
 
 In what follows, states are represented by boxes and hierarchy is
 illustrated by being inside or outside the boxes. Arrows between
@@ -259,120 +486,45 @@ simplest way of doing this is to enter the most recently visited
 state in the group. Hierarchical structures with quite general
 history functions can easily be translated into EFA's.
 
+\section{Remarks}
+\begin{enumerate}
+   \item [1] Shall we remove marked integer values from our definition of
+EFA's? Will the user only want to mark the states?
+
+    \item [2] Waters can only load one file. This must be fixed
+    before synch. of EFA's.
+
+    \item [3] Can we translate EFA's to Tord's stuff?
+
+    \item [4] We must find examples where EFA's are easy to use.
+
+    \item [5] We want to find examples where it is better to
+    synch. two EFA's than to translate to FA's and then synch.
+
+    \item [6] Find smart algorithm's  than convert FA's to EFA's.
+
+     \item [7] Decide what to write in our article.
+
+    \item [8] Look at EFA's as a supervisory control tool? this is
+    done in all standard papers.
+
+    \end{enumerate}
 
 
-
-\subsection{Synchronous composition of EFA's with common variables}
-
-The synchronous composition of two EFA's $A=\langle Q^A, \Sigma^A,
-\delta^A, q^A_i, Q^A_m, X^{A}, G^A, X^A_m \rangle$ and $B=\langle
-Q^B, \Sigma^B, \delta^B, q^B_i, Q^B_m, X^{B}, G^B, X^B_m \rangle$
-with common variables exists if and only if the automata are
-consistent. The consistency condition requires that the action
-functions triggered by a common enabled event $\sigma\in
-\Sigma_{A}\cap \Sigma_{B}$ in the two automata update common
-variables to the same values, i.e. if the $i^{ith}$ variable in
-$x^{A}$ and the $j^{ith}$ variable in $x^{B}$ are the same
-variable and $g_{q^A \sigma}(x^{A})\wedge g_{q^B \sigma}(x^{B})=1$
-where $(q^A,q^B)\in Q^A\times Q^B$ then $(a_{q^A \sigma}(x^{A}))_i
-= (a_{q^B \sigma}(x^{B}))_j$.
-
-The consistency condition can be verified by inspection. However,
-if the vectors $x^{A}$ or $x^{B}$ disable the corresponding guard
-formula ($g_{q^A \sigma}(x^{A})\wedge g_{q^B \sigma}(x^{B})$) it
-may happen that $a_{q^A \sigma}(x^{A}))_i \neq (a_{q^B
-\sigma}(x^{B}))_j$ even though the two automata are consistent.
-Therefore it may be a time-consuming task to verify the
-consistency condition by inspection. In section
-\ref{Implementation} we will present algorithms that includes a
-consistency check of the synchronous
-composition of two EFA's. \\
-
-Formally we define the synchronous product $A\|B$ of two EFA's
-$A=\langle Q^A, \Sigma^A, \delta^A, q^A_i, Q^A_m, X^{A}, G^A,X^A_m
-\rangle$ and $B=\langle Q^B, \Sigma^B, \delta^B, q^B_i, Q^B_m,
-X^{B}, G^B,X^B_m
- \rangle$ as
-\begin{eqnarray}
-A\|B=\langle Q^A\times Q^B, \Sigma^A \cup \Sigma^B , \delta, q_i,
-Q^A_m\times Q^B_m, Z, G, Z_m \rangle.
-\end{eqnarray}
-To define the integer variables, the guard functions, the action
-functions and the transition function for the product we make use
-of the corresponding elements in $A$ and $B$.
-
- Let $z^{AB}$ denote the common variables of $x^{A}$ and $x^{B}$, and let $z^A$
-and $z^B$ be the distinct variables of $x^{A}$ and $x^{B}$,
-respectively. We define the integer variables $z$ of the
-synchronous product of $A$ and $B$ as the vector $z=(z^A, z^{AB},
-z^B)$. The guard functions $g_{q \sigma}(z)$ are defined as
-\begin{eqnarray}\label{guard_sync_2}
-g_{q \sigma}(z)=\left\{
-\begin{array}{ll}
-g_{q^A\sigma}(x^{A})\wedge g_{q^B\sigma}(x^{B}) \textrm{ if }\sigma\in \Sigma^A \cap \Sigma^B\\
-g_{q^A\sigma}(x^{A}) \quad\quad \textrm{ if } \sigma\in \Sigma^A \setminus \Sigma^B\\
-g_{q^B\sigma}(x^{B}) \quad\quad \textrm{ if }
-\sigma\in\Sigma^B\setminus \Sigma^A
-\end{array}\right.
-\end{eqnarray}
-If any one of the guards functions in the above definition are
-undefined the guard function for the product $g_{q \sigma}$ is
-also undefined. To simplify the notation further, we use "dummy"
-guard functions in the following way. If $\sigma\in \Sigma^A
-\setminus \Sigma^B$ we introduce fictional guards functions
-$g_{q^B\sigma}(.)=1$ for $B$ and if $\sigma\in\Sigma^B\setminus
-\Sigma^A$ we set $g_{q^A\sigma}(.)=1$. With this convention we can
-write equation (\ref{guard_sync_2}) as
-\begin{eqnarray}
-g_{q \sigma}(z)= g_{q^A\sigma}(x^{A})\wedge g_{q^B\sigma}(x^{B}).
-\end{eqnarray}
-To define the action functions for $A\|B$ we look at the
-restrictions of the updating functions $a^A_\delta$ and
-$a^B_\delta$ to the sets $Z^A$ and $Z^B$. The updating functions
-are defined as (if $x^{A}$ and $x^{B}$ have no common variables
-then $z=(x^{A},x^{B})$)
-\begin{eqnarray}\label{action_sync_2}
-a_{q \sigma}(z)=\left\{
-\begin{array}{ll}
- \big(a^A_{q^A \sigma}(x^{A}), a^B_{q^B \sigma}(z^{B})\big)\quad\quad\sigma\in \Sigma^A \cap \Sigma^B\\
-\big(a^A_{q^A \sigma}(x^{A}), z^{B}\big)\quad\quad\quad\sigma\in \Sigma^A \setminus \Sigma^B\\
-\big(z^{A}, a^B_{q^B \sigma}(x^{B})\big)\quad\quad\quad\sigma\in
-\Sigma^B \setminus \Sigma^A
-\end{array}\right.
-\end{eqnarray}
-As in the definition of the guard functions the notion of being
-undefined is inherited from the action functions of $A$ and $B$.
-Similar to the "dummy" guard functions we introduce fictional
-action functions. If $\sigma\in \Sigma^A \setminus \Sigma^B$ we
-introduce fictional action functions $a_{q^B\sigma}(x^B)=x^B$ for
-$B$ and if $\sigma\in\Sigma^B\setminus \Sigma^A$ we set
-$a_{q^A\sigma}(x^A)=x^A$. If $x^{A}$ and $x^{B}$ have no common
-variables then equation (\ref{action_sync_2}), that defines the
-action functions of the product, simplifies to
-\begin{eqnarray}
-a_{q \sigma}(z)=
- \big(a^A_{q^A \sigma}(x^{A}), a^B_{q^B \sigma}(x^{B})\big).
-\end{eqnarray}
-
-
- The transition function
-$\delta(q,\sigma,z)$ is defined from $\delta^A$ and $\delta^B$ as
-\begin{eqnarray}
-\delta(q,\sigma,z)=\left\{
-\begin{array}{ll}
-\big(\delta^A(q^A,\sigma),\delta^B(q^B,\sigma),a_{q \sigma}(z)\big) \quad\quad \sigma\in \Sigma^A \cap \Sigma^B \quad g_{q \sigma}(z)=1\\
-\big(\delta^A(q^A,\sigma),q^B,a_{q \sigma}(z)\big) \quad\quad\quad\quad\quad \sigma\in \Sigma^A \setminus \Sigma^B \quad g_{q \sigma}(z)=1\\
-\big(q^A,\delta^B(q^B,\sigma),a_{q \sigma}(z)\big) \quad\quad\quad\quad\quad \sigma\in \Sigma^B \setminus \Sigma^A \quad g_{q \sigma}(z)=1\\
-\textrm{
-undefined}\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad
-g_{q\sigma}(z)=0
-\end{array}\right.
-\end{eqnarray}
-
-\section{Implementation of EFA's with hierarchy in Supremica}
-
-\subsection{Supremica}
-
-\subsection{Implementation}\label{Implementation}
+\section{Implementation}\label{Implementation}
 \subsection{Examples}
+
+\begin{thebibliography}{99}
+
+\bibitem{Chen} Y-L. Chen and F. Lin (2000). Modeling of Discrete Event Systems
+Using Finite State Machines with Parameters, emph{Proc. of the 2000 IEEE International Conference on Control Applications},
+Anchorag, Alaska, USA, pp. 941-946.
+
+\bibitem{Yang}Y. Yang and P. Gohari(2005). Embedded supervisory control of discrete-event systems,
+\emph{Proc. of the 2005 IEEE International Conference on Automation Science and Engineering},
+Edmonton, Canada, pp. 410-415.
+
+
+\end{thebibliography}
+
 \end{document}

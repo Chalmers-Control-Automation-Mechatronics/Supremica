@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleWindow
 //###########################################################################
-//# $Id: ModuleWindow.java,v 1.23 2006-02-20 22:20:21 robi Exp $
+//# $Id: ModuleWindow.java,v 1.24 2006-03-02 12:12:49 martin Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -31,6 +31,7 @@ import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
 import javax.xml.bind.JAXBException;
 
+
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -42,12 +43,10 @@ import java.awt.dnd.DragSourceAdapter;
 import java.awt.dnd.DragSourceDragEvent;
 import java.awt.dnd.DragSourceListener;
 import java.awt.dnd.InvalidDnDOperationException;
-
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.UndoableCommand;
 import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.observer.Observer;
-import net.sourceforge.waters.gui.observer.Subject;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.UndoRedoEvent;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
@@ -76,6 +75,10 @@ import net.sourceforge.waters.subject.module.ParameterBindingSubject;
 import net.sourceforge.waters.subject.module.ParameterSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
+
+//EFA-----------------
+import net.sourceforge.waters.subject.module.*;
+
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
 import net.sourceforge.waters.subject.module.IdentifierSubject;
@@ -220,6 +223,9 @@ public class ModuleWindow
 		int nbrOfAddedAutomata = supremica.addProject(supremicaProject);
 
 		System.err.println(nbrOfAddedAutomata);
+	//EFA question: 
+		/*export everything to supremica 
+		and translate to single automata there?*/
 	}
 
 	public JPanel createEventsPane()
@@ -878,10 +884,10 @@ public class ModuleWindow
 			if ((o instanceof SimpleComponentSubject))
 			{
 				SimpleComponentSubject scp = (SimpleComponentSubject) o;
-
+				
 				logEntry("Adding SimpleComponentSubject: " + scp.getName());
 
-				EditorWindow ed = new EditorWindow(scp.getName() + " - Waters Editor", module, scp, this, this);
+				EditorWindow ed = new EditorWindow(scp.getName() + " - Waters Editor", module, scp, this, this); 			
 			}
 
 			ModuleSelectTree.expandPath(new TreePath(parentNode.getPath()));
@@ -1114,7 +1120,6 @@ public class ModuleWindow
 		LanguagesEN.createLanguage(WLang);
 
 		ModuleWindow editor = new ModuleWindow("Waters");
-
 	}
 
 

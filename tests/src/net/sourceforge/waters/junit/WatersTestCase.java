@@ -4,14 +4,13 @@
 //# PACKAGE: net.sourceforge.waters.junit
 //# CLASS:   JAXBTestCase
 //###########################################################################
-//# $Id: WatersTestCase.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: WatersTestCase.java,v 1.3 2006-03-02 12:12:50 martin Exp $
 //###########################################################################
 
 package net.sourceforge.waters.junit;
 
 import java.io.File;
 import junit.framework.TestCase;
-
 
 public abstract class WatersTestCase
   extends TestCase
