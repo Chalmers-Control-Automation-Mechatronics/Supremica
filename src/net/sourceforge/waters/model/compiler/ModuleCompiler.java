@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.7 2006-03-03 10:05:02 markus Exp $
+//# $Id: ModuleCompiler.java,v 1.8 2006-03-03 10:36:36 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -1027,35 +1027,38 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
 					.createTransitionProxy(transition.getSource(),
 							relabeledEvent, transition.getTarget());
             
+			String guardString;
+			List<BinaryExpressionProxy> actionList;
+			SimpleExpressionProxy guardExpression;
 			if (mEFATransitionEdgeMap.get(transition).getGuardActionBlock() != null) {
-				mEFARelabeledTransitionActionMap.put(relabeledTransition,
-						mEFATransitionEdgeMap.get(transition)
-								.getGuardActionBlock().getActionList());
 
-				String guardString = mEFATransitionEdgeMap.get(transition)
+				actionList = mEFATransitionEdgeMap.get(transition)
+						.getGuardActionBlock().getActionList();
+
+				guardString = mEFATransitionEdgeMap.get(transition)
 						.getGuardActionBlock().getGuard();
 
 				if (guardString == null) {
 					guardString = "true";
 				}
 
-				SimpleExpressionProxy guardExpression;
-
-				try {
-					guardExpression = parser.parse(guardString);
-				} catch (ParseException e) {
-					guardExpression = null;
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-
-				mEFARelabeledTransitionGuardClauseMap.put(relabeledTransition,
-						guardExpression);
-
-				relabeledTransitions.add(relabeledTransition);
-
-				mCurrentEventID++;
+			} else {
+				guardString = "true";
+				actionList = new LinkedList<BinaryExpressionProxy>();
 			}
+			try {
+				guardExpression = parser.parse(guardString);
+			} catch (ParseException e) {
+				guardExpression = null;
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			mEFARelabeledTransitionActionMap.put(relabeledTransition,
+					actionList);
+			mEFARelabeledTransitionGuardClauseMap.put(relabeledTransition,
+					guardExpression);
+			relabeledTransitions.add(relabeledTransition);
+			mCurrentEventID++;
 		}
 		return relabeledTransitions;
 	}
