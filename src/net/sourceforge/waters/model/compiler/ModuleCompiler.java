@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.5 2006-03-02 12:12:50 martin Exp $
+//# $Id: ModuleCompiler.java,v 1.6 2006-03-03 09:25:06 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -801,7 +801,7 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
 					.getValue();
 					
 					//Get action expression operator.
-					BinaryOperator operator = action.getOperator();
+					String operator = action.getOperator().getName();
 					
 					//Calculate transition
 					if (operator.equals("+=")) {
@@ -1241,70 +1241,73 @@ private void createAutomatonEvents(final EventValue events)
 			while (iter.hasNext()) {
 				final CompiledSingleEventValue value = iter.next();
 				final EventProxy event = value.getEventProxy();
-				CompiledTransition duplicate = null;
+				CompiledTransition duplicate=null;
 				boolean create = true;
 				final Collection<CompiledTransition> compiledTransitions = sourceEntry
 						.getCompiledTransitions(event);
 				for (final CompiledTransition ctrans : compiledTransitions) {
 					if (ctrans.getTarget() == targetEntry.getState()) {
-						duplicate = ctrans;
+						duplicate=ctrans;
 						continue;
 					}
 					final NodeProxy cause = ctrans.getGroup();
-			          if (groupEntry.hasProperChildNode(cause)) {
-			            create = false;
-			            break;
-			          } else if (deterministic) {
-			            throw new NondeterminismException
-			              ("Multiple transitions labelled '" + event.getName() +
-			               "' originating from state '" + source.getName() + "'!",
-			               source);
-			          }
-			    }
+					if (groupEntry.hasProperChildNode(cause)) {
+						create = false;
+						break;
+					} else if (deterministic) {
+						throw new NondeterminismException(
+								"Multiple transitions labelled '"
+										+ event.getName()
+										+ "' originating from state '"
+										+ source.getName() + "'!", source);
+					}
+				}
 				if (create) {
 					final NodeProxy group = groupEntry.getNode();
 					if (duplicate == null) {
 						final TransitionProxy trans = mFactory
-						.createTransitionProxy(sourceState, event,
-								targetState);
+								.createTransitionProxy(sourceState, event,
+										targetState);
 						// EFA-----------
 						mEFATransitionEdgeMap.put(trans, edge);
 						mEFATransitions.add(trans);
 						// --------------
-						
+
 						mTransitions.add(trans);
 						sourceEntry.addTransition(trans, group);
 					}
-					
+
 					else {
 						final TransitionProxy trans = duplicate.getTransition();
 						sourceEntry.addTransition(trans, group);
 						// EFA---------
-						/*if(mEFATransitionEdgeMap.containsKey(trans)
-								&& !mEFATransitionEdgeMap
-								.get(trans)
-								.getGuardActionBlock()
-								.equals(edge.getGuardActionBlock()))
-							//Then we need to relabel the transition.
-						{*/
-							
-							final EventProxy relabeledEvent = mFactory
-							.createEventProxy(trans.getEvent()
-									.getName()
-									+ "*", trans.getEvent().getKind(),
-									trans.getEvent().isObservable());
-							
-							final TransitionProxy relabeledTrans = mFactory
-							.createTransitionProxy(trans.getSource(),
-									relabeledEvent, trans.getTarget());
-							
-							mEFATransitionEdgeMap.put(relabeledTrans, edge);
-							mEFATransitions.add(relabeledTrans);
-						//}
-						// ------------------
+						if (mEFATransitionEdgeMap.containsKey(trans)) 
+						{
+							if (!mEFATransitionEdgeMap.get(trans)
+									.getGuardActionBlock().equals(
+											edge.getGuardActionBlock())) {
+								// Then we need to relabel the transition.
+
+								final EventProxy relabeledEvent = mFactory
+										.createEventProxy(trans.getEvent()
+												.getName()
+												+ mCurrentEventID, trans.getEvent()
+												.getKind(), trans.getEvent()
+												.isObservable());
+
+								final TransitionProxy relabeledTrans = mFactory
+										.createTransitionProxy(trans
+												.getSource(), relabeledEvent,
+												trans.getTarget());
+								mCurrentEventID++;
+								mEFATransitionEdgeMap.put(relabeledTrans, edge);
+								mEFATransitions.add(relabeledTrans);
+							}
+							}
+						}
 					}
 				}
-			}
+		
 		} catch (final NondeterminismException exception) {
 			throw wrap(exception);
 		}
