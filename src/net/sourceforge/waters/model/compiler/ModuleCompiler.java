@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.6 2006-03-03 09:25:06 markus Exp $
+//# $Id: ModuleCompiler.java,v 1.7 2006-03-03 10:05:02 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -1026,34 +1026,36 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
 			final TransitionProxy relabeledTransition = mFactory
 					.createTransitionProxy(transition.getSource(),
 							relabeledEvent, transition.getTarget());
+            
+			if (mEFATransitionEdgeMap.get(transition).getGuardActionBlock() != null) {
+				mEFARelabeledTransitionActionMap.put(relabeledTransition,
+						mEFATransitionEdgeMap.get(transition)
+								.getGuardActionBlock().getActionList());
 
-			mEFARelabeledTransitionActionMap.put(relabeledTransition,
-					mEFATransitionEdgeMap.get(transition).getGuardActionBlock()
-							.getActionList());
+				String guardString = mEFATransitionEdgeMap.get(transition)
+						.getGuardActionBlock().getGuard();
 
-			String guardString = mEFATransitionEdgeMap.get(transition)
-					.getGuardActionBlock().getGuard();
+				if (guardString == null) {
+					guardString = "true";
+				}
 
-			if (guardString == null) {
-				guardString = "true";
+				SimpleExpressionProxy guardExpression;
+
+				try {
+					guardExpression = parser.parse(guardString);
+				} catch (ParseException e) {
+					guardExpression = null;
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+				mEFARelabeledTransitionGuardClauseMap.put(relabeledTransition,
+						guardExpression);
+
+				relabeledTransitions.add(relabeledTransition);
+
+				mCurrentEventID++;
 			}
-
-			SimpleExpressionProxy guardExpression;
-
-			try {
-				guardExpression = parser.parse(guardString);
-			} catch (ParseException e) {
-				guardExpression = null;
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-			mEFARelabeledTransitionGuardClauseMap.put(relabeledTransition,
-					guardExpression);
-
-			relabeledTransitions.add(relabeledTransition);
-
-			mCurrentEventID++;
 		}
 		return relabeledTransitions;
 	}
@@ -1283,15 +1285,13 @@ private void createAutomatonEvents(final EventValue events)
 						// EFA---------
 						if (mEFATransitionEdgeMap.containsKey(trans)) 
 						{
-							if (!mEFATransitionEdgeMap.get(trans)
-									.getGuardActionBlock().equals(
-											edge.getGuardActionBlock())) {
+							if (!mEFATransitionEdgeMap.get(trans).equals(edge)){
 								// Then we need to relabel the transition.
 
 								final EventProxy relabeledEvent = mFactory
 										.createEventProxy(trans.getEvent()
 												.getName()
-												+ mCurrentEventID, trans.getEvent()
+												+ "_" + mCurrentEventID, trans.getEvent()
 												.getKind(), trans.getEvent()
 												.isObservable());
 
