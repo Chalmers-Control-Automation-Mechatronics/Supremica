@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Module xmlns="http://waters.sourceforge.net/xsd/module" Name="stick_picking">
+<ParameterList>
+  <EventParameter Name="remove_one" Kind="CONTROLLABLE"/>
+  <EventParameter Name="remove_two" Kind="CONTROLLABLE"/>
+</ParameterList>
+
+<ComponentList>
+
+<SimpleComponent Kind="SPEC">
+  
+  <SimpleIdentifier Name="box"/>
+  <Graph>
+   
+   <NodeList>
+    <SimpleNode Name="buffer" Initial="true"/>
+  </NodeList>
+  
+  <EdgeList>
+  
+   <Edge Source="buffer" Target="buffer">
+         <LabelBlock>
+            <SimpleIdentifier Name="remove_one"/>
+         </LabelBlock>
+       <GuardActionBlock>
+      
+              <Guard> sticks &gt; 0 </Guard>
+              
+              <ActionList>
+                <BinaryExpression Operator="-=">
+      	          <SimpleIdentifier Name = "sticks"/>
+                  <IntConstant Value = "1"/>
+                </BinaryExpression> 
+              </ActionList>
+      
+      </GuardActionBlock>
+      </Edge>
+   <Edge Source="buffer" Target="buffer">
+            <LabelBlock>
+               <SimpleIdentifier Name="remove_two"/>
+            </LabelBlock>
+          <GuardActionBlock>
+         
+                 <Guard> sticks &gt;1 </Guard>
+                 
+                 <ActionList>
+                   <BinaryExpression Operator="-=">
+         	          <SimpleIdentifier Name = "sticks"/>
+                     <IntConstant Value = "2"/>
+                   </BinaryExpression> 
+                 </ActionList>
+         
+         </GuardActionBlock>
+      </Edge>
+   
+     </EdgeList>
+    </Graph>
+<VariableList>
+
+  <Variable Name = "sticks">
+  
+           <BinaryExpression Operator="..">
+      	    <IntConstant Value = "0"/>
+            <IntConstant Value = "5"/>
+           </BinaryExpression> 
+           
+           <IntConstant Value = "5"/>
+  </Variable>
+ </VariableList>
+ 
+</SimpleComponent>
+</ComponentList>
+</Module>

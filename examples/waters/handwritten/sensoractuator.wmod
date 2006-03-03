@@ -1,0 +1,346 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Module xmlns="http://waters.sourceforge.net/xsd/module" Name="Sensoractuator">
+<ParameterList>
+  <EventParameter Name="move_right" Kind="UNCONTROLLABLE"/>
+  <EventParameter Name="move_left" Kind="UNCONTROLLABLE"/>
+  <EventParameter Name="change_direction" Kind="CONTROLLABLE"/>
+</ParameterList>
+<ComponentList>
+<SimpleComponent Kind="SPEC">
+
+
+<SimpleIdentifier Name="Sensoractuator"/>
+
+<Graph Deterministic = "true">
+
+  <NodeList>
+    <SimpleNode Name="A" Initial="true"/>
+    <SimpleNode Name="B" Initial="false"/>
+    <SimpleNode Name="C" Initial="false"/>
+    <SimpleNode Name="D" Initial="false"/>
+    <SimpleNode Name="E" Initial="false"/>
+  </NodeList>
+  
+
+  <EdgeList>
+
+    <Edge Source="A" Target="B">
+      <LabelBlock><SimpleIdentifier Name="move_right"/>
+      </LabelBlock>
+      <GuardActionBlock>
+
+        <Guard>forward==true</Guard>
+        
+        <ActionList>
+          <BinaryExpression Operator="=">
+	    <SimpleIdentifier Name = "sensor1"/>
+            <BooleanConstant Value = "true"/>
+          </BinaryExpression> 
+        </ActionList>
+
+      </GuardActionBlock>
+    </Edge>
+
+    <Edge Source="B" Target="C">
+      <LabelBlock><SimpleIdentifier Name="move_right"/></LabelBlock>
+      <GuardActionBlock>
+
+        <Guard>forward==true</Guard>
+
+        <ActionList>
+          <BinaryExpression Operator="=">
+	    <SimpleIdentifier Name = "sensor1"/>
+            <BooleanConstant Value = "false"/>
+          </BinaryExpression> 
+        </ActionList>
+
+      </GuardActionBlock>
+    </Edge>
+
+    <Edge Source="C" Target="D">
+      <LabelBlock><SimpleIdentifier Name="move_right"/></LabelBlock>
+      <GuardActionBlock>
+
+        <Guard>forward==true</Guard>
+
+        <ActionList>
+          <BinaryExpression Operator="=">
+	    <SimpleIdentifier Name = "sensor2"/>
+            <BooleanConstant Value = "true"/>
+          </BinaryExpression> 
+        </ActionList>
+
+      </GuardActionBlock>
+    </Edge>
+    
+    <Edge Source="D" Target="E">
+      <LabelBlock><SimpleIdentifier Name="move_right"/></LabelBlock>
+      <GuardActionBlock>
+
+        <Guard>forward==true</Guard>
+
+        <ActionList>
+          <BinaryExpression Operator="=">
+	    <SimpleIdentifier Name = "sensor2"/>
+            <BooleanConstant Value = "false"/>
+          </BinaryExpression> 
+        </ActionList>
+
+      </GuardActionBlock>
+    </Edge>
+
+    <Edge Source="E" Target="D">
+      <LabelBlock><SimpleIdentifier Name="move_left"/></LabelBlock>
+      <GuardActionBlock>
+
+        <Guard>forward==false</Guard>
+
+        <ActionList>
+          <BinaryExpression Operator="=">
+	    <SimpleIdentifier Name = "sensor2"/>
+            <BooleanConstant Value = "true"/>
+          </BinaryExpression> 
+        </ActionList>
+
+      </GuardActionBlock>
+    </Edge>
+
+    <Edge Source="D" Target="C">
+      <LabelBlock><SimpleIdentifier Name="move_left"/></LabelBlock>
+      <GuardActionBlock>
+
+        <Guard>forward==false</Guard>
+
+        <ActionList>
+          <BinaryExpression Operator="=">
+	    <SimpleIdentifier Name = "sensor2"/>
+            <BooleanConstant Value = "false"/>
+          </BinaryExpression> 
+        </ActionList>
+
+      </GuardActionBlock>
+    </Edge>
+
+    <Edge Source="C" Target="B">
+      <LabelBlock><SimpleIdentifier Name="move_left"/></LabelBlock>
+      <GuardActionBlock>
+
+        <Guard>forward==false</Guard>
+
+        <ActionList>
+          <BinaryExpression Operator="=">
+	    <SimpleIdentifier Name = "sensor1"/>
+            <BooleanConstant Value = "true"/>
+          </BinaryExpression> 
+        </ActionList>
+
+      </GuardActionBlock>
+    </Edge>
+
+    <Edge Source="B" Target="A">
+      <LabelBlock><SimpleIdentifier Name="move_left"/></LabelBlock>
+      <GuardActionBlock>
+
+        <Guard>forward==false</Guard>
+
+        <ActionList>
+          <BinaryExpression Operator="=">
+	    <SimpleIdentifier Name = "sensor1"/>
+            <BooleanConstant Value = "false"/>
+          </BinaryExpression> 
+        </ActionList>
+
+      </GuardActionBlock>
+    </Edge>
+
+  <Edge Source="A" Target="A">
+      <LabelBlock><SimpleIdentifier Name="change_direction"/></LabelBlock>
+      <GuardActionBlock>
+
+        <Guard>forward==true</Guard>
+
+        <ActionList>
+          <BinaryExpression Operator="=">
+	    <SimpleIdentifier Name = "forward"/>
+            <BooleanConstant Value = "false"/>
+          </BinaryExpression> 
+        </ActionList>
+
+      </GuardActionBlock>
+    </Edge>
+
+  <Edge Source="A" Target="A">
+      <LabelBlock><SimpleIdentifier Name="change_direction"/></LabelBlock>
+      <GuardActionBlock>
+
+        <Guard>forward==false</Guard>
+
+        <ActionList>
+          <BinaryExpression Operator="=">
+	    <SimpleIdentifier Name = "forward"/>
+            <BooleanConstant Value = "true"/>
+          </BinaryExpression> 
+        </ActionList>
+
+      </GuardActionBlock>
+    </Edge>
+
+  <Edge Source="B" Target="B">
+      <LabelBlock><SimpleIdentifier Name="change_direction"/></LabelBlock>
+      <GuardActionBlock>
+
+        <Guard>forward==true</Guard>
+
+        <ActionList>
+          <BinaryExpression Operator="=">
+	    <SimpleIdentifier Name = "forward"/>
+            <BooleanConstant Value = "false"/>
+          </BinaryExpression> 
+        </ActionList>
+
+      </GuardActionBlock>
+    </Edge>
+
+  <Edge Source="B" Target="B">
+      <LabelBlock><SimpleIdentifier Name="change_direction"/></LabelBlock>
+      <GuardActionBlock>
+
+        <Guard>forward==false</Guard>
+
+        <ActionList>
+          <BinaryExpression Operator="=">
+	    <SimpleIdentifier Name = "forward"/>
+            <BooleanConstant Value = "true"/>
+          </BinaryExpression> 
+        </ActionList>
+
+      </GuardActionBlock>
+    </Edge>
+
+  <Edge Source="C" Target="C">
+      <LabelBlock><SimpleIdentifier Name="change_direction"/></LabelBlock>
+      <GuardActionBlock>
+
+        <Guard>forward==true</Guard>
+
+        <ActionList>
+          <BinaryExpression Operator="=">
+	    <SimpleIdentifier Name = "forward"/>
+            <BooleanConstant Value = "false"/>
+          </BinaryExpression> 
+        </ActionList>
+
+      </GuardActionBlock>
+    </Edge>
+
+  <Edge Source="C" Target="C">
+      <LabelBlock><SimpleIdentifier Name="change_direction"/></LabelBlock>
+      <GuardActionBlock>
+
+        <Guard>forward==false</Guard>
+
+        <ActionList>
+          <BinaryExpression Operator="=">
+	    <SimpleIdentifier Name = "forward"/>
+            <BooleanConstant Value = "true"/>
+          </BinaryExpression> 
+        </ActionList>
+
+      </GuardActionBlock>
+    </Edge>
+
+  <Edge Source="D" Target="D">
+      <LabelBlock><SimpleIdentifier Name="change_direction"/></LabelBlock>
+      <GuardActionBlock>
+
+        <Guard>forward==true</Guard>
+
+        <ActionList>
+          <BinaryExpression Operator="=">
+	    <SimpleIdentifier Name = "forward"/>
+            <BooleanConstant Value = "false"/>
+          </BinaryExpression> 
+        </ActionList>
+
+      </GuardActionBlock>
+    </Edge>
+
+  <Edge Source="D" Target="D">
+      <LabelBlock><SimpleIdentifier Name="change_direction"/></LabelBlock>
+      <GuardActionBlock>
+
+        <Guard>forward==false</Guard>
+
+        <ActionList>
+          <BinaryExpression Operator="=">
+	    <SimpleIdentifier Name = "forward"/>
+            <BooleanConstant Value = "true"/>
+          </BinaryExpression> 
+        </ActionList>
+
+      </GuardActionBlock>
+    </Edge>
+
+  <Edge Source="E" Target="E">
+      <LabelBlock><SimpleIdentifier Name="change_direction"/></LabelBlock>
+      <GuardActionBlock>
+
+        <Guard>forward==true</Guard>
+
+        <ActionList>
+          <BinaryExpression Operator="=">
+	    <SimpleIdentifier Name = "forward"/>
+            <BooleanConstant Value = "false"/>
+          </BinaryExpression> 
+        </ActionList>
+
+      </GuardActionBlock>
+    </Edge>
+
+  <Edge Source="E" Target="E">
+      <LabelBlock><SimpleIdentifier Name="change_direction"/></LabelBlock>
+      <GuardActionBlock>
+
+        <Guard>forward==false</Guard>
+
+        <ActionList>
+          <BinaryExpression Operator="=">
+	    <SimpleIdentifier Name = "forward"/>
+            <BooleanConstant Value = "true"/>
+          </BinaryExpression> 
+        </ActionList>
+
+      </GuardActionBlock>
+    </Edge>
+  </EdgeList>
+</Graph>
+
+
+<VariableList>
+ 
+  <Variable Name = "forward">
+    <SimpleIdentifier Name = "boolean"/>
+
+    <BooleanConstant Value = "false"/>
+  </Variable>
+
+  <Variable Name = "sensor1">
+    <SimpleIdentifier Name = "boolean"/>
+    <BooleanConstant Value = "false"/>
+  </Variable>
+
+
+  <Variable Name = "sensor2">
+    <SimpleIdentifier Name = "boolean"/>
+
+    <BooleanConstant Value = "false"/>
+  </Variable>
+
+</VariableList>
+
+</SimpleComponent>
+</ComponentList>
+</Module>
+
+
