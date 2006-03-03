@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<Module xmlns="http://waters.sourceforge.net/xsd/module" Name="stick_picking_two_players">
+<Module xmlns="http://waters.sourceforge.net/xsd/module" Name="Stick_picking">
 <ParameterList>
   <EventParameter Name="remove_one" Kind="CONTROLLABLE"/>
   <EventParameter Name="remove_two" Kind="CONTROLLABLE"/>
@@ -11,7 +11,7 @@
 
 <SimpleComponent Kind="SPEC">
   
-  <SimpleIdentifier Name="box"/>
+  <SimpleIdentifier Name="Two_players"/>
   <Graph>
    
    <NodeList>
