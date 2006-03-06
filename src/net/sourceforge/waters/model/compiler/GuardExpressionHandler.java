@@ -1,13 +1,10 @@
 package net.sourceforge.waters.model.compiler;
 
 import java.lang.reflect.Array;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
@@ -33,11 +30,6 @@ import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.expr.UnaryOperator;
 import net.sourceforge.waters.model.expr.Value;
-import net.sourceforge.waters.model.module.BinaryExpressionProxy;
-import net.sourceforge.waters.model.module.IntConstantProxy;
-import net.sourceforge.waters.model.module.SimpleExpressionProxy;
-import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
-import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 import net.sourceforge.waters.model.module.VariableProxy;
 import net.sourceforge.waters.subject.module.BinaryExpressionSubject;
 import net.sourceforge.waters.subject.module.IntConstantSubject;
@@ -48,27 +40,12 @@ import net.sourceforge.waters.subject.module.UnaryExpressionSubject;
 import net.sourceforge.waters.xsd.module.IntConstant;
 import net.sourceforge.waters.xsd.module.UnaryExpression;
 
-public class GuardExpressionHandler {
-	private Map<String, AbstractVariable> mVariables;
-	public static enum Type {BOOLEAN, INTEGER};
-	
-	private final Set<String> constants = new HashSet<String>(
-			Arrays.asList(new String[] {"true", "false"}));
-	private final Set mReservedWords;
-	
-	private ModuleSubjectFactory mFactory;
-	
-	private SimpleExpressionSubject mExpression;
-	private boolean mExpressionSet;
+public class GuardExpressionHandler extends ExpressionHandler{
 	private boolean mDNFGenerated;
 	private DNFExpression mDNFExpression;
-	private ExpressionParser mParser;
 	private boolean mHasPureAndExpression;
+	protected ExpressionParser mParser;
 
-	public SimpleExpressionProxy getExpression() {
-		return mExpression;
-	}
-	
 	public String toString() {
 		if(mExpressionSet) {
 			if(mDNFGenerated) {
@@ -82,23 +59,13 @@ public class GuardExpressionHandler {
 	}
 
 	public void setExpression(SimpleExpressionSubject expression) {
+		super.setExpression(expression);
 		mDNFExpression = null;
 		mDNFGenerated = false;
-		mExpressionSet = true;
 		mHasPureAndExpression = false;
-		mExpression = expression;
 	}
 
 	public GuardExpressionHandler() {
-		//we separate reserved words from constants in
-	    //case we want to add more reserved words later.
-		mReservedWords = new HashSet();
-		mReservedWords.addAll(constants);
-		
-		mVariables = new HashMap<String, AbstractVariable>();
-		declareConstants();
-		
-		mFactory = ModuleSubjectFactory.getInstance();
 		mParser = new ExpressionParser(mFactory,
 				GuardExpressionOperatorTable.getInstance());
 		mExpressionSet = false;
@@ -106,86 +73,6 @@ public class GuardExpressionHandler {
 		mDNFGenerated = false;
 	}
 	
-	private void declareConstants() {
-		//true
-		final AbstractVariable TRUE = 
-			createVariable("true", Type.BOOLEAN);
-		mVariables.put("true", TRUE);
-		assignValueToVariable("true", true);
-		
-		//false
-		final AbstractVariable FALSE = 
-			createVariable("false", Type.BOOLEAN);
-		mVariables.put("false", FALSE);
-		assignValueToVariable("false", false);
-	}
-
-	public boolean evaluate() throws EvalException {
-		if(mExpressionSet) {	
-		final Value value = eval(mExpression);
-			if(value instanceof BooleanValue) {
-				return ((BooleanValue) value).getValue();
-			}
-			else {
-				System.err.println("expression not boolean");
-				return false;
-			}
-		} else {
-			System.err.println("expression not initialized");
-			return false;
-		}
-	}
-	
-	private Value eval(SimpleExpressionProxy expression) throws EvalException {
-		//recursive descent of the syntax tree
-		if(expression instanceof UnaryExpressionProxy) {
-			return evalUnaryExpression((UnaryExpressionProxy) expression);
-		}
-		else if(expression instanceof BinaryExpressionProxy) {
-			return evalBinaryExpression((BinaryExpressionProxy) expression);
-		}
-		else if(expression instanceof IntConstantProxy) {
-			final IntValue value = new CompiledIntValue((
-					(IntConstantProxy) expression).getValue());
-			return value;
-		}
-		else if(expression instanceof SimpleIdentifierProxy) {
-			final String variableName = 
-				((SimpleIdentifierProxy) expression).getName();
-			if(mVariables.containsKey(variableName)) {
-				final AbstractVariable variable = 
-					mVariables.get(variableName);
-				return variable.getValue();
-			}
-			else {
-				System.err.println("GuardExpressionEvaluater: variable "
-						+ variableName + " not declared");
-				return null;
-			}
-		}
-		else {
-			System.err.println("GuardExpressionEvaluater: " +
-					"illegal expression type");
-			return null;
-		}
-	}
-
-	private Value evalUnaryExpression(UnaryExpressionProxy expression) throws EvalException {
-		SimpleExpressionProxy subExpression = expression.getSubTerm();
-		Value value = eval(subExpression);
-		UnaryOperator operator = expression.getOperator();
-		return operator.eval(value);
-	}
-
-	private Value evalBinaryExpression(BinaryExpressionProxy expression) throws EvalException {
-		final SimpleExpressionProxy leftHandSide = expression.getLeft();
-		final SimpleExpressionProxy rightHandSide = expression.getRight();
-		final Value rhsValue = eval(rightHandSide);
-		final Value lhsValue = eval(leftHandSide);
-		final BinaryOperator operator = expression.getOperator();
-		return operator.eval(lhsValue, rhsValue);
-	}
-
 	public Boolean evaluatePartialExpression(String variable) throws EvalException {
 		if(mHasPureAndExpression) {
 			return evaluatePartial(variable);
@@ -209,64 +96,6 @@ public class GuardExpressionHandler {
 			return result;
 	}
 	
-	public void declareVariable(String variableName, Type type) {
-		if(!mVariables.containsKey(variableName)) {
-			
-		mVariables.put(variableName, createVariable(variableName, type));
-		}
-		else if(mReservedWords.contains(variableName)) {
-			System.err.println("GuardExpressionEvaluater: " +
-					variableName + " is a reserved word and " +
-							"cannot be used as a variable");
-					
-		}
-		else {
-			System.err.println("GuardExpressionEvaluater: Variable "
-					+ variableName + " already declared");
-		}
-	}
-
-	private AbstractVariable createVariable(String name, Type type) {
-		switch(type) {
-		case INTEGER:
-			return new IntVariable(name, 0);
-		case BOOLEAN:
-			return new BooleanVariable(name, false);
-		default:
-			System.err.println("GuardExpressionHandler: unhandled " +
-					"variable type");
-			return null;
-		}
-	}
-
-	public void assignValueToVariable(String variableName, Integer value) {
-		if(mVariables.containsKey(variableName)) {
-			final AbstractVariable variable =
-				mVariables.get(variableName);
-			final Value setValue = new CompiledIntValue(value);
-			variable.setValue(setValue);
-		}
-		else {
-			System.err.println("GuardExpressionEvaluater: Variable "
-					+ variableName + " not declared");
-		}
-		
-	}
-	
-	public void assignValueToVariable(String variableName, boolean value) {
-		if(mVariables.containsKey(variableName)) {
-			final AbstractVariable variable =
-				mVariables.get(variableName);
-			final Value setValue = new CompiledBooleanValue(value);
-			variable.setValue(setValue);
-		}
-		else {
-			System.err.println("GuardExpressionHandler: Variable "
-					+ variableName + " not declared");
-		}
-		
-	}
-
 	public void convertToDNF() {
 		if(mExpressionSet) {
 			notPushDown();
@@ -601,77 +430,6 @@ public class GuardExpressionHandler {
 			wasNegated = false;
 		}
 		return wasNegated;
-	}
-	
-	private abstract class AbstractVariable {
-		protected String mName;
-		
-		public String getName() {
-			return mName;
-		}
-		
-		public void setName(String name) {
-			mName = name;
-		}
-		public abstract Type getType();
-		public abstract Value getValue();
-		public abstract void setValue(Value value);
-	}
-	
-	private class BooleanVariable extends AbstractVariable {
-		
-		private BooleanValue mValue;
-
-		public BooleanVariable(String name, boolean value) {
-			mValue = new CompiledBooleanValue(value);
-			mName = name;
-		}
-
-		public Type getType() {
-			return Type.BOOLEAN;
-		}
-
-		public Value getValue() {
-			return mValue;
-		}
-
-		public void setValue(Value value) {
-			if(value instanceof BooleanValue) {
-				mValue = (BooleanValue) value;
-			}
-			else {
-				System.err.println("illegal assignment to " +
-						"boolean variable");
-			}
-		}
-	}
-	
-	private class IntVariable extends AbstractVariable {
-
-		private IntValue mValue;
-
-		public IntVariable(String name, int value) {
-			mValue = new CompiledIntValue(value);
-			mName = name;
-		}
-
-		public Type getType() {
-			return Type.INTEGER;
-		}
-
-		public Value getValue() {
-			return mValue;
-		}
-
-		public void setValue(Value value) {
-			if(value instanceof IntValue) {
-				mValue = (IntValue) value;
-			}
-			else {
-				System.err.println("illegal assignment to " +
-						"integer variable");
-			}
-		}
 	}
 	
 	private abstract class AbstractDNF {

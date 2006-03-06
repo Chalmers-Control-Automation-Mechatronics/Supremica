@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBModuleExporter
 //###########################################################################
-//# $Id: JAXBModuleExporter.java,v 1.6 2006-03-06 17:08:46 markus Exp $
+//# $Id: JAXBModuleExporter.java,v 1.7 2006-03-06 17:38:40 martin Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -710,13 +710,13 @@ public Object visitExpressionProxy
 		element.setName(proxy.getName());
 		
 		final SimpleExpressionProxy typeProxy = proxy.getType();
-		final SimpleExpressionType typeElement = (SimpleExpressionType)visitSimpleExpressionProxy
-		(typeProxy);
+		final SimpleExpressionType typeElement = 
+			(SimpleExpressionType) typeProxy.acceptVisitor(this);
 		element.setType(typeElement);
 		
 		final SimpleExpressionProxy initialValueProxy = proxy.getInitialValue();
-		final SimpleExpressionType initialValueElement = (SimpleExpressionType)visitSimpleExpressionProxy
-		(initialValueProxy);
+		final SimpleExpressionType initialValueElement = 
+			(SimpleExpressionType) initialValueProxy.acceptVisitor(this);
 		element.setInitialValue(initialValueElement);
 		
 		final SimpleExpressionProxy markedValueProxy = proxy.getMarkedValue();
