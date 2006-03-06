@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   SimpleComponentSubject
 //###########################################################################
-//# $Id: SimpleComponentSubject.java,v 1.4 2006-03-02 12:12:49 martin Exp $
+//# $Id: SimpleComponentSubject.java,v 1.5 2006-03-06 17:08:46 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -46,7 +46,7 @@ public final class SimpleComponentSubject
    * @param identifier The identifier defining the name of the new simple component.
    * @param kind The kind of the new simple component.
    * @param graph The graph of the new simple component.
-   * @param variables The variables of the new simple component.
+   * @param variables The variables of the new simple component, or <CODE>null</CODE> if empty.
    */
   public SimpleComponentSubject(final IdentifierProxy identifier,
                                 final ComponentKind kind,
@@ -57,8 +57,12 @@ public final class SimpleComponentSubject
     mKind = kind;
     mGraph = (GraphSubject) graph;
     mGraph.setParent(this);
-    mVariables = new ArrayListSubject<VariableSubject>
-      (variables, VariableSubject.class);
+    if (variables == null) {
+      mVariables = new ArrayListSubject<VariableSubject>();
+    } else {
+      mVariables = new ArrayListSubject<VariableSubject>
+        (variables, VariableSubject.class);
+    }
     mVariables.setParent(this);
   }
 

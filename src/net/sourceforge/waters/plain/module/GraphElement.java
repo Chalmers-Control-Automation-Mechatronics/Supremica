@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   GraphElement
 //###########################################################################
-//# $Id: GraphElement.java,v 1.3 2006-02-22 03:35:07 robi Exp $
+//# $Id: GraphElement.java,v 1.4 2006-03-06 17:08:45 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;

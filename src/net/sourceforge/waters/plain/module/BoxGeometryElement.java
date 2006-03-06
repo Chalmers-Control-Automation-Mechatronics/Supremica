@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   BoxGeometryElement
 //###########################################################################
-//# $Id: BoxGeometryElement.java,v 1.3 2005-12-03 21:30:42 robi Exp $
+//# $Id: BoxGeometryElement.java,v 1.4 2006-03-06 17:08:45 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;

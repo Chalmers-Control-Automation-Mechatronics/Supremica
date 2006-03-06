@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   VariableProxy
 //###########################################################################
-//# $Id: VariableProxy.java,v 1.2 2006-03-02 12:12:49 martin Exp $
+//# $Id: VariableProxy.java,v 1.3 2006-03-06 17:08:46 markus Exp $
 //###########################################################################
 
 
@@ -47,6 +47,11 @@ public interface VariableProxy extends Proxy{
    */
  
   public SimpleExpressionProxy getInitialValue();
-
+  
+  /**
+   * Gets the marked value of this variable.
+   */
+  // @optional
+  public SimpleExpressionProxy getMarkedValue();
   
 }

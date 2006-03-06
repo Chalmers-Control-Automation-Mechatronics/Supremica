@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   ModuleSubjectFactory
 //###########################################################################
-//# $Id: ModuleSubjectFactory.java,v 1.6 2006-03-02 12:12:49 martin Exp $
+//# $Id: ModuleSubjectFactory.java,v 1.7 2006-03-06 17:08:46 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -445,7 +445,7 @@ public class ModuleSubjectFactory
   /**
    * Creates a new guard action block.
    * @param guard The guard of the new guard action block, or <CODE>null</CODE>.
-   * @param actionList The action list of the new guard action block.
+   * @param actionList The action list of the new guard action block, or <CODE>null</CODE> if empty.
    * @param geometry The geometry of the new guard action block, or <CODE>null</CODE>.
    */
   public GuardActionBlockSubject createGuardActionBlockProxy
@@ -742,7 +742,7 @@ public class ModuleSubjectFactory
    * @param identifier The identifier defining the name of the new simple component.
    * @param kind The kind of the new simple component.
    * @param graph The graph of the new simple component.
-   * @param variables The variables of the new simple component.
+   * @param variables The variables of the new simple component, or <CODE>null</CODE> if empty.
    */
   public SimpleComponentSubject createSimpleComponentProxy
       (final IdentifierProxy identifier,
@@ -866,6 +866,27 @@ public class ModuleSubjectFactory
 
   /**
    * Creates a new variable.
+   * @param name The name of the new variable.
+   * @param type The type of the new variable.
+   * @param initialValue The initial value of the new variable.
+   * @param markedValue The marked value of the new variable, or <CODE>null</CODE>.
+   */
+  public VariableSubject createVariableProxy
+      (final String name,
+       final SimpleExpressionProxy type,
+       final SimpleExpressionProxy initialValue,
+       final SimpleExpressionProxy markedValue)
+  {
+    return new VariableSubject(name,
+                               type,
+                               initialValue,
+                               markedValue);
+  }
+
+  /**
+   * Creates a new variable using default values.
+   * This method creates a variable with
+   * the marked value set to <CODE>null</CODE>.
    * @param name The name of the new variable.
    * @param type The type of the new variable.
    * @param initialValue The initial value of the new variable.

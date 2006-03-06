@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   BooleanConstantSubject
 //###########################################################################
-//# $Id: BooleanConstantSubject.java,v 1.2 2006-03-02 12:12:49 martin Exp $
+//# $Id: BooleanConstantSubject.java,v 1.3 2006-03-06 17:08:46 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -87,13 +87,13 @@ public final class BooleanConstantSubject
    */
   public void setValue(final boolean value)
   {
-    final boolean change = (mIsValue != value);
-    mIsValue = value;
-    if (change) {
-      final ModelChangeEvent event =
-        ModelChangeEvent.createStateChanged(this);
-      fireModelChanged(event);
+    if (mIsValue == value) {
+      return;
     }
+    mIsValue = value;
+    final ModelChangeEvent event =
+      ModelChangeEvent.createStateChanged(this);
+    fireModelChanged(event);
   }
 
 

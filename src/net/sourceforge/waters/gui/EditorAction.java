@@ -4,6 +4,8 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
+import java.util.List;
+
 import javax.swing.*;
 
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
@@ -58,8 +60,12 @@ public class EditorAction extends JTextField
 				((BinaryExpressionSubject) newExpression).getOperator(),
 				((BinaryExpressionSubject) newExpression).getLeft().clone(),
 				((BinaryExpressionSubject) newExpression).getRight().clone());
-		mGuardActionBlock.removeAction(mActionExpression);
-		mGuardActionBlock.addAction(action);
+		
+		List<BinaryExpressionProxy> actionList = 
+			mGuardActionBlock.getActionList();
+		actionList.remove(mActionExpression);
+		actionList.add(action);
+		
 		mActionExpression = newExpression;
 
 		mParent.resizePanel();

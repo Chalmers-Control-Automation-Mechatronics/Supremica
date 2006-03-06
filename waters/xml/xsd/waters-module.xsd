@@ -586,14 +586,24 @@
                <jaxb:property name="Type"/>
             </xs:appinfo>
            </xs:annotation>
-        </xs:group>    
-        <xs:group ref="M:InitialValue">
+        </xs:group>
+            
+        <xs:group ref="M:ValueType">
           <xs:annotation>
             <xs:appinfo>
                <jaxb:property name="InitialValue"/>
             </xs:appinfo>
            </xs:annotation>
+        </xs:group>
+         
+        <xs:group ref="M:ValueType" minOccurs="0">
+          <xs:annotation>
+            <xs:appinfo>
+               <jaxb:property name="MarkedValue"/>
+            </xs:appinfo>
+           </xs:annotation>
         </xs:group> 
+        
         <!--Remember to check that InitialValue has the right type.-->
        </xs:sequence>
       </xs:extension>
@@ -601,7 +611,7 @@
   </xs:complexType>
 </xs:element>
 
-<xs:group name="InitialValue">
+<xs:group name="ValueType">
   <xs:choice>
     <xs:element ref="M:SimpleIdentifier"/>
     <xs:element ref="M:IntConstant"/>

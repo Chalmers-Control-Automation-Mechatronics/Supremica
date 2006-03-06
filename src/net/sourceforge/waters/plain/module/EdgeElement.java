@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   EdgeElement
 //###########################################################################
-//# $Id: EdgeElement.java,v 1.3 2006-03-02 12:12:49 martin Exp $
+//# $Id: EdgeElement.java,v 1.4 2006-03-06 17:08:46 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;

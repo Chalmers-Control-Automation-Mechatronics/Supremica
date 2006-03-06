@@ -94,21 +94,18 @@
                         <IntConstant Value = "2"/>
                       </BinaryExpression> 
                     </ActionList>
-            
-            </GuardActionBlock>
+             </GuardActionBlock>
       </Edge>
      </EdgeList>
     </Graph>
 <VariableList>
-
   <Variable Name = "sticks">
-  
-           <BinaryExpression Operator="..">
+         <BinaryExpression Operator="..">
       	    <IntConstant Value = "0"/>
             <IntConstant Value = "5"/>
-           </BinaryExpression> 
-           
-           <IntConstant Value = "5"/>
+         </BinaryExpression> 
+         <IntConstant Value = "5"/>
+         <IntConstant Value = "0"/>
   </Variable>
  </VariableList>
  

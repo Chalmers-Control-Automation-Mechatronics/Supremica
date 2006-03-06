@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   SimpleComponentElement
 //###########################################################################
-//# $Id: SimpleComponentElement.java,v 1.3 2006-03-02 12:12:49 martin Exp $
+//# $Id: SimpleComponentElement.java,v 1.4 2006-03-06 17:08:46 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -43,7 +43,7 @@ public final class SimpleComponentElement
    * @param identifier The identifier defining the name of the new simple component.
    * @param kind The kind of the new simple component.
    * @param graph The graph of the new simple component.
-   * @param variables The variables of the new simple component.
+   * @param variables The variables of the new simple component, or <CODE>null</CODE> if empty.
    */
   public SimpleComponentElement(final IdentifierProxy identifier,
                                 final ComponentKind kind,
@@ -53,10 +53,14 @@ public final class SimpleComponentElement
     super(identifier);
     mKind = kind;
     mGraph = graph;
-    final List<VariableProxy> variablesModifiable =
-      new ArrayList<VariableProxy>(variables);
-    mVariables =
-      Collections.unmodifiableList(variablesModifiable);
+    if (variables == null) {
+      mVariables = Collections.emptyList();
+    } else {
+      final List<VariableProxy> variablesModifiable =
+        new ArrayList<VariableProxy>(variables);
+      mVariables =
+        Collections.unmodifiableList(variablesModifiable);
+    }
   }
 
   /**

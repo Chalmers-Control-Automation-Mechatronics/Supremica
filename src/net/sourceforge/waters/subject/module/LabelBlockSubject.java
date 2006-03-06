@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   LabelBlockSubject
 //###########################################################################
-//# $Id: LabelBlockSubject.java,v 1.5 2006-02-22 03:35:07 robi Exp $
+//# $Id: LabelBlockSubject.java,v 1.6 2006-03-06 17:08:46 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;

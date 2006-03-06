@@ -4,7 +4,8 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   SimpleNodeSubject
 //###########################################################################
-//# $Id: SimpleNodeSubject.java,v 1.6 2006-03-02 12:12:49 martin Exp $############################################################
+//# $Id: SimpleNodeSubject.java,v 1.7 2006-03-06 17:08:46 markus Exp $
+//###########################################################################
 
 package net.sourceforge.waters.subject.module;
 

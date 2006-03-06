@@ -202,13 +202,15 @@ public class EditorGuardActionBlock extends EditorLabelGroup
 	}
 
 	public void remove(EditorAction action) {
-		mGuardActionBlock.removeAction(action.getActionExpression());
+		List<BinaryExpressionProxy> actionList = 
+			mGuardActionBlock.getActionList();
+		actionList.remove(action.getActionExpression());
 		panel.remove(action);
 	}
 
 	public void remove(EditorGuard guard) {
 		mHasGuard = false;
-		mGuardActionBlock.removeGuard();
+		mGuardActionBlock.setGuard(null);
 		panel.remove(guard);
 		mActionLabelIndex = 1;
 	}

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   GuardActionBlockElement
 //###########################################################################
-//# $Id: GuardActionBlockElement.java,v 1.2 2006-03-02 12:12:49 martin Exp $
+//# $Id: GuardActionBlockElement.java,v 1.3 2006-03-06 17:08:46 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -40,7 +40,7 @@ public final class GuardActionBlockElement
   /**
    * Creates a new guard action block.
    * @param guard The guard of the new guard action block, or <CODE>null</CODE>.
-   * @param actionList The action list of the new guard action block.
+   * @param actionList The action list of the new guard action block, or <CODE>null</CODE> if empty.
    * @param geometry The geometry of the new guard action block, or <CODE>null</CODE>.
    */
   public GuardActionBlockElement(final String guard,
@@ -48,10 +48,14 @@ public final class GuardActionBlockElement
                                  final LabelGeometryProxy geometry)
   {
     mGuard = guard;
-    final List<BinaryExpressionProxy> actionListModifiable =
-      new ArrayList<BinaryExpressionProxy>(actionList);
-    mActionList =
-      Collections.unmodifiableList(actionListModifiable);
+    if (actionList == null) {
+      mActionList = Collections.emptyList();
+    } else {
+      final List<BinaryExpressionProxy> actionListModifiable =
+        new ArrayList<BinaryExpressionProxy>(actionList);
+      mActionList =
+        Collections.unmodifiableList(actionListModifiable);
+    }
     mGeometry = geometry;
   }
 

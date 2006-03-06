@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBModuleImporter
 //###########################################################################
-//# $Id: JAXBModuleImporter.java,v 1.8 2006-03-02 12:12:50 martin Exp $
+//# $Id: JAXBModuleImporter.java,v 1.9 2006-03-06 17:08:46 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -582,10 +582,17 @@ public class JAXBModuleImporter
 	    final SimpleExpressionType typeElement = element.getType();
 		final SimpleExpressionProxy type = 
 			(SimpleExpressionProxy) importElement(typeElement);
+		
 		final SimpleExpressionType initialValueElement =
 			element.getInitialValue();
 		final SimpleExpressionProxy initialValue = 
 			(SimpleExpressionProxy) importElement(initialValueElement);
+		
+		final SimpleExpressionType markedValueElement =
+			element.getMarkedValue();
+		final SimpleExpressionProxy markedValue = 
+			(SimpleExpressionProxy) importElement(markedValueElement);
+		
 		final String name = element.getName();
 
 		return mFactory.createVariableProxy(name, type, initialValue);

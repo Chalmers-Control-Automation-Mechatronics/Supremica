@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   PointGeometrySubject
 //###########################################################################
-//# $Id: PointGeometrySubject.java,v 1.4 2006-02-16 04:06:18 robi Exp $
+//# $Id: PointGeometrySubject.java,v 1.5 2006-03-06 17:08:46 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;

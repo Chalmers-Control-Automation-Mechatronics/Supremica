@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   BooleanConstantElement
 //###########################################################################
-//# $Id: BooleanConstantElement.java,v 1.2 2006-03-02 12:12:49 martin Exp $
+//# $Id: BooleanConstantElement.java,v 1.3 2006-03-06 17:08:45 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;

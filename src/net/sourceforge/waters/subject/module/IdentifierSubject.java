@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   IdentifierSubject
 //###########################################################################
-//# $Id: IdentifierSubject.java,v 1.3 2005-12-03 21:30:42 robi Exp $
+//# $Id: IdentifierSubject.java,v 1.4 2006-03-06 17:08:46 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;

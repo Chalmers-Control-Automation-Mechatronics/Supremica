@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   VariableElement
 //###########################################################################
-//# $Id: VariableElement.java,v 1.2 2006-03-02 12:12:49 martin Exp $
+//# $Id: VariableElement.java,v 1.3 2006-03-06 17:08:45 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -35,14 +35,35 @@ public final class VariableElement
    * @param name The name of the new variable.
    * @param type The type of the new variable.
    * @param initialValue The initial value of the new variable.
+   * @param markedValue The marked value of the new variable, or <CODE>null</CODE>.
+   */
+  public VariableElement(final String name,
+                         final SimpleExpressionProxy type,
+                         final SimpleExpressionProxy initialValue,
+                         final SimpleExpressionProxy markedValue)
+  {
+    mName = name;
+    mType = type;
+    mInitialValue = initialValue;
+    mMarkedValue = markedValue;
+  }
+
+  /**
+   * Creates a new variable using default values.
+   * This constructor creates a variable with
+   * the marked value set to <CODE>null</CODE>.
+   * @param name The name of the new variable.
+   * @param type The type of the new variable.
+   * @param initialValue The initial value of the new variable.
    */
   public VariableElement(final String name,
                          final SimpleExpressionProxy type,
                          final SimpleExpressionProxy initialValue)
   {
-    mName = name;
-    mType = type;
-    mInitialValue = initialValue;
+    this(name,
+         type,
+         initialValue,
+         null);
   }
 
 
@@ -63,7 +84,9 @@ public final class VariableElement
       return
         mName.equals(downcast.mName) &&
         mType.equals(downcast.mType) &&
-        mInitialValue.equals(downcast.mInitialValue);
+        mInitialValue.equals(downcast.mInitialValue) &&
+        (mMarkedValue == null ? downcast.mMarkedValue == null :
+         mMarkedValue.equals(downcast.mMarkedValue));
     } else {
       return false;
     }
@@ -97,11 +120,17 @@ public final class VariableElement
     return mInitialValue;
   }
 
+  public SimpleExpressionProxy getMarkedValue()
+  {
+    return mMarkedValue;
+  }
+
 
   //#########################################################################
   //# Data Members
   private final String mName;
   private final SimpleExpressionProxy mType;
   private final SimpleExpressionProxy mInitialValue;
+  private final SimpleExpressionProxy mMarkedValue;
 
 }

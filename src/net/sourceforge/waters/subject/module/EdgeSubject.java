@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   EdgeSubject
 //###########################################################################
-//# $Id: EdgeSubject.java,v 1.5 2006-03-02 12:12:49 martin Exp $
+//# $Id: EdgeSubject.java,v 1.6 2006-03-06 17:08:46 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -285,7 +285,9 @@ public final class EdgeSubject
 
   public void setGuardActionBlock(final GuardActionBlockSubject guardActionBlock)
   {
-    final boolean change = (mGuardActionBlock != guardActionBlock);
+    if (mGuardActionBlock == guardActionBlock) {
+      return;
+    }
     if (guardActionBlock != null) {
       guardActionBlock.setParent(this);
     }
@@ -293,11 +295,9 @@ public final class EdgeSubject
       mGuardActionBlock.setParent(null);
     }
     mGuardActionBlock = guardActionBlock;
-    if (change) {
-      final ModelChangeEvent event =
-        ModelChangeEvent.createStateChanged(this);
-      fireModelChanged(event);
-    }
+    final ModelChangeEvent event =
+      ModelChangeEvent.createStateChanged(this);
+    fireModelChanged(event);
   }
 
   /**

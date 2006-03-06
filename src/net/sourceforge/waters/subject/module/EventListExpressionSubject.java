@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   EventListExpressionSubject
 //###########################################################################
-//# $Id: EventListExpressionSubject.java,v 1.3 2006-02-22 03:35:07 robi Exp $
+//# $Id: EventListExpressionSubject.java,v 1.4 2006-03-06 17:08:46 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;

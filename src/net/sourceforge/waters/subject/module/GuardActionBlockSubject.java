@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   GuardActionBlockSubject
 //###########################################################################
-//# $Id: GuardActionBlockSubject.java,v 1.2 2006-03-02 12:12:49 martin Exp $
+//# $Id: GuardActionBlockSubject.java,v 1.3 2006-03-06 17:08:46 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -20,7 +20,6 @@ import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
-import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.unchecked.Casting;
 import net.sourceforge.waters.subject.base.ArrayListSubject;
 import net.sourceforge.waters.subject.base.ListSubject;
@@ -44,7 +43,7 @@ public final class GuardActionBlockSubject
   /**
    * Creates a new guard action block.
    * @param guard The guard of the new guard action block, or <CODE>null</CODE>.
-   * @param actionList The action list of the new guard action block.
+   * @param actionList The action list of the new guard action block, or <CODE>null</CODE> if empty.
    * @param geometry The geometry of the new guard action block, or <CODE>null</CODE>.
    */
   public GuardActionBlockSubject(final String guard,
@@ -52,8 +51,12 @@ public final class GuardActionBlockSubject
                                  final LabelGeometryProxy geometry)
   {
     mGuard = guard;
-    mActionList = new ArrayListSubject<BinaryExpressionSubject>
-      (actionList, BinaryExpressionSubject.class);
+    if (actionList == null) {
+      mActionList = new ArrayListSubject<BinaryExpressionSubject>();
+    } else {
+      mActionList = new ArrayListSubject<BinaryExpressionSubject>
+        (actionList, BinaryExpressionSubject.class);
+    }
     mActionList.setParent(this);
     mGeometry = (LabelGeometrySubject) geometry;
     if (mGeometry != null) {
@@ -154,13 +157,13 @@ public final class GuardActionBlockSubject
   //# Setters
   public void setGuard(final String guard)
   {
-    final boolean change = !mGuard.equals(guard);
-    mGuard = guard;
-    if (change) {
-      final ModelChangeEvent event =
-        ModelChangeEvent.createStateChanged(this);
-      fireModelChanged(event);
+    if (mGuard.equals(guard)) {
+      return;
     }
+    mGuard = guard;
+    final ModelChangeEvent event =
+      ModelChangeEvent.createStateChanged(this);
+    fireModelChanged(event);
   }
 
   public ListSubject<BinaryExpressionSubject> getActionListModifiable()
@@ -168,17 +171,11 @@ public final class GuardActionBlockSubject
     return mActionList;
   }
 
-  public void addAction(BinaryExpressionSubject actionExpression) {
-	mActionList.add(actionExpression);
-}
-
-public void removeAction(SimpleExpressionProxy actionExpression) {
-	mActionList.remove(actionExpression);
-  }
-
-public void setGeometry(final LabelGeometrySubject geometry)
+  public void setGeometry(final LabelGeometrySubject geometry)
   {
-    final boolean change = (mGeometry != geometry);
+    if (mGeometry == geometry) {
+      return;
+    }
     if (geometry != null) {
       geometry.setParent(this);
     }
@@ -186,16 +183,10 @@ public void setGeometry(final LabelGeometrySubject geometry)
       mGeometry.setParent(null);
     }
     mGeometry = geometry;
-    if (change) {
-      final ModelChangeEvent event =
-        ModelChangeEvent.createGeometryChanged(this, mGeometry);
-      fireModelChanged(event);
-    }
+    final ModelChangeEvent event =
+      ModelChangeEvent.createGeometryChanged(this, mGeometry);
+    fireModelChanged(event);
   }
-
-public void removeGuard() {
-	mGuard = null;
-}
 
 
   //#########################################################################

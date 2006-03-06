@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   VariableSubject
 //###########################################################################
-//# $Id: VariableSubject.java,v 1.2 2006-03-02 12:12:49 martin Exp $
+//# $Id: VariableSubject.java,v 1.3 2006-03-06 17:08:46 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -36,16 +36,40 @@ public final class VariableSubject
    * @param name The name of the new variable.
    * @param type The type of the new variable.
    * @param initialValue The initial value of the new variable.
+   * @param markedValue The marked value of the new variable, or <CODE>null</CODE>.
    */
   public VariableSubject(final String name,
                          final SimpleExpressionProxy type,
-                         final SimpleExpressionProxy initialValue)
+                         final SimpleExpressionProxy initialValue,
+                         final SimpleExpressionProxy markedValue)
   {
     mName = name;
     mType = (SimpleExpressionSubject) type;
     mType.setParent(this);
     mInitialValue = (SimpleExpressionSubject) initialValue;
     mInitialValue.setParent(this);
+    mMarkedValue = (SimpleExpressionSubject) markedValue;
+    if (mMarkedValue != null) {
+      mMarkedValue.setParent(this);
+    }
+  }
+
+  /**
+   * Creates a new variable using default values.
+   * This constructor creates a variable with
+   * the marked value set to <CODE>null</CODE>.
+   * @param name The name of the new variable.
+   * @param type The type of the new variable.
+   * @param initialValue The initial value of the new variable.
+   */
+  public VariableSubject(final String name,
+                         final SimpleExpressionProxy type,
+                         final SimpleExpressionProxy initialValue)
+  {
+    this(name,
+         type,
+         initialValue,
+         null);
   }
 
 
@@ -58,6 +82,10 @@ public final class VariableSubject
     cloned.mType.setParent(cloned);
     cloned.mInitialValue = mInitialValue.clone();
     cloned.mInitialValue.setParent(cloned);
+    if (mMarkedValue != null) {
+      cloned.mMarkedValue = mMarkedValue.clone();
+      cloned.mMarkedValue.setParent(cloned);
+    }
     return cloned;
   }
 
@@ -71,7 +99,9 @@ public final class VariableSubject
       return
         mName.equals(downcast.mName) &&
         mType.equals(downcast.mType) &&
-        mInitialValue.equals(downcast.mInitialValue);
+        mInitialValue.equals(downcast.mInitialValue) &&
+        (mMarkedValue == null ? downcast.mMarkedValue == null :
+         mMarkedValue.equals(downcast.mMarkedValue));
     } else {
       return false;
     }
@@ -105,6 +135,11 @@ public final class VariableSubject
     return mInitialValue;
   }
 
+  public SimpleExpressionSubject getMarkedValue()
+  {
+    return mMarkedValue;
+  }
+
 
   //#########################################################################
   //# Setters
@@ -113,13 +148,13 @@ public final class VariableSubject
    */
   public void setName(final String name)
   {
-    final boolean change = !mName.equals(name);
-    mName = name;
-    if (change) {
-      final ModelChangeEvent event =
-        ModelChangeEvent.createStateChanged(this);
-      fireModelChanged(event);
+    if (mName.equals(name)) {
+      return;
     }
+    mName = name;
+    final ModelChangeEvent event =
+      ModelChangeEvent.createStateChanged(this);
+    fireModelChanged(event);
   }
 
   /**
@@ -127,15 +162,15 @@ public final class VariableSubject
    */
   public void setType(final SimpleExpressionSubject type)
   {
-    final boolean change = (mType != type);
+    if (mType == type) {
+      return;
+    }
     type.setParent(this);
     mType.setParent(null);
     mType = type;
-    if (change) {
-      final ModelChangeEvent event =
-        ModelChangeEvent.createStateChanged(this);
-      fireModelChanged(event);
-    }
+    final ModelChangeEvent event =
+      ModelChangeEvent.createStateChanged(this);
+    fireModelChanged(event);
   }
 
   /**
@@ -143,15 +178,35 @@ public final class VariableSubject
    */
   public void setInitialValue(final SimpleExpressionSubject initialValue)
   {
-    final boolean change = (mInitialValue != initialValue);
+    if (mInitialValue == initialValue) {
+      return;
+    }
     initialValue.setParent(this);
     mInitialValue.setParent(null);
     mInitialValue = initialValue;
-    if (change) {
-      final ModelChangeEvent event =
-        ModelChangeEvent.createStateChanged(this);
-      fireModelChanged(event);
+    final ModelChangeEvent event =
+      ModelChangeEvent.createStateChanged(this);
+    fireModelChanged(event);
+  }
+
+  /**
+   * Sets the marked value of this variable.
+   */
+  public void setMarkedValue(final SimpleExpressionSubject markedValue)
+  {
+    if (mMarkedValue == markedValue) {
+      return;
     }
+    if (markedValue != null) {
+      markedValue.setParent(this);
+    }
+    if (mMarkedValue != null) {
+      mMarkedValue.setParent(null);
+    }
+    mMarkedValue = markedValue;
+    final ModelChangeEvent event =
+      ModelChangeEvent.createStateChanged(this);
+    fireModelChanged(event);
   }
 
 
@@ -160,5 +215,6 @@ public final class VariableSubject
   private String mName;
   private SimpleExpressionSubject mType;
   private SimpleExpressionSubject mInitialValue;
+  private SimpleExpressionSubject mMarkedValue;
 
 }
