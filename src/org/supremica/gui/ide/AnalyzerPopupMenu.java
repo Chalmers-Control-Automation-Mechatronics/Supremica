@@ -6,22 +6,33 @@ import java.awt.*;
 import javax.swing.*;
 import org.supremica.gui.MenuHandler;
 import org.supremica.util.VPopupMenu;
+import org.supremica.log.*;
 
 class AnalyzerPopupMenu
 	extends VPopupMenu
 {
+	private static Logger logger = LoggerFactory.createLogger(AnalyzerPopupMenu.class);
+
 	private static final long serialVersionUID = 1L;
 	private MenuHandler menuHandler = null;
-
 
 	public AnalyzerPopupMenu(JFrame parent)
 	{
 		setInvoker(parent);
 		menuHandler = new MenuHandler();
-		initPopups();
+		
+		try
+		{
+			initPopups();
+		}
+		catch (Exception ex)
+		{
+			logger.error(ex);
+		}
 	}
 
 	private void initPopups()
+		throws Exception
 	{
 		JMenuItem statusItem = new JMenuItem("Status");
 		statusItem.setToolTipText("Displays some statistics of the selected automata");

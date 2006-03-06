@@ -58,7 +58,6 @@ import org.supremica.util.VPopupMenu;
 // MF -- I also made the menuhandler accessible from org.supremica.gui.Supremica
 public class MenuHandler
 {
-
 	// private final JTable theTable;
 	private final JPopupMenu oneAutomataMenu = new VPopupMenu();
 	private final JPopupMenu twoAutomataMenu = new VPopupMenu();
@@ -67,6 +66,9 @@ public class MenuHandler
 	private final LinkedList zeroAutomataItems = new LinkedList();
 	private final LinkedList oneAutomataItems = new LinkedList();
 	private final LinkedList twoAutomataItems = new LinkedList();
+	private final LinkedList disabledItems = new LinkedList();
+
+	public static final int DISABLED = -1;
 
 	public MenuHandler( /* JTable theTable */)
 	{
@@ -75,6 +77,7 @@ public class MenuHandler
 	}
 
 	public void add(JMenuItem theMenuItem, int minNbrOfAutomata)
+		throws Exception
 	{
 		if (minNbrOfAutomata == 0)
 		{
@@ -88,25 +91,19 @@ public class MenuHandler
 		{
 			twoAutomataItems.add(theMenuItem);
 		}
+		else if (minNbrOfAutomata == DISABLED)
+		{
+			disabledItems.add(theMenuItem);
+		}
+		else
+		{
+			// Use an Enum instead!!!
+			throw new Exception("Error in MenuHandler. Illegal number.");
+		}
 
-		// System.err.println("new item");
-		// if (minNbrOfAutomata <= 2)
-		// {
-		// System.err.println("Added to two menu");
 		twoAutomataMenu.add(theMenuItem);
-
 		twoAutomataMenuLastSep = false;
 
-		// }
-
-		/*
-		 * if (minNbrOfAutomata <= 1)
-		 * {
-		 *       System.err.println("Added to one menu");
-		 *       oneAutomataMenu.add(theMenuItem);
-		 *       oneAutomataMenuLastSep = false;
-		 * }
-		 */
 	}
 
 	/**
@@ -155,6 +152,7 @@ public class MenuHandler
 		setEnabled(twoAutomataItems, nbrOfAutomata >= 2);
 		setEnabled(oneAutomataItems, nbrOfAutomata >= 1);
 		setEnabled(zeroAutomataItems, nbrOfAutomata >= 0);
+		setEnabled(disabledItems, false);
 
 		return twoAutomataMenu;
 	}

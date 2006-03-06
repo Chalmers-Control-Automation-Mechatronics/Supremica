@@ -13,10 +13,13 @@ import org.supremica.properties.SupremicaProperties;
 import org.supremica.gui.useractions.*;
 import org.supremica.util.VPopupMenu;
 import org.supremica.util.SupremicaMenuItem;
+import org.supremica.log.*;
 
 class MainPopupMenu
 	extends VPopupMenu
 {
+    private static Logger logger = LoggerFactory.createLogger(MainPopupMenu.class);
+
 	private static final long serialVersionUID = 1L;
 	private MenuHandler menuHandler = null;
 
@@ -28,13 +31,14 @@ class MainPopupMenu
 
 	// except for access, these are copied straight from gui.Supremica
 	private void initPopups()
+		throws Exception
 	{
 		JMenuItem selectAllItem = new JMenuItem("Select all");
 
 		menuHandler.add(selectAllItem, 0);
 		menuHandler.addSeparator();
 
-		JMenuItem statusItem = new JMenuItem("Status");
+		JMenuItem statusItem = new JMenuItem("Statistics");
 		statusItem.setToolTipText("Displays some statistics of the selected automata");
 		menuHandler.add(statusItem, 0);
 
@@ -93,29 +97,30 @@ class MainPopupMenu
 
 		JMenuItem verifyItem = new JMenuItem("Verify...");
 		verifyItem.setToolTipText("Verify properties");
-		menuHandler.add(verifyItem, 1);
 		verifyItem.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
 			{
-				ActionMan.automataVerify_actionPerformed(getGui());
-				getGui().repaint();
-			}
-		});
-
-		JMenuItem synthesizeItem = new SupremicaMenuItem(ActionMan.synthesizeAction);
-		synthesizeItem.setToolTipText("Synthesize supervisor");
-		menuHandler.add(synthesizeItem, 1);
-		/* Taken care of by SynthesizeAction -- all in one place y'know.
-		synthesizeItem.addActionListener(new ActionListener()
-		{
 				public void actionPerformed(ActionEvent e)
 				{
-						ActionMan.automataSynthesize_actionPerformed(getGui());
-						getGui().repaint();
+					ActionMan.automataVerify_actionPerformed(getGui());
+					getGui().repaint();
 				}
-		});
-		*/
+			});
+		
+		JMenuItem synthesizeItem = new SupremicaMenuItem(ActionMan.synthesizeAction);
+		synthesizeItem.setToolTipText("Synthesize supervisor");
+			
+		if (SupremicaProperties.getStudentVersion())
+		{
+			verifyItem.setToolTipText("Verification is disabled--use the Workbench!");
+			synthesizeItem.setToolTipText("Synthesis is disabled--use the Workbench!");
+			menuHandler.add(verifyItem, menuHandler.DISABLED);
+			menuHandler.add(synthesizeItem, menuHandler.DISABLED);
+		}
+		else
+		{
+			menuHandler.add(verifyItem, 1);
+			menuHandler.add(synthesizeItem, 1);
+		}
 
 		JMenuItem minimizeItem = new JMenuItem("Minimize...");
 		minimizeItem.setToolTipText("Minimize automata");
@@ -148,9 +153,18 @@ class MainPopupMenu
 		// JMenu standardalgos = JMenu("Standard Algorithms");
 		// menuHandler.add(standardalgos, 0);
 
+		/* These are rarely if ever used... 
 		JMenuItem allAcceptingItem = new JMenuItem("Set all states as accepting");
 		allAcceptingItem.setToolTipText("Make all states accepting (marked)");
 		menuHandler.add(allAcceptingItem, 1);
+		allAcceptingItem.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				ActionMan.automataAllAccepting_actionPerformed(getGui());
+				getGui().repaint();
+			}
+		});
 
 		JMenuItem stateEnumerator = new JMenuItem(ActionMan.stateEnumerator);
 		menuHandler.add(stateEnumerator, 1);
@@ -158,10 +172,19 @@ class MainPopupMenu
 		JMenuItem complementItem = new JMenuItem("Automaton complement");
 		complementItem.setToolTipText("Generate an automaton with complementary marked language");
 		menuHandler.add(complementItem, 1);
+		complementItem.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				ActionMan.automataComplement_actionPerformed(getGui());
+				getGui().repaint();
+			}
+		});
 
 		// Do this...
 		JMenuItem languageRestrictor = new SupremicaMenuItem(ActionMan.languageRestrictor);
 		menuHandler.add(languageRestrictor, 1);
+		*/
 
 		// Do this...
 		JMenuItem eventHider = new SupremicaMenuItem(ActionMan.eventHider);
@@ -475,22 +498,6 @@ class MainPopupMenu
 				getGui().repaint();
 			}
 		});
-		allAcceptingItem.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				ActionMan.automataAllAccepting_actionPerformed(getGui());
-				getGui().repaint();
-			}
-		});
-		complementItem.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				ActionMan.automataComplement_actionPerformed(getGui());
-				getGui().repaint();
-			}
-		});
 		copyItem.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -561,6 +568,13 @@ class MainPopupMenu
 		ActionMan.gui = gui;
 		menuHandler = new MenuHandler();
 
-		initPopups();
+		try
+		{
+			initPopups();
+		}
+		catch (Exception ex)
+		{
+			logger.error(ex);
+		}
 	}
 }

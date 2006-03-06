@@ -72,6 +72,8 @@ public final class SupremicaProperties
 	private static final long serialVersionUID = 1L;
 	/** the last property file used, so we write back changes to the correct config file */
 	private static String lastPropertyFile = null;
+
+	// Unsorted options (please sort)
 	private static final String DOC_DB_SERVER_NAME = "docdbHost";
 	private static final String DOC_DB_SERVER_PORT = "docdbPort";
 	private static final String DOC_DB_SERVER_USER = "docdbUser";
@@ -98,14 +100,6 @@ public final class SupremicaProperties
 	private static final String VERBOSE_MODE = "verboseMode";
 	private static final String SUPERUSER_IDENTITY = "superuserIdentity";
 	private static final String ALLOW_SUPERUSER_LOGIN = "allowSuperUserLogin";
-	private static final String GENERAL_REDIRECT_STDOUT = "generalRedirectStdout";
-	private static final String GENERAL_REDIRECT_STDERR = "generalRedirectStderr";
-	private static final String GENERAL_LOOKANDFEEL = "generalLookAndFeel";
-//	private static final String GENERAL_USE_SWT = "generalUseSWT";
-
-	// WHAT IS RCP!?!?!???! IS THAT INTUITIVELY CLEAR OR HAD IT BEEN A GOOD IDEA TO WRITE
-	// AN ENLIGHTENING COMMENT??!! Grrrrrrr...
-	private static final String GENERAL_USE_RCP = "generalUseRcp";
 
 	// Logging options
 	private static final String LOG_TO_CONSOLE = "logToConsole";
@@ -127,6 +121,17 @@ public final class SupremicaProperties
 	private static final String GENERAL_SILENT_EVENT_NAME = "generalSilentEventName";
 	private static final String GENERAL_SILENT_CONTROLLABLE_EVENT_NAME = "generalSilentControllableEventName";
 	private static final String GENERAL_SILENT_UNCONTROLLABLE_EVENT_NAME = "generalSilentUncontrollableEventName";
+	private static final String GENERAL_USE_SECURITY = "generalUseSecurity";
+	private static final String GENERAL_STUDENT_VERSION = "generalStudentVersion";
+	private static final String GENERAL_REDIRECT_STDOUT = "generalRedirectStdout";
+	private static final String GENERAL_REDIRECT_STDERR = "generalRedirectStderr";
+	private static final String GENERAL_LOOKANDFEEL = "generalLookAndFeel";
+	// WHAT THE &#/(OÖÅÄH IS RCP!?!?!???! IS THAT INTUITIVELY CLEAR OR
+	// HAD IT BEEN A GOOD IDEA TO WRITE AN ENLIGHTENING COMMENT??!! 
+	// Grrrrrrr...
+	private static final String GENERAL_USE_RCP = "generalUseRcp";
+	// AND WHAT IS SWT? Grrrrr!
+	// private static final String GENERAL_USE_SWT = "generalUseSWT";
 
 	// Synchronization Options
 	private static final String SYNC_FORBID_UNCON_STATES = "syncForbidUncontrollableStates";
@@ -154,7 +159,6 @@ public final class SupremicaProperties
 	private static final String SYNTHESIS_MAXIMALLY_PERMISSIVE = "synthesisMaximallyPermissive";
 	private static final String SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL = "synthesisMaximallyPermissiveIncremental";
 	private static final String SYNTHESIS_REDUCE_SUPERVISORS = "synthesisReduceSupervisors";
-	private static final String GENERAL_USE_SECURITY = "generalUseSecurity";
 
 	// Minimization Options
 	private static final String MINIMIZATION_EQUIVALENCE_RELATION = "minimizationEquivalenceRelation";
@@ -192,7 +196,6 @@ public final class SupremicaProperties
 	private static final String BDD_TRANSITION_OPTIMIZER_ALGO = "bddTransitionOptimizerAlgo"; // transition_optimizer_algo
 	private static final String BDD_INTERLEAVED_VARIABLES = "bddInterleavedVariables"; // interleaved_variables
 	private static final String BDD_LEVEL_GRAPHS = "bddLevelGraphs"; // show_level_graph
-
 
 	// Simulation stuff
 	private static final String SIMULATION_IS_EXTERNAL = "simulationIsExternal";
@@ -295,6 +298,8 @@ public final class SupremicaProperties
 		setProperty(GENERAL_SILENT_EVENT_NAME, "tau", false);
 		setProperty(GENERAL_SILENT_CONTROLLABLE_EVENT_NAME, "tau_c", false);
 		setProperty(GENERAL_SILENT_UNCONTROLLABLE_EVENT_NAME, "tau_u", false);
+		setProperty(GENERAL_USE_SECURITY, "false", false);
+		setProperty(GENERAL_STUDENT_VERSION, "false", true);
 		// Synchronization
 		setProperty(SYNC_FORBID_UNCON_STATES, "true", true);
 		setProperty(SYNC_EXPAND_FORBIDDEN_STATES, "true", true);
@@ -331,7 +336,6 @@ public final class SupremicaProperties
 		setProperty(SIMULATION_IS_EXTERNAL, "false", false);
 		setProperty(SIMULATION_CYCLE_TIME, "100", false);
 		// The rest (move to where it belongs if you know where that is!!!)
-		setProperty(GENERAL_USE_SECURITY, "false", false);
 		setProperty(INCLUDE_USERINTERFACE, "false", true);
 		setProperty(SOFTPLC_CYCLE_TIME, "40", true);
 		//setProperty(FB_RUNTIME_LIBRARY_PATH, "", true);
@@ -1006,6 +1010,24 @@ public final class SupremicaProperties
 	{
 		wp.setProperty(GENERAL_SILENT_UNCONTROLLABLE_EVENT_NAME, command);
 	}
+	public static boolean generalUseSecurity()
+	{
+		return toBoolean(wp.getProperty(GENERAL_USE_SECURITY));
+	}
+	public static void setUseSecurity(boolean useSecurity)
+	{
+		wp.setProperty(GENERAL_USE_SECURITY, toString(useSecurity));
+	}
+	public static boolean getStudentVersion()
+	{
+		return toBoolean(wp.getProperty(GENERAL_STUDENT_VERSION));
+	}
+	public static void setStudentVersion(boolean studentVersion)
+	{
+		wp.setProperty(GENERAL_STUDENT_VERSION, toString(studentVersion));
+	}
+
+	// Other
 	public static String getDotExecuteCommand()
 	{
 		return wp.getProperty(DOT_EXECUTE_COMMAND);
@@ -1404,14 +1426,6 @@ public final class SupremicaProperties
 	}
 
 	// Other (I think)
-	public static boolean generalUseSecurity()
-	{
-		return toBoolean(wp.getProperty(GENERAL_USE_SECURITY));
-	}
-	public static void setUseSecurity(boolean useSecurity)
-	{
-		wp.setProperty(GENERAL_USE_SECURITY, toString(useSecurity));
-	}
 	public static boolean includeAnimator()
 	{
 		return toBoolean(wp.getProperty(INCLUDE_ANIMATOR));
