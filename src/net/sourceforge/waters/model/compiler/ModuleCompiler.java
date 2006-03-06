@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.11 2006-03-06 17:38:40 martin Exp $
+//# $Id: ModuleCompiler.java,v 1.12 2006-03-06 17:47:38 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -36,7 +36,6 @@ import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.model.expr.AtomValue;
 import net.sourceforge.waters.model.expr.BinaryOperator;
-import net.sourceforge.waters.model.expr.BooleanValue;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.IndexValue;
@@ -80,9 +79,10 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 
 //EFA-------------------
 import net.sourceforge.waters.model.module.VariableProxy;
+import net.sourceforge.waters.plain.des.EventElement;
 //
 
-import net.sourceforge.waters.subject.module.BinaryExpressionSubject;
+import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 import net.sourceforge.waters.xsd.base.ComponentKind;
@@ -654,9 +654,7 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
 		// Create an expression handler to handle the guard expressions.
 		GuardExpressionHandler handler = new GuardExpressionHandler();
 
-		final Collection<EventProxy> VariableStateProps = new TreeSet<EventProxy>();
-
-		List<StateProxy> variableStates = new LinkedList<StateProxy>();
+		
 
 		// Declare variable, enum not yet implemented (TODO remove comment when implemented).
 		if (variable.getType() instanceof SimpleIdentifierProxy) {
@@ -666,9 +664,9 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
 			handler.declareVariable(variable.getName(),
 					GuardExpressionHandler.Type.INTEGER);
 		}
-
+		List<StateProxy> variableStates = new LinkedList<StateProxy>();
 		//Create states corresponding to the different states of the variable.
-		createVariableStates(variable, variableStates, VariableStateProps);
+		createVariableStates(variable, variableStates);
 
 		//Create transitions corresponding to all allowed updates of the variable.
 		Set<TransitionProxy> variableTransitions = 
@@ -740,23 +738,15 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
 		return variableTransitions;
 	}
 
-	private void createBooleanVariableTransition(VariableProxy variable,
-			GuardExpressionHandler handler, List<StateProxy> variableStates,
-			Set<TransitionProxy> variableTransitions, TransitionProxy transition,
-			final BinaryExpressionProxy action) {
-		int targetIndex, sourceIndex;
-		
-		//evaluater used to evaluate RHS of action expression
-		ExpressionHandler evaluater = new ExpressionHandler();
-		
-		//Create the set {true, false} to iterate over
+	private void createBooleanVariableTransition(VariableProxy variable, GuardExpressionHandler handler, List<StateProxy> variableStates, Set<TransitionProxy> variableTransitions, TransitionProxy transition, final BinaryExpressionProxy action) {
+		int targetIndex;
 		Set<Boolean> booleanValues = new HashSet<Boolean>();
 		booleanValues.add(true);
 		booleanValues.add(false);
 		
 		for(Boolean value: booleanValues) {
 			handler.assignValueToVariable(variable.getName(), value);
-			sourceIndex = value ? 1 : 0;
+			int sourceIndex = value ? 1 : 0;
 			
 			//Evaluate guard function for this variable.
 			Boolean guardValue = evaluatePartialGuard(variable, handler);
@@ -765,18 +755,9 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
 			if (guardValue) {
 				final StateProxy source = variableStates.get(sourceIndex);
 				if(action != null) {
-					//evaluate action expression to determine target index
-					//for the transition to be created
-					evaluater.setExpression((SimpleExpressionSubject) action.getRight());
-					Value constant;
-					try {
-						constant = evaluater.evaluate();
-					} catch (EvalException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-						constant = null;
-					}
-					targetIndex = ((BooleanValue) constant).getValue() ? 1 : 0;
+					final boolean constant = ((BooleanConstantProxy) action
+							.getRight()).isValue();
+					targetIndex = constant ? 1 : 0;
 				} else {
 					//action is null => no update takes place.
 					targetIndex = sourceIndex;
@@ -792,13 +773,9 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
 	}
 
 	private void createIntegerVariableTransition(VariableProxy variable, GuardExpressionHandler handler, List<StateProxy> variableStates, Set<TransitionProxy> variableTransitions, TransitionProxy transition, final BinaryExpressionProxy action) {
-		//binExpr represents the range for this variable
 		BinaryExpressionProxy binExpr = ((BinaryExpressionProxy) variable
 				.getType());
-		
-		//evaluater used to evaluate RHS of action expression
-		ExpressionHandler evaluater = new ExpressionHandler();
-		
+
 		final int lower = ((IntConstantProxy) binExpr.getLeft())
 				.getValue();
 		final int upper = ((IntConstantProxy) binExpr.getRight())
@@ -819,17 +796,9 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
 			// Create action transition if guard == true.
 			if(guardValue) {
 				if (action != null) {
-					//evaluate action expression to determine target index
-					//for the transition to be created
-					evaluater.setExpression((SimpleExpressionSubject) action.getRight());
-					int constant;
-					try {
-						constant = ((CompiledIntValue) evaluater.evaluate()).getValue();
-					} catch (EvalException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-						constant = -1;
-					}
+					//Get right hand side of action expression.
+					int constant = ((IntConstantProxy) action.getRight())
+					.getValue();
 					
 					//Get action expression operator.
 					String operator = action.getOperator().getName();
@@ -897,28 +866,55 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
 		return i;
 	}
 
-	private void createVariableStates(VariableProxy variable,
-			List<StateProxy> variableStates,
-			Collection<EventProxy> VariableStateProps) {
-
+	private void createVariableStates(VariableProxy variable, List<StateProxy> variableStates ) {
+		
+		final Collection<EventProxy> markedState = new TreeSet<EventProxy>();
+		final Collection<EventProxy> unMarkedState = new TreeSet<EventProxy>();
+   	    boolean hasMarking = false;
+        EventProxy  variableMarking = 
+			mFactory.createEventProxy("variableMarking", EventKind.PROPOSITION);
+        markedState.add(variableMarking);
+		
+        SimpleExpressionProxy markedValue;
+         
+         if(variable.getMarkedValue()!= null){
+        	 hasMarking = true;
+        	 markedValue = variable.getMarkedValue();
+         } else {
+        	 markedValue = null;
+         }
 		SimpleExpressionProxy type = variable.getType();
 
 		if (type instanceof SimpleIdentifierProxy) {
 			if (((SimpleIdentifierProxy) type).getName().equals("boolean")) {
+				Collection<EventProxy> marking;
 				if (variable.getInitialValue() instanceof BooleanConstantProxy) {
 					boolean initialValue = ((BooleanConstantProxy) variable
 							.getInitialValue()).isValue();
 
+					if(hasMarking) {
+						Boolean castMarkedValue = ((BooleanConstantProxy) markedValue).isValue();
+						marking = (castMarkedValue == true ? markedState : unMarkedState);
+					} else {
+						marking = markedState;
+					}
 					final StateProxy variableTrueState = mFactory
 							.createStateProxy(variable.getName() + "="
 									+ "false", initialValue == false,
-									VariableStateProps);
+									marking);
 					variableStates.add(variableTrueState);
 
+					if(hasMarking) {
+						Boolean castMarkedValue = ((BooleanConstantProxy) markedValue).isValue();
+						marking = (castMarkedValue == false ? markedState : unMarkedState);
+					} else {
+						marking = markedState;
+					}
 					final StateProxy variableFalseState = mFactory
 							.createStateProxy(
 									variable.getName() + "=" + "true",
-									initialValue == true, VariableStateProps);
+									initialValue == true,
+									marking);
 					variableStates.add(variableFalseState);
 
 				} else {
@@ -938,23 +934,33 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
 						.getInitialValue()).getName());
 				final StateProxy variableState = mFactory.createStateProxy(
 						variable.getName() + "=" + item.getName().toString(),
-						isInitial, VariableStateProps);
+						isInitial, markedState);
 				variableStates.add(variableState);
 			}
 		}
 
 		else if (type instanceof BinaryExpressionProxy) {
 			BinaryExpressionProxy binExpr = (BinaryExpressionProxy) type;
+			Collection<EventProxy> marking;
 			if (binExpr.getOperator().getName().equals("..")) {
 				int lower = ((IntConstantProxy) binExpr.getLeft()).getValue();
 				int higher = ((IntConstantProxy) binExpr.getRight()).getValue();
 				int initialValue = ((IntConstantProxy) variable
 						.getInitialValue()).getValue();
 				for (Integer i = lower; i <= higher; i++) {
-					final StateProxy variableState = mFactory.createStateProxy(
-							variable.getName() + "=" + i.toString(),
-							initialValue == i, VariableStateProps);
+					if(hasMarking) {
+						Integer castMarkedValue = ((IntConstantProxy) markedValue).getValue();
+						marking = (castMarkedValue == i ? markedState : unMarkedState);
+					} else {
+						marking = markedState;
+					}
+					
+						final StateProxy variableState = mFactory.createStateProxy(
+					    variable.getName() + "=" + i.toString(),
+							initialValue == i, 
+							marking);
 					variableStates.add(variableState);
+				
 				}
 			} else {
 				System.err
