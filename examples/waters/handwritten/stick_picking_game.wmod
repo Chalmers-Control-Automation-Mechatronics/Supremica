@@ -2,9 +2,11 @@
 
 <Module xmlns="http://waters.sourceforge.net/xsd/module" Name="Stick_picking">
 <ParameterList>
-  <EventParameter Name="remove_one" Kind="CONTROLLABLE"/>
-  <EventParameter Name="remove_two" Kind="CONTROLLABLE"/>
-  <EventParameter Name="@omega" Kind="PROPOSITION"/>
+  <EventParameter Name="player1_remove_one" Kind="CONTROLLABLE"/>
+  <EventParameter Name="player1_remove_two" Kind="CONTROLLABLE"/>
+  <EventParameter Name="player2_remove_one" Kind="UNCONTROLLABLE"/>
+  <EventParameter Name="player2_remove_two" Kind="UNCONTROLLABLE"/>
+   <EventParameter Name="@omega" Kind="PROPOSITION"/>
 </ParameterList>
 
 <ComponentList>
@@ -29,7 +31,7 @@
   
    <Edge Source="player1" Target="player2">
          <LabelBlock>
-            <SimpleIdentifier Name="remove_one"/>
+            <SimpleIdentifier Name="player1_remove_one"/>
          </LabelBlock>
        <GuardActionBlock>
       
@@ -46,7 +48,7 @@
       </Edge>
    <Edge Source="player1" Target="player2">
             <LabelBlock>
-               <SimpleIdentifier Name="remove_two"/>
+               <SimpleIdentifier Name="player1_remove_two"/>
             </LabelBlock>
           <GuardActionBlock>
          
@@ -63,7 +65,7 @@
       </Edge>
    <Edge Source="player2" Target="player1">
             <LabelBlock>
-               <SimpleIdentifier Name="remove_one"/>
+               <SimpleIdentifier Name="player2_remove_one"/>
             </LabelBlock>
           <GuardActionBlock>
          
@@ -80,7 +82,7 @@
          </Edge>
       <Edge Source="player2" Target="player1">
                <LabelBlock>
-                  <SimpleIdentifier Name="remove_two"/>
+                  <SimpleIdentifier Name="player2_remove_two"/>
                </LabelBlock>
              <GuardActionBlock>
             
