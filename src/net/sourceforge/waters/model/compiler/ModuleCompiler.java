@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.8 2006-03-03 10:36:36 markus Exp $
+//# $Id: ModuleCompiler.java,v 1.9 2006-03-06 09:06:03 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -1017,7 +1017,7 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
 		Set<TransitionProxy> relabeledTransitions = new TreeSet<TransitionProxy>();
 
 		for (TransitionProxy transition : mEFATransitions) {
-
+			
 			final EventProxy relabeledEvent = mFactory.createEventProxy(
 					transition.getEvent().getName() + "_" + mCurrentEventID.toString(),
 					transition.getEvent().getKind(), transition.getEvent()
@@ -1044,7 +1044,7 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
 
 			} else {
 				guardString = "true";
-				actionList = new LinkedList<BinaryExpressionProxy>();
+				actionList = new LinkedList<BinaryExpressionProxy>();/*action=empylist*/
 			}
 			try {
 				guardExpression = parser.parse(guardString);
