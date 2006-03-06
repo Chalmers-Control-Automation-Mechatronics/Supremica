@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBModuleImporter
 //###########################################################################
-//# $Id: JAXBModuleImporter.java,v 1.9 2006-03-06 17:08:46 markus Exp $
+//# $Id: JAXBModuleImporter.java,v 1.10 2006-03-06 17:25:15 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -579,25 +579,25 @@ public class JAXBModuleImporter
   }
 
   private VariableProxy importVariable(final VariableType element) {
-	    final SimpleExpressionType typeElement = element.getType();
-		final SimpleExpressionProxy type = 
-			(SimpleExpressionProxy) importElement(typeElement);
-		
-		final SimpleExpressionType initialValueElement =
-			element.getInitialValue();
-		final SimpleExpressionProxy initialValue = 
-			(SimpleExpressionProxy) importElement(initialValueElement);
-		
-		final SimpleExpressionType markedValueElement =
-			element.getMarkedValue();
-		final SimpleExpressionProxy markedValue = 
-			(SimpleExpressionProxy) importElement(markedValueElement);
-		
+		final SimpleExpressionType typeElement = element.getType();
+		final SimpleExpressionProxy type = (SimpleExpressionProxy) importElement(typeElement);
+
+		final SimpleExpressionType initialValueElement = element
+				.getInitialValue();
+		final SimpleExpressionProxy initialValue = (SimpleExpressionProxy) importElement(initialValueElement);
 		final String name = element.getName();
 
-		return mFactory.createVariableProxy(name, type, initialValue);
+		if (element.getMarkedValue() != null) {
+			final SimpleExpressionType markedValueElement = element
+					.getMarkedValue();
+			final SimpleExpressionProxy markedValue = (SimpleExpressionProxy) importElement(markedValueElement);
+			return mFactory.createVariableProxy(name, type, initialValue, markedValue);
+		}
+
+		else {
+			return mFactory.createVariableProxy(name, type, initialValue);
+		}
 	}
-  
   private GuardActionBlockProxy importGuardActionBlock(
 			final GuardActionBlockType element) {
 		
