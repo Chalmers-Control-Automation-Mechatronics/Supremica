@@ -22,11 +22,12 @@ class EditorLabelBlockPopupMenu
 	private JMenuItem addGuardItem;
 	private JMenuItem addActionItem;
 	private EditorLabelGroup mBlock;	
-
+	private EditorGuardActionBlock mGA;
 	public EditorLabelBlockPopupMenu(ControlledSurface parent, EditorLabelGroup block)
 	{
 		this.parent = parent;
 		this.mBlock = block;
+		mGA = mBlock.getParent().getEditorGuardActionBlock();
 
 		init();
 	}
@@ -52,8 +53,8 @@ class EditorLabelBlockPopupMenu
 		if(((EditorEdge) mBlock.getParent()).getEditorGuardActionBlock() != null) {
 			if (((EditorEdge) mBlock.getParent()).getEditorGuardActionBlock().hasGuard())
 			{
-				addActionItem.setEnabled(false);
-				addActionItem.setToolTipText("Label is already in default position");
+				addGuardItem.setEnabled(false);
+				addGuardItem.setToolTipText("A transition can have at most one guard expression.");
 			}
 		}
 	}
@@ -65,6 +66,7 @@ class EditorLabelBlockPopupMenu
 			/*Command deleteEdge = new DeleteEdgeCommand(parent, edge);
 			parent.getEditorInterface().getUndoInterface().executeCommand(deleteEdge);
 			this.hide();*/
+			
 			//TODO: add functionality
 		}
 

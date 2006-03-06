@@ -37,6 +37,17 @@ public class EditorAction extends JTextField
 		mActionExpression = action;
 		this.addFocusListener(this);
 	}
+	
+	public EditorAction(EditorGuardActionBlock parent) {
+		super(" ");
+		mParent = parent;
+		mGuardActionBlock = parent.getGuardActionBlock();
+		mFactory = ModuleSubjectFactory.getInstance();
+		mParser = new ExpressionParser(mFactory,
+				CompilerOperatorTable.getInstance());
+		mActionExpression = null;
+		this.addFocusListener(this);
+	}
 
 	private void update() {
 		SimpleExpressionProxy newExpression = null;

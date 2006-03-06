@@ -89,15 +89,27 @@ public class EditorGuardActionBlock extends EditorLabelGroup
 		this.shadow = this.getParent().getEditorLabelGroup().shadow;
 	}
 	
+	public void addAction() {
+		addAction(new EditorAction(this));
+	}
 	private void addAction(BinaryExpressionProxy action) {
 		EditorAction editorAction = new EditorAction(action, this);
+		addAction(editorAction);
+	}
+	private void addAction(EditorAction editorAction) {
 		addToPanel(editorAction, mActionLabelIndex + 1);
-		
 		resizePanel();
+	}
+	
+	public void addGuard() {
+		addGuard("");
 	}
 	private void addGuard(String guard)
 	{
 		EditorGuard editorGuard = new EditorGuard(guard, this);
+		addGuard(editorGuard);
+	}
+	private void addGuard(EditorGuard editorGuard) {
 		addToPanel(editorGuard, mGuardLabelIndex + 1);
 		resizePanel();
 		mActionLabelIndex += 1;
