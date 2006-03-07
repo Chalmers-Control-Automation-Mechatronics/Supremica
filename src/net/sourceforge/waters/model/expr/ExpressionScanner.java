@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.expr
 //# CLASS:   ExpressionScanner
 //###########################################################################
-//# $Id: ExpressionScanner.java,v 1.4 2005-11-03 01:24:16 robi Exp $
+//# $Id: ExpressionScanner.java,v 1.5 2006-03-07 03:37:51 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.expr;
@@ -64,8 +64,14 @@ class ExpressionScanner {
   Token peek()
     throws IOException, ParseException
   {
+    return peek(true);
+  }    
+
+  Token peek(final boolean allowNeg)
+    throws IOException, ParseException
+  {
     if (mNextToken == null) {
-      storeNextToken();
+      storeNextToken(allowNeg);
     }
     return mNextToken;
   }    
@@ -193,7 +199,7 @@ class ExpressionScanner {
 
   //#########################################################################
   //# Auxiliary Methods for Scanning
-  private void storeNextToken()
+  private void storeNextToken(final boolean allowNeg)
     throws IOException, ParseException
   {
     try {
@@ -207,7 +213,7 @@ class ExpressionScanner {
         storeNumberToken();
       } else if (isIdentifierStart(ch)) {
         storeSymbolToken();
-      } else if (ch == '-') {
+      } else if (allowNeg && ch == '-') {
         ch = getNextCharacter();
         if (isDigit(ch)) {
           mTokenText.append((char) ch);

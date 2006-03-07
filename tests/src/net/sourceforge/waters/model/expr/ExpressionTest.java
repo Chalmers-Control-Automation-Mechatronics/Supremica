@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.expr
 //# CLASS:   ExpressionTest
 //###########################################################################
-//# $Id: ExpressionTest.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: ExpressionTest.java,v 1.3 2006-03-07 03:37:51 robi Exp $
 //###########################################################################
 
 
@@ -61,6 +61,12 @@ public class ExpressionTest extends TestCase
     testExpression("1--100", mExpr_1minusm100, Operator.TYPE_INT);
   }
 
+  public void testExpression_1minusmm100()
+    throws ParseException
+  {
+    testExpression("1---100", mExpr_1minusmm100, Operator.TYPE_INT);
+  }
+
   public void testExpression_1plus1()
     throws ParseException
   {
@@ -109,10 +115,22 @@ public class ExpressionTest extends TestCase
     testExpression("2 - 1", mExpr_2minus1, Operator.TYPE_INT);
   }
 
+  public void testExpression_2minus1_a()
+    throws ParseException
+  {
+    testExpression("2-1", mExpr_2minus1, Operator.TYPE_INT);
+  }
+
   public void testExpression_2minus1minusa()
     throws ParseException
   {
     testExpression("2 - 1 - a", mExpr_2minus1minusa, Operator.TYPE_INT);
+  }
+
+  public void testExpression_2minus1minusa_a()
+    throws ParseException
+  {
+    testExpression("2-1-a", mExpr_2minus1minusa, Operator.TYPE_INT);
   }
 
   public void testExpression_2plus1minusa()
@@ -267,6 +285,8 @@ public class ExpressionTest extends TestCase
       (equals, mExpr_1, mExpr_m100);
     mExpr_1minusm100 =
       mFactory.createBinaryExpressionProxy(minus, mExpr_1, mExpr_m100);
+    mExpr_1minusmm100 =
+      mFactory.createBinaryExpressionProxy(minus, mExpr_1, mExpr_mm100);
     mExpr_1plus1 =
       mFactory.createBinaryExpressionProxy(plus, mExpr_1, mExpr_1);
     mExpr_1plus1eq2 =
@@ -320,6 +340,7 @@ public class ExpressionTest extends TestCase
     mExpr_c = null;
     mExpr_1eqm100 = null;
     mExpr_1minusm100 = null;
+    mExpr_1minusmm100 = null;
     mExpr_1plus1 = null;
     mExpr_1plus1eq2 = null;
     mExpr_1plus1plus2 = null;
@@ -353,6 +374,7 @@ public class ExpressionTest extends TestCase
   private SimpleExpressionProxy mExpr_mm100;
   private SimpleExpressionProxy mExpr_1eqm100;
   private SimpleExpressionProxy mExpr_1minusm100;
+  private SimpleExpressionProxy mExpr_1minusmm100;
   private SimpleExpressionProxy mExpr_1plus1;
   private SimpleExpressionProxy mExpr_1plus1eq2;
   private SimpleExpressionProxy mExpr_1plus1plus2;

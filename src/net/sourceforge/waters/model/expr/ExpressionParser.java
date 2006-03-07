@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.expr
 //# CLASS:   ExpressionParser
 //###########################################################################
-//# $Id: ExpressionParser.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: ExpressionParser.java,v 1.3 2006-03-07 03:37:51 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.expr;
@@ -387,7 +387,7 @@ public class ExpressionParser {
                                   final int outerassoc)
     throws IOException, ParseException
   {
-    final Token token = mScanner.peek();
+    final Token token = mScanner.peek(false);
     if (token.getType() == Token.OPERATOR) {
       final BinaryOperator op = token.getBinaryOperator();
       if (op == null) {

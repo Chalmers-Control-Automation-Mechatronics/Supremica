@@ -36,6 +36,12 @@
   <property name="waters.classes" location="${classes}/waters"/>
   <property name="waters424.jar" location="${jar}/waters424.jar"/>
 
+  <condition property="native.make" value="echo">
+    <not>
+      <isset property="native.make"/>
+    </not>
+  </condition>
+
   <path id="external-classpath">
     <pathelement path="${jwsdp.classpath}"/>
   </path>
@@ -188,7 +194,7 @@
 
   <target name="cpp" depends="javah,jniglue"
           description="Build native library.">
-    <exec executable="make" dir="${cpp}" failonerror="true"/>
+    <exec executable="${native.make}" dir="${cpp}" failonerror="true"/>
   </target>
 
   <target name="waters" depends="waters-jar,cpp"
@@ -217,8 +223,28 @@
     </jar>
   </target>
 
-  <target name="test" depends="test-jar"
-          description="Run the test cases.">
+  <target name="test-cpp" depends="test-jar,cpp"
+          description="Run native test cases.">
+    <mkdir dir="${logs}/model/analysis"/>
+    <junit printsummary="on" fork="true">
+      <formatter type="brief" extension=".log"/>
+      <test name="net.sourceforge.waters.model.analysis.AnalysisTest"
+            todir="${logs}/model/analysis"/>
+      <classpath>
+        <path refid="external-classpath"/>
+        <pathelement location="${jaxb.jar}"/>
+        <pathelement location="${waters.jar}"/>
+        <pathelement location="${test.jar}"/>
+        <pathelement location="${junit.jar}"/>
+      </classpath>
+      <sysproperty key="waters.test.inputdir" value="${examples}"/>
+      <sysproperty key="waters.test.outputdir" value="${logs}"/>
+      <env key="LD_LIBRARY_PATH" path="${cpplib}"/>
+    </junit>
+  </target>
+
+  <target name="test-java" depends="test-jar"
+          description="Run the Java test cases.">
     <mkdir dir="${logs}/model/analysis"/>
     <mkdir dir="${logs}/model/compiler"/>
     <mkdir dir="${logs}/model/expr"/>
@@ -240,10 +266,6 @@
             todir="${logs}/model/expr"/>
       <test name="net.sourceforge.waters.model.compiler.CompilerTest"
             todir="${logs}/model/compiler"/>
-      <!-- C++ dependent test
-    	<test name="net.sourceforge.waters.model.analysis.AnalysisTest"
-            todir="${logs}/model/analysis"/>
-      -->
       <test name="net.sourceforge.waters.valid.ValidTest"
             todir="${logs}/valid"/>
       <test name="net.sourceforge.waters.samples.maze.MazeTest"
@@ -259,9 +281,10 @@
       </classpath>
       <sysproperty key="waters.test.inputdir" value="${examples}"/>
       <sysproperty key="waters.test.outputdir" value="${logs}"/>
-      <env key="LD_LIBRARY_PATH" path="${cpplib}"/>
     </junit>
   </target>
+
+  <target name="test" depends="test-java,test-cpp"/>
 
   <target name="doc" depends="jaxb-generate"
           description="Generate Javadoc documentation.">
@@ -310,11 +333,9 @@
     <delete dir="${javadoc}"/>
     <delete dir="${javah.dir}"/>
     <delete dir="${jniglue.outdir}"/>
-    <!--
-    <exec executable="make" dir="${cpp}">
+    <exec executable="${native.make}" dir="${cpp}">
       <arg value="clean"/>
     </exec>
-	-->  
   </target>
 
 </project>
