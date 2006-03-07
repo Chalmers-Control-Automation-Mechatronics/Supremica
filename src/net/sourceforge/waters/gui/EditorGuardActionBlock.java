@@ -26,6 +26,7 @@ import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.module.GuardActionBlockSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 
 public class EditorGuardActionBlock extends EditorLabelGroup
@@ -45,19 +46,23 @@ public class EditorGuardActionBlock extends EditorLabelGroup
 
 	public EditorGuardActionBlock(EditorEdge parentEdge, EditorSurface editorSurface) {
 		super(parentEdge, editorSurface);
+		ModuleSubjectFactory factory = ModuleSubjectFactory.getInstance();
 		// This is a GuardActionBlock
 		type = GUARDACTIONBLOCK;
 		Font defaultFont = new Font(null);
 		panel.removeAll();
 		isCollapsed = false;
-		mCollapsedContent = new JLabel(" G/A");
+		mCollapsedContent = new JLabel(" +");
 		mCollapsedContent.setForeground(EditorColor.GUARDACTIONHEADER);
 		mPanelContent = new Component[0];
 		List<BinaryExpressionProxy> actions;
 		mGuardActionExpressionLabels = new ArrayList<JComponent>();
 		mGuardActionBlock = parentEdge.getSubject().getGuardActionBlock();
+		if(mGuardActionBlock == null) {
+			mGuardActionBlock = factory.createGuardActionBlockProxy();
+		}
 		parent.getParent().addMouseListener(this);
-		if(mGuardActionBlock.getGuard() != null || !mGuardActionBlock.getActionList().isEmpty()) {
+		if(true /*mGuardActionBlock.getGuard() != null || !mGuardActionBlock.getActionList().isEmpty()*/) {
 			
 			//Add guard header to guard action block
 			JTextField header = new JTextField(" Guard:");
@@ -81,7 +86,10 @@ public class EditorGuardActionBlock extends EditorLabelGroup
 			//Add guard and action
 			mGuardExpression = mGuardActionBlock.getGuard();
 			actions = mGuardActionBlock.getActionList();
-			this.addGuard(mGuardExpression);
+			if(mGuardExpression != null) {
+				
+				this.addGuard(mGuardExpression);
+			}
 			for(BinaryExpressionProxy action: actions) {
 				this.addAction(action);
 			}
@@ -126,6 +134,7 @@ public class EditorGuardActionBlock extends EditorLabelGroup
 		}
 		mGuardActionExpressionLabels.add(expressionLabel);
 		panel.add(expressionLabel, index);
+		expressionLabel.requestFocus();
 	}
 	
 	public void setPanelLocation()

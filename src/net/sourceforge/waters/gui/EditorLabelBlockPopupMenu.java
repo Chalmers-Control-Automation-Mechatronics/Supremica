@@ -27,7 +27,8 @@ class EditorLabelBlockPopupMenu
 	{
 		this.parent = parent;
 		this.mBlock = block;
-		mGA = mBlock.getParent().getEditorGuardActionBlock();
+		edge = mBlock.getParent();
+		mGA = edge.getEditorGuardActionBlock();
 
 		init();
 	}
@@ -50,8 +51,8 @@ class EditorLabelBlockPopupMenu
 		addActionItem = item;
 
 		// Disable "Add guard" if there is already a guard expression
-		if(((EditorEdge) mBlock.getParent()).getEditorGuardActionBlock() != null) {
-			if (((EditorEdge) mBlock.getParent()).getEditorGuardActionBlock().hasGuard())
+		if(mGA != null) {
+			if (mGA.hasGuard())
 			{
 				addGuardItem.setEnabled(false);
 				addGuardItem.setToolTipText("A transition can have at most one guard expression.");
@@ -63,16 +64,20 @@ class EditorLabelBlockPopupMenu
 	{
 		if (e.getSource() == addGuardItem)
 		{
-			/*Command deleteEdge = new DeleteEdgeCommand(parent, edge);
-			parent.getEditorInterface().getUndoInterface().executeCommand(deleteEdge);
-			this.hide();*/
-			
-			//TODO: add functionality
+			if(mGA == null) {
+				parent.addGuardActionBlock(edge);
+			}
+			mGA = edge.getEditorGuardActionBlock();
+			mGA.addGuard();
 		}
 
 		if (e.getSource() == addActionItem)
 		{
-			//TODO: add functionality
+			if(mGA == null) {
+				parent.addGuardActionBlock(edge);
+			}
+			mGA = edge.getEditorGuardActionBlock();
+			mGA.addAction();
 		}
 
 		parent.repaint();
