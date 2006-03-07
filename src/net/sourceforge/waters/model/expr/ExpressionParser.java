@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.expr
 //# CLASS:   ExpressionParser
 //###########################################################################
-//# $Id: ExpressionParser.java,v 1.3 2006-03-07 03:37:51 robi Exp $
+//# $Id: ExpressionParser.java,v 1.4 2006-03-07 17:42:32 martin Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.expr;
@@ -426,7 +426,7 @@ public class ExpressionParser {
   private ParseResult parseIdentifierResult(final String name)
     throws IOException, ParseException
   {
-    Token token = mScanner.peek();
+    Token token = mScanner.peek(false);
     if (token.getType() == Token.OPENSQ) {
       final List<SimpleExpressionProxy> indexes =
         new LinkedList<SimpleExpressionProxy>();
