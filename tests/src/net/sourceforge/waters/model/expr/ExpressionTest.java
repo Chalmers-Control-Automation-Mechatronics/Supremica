@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.expr
 //# CLASS:   ExpressionTest
 //###########################################################################
-//# $Id: ExpressionTest.java,v 1.3 2006-03-07 03:37:51 robi Exp $
+//# $Id: ExpressionTest.java,v 1.4 2006-03-07 21:25:43 robi Exp $
 //###########################################################################
 
 
@@ -35,6 +35,12 @@ public class ExpressionTest extends TestCase
     throws ParseException
   {
     testExpression("1", mExpr_1, Operator.TYPE_INT);
+  }
+
+  public void testExpression_1_a()
+    throws ParseException
+  {
+    testExpression("001", mExpr_1, Operator.TYPE_INT);
   }
 
   public void testExpression_m100()
@@ -121,6 +127,24 @@ public class ExpressionTest extends TestCase
     testExpression("2-1", mExpr_2minus1, Operator.TYPE_INT);
   }
 
+  public void testExpression_2minus1minus1()
+    throws ParseException
+  {
+    testExpression("2-1-1", mExpr_2minus1minus1, Operator.TYPE_INT);
+  }
+
+  public void testExpression_2minus1minus1_a()
+    throws ParseException
+  {
+    testExpression("(2-1)-1", mExpr_2minus1minus1, Operator.TYPE_INT);
+  }
+
+  public void testExpression_aminus1()
+    throws ParseException
+  {
+    testExpression("a-1", mExpr_aminus1, Operator.TYPE_INT);
+  }
+
   public void testExpression_2minus1minusa()
     throws ParseException
   {
@@ -185,6 +209,12 @@ public class ExpressionTest extends TestCase
     throws ParseException
   {
     testExpression("event [1][1+1]", mExpr_event_1_1plus1, Operator.TYPE_NAME);
+  }
+
+  public void testExpression_event_m2()
+    throws ParseException
+  {
+    testExpression("event[-2]", mExpr_event_m2, Operator.TYPE_NAME);
   }
 
   public void testExpression_1_multi()
@@ -301,6 +331,8 @@ public class ExpressionTest extends TestCase
       mFactory.createBinaryExpressionProxy(equals, mExpr_2, mExpr_1plus1);
     mExpr_2minus1 =
       mFactory.createBinaryExpressionProxy(minus, mExpr_2, mExpr_1);
+    mExpr_2minus1minus1 =
+      mFactory.createBinaryExpressionProxy(minus, mExpr_2minus1, mExpr_1);
     mExpr_2minus1minusa =
       mFactory.createBinaryExpressionProxy(minus, mExpr_2minus1, mExpr_a);
     mExpr_2minus1plusa =
@@ -314,6 +346,8 @@ public class ExpressionTest extends TestCase
     mExpr_m100tom2 =
       mFactory.createBinaryExpressionProxy(range, mExpr_m100, mExpr_m2);
     mExpr_m_a = mFactory.createUnaryExpressionProxy(uminus, mExpr_a);
+    mExpr_aminus1 =
+      mFactory.createBinaryExpressionProxy(minus, mExpr_a, mExpr_1);
     idlist.add(mExpr_a);
     idlist.add(mExpr_b);
     idlist.add(mExpr_c);
@@ -323,6 +357,9 @@ public class ExpressionTest extends TestCase
     exlist.add(mExpr_1plus1);
     mExpr_event_1_1plus1 =
       mFactory.createIndexedIdentifierProxy("event", exlist);
+    exlist.clear();
+    exlist.add(mExpr_m2);
+    mExpr_event_m2 = mFactory.createIndexedIdentifierProxy("event", exlist);
   }
 
   protected void tearDown()
@@ -348,6 +385,7 @@ public class ExpressionTest extends TestCase
     mExpr_1to2 = null;
     mExpr_2eq1plus1 = null;
     mExpr_2minus1 = null;
+    mExpr_2minus1minus1 = null;
     mExpr_2minus1minusa = null;
     mExpr_2minus1plusa = null;
     mExpr_2plus1 = null;
@@ -355,9 +393,11 @@ public class ExpressionTest extends TestCase
     mExpr_2plus1plus1 = null;
     mExpr_m100tom2 = null;
     mExpr_m_a = null;
+    mExpr_aminus1 = null;
     mExpr_a_b_c = null;
     mExpr_event_1 = null;
     mExpr_event_1_1plus1 = null;
+    mExpr_event_m2 = null;
   }
 
 
@@ -383,6 +423,7 @@ public class ExpressionTest extends TestCase
   private SimpleExpressionProxy mExpr_2eq1plus1;
   private SimpleExpressionProxy mExpr_2plus1plus1;
   private SimpleExpressionProxy mExpr_2minus1;
+  private SimpleExpressionProxy mExpr_2minus1minus1;
   private SimpleExpressionProxy mExpr_2minus1minusa;
   private SimpleExpressionProxy mExpr_2minus1plusa;
   private SimpleExpressionProxy mExpr_2plus1;
@@ -392,8 +433,10 @@ public class ExpressionTest extends TestCase
   private SimpleIdentifierProxy mExpr_c;
   private SimpleExpressionProxy mExpr_m100tom2;
   private SimpleExpressionProxy mExpr_m_a;
+  private SimpleExpressionProxy mExpr_aminus1;
   private SimpleExpressionProxy mExpr_a_b_c;
   private SimpleExpressionProxy mExpr_event_1;
   private SimpleExpressionProxy mExpr_event_1_1plus1;
+  private SimpleExpressionProxy mExpr_event_m2;
 
 }
