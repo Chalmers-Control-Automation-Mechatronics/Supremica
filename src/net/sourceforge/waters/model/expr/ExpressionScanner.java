@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.expr
 //# CLASS:   ExpressionScanner
 //###########################################################################
-//# $Id: ExpressionScanner.java,v 1.5 2006-03-07 03:37:51 robi Exp $
+//# $Id: ExpressionScanner.java,v 1.6 2006-03-07 08:28:05 martin Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.expr;
@@ -220,7 +220,7 @@ class ExpressionScanner {
           storeNumberToken();
         } else {
           putback(ch);
-          mNextToken = createOperatorToken();
+          storeOperatorToken();
         }
       } else if (isOperatorCharacter(ch)) {
         storeOperatorToken();
