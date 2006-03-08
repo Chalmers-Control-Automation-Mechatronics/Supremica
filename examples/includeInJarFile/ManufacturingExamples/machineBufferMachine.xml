@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<Automata name="Maching-Buffer-Machine" comment="Classical example. The specification is uncontrollable. Neat example of where 'supervisor reduction' works perfectly. Try modular controllability synthesis, with 'purge' and 'supervisor reduction'.">
+<Automata name="Machine-Buffer-Machine" comment="Classical example. The specification is uncontrollable. Neat example of where 'supervisor reduction' works perfectly. Try modular controllability synthesis, with 'purge' and 'supervisor reduction'.">
 <Automaton name="Machine 1" type="Plant">
 	<Events>
 		<Event id="s" label="Start1"/>

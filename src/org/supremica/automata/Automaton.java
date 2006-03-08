@@ -1113,7 +1113,6 @@ public class Automaton
 	 */
 	public int nbrOfTransitions()
 	{
-		/*
 		int amount = 0;
 		for (Iterator<Arc> arcIt = arcIterator(); arcIt.hasNext(); )
 		{
@@ -1122,8 +1121,8 @@ public class Automaton
 		}
 
 		return amount;
-		*/
 
+		/*
 		// Calculate the sum of the outgoing arcs in the states
 		int amount = 0;
 		for (Iterator<State> stIt = stateIterator(); stIt.hasNext(); )
@@ -1132,6 +1131,7 @@ public class Automaton
 		}
 
 		return amount;
+		*/
 	}
 
 	/**
