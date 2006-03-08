@@ -166,7 +166,7 @@ public class BasicFBInstance extends FBInstance
 		else
 		{
 
-			// this is probably never used
+			// this is probably never used when whole method is synchronized
 			/*
 			if(!queuedInScheduler & eventInputQueue.size() > 0)
 			{
