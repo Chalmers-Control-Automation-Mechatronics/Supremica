@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.12 2006-03-06 17:47:38 markus Exp $
+//# $Id: ModuleCompiler.java,v 1.13 2006-03-08 17:11:37 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -540,6 +540,7 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
 			//(via multiple events or guards with "OR" clauses). The mEFATransitionEdgeMap
 			//maps these transitions back to their respective "generating" edges.
 			mEFATransitionEdgeMap = new HashMap<TransitionProxy, EdgeProxy>();
+			mEFAEventOriginalEventMap= new HashMap<EventProxy, EventProxy>();
 			// --------------------
 			for (final NodeProxy source : nodes) {
 				final CompiledNode sourceEntry = mPrecompiledNodes.get(source);
@@ -607,7 +608,8 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
 					//Add variable automaton to mAutomata.
 					mAutomata.put(variable.getName(), variableAutomaton);
 				}
-				
+				List <AutomatonProxy> equivalentClassAutomata=
+					createEquivalentClassAutomata(mEFAEventOriginalEventMap);
 				return relabeledAutomaton;
 			}
 			else{
@@ -628,8 +630,15 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
 			mEFATransitionEdgeMap = null;
 			mEFARelabeledTransitionActionMap = null;
 			mEFARelabeledTransitionGuardClauseMap = null;
+			mEFAEventOriginalEventMap = null;
 			// ---------------------
 		}
+	}
+
+	private List<AutomatonProxy> createEquivalentClassAutomata
+	(Map<EventProxy, EventProxy> eventOriginalEventMap) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	private boolean hasNonEmptyGuardActionBlock(Collection<EdgeProxy> edges) {
@@ -1052,8 +1061,11 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
 		mEFARelabeledTransitionActionMap = new HashMap<TransitionProxy, List<BinaryExpressionProxy>>();
 		mEFARelabeledTransitionGuardClauseMap = new HashMap<TransitionProxy, SimpleExpressionProxy>();
 		Set<TransitionProxy> relabeledTransitions = new TreeSet<TransitionProxy>();
-
+		EventProxy originalEvent = null;
 		for (TransitionProxy transition : mEFATransitions) {
+			 originalEvent=
+		    mEFAEventOriginalEventMap.get(transition.getEvent());
+			mEFAEventOriginalEventMap.remove(transition.getEvent());
 			
 			final EventProxy relabeledEvent = mFactory.createEventProxy(
 					transition.getEvent().getName() + "_" + mCurrentEventID.toString(),
@@ -1095,6 +1107,8 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
 			mEFARelabeledTransitionGuardClauseMap.put(relabeledTransition,
 					guardExpression);
 			relabeledTransitions.add(relabeledTransition);
+			mEFAEventOriginalEventMap.put
+			(relabeledEvent,originalEvent);
 			mCurrentEventID++;
 		}
 		return relabeledTransitions;
@@ -1313,6 +1327,8 @@ private void createAutomatonEvents(final EventValue events)
 						// EFA-----------
 						mEFATransitionEdgeMap.put(trans, edge);
 						mEFATransitions.add(trans);
+						mEFAEventOriginalEventMap.put
+						(trans.getEvent(), trans.getEvent());
 						// --------------
 
 						mTransitions.add(trans);
@@ -1342,6 +1358,7 @@ private void createAutomatonEvents(final EventValue events)
 								mCurrentEventID++;
 								mEFATransitionEdgeMap.put(relabeledTrans, edge);
 								mEFATransitions.add(relabeledTrans);
+								mEFAEventOriginalEventMap.put(relabeledEvent, trans.getEvent());
 							}
 							}
 						}
@@ -1454,6 +1471,7 @@ private void createAutomatonEvents(final EventValue events)
 	private Map<TransitionProxy, SimpleExpressionProxy> mEFARelabeledTransitionGuardClauseMap;
 	private boolean mIsEFA;
 	private Integer mCurrentEventID;
+	private Map<EventProxy, EventProxy> mEFAEventOriginalEventMap;
 	// ---------------------
 
 
