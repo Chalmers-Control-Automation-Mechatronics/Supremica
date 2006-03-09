@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.13 2006-03-08 17:11:37 markus Exp $
+//# $Id: ModuleCompiler.java,v 1.14 2006-03-09 07:35:43 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -1342,7 +1342,11 @@ private void createAutomatonEvents(final EventValue events)
 						if (mEFATransitionEdgeMap.containsKey(trans)) 
 						{
 							if (!mEFATransitionEdgeMap.get(trans).equals(edge)){
-								// Then we need to relabel the transition.
+								/*Then we need to relabel the transition.
+								 * TODO: If the guard Strings are different
+								 * the evaluated guards can be the same. In such a
+								 * case we do not need to rename the event.
+								 * */
 
 								final EventProxy relabeledEvent = mFactory
 										.createEventProxy(trans.getEvent()
