@@ -331,7 +331,24 @@ public class Milp
 		logger.info("OPTIMAL MAKESPAN: " + makespan + ".............................");
 		logger.info("Time to build the schedule: " + timer.elapsedTime() + "ms ");
 
-		ActionMan.getGui().addAutomaton(schedule);
+		synchronized (this)
+		{
+			org.supremica.gui.Gui theGui = null;
+			try 
+			{
+				theGui = ActionMan.getGui(); 
+				theGui.addAutomaton(schedule);
+// 				if (theGui != null)
+// 					theGui.addAutomaton(schedule);
+// 				else
+// 					logger.info("THE GUI is NULL");
+			}
+			catch (Exception ex)
+			{
+				logger.warn("EXceptiON, gui = " + theGui);
+				throw ex;
+			}
+		}
 	}
 
 

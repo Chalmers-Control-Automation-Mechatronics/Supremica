@@ -65,13 +65,13 @@ public abstract class AbstractAstar
 	 * @see #ModifiedAstar.updateClosedTree(int[] node).
 	 */
 	protected TreeMap<Integer, int[]> closedTree;
-    
+
     /** 
-	 * The estimated cost for each state of each robot.
+	 * The remaining cost for each state of each robot (if run independently of other robots).
 	 * int[] = [robot_index, state_index].
 	 */
-    protected int[][] oneProdRelax;
-
+    protected int[][] remainingCosts;
+    
     /** Hashtable containing the estimated cost for each combination of two robots **/
     protected Hashtable[] twoProdRelax;
 
@@ -153,7 +153,7 @@ public abstract class AbstractAstar
 	private volatile boolean isRunning = false;
 
 	/** The dialog box that launched this scheduler */
-	private ScheduleDialog gui;
+	protected ScheduleDialog gui;
 
 	/** Decides if the schedule should be built */
 	private boolean buildSchedule;
@@ -164,14 +164,36 @@ public abstract class AbstractAstar
 	 */
 	private boolean manualExpansion;
 
+	protected Thread astarThread;
+
 
 	/****************************************************************************************/
 	/*                                 ABSTRACT METHODS                                     */
 	/****************************************************************************************/
 
+	/**
+	 * Converts the representation of the initial state to the int[]-representation of a node. 
+	 */
     protected abstract int[] makeInitialNode();
 
+	/**
+	 * Updates the closed tree if necessary, i.e. if the currently examined
+	 * node with better estimate value already is present on that tree.
+	 * If the node is added to the closed tree, its descendants are put on the 
+	 * open tree, according to the estimated remaining cost value.
+	 */
 	protected abstract void branch(int[] currNode);
+
+	/**
+	 * Calculates the total estimated cost for the node, i.e. the sum of the accumulated cost
+	 * and the estimate of the remaining cost (f(n) = g(n) + h(n)) is returned.
+	 *
+	 * @param int[] currNode - the node, whose estimated cost we want to know
+	 * @return int totalEstimatedCost - f(n) = g(n) + h(n)
+	 */
+
+	public abstract int calcEstimatedCost(int[] currNode) 
+		throws Exception;
 
 
 	/****************************************************************************************/
@@ -212,11 +234,44 @@ public abstract class AbstractAstar
 
 			useOneProdRelax = false;
 		}
+// 		else if (heuristic.equals(VISIBILITY_GRAPH))
+// 		{
+// 			if (theAutomata.getPlantAutomata().size() < 3)
+// 			{
+// 				new VisGraphScheduler(theAutomata.getPlantAutomata(), theAutomata.getSpecificationAutomata(), true, false, gui);
+// 				return;
+// 			}
+// 		}
 
-		Thread astarThread = new Thread(this);
+		astarThread = new Thread(this);
 		isRunning = true;
 		astarThread.start();
     }
+
+	public AbstractAstar(Automata theAutomata, boolean manualExpansion, boolean buildSchedule, ScheduleDialog gui)
+		throws Exception
+	{
+		this.theAutomata = theAutomata;
+		this.buildSchedule = buildSchedule;
+		this.gui = gui;
+		this.manualExpansion = manualExpansion;
+		
+		if (heuristic.equals("1-product relax"))
+			useOneProdRelax = true;
+		else if(heuristic.equals("2-product relax")) 
+		{
+			if (theAutomata.getPlantAutomata().size() < 3)
+			{
+				throw new Exception("2-product relax cannot be used for two or less products");
+			}
+
+			useOneProdRelax = false;
+		}
+
+		astarThread = new Thread(this);
+		isRunning = true;
+		astarThread.start();
+	}
 
 
 	/****************************************************************************************/
@@ -261,10 +316,11 @@ public abstract class AbstractAstar
     protected void init(boolean manualExpansion) 
 		throws Exception
 	{
+		if (theAutomata == null)
+			return;
+
 		timer = new ActionTimer();
-
 		expander = new NodeExpander(manualExpansion, theAutomata, this);
-
 		plantAutomata = theAutomata.getPlantAutomata();
 		
 		//Borde räcka med plantAutomata.size(), fast då kanske man måste ändra lite på andra ställen också
@@ -275,46 +331,17 @@ public abstract class AbstractAstar
 			keyMapping[i] = keyMapping[i-1] * (theAutomata.getAutomatonAt(i-1).nbrOfStates() + 1);
 		}
 	
-		// 	useOneProdRelax = true;
-	
-		if (theAutomata == null)
-			return;
-		else 
-		{
-			int nrOfPlants = plantAutomata.size();
-	    
-			oneProdRelax = new int[nrOfPlants][];
+		remainingCosts = new int[plantAutomata.size()][];
+		infoStr = "Processing times:\n";
+		
+		timer.restart();
+		initRemainingCosts();
+		infoStr += "\t1st preprocessing in " + timer.elapsedTime() + " ms\n";
 
-			if (heuristic.equals(VISIBILITY_GRAPH))
-			{
-				visGraphRelax = new Hashtable<String, Integer>();
-			}
-	    
-// 			if (nrOfPlants > 2) 
-// 			{
-// 				twoProdRelax = new Hashtable[nrOfPlants * (nrOfPlants - 1) / 2];
-// 				for (int i=0; i<twoProdRelax.length; i++)
-// 					twoProdRelax[i] = new Hashtable();
-// 			}
-
-			infoStr = "Processing times:\n";
-	    
-			timer.restart();
-			preprocess1();
-			infoStr += "\t1st preprocessing in " + timer.elapsedTime() + " ms\n";
-
-			if (heuristic.equals(VISIBILITY_GRAPH))
-			{
-				timer.restart();
-				preprocessVisibilityGraphs();
-				infoStr += "\tvisibility graphs calculated in " + timer.elapsedTime() + "ms\n";
-			}		
-
-			initAuxIndices();
-
-			openTree = new TreeSet<int[]>(new OpenTreeComparator(ESTIMATE_INDEX));
-			closedTree = new TreeMap<Integer, int[]>();
-		}	
+		initAuxIndices();
+		
+		openTree = new TreeSet<int[]>(new OpenTreeComparator(ESTIMATE_INDEX));
+		closedTree = new TreeMap<Integer, int[]>();
     }
 
     protected void initAuxIndices() {
@@ -331,6 +358,83 @@ public abstract class AbstractAstar
 		ESTIMATE_INDEX = ACCUMULATED_COST_INDEX + 1;
     }
 
+	/**
+     * Calculates the remaining (independent) cycle times for each robot (i.e. as if there
+     * would only be one robot in the cell) and stores them in remainingCosts.
+	 * It is equal to the minimal remaining time from each state to the marked state.
+	 * This information is used by different heuristics (e.g. 1-prod-relax, 2-prod-relax 
+	 * and visibility graph).
+     */	
+    private void initRemainingCosts() 
+		throws Exception
+	{
+		for (int i=0; i<plantAutomata.size(); i++) 
+		{
+			Automaton theAuto = plantAutomata.getAutomatonAt(i);
+
+			// An accepting state is found for the current automaton. In order 
+			// for the algorithm to work properly, it is assumed that the model is 
+			// such that the accepting state is also the last state in the sequence(s)
+			// of operations, described by the current automaton. 
+			State markedState = null;
+
+			for (Iterator<State> stateIt = theAuto.stateIterator(); stateIt.hasNext(); )
+			{
+				markedState = stateIt.next();
+		
+				if (markedState.isAccepting())
+					break;
+			}
+
+			if (! markedState.isAccepting())
+				throw new Exception("No accepting state for " + theAuto.getName() + " was found during preprocessing...");
+
+
+			ArrayList estList = new ArrayList();
+	    
+			remainingCosts[i] = new int[theAuto.nbrOfStates()];
+			for (int j=0; j<remainingCosts[i].length; j++) 
+				remainingCosts[i][j] = -1;
+	    
+			if (markedState == null)
+				return;
+			else 
+			{
+				remainingCosts[i][markedState.getIndex()] = markedState.getCost();
+
+				estList.add(markedState);
+		
+				while (!estList.isEmpty()) 
+				{
+					Iterator<Arc> incomingArcIterator = ((State)estList.remove(0)).incomingArcsIterator();
+		    
+					while (incomingArcIterator.hasNext()) 
+					{
+						Arc currArc = incomingArcIterator.next();
+						State currState = currArc.getFromState();
+						State nextState = currArc.getToState();
+
+						if (remainingCosts[i][currState.getIndex()] == -1) 
+						{
+							remainingCosts[i][currState.getIndex()] = remainingCosts[i][nextState.getIndex()] + nextState.getCost();
+							estList.add(currState);
+						}
+						else
+						{
+							int newRemainingCost = nextState.getCost() + remainingCosts[i][nextState.getIndex()];
+
+							if (newRemainingCost < remainingCosts[i][currState.getIndex()])
+							{
+								remainingCosts[i][currState.getIndex()] = newRemainingCost;
+								estList.add(currState);
+							}
+						}
+					}
+				}
+			}				
+		}
+    }
+
 	public void requestStop()
 	{
 		requestStop(false);
@@ -339,6 +443,7 @@ public abstract class AbstractAstar
 	public void requestStop(boolean disposeGui)
 	{
 		isRunning = false;
+		astarThread = null;
 
 		if (disposeGui)
 		{
@@ -528,106 +633,6 @@ public abstract class AbstractAstar
 	/*                                 HEURISTICS                                           */
 	/****************************************************************************************/
 
-    /**
-     * Calculates the costs for a one-product relaxation (i.e. as if there
-     * would only be one robot in the cell) and stores it in oneProdRelax.
-	 * It is equal to the minimal remaining time from each state to the marked state.
-     */	
-    protected void preprocess1() 
-		throws Exception
-	{
-		for (int i=0; i<plantAutomata.size(); i++) 
-		{
-			Automaton theAuto = plantAutomata.getAutomatonAt(i);
-
-			// An accepting state is found for the current automaton. In order 
-			// for the algorithm to work properly, it is assumed that the model is 
-			// such that the accepting state is also the last state in the sequence(s)
-			// of operations, described by the current automaton. 
-			State markedState = null;
-
-			for (Iterator<State> stateIt = theAuto.stateIterator(); stateIt.hasNext(); )
-			{
-				markedState = stateIt.next();
-		
-				if (markedState.isAccepting())
-					break;
-			}
-
-			if (! markedState.isAccepting())
-				throw new Exception("No accepting state for " + theAuto.getName() + " was found during preprocessing...");
-
-
-			ArrayList estList = new ArrayList();
-	    
-			oneProdRelax[i] = new int[theAuto.nbrOfStates()];
-			for (int j=0; j<oneProdRelax[i].length; j++) 
-				oneProdRelax[i][j] = -1;
-	    
-			if (markedState == null)
-				return;
-			else 
-			{
-				oneProdRelax[i][markedState.getIndex()] = markedState.getCost();
-
-				estList.add(markedState);
-		
-				while (!estList.isEmpty()) 
-				{
-					Iterator<Arc> incomingArcIterator = ((State)estList.remove(0)).incomingArcsIterator();
-		    
-					while (incomingArcIterator.hasNext()) 
-					{
-						Arc currArc = incomingArcIterator.next();
-						State currState = currArc.getFromState();
-						State nextState = currArc.getToState();
-
-						if (oneProdRelax[i][currState.getIndex()] == -1) 
-						{
-							oneProdRelax[i][currState.getIndex()] = oneProdRelax[i][nextState.getIndex()] + nextState.getCost();
-							estList.add(currState);
-						}
-						else
-						{
-							int newRemainingCost = nextState.getCost() + oneProdRelax[i][nextState.getIndex()];
-
-							if (newRemainingCost < oneProdRelax[i][currState.getIndex()])
-							{
-								oneProdRelax[i][currState.getIndex()] = newRemainingCost;
-								estList.add(currState);
-							}
-						}
-					}
-				}
-			}				
-		}
-    }
-
-	protected void preprocessVisibilityGraphs()
-		throws Exception
-	{
-		visibilityGraphs = new Hashtable<String, VisGraphScheduler>();
-
-		for (int i=0; i<plantAutomata.size() - 1; i++)
-		{
-			for (int j=i+1; j<plantAutomata.size(); j++)
-			{
-				String key = "";
-				Automata automataPair = new Automata();
-
-				Automaton currAuto = plantAutomata.getAutomatonAt(i);
-				automataPair.addAutomaton(currAuto);
-				key += currAuto.getName() + "_";
-				
-				currAuto = plantAutomata.getAutomatonAt(j);
-				automataPair.addAutomaton(currAuto);
-				key += currAuto.getName();				
-
-				visibilityGraphs.put(key, new VisGraphScheduler(automataPair, theAutomata.getSpecificationAutomata(), false));
-			}
-		}
-	}
-
 	//     protected void preprocess2() {
 	// 	for (int i=0; i<plantAutomata.size()-1; i++) {
 	// 	    for (int j=i+1; j<plantAutomata.size(); j++) {
@@ -717,27 +722,6 @@ public abstract class AbstractAstar
 	  return infoStr;
 	  }
 	*/
-  
-	/**
-	 * This method calculates the remaining cost for each robot/plant. The maximum remaining
-	 * cost is returned to be used as an estimate of the total remaining cost of the system. 
-	 * 
-	 * @param int[] node - the current node
-	 * @return int - the heuristic function, h(n), that guides the search, in this case it is the "1-product relaxation"
-	 */
-    protected int getOneProdRelaxation(int[] node) {
-		int estimate = 0;
-		int[] currCosts = expander.getCosts(node);
-	
-		for (int i=0; i<activeAutomataIndex.length; i++) {
-			int altEstimate = currCosts[i] + oneProdRelax[i][node[activeAutomataIndex[i]]]; 
-	    
-			if (altEstimate > estimate)
-				estimate = altEstimate;
-		}
-	
-		return estimate;
-    }
 
 	//     int getTwoProdRelaxation(int[] node) {
 	// 	int estimate = 0;
@@ -770,90 +754,6 @@ public abstract class AbstractAstar
 	
 	// 	return estimate + minCurrCost;
 	//     }
-
-	/**
-	 * Calculated the total estimated cost for the node, i.e. the sum of the accumulated cost
-	 * and the estimate of the remaining cost (f(n) = g(n) + h(n)) is returned.
-	 *
-	 * @param int[] node - the node, whose estimated cost we want to know
-	 * @return int totalEstimatedCost - f(n) = g(n) + h(n)
-	 */
-    public int calcEstimatedCost(int[] node) 
-		throws Exception 
-	{
-		if (useOneProdRelax) {
-			// 	    return node[node.length-1] + getOneProdRelaxation(node);
-
-			// The following code inside the if-loop is needed to ensure consistency of the heuristic
-			int[] parent = getParent(node);
-	    
-			int fNode = node[ACCUMULATED_COST_INDEX] + getOneProdRelaxation(node);
-			int fParent = parent[ACCUMULATED_COST_INDEX] + getOneProdRelaxation(parent);
-
-			if (fParent > fNode)
-				return fParent;
-			else
-				return fNode;
-		}
-		else if (heuristic.equals("brute force"))
-			return node[ACCUMULATED_COST_INDEX];
-		else if (heuristic.equals(VISIBILITY_GRAPH))
-		{
-			
-			int[] effTimePoint = new int[plantAutomata.size()];
-			String timePointKey = "";
-
-			// Calculate the visibility graph time coordinate, corresponding to the current node
-			for (int i=0; i<plantAutomata.size(); i++)
-			{
-				State initState = plantAutomata.getAutomatonAt(i).getInitialState();
-				int totalCycleTime = oneProdRelax[i][initState.getIndex()] + initState.getCost();
-				int remainingCycleTime = oneProdRelax[i][node[activeAutomataIndex[i]]] + node[CURRENT_COSTS_INDEX + i];
-
-				effTimePoint[i] = totalCycleTime - remainingCycleTime;
-				timePointKey += effTimePoint[i] + "_";
-			}
-
-			Integer previousVisibilityRelaxation = visGraphRelax.get(timePointKey);
-			if (previousVisibilityRelaxation == null)
-			{
-				double visibilityRelaxation = -1;
-				
-				for (int i=0; i<plantAutomata.size() - 1; i++)
-				{
-					for (int j=i+1; j<plantAutomata.size(); j++)
-					{
-						String visibilityGraphsKey = plantAutomata.getAutomatonAt(i).getName() + "_" + plantAutomata.getAutomatonAt(j).getName();
-						VisGraphScheduler relaxScheduler = visibilityGraphs.get(visibilityGraphsKey);
-						
-						if (relaxScheduler == null)
-						{
-							throw new Exception("The visibility graph scheduler NOT initialized for " + visibilityGraphsKey);
-						}
-						
-						double currVisibilityRelaxation = relaxScheduler.scheduleFrom(new double[]{effTimePoint[i], effTimePoint[j]});
-						
-						if (visibilityRelaxation < currVisibilityRelaxation)
-							visibilityRelaxation = currVisibilityRelaxation;
-					}
-				}
-
-				//tillfälligt så här fullt
-				int estimatedCost = (int) Math.round(visibilityRelaxation);
-				visGraphRelax.put(timePointKey, estimatedCost);
-				return estimatedCost + node[ACCUMULATED_COST_INDEX];
-			}
-			else
-			{
-				return previousVisibilityRelaxation.intValue() + node[ACCUMULATED_COST_INDEX];
-			}
-		}
-		else {
-			logger.error("2-prod relaxation not implemented yet");
-			return -1;
-		}
-		// 	    return node[node.length-1] + getTwoProdRelaxation(node);
-    }
 
     public int[] updateCosts(int[] costs, int changedIndex, int newCost) {
 		int[] newCosts = new int[costs.length];

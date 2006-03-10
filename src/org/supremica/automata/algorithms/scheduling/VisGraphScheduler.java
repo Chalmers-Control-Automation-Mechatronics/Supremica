@@ -42,6 +42,9 @@ public class VisGraphScheduler
 	/** To draw or not to draw - this is the question... */
 	private boolean toDrawVisibilityGraph;
 
+	/** Determines if this visibility graph is only used for relaxation (and is thus called by another scheduler) */
+	private boolean isRelaxationProvider = false;
+
 	private ActionTimer timer = new ActionTimer();
 
 	/** The index mapping handler */
@@ -53,12 +56,14 @@ public class VisGraphScheduler
 	/** The dialog box that launched this scheduler */
 	private ScheduleDialog gui;
 
-	public VisGraphScheduler (Automata robots, Automata zones, boolean toDrawVisibilityGraph)
-		throws Exception
-	{
-		this(robots, zones, toDrawVisibilityGraph, null);
-	}
+	/** 
+	 * Assures that the mutex zones of the graph have been initialized 
+	 * (is needed for correct functionning when this thread is started from
+	 * another thread for relaxation purposes).
+	 */
+	private boolean isInitialized = false;
 
+	
 	public VisGraphScheduler (Automata theAutomata, boolean toDrawVisibilityGraph, ScheduleDialog gui)
 		throws Exception
 	{
@@ -68,11 +73,18 @@ public class VisGraphScheduler
 	public VisGraphScheduler (Automata robots, Automata zones, boolean toDrawVisibilityGraph, ScheduleDialog gui)
 		throws Exception
 	{
+		this(robots, zones, toDrawVisibilityGraph, false, gui);
+	}
+	
+	public VisGraphScheduler (Automata robots, Automata zones, boolean toDrawVisibilityGraph, boolean isRelaxationProvider, ScheduleDialog gui)
+		throws Exception
+	{
 		this.toDrawVisibilityGraph = toDrawVisibilityGraph;
-
+		
 		this.robots = robots;
 		this.zones = zones;
 		this.gui = gui;
+		this.isRelaxationProvider = isRelaxationProvider;
 
 		Thread vgThread = new Thread(this);
 		isRunning = true;
@@ -85,48 +97,39 @@ public class VisGraphScheduler
 		{
 			if (isRunning)
 			{
-				timer.restart();
-				extractGraphTimes();
-
-				// If the call came from GUI, print the preprocessing time
-				if (gui != null)
-				{
-					logger.info("Preprocessing in " + timer.elapsedTime() + "ms");
-				}
-			}
-
-			if (isRunning)
-			{
 				init();
 			}
 
-			if (isRunning)
-			{
-				schedule();
-			}
-
-			if (isRunning && toDrawVisibilityGraph)
-			{
-				timer.restart();
-				drawVisibilityGraph(500, 500);
-
-				// If the call came from GUI, print the time needed to draw the graph
-				if (gui != null)
-				{
-					logger.info("The visibility graph painted in " + timer.elapsedTime() + "ms");
-				}
-			}	
-
-			if (gui != null)
+			if (!isRelaxationProvider)
 			{
 				if (isRunning)
 				{
-					requestStop(true);
+					schedule();
+				}
+
+				if (isRunning && toDrawVisibilityGraph)
+				{
+					timer.restart();
+					drawVisibilityGraph(500, 500);
+
+					logger.info("The visibility graph painted in " + timer.elapsedTime() + "ms");
+				}	
+
+				if (gui != null)
+				{
+					if (isRunning)
+					{
+						requestStop(true);
+					}
+					else
+					{
+						logger.warn("Scheduling interrupted");
+						gui.reset();
+					}
 				}
 				else
 				{
-					logger.warn("Scheduling interrupted");
-					gui.reset();
+					throw new Exception("Gui is NULL as far as VisGraphScheduler is concerned. The scheduling thread was not interrupted properly");
 				}
 			}
 		}
@@ -158,7 +161,7 @@ public class VisGraphScheduler
 				if (isAcceptingNode(currNode))
 				{
 					// If the algorithm was called from the GUI, print the optimal time value there
-					if (gui != null)
+					if (!isRelaxationProvider)
 					{
 						logger.info("OPTIMAL SOLUTION.......... " + currNode[G_INDEX] + " in time " + timer.elapsedTime() + "ms");
 					}
@@ -184,7 +187,7 @@ public class VisGraphScheduler
 	 * @param - the time coordinates of the starting point
 	 * @return - the minimal makespan
 	 */
-	public double scheduleFrom(double[] fromTimes)
+	public synchronized double scheduleFrom(double[] fromTimes)
 		throws Exception
 	{
 		double distanceToGoal = calcDistance(fromTimes, goalTimes);
@@ -254,7 +257,7 @@ public class VisGraphScheduler
 	 * the corresponding unbooking times. Also the total (independent) running
 	 * time of each robot is stored.
 	 */
-	private void extractGraphTimes()
+	private synchronized void extractGraphTimes()
 		throws Exception 
 	{
 		zoneBoundaryTimes = new Hashtable[robots.size()]; 
@@ -314,8 +317,19 @@ public class VisGraphScheduler
 	}
 
 	/** Now works only for two robots */
-	private void init()
+	private synchronized void init()
+		throws Exception
 	{
+		timer.restart();
+
+		extractGraphTimes();
+
+		// If the call came from GUI, print the preprocessing time
+		if (!isRelaxationProvider)
+		{
+			logger.info("Preprocessing in " + timer.elapsedTime() + "ms");
+		}
+		
 		indexMap = new AutomataIndexMap(robots);
 		ArrayList<double[]> edges = new ArrayList<double[]>();
 
@@ -358,6 +372,8 @@ public class VisGraphScheduler
 		// Initializing the A*-lists
 		openTree = new TreeSet<double[]>(new OpenTreeComparator(F_INDEX));
 		closedTree = new TreeMap<Double, double[]>();
+
+		isInitialized = true;
 	}
 
 	public void requestStop()
@@ -375,12 +391,12 @@ public class VisGraphScheduler
 		}
 	}
 
-	private double calcDistance(double[] start, double[] goal)
+	private synchronized double calcDistance(double[] start, double[] goal)
 	{
 		return Math.max(goal[0] - start[0], goal[1] - start[1]);
 	}
 
-	private void drawVisibilityGraph(int height, int width)
+	private synchronized void drawVisibilityGraph(int height, int width)
 		throws Exception
 	{
 		VisGraphDrawer drawer = new VisGraphDrawer(450, 450, new String[]{robots.getAutomatonAt(0).getName(), robots.getAutomatonAt(1).getName()});
@@ -432,5 +448,10 @@ public class VisGraphScheduler
 			return true;
 
 		return false;
+	}
+
+	public boolean isInitialized()
+	{
+		return isInitialized;
 	}
 }

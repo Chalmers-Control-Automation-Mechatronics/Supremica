@@ -46,6 +46,28 @@ public class ModifiedAstar
 		super(theAutomata, heuristic, manualExpansion, iterativeSearch, buildSchedule, gui);
     }
 
+	public ModifiedAstar(Automata theAutomata, boolean manualExpansion, boolean buildSchedule, ScheduleDialog gui)
+		throws Exception
+	{
+		super(theAutomata, manualExpansion, buildSchedule, gui);
+	}
+
+	/**
+	 * The defalut estimation of the remaining cost. This method is overriden 
+	 * in the subclasses. Is used if no relaxation is chosen (i.e. brute force search).
+	 */
+	public int calcEstimatedCost(int[] node)
+		throws Exception
+	{
+		return node[ACCUMULATED_COST_INDEX];
+	}
+
+	/**
+	 * Updates the closed tree if necessary, i.e. if the currently examined
+	 * node with better estimate value already is present on that tree.
+	 * If the node is added to the closed tree, its descendants are put on the 
+	 * open tree, according to the estimated remaining cost value.
+	 */
 	protected void branch(int[] currNode) 
 	{
 		try 
