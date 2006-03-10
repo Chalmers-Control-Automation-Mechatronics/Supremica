@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.15 2006-03-10 10:28:53 markus Exp $
+//# $Id: ModuleCompiler.java,v 1.16 2006-03-10 13:35:51 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -609,7 +609,7 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
 					mAutomata.put(variable.getName(), variableAutomaton);
 				}
 			 //Needed to calculate supervisor using original events.
-				addEquivalentClassAutomata(mEFAEventOriginalEventMap, kind);
+				addEquivalentClassAutomaton(mEFAEventOriginalEventMap, kind);
 				
 				return relabeledAutomaton;
 			}
@@ -636,22 +636,22 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
 		}
 	}
 
-	private void addEquivalentClassAutomata(
+	private void addEquivalentClassAutomaton(
 			Map<EventProxy, EventProxy> eventOriginalEventMap,
 			ComponentKind kind) {
+		final Collection<EventProxy> unMarkedState = new TreeSet<EventProxy>();
 		final Collection<EventProxy> markedState = new TreeSet<EventProxy>();
 		markedState.add(mFactory.createEventProxy("variableMarking",
 				EventKind.PROPOSITION));
 
 		final Collection<EventProxy> alphabet = new TreeSet<EventProxy>();
 		List<StateProxy> eventStates = new LinkedList<StateProxy>();
-		final StateProxy firstEventState = mFactory.createStateProxy("first",
+		final StateProxy firstEventState = mFactory.createStateProxy("start",
 				true, markedState);
-		final StateProxy secondEventState = mFactory.createStateProxy("second",
-				false, markedState);
+		
 
 		eventStates.add(firstEventState);
-		eventStates.add(secondEventState);
+		
 
 		Collection<TransitionProxy> transitions = new TreeSet<TransitionProxy>();
 		Set<EventProxy> keys = mEFAEventOriginalEventMap.keySet();
@@ -659,44 +659,31 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
 		//Only controllable events are considered in supervisory control.
 		
 		for (EventProxy originalEvent : mEFAEventOriginalEventMap.values()) {
-				if (originalEvent.getKind() == EventKind.CONTROLLABLE) {
-					final TransitionProxy firstEventTrans = mFactory
+				if (originalEvent.getKind() == EventKind.CONTROLLABLE &&
+						!alphabet.contains(originalEvent)) {
+					StateProxy eventState = mFactory.createStateProxy("dummy "+ originalEvent.getName(),
+							false, unMarkedState);
+					TransitionProxy eventTrans = mFactory
 							.createTransitionProxy(firstEventState,
-									originalEvent, secondEventState);
-					final TransitionProxy secondEventTrans = mFactory
-							.createTransitionProxy(secondEventState,
-									originalEvent, firstEventState);
-					transitions.add(firstEventTrans);
-					transitions.add(secondEventTrans);
+									originalEvent, eventState);
+					transitions.add(eventTrans);
 					alphabet.add(originalEvent);
+					eventStates.add(eventState);
+					mGlobalAlphabet.add(originalEvent);
 					for (EventProxy key : keys) {
 						if (mEFAEventOriginalEventMap.get(key) == originalEvent) {
 							final TransitionProxy trans = mFactory
-									.createTransitionProxy(secondEventState,
-											key, secondEventState);
+									.createTransitionProxy(eventState,
+											key, firstEventState);
 							transitions.add(trans);
 							alphabet.add(key);
 						}
 					}
-					/*At the momoent all events are relabelled so
-					 * the size of the alphabet is always >1.
-					 */
-					if (alphabet.size() > 1) {
-						/*Notice that the original events must be added
-						 * to the global alphabet.
-						 */
-						mGlobalAlphabet.add(originalEvent);
-						final AutomatonProxy eventAutomaton = mFactory
-								.createAutomatonProxy("EquivalentClassAut. for" +
-										originalEvent.getName(),
-										kind, alphabet, eventStates,
-										transitions);
-
-						// Add variable automaton to mAutomata.
-						mAutomata.put("EquivalentClassAut. for " + originalEvent.getName(), eventAutomaton);
-					}
-					transitions.clear();
-					alphabet.clear();
+					final AutomatonProxy eventAutomaton = mFactory
+					.createAutomatonProxy("EquivalentClassAut",
+							kind, alphabet, eventStates,
+							transitions);
+					mAutomata.put("EquivalentClassAut", eventAutomaton);
 				}
 			}
 		}
@@ -1401,10 +1388,21 @@ private void createAutomatonEvents(final EventValue events)
 								.createTransitionProxy(sourceState, event,
 										targetState);
 						// EFA-----------
-						mEFATransitionEdgeMap.put(trans, edge);
-						mEFATransitions.add(trans);
+						
+						final EventProxy relabeledEvent = mFactory
+						.createEventProxy(trans.getEvent()
+								.getName(), 
+								EventKind.UNCONTROLLABLE, trans.getEvent()
+								.isObservable());
+
+						final TransitionProxy relabeledTrans = mFactory
+								.createTransitionProxy(trans
+										.getSource(), relabeledEvent,
+										trans.getTarget());
+						mEFATransitionEdgeMap.put(relabeledTrans, edge);
+						mEFATransitions.add(relabeledTrans);
 						mEFAEventOriginalEventMap.put
-						(trans.getEvent(), trans.getEvent());
+						(relabeledTrans.getEvent(), trans.getEvent());
 						// --------------
 
 						mTransitions.add(trans);
@@ -1424,12 +1422,19 @@ private void createAutomatonEvents(final EventValue events)
 								 * case we do not need to rename the event.
 								 * */
 
-								final EventProxy relabeledEvent = mFactory
+								/*final EventProxy relabeledEvent = mFactory
 										.createEventProxy(trans.getEvent()
 												.getName()
 												+ "_" + mCurrentEventID, trans.getEvent()
 												.getKind(), trans.getEvent()
-												.isObservable());
+												.isObservable());*/
+								
+								final EventProxy relabeledEvent = mFactory
+								.createEventProxy(trans.getEvent()
+										.getName()
+										+ "_" + mCurrentEventID, 
+										EventKind.UNCONTROLLABLE, trans.getEvent()
+										.isObservable());
 
 								final TransitionProxy relabeledTrans = mFactory
 										.createTransitionProxy(trans
