@@ -219,7 +219,23 @@ In the last two steps  of the algorithm we obtain a monolithic description of $A
  the modular structure in the algorithm does not have the correct alphabet and can therefore not be used to
  verify specifications against a given plant model. For instance, suppose we have a model of the plant and
  a specification in EFA form. To analyze the specification against the plant and at the same time
-use the modular structure in the translation algorithm we must translate them simultaneously.
+use the modular structure in step 2 in the translation algorithm we must translate the
+specification and the plant simultaneously.
+
+Before we calculate a supervisor from the modular model obtained in step 2 we divide the alphabet of $A'$ (the
+relabelled alphabet)
+into as many subsets as the number of events (events that occur in transitions) in $A_e$. Each subset
+$\Sigma_\sigma=\{\text{events in } A' \text{ obtained by relabelling } \sigma \}$
+is an equivalence class representing the event $\sigma$ in the original alphabet. The supervisor
+calculated from the modular model with the relabelled alphabet have one important restriction,
+ it must either accept all events in an equivalence class or forbid all events in an equivalence class. Of course
+  we need only to consider the controllable events in $A_e$.
+ The key is to treat all the relabelled events as uncontrollable and control them
+ simultaneously with the original controllable event
+ of $A_e$ that defines the their equivalence class. This
+ can easily be obtained using regular algorithms by adding a simple automata shown in fig.
+
+
 
 Note that if two EFA's has common variables, we cannot first translate them
 separately into standard FA and then synchronize them. Either this
@@ -248,7 +264,7 @@ $j^{ith}$ variable in $x^{B}$ are the same then $(a_{q^A \sigma}(x^{A}))_i = (a_
 formula is false it may happen that $a_{q^A \sigma p^A}(x^{A}))_i \neq (a_{q^B
 \sigma p^B}(x^{B}))_j$ even though the two automata are consistent.
 To avoid such situations we require that action functions of common
-variables are identical.
+variables are identical?
 
 Before we define the synchronous product we introduce two more
 subscripts, $l$ and $c$. These are to be used for the variables.
