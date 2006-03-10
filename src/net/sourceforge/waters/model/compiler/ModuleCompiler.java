@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.14 2006-03-09 07:35:43 markus Exp $
+//# $Id: ModuleCompiler.java,v 1.15 2006-03-10 10:28:53 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -608,8 +608,9 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
 					//Add variable automaton to mAutomata.
 					mAutomata.put(variable.getName(), variableAutomaton);
 				}
-				List <AutomatonProxy> equivalentClassAutomata=
-					createEquivalentClassAutomata(mEFAEventOriginalEventMap);
+			 //Needed to calculate supervisor using original events.
+				addEquivalentClassAutomata(mEFAEventOriginalEventMap, kind);
+				
 				return relabeledAutomaton;
 			}
 			else{
@@ -635,11 +636,72 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
 		}
 	}
 
-	private List<AutomatonProxy> createEquivalentClassAutomata
-	(Map<EventProxy, EventProxy> eventOriginalEventMap) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	private void addEquivalentClassAutomata(
+			Map<EventProxy, EventProxy> eventOriginalEventMap,
+			ComponentKind kind) {
+		final Collection<EventProxy> markedState = new TreeSet<EventProxy>();
+		markedState.add(mFactory.createEventProxy("variableMarking",
+				EventKind.PROPOSITION));
+
+		final Collection<EventProxy> alphabet = new TreeSet<EventProxy>();
+		List<StateProxy> eventStates = new LinkedList<StateProxy>();
+		final StateProxy firstEventState = mFactory.createStateProxy("first",
+				true, markedState);
+		final StateProxy secondEventState = mFactory.createStateProxy("second",
+				false, markedState);
+
+		eventStates.add(firstEventState);
+		eventStates.add(secondEventState);
+
+		Collection<TransitionProxy> transitions = new TreeSet<TransitionProxy>();
+		Set<EventProxy> keys = mEFAEventOriginalEventMap.keySet();
+		
+		//Only controllable events are considered in supervisory control.
+		
+		for (EventProxy originalEvent : mEFAEventOriginalEventMap.values()) {
+				if (originalEvent.getKind() == EventKind.CONTROLLABLE) {
+					final TransitionProxy firstEventTrans = mFactory
+							.createTransitionProxy(firstEventState,
+									originalEvent, secondEventState);
+					final TransitionProxy secondEventTrans = mFactory
+							.createTransitionProxy(secondEventState,
+									originalEvent, firstEventState);
+					transitions.add(firstEventTrans);
+					transitions.add(secondEventTrans);
+					alphabet.add(originalEvent);
+					for (EventProxy key : keys) {
+						if (mEFAEventOriginalEventMap.get(key) == originalEvent) {
+							final TransitionProxy trans = mFactory
+									.createTransitionProxy(secondEventState,
+											key, secondEventState);
+							transitions.add(trans);
+							alphabet.add(key);
+						}
+					}
+					/*At the momoent all events are relabelled so
+					 * the size of the alphabet is always >1.
+					 */
+					if (alphabet.size() > 1) {
+						/*Notice that the original events must be added
+						 * to the global alphabet.
+						 */
+						mGlobalAlphabet.add(originalEvent);
+						final AutomatonProxy eventAutomaton = mFactory
+								.createAutomatonProxy("EquivalentClassAut. for" +
+										originalEvent.getName(),
+										kind, alphabet, eventStates,
+										transitions);
+
+						// Add variable automaton to mAutomata.
+						mAutomata.put("EquivalentClassAut. for " + originalEvent.getName(), eventAutomaton);
+					}
+					transitions.clear();
+					alphabet.clear();
+				}
+			}
+		}
+
+
 
 	private boolean hasNonEmptyGuardActionBlock(Collection<EdgeProxy> edges) {
 		for(EdgeProxy edge: edges){
@@ -994,7 +1056,11 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
 		Set<TransitionProxy> splitTransitions = new HashSet<TransitionProxy>();
 		Set<EventProxy> relabeledLocalAlphabet = new TreeSet<EventProxy>();
 		GuardExpressionHandler handler = new GuardExpressionHandler();
-
+		EventProxy originalEvent = null;
+		Map<EventProxy, EventProxy> eventOriginalEventMap= new HashMap<EventProxy, EventProxy>();
+		eventOriginalEventMap.putAll(mEFAEventOriginalEventMap);
+		mEFAEventOriginalEventMap.clear();
+		
 		for (TransitionProxy transition : relabeledEFATransitions) {
 			SimpleExpressionSubject guard = (SimpleExpressionSubject) mEFARelabeledTransitionGuardClauseMap
 					.get(transition);
@@ -1002,11 +1068,14 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
 					.get(transition);
 			handler.setExpression(guard);
 			List<SimpleExpressionSubject> andClauses = handler.getAndClauses();
-
+			originalEvent=
+			    eventOriginalEventMap.get(transition.getEvent());
+			
 			if(andClauses.size() >=  2) {
 				mEFARelabeledTransitionActionMap.remove(transition);
 				mEFARelabeledTransitionGuardClauseMap.remove(transition);
 				
+					
 				for (SimpleExpressionSubject andClause : andClauses) {
 					
 					final EventProxy relabeledEvent = mFactory.createEventProxy(
@@ -1026,6 +1095,8 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
 					mEFARelabeledTransitionActionMap.put(splitTransition, action);
 					mEFARelabeledTransitionGuardClauseMap.put(splitTransition,
 							andClause);
+					mEFAEventOriginalEventMap.put
+					(relabeledEvent,originalEvent);
 					
 					splitTransitions.add(splitTransition);
 					
@@ -1033,6 +1104,8 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
 				}
 			}
 			else{
+				mEFAEventOriginalEventMap.put
+				(transition.getEvent(),originalEvent);
 				relabeledLocalAlphabet.add(transition.getEvent());
 				splitTransitions.add(transition);
 				mGlobalAlphabet.add(transition.getEvent());
@@ -1062,10 +1135,13 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
 		mEFARelabeledTransitionGuardClauseMap = new HashMap<TransitionProxy, SimpleExpressionProxy>();
 		Set<TransitionProxy> relabeledTransitions = new TreeSet<TransitionProxy>();
 		EventProxy originalEvent = null;
+		Map<EventProxy, EventProxy> eventOriginalEventMap= new HashMap<EventProxy, EventProxy>();
+		eventOriginalEventMap.putAll(mEFAEventOriginalEventMap);
+		mEFAEventOriginalEventMap.clear();
 		for (TransitionProxy transition : mEFATransitions) {
 			 originalEvent=
-		    mEFAEventOriginalEventMap.get(transition.getEvent());
-			mEFAEventOriginalEventMap.remove(transition.getEvent());
+		    eventOriginalEventMap.get(transition.getEvent());
+			
 			
 			final EventProxy relabeledEvent = mFactory.createEventProxy(
 					transition.getEvent().getName() + "_" + mCurrentEventID.toString(),
