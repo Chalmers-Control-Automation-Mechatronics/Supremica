@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.19 2006-03-13 16:43:22 markus Exp $
+//# $Id: ModuleCompiler.java,v 1.20 2006-03-13 17:17:24 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -1045,8 +1045,17 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
 		 */
 
 		Set<TransitionProxy> splitTransitions = new HashSet<TransitionProxy>();
+	    /*
+	     * To remove old keys from the mappings, should we copy the mappings like this?
+		Map<TransitionProxy, List<BinaryExpressionProxy>> efaRelabeledTransitionActionMap = new HashMap<TransitionProxy, List<BinaryExpressionProxy>>();
+		Map<TransitionProxy, SimpleExpressionProxy> efaRelabeledTransitionGuardClauseMap = new HashMap<TransitionProxy, SimpleExpressionProxy>();
+		efaRelabeledTransitionActionMap.putAll(mEFARelabeledTransitionActionMap);
+		efaRelabeledTransitionGuardClauseMap.putAll(mEFARelabeledTransitionGuardClauseMap);
+		*/
 		Set<EventProxy> relabeledLocalAlphabet = new TreeSet<EventProxy>();
+		
 		GuardExpressionHandler handler = new GuardExpressionHandler();
+		
 		EventProxy originalEvent = null;
 		Map<EventProxy, EventProxy> eventOriginalEventMap= new HashMap<EventProxy, EventProxy>();
 		eventOriginalEventMap.putAll(mEFAEventOriginalEventMap);
