@@ -7,7 +7,7 @@
   <EventParameter Name="change_direction" Kind="CONTROLLABLE"/>
 </ParameterList>
 <ComponentList>
-<SimpleComponent Kind="SPEC">
+<SimpleComponent Kind="PLANT">
 
 
 <SimpleIdentifier Name="Sensoractuator"/>

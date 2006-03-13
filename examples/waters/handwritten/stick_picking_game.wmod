@@ -11,7 +11,7 @@
 
 <ComponentList>
 
-<SimpleComponent Kind="SPEC">
+<SimpleComponent Kind="PLANT">
   
   <SimpleIdentifier Name="Two_players"/>
   <Graph>

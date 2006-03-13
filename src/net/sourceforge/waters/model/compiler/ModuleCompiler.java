@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.16 2006-03-10 13:35:51 markus Exp $
+//# $Id: ModuleCompiler.java,v 1.17 2006-03-13 12:47:07 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -609,7 +609,7 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
 					mAutomata.put(variable.getName(), variableAutomaton);
 				}
 			 //Needed to calculate supervisor using original events.
-				addEquivalentClassAutomaton(mEFAEventOriginalEventMap, kind);
+				addEquivalenceClassAutomaton(mEFAEventOriginalEventMap, kind);
 				
 				return relabeledAutomaton;
 			}
@@ -635,8 +635,10 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
 			// ---------------------
 		}
 	}
-
-	private void addEquivalentClassAutomaton(
+/*
+ * 
+ */
+	private void addEquivalenceClassAutomaton(
 			Map<EventProxy, EventProxy> eventOriginalEventMap,
 			ComponentKind kind) {
 		final Collection<EventProxy> unMarkedState = new TreeSet<EventProxy>();
@@ -661,7 +663,7 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
 		for (EventProxy originalEvent : mEFAEventOriginalEventMap.values()) {
 				if (originalEvent.getKind() == EventKind.CONTROLLABLE &&
 						!alphabet.contains(originalEvent)) {
-					StateProxy eventState = mFactory.createStateProxy("dummy "+ originalEvent.getName(),
+					StateProxy eventState = mFactory.createStateProxy("Dummy "+ originalEvent.getName(),
 							false, unMarkedState);
 					TransitionProxy eventTrans = mFactory
 							.createTransitionProxy(firstEventState,
@@ -1388,23 +1390,12 @@ private void createAutomatonEvents(final EventValue events)
 								.createTransitionProxy(sourceState, event,
 										targetState);
 						// EFA-----------
-						
-						final EventProxy relabeledEvent = mFactory
-						.createEventProxy(trans.getEvent()
-								.getName(), 
-								EventKind.UNCONTROLLABLE, trans.getEvent()
-								.isObservable());
-
-						final TransitionProxy relabeledTrans = mFactory
-								.createTransitionProxy(trans
-										.getSource(), relabeledEvent,
-										trans.getTarget());
-						mEFATransitionEdgeMap.put(relabeledTrans, edge);
-						mEFATransitions.add(relabeledTrans);
+					    TransitionProxy	efaTrans = createEFATransition(trans);
+					    mEFATransitionEdgeMap.put(efaTrans, edge);
+						mEFATransitions.add(efaTrans);
 						mEFAEventOriginalEventMap.put
-						(relabeledTrans.getEvent(), trans.getEvent());
-						// --------------
-
+						(efaTrans.getEvent(), trans.getEvent());
+						//----------------------
 						mTransitions.add(trans);
 						sourceEntry.addTransition(trans, group);
 					}
@@ -1413,37 +1404,30 @@ private void createAutomatonEvents(final EventValue events)
 						final TransitionProxy trans = duplicate.getTransition();
 						sourceEntry.addTransition(trans, group);
 						// EFA---------
-						if (mEFATransitionEdgeMap.containsKey(trans)) 
+						TransitionProxy efaTrans= createEFATransition(trans);
+						if (mEFATransitionEdgeMap.containsKey(efaTrans)) 
 						{
-							if (!mEFATransitionEdgeMap.get(trans).equals(edge)){
+							if (!mEFATransitionEdgeMap.get(efaTrans).equals(edge)){
 								/*Then we need to relabel the transition.
 								 * TODO: If the guard Strings are different
 								 * the evaluated guards can be the same. In such a
 								 * case we do not need to rename the event.
 								 * */
-
-								/*final EventProxy relabeledEvent = mFactory
-										.createEventProxy(trans.getEvent()
-												.getName()
-												+ "_" + mCurrentEventID, trans.getEvent()
-												.getKind(), trans.getEvent()
-												.isObservable());*/
-								
 								final EventProxy relabeledEvent = mFactory
-								.createEventProxy(trans.getEvent()
+								.createEventProxy(efaTrans.getEvent()
 										.getName()
 										+ "_" + mCurrentEventID, 
-										EventKind.UNCONTROLLABLE, trans.getEvent()
-										.isObservable());
+										efaTrans.getEvent().getKind(),
+										efaTrans.getEvent().isObservable());
 
 								final TransitionProxy relabeledTrans = mFactory
-										.createTransitionProxy(trans
+										.createTransitionProxy(efaTrans
 												.getSource(), relabeledEvent,
-												trans.getTarget());
-								mCurrentEventID++;
+												efaTrans.getTarget());
 								mEFATransitionEdgeMap.put(relabeledTrans, edge);
 								mEFATransitions.add(relabeledTrans);
 								mEFAEventOriginalEventMap.put(relabeledEvent, trans.getEvent());
+								mCurrentEventID++;
 							}
 							}
 						}
@@ -1452,6 +1436,23 @@ private void createAutomatonEvents(final EventValue events)
 		
 		} catch (final NondeterminismException exception) {
 			throw wrap(exception);
+		}
+	}
+
+	private TransitionProxy createEFATransition(TransitionProxy trans) {
+		/*
+		 * TODO:all relabelled events are actually unobservable, therefore we
+		 * should construct an equivalenceclass automaton that includes the
+		 * uncontrollable events.
+		 */
+		if (trans.getEvent().getKind() == EventKind.CONTROLLABLE) {
+			final EventProxy efaEvent = mFactory.createEventProxy(trans
+					.getEvent().getName(), EventKind.UNCONTROLLABLE, false);
+
+			return mFactory.createTransitionProxy(trans.getSource(), efaEvent,
+					trans.getTarget());
+		} else {
+			return trans;
 		}
 	}
 
