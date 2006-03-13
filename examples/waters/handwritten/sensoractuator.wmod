@@ -5,6 +5,7 @@
   <EventParameter Name="move_right" Kind="UNCONTROLLABLE"/>
   <EventParameter Name="move_left" Kind="UNCONTROLLABLE"/>
   <EventParameter Name="change_direction" Kind="CONTROLLABLE"/>
+  <EventParameter Name="@omega" Kind="PROPOSITION"/>
 </ParameterList>
 <ComponentList>
 <SimpleComponent Kind="PLANT">
@@ -15,7 +16,11 @@
 <Graph Deterministic = "true">
 
   <NodeList>
-    <SimpleNode Name="A" Initial="true"/>
+    <SimpleNode Name="A" Initial="true">
+        <EventList>
+            <SimpleIdentifier Name="@omega"/>
+        </EventList>
+    </SimpleNode>
     <SimpleNode Name="B" Initial="false"/>
     <SimpleNode Name="C" Initial="false"/>
     <SimpleNode Name="D" Initial="false"/>

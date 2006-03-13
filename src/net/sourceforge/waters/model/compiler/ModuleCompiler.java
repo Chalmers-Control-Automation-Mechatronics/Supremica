@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.17 2006-03-13 12:47:07 markus Exp $
+//# $Id: ModuleCompiler.java,v 1.18 2006-03-13 13:43:41 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -648,7 +648,7 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
 
 		final Collection<EventProxy> alphabet = new TreeSet<EventProxy>();
 		List<StateProxy> eventStates = new LinkedList<StateProxy>();
-		final StateProxy firstEventState = mFactory.createStateProxy("start",
+		final StateProxy firstEventState = mFactory.createStateProxy("Block",
 				true, markedState);
 		
 
@@ -659,12 +659,13 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
 		Set<EventProxy> keys = mEFAEventOriginalEventMap.keySet();
 		
 		//Only controllable events are considered in supervisory control.
-		
+		Integer stateIndex=1;
 		for (EventProxy originalEvent : mEFAEventOriginalEventMap.values()) {
 				if (originalEvent.getKind() == EventKind.CONTROLLABLE &&
 						!alphabet.contains(originalEvent)) {
-					StateProxy eventState = mFactory.createStateProxy("Dummy "+ originalEvent.getName(),
-							false, unMarkedState);
+					StateProxy eventState = mFactory.createStateProxy
+					("Allow " + "_" + stateIndex.toString(), false, unMarkedState);
+					stateIndex++;
 					TransitionProxy eventTrans = mFactory
 							.createTransitionProxy(firstEventState,
 									originalEvent, eventState);
@@ -685,7 +686,7 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
 					.createAutomatonProxy("EquivalentClassAut",
 							kind, alphabet, eventStates,
 							transitions);
-					mAutomata.put("EquivalentClassAut", eventAutomaton);
+					mAutomata.put("EquivalenceClassAut", eventAutomaton);
 				}
 			}
 		}
