@@ -107,6 +107,8 @@ public class LabeledEvent
 		{
 			proposition = true;
 		}
+		
+		observable = e.isObservable();
 
 	}
 
