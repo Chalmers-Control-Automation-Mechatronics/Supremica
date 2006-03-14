@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.20 2006-03-13 17:17:24 markus Exp $
+//# $Id: ModuleCompiler.java,v 1.21 2006-03-14 12:16:01 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -1043,15 +1043,13 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
 		 * relabeledLocalAlphabet. This method splits transitions over logical
 		 * OR-operators.
 		 */
-
-		Set<TransitionProxy> splitTransitions = new HashSet<TransitionProxy>();
-	    /*
-	     * To remove old keys from the mappings, should we copy the mappings like this?
 		Map<TransitionProxy, List<BinaryExpressionProxy>> efaRelabeledTransitionActionMap = new HashMap<TransitionProxy, List<BinaryExpressionProxy>>();
 		Map<TransitionProxy, SimpleExpressionProxy> efaRelabeledTransitionGuardClauseMap = new HashMap<TransitionProxy, SimpleExpressionProxy>();
 		efaRelabeledTransitionActionMap.putAll(mEFARelabeledTransitionActionMap);
 		efaRelabeledTransitionGuardClauseMap.putAll(mEFARelabeledTransitionGuardClauseMap);
-		*/
+		mEFARelabeledTransitionActionMap.clear();
+		mEFARelabeledTransitionGuardClauseMap.clear();
+		
 		Set<EventProxy> relabeledLocalAlphabet = new TreeSet<EventProxy>();
 		
 		GuardExpressionHandler handler = new GuardExpressionHandler();
@@ -1062,9 +1060,9 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
 		mEFAEventOriginalEventMap.clear();
 		
 		for (TransitionProxy transition : relabeledEFATransitions) {
-			SimpleExpressionSubject guard = (SimpleExpressionSubject) mEFARelabeledTransitionGuardClauseMap
+			SimpleExpressionSubject guard = (SimpleExpressionSubject) efaRelabeledTransitionGuardClauseMap
 					.get(transition);
-			List<BinaryExpressionProxy> action = mEFARelabeledTransitionActionMap
+			List<BinaryExpressionProxy> action = efaRelabeledTransitionActionMap
 					.get(transition);
 			handler.setExpression(guard);
 			List<SimpleExpressionSubject> andClauses = handler.getAndClauses();
@@ -1072,8 +1070,8 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
 			    eventOriginalEventMap.get(transition.getEvent());
 			
 			if(andClauses.size() >=  2) {
-				mEFARelabeledTransitionActionMap.remove(transition);
-				mEFARelabeledTransitionGuardClauseMap.remove(transition);
+				//mEFARelabeledTransitionActionMap.remove(transition);
+				//mEFARelabeledTransitionGuardClauseMap.remove(transition);
 				
 					
 				for (SimpleExpressionSubject andClause : andClauses) {
@@ -1098,23 +1096,22 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
 					mEFAEventOriginalEventMap.put
 					(relabeledEvent,originalEvent);
 					
-					splitTransitions.add(splitTransition);
-					
 					mCurrentEventID++;
 				}
 			}
 			else{
+				mEFARelabeledTransitionActionMap.put(transition, action);
+				mEFARelabeledTransitionGuardClauseMap.put(transition, guard);
 				mEFAEventOriginalEventMap.put
 				(transition.getEvent(),originalEvent);
 				relabeledLocalAlphabet.add(transition.getEvent());
-				splitTransitions.add(transition);
 				mGlobalAlphabet.add(transition.getEvent());
 			}
 		}
 		
 		AutomatonProxy relabeledAutomaton = mFactory.createAutomatonProxy(
 				fullName + "_relabeled", kind, relabeledLocalAlphabet, mStates,
-				splitTransitions);
+				mEFARelabeledTransitionActionMap.keySet());
 		
 		
 		return relabeledAutomaton;
@@ -1454,14 +1451,10 @@ private void createAutomatonEvents(final EventValue events)
 	}
 
 	private TransitionProxy createEFATransition(TransitionProxy trans) {
-		/*
-		 * TODO:all relabelled events are actually unobservable, therefore we
-		 * should construct an equivalenceclass automaton that includes the
-		 * uncontrollable events.
-		 */
 		if (trans.getEvent().getKind() == EventKind.CONTROLLABLE) {
 			final EventProxy efaEvent = mFactory.createEventProxy(trans
-					.getEvent().getName(), EventKind.UNCONTROLLABLE, false);
+					.getEvent().getName(), EventKind.UNCONTROLLABLE, trans
+					.getEvent().isObservable());
 
 			return mFactory.createTransitionProxy(trans.getSource(), efaEvent,
 					trans.getTarget());
