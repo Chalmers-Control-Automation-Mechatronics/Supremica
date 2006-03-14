@@ -294,6 +294,12 @@ public abstract class AbstractAstar
 			if (isRunning && buildSchedule)
 			{
 				buildScheduleAutomaton();
+
+				//Tillf
+				if (this instanceof ModifiedAstarUsingVisGraphRelaxation)
+				{
+					logger.info("The number of VisGraphRelaxations = " + visGraphRelax.size());
+				}
 			}
 
 			if (isRunning)

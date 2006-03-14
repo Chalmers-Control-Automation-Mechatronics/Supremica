@@ -14,18 +14,43 @@ public class ModifiedAstarUsingVisGraphRelaxation
 	 * Hashtable containing the estimated cost for a given time configuration 
 	 * (as returned by the visibility graph)
 	 */
-	private Hashtable<String, Integer> visGraphRelax = null;
+	//Tillf public
+	public Hashtable<String, Integer> visGraphRelax = null;
 
 	/**
 	 * The output stream
 	 */
 	private static Logger logger = LoggerFactory.createLogger(ModifiedAstarUsingVisGraphRelaxation.class);
 
+	/*
+	 * The total cycle times of each robot (when run independently)
+	 */
+	private int[] cycleTimes;
+
+	//Tillf
+	private boolean relaxFromNodes = false;
+
 
 	public ModifiedAstarUsingVisGraphRelaxation(Automata theAutomata, boolean manualExpansion, boolean buildSchedule, ScheduleDialog gui) 
 		throws Exception 
 	{
+		//	super(theAutomata, manualExpansion, buildSchedule, gui);
+		this (theAutomata, manualExpansion, buildSchedule, false, gui);
+    }
+
+	//Tillf
+	public ModifiedAstarUsingVisGraphRelaxation(Automata theAutomata, boolean manualExpansion, boolean buildSchedule, boolean relaxFromNodes, ScheduleDialog gui) 
+		throws Exception 
+	{
 			super(theAutomata, manualExpansion, buildSchedule, gui);
+			this.relaxFromNodes = relaxFromNodes;
+
+			cycleTimes = new int[plantAutomata.size()];
+			for (int i=0; i<cycleTimes.length; i++)
+			{
+				State initState = plantAutomata.getAutomatonAt(i).getInitialState();
+				cycleTimes[i] = remainingCosts[i][initState.getIndex()] + initState.getCost();
+			}
     }
 
 	public void init (boolean manualExpansion)
@@ -49,14 +74,17 @@ public class ModifiedAstarUsingVisGraphRelaxation
 		// Calculate the visibility graph time coordinate, corresponding to the current node
 		for (int i=0; i<plantAutomata.size(); i++)
 		{
-			State initState = plantAutomata.getAutomatonAt(i).getInitialState();
-			int totalCycleTime = remainingCosts[i][initState.getIndex()] + initState.getCost();
-			int remainingCycleTime = remainingCosts[i][node[activeAutomataIndex[i]]] + node[CURRENT_COSTS_INDEX + i];
+			int remainingCycleTime = remainingCosts[i][node[activeAutomataIndex[i]]];
+			if (!relaxFromNodes)
+			{
+				remainingCycleTime += node[CURRENT_COSTS_INDEX + i];
+			}
 
-			effTimePoint[i] = totalCycleTime - remainingCycleTime;
+			effTimePoint[i] = cycleTimes[i] - remainingCycleTime;
 			timePointKey += effTimePoint[i] + "_";
 		}
 
+		int estimatedCost;
 		Integer previousVisibilityRelaxation = visGraphRelax.get(timePointKey);
 		if (previousVisibilityRelaxation == null)
 		{
@@ -76,15 +104,34 @@ public class ModifiedAstarUsingVisGraphRelaxation
 				}
 			}
 
-			//tillfälligt så här fullt
-			int estimatedCost = (int) Math.round(visibilityRelaxation);
+			//Tillf
+			//tillfälligt så här fullt (med avrundningen menar jag)
+			estimatedCost = (int) Math.round(visibilityRelaxation);
 			visGraphRelax.put(timePointKey, estimatedCost);
-			return estimatedCost + node[ACCUMULATED_COST_INDEX];
 		}
 		else
 		{
-			return previousVisibilityRelaxation.intValue() + node[ACCUMULATED_COST_INDEX];
+			estimatedCost = previousVisibilityRelaxation.intValue();
 		}
+
+		estimatedCost += node[ACCUMULATED_COST_INDEX];
+
+		// If the estimate is done from the next node, the minimal current cost is added
+		if (relaxFromNodes)
+		{
+			int minCurrentCost = Integer.MAX_VALUE;
+			for (int i=0; i<plantAutomata.size(); i++)
+			{
+				if (node[CURRENT_COSTS_INDEX + i] < minCurrentCost)
+				{
+					minCurrentCost = node[CURRENT_COSTS_INDEX + i];
+				}
+			}
+
+			estimatedCost += minCurrentCost;
+		}
+
+		return estimatedCost;
 	}
 
 	private void preprocessVisibilityGraphs()

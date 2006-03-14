@@ -20,11 +20,12 @@ public class ScheduleDialog
 	private static final String VIS_GRAPH = "Visibility Graph";
 
 	private static final String ONE_PRODUCT_RELAXATION = "1-product relax";
-	private static final String VIS_GRAPH_RELAXATION = "visibility graph";
+	private static final String VIS_GRAPH_TIME_RELAXATION = "visibility graph (time)";
+	private static final String VIS_GRAPH_NODE_RELAXATION = "visibility graph (node)";
 
     private static final long serialVersionUID = 1L;
     private static final String[] optiMethodNames = new String[]{MODIFIED_A_STAR, MODIFIED_VGA_STAR, MILP, VIS_GRAPH}; //, "Modified IDA*", "Modified SMA*"};
-    private static final String[] heuristicsNames = new String[]{ONE_PRODUCT_RELAXATION, VIS_GRAPH_RELAXATION, "brute force"}; //"2-product relax",
+    private static final String[] heuristicsNames = new String[]{ONE_PRODUCT_RELAXATION, VIS_GRAPH_TIME_RELAXATION, VIS_GRAPH_NODE_RELAXATION, "brute force"}; //"2-product relax",
     private static Logger logger = LoggerFactory.createLogger(ScheduleDialog.class);
     private JComboBox optiMethodsBox, heuristicsBox;
     private JCheckBox nodeExpander, buildAutomaton, vgDrawer;
@@ -175,7 +176,7 @@ public class ScheduleDialog
 			if (optiMethodsBox.getSelectedItem().equals(MODIFIED_A_STAR))
 			{
 				String selectedHeuristic = (String) heuristicsBox.getSelectedItem();
-				if (selectedHeuristic.equals(VIS_GRAPH_RELAXATION))
+				if (selectedHeuristic.equals(VIS_GRAPH_TIME_RELAXATION))
 				{
 					if (ActionMan.getGui().getSelectedAutomata().getPlantAutomata().size() == 2)
 					{
@@ -184,6 +185,19 @@ public class ScheduleDialog
 					else
 					{
 						sched = new ModifiedAstarUsingVisGraphRelaxation(ActionMan.getGui().getSelectedAutomata(), nodeExpander.isSelected(), buildAutomaton.isSelected(), this);
+					}
+				}
+				// Tillf
+				// This might be temporary (or the alternative just above) to determine which relaxation is best 
+				else if (selectedHeuristic.equals(VIS_GRAPH_NODE_RELAXATION))
+				{
+					if (ActionMan.getGui().getSelectedAutomata().getPlantAutomata().size() == 2)
+					{
+						sched = new VisGraphScheduler(ActionMan.getGui().getSelectedAutomata(), vgDrawer.isSelected(), this);
+					}
+					else
+					{
+						sched = new ModifiedAstarUsingVisGraphRelaxation(ActionMan.getGui().getSelectedAutomata(), nodeExpander.isSelected(), buildAutomaton.isSelected(), true, this);
 					}
 				}
 				else if (selectedHeuristic.equals(ONE_PRODUCT_RELAXATION))
