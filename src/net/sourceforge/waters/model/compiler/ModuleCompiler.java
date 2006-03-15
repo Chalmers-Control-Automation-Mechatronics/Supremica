@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.21 2006-03-14 12:16:01 markus Exp $
+//# $Id: ModuleCompiler.java,v 1.22 2006-03-15 17:21:19 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -608,9 +608,11 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
 					//Add variable automaton to mAutomata.
 					mAutomata.put(variable.getName(), variableAutomaton);
 				}
-			 //Needed to calculate supervisor using original events.
-				addEquivalenceClassAutomaton(mEFAEventOriginalEventMap, kind);
-				
+			 /*Needed to calculate supervisor in the nondet case(using original events).*/
+				if (!deterministic) {
+					addEquivalenceClassAutomaton(mEFAEventOriginalEventMap,
+							kind);
+				}
 				return relabeledAutomaton;
 			}
 			else{
