@@ -44,7 +44,7 @@ explained by extending the definition of the regular finite automaton.
 Typically, system behaviours are modelled using deterministic finite-state automata.
 Nondeterminism is used here to support the possibility of having different guards on transitions
 that are triggered by common events. To avoid contradictions when synchronizing
-automata, we do not allow this for the updating actions of variables
+automata, we do not allow this for the updating actions of global variables
 that are shared between automata.\\
 
 The regular finite nondeterministic automaton
@@ -60,11 +60,12 @@ initial state and $Q_m \subseteq Q$ is the set of marked states.
 
 First, we add to $A$ a set $X=X_1\times ... \times X_n$, where
 $X_k$, $k=1,...,n$, are finite nonempty sets. For instance, $X_k$
-could be any finite subset of $\mathbb{Z}$ or the set of states in  some
-other finite deterministic automaton. The finite set $X$ is the
+could be any finite subset of $\mathbb{Z}$, the set of states an automaton or
+an input signal. The finite set $X$ is the
 domain of definition of an $n$-tuple of variables
-$x=(x_1,...,x_n)$ with initial value $x_0=(x_{10},...,x_{n0})$. If
-a variable corresponds to the set of states in an automaton, we
+$x=(x_1,...,x_n)$ with initial value $x_0=(x_{10},...,x_{n0})$. If a variable is
+an input signal to the system that $A$ describes or the value
+of the variable represents the state that an automaton occupies, we
 shall call it a state variable. The initial value of a state
 variable must equal the initial state of its automaton and we do
 not admit updating actions of a state variable. To tell apart the
@@ -130,18 +131,19 @@ L(A_e)=\{s\in \Sigma^*:
 In some sense EFA's have small languages and a few number of
 states to the expense of many transitions. This is an important observation
 since it is the main reason why EFA's enable efficient modular algorithms to perform
-verifications of supervisors.
+verifications and to find supervisors.
 \subsection{How to use the variables}
 All logical systems can easily be represented by
-EFA models. When using EFA's as a modelling tool it important to understand how to choose the variables.
+EFA models. When using EFA's as a modelling tool it important to choose variables in a structured way.
 A variable $x$ can represent many things, some examples  are: the states that an object can be in,
  the number of customers in a queue system, the different types of customers in a queue or the time it
 takes for a process to execute different operations. In many applications the variables can be represented by
- integers or enumeration objects.
+ integers or enumeration objects. One way to standardize model building with EFA is to each EFA divide the
+ variables in input variables and output variables.
 
-\subsubsection{Integer variables}
+\subsubsection{Input variables}
 
-\subsubsection{Enumeration variables}
+\subsubsection{Output variables}
 
 
 \section{Translating EFA to FA}
@@ -152,9 +154,7 @@ $A=trans(A_e)$. When an EFA is "flatten out" the number of states
 increases to $Q \times X_v $. The reason for this is that all the
 actions are removed and translated into events in the regular FA. Notice
 that when $A_e$ only has ordinary variables $X=X_v$. If $A_e$ also has
-state variables the guard conditions on these variables are evaluated. When a variable
-corresponds to the set of states
-in an other automata this is not possible. Therefore its guard conditions are set to
+state variables the guard conditions on these variables can not be evaluated. Therefore its guard conditions are set to
 TRUE when the translation is performed. To simplify the
 algorithm we shall restrict us to quite simple action- and guard
 functions. We shall not compare variables with each other in the guard functions.
