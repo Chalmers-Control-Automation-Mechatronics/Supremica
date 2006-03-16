@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   DocumentManager
 //###########################################################################
-//# $Id: DocumentManager.java,v 1.3 2006-02-20 22:20:21 robi Exp $
+//# $Id: DocumentManager.java,v 1.4 2006-03-16 04:44:46 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -12,6 +12,7 @@ package net.sourceforge.waters.model.marshaller;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URL;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
@@ -142,7 +143,7 @@ public class DocumentManager<D extends DocumentProxy> {
     if (cached != null) {
       return cached;
     }
-    final String path = uri.getPath();
+    final String path = uri.getRawSchemeSpecificPart();
     final int dotpos = path.lastIndexOf(".");
     final String extension = dotpos >= 0 ? path.substring(dotpos) : "";
     final ProxyUnmarshaller<? extends D> unmarshaller =
@@ -202,6 +203,30 @@ public class DocumentManager<D extends DocumentProxy> {
   }
 
   /**
+   * Loads a document from a URL.
+   * This methods loads a document from a given file name, guessing the
+   * expected class from the file name extension.
+   * @param  uri          A URL specifiying the location of the document
+   *                      to be retrieved.
+   * @return The loaded document. This may be just a cached copy,
+   *         or it may actually be retrieved by reading an external file.
+   * @throws WatersUnmarshalException to indicate that parsing the input file
+   *                      has failed for some reason.
+   * @throws IOException  to indicate that the input file could not be
+   *                      opened or read.
+   */
+  public D load(final URL url)
+    throws WatersUnmarshalException, IOException
+  {
+    try {
+      final URI uri = url.toURI();
+      return load(uri);
+    } catch (final URISyntaxException exception) {
+      throw new WatersUnmarshalException(exception);
+    }
+  }
+
+  /**
    * Loads a document from a file.
    * This methods loads a document from a given file name, guessing the
    * expected class from the file name extension.
@@ -218,6 +243,37 @@ public class DocumentManager<D extends DocumentProxy> {
   {
     final URI uri = filename.toURI();
     return load(uri);
+  }
+
+  /**
+   * Saves a document to a file.
+   * This methods writes a document to a given file name, using the
+   * marshaller appropriate to the document's class. If the file name
+   * differs from the document's current location, the document
+   * manager cache will be updated to reflect the name change.
+   * @param  doc          The document to be written.
+   * @param  filename     The absolute path of the file to be written.
+   * @throws WatersMarshalException to indicate a failure while writing the
+   *                      data structures.
+   * @throws IOException to indicate that the output file could not be
+   *                      opened or written.
+   * @throws IllegalArgumentException to indicate that no registered
+   *                      {@link ProxyMarshaller} for the given class was
+   *                      found.
+   */
+  public void saveAs(final D doc, final File filename)
+    throws WatersMarshalException, IOException
+  {
+    final Class<D> clazz = Casting.toClass(doc.getClass());
+    final ProxyMarshaller<D> marshaller = findProxyMarshaller(clazz);
+    final URI newuri = filename.toURI();
+    final URI olduri = doc.getLocation();
+    marshaller.marshal(doc, filename);
+    if (!newuri.equals(olduri)) {
+      mDocumentCache.remove(olduri);
+      doc.setLocation(newuri);
+      mDocumentCache.put(newuri, doc);
+    }
   }
 
 
@@ -274,6 +330,9 @@ public class DocumentManager<D extends DocumentProxy> {
   //# Finding Marshallers
   /**
    * Gets the marshaller used to marshal objects of a given class.
+   * If there is no marshaller for excatly the given class, this method
+   * tries all superclasses and superinterfaces and returns a marshaller
+   * for the first supported class or interface found.
    * @param  clazz        The class of objects to be looked up.
    * @return The {@link ProxyMarshaller} used by this document manager
    *         to handle objects of the given class.
@@ -284,8 +343,7 @@ public class DocumentManager<D extends DocumentProxy> {
   public <DD extends D>
     ProxyMarshaller<DD> findProxyMarshaller(final Class<DD> clazz)
   {
-    final ProxyMarshaller<? extends D> marshaller =
-      mClassMarshallerMap.get(clazz);
+    final ProxyMarshaller marshaller = getProxyMarshaller(clazz);
     if (marshaller != null) {
       final Class<ProxyMarshaller<DD>> marshallerclazz =
         Casting.toClass(ProxyMarshaller.class);
@@ -322,6 +380,31 @@ public class DocumentManager<D extends DocumentProxy> {
 
   //#########################################################################
   //# Auxiliary Methods
+  private ProxyMarshaller getProxyMarshaller(final Class clazz)
+  {
+    if (DocumentProxy.class.isAssignableFrom(clazz)) {
+      ProxyMarshaller marshaller = mClassMarshallerMap.get(clazz);
+      if (marshaller != null) {
+        return marshaller;
+      }
+      final Class superclass = clazz.getSuperclass();
+      if (superclass != null) {
+        marshaller = getProxyMarshaller(superclass);
+        if (marshaller != null) {
+          return marshaller;
+        }
+      }
+      final Class[] interfaces = clazz.getInterfaces();
+      for (int i = 0; i < interfaces.length; i++) {
+        marshaller = getProxyMarshaller(interfaces[i]);
+        if (marshaller != null) {
+          return marshaller;
+        }
+      }
+    }
+    return null;
+  }
+
   private static URI resolve(final URI base, final String tailname)
     throws WatersUnmarshalException
   {

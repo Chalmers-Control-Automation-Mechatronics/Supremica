@@ -220,6 +220,8 @@
       <fileset dir="${test.classes}">
         <include name="net/sourceforge/waters/**/*.class"/>
       </fileset>
+      <zipfileset dir="${examples}"
+                  prefix="net/sourceforge/waters/model/marshaller/examples"/>
     </jar>
   </target>
 

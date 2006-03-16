@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.des
 //# CLASS:   ProductDESTest
 //###########################################################################
-//# $Id: ProductDESTest.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: ProductDESTest.java,v 1.3 2006-03-16 04:44:46 robi Exp $
 //###########################################################################
 
 
@@ -31,6 +31,12 @@ public abstract class ProductDESTest extends JAXBTestCase<ProductDESProxy>
   //#########################################################################
   //# Test Cases
   public void testParse_small_factory_2()
+    throws Exception
+  {
+    testParse("handwritten", "small_factory_2");
+  }
+
+  public void testJar_small_factory_2()
     throws Exception
   {
     testParse("handwritten", "small_factory_2");

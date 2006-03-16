@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleTest
 //###########################################################################
-//# $Id: ModuleTest.java,v 1.6 2006-03-02 12:12:50 martin Exp $
+//# $Id: ModuleTest.java,v 1.7 2006-03-16 04:44:46 robi Exp $
 //###########################################################################
 
 
@@ -89,6 +89,39 @@ public abstract class ModuleTest extends JAXBTestCase<ModuleProxy>
     throws Exception
   {
     testMarshal("handwritten", "tictactoe");
+  }
+
+
+  //#########################################################################
+  //# Jar Test Cases
+  public void testJar_buffer_sf1()
+    throws Exception
+  {
+    testJar("handwritten", "buffer_sf1");
+  }
+
+  public void testJar_machine()
+    throws Exception
+  {
+    testJar("handwritten", "machine");
+  }
+
+  public void testJar_small_factory_2()
+    throws Exception
+  {
+    testJar("handwritten", "small_factory_2");
+  }
+
+  public void testJar_small_factory_n()
+    throws Exception
+  {
+    testJar("handwritten", "small_factory_n");
+  }
+
+  public void testJar_tictactoe()
+    throws Exception
+  {
+    testJar("handwritten", "tictactoe");
   }
 
 
