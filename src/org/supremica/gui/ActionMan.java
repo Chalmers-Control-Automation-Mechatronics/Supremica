@@ -74,6 +74,14 @@ import org.supremica.gui.useractions.*;
 import org.supremica.gui.texteditor.TextFrame;
 import org.swixml.SwingEngine;
 
+// Waters importing
+import net.sourceforge.waters.subject.module.*;
+import net.sourceforge.waters.model.module.*;
+import net.sourceforge.waters.model.marshaller.*;
+import net.sourceforge.waters.model.expr.*;
+import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import java.net.URI;
+
 // Robot coordination junk
 //import org.supremica.external.robotCoordinationABB.*;
 //import org.supremica.automata.algorithms.RobotStudioLink;
@@ -2152,6 +2160,17 @@ public class ActionMan
 		};
 	}
 
+	public static void fileImportWaters(Gui gui)
+	{
+		new FileImporter(FileDialogs.getWatersFileImporter(), gui)    // anonymous class
+		{
+			void openFile(Gui g, File f)
+			{
+				importWatersFile(g, f);
+			}
+		};
+	}
+
 	public static void fileImportHYB(Gui gui)
 	{
 		new FileImporter(FileDialogs.getHYBFileImporter(), gui)    // anonymous class
@@ -2461,6 +2480,36 @@ public class ActionMan
 			int nbrOfAddedAutomata = gui.addAutomata(currAutomata);
 
 			gui.info("Successfully imported " + nbrOfAddedAutomata + " automata.");
+		}
+		catch (Exception ex)
+		{
+			logger.error("Error while importing " + file.getAbsolutePath() + ". " + ex);
+			logger.debug(ex.getStackTrace());
+
+			return;
+		}
+	}
+
+	public static void importWatersFile(Gui gui, File file)
+	{
+		gui.info("Importing " + file.getAbsolutePath() + " ...");
+
+		try
+		{
+		    // Build Waters ModuleProxy
+		    final ModuleProxyFactory factory =
+			ModuleSubjectFactory.getInstance();
+		    final OperatorTable optable = CompilerOperatorTable.getInstance();
+		    final ProxyUnmarshaller<ModuleProxy> unMarshaller =
+			new JAXBModuleMarshaller(factory, optable);
+		    final URI uri = file.toURI();
+		    ModuleProxy module = (ModuleSubject) unMarshaller.unmarshal(uri);
+
+		    ProjectBuildFromWaters builder = new ProjectBuildFromWaters(new VisualProjectFactory());
+		    Automata currAutomata = builder.build(module);
+		    int nbrOfAddedAutomata = gui.addAutomata(currAutomata);
+
+		    gui.info("Successfully imported " + nbrOfAddedAutomata + " automata.");
 		}
 		catch (Exception ex)
 		{

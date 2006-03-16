@@ -1,5 +1,5 @@
 //# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
-//# $Id: FileDialogs.java,v 1.27 2005-11-28 16:52:26 knut Exp $
+//# $Id: FileDialogs.java,v 1.28 2006-03-16 12:09:16 flordal Exp $
 
 /*
  * Supremica Software License Agreement
@@ -218,6 +218,16 @@ public class FileDialogs
 		fileImporter.addChoosableFileFilter(fd.getDGRFFilter());
 		fileImporter.addChoosableFileFilter(fd.getVMODFilter());
 		fileImporter.setFileFilter(fd.getVPRJFilter());
+
+		return fileImporter;
+	}
+
+	public static JFileChooser getWatersFileImporter()
+	{
+		JFileChooser fileImporter = fd.getFileImporter();
+
+		fileImporter.resetChoosableFileFilters();
+		fileImporter.setFileFilter(fd.getWMODFilter());
 
 		return fileImporter;
 	}
@@ -520,6 +530,16 @@ public class FileDialogs
 		return mainvmodFilter;
 	}
 
+	private FileFilter getDGRFFilter()
+	{
+		if (dgrfFilter == null)
+		{
+			dgrfFilter = makeFileFilter(".dgrf", "VALID Graph files (*.dgrf)");
+		}
+
+		return dgrfFilter;
+	}
+
 	private FileFilter getWMODFilter()
 	{
 		if (wmodFilter == null)
@@ -529,16 +549,6 @@ public class FileDialogs
 		}
 
 		return wmodFilter;
-	}
-
-	private FileFilter getDGRFFilter()
-	{
-		if (dgrfFilter == null)
-		{
-			dgrfFilter = makeFileFilter(".dgrf", "VALID Graph files (*.dgrf)");
-		}
-
-		return dgrfFilter;
 	}
 
 	private FileFilter getHYBFilter()

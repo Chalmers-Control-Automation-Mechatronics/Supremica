@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   CompilerOperatorTable
 //###########################################################################
-//# $Id: CompilerOperatorTable.java,v 1.3 2006-03-02 12:12:50 martin Exp $
+//# $Id: CompilerOperatorTable.java,v 1.4 2006-03-16 12:09:16 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -43,6 +43,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
     store(new BinaryPlusOperator());
     store(new BinaryMinusOperator());
     store(new BinaryEqualsOperator());
+    store(new BinaryNotEqualsOperator());
     store(new BinaryRangeOperator());
     store(new UnaryMinusOperator());
 
@@ -367,6 +368,21 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
   }
 
+  //#########################################################################
+  //# Inner Class BinaryNotEqualsOperator, inherits from BinaryEqualsOperator
+  private static class BinaryNotEqualsOperator extends BinaryEqualsOperator
+  {
+    public String getName()
+    {
+      return OPNAME_NOTEQUALS;
+    }
+
+    public CompiledIntValue eval(final Value lhsValue, final Value rhsValue)
+    {
+      final boolean result = lhsValue.equals(rhsValue);
+      return new CompiledIntValue(!result);     
+    }
+  }
 
   //#########################################################################
   //# Inner Class BinaryRangeOperator
@@ -461,6 +477,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
     new CompilerOperatorTable();
 
   private static final String OPNAME_EQUALS = "==";
+  private static final String OPNAME_NOTEQUALS = "!=";
   private static final String OPNAME_MINUS = "-";
   private static final String OPNAME_PLUS = "+";
   private static final String OPNAME_RANGE = "..";

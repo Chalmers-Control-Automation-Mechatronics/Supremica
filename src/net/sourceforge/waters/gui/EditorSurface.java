@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.45 2006-03-13 12:46:24 martin Exp $
+//# $Id: EditorSurface.java,v 1.46 2006-03-16 12:09:16 flordal Exp $
 //###########################################################################
 
 
@@ -185,7 +185,6 @@ public class EditorSurface
 		for (int i = 0; i < nodeGroups.size(); i++)
 		{
 			EditorNodeGroup n = (EditorNodeGroup) nodeGroups.get(i);
-
 			n.drawObject(g, isSelected(n));
 
 			ArrayList groups = new ArrayList();
@@ -265,14 +264,14 @@ public class EditorSurface
 			}
 		}
 		
-		if (newGroup != null) {
-			    newGroup.drawObject(g, isSelected(newGroup));
-			}
-
+		if (newGroup != null) 
+		{
+			newGroup.drawObject(g, isSelected(newGroup));
+		}
+		
 		for (int i = 0; i < edges.size(); i++)
 		{
 			EditorEdge edge = (EditorEdge) edges.get(i);
-
 			edge.drawObject(g, isSelected(edge));
 
 			/*
@@ -295,21 +294,18 @@ public class EditorSurface
 		for (int i = 0; i < nodes.size(); i++)
 		{
 			EditorNode n = (EditorNode) nodes.get(i);
-
 			n.drawObject(g, isSelected(n));
 		}
 
 		for (int i = 0; i < labels.size(); i++)
 		{
 			EditorLabel l = (EditorLabel) labels.get(i);
-
 			l.drawObject(g, isSelected(l) || isSelected(l.getParent()));
 		}
 
 		for (int i = 0; i < events.size(); i++)
 		{
 			EditorLabelGroup l = (EditorLabelGroup) events.get(i);
-
 			l.setPanelLocation(isSelected(l) || isSelected(l.getParent()));
 
 			// Why is this done here? Why are labelgroups treated differently?
@@ -327,15 +323,13 @@ public class EditorSurface
 		
 		for (int i = 0; i < mGuardActionBlocks.size(); i++)
 		{
+			EditorGuardActionBlock block = (EditorGuardActionBlock) mGuardActionBlocks.get(i);
+			block.setPanelLocation();
 
-			EditorGuardActionBlock GA = (EditorGuardActionBlock) mGuardActionBlocks.get(i);
-
-			GA.setPanelLocation();
-
-			if (GA.shadow && GA.isHighlighted())
+			if (block.shadow && block.isHighlighted())
 			{
-				Rectangle bounds = GA.getBounds();
-				g.setColor(GA.getShadowColor(isSelected(GA) || isSelected(GA.getParent())));
+				Rectangle bounds = block.getBounds();
+				g.setColor(block.getShadowColor(isSelected(block) || isSelected(block.getParent())));
 				g.fillRoundRect((int) bounds.getX()-panelMarginAdjust, (int) bounds.getY()-panelMarginAdjust, 
 								(int) bounds.getWidth()+2*panelMarginAdjust, (int) bounds.getHeight()+2*panelMarginAdjust, 
 								20, 20);
@@ -356,7 +350,7 @@ public class EditorSurface
 		}
 		
 		/*
-		// Print outline of drawn area (just to test if it's OK)
+		// Test: Print outline of drawn area (just to see if it's OK)
 		Rectangle rect = getDrawnAreaBounds();
 		g.setColor(Color.PINK);
 		g.drawRect((int) rect.getX(), (int) rect.getY(), (int) rect.getWidth(), (int) rect.getHeight());

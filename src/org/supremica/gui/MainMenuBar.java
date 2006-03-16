@@ -230,6 +230,16 @@ public class MainMenuBar
 		menuFileImport.setToolTipText("Import file");
 	    menuFile.add(menuFileImport);
 
+	    // File.Import.Waters
+	    JMenuItem menuFileImportWaters = new JMenuItem("From Waters...");
+	    menuFileImport.add(menuFileImportWaters);
+	    menuFileImportWaters.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					ActionMan.fileImportWaters(ActionMan.getGui());
+				}
+			});
 	    // File.Import.UMDES
 	    JMenuItem menuFileImportUMDES = new JMenuItem("From UMDES...");
 	    menuFileImport.add(menuFileImportUMDES);

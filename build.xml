@@ -105,7 +105,7 @@
 	<unjar src="${lib}/xmlBlaster.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/xtdash.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/jgrafchart.jar" dest="${lib}/${unjared}"/>	
-	<unjar src="${lib}/interfaceRobotStudio3_1.jar" dest="${lib}/${unjared}"/>	
+<!--	<unjar src="${lib}/interfaceRobotStudio3_1.jar" dest="${lib}/${unjared}"/>-->
 	<unjar src="${lib}/WMFWriter2D.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/sysutils.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/swixml.jar" dest="${lib}/${unjared}"/>
@@ -524,29 +524,6 @@
 	</jar>
 </target>
 
-
-<!--
-<target name="compile_robotstudiointerface" depends="startfiles_local_supremica">
-	<javac
-		srcdir="${supremica_basepackage}/temp/"
-		destdir="/research/rs"
-		classpath="${lib}/${unjared}"
-		includeJavaRuntime="yes"
-		deprecation="false"
-		verbose="false"
-		nowarn="true"
-		source="1.4"
-	/>
-</target>
-
-<target name="jar_robotstudiointerface">
-	<jar jarfile="${dist}/interfaceRobotStudio3_1.jar" manifest="${templates}/SUPREMICA_MANIFEST.MF"> 
-		<fileset dir="${supremica_basepackage}/temp/">
-		</fileset>
-	</jar>
-</target>
--->
-
 <target name="jar_supremica_student">
 	<jar jarfile="${dist}/Supremica.jar" manifest="${templates}/SUPREMICA_MANIFEST.MF"> 
 		<fileset dir="${build}">
@@ -682,8 +659,6 @@
 	<chmod file="${dist}/SupremicaLocalMoreMem.cmd" perm="644"/>
 	<copy file="${templates}/SupremicaLocal" todir="${dist}"/>	
 	<chmod file="${dist}/SupremicaLocal" perm="755"/>
-	<copy file="${templates}/SupremicaRobot.cmd" todir="${dist}"/>	
-	<chmod file="${dist}/SupremicaRobot.cmd" perm="755"/>
 	<copy file="${templates}/SFCtoSMV.cmd" todir="${dist}"/>	
 	<chmod file="${dist}/SFCtoSMV.cmd" perm="644"/>
 </target>

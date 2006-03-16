@@ -82,7 +82,7 @@ public class RSCell
     /** The name of the IPart containing the mutex zones. */
     final static String ZONEPART_NAME = "Mutex_Zones";
     //final static String BOXPART_NAME = "Box_Set";
-	final static String BOXPART_NAME = ZONEPART_NAME;
+    final static String BOXPART_NAME = ZONEPART_NAME;
     final static String VOLUMEPART_NAME = "Volumes_Set";
 
     final static String ZONEENTITY_BASENAME = "Zone";
@@ -386,178 +386,178 @@ public class RSCell
     public static Automata buildRobotAutomata(List<Robot> robots)
 		throws Exception
     {
-		Automata robotAut = new Automata();
-
-		// Iterate over the robots...
-		for (Iterator robotIt = robots.iterator(); robotIt.hasNext();)
+	Automata robotAut = new Automata();
+	
+	// Iterate over the robots...
+	for (Iterator robotIt = robots.iterator(); robotIt.hasNext();)
+	{
+	    Robot robot = (Robot) robotIt.next();
+	    
+	    // ONE AUTOMATON FOR THE ROBOT ITSELF //
+	    Automaton aut = new Automaton(robot.getName());
+	    aut.setType(AutomatonType.Plant);
+	    // Build the states...
+	    State initial = new State(CellExaminer.STARTSTATE_NAME);
+	    initial.setInitial(true);
+	    aut.addState(initial);
+	    initial.setCost(0);
+	    State marked = new State(CellExaminer.FINISHSTATE_NAME);
+	    marked.setAccepting(true);
+	    aut.addState(marked);
+	    marked.setCost(0);
+	    List<Configuration> posList = robot.getConfigurations();
+	    for (int i=0; i < posList.size(); i++)
 	    {
-			Robot robot = (Robot) robotIt.next();
-
-			// ONE AUTOMATON FOR THE ROBOT ITSELF //
-			Automaton aut = new Automaton(robot.getName());
-			aut.setType(AutomatonType.Plant);
-			// Build the states...
-			State initial = new State(CellExaminer.STARTSTATE_NAME);
-			initial.setInitial(true);
-			aut.addState(initial);
-			initial.setCost(0);
-			State marked = new State(CellExaminer.FINISHSTATE_NAME);
-			marked.setAccepting(true);
-			aut.addState(marked);
-			marked.setCost(0);
-			List<Configuration> posList = robot.getConfigurations();
-			for (int i=0; i < posList.size(); i++)
+		for (int j=0; j < posList.size(); j++)
+		{
+		    if (i != j)
 		    {
-				for (int j=0; j < posList.size(); j++)
-			    {
-					if (i != j)
-				    {
-						State state = new State((posList.get(i)).getName() +
-												(posList.get(j)).getName());
-						aut.addState(state);
-						state.setCost(0);
-				    }
-			    }
+			State state = new State((posList.get(i)).getName() +
+						(posList.get(j)).getName());
+			aut.addState(state);
+			state.setCost(0);
 		    }
-			// Build transitions...
-			for (Iterator<State> stateIt = aut.stateIterator(); stateIt.hasNext();)
-		    {
-				State fromState = stateIt.next();
-				// Initial?
-				if (fromState.getName().equals(CellExaminer.STARTSTATE_NAME))
-			    {
-					// Skip the 0:th element here... its assumed to be the home state
-					for (int i=1; i < posList.size(); i++)
-				    {
-						// Create new arc...
-						String name = (posList.get(0)).getName() +
-							(posList.get(i)).getName();
-						State toState = aut.getStateWithName(name);
-						LabeledEvent event = new LabeledEvent(name);
-						if (!aut.getAlphabet().contains(event))
-					    {
-							aut.getAlphabet().addEvent(event);
-					    }
-
-						Arc arc = new Arc(fromState, toState, event);
-						aut.addArc(arc);
-				    }
-			    }
-				else if (fromState.getName().equals(CellExaminer.FINISHSTATE_NAME))
-			    {
-					// No outgoing from final state...
-			    }
-				else
-			    {
-					String fromPos = null;
-					// Skip the 0:th element here... its assumed to be the home state
-					for (int i=0; i < posList.size(); i++)
-				    {
-						if (fromState.getName().endsWith((posList.get(i)).getName()))
-					    {
-							// Just to make sure there is no ambiguity
-							if (fromPos != null)
-						    {
-								throw new Exception("Error in RSCell.java, ambigous configuration names");
-						    }
-							fromPos = (posList.get(i)).getName();
-
-							// Create arc for each possible target configuration
-							for (int j=0; j < posList.size(); j++)
-						    {
-								if (i != j)
-							    {
-									// Create new arc...
-									String name = (posList.get(i)).getName() +
-										(posList.get(j)).getName();
-									State toState = aut.getStateWithName(name);
-
-									// Special treatment if were dealing with the home configuration
-									if (i==0)
-								    {
-										name = CellExaminer.FINISHEVENT_NAME;
-										toState = aut.getStateWithName(CellExaminer.FINISHSTATE_NAME);
-								    }
-
-									// Create event
-									LabeledEvent event = new LabeledEvent(name);
-									if (!aut.getAlphabet().contains(event))
-								    {
-										aut.getAlphabet().addEvent(event);
-								    }
-
-									// Add arc
-									Arc arc = new Arc(fromState, toState, event);
-									aut.addArc(arc);
-
-									// Only once if this was the home configuration (ugly hack... whatever)
-									if (i==0)
-								    {
-										break;
-								    }
-							    }
-						    }
-					    }
-				    }
-			    }
-		    }
-			aut.setComment("This automaton is not finished!");
-			// Add automaton
-			robotAut.addAutomaton(aut);
-
-			// ONE AUTOMATON PER TARGET //
-			List<Configuration> configurations = robot.getConfigurations();
-			// Skip home configuration (i=1...)
-			for (int i=1; i<configurations.size(); i++)
-		    {
-				Configuration pos = configurations.get(i);
-
-				aut = new Automaton(robot.getName() + CellExaminer.UNDERSCORE + pos.getName());
-				State notVisited = new State("0");
-				notVisited.setInitial(true);
-				State visited = new State("1");
-				visited.setAccepting(true);
-				aut.addState(notVisited);
-				aut.addState(visited);
-				aut.setType(AutomatonType.Specification);
-
-				/*
-				// Add transitions
-				for (int j=0; j<configurations.size(); j++)
-				{
-				if (i==j)
-				{
-				continue;
-				}
-
-				// Create event
-				String name = ((Configuration) configurations.get(j)).getName() + pos.getName();
-				LabeledEvent event = new LabeledEvent(name);
-				if (!aut.getAlphabet().contains(event)) // Is always true?
-				{
-				aut.getAlphabet().addEvent(event);
-				}
-
-				// Add arc
-				Arc arc = new Arc(notVisited, visited, event);
-				aut.addArc(arc);
-				}
-				*/
-
-				aut.setComment("This automaton is not ready generated!");
-				robotAut.addAutomaton(aut);
-		    }
-
-			/*
-			// ONE AUTOMATON FOR THE SEQUENCE LENGTH //
-			aut = new Automaton(robot.getName() + "_seq");
-			aut.setType(AutomatonType.Plant);
-			aut.setComment("This automaton is not ready generated!");
-			robotAut.addAutomaton(aut);
-			*/
+		}
 	    }
-
-		return robotAut;
+	    // Build transitions...
+	    for (Iterator<State> stateIt = aut.stateIterator(); stateIt.hasNext();)
+	    {
+		State fromState = stateIt.next();
+		// Initial?
+		if (fromState.getName().equals(CellExaminer.STARTSTATE_NAME))
+		{
+		    // Skip the 0:th element here... its assumed to be the home state
+		    for (int i=1; i < posList.size(); i++)
+		    {
+			// Create new arc...
+			String name = (posList.get(0)).getName() +
+			    (posList.get(i)).getName();
+			State toState = aut.getStateWithName(name);
+			LabeledEvent event = new LabeledEvent(name);
+			if (!aut.getAlphabet().contains(event))
+			{
+			    aut.getAlphabet().addEvent(event);
+			}
+			
+			Arc arc = new Arc(fromState, toState, event);
+			aut.addArc(arc);
+		    }
+		}
+		else if (fromState.getName().equals(CellExaminer.FINISHSTATE_NAME))
+		{
+		    // No outgoing from final state...
+		}
+		else
+		{
+		    String fromPos = null;
+		    // Skip the 0:th element here... its assumed to be the home state
+		    for (int i=0; i < posList.size(); i++)
+		    {
+			if (fromState.getName().endsWith((posList.get(i)).getName()))
+			{
+			    // Just to make sure there is no ambiguity
+			    if (fromPos != null)
+			    {
+				throw new Exception("Error in RSCell.java, ambigous configuration names");
+			    }
+			    fromPos = (posList.get(i)).getName();
+			    
+			    // Create arc for each possible target configuration
+			    for (int j=0; j < posList.size(); j++)
+			    {
+				if (i != j)
+				{
+				    // Create new arc...
+				    String name = (posList.get(i)).getName() +
+					(posList.get(j)).getName();
+				    State toState = aut.getStateWithName(name);
+				    
+				    // Special treatment if were dealing with the home configuration
+				    if (i==0)
+				    {
+					name = CellExaminer.FINISHEVENT_NAME;
+					toState = aut.getStateWithName(CellExaminer.FINISHSTATE_NAME);
+				    }
+				    
+				    // Create event
+				    LabeledEvent event = new LabeledEvent(name);
+				    if (!aut.getAlphabet().contains(event))
+				    {
+					aut.getAlphabet().addEvent(event);
+				    }
+				    
+				    // Add arc
+				    Arc arc = new Arc(fromState, toState, event);
+				    aut.addArc(arc);
+				    
+				    // Only once if this was the home configuration (ugly hack... whatever)
+				    if (i==0)
+				    {
+					break;
+				    }
+				}
+			    }
+			}
+		    }
+		}
+	    }
+	    aut.setComment("This automaton is not finished!");
+	    // Add automaton
+	    robotAut.addAutomaton(aut);
+	    
+	    // ONE AUTOMATON PER TARGET //
+	    List<Configuration> configurations = robot.getConfigurations();
+	    // Skip home configuration (i=1...)
+	    for (int i=1; i<configurations.size(); i++)
+	    {
+		Configuration pos = configurations.get(i);
+		
+		aut = new Automaton(robot.getName() + CellExaminer.UNDERSCORE + pos.getName());
+		State notVisited = new State("0");
+		notVisited.setInitial(true);
+		State visited = new State("1");
+		visited.setAccepting(true);
+		aut.addState(notVisited);
+		aut.addState(visited);
+		aut.setType(AutomatonType.Specification);
+		
+		/*
+		// Add transitions
+		for (int j=0; j<configurations.size(); j++)
+		{
+		if (i==j)
+		{
+		continue;
+		}
+		
+		// Create event
+		String name = ((Configuration) configurations.get(j)).getName() + pos.getName();
+		LabeledEvent event = new LabeledEvent(name);
+		if (!aut.getAlphabet().contains(event)) // Is always true?
+		{
+		aut.getAlphabet().addEvent(event);
+		}
+		
+		// Add arc
+		Arc arc = new Arc(notVisited, visited, event);
+		aut.addArc(arc);
+		}
+		*/
+		
+		aut.setComment("This automaton is not ready generated!");
+		robotAut.addAutomaton(aut);
+	    }
+	    
+	    /*
+	    // ONE AUTOMATON FOR THE SEQUENCE LENGTH //
+	    aut = new Automaton(robot.getName() + "_seq");
+	    aut.setType(AutomatonType.Plant);
+	    aut.setComment("This automaton is not ready generated!");
+	    robotAut.addAutomaton(aut);
+	    */
+	}
+	
+	return robotAut;
     }
 
     /**

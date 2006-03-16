@@ -179,6 +179,7 @@ public class ExampleTemplates
 		thisGroup.addItem(new TemplateItem("Ball Process - Gatekeeper", prefix + "ballProcessGatekeeper.xml"));
 		thisGroup.addItem(new TemplateItem("Car Window Control System", prefix + "big_bmw.xml"));
 		thisGroup.addItem(new TemplateItem("Observation Equivalence Execise", prefix + "ObservationEquivalenceExercise.xml"));
+		thisGroup.addItem(new TemplateItem("Passenger Land-Transportation System", prefix + "PLanTS.xml"));
 		thisGroup.addItem(new TemplateItem("Professors, Pen and Paper", prefix + "ProfessorsPenPaper.xml"));
 		thisGroup.addItem(new TemplateItem("Telecommunications Network (incomplete)", prefix + "telecommunicationsNetwork.xml"));
     }
@@ -293,6 +294,7 @@ public class ExampleTemplates
 		String prefix = extraPrefix + "/Games/";
 
 		thisGroup.addItem(new TemplateItem("Wine Merchant's Problem", prefix + "WineMerchant.xml"));
+		thisGroup.addItem(new TemplateItem("Man, Wolf, Goat, Cabbage", extraPrefix + "/CCSBookExercises/" + "Ex2_6.xml"));
     }
 
     /*

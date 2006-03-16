@@ -47,747 +47,679 @@
  * Supremica is owned and represented by KA.
  */
 package org.supremica.automata.algorithms.minimization;
-
 import org.supremica.log.*;
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.*;
 import org.supremica.gui.*;
 import org.supremica.util.ActionTimer;
 import org.supremica.properties.SupremicaProperties;
-
 import java.util.*;
-
 public class AutomataMinimizer
-	implements Stoppable
+    implements Stoppable
 {
-	private static Logger logger = LoggerFactory.createLogger(AutomataMinimizer.class);
-
-	// Stoppable stuff
-	private ExecutionDialog executionDialog;
-	private Stoppable threadToStop = null;
-	private boolean stopRequested = false;
-
-	/** The automata being minimized (may be a copy of the original). */
-	private Automata theAutomata;
-
-	/** The supplied options. */
-	private MinimizationOptions options;
-
-	/** The strategy to use, in order of priority */
-	private LinkedList<MinimizationStrategy> strategyList;
-
-	/** The heuristic to use, in order of priority */
-	private LinkedList<MinimizationHeuristic> heuristicList;
-
-	////////////////
-	// Statistics //
-	////////////////
-
-	/** Largest number of states come across. */
-	private int mostStates = 0;
-	/** Largest number of transitions come across. */
-	private int mostTransitions = 0;
-
-	/** Number of automata in the beginning. */
-	private int initialNbrOfAutomata;
-
-	/** Event to automata map, for choosing the next task in compositional minimization. */
-	private EventToAutomataMap eventToAutomataMap;
-
-	/**
-	 * Basic constructor.
-	 */
-	public AutomataMinimizer(Automata theAutomata)
-	{
-		initialNbrOfAutomata = theAutomata.nbrOfAutomata();
-		this.theAutomata = theAutomata;
-	}
-
-	/**
-	 * Sets the executionDialog of this AutomataMinimizer. If executionDialog is null,
-	 * the dialog is not updated.
-	 */
-	public void setExecutionDialog(ExecutionDialog executionDialog)
-	{
-		this.executionDialog = executionDialog;
-	}
-
-	/**
-	 * Returns minimized automaton, minimized with respect to the supplied options.
-	 */
-	public Automaton getCompositionalMinimization(MinimizationOptions options)
-		throws Exception
-	{
-		this.options = options;
+    private static Logger logger = LoggerFactory.createLogger(AutomataMinimizer.class);
+    // Stoppable stuff
+    private ExecutionDialog executionDialog;
+    private Stoppable threadToStop = null;
+    private boolean stopRequested = false;
+    /** The automata being minimized (may be a copy of the original). */
+    private Automata theAutomata;
+    /** The supplied options. */
+    private MinimizationOptions options;
+    /** The strategy to use, in order of priority */
+    private LinkedList<MinimizationStrategy> strategyList;
+    /** The heuristic to use, in order of priority */
+    private LinkedList<MinimizationHeuristic> heuristicList;
+    ////////////////
+    // Statistics //
+    ////////////////
+    /** Largest number of states come across. */
+    private int mostStates = 0;
+    /** Largest number of transitions come across. */
+    private int mostTransitions = 0;
+    /** Number of automata in the beginning. */
+    private int initialNbrOfAutomata;
+    /** Event to automata map, for choosing the next task in compositional minimization. */
+    private EventToAutomataMap eventToAutomataMap;
+    /**
+     * Basic constructor.
+     */
+    public AutomataMinimizer(Automata theAutomata)
+    {
+	initialNbrOfAutomata = theAutomata.nbrOfAutomata();
+	this.theAutomata = theAutomata;
+    }
+    /**
+     * Sets the executionDialog of this AutomataMinimizer. If executionDialog is null,
+     * the dialog is not updated.
+     */
+    public void setExecutionDialog(ExecutionDialog executionDialog)
+    {
+	this.executionDialog = executionDialog;
+    }
+    /**
+     * Returns minimized automaton, minimized with respect to the supplied options.
+     */
+    public Automaton getCompositionalMinimization(MinimizationOptions options)
+	throws Exception
+    {
+	this.options = options;
 		
-		// Are the options valid?
-		if (!options.isValid())
-		{
-			return null;
-		}
-
-		// Initialize execution dialog
-		if (executionDialog != null)
-		{
-			executionDialog.initProgressBar(0, theAutomata.size()-1);
-		}
-
-		// Make priority list of the strategies (used in getNextMinimizationTask())
-		strategyList = new LinkedList<MinimizationStrategy>();
-		//strategyList.add(MinimizationStrategy.AtLeastOneLocal);
-		//strategyList.add(MinimizationStrategy.AtLeastOneLocalMaxThree);
-		strategyList.add(MinimizationStrategy.FewestTransitionsFirst);
-		strategyList.add(MinimizationStrategy.FewestStatesFirst);
-		strategyList.add(MinimizationStrategy.FewestEventsFirst);
-		//strategyList.add(MinimizationStrategy.MostStatesFirst);
-		//strategyList.add(MinimizationStrategy.RandomFirst);
-		// Make sure the chosen strategy is the first one we try!
-		strategyList.remove(options.getMinimizationStrategy());
-		strategyList.addFirst(options.getMinimizationStrategy());
-
-		// Make priority list of the heuristics (used in getNextMinimizationTask())
-		heuristicList = new LinkedList<MinimizationHeuristic>();
-		heuristicList.add(MinimizationHeuristic.MostLocal);
-		heuristicList.add(MinimizationHeuristic.MostCommon);
-		//heuristicList.add(MinimizationHeuristic.FewestTransitions);
-		heuristicList.add(MinimizationHeuristic.FewestStates);
-		//heuristicList.add(MinimizationHeuristic.FewestEvents);
-		//heuristicList.add(MinimizationHeuristic.LeastExtension);
-		//heuristicList.add(MinimizationHeuristic.Random);
-		// Make sure the chosen heuristic is the first one we try!
-		heuristicList.remove(options.getMinimizationHeuristic());
-		heuristicList.addFirst(options.getMinimizationHeuristic());
-
-		// Initialize statistics count
-		AutomatonMinimizer.resetTotal();
-
-		// Special pre-minimization stuff
-		if (options.getMinimizationType() == EquivalenceRelation.SupervisionEquivalence)
-		{
-			MinimizationHelper.plantify(theAutomata);
-		}
-
-		// For each event, find the automata that has this event in its alphabet
-		eventToAutomataMap = AlphabetHelpers.buildEventToAutomataMap(theAutomata);
-
-		// Sizes in the beginning (may include epsilon?)
-		int globalAlphabetSize = eventToAutomataMap.size() - options.getTargetAlphabet().size(); 
-		// Current alphabet size...
-		int currentAlphabetSize = globalAlphabetSize;
-
-		ActionTimer timer = new ActionTimer();
-
-		// As long as there are at least two automata, compose and minimize!
-		while (theAutomata.size() >= 2)
-		{
-			timer.start();
-
-			/*
-			MinimizationTask newTask = getNextMinimizationTask(true);
-			MinimizationTask oldTask = getNextMinimizationTask(false);
-			if (!oldTask.equals(newTask))
-			{
-				logger.info("Unequal!!");
-				logger.info("New: " + newTask);
-				logger.info("Old: " + oldTask);
-			}
-			*/
-
-			// Get next automata to minimize
-			MinimizationTask task = getNextMinimizationTask(false);
-			Automata selection = task.getAutomata();
-			Alphabet hideThese = task.getEventsToHide();
-
-			timer.stop();
-
-			if (stopRequested)
-			{
-				return null;
-			}
-
-			// Perform the minimization, unless of course this is the last step
-			// and it should be skipped...
-			Automaton min;
- 			if (options.getSkipLast() && (theAutomata.size() == selection.size()))
-			{
-				// Just synch and hide
-				min = AutomataSynchronizer.synchronizeAutomata(selection);
-				boolean preserveControllability = options.getMinimizationType() == EquivalenceRelation.SupervisionEquivalence;
-				min.hide(hideThese, preserveControllability);
-
-				// Examine for largest sizes
-				if (min.nbrOfStates() > mostStates)
-				{
-					mostStates = min.nbrOfStates();
-				}
-				if (min.nbrOfTransitions() > mostTransitions)
-				{
-					mostTransitions = min.nbrOfTransitions();
-				}
-			}
-			else
-			{
-				// Compose and minimize!
-				min = monolithicMinimization(selection, hideThese);
-			}
-
-			// Early termination
-			if ((options.getMinimizationType() == EquivalenceRelation.ConflictEquivalence) ||
-				(options.getMinimizationType() == EquivalenceRelation.SupervisionEquivalence))
-			{
-				// If initial state is blocking, we can early terminate!
-				if (min.nbrOfStates() == 1 && !min.getInitialState().isAccepting())
-				{
-					// Return a one state blocking automaton (min for example)
-					logger.info("Early termination!");
-					min.hide(new Alphabet(min.getAlphabet()), false);
-					theAutomata = new Automata(min);
-					continue;
-				}
-			}
-
-			if (stopRequested)
-			{
-				return null;
-			}
-
-			// Adjust the eventToAutomataMap
-			// Remove the hidden events from the map
-			for (Iterator<LabeledEvent> it = hideThese.iterator(); it.hasNext(); )
-			{
-				eventToAutomataMap.remove(it.next());
-			}
-			// Remove the examined automata from the map
-			for (Iterator<LabeledEvent> it = selection.getUnionAlphabet().iterator(); it.hasNext(); )
-			{
-				Automata aut = eventToAutomataMap.get(it.next());
-				if (aut != null)
-				{
-					aut.removeAutomata(selection);
-				}
-			}
-			// And add the new automaton!
-			for (Iterator<LabeledEvent> it = min.getAlphabet().iterator(); it.hasNext(); )
-			{
-				eventToAutomataMap.insert(it.next(), min);
-			}
-
-			// Adjust the automata
-			theAutomata.removeAutomata(selection);
-			theAutomata.addAutomaton(min);
-			// Dispose of originals
-			selection.clear();
-
-			// Update execution dialog
-			if (executionDialog != null)
-			{
-				executionDialog.setProgress(initialNbrOfAutomata-theAutomata.size());
-				currentAlphabetSize -= hideThese.size()-hideThese.nbrOfEpsilonEvents();
-				executionDialog.setSubheader("Events left: " + currentAlphabetSize +
-											 " (" + globalAlphabetSize + ")");
-			}
-		}
- 
-		// Print statistics
-		if (SupremicaProperties.verboseMode())
-		{
-			// Print total reduction statistics
-			logger.info(AutomatonMinimizer.getStatistics());
-			// Print largest automaton size
-			logger.info("The automaton with the most states had " + mostStates + " states.");
-			logger.info("The automaton with the most transitions had " + mostTransitions + " transitions.");
-		}
-		//logger.info("Timer time: " + timer);
-		//logger.info(theAutomata.getName() + " & " + initialNbrOfAutomata + " & & " + mostStates + " & " + mostTransitions + " & TIME & true/false & " + AutomatonMinimizer.getWodesStatisticsLaTeX() + " & ALGO \\\\");
-
-		// Return the result of the minimization!
-		assert(theAutomata.size() == 1);
-		return theAutomata.getFirstAutomaton();
-	}
-
-	public String getStatisticsLine()
+	// Are the options valid?
+	if (!options.isValid())
 	{
-		return "\\texttt{NAME} & " + initialNbrOfAutomata + " & SIZE & " + mostStates + " & " + mostTransitions + " & TIME & BLOCK & " + AutomatonMinimizer.getWodesStatisticsLaTeX() + " & ALGO1 & ALGO2 \\\\";
+	    return null;
 	}
-
-	/**
-	 * Class holding info about what should be done in the next
-	 * minimization. Which automata should be composed and which
-	 * events can be hidden.
-	 */
-	private class MinimizationTask
+	// Initialize execution dialog
+	if (executionDialog != null)
 	{
-		private Automata automata;
-		private Alphabet eventsToHide;
-
-		public MinimizationTask(Automata automata, Alphabet eventsToHide)
-		{
-			this.automata = automata;
-			this.eventsToHide = eventsToHide;
-		}
-
-		public Automata getAutomata()
-		{
-			return automata;
-		}
-
-		public Alphabet getEventsToHide()
-		{
-			return eventsToHide;
-		}
-
-		public boolean equals(MinimizationTask other)
-		{
-			if (automata.equalAutomata(other.automata))
-			{
-				return eventsToHide.toString().equals(other.eventsToHide.toString());
-			}
-			else
-			{
-				return false;
-			}
-		}
-
-		public String toString()
-		{
-			return automata + ", " + eventsToHide;
-		}
+	    executionDialog.initProgressBar(0, theAutomata.size()-1);
 	}
-
-	/**
-	 * Returns the next Automata that is predicted to be the best one
-	 * to do minimization on next and the Alphabet of events that can
-	 * be hidden.
-	 */
-	private MinimizationTask getNextMinimizationTask(boolean newAlgo)
-		throws Exception
+	// Make priority list of the strategies (used in getNextMinimizationTask())
+	strategyList = new LinkedList<MinimizationStrategy>();
+	//strategyList.add(MinimizationStrategy.AtLeastOneLocal);
+	//strategyList.add(MinimizationStrategy.AtLeastOneLocalMaxThree);
+	strategyList.add(MinimizationStrategy.FewestTransitionsFirst);
+	strategyList.add(MinimizationStrategy.FewestStatesFirst);
+	strategyList.add(MinimizationStrategy.FewestEventsFirst);
+	//strategyList.add(MinimizationStrategy.MostStatesFirst);
+	//strategyList.add(MinimizationStrategy.RandomFirst);
+	// Make sure the chosen strategy is the first one we try!
+	strategyList.remove(options.getMinimizationStrategy());
+	strategyList.addFirst(options.getMinimizationStrategy());
+	// Make priority list of the heuristics (used in getNextMinimizationTask())
+	heuristicList = new LinkedList<MinimizationHeuristic>();
+	heuristicList.add(MinimizationHeuristic.MostLocal);
+	heuristicList.add(MinimizationHeuristic.MostCommon);
+	//heuristicList.add(MinimizationHeuristic.FewestTransitions);
+	heuristicList.add(MinimizationHeuristic.FewestStates);
+	//heuristicList.add(MinimizationHeuristic.FewestEvents);
+	//heuristicList.add(MinimizationHeuristic.LeastExtension);
+	//heuristicList.add(MinimizationHeuristic.Random);
+	// Make sure the chosen heuristic is the first one we try!
+	heuristicList.remove(options.getMinimizationHeuristic());
+	heuristicList.addFirst(options.getMinimizationHeuristic());
+	// Initialize statistics count
+	AutomatonMinimizer.resetTotal();
+	// Special pre-minimization stuff
+	if (options.getMinimizationType() == EquivalenceRelation.SupervisionEquivalence)
 	{
-		Automata taskAutomata = null;
-		Alphabet hideThese = null;
-
-		// Target alphabet
-		Alphabet targetAlphabet = options.getTargetAlphabet();
-
-		// Try the heuristics in order of priority...
-		strategyLoop: for (int strategyIndex = 0; strategyIndex < strategyList.size(); strategyIndex++)
-		{
-			////////////////
-			// FIRST STEP //
-			////////////////
-			
-			// Begin with the first strategy!
-			MinimizationStrategy strategy = strategyList.get(strategyIndex);
-			// ... and the first heuristic
-			int heuristicIndex = 0;
-			MinimizationHeuristic heuristic = heuristicList.get(heuristicIndex);
-
-			// Try to find a nice task
-			if (strategy == MinimizationStrategy.AtLeastOneLocal ||
-				strategy == MinimizationStrategy.AtLeastOneLocalMaxThree)
-			{
-				// Look through the map and find the best set of automata
-				double bestValue = heuristic.worstValue();
-				loop: for (Iterator<LabeledEvent> evIt = eventToAutomataMap.eventIterator(); evIt.hasNext(); )
-				{
-					LabeledEvent event = evIt.next();
-					// Skip the events in targetAlphabet and epsilon events!
-					if (targetAlphabet.contains(event) || event.isEpsilon())
-					{
-						continue;
-					}
-
-					if (stopRequested)
-					{
-						return null;
-					}
-										
-					// Get the selection that have this event in their alphabet
-					Automata selection = eventToAutomataMap.get(event);
-					
-					// If there is an automaton that by itself has
-					// local events, choose that one as the task!
-					// This can only happen in the beginning, of
-					// course...
-					if (selection.size() == 1)
-					{
-						taskAutomata = selection;
-						break strategyLoop;
-					}
-
-					if (strategy == MinimizationStrategy.AtLeastOneLocalMaxThree && 
-						selection.size() > 3)
-					{
-						continue loop;
-					}
-					
-					/////////////////
-					// SECOND STEP //
-					/////////////////
-					
-					// Evaluate selection
-					double thisValue = heuristic.value(selection, eventToAutomataMap, targetAlphabet);
-					// Maximize or minimize?
-					if ((heuristic.maximize() && thisValue > bestValue) ||
-						(heuristic.minimize() && thisValue < bestValue))
-					{
-						//logger.info(heuristic + ", " + selection);
-						bestValue = thisValue;
-						taskAutomata = selection;
-						continue loop;
-					}
-					else if (bestValue == thisValue)
-					{
-						// As good as the best one?
-						// Use lower priority heuristic to make a decision!
-						for (int i = heuristicIndex+1; i<heuristicList.size(); i++)
-						{
-							MinimizationHeuristic nextHeuristic = heuristicList.get(i);
-							double nextHeuristicBest = nextHeuristic.value(taskAutomata, 
-																		   eventToAutomataMap, 
-																		   targetAlphabet);
-							double nextHeuristicThis = nextHeuristic.value(selection, 
-																		   eventToAutomataMap, 
-																		   targetAlphabet);
-							if ((nextHeuristic.maximize() && nextHeuristicThis > nextHeuristicBest) ||
-								(nextHeuristic.minimize() && nextHeuristicThis < nextHeuristicBest))
-							{
-								//logger.info(nextHeuristic + ", " + selection);
-								taskAutomata = selection;
-								continue loop;
-							}
-							else if (!(nextHeuristicThis == nextHeuristicBest))
-							{
-								// Worse value!
-								continue loop;
-							}
-						}
-					}
-				}
-				
-				// Couldn't find an appropriate result?
-				if (taskAutomata == null)
-				{
-					// Try next strategy
-					continue strategyLoop;
-				}
-			}
-			else if (strategy != MinimizationStrategy.Undefined)
-			{				
-				////////////////
-				// FIRST STEP //
-				////////////////
-
-				// Choose the "best" automaton...
-				Automaton bestAutomaton = null;
-				{
-					int bestValue = strategy.worstValue();
-					// Search among all the automata for the best one according to the current strategy...
-					assert(!strategy.isSpecial());
-					loop: for (Iterator<Automaton> autIt = theAutomata.iterator(); autIt.hasNext(); )
-					{
-						Automaton aut = autIt.next();
-						
-						// Evaluate using current strategy
-						int thisValue = strategy.value(aut);
-						// Maximize or minimize?
-						if ((strategy.maximize() && thisValue > bestValue) ||
-							(strategy.minimize() && thisValue < bestValue))
-						{
-							bestAutomaton = aut;
-							bestValue = thisValue;
-							continue loop;
-						}
-						else if (bestValue == thisValue)
-						{
-							// They were equal! Use lower priority strategy to make a decision!
-							for (int i = strategyIndex+1; i<strategyList.size(); i++)
-							{
-								MinimizationStrategy nextStrategy = strategyList.get(i);
-								if (nextStrategy.isSpecial()) // Don't use special strategies here
-								{
-									continue;
-								}
-								int nextStrategyBest = nextStrategy.value(bestAutomaton);
-								int nextStrategyThis = nextStrategy.value(aut);
-								if ((nextStrategy.maximize() && nextStrategyThis > nextStrategyBest) ||
-									(nextStrategy.minimize() && nextStrategyThis < nextStrategyBest))
-								{
-									bestAutomaton = aut;
-									continue loop;
-								}
-								else if (!(nextStrategyThis == nextStrategyBest))
-								{
-									// Worse value!
-									continue loop;
-								}
-							}
-						}
-					}
-					// Got a result?
-					assert(bestAutomaton != null);
-				}
-
-				/////////////////
-				// SECOND STEP //
-				/////////////////
-
-				if (newAlgo)
-				{					
-					// Search among all automata
-					assert(!heuristic.isSpecial());
-					double bestValue = heuristic.worstValue();
-					loop: for (int j=0; j<theAutomata.size(); j++)
-					{
-						Automaton aut = theAutomata.getAutomatonAt(j);
-						
-						// Skip self
-						if (bestAutomaton == aut)
-						{
-							continue loop;
-						}
-						
-						// Now we have a candidate
-						Automata selection = new Automata(); //selection.clear();
-						selection.addAutomaton(bestAutomaton);
-						selection.addAutomaton(aut);
-						
-						// Evaluate selection
-						double thisValue = heuristic.value(selection, eventToAutomataMap, targetAlphabet);
-						// Maximize or minimize?
-						if ((heuristic.maximize() && thisValue > bestValue) ||
-							(heuristic.minimize() && thisValue < bestValue))
-						{
-							//logger.info(heuristic + ", this: " + thisValue + ", selection: " + selection);
-							bestValue = thisValue;
-							taskAutomata = selection;
-							continue loop;
-						}
-						else if (bestValue == thisValue)
-						//else if (bestValue == 0.0)
-						{
-							// Use lower priority heuristic to make a decision!
-							for (int i = heuristicIndex+1; i<heuristicList.size(); i++)
-							{
-								MinimizationHeuristic nextHeuristic = heuristicList.get(i);
-								double nextHeuristicBest = nextHeuristic.value(taskAutomata, eventToAutomataMap,
-																			   targetAlphabet);
-								double nextHeuristicThis = nextHeuristic.value(selection, eventToAutomataMap, 
-																			   targetAlphabet);
-								if ((nextHeuristic.maximize() && nextHeuristicThis > nextHeuristicBest) ||
-									(nextHeuristic.minimize() && nextHeuristicThis < nextHeuristicBest))
-								{
-									//logger.info(nextHeuristic + ", this: " + nextHeuristicThis + ", selection: " + selection);
-									taskAutomata = selection;
-									continue loop;
-								}
-								else if (!(nextHeuristicThis == nextHeuristicBest))
-								{
-									// Worse value!
-									break;
-								}
-							}
-						}
-
-						selection.clear();
-						selection = null;
-					}
-				}
-				else
-				{				
-					// Find the automaton with the highest "local to total" (number of events)
-					// ratio with respect to bestAutomaton
-					Alphabet alphaA = bestAutomaton.getAlphabet();
-					double bestLocalRatio = 0;
-					double bestCommonRatio = 0;
-					int bestSize = Integer.MAX_VALUE;
-					// Search among all automata
-					for (int j=0; j<theAutomata.size(); j++)
-					{
-						Automaton aut = theAutomata.getAutomatonAt(j);
-						Alphabet alpha = aut.getAlphabet();
-						// We have a new cndidate!
-						Automata selection = new Automata();
-						selection.addAutomaton(bestAutomaton);
-						selection.addAutomaton(aut);
-						
-						// Skip self
-						if (bestAutomaton == aut)
-						{
-							continue;
-						}
-						
-						// If there are no common events, try next automaton
-						//int nbrOfCommonEvents = alphaA.nbrOfCommonEvents(alpha);
-						Alphabet commonEvents = MinimizationHelper.getCommonEvents(selection, eventToAutomataMap);
-						int nbrOfCommonEvents = commonEvents.size();
-						if (nbrOfCommonEvents == 0)
-						{
-							if ((bestLocalRatio == 0) && (bestCommonRatio == 0) &&
-								(aut.nbrOfStates() < bestSize))
-							{
-								taskAutomata = selection;
-								bestSize = aut.nbrOfStates();
-								hideThese = null;
-							}
-							continue;
-						}
-						
-						// Calculate the alphabet of local events
-						Alphabet localEvents = MinimizationHelper.getLocalEvents(selection, eventToAutomataMap);
-						localEvents.minus(targetAlphabet); // Ignore events from targetAlphabet!
-						
-						// Find ratios
-						int nbrOfLocalEvents = localEvents.size();
-						int unionAlphabetSize = alphaA.size() + alpha.size() - nbrOfCommonEvents;
-						double thisLocalRatio = ((double) nbrOfLocalEvents)/((double) unionAlphabetSize);
-						double thisCommonRatio = ((double) nbrOfCommonEvents)/((double) unionAlphabetSize);
-						
-						// Improvement?
-						if (thisLocalRatio > bestLocalRatio)
-						{
-							taskAutomata = selection;
-							bestLocalRatio = thisLocalRatio;
-							hideThese = localEvents;
-						}
-						else if ((bestLocalRatio == 0) && (thisCommonRatio > bestCommonRatio))
-						{
-							taskAutomata = selection;
-							bestCommonRatio = thisCommonRatio;
-							hideThese = null;
-						}
-					}
-
-					if (stopRequested)
-					{
-						return null;
-					}
-					
-					// Generate result
-					if (hideThese == null)
-					{
-						hideThese = new Alphabet();
-					}
-					
-					// Was the system disjoint?
-					if (!((bestLocalRatio > 0) || (bestCommonRatio > 0)))
-					{
-						logger.warn("The system has disjoint parts. Preferrably, they should " +
-									"be treated separately if possible.");
-					}
-				}
-			}
-			else
-			{
-				logger.error("Error in AutomataMinimizer, unknown MinimizationStrategy.");
-				requestStop();
-				return null;
-			}
-
-			// We're ready?
-			if (taskAutomata != null)
-			{
-				break;
-			}			 
-		}
-
-		// A choice has been made!
-		assert(taskAutomata != null);
-		
-		// Which events should be hidden?
-		hideThese = MinimizationHelper.getLocalEvents(taskAutomata, eventToAutomataMap);
-		hideThese.minus(targetAlphabet);
-
-		//logger.info("Task: " + taskAutomata + ", " + hideThese);
-
-		// Result found! Return!
-		return new MinimizationTask(taskAutomata, hideThese);
+	    MinimizationHelper.plantify(theAutomata);
 	}
-
-	/**
- 	 * Composes automata and minimizes the result with hideThese considered as epsilon
- 	 * events.
-	 */
-	private Automaton monolithicMinimization(Automata automata, Alphabet hideThese)
-		throws Exception
+	// For each event, find the automata that has this event in its alphabet
+	eventToAutomataMap = AlphabetHelpers.buildEventToAutomataMap(theAutomata);
+	// Sizes in the beginning (may include epsilon?)
+	int globalAlphabetSize = eventToAutomataMap.size() - options.getTargetAlphabet().size(); 
+	// Current alphabet size...
+	int currentAlphabetSize = globalAlphabetSize;
+	ActionTimer timer = new ActionTimer();
+	// As long as there are at least two automata, compose and minimize!
+	while (theAutomata.size() >= 2)
 	{
-		// Do we care about state names?
-		boolean useShortStateNames = options.getMinimizationType() != EquivalenceRelation.SupervisionEquivalence;
-
-		// Synchronize, or if there's just one automaton, just find it
-		Automaton aut;
-		if (automata.size() > 1)
-		{
-			// Synch
-			SynchronizationOptions synchOptions = SynchronizationOptions.getDefaultSynchronizationOptions();
-			synchOptions.setUseShortStateNames(useShortStateNames);
-			aut = AutomataSynchronizer.synchronizeAutomata(automata, synchOptions);
-		}
-		else
-		{
-			/*
-			if (useShortStateNames)
-			{
-				EnumerateStates en = new EnumerateStates(automata, "q");
-				en.execute();
-			}
-			*/
-			aut = automata.getFirstAutomaton();
-
-			// This is probably one of the originals, so we might need to make a copy!
-			if (options.getKeepOriginal())
-			{
-				aut = new Automaton(aut);
-			}
-		}
-
-		// Hide the events!
+	    timer.start();
+	    /*
+	      MinimizationTask newTask = getNextMinimizationTask(true);
+	      MinimizationTask oldTask = getNextMinimizationTask(false);
+	      if (!oldTask.equals(newTask))
+	      {
+	      logger.info("Unequal!!");
+	      logger.info("New: " + newTask);
+	      logger.info("Old: " + oldTask);
+	      }
+	    */
+	    // Get next automata to minimize
+	    MinimizationTask task = getNextMinimizationTask(false);
+	    Automata selection = task.getAutomata();
+	    Alphabet hideThese = task.getEventsToHide();
+	    timer.stop();
+	    if (stopRequested)
+	    {
+		return null;
+	    }
+	    // Perform the minimization, unless of course this is the last step
+	    // and it should be skipped...
+	    Automaton min;
+	    if (options.getSkipLast() && (theAutomata.size() == selection.size()))
+	    {
+		// Just synch and hide
+		min = AutomataSynchronizer.synchronizeAutomata(selection);
 		boolean preserveControllability = options.getMinimizationType() == EquivalenceRelation.SupervisionEquivalence;
-		aut.hide(hideThese, preserveControllability);
-
+		min.hide(hideThese, preserveControllability);
 		// Examine for largest sizes
-		if (aut.nbrOfStates() > mostStates)
+		if (min.nbrOfStates() > mostStates)
 		{
-			mostStates = aut.nbrOfStates();
+		    mostStates = min.nbrOfStates();
 		}
-		if (aut.nbrOfTransitions() > mostTransitions)
+		if (min.nbrOfTransitions() > mostTransitions)
 		{
-			mostTransitions = aut.nbrOfTransitions();
+		    mostTransitions = min.nbrOfTransitions();
 		}
-
-		// Is it at all possible to minimize? (It may actually be possible even
-		// if there are no epsilons)
-		if (aut.nbrOfEpsilonTransitions() > 0)
+	    }
+	    else
+	    {
+		// Compose and minimize!
+		min = monolithicMinimization(selection, hideThese);
+	    }
+	    if (stopRequested)
+	    {
+		return null;
+	    }
+	    // Early termination
+	    if ((options.getMinimizationType() == EquivalenceRelation.ConflictEquivalence) ||
+		(options.getMinimizationType() == EquivalenceRelation.SupervisionEquivalence))
+	    {
+		// If initial state is blocking, we can early terminate!
+		// Easy check: If there's just one state and it is not marked, then it's blocking!
+		if (min.nbrOfStates() == 1 && !min.getInitialState().isAccepting())
 		{
-			AutomatonMinimizer minimizer = new AutomatonMinimizer(aut);
-			minimizer.useShortStateNames(useShortStateNames);
-			threadToStop = minimizer;
-			aut = minimizer.getMinimizedAutomaton(options);
-			threadToStop = null;
-
-			if (stopRequested)
+		    // Return a one state blocking automaton (min for example)
+		    logger.info("Early termination!");
+		    min.hide(new Alphabet(min.getAlphabet()), false);
+		    theAutomata = new Automata(min);
+		    continue;
+		}
+	    }
+	    // Adjust the eventToAutomataMap
+	    // Remove the hidden events from the map
+	    for (Iterator<LabeledEvent> it = hideThese.iterator(); it.hasNext(); )
+	    {
+		eventToAutomataMap.remove(it.next());
+	    }
+	    // Remove the examined automata from the map
+	    for (Iterator<LabeledEvent> it = selection.getUnionAlphabet().iterator(); it.hasNext(); )
+	    {
+		Automata aut = eventToAutomataMap.get(it.next());
+		if (aut != null)
+		{
+		    aut.removeAutomata(selection);
+		}
+	    }
+	    // And add the new automaton!
+	    for (Iterator<LabeledEvent> it = min.getAlphabet().iterator(); it.hasNext(); )
+	    {
+		eventToAutomataMap.insert(it.next(), min);
+	    }
+	    // Adjust the automata
+	    theAutomata.removeAutomata(selection);
+	    theAutomata.addAutomaton(min);
+	    // Dispose of originals
+	    selection.clear();
+	    // Update execution dialog
+	    if (executionDialog != null)
+	    {
+		executionDialog.setProgress(initialNbrOfAutomata-theAutomata.size());
+		currentAlphabetSize -= hideThese.size()-hideThese.nbrOfEpsilonEvents();
+		executionDialog.setSubheader("Events left: " + currentAlphabetSize +
+					     " (" + globalAlphabetSize + ")");
+	    }
+	}
+ 
+	// Print statistics
+	if (SupremicaProperties.verboseMode())
+	{
+	    // Print total reduction statistics
+	    logger.info(AutomatonMinimizer.getStatistics());
+	    // Print largest automaton size
+	    logger.info("The automaton with the most states had " + mostStates + " states.");
+	    logger.info("The automaton with the most transitions had " + mostTransitions + " transitions.");
+	}
+	//logger.info("Timer time: " + timer);
+	//logger.info(theAutomata.getName() + " & " + initialNbrOfAutomata + " & & " + mostStates + " & " + mostTransitions + " & TIME & true/false & " + AutomatonMinimizer.getWodesStatisticsLaTeX() + " & ALGO \\\\");
+	// Return the result of the minimization!
+	assert(theAutomata.size() == 1);
+	return theAutomata.getFirstAutomaton();
+    }
+    public String getStatisticsLine()
+    {
+	return "\\texttt{NAME} & " + initialNbrOfAutomata + " & SIZE & " + mostStates + " & " + mostTransitions + " & TIME & BLOCK & " + AutomatonMinimizer.getWodesStatisticsLaTeX() + " & ALGO1 & ALGO2 \\\\";
+    }
+    /**
+     * Class holding info about what should be done in the next
+     * minimization. Which automata should be composed and which
+     * events can be hidden.
+     */
+    private class MinimizationTask
+    {
+	private Automata automata;
+	private Alphabet eventsToHide;
+	public MinimizationTask(Automata automata, Alphabet eventsToHide)
+	{
+	    this.automata = automata;
+	    this.eventsToHide = eventsToHide;
+	}
+	public Automata getAutomata()
+	{
+	    return automata;
+	}
+	public Alphabet getEventsToHide()
+	{
+	    return eventsToHide;
+	}
+	public boolean equals(MinimizationTask other)
+	{
+	    if (automata.equalAutomata(other.automata))
+	    {
+		return eventsToHide.toString().equals(other.eventsToHide.toString());
+	    }
+	    else
+	    {
+		return false;
+	    }
+	}
+	public String toString()
+	{
+	    return automata + ", " + eventsToHide;
+	}
+    }
+    /**
+     * Returns the next Automata that is predicted to be the best one
+     * to do minimization on next and the Alphabet of events that can
+     * be hidden.
+     */
+    private MinimizationTask getNextMinimizationTask(boolean newAlgo)
+	throws Exception
+    {
+	Automata taskAutomata = null;
+	Alphabet hideThese = null;
+	// Target alphabet
+	Alphabet targetAlphabet = options.getTargetAlphabet();
+	// Try the heuristics in order of priority...
+	strategyLoop: for (int strategyIndex = 0; strategyIndex < strategyList.size(); strategyIndex++)
+	{
+	    ////////////////
+	    // FIRST STEP //
+	    ////////////////
+			
+	    // Begin with the first strategy!
+	    MinimizationStrategy strategy = strategyList.get(strategyIndex);
+	    // ... and the first heuristic
+	    int heuristicIndex = 0;
+	    MinimizationHeuristic heuristic = heuristicList.get(heuristicIndex);
+	    // Try to find a nice task
+	    if (strategy == MinimizationStrategy.AtLeastOneLocal ||
+		strategy == MinimizationStrategy.AtLeastOneLocalMaxThree)
+	    {
+		// Look through the map and find the best set of automata
+		double bestValue = heuristic.worstValue();
+		loop: for (Iterator<LabeledEvent> evIt = eventToAutomataMap.eventIterator(); evIt.hasNext(); )
+		{
+		    LabeledEvent event = evIt.next();
+		    // Skip the events in targetAlphabet and epsilon events!
+		    if (targetAlphabet.contains(event) || event.isEpsilon())
+		    {
+			continue;
+		    }
+		    if (stopRequested)
+		    {
+			return null;
+		    }
+										
+		    // Get the selection that have this event in their alphabet
+		    Automata selection = eventToAutomataMap.get(event);
+					
+		    // If there is an automaton that by itself has
+		    // local events, choose that one as the task!
+		    // This can only happen in the beginning, of
+		    // course...
+		    if (selection.size() == 1)
+		    {
+			taskAutomata = selection;
+			break strategyLoop;
+		    }
+		    if (strategy == MinimizationStrategy.AtLeastOneLocalMaxThree && 
+			selection.size() > 3)
+		    {
+			continue loop;
+		    }
+					
+		    /////////////////
+			// SECOND STEP //
+			/////////////////
+					
+			// Evaluate selection
+			double thisValue = heuristic.value(selection, eventToAutomataMap, targetAlphabet);
+			// Maximize or minimize?
+			if ((heuristic.maximize() && thisValue > bestValue) ||
+			    (heuristic.minimize() && thisValue < bestValue))
 			{
-				return null;
+			    //logger.info(heuristic + ", " + selection);
+			    bestValue = thisValue;
+			    taskAutomata = selection;
+			    continue loop;
+			}
+			else if (bestValue == thisValue)
+			{
+			    // As good as the best one?
+			    // Use lower priority heuristic to make a decision!
+			    for (int i = heuristicIndex+1; i<heuristicList.size(); i++)
+			    {
+				MinimizationHeuristic nextHeuristic = heuristicList.get(i);
+				double nextHeuristicBest = nextHeuristic.value(taskAutomata, 
+									       eventToAutomataMap, 
+									       targetAlphabet);
+				double nextHeuristicThis = nextHeuristic.value(selection, 
+									       eventToAutomataMap, 
+									       targetAlphabet);
+				if ((nextHeuristic.maximize() && nextHeuristicThis > nextHeuristicBest) ||
+				    (nextHeuristic.minimize() && nextHeuristicThis < nextHeuristicBest))
+				{
+				    //logger.info(nextHeuristic + ", " + selection);
+				    taskAutomata = selection;
+				    continue loop;
+				}
+				else if (!(nextHeuristicThis == nextHeuristicBest))
+				{
+				    // Worse value!
+				    continue loop;
+				}
+			    }
 			}
 		}
-
-		return aut;
-	}
-
-	/**
-	 * Method that stops AutomataMinimizer as soon as possible.
-	 *
-	 * @see  ExecutionDialog
-	 */
-	public void requestStop()
-	{
-		stopRequested = true;
-
-		logger.debug("AutomataMinimizer requested to stop.");
-
-		// Stop current minimization thread!
-		if (threadToStop != null)
+				
+		// Couldn't find an appropriate result?
+		if (taskAutomata == null)
 		{
-			threadToStop.requestStop();
+		    // Try next strategy
+		    continue strategyLoop;
 		}
+	    }
+	    else if (strategy != MinimizationStrategy.Undefined)
+	    {				
+		////////////////
+		// FIRST STEP //
+		////////////////
+		// Choose the "best" automaton...
+		Automaton bestAutomaton = null;
+		{
+		    int bestValue = strategy.worstValue();
+		    // Search among all the automata for the best one according to the current strategy...
+		    assert(!strategy.isSpecial());
+		    loop: for (Iterator<Automaton> autIt = theAutomata.iterator(); autIt.hasNext(); )
+		    {
+			Automaton aut = autIt.next();
+						
+			// Evaluate using current strategy
+			int thisValue = strategy.value(aut);
+			// Maximize or minimize?
+			if ((strategy.maximize() && thisValue > bestValue) ||
+			    (strategy.minimize() && thisValue < bestValue))
+			{
+			    bestAutomaton = aut;
+			    bestValue = thisValue;
+			    continue loop;
+			}
+			else if (bestValue == thisValue)
+			{
+			    // They were equal! Use lower priority strategy to make a decision!
+			    for (int i = strategyIndex+1; i<strategyList.size(); i++)
+			    {
+				MinimizationStrategy nextStrategy = strategyList.get(i);
+				if (nextStrategy.isSpecial()) // Don't use special strategies here
+				{
+				    continue;
+				}
+				int nextStrategyBest = nextStrategy.value(bestAutomaton);
+				int nextStrategyThis = nextStrategy.value(aut);
+				if ((nextStrategy.maximize() && nextStrategyThis > nextStrategyBest) ||
+				    (nextStrategy.minimize() && nextStrategyThis < nextStrategyBest))
+				{
+				    bestAutomaton = aut;
+				    continue loop;
+				}
+				else if (!(nextStrategyThis == nextStrategyBest))
+				{
+				    // Worse value!
+				    continue loop;
+				}
+			    }
+			}
+		    }
+		    // Got a result?
+		    assert(bestAutomaton != null);
+		}
+		/////////////////
+		    // SECOND STEP //
+		    /////////////////
+		    if (newAlgo)
+		    {					
+			// Search among all automata
+			assert(!heuristic.isSpecial());
+			double bestValue = heuristic.worstValue();
+			loop: for (int j=0; j<theAutomata.size(); j++)
+			{
+			    Automaton aut = theAutomata.getAutomatonAt(j);
+						
+			    // Skip self
+			    if (bestAutomaton == aut)
+			    {
+				continue loop;
+			    }
+						
+			    // Now we have a candidate
+			    Automata selection = new Automata(); //selection.clear();
+			    selection.addAutomaton(bestAutomaton);
+			    selection.addAutomaton(aut);
+						
+			    // Evaluate selection
+			    double thisValue = heuristic.value(selection, eventToAutomataMap, targetAlphabet);
+			    // Maximize or minimize?
+			    if ((heuristic.maximize() && thisValue > bestValue) ||
+				(heuristic.minimize() && thisValue < bestValue))
+			    {
+				//logger.info(heuristic + ", this: " + thisValue + ", selection: " + selection);
+				bestValue = thisValue;
+				taskAutomata = selection;
+				continue loop;
+			    }
+			    else if (bestValue == thisValue)
+				//else if (bestValue == 0.0)
+			    {
+				// Use lower priority heuristic to make a decision!
+				for (int i = heuristicIndex+1; i<heuristicList.size(); i++)
+				{
+				    MinimizationHeuristic nextHeuristic = heuristicList.get(i);
+				    double nextHeuristicBest = nextHeuristic.value(taskAutomata, eventToAutomataMap,
+										   targetAlphabet);
+				    double nextHeuristicThis = nextHeuristic.value(selection, eventToAutomataMap, 
+										   targetAlphabet);
+				    if ((nextHeuristic.maximize() && nextHeuristicThis > nextHeuristicBest) ||
+					(nextHeuristic.minimize() && nextHeuristicThis < nextHeuristicBest))
+				    {
+					//logger.info(nextHeuristic + ", this: " + nextHeuristicThis + ", selection: " + selection);
+					taskAutomata = selection;
+					continue loop;
+				    }
+				    else if (!(nextHeuristicThis == nextHeuristicBest))
+				    {
+					// Worse value!
+					break;
+				    }
+				}
+			    }
+			    selection.clear();
+			    selection = null;
+			}
+		    }
+		    else
+		    {				
+			// Find the automaton with the highest "local to total" (number of events)
+			// ratio with respect to bestAutomaton
+			Alphabet alphaA = bestAutomaton.getAlphabet();
+			double bestLocalRatio = 0;
+			double bestCommonRatio = 0;
+			int bestSize = Integer.MAX_VALUE;
+			// Search among all automata
+			for (int j=0; j<theAutomata.size(); j++)
+			{
+			    Automaton aut = theAutomata.getAutomatonAt(j);
+			    Alphabet alpha = aut.getAlphabet();
+			    // We have a new cndidate!
+			    Automata selection = new Automata();
+			    selection.addAutomaton(bestAutomaton);
+			    selection.addAutomaton(aut);
+						
+			    // Skip self
+			    if (bestAutomaton == aut)
+			    {
+				continue;
+			    }
+						
+			    // If there are no common events, try next automaton
+			    //int nbrOfCommonEvents = alphaA.nbrOfCommonEvents(alpha);
+			    Alphabet commonEvents = MinimizationHelper.getCommonEvents(selection, eventToAutomataMap);
+			    int nbrOfCommonEvents = commonEvents.size();
+			    if (nbrOfCommonEvents == 0)
+			    {
+				if ((bestLocalRatio == 0) && (bestCommonRatio == 0) &&
+				    (aut.nbrOfStates() < bestSize))
+				{
+				    taskAutomata = selection;
+				    bestSize = aut.nbrOfStates();
+				    hideThese = null;
+				}
+				continue;
+			    }
+						
+			    // Calculate the alphabet of local events
+			    Alphabet localEvents = MinimizationHelper.getLocalEvents(selection, eventToAutomataMap);
+			    localEvents.minus(targetAlphabet); // Ignore events from targetAlphabet!
+						
+			    // Find ratios
+			    int nbrOfLocalEvents = localEvents.size();
+			    int unionAlphabetSize = alphaA.size() + alpha.size() - nbrOfCommonEvents;
+			    double thisLocalRatio = ((double) nbrOfLocalEvents)/((double) unionAlphabetSize);
+			    double thisCommonRatio = ((double) nbrOfCommonEvents)/((double) unionAlphabetSize);
+						
+			    // Improvement?
+			    if (thisLocalRatio > bestLocalRatio)
+			    {
+				taskAutomata = selection;
+				bestLocalRatio = thisLocalRatio;
+				hideThese = localEvents;
+			    }
+			    else if ((bestLocalRatio == 0) && (thisCommonRatio > bestCommonRatio))
+			    {
+				taskAutomata = selection;
+				bestCommonRatio = thisCommonRatio;
+				hideThese = null;
+			    }
+			}
+			if (stopRequested)
+			{
+			    return null;
+			}
+					
+			// Generate result
+			if (hideThese == null)
+			{
+			    hideThese = new Alphabet();
+			}
+					
+			// Was the system disjoint?
+			if (!((bestLocalRatio > 0) || (bestCommonRatio > 0)))
+			{
+			    logger.warn("The system has disjoint parts. Preferrably, they should " +
+					"be treated separately if possible.");
+			}
+		    }
+	    }
+	    else
+	    {
+		logger.error("Error in AutomataMinimizer, unknown MinimizationStrategy.");
+		requestStop();
+		return null;
+	    }
+	    // We're ready?
+	    if (taskAutomata != null)
+	    {
+		break;
+	    }			 
 	}
+	// A choice has been made!
+	assert(taskAutomata != null);
+		
+	// Which events should be hidden?
+	hideThese = MinimizationHelper.getLocalEvents(taskAutomata, eventToAutomataMap);
+	hideThese.minus(targetAlphabet);
+	//logger.info("Task: " + taskAutomata + ", " + hideThese);
+	// Result found! Return!
+	return new MinimizationTask(taskAutomata, hideThese);
+    }
+    /**
+     * Composes automata and minimizes the result with hideThese considered as epsilon
+     * events.
+     */
+    private Automaton monolithicMinimization(Automata automata, Alphabet hideThese)
+	throws Exception
+    {
+	// Do we care about state names?
+	boolean useShortStateNames = options.getMinimizationType() != EquivalenceRelation.SupervisionEquivalence;
+	// Synchronize, or if there's just one automaton, just find it
+	Automaton aut;
+	if (automata.size() > 1)
+	{
+	    // Synch
+	    SynchronizationOptions synchOptions = SynchronizationOptions.getDefaultSynchronizationOptions();
+	    synchOptions.setUseShortStateNames(useShortStateNames);
+	    aut = AutomataSynchronizer.synchronizeAutomata(automata, synchOptions);
+	}
+	else
+	{
+	    /*
+	      if (useShortStateNames)
+	      {
+	      EnumerateStates en = new EnumerateStates(automata, "q");
+	      en.execute();
+	      }
+	    */
+	    aut = automata.getFirstAutomaton();
+	    // This is probably one of the originals, so we might need to make a copy!
+	    if (options.getKeepOriginal())
+	    {
+		aut = new Automaton(aut);
+	    }
+	}
+	// Hide the events!
+	boolean preserveControllability = options.getMinimizationType() == EquivalenceRelation.SupervisionEquivalence;
+	aut.hide(hideThese, preserveControllability);
+	// Examine for largest sizes
+	if (aut.nbrOfStates() > mostStates)
+	{
+	    mostStates = aut.nbrOfStates();
+	}
+	if (aut.nbrOfTransitions() > mostTransitions)
+	{
+	    mostTransitions = aut.nbrOfTransitions();
+	}
+	// Is it at all possible to minimize? (It may actually be possible even
+	// if there are no epsilons)
+	if (aut.nbrOfEpsilonTransitions() > 0)
+	{
+	    AutomatonMinimizer minimizer = new AutomatonMinimizer(aut);
+	    minimizer.useShortStateNames(useShortStateNames);
+	    threadToStop = minimizer;
+	    aut = minimizer.getMinimizedAutomaton(options);
+	    threadToStop = null;
+	    if (stopRequested)
+	    {
+		return null;
+	    }
+	}
+	return aut;
+    }
+    /**
+     * Method that stops AutomataMinimizer as soon as possible.
+     *
+     * @see  ExecutionDialog
+     */
+    public void requestStop()
+    {
+	stopRequested = true;
+	logger.debug("AutomataMinimizer requested to stop.");
+	// Stop current minimization thread!
+	if (threadToStop != null)
+	{
+	    threadToStop.requestStop();
+	}
+    }
 }

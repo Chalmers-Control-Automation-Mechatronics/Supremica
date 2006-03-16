@@ -1,4 +1,3 @@
-//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
 /*
  *  Supremica Software License Agreement
  *
@@ -64,139 +63,143 @@ import org.supremica.log.*;
 
 public class ProjectBuildFromWaters
 {
-	private static Logger logger = LoggerFactory.createLogger(ProjectBuildFromWaters.class);
-	private ProjectFactory theProjectFactory = null;
-	private Project currProject = null;
+    private static Logger logger = LoggerFactory.createLogger(ProjectBuildFromWaters.class);
+    private ProjectFactory theProjectFactory = null;
+    private Project currProject = null;
 
-	public ProjectBuildFromWaters()
+    public ProjectBuildFromWaters()
+    {
+	this.theProjectFactory = new DefaultProjectFactory();
+    }
+
+    public ProjectBuildFromWaters(ProjectFactory theProjectFactory)
+    {
+	this.theProjectFactory = theProjectFactory;
+    }
+
+    public Project build(ModuleProxy module)
+    {
+	if (module == null)
 	{
-		this.theProjectFactory = new DefaultProjectFactory();
+	    throw new IllegalArgumentException("argument must be non null");
+	}
+	Project currProject = theProjectFactory.getProject();
+	currProject.setName(module.getName());
+
+	final ProductDESProxyFactory factory =
+	    ProductDESElementFactory.getInstance();
+	DocumentManager mDocumentManager = new DocumentManager();
+	ModuleCompiler compiler =
+	    new ModuleCompiler(mDocumentManager, factory, module);
+
+	ProductDESProxy des = null;
+	try
+	{
+	    des = compiler.compile();
+	}
+	catch (Exception ex)
+	{
+	    ex.printStackTrace();
+	    logger.error("Exception - Failed to compile: " + ex.getMessage(), ex);
 	}
 
-	public ProjectBuildFromWaters(ProjectFactory theProjectFactory)
+	if (des == null)
 	{
-		this.theProjectFactory = theProjectFactory;
+	    return currProject;
 	}
 
-	public Project build(ModuleProxy module)
+	Collection theWatersAutomata = des.getAutomata();
+	for (Iterator autIt = theWatersAutomata.iterator(); autIt.hasNext(); )
 	{
-		if (module == null)
+	    AutomatonProxy currWatersAutomaton = (AutomatonProxy)autIt.next();
+	    Automaton currSupremicaAutomaton = new Automaton();
+	    currSupremicaAutomaton.setCorrespondingAutomatonProxy(currWatersAutomaton);
+	    currSupremicaAutomaton.setName(currWatersAutomaton.getName());
+		    
+	    //System.err.println("Automaton: " + currWatersAutomaton.getName());
+	    currSupremicaAutomaton.setType(AutomatonType.toType(currWatersAutomaton.getKind()));
+		    
+	    // Termination event
+	    EventProxy term = null;
+	    boolean multicolored = false;
+		    
+	    // Create states
+	    Set currWatersStates = currWatersAutomaton.getStates();
+	    for (Iterator stateIt = currWatersStates.iterator(); stateIt.hasNext(); )
+	    {
+		StateProxy currWatersState = (StateProxy) stateIt.next();
+		//System.err.println("State: " + currWatersState.getName());
+			
+		State currSupremicaState = new State(currWatersState.getName());
+			
+		// Set attributes
+		// Initial?
+		currSupremicaState.setInitial(currWatersState.isInitial());				
+		// Find marked status (only one type of marking here!!!)
+		for (Iterator evIt = currWatersState.getPropositions().iterator(); evIt.hasNext(); )
 		{
-			throw new IllegalArgumentException("argument must be non null");
-		}
-		Project currProject = theProjectFactory.getProject();
-		currProject.setName(module.getName());
-
-		final ProductDESProxyFactory factory =
-			ProductDESElementFactory.getInstance();
-		DocumentManager mDocumentManager = new DocumentManager();
-		ModuleCompiler compiler =
-			new ModuleCompiler(mDocumentManager, factory, module);
-
-		ProductDESProxy des = null;
- 		try
- 		{
- 			des = compiler.compile();
-		}
-		catch (Exception ex)
-		{
-			ex.printStackTrace();
-			logger.error("Exception - Failed to compile: " + ex.getMessage(), ex);
-		}
-
-		if (des == null)
-		{
-			return currProject;
-		}
-
-		Collection theWatersAutomata = des.getAutomata();
-		for (Iterator autIt = theWatersAutomata.iterator(); autIt.hasNext(); )
-		{
-			AutomatonProxy currWatersAutomaton = (AutomatonProxy)autIt.next();
-			Automaton currSupremicaAutomaton = new Automaton();
-			currSupremicaAutomaton.setCorrespondingAutomatonProxy(currWatersAutomaton);
-			currSupremicaAutomaton.setName(currWatersAutomaton.getName());
-
-			//System.err.println("Automaton: " + currWatersAutomaton.getName());
-			currSupremicaAutomaton.setType(AutomatonType.toType(currWatersAutomaton.getKind()));
-
-			// Termination event
-			EventProxy term = null;
-			boolean multicolored = false;
-
-			// Create states
-			Set currWatersStates = currWatersAutomaton.getStates();
-			for (Iterator stateIt = currWatersStates.iterator(); stateIt.hasNext(); )
+		    EventProxy event = (EventProxy) evIt.next();
+		    if (event.getKind() == EventKind.PROPOSITION)
+		    {
+			if (!multicolored && (term != null) && !event.equals(term))
 			{
-				StateProxy currWatersState = (StateProxy) stateIt.next();
-				//System.err.println("State: " + currWatersState.getName());
-
-				State currSupremicaState = new State(currWatersState.getName());
-
-				// Set attributes
-				// Initial?
-				currSupremicaState.setInitial(currWatersState.isInitial());				
-				// Find marked status (only one type of marking here!!!)
-				for (Iterator evIt = currWatersState.getPropositions().iterator(); evIt.hasNext(); )
-				{
-					EventProxy event = (EventProxy) evIt.next();
-					if (event.getKind() == EventKind.PROPOSITION)
-					{
-						if (!multicolored && (term != null) && !event.equals(term))
-						{
-							multicolored = true;
-						}
-						term = event;
-						currSupremicaState.setAccepting(true);
-						break;
-					}
-				}
-
-				if (multicolored)
-				{
-					//Print warning! Color disappears in conversion!
-					System.out.println("Waters model had multicolored marking, Supremica model treats all markings as the same color.");
-				}					
-
-				// Add to automaton
-				currSupremicaAutomaton.addState(currSupremicaState);
+			    multicolored = true;
 			}
-
-			Alphabet currSupremicaAlphabet = currSupremicaAutomaton.getAlphabet();
-
-			// Create the alphabet
-			Set currWatersEvents = currWatersAutomaton.getEvents();
-			for (Iterator evIt = currWatersEvents.iterator(); evIt.hasNext(); )
-			{
-				EventProxy currWatersEvent = (EventProxy)evIt.next();
-				LabeledEvent currSupremicaEvent = new LabeledEvent(currWatersEvent);
-				currSupremicaAlphabet.addEvent(currSupremicaEvent);
-			}
-
-			// Create transitions
-			Collection currWatersTransitions = currWatersAutomaton.getTransitions();
-			for (Iterator trIt = currWatersTransitions.iterator(); trIt.hasNext(); )
-			{
-				TransitionProxy currWatersTransition = (TransitionProxy)trIt.next();
-				StateProxy watersSourceState = currWatersTransition.getSource();
-				StateProxy watersTargetState = currWatersTransition.getTarget();
-				EventProxy watersEvent = currWatersTransition.getEvent();
-
-				State supremicaSourceState = currSupremicaAutomaton.getStateWithName(watersSourceState.getName());
-				State supremicaTargetState = currSupremicaAutomaton.getStateWithName(watersTargetState.getName());
-				LabeledEvent supremicaEvent = currSupremicaAlphabet.getEvent(watersEvent.getName());
-				Arc currSupremicaArc = new Arc(supremicaSourceState, supremicaTargetState, supremicaEvent);
-
-				currSupremicaAutomaton.addArc(currSupremicaArc);
-
-				//LabeledEvent currSupremicaEvent = new LabeledEvent(currWatersEvent);
-				//currSupremicaAlphabet.addEvent(currSupremicaEvent);
-			}
-
-			currProject.addAutomaton(currSupremicaAutomaton);
-
+			term = event;
+			currSupremicaState.setAccepting(true);
+			break;
+		    }
 		}
-		return currProject;
+			
+		// Did we find multiple colors?
+		if (multicolored)
+		{
+		    //Print warning! Color disappears in conversion!
+		    System.out.println("Waters model had multicolored marking, Supremica model treats all markings as the same color.");
+		}					
+			
+		// Add to automaton
+		currSupremicaAutomaton.addState(currSupremicaState);
+	    }
+		    
+	    Alphabet currSupremicaAlphabet = currSupremicaAutomaton.getAlphabet();
+		    
+	    // Create the alphabet
+	    Set currWatersEvents = currWatersAutomaton.getEvents();
+	    for (Iterator evIt = currWatersEvents.iterator(); evIt.hasNext(); )
+	    {
+		EventProxy currWatersEvent = (EventProxy)evIt.next();
+		if (currWatersEvent.getKind() != EventKind.PROPOSITION)
+		{
+		    LabeledEvent currSupremicaEvent = new LabeledEvent(currWatersEvent);
+		    currSupremicaAlphabet.addEvent(currSupremicaEvent);
+		}
+	    }
+		    
+	    // Create transitions
+	    Collection currWatersTransitions = currWatersAutomaton.getTransitions();
+	    for (Iterator trIt = currWatersTransitions.iterator(); trIt.hasNext(); )
+	    {
+		TransitionProxy currWatersTransition = (TransitionProxy)trIt.next();
+		StateProxy watersSourceState = currWatersTransition.getSource();
+		StateProxy watersTargetState = currWatersTransition.getTarget();
+		EventProxy watersEvent = currWatersTransition.getEvent();
+			
+		State supremicaSourceState = currSupremicaAutomaton.getStateWithName(watersSourceState.getName());
+		State supremicaTargetState = currSupremicaAutomaton.getStateWithName(watersTargetState.getName());
+		LabeledEvent supremicaEvent = currSupremicaAlphabet.getEvent(watersEvent.getName());
+		Arc currSupremicaArc = new Arc(supremicaSourceState, supremicaTargetState, supremicaEvent);
+			
+		currSupremicaAutomaton.addArc(currSupremicaArc);
+			
+		//LabeledEvent currSupremicaEvent = new LabeledEvent(currWatersEvent);
+		//currSupremicaAlphabet.addEvent(currSupremicaEvent);
+	    }
+		    
+	    currProject.addAutomaton(currSupremicaAutomaton);
+		    
 	}
+	return currProject;
+    }
 }
 

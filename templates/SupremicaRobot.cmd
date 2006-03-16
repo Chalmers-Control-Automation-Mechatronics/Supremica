@@ -1,1 +1,0 @@
-@java -cp ..\build;..\lib\unjared\;..\images -enableassertions org.supremica.external.robotCoordination.AutomataBuilder %1 %2 %3 %4 %5 %6 %7 %8 %9
