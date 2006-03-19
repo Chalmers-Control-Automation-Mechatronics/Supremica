@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   DocumentManager
 //###########################################################################
-//# $Id: DocumentManager.java,v 1.4 2006-03-16 04:44:46 robi Exp $
+//# $Id: DocumentManager.java,v 1.5 2006-03-19 01:55:29 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -206,7 +206,7 @@ public class DocumentManager<D extends DocumentProxy> {
    * Loads a document from a URL.
    * This methods loads a document from a given file name, guessing the
    * expected class from the file name extension.
-   * @param  uri          A URL specifiying the location of the document
+   * @param  url          A URL specifiying the location of the document
    *                      to be retrieved.
    * @return The loaded document. This may be just a cached copy,
    *         or it may actually be retrieved by reading an external file.
