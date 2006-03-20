@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   WmodFileFilter
 //###########################################################################
-//# $Id: WmodFileFilter.java,v 1.2 2005-02-18 03:09:06 knut Exp $
+//# $Id: WmodFileFilter.java,v 1.3 2006-03-20 14:16:12 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -15,6 +15,8 @@ import javax.swing.filechooser.*;
 public class WmodFileFilter
 	extends FileFilter
 {
+	public static final String WMOD = "wmod";
+
 	public static String getExtension(File f)
 	{
 		String ext = null;
@@ -40,7 +42,7 @@ public class WmodFileFilter
 
 		if (extension != null)
 		{
-			if (extension.equals("wmod"))
+			if (extension.equals(WMOD))
 			{
 				return true;
 			}

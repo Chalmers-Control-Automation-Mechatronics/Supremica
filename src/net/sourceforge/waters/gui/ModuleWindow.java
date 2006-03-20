@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleWindow
 //###########################################################################
-//# $Id: ModuleWindow.java,v 1.25 2006-03-20 12:22:35 flordal Exp $
+//# $Id: ModuleWindow.java,v 1.26 2006-03-20 14:16:12 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -114,6 +114,8 @@ public class ModuleWindow
 	extends JFrame
 	implements ActionListener, FocusListener, UndoInterface
 {
+	// Limits the functionality of Waters to just drawing simple components 
+	private static boolean limited = false;
 
 	//########################################################################
 	//# Constructor
@@ -495,43 +497,37 @@ public class ModuleWindow
 
 		moduleSelectTree.addMouseListener(ml);
 
-		JButton NewSimpleButton = new JButton("New Simple Component");
+		JPanel buttonpanel = new JPanel();
 
-		NewSimpleButton.addActionListener(this);
-		NewSimpleButton.setActionCommand("newsimple");
+		JButton newSimpleButton = new JButton("New Simple Component");
+		newSimpleButton.addActionListener(this);
+		newSimpleButton.setActionCommand("newsimple");
+		buttonpanel.add(newSimpleButton);
 
-		JButton NewForeachButton = new JButton("New Foreach Component");
+		JButton newForeachButton = new JButton("New Foreach Component");
+		newForeachButton.addActionListener(this);
+		newForeachButton.setActionCommand("newforeach");
+		newForeachButton.setEnabled(!limited);
+		buttonpanel.add(newForeachButton);
 
-		NewForeachButton.addActionListener(this);
-		NewForeachButton.setActionCommand("newforeach");
+		buttonpanel.add(newInstanceButton = new JButton("New Instance"));
+		newInstanceButton.setActionCommand("newinstance");
+		newInstanceButton.addActionListener(this);
+		newInstanceButton.setEnabled(!limited);
+
+		buttonpanel.add(newBindingButton = new JButton("New Binding"));
+		newBindingButton.setActionCommand("newbinding");
+		newBindingButton.addActionListener(this);
+		newBindingButton.setEnabled(!limited);
 
 		JButton deleteComponentButton = new JButton("Remove Component");
 		deleteComponentButton.addActionListener(this);
 		deleteComponentButton.setActionCommand("remove component");
-
-		if (module == null)
-		{
-			NewSimpleButton.setEnabled(false);
-			NewForeachButton.setEnabled(false);
-			deleteComponentButton.setEnabled(false);
-		}
+		buttonpanel.add(deleteComponentButton);		
 
 		JPanel content = new JPanel();
 		Box b = new Box(BoxLayout.PAGE_AXIS);
-
 		b.add(new JScrollPane(moduleSelectTree));
-
-		JPanel buttonpanel = new JPanel();
-
-		buttonpanel.add(NewSimpleButton);
-		buttonpanel.add(NewForeachButton);
-		buttonpanel.add(newInstanceButton = new JButton("New Instance"));
-		buttonpanel.add(newBindingButton = new JButton("New Binding"));
-		buttonpanel.add(deleteComponentButton);
-		newInstanceButton.setActionCommand("newinstance");
-		newInstanceButton.addActionListener(this);
-		newBindingButton.setActionCommand("newbinding");
-		newBindingButton.addActionListener(this);
 		b.add(buttonpanel);
 		content.add(b);
 		content.setLayout(new GridLayout(1, 1));
@@ -621,21 +617,27 @@ public class ModuleWindow
 
 	public void constructWindow()
 	{
+		Component defaultTab;
 
 		// Construct the window
 		tabbedPane = new JTabbedPane();
 
 		tabbedPane.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
-		tabbedPane.addTab("Parameters", null, createParametersPane(), "");
+		if (!limited)
+			tabbedPane.addTab("Parameters", null, createParametersPane(), "");
 		tabbedPane.addTab("Events", null, createEventsPane(), "Create events");
-		tabbedPane.addTab("Aliases", null, new JPanel(), "Create aliases");
-		tabbedPane.addTab("Components", null, createContentPane(), "Create components");
-		tabbedPane.addTab("Compile", null, new JPanel(), "Compilation");
-		tabbedPane.addTab("Debug", null, debugPane, "Debug information");
+		if (!limited)
+			tabbedPane.addTab("Aliases", null, new JPanel(), "Create aliases");
+		tabbedPane.addTab("Components", null, defaultTab = createContentPane(), "Create components");
+		if (!limited)
+			tabbedPane.addTab("Compile", null, new JPanel(), "Compilation");
+		if (!limited)
+			tabbedPane.addTab("Debug", null, debugPane, "Debug information");
 		debugPane.addFocusListener(this);
 
 		// Components selected by default
-		tabbedPane.setSelectedIndex(3);
+		//tabbedPane.setSelectedIndex(3);
+		tabbedPane.setSelectedComponent(defaultTab);
 		this.setJMenuBar(createMenuBar());
 
 		JPanel background = new JPanel();
@@ -815,11 +817,23 @@ public class ModuleWindow
 
 		if (e.getSource() == FileSaveAsMenu)
 		{
+			fileSaveChooser.setFileFilter(new WmodFileFilter());			
 			int returnVal = fileSaveChooser.showSaveDialog(this);
 
 			if (returnVal == JFileChooser.APPROVE_OPTION)
 			{
 				File file = fileSaveChooser.getSelectedFile();
+				String ext = null;
+				String s = file.getName();
+				int i = s.lastIndexOf('.');
+				if (i > 0 &&  i < s.length() - 1) 
+				{
+					ext = s.substring(i+1).toLowerCase();
+				}
+				if (ext == null || !ext.equals(WmodFileFilter.WMOD))
+				{
+					file = new File(file.getPath() + "." + WmodFileFilter.WMOD);
+				}
 
 				saveWmodFile(file);
 
@@ -1139,7 +1153,7 @@ public class ModuleWindow
 
 		LanguagesEN.createLanguage(WLang);
 
-		ModuleWindow editor = new ModuleWindow("Waters");
+		ModuleWindow editor = new ModuleWindow("Waters" + (limited ? " - limited" : ""));
 	}
 
 
@@ -1156,8 +1170,8 @@ public class ModuleWindow
 	private JMenuItem FileExitMenu;
 	private JMenuItem analysisExportSupremicaMenu;
 	private JTree moduleSelectTree = null;
-	private JButton NewSimpleButton;
-	private JButton NewForeachButton;
+	private JButton newSimpleButton;
+	private JButton newForeachButton;
 	private JButton deleteComponentButton;
 	private JButton NewEventButton;
 	private JButton DeleteEventButton;
