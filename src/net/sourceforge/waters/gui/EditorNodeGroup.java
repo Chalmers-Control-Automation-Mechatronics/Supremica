@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorNodeGroup
 //###########################################################################
-//# $Id: EditorNodeGroup.java,v 1.19 2006-01-17 02:00:07 siw4 Exp $
+//# $Id: EditorNodeGroup.java,v 1.20 2006-03-20 12:22:35 flordal Exp $
 //###########################################################################
 
 
@@ -94,10 +94,14 @@ public class EditorNodeGroup
 
 	public void resize(int x, int y)
 	{
+		// There's a bug here, resizing does not work properly if you
+		// drag a point past a neighbouring control point.
+
 		GeometryProxy old = new BoxGeometrySubject((Rectangle2D)subject.getGeometry().getRectangle().clone());
 		Rectangle2D bounds = new Rectangle2D.Double();
 		Rectangle2D[] corners = getCorners();
 		Point2D point = new Point2D.Double();
+		// Is it a side or a corner control point?
 		if (resizingFrom % 2 == 0)
 		{
 			point.setLocation(corners[resizingFrom].getCenterX(),
@@ -127,7 +131,6 @@ public class EditorNodeGroup
 												  subject));
 	}   
 
-	//public void moveGroupTo(int x, int y)
 	public void setPosition(double x, double y)
 	{
 		Rectangle2D bounds = getBounds();
@@ -135,11 +138,11 @@ public class EditorNodeGroup
 		int dy = (int)y - (int) bounds.getY();
 
 		GeometryProxy old = new BoxGeometrySubject((Rectangle2D)subject.getGeometry().getRectangle().clone());
-		System.out.println("old1 :" + ((BoxGeometryProxy)old).getRectangle());
+		//System.out.println("old1 :" + ((BoxGeometryProxy)old).getRectangle());
 		// Move rect
 		bounds.setRect(bounds.getX() + dx, bounds.getY() + dy, bounds.getWidth(), bounds.getHeight());
 		subject.getGeometry().setRectangle(bounds);
-		System.out.println("old2 :" + ((BoxGeometryProxy)old).getRectangle());
+		//System.out.println("old2 :" + ((BoxGeometryProxy)old).getRectangle());
 		fireEditorChangedEvent(new NodeMovedEvent(old, subject.getGeometry(),
 												  subject));
 	}
@@ -166,8 +169,8 @@ public class EditorNodeGroup
 
 	public Point2D setOnBounds(double x, double y)
 	{
-		System.out.println("start");
-		System.out.println(x + "," + y);
+		//System.out.println("start");
+		//System.out.println(x + "," + y);
 		Rectangle2D[] corners = getCorners();
 		Line2D.Double closest = new Line2D.Double(corners[0].getCenterX(), corners[0].getCenterY(),
 							  corners[6].getCenterX(), corners[6].getCenterY());
@@ -182,8 +185,8 @@ public class EditorNodeGroup
 				closest = l;
 			}
 		}
-		System.out.println(closest.getP1());
-		System.out.println(closest.getP2());
+		//System.out.println(closest.getP1());
+		//System.out.println(closest.getP2());
 		if (closest.getX1() == closest.getX2())
 		{
 			x = (int) closest.getX1();
@@ -238,7 +241,7 @@ public class EditorNodeGroup
 				}
 			}
 		}
-		System.out.println(x + "," + y);
+		//System.out.println(x + "," + y);
 		return (new Point2D.Double(x, y));
 	}
 

@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EventTableModel
 //###########################################################################
-//# $Id: EventTableModel.java,v 1.14 2006-01-23 02:06:23 siw4 Exp $
+//# $Id: EventTableModel.java,v 1.15 2006-03-20 12:22:35 flordal Exp $
 //###########################################################################
 
 
@@ -169,11 +169,12 @@ class EventTableModel
 		if (ident != null)
 		{
 			int row;
-			if (mEvents.get(mEvents.size()-1).getName() == null)
-			{
-				row = mEvents.size()-1;
-			}
-			else
+			// This code threw exceptions when the first event was added to a new component.
+			//if (mEvents.get(mEvents.size()-1).getName() == null)
+			//{
+			//row = mEvents.size()-1;
+			//}
+			// else
 			{
 				row = createEvent();
 			}

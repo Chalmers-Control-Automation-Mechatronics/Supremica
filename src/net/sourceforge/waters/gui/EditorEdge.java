@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorEdge
 //###########################################################################
-//# $Id: EditorEdge.java,v 1.35 2006-03-02 12:12:49 martin Exp $
+//# $Id: EditorEdge.java,v 1.36 2006-03-20 12:22:35 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -182,10 +182,10 @@ public class EditorEdge
 	
 	public void update(EditorChangedEvent e)
 	{
-		System.out.println("stuff");
+		//System.out.println("stuff");
 		if (e.getType() == EditorChangedEvent.NODEMOVED)
 		{
-			System.out.println("old start:" + getStartPoint());		
+			//System.out.println("old start:" + getStartPoint());		
 			NodeMovedEvent n = (NodeMovedEvent)e;
 			boolean start = subject.getSource() == n.getNode();
 			double oldx;
@@ -194,7 +194,7 @@ public class EditorEdge
 			{
 				oldx = ((PointGeometryProxy)n.getOld()).getPoint().getX();
 				oldy = ((PointGeometryProxy)n.getOld()).getPoint().getY();
-				System.out.println(oldx + " " + oldy);
+				//System.out.println(oldx + " " + oldy);
 				if (start)
 				{
 					subject.getStartPoint().setPoint(((PointGeometryProxy)
@@ -210,8 +210,8 @@ public class EditorEdge
 			{
 				Rectangle2D oldR = ((BoxGeometryProxy)n.getOld()).getRectangle();
 				Rectangle2D newR = ((BoxGeometryProxy)n.getNew()).getRectangle();
-				System.out.println("Old Geometry: " + oldR);
-				System.out.println("New Geometry: " + newR);
+				//System.out.println("Old Geometry: " + oldR);
+				//System.out.println("New Geometry: " + newR);
 				if (start)
 				{
 					oldx = subject.getStartPoint().getPoint().getX();
@@ -235,10 +235,10 @@ public class EditorEdge
 					subject.getEndPoint().setPoint(new Point2D.Double(newR.getMinX() + dx, newR.getMinY() + dy));
 				}
 			}
-			System.out.println("Old TPoint: " + getPosition());
+			//System.out.println("Old TPoint: " + getPosition());
 			updateControlPoint(oldx, oldy, start);
-			System.out.println("New Tpoint: " + getPosition());
-			System.out.println("New Start Point: " + getStartPoint());
+			//System.out.println("New Tpoint: " + getPosition());
+			//System.out.println("New Start Point: " + getStartPoint());
 		}
 	}
 	

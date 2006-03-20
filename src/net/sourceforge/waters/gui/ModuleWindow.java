@@ -4,13 +4,14 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleWindow
 //###########################################################################
-//# $Id: ModuleWindow.java,v 1.24 2006-03-02 12:12:49 martin Exp $
+//# $Id: ModuleWindow.java,v 1.25 2006-03-20 12:22:35 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
 
 import java.awt.GridLayout;
 import java.awt.Dimension;
+import java.awt.Component;
 import java.awt.event.*;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -444,32 +445,32 @@ public class ModuleWindow
 		final ImageIcon instanceIcon = new ImageIcon(ModuleWindow.class.getResource("/icons/waters/instance.gif"));
 		final ImageIcon bindingIcon = null;
 
-		ModuleSelectTree = new JTree(treeModel);
+		moduleSelectTree = new JTree(treeModel);
 
-		ModuleSelectTree.setCellRenderer(new ModuleTreeRenderer(foreachIcon, plantIcon, propertyIcon, specIcon, instanceIcon, bindingIcon));
-		ModuleSelectTree.setEditable(false);
-		ModuleSelectTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+		moduleSelectTree.setCellRenderer(new ModuleTreeRenderer(foreachIcon, plantIcon, propertyIcon, specIcon, instanceIcon, bindingIcon));
+		moduleSelectTree.setEditable(false);
+		moduleSelectTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 
 		DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer();
 
 		//renderer.setLeafIcon(simpleIcon);
 		//renderer.setOpenIcon(null);
 		//renderer.setClosedIcon(null);
-		//ModuleSelectTree.setCellRenderer(renderer);
+		//moduleSelectTree.setCellRenderer(renderer);
 		MouseListener ml = new MouseAdapter()
 		{
 			EditorWindow ed = null;
 
 			public void mousePressed(MouseEvent e)
 			{
-				int selRow = ModuleSelectTree.getRowForLocation(e.getX(), e.getY());
-				TreePath selPath = ModuleSelectTree.getPathForLocation(e.getX(), e.getY());
+				int selRow = moduleSelectTree.getRowForLocation(e.getX(), e.getY());
+				TreePath selPath = moduleSelectTree.getPathForLocation(e.getX(), e.getY());
 
 				if (selRow != -1)
 				{
 					if (e.getClickCount() == 2)
 					{
-						DefaultMutableTreeNode node = (DefaultMutableTreeNode) ModuleSelectTree.getLastSelectedPathComponent();
+						DefaultMutableTreeNode node = (DefaultMutableTreeNode) moduleSelectTree.getLastSelectedPathComponent();
 
 						if (node == null)
 						{
@@ -492,7 +493,7 @@ public class ModuleWindow
 			}
 		};
 
-		ModuleSelectTree.addMouseListener(ml);
+		moduleSelectTree.addMouseListener(ml);
 
 		JButton NewSimpleButton = new JButton("New Simple Component");
 
@@ -504,19 +505,21 @@ public class ModuleWindow
 		NewForeachButton.addActionListener(this);
 		NewForeachButton.setActionCommand("newforeach");
 
-		JButton DeleteComponentButton = new JButton("Remove Component");
+		JButton deleteComponentButton = new JButton("Remove Component");
+		deleteComponentButton.addActionListener(this);
+		deleteComponentButton.setActionCommand("remove component");
 
 		if (module == null)
 		{
 			NewSimpleButton.setEnabled(false);
 			NewForeachButton.setEnabled(false);
-			DeleteComponentButton.setEnabled(false);
+			deleteComponentButton.setEnabled(false);
 		}
 
 		JPanel content = new JPanel();
 		Box b = new Box(BoxLayout.PAGE_AXIS);
 
-		b.add(new JScrollPane(ModuleSelectTree));
+		b.add(new JScrollPane(moduleSelectTree));
 
 		JPanel buttonpanel = new JPanel();
 
@@ -524,7 +527,7 @@ public class ModuleWindow
 		buttonpanel.add(NewForeachButton);
 		buttonpanel.add(newInstanceButton = new JButton("New Instance"));
 		buttonpanel.add(newBindingButton = new JButton("New Binding"));
-		buttonpanel.add(DeleteComponentButton);
+		buttonpanel.add(deleteComponentButton);
 		newInstanceButton.setActionCommand("newinstance");
 		newInstanceButton.addActionListener(this);
 		newBindingButton.setActionCommand("newbinding");
@@ -650,7 +653,7 @@ public class ModuleWindow
 		if ("newsimple".equals(e.getActionCommand()))
 		{
 			DefaultMutableTreeNode parentNode = null;
-			TreePath parentPath = ModuleSelectTree.getSelectionPath();
+			TreePath parentPath = moduleSelectTree.getSelectionPath();
 
 			/*if (parentPath == null) {
 			//There's no selection. Default to the root node.
@@ -669,6 +672,24 @@ public class ModuleWindow
 			EditorForeachDialog diag = new EditorForeachDialog(this);
 
 			logEntry("New Foreach Component requested");
+		}
+
+		if ("remove component".equals(e.getActionCommand()))
+		{
+			TreePath currentSelection = moduleSelectTree.getSelectionPath();
+			if (currentSelection != null) 
+			{
+				DefaultMutableTreeNode currentNode = (DefaultMutableTreeNode)
+					(currentSelection.getLastPathComponent());
+				MutableTreeNode parent = (MutableTreeNode)(currentNode.getParent());
+				if (parent != null) 
+				{
+					treeModel.removeNodeFromParent(currentNode);
+					return;
+				}
+			}
+			
+			logEntry("Remove Component requested");
 		}
 
 		if ("newinstance".equals(e.getActionCommand()))
@@ -832,15 +853,14 @@ public class ModuleWindow
 			modified = true;
 
 			DefaultMutableTreeNode parentNode = null;
-			TreePath parentPath = ModuleSelectTree.getSelectionPath();
+			TreePath parentPath = moduleSelectTree.getSelectionPath();
 
 			if (parentPath == null)
 			{
-
 				//There's no selection. Default to the root node.
 				parentNode = rootNode;
 
-				ModuleSelectTree.expandPath(new TreePath(rootNode.getPath()));
+				moduleSelectTree.expandPath(new TreePath(rootNode.getPath()));
 			}
 			else
 			{
@@ -878,7 +898,7 @@ public class ModuleWindow
 
 			if (o instanceof ForeachSubject)
 			{
-				ModuleSelectTree.expandPath(new TreePath(newChild.getPath()));
+				moduleSelectTree.expandPath(new TreePath(newChild.getPath()));
 			}
 
 			if ((o instanceof SimpleComponentSubject))
@@ -890,7 +910,7 @@ public class ModuleWindow
 				EditorWindow ed = new EditorWindow(scp.getName() + " - Waters Editor", module, scp, this, this); 			
 			}
 
-			ModuleSelectTree.expandPath(new TreePath(parentNode.getPath()));
+			moduleSelectTree.expandPath(new TreePath(parentNode.getPath()));
 		}
 	}
 
@@ -1135,10 +1155,10 @@ public class ModuleWindow
 	private JMenuItem FileSaveAsMenu;
 	private JMenuItem FileExitMenu;
 	private JMenuItem analysisExportSupremicaMenu;
-	private JTree ModuleSelectTree = null;
+	private JTree moduleSelectTree = null;
 	private JButton NewSimpleButton;
 	private JButton NewForeachButton;
-	private JButton DeleteComponentButton;
+	private JButton deleteComponentButton;
 	private JButton NewEventButton;
 	private JButton DeleteEventButton;
 	private JButton newInstanceButton;

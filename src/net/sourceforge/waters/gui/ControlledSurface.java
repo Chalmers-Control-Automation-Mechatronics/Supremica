@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.62 2006-03-02 12:12:49 martin Exp $
+//# $Id: ControlledSurface.java,v 1.63 2006-03-20 12:22:35 flordal Exp $
 //###########################################################################
  
 package net.sourceforge.waters.gui;
@@ -903,7 +903,8 @@ public class ControlledSurface
 						root.getUndoInterface().executeCommand(c);				 
 					}
 				}
-				if (newGroup != null) {
+				if (newGroup != null) 
+				{
 					newGroup.setResizingFalse();
 					Command c = new CreateNodeGroupCommand(ControlledSurface.this, newGroup);
 					newGroup = null;
@@ -1007,7 +1008,7 @@ public class ControlledSurface
 					toBeSelected = getDragSelection();
 	
 					// Select all that should be selected...
-					System.out.println(previouslySelected.size());
+					//System.out.println(previouslySelected.size());
 					UnSelectCommand unselect = new UnSelectCommand(ControlledSurface.this, selectedObjects);
 					unselect.execute();
 					// These have been selected previously and should still be
@@ -1345,7 +1346,7 @@ public class ControlledSurface
 			}
 			else if (e.getButton() == MouseEvent.BUTTON3)
 			{
-	
+				System.out.println("Button 3!");
 			}
 	
 			repaint(false);
@@ -1543,7 +1544,7 @@ public class ControlledSurface
 			}
 			else if (e.getButton() == MouseEvent.BUTTON3)
 			{
-	
+				System.out.println("Button 3!");	
 			}
 	
 			repaint(false);
@@ -1668,9 +1669,12 @@ public class ControlledSurface
 					return;
 				}
 				// is this the start of the move or a continuation of it
-				if (!selectedObjects.isEmpty()) {
-					for (final EditorObject object : selectedObjects) {
-						if (object.getType() == EditorObject.EDGE) {
+				if (!selectedObjects.isEmpty()) 
+				{
+					for (final EditorObject object : selectedObjects) 
+					{
+						if (object.getType() == EditorObject.EDGE) 
+						{
 							EditorEdge edge = (EditorEdge) object;
 							if (!(edge.getDragT() || edge.getDragS()))
 							{
@@ -1689,19 +1693,27 @@ public class ControlledSurface
 				// There should only be one object here, or maybe two, 
 				// a node and it's label or an edge and it's labelgroup...
 				// Let's make it an iterator anyway!
-				for (final EditorObject object : selectedObjects) {
+				for (final EditorObject object : selectedObjects) 
+				{
 					if (object.getType() == EditorObject.EDGE) {
 						// If an edge is selected, you can drag!
 						assert(selectedObjects.size() <= 2);
 						EditorEdge edge = (EditorEdge) object;
-						if (edge.getDragS()) {
+						if (edge.getDragS()) 
+						{
 							edge.setSource(e.getX(), e.getY());
-						} else if (edge.getDragT())	{
+						} 
+						else if (edge.getDragT())	
+						{
 							edge.setTarget(e.getX(), e.getY());
-						} else {
+						} 
+						else 
+						{
 							edge.setPosition(edge.getTPointX() + dx, edge.getTPointY() + dy);
 						}
-					} else if (object.getType() == EditorObject.NODE) {
+					} 
+					else if (object.getType() == EditorObject.NODE) 
+					{
 						// If clicking on a node or nodegroup, draw a
 						// new edge!
 						assert(selectedObjects.size() <= 2);
@@ -1717,7 +1729,9 @@ public class ControlledSurface
 						{
 							lines.add(dat);
 						}
-					} else if (object.getType() == EditorObject.NODEGROUP) {
+					} 
+					else if (object.getType() == EditorObject.NODEGROUP) 
+					{
 						assert(selectedObjects.size() == 1);
 						EditorNodeGroup nodeGroup = (EditorNodeGroup) object;
 						// Find point on the border of the group from where the line is drawn...
@@ -1734,9 +1748,6 @@ public class ControlledSurface
 						}
 					}
 				}
-			
-				// Update highlighting!
-				//updateHighlighting(e);								
 			}
 	
 			repaint(false);
@@ -1848,7 +1859,7 @@ public class ControlledSurface
 			}
 			else if (e.getButton() == MouseEvent.BUTTON3)
 			{
-	
+				System.out.println("Button 3!");	
 			}
 	
 			repaint(false);
@@ -1880,11 +1891,20 @@ public class ControlledSurface
 						root.getUndoInterface().executeCommand(c);				 
 					}
 				}
-				if (newGroup != null) {
-					newGroup.setResizingFalse();
-					Command c = new CreateNodeGroupCommand(ControlledSurface.this, newGroup);
+				if (newGroup != null) 
+				{
+					if (!newGroup.isEmpty())
+					{
+						newGroup.setResizingFalse();
+						Command c = new CreateNodeGroupCommand(ControlledSurface.this, newGroup);
+						root.getUndoInterface().executeCommand(c);
+					}					
+					else 
+					{
+						Command c = new DeleteNodeGroupCommand(ControlledSurface.this, newGroup);
+						// No undo!
+					}
 					newGroup = null;
-					root.getUndoInterface().executeCommand(c);
 				}
 	
 				lines.clear();
