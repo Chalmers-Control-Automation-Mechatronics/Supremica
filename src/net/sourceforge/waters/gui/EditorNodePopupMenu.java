@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorLabel
 //###########################################################################
-//# $Id: EditorNodePopupMenu.java,v 1.9 2006-01-09 23:52:56 siw4 Exp $
+//# $Id: EditorNodePopupMenu.java,v 1.10 2006-03-20 16:52:55 flordal Exp $
 //###########################################################################
 
 
@@ -31,6 +31,7 @@ class EditorNodePopupMenu
 	private JMenuItem deleteItem;
 	private JMenuItem initialItem;	
 	private JMenuItem recallItem;	
+	private JMenuItem markItem;	
 	private JMenuItem clearItem;	
 
 	public EditorNodePopupMenu(ControlledSurface parent, EditorNode node)
@@ -76,6 +77,19 @@ class EditorNodePopupMenu
 		}
 		recallItem = item;
 
+		/*
+		item = new JMenuItem("Mark state");
+		item.addActionListener(this);
+		this.add(item);
+		// Disable if there are no propositions
+		if (node.hasPropositions())
+		{
+			item.setEnabled(false);
+			item.setToolTipText("State is marked already");
+		}
+		markItem = item;
+		*/
+
 		item = new JMenuItem("Clear marking");
 		item.addActionListener(this);
 		this.add(item);
@@ -84,7 +98,6 @@ class EditorNodePopupMenu
 		{
 			item.setEnabled(false);
 			item.setToolTipText("State has no marking");
-
 		}
 		clearItem = item;
 	}
@@ -110,6 +123,11 @@ class EditorNodePopupMenu
 			final EditorLabel label = parent.getLabel(node);
 			label.setOffset(EditorLabel.DEFAULTOFFSETX,
 							EditorLabel.DEFAULTOFFSETY);
+		}
+
+		if (e.getSource() == markItem)
+		{
+			node.addDefaultProposition();
 		}
 
 		if (e.getSource() == clearItem)

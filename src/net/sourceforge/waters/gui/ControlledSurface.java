@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.63 2006-03-20 12:22:35 flordal Exp $
+//# $Id: ControlledSurface.java,v 1.64 2006-03-20 16:52:55 flordal Exp $
 //###########################################################################
  
 package net.sourceforge.waters.gui;
@@ -1346,7 +1346,6 @@ public class ControlledSurface
 			}
 			else if (e.getButton() == MouseEvent.BUTTON3)
 			{
-				System.out.println("Button 3!");
 			}
 	
 			repaint(false);
@@ -1544,7 +1543,6 @@ public class ControlledSurface
 			}
 			else if (e.getButton() == MouseEvent.BUTTON3)
 			{
-				System.out.println("Button 3!");	
 			}
 	
 			repaint(false);
@@ -1859,7 +1857,6 @@ public class ControlledSurface
 			}
 			else if (e.getButton() == MouseEvent.BUTTON3)
 			{
-				System.out.println("Button 3!");	
 			}
 	
 			repaint(false);

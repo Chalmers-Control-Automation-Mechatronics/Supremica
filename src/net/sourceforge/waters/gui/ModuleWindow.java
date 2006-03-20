@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleWindow
 //###########################################################################
-//# $Id: ModuleWindow.java,v 1.26 2006-03-20 14:16:12 flordal Exp $
+//# $Id: ModuleWindow.java,v 1.27 2006-03-20 16:52:55 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -617,11 +617,9 @@ public class ModuleWindow
 
 	public void constructWindow()
 	{
-		Component defaultTab;
-
 		// Construct the window
 		tabbedPane = new JTabbedPane();
-
+		Component defaultTab;
 		tabbedPane.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
 		if (!limited)
 			tabbedPane.addTab("Parameters", null, createParametersPane(), "");
@@ -636,12 +634,10 @@ public class ModuleWindow
 		debugPane.addFocusListener(this);
 
 		// Components selected by default
-		//tabbedPane.setSelectedIndex(3);
 		tabbedPane.setSelectedComponent(defaultTab);
 		this.setJMenuBar(createMenuBar());
 
 		JPanel background = new JPanel();
-
 		background.setOpaque(true);
 		background.add(tabbedPane);
 		setContentPane(background);

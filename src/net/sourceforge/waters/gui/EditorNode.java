@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorNode
 //###########################################################################
-//# $Id: EditorNode.java,v 1.32 2006-01-23 02:06:23 siw4 Exp $
+//# $Id: EditorNode.java,v 1.33 2006-03-20 16:52:55 flordal Exp $
 //###########################################################################
 
 
@@ -47,6 +47,8 @@ import net.sourceforge.waters.subject.module.PointGeometrySubject;
 import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 import net.sourceforge.waters.xsd.module.AnchorPosition;
 
+//import net.sourceforge.waters.xsd.base.EventKind;
+import net.sourceforge.waters.subject.module.IndexedIdentifierSubject;
 
 /** 
  * <p>The internal editor representation of node objects.</p>
@@ -131,6 +133,17 @@ public class EditorNode
 		return (list.size() != 0);
     }
 
+	/**
+	 * If one color is enough for the marking, this is a way to do it.
+	 */
+    public void addDefaultProposition()
+    {
+		final EventListExpressionSubject props = mSubject.getPropositions();
+		final List<AbstractSubject> list = props.getEventListModifiable();
+		//list.add(new EventDeclSubject("omega", EventKind.PROPOSITION));
+		list.add(new IndexedIdentifierSubject("omega"));
+    }
+	
     public void clearPropositions()
     {
 		final EventListExpressionSubject props = mSubject.getPropositions();
@@ -366,11 +379,13 @@ public class EditorNode
 		g2d.setColor(getColor(selected));
 		if (isInitial())
 		{
-			// Draw initial state arrow
-			drawInitialStateArrow(g2d);
-
-			// Draw line thicker!
-			//g2d.setStroke(DOUBLESTROKE);
+			// Arrow or thick border on initial states?
+			if (true)
+				// Draw initial state arrow
+				drawInitialStateArrow(g2d);
+			else
+				// Draw border thicker!
+				g2d.setStroke(DOUBLESTROKE);
 		}
 		g2d.drawOval(getX() - RADIUS, getY() - RADIUS, WIDTH, WIDTH);			
 		g2d.setStroke(BASICSTROKE);

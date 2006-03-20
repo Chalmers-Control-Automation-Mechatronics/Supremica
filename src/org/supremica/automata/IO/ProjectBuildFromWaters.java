@@ -141,13 +141,13 @@ public class ProjectBuildFromWaters
 		    EventProxy event = (EventProxy) evIt.next();
 		    if (event.getKind() == EventKind.PROPOSITION)
 		    {
-			if (!multicolored && (term != null) && !event.equals(term))
-			{
-			    multicolored = true;
-			}
-			term = event;
-			currSupremicaState.setAccepting(true);
-			break;
+				if (!multicolored && (term != null) && !event.equals(term))
+				{
+					multicolored = true;
+				}
+				term = event;
+				currSupremicaState.setAccepting(true);
+				break;
 		    }
 		}
 			
