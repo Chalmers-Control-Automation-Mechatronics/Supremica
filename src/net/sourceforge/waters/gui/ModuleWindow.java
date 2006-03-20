@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleWindow
 //###########################################################################
-//# $Id: ModuleWindow.java,v 1.27 2006-03-20 16:52:55 flordal Exp $
+//# $Id: ModuleWindow.java,v 1.28 2006-03-20 22:50:27 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -226,7 +226,8 @@ public class ModuleWindow
 		int nbrOfAddedAutomata = supremica.addProject(supremicaProject);
 
 		System.err.println(nbrOfAddedAutomata);
-	//EFA question: 
+
+		//EFA question: 
 		/*export everything to supremica 
 		and translate to single automata there?*/
 	}
@@ -545,20 +546,14 @@ public class ModuleWindow
 		menuBar.add(menu);
 
 		JMenuItem menuItem = new JMenuItem(WLang.FileNewMenu, KeyEvent.VK_O);
-
 		menuItem.addActionListener(this);
-
+		menu.add(menuItem);
 		FileNewMenu = menuItem;
 
-		menu.add(menuItem);
-
 		menuItem = new JMenuItem(WLang.FileOpenMenu, KeyEvent.VK_O);
-
 		menuItem.addActionListener(this);
-
-		FileOpenMenu = menuItem;
-
 		menu.add(menuItem);
+		FileOpenMenu = menuItem;
 
 		menuItem = new JMenuItem(WLang.FileSaveMenu, KeyEvent.VK_S);
 		menuItem.addActionListener(this);
@@ -575,7 +570,6 @@ public class ModuleWindow
 		menu.addSeparator();
 
 		menuItem = new JMenuItem(WLang.FilePageSetupMenu, KeyEvent.VK_G);
-
 		menuItem.setEnabled(false);
 		menuItem.setToolTipText("Not implemented yet");
 		menu.add(menuItem);

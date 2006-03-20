@@ -57,7 +57,7 @@ import org.supremica.gui.*;
 // import org.jgrafchart.*;
 public class SupremicaWithGui
 {
-	static
+	staticjcatholi
 	{
 		SupremicaProperties.setLogToConsole(false);
 		SupremicaProperties.setLogToGUI(true);

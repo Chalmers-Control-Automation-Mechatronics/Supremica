@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorLabel
 //###########################################################################
-//# $Id: EditorNodePopupMenu.java,v 1.10 2006-03-20 16:52:55 flordal Exp $
+//# $Id: EditorNodePopupMenu.java,v 1.11 2006-03-20 22:50:27 flordal Exp $
 //###########################################################################
 
 
@@ -77,7 +77,6 @@ class EditorNodePopupMenu
 		}
 		recallItem = item;
 
-		/*
 		item = new JMenuItem("Mark state");
 		item.addActionListener(this);
 		this.add(item);
@@ -88,7 +87,6 @@ class EditorNodePopupMenu
 			item.setToolTipText("State is marked already");
 		}
 		markItem = item;
-		*/
 
 		item = new JMenuItem("Clear marking");
 		item.addActionListener(this);

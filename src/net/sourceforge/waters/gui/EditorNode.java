@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorNode
 //###########################################################################
-//# $Id: EditorNode.java,v 1.33 2006-03-20 16:52:55 flordal Exp $
+//# $Id: EditorNode.java,v 1.34 2006-03-20 22:50:27 flordal Exp $
 //###########################################################################
 
 
@@ -47,7 +47,7 @@ import net.sourceforge.waters.subject.module.PointGeometrySubject;
 import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 import net.sourceforge.waters.xsd.module.AnchorPosition;
 
-//import net.sourceforge.waters.xsd.base.EventKind;
+import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.subject.module.IndexedIdentifierSubject;
 
 /** 
@@ -140,8 +140,9 @@ public class EditorNode
     {
 		final EventListExpressionSubject props = mSubject.getPropositions();
 		final List<AbstractSubject> list = props.getEventListModifiable();
-		//list.add(new EventDeclSubject("omega", EventKind.PROPOSITION));
 		list.add(new IndexedIdentifierSubject("omega"));
+		final IndexedList<EventDeclSubject> decls = mModule.getEventDeclListModifiable();
+		decls.add(new EventDeclSubject("omega", EventKind.PROPOSITION));
     }
 	
     public void clearPropositions()
