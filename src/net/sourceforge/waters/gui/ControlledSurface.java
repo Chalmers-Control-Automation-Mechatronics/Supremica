@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.64 2006-03-20 16:52:55 flordal Exp $
+//# $Id: ControlledSurface.java,v 1.65 2006-03-21 21:58:04 flordal Exp $
 //###########################################################################
  
 package net.sourceforge.waters.gui;
@@ -1588,7 +1588,7 @@ public class ControlledSurface
 							{
 								EditorNodeGroup n = (EditorNodeGroup) n1;
 								Command createEdge = new CreateEdgeCommand(ControlledSurface.this ,n, n2,
-													   n.getX() + xoff, n.getY() + yoff);
+																		   n.getX() + xoff, n.getY() + yoff);
 								root.getUndoInterface().executeCommand(createEdge);
 							}
 						}

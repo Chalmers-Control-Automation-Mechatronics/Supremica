@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorLabelGroup
 //###########################################################################
-//# $Id: EditorLabelGroup.java,v 1.25 2006-03-02 12:12:49 martin Exp $
+//# $Id: EditorLabelGroup.java,v 1.26 2006-03-21 21:58:04 flordal Exp $
 //###########################################################################
 
 
@@ -335,7 +335,8 @@ public class EditorLabelGroup
 	public void addEvent(IdentifierSubject ident)
 	{
 		final List<AbstractSubject> list = mSubject.getEventListModifiable();
-	    if (list.add(ident)) {
+	    if (list.add(ident)) 
+		{
 			addToPanel(ident.toString());
 			resizePanel();
 	    }

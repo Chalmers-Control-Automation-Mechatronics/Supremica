@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorNodeGroup
 //###########################################################################
-//# $Id: EditorNodeGroup.java,v 1.20 2006-03-20 12:22:35 flordal Exp $
+//# $Id: EditorNodeGroup.java,v 1.21 2006-03-21 21:58:04 flordal Exp $
 //###########################################################################
 
 
@@ -95,7 +95,8 @@ public class EditorNodeGroup
 	public void resize(int x, int y)
 	{
 		// There's a bug here, resizing does not work properly if you
-		// drag a point past a neighbouring control point.
+		// drag a control point past one of its neighbours (and so
+		// "inverting" the rectangle)!
 
 		GeometryProxy old = new BoxGeometrySubject((Rectangle2D)subject.getGeometry().getRectangle().clone());
 		Rectangle2D bounds = new Rectangle2D.Double();
@@ -104,11 +105,13 @@ public class EditorNodeGroup
 		// Is it a side or a corner control point?
 		if (resizingFrom % 2 == 0)
 		{
+			// Resizing from a corner
 			point.setLocation(corners[resizingFrom].getCenterX(),
 							  corners[resizingFrom].getCenterY());
 		}
 		else
 		{
+			// Resizing from a side
 			int i = resizingFrom + 1;
 			if (i >= 8)
 			{
@@ -124,7 +127,8 @@ public class EditorNodeGroup
 			{
 				y = (int)corners[i].getCenterY();
 			}
-		}
+		} 
+		System.out.println("x " + point.getX() + " y " + point.getY() + " x " + x + " y " + y);
 		bounds.setFrameFromDiagonal(point.getX(), point.getY(), x, y);
 		subject.getGeometry().setRectangle(bounds);
 		fireEditorChangedEvent(new NodeMovedEvent(old, subject.getGeometry(),

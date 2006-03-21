@@ -103,17 +103,16 @@ public class Supremica
 	// Construct the frame
 	public Supremica()
 	{
+		//setDefaultCloseOperation(DISPOSE_ON_CLOSE);		
+
 		theVisualProjectContainer = new VisualProjectContainer();
-
 		theVisualProjectContainer.addListener(this);
-
 		VisualProject theVisualProject = new VisualProject("");
-
 		theVisualProjectContainer.addProject(theVisualProject);
 		setActiveProject(theVisualProject);
-
 		// theVisualProjectContainer = currProject.getVisualProjectContainer();
 		// theVisualProjectContainer.addListener(this);
+
 		logger.info("Supremica version: " + (new Version()).toString());
 
 		if (SupremicaProperties.isXmlRpcActive())
@@ -146,7 +145,6 @@ public class Supremica
 		theTableSorter.addMouseListenerToHeaderInTable(theAutomatonTable);
 
 		menuHandler = new MenuHandler(
-
 		/**
 		 *  theAutomatonTable
 		 */

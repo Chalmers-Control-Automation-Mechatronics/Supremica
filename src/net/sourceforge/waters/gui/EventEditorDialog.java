@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventEditorDialog
 //###########################################################################
-//# $Id: EventEditorDialog.java,v 1.5 2005-12-15 18:21:27 robi Exp $
+//# $Id: EventEditorDialog.java,v 1.6 2006-03-21 21:58:04 flordal Exp $
 //###########################################################################
 
 
@@ -132,7 +132,6 @@ public class EventEditorDialog
 	{
 		if ("okbutton".equals(e.getActionCommand()))
 		{
-
 			// addEvent(...);
 			final String key = group.getSelection().getActionCommand();
 			EventKind eventkind = null;
@@ -160,14 +159,18 @@ public class EventEditorDialog
 			final int numranges = mData.getSize();
 			final List<SimpleExpressionSubject> ranges =
 				new ArrayList<SimpleExpressionSubject>(numranges);
-			for (int i = 0; i < numranges; i++)	{
+			for (int i = 0; i < numranges; i++)	
+			{
 				final String text = (String) mData.get(i);
-				try	{
+				try	
+				{
 					final SimpleExpressionSubject range =
 						(SimpleExpressionSubject)
 						parser.parse(text, Operator.TYPE_RANGE);
 					ranges.add(range);
-				} catch (final ParseException exception) {
+				}
+				catch (final ParseException exception) 
+				{
 					ErrorWindow.askRevert(exception, text);
 					mRoot.logEntry("ParseException in event range: " +
 								   exception.getMessage());
@@ -175,14 +178,16 @@ public class EventEditorDialog
 				}
 			}
 
-			final EventDeclSubject decl =
-				new EventDeclSubject(nameText, eventkind, true, ranges, null);
-			try	{
+			newEvent = new EventDeclSubject(nameText, eventkind, true, ranges, null);
+			try	
+			{
 				final ModuleSubject module = mRoot.getModuleSubject();
 				final IndexedList<EventDeclSubject> decls =
 					module.getEventDeclListModifiable();
-				decls.insert(decl);
-			} catch (final DuplicateNameException exception) {
+				decls.insert(newEvent);
+			} 
+			catch (final DuplicateNameException exception) 
+			{
 				JOptionPane.showMessageDialog(this, "Duplicate event");
 				mRoot.logEntry("DuplicateNameException: " +
 							   exception.getMessage());
@@ -190,7 +195,7 @@ public class EventEditorDialog
 			}
 	
 			final DefaultListModel eventData = mRoot.getEventDataList();
-			eventData.addElement(decl);
+			eventData.addElement(newEvent);
 			dispose();
 		}
 
@@ -248,7 +253,11 @@ public class EventEditorDialog
 		}
 	}
 
-
+	public EventDeclSubject getEventDeclSubject()
+	{
+		return newEvent;
+	}
+	
 	//#######################################################################
 	//# Data Members
 	private final JTextField mNameInput = new JTextField(16);
@@ -256,6 +265,7 @@ public class EventEditorDialog
 	private final ButtonGroup group = new ButtonGroup();
 	private final ModuleWindow mRoot;
 	private final DefaultListModel mData;
+	private EventDeclSubject newEvent = null;
 	JList mDataList = null;
 
 }

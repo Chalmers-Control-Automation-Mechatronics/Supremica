@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   WmodFileFilter
 //###########################################################################
-//# $Id: WmodFileFilter.java,v 1.3 2006-03-20 14:16:12 flordal Exp $
+//# $Id: WmodFileFilter.java,v 1.4 2006-03-21 21:58:04 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -39,7 +39,6 @@ public class WmodFileFilter
 		}
 
 		String extension = getExtension(f);
-
 		if (extension != null)
 		{
 			if (extension.equals(WMOD))

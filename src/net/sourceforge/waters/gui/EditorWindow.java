@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorWindow
 //###########################################################################
-//# $Id: EditorWindow.java,v 1.24 2006-01-23 02:06:23 siw4 Exp $
+//# $Id: EditorWindow.java,v 1.25 2006-03-21 21:58:04 flordal Exp $
 //###########################################################################
 
 
@@ -33,20 +33,27 @@ import net.sourceforge.waters.gui.observer.UndoRedoEvent;
 
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.UndoInterface;
+import net.sourceforge.waters.model.base.IndexedList;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
+import net.sourceforge.waters.subject.module.EventDeclSubject;
+import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 
 import org.supremica.gui.GraphicsToClipboard;
 
-
+// Printing
+import java.awt.print.*;
+import javax.print.attribute.*;
+import javax.print.attribute.standard.*;
+import java.util.Locale;
+import java.net.URI;
 
 public class EditorWindow
 	extends JFrame
 	implements EditorWindowInterface
 {
-
 	//#######################################################################
 	//# Constructor
 	public EditorWindow(final String title,
@@ -68,6 +75,8 @@ public class EditorWindow
 		final ExpressionParser parser = root.getExpressionParser();
 		mEventPane = new EditorEvents(module, subject, parser, this);
 		menu = new EditorMenu(surface, this);
+
+		mModuleWindow = root;
 
 		final Container panel = getContentPane();
 		final GridBagLayout gridbag = new GridBagLayout();
@@ -186,8 +195,82 @@ public class EditorWindow
 		requestFocus();
 	}
 
-	public void createPDF(File file)
+	public void printFigure()
 	{
+		try
+		{
+			PrinterJob printJob = PrinterJob.getPrinterJob();
+			if (printJob.getPrintService() == null)
+			{
+				System.err.println("No default printer set.");
+				return;
+			}
+			printJob.setPrintable((EditorSurface) getControlledSurface());
+			
+			// Printing attributes
+			PrintRequestAttribute name = new JobName("Waters Printing", Locale.ENGLISH);
+			PrintRequestAttributeSet attributes = new HashPrintRequestAttributeSet();
+			attributes.add(name);
+			
+			// Show printing dialog
+			if (printJob.printDialog(attributes))
+			{
+				// Print!
+				printJob.print(attributes);
+			}
+		}
+		catch (Exception ex)
+		{
+			System.err.println(ex.getStackTrace());
+		}
+	}
+
+	public void exportPostscript()
+	{
+		// Get file to export to
+		JFileChooser chooser = new JFileChooser();
+		chooser.setSelectedFile(new File(mSubject.getName() + ".ps"));
+		int returnVal = chooser.showSaveDialog(surface);
+		File file = chooser.getSelectedFile();
+		// Not OK?
+		if (returnVal != JFileChooser.APPROVE_OPTION) 
+		{
+			return;
+		}
+		
+		// Create output
+		try
+		{
+			PrinterJob printJob = PrinterJob.getPrinterJob();
+			printJob.setPrintable((EditorSurface) getControlledSurface());
+
+			PrintRequestAttribute postscript = new Destination(file.toURI());
+			PrintRequestAttributeSet attributes = new HashPrintRequestAttributeSet();
+			attributes.add(postscript);
+			
+			// Print!
+			printJob.print(attributes);
+		}
+		catch (Exception ex)
+		{
+			System.err.println(ex.getStackTrace());
+		}
+	}
+
+	public void exportPDF()
+	{
+		// Get file to export to
+		JFileChooser chooser = new JFileChooser();
+		chooser.setSelectedFile(new File(mSubject.getName() + ".pdf"));
+		int returnVal = chooser.showSaveDialog(surface);
+		File file = chooser.getSelectedFile();
+		// Not OK?
+		if (returnVal != JFileChooser.APPROVE_OPTION) 
+		{
+			return;
+		}
+			
+		// Create output
 		int width = surface.getWidth();
 		int height = surface.getHeight();
 		Document document = new Document(new com.lowagie.text.Rectangle(width, height));
@@ -221,6 +304,15 @@ public class EditorWindow
 		document.close();
 	}
 
+	public void createEvent()
+	{
+		EventEditorDialog diag = new EventEditorDialog(mModuleWindow);
+		EventDeclSubject newEvent = diag.getEventDeclSubject();
+		final EventTableModel model = (EventTableModel) mEventPane.getModel();
+		model.addIdentifier(new SimpleIdentifierSubject(newEvent.getName()));
+		//final IndexedList<EventDeclSubject> decls = mModule.getEventDeclListModifiable();
+		//decls.add(newEvent);
+	}
 
 	//#######################################################################
 	//# Data Members
@@ -230,6 +322,7 @@ public class EditorWindow
 	private final EditorEvents mEventPane;
 	private final SimpleComponentSubject mSubject;
 	private final ModuleSubject mModule;
+	private final ModuleWindow mModuleWindow;
 	private boolean isSaved = false;
 	private GraphicsToClipboard toClipboard = null;
 	private final UndoInterface mUndoInterface;

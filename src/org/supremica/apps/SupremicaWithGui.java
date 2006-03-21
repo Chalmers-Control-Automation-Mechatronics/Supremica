@@ -110,12 +110,10 @@ public class SupremicaWithGui
 		// Center the window
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		Dimension frameSize = workbench.getSize();
-
 		if (frameSize.height > screenSize.height)
 		{
 			frameSize.height = screenSize.height;
 		}
-
 		if (frameSize.width > screenSize.width)
 		{
 			frameSize.width = screenSize.width;

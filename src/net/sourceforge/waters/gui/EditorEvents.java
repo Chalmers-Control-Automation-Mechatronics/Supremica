@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorEvents
 //###########################################################################
-//# $Id: EditorEvents.java,v 1.19 2006-01-23 02:06:23 siw4 Exp $
+//# $Id: EditorEvents.java,v 1.20 2006-03-21 21:58:04 flordal Exp $
 //###########################################################################
 
 
@@ -191,7 +191,8 @@ public class EditorEvents
 		}
 		final EventTableModel model = (EventTableModel) getModel();
 		final int row = model.createEvent();
-		if (editCellAt(row, 1)) {
+		if (editCellAt(row, 1)) 
+		{
 			final Component comp = getEditorComponent();
 			final Rectangle bounds = comp.getBounds();
 			scrollRectToVisible(bounds);

@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EventTableModel
 //###########################################################################
-//# $Id: EventTableModel.java,v 1.15 2006-03-20 12:22:35 flordal Exp $
+//# $Id: EventTableModel.java,v 1.16 2006-03-21 21:58:04 flordal Exp $
 //###########################################################################
 
 
@@ -156,7 +156,6 @@ class EventTableModel
 				("Bad column number for event table model!");
 		}
 	}
-
 
 	public boolean isCellEditable(final int row, final int column)
 	{

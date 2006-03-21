@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorNode
 //###########################################################################
-//# $Id: EditorNode.java,v 1.34 2006-03-20 22:50:27 flordal Exp $
+//# $Id: EditorNode.java,v 1.35 2006-03-21 21:58:04 flordal Exp $
 //###########################################################################
 
 
@@ -138,11 +138,14 @@ public class EditorNode
 	 */
     public void addDefaultProposition()
     {
+		final String DEFAULTNAME = "omega";
+		// Add to propositionlist in node
 		final EventListExpressionSubject props = mSubject.getPropositions();
 		final List<AbstractSubject> list = props.getEventListModifiable();
-		list.add(new IndexedIdentifierSubject("omega"));
+		list.add(new IndexedIdentifierSubject(DEFAULTNAME));
+		// Add to eventlist in module
 		final IndexedList<EventDeclSubject> decls = mModule.getEventDeclListModifiable();
-		decls.add(new EventDeclSubject("omega", EventKind.PROPOSITION));
+		decls.add(new EventDeclSubject(DEFAULTNAME, EventKind.PROPOSITION));
     }
 	
     public void clearPropositions()

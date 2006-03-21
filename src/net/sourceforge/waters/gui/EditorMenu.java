@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorMenu
 //###########################################################################
-//# $Id: EditorMenu.java,v 1.18 2005-12-02 02:31:04 siw4 Exp $
+//# $Id: EditorMenu.java,v 1.19 2006-03-21 21:58:04 flordal Exp $
 //###########################################################################
 
 
@@ -17,12 +17,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
-
-// Printing
-import java.awt.print.*;
-import javax.print.attribute.*;
-import javax.print.attribute.standard.*;
-import java.util.Locale;
 
 /**
  * <p>The EditorWindow menu.</p>
@@ -37,16 +31,17 @@ public class EditorMenu
 	implements ActionListener,
 			   Observer
 {
-	public final JMenuItem FileNewMenu;
-	public final JMenuItem PrintMenu;
-	public final JMenuItem FileExitMenu;
+	public final JMenuItem fileNewMenu;
+	public final JMenuItem printMenu;
+	public final JMenuItem fileExitMenu;
 	public final JMenuItem mEditUndo;
 	public final JMenuItem mEditRedo;
 	public final JMenuItem mToolsCreateEvent;
-	public final JMenuItem ToolsOptionsMenu;
+	public final JMenuItem toolsOptionsMenu;
 	public final JMenuItem editDeleteMenu;
 	public final JMenuItem editCopyAsWMFMenu;
-	public final JMenuItem editCreatePDFMenu;
+	public final JMenuItem editExportPostscriptMenu;
+	public final JMenuItem editExportPDFMenu;
 	public final JMenuItem mEmbedder;
 	EditorWindowInterface root;
 	ControlledSurface surface;
@@ -58,36 +53,48 @@ public class EditorMenu
 		surface = c;
 
 		JMenu menu = new JMenu("File");
-
 		menu.setMnemonic(KeyEvent.VK_F);
 		menu.getAccessibleContext().setAccessibleDescription("The File menu");
 		this.add(menu);
 
 		JMenuItem menuItem = new JMenuItem("Clear all", KeyEvent.VK_O);
 		menuItem.addActionListener(this);
-		FileNewMenu = menuItem;
+		fileNewMenu = menuItem;
 		menu.add(menuItem);
 
 		menu.addSeparator();
+
+		menuItem = new JMenuItem("Export to Postscript");
+		menuItem.addActionListener(this);
+		editExportPostscriptMenu = menuItem;
+		menu.add(menuItem);
+
+		menuItem = new JMenuItem("Export to PDF");
+		menuItem.addActionListener(this);
+		editExportPDFMenu = menuItem;
+		menu.add(menuItem);
+
+		menu.addSeparator();
+
+		menuItem = new JMenuItem("Print...", KeyEvent.VK_P);
+		menuItem.addActionListener(this);
+		printMenu = menuItem;
+		//menuItem.setEnabled(false);
+		//menuItem.setToolTipText("Not implemented yet");
+		menu.add(menuItem);
 
 		menuItem = new JMenuItem("Page Setup...", KeyEvent.VK_G);
 		menuItem.setEnabled(false);
 		menuItem.setToolTipText("Not implemented yet");
 		menu.add(menuItem);
 
-		menuItem = new JMenuItem("Print...", KeyEvent.VK_P);
-		menuItem.addActionListener(this);
-		PrintMenu = menuItem;
-		//menuItem.setEnabled(false);
-		//menuItem.setToolTipText("Not implemented yet");
-		menu.add(menuItem);
 		menu.addSeparator();
 
 		menuItem = new JMenuItem("Close Window", KeyEvent.VK_X);
-		menu.add(menuItem);
 		menuItem.addActionListener(this);
+		menu.add(menuItem);
 
-		FileExitMenu = menuItem;
+		fileExitMenu = menuItem;
 		menu = new JMenu("Edit");
 
 		this.add(menu);
@@ -95,40 +102,30 @@ public class EditorMenu
 		menuItem = new JMenuItem("Undo");
 		menuItem.setEnabled(root.getUndoInterface().canUndo());
 		menuItem.setToolTipText("Not implemented yet");
-		menu.add(menuItem);
 		menuItem.addActionListener(this);
-
 		mEditUndo = menuItem;
+		menu.add(menuItem);
+
 
 		menuItem = new JMenuItem("Redo");
 		menuItem.setEnabled(root.getUndoInterface().canRedo());
 		menuItem.setToolTipText("Not implemented yet");
-		menu.add(menuItem);
-		menu.addSeparator();
 		menuItem.addActionListener(this);
-
 		mEditRedo = menuItem;
+		menu.add(menuItem);
 
 		menu.addSeparator();
 
-	/*
+		menuItem = new JMenuItem("Copy as WMF");
+		menuItem.addActionListener(this);
+		editCopyAsWMFMenu = menuItem;
+		menu.add(menuItem);
+
 		menuItem = new JMenuItem("Copy");
+		menuItem.setMnemonic(KeyEvent.VK_COPY);
 		menuItem.setEnabled(false);
 		menuItem.setToolTipText("Not implemented yet");
 		menu.add(menuItem);
-	*/
-
-		menuItem = new JMenuItem("Copy");
-		menu.add(menuItem);
-		menuItem.addActionListener(this);
-
-		editCopyAsWMFMenu = menuItem;
-
-		menuItem = new JMenuItem("Create PDF");
-		menu.add(menuItem);
-		menuItem.addActionListener(this);
-
-		editCreatePDFMenu = menuItem;
 
 		menuItem = new JMenuItem("Cut");
 		menuItem.setEnabled(false);
@@ -139,19 +136,18 @@ public class EditorMenu
 		menuItem.setEnabled(false);
 		menuItem.setToolTipText("Not implemented yet");
 		menu.add(menuItem);
+
 		menu.addSeparator();
 
 		menuItem = new JMenuItem("Delete");
 		menu.add(menuItem);
 		menuItem.addActionListener(this);
-
 		editDeleteMenu = menuItem;
-		menu = new JMenu("Tools");
 
+		menu = new JMenu("Tools");
 		this.add(menu);
 
 		menuItem = new JMenuItem("Select Tool");
-
 		menu.add(menuItem);
 
 		menuItem = new JMenuItem("Node Tool");
@@ -181,7 +177,7 @@ public class EditorMenu
 		menu.add(menuItem);
 		menuItem.addActionListener(this);
 		
-		ToolsOptionsMenu = menuItem;
+		toolsOptionsMenu = menuItem;
 
 		menu = new JMenu("Help");
 		this.add(menu);
@@ -197,46 +193,19 @@ public class EditorMenu
 
 	public void actionPerformed(ActionEvent e)
 	{
-		if (e.getSource() == FileNewMenu)
+		if (e.getSource() == fileNewMenu)
 		{
 			surface.clearAll();
 		}
 
-		if (e.getSource() == FileExitMenu)
+		if (e.getSource() == fileExitMenu)
 		{
 			// root.dispose();
 		}
 
-		if (e.getSource() == PrintMenu)
+		if (e.getSource() == printMenu)
 		{
-			ControlledSurface surface = root.getControlledSurface();
-
-			PrinterJob printJob = PrinterJob.getPrinterJob();
-			if (printJob.getPrintService() == null)
-			{
-				System.err.println("No default printer set.");
-				return;
-			}
-			printJob.setPrintable((EditorSurface) surface);
-
-			// Printing attributes
-			PrintRequestAttribute name = new JobName("Waters Printing", Locale.ENGLISH);
-			PrintRequestAttributeSet attributes = new HashPrintRequestAttributeSet();
-			attributes.add(name);
-
-			// Show printing dialog
-			if (printJob.printDialog(attributes))
-			{
-				try
-				{
-					// Print!
-					printJob.print(attributes);
-				}
-				catch (Exception ex)
-				{
-					System.err.println(ex.getStackTrace());
-				}
-			}
+			root.printFigure();
 		}
 
 		if (e.getSource() == editDeleteMenu)
@@ -246,10 +215,13 @@ public class EditorMenu
 
 		if (e.getSource() == mToolsCreateEvent)
 		{
-			root.getEventPane().createEvent();
+			// Is there a point in having a special way to add events
+			// here? Why not simply use the EventEditorDialog?
+			//root.getEventPane().createEvent();
+			root.createEvent();
 		}
 
-		if (e.getSource() == ToolsOptionsMenu)
+		if (e.getSource() == toolsOptionsMenu)
 		{
 			root.getControlledSurface().setOptionsVisible(true);
 		}
@@ -288,26 +260,15 @@ public class EditorMenu
 			}												  
 		}
 
-		if (e.getSource() == editCreatePDFMenu)
+		if (e.getSource() == editExportPostscriptMenu)
 		{
-			/*
-			File f = new File("C:/Temp/test.pdf");
-			root.createPDF(f);
-			*/
-
-			JFileChooser chooser = new JFileChooser();
-			int returnVal = chooser.showSaveDialog(surface);
-
-			if (returnVal == JFileChooser.APPROVE_OPTION) 
-			{
-				File file = chooser.getSelectedFile();
-				root.createPDF(file);
-			} 
-			else 
-			{
-			}
+			root.exportPostscript();
 		}
 
+		if (e.getSource() == editExportPDFMenu)
+		{
+			root.exportPDF();
+		}
 	}
 	public void update(EditorChangedEvent e)
 	{

@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorWindow
 //###########################################################################
-//# $Id: EditorWindowInterface.java,v 1.6 2005-12-16 00:26:39 siw4 Exp $
+//# $Id: EditorWindowInterface.java,v 1.7 2006-03-21 21:58:04 flordal Exp $
 //###########################################################################
 
 
@@ -40,5 +40,11 @@ public interface EditorWindowInterface
 
 	public void copyAsWMFToClipboard();
 
-	public void createPDF(File f);
+	public void exportPDF();
+
+	public void exportPostscript();
+
+	public void printFigure();
+
+	public void createEvent();
 }

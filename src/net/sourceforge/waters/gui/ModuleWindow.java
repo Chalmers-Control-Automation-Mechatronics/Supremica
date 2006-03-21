@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleWindow
 //###########################################################################
-//# $Id: ModuleWindow.java,v 1.29 2006-03-21 08:31:02 flordal Exp $
+//# $Id: ModuleWindow.java,v 1.30 2006-03-21 21:58:04 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -253,21 +253,19 @@ public class ModuleWindow
 
 		dataList.setCellRenderer(new EventListCell());
 
-		JButton NewEventButton = new JButton("New Event");
+		JButton newEventButton = new JButton("New Event");
+		newEventButton.setActionCommand("newevent");
+		newEventButton.addActionListener(this);
 
-		NewEventButton.setActionCommand("newevent");
-		NewEventButton.addActionListener(this);
-
-		JButton DeleteEventButton = new JButton("Delete Event");
-
-		DeleteEventButton.setActionCommand("delevent");
-		DeleteEventButton.addActionListener(this);
+		JButton deleteEventButton = new JButton("Delete Event");
+		deleteEventButton.setActionCommand("delevent");
+		deleteEventButton.addActionListener(this);
 
 		Box jp = new Box(BoxLayout.PAGE_AXIS);
 		JPanel p = new JPanel();
 
-		p.add(NewEventButton);
-		p.add(DeleteEventButton);
+		p.add(newEventButton);
+		p.add(deleteEventButton);
 		jp.add(new JScrollPane(dataList));
 		jp.add(p);
 
@@ -828,20 +826,13 @@ public class ModuleWindow
 
 	private void saveAs()
 	{
-		fileSaveChooser.setFileFilter(new WmodFileFilter());			
+		WmodFileFilter filter = new WmodFileFilter();
+		fileSaveChooser.setFileFilter(filter);			
 		int returnVal = fileSaveChooser.showSaveDialog(this);
-		
 		if (returnVal == JFileChooser.APPROVE_OPTION)
 		{
 			File file = fileSaveChooser.getSelectedFile();
-			String ext = null;
-			String s = file.getName();
-			int i = s.lastIndexOf('.');
-			if (i > 0 &&  i < s.length() - 1) 
-			{
-				ext = s.substring(i+1).toLowerCase();
-			}
-			if (ext == null || !ext.equals(WmodFileFilter.WMOD))
+			if (!filter.accept(file))
 			{
 				file = new File(file.getPath() + "." + WmodFileFilter.WMOD);
 			}
@@ -1015,11 +1006,16 @@ public class ModuleWindow
 		}
 	}
 
-	// WindowListener interface
+	//////////////////////////////
+	// WindowListener interface //
+	//////////////////////////////
+
 	public void windowActivated(WindowEvent e) {}
 	public void windowClosed(WindowEvent e) {}
 	public void windowClosing(WindowEvent e)
 	{
+		// If modified, opt to save changes!
+		// "modified" does not work properly as of yet.
 		//if (modified)
 		{
 			int yesNo = JOptionPane.showConfirmDialog(this, "Do you want to save the module before exiting?", "Save before exit?", JOptionPane.YES_NO_OPTION);
@@ -1190,8 +1186,8 @@ public class ModuleWindow
 	private JButton newSimpleButton;
 	private JButton newForeachButton;
 	private JButton deleteComponentButton;
-	private JButton NewEventButton;
-	private JButton DeleteEventButton;
+	private JButton newEventButton;
+	private JButton deleteEventButton;
 	private JButton newInstanceButton;
 	private JButton newBindingButton;
 	private JButton newParamButton;
