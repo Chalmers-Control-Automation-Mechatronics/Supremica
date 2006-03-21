@@ -14,8 +14,7 @@ public class ModifiedAstarUsingVisGraphRelaxation
 	 * Hashtable containing the estimated cost for a given time configuration 
 	 * (as returned by the visibility graph)
 	 */
-	//Tillf public
-	public Hashtable<String, Integer> visGraphRelax = null;
+	//private Hashtable<String, Integer> visGraphRelax = null;
 
 	/**
 	 * The output stream
@@ -27,8 +26,7 @@ public class ModifiedAstarUsingVisGraphRelaxation
 	 */
 	private int[] cycleTimes;
 
-	//Tillf
-	private boolean relaxFromNodes = false;
+	private volatile boolean relaxFromNodes = false;
 
 
 	public ModifiedAstarUsingVisGraphRelaxation(Automata theAutomata, boolean manualExpansion, boolean buildSchedule, ScheduleDialog gui) 
@@ -38,31 +36,30 @@ public class ModifiedAstarUsingVisGraphRelaxation
 		this (theAutomata, manualExpansion, buildSchedule, false, gui);
     }
 
-	//Tillf
 	public ModifiedAstarUsingVisGraphRelaxation(Automata theAutomata, boolean manualExpansion, boolean buildSchedule, boolean relaxFromNodes, ScheduleDialog gui) 
 		throws Exception 
 	{
 			super(theAutomata, manualExpansion, buildSchedule, gui);
 			this.relaxFromNodes = relaxFromNodes;
-
-			cycleTimes = new int[plantAutomata.size()];
-			for (int i=0; i<cycleTimes.length; i++)
-			{
-				State initState = plantAutomata.getAutomatonAt(i).getInitialState();
-				cycleTimes[i] = remainingCosts[i][initState.getIndex()] + initState.getCost();
-			}
     }
 
-	public void init (boolean manualExpansion)
+	public void init()
 		throws Exception
 	{
-		super.init(manualExpansion);
+		super.init();
 
 		visGraphRelax = new Hashtable<String, Integer>();
 
+		cycleTimes = new int[plantAutomata.size()];
+		for (int i=0; i<cycleTimes.length; i++)
+		{
+			State initState = plantAutomata.getAutomatonAt(i).getInitialState();
+			cycleTimes[i] = remainingCosts[i][initState.getIndex()] + initState.getCost();
+		}
+
 		timer.restart();
 		preprocessVisibilityGraphs();
-		infoStr += "\tvisibility graphs calculated in " + timer.elapsedTime() + "ms\n";
+		infoStr += "\tvisibility graphs calculated in " + timer.elapsedTime() + "ms\n"; 
 	}
 
 	public int calcEstimatedCost(int[] node)
@@ -98,6 +95,19 @@ public class ModifiedAstarUsingVisGraphRelaxation
 					VisGraphScheduler relaxScheduler = visibilityGraphs.get(visibilityGraphsKey);
 				
 					double currVisibilityRelaxation = relaxScheduler.scheduleFrom(new double[]{effTimePoint[i], effTimePoint[j]});
+
+					try 
+					{
+						while (!relaxScheduler.schedulingDone())
+						{
+							astarThread.sleep(1);
+						}
+					}
+					catch (InterruptedException ex)
+					{
+						logger.error("INTERRUPTED_EXCEPTION in AbstractAstar.calcEstimatedCost()...");
+						throw(ex);
+					}
 						
 					if (visibilityRelaxation < currVisibilityRelaxation)
 						visibilityRelaxation = currVisibilityRelaxation;

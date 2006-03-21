@@ -48,19 +48,29 @@ public class NodeExpander
 		plantAutomata = theAutomata.getPlantAutomata();
 
 		if (!manualExpansion)
+		{
 			initOnlineSynchronizer();
-		else {	   
+		}
+		else 
+		{	   
 			for (int i=0; i<theAutomata.size(); i++)
+			{
 				theAutomata.getAutomatonAt(i).remapStateIndices();
+			}
+
 			initSpecEventTable();
 		}
     }
 
     public Collection expandNode(int[] node, int[] activeAutomataIndex) {
 		if (!manualExpansion) 
+		{
 			return expandNodeWithSupremica(node, activeAutomataIndex);
+		}
 		else
+		{
 			return expandNodeManually(node, activeAutomataIndex);
+		}
     }
 
 
@@ -72,14 +82,18 @@ public class NodeExpander
     protected void initSpecEventTable() {
 		specEventTable = new Hashtable<LabeledEvent, Integer>();
 
-		for (int i=0; i<theAutomata.size(); i++) {
+		for (int i=0; i<theAutomata.size(); i++) 
+		{
 			Automaton theAuto = theAutomata.getAutomatonAt(i);
 	    
-			if (theAuto.isSpecification()) {
+			if (theAuto.isSpecification()) 
+			{
 				Iterator<LabeledEvent> eventIt = theAuto.getAlphabet().iterator();
 
 				while(eventIt.hasNext()) 
+				{
 					specEventTable.put(eventIt.next(), i);
+				}
 			}
 		}
     }
@@ -87,26 +101,33 @@ public class NodeExpander
     public Collection expandNodeManually(int[] node, int[] activeAutomataIndex) {
 		ArrayList children = new ArrayList();
 
-		for (int i=0; i<activeAutomataIndex.length; i++) {
+		for (int i=0; i<activeAutomataIndex.length; i++)
+		{
 			int automatonIndex = activeAutomataIndex[i]; 
 			int stateIndex = node[automatonIndex];
 
 			State st = theAutomata.getAutomatonAt(automatonIndex).getStateWithIndex(stateIndex);
 			Iterator<Arc> arcIt = st.outgoingArcsIterator();
 
-			while (arcIt.hasNext()) {
+			while (arcIt.hasNext()) 
+			{
 				LabeledEvent currEvent = arcIt.next().getEvent();
 				Object currSpecIndexObj = specEventTable.get(currEvent);
 
 				if (currSpecIndexObj == null) 
+				{
 					children.add(newNode(node, new int[]{i}, new int[]{st.nextState(currEvent).getIndex()}, st.nextState(currEvent).getCost()));
-				else {
+				}
+				else 
+				{
 					int currSpecIndex = ((Integer)currSpecIndexObj).intValue();
 					Iterator<State> enabledStatesIt = theAutomata.getAutomatonAt(currSpecIndex).statesThatEnableEventIterator(currEvent.getLabel());
 
-					while (enabledStatesIt.hasNext()) {
+					while (enabledStatesIt.hasNext()) 
+					{
 						State specState = enabledStatesIt.next();
-						if (node[currSpecIndex] == specState.getIndex()) {
+						if (node[currSpecIndex] == specState.getIndex()) 
+						{
 							int[] changedIndices = new int[]{activeAutomataIndex[i], currSpecIndex};
 							int[] newStateIndices = new int[]{st.nextState(currEvent).getIndex(), specState.nextState(currEvent).getIndex()};
 
@@ -182,10 +203,14 @@ public class NodeExpander
 		int[] nextStateIndices = new int[theAutomata.size() + AutomataIndexFormHelper.STATE_EXTRA_DATA];
 
 		for (int k=0; k<nextStateIndices.length; k++) 
+		{
 			nextStateIndices[k] = node[k];
+		}
 
 		for (int i=0; i<changedIndices.length; i++)
+		{
 			nextStateIndices[changedIndices[i]] = newStateIndices[i];
+		}
 
 		int[] newCosts = sched.updateCosts(getCosts(node), changedIndices[0], newCost);
 
@@ -234,8 +259,10 @@ public class NodeExpander
 				int[] nextStateIndex = onlineSynchronizer.doTransition(currStateIndex, currOutgoingEvents[i]);
 		
 				int changedIndex = -1;
-				for (int k=0; k<activeAutomataIndex.length; k++) {
-					if (nextStateIndex[activeAutomataIndex[k]] != currStateIndex[activeAutomataIndex[k]]) {
+				for (int k=0; k<activeAutomataIndex.length; k++)
+				{
+					if (nextStateIndex[activeAutomataIndex[k]] != currStateIndex[activeAutomataIndex[k]]) 
+					{
 						changedIndex = k;
 						break;
 					}
@@ -244,7 +271,8 @@ public class NodeExpander
 				if (changedIndex > -1) { // || activeAutomataIndex.length == plantAutomata.size()) {
 					Integer currKey = sched.getKey(nextStateIndex);
 		    
-					if (!childNodes.contains(currKey)) {
+					if (!childNodes.contains(currKey)) 
+					{
 						int newCost = plantAutomata.getAutomatonAt(changedIndex).getStateWithIndex(nextStateIndex[activeAutomataIndex[changedIndex]]).getCost();
 						int[] newCosts = sched.updateCosts(getCosts(node), changedIndex, newCost);
 			

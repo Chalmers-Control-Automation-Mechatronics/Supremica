@@ -328,7 +328,6 @@ public class Milp
 			}
 		}
 
-		logger.info("OPTIMAL MAKESPAN: " + makespan + ".............................");
 		logger.info("Time to build the schedule: " + timer.elapsedTime() + "ms ");
 
 		synchronized (this)
@@ -1082,13 +1081,14 @@ public class Milp
 
 			str = r.readLine();
 		}
+
+		logger.info("OPTIMAL MAKESPAN: " + makespan + ".............................");
 	}
 
 	private void callMilpSolver()
 		throws Exception
 	{
 		logger.info("The MILP-solver started....");
-
 		// Defines the name of the .exe-file as well the arguments (.mod and .sol file names)
 		String[] cmds = new String[5];
 		cmds[0] = "C:\\Program Files\\glpk\\bin\\glpsol.exe";

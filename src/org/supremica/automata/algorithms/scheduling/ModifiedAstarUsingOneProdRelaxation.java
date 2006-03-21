@@ -18,23 +18,16 @@ public class ModifiedAstarUsingOneProdRelaxation
 	public ModifiedAstarUsingOneProdRelaxation(Automata theAutomata, boolean manualExpansion, boolean buildSchedule, ScheduleDialog gui) 
 		throws Exception 
 	{
-			super(theAutomata, manualExpansion, buildSchedule, gui);
+		this(theAutomata, manualExpansion, buildSchedule, false, gui);
     }
 
-	public int calcEstimatedCost(int[] node)
-			throws Exception
+	public ModifiedAstarUsingOneProdRelaxation(Automata theAutomata, boolean manualExpansion, boolean buildSchedule, boolean isRelaxationProvider, ScheduleDialog gui) 
+		throws Exception 
 	{
-		int[] parent = getParent(node);
-	    
-		int fNode = node[ACCUMULATED_COST_INDEX] + getOneProdRelaxation(node);
-		int fParent = parent[ACCUMULATED_COST_INDEX] + getOneProdRelaxation(parent);
-
-		// The following code inside the if-loop is needed to ensure consistency of the heuristic
-		if (fParent > fNode)
-			return fParent;
-		else
-			return fNode;
-	}
+		super(theAutomata, manualExpansion, buildSchedule, gui);
+		
+		this.isRelaxationProvider = isRelaxationProvider;
+    }
 
 	/**
 	 * This method calculates the remaining cost for each robot/plant. The maximum remaining
@@ -43,7 +36,9 @@ public class ModifiedAstarUsingOneProdRelaxation
 	 * @param int[] node - the current node
 	 * @return int - the heuristic function, h(n), that guides the search, in this case it is the "1-product relaxation"
 	 */
-    private int getOneProdRelaxation(int[] node) {
+    int getRelaxation(int[] node) 
+		throws Exception
+	{
 		int estimate = 0;
 		int[] currCosts = expander.getCosts(node);
 	

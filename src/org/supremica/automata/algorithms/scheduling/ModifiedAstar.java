@@ -53,13 +53,13 @@ public class ModifiedAstar
 	}
 
 	/**
-	 * The defalut estimation of the remaining cost. This method is overriden 
+	 * The defalut relaxation, used for estimation of the remaining cost. This method is overriden 
 	 * in the subclasses. Is used if no relaxation is chosen (i.e. brute force search).
 	 */
-	public int calcEstimatedCost(int[] node)
+	int getRelaxation(int[] node)
 		throws Exception
 	{
-		return node[ACCUMULATED_COST_INDEX];
+		return 0; 
 	}
 
 	/**
@@ -80,6 +80,7 @@ public class ModifiedAstar
 				while (childIter.hasNext()) 
 				{
 					int[] nextNode = (int[])childIter.next();
+					logger.info("nextNode = " + printArray(nextNode));
 					
 					// Calculate the estimate function of the expanded node and store it at the appropriate position
 					nextNode[ESTIMATE_INDEX] = calcEstimatedCost(nextNode);
@@ -87,6 +88,8 @@ public class ModifiedAstar
 					openTree.add(nextNode);
 				}
 			}
+			else
+				logger.info("currNodeIsAddedToClosed");
 		}
 		catch (Exception e)
 		{
@@ -101,7 +104,7 @@ public class ModifiedAstar
 	 * int[] initialNode is thus [initialStates.getIndex() AutomataIndexFormHelper-info 
 	 * null initialStates.getCost() 0 -1].
 	 */
-    protected int[] makeInitialNode() 
+    protected int[] makeInitialNode()
 	{
 		int[] initialStates = AutomataIndexFormHelper.createState(theAutomata.size());
 		int[] initialCosts = new int[getActiveLength() + 2];

@@ -20,6 +20,8 @@ public class VisGraphScheduler
 	private static final int PARENT_INDEX = SELF_INDEX + 1;
 	private static final int G_INDEX = PARENT_INDEX + 1;
 	private static final int F_INDEX = G_INDEX + 1;
+
+	private static final String ACCEPTING_NODE_NOT_FOUND_EXCEPTION = "Accepting node not found during scheduling";
 	
 	/** The involved automata, plants, zone specifications */
 	private Automata robots, zones;
@@ -61,9 +63,14 @@ public class VisGraphScheduler
 	 * (is needed for correct functionning when this thread is started from
 	 * another thread for relaxation purposes).
 	 */
-	private boolean isInitialized = false;
+	private volatile boolean isInitialized = false;
 
-	
+	/** 
+	 * Assures that the scheduling is done (is needed for correct functionning when 
+	 * this thread is started from another thread for relaxation purposes).
+	 */
+	private volatile boolean schedulingDone = false;
+
 	public VisGraphScheduler (Automata theAutomata, boolean toDrawVisibilityGraph, ScheduleDialog gui)
 		throws Exception
 	{
@@ -143,6 +150,8 @@ public class VisGraphScheduler
 	public void schedule()
 		throws Exception
 	{
+		schedulingDone = false;
+
 		timer.restart();
 
 		openTree.clear();
@@ -176,8 +185,17 @@ public class VisGraphScheduler
 			}
 			else
 			{
-				return;
+				break;
 			}
+		}
+
+		schedulingDone = true;
+
+		// If an accepting node could not be found although the scheduling process has not been interrupted,
+		// then something is wrong (unless this method is called from scheduleFrom())
+		if (isRunning && !isAcceptingNode(currNode))
+		{
+			throw new Exception(ACCEPTING_NODE_NOT_FOUND_EXCEPTION);
 		}
 	}
 
@@ -190,8 +208,9 @@ public class VisGraphScheduler
 	public synchronized double scheduleFrom(double[] fromTimes)
 		throws Exception
 	{
-		double distanceToGoal = calcDistance(fromTimes, goalTimes);
+		int exceptionCounter = 0;
 
+		double distanceToGoal = calcDistance(fromTimes, goalTimes);
 		if (distanceToGoal == 0)
 		{
 			return 0;
@@ -199,7 +218,7 @@ public class VisGraphScheduler
 		
 		// Removes the previous start vertex
 		vertices.remove(0);
-
+		
 		// Initializes the new start vertex
 		double[] newStartVertex = new double[fromTimes.length + 1];
 		for (int i=0; i<fromTimes.length; i++)
@@ -207,13 +226,27 @@ public class VisGraphScheduler
 			newStartVertex[i] = fromTimes[i];
 		}
 		newStartVertex[newStartVertex.length - 1] = distanceToGoal;
-
+		
 		// Adds the new start vertex to the vertices-collection
 		vertices.add(0, newStartVertex);
 		
 		// ... and off we go... 
-		schedule();
-
+		try
+		{
+			schedule();
+		}
+		catch (Exception e)
+		{
+			if (e.getMessage().equals(ACCEPTING_NODE_NOT_FOUND_EXCEPTION))
+			{
+				return Double.MAX_VALUE;
+			}
+			else
+			{
+				throw e;
+			}
+		}
+		
 		// The optimal solution is returned
 		return closedTree.get(new Double(vertices.size() - 1))[G_INDEX];
 	}
@@ -453,5 +486,10 @@ public class VisGraphScheduler
 	public boolean isInitialized()
 	{
 		return isInitialized;
+	}
+
+	public boolean schedulingDone()
+	{
+		return schedulingDone;
 	}
 }

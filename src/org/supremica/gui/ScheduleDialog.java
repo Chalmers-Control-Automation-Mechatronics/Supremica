@@ -20,18 +20,22 @@ public class ScheduleDialog
 	private static final String VIS_GRAPH = "Visibility Graph";
 
 	private static final String ONE_PRODUCT_RELAXATION = "1-product relax";
+	private static final String TWO_PRODUCT_RELAXATION = "2-product relax";
 	private static final String VIS_GRAPH_TIME_RELAXATION = "visibility graph (time)";
 	private static final String VIS_GRAPH_NODE_RELAXATION = "visibility graph (node)";
 
     private static final long serialVersionUID = 1L;
     private static final String[] optiMethodNames = new String[]{MODIFIED_A_STAR, MODIFIED_VGA_STAR, MILP, VIS_GRAPH}; //, "Modified IDA*", "Modified SMA*"};
-    private static final String[] heuristicsNames = new String[]{ONE_PRODUCT_RELAXATION, VIS_GRAPH_TIME_RELAXATION, VIS_GRAPH_NODE_RELAXATION, "brute force"}; //"2-product relax",
+    private static final String[] heuristicsNames = new String[]{ONE_PRODUCT_RELAXATION, TWO_PRODUCT_RELAXATION, VIS_GRAPH_TIME_RELAXATION, VIS_GRAPH_NODE_RELAXATION, "brute force"}; 
     private static Logger logger = LoggerFactory.createLogger(ScheduleDialog.class);
     private JComboBox optiMethodsBox, heuristicsBox;
     private JCheckBox nodeExpander, buildAutomaton, vgDrawer;
     private int memoryCapacity;
     private JTextField memoryCapacityField;
 	private JButton okButton, cancelButton;
+	JButton autoTestButton; //Tillf
+	public ScheduleDialog dia = this; //Tillf
+	private java.util.ArrayList filesToSchedule = new java.util.ArrayList();
 
 	Scheduler sched = null;
 	public Thread milpThread = null;
@@ -158,6 +162,26 @@ public class ScheduleDialog
 					}
 				}
 			}); 
+
+		// Is only used for automatic scheduling of several files (a whole directory)
+		autoTestButton = new JButton("AutoTest");
+		buttonPanel.add(autoTestButton);
+		autoTestButton.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					java.io.File rootDir = new java.io.File("Y:\\xml-files\\Domenicos\\TestCasesNrobots\\AK\\Test");
+					java.io.File[] files = rootDir.listFiles();
+
+					for (int i=0; i<files.length; i++)
+					{
+						filesToSchedule.add(files[i]);
+					}
+
+					autoTestButton.setEnabled(false);
+					done();
+				}
+			});
     }
 
     /**
@@ -204,6 +228,10 @@ public class ScheduleDialog
 				{
 					sched = new ModifiedAstarUsingOneProdRelaxation(ActionMan.getGui().getSelectedAutomata(), nodeExpander.isSelected(), buildAutomaton.isSelected(), this);
 				}
+				else if (selectedHeuristic.equals(TWO_PRODUCT_RELAXATION))
+				{
+					sched = new ModifiedAstarUsingTwoProdRelaxation(ActionMan.getGui().getSelectedAutomata(), nodeExpander.isSelected(), buildAutomaton.isSelected(), this);
+				}
 				else
 				{
 					sched = new ModifiedAstar(ActionMan.getGui().getSelectedAutomata(), (String) heuristicsBox.getSelectedItem(), nodeExpander.isSelected(), false, buildAutomaton.isSelected(), this);
@@ -227,7 +255,9 @@ public class ScheduleDialog
 // 			else if (optiMethodsBox.getSelectedItem().equals("Modified SMA*"))
 // 				throw new Exception("SMA* not implemented yet...");
 			else 
+			{
 				throw new Exception("Unknown optimization method");
+			}
 		}
 		catch (Exception excp) 
 		{
@@ -241,9 +271,40 @@ public class ScheduleDialog
      */
     public void done()
     {
-		setVisible(false);
-		dispose();
-		getParent().repaint();
+		if (autoTestButton.isEnabled())
+		{
+			setVisible(false);
+			dispose();
+			getParent().repaint();
+		}
+		else
+		{
+			if (filesToSchedule.size() > 0)
+			{
+				getParent().repaint();
+
+				java.io.File currFile = (java.io.File)filesToSchedule.remove(0);
+
+				if (currFile.getName().contains(".xml"))
+				{
+					ActionMan.automataDeleteAll_actionPerformed(ActionMan.getGui());
+					ActionMan.openFile(ActionMan.getGui(), currFile);
+					ActionMan.getGui().invertSelection();
+					getParent().repaint();
+					
+					doit();
+				}
+				else
+				{
+					done();
+				}
+			}
+			else 
+			{
+				autoTestButton.setEnabled(true);
+				done();
+			}
+		}
     }
 
     void readMemoryCapacity() {
