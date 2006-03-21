@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   JAXBTestCase
 //###########################################################################
-//# $Id: CompilerTest.java,v 1.4 2006-02-21 21:50:40 robi Exp $
+//# $Id: CompilerTest.java,v 1.5 2006-03-21 22:13:30 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -146,10 +146,22 @@ public class CompilerTest
     compile("nodegroup4");
   }
 
+  public void testCompile_manwolfgoatcabbage()
+    throws IOException, WatersException
+  {
+    compile("manwolfgoatcabbage");
+  }
+
   public void testCompile_markus2()
     throws IOException, WatersException
   {
     compile("markus2");
+  }
+
+  public void testCompile_PLanTS()
+    throws IOException, WatersException
+  {
+    compile("PLanTS");
   }
 
   public void testCompile_small_factory_2()
@@ -168,6 +180,12 @@ public class CompilerTest
     throws IOException, WatersException
   {
     compile("tictactoe");
+  }
+
+  public void testCompile_winemerchant()
+    throws IOException, WatersException
+  {
+    compile("winemerchant");
   }
 
 

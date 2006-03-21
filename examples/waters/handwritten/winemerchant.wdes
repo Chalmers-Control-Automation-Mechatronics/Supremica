@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ProductDES Name="WineMerchant" xmlns="http://waters.sourceforge.net/xsd/des">
+<EventList>
+<Event Kind="CONTROLLABLE" Name="e12"/>
+<Event Kind="CONTROLLABLE" Name="e13"/>
+<Event Kind="CONTROLLABLE" Name="e21"/>
+<Event Kind="CONTROLLABLE" Name="e23"/>
+<Event Kind="CONTROLLABLE" Name="e31"/>
+<Event Kind="CONTROLLABLE" Name="e32"/>
+<Event Kind="PROPOSITION" Name="omega"/>
+</EventList>
+<AutomataList>
+<Automaton Kind="PLANT" Name="WineMerchant">
+<EventRefList>
+<EventRef Name="e12"/>
+<EventRef Name="e13"/>
+<EventRef Name="e21"/>
+<EventRef Name="e23"/>
+<EventRef Name="e31"/>
+<EventRef Name="e32"/>
+<EventRef Name="omega"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="008"/>
+<State Name="017"/>
+<State Name="026"/>
+<State Name="035"/>
+<State Name="044">
+<EventRefList>
+<EventRef Name="omega"/>
+</EventRefList>
+</State>
+<State Name="053"/>
+<State Name="107"/>
+<State Name="152"/>
+<State Name="206"/>
+<State Name="251"/>
+<State Name="305"/>
+<State Name="314"/>
+<State Name="323"/>
+<State Name="332"/>
+<State Name="341"/>
+<State Name="350"/>
+</StateList>
+<TransitionList>
+<Transition Event="e31" Source="008" Target="305"/>
+<Transition Event="e32" Source="008" Target="053"/>
+<Transition Event="e21" Source="017" Target="107"/>
+<Transition Event="e23" Source="017" Target="008"/>
+<Transition Event="e31" Source="017" Target="314"/>
+<Transition Event="e32" Source="017" Target="053"/>
+<Transition Event="e21" Source="026" Target="206"/>
+<Transition Event="e23" Source="026" Target="008"/>
+<Transition Event="e31" Source="026" Target="323"/>
+<Transition Event="e32" Source="026" Target="053"/>
+<Transition Event="e21" Source="035" Target="305"/>
+<Transition Event="e23" Source="035" Target="008"/>
+<Transition Event="e31" Source="035" Target="332"/>
+<Transition Event="e32" Source="035" Target="053"/>
+<Transition Event="e21" Source="044" Target="314"/>
+<Transition Event="e23" Source="044" Target="008"/>
+<Transition Event="e31" Source="044" Target="341"/>
+<Transition Event="e32" Source="044" Target="053"/>
+<Transition Event="e21" Source="053" Target="323"/>
+<Transition Event="e23" Source="053" Target="008"/>
+<Transition Event="e31" Source="053" Target="350"/>
+<Transition Event="e12" Source="107" Target="017"/>
+<Transition Event="e13" Source="107" Target="008"/>
+<Transition Event="e31" Source="107" Target="305"/>
+<Transition Event="e32" Source="107" Target="152"/>
+<Transition Event="e13" Source="152" Target="053"/>
+<Transition Event="e21" Source="152" Target="332"/>
+<Transition Event="e23" Source="152" Target="107"/>
+<Transition Event="e31" Source="152" Target="350"/>
+<Transition Event="e12" Source="206" Target="026"/>
+<Transition Event="e13" Source="206" Target="008"/>
+<Transition Event="e31" Source="206" Target="305"/>
+<Transition Event="e32" Source="206" Target="251"/>
+<Transition Event="e13" Source="251" Target="053"/>
+<Transition Event="e21" Source="251" Target="341"/>
+<Transition Event="e23" Source="251" Target="206"/>
+<Transition Event="e31" Source="251" Target="350"/>
+<Transition Event="e12" Source="305" Target="035"/>
+<Transition Event="e13" Source="305" Target="008"/>
+<Transition Event="e32" Source="305" Target="350"/>
+<Transition Event="e12" Source="314" Target="044"/>
+<Transition Event="e13" Source="314" Target="017"/>
+<Transition Event="e23" Source="314" Target="305"/>
+<Transition Event="e32" Source="314" Target="350"/>
+<Transition Event="e12" Source="323" Target="053"/>
+<Transition Event="e13" Source="323" Target="026"/>
+<Transition Event="e23" Source="323" Target="305"/>
+<Transition Event="e32" Source="323" Target="350"/>
+<Transition Event="e12" Source="332" Target="152"/>
+<Transition Event="e13" Source="332" Target="035"/>
+<Transition Event="e23" Source="332" Target="305"/>
+<Transition Event="e32" Source="332" Target="350"/>
+<Transition Event="e12" Source="341" Target="251"/>
+<Transition Event="e13" Source="341" Target="044"/>
+<Transition Event="e23" Source="341" Target="305"/>
+<Transition Event="e32" Source="341" Target="350"/>
+<Transition Event="e13" Source="350" Target="053"/>
+<Transition Event="e23" Source="350" Target="305"/>
+</TransitionList>
+</Automaton>
+</AutomataList>
+</ProductDES>
+

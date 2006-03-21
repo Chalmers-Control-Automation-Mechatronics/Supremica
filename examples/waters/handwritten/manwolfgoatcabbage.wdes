@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ProductDES Name="Waters" xmlns="http://waters.sourceforge.net/xsd/des">
+<EventList>
+<Event Kind="CONTROLLABLE" Name="m"/>
+<Event Kind="CONTROLLABLE" Name="mb"/>
+<Event Kind="CONTROLLABLE" Name="mc"/>
+<Event Kind="CONTROLLABLE" Name="mcb"/>
+<Event Kind="CONTROLLABLE" Name="mg"/>
+<Event Kind="CONTROLLABLE" Name="mgb"/>
+<Event Kind="CONTROLLABLE" Name="mw"/>
+<Event Kind="CONTROLLABLE" Name="mwb"/>
+<Event Kind="PROPOSITION" Name="omega"/>
+</EventList>
+<AutomataList>
+<Automaton Kind="PLANT" Name="Cabbage">
+<EventRefList>
+<EventRef Name="mc"/>
+<EventRef Name="mcb"/>
+<EventRef Name="omega"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="cl"/>
+<State Name="cr">
+<EventRefList>
+<EventRef Name="omega"/>
+</EventRefList>
+</State>
+</StateList>
+<TransitionList>
+<Transition Event="mc" Source="cl" Target="cr"/>
+<Transition Event="mcb" Source="cr" Target="cl"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="Goat">
+<EventRefList>
+<EventRef Name="mg"/>
+<EventRef Name="mgb"/>
+<EventRef Name="omega"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="gl"/>
+<State Name="gr">
+<EventRefList>
+<EventRef Name="omega"/>
+</EventRefList>
+</State>
+</StateList>
+<TransitionList>
+<Transition Event="mg" Source="gl" Target="gr"/>
+<Transition Event="mgb" Source="gr" Target="gl"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="Man">
+<EventRefList>
+<EventRef Name="m"/>
+<EventRef Name="mb"/>
+<EventRef Name="mc"/>
+<EventRef Name="mcb"/>
+<EventRef Name="mg"/>
+<EventRef Name="mgb"/>
+<EventRef Name="mw"/>
+<EventRef Name="mwb"/>
+<EventRef Name="omega"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="ml"/>
+<State Name="mr">
+<EventRefList>
+<EventRef Name="omega"/>
+</EventRefList>
+</State>
+</StateList>
+<TransitionList>
+<Transition Event="m" Source="ml" Target="mr"/>
+<Transition Event="mc" Source="ml" Target="mr"/>
+<Transition Event="mg" Source="ml" Target="mr"/>
+<Transition Event="mw" Source="ml" Target="mr"/>
+<Transition Event="mb" Source="mr" Target="ml"/>
+<Transition Event="mcb" Source="mr" Target="ml"/>
+<Transition Event="mgb" Source="mr" Target="ml"/>
+<Transition Event="mwb" Source="mr" Target="ml"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="Wolf">
+<EventRefList>
+<EventRef Name="mw"/>
+<EventRef Name="mwb"/>
+<EventRef Name="omega"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="wl"/>
+<State Name="wr">
+<EventRefList>
+<EventRef Name="omega"/>
+</EventRefList>
+</State>
+</StateList>
+<TransitionList>
+<Transition Event="mw" Source="wl" Target="wr"/>
+<Transition Event="mwb" Source="wr" Target="wl"/>
+</TransitionList>
+</Automaton>
+</AutomataList>
+</ProductDES>
+
