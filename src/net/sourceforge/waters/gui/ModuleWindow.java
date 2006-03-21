@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleWindow
 //###########################################################################
-//# $Id: ModuleWindow.java,v 1.28 2006-03-20 22:50:27 flordal Exp $
+//# $Id: ModuleWindow.java,v 1.29 2006-03-21 08:31:02 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -112,7 +112,7 @@ import org.supremica.automata.Project;
  */
 public class ModuleWindow
 	extends JFrame
-	implements ActionListener, FocusListener, UndoInterface
+	implements ActionListener, FocusListener, UndoInterface, WindowListener
 {
 	// Limits the functionality of Waters to just drawing simple components 
 	private static boolean limited = false;
@@ -121,8 +121,12 @@ public class ModuleWindow
 	//# Constructor
 	public ModuleWindow(String title)
 	{
+		// Don't close the window without doing some stuff first...
+		//setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		addWindowListener(this);
+
 		setTitle(title);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		module = new ModuleSubject(title, null);
 		debugPane = createDebugPane();
 
@@ -807,44 +811,50 @@ public class ModuleWindow
 
 		if (e.getSource() == FileSaveAsMenu)
 		{
-			fileSaveChooser.setFileFilter(new WmodFileFilter());			
-			int returnVal = fileSaveChooser.showSaveDialog(this);
-
-			if (returnVal == JFileChooser.APPROVE_OPTION)
-			{
-				File file = fileSaveChooser.getSelectedFile();
-				String ext = null;
-				String s = file.getName();
-				int i = s.lastIndexOf('.');
-				if (i > 0 &&  i < s.length() - 1) 
-				{
-					ext = s.substring(i+1).toLowerCase();
-				}
-				if (ext == null || !ext.equals(WmodFileFilter.WMOD))
-				{
-					file = new File(file.getPath() + "." + WmodFileFilter.WMOD);
-				}
-
-				saveWmodFile(file);
-
-				modified = false;
-
-				logEntry("File saved: " + file);
-			}
-			else
-			{
-				// SaveAs cancelled...  do nothing
-			}
+			saveAs();
 		}
 
 		if (e.getSource() == FileExitMenu)
 		{
-			System.exit(0);
+			//System.exit(0);
+			processWindowEvent(new WindowEvent(this,WindowEvent.WINDOW_CLOSING));
 		}
 
 		if (e.getSource() == analysisExportSupremicaMenu)
 		{
 			exportToSupremica();
+		}
+	}
+
+	private void saveAs()
+	{
+		fileSaveChooser.setFileFilter(new WmodFileFilter());			
+		int returnVal = fileSaveChooser.showSaveDialog(this);
+		
+		if (returnVal == JFileChooser.APPROVE_OPTION)
+		{
+			File file = fileSaveChooser.getSelectedFile();
+			String ext = null;
+			String s = file.getName();
+			int i = s.lastIndexOf('.');
+			if (i > 0 &&  i < s.length() - 1) 
+			{
+				ext = s.substring(i+1).toLowerCase();
+			}
+			if (ext == null || !ext.equals(WmodFileFilter.WMOD))
+			{
+				file = new File(file.getPath() + "." + WmodFileFilter.WMOD);
+			}
+			
+			saveWmodFile(file);
+			
+			modified = false;
+			
+			logEntry("File saved: " + file);
+		}
+		else
+		{
+			// SaveAs cancelled...  do nothing
 		}
 	}
 
@@ -1005,6 +1015,23 @@ public class ModuleWindow
 		}
 	}
 
+	// WindowListener interface
+	public void windowActivated(WindowEvent e) {}
+	public void windowClosed(WindowEvent e) {}
+	public void windowClosing(WindowEvent e)
+	{
+		//if (modified)
+		{
+			int yesNo = JOptionPane.showConfirmDialog(this, "Do you want to save the module before exiting?", "Save before exit?", JOptionPane.YES_NO_OPTION);
+			if (yesNo == JOptionPane.YES_OPTION)
+				saveAs(); 
+		}
+		System.exit(0); 
+	}
+	public void windowDeactivated(WindowEvent e) {}
+	public void windowDeiconified(WindowEvent e) {}
+	public void windowIconified(WindowEvent e) {}
+	public void windowOpened(WindowEvent e) {}
 
 	//########################################################################
 	//# Access the Module
