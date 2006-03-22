@@ -230,8 +230,7 @@ public class ScheduleDialog
 				}
 				else if (selectedHeuristic.equals(TWO_PRODUCT_RELAXATION))
 				{
-					logger.error("ModifiedAstarUsingOneProdRelaxation is not in the CVS.");
-					//sched = new ModifiedAstarUsingTwoProdRelaxation(ActionMan.getGui().getSelectedAutomata(), nodeExpander.isSelected(), buildAutomaton.isSelected(), this);
+					sched = new ModifiedAstarUsingTwoProdRelaxation(ActionMan.getGui().getSelectedAutomata(), nodeExpander.isSelected(), buildAutomaton.isSelected(), this);
 				}
 				else
 				{
