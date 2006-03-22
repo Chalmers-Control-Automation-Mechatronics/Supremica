@@ -1243,7 +1243,7 @@
                                         <SimpleIdentifier Name="i"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point X="-1" Y="2"/>
+                                        <Point X="7" Y="-14"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <StartPointGeometry>
@@ -1282,7 +1282,7 @@
                                         <IntConstant Value="1"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point X="-114" Y="-48"/>
+                                        <Point X="-154" Y="-56"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <StartPointGeometry>
@@ -1306,7 +1306,7 @@
                                         <SimpleIdentifier Name="i"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point X="2" Y="-4"/>
+                                        <Point X="6" Y="-5"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <StartPointGeometry>
@@ -1354,7 +1354,7 @@
                                         <SimpleIdentifier Name="i"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point X="-10" Y="-30"/>
+                                        <Point X="-12" Y="-32"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <StartPointGeometry>
@@ -1432,7 +1432,7 @@
                                         <IntConstant Value="3"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point X="-30" Y="41"/>
+                                        <Point X="-15" Y="39"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <StartPointGeometry>
@@ -1471,7 +1471,7 @@
                                         <IntConstant Value="2"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point X="-203" Y="12"/>
+                                        <Point X="-237" Y="11"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <StartPointGeometry>
@@ -1554,7 +1554,7 @@
                                         </EventList>
                                     </ForeachEvent>
                                     <LabelGeometry Anchor="NW">
-                                        <Point X="-257" Y="6"/>
+                                        <Point X="-260" Y="-1"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <StartPointGeometry>
@@ -1637,7 +1637,7 @@
                                         </EventList>
                                     </ForeachEvent>
                                     <LabelGeometry Anchor="NW">
-                                        <Point X="-177" Y="18"/>
+                                        <Point X="-270" Y="17"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <StartPointGeometry>
@@ -1720,7 +1720,7 @@
                                         </EventList>
                                     </ForeachEvent>
                                     <LabelGeometry Anchor="NW">
-                                        <Point X="-25" Y="18"/>
+                                        <Point X="-53" Y="17"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <StartPointGeometry>

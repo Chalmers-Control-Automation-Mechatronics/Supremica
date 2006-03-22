@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorWindow
 //###########################################################################
-//# $Id: EditorWindow.java,v 1.25 2006-03-21 21:58:04 flordal Exp $
+//# $Id: EditorWindow.java,v 1.26 2006-03-22 09:30:53 flordal Exp $
 //###########################################################################
 
 
@@ -308,10 +308,11 @@ public class EditorWindow
 	{
 		EventEditorDialog diag = new EventEditorDialog(mModuleWindow);
 		EventDeclSubject newEvent = diag.getEventDeclSubject();
-		final EventTableModel model = (EventTableModel) mEventPane.getModel();
-		model.addIdentifier(new SimpleIdentifierSubject(newEvent.getName()));
-		//final IndexedList<EventDeclSubject> decls = mModule.getEventDeclListModifiable();
-		//decls.add(newEvent);
+		if (newEvent != null)
+		{
+			final EventTableModel model = (EventTableModel) mEventPane.getModel();
+			model.addIdentifier(new SimpleIdentifierSubject(newEvent.getName()));
+		}
 	}
 
 	//#######################################################################
