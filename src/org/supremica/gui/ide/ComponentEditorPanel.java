@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ComponentEditorPanel
 //###########################################################################
-//# $Id: ComponentEditorPanel.java,v 1.20 2006-01-23 02:06:23 siw4 Exp $
+//# $Id: ComponentEditorPanel.java,v 1.21 2006-03-22 09:19:08 flordal Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -181,8 +181,12 @@ public class ComponentEditorPanel
 		toClipboard.copyToClipboard();
 	}
 
-	public void createPDF(File f)
-	{
 
-	}
+	public void exportPDF() {}
+
+	public void exportPostscript() {}
+
+	public void printFigure() {}
+
+	public void createEvent() {}
 }
