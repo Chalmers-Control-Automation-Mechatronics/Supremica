@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorLabelGroup
 //###########################################################################
-//# $Id: EditorLabelGroup.java,v 1.26 2006-03-21 21:58:04 flordal Exp $
+//# $Id: EditorLabelGroup.java,v 1.27 2006-03-22 16:05:55 flordal Exp $
 //###########################################################################
 
 
@@ -54,9 +54,6 @@ public class EditorLabelGroup
 	public void removeFromSurface(EditorSurface e)
 	{
 		e.remove(panel);
-		/*
-		e.remove(shadowPanel);
-		*/
 	}
 
 	public EditorEdge getParent()
@@ -249,9 +246,6 @@ public class EditorLabelGroup
 			y += parent.getTPointY();    // - ((double)(verticalA / 2) * panel.getHeight()));
 		}	
 		panel.setLocation(x, y);
-		/*
-		shadowPanel.setLocation(x+2, y+2);
-		*/
 
 		/*
 		// Draw shadow
@@ -280,20 +274,6 @@ public class EditorLabelGroup
 			{
 				l.setForeground(Color.RED);
 			}
-
-			/*
-			// Draw shadow
-			if (isHighlighted())
-			{
-				//l.setOpaque(true);
-				l.setBackground(getShadowColor(selected));
-			}
-			else
-			{
-				//l.setOpaque(false);
-				l.setBackground(EditorColor.INVISIBLE);
-			}
-			*/
 		}
 	}
 
@@ -408,9 +388,6 @@ public class EditorLabelGroup
 		l.setBackground(getShadowColor(false));
 
 		panel.add(l);
-		/*
-		shadowPanel.add(new JLabel(l.getText()));
-		*/
 	}
 	protected void resizePanel() {
 		if(parent != null) {
@@ -435,9 +412,6 @@ public class EditorLabelGroup
 		}
 
 		panel.setSize(width + 2, height);
-		/*
-		shadowPanel.setSize(width, height);
-		*/
 
 		panel.repaint();
 		return width;
@@ -480,19 +454,10 @@ public class EditorLabelGroup
 		
 		panel = new JPanel();
 		panel.setAlignmentX(5);
-		/*
-		shadowPanel = new JPanel();
-		*/
 
 		panel.setVisible(true);
 		panel.setOpaque(false);
 		panel.setLayout(null);
-
-		/*
-		shadowPanel.setVisible(true);
-		shadowPanel.setOpaque(false);
-		shadowPanel.setLayout(null);
-		*/
 
 		if (mSubject.getGeometry() == null)	{
 			final Point2D point = new Point(DEFAULTOFFSETX, DEFAULTOFFSETY);
@@ -512,9 +477,6 @@ public class EditorLabelGroup
 			addToPanel(text);
 		}
 		resizePanel();
-		/*
-		e.add(shadowPanel);
-		*/
 		surface.add(panel);
 		setPanelLocation(false);
 	}

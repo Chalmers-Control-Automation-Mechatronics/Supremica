@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorLabel
 //###########################################################################
-//# $Id: EditorLabel.java,v 1.26 2006-01-23 23:32:34 siw4 Exp $
+//# $Id: EditorLabel.java,v 1.27 2006-03-22 16:05:55 flordal Exp $
 //###########################################################################
 
 
@@ -126,16 +126,6 @@ public class EditorLabel
 		}
 
 		label.setForeground(getColor(selected));
-		/*
-		if (shadow && isHighlighted())
-		{
-			labelShadow.setForeground(getShadowColor(selected));
-		}
-		else
-		{
-		    labelShadow.setForeground(EditorColor.INVISIBLE);
-		}
-		*/
 
 		int xposition = mParent.getX() + (int) mGeometry.getOffset().getX();
 		int yposition = mParent.getY() + (int) mGeometry.getOffset().getY();
@@ -155,8 +145,9 @@ public class EditorLabel
 		{
 			Graphics2D g2d = (Graphics2D) g;
 			g2d.setColor(getShadowColor(selected));				
-			g2d.fillRoundRect((int) boundingRect.getX(), (int) boundingRect.getY(), 
-							  (int) boundingRect.getWidth(), (int) boundingRect.getHeight(),
+			final int adjust = 2; // The bounds are too tight!
+			g2d.fillRoundRect((int) boundingRect.getX()-adjust, (int) boundingRect.getY()-adjust, 
+							  (int) boundingRect.getWidth()+2*adjust, (int) boundingRect.getHeight()+2*adjust,
 							  20, 20);
 			g2d.setColor(getColor(selected));
 		}

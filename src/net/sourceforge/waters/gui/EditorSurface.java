@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.46 2006-03-16 12:09:16 flordal Exp $
+//# $Id: EditorSurface.java,v 1.47 2006-03-22 16:05:55 flordal Exp $
 //###########################################################################
 
 
@@ -308,13 +308,15 @@ public class EditorSurface
 			EditorLabelGroup l = (EditorLabelGroup) events.get(i);
 			l.setPanelLocation(isSelected(l) || isSelected(l.getParent()));
 
-			// Why is this done here? Why are labelgroups treated differently?
+			// Why is this done here? Why are labelgroups treated
+			// differently? EditorLabelGroup:s don't have drawObject
+			// methods?
 			// Draw shadow
 			if (l.shadow && l.isHighlighted())
 			{
 				Rectangle bounds = l.getBounds();
 				g.setColor(l.getShadowColor(isSelected(l) || isSelected(l.getParent())));
-				int adjust = 2; // The bounds are too tight!
+				final int adjust = 2; // The bounds are too tight!
 				g.fillRoundRect((int) bounds.getX()-adjust, (int) bounds.getY()-adjust, 
 								(int) bounds.getWidth()+2*adjust, (int) bounds.getHeight()+2*adjust, 
 								20, 20);
