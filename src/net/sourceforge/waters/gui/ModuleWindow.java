@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleWindow
 //###########################################################################
-//# $Id: ModuleWindow.java,v 1.31 2006-03-23 12:07:14 flordal Exp $
+//# $Id: ModuleWindow.java,v 1.32 2006-03-23 12:20:44 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -205,13 +205,17 @@ public class ModuleWindow
 		}
 	}
 
+	/**
+	 * Translates the current module into a Supremica project and open
+	 * the project in Supremica.
+	 */
 	public void exportToSupremica()
 	{
-		//System.err.println("exportToSupremica");
 		ModuleSubject currModule = getModuleSubject();
 		ProjectBuildFromWaters builder = new ProjectBuildFromWaters();
 		Project supremicaProject = builder.build(currModule);
 
+		// Show Supremica window...
 		if (supremica == null)
 		{
 			// Initializes some properties
@@ -223,6 +227,9 @@ public class ModuleWindow
 		{
 			supremica.setVisible(true);
 		}
+
+		// Don't kill the JVM when Supremica is closed! Just close the window...
+		supremica.setDefaultCloseOperation(supremica.DISPOSE_ON_CLOSE);
 
 		//supremica.
 		System.err.println(supremicaProject.toString());

@@ -105,6 +105,7 @@ public class Supremica
 	{
 		//setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);		
 		//setDefaultCloseOperation(DISPOSE_ON_CLOSE);		
+		setDefaultCloseOperation(EXIT_ON_CLOSE);		
 
 		theVisualProjectContainer = new VisualProjectContainer();
 		theVisualProjectContainer.addListener(this);

@@ -118,7 +118,6 @@ public class SupremicaWithGui
 		{
 			frameSize.width = screenSize.width;
 		}
-
 		workbench.setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
 		workbench.initialize();
 		splash.setVisible(false);
