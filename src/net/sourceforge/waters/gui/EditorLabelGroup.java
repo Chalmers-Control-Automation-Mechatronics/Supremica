@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorLabelGroup
 //###########################################################################
-//# $Id: EditorLabelGroup.java,v 1.27 2006-03-22 16:05:55 flordal Exp $
+//# $Id: EditorLabelGroup.java,v 1.28 2006-03-23 12:07:14 flordal Exp $
 //###########################################################################
 
 
@@ -230,7 +230,11 @@ public class EditorLabelGroup
 			
 			if (l.getBounds().contains(ex, ey))
 			{
-				return (IdentifierSubject)getSubject().getEventList().get(i);
+				// There's a bug here, it may be other things than
+				// IdentifierSubject:s in the labelgroup,
+				// ForeachEventSubject:s for example...
+
+				return (IdentifierSubject) getSubject().getEventList().get(i);
 			}
 		}		
 		return null;

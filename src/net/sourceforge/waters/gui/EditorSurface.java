@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.47 2006-03-22 16:05:55 flordal Exp $
+//# $Id: EditorSurface.java,v 1.48 2006-03-23 12:07:14 flordal Exp $
 //###########################################################################
 
 
@@ -52,7 +52,10 @@ public class EditorSurface
 	implements Printable,
 			   ModelObserver
 {
-	public static final int panelMarginAdjust = 2; //increase bounds for label & guardAction panels
+	/**
+	 * Increase bounds for label & guardAction panels.
+	 */
+	public static final int TEXTSHADOWMARGIN = 2; 
 	protected boolean showGrid = true;
 	protected EditorWindowInterface root;
 	protected int gridSize = 16;
@@ -174,14 +177,7 @@ public class EditorSurface
 			paintGrid(g);
 		}
 		
-		/*
-		// Don't do anything if there is nothing to do!		
-		if ((nodes == null) || (nodes.size() == 0))
-		{
-			return;
-		}
-		*/
-
+ 		// Draw nodegroups
 		for (int i = 0; i < nodeGroups.size(); i++)
 		{
 			EditorNodeGroup n = (EditorNodeGroup) nodeGroups.get(i);
@@ -264,11 +260,13 @@ public class EditorSurface
 			}
 		}
 		
+		// If there is a new group being created, draw it!
 		if (newGroup != null) 
 		{
 			newGroup.drawObject(g, isSelected(newGroup));
 		}
 		
+		// Draw edges
 		for (int i = 0; i < edges.size(); i++)
 		{
 			EditorEdge edge = (EditorEdge) edges.get(i);
@@ -291,18 +289,30 @@ public class EditorSurface
 			*/
 		}
 
+		// Draw lines (edges being drawn)
+		for (int i = 0; i < lines.size(); i++)
+		{ 
+			int[] l = (int[]) lines.get(i);
+
+			g.setColor(Color.BLACK);
+			g.drawLine(l[0], l[1], l[2], l[3]);
+		}
+
+		// Draw nodes
 		for (int i = 0; i < nodes.size(); i++)
 		{
 			EditorNode n = (EditorNode) nodes.get(i);
 			n.drawObject(g, isSelected(n));
 		}
 
+		// Draw node labels
 		for (int i = 0; i < labels.size(); i++)
 		{
 			EditorLabel l = (EditorLabel) labels.get(i);
 			l.drawObject(g, isSelected(l) || isSelected(l.getParent()));
 		}
 
+		// Draw event labels
 		for (int i = 0; i < events.size(); i++)
 		{
 			EditorLabelGroup l = (EditorLabelGroup) events.get(i);
@@ -310,19 +320,21 @@ public class EditorSurface
 
 			// Why is this done here? Why are labelgroups treated
 			// differently? EditorLabelGroup:s don't have drawObject
-			// methods?
+			// methods, they are drawn as panels?
 			// Draw shadow
 			if (l.shadow && l.isHighlighted())
 			{
 				Rectangle bounds = l.getBounds();
 				g.setColor(l.getShadowColor(isSelected(l) || isSelected(l.getParent())));
-				final int adjust = 2; // The bounds are too tight!
-				g.fillRoundRect((int) bounds.getX()-adjust, (int) bounds.getY()-adjust, 
-								(int) bounds.getWidth()+2*adjust, (int) bounds.getHeight()+2*adjust, 
+				g.fillRoundRect((int) bounds.getX()-TEXTSHADOWMARGIN, 
+								(int) bounds.getY()-TEXTSHADOWMARGIN, 
+								(int) bounds.getWidth()+2*TEXTSHADOWMARGIN, 
+								(int) bounds.getHeight()+2*TEXTSHADOWMARGIN, 
 								20, 20);
 			}
 		}
 		
+		// Draw guard/action blocks
 		for (int i = 0; i < mGuardActionBlocks.size(); i++)
 		{
 			EditorGuardActionBlock block = (EditorGuardActionBlock) mGuardActionBlocks.get(i);
@@ -332,27 +344,22 @@ public class EditorSurface
 			{
 				Rectangle bounds = block.getBounds();
 				g.setColor(block.getShadowColor(isSelected(block) || isSelected(block.getParent())));
-				g.fillRoundRect((int) bounds.getX()-panelMarginAdjust, (int) bounds.getY()-panelMarginAdjust, 
-								(int) bounds.getWidth()+2*panelMarginAdjust, (int) bounds.getHeight()+2*panelMarginAdjust, 
+				g.fillRoundRect((int) bounds.getX()-TEXTSHADOWMARGIN, 
+								(int) bounds.getY()-TEXTSHADOWMARGIN, 
+								(int) bounds.getWidth()+2*TEXTSHADOWMARGIN, 
+								(int) bounds.getHeight()+2*TEXTSHADOWMARGIN, 
 								20, 20);
 			}
 		}
 
-		for (int i = 0; i < lines.size(); i++)
-		{ 
-			int[] l = (int[]) lines.get(i);
-
-			g.setColor(Color.BLACK);
-			g.drawLine(l[0], l[1], l[2], l[3]);
-		}
-
+		// Draw selection area
 		if (dragSelect)
 		{
 			showDragSelect(g);
 		}
 		
 		/*
-		// Test: Print outline of drawn area (just to see if it's OK)
+		// Test: Print outline of drawn area (just to see that it's OK)
 		Rectangle rect = getDrawnAreaBounds();
 		g.setColor(Color.PINK);
 		g.drawRect((int) rect.getX(), (int) rect.getY(), (int) rect.getWidth(), (int) rect.getHeight());

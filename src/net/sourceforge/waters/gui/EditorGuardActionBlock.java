@@ -142,7 +142,7 @@ public class EditorGuardActionBlock extends EditorLabelGroup
 		int x = getOffsetX() + (int) parent.getTPointX();
 		int y = getOffsetY() + (int) parent.getTPointY() +
 			parent.getEditorLabelGroup().getHeight() +
-			2*EditorSurface.panelMarginAdjust;
+			2*EditorSurface.TEXTSHADOWMARGIN;
 
 		panel.setLocation(x, y);
 	}

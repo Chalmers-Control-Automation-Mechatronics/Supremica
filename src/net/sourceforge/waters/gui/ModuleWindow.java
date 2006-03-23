@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleWindow
 //###########################################################################
-//# $Id: ModuleWindow.java,v 1.30 2006-03-21 21:58:04 flordal Exp $
+//# $Id: ModuleWindow.java,v 1.31 2006-03-23 12:07:14 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -115,7 +115,7 @@ public class ModuleWindow
 	implements ActionListener, FocusListener, UndoInterface, WindowListener
 {
 	// Limits the functionality of Waters to just drawing simple components 
-	private static boolean limited = false;
+	public static final boolean DES_COURSE_VERSION = false;
 
 	//########################################################################
 	//# Constructor
@@ -510,18 +510,18 @@ public class ModuleWindow
 		JButton newForeachButton = new JButton("New Foreach Component");
 		newForeachButton.addActionListener(this);
 		newForeachButton.setActionCommand("newforeach");
-		newForeachButton.setEnabled(!limited);
+		newForeachButton.setEnabled(!DES_COURSE_VERSION);
 		buttonpanel.add(newForeachButton);
 
 		buttonpanel.add(newInstanceButton = new JButton("New Instance"));
 		newInstanceButton.setActionCommand("newinstance");
 		newInstanceButton.addActionListener(this);
-		newInstanceButton.setEnabled(!limited);
+		newInstanceButton.setEnabled(!DES_COURSE_VERSION);
 
 		buttonpanel.add(newBindingButton = new JButton("New Binding"));
 		newBindingButton.setActionCommand("newbinding");
 		newBindingButton.addActionListener(this);
-		newBindingButton.setEnabled(!limited);
+		newBindingButton.setEnabled(!DES_COURSE_VERSION);
 
 		JButton deleteComponentButton = new JButton("Remove Component");
 		deleteComponentButton.addActionListener(this);
@@ -617,15 +617,15 @@ public class ModuleWindow
 		tabbedPane = new JTabbedPane();
 		Component defaultTab;
 		tabbedPane.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
-		if (!limited)
+		if (!DES_COURSE_VERSION)
 			tabbedPane.addTab("Parameters", null, createParametersPane(), "");
 		tabbedPane.addTab("Events", null, createEventsPane(), "Create events");
-		if (!limited)
+		if (!DES_COURSE_VERSION)
 			tabbedPane.addTab("Aliases", null, new JPanel(), "Create aliases");
 		tabbedPane.addTab("Components", null, defaultTab = createContentPane(), "Create components");
-		if (!limited)
+		if (!DES_COURSE_VERSION)
 			tabbedPane.addTab("Compile", null, new JPanel(), "Compilation");
-		if (!limited)
+		if (!DES_COURSE_VERSION)
 			tabbedPane.addTab("Debug", null, debugPane, "Debug information");
 		debugPane.addFocusListener(this);
 
@@ -1166,7 +1166,7 @@ public class ModuleWindow
 
 		LanguagesEN.createLanguage(WLang);
 
-		ModuleWindow editor = new ModuleWindow("Waters" + (limited ? " - limited" : ""));
+		ModuleWindow editor = new ModuleWindow("Waters" + (DES_COURSE_VERSION ? " - limited version" : ""));
 	}
 
 

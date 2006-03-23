@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorEdge
 //###########################################################################
-//# $Id: EditorEdge.java,v 1.36 2006-03-20 12:22:35 flordal Exp $
+//# $Id: EditorEdge.java,v 1.37 2006-03-23 12:07:14 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -69,7 +69,7 @@ public class EditorEdge
 	private boolean straight;
 
 	/** Arrows at end of edge or in the middle? */
-	private static boolean arrowAtEnd = false;
+	private static boolean arrowAtEnd = ModuleWindow.DES_COURSE_VERSION;
 
 	// Handles
 	private Rectangle2D.Double source = new Rectangle2D.Double();
@@ -79,7 +79,6 @@ public class EditorEdge
 	private Rectangle2D.Double center = new Rectangle2D.Double();
 	private boolean dragC = false;
 	private EdgeSubject subject;
-	//private Point2D start;
 	private static double tearRatio = .8;
 	private static int WIDTHD = 2;
 	private static int WIDTHS = 5;

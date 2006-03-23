@@ -2068,21 +2068,7 @@ public class ActionMan
 	// File.Exit action performed
 	public static void fileExit(Gui gui)
 	{
-		if (SupremicaProperties.fileAllowQuit())
-		{
-			try
-			{
-				SupremicaProperties.saveProperties();
-			}
-			catch(Exception e)
-			{
-			}
-			System.exit(0);
-		}
-		else
-		{
-			fileClose(gui);
-		}
+		fileClose(gui);
 	}
 
 	// File.Close action performed
@@ -2097,13 +2083,9 @@ public class ActionMan
 			catch(Exception e)
 			{
 			}
-			
-			System.exit(0);
 		}
-		else
-		{
-			gui.close();
-		}
+		
+		gui.close();
 	}
 
 	public static void fileExportDesco(Gui gui)

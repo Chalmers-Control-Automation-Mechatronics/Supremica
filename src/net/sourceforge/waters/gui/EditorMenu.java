@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorMenu
 //###########################################################################
-//# $Id: EditorMenu.java,v 1.19 2006-03-21 21:58:04 flordal Exp $
+//# $Id: EditorMenu.java,v 1.20 2006-03-23 12:07:14 flordal Exp $
 //###########################################################################
 
 
@@ -52,6 +52,7 @@ public class EditorMenu
 		root = r;
 		surface = c;
 
+		// New menu
 		JMenu menu = new JMenu("File");
 		menu.setMnemonic(KeyEvent.VK_F);
 		menu.getAccessibleContext().setAccessibleDescription("The File menu");
@@ -59,29 +60,27 @@ public class EditorMenu
 
 		JMenuItem menuItem = new JMenuItem("Clear all", KeyEvent.VK_O);
 		menuItem.addActionListener(this);
-		fileNewMenu = menuItem;
 		menu.add(menuItem);
+		fileNewMenu = menuItem;
 
 		menu.addSeparator();
 
 		menuItem = new JMenuItem("Export to Postscript");
 		menuItem.addActionListener(this);
-		editExportPostscriptMenu = menuItem;
 		menu.add(menuItem);
+		editExportPostscriptMenu = menuItem;
 
 		menuItem = new JMenuItem("Export to PDF");
 		menuItem.addActionListener(this);
-		editExportPDFMenu = menuItem;
 		menu.add(menuItem);
+		editExportPDFMenu = menuItem;
 
 		menu.addSeparator();
 
 		menuItem = new JMenuItem("Print...", KeyEvent.VK_P);
 		menuItem.addActionListener(this);
-		printMenu = menuItem;
-		//menuItem.setEnabled(false);
-		//menuItem.setToolTipText("Not implemented yet");
 		menu.add(menuItem);
+		printMenu = menuItem;
 
 		menuItem = new JMenuItem("Page Setup...", KeyEvent.VK_G);
 		menuItem.setEnabled(false);
@@ -93,33 +92,32 @@ public class EditorMenu
 		menuItem = new JMenuItem("Close Window", KeyEvent.VK_X);
 		menuItem.addActionListener(this);
 		menu.add(menuItem);
-
 		fileExitMenu = menuItem;
-		menu = new JMenu("Edit");
 
+		// Next menu
+		menu = new JMenu("Edit");
 		this.add(menu);
 
 		menuItem = new JMenuItem("Undo");
 		menuItem.setEnabled(root.getUndoInterface().canUndo());
 		menuItem.setToolTipText("Not implemented yet");
 		menuItem.addActionListener(this);
-		mEditUndo = menuItem;
 		menu.add(menuItem);
-
+		mEditUndo = menuItem;
 
 		menuItem = new JMenuItem("Redo");
 		menuItem.setEnabled(root.getUndoInterface().canRedo());
 		menuItem.setToolTipText("Not implemented yet");
 		menuItem.addActionListener(this);
-		mEditRedo = menuItem;
 		menu.add(menuItem);
+		mEditRedo = menuItem;
 
 		menu.addSeparator();
 
 		menuItem = new JMenuItem("Copy as WMF");
 		menuItem.addActionListener(this);
-		editCopyAsWMFMenu = menuItem;
 		menu.add(menuItem);
+		editCopyAsWMFMenu = menuItem;
 
 		menuItem = new JMenuItem("Copy");
 		menuItem.setMnemonic(KeyEvent.VK_COPY);
@@ -144,41 +142,50 @@ public class EditorMenu
 		menuItem.addActionListener(this);
 		editDeleteMenu = menuItem;
 
+		// Next menu
 		menu = new JMenu("Tools");
 		this.add(menu);
 
 		menuItem = new JMenuItem("Select Tool");
+		menuItem.setEnabled(false);
+		menuItem.setToolTipText("Not implemented yet");		
 		menu.add(menuItem);
 
 		menuItem = new JMenuItem("Node Tool");
+		menuItem.setEnabled(false);
+		menuItem.setToolTipText("Not implemented yet");
 		menu.add(menuItem);
 
 		menuItem = new JMenuItem("Edge Tool");
+		menuItem.setEnabled(false);
+		menuItem.setToolTipText("Not implemented yet");
 		menu.add(menuItem);
 
 		menuItem = new JMenuItem("Initial Node Tool");
+		menuItem.setEnabled(false);
+		menuItem.setToolTipText("Not implemented yet");
 		menu.add(menuItem);
 
 		menu.addSeparator();
 
 		menuItem = new JMenuItem("Create Event");
-		mToolsCreateEvent = menuItem;
-		menu.add(menuItem);
 		menuItem.addActionListener(this);
+		menu.add(menuItem);
+		mToolsCreateEvent = menuItem;
 		
 		menuItem = new JMenuItem("Run Embedder");
-		mEmbedder = menuItem;
-		menu.add(menuItem);
 		menuItem.addActionListener(this);
+		menu.add(menuItem);
+		mEmbedder = menuItem;
 		
 		menu.addSeparator();
 
 		menuItem = new JMenuItem("Options...");
-		menu.add(menuItem);
 		menuItem.addActionListener(this);
-		
+		menu.add(menuItem);
 		toolsOptionsMenu = menuItem;
 
+		// Next menu
 		menu = new JMenu("Help");
 		this.add(menu);
 
@@ -251,7 +258,7 @@ public class EditorMenu
 		{
 			try {
 				int iterations = Integer.parseInt(JOptionPane.showInputDialog(this, "Input A number of Iterations to Run the Embedder",
-												  new Integer(1000)));
+												  new Integer(100)));
 				SpringEmbedder.run(surface, surface.getGraph() , iterations);
 			}
 			catch(Throwable t)

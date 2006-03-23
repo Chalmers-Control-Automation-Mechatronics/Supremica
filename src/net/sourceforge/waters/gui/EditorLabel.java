@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorLabel
 //###########################################################################
-//# $Id: EditorLabel.java,v 1.27 2006-03-22 16:05:55 flordal Exp $
+//# $Id: EditorLabel.java,v 1.28 2006-03-23 12:07:14 flordal Exp $
 //###########################################################################
 
 
@@ -145,9 +145,10 @@ public class EditorLabel
 		{
 			Graphics2D g2d = (Graphics2D) g;
 			g2d.setColor(getShadowColor(selected));				
-			final int adjust = 2; // The bounds are too tight!
-			g2d.fillRoundRect((int) boundingRect.getX()-adjust, (int) boundingRect.getY()-adjust, 
-							  (int) boundingRect.getWidth()+2*adjust, (int) boundingRect.getHeight()+2*adjust,
+			g2d.fillRoundRect((int) boundingRect.getX()-EditorSurface.TEXTSHADOWMARGIN, 
+							  (int) boundingRect.getY()-EditorSurface.TEXTSHADOWMARGIN, 
+							  (int) boundingRect.getWidth()+2*EditorSurface.TEXTSHADOWMARGIN, 
+							  (int) boundingRect.getHeight()+2*EditorSurface.TEXTSHADOWMARGIN,
 							  20, 20);
 			g2d.setColor(getColor(selected));
 		}
