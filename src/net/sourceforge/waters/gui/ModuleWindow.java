@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleWindow
 //###########################################################################
-//# $Id: ModuleWindow.java,v 1.34 2006-03-23 16:10:32 flordal Exp $
+//# $Id: ModuleWindow.java,v 1.35 2006-03-23 16:21:37 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -244,10 +244,8 @@ public class ModuleWindow
 		supremica.setDefaultCloseOperation(supremica.DISPOSE_ON_CLOSE);
 
 		//supremica.
-		System.err.println(supremicaProject.toString());
-
+		System.out.println(supremicaProject.toString());
 		int nbrOfAddedAutomata = supremica.addProject(supremicaProject);
-
 		System.err.println(nbrOfAddedAutomata);
 
 		//EFA question: 
@@ -566,7 +564,7 @@ public class ModuleWindow
 		menu.getAccessibleContext().setAccessibleDescription("The File menu");
 		menuBar.add(menu);
 
-		JMenuItem menuItem = new JMenuItem(WLang.FileNewMenu, KeyEvent.VK_O);
+		JMenuItem menuItem = new JMenuItem(WLang.FileNewMenu, KeyEvent.VK_N);
 		menuItem.addActionListener(this);
 		menu.add(menuItem);
 		FileNewMenu = menuItem;
@@ -612,19 +610,21 @@ public class ModuleWindow
 		//fileChooser = new JFileChooser();
 		fileChooser.addChoosableFileFilter(new WmodFileFilter());
 
-		JMenu editMenu = new JMenu("Edit");
+		/*
+		// Next menu
+		menu = new JMenu("Edit");
+		menu.setMnemonic(KeyEvent.VK_E);
+		menuBar.add(menu);
+		*/
 
-		menuBar.add(editMenu);
+		// Next menu
+		menu = new JMenu("Analysis");
+		menu.setMnemonic(KeyEvent.VK_A);
+		menuBar.add(menu);
 
-		JMenu analysisMenu = new JMenu("Analysis");
-
-		menuBar.add(analysisMenu);
-
-		menuItem = new JMenuItem("Export To Supremica");
-
-		analysisMenu.add(menuItem);
+		menuItem = new JMenuItem("Export To Supremica", KeyEvent.VK_E);
 		menuItem.addActionListener(this);
-
+		menu.add(menuItem);
 		analysisExportSupremicaMenu = menuItem;
 
 		return menuBar;
