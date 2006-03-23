@@ -96,15 +96,16 @@ class AnalyzerAutomataPanel
 		int tableWidthEntity = tableWidth / 11;
 		TableColumnModel theTableColumnModel = theAutomatonTable.getColumnModel();
 
+		// This does not work. why? The preferred width is ignored!
 		for (int i = 0; i < theAutomatonTable.getColumnCount(); i++)
 		{
 			TableColumn currColumn = theTableColumnModel.getColumn(i);
 
-			if (i == 0)
+			if (i == TABLE_IDENTITY_COLUMN)
 			{
 				currColumn.setPreferredWidth(tableWidthEntity * 5);
 			}
-			else if (i == 1)
+			else if (i == TABLE_TYPE_COLUMN)
 			{
 				currColumn.setPreferredWidth(tableWidthEntity * 3);
 			}
@@ -129,7 +130,7 @@ class AnalyzerAutomataPanel
 						return;
 					}
 
-					// Show in the panel
+					// Show automaton in the panel
 					if (col == TABLE_IDENTITY_COLUMN)
 					{
 						Automata selectedAutomata = getSelectedAutomata();
@@ -172,7 +173,6 @@ class AnalyzerAutomataPanel
 
 			public void mousePressed(MouseEvent e)
 			{
-
 				// This is needed for the Linux platform
 				// where isPopupTrigger is true only on mousePressed.
 				maybeShowPopup(e);
@@ -180,7 +180,6 @@ class AnalyzerAutomataPanel
 
 			public void mouseReleased(MouseEvent e)
 			{
-
 				// This is for triggering the popup on Windows platforms
 				maybeShowPopup(e);
 			}
@@ -201,7 +200,6 @@ class AnalyzerAutomataPanel
 						theAutomatonTable.clearSelection();
 						theAutomatonTable.setRowSelectionInterval(currRow, currRow);
 					}
-
 
 					analyzerPopupMenu.show(theAutomatonTable.getSelectedRowCount(), e.getComponent(), e.getX(), e.getY());
 				}

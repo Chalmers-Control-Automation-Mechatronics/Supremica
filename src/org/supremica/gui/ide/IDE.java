@@ -82,7 +82,7 @@ public class IDE
 		ModuleContainer currModuleContainer = moduleContainers.getActiveModuleContainer();
 		tabPanel.add(currModuleContainer.getEditorPanel());
 		tabPanel.add(currModuleContainer.getAnalyzerPanel());
-//		tabPanel.add(currModuleContainer.getSimulatorPanel());
+		//tabPanel.add(currModuleContainer.getSimulatorPanel());
 
 		tabPanel.validate();
 
@@ -156,11 +156,11 @@ public class IDE
 
 			tabPanel.remove(oldModuleContainer.getEditorPanel());
 			tabPanel.remove(oldModuleContainer.getAnalyzerPanel());
-//			tabPanel.remove(oldModuleContainer.getSimulatorPanel());
+			//tabPanel.remove(oldModuleContainer.getSimulatorPanel());
 
 			tabPanel.add(moduleContainer.getEditorPanel());
 			tabPanel.add(moduleContainer.getAnalyzerPanel());
-//			tabPanel.add(moduleContainer.getSimulatorPanel());
+			//tabPanel.add(moduleContainer.getSimulatorPanel());
 
 			tabPanel.setSelectedComponent(moduleContainer.getSelectedComponent());
 		}

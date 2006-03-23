@@ -31,21 +31,21 @@ public class AnalyzerPanel
 		tabPanel.setSelectedComponent(automataPanel);
 
 		automatonViewerPanel = getEmptyRightPanel();
-//		automatonViewerPanel.setPreferredSize(IDEDimensions.rightAnalyzerPreferredSize);
-//		automatonViewerPanel.setMinimumSize(IDEDimensions.rightAnalyzerMinimumSize);
+		//		automatonViewerPanel.setPreferredSize(IDEDimensions.rightAnalyzerPreferredSize);
+		//		automatonViewerPanel.setMinimumSize(IDEDimensions.rightAnalyzerMinimumSize);
 
 		splitPanelHorizontal = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, tabPanel, automatonViewerPanel);
 		splitPanelHorizontal.setContinuousLayout(false);
 		splitPanelHorizontal.setOneTouchExpandable(false);
 		splitPanelHorizontal.setDividerLocation(0.2);
 		splitPanelHorizontal.setResizeWeight(0.0);
-//		splitPanelHorizontal.setPreferredSize(IDEDimensions.mainPanelPreferredSize);
-//		splitPanelHorizontal.setMinimumSize(IDEDimensions.mainPanelMinimumSize);
-
+		//		splitPanelHorizontal.setPreferredSize(IDEDimensions.mainPanelPreferredSize);
+		//		splitPanelHorizontal.setMinimumSize(IDEDimensions.mainPanelMinimumSize);
+		
 		((GridBagLayout)getLayout()).setConstraints(splitPanelHorizontal, getGridBagConstraints());
 
 		add(splitPanelHorizontal);
-//		validate();
+		//		validate();
 	}
 
 
