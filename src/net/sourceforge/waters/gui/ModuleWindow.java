@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleWindow
 //###########################################################################
-//# $Id: ModuleWindow.java,v 1.32 2006-03-23 12:20:44 flordal Exp $
+//# $Id: ModuleWindow.java,v 1.33 2006-03-23 13:54:17 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -211,10 +211,22 @@ public class ModuleWindow
 	 */
 	public void exportToSupremica()
 	{
-		ModuleSubject currModule = getModuleSubject();
-		ProjectBuildFromWaters builder = new ProjectBuildFromWaters();
-		Project supremicaProject = builder.build(currModule);
-
+		// The project in Supremica format
+		Project supremicaProject;
+		try
+		{
+			ModuleSubject currModule = getModuleSubject();
+			ProjectBuildFromWaters builder = new ProjectBuildFromWaters();
+			supremicaProject = builder.build(currModule);
+		}
+		catch (Exception ex)
+		{
+			JOptionPane.showMessageDialog(this, ex.getMessage(), "Error exporting to Supremica", 
+										  JOptionPane.ERROR_MESSAGE); 
+			// ex.printStackTrace();
+			return;
+		}
+			
 		// Show Supremica window...
 		if (supremica == null)
 		{
@@ -1173,7 +1185,7 @@ public class ModuleWindow
 
 		LanguagesEN.createLanguage(WLang);
 
-		ModuleWindow editor = new ModuleWindow("Waters" + (DES_COURSE_VERSION ? " - limited version" : ""));
+		ModuleWindow editor = new ModuleWindow("Waters");
 	}
 
 

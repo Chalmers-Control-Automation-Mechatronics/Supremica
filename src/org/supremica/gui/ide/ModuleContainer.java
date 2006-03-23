@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ModuleContainer
 //###########################################################################
-//# $Id: ModuleContainer.java,v 1.22 2006-01-12 21:51:53 siw4 Exp $
+//# $Id: ModuleContainer.java,v 1.23 2006-03-23 13:54:17 flordal Exp $
 //###########################################################################
 
 
@@ -233,7 +233,6 @@ public class ModuleContainer implements UndoInterface
 		fireEditorChangedEvent(new UndoRedoEvent());
 	}
 
-
 	//#######################################################################
 	//# Observer Support
 	public void attach(final Observer o)
@@ -255,10 +254,17 @@ public class ModuleContainer implements UndoInterface
 
 	public void updateAutomata()
 	{
-		ProjectBuildFromWaters builder = new ProjectBuildFromWaters();
-		Project supremicaProject = builder.build(mModule);
-		mVisualProject.clear();
-		mVisualProject.addAutomata(supremicaProject);
+		try
+		{
+			ProjectBuildFromWaters builder = new ProjectBuildFromWaters();
+			Project supremicaProject = builder.build(mModule);
+			mVisualProject.clear();
+			mVisualProject.addAutomata(supremicaProject);
+		}
+		catch (Exception ex)
+		{
+			System.err.println(ex);
+		}
 	}
 
 

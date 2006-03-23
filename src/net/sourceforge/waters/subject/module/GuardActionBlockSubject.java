@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   GuardActionBlockSubject
 //###########################################################################
-//# $Id: GuardActionBlockSubject.java,v 1.4 2006-03-13 12:46:24 martin Exp $
+//# $Id: GuardActionBlockSubject.java,v 1.5 2006-03-23 13:54:17 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -157,7 +157,7 @@ public final class GuardActionBlockSubject
   //# Setters
   public void setGuard(final String guard)
   {
-    if (guard.equals(mGuard)) {
+    if (guard == null || guard.equals(mGuard)) {
       return;
     }
     mGuard = guard;

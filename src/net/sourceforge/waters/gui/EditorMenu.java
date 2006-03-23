@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorMenu
 //###########################################################################
-//# $Id: EditorMenu.java,v 1.20 2006-03-23 12:07:14 flordal Exp $
+//# $Id: EditorMenu.java,v 1.21 2006-03-23 13:54:17 flordal Exp $
 //###########################################################################
 
 
@@ -65,10 +65,12 @@ public class EditorMenu
 
 		menu.addSeparator();
 
+		/* // On windows machines, this is not postscript...
 		menuItem = new JMenuItem("Export to Postscript");
 		menuItem.addActionListener(this);
 		menu.add(menuItem);
 		editExportPostscriptMenu = menuItem;
+		*/
 
 		menuItem = new JMenuItem("Export to PDF");
 		menuItem.addActionListener(this);
@@ -207,7 +209,7 @@ public class EditorMenu
 
 		if (e.getSource() == fileExitMenu)
 		{
-			// root.dispose();
+			root.getFrame().dispose();
 		}
 
 		if (e.getSource() == printMenu)

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.65 2006-03-21 21:58:04 flordal Exp $
+//# $Id: ControlledSurface.java,v 1.66 2006-03-23 13:54:17 flordal Exp $
 //###########################################################################
  
 package net.sourceforge.waters.gui;
@@ -480,11 +480,13 @@ public class ControlledSurface
 		{
 			int operation = DnDConstants.ACTION_MOVE;
 			EditorObject o = null;
-			if (mDrag != null) {
+			if (mDrag != null) 
+			{
 				setDragOver(mDrag, EditorObject.NOTDRAG);
 			}
 			mDrag = null;
-			try {
+			try 
+			{
 				final IdentifierWithKind i = (IdentifierWithKind)
 					e.getTransferable().getTransferData(FLAVOUR);
 				final EventKind ek = i.getKind();
@@ -493,40 +495,65 @@ public class ControlledSurface
 										(int) e.getLocation().getY());
 				mDrag = o;
 				if (ek == null) {
-					if (o instanceof EditorNode) {
-						operation = DnDConstants.ACTION_COPY;
-					} else if (o instanceof EditorEdge) {
-						operation = DnDConstants.ACTION_COPY;
-					} else if (o instanceof EditorLabelGroup && 
-							!(o instanceof EditorGuardActionBlock)) {
-						operation = DnDConstants.ACTION_COPY;
-					} else if (o instanceof EditorLabel) {
+					if (o instanceof EditorNode) 
+					{
 						operation = DnDConstants.ACTION_COPY;
 					}
-				} else if (ek.equals(EventKind.PROPOSITION)) {
-					if (o instanceof EditorNode) {
+					else if (o instanceof EditorEdge) 
+					{
 						operation = DnDConstants.ACTION_COPY;
-					} else if (o instanceof EditorLabel) {
+					} 
+					else if (o instanceof EditorLabelGroup && 
+							!(o instanceof EditorGuardActionBlock)) 
+					{
+						operation = DnDConstants.ACTION_COPY;
+					} 
+					else if (o instanceof EditorLabel) 
+					{
 						operation = DnDConstants.ACTION_COPY;
 					}
-				} else if (ek.equals(EventKind.CONTROLLABLE) ||
-						   ek.equals(EventKind.UNCONTROLLABLE)) {
-					if (o instanceof EditorEdge) {
+				} 
+				else if (ek.equals(EventKind.PROPOSITION)) {
+					if (o instanceof EditorNode) 
+					{
 						operation = DnDConstants.ACTION_COPY;
-					} else if (o instanceof EditorLabelGroup && 
-							!(o instanceof EditorGuardActionBlock)) {
+					}
+					else if (o instanceof EditorLabel) 
+					{
+						operation = DnDConstants.ACTION_COPY;
+					}
+				} 
+				else if (ek.equals(EventKind.CONTROLLABLE) ||
+						 ek.equals(EventKind.UNCONTROLLABLE)) 
+				{
+					if (o instanceof EditorEdge) 
+					{
+						operation = DnDConstants.ACTION_COPY;
+					} 
+					else if (o instanceof EditorLabelGroup && 
+							!(o instanceof EditorGuardActionBlock)) 
+					{
 						operation = DnDConstants.ACTION_COPY;
 					}
 				}
-			} catch (final UnsupportedFlavorException exception) {
-				throw new IllegalArgumentException(exception);
-			} catch (final IOException exception) {
+			} 
+			catch (final UnsupportedFlavorException exception) 
+			{
 				throw new IllegalArgumentException(exception);
 			}
-			if (o != null) {
-				if (operation == DnDConstants.ACTION_COPY) {
+			catch (final IOException exception) 
+			{
+				throw new IllegalArgumentException(exception);
+			}
+
+			if (o != null) 
+			{
+				if (operation == DnDConstants.ACTION_COPY) 
+				{
 					setDragOver(o, EditorObject.CANDROP);
-				} else {
+				}
+				else 
+				{
 					setDragOver(o, EditorObject.CANTDROP);
 				}
 			}
@@ -537,38 +564,56 @@ public class ControlledSurface
 
 		public void drop(final DropTargetDropEvent e)
 		{
-			try {
+			try 
+			{
+				// Drag is finished!
+				if (mDrag != null) 
+				{
+					setDragOver(mDrag, EditorObject.NOTDRAG);
+				}
+
 				if (e.getDropTargetContext().getDropTarget().
-					getDefaultActions() == DnDConstants.ACTION_COPY) {
+					getDefaultActions() == DnDConstants.ACTION_COPY) 
+				{
 					final IdentifierWithKind i = (IdentifierWithKind)
 						e.getTransferable().getTransferData(FLAVOUR);
 					final IdentifierSubject ip = i.getIdentifier();
-					final EditorObject o =
-						getObjectAtPosition((int) e.getLocation().getX(),
-											(int) e.getLocation().getY());
-					setDragOver(o, EditorObject.NOTDRAG);
-					if (o instanceof EditorNode) {
+					final EditorObject o = getObjectAtPosition((int) e.getLocation().getX(),
+															   (int) e.getLocation().getY());
+					//setDragOver(o, EditorObject.NOTDRAG);
+					if (o instanceof EditorNode) 
+					{
 						addToNode((EditorNode) o, ip);
 						e.dropComplete(true);
 						return;
-					} else if (o instanceof EditorEdge) {
+					}
+					else if (o instanceof EditorEdge) 
+					{
 						addToEdge((EditorEdge) o, ip, e);
 						e.dropComplete(true);
 						return;
-					} else if (o instanceof EditorLabelGroup && 
-							!(o instanceof EditorGuardActionBlock)) {
+					}
+					else if (o instanceof EditorLabelGroup && 
+							!(o instanceof EditorGuardActionBlock)) 
+					{
 						addToLabelGroup((EditorLabelGroup) o, ip, e);
 						e.dropComplete(true);
 						return;
-					} else if (o instanceof EditorLabel) {
+					}
+					else if (o instanceof EditorLabel) 
+					{
 						addToLabel((EditorLabel) o, ip);
 						e.dropComplete(true);
 						return;
 					}
 				}
-			} catch (final UnsupportedFlavorException exception) {
+			} 
+			catch (final UnsupportedFlavorException exception) 
+			{
 				throw new IllegalArgumentException(exception);
-			} catch (final IOException exception) {
+			} 
+			catch (final IOException exception) 
+			{
 				throw new IllegalArgumentException(exception);
 			}
 			e.dropComplete(false);
