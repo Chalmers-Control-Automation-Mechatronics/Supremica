@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleWindow
 //###########################################################################
-//# $Id: ModuleWindow.java,v 1.35 2006-03-23 16:21:37 flordal Exp $
+//# $Id: ModuleWindow.java,v 1.36 2006-03-23 19:45:45 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -76,6 +76,8 @@ import net.sourceforge.waters.subject.module.ParameterBindingSubject;
 import net.sourceforge.waters.subject.module.ParameterSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
+
+import net.sourceforge.waters.subject.base.ListSubject;
 
 //EFA-----------------
 import net.sourceforge.waters.subject.module.*;
@@ -500,10 +502,10 @@ public class ModuleWindow
 						}
 
 						Object nodeInfo = node.getUserObject();
-
-						if (node.isLeaf())
+						AbstractSubject abstractComponent = (((ComponentInfo) nodeInfo).getComponent());
+						if (abstractComponent instanceof SimpleComponentSubject)
 						{
-							SimpleComponentSubject scp = (SimpleComponentSubject) (((ComponentInfo) nodeInfo).getComponent());
+							SimpleComponentSubject scp = (SimpleComponentSubject) abstractComponent;
 
 							if (scp != null)
 							{
@@ -558,8 +560,9 @@ public class ModuleWindow
 	public JMenuBar createMenuBar()
 	{
 		JMenuBar menuBar = new JMenuBar();
-		JMenu menu = new JMenu(WLang.FileMenu);
 
+		// New menu
+		JMenu menu = new JMenu(WLang.FileMenu);		
 		menu.setMnemonic(KeyEvent.VK_F);
 		menu.getAccessibleContext().setAccessibleDescription("The File menu");
 		menuBar.add(menu);
@@ -583,6 +586,7 @@ public class ModuleWindow
 
 		menuItem = new JMenuItem(WLang.FileSaveAsMenu, KeyEvent.VK_A);
 		menuItem.addActionListener(this);
+		menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
 		menu.add(menuItem);
 		FileSaveAsMenu = menuItem;
 
@@ -610,12 +614,22 @@ public class ModuleWindow
 		//fileChooser = new JFileChooser();
 		fileChooser.addChoosableFileFilter(new WmodFileFilter());
 
-		/*
 		// Next menu
 		menu = new JMenu("Edit");
 		menu.setMnemonic(KeyEvent.VK_E);
 		menuBar.add(menu);
-		*/
+
+		menuItem = new JMenuItem("New Simple Component", KeyEvent.VK_N);
+		menuItem.addActionListener(this);
+		menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
+		menuItem.setActionCommand("newsimple");
+		menu.add(menuItem);
+
+		menuItem = new JMenuItem("Remove component", KeyEvent.VK_R);
+		menuItem.addActionListener(this);
+		menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
+		menuItem.setActionCommand("remove component");
+		menu.add(menuItem);
 
 		// Next menu
 		menu = new JMenu("Analysis");
@@ -692,12 +706,35 @@ public class ModuleWindow
 			TreePath currentSelection = moduleSelectTree.getSelectionPath();
 			if (currentSelection != null) 
 			{
-				DefaultMutableTreeNode currentNode = (DefaultMutableTreeNode)
-					(currentSelection.getLastPathComponent());
-				MutableTreeNode parent = (MutableTreeNode)(currentNode.getParent());
+				// Find the depth of the component...
+				int depth = currentSelection.getPathCount()-1;
+				// Get the node in the tree
+				DefaultMutableTreeNode targetNode = (DefaultMutableTreeNode) (currentSelection.getLastPathComponent());
+				// Find the way to the component in the module
+				ListSubject<AbstractSubject> rootList = module.getComponentListModifiable();
+				ListSubject<AbstractSubject> currentList = rootList;
+				for (int i=1; i<depth; i++)
+				{
+					// We're (depth-i) levels too deep
+					DefaultMutableTreeNode currentNode = targetNode;
+					for (int j=0; j<(depth-i); j++)
+					{
+						currentNode = (DefaultMutableTreeNode) (currentNode.getParent());
+					}
+					// Find currentNode (a ForeachSubject) in currentList and unfold a new ListSubject
+					ForeachSubject foreachSubject = (ForeachSubject) currentList.get(currentList.indexOf(((ComponentInfo) currentNode.getUserObject()).getComponent()));
+					currentList = foreachSubject.getBodyModifiable();
+				}
+				// I just realised there's a nicer way to do this...
+
+				// Remove component from module
+				currentList.remove(((ComponentInfo) targetNode.getUserObject()).getComponent());
+
+				// Remove the component visually
+				MutableTreeNode parent = (MutableTreeNode) (targetNode.getParent());
 				if (parent != null) 
 				{
-					treeModel.removeNodeFromParent(currentNode);
+					treeModel.removeNodeFromParent(targetNode);
 					return;
 				}
 			}
@@ -931,7 +968,7 @@ public class ModuleWindow
 				
 				logEntry("Adding SimpleComponentSubject: " + scp.getName());
 
-				EditorWindow ed = new EditorWindow(scp.getName() + " - Waters Editor", module, scp, this, this); 			
+				EditorWindow ed = new EditorWindow(scp.getName() + " - Waters Editor", module, scp, this, this);
 			}
 
 			moduleSelectTree.expandPath(new TreePath(parentNode.getPath()));

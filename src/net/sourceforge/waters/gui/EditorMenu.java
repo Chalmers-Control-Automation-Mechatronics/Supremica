@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorMenu
 //###########################################################################
-//# $Id: EditorMenu.java,v 1.22 2006-03-23 16:06:03 flordal Exp $
+//# $Id: EditorMenu.java,v 1.23 2006-03-23 19:45:45 flordal Exp $
 //###########################################################################
 
 
@@ -101,16 +101,18 @@ public class EditorMenu
 		this.add(menu);
 
 		menuItem = new JMenuItem("Undo");
+		menuItem.addActionListener(this);
+		menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, ActionEvent.CTRL_MASK));
 		menuItem.setEnabled(root.getUndoInterface().canUndo());
 		menuItem.setToolTipText("Not implemented yet");
-		menuItem.addActionListener(this);
 		menu.add(menuItem);
 		mEditUndo = menuItem;
 
 		menuItem = new JMenuItem("Redo");
+		menuItem.addActionListener(this);
+		menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, ActionEvent.CTRL_MASK));
 		menuItem.setEnabled(root.getUndoInterface().canRedo());
 		menuItem.setToolTipText("Not implemented yet");
-		menuItem.addActionListener(this);
 		menu.add(menuItem);
 		mEditRedo = menuItem;
 
@@ -122,17 +124,19 @@ public class EditorMenu
 		editCopyAsWMFMenu = menuItem;
 
 		menuItem = new JMenuItem("Copy");
-		menuItem.setMnemonic(KeyEvent.VK_COPY);
+		menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, ActionEvent.CTRL_MASK));
 		menuItem.setEnabled(false);
 		menuItem.setToolTipText("Not implemented yet");
 		menu.add(menuItem);
 
 		menuItem = new JMenuItem("Cut");
+		menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, ActionEvent.CTRL_MASK));
 		menuItem.setEnabled(false);
 		menuItem.setToolTipText("Not implemented yet");
 		menu.add(menuItem);
 
 		menuItem = new JMenuItem("Paste");
+		menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, ActionEvent.CTRL_MASK));
 		menuItem.setEnabled(false);
 		menuItem.setToolTipText("Not implemented yet");
 		menu.add(menuItem);
@@ -140,8 +144,9 @@ public class EditorMenu
 		menu.addSeparator();
 
 		menuItem = new JMenuItem("Delete");
-		menu.add(menuItem);
 		menuItem.addActionListener(this);
+		menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
+		menu.add(menuItem);
 		editDeleteMenu = menuItem;
 
 		// Next menu
@@ -172,6 +177,7 @@ public class EditorMenu
 
 		menuItem = new JMenuItem("Create Event");
 		menuItem.addActionListener(this);
+		menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, ActionEvent.CTRL_MASK));
 		menu.add(menuItem);
 		mToolsCreateEvent = menuItem;
 		
