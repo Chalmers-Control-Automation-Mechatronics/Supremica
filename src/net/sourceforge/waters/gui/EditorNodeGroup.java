@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorNodeGroup
 //###########################################################################
-//# $Id: EditorNodeGroup.java,v 1.21 2006-03-21 21:58:04 flordal Exp $
+//# $Id: EditorNodeGroup.java,v 1.22 2006-03-23 16:06:03 flordal Exp $
 //###########################################################################
 
 
@@ -128,7 +128,7 @@ public class EditorNodeGroup
 				y = (int)corners[i].getCenterY();
 			}
 		} 
-		System.out.println("x " + point.getX() + " y " + point.getY() + " x " + x + " y " + y);
+		//System.out.println("x " + point.getX() + " y " + point.getY() + " x " + x + " y " + y);
 		bounds.setFrameFromDiagonal(point.getX(), point.getY(), x, y);
 		subject.getGeometry().setRectangle(bounds);
 		fireEditorChangedEvent(new NodeMovedEvent(old, subject.getGeometry(),

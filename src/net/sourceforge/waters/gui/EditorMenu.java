@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorMenu
 //###########################################################################
-//# $Id: EditorMenu.java,v 1.21 2006-03-23 13:54:17 flordal Exp $
+//# $Id: EditorMenu.java,v 1.22 2006-03-23 16:06:03 flordal Exp $
 //###########################################################################
 
 
@@ -40,7 +40,7 @@ public class EditorMenu
 	public final JMenuItem toolsOptionsMenu;
 	public final JMenuItem editDeleteMenu;
 	public final JMenuItem editCopyAsWMFMenu;
-	public final JMenuItem editExportPostscriptMenu;
+	public final JMenuItem editExportPostscriptMenu = null;
 	public final JMenuItem editExportPDFMenu;
 	public final JMenuItem mEmbedder;
 	EditorWindowInterface root;

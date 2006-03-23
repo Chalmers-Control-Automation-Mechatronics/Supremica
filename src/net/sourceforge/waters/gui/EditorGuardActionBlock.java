@@ -97,6 +97,11 @@ public class EditorGuardActionBlock extends EditorLabelGroup
 		this.shadow = this.getParent().getEditorLabelGroup().shadow;
 	}
 	
+	//////////////////////////////////////////////
+	// WHAT ABOUT REMOVING GUARDS AND ACTIONS?  //
+	// IT'S EASIER FOR YOU THAN ME TO ADD THIS. //
+	//////////////////////////////////////////////
+
 	public void addAction() {
 		addAction(new EditorAction(this));
 	}
@@ -170,7 +175,8 @@ public class EditorGuardActionBlock extends EditorLabelGroup
 		}
 	}
 
-	private void collapsePanel() {
+	private void collapsePanel() 
+	{
 		mPanelContent = panel.getComponents();
 		panel.removeAll();
 		panel.add(mCollapsedContent);
@@ -222,14 +228,16 @@ public class EditorGuardActionBlock extends EditorLabelGroup
 		//do nothing
 	}
 
-	public void remove(EditorAction action) {
+	public void remove(EditorAction action) 
+	{
 		List<BinaryExpressionProxy> actionList = 
 			mGuardActionBlock.getActionList();
 		actionList.remove(action.getActionExpression());
 		panel.remove(action);
 	}
 
-	public void remove(EditorGuard guard) {
+	public void remove(EditorGuard guard) 
+	{
 		mHasGuard = false;
 		mGuardActionBlock.setGuard(null);
 		panel.remove(guard);

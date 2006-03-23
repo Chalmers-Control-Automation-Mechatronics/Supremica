@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.48 2006-03-23 12:07:14 flordal Exp $
+//# $Id: EditorSurface.java,v 1.49 2006-03-23 16:06:03 flordal Exp $
 //###########################################################################
 
 
@@ -588,15 +588,26 @@ public class EditorSurface
 		repaint();
 	}
 
-	public void addGuardActionBlock(EditorEdge edge) {
-			if(edge.getSubject().getGuardActionBlock() == null) {
-				edge.getSubject().setGuardActionBlock(new GuardActionBlockSubject());
-			}
-			EditorGuardActionBlock guardActionBlock = 
-				new EditorGuardActionBlock(edge, this);
-			mGuardActionBlocks.add(guardActionBlock);
-			edge.setEditorGuardActionBlock(guardActionBlock);
-			repaint();
+	public void addGuardActionBlock(EditorEdge edge) 
+	{
+		if (edge.getSubject().getGuardActionBlock() == null) 
+		{
+			edge.getSubject().setGuardActionBlock(new GuardActionBlockSubject());
+		}
+		EditorGuardActionBlock guardActionBlock = 
+			new EditorGuardActionBlock(edge, this);
+		mGuardActionBlocks.add(guardActionBlock);
+		edge.setEditorGuardActionBlock(guardActionBlock);
+		repaint();
+	}
+
+	public void removeGuardActionBlock(EditorEdge edge) 
+	{
+		EditorGuardActionBlock gab = edge.getEditorGuardActionBlock();
+		mGuardActionBlocks.remove(gab);
+		edge.setEditorGuardActionBlock(null);
+		edge.getSubject().setGuardActionBlock(null);
+		repaint();
 	}
 
 	/*

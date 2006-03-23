@@ -27,7 +27,8 @@ public class EditorAction extends JTextField
 	private EditorGuardActionBlock mParent;
 	
 	public EditorAction(BinaryExpressionProxy action,
-			EditorGuardActionBlock editorGuardActionBlock) {
+			EditorGuardActionBlock editorGuardActionBlock) 
+	{
 		super(" " + action.toString());
 		mParent = editorGuardActionBlock;
 		mGuardActionBlock = editorGuardActionBlock.getGuardActionBlock();
@@ -38,7 +39,8 @@ public class EditorAction extends JTextField
 		this.addFocusListener(this);
 	}
 	
-	public EditorAction(EditorGuardActionBlock parent) {
+	public EditorAction(EditorGuardActionBlock parent) 
+	{
 		super(" ");
 		mParent = parent;
 		mGuardActionBlock = parent.getGuardActionBlock();
@@ -49,10 +51,11 @@ public class EditorAction extends JTextField
 		this.addFocusListener(this);
 	}
 
-	private void update() {
+	private void update() 
+	{
 		SimpleExpressionProxy newExpression = null;
 		
-		if(this.getText().trim().equals("")) {
+		if (this.getText().trim().equals("")) {
 			mParent.remove(this);
 			mParent.resizePanel();
 			mParent.getParent().getParent().repaint();
@@ -60,41 +63,58 @@ public class EditorAction extends JTextField
 		}
 		
 		//check syntax
-		try {
+		try 
+		{
 			newExpression = mParser.parse(this.getText());
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+
+			BinaryExpressionSubject action = new BinaryExpressionSubject(
+							 ((BinaryExpressionSubject) newExpression).getOperator(),
+							 ((BinaryExpressionSubject) newExpression).getLeft().clone(),
+							 ((BinaryExpressionSubject) newExpression).getRight().clone());
+			
+			List<BinaryExpressionProxy> actionList = 
+				mGuardActionBlock.getActionList();
+			actionList.remove(mActionExpression);
+			actionList.add(action);
+			
+			mActionExpression = newExpression;
+		} 
+		catch (ParseException ex) 
+		{
+			JOptionPane.showMessageDialog(this, ex.getMessage(), "Error parsing expression", 
+										  JOptionPane.ERROR_MESSAGE); 
+			// ex.printStackTrace();
+			return;
+		}
+		catch (Exception ex)
+		{
+			JOptionPane.showMessageDialog(this, ex.getMessage(), "Error when adding action", 
+										  JOptionPane.ERROR_MESSAGE); 
+			// ex.printStackTrace();
+			return;
 		}
 		
-		BinaryExpressionSubject action = new BinaryExpressionSubject(
-				((BinaryExpressionSubject) newExpression).getOperator(),
-				((BinaryExpressionSubject) newExpression).getLeft().clone(),
-				((BinaryExpressionSubject) newExpression).getRight().clone());
-		
-		List<BinaryExpressionProxy> actionList = 
-			mGuardActionBlock.getActionList();
-		actionList.remove(mActionExpression);
-		actionList.add(action);
-		
-		mActionExpression = newExpression;
-
 		mParent.resizePanel();
 		mParent.panel.repaint();
 	}
 	
-	public String toString() {
+	public String toString() 
+	{
 		return super.toString();
 	}
-	public void focusGained(FocusEvent arg0) {
+
+	public void focusGained(FocusEvent arg0) 
+	{
 		//do nothing
 	}
 
-	public void focusLost(FocusEvent arg0) {
+	public void focusLost(FocusEvent arg0) 
+	{
 		update();
 	}
 
-	public SimpleExpressionProxy getActionExpression() {
+	public SimpleExpressionProxy getActionExpression() 
+	{
 		return mActionExpression;
 	}
 }

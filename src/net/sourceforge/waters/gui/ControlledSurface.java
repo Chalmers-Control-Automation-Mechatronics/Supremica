@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.66 2006-03-23 13:54:17 flordal Exp $
+//# $Id: ControlledSurface.java,v 1.67 2006-03-23 16:06:03 flordal Exp $
 //###########################################################################
  
 package net.sourceforge.waters.gui;
@@ -2195,8 +2195,8 @@ public class ControlledSurface
 		{
 			if (!getText().equals(mLabel.getParent().getName()))
 			{
-				System.out.println(getText() + ":" + mLabel.getParent().getName());
-				System.out.println(!getText().equals(mLabel.getParent().getName()));
+				//System.out.println(getText() + ":" + mLabel.getParent().getName());
+				//System.out.println(!getText().equals(mLabel.getParent().getName()));
 				try
 				{
 					Command u = new ChangeNameCommand(mLabel.getParent().getName(),

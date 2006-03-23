@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleWindow
 //###########################################################################
-//# $Id: ModuleWindow.java,v 1.33 2006-03-23 13:54:17 flordal Exp $
+//# $Id: ModuleWindow.java,v 1.34 2006-03-23 16:10:32 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -1149,7 +1149,7 @@ public class ModuleWindow
 		public void dragGestureRecognized(DragGestureEvent e)
 		{		
 			final int row = mList.locationToIndex(e.getDragOrigin());
-			System.out.println(row);
+			//System.out.println(row);
 			if (row == -1) {
 				return;
 			}

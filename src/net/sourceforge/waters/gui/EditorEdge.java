@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorEdge
 //###########################################################################
-//# $Id: EditorEdge.java,v 1.37 2006-03-23 12:07:14 flordal Exp $
+//# $Id: EditorEdge.java,v 1.38 2006-03-23 16:06:03 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -1168,12 +1168,13 @@ public class EditorEdge
 		arrowAtEnd = set;
 	}
 
-	public EditorGuardActionBlock getEditorGuardActionBlock() {
+	public EditorGuardActionBlock getEditorGuardActionBlock() 
+	{
 		return mEditorGuardActionBlock;
 	}
 
-	public void setEditorGuardActionBlock(
-			EditorGuardActionBlock editorGuardActionBlock) {
+	public void setEditorGuardActionBlock(EditorGuardActionBlock editorGuardActionBlock) 
+	{
 		mEditorGuardActionBlock = editorGuardActionBlock;
 	}
 

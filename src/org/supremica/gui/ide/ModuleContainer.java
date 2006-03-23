@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ModuleContainer
 //###########################################################################
-//# $Id: ModuleContainer.java,v 1.23 2006-03-23 13:54:17 flordal Exp $
+//# $Id: ModuleContainer.java,v 1.24 2006-03-23 16:06:03 flordal Exp $
 //###########################################################################
 
 
@@ -44,6 +44,8 @@ import org.supremica.automata.IO.ProjectBuildFromWaters;
 import org.supremica.automata.Project;
 import org.supremica.gui.VisualProject;
 import org.supremica.gui.ide.actions.Actions;
+
+import javax.swing.JOptionPane;
 
 
 public class ModuleContainer implements UndoInterface
@@ -263,7 +265,10 @@ public class ModuleContainer implements UndoInterface
 		}
 		catch (Exception ex)
 		{
-			System.err.println(ex);
+			JOptionPane.showMessageDialog(mIDE, ex.getMessage(), "Error in graph", 
+										  JOptionPane.ERROR_MESSAGE); 
+			ex.printStackTrace();
+			return;
 		}
 	}
 
