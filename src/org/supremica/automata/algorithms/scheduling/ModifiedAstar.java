@@ -80,7 +80,7 @@ public class ModifiedAstar
 				while (childIter.hasNext()) 
 				{
 					int[] nextNode = (int[])childIter.next();
-					logger.info("nextNode = " + printArray(nextNode));
+// 					logger.info("nextNode = " + printArray(nextNode));
 					
 					// Calculate the estimate function of the expanded node and store it at the appropriate position
 					nextNode[ESTIMATE_INDEX] = calcEstimatedCost(nextNode);
@@ -88,8 +88,8 @@ public class ModifiedAstar
 					openTree.add(nextNode);
 				}
 			}
-			else
-				logger.info("currNodeIsAddedToClosed");
+// 			else
+// 				logger.info("currNodeIsAddedToClosed");
 		}
 		catch (Exception e)
 		{

@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.GridLayout;
 import java.awt.BorderLayout;
 import java.awt.event.*;
+import java.io.*;
 
 import org.supremica.log.*;
 import org.supremica.automata.*;
@@ -39,6 +40,9 @@ public class ScheduleDialog
 
 	Scheduler sched = null;
 	public Thread milpThread = null;
+
+	private BufferedWriter writer = null; //Tillf
+	
 
     public ScheduleDialog()
     {
@@ -170,8 +174,27 @@ public class ScheduleDialog
 			{
 				public void actionPerformed(ActionEvent e)
 				{
-					java.io.File rootDir = new java.io.File("Y:\\xml-files\\Domenicos\\TestCasesNrobots\\AK\\Test");
-					java.io.File[] files = rootDir.listFiles();
+					File rootDir = new File(org.supremica.properties.SupremicaProperties.getFileOpenPath());
+	 				File[] files = rootDir.listFiles();
+					
+					try {
+						File resultFile = null;
+						if (((String)optiMethodsBox.getSelectedItem()).equals(MODIFIED_A_STAR))
+						{
+							resultFile = new File(rootDir + File.separator + "_" + heuristicsBox.getSelectedItem() + ".txt");
+						}
+						else 
+						{
+							resultFile = new File(rootDir + File.separator + "_" + optiMethodsBox.getSelectedItem() + ".txt");
+						}
+						resultFile.createNewFile();
+
+						writer =  new BufferedWriter(new FileWriter(resultFile));
+					}
+					catch (IOException ioe)
+					{
+						logger.error("Error at file creation : " + rootDir + File.separator + optiMethodsBox.getSelectedItem() + "_" + heuristicsBox.getSelectedItem() + ".txt");
+					}
 
 					for (int i=0; i<files.length; i++)
 					{
@@ -271,39 +294,59 @@ public class ScheduleDialog
      */
     public void done()
     {
-		if (autoTestButton.isEnabled())
+		try 
 		{
-			setVisible(false);
-			dispose();
-			getParent().repaint();
-		}
-		else
-		{
-			if (filesToSchedule.size() > 0)
+			if (autoTestButton.isEnabled())
 			{
+				setVisible(false);
+				dispose();
 				getParent().repaint();
-
-				java.io.File currFile = (java.io.File)filesToSchedule.remove(0);
-
-				if (currFile.getName().contains(".xml"))
+			}
+			else
+			{
+				// Write the results of previous scheduling operation
+				if (sched != null && sched instanceof ModifiedAstar)
 				{
-					ActionMan.automataDeleteAll_actionPerformed(ActionMan.getGui());
-					ActionMan.openFile(ActionMan.getGui(), currFile);
-					ActionMan.getGui().invertSelection();
-					getParent().repaint();
-					
-					doit();
+					writer.write(((ModifiedAstar)sched).getOutputString());
+					writer.newLine();
+					writer.newLine();
 				}
-				else
+
+				if (filesToSchedule.size() > 0)
 				{
+					// 				getParent().repaint();
+
+					File currFile = (File)filesToSchedule.remove(0);
+
+					writer.write(currFile.getName());
+					writer.newLine();
+
+					if (currFile.getName().contains(".xml"))
+					{
+						ActionMan.automataDeleteAll_actionPerformed(ActionMan.getGui());
+						ActionMan.openFile(ActionMan.getGui(), currFile);
+						ActionMan.getGui().invertSelection();
+						// 					getParent().repaint();
+					
+						doit();
+					}
+					else
+					{
+						done();
+					}
+				}
+				else 
+				{
+					writer.flush();
+
+					autoTestButton.setEnabled(true);
 					done();
 				}
 			}
-			else 
-			{
-				autoTestButton.setEnabled(true);
-				done();
-			}
+		}
+		catch (IOException ioe)
+		{
+			logger.error("Error at writing the results of scheduling to file");
 		}
     }
 

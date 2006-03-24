@@ -208,8 +208,6 @@ public class VisGraphScheduler
 	public synchronized double scheduleFrom(double[] fromTimes)
 		throws Exception
 	{
-		int exceptionCounter = 0;
-
 		double distanceToGoal = calcDistance(fromTimes, goalTimes);
 		if (distanceToGoal == 0)
 		{

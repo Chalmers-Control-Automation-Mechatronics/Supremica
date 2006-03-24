@@ -115,7 +115,7 @@ public abstract class AbstractAstar
     protected boolean useOneProdRelax;
     
 	/** This string contains info about the scheduling, such as time, nr of iterations etc. */
-    protected String infoStr =  "";
+    protected String outputStr =  "";
 
 	/** 
 	 * Which heuristic should be chosen. The value is normally supplied by the
@@ -346,7 +346,7 @@ public abstract class AbstractAstar
 
     protected void init() 
 		throws Exception
-	{
+	{	
 		if (theAutomata == null)
 			return;
 
@@ -363,11 +363,11 @@ public abstract class AbstractAstar
 		}
 	
 		remainingCosts = new int[plantAutomata.size()][];
-		infoStr = "Processing times:\n";
+		outputStr = "Processing times:\n";
 		
 		timer.restart();
 		initRemainingCosts();
-		infoStr += "\t1st preprocessing in " + timer.elapsedTime() + " ms\n";
+		outputStr += "\t1st preprocessing in " + timer.elapsedTime() + " ms\n";
 
 		initAuxIndices();
 		
@@ -518,7 +518,7 @@ public abstract class AbstractAstar
 		int[] a = new int[currNode.length];
 		for (int i=0; i<a.length; i++)
 			a[i] = currNode[i];
-		logger.info("SCHEDULING_FROM " + printArray(currNode) + "; activeAutomataIndex = " + printArray(activeAutomataIndex));
+// 		logger.info("SCHEDULING_FROM " + printArray(currNode) + "; activeAutomataIndex = " + printArray(activeAutomataIndex));
 
 		// Resets the OPEN and the CLOSED trees
 		openTree.clear();
@@ -572,34 +572,34 @@ public abstract class AbstractAstar
 
 		if (currNode == null || ! isAcceptingNode(currNode))
 		{
-			if (currNode != null)
-				logger.error("currnode = " + printArray(currNode) + "; activeAutomataIndex = " + printArray(activeAutomataIndex));
+// 			if (currNode != null)
+// 				logger.error("currnode = " + printArray(currNode) + "; activeAutomataIndex = " + printArray(activeAutomataIndex));
 
-			for (Iterator<int[]> it = closedTree.values().iterator(); it.hasNext(); )
-				logger.info("e_cl : " + printArray(it.next()));
+// 			for (Iterator<int[]> it = closedTree.values().iterator(); it.hasNext(); )
+// 				logger.info("e_cl : " + printArray(it.next()));
 			throw new RuntimeException("An accepting state could not be found, nr of iterations = " + iterationCounter); 
 		}
 
-		infoStr += "\tA*-iterations (nr of search calls through the closed tree): " + iterationCounter + "\n";
-		infoStr += "\tIn time: " + timer.elapsedTime() + " ms\n";
-		infoStr += "\tThe CLOSED tree contains (at the end) " + closedTree.size() + " elements\n";
-		infoStr += "\tMax{OPEN.size} = " + maxOpenSize + "\n";
-		infoStr += "\t\t" + "g = " + currNode[ACCUMULATED_COST_INDEX];
+		outputStr += "\tA*-iterations (nr of search calls through the closed tree): " + iterationCounter + "\n";
+		outputStr += "\tIn time: " + timer.elapsedTime() + " ms\n";
+		outputStr += "\tThe CLOSED tree contains (at the end) " + closedTree.size() + " elements\n";
+		outputStr += "\tMax{OPEN.size} = " + maxOpenSize + "\n";
+		outputStr += "\t\t" + "g = " + currNode[ACCUMULATED_COST_INDEX];
 			
 		if (!isRelaxationProvider)
 		{
-			logger.info(infoStr);
+			logger.info(outputStr);
 
-			for (Iterator<int[]> closedsIt = closedTree.values().iterator(); closedsIt.hasNext();)
-			{
-				int[] node = closedsIt.next();
-				logger.warn("cl: " + printArray(node));
-			}
+// 			for (Iterator<int[]> closedsIt = closedTree.values().iterator(); closedsIt.hasNext();)
+// 			{
+// 				int[] node = closedsIt.next();
+// 				logger.warn("cl: " + printArray(node));
+// 			}
 		}
-		else
-		{
-			logger.info(printArray(currNode) + " nådd; kostnad = " + currNode[ACCUMULATED_COST_INDEX]);
-		}
+// 		else
+// 		{
+// 			logger.info(printArray(currNode) + " nådd; kostnad = " + currNode[ACCUMULATED_COST_INDEX]);
+// 		}
 
 		this.acceptingNode = currNode;
 
@@ -739,7 +739,7 @@ public abstract class AbstractAstar
      * 			twoProdRelax.
      */
     /*	protected String preprocess2() {
-      String infoStr = "";
+      String outputStr = "";
       Automata plantAutomata = theAutomata.getPlantAutomata();
       
       for (int i=0; i<plantAutomata.size()-1; i++) {
@@ -784,11 +784,11 @@ public abstract class AbstractAstar
 	  plantNames += theAutomata.getAutomatonAt(currAutomataIndex[k]).getName() + "||";
 	  plantNames += theAutomata.getAutomatonAt(currAutomataIndex[currAutomataIndex.length-1]).getName();
 
-	  infoStr += "\t\t" + plantNames + ": " + schedCounter + " nodes relaxed\n";
+	  outputStr += "\t\t" + plantNames + ": " + schedCounter + " nodes relaxed\n";
 	  }
 	  }
 
-	  return infoStr;
+	  return outputStr;
 	  }
 	*/
 
@@ -843,10 +843,17 @@ public abstract class AbstractAstar
  		int fParent = parent[ACCUMULATED_COST_INDEX] + getRelaxation(parent);
 
  		// The following code inside the if-loop is needed to ensure consistency of the heuristic
- 		if (fParent > fNode)
- 			return fParent;
- 		else
- 			return fNode;
+//  		if (fParent > fNode)
+// 		{
+// 			//logger.warn("Consistency ensurance");
+//  			return fParent;
+// 		}
+//  		else
+// 		{			
+//  			return fNode;
+// 		}
+
+		return fNode;
 	}
 
 	/*
@@ -1214,5 +1221,10 @@ public abstract class AbstractAstar
 	public int getMakespan()
 	{
 		return makespan;
+	}
+
+	public String getOutputString()
+	{
+		return outputStr;
 	}
 }

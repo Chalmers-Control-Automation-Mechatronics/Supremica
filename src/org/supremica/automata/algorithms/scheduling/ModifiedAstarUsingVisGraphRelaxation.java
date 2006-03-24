@@ -41,6 +41,7 @@ public class ModifiedAstarUsingVisGraphRelaxation
 	{
 			super(theAutomata, manualExpansion, buildSchedule, gui);
 			this.relaxFromNodes = relaxFromNodes;
+			isRelaxationProvider = false; //fulhack
     }
 
 	public void init()
@@ -59,10 +60,10 @@ public class ModifiedAstarUsingVisGraphRelaxation
 
 		timer.restart();
 		preprocessVisibilityGraphs();
-		infoStr += "\tvisibility graphs calculated in " + timer.elapsedTime() + "ms\n"; 
+		outputStr += "\tvisibility graphs calculated in " + timer.elapsedTime() + "ms\n"; 
 	}
 
-	public int calcEstimatedCost(int[] node)
+	int getRelaxation(int[] node)
 		throws Exception
 	{
 		int[] effTimePoint = new int[plantAutomata.size()];
@@ -81,7 +82,7 @@ public class ModifiedAstarUsingVisGraphRelaxation
 			timePointKey += effTimePoint[i] + "_";
 		}
 
-		int estimatedCost;
+		int estimatedRemainingCost;
 		Integer previousVisibilityRelaxation = visGraphRelax.get(timePointKey);
 		if (previousVisibilityRelaxation == null)
 		{
@@ -116,15 +117,15 @@ public class ModifiedAstarUsingVisGraphRelaxation
 
 			//Tillf
 			//tillfälligt så här fullt (med avrundningen menar jag)
-			estimatedCost = (int) Math.round(visibilityRelaxation);
-			visGraphRelax.put(timePointKey, estimatedCost);
+			estimatedRemainingCost = (int) Math.round(visibilityRelaxation);
+			visGraphRelax.put(timePointKey, estimatedRemainingCost);
 		}
 		else
 		{
-			estimatedCost = previousVisibilityRelaxation.intValue();
+			estimatedRemainingCost = previousVisibilityRelaxation.intValue();
 		}
 
-		estimatedCost += node[ACCUMULATED_COST_INDEX];
+	// 	estimatedRemainingCost += node[ACCUMULATED_COST_INDEX];
 
 		// If the estimate is done from the next node, the minimal current cost is added
 		if (relaxFromNodes)
@@ -138,10 +139,28 @@ public class ModifiedAstarUsingVisGraphRelaxation
 				}
 			}
 
-			estimatedCost += minCurrentCost;
+			estimatedRemainingCost += minCurrentCost;
 		}
 
-		return estimatedCost;
+		//Tillf
+		boolean approximation = true;
+		if (approximation)
+		{
+			int xWeight = 3;
+			int yWeight = 1;
+			int depth = 0;
+			for (int i=0; i<activeAutomataIndex.length; i++)
+			{
+// 				depth += Math.pow(node[activeAutomataIndex[i]], 2);
+				depth += node[activeAutomataIndex[i]];
+			}
+// 			depth = (int)Math.round(Math.sqrt(depth));
+			depth = depth / activeAutomataIndex.length;
+// 		    depth = (int)Math.floor(Math.random() * depth);
+			return estimatedRemainingCost * ( 1 + xWeight / (yWeight + depth));
+		}
+
+		return estimatedRemainingCost;
 	}
 
 	private void preprocessVisibilityGraphs()

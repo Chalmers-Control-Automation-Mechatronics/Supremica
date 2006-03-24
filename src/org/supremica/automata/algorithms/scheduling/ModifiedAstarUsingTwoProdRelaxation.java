@@ -148,11 +148,11 @@ public class ModifiedAstarUsingTwoProdRelaxation
 				estimate = altEstimate;
 		}
 
-		if (key == 636)
-		{
-			logger.info("636: relax = " + relaxationValue + "; estim = " + estimate + "; est_index = " + ESTIMATE_INDEX + "; acc_index = " + ACCUMULATED_COST_INDEX + "; curr_index = " + CURRENT_COSTS_INDEX + "; activeAutomataIndex = " + printArray(activeAutomataIndex));
-		}
-	
+// 		if (key == 636)
+// 		{
+// 			logger.info("636: relax = " + relaxationValue + "; estim = " + estimate + "; est_index = " + ESTIMATE_INDEX + "; acc_index = " + ACCUMULATED_COST_INDEX + "; curr_index = " + CURRENT_COSTS_INDEX + "; activeAutomataIndex = " + printArray(activeAutomataIndex));
+// 		}
+
 		return estimate;
 	}
 }
