@@ -113,7 +113,6 @@ public final class SupremicaProperties
 	private static final String FILE_ALLOW_IMPORT = "fileAllowImport";
 	private static final String FILE_ALLOW_EXPORT = "fileAllowExport";
 	private static final String FILE_ALLOW_QUIT = "fileAllowQuit";
-	private static final String FILE_RSDEMO_OPEN_PATH = "fileRSDemoOpenPath";
 
 	// General properties
 	private static final String GENERAL_STATE_SEPARATOR = "generalStateSeparator";
@@ -218,15 +217,9 @@ public final class SupremicaProperties
 	private static final String SOFTPLC_CYCLE_TIME = "softplcCycleTime";
 	private static Vector softplcInterfaces = new Vector();
 
-	// Robot coordination Options
-	private static final String GENERAL_USE_ROBOTCOORDINATION = "generalUseRobotCoordination";
-
 	// FBRuntime Options
 	//private static final String FB_RUNTIME_LIBRARY_PATH = "fbRuntimeLibraryPath";
 
-
-	// Junk
-	private static final String SHOW_GENETIC_ALGORITHMS = "showGeneticAlgorithms";
 
 	// What's this for?
 	private Set forbidExternalModification = new HashSet();
@@ -290,8 +283,6 @@ public final class SupremicaProperties
 		setProperty(LOG_TO_CONSOLE, "false", true);
 		setProperty(LOG_TO_GUI, "false", true);
 		setProperty(ALLOW_SUPERUSER_LOGIN, "true", false);
-		// Robot Coordination
-		setProperty(GENERAL_USE_ROBOTCOORDINATION, "false", true);
 		// General
 		setProperty(GENERAL_STATE_SEPARATOR, ".", true);
 		setProperty(GENERAL_STATELABEL_SEPARATOR, ",", false);
@@ -341,9 +332,6 @@ public final class SupremicaProperties
 		//setProperty(FB_RUNTIME_LIBRARY_PATH, "", true);
 
 		softplcInterfaces.add(new org.supremica.gui.SoftplcInterface("org.supremica.softplc.Simulator.BTSim"));
-
-		// Junk
-		setProperty(SHOW_GENETIC_ALGORITHMS, "false", true);
 	}
 
 	// --------------------------------------------------------------
@@ -726,23 +714,6 @@ public final class SupremicaProperties
 		return theFile.getAbsolutePath();
 	}
 
-	public static String getFileRSDemoOpenPath()
-	{
-		try {
-			File theFile = new File(wp.getProperty(FILE_RSDEMO_OPEN_PATH));
-
-			return theFile.getAbsolutePath();
-		}
-		catch (NullPointerException e) {
-			return null;
-		}
-	}
-
-	public static void setFileRSDemoOpenPath(String path)
-	{
-		wp.setProperty(FILE_RSDEMO_OPEN_PATH, path);
-	}
-
 	public static void setFileSavePath(String path)
 	{
 		wp.setProperty(FILE_SAVE_PATH, path);
@@ -773,7 +744,6 @@ public final class SupremicaProperties
 		return isWindows();
 	}
 
-
 	public static boolean generalUseRCP()
 	{
 		return toBoolean(wp.getProperty(GENERAL_USE_RCP));
@@ -783,29 +753,6 @@ public final class SupremicaProperties
 	{
 		wp.setProperty(GENERAL_USE_RCP, toString(allow));
 	}
-
-	public static boolean generalUseRobotCoordination()
-	{
-		return toBoolean(wp.getProperty(GENERAL_USE_ROBOTCOORDINATION));
-	}
-
-	public static void setGeneralUseRobotCoordination(boolean allow)
-	{
-		wp.setProperty(GENERAL_USE_ROBOTCOORDINATION, toString(allow));
-	}
-
-	/* WHAT'S THE DIFFERENCE!??!? WHY IS THERE A DIFFERENCE!! WASN'T THE WHOLE BLOODY
-	   POINT THAT THERE WOULDN'T BE A DIFFERENCE? AAARGH. I'M SO UPSET!!! /hguo
-	public static boolean generalUseRobotCoordinationABB()
-	{
-		return toBoolean(wp.getProperty(GENERAL_USE_ROBOTCOORDINATION_ABB));
-	}
-
-	public static void setGeneralUseRobotCoordinationABB(boolean allow)
-	{
-		wp.setProperty(GENERAL_USE_ROBOTCOORDINATION_ABB, toString(allow));
-	}
-	*/
 
 	public static boolean fileAllowImport()
 	{
@@ -1530,11 +1477,6 @@ public final class SupremicaProperties
 			Options.interleaved_variables = optionAsBoolean(BDD_INTERLEAVED_VARIABLES, Options.interleaved_variables);
 			Options.show_level_graph = optionAsBoolean(BDD_LEVEL_GRAPHS, Options.show_level_graph);
 		}
-	}
-
-	public static boolean showGeneticAlgorithms()
-	{
-		return toBoolean(wp.getProperty(SHOW_GENETIC_ALGORITHMS));
 	}
 
 	private static String toString(boolean b)

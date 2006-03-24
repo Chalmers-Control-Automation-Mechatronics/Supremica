@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorNodeGroup
 //###########################################################################
-//# $Id: EditorNodeGroup.java,v 1.22 2006-03-23 16:06:03 flordal Exp $
+//# $Id: EditorNodeGroup.java,v 1.23 2006-03-24 16:59:27 flordal Exp $
 //###########################################################################
 
 
@@ -96,7 +96,7 @@ public class EditorNodeGroup
 	{
 		// There's a bug here, resizing does not work properly if you
 		// drag a control point past one of its neighbours (and so
-		// "inverting" the rectangle)!
+		// "invert" the rectangle)!
 
 		GeometryProxy old = new BoxGeometrySubject((Rectangle2D)subject.getGeometry().getRectangle().clone());
 		Rectangle2D bounds = new Rectangle2D.Double();

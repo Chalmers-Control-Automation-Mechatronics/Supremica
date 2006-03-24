@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorEdge
 //###########################################################################
-//# $Id: EditorEdge.java,v 1.38 2006-03-23 16:06:03 flordal Exp $
+//# $Id: EditorEdge.java,v 1.39 2006-03-24 16:59:27 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -960,7 +960,7 @@ public class EditorEdge
 
 		//      else{
 		double m = e.getY() / e.getX();
-		double x = Math.sqrt(Math.pow(endNode.getWidth() / 2 + WIDTHD, 2) / (Math.pow(m, 2) + 1));
+		double x = Math.sqrt(Math.pow(endNode.RADIUS + WIDTHD, 2) / (Math.pow(m, 2) + 1));
 
 		if (e.getX() < 0)
 		{

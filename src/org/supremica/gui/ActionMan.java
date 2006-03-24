@@ -65,7 +65,7 @@ import org.supremica.gui.animators.scenebeans.*;
 //import org.supremica.gui.animators.tsim.*;
 import org.supremica.gui.automataExplorer.AutomataExplorer;
 import org.supremica.gui.simulator.SimulatorExecuter;
-import org.supremica.external.robotCoordination.*;
+//import org.supremica.external.robotCoordination.*;
 import org.supremica.external.shoefactory.plantBuilder.*;
 import org.supremica.external.shoefactory.Configurator.*;
 import org.supremica.log.*;
@@ -2175,6 +2175,7 @@ public class ActionMan
 		};
 	}
 
+	/*
 	public static void fileImportRobotCoordination(Gui gui)
 	{
 		new FileImporter(FileDialogs.getXMLFileImporter(), gui)    // anonymous class
@@ -2185,6 +2186,7 @@ public class ActionMan
 			}
 		};
 	}
+	*/
 
 	// Aldebaran format, a simple format for specifying des
 	public static void fileImportAut(Gui gui)
@@ -2544,6 +2546,7 @@ public class ActionMan
 		}
 	}
 
+	/*
 	public static void importRobotCoordinationFile(Gui gui, File file)
 	{
 
@@ -2566,6 +2569,7 @@ public class ActionMan
 			return;
 		}
 	}
+	*/
 
 	// Automata.AlphabetNormalize action performed
 	public static void normalizeAlphabet_actionPerformed(Gui gui)
@@ -2824,6 +2828,7 @@ public class ActionMan
 	}
 	*/
 
+	/*
 	static CellExaminer theCellExaminer = null;
 	public static void showCellExaminer(Gui gui)
 	{
@@ -2838,225 +2843,6 @@ public class ActionMan
 				}
 
 				theCellExaminer.setVisible(true);
-
-				/*
-				CellExaminer examiner = new CellExaminer(ActionMan.getGui().getFrame());
-				examiner.setVisible(true);
-				*/
-			}
-		});
-
-		thread.start();
-	}
-
-	/*
-	public static void robotStudioOpenStation(Gui gui)
-	{
-		new FileImporter(FileDialogs.getRobotStudioStationFileImporter(), gui)    // anonymous class
-		{
-			void openFile(Gui g, File f)
-			{
-				String stationName;
-
-				stationName = f.getAbsolutePath();
-
-				RobotStudioLink robotStudioLink = new RobotStudioLink(g, stationName);
-
-				robotStudioLink.init();
-			}
-		};
-	}
-
-	public static void robotStudioCreateMutexZones(Gui gui)
-	{
-		Thread thread = new Thread(new Runnable()
-		{
-			public void run()
-			{
-				RobotStudioLink.createMutexZonesManual();
-			}
-		});
-
-		thread.start();
-	}
-
-	public static void robotStudioCreateMutexZonesGrid(Gui gui)
-	{
-		Thread thread = new Thread(new Runnable()
-		{
-			public void run()
-			{
-				RobotStudioLink.createMutexZonesGrid();
-			}
-		});
-
-		thread.start();
-	}
-
-	public static void robotStudioCreateMutexZonesFromSpan(Gui gui)
-	{
-		Thread thread = new Thread(new Runnable()
-		{
-			public void run()
-			{
-				RobotStudioLink.createMutexZonesFromSpan();
-			}
-		});
-
-		thread.start();
-	}
-
-	public static void robotStudioExtractAutomata(Gui gui)
-	{
-		Thread thread = new Thread(new Runnable()
-		{
-			public void run()
-			{
-				RobotStudioLink.extractAutomata();
-			}
-		});
-
-		thread.start();
-	}
-
-	public static void robotStudioExecuteRobot(Gui gui)
-	{
-		Automata selectedAutomata = gui.getSelectedAutomata();
-
-		if (selectedAutomata.size() != 1)
-		{
-			JOptionPane.showMessageDialog(gui.getComponent(), "Exactly one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
-
-			return;
-		}
-
-		RobotStudioLink.executeRobotAutomaton(selectedAutomata.getAutomatonAt(0));
-	}
-
-	public static void robotStudioKill()
-	{
-		RobotStudioLink.kill();
-	}
-
-	public static void robotStudioTest(Gui gui)
-	{
-		RobotStudioLink.test(gui);
-	}
-	*/
-
-	/* // DOMENICO STUFF
-	// File.Import.FromRobotCoordinationABB
-	public static void importRobotCoordinationFileABB(Gui gui, File file)
-	{
-		// logger.info("Importing " + file.getAbsolutePath() + " ...");
-		gui.info("Importing " + file.getAbsolutePath() + " ...");
-		ConvertToAutomata.conversionToAutomata(file);
-	}
-
-	// What is this!?!?? Wasn't the friggin' point of this whole thing to AVOID having
-	// application specific import functions?!? Why is there a fileImportRobotCoordination
-	// AND a fileImportRobotCoordinationABB????? I'm so upset! GRRRRRrrrrRRRR!! /hguo
-	//
-	// File.Import.FromRobotCoordinationABB (format representing RobotStudio station)
-	public static void fileImportRobotCoordinationABB(Gui gui)
-	{
-		new FileImporter(FileDialogs.getXMLFileImporter(), gui)    // anonymous class
-		{
-			void openFile(Gui g, File f)
-			{
-				importRobotCoordinationFileABB(g, f);
-			}
-		};
-	}
-
-	// CoordinationABB of robots in Robot Studio
-	public static void createPathsInRS(Gui gui)
-	{
-		Thread thread = new Thread(new Runnable()
-		{
-			public void run()
-			{
-				CreateXml.createPathsInRS();
-			}
-		});
-
-		thread.start();
-	}
-
-	public static void createSpansInRS(Gui gui)
-	{
-		Thread thread = new Thread(new Runnable()
-		{
-			public void run()
-			{
-				CreateXml.createSpansInRS();
-			}
-		});
-
-		thread.start();
-	}
-
-	public static void createMutexZonesInRS(Gui gui)
-	{
-		Thread thread = new Thread(new Runnable()
-		{
-			public void run()
-			{
-				CreateXml.createMutexZonesInRS();
-			}
-		});
-
-		thread.start();
-	}
-
-	public static void addViaPointsInRS(Gui gui)
-	{
-		Thread thread = new Thread(new Runnable()
-		{
-			public void run()
-			{
-				CreateXml.addViaPointsInRS();
-			}
-		});
-
-		thread.start();
-	}
-
-	public static void buildXmlFile(Gui gui)
-	{
-		CreateXml.buildXmlFile();
-	}
-
-	public static void executeScheduledAutomaton(Gui gui)
-	{
-		Automata selectedAutomata = gui.getSelectedAutomata();
-
-		if (selectedAutomata.size() != 1)
-		{
-			JOptionPane.showMessageDialog(gui.getComponent(), "Exactly one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
-
-			return;
-		}
-
-		final Automaton a = new Automaton(selectedAutomata.getAutomatonAt(0));
-		Thread thread = new Thread(new Runnable()
-		{
-			public void run()
-			{
-				CreateXml.executeScheduledAutomaton(a);
-			}
-		});
-
-		thread.start();
-	}
-
-	public static void demonstrate(Gui gui)
-	{
-		Thread thread = new Thread(new Runnable()
-		{
-			public void run()
-			{
-				CreateXml.demoCoordination();
 			}
 		});
 

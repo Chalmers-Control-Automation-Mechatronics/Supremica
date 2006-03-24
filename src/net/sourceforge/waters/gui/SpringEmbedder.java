@@ -41,7 +41,7 @@ public class SpringEmbedder
 					}
 				}
 				max = d.updatePositions(movements);
-				System.out.println(max);
+				//System.out.println(max);
 				if (max < .01)
 				{
 					break;
@@ -56,7 +56,7 @@ public class SpringEmbedder
 					movements.put(p, p.acceptVisitor(d));
 				}
 				max = d.updatePositions(movements);
-				System.out.println(max);
+				//System.out.println(max);
 				if (max < .01)
 				{
 					break;

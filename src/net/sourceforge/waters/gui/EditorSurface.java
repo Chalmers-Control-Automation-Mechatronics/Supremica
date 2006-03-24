@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.49 2006-03-23 16:06:03 flordal Exp $
+//# $Id: EditorSurface.java,v 1.50 2006-03-24 16:59:27 flordal Exp $
 //###########################################################################
 
 
@@ -1107,13 +1107,13 @@ public class EditorSurface
 			int x = 0;
 			int y = 0;
 
-			for (y = gridSize - EditorNode.WIDTH / 2; y < getHeight();
+			for (y = gridSize - EditorNode.RADIUS; y < getHeight();
 					y += gridSize)
 			{
-				for (x = gridSize - EditorNode.WIDTH / 2; x < getWidth();
+				for (x = gridSize - EditorNode.RADIUS; x < getWidth();
 						x += gridSize)
 				{
-					r.setRect(x, y, gridSize * (size - 1) * 4 + EditorNode.WIDTH, gridSize * (size - 1) * 4 + EditorNode.WIDTH);
+					r.setRect(x, y, gridSize * (size - 1) * 4 + EditorNode.RADIUS*2, gridSize * (size - 1) * 4 + EditorNode.RADIUS*2);
 
 					found = true;
 
@@ -1169,8 +1169,8 @@ public class EditorSurface
 					if (noGeometry.get(i * size + j) instanceof SimpleNodeSubject)
 					{
 						SimpleNodeSubject np = (SimpleNodeSubject) noGeometry.get(i * size + j);
-						Point2D.Double p = new Point2D.Double(x + (j * gridSize * 4) + EditorNode.WIDTH / 2,
-										      y + (i * gridSize * 4) + EditorNode.WIDTH / 2);
+						Point2D.Double p = new Point2D.Double(x + (j * gridSize * 4) + EditorNode.RADIUS,
+										      y + (i * gridSize * 4) + EditorNode.RADIUS);
 						np.setPointGeometry(new PointGeometrySubject(p));
 						addNode(np);
 					}
@@ -1302,7 +1302,7 @@ public class EditorSurface
 			EditorNode node = (EditorNode) nodes.get(i);
 			
 			x = node.getX();
-			mod = EditorNode.RADIUS + 2 + SPACING; // The 2 is there to compensate for rounding?
+			mod = node.RADIUS + 2 + SPACING; // The 2 is there to compensate for rounding?
 			if (x + mod > maxX)
 			{
 				maxX = x + mod;
@@ -1590,6 +1590,9 @@ public class EditorSurface
 		return drawnAreaBounds;
 	}
 
+	/**
+	 * Returns true if the nodegroup ng is colliding with anything (a node).
+	 */
 	public boolean nodeGroupIsColliding(EditorNodeGroup ng)
 	{
 		Rectangle2D r = ng.getBounds();
@@ -1599,7 +1602,7 @@ public class EditorSurface
 		{
 			EditorNode n = (EditorNode) nodes.get(i);
 
-			e.setFrameFromCenter(n.getX(), n.getY(), n.getX() + n.radius(), n.getY() + n.radius());
+			e.setFrameFromCenter(n.getX(), n.getY(), n.getX() + n.RADIUS, n.getY() + n.RADIUS);
 
 			if (r.intersects(e) &&!r.contains(e))
 			{
@@ -1610,10 +1613,13 @@ public class EditorSurface
 		return false;
 	}
 
+	/**
+	 * Returns true if the node n is colliding with anything (another node or a nodegroup).
+	 */
 	public boolean nodeIsColliding(EditorNode n)
 	{
 		Rectangle2D.Double e = new Rectangle2D.Double();
-		e.setFrameFromCenter(n.getX(), n.getY(), n.getX() + n.radius(), n.getY() + n.radius());
+		e.setFrameFromCenter(n.getX(), n.getY(), n.getX() + n.RADIUS, n.getY() + n.RADIUS);
 
 		for (int i = 0; i < nodeGroups.size(); i++)
 		{
@@ -1630,7 +1636,7 @@ public class EditorSurface
 		{
 			EditorNode n2 = (EditorNode) nodes.get(i);
 
-			if ((n != n2) && Math.sqrt(Math.pow(n.getX()-n2.getX(), 2) + Math.pow(n.getY()-n2.getY(), 2)) < EditorNode.RADIUS*2+2)
+			if ((n != n2) && Math.sqrt(Math.pow(n.getX()-n2.getX(), 2) + Math.pow(n.getY()-n2.getY(), 2)) < n2.RADIUS*2+2)
 			{
 				return true;
 			}

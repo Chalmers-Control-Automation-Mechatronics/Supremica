@@ -76,6 +76,7 @@
 -->
 
 <target name="initialize_jars">	
+    <!-- PLEASE ADD COMMENTS DESCRIBING THE DIFFERENT LIBRARIES. -->
  	<unjar src="${lib}/rpcdocdbClient.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/JGo.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/JGoLayout.jar" dest="${lib}/${unjared}"/>
@@ -96,7 +97,7 @@
 	<unjar src="${lib}/scenebeansXmlCompability.jar" dest="${lib}/${unjared}"/>
 	<unjar src="${lib}/BCEL.jar" dest="${lib}/${unjared}"/>
 	<unjar src="${lib}/jgl3.1.0.jar" dest="${lib}/${unjared}"/>
-	<unjar src="${lib}/izmcomjni.jar" dest="${lib}/${unjared}"/>
+<!--	<unjar src="${lib}/izmcomjni.jar" dest="${lib}/${unjared}"/>--> <!-- JacoZoom library. -->
 	<unjar src="${lib}/ctrlmngr.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/CCOM.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/jacorb.jar" dest="${lib}/${unjared}"/>	
@@ -105,7 +106,7 @@
 	<unjar src="${lib}/xmlBlaster.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/xtdash.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/jgrafchart.jar" dest="${lib}/${unjared}"/>	
-	<unjar src="${lib}/interfaceRobotStudio3_1.jar" dest="${lib}/${unjared}"/>
+<!--	<unjar src="${lib}/interfaceRobotStudio3_1.jar" dest="${lib}/${unjared}"/>--> <!-- RobotStudio API. -->
 	<unjar src="${lib}/WMFWriter2D.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/sysutils.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/swixml.jar" dest="${lib}/${unjared}"/>
@@ -212,21 +213,6 @@
 *	source files that have changed.
 -->
 <target name="compile" depends="compile_supremica,compile_tests_supremica">
-	<javac
-		debug="on"
-		debuglevel="lines,source"
-		srcdir="${src}"
-		destdir="${build}"
-		classpath="${lib}/${unjared}"
-		includeJavaRuntime="yes"
-		deprecation="false"
-		verbose="false"
-		nowarn="true"
-		includes="
-			${supremica_basedir}/external/**,
-			${jgrafchart_basedir}/external/**"
-		source="1.5"
-	/>
 </target>
 
 <!-- Compile:
@@ -244,14 +230,11 @@
 		deprecation="false"
 		verbose="false"
 		nowarn="true"
-		excludes="
+        excludes="
 			${jgrafchart_basedir}/**,
-			${supremica_basedir}/external/comInterfaces/**,
-			${supremica_basedir}/sattline/**,
-			${supremica_basedir}/supervisor/**,	
+			${supremica_basedir}/external/robotCoordination/**,
 			${supremica_basedir}/functionblocks/xsd/**,
 			${supremica_basedir}/automationobjects/xsd/**"	
-		source="1.5"
 		fork="true"
 		memoryMaximumSize="128M"
 	/>
@@ -712,8 +695,10 @@
 	<chmod file="${dist}/BisimulationEquivalence.dll" perm="644"/> 
 	<copy file="${platform}/win.x86/lib/izmjnicom.dll" todir="${dist}"/>	
 	<chmod file="${dist}/izmjnicom.dll" perm="644"/>
+<!-- JacoZoom license removed.
 	<copy file="${platform}/win.x86/lib/21100280.LIC" todir="${dist}"/>	
 	<chmod file="${dist}/21100280.LIC" perm="644"/>
+-->
 	<copy file="${platform}/win.x86/lib/JavaClipboard.dll" todir="${dist}"/>	
 	<chmod file="${dist}/JavaClipboard.dll" perm="644"/>
 	<copy file="${platform}/win.x86/lib/glpk_bridge.dll" todir="${dist}"/>	

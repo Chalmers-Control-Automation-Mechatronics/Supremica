@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorMenu
 //###########################################################################
-//# $Id: EditorMenu.java,v 1.23 2006-03-23 19:45:45 flordal Exp $
+//# $Id: EditorMenu.java,v 1.24 2006-03-24 16:59:27 flordal Exp $
 //###########################################################################
 
 
@@ -264,9 +264,9 @@ public class EditorMenu
 		
 		if (e.getSource() == mEmbedder)
 		{
-			try {
-				int iterations = Integer.parseInt(JOptionPane.showInputDialog(this, "Input A number of Iterations to Run the Embedder",
-												  new Integer(100)));
+			try 
+			{
+				int iterations = Integer.parseInt(JOptionPane.showInputDialog(this, "Input number of iterations for the embedder", new Integer(100)));
 				SpringEmbedder.run(surface, surface.getGraph() , iterations);
 			}
 			catch(Throwable t)

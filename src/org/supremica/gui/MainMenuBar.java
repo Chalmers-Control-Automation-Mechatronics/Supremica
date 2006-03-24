@@ -89,7 +89,6 @@ import org.supremica.gui.animators.scenebeans.AnimationItem;
 import org.supremica.gui.animators.scenebeans.AnimationGroup;
 import org.supremica.util.BrowserControl;
 import org.supremica.util.SupremicaMenuItem;
-//import org.supremica.automata.algorithms.RobotStudioLink;
 
 public class MainMenuBar
     extends JMenuBar
@@ -275,6 +274,7 @@ public class MainMenuBar
 		});
 		*/
 
+		/*
 		//File.Import.RobotCoordination
 		JMenuItem menuFileImportRobotCoordination = new JMenuItem("From Robot Coordinator...");
 		menuFileImport.add(menuFileImportRobotCoordination);
@@ -285,6 +285,7 @@ public class MainMenuBar
 					ActionMan.fileImportRobotCoordination(ActionMan.getGui());
 				}
 		    });
+		*/
 	}
 
 	/*
@@ -948,6 +949,7 @@ public class MainMenuBar
 	});
 	*/
 
+	/*
 	// Tools.CellExaminer
 	if (SupremicaProperties.generalUseRobotCoordination())
 	{
@@ -965,245 +967,10 @@ public class MainMenuBar
 		    }
 		});
 	}
-
-	/*
-	// Tools.RobotStudio
-	// This is Hugo's old implementation
-	if (SupremicaProperties.showRobotstudioLink())
-	{
-	    menuTools.add(new JSeparator());
-
-	    JMenu menuRobotStudioLink = new JMenu();
-
-	    menuRobotStudioLink.setText("RobotStudio");
-	    menuTools.add(menuRobotStudioLink);
-
-	    // RobotStudioOpenStation
-	    JMenuItem robOpen = new JMenuItem();
-
-	    robOpen.setText("Open RobotStudio Station...");
-	    menuRobotStudioLink.add(robOpen);
-	    robOpen.addActionListener(new ActionListener()
-		{
-		    public void actionPerformed(ActionEvent e)
-		    {
-			ActionMan.robotStudioOpenStation(ActionMan.getGui());
-		    }
-		});
-
-	    // RobotStudioCreateMutexZones
-	    JMenuItem robMutex = new JMenuItem();
-
-	    robMutex.setText("Create Mutex Zones 'Manually'");
-	    menuRobotStudioLink.add(robMutex);
-	    robMutex.addActionListener(new ActionListener()
-		{
-		    public void actionPerformed(ActionEvent e)
-		    {
-			ActionMan.robotStudioCreateMutexZones(ActionMan.getGui());
-		    }
-		});
-
-	    // RobotStudioCreateMutexZones
-	    JMenuItem robMutexGrid = new JMenuItem();
-
-	    robMutexGrid.setText("Create Mutex Zones Grid");
-	    menuRobotStudioLink.add(robMutexGrid);
-	    robMutexGrid.addActionListener(new ActionListener()
-		{
-		    public void actionPerformed(ActionEvent e)
-		    {
-			ActionMan.robotStudioCreateMutexZonesGrid(ActionMan.getGui());
-		    }
-		});
-
-	    // RobotStudioCreateMutexZones
-	    JMenuItem robSpanMutex = new JMenuItem();
-
-	    robSpanMutex.setText("Create Mutex Zones From Span");
-	    menuRobotStudioLink.add(robSpanMutex);
-	    robSpanMutex.addActionListener(new ActionListener()
-		{
-		    public void actionPerformed(ActionEvent e)
-		    {
-			ActionMan.robotStudioCreateMutexZonesFromSpan(ActionMan.getGui());
-		    }
-		});
-
-	    // RobotStudioExtractAutomata
-	    JMenuItem robExtract = new JMenuItem();
-
-	    robExtract.setText("Extract Automata");
-	    menuRobotStudioLink.add(robExtract);
-	    robExtract.addActionListener(new ActionListener()
-		{
-		    public void actionPerformed(ActionEvent e)
-		    {
-			ActionMan.robotStudioExtractAutomata(ActionMan.getGui());
-		    }
-		});
-
-	    // RobotStudioExecuteAutomaton
-	    JMenuItem robExec = new JMenuItem();
-
-	    robExec.setText("Execute Robot Automaton");
-	    menuRobotStudioLink.add(robExec);
-	    robExec.addActionListener(new ActionListener()
-		{
-		    public void actionPerformed(ActionEvent e)
-		    {
-			ActionMan.robotStudioExecuteRobot(ActionMan.getGui());
-		    }
-		});
-
-	    // RobotStudioKill
-	    JMenuItem robKill = new JMenuItem();
-
-	    robKill.setText("Kill RobotStudio Link");
-	    menuRobotStudioLink.add(robKill);
-	    robKill.addActionListener(new ActionListener()
-		{
-		    public void actionPerformed(ActionEvent e)
-		    {
-			ActionMan.robotStudioKill();
-		    }
-		});
-
-	    // RobotStudioTest
-	    JMenuItem robTest = new JMenuItem();
-
-	    robTest.setText("Run Demo");
-	    menuRobotStudioLink.add(robTest);
-	    robTest.addActionListener(new ActionListener()
-		{
-		    public void actionPerformed(ActionEvent e)
-		    {
-			ActionMan.robotStudioTest(ActionMan.getGui());
-		    }
-		});
-	}
-	*/
-
-	/*
-	// Tools.CoordinationABB
-	// This is Domenico's implementation, the result from his master's thesis
-	if (SupremicaProperties.showCoordinationABB())
-	{
-	    menuTools.add(new JSeparator());
-
-	    JMenu menuCoordinationABB = new JMenu();
-
-	    menuCoordinationABB.setText("CoordinationABB");
-	    menuTools.add(menuCoordinationABB);
-
-	    // OpenRobotStudioStation
-	    JMenuItem stationOpen = new JMenuItem();
-
-	    stationOpen.setText("Open Robot Studio Station...");
-	    menuCoordinationABB.add(stationOpen);
-	    stationOpen.addActionListener(new ActionListener()
-		{
-		    public void actionPerformed(ActionEvent e)
-		    {
-			ActionMan.robotStudioOpenStation(ActionMan.getGui());
-			RobotStudioLink.configureCreateXml();
-		    }
-		});
-
-	    // CreatePaths
-	    JMenuItem createPaths = new JMenuItem();
-
-	    createPaths.setText("Create paths in Robot Studio");
-	    menuCoordinationABB.add(createPaths);
-	    createPaths.addActionListener(new ActionListener()
-		{
-		    public void actionPerformed(ActionEvent e)
-		    {
-			ActionMan.createPathsInRS(ActionMan.getGui());
-		    }
-		});
-
-	    // CreateSpans
-	    JMenuItem createSpans = new JMenuItem();
-
-	    createSpans.setText("Simulations to create Spans");
-	    menuCoordinationABB.add(createSpans);
-	    createSpans.addActionListener(new ActionListener()
-		{
-		    public void actionPerformed(ActionEvent e)
-		    {
-			ActionMan.createSpansInRS(ActionMan.getGui());
-		    }
-		});
-
-	    // CreateMutexZones
-	    JMenuItem createMutexZones = new JMenuItem();
-
-	    createMutexZones.setText("Intersect Spans -> Mutex Zones");
-	    menuCoordinationABB.add(createMutexZones);
-	    createMutexZones.addActionListener(new ActionListener()
-		{
-		    public void actionPerformed(ActionEvent e)
-		    {
-			ActionMan.createMutexZonesInRS(ActionMan.getGui());
-		    }
-		});
-
-	    // AddViaPoints
-	    JMenuItem addViaPoints = new JMenuItem();
-
-	    addViaPoints.setText("Simulations to add via-points");
-	    menuCoordinationABB.add(addViaPoints);
-	    addViaPoints.addActionListener(new ActionListener()
-		{
-		    public void actionPerformed(ActionEvent e)
-		    {
-			ActionMan.addViaPointsInRS(ActionMan.getGui());
-		    }
-		});
-
-	    // BuildXmlFile
-	    JMenuItem buildXmlFile = new JMenuItem();
-
-	    buildXmlFile.setText("Build xml file");
-	    menuCoordinationABB.add(buildXmlFile);
-	    buildXmlFile.addActionListener(new ActionListener()
-		{
-		    public void actionPerformed(ActionEvent e)
-		    {
-			ActionMan.buildXmlFile(ActionMan.getGui());
-		    }
-		});
-
-	    // ExecuteScheduledAutomaton
-	    JMenuItem scheduledExecute = new JMenuItem();
-
-	    scheduledExecute.setText("Execute Optimal Coordination");
-	    menuCoordinationABB.add(scheduledExecute);
-	    scheduledExecute.addActionListener(new ActionListener()
-		{
-		    public void actionPerformed(ActionEvent e)
-		    {
-			ActionMan.executeScheduledAutomaton(ActionMan.getGui());
-		    }
-		});
-
-	    JMenuItem demo = new JMenuItem();
-
-	    demo.setText("Optimal coordination DEMO");
-	    menuCoordinationABB.add(demo);
-	    demo.addActionListener(new ActionListener()
-		{
-		    public void actionPerformed(ActionEvent e)
-		    {
-			ActionMan.demonstrate(ActionMan.getGui());
-		    }
-		});
-	}
 	*/
 
 	// Tools.Evolution
-	if (SupremicaProperties.showGeneticAlgorithms())
+	if (false)
 	{
 	    menuTools.add(new JSeparator());
 

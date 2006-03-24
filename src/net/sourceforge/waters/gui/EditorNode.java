@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorNode
 //###########################################################################
-//# $Id: EditorNode.java,v 1.35 2006-03-21 21:58:04 flordal Exp $
+//# $Id: EditorNode.java,v 1.36 2006-03-24 16:59:27 flordal Exp $
 //###########################################################################
 
 
@@ -293,22 +293,12 @@ public class EditorNode
 		return mSubject;
 	}
 
-	public int radius()
-	{
-		return (int) RADIUS;
-	}
-
-	public int getWidth()
-	{
-		return WIDTH;
-	}
-
 	/**
 	 * Returns an ellipse that outlines the node.
 	 */
 	public Ellipse2D.Double getEllipsicalOutline()
 	{
-		return new Ellipse2D.Double(getX() - RADIUS, getY() - RADIUS, WIDTH, WIDTH);
+		return new Ellipse2D.Double(getX()-RADIUS, getY()-RADIUS, RADIUS*2, RADIUS*2);
 	}
 
 	/**
@@ -316,7 +306,7 @@ public class EditorNode
 	 */
 	public Rectangle2D.Double getRectangularOutline()
 	{
-		return new Rectangle2D.Double(getX() - RADIUS, getY() - RADIUS, WIDTH, WIDTH);
+		return new Rectangle2D.Double(getX()-RADIUS, getY()-RADIUS, RADIUS*2, RADIUS*2);
 	}
 
 	public void drawObject(Graphics g, boolean selected)
@@ -338,7 +328,7 @@ public class EditorNode
 		{
 			g2d.setStroke(SHADOWSTROKE); 
 			g2d.setColor(getShadowColor(selected));				
-			g2d.drawOval(getX() - RADIUS, getY() - RADIUS, WIDTH, WIDTH);			
+			g2d.drawOval(getX() - RADIUS, getY() - RADIUS, RADIUS*2, RADIUS*2);			
 			g2d.setColor(getColor(selected));
 			g2d.setStroke(BASICSTROKE);
 		}
@@ -349,16 +339,16 @@ public class EditorNode
 			// There is no marking!
 			// Draw the background white!
 			g2d.setColor(Color.WHITE);
-			g2d.fillOval(getX() - RADIUS, getY() - RADIUS, WIDTH, WIDTH);
+			g2d.fillOval(getX() - RADIUS, getY() - RADIUS, RADIUS*2, RADIUS*2);
 		}
-		else if (mColors.size() <= maxDrawnMarkings)
+		else if (mColors.size() <= MAXDRAWNMARKINGS)
 		{
 			Arc2D.Double a = new Arc2D.Double();
 			double startAngle = 0;
 			double deltaAngle = (double) (360/mColors.size());
 			for (final Color color : mColors) {
 				// There are markings but they are fewer than
-				// maxDrawnMarkings+1! 
+				// MAXDRAWNMARKINGS+1! 
 				// Draw nice colored pies!!
 				a.setArcByCenter(getX(), getY(), RADIUS,
 								 startAngle, deltaAngle, Arc2D.PIE);
@@ -369,9 +359,9 @@ public class EditorNode
 		}
 		else
 		{
-			// More than maxDrawnMarkings markings! Use the default marking color and draw a cross on top!
+			// More than MAXDRAWNMARKINGS markings! Use the default marking color and draw a cross on top!
 			g2d.setColor(EditorColor.DEFAULTMARKINGCOLOR);
-			g2d.fillOval(getX() - RADIUS, getY() - RADIUS, WIDTH, WIDTH);
+			g2d.fillOval(getX() - RADIUS, getY() - RADIUS, RADIUS*2, RADIUS*2);
 			
 			//g2d.setColor(EditorColor.DEFAULTCOLOR);
 			g2d.setColor(Color.WHITE);
@@ -391,15 +381,20 @@ public class EditorNode
 				// Draw border thicker!
 				g2d.setStroke(DOUBLESTROKE);
 		}
-		g2d.drawOval(getX() - RADIUS, getY() - RADIUS, WIDTH, WIDTH);			
+		g2d.drawOval(getX()-RADIUS, getY()-RADIUS, RADIUS*2, RADIUS*2);			
 		g2d.setStroke(BASICSTROKE);
+		/*
+		// Draw a double circle on marked nodes... (one color marking only?)
+		if (mColors.size() > 0)
+			g2d.drawOval(getX()-RADIUS+2, getY()-RADIUS+2, RADIUS*2-4, RADIUS*2-4);			
+		*/
 	}
 
 	private void drawInitialStateArrow(Graphics2D g2d)
 	{
 		// Draw line
-		int borderX = getX() + (int) ((RADIUS+4) * Math.sin(INITARROWANGLE));
-		int borderY = getY() + (int) ((RADIUS+4) * Math.cos(INITARROWANGLE));
+		int borderX = getX() + (int) ((RADIUS+4) * Math.sin(INITARROWANGLE)); // Why +4?
+		int borderY = getY() + (int) ((RADIUS+4) * Math.cos(INITARROWANGLE)); // Why +4?
 		int outerX = borderX + (int) (INITARROWLENGTH * Math.sin(INITARROWANGLE));
 		int outerY = borderY + (int) (INITARROWLENGTH * Math.cos(INITARROWANGLE));
 		g2d.setStroke(BASICSTROKE);
@@ -452,13 +447,14 @@ public class EditorNode
 	private EditorPropGroup propGroup;
 
 	// Constants
-	public static final int WIDTH = 12;
-	public static final int RADIUS = WIDTH/2;
-	public static final double INITARROWANGLE =
-		3*Math.PI/4 + Math.PI/2; // 135 degrees plus correction
-	public static final int INITARROWLENGTH = 15;
 
-	// Maximum number of colors shown in a node
-	private static final int maxDrawnMarkings = 4;
+	/** Radius of node. */
+	public static final int RADIUS = 6;
+	/** Angle of initial state arrow -- 135 degrees (plus correction) */
+	public static final double INITARROWANGLE = 3*Math.PI/4 + Math.PI/2;
+	/** Length of initial state arrow. */
+	public static final int INITARROWLENGTH = 15;
+	/** Maximum number of colors shown in a node. */
+	private static final int MAXDRAWNMARKINGS = 4;
 
 }
