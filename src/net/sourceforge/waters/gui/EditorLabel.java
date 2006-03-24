@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorLabel
 //###########################################################################
-//# $Id: EditorLabel.java,v 1.28 2006-03-23 12:07:14 flordal Exp $
+//# $Id: EditorLabel.java,v 1.29 2006-03-24 17:46:57 flordal Exp $
 //###########################################################################
 
 
@@ -18,6 +18,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.Font;
 import java.awt.geom.Rectangle2D;
 import java.awt.event.*;
 import java.awt.geom.Point2D;
@@ -222,6 +223,7 @@ public class EditorLabel
 		{
 			label = new JLabel(par.getName());
 		}
+		//label.setFont(new Font(null, Font.BOLD, 12));
 		if (par.getSubject().getLabelGeometry() == null)
 		{
 			final Point2D point = new Point(DEFAULTOFFSETX, DEFAULTOFFSETY);
