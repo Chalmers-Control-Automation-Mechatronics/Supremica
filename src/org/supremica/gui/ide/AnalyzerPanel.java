@@ -46,7 +46,6 @@ public class AnalyzerPanel
 		((GridBagLayout)getLayout()).setConstraints(splitPanelHorizontal, getGridBagConstraints());
 
 		add(splitPanelHorizontal);
-		//		validate();
 	}
 
 	/**

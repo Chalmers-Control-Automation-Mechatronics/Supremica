@@ -839,7 +839,11 @@ class DoneButton
 		// Add to gui?
 		if (wb.automaton != null && wb.toAddIt())
 		{
-			ActionMan.getGui().addAutomaton(wb.automaton);
+			Gui gui = ActionMan.getGui();
+			if (gui != null)
+			{
+				gui.addAutomaton(wb.automaton);
+			}
 		}
 		
 		// Exit

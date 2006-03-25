@@ -1226,7 +1226,7 @@
                                     <Point X="464" Y="192"/>
                                 </StartPointGeometry>
                                 <SplineGeometry Kind="INTERPOLATING">
-                                    <Point X="486" Y="151"/>
+                                    <Point X="483" Y="157"/>
                                 </SplineGeometry>
                                 <EndPointGeometry>
                                     <Point X="464" Y="192"/>
@@ -1432,7 +1432,7 @@
                                         <IntConstant Value="3"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point X="-15" Y="39"/>
+                                        <Point X="-25" Y="41"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <StartPointGeometry>
@@ -1471,7 +1471,7 @@
                                         <IntConstant Value="2"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point X="-237" Y="11"/>
+                                        <Point X="-218" Y="11"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <StartPointGeometry>
@@ -1554,7 +1554,7 @@
                                         </EventList>
                                     </ForeachEvent>
                                     <LabelGeometry Anchor="NW">
-                                        <Point X="-260" Y="-1"/>
+                                        <Point X="-253" Y="4"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <StartPointGeometry>
@@ -1637,7 +1637,7 @@
                                         </EventList>
                                     </ForeachEvent>
                                     <LabelGeometry Anchor="NW">
-                                        <Point X="-270" Y="17"/>
+                                        <Point X="-261" Y="7"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <StartPointGeometry>

@@ -50,7 +50,7 @@ class AnalyzerAutomataPanel
 		this.analyzerPanel = analyzerPanel;
 		this.moduleContainer = moduleContainer;
 		this.name = name;
-		analyzerPopupMenu = new AnalyzerPopupMenu(moduleContainer.getFrame());
+		analyzerPopupMenu = new AnalyzerPopupMenu(moduleContainer.getFrame(), moduleContainer.getIDE());
 
 		setPreferredSize(IDEDimensions.leftAnalyzerPreferredSize);
 		setMinimumSize(IDEDimensions.leftAnalyzerMinimumSize);
@@ -233,7 +233,7 @@ class AnalyzerAutomataPanel
 						theAutomatonTable.setRowSelectionInterval(currRow, currRow);
 					}
 
-					analyzerPopupMenu.show(theAutomatonTable.getSelectedRowCount(), e.getComponent(), e.getX(), e.getY());
+					analyzerPopupMenu.show(e.getComponent(), e.getX(), e.getY());
 				}
 			}
 		});
@@ -254,7 +254,6 @@ class AnalyzerAutomataPanel
 
 	public void tableChanged(TableModelEvent e)
 	{
-
 		theAutomatonTable.revalidate();
 	}
 

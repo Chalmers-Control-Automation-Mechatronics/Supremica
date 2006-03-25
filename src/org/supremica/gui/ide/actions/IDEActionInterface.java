@@ -16,6 +16,7 @@ public interface IDEActionInterface
 	public void setActive(ModuleContainer module);
 	public JFrame getFrame();
 	public IDE getIDE();
+	public Actions getActions();
 	public void repaint();
 	public void setEditorMode(IDEAction theAction);
 	public EditorWindowInterface getActiveEditorWindowInterface();

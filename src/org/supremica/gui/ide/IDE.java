@@ -84,7 +84,7 @@ public class IDE
 		tabPanel.add(currModuleContainer.getAnalyzerPanel());
 		//tabPanel.add(currModuleContainer.getSimulatorPanel());
 
-		tabPanel.validate();
+		//tabPanel.validate();
 
 		logPanel = new LogPanel(this, "Logger");
 
@@ -97,7 +97,7 @@ public class IDE
 		contentPanel.add(splitPanelVertical, BorderLayout.CENTER);
 
 		pack();
-		validate();
+		//validate();
 
 		logger.info("Supremica version: " + (new Version()).toString());
     }
@@ -255,7 +255,7 @@ public class IDE
 			getActiveModuleContainer().getEditorPanel().enablePanel();
 			getActiveModuleContainer().getAnalyzerPanel().disablePanel();
 		}
-		validate();
+		//validate();
 		repaint();
 	}
 

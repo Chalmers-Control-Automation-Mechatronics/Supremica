@@ -67,12 +67,13 @@ public class IDEMenuBar
 
 		// Configure
 		menu = new JMenu("Configure");
+		menu.setMnemonic(KeyEvent.VK_C);
 		add(menu);
 		menu.add(new JMenuItem(ide.getActions().editorOptionsAction));
 
 		// Modules
 		menu = new JMenu("Modules");
-		//		menu.setMnemonic(KeyEvent.VK_M);
+		menu.setMnemonic(KeyEvent.VK_M);
 		add(menu);
 		menu.addMenuListener
 		(
