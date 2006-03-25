@@ -61,7 +61,6 @@ public class EditorPanel
 		add(splitPanelHorizontal);
 	}
 
-
 	public void addToolBarEntries(IDEToolBar toolBar)
 	{
 		editorButtonGroup = new ButtonGroup();

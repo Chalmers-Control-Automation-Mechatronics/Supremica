@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorComponentsPanel
 //###########################################################################
-//# $Id: EditorComponentsPanel.java,v 1.14 2005-11-10 21:54:42 robi Exp $
+//# $Id: EditorComponentsPanel.java,v 1.15 2006-03-25 00:25:44 flordal Exp $
 //###########################################################################
 
 
@@ -147,7 +147,6 @@ class EditorComponentsPanel
 		}
 	}
 
-
 	private class TreeMouseAdapter
 		extends MouseAdapter
 	{
@@ -162,8 +161,25 @@ class EditorComponentsPanel
 			this.moduleSelectTree = moduleSelectTree;
 		}
 
+		private void maybeShowPopup(MouseEvent e)
+		{
+			if (e.isPopupTrigger())
+			{
+				
+			}
+		}
+
+		public void mouseReleased(MouseEvent e)
+		{
+			// This is for triggering the popup 
+			maybeShowPopup(e);
+		}
+		
 		public void mousePressed(MouseEvent e)
 		{
+			// This is for triggering the popup 
+			maybeShowPopup(e);
+
 			int selRow = moduleSelectTree.getRowForLocation(e.getX(), e.getY());
 			TreePath selPath = moduleSelectTree.getPathForLocation(e.getX(), e.getY());
 

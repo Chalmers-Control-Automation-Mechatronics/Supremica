@@ -34,9 +34,14 @@ class AnalyzerPopupMenu
 	private void initPopups()
 		throws Exception
 	{
-		JMenuItem statusItem = new JMenuItem("Status");
-		statusItem.setToolTipText("Displays some statistics of the selected automata");
-		menuHandler.add(statusItem, 0);
+		JMenuItem menuItem = new JMenuItem("Status");
+		menuItem.setToolTipText("Displays some statistics of the selected automata");
+		menuHandler.add(menuItem, 0);
+
+		menuItem = new JMenuItem("Verify");
+		//menuItem = new JMenuItem(IDE.getActions().verifyAction);
+		menuItem.setToolTipText("Performs verification on the selected automata");
+		menuHandler.add(menuItem, 0);
 	}
 
 	public void show(int num_selected, Component c, int x, int y)

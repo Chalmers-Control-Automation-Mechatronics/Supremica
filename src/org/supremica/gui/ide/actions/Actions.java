@@ -5,14 +5,17 @@ import java.util.*;
 
 public class Actions
 {
+	/** The ide to which the actions in this class applies. */
 	private IDEActionInterface ide;
 
-	private List analyzerActions = new LinkedList();
-	private List editorActions = new LinkedList();
+	/** The actions that apply to the analyzer. */
+	private List<IDEAction> analyzerActions = new LinkedList<IDEAction>();
+	/** The actions that apply to the editor. */
+	private List<IDEAction> editorActions = new LinkedList<IDEAction>();
 
 	public NewAction newAction;
 	public OpenAction openAction;
-//	public ImportAction importAction;
+	//public ImportAction importAction;
 	public CloseAction closeAction;
 	public SaveAction saveAction;
 
@@ -50,7 +53,7 @@ public class Actions
 
 		newAction = new NewAction(ide);
 		openAction = new OpenAction(ide);
-//		importAction = new ImportAction(ide);
+		//		importAction = new ImportAction(ide);
 		closeAction = new CloseAction(ide);
 		saveAction = new SaveAction(ide);
 
@@ -104,7 +107,6 @@ public class Actions
 
 		helpWebAction = new HelpWebAction(ide);
 		helpAboutAction = new HelpAboutAction(ide);
-
 	}
 
 	public void enableEditorActions(boolean enabled)
@@ -117,12 +119,9 @@ public class Actions
 		actionsSetEnabled(analyzerActions, enabled);
 	}
 
-	private void actionsSetEnabled(List theActions, boolean enabled)
+	private void actionsSetEnabled(List<IDEAction> theActions, boolean enabled)
 	{
-		for (Iterator actIt = theActions.iterator(); actIt.hasNext(); )
-		{
-			IDEAction currAction = (IDEAction)actIt.next();
+		for (IDEAction currAction : theActions)
 			currAction.setEnabled(enabled);
-		}
 	}
 }
