@@ -3,6 +3,7 @@ package org.supremica.gui.ide;
 import javax.swing.*;
 import java.awt.GridBagLayout;
 
+import org.supremica.automata.Automata;
 
 public class AnalyzerPanel
 	extends MainPanel
@@ -48,6 +49,13 @@ public class AnalyzerPanel
 		//		validate();
 	}
 
+	/**
+	 * Gets the selected automata.
+	 */
+	public Automata getSelectedAutomata()
+	{
+		return automataPanel.getSelectedAutomata();
+	}
 
 	public void addToolBarEntries(IDEToolBar toolBar)
 	{

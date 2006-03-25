@@ -115,7 +115,6 @@ public class VisualProject
 		addListener(lightTableModel);
 		addListener(fullTableModel);
 		addListener(analyzerTableModel);
-
 	}
 
 	public void clear()

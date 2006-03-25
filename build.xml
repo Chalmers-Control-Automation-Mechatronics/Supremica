@@ -236,7 +236,6 @@
 			${supremica_basedir}/functionblocks/xsd/**,
 			${supremica_basedir}/automationobjects/xsd/**"	
 		fork="true"
-		memoryMaximumSize="128M"
 	/>
 </target>
 

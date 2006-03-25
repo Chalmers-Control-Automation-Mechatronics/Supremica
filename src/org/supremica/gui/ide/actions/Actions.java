@@ -47,6 +47,9 @@ public class Actions
 	public HelpWebAction helpWebAction;
 	public HelpAboutAction helpAboutAction;
 
+	// Analyzer actions
+	public WorkbenchAction analyzerWorkbenchAction;
+
 	public Actions(IDEActionInterface ide)
 	{
 		this.ide = ide;
@@ -107,6 +110,9 @@ public class Actions
 
 		helpWebAction = new HelpWebAction(ide);
 		helpAboutAction = new HelpAboutAction(ide);
+
+		// Analyzer
+		analyzerWorkbenchAction = new WorkbenchAction(ide);
 	}
 
 	public void enableEditorActions(boolean enabled)

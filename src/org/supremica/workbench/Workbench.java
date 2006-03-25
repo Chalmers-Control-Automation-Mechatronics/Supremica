@@ -20,6 +20,204 @@ import org.supremica.properties.SupremicaProperties;
 // For debug
 import org.supremica.testcases.StickPickingGame;
 
+/**
+ * The main frame for the workbench.
+ */
+public class Workbench
+	extends CenteredFrame
+{
+	private static final long serialVersionUID = 1L;
+
+	private static Logger logger = LoggerFactory.createLogger(Workbench.class);
+	Automata automata = null;    // these are used "globally" in this file
+	Automaton automaton = null;    // eventually the resulting supervisor
+	VisualProject project = null;
+//	AutomatonViewer viewer = null;	// Each workbench manages only a single viewer
+	AutomataSynchronizer syncher = null;
+	private ParamPanel params;
+	private ButtonPanel buttons;
+	private InfoPanel info;
+
+	public Workbench(VisualProject project, Automata automata)
+		throws Exception
+	{
+		//super(228, 432);
+		super(235, 475);
+
+		setTitle("Supervisor Workbench");
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		addWindowListener(new WindowAdapter()
+		{
+			public void windowClosed(WindowEvent we)
+			{
+				close();
+			}
+		});
+		setResizable(false);
+
+		JPanel panel = new JPanel();
+
+		panel.setLayout(new VerticalFlowLayout(true, 5));
+		panel.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
+		panel.add(params = new ParamPanel(this));
+		panel.add(buttons = new ButtonPanel(this));
+		panel.add(info = new InfoPanel(this));
+
+		//getContentPane().add(panel, BorderLayout.CENTER);
+		setContentPane(panel);
+
+		this.project = project;
+		this.automata = automata;
+
+		showMessage("Press Synch to get started");
+
+		updateButtons();
+		pack();
+	}
+
+	void close()
+	{
+		hideGraph();
+		/*
+		if (automaton != null && toAddIt() == false)
+		{
+			project.removeAutomaton(automaton);
+		}
+		*/
+	}
+
+	void showGraph()
+		throws Exception
+	{
+		if (toShowGraph() && automaton != null)    // we should show it and there's something to show
+		{
+			try
+			{
+				if(project.existsAutomatonViewer(automaton))
+				{
+					AutomatonViewer viewer = project.returnAutomatonViewer(automaton);
+					if (viewer.isVisible() == false)
+					{
+						viewer.setVisible(true);
+					}
+				}
+				else
+				{
+					if(project.showAutomatonViewer(automaton))
+					{
+						AutomatonViewer viewer = project.createAutomatonViewer(automaton, new MyAutomatonViewerFactory());
+						viewer.setVisible(true);
+					}
+				}
+			}
+			catch(Exception excp)
+			{
+				System.out.println("Something bad occurred");
+			}
+		}
+	}
+
+	void hideGraph()
+	{
+		try
+		{
+			if (automaton != null && project.existsAutomatonViewer(automaton))
+			{
+				AutomatonViewer viewer = project.returnAutomatonViewer(automaton);
+				if (viewer.isVisible())
+				{
+					viewer.setVisible(false);
+				}
+			}
+		}
+		catch(Exception excp)
+		{
+			logger.error("Error in hiding viewer", excp);
+		}
+	}
+
+	void showMessage(String mess)
+	{
+		info.setText(mess);
+
+		//if (toListUC()) {}
+	}
+
+	/**
+	 * What is this one supposed to do?
+	 */
+	boolean toShowGraph()
+	{
+		return params.toShowGraph();
+	}
+
+	/**
+	 * What is this one supposed to do?
+	 */
+	boolean toListUC()
+	{
+		return params.toListUC();
+	}
+
+	/**
+	 * What is this one supposed to do?
+	 */
+	boolean toListNB()
+	{
+		return params.toListNB();
+	}
+
+	/**
+	 * Returns true if "Add final result to the project" is selected.
+	 */
+	boolean toAddIt()
+	{
+		return params.toAddIt();
+	}
+
+	/**
+	 * Updates the enabled status of the buttons.
+	 */
+	void updateButtons()
+	{
+		if (automaton == null)
+		{
+			buttons.synchButton.setEnabled(true);
+			buttons.compareButton.setEnabled(false);
+			buttons.contButton.setEnabled(false);
+			buttons.nonblockButton.setEnabled(false);
+			buttons.reachButton.setEnabled(false);
+			buttons.purgeButton.setEnabled(false);
+			buttons.doneButton.setEnabled(true);
+		}
+		else
+		{
+			buttons.synchButton.setEnabled(true);
+			buttons.compareButton.setEnabled(true);
+			buttons.contButton.setEnabled(true);
+			buttons.nonblockButton.setEnabled(true);
+			buttons.reachButton.setEnabled(true);
+			buttons.purgeButton.setEnabled(true);
+			buttons.doneButton.setEnabled(true);
+
+			if (automata.isNoAutomataPlants())
+			{
+				buttons.compareButton.setEnabled(false);
+			}
+		}
+	}
+
+	// For debugging only
+	public static void main(String args[])
+		throws Exception
+	{
+		StickPickingGame game = new StickPickingGame(2, 7);
+		Workbench wb = new Workbench(null, game.getProject());
+
+		wb.setVisible(true);
+	}
+}
+
 //*** Finally! A valid use for inheritance -- inherit to be reused!!
 // We want the colors to be different from the default so we inherit
 // and make our own AutoatonToDot serializer
@@ -800,200 +998,3 @@ class InfoPanel
 	}
 }
 
-/**
- * The main frame for the workbench.
- */
-public class Workbench
-	extends CenteredFrame
-{
-	private static final long serialVersionUID = 1L;
-
-	private static Logger logger = LoggerFactory.createLogger(Workbench.class);
-	Automata automata = null;    // these are used "globally" in this file
-	Automaton automaton = null;    // eventually the resulting supervisor
-	VisualProject project = null;
-//	AutomatonViewer viewer = null;	// Each workbench manages only a single viewer
-	AutomataSynchronizer syncher = null;
-	private ParamPanel params;
-	private ButtonPanel buttons;
-	private InfoPanel info;
-
-	public Workbench(VisualProject project, Automata automata)
-		throws Exception
-	{
-		//super(228, 432);
-		super(235, 475);
-
-		setTitle("Supervisor Workbench");
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		addWindowListener(new WindowAdapter()
-		{
-			public void windowClosed(WindowEvent we)
-			{
-				close();
-			}
-		});
-		setResizable(false);
-
-		JPanel panel = new JPanel();
-
-		panel.setLayout(new VerticalFlowLayout(true, 5));
-		panel.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
-		panel.add(params = new ParamPanel(this));
-		panel.add(buttons = new ButtonPanel(this));
-		panel.add(info = new InfoPanel(this));
-
-		//getContentPane().add(panel, BorderLayout.CENTER);
-		setContentPane(panel);
-
-		this.project = project;
-		this.automata = automata;
-
-		showMessage("Press Synch to get started");
-
-		updateButtons();
-		pack();
-	}
-
-	void close()
-	{
-		hideGraph();
-		/*
-		if (automaton != null && toAddIt() == false)
-		{
-			project.removeAutomaton(automaton);
-		}
-		*/
-	}
-
-	void showGraph()
-		throws Exception
-	{
-		if (toShowGraph() && automaton != null)    // we should show it and there's something to show
-		{
-			try
-			{
-				if(project.existsAutomatonViewer(automaton))
-				{
-					AutomatonViewer viewer = project.returnAutomatonViewer(automaton);
-					if (viewer.isVisible() == false)
-					{
-						viewer.setVisible(true);
-					}
-				}
-				else
-				{
-					if(project.showAutomatonViewer(automaton))
-					{
-						AutomatonViewer viewer = project.createAutomatonViewer(automaton, new MyAutomatonViewerFactory());
-						viewer.setVisible(true);
-					}
-				}
-			}
-			catch(Exception excp)
-			{
-				System.out.println("Something bad occurred");
-			}
-		}
-	}
-
-	void hideGraph()
-	{
-		try
-		{
-			if (automaton != null && project.existsAutomatonViewer(automaton))
-			{
-				AutomatonViewer viewer = project.returnAutomatonViewer(automaton);
-				if (viewer.isVisible())
-				{
-					viewer.setVisible(false);
-				}
-			}
-		}
-		catch(Exception excp)
-		{
-			logger.error("Error in hiding viewer", excp);
-		}
-	}
-
-	void showMessage(String mess)
-	{
-		info.setText(mess);
-
-		//if (toListUC()) {}
-	}
-
-	/**
-	 * What is this one supposed to do?
-	 */
-	boolean toShowGraph()
-	{
-		return params.toShowGraph();
-	}
-
-	/**
-	 * What is this one supposed to do?
-	 */
-	boolean toListUC()
-	{
-		return params.toListUC();
-	}
-
-	/**
-	 * What is this one supposed to do?
-	 */
-	boolean toListNB()
-	{
-		return params.toListNB();
-	}
-
-	/**
-	 * Returns true if "Add final result to the project" is selected.
-	 */
-	boolean toAddIt()
-	{
-		return params.toAddIt();
-	}
-
-	/**
-	 * Updates the enabled status of the buttons.
-	 */
-	void updateButtons()
-	{
-		if (automaton == null)
-		{
-			buttons.synchButton.setEnabled(true);
-			buttons.compareButton.setEnabled(false);
-			buttons.contButton.setEnabled(false);
-			buttons.nonblockButton.setEnabled(false);
-			buttons.reachButton.setEnabled(false);
-			buttons.purgeButton.setEnabled(false);
-			buttons.doneButton.setEnabled(true);
-		}
-		else
-		{
-			buttons.synchButton.setEnabled(true);
-			buttons.compareButton.setEnabled(true);
-			buttons.contButton.setEnabled(true);
-			buttons.nonblockButton.setEnabled(true);
-			buttons.reachButton.setEnabled(true);
-			buttons.purgeButton.setEnabled(true);
-			buttons.doneButton.setEnabled(true);
-
-			if (automata.isNoAutomataPlants())
-			{
-				buttons.compareButton.setEnabled(false);
-			}
-		}
-	}
-
-	// For debugging only
-	public static void main(String args[])
-		throws Exception
-	{
-		StickPickingGame game = new StickPickingGame(2, 7);
-		Workbench wb = new Workbench(null, game.getProject());
-
-		wb.setVisible(true);
-	}
-}

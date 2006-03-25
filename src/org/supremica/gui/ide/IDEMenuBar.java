@@ -26,81 +26,55 @@ public class IDEMenuBar
 
 	private void initMenubar()
 	{
-
-		//
 		// File
-		//
+		JMenu menu = new JMenu("File");
+		menu.setMnemonic(KeyEvent.VK_F);
+		add(menu);
+		menu.add(new JMenuItem(ide.getActions().newAction));
+		menu.add(new JMenuItem(ide.getActions().openAction));
+		menu.add(new JMenuItem(ide.getActions().closeAction));
+		menu.addSeparator();
+		menu.add(new JMenuItem(ide.getActions().saveAction));
+		menu.addSeparator();
+		//		menu.add(new JMenuItem(ide.getActions().importAction));
+		menu.add(new JMenuItem(ide.getActions().printAction));
+		menu.add(new JMenuItem(ide.getActions().editorPrintPDFAction));
+		menu.addSeparator();
+		menu.add(new JMenuItem(ide.getActions().exitAction));
 
-		JMenu menuFile = new JMenu("File");
-		menuFile.setMnemonic(KeyEvent.VK_F);
-		add(menuFile);
-
-		menuFile.add(new JMenuItem(ide.getActions().newAction));
-		menuFile.add(new JMenuItem(ide.getActions().openAction));
-		menuFile.add(new JMenuItem(ide.getActions().closeAction));
-
-		menuFile.addSeparator();
-
-		menuFile.add(new JMenuItem(ide.getActions().saveAction));
-
-		menuFile.addSeparator();
-
-//		menuFile.add(new JMenuItem(ide.getActions().importAction));
-//		menuFile.addSeparator();
-
-		menuFile.add(new JMenuItem(ide.getActions().printAction));
-		menuFile.add(new JMenuItem(ide.getActions().editorPrintPDFAction));
-
-		menuFile.addSeparator();
-
-		menuFile.add(new JMenuItem(ide.getActions().exitAction));
-
-
-		//
 		// Edit
-		//
+		menu = new JMenu("Edit");
+		menu.setMnemonic(KeyEvent.VK_E);
+		add(menu);
+		menu.add(new JMenuItem(ide.getActions().editorCopyAction));
+		menu.add(new JMenuItem(ide.getActions().editorUndoAction));
+		menu.add(new JMenuItem(ide.getActions().editorRedoAction));
 
-		JMenu menuEdit = new JMenu("Edit");
-		menuEdit.setMnemonic(KeyEvent.VK_E);
-		add(menuEdit);
+		// Editor
+		menu = new JMenu("Editor");
+		menu.setMnemonic(KeyEvent.VK_M);
+		add(menu);
+		menu.add(new JMenuItem(ide.getActions().editorAddSimpleComponentAction));
+		menu.add(new JMenuItem(ide.getActions().editorAddForeachComponentAction));
+		menu.add(new JMenuItem(ide.getActions().editorAddInstanceAction));
+		menu.add(new JMenuItem(ide.getActions().editorAddBindingAction));
 
-		menuEdit.add(new JMenuItem(ide.getActions().editorCopyAction));
-		menuEdit.add(new JMenuItem(ide.getActions().editorUndoAction));
-		menuEdit.add(new JMenuItem(ide.getActions().editorRedoAction));
-		//
-		// Module
-		//
+		// Analyze
+		menu = new JMenu("Analyzer");
+		menu.setMnemonic(KeyEvent.VK_A);
+		add(menu);
+		menu.add(new JMenuItem(ide.getActions().analyzerWorkbenchAction));
 
-		JMenu menuModule = new JMenu("Editor");
-		menuModule.setMnemonic(KeyEvent.VK_M);
-		add(menuModule);
-
-		menuModule.add(new JMenuItem(ide.getActions().editorAddSimpleComponentAction));
-		menuModule.add(new JMenuItem(ide.getActions().editorAddForeachComponentAction));
-		menuModule.add(new JMenuItem(ide.getActions().editorAddInstanceAction));
-		menuModule.add(new JMenuItem(ide.getActions().editorAddBindingAction));
-
-
-		//
 		// Configure
-		//
+		menu = new JMenu("Configure");
+		add(menu);
+		menu.add(new JMenuItem(ide.getActions().editorOptionsAction));
 
-		JMenu menuConfigure = new JMenu("Configure");
-		add(menuConfigure);
-
-		menuConfigure.add(new JMenuItem(ide.getActions().editorOptionsAction));
-
-
-
-		//
 		// Modules
-		//
-
-		JMenu menuModules = new JMenu("Modules");
-//		menuModules.setMnemonic(KeyEvent.VK_M);
-		add(menuModules);
-
-		menuModules.addMenuListener
+		menu = new JMenu("Modules");
+		//		menu.setMnemonic(KeyEvent.VK_M);
+		add(menu);
+		menu.addMenuListener
 		(
 			new MenuListener()
 			{
@@ -119,20 +93,14 @@ public class IDEMenuBar
 			}
 		);
 
-
-		//
 		// Help
-		//
-
-		JMenu menuHelp = new JMenu();
-		menuHelp.setText("Help");
-		menuHelp.setMnemonic(KeyEvent.VK_H);
-		add(menuHelp);
-
-		menuHelp.add(new JMenuItem(ide.getActions().helpWebAction));
-		menuHelp.addSeparator();
-		menuHelp.add(new JMenuItem(ide.getActions().helpAboutAction));
-
+		menu = new JMenu();
+		menu.setText("Help");
+		menu.setMnemonic(KeyEvent.VK_H);
+		add(menu);
+		menu.add(new JMenuItem(ide.getActions().helpWebAction));
+		menu.addSeparator();
+		menu.add(new JMenuItem(ide.getActions().helpAboutAction));
 	}
 
 	public void createModuleList(MenuEvent ev)
