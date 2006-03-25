@@ -40,7 +40,6 @@ class AnalyzerPopupMenu
 
 		menuItem = new JMenuItem("Verify");
 		//menuItem = new JMenuItem(IDE.getActions().verifyAction);
-		menuItem.setToolTipText("Performs verification on the selected automata");
 		menuHandler.add(menuItem, 0);
 	}
 

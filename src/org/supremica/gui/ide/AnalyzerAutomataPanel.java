@@ -8,6 +8,7 @@ import org.supremica.gui.AutomatonViewer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
+import javax.swing.table.JTableHeader;
 
 import org.supremica.gui.VisualProject;
 import org.supremica.log.*;
@@ -67,6 +68,37 @@ class AnalyzerAutomataPanel
 		analyzerTableModel = getActiveProject().getAnalyzerTableModel();
 		theTableSorter = new TableSorter(analyzerTableModel);
 		theAutomatonTable = new JTable(theTableSorter);
+		theAutomatonTable.setTableHeader(new JTableHeader(theAutomatonTable.getColumnModel())
+		{
+			public String getToolTipText(MouseEvent e)
+			{
+				int i = columnAtPoint(e.getPoint());
+				if (i == TABLE_IDENTITY_COLUMN)
+				{
+					return "Sort on name";
+				}
+				else if (i == TABLE_TYPE_COLUMN)
+				{
+					return "Sort on type";
+				}
+				else if (i == TABLE_STATES_COLUMN)
+				{
+					return "Sort on number of states";
+				}
+				else if (i == TABLE_EVENTS_COLUMN)
+				{
+					return "Sort on number of events";
+				}
+				else if (i == TABLE_TRANSITIONS_COLUMN)
+				{
+					return "Sort on number of transitions";
+				}
+				else
+				{
+					return null;
+				}
+			}
+		});
 
 		theAutomatonTable.getTableHeader().setReorderingAllowed(false);
 
@@ -96,7 +128,7 @@ class AnalyzerAutomataPanel
 		int tableWidthEntity = tableWidth / 11;
 		TableColumnModel theTableColumnModel = theAutomatonTable.getColumnModel();
 
-		// This does not work. why? The preferred width is ignored!
+		// This does not work. Why? The preferred width is ignored!
 		for (int i = 0; i < theAutomatonTable.getColumnCount(); i++)
 		{
 			TableColumn currColumn = theTableColumnModel.getColumn(i);

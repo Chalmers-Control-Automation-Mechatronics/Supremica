@@ -1019,12 +1019,12 @@ public class VisualProject
 
 			if (columnIndex == 3)
 			{
-				return "|E|";
+				return "|\u03a3|";
 			}
 
 			if (columnIndex == 4)
 			{
-				return "|T|";
+				return "|\u2192|";
 			}
 
 			return "Unknown";

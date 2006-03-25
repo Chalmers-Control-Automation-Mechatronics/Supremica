@@ -433,6 +433,9 @@ public class TableSorter
 
 		MouseAdapter listMouseListener = new MouseAdapter()
 		{
+			private int currentSortColumn = -1;
+			private boolean ascending = true;
+
 			public void mouseClicked(MouseEvent e)
 			{
 				TableColumnModel columnModel = tableView.getColumnModel();
@@ -441,17 +444,25 @@ public class TableSorter
 
 				if ((e.getClickCount() == 1) && (column != -1))
 				{
-
 					// System.out.println("Sorting ...");
-					int shiftPressed = e.getModifiers() & InputEvent.SHIFT_MASK;
-					boolean ascending = (shiftPressed == 0);
+					//int shiftPressed = e.getModifiers() & InputEvent.SHIFT_MASK;
+					//boolean ascending = (shiftPressed == 0);
+					if (column == currentSortColumn)
+					{
+						// Another click on same column? Turn order around!
+						ascending = !ascending;						
+					}
+					else
+					{
+						currentSortColumn = column;
+						ascending = true;
+					}
 
 					sorter.sortByColumn(column, ascending);
 				}
-			}
+			}			
 		};
 		JTableHeader th = tableView.getTableHeader();
-
 		th.addMouseListener(listMouseListener);
 	}
 }
