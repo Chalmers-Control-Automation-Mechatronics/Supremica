@@ -55,7 +55,7 @@ class AnalyzerAutomataPanel
 		setPreferredSize(IDEDimensions.leftAnalyzerPreferredSize);
 		setMinimumSize(IDEDimensions.leftAnalyzerMinimumSize);
 		initialize();
-		validate();
+		//validate();
 	}
 
 	public String getName()
@@ -124,26 +124,29 @@ class AnalyzerAutomataPanel
 
 
 		// Set the preferred column width of the automaton table
-		int tableWidth = theAutomatonTable.getWidth();
-		int tableWidthEntity = tableWidth / 11;
+		//int tableWidth = theAutomatonTable.getWidth();
+		validate();
+		int tableWidth = getWidth()+220; // getWidth() returns 0?
+		int tableWidthUnit = tableWidth / 11;
 		TableColumnModel theTableColumnModel = theAutomatonTable.getColumnModel();
 
 		// This does not work. Why? The preferred width is ignored!
 		for (int i = 0; i < theAutomatonTable.getColumnCount(); i++)
 		{
+			System.out.println(tableWidth + " " + i);
 			TableColumn currColumn = theTableColumnModel.getColumn(i);
 
 			if (i == TABLE_IDENTITY_COLUMN)
 			{
-				currColumn.setPreferredWidth(tableWidthEntity * 5);
+				currColumn.setPreferredWidth(tableWidthUnit * 5);
 			}
 			else if (i == TABLE_TYPE_COLUMN)
 			{
-				currColumn.setPreferredWidth(tableWidthEntity * 3);
+				currColumn.setPreferredWidth(tableWidthUnit * 3);
 			}
 			else
 			{
-				currColumn.setPreferredWidth(tableWidthEntity * 1);
+				currColumn.setPreferredWidth(tableWidthUnit * 1);
 			}
 		}
 
@@ -254,7 +257,7 @@ class AnalyzerAutomataPanel
 
 	public void tableChanged(TableModelEvent e)
 	{
-		theAutomatonTable.revalidate();
+		//theAutomatonTable.revalidate();
 	}
 
 	public Automata getSelectedAutomata()

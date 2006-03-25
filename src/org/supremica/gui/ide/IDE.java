@@ -84,7 +84,7 @@ public class IDE
 		tabPanel.add(currModuleContainer.getAnalyzerPanel());
 		//tabPanel.add(currModuleContainer.getSimulatorPanel());
 
-		//tabPanel.validate();
+		tabPanel.validate();
 
 		logPanel = new LogPanel(this, "Logger");
 
@@ -96,7 +96,7 @@ public class IDE
 
 		contentPanel.add(splitPanelVertical, BorderLayout.CENTER);
 
-		pack();
+		//pack();
 		//validate();
 
 		logger.info("Supremica version: " + (new Version()).toString());
@@ -236,6 +236,7 @@ public class IDE
 		if (e.getID() == WindowEvent.WINDOW_CLOSING)
 		{
 			getActions().exitAction.doAction();
+			System.exit(0);
 		}
 	}
 
