@@ -4,15 +4,18 @@ import javax.swing.Action;
 import javax.swing.ImageIcon;
 import java.awt.event.ActionEvent;
 import org.supremica.gui.ide.IDE;
+import java.util.List;
 
 public class EditorUndoAction
 	extends IDEAction
 {
 	private static final long serialVersionUID = 1L;
 
-	public EditorUndoAction(IDEActionInterface ide)
+	public EditorUndoAction(List<IDEAction> actionList)
 	{
-		super(ide);
+		super(actionList);
+
+		setEditorActiveRequired(true);
 
 		putValue(Action.NAME, "Undo");
 		putValue(Action.SHORT_DESCRIPTION, "Undo");

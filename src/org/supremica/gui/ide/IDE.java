@@ -185,6 +185,7 @@ public class IDE
 	{
 		return this;
 	}
+
 	private void setToolBar(JToolBar toolBar)
 	{
 		if (toolBar == null)
@@ -201,6 +202,11 @@ public class IDE
 		}
     	contentPanel.add(toolBar, BorderLayout.NORTH);
     	currToolBar = toolBar;
+	}
+
+	public int numberOfSelectedComponents()
+	{
+		return 0; // TO DO Fix this
 	}
 
 	private IDEToolBar createToolBar()

@@ -3,6 +3,7 @@ package org.supremica.gui.ide.actions;
 import javax.swing.Action;
 import java.awt.event.ActionEvent;
 import org.supremica.gui.ide.ModuleContainer;
+import java.util.List;
 
 public class CloseAction
 	extends IDEAction
@@ -12,9 +13,9 @@ public class CloseAction
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public CloseAction(IDEActionInterface ide)
+	public CloseAction(List<IDEAction> actionList)
 	{
-		super(ide);
+		super(actionList);
 
 		putValue(Action.NAME, "Close");
 		putValue(Action.SHORT_DESCRIPTION, "Close module");

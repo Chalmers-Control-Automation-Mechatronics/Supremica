@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   OpenAction
 //###########################################################################
-//# $Id: OpenAction.java,v 1.11 2006-02-20 22:20:22 robi Exp $
+//# $Id: OpenAction.java,v 1.12 2006-03-25 15:56:47 flordal Exp $
 //###########################################################################
 
 
@@ -19,6 +19,8 @@ import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.xml.bind.JAXBException;
+
+import java.util.List;
 
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.OperatorTable;
@@ -41,9 +43,9 @@ public class OpenAction
 {
 	private static final long serialVersionUID = 1L;
 
-	public OpenAction(IDEActionInterface ide)
+	public OpenAction(List<IDEAction> actionList)
 	{
-		super(ide);
+		super(actionList);
 
 		putValue(Action.NAME, "Open...");
 		putValue(Action.SHORT_DESCRIPTION, "Open a new project");

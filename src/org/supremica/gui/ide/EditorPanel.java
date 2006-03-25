@@ -75,12 +75,12 @@ public class EditorPanel
 
 	public void disablePanel()
 	{
-		getActions().enableEditorActions(false);
+		//getActions().enableEditorActions(false);
 	}
 
 	public void enablePanel()
 	{
-		getActions().enableEditorActions(true);
+		//getActions().enableEditorActions(true);
 	}
 
 	public EditorWindowInterface getActiveEditorWindowInterface()

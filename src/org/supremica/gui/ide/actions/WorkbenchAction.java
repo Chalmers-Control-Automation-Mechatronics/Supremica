@@ -12,6 +12,7 @@ import org.supremica.gui.ide.IDE;
 import org.supremica.workbench.Workbench;
 import org.supremica.gui.VisualProject;
 import org.supremica.automata.Automata;
+import java.util.List;
 
 /**
  * A new action
@@ -24,9 +25,9 @@ public class WorkbenchAction
 	/**
 	 * Constructor.
 	 */
-	public WorkbenchAction(IDEActionInterface ide)
+	public WorkbenchAction(List<IDEAction> actionList)
 	{
-		super(ide);
+		super(actionList);
 
 		putValue(Action.NAME, "Workbench");
 		putValue(Action.SHORT_DESCRIPTION, "Launch workbench");	

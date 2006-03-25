@@ -1,5 +1,6 @@
 package org.supremica.gui.ide.actions;
 
+import java.util.List;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
@@ -19,9 +20,12 @@ public class ActionTemplate
 	/**
 	 * Constructor.
 	 */
-	public ActionTemplate(IDEActionInterface ide)
+	public ActionTemplate(List<IDEAction> actionList)
 	{
-		super(ide);
+		super(actionList);
+
+		setEditorActiveRequired(false);
+		setAnalyzerActiveRequired(false);
 
 		putValue(Action.NAME, "Action name");
 		putValue(Action.SHORT_DESCRIPTION, "Action description");	

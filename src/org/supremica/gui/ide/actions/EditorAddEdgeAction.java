@@ -3,6 +3,7 @@ package org.supremica.gui.ide.actions;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import java.awt.event.ActionEvent;
+import java.util.List;
 import org.supremica.gui.ide.IDE;
 import net.sourceforge.waters.gui.ControlledSurface;
 
@@ -11,9 +12,11 @@ public class EditorAddEdgeAction
 {
 	private static final long serialVersionUID = 1L;
 
-	public EditorAddEdgeAction(IDEActionInterface ide)
+	public EditorAddEdgeAction(List<IDEAction> actionList)
 	{
-		super(ide);
+		super(actionList);
+
+		setEditorActiveRequired(true);
 
 		putValue(Action.NAME, "Add Edge");
 		putValue(Action.SHORT_DESCRIPTION, "Add Edge");

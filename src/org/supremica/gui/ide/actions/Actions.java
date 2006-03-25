@@ -8,126 +8,67 @@ public class Actions
 	/** The ide to which the actions in this class applies. */
 	private IDEActionInterface ide;
 
-	/** The actions that apply to the analyzer. */
-	private List<IDEAction> analyzerActions = new LinkedList<IDEAction>();
-	/** The actions that apply to the editor. */
-	private List<IDEAction> editorActions = new LinkedList<IDEAction>();
+	private List<IDEAction> allActions = new LinkedList<IDEAction>();
 
-	public NewAction newAction;
-	public OpenAction openAction;
-	//public ImportAction importAction;
-	public CloseAction closeAction;
-	public SaveAction saveAction;
+	//
+	// General Actions
+	//
 
-	public PrintAction printAction;
-	public EditorPrintAction editorPrintAction;
-	public EditorPrintPDFAction editorPrintPDFAction;
+	public IDEAction newAction = new NewAction(allActions);
+	public IDEAction openAction = new OpenAction(allActions);
 
-	public ExitAction exitAction;
+	public IDEAction closeAction = new CloseAction(allActions);
+	public IDEAction saveAction = new SaveAction(allActions);
 
-	public EditorCopyAction editorCopyAction;
-    public EditorUndoAction editorUndoAction;
-    public EditorRedoAction editorRedoAction;
+	public IDEAction printAction = new PrintAction(allActions);
 
+	//
+	// Editor Actions
+	//
 
-	public EditorSelectAction editorSelectAction;
+	public IDEAction editorPrintAction = new EditorPrintAction(allActions);
+	public IDEAction editorPrintPDFAction = new EditorPrintPDFAction(allActions);
 
-	public EditorAddNodeAction editorAddNodeAction;
-	public EditorAddNodeGroupAction editorAddNodeGroupAction;
-	public EditorAddEdgeAction editorAddEdgeAction;
-	public EditorAddEventAction editorAddEventAction;
+	public IDEAction exitAction = new NewAction(allActions);
 
-	public EditorOptionsAction editorOptionsAction;
+	public IDEAction editorCopyAction = new EditorCopyAction(allActions);
+    public IDEAction editorUndoAction = new EditorUndoAction(allActions);
+    public IDEAction editorRedoAction = new EditorRedoAction(allActions);
 
-	public EditorAddSimpleComponentAction editorAddSimpleComponentAction;
-	public EditorAddForeachComponentAction editorAddForeachComponentAction;
-	public EditorAddInstanceAction editorAddInstanceAction;
-	public EditorAddBindingAction editorAddBindingAction;
+	public IDEAction editorSelectAction = new EditorSelectAction(allActions);
 
-	public HelpWebAction helpWebAction;
-	public HelpAboutAction helpAboutAction;
+	public IDEAction editorAddNodeAction = new EditorAddNodeAction(allActions);
+	public IDEAction editorAddNodeGroupAction = new EditorAddNodeGroupAction(allActions);
+	public IDEAction editorAddEdgeAction = new EditorAddEdgeAction(allActions);
+	public IDEAction editorAddEventAction = new EditorAddEventAction(allActions);
 
-	// Analyzer actions
-	public WorkbenchAction analyzerWorkbenchAction;
+	public IDEAction editorOptionsAction = new EditorOptionsAction(allActions);
+
+	public IDEAction editorAddSimpleComponentAction = new EditorAddSimpleComponentAction(allActions);
+	public IDEAction editorAddForeachComponentAction = new EditorAddForeachComponentAction(allActions);
+	public IDEAction editorAddInstanceAction = new EditorAddInstanceAction(allActions);
+	public IDEAction editorAddBindingAction = new EditorAddBindingAction(allActions);
+
+	//
+	// Analyzer Actions
+	//
+
+	public IDEAction analyzerWorkbenchAction = new WorkbenchAction(allActions);
+
+	//
+	// Help Actions
+	//
+
+	public IDEAction helpWebAction = new HelpWebAction(allActions);
+	public IDEAction helpAboutAction = new HelpAboutAction(allActions);
 
 	public Actions(IDEActionInterface ide)
 	{
-		this.ide = ide;
+ 		this.ide = ide;
 
-		newAction = new NewAction(ide);
-		openAction = new OpenAction(ide);
-		//		importAction = new ImportAction(ide);
-		closeAction = new CloseAction(ide);
-		saveAction = new SaveAction(ide);
-
-		printAction = new PrintAction(ide);
-
-		editorPrintAction = new EditorPrintAction(ide);
-		editorActions.add(editorPrintAction);
-
-		editorPrintPDFAction = new EditorPrintPDFAction(ide);
-		editorActions.add(editorPrintPDFAction);
-
-		exitAction = new ExitAction(ide);
-
-		editorCopyAction = new EditorCopyAction(ide);
-		editorActions.add(editorCopyAction);
-
-		editorUndoAction = new EditorUndoAction(ide);
-		//		editorActions.add(editorUndoAction);
-
-		editorRedoAction = new EditorRedoAction(ide);
-		//		editorActions.add(editorRedoAction);
-
-		editorSelectAction = new EditorSelectAction(ide);
-		editorActions.add(editorSelectAction);
-
-		editorAddNodeAction = new EditorAddNodeAction(ide);
-		editorActions.add(editorAddNodeAction);
-
-		editorAddNodeGroupAction = new EditorAddNodeGroupAction(ide);
-		editorActions.add(editorAddNodeGroupAction);
-
-		editorAddEdgeAction = new EditorAddEdgeAction(ide);
-		editorActions.add(editorAddEdgeAction);
-
-		editorAddEventAction = new EditorAddEventAction(ide);
-		editorActions.add(editorAddEventAction);
-
-		editorOptionsAction = new EditorOptionsAction(ide);
-
-		editorAddSimpleComponentAction = new EditorAddSimpleComponentAction(ide);
-		editorActions.add(editorAddSimpleComponentAction);
-
-		editorAddForeachComponentAction = new EditorAddForeachComponentAction(ide);
-		editorActions.add(editorAddForeachComponentAction);
-
-		editorAddInstanceAction = new EditorAddInstanceAction(ide);
-		editorActions.add(editorAddInstanceAction);
-
-		editorAddBindingAction = new EditorAddBindingAction(ide);
-		editorActions.add(editorAddBindingAction);
-
-		helpWebAction = new HelpWebAction(ide);
-		helpAboutAction = new HelpAboutAction(ide);
-
-		// Analyzer
-		analyzerWorkbenchAction = new WorkbenchAction(ide);
-	}
-
-	public void enableEditorActions(boolean enabled)
-	{
-		actionsSetEnabled(editorActions, enabled);
-	}
-
-	public void enableAnalyzerActions(boolean enabled)
-	{
-		actionsSetEnabled(analyzerActions, enabled);
-	}
-
-	private void actionsSetEnabled(List<IDEAction> theActions, boolean enabled)
-	{
-		for (IDEAction currAction : theActions)
-			currAction.setEnabled(enabled);
+		for (IDEAction action : allActions)
+		{
+			action.setIDEActionInterface(ide);
+		}
 	}
 }

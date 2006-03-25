@@ -5,15 +5,18 @@ import javax.swing.ImageIcon;
 import java.awt.event.ActionEvent;
 import org.supremica.gui.ide.IDE;
 import net.sourceforge.waters.gui.ControlledSurface;
+import java.util.List;
 
 public class EditorSelectAction
 	extends IDEAction
 {
 	private static final long serialVersionUID = 1L;
 
-	public EditorSelectAction(IDEActionInterface ide)
+	public EditorSelectAction(List<IDEAction> actionList)
 	{
-		super(ide);
+		super(actionList);
+
+		setEditorActiveRequired(true);
 
 		putValue(Action.NAME, "Select");
 		putValue(Action.SHORT_DESCRIPTION, "Select");

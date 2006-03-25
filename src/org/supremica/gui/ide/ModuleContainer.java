@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ModuleContainer
 //###########################################################################
-//# $Id: ModuleContainer.java,v 1.24 2006-03-23 16:06:03 flordal Exp $
+//# $Id: ModuleContainer.java,v 1.25 2006-03-25 15:56:47 flordal Exp $
 //###########################################################################
 
 
@@ -168,7 +168,6 @@ public class ModuleContainer implements UndoInterface
 	{
 		return mVisualProject;
 	}
-
 
 	//#######################################################################
 	//# Undo & Redo

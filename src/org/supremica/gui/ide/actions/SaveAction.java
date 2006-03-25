@@ -4,6 +4,7 @@ import javax.swing.Action;
 import javax.swing.ImageIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.util.List;
 import org.supremica.gui.ide.IDE;
 import org.supremica.log.*;
 
@@ -15,9 +16,9 @@ public class SaveAction
 
 	private static Logger logger = LoggerFactory.createLogger(SaveAction.class);
 
-	public SaveAction(IDEActionInterface ide)
+	public SaveAction(List<IDEAction> actionList)
 	{
-		super(ide);
+		super(actionList);
 
 		putValue(Action.NAME, "Save...");
 		putValue(Action.SHORT_DESCRIPTION, "Save the project");

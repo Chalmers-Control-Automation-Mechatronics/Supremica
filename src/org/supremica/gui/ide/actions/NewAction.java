@@ -6,15 +6,16 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import org.supremica.gui.ide.ModuleContainer;
 import org.supremica.gui.ide.IDE;
+import java.util.List;
 
 public class NewAction
 	extends IDEAction
 {
 	private static final long serialVersionUID = 1L;
 
-	public NewAction(IDEActionInterface ide)
+	public NewAction(List<IDEAction> actionList)
 	{
-		super(ide);
+		super(actionList);
 
 		putValue(Action.NAME, "New");
 		putValue(Action.SHORT_DESCRIPTION, "New module");

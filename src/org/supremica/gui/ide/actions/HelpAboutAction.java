@@ -4,7 +4,7 @@ import javax.swing.Action;
 import java.awt.event.ActionEvent;
 import org.supremica.gui.ide.AboutDialog;
 import org.supremica.log.*;
-
+import java.util.List;
 
 public class HelpAboutAction
 	extends IDEAction
@@ -13,9 +13,9 @@ public class HelpAboutAction
 
 	private static Logger logger = LoggerFactory.createLogger(HelpAboutAction.class);
 
-	public HelpAboutAction(IDEActionInterface ide)
+	public HelpAboutAction(List<IDEAction> actionList)
 	{
-		super(ide);
+		super(actionList);
 
 		putValue(Action.NAME, "About Supremica...");
 		putValue(Action.SHORT_DESCRIPTION, "About Supremica");

@@ -2,15 +2,18 @@ package org.supremica.gui.ide.actions;
 
 import javax.swing.Action;
 import java.awt.event.ActionEvent;
+import java.util.List;
 
 public class EditorAddBindingAction
 	extends IDEAction
 {
 	private static final long serialVersionUID = 1L;
 
-	public EditorAddBindingAction(IDEActionInterface ide)
+	public EditorAddBindingAction(List<IDEAction> actionList)
 	{
-		super(ide);
+		super(actionList);
+
+		setEditorActiveRequired(true);
 
 		putValue(Action.NAME, "Add Binding...");
 		putValue(Action.SHORT_DESCRIPTION, "Add Binding");
