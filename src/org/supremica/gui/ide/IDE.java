@@ -276,8 +276,5 @@ public class IDE
 
 		IDE ide = new IDE();
 		ide.setVisible(true);
-
-
 	}
-
 }

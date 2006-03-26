@@ -39,7 +39,7 @@ class AnalyzerAutomataPanel
 	private TableModel analyzerTableModel;
 	private AnalyzerPopupMenu analyzerPopupMenu;
 
-	public static int TABLE_IDENTITY_COLUMN = 0;
+	public static int TABLE_NAME_COLUMN = 0;
 	public static int TABLE_TYPE_COLUMN = 1;
 	public static int TABLE_STATES_COLUMN = 2;
 	public static int TABLE_EVENTS_COLUMN = 3;
@@ -73,7 +73,7 @@ class AnalyzerAutomataPanel
 			public String getToolTipText(MouseEvent e)
 			{
 				int i = columnAtPoint(e.getPoint());
-				if (i == TABLE_IDENTITY_COLUMN)
+				if (i == TABLE_NAME_COLUMN)
 				{
 					return "Sort on name";
 				}
@@ -122,21 +122,17 @@ class AnalyzerAutomataPanel
 			public void keyTyped(KeyEvent e) {}
 		});
 
-
 		// Set the preferred column width of the automaton table
 		//int tableWidth = theAutomatonTable.getWidth();
-		validate();
 		int tableWidth = getWidth()+220; // getWidth() returns 0?
 		int tableWidthUnit = tableWidth / 11;
 		TableColumnModel theTableColumnModel = theAutomatonTable.getColumnModel();
-
-		// This does not work. Why? The preferred width is ignored!
 		for (int i = 0; i < theAutomatonTable.getColumnCount(); i++)
 		{
 			System.out.println(tableWidth + " " + i);
 			TableColumn currColumn = theTableColumnModel.getColumn(i);
 
-			if (i == TABLE_IDENTITY_COLUMN)
+			if (i == TABLE_NAME_COLUMN)
 			{
 				currColumn.setPreferredWidth(tableWidthUnit * 5);
 			}
@@ -166,7 +162,7 @@ class AnalyzerAutomataPanel
 					}
 
 					// Show automaton in the panel
-					if (col == TABLE_IDENTITY_COLUMN)
+					if (col == TABLE_NAME_COLUMN)
 					{
 						Automata selectedAutomata = getSelectedAutomata();
 
