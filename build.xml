@@ -77,7 +77,6 @@
 
 <target name="initialize_jars">	
     <!-- PLEASE ADD COMMENTS DESCRIBING THE DIFFERENT LIBRARIES. -->
- 	<unjar src="${lib}/rpcdocdbClient.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/JGo.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/JGoLayout.jar" dest="${lib}/${unjared}"/>
 	<unjar src="${lib}/antlr.jar" dest="${lib}/${unjared}"/>

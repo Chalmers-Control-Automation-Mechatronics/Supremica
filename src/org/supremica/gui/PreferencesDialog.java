@@ -379,7 +379,6 @@ class CommunicationPanel
 	private PreferencesDialog theDialog = null;
 	private JCheckBox useXmlRpc = null, debugXmlRpc = null;;
 	private JTextField xmlRpcPort, xmlRpcFilter;
-	private JTextField docdbHost, docdbPort, docdbUser, docdbDoc;
 
 	public CommunicationPanel(PreferencesDialog theDialog)
 	{
@@ -416,10 +415,6 @@ class CommunicationPanel
 		panel.add(tmp = new JLabel("Document Database", SwingConstants.LEFT));
 		tmp.setForeground(Color.blue);
 
-		docdbHost = add(panel, "Sever address", 10);
-		docdbPort = add(panel, "Server port ", 10);
-		docdbUser = add(panel, "Username", 10);
-		docdbDoc = add(panel, "Default document", 10);
 	}
 
 	// ----------------------- helper funcs
@@ -441,9 +436,8 @@ class CommunicationPanel
 	public boolean doApply()
 	{
 		int port = PreferencesDialog.getInt("XML-RPC Port", xmlRpcPort.getText(), 1);
-		int port2 = PreferencesDialog.getInt("Remote document server port", docdbPort.getText(), 1);
 
-		if ((port == Integer.MIN_VALUE) || (port2 == Integer.MIN_VALUE))
+		if (port == Integer.MIN_VALUE)
 		{
 			return false;
 		}
@@ -452,10 +446,6 @@ class CommunicationPanel
 		Config.XML_RPC_FILTER.set(xmlRpcFilter.getText());
 		Config.XML_RPC_ACTIVE.set(useXmlRpc.isSelected());
 		Config.XML_RPC_DEBUG.set(debugXmlRpc.isSelected());
-		Config.DOC_DB_SERVER_NAME.set(docdbHost.getText());
-		Config.DOC_DB_SERVER_PORT.set(port2);
-		Config.DOC_DB_SERVER_USER.set(docdbUser.getText());
-		Config.DOC_DB_SERVER_DOC.set(docdbDoc.getText());
 
 		return true;
 	}
@@ -466,10 +456,6 @@ class CommunicationPanel
 		debugXmlRpc.setSelected(Config.XML_RPC_DEBUG.isTrue());
 		xmlRpcPort.setText(Integer.toString(Config.XML_RPC_PORT.get()));
 		xmlRpcFilter.setText(Config.XML_RPC_FILTER.get());
-		docdbPort.setText("" + Config.DOC_DB_SERVER_PORT.get());
-		docdbHost.setText(Config.DOC_DB_SERVER_NAME.get());
-		docdbUser.setText(Config.DOC_DB_SERVER_USER.get());
-		docdbDoc.setText(Config.DOC_DB_SERVER_DOC.get());
 	}
 }
 

@@ -60,7 +60,6 @@ public class PropertyType
 	public static final PropertyType GENERAL_FILE = new PropertyType("general.file");
 	public static final PropertyType GENERAL_COMM = new PropertyType("general.comm");
 	public static final PropertyType GENERAL_COMM_XMLRPC = new PropertyType("general.comm.xmlrpc");
-	public static final PropertyType GENERAL_COMM_DOCDB = new PropertyType("general.comm.docdb");
 	public static final PropertyType GUI = new PropertyType("gui");
 	public static final PropertyType GUI_EDITOR = new PropertyType("gui.editor");
 	public static final PropertyType GUI_ANALYZER = new PropertyType("gui.analyzer");

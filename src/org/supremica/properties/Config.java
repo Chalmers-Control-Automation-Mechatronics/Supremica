@@ -77,7 +77,6 @@ public final class Config
 	//   GENERAL_FILE
 	//   GENERAL_COMM
 	//   GENERAL_COMM_XMLRPC
-	//   GENERAL_COMM_DOCDB
 	//   GUI
 	//   GUI_EDITOR
 	//   GUI_ANALYZER
@@ -90,11 +89,6 @@ public final class Config
 	//   ALGORITHMS_BDD
 	//   MISC
 
-	// GENERAL_COMM_DOCDB
-	public static final StringProperty DOC_DB_SERVER_NAME = new StringProperty(PropertyType.GENERAL_COMM_DOCDB, "docdbHost", "localhost", "Doc DB server name");
-	public static final IntegerProperty DOC_DB_SERVER_PORT = new IntegerProperty(PropertyType.GENERAL_COMM_DOCDB, "docdbPort", 9111, "Doc DB server port");
-	public static final StringProperty DOC_DB_SERVER_USER = new StringProperty(PropertyType.GENERAL_COMM_DOCDB, "docdbUser", "", "Doc DB server user");
-	public static final StringProperty DOC_DB_SERVER_DOC = new StringProperty(PropertyType.GENERAL_COMM_DOCDB, "docdbDoc", "work", "Doc DB server doc");
 
 	// GENERAL_COMM_XMLRPC
 	public static final BooleanProperty XML_RPC_ACTIVE = new BooleanProperty(PropertyType.GENERAL_COMM_XMLRPC, "xmlRpcActive", false, "XML-RPC Active");

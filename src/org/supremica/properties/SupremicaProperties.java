@@ -564,48 +564,6 @@ public final class SupremicaProperties
 
 
 
-
-	// -----------------------------------------
-	public static int getDocDBPort()
-	{
-		return toInt(wp.getProperty(DOC_DB_SERVER_PORT));
-	}
-
-	public static void setDocDBPort(int port)
-	{
-		wp.setProperty(DOC_DB_SERVER_PORT, toString(port));
-	}
-
-	public static String getDocDBHost()
-	{
-		return wp.getProperty(DOC_DB_SERVER_NAME);
-	}
-
-	public static void setDocDBHost(String x)
-	{
-		wp.setProperty(DOC_DB_SERVER_NAME, x);
-	}
-
-	public static String getDocDBUsername()
-	{
-		return wp.getProperty(DOC_DB_SERVER_USER);
-	}
-
-	public static void setDocDBUsername(String x)
-	{
-		wp.setProperty(DOC_DB_SERVER_USER, x);
-	}
-
-	public static String getDocDBDocument()
-	{
-		return wp.getProperty(DOC_DB_SERVER_DOC);
-	}
-
-	public static void setDocDBDocument(String x)
-	{
-		wp.setProperty(DOC_DB_SERVER_DOC, x);
-	}
-
 	// -----------------------------------------
 	public static boolean isXmlRpcActive()
 	{
