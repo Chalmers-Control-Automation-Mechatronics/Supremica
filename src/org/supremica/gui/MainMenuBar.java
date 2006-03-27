@@ -83,6 +83,7 @@ import java.util.*;
 import javax.help.*;
 import org.supremica.gui.help.ContentHelp;
 import org.supremica.properties.SupremicaProperties;
+import org.supremica.properties.Config;
 import org.supremica.automata.templates.TemplateItem;
 import org.supremica.automata.templates.TemplateGroup;
 import org.supremica.gui.animators.scenebeans.AnimationItem;
@@ -192,7 +193,7 @@ public class MainMenuBar
 	    }
 	}
 
-	if (SupremicaProperties.fileAllowOpen())
+	if (Config.FILE_ALLOW_OPEN.isTrue())
 	{
 	    // File.Open
 	    JMenuItem menuFileOpen = new SupremicaMenuItem(ActionMan.openAction);
@@ -201,7 +202,7 @@ public class MainMenuBar
 	    separatorNeeded = true;
 	}
 
-	if (SupremicaProperties.fileAllowSave())
+	if (Config.FILE_ALLOW_SAVE.isTrue())
 	{
 	    // File.Save
 	    JMenuItem menuFileSave = new SupremicaMenuItem(ActionMan.saveAction);
@@ -221,7 +222,7 @@ public class MainMenuBar
 	    separatorNeeded = false;
 	}
 
-	if (SupremicaProperties.fileAllowImport())
+	if (Config.FILE_ALLOW_IMPORT.isTrue())
 	{
 	    // File.Import
 	    JMenu menuFileImport = new JMenu("Import");
@@ -308,7 +309,7 @@ public class MainMenuBar
 	}
 	*/
 
-	if (false && SupremicaProperties.fileAllowExport())
+	if (false && Config.FILE_ALLOW_EXPORT.isTrue())
 	{
 
 	    // File.Export
@@ -322,7 +323,7 @@ public class MainMenuBar
 		{
 		    public void actionPerformed(ActionEvent e)
 		    {
-			ActionMan.fileExportHtml(ActionMan.getGui());
+				ActionMan.fileExportHtml(ActionMan.getGui());
 		    }
 		});
 
@@ -333,7 +334,7 @@ public class MainMenuBar
 		{
 		    public void actionPerformed(ActionEvent e)
 		    {
-			ActionMan.fileExportDesco(ActionMan.getGui());
+				ActionMan.fileExportDesco(ActionMan.getGui());
 		    }
 		});
 
@@ -344,7 +345,7 @@ public class MainMenuBar
 		{
 		    public void actionPerformed(ActionEvent e)
 		    {
-			ActionMan.fileExportUMDES(ActionMan.getGui());
+				ActionMan.fileExportUMDES(ActionMan.getGui());
 		    }
 		});
 	}
@@ -363,7 +364,7 @@ public class MainMenuBar
 	    separatorNeeded = false;
 	}
 
-	if (SupremicaProperties.fileAllowQuit())
+	if (Config.FILE_ALLOW_QUIT.isTrue())
 	{
 
 	    // File.Exit

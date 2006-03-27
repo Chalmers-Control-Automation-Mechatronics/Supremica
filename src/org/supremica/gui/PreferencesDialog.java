@@ -55,6 +55,7 @@ import java.io.*;
 import javax.swing.*;
 import java.util.*;
 import org.supremica.properties.SupremicaProperties;
+import org.supremica.properties.Config;
 import org.supremica.util.BDD.Options;    // Arash
 
 public class PreferencesDialog
@@ -120,7 +121,7 @@ public class PreferencesDialog
 		theTabbedPanel.add("Robot coordination", theRobotCoordinationPanel);
 		*/
 
-		if (SupremicaProperties.fileAllowOpen() || SupremicaProperties.fileAllowSave())
+		if (Config.FILE_ALLOW_OPEN.isTrue() || Config.FILE_ALLOW_SAVE.isTrue())
 		{
 			theFilePanel = new FilePanel(this);
 
@@ -358,16 +359,16 @@ class FilePanel
 
 	public boolean doApply()
 	{
-		SupremicaProperties.setFileOpenPath(fileOpenPath.getText());
-		SupremicaProperties.setFileSavePath(fileSavePath.getText());
+		Config.FILE_OPEN_PATH.set(fileOpenPath.getText());
+		Config.FILE_SAVE_PATH.set(fileSavePath.getText());
 
 		return true;
 	}
 
 	public void update()
 	{
-		fileOpenPath.setText(SupremicaProperties.getFileOpenPath());
-		fileSavePath.setText(SupremicaProperties.getFileSavePath());
+		fileOpenPath.setText(Config.FILE_OPEN_PATH.get());
+		fileSavePath.setText(Config.FILE_SAVE_PATH.get());
 	}
 }
 
@@ -404,7 +405,7 @@ class CommunicationPanel
 		xmlRpcFilter = add(panel, "Server IP filter ", 10);
 		debugXmlRpc = new JCheckBox("Debug XML-RPC communication");
 
-		if (SupremicaProperties.includeExperimentalAlgorithms())    // debugging XML-RPC is good to only developers
+		if (Config.INCLUDE_EXPERIMENTAL_ALGORITHMS.isTrue())    // debugging XML-RPC is good to only developers
 		{
 			panel.add(debugXmlRpc);
 		}
@@ -447,28 +448,28 @@ class CommunicationPanel
 			return false;
 		}
 
-		SupremicaProperties.setXmlRpcPort(port);
-		SupremicaProperties.setXmlRpcFilter(xmlRpcFilter.getText());
-		SupremicaProperties.setXmlRpcActive(useXmlRpc.isSelected());
-		SupremicaProperties.setXmlRpcDebug(debugXmlRpc.isSelected());
-		SupremicaProperties.setDocDBHost(docdbHost.getText());
-		SupremicaProperties.setDocDBPort(port2);
-		SupremicaProperties.setDocDBUsername(docdbUser.getText());
-		SupremicaProperties.setDocDBDocument(docdbDoc.getText());
+		Config.XML_RPC_PORT.set(port);
+		Config.XML_RPC_FILTER.set(xmlRpcFilter.getText());
+		Config.XML_RPC_ACTIVE.set(useXmlRpc.isSelected());
+		Config.XML_RPC_DEBUG.set(debugXmlRpc.isSelected());
+		Config.DOC_DB_SERVER_NAME.set(docdbHost.getText());
+		Config.DOC_DB_SERVER_PORT.set(port2);
+		Config.DOC_DB_SERVER_USER.set(docdbUser.getText());
+		Config.DOC_DB_SERVER_DOC.set(docdbDoc.getText());
 
 		return true;
 	}
 
 	public void update()
 	{
-		useXmlRpc.setSelected(SupremicaProperties.isXmlRpcActive());
-		debugXmlRpc.setSelected(SupremicaProperties.isXmlRpcDebugging());
-		xmlRpcPort.setText(Integer.toString(SupremicaProperties.getXmlRpcPort()));
-		xmlRpcFilter.setText(SupremicaProperties.getXmlRpcFilter());
-		docdbPort.setText("" + SupremicaProperties.getDocDBPort());
-		docdbHost.setText(SupremicaProperties.getDocDBHost());
-		docdbUser.setText(SupremicaProperties.getDocDBUsername());
-		docdbDoc.setText(SupremicaProperties.getDocDBDocument());
+		useXmlRpc.setSelected(Config.XML_RPC_ACTIVE.isTrue());
+		debugXmlRpc.setSelected(Config.XML_RPC_DEBUG.isTrue());
+		xmlRpcPort.setText(Integer.toString(Config.XML_RPC_PORT.get()));
+		xmlRpcFilter.setText(Config.XML_RPC_FILTER.get());
+		docdbPort.setText("" + Config.DOC_DB_SERVER_PORT.get());
+		docdbHost.setText(Config.DOC_DB_SERVER_NAME.get());
+		docdbUser.setText(Config.DOC_DB_SERVER_USER.get());
+		docdbDoc.setText(Config.DOC_DB_SERVER_DOC.get());
 	}
 }
 
@@ -537,13 +538,13 @@ class LayoutPanel
 
 	public boolean doApply()
 	{
-		SupremicaProperties.setDotLeftToRight(dotLeftToRight.isSelected());
-		SupremicaProperties.setDotWithStateLabels(dotWithStateLabels.isSelected());
-		SupremicaProperties.setDotWithCircles(dotWithCircles.isSelected());
-		SupremicaProperties.setDotUseStateColors(dotUseStateColors.isSelected());
-		SupremicaProperties.setDotUseArcColors(dotUseArcColors.isSelected());
-		SupremicaProperties.setDotUseMultipleLabels(dotUseMultipleLabels.isSelected());
-		SupremicaProperties.setDotExecuteCommand(dotCommand.getText());
+		Config.DOT_LEFT_TO_RIGHT.set(dotLeftToRight.isSelected());
+		Config.DOT_WITH_STATE_LABELS.set(dotWithStateLabels.isSelected());
+		Config.DOT_WITH_CIRCLES.set(dotWithCircles.isSelected());
+		Config.DOT_USE_STATE_COLORS.set(dotUseStateColors.isSelected());
+		Config.DOT_USE_ARC_COLORS.set(dotUseArcColors.isSelected());
+		Config.DOT_USE_MULTI_LABELS.set(dotUseMultipleLabels.isSelected());
+		Config.DOT_EXECUTE_COMMAND.set(dotCommand.getText());
 
 		int maxNbrOfStates = PreferencesDialog.getInt("Max number of states without warning", dotMaxNbrOfStates.getText(), 0);
 
@@ -552,21 +553,21 @@ class LayoutPanel
 			return false;
 		}
 
-		SupremicaProperties.setDotMaxNbrOfStatesWithoutWarning(maxNbrOfStates);
+		Config.DOT_MAX_NBR_OF_STATES.set(maxNbrOfStates);
 
 		return true;
 	}
 
 	public void update()
 	{
-		dotLeftToRight.setSelected(SupremicaProperties.isDotLeftToRight());
-		dotWithStateLabels.setSelected(SupremicaProperties.isDotWithStateLabels());
-		dotWithCircles.setSelected(SupremicaProperties.isDotWithCircles());
-		dotUseStateColors.setSelected(SupremicaProperties.isDotUseStateColors());
-		dotUseArcColors.setSelected(SupremicaProperties.isDotUseArcColors());
-		dotUseMultipleLabels.setSelected(SupremicaProperties.isDotUseMultipleLabels());
-		dotCommand.setText(SupremicaProperties.getDotExecuteCommand());
-		dotMaxNbrOfStates.setText(Integer.toString(SupremicaProperties.getDotMaxNbrOfStatesWithoutWarning()));
+		dotLeftToRight.setSelected(Config.DOT_LEFT_TO_RIGHT.isTrue());
+		dotWithStateLabels.setSelected(Config.DOT_WITH_STATE_LABELS.isTrue());
+		dotWithCircles.setSelected(Config.DOT_WITH_CIRCLES.isTrue());
+		dotUseStateColors.setSelected(Config.DOT_USE_STATE_COLORS.isTrue());
+		dotUseArcColors.setSelected(Config.DOT_USE_ARC_COLORS.isTrue());
+		dotUseMultipleLabels.setSelected(Config.DOT_USE_MULTI_LABELS.isTrue());
+		dotCommand.setText(Config.DOT_EXECUTE_COMMAND.get());
+		dotMaxNbrOfStates.setText(Integer.toString(Config.DOT_MAX_NBR_OF_STATES.get()));
 	}
 }
 
@@ -624,18 +625,18 @@ class GeneralPanel
 		{
 			return false;
 		}
-		SupremicaProperties.setSyncNbrOfExecuters(nbrOfThreads);
-		SupremicaProperties.setStateSeparator(stateSeparator.getText());
-		SupremicaProperties.setVerboseMode(verboseMode.isSelected());
+		Config.SYNC_NBR_OF_EXECUTERS.set(nbrOfThreads);
+		Config.GENERAL_STATE_SEPARATOR.set(stateSeparator.getText());
+		Config.VERBOSE_MODE.set(verboseMode.isSelected());
 
 		return true;
 	}
 
 	public void update()
 	{
-		nbrOfExecuters.setText(Integer.toString(SupremicaProperties.syncNbrOfExecuters()));
-		stateSeparator.setText(SupremicaProperties.getStateSeparator());
-		verboseMode.setSelected(SupremicaProperties.verboseMode());
+		nbrOfExecuters.setText(Integer.toString(Config.SYNC_NBR_OF_EXECUTERS.get()));
+		stateSeparator.setText(Config.GENERAL_STATE_SEPARATOR.get());
+		verboseMode.setSelected(Config.VERBOSE_MODE.isTrue());
 	}
 }
 
@@ -700,40 +701,28 @@ class SynchronizationPropertiesPanel
 
 	public boolean doApply()
 	{
-		SupremicaProperties.setSyncForbidUncontrollableStates(forbidUncontrollableStates.isSelected());
-		SupremicaProperties.setSyncExpandForbiddenStates(expandForbiddenStates.isSelected());
-		SupremicaProperties.setSyncExpandHashtable(expandHashtable.isSelected());
-		//SupremicaProperties.setVerboseMode(verboseMode.isSelected());
-		SupremicaProperties.setSyncAutomatonNameSeparator(automatonNameSeparator.getText());
+		Config.SYNC_FORBID_UNCON_STATES.set(forbidUncontrollableStates.isSelected());
+		Config.SYNC_EXPAND_FORBIDDEN_STATES.set(expandForbiddenStates.isSelected());
+		Config.SYNC_EXPAND_HASHTABLE.set(expandHashtable.isSelected());
+		Config.SYNC_AUTOMATON_NAME_SEPARATOR.set(automatonNameSeparator.getText());
 
 		int size = PreferencesDialog.getInt("Hashtable size", hashtableSize.getText(), 100);
 		if (size == Integer.MIN_VALUE)
 		{
 			return false;
 		}
-		SupremicaProperties.setSyncInitialHashtableSize(size);
-
-		/*
-		int nbrOfThreads = PreferencesDialog.getInt("Nbr of threads", nbrOfExecuters.getText(), 1);
-		if (nbrOfThreads == Integer.MIN_VALUE)
-		{
-			return false;
-		}
-		SupremicaProperties.setSyncNbrOfExecuters(nbrOfThreads);
-		*/
+		Config.SYNC_INITIAL_HASHTABLE_SIZE.set(size);
 
 		return true;
 	}
 
 	public void update()
 	{
-		forbidUncontrollableStates.setSelected(SupremicaProperties.syncForbidUncontrollableStates());
-		expandForbiddenStates.setSelected(SupremicaProperties.syncExpandForbiddenStates());
-		expandHashtable.setSelected(SupremicaProperties.syncExpandHashtable());
-		//verboseMode.setSelected(SupremicaProperties.verboseMode());
-		hashtableSize.setText(Integer.toString(SupremicaProperties.syncInitialHashtableSize()));
-		//nbrOfExecuters.setText(Integer.toString(SupremicaProperties.syncNbrOfExecuters()));
-		automatonNameSeparator.setText(SupremicaProperties.syncAutomatonNameSeparator());
+		forbidUncontrollableStates.setSelected(Config.SYNC_FORBID_UNCON_STATES.get());
+		expandForbiddenStates.setSelected(Config.SYNC_EXPAND_FORBIDDEN_STATES.get());
+		expandHashtable.setSelected(Config.SYNC_EXPAND_HASHTABLE.get());
+		hashtableSize.setText(Integer.toString(Config.SYNC_INITIAL_HASHTABLE_SIZE.get()));
+		automatonNameSeparator.setText(Config.SYNC_AUTOMATON_NAME_SEPARATOR.get());
 	}
 }
 
@@ -754,17 +743,11 @@ class PreferencesControllerPanel
 		applyButton = new JButton("Apply");
 		applyButton.setToolTipText("Saves the preferences and closes this dialog");
 		cancelButton = new JButton("Cancel");
-		cancelButton.setToolTipText("Cancel the dislog without saving the preferences");
+		cancelButton.setToolTipText("Cancel the dialog without saving the preferences");
 
 		add(applyButton, BorderLayout.CENTER);
 		add(cancelButton, BorderLayout.CENTER);
 
-//              buttonBox.add(Box.createHorizontalGlue());
-//              buttonBox.add(applyButton);
-//              buttonBox.add(Box.createHorizontalGlue());
-//              buttonBox.add(cancelButton);
-//              buttonBox.add(Box.createHorizontalGlue());
-//              add(buttonBox, BorderLayout.NORTH);
 		applyButton.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)

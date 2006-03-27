@@ -9,6 +9,7 @@ package org.supremica.gui;
 import java.awt.*;
 import javax.swing.*;
 import org.supremica.properties.SupremicaProperties;
+import org.supremica.properties.Config;
 import org.supremica.gui.useractions.*;
 
 public class MainToolBar
@@ -43,12 +44,12 @@ public class MainToolBar
 
 	private void initToolBar()
 	{
-		if (SupremicaProperties.fileAllowOpen())
+		if (Config.FILE_ALLOW_OPEN.isTrue())
 		{
 			add(openAction);
 		}
 
-		if (SupremicaProperties.fileAllowSave())
+		if (Config.FILE_ALLOW_SAVE.isTrue())
 		{
 			add(saveAction);
 			add(saveAsAction);

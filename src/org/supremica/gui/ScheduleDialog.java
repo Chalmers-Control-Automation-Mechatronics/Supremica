@@ -27,7 +27,7 @@ public class ScheduleDialog
 
     private static final long serialVersionUID = 1L;
     private static final String[] optiMethodNames = new String[]{MODIFIED_A_STAR, MODIFIED_VGA_STAR, MILP, VIS_GRAPH}; //, "Modified IDA*", "Modified SMA*"};
-    private static final String[] heuristicsNames = new String[]{ONE_PRODUCT_RELAXATION, TWO_PRODUCT_RELAXATION, VIS_GRAPH_TIME_RELAXATION, VIS_GRAPH_NODE_RELAXATION, "brute force"}; 
+    private static final String[] heuristicsNames = new String[]{ONE_PRODUCT_RELAXATION, TWO_PRODUCT_RELAXATION, VIS_GRAPH_TIME_RELAXATION, VIS_GRAPH_NODE_RELAXATION, "brute force"};
     private static Logger logger = LoggerFactory.createLogger(ScheduleDialog.class);
     private JComboBox optiMethodsBox, heuristicsBox;
     private JCheckBox nodeExpander, buildAutomaton, vgDrawer;
@@ -42,33 +42,33 @@ public class ScheduleDialog
 	public Thread milpThread = null;
 
 	private BufferedWriter writer = null; //Tillf
-	
+
 
     public ScheduleDialog()
     {
 		this(ActionMan.getGui().getFrame());
     }
-    
+
     public ScheduleDialog(JFrame frame)
     {
 		super(frame, "Schedule Selected Automata", true);
-	
+
 		/******** Base components of the dialog ***********/
 		okButton = new JButton("Schedule");
 		cancelButton = new JButton("Cancel");
-	
+
 		JLabel optiMethodsLabel = new JLabel("Optimization methods: \t \t");
 		optiMethodsBox = new JComboBox(optiMethodNames);
-	
+
 		JLabel heuristicsLabel = new JLabel("Heuristics: \t \t");
 		heuristicsBox = new JComboBox(heuristicsNames);
-	
+
 		nodeExpander = new JCheckBox("use AK's node expander", true);
-		buildAutomaton = new JCheckBox("build schedule", true); 
+		buildAutomaton = new JCheckBox("build schedule", true);
 		vgDrawer = new JCheckBox("Draw Visibility Graph", true);
 
 		memoryCapacityField = new JTextField("300", 10);
-	
+
 		/******** Base containers of the dialog ***********/
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.add(okButton);
@@ -77,11 +77,11 @@ public class ScheduleDialog
 		JPanel optiPanel = new JPanel();
 		optiPanel.add(optiMethodsLabel);
 		optiPanel.add(optiMethodsBox);
-	
+
 		JPanel heuristicsPanel = new JPanel();
 		heuristicsPanel.add(heuristicsLabel);
 		heuristicsPanel.add(heuristicsBox);
-	
+
 		JPanel smaPanel = new JPanel();
 		smaPanel.add(new JLabel("Nr of nodes in memory (SMA*)"));
 		smaPanel.add(memoryCapacityField);
@@ -91,7 +91,7 @@ public class ScheduleDialog
 		// 	expanderPanel.add(nodeExpander);
 
 		/********* Composite containers *******************/
-	
+
 		JPanel algorithmPanel = new JPanel();
 		algorithmPanel.setLayout(new GridLayout(2,1));
 		algorithmPanel.add(optiPanel);
@@ -107,14 +107,14 @@ public class ScheduleDialog
 		JTabbedPane tabbedPane = new JTabbedPane();
 		tabbedPane.addTab("Algorithms", algorithmPanel);
 		tabbedPane.addTab("Specifications", specPanel);
-	
+
 		// 	/******** Layout of the dialog ***********/
 		// 	getContentPane().setLayout(new GridLayout(4, 1));
 		// 	getContentPane().add(optiPanel);
 		// 	getContentPane().add(heuristicsPanel);
 		// 	getContentPane().add(expanderPanel);
 		// 	getContentPane().add(buttonPanel);
-	
+
 		getContentPane().add("Center", tabbedPane);
 		getContentPane().add("South", buttonPanel);
 
@@ -129,7 +129,7 @@ public class ScheduleDialog
 					doit();
 				}
 			});
-	
+
 		cancelButton.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
@@ -142,7 +142,7 @@ public class ScheduleDialog
 					{
 						done();
 					}
-						
+
 				}
 			});
 
@@ -165,7 +165,7 @@ public class ScheduleDialog
 						heuristicsBox.setEnabled(false);
 					}
 				}
-			}); 
+			});
 
 		// Is only used for automatic scheduling of several files (a whole directory)
 		autoTestButton = new JButton("AutoTest");
@@ -174,16 +174,16 @@ public class ScheduleDialog
 			{
 				public void actionPerformed(ActionEvent e)
 				{
-					File rootDir = new File(org.supremica.properties.SupremicaProperties.getFileOpenPath());
+					File rootDir = new File(org.supremica.properties.Config.FILE_OPEN_PATH.get());
 	 				File[] files = rootDir.listFiles();
-					
+
 					try {
 						File resultFile = null;
 						if (((String)optiMethodsBox.getSelectedItem()).equals(MODIFIED_A_STAR))
 						{
 							resultFile = new File(rootDir + File.separator + "_" + heuristicsBox.getSelectedItem() + ".txt");
 						}
-						else 
+						else
 						{
 							resultFile = new File(rootDir + File.separator + "_" + optiMethodsBox.getSelectedItem() + ".txt");
 						}
@@ -213,13 +213,13 @@ public class ScheduleDialog
      */
     void doit()
     {
-		try 
+		try
 		{
 			cancelButton.setText("Stop");
 			okButton.setEnabled(false);
 
 			readMemoryCapacity();
-			
+
 			if (optiMethodsBox.getSelectedItem().equals(MODIFIED_A_STAR))
 			{
 				String selectedHeuristic = (String) heuristicsBox.getSelectedItem();
@@ -235,7 +235,7 @@ public class ScheduleDialog
 					}
 				}
 				// Tillf
-				// This might be temporary (or the alternative just above) to determine which relaxation is best 
+				// This might be temporary (or the alternative just above) to determine which relaxation is best
 				else if (selectedHeuristic.equals(VIS_GRAPH_NODE_RELAXATION))
 				{
 					if (ActionMan.getGui().getSelectedAutomata().getPlantAutomata().size() == 2)
@@ -274,27 +274,27 @@ public class ScheduleDialog
 			}
 // 			else if (optiMethodsBox.getSelectedItem().equals("Modified IDA*"))
 // 				throw new Exception("IMA* not implemented yet...");
-// 			// 		sched = new ModifiedAstar(ActionMan.getGui().getSelectedAutomata(), (String) heuristicsBox.getSelectedItem(), nodeExpander.isSelected(), true);	
+// 			// 		sched = new ModifiedAstar(ActionMan.getGui().getSelectedAutomata(), (String) heuristicsBox.getSelectedItem(), nodeExpander.isSelected(), true);
 // 			else if (optiMethodsBox.getSelectedItem().equals("Modified SMA*"))
 // 				throw new Exception("SMA* not implemented yet...");
-			else 
+			else
 			{
 				throw new Exception("Unknown optimization method");
 			}
 		}
-		catch (Exception excp) 
+		catch (Exception excp)
 		{
 			logger.error("ScheduleDialog::doit " + excp);
 			logger.debug(excp.getStackTrace());
 		}
     }
-    
+
     /**
      *      Terminates the Schedule Dialog.
      */
     public void done()
     {
-		try 
+		try
 		{
 			if (autoTestButton.isEnabled())
 			{
@@ -327,7 +327,7 @@ public class ScheduleDialog
 						ActionMan.openFile(ActionMan.getGui(), currFile);
 						ActionMan.getGui().invertSelection();
 						// 					getParent().repaint();
-					
+
 						doit();
 					}
 					else
@@ -335,7 +335,7 @@ public class ScheduleDialog
 						done();
 					}
 				}
-				else 
+				else
 				{
 					writer.flush();
 

@@ -10,6 +10,7 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import org.supremica.properties.SupremicaProperties;
+import org.supremica.properties.Config;
 import org.supremica.gui.useractions.*;
 import org.supremica.util.VPopupMenu;
 import org.supremica.util.SupremicaMenuItem;
@@ -105,10 +106,10 @@ class MainPopupMenu
 					getGui().repaint();
 				}
 			});
-		
+
 		JMenuItem synthesizeItem = new SupremicaMenuItem(ActionMan.synthesizeAction);
 		synthesizeItem.setToolTipText("Synthesize supervisor");
-			
+
 		if (SupremicaProperties.getStudentVersion())
 		{
 			verifyItem.setToolTipText("Verification is disabled--use the Workbench!");
@@ -153,7 +154,7 @@ class MainPopupMenu
 		// JMenu standardalgos = JMenu("Standard Algorithms");
 		// menuHandler.add(standardalgos, 0);
 
-		/* These are rarely if ever used... 
+		/* These are rarely if ever used...
 		JMenuItem allAcceptingItem = new JMenuItem("Set all states as accepting");
 		allAcceptingItem.setToolTipText("Make all states accepting (marked)");
 		menuHandler.add(allAcceptingItem, 1);
@@ -344,7 +345,7 @@ class MainPopupMenu
 
 		// JMenuItem saveAsItem = new JMenuItem("Save As...");
 		// menuHandler.add(saveAsItem, 1);
-		if (SupremicaProperties.fileAllowExport())
+		if (Config.FILE_ALLOW_EXPORT.isTrue())
 		{
 			// This is how it would be done with an export command object
 			// JMenuItem exportItem = new SupremicaMenuItem(ActionMan.exportItem);
@@ -364,7 +365,7 @@ class MainPopupMenu
 
 		// --------------------------------------------------------------
 		// ***************** UNDER DEVELOPMENT MENUES ARE ADDED HERE:
-		if (SupremicaProperties.includeExperimentalAlgorithms())
+		if (Config.INCLUDE_EXPERIMENTAL_ALGORITHMS.isTrue())
 		{
 			JMenu expMenu = new JMenu("Experimental algorithms");
 			menuHandler.add(expMenu, 1);
@@ -376,7 +377,7 @@ class MainPopupMenu
 			expMenu.addSeparator();
 
 			expMenu.add(new SupremicaMenuItem(new ScheduleAction()));
-			
+
 			JMenuItem mMd, mMmc, predictCompositionSize;
 
 			expMenu.addSeparator();
@@ -410,7 +411,7 @@ class MainPopupMenu
 
 			// BDD crap, sorry for the compressed lines... /Arash
 			JMenuItem miR, miCR, miXXX;
-			
+
 			expMenu.addSeparator();
 			expMenu.add(miR = new JMenuItem("BDD/Reachability"));
 			miR.addActionListener(new ActionListener()

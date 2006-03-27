@@ -56,6 +56,7 @@ import javax.swing.*;
 import java.util.*;
 import java.io.*;
 import org.supremica.properties.SupremicaProperties;
+import org.supremica.properties.Config;
 import org.supremica.automata.templates.*;
 import org.supremica.automata.algorithms.*;
 import org.supremica.automata.algorithms.minimization.*;
@@ -2027,7 +2028,7 @@ public class ActionMan
 	// File.Close action performed
 	public static void fileClose(Gui gui)
 	{
-		if (SupremicaProperties.fileAllowQuit())
+		if (Config.FILE_ALLOW_QUIT.isTrue())
 		{
 			try
 			{
@@ -2161,7 +2162,7 @@ public class ActionMan
 			void openFile(Gui g, File f)
 			{
 				openProjectXMLFile(g, f);
-				SupremicaProperties.setFileOpenPath(f.getParentFile().getAbsolutePath());
+				Config.FILE_OPEN_PATH.set(f.getParentFile().getAbsolutePath());
 			}
 		};
 	}
@@ -2338,7 +2339,7 @@ public class ActionMan
 			{
 				gui.getVisualProjectContainer().getActiveProject().setProjectFile(currFile);
 				fileSave(gui);
-				SupremicaProperties.setFileSavePath(currFile.getParentFile().getAbsolutePath());
+				Config.FILE_SAVE_PATH.set(currFile.getParentFile().getAbsolutePath());
 			}
 		}
 	}

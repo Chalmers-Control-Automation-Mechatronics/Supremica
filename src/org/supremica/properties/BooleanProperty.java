@@ -66,6 +66,11 @@ public class BooleanProperty
 		this.value = value;
 	}
 
+	public boolean get()
+	{
+		return isTrue();
+	}
+
 	public boolean isTrue()
 	{
 		return value;

@@ -1,5 +1,5 @@
 //# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
-//# $Id: FileDialogs.java,v 1.28 2006-03-16 12:09:16 flordal Exp $
+//# $Id: FileDialogs.java,v 1.29 2006-03-27 19:21:31 knut Exp $
 
 /*
  * Supremica Software License Agreement
@@ -52,6 +52,7 @@
 package org.supremica.gui;
 
 import org.supremica.properties.SupremicaProperties;
+import org.supremica.properties.Config;
 import org.supremica.automata.IO.FileFormats;
 import javax.swing.filechooser.*;
 import javax.swing.*;
@@ -420,7 +421,7 @@ public class FileDialogs
 			fileImporter = new JFileChooser();
 
 			fileImporter.setDialogType(JFileChooser.OPEN_DIALOG);
-			fileImporter.setCurrentDirectory(new java.io.File(SupremicaProperties.getFileOpenPath()));
+			fileImporter.setCurrentDirectory(new java.io.File(Config.FILE_OPEN_PATH.get()));
 			fileImporter.setMultiSelectionEnabled(true);
 		}
 
@@ -434,7 +435,7 @@ public class FileDialogs
 			fileExporter = new StandardExtensionFileChooser();
 
 			fileExporter.setDialogType(JFileChooser.SAVE_DIALOG);
-			fileExporter.setCurrentDirectory(new java.io.File(SupremicaProperties.getFileSavePath()));
+			fileExporter.setCurrentDirectory(new java.io.File(Config.FILE_SAVE_PATH.get()));
 			fileExporter.setMultiSelectionEnabled(false);
 		}
 
@@ -448,7 +449,7 @@ public class FileDialogs
 			fileSaveAs = new StandardExtensionFileChooser();
 
 			fileSaveAs.setDialogType(JFileChooser.SAVE_DIALOG);
-			fileSaveAs.setCurrentDirectory(new java.io.File(SupremicaProperties.getFileSavePath()));
+			fileSaveAs.setCurrentDirectory(new java.io.File(Config.FILE_SAVE_PATH.get()));
 			fileSaveAs.setMultiSelectionEnabled(false);
 		}
 

@@ -57,6 +57,7 @@ import java.io.*;
 import javax.swing.*;
 import att.grappa.*;
 import org.supremica.properties.SupremicaProperties;
+import org.supremica.properties.Config;
 import org.supremica.automata.IO.*;
 import org.supremica.gui.texteditor.TextFrame;
 import java.awt.geom.Rectangle2D;
@@ -690,7 +691,7 @@ else {
 			JFileChooser fileExporter = dlg.getFileExporter();
 
 			// Suggest a reasonable filename based on the name of the automaton...
-			fileExporter.setSelectedFile(new File(SupremicaProperties.getFileSavePath() + "/" + objectName + "." + dlg.getSelectedValue()));
+			fileExporter.setSelectedFile(new File(Config.FILE_SAVE_PATH.get() + "/" + objectName + "." + dlg.getSelectedValue()));
 
 			if (fileExporter.showSaveDialog(this) == JFileChooser.APPROVE_OPTION)
 			{
@@ -705,7 +706,7 @@ else {
 							AutomataSerializer serializer = getSerializer();
 
 							DotBuilder.getDotBuilder(new DotFileViewer(currFile), null, serializer, dlg.getDotArgument());
-							SupremicaProperties.setFileSavePath(currFile.getParentFile().getAbsolutePath());
+							Config.FILE_SAVE_PATH.set(currFile.getParentFile().getAbsolutePath());
 
 						}
 						catch (Exception ex)
