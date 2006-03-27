@@ -61,7 +61,7 @@ public class InterfaceManager
 	{
 		try
 		{
-			String lookAndFeel = SupremicaProperties.getLookAndFeel();
+			String lookAndFeel = Config.GENERAL_LOOKANDFEEL.get();
 
 			if ((lookAndFeel == null) || "System".equalsIgnoreCase(lookAndFeel))
 			{

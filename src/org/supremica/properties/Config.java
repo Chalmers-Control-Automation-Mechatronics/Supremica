@@ -110,10 +110,19 @@ public final class Config
 	public static final BooleanProperty DOT_AUTOMATIC_UPDATE = new BooleanProperty(PropertyType.GUI_DOT, "dotAutomaticUpdate", true, "Do automatic update of the layout");
 
 	// GENERAL
-	public static final StringProperty GENERAL_GENERAL_LOOKANDFEEL  = new StringProperty(PropertyType.GENERAL, "generalLookAndFeel", "System", "Look and feel");
+	/**
+	 * Possible values for look and feel
+	 * Metal : All platforms
+	 * javax.swing.plaf.metal.MetalLookAndFeel : All platforms
+	 * com.sun.java.swing.plaf.windows.WindowsLookAndFeel : Windows only
+	 * com.sun.java.swing.plaf.motif.MotifLookAndFeel : All platforms
+	 * javax.swing.plaf.mac.MacLookAndFeel : Mac only
+	 * System : All platforms
+	 */
+	public static final StringProperty GENERAL_LOOKANDFEEL  = new StringProperty(PropertyType.GENERAL, "generalLookAndFeel", "System", "Look and feel");
 	public static final StringProperty GENERAL_STATE_SEPARATOR  = new StringProperty(PropertyType.GENERAL, "generalStateSeparator", ".", "State separator character");
 	public static final StringProperty GENERAL_STATELABEL_SEPARATOR  = new StringProperty(PropertyType.GENERAL, "generalStateLabelSeparator", ",", "State label separator character");
-	public static final StringProperty GENERAL_SILENT_EVENT_NAME  = new StringProperty(PropertyType.GENERAL, "eneralSilentEventName", "tau", "Silent event name");
+	public static final StringProperty GENERAL_SILENT_EVENT_NAME  = new StringProperty(PropertyType.GENERAL, "generalSilentEventName", "tau", "Silent event name");
 	public static final StringProperty GENERAL_SILENT_CONTROLLABLE_EVENT_NAME  = new StringProperty(PropertyType.GENERAL, "generalSilentControllableEventName", "tau_c", "Silent controllable event name");
 	public static final StringProperty GENERAL_SILENT_UNCONTROLLABLE_EVENT_NAME  = new StringProperty(PropertyType.GENERAL, "generalSilentUnontrollableEventName", "tau_u", "Silent uncontrollable event name");
 	public static final BooleanProperty GENERAL_USE_SECURITY = new BooleanProperty(PropertyType.GENERAL, "generalUseSecurity", false, "Use file security");

@@ -52,6 +52,7 @@ package org.supremica.apps;
 import java.util.*;
 import org.apache.xmlrpc.*;
 import org.supremica.properties.SupremicaProperties;
+import org.supremica.properties.Config;
 import org.supremica.log.*;
 
 public class SupremicaClient
@@ -63,7 +64,7 @@ public class SupremicaClient
 	public static void main(String[] args)
 		throws Exception
 	{
-		XmlRpcClient xmlrpc = new XmlRpcClient("http://localhost:" + SupremicaProperties.getXmlRpcPort());
+		XmlRpcClient xmlrpc = new XmlRpcClient("http://localhost:" + Config.XML_RPC_PORT.get());
 
 		// this method return a vector of strings
 		Vector params = new Vector();

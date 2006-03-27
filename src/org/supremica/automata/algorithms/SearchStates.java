@@ -21,6 +21,7 @@ import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.gui.MonitorableThread;
 import org.supremica.properties.SupremicaProperties;
+import org.supremica.properties.Config;
 
 public class SearchStates
 	extends MonitorableThread
@@ -149,7 +150,7 @@ public class SearchStates
 	}
 
 	// To iterate over the matched states
-	public Iterator iterator() 
+	public Iterator iterator()
 	{
 		return container.iterator();
 	}
@@ -174,7 +175,7 @@ public class SearchStates
 		private org.supremica.automata.State[][] states;
 		private int[] composite;
 		int index;	// holds the automaton index
-		
+
 		// Private, instantiate only through getStateIterator
 		private StateIterator(org.supremica.automata.State[][] s, int[] c)
 		{
@@ -218,7 +219,7 @@ public class SearchStates
 
 	/**
 	 * External users use this method to create a StateIterator
-	 * 
+	 *
 	 */
 	public StateIterator getStateIterator(int[] composite_state)
 	{
@@ -234,14 +235,14 @@ public class SearchStates
 
 		for (int i = 0; i < states.length; ++i)
 		{
-			str.append(states[i][composite_state[i]].getName());	
-			str.append(SupremicaProperties.getStateSeparator());
+			str.append(states[i][composite_state[i]].getName());
+			str.append(Config.GENERAL_STATE_SEPARATOR.get());
 		}
 
 		// Remove last state separator
-		int idx = str.lastIndexOf(SupremicaProperties.getStateSeparator());
+		int idx = str.lastIndexOf(Config.GENERAL_STATE_SEPARATOR.get());
 		str.delete(idx, str.length());
-		
+
 		return new String(str);
 	}
 

@@ -50,7 +50,7 @@
 package org.supremica.automata.algorithms;
 
 import org.supremica.log.*;
-import org.supremica.properties.SupremicaProperties;
+import org.supremica.properties.Config;
 import org.supremica.util.SupremicaException;
 
 public final class SynchronizationOptions
@@ -84,7 +84,7 @@ public final class SynchronizationOptions
 	public SynchronizationOptions()
 //		throws SupremicaException
 	{
-		this.nbrOfExecuters = SupremicaProperties.syncNbrOfExecuters();
+		this.nbrOfExecuters = Config.SYNC_NBR_OF_EXECUTERS.get();
 		//The following check should ideally be done within SupremicaProperties
 		if (this.nbrOfExecuters != 1)
 		{
@@ -94,24 +94,24 @@ public final class SynchronizationOptions
 		this.syncType = SynchronizationType.Prioritized;
 		assert this.syncType != null;
 
-		this.initialHashtableSize = SupremicaProperties.syncInitialHashtableSize();
+		this.initialHashtableSize = Config.SYNC_INITIAL_HASHTABLE_SIZE.get();
 		//The following check should ideally be done within SupremicaProperties
 		if (this.initialHashtableSize < 100)
 		{
 //			throw new SupremicaException("Error in SupremicaProperties. The property syncInitialHashtableSize must be at least 100");
 		}
 
-		this.expandHashtable = SupremicaProperties.syncExpandHashtable();
-		this.forbidUnconStates = SupremicaProperties.syncForbidUncontrollableStates();
-		this.expandForbiddenStates = SupremicaProperties.syncExpandForbiddenStates();
+		this.expandHashtable = Config.SYNC_EXPAND_HASHTABLE.isTrue();
+		this.forbidUnconStates = Config.SYNC_FORBID_UNCON_STATES.isTrue();
+		this.expandForbiddenStates = Config.SYNC_EXPAND_FORBIDDEN_STATES.isTrue();
 		this.expandEventsUsingPriority = false;
 		this.buildAutomaton = true;
 		this.useShortStateNames = false;
 		this.requireConsistentControllability = true;
 		this.requireConsistentImmediate = true;
 		this.rememberDisabledEvents = false;
-		this.automatonNameSeparator = SupremicaProperties.syncAutomatonNameSeparator();
-		this.stateNameSeparator = SupremicaProperties.getStateSeparator();
+		this.automatonNameSeparator = Config.SYNC_AUTOMATON_NAME_SEPARATOR.get();
+		this.stateNameSeparator = Config.GENERAL_STATE_SEPARATOR.get();
 	}
 
 	public void setDialogOK(boolean bool)

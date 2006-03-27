@@ -54,6 +54,7 @@ import org.supremica.*;
 import org.supremica.comm.xmlrpc.*;
 import org.supremica.gui.VisualProjectContainer;
 import org.supremica.properties.SupremicaProperties;
+import org.supremica.properties.Config;
 
 public class SupremicaServer
 {
@@ -78,7 +79,7 @@ public class SupremicaServer
 
 		try
 		{
-			xmlRpcServer = new Server(theVisualProjectContainer, SupremicaProperties.getXmlRpcPort());
+			xmlRpcServer = new Server(theVisualProjectContainer, Config.XML_RPC_PORT.get());
 		}
 		catch (Exception e)
 		{
@@ -90,7 +91,7 @@ public class SupremicaServer
 
 		if (serverStarted)
 		{
-			logger.info("XML-RPC server running on port " + SupremicaProperties.getXmlRpcPort());
+			logger.info("XML-RPC server running on port " + Config.XML_RPC_PORT.get());
 		}
 	}
 

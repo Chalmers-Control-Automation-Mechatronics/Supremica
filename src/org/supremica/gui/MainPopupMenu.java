@@ -50,7 +50,7 @@ class MainPopupMenu
 		JMenu viewMenu = new JMenu("View");
 		menuHandler.add(viewMenu, 1);
 
-		if (SupremicaProperties.useDot())
+		if (Config.DOT_USE.isTrue())
 		{
 			JMenuItem viewItem = new JMenuItem("View automaton");
 			viewItem.setToolTipText("Display graphical representation of the selected automata");

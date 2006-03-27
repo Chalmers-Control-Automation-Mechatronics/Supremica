@@ -12,6 +12,7 @@ package org.supremica.automata;
 
 import java.util.*;
 import org.supremica.properties.SupremicaProperties;
+import org.supremica.properties.Config;
 
 public class StateSet
 	extends TreeSet<State>
@@ -24,7 +25,7 @@ public class StateSet
 	{
 		// State implements Comparable!
 		//super(new State.StateComparator());
-		super(); 
+		super();
 	}
 
 	public StateSet(Collection<? extends State> collection)
@@ -69,7 +70,7 @@ public class StateSet
 		StateSet states = (StateSet) obj;
 
 		// avoid testing for self comparison
-		if (this == states)    
+		if (this == states)
 		{
 			return true;
 		}
@@ -155,7 +156,7 @@ public class StateSet
 
 		for (Iterator<State> stateIt = iterator(); stateIt.hasNext(); )
 		{
-			for (Iterator<State> prevIt = stateIt.next().previousStateIterator(eventLabel); 
+			for (Iterator<State> prevIt = stateIt.next().previousStateIterator(eventLabel);
 				 prevIt.hasNext(); )
 			{
 				prevStates.add(prevIt.next());
@@ -164,7 +165,7 @@ public class StateSet
 
 		return prevStates;
 	}
-	
+
 	/**
 	 * Returns the set of states that can be reached from the current
 	 * state set by transitions associated with "event".
@@ -193,14 +194,14 @@ public class StateSet
 	public StateSet epsilonClosure(boolean includeSelf)
 	{
 		StateSet result = new StateSet();
-		
+
 		// Include self?
 		if (includeSelf)
 		{
 			result.addAll(this);
 		}
 
-		// Examine states 
+		// Examine states
 		StateSet statesToExamine = new StateSet();
 		statesToExamine.addAll(this);
 		while (statesToExamine.size() != 0)
@@ -211,8 +212,8 @@ public class StateSet
 			{
 				Arc currArc = arcIt.next();
 				State state = currArc.getToState();
-				
-				if (currArc.getEvent().isEpsilon() && !currArc.isSelfLoop() && 
+
+				if (currArc.getEvent().isEpsilon() && !currArc.isSelfLoop() &&
 					!result.contains(state))
 				{
 					statesToExamine.add(state);
@@ -261,7 +262,7 @@ public class StateSet
 			buf.append(state.getName());
 			if (stateit.hasNext())
 			{
-				buf.append(SupremicaProperties.getStateSeparator());
+				buf.append(Config.GENERAL_STATE_SEPARATOR.get());
 			}
 
 			// i |= state.isInitial();
@@ -365,7 +366,7 @@ public class StateSet
 		{
 			this.outgoing = outgoing;
 			stateIterator = stateSet.iterator();
-			
+
 			// Find a state that has at least one outgoing/incoming arcs
 			while (stateIterator.hasNext())
 			{
@@ -378,7 +379,7 @@ public class StateSet
 				{
 					arcIt = stateIterator.next().incomingArcsIterator();
 				}
-				
+
 				// If there are arcs in this iterator, we're done!
 				if (arcIt.hasNext())
 				{
@@ -397,12 +398,12 @@ public class StateSet
 
 			return arcIterator.hasNext();
 		}
-		
+
 		public Arc next()
 			throws NoSuchElementException
 		{
 			Arc arc = arcIterator.next();
-			
+
 			// Jump to the next state?
 			if (!arcIterator.hasNext())
 			{
@@ -430,7 +431,7 @@ public class StateSet
 
 			return arc;
 		}
-		
+
 		public void remove()
 			throws UnsupportedOperationException, IllegalStateException
 		{

@@ -50,14 +50,16 @@
 package org.supremica.apps;
 
 import org.supremica.properties.SupremicaProperties;
+import org.supremica.properties.Config;
+
 import java.lang.Exception;
 
 public class Supremica
 {
 	static
 	{
-		SupremicaProperties.setXmlRpcActive(false);
-		SupremicaProperties.setUseDot(true);
+		Config.XML_RPC_ACTIVE.set(false);
+		Config.DOT_USE.set(true);
 	}
 
 	public static void main(String[] args)

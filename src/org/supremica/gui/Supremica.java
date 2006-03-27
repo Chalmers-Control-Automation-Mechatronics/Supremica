@@ -63,6 +63,7 @@ import org.supremica.automata.algorithms.*;
 import org.supremica.comm.xmlrpc.*;
 import org.supremica.gui.help.*;
 import org.supremica.properties.SupremicaProperties;
+import org.supremica.properties.Config;
 import org.supremica.automata.*;
 import org.supremica.automata.IO.*;
 
@@ -116,24 +117,24 @@ public class Supremica
 
 		logger.info("Supremica version: " + (new Version()).toString());
 
-		if (SupremicaProperties.isXmlRpcActive())
+		if (Config.XML_RPC_ACTIVE.isTrue())
 		{
 			boolean serverStarted = true;
 
 			try
 			{
-				xmlRpcServer = new Server(theVisualProjectContainer, SupremicaProperties.getXmlRpcPort());
+				xmlRpcServer = new Server(theVisualProjectContainer, Config.XML_RPC_PORT.get());
 			}
 			catch (Exception e)
 			{
 				serverStarted = false;
 
-				logger.warn("Another server already running on port " + SupremicaProperties.getXmlRpcPort() + ". XML-RPC server not started!");
+				logger.warn("Another server already running on port " + Config.XML_RPC_PORT.get() + ". XML-RPC server not started!");
 			}
 
 			if (serverStarted)
 			{
-				logger.info("XML-RPC server running on port " + SupremicaProperties.getXmlRpcPort());
+				logger.info("XML-RPC server running on port " + Config.XML_RPC_PORT.get());
 			}
 		}
 
@@ -188,7 +189,7 @@ public class Supremica
 						return;
 					}
 
-					if (SupremicaProperties.useDot())
+					if (Config.DOT_USE.isTrue())
 					{
 						if (col == TABLE_IDENTITY_COLUMN)
 						{

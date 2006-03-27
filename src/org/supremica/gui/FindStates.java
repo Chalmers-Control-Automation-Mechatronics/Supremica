@@ -75,6 +75,7 @@ import org.supremica.automata.Automaton;
 import org.supremica.automata.AutomataListener;
 import org.supremica.gui.VisualProject;
 import org.supremica.properties.SupremicaProperties;
+import org.supremica.properties.Config;
 
 // ----------------------------------------------------------------------------------
 // compiler type should be adjustable, but as for now, we only support a single type
@@ -861,7 +862,7 @@ class FreeFormPanel
 		x2Box.add(new JLabel("State Separator: "));
 
 		// sep_str = new JTextField(".", 30);
-		sep_str = new JTextField(SupremicaProperties.getStateSeparator(), 30);
+		sep_str = new JTextField(Config.GENERAL_STATE_SEPARATOR.get(), 30);
 
 		x2Box.add(sep_str);
 		yBox.add(Box.createVerticalGlue());

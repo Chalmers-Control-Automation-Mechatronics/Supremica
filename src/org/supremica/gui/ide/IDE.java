@@ -17,6 +17,7 @@ import org.supremica.gui.Utility;
 import org.supremica.gui.InterfaceManager;
 import org.supremica.gui.ide.actions.Actions;
 import org.supremica.properties.SupremicaProperties;
+import org.supremica.properties.Config;
 import org.supremica.log.*;
 import org.supremica.Version;
 
@@ -28,10 +29,10 @@ public class IDE
 
 	static
 	{
-		SupremicaProperties.setXmlRpcActive(false);
-		SupremicaProperties.setUseDot(true);
-		SupremicaProperties.setLogToConsole(false);
-		SupremicaProperties.setLogToGUI(true);
+		Config.XML_RPC_ACTIVE.set(false);
+		Config.DOT_USE.set(true);
+		Config.LOG_TO_CONSOLE.set(false);
+		Config.LOG_TO_GUI.set(true);
 	}
 	private static Logger logger = LoggerFactory.createLogger(IDE.class);
 	private final static InterfaceManager interfaceManager = InterfaceManager.getInstance();

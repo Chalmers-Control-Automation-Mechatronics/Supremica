@@ -130,7 +130,7 @@ public class Server
 		this.container = container;
 		instance_ = this;    // this statement would be illegal in C++  :)
 
-		String filter = SupremicaProperties.getXmlRpcFilter();
+		String filter = Config.XML_RPC_FILTER.get();
 
 		theServer = new WebServer(port);
 
@@ -140,7 +140,7 @@ public class Server
 			theServer.acceptClient(filter);
 		}
 
-		XmlRpc.setDebug(SupremicaProperties.isXmlRpcDebugging());
+		XmlRpc.setDebug(Config.XML_RPC_DEBUG.isTrue());
 		theServer.addHandler("$default", this);
 		theServer.start();
 	}

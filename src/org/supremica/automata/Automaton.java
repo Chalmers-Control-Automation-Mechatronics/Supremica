@@ -54,6 +54,7 @@ import java.util.*;
 import org.supremica.log.*;
 import org.supremica.util.SupremicaIterator;
 import org.supremica.properties.SupremicaProperties;
+import org.supremica.properties.Config;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 
 public class Automaton
@@ -1931,7 +1932,7 @@ public class Automaton
 		if (!preserveControllability)
 		{
 			// Get/create silent event tau
-			String silentName = SupremicaProperties.getSilentEventName();
+			String silentName = Config.GENERAL_SILENT_EVENT_NAME.get();
 			LabeledEvent tau = getAlphabet().getEvent(silentName);
 			if (tau == null)
 			{
@@ -1964,8 +1965,8 @@ public class Automaton
 		else
 		{
 			// Get/create silent events tau_c and tau_u
-			String silentCName = SupremicaProperties.getSilentControllableEventName();
-			String silentUName = SupremicaProperties.getSilentUncontrollableEventName();
+			String silentCName = Config.GENERAL_SILENT_CONTROLLABLE_EVENT_NAME.get();
+			String silentUName = Config.GENERAL_SILENT_UNCONTROLLABLE_EVENT_NAME.get();
 			LabeledEvent tau_c = getAlphabet().getEvent(silentCName);
 			LabeledEvent tau_u = getAlphabet().getEvent(silentUName);
 			if (tau_c == null)

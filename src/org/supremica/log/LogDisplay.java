@@ -144,7 +144,7 @@ public class LogDisplay
 		});
 
 		// --------------------------------------//
-		if (SupremicaProperties.generalRedirectStdout())
+		if (Config.GENERAL_REDIRECT_STDOUT.isTrue())
 		{
 			try
 			{
@@ -171,7 +171,7 @@ public class LogDisplay
 			reader.start();
 		}
 
-		if (SupremicaProperties.generalRedirectStderr())
+		if (Config.GENERAL_REDIRECT_STDERR.isTrue())
 		{
 			try
 			{

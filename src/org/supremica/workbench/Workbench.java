@@ -14,7 +14,7 @@ import org.supremica.util.VerticalFlowLayout;
 import org.supremica.automata.*;
 import org.supremica.automata.IO.AutomatonToDot;
 import org.supremica.automata.IO.AutomataSerializer;
-import org.supremica.properties.SupremicaProperties;
+import org.supremica.properties.Config;
 // For debug
 import org.supremica.testcases.StickPickingGame;
 /**
@@ -76,7 +76,7 @@ public class Workbench
 		throws Exception
 	{
 		// Should we show it and is there something to show?
-		if (toShowGraph() && automaton != null)    
+		if (toShowGraph() && automaton != null)
 		{
 			try
 			{
@@ -313,7 +313,7 @@ class SynchButton
 			// name, the user won't be asked, not even if asame-named
 			// automaton already exists If we don't set the name, the
 			// user will be prompted with a suggested name, and
-			// prompted again until a unique name is given 
+			// prompted again until a unique name is given
 			wb.automaton.setName("sup(" + wb.automaton.getComment() + ")");
 			wb.automaton.setType(AutomatonType.Supervisor);
 			// Note that there may be explicitly specified uc-states
@@ -332,8 +332,8 @@ class SynchButton
 	}
 }
 /**
- * "Compare" button, this button examines the controllablity status of the current 
- * supervisor with respect to the plant model that it is supposed to control, i.e. 
+ * "Compare" button, this button examines the controllablity status of the current
+ * supervisor with respect to the plant model that it is supposed to control, i.e.
  * the plants (and all other automata) that were selected previously in the gui.
  */
 class CompareButton
@@ -424,7 +424,7 @@ class CompareButton
 					// coincides with the normalized name (omg that would be stupid)) since we've
 					// normalized the names above!))
 					String name = state.getName();
-					name = name.substring(0, name.lastIndexOf(SupremicaProperties.getStateSeparator()));
+					name = name.substring(0, name.lastIndexOf(Config.GENERAL_STATE_SEPARATOR.get()));
 					// Find this state in automaton
 					State s = wb.automaton.getStateWithName(name);
 					s.setForbidden(true);
@@ -712,7 +712,7 @@ class DoneButton
 				gui.addAutomaton(wb.automaton);
 			}
 		}
-		
+
 		// Exit
 		wb.close();
 		wb.dispose();

@@ -54,13 +54,13 @@ import org.supremica.log.*;
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.*;
 import org.supremica.automata.algorithms.standard.Determinizer;
-import org.supremica.properties.SupremicaProperties;
+import org.supremica.properties.Config;
 import org.supremica.gui.ExecutionDialog;
 import org.supremica.gui.ActionMan;
 
 /**
  * This class can be used to reduce the size of an automaton while
- * preserving different equivalences. 
+ * preserving different equivalences.
  */
 public class AutomatonMinimizer
     implements Stoppable
@@ -114,13 +114,13 @@ public class AutomatonMinimizer
         int before = theAutomaton.nbrOfStates();
         int epsilons = theAutomaton.nbrOfEpsilonTransitions();
         int total = theAutomaton.nbrOfTransitions();
-		if (SupremicaProperties.verboseMode())
+		if (Config.VERBOSE_MODE.isTrue())
 		{
 			logger.info("Minimizing " + theAutomaton + " with " + before +
 						" states and " + epsilons + " epsilon transitions (" +
 						Math.round(100*(((double) epsilons)*100/total))/100.0 + "%).");
 		}
-			
+
         // Are the options valid?
         if (!options.isValid())
         {
@@ -141,7 +141,7 @@ public class AutomatonMinimizer
 					logger.verbose("The state " + state + " will be removed since it is not reachable.");
 					toBeRemoved.add(state);
 				}
-				
+
 				// The forbidden states may actually be reachable?
 				if (state.isForbidden())
 				{
@@ -216,7 +216,7 @@ public class AutomatonMinimizer
 				while (innerChange)
 				{
 					// Find new states
-					StateSet newStates = blockingStates.previousStates(SupremicaProperties.getSilentUncontrollableEventName());
+					StateSet newStates = blockingStates.previousStates(Config.GENERAL_SILENT_UNCONTROLLABLE_EVENT_NAME.get());
 					// Remove outgoing arcs from newStates
 					for (State state : newStates)
 					{
@@ -229,7 +229,7 @@ public class AutomatonMinimizer
 					innerChange = (oldSize < newSize);
 				}
 				//logger.info("Blocking + tau_u-uncontrollable: " + blockingStates);
-				
+
 				if (stopRequested)
 				{
 					return null;
@@ -266,7 +266,7 @@ public class AutomatonMinimizer
 					outerChange = true;
 				}
 			}
-			
+
 			// Reset costs
 			for (State state : theAutomaton)
 			{
@@ -285,7 +285,7 @@ public class AutomatonMinimizer
 					logger.verbose("The state " + state + " will be removed since it is not reachable.");
 					toBeRemoved.add(state);
 				}
-				
+
 				// The forbidden states may actually be reachable?
 				if (state.isForbidden())
 				{
@@ -300,11 +300,6 @@ public class AutomatonMinimizer
 	        // Start listening again
 	        theAutomaton.endTransaction();
 
-			/*
-			// Show intermediate result?
-			if (SupremicaProperties.verboseMode())
-				ActionMan.getGui().addAutomaton(new Automaton(theAutomaton));
-			*/
 
 			// Finished!
 			return theAutomaton;
@@ -485,7 +480,7 @@ public class AutomatonMinimizer
         removeUnusedEpsilonEvents(theAutomaton);
 
 		// Message
-		if (SupremicaProperties.verboseMode())
+		if (Config.VERBOSE_MODE.isTrue())
 		{
 			int after = theAutomaton.nbrOfStates();
 			logger.info("There were " + before + " states before and " + after +
@@ -692,7 +687,7 @@ public class AutomatonMinimizer
 
 		// Start listening again
 		newAutomaton.endTransaction();
-		
+
         // Return the new automaton!
         return newAutomaton;
     }
@@ -769,7 +764,7 @@ public class AutomatonMinimizer
      * Partitions equivClass by the event e.
      * @return true if a partitioning was made, false otherwise.
      */
-    private boolean partition(EquivalenceClasses equivClasses, 
+    private boolean partition(EquivalenceClasses equivClasses,
 							  EquivalenceClass equivClass, LabeledEvent e)
     {
         // "Split" class on event 'e', i.e. based on where the 'e'-transitions lead
@@ -1684,7 +1679,7 @@ public class AutomatonMinimizer
                     if (!useShortNames)
                     {
                         State toState = outArc.getToState();
-                        toState.setName(state.getName() + SupremicaProperties.getStateSeparator() +
+                        toState.setName(state.getName() + Config.GENERAL_STATE_SEPARATOR.get() +
                                         toState.getName());
                     }
                 }
@@ -1755,7 +1750,7 @@ public class AutomatonMinimizer
 		int count = 0;
 
         // Add silent event (it's probably already there)
-        LabeledEvent tau = new LabeledEvent(SupremicaProperties.getSilentEventName());
+        LabeledEvent tau = new LabeledEvent(Config.GENERAL_SILENT_EVENT_NAME.get());
         tau.setEpsilon(true);
         if (!aut.getAlphabet().contains(tau.getLabel()))
         {
