@@ -183,36 +183,34 @@ public final class Config
 	public static final StringProperty MINIMIZATION_STRATEGY = new StringProperty(PropertyType.ALGORITHMS_MINIMIZATION, "minimizationStrategy", org.supremica.automata.algorithms.minimization.MinimizationStrategy.FewestTransitionsFirst.toString(), "Minimization strategy");
 	public static final StringProperty MINIMIZATION_HEURISTIC = new StringProperty(PropertyType.ALGORITHMS_MINIMIZATION, "minimizationHeuristic", org.supremica.automata.algorithms.minimization.MinimizationHeuristic.MostLocal.toString(), "Minimization heuristics");
 
-/*
-	// BDD Options. note that these mirror the stuff in org.supremica.util.BDD.Options
-	private static final String BDD_SHOW_GROW = "bddShowGrowth";
-	private static final String BDD_SIZE_WATCH = "bddSizeWatch";
-	private static final String BDD_ALTER_PCG = "bddAlterPCG";
-	private static final String BDD_TRACE_ON = "bddTraceOn";
-	private static final String BDD_DEBUG_ON = "bddDebugOn";
-	private static final String BDD_PROFILE_ON = "bddProfileOn";
-	private static final String BDD_ALGORITHM = "bddAlgorithm";
-	private static final String BDD_COUNT_ALGO = "bddCountAlgorithm";
-	private static final String BDD_LOCAL_SATURATION = "bddLocalSaturation";
-	private static final String BDD_UC_OPTIMISTIC = "bddUCOptimistic";
-	private static final String BDD_NB_OPTIMISTIC = "bddNBOptimistic";
-	private static final String BDD_LIB_PATH = "bddLibPath";
-	private static final String BDD_LI_ALGO = "bddLanguageInclusionAlgorithm";    // inclsuion_algorithm
-	private static final String BDD_ORDER_ALGO = "bddAutomataOrderingAlgorithm";    // ordering_algorithm
-	private static final String BDD_ORDERING_FORCE_COST = "bddOrderingForceCost";    // ordering_force_cost
-	private static final String BDD_AS_HEURISTIC = "bddAutomataSelectionHeuristics";    // as_heuristics
-	private static final String BDD_FRONTIER_TYPE = "bddFrontierType";    // frontier_strategy
-	private static final String BDD_H1 = "bddH1";    // es_heuristics
-	private static final String BDD_H2 = "bddH2";    // ndas_heuristics
-	private static final String BDD_DSSI_HEURISTIC = "bddDelayedStarSelection";    // dssi_heuristics
-	private static final String BDD_PARTITION_MAX = "bddMaxPartitionSize";    // max_partition_size
-	private static final String BDD_ENCODING_ALGO = "bddStateEncodingAlgorithm";    // encoding_algorithm
-	private static final String BDD_SUP_REACHABILITY = "bddSupReachability";    // sup_reachability_type
-	private static final String BDD_DISJ_OPTIMIZER_ALGO = "bddDisjOptimizerAlgo"; // disj_optimizer_algo
-	private static final String BDD_TRANSITION_OPTIMIZER_ALGO = "bddTransitionOptimizerAlgo"; // transition_optimizer_algo
-	private static final String BDD_INTERLEAVED_VARIABLES = "bddInterleavedVariables"; // interleaved_variables
-	private static final String BDD_LEVEL_GRAPHS = "bddLevelGraphs"; // show_level_graph
-*/
+	// ALGORITHMS_BDD
+	public static final IntegerProperty BDD_ALGORITHM = new IntegerProperty(PropertyType.ALGORITHMS_BDD, "bddAlgorithm", 4, "Algorithm");
+	public static final IntegerProperty BDD_SHOW_GROW = new IntegerProperty(PropertyType.ALGORITHMS_BDD, "bddShowGrowth", 0, "Show growth");
+	public static final BooleanProperty BDD_SIZE_WATCH = new BooleanProperty(PropertyType.ALGORITHMS_BDD, "bddSizeWatch", false, "Size watch");
+	public static final BooleanProperty BDD_ALTER_PCG = new BooleanProperty(PropertyType.ALGORITHMS_BDD, "bddAlterPCG", false, "Alter PCG");
+	public static final BooleanProperty BDD_DEBUG_ON = new BooleanProperty(PropertyType.ALGORITHMS_BDD, "bddDebugOn", false, "Debug on");
+	public static final BooleanProperty BDD_UC_OPTIMISTIC = new BooleanProperty(PropertyType.ALGORITHMS_BDD, "bddUCOptimistic", true, "uc optimistic");
+	public static final BooleanProperty BDD_NB_OPTIMISTIC = new BooleanProperty(PropertyType.ALGORITHMS_BDD, "bddNBOptimistic", true, "nb optimistic");
+	public static final BooleanProperty BDD_LOCAL_SATURATION = new BooleanProperty(PropertyType.ALGORITHMS_BDD, "bddLocalSaturation", false, "Local saturation");
+	public static final BooleanProperty BDD_TRACE_ON = new BooleanProperty(PropertyType.ALGORITHMS_BDD, "bddTraceOn", false, "Trace on");
+	public static final BooleanProperty BDD_PROFILE_ON = new BooleanProperty(PropertyType.ALGORITHMS_BDD, "bddProfileOn", false, "Profile on");
+	public static final IntegerProperty BDD_COUNT_ALGO = new IntegerProperty(PropertyType.ALGORITHMS_BDD, "bddCountAlgorithm", 2, "Count algorithm");
+	public static final IntegerProperty BDD_LI_ALGO = new IntegerProperty(PropertyType.ALGORITHMS_BDD, "bddLanguageInclusionAlgorithm", 2, "Inclusion algorithm");
+	public static final IntegerProperty BDD_ORDER_ALGO = new IntegerProperty(PropertyType.ALGORITHMS_BDD, "bddAutomataOrderingAlgorithm", 8, "Automata ordering algorithm");
+	public static final IntegerProperty BDD_ORDERING_FORCE_COST = new IntegerProperty(PropertyType.ALGORITHMS_BDD, "bddOrderingForceCost", 1, "Ordering force cost");
+	public static final IntegerProperty BDD_AS_HEURISTIC = new IntegerProperty(PropertyType.ALGORITHMS_BDD, "bddAutomataSelectionHeuristics", 9, "Automata selection heuristics");
+	public static final IntegerProperty BDD_FRONTIER_TYPE = new IntegerProperty(PropertyType.ALGORITHMS_BDD, "bddFrontierType", 1, "Frontier strategy");
+	public static final IntegerProperty BDD_H1 = new IntegerProperty(PropertyType.ALGORITHMS_BDD, "bddH1", 10, "ES Heuristics");
+	public static final IntegerProperty BDD_H2 = new IntegerProperty(PropertyType.ALGORITHMS_BDD, "bddH2", 5, "NDAS Heuristics");
+	public static final IntegerProperty BDD_DSSI_HEURISTIC = new IntegerProperty(PropertyType.ALGORITHMS_BDD, "bddDelayedStarSelection", 1, "DSSI heuristics");
+	public static final IntegerProperty BDD_PARTITION_MAX = new IntegerProperty(PropertyType.ALGORITHMS_BDD, "bddMaxPartitionSize", 3000, "Max Partition Size");
+	public static final IntegerProperty BDD_ENCODING_ALGO = new IntegerProperty(PropertyType.ALGORITHMS_BDD, "bddStateEncodingAlgorithm", 5, "Encoding algorithm");
+	public static final StringProperty BDD_LIB_PATH  = new StringProperty(PropertyType.ALGORITHMS_BDD, "bddLibPath", ".", "Extra Library path");
+	public static final IntegerProperty BDD_SUP_REACHABILITY = new IntegerProperty(PropertyType.ALGORITHMS_BDD, "bddSupReachability", 0, "Supervisor Reachability Type");
+	public static final IntegerProperty BDD_DISJ_OPTIMIZER_ALGO = new IntegerProperty(PropertyType.ALGORITHMS_BDD, "bddDisjOptimizerAlgo", 0, "Disjunctive optimizer algorithm");
+	public static final IntegerProperty BDD_TRANSITION_OPTIMIZER_ALGO = new IntegerProperty(PropertyType.ALGORITHMS_BDD, "bddTransitionOptimizerAlgo", 3, "Transition optimizer algorithm");
+	public static final BooleanProperty BDD_INTERLEAVED_VARIABLES = new BooleanProperty(PropertyType.ALGORITHMS_BDD, "bddInterleavedVariables", true, "Interleaved or seperated variable orders");
+	public static final BooleanProperty BDD_LEVEL_GRAPHS = new BooleanProperty(PropertyType.ALGORITHMS_BDD, "bddLevelGraphs", false, "Shows the fillness of the workset sent to H1");
 
 	static Config instance = new Config();
 
