@@ -1,0 +1,141 @@
+/*
+ * Supremica Software License Agreement
+ *
+ * The Supremica software is not in the public domain
+ * However, it is freely available without fee for education,
+ * research, and non-profit purposes.  By obtaining copies of
+ * this and other files that comprise the Supremica software,
+ * you, the Licensee, agree to abide by the following
+ * conditions and understandings with respect to the
+ * copyrighted software:
+ *
+ * The software is copyrighted in the name of Supremica,
+ * and ownership of the software remains with Supremica.
+ *
+ * Permission to use, copy, and modify this software and its
+ * documentation for education, research, and non-profit
+ * purposes is hereby granted to Licensee, provided that the
+ * copyright notice, the original author's names and unit
+ * identification, and this permission notice appear on all
+ * such copies, and that no charge be made for such copies.
+ * Any entity desiring permission to incorporate this software
+ * into commercial products or to use it for commercial
+ * purposes should contact:
+ *
+ * Knut Akesson (KA), knut@supremica.org
+ * Supremica,
+ * Knarrhogsgatan 10
+ * SE-431 60 MOLNDAL
+ * SWEDEN
+ *
+ * to discuss license terms. No cost evaluation licenses are
+ * available.
+ *
+ * Licensee may not use the name, logo, or any other symbol
+ * of Supremica nor the names of any of its employees nor
+ * any adaptation thereof in advertising or publicity
+ * pertaining to the software without specific prior written
+ * approval of the Supremica.
+ *
+ * SUPREMICA AND KA MAKES NO REPRESENTATIONS ABOUT THE
+ * SUITABILITY OF THE SOFTWARE FOR ANY PURPOSE.
+ * IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY.
+ *
+ * Supremica or KA shall not be liable for any damages
+ * suffered by Licensee from the use of this software.
+ *
+ * Supremica is owned and represented by KA.
+ */
+package org.supremica.properties;
+
+public class IntegerProperty
+	extends Property
+{
+	private int defaultValue;
+	private int value;
+	private final int min;
+	private final int max;
+
+	public IntegerProperty(PropertyType type, String key, int value, String comment)
+	{
+		this(type, key, value, comment, false);
+	}
+
+	public IntegerProperty(PropertyType type, String key, int value, String comment, boolean immutable)
+	{
+		this(type, key, value, comment, immutable, Integer.MIN_VALUE, Integer.MAX_VALUE);
+	}
+
+	public IntegerProperty(PropertyType type, String key, int value, String comment, boolean immutable, int min)
+	{
+		this(type, key, value, comment, immutable, min, Integer.MAX_VALUE);
+	}
+
+	public IntegerProperty(PropertyType type, String key, int value, String comment, boolean immutable, int min, int max)
+	{
+		super(type, key, comment, immutable);
+		this.defaultValue = value;
+		this.value = value;
+		this.min = min;
+		this.max = max;
+		if (!isValid(value))
+		{
+			throw new IllegalArgumentException("Illegal value");
+		}
+	}
+
+	public int get()
+	{
+		return value;
+	}
+
+	public void set(String value)
+	{
+		if (isImmutable())
+		{
+			throw new IllegalStateException("This object is immutable, calling the set method is illegal");
+		}
+		int newValue = Integer.parseInt(value);
+		if (isValid(newValue))
+		{
+			this.value = newValue;
+		}
+		else
+		{
+			throw new IllegalArgumentException("Illegal value");
+		}
+	}
+
+	public void set(int value)
+	{
+		if (isImmutable())
+		{
+			throw new IllegalStateException("This object is immutable, calling the set method is illegal");
+		}
+
+		this.value = value;
+	}
+
+	public boolean isValid(int value)
+	{
+		if (value < min)
+		{
+			return false;
+		}
+		if (value < max)
+		{
+			return false;
+		}
+		return true;
+	}
+
+	public String valueToString()
+	{
+		return Integer.toString(value);
+	}
+
+	public boolean currentValueDifferentFromDefaultValue()
+	{
+		return defaultValue != value;
+	}
+}
