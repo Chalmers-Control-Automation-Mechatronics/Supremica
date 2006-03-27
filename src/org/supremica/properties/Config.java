@@ -84,7 +84,7 @@ public final class Config
 	//   GUI_DOT
 	//   ALGORITHMS
 	//   ALGORITHMS_SYNC
-	//   ALGORITHMS_VERIFiCATION
+	//   ALGORITHMS_VERIFICATION
 	//   ALGORITHMS_SYNTHESIS
 	//   ALGORITHMS_MINIMIZATION
 	//   ALGORITHMS_BDD
@@ -126,16 +126,7 @@ public final class Config
 	public static final BooleanProperty GENERAL_STUDENT_VERSION = new BooleanProperty(PropertyType.GENERAL, "generalStudentVersion", false, "Student version");
 	public static final BooleanProperty GENERAL_REDIRECT_STDOUT = new BooleanProperty(PropertyType.GENERAL, "generalRedirectStdout", true, "Redirect stdout");
 	public static final BooleanProperty GENERAL_REDIRECT_STDERR = new BooleanProperty(PropertyType.GENERAL, "generalRedirectStderr", true, "Redirect stderr");
-
-
-
-	private static final String INCLUDE_EDITOR = "includeEditor";
-	private static final String INCLUDE_CELLEDITOR = "includeCellEditor";
-	private static final String INCLUDE_BOUNDED_UNCON_TOOLS = "includeBoundedUnconTools";
-	private static final String INCLUDE_EXPERIMENTAL_ALGORITHMS = "includeExperimentalAlgorithms";
-	private static final String VERBOSE_MODE = "verboseMode";
-	private static final String SUPERUSER_IDENTITY = "superuserIdentity";
-	private static final String ALLOW_SUPERUSER_LOGIN = "allowSuperUserLogin";
+	public static final BooleanProperty VERBOSE_MODE = new BooleanProperty(PropertyType.GENERAL, "verboseMode", false, "Verbose mode");
 
 
 	// GENERAL_LOG
@@ -151,45 +142,48 @@ public final class Config
 	public static final BooleanProperty FILE_ALLOW_EXPORT = new BooleanProperty(PropertyType.GENERAL_FILE, "fileAllowExport", true, "Allow user to export file");
 	public static final BooleanProperty FILE_ALLOW_QUIT = new BooleanProperty(PropertyType.GENERAL_FILE, "fileAllowQuit", true, "Allow user to quit Supremica");
 
+	// GUI_ANALYZER
+	public static final BooleanProperty INCLUDE_BOUNDED_UNCON_TOOLS = new BooleanProperty(PropertyType.GUI_ANALYZER, "includeBoundedUnconTools", false, "Include unbounded controllability tools");
+
+	// ALGORITHMS
+	public static final BooleanProperty INCLUDE_EXPERIMENTAL_ALGORITHMS = new BooleanProperty(PropertyType.ALGORITHMS, "includeExperimentalAlgorithms", false, "Include experimental algorithms");
+
+	// ALGORITHMS_SYNC
+	public static final BooleanProperty SYNC_FORBID_UNCON_STATES = new BooleanProperty(PropertyType.ALGORITHMS_SYNC, "syncForbidUncontrollableStates", true, "Forbid uncontrollable states when synchronizing");
+	public static final BooleanProperty SYNC_EXPAND_FORBIDDEN_STATES = new BooleanProperty(PropertyType.ALGORITHMS_SYNC, "syncExpandUncontrollableStates", true, "Expand forbidden states when synchronizing");
+	public static final IntegerProperty SYNC_INITIAL_HASHTABLE_SIZE = new IntegerProperty(PropertyType.ALGORITHMS_SYNC, "syncInitialHashtableSize", (1 << 14) - 1, "Initial hashtable size", false, 1);
+	public static final BooleanProperty SYNC_EXPAND_HASHTABLE = new BooleanProperty(PropertyType.ALGORITHMS_SYNC, "syncExpandHashtable", true, "Expand hashtable");
+	public static final IntegerProperty SYNC_NBR_OF_EXECUTERS = new IntegerProperty(PropertyType.ALGORITHMS_SYNC, "synchNbrOfExecuters", 1, "Number of synchronization threads", false, 1);
+	public static final StringProperty SYNC_AUTOMATON_NAME_SEPARATOR = new StringProperty(PropertyType.ALGORITHMS_SYNC, "synchAutomatonNameSeparator", "||", "Automata name separator");
+
+	// ALGORITHMS_VERIFICATION
+	public static final StringProperty VERIFY_VERIFICATION_TYPE = new StringProperty(PropertyType.ALGORITHMS_VERIFICATION, "verifyVerificationType", org.supremica.automata.algorithms.VerificationType.Controllability.toString(), "Default verificaton type");
+	public static final StringProperty VERIFY_ALGORITHM_TYPE  = new StringProperty(PropertyType.ALGORITHMS_VERIFICATION, "verifyAlgorithmType", org.supremica.automata.algorithms.VerificationAlgorithm.Modular.toString(), "Default verificaton algorithm");
+	public static final IntegerProperty VERIFY_EXCLUSION_STATE_LIMIT = new IntegerProperty(PropertyType.ALGORITHMS_VERIFICATION, "verifyExclusionStateLimit", 1000, "Exclusion state limit", false, 1);
+	public static final IntegerProperty VERIFY_REACHABILITY_STATE_LIMIT = new IntegerProperty(PropertyType.ALGORITHMS_VERIFICATION, "verifyReachabilityStateLimit", 1000, "Reachability state limit", false, 1);
+	public static final BooleanProperty VERIFY_ONE_EVENT_AT_A_TIME = new BooleanProperty(PropertyType.ALGORITHMS_VERIFICATION, "verifyOneEventAtATime", false, "Verify one event at a time");
+	public static final BooleanProperty VERIFY_SKIP_UNCONTROLLABILITY_CHECK = new BooleanProperty(PropertyType.ALGORITHMS_VERIFICATION, "skipUncontrollabilityCheck", false, "Skip uncontrollability check");
+	public static final IntegerProperty VERIFY_NBR_OF_ATTEMPTS = new IntegerProperty(PropertyType.ALGORITHMS_VERIFICATION, "nbrOfAttempts", 5, "Number of attempts", false, 1);
+	public static final BooleanProperty VERIFY_SHOW_BAD_TRACE = new BooleanProperty(PropertyType.ALGORITHMS_VERIFICATION, "showBadTrace", false, "Show bad trace");
+
+	// ALGORITHMS_SYNTHESIS
+	public static final StringProperty SYNTHESIS_SYNTHESIS_TYPE = new StringProperty(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisSynthesisType", org.supremica.automata.algorithms.SynthesisType.Both.toString(), "Default synthesis type");
+	public static final StringProperty SYNTHESIS_ALGORITHM_TYPE  = new StringProperty(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisAlgorithmType", org.supremica.automata.algorithms.SynthesisAlgorithm.Monolithic.toString(), "Default synthesis algorithm");
+	public static final BooleanProperty SYNTHESIS_PURGE = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisPurge", false, "Remove forbidden states after synthesis");
+	public static final BooleanProperty SYNTHESIS_OPTIMIZE = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisOptimize", false, "Try to remove supervisors that are not necessary");
+	public static final BooleanProperty SYNTHESIS_MAXIMALLY_PERMISSIVE = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisMaximallyPermissive", true, "Synthesize a maximally permissive supervisor");
+	public static final BooleanProperty SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisMaximallyPermissiveIncremental", true, "Use incremental algorithm when synthesizing");
+	public static final BooleanProperty SYNTHESIS_REDUCE_SUPERVISORS = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisReduceSupervisors", false, "Try to minimize supervisors");
+
+	// ALGORITHMS_MINIMIZATION
+	public static final StringProperty MINIMIZATION_EQUIVALENCE_RELATION = new StringProperty(PropertyType.ALGORITHMS_MINIMIZATION, "minimizationEquivalenceRelation", org.supremica.automata.algorithms.EquivalenceRelation.LanguageEquivalence.toString(), "Default equivalence relation");
+	public static final BooleanProperty MINIMIZATION_ALSO_MINIMIZE_TRANSITIONS = new BooleanProperty(PropertyType.ALGORITHMS_MINIMIZATION, "minimizationAlsoMinimizeTransitions", true, "Minimize the number of transitions");
+	public static final BooleanProperty MINIMIZATION_KEEP_ORIGINAL = new BooleanProperty(PropertyType.ALGORITHMS_MINIMIZATION, "minimizationKeepOriginal", true, "Keep original");
+	public static final BooleanProperty MINIMIZATION_IGNORE_MARKING = new BooleanProperty(PropertyType.ALGORITHMS_MINIMIZATION, "minimizationIgnoreMarking", false, "Ignore marking");
+	public static final StringProperty MINIMIZATION_STRATEGY = new StringProperty(PropertyType.ALGORITHMS_MINIMIZATION, "minimizationStrategy", org.supremica.automata.algorithms.minimization.MinimizationStrategy.FewestTransitionsFirst.toString(), "Minimization strategy");
+	public static final StringProperty MINIMIZATION_HEURISTIC = new StringProperty(PropertyType.ALGORITHMS_MINIMIZATION, "minimizationHeuristic", org.supremica.automata.algorithms.minimization.MinimizationHeuristic.MostLocal.toString(), "Minimization heuristics");
 
 /*
-
-
-	// Synchronization Options
-	private static final String SYNC_FORBID_UNCON_STATES = "syncForbidUncontrollableStates";
-	private static final String SYNC_EXPAND_FORBIDDEN_STATES = "syncExpandUncontrollableStates";
-	private static final String SYNC_INITIAL_HASHTABLE_SIZE = "syncInitialHashtableSize";
-	private static final String SYNC_EXPAND_HASHTABLE = "syncExpandHashtable";
-	private static final String SYNC_NBR_OF_EXECUTERS = "synchNbrOfExecuters";
-	private static final String SYNC_AUTOMATON_NAME_SEPARATOR = "synchAutomatonNameSeparator";
-
-	// Verification Options
-	private static final String VERIFY_VERIFICATION_TYPE = "verifyVerificationType";
-	private static final String VERIFY_ALGORITHM_TYPE = "verifyAlgorithmType";
-	private static final String VERIFY_EXCLUSION_STATE_LIMIT = "verifyExclusionStateLimit";
-	private static final String VERIFY_REACHABILITY_STATE_LIMIT = "verifyReachabilityStateLimit";
-	private static final String VERIFY_ONE_EVENT_AT_A_TIME = "verifyOneEventAtATime";
-	private static final String VERIFY_SKIP_UNCONTROLLABILITY_CHECK = "skipUncontrollabilityCheck";
-	private static final String VERIFY_NBR_OF_ATTEMPTS = "nbrOfAttempts";
-	private static final String VERIFY_SHOW_BAD_TRACE = "showBadTrace";
-
-	// Synthesizer Options
-	private static final String SYNTHESIS_SYNTHESIS_TYPE = "synthesisSynthesisType";
-	private static final String SYNTHESIS_ALGORITHM_TYPE = "synthesisAlgorithmType";
-	private static final String SYNTHESIS_PURGE = "synthesisPurge";
-	private static final String SYNTHESIS_OPTIMIZE = "synthesisOptimize";
-	private static final String SYNTHESIS_MAXIMALLY_PERMISSIVE = "synthesisMaximallyPermissive";
-	private static final String SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL = "synthesisMaximallyPermissiveIncremental";
-	private static final String SYNTHESIS_REDUCE_SUPERVISORS = "synthesisReduceSupervisors";
-
-	// Minimization Options
-	private static final String MINIMIZATION_EQUIVALENCE_RELATION = "minimizationEquivalenceRelation";
-	private static final String MINIMIZATION_ALSO_MINIMIZE_TRANSITIONS = "minimizationAlsoMinimizeTransitions";
-	private static final String MINIMIZATION_KEEP_ORIGINAL = "minimizationKeepOriginal";
-	private static final String MINIMIZATION_IGNORE_MARKING = "minimizationIgnoreMarking";
-	private static final String MINIMIZATION_STRATEGY = "minimizationStrategy";
-	private static final String MINIMIZATION_HEURISTIC = "minimizationHeuristic";
-
 	// BDD Options. note that these mirror the stuff in org.supremica.util.BDD.Options
 	private static final String BDD_SHOW_GROW = "bddShowGrowth";
 	private static final String BDD_SIZE_WATCH = "bddSizeWatch";

@@ -67,7 +67,7 @@ public class PropertyType
 	public static final PropertyType GUI_DOT = new PropertyType("gui.dot");
 	public static final PropertyType ALGORITHMS = new PropertyType("algorithms");
 	public static final PropertyType ALGORITHMS_SYNC = new PropertyType("algorithms.sync");
-	public static final PropertyType ALGORITHMS_VERIFiCATION = new PropertyType("algorithms.verification");
+	public static final PropertyType ALGORITHMS_VERIFICATION = new PropertyType("algorithms.verification");
 	public static final PropertyType ALGORITHMS_SYNTHESIS = new PropertyType("algorithms.synthesis");
 	public static final PropertyType ALGORITHMS_MINIMIZATION = new PropertyType("algorithms.minimization");
 	public static final PropertyType ALGORITHMS_BDD = new PropertyType("algorithms.bdd");

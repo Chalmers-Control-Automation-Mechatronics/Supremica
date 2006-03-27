@@ -55,9 +55,7 @@ public class SupremicaStudent
 {
 	static
 	{
-		SupremicaProperties.setUseSecurity(true);
 		SupremicaProperties.setXmlRpcActive(false);
-		SupremicaProperties.setAllowSuperUserLogin(false);
 		SupremicaProperties.setUseDot(false);
 		SupremicaProperties.setFileAllowImport(false);
 		SupremicaProperties.setFileAllowExport(false);

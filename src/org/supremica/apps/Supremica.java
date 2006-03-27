@@ -56,9 +56,7 @@ public class Supremica
 {
 	static
 	{
-		SupremicaProperties.setUseSecurity(false);
 		SupremicaProperties.setXmlRpcActive(false);
-		SupremicaProperties.setAllowSuperUserLogin(false);
 		SupremicaProperties.setUseDot(true);
 	}
 

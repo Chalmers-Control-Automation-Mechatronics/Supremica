@@ -28,9 +28,7 @@ public class IDE
 
 	static
 	{
-		SupremicaProperties.setUseSecurity(false);
 		SupremicaProperties.setXmlRpcActive(false);
-		SupremicaProperties.setAllowSuperUserLogin(false);
 		SupremicaProperties.setUseDot(true);
 		SupremicaProperties.setLogToConsole(false);
 		SupremicaProperties.setLogToGUI(true);

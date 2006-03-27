@@ -57,9 +57,7 @@ public class SupremicaTeacher
 	// Same as SupremicaStudent but with setAllowSuperUserLogin to true
 	static
 	{
-		SupremicaProperties.setUseSecurity(true);
 		SupremicaProperties.setXmlRpcActive(false);
-		SupremicaProperties.setAllowSuperUserLogin(true);
 		SupremicaProperties.setUseDot(false);
 		SupremicaProperties.setFileAllowImport(false);
 		SupremicaProperties.setFileAllowExport(false);

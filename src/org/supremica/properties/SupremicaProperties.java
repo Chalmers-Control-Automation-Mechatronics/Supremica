@@ -93,13 +93,9 @@ public final class SupremicaProperties
 	private static final String DOT_USE_ARC_COLORS = "dotUseArcColors";
 	private static final String DOT_USE_MULTI_LABELS = "dotUseMultiLabels";
 	private static final String DOT_AUTOMATIC_UPDATE = "dotAutomaticUpdate";
-	private static final String INCLUDE_EDITOR = "includeEditor";
-	private static final String INCLUDE_CELLEDITOR = "includeCellEditor";
 	private static final String INCLUDE_BOUNDED_UNCON_TOOLS = "includeBoundedUnconTools";
 	private static final String INCLUDE_EXPERIMENTAL_ALGORITHMS = "includeExperimentalAlgorithms";
 	private static final String VERBOSE_MODE = "verboseMode";
-	private static final String SUPERUSER_IDENTITY = "superuserIdentity";
-	private static final String ALLOW_SUPERUSER_LOGIN = "allowSuperUserLogin";
 
 	// Logging options
 	private static final String LOG_TO_CONSOLE = "logToConsole";
@@ -264,17 +260,14 @@ public final class SupremicaProperties
 		setProperty(GENERAL_REDIRECT_STDERR, "true", true);
 		setProperty(GENERAL_LOOKANDFEEL, "System", true);
 
-		setProperty(INCLUDE_EDITOR, "false", true);
 		setProperty(INCLUDE_SHOE_FACTORY, "false", true);
 		setProperty(INCLUDE_SOFTPLC, "false", true);
 		setProperty(INCLUDE_JGRAFCHART, "false", true);
 		setProperty(INCLUDE_EXPERIMENTAL_ALGORITHMS, "false", true);
 		setProperty(INCLUDE_BOUNDED_UNCON_TOOLS, "false", true);
 		setProperty(VERBOSE_MODE, "false", true);
-		setProperty(SUPERUSER_IDENTITY, "ESS030", false);
 		setProperty(LOG_TO_CONSOLE, "false", true);
 		setProperty(LOG_TO_GUI, "false", true);
-		setProperty(ALLOW_SUPERUSER_LOGIN, "true", false);
 		// General
 		setProperty(GENERAL_STATE_SEPARATOR, ".", true);
 		setProperty(GENERAL_STATELABEL_SEPARATOR, ",", false);
@@ -828,14 +821,6 @@ public final class SupremicaProperties
 	{
 		wp.setProperty(GENERAL_SILENT_UNCONTROLLABLE_EVENT_NAME, command);
 	}
-	public static boolean generalUseSecurity()
-	{
-		return toBoolean(wp.getProperty(GENERAL_USE_SECURITY));
-	}
-	public static void setUseSecurity(boolean useSecurity)
-	{
-		wp.setProperty(GENERAL_USE_SECURITY, toString(useSecurity));
-	}
 	public static boolean getStudentVersion()
 	{
 		return toBoolean(wp.getProperty(GENERAL_STUDENT_VERSION));
@@ -926,10 +911,7 @@ public final class SupremicaProperties
 	{
 		wp.setProperty(DOT_AUTOMATIC_UPDATE, toString(automaticUpdate));
 	}
-	public static boolean includeEditor()
-	{
-		return toBoolean(wp.getProperty(INCLUDE_EDITOR));
-	}
+
 	public static boolean includeExperimentalAlgorithms()
 	{
 		return toBoolean(wp.getProperty(INCLUDE_EXPERIMENTAL_ALGORITHMS));
@@ -938,10 +920,7 @@ public final class SupremicaProperties
 	{
 		return toBoolean(wp.getProperty(INCLUDE_SOFTPLC));
 	}
-	public static boolean includeCellEditor()
-	{
-		return toBoolean(wp.getProperty(INCLUDE_CELLEDITOR));
-	}
+
 	public static boolean includeShoeFactory()
 	{
 		return toBoolean(wp.getProperty(INCLUDE_SHOE_FACTORY));
@@ -961,18 +940,6 @@ public final class SupremicaProperties
 	public static void setVerboseMode(boolean mode)
 	{
 		wp.setProperty(VERBOSE_MODE, toString(mode));
-	}
-	public static String getSuperuserIdentity()
-	{
-		return wp.getProperty(SUPERUSER_IDENTITY);
-	}
-	public static boolean allowSuperUserLogin()
-	{
-		return toBoolean(wp.getProperty(ALLOW_SUPERUSER_LOGIN));
-	}
-	public static void setAllowSuperUserLogin(boolean mode)
-	{
-		wp.setProperty(ALLOW_SUPERUSER_LOGIN, toString(mode));
 	}
 	public static boolean logToConsole()
 	{
