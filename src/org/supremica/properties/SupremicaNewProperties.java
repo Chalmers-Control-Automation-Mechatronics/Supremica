@@ -54,8 +54,9 @@ import java.io.*;
 
 /**
  * Properties for Supremica.
- **/
+ */
 public final class SupremicaNewProperties
+	implements Iterable<Property>
 {
 
 
@@ -155,9 +156,8 @@ public final class SupremicaNewProperties
 		writer.write("#" + new Date().toString());
 		writer.newLine();
 
-		for (Iterator<Property> it = iterator(); it.hasNext(); )
+		for (Property currProperty : this)
 		{
-			Property currProperty = it.next();
 			if (currProperty.currentValueDifferentFromDefaultValue())
 			{
 				writer.append("# " + currProperty.getComment() + "\n");
