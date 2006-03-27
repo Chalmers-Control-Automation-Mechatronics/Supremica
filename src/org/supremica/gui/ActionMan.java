@@ -180,17 +180,17 @@ public class ActionMan
 			try
 			{
 				int nbrOfAddedAutomata = gui.addProject(project);
-				
+
 				gui.info("Successfully added " + nbrOfAddedAutomata + " automata.");
 			}
 			catch (Exception excp)
 			{
 				logger.error("Error adding automata ", excp);
 				logger.debug(excp.getStackTrace());
-				
+
 				return;
 			}
-			
+
 			// logger.debug("ActionMan.fileNewFromTemplate");
 		}
 		catch (Exception ex)
@@ -198,53 +198,6 @@ public class ActionMan
 			JOptionPane.showMessageDialog(gui.getComponent(), "Error while creating the template!", "Alert", JOptionPane.ERROR_MESSAGE);
 			logger.debug(ex.getStackTrace());
 		}
-	}
-
-	// File.NewFromTemplate action performed
-	//public static void updateFromJGrafchart(Gui gui)
-	//{
-	//}
-	// File.Login action performed
-	public static void fileLogin(Gui gui)
-	{
-		FileSecurity fileSecurity = gui.getFileSecurity();
-
-		if (fileSecurity.hasCurrentUser())
-		{
-			JOptionPane.showMessageDialog(gui.getComponent(), "You are only allowed to log in once. You are logged in as: " + fileSecurity.getCurrentUser(), "Already logged in", JOptionPane.ERROR_MESSAGE);
-
-			return;
-		}
-
-		boolean finished = false;
-		String newName = null;
-
-		while (!finished)
-		{
-			newName = JOptionPane.showInputDialog(gui.getComponent(), "Enter your username");
-
-			if ((newName == null) || newName.equals(""))
-			{
-				JOptionPane.showMessageDialog(gui.getComponent(), "An empty name is not allowed", "alert", JOptionPane.ERROR_MESSAGE);
-			}
-			else if (fileSecurity.isSuperuser(newName))
-			{
-				if (fileSecurity.allowSuperUserLogin())
-				{
-					finished = true;
-				}
-				else
-				{
-					JOptionPane.showMessageDialog(gui.getComponent(), "You are not allowed to login as " + newName, "alert", JOptionPane.ERROR_MESSAGE);
-				}
-			}
-			else
-			{
-				finished = true;
-			}
-		}
-
-		fileSecurity.setCurrentUser(newName);
 	}
 
 	// Automata.AlphabetAnalyzer action performed
@@ -2084,7 +2037,7 @@ public class ActionMan
 			{
 			}
 		}
-		
+
 		gui.close();
 	}
 
@@ -2240,18 +2193,6 @@ public class ActionMan
 			return;
 		}
 
-		FileSecurity fileSecurity = gui.getFileSecurity();
-
-		if (SupremicaProperties.generalUseSecurity())
-		{
-			if (!fileSecurity.allowOpening(currProject))
-			{
-				JOptionPane.showMessageDialog(gui.getComponent(), "You are not allowed to open this file", "alert", JOptionPane.ERROR_MESSAGE);
-
-				return;
-			}
-		}
-
 		if (!currProject.isDeterministic())
 		{
 			/*
@@ -2271,11 +2212,6 @@ public class ActionMan
 			logger.warn("Non-deterministic automaton loaded. Some algorithms are not guaranteed to work.");
 		}
 
-		// We should always check owner and hash when it is present
-		if (!((currProject.getOwner() == null) && (currProject.getHash() == null)) &&!fileSecurity.hasCorrectHash(currProject))
-		{
-			JOptionPane.showMessageDialog(gui.getComponent(), "The project has an invalid hash", "alert", JOptionPane.WARNING_MESSAGE);
-		}
 
 		int nbrOfAutomataBeforeOpening = gui.getVisualProjectContainer().getActiveProject().nbrOfAutomata();
 
@@ -2366,25 +2302,10 @@ public class ActionMan
 						}
 					}
 
-					FileSecurity fileSecurity = gui.getFileSecurity();
-
-					if (SupremicaProperties.generalUseSecurity())
-					{
-						if (!fileSecurity.hasCurrentUser())
-						{
-							JOptionPane.showMessageDialog(gui.getComponent(), "You must be logged in to save!", "Alert", JOptionPane.ERROR_MESSAGE);
-
-							return;
-						}
-
-						currProject.setOwner(fileSecurity.getCurrentUser());
-						currProject.setHash(currProject.computeHash());
-					}
-
 					AutomataToXml exporter = new AutomataToXml(currProject);
 
 					exporter.serialize(currFile.getAbsolutePath());
-					
+
 				}
 				catch (Exception ex)
 				{
@@ -2398,17 +2319,6 @@ public class ActionMan
 	// File.SaveAs action performed
 	public static void fileSaveAs(Gui gui)
 	{
-		FileSecurity fileSecurity = gui.getFileSecurity();
-
-		if (SupremicaProperties.generalUseSecurity())
-		{
-			if (!fileSecurity.hasCurrentUser())
-			{
-				JOptionPane.showMessageDialog(gui.getComponent(), "You must be logged in to save!", "Alert", JOptionPane.ERROR_MESSAGE);
-
-				return;
-			}
-		}
 
 		JFileChooser fileSaveAs = FileDialogs.getXMLFileSaveAs();
 		String projectName = gui.getVisualProjectContainer().getActiveProject().getName();
@@ -2789,7 +2699,7 @@ public class ActionMan
 		}
 		else if (selectedAutomata.size() != 2)
 		{
-			JOptionPane.showMessageDialog(gui.getComponent(), "Exactly two automata must be selected.", "Info", JOptionPane.INFORMATION_MESSAGE);	
+			JOptionPane.showMessageDialog(gui.getComponent(), "Exactly two automata must be selected.", "Info", JOptionPane.INFORMATION_MESSAGE);
 			return;
 		}
 
@@ -3502,13 +3412,13 @@ public class ActionMan
 										  JOptionPane.ERROR_MESSAGE);
 			return;
 		}
-		
+
 		JFileChooser fileExporter = FileDialogs.getExportFileChooser(FileFormats.SYS);
 
 		if (fileExporter.showSaveDialog(gui.getComponent()) == JFileChooser.APPROVE_OPTION)
 		{
 			File theFile = fileExporter.getSelectedFile();
-			
+
 			if (theFile != null)
 			{
 				try
@@ -3519,7 +3429,7 @@ public class ActionMan
 					AutomataToIEC61499 exporter =  new AutomataToIEC61499(copyOfSelectedProject);
 
 					// ask to turn on comments
-					int comments = 
+					int comments =
 						JOptionPane.showConfirmDialog(gui.getComponent(),
 													  "Do you want to add comments to the source files?",
 													  "Add comments...",
@@ -3528,10 +3438,10 @@ public class ActionMan
 					{
 						exporter.commentsOn();
 					}
-					
+
 					//ask to export to FBDK or FBRuntime
 					String[] options = {"FBDK","FBRuntime"};
-					int exportTo = 
+					int exportTo =
 						JOptionPane.showOptionDialog(gui.getComponent(),
 													 "What runtime do you want to generate the code for?",
 													 "Export to...",
@@ -3544,9 +3454,9 @@ public class ActionMan
 					{
 						exporter.useXmlNameSpace(false);
 					}
-					
+
 					exporter.printSources(theFile);
-					
+
 				}
 				catch (Exception ex)
 				{
@@ -3554,10 +3464,10 @@ public class ActionMan
 								 + theFile.getAbsolutePath());
 					logger.debug(ex.getMessage());
 					logger.debug(ex.getStackTrace());
-					
+
 					return;
 				}
-				
+
 				logger.info("IEC-61499 Function Block System file successfully generated at "
 							+ theFile.getAbsolutePath());
 			}
@@ -3771,41 +3681,6 @@ public class ActionMan
 		logger.info("Java Bytecode file successfully generated");
 	}
 
-	public static void startRecipeEditor(Gui gui)
-	{
-		try
-		{
-			VisualProjectContainer projectContainer = gui.getVisualProjectContainer();
-			VisualProject theProject = (VisualProject) projectContainer.getActiveProject();
-
-			theProject.getRecipeEditor();
-		}
-		catch (Exception ex)
-		{
-			logger.error("Exception while getting Recipe Editor");
-			logger.debug(ex.getStackTrace());
-
-			return;
-		}
-	}
-
-	public static void startCellEditor(Gui gui)
-	{
-		try
-		{
-			VisualProjectContainer projectContainer = gui.getVisualProjectContainer();
-			VisualProject theProject = (VisualProject) projectContainer.getActiveProject();
-
-			theProject.getCellEditor();
-		}
-		catch (Exception ex)
-		{
-			logger.error("Exception while getting Recipe Editor");
-			logger.debug(ex.getStackTrace());
-
-			return;
-		}
-	}
 
 	///////////////
 	// BDD STUFF //

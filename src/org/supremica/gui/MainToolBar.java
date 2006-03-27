@@ -30,7 +30,6 @@ public class MainToolBar
 	private static final MoveAutomataAction moveAutomataToBottomAction = new MoveAutomataAction(false, true);
 
 	private static final PreferencesAction preferencesAction = new PreferencesAction();
-	private static final EditAction editAction = new EditAction(supremica);
 
 	private static final Insets theInsets = new Insets(0, 0, 0, 0);
 
@@ -79,12 +78,6 @@ public class MainToolBar
 		add(preferencesAction);
 		addSeparator();
 
-		// Tools.AutomataEditor
-		if (SupremicaProperties.includeEditor())
-		{
-			add(editAction);
-			addSeparator();
-		}
 
 		add(ActionMan.helpAction);
 	}

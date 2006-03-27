@@ -70,7 +70,5 @@ public interface Gui
 
 	Project getSelectedProject();
 
-	FileSecurity getFileSecurity();
-
 	void show();
 }

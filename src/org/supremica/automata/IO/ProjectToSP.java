@@ -99,12 +99,6 @@ public class ProjectToSP
 		pw.print(" major=\"" + majorFileVersion + "\" ");
 		pw.print(" minor=\"" + minorFileVersion + "\" ");
 
-		if (SupremicaProperties.generalUseSecurity())
-		{
-			pw.print(" owner=\"" + project.getOwner() + "\"");
-			pw.print(" hash=\"" + project.getHash() + "\"");
-		}
-
 		pw.println(">");
 
 		for (Iterator projectIt = project.iterator(); projectIt.hasNext(); )

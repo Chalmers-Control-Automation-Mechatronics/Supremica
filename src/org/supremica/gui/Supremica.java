@@ -90,7 +90,6 @@ public class Supremica
 	private Server xmlRpcServer = null;
 	private ContentHelp help = null;
 	private CSH.DisplayHelpFromSource helpDisplayer = null;
-	private FileSecurity fileSecurity = new FileSecurity();
 
 	// MF -- made publically available
 	public static int TABLE_IDENTITY_COLUMN = 0;
@@ -103,9 +102,9 @@ public class Supremica
 	// Construct the frame
 	public Supremica()
 	{
-		//setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);		
-		//setDefaultCloseOperation(DISPOSE_ON_CLOSE);		
-		setDefaultCloseOperation(EXIT_ON_CLOSE);		
+		//setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+		//setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
 
 		theVisualProjectContainer = new VisualProjectContainer();
 		theVisualProjectContainer.addListener(this);
@@ -284,11 +283,6 @@ public class Supremica
 	private JFrame getCurrentFrame()
 	{
 		return this;
-	}
-
-	public FileSecurity getFileSecurity()
-	{
-		return fileSecurity;
 	}
 
 	// Component initialization
@@ -635,11 +629,6 @@ public class Supremica
 		return selectedProject;
 	}
 
-	// Tools.AutomataEditor
-	public void toolsAutomataEditor()
-	{
-		getActiveProject().getAutomataEditor();
-	}
 
 	public void renameProject()
 	{
@@ -984,7 +973,7 @@ public class Supremica
 		{
 			JOptionPane.showMessageDialog(this, EncodingHelper.linebreakAdjust(theProject.getComment()), "Project information", JOptionPane.INFORMATION_MESSAGE);
 		}
-		
+
 		if (theProject.hasAnimation())
 		{
 			JOptionPane.showMessageDialog(this, "This project includes an animation.", "Project information", JOptionPane.INFORMATION_MESSAGE);

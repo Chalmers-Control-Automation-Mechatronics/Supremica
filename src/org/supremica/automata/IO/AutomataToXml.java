@@ -103,11 +103,6 @@ public class AutomataToXml
 		pw.print(" major=\"" + majorFileVersion + "\"");
 		pw.print(" minor=\"" + minorFileVersion + "\"");
 
-		if (SupremicaProperties.generalUseSecurity())
-		{
-			pw.print(" owner=\"" + automata.getOwner() + "\"");
-			pw.print(" hash=\"" + automata.getHash() + "\"");
-		}
 
 		if ((automata.getComment() != null) &&!automata.getComment().equals(""))
 		{

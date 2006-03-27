@@ -185,7 +185,7 @@ public class Automaton
 			State toState = getStateWithIndex(arc.getToState().getIndex());
 			LabeledEvent event = alphabet.getEvent(arc.getEvent().getLabel());
 			Arc newArc = new Arc(fromState, toState, event);
-			
+
 			addArc(newArc);
 		}
 
@@ -1943,17 +1943,17 @@ public class Automaton
 			{
 				if (!tau.isEpsilon())
 				{
-					logger.error("The event name " + silentName + 
+					logger.error("The event name " + silentName +
 								 " is reserved and must be unobservable!");
 					return;
 				}
 			}
-			
+
 			// Modify arcs
 			for (Iterator<Arc> arcIt = arcIterator(); arcIt.hasNext(); )
 			{
 				Arc arc = arcIt.next();
-				
+
 				// Hide this one?
 				if (alpha.contains(arc.getEvent()))
 				{
@@ -1979,7 +1979,7 @@ public class Automaton
 			{
 				if (!tau_c.isEpsilon() || !tau_c.isControllable())
 				{
-					logger.error("The event name " + silentCName + 
+					logger.error("The event name " + silentCName +
 								 " is reserved and must be controllable and unobservable!");
 					return;
 				}
@@ -1995,17 +1995,17 @@ public class Automaton
 			{
 				if (!tau_u.isEpsilon() || tau_u.isControllable())
 				{
-					logger.error("The event name " + silentUName + 
+					logger.error("The event name " + silentUName +
 								 " is reserved and must be uncontrollable and unobservable!");
 					return;
 				}
 			}
-			
+
 			// Modify arcs
 			for (Iterator<Arc> arcIt = arcIterator(); arcIt.hasNext(); )
 			{
 				Arc arc = arcIt.next();
-				
+
 				// Hide this one?
 				if (alpha.contains(arc.getEvent()))
 				{
@@ -2191,12 +2191,12 @@ public class Automaton
 		}
 		if (nbrOfAcceptingAndForbiddenStates() != other.nbrOfAcceptingAndForbiddenStates())
 		{
-			logger.debug("equalAutomaton::non equal name nbr of accepting and forbidden states");			
+			logger.debug("equalAutomaton::non equal name nbr of accepting and forbidden states");
 			return false;
 		}
 		if (!alphabet.equalAlphabet(other.alphabet))
 		{
-			logger.debug("equalAutomaton::non equal alphabet");			
+			logger.debug("equalAutomaton::non equal alphabet");
 			return false;
 		}
 
@@ -2218,62 +2218,7 @@ public class Automaton
 	{
 		return correspondingAutomatonProxy;
 	}
-	// checksum?? //MF
-	public long checksum()
-	{
-		// Ad-hoc checksum algorithm
-		long checksum = 0;
 
-		for (Iterator<State> sIt = stateIterator(); sIt.hasNext(); )
-		{
-			State currState = sIt.next();
-			int part2 = 2;
-
-			String name = currState.getName();
-
-			if (name != null)
-			{
-				part2 = name.hashCode();
-			}
-
-			int part3 = currState.nbrOfIncomingArcs();
-			int part4 = currState.nbrOfOutgoingArcs();
-
-			checksum = part2 + part3 + part4;
-		}
-
-		int part5 = nbrOfStates();
-		int part6 = nbrOfEvents();
-		int part7 = nbrOfTransitions();
-		int part8 = 1;
-
-		if (name != null)
-		{
-			part8 = name.hashCode();
-		}
-
-		if (part5 > 0)
-		{
-			checksum = checksum * part5;
-		}
-
-		if (part6 > 0)
-		{
-			checksum = checksum * part6;
-		}
-
-		if (part7 > 0)
-		{
-			checksum = checksum * part7;
-		}
-
-		if (part8 > 0)
-		{
-			checksum = checksum * part8;
-		}
-
-		return checksum;
-	}
 
 	public Listeners getListeners()
 	{
@@ -2388,8 +2333,8 @@ public class Automaton
 		boolean done_something = false; // keep track so we don't add dump-states over and over
 
 		// Create uniquely named dump state
-		State dump = createUniqueState("dump");	
-		addState(dump);							
+		State dump = createUniqueState("dump");
+		addState(dump);
 		// saturate, else something will always be done
 		saturate(dump, alpha, dump);
 
@@ -2400,7 +2345,7 @@ public class Automaton
 		}
 
 		// Need to remove dump state including its self-loop arcs?
-		if (done_something == false) 
+		if (done_something == false)
 		{
 			removeState(dump);
 		}
@@ -2441,7 +2386,7 @@ public class Automaton
 	/**
 	 * Add an arc <from_state, event, to-state> for each event in
 	 * alpha that is not defined in from_state. Returns true if
-	 * anything added. 
+	 * anything added.
 	 *
 	 * Note that this one costs you |Q|x|A|x|T|, where Q is the
 	 * state-set, A the given alphabet and T the transitions from the

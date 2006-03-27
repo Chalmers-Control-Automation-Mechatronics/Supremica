@@ -56,12 +56,9 @@ import java.awt.*;
 import javax.swing.table.*;
 import org.supremica.automata.*;
 import org.supremica.log.*;
-import org.supremica.gui.editor.*;
 import org.supremica.gui.animators.scenebeans.AnimationItem;
 import org.supremica.gui.animators.scenebeans.Animator;
 import org.supremica.gui.simulator.SimulatorExecuter;
-import org.supremica.gui.recipeEditor.RecipeEditor;
-import org.supremica.gui.cellEditor.CellEditor;
 import grafchart.sfc.JGrafchartSupremicaEditor;
 import org.supremica.properties.SupremicaProperties;
 import org.supremica.util.ResourceClassLoader;
@@ -79,19 +76,15 @@ public class VisualProject
 {
 	private static Logger logger = LoggerFactory.createLogger(VisualProject.class);
 	private Automata selectedAutomata = null;
-	private AutomataEditor theAutomataEditor = null;    // Lazy construction
 	private ActionAndControlViewer theActionAndControlViewer = null;    // Lazy construction
 	private Animator theAnimator = null;    // Lazy construction
 	private SwingEngine theSwingEngine = null;    // Lazy construction
 	private Container theUserInterface = null;    // Lazy construction
 	private SimulatorExecuter theSimulator = null;    // Lazy construction
-	private RecipeEditor theRecipeEditor = null;    // Lazy construction
 	private JGrafchartSupremicaEditor theJGrafchartEditor = null;    // Lazy construction
-	private CellEditor theCellEditor = null;    // Lazy construction
 	private HashMap theAutomatonViewerContainer = new HashMap();
 	private HashMap theAutomatonExplorerContainer = new HashMap();
-	private HashMap theAutomatonFrameContainer = new HashMap();
-	private HashMap theAutomatonDocumentContainer = new HashMap();
+//	private HashMap theAutomatonFrameContainer = new HashMap();
 	private HashMap theAlphabetViewerContainer = new HashMap();
 	private LightTableModel lightTableModel = new LightTableModel();
 	private FullTableModel fullTableModel = new FullTableModel();
@@ -120,14 +113,6 @@ public class VisualProject
 	public void clear()
 	{
 		super.clear();
-
-		if (theAutomataEditor != null)
-		{
-			theAutomataEditor.setVisible(false);
-			theAutomataEditor.dispose();
-
-			theAutomataEditor = null;
-		}
 
 		if (theAnimator != null)
 		{
@@ -169,22 +154,6 @@ public class VisualProject
 			theAutomatonExplorerContainer.put(aut.getName(), theExplorer);
 		}
 
-		JInternalFrame theFrame = (JInternalFrame) theAutomatonFrameContainer.get(oldName);
-
-		if (theFrame != null)
-		{
-			theAutomatonFrameContainer.remove(oldName);
-			theAutomatonFrameContainer.put(aut.getName(), theFrame);
-		}
-
-		AutomatonDocument theDocument = (AutomatonDocument) theAutomatonDocumentContainer.get(oldName);
-
-		if (theDocument != null)
-		{
-			theAutomatonDocumentContainer.remove(oldName);
-			theAutomatonDocumentContainer.put(aut.getName(), theDocument);
-		}
-
 		AlphabetViewer theAlphabetViewer = (AlphabetViewer) theAlphabetViewerContainer.get(oldName);
 
 		if (theAlphabetViewer != null)
@@ -218,24 +187,6 @@ public class VisualProject
 			theAutomatonExplorerContainer.remove(aut.getName());
 		}
 
-		JInternalFrame theFrame = (JInternalFrame) theAutomatonFrameContainer.get(aut.getName());
-
-		if (theFrame != null)
-		{
-			theFrame.setVisible(false);
-			theFrame.dispose();
-			theAutomatonFrameContainer.remove(aut.getName());
-		}
-
-		AutomatonDocument theDocument = (AutomatonDocument) theAutomatonDocumentContainer.get(aut.getName());
-
-		if (theDocument != null)
-		{
-
-			//theDocument.setVisible(false); // Are these necessary
-			//theDocument.dispose();
-			theAutomatonDocumentContainer.remove(aut.getName());
-		}
 
 		AlphabetViewer theAlphabetViewer = (AlphabetViewer) theAlphabetViewerContainer.get(aut.getName());
 
@@ -257,43 +208,15 @@ public class VisualProject
 		return selectedAutomata;
 	}
 
-	public void showInEditor(Automaton theAutomaton)
-	{
-
-		//return selectedAutomata;
-	}
 
 	public void clearSelection()
 	{
 		selectedAutomata = null;
 	}
 
-	public synchronized AutomataEditor getAutomataEditor()
-	{
-		if (theAutomataEditor == null)
-		{
-			theAutomataEditor = new AutomataEditor(this);
-
-			theAutomataEditor.setVisible(true);
-
-			return theAutomataEditor;
-		}
-		else
-		{
-			theAutomataEditor.setVisible(true);
-
-			return theAutomataEditor;
-		}
-	}
-
 	public void updateFrameTitles()
 	{
 		String title = "Supremica - " + getName();
-
-		if (theAutomataEditor != null)
-		{
-			theAutomataEditor.setTitle(title);
-		}
 	}
 
 	public File getProjectFile()
@@ -416,53 +339,6 @@ public class VisualProject
 		AutomatonViewer viewer = maker.createAutomatonViewer(automaton);
 		theAutomatonViewerContainer.put(automaton.getName(), viewer);
 		return viewer;
-	}
-
-	public JInternalFrame getAutomatonFrame(String automatonName)
-		throws Exception
-	{
-		if (theAutomatonFrameContainer.containsKey(automatonName))
-		{
-			JInternalFrame theFrame = (JInternalFrame) theAutomatonFrameContainer.get(automatonName);
-
-			theFrame.setVisible(true);
-
-			return theFrame;
-		}
-		else
-		{
-			AutomatonDocument currDocument = getAutomatonDocument(automatonName);
-
-			if (currDocument == null)
-			{
-				return null;
-			}
-
-			if (theAutomataEditor == null)
-			{
-				return null;
-			}
-
-			JInternalFrame theFrame = theAutomataEditor.createFrame(currDocument);
-
-			theAutomatonFrameContainer.put(automatonName, theFrame);
-			theFrame.setVisible(true);
-
-			return theFrame;
-		}
-	}
-
-	public AutomatonDocument getAutomatonDocument(String automatonName)
-		throws Exception
-	{
-		if (theAutomatonDocumentContainer.containsKey(automatonName))
-		{
-			AutomatonDocument document = (AutomatonDocument) theAutomatonDocumentContainer.get(automatonName);
-
-			return document;
-		}
-
-		return null;
 	}
 
 	public AutomatonExplorer getAutomatonExplorer(String automaton)
@@ -657,31 +533,6 @@ public class VisualProject
 				return theSimulator;
 		}
 */
-	public CellEditor getCellEditor()
-		throws Exception
-	{
-		if (theCellEditor == null)
-		{
-			theCellEditor = org.supremica.gui.cellEditor.CellEditor.createEditor(this);
-		}
-
-		theCellEditor.setVisible(true);
-
-		return theCellEditor;
-	}
-
-	public RecipeEditor getRecipeEditor()
-		throws Exception
-	{
-		if (theRecipeEditor == null)
-		{
-			theRecipeEditor = org.supremica.gui.recipeEditor.RecipeEditor.createEditor(this);
-		}
-
-		theRecipeEditor.setVisible(true);
-
-		return theRecipeEditor;
-	}
 
 	public JGrafchartSupremicaEditor getJGrafchartEditor()
 	{

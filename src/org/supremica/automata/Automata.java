@@ -68,8 +68,6 @@ public class Automata
 	private String name = null;
 	private String comment = null;
 	private AutomataListeners listeners = null;
-	private String owner = null;
-	private String hash = null;
 
 	public Automata()
 	{
@@ -271,36 +269,6 @@ public class Automata
 		aut.setName(newName);
 	}
 
-	public void setOwner(String owner)
-	{
-		this.owner = owner;
-	}
-
-	public String getOwner()
-	{
-		return owner;
-	}
-
-	public void setHash(String hash)
-	{
-		this.hash = hash;
-	}
-
-	public String getHash()
-	{
-		return hash;
-	}
-
-	public String computeHash()
-	{
-		long checksum = checksum();
-		long ownerhash = owner.hashCode();
-		long extrahash = 0x314C;
-		long totalhash = checksum * ownerhash * extrahash;
-		String newHash = Long.toHexString(totalhash);
-
-		return newHash;
-	}
 
 	public Iterator<Automaton> iterator()
 	{
@@ -933,7 +901,7 @@ public class Automata
 			throw new RuntimeException(ex);
 		}
 		*/
-		
+
 		// Add all alphabets to a new one...
 		Alphabet unionAlphabet = new Alphabet();
 		for (Iterator<Automaton> autIt = iterator(); autIt.hasNext(); )
@@ -1176,21 +1144,6 @@ public class Automata
 		getListeners().addListener(listener);
 	}
 
-	public long checksum()
-	{    
-		// Ad-hoc checksum algorithm
-		long checksum = 53562951413L;
-
-		for (Iterator aIt = iterator(); aIt.hasNext(); )
-		{
-			Automaton currAutomaton = (Automaton) aIt.next();
-
-			checksum = checksum + currAutomaton.checksum();
-		}
-
-		return checksum;
-	}
-
 	void notifyListeners()
 	{
 		if (listeners != null)
@@ -1379,7 +1332,7 @@ public class Automata
 	 *
 	 * This method was originally in gui.ActionMan (to handle the gui-stuff conveniently).
 	 */
-	public boolean sanityCheck(Gui gui, int minSize, 
+	public boolean sanityCheck(Gui gui, int minSize,
 							   boolean mustHaveInitial, boolean mustHaveValidType,
 							   boolean mustBeControllabilityConsistent, boolean examineStructure)
 	{
@@ -1403,10 +1356,10 @@ public class Automata
 			if (inadequate.size() > 0)
 			{
 				if (inadequate.size() == 1)
-					logger.warn("In " + aut + ", the event " + inadequate + 
+					logger.warn("In " + aut + ", the event " + inadequate +
 								" is selflooped in all states.");
 				else
-					logger.warn("In " + aut + ", the events " + inadequate + 
+					logger.warn("In " + aut + ", the events " + inadequate +
 								" are selflooped in all states.");
 			}
 		}

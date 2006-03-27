@@ -88,8 +88,6 @@ public class ProjectBuildFromXml
 	private final static String operatorResetStr = "operatorReset";
 	private final static String immediateStr = "immediate";
 	private final static String epsilonStr = "epsilon";
-	private final static String owner = "owner";
-	private final static String hash = "hash";
 	private final static String projectStr = "SupremicaProject";
 	private final static String layoutStr = "Layout";
 	private final static String statesLayoutStr = "StatesLayout";
@@ -439,7 +437,7 @@ public class ProjectBuildFromXml
 		if (currProject.containsAutomaton(currAutomaton.getName()))
 		{
 			// Already there!?!
-			logger.error("Name conflict, multiple automata with name " + 
+			logger.error("Name conflict, multiple automata with name " +
 						 currAutomaton + ", discarding last one added.");
 		}
 		else
@@ -609,7 +607,7 @@ public class ProjectBuildFromXml
 		currState.setAccepting(accepting);
 		currState.setForbidden(forbidden);
 		currState.setCost(cost);
-		
+
 		// Associate the id with the state
 		idStateMap.put(id, currState);
 		currAutomaton.addState(currState);
@@ -703,20 +701,6 @@ public class ProjectBuildFromXml
 		if (name != null)
 		{
 			currProject.setName(name);
-		}
-
-		String owner = attributes.getValue("owner");
-
-		if (name != null)
-		{
-			currProject.setOwner(owner);
-		}
-
-		String hash = attributes.getValue("hash");
-
-		if (hash != null)
-		{
-			currProject.setHash(hash);
 		}
 
 		String comment = attributes.getValue("comment");

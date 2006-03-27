@@ -27,11 +27,12 @@ public class EditorPanel
 		tabPanel.setPreferredSize(IDEDimensions.leftEditorPreferredSize);
 		tabPanel.setMinimumSize(IDEDimensions.leftEditorMinimumSize);
 
+/*
 		aliasesPanel = new EditorAliasesPanel(moduleContainer, "Aliases");
 		aliasesPanel.setPreferredSize(IDEDimensions.leftEditorPreferredSize);
 		aliasesPanel.setMinimumSize(IDEDimensions.leftEditorMinimumSize);
 		tabPanel.add(aliasesPanel);
-
+*/
 		componentsPanel = new EditorComponentsPanel(moduleContainer, "Components");
 		componentsPanel.setPreferredSize(IDEDimensions.leftEditorPreferredSize);
 		componentsPanel.setMinimumSize(IDEDimensions.leftEditorMinimumSize);
@@ -42,11 +43,12 @@ public class EditorPanel
 		eventsPanel.setMinimumSize(IDEDimensions.leftEditorMinimumSize);
 		tabPanel.add(eventsPanel);
 
+/*
 		parametersPanel = new EditorParametersPanel(moduleContainer, "Parameters");
 		parametersPanel.setPreferredSize(IDEDimensions.leftEditorPreferredSize);
 		parametersPanel.setMinimumSize(IDEDimensions.leftEditorMinimumSize);
 		tabPanel.add(parametersPanel);
-
+*/
 		tabPanel.setSelectedComponent(componentsPanel);
 
 		componentEditorPanel = getEmptyRightPanel();

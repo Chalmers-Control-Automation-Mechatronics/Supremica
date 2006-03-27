@@ -51,18 +51,13 @@ package org.supremica.properties;
 import java.util.*;
 import java.io.*;
 
-
 /**
  * Properties for Supremica.
- */
+ * All properties are added in the Config class.
+ **/
 public final class SupremicaNewProperties
 	implements Iterable<Property>
 {
-
-
-	public static final StringProperty docDBServerName = new StringProperty(PropertyType.UNCLASSIFIED, "docdbHost", "", "No comments");
-//	public static final IntProperty docDBServerPort = new IntProperty("docdbPort");
-
 	private SupremicaNewProperties()
 	{
 	}
@@ -90,12 +85,8 @@ public final class SupremicaNewProperties
 	 * Looks for "-p propertyFile" option, and loads it if it exists.
 	 * Looks also for developer/user options
 	 */
-/*
 	public void loadProperties(String[] args)
 	{
-		// do we  want developer stuff by default
-		boolean enabled_developer_mode = true;
-
 		for (int i = 0; i < args.length; i++)
 		{
 			if (args[i].equals("-p") || args[i].equals("--properties"))
@@ -109,12 +100,12 @@ public final class SupremicaNewProperties
 					{
 						if (!propFile.exists())
 						{
-							System.out.println("Properties file not found: " + propFile.getAbsolutePath());
-							System.out.println("Creating empty properties file: " + propFile.getAbsolutePath());
+							System.err.println("Properties file not found: " + propFile.getAbsolutePath());
+							System.err.println("Creating empty properties file: " + propFile.getAbsolutePath());
 							propFile.createNewFile();
 						}
 
-						setProperties(propFile);
+						updateProperties(propFile);
 					}
 					catch (Exception e)
 					{
@@ -122,30 +113,85 @@ public final class SupremicaNewProperties
 					}
 				}
 			}
-			else if (args[i].equals("--developer"))
+		}
+	}
+
+
+	private Properties buildProperties(File theFile)
+		throws FileNotFoundException, IOException
+	{
+		FileInputStream theStream = new FileInputStream(theFile);
+		return buildProperties(new BufferedInputStream(theStream));
+	}
+
+	private Properties buildProperties(InputStream inStream)
+		throws IOException
+	{
+		Properties newProperties = new Properties();
+		newProperties.load(inStream);
+		return newProperties;
+	}
+
+	public void updateProperties(File propertyFile)
+		throws FileNotFoundException, IOException
+	{
+		Properties propertiesFromFile = buildProperties(propertyFile);
+		for (Enumeration e = propertiesFromFile.keys(); e.hasMoreElements(); )
+		{
+			String newKey = (String)e.nextElement();
+			String newValue = propertiesFromFile.getProperty(newKey);
+
+			Property orgProperty = Property.getProperty(newKey);
+			if (orgProperty == null)
 			{
-				enabled_developer_mode = true;
+				System.err.println("Unknown property: " + newKey);
 			}
-			else if (args[i].equals("--user"))
+			else if (orgProperty.isImmutable())
 			{
-				enabled_developer_mode = false;
+				System.err.println("Property \"" + newKey + "\" is immutable");
+
+			}
+			else
+			{
+				try
+				{
+					orgProperty.set(newValue);
+				}
+				catch (IllegalArgumentException ex)
+				{
+					System.err.println("Invalid argument to key: " + newKey);
+				}
 			}
 		}
-
-//		wp.setProperty(INCLUDE_EXPERIMENTAL_ALGORITHMS, enabled_developer_mode
-														? "true"
-														: "false", true);
-//		updateBDDOptions(false);    // sync BDD options to the newly loaded options
 	}
-*/
 
+	public void saveProperties()
+		throws IOException
+	{
+		saveProperties(false);
+	}
+
+	public void saveProperties(boolean saveAll)
+		throws IOException
+	{
+		if (lastPropertyFile != null)
+		{
+			saveProperties(lastPropertyFile, saveAll);
+		}
+		else
+		{
+			System.err.println("Could not write to configuration file, unknown file name.");
+		}
+	}
 
 	/**
 	 * Save the property list to the configuration file.
 	 *
-	 * @param name is the name of the config file
+	 * @param filename is the name of the config file
+	 * @param saveAll if this is true all mutable properties are saved to file
+	 * otherwise only those properties that values different from the default value is saved.
 	 */
-	public void saveProperties(String filename)
+	public void saveProperties(String filename, boolean saveAll)
 		throws IOException
 	{
 		OutputStream os = new FileOutputStream(filename);
@@ -158,7 +204,7 @@ public final class SupremicaNewProperties
 
 		for (Property currProperty : this)
 		{
-			if (currProperty.currentValueDifferentFromDefaultValue())
+			if ((saveAll && !currProperty.isImmutable()) || currProperty.currentValueDifferentFromDefaultValue())
 			{
 				writer.append("# " + currProperty.getComment() + "\n");
 				writer.append(currProperty.getPropertyType() + "." + currProperty.getKey() + " " + currProperty.valueToEscapedString()  + "\n\n");
@@ -168,55 +214,19 @@ public final class SupremicaNewProperties
 		writer.flush();
 		os.close();
 	}
-/*
-	public void saveProperties()
-		throws IOException
-	{
-		if (lastPropertyFile != null)
-		{
-			saveProperties(lastPropertyFile);
-		}
-		else
-		{
-			System.err.println("Could not write to configuration file, unknown file name.");
-		}
-	}
 
-	public void setProperties(File aFile)
-		throws Exception
-	{
-		lastPropertyFile = aFile.getAbsolutePath();    // save it for later days,,,,
-
-		FileInputStream fStream = new FileInputStream(aFile);
-		BufferedInputStream bStream = new BufferedInputStream(fStream);
-
-		setProperties(bStream);
-	}
-
-	public void setProperties(InputStream iStream)
-		throws Exception
-	{
-		Properties newProperties = new Properties();
-
-		newProperties.load(iStream);
-		setProperties(newProperties);
-//		updateBDDOptions(false);
-	}
-
-	public static final void setProperties(Properties otherProperties)
-	{
-		for (Enumeration propEnum = otherProperties.propertyNames();
-				propEnum.hasMoreElements(); )
-		{
-			String currKey = (String) propEnum.nextElement();
-
-			if (wp.allowExternalModification(currKey))
-			{
-				wp.setProperty(currKey, otherProperties.getProperty(currKey));
-			}
-		}
-	}
-
-*/
+	private static SupremicaNewProperties supremicaProperties;
+	private static Config config = Config.instance;
 	private String lastPropertyFile = null;
+
+	static
+	{
+		supremicaProperties = new SupremicaNewProperties();
+	}
+
+
+	public static void main(String[] args)
+	{
+		System.out.println(supremicaProperties.toString());
+	}
 }

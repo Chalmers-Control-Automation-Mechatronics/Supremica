@@ -53,6 +53,7 @@ import java.util.*;
 public abstract class Property
 {
 	private static List<Property> collection = new LinkedList<Property>();
+	private static HashMap<String, Property> fullkeyToPropertyMap = new HashMap<String, Property>();
 
 	private PropertyType type;
 	private final boolean immutable;
@@ -67,17 +68,24 @@ public abstract class Property
 		this.comment = comment;
 		this.immutable = immutable;
 		collection.add(this);
+		fullkeyToPropertyMap.put(getFullKey(), this);
 	}
 
-	public PropertyType getPropertyType()
+	public final PropertyType getPropertyType()
 	{
 		return type;
 	}
 
-	public String getKey()
+	public final String getKey()
 	{
 		return key;
 	}
+
+	public final String getFullKey()
+	{
+		return type.toString() + "." + key;
+	}
+
 
 	public String getComment()
 	{
@@ -94,14 +102,28 @@ public abstract class Property
 		return collection.iterator();
 	}
 
+	static Property getProperty(String fullKey)
+	{
+		return fullkeyToPropertyMap.get(fullKey);
+	}
+
 	public final String toString()
 	{
-		return getPropertyType().toString() + "." + getKey() + " " + valueToString();
+		return getFullKey() + " " + valueToString();
 	}
 
 	public String valueToEscapedString()
 	{
 		return valueToString();
+	}
+
+	public boolean equals(Object other)
+	{
+		if (other == null || (!(other instanceof Property)))
+		{
+			return false;
+		}
+		return getFullKey().equals(((Property)other).getFullKey());
 	}
 
 	public abstract void set(String value);

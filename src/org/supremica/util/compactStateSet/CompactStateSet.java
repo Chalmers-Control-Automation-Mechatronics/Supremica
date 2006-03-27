@@ -49,9 +49,12 @@
  */
 package org.supremica.util.compactStateSet;
 
+import org.supremica.automata.AutomataIndexFormHelper;
+import org.supremica.automata.StateStorage;
 import java.util.*;
 
 public class CompactStateSet
+	implements StateStorage
 {
 	private StateCompressor compressor;
 	private int nbrOfStatesInEachBlock;
@@ -71,4 +74,45 @@ public class CompactStateSet
 		this.stateToPositionMap = new HashMap();
 	}
 
+	/**
+	 * Try to add theArray to the table.
+	 * If there already exists an entry then return
+	 * that entry. Otherwise add theArray
+	 * and return null.
+	 */
+	public int[] add(int[] theArray)
+	{
+		return null;
+	}
+
+	/**
+	 * Return the number of states.
+	 */
+	public int size()
+	{
+		return 0;
+	}
+
+	/**
+	 * Remove all states.
+	 */
+	public void clear()
+	{
+	}
+
+	/**
+	 * Returns an int[] if it exists otherwise null
+	 */
+	public int[] get(int[] theArray)
+	{
+		return null;
+	}
+
+	/**
+	 * Returns an iterator for all states in the storage
+	 */
+	public Iterator iterator()
+	{
+		return null;
+	}
 }

@@ -356,22 +356,6 @@ public class MainMenuBar
 	    separatorNeeded = false;
 	}
 
-	if (SupremicaProperties.generalUseSecurity())
-	{
-	    // File.Login
-	    JMenuItem menuFileLogin = new JMenuItem("Login");
-	    menuFile.add(menuFileLogin);
-	    menuFileLogin.addActionListener(new ActionListener()
-		{
-		    public void actionPerformed(ActionEvent e)
-		    {
-			ActionMan.fileLogin(ActionMan.getGui());
-		    }
-		});
-
-	    separatorNeeded = true;
-	}
-
 	if (separatorNeeded)
 	{
 	    menuFile.addSeparator();
@@ -605,23 +589,6 @@ public class MainMenuBar
 	    }
 	}
 
-	// Tools.AutomataEditor
-	if (SupremicaProperties.includeEditor())
-	{
-	    menuTools.add(new JSeparator());
-
-	    JMenuItem menuToolsAutomataEditor = new JMenuItem();
-
-	    menuToolsAutomataEditor.setText("Editor...");
-	    menuTools.add(menuToolsAutomataEditor);
-	    menuToolsAutomataEditor.addActionListener(new ActionListener()
-		{
-		    public void actionPerformed(ActionEvent e)
-		    {
-			supremica.toolsAutomataEditor();
-		    }
-		});
-	}
 
 	// Tools.ShoeFactory
 	if (SupremicaProperties.includeShoeFactory())
@@ -705,34 +672,6 @@ public class MainMenuBar
 	    */
 	}
 
-	// Tools.CellEditor
-	if (SupremicaProperties.includeCellEditor())
-	{
-	    JMenuItem menuToolsCellEditor = new JMenuItem();
-
-	    menuToolsCellEditor.setText("Cell Editor...");
-	    menuTools.add(menuToolsCellEditor);
-	    menuToolsCellEditor.addActionListener(new ActionListener()
-		{
-		    public void actionPerformed(ActionEvent e)
-		    {
-			ActionMan.startCellEditor(ActionMan.getGui());
-		    }
-		});
-
-	    JMenuItem menuToolsRecipeEditor = new JMenuItem();
-
-	    menuToolsRecipeEditor.setText("Recipe Editor...");
-	    menuTools.add(menuToolsRecipeEditor);
-	    menuToolsRecipeEditor.addActionListener(new ActionListener()
-		{
-		    public void actionPerformed(ActionEvent e)
-		    {
-			ActionMan.startRecipeEditor(ActionMan.getGui());
-		    }
-		});
-	    menuTools.add(new JSeparator());
-	}
 
 	menuTools.add(new JSeparator());
 

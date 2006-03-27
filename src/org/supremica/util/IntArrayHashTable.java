@@ -50,6 +50,7 @@
 package org.supremica.util;
 
 import org.supremica.util.SupremicaException;
+import org.supremica.automata.StateStorage;
 import org.supremica.automata.AutomataIndexFormHelper;
 import java.util.*;
 
@@ -57,6 +58,7 @@ import java.util.*;
  * Insert <int_1, int_2, int_3, ..., int_n, prev_state, int_status>
  */
 public final class IntArrayHashTable
+	implements StateStorage
 {
 	private int[][] theTable;
 	private int size;
@@ -110,7 +112,7 @@ public final class IntArrayHashTable
 	 * and return null.
 	 */
 	public int[] add(int[] theArray)
-		throws Exception
+		throws SupremicaException
 	{
 		int table[][] = theTable;
 		int hash = hashCodeIntArray(theArray);

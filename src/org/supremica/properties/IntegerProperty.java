@@ -122,7 +122,7 @@ public class IntegerProperty
 		{
 			return false;
 		}
-		if (value < max)
+		if (value > max)
 		{
 			return false;
 		}

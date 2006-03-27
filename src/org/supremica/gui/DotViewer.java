@@ -203,7 +203,7 @@ public abstract class DotViewer
 		menuEdit.setMnemonic(KeyEvent.VK_E);
 		menuBar.add(menuEdit);
 
-		if (SupremicaProperties.isWindows())
+		if (org.supremica.properties.LocalSystem.isWindows())
 		{
 			// Edit
 			JMenuItem menuEditCopy = new JMenuItem();
