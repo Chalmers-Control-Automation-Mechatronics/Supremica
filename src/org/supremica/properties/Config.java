@@ -77,9 +77,11 @@ public final class Config
 	//   GENERAL_FILE
 	//   GENERAL_COMM
 	//   GENERAL_COMM_XMLRPC
+	//   GENERAL_SOFTPLC
 	//   GUI
 	//   GUI_EDITOR
 	//   GUI_ANALYZER
+	//   GUI_SIMULATOR
 	//   GUI_DOT
 	//   ALGORITHMS
 	//   ALGORITHMS_SYNC
@@ -87,6 +89,7 @@ public final class Config
 	//   ALGORITHMS_SYNTHESIS
 	//   ALGORITHMS_MINIMIZATION
 	//   ALGORITHMS_BDD
+	//   ALGORITHMS_HMI
 	//   MISC
 
 
@@ -145,8 +148,22 @@ public final class Config
 	public static final BooleanProperty FILE_ALLOW_EXPORT = new BooleanProperty(PropertyType.GENERAL_FILE, "fileAllowExport", true, "Allow user to export file");
 	public static final BooleanProperty FILE_ALLOW_QUIT = new BooleanProperty(PropertyType.GENERAL_FILE, "fileAllowQuit", true, "Allow user to quit Supremica");
 
+	// GENERAL_SOFTPLC
+	public static final BooleanProperty INCLUDE_SOFTPLC = new BooleanProperty(PropertyType.GENERAL_SOFTPLC, "includeSoftPLC", false, "Include soft PLC");
+	public static final IntegerProperty SOFTPLC_CYCLE_TIME = new IntegerProperty(PropertyType.GENERAL_SOFTPLC, "softplcCycleTime", 40, "SoftPLC Cycle time", false, 1);
+	public static final StringProperty SOFTPLC_INTERFACES = new StringProperty(PropertyType.GENERAL_SOFTPLC, "softplcInterfaces", "org.supremica.softplc.Simulator.BTSim", "Default interface");
+
+	// GUI
+	public static final BooleanProperty INCLUDE_JGRAFCHART = new BooleanProperty(PropertyType.GUI, "includeJGrafchart", false, "Include JGrafchart");
+	public static final BooleanProperty INCLUDE_SHOE_FACTORY = new BooleanProperty(PropertyType.GUI, "includeShoeFactory", false, "Include Shoe factory simulation");
+
 	// GUI_ANALYZER
 	public static final BooleanProperty INCLUDE_BOUNDED_UNCON_TOOLS = new BooleanProperty(PropertyType.GUI_ANALYZER, "includeBoundedUnconTools", false, "Include unbounded controllability tools");
+
+	// GUI_SIMULATOR
+	public static final BooleanProperty INCLUDE_ANIMATOR = new BooleanProperty(PropertyType.GUI_SIMULATOR, "includeAnimator", false, "Include 2D Graphical Animator");
+	public static final BooleanProperty SIMULATION_IS_EXTERNAL = new BooleanProperty(PropertyType.GUI_SIMULATOR, "simulationIsExternal", false, "External simulation process");
+	public static final IntegerProperty SIMULATION_CYCLE_TIME = new IntegerProperty(PropertyType.GUI_SIMULATOR, "simulationCycleTime", 100, "Simulator Cycle time", false, 0);
 
 	// ALGORITHMS
 	public static final BooleanProperty INCLUDE_EXPERIMENTAL_ALGORITHMS = new BooleanProperty(PropertyType.ALGORITHMS, "includeExperimentalAlgorithms", false, "Include experimental algorithms");
@@ -214,6 +231,9 @@ public final class Config
 	public static final IntegerProperty BDD_TRANSITION_OPTIMIZER_ALGO = new IntegerProperty(PropertyType.ALGORITHMS_BDD, "bddTransitionOptimizerAlgo", 3, "Transition optimizer algorithm");
 	public static final BooleanProperty BDD_INTERLEAVED_VARIABLES = new BooleanProperty(PropertyType.ALGORITHMS_BDD, "bddInterleavedVariables", true, "Interleaved or seperated variable orders");
 	public static final BooleanProperty BDD_LEVEL_GRAPHS = new BooleanProperty(PropertyType.ALGORITHMS_BDD, "bddLevelGraphs", false, "Shows the fillness of the workset sent to H1");
+
+	// ALGORITHMS_HMI
+	public static final BooleanProperty INCLUDE_USERINTERFACE = new BooleanProperty(PropertyType.ALGORITHMS_HMI, "includeUserInterface", false, "Include SwiXML analyzer tools");
 
 	static Config instance = new Config();
 

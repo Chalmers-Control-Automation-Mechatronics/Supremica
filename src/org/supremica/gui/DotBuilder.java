@@ -3,7 +3,7 @@ package org.supremica.gui;
 import org.supremica.log.*;
 import java.io.*;
 import att.grappa.*;
-import org.supremica.properties.SupremicaProperties;
+import org.supremica.properties.Config;
 import org.supremica.automata.IO.AutomataSerializer;
 
 public class DotBuilder
@@ -175,7 +175,7 @@ public class DotBuilder
 	{
 		try
 		{
-			dotProcess = Runtime.getRuntime().exec(SupremicaProperties.getDotExecuteCommand() + " " + arguments);
+			dotProcess = Runtime.getRuntime().exec(Config.DOT_EXECUTE_COMMAND.get() + " " + arguments);
 		}
 		catch (IOException ex)
 		{

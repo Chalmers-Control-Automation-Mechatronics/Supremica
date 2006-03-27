@@ -1881,7 +1881,7 @@ public class ActionMan
 		}
 
 		// Warn if there are too many "states" i.e. automata
-		int maxNbrOfStates = SupremicaProperties.getDotMaxNbrOfStatesWithoutWarning();
+		int maxNbrOfStates = Config.DOT_MAX_NBR_OF_STATES.get();
 		if (maxNbrOfStates < selectedAutomata.size())
 		{
 			String msg = "You have selected " + selectedAutomata.size() + " automata. It is not " +

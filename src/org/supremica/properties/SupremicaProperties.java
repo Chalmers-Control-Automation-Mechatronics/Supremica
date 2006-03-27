@@ -314,7 +314,6 @@ public final class SupremicaProperties
 		// The rest (move to where it belongs if you know where that is!!!)
 		setProperty(INCLUDE_USERINTERFACE, "false", true);
 		setProperty(SOFTPLC_CYCLE_TIME, "40", true);
-		//setProperty(FB_RUNTIME_LIBRARY_PATH, "", true);
 
 		softplcInterfaces.add(new org.supremica.gui.SoftplcInterface("org.supremica.softplc.Simulator.BTSim"));
 	}
@@ -569,88 +568,6 @@ public final class SupremicaProperties
 	public static void setStudentVersion(boolean studentVersion)
 	{
 		wp.setProperty(GENERAL_STUDENT_VERSION, toString(studentVersion));
-	}
-
-	// Other
-	public static String getDotExecuteCommand()
-	{
-		return wp.getProperty(DOT_EXECUTE_COMMAND);
-	}
-	public static void setDotExecuteCommand(String command)
-	{
-		wp.setProperty(DOT_EXECUTE_COMMAND, command);
-	}
-	public static int getDotMaxNbrOfStatesWithoutWarning()
-	{
-		return toInt(wp.getProperty(DOT_MAX_NBR_OF_STATES));
-	}
-	public static void setDotMaxNbrOfStatesWithoutWarning(int maxNbrOfStates)
-	{
-		wp.setProperty(DOT_MAX_NBR_OF_STATES, toString(maxNbrOfStates));
-	}
-	public static boolean isDotLeftToRight()
-	{
-		return toBoolean(wp.getProperty(DOT_LEFT_TO_RIGHT));
-	}
-	public static void setDotLeftToRight(boolean leftToRight)
-	{
-		wp.setProperty(DOT_LEFT_TO_RIGHT, toString(leftToRight));
-	}
-	public static boolean isDotWithStateLabels()
-	{
-		return toBoolean(wp.getProperty(DOT_WITH_STATE_LABELS));
-	}
-	public static void setDotWithStateLabels(boolean withStateLabels)
-	{
-		wp.setProperty(DOT_WITH_STATE_LABELS, toString(withStateLabels));
-	}
-	public static boolean isDotWithEventLabels()
-	{
-		return toBoolean(wp.getProperty(DOT_WITH_EVENT_LABELS));
-	}
-	public static void setDotWithEventLabels(boolean withEventLabels)
-	{
-		wp.setProperty(DOT_WITH_EVENT_LABELS, toString(withEventLabels));
-	}
-	public static boolean isDotWithCircles()
-	{
-		return toBoolean(wp.getProperty(DOT_WITH_CIRCLES));
-	}
-	public static void setDotWithCircles(boolean withCircles)
-	{
-		wp.setProperty(DOT_WITH_CIRCLES, toString(withCircles));
-	}
-	public static boolean isDotUseArcColors()
-	{
-		return toBoolean(wp.getProperty(DOT_USE_ARC_COLORS));
-	}
-	public static void setDotUseArcColors(boolean useArcColors)
-	{
-		wp.setProperty(DOT_USE_ARC_COLORS, toString(useArcColors));
-	}
-	public static boolean isDotUseStateColors()
-	{
-		return toBoolean(wp.getProperty(DOT_USE_STATE_COLORS));
-	}
-	public static void setDotUseStateColors(boolean useStateColors)
-	{
-		wp.setProperty(DOT_USE_STATE_COLORS, toString(useStateColors));
-	}
-	public static boolean isDotUseMultipleLabels()
-	{
-		return toBoolean(wp.getProperty(DOT_USE_MULTI_LABELS));
-	}
-	public static void setDotUseMultipleLabels(boolean useMultiLabels)
-	{
-		wp.setProperty(DOT_USE_MULTI_LABELS, toString(useMultiLabels));
-	}
-	public static boolean isDotAutomaticUpdate()
-	{
-		return toBoolean(wp.getProperty(DOT_AUTOMATIC_UPDATE));
-	}
-	public static void setDotAutomaticUpdate(boolean automaticUpdate)
-	{
-		wp.setProperty(DOT_AUTOMATIC_UPDATE, toString(automaticUpdate));
 	}
 
 	public static boolean includeExperimentalAlgorithms()

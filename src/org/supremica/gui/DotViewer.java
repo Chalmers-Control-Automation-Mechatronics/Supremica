@@ -56,7 +56,6 @@ import java.awt.event.*;
 import java.io.*;
 import javax.swing.*;
 import att.grappa.*;
-import org.supremica.properties.SupremicaProperties;
 import org.supremica.properties.Config;
 import org.supremica.automata.IO.*;
 import org.supremica.gui.texteditor.TextFrame;
@@ -83,13 +82,13 @@ public abstract class DotViewer
 	private JMenuBar menuBar = new JMenuBar();
 	private JToolBar toolBar = new JToolBar();
 	private boolean updateNeeded = false;
-	protected JCheckBoxMenuItem leftToRightCheckBox = new JCheckBoxMenuItem("Layout left to right", SupremicaProperties.isDotLeftToRight());
-	protected JCheckBoxMenuItem withCirclesCheckBox = new JCheckBoxMenuItem("Draw circles", SupremicaProperties.isDotWithCircles());
-	protected JCheckBoxMenuItem withLabelsCheckBox = new JCheckBoxMenuItem("Draw state names", SupremicaProperties.isDotWithStateLabels());
-	protected JCheckBoxMenuItem withEventLabelsCheckBox = new JCheckBoxMenuItem("Draw event labels", SupremicaProperties.isDotWithEventLabels());
-	protected JCheckBoxMenuItem useStateColorsCheckBox = new JCheckBoxMenuItem("Draw state colors", SupremicaProperties.isDotUseStateColors());
-	protected JCheckBoxMenuItem useArcColorsCheckBox = new JCheckBoxMenuItem("Draw arc colors", SupremicaProperties.isDotUseArcColors());
-	protected JCheckBoxMenuItem automaticUpdateCheckBox = new JCheckBoxMenuItem("Automatic update", SupremicaProperties.isDotAutomaticUpdate());
+	protected JCheckBoxMenuItem leftToRightCheckBox = new JCheckBoxMenuItem("Layout left to right", Config.DOT_LEFT_TO_RIGHT.isTrue());
+	protected JCheckBoxMenuItem withCirclesCheckBox = new JCheckBoxMenuItem("Draw circles", Config.DOT_WITH_CIRCLES.isTrue());
+	protected JCheckBoxMenuItem withLabelsCheckBox = new JCheckBoxMenuItem("Draw state names", Config.DOT_WITH_STATE_LABELS.isTrue());
+	protected JCheckBoxMenuItem withEventLabelsCheckBox = new JCheckBoxMenuItem("Draw event labels", Config.DOT_WITH_EVENT_LABELS.isTrue());
+	protected JCheckBoxMenuItem useStateColorsCheckBox = new JCheckBoxMenuItem("Draw state colors", Config.DOT_USE_STATE_COLORS.isTrue());
+	protected JCheckBoxMenuItem useArcColorsCheckBox = new JCheckBoxMenuItem("Draw arc colors", Config.DOT_USE_ARC_COLORS.isTrue());
+	protected JCheckBoxMenuItem automaticUpdateCheckBox = new JCheckBoxMenuItem("Automatic update", Config.DOT_AUTOMATIC_UPDATE.isTrue());
 	private final static double SCALE_RESET = 1.0, SCALE_CHANGE = 1.5,
 								MAX_SCALE = 64.0, MIN_SCALE = 1.0 / 64;
 	private double scaleFactor = SCALE_RESET;

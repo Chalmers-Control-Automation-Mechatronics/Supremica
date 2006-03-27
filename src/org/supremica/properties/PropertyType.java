@@ -60,9 +60,11 @@ public class PropertyType
 	public static final PropertyType GENERAL_FILE = new PropertyType("general.file");
 	public static final PropertyType GENERAL_COMM = new PropertyType("general.comm");
 	public static final PropertyType GENERAL_COMM_XMLRPC = new PropertyType("general.comm.xmlrpc");
+	public static final PropertyType GENERAL_SOFTPLC = new PropertyType("general.softplc");
 	public static final PropertyType GUI = new PropertyType("gui");
 	public static final PropertyType GUI_EDITOR = new PropertyType("gui.editor");
 	public static final PropertyType GUI_ANALYZER = new PropertyType("gui.analyzer");
+	public static final PropertyType GUI_SIMULATOR = new PropertyType("gui.simulator");
 	public static final PropertyType GUI_DOT = new PropertyType("gui.dot");
 	public static final PropertyType ALGORITHMS = new PropertyType("algorithms");
 	public static final PropertyType ALGORITHMS_SYNC = new PropertyType("algorithms.sync");
@@ -70,6 +72,7 @@ public class PropertyType
 	public static final PropertyType ALGORITHMS_SYNTHESIS = new PropertyType("algorithms.synthesis");
 	public static final PropertyType ALGORITHMS_MINIMIZATION = new PropertyType("algorithms.minimization");
 	public static final PropertyType ALGORITHMS_BDD = new PropertyType("algorithms.bdd");
+	public static final PropertyType ALGORITHMS_HMI = new PropertyType("algorithms.hmi");
 	public static final PropertyType MISC = new PropertyType("misc");
 
 	private String identifier;

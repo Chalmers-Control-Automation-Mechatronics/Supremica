@@ -56,7 +56,7 @@ import org.supremica.automata.MultiArc;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.State;
 import org.supremica.automata.LabeledEvent;
-import org.supremica.properties.SupremicaProperties;
+import org.supremica.properties.Config;
 
 public class AutomatonToDot
 	implements AutomataSerializer
@@ -67,12 +67,12 @@ public class AutomatonToDot
 	private static final int DEFAULT_HEIGHT = 11;
 	private Automaton aut;
 
-	private boolean leftToRight = SupremicaProperties.isDotLeftToRight();
-	private boolean withLabel = SupremicaProperties.isDotWithStateLabels();
-	private boolean withCircles = SupremicaProperties.isDotWithCircles();
-	private boolean useStateColors = SupremicaProperties.isDotUseStateColors();
-	private boolean useArcColors = SupremicaProperties.isDotUseArcColors();
-	private boolean writeEventLabels = SupremicaProperties.isDotWithEventLabels();
+	private boolean leftToRight = Config.DOT_LEFT_TO_RIGHT.isTrue();
+	private boolean withLabel = Config.DOT_WITH_STATE_LABELS.isTrue();
+	private boolean withCircles = Config.DOT_WITH_CIRCLES.isTrue();
+	private boolean useStateColors = Config.DOT_USE_STATE_COLORS.isTrue();
+	private boolean useArcColors = Config.DOT_USE_ARC_COLORS.isTrue();
+	private boolean writeEventLabels = Config.DOT_WITH_EVENT_LABELS.isTrue();
 
 	public AutomatonToDot(Automaton aut)
 	{
@@ -160,7 +160,7 @@ public class AutomatonToDot
 		throws Exception
 	{
 		//aut.normalizeStateIdentities();
-		
+
 		/*
 		EnumerateStates en = new EnumerateStates(aut, "q");
 		en.execute();

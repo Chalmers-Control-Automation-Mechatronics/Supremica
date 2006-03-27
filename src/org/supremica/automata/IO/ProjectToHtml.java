@@ -51,7 +51,7 @@ package org.supremica.automata.IO;
 
 import java.io.*;
 import java.util.*;
-import org.supremica.properties.SupremicaProperties;
+import org.supremica.properties.Config;
 import org.supremica.automata.*;
 import org.supremica.log.*;
 
@@ -77,7 +77,7 @@ public class ProjectToHtml
 			logger.error("ProjectToHtml: You must export to a directory");
 		}
 
-		maxNbrOfStatesInPng = SupremicaProperties.getDotMaxNbrOfStatesWithoutWarning();
+		maxNbrOfStatesInPng = Config.DOT_MAX_NBR_OF_STATES.get();
 	}
 
 	public void serialize()
@@ -253,7 +253,7 @@ public class ProjectToHtml
 
 					try
 					{
-						dotProcess = Runtime.getRuntime().exec(SupremicaProperties.getDotExecuteCommand() + " -Tpng");
+						dotProcess = Runtime.getRuntime().exec(Config.DOT_EXECUTE_COMMAND.get() + " -Tpng");
 					}
 					catch (IOException ex)
 					{
