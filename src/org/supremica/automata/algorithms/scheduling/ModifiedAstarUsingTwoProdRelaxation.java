@@ -16,7 +16,7 @@ public class ModifiedAstarUsingTwoProdRelaxation
 	private static Logger logger = LoggerFactory.createLogger(ModifiedAstarUsingTwoProdRelaxation.class);
 
 	/** Hashtable containing the estimated cost for each combination of two robots **/
-	private Hashtable<Integer, Integer> twoProdRelax = new Hashtable<Integer, Integer>();
+	private Hashtable<Integer, Double> twoProdRelax = new Hashtable<Integer, Double>();
 
 	public ModifiedAstarUsingTwoProdRelaxation(Automata theAutomata, boolean manualExpansion, boolean buildSchedule, ScheduleDialog gui) 
 		throws Exception 
@@ -30,13 +30,13 @@ public class ModifiedAstarUsingTwoProdRelaxation
 	 * cost added to the minimum current cost is returned to be used as an estimate of the 
 	 * total remaining cost of the system. 
 	 * 
-	 * @param int[] node - the current node
-	 * @return int - the heuristic function, h(n), that guides the search, in this case it is the "2-product relaxation"
+	 * @param double[] node - the current node
+	 * @return double - the heuristic function, h(n), that guides the search, in this case it is the "2-product relaxation"
 	 */
-	int getRelaxation(int[] node)
+	double getRelaxation(double[] node)
 		throws Exception
 	{
-		int relaxationValue = -1;
+		double relaxationValue = -1;
 
 		Integer key = getKey(node);
 		Object relaxationObject = twoProdRelax.get(key);
@@ -44,7 +44,7 @@ public class ModifiedAstarUsingTwoProdRelaxation
 		// If the relaxation has already been done once, then return the result
 		if (relaxationObject != null)
 		{
-			relaxationValue = ((Integer)relaxationObject).intValue();
+			relaxationValue = ((Double)relaxationObject).doubleValue();
 		}
 		else
 		{
@@ -92,7 +92,7 @@ public class ModifiedAstarUsingTwoProdRelaxation
 							int initialStateIndex = specAutomaton.getInitialState().getIndex();
 							if (node[k] != initialStateIndex)
 							{
-								for (Iterator<Arc> outgoingArcs = specAutomaton.getStateWithIndex(node[k]).outgoingArcsIterator(); outgoingArcs.hasNext();)
+								for (Iterator<Arc> outgoingArcs = specAutomaton.getStateWithIndex((int)node[k]).outgoingArcsIterator(); outgoingArcs.hasNext();)
 								{
 									LabeledEvent currEvent = outgoingArcs.next().getEvent();
 									if (!activePlantsAlphabet.contains(currEvent))
@@ -138,14 +138,17 @@ public class ModifiedAstarUsingTwoProdRelaxation
 		}
 
 		// Adds the minimal current cost to the relaxation value in order to come close to the optimal value without overshooting
- 		int estimate = Integer.MAX_VALUE;
-		int[] currCosts = expander.getCosts(node);
+ 		double estimate = Double.MAX_VALUE;
+		double[] currCosts = expander.getCosts(node);
 	
-		for (int i=0; i<activeAutomataIndex.length; i++) {
-			int altEstimate = currCosts[i] + relaxationValue;
+		for (int i=0; i<activeAutomataIndex.length; i++) 
+		{
+			double altEstimate = currCosts[i] + relaxationValue;
 	    
 			if (altEstimate < estimate)
+			{
 				estimate = altEstimate;
+			}
 		}
 
 // 		if (key == 636)

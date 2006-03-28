@@ -305,9 +305,9 @@ public class ScheduleDialog
 			else
 			{
 				// Write the results of previous scheduling operation
-				if (sched != null && sched instanceof ModifiedAstar)
+				if (sched != null)
 				{
-					writer.write(((ModifiedAstar)sched).getOutputString());
+					writer.write(sched.getOutputString());
 					writer.newLine();
 					writer.newLine();
 				}

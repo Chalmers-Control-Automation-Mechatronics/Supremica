@@ -56,7 +56,7 @@ public class ModifiedAstar
 	 * The defalut relaxation, used for estimation of the remaining cost. This method is overriden 
 	 * in the subclasses. Is used if no relaxation is chosen (i.e. brute force search).
 	 */
-	int getRelaxation(int[] node)
+	double getRelaxation(double[] node)
 		throws Exception
 	{
 		return 0; 
@@ -68,28 +68,25 @@ public class ModifiedAstar
 	 * If the node is added to the closed tree, its descendants are put on the 
 	 * open tree, according to the estimated remaining cost value.
 	 */
-	protected void branch(int[] currNode) 
+	protected void branch(double[] currNode) 
 	{
 		try 
 		{
 			boolean currNodeIsAddedToClosed = updateClosedTree(currNode);
-			
+
 			if (currNodeIsAddedToClosed)
 			{
 				Iterator childIter = expander.expandNode(currNode, activeAutomataIndex).iterator();
 				while (childIter.hasNext()) 
 				{
-					int[] nextNode = (int[])childIter.next();
-// 					logger.info("nextNode = " + printArray(nextNode));
-					
+					double[] nextNode = (double[])childIter.next();
+										
 					// Calculate the estimate function of the expanded node and store it at the appropriate position
-					nextNode[ESTIMATE_INDEX] = calcEstimatedCost(nextNode);
+					nextNode[ESTIMATE_INDEX] = calcEstimatedCost(nextNode);					
 					
 					openTree.add(nextNode);
 				}
 			}
-// 			else
-// 				logger.info("currNodeIsAddedToClosed");
 		}
 		catch (Exception e)
 		{
@@ -98,26 +95,30 @@ public class ModifiedAstar
 	}
 	
 	/**
-	 * Converts the representation of the initial state to the int[]-representation of a node. 
-	 * int[] node consists of [states.getIndex() AutomataIndexFormHelper-info (-1 0 normally) 
+	 * Converts the representation of the initial state to the double[]-representation of a node. 
+	 * double[] node consists of [states.getIndex() AutomataIndexFormHelper-info (-1 0 normally) 
 	 * parentStates.getIndex() states.getCurrentCost() accumulatedCost estimatedCost]. 
-	 * int[] initialNode is thus [initialStates.getIndex() AutomataIndexFormHelper-info 
+	 * double[] initialNode is thus [initialStates.getIndex() AutomataIndexFormHelper-info 
 	 * null initialStates.getCost() 0 -1].
 	 */
-    protected int[] makeInitialNode()
+    protected double[] makeInitialNode()
 	{
 		int[] initialStates = AutomataIndexFormHelper.createState(theAutomata.size());
-		int[] initialCosts = new int[getActiveLength() + 2];
+		double[] initialCosts = new double[getActiveLength() + 2];
 
 		int nrOfPlants = plantAutomata.size(); 
 	
 		// Initial state indices are stored
 		for (int i=0; i<theAutomata.size(); i++) 
+		{
 			initialStates[i] = theAutomata.getAutomatonAt(i).getInitialState().getIndex();
-	
+		}
+
 		// Initial state costs are stored
 		for (int i=0; i<nrOfPlants; i++) 
+		{
 			initialCosts[i] = plantAutomata.getAutomatonAt(i).getInitialState().getCost();
+		}
 
 		// The initial accumulated cost is zero
 		initialCosts[nrOfPlants] = 0;

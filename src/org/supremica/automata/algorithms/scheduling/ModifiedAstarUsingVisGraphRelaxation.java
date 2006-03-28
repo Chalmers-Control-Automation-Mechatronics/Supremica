@@ -24,10 +24,9 @@ public class ModifiedAstarUsingVisGraphRelaxation
 	/*
 	 * The total cycle times of each robot (when run independently)
 	 */
-	private int[] cycleTimes;
+	private double[] cycleTimes;
 
 	private volatile boolean relaxFromNodes = false;
-
 
 	public ModifiedAstarUsingVisGraphRelaxation(Automata theAutomata, boolean manualExpansion, boolean buildSchedule, ScheduleDialog gui) 
 		throws Exception 
@@ -49,9 +48,9 @@ public class ModifiedAstarUsingVisGraphRelaxation
 	{
 		super.init();
 
-		visGraphRelax = new Hashtable<String, Integer>();
+		visGraphRelax = new Hashtable<String, Double>();
 
-		cycleTimes = new int[plantAutomata.size()];
+		cycleTimes = new double[plantAutomata.size()];
 		for (int i=0; i<cycleTimes.length; i++)
 		{
 			State initState = plantAutomata.getAutomatonAt(i).getInitialState();
@@ -63,16 +62,16 @@ public class ModifiedAstarUsingVisGraphRelaxation
 		outputStr += "\tvisibility graphs calculated in " + timer.elapsedTime() + "ms\n"; 
 	}
 
-	int getRelaxation(int[] node)
+	double getRelaxation(double[] node)
 		throws Exception
 	{
-		int[] effTimePoint = new int[plantAutomata.size()];
+		double[] effTimePoint = new double[plantAutomata.size()];
 		String timePointKey = "";
 
 		// Calculate the visibility graph time coordinate, corresponding to the current node
 		for (int i=0; i<plantAutomata.size(); i++)
 		{
-			int remainingCycleTime = remainingCosts[i][node[activeAutomataIndex[i]]];
+			double remainingCycleTime = remainingCosts[i][(int)node[activeAutomataIndex[i]]];
 			if (!relaxFromNodes)
 			{
 				remainingCycleTime += node[CURRENT_COSTS_INDEX + i];
@@ -82,8 +81,8 @@ public class ModifiedAstarUsingVisGraphRelaxation
 			timePointKey += effTimePoint[i] + "_";
 		}
 
-		int estimatedRemainingCost;
-		Integer previousVisibilityRelaxation = visGraphRelax.get(timePointKey);
+		double estimatedRemainingCost;
+		Double previousVisibilityRelaxation = visGraphRelax.get(timePointKey);
 		if (previousVisibilityRelaxation == null)
 		{
 			double visibilityRelaxation = -1;
@@ -95,8 +94,11 @@ public class ModifiedAstarUsingVisGraphRelaxation
 					String visibilityGraphsKey = plantAutomata.getAutomatonAt(i).getName() + "_" + plantAutomata.getAutomatonAt(j).getName();
 					VisGraphScheduler relaxScheduler = visibilityGraphs.get(visibilityGraphsKey);
 				
+					//Tillf
+					ActionTimer relaxTimer = new ActionTimer();
+					relaxTimer.restart();
+					
 					double currVisibilityRelaxation = relaxScheduler.scheduleFrom(new double[]{effTimePoint[i], effTimePoint[j]});
-
 					try 
 					{
 						while (!relaxScheduler.schedulingDone())
@@ -108,21 +110,25 @@ public class ModifiedAstarUsingVisGraphRelaxation
 					{
 						logger.error("INTERRUPTED_EXCEPTION in AbstractAstar.calcEstimatedCost()...");
 						throw(ex);
-					}
-						
+					}				
+
+					//Tillf
+					scheduleFromTime += relaxTimer.elapsedTime();
+					scheduleFromCounter++;
+					
 					if (visibilityRelaxation < currVisibilityRelaxation)
+					{
 						visibilityRelaxation = currVisibilityRelaxation;
+					}
 				}
 			}
 
-			//Tillf
-			//tillfälligt så här fullt (med avrundningen menar jag)
-			estimatedRemainingCost = (int) Math.round(visibilityRelaxation);
+			estimatedRemainingCost = visibilityRelaxation;
 			visGraphRelax.put(timePointKey, estimatedRemainingCost);
 		}
 		else
 		{
-			estimatedRemainingCost = previousVisibilityRelaxation.intValue();
+			estimatedRemainingCost = previousVisibilityRelaxation.doubleValue();
 		}
 
 	// 	estimatedRemainingCost += node[ACCUMULATED_COST_INDEX];
@@ -130,7 +136,7 @@ public class ModifiedAstarUsingVisGraphRelaxation
 		// If the estimate is done from the next node, the minimal current cost is added
 		if (relaxFromNodes)
 		{
-			int minCurrentCost = Integer.MAX_VALUE;
+			double minCurrentCost = Double.MAX_VALUE;
 			for (int i=0; i<plantAutomata.size(); i++)
 			{
 				if (node[CURRENT_COSTS_INDEX + i] < minCurrentCost)
@@ -143,19 +149,19 @@ public class ModifiedAstarUsingVisGraphRelaxation
 		}
 
 		//Tillf
-		boolean approximation = true;
+		boolean approximation = false;
 		if (approximation)
 		{
-			int xWeight = 3;
-			int yWeight = 1;
-			int depth = 0;
+			double xWeight = 30;
+			double yWeight = 60;
+			double depth = 0;
 			for (int i=0; i<activeAutomataIndex.length; i++)
 			{
-// 				depth += Math.pow(node[activeAutomataIndex[i]], 2);
-				depth += node[activeAutomataIndex[i]];
+				depth += Math.pow(node[activeAutomataIndex[i]], 2);
+// 				depth += node[activeAutomataIndex[i]];
 			}
-// 			depth = (int)Math.round(Math.sqrt(depth));
-			depth = depth / activeAutomataIndex.length;
+			depth = Math.sqrt(depth);
+// 			depth = depth / activeAutomataIndex.length;
 // 		    depth = (int)Math.floor(Math.random() * depth);
 			return estimatedRemainingCost * ( 1 + xWeight / (yWeight + depth));
 		}

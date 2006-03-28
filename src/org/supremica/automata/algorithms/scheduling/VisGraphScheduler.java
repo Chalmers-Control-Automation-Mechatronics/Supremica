@@ -71,6 +71,14 @@ public class VisGraphScheduler
 	 */
 	private volatile boolean schedulingDone = false;
 
+	private double[] optimalTimesFromVertices;
+
+	//MKT tillf
+	public long totalVisCheckTime = 0;
+
+	/** The output string */
+	private String outputStr = "";
+
 	public VisGraphScheduler (Automata theAutomata, boolean toDrawVisibilityGraph, ScheduleDialog gui)
 		throws Exception
 	{
@@ -158,7 +166,7 @@ public class VisGraphScheduler
 		closedTree.clear();
 
 		// Consists of [self_index, parent_index, g-value, f-value]
-		double[] currNode = new double[]{0, -1, 0, vertices.get(0)[robots.size()]};
+ 		double[] currNode = new double[]{0, -1, 0, vertices.get(0)[robots.size()]};
 		openTree.add(currNode);
 
 		while (! openTree.isEmpty())
@@ -172,7 +180,9 @@ public class VisGraphScheduler
 					// If the algorithm was called from the GUI, print the optimal time value there
 					if (!isRelaxationProvider)
 					{
-						logger.info("OPTIMAL SOLUTION.......... " + currNode[G_INDEX] + " in time " + timer.elapsedTime() + "ms");
+						String str = "OPTIMAL SOLUTION.......... " + currNode[G_INDEX] + " in time " + timer.elapsedTime() + "ms";
+						logger.info(str);
+						outputStr += "\t" + str + "\n";
 					}
 
 					closedTree.put(new Double(currNode[SELF_INDEX]), currNode);
@@ -205,7 +215,7 @@ public class VisGraphScheduler
 	 * @param - the time coordinates of the starting point
 	 * @return - the minimal makespan
 	 */
-	public synchronized double scheduleFrom(double[] fromTimes)
+	public synchronized double reallyScheduleFrom(double[] fromTimes)
 		throws Exception
 	{
 		double distanceToGoal = calcDistance(fromTimes, goalTimes);
@@ -215,10 +225,10 @@ public class VisGraphScheduler
 		}
 		
 		// Removes the previous start vertex
-		vertices.remove(0);
+// 		vertices.remove(0);
 		
 		// Initializes the new start vertex
-		double[] newStartVertex = new double[fromTimes.length + 1];
+	 	double[] newStartVertex = new double[fromTimes.length + 1];
 		for (int i=0; i<fromTimes.length; i++)
 		{
 			newStartVertex[i] = fromTimes[i];
@@ -227,7 +237,7 @@ public class VisGraphScheduler
 		
 		// Adds the new start vertex to the vertices-collection
 		vertices.add(0, newStartVertex);
-		
+
 		// ... and off we go... 
 		try
 		{
@@ -237,6 +247,7 @@ public class VisGraphScheduler
 		{
 			if (e.getMessage().equals(ACCEPTING_NODE_NOT_FOUND_EXCEPTION))
 			{
+				vertices.remove(0);
 				return Double.MAX_VALUE;
 			}
 			else
@@ -244,9 +255,69 @@ public class VisGraphScheduler
 				throw e;
 			}
 		}
+
+		vertices.remove(0);
+
+		// The optimal solution is returned 
+		// (when (if) building the schedule automaton, remember that the indices 
+		// of closed states are shifted by 1 due to the removal of the first vertice (above))
+		return closedTree.get(new Double(vertices.size()))[G_INDEX];
+	}
+
+
+// 	/**
+// 	 * This method allows to set the starting point, from which the scheduling is done. 
+// 	 * 
+// 	 * @param - the time coordinates of the starting point
+// 	 * @return - the minimal makespan
+// 	 */
+// 	public synchronized double reallyScheduleFrom(double[] fromTimes)
+// 		throws Exception
+// 	{
+// 		return scheduleFrom(fromTimes);
+// 	}
+
+	/**
+	 * This method allows to set the starting point, from which the scheduling is done. 
+	 * 
+	 * @param - the time coordinates of the starting point
+	 * @return - the minimal makespan
+	 */
+	public synchronized double scheduleFrom(double[] fromTimes)
+		throws Exception
+	{
+		schedulingDone = false;
+
+		double distanceToGoal = calcDistance(fromTimes, goalTimes);
+		if (distanceToGoal == 0)
+		{
+			schedulingDone = true;
+			return 0;
+		}
+
+		double minCostToGoal = Double.MAX_VALUE;
+		//tillf
+		ActionTimer visCheckTimer = new ActionTimer();
+		visCheckTimer.restart();
+		ArrayList<Integer> visibleVerticeIndices = visibilityChecker.getVisibleIndices(fromTimes, vertices);
+// 		//tillf (test)
+// 		ArrayList<Integer> visibleVerticeIndices = new ArrayList<Integer>(vertices.size());
+// 		for (int i=0; i<vertices.size(); i++)
+// 			visibleVerticeIndices.add(i);
+		totalVisCheckTime += visCheckTimer.elapsedTime();
 		
-		// The optimal solution is returned
-		return closedTree.get(new Double(vertices.size() - 1))[G_INDEX];
+		for (int i=0; i<visibleVerticeIndices.size(); i++)
+		{
+			double costToGoal = calcDistance(fromTimes, vertices.get(visibleVerticeIndices.get(i))) + optimalTimesFromVertices[visibleVerticeIndices.get(i)];
+			if (costToGoal < minCostToGoal)
+			{
+				minCostToGoal = costToGoal;
+			}
+		}
+		
+		schedulingDone = true;
+	
+		return minCostToGoal;
 	}
 
 	public void buildScheduleAutomaton()
@@ -358,7 +429,9 @@ public class VisGraphScheduler
 		// If the call came from GUI, print the preprocessing time
 		if (!isRelaxationProvider)
 		{
-			logger.info("Preprocessing in " + timer.elapsedTime() + "ms");
+			String str = "Preprocessing in " + timer.elapsedTime() + "ms";
+			logger.info(str);
+			outputStr += "\t" + str + "\n";
 		}
 		
 		indexMap = new AutomataIndexMap(robots);
@@ -403,6 +476,18 @@ public class VisGraphScheduler
 		// Initializing the A*-lists
 		openTree = new TreeSet<double[]>(new OpenTreeComparator(F_INDEX));
 		closedTree = new TreeMap<Double, double[]>();
+
+		//UnderConstruction
+		ActionTimer preprocessTimer = new ActionTimer();
+		preprocessTimer.restart();
+		optimalTimesFromVertices = new double[vertices.size()];
+		for (int i=0; i<optimalTimesFromVertices.length; i++)
+		{
+			optimalTimesFromVertices[i] = reallyScheduleFrom(vertices.get(i));
+		}
+		String str = "vertice optimization (" + optimalTimesFromVertices.length + " vertices) done in " + preprocessTimer.elapsedTime() + "ms";
+		logger.info(str);
+		outputStr += "\t" + str + "\n";
 
 		isInitialized = true;
 	}
@@ -490,4 +575,29 @@ public class VisGraphScheduler
 	{
 		return schedulingDone;
 	}
+
+	public String getOutputString()
+	{
+		return outputStr;
+	}
+
+	public double[] getOptimalTimesFromVertices()
+	{
+		return optimalTimesFromVertices;
+	}
+
+	//Tillf
+	public String printArray(double[] array) 
+	{
+		String s = "[";
+		
+		for (int i=0; i<array.length-1; i++) 
+		{
+			s += array[i] + " ";
+		}
+		s += array[array.length-1] + "]";
+		
+		return s;
+    }
+
 }

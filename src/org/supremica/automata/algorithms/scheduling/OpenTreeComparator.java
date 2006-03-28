@@ -20,7 +20,9 @@ public class OpenTreeComparator
 	{
 		// If newNode and openNode point to the same location, then they are equal
 		if (newNode == openNode)
+		{
 			return 0;
+		}
 
 		// If newNode and openNode do not point to the same location, but consist of 
 		// identical elements, then they are equal. Otherwise, the new node should be 
@@ -30,7 +32,9 @@ public class OpenTreeComparator
 			for (int i=0; i<newNode.length; i++)
 			{
 				if (newNode[i] != openNode[i])
+				{
 					return -1;
+				}
 			}
 
 			return 0;
@@ -48,17 +52,22 @@ public class OpenTreeComparator
 	{
 		// If newNode and openNode point to the same location, then they are equal
 		if (newNode == openNode)
+		{
 			return 0;
+		}
 
-		// If newNode and openNode do not point to the same location, but consist of 
-		// identical elements, then they are equal. Otherwise, the new node should be 
-		// placed first in the openTree.
+		// If newNode and openNode do not point to the same location, but have the 
+		// same comparison cost and consist of identical elements, then they are equal. 
+		// Otherwise (but still assuming that they have the same cost), the new node is 
+		// placed first.
 		if (newNode[comparatorIndex] == openNode[comparatorIndex])
 		{
 			for (int i=0; i<newNode.length; i++)
 			{
 				if (newNode[i] != openNode[i])
+				{
 					return -1;
+				}
 			}
 
 			return 0;
@@ -73,9 +82,13 @@ public class OpenTreeComparator
 	public int compare(Object a, Object b)
 	{
 		if (a instanceof int[])
+		{
 			return compare((int[]) a, (int[]) b);
+		}
 		else if (a instanceof double[])
+		{
 			return compare((double[]) a, (double[]) b);
+		}
 
 		return 0;
 	}

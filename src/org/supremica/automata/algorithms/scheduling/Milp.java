@@ -69,6 +69,9 @@ public class Milp
 	/** Decides if the schedule should be built */
 	private boolean buildSchedule;
 
+	/** The output string */
+	private String outputStr = "";
+
 	/****************************************************************************************/
 	/*                                 CONSTUCTORS                                          */
 	/****************************************************************************************/
@@ -328,7 +331,9 @@ public class Milp
 			}
 		}
 
-		logger.info("Time to build the schedule: " + timer.elapsedTime() + "ms ");
+		String str = "Time to build the schedule: " + timer.elapsedTime() + "ms "; 
+		logger.info(str);
+		outputStr += "\t" + str;
 
 		synchronized (this)
 		{
@@ -1032,7 +1037,9 @@ public class Milp
 		w.write("end;");
 		w.flush();
 
-		logger.info("Time to set up the optimization problem: " + timer.elapsedTime() + "ms");
+		String str = "Time to set up the optimization problem: " + timer.elapsedTime() + "ms";
+		logger.info(str);
+		outputStr += "\t" + str + "\n";
 	}
 
 	private void processSolutionFile()
@@ -1082,7 +1089,9 @@ public class Milp
 			str = r.readLine();
 		}
 
-		logger.info("OPTIMAL MAKESPAN: " + makespan + ".............................");
+		str = "OPTIMAL MAKESPAN: " + makespan + ".............................";
+		logger.info(str);
+		outputStr += "\t" + str + "\n";
 	}
 
 	private void callMilpSolver()
@@ -1111,9 +1120,18 @@ public class Milp
 			totalMilpEchoStr += milpEchoStr + "\n";
 
 			if (milpEchoStr.contains("INTEGER OPTIMAL SOLUTION FOUND") || milpEchoStr.contains("Time") || milpEchoStr.contains("Memory"))
+			{
 				logger.info(milpEchoStr);
+
+				if (!milpEchoStr.contains("INTEGER OPTIMAL SOLUTION FOUND"))
+				{
+					outputStr += "\t" + milpEchoStr + "\n";
+				}
+			}
 			else if (milpEchoStr.contains("error"))
+			{
 				throw new Exception(totalMilpEchoStr);
+			}
 		}
 	}
 
@@ -1159,5 +1177,10 @@ public class Milp
 	private State makeScheduleState(int[] stateIndices)
 	{
 		return makeScheduleState(stateIndices, false);
+	}
+
+	public String getOutputString()
+	{
+		return outputStr;
 	}
 }

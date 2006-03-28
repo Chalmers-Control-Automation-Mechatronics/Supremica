@@ -33,17 +33,18 @@ public class ModifiedAstarUsingOneProdRelaxation
 	 * This method calculates the remaining cost for each robot/plant. The maximum remaining
 	 * cost is returned to be used as an estimate of the total remaining cost of the system. 
 	 * 
-	 * @param int[] node - the current node
-	 * @return int - the heuristic function, h(n), that guides the search, in this case it is the "1-product relaxation"
+	 * @param double[] node - the current node
+	 * @return double - the heuristic function, h(n), that guides the search, in this case it is the "1-product relaxation"
 	 */
-    int getRelaxation(int[] node) 
+    double getRelaxation(double[] node) 
 		throws Exception
 	{
-		int estimate = 0;
-		int[] currCosts = expander.getCosts(node);
+		double estimate = 0;
+		double[] currCosts = expander.getCosts(node);
 	
-		for (int i=0; i<activeAutomataIndex.length; i++) {
-			int altEstimate = currCosts[i] + remainingCosts[i][node[activeAutomataIndex[i]]]; 
+		for (int i=0; i<activeAutomataIndex.length; i++) 
+		{
+			double altEstimate = currCosts[i] + remainingCosts[i][(int)node[activeAutomataIndex[i]]]; 
 	    
 			if (altEstimate > estimate)
 				estimate = altEstimate;

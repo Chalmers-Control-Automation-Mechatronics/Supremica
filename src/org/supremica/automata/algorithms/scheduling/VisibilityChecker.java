@@ -51,13 +51,17 @@ public class VisibilityChecker {
 		if (goal[0] == start[0] && goal[1] == start[1])
 			return false;
 
-		for (int i=0; i<intersectionEdges.size(); i++) {
-			if (!pointOnTheEdge(intersectionEdges.get(i))) {
+		for (int i=0; i<intersectionEdges.size(); i++) 
+		{
+			if (!pointOnTheEdge(intersectionEdges.get(i))) 
+			{
 				double[] firstVertice = new double[]{intersectionEdges.get(i)[0], intersectionEdges.get(i)[1]};
 				double[] secondVertice = new double[]{intersectionEdges.get(i)[2], intersectionEdges.get(i)[3]};
 				
 				if (intersect(start, goal, firstVertice, secondVertice))
+				{
 					return false;
+				}
 			}
 		}
 

@@ -62,7 +62,7 @@ public class NodeExpander
 		}
     }
 
-    public Collection expandNode(int[] node, int[] activeAutomataIndex) {
+    public Collection expandNode(double[] node, int[] activeAutomataIndex) {
 		if (!manualExpansion) 
 		{
 			return expandNodeWithSupremica(node, activeAutomataIndex);
@@ -98,13 +98,13 @@ public class NodeExpander
 		}
     }
 
-    public Collection expandNodeManually(int[] node, int[] activeAutomataIndex) {
+    public Collection expandNodeManually(double[] node, int[] activeAutomataIndex) {
 		ArrayList children = new ArrayList();
 
 		for (int i=0; i<activeAutomataIndex.length; i++)
 		{
 			int automatonIndex = activeAutomataIndex[i]; 
-			int stateIndex = node[automatonIndex];
+			int stateIndex = (int)node[automatonIndex];
 
 			State st = theAutomata.getAutomatonAt(automatonIndex).getStateWithIndex(stateIndex);
 			Iterator<Arc> arcIt = st.outgoingArcsIterator();
@@ -199,12 +199,12 @@ public class NodeExpander
 	// 	return null;
 	//     }
 
-    public int[] newNode(int[] node, int[] changedIndices, int[] newStateIndices, int newCost) {
+    public double[] newNode(double[] node, int[] changedIndices, int[] newStateIndices, double newCost) {
 		int[] nextStateIndices = new int[theAutomata.size() + AutomataIndexFormHelper.STATE_EXTRA_DATA];
 
 		for (int k=0; k<nextStateIndices.length; k++) 
 		{
-			nextStateIndices[k] = node[k];
+			nextStateIndices[k] = (int)node[k];
 		}
 
 		for (int i=0; i<changedIndices.length; i++)
@@ -212,7 +212,7 @@ public class NodeExpander
 			nextStateIndices[changedIndices[i]] = newStateIndices[i];
 		}
 
-		int[] newCosts = sched.updateCosts(getCosts(node), changedIndices[0], newCost);
+		double[] newCosts = sched.updateCosts(getCosts(node), changedIndices[0], newCost);
 
 		return makeNode(nextStateIndices, makeParentNodeKeys(node), newCosts);
     }
@@ -245,17 +245,21 @@ public class NodeExpander
 		}
     }
 
-    public Collection expandNodeWithSupremica(int[] node, int[] activeAutomataIndex) {
+    public Collection expandNodeWithSupremica(double[] node, int[] activeAutomataIndex) {
         Hashtable childNodes = new Hashtable();
 
 		int[] currStateIndex = AutomataIndexFormHelper.createState(theAutomata.size());
 		for (int i=0; i<currStateIndex.length; i++)
-			currStateIndex[i] = node[i];
-	
+		{
+			currStateIndex[i] = (int)node[i];
+		}
+
 		int[] currOutgoingEvents = onlineSynchronizer.getOutgoingEvents(currStateIndex);
 	
-		for (int i=0; i<currOutgoingEvents.length; i++) {
-			if (onlineSynchronizer.isEnabled(currOutgoingEvents[i])) {
+		for (int i=0; i<currOutgoingEvents.length; i++) 
+		{
+			if (onlineSynchronizer.isEnabled(currOutgoingEvents[i])) 
+			{
 				int[] nextStateIndex = onlineSynchronizer.doTransition(currStateIndex, currOutgoingEvents[i]);
 		
 				int changedIndex = -1;
@@ -268,13 +272,14 @@ public class NodeExpander
 					}
 				}
 		
-				if (changedIndex > -1) { // || activeAutomataIndex.length == plantAutomata.size()) {
+				if (changedIndex > -1) // || activeAutomataIndex.length == plantAutomata.size()) 
+				{
 					Integer currKey = sched.getKey(nextStateIndex);
 		    
 					if (!childNodes.contains(currKey)) 
 					{
-						int newCost = plantAutomata.getAutomatonAt(changedIndex).getStateWithIndex(nextStateIndex[activeAutomataIndex[changedIndex]]).getCost();
-						int[] newCosts = sched.updateCosts(getCosts(node), changedIndex, newCost);
+						double newCost = plantAutomata.getAutomatonAt(changedIndex).getStateWithIndex(nextStateIndex[activeAutomataIndex[changedIndex]]).getCost();
+						double[] newCosts = sched.updateCosts(getCosts(node), changedIndex, newCost);
 			
 						childNodes.put(currKey, makeNode(nextStateIndex, makeParentNodeKeys(node), newCosts));
 					}
@@ -291,9 +296,12 @@ public class NodeExpander
      ***********************************************************************/
 
 	// Ändra detta oxo (ClosedNodes.CLOSED_NODE_INFO...)
-    private int[] makeParentNodeKeys(int[] node) {
+    private int[] makeParentNodeKeys(double [] node) 
+	{
 		if (node == null) 
+		{
 			return new int[]{-1, -1};
+		}
 	
 		int key = sched.getKey(node);
 		
@@ -308,32 +316,41 @@ public class NodeExpander
 	 * with the costs (currentCosts, accumulatedCost and estimatedCost) into an
 	 * int-array that represent the current node.
 	 */
-    public int[] makeNode(int[] stateIndices, int[] parentNodeKeys, int[] costs) {
-		if (parentNodeKeys == null) {
+    public double[] makeNode(int[] stateIndices, int[] parentNodeKeys, double[] costs) {
+		if (parentNodeKeys == null) 
+		{
 			// Ändra detta
 			parentNodeKeys = new int[2]; //new int[ClosedNodes.CLOSED_NODE_INFO_SIZE];
 			for (int i=0; i<parentNodeKeys.length; i++)
+			{
 				parentNodeKeys[i] = -1;
+			}
 		}
 
-		int[] newNode = new int[stateIndices.length + parentNodeKeys.length + costs.length];
+		double[] newNode = new double[stateIndices.length + parentNodeKeys.length + costs.length];
 	
 		for (int i=0; i<stateIndices.length; i++)
+		{
 			newNode[i] = stateIndices[i];
+		}
 
 		for (int i=0; i<parentNodeKeys.length; i++)
+		{
 			newNode[i + stateIndices.length] = parentNodeKeys[i];
+		}
 
 		for (int i=0; i<costs.length; i++)
+		{
 			newNode[i + stateIndices.length + parentNodeKeys.length] = costs[i];
-	
+		}
+
 		return newNode;
     }
 
-    public int[] getCosts(int[] node) {
+    public double[] getCosts(double[] node) {
 		// Ändra detta
 		int startIndex = theAutomata.size() + AutomataIndexFormHelper.STATE_EXTRA_DATA + 2; //ClosedNodes.CLOSED_NODE_INFO_SIZE;
-		int[] costs = new int[node.length - startIndex];
+		double[] costs = new double[node.length - startIndex];
 	
 		for (int i=0; i<costs.length; i++)
 			costs[i] = node[startIndex + i];
