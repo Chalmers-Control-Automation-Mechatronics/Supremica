@@ -52,7 +52,6 @@ package org.supremica.automata.IO;
 import java.io.*;
 import java.util.*;
 import org.supremica.log.*;
-import org.supremica.properties.SupremicaProperties;
 import org.supremica.automata.Arc;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;

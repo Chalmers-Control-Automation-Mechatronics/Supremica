@@ -66,14 +66,13 @@ import javax.xml.bind.*;
 import org.supremica.manufacturingTables.xsd.factory.*;
 import org.supremica.functionblocks.xsd.libraryelement.*;
 import org.supremica.automationobjects.xsd.libraryelement.*;
-import org.supremica.properties.SupremicaProperties;
 
 
 public class XMLCreator
 {
     private JAXBContext jaxbContext;
     private Marshaller marshaller;
-    
+
     public XMLCreator()
     {
 	try
@@ -81,7 +80,7 @@ public class XMLCreator
 		//jaxbContext = JAXBContext.newInstance("org.supremica.functionblocks.xsd.libraryelement");
 		jaxbContext = JAXBContext.newInstance("org.supremica.automationobjects.xsd.libraryelement");
 		marshaller = jaxbContext.createMarshaller();
-		//You can tell the Marshaller to format the resulting XML data with line breaks and indentation. The following statement turns this output format property on -- line breaks and indentation will appear in the output format: 
+		//You can tell the Marshaller to format the resulting XML data with line breaks and indentation. The following statement turns this output format property on -- line breaks and indentation will appear in the output format:
 		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,new Boolean(true));
 	    }
 	catch(JAXBException je)
@@ -89,16 +88,16 @@ public class XMLCreator
 		je.printStackTrace();
 	    }
     }
-    
+
     public void createXMLFile(Object o, String path, String fileName)
     {
 	try
 	    {
 		File file = new File(path, fileName);
 		marshaller.marshal(o,new FileOutputStream(file));
-		
-		//Validation is not performed as part of the marshalling operation. In other words, unlike the case for unmarshalling, there is no setValidating method for marshalling. Instead, when marshalling data, you use the Validator class that is a part of the binding framework to validate a content tree against a schema. For example: 
-		
+
+		//Validation is not performed as part of the marshalling operation. In other words, unlike the case for unmarshalling, there is no setValidating method for marshalling. Instead, when marshalling data, you use the Validator class that is a part of the binding framework to validate a content tree against a schema. For example:
+
 		Validator validator = jaxbContext.createValidator();
 		validator.validate(o);
 	    }

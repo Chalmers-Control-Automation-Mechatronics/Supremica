@@ -62,7 +62,6 @@ import org.supremica.*;
 import org.supremica.automata.algorithms.*;
 import org.supremica.comm.xmlrpc.*;
 import org.supremica.gui.help.*;
-import org.supremica.properties.SupremicaProperties;
 import org.supremica.properties.Config;
 import org.supremica.automata.*;
 import org.supremica.automata.IO.*;

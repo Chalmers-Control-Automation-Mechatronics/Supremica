@@ -20,7 +20,6 @@ import org.supremica.util.IntArrayVector;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.gui.MonitorableThread;
-import org.supremica.properties.SupremicaProperties;
 import org.supremica.properties.Config;
 
 public class SearchStates

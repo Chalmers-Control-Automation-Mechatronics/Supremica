@@ -74,7 +74,6 @@ import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.AutomataListener;
 import org.supremica.gui.VisualProject;
-import org.supremica.properties.SupremicaProperties;
 import org.supremica.properties.Config;
 
 // ----------------------------------------------------------------------------------

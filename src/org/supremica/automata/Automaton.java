@@ -53,7 +53,6 @@ import org.supremica.util.SupremicaException;
 import java.util.*;
 import org.supremica.log.*;
 import org.supremica.util.SupremicaIterator;
-import org.supremica.properties.SupremicaProperties;
 import org.supremica.properties.Config;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 

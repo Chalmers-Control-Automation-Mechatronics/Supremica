@@ -66,14 +66,13 @@ import javax.xml.bind.*;
 import org.supremica.manufacturingTables.xsd.factory.*;
 import org.supremica.functionblocks.xsd.libraryelement.*;
 import org.supremica.functionblocks.xsd.libraryelement.impl.*;
-import org.supremica.properties.SupremicaProperties;
 
 
 public class Loader
 {
     private JAXBContext jaxbContext;
     private Unmarshaller u;
-    
+
 
     public Loader()
     {

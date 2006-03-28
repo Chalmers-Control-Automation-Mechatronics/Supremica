@@ -11,7 +11,6 @@
 package org.supremica.automata;
 
 import java.util.*;
-import org.supremica.properties.SupremicaProperties;
 import org.supremica.properties.Config;
 
 public class StateSet

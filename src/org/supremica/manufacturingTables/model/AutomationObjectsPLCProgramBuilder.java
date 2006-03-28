@@ -67,17 +67,16 @@ import org.supremica.manufacturingTables.xsd.factory.*;
 import org.supremica.manufacturingTables.management.*;
 import org.supremica.automationobjects.xsd.libraryelement.*;
 import org.supremica.functionblocks.xsd.libraryelement.*;
-import org.supremica.properties.SupremicaProperties;
 
 
 public class AutomationObjectsPLCProgramBuilder
 {
-    
+
     // Variable to keep track of the indentation, just for now for printing the XML code
     private int nbrOfBlanks;
     private String blanks;
-    private AOApplication aoApplication; 
-    private org.supremica.automationobjects.xsd.libraryelement.ObjectFactory objFactory; 
+    private AOApplication aoApplication;
+    private org.supremica.automationobjects.xsd.libraryelement.ObjectFactory objFactory;
 
     public AutomationObjectsPLCProgramBuilder()
     {
@@ -86,7 +85,7 @@ public class AutomationObjectsPLCProgramBuilder
     public void buildPLCProgram(FactoryType factory)
     {
 	// Create an Automation Object application using the ObjectFactory
-	objFactory = new org.supremica.automationobjects.xsd.libraryelement.ObjectFactory(); 
+	objFactory = new org.supremica.automationobjects.xsd.libraryelement.ObjectFactory();
 	try
 	    {
 		aoApplication = objFactory.createAOApplication();
@@ -97,20 +96,20 @@ public class AutomationObjectsPLCProgramBuilder
 		je.printStackTrace();
 		return;
 	    }
-	
+
 	// Variable to keep track of the indentation, just for now for printing the XML code
 	nbrOfBlanks = 0;
 	blanks = "                                                                              ";
-	
+
 	// Factory
 	System.err.println(blanks.substring(0,nbrOfBlanks) + "<Factory name=\"" + factory.getName() + "\">");
 	aoApplication.setName("Factory " + factory.getName());
-	
+
 	if(factory.getDescription()!=null)
 	    {
 		System.err.println(blanks.substring(0,nbrOfBlanks) + "<Description>" + factory.getDescription() + "</Description>");
 	    }
-	
+
 	// Areas
 	nbrOfBlanks++;
 	AreasType areas = factory.getAreas();
@@ -140,7 +139,7 @@ public class AutomationObjectsPLCProgramBuilder
 			CellType currentCell = (CellType) cellIter.next();
 			System.err.println(blanks.substring(0,nbrOfBlanks) + "<Cell name=\"" + currentCell.getName() + "\">");
 			nbrOfBlanks++;
-			
+
 			// Description
 			if(currentCell.getDescription()!=null)
 			    {
@@ -155,7 +154,7 @@ public class AutomationObjectsPLCProgramBuilder
 
 			// Machines
 			buildMachines(currentCell.getMachines());
-			
+
 			nbrOfBlanks--;
 			System.err.println(blanks.substring(0,nbrOfBlanks) + "</Cell>");
 		    }
@@ -163,14 +162,14 @@ public class AutomationObjectsPLCProgramBuilder
 		System.err.println(blanks.substring(0,nbrOfBlanks) + "</Cells>");
 		nbrOfBlanks--;
 		System.err.println(blanks.substring(0,nbrOfBlanks) + "</Area>");
-		
+
 	    }
 	nbrOfBlanks--;
 	System.err.println(blanks.substring(0,nbrOfBlanks) + "</Areas>");
 	nbrOfBlanks--;
 	System.err.println(blanks.substring(0,nbrOfBlanks) + "</Factory>");
     }
-    
+
     private void buildMachines(MachinesType machines)
     {
 	System.err.println(blanks.substring(0,nbrOfBlanks) + "<Machines>");
@@ -208,7 +207,7 @@ public class AutomationObjectsPLCProgramBuilder
 		    {
 			// Since there is a class Variable this XML simpletype should be represented by a Variable object,
 			// but it is a String.
-			// In JABX version 2.0 there will be an opportunity to set mapSimpleTypeDef="true" and that will 
+			// In JABX version 2.0 there will be an opportunity to set mapSimpleTypeDef="true" and that will
 			// hopefully sort this out
 			//Variable currentVariable = (Variable) variableIter.next();
 			String currentVariable = (String) variableIter.next();
@@ -218,7 +217,7 @@ public class AutomationObjectsPLCProgramBuilder
 		nbrOfBlanks--;
 		System.err.println(blanks.substring(0,nbrOfBlanks) + "</Variables>");
 	    }
-	
+
 	// Equipment
 	if (machine.getEquipment()!=null)
 	    {
@@ -267,7 +266,7 @@ public class AutomationObjectsPLCProgramBuilder
 	    {
 		// Since there is a class State this XML simpletype should be represented by a State object,
 		// but it is a String.
-		// In JABX version 2.0 there will be an opportunity to set mapSimpleTypeDef="true" and that will 
+		// In JABX version 2.0 there will be an opportunity to set mapSimpleTypeDef="true" and that will
 		// hopefully sort this out
 		//State currentState = (State) stateIter.next();
 		String currentState = (String) stateIter.next();
@@ -282,7 +281,7 @@ public class AutomationObjectsPLCProgramBuilder
 	    {
 		buildElements(equipEnt.getElements());
 	    }
-	
+
 	// Equipment
 	if (equipEnt.getEquipment()!=null)
 	    {
@@ -304,7 +303,7 @@ public class AutomationObjectsPLCProgramBuilder
 			// there is no setAO method in AOApplication but the getAO method returns the actual list
 			aoApplication.getAO().add(currentAO);
 			currentAO.setName(equipEnt.getType() + "_" + equipEnt.getName());
-			
+
 			System.err.println("This is a sensor!");
 			currentAO.setType("Sensor.aot");
 
@@ -343,8 +342,8 @@ public class AutomationObjectsPLCProgramBuilder
 			// there is no setEvent method in EventInputs but the getEvent method returns the actual list
 			//eventInputs.getEvent().add(eventREQ);
 			//interfaceList.setEventInputs(eventInputs);
-			//FB.setInterfaceList(interfaceList);		   
-			
+			//FB.setInterfaceList(interfaceList);
+
 			// The FB needs to have versionInfo
 			//org.supremica.functionblocks.xsd.libraryelement.VersionInfoType versionInfo = objFactory.createVersionInfo();
 			//versionInfo.setOrganization("Chalmers");

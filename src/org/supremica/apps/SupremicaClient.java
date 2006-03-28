@@ -51,7 +51,6 @@ package org.supremica.apps;
 
 import java.util.*;
 import org.apache.xmlrpc.*;
-import org.supremica.properties.SupremicaProperties;
 import org.supremica.properties.Config;
 import org.supremica.log.*;
 
