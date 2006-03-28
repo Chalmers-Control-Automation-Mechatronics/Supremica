@@ -49,7 +49,7 @@
  */
 package org.supremica.automata.algorithms;
 
-import org.supremica.properties.SupremicaProperties;
+import org.supremica.properties.Config;
 import org.supremica.log.*;
 
 public final class SynthesizerOptions
@@ -71,7 +71,7 @@ public final class SynthesizerOptions
 	 */
 	public SynthesizerOptions()
 	{
-		this(SupremicaProperties.synthesisSynthesisType(), SupremicaProperties.synthesisAlgorithmType(), SupremicaProperties.synthesisPurge(), SupremicaProperties.synthesisOptimize(), SupremicaProperties.synthesisMaximallyPermissive(), SupremicaProperties.synthesisMaximallyPermissiveIncremental(), SupremicaProperties.synthesisReduceSupervisors());
+		this(SynthesisType.toType(Config.SYNTHESIS_SYNTHESIS_TYPE.get()), SynthesisAlgorithm.toAlgorithm(Config.SYNTHESIS_ALGORITHM_TYPE.get()), Config.SYNTHESIS_PURGE.get(), Config.SYNTHESIS_OPTIMIZE.get(), Config.SYNTHESIS_MAXIMALLY_PERMISSIVE.get(), Config.SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL.get(), Config.SYNTHESIS_REDUCE_SUPERVISORS.get());
 	}
 
 	/**
@@ -112,7 +112,7 @@ public final class SynthesizerOptions
 
 		if (synthesisAlgorithm == SynthesisAlgorithm.BDD)
 		{
-			if ((synthesisType != SynthesisType.Both) && 
+			if ((synthesisType != SynthesisType.Both) &&
 				(synthesisType != SynthesisType.Controllable) &&
 				(synthesisType != SynthesisType.Nonblocking))
 			{
@@ -226,14 +226,14 @@ public final class SynthesizerOptions
 	 */
 	public void saveOptions()
 	{
-		SupremicaProperties.setSynthesisMaximallyPermissiveIncremental(maximallyPermissiveIncremental);
-		SupremicaProperties.setSynthesisReduceSupervisors(reduceSupervisors);
-		SupremicaProperties.setSynthesisSynthesisType(synthesisType);
-		SupremicaProperties.setSynthesisAlgorithmType(synthesisAlgorithm);
-		SupremicaProperties.setSynthesisPurge(purge);
-		SupremicaProperties.setSynthesisOptimize(optimize);
-		SupremicaProperties.setSynthesisMaximallyPermissive(maximallyPermissive);
-		SupremicaProperties.setSynthesisMaximallyPermissiveIncremental(maximallyPermissiveIncremental);
+		Config.SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL.set(maximallyPermissiveIncremental);
+		Config.SYNTHESIS_REDUCE_SUPERVISORS.set(reduceSupervisors);
+		Config.SYNTHESIS_SYNTHESIS_TYPE.set(synthesisType.toString());
+		Config.SYNTHESIS_ALGORITHM_TYPE.set(synthesisAlgorithm.toString());
+		Config.SYNTHESIS_PURGE.set(purge);
+		Config.SYNTHESIS_OPTIMIZE.set(optimize);
+		Config.SYNTHESIS_MAXIMALLY_PERMISSIVE.set(maximallyPermissive);
+		Config.SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL.set(maximallyPermissiveIncremental);
 	}
 
 	/**

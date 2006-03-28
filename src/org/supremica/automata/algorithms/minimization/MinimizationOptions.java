@@ -49,7 +49,7 @@
  */
 package org.supremica.automata.algorithms.minimization;
 
-import org.supremica.properties.SupremicaProperties;
+import org.supremica.properties.Config;
 import org.supremica.log.*;
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.algorithms.EquivalenceRelation;
@@ -118,12 +118,12 @@ public final class MinimizationOptions
 	 */
 	public MinimizationOptions()
 	{
-		this(SupremicaProperties.minimizationMinimizationType(),
-			 SupremicaProperties.minimizationAlsoTransitions(),
-			 SupremicaProperties.minimizationKeepOriginal(),
-			 SupremicaProperties.minimizationIgnoreMarking(),
-			 SupremicaProperties.minimizationStrategy(),
-			 SupremicaProperties.minimizationHeuristic());
+		this(EquivalenceRelation.toType(Config.MINIMIZATION_EQUIVALENCE_RELATION.get()),
+			 Config.MINIMIZATION_ALSO_MINIMIZE_TRANSITIONS.get(),
+			 Config.MINIMIZATION_KEEP_ORIGINAL.get(),
+			 Config.MINIMIZATION_IGNORE_MARKING.get(),
+			 MinimizationStrategy.toStrategy(Config.MINIMIZATION_STRATEGY.get()),
+			 MinimizationHeuristic.toHeuristic(Config.MINIMIZATION_HEURISTIC.get()));
 	}
 
 	/**
@@ -192,8 +192,8 @@ public final class MinimizationOptions
 			return message;
 		}
 
-		if (minimizationStrategy != MinimizationStrategy.AtLeastOneLocal && 
-			(minimizationHeuristic == MinimizationHeuristic.FewestAutomata || 
+		if (minimizationStrategy != MinimizationStrategy.AtLeastOneLocal &&
+			(minimizationHeuristic == MinimizationHeuristic.FewestAutomata ||
 			 minimizationHeuristic == MinimizationHeuristic.MostAutomata))
 		{
 			String message = "Inapropriate choice of minimization heuristic.";
@@ -331,12 +331,12 @@ public final class MinimizationOptions
 	 */
 	public void saveOptions()
 	{
-		SupremicaProperties.setMinimizationMinimizationType(equivalenceRelation);
-		SupremicaProperties.setMinimizationAlsoTransitions(alsoTransitions);
-		SupremicaProperties.setMinimizationKeepOriginal(keepOriginal);
-		SupremicaProperties.setMinimizationIgnoreMarking(ignoreMarking);
-		SupremicaProperties.setMinimizationStrategy(minimizationStrategy);
-		SupremicaProperties.setMinimizationHeuristic(minimizationHeuristic);
+		Config.MINIMIZATION_EQUIVALENCE_RELATION.set(equivalenceRelation.toString());
+		Config.MINIMIZATION_ALSO_MINIMIZE_TRANSITIONS.set(alsoTransitions);
+		Config.MINIMIZATION_KEEP_ORIGINAL.set(keepOriginal);
+		Config.MINIMIZATION_IGNORE_MARKING.set(ignoreMarking);
+		Config.MINIMIZATION_STRATEGY.set(minimizationStrategy.toString());
+		Config.MINIMIZATION_HEURISTIC.set(minimizationHeuristic.toString());
 	}
 
 	/**
