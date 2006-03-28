@@ -50,6 +50,7 @@ package org.supremica.properties;
 
 import java.util.*;
 import java.io.*;
+import org.supremica.util.BDD.Options;
 
 /**
  * Properties for Supremica.
@@ -114,6 +115,8 @@ public final class SupremicaNewProperties
 				}
 			}
 		}
+		updateBDDOptions(false);
+
 	}
 
 
@@ -195,6 +198,8 @@ public final class SupremicaNewProperties
 	public void saveProperties(String filename, boolean saveAll)
 		throws IOException
 	{
+		updateBDDOptions(true);    // first sync from BDD options
+
 		OutputStream os = new FileOutputStream(filename);
 		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "8859_1"));
 
@@ -216,6 +221,83 @@ public final class SupremicaNewProperties
 		os.close();
 	}
 
+
+
+	/*
+	 * The problem is that we got two copies of BDD Options.
+	 * This will make sure they are both updated
+	 *
+	 * TO DO: Rewrite the Option code in the BDD Package to
+	 * support Supremica style option handling.
+	 */
+	public static void updateBDDOptions(boolean from_Options)
+	{
+		if (from_Options)
+		{
+			// Options -> Properties
+			Config.BDD_ALGORITHM.set(Options.algo_family);
+			Config.BDD_SHOW_GROW.set(Options.show_grow);
+			Config.BDD_SIZE_WATCH.set(Options.size_watch);
+			Config.BDD_ALTER_PCG.set(Options.user_alters_PCG);
+			Config.BDD_DEBUG_ON.set(Options.debug_on);
+			Config.BDD_PROFILE_ON.set(Options.profile_on);
+			Config.BDD_UC_OPTIMISTIC.set(Options.uc_optimistic);
+			Config.BDD_NB_OPTIMISTIC.set(Options.nb_optimistic);
+			Config.BDD_LOCAL_SATURATION.set(Options.local_saturation);
+			Config.BDD_TRACE_ON.set(Options.trace_on);
+			Config.BDD_COUNT_ALGO.set(Options.count_algo);
+			Config.BDD_LI_ALGO.set(Options.inclsuion_algorithm);
+			Config.BDD_ORDER_ALGO.set(Options.ordering_algorithm);
+			Config.BDD_ORDERING_FORCE_COST.set(Options.ordering_force_cost);
+			Config.BDD_AS_HEURISTIC.set(Options.as_heuristics);
+			Config.BDD_FRONTIER_TYPE.set(Options.frontier_strategy);
+			Config.BDD_H1.set(Options.es_heuristics);
+			Config.BDD_H2.set(Options.ndas_heuristics);
+			Config.BDD_DSSI_HEURISTIC.set(Options.dssi_heuristics);
+			Config.BDD_PARTITION_MAX.set(Options.max_partition_size);
+			Config.BDD_ENCODING_ALGO.set(Options.encoding_algorithm);
+			Config.BDD_LIB_PATH.set(Options.extraLibPath);
+			Config.BDD_SUP_REACHABILITY.set(Options.sup_reachability_type);
+			Config.BDD_DISJ_OPTIMIZER_ALGO.set(Options.disj_optimizer_algo);
+			Config.BDD_TRANSITION_OPTIMIZER_ALGO.set(Options.transition_optimizer_algo);
+			Config.BDD_INTERLEAVED_VARIABLES.set(Options.interleaved_variables);
+			Config.BDD_LEVEL_GRAPHS.set(Options.show_level_graph);
+
+		}
+		else
+		{
+			// Properties -> Options
+			Options.algo_family = Config.BDD_ALGORITHM.get();
+			Options.show_grow = Config.BDD_SHOW_GROW.get();
+			Options.size_watch = Config.BDD_SIZE_WATCH.get();
+			Options.user_alters_PCG = Config.BDD_ALTER_PCG.get();
+			Options.debug_on = Config.BDD_DEBUG_ON.get();
+			Options.uc_optimistic = Config.BDD_UC_OPTIMISTIC.get();
+			Options.nb_optimistic = Config.BDD_NB_OPTIMISTIC.get();
+			Options.local_saturation = Config.BDD_LOCAL_SATURATION.get();
+			Options.trace_on = Config.BDD_TRACE_ON.get();
+			Options.profile_on = Config.BDD_PROFILE_ON.get();
+			Options.count_algo = Config.BDD_COUNT_ALGO.get();
+			Options.inclsuion_algorithm = Config.BDD_LI_ALGO.get();
+			Options.ordering_algorithm = Config.BDD_ORDER_ALGO.get();
+			Options.ordering_force_cost = Config.BDD_ORDERING_FORCE_COST.get();
+			Options.as_heuristics = Config.BDD_AS_HEURISTIC.get();
+			Options.frontier_strategy = Config.BDD_FRONTIER_TYPE.get();
+			Options.es_heuristics = Config.BDD_H1.get();
+			Options.ndas_heuristics = Config.BDD_H2.get();
+			Options.dssi_heuristics = Config.BDD_DSSI_HEURISTIC.get();
+			Options.max_partition_size = Config.BDD_PARTITION_MAX.get();
+			Options.encoding_algorithm = Config.BDD_ENCODING_ALGO.get();
+			Options.extraLibPath = Config.BDD_LIB_PATH.get();
+			Options.sup_reachability_type = Config.BDD_SUP_REACHABILITY.get();
+			Options.disj_optimizer_algo = Config.BDD_DISJ_OPTIMIZER_ALGO.get();
+			Options.transition_optimizer_algo = Config.BDD_TRANSITION_OPTIMIZER_ALGO.get();
+			Options.interleaved_variables = Config.BDD_INTERLEAVED_VARIABLES.get();
+			Options.show_level_graph = Config.BDD_LEVEL_GRAPHS.get();
+		}
+	}
+
+
 	private static SupremicaNewProperties supremicaProperties;
 	private static Config config = Config.instance;
 	private String lastPropertyFile = null;
@@ -223,6 +305,7 @@ public final class SupremicaNewProperties
 	static
 	{
 		supremicaProperties = new SupremicaNewProperties();
+		updateBDDOptions(false);
 	}
 
 
