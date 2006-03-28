@@ -27,14 +27,15 @@ public class VisibilityChecker {
      * This method returns true if the points (a, b, c) are ordered clockwise.
      * This is useful in intersection detection.  
      */
-    private boolean clockwisePts(double[] a, double[] b, double[] c) {
-	double leftSide = (c[1]-a[1])*(b[0]-a[0]);
-	double rightSide = (b[1]-a[1])*(c[0]-a[0]);
+    private boolean clockwisePts(double[] a, double[] b, double[] c) 
+	{
+		double leftSide = (c[1]-a[1])*(b[0]-a[0]);
+		double rightSide = (b[1]-a[1])*(c[0]-a[0]);
+		
+		if (leftSide < rightSide)
+			return true;
 
-	if (leftSide < rightSide)
-	    return true;
-
-	return false;
+		return false;
     }
 
     /**
@@ -98,13 +99,18 @@ public class VisibilityChecker {
     /**
      * Returns true if the two edges ab and cd intersect. 
      */
-    private boolean intersect(double[] a, double[] b, double[] c, double[] d) {
-	if (clockwisePts(a, c, d) == clockwisePts(b, c, d))
-	    return false;
-	else if (clockwisePts(a, b, c) == clockwisePts(a, b, d))
-	    return false;
+    private boolean intersect(double[] a, double[] b, double[] c, double[] d) 
+	{
+		if (clockwisePts(a, c, d) == clockwisePts(b, c, d))
+		{
+			return false;
+		}
+		else if (clockwisePts(a, b, c) == clockwisePts(a, b, d))
+		{
+			return false;
+		}
 	
-	return true;
+		return true;
     }
 
     /**

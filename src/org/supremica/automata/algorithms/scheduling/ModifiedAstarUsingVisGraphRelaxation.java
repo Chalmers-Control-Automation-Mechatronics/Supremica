@@ -136,7 +136,7 @@ public class ModifiedAstarUsingVisGraphRelaxation
 		// If the estimate is done from the next node, the minimal current cost is added
 		if (relaxFromNodes)
 		{
-			double minCurrentCost = Double.MAX_VALUE;
+			double minCurrentCost = 500; //Double.MAX_VALUE;
 			for (int i=0; i<plantAutomata.size(); i++)
 			{
 				if (node[CURRENT_COSTS_INDEX + i] < minCurrentCost)
@@ -153,7 +153,7 @@ public class ModifiedAstarUsingVisGraphRelaxation
 		if (approximation)
 		{
 			double xWeight = 30;
-			double yWeight = 60;
+			double yWeight = 40;
 			double depth = 0;
 			for (int i=0; i<activeAutomataIndex.length; i++)
 			{

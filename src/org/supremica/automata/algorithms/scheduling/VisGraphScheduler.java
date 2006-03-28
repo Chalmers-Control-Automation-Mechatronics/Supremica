@@ -295,15 +295,15 @@ public class VisGraphScheduler
 			return 0;
 		}
 
-		double minCostToGoal = Double.MAX_VALUE;
+		double minCostToGoal = 500; //Double.MAX_VALUE;
 		//tillf
 		ActionTimer visCheckTimer = new ActionTimer();
 		visCheckTimer.restart();
-		ArrayList<Integer> visibleVerticeIndices = visibilityChecker.getVisibleIndices(fromTimes, vertices);
-// 		//tillf (test)
-// 		ArrayList<Integer> visibleVerticeIndices = new ArrayList<Integer>(vertices.size());
-// 		for (int i=0; i<vertices.size(); i++)
-// 			visibleVerticeIndices.add(i);
+// 		ArrayList<Integer> visibleVerticeIndices = visibilityChecker.getVisibleIndices(fromTimes, vertices);
+		//tillf (test)
+		ArrayList<Integer> visibleVerticeIndices = new ArrayList<Integer>(vertices.size());
+		for (int i=0; i<vertices.size(); i++)
+			visibleVerticeIndices.add(i);
 		totalVisCheckTime += visCheckTimer.elapsedTime();
 		
 		for (int i=0; i<visibleVerticeIndices.size(); i++)
@@ -311,7 +311,10 @@ public class VisGraphScheduler
 			double costToGoal = calcDistance(fromTimes, vertices.get(visibleVerticeIndices.get(i))) + optimalTimesFromVertices[visibleVerticeIndices.get(i)];
 			if (costToGoal < minCostToGoal)
 			{
-				minCostToGoal = costToGoal;
+				visibilityChecker.setStart(fromTimes);
+				visibilityChecker.setGoal(vertices.get(visibleVerticeIndices.get(i)));
+				if (visibilityChecker.isVisible())
+					minCostToGoal = costToGoal;
 			}
 		}
 		
@@ -478,16 +481,19 @@ public class VisGraphScheduler
 		closedTree = new TreeMap<Double, double[]>();
 
 		//UnderConstruction
-		ActionTimer preprocessTimer = new ActionTimer();
-		preprocessTimer.restart();
-		optimalTimesFromVertices = new double[vertices.size()];
-		for (int i=0; i<optimalTimesFromVertices.length; i++)
+		if (isRelaxationProvider)
 		{
-			optimalTimesFromVertices[i] = reallyScheduleFrom(vertices.get(i));
+			ActionTimer preprocessTimer = new ActionTimer();
+			preprocessTimer.restart();
+			optimalTimesFromVertices = new double[vertices.size()];
+			for (int i=0; i<optimalTimesFromVertices.length; i++)
+			{
+				optimalTimesFromVertices[i] = reallyScheduleFrom(vertices.get(i));
+			}
+			String str = "vertice optimization (" + optimalTimesFromVertices.length + " vertices) done in " + preprocessTimer.elapsedTime() + "ms";
+			logger.info(str);
+			outputStr += "\t" + str + "\n";
 		}
-		String str = "vertice optimization (" + optimalTimesFromVertices.length + " vertices) done in " + preprocessTimer.elapsedTime() + "ms";
-		logger.info(str);
-		outputStr += "\t" + str + "\n";
 
 		isInitialized = true;
 	}

@@ -850,22 +850,24 @@ public abstract class AbstractAstar
  		double[] parent = getParent(node);
 	
  		double fNode = node[ACCUMULATED_COST_INDEX] + getRelaxation(node);
-//  		double fParent = parent[ACCUMULATED_COST_INDEX] + getRelaxation(parent);
+  		double fParent = parent[ESTIMATE_INDEX]; //parent[ACCUMULATED_COST_INDEX] + getRelaxation(parent);
 	
  		// The following code inside the if-loop is needed to ensure consistency of the heuristic
-//  		if (fParent > fNode)
-// 		{
-// 			//logger.warn("Consistency ensurance");
-//  			return fParent;
-// 		}
-//  		else
-// 		{			
-//  			return fNode;
-// 		}
+ 		if (fParent > fNode)
+		{
+			//logger.warn("Consistency ensurance");
+			logger.info("(P) node = " + printArray(node) + "; estimation = " + fParent);
+ 			return fParent;
+		}
+ 		else
+		{			
+			logger.info("node = " + printArray(node) + "; estimation = " + fNode);
+ 			return fNode;
+		}
 
 // 		logger.info("node = " + printArray(node) + "; estimation = " + fNode);
 
-		return fNode;
+// 		return fNode;
 	}
 
 	/*
