@@ -9,7 +9,6 @@ package org.supremica.gui;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import org.supremica.properties.SupremicaProperties;
 import org.supremica.properties.Config;
 import org.supremica.gui.useractions.*;
 import org.supremica.util.VPopupMenu;
@@ -110,7 +109,7 @@ class MainPopupMenu
 		JMenuItem synthesizeItem = new SupremicaMenuItem(ActionMan.synthesizeAction);
 		synthesizeItem.setToolTipText("Synthesize supervisor");
 
-		if (SupremicaProperties.getStudentVersion())
+		if (Config.GENERAL_STUDENT_VERSION.isTrue())
 		{
 			verifyItem.setToolTipText("Verification is disabled--use the Workbench!");
 			synthesizeItem.setToolTipText("Synthesis is disabled--use the Workbench!");
@@ -215,7 +214,7 @@ class MainPopupMenu
 		});
 		*/
 
-		if (SupremicaProperties.includeBoundedUnconTools())
+		if (Config.INCLUDE_BOUNDED_UNCON_TOOLS.isTrue())
 		{
 			JMenuItem extendItem = new JMenuItem("Extend");
 			menuHandler.add(extendItem, 1);

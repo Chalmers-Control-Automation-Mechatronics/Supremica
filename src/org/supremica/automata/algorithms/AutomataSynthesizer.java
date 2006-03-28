@@ -54,7 +54,7 @@ import org.supremica.log.*;
 import org.supremica.gui.*;
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.minimization.*;
-import org.supremica.properties.SupremicaProperties;
+import org.supremica.properties.Config;
 
 // This one is used for doMonolithic to return two values
 class MonolithicReturnValue
@@ -145,7 +145,7 @@ public class AutomataSynthesizer
 				return new Automata();
 			}
 
-			result.addAutomaton(retval.automaton); 
+			result.addAutomaton(retval.automaton);
 		}
 		else if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.Monolithic)
 		{
@@ -157,7 +157,7 @@ public class AutomataSynthesizer
 				return new Automata();
 			}
 
-			result.addAutomaton(retval.automaton); 
+			result.addAutomaton(retval.automaton);
 		}
 		else if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.Modular)
 		{
@@ -168,13 +168,13 @@ public class AutomataSynthesizer
 			{
 				// Modular (controllability) synthesis
 				Automata newSupervisors = doModular(theAutomata);
-				
+
 				if (stopRequested)
 				{
 					return new Automata();
 				}
-				
-				result.addAutomata(newSupervisors); 
+
+				result.addAutomata(newSupervisors);
 			}
 			else if ((type == SynthesisType.Nonblocking) ||
 					 (type == SynthesisType.Both))
@@ -210,10 +210,10 @@ public class AutomataSynthesizer
 				min.setName(null);
 
 				// Present result
-				if (SupremicaProperties.verboseMode() && (min.nbrOfStates() < 1000))
+				if (Config.VERBOSE_MODE.isTrue() && (min.nbrOfStates() < 1000))
 				{
 					// This may not be true if more advanced simplification rules have been used!
-					logger.info("The states that are reachable in the maximally permissive, " 
+					logger.info("The states that are reachable in the maximally permissive, "
 								+ "controllable and nonblocking supervisor are: " + min.getStateSet() + ".");
 				}
 				result.addAutomaton(min);

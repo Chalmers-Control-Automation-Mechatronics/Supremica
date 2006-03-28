@@ -53,15 +53,15 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import org.supremica.automata.TestPackageAutomata;
 import org.supremica.util.TestPackageUtil;
-import org.supremica.properties.SupremicaProperties;
+import org.supremica.properties.Config;
 
 public class TestPackageSupremica
 	extends TestCase
 {
 	static
 	{
-		SupremicaProperties.setLogToConsole(true);
-		SupremicaProperties.setLogToGUI(false);
+		Config.LOG_TO_CONSOLE.set(true);
+		Config.LOG_TO_GUI.set(false);
 	}
 
 	public TestPackageSupremica(String name)

@@ -65,8 +65,7 @@ import org.supremica.automata.Automata;
 import org.supremica.automata.AutomatonType;
 import org.supremica.automata.CompositeState;
 import org.supremica.automata.LabeledEvent;
-import org.supremica.properties.SupremicaProperties;
-//import EDU.oswego.cs.dl.util.concurrent.Rendezvous;
+import org.supremica.properties.Config;
 
 /**
  * Performs all kinds of synchronization tasks, for synchronization, verification and synthesis.
@@ -616,7 +615,7 @@ public final class AutomataSynchronizerExecuter
 			if (insertionIndex == 0)
 			{
 				// Found no corresponding transitions in the suspect automaton...
-				if (SupremicaProperties.verboseMode())
+				if (Config.VERBOSE_MODE.isTrue())
 				{
 					logger.debug("The suspect automaton has no corresponding transitions, wandering aimlessly...");
 				}
@@ -631,7 +630,7 @@ public final class AutomataSynchronizerExecuter
 
 				// There are transitions in the suspect automaton...
 				// /*
-				if (SupremicaProperties.verboseMode())
+				if (Config.VERBOSE_MODE.isTrue())
 				{
 					logger.debug("Following transitions in the suspect automaton. There are " + insertionIndex + " such transitions...");
 				}

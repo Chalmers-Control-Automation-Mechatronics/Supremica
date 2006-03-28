@@ -42,7 +42,7 @@
  */
 package org.supremica.gui.fbruntime;
 
-import org.supremica.properties.SupremicaProperties;
+import org.supremica.properties.Config;
 import org.supremica.log.*;
 
 import java.awt.*;
@@ -56,8 +56,8 @@ public class MainFrame extends JFrame {
 
 	static
 	{
-		SupremicaProperties.setLogToConsole(false);
-		SupremicaProperties.setLogToGUI(true);
+		Config.LOG_TO_CONSOLE.set(false);
+		Config.LOG_TO_GUI.set(true);
 	}
 
 	private Logger logger = LoggerFactory.createLogger(MainFrame.class);
@@ -79,7 +79,7 @@ public class MainFrame extends JFrame {
 		setExtendedState(JFrame.MAXIMIZED_BOTH);
 		logger.info("Blah");
     }
-    
+
     /** This method is called from within the constructor to
      * initialize the form.
      */
@@ -101,14 +101,14 @@ public class MainFrame extends JFrame {
         theMenuBar.add(fileMenu);
         setJMenuBar(theMenuBar);
 
-		
+
 		// ToolBar
         theToolBar = new JToolBar();
         newButton = new JButton();
         newButton.setText("New");
         theToolBar.add(newButton);
         getContentPane().add(theToolBar, BorderLayout.NORTH);
-		
+
 
 		// StatusLine
         //statusLine = new JTextPane();
@@ -117,7 +117,7 @@ public class MainFrame extends JFrame {
         //statusLine.setText("Status Bar");
         //getContentPane().add(statusLine, BorderLayout.SOUTH);
 
-		
+
 		// Split Panes
 		horizontalSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		verticalSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
@@ -127,11 +127,11 @@ public class MainFrame extends JFrame {
 
         pack();
     }
-    
+
 
     public static void main(String args[])
 	{
 		new MainFrame();
     }
-	
+
 }

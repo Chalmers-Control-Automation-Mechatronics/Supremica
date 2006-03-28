@@ -55,8 +55,8 @@ import org.supremica.properties.*;
 public class LoggerFactory
 {
 	private static LoggerFilter filter = new LoggerFilter();
-	private static boolean logToGui = SupremicaProperties.logToGUI();
-	private static boolean logToConsole = SupremicaProperties.logToConsole();
+	private static boolean logToGui = Config.LOG_TO_GUI.get();
+	private static boolean logToConsole = Config.LOG_TO_CONSOLE.get();
 	private static final PatternLayout layout = new PatternLayout("%-5p %m%n");
 	private static ConsoleAppender consoleAppender = null;
 
@@ -112,7 +112,7 @@ public class LoggerFactory
 
 	public synchronized static void updateLoggers()
 	{
-		logToGui = SupremicaProperties.logToGUI();
-		logToConsole = SupremicaProperties.logToConsole();
+		logToGui = Config.LOG_TO_GUI.get();
+		logToConsole = Config.LOG_TO_CONSOLE.get();
 	}
 }

@@ -49,7 +49,7 @@
  */
 package org.supremica.automata.algorithms;
 
-import org.supremica.properties.SupremicaProperties;
+import org.supremica.properties.Config;
 import org.supremica.automata.Automata;
 
 public final class VerificationOptions
@@ -73,7 +73,7 @@ public final class VerificationOptions
 	 */
 	public VerificationOptions()
 	{
-		this(SupremicaProperties.verifyVerificationType(), SupremicaProperties.verifyAlgorithmType(), SupremicaProperties.verifyExclusionStateLimit(), SupremicaProperties.verifyReachabilityStateLimit(), SupremicaProperties.verifyOneEventAtATime(), SupremicaProperties.verifySkipUncontrollabilityCheck(), SupremicaProperties.verifyNbrOfAttempts(), SupremicaProperties.verifyShowBadTrace());
+		this(VerificationType.toType(Config.VERIFY_VERIFICATION_TYPE.get()), VerificationAlgorithm.toAlgorithm(Config.VERIFY_ALGORITHM_TYPE.get()), Config.VERIFY_EXCLUSION_STATE_LIMIT.get(), Config.VERIFY_REACHABILITY_STATE_LIMIT.get(), Config.VERIFY_ONE_EVENT_AT_A_TIME.get(), Config.VERIFY_SKIP_UNCONTROLLABILITY_CHECK.get(), Config.VERIFY_NBR_OF_ATTEMPTS.get(), Config.VERIFY_SHOW_BAD_TRACE.get());
 	}
 
 	/**
@@ -195,18 +195,18 @@ public final class VerificationOptions
 	}
 
 	/**
-	 * Stores the current set of options in SupremicaProperties.
+	 * Stores the current set of options in Config.
 	 */
 	public void saveOptions()
 	{
-		SupremicaProperties.setVerifyVerificationType(verificationType);
-		SupremicaProperties.setVerifyAlgorithmType(algorithmType);
-		SupremicaProperties.setVerifyExclusionStateLimit(exclusionStateLimit);
-		SupremicaProperties.setVerifyReachabilityStateLimit(reachabilityStateLimit);
-		SupremicaProperties.setVerifyOneEventAtATime(oneEventAtATime);
-		SupremicaProperties.setVerifySkipUncontrollabilityCheck(skipUncontrollabilityCheck);
-		SupremicaProperties.setVerifyNbrOfAttempts(nbrOfAttempts);
-		SupremicaProperties.setVerifyShowBadTrace(showBadTrace);
+		Config.VERIFY_VERIFICATION_TYPE.set(verificationType.toString());
+		Config.VERIFY_ALGORITHM_TYPE.set(algorithmType.toString());
+		Config.VERIFY_EXCLUSION_STATE_LIMIT.set(exclusionStateLimit);
+		Config.VERIFY_REACHABILITY_STATE_LIMIT.set(reachabilityStateLimit);
+		Config.VERIFY_ONE_EVENT_AT_A_TIME.set(oneEventAtATime);
+		Config.VERIFY_SKIP_UNCONTROLLABILITY_CHECK.set(skipUncontrollabilityCheck);
+		Config.VERIFY_NBR_OF_ATTEMPTS.set(nbrOfAttempts);
+		Config.VERIFY_SHOW_BAD_TRACE.set(showBadTrace);
 	}
 
 	/**

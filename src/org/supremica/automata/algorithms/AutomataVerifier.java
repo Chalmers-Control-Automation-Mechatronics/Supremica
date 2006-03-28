@@ -67,7 +67,7 @@ import org.supremica.automata.algorithms.minimization.MinimizationHeuristic;
 import org.supremica.automata.algorithms.minimization.AutomataMinimizer;
 import org.supremica.automata.algorithms.standard.Determinizer;
 import org.supremica.util.BDD.*;
-import org.supremica.properties.SupremicaProperties;
+import org.supremica.properties.Config;
 
 /**
  * For performing verification. Uses AutomataSynchronizerExecuter for the actual verification work.
@@ -629,7 +629,7 @@ public class AutomataVerifier
 		// The name of the "synchronized" automata
 		StringBuffer automataNames = new StringBuffer();
 
-		if (SupremicaProperties.verboseMode())
+		if (Config.VERBOSE_MODE.isTrue())
 		{
 			// For printing the names of the automata in selectedAutomata
 			for (Iterator autIt = selectedAutomata.iterator();
@@ -658,7 +658,7 @@ public class AutomataVerifier
 				automataIndices[i++] = autIt.next().getIndex();
 			}
 
-			if (SupremicaProperties.verboseMode())
+			if (Config.VERBOSE_MODE.isTrue())
 			{
 				String states;
 				int size = potentiallyUncontrollableStates.size(automataIndices);
@@ -686,7 +686,7 @@ public class AutomataVerifier
 				// This never happens?
 
 				// There are no similar automata, this module must be uncontrollable
-				if (SupremicaProperties.verboseMode())
+				if (Config.VERBOSE_MODE.isTrue())
 				{
 					// Print the uncontrollable state(s)...
 					synchHelper.printUncontrollableStates(automataIndices);
@@ -695,7 +695,7 @@ public class AutomataVerifier
 				return false;
 			}
 
-			if (SupremicaProperties.verboseMode())
+			if (Config.VERBOSE_MODE.isTrue())
 			{
 				logger.info("There are " + similarAutomata.length + " automata with similar alphabets...");
 			}
@@ -716,7 +716,7 @@ public class AutomataVerifier
 					if (moreSimilarAutomata != null)
 					{
 						int[] newSimilarAutomata = new int[similarAutomata.length + moreSimilarAutomata.length];
-						if (SupremicaProperties.verboseMode())
+						if (Config.VERBOSE_MODE.isTrue())
 						{
 							logger.info("All similar automata are already added, trying to add some more...");
 						}
@@ -728,12 +728,12 @@ public class AutomataVerifier
 					}
 					else
 					{
-						if (SupremicaProperties.verboseMode())
+						if (Config.VERBOSE_MODE.isTrue())
 						{
 							logger.info("All similar automata are already added, " +
 										"no chance for controllability.");
 
-							// CAN'T BE DONE... TRACE NOT REMEMBERED... 							
+							// CAN'T BE DONE... TRACE NOT REMEMBERED...
 							/*
 							// Print the uncontrollable state(s)...
 							synchHelper.printUncontrollableStates();
@@ -741,7 +741,7 @@ public class AutomataVerifier
 							// Print event trace reaching uncontrollable state
 							if (verificationOptions.showBadTrace())
 							{
-								synchHelper.displayTrace();  
+								synchHelper.displayTrace();
 							}
 							*/
 						}
@@ -771,7 +771,7 @@ public class AutomataVerifier
 						if (findUncontrollableStates(automataIndices))
 						{
 							// Uncontrollable state found!
-							if (SupremicaProperties.verboseMode() || verificationOptions.showBadTrace())
+							if (Config.VERBOSE_MODE.isTrue() || verificationOptions.showBadTrace())
 							{    // Print the uncontrollable state(s)...
 								uncontrollabilityCheckHelper.printUncontrollableStates();
 							}
@@ -802,7 +802,7 @@ public class AutomataVerifier
 				// controllable or uncontrollable. We now have no idea what so ever on the
 				// controllability so... we chicken out and give up.
 				// Print remaining suspected uncontrollable state(s)
-				if (SupremicaProperties.verboseMode())
+				if (Config.VERBOSE_MODE.isTrue())
 				{
 					logger.info("Unfortunately the following states might be uncontrollable...");
 					synchHelper.printUncontrollableStates(automataIndices);
@@ -1102,7 +1102,7 @@ public class AutomataVerifier
 
 				// Print result
 				int statesLeft = potentiallyUncontrollableStates.size(automataIndices);
-				if (SupremicaProperties.verboseMode())
+				if (Config.VERBOSE_MODE.isTrue())
 				{
 					String message = "";
 
@@ -1169,7 +1169,7 @@ public class AutomataVerifier
 
 			uncontrollabilityCheckHelper = new AutomataSynchronizerHelper(synchHelper);
 
-			if (SupremicaProperties.verboseMode())
+			if (Config.VERBOSE_MODE.isTrue())
 			{
 				// It's important that setRememberTrace occurs before initialize()!
 				uncontrollabilityCheckHelper.setRememberTrace(true);
@@ -1214,7 +1214,7 @@ public class AutomataVerifier
 		 * onlineSynchronizer.selectAutomata(automataIndices);
 		 * onlineSynchronizer.initialize();
 		 *
-		 * if (SupremicaProperties.verboseMode())
+		 * if (Config.VERBOSE_MODE.isTrue())
 		 * {       // It's important that setRememberTrace occurs before addState!
 		 * synchHelper.setRememberTrace(true);
 		 * }
@@ -1657,7 +1657,7 @@ public class AutomataVerifier
 		{
 			// JUNK
 			message = "";
-			
+
 			// Minimizer
 		 	AutomataMinimizer minimizer = new AutomataMinimizer(theAutomata);
 			threadToStop = minimizer;
@@ -1668,7 +1668,7 @@ public class AutomataVerifier
 
 			// Minimize!
 			result = minimizer.getCompositionalMinimization(minimizationOptions);
-			
+
 			// Something went wrong?
 			if (result == null)
 			{
@@ -1692,7 +1692,7 @@ public class AutomataVerifier
 		{
 			return false;
 		}
-		
+
 		// Examine the result and return the verdict!
 		return moduleIsNonblocking(result, true);
 	}
@@ -1787,7 +1787,7 @@ public class AutomataVerifier
 		}
 
 		// Present result (if in verbose mode)
-		if (SupremicaProperties.verboseMode())
+		if (Config.VERBOSE_MODE.isTrue())
 		{
 			// Show all blocking states? They can be many!
 			stateIterator = aut.stateIterator();
@@ -1795,7 +1795,7 @@ public class AutomataVerifier
 			{
 				currState = (State) stateIterator.next();
 				logger.info("Blocking state: " + currState.getName());
-				
+
 				// If we did a copy of theAutomata before we destroyed it we could display the trace...
 				if (!destructive && verificationOptions.showBadTrace())
 				{

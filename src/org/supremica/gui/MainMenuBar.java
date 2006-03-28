@@ -82,7 +82,6 @@ import javax.swing.*;
 import java.util.*;
 import javax.help.*;
 import org.supremica.gui.help.ContentHelp;
-import org.supremica.properties.SupremicaProperties;
 import org.supremica.properties.Config;
 import org.supremica.automata.templates.TemplateItem;
 import org.supremica.automata.templates.TemplateGroup;
@@ -444,7 +443,7 @@ public class MainMenuBar
 		}
 	    });
 
-	if (SupremicaProperties.includeUserInterface())
+	if (Config.INCLUDE_USERINTERFACE.isTrue())
 	{
 
 	    // Project.UserInterface
@@ -476,7 +475,7 @@ public class MainMenuBar
 	    menuProject.addSeparator();
 	}
 
-	if (SupremicaProperties.includeAnimator())
+	if (Config.INCLUDE_ANIMATOR.isTrue())
 	{
 	    // Project.Animator
 	    JMenuItem menuProjectAnimator = new JMenuItem();
@@ -547,7 +546,7 @@ public class MainMenuBar
 	    });
 
 	// Tools.Animations
-	if (SupremicaProperties.includeAnimator())
+	if (Config.INCLUDE_ANIMATOR.isTrue())
 	{
 	    JMenu menuToolsAnimations = new JMenu();
 
@@ -578,7 +577,7 @@ public class MainMenuBar
 
 
 	// Tools.ShoeFactory
-	if (SupremicaProperties.includeShoeFactory())
+	if (Config.INCLUDE_SHOE_FACTORY.isTrue())
 	{
 	    menuTools.add(new JSeparator());
 
@@ -618,7 +617,7 @@ public class MainMenuBar
 	}
 
 	// Tools.JGrafchart
-	if (SupremicaProperties.includeJGrafchart())
+	if (Config.INCLUDE_JGRAFCHART.isTrue())
 	{
 	    menuTools.add(new JSeparator());
 
@@ -825,7 +824,7 @@ public class MainMenuBar
 	    });
 
 	// Tools.SoftPLC
-	if (SupremicaProperties.includeSoftPLC())
+	if (Config.INCLUDE_SOFTPLC.isTrue())
 	{
 
 	    // Tools.RunSimulation

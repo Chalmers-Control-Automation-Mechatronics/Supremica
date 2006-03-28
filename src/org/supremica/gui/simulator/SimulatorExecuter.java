@@ -119,7 +119,7 @@ public class SimulatorExecuter
 
 		SynchronizationOptions syncOptions = SynchronizationOptions.getDefaultVerificationOptions();
 
-		//SynchronizationOptions syncOptions = new SynchronizationOptions(SupremicaProperties.syncNbrOfExecuters(), SynchronizationType.Prioritized, SupremicaProperties.syncInitialHashtableSize(), SupremicaProperties.syncExpandHashtable(), SupremicaProperties.syncForbidUncontrollableStates(), SupremicaProperties.syncExpandForbiddenStates(), false, false, false, SupremicaProperties.verboseMode(), false, true, false);
+		//SynchronizationOptions syncOptions = new SynchronizationOptions(SupremicaProperties.syncNbrOfExecuters(), SynchronizationType.Prioritized, SupremicaProperties.syncInitialHashtableSize(), SupremicaProperties.syncExpandHashtable(), SupremicaProperties.syncForbidUncontrollableStates(), SupremicaProperties.syncExpandForbiddenStates(), false, false, false, Config.VERBOSE_MODE.isTrue(), false, true, false);
 		helper = new AutomataSynchronizerHelper(theProject, syncOptions);
 
 		// Build the initial state

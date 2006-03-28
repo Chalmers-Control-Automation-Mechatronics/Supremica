@@ -53,15 +53,14 @@ import org.supremica.log.*;
 import org.supremica.*;
 import org.supremica.comm.xmlrpc.*;
 import org.supremica.gui.VisualProjectContainer;
-import org.supremica.properties.SupremicaProperties;
 import org.supremica.properties.Config;
 
 public class SupremicaServer
 {
 	static
 	{
-		SupremicaProperties.setLogToConsole(true);
-		SupremicaProperties.setLogToGUI(false);
+		Config.LOG_TO_CONSOLE.set(true);
+		Config.LOG_TO_GUI.set(false);
 	}
 
 	private static Logger logger = LoggerFactory.createLogger(SupremicaServer.class);

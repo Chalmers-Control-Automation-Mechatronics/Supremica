@@ -51,7 +51,7 @@ package org.supremica.apps;
 
 import java.awt.*;
 import org.supremica.log.*;
-import org.supremica.properties.SupremicaProperties;
+import org.supremica.properties.Config;
 import org.supremica.gui.*;
 
 // import org.jgrafchart.*;
@@ -59,8 +59,8 @@ public class SupremicaWithGui
 {
 	static
 	{
-		SupremicaProperties.setLogToConsole(false);
-		SupremicaProperties.setLogToGUI(true);
+		Config.LOG_TO_CONSOLE.set(false);
+		Config.LOG_TO_GUI.set(true);
 	}
 
 	private SupremicaWithGui() {}

@@ -8,7 +8,6 @@ package org.supremica.gui;
 
 import java.awt.*;
 import javax.swing.*;
-import org.supremica.properties.SupremicaProperties;
 import org.supremica.properties.Config;
 import org.supremica.gui.useractions.*;
 
@@ -69,7 +68,7 @@ public class MainToolBar
 		add(moveAutomataToBottomAction);
 		addSeparator();
 
-		if (SupremicaProperties.includeJGrafchart())
+		if (Config.INCLUDE_JGRAFCHART.isTrue())
 		{
 			add(ActionMan.openJGrafchartAction);
 			add(ActionMan.updateFromJGrafchartAction);

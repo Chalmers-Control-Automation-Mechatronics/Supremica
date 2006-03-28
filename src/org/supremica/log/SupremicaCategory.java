@@ -50,7 +50,7 @@
 package org.supremica.log;
 
 import org.apache.log4j.*;
-import org.supremica.properties.SupremicaProperties;
+import org.supremica.properties.Config;
 import java.io.StringWriter;
 import java.io.PrintWriter;
 
@@ -170,7 +170,7 @@ public final class SupremicaCategory
 	 */
 	public void verbose(Object message)
 	{
-		if (SupremicaProperties.verboseMode())
+		if (Config.VERBOSE_MODE.isTrue())
 		{
 			info(message);
 		}

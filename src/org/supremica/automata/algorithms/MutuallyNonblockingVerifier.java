@@ -53,7 +53,7 @@ import java.util.*;
 import org.supremica.gui.*;
 import org.supremica.log.*;
 import org.supremica.automata.*;
-import org.supremica.properties.SupremicaProperties;
+import org.supremica.properties.Config;
 
 public class MutuallyNonblockingVerifier
 	implements Stoppable
@@ -1056,7 +1056,7 @@ public class MutuallyNonblockingVerifier
 
 			if (isSafe)
 			{
-				if (SupremicaProperties.verboseMode())
+				if (Config.VERBOSE_MODE.isTrue())
 				{
 					logger.debug("The event " + currEvent + " is safe.");
 				}
@@ -1073,7 +1073,7 @@ public class MutuallyNonblockingVerifier
 			}
 			else
 			{
-				if (SupremicaProperties.verboseMode())
+				if (Config.VERBOSE_MODE.isTrue())
 				{
 					logger.debug("The event " + currEvent + " is unsafe.");
 				}
@@ -1303,7 +1303,7 @@ public class MutuallyNonblockingVerifier
 		{
 			State currState = stateIt.next();
 
-			assert(false); // The names are used below to identify composed names... see **** 
+			assert(false); // The names are used below to identify composed names... see ****
 			//currState.setName(count++ + "_");
 		}
 	}
