@@ -165,11 +165,12 @@ public final class SupremicaNewProperties
 		}
 	}
 
-	public void saveProperties()
+	public static void saveProperties()
 		throws IOException
 	{
-		saveProperties(false);
+		supremicaProperties.saveProperties(false);
 	}
+
 
 	public void saveProperties(boolean saveAll)
 		throws IOException

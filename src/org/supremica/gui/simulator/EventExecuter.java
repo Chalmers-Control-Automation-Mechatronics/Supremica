@@ -2,7 +2,7 @@ package org.supremica.gui.simulator;
 
 import javax.swing.event.ListDataEvent;
 import org.supremica.automata.LabeledEvent;
-import org.supremica.properties.SupremicaProperties;
+import org.supremica.properties.Config;
 import org.supremica.log.*;
 
 /**
@@ -31,7 +31,7 @@ class EventExecuter
 		this.theExecuter = theExecuter;
 
 //              eventModel.addListDataListener(this);
-		sleepTime = SupremicaProperties.getSimulationCycleTime();
+		sleepTime = Config.SIMULATION_CYCLE_TIME.get();
 
 		System.out.println("sleepTime = " + sleepTime);    // DEBUG
 	}

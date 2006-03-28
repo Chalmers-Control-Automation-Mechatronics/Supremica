@@ -4,7 +4,7 @@ import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
 import java.util.*;
-import org.supremica.properties.SupremicaProperties;
+import org.supremica.properties.Config;
 
 public class SoftplcSimulationDialog
 	extends JDialog
@@ -12,7 +12,7 @@ public class SoftplcSimulationDialog
 	private static final long serialVersionUID = 1L;
 	private boolean ok = false;
 	private JComboBox interfaces;
-	private Vector interfacesVector;
+	private Vector interfacesVector = new Vector();
 
 	public SoftplcSimulationDialog(Frame frame, String title, boolean modal)
 	{
@@ -28,7 +28,7 @@ public class SoftplcSimulationDialog
 		JButton simulateButton = new JButton("Simulate");
 		JLabel tempLabel = new JLabel(" ");
 
-		interfacesVector = SupremicaProperties.getSoftplcInterfaces();
+		interfacesVector.add(Config.SOFTPLC_INTERFACES.get()); // TO DO - Divide string into multiple entries - they are separated by colon
 		interfaces = new JComboBox(interfacesVector);
 
 		try

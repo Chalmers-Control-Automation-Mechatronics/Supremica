@@ -54,8 +54,8 @@ import java.awt.event.*;
 import java.io.*;
 import javax.swing.*;
 import java.util.*;
-import org.supremica.properties.SupremicaProperties;
 import org.supremica.properties.Config;
+import org.supremica.properties.SupremicaNewProperties;
 import org.supremica.util.BDD.Options;    // Arash
 
 public class PreferencesDialog
@@ -177,7 +177,7 @@ public class PreferencesDialog
 		{
 			try
 			{
-				SupremicaProperties.saveProperties();    // write back the changes to the config file too!!
+				SupremicaNewProperties.saveProperties();    // write back the changes to the config file too!!
 			}
 			catch (IOException exx)
 			{
@@ -783,7 +783,8 @@ class SoftPLCPanel
 		JButton addButton = new JButton("Add");
 		JScrollPane interfaceScrollPane = new JScrollPane();
 
-		interfaces = SupremicaProperties.getSoftplcInterfaces();
+		String interfaceString = Config.SOFTPLC_INTERFACES.get();
+		interfaces.add(interfaceString);
 		ioInterfaceList = new JList(interfaces);
 
 		contentPane.setLayout(gridBagLayout1);
@@ -841,15 +842,23 @@ class SoftPLCPanel
 	{
 		int cycleTimeInt = PreferencesDialog.getInt("Cycle time", cycleTime.getText());
 
-		SupremicaProperties.setSoftplcCycleTime(cycleTimeInt);
-		SupremicaProperties.setSoftplcInterfaces(interfaces);
+		Config.SOFTPLC_CYCLE_TIME.set(cycleTimeInt);
+		StringBuffer sb = new StringBuffer();
+		for (Iterator it = interfaces.iterator(); it.hasNext(); )
+		{
+			String currInterface = (String)it.next();
+			sb.append(currInterface);
+			if (it.hasNext())
+				sb.append(":");
+		}
+		Config.SOFTPLC_INTERFACES.set(sb.toString());
 
 		return true;
 	}
 
 	public void update()
 	{
-		cycleTime.setText(Integer.toString(SupremicaProperties.getSoftplcCycleTime()));
+		cycleTime.setText(Integer.toString(Config.SOFTPLC_CYCLE_TIME.get()));
 		ioInterfaceList.updateUI();
 	}
 }
@@ -1240,13 +1249,13 @@ class SimulationPanel
 
 		propertiesBox.add(jp);
 		jp.add(new JLabel("Simulation cycle time (lower bound)"));
-		jp.add(cycleTime = new JTextField("" + SupremicaProperties.getSimulationCycleTime(), 10));
+		jp.add(cycleTime = new JTextField("" + Config.SIMULATION_CYCLE_TIME.get(), 10));
 		jp.add(new JLabel("[ms]"));
 	}
 
 	public boolean doApply()
 	{
-		SupremicaProperties.setSimulationIsExternal(useExternal.isSelected());
+		Config.SIMULATION_IS_EXTERNAL.set(useExternal.isSelected());
 
 		int time = PreferencesDialog.getInt("Simulation cycle time", cycleTime.getText(), 0);
 
@@ -1255,15 +1264,15 @@ class SimulationPanel
 			return false;
 		}
 
-		SupremicaProperties.setSimulationCycleTime(time);
+		Config.SIMULATION_CYCLE_TIME.set(time);
 
 		return true;
 	}
 
 	public void update()
 	{
-		useExternal.setSelected(SupremicaProperties.getSimulationIsExternal());
-		cycleTime.setText("" + SupremicaProperties.getSimulationCycleTime());
+		useExternal.setSelected(Config.SIMULATION_IS_EXTERNAL.get());
+		cycleTime.setText("" + Config.SIMULATION_CYCLE_TIME.get());
 	}
 }
 

@@ -562,58 +562,6 @@ public final class SupremicaProperties
 	}
 
 
-	// Simulation
-	public static boolean getSimulationIsExternal()
-	{
-		return toBoolean(wp.getProperty(SIMULATION_IS_EXTERNAL));
-	}
-	public static void setSimulationIsExternal(boolean a)
-	{
-		wp.setProperty(SIMULATION_IS_EXTERNAL, toString(a));
-	}
-	public static int getSimulationCycleTime()
-	{
-		return toInt(wp.getProperty(SIMULATION_CYCLE_TIME));
-	}
-	public static void setSimulationCycleTime(int a)
-	{
-		wp.setProperty(SIMULATION_CYCLE_TIME, toString(a));
-	}
-
-	// Other (I think)
-	public static boolean includeAnimator()
-	{
-		return toBoolean(wp.getProperty(INCLUDE_ANIMATOR));
-	}
-	public static void setIncludeAnimator(boolean includeAnimator)
-	{
-		wp.setProperty(INCLUDE_ANIMATOR, toString(includeAnimator));
-	}
-	public static boolean includeUserInterface()
-	{
-		return toBoolean(wp.getProperty(INCLUDE_USERINTERFACE));
-	}
-	public static void setIncludeUserInterface(boolean includeUserInterface)
-	{
-		wp.setProperty(INCLUDE_USERINTERFACE, toString(includeUserInterface));
-	}
-	public static int getSoftplcCycleTime()
-	{
-		return toInt(wp.getProperty(SOFTPLC_CYCLE_TIME));
-	}
-	public static void setSoftplcCycleTime(int cycleTime)
-	{
-		wp.setProperty(SOFTPLC_CYCLE_TIME, toString(cycleTime));
-	}
-	public static Vector getSoftplcInterfaces()
-	{
-		return softplcInterfaces;
-	}
-	public static void setSoftplcInterfaces(Vector interfaces)
-	{
-		softplcInterfaces = interfaces;
-	}
-
 	// BDD
 
 	/*
