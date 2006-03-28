@@ -56,10 +56,10 @@ import org.supremica.util.BDD.Options;
  * Properties for Supremica.
  * All properties are added in the Config class.
  **/
-public final class SupremicaNewProperties
+public final class SupremicaProperties
 	implements Iterable<Property>
 {
-	private SupremicaNewProperties()
+	private SupremicaProperties()
 	{
 	}
 
@@ -86,7 +86,7 @@ public final class SupremicaNewProperties
 	 * Looks for "-p propertyFile" option, and loads it if it exists.
 	 * Looks also for developer/user options
 	 */
-	public void loadProperties(String[] args)
+	private void internalLoadProperties(String[] args)
 	{
 		for (int i = 0; i < args.length; i++)
 		{
@@ -166,6 +166,11 @@ public final class SupremicaNewProperties
 				}
 			}
 		}
+	}
+
+	public static void loadProperties(String[] args)
+	{
+		supremicaProperties.internalLoadProperties(args);
 	}
 
 	public static void saveProperties()
@@ -298,13 +303,13 @@ public final class SupremicaNewProperties
 	}
 
 
-	private static SupremicaNewProperties supremicaProperties;
+	private static SupremicaProperties supremicaProperties;
 	private static Config config = Config.instance;
 	private String lastPropertyFile = null;
 
 	static
 	{
-		supremicaProperties = new SupremicaNewProperties();
+		supremicaProperties = new SupremicaProperties();
 		updateBDDOptions(false);
 	}
 

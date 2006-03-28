@@ -55,6 +55,7 @@ import java.awt.*;
 import javax.swing.*;
 import java.util.*;
 import java.io.*;
+import org.supremica.properties.SupremicaProperties;
 import org.supremica.properties.Config;
 import org.supremica.automata.templates.*;
 import org.supremica.automata.algorithms.*;

@@ -55,7 +55,7 @@ import java.io.*;
 import javax.swing.*;
 import java.util.*;
 import org.supremica.properties.Config;
-import org.supremica.properties.SupremicaNewProperties;
+import org.supremica.properties.SupremicaProperties;
 import org.supremica.util.BDD.Options;    // Arash
 
 public class PreferencesDialog
@@ -177,7 +177,7 @@ public class PreferencesDialog
 		{
 			try
 			{
-				SupremicaNewProperties.saveProperties();    // write back the changes to the config file too!!
+				SupremicaProperties.saveProperties();    // write back the changes to the config file too!!
 			}
 			catch (IOException exx)
 			{

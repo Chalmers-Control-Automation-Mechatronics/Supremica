@@ -17,6 +17,7 @@ import org.supremica.gui.Utility;
 import org.supremica.gui.InterfaceManager;
 import org.supremica.gui.ide.actions.Actions;
 import org.supremica.properties.Config;
+import org.supremica.properties.SupremicaProperties;
 import org.supremica.log.*;
 import org.supremica.Version;
 
