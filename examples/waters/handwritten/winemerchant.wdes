@@ -10,7 +10,7 @@
 <Event Kind="PROPOSITION" Name="omega"/>
 </EventList>
 <AutomataList>
-<Automaton Kind="PLANT" Name="WineMerchant">
+<Automaton Kind="PLANT" Name="The Wine Merchants Problem - divide 8 units of wine into 4+4 units using (ungraded) bottles of 3, 5 and 8 units respectively">
 <EventRefList>
 <EventRef Name="e12"/>
 <EventRef Name="e13"/>
