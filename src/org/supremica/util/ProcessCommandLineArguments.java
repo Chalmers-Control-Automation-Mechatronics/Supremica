@@ -47,24 +47,67 @@
  *
  * Supremica is owned and represented by KA.
  */
-package org.supremica.apps;
+package org.supremica.util;
 
 import org.supremica.properties.SupremicaProperties;
-import org.supremica.properties.Config;
 
 import java.lang.Exception;
+import java.io.*;
 
-public class Supremica
+public class ProcessCommandLineArguments
 {
-	static
+	public static void process(String[] args)
 	{
-		Config.XML_RPC_ACTIVE.set(false);
-		Config.DOT_USE.set(true);
+		for (int i = 0; i < args.length; i++)
+		{
+			if (args[i].equals("-h") || args[i].equals("-?") || args[i].equals("--help") || args[i].equals("--usage"))
+			{
+				ProcessCommandLineArguments.printUsage();
+			}
+			else if (args[i].equals("-p") || args[i].equals("--properties"))
+			{
+				if (i + 1 < args.length)
+				{
+					String fileName = args[i + 1];
+					i++;
+					File propFile = new File(fileName);
+
+					try
+					{
+						if (!propFile.exists())
+						{
+							System.err.println("Properties file not found: " + propFile.getAbsolutePath());
+							System.err.println("Creating empty properties file: " + propFile.getAbsolutePath());
+							propFile.createNewFile();
+						}
+
+						SupremicaProperties.loadProperties(propFile);
+					}
+					catch (Exception e)
+					{
+						System.err.println("Error reading properties file: " + propFile.getAbsolutePath());
+					}
+				}
+			}
+			else if (args[i].equals("-l") || args[i].equals("--list"))
+			{
+				System.out.println(SupremicaProperties.getProperties());
+			}
+			else
+			{
+				System.out.println("Invalid usage.");
+				ProcessCommandLineArguments.printUsage();
+			}
+		}
 	}
 
-	public static void main(String[] args)
+	private static void printUsage()
 	{
-		org.supremica.util.ProcessCommandLineArguments.process(args);
-		SupremicaWithGui.startSupremica();
+		System.out.println("Supremica: " + org.supremica.Version.version());
+		System.out.println("More information about Supremica is available at www.supremica.org\n");
+		System.out.println("Usage: Supremica [OPTION]\n");
+		System.out.println("Property options: \n  -p, --properties FILE\t Load properties from FILE");
+		System.out.println("List: \n  -l FILE, --list\t List properties with current values");
+		System.out.println("Help options: \n  -?, -h, --help --usage\t show this help message");
 	}
 }

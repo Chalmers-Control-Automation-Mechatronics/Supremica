@@ -1,6 +1,7 @@
 
 package org.supremica.gui.ide;
 
+import org.supremica.util.ProcessCommandLineArguments;
 import org.supremica.gui.ide.actions.IDEAction;
 import org.supremica.gui.ide.actions.IDEActionInterface;
 import net.sourceforge.waters.gui.EditorWindowInterface;
@@ -271,7 +272,7 @@ public class IDE
 
 	public static void main(String args[])
 	{
-		SupremicaProperties.loadProperties(args);
+		ProcessCommandLineArguments.process(args);
 
 		IDE ide = new IDE();
 		ide.setVisible(true);

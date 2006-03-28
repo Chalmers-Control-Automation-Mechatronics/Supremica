@@ -57,19 +57,18 @@ import org.supremica.util.BDD.Options;
  * All properties are added in the Config class.
  **/
 public final class SupremicaProperties
-	implements Iterable<Property>
 {
 	private SupremicaProperties()
 	{
 	}
 
-	public Iterator<Property> iterator()
+	public static Iterator<Property> iterator()
 	{
 		return Property.iterator();
 	}
 
 
-	public String toString()
+	public static String getProperties()
 	{
 		StringBuffer sb = new StringBuffer();
 		for (Iterator<Property> it = iterator(); it.hasNext(); )
@@ -82,61 +81,16 @@ public final class SupremicaProperties
 
 	}
 
-	/**
-	 * Looks for "-p propertyFile" option, and loads it if it exists.
-	 * Looks also for developer/user options
-	 */
-	private void internalLoadProperties(String[] args)
-	{
-		for (int i = 0; i < args.length; i++)
-		{
-			if (args[i].equals("-p") || args[i].equals("--properties"))
-			{
-				if (i + 1 < args.length)
-				{
-					String fileName = args[i + 1];
-					File propFile = new File(fileName);
-
-					try
-					{
-						if (!propFile.exists())
-						{
-							System.err.println("Properties file not found: " + propFile.getAbsolutePath());
-							System.err.println("Creating empty properties file: " + propFile.getAbsolutePath());
-							propFile.createNewFile();
-						}
-
-						updateProperties(propFile);
-					}
-					catch (Exception e)
-					{
-						System.err.println("Error reading properties file: " + propFile.getAbsolutePath());
-					}
-				}
-			}
-		}
-		updateBDDOptions(false);
-
-	}
-
-
-	private Properties buildProperties(File theFile)
+	public static void loadProperties(File theFile)
 		throws FileNotFoundException, IOException
 	{
-		FileInputStream theStream = new FileInputStream(theFile);
-		return buildProperties(new BufferedInputStream(theStream));
+		propertyFile = theFile;
+		updateProperties(propertyFile);
 	}
 
-	private Properties buildProperties(InputStream inStream)
-		throws IOException
-	{
-		Properties newProperties = new Properties();
-		newProperties.load(inStream);
-		return newProperties;
-	}
-
-	public void updateProperties(File propertyFile)
+	private static void updateProperties(File propertyFile)
 		throws FileNotFoundException, IOException
+
 	{
 		Properties propertiesFromFile = buildProperties(propertyFile);
 		for (Enumeration e = propertiesFromFile.keys(); e.hasMoreElements(); )
@@ -166,26 +120,23 @@ public final class SupremicaProperties
 				}
 			}
 		}
-	}
+		updateBDDOptions(false);
 
-	public static void loadProperties(String[] args)
-	{
-		supremicaProperties.internalLoadProperties(args);
 	}
 
 	public static void saveProperties()
-		throws IOException
+		throws FileNotFoundException, IOException
 	{
 		supremicaProperties.saveProperties(false);
 	}
 
 
-	public void saveProperties(boolean saveAll)
-		throws IOException
+	public static void saveProperties(boolean saveAll)
+		throws FileNotFoundException, IOException
 	{
-		if (lastPropertyFile != null)
+		if (propertyFile != null)
 		{
-			saveProperties(lastPropertyFile, saveAll);
+			saveProperties(propertyFile, saveAll);
 		}
 		else
 		{
@@ -200,21 +151,20 @@ public final class SupremicaProperties
 	 * @param saveAll if this is true all mutable properties are saved to file
 	 * otherwise only those properties that values different from the default value is saved.
 	 */
-	public void saveProperties(String filename, boolean saveAll)
-		throws IOException
+	private static void saveProperties(File propertyFile, boolean saveAll)
+		throws FileNotFoundException, IOException
 	{
 		updateBDDOptions(true);    // first sync from BDD options
 
-		OutputStream os = new FileOutputStream(filename);
+		OutputStream os = new FileOutputStream(propertyFile);
 		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "8859_1"));
 
-		writer.write("# Supremica configuration file");
-		writer.newLine();
-		writer.write("#" + new Date().toString());
-		writer.newLine();
+		writer.write("# Supremica configuration file\n");
+		writer.write("# Created: " + new Date().toString() + "\n\n");
 
-		for (Property currProperty : this)
+		for (Iterator<Property> currIt = SupremicaProperties.iterator(); currIt.hasNext(); )
 		{
+			Property currProperty = currIt.next();
 			if ((saveAll && !currProperty.isImmutable()) || currProperty.currentValueDifferentFromDefaultValue())
 			{
 				writer.append("# " + currProperty.getComment() + "\n");
@@ -226,7 +176,20 @@ public final class SupremicaProperties
 		os.close();
 	}
 
+	private static Properties buildProperties(File theFile)
+		throws FileNotFoundException, IOException
+	{
+		FileInputStream theStream = new FileInputStream(theFile);
+		return buildProperties(new BufferedInputStream(theStream));
+	}
 
+	private static Properties buildProperties(InputStream inStream)
+		throws IOException
+	{
+		Properties newProperties = new Properties();
+		newProperties.load(inStream);
+		return newProperties;
+	}
 
 	/*
 	 * The problem is that we got two copies of BDD Options.
@@ -305,7 +268,7 @@ public final class SupremicaProperties
 
 	private static SupremicaProperties supremicaProperties;
 	private static Config config = Config.instance;
-	private String lastPropertyFile = null;
+	private static File propertyFile = null;
 
 	static
 	{
