@@ -51,41 +51,33 @@ package org.supremica.properties;
 
 import java.util.*;
 
-public class PropertyType
+public enum PropertyType
 {
-	private static List collection = new LinkedList();
-
-	public static final PropertyType GENERAL = new PropertyType("general");
-	public static final PropertyType GENERAL_LOG = new PropertyType("general.log");
-	public static final PropertyType GENERAL_FILE = new PropertyType("general.file");
-	public static final PropertyType GENERAL_COMM = new PropertyType("general.comm");
-	public static final PropertyType GENERAL_COMM_XMLRPC = new PropertyType("general.comm.xmlrpc");
-	public static final PropertyType GENERAL_SOFTPLC = new PropertyType("general.softplc");
-	public static final PropertyType GUI = new PropertyType("gui");
-	public static final PropertyType GUI_EDITOR = new PropertyType("gui.editor");
-	public static final PropertyType GUI_ANALYZER = new PropertyType("gui.analyzer");
-	public static final PropertyType GUI_SIMULATOR = new PropertyType("gui.simulator");
-	public static final PropertyType GUI_DOT = new PropertyType("gui.dot");
-	public static final PropertyType ALGORITHMS = new PropertyType("algorithms");
-	public static final PropertyType ALGORITHMS_SYNC = new PropertyType("algorithms.sync");
-	public static final PropertyType ALGORITHMS_VERIFICATION = new PropertyType("algorithms.verification");
-	public static final PropertyType ALGORITHMS_SYNTHESIS = new PropertyType("algorithms.synthesis");
-	public static final PropertyType ALGORITHMS_MINIMIZATION = new PropertyType("algorithms.minimization");
-	public static final PropertyType ALGORITHMS_BDD = new PropertyType("algorithms.bdd");
-	public static final PropertyType ALGORITHMS_HMI = new PropertyType("algorithms.hmi");
-	public static final PropertyType MISC = new PropertyType("misc");
+	GENERAL("general"),
+	GENERAL_LOG("general.log"),
+	GENERAL_FILE("general.file"),
+	GENERAL_COMM("general.comm"),
+	GENERAL_COMM_XMLRPC("general.comm.xmlrpc"),
+	GENERAL_SOFTPLC("general.softplc"),
+	GUI("gui"),
+	GUI_EDITOR("gui.editor"),
+	GUI_ANALYZER("gui.analyzer"),
+	GUI_SIMULATOR("gui.simulator"),
+	GUI_DOT("gui.dot"),
+	ALGORITHMS("algorithms"),
+	ALGORITHMS_SYNC("algorithms.sync"),
+	ALGORITHMS_VERIFICATION("algorithms.verification"),
+	ALGORITHMS_SYNTHESIS("algorithms.synthesis"),
+	ALGORITHMS_MINIMIZATION("algorithms.minimization"),
+	ALGORITHMS_BDD("algorithms.bdd"),
+	ALGORITHMS_HMI("algorithms.hmi"),
+	MISC("misc");
 
 	private String identifier;
 
 	private PropertyType(String identifier)
 	{
-		collection.add(this);
 		this.identifier = identifier;
-	}
-
-	public static Iterator iterator()
-	{
-		return collection.iterator();
 	}
 
 	public String toString()

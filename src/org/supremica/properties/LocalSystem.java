@@ -50,9 +50,9 @@ package org.supremica.properties;
 
 public class LocalSystem
 {
-
 	private LocalSystem()
-	{ // Do not instantiate this class
+	{ 
+		// Do not instantiate this class 	
 	}
 
 	/**
@@ -131,10 +131,8 @@ public class LocalSystem
 	 */
 	public static String getPrefsDirectory()
 	{
-			return com.muchsoft.util.Sys.getPrefsDirectory();
+		return com.muchsoft.util.Sys.getPrefsDirectory();
 	}
-
-
 
 	/**
 	 * The local preferences directory contains configuration files that are shared by all users on the computer.
@@ -145,10 +143,8 @@ public class LocalSystem
 	 */
 	public static String getLocalPrefsDirectory()
 	{
-			return com.muchsoft.util.Sys.getLocalPrefsDirectory();
+		return com.muchsoft.util.Sys.getLocalPrefsDirectory();
 	}
-
-
 
 	/**
 	 * The Java home directory contains the <code>bin</code> subdirectory and is needed to invoke the Java tools

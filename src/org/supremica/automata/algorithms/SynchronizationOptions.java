@@ -82,13 +82,13 @@ public final class SynchronizationOptions
 	 * @throws SupremicaException
 	 */
 	public SynchronizationOptions()
-//		throws SupremicaException
+	// throws SupremicaException
 	{
 		this.nbrOfExecuters = Config.SYNC_NBR_OF_EXECUTERS.get();
 		//The following check should ideally be done within SupremicaProperties
 		if (this.nbrOfExecuters != 1)
 		{
-//			throw new SupremicaException("Error in SupremicaProperties. The property synchNbrOfExecuters must be at least 1.");
+			//			throw new SupremicaException("Error in SupremicaProperties. The property synchNbrOfExecuters must be at least 1.");
 		}
 
 		this.syncType = SynchronizationType.Prioritized;
@@ -98,7 +98,7 @@ public final class SynchronizationOptions
 		//The following check should ideally be done within SupremicaProperties
 		if (this.initialHashtableSize < 100)
 		{
-//			throw new SupremicaException("Error in SupremicaProperties. The property syncInitialHashtableSize must be at least 100");
+			//			throw new SupremicaException("Error in SupremicaProperties. The property syncInitialHashtableSize must be at least 100");
 		}
 
 		this.expandHashtable = Config.SYNC_EXPAND_HASHTABLE.isTrue();
