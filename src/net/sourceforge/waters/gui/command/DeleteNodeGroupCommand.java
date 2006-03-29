@@ -34,7 +34,6 @@ public class DeleteNodeGroupCommand
      * creates the node in the x,y position specified
      *
      * @param surface the surface edited by this command
-     * @param x,y the position upon which the node is created
      */
     public DeleteNodeGroupCommand(ControlledSurface surface, EditorNodeGroup nodeGroup)
     {

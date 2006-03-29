@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   NodeSetSubject
 //###########################################################################
-//# $Id: NodeSetSubject.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: NodeSetSubject.java,v 1.3 2006-03-29 12:13:46 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -730,7 +730,7 @@ class NodeSetSubject
    * The parent of this element in the containment hierarchy.
    * The parent is the element that directly contains this element
    * in the document structure given by the XML file.
-   * @see Proxy#getParent()
+   * // @see Proxy#getParent()
    */
   private Subject mParent;
   /**

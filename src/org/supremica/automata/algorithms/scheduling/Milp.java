@@ -158,7 +158,7 @@ public class Milp
 	 * sequence of times (one time value for every state of the involved plant automata) 
 	 * that the MILP-solver has generated. 
 	 *
-	 * @return the automaton representing the optimal schedule, as given by the MILP-solver
+	 * Does not return anything? The automaton representing the optimal schedule, as given by the MILP-solver
 	 */
 	public void buildScheduleAutomaton() 
 		throws Exception

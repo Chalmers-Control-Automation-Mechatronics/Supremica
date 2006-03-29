@@ -214,7 +214,7 @@ public class AutomataSynchronizer
 	/**
 	 * Method for synchronizing Automata with default options.
 	 *
-	 * @param theAutomata the Automata to be synchronized.
+	 * @param automata the Automata to be synchronized.
 	 * @return Automaton representing the synchronous composition.
 	 */
 	public static Automaton synchronizeAutomata(Automata automata)
@@ -227,7 +227,7 @@ public class AutomataSynchronizer
 	/**
 	 * Method for synchronizing Automata with supplied options.
 	 *
-	 * @param theAutomata the Automata to be synchronized.
+	 * @param automata the Automata to be synchronized.
 	 * @param options the SynchronizationOptions that should be used.
 	 * @return Automaton representing the synchronous composition.
 	 */

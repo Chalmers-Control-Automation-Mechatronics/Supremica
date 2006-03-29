@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   ChildNodeSetSubject
 //###########################################################################
-//# $Id: ChildNodeSetSubject.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: ChildNodeSetSubject.java,v 1.3 2006-03-29 12:13:46 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -63,13 +63,12 @@ class ChildNodeSetSubject
 
   /**
    * Creates a hash set.
-   * This method creates a set of {@link subject} objects from a collection
+   * This method creates a set of {@link Subject} objects from a collection
    * of {@link Proxy} by dynamically checking the type of each object.
    * The constructor fails if any of the provided objects is not of the
    * appropriate type.
    * @param  input       A collection of objects that constitute the initial
    *                     contents of the new set.
-   * @param  clazz       The class of the objects to be added to the set.
    * @throws ClassCastException to indicate that some of the elements of the
    *                     input does not match the type of this set.
    */

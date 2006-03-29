@@ -30,8 +30,8 @@ public class ModifiedAstarUsingTwoProdRelaxation
 	 * cost added to the minimum current cost is returned to be used as an estimate of the 
 	 * total remaining cost of the system. 
 	 * 
-	 * @param double[] node - the current node
-	 * @return double - the heuristic function, h(n), that guides the search, in this case it is the "2-product relaxation"
+	 * @param node the current node
+	 * @return double the heuristic function, h(n), that guides the search, in this case it is the "2-product relaxation"
 	 */
 	double getRelaxation(double[] node)
 		throws Exception

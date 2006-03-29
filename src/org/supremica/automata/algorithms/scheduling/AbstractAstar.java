@@ -53,14 +53,14 @@ public abstract class AbstractAstar
     
     /** 
 	 * Contains already examined (i.e. "closed") search tree nodes (or rather their int[]-representations 
-	 * @see #openTree).
+	 * @see #openTree ).
 	 * For efficiency, CLOSED should be represented as a tree. It is faster to search through 
 	 * than a list and takes less place than a hashtable.
 	 * If several nodes, corresponding to the same logical state, have been examined and 
 	 * none of them is guaranteed to be better than the other, all the nodes are stored 
 	 * as one int[]-variable. The closed nodes are unrolled and compared when necessary, 
 	 * for example when a new node is to be added to the closedTree. This is done by 
-	 * @see #ModifiedAstar.updateClosedTree(int[] node).
+	 * @see AbstractAstar#updateClosedTree(int[] node) .
 	 */
 	protected TreeMap<Integer, double[]> closedTree;
 
@@ -221,8 +221,8 @@ public abstract class AbstractAstar
 	 * Calculates the relaxation value for the node, i.e. the estimate of the remaining 
 	 * cost, h(n), according to the employed heuristic
 	 *
-	 * @param int[] currNode - the node, whose estimated cost we want to know
-	 * @return int remainingEstimatedCost : h(n)
+	 * @param node the node, whose estimated cost we want to know
+	 * @return remainingEstimatedCost : h(n)
 	 */
 	abstract double getRelaxation(double[] node)
 		throws Exception;
@@ -622,7 +622,7 @@ public abstract class AbstractAstar
 	 * it is worse), this node, as well as all the discovered tie nodes are stored in the closedTree
 	 * (note that all examined nodes that are always worse than "node" are discarded).
 	 * 
-	 * @param int[] node - the new node that might be added to the CLOSED tree.
+	 * @param node the new node that might be added to the CLOSED tree.
 	 * @return true, if the new node is added to the CLOSED tree
 	 *         false, otherwise.
 	 */
@@ -841,8 +841,8 @@ public abstract class AbstractAstar
 	 * method must be defined in the classes, that inherit from this one for 
 	 * correct functionning.
 	 *
-	 * @param double[] currNode - the node, whose estimated cost we want to know
-	 * @return double totalEstimatedCost : f(n) = g(n) + h(n)
+	 * @param node the node, whose estimated cost we want to know
+	 * @return totalEstimatedCost : f(n) = g(n) + h(n)
 	 */
 	public double calcEstimatedCost(double[] node)
 			throws Exception
@@ -912,9 +912,6 @@ public abstract class AbstractAstar
 	 * an event, connecting the two nodes is found and added to the schedule, 
 	 * while the parent becomes the next node in search of its parent. This
 	 * is done until an initial node is found, which completes the construction.
-	 *
-	 * @param double[] currNode - the accepting node that makes it possible to build the schedule backwards
-	 * @return Automaton schedule - the resulting schedule
 	 */
     public void buildScheduleAutomaton() 
 		throws Exception
@@ -975,8 +972,8 @@ public abstract class AbstractAstar
 	* The true parent is found by comparing the costs for all the nodes stored in the 
 	* parent element. 
 	*
-	* @param double[] node - the node whose parent is seeked
-	* @return double[] parentNode - the parent of the node 'node'
+	* @param node - the node whose parent is seeked
+	* @return parentNode - the parent of the node 'node'
 	*/
     protected double[] getParent(double[] node) 
 		throws Exception 
@@ -1080,12 +1077,14 @@ public abstract class AbstractAstar
 	 * responsible for the transition, i.e. the plant automaton, whose indices differ 
 	 * between the two nodes, is found.
 	 *
-	 * @param double[] fromNode - the "from" end of the seeked transition
-	 * @param double[] toNode   - the "to" end of the seeked transition
-	 * @return LabeledEvent connectingEvent - the event between "fromNode" and "toNode"
+	 * @param fromNode the "from" end of the seeked transition
+	 * @param toNode the "to" end of the seeked transition
+	 * @return connectingEvent - the event between "fromNode" and "toNode"
 	 */
-    protected LabeledEvent findCurrentEvent(double[] fromNode, double[] toNode) throws Exception {
-		for (int i=0; i<theAutomata.size(); i++) {
+    protected LabeledEvent findCurrentEvent(double[] fromNode, double[] toNode) throws Exception 
+	{
+		for (int i=0; i<theAutomata.size(); i++) 
+		{
 			if (fromNode[i] != toNode[i]) {
 				Automaton auto = theAutomata.getAutomatonAt(i);
 				return auto.getLabeledEvent(auto.getStateWithIndex((int)fromNode[i]), auto.getStateWithIndex((int)toNode[i]));
@@ -1153,10 +1152,11 @@ public abstract class AbstractAstar
 	/**
 	 * Returns true if all the states that this node represents are accepting.
 	 *
-	 * @param double[] node - the current node
-	 * @return boolean isAccepting - true if all the corresponing states are accepting
+	 * @param node the current node
+	 * @return true if all the corresponing states are accepting
 	 */
-    protected boolean isAcceptingNode(double[] node) {
+    protected boolean isAcceptingNode(double[] node) 
+	{
 		for (int i=0; i<activeAutomataIndex.length; i++) {
 			int index = activeAutomataIndex[i];
 			if (!theAutomata.getAutomatonAt(index).getStateWithIndex((int)node[index]).isAccepting()) 
@@ -1171,8 +1171,8 @@ public abstract class AbstractAstar
 	 * Every logical state maps uniquely to a key. Note though that the nodes
 	 * corresponding to the same state get identical keys. 
 	 *
-	 * @param double[] node - the current node
-	 * @return int key - the key for the node ordering in the closedTree
+	 * @param node the current node
+	 * @return the key (int) for the node ordering in the closedTree
 	 */
     public int getKey(double[] node) {
 		int key = 0;
@@ -1190,8 +1190,8 @@ public abstract class AbstractAstar
 	 * Every logical state maps uniquely to a key. Note though that the nodes
 	 * corresponding to the same state get identical keys. 
 	 *
-	 * @param double[] node - the current node
-	 * @return int key - the key for the node ordering in the closedTree
+	 * @param node the current node
+	 * @return the key (int) for the node ordering in the closedTree
 	 */
     public int getKey(int[] node) {
 		int key = 0;

@@ -26,23 +26,22 @@ public class CreateNodeGroupCommand
     /** The Node Created by this Command */
     private final EditorNodeGroup mCreated;
     private final String mDescription = "Group Node Creation";
+
     /**
      * Constructs a new CreateNodeCommand with the specified surface and
      * creates the node in the x,y position specified
      *
      * @param surface the surface edited by this command
-     * @param x,y the position upon which the node is created
      */
     public CreateNodeGroupCommand(ControlledSurface surface, EditorNodeGroup created)
     {
-	mSurface = surface;
-	mCreated = created;       
+		mSurface = surface;
+		mCreated = created;       
     }
 
     /**
      * Executes the Creation of the Node
      */
-
     public void execute()
     {
 		mSurface.addNodeGroup(mCreated);
@@ -52,7 +51,6 @@ public class CreateNodeGroupCommand
     /** 
      * Undoes the Command
      */    
-
     public void undo()
     {	
 		mSurface.delNodeGroup(mCreated);

@@ -416,20 +416,6 @@
 <target name="build_supremica" depends="compile_supremica,compile_tests_supremica,jar_supremica,startfiles_supremica">
 </target>
 
-<!-- Build:
-*	A standard compilation followed by packaging
-*	all files into a jar file. 
--->
-<target name="build_supremica_student" depends="compile_supremica,compile_tests_supremica,jar_supremica_student,startfiles_supremica_student">
-</target>
-
-<!-- Build:
-*	A standard compilation followed by packaging
-*	all files into a jar file. 
--->
-<target name="build_supremica_teacher" depends="compile_supremica,compile_tests_supremica,jar_supremica_teacher,startfiles_supremica_teacher">
-</target>
-
 <!-- Rebuild:
 *	Deletes all existing class files, recompiles all files,
 *	and packages all files into a jar file that can
@@ -437,23 +423,6 @@
 -->
 <target name="rebuild_supremica" depends="clean,version,build_supremica,jar_supremica_lib">
 </target>
-
-<!-- Rebuild:
-*	Deletes all existing class files, recompiles all files,
-*	and packages all files into a jar file that can
-*	be executed without any other dependencies. 
--->
-<target name="rebuild_supremica_student" depends="clean,version,build_supremica_student,jar_supremica_lib">
-</target>
-
-<!-- Rebuild:
-*	Deletes all existing class files, recompiles all files,
-*	and packages all files into a jar file that can
-*	be executed without any other dependencies. 
--->
-<target name="rebuild_supremica_teacher" depends="clean,version,build_supremica_teacher,jar_supremica_lib">
-</target>
-
 
 <!-- Build:
 *	A standard compilation followed by packaging
@@ -505,51 +474,6 @@
 			fullpath="net/sourceforge/waters/valid/vw.xsl"/>
 	</jar>
 </target>
-
-<target name="jar_supremica_student">
-	<jar jarfile="${dist}/Supremica.jar" manifest="${templates}/SUPREMICA_MANIFEST.MF"> 
-		<fileset dir="${build}">
-			<!--patternset-->
-				<include name="**/*"/>
-				<exclude name="org/supremica/apps/Supremica.class"/>
-				<exclude name="org/supremica/apps/SupremicaApplet.class"/>
-				<exclude name="org/supremica/apps/SupremicaTeacher.class"/>
-				<exclude name="org/supremica/apps/SupremicaClient.class"/>
-				<exclude name="org/supremica/apps/SupremicaServer.class"/>
-			<!--/patternset-->			
-		</fileset>
-		<fileset dir="${images}"/>
-		<fileset dir="${examples}"/>
-		<fileset dir="${animations}"/>	
-		<fileset dir="${userinterfaces}"/>		
-		<fileset dir="${runtimesoftplcbuild}"/>	
-	</jar>
-</target>
-
-<target name="jar_supremica_teacher">
-	<jar jarfile="${dist}/Supremica.jar" manifest="${templates}/SUPREMICA_MANIFEST.MF"> 
-		<fileset dir="${build}"/>
-		<fileset dir="${images}"/>
-		<fileset dir="${examples}"/>
-		<fileset dir="${animations}"/>	
-		<fileset dir="${userinterfaces}"/>		
-		<fileset dir="${runtimesoftplcbuild}"/>	
-	</jar>
-</target>
-
-
-<!--
-<target name="jar">
-	<jar jarfile="${dist}/Supremica.jar" manifest="${templates}/ALL_MANIFEST.MF"> 
-		<fileset dir="${build}"/>
-		<fileset dir="${images}"/>
-		<fileset dir="${examples}"/>
-		<fileset dir="${animations}"/>			
-		<fileset dir="${userinterfaces}"/>
-		<fileset dir="${runtimesoftplcbuild}"/>	
-	</jar>
-</target>
--->
 
 <target name="jar_waters_jaxb">
 	<jar jarfile="${lib}/waters_jaxb.jar"> 
@@ -645,7 +569,7 @@
 	<chmod file="${dist}/SFCtoSMV.cmd" perm="644"/>
 </target>
 
-<target name="startfiles_supremica" depends="startfiles_local_supremica,startfiles_supremica_student,startfiles_supremica_teacher">
+<target name="startfiles_supremica" depends="startfiles_local_supremica">
 	<copy file="${templates}/StepToPPN.cmd" todir="${dist}"/>	
 	<chmod file="${dist}/StepToPPN.cmd" perm="644"/>
 	<copy file="${templates}/IDE.cmd" todir="${dist}"/>	
@@ -706,20 +630,6 @@
 	<chmod file="${dist}/libbuddy.so" perm="644"/>
 	<copy file="${platform}/linux.x86/lib/libBisimulationEquivalence.so" todir="${dist}"/>	
 	<chmod file="${dist}/libBisimulationEquivalence.so" perm="644"/>
-</target>
-
-<target name="startfiles_supremica_student">
-	<copy file="${templates}/SupremicaStudent" todir="${dist}"/>	
-	<chmod file="${dist}/SupremicaStudent" perm="755"/>	
-	<copy file="${templates}/SupremicaStudent.cmd" todir="${dist}"/>	
-	<chmod file="${dist}/SupremicaStudent.cmd" perm="644"/>
-</target>
-
-<target name="startfiles_supremica_teacher">
-	<copy file="${templates}/SupremicaTeacher" todir="${dist}"/>	
-	<chmod file="${dist}/SupremicaTeacher" perm="755"/>	
-	<copy file="${templates}/SupremicaTeacher.cmd" todir="${dist}"/>	
-	<chmod file="${dist}/SupremicaTeacher.cmd" perm="644"/>
 </target>
 
 <!--
@@ -859,6 +769,7 @@
 			<exclude name="org/supremica/functionblocks/xsd/*/impl/**"/>
 			<exclude name="net/sourceforge/waters/xsd/*/impl/**"/>
 			<exclude name="org/supremica/softplc/**"/>
+			<exclude name="org/supremica/external/robotCoordination/**"/>
 		</packageset>	
 		<link href="${java14.api.url}"
 			offline="true" packagelistLoc="${docsrc}/offline/j2sdk1.4.2"/>
@@ -867,11 +778,9 @@
 		<link href="${junit.api.url}"
 			offline="true" packagelistLoc="${docsrc}/offline/junit"/>
 	</javadoc>
-
 </target>
 <!--	THIS ONE WAS PREVIOUSLY INCLUDED ABOVE...  -->
 <!--	overview="${templates}/Overview.html"      -->
-
 
 <target name="doc_waters"
 	description="Generate Javadoc documentation.">

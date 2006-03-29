@@ -27,16 +27,14 @@ public class DeleteEdgeCommand
     private final String mDescription = "Edge Deletion";
 
     /**
-     * Constructs a new CreateNodeCommand with the specified surface and
-     * creates the node in the x,y position specified
+     * Deletes an edge on the specified surface.
      *
      * @param surface the surface edited by this command
-     * @param x,y the position upon which the node is created
      */
     public DeleteEdgeCommand(ControlledSurface surface, EditorEdge edge)
     {
-	mSurface = surface;
-	mDeleted = edge;
+		mSurface = surface;
+		mDeleted = edge;
     }
 
     /**
@@ -45,8 +43,8 @@ public class DeleteEdgeCommand
 
     public void execute()
     {
-	mSurface.delEdge(mDeleted);
-	mSurface.getEditorInterface().setDisplayed();
+		mSurface.delEdge(mDeleted);
+		mSurface.getEditorInterface().setDisplayed();
     }
 
     /** 

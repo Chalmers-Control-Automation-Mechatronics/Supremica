@@ -112,7 +112,7 @@ public class AutomataIndexMap
 	 * Returns the index corresponding to the current automaton, as stored in the 
 	 * automaton index hashtable.
 	 *
-	 * @param the automaton, whose index is requested
+	 * @param automaton the automaton, whose index is requested
 	 * @return the index of this automaton.
 	 */
 	public int getAutomatonIndex(Automaton automaton)
@@ -124,7 +124,7 @@ public class AutomataIndexMap
 	 * Returns the index corresponding to the current event, as stored in the 
 	 * event index hashtable.
 	 *
-	 * @param the event, whose index is requested
+	 * @param event the event, whose index is requested
 	 * @return the index of this event.
 	 */
 	public int getEventIndex(LabeledEvent event)
@@ -136,8 +136,8 @@ public class AutomataIndexMap
 	 * Returns the index corresponding to the current state, as stored in the 
 	 * state index hashtable.
 	 *
-	 * @parame the automaton, containing the state 
-	 * @param the state, whose index is requested
+	 * @param automaton the automaton, containing the state 
+	 * @param state the state, whose index is requested
 	 * @return the index of this state.
 	 */
 	public int getStateIndex(Automaton automaton, State state)
@@ -149,8 +149,8 @@ public class AutomataIndexMap
 	 * Calculates and returns the (unique) index corresponding to the synchronization of the 
 	 * current states, using the indices stored in the state index hashtable.
 	 *
-	 * @param the automata containing the states, that need a common index
-	 * @param the states, whose index is requested
+	 * @param automata the automata containing the states, that need a common index
+	 * @param states the states, whose index is requested
 	 * @return the index of this event.
 	 */
 // 	public int getStateIndex(Automata automata, State[] states)

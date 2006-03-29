@@ -147,7 +147,7 @@ public final class SupremicaProperties
 	/**
 	 * Save the property list to the configuration file.
 	 *
-	 * @param filename is the name of the config file
+	 * @param propertyFile is the name of the config file
 	 * @param saveAll if this is true all mutable properties are saved to file
 	 * otherwise only those properties that values different from the default value is saved.
 	 */

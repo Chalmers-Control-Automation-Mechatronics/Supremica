@@ -33,8 +33,8 @@ public class ModifiedAstarUsingOneProdRelaxation
 	 * This method calculates the remaining cost for each robot/plant. The maximum remaining
 	 * cost is returned to be used as an estimate of the total remaining cost of the system. 
 	 * 
-	 * @param double[] node - the current node
-	 * @return double - the heuristic function, h(n), that guides the search, in this case it is the "1-product relaxation"
+	 * @param node the current node
+	 * @return double the heuristic function, h(n), that guides the search, in this case it is the "1-product relaxation"
 	 */
     double getRelaxation(double[] node) 
 		throws Exception

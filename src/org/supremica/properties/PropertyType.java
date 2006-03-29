@@ -53,6 +53,8 @@ import java.util.*;
 
 /**
  * Type for categorization of properties.
+ *
+ * @see Config
  */
 public enum PropertyType
 {

@@ -559,7 +559,7 @@ public class Alphabet
 	 * Computes A \ B (difference) where A is this alphabet and B is other
 	 *
 	 *@param  other The other alphabet
-	 *@returns the modified self.
+	 *@return the modified self.
 	 */
 	public Alphabet minus(Alphabet other)
 	{

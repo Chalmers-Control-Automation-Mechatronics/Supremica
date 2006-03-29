@@ -212,8 +212,8 @@ public class VisGraphScheduler
 	/**
 	 * This method allows to set the starting point, from which the scheduling is done. 
 	 * 
-	 * @param - the time coordinates of the starting point
-	 * @return - the minimal makespan
+	 * @param fromTimes the time coordinates of the starting point
+	 * @return the minimal makespan
 	 */
 	public synchronized double reallyScheduleFrom(double[] fromTimes)
 		throws Exception
@@ -280,8 +280,8 @@ public class VisGraphScheduler
 	/**
 	 * This method allows to set the starting point, from which the scheduling is done. 
 	 * 
-	 * @param - the time coordinates of the starting point
-	 * @return - the minimal makespan
+	 * @param fromTimes the time coordinates of the starting point
+	 * @return the minimal makespan
 	 */
 	public synchronized double scheduleFrom(double[] fromTimes)
 		throws Exception
