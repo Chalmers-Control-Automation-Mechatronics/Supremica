@@ -531,10 +531,67 @@ public abstract class AbstractAstar
 		// state of the synchronous composition of the selected automata. 
 		openTree.add(currNode);
 
+		//tillf
+		Runtime jvm = Runtime.getRuntime();
+		logger.info("Innan körning finns " + jvm.freeMemory() + " bitar");
+		ActionTimer cleanUpTimer = new ActionTimer();
+		cleanUpTimer.restart();
+
+		
+		double[] newNode = new double[currNode.length];
+		newNode[0] = 10;
+		for (int i=1; i<currNode.length; i++)
+			newNode[i] = currNode[i];
+		openTree.add(currNode);
+
+		newNode = new double[currNode.length];
+		newNode[0] = 100;
+		for (int i=1; i<currNode.length; i++)
+			newNode[i] = currNode[i];
+		openTree.add(currNode);
+
+		newNode = new double[currNode.length];
+		newNode[0] = 1000;
+		for (int i=1; i<currNode.length; i++)
+			newNode[i] = currNode[i];
+		openTree.add(currNode);
+
+		logger.info("aaaaaaaaaaaaaabbbbbbbbbbbbbbbccccccccccccc...... = " + openTree.size());
+
+		openTree.remove(openTree.last());
+		logger.info("aaaaaaaaaaaaaabbbbbbbbbbbbbbbccccccccccccc...... = " + openTree.size());
+
+		openTree.remove(openTree.last());
+		logger.info("aaaaaaaaaaaaaabbbbbbbbbbbbbbbccccccccccccc...... = " + openTree.size());
+
+		openTree.remove(openTree.last());
+		logger.info("aaaaaaaaaaaaaabbbbbbbbbbbbbbbccccccccccccc...... = " + openTree.size());
+
+		openTree.remove(openTree.last());
+		logger.info("aaaaaaaaaaaaaabbbbbbbbbbbbbbbccccccccccccc...... = " + openTree.size());
+
 		while(! openTree.isEmpty())
 		{
 			if (isRunning)
 			{
+				//tillf
+				if (jvm.freeMemory() < 10000)
+				{
+					logger.warn("Fria minnet nästan slut i JVM, " + jvm.freeMemory() + " bitar kvar. Senast städat för " + cleanUpTimer.elapsedTime() + "ms sen.");
+//  					openTree.removeRange(openTree.size()/2, openTree.size());
+					int nedskalning = openTree.size()/2;
+					logger.info("Skall rensa bort " + nedskalning + " saker");
+					logger.info("Klipper äppelträdet med " + openTree.size() + " löv");
+					for (int i=0; i<nedskalning; i++)
+					{
+						openTree.remove(openTree.last());
+					}
+					logger.info("Äpplen samlade, kvar " + openTree.size() + " löv");
+// 					jvm.gc();
+					logger.warn("Efter städning är " + jvm.freeMemory() + " bitar lediga.");
+					cleanUpTimer.restart();
+				}
+
 				iterationCounter++;
 				
 				// Records the maximum size of the openTree
@@ -850,24 +907,24 @@ public abstract class AbstractAstar
  		double[] parent = getParent(node);
 	
  		double fNode = node[ACCUMULATED_COST_INDEX] + getRelaxation(node);
-  		double fParent = parent[ESTIMATE_INDEX]; //parent[ACCUMULATED_COST_INDEX] + getRelaxation(parent);
+//   		double fParent = parent[ESTIMATE_INDEX]; //parent[ACCUMULATED_COST_INDEX] + getRelaxation(parent);
 	
- 		// The following code inside the if-loop is needed to ensure consistency of the heuristic
- 		if (fParent > fNode)
-		{
-			//logger.warn("Consistency ensurance");
-			logger.info("(P) node = " + printArray(node) + "; estimation = " + fParent);
- 			return fParent;
-		}
- 		else
-		{			
-			logger.info("node = " + printArray(node) + "; estimation = " + fNode);
- 			return fNode;
-		}
+//  		// The following code inside the if-loop is needed to ensure consistency of the heuristic
+//  		if (fParent > fNode)
+// 		{
+// 			//logger.warn("Consistency ensurance");
+// // 			logger.info("(P) node = " + printArray(node) + "; estimation = " + fParent);
+//  			return fParent;
+// 		}
+//  		else
+// 		{			
+// // 			logger.info("node = " + printArray(node) + "; estimation = " + fNode);
+//  			return fNode;
+// 		}
 
 // 		logger.info("node = " + printArray(node) + "; estimation = " + fNode);
 
-// 		return fNode;
+ 		return fNode;
 	}
 
 	/*

@@ -295,7 +295,7 @@ public class VisGraphScheduler
 			return 0;
 		}
 
-		double minCostToGoal = 500; //Double.MAX_VALUE;
+		double minCostToGoal = Double.MAX_VALUE;
 		//tillf
 		ActionTimer visCheckTimer = new ActionTimer();
 		visCheckTimer.restart();
@@ -490,9 +490,9 @@ public class VisGraphScheduler
 			{
 				optimalTimesFromVertices[i] = reallyScheduleFrom(vertices.get(i));
 			}
-			String str = "vertice optimization (" + optimalTimesFromVertices.length + " vertices) done in " + preprocessTimer.elapsedTime() + "ms";
-			logger.info(str);
-			outputStr += "\t" + str + "\n";
+			// String str = "vertice optimization (" + optimalTimesFromVertices.length + " vertices) done in " + preprocessTimer.elapsedTime() + "ms";
+// 			logger.info(str);
+// 			outputStr += "\t" + str + "\n";
 		}
 
 		isInitialized = true;
