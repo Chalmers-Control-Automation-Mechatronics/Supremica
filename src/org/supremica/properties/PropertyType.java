@@ -51,37 +51,40 @@ package org.supremica.properties;
 
 import java.util.*;
 
+/**
+ * Type for categorization of properties.
+ */
 public enum PropertyType
 {
-	GENERAL("general"),
-	GENERAL_LOG("general.log"),
-	GENERAL_FILE("general.file"),
-	GENERAL_COMM("general.comm"),
-	GENERAL_COMM_XMLRPC("general.comm.xmlrpc"),
-	GENERAL_SOFTPLC("general.softplc"),
-	GUI("gui"),
-	GUI_EDITOR("gui.editor"),
-	GUI_ANALYZER("gui.analyzer"),
-	GUI_SIMULATOR("gui.simulator"),
-	GUI_DOT("gui.dot"),
-	ALGORITHMS("algorithms"),
-	ALGORITHMS_SYNC("algorithms.sync"),
-	ALGORITHMS_VERIFICATION("algorithms.verification"),
-	ALGORITHMS_SYNTHESIS("algorithms.synthesis"),
-	ALGORITHMS_MINIMIZATION("algorithms.minimization"),
-	ALGORITHMS_BDD("algorithms.bdd"),
-	ALGORITHMS_HMI("algorithms.hmi"),
-	MISC("misc");
+	GENERAL,
+	GENERAL_LOG,
+	GENERAL_FILE,
+	GENERAL_COMM,
+	GENERAL_COMM_XMLRPC,
+	GENERAL_SOFTPLC,
+	GUI,
+	GUI_EDITOR,
+	GUI_ANALYZER,
+	GUI_SIMULATOR,
+	GUI_DOT,
+	ALGORITHMS,
+	ALGORITHMS_SYNC,
+	ALGORITHMS_VERIFICATION,
+	ALGORITHMS_SYNTHESIS,
+	ALGORITHMS_MINIMIZATION,
+	ALGORITHMS_BDD,
+	ALGORITHMS_HMI,
+	MISC;
 
-	private String identifier;
-
-	private PropertyType(String identifier)
-	{
-		this.identifier = identifier;
-	}
-
+	/**
+	 * Override of toString-method, transforms identifier into lowercase and uses
+	 * "." instead of "_".
+	 */
 	public String toString()
 	{
-		return identifier;
+		String string = super.toString();
+		string = string.toLowerCase();
+		string = string.replace('_','.');
+		return string;
 	}
 }
