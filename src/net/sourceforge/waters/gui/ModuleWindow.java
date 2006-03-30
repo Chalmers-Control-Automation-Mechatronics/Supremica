@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleWindow
 //###########################################################################
-//# $Id: ModuleWindow.java,v 1.37 2006-03-30 15:21:55 flordal Exp $
+//# $Id: ModuleWindow.java,v 1.38 2006-03-30 15:28:17 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -117,7 +117,7 @@ public class ModuleWindow
 	implements ActionListener, FocusListener, UndoInterface, WindowListener
 {
 	// Limits the functionality of Waters to just drawing simple components 
-	public static final boolean DES_COURSE_VERSION = true;
+	public static final boolean DES_COURSE_VERSION = false;
 
 	//########################################################################
 	//# Constructor
