@@ -23,7 +23,7 @@ import org.supremica.gui.ScheduleDialog;
 import org.supremica.log.*;
 import org.supremica.util.ActionTimer;
 
-public abstract class AbstractAstar 
+public abstract class AbstractAstar
 	implements Scheduler
 {
 	/****************************************************************************************/
@@ -34,47 +34,47 @@ public abstract class AbstractAstar
 	public static int ESTIMATE_INDEX, ACCUMULATED_COST_INDEX, CURRENT_COSTS_INDEX, PARENT_INDEX;
 
 	private static final String VISIBILITY_GRAPH = "visibility graph";
-       
-    /** 
-	 * Contains promising search tree nodes, i.e. nodes that might lie on the optimal path. 
-	 * They are "opened" but not yet examined (i.e. not "closed"). 
+
+    /**
+	 * Contains promising search tree nodes, i.e. nodes that might lie on the optimal path.
+	 * They are "opened" but not yet examined (i.e. not "closed").
 	 * OPEN list is better represented as a tree, ordered by the estimate values, f(n),
-	 * while the tree vertices contain the int[] representations of the "opened" nodes. 
-	 * 
-	 * int[] node = [state_0_index, ..., state_m_index, -1, 0, 
-	 *               parent_key, current_costs_0, ..., current_costs_k, 
-	 *               accumulated_cost, estimate_value], 
-	 * m being the number of selected automata, k the number of selected plants (robots), 
+	 * while the tree vertices contain the int[] representations of the "opened" nodes.
+	 *
+	 * int[] node = [state_0_index, ..., state_m_index, -1, 0,
+	 *               parent_key, current_costs_0, ..., current_costs_k,
+	 *               accumulated_cost, estimate_value],
+	 * m being the number of selected automata, k the number of selected plants (robots),
 	 * current_costs are the Tv(n)-values, accumulated_cost = g(n) and estimate_value = f(n).
-	 * (-1 and 0 are due to Supremicas AutomataIndexFormHelper information, namely 
+	 * (-1 and 0 are due to Supremicas AutomataIndexFormHelper information, namely
 	 * AutomataIndexFormHelper.STATE_EXTRA_DATA).
 	 */
 	protected TreeSet<double[]> openTree;
-    
-    /** 
-	 * Contains already examined (i.e. "closed") search tree nodes (or rather their int[]-representations 
+
+    /**
+	 * Contains already examined (i.e. "closed") search tree nodes (or rather their int[]-representations
 	 * @see #openTree ).
-	 * For efficiency, CLOSED should be represented as a tree. It is faster to search through 
+	 * For efficiency, CLOSED should be represented as a tree. It is faster to search through
 	 * than a list and takes less place than a hashtable.
-	 * If several nodes, corresponding to the same logical state, have been examined and 
-	 * none of them is guaranteed to be better than the other, all the nodes are stored 
-	 * as one int[]-variable. The closed nodes are unrolled and compared when necessary, 
-	 * for example when a new node is to be added to the closedTree. This is done by 
+	 * If several nodes, corresponding to the same logical state, have been examined and
+	 * none of them is guaranteed to be better than the other, all the nodes are stored
+	 * as one int[]-variable. The closed nodes are unrolled and compared when necessary,
+	 * for example when a new node is to be added to the closedTree. This is done by
 	 * @see AbstractAstar#updateClosedTree(int[] node) .
 	 */
 	protected TreeMap<Integer, double[]> closedTree;
 
-    /** 
+    /**
 	 * The remaining cost for each state of each robot (if run independently of other robots).
 	 * int[] = [robot_index, state_index].
 	 */
     protected double[][] remainingCosts;
-    
+
     /** Hashtable containing the estimated cost for each combination of two robots **/
 //     protected Hashtable[] twoProdRelax;
 
-	/** 
-	 * Hashtable containing the estimated cost for a given time configuration 
+	/**
+	 * Hashtable containing the estimated cost for a given time configuration
 	 * (as returned by the visibility graph)
 	 */
 	// Should it be here??? /AK
@@ -82,16 +82,16 @@ public abstract class AbstractAstar
 
 	/** The Visibility Graphs, used for relaxation. Can handle two robots at a time */
 	protected Hashtable<String, VisGraphScheduler> visibilityGraphs = null;
-    
+
     /** The selected automata */
     protected Automata theAutomata, plantAutomata;
-    
-	/** 
-	 * Contains the indices of the selected plants, i.e. activeAutomataIndex[0] contains the 
+
+	/**
+	 * Contains the indices of the selected plants, i.e. activeAutomataIndex[0] contains the
 	 * index of the zeroth plant in the overall Automata, "theAutomata".
 	 */
     protected int[] activeAutomataIndex;
-    
+
 	/** Counts the number of iterations */
     protected int iterationCounter;
 
@@ -105,41 +105,41 @@ public abstract class AbstractAstar
     /** Is used to translate the state indices to unique hash values */
     protected int[] keyMapping;
 
-    /** 
+    /**
 	 * Decides whether 1-prod-relaxation should be used. Note that this variable is somewhat
-	 * different from 'String heuristic'. For example, if heuristic = "2-product relax", 
-	 * 1-product relaxation should be carried out first to collect enough information for the 
+	 * different from 'String heuristic'. For example, if heuristic = "2-product relax",
+	 * 1-product relaxation should be carried out first to collect enough information for the
 	 * 2-product relaxation. During this first phase, useOneProdRelax would be true although
 	 * heuristic = "2-product relax".
 	 */
     protected boolean useOneProdRelax;
-    
+
 	/** This string contains info about the scheduling, such as time, nr of iterations etc. */
     protected String outputStr =  "";
 
-	/** 
+	/**
 	 * Which heuristic should be chosen. The value is normally supplied by the
 	 * user through org.supremica.gui.ScheduleDialog.java.
-	 * If not, the default value is "1-product relax". 
+	 * If not, the default value is "1-product relax".
 	 */
     protected String heuristic = "";
 
 	/** Stores the maximum size of the openTree. */
 	protected int maxOpenSize = 0;
 
-    /** 
-	 * If true, an iterative deepening search is used, which can be slower than 
-	 * the simple modified A*, but requires less memory. 
-	 * THIS FEATURE IS HOWEVER NOT IMPLEMENTED. 
+    /**
+	 * If true, an iterative deepening search is used, which can be slower than
+	 * the simple modified A*, but requires less memory.
+	 * THIS FEATURE IS HOWEVER NOT IMPLEMENTED.
 	 */
     protected boolean iterativeSearch;
-	
-	/** 
-	 * If this variable is set to true, the consistensy of the heuristic is guaranteed, 
-	 * at the cost of some extra operations. 
+
+	/**
+	 * If this variable is set to true, the consistensy of the heuristic is guaranteed,
+	 * at the cost of some extra operations.
 	 */
 	protected boolean consistentHeuristic = false;
-	
+
 	/**
 	 * The output stream
 	 */
@@ -157,25 +157,25 @@ public abstract class AbstractAstar
 	/** Decides if the schedule should be built */
 	protected boolean buildSchedule;
 
-	/** 
-	 * If this boolean is true, node expansion is done manually 
-	 * (i.e. not using Supremica's synchronization methods) 
+	/**
+	 * If this boolean is true, node expansion is done manually
+	 * (i.e. not using Supremica's synchronization methods)
 	 */
 	protected boolean manualExpansion;
-	
+
 	/*
 	 * The thread that performs the search for the optimal solution
 	 */
 	protected Thread astarThread;
-	
-	/** 
-	 * Assures that the scheduling is done (is needed for correct functionning when 
+
+	/**
+	 * Assures that the scheduling is done (is needed for correct functionning when
 	 * this thread is started from another thread for relaxation purposes).
 	 */
 	protected volatile boolean schedulingDone;
 
-	/** 
-	 * Assures that the mutex zones of the graph have been initialized 
+	/**
+	 * Assures that the mutex zones of the graph have been initialized
 	 * (is needed for correct functionning when this thread is started from
 	 * another thread for relaxation purposes).
 	 */
@@ -186,9 +186,9 @@ public abstract class AbstractAstar
 	 */
 	protected int makespan = -1;
 
-	/** 
-	 * Determines if this scheduler is only used for relaxation 
-	 * (and is thus called by another scheduler) 
+	/**
+	 * Determines if this scheduler is only used for relaxation
+	 * (and is thus called by another scheduler)
 	 */
 	protected volatile boolean isRelaxationProvider = true;
 
@@ -205,20 +205,20 @@ public abstract class AbstractAstar
 	/****************************************************************************************/
 
 	/**
-	 * Converts the representation of the initial state to the double[]-representation of a node. 
+	 * Converts the representation of the initial state to the double[]-representation of a node.
 	 */
     protected abstract double[] makeInitialNode();
 
 	/**
 	 * Updates the closed tree if necessary, i.e. if the currently examined
 	 * node with better estimate value already is present on that tree.
-	 * If the node is added to the closed tree, its descendants are put on the 
+	 * If the node is added to the closed tree, its descendants are put on the
 	 * open tree, according to the estimated remaining cost value.
 	 */
 	protected abstract void branch(double[] currNode);
 
 	/**
-	 * Calculates the relaxation value for the node, i.e. the estimate of the remaining 
+	 * Calculates the relaxation value for the node, i.e. the estimate of the remaining
 	 * cost, h(n), according to the employed heuristic
 	 *
 	 * @param node the node, whose estimated cost we want to know
@@ -232,21 +232,21 @@ public abstract class AbstractAstar
 	/*                                 CONSTUCTORS                                          */
 	/****************************************************************************************/
 
- 
+
     public AbstractAstar(Automata theAutomata, boolean buildSchedule, ScheduleDialog gui)
-		throws Exception  
+		throws Exception
 	{
 		this(theAutomata, "1-product relax", buildSchedule, gui);
     }
 
-    public AbstractAstar(Automata theAutomata, String heuristic, boolean buildSchedule, ScheduleDialog gui) 
-		throws Exception 
+    public AbstractAstar(Automata theAutomata, String heuristic, boolean buildSchedule, ScheduleDialog gui)
+		throws Exception
 	{
 		this(theAutomata, heuristic, true, false, buildSchedule, gui);
     }
 
-    public AbstractAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean iterativeSearch, boolean buildSchedule, ScheduleDialog gui) 
-		throws Exception 
+    public AbstractAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean iterativeSearch, boolean buildSchedule, ScheduleDialog gui)
+		throws Exception
 	{
 		this.theAutomata = theAutomata;
 		this.iterativeSearch = iterativeSearch;
@@ -254,12 +254,12 @@ public abstract class AbstractAstar
 		this.buildSchedule = buildSchedule;
 		this.gui = gui;
 		this.manualExpansion = manualExpansion;
-		
+
 		if (heuristic.equals("1-product relax"))
 		{
 			useOneProdRelax = true;
 		}
-		else if(heuristic.equals("2-product relax")) 
+		else if(heuristic.equals("2-product relax"))
 		{
 			if (theAutomata.getPlantAutomata().size() < 3)
 			{
@@ -281,10 +281,10 @@ public abstract class AbstractAstar
 		this.buildSchedule = buildSchedule;
 		this.gui = gui;
 		this.manualExpansion = manualExpansion;
-		
+
 		if (heuristic.equals("1-product relax"))
 			useOneProdRelax = true;
-		else if(heuristic.equals("2-product relax")) 
+		else if(heuristic.equals("2-product relax"))
 		{
 			if (theAutomata.getPlantAutomata().size() < 3)
 			{
@@ -353,33 +353,33 @@ public abstract class AbstractAstar
 		}
 	}
 
-    protected void init() 
+    protected void init()
 		throws Exception
-	{	
+	{
 		if (theAutomata == null)
 			return;
 
 		timer = new ActionTimer();
 		expander = new NodeExpander(manualExpansion, theAutomata, this);
 		plantAutomata = theAutomata.getPlantAutomata();
-		
+
 		//Borde räcka med plantAutomata.size(), fast då kanske man måste ändra lite på andra ställen också
 		keyMapping = new int[theAutomata.size()];
 		keyMapping[0] = 1;
-		for (int i=1; i<keyMapping.length; i++) 
+		for (int i=1; i<keyMapping.length; i++)
 		{
 			keyMapping[i] = keyMapping[i-1] * (theAutomata.getAutomatonAt(i-1).nbrOfStates() + 1);
 		}
-	
+
 		remainingCosts = new double[plantAutomata.size()][];
 		outputStr = "Processing times:\n";
-		
+
 		timer.restart();
 		initRemainingCosts();
 		outputStr += "\t1st preprocessing in " + timer.elapsedTime() + " ms\n";
 
 		initAuxIndices();
-		
+
 		openTree = new TreeSet<double[]>(new OpenTreeComparator(ESTIMATE_INDEX));
 		closedTree = new TreeMap<Integer, double[]>();
 
@@ -393,7 +393,7 @@ public abstract class AbstractAstar
 		}
 
 		PARENT_INDEX = theAutomata.size() + AutomataIndexFormHelper.STATE_EXTRA_DATA;
-		
+
 		// Detta borde ändras till STATIC_VARIBEL = 1 (och inte 2) => 2 ändringar
 		CURRENT_COSTS_INDEX = PARENT_INDEX + 2; //ClosedNodes.CLOSED_NODE_INFO_SIZE;
 		//ACCUMULATED_COST_INDEX = CURRENT_COSTS_INDEX + activeAutomataIndex.length;
@@ -405,26 +405,26 @@ public abstract class AbstractAstar
      * Calculates the remaining (independent) cycle times for each robot (i.e. as if there
      * would only be one robot in the cell) and stores them in remainingCosts.
 	 * It is equal to the minimal remaining time from each state to the marked state.
-	 * This information is used by different heuristics (e.g. 1-prod-relax, 2-prod-relax 
+	 * This information is used by different heuristics (e.g. 1-prod-relax, 2-prod-relax
 	 * and visibility graph).
-     */	
-    private void initRemainingCosts() 
+     */
+    private void initRemainingCosts()
 		throws Exception
 	{
-		for (int i=0; i<plantAutomata.size(); i++) 
+		for (int i=0; i<plantAutomata.size(); i++)
 		{
 			Automaton theAuto = plantAutomata.getAutomatonAt(i);
 
-			// An accepting state is found for the current automaton. In order 
-			// for the algorithm to work properly, it is assumed that the model is 
+			// An accepting state is found for the current automaton. In order
+			// for the algorithm to work properly, it is assumed that the model is
 			// such that the accepting state is also the last state in the sequence(s)
-			// of operations, described by the current automaton. 
+			// of operations, described by the current automaton.
 			State markedState = null;
 
 			for (Iterator<State> stateIt = theAuto.stateIterator(); stateIt.hasNext(); )
 			{
 				markedState = stateIt.next();
-		
+
 				if (markedState.isAccepting())
 					break;
 			}
@@ -434,30 +434,30 @@ public abstract class AbstractAstar
 
 
 			ArrayList estList = new ArrayList();
-	    
+
 			remainingCosts[i] = new double[theAuto.nbrOfStates()];
-			for (int j=0; j<remainingCosts[i].length; j++) 
+			for (int j=0; j<remainingCosts[i].length; j++)
 				remainingCosts[i][j] = -1;
-	    
+
 			if (markedState == null)
 				return;
-			else 
+			else
 			{
 				remainingCosts[i][markedState.getIndex()] = markedState.getCost();
 
 				estList.add(markedState);
-		
-				while (!estList.isEmpty()) 
+
+				while (!estList.isEmpty())
 				{
 					Iterator<Arc> incomingArcIterator = ((State)estList.remove(0)).incomingArcsIterator();
-		    
-					while (incomingArcIterator.hasNext()) 
+
+					while (incomingArcIterator.hasNext())
 					{
 						Arc currArc = incomingArcIterator.next();
 						State currState = currArc.getFromState();
 						State nextState = currArc.getToState();
 
-						if (remainingCosts[i][currState.getIndex()] == -1) 
+						if (remainingCosts[i][currState.getIndex()] == -1)
 						{
 							remainingCosts[i][currState.getIndex()] = remainingCosts[i][nextState.getIndex()] + nextState.getCost();
 							estList.add(currState);
@@ -474,7 +474,7 @@ public abstract class AbstractAstar
 						}
 					}
 				}
-			}				
+			}
 		}
     }
 
@@ -482,7 +482,7 @@ public abstract class AbstractAstar
 	{
 		requestStop(false);
 	}
-	
+
 	public void requestStop(boolean disposeGui)
 	{
 		isRunning = false;
@@ -500,16 +500,16 @@ public abstract class AbstractAstar
 	/****************************************************************************************/
 
     /**
-     * Walks through the tree of possible paths in search for the optimal one, 
-	 * starting from the initial node. 
+     * Walks through the tree of possible paths in search for the optimal one,
+	 * starting from the initial node.
      */
-    public void schedule() 
+    public void schedule()
 		throws Exception
     {
 		if (theAutomata == null) {
 			throw new Exception("Choose several automata to schedule...");
 		}
-		else 
+		else
 		{
 			scheduleFrom(makeInitialNode());
 		}
@@ -527,17 +527,18 @@ public abstract class AbstractAstar
 		openTree.clear();
 		closedTree.clear();
 
-		// Initiates the OPEN tree by adding the initial node, corresponding to the initial 
-		// state of the synchronous composition of the selected automata. 
+		// Initiates the OPEN tree by adding the initial node, corresponding to the initial
+		// state of the synchronous composition of the selected automata.
 		openTree.add(currNode);
 
 		//tillf
 		Runtime jvm = Runtime.getRuntime();
+
 		logger.info("Innan körning finns " + jvm.freeMemory() + " bitar");
 		ActionTimer cleanUpTimer = new ActionTimer();
 		cleanUpTimer.restart();
+/*
 
-		
 		double[] newNode = new double[currNode.length];
 		newNode[0] = 10;
 		for (int i=1; i<currNode.length; i++)
@@ -569,7 +570,7 @@ public abstract class AbstractAstar
 
 		openTree.remove(openTree.last());
 		logger.info("aaaaaaaaaaaaaabbbbbbbbbbbbbbbccccccccccccc...... = " + openTree.size());
-
+*/
 		while(! openTree.isEmpty())
 		{
 			if (isRunning)
@@ -587,13 +588,13 @@ public abstract class AbstractAstar
 						openTree.remove(openTree.last());
 					}
 					logger.info("Äpplen samlade, kvar " + openTree.size() + " löv");
-// 					jvm.gc();
+					jvm.gc();
 					logger.warn("Efter städning är " + jvm.freeMemory() + " bitar lediga.");
 					cleanUpTimer.restart();
 				}
 
 				iterationCounter++;
-				
+
 				// Records the maximum size of the openTree
 				int currOpenSize = openTree.size();
 				if (currOpenSize > maxOpenSize)
@@ -620,9 +621,9 @@ public abstract class AbstractAstar
 				}
 
 				// If the node is not accepting, it goes to the CLOSED tree if there is not a node there already
-				// that represents the same logical state and is better than the current node in all 
+				// that represents the same logical state and is better than the current node in all
 				// "aspects" (lower cost in all directions). If the current node is promising (if it ends up on CLOSED),
-				// its successors are found and put on the OPEN tree. 
+				// its successors are found and put on the OPEN tree.
 				branch(currNode);
 			}
 			else
@@ -638,7 +639,7 @@ public abstract class AbstractAstar
 
 // 			for (Iterator<int[]> it = closedTree.values().iterator(); it.hasNext(); )
 // 				logger.info("e_cl : " + printArray(it.next()));
-			throw new RuntimeException("An accepting state could not be found, nr of iterations = " + iterationCounter); 
+			throw new RuntimeException("An accepting state could not be found, nr of iterations = " + iterationCounter);
 		}
 
 		outputStr += "\tA*-iterations (nr of search calls through the closed tree): " + iterationCounter + "\n";
@@ -646,7 +647,7 @@ public abstract class AbstractAstar
 		outputStr += "\tThe CLOSED tree contains (at the end) " + closedTree.size() + " elements\n";
 		outputStr += "\tMax{OPEN.size} = " + maxOpenSize + "\n";
 		outputStr += "\t\t" + "g = " + currNode[ACCUMULATED_COST_INDEX];
-			
+
 		if (!isRelaxationProvider)
 		{
 			logger.info(outputStr);
@@ -671,14 +672,14 @@ public abstract class AbstractAstar
 
 	/**
 	 * This method puts the node "node" in the right place on the closedTree if the tree does not already
-	 * contain any nodes that correspond to the same logical states than this node. 
-	 * Otherwise, the method compares this node to those already examined. If this node is worse 
-	 * (more expensive in every future direction) that any already examined node, it is discarded. 
-	 * Conversely, if it is better than every examined node, this node is the only one to be stored in the 
+	 * contain any nodes that correspond to the same logical states than this node.
+	 * Otherwise, the method compares this node to those already examined. If this node is worse
+	 * (more expensive in every future direction) that any already examined node, it is discarded.
+	 * Conversely, if it is better than every examined node, this node is the only one to be stored in the
 	 * closedTree. If there are ties (in some directions one node is better than the other, but in others
 	 * it is worse), this node, as well as all the discovered tie nodes are stored in the closedTree
 	 * (note that all examined nodes that are always worse than "node" are discarded).
-	 * 
+	 *
 	 * @param node the new node that might be added to the CLOSED tree.
 	 * @return true, if the new node is added to the CLOSED tree
 	 *         false, otherwise.
@@ -689,7 +690,7 @@ public abstract class AbstractAstar
 		// as the new node. They are stored as one double[]-variable in the closedTree.
 		double[] correspondingClosedNodes = closedTree.remove(new Integer(getKey(node)));
 
-		// If the node (or its logical state collegues) has not yet been put on the closedTree, 
+		// If the node (or its logical state collegues) has not yet been put on the closedTree,
 		// then it is simply added to CLOSED.
 		if (correspondingClosedNodes == null)
 		{
@@ -698,14 +699,14 @@ public abstract class AbstractAstar
 		else
 		{
 			// The internal indices of the nodes that can be either better or worse (cheaper or more expensive)
-			// than the current node, depending on the future path ("internal index" meaning the node's number in the 
+			// than the current node, depending on the future path ("internal index" meaning the node's number in the
 			// correspondingClosedNodes-double[]-array).
 			ArrayList<Integer> tieIndices = new ArrayList<Integer>();
 
 			int nodeLength = node.length;
 			int nrOfClosedNodes = correspondingClosedNodes.length / nodeLength;
 
-			// Each "internal" node should be compared to the current node 
+			// Each "internal" node should be compared to the current node
 			for (int i=0; i<nrOfClosedNodes; i++)
 			{
 				boolean newNodeIsAlwaysWorse = true;
@@ -736,23 +737,23 @@ public abstract class AbstractAstar
 				// else if the examined node is neither worse nor better, its index is added to the tieIndices
 				else if (! newNodeIsAlwaysWorse && ! newNodeIsAlwaysBetter)
 				{
-					tieIndices.add(new Integer(i));					
+					tieIndices.add(new Integer(i));
 				}
 			}
 
-			// Only ties (and the new node) are kept for the update of the closedTree. 
+			// Only ties (and the new node) are kept for the update of the closedTree.
 			double[] newClosedNode = new double[(tieIndices.size() + 1)*nodeLength];
 
 			// The tie-nodes (if there are any) are copied to the new closedNode
 			for (int i=0; i<tieIndices.size(); i++)
 			{
 				int currExaminedNodesIndex = tieIndices.get(i).intValue();
-				for (int j=0; j<nodeLength; j++) 
+				for (int j=0; j<nodeLength; j++)
 				{
 					newClosedNode[j + i*nodeLength] = correspondingClosedNodes[j + currExaminedNodesIndex*nodeLength];
 				}
 			}
-			
+
 			// The latest addition to the node-family (double[] node) is also added to the new closedNode
 			for (int j=0; j<nodeLength; j++)
 			{
@@ -773,25 +774,25 @@ public abstract class AbstractAstar
 	// 	for (int i=0; i<plantAutomata.size()-1; i++) {
 	// 	    for (int j=i+1; j<plantAutomata.size(); j++) {
 	// 		int hashtableIndex = calcHashtableIndex(i,j);
-		
+
 	// 		activeAutomataIndex = new int[2];
 	// 		activeAutomataIndex[0] = theAutomata.getAutomatonIndex(plantAutomata.getAutomatonAt(i));
 	// 		activeAutomataIndex[1] = theAutomata.getAutomatonIndex(plantAutomata.getAutomatonAt(j));
-		
+
 	// 		int schedCounter = 0;
-		
-	// 		ArrayList activeNodes = new ArrayList();	
+
+	// 		ArrayList activeNodes = new ArrayList();
 	// 		activeNodes.add(makeInitialNode());
-		
+
 	// 		while (!activeNodes.isEmpty()) {
 	// 		    int[] currNode = (int[])activeNodes.remove(0);
-		    
+
 	// 		    if (! (twoProdRelax[hashtableIndex].containsKey(getKey(currNode)))) {
 	// 			activeNodes.addAll(expander.expandNode(currNode, activeAutomataIndex));
-			
+
 	// 			schedCounter++;
 	// 			int[] accNode = scheduleFrom(resetCosts(currNode));
-			
+
 	// 			if (accNode != null)
 	// 			    twoProdRelax[hashtableIndex].put(getKey(currNode), new Integer(accNode[accNode.length-1]));
 	// 		    }
@@ -808,30 +809,30 @@ public abstract class AbstractAstar
     /*	protected String preprocess2() {
       String outputStr = "";
       Automata plantAutomata = theAutomata.getPlantAutomata();
-      
+
       for (int i=0; i<plantAutomata.size()-1; i++) {
       for (int j=i+1; j<plantAutomata.size(); j++) {
       int hashtableIndex = calcHashtableIndex(i,j);
-      
+
       int schedCounter = 0;
-      
+
       int[] currAutomataIndex = new int[]{theAutomata.getAutomatonIndex(plantAutomata.getAutomatonAt(i)),
       theAutomata.getAutomatonIndex(plantAutomata.getAutomatonAt(j))};
-      
+
       ArrayList activeNodes = new ArrayList();
-      
+
       activeNodes.add(new Node(makeInitialState()));
-      
+
       while (!activeNodes.isEmpty()) {
       Node currNode = (Node)activeNodes.remove(0);
-      
+
       if (! (twoProdRelax[hashtableIndex].containsKey(currNode))) {
       activeNodes.addAll(expandNode(currNode, currAutomataIndex));
-      
+
       schedCounter++;
       currNode.resetCosts();
       Node accNode = scheduleFrom(currNode, currAutomataIndex);
-      
+
       if (accNode != null)
       twoProdRelax[hashtableIndex].put(currNode, new Integer(accNode.getAccumulatedCost()));
       else {
@@ -864,38 +865,38 @@ public abstract class AbstractAstar
 	// 	int[] currentCosts = expander.getCosts(node);
 	// 	int plantAutomataSize = plantAutomata.size();
 	// 	activeAutomataIndex = new int[2];
-	
+
 	// 	for (int i=0; i<plantAutomataSize-1; i++) {
 	// 	    for (int j=i+1; j<plantAutomataSize; j++) {
 	// 		activeAutomataIndex[0] = i;
 	// 		activeAutomataIndex[1] = j;
-		
+
 	// 		// Funkar bara om alla noder i den totala synkningen har 2-prod-relaxerats
 	// 		// Har de det?????????????
 	// 		Object relaxation = twoProdRelax[calcHashtableIndex(i,j)].get(getKey(node));
 	// 		if (relaxation != null) {
 	// 		    int altEstimate = ((Integer) relaxation).intValue();
-		    
+
 	// 		    if (altEstimate > estimate)
 	// 			estimate = altEstimate;
 	// 		}
 	// 	    }
 	// 	}
-	
+
 	// 	int minCurrCost = currentCosts[0];
 	// 	for (int i=1; i<currentCosts.length; i++) {
 	// 	    if (currentCosts[i] < minCurrCost)
 	// 		minCurrCost = currentCosts[i];
 	// 	}
-	
+
 	// 	return estimate + minCurrCost;
 	//     }
 
 	/**
-	 * Calculates the total estimated cost (makespan) for the node, i.e. 
-	 * the sum of the accumulated cost and the estimate of the remaining 
+	 * Calculates the total estimated cost (makespan) for the node, i.e.
+	 * the sum of the accumulated cost and the estimate of the remaining
 	 * cost (f(n) = g(n) + h(n)) is returned. Note that the getRelaxation(node)-
-	 * method must be defined in the classes, that inherit from this one for 
+	 * method must be defined in the classes, that inherit from this one for
 	 * correct functionning.
 	 *
 	 * @param node the node, whose estimated cost we want to know
@@ -903,12 +904,12 @@ public abstract class AbstractAstar
 	 */
 	public double calcEstimatedCost(double[] node)
 			throws Exception
-	{		
+	{
  		double[] parent = getParent(node);
-	
+
  		double fNode = node[ACCUMULATED_COST_INDEX] + getRelaxation(node);
 //   		double fParent = parent[ESTIMATE_INDEX]; //parent[ACCUMULATED_COST_INDEX] + getRelaxation(parent);
-	
+
 //  		// The following code inside the if-loop is needed to ensure consistency of the heuristic
 //  		if (fParent > fNode)
 // 		{
@@ -917,7 +918,7 @@ public abstract class AbstractAstar
 //  			return fParent;
 // 		}
 //  		else
-// 		{			
+// 		{
 // // 			logger.info("node = " + printArray(node) + "; estimation = " + fNode);
 //  			return fNode;
 // 		}
@@ -928,7 +929,7 @@ public abstract class AbstractAstar
 	}
 
 	/*
-	 * This method returns an updated cost vector, containing updated current costs, 
+	 * This method returns an updated cost vector, containing updated current costs,
 	 * accumulated cost and estimated cost.
 	 */
     public double[] updateCosts(double[] costs, int changedIndex, double newCost) {
@@ -940,20 +941,20 @@ public abstract class AbstractAstar
 				newCosts[i] = newCost;
 			}
 			else {
-				newCosts[i] = costs[i] - costs[changedIndex]; 
+				newCosts[i] = costs[i] - costs[changedIndex];
 				if (newCosts[i] < 0)
 				{
 					newCosts[i] = 0;
 				}
 			}
 		}
-	
+
 		// The accumulated cost update
 		newCosts[newCosts.length-2] = costs[costs.length-2] + costs[changedIndex];
 
 		// The f-update
 		newCosts[newCosts.length-1] = costs[costs.length-1];
-	
+
 		return newCosts;
     }
 
@@ -965,12 +966,12 @@ public abstract class AbstractAstar
 
 	/**
 	 * Starting from an accepting state/node, this method walks its way back,
-	 * using keys stored in PARENT_INDEX to find parents. When this is done, 
-	 * an event, connecting the two nodes is found and added to the schedule, 
+	 * using keys stored in PARENT_INDEX to find parents. When this is done,
+	 * an event, connecting the two nodes is found and added to the schedule,
 	 * while the parent becomes the next node in search of its parent. This
 	 * is done until an initial node is found, which completes the construction.
 	 */
-    public void buildScheduleAutomaton() 
+    public void buildScheduleAutomaton()
 		throws Exception
 	{
 		timer.restart();
@@ -993,14 +994,14 @@ public abstract class AbstractAstar
 					double[] parent = getParent(currNode);
 					State currState = new State(printNodeSignature(parent) + "; firing time = " + currNode[ACCUMULATED_COST_INDEX]);
 					LabeledEvent event = findCurrentEvent(parent, currNode);
-			
+
 					if (!hasParent(parent))
 						currState.setInitial(true);
-			
+
 					scheduleAuto.addState(currState);
 					scheduleAuto.getAlphabet().addEvent(event);
 					scheduleAuto.addArc(new Arc(currState, nextState, event));
-			
+
 					currNode = parent;
 					nextState = currState;
 				}
@@ -1017,26 +1018,26 @@ public abstract class AbstractAstar
 				throw ex;
 		    }
 	    }
-		
+
 		logger.info("Schedule was built in " + timer.elapsedTime() + "ms");
 		ActionMan.getGui().addAutomaton(scheduleAuto);
     }
-   
+
 	/**
-	* This method finds a parent to the current node by retrieving an element from 
+	* This method finds a parent to the current node by retrieving an element from
 	* the closedTree that corresponds to the key, stored in the current nodes PARENT_INDEX.
-	* Caution should be made, since the closed element might consist of several nodes. 
-	* The true parent is found by comparing the costs for all the nodes stored in the 
-	* parent element. 
+	* Caution should be made, since the closed element might consist of several nodes.
+	* The true parent is found by comparing the costs for all the nodes stored in the
+	* parent element.
 	*
 	* @param node - the node whose parent is seeked
 	* @return parentNode - the parent of the node 'node'
 	*/
-    protected double[] getParent(double[] node) 
-		throws Exception 
+    protected double[] getParent(double[] node)
+		throws Exception
 	{
 		// one object of the closedTree may contain several nodes (that all correspond
-		// to the same logical state but different paths). 
+		// to the same logical state but different paths).
 		double[] parentCandidates = closedTree.get(new Integer((int)node[PARENT_INDEX]));
 		int nrOfCandidates = parentCandidates.length / node.length;
 
@@ -1050,33 +1051,33 @@ public abstract class AbstractAstar
 
 			// which cost is the new cost of the firing state...
 			double newStateCost = -1;
-			
+
 			// activePlantIndex is found as the index that corresponds to a plant automaton
 			// (in the plantAutomata-collection) and differs between this node and its parent
 			for (int j=0; j<activeAutomataIndex.length; j++)
 			{
 				int currIndex = activeAutomataIndex[j];
-				
-				// This might look strange, but it is not. All parent candidates corresponds to 
+
+				// This might look strange, but it is not. All parent candidates corresponds to
 				// the same logical state. In other words, it is enough to do the state indices check
 				// for some of the parent candidates, why not the first.
 				if (node[currIndex] != parentCandidates[currIndex])
 				{
 					activePlantIndex = j;
-					
+
 					// The new cost (after update) is equal to the cost of the state that is changed
 					// during the transition, i.e. the state corresponding to the firing robot.
 					newStateCost = theAutomata.getAutomatonAt(currIndex).getStateWithIndex((int)node[currIndex]).getCost();
-					
+
 					break;
 				}
 			}
-			
+
 			double[] parentCosts = new double[ESTIMATE_INDEX - CURRENT_COSTS_INDEX + 1];
 
 			// The only thing that differs between the candidates is their cost-vectors
 			// So, find the parent that gives correct cost update for the current state
-			// and return it. Return null if nothing appropriate is found. 
+			// and return it. Return null if nothing appropriate is found.
 			for (int i=0; i<nrOfCandidates; i++)
 			{
 				// Retrieving the costs of the current parent candidate
@@ -1091,7 +1092,7 @@ public abstract class AbstractAstar
 				// is equal to the costs of the current node, then the true parent is found.
 				boolean isParent = true;
 				//for (int j=0; j<newCosts.length; j++)
-				// The estimate cost is not important here 
+				// The estimate cost is not important here
 				for (int j=0; j<newCosts.length - 1; j++)
 				{
 					if (newCosts[j] != node[j + CURRENT_COSTS_INDEX])
@@ -1114,40 +1115,40 @@ public abstract class AbstractAstar
 			}
 
 			return null;
-		}		
-    }   
+		}
+    }
 
 	/**
 	 * Checks if the current node contains a reference to its parent.
-	 * The reference should be stored in the PARENT_INDEX. If its value 
+	 * The reference should be stored in the PARENT_INDEX. If its value
 	 * is -1, the current node has no recognized parent.
 	 */
     protected boolean hasParent(double[] node) {
 		if (node[PARENT_INDEX] == -1)
 			return false;
-	
+
 		return true;
     }
-    
+
 	/**
-	 * Finds an event between two nodes. In order to do this, the automaton that is 
-	 * responsible for the transition, i.e. the plant automaton, whose indices differ 
+	 * Finds an event between two nodes. In order to do this, the automaton that is
+	 * responsible for the transition, i.e. the plant automaton, whose indices differ
 	 * between the two nodes, is found.
 	 *
 	 * @param fromNode the "from" end of the seeked transition
 	 * @param toNode the "to" end of the seeked transition
 	 * @return connectingEvent - the event between "fromNode" and "toNode"
 	 */
-    protected LabeledEvent findCurrentEvent(double[] fromNode, double[] toNode) throws Exception 
+    protected LabeledEvent findCurrentEvent(double[] fromNode, double[] toNode) throws Exception
 	{
-		for (int i=0; i<theAutomata.size(); i++) 
+		for (int i=0; i<theAutomata.size(); i++)
 		{
 			if (fromNode[i] != toNode[i]) {
 				Automaton auto = theAutomata.getAutomatonAt(i);
 				return auto.getLabeledEvent(auto.getStateWithIndex((int)fromNode[i]), auto.getStateWithIndex((int)toNode[i]));
 			}
 		}
-	
+
 		return null;
     }
 
@@ -1159,81 +1160,81 @@ public abstract class AbstractAstar
 
     public String printArray(int[] node) {
 		String s = "[";
-		
+
 		for (int i=0; i<node.length-1; i++) {
 			s += node[i] + " ";
 		}
 		s += node[node.length-1] + "]";
-		
+
 		return s;
     }
 
-	public String printArray(double[] array) 
+	public String printArray(double[] array)
 	{
 		String s = "[";
-		
-		for (int i=0; i<array.length-1; i++) 
+
+		for (int i=0; i<array.length-1; i++)
 		{
 			s += array[i] + " ";
 		}
 		s += array[array.length-1] + "]";
-		
+
 		return s;
     }
-	
+
     protected String printNodeSignature(double[] node) {
 		String s = printNodeName(node) + "; Tv = [";
-		
+
 		int addIndex = node.length - (plantAutomata.size() + 1);
-		for (int i=0; i<getActiveLength()-1; i++) 
+		for (int i=0; i<getActiveLength()-1; i++)
 			s += node[i + CURRENT_COSTS_INDEX] +  " ";
 		s += node[ACCUMULATED_COST_INDEX-1] + "]; g = ";
-		
+
 		s += node[ACCUMULATED_COST_INDEX];
-		
+
 		return s;
     }
-	
+
     protected String printNodeName(double[] node) {
 		String s = "[";
-		
-		for (int i=0; i<theAutomata.size()-1; i++) 
+
+		for (int i=0; i<theAutomata.size()-1; i++)
 		{
 			s += theAutomata.getAutomatonAt(i).getStateWithIndex((int)node[i]) + " ";
 		}
 		s += theAutomata.getAutomatonAt(theAutomata.size()-1).getStateWithIndex((int)node[theAutomata.size()-1]) + "]";
-		
+
 		return s;
     }
-   
+
 	/**
 	 * Returns true if all the states that this node represents are accepting.
 	 *
 	 * @param node the current node
 	 * @return true if all the corresponing states are accepting
 	 */
-    protected boolean isAcceptingNode(double[] node) 
+    protected boolean isAcceptingNode(double[] node)
 	{
 		for (int i=0; i<activeAutomataIndex.length; i++) {
 			int index = activeAutomataIndex[i];
-			if (!theAutomata.getAutomatonAt(index).getStateWithIndex((int)node[index]).isAccepting()) 
+			if (!theAutomata.getAutomatonAt(index).getStateWithIndex((int)node[index]).isAccepting())
 				return false;
 		}
-	
+
 		return true;
     }
 
 	/**
-	 * Calculates a key that is used to order the nodes in the closedTree. 
+	 * Calculates a key that is used to order the nodes in the closedTree.
 	 * Every logical state maps uniquely to a key. Note though that the nodes
-	 * corresponding to the same state get identical keys. 
+	 * corresponding to the same state get identical keys.
 	 *
 	 * @param node the current node
 	 * @return the key (int) for the node ordering in the closedTree
 	 */
     public int getKey(double[] node) {
 		int key = 0;
-	
+
 		for (int i=0; i<activeAutomataIndex.length; i++)
 		{
 			key += ((int)node[activeAutomataIndex[i]])*keyMapping[activeAutomataIndex[i]];
@@ -1243,16 +1244,16 @@ public abstract class AbstractAstar
     }
 
 	/**
-	 * Calculates a key that is used to order the nodes in the closedTree. 
+	 * Calculates a key that is used to order the nodes in the closedTree.
 	 * Every logical state maps uniquely to a key. Note though that the nodes
-	 * corresponding to the same state get identical keys. 
+	 * corresponding to the same state get identical keys.
 	 *
 	 * @param node the current node
 	 * @return the key (int) for the node ordering in the closedTree
 	 */
     public int getKey(int[] node) {
 		int key = 0;
-	
+
 		for (int i=0; i<activeAutomataIndex.length; i++)
 		{
 			key += node[activeAutomataIndex[i]]*keyMapping[activeAutomataIndex[i]];
@@ -1260,9 +1261,9 @@ public abstract class AbstractAstar
 
 		return key;
     }
-    
-    protected double[] resetCosts(double[] node) 
-	{	
+
+    protected double[] resetCosts(double[] node)
+	{
 		for (int i = 2*theAutomata.size() + AutomataIndexFormHelper.STATE_EXTRA_DATA; i<node.length; i++)
 		{
 			node[i] = 0;
@@ -1270,7 +1271,7 @@ public abstract class AbstractAstar
 
 		return node;
     }
-	
+
     /**
      * 	Calculates an index to Hashtable[] twoProdRelax.
      *
@@ -1278,19 +1279,19 @@ public abstract class AbstractAstar
      * @param j
      * @return index of the 2-prod-relax-hashtable corresponing to robot_i and robot_j.
      */
-	protected int calcHashtableIndex(int i, int j) 
+	protected int calcHashtableIndex(int i, int j)
 	{
 		int size = theAutomata.getPlantAutomata().size();
-		
+
 		return (int) (i*(size - 1.5) - 0.5*(i*i) - 1 + j);
 	}
-	
-    public int getActiveLength() 
+
+    public int getActiveLength()
 	{
-		return activeAutomataIndex.length; 
+		return activeAutomataIndex.length;
     }
 
-    public int[] getActiveAutomataIndex() 
+    public int[] getActiveAutomataIndex()
 	{
 		return activeAutomataIndex;
     }
