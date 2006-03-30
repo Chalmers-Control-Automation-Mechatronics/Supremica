@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleWindow
 //###########################################################################
-//# $Id: ModuleWindow.java,v 1.36 2006-03-23 19:45:45 flordal Exp $
+//# $Id: ModuleWindow.java,v 1.37 2006-03-30 15:21:55 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -117,7 +117,7 @@ public class ModuleWindow
 	implements ActionListener, FocusListener, UndoInterface, WindowListener
 {
 	// Limits the functionality of Waters to just drawing simple components 
-	public static final boolean DES_COURSE_VERSION = false;
+	public static final boolean DES_COURSE_VERSION = true;
 
 	//########################################################################
 	//# Constructor
@@ -260,16 +260,15 @@ public class ModuleWindow
 		final ArrayList l;
 
 		data = new DefaultListModel();
-
 		if (module != null)
 		{
-			for (final EventDeclProxy event : module.getEventDeclList()) {
+			for (final EventDeclProxy event : module.getEventDeclList()) 
+			{
 				data.addElement(event);
 			}
 		}
 
 		dataList = new JList(data);
-
 		dataList.setCellRenderer(new EventListCell());
 
 		JButton newEventButton = new JButton("New Event");
@@ -299,8 +298,8 @@ public class ModuleWindow
 		
 		// component, action, listener
 		mDragSource.createDefaultDragGestureRecognizer(dataList,
-													  mDragAction,
-													  mDGListener);
+													   mDragAction,
+													   mDGListener);
 		mDragSource.addDragSourceListener(mDSListener);
 
 		return p;
@@ -725,7 +724,7 @@ public class ModuleWindow
 					ForeachSubject foreachSubject = (ForeachSubject) currentList.get(currentList.indexOf(((ComponentInfo) currentNode.getUserObject()).getComponent()));
 					currentList = foreachSubject.getBodyModifiable();
 				}
-				// I just realised there's a nicer way to do this...
+				// I just realised there's a nicer way to do this... well, well.
 
 				// Remove component from module
 				currentList.remove(((ComponentInfo) targetNode.getUserObject()).getComponent());

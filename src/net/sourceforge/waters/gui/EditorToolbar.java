@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorToolbar
 //###########################################################################
-//# $Id: EditorToolbar.java,v 1.11 2005-12-13 02:23:23 siw4 Exp $
+//# $Id: EditorToolbar.java,v 1.12 2006-03-30 15:21:55 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -44,7 +44,7 @@ public class EditorToolbar
 		mLastSelected = createButton(ControlledSurface.SELECT, "Select", true);
 		createButton(ControlledSurface.NODE, "Create Nodes", false);
 		createButton(ControlledSurface.NODEGROUP, "Create Group Nodes", false);
-		createButton(ControlledSurface.INITIAL, "Set Initial Nodes", false);
+		createButton(ControlledSurface.INITIAL, "Set Initial Node", false);
 		createButton(ControlledSurface.EDGE, "Create Edges", false);
 	}
 
@@ -60,6 +60,7 @@ public class EditorToolbar
 		return mGroup.getSelection().getActionCommand();
 	}
 	   */
+
 	//#########################################################################
 	//# Rendering Buttons
 	private ToolButtonListener createButton(final String command, final String tooltip, final boolean selected)

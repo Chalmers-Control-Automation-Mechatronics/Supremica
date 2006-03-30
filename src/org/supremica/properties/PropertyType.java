@@ -80,7 +80,7 @@ public enum PropertyType
 
 	/**
 	 * Override of toString-method, transforms identifier into lowercase and uses
-	 * "." instead of "_".
+	 * "." instead of "_", so, for example, "GUI_DOT" becomes "gui.dot".
 	 */
 	public String toString()
 	{

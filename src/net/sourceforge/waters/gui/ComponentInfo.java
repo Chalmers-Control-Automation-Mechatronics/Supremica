@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ComponentInfo
 //###########################################################################
-//# $Id: ComponentInfo.java,v 1.3 2005-11-03 01:24:15 robi Exp $
+//# $Id: ComponentInfo.java,v 1.4 2006-03-30 15:21:55 flordal Exp $
 //###########################################################################
 
 
@@ -45,10 +45,8 @@ public class ComponentInfo
 		return mName;
 	}
 
-
 	//#######################################################################
 	//# Data Members
 	private final AbstractSubject mSubject;
 	private final String mName;
-
 }
