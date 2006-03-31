@@ -49,10 +49,8 @@
  */
 package org.supremica.properties;
 
-import java.util.*;
-
 /**
- * Type for categorization of properties.
+ * Type for categorisation of properties.
  *
  * @see Config
  */
@@ -84,9 +82,6 @@ public enum PropertyType
 	 */
 	public String toString()
 	{
-		String string = super.toString();
-		string = string.toLowerCase();
-		string = string.replace('_','.');
-		return string;
+		return super.toString().toLowerCase().replace('_','.');
 	}
 }

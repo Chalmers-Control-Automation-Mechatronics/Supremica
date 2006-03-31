@@ -50,6 +50,7 @@
 package org.supremica.util;
 
 import org.supremica.properties.SupremicaProperties;
+import org.supremica.Version;
 
 import java.lang.Exception;
 import java.io.*;
@@ -58,11 +59,14 @@ public class ProcessCommandLineArguments
 {
 	public static void process(String[] args)
 	{
+		boolean quit = false;
+
 		for (int i = 0; i < args.length; i++)
 		{
 			if (args[i].equals("-h") || args[i].equals("-?") || args[i].equals("--help") || args[i].equals("--usage"))
 			{
-				ProcessCommandLineArguments.printUsage();
+				printUsage();
+				quit = true;
 			}
 			else if (args[i].equals("-p") || args[i].equals("--properties"))
 			{
@@ -93,11 +97,22 @@ public class ProcessCommandLineArguments
 			{
 				System.out.println(SupremicaProperties.getProperties());
 			}
+			else if (args[i].equals("-v") || args[i].equals("--version"))
+			{
+				System.out.println("Supremica version: " + Version.version());
+				quit = true;
+			}
 			else
 			{
-				System.out.println("Invalid usage.");
+				System.out.println("Invalid usage.\n");
 				ProcessCommandLineArguments.printUsage();
+				quit = true;
 			}
+		}
+
+		if (quit)
+		{
+			System.exit(0);
 		}
 	}
 
@@ -106,8 +121,10 @@ public class ProcessCommandLineArguments
 		System.out.println("Supremica: " + org.supremica.Version.version());
 		System.out.println("More information about Supremica is available at www.supremica.org\n");
 		System.out.println("Usage: Supremica [OPTION]\n");
-		System.out.println("Property options: \n  -p, --properties FILE\t Load properties from FILE");
-		System.out.println("List: \n  -l FILE, --list\t List properties with current values");
-		System.out.println("Help options: \n  -?, -h, --help --usage\t show this help message");
+		System.out.println("Property options: \n  -p, --properties FILE\t\t Load properties from FILE");
+		System.out.println("List: \n  -l, --list [FILE]\t\t List properties with current values (or values in FILE)");
+		System.out.println("Help options: \n  -?, -h, --help, --usage\t show this help message");
+		System.out.println("Version: \n  -v, --version \t\t show version");
+		System.out.println("");
 	}
 }
