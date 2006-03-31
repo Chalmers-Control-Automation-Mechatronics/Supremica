@@ -79,6 +79,9 @@ public class VisGraphScheduler
 	/** The output string */
 	private String outputStr = "";
 
+	/** The number of zones that each robot occupies during its cycle */
+	private double[] additionalTimes;
+
 	public VisGraphScheduler (Automata theAutomata, boolean toDrawVisibilityGraph, ScheduleDialog gui)
 		throws Exception
 	{
@@ -303,7 +306,9 @@ public class VisGraphScheduler
 		//tillf (test)
 		ArrayList<Integer> visibleVerticeIndices = new ArrayList<Integer>(vertices.size());
 		for (int i=0; i<vertices.size(); i++)
+		{
 			visibleVerticeIndices.add(i);
+		}
 		totalVisCheckTime += visCheckTimer.elapsedTime();
 		
 		for (int i=0; i<visibleVerticeIndices.size(); i++)
@@ -365,6 +370,9 @@ public class VisGraphScheduler
 	private synchronized void extractGraphTimes()
 		throws Exception 
 	{
+		// One hashtable per robot containing 2-sized doubles, 
+		// representing the booking and unbooking sequences of corresponding zones.
+		// The zone indices are used as the keys of the hashtable. 
 		zoneBoundaryTimes = new Hashtable[robots.size()]; 
 		goalTimes = new double[robots.size()];
 
@@ -396,10 +404,13 @@ public class VisGraphScheduler
 
 						if (currZone.getAlphabet().contains(currEvent))
 						{
+							// If the current event is a booking event...
 							if (currZone.getInitialState().activeEvents(false).contains(currEvent))
 							{
 								zoneBoundaryTimes[i].put(new Integer(j), new double[]{currTime, -1});
+								additionalTimes[i]++;
 							}
+							// If the current event is an unbooking event...
 							else
 							{
 								double[] currTimePair = zoneBoundaryTimes[i].get(new Integer(j));
@@ -418,6 +429,68 @@ public class VisGraphScheduler
 			}
 
 			goalTimes[i] = currTime;
+			additionalTimes[i] = goalTimes[i] / additionalTimes[i]; 
+		}
+
+		//TEST (Add some time for each booking event that is not active since it is
+		// is probable that the risk of collision might delay the schedule somewhat);
+		TreeSet<Double>[] timesOfInactiveZones = new TreeSet[2];
+		timesOfInactiveZones[0] = new TreeSet<Double>();
+		timesOfInactiveZones[1] = new TreeSet<Double>();
+		for (int j=0; j<zones.size(); j++)
+		{
+			// The zone boundaries of the first robot
+			double[] firstBoundaryTimes = zoneBoundaryTimes[0].get(new Integer(j));
+			
+			// The zone boundaries of the second robot
+			double[] secondBoundaryTimes = zoneBoundaryTimes[1].get(new Integer(j));
+			
+			// If the current zone is only booked by one robot, i.e. if it is 
+			// inactive, its time is recorded and later used to shift the following times
+			// It is important that every inactive zone results in a time shifting (thus += 0.000001)
+			if (firstBoundaryTimes == null && secondBoundaryTimes != null)
+			{
+				double inactiveBoundaryTime = secondBoundaryTimes[0];
+				boolean inactiveZoneAdded = false;
+				while (!inactiveZoneAdded)
+				{
+					inactiveZoneAdded = timesOfInactiveZones[1].add(new Double(inactiveBoundaryTime));
+					inactiveBoundaryTime += 0.000001;
+				}					
+			}
+			else if (secondBoundaryTimes == null && firstBoundaryTimes != null)
+			{
+				double inactiveBoundaryTime = firstBoundaryTimes[0];
+				boolean inactiveZoneAdded = false;
+				while (!inactiveZoneAdded)
+				{
+					inactiveZoneAdded = timesOfInactiveZones[0].add(new Double(inactiveBoundaryTime));
+					inactiveBoundaryTime += 0.000001;
+				}
+			}
+		}
+		
+		double PROPORTIONAL_DELAY_CONSTANT = 0.33;
+		for (int i=0; i<robots.size(); i++)
+		{
+			for (int j=0; j<zones.size(); j++)
+			{
+				double[] currBoundaryTime = zoneBoundaryTimes[i].get(new Integer(j));
+				int partnerRobotIndex = (int)Math.IEEEremainder(i + 1, 2);
+				if (currBoundaryTime != null && zoneBoundaryTimes[partnerRobotIndex].get(new Integer(j)) != null)
+				{
+					for (int k=0; k<currBoundaryTime.length; k++)
+					{
+						Double currBookingTime = new Double(currBoundaryTime[k]);
+						
+						int nrOfprecedingInactiveZones = timesOfInactiveZones[i].headSet(currBookingTime).size();		
+						currBoundaryTime[k] += nrOfprecedingInactiveZones * PROPORTIONAL_DELAY_CONSTANT * additionalTimes[i];
+					}
+				}
+			}
+
+			int nrOfprecedingInactiveZones = timesOfInactiveZones[i].headSet(new Double(goalTimes[i])).size();		
+			goalTimes[i] += nrOfprecedingInactiveZones * PROPORTIONAL_DELAY_CONSTANT * additionalTimes[i];
 		}
 	}
 
@@ -426,6 +499,8 @@ public class VisGraphScheduler
 		throws Exception
 	{
 		timer.restart();
+
+		additionalTimes = new double[robots.size()];
 
 		extractGraphTimes();
 
@@ -444,18 +519,24 @@ public class VisGraphScheduler
 
 		for (int j=0; j<zones.size(); j++)
 		{
+			// The zone boundaries of the first robot
 			double[] firstBoundaryTimes = zoneBoundaryTimes[0].get(new Integer(j));
+
+			// The zone boundaries of the second robot
 			double[] secondBoundaryTimes = zoneBoundaryTimes[1].get(new Integer(j));
 
+			// Two vertices (NW and SE) are added to the graph. But this is done only if 
+			// both boundary times are non-null, i.e. if both robots use the current zone.
 			if (firstBoundaryTimes != null && secondBoundaryTimes != null)
 			{
-				// Initialize vertices (NW and SE)
+				// Initialize vertices (NW)
 				double[] vertice = new double[3];
 				vertice[0]= firstBoundaryTimes[0];
 				vertice[1]= secondBoundaryTimes[1];
 				vertice[vertice.length - 1] = calcDistance(vertice, goalTimes);
 				vertices.add(vertice);
 
+				// Initialize vertices (SE)
 				vertice = new double[3];
 				vertice[0]= firstBoundaryTimes[1];
 				vertice[1]= secondBoundaryTimes[0];
