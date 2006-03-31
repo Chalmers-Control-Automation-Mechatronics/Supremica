@@ -322,7 +322,7 @@ public abstract class AbstractAstar
 					if (this instanceof ModifiedAstarUsingVisGraphRelaxation)
 					{
 						logger.info("Nr of VisGraphRelaxations = " + visGraphRelax.size());
-						logger.info("scheduleFromTime = " + scheduleFromTime + "; scheduleFromCounter = " + scheduleFromCounter);
+						logger.info("scheduleFromTime = " + scheduleFromTime + "; scheduleFromCounter = " + scheduleFromCounter + "; " + scheduleFromCounter/(scheduleFromTime+0.0) + " relax_counts/ms");
 						int visCheckTime = 0;
 						for (Iterator<VisGraphScheduler> it = visibilityGraphs.values().iterator(); it.hasNext(); )
 							visCheckTime += it.next().totalVisCheckTime;
@@ -333,7 +333,7 @@ public abstract class AbstractAstar
 				if (isRunning && buildSchedule)
 				{
 					buildScheduleAutomaton();
-				}
+				}  
 
 				if (isRunning)
 				{
@@ -341,7 +341,7 @@ public abstract class AbstractAstar
 				}
 				else
 				{
-					logger.warn("Scheduling interrupted");
+					logger.warn("Scheduling interrupted, openTree.size = " + openTree.size() + "; closedTree.size = " + closedTree.size());
 					gui.reset();
 				}
 			}
@@ -533,65 +533,39 @@ public abstract class AbstractAstar
 
 		//tillf
 		Runtime jvm = Runtime.getRuntime();
-
-		logger.info("Innan körning finns " + jvm.freeMemory() + " bitar");
 		ActionTimer cleanUpTimer = new ActionTimer();
 		cleanUpTimer.restart();
-/*
 
-		double[] newNode = new double[currNode.length];
-		newNode[0] = 10;
-		for (int i=1; i<currNode.length; i++)
-			newNode[i] = currNode[i];
-		openTree.add(currNode);
-
-		newNode = new double[currNode.length];
-		newNode[0] = 100;
-		for (int i=1; i<currNode.length; i++)
-			newNode[i] = currNode[i];
-		openTree.add(currNode);
-
-		newNode = new double[currNode.length];
-		newNode[0] = 1000;
-		for (int i=1; i<currNode.length; i++)
-			newNode[i] = currNode[i];
-		openTree.add(currNode);
-
-		logger.info("aaaaaaaaaaaaaabbbbbbbbbbbbbbbccccccccccccc...... = " + openTree.size());
-
-		openTree.remove(openTree.last());
-		logger.info("aaaaaaaaaaaaaabbbbbbbbbbbbbbbccccccccccccc...... = " + openTree.size());
-
-		openTree.remove(openTree.last());
-		logger.info("aaaaaaaaaaaaaabbbbbbbbbbbbbbbccccccccccccc...... = " + openTree.size());
-
-		openTree.remove(openTree.last());
-		logger.info("aaaaaaaaaaaaaabbbbbbbbbbbbbbbccccccccccccc...... = " + openTree.size());
-
-		openTree.remove(openTree.last());
-		logger.info("aaaaaaaaaaaaaabbbbbbbbbbbbbbbccccccccccccc...... = " + openTree.size());
-*/
 		while(! openTree.isEmpty())
 		{
 			if (isRunning)
 			{
-				//tillf
-				if (jvm.freeMemory() < 10000)
-				{
-					logger.warn("Fria minnet nästan slut i JVM, " + jvm.freeMemory() + " bitar kvar. Senast städat för " + cleanUpTimer.elapsedTime() + "ms sen.");
-//  					openTree.removeRange(openTree.size()/2, openTree.size());
-					int nedskalning = openTree.size()/2;
-					logger.info("Skall rensa bort " + nedskalning + " saker");
-					logger.info("Klipper äppelträdet med " + openTree.size() + " löv");
-					for (int i=0; i<nedskalning; i++)
-					{
-						openTree.remove(openTree.last());
-					}
-					logger.info("Äpplen samlade, kvar " + openTree.size() + " löv");
-					jvm.gc();
-					logger.warn("Efter städning är " + jvm.freeMemory() + " bitar lediga.");
-					cleanUpTimer.restart();
-				}
+				//tillf (Throws away the tail of the OPEN list)
+			//     if (jvm.freeMemory() < 2000000)
+// 				{
+// 					logger.warn("Almost run out of memory, the time since clean up = " + cleanUpTimer.elapsedTime() + "ms. FORCED CLEAN UP STARTED..........");
+// 					logger.info("Before clean up -> openTree.size = " + openTree.size() + "; closedTree.size = " + closedTree.size());
+// 					int cleanUpSize = openTree.size()/4;
+// 					double[] firstNodeToBeThrownAway = null;
+// 					double estimateToBeThrownAway = -1;
+// 					for (Iterator<double[]> it = openTree.iterator(); it.hasNext(); )
+// 					{
+// 						double[] currOpenNode = it.next();
+// 						double currEstimate = currOpenNode[ESTIMATE_INDEX];
+// 						if (currEstimate != estimateToBeThrownAway && cleanUpSize > 0)
+// 						{
+// 							estimateToBeThrownAway = currEstimate;
+// 							firstNodeToBeThrownAway = currOpenNode;
+// 						}
+// 						cleanUpSize--;
+// 					}
+// 					SortedSet<double[]> tailSetToBeThrownAway = openTree.tailSet(firstNodeToBeThrownAway);
+// 					tailSetToBeThrownAway.clear();
+// 					jvm.gc();
+// 					logger.info("After clean up -> openTree.size = " + openTree.size() + "; closedTree.size = " + closedTree.size());
+					
+// 					cleanUpTimer.restart();
+// 				}
 
 				iterationCounter++;
 
@@ -688,13 +662,13 @@ public abstract class AbstractAstar
 	{
 		// The nodes corresponding to the same logical state (but different paths from the initial state)
 		// as the new node. They are stored as one double[]-variable in the closedTree.
-		double[] correspondingClosedNodes = closedTree.remove(new Integer(getKey(node)));
+		double[] correspondingClosedNodes = closedTree.remove(new Integer((int)getKey(node)));
 
 		// If the node (or its logical state collegues) has not yet been put on the closedTree,
 		// then it is simply added to CLOSED.
 		if (correspondingClosedNodes == null)
 		{
-			closedTree.put(new Integer(getKey(node)), node);
+			closedTree.put(new Integer((int)getKey(node)), node);
 		}
 		else
 		{
@@ -731,7 +705,7 @@ public abstract class AbstractAstar
 				// it is thrown away;
 				if (newNodeIsAlwaysWorse)
 				{
-					closedTree.put(new Integer(getKey(node)), correspondingClosedNodes);
+					closedTree.put(new Integer((int)getKey(node)), correspondingClosedNodes);
 					return false;
 				}
 				// else if the examined node is neither worse nor better, its index is added to the tieIndices
@@ -760,7 +734,7 @@ public abstract class AbstractAstar
 				newClosedNode[j + tieIndices.size()*nodeLength] = node[j];
 			}
 
-			closedTree.put(new Integer(getKey(node)), newClosedNode);
+			closedTree.put(new Integer((int)getKey(node)), newClosedNode);
 		}
 
 		return true;
@@ -1042,7 +1016,9 @@ public abstract class AbstractAstar
 		int nrOfCandidates = parentCandidates.length / node.length;
 
 		if (nrOfCandidates == 1)
+		{
 			return parentCandidates;
+		}
 		// which candidate is the true parent...
 		else
 		{
@@ -1251,7 +1227,8 @@ public abstract class AbstractAstar
 	 * @param node the current node
 	 * @return the key (int) for the node ordering in the closedTree
 	 */
-    public int getKey(int[] node) {
+    public int getKey(int[] node) 
+	{
 		int key = 0;
 
 		for (int i=0; i<activeAutomataIndex.length; i++)

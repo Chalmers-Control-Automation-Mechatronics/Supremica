@@ -92,5 +92,4 @@ public class OpenTreeComparator
 
 		return 0;
 	}
-
 }

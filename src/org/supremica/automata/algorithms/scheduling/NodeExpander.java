@@ -214,7 +214,8 @@ public class NodeExpander
 
 		double[] newCosts = sched.updateCosts(getCosts(node), changedIndices[0], newCost);
 
-		return makeNode(nextStateIndices, makeParentNodeKeys(node), newCosts);
+// 		return makeNode(nextStateIndices, makeParentNodeKeys(node), newCosts);
+		return makeNode(nextStateIndices, sched.getKey(node), newCosts);
     }
 
     /***********************************************************************
@@ -281,7 +282,8 @@ public class NodeExpander
 						double newCost = plantAutomata.getAutomatonAt(changedIndex).getStateWithIndex(nextStateIndex[activeAutomataIndex[changedIndex]]).getCost();
 						double[] newCosts = sched.updateCosts(getCosts(node), changedIndex, newCost);
 			
-						childNodes.put(currKey, makeNode(nextStateIndex, makeParentNodeKeys(node), newCosts));
+// 						childNodes.put(currKey, makeNode(nextStateIndex, makeParentNodeKeys(node), newCosts));
+						childNodes.put(currKey, makeNode(nextStateIndex, sched.getKey(node), newCosts));
 					}
 				}
 			}
@@ -296,52 +298,58 @@ public class NodeExpander
      ***********************************************************************/
 
 	// Ändra detta oxo (ClosedNodes.CLOSED_NODE_INFO...)
-    private int[] makeParentNodeKeys(double [] node) 
-	{
-		if (node == null) 
-		{
-			return new int[]{-1, -1};
-		}
+//     private long[] makeParentNodeKeys(double [] node) 
+// 	{
+// 		if (node == null) 
+// 		{
+// 			return new long[]{-1, -1};
+// 		}
 	
-		int key = sched.getKey(node);
+// 		long key = sched.getKey(node);
 		
-		// parentNodeKeys kan strax ändras till att vara int och inte int[].
-		int nodeArrayIndex = -1; //sched.getClosedNodes().getArrayIndexForNode(key, node);
+// 		// parentNodeKeys kan strax ändras till att vara int och inte int[].
+// 		int nodeArrayIndex = -1; //sched.getClosedNodes().getArrayIndexForNode(key, node);
 
-		return new int[]{key, nodeArrayIndex};
-    }
+// 		return new long[]{key, nodeArrayIndex};
+//     }
 
 	/**
 	 * Combines the state indices of the current state and its parent, together
 	 * with the costs (currentCosts, accumulatedCost and estimatedCost) into an
 	 * int-array that represent the current node.
 	 */
-    public double[] makeNode(int[] stateIndices, int[] parentNodeKeys, double[] costs) {
-		if (parentNodeKeys == null) 
-		{
-			// Ändra detta
-			parentNodeKeys = new int[2]; //new int[ClosedNodes.CLOSED_NODE_INFO_SIZE];
-			for (int i=0; i<parentNodeKeys.length; i++)
-			{
-				parentNodeKeys[i] = -1;
-			}
-		}
+    public double[] makeNode(int[] stateIndices, int parentNodeKey, double[] costs) 
+	{
+// 		if (parentNodeKey == null) 
+// 		{
+// 			// Ändra detta
+// 			parentNodeKey = new int[2]; //new int[ClosedNodes.CLOSED_NODE_INFO_SIZE];
+// 			for (int i=0; i<parentNodeKeys.length; i++)
+// 			{
+// 				parentNodeKeys[i] = -1;
+// 			}
+// 		}
 
-		double[] newNode = new double[stateIndices.length + parentNodeKeys.length + costs.length];
+// 		double[] newNode = new double[stateIndices.length + parentNodeKeys.length + costs.length];
+		double[] newNode = new double[stateIndices.length + 2 + costs.length];
 	
 		for (int i=0; i<stateIndices.length; i++)
 		{
 			newNode[i] = stateIndices[i];
 		}
 
-		for (int i=0; i<parentNodeKeys.length; i++)
-		{
-			newNode[i + stateIndices.length] = parentNodeKeys[i];
-		}
+// 		for (int i=0; i<parentNodeKeys.length; i++)
+// 		{
+// 			newNode[i + stateIndices.length] = parentNodeKeys[i];
+// 		}
+
+		newNode[stateIndices.length] = parentNodeKey;
+		newNode[stateIndices.length + 1] = -1;
 
 		for (int i=0; i<costs.length; i++)
 		{
-			newNode[i + stateIndices.length + parentNodeKeys.length] = costs[i];
+// 			newNode[i + stateIndices.length + parentNodeKeys.length] = costs[i];
+			newNode[i + stateIndices.length + 2] = costs[i];
 		}
 
 		return newNode;

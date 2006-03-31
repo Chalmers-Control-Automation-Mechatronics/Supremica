@@ -128,6 +128,7 @@ public class ModifiedAstar
 
 		// The NodeExpander combines the information, together with the parent-information, 
 		// which is null for the initial state. 
-		return expander.makeNode(initialStates, null, initialCosts);
+// 		return expander.makeNode(initialStates, null, initialCosts);
+		return expander.makeNode(initialStates, -1, initialCosts);
     }
 }

@@ -136,25 +136,33 @@ public class VisibilityChecker {
 	return false;
     }
 
-    public void setStart(double[] start) {
-	for (int i=0; i<this.start.length; i++)
-	    this.start[i] = start[i]; 
+    public void setStart(double[] start) 
+	{
+		for (int i=0; i<this.start.length; i++)
+		{
+			this.start[i] = start[i]; 
+		}
     }
 
-    public void setGoal(double[] goal) {
-	for (int i=0; i<this.goal.length; i++)
-	    this.goal[i] = goal[i]; 
+    public void setGoal(double[] goal) 
+	{
+		for (int i=0; i<this.goal.length; i++)
+		{
+			this.goal[i] = goal[i]; 
+		}
     }
 
-    public double getDistanceToDiag(double[] point) {
-	double s1 = 0; 
-	double s2 = 0;
-
-	for (int i=0; i<point.length; i++) {
-	    s1 += Math.pow(start[i]-point[i], 2);
-	    s2 += Math.pow(goal[i]-point[i], 2);
-	}
-	
-	return Math.sqrt(s1) + Math.sqrt(s2);
+    public double getDistanceToDiag(double[] point) 
+	{
+		double s1 = 0; 
+		double s2 = 0;
+		
+		for (int i=0; i<point.length; i++) 
+		{
+			s1 += Math.pow(start[i]-point[i], 2);
+			s2 += Math.pow(goal[i]-point[i], 2);
+		}
+		
+		return Math.sqrt(s1) + Math.sqrt(s2);
     }
 }

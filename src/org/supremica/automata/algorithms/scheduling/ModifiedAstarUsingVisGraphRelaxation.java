@@ -153,7 +153,7 @@ public class ModifiedAstarUsingVisGraphRelaxation
 		if (approximation)
 		{
 			double xWeight = 1000;
-			double yWeight = 1000;
+			double yWeight = 500;
 			double depth = 0;
 			for (int i=0; i<activeAutomataIndex.length; i++)
 			{
@@ -163,7 +163,7 @@ public class ModifiedAstarUsingVisGraphRelaxation
 			depth = Math.sqrt(depth);
 // 			depth = depth / activeAutomataIndex.length;
 // 		    depth = (int)Math.floor(Math.random() * depth);
-			return estimatedRemainingCost * ( 1 + xWeight / (yWeight + depth));
+			return (new Double(estimatedRemainingCost * ( 1 + xWeight / (yWeight + depth)))).doubleValue();
 		}
 
 		return estimatedRemainingCost;

@@ -187,30 +187,36 @@ public class VisGraphBuilder {
 		}
     }
 
-    public double[] getGoal() {
+    public double[] getGoal() 
+	{
 		return goal;
     }
     
-    public ArrayList<double[]> getEdges() {
+    public ArrayList<double[]> getEdges() 
+	{
 		return edges;
     }
 
-    public boolean isVisible(double[] start, double[] goal) {
+    public boolean isVisible(double[] start, double[] goal) 
+	{
 		checker.setStart(start);
 		checker.setGoal(goal);
 
 		return checker.isVisible();
     }
 
-    public boolean isVisible(double[] start) {
+    public boolean isVisible(double[] start) 
+	{
 		return isVisible(start, goal);
     }
 
-    public double getDistanceToDiag(double[] point) {
+    public double getDistanceToDiag(double[] point) 
+	{
 		return checker.getDistanceToDiag(point);
     }
 
-    public void setStart(double[] point) {
+    public void setStart(double[] point) 
+	{
 		checker.setStart(point);
     }
 }
