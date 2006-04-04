@@ -28,6 +28,9 @@ public class ModifiedAstar
 
 	private static Logger logger = LoggerFactory.createLogger(ModifiedAstar.class);
 
+	//tillf
+	private int searchDepthCounter;
+
     public ModifiedAstar(Automata theAutomata, boolean buildSchedule, ScheduleDialog gui) 
 		throws Exception  
 	{
@@ -77,6 +80,29 @@ public class ModifiedAstar
 			if (currNodeIsAddedToClosed)
 			{
 				Iterator childIter = expander.expandNode(currNode, activeAutomataIndex).iterator();
+// 				//tillf (test)
+// 				Collection childColl = expander.expandNode(currNode, activeAutomataIndex);
+// 				if (childColl.size() > 0 && searchDepthCounter++ > 30)
+// 				{
+// 					int cleanUpSize = openTree.size()/searchDepthCounter;
+// 					double[] firstNodeToBeThrownAway = null;
+// 					double estimateToBeThrownAway = -1;
+// 					for (Iterator<double[]> it = openTree.iterator(); it.hasNext(); )
+// 					{
+// 						double[] currOpenNode = it.next();
+// 						double currEstimate = currOpenNode[ESTIMATE_INDEX];
+// 						if (currEstimate != estimateToBeThrownAway && cleanUpSize > 0)
+// 						{
+// 							estimateToBeThrownAway = currEstimate;
+// 							firstNodeToBeThrownAway = currOpenNode;
+// 						}
+// 						cleanUpSize--;
+// 					}
+// 					SortedSet<double[]> tailSetToBeThrownAway = openTree.tailSet(firstNodeToBeThrownAway);
+// 					tailSetToBeThrownAway.clear();
+// 					searchDepthCounter = 0;
+// 				}
+// 				Iterator childIter = childColl.iterator();
 				while (childIter.hasNext()) 
 				{
 					double[] nextNode = (double[])childIter.next();

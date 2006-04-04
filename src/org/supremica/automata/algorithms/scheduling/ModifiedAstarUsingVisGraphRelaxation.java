@@ -152,18 +152,29 @@ public class ModifiedAstarUsingVisGraphRelaxation
 		boolean approximation = true;
 		if (approximation)
 		{
-			double xWeight = 1000;
-			double yWeight = 500;
+			double xWeight = 100;
+			double yWeight = 200;
 			double depth = 0;
 			for (int i=0; i<activeAutomataIndex.length; i++)
 			{
 				depth += Math.pow(node[activeAutomataIndex[i]], 2);
-// 				depth += node[activeAutomataIndex[i]];
 			}
 			depth = Math.sqrt(depth);
-// 			depth = depth / activeAutomataIndex.length;
-// 		    depth = (int)Math.floor(Math.random() * depth);
 			return (new Double(estimatedRemainingCost * ( 1 + xWeight / (yWeight + depth)))).doubleValue();
+
+// 			double addition = 1;
+// 			for (int i=0; i<activeAutomataIndex.length; i++)
+// 			{
+// 				int automataIndex = activeAutomataIndex[i];
+
+// 				double currAddition = remainingCosts[automataIndex][(int)node[automataIndex]] / cycleTimes[automataIndex];			
+// 				if (currAddition < addition)
+// 				{
+// 					addition = currAddition;
+// 				}
+// 			}
+
+// 			return estimatedRemainingCost +  addition;
 		}
 
 		return estimatedRemainingCost;

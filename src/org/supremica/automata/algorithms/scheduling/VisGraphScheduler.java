@@ -376,6 +376,9 @@ public class VisGraphScheduler
 		zoneBoundaryTimes = new Hashtable[robots.size()]; 
 		goalTimes = new double[robots.size()];
 
+		// The times that are added to compensate for the independent bookings that lie ahead 
+		additionalTimes = new double[robots.size()];
+
 		for (int i=0; i<robots.size(); i++)
 		{
 			double currTime = 0;
@@ -432,66 +435,67 @@ public class VisGraphScheduler
 			additionalTimes[i] = goalTimes[i] / additionalTimes[i]; 
 		}
 
-		//TEST (Add some time for each booking event that is not active since it is
-		// is probable that the risk of collision might delay the schedule somewhat);
-		TreeSet<Double>[] timesOfInactiveZones = new TreeSet[2];
-		timesOfInactiveZones[0] = new TreeSet<Double>();
-		timesOfInactiveZones[1] = new TreeSet<Double>();
-		for (int j=0; j<zones.size(); j++)
-		{
-			// The zone boundaries of the first robot
-			double[] firstBoundaryTimes = zoneBoundaryTimes[0].get(new Integer(j));
+// 		//TEST (Add some time for each booking event that is not active since it is
+// 		// is probable that the risk of collision might delay the schedule somewhat);
+// 		TreeSet<Double>[] timesOfInactiveZones = new TreeSet[2];
+// 		timesOfInactiveZones[0] = new TreeSet<Double>();
+// 		timesOfInactiveZones[1] = new TreeSet<Double>();
+// 		for (int j=0; j<zones.size(); j++)
+// 		{
+// 			// The zone boundaries of the first robot
+// 			double[] firstBoundaryTimes = zoneBoundaryTimes[0].get(new Integer(j));
 			
-			// The zone boundaries of the second robot
-			double[] secondBoundaryTimes = zoneBoundaryTimes[1].get(new Integer(j));
+// 			// The zone boundaries of the second robot
+// 			double[] secondBoundaryTimes = zoneBoundaryTimes[1].get(new Integer(j));
 			
-			// If the current zone is only booked by one robot, i.e. if it is 
-			// inactive, its time is recorded and later used to shift the following times
-			// It is important that every inactive zone results in a time shifting (thus += 0.000001)
-			if (firstBoundaryTimes == null && secondBoundaryTimes != null)
-			{
-				double inactiveBoundaryTime = secondBoundaryTimes[0];
-				boolean inactiveZoneAdded = false;
-				while (!inactiveZoneAdded)
-				{
-					inactiveZoneAdded = timesOfInactiveZones[1].add(new Double(inactiveBoundaryTime));
-					inactiveBoundaryTime += 0.000001;
-				}					
-			}
-			else if (secondBoundaryTimes == null && firstBoundaryTimes != null)
-			{
-				double inactiveBoundaryTime = firstBoundaryTimes[0];
-				boolean inactiveZoneAdded = false;
-				while (!inactiveZoneAdded)
-				{
-					inactiveZoneAdded = timesOfInactiveZones[0].add(new Double(inactiveBoundaryTime));
-					inactiveBoundaryTime += 0.000001;
-				}
-			}
-		}
+// 			// If the current zone is only booked by one robot, i.e. if it is 
+// 			// inactive, its time is recorded and later used to shift the following times
+// 			// It is important that every inactive zone results in a time shifting (thus += 0.000001)
+// 			if (firstBoundaryTimes == null && secondBoundaryTimes != null)
+// 			{
+// 				double inactiveBoundaryTime = secondBoundaryTimes[0];
+// 				boolean inactiveZoneAdded = false;
+// 				while (!inactiveZoneAdded)
+// 				{
+// 					inactiveZoneAdded = timesOfInactiveZones[1].add(new Double(inactiveBoundaryTime));
+// 					inactiveBoundaryTime += 0.000001;
+// 				}					
+// 			}
+// 			else if (secondBoundaryTimes == null && firstBoundaryTimes != null)
+// 			{
+// 				double inactiveBoundaryTime = firstBoundaryTimes[0];
+// 				boolean inactiveZoneAdded = false;
+// 				while (!inactiveZoneAdded)
+// 				{
+// 					inactiveZoneAdded = timesOfInactiveZones[0].add(new Double(inactiveBoundaryTime));
+// 					inactiveBoundaryTime += 0.000001;
+// 				}
+// 			}
+// 		}
 		
-		double PROPORTIONAL_DELAY_CONSTANT = 0.33;
-		for (int i=0; i<robots.size(); i++)
-		{
-			for (int j=0; j<zones.size(); j++)
-			{
-				double[] currBoundaryTime = zoneBoundaryTimes[i].get(new Integer(j));
-				int partnerRobotIndex = (int)Math.IEEEremainder(i + 1, 2);
-				if (currBoundaryTime != null && zoneBoundaryTimes[partnerRobotIndex].get(new Integer(j)) != null)
-				{
-					for (int k=0; k<currBoundaryTime.length; k++)
-					{
-						Double currBookingTime = new Double(currBoundaryTime[k]);
+// 		double PROPORTIONAL_DELAY_CONSTANT = 0;
+// // 		double PROPORTIONAL_DELAY_CONSTANT = 0.25 * Math.random();
+// 		for (int i=0; i<robots.size(); i++)
+// 		{
+// 			for (int j=0; j<zones.size(); j++)
+// 			{
+// 				double[] currBoundaryTime = zoneBoundaryTimes[i].get(new Integer(j));
+// 				int partnerRobotIndex = (int)Math.IEEEremainder(i + 1, 2);
+// 				if (currBoundaryTime != null && zoneBoundaryTimes[partnerRobotIndex].get(new Integer(j)) != null)
+// 				{
+// 					for (int k=0; k<currBoundaryTime.length; k++)
+// 					{
+// 						Double currBookingTime = new Double(currBoundaryTime[k]);
 						
-						int nrOfprecedingInactiveZones = timesOfInactiveZones[i].headSet(currBookingTime).size();		
-						currBoundaryTime[k] += nrOfprecedingInactiveZones * PROPORTIONAL_DELAY_CONSTANT * additionalTimes[i];
-					}
-				}
-			}
+// 						int nrOfprecedingInactiveZones = timesOfInactiveZones[i].headSet(currBookingTime).size();		
+// 						currBoundaryTime[k] += nrOfprecedingInactiveZones * PROPORTIONAL_DELAY_CONSTANT * additionalTimes[i];
+// 					}
+// 				}
+// 			}
 
-			int nrOfprecedingInactiveZones = timesOfInactiveZones[i].headSet(new Double(goalTimes[i])).size();		
-			goalTimes[i] += nrOfprecedingInactiveZones * PROPORTIONAL_DELAY_CONSTANT * additionalTimes[i];
-		}
+// 			int nrOfprecedingInactiveZones = timesOfInactiveZones[i].headSet(new Double(goalTimes[i])).size();		
+// 			goalTimes[i] += nrOfprecedingInactiveZones * PROPORTIONAL_DELAY_CONSTANT * additionalTimes[i];
+// 		}
 	}
 
 	/** Now works only for two robots */
@@ -499,8 +503,6 @@ public class VisGraphScheduler
 		throws Exception
 	{
 		timer.restart();
-
-		additionalTimes = new double[robots.size()];
 
 		extractGraphTimes();
 

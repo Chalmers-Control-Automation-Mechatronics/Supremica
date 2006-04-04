@@ -113,8 +113,12 @@ public class Milp
 	public void schedule()
 		throws Exception
 	{
+		ActionTimer totalTimer = new ActionTimer();
+
 		if (isRunning)
 		{
+			totalTimer.restart();
+
 			initialize();
 		}
 
@@ -134,6 +138,10 @@ public class Milp
 		if (isRunning)
 		{
 			processSolutionFile();
+
+			String totalTimeStr = "Total optimization time = " + totalTimer.elapsedTime() + "ms";
+			logger.info(totalTimeStr);
+			outputStr += "\t" + totalTimeStr + "\n";
 		}
 
 		// Builds the optimal schedule (if solicited)
@@ -734,7 +742,7 @@ public class Milp
 
 		// The string containing mutex constraints
 		String mutexConstraints = "";
-
+ 
 		// The string containing mutex variables
 		String mutexVariables = "";
 
@@ -1121,12 +1129,12 @@ public class Milp
 
 			if (milpEchoStr.contains("INTEGER OPTIMAL SOLUTION FOUND") || milpEchoStr.contains("Time") || milpEchoStr.contains("Memory"))
 			{
-				logger.info(milpEchoStr);
+// 				logger.info(milpEchoStr);
 
-				if (!milpEchoStr.contains("INTEGER OPTIMAL SOLUTION FOUND"))
-				{
-					outputStr += "\t" + milpEchoStr + "\n";
-				}
+// 				if (!milpEchoStr.contains("INTEGER OPTIMAL SOLUTION FOUND"))
+// 				{
+// 					outputStr += "\t" + milpEchoStr + "\n";
+// 				}
 			}
 			else if (milpEchoStr.contains("error"))
 			{

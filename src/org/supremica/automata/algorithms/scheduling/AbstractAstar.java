@@ -306,9 +306,14 @@ public abstract class AbstractAstar
 
 	public void run()
 	{
-		try {
+		try 
+		{
+			ActionTimer totalTimer = new ActionTimer();
+
 			if (isRunning)
 			{
+				totalTimer.restart();
+
 				init();
 			}
 
@@ -317,6 +322,10 @@ public abstract class AbstractAstar
 				if (isRunning)
 				{
 					schedule();
+
+					String totalTimeStr = "Total optimization time = " + totalTimer.elapsedTime() + "ms";
+					logger.info(totalTimeStr);
+					outputStr += "\t" + totalTimeStr + "\n";
 
 					//Tillf
 					if (this instanceof ModifiedAstarUsingVisGraphRelaxation)
@@ -541,7 +550,7 @@ public abstract class AbstractAstar
 			if (isRunning)
 			{
 				//tillf (Throws away the tail of the OPEN list)
-			//     if (jvm.freeMemory() < 2000000)
+// 			    if (jvm.freeMemory() < jvm.maxMemory() / 100)
 // 				{
 // 					logger.warn("Almost run out of memory, the time since clean up = " + cleanUpTimer.elapsedTime() + "ms. FORCED CLEAN UP STARTED..........");
 // 					logger.info("Before clean up -> openTree.size = " + openTree.size() + "; closedTree.size = " + closedTree.size());
