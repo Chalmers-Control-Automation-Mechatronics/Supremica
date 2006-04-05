@@ -114,7 +114,7 @@ public class Supremica
 		// theVisualProjectContainer = currProject.getVisualProjectContainer();
 		// theVisualProjectContainer.addListener(this);
 
-		logger.info("Supremica version: " + (new Version()).toString());
+		logger.info("Supremica version: " + Version.version());
 
 		if (Config.XML_RPC_ACTIVE.isTrue())
 		{
@@ -388,13 +388,11 @@ public class Supremica
 
 	public void selectAutomaton(Automaton a)
 	{
-
 		// XXX: where is my implementation dude???
 	}
 
 	public void selectAutomata(Collection whichAutomata)
 	{
-
 		// make it a name set. reason: automata object may be _equal_ but not _same_ :(
 		Collection which = new HashSet();
 
@@ -592,7 +590,9 @@ public class Supremica
 		return unselectedAutomata;
 	}
 
-	// Same as getSelectedAutomata but include execution information
+	/**
+	 * Same as getSelectedAutomata but include execution information
+	 */
 	public Project getSelectedProject()
 	{
 		int[] selectedRowIndices = theAutomatonTable.getSelectedRows();
@@ -629,7 +629,6 @@ public class Supremica
 		return selectedProject;
 	}
 
-
 	public void renameProject()
 	{
 		String newName = getNewProjectName();
@@ -653,7 +652,9 @@ public class Supremica
 		}
 	}
 
-	// Help.About action performed
+	/**
+	 * Help.About action performed
+	 */
 	public void helpAbout()
 	{
 		AboutBox dlg = new AboutBox(this);
@@ -677,12 +678,6 @@ public class Supremica
 		}
 	}
 
-	/*
-	public void updateFromJGrafchart()
-	{
-
-	}
-*/
 	public String getNewProjectName()
 	{
 		String msg = "Enter new project name";
@@ -805,7 +800,6 @@ public class Supremica
 
 	public void tableChanged(TableModelEvent e)
 	{
-
 		// logger.debug("Supremica.tableChanged");
 		theAutomatonTable.revalidate();
 	}

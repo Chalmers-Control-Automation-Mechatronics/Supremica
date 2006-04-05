@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleWindow
 //###########################################################################
-//# $Id: ModuleWindow.java,v 1.38 2006-03-30 15:28:17 flordal Exp $
+//# $Id: ModuleWindow.java,v 1.39 2006-04-05 14:36:00 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -103,6 +103,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.supremica.automata.IO.ProjectBuildFromWaters;
 import org.supremica.automata.Project;
+import org.supremica.properties.Config;
 
 /**
  * <p>The primary module-loading window.</p>
@@ -117,7 +118,7 @@ public class ModuleWindow
 	implements ActionListener, FocusListener, UndoInterface, WindowListener
 {
 	// Limits the functionality of Waters to just drawing simple components 
-	public static final boolean DES_COURSE_VERSION = false;
+	public static final boolean DES_COURSE_VERSION = Config.GENERAL_STUDENT_VERSION.isTrue();
 
 	//########################################################################
 	//# Constructor

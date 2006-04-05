@@ -132,12 +132,13 @@ public class ExampleTemplates
 		thisGroup.addItem(new TemplateItem("2.1 - PIN Code Reader", prefix + "Ex2_1.xml"));
 		thisGroup.addItem(new TemplateItem("2.2 - Kanban", prefix + "Ex2_2.xml"));
 		thisGroup.addItem(new TemplateItem("2.6 - Man, Wolf, Goat, Cabbage", prefix + "Ex2_6.xml"));
-		thisGroup.addItem(new TemplateItem("4.1 - Man, Wolf, Goat, Cabbage Revisited", prefix + "Ex4_1.xml"));
-		thisGroup.addItem(new TemplateItem("4.2 - AGV System", prefix + "Ex4_2.xml"));
-		thisGroup.addItem(new TemplateItem("4.4 - Cat & Mouse", prefix + "Ex4_4.xml"));
-		thisGroup.addItem(new TemplateItem("4.5 - Robot & Machine: All events controllable", prefix + "Ex4_5_all_con.xml"));
-		thisGroup.addItem(new TemplateItem("4.5 - Robot & Machine: Put is uncontrollable", prefix + "Ex4_5_b_uncon.xml"));
-		thisGroup.addItem(new TemplateItem("4.6 - Two Machines & a Buffer", prefix + "Ex4_6.xml"));
+		// OBS! THE EXERCISES BELOW HAVE CHANGED NUMBER...
+		thisGroup.addItem(new TemplateItem("4.2 - Man, Wolf, Goat, Cabbage Revisited", prefix + "Ex4_1.xml"));
+		thisGroup.addItem(new TemplateItem("4.3 - AGV System", prefix + "Ex4_2.xml"));
+		thisGroup.addItem(new TemplateItem("4.5 - Cat & Mouse", prefix + "Ex4_4.xml"));
+		thisGroup.addItem(new TemplateItem("4.6 - Robot & Machine: All events controllable", prefix + "Ex4_5_all_con.xml"));
+		thisGroup.addItem(new TemplateItem("4.6 - Robot & Machine: Put is uncontrollable", prefix + "Ex4_5_b_uncon.xml"));
+		thisGroup.addItem(new TemplateItem("4.7 - Two Machines & a Buffer", prefix + "Ex4_6.xml"));
     }
 
     private void initializeCCSCourseAssignments()
