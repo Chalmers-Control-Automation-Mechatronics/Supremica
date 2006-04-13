@@ -11,58 +11,52 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 /**
- * the Command for deleting of edges
+ * Command for the flipping of edges
  *
- * @author Simon Ware
+ * @author Hugo Flordal
  */
-public class DeleteEdgeCommand
+
+public class FlipEdgeCommand
     implements Command
 {
-
-    /** The ControlledSurface Edited with this Command */
-    private final ControlledSurface mSurface;
     /** The Edge Edited by this Command */
-    private final EditorEdge mDeleted;
-    private final String mDescription = "Edge Deletion";
+    private final EditorEdge edge;
+    private final String description = "Edge Flipping";
 
     /**
-     * Deletes an edge on the specified surface.
+     * Flips an edge on the specified surface.
      *
      * @param surface the surface edited by this command
      */
-    public DeleteEdgeCommand(ControlledSurface surface, EditorEdge edge)
+    public FlipEdgeCommand(EditorEdge edge)
     {
-		mSurface = surface;
-		mDeleted = edge;
+		this.edge = edge;
     }
 
     /**
      * Does the Command.
      */
-
     public void execute()
     {
-		mSurface.delEdge(mDeleted);
-		mSurface.getEditorInterface().setDisplayed();
+		edge.flipEdge();
     }
 
     /** 
-     * Undoes the Command.
+     * Undoes the Command
      */    
-
     public void undo()
     {
-		mSurface.addEdge(mDeleted);
-		mSurface.getEditorInterface().setDisplayed();
+		edge.flipEdge();
     }
 
-	public boolean isSignificant()
+   	public boolean isSignificant()
 	{
+		// I have no idea what to return here... I return false, true?!
 		return true;
 	}
-	
+
     public String getName()
     {
-		return mDescription;
+		return description;
     }
 }

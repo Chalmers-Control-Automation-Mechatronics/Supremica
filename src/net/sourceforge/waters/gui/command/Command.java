@@ -7,6 +7,7 @@ public interface Command
 	public void undo();
 	
 	public String getName();
-	
+
+	/** What should this one do? */
 	public boolean isSignificant();
 }

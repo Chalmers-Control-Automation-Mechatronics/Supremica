@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorNode
 //###########################################################################
-//# $Id: EditorNode.java,v 1.36 2006-03-24 16:59:27 flordal Exp $
+//# $Id: EditorNode.java,v 1.37 2006-04-13 08:58:23 flordal Exp $
 //###########################################################################
 
 
@@ -183,9 +183,20 @@ public class EditorNode
 		return mSubject.hashCode();
 	}
 
+	/**
+	 * Returns true if this node is initial.
+	 */
 	public boolean isInitial()
 	{
 		return mSubject.isInitial();
+	}
+
+	/**
+	 * Returns true if this node is forbidden.
+	 */
+	public boolean isForbidden()
+	{
+		return false;
 	}
 
 	public boolean setName(String n, JComponent c)
@@ -383,6 +394,12 @@ public class EditorNode
 		}
 		g2d.drawOval(getX()-RADIUS, getY()-RADIUS, RADIUS*2, RADIUS*2);			
 		g2d.setStroke(BASICSTROKE);
+		if (isForbidden())
+		{
+			g2d.setColor(Color.RED);
+			g2d.drawLine(getX() - (RADIUS+1), getY() - (RADIUS+1), getX() + (RADIUS+1), getY() + (RADIUS+1));
+			g2d.drawLine(getX() + (RADIUS+1), getY() - (RADIUS+1), getX() - (RADIUS+1), getY() + (RADIUS+1));
+		}
 		/*
 		// Draw a double circle on marked nodes... (one color marking only?)
 		if (mColors.size() > 0)

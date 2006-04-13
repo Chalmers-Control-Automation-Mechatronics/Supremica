@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorEdge
 //###########################################################################
-//# $Id: EditorEdge.java,v 1.39 2006-03-24 16:59:27 flordal Exp $
+//# $Id: EditorEdge.java,v 1.40 2006-04-13 08:58:23 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -79,11 +79,16 @@ public class EditorEdge
 	private Rectangle2D.Double center = new Rectangle2D.Double();
 	private boolean dragC = false;
 	private EdgeSubject subject;
-	private static double tearRatio = .8;
 	private static int WIDTHD = 2;
 	private static int WIDTHS = 5;
 	private EditorSurface mParent;
 
+	// Selfloops
+	private static double tearRatio = .8;
+
+	/**
+	 * Constructor.
+	 */
 	public EditorEdge(EditorObject iStartNode, EditorNode iEndNode,
 			int x, int y, EdgeSubject e, EditorSurface parent)
 	{
@@ -98,21 +103,15 @@ public class EditorEdge
 		if (startNode.getType() == NODE)
 		{
 			EditorNode s = (EditorNode) startNode;
-			
 			subject.setSource((NodeSubject) s.getSubject());
-			
-			start = s.getPosition();
-			
+			start = s.getPosition();			
 			s.attach(this);
 		}
 		else
 		{
 			EditorNodeGroup s = (EditorNodeGroup) startNode;
-			
-			subject.setSource((NodeSubject) s.getSubject());
-		
-			start = s.setOnBounds(x, y);
-			
+			subject.setSource((NodeSubject) s.getSubject());		
+			start = s.setOnBounds(x, y);			
 			s.attach(this);
 		}
 		
@@ -156,8 +155,7 @@ public class EditorEdge
 			ArrayList l = new ArrayList(1);
 
 			l.add(tPoint);
-			subject.setGeometry
-				(new SplineGeometrySubject(l, SplineKind.INTERPOLATING));
+			subject.setGeometry(new SplineGeometrySubject(l, SplineKind.INTERPOLATING));
 		}
 		else
 		{
@@ -172,7 +170,7 @@ public class EditorEdge
 		}
 
 		// Initialize the edge (somehow this strange call does exactly what
-		// we want) Without this call, when the mouse is moved above the
+		// we want). Without this call, when the mouse is moved above the
 		// handle of one of the _curved_ edges, the labelgroup on that edge
 		// jumps to the side!! Presumably TPoint is not properly set before
 		// this call...
@@ -452,8 +450,8 @@ public class EditorEdge
 	}
 
 	/** 
-	 * Get the X coordinate of the turning point of the curve
-	 * returns The X coordinate of the curve turning point
+	 * Get the x-coordinate of the turning point of the curve
+	 * @returns The x-coordinate of the curve turning point
 	 */
 	public double getTPointX()
 	{
@@ -470,8 +468,8 @@ public class EditorEdge
 	}
 
 	/** 
-	 * Get the Y coordinate of the turning point of the curve
-	 * returns The Y coordinate of the curve turning point
+	 * Get the y-coordinate of the turning point of the curve
+	 * @returns The y-coordinate of the curve turning point
 	 */
 	public double getTPointY()
 	{
@@ -547,8 +545,25 @@ public class EditorEdge
 	}
 
 	/**
-	 * Set the edge control point (rather than the turning point)
+	 * Changes the direction of the edge.
 	 */
+	public void flipEdge()
+	{
+		// Can't flip if startnode is nodegroup or edge is selfloop!
+		if (startNode.getType() == NODEGROUP || isSelfLoop())
+		{
+			return;
+		}
+	
+		double oldX = getTPointX();
+		double oldY = getTPointY();
+
+		EditorNode tempNode = (EditorNode) startNode;
+		setStartNode(endNode,0,0);
+		setEndNode(tempNode);
+
+		setPosition(oldX, oldY);
+	}
 
 	/** 
 	 * Recaculate the position of the control point, based on the turning point
@@ -557,6 +572,7 @@ public class EditorEdge
 	 * @param startN True if the node being moved is the source node.
 	 */
 	public void updateControlPoint(double ox, double oy, boolean startN)
+
 	{
 		if (isSelfLoop())
 		{

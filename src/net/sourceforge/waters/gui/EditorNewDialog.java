@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorNewDialog
 //###########################################################################
-//# $Id: EditorNewDialog.java,v 1.5 2006-03-02 12:12:49 martin Exp $
+//# $Id: EditorNewDialog.java,v 1.6 2006-04-13 08:58:23 flordal Exp $
 //###########################################################################
 
 
@@ -85,6 +85,7 @@ public class EditorNewDialog
 
 		k1 = new JRadioButton("Property");
 		k1.setActionCommand("Property");
+		k1.setEnabled(!ModuleWindow.DES_COURSE_VERSION);
 		group.add(k1);
 		kBox.add(k1);
 

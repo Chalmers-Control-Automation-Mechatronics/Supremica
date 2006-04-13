@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventEditorDialog
 //###########################################################################
-//# $Id: EventEditorDialog.java,v 1.6 2006-03-21 21:58:04 flordal Exp $
+//# $Id: EventEditorDialog.java,v 1.7 2006-04-13 08:58:23 flordal Exp $
 //###########################################################################
 
 
@@ -69,6 +69,7 @@ public class EventEditorDialog
 		controllable.setActionCommand("controllable");
 		uncontrollable.setActionCommand("uncontrollable");
 		proposition.setActionCommand("proposition");
+		proposition.setEnabled(!ModuleWindow.DES_COURSE_VERSION);
 
 		JPanel buttons = new JPanel();
 
@@ -99,15 +100,19 @@ public class EventEditorDialog
 		buttonBox.add(tButton = new JButton("Add"));
 		tButton.setActionCommand("add");
 		tButton.addActionListener(this);
+		tButton.setEnabled(!ModuleWindow.DES_COURSE_VERSION);
 		buttonBox.add(tButton = new JButton("Remove"));
 		tButton.setActionCommand("remove");
 		tButton.addActionListener(this);
+		tButton.setEnabled(!ModuleWindow.DES_COURSE_VERSION);
 		buttonBox.add(tButton = new JButton("Up"));
 		tButton.setActionCommand("up");
 		tButton.addActionListener(this);
+		tButton.setEnabled(!ModuleWindow.DES_COURSE_VERSION);
 		buttonBox.add(tButton = new JButton("Down"));
 		tButton.setActionCommand("down");
 		tButton.addActionListener(this);
+		tButton.setEnabled(!ModuleWindow.DES_COURSE_VERSION);
 
 		JButton cancelButton = new JButton("Cancel");
 		JPanel r4 = new JPanel();

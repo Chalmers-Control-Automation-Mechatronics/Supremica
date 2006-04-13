@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleWindow
 //###########################################################################
-//# $Id: ModuleWindow.java,v 1.40 2006-04-05 15:36:08 flordal Exp $
+//# $Id: ModuleWindow.java,v 1.41 2006-04-13 08:58:23 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -31,7 +31,6 @@ import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
 import javax.xml.bind.JAXBException;
-
 
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.DataFlavor;
@@ -116,11 +115,15 @@ public class ModuleWindow
 	extends JFrame
 	implements ActionListener, FocusListener, UndoInterface, WindowListener
 {
-	// Limits the functionality of Waters to just drawing simple components 
-	public static final boolean DES_COURSE_VERSION = false;
+	/**
+	 * Limits the functionality of Waters to just drawing simple components.
+	 * Should be a property (will be a property in the IDE...).
+	 */
+	public static final boolean DES_COURSE_VERSION = true;
 
-	//########################################################################
-	//# Constructor
+	/**
+	 * Constructor.
+	 */
 	public ModuleWindow(String title)
 	{
 		// Don't close the window without doing some stuff first...
@@ -686,8 +689,8 @@ public class ModuleWindow
 			parentNode = rootNode;
 			} else {
 			parentNode = (DefaultMutableTreeNode)
-		(parentPath.getLastPathComponent());
-		}*/
+			(parentPath.getLastPathComponent());
+			}*/
 			EditorNewDialog diag = new EditorNewDialog(this, parentNode);
 
 			logEntry("New Simple Component requested");

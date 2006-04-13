@@ -8,6 +8,7 @@ import org.supremica.util.VPopupMenu;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.DeleteEdgeCommand;
+import net.sourceforge.waters.gui.command.FlipEdgeCommand;
 
 /**
  * Popup for editing attributes of a node.
@@ -21,6 +22,7 @@ class EditorEdgePopupMenu
 
 	private JMenuItem deleteItem;
 	private JMenuItem recallItem;	
+	private JMenuItem flipItem;	
 
 	public EditorEdgePopupMenu(ControlledSurface parent, EditorEdge edge)
 	{
@@ -47,12 +49,30 @@ class EditorEdgePopupMenu
 		this.add(item);
 		recallItem = item;
 
+		item = new JMenuItem("Flip edge");
+		item.addActionListener(this);
+		this.add(item);
+		flipItem = item;
+
 		// Disable "recall" if label is in right position (or maybe instead if it is close enough?)
 		if ((parent.getLabelGroup(edge).getOffsetX() == EditorLabelGroup.DEFAULTOFFSETX) && (parent.getLabelGroup(edge).getOffsetY() == EditorLabelGroup.DEFAULTOFFSETY))
 		{
 			recallItem.setEnabled(false);
 			recallItem.setToolTipText("Label is already in default position");
 		}
+		
+		// Disable "flip" if startnode is a nodegroup
+		if (edge.getStartNode() instanceof EditorNodeGroup)
+		{
+			flipItem.setEnabled(false);
+			flipItem.setToolTipText("Can't make an edge end in a nodegroup");
+		}
+		// Disable "flip" if selfloop
+		if (edge.isSelfLoop())
+		{
+			flipItem.setEnabled(false);
+			flipItem.setToolTipText("Selfloop");
+		} 
 	}
 
 	public void actionPerformed(ActionEvent e) 
@@ -67,6 +87,12 @@ class EditorEdgePopupMenu
 		if (e.getSource() == recallItem)
 		{
 			parent.getLabelGroup(edge).setOffset(EditorLabelGroup.DEFAULTOFFSETX, EditorLabelGroup.DEFAULTOFFSETY);
+		}
+
+		if (e.getSource() == flipItem)
+		{
+			Command flipEdge = new FlipEdgeCommand(edge);
+			parent.getEditorInterface().getUndoInterface().executeCommand(flipEdge);
 		}
 
 		parent.repaint();
