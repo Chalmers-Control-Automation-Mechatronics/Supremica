@@ -46,15 +46,26 @@ public class VisibilityChecker {
 		if (!backwardTimeAllowed)
 		{
 			if (goal[0] < start[0] || goal[1] < start[1])
+			{
 				return false;
+			}
 		}
 
 		if (goal[0] == start[0] && goal[1] == start[1])
+		{
 			return false;
+		}
 
 		for (int i=0; i<intersectionEdges.size(); i++) 
 		{
-			if (!pointOnTheEdge(intersectionEdges.get(i))) 
+			if (pointOnTheEdge(start, intersectionEdges.get(i))) 
+			{
+				if (pointOnTheEdge(goal, intersectionEdges.get(i)))
+				{
+					return true;
+				}
+			}
+			else
 			{
 				double[] firstVertice = new double[]{intersectionEdges.get(i)[0], intersectionEdges.get(i)[1]};
 				double[] secondVertice = new double[]{intersectionEdges.get(i)[2], intersectionEdges.get(i)[3]};
@@ -116,24 +127,34 @@ public class VisibilityChecker {
     /**
      * Returns true if the start point lies somewhere on the supplied edge (including the vertices). 
      */
-    private boolean pointOnTheEdge(double[] edge) {
-	double[] a = new double[]{edge[0], edge[1]};
-	double[] b = new double[]{edge[2], edge[3]};
-
-	if (!clockwisePts(start, a, b) && !clockwisePts(start, b, a)) {
-	    if (start[0] < Math.min(edge[0], edge[2])) 
+    private boolean pointOnTheEdge(double[] start, double[] edge) 
+	{
+		double[] a = new double[]{edge[0], edge[1]};
+		double[] b = new double[]{edge[2], edge[3]};
+		
+		if (!clockwisePts(start, a, b) && !clockwisePts(start, b, a)) 
+		{
+			if (start[0] < Math.min(edge[0], edge[2])) 
+			{
+				return false;
+			}
+			else if (start[0] > Math.max(edge[0], edge[2])) 
+			{
+				return false;
+			}
+			else if (start[1] < Math.min(edge[1], edge[3])) 
+			{
+				return false;
+			}
+			else if (start[1] > Math.max(edge[1], edge[3]))
+			{
+				return false;
+			}
+			
+			return true;
+		}
+		
 		return false;
-	    else if (start[0] > Math.max(edge[0], edge[2])) 
-		return false;
-	    else if (start[1] < Math.min(edge[1], edge[3])) 
-		return false;
-	    else if (start[1] > Math.max(edge[1], edge[3]))
-		return false;
-
-	    return true;
-	}
-
-	return false;
     }
 
     public void setStart(double[] start) 

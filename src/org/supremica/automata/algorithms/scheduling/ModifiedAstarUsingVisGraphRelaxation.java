@@ -152,8 +152,8 @@ public class ModifiedAstarUsingVisGraphRelaxation
 		boolean approximation = true;
 		if (approximation)
 		{
-			double xWeight = 100;
-			double yWeight = 200;
+			double xWeight = 200;
+			double yWeight = 100;
 			double depth = 0;
 			for (int i=0; i<activeAutomataIndex.length; i++)
 			{

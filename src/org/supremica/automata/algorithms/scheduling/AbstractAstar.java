@@ -550,31 +550,31 @@ public abstract class AbstractAstar
 			if (isRunning)
 			{
 				//tillf (Throws away the tail of the OPEN list)
-// 			    if (jvm.freeMemory() < jvm.maxMemory() / 100)
-// 				{
-// 					logger.warn("Almost run out of memory, the time since clean up = " + cleanUpTimer.elapsedTime() + "ms. FORCED CLEAN UP STARTED..........");
-// 					logger.info("Before clean up -> openTree.size = " + openTree.size() + "; closedTree.size = " + closedTree.size());
-// 					int cleanUpSize = openTree.size()/4;
-// 					double[] firstNodeToBeThrownAway = null;
-// 					double estimateToBeThrownAway = -1;
-// 					for (Iterator<double[]> it = openTree.iterator(); it.hasNext(); )
-// 					{
-// 						double[] currOpenNode = it.next();
-// 						double currEstimate = currOpenNode[ESTIMATE_INDEX];
-// 						if (currEstimate != estimateToBeThrownAway && cleanUpSize > 0)
-// 						{
-// 							estimateToBeThrownAway = currEstimate;
-// 							firstNodeToBeThrownAway = currOpenNode;
-// 						}
-// 						cleanUpSize--;
-// 					}
-// 					SortedSet<double[]> tailSetToBeThrownAway = openTree.tailSet(firstNodeToBeThrownAway);
-// 					tailSetToBeThrownAway.clear();
-// 					jvm.gc();
-// 					logger.info("After clean up -> openTree.size = " + openTree.size() + "; closedTree.size = " + closedTree.size());
+			    if (jvm.freeMemory() < jvm.maxMemory() / 100)
+				{
+					logger.warn("Almost run out of memory, the time since clean up = " + cleanUpTimer.elapsedTime() + "ms. FORCED CLEAN UP STARTED..........");
+					logger.info("Before clean up -> openTree.size = " + openTree.size() + "; closedTree.size = " + closedTree.size());
+					int cleanUpSize = openTree.size()/4;
+					double[] firstNodeToBeThrownAway = null;
+					double estimateToBeThrownAway = -1;
+					for (Iterator<double[]> it = openTree.iterator(); it.hasNext(); )
+					{
+						double[] currOpenNode = it.next();
+						double currEstimate = currOpenNode[ESTIMATE_INDEX];
+						if (currEstimate != estimateToBeThrownAway && cleanUpSize > 0)
+						{
+							estimateToBeThrownAway = currEstimate;
+							firstNodeToBeThrownAway = currOpenNode;
+						}
+						cleanUpSize--;
+					}
+					SortedSet<double[]> tailSetToBeThrownAway = openTree.tailSet(firstNodeToBeThrownAway);
+					tailSetToBeThrownAway.clear();
+					jvm.gc();
+					logger.info("After clean up -> openTree.size = " + openTree.size() + "; closedTree.size = " + closedTree.size());
 					
-// 					cleanUpTimer.restart();
-// 				}
+					cleanUpTimer.restart();
+				}
 
 				iterationCounter++;
 
@@ -891,20 +891,16 @@ public abstract class AbstractAstar
  		double[] parent = getParent(node);
 
  		double fNode = node[ACCUMULATED_COST_INDEX] + getRelaxation(node);
-//   		double fParent = parent[ESTIMATE_INDEX]; //parent[ACCUMULATED_COST_INDEX] + getRelaxation(parent);
+//   		double fParent = parent[ESTIMATE_INDEX];
 
 //  		// The following code inside the if-loop is needed to ensure consistency of the heuristic
 //  		if (fParent > fNode)
 // 		{
 // 			//logger.warn("Consistency ensurance");
-// // 			logger.info("(P) node = " + printArray(node) + "; estimation = " + fParent);
+// 			//logger.info("(P) node = " + printArray(node) + "; estimation = " + fParent);
 //  			return fParent;
 // 		}
-//  		else
-// 		{
-// // 			logger.info("node = " + printArray(node) + "; estimation = " + fNode);
-//  			return fNode;
-// 		}
+
 
 // 		logger.info("node = " + printArray(node) + "; estimation = " + fNode);
 

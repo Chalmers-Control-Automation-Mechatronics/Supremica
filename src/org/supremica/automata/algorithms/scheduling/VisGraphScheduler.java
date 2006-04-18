@@ -342,7 +342,7 @@ public class VisGraphScheduler
 		{
 			// ... then add the children of the current vertice to the open list
 			ArrayList<Integer> visibleVerticeIndices = visibilityChecker.getVisibleIndices(vertices.get((int) currNode[SELF_INDEX]), vertices);
-
+			
 			for (int i=0; i<visibleVerticeIndices.size(); i++)
 			{
 				int newSelfIndex = visibleVerticeIndices.get(i).intValue();
@@ -688,5 +688,4 @@ public class VisGraphScheduler
 		
 		return s;
     }
-
 }

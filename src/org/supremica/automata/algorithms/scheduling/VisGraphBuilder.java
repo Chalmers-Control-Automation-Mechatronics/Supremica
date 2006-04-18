@@ -5,7 +5,8 @@ import java.util.*;
 import org.supremica.log.*;
 import org.supremica.automata.*;
 
-public class VisGraphBuilder {
+public class VisGraphBuilder 
+{
 
 	//     private BufferedReader r;
 	//     private ArrayList<Double>[] allTimes;
@@ -26,7 +27,8 @@ public class VisGraphBuilder {
     private VisibilityChecker checker;
     private static Logger logger = LoggerFactory.createLogger(VisGraphBuilder.class);
 
-    public VisGraphBuilder(Automata plantAutomata, int[][] oneProdRelax) {
+    public VisGraphBuilder(Automata plantAutomata, int[][] oneProdRelax) 
+	{
 	
 		this.plantAutomata = plantAutomata;
 
@@ -99,23 +101,30 @@ public class VisGraphBuilder {
 	// 	}
 	//     }   
 
-    public void buildVisGraph() {
+    public void buildVisGraph() 
+	{
 		extractTimes();
 		generateTotalZoneIndices();
 
 		//Detta funkar bara för två robotar och borde utökas/ändras......
 		Enumeration<Integer> keys = totalZoneIndices[0].keys();
-		while (keys.hasMoreElements()) {
+		while (keys.hasMoreElements()) 
+		{
 			int key = keys.nextElement();
 			ArrayList<Integer> r1TimeIndices = totalZoneIndices[0].get(key);
 			ArrayList<Integer> r2TimeIndices = totalZoneIndices[1].get(key);
 
 			if (key == -1) 
+			{
 				goal = new double[]{zoneTimes[0][r1TimeIndices.get(0)], zoneTimes[1][r2TimeIndices.get(0)]};
-			else if (! (r2TimeIndices == null)) {
+			}
+			else if (! (r2TimeIndices == null)) 
+			{
 				double[] r1 = new double[r1TimeIndices.size()];
 				double[] r2 = new double[r2TimeIndices.size()];
-				for (int i=0; i<r1.length; i++) {
+				
+				for (int i=0; i<r1.length; i++) 
+				{
 					r1[i] = zoneTimes[0][r1TimeIndices.get(i)];
 					r2[i] = zoneTimes[1][r2TimeIndices.get(i)];
 				}
@@ -128,19 +137,23 @@ public class VisGraphBuilder {
 		}
     }
 
-    public void drawVisGraph() {
+    public void drawVisGraph() 
+	{
 		logger.error("VisGraphBuilder.drawVisGraph() not implemented.........................");
     }
 
-    private void extractTimes() {
+    private void extractTimes() 
+	{
 		zoneTimes = new double[plantAutomata.size()][];
 
-		for (int i=0; i<plantAutomata.size(); i++) {
+		for (int i=0; i<plantAutomata.size(); i++) 
+		{
 			int[] relaxationTimes = oneProdRelax[i];
 			double[] automatonZoneTimes = new double[relaxationTimes.length-1];
 			double base = relaxationTimes[0] + plantAutomata.getAutomatonAt(i).getInitialState().getCost();
 	    
-			for (int j=0; j<automatonZoneTimes.length; j++) {
+			for (int j=0; j<automatonZoneTimes.length; j++) 
+			{
 				automatonZoneTimes[j] = base - relaxationTimes[j];
 			}
 
@@ -148,33 +161,43 @@ public class VisGraphBuilder {
 		}
     }
 
-    private void generateTotalZoneIndices() {
+    private void generateTotalZoneIndices() 
+	{
 		totalZoneIndices = new Hashtable[plantAutomata.size()];
  
-		for (int i=0; i<plantAutomata.size(); i++) {
+		for (int i=0; i<plantAutomata.size(); i++) 
+		{
 			Hashtable<Integer, ArrayList<Integer>> zoneIndices = new Hashtable<Integer, ArrayList<Integer>>();
 			int counter = 0;
 	    
 			Automaton theAuto = plantAutomata.getAutomatonAt(i);
 			State currState = theAuto.getInitialState();
 	    
-			while (!currState.isAccepting()) {
+			while (!currState.isAccepting()) 
+			{
 				Iterator<Arc> outgoingArcsIter = currState.outgoingArcsIterator();
 		
-				while (outgoingArcsIter.hasNext()) {
+				while (outgoingArcsIter.hasNext()) 
+				{
 					Arc outgoingArc = outgoingArcsIter.next();
 					String label = outgoingArc.getLabel();
 					int zoneNr = -1;
 		    
 					if (label.contains("b"))
+					{
 						zoneNr = (new Integer(label.substring(label.indexOf("b")+1).trim())).intValue();
+					}
 					else if (label.contains("u"))
+					{
 						zoneNr = (new Integer(label.substring(label.indexOf("u")+1).trim())).intValue();
-		    
+					}
+
 					ArrayList<Integer> localZoneIndices = zoneIndices.get(zoneNr);
 					if (localZoneIndices == null) 
+					{
 						localZoneIndices = new ArrayList<Integer>();
-		    
+					}
+					
 					localZoneIndices.add(counter);
 					zoneIndices.put(zoneNr, localZoneIndices);
 		    

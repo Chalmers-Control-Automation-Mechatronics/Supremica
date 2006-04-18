@@ -338,6 +338,7 @@ public class ScheduleDialog
 				else
 				{
 					writer.flush();
+					writer.close();
 
 					autoTestButton.setEnabled(true);
 					done();
