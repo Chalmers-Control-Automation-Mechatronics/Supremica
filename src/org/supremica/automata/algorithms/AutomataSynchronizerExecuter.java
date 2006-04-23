@@ -1004,6 +1004,7 @@ public final class AutomataSynchronizerExecuter
 					newState.setFirst(AutomataIndexFormHelper.isFirst(currState));
 					newState.setLast(AutomataIndexFormHelper.isLast(currState));
 					newState.initCosts();
+
 					theAutomaton.addState(newState);
 				}
 			}

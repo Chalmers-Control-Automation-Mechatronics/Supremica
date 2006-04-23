@@ -47,28 +47,36 @@
  *
  * Supremica is owned and represented by KA.
  */
-package org.supremica.util;
+package org.supremica.automata;
 
-public class SupremicaException
-	extends Exception
+import java.lang.String;
+
+/**
+ * A label, such as the ones appearing in a KripkeState.
+ *
+ * @author Hugo Flordal
+ */
+public class KripkeLabel
+	implements Comparable<KripkeLabel>
 {
-	public SupremicaException()
+	private String label = null;
+	
+	public KripkeLabel(String label)
 	{
-		super();
+		this.label = label;
 	}
 
-	public SupremicaException(String message)
+	public String toString()
 	{
-		super(message);
+		return label;
 	}
 
-	public SupremicaException(String message, Throwable cause)
+	/**
+	 * Implementation of the Comparable interface. Compares the labels.
+	 */
+	public int compareTo(KripkeLabel other)
 	{
-		super(message, cause);
+		return this.label.compareTo(other.label);
 	}
 
-	public SupremicaException(Throwable cause)
-	{
-		super(cause);
-	}
 }

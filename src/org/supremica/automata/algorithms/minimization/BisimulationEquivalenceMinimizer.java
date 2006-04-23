@@ -104,11 +104,23 @@ public class BisimulationEquivalenceMinimizer
 		}
     }
 
+	
     /**
-     * Minimizes automaton with respect to bisimulation equivalence.
+     * Minimizes automaton with respect to strong bisimulation equivalence.
+     */
+	public static void minimize(Automaton aut)
+	{
+		minimize(aut, false, true);
+	}
+    /**
+     * Minimizes automaton with respect to weak or strong bisimulation
+     * equivalence using long or short state names
      *
+     * @param useShortNames If true, merged states will get a new,
+     * short name, otherwise merged states are built from their
+     * components, separated by the chosen state name separator.
      * @param strong If true, minimizes with respect to strong bisimulation equivalence,
-     * if false, minimized with respect to weak bisimulation equivalence.
+     * if false, minimizes with respect to weak bisimulation equivalence.
      */
     public static void minimize(Automaton aut, boolean useShortNames, boolean strong)
         throws UnsatisfiedLinkError
@@ -118,7 +130,7 @@ public class BisimulationEquivalenceMinimizer
 
         // States...
         State[] states = new State[aut.nbrOfStates()];
-
+		
         // Initialize
         {
             // The initial partitioning in an array, separated by -1 elements.
@@ -169,7 +181,8 @@ public class BisimulationEquivalenceMinimizer
                 int index = 0;
                 for (Iterator<Arc> arcIt = aut.arcIterator(); arcIt.hasNext(); )
                 {
-                    Arc arc = arcIt.next();
+					Arc arc = arcIt.next();
+					//logger.info("From: " + arc.getFromState() + " ev: " + arc.getEvent() + " (" + arc.getEvent().getIndex() + ") to: " + arc.getToState());
                     transitions[index++] = arc.getFromState().getIndex();
                     transitions[index++] = arc.getEvent().getIndex();
                     transitions[index++] = arc.getToState().getIndex();
@@ -237,6 +250,7 @@ public class BisimulationEquivalenceMinimizer
             }
 
             // Initialize
+			//logger.info("States: " + aut.nbrOfStates() + " events: " + aut.nbrOfEvents() + " transitions: " + transitionCount);
             initialize(aut.nbrOfStates(), aut.nbrOfEvents(), transitionCount,
                        initialPartitioning, transitions);
 			initialPartitioning = null;

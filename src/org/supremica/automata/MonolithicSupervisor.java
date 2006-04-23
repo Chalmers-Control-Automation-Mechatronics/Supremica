@@ -47,28 +47,31 @@
  *
  * Supremica is owned and represented by KA.
  */
-package org.supremica.util;
+package org.supremica.automata;
 
-public class SupremicaException
-	extends Exception
+import java.lang.String;
+
+import org.supremica.util.SupremicaException;
+import org.supremica.automata.Automata;
+import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.State;
+
+/**
+ * A monolithic supervisor works just like a modular supervisor with
+ * just one module...
+ */
+public class MonolithicSupervisor
+	extends ModularSupervisor
+	implements Supervisor
 {
-	public SupremicaException()
+	/**
+	 * Creates a monolithic supervisor. 
+	 *
+	 * @param supervisor is an Automaton modeling the supervisor.
+	 */
+	public MonolithicSupervisor(Automaton supervisor)
+		throws SupremicaException
 	{
-		super();
-	}
-
-	public SupremicaException(String message)
-	{
-		super(message);
-	}
-
-	public SupremicaException(String message, Throwable cause)
-	{
-		super(message, cause);
-	}
-
-	public SupremicaException(Throwable cause)
-	{
-		super(cause);
+		super(new Automata(supervisor));
 	}
 }

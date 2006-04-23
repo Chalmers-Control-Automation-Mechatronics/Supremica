@@ -904,36 +904,6 @@ public final class AutomataSynchronizerHelper
 		}
 	}
 
-	/*
-	 *  public void newAutomaton(ArrayList selectedAutomata)
-	 *  throws Exception
-	 *  {   // Used by automataaSynthesizer (essential when building more than one automata)
-	 *  theAutomaton = new Automaton();
-	 *
-	 *  // Compute the new alphabet
-	 *  EventsSet theAlphabets = new EventsSet();
-	 *  Iterator autIt = selectedAutomata.iterator();
-	 *  while (autIt.hasNext())
-	 *  {
-	 *  Automaton currAutomaton = (Automaton)autIt.next();
-	 *  Alphabet currAlphabet = currAutomaton.getAlphabet();
-	 *  theAlphabets.add(currAlphabet);
-	 *  }
-	 *
-	 *  try
-	 *  {
-	 *  Alphabet theAlphabet = AlphabetHelpers.getUnionAlphabet(theAlphabets, "a");
-	 *  theAutomaton.setAlphabet(theAlphabet);
-	 *  }
-	 *  catch (Exception e)
-	 *  {
-	 *  System.err.println("Error while generating union alphabet: " + e);
-	 *  logger.error("Error while generating union alphabet: " + e);
-	 *      logger.debug(e.getStackTrace());
-	 *  throw e;
-	 *  }
-	 *  }
-	 */
 	public void stopExecutionAfter(int stopExecutionLimit)
 	{
 		this.stopExecutionLimit = stopExecutionLimit;

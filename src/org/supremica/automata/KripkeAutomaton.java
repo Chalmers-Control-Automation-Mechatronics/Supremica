@@ -47,28 +47,25 @@
  *
  * Supremica is owned and represented by KA.
  */
-package org.supremica.util;
+package org.supremica.automata;
 
-public class SupremicaException
-	extends Exception
+public class KripkeAutomaton
+	extends Automaton
 {
-	public SupremicaException()
+	/**
+	 * Creates a new KripkeAutomaton.
+	 */
+	public KripkeAutomaton()
 	{
 		super();
 	}
 
-	public SupremicaException(String message)
+	/**
+	 * Creates a KripkeAutomaton out of an Automaton.
+	 */
+	public KripkeAutomaton(Automaton automaton)
 	{
-		super(message);
-	}
-
-	public SupremicaException(String message, Throwable cause)
-	{
-		super(message, cause);
-	}
-
-	public SupremicaException(Throwable cause)
-	{
-		super(cause);
+		// Make deep copy (shallow copy is ok, though).
+		super(automaton);
 	}
 }

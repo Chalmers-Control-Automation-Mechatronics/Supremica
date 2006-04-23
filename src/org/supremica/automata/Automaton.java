@@ -1964,10 +1964,9 @@ public class Automaton
 		else
 		{
 			// Get/create silent events tau_c and tau_u
+			// tau_c
 			String silentCName = Config.GENERAL_SILENT_CONTROLLABLE_EVENT_NAME.get();
-			String silentUName = Config.GENERAL_SILENT_UNCONTROLLABLE_EVENT_NAME.get();
 			LabeledEvent tau_c = getAlphabet().getEvent(silentCName);
-			LabeledEvent tau_u = getAlphabet().getEvent(silentUName);
 			if (tau_c == null)
 			{
 				tau_c = new LabeledEvent(silentCName);
@@ -1984,6 +1983,9 @@ public class Automaton
 					return;
 				}
 			}
+			// tau_u
+			String silentUName = Config.GENERAL_SILENT_UNCONTROLLABLE_EVENT_NAME.get();
+			LabeledEvent tau_u = getAlphabet().getEvent(silentUName);
 			if (tau_u == null)
 			{
 				tau_u = new LabeledEvent(silentUName);

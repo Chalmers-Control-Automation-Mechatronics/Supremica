@@ -15,7 +15,6 @@ import javax.swing.undo.CannotUndoException;
  *
  * @author Hugo Flordal
  */
-
 public class FlipEdgeCommand
     implements Command
 {

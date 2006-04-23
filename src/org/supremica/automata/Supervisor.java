@@ -47,28 +47,40 @@
  *
  * Supremica is owned and represented by KA.
  */
-package org.supremica.util;
+package org.supremica.automata;
 
-public class SupremicaException
-	extends Exception
+import org.supremica.util.SupremicaException;
+
+/**
+ * Interface describing the methods of a supervisor.
+ *
+ * You can ask a supervisor whether a particular event is enabled
+ * currently (call the isEnabled-method) and you can inform it that
+ * you have executed an event so that it can change state properly
+ * (call the executeEvent-method).
+ */
+public interface Supervisor
 {
-	public SupremicaException()
-	{
-		super();
-	}
+	/**
+	 * Returns true if the event <code>event</code> is enabled by the
+	 * supervisor in its current state.
+	 */
+	public boolean isEnabled(LabeledEvent event);
 
-	public SupremicaException(String message)
-	{
-		super(message);
-	}
+	/**
+	 * Executes the event <code>event</code>; changes the current
+	 * internal state of the supervisor.
+	 *
+	 * @throws EventDisabledException if the event was not enabled.
+	 */
+	public void executeEvent(LabeledEvent event)
+		throws EventDisabledException;
+}
 
-	public SupremicaException(String message, Throwable cause)
-	{
-		super(message, cause);
-	}
-
-	public SupremicaException(Throwable cause)
-	{
-		super(cause);
-	}
+/**
+ * Thrown when an event unexpectedly turns out to be disabled.
+ */
+class EventDisabledException
+	extends SupremicaException
+{
 }

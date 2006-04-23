@@ -57,6 +57,7 @@ import org.supremica.automata.algorithms.standard.Determinizer;
 import org.supremica.properties.Config;
 import org.supremica.gui.ExecutionDialog;
 import org.supremica.gui.ActionMan;
+import org.supremica.util.SupremicaException;
 
 /**
  * This class can be used to reduce the size of an automaton while
@@ -184,122 +185,41 @@ public class AutomatonMinimizer
         }
 		else if (equivalenceRelation == EquivalenceRelation.SupervisionEquivalence)
 		{
-			//////////////////////
-			// "Half-synthesis" //
-			//////////////////////
-
-			//logger.info("Half-synthesis on " + theAutomaton);
-
 			//Coreachability is strange, forbidden and MAX_COST
 			//coincides? Why!? I'll ignore forbidden states for now.
 			if (theAutomaton.nbrOfForbiddenStates() > 0)
 			{
-				logger.warn("Supervision equivalence does not cope with previously forbidden states.");
+				logger.warn("Supervision equivalence can not cope with previously forbidden states.");
 				requestStop();
 				return null;
 			}
-			boolean outerChange = true;
-			while (outerChange)
+
+			//////////////////////
+			// "Half-synthesis" //
+			//////////////////////
+			halfWaySynthesis(theAutomaton);
+
+			// Check if the library with the native methods is ok
+			if (BisimulationEquivalenceMinimizer.libraryLoaded())
 			{
-				outerChange = false;
-				SynthesizerOptions synthOptions = SynthesizerOptions.getDefaultSynthesizerOptions();
-				AutomatonSynthesizer synth = new AutomatonSynthesizer(theAutomaton, synthOptions);
-				StateSet blockingStates = synth.doCoreachable();
-				//logger.info("Blocking: " + blockingStates);
-				// Remove outgoing arcs from blocking states
-				for (State state : blockingStates)
-				{
-					state.removeOutgoingArcs();
-				}
-				// Find all states that can reach blockingStates using tau_u events
-				boolean innerChange = true;
-				while (innerChange)
-				{
-					// Find new states
-					StateSet newStates = blockingStates.previousStates(Config.GENERAL_SILENT_UNCONTROLLABLE_EVENT_NAME.get());
-					// Remove outgoing arcs from newStates
-					for (State state : newStates)
-					{
-						state.removeOutgoingArcs();
-					}
-					// Add new to old
-					int oldSize = blockingStates.size();
-					blockingStates.addAll(newStates);
-					int newSize = blockingStates.size();
-					innerChange = (oldSize < newSize);
-				}
-				//logger.info("Blocking + tau_u-uncontrollable: " + blockingStates);
+				// tau_u-saturate!
+				supervisionEquivalenceSaturate(theAutomaton);
 
-				if (stopRequested)
-				{
-					return null;
-				}
-
-				// Remove all controllable incoming transitions
-				for (State state : blockingStates)
-				{
-					List<Arc> toBeRemoved = new LinkedList<Arc>();
-					for (Iterator<Arc> arcIt = state.incomingArcsIterator(); arcIt.hasNext(); )
-					{
-						Arc arc = arcIt.next();
-						if (arc.getEvent().isControllable())
-						{
-							toBeRemoved.add(arc);
-						}
-					}
-					while (toBeRemoved.size() > 0)
-					{
-						theAutomaton.removeArc(toBeRemoved.remove(0));
-					}
-				}
-				// Merge all states in blockingStates
-				if (blockingStates.size() > 1)
-				{
-					State blob = blockingStates.remove();
-					while (blockingStates.size() > 0)
-					{
-						State state = blockingStates.remove();
-						blob = MinimizationHelper.mergeStates(theAutomaton, blob, state, false);
-					}
-					blob.setName("dump");
-					blob.setAccepting(false);
-					outerChange = true;
-				}
+				// Partition using native methods
+				BisimulationEquivalenceMinimizer.minimize(theAutomaton, false, true);
 			}
 
-			// Reset costs
-			for (State state : theAutomaton)
+			// Message
+			if (Config.VERBOSE_MODE.isTrue())
 			{
-				state.setCost(0);
-			}
-			// Make accessible
-			SynthesizerOptions synthOptions = SynthesizerOptions.getDefaultSynthesizerOptions();
-			AutomatonSynthesizer synth = new AutomatonSynthesizer(theAutomaton, synthOptions);
-			synth.doReachable(true);
-			LinkedList<State> toBeRemoved = new LinkedList<State>();
-			for (Iterator<State> it = theAutomaton.stateIterator(); it.hasNext(); )
-			{
-				State state = it.next();
-				if ((state.getCost() == State.MAX_COST) && !state.isForbidden())
-				{
-					logger.verbose("The state " + state + " will be removed since it is not reachable.");
-					toBeRemoved.add(state);
-				}
-
-				// The forbidden states may actually be reachable?
-				if (state.isForbidden())
-				{
-					//logger.fatal("The state " + state + " is forbidden.");
-				}
-			}
-			while (toBeRemoved.size() != 0)
-			{
-				theAutomaton.removeState(toBeRemoved.remove(0));
+				int after = theAutomaton.nbrOfStates();
+				logger.info("There were " + before + " states before and " + after +
+							" states after the minimization. Reduction: " +
+							Math.round(100*(((double) (before-after))*100/before))/100.0 + "%.");
 			}
 
 	        // Start listening again
 	        theAutomaton.endTransaction();
-
 
 			// Finished!
 			return theAutomaton;
@@ -385,7 +305,7 @@ public class AutomatonMinimizer
                 // RULES A, AA, B, C, F //
                 //////////////////////////
 
-                int count = runRules(theAutomaton);
+                int count = runConflictEquivalenceRules(theAutomaton);
                 if (count > 0)
                 {
                     logger.verbose("Removed " + count + " states based on conflict equivalence " +
@@ -460,7 +380,7 @@ public class AutomatonMinimizer
             // RULES A, AA, B, C, F //
             //////////////////////////
 
-            int count = runRules(theAutomaton);
+            int count = runConflictEquivalenceRules(theAutomaton);
             if (count > 0)
             {
                 logger.verbose("Removed " + count + " states based on conflict equivalence " +
@@ -990,7 +910,7 @@ public class AutomatonMinimizer
      *
      * @return total number of states removed.
      */
-    public int runRules(Automaton aut)
+    public int runConflictEquivalenceRules(Automaton aut)
     {
         int total = 0;
 
@@ -1746,16 +1666,26 @@ public class AutomatonMinimizer
      * "saturation"), there is also a transition "p -epsilon-> q".
      */
 	public static int epsilonSaturate(Automaton aut, boolean addSelfloops)
+		throws SupremicaException
 	{
 		int count = 0;
-
-        // Add silent event (it's probably already there)
-        LabeledEvent tau = new LabeledEvent(Config.GENERAL_SILENT_EVENT_NAME.get());
-        tau.setEpsilon(true);
-        if (!aut.getAlphabet().contains(tau.getLabel()))
-        {
-            aut.getAlphabet().addEvent(tau);
-        }
+		
+		// Get/create silent event tau
+		String silentName = Config.GENERAL_SILENT_EVENT_NAME.get();
+		LabeledEvent tau = aut.getAlphabet().getEvent(silentName);
+		if (tau == null)
+		{
+			tau = new LabeledEvent(silentName);
+			tau.setEpsilon(true);
+			aut.getAlphabet().addEvent(tau);
+		}
+		else
+		{
+			if (!tau.isEpsilon())
+			{
+				throw new SupremicaException("Misuse of reserved event name 'tau'.");
+			}
+		}
 
 		// For each state, find epsilon closure and add add transitions
         for (Iterator<State> fromIt = aut.stateIterator(); fromIt.hasNext();)
@@ -1776,6 +1706,75 @@ public class AutomatonMinimizer
 			}
         }
 
+        return count;
+	}
+
+    /**
+     * Each time there is a transition "p -tau_u^*sigma-> q", after
+     * completing the saturation, there is also a transition "p
+     * -sigma-> q".
+     */
+	public static int supervisionEquivalenceSaturate(Automaton aut)
+		throws SupremicaException
+	{
+		int count = 0;
+
+        // Add silent event (if it's not already there)
+		String silentUName = Config.GENERAL_SILENT_UNCONTROLLABLE_EVENT_NAME.get();
+		LabeledEvent tau_u = aut.getAlphabet().getEvent(silentUName);
+		if (tau_u == null)
+		{
+			tau_u = new LabeledEvent(silentUName);
+			tau_u.setEpsilon(true);
+			tau_u.setControllable(false);
+			aut.getAlphabet().addEvent(tau_u);
+		}
+		else
+		{
+			if (!tau_u.isEpsilon() || tau_u.isControllable())
+			{
+				throw new SupremicaException("Misuse of reserved event name 'tau_u'.");
+			}
+		}
+
+		// For each state, find tau_u-epsilon closure and add transitions
+        for (Iterator<State> fromIt = aut.stateIterator(); fromIt.hasNext();)
+        {
+            State from = fromIt.next();
+
+			// Add self-loop
+			{
+				Arc arc = new Arc(from, from, tau_u);
+				if (!from.containsOutgoingArc(arc))
+				{
+					aut.addArc(arc);
+					count++;			
+				}
+			}
+			
+			// Iterate over states in closure
+            StateSet closure = from.epsilonClosure(false, false, true);
+			for (Iterator<State> toIt = closure.iterator(); toIt.hasNext(); )
+			{
+				State to = toIt.next();
+				LinkedList<Arc> toBeAdded = new LinkedList<Arc>();
+				for (Iterator<Arc> outIt = to.outgoingArcsIterator(); outIt.hasNext(); )
+				{
+					Arc oldArc = outIt.next();
+					Arc arc = new Arc(from, oldArc.getToState(), oldArc.getEvent());
+					if (!from.containsOutgoingArc(arc))
+					{
+						toBeAdded.add(arc);
+					}
+				}
+				for (Arc arc : toBeAdded)
+				{
+					aut.addArc(arc);
+            	    count++;
+				}
+			}
+        }
+		
         return count;
 	}
 
@@ -2068,6 +2067,120 @@ public class AutomatonMinimizer
         }
     }
 
+	/**
+	 * Performs "half-way" synthesis on aut.
+	 *
+	 * @return size of state space reduction.
+	 */
+	private int halfWaySynthesis(Automaton aut)
+		throws Exception
+	{
+		//logger.info("Halfway-synthesis on " + aut);
+		int sizeBefore = aut.nbrOfStates();
+
+		// Loop
+		boolean outerChange = true;
+		while (outerChange)
+		{
+			outerChange = false;
+			SynthesizerOptions synthOptions = SynthesizerOptions.getDefaultSynthesizerOptions();
+			AutomatonSynthesizer synth = new AutomatonSynthesizer(aut, synthOptions);
+			StateSet blockingStates = synth.doCoreachable();
+			//logger.info("Blocking: " + blockingStates);
+			// Remove outgoing arcs from blocking states
+			for (State state : blockingStates)
+			{
+				state.removeOutgoingArcs();
+			}
+			// Find all states that can reach blockingStates using tau_u events
+			boolean innerChange = true;
+			while (innerChange)
+			{
+				// Find new states
+				StateSet newStates = blockingStates.previousStates(Config.GENERAL_SILENT_UNCONTROLLABLE_EVENT_NAME.get());
+				// Remove outgoing arcs from newStates
+				for (State state : newStates)
+				{
+					state.removeOutgoingArcs();
+				}
+				// Add new to old
+				int oldSize = blockingStates.size();
+				blockingStates.addAll(newStates);
+				int newSize = blockingStates.size();
+				innerChange = (oldSize < newSize);
+			}
+			//logger.info("Blocking + tau_u-uncontrollable: " + blockingStates);
+
+			if (stopRequested)
+			{
+				throw new Exception("Stop requested during Halfway-synthesis.");
+			}
+
+			// Remove all controllable incoming transitions
+			for (State state : blockingStates)
+			{
+				List<Arc> toBeRemoved = new LinkedList<Arc>();
+				for (Iterator<Arc> arcIt = state.incomingArcsIterator(); arcIt.hasNext(); )
+				{
+					Arc arc = arcIt.next();
+					if (arc.getEvent().isControllable())
+					{
+						toBeRemoved.add(arc);
+					}
+				}
+				while (toBeRemoved.size() > 0)
+				{
+					aut.removeArc(toBeRemoved.remove(0));
+				}
+			}
+			// Merge all states in blockingStates
+			if (blockingStates.size() > 1)
+			{
+				State blob = blockingStates.remove();
+				while (blockingStates.size() > 0)
+				{
+					State state = blockingStates.remove();
+					blob = MinimizationHelper.mergeStates(aut, blob, state, false);
+				}
+				blob.setName("dump");
+				blob.setAccepting(false);
+				outerChange = true;
+			}
+		}
+
+		// Reset costs
+		for (State state : aut)
+		{
+			state.setCost(0);
+		}
+		// Make accessible
+		SynthesizerOptions synthOptions = SynthesizerOptions.getDefaultSynthesizerOptions();
+		AutomatonSynthesizer synth = new AutomatonSynthesizer(aut, synthOptions);
+		synth.doReachable(true);
+		LinkedList<State> toBeRemoved = new LinkedList<State>();
+		for (Iterator<State> it = aut.stateIterator(); it.hasNext(); )
+		{
+			State state = it.next();
+			if ((state.getCost() == State.MAX_COST) && !state.isForbidden())
+			{
+				logger.verbose("The state " + state + " will be removed since it is not reachable.");
+				toBeRemoved.add(state);
+			}
+
+			// The forbidden states may actually be reachable?
+			if (state.isForbidden())
+			{
+				//logger.fatal("The state " + state + " is forbidden.");
+			}
+		}
+		while (toBeRemoved.size() != 0)
+		{
+			aut.removeState(toBeRemoved.remove(0));
+		}
+
+		return sizeBefore - aut.nbrOfStates();
+	}
+
     /**
      * Sets the executionDialog of this AutomatonMinimizer. If executionDialog is null,
      * the dialog is not updated.
@@ -2210,10 +2323,6 @@ class StateInfoIncoming
     class Arclets
 		extends TreeSet<Arclet>
     {
-        // Why can't I have a TreeSet here!?!?!?
-        //private TreeMap arclets = new TreeMap();
-        //private TreeSet arclets = new TreeSet();
-
         public Arclets(Iterator<Arc> arcIterator)
         {
             while (arcIterator.hasNext())
@@ -2314,59 +2423,6 @@ class EquivalenceClasses
             super.add(currEquivClass);
         }
     }
-
-    /*
-    private LinkedList equivClasses = new LinkedList();
-
-    public void add(EquivalenceClass equivClass)
-    {
-        equivClasses.add(equivClass);
-    }
-
-    public void remove(EquivalenceClass equivClass)
-    {
-        equivClasses.remove(equivClass);
-    }
-
-    public Iterator iterator()
-    {
-        return equivClasses.iterator();
-    }
-
-    public Iterator safeIterator()
-    {
-        return ((LinkedList) equivClasses.clone()).iterator();
-    }
-
-    public void clear()
-    {
-        equivClasses.clear();
-    }
-
-    public int size()
-    {
-        return equivClasses.size();
-    }
-
-    public String toString()
-    {
-        StringBuffer sb = new StringBuffer();
-        Iterator equivClassIt = equivClasses.iterator();
-
-        sb.append("(");
-
-        while (equivClassIt.hasNext())
-        {
-            EquivalenceClass currEquivClass = (EquivalenceClass) equivClassIt.next();
-
-            sb.append(currEquivClass);
-        }
-
-        sb.append(")");
-
-        return sb.toString();
-    }
-    */
 }
 
 class EquivalenceClass
