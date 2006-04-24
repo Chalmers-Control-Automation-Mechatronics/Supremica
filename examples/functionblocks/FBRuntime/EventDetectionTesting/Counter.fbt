@@ -28,10 +28,13 @@
       </ECState>
  
       <ECTransition Source="q0" Destination="q1" Condition="increaseCounter" />
+      <ECTransition Source="q1" Destination="q0" Condition="1" />
+
+      <!--ECTransition Source="q0" Destination="q1" Condition="increaseCounter" />
       <ECTransition Source="q1" Destination="q2" Condition="increaseCounter" />
       <ECTransition Source="q1" Destination="q0" Condition="NOT increaseCounter" />
       <ECTransition Source="q2" Destination="q1" Condition="increaseCounter" />
-      <ECTransition Source="q2" Destination="q0" Condition="NOT increaseCounter" />
+      <ECTransition Source="q2" Destination="q0" Condition="NOT increaseCounter" /-->
 	
     </ECC>
 

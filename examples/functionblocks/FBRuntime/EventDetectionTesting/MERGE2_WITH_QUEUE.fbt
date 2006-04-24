@@ -16,22 +16,28 @@
         <ECState Name="S1">
           <ECAction Output="EO" />
         </ECState>    
-        <!--ECState Name="S2">
+        <ECState Name="S2">
           <ECAction Output="EO" />
           <ECAction Output="EO" />
-        </ECState-->    
+        </ECState>    
 
-	<ECTransition Source="S0" Destination="S1" Condition="EI1 OR EI2" />
-	<ECTransition Source="S1" Destination="S0" Condition="1" />
+	<!--ECTransition Source="S0" Destination="S1" Condition="EI1 OR EI2" />
+	<ECTransition Source="S1" Destination="S0" Condition="1" /-->
 
 	<!--ECTransition Source="S0" Destination="S1" Condition="(EI1 AND NOT EI2) OR (EI2 AND NOT EI1)" />
+	<ECTransition Source="S1" Destination="S0" Condition="1" />
 	<ECTransition Source="S0" Destination="S2" Condition="EI1 AND EI2" />
+	<ECTransition Source="S2" Destination="S0" Condition="1" /-->
+
+	<ECTransition Source="S0" Destination="S1" Condition="(EI1 AND NOT EI2) OR (EI2 AND NOT EI1)" />
 	<ECTransition Source="S1" Destination="S2" Condition="EI1 AND EI2" />
 	<ECTransition Source="S1" Destination="S1" Condition="(EI1 AND NOT EI2) OR (EI2 AND NOT EI1)" />
 	<ECTransition Source="S1" Destination="S0" Condition="NOT EI1 AND NOT EI2" />
 	<ECTransition Source="S2" Destination="S2" Condition="EI1 AND EI2" />
 	<ECTransition Source="S2" Destination="S1" Condition="(EI1 AND NOT EI2) OR (EI2 AND NOT EI1)" />
-	<ECTransition Source="S2" Destination="S0" Condition="NOT EI1 AND NOT EI2" /-->
+	<ECTransition Source="S2" Destination="S0" Condition="NOT EI1 AND NOT EI2" />
+
+	
     </ECC>
   </BasicFB>
 </FBType>

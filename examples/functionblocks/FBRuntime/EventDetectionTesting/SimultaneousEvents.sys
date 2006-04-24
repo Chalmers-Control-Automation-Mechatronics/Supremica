@@ -9,8 +9,8 @@
        <FB Name="cycle1" Type="E_CYCLE" />
        <FB Name="cycle2" Type="E_CYCLE" />
        <!--FB Name="delay" Type="E_DELAY" /-->
-       <FB Name="merge2EO" Type="E_MERGE2" />
-       <!--FB Name="merge2EO" Type="MERGE2_WITH_QUEUE" /-->
+       <!--FB Name="merge2EO" Type="E_MERGE2" /-->
+       <FB Name="merge2EO" Type="MERGE2_WITH_QUEUE" />
        <FB Name="split2WARM" Type="E_SPLIT2" />
        <FB Name="split2STOP" Type="E_SPLIT2" />
        <FB Name="counter" Type="Counter" />
@@ -27,9 +27,9 @@
            <Connection Source="cycle1.EO" Destination="merge2EO.EI1" />
            <Connection Source="cycle2.EO" Destination="merge2EO.EI2" />
 
-           <!--Connection Source="cycle1.EO" Destination="merge2EO.EI1" />
-           <Connection Source="cycle2.EO" Destination="delay.START" />
-           <Connection Source="delay.EO" Destination="merge2EO.EI2" /-->
+           <Connection Source="cycle1.EO" Destination="merge2EO.EI1" />
+           <!--Connection Source="cycle2.EO" Destination="delay.START" /-->
+           <!--Connection Source="delay.EO" Destination="merge2EO.EI2" /-->
 
            <Connection Source="merge2EO.EO" Destination="counter.increaseCounter" />
           </EventConnections>
