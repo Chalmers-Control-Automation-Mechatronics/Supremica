@@ -912,14 +912,7 @@ public class Supremica
 	 */
 	public int addAutomata(Automata currAutomata)
 	{
-		//-- MF -- debug stuff, is there no way to remove the if under no-debug-build?
-		// Yes there is! We could use an assertion! /hguo
-		if (currAutomata.size() == 0)
-		{
-			logger.debug("Supremica::addAutomata(): adding empty automata.");
-
-			return 0;    // "nothing to do, nowhere to go-o" [Ramones 1978]
-		}
+		assert (currAutomata.size() != 0);
 
 		int nbrOfAddedAutomata = 0;
 		Iterator autIt = currAutomata.iterator();
@@ -991,8 +984,10 @@ public class Supremica
 		return nbrOfAddedAutomata;
 	}
 
-	// We need a single entry to add automata to the gui
-	// Here we manage all necessary user interaction
+	/**
+	 * We need a single entry to add automata to the gui. Here we
+	 * manage all necessary user interaction
+	 */
 	public boolean addAutomaton(Automaton currAutomaton)
 	{
 		logger.debug("Supremica::addAutomaton(" + currAutomaton.getName() + ")");
@@ -1025,14 +1020,13 @@ public class Supremica
 		}
 
 		try
-		{    // throws Exception if the automaton already exists
-
+		{    
+			// throws Exception if the automaton already exists
 			// logger.debug("Supremica.addAutomaton");
 			getActiveProject().addAutomaton(currAutomaton);
 		}
 		catch (Exception ex)
 		{
-
 			// should never occur, we test for this condition already
 			logger.error("Error while adding: " + ex.getMessage());
 			logger.debug(ex.getStackTrace());

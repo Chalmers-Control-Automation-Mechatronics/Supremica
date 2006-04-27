@@ -62,6 +62,7 @@ public class Workbench
 		updateButtons();
 		pack();
 	}
+
 	void close()
 	{
 		hideGraph();
@@ -72,6 +73,7 @@ public class Workbench
 		}
 		*/
 	}
+
 	void showGraph()
 		throws Exception
 	{
@@ -103,6 +105,7 @@ public class Workbench
 			}
 		}
 	}
+
 	void hideGraph()
 	{
 		try
@@ -121,11 +124,13 @@ public class Workbench
 			logger.error("Error in hiding viewer", excp);
 		}
 	}
+
 	void showMessage(String mess)
 	{
 		info.setText(mess);
 		//if (toListUC()) {}
 	}
+
 	/**
 	 * What is this one supposed to do?
 	 */
@@ -133,6 +138,7 @@ public class Workbench
 	{
 		return params.toShowGraph();
 	}
+
 	/**
 	 * What is this one supposed to do?
 	 */
@@ -140,6 +146,7 @@ public class Workbench
 	{
 		return params.toListUC();
 	}
+
 	/**
 	 * What is this one supposed to do?
 	 */
@@ -147,6 +154,7 @@ public class Workbench
 	{
 		return params.toListNB();
 	}
+
 	/**
 	 * Returns true if "Add final result to the project" is selected.
 	 */
@@ -154,6 +162,7 @@ public class Workbench
 	{
 		return params.toAddIt();
 	}
+
 	/**
 	 * Updates the enabled status of the buttons.
 	 */
@@ -184,6 +193,7 @@ public class Workbench
 			}
 		}
 	}
+
 	// For debugging only
 	public static void main(String args[])
 		throws Exception
@@ -193,6 +203,7 @@ public class Workbench
 		wb.setVisible(true);
 	}
 }
+
 //*** Finally! A valid use for inheritance -- inherit to be reused!!
 // We want the colors to be different from the default so we inherit
 // and make our own AutoatonToDot serializer
@@ -206,6 +217,7 @@ class MyAutomatonToDot
 		// logger.info("MyAutomatonToDot::constructed");
 		super(automaton);
 	}
+
 	protected String getStateColor(State state)
 	{
 		/*
@@ -225,6 +237,7 @@ class MyAutomatonToDot
 		}
 	}
 }
+
 // Must also override AutomatonViewer::getSerializer()
 // And this required adding AutomataViewer::getAutomaton()
 class MyAutomatonViewer
@@ -237,6 +250,7 @@ class MyAutomatonViewer
 		// logger.info("MyAutomatonViewer::constructed");
 		super(theAutomaton);
 	}
+
 	public AutomataSerializer getSerializer()
 	{
 		MyAutomatonToDot serializer = new MyAutomatonToDot(getAutomaton());
@@ -248,6 +262,7 @@ class MyAutomatonViewer
 		return serializer;
 	}
 }
+
 class MyAutomatonViewerFactory
 	implements AutomatonViewerFactory
 {
@@ -257,6 +272,7 @@ class MyAutomatonViewerFactory
 		return new MyAutomatonViewer(automaton);
 	}
 }
+
 /**
  * Parent class for workbench buttons.
  */
@@ -265,6 +281,7 @@ class ButtonImpl
 {
 	private static final long serialVersionUID = 1L;
 	Workbench wb = null;
+
 	ButtonImpl(String text, Workbench wb, String tooltip)
 	{
 		super(text);
@@ -272,6 +289,7 @@ class ButtonImpl
 		setToolTipText(tooltip);
 	}
 }
+
 /**
  * Synch button. Composes the automata selected in the gui, generating the first candidate
  * for a supervisor, a "total" specification.
@@ -292,8 +310,12 @@ class SynchButton
 			}
 		});
 	}
-	// Synchronize all. Note that we do not mark new forbidden states
-	// Probably this will change the look of the graph after comparison, but what can we do?
+
+	/**
+	 * Synchronize all. Note that we do not mark new forbidden states
+	 * Probably this will change the look of the graph after
+	 * comparison, but what can we do?
+	 */
 	void action(ActionEvent e)
 	{
 		SynchronizationOptions synch_ops = SynchronizationOptions.getDefaultSynchronizationOptions();
@@ -331,10 +353,12 @@ class SynchButton
 		}
 	}
 }
+
 /**
- * "Compare" button, this button examines the controllablity status of the current
- * supervisor with respect to the plant model that it is supposed to control, i.e.
- * the plants (and all other automata) that were selected previously in the gui.
+ * "Compare" button, this button examines the controllablity status of
+ * the current supervisor with respect to the plant model that it is
+ * supposed to control, i.e.  the plants (and all other automata) that
+ * were selected previously in the gui.
  */
 class CompareButton
 	extends ButtonImpl
@@ -343,7 +367,7 @@ class CompareButton
 	private static Logger logger = LoggerFactory.createLogger(CompareButton.class);
 	CompareButton(Workbench wb)
 	{
-		super("Compare", wb, "Compare supervisor wrt plant");
+		super("Compare", wb, "Compare supervisor candidate vs. plant for controllability problems");
 		addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -352,8 +376,12 @@ class CompareButton
 			}
 		});
 	}
-	// Compare the synched result with the plant
-	//      If the automaton exists, calc new states (only) and manually set the forbiddenness
+
+	/** 
+	 * Compare the synched result with the plant If the automaton
+	 * exists, calc new states (only) and manually set the
+	 * forbiddenness
+	 */
 	void action(ActionEvent e)
 	{
 		int num_x_states = 0;
@@ -440,6 +468,7 @@ class CompareButton
 			logger.debug(excp.getStackTrace());
 			return;
 		}
+
 		// In any case we do this and let wb handle how...
 		try
 		{
@@ -457,6 +486,7 @@ class CompareButton
 		}
 	}
 }
+
 /**
  * Controllability button.
  */
@@ -467,7 +497,7 @@ class ContButton
 	private static Logger logger = LoggerFactory.createLogger(ContButton.class);
 	ContButton(Workbench wb)
 	{
-		super("Controllability", wb, "Calculate uncontrollable states - repeat until zero new states");
+		super("Controllability", wb, "Forbid states that uncontrollably can reach forbidden states");
 		addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -476,6 +506,7 @@ class ContButton
 			}
 		});
 	}
+
 	// let's calc the new uc-states
 	void action(ActionEvent e)
 	{
@@ -521,6 +552,7 @@ class ContButton
 		}
 	}
 }
+
 /**
  * Coreachability button.
  */
@@ -531,7 +563,7 @@ class NonblockButton
 	private static Logger logger = LoggerFactory.createLogger(NonblockButton.class);
 	NonblockButton(Workbench wb)
 	{
-		super("Coreachability", wb, "Calculate blocking states - repeat until zero new states");
+		super("Coreachability", wb, "Forbid states that can not reach marked states");
 		addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -540,6 +572,7 @@ class NonblockButton
 			}
 		});
 	}
+
 	// Here we are to forbid *non*coreachable states
 	// So we have to calc the coreachable (and nonforbidden ones) and forbid the rest
 	public void action(ActionEvent e)
@@ -577,6 +610,7 @@ class NonblockButton
 		}
 	}
 }
+
 /**
  * Reachability button.
  */
@@ -587,7 +621,7 @@ class ReachButton
 	private static Logger logger = LoggerFactory.createLogger(ReachButton.class);
 	ReachButton(Workbench wb)
 	{
-		super("Reachability", wb, "Calc the reachable states - need be done only once");
+		super("Reachability", wb, "Forbid non-reachable states");
 		addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -637,6 +671,7 @@ class ReachButton
 		}
 	}
 }
+
 /**
  * Purge button.
  */
@@ -647,7 +682,7 @@ class PurgeButton
 	private static Logger logger = LoggerFactory.createLogger(ReachButton.class);
 	PurgeButton(Workbench wb)
 	{
-		super("Purge", wb, "Remove forbidden states");
+		super("Purge", wb, "Remove all forbidden states");
 		addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -683,6 +718,7 @@ class PurgeButton
 		wb.showMessage(before-after + " state(s) removed");
 	}
 }
+
 /**
  * Done button.
  */
@@ -692,7 +728,7 @@ class DoneButton
 	private static final long serialVersionUID = 1L;
 	DoneButton(Workbench wb)
 	{
-		super("Done", wb, "Done already... close");
+		super("Done", wb, "Exit workbench (return supervisor)");
 		addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -781,6 +817,7 @@ class ParamPanel
 		return add_it.isSelected();
 	}
 }
+
 class ButtonPanel
 	extends JPanel
 {
@@ -834,16 +871,25 @@ class ButtonPanel
 		setEnabled(true);
 	}
 }
+
 class InfoPanel
 	extends JPanel
 {
 	private static final long serialVersionUID = 1L;
-	JTextField text = new JTextField("", 18);
+	//JTextField text = new JTextField("", 18);
+	//JTextArea text = new JTextArea(2,22);
+	JTextPane text = new JTextPane();
+
 	InfoPanel(Workbench wb)
 	{
+		//text.setFont(new JTextField().getFont()); // Didn't know how to find the right font...
+		text.setAlignmentX(JTextArea.CENTER_ALIGNMENT);
+		text.setAlignmentY(JTextArea.CENTER_ALIGNMENT);
 		text.setEditable(false);
+		text.setBackground(super.getBackground());
 		add(text);
 	}
+
 	void setText(String string)
 	{
 		text.setText(string);
