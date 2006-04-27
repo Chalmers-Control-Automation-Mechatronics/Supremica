@@ -8,7 +8,8 @@
 		<Event id="send0" label="send0"/>
 		<Event id="send1" label="send1"/>
 		<Event id="timeout" label="timeout" controllable="false"/>
-		<Event id="timer" label="timer" immediate="true"/>
+        <Event id="timer" label="timer" controllable="false"/>
+<!--		<Event id="timer" label="timer" immediate="true"/>   -->
 	</Events>
 	<States> 
 		<State id="s0" initial="true" accepting="true"/>

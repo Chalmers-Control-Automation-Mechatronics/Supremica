@@ -89,7 +89,7 @@ public class CompositionalSupervisor
 	}
 
    	////////////////////////////////////////
-	// SupervisorInterface methods        //
+	// Supervisor interface methods       //
 	// (inherited from ModularSupervisor) //
 	////////////////////////////////////////
 	
@@ -113,7 +113,9 @@ public class CompositionalSupervisor
 		{
 			// Restore order
 			currentGlobalState = currentStateSave;
-			// The event is disabled!
+			// The event is disabled by the model (it was a stupid
+			// question, it should not matter whether the supervisor
+			// enables or disables the event)
 			return false;
 		}
 

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<Automata name="Flexible production cell" comment="From 'Task Description of a Flexible Production Cell with Real Time Properties' by A. Lötzbeyer and R. Mühlfeld. Different products enter on a conveyor belt and two cranes move the products between four stations before leving them on a conveyor belt at the onder end of the cell."> 
+<Automata name="Flexible production cell" comment="From 'Task Description of a Flexible Production Cell with Real Time Properties' by A. Lötzbeyer and R. Mühlfeld. Different products enter on a conveyor belt and two cranes move the products between four stations before leving them on a conveyor belt at the other end of the cell."> 
 <Automaton name="station[S4]" type="Specification">
 	<Events>
 		<Event id="0" label=":omega"/>

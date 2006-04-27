@@ -99,9 +99,9 @@ public class ModularSupervisor
 		this.model = model;
 	}
 
-   	/////////////////////////////////
-	// SupervisorInterface methods //
-	/////////////////////////////////
+   	//////////////////////////////////
+	// Supervisor interface methods //
+	//////////////////////////////////
 	
 	public boolean isEnabled(LabeledEvent event)
 	{

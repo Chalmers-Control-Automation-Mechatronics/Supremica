@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<Automata comment="Unknown origin.">
+<Automata comment="Unknown origin (Balemi?).">
  <Automaton name="V1" type="Plant">
   <Events>
    <Event id="v11" label="v11" controllable="true" prioritized="true" />

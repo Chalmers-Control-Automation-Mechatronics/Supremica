@@ -696,13 +696,6 @@ public class AutomataMinimizer
 		}
 		else
 		{
-			/*
-			  if (useShortStateNames)
-			  {
-			  EnumerateStates en = new EnumerateStates(automata, "q");
-			  en.execute();
-			  }
-			*/
 			aut = automata.getFirstAutomaton();
 			// This could be one of the originals, so we might need to make a copy!
 			if (options.getKeepOriginal())
@@ -729,6 +722,9 @@ public class AutomataMinimizer
 		{
 			mostTransitions = aut.nbrOfTransitions();
 		}
+
+		//ActionMan.getGui().addAutomaton(new Automaton(aut));
+
 		// Is it at all possible to minimize? (It may actually be possible even
 		// if there are no epsilons)
 		if (aut.nbrOfEpsilonTransitions() > 0)
@@ -745,6 +741,9 @@ public class AutomataMinimizer
 				return null;
 			}
 		}
+
+		//ActionMan.getGui().addAutomaton(new Automaton(aut));
+
 		return aut;
     }
 
