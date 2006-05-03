@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.24 2006-05-03 16:28:32 markus Exp $
+//# $Id: ModuleCompiler.java,v 1.25 2006-05-03 16:48:59 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -478,8 +478,9 @@ public class ModuleCompiler
 			throw wrap(exception);
 		}
         // ------EFA--------
-		mTransitionAutomatonMap = new HashMap<TransitionProxy, AutomatonProxy>();
+		/*mTransitionAutomatonMap = new HashMap<TransitionProxy, AutomatonProxy>();
 		mTransitionGuardActionBlockMap = new HashMap<TransitionProxy, GuardActionBlockProxy>();
+		*/
 		// -----------------
 		
 		final List<AliasProxy> constants = proxy.getConstantAliasList();
@@ -490,11 +491,11 @@ public class ModuleCompiler
 		visitCollection(aliases);
 		final List<Proxy> components = proxy.getComponentList();
 		visitCollection(components);
-		compileEFA();
+		//compileEFA();
 		return null;
 	}
 
-	private void compileEFA() {
+	/*private void compileEFA() {
 		mEFAEventGuardActionBlockMap = new HashMap<EventProxy, GuardActionBlockProxy>();
 		for (EventProxy event : mGlobalAlphabet) {
 			List<List<TransitionProxy>> transitions = 
@@ -511,12 +512,12 @@ public class ModuleCompiler
 					transitions.add(transInAutomaton);
 				}
 				else if(automaton.getEvents().contains(event)){
-					/*Event alltid blockerat*/
+					
 				}
 			}
 		}
 	}
-
+*/
 	public CompiledParameterBinding visitParameterBindingProxy
 		(final ParameterBindingProxy proxy)
 		throws VisitorException
@@ -655,9 +656,9 @@ public class ModuleCompiler
 				final AutomatonProxy aut = mFactory.createAutomatonProxy(
 						fullName, kind, mLocalAlphabet, mStates, mTransitions);
 
-				for (TransitionProxy trans : aut.getTransitions()) {
+				/*for (TransitionProxy trans : aut.getTransitions()) {
 					mTransitionAutomatonMap.put(trans, aut);
-				}
+				}*/
 				mAutomata.put(fullName, aut);
 				
 				return aut;
@@ -1436,7 +1437,7 @@ public class ModuleCompiler
 							.createTransitionProxy(sourceState, event,
 												   targetState);
 						//EFA with shared variables----------
-						mTransitionGuardActionBlockMap.put(trans, edge.getGuardActionBlock());
+						//mTransitionGuardActionBlockMap.put(trans, edge.getGuardActionBlock());
 						//---------------------------
 						
 						// EFA-----------
@@ -1454,7 +1455,7 @@ public class ModuleCompiler
 						final TransitionProxy trans = duplicate.getTransition();
 						sourceEntry.addTransition(trans, group);
 						//EFA with shared variables-----------
-						if (mTransitionGuardActionBlockMap.containsKey(trans)) {
+						/*if (mTransitionGuardActionBlockMap.containsKey(trans)) {
 							if (!mTransitionGuardActionBlockMap.get(trans).equals(
 									edge.getGuardActionBlock())) {
 								final TransitionProxy efaCopy = mFactory
@@ -1464,7 +1465,7 @@ public class ModuleCompiler
 								mTransitionGuardActionBlockMap.put(efaCopy,
 										   edge.getGuardActionBlock());
 							}
-						}
+						}*/
 						//------------------------------------
 						// EFA---------
 						TransitionProxy efaTrans = createEFATransition(trans);
@@ -1617,10 +1618,10 @@ public class ModuleCompiler
 	/*
 	 * Two mappings needed for EFA with guards on shared variables.
 	 */
-	private Map<TransitionProxy, AutomatonProxy> mTransitionAutomatonMap;
+	/*private Map<TransitionProxy, AutomatonProxy> mTransitionAutomatonMap;
 	private Map<TransitionProxy, GuardActionBlockProxy> mTransitionGuardActionBlockMap;
 	private Map<EventProxy, GuardActionBlockProxy> mEFAEventGuardActionBlockMap;
-	//
+	*///
 	private Map<TransitionProxy, EdgeProxy> mEFATransitionEdgeMap;
 	private Collection<TransitionProxy> mEFATransitions;
 	private Map<TransitionProxy, List<BinaryExpressionProxy>> mEFARelabeledTransitionActionMap;
