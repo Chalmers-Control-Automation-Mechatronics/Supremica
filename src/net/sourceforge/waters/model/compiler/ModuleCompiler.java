@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.27 2006-05-04 15:09:20 martin Exp $
+//# $Id: ModuleCompiler.java,v 1.28 2006-05-04 15:34:17 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -491,42 +491,44 @@ public class ModuleCompiler
 		final List<Proxy> components = proxy.getComponentList();
 		visitCollection(components);
 
+
 		compileEFA();
+
 		return null;
 	}
 
 	private void compileEFA() {
 		mEFAEventGuardActionBlockMap = new HashMap<EventProxy, GuardActionBlockProxy>();
 		for (EventProxy event : mGlobalAlphabet) {
-			List<List<TransitionProxy>> transitions = 
-				new LinkedList<List<TransitionProxy> >();
+			List<List<TransitionProxy>> transitions = new LinkedList<List<TransitionProxy>>();
 			for (AutomatonProxy automaton : mAutomata.values()) {
 				List<TransitionProxy> transInAutomaton = new LinkedList<TransitionProxy>();
-				//Obs if the automaton is EFA we need to count duplicate trans
-				//if the GuardActionBlock differ. We assume that this has been fixed.
+				// Obs if the automaton is EFA we need to count duplicate trans
+				// if the GuardActionBlock differ. We assume that this has been
+				// fixed.
+
 				for (TransitionProxy transition : automaton.getTransitions()) {
 					if (transition.getEvent().equals(event)) {
 						transInAutomaton.add(transition);
 					}
 				}
+				if (transInAutomaton.isEmpty()
+						&& automaton.getEvents().contains(event)) {
+					transitions.clear();
+					break;
 
-				Set<EventProxy> events = automaton.getEvents();
-			    EventProxy ea = mFactory.createEventProxy("a",EventKind.CONTROLLABLE);
-			    EventProxy eb = mFactory.createEventProxy("b",EventKind.PROPOSITION);
-				boolean b = events.contains(event);
-				if(!transInAutomaton.isEmpty()){
+				} else {
 					transitions.add(transInAutomaton);
 				}
-				else if(automaton.getEvents().contains(event)){
-				transitions.clear();
-				break;
-				}
 			}
-			List<List<TransitionProxy>> allPaths= allPossiblePaths(transitions);
+			List<List<TransitionProxy>> allPaths = allPossiblePaths(transitions);
 		}
 	}
 
 	private List<List<TransitionProxy>> allPossiblePaths(List<List<TransitionProxy>> transitions) {
+		if(transitions.isEmpty()) return transitions;
+		
+		
 		// TODO Auto-generated method stub
 
 		return null;
