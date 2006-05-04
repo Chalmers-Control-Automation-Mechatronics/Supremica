@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.26 2006-05-04 09:29:13 markus Exp $
+//# $Id: ModuleCompiler.java,v 1.27 2006-05-04 15:09:20 martin Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -490,7 +490,8 @@ public class ModuleCompiler
 		visitCollection(aliases);
 		final List<Proxy> components = proxy.getComponentList();
 		visitCollection(components);
-		//compileEFA();
+
+		compileEFA();
 		return null;
 	}
 
@@ -508,6 +509,11 @@ public class ModuleCompiler
 						transInAutomaton.add(transition);
 					}
 				}
+
+				Set<EventProxy> events = automaton.getEvents();
+			    EventProxy ea = mFactory.createEventProxy("a",EventKind.CONTROLLABLE);
+			    EventProxy eb = mFactory.createEventProxy("b",EventKind.PROPOSITION);
+				boolean b = events.contains(event);
 				if(!transInAutomaton.isEmpty()){
 					transitions.add(transInAutomaton);
 				}
@@ -522,6 +528,7 @@ public class ModuleCompiler
 
 	private List<List<TransitionProxy>> allPossiblePaths(List<List<TransitionProxy>> transitions) {
 		// TODO Auto-generated method stub
+
 		return null;
 	}
 

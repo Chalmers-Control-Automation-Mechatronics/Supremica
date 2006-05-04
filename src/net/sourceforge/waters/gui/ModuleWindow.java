@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleWindow
 //###########################################################################
-//# $Id: ModuleWindow.java,v 1.41 2006-04-13 08:58:23 flordal Exp $
+//# $Id: ModuleWindow.java,v 1.42 2006-05-04 15:09:20 martin Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -216,7 +216,7 @@ public class ModuleWindow
 	 */
 	public void exportToSupremica()
 	{
-		// The project in Supremica format
+		//The project in Supremica format
 		Project supremicaProject;
 		try
 		{
@@ -228,7 +228,7 @@ public class ModuleWindow
 		{
 			JOptionPane.showMessageDialog(this, ex.getMessage(), "Error exporting to Supremica", 
 										  JOptionPane.ERROR_MESSAGE); 
-			// ex.printStackTrace();
+			ex.printStackTrace();
 			return;
 		}
 			

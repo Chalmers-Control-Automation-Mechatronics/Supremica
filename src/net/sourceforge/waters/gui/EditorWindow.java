@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorWindow
 //###########################################################################
-//# $Id: EditorWindow.java,v 1.26 2006-03-22 09:30:53 flordal Exp $
+//# $Id: EditorWindow.java,v 1.27 2006-05-04 15:09:20 martin Exp $
 //###########################################################################
 
 
@@ -93,8 +93,22 @@ public class EditorWindow
 		final JScrollPane scrollsurface = new JScrollPane(surface);
 		final JScrollPane scrollevents = new JScrollPane(mEventPane);
 		final JViewport viewevents = scrollevents.getViewport();
+
+		//------- EFA
+		final JScrollPane scrollvariables = new JScrollPane(mEventPane);
+		final JViewport viewvariables = scrollvariables.getViewport();
+		
+		final JSplitPane subSplit = new JSplitPane
+			(JSplitPane.VERTICAL_SPLIT, scrollvariables, scrollevents);
+		viewvariables.setBackground(Color.WHITE);
+		subSplit.setResizeWeight(1.0);
+		//-------
+		
+		//final JSplitPane split = new JSplitPane
+		//	(JSplitPane.HORIZONTAL_SPLIT, scrollsurface, scrollevents);
 		final JSplitPane split = new JSplitPane
-			(JSplitPane.HORIZONTAL_SPLIT, scrollsurface, scrollevents);
+			(JSplitPane.HORIZONTAL_SPLIT, scrollsurface, subSplit);
+		
 		viewevents.setBackground(Color.WHITE);
 		split.setResizeWeight(1.0);
 
