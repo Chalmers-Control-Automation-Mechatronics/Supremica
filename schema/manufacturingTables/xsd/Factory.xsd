@@ -23,7 +23,6 @@
   <xs:restriction base="xs:string">
     <xs:enumeration value="Actuator"/>
     <xs:enumeration value="Sensor"/>
-    <xs:enumeration value="Other"/>
   </xs:restriction>
  </xs:simpleType>
 
@@ -31,7 +30,6 @@
   <xs:restriction base="xs:string">
     <xs:enumeration value="Actuator"/>
     <xs:enumeration value="Sensor"/>
-    <xs:enumeration value="Other"/>
   </xs:restriction>
  </xs:simpleType>
 
@@ -43,7 +41,7 @@
 
 
  <!-- Definition of simple elements ________________________________-->
- <xs:element name="Variable" type="xs:string"/>
+ <xs:element name="Value" type="xs:string"/>
  <xs:element name="State" type="xs:string"/>
  <xs:element name="Description" type="xs:string"/>
 
@@ -90,9 +88,10 @@
   <xs:complexType>
    <xs:sequence>
    <xs:element ref="Description" minOccurs="0" maxOccurs="1"/>
-   <!-- Variabler skall bara finnas paa maskin-nivaa daer alla anses var semiglobala, d vs laesbara fraan andra maskiner-->
+   <!-- Variables shall only exist on machine-level where all are considered semiglobale, i.e. readable from other machines-->
    <!--xs:element ref="Variable" minOccurs="0" maxOccurs="unbounded"/-->
-   <xs:element ref="Equipment" minOccurs="0" maxOccurs="1"/>
+   <!-- Equipment does not exist on this level, i.e. they are machines-->
+   <!--xs:element ref="Equipment" minOccurs="0" maxOccurs="1"/-->
    <xs:element ref="Machines" minOccurs="1" maxOccurs="1"/>
    </xs:sequence>  
    <xs:attribute name="name" type="nameType" use="required"/>
@@ -135,6 +134,23 @@
   </xs:complexType>
  </xs:element>
 
+ <xs:element name="Variable">
+  <xs:complexType>
+   <xs:sequence>
+   <xs:element ref="Values" minOccurs="1" maxOccurs="1"/>
+   </xs:sequence>  
+   <xs:attribute name="name" type="nameType" use="required"/>
+  </xs:complexType>
+ </xs:element>
+
+ <xs:element name="Values">
+  <xs:complexType>
+   <xs:sequence>
+   <xs:element ref="Value" minOccurs="1" maxOccurs="unbounded"/>
+   </xs:sequence>  
+  </xs:complexType>
+ </xs:element>
+
  <xs:element name="EquipmentEntity">
   <xs:complexType>
    <xs:sequence>
@@ -169,7 +185,7 @@
    <xs:sequence>
    <xs:element ref="Description" minOccurs="0" maxOccurs="1"/>
    </xs:sequence>  
-   <xs:attribute name="Type" type="elementType" use="required"/>
+   <!--xs:attribute name="Type" type="elementType" use="required"/-->
    <xs:attribute name="name" type="nameType" use="required"/>
   </xs:complexType>
  </xs:element>

@@ -48,44 +48,49 @@
  */
 
 /**
- * The Loader class uses JAXB to load a Factory
- * application into a PLC program structure.
+ * The Variable describes some state of a part of the machine and can have a finite number of states.
  *
  *
- * Created: Tue Nov  25 13:49:32 2005
+ * Created: Mon Apr  24 15:00:32 2006
  *
  * @author Oscar
  * @version 1.0
  */
-package org.supremica.manufacturingTables.management;
-import org.supremica.manufacturingTables.controlsystemdata.*;
-import org.supremica.manufacturingTables.controlsystemimplementation.*;
+package org.supremica.manufacturingTables.controlsystemdata;
 
-import org.supremica.manufacturingTables.xsd.factory.*;
+import java.util.List;
+import java.util.LinkedList;
+//import java.io.*;
 
-public class Main
+
+//Should the values really be Strings and not boolean, integers and so on. Strings may take to much time?
+
+public class Variable
 {
-    public static void main(String[] args)
+    private String name;
+    private List values;
+    //private String type;
+    //private int nbrOfValues:
+
+    public Variable(String name)
     {
-	System.err.println("main function entered");
-	String path = null;
-	if (args.length >= 2)
-	    {
-		path = args[1];
-	    }
-	if (args.length >=1)
-	    {
-		String fileName = args[0];
-		Loader loader = new Loader();
-		FactoryType factory = (FactoryType) loader.load(path, fileName);
-		//AutomationObjectsPLCProgramBuilder plcProgramBuilder = new AutomationObjectsPLCProgramBuilder();
-		//plcProgramBuilder.buildPLCProgram(factory);
-		ControlSystemDataBuilder plcDataBuilder = new ControlSystemDataBuilder();
-		ManufacturingCell cell = plcDataBuilder.buildPLCData(factory);
-	    }
-	else
-	    {
-		System.err.println("You must enter a fileName and optionally a path!");
-	    }
+	this.name = name;
+	values = new LinkedList();
     }
+
+    public String getName()
+    {
+	return name;
+    }
+   
+    public List getValues()
+    {
+	return values;
+    }
+  
+    public void addValue(String valueToAdd)
+    {
+	values.add(valueToAdd);
+    }
+
 }

@@ -48,44 +48,20 @@
  */
 
 /**
- * The Loader class uses JAXB to load a Factory
- * application into a PLC program structure.
+ * The EquipmentInterface states the methods that equipment (Sensors and Actuators) has to implement to
+ * be abled to be added to a higher level actuator.
  *
- *
- * Created: Tue Nov  25 13:49:32 2005
+ * Created: Wen May  03 13:39:32 2006
  *
  * @author Oscar
  * @version 1.0
  */
-package org.supremica.manufacturingTables.management;
-import org.supremica.manufacturingTables.controlsystemdata.*;
-import org.supremica.manufacturingTables.controlsystemimplementation.*;
+package org.supremica.manufacturingTables.controlsystemdata;
 
-import org.supremica.manufacturingTables.xsd.factory.*;
-
-public class Main
+public interface EquipmentContainer
 {
-    public static void main(String[] args)
-    {
-	System.err.println("main function entered");
-	String path = null;
-	if (args.length >= 2)
-	    {
-		path = args[1];
-	    }
-	if (args.length >=1)
-	    {
-		String fileName = args[0];
-		Loader loader = new Loader();
-		FactoryType factory = (FactoryType) loader.load(path, fileName);
-		//AutomationObjectsPLCProgramBuilder plcProgramBuilder = new AutomationObjectsPLCProgramBuilder();
-		//plcProgramBuilder.buildPLCProgram(factory);
-		ControlSystemDataBuilder plcDataBuilder = new ControlSystemDataBuilder();
-		ManufacturingCell cell = plcDataBuilder.buildPLCData(factory);
-	    }
-	else
-	    {
-		System.err.println("You must enter a fileName and optionally a path!");
-	    }
-    }
+    
+    public void addActuator(Actuator actuatorToAdd);
+    public void addSensor(Sensor sensorToAdd);
+    
 }

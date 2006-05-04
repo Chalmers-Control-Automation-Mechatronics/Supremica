@@ -48,44 +48,61 @@
  */
 
 /**
- * The Loader class uses JAXB to load a Factory
- * application into a PLC program structure.
+ * The Mailbox class at this level does not contain any information since the Machine 
+ * holds information about alla parts.
  *
  *
- * Created: Tue Nov  25 13:49:32 2005
+ * Created: Mon Apr  24 12:27:32 2006
  *
  * @author Oscar
  * @version 1.0
  */
-package org.supremica.manufacturingTables.management;
-import org.supremica.manufacturingTables.controlsystemdata.*;
-import org.supremica.manufacturingTables.controlsystemimplementation.*;
+package org.supremica.manufacturingTables.controlsystemdata;
 
-import org.supremica.manufacturingTables.xsd.factory.*;
+//import java.util.List;
+//import java.io.*;
 
-public class Main
+public class Mailbox
 {
-    public static void main(String[] args)
+    //private MachineController machineController;
+    //private List sensors;
+    //private List actuators;
+
+    public Mailbox()
     {
-	System.err.println("main function entered");
-	String path = null;
-	if (args.length >= 2)
-	    {
-		path = args[1];
-	    }
-	if (args.length >=1)
-	    {
-		String fileName = args[0];
-		Loader loader = new Loader();
-		FactoryType factory = (FactoryType) loader.load(path, fileName);
-		//AutomationObjectsPLCProgramBuilder plcProgramBuilder = new AutomationObjectsPLCProgramBuilder();
-		//plcProgramBuilder.buildPLCProgram(factory);
-		ControlSystemDataBuilder plcDataBuilder = new ControlSystemDataBuilder();
-		ManufacturingCell cell = plcDataBuilder.buildPLCData(factory);
-	    }
-	else
-	    {
-		System.err.println("You must enter a fileName and optionally a path!");
-	    }
+	//machineController = null;
+	//actuators = null;
+	//sensors = null;
     }
+
+//     public MachineController getMachineController()
+//     {
+// 	return machineController;
+//     }
+   
+//     public void setMachineController(MachineController newMachineController)
+//     {
+// 	machineController = newMachineController;
+//     }
+    
+//     public List getActuators()
+//     {
+// 	return actuators;
+//     }
+  
+//     public void addActuator(Actuator actuatorToAdd)
+//     {
+// 	actuators.add(actuatorToAdd);
+//     }
+
+//     public List getSensors()
+//     {
+// 	return sensors;
+//     }
+  
+//     public void addSensor(Sensor sensorToAdd)
+//     {
+// 	actuators.add(sensorToAdd);
+//     }
+
 }

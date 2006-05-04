@@ -48,8 +48,9 @@
  */
 
 /**
- * The Loader class uses JAXB to load a Factory
- * application into a PLC program structure.
+ * The ControlSystemDataBuilder class is used to load a Factory
+ * application, defined by XML- files, into a Java-representation. This medium-level 
+ * Java-representation can then be transformed to different PLC programs.
  *
  *
  * Created: Mon Dec  05 13:49:32 2005
@@ -57,7 +58,7 @@
  * @author Oscar
  * @version 1.0
  */
-package org.supremica.manufacturingTables.model;
+package org.supremica.manufacturingTables.management;
 
 import java.util.Iterator;
 import java.util.List;
@@ -67,35 +68,23 @@ import org.supremica.manufacturingTables.xsd.factory.*;
 import org.supremica.manufacturingTables.management.*;
 import org.supremica.automationobjects.xsd.libraryelement.*;
 import org.supremica.functionblocks.xsd.libraryelement.*;
+import org.supremica.manufacturingTables.controlsystemdata.*;
 
 
-public class AutomationObjectsPLCProgramBuilder
+public class ControlSystemDataBuilder
 {
 
     // Variable to keep track of the indentation, just for now for printing the XML code
     private int nbrOfBlanks;
     private String blanks;
-    private AOApplication aoApplication;
-    private org.supremica.automationobjects.xsd.libraryelement.ObjectFactory objFactory;
 
-    public AutomationObjectsPLCProgramBuilder()
+    public ControlSystemDataBuilder()
     {
     }
 
-    public void buildPLCProgram(FactoryType factory)
+    public ManufacturingCell buildPLCData(FactoryType factory)
     {
-	// Create an Automation Object application using the ObjectFactory
-	objFactory = new org.supremica.automationobjects.xsd.libraryelement.ObjectFactory();
-	try
-	    {
-		aoApplication = objFactory.createAOApplication();
-	    }
-	catch (JAXBException je)
-	    {
-		System.err.println("Failed to create an AOApplication");
-		je.printStackTrace();
-		return;
-	    }
+
 
 	// Variable to keep track of the indentation, just for now for printing the XML code
 	nbrOfBlanks = 0;
@@ -103,7 +92,6 @@ public class AutomationObjectsPLCProgramBuilder
 
 	// Factory
 	System.err.println(blanks.substring(0,nbrOfBlanks) + "<Factory name=\"" + factory.getName() + "\">");
-	aoApplication.setName("Factory " + factory.getName());
 
 	if(factory.getDescription()!=null)
 	    {
@@ -118,6 +106,11 @@ public class AutomationObjectsPLCProgramBuilder
 	// Nbr of Areas
 	List areaList = areas.getArea();
 	nbrOfBlanks++;
+
+	// For now the controlprogram is for just one cell and I assume that the Factory only
+	// contains one cell
+	ManufacturingCell cell = null;
+
 	for (Iterator areaIter = areaList.iterator();areaIter.hasNext();)
 	    {
 		AreaType currentArea = (AreaType) areaIter.next();
@@ -134,26 +127,26 @@ public class AutomationObjectsPLCProgramBuilder
 		// Nbr of Cells
 		List cellList = cells.getCell();
 		nbrOfBlanks++;
+
 		for (Iterator cellIter = cellList.iterator();cellIter.hasNext();)
 		    {
 			CellType currentCell = (CellType) cellIter.next();
 			System.err.println(blanks.substring(0,nbrOfBlanks) + "<Cell name=\"" + currentCell.getName() + "\">");
 			nbrOfBlanks++;
 
+			//Creating the ManufacturingCell
+			cell = new ManufacturingCell(currentCell.getName(), new Coordinator(), new Mailbox());
+
+
 			// Description
 			if(currentCell.getDescription()!=null)
 			    {
 				System.err.println(blanks.substring(0,nbrOfBlanks) + "<Description>" + currentCell.getDescription() + "</Description>");
+				cell.setDescription(currentCell.getDescription());
 			    }
-
-			// Equipment
-			if (currentCell.getEquipment()!=null)
-			    {
-				buildEquipment(currentCell.getEquipment());
-			    }
-
+			
 			// Machines
-			buildMachines(currentCell.getMachines());
+			buildMachines(currentCell.getMachines(), cell);
 
 			nbrOfBlanks--;
 			System.err.println(blanks.substring(0,nbrOfBlanks) + "</Cell>");
@@ -168,9 +161,11 @@ public class AutomationObjectsPLCProgramBuilder
 	System.err.println(blanks.substring(0,nbrOfBlanks) + "</Areas>");
 	nbrOfBlanks--;
 	System.err.println(blanks.substring(0,nbrOfBlanks) + "</Factory>");
+
+	return cell;
     }
 
-    private void buildMachines(MachinesType machines)
+    private void buildMachines(MachinesType machines, ManufacturingCell cell)
     {
 	System.err.println(blanks.substring(0,nbrOfBlanks) + "<Machines>");
 
@@ -179,58 +174,98 @@ public class AutomationObjectsPLCProgramBuilder
 	nbrOfBlanks++;
 	for (Iterator machineIter = machineList.iterator();machineIter.hasNext();)
 	    {
-		buildMachine((MachineType) machineIter.next());
+		buildMachine((MachineType) machineIter.next(), cell);
 	    }
 	nbrOfBlanks--;
 	System.err.println(blanks.substring(0,nbrOfBlanks) + "</Machines>");
     }
 
-    private void buildMachine(MachineType machine)
+    private void buildMachine(MachineType machineType, ManufacturingCell cell)
     {
-	System.err.println(blanks.substring(0,nbrOfBlanks) + "<Machine machineType=\"" + machine.getType() + "\" " + "name=\"" + machine.getName() + "\">");
+	System.err.println(blanks.substring(0,nbrOfBlanks) + "<Machine machineType=\"" + machineType.getType() + "\" " + "name=\"" + machineType.getName() + "\">");
 	nbrOfBlanks++;
 
+	// Create Machine, MachineController and Mailbox and add the Machine to the cell
+	MachineController machineController = new MachineController();
+	Mailbox mailbox = new Mailbox();
+	org.supremica.manufacturingTables.controlsystemdata.Machine machine = new org.supremica.manufacturingTables.controlsystemdata.Machine(machineType.getName(), machineType.getType(), machineController, mailbox); 
+	cell.addMachine(machine);
+
 	// Description
-	if (machine.getDescription()!=null)
+	if (machineType.getDescription()!=null)
 	    {
-		System.err.println(blanks.substring(0,nbrOfBlanks) + "<Description>" + machine.getDescription() + "</Description>");
+		System.err.println(blanks.substring(0,nbrOfBlanks) + "<Description>" + machineType.getDescription() + "</Description>");
+		machine.setDescription(machineType.getDescription());
 	    }
+
 	// Variables
-	if (machine.getVariables()!=null)
+	if (machineType.getVariables()!=null)
 	    {
-		VariablesType variables = machine.getVariables();
-		System.err.println(blanks.substring(0,nbrOfBlanks) + "<Variables>");
-		// Nbr of Variables
-		List variableList = variables.getVariable();
-		nbrOfBlanks++;
-		for (Iterator variableIter = variableList.iterator();variableIter.hasNext();)
-		    {
-			// Since there is a class Variable this XML simpletype should be represented by a Variable object,
-			// but it is a String.
-			// In JABX version 2.0 there will be an opportunity to set mapSimpleTypeDef="true" and that will
-			// hopefully sort this out
-			//Variable currentVariable = (Variable) variableIter.next();
-			String currentVariable = (String) variableIter.next();
-			//System.err.println(blanks.substring(0,nbrOfBlanks) + "<Variable>" + currentVariable.getValue() + "</Variable>");
-			System.err.println(blanks.substring(0,nbrOfBlanks) + "<Variable>" + currentVariable + "</Variable>");
-		    }
-		nbrOfBlanks--;
-		System.err.println(blanks.substring(0,nbrOfBlanks) + "</Variables>");
+		buildVariables(machineType.getVariables(), machine);
 	    }
-
+	
 	// Equipment
-	if (machine.getEquipment()!=null)
+	if (machineType.getEquipment()!=null)
 	    {
-		buildEquipment(machine.getEquipment());
+		buildEquipment(machineType.getEquipment(), machine);
 	    }
-
+	
 	nbrOfBlanks--;
 	System.err.println(blanks.substring(0,nbrOfBlanks) + "</Machine>");
     }
 
+    private void buildVariables(VariablesType variables, org.supremica.manufacturingTables.controlsystemdata.Machine machine)
+    {
+	System.err.println(blanks.substring(0,nbrOfBlanks) + "<Variables>");
+	
+	// Nbr of Variables
+	List variableList = variables.getVariable();
+	nbrOfBlanks++;
+	for (Iterator variableIter = variableList.iterator(); variableIter.hasNext(); )
+	    {
+		VariableType variableType = (VariableType) variableIter.next();
 
+		System.err.println(blanks.substring(0,nbrOfBlanks) + "<Variable name=\"" + variableType.getName() + "\">");		
+		org.supremica.manufacturingTables.controlsystemdata.Variable variable = new org.supremica.manufacturingTables.controlsystemdata.Variable(variableType.getName());
+		
+		ValuesType values = variableType.getValues();
+		nbrOfBlanks++;
+		System.err.println(blanks.substring(0,nbrOfBlanks) + "<Values>");
+		
+		// Nbr of Values
+		List valueList = values.getValue();
+		nbrOfBlanks++;
+		for (Iterator valueIter = valueList.iterator(); valueIter.hasNext(); )
+		    {
+			// Since there is a class Value this XML simpletype should be represented by a Value object,
+			// but it is a String.
+			// In JABX version 2.0 there will be an opportunity to set mapSimpleTypeDef="true" and that will
+			// hopefully sort this out
+			//Value value = (Value) valueIter.next();
+			String value = (String) valueIter.next();
+			
+			//System.err.println(blanks.substring(0,nbrOfBlanks) + "<Value>" + value.getValue() + "</Value>");
+			System.err.println(blanks.substring(0,nbrOfBlanks) + "<Value>" + value + "</Value>");
+			
+			variable.addValue(value);
+		    }
+		nbrOfBlanks--;
+		System.err.println(blanks.substring(0,nbrOfBlanks) + "</Values>");
+		
+		machine.addVariable(variable);
 
-    private void buildEquipment(EquipmentType equip)
+		nbrOfBlanks--;
+		System.err.println(blanks.substring(0,nbrOfBlanks) + "</Variable>");
+	    }
+	nbrOfBlanks--;
+	System.err.println(blanks.substring(0,nbrOfBlanks) + "</Variables>");
+    }
+
+    // The EquipmentContainer (interface) upperLevelEquipment could be either a machine 
+    // (org.supremica.manufacturingTables.controlsystemdata.Machine)
+    // or an Actuator and the current Equipment should be added to the corresponding 
+    // upperLevelEquipment Equipment or Machine.
+    private void buildEquipment(EquipmentType equip, EquipmentContainer upperLevelEquipment)
     {
 	System.err.println(blanks.substring(0,nbrOfBlanks) + "<Equipment>");
 
@@ -240,22 +275,51 @@ public class AutomationObjectsPLCProgramBuilder
 	for (Iterator equipIter = equipList.iterator();equipIter.hasNext();)
 	    {
 		EquipmentEntityType currentEquip = (EquipmentEntityType) equipIter.next();
-		buildEquipmentEntity(currentEquip);
+		buildEquipmentEntity(currentEquip, upperLevelEquipment);
 	    }
 	nbrOfBlanks--;
 	System.err.println(blanks.substring(0,nbrOfBlanks) + "</Equipment>");
     }
-
-    private void buildEquipmentEntity(EquipmentEntityType equipEnt)
+    
+    // The EquipmentContainer upperLevelEquipment could be either a machine 
+    // (org.supremica.manufacturingTables.controlsystemdata.Machine)
+    // or an Actuator and the current Equipment should be added to the corresponding Equipment or Machine.
+    private void buildEquipmentEntity(EquipmentEntityType equipEnt, EquipmentContainer upperLevelEquipment)
     {
+	EquipmentInterface equipment = null;
+	// Sensors and Actuators are separated.
+	if (equipEnt.getType().equals("Sensor"))
+	    {
+		equipment = new Sensor(equipEnt.getName());
+		upperLevelEquipment.addSensor((Sensor) equipment);
+	    }
+	
+	else if (equipEnt.getType().equals("Actuator"))
+	    {
+		equipment = new Actuator(equipEnt.getName());
+		upperLevelEquipment.addActuator((Actuator) equipment);
+	    }
+	else
+	    {
+		System.err.println("The EquipmentEntity is neither a sensor nor an actuator!!!!");
+		return;
+	    }
+	
+	// The following should be performed fore both sensors and actuators
+	
 	System.err.println(blanks.substring(0,nbrOfBlanks) + "<EquipmentEntity equipmentType=\"" + equipEnt.getType() + "\" " + "name=\"" + equipEnt.getName() + "\">");
 	nbrOfBlanks++;
-
+	
+	
 	// Description
 	if (equipEnt.getDescription()!=null)
 	    {
 		System.err.println(blanks.substring(0,nbrOfBlanks) + "<Description>" + equipEnt.getDescription() + "</Description>");
+		equipment.setDescription(equipEnt.getDescription());
+		
 	    }
+	
+	
 	// States
 	StatesType states = equipEnt.getStates();
 	System.err.println(blanks.substring(0,nbrOfBlanks) + "<States>");
@@ -265,128 +329,62 @@ public class AutomationObjectsPLCProgramBuilder
 	for (Iterator stateIter = stateList.iterator();stateIter.hasNext();)
 	    {
 		// Since there is a class State this XML simpletype should be represented by a State object,
-		// but it is a String.
-		// In JABX version 2.0 there will be an opportunity to set mapSimpleTypeDef="true" and that will
-		// hopefully sort this out
+		// but it is a String, as for the Value above.
 		//State currentState = (State) stateIter.next();
 		String currentState = (String) stateIter.next();
 		//System.err.println(blanks.substring(0,nbrOfBlanks) + "<State>" + currentState.getValue() + "</State>");
 		System.err.println(blanks.substring(0,nbrOfBlanks) + "<State>" + currentState + "</State>");
+		
+		equipment.addState(currentState);
 	    }
 	nbrOfBlanks--;
 	System.err.println(blanks.substring(0,nbrOfBlanks) + "</States>");
-
-	// Elements
+	
+	// Elements (optional for an actuator)
 	if (equipEnt.getElements()!=null)
 	    {
-		buildElements(equipEnt.getElements());
+		System.err.println(blanks.substring(0,nbrOfBlanks) + "<Elements>");
+		
+		// Nbr of Elements
+		// It may be hard to imagine an EquipmentEntity having more than one Elements 
+		// but for now I divide it this way.
+		List elementList = equipEnt.getElements().getElement();
+		nbrOfBlanks++;
+		for (Iterator elementIter = elementList.iterator();elementIter.hasNext();)
+		    {
+			ElementType currentElement = (ElementType) elementIter.next();
+			printElement(currentElement);
+			equipment.addHardwareConnection(currentElement.getName());
+		    }
+		nbrOfBlanks--;
+		System.err.println(blanks.substring(0,nbrOfBlanks) + "</Elements>");
 	    }
-
-	// Equipment
+	
+	// Lower level Equipment, should only be possible for actuators
 	if (equipEnt.getEquipment()!=null)
 	    {
-		buildEquipment(equipEnt.getEquipment());
-	    }
-
-	nbrOfBlanks--;
-	System.err.println(blanks.substring(0,nbrOfBlanks) + "</EquipmentEntity>");
-
-
-	// Instatiating the corresponding Automation Object
-	try
-	    {
-
-		// Check if it is a sensor EquipmentEntity
-		if (equipEnt.getType().compareTo("Sensor") == 0)
+		if (equipment instanceof Actuator)
 		    {
-			AO currentAO = objFactory.createAO();
-			// there is no setAO method in AOApplication but the getAO method returns the actual list
-			aoApplication.getAO().add(currentAO);
-			currentAO.setName(equipEnt.getType() + "_" + equipEnt.getName());
-
-			System.err.println("This is a sensor!");
-			currentAO.setType("Sensor.aot");
-
-			// Instantiate the Views, model and controller for the sensor
-			Model model = objFactory.createModel();
-			model.setType("Sensor_Model.fbt");
-			currentAO.setModel(model);
-
-			Controller controller = objFactory.createController();
-			controller.setType("StateMonitor_Controller.fbt");
-			controller.setName("StateMonitor_Controller");
-			// there is no setController method in AO but the getController method returns the actual list
-			currentAO.getController().add(controller);
-
-			View view1 = objFactory.createView();
-			view1.setType("StateRequest_View.fbt");
-			view1.setName("StateRequest_View");
-			currentAO.getView().add(view1);
-			View view2 = objFactory.createView();
-			view2.setType("StateCheck_View.fbt");
-			view2.setName("StateCheck_View");
-			currentAO.getView().add(view2);
-			View view3 = objFactory.createView();
-			view3.setType("Sensor_StateOrder_View.fbt");
-			view3.setName("Sensor_StateOrder_View");
-			currentAO.getView().add(view3);
-			View view4 = objFactory.createView();
-			view4.setType("Sensor_StateMonitor_View.fbt");
-			view4.setName("StateMonitor_View");
-			currentAO.getView().add(view4);
-
-			//InterfaceListType interfaceList = objFactory.createInterfaceList();
-			//EventInputsType eventInputs = objFactory.createEventInputs();
-			//JaxbEvent eventREQ = objFactory.createJaxbEvent();
-			//eventREQ.setName("REQ");
-			// there is no setEvent method in EventInputs but the getEvent method returns the actual list
-			//eventInputs.getEvent().add(eventREQ);
-			//interfaceList.setEventInputs(eventInputs);
-			//FB.setInterfaceList(interfaceList);
-
-			// The FB needs to have versionInfo
-			//org.supremica.functionblocks.xsd.libraryelement.VersionInfoType versionInfo = objFactory.createVersionInfo();
-			//versionInfo.setOrganization("Chalmers");
-			//versionInfo.setVersion("0.1");
-			//versionInfo.setAuthor("Oscar Ljungkrantz");
-			//versionInfo.setDate((new java.util.Date()).toLocaleString());
-			// there is no setVersionInfo method in FBType but the getVersionInfo method returns the actual list
-			//FB.getVersionInfo().add(versionInfo);
-			// Create an xml-file of the AO
-			XMLCreator xmlCreator = new XMLCreator();
-			xmlCreator.createXMLFile(aoApplication,"C:/Documents and Settings/oscar/My Documents/Supremica/examples/functionblocks/FBRuntime/manufacturingTables" , "test.aoa");
+			buildEquipment(equipEnt.getEquipment(),(Actuator) equipment);
+		    }
+		else
+		    {
+			System.err.println("Only possible for actuators to contain lower level equipment!");
 		    }
 	    }
-	catch (JAXBException je)
-	    {
-		je.printStackTrace();
-	    }
-
-    }
-
-
-    private void buildElements(ElementsType elements)
-    {
-	System.err.println(blanks.substring(0,nbrOfBlanks) + "<Elements>");
-
-	// Nbr of Elements
-	List elementList = elements.getElement();
-	nbrOfBlanks++;
-	for (Iterator elementIter = elementList.iterator();elementIter.hasNext();)
-	    {
-		ElementType currentElement = (ElementType) elementIter.next();
-		buildElement(currentElement);
-	    }
+	
 	nbrOfBlanks--;
-	System.err.println(blanks.substring(0,nbrOfBlanks) + "</Elements>");
+	System.err.println(blanks.substring(0,nbrOfBlanks) + "</EquipmentEntity>");
     }
-
-    private void buildElement(ElementType element)
+    
+    
+    // For printing the element data. 
+    private void printElement(ElementType element)
     {
-	System.err.println(blanks.substring(0,nbrOfBlanks) + "<Element elementType=\"" + element.getType() + "\" " + "name=\"" + element.getName() + "\">");
+	System.err.println(blanks.substring(0,nbrOfBlanks) + "<Element name=\"" + element.getName() + "\">");
 	nbrOfBlanks++;
-
-	// Description
+	
+	// Description, this is not added to the ControlSystemData
 	if (element.getDescription()!=null)
 	    {
 		System.err.println(blanks.substring(0,nbrOfBlanks) + "<Description>" + element.getDescription() + "</Description>");

@@ -76,6 +76,7 @@ public class Loader
 
     public Loader()
     {
+	System.err.println("Inside Loader");
 	try
 	    {
 		jaxbContext = JAXBContext.newInstance("org.supremica.manufacturingTables.xsd.factory");

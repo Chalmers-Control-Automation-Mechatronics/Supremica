@@ -48,44 +48,105 @@
  */
 
 /**
- * The Loader class uses JAXB to load a Factory
- * application into a PLC program structure.
+ * The Actuator class describes all the information needed to describe the actuator
+ * in order to build a control program.
  *
  *
- * Created: Tue Nov  25 13:49:32 2005
+ * Created: Mon Apr  24 13:39:32 2006
  *
  * @author Oscar
  * @version 1.0
  */
-package org.supremica.manufacturingTables.management;
-import org.supremica.manufacturingTables.controlsystemdata.*;
-import org.supremica.manufacturingTables.controlsystemimplementation.*;
+package org.supremica.manufacturingTables.controlsystemdata;
 
-import org.supremica.manufacturingTables.xsd.factory.*;
+import java.util.List;
+import java.util.LinkedList;
+//import java.io.*;
 
-public class Main
+public class Actuator implements EquipmentInterface, EquipmentContainer
 {
-    public static void main(String[] args)
+    private String name;
+    private String description;
+    private List actuators;
+    private List sensors;
+    private List states;
+    private List hardwareConnections;
+    //    private Mailbox mailbox;
+    
+    public Actuator(String name)
     {
-	System.err.println("main function entered");
-	String path = null;
-	if (args.length >= 2)
-	    {
-		path = args[1];
-	    }
-	if (args.length >=1)
-	    {
-		String fileName = args[0];
-		Loader loader = new Loader();
-		FactoryType factory = (FactoryType) loader.load(path, fileName);
-		//AutomationObjectsPLCProgramBuilder plcProgramBuilder = new AutomationObjectsPLCProgramBuilder();
-		//plcProgramBuilder.buildPLCProgram(factory);
-		ControlSystemDataBuilder plcDataBuilder = new ControlSystemDataBuilder();
-		ManufacturingCell cell = plcDataBuilder.buildPLCData(factory);
-	    }
-	else
-	    {
-		System.err.println("You must enter a fileName and optionally a path!");
-	    }
+	this.name = name;
+	description = null;
+	states = new LinkedList();
+	actuators = new LinkedList();
+	sensors = new LinkedList();
+	hardwareConnections = new LinkedList();
+	//mailbox = null;
     }
+
+    public String getName()
+    {
+	return name;
+    }
+
+    public void setDescription(String newDescription)
+    {
+	description = newDescription;
+    }
+     
+    public String getDesciption()
+    {
+	return description;
+    }
+    
+//     public Mailbox getMailbox()
+//     {
+// 	return mailbox;
+//     }
+
+//     public void setMailbox(Mailbox newMailbox)
+//     {
+// 	mailbox = newMailbox;
+//     }
+
+    public List getStates()
+    {
+	return states;
+    }
+  
+    public void addState(String stateToAdd)
+    {
+	states.add(stateToAdd);
+    }
+
+    public List getActuators()
+    {
+	return actuators;
+    }
+  
+    public void addActuator(Actuator actuatorToAdd)
+    {
+	actuators.add(actuatorToAdd);
+    }
+
+    public List getSensors()
+    {
+	return sensors;
+    }
+  
+    public void addSensor(Sensor sensorToAdd)
+    {
+	actuators.add(sensorToAdd);
+    }
+
+    public List getHardwareConnections()
+    {
+	return hardwareConnections;
+    }
+  
+    public void addHardwareConnection(String hardwareConnectionToAdd)
+    {
+	hardwareConnections.add(hardwareConnectionToAdd);
+    }
+
 }

@@ -48,44 +48,24 @@
  */
 
 /**
- * The Loader class uses JAXB to load a Factory
- * application into a PLC program structure.
+ * The Coordinator class at this level does not contain any information since the ManufacturingCell
+ * holds information about alla parts.
  *
- *
- * Created: Tue Nov  25 13:49:32 2005
+ * Created: Mon Apr  24 14:20:32 2006
  *
  * @author Oscar
  * @version 1.0
  */
-package org.supremica.manufacturingTables.management;
-import org.supremica.manufacturingTables.controlsystemdata.*;
-import org.supremica.manufacturingTables.controlsystemimplementation.*;
+package org.supremica.manufacturingTables.controlsystemdata;
 
-import org.supremica.manufacturingTables.xsd.factory.*;
+//import java.io.*;
 
-public class Main
+public class Coordinator
 {
-    public static void main(String[] args)
+
+    public Coordinator()
     {
-	System.err.println("main function entered");
-	String path = null;
-	if (args.length >= 2)
-	    {
-		path = args[1];
-	    }
-	if (args.length >=1)
-	    {
-		String fileName = args[0];
-		Loader loader = new Loader();
-		FactoryType factory = (FactoryType) loader.load(path, fileName);
-		//AutomationObjectsPLCProgramBuilder plcProgramBuilder = new AutomationObjectsPLCProgramBuilder();
-		//plcProgramBuilder.buildPLCProgram(factory);
-		ControlSystemDataBuilder plcDataBuilder = new ControlSystemDataBuilder();
-		ManufacturingCell cell = plcDataBuilder.buildPLCData(factory);
-	    }
-	else
-	    {
-		System.err.println("You must enter a fileName and optionally a path!");
-	    }
     }
+
+
 }

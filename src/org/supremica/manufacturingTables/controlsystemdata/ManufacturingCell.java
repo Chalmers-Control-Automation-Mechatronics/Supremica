@@ -48,44 +48,71 @@
  */
 
 /**
- * The Loader class uses JAXB to load a Factory
- * application into a PLC program structure.
+ * The ManufacturingCell contains information about the Mailbox, the Coordinator 
+ * and about all the Machines in the cell
  *
  *
- * Created: Tue Nov  25 13:49:32 2005
+ * Created: Mon Apr  24 13:39:32 2006
  *
  * @author Oscar
  * @version 1.0
  */
-package org.supremica.manufacturingTables.management;
-import org.supremica.manufacturingTables.controlsystemdata.*;
-import org.supremica.manufacturingTables.controlsystemimplementation.*;
+package org.supremica.manufacturingTables.controlsystemdata;
 
-import org.supremica.manufacturingTables.xsd.factory.*;
+import java.util.List;
+import java.util.LinkedList;
+//import java.io.*;
 
-public class Main
+public class ManufacturingCell
 {
-    public static void main(String[] args)
+    private String name;
+    private String description;
+    private List machines;
+    private Mailbox mailbox;
+    private Coordinator coordinator;
+
+    public ManufacturingCell(String name, Coordinator coordinator, Mailbox mailbox)
     {
-	System.err.println("main function entered");
-	String path = null;
-	if (args.length >= 2)
-	    {
-		path = args[1];
-	    }
-	if (args.length >=1)
-	    {
-		String fileName = args[0];
-		Loader loader = new Loader();
-		FactoryType factory = (FactoryType) loader.load(path, fileName);
-		//AutomationObjectsPLCProgramBuilder plcProgramBuilder = new AutomationObjectsPLCProgramBuilder();
-		//plcProgramBuilder.buildPLCProgram(factory);
-		ControlSystemDataBuilder plcDataBuilder = new ControlSystemDataBuilder();
-		ManufacturingCell cell = plcDataBuilder.buildPLCData(factory);
-	    }
-	else
-	    {
-		System.err.println("You must enter a fileName and optionally a path!");
-	    }
+	this.name = name;
+	this.coordinator = coordinator;
+	description = null;
+	machines = new LinkedList();
+	this.mailbox = mailbox;
     }
+
+    public String getName()
+    {
+	return name;
+    }
+    
+    public String getDescription()
+    {
+	return description;
+    }
+
+    public void setDescription(String newDescription)
+    {
+	description = newDescription;
+    }
+
+    public Mailbox getMailbox()
+    {
+	return mailbox;
+    }
+
+    public Coordinator getCoordinator()
+    {
+	return coordinator;
+    }
+
+    public List getMachines()
+    {
+	return machines;
+    }
+  
+    public void addMachine(Machine machineToAdd)
+    {
+	machines.add(machineToAdd);
+    }
+
 }
