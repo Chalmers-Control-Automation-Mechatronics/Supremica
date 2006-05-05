@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.29 2006-05-05 13:17:37 markus Exp $
+//# $Id: ModuleCompiler.java,v 1.30 2006-05-05 13:55:30 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -559,12 +559,12 @@ public class ModuleCompiler
 		String guardString= new String("");
 		for (TransitionProxy transition : path) {
 			if (mEFATransitionGuardActionBlockMap.get(transition) != null) {
-				guardString = guardString.toString() + mEFATransitionGuardActionBlockMap
-						.get(transition).getGuard().toString();
+				guardString = guardString + mEFATransitionGuardActionBlockMap
+						.get(transition).getGuard();
 			}
 
 		}
-		if (guardString.equals("")|| guardString == null) {
+		if (guardString.equals("")) {
 			guardString = "true";
 		}
 		ExpressionParser parser = new ExpressionParser(ModuleSubjectFactory
