@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.28 2006-05-04 15:34:17 markus Exp $
+//# $Id: ModuleCompiler.java,v 1.29 2006-05-05 13:17:37 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -65,6 +65,7 @@ import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
 import net.sourceforge.waters.model.module.InstanceProxy;
 import net.sourceforge.waters.model.module.IntConstantProxy;
 import net.sourceforge.waters.model.module.IntParameterProxy;
+import net.sourceforge.waters.model.module.LabelGeometryProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
@@ -81,6 +82,7 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 import net.sourceforge.waters.model.module.VariableProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.plain.des.EventElement;
+import net.sourceforge.waters.subject.module.GuardActionBlockSubject;
 //
 
 import net.sourceforge.waters.subject.module.EventDeclSubject;
@@ -500,7 +502,7 @@ public class ModuleCompiler
 	private void compileEFA() {
 		mEFAEventGuardActionBlockMap = new HashMap<EventProxy, GuardActionBlockProxy>();
 		for (EventProxy event : mGlobalAlphabet) {
-			List<List<TransitionProxy>> transitions = new LinkedList<List<TransitionProxy>>();
+			LinkedList<List<TransitionProxy>> transitions = new LinkedList<List<TransitionProxy>>();
 			for (AutomatonProxy automaton : mAutomata.values()) {
 				List<TransitionProxy> transInAutomaton = new LinkedList<TransitionProxy>();
 				// Obs if the automaton is EFA we need to count duplicate trans
@@ -516,22 +518,91 @@ public class ModuleCompiler
 						&& automaton.getEvents().contains(event)) {
 					transitions.clear();
 					break;
-
 				} else {
 					transitions.add(transInAutomaton);
 				}
 			}
+
 			List<List<TransitionProxy>> allPaths = allPossiblePaths(transitions);
+
+			int index = 1;
+			for (List<TransitionProxy> path : allPaths) {
+				SimpleExpressionSubject guardExpression = collectGuard(path);
+				List<BinaryExpressionProxy> actionList = collectAction(path);
+
+				GuardExpressionHandler handler = new GuardExpressionHandler();
+				handler.setExpression(guardExpression);
+				List<SimpleExpressionSubject> andClauses = handler
+						.getAndClauses();
+
+				for (SimpleExpressionSubject andClause : andClauses) {
+				}
+			}
 		}
 	}
-
-	private List<List<TransitionProxy>> allPossiblePaths(List<List<TransitionProxy>> transitions) {
-		if(transitions.isEmpty()) return transitions;
 		
-		
-		// TODO Auto-generated method stub
+	
+	private List <BinaryExpressionProxy> collectAction(List<TransitionProxy> path) {
+		List <BinaryExpressionProxy> actionList = new LinkedList<BinaryExpressionProxy>();
+		for(TransitionProxy transition: path){
+			if(mEFATransitionGuardActionBlockMap.get(transition)!= null){
+				actionList.addAll
+				(mEFATransitionGuardActionBlockMap.get(transition).getActionList());
+			}
+			
+		}
+		return actionList;
+	}
 
-		return null;
+	private SimpleExpressionSubject collectGuard(List<TransitionProxy> path) {
+		SimpleExpressionSubject guardExpression;
+		String guardString= new String("");
+		for (TransitionProxy transition : path) {
+			if (mEFATransitionGuardActionBlockMap.get(transition) != null) {
+				guardString = guardString.toString() + mEFATransitionGuardActionBlockMap
+						.get(transition).getGuard().toString();
+			}
+
+		}
+		if (guardString.equals("")|| guardString == null) {
+			guardString = "true";
+		}
+		ExpressionParser parser = new ExpressionParser(ModuleSubjectFactory
+				.getInstance(), GuardExpressionOperatorTable.getInstance());
+		try {
+			guardExpression = (SimpleExpressionSubject)parser.parse(guardString);
+		} catch (ParseException e) {
+			guardExpression = null;
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return guardExpression;
+	}
+
+	private List<List<TransitionProxy>> allPossiblePaths(LinkedList<List<TransitionProxy>> transitions) {
+		if(transitions.isEmpty()) {
+			List<List<TransitionProxy>> noPaths = new LinkedList<List<TransitionProxy>>();
+			noPaths.add(new LinkedList<TransitionProxy>());
+			return noPaths;
+		}
+		
+		List<TransitionProxy> transInAut = transitions.removeFirst();
+		List<List<TransitionProxy>> subPaths = allPossiblePaths(transitions);
+		
+		List<List<TransitionProxy>> allPaths = new LinkedList<List<TransitionProxy>>();
+		allPaths.add(new LinkedList<TransitionProxy>());
+		
+		for(List<TransitionProxy> subPath : subPaths){
+			for(TransitionProxy trans: transInAut){
+				List<TransitionProxy> p = new LinkedList <TransitionProxy>();
+				p.add(trans);
+				for(TransitionProxy t: subPath){
+					p.add(t);
+				}
+				allPaths.add(p);
+			}
+		}
+		return allPaths;
 	}
 
 	public CompiledParameterBinding visitParameterBindingProxy
