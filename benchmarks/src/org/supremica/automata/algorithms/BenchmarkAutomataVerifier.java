@@ -184,11 +184,11 @@ public class BenchmarkAutomataVerifier
 				// Benchmarks
 				String[] test = 
 				{
-					"verriegel3", "verriegel3b",
+					"FMS", "verriegel3", "verriegel3b",
 					"verriegel4", "verriegel4b",
 					"agv", "agvb", 
-					"IPS",
-					"SMS", "PMS",
+					"IPC",
+					"FMS", "SMS", "PMS",
 					"bmw_fh", "big_bmw",
 					"tbed_valid", "tbed_ctct", 
 					"fzelle",

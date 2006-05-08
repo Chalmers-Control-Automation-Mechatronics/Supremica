@@ -1,4 +1,7 @@
-All bugs are reported and stored in the bug datbase,
+There is currently no real bug-tracking system for Supremica/Waters... we should start a new one! 
 
-see, http://www.supremica.org/bugtracking
+ * Problem in Waters when using non-UTF-8 characters in state names (едц fцr example). Saved files can not be opened.
+ * Monolithic Synthesis does not remove non-reachable states which it should (why not?).
+
+Previously, all bugs were reported and stored in the bug database, http://www.supremica.org/bugtracking, but this is no longer the case. 
 

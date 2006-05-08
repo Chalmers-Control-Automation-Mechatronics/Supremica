@@ -188,7 +188,7 @@ public class AutomataMinimizer
 			  }
 			*/
 			// Get next automata to minimize
-			MinimizationTask task = getNextMinimizationTask(true);
+			MinimizationTask task = getNextMinimizationTask(false);
 			Automata selection = task.getAutomata();
 			Alphabet hideThese = task.getEventsToHide();
 			timer.stop();
@@ -284,7 +284,7 @@ public class AutomataMinimizer
 			logger.info("The automaton with the most transitions had " + mostTransitions + " transitions.");
 		}
 		//logger.info("Timer time: " + timer);
-		//logger.info(theAutomata.getName() + " & " + initialNbrOfAutomata + " & & " + mostStates + " & " + mostTransitions + " & TIME & true/false & " + AutomatonMinimizer.getWodesStatisticsLaTeX() + " & ALGO \\\\");
+		logger.info(theAutomata.getName() + " & " + initialNbrOfAutomata + " & & " + mostStates + " & " + mostTransitions + " & TIME & true/false & " + AutomatonMinimizer.getWodesStatisticsLaTeX() + " & ALGO \\\\");
 		// Return the result of the minimization!
 		assert(theAutomata.size() == 1);
 		return theAutomata.getFirstAutomaton();
@@ -724,7 +724,7 @@ public class AutomataMinimizer
 		}
 
 		//ActionMan.getGui().addAutomaton(new Automaton(aut));
-
+		
 		// Is it at all possible to minimize? (It may actually be possible even
 		// if there are no epsilons)
 		if (aut.nbrOfEpsilonTransitions() > 0)
@@ -741,7 +741,7 @@ public class AutomataMinimizer
 				return null;
 			}
 		}
-
+		
 		//ActionMan.getGui().addAutomaton(new Automaton(aut));
 
 		return aut;

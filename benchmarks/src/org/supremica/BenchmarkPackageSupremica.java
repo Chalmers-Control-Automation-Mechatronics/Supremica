@@ -52,15 +52,15 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import org.supremica.automata.BenchmarkPackageAutomata;
-import org.supremica.properties.SupremicaProperties;
+import org.supremica.properties.Config;
 
 public class BenchmarkPackageSupremica
 	extends TestCase
 {
 	static
 	{
-		SupremicaProperties.setLogToConsole(true);
-		SupremicaProperties.setLogToGUI(false);
+		Config.LOG_TO_CONSOLE.set(true);
+		Config.LOG_TO_GUI.set(true);
 	}
 
 	public BenchmarkPackageSupremica(String name)

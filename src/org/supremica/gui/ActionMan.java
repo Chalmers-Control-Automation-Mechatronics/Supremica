@@ -2395,8 +2395,7 @@ public class ActionMan
 		    final ModuleProxyFactory factory =
 			ModuleSubjectFactory.getInstance();
 		    final OperatorTable optable = CompilerOperatorTable.getInstance();
-		    final ProxyUnmarshaller<ModuleProxy> unMarshaller =
-			new JAXBModuleMarshaller(factory, optable);
+		    final ProxyUnmarshaller<ModuleProxy> unMarshaller = new JAXBModuleMarshaller(factory, optable);
 		    final URI uri = file.toURI();
 		    ModuleProxy module = (ModuleSubject) unMarshaller.unmarshal(uri);
 

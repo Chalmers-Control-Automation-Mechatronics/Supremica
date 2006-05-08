@@ -309,9 +309,7 @@ public class AutomatonSynthesizer
 
 		// Forbid the states with MAX_COST
 		boolean didSomething = false;
-
 		stateIt = theAutomaton.stateIterator();
-
 		while (stateIt.hasNext())
 		{
 			State currState = (State) stateIt.next();
@@ -519,9 +517,13 @@ public class AutomatonSynthesizer
 	{
 		doReachable(false);
 	}
+
 	/**
 	 * Sets the cost of all non reachable states to State.MAX_COST. The treatment of
 	 * forbidden states as stops for reachability is selectable through the argument.
+	 *
+	 * @param expandForbidden If false, states that are reachable only
+	 * by paths that pass through forbidden states are considered non-reachable.
 	 */
 	public void doReachable(boolean expandForbidden)
 	{

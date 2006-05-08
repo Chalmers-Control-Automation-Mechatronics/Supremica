@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleWindow
 //###########################################################################
-//# $Id: ModuleWindow.java,v 1.42 2006-05-04 15:09:20 martin Exp $
+//# $Id: ModuleWindow.java,v 1.43 2006-05-08 12:38:35 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -102,6 +102,8 @@ import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.supremica.automata.IO.ProjectBuildFromWaters;
 import org.supremica.automata.Project;
+
+import org.supremica.properties.Config;
 
 /**
  * <p>The primary module-loading window.</p>
@@ -235,10 +237,11 @@ public class ModuleWindow
 		// Show Supremica window...
 		if (supremica == null)
 		{
-			// Initializes some properties
 			org.supremica.apps.Supremica dummySupremica =
 				new org.supremica.apps.Supremica();
 			supremica = org.supremica.apps.SupremicaWithGui.startSupremica();
+			// Initializes some properties
+			// Why doesn't this Supremica instance log stuff in the log-window?
 		}
 		else
 		{
