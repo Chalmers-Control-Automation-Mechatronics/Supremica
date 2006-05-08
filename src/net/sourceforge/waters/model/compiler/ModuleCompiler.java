@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.30 2006-05-05 13:55:30 markus Exp $
+//# $Id: ModuleCompiler.java,v 1.31 2006-05-08 09:31:30 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -82,7 +82,6 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 import net.sourceforge.waters.model.module.VariableProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.plain.des.EventElement;
-import net.sourceforge.waters.subject.module.GuardActionBlockSubject;
 //
 
 import net.sourceforge.waters.subject.module.EventDeclSubject;
@@ -482,6 +481,7 @@ public class ModuleCompiler
         // ------EFA--------
 		mEFATransitionAutomatonMap = new HashMap<TransitionProxy, AutomatonProxy>();
 		mEFATransitionGuardActionBlockMap = new HashMap<TransitionProxy, GuardActionBlockProxy>();
+		mEFAVariables = new LinkedList<List<VariableProxy>>();/*Variables are updated locally*/
 		// -----------------
 		
 		final List<AliasProxy> constants = proxy.getConstantAliasList();
@@ -500,48 +500,76 @@ public class ModuleCompiler
 	}
 
 	private void compileEFA() {
-		mEFAEventGuardActionBlockMap = new HashMap<EventProxy, GuardActionBlockProxy>();
+		mEFAEventGuardClauseMap = new HashMap<EventProxy, SimpleExpressionSubject>();
+		mEFAEventActionListMap = new HashMap<EventProxy, List<BinaryExpressionProxy>>();
 		for (EventProxy event : mGlobalAlphabet) {
-			LinkedList<List<TransitionProxy>> transitions = new LinkedList<List<TransitionProxy>>();
-			for (AutomatonProxy automaton : mAutomata.values()) {
-				List<TransitionProxy> transInAutomaton = new LinkedList<TransitionProxy>();
-				// Obs if the automaton is EFA we need to count duplicate trans
-				// if the GuardActionBlock differ. We assume that this has been
-				// fixed.
+			/*
+			 * Find all possible transitions (synch-combinations between the automata)
+			 * that the event can trigger(stored in the allPaths list).
+			 */
+			List<List<TransitionProxy>> allTrans = allPossibleTransitions(event);
 
-				for (TransitionProxy transition : automaton.getTransitions()) {
-					if (transition.getEvent().equals(event)) {
-						transInAutomaton.add(transition);
-					}
-				}
-				if (transInAutomaton.isEmpty()
-						&& automaton.getEvents().contains(event)) {
-					transitions.clear();
-					break;
-				} else {
-					transitions.add(transInAutomaton);
-				}
-			}
-
-			List<List<TransitionProxy>> allPaths = allPossiblePaths(transitions);
-
+			/*
+			 * Collect guard and actions. Split the guards into andClauses.
+			 * Update the automata with the final events and
+			 * transitions. Fill mappings, mEFAEventGuardClauseMap and
+			 * mEFAEventActionListMap, needed to build variable automata. 
+			 */
 			int index = 1;
-			for (List<TransitionProxy> path : allPaths) {
+			for (List<TransitionProxy> path : allTrans) {
 				SimpleExpressionSubject guardExpression = collectGuard(path);
 				List<BinaryExpressionProxy> actionList = collectAction(path);
 
 				GuardExpressionHandler handler = new GuardExpressionHandler();
 				handler.setExpression(guardExpression);
-				List<SimpleExpressionSubject> andClauses = handler
-						.getAndClauses();
+				List<SimpleExpressionSubject> andClauses = handler.getAndClauses();
 
 				for (SimpleExpressionSubject andClause : andClauses) {
-				}
+                final EventProxy relabeledEvent = mFactory.createEventProxy
+                (event.getName() + "_" + index, event.getKind(), event.isObservable());
+                mEFAEventGuardClauseMap.put(relabeledEvent, andClause);
+                mEFAEventActionListMap.put(relabeledEvent, actionList);
+                index++;
+                updateAutomtata(relabeledEvent,path);
+                			}
 			}
 		}
+		/*
+		 * 
+		 */
+		buildVariableAutomata();
+	}
+	private void buildVariableAutomata() {
+    //		 TODO Auto-generated method stub	
+	}
+	private List<List<TransitionProxy>> allPossibleTransitions(EventProxy event) {
+		LinkedList<List<TransitionProxy>> transitions = new LinkedList<List<TransitionProxy>>();
+		for (AutomatonProxy automaton : mAutomata.values()) {
+			List<TransitionProxy> transInAutomaton = new LinkedList<TransitionProxy>();
+			
+			for (TransitionProxy transition : automaton.getTransitions()) {
+				if (transition.getEvent().equals(event)) {
+					transInAutomaton.add(transition);
+				}
+			}
+			if (transInAutomaton.isEmpty()
+					&& automaton.getEvents().contains(event)) {
+				transitions.clear();
+				break;
+			} else {
+				transitions.add(transInAutomaton);
+			}
+		}
+		List<List<TransitionProxy>> allPaths = allPossiblePaths(transitions);
+		return allPaths;
 	}
 		
 	
+	private void updateAutomtata(EventProxy relabeledEvent, List<TransitionProxy> path) {
+		// TODO Auto-generated method stub
+		
+	}
+
 	private List <BinaryExpressionProxy> collectAction(List<TransitionProxy> path) {
 		List <BinaryExpressionProxy> actionList = new LinkedList<BinaryExpressionProxy>();
 		for(TransitionProxy transition: path){
@@ -1713,8 +1741,11 @@ public class ModuleCompiler
 	private List<TransitionProxy> mEFATransitions;
 	private Map<TransitionProxy, AutomatonProxy> mEFATransitionAutomatonMap;
 	private Map<TransitionProxy, GuardActionBlockProxy> mEFATransitionGuardActionBlockMap;
-	private Map<EventProxy, GuardActionBlockProxy> mEFAEventGuardActionBlockMap;
+	private Map<EventProxy, SimpleExpressionSubject> mEFAEventGuardClauseMap;
+	private Map<EventProxy,List<BinaryExpressionProxy>> mEFAEventActionListMap;
+	private List<List<VariableProxy>> mEFAVariables;/*Variables are updated locally*/
 	//
+	
 	private Map<TransitionProxy, EdgeProxy> mEFATransitionEdgeMap;
 	private Collection<TransitionProxy> mEFAUncontrollableTrans;
 	private Map<TransitionProxy, List<BinaryExpressionProxy>> mEFARelabeledTransitionActionMap;
