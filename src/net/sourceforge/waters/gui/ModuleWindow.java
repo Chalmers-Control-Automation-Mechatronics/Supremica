@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleWindow
 //###########################################################################
-//# $Id: ModuleWindow.java,v 1.43 2006-05-08 12:38:35 flordal Exp $
+//# $Id: ModuleWindow.java,v 1.44 2006-05-08 20:17:50 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -121,7 +121,7 @@ public class ModuleWindow
 	 * Limits the functionality of Waters to just drawing simple components.
 	 * Should be a property (will be a property in the IDE...).
 	 */
-	public static final boolean DES_COURSE_VERSION = true;
+	public static final boolean DES_COURSE_VERSION = false;
 
 	/**
 	 * Constructor.
