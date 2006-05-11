@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorNewDialog
 //###########################################################################
-//# $Id: EditorNewDialog.java,v 1.6 2006-04-13 08:58:23 flordal Exp $
+//# $Id: EditorNewDialog.java,v 1.7 2006-05-11 10:04:17 flordal Exp $
 //###########################################################################
 
 
@@ -65,11 +65,12 @@ public class EditorNewDialog
 		mNameInput.addActionListener(this);
 
 		JButton b2 = new JButton("Cancel");
-
-		okButton.setActionCommand("ok");
 		b2.setActionCommand("cancel");
-		okButton.addActionListener(this);
 		b2.addActionListener(this);
+		//b2.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0));
+		okButton = new JButton("OK");
+		okButton.setActionCommand("ok");
+		okButton.addActionListener(this);
 
 		Box kBox = new Box(BoxLayout.PAGE_AXIS);
 
@@ -151,7 +152,7 @@ public class EditorNewDialog
 	private final ModuleWindow mRoot;
 	private final DefaultMutableTreeNode mParentNode;
 	private final JTextField mNameInput = new JTextField(16);
-	private final JButton okButton = new JButton("OK");
+	private final JButton okButton;
 	private final ButtonGroup group = new ButtonGroup();
 
 	private static final int FOREACH = 1;
