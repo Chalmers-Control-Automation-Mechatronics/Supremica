@@ -47,6 +47,8 @@ how to use id and label, then use only id.
 		<xs:attribute name="operator" type="xs:boolean" default="false" />
 		<xs:attribute name="immediate" type="xs:boolean" default="false" />
 		<xs:attribute name="epsilon" type="xs:boolean" default="false" />
+		<xs:attribute name="operatorReset" type="xs:boolean" default="false" />
+		<xs:attribute name="operatorIncrease" type="xs:boolean" default="false" />
 	</xs:complexType>
 	<xs:complexType name="Events">
 		<xs:sequence>
