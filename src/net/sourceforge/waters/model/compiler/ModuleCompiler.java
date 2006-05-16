@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.32 2006-05-16 11:15:51 markus Exp $
+//# $Id: ModuleCompiler.java,v 1.33 2006-05-16 13:35:11 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -538,7 +538,11 @@ public class ModuleCompiler
 				 * then for each andClause in the guard expression.
 				 */
 				if (!path.isEmpty()) {
-
+					/*
+					 * Debugging
+					 */
+					//System.out.println("path: " + path);
+					
 					newEvents.remove(event);
 
 					SimpleExpressionSubject guardExpression = collectGuard(path);
@@ -1103,6 +1107,12 @@ public class ModuleCompiler
 			}
 	
 		}
+		/*
+		 * For debugging
+		 * 
+		 */
+		//System.out.println("guardString: " + guardString);
+		
 		ExpressionParser parser = new ExpressionParser(ModuleSubjectFactory
 				.getInstance(), GuardExpressionOperatorTable.getInstance());
 		try {
@@ -1230,16 +1240,17 @@ public class ModuleCompiler
 					stateStateMap.put(state,s);
 					
 					}
+					
+					/*
+					 * Rename all transitions. Update mapping: transition to 
+					 * GuardActionBlock.
+					 */
 					LinkedList<TransitionProxy> Transitions = 
 			    		new LinkedList<TransitionProxy>();
-					/*
-					 * Rename all transitions. Copy mapping: transition to guard.
-					 */
-					Map<TransitionProxy, GuardActionBlockProxy> transitionGuardActionBlockMap
-					= new HashMap<TransitionProxy, GuardActionBlockProxy>();
 					
 					for (TransitionProxy transition : mTransitions) {
-					StateProxy source = transition.getSource();
+					
+				    StateProxy source = transition.getSource();
 					StateProxy target = transition.getTarget();
 
 					for (StateProxy state : mStates) {
@@ -1255,23 +1266,23 @@ public class ModuleCompiler
 							source, transition.getEvent(), target);
 					
 					if(mEFATransitionGuardActionBlockMap.containsKey(transition)){
-					transitionGuardActionBlockMap.put(trans,
+						mEFATransitionGuardActionBlockMap.put(trans,
 							mEFATransitionGuardActionBlockMap.get(transition));
+						mEFATransitionGuardActionBlockMap.remove(transition);
 					}
 					
 					Transitions.add(trans);
 					
 				}
 					/*
-					 * Update mappings.
+					 * Update transitions and states.
 					 */
 					
 					mTransitions.clear();
 					mTransitions.addAll(Transitions);
 					mStates.clear();
 					mStates.addAll(stateStateMap.values());
-					mEFATransitionGuardActionBlockMap.clear();
-					mEFATransitionGuardActionBlockMap.putAll(transitionGuardActionBlockMap);
+					
 				
 					
 			    	final AutomatonProxy aut = mFactory.createAutomatonProxy(
