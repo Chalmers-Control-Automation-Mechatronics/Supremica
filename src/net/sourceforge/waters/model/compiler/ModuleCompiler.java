@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.33 2006-05-16 13:35:11 markus Exp $
+//# $Id: ModuleCompiler.java,v 1.34 2006-05-17 08:40:54 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -23,6 +23,8 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Set;
+
+import java.lang.ClassCastException;
 
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.Proxy;
@@ -126,11 +128,19 @@ public class ModuleCompiler
 			
 
 			mIsEFA=false;
+			
 			for(Proxy proxy: mModule.getComponentList()){
+				try{
 			List <EdgeProxy> edges= ((SimpleComponentProxy) proxy).getGraph().getEdges();
 				mIsEFA = mIsEFA || componentHasNonEmptyGuardActionBlock(edges);
-			}
 			
+			}
+			catch(ClassCastException exception)
+			{
+				mIsEFA=false;
+				break;
+			}
+			}
 			visitModuleProxy(mModule); // mModule.acceptVisitor(this) more
 			// correct?
 			return mFactory.createProductDESProxy(name, desLocation,
