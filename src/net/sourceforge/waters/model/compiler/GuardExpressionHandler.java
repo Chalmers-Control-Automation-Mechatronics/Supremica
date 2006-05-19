@@ -193,7 +193,7 @@ public class GuardExpressionHandler extends ExpressionHandler{
 		}
 	}
 
-	public List getAndClauses() {
+	public List<SimpleExpressionSubject> getAndClauses() {
 		if(mExpressionSet) {
 			List<SimpleExpressionSubject> andClauses
 				= new LinkedList<SimpleExpressionSubject>();
