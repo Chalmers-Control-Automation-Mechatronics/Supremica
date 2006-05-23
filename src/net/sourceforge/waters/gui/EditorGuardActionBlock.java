@@ -2,6 +2,7 @@ package net.sourceforge.waters.gui;
 
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -14,6 +15,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
@@ -34,10 +36,7 @@ public class EditorGuardActionBlock extends EditorLabelGroup
 
 	private static final int LEFTMARGIN = 2;
 	private GuardActionBlockSubject mGuardActionBlock;
-	private String mGuardExpression;
 	private ArrayList<JComponent> mGuardActionExpressionLabels;
-	private int mGuardLabelIndex;
-	private int mActionLabelIndex;
 	private Component[] mPanelContent;
 	private JLabel mCollapsedContent;
 	private boolean isCollapsed;
@@ -53,54 +52,38 @@ public class EditorGuardActionBlock extends EditorLabelGroup
 		panel.removeAll();
 		isCollapsed = false;
 		mCollapsedContent = new JLabel(" +");
-		mCollapsedContent.setForeground(EditorColor.GUARDACTIONHEADER);
+		mCollapsedContent.setForeground(EditorColor.DISABLED);
 		mPanelContent = new Component[0];
 		List<BinaryExpressionProxy> actions;
 		mGuardActionExpressionLabels = new ArrayList<JComponent>();
 		mGuardActionBlock = parentEdge.getSubject().getGuardActionBlock();
+		
 		if(mGuardActionBlock == null) {
 			mGuardActionBlock = factory.createGuardActionBlockProxy();
 		}
+		
+		//observe model
+		mGuardActionBlock.addModelObserver(this);
+		
 		parent.getParent().addMouseListener(this);
-		if(true /*mGuardActionBlock.getGuard() != null || !mGuardActionBlock.getActionList().isEmpty()*/) {
-			
-			//Add guard header to guard action block
-			JTextField header = new JTextField(" Guard:");
-			header.addMouseListener(this);
-			header.setEditable(false);
-			addToPanel(header, 0);
-			mGuardActionExpressionLabels.get(0).setFont(new Font(null, Font.PLAIN, defaultFont.getSize()));
-			mGuardActionExpressionLabels.get(0).setForeground(EditorColor.GUARDACTIONHEADER);
-			
-			//Add action header to guard action block
-			header = new JTextField(" Action:");
-			header.addMouseListener(this);
-			header.setEditable(false);
-			addToPanel(header, 1);
-			mGuardActionExpressionLabels.get(1).setFont(new Font(null, Font.PLAIN, defaultFont.getSize()));
-			mGuardActionExpressionLabels.get(1).setForeground(EditorColor.GUARDACTIONHEADER);
-			
-			mGuardLabelIndex = 0;
-			mActionLabelIndex = 1;
-			
-			//Add guard and action
-			mGuardExpression = mGuardActionBlock.getGuard();
-			actions = mGuardActionBlock.getActionList();
-			if(mGuardExpression != null) {
 				
-				this.addGuard(mGuardExpression);
-			}
-			for(BinaryExpressionProxy action: actions) {
-				this.addAction(action);
-			}
-		}
+		//Add guard and action
+		update();
 		this.shadow = this.getParent().getEditorLabelGroup().shadow;
 	}
-	
-	//////////////////////////////////////////////
-	// WHAT ABOUT REMOVING GUARDS AND ACTIONS?  //
-	// IT'S EASIER FOR YOU THAN ME TO ADD THIS. //
-	//////////////////////////////////////////////
+
+	private void update() {
+		mPanelContent = new Component[0];
+		panel.removeAll();
+		List<BinaryExpressionProxy> actions;
+		actions = mGuardActionBlock.getActionList();
+		if(mGuardActionBlock.getGuard() != null) {
+			this.addGuard(mGuardActionBlock.getGuard());
+		}
+		for(BinaryExpressionProxy action: actions) {
+			this.addAction(action);
+		}
+	}
 
 	public void addAction() {
 		addAction(new EditorAction(this));
@@ -110,7 +93,7 @@ public class EditorGuardActionBlock extends EditorLabelGroup
 		addAction(editorAction);
 	}
 	private void addAction(EditorAction editorAction) {
-		addToPanel(editorAction, mActionLabelIndex + 1);
+		addToPanel(editorAction);
 		resizePanel();
 	}
 	
@@ -123,13 +106,12 @@ public class EditorGuardActionBlock extends EditorLabelGroup
 		addGuard(editorGuard);
 	}
 	private void addGuard(EditorGuard editorGuard) {
-		addToPanel(editorGuard, mGuardLabelIndex + 1);
+		addToPanel(editorGuard);
 		resizePanel();
-		mActionLabelIndex += 1;
 		mHasGuard = true;
 	}
 	
-	private void addToPanel(JTextField expressionLabel, int index)
+	private void addToPanel(JComponent expressionLabel)
 	{
 		expressionLabel.setBorder(new EmptyBorder(0, 0, 0, 0));
 		expressionLabel.setOpaque(false);
@@ -138,7 +120,7 @@ public class EditorGuardActionBlock extends EditorLabelGroup
 			expandPanel(); 
 		}
 		mGuardActionExpressionLabels.add(expressionLabel);
-		panel.add(expressionLabel, index);
+		panel.add(expressionLabel);
 		expressionLabel.requestFocus();
 	}
 	
@@ -241,11 +223,10 @@ public class EditorGuardActionBlock extends EditorLabelGroup
 		mHasGuard = false;
 		mGuardActionBlock.setGuard(null);
 		panel.remove(guard);
-		mActionLabelIndex = 1;
 	}
 	public void modelChanged(ModelChangeEvent e)
 	{
-		//Do nothing. Overrides modelChanged of EditorLabelGroup
+		update();
 	}
 
 	public boolean hasGuard() {

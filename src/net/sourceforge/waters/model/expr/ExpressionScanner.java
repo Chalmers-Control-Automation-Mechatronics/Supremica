@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.expr
 //# CLASS:   ExpressionScanner
 //###########################################################################
-//# $Id: ExpressionScanner.java,v 1.6 2006-03-07 08:28:05 martin Exp $
+//# $Id: ExpressionScanner.java,v 1.7 2006-05-23 13:21:20 martin Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.expr;
@@ -92,7 +92,7 @@ class ExpressionScanner {
    */
   boolean isWhitespace(final int ch)
   {
-    return ch == ' ' || ch == '\t';
+    return ch == ' ' || ch == '\t' || ch == '\n';
   }
 
   /**

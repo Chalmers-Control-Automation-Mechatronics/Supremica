@@ -1,9 +1,14 @@
 package net.sourceforge.waters.gui;
 
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
+import javax.swing.JLabel;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
 
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.GuardExpressionOperatorTable;
@@ -15,8 +20,7 @@ import net.sourceforge.waters.subject.module.BinaryExpressionSubject;
 import net.sourceforge.waters.subject.module.GuardActionBlockSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 
-public class EditorGuard extends JTextField
-	implements FocusListener{
+public class EditorGuard extends JTextPane {
 
 	private String mGuardExpression;
 	private ExpressionParser mParser;
@@ -25,14 +29,16 @@ public class EditorGuard extends JTextField
 	private EditorGuardActionBlock mParent;
 	
 	public EditorGuard(String guard, EditorGuardActionBlock editorGuardActionBlock) {
-		super(" " + guard.toString());
+		this.setText(guard.toString());
+		this.setEditable(false);
+		this.setForeground(EditorColor.GUARDCOLOR);
+		this.setOpaque(false);
 		mParent = editorGuardActionBlock;
 		mGuardActionBlock = editorGuardActionBlock.getGuardActionBlock();;
 		mFactory = ModuleSubjectFactory.getInstance();
 		mParser = new ExpressionParser(mFactory,
 				GuardExpressionOperatorTable.getInstance());
-		mGuardExpression = guard;
-		this.addFocusListener(this);
+		update();
 	}
 
 	private void update() {
@@ -50,7 +56,7 @@ public class EditorGuard extends JTextField
 			newExpression = mParser.parse(this.getText());
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		
 		mGuardActionBlock.setGuard(this.getText());
@@ -61,12 +67,5 @@ public class EditorGuard extends JTextField
 	
 	public String toString() {
 		return super.toString();
-	}
-	public void focusGained(FocusEvent arg0) {
-		//do nothing
-	}
-
-	public void focusLost(FocusEvent arg0) {
-		update();
 	}
 }

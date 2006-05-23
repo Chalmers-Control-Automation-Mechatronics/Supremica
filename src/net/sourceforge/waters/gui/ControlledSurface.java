@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.67 2006-03-23 16:06:03 flordal Exp $
+//# $Id: ControlledSurface.java,v 1.68 2006-05-23 13:21:20 martin Exp $
 //###########################################################################
  
 package net.sourceforge.waters.gui;
@@ -792,6 +792,11 @@ public class ControlledSurface
 							EditorNode n = (EditorNode) o;
 							
 							n.getPropGroup().setVisible(true);
+						}
+						else if (o.getType() == EditorObject.EDGE)
+						{
+							EditorEdge edge = (EditorEdge) o;
+							EditorEditEdgeDialog.showDialog(edge.getSubject());
 						}
 					}
 				}

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.expr
 //# CLASS:   ExpressionParser
 //###########################################################################
-//# $Id: ExpressionParser.java,v 1.4 2006-03-07 17:42:32 martin Exp $
+//# $Id: ExpressionParser.java,v 1.5 2006-05-23 13:21:20 martin Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.expr;
@@ -153,9 +153,11 @@ public class ExpressionParser {
    * @throws ParseException to indicate that the string could not be
    *                     parsed because of some syntax error.
    */
-  public SimpleExpressionProxy parse(final String input, final int mask)
+  public SimpleExpressionProxy parse(String input, final int mask)
     throws ParseException
   {
+	  input = removeBlanks(input);
+	  if(input == "") return null;
     try {
       final Reader reader = new StringReader(input);
       return parse(reader, mask);
@@ -194,7 +196,17 @@ public class ExpressionParser {
     }
   }
 
-
+  private String removeBlanks(String str) {
+	  	if(str.equals("")) return "";
+		int i = 0;
+		char c = str.charAt(0);
+		while(isWhitespace(c)) {
+			i++;
+			if(i == str.length()) return "";
+			c = str.charAt(i);
+		}
+		return str.substring(i);
+	}
   //#########################################################################
   //# Character Classes
   /**

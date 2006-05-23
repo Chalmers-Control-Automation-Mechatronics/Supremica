@@ -22,7 +22,7 @@ import net.sourceforge.waters.model.expr.Value;
 
 
 /**
- * <P>The guard+action expression operator table.</P>
+ * <P>The guard expression operator table.</P>
  *
  * @author Martin Byröd
  */
@@ -805,6 +805,9 @@ public class GuardExpressionOperatorTable extends AbstractOperatorTable {
   private static final String OPNAME_GREATERTHAN = ">";
   private static final String OPNAME_LESSEQUAL = "<=";
   private static final String OPNAME_GREATEREQUAL = ">=";
+  private static final String OPNAME_ASSIGN = "=";
+  private static final String OPNAME_INCREASE = "+=";
+  private static final String OPNAME_DECREASE = "-=";
 
   private static final int PRIORITY_UNARY = 90;
   private static final int PRIORITY_MULT = 80;

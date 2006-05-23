@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   GuardActionBlockSubject
 //###########################################################################
-//# $Id: GuardActionBlockSubject.java,v 1.5 2006-03-23 13:54:17 flordal Exp $
+//# $Id: GuardActionBlockSubject.java,v 1.6 2006-05-23 13:21:21 martin Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -164,6 +164,13 @@ public final class GuardActionBlockSubject
     final ModelChangeEvent event =
       ModelChangeEvent.createStateChanged(this);
     fireModelChanged(event);
+  }
+  
+  public void setActionList(final ListSubject<BinaryExpressionSubject> actionList) {
+		mActionList = actionList;
+	    final ModelChangeEvent event =
+	        ModelChangeEvent.createStateChanged(this);
+	    fireModelChanged(event);
   }
 
   public ListSubject<BinaryExpressionSubject> getActionListModifiable()

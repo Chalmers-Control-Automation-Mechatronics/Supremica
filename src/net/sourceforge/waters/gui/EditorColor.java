@@ -11,11 +11,17 @@ class EditorColor
 	/** The alpha value of the shadow-colors. */
 	private static final int SHADOWALPHA = 32;
 
+	/** The default color of disabled text. */
+	public static final Color DISABLED = Color.GRAY;
+
 	/** The default color of marked (accepting) nodes. */
-	public static Color DEFAULTMARKINGCOLOR = Color.GRAY; 
-	
-	/** The default color of marked (accepting) nodes. */
-	public static Color GUARDACTIONHEADER = Color.GRAY; 
+	public static Color DEFAULTMARKINGCOLOR = Color.GRAY;
+
+	/** The color of guard expressions. */
+	public static Color GUARDCOLOR = Color.GREEN.darker().darker();
+
+	/** The color of action expressions. */
+	public static Color ACTIONCOLOR = Color.BLUE; 
 
 	/** The color of the drag-select area. */
 	public static Color DRAGSELECTCOLOR = new Color(0,0,255,32); 

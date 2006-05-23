@@ -1,5 +1,6 @@
 package net.sourceforge.waters.gui;
 
+import java.awt.Color;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.MouseEvent;
@@ -17,8 +18,7 @@ import net.sourceforge.waters.subject.module.BinaryExpressionSubject;
 import net.sourceforge.waters.subject.module.GuardActionBlockSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 
-public class EditorAction extends JTextField 
-	implements FocusListener{
+public class EditorAction extends JTextPane {
 
 	private SimpleExpressionProxy mActionExpression;
 	private ExpressionParser mParser;
@@ -29,26 +29,41 @@ public class EditorAction extends JTextField
 	public EditorAction(BinaryExpressionProxy action,
 			EditorGuardActionBlock editorGuardActionBlock) 
 	{
-		super(" " + action.toString());
+		this.setText(action.toString());
+		this.setForeground(EditorColor.ACTIONCOLOR);
+		this.setEditable(false);
 		mParent = editorGuardActionBlock;
 		mGuardActionBlock = editorGuardActionBlock.getGuardActionBlock();
 		mFactory = ModuleSubjectFactory.getInstance();
 		mParser = new ExpressionParser(mFactory,
 				CompilerOperatorTable.getInstance());
 		mActionExpression = action;
-		this.addFocusListener(this);
+	}
+	
+	public EditorAction(String action,
+			EditorGuardActionBlock editorGuardActionBlock) 
+	{
+		this.setText(action);
+		this.setForeground(EditorColor.ACTIONCOLOR);
+		this.setEditable(false);
+		mParent = editorGuardActionBlock;
+		mGuardActionBlock = editorGuardActionBlock.getGuardActionBlock();
+		mFactory = ModuleSubjectFactory.getInstance();
+		mParser = new ExpressionParser(mFactory,
+				CompilerOperatorTable.getInstance());
+		update();
 	}
 	
 	public EditorAction(EditorGuardActionBlock parent) 
 	{
-		super(" ");
 		mParent = parent;
+		this.setForeground(EditorColor.ACTIONCOLOR);
+		this.setEditable(false);
 		mGuardActionBlock = parent.getGuardActionBlock();
 		mFactory = ModuleSubjectFactory.getInstance();
 		mParser = new ExpressionParser(mFactory,
 				CompilerOperatorTable.getInstance());
 		mActionExpression = null;
-		this.addFocusListener(this);
 	}
 
 	private void update() 
@@ -81,15 +96,8 @@ public class EditorAction extends JTextField
 		} 
 		catch (ParseException ex) 
 		{
-			JOptionPane.showMessageDialog(this, ex.getMessage(), "Error parsing expression", 
-										  JOptionPane.ERROR_MESSAGE); 
-			// ex.printStackTrace();
-			return;
-		}
-		catch (Exception ex)
-		{
-			JOptionPane.showMessageDialog(this, ex.getMessage(), "Error when adding action", 
-										  JOptionPane.ERROR_MESSAGE); 
+			//JOptionPane.showMessageDialog(this, ex.getMessage(), "Syntax error", 
+			//							  JOptionPane.ERROR_MESSAGE); 
 			// ex.printStackTrace();
 			return;
 		}
@@ -101,16 +109,6 @@ public class EditorAction extends JTextField
 	public String toString() 
 	{
 		return super.toString();
-	}
-
-	public void focusGained(FocusEvent arg0) 
-	{
-		//do nothing
-	}
-
-	public void focusLost(FocusEvent arg0) 
-	{
-		update();
 	}
 
 	public SimpleExpressionProxy getActionExpression() 
