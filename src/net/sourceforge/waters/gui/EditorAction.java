@@ -87,7 +87,7 @@ public class EditorAction extends JTextPane {
 							 ((BinaryExpressionSubject) newExpression).getLeft().clone(),
 							 ((BinaryExpressionSubject) newExpression).getRight().clone());
 			
-			List<BinaryExpressionProxy> actionList = 
+			List<NamedProxy> actionList = 
 				mGuardActionBlock.getActionList();
 			actionList.remove(mActionExpression);
 			actionList.add(action);

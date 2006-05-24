@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.34 2006-05-17 08:40:54 markus Exp $
+//# $Id: ModuleCompiler.java,v 1.35 2006-05-24 09:13:02 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -25,6 +25,9 @@ import java.util.TreeSet;
 import java.util.Set;
 
 import java.lang.ClassCastException;
+
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.Proxy;
@@ -84,6 +87,9 @@ import net.sourceforge.waters.model.module.VariableProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 //
 
+import net.sourceforge.waters.subject.base.ArrayListSubject;
+import net.sourceforge.waters.subject.base.ListSubject;
+import net.sourceforge.waters.subject.module.BinaryExpressionSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 import net.sourceforge.waters.xsd.base.ComponentKind;
@@ -1138,10 +1144,33 @@ public class ModuleCompiler
 	private List <List <BinaryExpressionProxy>> collectAction(List<TransitionProxy> path) {
 		List <List <BinaryExpressionProxy>> actionLists = 
 			new LinkedList<List <BinaryExpressionProxy>>();
+		ExpressionParser actionParser = new ExpressionParser(ModuleSubjectFactory
+				.getInstance(), CompilerOperatorTable.getInstance());
 		for(TransitionProxy transition: path){
 			if(mEFATransitionGuardActionBlockMap.get(transition)!= null){
+				String[] actions = mEFATransitionGuardActionBlockMap
+				.get(transition).getAction().split(";");
+				List<BinaryExpressionProxy> actionList = 
+					new LinkedList<BinaryExpressionProxy>();
+				for(String action: actions) {
+					BinaryExpressionProxy actionExpr;
+					try {
+						actionExpr = (BinaryExpressionSubject) actionParser.parse(action);
+					} catch (ParseException e) {
+						e.printStackTrace();
+						actionExpr = null;
+					} catch (ClassCastException e) {
+						e.printStackTrace();
+						actionExpr = null;
+					}
+					if(actionExpr != null) {
+						actionList.add(actionExpr);
+					}
+				}
+				if(!actionList.isEmpty()){
 				actionLists.add
-				(mEFATransitionGuardActionBlockMap.get(transition).getActionList());
+				(actionList);
+				}
 			}
 			
 		}

@@ -4,20 +4,14 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   GuardActionBlockElement
 //###########################################################################
-//# $Id: GuardActionBlockElement.java,v 1.3 2006-03-06 17:08:46 markus Exp $
+//# $Id: GuardActionBlockElement.java,v 1.4 2006-05-24 09:13:02 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
 import net.sourceforge.waters.model.base.Geometry;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
@@ -40,22 +34,15 @@ public final class GuardActionBlockElement
   /**
    * Creates a new guard action block.
    * @param guard The guard of the new guard action block, or <CODE>null</CODE>.
-   * @param actionList The action list of the new guard action block, or <CODE>null</CODE> if empty.
+   * @param action The action of the new guard action block, or <CODE>null</CODE>.
    * @param geometry The geometry of the new guard action block, or <CODE>null</CODE>.
    */
   public GuardActionBlockElement(final String guard,
-                                 final Collection<? extends BinaryExpressionProxy> actionList,
+                                 final String action,
                                  final LabelGeometryProxy geometry)
   {
     mGuard = guard;
-    if (actionList == null) {
-      mActionList = Collections.emptyList();
-    } else {
-      final List<BinaryExpressionProxy> actionListModifiable =
-        new ArrayList<BinaryExpressionProxy>(actionList);
-      mActionList =
-        Collections.unmodifiableList(actionListModifiable);
-    }
+    mAction = action;
     mGeometry = geometry;
   }
 
@@ -63,13 +50,13 @@ public final class GuardActionBlockElement
    * Creates a new guard action block using default values.
    * This constructor creates a guard action block with
    * the guard set to <CODE>null</CODE>,
-   * an empty action list, and
+   * the action set to <CODE>null</CODE>, and
    * the geometry set to <CODE>null</CODE>.
    */
   public GuardActionBlockElement()
   {
     this(null,
-         emptyBinaryExpressionProxyList(),
+         null,
          null);
   }
 
@@ -91,7 +78,8 @@ public final class GuardActionBlockElement
       return
         (mGuard == null ? downcast.mGuard == null :
          mGuard.equals(downcast.mGuard)) &&
-        mActionList.equals(downcast.mActionList);
+        (mAction == null ? downcast.mAction == null :
+         mAction.equals(downcast.mAction));
     } else {
       return false;
     }
@@ -104,7 +92,8 @@ public final class GuardActionBlockElement
       return
         (mGuard == null ? downcast.mGuard == null :
          mGuard.equals(downcast.mGuard)) &&
-        Geometry.equalList(mActionList, downcast.mActionList) &&
+        (mAction == null ? downcast.mAction == null :
+         mAction.equals(downcast.mAction)) &&
         Geometry.equalGeometry(mGeometry, downcast.mGeometry);
     } else {
       return false;
@@ -129,9 +118,9 @@ public final class GuardActionBlockElement
     return mGuard;
   }
 
-  public List<BinaryExpressionProxy> getActionList()
+  public String getAction()
   {
-    return mActionList;
+    return mAction;
   }
 
   public LabelGeometryProxy getGeometry()
@@ -141,17 +130,9 @@ public final class GuardActionBlockElement
 
 
   //#########################################################################
-  //# Auxiliary Methods
-  private static List<BinaryExpressionProxy> emptyBinaryExpressionProxyList()
-  {
-    return Collections.emptyList();
-  }
-
-
-  //#########################################################################
   //# Data Members
   private final String mGuard;
-  private final List<BinaryExpressionProxy> mActionList;
+  private final String mAction;
   private final LabelGeometryProxy mGeometry;
 
 }

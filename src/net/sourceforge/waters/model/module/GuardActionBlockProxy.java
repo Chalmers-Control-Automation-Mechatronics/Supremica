@@ -4,12 +4,10 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   GuardActionBlockProxy
 //###########################################################################
-//# $Id: GuardActionBlockProxy.java,v 1.2 2006-03-02 12:12:49 martin Exp $
+//# $Id: GuardActionBlockProxy.java,v 1.3 2006-05-24 09:13:02 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
-import java.util.List;
-
 import net.sourceforge.waters.model.base.Proxy;
 
 /**
@@ -26,8 +24,9 @@ public interface GuardActionBlockProxy extends Proxy {
   
   // @optional 
   public String getGuard();
-   
-  public List<BinaryExpressionProxy> getActionList();
+  
+  // @optional 
+  public String getAction();
   
   public LabelGeometryProxy getGeometry();
 }

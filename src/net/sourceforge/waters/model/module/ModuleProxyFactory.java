@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleProxyFactory
 //###########################################################################
-//# $Id: ModuleProxyFactory.java,v 1.7 2006-03-06 17:08:46 markus Exp $
+//# $Id: ModuleProxyFactory.java,v 1.8 2006-05-24 09:13:02 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
@@ -301,19 +301,19 @@ public interface ModuleProxyFactory
   /**
    * Creates a new guard action block.
    * @param guard The guard of the new guard action block, or <CODE>null</CODE>.
-   * @param actionList The action list of the new guard action block, or <CODE>null</CODE> if empty.
+   * @param action The action of the new guard action block, or <CODE>null</CODE>.
    * @param geometry The geometry of the new guard action block, or <CODE>null</CODE>.
    */
   public GuardActionBlockProxy createGuardActionBlockProxy
       (String guard,
-       Collection<? extends BinaryExpressionProxy> actionList,
+       String action,
        LabelGeometryProxy geometry);
 
   /**
    * Creates a new guard action block using default values.
    * This method creates a guard action block with
    * the guard set to <CODE>null</CODE>,
-   * an empty action list, and
+   * the action set to <CODE>null</CODE>, and
    * the geometry set to <CODE>null</CODE>.
    */
   public GuardActionBlockProxy createGuardActionBlockProxy();

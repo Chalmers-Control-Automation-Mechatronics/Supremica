@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   ModuleElementFactory
 //###########################################################################
-//# $Id: ModuleElementFactory.java,v 1.7 2006-03-06 17:08:46 markus Exp $
+//# $Id: ModuleElementFactory.java,v 1.8 2006-05-24 09:13:02 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -19,7 +19,6 @@ import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.UnaryOperator;
 import net.sourceforge.waters.model.module.AliasProxy;
-import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.BoxGeometryProxy;
 import net.sourceforge.waters.model.module.ColorGeometryProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
@@ -445,16 +444,16 @@ public class ModuleElementFactory
   /**
    * Creates a new guard action block.
    * @param guard The guard of the new guard action block, or <CODE>null</CODE>.
-   * @param actionList The action list of the new guard action block, or <CODE>null</CODE> if empty.
+   * @param action The action of the new guard action block, or <CODE>null</CODE>.
    * @param geometry The geometry of the new guard action block, or <CODE>null</CODE>.
    */
   public GuardActionBlockElement createGuardActionBlockProxy
       (final String guard,
-       final Collection<? extends BinaryExpressionProxy> actionList,
+       final String action,
        final LabelGeometryProxy geometry)
   {
     return new GuardActionBlockElement(guard,
-                                       actionList,
+                                       action,
                                        geometry);
   }
 
@@ -462,7 +461,7 @@ public class ModuleElementFactory
    * Creates a new guard action block using default values.
    * This method creates a guard action block with
    * the guard set to <CODE>null</CODE>,
-   * an empty action list, and
+   * the action set to <CODE>null</CODE>, and
    * the geometry set to <CODE>null</CODE>.
    */
   public GuardActionBlockElement createGuardActionBlockProxy()

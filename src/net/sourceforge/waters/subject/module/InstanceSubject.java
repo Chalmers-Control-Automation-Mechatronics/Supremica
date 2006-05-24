@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   InstanceSubject
 //###########################################################################
-//# $Id: InstanceSubject.java,v 1.5 2006-03-06 17:08:46 markus Exp $
+//# $Id: InstanceSubject.java,v 1.6 2006-05-24 09:13:02 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;

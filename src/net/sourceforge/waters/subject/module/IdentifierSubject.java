@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   IdentifierSubject
 //###########################################################################
-//# $Id: IdentifierSubject.java,v 1.5 2006-03-21 21:58:04 flordal Exp $
+//# $Id: IdentifierSubject.java,v 1.6 2006-05-24 09:13:02 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -23,6 +23,7 @@ public abstract class IdentifierSubject
   extends SimpleExpressionSubject
   implements IdentifierProxy
 {
+
   //#########################################################################
   //# Constructors
   /**

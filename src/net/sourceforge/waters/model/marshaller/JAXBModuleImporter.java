@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBModuleImporter
 //###########################################################################
-//# $Id: JAXBModuleImporter.java,v 1.10 2006-03-06 17:25:15 markus Exp $
+//# $Id: JAXBModuleImporter.java,v 1.11 2006-05-24 09:13:02 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -602,14 +602,12 @@ public class JAXBModuleImporter
 			final GuardActionBlockType element) {
 		
 	  if(element != null) {
-		  final List<BinaryExpressionProxy> actionList = new LinkedList<BinaryExpressionProxy>();
-		  mGuardActionBlockActionListHandler.fromJAXB(this, element, actionList);
 		  
 		  final String guard = element.getGuard();
-		  
+		  final String action = element.getAction();
 		  final LabelGeometryProxy geometry = (LabelGeometryProxy) element.getLabelGeometry(); 
 		  return mFactory
-		  .createGuardActionBlockProxy(guard, actionList, geometry);
+		  .createGuardActionBlockProxy(guard, action, geometry);
 	  } else {
 		  return null;
 	  }
@@ -1082,11 +1080,6 @@ public class JAXBModuleImporter
   private static final GraphEdgeListHandler
     mGraphEdgeListHandler =
     new GraphEdgeListHandler();
-//EFA-------------
-  private static final GuardActionBlockActionListHandler
-  mGuardActionBlockActionListHandler =
-  new GuardActionBlockActionListHandler();
-//------------------
 //EFA-------------
   private static final SimpleComponentVariableListHandler
   mSimpleComponentVariableListHandler =

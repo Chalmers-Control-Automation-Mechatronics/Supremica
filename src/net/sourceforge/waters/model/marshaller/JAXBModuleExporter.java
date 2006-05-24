@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBModuleExporter
 //###########################################################################
-//# $Id: JAXBModuleExporter.java,v 1.8 2006-03-06 18:12:09 martin Exp $
+//# $Id: JAXBModuleExporter.java,v 1.9 2006-05-24 09:13:02 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -21,6 +21,7 @@ import javax.xml.bind.JAXBException;
 
 import net.sourceforge.waters.model.base.IndexedList;
 import net.sourceforge.waters.model.base.IndexedSet;
+import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.expr.BinaryOperator;
@@ -684,11 +685,9 @@ public Object visitExpressionProxy
   private void copyGuardActionBlockProxy(final GuardActionBlockProxy proxy,
 			final GuardActionBlockType element) throws VisitorException {
 		try {
-			final List<BinaryExpressionProxy> actionListProxy = proxy
-					.getActionList();
-			mGuardActionBlockActionListHandler.toJAXB(this, actionListProxy,
-					element);
-			copyProxy(proxy, element);
+			final String action = proxy
+					.getAction();
+			element.setAction(action);
 
 			final String guard = proxy.getGuard();
 			element.setGuard(guard);
@@ -1434,12 +1433,7 @@ public Object visitExpressionProxy
   private static final GraphEdgeListHandler
     mGraphEdgeListHandler =
     new GraphEdgeListHandler(mFactory);
-  //EFA---------------
-  
-  private static final GuardActionBlockActionListHandler
-  mGuardActionBlockActionListHandler =
-  new GuardActionBlockActionListHandler(mFactory);
-  
+  //EFA
   private static final SimpleComponentVariableListHandler
   mSimpleComponentVariableListHandler =
   new SimpleComponentVariableListHandler(mFactory);
