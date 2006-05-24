@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBModuleExporter
 //###########################################################################
-//# $Id: JAXBModuleExporter.java,v 1.9 2006-05-24 09:13:02 markus Exp $
+//# $Id: JAXBModuleExporter.java,v 1.10 2006-05-24 12:01:56 martin Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -684,7 +684,6 @@ public Object visitExpressionProxy
   
   private void copyGuardActionBlockProxy(final GuardActionBlockProxy proxy,
 			final GuardActionBlockType element) throws VisitorException {
-		try {
 			final String action = proxy
 					.getAction();
 			element.setAction(action);
@@ -697,10 +696,8 @@ public Object visitExpressionProxy
 				final LabelGeometryType geometryElement = visitLabelGeometryProxy(geometryProxy);
 				element.setLabelGeometry(geometryElement);
 			}
-		} catch (final JAXBException exception) {
-			throw wrap(exception);
 		}
-	}
+	
  
   
   private void copyVariableProxy(final VariableProxy proxy,

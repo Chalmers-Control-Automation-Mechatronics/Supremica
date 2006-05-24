@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.printer
 //# CLASS:   ModuleProxyPrinter
 //###########################################################################
-//# $Id: ModuleProxyPrinter.java,v 1.4 2006-03-02 12:12:50 martin Exp $
+//# $Id: ModuleProxyPrinter.java,v 1.5 2006-05-24 12:01:56 martin Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.printer;
@@ -107,9 +107,10 @@ public class ModuleProxyPrinter
   (final VariableProxy proxy)
  throws VisitorException
   {
-	  //Temporary changes
+	    print(proxy.getName());
 	    return null;
   }
+  
   public Object visitBooleanConstantProxy 
   (final BooleanConstantProxy proxy)
   throws VisitorException

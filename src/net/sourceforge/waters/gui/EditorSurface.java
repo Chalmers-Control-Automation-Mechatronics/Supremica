@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.51 2006-05-23 13:21:21 martin Exp $
+//# $Id: EditorSurface.java,v 1.52 2006-05-24 12:01:56 martin Exp $
 //###########################################################################
 
 
@@ -588,7 +588,7 @@ public class EditorSurface
 	{
 		if (edge.getSubject().getGuardActionBlock() == null) 
 		{
-			edge.getSubject().setGuardActionBlock(new GuardActionBlockSubject());
+			edge.getSubject().setGuardActionBlock(new GuardActionBlockSubject("", "", null));
 		}
 		EditorGuardActionBlock guardActionBlock = 
 			new EditorGuardActionBlock(edge, this);

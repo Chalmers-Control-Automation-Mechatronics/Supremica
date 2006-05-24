@@ -28,41 +28,12 @@ public class EditorGuard extends JTextPane {
 	private GuardActionBlockSubject mGuardActionBlock;
 	private EditorGuardActionBlock mParent;
 	
-	public EditorGuard(String guard, EditorGuardActionBlock editorGuardActionBlock) {
+	public EditorGuard(String guard) {
+		super();
 		this.setText(guard.toString());
 		this.setEditable(false);
 		this.setForeground(EditorColor.GUARDCOLOR);
 		this.setOpaque(false);
-		mParent = editorGuardActionBlock;
-		mGuardActionBlock = editorGuardActionBlock.getGuardActionBlock();;
-		mFactory = ModuleSubjectFactory.getInstance();
-		mParser = new ExpressionParser(mFactory,
-				GuardExpressionOperatorTable.getInstance());
-		update();
-	}
-
-	private void update() {
-		SimpleExpressionProxy newExpression = null;
-		
-		if(this.getText().trim().equals("")) {
-			mParent.remove(this);
-			mParent.resizePanel();
-			mParent.getParent().getParent().repaint();
-			return;
-		}
-		
-		//check syntax
-		try {
-			newExpression = mParser.parse(this.getText());
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			//e.printStackTrace();
-		}
-		
-		mGuardActionBlock.setGuard(this.getText());
-		mGuardExpression = this.getText();
-		mParent.resizePanel();
-		mParent.getParent().getParent().repaint();
 	}
 	
 	public String toString() {

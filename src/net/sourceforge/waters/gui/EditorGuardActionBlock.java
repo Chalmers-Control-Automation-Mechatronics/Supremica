@@ -41,20 +41,17 @@ public class EditorGuardActionBlock extends EditorLabelGroup
 	private JLabel mCollapsedContent;
 	private boolean isCollapsed;
 	private boolean mIsHighlighted = false;
-	private boolean mHasGuard = false;
 
 	public EditorGuardActionBlock(EditorEdge parentEdge, EditorSurface editorSurface) {
 		super(parentEdge, editorSurface);
 		ModuleSubjectFactory factory = ModuleSubjectFactory.getInstance();
 		// This is a GuardActionBlock
 		type = GUARDACTIONBLOCK;
-		Font defaultFont = new Font(null);
 		panel.removeAll();
 		isCollapsed = false;
 		mCollapsedContent = new JLabel(" +");
 		mCollapsedContent.setForeground(EditorColor.DISABLED);
 		mPanelContent = new Component[0];
-		List<BinaryExpressionProxy> actions;
 		mGuardActionExpressionLabels = new ArrayList<JComponent>();
 		mGuardActionBlock = parentEdge.getSubject().getGuardActionBlock();
 		
@@ -69,46 +66,42 @@ public class EditorGuardActionBlock extends EditorLabelGroup
 				
 		//Add guard and action
 		update();
+		
 		this.shadow = this.getParent().getEditorLabelGroup().shadow;
 	}
 
 	private void update() {
 		mPanelContent = new Component[0];
 		panel.removeAll();
-		List<BinaryExpressionProxy> actions;
-		actions = mGuardActionBlock.getActionList();
+		String action = mGuardActionBlock.getAction();
 		if(mGuardActionBlock.getGuard() != null) {
 			this.addGuard(mGuardActionBlock.getGuard());
 		}
-		for(BinaryExpressionProxy action: actions) {
+		if(action != null) {
 			this.addAction(action);
 		}
+		this.resizePanel();
 	}
-
-	public void addAction() {
-		addAction(new EditorAction(this));
-	}
-	private void addAction(BinaryExpressionProxy action) {
-		EditorAction editorAction = new EditorAction(action, this);
+	
+	private void addAction(String action) {
+		EditorAction editorAction = new EditorAction(action);
 		addAction(editorAction);
 	}
+	
 	private void addAction(EditorAction editorAction) {
 		addToPanel(editorAction);
 		resizePanel();
 	}
 	
-	public void addGuard() {
-		addGuard("");
-	}
 	private void addGuard(String guard)
 	{
-		EditorGuard editorGuard = new EditorGuard(guard, this);
+		EditorGuard editorGuard = new EditorGuard(guard);
 		addGuard(editorGuard);
 	}
+	
 	private void addGuard(EditorGuard editorGuard) {
 		addToPanel(editorGuard);
 		resizePanel();
-		mHasGuard = true;
 	}
 	
 	private void addToPanel(JComponent expressionLabel)
@@ -209,27 +202,9 @@ public class EditorGuardActionBlock extends EditorLabelGroup
 	public void mouseExited(MouseEvent arg0) {
 		//do nothing
 	}
-
-	public void remove(EditorAction action) 
-	{
-		List<BinaryExpressionProxy> actionList = 
-			mGuardActionBlock.getActionList();
-		actionList.remove(action.getActionExpression());
-		panel.remove(action);
-	}
-
-	public void remove(EditorGuard guard) 
-	{
-		mHasGuard = false;
-		mGuardActionBlock.setGuard(null);
-		panel.remove(guard);
-	}
+	
 	public void modelChanged(ModelChangeEvent e)
 	{
 		update();
-	}
-
-	public boolean hasGuard() {
-		return mHasGuard ;
 	}
 }

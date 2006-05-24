@@ -96,7 +96,7 @@ implements ActionListener, ItemListener{
 			guardText = edge.getGuardActionBlock().getGuard();
 		} else {
 			guardText = "";
-			edge.setGuardActionBlock(m.createGuardActionBlockProxy());
+			edge.setGuardActionBlock(m.createGuardActionBlockProxy("", "", null));
 		}
 		guardField.setText(guardText);
 		guardField.setMargin(new Insets(5,5,5,5));
@@ -120,12 +120,8 @@ implements ActionListener, ItemListener{
 		add(actionLabel);
 		
 		actionField = new JTextPane();
-		List<BinaryExpressionProxy> actionList;
 		String actionText = "";
-		actionList = edge.getGuardActionBlock().getActionList();
-		for(BinaryExpressionProxy action: actionList) {
-			actionText = actionText + action + ";\n";
-		}
+		actionText = edge.getGuardActionBlock().getAction();
 		actionField.setText(actionText);
 		actionField.setMargin(new Insets(5,5,5,5));
 		JScrollPane scrollPaneA = new JScrollPane(actionField);
@@ -150,6 +146,7 @@ implements ActionListener, ItemListener{
 	public void actionPerformed(ActionEvent arg0) {
 		if(arg0.getActionCommand().equals("OK")) {
 			//set guard
+			//check syntax
 			try {
 				guardParser.parse(guardField.getText());
 			} catch (ParseException e) {
@@ -158,6 +155,7 @@ implements ActionListener, ItemListener{
 			edgeModel.getGuardActionBlock().setGuard(guardField.getText());
 			
 			//set action
+			//check syntax
 			String[] actions = actionField.getText().split(";");
 			ListSubject<BinaryExpressionSubject> actionList = 
 				new ArrayListSubject<BinaryExpressionSubject>();
@@ -177,7 +175,7 @@ implements ActionListener, ItemListener{
 					actionList.add(actionExpr);
 				}
 			}
-			edgeModel.getGuardActionBlock().setActionList(actionList);
+			edgeModel.getGuardActionBlock().setAction(actionField.getText());
 			
 			dispose();
 		} else if (arg0.getActionCommand().equals("Cancel")) {

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleWindow
 //###########################################################################
-//# $Id: ModuleWindow.java,v 1.44 2006-05-08 20:17:50 flordal Exp $
+//# $Id: ModuleWindow.java,v 1.45 2006-05-24 12:01:56 martin Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -64,6 +64,7 @@ import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.ParameterProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
+import net.sourceforge.waters.model.module.VariableProxy;
 import net.sourceforge.waters.model.printer.ProxyPrinter;
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.base.NamedSubject;
@@ -413,6 +414,15 @@ public class ModuleWindow
 		final String text = mPrinter.toString(e);
 		final Object userobject = new ComponentInfo(text, e);
 		if (e instanceof SimpleComponentSubject) {
+			SimpleComponentSubject component = (SimpleComponentSubject) e;
+			DefaultMutableTreeNode compNode = new DefaultMutableTreeNode(userobject, true);
+			List<VariableProxy> variables = component.getVariables();
+			for(VariableProxy variable: variables) {
+				compNode.add(makeTreeFromComponent((VariableSubject) variable));
+			}
+			//return new DefaultMutableTreeNode(userobject, false);
+			return compNode;
+		} else if(e instanceof VariableSubject) {
 			return new DefaultMutableTreeNode(userobject, false);
 		} else if (e instanceof InstanceSubject) {
 			final InstanceSubject inst = (InstanceSubject) e;
