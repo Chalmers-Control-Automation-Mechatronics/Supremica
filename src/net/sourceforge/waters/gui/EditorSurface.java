@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.52 2006-05-24 12:01:56 martin Exp $
+//# $Id: EditorSurface.java,v 1.53 2006-05-24 13:41:28 martin Exp $
 //###########################################################################
 
 
@@ -322,7 +322,7 @@ public class EditorSurface
 			// differently? EditorLabelGroup:s don't have drawObject
 			// methods, they are drawn as panels?
 			// Draw shadow
-			if (l.shadow && l.isHighlighted())
+			if (l.shadow && l.isHighlighted() && l.nonEmpty())
 			{
 				Rectangle bounds = l.getBounds();
 				g.setColor(l.getShadowColor(isSelected(l) || isSelected(l.getParent())));
@@ -340,7 +340,7 @@ public class EditorSurface
 			EditorGuardActionBlock block = (EditorGuardActionBlock) mGuardActionBlocks.get(i);
 			block.setPanelLocation();
 
-			if (block.shadow && block.isHighlighted())
+			if (block.shadow && block.isHighlighted() && block.nonEmpty())
 			{
 				Rectangle bounds = block.getBounds();
 				g.setColor(block.getShadowColor(isSelected(block) || isSelected(block.getParent())));

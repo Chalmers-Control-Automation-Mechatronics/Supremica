@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   ModuleTreeRenderer
 //###########################################################################
-//# $Id: ModuleTreeRenderer.java,v 1.3 2005-02-22 02:14:15 knut Exp $
+//# $Id: ModuleTreeRenderer.java,v 1.4 2006-05-24 13:41:28 martin Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -63,7 +63,6 @@ public class ModuleTreeRenderer
 		{
 			setIcon(foreachIcon);
 			setToolTipText(null);
-
 			//setEditable(false);
 		}
 		else
@@ -71,7 +70,7 @@ public class ModuleTreeRenderer
 			setToolTipText(null);    //no tool tip
 		}
 
-		if (leaf && (ci.getComponent() instanceof SimpleComponentProxy))
+		if (/*leaf &&*/ (ci.getComponent() instanceof SimpleComponentProxy))
 		{
 			SimpleComponentProxy scp = (SimpleComponentProxy) ci.getComponent();
 

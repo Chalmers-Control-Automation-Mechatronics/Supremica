@@ -74,10 +74,11 @@ public class EditorGuardActionBlock extends EditorLabelGroup
 		mPanelContent = new Component[0];
 		panel.removeAll();
 		String action = mGuardActionBlock.getAction();
-		if(mGuardActionBlock.getGuard() != null) {
+		if(mGuardActionBlock.getGuard() != null &&
+				!mGuardActionBlock.getGuard().equals("")) {
 			this.addGuard(mGuardActionBlock.getGuard());
 		}
-		if(action != null) {
+		if(action != null && !action.equals("")) {
 			this.addAction(action);
 		}
 		this.resizePanel();
@@ -117,6 +118,11 @@ public class EditorGuardActionBlock extends EditorLabelGroup
 		expressionLabel.requestFocus();
 	}
 	
+	public boolean nonEmpty() {
+		return !mGuardActionBlock.getAction().equals("") ||
+			!mGuardActionBlock.getGuard().equals("");
+	}
+
 	public void setPanelLocation()
 	{
 		int x = getOffsetX() + (int) parent.getTPointX();

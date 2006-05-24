@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleWindow
 //###########################################################################
-//# $Id: ModuleWindow.java,v 1.46 2006-05-24 12:03:52 martin Exp $
+//# $Id: ModuleWindow.java,v 1.47 2006-05-24 13:41:28 martin Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -420,8 +420,8 @@ public class ModuleWindow
 			for(VariableProxy variable: variables) {
 				compNode.add(makeTreeFromComponent((VariableSubject) variable));
 			}
-			return new DefaultMutableTreeNode(userobject, false);
-			//return compNode;
+			//return new DefaultMutableTreeNode(userobject, false);
+			return compNode;
 		} else if(e instanceof VariableSubject) {
 			return new DefaultMutableTreeNode(userobject, false);
 		} else if (e instanceof InstanceSubject) {
