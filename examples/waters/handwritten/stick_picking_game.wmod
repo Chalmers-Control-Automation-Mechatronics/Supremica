@@ -50,13 +50,8 @@
                             <Point X="224" Y="256"/>
                         </EndPointGeometry>
                         <GuardActionBlock>
-                            <Guard> sticks &gt; 0 </Guard>
-                            <ActionList>
-                                <BinaryExpression Operator="-=">
-                                    <SimpleIdentifier Name="sticks"/>
-                                    <IntConstant Value="1"/>
-                                </BinaryExpression>
-                            </ActionList>
+                            <Guard> sticks > 0 </Guard>
+                            <Action> sticks-=1;</Action>
                         </GuardActionBlock>
                     </Edge>
                     <Edge Source="player1" Target="player2">
@@ -77,12 +72,7 @@
                         </EndPointGeometry>
                         <GuardActionBlock>
                             <Guard> sticks &gt;1 </Guard>
-                            <ActionList>
-                                <BinaryExpression Operator="-=">
-                                    <SimpleIdentifier Name="sticks"/>
-                                    <IntConstant Value="2"/>
-                                </BinaryExpression>
-                            </ActionList>
+                            <Action> sticks-=2;</Action>
                         </GuardActionBlock>
                     </Edge>
                     <Edge Source="player2" Target="player1">
@@ -103,12 +93,7 @@
                         </EndPointGeometry>
                         <GuardActionBlock>
                             <Guard> sticks &gt; 0 </Guard>
-                            <ActionList>
-                                <BinaryExpression Operator="-=">
-                                    <SimpleIdentifier Name="sticks"/>
-                                    <IntConstant Value="1"/>
-                                </BinaryExpression>
-                            </ActionList>
+                            <Action> sticks-=1; </Action>
                         </GuardActionBlock>
                     </Edge>
                     <Edge Source="player2" Target="player1">
@@ -129,12 +114,7 @@
                         </EndPointGeometry>
                         <GuardActionBlock>
                             <Guard> sticks &gt;1 </Guard>
-                            <ActionList>
-                                <BinaryExpression Operator="-=">
-                                    <SimpleIdentifier Name="sticks"/>
-                                    <IntConstant Value="2"/>
-                                </BinaryExpression>
-                            </ActionList>
+                            <Action>sticks-=2;</Action>
                         </GuardActionBlock>
                     </Edge>
                 </EdgeList>
