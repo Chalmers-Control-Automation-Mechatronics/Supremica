@@ -129,7 +129,7 @@ public class Automaton
 		comment = new String(orgAut.comment == null ? "" : orgAut.comment);
 
 		// Create all states
-		for (State orgState : theStates)
+		for (State orgState : orgAut)
 		{
 			State newState = new State(orgState);
 

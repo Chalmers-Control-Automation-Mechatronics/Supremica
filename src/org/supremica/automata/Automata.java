@@ -152,23 +152,13 @@ public class Automata
 	 */
 	public void addAutomaton(Automaton aut)
 	{
-		if (containsAutomaton(aut.getName()))
+		if (!containsAutomaton(aut.getName()))
 		{
-			/*
-			// Already here!
-			logger.error("Name conflict, multiple automata with name " +
-						 aut + ", discarding last one added.");
-			*/
-
-			return;
+			theAutomata.add(aut);
+			nameMap.put(aut.getName(), aut);
+			aut.addListener(this);
+			notifyListeners(AutomataListeners.MODE_AUTOMATON_ADDED, aut);
 		}
-
-		theAutomata.add(aut);
-		nameMap.put(aut.getName(), aut);
-		aut.addListener(this);
-		notifyListeners(AutomataListeners.MODE_AUTOMATON_ADDED, aut);
-
-		// logger.debug("Automata.addAutomaton: " + aut.getName());
 	}
 
 	/**
