@@ -107,11 +107,6 @@ public class AutomataToHierarchyToDot
 			return "";
 		}
 
-		if (aut.isInterface())
-		{
-			return ", color = yellow";
-		}
-
 		if (aut.isUndefined())
 		{
 			return ", color = pink";
@@ -136,11 +131,6 @@ public class AutomataToHierarchyToDot
 		if (withCircles)
 		{
 			return "";
-		}
-
-		if (aut.isInterface())
-		{
-			return ", shape = diamond";
 		}
 
 		if (aut.isPlant())

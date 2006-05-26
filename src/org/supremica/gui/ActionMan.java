@@ -258,51 +258,6 @@ public class ActionMan
 	*/
     }
 
-    // Automaton.UpdateInterface action performed
-    //
-    // What is this method used for? When? /Hguo.
-    public static void automatonUpdateInterface_actionPerformed(Gui gui)
-    {
-	Automata selectedAutomata = gui.getSelectedAutomata();
-
-	if (selectedAutomata.size() < 1)
-	{
-	    JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
-
-	    return;
-	}
-
-	if (selectedAutomata.size() > 1)
-	{
-	    JOptionPane.showMessageDialog(gui.getComponent(), "At most one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
-
-	    return;
-	}
-
-	Automaton theInterface = selectedAutomata.getAutomatonAt(0);
-
-	if (theInterface == null)
-	{
-	    JOptionPane.showMessageDialog(gui.getComponent(), "Could not find the interface!", "Alert", JOptionPane.ERROR_MESSAGE);
-
-	    return;
-	}
-
-	VisualProjectContainer projectContainer = gui.getVisualProjectContainer();
-	VisualProject theProject = (VisualProject) projectContainer.getActiveProject();
-	UpdateInterface updateInterface = new UpdateInterface(gui.getFrame(), theProject, theInterface);
-
-	try
-	{
-	    updateInterface.execute();
-	}
-	catch (Exception ex)
-	{
-	    logger.error(ex.toString());
-	    logger.debug(ex.getStackTrace());
-	}
-    }
-
     // Automata.AddSelfLoopArcs action performed
     public static void automataAddSelfLoopArcs_actionPerformed(Gui gui)
     {
@@ -916,7 +871,7 @@ public class ActionMan
 	    if (fileExporter.showSaveDialog(gui.getComponent()) == JFileChooser.APPROVE_OPTION)
 	    {
 		File currFile = fileExporter.getSelectedFile();
-		    
+
 		if (currFile == null)
 		{
 		    return;

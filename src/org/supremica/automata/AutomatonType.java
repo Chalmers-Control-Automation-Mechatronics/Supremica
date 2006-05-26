@@ -60,8 +60,6 @@ public class AutomatonType
 	public static final AutomatonType Specification = new AutomatonType("Specification", true);
 	public static final AutomatonType Supervisor = new AutomatonType("Supervisor", true);
 	public static final AutomatonType Property = new AutomatonType("Property", true);
-	public static final AutomatonType Interface = new AutomatonType("Interface", false);
-
 
 	private String identifier;
 

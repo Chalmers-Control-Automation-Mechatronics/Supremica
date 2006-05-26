@@ -148,18 +148,6 @@ public class ProjectToHtml
 		}
 
 		pw.println("</ul>");
-		pw.println("<h2>Interfaces:</h2>");
-		pw.println("<ul>");
-
-		for (Iterator projectIt = project.interfaceIterator();
-				projectIt.hasNext(); )
-		{
-			Automaton aut = (Automaton) projectIt.next();
-
-			pw.println("<li> <a href=\"automaton" + aut.getIndex() + ".html\">" + EncodingHelper.normalize(aut.getName()) + "</a></li>");
-		}
-
-		pw.println("</ul>");
 		printHtmlEnd(pw);
 	}
 

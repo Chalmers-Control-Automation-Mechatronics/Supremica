@@ -14,7 +14,6 @@ public class AutomatonSubTree
 {
 	private static ImageIcon plantIcon = new ImageIcon(Supremica.class.getResource("/icons/Plant16.gif"));
 	private static ImageIcon specificationIcon = new ImageIcon(Supremica.class.getResource("/icons/Specification16.gif"));
-	private static ImageIcon interfaceIcon = new ImageIcon(Supremica.class.getResource("/icons/Interface16.gif"));
 
 	public AutomatonSubTree(Automaton automaton, boolean includeAlphabet, boolean includeStates)
 	{
@@ -49,10 +48,6 @@ public class AutomatonSubTree
 		else if (aut.isSupervisor() || aut.isSpecification())
 		{
 			return specificationIcon;
-		}
-		else if (aut.isInterface())
-		{
-			return interfaceIcon;
 		}
 		else
 		{

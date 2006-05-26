@@ -90,10 +90,6 @@ public class Automaton
 	private int width = -1;
 	private int height = -1;
 
-	// master and slave automata are only valid if this automaton is an interface
-	// Shouldn't then Interface inherit from Automata?
-	private Automata masterAutomata = null;
-	private Automata slaveAutomata = null;
 	private AutomatonListeners listeners = null;
 
 	private AutomatonProxy correspondingAutomatonProxy = null;
@@ -104,11 +100,7 @@ public class Automaton
 	public Automaton()
 	{
 		alphabet = new Alphabet();
-		//idStateMap = new HashMap();
 		indexStateMap = new HashMap<Integer,State>();
-//		theArcs = new ArcSet();
-		masterAutomata = new Automata();
-		slaveAutomata = new Automata();
 	}
 
 	/**
@@ -137,44 +129,13 @@ public class Automaton
 		comment = new String(orgAut.comment == null ? "" : orgAut.comment);
 
 		// Create all states
-		for (Iterator<State> states = orgAut.stateIterator(); states.hasNext(); )
+		for (State orgState : theStates)
 		{
-			State orgState = states.next();
 			State newState = new State(orgState);
 
 			addState(newState);
 		}
 
-		// Create all transitions
-		/*
-		try
-		{
-			for (Iterator<State> states = orgAut.stateIterator();
-					states.hasNext(); )
-			{
-				State orgSourceState = (State) states.next();
-				State newSourceState = getStateWithName(orgSourceState.getName());
-
-				for (Iterator<Arc> outgoingArcs = orgSourceState.outgoingArcsIterator();
-					 outgoingArcs.hasNext(); )
-				{
-					Arc orgArc = outgoingArcs.next();
-					State orgDestState = orgArc.getToState();
-					State newDestState = getStateWithName(orgDestState.getName());
-					LabeledEvent currEvent = alphabet.getEvent(orgArc.getEvent());
-					Arc newArc = new Arc(newSourceState, newDestState, currEvent);
-
-					addArc(newArc);
-				}
-			}
-		}
-		catch (Exception ex)
-		{
-			logger.error("Error while copying transitions", ex);
-			//ex.printStackTrace();
-			logger.debug(ex.getStackTrace());
-		}
-		*/
 		for (Iterator<Arc> arcIt = orgAut.arcIterator(); arcIt.hasNext(); )
 		{
 			Arc arc = arcIt.next();
@@ -233,11 +194,6 @@ public class Automaton
 	public boolean isPlant()
 	{
 		return type == AutomatonType.Plant;
-	}
-
-	public boolean isInterface()
-	{
-		return type == AutomatonType.Interface;
 	}
 
 	public boolean isUndefined()
@@ -1368,96 +1324,6 @@ public class Automaton
 		return (new StateSet(theStates)).iterator();
 	}
 
-/*
-	public Iterator<Arc> arcIterator()
-	{
-		return theArcs.iterator();
-	}
-*/
-
-	/*
-	public Iterator<Arc> safeIterator<Arc>()
-	{
-		return (new ArcSet(theArcs)).iterator();
-	}
-	*/
-
-/*
-	public boolean containsArc(Arc arc)
-	{ // KATODO
-		return false; //theArcs.contains(arc);
-	}
-*/
-	/*
-	public EventIterator outgoingEventsIterator(State theState)
-	{
-		Iterator arcIt = theState.outgoingArcsIterator();
-
-		return new InternalEventIterator(arcIt);
-	}
-
-	public EventIterator incomingEventsIterator(State theState)
-	{
-		Iterator arcIt = theState.incomingArcsIterator();
-
-		return new InternalEventIterator(arcIt);
-	}
-	*/
-
-	/**
-	 * These are only valid if the automatonType is interface.
-	 */
-	public Automata getMasterAutomata()
-		throws IllegalStateException
-	{
-		if (!isInterface())
-		{
-			throw new IllegalStateException("This Automaton is not an interface");
-		}
-
-		return masterAutomata;
-	}
-
-	public Automata getSlaveAutomata()
-		throws IllegalStateException
-	{
-		if (!isInterface())
-		{
-			throw new IllegalStateException("This Automaton is not an interface");
-		}
-
-		return slaveAutomata;
-	}
-
-	public void purgeInterfaceAutomata(Automata validAutomata)
-	{
-		purgeInterfaceAutomata(masterAutomata, validAutomata);
-		purgeInterfaceAutomata(slaveAutomata, validAutomata);
-	}
-
-	private void purgeInterfaceAutomata(Automata currDependencies, Automata validAutomata)
-	{
-		List toBeRemoved = new ArrayList();
-
-		for (Iterator autIt = currDependencies.iterator(); autIt.hasNext(); )
-		{
-			Automaton currAutomaton = (Automaton) autIt.next();
-
-			if (!validAutomata.containsAutomaton(currAutomaton))
-			{
-				toBeRemoved.add(currAutomaton);
-			}
-		}
-
-		for (Iterator autIt = toBeRemoved.iterator(); autIt.hasNext(); )
-		{
-			Automaton currAutomaton = (Automaton) autIt.next();
-
-			currDependencies.removeAutomaton(currAutomaton);
-		}
-	}
-	/* End interface-specific methods (?) */ //MF
-
 	public Iterator<LabeledEvent> eventIterator()
 	{
 		return alphabet.iterator();
@@ -1472,18 +1338,6 @@ public class Automaton
 	{
 		return alphabet;
 	}
-
-	/*
-	public void setAlphabet(Alphabet alphabet)
-		throws IllegalArgumentException
-	{
-		if (alphabet == null)
-		{
-			throw new IllegalArgumentException("Alphabet must be non-null");
-		}
-		this.alphabet = alphabet;
-	}
-	*/
 
 	/**
 	 * In some situation, for example in the dot output
@@ -1553,23 +1407,6 @@ public class Automaton
 		return getIndex();
 	}
 
-	/**
-	 * Don't do this in public
-	 */
-	/*
-	private String getUniqueStateId()
-	{
-		String newId;
-
-		do
-		{
-			newId = "q" + uniqueStateIndex++;
-		}
-		while (containsStateWithId(newId));
-
-		return newId;
-	}
-	*/
 
 	/**
 	 * Don't do this in public
@@ -2282,15 +2119,6 @@ public class Automaton
 	}
 
 	public void updated(Object o) {}
-
-/*
-	public void arcAdded(Arc arc) {}
-
-	public void arcRemoved(Arc arc)
-	{
-		//theArcs.removeArc(arc);
-	}
-*/
 
 	public int hashCode()
 	{
