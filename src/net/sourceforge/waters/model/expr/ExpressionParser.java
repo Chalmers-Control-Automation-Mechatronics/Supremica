@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.expr
 //# CLASS:   ExpressionParser
 //###########################################################################
-//# $Id: ExpressionParser.java,v 1.5 2006-05-23 13:21:20 martin Exp $
+//# $Id: ExpressionParser.java,v 1.6 2006-05-29 11:30:17 martin Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.expr;
@@ -17,6 +17,7 @@ import java.util.List;
 
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
+import net.sourceforge.waters.model.module.BooleanConstantProxy;
 import net.sourceforge.waters.model.module.EnumSetExpressionProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
@@ -454,9 +455,19 @@ public class ExpressionParser {
         mFactory.createIndexedIdentifierProxy(name, indexes);      
       return new ParseResult(Operator.TYPE_NAME, expr);
     } else {
-      final IdentifierProxy expr =
-        mFactory.createSimpleIdentifierProxy(name);
-      return new ParseResult(Operator.TYPE_ANY, expr);
+    	if(name.equals("true") || name.equals("TRUE")) {
+    		final BooleanConstantProxy expr =
+    			mFactory.createBooleanConstantProxy(true);
+    	      	return new ParseResult(Operator.TYPE_ANY, expr);
+    	} else if(name.equals("false") || name.equals("FALSE")) {
+    		final BooleanConstantProxy expr =
+    			mFactory.createBooleanConstantProxy(false);
+    	      	return new ParseResult(Operator.TYPE_ANY, expr);
+    	} else {
+    		final IdentifierProxy expr =
+    			mFactory.createSimpleIdentifierProxy(name);
+    	      	return new ParseResult(Operator.TYPE_ANY, expr);
+    	}
     }
   }
 

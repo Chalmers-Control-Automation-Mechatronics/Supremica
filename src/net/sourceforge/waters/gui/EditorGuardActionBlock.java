@@ -17,6 +17,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -38,7 +39,7 @@ public class EditorGuardActionBlock extends EditorLabelGroup
 	private GuardActionBlockSubject mGuardActionBlock;
 	private ArrayList<JComponent> mGuardActionExpressionLabels;
 	private Component[] mPanelContent;
-	private JLabel mCollapsedContent;
+	private JTextPane mCollapsedContent;
 	private boolean isCollapsed;
 	private boolean mIsHighlighted = false;
 
@@ -49,7 +50,9 @@ public class EditorGuardActionBlock extends EditorLabelGroup
 		type = GUARDACTIONBLOCK;
 		panel.removeAll();
 		isCollapsed = false;
-		mCollapsedContent = new JLabel(" +");
+		mCollapsedContent = new JTextPane();
+		mCollapsedContent.setText(" +");
+		mCollapsedContent.setOpaque(false);
 		mCollapsedContent.setForeground(EditorColor.DISABLED);
 		mPanelContent = new Component[0];
 		mGuardActionExpressionLabels = new ArrayList<JComponent>();

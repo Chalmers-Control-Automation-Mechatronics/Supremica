@@ -10,7 +10,7 @@ import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.DeleteEdgeCommand;
 
 /**
- * Popup for editing attributes of a node.
+ * Popup for editing attributes of a label block.
  */
 class EditorLabelBlockPopupMenu
 	extends VPopupMenu

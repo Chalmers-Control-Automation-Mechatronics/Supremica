@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorLabelGroup
 //###########################################################################
-//# $Id: EditorLabelGroup.java,v 1.29 2006-05-24 13:41:28 martin Exp $
+//# $Id: EditorLabelGroup.java,v 1.30 2006-05-29 11:30:17 martin Exp $
 //###########################################################################
 
 
@@ -409,7 +409,7 @@ public class EditorLabelGroup
 			c.setSize(c.getPreferredSize());
 
 			if(this.type == this.GUARDACTIONBLOCK) {
-				if(((JTextPane) c).getText().equals("")) 
+				if(!((JTextPane) c).getText().equals("")) 
 					height += c.getHeight();
 			} else height += c.getHeight();
 			

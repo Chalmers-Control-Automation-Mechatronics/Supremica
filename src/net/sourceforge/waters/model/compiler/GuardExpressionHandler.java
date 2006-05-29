@@ -32,6 +32,7 @@ import net.sourceforge.waters.model.expr.UnaryOperator;
 import net.sourceforge.waters.model.expr.Value;
 import net.sourceforge.waters.model.module.VariableProxy;
 import net.sourceforge.waters.subject.module.BinaryExpressionSubject;
+import net.sourceforge.waters.subject.module.BooleanConstantSubject;
 import net.sourceforge.waters.subject.module.IntConstantSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
@@ -178,6 +179,19 @@ public class GuardExpressionHandler extends ExpressionHandler{
 			
 			DNFIntConstant constant = new DNFIntConstant(
 					(IntConstantSubject) expression);
+			DNFUnaryAtom atom = new DNFUnaryAtom(
+					new IdentityOperator(), constant);
+			andClause.addAtom(atom);
+			orClause.addAndClause(andClause);
+			dnfExpression.setOrClause(orClause);
+			return dnfExpression;
+		}
+		
+		else if(expression instanceof BooleanConstantSubject) {
+			DNFAndClause andClause = new DNFAndClause();
+			
+			DNFBooleanConstant constant = new DNFBooleanConstant(
+					(BooleanConstantSubject) expression);
 			DNFUnaryAtom atom = new DNFUnaryAtom(
 					new IdentityOperator(), constant);
 			andClause.addAtom(atom);
@@ -634,13 +648,17 @@ public class GuardExpressionHandler extends ExpressionHandler{
 			} else if(expression instanceof IntConstantSubject) {
 				mOperator = new IdentityOperator();
 				mTerm = new DNFIntConstant((IntConstantSubject) expression);
+			} else if(expression instanceof BooleanConstantSubject) {
+				mOperator = new IdentityOperator();
+				mTerm = new DNFBooleanConstant((BooleanConstantSubject) expression);
 			} else if(expression instanceof UnaryExpressionSubject) {
 				mOperator = (UnaryBooleanOperator) 
 					((UnaryExpressionSubject) expression).getOperator();
 				mTerm = createTerm(((UnaryExpressionSubject) expression)
 						.getSubTerm());
 			} else {
-				
+				System.out.println("GuardExpressionHandler.DNFUnaryAtom" +
+						"(SimpleExpressionSubject expression): Unknown expression type " + expression.getClass());
 			}
 		}
 		@Override
@@ -678,6 +696,12 @@ public class GuardExpressionHandler extends ExpressionHandler{
 	
 	private class DNFIntConstant extends DNFTerm {
 		IntConstantSubject mConstant;
+		
+		public DNFIntConstant(IntConstantSubject constant) {
+			super();
+			mConstant = constant;
+		}
+
 		@Override
 		public String toString() {
 			return mConstant.toString();
@@ -687,12 +711,23 @@ public class GuardExpressionHandler extends ExpressionHandler{
 		public Value evaluate() throws EvalException {
 			return new CompiledIntValue(mConstant.getValue());
 		}
+	}
 
-		public DNFIntConstant(IntConstantSubject constant) {
+	private class DNFBooleanConstant extends DNFTerm {
+		BooleanConstantSubject mConstant;
+		public DNFBooleanConstant(BooleanConstantSubject constant) {
 			super();
 			mConstant = constant;
 		}
-		
+		@Override
+		public String toString() {
+			return mConstant.toString();
+		}
+
+		@Override
+		public Value evaluate() throws EvalException {
+			return new CompiledBooleanValue(mConstant.isValue());
+		}
 	}
 
 	public DNFTerm createTerm(SimpleExpressionSubject term) {
@@ -739,22 +774,6 @@ public class GuardExpressionHandler extends ExpressionHandler{
 
 		return result;
 	}
-
-	
-	/* TODO remove comments when BooleanConstant is implemented
-	 * private class DNFBooleanConstant extends DNFTerm {
-		BooleanConstantSubject mConstant;
-
-		@Override
-		public String toString() {
-			return mConstant.toString();
-		}
-
-		@Override
-		public Value evaluate() throws EvalException {
-			return new CompiledBooleanValue(mConstant.getValue());
-		}
-	}*/
 }
 
 	
