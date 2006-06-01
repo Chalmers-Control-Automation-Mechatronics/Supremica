@@ -59,15 +59,14 @@
  */
 package org.supremica.manufacturingTables.controlsystemdata;
 
-import java.util.List;
-import java.util.LinkedList;
-//import java.io.*;
+import java.util.Map;
+import java.util.HashMap;
 
 public class ManufacturingCell
 {
     private String name;
     private String description;
-    private List machines;
+    private Map machines; // HashMap will be used for quick access to the machines when registering EOPs
     private Mailbox mailbox;
     private Coordinator coordinator;
 
@@ -76,7 +75,7 @@ public class ManufacturingCell
 	this.name = name;
 	this.coordinator = coordinator;
 	description = null;
-	machines = new LinkedList();
+	machines = new HashMap();  //default capacity (16) and load factor (0,75) suits me fine
 	this.mailbox = mailbox;
     }
 
@@ -105,14 +104,19 @@ public class ManufacturingCell
 	return coordinator;
     }
 
-    public List getMachines()
+    public Map getMachines()
     {
 	return machines;
     }
-  
+    
+    public Machine getMachine(String machineName)
+    {
+	return (Machine) machines.get(machineName);
+    }
+    
     public void addMachine(Machine machineToAdd)
     {
-	machines.add(machineToAdd);
+	machines.put(machineToAdd.getName(), machineToAdd);
     }
 
 }

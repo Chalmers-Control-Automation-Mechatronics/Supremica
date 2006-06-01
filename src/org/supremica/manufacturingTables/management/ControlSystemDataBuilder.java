@@ -65,11 +65,11 @@ import java.util.List;
 import java.io.*;
 import javax.xml.bind.*;
 import org.supremica.manufacturingTables.xsd.factory.*;
+import org.supremica.manufacturingTables.xsd.eop.*;
 import org.supremica.manufacturingTables.management.*;
 import org.supremica.automationobjects.xsd.libraryelement.*;
 import org.supremica.functionblocks.xsd.libraryelement.*;
 import org.supremica.manufacturingTables.controlsystemdata.*;
-
 
 public class ControlSystemDataBuilder
 {
@@ -77,14 +77,324 @@ public class ControlSystemDataBuilder
     // Variable to keep track of the indentation, just for now for printing the XML code
     private int nbrOfBlanks;
     private String blanks;
+    private ManufacturingCell manufacturingCell;
 
     public ControlSystemDataBuilder()
     {
+	nbrOfBlanks = 0;
+	blanks = null;
+	manufacturingCell = null;
+    }
+    
+    public ManufacturingCell getManufacturingCell()
+    {
+	return manufacturingCell;
     }
 
-    public ManufacturingCell buildPLCData(FactoryType factory)
+    public void buildEOP(OperationType operation)
     {
+	// Variable to keep track of the indentation, just for now for printing the XML code
+	nbrOfBlanks = 0;
+	blanks = "                                                                              ";
 
+	// Operation
+	System.err.println(blanks.substring(0,nbrOfBlanks) + "<Operation OpID=\"" + operation.getOpID().intValue() + "\">"); 
+	nbrOfBlanks++;
+
+	// Create EOPData	
+	EOPData EOPData = new EOPData(operation.getOpID().intValue(), operation.getType());
+
+	System.err.println(blanks.substring(0,nbrOfBlanks) + "<Type>" + operation.getType() + "</Type>");
+
+	if (operation.getComment()!=null)
+	    {
+		EOPData.setComment(operation.getComment());
+		System.err.println(blanks.substring(0,nbrOfBlanks) + "<Comment>" + operation.getComment() + "</Comment>"); 
+	    }
+	
+	// Register EOP to the correct machine
+	String machineName = manufacturingCell.getName().substring(manufacturingCell.getName().length()-3, manufacturingCell.getName().length()) + operation.getMachine(); 
+	// (The EOP has shorter names not containing the last of the cell name)
+	
+	if (manufacturingCell.getMachine(machineName)==null)
+	    {
+		System.err.println("The machine " + machineName + " was not found!");
+		return;
+	    }
+	manufacturingCell.getMachine(machineName).registerEOP(EOPData);
+	System.err.println(blanks.substring(0,nbrOfBlanks) + "<Machine>" + operation.getMachine() + "</Machine>"); 
+	
+	// EOP
+	EOPType EOPType = operation.getEOP();
+	System.err.println(blanks.substring(0,nbrOfBlanks) + "<EOP>"); 
+	nbrOfBlanks++;
+
+
+	// At the moment no control is made to check that the internal and external components correspond
+	// to the ones used in the initial state and the action.
+
+	// InternalComponents
+	InternalComponentsType internalComponents = EOPType.getInternalComponents();
+	System.err.println(blanks.substring(0,nbrOfBlanks) + "<InternalComponents>"); 
+	nbrOfBlanks++;
+	for (Iterator actuatorIter = internalComponents.getActuator().iterator(); actuatorIter.hasNext();)
+	    {
+		System.err.println(blanks.substring(0,nbrOfBlanks) + "<Actuator>" + (String) actuatorIter.next() + "</Actuator>"); 
+	    }
+	for (Iterator sensorIter = internalComponents.getSensor().iterator(); sensorIter.hasNext();)
+	    {
+		System.err.println(blanks.substring(0,nbrOfBlanks) + "<Sensor>" + (String) sensorIter.next() + "</Sensor>"); 
+	    }
+	nbrOfBlanks--;
+	System.err.println(blanks.substring(0,nbrOfBlanks) + "</InternalComponents>"); 
+
+	// ExternalComponents
+	ExternalComponentsType externalComponents = EOPType.getExternalComponents();
+	System.err.println(blanks.substring(0,nbrOfBlanks) + "<ExternalComponents>"); 
+	nbrOfBlanks++;
+	for (Iterator variableIter = externalComponents.getExternalVariable().iterator(); variableIter.hasNext();)
+	    {
+		System.err.println(blanks.substring(0,nbrOfBlanks) + "<ExternalVariable>" + (String) variableIter.next() + "</ExternalVariable>"); 
+	    }
+	nbrOfBlanks--;
+	System.err.println(blanks.substring(0,nbrOfBlanks) + "</ExternalComponents>"); 
+	
+	// InitialState
+	InitialStateType initialState = EOPType.getInitialState();
+	System.err.println(blanks.substring(0,nbrOfBlanks) + "<InitialState>"); 
+	nbrOfBlanks++;
+
+	// Create and set InitialRow
+	EOPInitialRowData initialRow = new EOPInitialRowData(); 
+	EOPData.setEOPInitialRow(initialRow);
+
+	//   ActuatorValue
+	for (Iterator actuatorIter = initialState.getActuatorValue().iterator(); actuatorIter.hasNext();)
+	    {
+		System.err.println(blanks.substring(0,nbrOfBlanks) + "<ActuatorValue>"); 
+		nbrOfBlanks++;
+		ActuatorValueType actuatorValue = (ActuatorValueType) actuatorIter.next();
+		System.err.println(blanks.substring(0,nbrOfBlanks) + "<Actuator>" + actuatorValue.getActuator() + "</Actuator>"); 
+		System.err.println(blanks.substring(0,nbrOfBlanks) + "<Value>" + actuatorValue.getValue() + "</Value>"); 
+		nbrOfBlanks--;
+		System.err.println(blanks.substring(0,nbrOfBlanks) + "</ActuatorValue>"); 
+
+		// Add actuatorToState
+		String actuatorName = machineName.substring( machineName.length()-3, machineName.length() ) + actuatorValue.getActuator(); 
+		// (The EOP has shorter actuator names not containing the last of the machine name)
+		initialRow.addActuatorToState(actuatorName, actuatorValue.getValue());
+	    }
+	
+	//   SensorValue
+	for (Iterator sensorIter = initialState.getSensorValue().iterator(); sensorIter.hasNext();)
+	    {
+		System.err.println(blanks.substring(0,nbrOfBlanks) + "<SensorValue>"); 
+		nbrOfBlanks++;
+		SensorValueType sensorValue = (SensorValueType) sensorIter.next();
+		System.err.println(blanks.substring(0,nbrOfBlanks) + "<Sensor>" + sensorValue.getSensor() + "</Sensor>"); 
+		System.err.println(blanks.substring(0,nbrOfBlanks) + "<Value>" + sensorValue.getValue() + "</Value>"); 
+		nbrOfBlanks--;
+		System.err.println(blanks.substring(0,nbrOfBlanks) + "</SensorValue>"); 
+
+		// Add sensorToState
+		String sensorName = machineName.substring( machineName.length()-3, machineName.length() ) + sensorValue.getSensor(); 
+		// (The EOP has shorter sensor names not containing the last of the machine name)
+		initialRow.addSensorToState(sensorName, sensorValue.getValue());
+	    }
+	
+	//   ExternalVariableValue
+	for (Iterator variableIter = initialState.getExternalVariableValue().iterator(); variableIter.hasNext();)
+	    {
+		System.err.println(blanks.substring(0,nbrOfBlanks) + "<ExternalVariableValue>"); 
+		nbrOfBlanks++;
+		ExternalVariableValueType externalVariableValue = (ExternalVariableValueType) variableIter.next();
+		System.err.println(blanks.substring(0,nbrOfBlanks) + "<ExternalVariable>" + externalVariableValue.getExternalVariable() + "</ExternalVariable>"); 
+		System.err.println(blanks.substring(0,nbrOfBlanks) + "<Value>" + externalVariableValue.getValue() + "</Value>"); 
+		nbrOfBlanks--;
+		System.err.println(blanks.substring(0,nbrOfBlanks) + "</ExternalVariableValue>"); 
+
+		// Add externalVariableToState
+		initialRow.addExternalVariableToState(externalVariableValue.getExternalVariable(), externalVariableValue.getValue());
+	    }
+	
+	//   InitialStateCheck
+	System.err.println(blanks.substring(0,nbrOfBlanks) + "<InitialStateCheck>"); 
+	nbrOfBlanks++;
+	InitialStateCheckType initialStateCheck = initialState.getInitialStateCheck();
+	System.err.println(blanks.substring(0,nbrOfBlanks) + "<AlarmType>" + initialStateCheck.getAlarmType() + "</AlarmType>"); 
+	
+	// Set AlarmType
+	initialRow.setAlarmType(initialStateCheck.getAlarmType());
+
+	System.err.println(blanks.substring(0,nbrOfBlanks) + "<AlarmDelay>" + initialStateCheck.getAlarmDelay() + "</AlarmDelay>"); 
+
+	// Set AlarmDelay
+	initialRow.setAlarmDelay(initialStateCheck.getAlarmDelay());
+
+	nbrOfBlanks--;
+	System.err.println(blanks.substring(0,nbrOfBlanks) + "</InitialStateCheck>"); 
+
+	nbrOfBlanks--;
+	System.err.println(blanks.substring(0,nbrOfBlanks) + "</InitialState>"); 
+
+
+ 	// Actions
+ 	for (Iterator actionIter = EOPType.getAction().iterator(); actionIter.hasNext();)
+ 	    {
+ 		ActionType action = (ActionType) actionIter.next();
+ 		System.err.println(blanks.substring(0,nbrOfBlanks) + "<Action ActionNbr=\"" + action.getActionNbr().intValue() + "\">"); 
+		nbrOfBlanks++;
+
+		// Create and add ActionRow
+		EOPActionRowData actionRow = new EOPActionRowData(); 
+		EOPData.addEOPActionRow(actionRow);
+
+		//   ActuatorValue
+		for (Iterator actuatorIter = action.getActuatorValue().iterator(); actuatorIter.hasNext();)
+		    {
+			System.err.println(blanks.substring(0,nbrOfBlanks) + "<ActuatorValue>"); 
+			nbrOfBlanks++;
+			ActuatorValueType actuatorValue = (ActuatorValueType) actuatorIter.next();
+			System.err.println(blanks.substring(0,nbrOfBlanks) + "<Actuator>" + actuatorValue.getActuator() + "</Actuator>"); 
+			System.err.println(blanks.substring(0,nbrOfBlanks) + "<Value>" + actuatorValue.getValue() + "</Value>"); 
+			nbrOfBlanks--;
+			System.err.println(blanks.substring(0,nbrOfBlanks) + "</ActuatorValue>"); 
+	
+			// Add actuatorToState
+			String actuatorName = machineName.substring( machineName.length()-3, machineName.length() ) + actuatorValue.getActuator(); 
+			// (The EOP has shorter actuator names not containing the last of the machine name)
+			actionRow.addActuatorToState(actuatorName, actuatorValue.getValue());
+		    }
+	
+		//   SensorValue
+		for (Iterator sensorIter = action.getSensorValue().iterator(); sensorIter.hasNext();)
+		    {
+			System.err.println(blanks.substring(0,nbrOfBlanks) + "<SensorValue>"); 
+			nbrOfBlanks++;
+			SensorValueType sensorValue = (SensorValueType) sensorIter.next();
+			System.err.println(blanks.substring(0,nbrOfBlanks) + "<Sensor>" + sensorValue.getSensor() + "</Sensor>"); 
+			System.err.println(blanks.substring(0,nbrOfBlanks) + "<Value>" + sensorValue.getValue() + "</Value>"); 
+			nbrOfBlanks--;
+			System.err.println(blanks.substring(0,nbrOfBlanks) + "</SensorValue>"); 
+
+			// Add sensorToState
+			String sensorName = machineName.substring( machineName.length()-3, machineName.length() ) + sensorValue.getSensor(); 
+			// (The EOP has shorter sensor names not containing the last of the machine name)
+			actionRow.addSensorToState(sensorName, sensorValue.getValue());
+		    }
+		
+		//   Zones
+		System.err.println(blanks.substring(0,nbrOfBlanks) + "<Zones>" + action.getZones()  + "<Zones>"); 
+		
+		// Add bookingZones and unbookingZones in private method. 
+		if ( !parseZoneString( action.getZones(), actionRow ) )
+		    {
+			return;
+		    }
+		
+		nbrOfBlanks--;
+		System.err.println(blanks.substring(0,nbrOfBlanks) + "</Action>"); 
+	    }
+	
+	nbrOfBlanks--;
+	System.err.println(blanks.substring(0,nbrOfBlanks) + "</EOP>"); 
+	
+	nbrOfBlanks--;
+	System.err.println(blanks.substring(0,nbrOfBlanks) + "</Operation>"); 
+    }
+    
+    private boolean parseZoneString( String zoneString, EOPActionRowData actionRow)
+    { 
+	// Add bookingZones and unbookingZones. For now I do not accept both booking and unbooking 
+	// zones at the same row.
+	boolean bookingZones = false;
+	boolean unbookingZones = false;
+	char previousChar = ')'; 
+	// I allways check that the current character is the expected compared to the previous.
+	// It is OK with a new booking or unbooking substring after the previuos one has 
+	// ended (ends with an ')').
+	
+	// A zone string typically looks like "u(1,2,20)" or "b(5,12)". It is OK with
+	// string like  "u(1,20)b(5,12)" and whitespaces between digits and tokens
+	// are also OK, but ignored. 
+	for (int i = 0; i < zoneString.length(); i++)
+	    {
+		// "-" means no booking or unbooking
+		if ( zoneString.charAt(i) == '-' )
+		    {
+			break;
+		    }
+		
+		// booking zones
+		else if ( zoneString.charAt(i) == 'b' && previousChar == ')' )
+		    {
+			bookingZones = true;
+		    }
+		// unbooking zones
+		else if ( zoneString.charAt(i) == 'u' && previousChar == ')' )
+		    {
+			unbookingZones = true;
+		    }
+		
+		// left parenthesis
+		else if ( zoneString.charAt(i) == '(' && ( previousChar == 'u' || previousChar == 'b' ) )
+		    {
+			// This is OK as expected but nothing happens
+		    }			
+		// right parenthesis
+		else if ( zoneString.charAt(i)  == ')' && Character.isDigit(previousChar) )
+		    {
+			unbookingZones = false;
+			bookingZones = false;
+		    }		
+		// comma
+		else if ( zoneString.charAt(i) == ',' && Character.isDigit(previousChar) )
+		    {
+			// This is OK as expected but nothing happens
+		    }	
+		// A number with one or more digits
+		else if ( Character.isDigit( zoneString.charAt(i) ) && ( previousChar == ',' || previousChar == '(' ) )
+		    {
+			String number = zoneString.substring(i, i+1); 
+			while ( i < zoneString.length()-1 && Character.isDigit( zoneString.charAt(i+1) ) )
+			    {
+				i++;
+				number += zoneString.substring(i, i+1);
+			    }
+			// Add booking zone
+			if ( bookingZones )
+			    {
+				actionRow.addBookingZone(number);
+			    }
+			// Add unbooking zone
+			else if ( unbookingZones )
+			    {
+				actionRow.addUnbookingZone(number);
+			    }
+			else
+			    {
+				System.err.println("The zone booking/unbooking string was incorrect!");
+				return false;
+			    }
+		    }
+		// White space
+		else if ( zoneString.charAt(i) == ' ' )
+		    {
+			// Shall not make this the previous character since it is not important
+			continue;
+		    }
+		else
+		    {
+			System.err.println("The zone booking/unbooking string was incorrect!");
+			return false;
+		    }
+		previousChar = zoneString.charAt(i);
+	    }
+	return true;
+    }
+    
+    public void buildPLCData(FactoryType factory)
+    {
 
 	// Variable to keep track of the indentation, just for now for printing the XML code
 	nbrOfBlanks = 0;
@@ -109,7 +419,6 @@ public class ControlSystemDataBuilder
 
 	// For now the controlprogram is for just one cell and I assume that the Factory only
 	// contains one cell
-	ManufacturingCell cell = null;
 
 	for (Iterator areaIter = areaList.iterator();areaIter.hasNext();)
 	    {
@@ -135,18 +444,18 @@ public class ControlSystemDataBuilder
 			nbrOfBlanks++;
 
 			//Creating the ManufacturingCell
-			cell = new ManufacturingCell(currentCell.getName(), new Coordinator(), new Mailbox());
+			manufacturingCell = new ManufacturingCell(currentCell.getName(), new Coordinator(), new Mailbox());
 
 
 			// Description
 			if(currentCell.getDescription()!=null)
 			    {
 				System.err.println(blanks.substring(0,nbrOfBlanks) + "<Description>" + currentCell.getDescription() + "</Description>");
-				cell.setDescription(currentCell.getDescription());
+				manufacturingCell.setDescription(currentCell.getDescription());
 			    }
 			
 			// Machines
-			buildMachines(currentCell.getMachines(), cell);
+			buildMachines(currentCell.getMachines(), manufacturingCell);
 
 			nbrOfBlanks--;
 			System.err.println(blanks.substring(0,nbrOfBlanks) + "</Cell>");
@@ -162,10 +471,9 @@ public class ControlSystemDataBuilder
 	nbrOfBlanks--;
 	System.err.println(blanks.substring(0,nbrOfBlanks) + "</Factory>");
 
-	return cell;
     }
 
-    private void buildMachines(MachinesType machines, ManufacturingCell cell)
+    private void buildMachines(MachinesType machines, ManufacturingCell manufacturingCell)
     {
 	System.err.println(blanks.substring(0,nbrOfBlanks) + "<Machines>");
 
@@ -174,13 +482,13 @@ public class ControlSystemDataBuilder
 	nbrOfBlanks++;
 	for (Iterator machineIter = machineList.iterator();machineIter.hasNext();)
 	    {
-		buildMachine((MachineType) machineIter.next(), cell);
+		buildMachine((MachineType) machineIter.next(), manufacturingCell);
 	    }
 	nbrOfBlanks--;
 	System.err.println(blanks.substring(0,nbrOfBlanks) + "</Machines>");
     }
 
-    private void buildMachine(MachineType machineType, ManufacturingCell cell)
+    private void buildMachine(MachineType machineType, ManufacturingCell manufacturingCell)
     {
 	System.err.println(blanks.substring(0,nbrOfBlanks) + "<Machine machineType=\"" + machineType.getType() + "\" " + "name=\"" + machineType.getName() + "\">");
 	nbrOfBlanks++;
@@ -189,7 +497,8 @@ public class ControlSystemDataBuilder
 	MachineController machineController = new MachineController();
 	Mailbox mailbox = new Mailbox();
 	org.supremica.manufacturingTables.controlsystemdata.Machine machine = new org.supremica.manufacturingTables.controlsystemdata.Machine(machineType.getName(), machineType.getType(), machineController, mailbox); 
-	cell.addMachine(machine);
+	
+	manufacturingCell.addMachine(machine);
 
 	// Description
 	if (machineType.getDescription()!=null)
@@ -286,18 +595,18 @@ public class ControlSystemDataBuilder
     // or an Actuator and the current Equipment should be added to the corresponding Equipment or Machine.
     private void buildEquipmentEntity(EquipmentEntityType equipEnt, EquipmentContainer upperLevelEquipment)
     {
-	EquipmentInterface equipment = null;
+	org.supremica.manufacturingTables.controlsystemdata.Equipment equipment = null;
 	// Sensors and Actuators are separated.
 	if (equipEnt.getType().equals("Sensor"))
 	    {
-		equipment = new Sensor(equipEnt.getName());
-		upperLevelEquipment.addSensor((Sensor) equipment);
+		equipment = new org.supremica.manufacturingTables.controlsystemdata.Sensor(equipEnt.getName());
+		upperLevelEquipment.addSensor((org.supremica.manufacturingTables.controlsystemdata.Sensor) equipment);
 	    }
 	
 	else if (equipEnt.getType().equals("Actuator"))
 	    {
-		equipment = new Actuator(equipEnt.getName());
-		upperLevelEquipment.addActuator((Actuator) equipment);
+		equipment = new org.supremica.manufacturingTables.controlsystemdata.Actuator(equipEnt.getName());
+		upperLevelEquipment.addActuator((org.supremica.manufacturingTables.controlsystemdata.Actuator) equipment);
 	    }
 	else
 	    {
@@ -340,7 +649,8 @@ public class ControlSystemDataBuilder
 	nbrOfBlanks--;
 	System.err.println(blanks.substring(0,nbrOfBlanks) + "</States>");
 	
-	// Elements (optional for an actuator)
+	// Elements (Optional for an actuator, a sensor must have elements or lower level sensors. This i 
+	// however not checked here.)
 	if (equipEnt.getElements()!=null)
 	    {
 		System.err.println(blanks.substring(0,nbrOfBlanks) + "<Elements>");
@@ -360,17 +670,11 @@ public class ControlSystemDataBuilder
 		System.err.println(blanks.substring(0,nbrOfBlanks) + "</Elements>");
 	    }
 	
-	// Lower level Equipment, should only be possible for actuators
+	// Lower level Equipment, could be possible even for sensors consisting of sensors, but not 
+	// sensors consisting of actuators. This is however not checked here.
 	if (equipEnt.getEquipment()!=null)
 	    {
-		if (equipment instanceof Actuator)
-		    {
-			buildEquipment(equipEnt.getEquipment(),(Actuator) equipment);
-		    }
-		else
-		    {
-			System.err.println("Only possible for actuators to contain lower level equipment!");
-		    }
+		buildEquipment(equipEnt.getEquipment(), equipment);
 	    }
 	
 	nbrOfBlanks--;

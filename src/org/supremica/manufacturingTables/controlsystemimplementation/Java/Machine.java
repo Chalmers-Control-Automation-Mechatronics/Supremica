@@ -48,8 +48,8 @@
  */
 
 /**
- * The Machine contains information about the mailbox, the MachineController 
- * and about all the toplevel actuators and sensors in the machine
+ * The Machine contains information about the MachineController and the variables.
+ * The MachineController communicates with the actuators and sensors via a mailbox.
  *
  *
  * Created: Mon Apr  24 13:39:32 2006
@@ -57,46 +57,54 @@
  * @author Oscar
  * @version 1.0
  */
-package org.supremica.manufacturingTables.controlsystemimplementation;
+package org.supremica.manufacturingTables.controlsystemimplementation.Java;
 
-import java.util.List;
-//import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
 
-public class Machine
+public class Machine implements Listener
 {
     protected final String [] types = {"Conveyor", "Robot", "Memory", "Fixture", "TurnTable", "Other"};
     private String name;
     private String type;
     private String description;
-    //private List actuators;
-    //private List sensors;
-    //private Mailbox mailbox;
-    private List variables;
+    private Map variables;  // HashMap will be used for quick access to the variables
     private MachineController machineController;
+    private Mailbox cellMailbox;
 
-    public Machine(String name, String type, MachineController machineController)
+    public Machine(String name, String type, MachineController machineController, Mailbox cellMailbox)
     {
 	this.name = name;
 
-	boolean typeOK = false;
-	for (int i=0; i<types.length; i++)
-	    {
-		if (types[i].equals(type))
-		    {
-			typeOK = true;
-		    }
-	    }
-	if (!typeOK)
-	    {
-		System.err.println("Wrong machine type declared!");
-		return;
-	    }
-	    
+	// How do you decide if a machine has own controll system? Is it when it doesn´t contain equipment
+	// or is it allways for different types, such as robots? See JavaControlSystemImplementationBuilder.
 	this.type = type;
+
 	this.machineController = machineController;
-	variables = null;
+	variables = new HashMap(5); //initital capacity 5 and default load factor (0,75) suits me fine
 	description = null;
+	this.cellMailbox = cellMailbox;
+	cellMailbox.register(this);
     }
+    
+    public String getID() // to implement the Listener interface
+    {
+	return getName();
+    }
+
+    public void receiveMessage(Message msg)
+    {
+	if (msg.getType().equals("performEOP"))
+	    {
+		machineController.performEOP(((Integer) msg.getContent()).intValue());
+		System.err.println("Machine " +name+ " performing EOP " + ((Integer) msg.getContent()).intValue() + " .");
+	    }
+	else
+	    {
+		System.err.println("Wrong message type sent to Coordinator!");
+	    }
+    }
+
 
     public String getName()
     {
@@ -118,19 +126,31 @@ public class Machine
 	description = descriptionToSet;
     }
 
-    public MachineController getMachineController()
-    {
-	return machineController;
-    }
-
-    public List getVariables()
-    {
-	return variables;
-    }
-  
     public void addVariable(Variable variableToAdd)
     {
-	variables.add(variableToAdd);
+	variables.put(variableToAdd.getName(), variableToAdd);
     }
 
+    public void setVariable(String variableName, String valueToSet)
+    {
+	if (variables.containsKey(variableName)) 
+	    {
+		((Variable) variables.get(variableName)).setCurrentValue(valueToSet);
+	    }
+	else
+	    {
+		System.err.println("The variable "+ variableName  +" is unknown for the machine " + name + ".");
+	    }
+    }
+
+    // Check if the value is the current value of the specified variable of this machine.
+    public boolean checkVariable(String variableName, String valueToCheck)
+    {
+	if (!variables.containsKey(variableName))
+	    {
+		System.err.println("The variable "+ variableName  +" is unknown for the machine " + name + ".");
+		return false;
+	    }
+	return ((Variable) variables.get(variableName)).checkCurrentValue(valueToCheck); 
+    }
 }

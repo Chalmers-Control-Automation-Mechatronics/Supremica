@@ -47,10 +47,17 @@
     </xjc>
   </target>
 
-  <target name="gen_ManufacturingTables" description="Generate Manufacturing Tables JAXB classes.">
+  <target name="gen_manufacturingtables_factory" description="Generate Manufacturing Tables Factory JAXB classes.">
     <xjc target="${src}" extension="true" removeOldOutput="yes" package="org.supremica.manufacturingTables.xsd.factory">
       <schema dir="${xsd_manufacturingTables}" includes="Factory.xsd"/>
       <produces dir="${src}/org/supremica/manufacturingTables/xsd/factory"/>
+    </xjc>
+  </target>
+
+  <target name="gen_manufacturingtables_eop" description="Generate Manufacturing Tables EOP JAXB classes.">
+    <xjc target="${src}" extension="true" removeOldOutput="yes" package="org.supremica.manufacturingTables.xsd.eop">
+      <schema dir="${xsd_manufacturingTables}" includes="EOP.xsd"/>
+      <produces dir="${src}/org/supremica/manufacturingTables/xsd/eop"/>
     </xjc>
   </target>
 

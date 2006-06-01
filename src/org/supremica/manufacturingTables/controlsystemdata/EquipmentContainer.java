@@ -48,8 +48,8 @@
  */
 
 /**
- * The EquipmentInterface states the methods that equipment (Sensors and Actuators) has to implement to
- * be abled to be added to a higher level actuator.
+ * The EquipmentContainer interface states the methods that equipment containers (sensors and actuators and machines) 
+ * has to implement to be able to contain equipment (sensors and actuators).
  *
  * Created: Wen May  03 13:39:32 2006
  *

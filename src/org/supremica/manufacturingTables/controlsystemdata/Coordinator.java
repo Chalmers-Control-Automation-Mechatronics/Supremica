@@ -58,8 +58,6 @@
  */
 package org.supremica.manufacturingTables.controlsystemdata;
 
-//import java.io.*;
-
 public class Coordinator
 {
 

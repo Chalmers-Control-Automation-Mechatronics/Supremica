@@ -57,40 +57,54 @@
  * @author Oscar
  * @version 1.0
  */
-package org.supremica.manufacturingTables.controlsystemimplementation;
+package org.supremica.manufacturingTables.controlsystemimplementation.Java;
 
-import java.util.List;
-//import java.io.*;
-
-
-//Should the values really be Strings and not boolean, integers and so on. Strings may take to much time?
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Iterator;
 
 public class Variable
 {
     private String name;
-    private List values;
-    //private String type;
-    //private int nbrOfValues:
+    private Map values; // HashMap will be used for quick access to the values.
+    private String currentValue;
 
     public Variable(String name)
     {
 	this.name = name;
-	values = null;
+	values = new HashMap(5); //initital capacity 5 and default load factor (0,75) suits me fine;
+	currentValue = null;
     }
 
     public String getName()
     {
 	return name;
     }
-   
-    public List getValues()
+    
+    public void setCurrentValue(String newValue)
     {
-	return values;
+	if (values.containsKey(newValue))
+	    {
+		currentValue = newValue;
+	    }
+	else
+	    {
+		System.err.println("The value "+ newValue  +" is not possible to set for the variable " + name + ".");
+	    }
     }
-  
+
     public void addValue(String valueToAdd)
     {
-	values.add(valueToAdd);
+	values.put(valueToAdd, valueToAdd); 
+	// Now Strings are used both as values and keys, but the value may in the future be a Value object
     }
+
+    // Check if the value valueToCheck is the current value of the Variable 
+    public boolean checkCurrentValue(String valueToCheck)
+    {
+	return valueToCheck.equals(currentValue);
+    }
+
+
 
 }

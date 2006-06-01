@@ -48,7 +48,7 @@
  */
 
 /**
- * The Machine contains information about the mailbox, the MachineController 
+ * The Machine contains information about the mailbox, the MachineController, corresponding EOPs 
  * and about all the toplevel actuators and sensors in the machine
  *
  *
@@ -61,18 +61,20 @@ package org.supremica.manufacturingTables.controlsystemdata;
 
 import java.util.List;
 import java.util.LinkedList;
-//import java.io.*;
 
 public class Machine implements EquipmentContainer
 {
-    protected final String [] types = {"Conveyor", "Robot", "Memory", "Fixture", "TurnTable", "Other"};
+    static final String [] TYPES = {"Conveyor", "Robot", "Memory", "Fixture", "TurnTable", "Other"};
     private String name;
     private String type;
     private String description;
-    private List actuators;
-    private List sensors;
+    private List actuators; 
+    // The order for the actuators (and sensors, variables and EOPs below) are not important but I allways iterate 
+    // through all elements in the list. Normally very few elements are used.
+    private List sensors; 
     private Mailbox mailbox;
     private List variables;
+    private List EOPs;
     private MachineController machineController;
 
     public Machine(String name, String type, MachineController machineController, Mailbox mailbox)
@@ -80,9 +82,9 @@ public class Machine implements EquipmentContainer
 	this.name = name;
 
 	boolean typeOK = false;
-	for (int i=0; i<types.length; i++)
+	for (int i=0; i<TYPES.length; i++)
 	    {
-		if (types[i].equals(type))
+		if (TYPES[i].equals(type))
 		    {
 			typeOK = true;
 		    }
@@ -99,6 +101,7 @@ public class Machine implements EquipmentContainer
 	description = null;
 	sensors = new LinkedList();
 	actuators = new LinkedList();
+	EOPs = new LinkedList();
 	this.mailbox = mailbox;
     }
 
@@ -120,6 +123,16 @@ public class Machine implements EquipmentContainer
     public void setDescription(String newDescription)
     {
 	description = newDescription;
+    }
+
+    public void registerEOP(EOPData EOPData)
+    {
+	EOPs.add(EOPData);
+    }
+
+    public List getEOPs()
+    {
+	return EOPs;
     }
 
     public Mailbox getMailbox()

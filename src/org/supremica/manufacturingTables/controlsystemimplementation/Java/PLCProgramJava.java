@@ -48,77 +48,63 @@
  */
 
 /**
- * The abstract Sensor class describes all the information in common for low level
- * and top level sensors.
+ * The PLCProgramJava contains information about the Coordinator, which 
+ * in turn communicates with the machines via a mailbox.
  *
  *
- * Created: Mon Apr  24 11:17:32 2006
+ * Created: Mon Apr  24 13:39:32 2006
  *
  * @author Oscar
  * @version 1.0
  */
 package org.supremica.manufacturingTables.controlsystemimplementation.Java;
 
-import java.util.List;
-import java.util.LinkedList;
-import java.util.HashMap;
-import java.util.Map;
+import org.supremica.manufacturingTables.controlsystemimplementation.PLCProgram;
 
-public abstract class Sensor
+public class PLCProgramJava extends PLCProgram
 {
-    protected String name;
+    private String name;
     private String description;
-    protected Map states; // HashMap will be used for quick access to the states
-    protected List sensors; 
-    // The order for the sensors (and hardwareConnections below) are not important but I allways iterate 
-    // through all elements in the list. Normally very few elements are used.
-    protected List hardwareConnections;
+    private Coordinator coordinator;
 
-    public Sensor(String name)
+    public PLCProgramJava(String name, Coordinator coordinator)
     {
+	super();
 	this.name = name;
-	states = new HashMap(5); //initital capacity 5 and default load factor (0,75) suits me fine
-	hardwareConnections = new LinkedList();
-	sensors = new LinkedList();
+	this.coordinator = coordinator;
+	description = null;
     }
 
-    final public String getName()
+    public String getName()
     {
 	return name;
     }
-
-    final public void setDescription(String newDescription)
-    {
-	description = newDescription;
-    }
-   
-    final public String getDesciption()
+    
+    public String getDescription()
     {
 	return description;
     }
+
+    public void setDescription(String newDescription)
+    {
+	description = newDescription;
+    }
+
+    public void run()
+    {
+	newProductDetected("Volvo");
+    }
     
-    final public void addState(String stateToAdd)
+    public void newProductDetected(String product)
     {
-	states.put(stateToAdd, stateToAdd); 	
-	// Now Strings are used both as values and keys, but the value may in the future be a State object
-
+	if (product.equals("Volvo"))
+	    {
+		coordinator.performTask("weld floor");
+	    }
+	else
+	    {
+		System.err.println("Product unknown!");
+	    }
     }
-
-    final public void addHardwareConnection(String hardwareConnectionToAdd)
-    {
-	hardwareConnections.add(hardwareConnectionToAdd);
-    }
-
-    final public void addSensor(Sensor sensorToAdd)
-    {
-	sensors.add(sensorToAdd);
-    }
-  
-    final public boolean hasState(String state)
-    {
-	return states.containsKey(state); // containsValue are more expensive than containsKey
-    }
-
-    abstract public String requestState(); 
     
 }

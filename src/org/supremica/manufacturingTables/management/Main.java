@@ -60,8 +60,14 @@
 package org.supremica.manufacturingTables.management;
 import org.supremica.manufacturingTables.controlsystemdata.*;
 import org.supremica.manufacturingTables.controlsystemimplementation.*;
-
+import org.supremica.manufacturingTables.controlsystemimplementation.Java.*;
 import org.supremica.manufacturingTables.xsd.factory.*;
+import org.supremica.manufacturingTables.xsd.eop.*;
+
+import java.io.*;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Iterator;
 
 public class Main
 {
@@ -77,11 +83,34 @@ public class Main
 	    {
 		String fileName = args[0];
 		Loader loader = new Loader();
-		FactoryType factory = (FactoryType) loader.load(path, fileName);
+		FactoryType factory = (FactoryType) loader.loadFactory(path, fileName);
 		//AutomationObjectsPLCProgramBuilder plcProgramBuilder = new AutomationObjectsPLCProgramBuilder();
 		//plcProgramBuilder.buildPLCProgram(factory);
 		ControlSystemDataBuilder plcDataBuilder = new ControlSystemDataBuilder();
-		ManufacturingCell cell = plcDataBuilder.buildPLCData(factory);
+		plcDataBuilder.buildPLCData(factory);
+		
+		// build EOPs
+		for (int i = 2; i < args.length; i++)
+		    {
+			OperationType eop = (OperationType) loader.loadEOP(path, args[i]);
+			plcDataBuilder.buildEOP(eop);
+		    }
+
+		ManufacturingCell cell = plcDataBuilder.getManufacturingCell();
+		
+
+		ControlSystemImplementationBuilder javaPLCProgramBuilder = new JavaControlSystemImplementationBuilder();
+		javaPLCProgramBuilder.createNewPLCProgram(cell);
+		System.err.println("Java PLCProgram created");
+		PLCProgram plcProgram = javaPLCProgramBuilder.getPLCProgram();
+		System.err.println("Time to run the PLCProgram!");
+		plcProgram.run();
+
+
+		
+
+		
+
 	    }
 	else
 	    {

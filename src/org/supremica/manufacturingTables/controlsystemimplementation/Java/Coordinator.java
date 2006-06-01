@@ -48,77 +48,71 @@
  */
 
 /**
- * The abstract Sensor class describes all the information in common for low level
- * and top level sensors.
+ * The Coordinator class sends EOPNumbers to the Machines, via a mailbox,
+ * according to the SOP for the current task.
  *
- *
- * Created: Mon Apr  24 11:17:32 2006
+ * Created: Mon Apr  24 14:20:32 2006
  *
  * @author Oscar
  * @version 1.0
  */
 package org.supremica.manufacturingTables.controlsystemimplementation.Java;
 
-import java.util.List;
-import java.util.LinkedList;
-import java.util.HashMap;
-import java.util.Map;
-
-public abstract class Sensor
+public class Coordinator implements Listener
 {
-    protected String name;
-    private String description;
-    protected Map states; // HashMap will be used for quick access to the states
-    protected List sensors; 
-    // The order for the sensors (and hardwareConnections below) are not important but I allways iterate 
-    // through all elements in the list. Normally very few elements are used.
-    protected List hardwareConnections;
+    private Mailbox mailbox;
+    private boolean performsTask;
+    private String ID;
 
-    public Sensor(String name)
+    public Coordinator(Mailbox mailbox)
     {
-	this.name = name;
-	states = new HashMap(5); //initital capacity 5 and default load factor (0,75) suits me fine
-	hardwareConnections = new LinkedList();
-	sensors = new LinkedList();
+	this.mailbox = mailbox;
+	performsTask = false;
+	ID = "Coordinator";
+	mailbox.register(this);
     }
 
-    final public String getName()
+    public void performTask(String task)
     {
-	return name;
-    }
+	if (task.equals("weld floor") && !performsTask)
+	    {
+		performsTask = true;
+		//read the SOP...!
 
-    final public void setDescription(String newDescription)
-    {
-	description = newDescription;
-    }
-   
-    final public String getDesciption()
-    {
-	return description;
+		//Message.TYPE[0];
+		mailbox.send(new Message(ID, "150FIX152", "performEOP", 44));
+	    }
+	else 
+	    {
+		System.err.println("Unknown task or already busy performing a task!");
+	    }
     }
     
-    final public void addState(String stateToAdd)
+    // Do not need to check if the message is for me since it allways is!
+    public void receiveMessage(Message msg)
     {
-	states.put(stateToAdd, stateToAdd); 	
-	// Now Strings are used both as values and keys, but the value may in the future be a State object
-
+	if (performsTask && msg.getType().equals("EOPDone"))
+	    {
+		// Here must be added code to check who sent the message
+		if (((Boolean) msg.getContent()).booleanValue())
+		    {
+			System.err.println("The EOP has been performed with outstanding results!");
+		    }
+		else
+		    {
+			System.out.println("The EOP could not be performed!");
+		    }
+		performsTask = false;
+	    }
+	else
+	    {
+		System.err.println("Wrong message or message type sent to Coordinator!");
+	    }
     }
-
-    final public void addHardwareConnection(String hardwareConnectionToAdd)
+    
+    public String getID()
     {
-	hardwareConnections.add(hardwareConnectionToAdd);
+	return ID;
     }
-
-    final public void addSensor(Sensor sensorToAdd)
-    {
-	sensors.add(sensorToAdd);
-    }
-  
-    final public boolean hasState(String state)
-    {
-	return states.containsKey(state); // containsValue are more expensive than containsKey
-    }
-
-    abstract public String requestState(); 
     
 }

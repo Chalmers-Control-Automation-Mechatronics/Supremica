@@ -48,90 +48,95 @@
  */
 
 /**
- * The abstract Actuator class describes all the information in common for all low level 
- * and top level actuators. 
+ * The EOPInitialRow class describes the initial state of the EOP and alarm type and delay for 
+ * the initial state check.
  *
- *
- * Created: Mon May  10 13:39:32 2006
+ * Created: Mon May  15 16:08:32 2006
  *
  * @author Oscar
  * @version 1.0
  */
 package org.supremica.manufacturingTables.controlsystemimplementation.Java;
 
-import java.util.List;
-import java.util.LinkedList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
-public abstract class Actuator 
+public class EOPInitialRow extends EOPRow implements Cloneable
 {
-    protected String name;
-    private String description;
-    protected List actuators;
-    // The order for the actuators (and sensors and hardwareConnections below) are not important but I allways iterate 
-    // through all elements in the list. Normally very few elements are used.
-    protected List sensors;
-    protected List hardwareConnections;
-    protected Map states;// HashMap will be used for quick access to the states
+    private Map externalVariableToStateMap;
+    private String alarmType;
+    private String alarmDelay;
     
-    public Actuator(String name)
+    public EOPInitialRow()
     {
-	this.name = name;
-	states = new HashMap(5); //initital capacity 5 and default load factor (0,75) suits me fine
-	actuators = new LinkedList();
-	sensors = new LinkedList();
-	hardwareConnections = new LinkedList();
+	super();
+	externalVariableToStateMap = new HashMap(5); //initital capacity 5 and default load factor (0,75) suits me fine
+	alarmType = null;
+	alarmDelay = null;
     }
 
-    final public String getName()
+    public void setAlarmType(String alarmType)
     {
-	return name;
-    }
-   
-    final public void setDescription(String newDescription)
-    {
-	description = newDescription;
-    }
-
-    final public String getDesciption()
-    {
-	return description;
+	this.alarmType = alarmType;
     }
     
-    final public void addState(String stateToAdd)
+    public String getAlarmType()
     {
-	states.put(stateToAdd, stateToAdd);
-  	// Now Strings are used both as values and keys, but the value may in the future be a State object
+	return alarmType;
     }
 
-    final public void addActuator(Actuator actuatorToAdd)
+    public void setAlarmDelay(String alarmDelay)
     {
-	actuators.add(actuatorToAdd);
+	this.alarmDelay = alarmDelay;
+    }
+    
+    public String getAlarmDelay()
+    {
+	return alarmDelay;
     }
 
-    final public void addSensor(Sensor sensorToAdd)
+    public void addExternalVariableToState(String variable, String state)
     {
-	sensors.add(sensorToAdd);
-    }
-  
-    final public void addHardwareConnection(String hardwareConnectionToAdd)
-    {
-	hardwareConnections.add(hardwareConnectionToAdd);
+	externalVariableToStateMap.put(variable, state);
     }
 
-    final public boolean hasState(String state)
+    public Map getExternalVariableToStateMap() 
     {
-	return states.containsKey(state); // containsValue are more expensive than containsKey
+	return externalVariableToStateMap;
     }
-    
-    abstract public String requestState(); 
-    
-     
-    abstract public boolean orderState(String orderedState);
-    
-    
-    // We shall also have a statemonitor that gives an alarm if the actuator is moved when not ordered to
 
-   
+    // An EOPInitialRow contains no booking zones
+    public Set getBookingZones() 
+    {
+	return null;
+    }
+
+    // An EOPInitialRow contains no unbooking zones
+    public Set getUnbookingZones() 
+    {
+	return null;
+    }
+
+   public Object clone() 
+    {
+	EOPInitialRow clone = null;
+	try
+	    {
+		clone =(EOPInitialRow) super.clone(); // Create space and clone the trivial data
+		// The externalVariable-, sensor- and actuatorToStateMap has to be cloned separately since we
+		// want to be able to remove elements from the cloned maps and not effect the original maps.
+		clone.sensorToStateMap = (Map) ((HashMap) this.sensorToStateMap).clone();
+		clone.actuatorToStateMap = (Map) ((HashMap) this.actuatorToStateMap).clone();
+		clone.externalVariableToStateMap = (Map) ((HashMap) this.externalVariableToStateMap).clone();
+		// The order of the original map may be changed when elements are removed from the cloned hashmap
+		// but this does not matter since the order is not important.
+	    }
+	catch (CloneNotSupportedException e)
+	    {
+		System.err.println("The EOPInitialRow could not be cloned!");
+	    } 
+	return clone;
+    }
+
 }

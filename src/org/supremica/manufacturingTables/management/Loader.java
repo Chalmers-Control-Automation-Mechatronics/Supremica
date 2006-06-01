@@ -63,7 +63,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.io.*;
 import javax.xml.bind.*;
-import org.supremica.manufacturingTables.xsd.factory.*;
 import org.supremica.functionblocks.xsd.libraryelement.*;
 import org.supremica.functionblocks.xsd.libraryelement.impl.*;
 
@@ -76,7 +75,11 @@ public class Loader
 
     public Loader()
     {
-	System.err.println("Inside Loader");
+    }
+
+    public Object loadFactory(String path, String fileName)
+    {
+	// Create JAXBContext and unmarshaller for factory
 	try
 	    {
 		jaxbContext = JAXBContext.newInstance("org.supremica.manufacturingTables.xsd.factory");
@@ -93,15 +96,40 @@ public class Loader
 		// ValidationEventHandler will cause the unmarshal operation
 		// to fail with an UnmarshalException after encountering the
 		// first error or fatal error.
+		return load(path, fileName);
 	    }
 	catch(JAXBException je)
 	    {
 		je.printStackTrace();
+		return null;
 	    }
+       
     }
 
-    public Object load(String path, String fileName)
+    public Object loadEOP(String path, String fileName)
     {
+	// Create JAXBContext and unmarshaller for factory
+	try
+	    {
+		jaxbContext = JAXBContext.newInstance("org.supremica.manufacturingTables.xsd.eop");
+		u = jaxbContext.createUnmarshaller();
+		// enable validation
+		u.setValidating( true );
+		
+		// Se comment about validation above.
+		return load(path, fileName);
+	    }
+	catch(JAXBException je)
+	    {
+		je.printStackTrace();
+		return null;
+	    }
+    }
+    
+    private Object load(String path, String fileName)
+    {
+	
+
 	try
 	    {
 		File theFile = getFile(path, fileName);
@@ -112,9 +140,7 @@ public class Loader
 			Object o = u.unmarshal(theFile);
 			java.lang.System.err.println("The file is unmarshalled");
 
-			//return (FactoryType) o;
 			return o;
-			//buildPLCProgram((FactoryType) o);
 		    }
 		else
 		    {

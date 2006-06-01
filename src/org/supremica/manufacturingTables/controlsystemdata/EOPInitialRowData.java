@@ -48,77 +48,61 @@
  */
 
 /**
- * The abstract Sensor class describes all the information in common for low level
- * and top level sensors.
+ * The EOPInitialRow class describes the initial state of the EOP and alarm type and delay for 
+ * the initial state check.
  *
- *
- * Created: Mon Apr  24 11:17:32 2006
+ * Created: Wed May  24 07:58:32 2006
  *
  * @author Oscar
  * @version 1.0
  */
-package org.supremica.manufacturingTables.controlsystemimplementation.Java;
+package org.supremica.manufacturingTables.controlsystemdata;
 
-import java.util.List;
-import java.util.LinkedList;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class Sensor
+public class EOPInitialRowData extends EOPRowData
 {
-    protected String name;
-    private String description;
-    protected Map states; // HashMap will be used for quick access to the states
-    protected List sensors; 
-    // The order for the sensors (and hardwareConnections below) are not important but I allways iterate 
-    // through all elements in the list. Normally very few elements are used.
-    protected List hardwareConnections;
-
-    public Sensor(String name)
+    private Map externalVariableToStateMap;
+    private String alarmType;
+    private String alarmDelay;
+    
+    public EOPInitialRowData()
     {
-	this.name = name;
-	states = new HashMap(5); //initital capacity 5 and default load factor (0,75) suits me fine
-	hardwareConnections = new LinkedList();
-	sensors = new LinkedList();
+	super();
+	externalVariableToStateMap = new HashMap(5); //initital capacity 5 and default load factor (0,75) suits me fine
+	alarmType = null;
+	alarmDelay = null;
     }
 
-    final public String getName()
+    public void setAlarmType(String alarmType)
     {
-	return name;
-    }
-
-    final public void setDescription(String newDescription)
-    {
-	description = newDescription;
-    }
-   
-    final public String getDesciption()
-    {
-	return description;
+	this.alarmType = alarmType;
     }
     
-    final public void addState(String stateToAdd)
+    public String getAlarmType()
     {
-	states.put(stateToAdd, stateToAdd); 	
-	// Now Strings are used both as values and keys, but the value may in the future be a State object
-
+	return alarmType;
     }
 
-    final public void addHardwareConnection(String hardwareConnectionToAdd)
+    public void setAlarmDelay(String alarmDelay)
     {
-	hardwareConnections.add(hardwareConnectionToAdd);
+	this.alarmDelay = alarmDelay;
     }
-
-    final public void addSensor(Sensor sensorToAdd)
-    {
-	sensors.add(sensorToAdd);
-    }
-  
-    final public boolean hasState(String state)
-    {
-	return states.containsKey(state); // containsValue are more expensive than containsKey
-    }
-
-    abstract public String requestState(); 
     
+    public String getAlarmDelay()
+    {
+	return alarmDelay;
+    }
+
+    public void addExternalVariableToState(String variable, String state)
+    {
+	externalVariableToStateMap.put(variable, state);
+    }
+
+    public Map getExternalVariableToStateMap() 
+    {
+	return externalVariableToStateMap;
+    }
+
 }

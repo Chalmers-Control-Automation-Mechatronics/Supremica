@@ -65,8 +65,8 @@
                                 <EquipmentEntity Type="Actuator" name="150F9VY1">                        
                                     <Description>Monostable pneumatic valve, pressure air cell 150</Description>
                                     <States>
-                                        <State>Blabla></State>
-                                        <State>Blabla2></State>
+                                        <State>Blabla</State>
+                                        <State>Blabla2</State>
                                     </States>
                                     <!-- Element beskriver (styrning av) den fysiska utrustningen paa laegsta nivaa, d v s den nivaa daer kommunikation med kort/omvaerld sker-->
                                     <Elements>
@@ -78,8 +78,8 @@
                                 <EquipmentEntity Type="Sensor" name="150SP1">                        
                                     <Description>Pressure switch, pressure air in cell 150 ok</Description>
                                     <States>
-                                        <State>Blabla></State>
-                                        <State>Blabla2></State>
+                                        <State>Blabla</State>
+                                        <State>Blabla2</State>
                                     </States>
                                     <Elements>
                                         <Element name="150SP1">
@@ -96,14 +96,31 @@
                                 <EquipmentEntity Type="Sensor" name="150SG1">                        
                                     <Description>Proximity sensor, product present in cell 150 </Description>
                                     <States>
-                                         <State>Blabla></State>
-                                         <State>Blabla2></State>
+                                         <State>Blabla</State>
+                                         <State>Blabla2</State>
                                     </States>
                                     <Elements>
                                         <Element name="-----">              <!-- Detta borde kunna vaeljas automatiskt om det inte finns naagon undernivaa?-->
                                             <Description>The part of the virtual sensor that handles the communication with the real sensor</Description>
                                         </Element>
                                    </Elements>
+
+                                   <!-- The Equipment below was just to test (in the Java-program) that a sensor can contain sensors. -->
+                                   <!--Equipment>   
+                                       <EquipmentEntity Type="Sensor" name="testing">                        
+                                           <Description>Testing </Description>
+                                           <States>
+                                               <State>Blabla</State>
+                                               <State>Blabla2</State>
+                                           </States>
+                                           <Elements>
+                                               <Element name="Testing">            
+                                                   <Description>Testing</Description>
+                                               </Element>
+                                           </Elements>
+                                       </EquipmentEntity>
+                                    </Equipment-->
+
                                </EquipmentEntity>
                            </Equipment>
                         </Machine>
@@ -116,8 +133,8 @@
                                 <EquipmentEntity Type="Sensor" name="152SG3">                        
                                     <Description>Proximity sensor part present on fixture </Description>
                                     <States>
-                                        <State>on></State>
-                                        <State>off></State>
+                                        <State>on</State>
+                                        <State>off</State>
                                     </States>
                                     <!-- Element beskriver (styrning av) den fysiska utrustningen paa laegsta nivaa, d v s den nivaa daer kommunikation med kort/omvaerld sker -->
                                     <Elements>
@@ -129,8 +146,8 @@
                                 <EquipmentEntity Type="Sensor" name="152SG6">                        
                                     <Description>Proximity sensor part present on fixture </Description>
                                     <States>
-                                        <State>on></State>
-                                        <State>off></State>
+                                        <State>on</State>
+                                        <State>off</State>
 	                            </States>
                                     <Elements>
                                         <Element name="152SG6"> 
@@ -141,8 +158,8 @@
                                 <EquipmentEntity Type="Actuator" name="152Y14">                        
                                     <Description>ClampGroup</Description>
                                     <States>
-                                        <State>open></State>
-                                        <State>close></State>
+                                        <State>open</State>
+                                        <State>closed</State>
                                     </States>
                                     <Elements>
                                         <Element name="152Y14Y">
@@ -154,14 +171,15 @@
                                         <EquipmentEntity Type="Actuator" name="152Y14C1">                        
                                             <Description>Cylinder</Description>
                                             <States>
-                                                <State>open></State>
-                                                <State>close></State>
+                                                <State>open</State>
+                                                <State>closed</State>
                                             </States>
                                             <Equipment>
                                                 <EquipmentEntity Type="Sensor" name="152Y14ASG1">
                                                     <Description>Proximity sensor clamp 1 open</Description>
                                                     <States>
-                                                        <State>open></State>
+                                                        <State>open</State>
+                                                        <State>not open</State>
                                                     </States>
                                                     <Elements>
                                                         <Element name="152Y14ASG1">
@@ -172,7 +190,8 @@
                                                 <EquipmentEntity Type="Sensor" name="152Y14ASG2">
                                                     <Description>Proximity sensor clamp 1 closed</Description>
                                                     <States>
-                                                        <State>closed></State>
+                                                        <State>closed</State>
+                                                        <State>not closed</State>
                                                     </States>
                                                     <Elements>
                                                         <Element name="152Y14ASG2">
@@ -186,15 +205,16 @@
                                         <EquipmentEntity Type="Actuator" name="152Y14C2">                        
                                             <Description>Cylinder</Description>
                                             <States>
-                                                <State>open></State>
-                                                <State>close></State>
+                                                <State>open</State>
+                                                <State>closed</State>
                                             </States>
                                             <Equipment>
                                                 <EquipmentEntity Type="Sensor" name="152Y14BSG1">
                                                     <Description>Proximity sensor clamp 2 open</Description>
                                                     <States>
-                                                        <State>open></State>
-                                                    </States>
+                                                        <State>open</State>
+                                                        <State>not open</State>
+                                                     </States>
                                                     <Elements>
                                                         <Element name="152Y14BSG1">
                                                             <Description>The part of the virtual sensor that handles the communication with the real sensor</Description>
@@ -204,7 +224,8 @@
                                                 <EquipmentEntity Type="Sensor" name="152Y14BSG2">
                                                     <Description>Proximity sensor clamp 2 closed</Description>
                                                     <States>
-                                                        <State>closed></State>
+                                                        <State>closed</State>
+                                                        <State>not closed</State>
                                                     </States>
                                                     <Elements>
                                                         <Element name="152Y14BSG2">

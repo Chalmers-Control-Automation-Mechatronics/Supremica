@@ -48,77 +48,47 @@
  */
 
 /**
- * The abstract Sensor class describes all the information in common for low level
- * and top level sensors.
+ * The abstract class EOPRow describes a row (intial state or action) of an EOP
+ * 
  *
- *
- * Created: Mon Apr  24 11:17:32 2006
+ * Created: Wed May  24 07:56:32 2006
  *
  * @author Oscar
  * @version 1.0
  */
-package org.supremica.manufacturingTables.controlsystemimplementation.Java;
+package org.supremica.manufacturingTables.controlsystemdata;
 
-import java.util.List;
-import java.util.LinkedList;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class Sensor
+abstract public class EOPRowData
 {
-    protected String name;
-    private String description;
-    protected Map states; // HashMap will be used for quick access to the states
-    protected List sensors; 
-    // The order for the sensors (and hardwareConnections below) are not important but I allways iterate 
-    // through all elements in the list. Normally very few elements are used.
-    protected List hardwareConnections;
-
-    public Sensor(String name)
-    {
-	this.name = name;
-	states = new HashMap(5); //initital capacity 5 and default load factor (0,75) suits me fine
-	hardwareConnections = new LinkedList();
-	sensors = new LinkedList();
-    }
-
-    final public String getName()
-    {
-	return name;
-    }
-
-    final public void setDescription(String newDescription)
-    {
-	description = newDescription;
-    }
-   
-    final public String getDesciption()
-    {
-	return description;
-    }
+    protected Map sensorToStateMap; // HashMap will be used for quick access to the states
+    protected Map actuatorToStateMap;
     
-    final public void addState(String stateToAdd)
+    public EOPRowData()
     {
-	states.put(stateToAdd, stateToAdd); 	
-	// Now Strings are used both as values and keys, but the value may in the future be a State object
-
+	sensorToStateMap = new HashMap(10); //initital capacity 10 and default load factor (0,75) suits me fine
+	actuatorToStateMap = new HashMap(10);
     }
 
-    final public void addHardwareConnection(String hardwareConnectionToAdd)
+    final public void addSensorToState(String sensor, String state)
     {
-	hardwareConnections.add(hardwareConnectionToAdd);
+	sensorToStateMap.put(sensor, state);
     }
 
-    final public void addSensor(Sensor sensorToAdd)
+    final public Map getSensorToStateMap() 
     {
-	sensors.add(sensorToAdd);
-    }
-  
-    final public boolean hasState(String state)
-    {
-	return states.containsKey(state); // containsValue are more expensive than containsKey
+	return sensorToStateMap;
     }
 
-    abstract public String requestState(); 
-    
+    final public void addActuatorToState(String actuator, String state)
+    {
+	actuatorToStateMap.put(actuator, state);
+    }
+
+    final public Map getActuatorToStateMap() 
+    {
+	return actuatorToStateMap;
+    }
 }

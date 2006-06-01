@@ -48,77 +48,49 @@
  */
 
 /**
- * The abstract Sensor class describes all the information in common for low level
- * and top level sensors.
+ * The EOPActionRow class describes the desired state for an action in an EOP
+ * containing internal components and zones.
  *
- *
- * Created: Mon Apr  24 11:17:32 2006
+ * Created: Wed May  24 07:52:32 2006
  *
  * @author Oscar
  * @version 1.0
  */
-package org.supremica.manufacturingTables.controlsystemimplementation.Java;
+package org.supremica.manufacturingTables.controlsystemdata;
 
-import java.util.List;
-import java.util.LinkedList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Set;
+import java.util.HashSet;
 
-public abstract class Sensor
+public class EOPActionRowData extends EOPRowData 
 {
-    protected String name;
-    private String description;
-    protected Map states; // HashMap will be used for quick access to the states
-    protected List sensors; 
-    // The order for the sensors (and hardwareConnections below) are not important but I allways iterate 
-    // through all elements in the list. Normally very few elements are used.
-    protected List hardwareConnections;
-
-    public Sensor(String name)
+    
+    private Set bookingZones;
+    private Set unbookingZones;
+    
+    public EOPActionRowData()
     {
-	this.name = name;
-	states = new HashMap(5); //initital capacity 5 and default load factor (0,75) suits me fine
-	hardwareConnections = new LinkedList();
-	sensors = new LinkedList();
+	super();
+	bookingZones = new HashSet(10); //initital capacity 10 and default load factor (0,75) suits me fine
+	unbookingZones = new HashSet(10);
     }
 
-    final public String getName()
+    public void addBookingZone(String zone)
     {
-	return name;
+	bookingZones.add(zone);
     }
 
-    final public void setDescription(String newDescription)
+    public Set getBookingZones() 
     {
-	description = newDescription;
-    }
-   
-    final public String getDesciption()
-    {
-	return description;
+	return bookingZones;
     }
     
-    final public void addState(String stateToAdd)
+    public void addUnbookingZone(String zone)
     {
-	states.put(stateToAdd, stateToAdd); 	
-	// Now Strings are used both as values and keys, but the value may in the future be a State object
-
+	unbookingZones.add(zone);
     }
 
-    final public void addHardwareConnection(String hardwareConnectionToAdd)
+    public Set getUnbookingZones() 
     {
-	hardwareConnections.add(hardwareConnectionToAdd);
+	return unbookingZones;
     }
-
-    final public void addSensor(Sensor sensorToAdd)
-    {
-	sensors.add(sensorToAdd);
-    }
-  
-    final public boolean hasState(String state)
-    {
-	return states.containsKey(state); // containsValue are more expensive than containsKey
-    }
-
-    abstract public String requestState(); 
-    
 }

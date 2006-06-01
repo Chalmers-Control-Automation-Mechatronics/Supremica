@@ -59,76 +59,24 @@
  */
 package org.supremica.manufacturingTables.controlsystemdata;
 
-import java.util.List;
-import java.util.LinkedList;
-//import java.io.*;
+// import java.util.List;
 
-public class Sensor implements EquipmentInterface
+public class Sensor extends Equipment
 {
-    private String name;
-    private String description;
-    private List states;
-    private List hardwareConnections;
-    //    private Mailbox mailbox;
 
     public Sensor(String name)
     {
-	this.name = name;
-	description = null;
-	states = new LinkedList();
-	hardwareConnections = new LinkedList();
-	// mailbox = null;
+	super(name);
     }
 
-    public String getName()
-    {
-	return name;
-    }
-
-    public void setDescription(String newDescription)
-    {
-	description = newDescription;
-    }
-   
-    public String getDesciption()
-    {
-	return description;
-    }
-    
-//     public int getNbrOfStates ()
+//     public List getActuators()
 //     {
-// 	return nbrOfStates;
+// 	return null;
 //     }
-    
-//     public Mailbox getMailbox()
-//     {
-// 	return mailbox;
-//     }
-
-//     public void setMailbox(Mailbox newMailbox)
-//     {
-// 	mailbox = newMailbox;
-//     }
-
-    public List getStates()
-    {
-	return states;
-    }
   
-    public void addState(String stateToAdd)
-    {
-	states.add(stateToAdd);
-	//nrbOfStates++;
-    }
-
-    public List getHardwareConnections()
-    {
-	return hardwareConnections;
-    }
-  
-    public void addHardwareConnection(String hardwareConnectionToAdd)
-    {
-	hardwareConnections.add(hardwareConnectionToAdd);
-    }
+     public void addActuator(Actuator actuatorToAdd)
+     {
+ 	System.err.println("A sensor can not contain actuators!");
+     }
 
 }

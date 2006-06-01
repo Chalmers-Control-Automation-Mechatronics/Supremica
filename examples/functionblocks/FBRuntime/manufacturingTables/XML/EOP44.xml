@@ -1,7 +1,7 @@
 <Operation OpID="44">
     <Type>basic</Type>
     <Comment>move to home position</Comment>
-    <Resource>FIX152</Resource>
+    <Machine>FIX152</Machine>
     <EOP>
     
         <InternalComponents>
@@ -27,7 +27,7 @@
             </ActuatorValue>
             <ActuatorValue>
                 <Actuator>Y14</Actuator>
-                <Value>close</Value>
+                <Value>closed</Value>
             </ActuatorValue>
             <SensorValue>
                 <Sensor>SG3</Sensor>
@@ -37,7 +37,6 @@
                 <Sensor>SG6</Sensor>
                 <Value>on</Value>
             </SensorValue>
-            <Zones>-</Zones>
             <ExternalVariableValue>
                 <ExternalVariable>R3325#parts&gt;0</ExternalVariable>
                 <Value>*</Value>
@@ -48,7 +47,7 @@
             </InitialStateCheck>
         </InitialState>
 
-        <Action ActuatorNbr="1">
+        <Action ActionNbr="1">
             <ActuatorValue>
                 <Actuator>Y18</Actuator>
                 <Value>work pos</Value>
@@ -72,7 +71,7 @@
             <Zones>-</Zones>
         </Action>
 
-        <Action  ActuatorNbr="2">
+        <Action  ActionNbr="2">
             <ActuatorValue>
                 <Actuator>Y18</Actuator>
                 <Value>work pos</Value>
@@ -96,7 +95,7 @@
             <Zones>-</Zones>
         </Action>
 
-        <Action ActuatorNbr="3">
+        <Action ActionNbr="3">
             <ActuatorValue>
                 <Actuator>Y18</Actuator>
                 <Value>home</Value>
@@ -120,7 +119,7 @@
             <Zones>-</Zones>
         </Action>
 
-        <Action ActuatorNbr="4">
+        <Action ActionNbr="4">
             <ActuatorValue>
                 <Actuator>Y18</Actuator>
                 <Value>home</Value>

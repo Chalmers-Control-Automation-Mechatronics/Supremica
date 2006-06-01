@@ -1,0 +1,46 @@
+		EOPInitialRow row1 = new EOPInitialRow();
+		row1.addSensorToState("s1", "open");
+		row1.addSensorToState("s2", "closed");
+		row1.addSensorToState("s3", "work");
+		row1.addSensorToState("s4", "work");
+		row1.addSensorToState("s5", "work");
+
+		EOPActionRow row2 = new EOPActionRow();
+		row2.addSensorToState("s1", "open");
+		row2.addSensorToState("s2", "open");
+		row2.addSensorToState("s3", "home");
+		row2.addSensorToState("s4", "work");
+		row2.addSensorToState("s6", "work");
+		row2.addSensorToState("s7", "work");
+
+		EOPActionRow row2Clone = (EOPActionRow) row2.clone();
+		row2Clone.removeUnchangedComponents(row1);
+		
+
+		System.err.println("InitialRow row1:");
+		Map sensorToStateMap = row1.getSensorToStateMap();
+		Iterator sensorIter = sensorToStateMap.entrySet().iterator();
+		while (sensorIter.hasNext())
+		    {
+			Entry sensorToState = (Entry) sensorIter.next();
+			System.err.println("Sensor " + (String) sensorToState.getKey() + " has state " + (String) sensorToState.getValue()); 
+		    }
+
+		System.err.println("ActionRow row2:");
+		sensorToStateMap = row2.getSensorToStateMap();
+		sensorIter = sensorToStateMap.entrySet().iterator();
+		while (sensorIter.hasNext())
+		    {
+			Entry sensorToState = (Entry) sensorIter.next();
+			System.err.println("Sensor " + (String) sensorToState.getKey() + " has state " + (String) sensorToState.getValue()); 
+		    }
+
+		System.err.println("Reduced ActionRow row2Clone:");
+		sensorToStateMap = row2Clone.getSensorToStateMap();
+		sensorIter = sensorToStateMap.entrySet().iterator();
+		while (sensorIter.hasNext())
+		    {
+			Entry sensorToState = (Entry) sensorIter.next();
+			System.err.println("Sensor " + (String) sensorToState.getKey() + " has state " + (String) sensorToState.getValue()); 
+		    }
+

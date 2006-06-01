@@ -48,77 +48,63 @@
  */
 
 /**
- * The abstract Sensor class describes all the information in common for low level
- * and top level sensors.
+ * The Message can be sent to and from a mailbox. It consists off sender, receiver, type and the message content.
  *
  *
- * Created: Mon Apr  24 11:17:32 2006
+ * Created: Mon Apr  24 12:27:32 2006
  *
  * @author Oscar
  * @version 1.0
  */
 package org.supremica.manufacturingTables.controlsystemimplementation.Java;
 
-import java.util.List;
-import java.util.LinkedList;
-import java.util.HashMap;
-import java.util.Map;
-
-public abstract class Sensor
+public class Message
 {
-    protected String name;
-    private String description;
-    protected Map states; // HashMap will be used for quick access to the states
-    protected List sensors; 
-    // The order for the sensors (and hardwareConnections below) are not important but I allways iterate 
-    // through all elements in the list. Normally very few elements are used.
-    protected List hardwareConnections;
+    static final String [] TYPES = {"performEOP", "EOPDone", "requestState", "checkState", 
+				    "orderState", "monitorState", "reportState", "confirmState"};
+    private String type;
+    private Object content;
+    private String receiver;
+    private String sender;
 
-    public Sensor(String name)
+    public Message(String sender, String receiver, String type, Object content)
     {
-	this.name = name;
-	states = new HashMap(5); //initital capacity 5 and default load factor (0,75) suits me fine
-	hardwareConnections = new LinkedList();
-	sensors = new LinkedList();
-    }
-
-    final public String getName()
-    {
-	return name;
-    }
-
-    final public void setDescription(String newDescription)
-    {
-	description = newDescription;
-    }
-   
-    final public String getDesciption()
-    {
-	return description;
+	this.content = content;
+	boolean typeOK = false;
+	for (int i=0; i<TYPES.length && !typeOK; i++)
+	    {
+		if (TYPES[i].equals(type))
+		    {
+			typeOK = true;
+		    }
+	    }
+	if (!typeOK)
+	    {
+		System.err.println("Wrong message type declared!");
+		return;
+	    }
+	this.type = type;
+	this.receiver = receiver;
+	this.sender = sender;
     }
     
-    final public void addState(String stateToAdd)
+    public String getType()
     {
-	states.put(stateToAdd, stateToAdd); 	
-	// Now Strings are used both as values and keys, but the value may in the future be a State object
-
+	return type;
     }
 
-    final public void addHardwareConnection(String hardwareConnectionToAdd)
+    public Object getContent()
     {
-	hardwareConnections.add(hardwareConnectionToAdd);
+	return content;
     }
-
-    final public void addSensor(Sensor sensorToAdd)
-    {
-	sensors.add(sensorToAdd);
-    }
-  
-    final public boolean hasState(String state)
-    {
-	return states.containsKey(state); // containsValue are more expensive than containsKey
-    }
-
-    abstract public String requestState(); 
     
+    public String getSender()
+    {
+	return sender;
+    }
+
+    public String getReceiver()
+    {
+	return receiver;
+    }
 }

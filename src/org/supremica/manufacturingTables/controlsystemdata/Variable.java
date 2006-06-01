@@ -60,17 +60,16 @@ package org.supremica.manufacturingTables.controlsystemdata;
 
 import java.util.List;
 import java.util.LinkedList;
-//import java.io.*;
 
-
-//Should the values really be Strings and not boolean, integers and so on. Strings may take to much time?
+// Should the values really be Strings and not boolean, integers and so on. Strings may take to much time? 
+// Could use hashvalue too.
 
 public class Variable
 {
     private String name;
-    private List values;
-    //private String type;
-    //private int nbrOfValues:
+    private List values; 
+    // The order for the values are not important but I allways iterate through all values.
+    // Normally very few elements are used.
 
     public Variable(String name)
     {

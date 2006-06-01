@@ -49,7 +49,7 @@
 
 /**
  * The MachineController class at this level does not contain any information since the Machine 
- * holds information about alla parts.
+ * holds information about all parts.
  *
  * Created: Mon Apr  24 14:20:32 2006
  *
@@ -58,25 +58,11 @@
  */
 package org.supremica.manufacturingTables.controlsystemdata;
 
-//import java.io.*;
-
 public class MachineController
 {
-    //    private Mailbox mailbox;
     
     public MachineController()
     {
-	//mailbox = null;
     }
-
-//     public Mailbox getMailbox()
-//     {
-// 	return mailbox;
-//     }
-
-//     public void setMailbox(Mailbox newMailbox)
-//     {
-// 	mailbox = newMailbox;
-//     }
 
 }

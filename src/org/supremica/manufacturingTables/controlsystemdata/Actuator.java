@@ -61,64 +61,19 @@ package org.supremica.manufacturingTables.controlsystemdata;
 
 import java.util.List;
 import java.util.LinkedList;
-//import java.io.*;
 
-public class Actuator implements EquipmentInterface, EquipmentContainer
+public class Actuator extends Equipment
 {
-    private String name;
-    private String description;
-    private List actuators;
-    private List sensors;
-    private List states;
-    private List hardwareConnections;
-    //    private Mailbox mailbox;
+    private List actuators; 
+    // The order for the actuators are not important but I allways iterate through all elements.
+    // Normally very few elements are used.
     
     public Actuator(String name)
     {
-	this.name = name;
-	description = null;
-	states = new LinkedList();
+	super(name);
 	actuators = new LinkedList();
-	sensors = new LinkedList();
-	hardwareConnections = new LinkedList();
-	//mailbox = null;
-    }
-
-    public String getName()
-    {
-	return name;
-    }
-
-    public void setDescription(String newDescription)
-    {
-	description = newDescription;
-    }
-     
-    public String getDesciption()
-    {
-	return description;
     }
     
-//     public Mailbox getMailbox()
-//     {
-// 	return mailbox;
-//     }
-
-//     public void setMailbox(Mailbox newMailbox)
-//     {
-// 	mailbox = newMailbox;
-//     }
-
-    public List getStates()
-    {
-	return states;
-    }
-  
-    public void addState(String stateToAdd)
-    {
-	states.add(stateToAdd);
-    }
-
     public List getActuators()
     {
 	return actuators;
@@ -129,24 +84,5 @@ public class Actuator implements EquipmentInterface, EquipmentContainer
 	actuators.add(actuatorToAdd);
     }
 
-    public List getSensors()
-    {
-	return sensors;
-    }
-  
-    public void addSensor(Sensor sensorToAdd)
-    {
-	actuators.add(sensorToAdd);
-    }
-
-    public List getHardwareConnections()
-    {
-	return hardwareConnections;
-    }
-  
-    public void addHardwareConnection(String hardwareConnectionToAdd)
-    {
-	hardwareConnections.add(hardwareConnectionToAdd);
-    }
 
 }

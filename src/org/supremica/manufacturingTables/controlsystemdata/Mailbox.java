@@ -49,7 +49,7 @@
 
 /**
  * The Mailbox class at this level does not contain any information since the Machine 
- * holds information about alla parts.
+ * holds information about all parts.
  *
  *
  * Created: Mon Apr  24 12:27:32 2006
@@ -59,50 +59,12 @@
  */
 package org.supremica.manufacturingTables.controlsystemdata;
 
-//import java.util.List;
-//import java.io.*;
 
 public class Mailbox
 {
-    //private MachineController machineController;
-    //private List sensors;
-    //private List actuators;
 
     public Mailbox()
     {
-	//machineController = null;
-	//actuators = null;
-	//sensors = null;
     }
-
-//     public MachineController getMachineController()
-//     {
-// 	return machineController;
-//     }
-   
-//     public void setMachineController(MachineController newMachineController)
-//     {
-// 	machineController = newMachineController;
-//     }
-    
-//     public List getActuators()
-//     {
-// 	return actuators;
-//     }
-  
-//     public void addActuator(Actuator actuatorToAdd)
-//     {
-// 	actuators.add(actuatorToAdd);
-//     }
-
-//     public List getSensors()
-//     {
-// 	return sensors;
-//     }
-  
-//     public void addSensor(Sensor sensorToAdd)
-//     {
-// 	actuators.add(sensorToAdd);
-//     }
 
 }

@@ -48,77 +48,88 @@
  */
 
 /**
- * The abstract Sensor class describes all the information in common for low level
- * and top level sensors.
+ * The abstract class Equipment states the methods and data that equipment (for instance sensors and actuators) 
+ * have in common.
  *
- *
- * Created: Mon Apr  24 11:17:32 2006
+ * Created: Wen May  03 13:39:32 2006
  *
  * @author Oscar
  * @version 1.0
  */
-package org.supremica.manufacturingTables.controlsystemimplementation.Java;
+package org.supremica.manufacturingTables.controlsystemdata;
 
 import java.util.List;
 import java.util.LinkedList;
-import java.util.HashMap;
-import java.util.Map;
 
-public abstract class Sensor
+abstract public class Equipment implements EquipmentContainer
 {
+    
     protected String name;
     private String description;
-    protected Map states; // HashMap will be used for quick access to the states
+    //private List actuators;
     protected List sensors; 
-    // The order for the sensors (and hardwareConnections below) are not important but I allways iterate 
-    // through all elements in the list. Normally very few elements are used.
+    // The order for the sensors (and states and hardwareConnections below) are not important but I allways 
+    // iterate through all elements in the List. Normally very few elements are used.
+    protected List states;
     protected List hardwareConnections;
-
-    public Sensor(String name)
+    
+    public Equipment(String name)
     {
 	this.name = name;
-	states = new HashMap(5); //initital capacity 5 and default load factor (0,75) suits me fine
-	hardwareConnections = new LinkedList();
+	description = null;
+	states = new LinkedList();
+	//actuators = new LinkedList();
 	sensors = new LinkedList();
+	hardwareConnections = new LinkedList();
     }
 
     final public String getName()
     {
-	return name;
+ 	return name;
     }
 
     final public void setDescription(String newDescription)
     {
 	description = newDescription;
     }
-   
-    final public String getDesciption()
+     
+    final public String getDescription()
     {
 	return description;
     }
-    
+     
+
+    final public List getStates()
+    {
+	return states;
+    }
+  
     final public void addState(String stateToAdd)
     {
-	states.put(stateToAdd, stateToAdd); 	
-	// Now Strings are used both as values and keys, but the value may in the future be a State object
-
+	states.add(stateToAdd);
     }
 
+    abstract public void addActuator(Actuator actuatorToAdd);
+
+    public List getSensors()
+    {
+	return sensors;
+    }
+  
+    public void addSensor(Sensor sensorToAdd)
+    {
+	sensors.add(sensorToAdd);
+    }
+
+    final public List getHardwareConnections()
+    {
+	return hardwareConnections;
+    }
+  
     final public void addHardwareConnection(String hardwareConnectionToAdd)
     {
 	hardwareConnections.add(hardwareConnectionToAdd);
     }
-
-    final public void addSensor(Sensor sensorToAdd)
-    {
-	sensors.add(sensorToAdd);
-    }
-  
-    final public boolean hasState(String state)
-    {
-	return states.containsKey(state); // containsValue are more expensive than containsKey
-    }
-
-    abstract public String requestState(); 
-    
 }
+
+

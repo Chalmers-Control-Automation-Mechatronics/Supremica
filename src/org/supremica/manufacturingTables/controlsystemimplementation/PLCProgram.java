@@ -48,77 +48,24 @@
  */
 
 /**
- * The abstract Sensor class describes all the information in common for low level
- * and top level sensors.
+ * The ControlSystemImplementationBuilder abstract class is used to build a PLCProgram 
+ * from the ControlSystemData.
  *
  *
- * Created: Mon Apr  24 11:17:32 2006
+ * Created: Fri May 12 10:21:59 2006
  *
  * @author Oscar
  * @version 1.0
  */
-package org.supremica.manufacturingTables.controlsystemimplementation.Java;
+package org.supremica.manufacturingTables.controlsystemimplementation;
 
-import java.util.List;
-import java.util.LinkedList;
-import java.util.HashMap;
-import java.util.Map;
-
-public abstract class Sensor
-{
-    protected String name;
-    private String description;
-    protected Map states; // HashMap will be used for quick access to the states
-    protected List sensors; 
-    // The order for the sensors (and hardwareConnections below) are not important but I allways iterate 
-    // through all elements in the list. Normally very few elements are used.
-    protected List hardwareConnections;
-
-    public Sensor(String name)
-    {
-	this.name = name;
-	states = new HashMap(5); //initital capacity 5 and default load factor (0,75) suits me fine
-	hardwareConnections = new LinkedList();
-	sensors = new LinkedList();
-    }
-
-    final public String getName()
-    {
-	return name;
-    }
-
-    final public void setDescription(String newDescription)
-    {
-	description = newDescription;
-    }
-   
-    final public String getDesciption()
-    {
-	return description;
-    }
+abstract public class PLCProgram {
     
-    final public void addState(String stateToAdd)
-    {
-	states.put(stateToAdd, stateToAdd); 	
-	// Now Strings are used both as values and keys, but the value may in the future be a State object
-
-    }
-
-    final public void addHardwareConnection(String hardwareConnectionToAdd)
-    {
-	hardwareConnections.add(hardwareConnectionToAdd);
-    }
-
-    final public void addSensor(Sensor sensorToAdd)
-    {
-	sensors.add(sensorToAdd);
-    }
-  
-    final public boolean hasState(String state)
-    {
-	return states.containsKey(state); // containsValue are more expensive than containsKey
-    }
-
-    abstract public String requestState(); 
+//     public PLCProgram()
+// 	{
+	    
+// 	}
     
+    abstract public void run();
 }
+
