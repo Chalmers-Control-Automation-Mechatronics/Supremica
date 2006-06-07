@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.35 2006-05-24 09:13:02 markus Exp $
+//# $Id: ModuleCompiler.java,v 1.36 2006-06-07 01:24:28 martin Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -884,7 +884,7 @@ public class ModuleCompiler
 
 	private BinaryExpressionProxy findAction(String name,
 			List<List<BinaryExpressionProxy>> actionLists) {
-		//TODO: check that only one automtata updates each variable.
+		//TODO: check that only one automaton updates each variable.
 		for (List<BinaryExpressionProxy> actions : actionLists){
 		for (BinaryExpressionProxy action : actions) {
 			if (((SimpleIdentifierProxy) action.getLeft()).
@@ -1118,8 +1118,10 @@ public class ModuleCompiler
 		String guardString= new String("true");
 		for (TransitionProxy transition : path) {
 			if (mEFATransitionGuardActionBlockMap.get(transition) != null) {
-				guardString = guardString + "&" + mEFATransitionGuardActionBlockMap
-						.get(transition).getGuard();
+				String partialGuardString = mEFATransitionGuardActionBlockMap
+				.get(transition).getGuard();
+				if(removeBlanks(partialGuardString).equals("")) continue;
+				guardString = guardString + "&" + partialGuardString;
 			}
 	
 		}
@@ -1700,7 +1702,23 @@ public class ModuleCompiler
 			throw new TypeMismatchException(value, typename);
 		}
 	}
-
+	
+	 private String removeBlanks(String str) {
+		  	if(str.equals("")) return "";
+			int i = 0;
+			char c = str.charAt(0);
+			while(isWhitespace(c)) {
+				i++;
+				if(i == str.length()) return "";
+				c = str.charAt(i);
+			}
+			return str.substring(i);
+		}
+	 
+	 private boolean isWhitespace(final int ch)
+	  {
+	    return ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r';
+	  }
 
 	//#########################################################################
 	//# Inner Class NameCompiler

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="Waters" xmlns="http://waters.sourceforge.net/xsd/module">
+    <EventDeclList>
+        <EventDecl Kind="CONTROLLABLE" Observable="true" Name="e1"/>
+        <EventDecl Kind="CONTROLLABLE" Observable="true" Name="e2"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="PLANT">
+            <SimpleIdentifier Name="A"/>
+            <Graph Deterministic="true">
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <PointGeometry>
+                            <Point X="112" Y="240"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Initial="false" Name="s1">
+                        <PointGeometry>
+                            <Point X="208" Y="128"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Initial="false" Name="s2">
+                        <PointGeometry>
+                            <Point X="288" Y="320"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="s0" Target="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point X="112" Y="240"/>
+                        </StartPointGeometry>
+                        <SplineGeometry Kind="INTERPOLATING">
+                            <Point X="160" Y="184"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point X="208" Y="128"/>
+                        </EndPointGeometry>
+                        <GuardActionBlock>
+                            <Guard>true</Guard>
+                            <Action/>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="s0" Target="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e2"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point X="112" Y="240"/>
+                        </StartPointGeometry>
+                        <SplineGeometry Kind="INTERPOLATING">
+                            <Point X="200" Y="280"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point X="288" Y="320"/>
+                        </EndPointGeometry>
+                        <GuardActionBlock>
+                            <Guard>false</Guard>
+                            <Action/>
+                        </GuardActionBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>
+

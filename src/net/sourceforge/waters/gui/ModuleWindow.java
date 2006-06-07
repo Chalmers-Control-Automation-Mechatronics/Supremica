@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleWindow
 //###########################################################################
-//# $Id: ModuleWindow.java,v 1.47 2006-05-24 13:41:28 martin Exp $
+//# $Id: ModuleWindow.java,v 1.48 2006-06-07 01:24:28 martin Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -68,6 +68,7 @@ import net.sourceforge.waters.model.module.VariableProxy;
 import net.sourceforge.waters.model.printer.ProxyPrinter;
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.base.NamedSubject;
+import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.module.ForeachSubject;
 import net.sourceforge.waters.subject.module.InstanceSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
@@ -408,131 +409,10 @@ public class ModuleWindow
 
 		// TODO - Add logging to file
 	}
-
-	private DefaultMutableTreeNode makeTreeFromComponent(AbstractSubject e)
-	{
-		final String text = mPrinter.toString(e);
-		final Object userobject = new ComponentInfo(text, e);
-		if (e instanceof SimpleComponentSubject) {
-			SimpleComponentSubject component = (SimpleComponentSubject) e;
-			DefaultMutableTreeNode compNode = new DefaultMutableTreeNode(userobject, true);
-			List<VariableProxy> variables = component.getVariables();
-			for(VariableProxy variable: variables) {
-				compNode.add(makeTreeFromComponent((VariableSubject) variable));
-			}
-			//return new DefaultMutableTreeNode(userobject, false);
-			return compNode;
-		} else if(e instanceof VariableSubject) {
-			return new DefaultMutableTreeNode(userobject, false);
-		} else if (e instanceof InstanceSubject) {
-			final InstanceSubject inst = (InstanceSubject) e;
-			final DefaultMutableTreeNode tmp =
-				new DefaultMutableTreeNode(userobject, true);
-			final List<ParameterBindingSubject> bindings =
-				inst.getBindingListModifiable() ;
-			for (final ParameterBindingSubject binding : bindings) {
-				tmp.add(makeTreeFromComponent(binding));
-			}
-			return tmp;
-		} else if (e instanceof ParameterBindingSubject) {
-			return new DefaultMutableTreeNode(userobject, false);
-		} else if (e instanceof ForeachSubject) {
-			final ForeachSubject foreach = (ForeachSubject) e;
-			final DefaultMutableTreeNode tn =
-				new DefaultMutableTreeNode(userobject, true);
-			final List<AbstractSubject> body = foreach.getBodyModifiable();
-			for (final AbstractSubject item : body) {
-				tn.add(makeTreeFromComponent(item));
-			}
-			return tn;
-		} else {
-			throw new IllegalArgumentException
-				("Don't know how to make tree from subject of type " +
-				 e.getClass().getName() + "!");
-		}
-	}
-
+	
 	public JPanel createContentPane()
 	{
-		final ArrayList l;
-		DefaultMutableTreeNode treeNode = null;
-
-		if (module != null)
-		{
-			l = new ArrayList(module.getComponentList());
-			treeNode = new DefaultMutableTreeNode(new ComponentInfo("Module: " + module.getName(), null));
-		}
-		else
-		{
-			l = new ArrayList();
-			treeNode = null;
-		}
-
-		for (int i = 0; i < l.size(); i++)
-		{
-			treeNode.add(makeTreeFromComponent((AbstractSubject) (l.get(i))));
-		}
-
-		rootNode = treeNode;
-		treeModel = new DefaultTreeModel(rootNode);
-
-		//TODO: Put some proper icons in place!
-		final ImageIcon plantIcon = new ImageIcon(ModuleWindow.class.getResource("/icons/waters/plant.gif"));
-		final ImageIcon specIcon = new ImageIcon(ModuleWindow.class.getResource("/icons/waters/spec.gif"));
-		final ImageIcon propertyIcon = new ImageIcon(ModuleWindow.class.getResource("/icons/waters/property.gif"));
-		final ImageIcon foreachIcon = null;
-		final ImageIcon instanceIcon = new ImageIcon(ModuleWindow.class.getResource("/icons/waters/instance.gif"));
-		final ImageIcon bindingIcon = null;
-
-		moduleSelectTree = new JTree(treeModel);
-
-		moduleSelectTree.setCellRenderer(new ModuleTreeRenderer(foreachIcon, plantIcon, propertyIcon, specIcon, instanceIcon, bindingIcon));
-		moduleSelectTree.setEditable(false);
-		moduleSelectTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-
-		DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer();
-
-		//renderer.setLeafIcon(simpleIcon);
-		//renderer.setOpenIcon(null);
-		//renderer.setClosedIcon(null);
-		//moduleSelectTree.setCellRenderer(renderer);
-		MouseListener ml = new MouseAdapter()
-		{
-			EditorWindow ed = null;
-
-			public void mousePressed(MouseEvent e)
-			{
-				int selRow = moduleSelectTree.getRowForLocation(e.getX(), e.getY());
-				TreePath selPath = moduleSelectTree.getPathForLocation(e.getX(), e.getY());
-
-				if (selRow != -1)
-				{
-					if (e.getClickCount() == 2)
-					{
-						DefaultMutableTreeNode node = (DefaultMutableTreeNode) moduleSelectTree.getLastSelectedPathComponent();
-
-						if (node == null)
-						{
-							return;
-						}
-
-						Object nodeInfo = node.getUserObject();
-						AbstractSubject abstractComponent = (((ComponentInfo) nodeInfo).getComponent());
-						if (abstractComponent instanceof SimpleComponentSubject)
-						{
-							SimpleComponentSubject scp = (SimpleComponentSubject) abstractComponent;
-
-							if (scp != null)
-							{
-								ed = new EditorWindow(scp.getName() + " - Waters Editor", module, scp, ModuleWindow.this, ModuleWindow.this);
-							}
-						}
-					}
-				}
-			}
-		};
-
-		moduleSelectTree.addMouseListener(ml);
+		moduleSelectTree = new ModuleTree(this);
 
 		JPanel buttonpanel = new JPanel();
 
@@ -708,6 +588,55 @@ public class ModuleWindow
 
 			logEntry("New Simple Component requested");
 		}
+		
+		if("add variable".equals(e.getActionCommand())) {
+			//add new variable
+			logEntry("New variable requested");
+			TreePath currentSelection = moduleSelectTree.getSelectionPath();
+			if (currentSelection != null) 
+			{
+				// Get the node in the tree
+				DefaultMutableTreeNode targetNode = (DefaultMutableTreeNode)
+					(currentSelection.getLastPathComponent());
+				Subject component = ((ComponentInfo) 
+						targetNode.getUserObject()).getComponent();
+				
+				if(component instanceof VariableSubject) {
+					component = component.getParent().getParent();
+					EditorEditVariableDialog.showDialog(null,
+							(SimpleComponentSubject) component, moduleSelectTree);
+				} else if(component instanceof SimpleComponentSubject) {
+					EditorEditVariableDialog.showDialog(null,
+							(SimpleComponentSubject) component, moduleSelectTree);
+				} else {
+					System.err.println("ModuleWindow.actionPerformed(): " +
+							"'add variable' performed by illegal node type");
+				}
+			}
+		}
+		
+		if("edit variable".equals(e.getActionCommand())) {
+			//edit existing variable
+			logEntry("Editing of variable requested");
+			TreePath currentSelection = moduleSelectTree.getSelectionPath();
+			if (currentSelection != null) 
+			{
+				// Get the node in the tree
+				DefaultMutableTreeNode targetNode = (DefaultMutableTreeNode)
+					(currentSelection.getLastPathComponent());
+				Subject component = ((ComponentInfo) 
+						targetNode.getUserObject()).getComponent();
+				
+				if(component instanceof VariableSubject) {
+					Subject parent = component.getParent().getParent();
+					EditorEditVariableDialog.showDialog((VariableSubject) component,
+							(SimpleComponentSubject) parent, moduleSelectTree);
+				} else {
+					System.err.println("ModuleWindow.actionPerformed(): " +
+							"'edit variable' performed by illegal node type");
+				}
+			}
+		}
 
 		if ("newforeach".equals(e.getActionCommand()))
 		{
@@ -725,6 +654,20 @@ public class ModuleWindow
 				int depth = currentSelection.getPathCount()-1;
 				// Get the node in the tree
 				DefaultMutableTreeNode targetNode = (DefaultMutableTreeNode) (currentSelection.getLastPathComponent());
+				
+				//Special treatment for variables
+				AbstractSubject component = ((ComponentInfo) 
+						targetNode.getUserObject()).getComponent();
+				if(component instanceof VariableSubject) {
+					//remove from model (take getParent()x2 because a variableSubject is the child of a list.)
+					((SimpleComponentSubject) component.getParent().getParent())
+						.getVariablesModifiable().remove(component);
+					
+					//remove from module tree view
+					moduleSelectTree.removeCurrentNode();
+					return;
+				}
+				
 				// Find the way to the component in the module
 				ListSubject<AbstractSubject> rootList = module.getComponentListModifiable();
 				ListSubject<AbstractSubject> currentList = rootList;
@@ -746,12 +689,7 @@ public class ModuleWindow
 				currentList.remove(((ComponentInfo) targetNode.getUserObject()).getComponent());
 
 				// Remove the component visually
-				MutableTreeNode parent = (MutableTreeNode) (targetNode.getParent());
-				if (parent != null) 
-				{
-					treeModel.removeNodeFromParent(targetNode);
-					return;
-				}
+				moduleSelectTree.removeCurrentNode();
 			}
 			
 			logEntry("Remove Component requested");
@@ -934,9 +872,9 @@ public class ModuleWindow
 			if (parentPath == null)
 			{
 				//There's no selection. Default to the root node.
-				parentNode = rootNode;
+				parentNode = ((ModuleTree) moduleSelectTree).getRoot();
 
-				moduleSelectTree.expandPath(new TreePath(rootNode.getPath()));
+				moduleSelectTree.expandPath(new TreePath(parentNode.getPath()));
 			}
 			else
 			{
@@ -955,28 +893,7 @@ public class ModuleWindow
 			{
 				module.getComponentListModifiable().add(o);
 			}
-
-			// We don't want InstanceSubject components having children
-			if (!(ci.getComponent() instanceof ForeachSubject) &&!(o instanceof ParameterBindingSubject))
-			{
-				parentNode = rootNode;
-			}
-
-			if (!(ci.getComponent() instanceof InstanceSubject) && (o instanceof ParameterBindingSubject))
-			{
-				return;
-			}
-
-			//constructWindow();
-			DefaultMutableTreeNode newChild = makeTreeFromComponent((AbstractSubject) o);
-
-			treeModel.insertNodeInto(newChild, parentNode, treeModel.getChildCount(parentNode));
-
-			if (o instanceof ForeachSubject)
-			{
-				moduleSelectTree.expandPath(new TreePath(newChild.getPath()));
-			}
-
+			
 			if ((o instanceof SimpleComponentSubject))
 			{
 				SimpleComponentSubject scp = (SimpleComponentSubject) o;
@@ -985,8 +902,9 @@ public class ModuleWindow
 
 				EditorWindow ed = new EditorWindow(scp.getName() + " - Waters Editor", module, scp, this, this);
 			}
-
-			moduleSelectTree.expandPath(new TreePath(parentNode.getPath()));
+			
+			//Add node to module tree
+			((ModuleTree) moduleSelectTree).addComponent(o);
 		}
 	}
 
@@ -1253,7 +1171,7 @@ public class ModuleWindow
 	private JMenuItem FileSaveAsMenu;
 	private JMenuItem FileExitMenu;
 	private JMenuItem analysisExportSupremicaMenu;
-	private JTree moduleSelectTree = null;
+	private ModuleTree moduleSelectTree = null;
 	private JButton newSimpleButton;
 	private JButton newForeachButton;
 	private JButton deleteComponentButton;
@@ -1268,10 +1186,8 @@ public class ModuleWindow
 	private JTextArea debugArea;
 	private JPanel debugPane = null;
 	private String debugText = "";
-	private DefaultMutableTreeNode rootNode = null;
 	private JList dataList = null;
 	private DefaultListModel data = null;
-	private DefaultTreeModel treeModel = null;
 	private boolean modified = true;
 	private JList paramdataList = null;
 	private DefaultListModel paramData = null;
