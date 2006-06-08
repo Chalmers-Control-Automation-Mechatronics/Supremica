@@ -192,7 +192,8 @@ public class EditorGuardActionBlock extends EditorLabelGroup
 		int y = e.getY();
 		if((e.getComponent().getParent() == this.panel ||
 				wasClicked(x,y)) && e.getClickCount() == 2) {
-			togglePanelCollapse();
+			//togglePanelCollapse();
+			EditorEditEdgeDialog.showDialog(this.getParent().getSubject());
 		}
 	}
 

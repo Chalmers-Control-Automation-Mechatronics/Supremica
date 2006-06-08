@@ -110,6 +110,18 @@ public class ModuleTree extends JTree {
 								ed = new EditorWindow(scp.getName() + " - Waters Editor", mModule, scp, mModuleWindow, mModuleWindow);
 							}
 						}
+						if (abstractComponent instanceof VariableSubject)
+						{
+							VariableSubject v = (VariableSubject) abstractComponent;
+							if (v != null)
+							{
+								SimpleComponentSubject component = (SimpleComponentSubject)
+										((ComponentInfo)((DefaultMutableTreeNode) node.getParent())
+										.getUserObject()).getComponent();
+
+								EditorEditVariableDialog.showDialog(v, component, mSelfRef);
+							}
+						}
 					}
 				}
 			}
@@ -215,8 +227,6 @@ public class ModuleTree extends JTree {
 				SimpleComponentSubject scp = (SimpleComponentSubject) o;
 				
 				mModuleWindow.logEntry("Adding SimpleComponentSubject: " + scp.getName());
-				
-				EditorWindow ed = new EditorWindow(scp.getName() + " - Waters Editor", mModule, scp, mModuleWindow, mModuleWindow);
 			}
 			
 			expandPath(new TreePath(parentNode.getPath()));

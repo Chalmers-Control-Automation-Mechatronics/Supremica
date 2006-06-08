@@ -159,6 +159,8 @@ implements ActionListener{
 		okButton.addActionListener(this);
 		buttonPanel.add(okButton);
 		
+		this.getRootPane().setDefaultButton(okButton);
+		
 		//cancel button
 		cancelButton = new JButton();
 		cancelButton.setText("Cancel");

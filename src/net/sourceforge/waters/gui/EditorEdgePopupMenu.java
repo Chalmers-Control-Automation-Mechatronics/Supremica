@@ -22,7 +22,8 @@ class EditorEdgePopupMenu
 
 	private JMenuItem deleteItem;
 	private JMenuItem recallItem;	
-	private JMenuItem flipItem;	
+	private JMenuItem flipItem;		
+	private JMenuItem editEdgeItem;	
 
 	public EditorEdgePopupMenu(ControlledSurface parent, EditorEdge edge)
 	{
@@ -39,6 +40,11 @@ class EditorEdgePopupMenu
 	{
 		JMenuItem item;
 
+		item = new JMenuItem("Edit Edge");
+		item.addActionListener(this);
+		this.add(item);
+		editEdgeItem = item;
+		
 		item = new JMenuItem("Delete edge");
 		item.addActionListener(this);
 		this.add(item);
@@ -77,6 +83,12 @@ class EditorEdgePopupMenu
 
 	public void actionPerformed(ActionEvent e) 
 	{
+		if (e.getSource() == editEdgeItem)
+		{
+			EditorEditEdgeDialog.showDialog(edge.getSubject());
+			this.hide();
+		}
+
 		if (e.getSource() == deleteItem)
 		{
 			Command deleteEdge = new DeleteEdgeCommand(parent, edge);

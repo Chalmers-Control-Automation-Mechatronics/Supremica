@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.68 2006-05-23 13:21:20 martin Exp $
+//# $Id: ControlledSurface.java,v 1.69 2006-06-08 15:33:01 martin Exp $
 //###########################################################################
  
 package net.sourceforge.waters.gui;
@@ -202,6 +202,14 @@ public class ControlledSurface
 					selectedObjects.add(o);
 				}
 			}
+			if (o.getType() == EditorObject.GUARDACTIONBLOCK)
+			{
+				EditorLabelGroup l = (EditorLabelGroup)o;
+				if (!selectedObjects.contains(l.getParent()))
+				{
+					selectedObjects.add(o);
+				}
+			}
 			if (o.getType() == EditorObject.NODEGROUP)
 			{
 				selectedObjects.add(o);
@@ -323,7 +331,7 @@ public class ControlledSurface
 					EditorEdgePopupMenu popup = new EditorEdgePopupMenu(this, object);
 					popup.show(this, e.getX(), e.getY());
 				}
-				if (o.getType() == EditorObject.LABELGROUP) {
+				if (o.getType() == EditorObject.LABELGROUP || o.getType() == EditorObject.GUARDACTIONBLOCK) {
 					EditorLabelGroup object =
 						(EditorLabelGroup) o;
 					
@@ -1233,6 +1241,16 @@ public class ControlledSurface
 						}
 						// Is it a labelgroup?
 						else if (object.getType() == EditorObject.LABELGROUP) // Don't move
+						{
+							EditorLabelGroup labelGroup = (EditorLabelGroup) object;
+							
+							//labelGroup.moveTo(labelGroup.getX() + dx, labelGroup.getY() + dy);
+							//labelGroup.setX(labelGroup.getX() + dx);
+							//labelGroup.setY(labelGroup.getY() + dy);
+							labelGroup.setOffset(labelGroup.getOffsetX() + dx, labelGroup.getOffsetY() + dy);
+						}
+						// Is it a guardActionBlock?
+						else if (object.getType() == EditorObject.GUARDACTIONBLOCK) // Don't move
 						{
 							EditorLabelGroup labelGroup = (EditorLabelGroup) object;
 							
