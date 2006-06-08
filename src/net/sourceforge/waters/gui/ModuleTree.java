@@ -330,4 +330,15 @@ public class ModuleTree extends JTree {
 	public DefaultMutableTreeNode getRoot() {
 		return mRootNode;
 	}
+
+	public void updateSelectedNode() {
+		TreePath selPath = this.getSelectionPath();
+		DefaultMutableTreeNode node = (DefaultMutableTreeNode) 
+			selPath.getLastPathComponent();
+		AbstractSubject c = ((ComponentInfo) node.getUserObject())
+		.getComponent();
+		String name = mPrinter.toString(c);
+		node.setUserObject(new ComponentInfo(name, c));
+		this.updateUI();
+	}
 }

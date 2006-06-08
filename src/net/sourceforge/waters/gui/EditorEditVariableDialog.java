@@ -27,10 +27,13 @@ import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 public class EditorEditVariableDialog extends JDialog
 implements ActionListener{
 	private static final int FIELDWIDTH = 100;
+	private static final int DEFAULTLOWERINT = 0;
+	private static final int DEFAULTUPPERINT = 1;
+	private static final int DEFAULTINITIALINT = 0;
+	private static final boolean DEFAULTBOOLEANINITIAL = false;
 	JComboBox typeSelector;
 	JLabel lName, lType;
 	JTextField name, rangeLower, rangeUpper, integerInitial, integerMarked;
-	JCheckBox booleanUseMarking, integerUseMarking;
 	JComboBox booleanInitial, booleanMarked;
 	JButton cancelButton, okButton;
 	JSeparator separator;
@@ -98,12 +101,6 @@ implements ActionListener{
 		layout.setConstraints(separator, con);
 		add(separator);
 		
-		//items to be added to the type-specific panels
-		booleanUseMarking = new JCheckBox("Use marking");
-		booleanUseMarking.addActionListener(this);
-		integerUseMarking = new JCheckBox("Use marking");
-		integerUseMarking.addActionListener(this);
-		
 		//setup editor panel for integer variables
 		createIntegerPanel();
 		con.gridx = 1;
@@ -170,8 +167,6 @@ implements ActionListener{
 		cancelButton.addActionListener(this);
 		buttonPanel.add(cancelButton);
 		
-		updateUseMarking();
-		
 		pack();
 		this.setResizable(false);
 		setVisible(true);
@@ -186,13 +181,7 @@ implements ActionListener{
 			integerPanel.setVisible(false);
 			booleanPanel.setVisible(true);
 		}
-		
-		//resize
-		//this.setVisible(false);
-		//this.setResizable(true);
 		pack();
-		//this.setResizable(false);
-		//setVisible(true);
 	}
 	
 	private void createBooleanPanel() {
@@ -214,16 +203,11 @@ implements ActionListener{
 		booleanPanel.add(lInitial);
 		
 		con.gridy = 2;
-		con.gridwidth = 2;
-		layout.setConstraints(booleanUseMarking, con);
-		booleanPanel.add(booleanUseMarking);
-		con.gridwidth = 1;
-		
-		con.gridy = 3;
 		layout.setConstraints(lMarked, con);
 		booleanPanel.add(lMarked);
-		
+
 		final String[] booleanValues = {"true", "false"};
+		final String[] booleanValuesExt = {"none", "true", "false"};
 		con.gridx = 2;
 		con.gridy = 1;
 		con.weightx = 1;
@@ -232,8 +216,8 @@ implements ActionListener{
 		layout.setConstraints(booleanInitial, con);
 		booleanPanel.add(booleanInitial);
 		
-		con.gridy = 3;
-		booleanMarked = new JComboBox(booleanValues);
+		con.gridy = 2;
+		booleanMarked = new JComboBox(booleanValuesExt);
 		layout.setConstraints(booleanMarked, con);
 		booleanPanel.add(booleanMarked);
 		
@@ -246,15 +230,16 @@ implements ActionListener{
 			}
 			//set marked value
 			if(mVariable.getMarkedValue() != null) {
-				booleanUseMarking.setSelected(true);
 				if(((BooleanConstantSubject) mVariable.getMarkedValue()).isValue()) {
 					booleanMarked.setSelectedItem("true");
 				} else {
 					booleanMarked.setSelectedItem("false");
 				}
 			} else {
-				booleanUseMarking.setSelected(false);
+				booleanMarked.setSelectedItem("none");
 			}
+		} else {
+			booleanInitial.setSelectedItem(Boolean.toString(DEFAULTBOOLEANINITIAL));
 		}
 	}
 	
@@ -282,12 +267,6 @@ implements ActionListener{
 		integerPanel.add(lInitial);
 		
 		con.gridy = 3;
-		con.gridwidth = 2;
-		layout.setConstraints(integerUseMarking, con);
-		integerPanel.add(integerUseMarking);
-		con.gridwidth = 1;
-		
-		con.gridy = 4;
 		layout.setConstraints(lMarked, con);
 		integerPanel.add(lMarked);
 		
@@ -323,7 +302,7 @@ implements ActionListener{
 		layout.setConstraints(integerInitial, con);
 		integerPanel.add(integerInitial);
 		
-		con.gridy = 4;
+		con.gridy = 3;
 		integerMarked = new JTextField();
 		layout.setConstraints(integerMarked, con);
 		integerPanel.add(integerMarked);
@@ -342,13 +321,19 @@ implements ActionListener{
 			
 			//set marked value
 			if(mVariable.getMarkedValue() != null) {
-				integerUseMarking.setSelected(true);
 				integerMarked.setText(Integer.toString(
 						((IntConstantProxy) mVariable.getMarkedValue()).getValue()));
 				
-			} else {
-				integerUseMarking.setSelected(false);
 			}
+		} else {
+			//enter default values
+			//set range values
+			rangeLower.setText(Integer.toString(DEFAULTLOWERINT));
+			rangeUpper.setText(Integer.toString(DEFAULTUPPERINT));
+			
+			//set initial value
+			integerInitial.setText(Integer.toString(DEFAULTINITIALINT));
+			
 		}
 	}
 	
@@ -383,9 +368,9 @@ implements ActionListener{
 							JOptionPane.ERROR_MESSAGE);
 					return;
 				}
-				if(integerUseMarking.isSelected()) {
+				if(!integerMarked.getText().trim().equals("")) {
 					try {
-						intMarked = new Integer(integerMarked.getText());
+						intMarked = new Integer(integerMarked.getText().trim());
 					}
 					catch(NumberFormatException ex) {
 						JOptionPane.showMessageDialog(this,
@@ -394,6 +379,20 @@ implements ActionListener{
 								JOptionPane.ERROR_MESSAGE);
 						return;
 					}
+					if(intMarked < intLower || intMarked > intUpper) {
+						JOptionPane.showMessageDialog(this,
+								"Error: Marked value outside specified range",
+								"Input error",
+								JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+				}
+				if(intInitial < intLower || intInitial > intUpper) {
+					JOptionPane.showMessageDialog(this,
+							"Error: Initial value outside specified range",
+							"Input error",
+							JOptionPane.ERROR_MESSAGE);
+					return;
 				}
 			}
 			SimpleExpressionSubject type = typeSelector.getSelectedItem().equals("integer")
@@ -406,14 +405,14 @@ implements ActionListener{
 		    SimpleExpressionSubject initial, marked;
 		    if(type instanceof BinaryExpressionProxy) {
 		    	initial = mFactory.createIntConstantProxy(intInitial);
-		    	if(integerUseMarking.isSelected()) {
+		    	if(!integerMarked.getText().trim().equals("")) {
 		    		marked = mFactory.createIntConstantProxy(intMarked);
 		    	} else {
 		    		marked = null;
 		    	}
 		    } else if(type instanceof SimpleIdentifierSubject) {
 		    	initial = mFactory.createBooleanConstantProxy(booleanInitial.getSelectedItem().equals("true"));
-		    	if(booleanUseMarking.isSelected()) {
+		    	if(!booleanMarked.getSelectedItem().equals("none")) {
 		    		marked = mFactory.createBooleanConstantProxy(booleanMarked.getSelectedItem().equals("true"));
 		    	} else {
 		    		marked = null;
@@ -430,40 +429,19 @@ implements ActionListener{
 		    	mTree.addVariable(mVariable);
 		    } else {
 		    	//edit existing variable
+		    	mVariable.setName(name.getText());
 		    	mVariable.setType(type);
 		    	mVariable.setInitialValue(initial);
 		    	mVariable.setMarkedValue(marked);
+		    	mTree.updateSelectedNode();
 		    }
 		    dispose();
 		}
 		if(e.getActionCommand().equals("Cancel")) {
 			dispose();
 		}
-		if(e.getSource().equals(integerUseMarking)) {
-			updateUseMarking();
-		}
-		if(e.getSource().equals(booleanUseMarking)) {
-			updateUseMarking();
-		}
 		if(e.getSource() == typeSelector) {
 			selectTypePanel();
 		}
 	}
-	
-	private void updateUseMarking() {
-		//update integer use marking
-		if(integerUseMarking.isSelected()) {
-			integerMarked.setEnabled(true);
-		} else {
-			integerMarked.setEnabled(false);
-		}
-		
-		//update boolean use marking
-		if(booleanUseMarking.isSelected()) {
-			booleanMarked.setEnabled(true);
-		} else {
-			booleanMarked.setEnabled(false);
-		}
-	}
-	
 }
