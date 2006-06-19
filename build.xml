@@ -117,7 +117,7 @@
 	<unjar src="${lib}/relaxngDatatype.jar" dest="${lib}/${unjared}"/>
 	<unjar src="${lib}/xsdlib.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/waters_jaxb.jar" dest="${lib}/${unjared}"/>		
-	<unjar src="${lib}/functionblocks_jaxb.jar" dest="${lib}/${unjared}"/>		
+	<unjar src="${lib}/fuber.jar" dest="${lib}/${unjared}"/>		
 	<unjar src="${lib}/automationobjects_jaxb.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/manufacturingTables_jaxb.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/itext.jar" dest="${lib}/${unjared}"/>		
@@ -232,7 +232,6 @@
         excludes="
 			${jgrafchart_basedir}/**,
 			${supremica_basedir}/external/robotCoordination/**,
-			${supremica_basedir}/functionblocks/xsd/**,
 			${supremica_basedir}/automationobjects/xsd/**"	
 		fork="true"
 		memoryMaximumSize="128M"
@@ -249,22 +248,6 @@
 		verbose="false"
 		nowarn="true"
 		includes="${supremica_basedir}/automationobjects/xsd/**"		
-		source="1.5"
-	/>
-</target>
-
-<target name="compile_functionblocks_jaxb">
-	<javac
-		debug="on"
-		debuglevel="source"
-		srcdir="${src}"
-		destdir="${build}"
-		classpath="${lib}/${unjared}"
-		includeJavaRuntime="yes"
-		deprecation="false"
-		verbose="false"
-		nowarn="true"
-		includes="${supremica_basedir}/functionblocks/xsd/**"		
 		source="1.5"
 	/>
 </target>
@@ -516,25 +499,6 @@
 	<unjar src="${lib}/automationobjects_jaxb.jar" dest="${lib}/${unjared}"/>		
 </target>
 
-<target name="jar_functionblocks_jaxb" depends="compile_functionblocks_jaxb">
-	<jar jarfile="${lib}/functionblocks_jaxb.jar"> 
-		<fileset dir="${build}/">
-			<include name="org/supremica/functionblocks/xsd/**"/>
-		</fileset>
-		<fileset dir="${src}/">
-			<include name="**/*.properties"/>
-			<include name="**/*.ser"/>
-		</fileset>
-	</jar>
-	<delete>
-		<fileset dir="${lib}">
-			<include name="org/supremica/functionblocks/xsd/**"/>
-		</fileset>
-	</delete>
-	<unjar src="${lib}/functionblocks_jaxb.jar" dest="${lib}/${unjared}"/>		
-</target>
-
-
 <target name="jar_manufacturingTables_jaxb" depends="compile_manufacturingTables_jaxb">
 	<jar jarfile="${lib}/manufacturingTables_jaxb.jar"> 
 		<fileset dir="${build}/">
@@ -585,10 +549,6 @@
 	<chmod file="${dist}/Supremica" perm="755"/>	
 	<copy file="${templates}/Supremica.cmd" todir="${dist}"/>	
 	<chmod file="${dist}/Supremica.cmd" perm="644"/>
-	<copy file="${templates}/FunctionblockViewer.cmd" todir="${dist}"/>	
-	<chmod file="${dist}/FunctionblockViewer.cmd" perm="644"/>
-	<copy file="${templates}/FunctionblockViewer" todir="${dist}"/>	
-	<chmod file="${dist}/FunctionblockViewer" perm="755"/>
 	<copy file="${templates}/FBRuntime" todir="${dist}"/>	
 	<chmod file="${dist}/FBRuntime" perm="755"/>
 	<copy file="${templates}/FBRuntime.cmd" todir="${dist}"/>	
@@ -746,7 +706,7 @@
 	</java>
 </target>
 <!--
-		packagenames="${supremica_basepackage}.automata.*,${supremica_basepackage}.gui.*,${supremica_basepackage}.util.*,${supremica_basepackage}.apps.*,${supremica_basepackage}.functionblocks.*"
+		packagenames="${supremica_basepackage}.automata.*,${supremica_basepackage}.gui.*,${supremica_basepackage}.util.*,${supremica_basepackage}.apps.*"
 -->
 
 <target name="doc_supremica">
