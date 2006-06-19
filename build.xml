@@ -549,10 +549,10 @@
 	<chmod file="${dist}/Supremica" perm="755"/>	
 	<copy file="${templates}/Supremica.cmd" todir="${dist}"/>	
 	<chmod file="${dist}/Supremica.cmd" perm="644"/>
-	<copy file="${templates}/FBRuntime" todir="${dist}"/>	
-	<chmod file="${dist}/FBRuntime" perm="755"/>
-	<copy file="${templates}/FBRuntime.cmd" todir="${dist}"/>	
-	<chmod file="${dist}/FBRuntime.cmd" perm="644"/>
+	<copy file="${templates}/Fuber" todir="${dist}"/>	
+	<chmod file="${dist}/Fuber" perm="755"/>
+	<copy file="${templates}/Fuber.cmd" todir="${dist}"/>	
+	<chmod file="${dist}/Fuber.cmd" perm="644"/>
 	<copy file="${templates}/manufacturingTablesTest" todir="${dist}"/>	
 	<chmod file="${dist}/manufacturingTablesTest" perm="755"/>
 	<copy file="${templates}/manufacturingTablesTest.cmd" todir="${dist}"/>	
