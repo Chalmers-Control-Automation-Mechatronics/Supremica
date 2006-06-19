@@ -452,6 +452,7 @@
 -->
 
 <target name="jar_supremica_lib">
+	<delete dir="${javalibs.dir}/META-INF"/>
 	<jar jarfile="${dist}/SupremicaLib.jar"> 
 		<fileset dir="${javalibs.dir}"/>		
 	</jar>

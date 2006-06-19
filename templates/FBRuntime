@@ -1,3 +1,3 @@
 #/bin/sh
 
-java -enableassertions org.supremica.functionblocks.model.FBRuntime  $*
+java -jar fuber.jar  $*
