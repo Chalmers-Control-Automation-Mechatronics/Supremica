@@ -1,3 +1,3 @@
 #/bin/sh
 
-java -jar fuber.jar  $*
+java -cp Supremica.jar:SupremicaLib.jar net.sourceforge.fuber.model.FBRuntime  $*

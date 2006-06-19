@@ -68,7 +68,7 @@ import org.supremica.manufacturingTables.xsd.factory.*;
 import org.supremica.manufacturingTables.xsd.eop.*;
 import org.supremica.manufacturingTables.management.*;
 import org.supremica.automationobjects.xsd.libraryelement.*;
-import org.supremica.functionblocks.xsd.libraryelement.*;
+import net.sourceforge.fuber.xsd.libraryelement.*;
 import org.supremica.manufacturingTables.controlsystemdata.*;
 
 public class ControlSystemDataBuilder

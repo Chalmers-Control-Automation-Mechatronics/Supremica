@@ -66,7 +66,7 @@ import javax.xml.bind.*;
 import org.supremica.manufacturingTables.xsd.factory.*;
 import org.supremica.manufacturingTables.management.*;
 import org.supremica.automationobjects.xsd.libraryelement.*;
-import org.supremica.functionblocks.xsd.libraryelement.*;
+import net.sourceforge.fuber.xsd.libraryelement.*;
 
 
 public class AutomationObjectsPLCProgramBuilder
@@ -345,7 +345,7 @@ public class AutomationObjectsPLCProgramBuilder
 			//FB.setInterfaceList(interfaceList);
 
 			// The FB needs to have versionInfo
-			//org.supremica.functionblocks.xsd.libraryelement.VersionInfoType versionInfo = objFactory.createVersionInfo();
+			//net.sourceforge.fuber.xsd.libraryelement.VersionInfoType versionInfo = objFactory.createVersionInfo();
 			//versionInfo.setOrganization("Chalmers");
 			//versionInfo.setVersion("0.1");
 			//versionInfo.setAuthor("Oscar Ljungkrantz");

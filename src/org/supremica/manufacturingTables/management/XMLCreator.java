@@ -64,7 +64,7 @@ package org.supremica.manufacturingTables.management;
 import java.io.*;
 import javax.xml.bind.*;
 import org.supremica.manufacturingTables.xsd.factory.*;
-import org.supremica.functionblocks.xsd.libraryelement.*;
+import net.sourceforge.fuber.xsd.libraryelement.*;
 import org.supremica.automationobjects.xsd.libraryelement.*;
 
 
@@ -77,7 +77,7 @@ public class XMLCreator
     {
 	try
 	    {
-		//jaxbContext = JAXBContext.newInstance("org.supremica.functionblocks.xsd.libraryelement");
+		//jaxbContext = JAXBContext.newInstance("net.sourceforge.fuber.xsd.libraryelement");
 		jaxbContext = JAXBContext.newInstance("org.supremica.automationobjects.xsd.libraryelement");
 		marshaller = jaxbContext.createMarshaller();
 		//You can tell the Marshaller to format the resulting XML data with line breaks and indentation. The following statement turns this output format property on -- line breaks and indentation will appear in the output format:
